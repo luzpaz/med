@@ -12,7 +12,7 @@
 
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(Med_Gen)
-#include CORBA_CLIENT_HEADER(SMESH_Mesh)
+//#include CORBA_CLIENT_HEADER(SMESH_Mesh)
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
 
 class MedGUI: public QObject
@@ -50,7 +50,7 @@ public:
   static Engines::Med_Gen_ptr InitMedGen(QAD_Desktop* parent);
 
   static bool DumpMesh( SALOME_MED::MESH_var aMesh );
-  static bool DumpSubMesh( SMESH::SMESH_subMesh_ptr aSubMesh ) ;
+  //  static bool DumpSubMesh( SMESH::SMESH_subMesh_ptr aSubMesh ) ;
   static bool DumpSubMesh( SALOME_MED::FAMILY_var Fam ) ;
 
   static void setOrb();

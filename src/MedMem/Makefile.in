@@ -9,7 +9,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:@srcdir@:@top_srcdir@/idl:$(top_builddir)/idl
+VPATH=.:@srcdir@:@top_srcdir@/idl:$(top_builddir)/idl:${KERNEL_ROOT_DIR}/idl/salome
 
 MACHINE=PCLINUX
 
@@ -51,6 +51,6 @@ LDFLAGS+=-lmedmem -lOpUtil -L${KERNEL_ROOT_DIR}/lib/salome
 # does we put only -lSalomeContainer and compiler retrieves -lSalomeNS -lRegistry -lOpUtil ????
 
 MED.hh MEDSK.cc: MED.idl
-	omniidl -bcxx -Wbtp $^
+	omniidl -bcxx -Wbtp -I$(top_builddir)/idl $^
 
 @CONCLUDE@

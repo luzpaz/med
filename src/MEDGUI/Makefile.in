@@ -11,7 +11,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl
+VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl:${KERNEL_ROOT_DIR}/idl/salome
 
 
 @COMMENCE@
@@ -33,8 +33,9 @@ LIB_MOC = MedGUI.h
 
 LIB_CLIENT_IDL = SALOMEDS.idl SALOME_Exception.idl \
                  Med_Gen.idl  MED.idl \
-		 SMESH_Mesh.idl SMESH_Hypothesis.idl SMESH_BasicHypothesis.idl \
-		 GEOM_Shape.idl SALOMEDS_Attributes.idl
+		 SALOMEDS_Attributes.idl
+#		 SMESH_Mesh.idl SMESH_Hypothesis.idl SMESH_BasicHypothesis.idl \
+#		 GEOM_Shape.idl SALOMEDS_Attributes.idl
 
 LIB_SERVER_IDL = 
 
@@ -47,6 +48,6 @@ LDFLAGS += -lSalomeGUI -lmedmem -lMEDImpl -lMedEngine -L${KERNEL_ROOT_DIR}/lib/s
 
 
 MED.hh MEDSK.cc: MED.idl
-	omniidl -bcxx -Wbtp $^
+	omniidl -bcxx -Wbtp -I$(top_builddir)/idl $^
 
 @CONCLUDE@

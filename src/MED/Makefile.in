@@ -11,7 +11,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl
+VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl:${KERNEL_ROOT_DIR}/idl/salome
 
 @COMMENCE@
 
@@ -40,6 +40,6 @@ LDFLAGS+=  $(OCC_LIBS) $(HDF5_LIBS) -lSalomeContainer -lSalomeHDFPersist -lSalom
 
 
 MED.hh MEDSK.cc: MED.idl
-	omniidl -bcxx -Wbtp $^
+	omniidl -bcxx -Wbtp -I$(top_builddir)/idl $^
 
 @CONCLUDE@

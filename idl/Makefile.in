@@ -23,12 +23,12 @@ IDL_FILES = \
   SALOME_Registry.idl \
   MED.idl \
   Med_Gen.idl \
-  Logger.idl \
-  SMESH_Mesh.idl \
-  SMESH_Hypothesis.idl \
-  SMESH_BasicHypothesis.idl \
-  GEOM_Shape.idl \
-  VISU_Gen.idl
+  Logger.idl
+#  SMESH_Mesh.idl \
+#  SMESH_Hypothesis.idl \
+#  SMESH_BasicHypothesis.idl \
+#  GEOM_Shape.idl \
+#  VISU_Gen.idl
 
 PY_CLIENT_IDL = $(IDL_FILES)
 
