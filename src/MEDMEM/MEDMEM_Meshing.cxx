@@ -35,10 +35,10 @@ void MESHING::setSpaceDimension(const int SpaceDimension)
 }
 
 /* Set the dimension of the MESHING */
-// void MESHING::setMeshDimension(const int MeshDimension)
-// {
-//    _meshDimension = MeshDimension ;
-// }
+void MESHING::setMeshDimension(const int MeshDimension)
+{
+  _meshDimension = MeshDimension ;
+}
 
 /*! Set the number of nodes used in the %MESH */
 void MESHING::setNumberOfNodes(const int NumberOfNodes)

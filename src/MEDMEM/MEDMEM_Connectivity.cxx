@@ -845,7 +845,7 @@ void CONNECTIVITY::updateGroup(vector<GROUP*> myFamilies)
 }
 
 //------------------------------------------------------------------------------------------------------------------//
-const med_int * CONNECTIVITY::getConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type) 
+const med_int * MEDMEM::CONNECTIVITY::getConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type) 
 //------------------------------------------------------------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::getConnectivity";

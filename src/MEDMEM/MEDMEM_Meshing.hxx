@@ -22,7 +22,7 @@ public :
   ~MESHING();
 
   void setSpaceDimension   (const int SpaceDimension) ;
-  //void setMeshDimension    (const int MeshDimension) ;
+  void setMeshDimension    (const int MeshDimension) ;
   void setNumberOfNodes    (const int NumberOfNodes) ;
   void setCoordinates      (const int SpaceDimension,
 			    const int NumberOfNodes,

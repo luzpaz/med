@@ -49,8 +49,8 @@ namespace MED_EN {
     const medGeometryElement MED_PYRA13 = 313;
     const medGeometryElement MED_PENTA15 = 315;
     const medGeometryElement MED_HEXA20 = 320;
-    const medGeometryElement MED_POLYGONE = 400;
-    const medGeometryElement MED_POLYEDRE = 500;
+    const medGeometryElement MED_POLYGON = 400;
+    const medGeometryElement MED_POLYHEDRA = 500;
     const medGeometryElement MED_ALL_ELEMENTS = 999;
 
     typedef long medEntityMesh;

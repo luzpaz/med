@@ -27,6 +27,7 @@ int main (int argc, char ** argv) {
   // define coordinates
 
   int SpaceDimension = 3 ;
+  int MeshDimension = SpaceDimension ;
   int NumberOfNodes = 19 ;
   double Coordinates[57] = {
     0.0, 0.0, 0.0, 
@@ -49,6 +50,8 @@ int main (int argc, char ** argv) {
     1.0, -1.0, 4.0,
     0.0, 0.0, 5.0
   };
+
+  myMeshing.setMeshDimension(MeshDimension);
 
   myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,"CARTESIAN",MED_FULL_INTERLACE);
 
