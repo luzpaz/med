@@ -12,7 +12,8 @@ VPATH=.:$(srcdir):${KERNEL_ROOT_DIR}/idl/salome
 
 IDL_FILES = \
   MED.idl \
-  Med_Gen.idl
+  Med_Gen.idl \
+  Compo1Py.idl
 
 PY_CLIENT_IDL = $(IDL_FILES)
 
