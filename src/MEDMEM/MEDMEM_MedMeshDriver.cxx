@@ -1181,6 +1181,9 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 					    MED_FR::MED_NOD);
       if (NumberOfPolygons > 0)
 	{
+	  if (Connectivity->_entityDimension == 1)
+	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 2D mesh, polygons need at least one 2D cell of a classic geometric type !"));
+
 	  med_int ConnectivitySize;
 	  med_err err1 = MEDpolygoneInfo(_medIdt,
 					 const_cast <char *> (_ptrMesh->_name.c_str()),
@@ -1208,9 +1211,16 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	      MESSAGE(LOC<<": MEDpolygoneConnLire returns "<<err2);
 	      return MED_ERROR;
 	    }
-      
-	  Connectivity->setPolygonsConnectivity(MED_NODAL,(medEntityMesh) Entity,PolygonsConnectivity,PolygonsConnectivityIndex,ConnectivitySize,NumberOfPolygons);
-      
+
+	  if (Connectivity->_entityDimension == 2) // 2D mesh : polygons in Connectivity
+	    Connectivity->setPolygonsConnectivity(MED_NODAL,(medEntityMesh) Entity,PolygonsConnectivity,PolygonsConnectivityIndex,ConnectivitySize,NumberOfPolygons);
+	  else if (Connectivity->_entityDimension == 3)
+	    {
+	      if (Connectivity->_constituent == NULL) // 3D mesh : polygons in Connectivity->_constituent
+		Connectivity->_constituent = new CONNECTIVITY(MED_FACE);
+	      Connectivity->_constituent->setPolygonsConnectivity(MED_NODAL,MED_FACE,PolygonsConnectivity,PolygonsConnectivityIndex,ConnectivitySize,NumberOfPolygons);
+	    }
+
 	  delete[] PolygonsConnectivity;
 	  delete[] PolygonsConnectivityIndex;
 	} // end polygons
@@ -1226,6 +1236,9 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 					      MED_FR::MED_NOD);
       if (NumberOfPolyhedron > 0)
 	{
+	  if (Connectivity->_entityDimension == 2 || Connectivity->_entityDimension == 1)
+	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 3D mesh, polyhedron need at least one 3D cell of a classic geometric type !"));
+
 	  med_int FacesIndexSize, NumberOfNodes, NumberOfFaces;
 	  med_err err3 = MEDpolyedreInfo(_medIdt,
 					 const_cast <char *> (_ptrMesh->_name.c_str()),
