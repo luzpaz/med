@@ -26,7 +26,6 @@
 //  Module : MED
 //  $Header$
 
-using namespace std;
 #include "Med_Gen_i.hxx"
 
 #include "MEDMEM_Mesh_i.hxx"
@@ -59,6 +58,7 @@ using namespace std;
 #include <HDFascii.hxx>
 #include "SALOMEDS_Tool.hxx"
 
+using namespace std;
 using namespace MEDMEM;
 
 // Initialisation des variables statiques
@@ -276,7 +276,8 @@ throw (SALOME::SALOME_Exception)
   		myMeshDriver.setMeshName(meshName);
 		myMeshDriver.open();
 	}
-        catch (const exception & ex)
+//CCRT        catch (const exception & ex)
+        catch (const std::exception & ex)
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -288,7 +289,8 @@ throw (SALOME::SALOME_Exception)
                 MESSAGE("apres read");
 		myMeshDriver.close();
 	}
-        catch (const exception & ex)
+//CCRT        catch (const exception & ex)
+        catch (const std::exception & ex)
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -399,7 +401,8 @@ throw (SALOME::SALOME_Exception)
 */
 		myField = mymed->getField(fieldName,iter,ordre);
 	}
-        catch (const exception & ex)
+//CCRT        catch (const exception & ex)
+        catch (const std::exception & ex)
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -420,7 +423,8 @@ throw (SALOME::SALOME_Exception)
         	SUPPORT_i * mySupportI = new SUPPORT_i(fieldSupport);
 		mySupportIOR=mySupportI->_this();
 	}
-        catch (const exception & ex)
+//CCRT        catch (const exception & ex)
+        catch (const std::exception & ex)
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -434,15 +438,18 @@ throw (SALOME::SALOME_Exception)
 	 {
 		try 
 		{
-			((FIELD<int>*)myField)->read() ;
-			FIELDINT_i * myFieldIntI = new FIELDINT_i(mySupportIOR,(FIELD<int>*)myField);
+//CCRT			((FIELD<int>*)myField)->read() ;
+			((FIELD<med_int>*)myField)->read() ;
+//CCRT			FIELDINT_i * myFieldIntI = new FIELDINT_i(mySupportIOR,(FIELD<int>*)myField);
+			FIELDINT_i * myFieldIntI = new FIELDINT_i(mySupportIOR,(FIELD<med_int>*)myField);
         		POA_SALOME_MED::FIELD_tie<FIELD_i> * myFieldTie = new POA_SALOME_MED::FIELD_tie<FIELD_i>(myFieldIntI);
         		SALOME_MED::FIELD_ptr myFieldIOR = myFieldTie->_this() ;
         		if (!_duringLoad) myFieldIntI->addInStudy(myStudy,myFieldIOR) ;
         		return SALOME_MED::FIELD::_duplicate(myFieldIOR);
 		}
 		catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
-        	catch (const exception & ex)
+//CCRT        	catch (const exception & ex)
+        	catch (const std::exception & ex)
         	{
                		MESSAGE("Exception Interceptee : ");
                 	SCRUTE(ex.what());
@@ -462,7 +469,8 @@ throw (SALOME::SALOME_Exception)
         		return SALOME_MED::FIELD::_duplicate(myFieldIOR);
 		}
 		catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
-        	catch (const exception & ex)
+//CCRT        	catch (const exception & ex)
+        	catch (const std::exception & ex)
         	{
                		MESSAGE("Exception Interceptee : ");
                 	SCRUTE(ex.what());
@@ -657,7 +665,7 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
   // Return the created byte stream
   return aStreamFile._retn();
   
-  END_OF(LOC);
+//CCRT  END_OF(LOC);
 }
 
 //=============================================================================
@@ -681,7 +689,7 @@ CORBA::Boolean Med_Gen_i::Load(SALOMEDS::SComponent_ptr theComponent,
     SALOMEDS_Tool::PutStreamToFiles(theStream, aTmpDir.ToCString(), isMultiFile);
   return true;
 
-  END_OF(LOC);
+//CCRT  END_OF(LOC);
 }
 
 CORBA::Boolean Med_Gen_i::LoadASCII(SALOMEDS::SComponent_ptr theComponent,
@@ -802,7 +810,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   //THROW_SALOME_CORBA_EXCEPTION("Unable to save IOR",SALOME::BAD_PARAM);
   return "_MED";
 
-  END_OF(LOC) ;
+//CCRT  END_OF(LOC) ;
 }
 
 //=============================================================================
@@ -847,7 +855,8 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
 	myMeshDriver.setMeshName(aMeshName);
 	myMeshDriver.open();
       }
-    catch (const exception & ex)
+//CCRT    catch (const exception & ex)
+    catch (const std::exception & ex)
       {
 	MESSAGE("Exception Interceptee : ");
 	SCRUTE(ex.what());
@@ -859,7 +868,8 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
 	MESSAGE("apres read");
 	myMeshDriver.close();
       }
-    catch (const exception & ex)
+//CCRT    catch (const exception & ex)
+    catch (const std::exception & ex)
       {
 	MESSAGE("Exception Interceptee : ");
 	SCRUTE(ex.what());
@@ -886,7 +896,7 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
 
   return strdup("");
 
-  END_OF(LOC) ;
+//CCRT  END_OF(LOC) ;
 }
 
 //=============================================================================
@@ -1045,7 +1055,8 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   try {
     myMeshDriver.setMeshName((char*)aMeshName);
     myMeshDriver.open();
-  } catch (const exception & ex) {
+//CCRT  } catch (const exception & ex) {
+  } catch (const std::exception & ex) {
     MESSAGE("Exception Interceptee : ");
     SCRUTE(ex.what());
     delete(aFullName);
@@ -1055,7 +1066,8 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
     myMeshDriver.read();
     ("apres read");
     myMeshDriver.close();
-  } catch (const exception & ex) {
+//CCRT  } catch (const exception & ex) {
+  } catch (const std::exception & ex) {
     MESSAGE("Exception Interceptee : ");
     SCRUTE(ex.what());
     delete(aFullName);
