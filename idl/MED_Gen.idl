@@ -19,8 +19,7 @@ module SALOME_MED
   {
     /*!
       it returns a Corba pointer %MESH on the mesh stored in the .med file
-      <VAR>fileName</VAR> with the name <VAR>meshName</VAR>; and it pushes it
-      in the study named <VAR>studyName</VAR>.
+      <VAR>fileName</VAR> with the name <VAR>meshName</VAR>.
      */
     SALOME_MED::MESH readMeshInFile(in string fileName, in string studyName,
 				    in string meshName)
@@ -29,8 +28,7 @@ module SALOME_MED
     /*!
       it returns a Corba pointer %FIELD on the field instance with the order
       <VAR>ordre</VAR> at the iteration <VAR>iter</VAR>, stored in the .med
-      file <VAR>fileName</VAR> with the name <VAR>fieldName</VAR>; and it
-      pushes it in the study named <VAR>studyName</VAR>.
+      file <VAR>fileName</VAR> with the name <VAR>fieldName</VAR>.
      */
     SALOME_MED::FIELD readFieldInFile(in string fileName, in string studyName,
 				      in string fieldName, in long ordre,
@@ -39,8 +37,7 @@ module SALOME_MED
 
     /*!
       it returns a Corba pointer on the %MED object regrouping all objects
-      (%MESH and %FIELD) stored in the file <VAR>fileName</VAR>; and it pushes
-      all those objects in the study named <VAR>studyName</VAR>. All instances
+      (%MESH and %FIELD) stored in the file <VAR>fileName</VAR>. All instances
       of the fields are stored without their type.
     */
     SALOME_MED::MED readStructFile(in string fileName,

@@ -18,6 +18,7 @@ This file contains the main IDL definitions of the %MED component in %SALOME app
 #include "SALOME_Exception.idl"
 #include "SALOME_Component.idl"
 #include "SALOMEDS.idl"
+#include "SALOME_Comm.idl"
 
 module SALOME_MED {
   /*!
@@ -130,7 +131,7 @@ This enumeration contains a set of elements defining the type of connectivity.
   // mesh interface
   // ----------------------
 
-  interface MESH {
+  interface MESH : SALOME::MultiCommClass, SALOME::ServantLifeCycle {
     // Index range begins from 1
 
     // General Informations
@@ -189,7 +190,13 @@ This enumeration contains a set of elements defining the type of connectivity.
     */
     SALOME_MED::double_array getCoordinates(in medModeSwitch typeSwitch)
       raises (SALOME::SALOME_Exception);
-
+    
+    /*!
+      Returns an array (Sender) of coordinates stored in any type.\n
+      It could be used in a Client code using the MED Client classes.
+     */
+    SALOME::Sender getSenderForCoordinates(in medModeSwitch typeSwitch)
+      raises (SALOME::SALOME_Exception);
     /*!
      Returns coordinate  n° Number on axis n° Axis 
     */
@@ -292,6 +299,16 @@ This enumeration contains a set of elements defining the type of connectivity.
       raises (SALOME::SALOME_Exception);
 
     /*!
+      Idem getConnectivity but return a Sender.\n
+      It could be used in a Client code using the MED Client classes.
+     */
+    SALOME::Sender getSenderForConnectivity(in medModeSwitch typeSwitch,
+					in medConnectivity mode,
+					in medEntityMesh entity,
+					in medGeometryElement geomElement)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
       Give morse index array to use with 
       getConnectivity(MED_FULL_INTERLACE,mode,entity,MED_ALL_ELEMENTS).
 
@@ -348,6 +365,7 @@ This enumeration contains a set of elements defining the type of connectivity.
     	long                     numberOfNodes;
         medGeometryElement_array meshTypes;
     	SALOME_MED::long_array      numberOfElements;
+        long                       entityDimension;
     };
     connectivityInfos getConnectGlobal(in medEntityMesh entity) 
     raises (SALOME::SALOME_Exception);
@@ -498,7 +516,7 @@ Internal Corba method.
   // Support interface
   // ----------------------
   
-  interface SUPPORT {
+  interface SUPPORT : SALOME::MultiCommClass, SALOME::ServantLifeCycle {
     
     /*!
       Returns the name of the support.
@@ -571,6 +589,14 @@ Internal Corba method.
       raises (SALOME::SALOME_Exception);
 
     /*!
+      Idem SALOME::Sender getNumber(in medGeometryElement geomElement) but returning Sender.\n
+      It could be used in a Client code using the MED Client classes.
+     */
+
+    SALOME::Sender getSenderForNumber(in medGeometryElement geomElement)
+      raises (SALOME::SALOME_Exception);
+    
+    /*!
       If the method %isOnAllElements() returns False, this method returns the index 
       of element number.
       
@@ -581,6 +607,14 @@ Internal Corba method.
     */
     SALOME_MED::long_array getNumberIndex()
       raises (SALOME::SALOME_Exception);
+
+    /*!
+      Idem SALOME_MED::long_array getNumberIndex() but return a Sender.\n
+      It could be used in a Client code using the MED Client classes.
+     */
+    SALOME::Sender getSenderForNumberIndex()
+      raises (SALOME::SALOME_Exception);
+
     /*!
       Returns the number of Gauss points for this %medGeometryElement.
 
@@ -739,7 +773,7 @@ Internal Corba method.
   // Field interface
   //----------------
 
-  interface FIELD 
+  interface FIELD : SALOME::ServantLifeCycle
     {
 
       /*!
@@ -791,6 +825,21 @@ Internal Corba method.
       i is bounded by 1 and NumberOfComponents.
       */
       string getComponentUnit(in long i) raises (SALOME::SALOME_Exception);
+
+      /*!
+	Returns an array containing components descriptions.
+      */
+      SALOME_MED::string_array getComponentsDescriptions() 
+	raises (SALOME::SALOME_Exception);
+
+      /*!
+	Returns the description of i-th component.
+
+	\note  
+	- i is bounded by 1 and NumberOfComponents.
+	- Name is mandatory for each field's component.
+      */
+      string getComponentDescription(in long i) raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns the iteration number.
@@ -845,16 +894,23 @@ Internal Corba method.
     };
 
 
-  interface FIELDDOUBLE : FIELD {
+  interface FIELDDOUBLE : FIELD , SALOME::MultiCommClass {
 
     /*!
       Returns an array of values of the field  
     */
     SALOME_MED::double_array getValue(in medModeSwitch mode)
       raises (SALOME::SALOME_Exception);
+
+    /*!
+      Idem as getValue but it could be used in a Client code using the
+      MED Client classes.
+    */
+    SALOME::Sender getSenderForValue(in medModeSwitch mode)
+      raises (SALOME::SALOME_Exception);
   };
 
-  interface FIELDINT : FIELD {
+  interface FIELDINT : FIELD , SALOME::MultiCommClass {
 
     /*!
       Returns an array of values of the field  
@@ -862,6 +918,12 @@ Internal Corba method.
     SALOME_MED::long_array getValue(in medModeSwitch mode)
       raises (SALOME::SALOME_Exception);
 
+    /*!
+      Idem as getValue but it could be used in a Client code using the
+      MED Client classes.
+    */
+    SALOME::Sender getSenderForValue(in medModeSwitch mode)
+      raises (SALOME::SALOME_Exception);
   };
 
   // MED interface
