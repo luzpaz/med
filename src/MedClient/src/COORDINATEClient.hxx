@@ -53,7 +53,8 @@ public:
   virtual const double *  getCoordinates(medModeSwitch Mode);
   virtual double          getCoordinate(int Number,int Axis);
   virtual const double *  getCoordinateAxis(int Axis);
-  virtual const int*      getNodesNumbers() const;
+//CCRT  virtual const int*      getNodesNumbers() const;
+  virtual const med_int*      getNodesNumbers() const;
 
 };
 };

@@ -12,7 +12,8 @@
 
 void FIELDClient_value(FIELD<double> *F, 
 		       const SALOME_MED::FIELD_ptr IOR_Field);
-void FIELDClient_value(FIELD<int> *F, 
+//CCRTvoid FIELDClient_value(FIELD<int> *F, 
+void FIELDClient_value(FIELD<med_int> *F, 
 		       const SALOME_MED::FIELD_ptr IOR_Field);
   
 

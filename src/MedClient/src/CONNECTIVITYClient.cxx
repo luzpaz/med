@@ -71,9 +71,11 @@ void CONNECTIVITYClient::blankCopy()
   long iT, nT;
   //convertCorbaArray<SALOME_MED::medGeometryElement>
   //  (Types, nT, IOR_Mesh->getTypes(Entity));
+//CCRTconvertCorbaArray<SALOME_MED::medGeometryElement>
+//CCRT    (Types, nT, &all->meshTypes);
+  void * voidf = NULL ;//CCRT ? UtilClient.hxx
   convertCorbaArray<SALOME_MED::medGeometryElement>
-    (Types, nT, &all->meshTypes);
-
+    (Types, nT, &all->meshTypes,voidf);
   ASSERT(nT == (int) getNumberOfTypes(Entity));
   SCRUTE(nT);
   
@@ -108,7 +110,8 @@ void CONNECTIVITYClient::fillCopy()
 
   if (!_complete) {
 
-    int *pC;
+//CCRT    int *pC;
+    med_int *pC;
     long nC;
     
     medEntityMesh Entity = getEntity();
@@ -116,7 +119,8 @@ void CONNECTIVITYClient::fillCopy()
     SCRUTE(nT);
     const medGeometryElement * T = getGeometricTypes(Entity);
     
-    int * Count = new int[nT+1] ;
+//CCRT    int * Count = new int[nT+1] ;
+    med_int * Count = new med_int[nT+1] ;
     Count[0]=1 ;
     SCRUTE(Count[0]);
     for (iT=0; iT<nT; iT++) {
@@ -268,7 +272,8 @@ void  CONNECTIVITYClient::updateFamily (vector<FAMILY*> myFamilies)
 /*!
  */
 //=============================================================================
-const int * CONNECTIVITYClient::getGlobalNumberingIndex 
+//CCRTconst int * CONNECTIVITYClient::getGlobalNumberingIndex 
+const med_int * CONNECTIVITYClient::getGlobalNumberingIndex 
                       (medEntityMesh Entity) const throw (MEDEXCEPTION)
 {
   BEGIN_OF("void CONNECTIVITYClient::getGlobalNumberingIndex()");

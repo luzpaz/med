@@ -91,7 +91,8 @@ void SUPPORTClient::fillCopy()
 
   if (!_complete_support) {
 
-    int * index, * value;
+//CCRT    int * index, * value;
+    med_int * index, * value;
     long n_index, n_value;
 
     convertCorbaArray(value, n_value, 
@@ -144,13 +145,15 @@ MEDSKYLINEARRAY *  SUPPORTClient::getnumber() const throw (MEDEXCEPTION)
  * 
  */
 //=============================================================================
-const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType) 
+//CCRTconst int *  SUPPORTClient::getNumber(medGeometryElement GeometricType) 
+const med_int *  SUPPORTClient::getNumber(medGeometryElement GeometricType) 
     const throw (MEDEXCEPTION)
 {
   BEGIN_OF("SUPPORTClient::getnumber(medGeometryElement)");
 
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
-  const int *n = SUPPORT::getNumber(GeometricType);
+//CCRT  const int *n = SUPPORT::getNumber(GeometricType);
+  const med_int *n = SUPPORT::getNumber(GeometricType);
 
   END_OF("SUPPORTClient::getnumber(medGeometryElement)");
   return n;
@@ -161,12 +164,14 @@ const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType)
  * 
  */
 //=============================================================================
-const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION) 
+//CCRTconst int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION) 
+const med_int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION) 
 {
   BEGIN_OF("SUPPORTClient::getnumberIndex()");
 
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
-  const int * n = SUPPORT::getNumberIndex();
+//CCRT  const int * n = SUPPORT::getNumberIndex();
+  const med_int * n = SUPPORT::getNumberIndex();
 
   END_OF("SUPPORTClient::getnumberIndex()");
   return n;

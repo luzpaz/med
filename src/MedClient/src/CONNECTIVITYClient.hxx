@@ -39,7 +39,8 @@ public:
 
   void  updateFamily (vector<FAMILY*> myFamilies);
 
-  const int * getGlobalNumberingIndex (medEntityMesh Entity) const throw (MEDEXCEPTION);
+//CCRT  const int * getGlobalNumberingIndex (medEntityMesh Entity) const throw (MEDEXCEPTION);
+  const med_int * getGlobalNumberingIndex (medEntityMesh Entity) const throw (MEDEXCEPTION);
 
   bool existConnectivity(medConnectivity ConnectivityType, 
 			 medEntityMesh Entity) const;

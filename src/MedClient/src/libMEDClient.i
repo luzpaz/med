@@ -6,7 +6,8 @@
 #include "FIELDClient.hxx"
 #include CORBA_CLIENT_HEADER(MED)
 #define FIELDDOUBLEClient FIELDClient<double>
-#define FIELDINTClient FIELDClient<int>
+//CCRT#define FIELDINTClient FIELDClient<int>
+#define FIELDINTClient FIELDClient<med_int>
 %}
 
 %include "libMedCorba_Swig.i"
@@ -41,6 +42,7 @@ class SUPPORTClient : public SUPPORT {
 FIELDDOUBLE * FIELDDOUBLEClient(const SALOME_MED::FIELDDOUBLE_ptr IOR_Field, 
 				SUPPORT * S = NULL);
 
-%rename(FIELDINTClient) FIELDClient<int>;
+//CCRT%rename(FIELDINTClient) FIELDClient<int>;
+%rename(FIELDINTClient) FIELDClient<med_int>;
 FIELDDOUBLE * FIELDINTClient   (const SALOME_MED::FIELDINT_ptr IOR_Field, 
 				SUPPORT * S = NULL);

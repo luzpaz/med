@@ -27,9 +27,11 @@ public :
 
   MEDSKYLINEARRAY *  getnumber()
     const throw (MEDEXCEPTION);
-  const int *  getNumber(medGeometryElement GeometricType) 
+//CCRT  const int *  getNumber(medGeometryElement GeometricType) 
+  const med_int *  getNumber(medGeometryElement GeometricType) 
     const throw (MEDEXCEPTION);
-  const int *  getNumberIndex()
+//CCRT  const int *  getNumberIndex()
+  const med_int *  getNumberIndex()
     const throw (MEDEXCEPTION);
 
 };

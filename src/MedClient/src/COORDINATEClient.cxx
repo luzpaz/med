@@ -144,7 +144,8 @@ const double *  COORDINATEClient::getCoordinateAxis(int Axis)
  * Retourne le nombre de noeuds
  */
 //=============================================================================
-const int*      COORDINATEClient::getNodesNumbers() const
+//CCRTconst int*      COORDINATEClient::getNodesNumbers() const
+const med_int*      COORDINATEClient::getNodesNumbers() const
 {
   BEGIN_OF("void COORDINATEClient::getNodesNumbers()");
 

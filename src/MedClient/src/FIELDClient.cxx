@@ -39,9 +39,10 @@ void FIELDClient_value(FIELD<double> *F, const SALOME_MED::FIELD_ptr IOR_Field)
  *   (version FIELD<int>)
  */
 //=============================================================================
-void FIELDClient_value(FIELD<int> *F, const SALOME_MED::FIELD_ptr IOR_Field)
+//CCRTvoid FIELDClient_value(FIELD<int> *F, const SALOME_MED::FIELD_ptr IOR_Field)
+void FIELDClient_value(FIELD<med_int> *F, const SALOME_MED::FIELD_ptr IOR_Field)
 {
-  BEGIN_OF("FIELDClient_value(int)");
+  BEGIN_OF("FIELDClient_value(med_int)");
 
   F->setValueType(MED_INT32);
 
@@ -53,12 +54,14 @@ void FIELDClient_value(FIELD<int> *F, const SALOME_MED::FIELD_ptr IOR_Field)
 
   long i, n = v_corba->length();
   SCRUTE(n);
-  int *v = new int[n];
+//CCRT  int *v = new int[n];
+  med_int *v = new med_int[n];
   for (i=0; i<n; i++) v[i] = v_corba[i];
 
-  MEDARRAY<int> * M = new MEDARRAY<int> 
+//CCRT  MEDARRAY<int> * M = new MEDARRAY<int> 
+  MEDARRAY<med_int> * M = new MEDARRAY<med_int> 
     (v, F->getNumberOfComponents(),F->getNumberOfValues(), MED_FULL_INTERLACE);
   F->setValue(M); 
  
-  END_OF("FIELDClient_value(int)");
+  END_OF("FIELDClient_value(med_int)");
 }
