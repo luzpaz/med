@@ -27,6 +27,7 @@ using namespace std;
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_DriversDef.hxx"
 using namespace MEDMEM;
 

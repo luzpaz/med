@@ -8,7 +8,6 @@
 #include "MEDMEM_FieldDouble_i.hxx"
 #include "MEDMEM_Field_i.hxx"
 #include "MEDMEM_FieldInt_i.hxx"
-#include "MEDMEM_FieldOf_i.hxx"
 #include "MEDMEM_Group_i.hxx"
 #include "MEDMEM_Med_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
@@ -211,6 +210,82 @@
   SCRUTE(*$1);
 }
 
+%typemap(python,in) const SALOME_MED::FIELDDOUBLE_ptr,
+                    SALOME_MED::FIELDDOUBLE_ptr
+{
+
+  MESSAGE("typemap in sur Objet Corba FIELDDOUBLE sans reference");
+
+  PyObject* pdict = PyDict_New();
+  PyDict_SetItemString(pdict, "__builtins__", PyEval_GetBuiltins());
+  PyRun_String("import CORBA", Py_single_input, pdict, pdict);
+ 
+  PyRun_String("o = CORBA.ORB_init([''], CORBA.ORB_ID);", Py_single_input,
+                   pdict, pdict);
+ 
+  PyObject* orb = PyDict_GetItemString(pdict, "o");
+
+  // Ask omniORBpy to transform FIELDDOUBLE (python Corba) ptr to IOR string
+
+  PyObject* iorFieldDouble
+    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+ 
+  if (iorFieldDouble == Py_None)
+    return NULL;
+  char * s = PyString_AsString(PyObject_Str(iorFieldDouble));
+ 
+  // Ask omniORB to convert IOR string to FIELDDOUBLE (C++ Corba) ptr
+
+  int argc = 0;
+  char *xargv = "";
+  char **argv = &xargv;
+  CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
+  CORBA::Object_var O =  ORB->string_to_object(s);
+  SCRUTE(O);
+  SALOME_MED::FIELDDOUBLE_ptr t = SALOME_MED::FIELDDOUBLE::_narrow(O);
+
+  $1 = t;
+  SCRUTE($1);
+}
+
+%typemap(python,in) const SALOME_MED::FIELDINT_ptr,
+                    SALOME_MED::FIELDINT_ptr
+{
+
+  MESSAGE("typemap in sur Objet Corba FIELDINT sans reference");
+
+  PyObject* pdict = PyDict_New();
+  PyDict_SetItemString(pdict, "__builtins__", PyEval_GetBuiltins());
+  PyRun_String("import CORBA", Py_single_input, pdict, pdict);
+ 
+  PyRun_String("o = CORBA.ORB_init([''], CORBA.ORB_ID);", Py_single_input,
+                   pdict, pdict);
+ 
+  PyObject* orb = PyDict_GetItemString(pdict, "o");
+
+  // Ask omniORBpy to transform FIELDINT (python Corba) ptr to IOR string
+
+  PyObject* iorFieldInt
+    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+ 
+  if (iorFieldInt == Py_None)
+    return NULL;
+  char * s = PyString_AsString(PyObject_Str(iorFieldInt));
+ 
+  // Ask omniORB to convert IOR string to FIELDINT (C++ Corba) ptr
+
+  int argc = 0;
+  char *xargv = "";
+  char **argv = &xargv;
+  CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
+  CORBA::Object_var O =  ORB->string_to_object(s);
+  SCRUTE(O);
+  SALOME_MED::FIELDINT_ptr t = SALOME_MED::FIELDINT::_narrow(O);
+
+  $1 = t;
+  SCRUTE($1);
+}
+
 %typemap(python,in) const SALOME_MED::SUPPORT_ptr &, SALOME_MED::SUPPORT_ptr &
 {
 
@@ -407,10 +482,12 @@
 }
 
 SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr,
-						   FIELDDOUBLE *);
+						   FIELDDOUBLE *,
+						   bool ownCppPtr=false);
 
 SALOME_MED::FIELDINT_ptr createCorbaFieldInt(SALOME_MED::SUPPORT_ptr,
-					     FIELDINT *);
+					     FIELDINT *,
+					     bool ownCppPtr=false);
 
 SALOME_MED::SUPPORT_ptr createCorbaSupport(const SUPPORT *);
 
@@ -421,11 +498,9 @@ FIELDINT * createLocalFieldInt(const int, const int);
 SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
 %{
-  SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDDOUBLE * field)
+  SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDDOUBLE * field, bool ownCppPtr)
     {
       BEGIN_OF("SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble from libMedCorba_Swig");
-
-      SCRUTE(mySupportIOR);
 
       SCRUTE(field);
 
@@ -434,41 +509,30 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       field->setDescription("Got From A Local One");
 
-      FIELDDOUBLE_i * fieldimpl = new FIELDDOUBLE_i(mySupportIOR,field);
+      FIELDDOUBLE_i * fieldimpl = new FIELDDOUBLE_i(field, ownCppPtr);
 
-      POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i> * fieldcorba1 = 
-	new POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i>(fieldimpl,true);
-
-      SALOME_MED::FIELDDOUBLE_ptr fieldcorba2 = fieldcorba1->_this();
-
-      SALOME_MED::FIELDDOUBLE_ptr fieldcorba3 = SALOME_MED::FIELDDOUBLE::_duplicate(fieldcorba2);
-
-      fieldcorba1->_remove_ref();
+      SALOME_MED::FIELDDOUBLE_ptr fieldcorba2 = fieldimpl->_this();
 
       SCRUTE(fieldimpl);
 
-      SCRUTE(fieldcorba1);
-
       SCRUTE(fieldcorba2);
-
-      SCRUTE(fieldcorba3);
 
       END_OF("SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble from libMedCorba_Swig");
 
       MESSAGE("Test de tirarge sur le pointeur Corba Field dans le cxx");
 
-      char * name = fieldcorba3->getName();
+      char * name = fieldcorba2->getName();
 
       SCRUTE(name);
 
-     return fieldcorba3;
+      delete [] name;
+
+     return fieldcorba2;
     }
 
-  SALOME_MED::FIELDINT_ptr createCorbaFieldInt(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDINT * field)
+  SALOME_MED::FIELDINT_ptr createCorbaFieldInt(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDINT * field, bool ownCppPtr)
     {
       BEGIN_OF("SALOME_MED::FIELDINT_ptr createCorbaFieldInt from libMedCorba_Swig");
-
-      SCRUTE(mySupportIOR);
 
       SCRUTE(field);
 
@@ -477,33 +541,24 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       field->setDescription("Got From A Local One");
 
-      FIELDINT_i * fieldimpl = new FIELDINT_i(mySupportIOR,field);
+      FIELDINT_i * fieldimpl = new FIELDINT_i(field, ownCppPtr);
 
-      POA_SALOME_MED::FIELDINT_tie<FIELDINT_i> * fieldcorba1 = 
-	new POA_SALOME_MED::FIELDINT_tie<FIELDINT_i>(fieldimpl,true);
-
-      SALOME_MED::FIELDINT_ptr fieldcorba2 = fieldcorba1->_this();
-
-      SALOME_MED::FIELDINT_ptr fieldcorba3 = SALOME_MED::FIELDINT::_duplicate(fieldcorba2);
-
-      fieldcorba1->_remove_ref();
+      SALOME_MED::FIELDINT_ptr fieldcorba2 = fieldimpl->_this();
 
       SCRUTE(fieldimpl);
 
-      SCRUTE(fieldcorba1);
-
       SCRUTE(fieldcorba2);
-
-      SCRUTE(fieldcorba3);
 
       END_OF("SALOME_MED::FIELDINT_ptr createCorbaFieldInt from libMedCorba_Swig");
       MESSAGE("Test de tirarge sur le pointeur Corba Field dans le cxx");
 
-      char * name = fieldcorba3->getName();
+      char * name = fieldcorba2->getName();
 
       SCRUTE(name);
 
-      return fieldcorba3;
+      delete [] name;
+
+      return fieldcorba2;
     }
 
   SALOME_MED::SUPPORT_ptr createCorbaSupport(const SUPPORT * const support)
@@ -520,8 +575,6 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
       SCRUTE(supportimpl);
 
       SCRUTE(supportcorba);
-
-      supportimpl->_remove_ref();
 
       END_OF("SALOME_MED::SUPPORT_ptr createCorbaSupport from libMedCorba_Swig");
 
@@ -542,8 +595,6 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
       SCRUTE(meshimpl);
 
       SCRUTE(meshcorba);
-
-      meshimpl->_remove_ref();
 
       END_OF("SALOME_MED::MESH_ptr createCorbaMesh from libMedCorba_Swig");
 
