@@ -1,0 +1,131 @@
+// File: SALOME_ModuleCatalog.idl
+// Created: Tue June 25 2001
+// Author: Estelle Deville
+// Project: SALOME
+// Copyright : CEA/DEN/DMSS/LGLS
+// $Header$
+
+module SALOME_ModuleCatalog
+{
+  // Type Definitions
+
+  enum ComponentType {GEOM, MESH, Med, SOLVER, DATA, VISU, SUPERV, OTHER} ;
+
+  struct ServicesParameter
+  {
+    string Parametertype;
+    string Parametername;
+  } ;
+
+  typedef sequence<ServicesParameter> ListOfServicesParameter;
+
+  struct Service
+  {
+    string                  ServiceName;
+    ListOfServicesParameter ServiceinParameter;
+    ListOfServicesParameter ServiceoutParameter;
+    boolean                 Servicebydefault;
+  } ;
+
+  typedef sequence<Service> ListOfInterfaceService;
+
+  typedef sequence<string> ListOfServices ;
+
+  struct DefinitionInterface
+  {
+    string                 interfacename ;
+    ListOfInterfaceService interfaceservicelist ;
+  } ;
+
+  typedef sequence<DefinitionInterface> ListOfDefInterface ;
+
+  typedef sequence<string> ListOfInterfaces ;
+
+  typedef sequence<string> ListOfComponents ;
+
+  typedef sequence<string> ListOfComputers ;
+
+  struct IAPP_Affich
+  {
+    string modulename;
+    string moduleicone;
+  };
+
+  typedef sequence<IAPP_Affich> ListOfIAPP_Affich ;
+
+  // Exceptions Definitions
+  exception NotFound
+  {
+    string what ; // to indicate if it's component, service or pathPrefix
+  } ;
+
+  interface Acomponent
+  {
+    // GetInterfaceList : operation to get a list of the interfaces name of
+    //                    a component
+    ListOfInterfaces GetInterfaceList() ;
+
+    // GetInterface : operation to get one interface of a component
+    DefinitionInterface GetInterface(in string interfacename) raises(NotFound);
+
+    // GetServiceList : operation to get a list of the services name of
+    //                  an interface of a component
+    ListOfServices GetServiceList(in string interfacename) raises(NotFound);
+
+    
+    // GetService : operation to get one service of an interface of a component
+    Service GetService(in string interfacename, 
+		       in string servicename) raises(NotFound);
+
+    // GetDefaultService : operation to get the default service
+    //                     of an interface of a component
+    Service GetDefaultService(in string interfacename) raises(NotFound);
+
+    // GetPathPrefix : operation to get the PathPrefix of a computer
+    string GetPathPrefix(in string machinename) raises(NotFound);
+
+    // constraint : attribute to obtain the constraint affected to a component
+    //              (to be resolved by LifeCycle for the computer choice)
+    readonly attribute string constraint ;
+
+    // componentname : attribute to obtain the componentname
+    readonly attribute string componentname;
+
+    // multistudy : attribute to define if a component can be multistudy or not
+    readonly attribute boolean multistudy;
+
+    // componenttype : attribute to define the type of the component
+    readonly attribute ComponentType component_type ;
+
+    // component_icone : attribute to obtain the component icone
+    readonly attribute string component_icone;
+  } ;
+
+  interface ModuleCatalog
+  {
+    void ping();
+
+    // GetComputerList : operation to get a list of the computers name of
+    //                    the catalog    
+    ListOfComputers GetComputerList();
+
+    // GetPathPrefix : operation to get the PathPrefix of a computer
+    string GetPathPrefix(in string machinename) raises(NotFound);
+
+    // GetComponentList : operation to get a list of the components name of
+    //                    the catalog    
+    ListOfComponents GetComponentList();
+
+    // GetComponentIconeList : operation to get a list of couple
+    //                         (components name, component icone) for all
+    //                         the modules of the catalog   
+    ListOfIAPP_Affich GetComponentIconeList();
+
+    // GetComponentList : operation to get a list of the components name of
+    //                    a particular type of the catalog   
+    ListOfComponents GetTypedComponentList(in ComponentType _component_type);
+
+    // GetComponent : operation to get one component of the catalog
+    Acomponent GetComponent(in string componentname) raises(NotFound);
+  } ;
+};

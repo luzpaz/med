@@ -1,0 +1,65 @@
+//=============================================================================
+// File      : SALOME_Component.idl
+// Created   : jeu jui 12 08:11:23 CEST 2001
+// Author    : Paul RASCLE, EDF
+// Project   : SALOME
+// Copyright : EDF 2001
+// $Header$
+//=============================================================================
+
+#ifndef _SALOME_COMPONENT_IDL_
+#define _SALOME_COMPONENT_IDL_
+
+module Engines
+{
+  interface Component ;
+
+  interface Container
+  {
+
+    Container start_impl( in string ContainerName ) ;
+
+    /*!
+     * Loads a component (SALOME engine) an starts it's CORBA servant
+     * /nameToRegister to register the component into Registry (or Name Service)
+     * /componentName  to build the library Name
+     */
+    Component load_impl(in string nameToRegister, in string componentName);
+
+    /*!
+     * Stops the component servant, and deletes related objects
+     */
+    void remove_impl(in Component component_i);
+
+    /*!
+     * Discharges (dlclose) all stopped component in tne container.
+     */
+    void finalize_removal() ;
+
+    void ping();
+    readonly attribute string name ;
+    readonly attribute string machineName ;
+
+    boolean Kill() ;
+  };
+ 
+  interface Component
+  {
+    readonly attribute string instanceName ;
+    readonly attribute string interfaceName ;
+    
+    void ping();
+
+    void destroy() ;
+    
+    Container GetContainerRef() ;
+
+    void Names( in string aGraphName , in string aNodeName ) ;
+    boolean Kill() ;
+    boolean Stop() ;
+    boolean Suspend() ;
+    boolean Resume() ;
+  } ;
+} ;
+
+#endif

@@ -23,8 +23,7 @@ Infos.png \
 Structure.png \
 ModuleMed.png
 
-BIN_SCRIPT= \
-README
+BIN_SCRIPT=
 
 
 # copy header files in common directory
@@ -68,7 +67,9 @@ install-include: $(include_list)
 # install script in $(bindir) :
 install-bin: $(BIN_SCRIPT)
 	$(INSTALL) -d  $(bindir)
-	$(INSTALL_PROGRAM) $^ $(bindir)
+	if test $(BIN_SCRIPT)X != X; then 			\
+		$(INSTALL_PROGRAM) $^ $(bindir);		\
+	fi
 
 uninstall: uninstall-idl
 

@@ -1,0 +1,361 @@
+//=====================================================
+//  File      : SALOMEDS.idl
+//  Created   : Thu Nov 29 21:25:39 2001
+//  Author    : Yves FRICAUD
+//  Project   : SALOME
+//  Copyright : Open CASCADE 2001
+//  $Header$
+//=====================================================
+
+//The Study module contains the following interfaces:
+//=====================================================
+
+#ifndef _SALOMEDS_IDL_
+#define _SALOMEDS_IDL_
+
+#include "SALOME_Exception.idl"
+
+module SALOMEDS
+{
+  typedef string URL;
+  typedef string ID;
+  typedef string PersistentReference;
+  typedef string SalomeReference;
+  typedef sequence<string> ListOfOpenStudies ;
+  typedef sequence<string> ListOfFileNames;
+  typedef sequence<string> ListOfDates ;
+  typedef sequence<string> ListOfStrings ;
+  typedef sequence<octet> TMPFile;
+  
+
+  // Reference to other objects is treated with function AddReference
+  // and ReferencedObject
+  // All other type of attributes defined in AttributeType enum are
+  // treated with AddAdttribute and GetAttribute
+  // The difference is made because Reference attribute don't contain 
+  // strings but reference to ID of other objects
+
+  interface GenericAttribute;
+  interface Study;
+  interface StudyManager;
+  interface StudyBuilder;
+  interface SObject;
+  interface SComponent;
+  interface SComponentIterator;
+  interface ChildIterator;
+  interface Driver;
+  interface AttributeStudyProperties;
+
+  typedef sequence<GenericAttribute> ListOfAttributes;
+
+  exception NotImplemented {};
+
+  //===========================================================================
+  //Study Interface
+  //Most of the Study operations are handled by the Study Manager and the Stu=
+  //dyBuilder. What is left in the Study
+  //interface are elementary inquiries. (Incidentally, we recall that a CORBA=
+  // attribute is implemented as a pair of get
+  //and set methods.) A Study is explored by a set of tools, mainly iterators=
+  //, described farther. Nevertheless, the Study
+  //interface allows the search of an object by name or by ID.
+  //===========================================================================
+
+  interface Study
+  {
+    exception StudyInvalidContext {};
+    exception StudyInvalidComponent {};
+    exception StudyInvalidDirectory {};
+    exception StudyNameAlreadyUsed {};
+    exception StudyObjectAlreadyExists {};
+    exception StudyNameError {};
+    exception StudyCommentError {};
+
+    attribute string     Name; // equivalent to setName() & getName()
+    attribute short      StudyId;
+
+    typedef sequence<SObject> ListOfSObject; 
+
+    PersistentReference  GetPersistentReference();
+    SalomeReference      GetTransientReference();
+    //
+    boolean IsEmpty();
+    SComponent FindComponent  (in string aComponentName);
+    SComponent FindComponentID(in ID aComponentID);
+
+    SObject       FindObject      (in string anObjectName);
+    SObject       FindObjectID    (in ID aObjectID);
+    SObject       FindObjectIOR   (in ID aObjectIOR);
+    ListOfSObject FindObjectByName(in string anObjectName, in string aComponentName);
+
+    SObject FindObjectByPath(in string thePath);
+    string  GetObjectPath(in Object theObject);
+
+    void SetContext(in string thePath);
+    string GetContext();  
+
+    ListOfStrings GetObjectNames(in string theContext);
+    ListOfStrings GetDirectoryNames(in string theContext);
+    ListOfStrings GetFileNames(in string theContext);
+    ListOfStrings GetComponentNames(in string theContext);
+
+    ChildIterator      NewChildIterator(in SObject aSO);
+    SComponentIterator NewComponentIterator();
+    //Create a Builder to add or modify object in study.
+    StudyBuilder NewBuilder() ;
+    // Updates map with IOR attribute-Labels dependency
+    void UpdateIORLabelMap(in string anIOR, in string anEntry);
+    
+    // returns the attriubte, which contains properties of this study
+    AttributeStudyProperties GetProperties();
+
+    attribute boolean IsSaved;
+    boolean IsModified();
+    attribute string  URL;
+    
+    ListOfSObject FindDependances(in SObject anObject);
+
+    // returns the date of the last saving of study with format: "DD/MM/YYYY HH:MM"
+    string GetLastModificationDate();
+    // returns the list of modification dates (without creation date) with format "DD/MM/YYYY HH:MM"
+    // first modification is first in the list
+    ListOfDates GetModificationsDate();
+
+    string ConvertObjectToIOR(in Object theObject);
+    Object ConvertIORToObject(in string theIOR);		
+  };
+
+
+  //==========================================================================
+  //The purpose of the Manager is to manipulate the Study. We will find in this
+  // interface the methods to create, open,
+  //close, and save a Study. Since a Salome session is multi-document, we will
+  // also find the methods to navigate
+  //amongst the collection of studies present in a session.
+  //==========================================================================
+
+  interface StudyManager
+  {
+    void ping();
+
+    Study NewStudy(in string study_name);
+
+    // Open a study this method read and activate the structure of the study Objects
+    // WARNING : This method doesn't activate the corba objects. Only a component can do it
+    Study Open (in URL aStudyUrl) raises (SALOME::SALOME_Exception);
+
+    void  Close(in Study aStudy);
+
+    void  Save(in  Study aStudy);
+
+    void  SaveAs(in URL   aUrl, // if the file already exists
+		in Study aStudy); // overwrite (as option)
+    ListOfOpenStudies GetOpenStudies();
+
+    // the following activate a particular Study
+    // amongst the session collection
+    Study GetStudyByName  (in string aStudyName);
+    Study GetStudyByID  (in short aStudyID);
+  };
+
+
+  //==========================================================================
+  //Study Builder Interface
+  //The purpose of the Builder is to add and/or remove objects and attributes.
+  //A StudyBuilder is linked to a Study. A
+  //command management is provided for the undo/redo functionalities.
+  //==========================================================================
+
+  interface StudyBuilder
+  {
+    exception LockProtection {};
+
+    SComponent NewComponent(in string ComponentDataType);
+    void       DefineComponentInstance (in SComponent aComponent,in Object ComponentIOR);
+    void       RemoveComponent(in SComponent aComponent);
+    //
+    SObject NewObject      (in SObject theFatherObject);
+    SObject NewObjectToTag (in SObject theFatherObject, in long atag);
+    void    RemoveObject   (in SObject anObject);
+    void    RemoveObjectWithChildren(in SObject anObject);
+
+    //
+    void  LoadWith (in SComponent sco, in Driver Engine);
+
+    void  Load (in SObject sco);
+
+    /*!
+     * Working with attributes
+     * 
+     */
+
+    GenericAttribute FindOrCreateAttribute(in  SObject        anObject,
+	                                 in  string         aTypeOfAttribute);
+    
+    boolean FindAttribute(in  SObject        anObject,
+				 out GenericAttribute anAttribute,
+				 in  string         aTypeOfAttribute);
+    
+    void RemoveAttribute(in  SObject        anObject,
+				in  string         aTypeOfAttribute);
+
+    
+
+    void Addreference(in SObject anObject, 
+		      in SObject theReferencedObject) ;
+
+    void AddDirectory(in string theName);  
+
+    /*! 
+     *  Identification of the SObject substructure
+     *  as a GUID use the followin format "00000000-0000-0000-0000-000000000000"
+     */		
+
+     void SetGUID(in SObject anObject, in string theGUID);
+     boolean IsGUID(in SObject anObject, in string theGUID);		
+
+
+    void NewCommand(); // command management
+    void CommitCommand() raises(LockProtection); // command management
+    boolean HasOpenCommand();
+    void AbortCommand(); // command management
+
+    attribute long  UndoLimit;
+    void Undo() raises (LockProtection);
+    void Redo() raises (LockProtection);
+
+    boolean GetAvailableUndos();
+    boolean GetAvailableRedos();
+  };
+
+  //==========================================================================
+  //The Study objects are built by the StudyBuilder. The SObject interface pr=
+  //ovides methods for elementary inquiries,
+  //like getting an object ID or its attribuites.
+  //The SComponent interface is a specialisation of the SObject interface.
+  //==========================================================================
+
+  interface SObject
+  {
+
+    attribute string Name; // equivalent to setName() & getName()
+    ID GetID();
+    //
+    SComponent GetFatherComponent();
+    SObject    GetFather();
+    //
+    short      Tag();
+
+    boolean FindSubObject (in long atag,out SObject obj);
+    boolean FindAttribute(out GenericAttribute anAttribute,
+				  in  string         aTypeOfAttribute);
+
+    boolean ReferencedObject(out SObject obj);                                 // A REVOIR
+
+    ListOfAttributes     GetAllAttributes();
+    Study GetStudy();
+
+  };
+
+
+  //==========================================================================
+  // Generic attribute, all attributes inherit this base interface
+  //==========================================================================
+  interface GenericAttribute
+  {
+    exception LockProtection {};
+    void CheckLocked() raises (LockProtection);
+  };
+
+  
+
+
+  //==========================================================================
+  //==========================================================================
+  interface SComponent : SObject
+  {
+    string  ComponentDataType();
+    boolean ComponentIOR (out ID theID); //returns True if there is an instance
+                                         //In this case ID identifies this one
+  };
+
+
+  //==========================================================================
+  //==========================================================================
+  interface SComponentIterator
+  {
+    void Init();
+    boolean More();
+    void Next();
+    SComponent Value();
+  };
+
+  //==========================================================================
+  //==========================================================================
+  interface ChildIterator
+  {
+    void Init();
+    void InitEx(in boolean allLevels);
+    boolean More();
+    void Next();
+    SObject Value();
+  };
+
+
+  //==========================================================================
+  // Interface Component containes the Set of methods used for the management 
+  // of produced object in the study by a component.
+  //==========================================================================
+  interface Driver
+  {
+
+    /*!
+     * This method Save is called  by the StudyManager during the saving of a study .
+     * <theComponent> points to the component specific data in the study
+     * The method returns a byte stream TMPFile that contains all saved data
+     */
+
+
+    TMPFile Save(in SComponent theComponent);
+
+
+    /*!
+     * This method Load is called  by the StudyManager during the opening of a study .
+     * <theComponent> points to the component specific data in the study
+     * <theStream> contains all data saved by the component on Save method
+     */
+
+    boolean Load(in SComponent theComponent, in TMPFile theStream);
+
+
+    /*!
+     * This method Close is called  by the StudyManager during the closing of a study .
+     * /aStudy which is saved
+     * /aSComponent which is the father of the produced study objects by the component
+     */
+
+    //void Close (in SComponent aSComponent);
+    void Close ( in string  aIORSComponent);
+    
+    /*!
+     *  This method ComponentDataType() returns the type of data produced by this Component in the study 
+     */
+    
+     string ComponentDataType();
+
+    // Driver Transient -> persistent called for each object in study
+
+    string IORToLocalPersistentID (in string IORString, out boolean IsAFile); 
+
+    string LocalPersistentIDToIOR (in string aLocalPersistentID);
+      
+    // Publishing in the study
+
+    boolean CanPublishInStudy(in Object theIOR);		      
+
+    SObject PublishInStudy(in Study theStudy, in SObject theSObject, in Object theObject, in string theName);
+    
+  };
+};
+
+#endif
