@@ -1,3 +1,31 @@
+/*----------------------------------------------------------------------------
+MED MEDMEM : MED files in memory
+
+ Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+ CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+
+ This library is free software; you can redistribute it and/or 
+ modify it under the terms of the GNU Lesser General Public 
+ License as published by the Free Software Foundation; either 
+ version 2.1 of the License. 
+
+ This library is distributed in the hope that it will be useful, 
+ but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ Lesser General Public License for more details. 
+
+ You should have received a copy of the GNU Lesser General Public 
+ License along with this library; if not, write to the Free Software 
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+
+ See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+
+
+
+  File   : create_mesh.c
+Module : MED
+----------------------------------------------------------------------------*/
+
 #include <med.h>
 #include <string.h>
 
@@ -112,12 +140,19 @@ int main (int argc, char **argv)
   med_float   fieldnodedouble1[19] = {1.,1.,1.,2.,2.,2.,3.,3.,3.,4.,4.,4.,5.,5.,5.,6.,6.,6.,7.};
   med_float   fieldnodedouble2[19] = {1.,2.,2.,2.,3.,3.,3.,4.,4.,4.,5.,5.,5.,6.,6.,6.,7.,7.,7.};
 
-  char champ3[MED_TAILLE_NOM+1]="fieldcelldouble" ;
+  char champ3[MED_TAILLE_NOM+1]="fieldcelldoublevector" ;
   char champ3_comp[MED_TAILLE_PNOM*3+1]="comp1   comp2   comp3   " ;
-  char champ3_unit[MED_TAILLE_PNOM*3+1]="M/S     M/s     m/s     " ;
-  med_float   fieldcelldouble1[12*3] = {1,1,1,2,2,2,3,3,3,4,4,4,0,0,0,1,1,1,0,0,0,1,1,1,1,1,1,0,0,0,1,1,1,0,0,0};
-  med_float   fieldcelldouble2[2*3]  = {5,5,0,1,0,1};
-  med_float   fieldcelldouble3[2*3]  = {6,6,1,0,1,0};
+  char champ3_unit[MED_TAILLE_PNOM*3+1]="m/s     m/s     m/s     " ;
+  med_float   fieldcelldouble1[12*3] = {1.,1.,1.,2.,2.,2.,3.,3.,3.,4.,4.,4.,0.,0.,0.,1.,1.,1.,0.,0.,0.,1.,1.,1.,1.,1.,1.,0.,0.,0.,1.,1.,1.,0.,0.,0.};
+  med_float   fieldcelldouble2[2*3]  = {5.,5.,0.,1.,0.,1.};
+  med_float   fieldcelldouble3[2*3]  = {6.,6.,1.,0.,1.,0.};
+
+  char champ4[MED_TAILLE_NOM+1]="fieldcelldoublescalar" ;
+  char champ4_comp[MED_TAILLE_PNOM+1]="comp1   " ;
+  char champ4_unit[MED_TAILLE_PNOM+1]="m/s     " ;
+  med_float   fieldcelldouble4[12] = {1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.};
+  med_float   fieldcelldouble5[2]  = {2.,2.};
+  med_float   fieldcelldouble6[2]  = {3.,3.};
 
   /***************************************************************************/
   fid = MEDouvrir("pointe.med",MED_REMP);
@@ -346,15 +381,38 @@ int main (int argc, char **argv)
 			  MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_MAILLE, 
 			  MED_TETRA4, MED_NOPDT,"        ", 0., MED_NONOR);
 	printf("MEDchampEcr : %d \n",ret);
+	ret = MEDchampEcr(fid, maa, champ3, (unsigned char *)fieldcelldouble3,
+			  MED_NO_INTERLACE, nhexa8,
+			  MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_MAILLE, 
+			  MED_HEXA8, MED_NOPDT,"        ", 0., MED_NONOR);
+	printf("MEDchampEcr : %d \n",ret);
 	ret = MEDchampEcr(fid, maa, champ3, (unsigned char *)fieldcelldouble2,
 			  MED_NO_INTERLACE, npyra5,
 			  MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_MAILLE, 
 			  MED_PYRA5, MED_NOPDT,"        ", 0., MED_NONOR);
 	printf("MEDchampEcr : %d \n",ret);
-	ret = MEDchampEcr(fid, maa, champ3, (unsigned char *)fieldcelldouble3,
+      }
+    }
+  
+  if (ret == 0)
+    {
+      ret = MEDchampCr(fid,champ4,MED_REEL64,champ4_comp,champ4_unit,1);
+      printf("MEDchampCr : %d \n",ret);
+      if (ret == 0) {
+	ret = MEDchampEcr(fid, maa, champ4, (unsigned char *)fieldcelldouble4,
+			  MED_NO_INTERLACE, ntet4,
+			  MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_MAILLE, 
+			  MED_TETRA4, MED_NOPDT,"        ", 0., MED_NONOR);
+	printf("MEDchampEcr : %d \n",ret);
+	ret = MEDchampEcr(fid, maa, champ4, (unsigned char *)fieldcelldouble6,
 			  MED_NO_INTERLACE, nhexa8,
 			  MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_MAILLE, 
 			  MED_HEXA8, MED_NOPDT,"        ", 0., MED_NONOR);
+	printf("MEDchampEcr : %d \n",ret);
+	ret = MEDchampEcr(fid, maa, champ4, (unsigned char *)fieldcelldouble5,
+			  MED_NO_INTERLACE, npyra5,
+			  MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_MAILLE, 
+			  MED_PYRA5, MED_NOPDT,"        ", 0., MED_NONOR);
 	printf("MEDchampEcr : %d \n",ret);
       }
     }

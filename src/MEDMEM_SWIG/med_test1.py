@@ -1,11 +1,28 @@
-###################################################################################
+#  MED MEDMEM_SWIG : binding of C++ implementation and Python
 #
-# This Python script is parsing a MED file using MED Memory from SALOME platform:
-# It analyses all meshes in the MED file (coordinates, connectivity of d-cells as
-# well as (d-1)-cells, families). It analyses fields stored in the MED file (d is
-# the space dimension). You can assume that it is a kind of MED file parser.
+#  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+# 
+#  This library is free software; you can redistribute it and/or 
+#  modify it under the terms of the GNU Lesser General Public 
+#  License as published by the Free Software Foundation; either 
+#  version 2.1 of the License. 
+# 
+#  This library is distributed in the hope that it will be useful, 
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+#  Lesser General Public License for more details. 
+# 
+#  You should have received a copy of the GNU Lesser General Public 
+#  License along with this library; if not, write to the Free Software 
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+# 
+#  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
 #
-###################################################################################
+#
+#
+#  File   : med_test1.py
+#  Module : MED
 
 from libMEDMEM_Swig import *
 from random import *
@@ -392,27 +409,29 @@ if (nbMeshes>0):
             suppBound = mesh.getBoundaryElements(MED_FACE)
             nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
-            normalBound = mesh.getNormal(suppBound)
-            for j in range(nbElmBound):
-                normalBoundJ = normalBound.getValueI(MED_FULL_INTERLACE,j+1)
-                value1 = normalBoundJ[0]
-                value2 = normalBoundJ[1]
-                value3 = normalBoundJ[2]
-                norm = (value1*value1 + value2*value2 + value3*value3)**(0.5)
-                print "    * ",normalBoundJ[:spaceDim],"norm:",norm
+##            normalBound = mesh.getNormal(suppBound)
+##            for j in range(nbElmBound):
+##                normalBoundJ = normalBound.getValueI(MED_FULL_INTERLACE,j+1)
+##                value1 = normalBoundJ[0]
+##                value2 = normalBoundJ[1]
+##                value3 = normalBoundJ[2]
+##                norm = (value1*value1 + value2*value2 + value3*value3)**(0.5)
+##                print "    * ",normalBoundJ[:spaceDim],"norm:",norm
         elif spaceDim == 2:
             suppBound = mesh.getBoundaryElements(MED_EDGE)
             nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
-            normalBound = mesh.getNormal(suppBound)
-            for j in range(nbElmBound):
-                normalBoundJ = normalBound.getValueI(MED_FULL_INTERLACE,j+1)
-                value1 = normalBoundJ[0]
-                value2 = normalBoundJ[1]
-                norm = (value1*value1 + value2*value2)**(0.5)
-                print "    * ",normalBoundJ[:spaceDim],"norm:",norm
+##            normalBound = mesh.getNormal(suppBound)
+##            for j in range(nbElmBound):
+##                normalBoundJ = normalBound.getValueI(MED_FULL_INTERLACE,j+1)
+##                value1 = normalBoundJ[0]
+##                value2 = normalBoundJ[1]
+##                norm = (value1*value1 + value2*value2)**(0.5)
+##                print "    * ",normalBoundJ[:spaceDim],"norm:",norm
         print ""
 if (nbFields>0):
+    print "Updating supports in the Med Object"
+    md.updateSupport()
     print "Field(s) Analysis "
     for i in range(nbFields):
         field_name = md.getFieldName(i)

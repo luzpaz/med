@@ -1,0 +1,312 @@
+#include <cstdlib>	// pour l'acces à EXIT_SUCCESS et EXIT_FAILURE
+#include "utilities.h"
+#include "MEDMEM_Array.hxx"
+
+int main (int argc, char ** argv) 
+{
+
+  int SpaceDimension = 3;
+  int NumberOfNodes  = 4; 
+  MEDARRAY<int> * myArray = new MEDARRAY<int>(SpaceDimension,NumberOfNodes,MED_FULL_INTERLACE) ;
+  ASSERT(myArray != NULL);
+
+  int * value = myArray->get(MED_FULL_INTERLACE) ;
+  ASSERT(value!= NULL);
+
+  for (int i=0; i<SpaceDimension*NumberOfNodes; i++)
+    value[i]=i ; 
+  
+  int leadingValue;
+  try
+  {
+  	leadingValue = myArray->getLeadingValue() ;
+	ASSERT (leadingValue == SpaceDimension);
+  }
+  catch ( const std::exception &e )
+  {
+	cout << "-------------------------------" << endl;
+        cout << "   Pb au getLeadingValue()     " << endl;
+        cout << "-------------------------------" << endl;
+	MESSAGE( "catched exception : " << e.what() ) ;
+	return EXIT_FAILURE ;
+  }
+  catch (...)
+  {
+	cout << "-------------------------------" << endl;
+        cout << "   Pb au getLeadingValue()     " << endl;
+        cout << "-------------------------------" << endl;
+	return EXIT_FAILURE ;
+  }
+
+  int lengthValue;
+  try
+  {
+  	lengthValue = myArray->getLengthValue() ;
+        ASSERT(lengthValue == NumberOfNodes)
+  }
+  catch ( const std::exception &e )
+  {
+	cout << "-------------------------------" << endl;
+        cout << "   Pb au getLengthValue()     " << endl;
+        cout << "-------------------------------" << endl;
+	MESSAGE( "catched exception : " << e.what() ) ;
+	return EXIT_FAILURE ;
+  }
+  catch (...)
+  {
+	cout << "-------------------------------" << endl;
+        cout << "   Pb au getLengthValue()     " << endl;
+        cout << "-------------------------------" << endl;
+	return EXIT_FAILURE ;
+  }
+
+  cout << "Show all using getI and full interlace  :" << endl;
+  for (int i=1; i<=lengthValue; i++) 
+  {
+	try
+	{
+    		int * node = myArray->getI(MED_FULL_INTERLACE,i) ;
+    		cout << " - " ;
+    		for (int j=0;j<leadingValue;j++)
+      			cout << node[j] << " " ;
+    		cout << endl ;
+	}
+  	catch ( const std::exception &e )
+  	{
+		cout << "-------------------------------" << endl;
+        	cout << "   Pb au getI()  valeur de i " << i << endl;
+        	cout << "-------------------------------" << endl;
+		MESSAGE( "catched exception : " << e.what() ) ;
+		return EXIT_FAILURE ;
+  	}
+  	catch (...)
+  	{
+		cout << "-------------------------------" << endl;
+       		cout << "   Pb au getI()  valeur de i " << i << endl;
+       		cout << "-------------------------------" << endl;
+		return EXIT_FAILURE ;
+  	}
+  }
+
+  cout << "Show all using getI and no interlace  :" << endl;
+  for (int i=1; i<=leadingValue; i++) 
+  {
+	try
+	{
+    		int * node = myArray->getI(MED_NO_INTERLACE,i) ;
+    		cout << " - " ;
+    		for (int j=0;j<lengthValue;j++)
+      			cout << node[j] << " " ;
+    		cout << endl ;
+	}
+  	catch ( const std::exception &e )
+  	{
+		cout << "-------------------------------" << endl;
+        	cout << "   Pb au getI()  valeur de i " << i << endl;
+        	cout << "-------------------------------" << endl;
+		MESSAGE( "catched exception : " << e.what() ) ;
+		return EXIT_FAILURE ;
+  	}
+  	catch (...)
+  	{
+		cout << "-------------------------------" << endl;
+        	cout << "   Pb au getI()  valeur de i " << i << endl;
+        	cout << "-------------------------------" << endl;
+		return EXIT_FAILURE ;
+  	}
+  }
+
+  cout << "Show all using getIJ :" << endl;
+  for (int i=1; i<=lengthValue ; i++) 
+  {
+	int j;
+	try
+	{
+  		cout << " - " ;
+    		for (j=1;j<leadingValue+1;j++)
+      			cout << myArray->getIJ(i,j) << " " ;
+    		cout << endl ;
+	}
+  	catch ( const std::exception &e )
+  	{
+		cout << "-------------------------------" << endl;
+        	cout << "   Pb au getIJ()  i " << i << " j " << j << endl;
+        	cout << "-------------------------------" << endl;
+		MESSAGE( "catched exception : " << e.what() ) ;
+		return EXIT_FAILURE ;
+  	}
+  	catch (...)
+  	{
+		cout << "-------------------------------" << endl;
+        	cout << "   Pb au getIJ()  i " << i << " j " << j << endl;
+        	cout << "-------------------------------" << endl;
+		return EXIT_FAILURE ;
+  	}
+  }
+
+  cout << "Show all using get and MED_NO_INTERLACE :" << endl;
+  try
+  {
+  	int * NoInterlaceArray = myArray->get(MED_NO_INTERLACE) ;
+  	for (int i=0; i<lengthValue ; i++) 
+	{
+    		cout << " - " ;
+    		for (int j=0;j<leadingValue;j++)
+      			cout << NoInterlaceArray[j*lengthValue+i] << " " ;
+    		cout << endl ;
+  	}
+  }
+  catch ( const std::exception &e )
+  {
+	cout << "-------------------------------" << endl;
+       	cout << "   Pb au get   " << endl;
+        cout << "-------------------------------" << endl;
+	MESSAGE( "catched exception : " << e.what() ) ;
+	return EXIT_FAILURE ;
+  }
+  catch (...)
+  {
+	cout << "---------------" << endl;
+       	cout << "   Pb au get   " << endl;
+       	cout << "---------------" << endl;
+	return EXIT_FAILURE ;
+  }
+
+
+  cout << endl << endl << "Tests des fonctions Set " << endl;
+
+  int * myNewInt = new int[SpaceDimension*NumberOfNodes];
+  for (int i=0; i<SpaceDimension*NumberOfNodes; i++)
+  {
+	myNewInt[i]=i*10 ; 
+  }
+
+  try
+  {
+  	myArray->set(MED_FULL_INTERLACE, myNewInt);
+  }
+  catch ( const std::exception &e )
+  {
+	cout << "-------------------------------" << endl;
+       	cout << "   Pb au set   " << endl;
+        cout << "-------------------------------" << endl;
+	MESSAGE( "catched exception : " << e.what() ) ;
+	return EXIT_FAILURE ;
+  }
+  catch (...)
+  {
+	cout << "---------------" << endl;
+       	cout << "   Pb au set   " << endl;
+       	cout << "---------------" << endl;
+	return EXIT_FAILURE ;
+   }
+  delete [] myNewInt;
+
+  cout << "Nouvelles valeurs (x10) : get avec Full interlace : " << endl;
+  int * myNewValue;
+  try
+  {
+  	 myNewValue = myArray->get(MED_FULL_INTERLACE) ;
+  	 ASSERT(myNewValue!= NULL);
+  }
+  catch ( const std::exception &e )
+  {
+	cout << "-----------------" << endl;
+        cout << "   Pb au get     " << endl;
+        cout << "-----------------" << endl;
+	MESSAGE( "catched exception : " << e.what() ) ;
+	return EXIT_FAILURE ;
+  }
+  catch (...)
+  {
+	cout << "---------------" << endl;
+       	cout << "   Pb au get   " << endl;
+       	cout << "---------------" << endl;
+  }
+
+  cout << " - ";
+  for (int i=0; i<SpaceDimension*NumberOfNodes; i++)
+	cout << myNewValue[i]<< " " ; 
+  cout << endl;
+
+
+  int * myNewLine = new int[SpaceDimension];
+  for (int i = 0; i < SpaceDimension; i++) 
+  	myNewLine[i] = i * 100;
+
+  try
+  {
+  	myArray->setI(MED_FULL_INTERLACE, 1, myNewLine);
+  }
+  catch ( const std::exception &e )
+  {
+	cout << "-------------------------------" << endl;
+        cout << "   Pb au getLengthValue()     " << endl;
+        cout << "-------------------------------" << endl;
+	MESSAGE( "catched exception : " << e.what() ) ;
+	return EXIT_FAILURE ;
+  }
+  catch (...)
+  {
+	cout << "---------------" << endl;
+       	cout << "   Pb au setI   " << endl;
+       	cout << "---------------" << endl;
+  }
+  delete [] myNewLine;
+
+  try
+  {
+  	 myNewValue = myArray->getI(MED_FULL_INTERLACE,1) ;
+  	 ASSERT(myNewValue!= NULL);
+  }
+  catch ( const std::exception &e )
+  {
+	cout << "-------------------------------" << endl;
+        cout << "   Pb au getLengthValue()     " << endl;
+        cout << "-------------------------------" << endl;
+	MESSAGE( "catched exception : " << e.what() ) ;
+	return EXIT_FAILURE ;
+  }
+  catch (...)
+  {
+	cout << "---------------" << endl;
+       	cout << "   Pb au getI  " << endl;
+       	cout << "---------------" << endl;
+  }
+
+  cout << endl << " Nouvelles valeurs (x100)  sur la 1ere ligne: get avec Full interlace : ";
+  cout << endl << " - ";
+  for (int i=0; i<SpaceDimension; i++)
+	cout << myNewValue[i]<< " " ; 
+  cout << endl;
+
+  try
+  {
+  	myArray->setIJ(1,1,1992);
+  }
+  catch ( const std::exception &e )
+  {
+	cout << "---------------------------" << endl;
+        cout << "   Pb au setIJ()  de 1 , 1 "  << endl;
+	cout << "---------------------------" << endl;
+	MESSAGE( "catched exception : " << e.what() ) ;
+	return EXIT_FAILURE ;
+  }
+  catch (...)
+  {
+	cout << "-----------------------------" << endl;
+        cout << "   Pb au setIJ()  de 1 , 1 "  << endl;
+	cout << "-----------------------------" << endl;
+  }
+
+  cout << "Nouvelle valeur avec setIJ et getIJ" << endl;
+  cout << " - " << myArray->getIJ(1,1) << endl;
+
+  delete myArray;
+  return EXIT_SUCCESS ;
+}
+  
+/*
+  inline medModeSwitch getMode() const ;
+ 
+*/

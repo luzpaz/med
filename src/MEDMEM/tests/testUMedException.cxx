@@ -1,5 +1,3 @@
-//  MED MedMem : MED idl descriptions implementation based on the classes of MEDMEM
-//
 //  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
 // 
@@ -21,41 +19,35 @@
 //
 //
 //
-//  File   : Group_i.hxx
-//  Author : EDF
+//  File   : testUMedException.cxx
 //  Module : MED
-//  $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Group_i.hxx
 
-#ifndef MED_GROUP_I_HXX_
-#define MED_GROUP_I_HXX_
+using namespace std;
+#include <cstdlib>
+#include "MEDMEM_STRING.hxx"
+#include "MEDMEM_Exception.hxx"
 
-#include "Support_i.hxx"
-
-class FAMILY_i;
-class GROUP;
-
-class GROUP_i:
-                public POA_SALOME_MED::GROUP,
-	        public SUPPORT_i
+int main (int argc, char ** argv)
 {
-protected :
-    GROUP_i();
-    ~GROUP_i();
+	MEDEXCEPTION a = MEDEXCEPTION("test med exception");
+	cout << a << endl;;
+	cout << a.what() << endl;;
 
-    // C++ object containing values
-    const ::GROUP * const  _group;
+	MEDEXCEPTION b(a);
+	cout << b << endl;
+	cout << b.what() << endl;;
 
-public :
-    // Constructors and associated internal methods
-    GROUP_i(const ::GROUP * const g);
-    GROUP_i(const GROUP_i & g);
+	MEDEXCEPTION c("test med exception",argv[0],14);
+	cout << c << endl;
+	cout << c.what() << endl;;
 
-    CORBA::Long    	      getNumberOfFamilies() 
-					throw (SALOME::SALOME_Exception);
-    SALOME_MED::Family_array* getFamilies() 	         
-					throw (SALOME::SALOME_Exception);
-    SALOME_MED::FAMILY_ptr    getFamily(CORBA::Long i) 
-					throw (SALOME::SALOME_Exception);
+      	STRING msgErr;
+	msgErr << "ESSAI::ESSAI()!  "<< 4 << "ieme essai ";
+        cout << MEDEXCEPTION (LOCALIZED(msgErr)).what() << endl ;
+
+	const char * LOC = "toto" ;
+        cout << MEDEXCEPTION (LOCALIZED(STRING(LOC)<<" et titi")).what() << endl ;
+
+	return EXIT_SUCCESS;	
+
 };
-
-#endif /* MED_GROUP_I_HXX_ */

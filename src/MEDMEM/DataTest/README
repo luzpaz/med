@@ -1,0 +1,54 @@
+
+mesh.med	maillage du cube par SMESH
+pointe.med	fichier de test cree par Med Memoire
+zzzz121b.med    maillages Aster + champ : sert a Aster de fichier de test
+maill.0.med	petit fichier Aster (2D) 
+
+Seuls les 2 premiers fichiers peuvent etre entierement lus par Med Memoire en version V08.2 :
+Les 2 autres fichiers contiennent des points de Gauss qui ne seront pas gérés avant 
+la version V08.4 de Med Memoire.
+
+		Utilisation des tests
+		---------------------
+
+1) Tests Unitaires
+__________________
+
+Il faut récuperer les fichiers de reference
+puis lancer tous.sh (apres avoir modifier les variables selon votre 
+environnement (SALOME,SALOME_LIB et SALOME_PATH) )
+
+
+Les resultats "grossiers" (OK ou NOK) sont dans le fichier cpterendu.
+La "log" des résultats est dans le fichier result_test
+
+
+2) Les deux tests readCoordinate et ReadEntete
+______________________________________________
+
+Ces deux tests, à terme devront permettre d'avoir un équivalent à mdump
+
+
+A Constitution des fichiers de référence mdump
+----------------------------------------------
+
+Une liste des fichiers avec les noms de maillages associés se trouve
+dans le fichier Maillages.txt sous la forme:
+
+	nom de fichier:nom de maillage:numero du maillage
+
+creer la directory Ref
+lancer constituedump.sh (apres avoir modifier les variables selon votre 
+environnement (SALOME,SALOME_LIB et SALOME_PATH) )
+
+B Comparaison avec ces fichiers
+-------------------------------
+
+Lancer testReadCoordinate.sh (apres avoir modifier les variables selon votre 
+environnement (SALOME,SALOME_LIB et SALOME_PATH) )
+Lancer testReadEntete.sh (apres avoir modifier les variables selon votre 
+environnement (SALOME,SALOME_LIB et SALOME_PATH) )
+
+Les resultats sont dans le fichier PourMail
+
+
