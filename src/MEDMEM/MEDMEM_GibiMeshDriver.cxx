@@ -1460,14 +1460,14 @@ void GIBI_MESH_WRONLY_DRIVER::write(void) const
 
   // we are going to modify the _gibi field
   GIBI_MESH_WRONLY_DRIVER * me = const_cast<GIBI_MESH_WRONLY_DRIVER *>(this);
-  try {
+//  try {
     me->writeSupportsAndMesh();
     me->writeLastRecord();
-  }
-  catch (MEDEXCEPTION &ex)
-  {
-    INFOS( ex.what() );
-  }
+//   }
+//   catch (MEDEXCEPTION &ex)
+//   {
+//     INFOS( ex.what() );
+//   }
 
   END_OF(LOC);
 }
@@ -1731,23 +1731,30 @@ void GIBI_MESH_WRONLY_DRIVER::addName(map<string,int>& nameMap,
   string name = cleanName( theName );
   if ( !name.empty() ) {
     int len = name.length();
-    bool ok = ( len <= 8 && len > 0 );
-    if ( ok ) {
-      for ( int i = 0; i < len; ++i )
-        name[i] = toupper( name[i] );
-      ok = nameMap.insert( make_pair( name, index )).second;
-    }
-    if ( !ok ) {
-      char *str=new char[ prefix.size() + 13 ];
-      int j = 1;
-      do {
-        sprintf( str, "%s_%d", prefix.c_str(), nameMap.size()+j );
-        ok = nameMap.insert( make_pair( str, index )).second;
-        j++;
-      } while ( !ok );
-      INFOS( "Save <" << name << "> as <" << str << ">");
-      delete [] str;
-    }
+    if ( len > 8 )
+      throw MEDEXCEPTION(STRING("Can't write too long name: ") << name );
+
+    for ( int i = 0; i < len; ++i )
+      name[i] = toupper( name[i] );
+    if ( ! nameMap.insert( make_pair( name, index )).second )
+      throw MEDEXCEPTION(STRING("Can't write not unique name: ") << name );
+//     bool ok = ( len <= 8 && len > 0 );
+//     if ( ok ) {
+//       for ( int i = 0; i < len; ++i )
+//         name[i] = toupper( name[i] );
+//       ok = nameMap.insert( make_pair( name, index )).second;
+//     }
+//     if ( !ok ) {
+//       char *str=new char[ prefix.size() + 13 ];
+//       int j = 1;
+//       do {
+//         sprintf( str, "%s_%d", prefix.c_str(), nameMap.size()+j );
+//         ok = nameMap.insert( make_pair( str, index )).second;
+//         j++;
+//       } while ( !ok );
+//       INFOS( "Save <" << name << "> as <" << str << ">");
+//       delete [] str;
+//     }
   }
 }
 
@@ -2332,14 +2339,14 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
 
   // write mesh
 
-  try {
+  //try {
     me->writeSupportsAndMesh();
-  }
-  catch (MEDEXCEPTION &ex)
-  {
-    INFOS( ex.what() );
-    return;
-  }
+//   }
+//   catch (MEDEXCEPTION &ex)
+//   {
+//     INFOS( ex.what() );
+//     return;
+//   }
 
   // write fields
 
