@@ -86,7 +86,7 @@ int MESH::addDriver(driverTypes driverType,
 }
 
 /*! Add an existing MESH driver. */
-int  MESH::addDriver(MED_MESH_DRIVER & driver) {
+int  MESH::addDriver(GENDRIVER & driver) {
   const char * LOC = "MESH::addDriver(GENDRIVER &) : ";
   BEGIN_OF(LOC);
 

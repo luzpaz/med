@@ -336,11 +336,6 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
       return;
     }
 
-    for(int i=0; i<numberOfFamilies; i++) {
-      FAMILY * myFamily = myFamilies[i] ;
-      MESSAGE(LOC<<"updating the family (BEGIN) : " << *myFamily);
-    }
-
     // well we could go !
     CONNECTIVITY * oldConstituent = _constituent;
 

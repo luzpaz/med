@@ -156,7 +156,6 @@ public :
   // Add your personnal driver line (step 2)
   friend class MED_MESH_RDONLY_DRIVER;
   friend class MED_MESH_WRONLY_DRIVER;
-  friend class MED_MED_DRIVER;
 
   friend class MED_MED_RDONLY_DRIVER;
   friend class MED_MED_WRONLY_DRIVER;
@@ -328,25 +327,6 @@ inline void MESH::read(const MED_MED_DRIVER & genDriver)
   END_OF(LOC);
 
 }
-
-// This method is MED specific : don't use it 
-// must be private. 
-inline void MESH::read(const MED_MED_DRIVER & genDriver) 
-{ 
-  const char * LOC = "MESH::read(const MED_MED_DRIVER & genDriver): ";
-  BEGIN_OF(LOC);
-
-  for (int index=0; index < _drivers.size(); index++ )
-    if ( *_drivers[index] == genDriver ) { 
-      _drivers[index]->open();   
-      _drivers[index]->read(); 
-      _drivers[index]->close();
-      // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
-    }
-  
-  END_OF(LOC);
-  
-} 
 
 /*! Set the MESH name */
 inline void MESH::setName(string name)

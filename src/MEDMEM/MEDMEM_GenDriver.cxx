@@ -168,6 +168,4 @@ bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
   return ( _id == genDriver._id )  &&
     ( _driverType == genDriver._driverType );
   
-  END_OF(LOC);
-  
 };

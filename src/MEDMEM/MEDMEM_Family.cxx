@@ -229,43 +229,6 @@ FAMILY::FAMILY(const SUPPORT & s):SUPPORT(s)
   _groupName= (string*) NULL;
 };
 
-FAMILY::FAMILY(FAMILY & m):SUPPORT(m)
-{
-  _identifier = m._identifier;
-  _numberOfAttribute = m._numberOfAttribute;
-  if (m._attributeIdentifier != NULL)
-    {
-      _attributeIdentifier = new int[m._numberOfAttribute];
-      memcpy(_attributeIdentifier,m._attributeIdentifier,m._numberOfAttribute*sizeof(int));
-    }
-  else
-    _attributeIdentifier = (int *) NULL;
-  if (m._attributeValue != NULL)
-    {
-      _attributeValue = new int[m._numberOfAttribute];
-      memcpy(_attributeValue,m._attributeValue,m._numberOfAttribute*sizeof(int));
-    }
-  else
-    _attributeValue = (int *) NULL;
-  if (m._attributeDescription != NULL)
-    {
-      _attributeDescription = new string[m._numberOfAttribute];
-      for (int i=0;i<m._numberOfAttribute;i++)
-	_attributeDescription[i] = m._attributeDescription[i];
-    }
-  else
-    _attributeDescription = (string *) NULL;
-  _numberOfGroup = m._numberOfGroup;
-  if (m._groupName != NULL)
-    {
-      _groupName = new string[m._numberOfGroup];
-      for (int i=0;i<m._numberOfGroup;i++)
-	_groupName[i]=m._groupName[i];
-    }
-  else
-    _groupName = (string *) NULL;
-};
-
 FAMILY::~FAMILY() 
 {
     MESSAGE("~FAMILY()");
