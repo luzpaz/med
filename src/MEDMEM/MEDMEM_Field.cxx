@@ -68,9 +68,16 @@ FIELD_::FIELD_(const FIELD_ &m)
   _componentsDescriptions = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsDescriptions[i]=m._componentsDescriptions[i];}
-  _componentsUnits = new UNIT[m._numberOfComponents];
-  for (int i=0; i<m._numberOfComponents; i++)
-    {_componentsUnits[i] = m._componentsUnits[i];}
+
+  if (m._componentsUnits != NULL)
+  {
+      _componentsUnits = new UNIT[m._numberOfComponents];
+      for (int i=0; i<m._numberOfComponents; i++)
+	  _componentsUnits[i] = m._componentsUnits[i];
+  }
+  else
+      _componentsUnits=(UNIT*)NULL;
+  
   // L'operateur '=' est defini dans la classe UNIT
   _MEDComponentsUnits = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
