@@ -32,7 +32,7 @@ MED::MED(driverTypes driverType, const string & fileName)
 
   MESSAGE(LOC << "driverType = " << driverType);
 
-  int current = addDriver(driverType,fileName);
+  int current = addDriver(driverType,fileName,MED_LECT);
 
   _drivers[current]->open();
   _drivers[current]->readFileStruct();
@@ -149,7 +149,9 @@ MED::~MED()
   Create the specified driver and return its index reference to path to 
   read or write methods.
 */
-int MED::addDriver(driverTypes driverType, const string & fileName="Default File Name.med") {
+int MED::addDriver(driverTypes driverType,
+		   const string & fileName="Default File Name.med",
+		   MED_EN::med_mode_acces access) {
 
   const char * LOC = "MED::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\") : ";
 
@@ -158,8 +160,10 @@ int MED::addDriver(driverTypes driverType, const string & fileName="Default File
   MESSAGE(LOC << " the file name is " << fileName);
 
   SCRUTE(driverType);
+  SCRUTE(access);
 
-  GENDRIVER *driver = DRIVERFACTORY::buildDriverForMed(driverType,fileName,this);
+  GENDRIVER *driver = DRIVERFACTORY::buildDriverForMed(driverType,fileName,
+						       this,access);
 
   _drivers.push_back(driver);
 

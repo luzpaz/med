@@ -36,9 +36,11 @@ using namespace MED_EN;
 /*! Add a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. The meshname used in the file
     is  driverName. addDriver returns an integer handler. */
 int MESH::addDriver(driverTypes driverType, 
-                    const string & fileName/*="Default File Name.med"*/,const string & driverName/*="Default Mesh Name"*/) {
+                    const string & fileName/*="Default File Name.med"*/,
+		    const string & driverName/*="Default Mesh Name"*/,
+		    med_mode_acces access) {
 
-  const char * LOC = "MESH::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Mesh Name\") : ";
+  const char * LOC = "MESH::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Mesh Name\",MED_EN::med_mode_acces access) : ";
   
   GENDRIVER * driver;
 
@@ -46,7 +48,8 @@ int MESH::addDriver(driverTypes driverType,
   
   SCRUTE(driverType);
 
-  driver = DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName) ;
+  driver = DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,
+					     driverName,access) ;
 
   _drivers.push_back(driver);
 
@@ -296,7 +299,7 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
   BEGIN_OF(LOC);
 
   init();
-  GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName);
+  GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,MED_LECT);
   current = addDriver(*myDriver);
   delete myDriver;
   _drivers[current]->open();   

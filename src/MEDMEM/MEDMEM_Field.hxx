@@ -164,7 +164,9 @@ public:
   virtual  void     rmDriver(int index);
   virtual   int     addDriver(driverTypes driverType,
                               const string & fileName="Default File Name.med",
-			      const string & driverFieldName="Default Field Nam") ;
+			      const string & driverFieldName="Default Field Nam",
+			      MED_EN::med_mode_acces access=MED_EN::MED_REMP) ;
+
   virtual  int      addDriver( GENDRIVER & driver);
   virtual  void     read (const GENDRIVER &);
   virtual  void     read(int index=0);
@@ -600,7 +602,9 @@ public:
   void rmDriver(int index=0);
   int  addDriver(driverTypes driverType,
 		 const string & fileName="Default File Name.med",
-		 const string & driverFieldName="Default Field Name") ;
+		 const string & driverFieldName="Default Field Name",
+		 MED_EN::med_mode_acces access=MED_EN::MED_REMP) ;
+
   int  addDriver(GENDRIVER & driver);
 
   void allocValue(const int NumberOfComponents);
@@ -1642,15 +1646,17 @@ template <class T> FIELD<T>::FIELD(const SUPPORT * Support,
   _time = 0.0;
   _orderNumber = orderNumber;
 
-  switch(driverType)
-    {
-    case MED_DRIVER :
-      {
-	MED_FIELD_RDONLY_DRIVER<T> myDriver(fileName,this);
-	myDriver.setFieldName(fieldDriverName);
-	current = addDriver(myDriver);
-	break;
-      }
+  current = addDriver(driverType,fileName,fieldDriverName,MED_LECT);
+
+//   switch(driverType)
+//     {
+//     case MED_DRIVER :
+//       {
+// 	MED_FIELD_RDONLY_DRIVER<T> myDriver(fileName,this);
+// 	myDriver.setFieldName(fieldDriverName);
+// 	current = addDriver(myDriver);
+// 	break;
+//       }
 //   current = addDriver(driverType,fileName,fieldDriverName);
 //   switch(_drivers[current]->getAccessMode() ) {
 //   case MED_WRONLY : {
@@ -1660,12 +1666,12 @@ template <class T> FIELD<T>::FIELD(const SUPPORT * Support,
 //   default : {
 //   }
 //   }
-    default :
-      {
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Driver type unknown : can't create driver!"));
-	break;
-      }
-    }
+//     default :
+//       {
+// 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Driver type unknown : can't create driver!"));
+// 	break;
+//       }
+//     }
 
   _drivers[current]->open();
   _drivers[current]->read();
@@ -1781,9 +1787,10 @@ template <class T> void FIELD<T>::deallocValue()
 
 template <class T> int FIELD<T>::addDriver(driverTypes driverType,
 					   const string & fileName/*="Default File Name.med"*/,
-					   const string & driverName/*="Default Field Name"*/)
+					   const string & driverName/*="Default Field Name"*/,
+					   MED_EN::med_mode_acces access)
 {
-  const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name\") : ";
+  const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name\,MED_EN::med_mode_acces access) : ";
 
   GENDRIVER * driver;
 
@@ -1791,7 +1798,7 @@ template <class T> int FIELD<T>::addDriver(driverTypes driverType,
 
   SCRUTE(driverType);
 
-  driver = DRIVERFACTORY::buildDriverForField(driverType,fileName,this);
+  driver = DRIVERFACTORY::buildDriverForField(driverType,fileName,this,access);
 
   _drivers.push_back(driver);
 

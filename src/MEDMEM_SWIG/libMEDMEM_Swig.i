@@ -633,10 +633,11 @@ public:
   %extend {
     int addDriver(driverTypes driverType,
 		  char * fileName="Default File Name.med",
-		  char * driverName="Default Field Name")
+		  char * driverName="Default Field Name",
+		  med_mode_acces access=MED_REMP)
       {
 	return self->addDriver(driverType,string(fileName),
-			       string(driverName));
+			       string(driverName),access);
       }
 
   }
@@ -1101,10 +1102,11 @@ public :
 
     int addDriver(driverTypes driverType,
 		  char * fileName="Default File Name.med",
-		  char * driverName="Default Mesh Name")
+		  char * driverName="Default Mesh Name",
+		  med_mode_acces access=MED_REMP)
       {
 	return self->addDriver(driverType,string(fileName),
-			       string(driverName));
+			       string(driverName),access);
       }
 
     void write(int index=0, char * driverName="")
@@ -1581,9 +1583,10 @@ class MED
       }
 
     int addDriver(driverTypes driverType,
-		  char * fileName="Default File Name.med")
+		  char * fileName="Default File Name.med",
+		  med_mode_acces access=MED_REMP)
       {
-	return self->addDriver(driverType,string(fileName));
+	return self->addDriver(driverType,string(fileName),access);
       }
 
     %newobject getMeshName(int );

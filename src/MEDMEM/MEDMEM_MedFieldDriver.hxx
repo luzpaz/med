@@ -167,7 +167,7 @@ public :
     Constructor.
   */
   MED_FIELD_RDONLY_DRIVER(const string & fileName,  FIELD<T> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_RDONLY) { 
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY) { 
     BEGIN_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
     END_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
   }
@@ -220,7 +220,7 @@ public :
     Constructor.
   */
   MED_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_WRONLY)
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_WRONLY)
   {
     BEGIN_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
     END_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");

@@ -124,7 +124,8 @@ public :
 
   int  addDriver(driverTypes driverType,
 		 const string & fileName  ="Default File Name.med",
-		 const string & driverName="Default Mesh Name");
+		 const string & driverName="Default Mesh Name",
+		 MED_EN::med_mode_acces access=MED_EN::MED_REMP);
   int  addDriver(GENDRIVER & driver);
   void rmDriver(int index=0);
 

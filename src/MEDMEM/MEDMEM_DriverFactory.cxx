@@ -17,31 +17,99 @@
 //#include "utilities.h"
 
 using namespace MEDMEM;
+using namespace MED_EN;
 
-GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType, const std::string & fileName, MESH *mesh,const string &  driverName)
+GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
+					     const std::string & fileName,
+					     MESH *mesh,
+					     const string & driverName,
+					     med_mode_acces access)
 {
   GENDRIVER *ret;
   switch(driverType)
     {
     case MED_DRIVER : {
-      MED_MESH_RDWR_DRIVER *retmed=new MED_MESH_RDWR_DRIVER(fileName,mesh);
-      retmed->setMeshName(driverName);
-      return retmed;
+      switch(access)
+	{
+	case MED_LECT : {
+	  MED_MESH_RDONLY_DRIVER *retmed=new MED_MESH_RDONLY_DRIVER(fileName,
+								    mesh);
+	  retmed->setMeshName(driverName);
+	  return retmed;
+	}
+	case MED_ECRI : {
+	  MED_MESH_WRONLY_DRIVER *retmed=new MED_MESH_WRONLY_DRIVER(fileName,
+								    mesh);
+	  retmed->setMeshName(driverName);
+	  return retmed;
+	}
+	case MED_REMP : {
+	  MED_MESH_RDWR_DRIVER *retmed=new MED_MESH_RDWR_DRIVER(fileName,mesh);
+	  retmed->setMeshName(driverName);
+	  return retmed;
+	}
+	default:
+	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	}
+      break;
     }
 
     case GIBI_DRIVER : {
-      ret=new GIBI_MESH_RDWR_DRIVER(fileName,mesh);
-      return ret;
+      switch(access)
+	{
+	case MED_LECT : {
+	  ret=new GIBI_MESH_RDONLY_DRIVER(fileName,mesh);
+	  return ret;
+	}
+	case MED_ECRI : {
+	  throw MED_EXCEPTION ("access mode other than MED_LECT has been specified with the GIBI_DRIVER type which is not allowed because GIBI_DRIVER is only a read access driver");
+	}
+	case MED_REMP : {
+	  throw MED_EXCEPTION ("access mode other than MED_LECT has been specified with the GIBI_DRIVER type which is not allowed because GIBI_DRIVER is only a read access driver");
+	}
+	default:
+	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	}
+      break;
     }
 
     case PORFLOW_DRIVER : {
-      ret=new PORFLOW_MESH_RDWR_DRIVER(fileName,mesh);
-      return ret;
+      switch(access)
+	{
+	case MED_LECT : {
+	  ret=new PORFLOW_MESH_RDONLY_DRIVER(fileName,mesh);
+	  return ret;
+	}
+	case MED_ECRI : {
+	  throw MED_EXCEPTION ("access mode other than MED_LECT has been specified with the PORFLOW_DRIVER type which is not allowed because PORFLOW_DRIVER is only a read access driver");
+	}
+	case MED_REMP : {
+	  throw MED_EXCEPTION ("access mode other than MED_LECT has been specified with the PORFLOW_DRIVER type which is not allowed because PORFLOW_DRIVER is only a read access driver");
+	}
+	default:
+	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	}
+      break;
     }
 
     case VTK_DRIVER : {
-      ret=new VTK_MESH_DRIVER(fileName,mesh);
-      return ret;
+      switch(access)
+	{
+	case MED_LECT : {
+	  throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
+	}
+	case MED_ECRI : {
+	  ret=new VTK_MESH_DRIVER(fileName,mesh);
+	  return ret;
+	}
+	case MED_REMP : {
+	  ret=new VTK_MESH_DRIVER(fileName,mesh);
+	  return ret;
+	}
+	default:
+	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	}
+      break;
     }
 
     case NO_DRIVER : {
@@ -52,19 +120,53 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType, const std::
     }
 }
 
-GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType, const std::string & fileName, MED *med)
+GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
+					    const std::string & fileName,
+					    MED *med, med_mode_acces access)
 {
   GENDRIVER *ret;
+
   switch(driverType)
     {
     case MED_DRIVER : {
-      ret=new MED_MED_RDWR_DRIVER(fileName,med);
-      break ;
+      switch(access)
+	{
+	case MED_LECT : {
+	  ret=new MED_MED_RDONLY_DRIVER(fileName,med);
+	  break ;
+	}
+	case MED_ECRI : {
+	  ret=new MED_MED_WRONLY_DRIVER(fileName,med);
+	  break ;
+	}
+	case MED_REMP : {
+	  ret=new MED_MED_RDONLY_DRIVER(fileName,med);
+	  break ;
+	}
+	default:
+	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	}
+      break;
     }
 
     case VTK_DRIVER : {
-      ret=new VTK_MED_DRIVER(fileName,med);
-      break ;
+      switch(access)
+	{
+	case MED_LECT : {
+	  throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
+	}
+	case MED_ECRI : {
+	  ret=new VTK_MED_DRIVER(fileName,med);
+	  break ;
+	}
+	case MED_REMP : {
+	  ret=new VTK_MED_DRIVER(fileName,med);
+	  break ;
+	}
+	default:
+	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	}
+      break;
     }
 
     case GIBI_DRIVER : {
