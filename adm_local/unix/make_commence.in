@@ -2,7 +2,7 @@
 inc_builddir=$(top_builddir)/include/salome
 
 @SET_MAKE@
-SHELL=/bin/sh
+SHELL=@SHELL@
 
 # header missing
 
@@ -11,11 +11,13 @@ HAVE_SSTREAM=@HAVE_SSTREAM@
 
 LIBS=@LIBS@
 LIBSFORBIN=@LIBS@
-LDFLAGS=@LDFLAGS@ -L$(top_builddir)/lib/salome -Xlinker -rpath-link -Xlinker -L$(top_builddir)/lib/salome
-LDFLAGSFORBIN=@LDFLAGS@ -L$(top_builddir)/lib/salome -Xlinker -rpath-link -Xlinker -L$(top_builddir)/lib/salome
+# LDFLAGS=@LDFLAGS@ -L$(top_builddir)/lib/salome -Xlinker -rpath-link -Xlinker -L$(top_builddir)/lib/salome
+LDFLAGS= @LDFLAGS@ -L$(top_builddir)/lib/salome
+# LDFLAGSFORBIN=@LDFLAGS@ -L$(top_builddir)/lib/salome -Xlinker -rpath-link -Xlinker -L$(top_builddir)/lib/salome
+LDFLAGSFORBIN=@LDFLAGS@ -L$(top_builddir)/lib/salome
 # add libstdc++ to link c++ library with libtool !
-LDFLAGS+= -lstdc++
-LDFLAGSFORBIN+= -lstdc++
+LDFLAGS+= @STDLIB@
+LDFLAGSFORBIN+= @STDLIB@
 
 CP=@CP@
 
