@@ -1,12 +1,14 @@
-using namespace std;
 #include "utilities.h"
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_DriversDef.hxx"
 
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
+
 int main (int argc, char ** argv) {
-  list<MED_FR::med_geometrie_element> geomList = MED_FR::meshEntities[MED_FR::MED_MAILLE] ;
-  list<MED_FR::med_geometrie_element>::iterator itGeomList ;
+  list<medGeometryElement> geomList = meshEntities[MED_CELL] ;
+  list<medGeometryElement>::iterator itGeomList ;
   for(itGeomList=geomList.begin();itGeomList!=geomList.end();itGeomList++) {
     CELLMODEL myCellModel((MED_EN::medGeometryElement)(*itGeomList)) ;
 

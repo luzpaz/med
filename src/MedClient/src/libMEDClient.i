@@ -8,6 +8,9 @@
 #include CORBA_CLIENT_HEADER(MED)
 /* #define FIELDDOUBLEClient FIELDClient<double,SALOME_MED::FIELDDOUBLE_ptr> */
 /* #define FIELDINTClient FIELDClient<int,SALOME_MED::FIELDINT_ptr> */
+
+  using namespace MEDMEM;
+  using namespace MED_EN;
 %}
 
 %include "libMedCorba_Swig.i"

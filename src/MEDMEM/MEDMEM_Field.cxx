@@ -1,7 +1,9 @@
-using namespace std;
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_Mesh.hxx"
+
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
 
 // ---------------------------------
 // FIELD_ : Constructors

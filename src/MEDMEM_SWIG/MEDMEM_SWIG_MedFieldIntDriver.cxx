@@ -1,5 +1,8 @@
-using namespace std;
 #include "MEDMEM_SWIG_MedFieldIntDriver.hxx"
+
+using namespace std;
+using namespace MEDMEM;
+using namespace MED_EN;
 
 //=============================================================================
 /*!

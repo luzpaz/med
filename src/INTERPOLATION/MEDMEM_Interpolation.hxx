@@ -166,14 +166,14 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const FIELD<dou
   if ( ! _fromMesh    )  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"fromMesh is a NULL pointer  !")) ;
 
   _fromWrapper = new Meta_Wrapper<DIMENSION>(_fromMesh->getNumberOfNodes(),
-                                             const_cast<double *> (_fromMesh->getCoordinates(MED_FULL_INTERLACE)),
-					     const_cast<CONNECTIVITY *> (_fromMesh->getConnectivityptr()),
-					     const_cast<FIELD<double> *>(_fromField)
+                                             const_cast<double *> (_fromMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE)),
+					     const_cast<MEDMEM::CONNECTIVITY *> (_fromMesh->getConnectivityptr()),
+					     const_cast<MEDMEM::FIELD<double> *>(_fromField)
 					     );
 					     
 					     
   _toWrapper   = new Meta_Wrapper<DIMENSION>(_toMesh->getNumberOfNodes(),
-                                             const_cast<double *> (_toMesh->getCoordinates(MED_FULL_INTERLACE))
+                                             const_cast<double *> (_toMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE))
 					     );  
 
   
@@ -302,12 +302,12 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolate(i
   _toField->setOrderNumber	      ( _fromField->getOrderNumber()		);
   _toField->setValueType	      ( MED_EN::MED_REEL64			);
 
-  SUPPORT * mySupport(new SUPPORT(_toMesh,"support",MED_NODE));
+  SUPPORT * mySupport(new SUPPORT(_toMesh,"support",MED_EN::MED_NODE));
   _toField->setSupport(mySupport);  
   
   _toField->allocValue(_toField->getNumberOfComponents(),_toField->getNumberOfValues());
     
-  _toField->setValue(MED_FULL_INTERLACE,resultat.Get_Valeurs());
+  _toField->setValue( MED_EN::MED_FULL_INTERLACE,resultat.Get_Valeurs());
  
   _toWrapper->Construit_Wrapper_Champ(_toField);
 
@@ -349,9 +349,9 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolateNe
         _fromMesh = _fromField->getSupport()->getMesh();
 
 	_fromWrapper = new Meta_Wrapper<DIMENSION>(_fromMesh->getNumberOfNodes(),
-						   const_cast<double *> (_fromMesh->getCoordinates(MED_FULL_INTERLACE)),
-						   const_cast<CONNECTIVITY *> (_fromMesh->getConnectivityptr()),
-						   const_cast<FIELD<double> *>(_fromField)
+						   const_cast<double *> (_fromMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE)),
+						   const_cast<MEDMEM::CONNECTIVITY *> (_fromMesh->getConnectivityptr()),
+						   const_cast<MEDMEM::FIELD<double> *>(_fromField)
 						   );
   	_mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
 	
@@ -363,8 +363,8 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolateNe
 	
 	flagNewMapping=0;
 	
-	_fromField = const_cast<FIELD<double> *>(&nextFromField);
-	_fromWrapper->Change_Champ(const_cast<FIELD<double> *>(_fromField));		
+	_fromField = const_cast<MEDMEM::FIELD<double> *>(&nextFromField);
+	_fromWrapper->Change_Champ(const_cast<MEDMEM::FIELD<double> *>(_fromField));		
 	}
   
   return interpolate(_iType,_isConvexFromMesh);

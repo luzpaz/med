@@ -1,4 +1,3 @@
-using namespace std;
 # include <string> 
 
 # include "MEDMEM_Med.hxx"
@@ -11,7 +10,10 @@ using namespace std;
 
 # include "MEDMEM_Exception.hxx"
 # include "utilities.h"
+
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
 
 /*!
   Constructor.
@@ -62,10 +64,10 @@ MED::~MED()
     if ( (*currentField).first != NULL) MESSAGE("             " << ((*currentField).first)->getName().c_str());
   }
 
-  map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::iterator itSupportOnMesh ;
+  map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::iterator itSupportOnMesh ;
   index = 0;
   for ( itSupportOnMesh=_support.begin();itSupportOnMesh != _support.end(); itSupportOnMesh++ ) {
-    map<MED_FR::med_entite_maillage,SUPPORT *>::iterator itSupport ;
+    map<MED_EN::medEntityMesh,SUPPORT *>::iterator itSupport ;
     for ( itSupport=(*itSupportOnMesh).second.begin();itSupport!=(*itSupportOnMesh).second.end();itSupport++)
       index++;
   }
@@ -109,9 +111,9 @@ MED::~MED()
       }
     }
   }
-  //  map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::iterator itSupportOnMesh ;
+  //  map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::iterator itSupportOnMesh ;
   for ( itSupportOnMesh=_support.begin();itSupportOnMesh != _support.end(); itSupportOnMesh++ ) {
-    map<MED_FR::med_entite_maillage,SUPPORT *>::iterator itSupport ;
+    map<MED_EN::medEntityMesh,SUPPORT *>::iterator itSupport ;
     for ( itSupport=(*itSupportOnMesh).second.begin();itSupport!=(*itSupportOnMesh).second.end();itSupport++)
 	delete (*itSupport).second ;
   }
@@ -288,7 +290,6 @@ void MED::readFileStruct (int index/*=0*/)
                                      << _drivers.size()
                                      )
                           );   
-  END_OF(LOC);
 }
 
 /*!
@@ -330,8 +331,6 @@ int      MED::getNumberOfMeshes ( void ) const {
   BEGIN_OF(LOC);
 
   return _meshes.size();
-
-  END_OF(LOC);
 };   
     
 /*!
@@ -343,8 +342,6 @@ int      MED::getNumberOfFields ( void ) const {
   BEGIN_OF(LOC);
 
   return _fields.size(); // we get number of field with different name
-
-  END_OF(LOC);
 };       
 
 /*!
@@ -636,16 +633,16 @@ FIELD_  * MED::getField          ( const string & fieldName, const int dt=MED_NO
 // };
 
 /*!
-  Return a map<MED_FR::med_entite_maillage,SUPPORT*> which contain 
+  Return a map<MED_EN::medEntityMesh,SUPPORT*> which contain 
   foreach entity, a reference to the SUPPORT on all elements.
 */
-const map<MED_FR::med_entite_maillage,SUPPORT*> & MED::getSupports(const string & meshName) const
+const map<MED_EN::medEntityMesh,SUPPORT*> & MED::getSupports(const string & meshName) const
   throw (MED_EXCEPTION)
 {
   const char * LOC = "MED::getSupports ( const string ) const : ";
   BEGIN_OF(LOC);
 
-  map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::const_iterator itSupportOnMesh = _support.find(meshName) ;
+  map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator itSupportOnMesh = _support.find(meshName) ;
   
   if ( itSupportOnMesh == _support.end() )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -661,26 +658,26 @@ const map<MED_FR::med_entite_maillage,SUPPORT*> & MED::getSupports(const string 
   Return a reference to the SUPPORT object on all elements of entity 
   for the MESH named meshName.
 */
-SUPPORT *  MED::getSupport (const string & meshName,MED_FR::med_entite_maillage entity) const 
+SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity) const 
   throw (MED_EXCEPTION)
 {
-  const char * LOC = "MED::getSupport ( const string, MED_FR::med_entite_maillage ) const : ";
+  const char * LOC = "MED::getSupport ( const string, MED_EN::medEntityMesh ) const : ";
   BEGIN_OF(LOC);
 
   int index = 0;
-  for (map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::const_iterator const_itSupportOnMesh=_support.begin(); const_itSupportOnMesh != _support.end();
+  for (map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator const_itSupportOnMesh=_support.begin(); const_itSupportOnMesh != _support.end();
        const_itSupportOnMesh++ )
     {
-      map<MED_FR::med_entite_maillage,SUPPORT *>::const_iterator const_itSupport ;
+      map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator const_itSupport ;
       for (const_itSupport=(*const_itSupportOnMesh).second.begin();
 	   const_itSupport!=(*const_itSupportOnMesh).second.end();const_itSupport++) index++;
     }
 
   MESSAGE(LOC << "In this MED object there is(are) " << index << " support(s):");
 
-  for (map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::const_iterator const_itSupportOnMesh=_support.begin();const_itSupportOnMesh != _support.end(); const_itSupportOnMesh++ )
+  for (map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator const_itSupportOnMesh=_support.begin();const_itSupportOnMesh != _support.end(); const_itSupportOnMesh++ )
     {
-      map<MED_FR::med_entite_maillage,SUPPORT *>::const_iterator const_itSupport ;
+      map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator const_itSupport ;
       for (const_itSupport=(*const_itSupportOnMesh).second.begin();
 	   const_itSupport!=(*const_itSupportOnMesh).second.end();const_itSupport++)
 	{
@@ -689,7 +686,7 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_FR::med_entite_maillage 
   }
 
 
-  map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::const_iterator const_itSupportOnMesh = _support.find(meshName) ;
+  map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator const_itSupportOnMesh = _support.find(meshName) ;
   
   if ( const_itSupportOnMesh == _support.end() )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -698,8 +695,8 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_FR::med_entite_maillage 
                                      )
                           );
  
-//   map<MED_FR::med_entite_maillage,SUPPORT *> & SupportOnMesh = (map<MED_FR::med_entite_maillage,SUPPORT *>&) ((*itSupportOnMesh).second) ;
-//   map<MED_FR::med_entite_maillage,SUPPORT *>::const_iterator itSupport = SupportOnMesh.find(entity) ;
+//   map<MED_EN::medEntityMesh,SUPPORT *> & SupportOnMesh = (map<MED_EN::medEntityMesh,SUPPORT *>&) ((*itSupportOnMesh).second) ;
+//   map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator itSupport = SupportOnMesh.find(entity) ;
   
 //   if (itSupport == SupportOnMesh.end() )
 //     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -710,9 +707,9 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_FR::med_entite_maillage 
 //                           );
 
 
-  map<MED_FR::med_entite_maillage,SUPPORT *> SupportOnMesh = ((*const_itSupportOnMesh).second);
+  map<MED_EN::medEntityMesh,SUPPORT *> SupportOnMesh = ((*const_itSupportOnMesh).second);
 
-  map<MED_FR::med_entite_maillage,SUPPORT *>::const_iterator itSupport = SupportOnMesh.find(entity) ;
+  map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator itSupport = SupportOnMesh.find(entity) ;
   
   if (itSupport == SupportOnMesh.end() )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -735,9 +732,9 @@ void MED::updateSupport ()
   const char * LOC = "MED::updateSupport () : ";
   BEGIN_OF(LOC);
 
-  map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::iterator itSupportOnMesh ;
+  map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::iterator itSupportOnMesh ;
   for ( itSupportOnMesh=_support.begin();itSupportOnMesh != _support.end(); itSupportOnMesh++ ) {
-    map<MED_FR::med_entite_maillage,SUPPORT *>::iterator itSupport ;
+    map<MED_EN::medEntityMesh,SUPPORT *>::iterator itSupport ;
     for ( itSupport=(*itSupportOnMesh).second.begin();itSupport!=(*itSupportOnMesh).second.end();itSupport++)
       try {
 	(*itSupport).second->update() ;
@@ -822,7 +819,7 @@ void MED::addField( FIELD_ * const ptrField)
   _meshes   [meshName]        = ptrMesh;  // if it already exists it is replaced
 
   //  int  numberOfTypes = ptrSupport->getNumberOfTypes(); !! UNUSED VARIABLE !!
-  _support  [meshName][ (MED_FR::med_entite_maillage) ptrSupport->getEntity()] = ptrSupport;// if it already exists it is replaced
+  _support  [meshName][ptrSupport->getEntity()] = ptrSupport;// if it already exists it is replaced
 
 
   END_OF(LOC);

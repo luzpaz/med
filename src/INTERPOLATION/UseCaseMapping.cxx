@@ -5,6 +5,9 @@
 
 #include "MEDMEM_InterpolationHighLevelObjects.hxx"
 
+using namespace MEDMEM;
+using namespace MED_EN;
+
 int main (void) 
 {
 int i;

@@ -1,4 +1,3 @@
-using namespace std;
 #include "MEDMEM_VtkMeshDriver.hxx"
 
 #include "MEDMEM_DriversDef.hxx"
@@ -12,7 +11,10 @@ using namespace std;
 #include "MEDMEM_Grid.hxx"
 
 #include <sstream>
+
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
 
 VTK_MESH_DRIVER::VTK_MESH_DRIVER(): GENDRIVER(), 
 				    _ptrMesh((MESH * const)MED_NULL)

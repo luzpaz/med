@@ -1,4 +1,3 @@
-using namespace std;
 #include<string>
 
 #include <math.h>
@@ -14,8 +13,10 @@ using namespace std;
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
-using namespace MEDMEM;
 
+using namespace std;
+using namespace MEDMEM;
+using namespace MED_EN;
 
 void affiche_support(const SUPPORT * mySupport) 
 {

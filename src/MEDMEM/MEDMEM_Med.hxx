@@ -12,8 +12,6 @@
 # include "MEDMEM_Exception.hxx"
 # include "MEDMEM_GenDriver.hxx"
 
-using namespace MED_EN;
-
 
 namespace MEDMEM {
 class MESH;
@@ -66,7 +64,7 @@ private:
                                             // in order to get the MESH* from _meshes 
 
   // POURQUOI MED_FR::med_entite_maillage ? devrait être MED_EN !
-  map < MESH_NAME_, map <MED_FR::med_entite_maillage,SUPPORT * > > _support ;
+  map < MESH_NAME_, map < MED_EN::medEntityMesh, SUPPORT * > > _support ;
   // For each MESH, we list support for each entity on all elements.
 
   vector<GENDRIVER *>  _drivers;          // Storage of the MED_MED drivers currently in use
@@ -106,9 +104,9 @@ public:
   FIELD_   * getField          ( const string & fieldName,
                                  const int dt,  const int it) const throw (MEDEXCEPTION) ;
 
-  const map<MED_FR::med_entite_maillage,SUPPORT *> & getSupports(const string & meshName) const throw (MEDEXCEPTION) ;
+  const map<MED_EN::medEntityMesh,SUPPORT *> & getSupports(const string & meshName) const throw (MEDEXCEPTION) ;
 
-  SUPPORT *  getSupport (const string & meshName,MED_FR::med_entite_maillage entity) const throw (MEDEXCEPTION) ;
+  SUPPORT *  getSupport (const string & meshName,MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION) ;
 
   void       updateSupport () ;
 

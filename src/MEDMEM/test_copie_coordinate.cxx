@@ -1,4 +1,3 @@
-using namespace std;
 /* Programme de test du constructeur de copies de la classe COORDINATE de MEDMEM
    jroy - 17/12/2002 */
 
@@ -17,8 +16,10 @@ using namespace std;
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
-using namespace MEDMEM;
 
+using namespace std;
+using namespace MEDMEM;
+using namespace MED_EN;
 
 void affiche_tableau(const double * myArray, int nb_lignes, int nb_colonnes)
 {

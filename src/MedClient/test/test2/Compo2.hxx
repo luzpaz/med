@@ -10,15 +10,15 @@
 class Compo2
 {
 
-  FIELD<double> * _F;
+  MEDMEM::FIELD<double> * _F;
 
 public:
   Compo2();
   ~Compo2();
 
-  std::string Calcul(const MESH &M);
-  const FAMILY * Calcul2(const MESH &M);
-  void Calcul3(const FIELD<double> &S);
+  std::string Calcul(const MEDMEM::MESH &M);
+  const MEDMEM::FAMILY * Calcul2(const MEDMEM::MESH &M);
+  void Calcul3(const MEDMEM::FIELD<double> &S);
 };
 
 #endif

@@ -22,14 +22,16 @@
 //  File   : readEntete.cxx
 //  Module : MED
 
-using namespace std;
 #include<string>
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_DriversDef.hxx"
+
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
 
 void usage(char * name)
 {
@@ -101,74 +103,83 @@ int main (int argc, char ** argv) {
   cout << "- Nombre de noeuds : "     << NumberOfNodes  << " " << endl;
 
   int NumberOfTypes           = myMesh->getNumberOfTypes(MED_CELL);
-  const medGeometryElement  * Types = myMesh->getTypes(MED_CELL);
-  
+  const medGeometryElement  * Types;
+
   cout << "- Nombre de Type de mailles : " << NumberOfTypes << endl;
 
   if (NumberOfTypes > 0)
     {
+      Types = myMesh->getTypes(MED_CELL);
+
       cout << "  Types : ";
       for (int itype=0; itype<NumberOfTypes; itype++) cout << Types[itype] << " ";
       cout << endl;
+
+      const list<medGeometryElement> currentEntity = meshEntities[MED_CELL];
+      list<medGeometryElement>::const_iterator currentGeometry;
+
+      for (currentGeometry  = currentEntity.begin();
+	   currentGeometry != currentEntity.end(); 
+	   currentGeometry++) 
+	{
+	  cout << "- Nombre de mailles de type "; 
+	  cout << geoNames[(*currentGeometry)] << " : ";
+	  cout << myMesh->getNumberOfElements(MED_CELL,(MED_EN::medGeometryElement)(*currentGeometry));
+	  cout << " " << endl;
+	}
     }
 
-  const list<MED_FR::med_geometrie_element> currentEntity = MED_FR::meshEntities[(MED_FR::med_entite_maillage)MED_CELL];
-  list<MED_FR::med_geometrie_element>::const_iterator currentGeometry;
-  for (currentGeometry  = currentEntity.begin();
-       currentGeometry != currentEntity.end(); 
-       currentGeometry++) 
-  {
-	cout << "- Nombre de mailles de type "; 
-	cout << MED_FR::geoNames[(MED_FR::med_geometrie_element)(*currentGeometry)] << " : ";
-        cout << myMesh->getNumberOfElements(MED_CELL,(MED_EN::medGeometryElement)(*currentGeometry));
-	cout << " " << endl;
-  }
-
   NumberOfTypes = myMesh->getNumberOfTypes(MED_FACE);
-  Types = myMesh->getTypes(MED_FACE);
   
   cout << "- Nombre de Type de faces : " << NumberOfTypes << endl;
 
   if (NumberOfTypes > 0)
     {
+      Types = myMesh->getTypes(MED_FACE);
+
       cout << "  Types : ";
       for (int itype=0; itype<NumberOfTypes; itype++) cout << Types[itype] << " ";
       cout << endl;
+
+      const list<medGeometryElement> currentEntity2 = meshEntities[MED_FACE];
+      list<medGeometryElement>::const_iterator currentGeometry;
+
+      for (currentGeometry  = currentEntity2.begin();
+	   currentGeometry != currentEntity2.end(); 
+	   currentGeometry++) 
+	{
+	  cout << "- Nombre de faces de type "; 
+	  cout << geoNames[(*currentGeometry)] << " : ";
+	  cout << myMesh->getNumberOfElements(MED_FACE,(*currentGeometry));
+	  cout << " " << endl;
+	}
     }
 
-  const list<MED_FR::med_geometrie_element> currentEntity2 = MED_FR::meshEntities[(MED_FR::med_entite_maillage)MED_FACE];
-  for (currentGeometry  = currentEntity2.begin();
-       currentGeometry != currentEntity2.end(); 
-       currentGeometry++) 
-  {
-	cout << "- Nombre de faces de type "; 
-	cout << MED_FR::geoNames[(MED_FR::med_geometrie_element)(*currentGeometry)] << " : ";
-        cout << myMesh->getNumberOfElements(MED_FACE,(MED_EN::medGeometryElement)(*currentGeometry));
-	cout << " " << endl;
-  }
-
   NumberOfTypes = myMesh->getNumberOfTypes(MED_EDGE);
-  Types = myMesh->getTypes(MED_EDGE);
   
   cout << "- Nombre de Type de aretes : " << NumberOfTypes << endl;
 
   if (NumberOfTypes > 0)
     {
+      Types = myMesh->getTypes(MED_EDGE);
+
       cout << "  Types : ";
       for (int itype=0; itype<NumberOfTypes; itype++) cout << Types[itype] << " ";
       cout << endl;
-    }
 
-  const list<MED_FR::med_geometrie_element> currentEntity3 = MED_FR::meshEntities[(MED_FR::med_entite_maillage)MED_EDGE];
-  for (currentGeometry  = currentEntity3.begin();
-       currentGeometry != currentEntity3.end(); 
-       currentGeometry++) 
-  {
-	cout << "- Nombre d'aretes de type "; 
-	cout << MED_FR::geoNames[(MED_FR::med_geometrie_element)(*currentGeometry)] << " : ";
-        cout << myMesh->getNumberOfElements(MED_EDGE,(MED_EN::medGeometryElement)(*currentGeometry));
-	cout << " " << endl;
-  }
+      const list<medGeometryElement> currentEntity3 = meshEntities[MED_EDGE];
+      list<medGeometryElement>::const_iterator currentGeometry;
+
+      for (currentGeometry  = currentEntity3.begin();
+	   currentGeometry != currentEntity3.end(); 
+	   currentGeometry++) 
+	{
+	  cout << "- Nombre d'aretes de type "; 
+	  cout << geoNames[(*currentGeometry)] << " : ";
+	  cout << myMesh->getNumberOfElements(MED_EDGE,(*currentGeometry));
+	  cout << " " << endl;
+	}
+    }
 
   delete myMesh;
 }

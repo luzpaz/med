@@ -14,7 +14,6 @@
 #include "MEDMEM_define.hxx"
 
 using namespace std ;
-using namespace MED_EN;
 
 /*!
   This class is an internal class and should not be used by the end-user.
@@ -41,7 +40,7 @@ private:
 			/*! explicit name (as MED_POINT1)           */
   string             _name;
 			/*! type of cell (cf define.h)              */
-  medGeometryElement _type;
+  MED_EN::medGeometryElement _type;
                         /*! Cell dimension (not space dimension)    */
   int 		     _dimension;
                         /*! number of nodes forming this type of a cell    */
@@ -64,14 +63,14 @@ private:
 			      this dimension\n
         		    - third vector : list of local nodes    */
   int*** 		_constituents ;
-  medGeometryElement** 	_constituentsType ;
+  MED_EN::medGeometryElement** 	_constituentsType ;
 
 public :
 
   			/*! Constructor. */
   inline CELLMODEL();
   			/*! Constructor. */
-  CELLMODEL(medGeometryElement t);
+  CELLMODEL(MED_EN::medGeometryElement t);
   			/*! Copy constructor. */
   inline CELLMODEL(const CELLMODEL &m);
   			/*! Destructor. */
@@ -99,7 +98,7 @@ public :
 
 			/*! returns the geometric type of the cell. \n
 		   	    see med.h (in med/include) */
-  inline medGeometryElement     getType()             const;
+  inline MED_EN::medGeometryElement     getType()             const;
 
   			/*! returns all constituents which dimension is _dimension-dim.*/
   int** getConstituents(int dim) const;
@@ -117,11 +116,11 @@ public :
 
 			/*! returns types of each constituents which dimension 
 			    is _dimension-dim.*/
-  medGeometryElement*  getConstituentsType(int dim) const;
+  MED_EN::medGeometryElement*  getConstituentsType(int dim) const;
 
 			/*! returns type of num-th constituent which dimension 
 			    is _dimension-dim.*/
-  medGeometryElement getConstituentType(int dim,int num) const;
+  MED_EN::medGeometryElement getConstituentType(int dim,int num) const;
 
 			/*! returns number of constituents type 
 			    (which dimension is _dimension-1).*/
@@ -129,23 +128,21 @@ public :
 
 			/*! returns all types of constituents which dimension 
 			    is (_dimension-1).*/
-  set<medGeometryElement>  getAllConstituentsType() const;
+  set<MED_EN::medGeometryElement>  getAllConstituentsType() const;
 
 			/*! returns number of constituents foreach type (which dimension 
 			    is _dimension-1).*/
-  map<medGeometryElement,int>  getNumberOfConstituentsForeachType() const;
+  map<MED_EN::medGeometryElement,int>  getNumberOfConstituentsForeachType() const;
 
 
-};
 };
 
 // ------------------------------------------
 //	Methodes Inline
 // ------------------------------------------
 
-using namespace MEDMEM;
 inline CELLMODEL::CELLMODEL():
-    _type(MED_NONE),
+    _type(MED_EN::MED_NONE),
     _dimension(0),
     _numberOfNodes(0),
     _numberOfVertexes(0),
@@ -153,7 +150,7 @@ inline CELLMODEL::CELLMODEL():
     _numberOfConstituents((int*)NULL),
     _numberOfNodeOfEachConstituent((int**)NULL),
     _constituents((int***)NULL),
-    _constituentsType((medGeometryElement**)NULL)
+    _constituentsType((MED_EN::medGeometryElement**)NULL)
 {
 }
 inline CELLMODEL::CELLMODEL(const CELLMODEL &m)
@@ -187,7 +184,7 @@ inline int CELLMODEL::getDimension() const
 {
   return _dimension;
 }
-inline medGeometryElement CELLMODEL::getType() const
+inline MED_EN::medGeometryElement CELLMODEL::getType() const
 {
   return _type;
 }
@@ -207,13 +204,15 @@ inline int CELLMODEL::getNodeConstituent(int dim,int num,int nodesNumber) const
 {
   return _constituents[dim-1][num-1][nodesNumber-1] ;
 }
-inline medGeometryElement* CELLMODEL::getConstituentsType(int dim) const
+inline MED_EN::medGeometryElement* CELLMODEL::getConstituentsType(int dim) const
 {
   return _constituentsType[dim-1];
 }
-inline medGeometryElement CELLMODEL::getConstituentType(int dim,int num) const
+inline MED_EN::medGeometryElement CELLMODEL::getConstituentType(int dim,int num) const
 {
   return _constituentsType[dim-1][num-1];
 }
+
+}//End of namespace MEDMEM
 
 #endif /* CELLMODEL_HXX */

@@ -1,5 +1,3 @@
-using namespace std;
-
 #include "MEDMEM_TypeMeshDriver.hxx"
 #include "MEDMEM_DriversDef.hxx"
 
@@ -9,6 +7,8 @@ using namespace std;
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_CellModel.hxx"
+
+using namespace std;
 using namespace MEDMEM;
 
 // Every memory allocation made in the MedDriver members function are desallocated in the Mesh destructor 

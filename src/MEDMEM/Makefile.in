@@ -108,24 +108,25 @@ BIN_SRC =
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit testUGeoNameMeshEntities testUMedException testUModulusArray testUSkyLineArray testUArray testUCellModel readEntete readCoordinate test_copie_field_ test_copie_fieldT test_copie_coordinate test_copie_medarray test_copie_connectivity test_copie_support test_copie_family test_copie_group test_copie_mesh test_affect_medarray test_MEDMEM_Meshing test_operation_fielddouble test_operation_fieldint test_gibi_driver test_porflow_driver
+TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit testUGeoNameMeshEntities testUMedException testUModulusArray testUSkyLineArray testUArray testUCellModel readEntete readCoordinate test_copie_field_ test_copie_fieldT test_copie_coordinate test_copie_medarray test_copie_connectivity test_copie_support test_copie_family test_copie_group test_copie_mesh test_affect_medarray test_MEDMEM_Meshing test_operation_fielddouble test_operation_fieldint test_gibi_driver test_porflow_driver test_grid
 
 # testUCellModel -> a revoir car l'API a changee (plus de vector)
 
+LDFLAGS+= -L$(top_builddir)/lib/salome 
+LDFLAGSFORBIN+= -L$(top_builddir)/lib/salome
+
 CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
 
-CXXFLAGS+=-ftemplate-depth-42 -I${KERNEL_ROOT_DIR}/include/salome
+CXXFLAGS+=@CXXTMPDPTHFLAGS@ -I${KERNEL_ROOT_DIR}/include/salome
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace -lMEDWrapper_V2_1 $(STDLIB)
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace -lMEDWrapper_V2_1 -lMEDWrapperBase
 
 LIBSFORBIN=
-
-LDFLAGS=
 
 LIBS=
 

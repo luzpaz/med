@@ -35,7 +35,7 @@ protected:
 
   map<string,SALOME_MED::MESH_ptr>    _meshes;   // We can't have two MESHes with the same name.  
 
-  map<string,map<MED_FR::med_entite_maillage,SALOME_MED::SUPPORT_ptr> > _supports; 
+  map<string,map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> > _supports; 
 
   map<string,MAP_IOR_DT_IT_>          _fields;   // We can't have two FIELDs with the same name. 
   

@@ -1,4 +1,3 @@
-using namespace std;
 #include<string>
 
 #include <math.h>
@@ -15,7 +14,9 @@ using namespace std;
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
 
 double dmax(double x, double y) { return (x>y)?x:y;}
 

@@ -63,18 +63,18 @@ public :
 
 _TEMPLATE_ Calcul_Hybride<_PARAM_>::Calcul_Hybride(NUAGENOEUD * nn,NUAGEMAILLE * nm,CHAMP * c):mailles(nm)
 	{
-	fonctions[MED_TRIA3  ]=new Calcul_Interpolation_Tria3  <_PARAM_>(nn,nm,c);
-	fonctions[MED_TRIA6  ]=new Calcul_Interpolation_Tria6  <_PARAM_>(nn,nm,c);
-	fonctions[MED_QUAD4  ]=new Calcul_Interpolation_Quad4  <_PARAM_>(nn,nm,c);
-	fonctions[MED_QUAD8  ]=new Calcul_Interpolation_Quad8  <_PARAM_>(nn,nm,c);
-	fonctions[MED_TETRA4 ]=new Calcul_Interpolation_Tetra4 <_PARAM_>(nn,nm,c);
-	fonctions[MED_TETRA10]=new Calcul_Interpolation_Tetra10<_PARAM_>(nn,nm,c);
-	fonctions[MED_HEXA8  ]=new Calcul_Interpolation_Hexa8  <_PARAM_>(nn,nm,c);
-	fonctions[MED_HEXA20 ]=new Calcul_Interpolation_Hexa20 <_PARAM_>(nn,nm,c);
-	fonctions[MED_PENTA6 ]=new Calcul_Interpolation_Penta6 <_PARAM_>(nn,nm,c);
-	fonctions[MED_PENTA15]=new Calcul_Interpolation_Penta15<_PARAM_>(nn,nm,c);
-	fonctions[MED_PYRA5  ]=new Calcul_Interpolation_Pyra5  <_PARAM_>(nn,nm,c);
-	fonctions[MED_PYRA13 ]=new Calcul_Interpolation_Pyra13 <_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_TRIA3  ]=new Calcul_Interpolation_Tria3  <_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_TRIA6  ]=new Calcul_Interpolation_Tria6  <_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_QUAD4  ]=new Calcul_Interpolation_Quad4  <_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_QUAD8  ]=new Calcul_Interpolation_Quad8  <_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_TETRA4 ]=new Calcul_Interpolation_Tetra4 <_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_TETRA10]=new Calcul_Interpolation_Tetra10<_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_HEXA8  ]=new Calcul_Interpolation_Hexa8  <_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_HEXA20 ]=new Calcul_Interpolation_Hexa20 <_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_PENTA6 ]=new Calcul_Interpolation_Penta6 <_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_PENTA15]=new Calcul_Interpolation_Penta15<_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_PYRA5  ]=new Calcul_Interpolation_Pyra5  <_PARAM_>(nn,nm,c);
+	fonctions[ MED_EN::MED_PYRA13 ]=new Calcul_Interpolation_Pyra13 <_PARAM_>(nn,nm,c);
 	}
 
 _TEMPLATE_ VALEURCHAMP Calcul_Hybride<_PARAM_>::operator() (const NOEUD & n, int num_maille)
@@ -218,7 +218,7 @@ public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	cout<<"  ### Mu1 = "<<mu1<<endl;
 	cout<<"  ### Mu2 = "<<mu2<<endl;
 	cout<<"  ### Mu3 = "<<mu3<<endl;
-	//*/
+	*/
 	VALEURCHAMP retour(v0.SIZE()); //		
 
 	retour=(mu0*v0+mu1*v1+mu2*v2+mu3*v3)/delta;
@@ -328,7 +328,7 @@ public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	cout<<"  ### Lambda2 = "<<lambda2<<endl;
 	cout<<"  ### Lambda3 = "<<lambda3<<endl;
 	cout<<"  ### Controle = "<<(lambda0+lambda1+lambda2+lambda3)<<endl;
-	//*/
+	*/
 
 	VALEURCHAMP retour(v0.SIZE()); //		
 

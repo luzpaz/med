@@ -1,10 +1,12 @@
-using namespace std;
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_STRING.hxx"
 
 #include "utilities.h"
+
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
 
 /*! Default Constructor : should not be used */
 //----------------------------------------------------------//
@@ -33,6 +35,25 @@ COORDINATE::COORDINATE(int SpaceDimension, int NumberOfNodes, medModeSwitch Mode
     BEGIN_OF("Constructor COORDINATE");
 }
 
+/*! This constructor is specialy designed for use in class GRID.\n
+ *  The purpose is to create a COORDINATE without allocating memory for nodes (in the MEDARRAY).
+ *  The allocation (call to setCoordinates) is performed afterward by GRID, if necessary.
+ *  We set _coordinateName & _coordinateUnit in the constructor, because calls to setCoordinateName
+ *  and setCoordinateUnit are not possible before allocation of MEDARRAY.
+ */
+//------------------------------------------------------------------------------//
+COORDINATE::COORDINATE(int SpaceDimension,const string * CoordinateName, const string * CoordinateUnit): 
+   _coordinateSystem(""), _coordinate(MEDARRAY<double>()), _coordinateName(SpaceDimension), 
+   _coordinateUnit(SpaceDimension), _nodeNumber()
+{
+    for (int i=0; i<SpaceDimension; ++i)
+    {
+	_coordinateName[i]=CoordinateName[i];
+	_coordinateUnit[i]=CoordinateUnit[i];
+    }
+}
+
+
 /*! This constructor will COPY all data (it is a deep copy) included in m.\n  
     But only the default storage mode of coordinates array
     will be copied (not both storage representation modes even if they both
@@ -53,7 +74,7 @@ COORDINATE::COORDINATE(const COORDINATE & m):
   setCoordinatesUnits((const string*)m._coordinateUnit) ;
 
   if ( (const int * const) m._nodeNumber != NULL)
-    _nodeNumber.set(numberOfNodes,(const med_int*)m._nodeNumber);
+    _nodeNumber.set(numberOfNodes,(const int*)m._nodeNumber);
   // PG : it's default no ?
 //    else
 //      {

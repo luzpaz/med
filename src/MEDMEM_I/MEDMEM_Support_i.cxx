@@ -36,7 +36,7 @@ int SUPPORT_i::supportIndex = 0 ;
  * Default constructor
  */
 //=============================================================================
-SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL)
+SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL),_corbaIndex(SUPPORT_i::supportIndex++)
 {
 	BEGIN_OF("Default Constructor SUPPORT_i");
 	END_OF("Default Constructor SUPPORT_i");

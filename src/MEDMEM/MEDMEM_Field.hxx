@@ -20,8 +20,6 @@
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_DriverFactory.hxx"
 
-using namespace MED_EN;
-
 /*!
 
   This class contains all the informations related with a template class FIELD :
@@ -126,7 +124,7 @@ protected:
   // template < > struct SET_VALUE_TYPE<double> { static const med_type_champ _valueType = MED_EN::MED_REEL64; }
   // template < > struct SET_VALUE_TYPE<int> { static const med_type_champ _valueType = MED_EN::MED_INT32; }
   // static const med_type_champ _valueType = SET_VALUE_TYPE <T>::_valueType;
-  med_type_champ _valueType ;
+  MED_EN::med_type_champ _valueType ;
 
   vector<GENDRIVER *> _drivers; // Storage of the drivers currently in use
   static void _checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (MEDEXCEPTION);
@@ -215,16 +213,14 @@ public:
   inline void     setOrderNumber(int OrderNumber);
   inline int      getOrderNumber() const;
 
-  inline void     setValueType (const med_type_champ ValueType) ;
-  inline med_type_champ getValueType () const;
+  inline void     setValueType (const MED_EN::med_type_champ ValueType) ;
+  inline MED_EN::med_type_champ getValueType () const;
 
-};
 };
 
 // ---------------------------------
 // Implemented Methods : constructor
 // ---------------------------------
-using namespace MEDMEM;
 
 // -----------------
 // Methodes Inline
@@ -260,7 +256,7 @@ inline string FIELD_::getDescription() const
 /*!
   Set FIELD number of components.
 */
-inline void FIELD_::setNumberOfComponents(int NumberOfComponents)
+inline void FIELD_::setNumberOfComponents(const int NumberOfComponents)
 {
   _numberOfComponents=NumberOfComponents;
 }
@@ -276,7 +272,7 @@ inline int FIELD_::getNumberOfComponents() const
 
   It must be the same than in the associated SUPPORT object.
 */
-inline void FIELD_::setNumberOfValues(int NumberOfValues)
+inline void FIELD_::setNumberOfValues(const int NumberOfValues)
 {
   _numberOfValues=NumberOfValues;
 }
@@ -513,17 +509,19 @@ inline void FIELD_::setSupport(const SUPPORT * support)
 /*!
   Get the FIELD med value type (MED_INT32 or MED_REEL64).
 */
-inline med_type_champ FIELD_::getValueType () const
+inline MED_EN::med_type_champ FIELD_::getValueType () const
 {
   return _valueType ;
 }
 /*!
   Set the FIELD med value type (MED_INT32 or MED_REEL64).
 */
-inline void FIELD_::setValueType (const med_type_champ ValueType)
+inline void FIELD_::setValueType (const MED_EN::med_type_champ ValueType)
 {
   _valueType = ValueType ;
 }
+
+}//End namespace MEDMEM
 
 /////////////////////////
 // END OF CLASS FIELD_ //
@@ -551,19 +549,19 @@ protected:
   MEDARRAY<T> *_value ;
 
 private:
-  void _operation(const FIELD& m,const FIELD& n, const medModeSwitch mode, char* Op);
+  void _operation(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode, char* Op);
   void _operationInitialize(const FIELD& m,const FIELD& n, char* Op);
-  void _add_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode);
-  void _sub_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode);
-  void _mul_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode);
-  void _div_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode);
+  void _add_in_place(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode);
+  void _sub_in_place(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode);
+  void _mul_in_place(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode);
+  void _div_in_place(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode) throw (MEDEXCEPTION);
   //setValueType() ;
 
   FIELD & operator=(const FIELD &m); 	// A FAIRE
 public:
   FIELD();
   FIELD(const FIELD &m);
-  FIELD(const SUPPORT * Support, const int NumberOfComponents, const medModeSwitch Mode=MED_FULL_INTERLACE)  throw (MEDEXCEPTION) ; // Ajout NB Constructeur FIELD avec allocation de memoire de tous ses attribut
+  FIELD(const SUPPORT * Support, const int NumberOfComponents, const MED_EN::medModeSwitch Mode=MED_EN::MED_FULL_INTERLACE)  throw (MEDEXCEPTION) ; // Ajout NB Constructeur FIELD avec allocation de memoire de tous ses attribut
   FIELD(const SUPPORT * Support, driverTypes driverType,
 	const string & fileName="", const string & fieldName="",
 	const int iterationNumber = -1, const int orderNumber = -1)
@@ -621,13 +619,13 @@ public:
   inline void     setValue(MEDARRAY<T> *Value);
 
   inline MEDARRAY<T>* getvalue() const;
-  inline int getValueLength(medModeSwitch Mode) const;
-  inline const T*       getValue(medModeSwitch Mode) const;
-  inline const T*       getValueI(medModeSwitch Mode,int i) const;
+  inline int getValueLength(MED_EN::medModeSwitch Mode) const;
+  inline const T*       getValue(MED_EN::medModeSwitch Mode) const;
+  inline const T*       getValueI(MED_EN::medModeSwitch Mode,int i) const;
   inline T        getValueIJ(int i,int j) const;
 
-  inline void setValue(medModeSwitch mode, T* value);
-  inline void setValueI(medModeSwitch mode, int i, T* value);
+  inline void setValue(MED_EN::medModeSwitch mode, T* value);
+  inline void setValueI(MED_EN::medModeSwitch mode, int i, T* value);
   inline void setValueIJ(int i, int j, T value);
 
   /*!
@@ -682,12 +680,10 @@ public:
    */
   void getBarycenter() const throw (MEDEXCEPTION) ;
 };
-};
 
 // --------------------
 // Implemented Methods
 // --------------------
-using namespace MEDMEM;
 
 /*!
   Constructor with no parameter, most of the attribut members are set to NULL.
@@ -703,7 +699,7 @@ template <class T>  FIELD<T>::FIELD():
   attribut is allocated but not set.
 */
 template <class T>  FIELD<T>::FIELD(const SUPPORT * Support,
-				    const int NumberOfComponents, const medModeSwitch Mode) throw (MEDEXCEPTION) :
+				    const int NumberOfComponents, const MED_EN::medModeSwitch Mode) throw (MEDEXCEPTION) :
   FIELD_(Support, NumberOfComponents)
 {
   BEGIN_OF("FIELD<T>::FIELD(const SUPPORT * Support, const int NumberOfComponents, const medModeSwitch Mode)");
@@ -791,7 +787,7 @@ const FIELD<T> FIELD<T>::operator+(const FIELD & m) const
     FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
-    medModeSwitch mode;
+    MED_EN::medModeSwitch mode;
     if(this->getvalue()->getMode()==m.getvalue()->getMode() || this->getvalue()->isOtherCalculated())
 	mode=m.getvalue()->getMode();
     else
@@ -818,7 +814,7 @@ FIELD<T>& FIELD<T>::operator+=(const FIELD & m)
     FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
 
     // We choose to keep *this mode, even if it may cost a re-calculation for m
-    medModeSwitch mode=this->getvalue()->getMode();
+    MED_EN::medModeSwitch mode=this->getvalue()->getMode();
     const T* value1=m.getValue(mode); // get pointers to the values we are adding
 
     // get a non const pointer to the inside array of values and perform operation
@@ -846,7 +842,7 @@ FIELD<T>* FIELD<T>::add(const FIELD& m, const FIELD& n)
     FIELD_::_checkFieldCompatibility(m, n); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
-    medModeSwitch mode;
+    MED_EN::medModeSwitch mode;
     if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
 	mode=m.getvalue()->getMode();
     else
@@ -887,8 +883,7 @@ const FIELD<T> FIELD<T>::operator-(const FIELD & m) const
     BEGIN_OF("FIELD<T>::operator-(const FIELD & m)");
     FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
 
-    // Select mode : avoid if possible any calculation of other mode for fields m or *this
-    medModeSwitch mode;
+    MED_EN::medModeSwitch mode;
     if(this->getvalue()->getMode()==m.getvalue()->getMode() || this->getvalue()->isOtherCalculated())
 	mode=m.getvalue()->getMode();
     else
@@ -909,7 +904,7 @@ const FIELD<T> FIELD<T>::operator-() const
 {
     BEGIN_OF("FIELD<T>::operator-()");
 
-    medModeSwitch mode=this->getvalue()->getMode();
+    MED_EN::medModeSwitch mode=this->getvalue()->getMode();
     // Creation of the result - memory is allocated by FIELD constructor
     FIELD<T> result(this->getSupport(),this->getNumberOfComponents(),mode);
     // Atribute's initialization 
@@ -947,7 +942,7 @@ FIELD<T>& FIELD<T>::operator-=(const FIELD & m)
     FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
 
     // We choose to keep *this mode, even if it may cost a re-calculation for m
-    medModeSwitch mode=this->getvalue()->getMode();
+    MED_EN::medModeSwitch mode=this->getvalue()->getMode();
     const T* value1=m.getValue(mode); // get pointers to the values we are adding
 
     // get a non const pointer to the inside array of values and perform operation
@@ -976,7 +971,7 @@ FIELD<T>* FIELD<T>::sub(const FIELD& m, const FIELD& n)
     FIELD_::_checkFieldCompatibility(m, n); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
-    medModeSwitch mode;
+    MED_EN::medModeSwitch mode;
     if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
 	mode=m.getvalue()->getMode();
     else
@@ -1018,7 +1013,7 @@ const FIELD<T> FIELD<T>::operator*(const FIELD & m) const
     FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
-    medModeSwitch mode;
+    MED_EN::medModeSwitch mode;
     if(this->getvalue()->getMode()==m.getvalue()->getMode() || this->getvalue()->isOtherCalculated())
 	mode=m.getvalue()->getMode();
     else
@@ -1045,7 +1040,7 @@ FIELD<T>& FIELD<T>::operator*=(const FIELD & m)
     FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
 
     // We choose to keep *this mode, even if it may cost a re-calculation for m
-    medModeSwitch mode=this->getvalue()->getMode();
+    MED_EN::medModeSwitch mode=this->getvalue()->getMode();
     const T* value1=m.getValue(mode); // get pointers to the values we are adding
 
     // get a non const pointer to the inside array of values and perform operation
@@ -1074,7 +1069,7 @@ FIELD<T>* FIELD<T>::mul(const FIELD& m, const FIELD& n)
     FIELD_::_checkFieldCompatibility(m, n); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
-    medModeSwitch mode;
+    MED_EN::medModeSwitch mode;
     if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
 	mode=m.getvalue()->getMode();
     else
@@ -1117,7 +1112,7 @@ const FIELD<T> FIELD<T>::operator/(const FIELD & m) const
     FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
-    medModeSwitch mode;
+    MED_EN::medModeSwitch mode;
     if(this->getvalue()->getMode()==m.getvalue()->getMode() || this->getvalue()->isOtherCalculated())
 	mode=m.getvalue()->getMode();
     else
@@ -1145,7 +1140,7 @@ FIELD<T>& FIELD<T>::operator/=(const FIELD & m)
     FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
 
     // We choose to keep *this mode, even if it may cost a re-calculation for m
-    medModeSwitch mode=this->getvalue()->getMode();
+    MED_EN::medModeSwitch mode=this->getvalue()->getMode();
     const T* value1=m.getValue(mode); // get pointers to the values we are adding
 
     // get a non const pointer to the inside array of values and perform operation
@@ -1174,7 +1169,7 @@ FIELD<T>* FIELD<T>::div(const FIELD& m, const FIELD& n)
     FIELD_::_checkFieldCompatibility(m, n); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
-    medModeSwitch mode;
+    MED_EN::medModeSwitch mode;
     if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
 	mode=m.getvalue()->getMode();
     else
@@ -1229,7 +1224,7 @@ void FIELD<T>::_operationInitialize(const FIELD& m,const FIELD& n, char* Op)
   \endif
 */
 template <class T>
-void FIELD<T>::_add_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode)
+void FIELD<T>::_add_in_place(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode)
 {
     // get pointers to the values we are adding
     const T* value1=m.getValue(mode);
@@ -1253,7 +1248,7 @@ void FIELD<T>::_add_in_place(const FIELD& m,const FIELD& n, const medModeSwitch 
   \endif
 */
 template <class T>
-void FIELD<T>::_sub_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode)
+void FIELD<T>::_sub_in_place(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode)
 {
     // get pointers to the values we are adding
     const T* value1=m.getValue(mode);
@@ -1277,7 +1272,7 @@ void FIELD<T>::_sub_in_place(const FIELD& m,const FIELD& n, const medModeSwitch 
   \endif
 */
 template <class T>
-void FIELD<T>::_mul_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode)
+void FIELD<T>::_mul_in_place(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode)
 {
     // get pointers to the values we are adding
     const T* value1=m.getValue(mode);
@@ -1301,7 +1296,7 @@ void FIELD<T>::_mul_in_place(const FIELD& m,const FIELD& n, const medModeSwitch 
   \endif
 */
 template <class T>
-void FIELD<T>::_div_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode)
+void FIELD<T>::_div_in_place(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode) throw (MEDEXCEPTION)
 {
     // get pointers to the values we are adding
     const T* value1=m.getValue(mode);
@@ -1312,8 +1307,14 @@ void FIELD<T>::_div_in_place(const FIELD& m,const FIELD& n, const medModeSwitch 
     const int size=getNumberOfValues()*getNumberOfComponents();
     SCRUTE(size);
     const T* endV1=value1+size;
-    for(;value1!=endV1; value1++,value2++,value++)
+    for(;value1!=endV1; value1++,value2++,value++){
+      if ( *value2 == 0 ) {
+	  string diagnosis;
+	  diagnosis="FIELD<T>::_div_in_place(...) : Divide by zero !";
+	  throw MEDEXCEPTION(diagnosis.c_str());
+	}
 	*value=(*value1)/(*value2);
+    }
 }
 
 /*!  Return Max Norm 
@@ -1383,7 +1384,7 @@ template <class T> double FIELD<T>::norm2() const throw (MEDEXCEPTION)
 template <class T> template <T T_function(T)> 
 void FIELD<T>::applyFunc()
 {
-    medModeSwitch mode=getvalue()->getMode();
+    MED_EN::medModeSwitch mode=getvalue()->getMode();
 
     // get a non const pointer to the inside array of values and perform operation
     T * value=const_cast<T *> (getValue(mode));
@@ -1405,7 +1406,7 @@ void FIELD<T>::applyFunc()
  */
 template <class T> void FIELD<T>::applyLin(T a, T b)
 {
-    medModeSwitch mode=getvalue()->getMode();
+    MED_EN::medModeSwitch mode=getvalue()->getMode();
 
     // get a non const pointer to the inside array of values and perform operation in place
     T * value=const_cast<T *> (getValue(mode));
@@ -1440,7 +1441,7 @@ template <class T> FIELD<T>* FIELD<T>::scalarProduct(const FIELD & m, const FIEL
 {
     FIELD_::_checkFieldCompatibility( m, n); // may throw exception
     // we need a MED_FULL_INTERLACE representation of m & n to compute the scalar product
-    const medModeSwitch mode=MED_FULL_INTERLACE; 
+    const MED_EN::medModeSwitch mode=MED_EN::MED_FULL_INTERLACE; 
 
     const int numberOfElements=m.getNumberOfValues(); // strictly positive
     const int NumberOfComponents=m.getNumberOfComponents(); // strictly positive
@@ -2013,14 +2014,14 @@ template <class T> inline MEDARRAY<T>* FIELD<T>::getvalue() const
 /*!
   Return the actual length of the reference to values array returned by getValue.
 */
-template <class T> inline int FIELD<T>::getValueLength(medModeSwitch Mode) const{
+template <class T> inline int FIELD<T>::getValueLength(MED_EN::medModeSwitch Mode) const{
   return _numberOfComponents*_numberOfValues;
 }
 
 /*!
   Return a reference to values array to read them.
 */
-template <class T> inline const T* FIELD<T>::getValue(medModeSwitch Mode) const
+template <class T> inline const T* FIELD<T>::getValue(MED_EN::medModeSwitch Mode) const
 {
   return _value->get(Mode) ;
 }
@@ -2029,13 +2030,13 @@ template <class T> inline const T* FIELD<T>::getValue(medModeSwitch Mode) const
   Return a reference to i^{th} row or column - component - (depend on Mode value)
   of FIELD values array.
 */
-template <class T> inline const T* FIELD<T>::getValueI(medModeSwitch Mode,int i) const
+template <class T> inline const T* FIELD<T>::getValueI(MED_EN::medModeSwitch Mode,int i) const
 {
- if ( Mode == MED_FULL_INTERLACE )
+ if ( Mode == MED_EN::MED_FULL_INTERLACE )
  {
  	 return _value->getRow(i) ;
  }
- ASSERT (  Mode == MED_NO_INTERLACE);
+ ASSERT (  Mode == MED_EN::MED_NO_INTERLACE);
  return _value->getColumn(i);
 }
 
@@ -2052,7 +2053,7 @@ template <class T> inline T FIELD<T>::getValueIJ(int i,int j) const
 
   Array must have right size. If not results are unpredicable.
 */
-template <class T> inline void FIELD<T>::setValue(medModeSwitch mode, T* value)
+template <class T> inline void FIELD<T>::setValue(MED_EN::medModeSwitch mode, T* value)
 {
   _value->set(mode,value);
 }
@@ -2060,12 +2061,12 @@ template <class T> inline void FIELD<T>::setValue(medModeSwitch mode, T* value)
 /*!
   Update values array in FIELD with the given ones according to specified mode.
 */
-template <class T> inline void FIELD<T>::setValueI(medModeSwitch mode, int i, T* value)
+template <class T> inline void FIELD<T>::setValueI(MED_EN::medModeSwitch mode, int i, T* value)
 {
   // PROVISOIRE :
-  if (MED_FULL_INTERLACE == mode)
+  if (MED_EN::MED_FULL_INTERLACE == mode)
     _value->setI(i,value);
-  else if (MED_NO_INTERLACE == mode)
+  else if (MED_EN::MED_NO_INTERLACE == mode)
     _value->setJ(i,value);
   else
     throw MEDEXCEPTION(LOCALIZED("FIELD<T>::setValueI : bad medModeSwitch")) ;
@@ -2182,5 +2183,7 @@ template <class T> void FIELD<T>::getBarycenter() const throw (MEDEXCEPTION)
 
   END_OF(LOC);
 }
+
+}//End namespace MEDMEM
 
 #endif /* FIELD_HXX */

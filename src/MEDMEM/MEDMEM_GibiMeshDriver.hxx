@@ -42,7 +42,7 @@ protected:
   
   // tableau de correspondance des types géométriques de CASTEM -> MED
   static const size_t nb_geometrie_gibi=47;
-  static const medGeometryElement geomGIBItoMED[nb_geometrie_gibi];
+  static const MED_EN::medGeometryElement geomGIBItoMED[nb_geometrie_gibi];
   /////
 
 public :
@@ -56,7 +56,7 @@ public :
   */
   GIBI_MESH_DRIVER(const string & fileName,  
 		  MESH * ptrMesh, 
-		  med_mode_acces accessMode) ;
+		  MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.
   */

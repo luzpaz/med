@@ -1,8 +1,10 @@
-using namespace std;
-
 #include "MEDMEM_PorflowMeshDriver.hxx"
 #include "MEDMEM_Mesh.hxx"
+
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
+
 int main (int argc, char ** argv)
 {
     /* process the arguments */

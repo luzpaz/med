@@ -8,6 +8,7 @@
 #include "stdio.h"
 
 using namespace MEDMEM;
+using namespace MED_EN;
 
 main () {
   

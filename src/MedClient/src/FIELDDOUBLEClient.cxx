@@ -6,7 +6,7 @@
  */
 //=============================================================================
 FIELDDOUBLEClient::FIELDDOUBLEClient(SALOME_MED::FIELDDOUBLE_ptr ptrCorba,
-				     SUPPORT * S) :
+				     MEDMEM::SUPPORT * S) :
   FIELDClient<double,SALOME_MED::FIELDDOUBLE>(ptrCorba,S)
 {
   BEGIN_OF("Constructor with arguments (for Python API) FIELDDOUBLEClient");

@@ -1,4 +1,3 @@
-using namespace std;
 //=============================================================================
 // File      : MEDMEM_Med_i.cxx
 // Project   : SALOME
@@ -23,6 +22,8 @@ using namespace std;
 #include "MEDMEM_DriversDef.hxx"
 #include "utilities.h"
 #include "Utils_CorbaException.hxx"
+
+using namespace std;
 using namespace MEDMEM;
 
 //=============================================================================
@@ -73,12 +74,12 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 	vector<GROUP*> groupVector;
 	vector<GROUP*>::iterator groupVectorIt;
   
-	MED_FR::MESH_ENTITIES::const_iterator currentEntity; 
+	MED_EN::MESH_ENTITIES::const_iterator currentEntity; 
 	for (int i=0; i<numberOfMeshes; i++) 
 	{
 		::MESH * ptrMesh = _med->getMesh(meshesNames[i]);
-		for (currentEntity = MED_FR::meshEntities.begin();
-		     currentEntity != MED_FR::meshEntities.end(); 
+		for (currentEntity = MED_EN::meshEntities.begin();
+		     currentEntity != MED_EN::meshEntities.end(); 
 		     currentEntity++) 
 		{
 // 		     MESSAGE(LOC << ": for entity " << (*currentEntity).first);
@@ -112,9 +113,9 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 
 	for (int i=0; i<numberOfMeshes; i++) 
 	{
-	      map<MED_FR::med_entite_maillage,::SUPPORT*> mySupports = _med->getSupports(meshesNames[i]);
-	      map<MED_FR::med_entite_maillage,::SUPPORT*>::const_iterator itSupport;
-   	      map<MED_FR::med_entite_maillage, SALOME_MED::SUPPORT_ptr> & mySupportsIOR 
+	      map<MED_EN::medEntityMesh,::SUPPORT*> mySupports = _med->getSupports(meshesNames[i]);
+	      map<MED_EN::medEntityMesh,::SUPPORT*>::const_iterator itSupport;
+   	      map<MED_EN::medEntityMesh, SALOME_MED::SUPPORT_ptr> & mySupportsIOR 
 				= _supports[meshesNames[i]];
 	      for ( itSupport = mySupports.begin(); itSupport != mySupports.end(); itSupport++ ) 
 	      {
@@ -137,16 +138,16 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 	         ::FIELD_ * myField = _med->getField(fieldsNames[i], myIteration[j].dt, myIteration[j].it);
 	         string meshName = myField->getSupport()->getMesh()->getName();
 	         medEntityMesh myEntity = myField->getSupport()->getEntity();
-	         map<string, map<MED_FR::med_entite_maillage, SALOME_MED::SUPPORT_ptr> >::const_iterator 
+	         map<string, map<MED_EN::medEntityMesh, SALOME_MED::SUPPORT_ptr> >::const_iterator 
 							     itSupportOnMesh = _supports.find(meshName);
 	         if ( itSupportOnMesh == _supports.end() )
 		      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
 					 << "There is no support on mesh named |" 
 					 << meshName << "|" ));
-      		 const map<MED_FR::med_entite_maillage, SALOME_MED::SUPPORT_ptr> & SupportOnMesh 
+      		 const map<MED_EN::medEntityMesh, SALOME_MED::SUPPORT_ptr> & SupportOnMesh 
 					= (*itSupportOnMesh).second;
-                 map<MED_FR::med_entite_maillage,SALOME_MED::SUPPORT_ptr>::const_iterator itSupport 
-					= SupportOnMesh.find((MED_FR::med_entite_maillage)myEntity);
+                 map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr>::const_iterator itSupport 
+					= SupportOnMesh.find(myEntity);
                  if (itSupport == SupportOnMesh.end())
 		      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
 					 << "There is no support on entity "
@@ -157,7 +158,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
       		 SALOME_MED::FIELD_ptr myFieldIOR;
       		 switch (type) 
 		 {
-      		         case MED_FR::MED_INT32 : 
+      		         case MED_EN::MED_INT32 : 
 			 {
 			     ((FIELD<int>*)myField)->read();
 			     FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
@@ -166,7 +167,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 		             break;
       			 }
 
-      			case MED_FR::MED_REEL64: 
+      			case MED_EN::MED_REEL64: 
                         {
 			     ((FIELD<double>*)myField)->read();
 			     FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
@@ -246,15 +247,15 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
   
 	SCRUTE(numberOfMeshes);
 
-	MED_FR::MESH_ENTITIES::const_iterator currentEntity; 
+	MED_EN::MESH_ENTITIES::const_iterator currentEntity; 
 	for (int i=0; i<numberOfMeshes; i++) 
 	{
 		::MESH * ptrMesh = _med->getMesh(meshesNames[i]);
 
 		SCRUTE(ptrMesh);
 
-		for (currentEntity = MED_FR::meshEntities.begin();
-		     currentEntity != MED_FR::meshEntities.end(); 
+		for (currentEntity = MED_EN::meshEntities.begin();
+		     currentEntity != MED_EN::meshEntities.end(); 
 		     currentEntity++) 
 		{
 		     MESSAGE(LOC << ": for entity " << (*currentEntity).first);
@@ -288,9 +289,9 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
 	for (int i=0; i<numberOfMeshes; i++) 
 	{
-	    map<MED_FR::med_entite_maillage,::SUPPORT*> mySupports = _med->getSupports(meshesNames[i]);
-	    map<MED_FR::med_entite_maillage,::SUPPORT*>::const_iterator itSupport;
-	    map<MED_FR::med_entite_maillage,SALOME_MED::SUPPORT_ptr> & 
+	    map<MED_EN::medEntityMesh,::SUPPORT*> mySupports = _med->getSupports(meshesNames[i]);
+	    map<MED_EN::medEntityMesh,::SUPPORT*>::const_iterator itSupport;
+	    map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> & 
 			mySupportsIOR = _supports[meshesNames[i]];
 	    for (itSupport=mySupports.begin(); itSupport!=mySupports.end(); itSupport++ ) 
 	    {
@@ -456,16 +457,16 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
 		  string meshName = myField->getSupport()->getMesh()->getName();
 		  medEntityMesh myEntity = myField->getSupport()->getEntity();
-		  map<string, map<MED_FR::med_entite_maillage,SALOME_MED::SUPPORT_ptr> >::const_iterator 
+		  map<string, map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> >::const_iterator 
 			itSupportOnMesh = _supports.find(meshName);
 		  if (itSupportOnMesh == _supports.end() )
 		  	throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
 					 << "There is no support on mesh named |" 
 					 << meshName << "|"));
-		  const map<MED_FR::med_entite_maillage,SALOME_MED::SUPPORT_ptr> & SupportOnMesh 
+		  const map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> & SupportOnMesh 
 				= (*itSupportOnMesh).second;
-		  map<MED_FR::med_entite_maillage,SALOME_MED::SUPPORT_ptr>::const_iterator itSupport
-				= SupportOnMesh.find((MED_FR::med_entite_maillage)myEntity);
+		  map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr>::const_iterator itSupport
+				= SupportOnMesh.find(myEntity);
 		  if (itSupport == SupportOnMesh.end() )
 			throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
 					 << "There is no support on entity "
@@ -480,7 +481,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
 		  switch (type) 
 		  {
-		     case MED_FR::MED_INT32: 
+		     case MED_EN::MED_INT32: 
 		     {
 			((FIELD<int>*)myField)->read();
 			FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
@@ -494,7 +495,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 			break;
   		     }
 
-      		     case MED_FR::MED_REEL64: 
+      		     case MED_EN::MED_REEL64: 
 		     {
 			((FIELD<double>*)myField)->read();
 			FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);

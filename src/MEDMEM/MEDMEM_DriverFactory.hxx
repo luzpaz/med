@@ -2,6 +2,8 @@
 #define DRIVERFACTORY_HXX
 
 #include "MEDMEM_GenDriver.hxx"
+#include "MEDMEM_VtkFieldDriver.hxx"
+#include "MEDMEM_MedFieldDriver.hxx"
 #include <string>
 
 namespace MEDMEM {
@@ -16,13 +18,6 @@ namespace MEDMEM {
     GENDRIVER *buildDriverForField(driverTypes driverType, const std::string & fileName, FIELD<T> *field);
     GENDRIVER *buildDriverForMed(driverTypes driverType, const std::string & fileName, MED *med);
   }
-  
-}
-
-#include "MEDMEM_VtkFieldDriver.hxx"
-#include "MEDMEM_MedFieldDriver.hxx"
-
-using namespace MEDMEM;
 
 template<class T>
 GENDRIVER *DRIVERFACTORY::buildDriverForField(driverTypes driverType, const std::string & fileName, FIELD<T> *field)
@@ -58,6 +53,8 @@ GENDRIVER *DRIVERFACTORY::buildDriverForField(driverTypes driverType, const std:
     MED_EXCEPTION ("driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD");
     }
   return ret;
+}
+
 }
 
 #endif

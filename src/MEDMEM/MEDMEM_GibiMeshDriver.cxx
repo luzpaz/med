@@ -1,5 +1,3 @@
-using namespace std;
-
 #include <algorithm>
 
 #include "MEDMEM_GibiMeshDriver.hxx"
@@ -16,6 +14,7 @@ using namespace std;
 #include "MEDMEM_DriverTools.hxx"
 
 /////
+using namespace std;
 using namespace MED_EN;
 using namespace MEDMEM;
 /////
@@ -157,9 +156,9 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
     while ( getline(_gibi, buf_ligne) ) // boucle externe de recherche de "ENREGISTREMENT DE TYPE"
     {
 	string::size_type pos = buf_ligne.find(enregistrement_type);
-	if ( pos==string::npos )
+	if ( pos==string::npos ){
 	    continue; // "ENREGISTREMENT DE TYPE" non trouvé -> on lit la ligne suivante
-
+	}
 	// lecture du numéro d'enregistrement
 	int numero_enregistrement;
 	istringstream buf(buf_ligne.c_str()+strlen(enregistrement_type)+1);
@@ -290,7 +289,11 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 			      {
 				// pour chacun des sous-maillages j, on recupere les iterateurs *k sur les  maille 
 				// contenues et on les insere dans le groupe i
-				std::set< std::set<_maille>::iterator >::const_iterator k=medi.groupes[*j-1].mailles.begin();
+				std::set< std::set<_maille, std::less<_maille>,
+                                std::allocator<_maille> >::iterator,
+                                _mailleIteratorCompare,
+                                std::allocator< std::set<_maille, std::less<_maille>,
+                                std::allocator<_maille> >::iterator> >::iterator k=medi.groupes[*j-1].mailles.begin();
 				for( ; k!=medi.groupes[*j-1].mailles.end(); ++k)
 				  i->mailles.insert(*k);
 			      }

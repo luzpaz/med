@@ -22,9 +22,9 @@
 //  File   : testUGeoNameMeshEntities.cxx
 //  Module : MED
 
-using namespace std;
 #include "MEDMEM_DriversDef.hxx"
 
+using namespace std;
 void usage(char * name)
 {
   cout << "    " << name << endl;
@@ -43,30 +43,30 @@ int main (int argc, char ** argv)
 
   cout << "GEO_NAME Test" << endl ;
   cout << "-------------" << endl << endl;
-  MED_FR::GEO_NAME::const_iterator currentGeom;
-  for (currentGeom  = MED_FR::geoNames.begin();
-       currentGeom != MED_FR::geoNames.end(); 
+  MED_EN::GEO_NAME::const_iterator currentGeom;
+  for (currentGeom  = MED_EN::geoNames.begin();
+       currentGeom != MED_EN::geoNames.end(); 
        currentGeom++) 
   {
 		cout << (*currentGeom).second << endl;
   };
 
-  MED_FR::MESH_ENTITIES::const_iterator currentEntity;
-  list<MED_FR::med_geometrie_element>::const_iterator currentGeometry;
+  MED_EN::MESH_ENTITIES::const_iterator currentEntity;
+  list<MED_EN::medGeometryElement>::const_iterator currentGeometry;
 
   cout << endl; 
   cout << "MESH_ENTITIES Test" << endl ;
   cout << "------------------" << endl << endl;
-  for (currentEntity  = MED_FR::meshEntities.begin();
-       currentEntity != MED_FR::meshEntities.end(); 
+  for (currentEntity  = MED_EN::meshEntities.begin();
+       currentEntity != MED_EN::meshEntities.end(); 
        currentEntity++) 
   {
-	cout << (*((MED_FR::entNames).find((*currentEntity).first))).second <<endl;
+	cout << (*((MED_EN::entNames).find((*currentEntity).first))).second <<endl;
   	for (currentGeometry  = (*currentEntity).second.begin();
        	     currentGeometry != (*currentEntity).second.end(); 
       	     currentGeometry++) 
 	{
-	cout << MED_FR::geoNames[(MED_FR::med_geometrie_element)(*currentGeometry)] << endl;
+	cout << MED_EN::geoNames[(MED_EN::medGeometryElement)(*currentGeometry)] << endl;
 	}
 	cout << endl;
   }

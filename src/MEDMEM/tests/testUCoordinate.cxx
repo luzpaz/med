@@ -22,7 +22,6 @@
 //  File   : testUCoordinate.cxx
 //  Module : MED
 
-using namespace std;
 #include <cstdlib>
 #include <cmath>
 #include "utilities.h"
@@ -31,6 +30,8 @@ using namespace std;
 #include "MEDMEM_Array.hxx"
 #include "MEDMEM_Coordinate.hxx"
 #include <string> 
+
+using namespace std;
 using namespace MEDMEM;
 
 void usage(char * name)

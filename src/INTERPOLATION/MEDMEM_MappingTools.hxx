@@ -218,9 +218,10 @@ _TEMPLATE_SPE_ vector<double> _COORDBARY_3D_::Calcule_Coord_Baryc(int num_maille
 	{
 	int i,j;
 	int nbr_faces=coord_baryc[num_maille].size();
-	vector<double> coord_baryc_M(nbr_faces,0);
+	vector<double> coord_baryc_M(nbr_faces);
 	for (i=0;i<nbr_faces;i++) 
-		{
+		{//CCRT Porting : constructor of vector<T>(int,const T&) not supported on CCRT
+		coord_baryc_M[i]=0.;
 		for (j=0;j<3;j++) coord_baryc_M[i]+=coord_baryc[num_maille][i][j]*M[j];
 		coord_baryc_M[i]+=coord_baryc[num_maille][i][3];
 		}

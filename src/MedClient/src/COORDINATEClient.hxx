@@ -24,7 +24,7 @@ public:
   Parameters in : m (Mesh Corba IOR)
                   mode (FULL_ or NO_ interlace)
  */
-  COORDINATEClient(const SALOME_MED::MESH_ptr m, medModeSwitch Mode);
+  COORDINATEClient(const SALOME_MED::MESH_ptr m, MED_EN::medModeSwitch Mode);
 
 
   /*!
@@ -50,7 +50,7 @@ public:
 
   virtual ~COORDINATEClient() {};
 
-  virtual const double *  getCoordinates(medModeSwitch Mode);
+  virtual const double *  getCoordinates(MED_EN::medModeSwitch Mode);
   virtual double          getCoordinate(int Number,int Axis);
   virtual const double *  getCoordinateAxis(int Axis);
   virtual const int*      getNodesNumbers() const;

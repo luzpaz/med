@@ -7,6 +7,9 @@
 #include <typeinfo>
 #include <iostream>
 
+using namespace MEDMEM;
+using namespace MED_EN;
+
 Compo2::Compo2() : _F(NULL)
 {
 }

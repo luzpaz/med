@@ -17,6 +17,7 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 using namespace MEDMEM;
+using namespace MED_EN;
 
 
 void affiche_field(FIELD_ * myField, const SUPPORT * mySupport)
@@ -90,9 +91,9 @@ int main (int argc, char ** argv) {
 
 
   //  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
-  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_cell",MED_CELL);
+  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_cell",MED_EN::MED_CELL);
   FIELD<double> * myField = new FIELD<double>() ;
-  myField->setValueType(MED_REEL64);
+  myField->setValueType(MED_EN::MED_REEL64);
 
   myField->setName(fieldname);
   myField->setSupport(mySupport);
@@ -104,7 +105,7 @@ int main (int argc, char ** argv) {
     myFieldDriver.read() ;
   } catch (...) {
     delete mySupport ;
-    mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
+    mySupport = new SUPPORT(myMesh,"On_all_node",MED_EN::MED_NODE);
     myField->setSupport(mySupport);
     try {
       myFieldDriver.read() ;

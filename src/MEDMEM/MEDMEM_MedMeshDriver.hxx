@@ -28,14 +28,14 @@ class MED_MESH_DRIVER : public GENDRIVER
 protected:
   
   MESH *   _ptrMesh;
-  MED_FR::med_idt        _medIdt;
+  med_2_1::med_idt        _medIdt;
   string         _meshName;    // const ?
   int            _meshNum;     // INUTILE ?
   
 public :
 
   // all MED cell type
-  static const MED_FR::med_geometrie_element all_cell_type[MED_NBR_GEOMETRIE_MAILLE];
+  static const med_2_1::med_geometrie_element all_cell_type[MED_NBR_GEOMETRIE_MAILLE];
   
   static const char * const all_cell_type_tab [MED_NBR_GEOMETRIE_MAILLE];
 
@@ -48,7 +48,7 @@ public :
   */
   MED_MESH_DRIVER(const string & fileName,  
 		  MESH * ptrMesh, 
-		  med_mode_acces accessMode) ;
+		  MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.
   */
@@ -130,7 +130,7 @@ private:
   int getNodalConnectivity(CONNECTIVITY * Connectivity) ;
   int getDescendingConnectivity(CONNECTIVITY * Connectivity) ;
   int getNodesFamiliesNumber(int * MEDArrayNodeFamily) ;
-  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity) ;
+  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity) ;
   void updateFamily() ;
   void buildAllGroups(vector<GROUP*> & Groups, vector<FAMILY*> & Families) ;
   void getGRID ();
@@ -180,7 +180,7 @@ public :
 
 private:
   int writeCoordinates    ()                           const;
-  int writeConnectivities (medEntityMesh entity)       const;
+  int writeConnectivities (MED_EN::medEntityMesh entity)       const;
   int writeFamilyNumbers  ()                           const;
   int writeFamilies       (vector<FAMILY*> & families) const;
   int writeGRID() const;

@@ -1,4 +1,3 @@
-using namespace std;
 /*
  File Support.cxx
  $Header$
@@ -16,6 +15,7 @@ using namespace std;
 //#include "MEDMEM_Group.hxx"
 #include "MEDMEM_Mesh.hxx"
 
+using namespace std;
 using namespace MED_EN;
 using namespace MEDMEM;
 
@@ -233,9 +233,9 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
   medGeometryElement * myType = new medGeometryElement[MED_NBR_GEOMETRIE_MAILLE];
   int * whereIsType = new int[MED_NBR_GEOMETRIE_MAILLE];
   //MESH_ENTITIES myMeshEntities() ;
-  list<MED_FR::med_geometrie_element>::const_iterator listIt ;
+  list<MED_EN::medGeometryElement>::const_iterator listIt ;
   int it=0 ;
-  for(listIt=(MED_FR::meshEntities[(MED_FR::med_entite_maillage)_entity]).begin();listIt!=(MED_FR::meshEntities[(MED_FR::med_entite_maillage)_entity]).end();listIt++) {
+  for(listIt=(meshEntities[_entity]).begin();listIt!=(meshEntities[_entity]).end();listIt++) {
     tmp_NumberOfElementsInType[it]=0;
     whereIsType[it]=0 ;
     try {
@@ -588,9 +588,9 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
   medGeometryElement * myType = new medGeometryElement[MED_NBR_GEOMETRIE_MAILLE];
   int * whereIsType = new int[MED_NBR_GEOMETRIE_MAILLE];
   //MESH_ENTITIES myMeshEntities() ;
-  list<MED_FR::med_geometrie_element>::const_iterator listIt ;
+  list<MED_EN::medGeometryElement>::const_iterator listIt ;
   int it=0 ;
-  for(listIt=(MED_FR::meshEntities[(MED_FR::med_entite_maillage)_entity]).begin();listIt!=(MED_FR::meshEntities[(MED_FR::med_entite_maillage)_entity]).end();listIt++) {
+  for(listIt=(meshEntities[_entity]).begin();listIt!=(meshEntities[_entity]).end();listIt++) {
     tmp_NumberOfElementsInType[it]=0;
     whereIsType[it]=0 ;
     myType[it]= MED_NONE;

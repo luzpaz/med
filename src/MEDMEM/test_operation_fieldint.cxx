@@ -17,6 +17,8 @@
 #include "MEDMEM_define.hxx"
 
 using namespace MEDMEM;
+using namespace MED_EN;
+
 int myfunction1(int x)
 {
     return 2*x;

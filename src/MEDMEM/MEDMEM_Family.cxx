@@ -1,4 +1,3 @@
-using namespace std;
 /*
  File MEDMEM_Family.cxx
  $Header$
@@ -6,7 +5,10 @@ using namespace std;
 
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Family.hxx"
+
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
 
 FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), 
                  _attributeIdentifier((int*)NULL),_attributeValue((int*)NULL), _attributeDescription((string*)NULL),

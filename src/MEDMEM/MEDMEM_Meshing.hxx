@@ -8,8 +8,6 @@
 
 #include "MEDMEM_Mesh.hxx"
 
-using namespace MED_EN;
-
 /*!
   This class MESHING is a special class to set a MESH object.
 */
@@ -28,7 +26,7 @@ public :
 			    const int NumberOfNodes,
 			    const double * Coordinates,
 			    const string System,
-			    const medModeSwitch Mode) ;
+			    const MED_EN::medModeSwitch Mode) ;
   void setCoordinatesSystem(const string System)
     throw (MEDEXCEPTION) ;
   void setCoordinatesNames (const string * names) ;
@@ -37,23 +35,23 @@ public :
   void setCoordinateUnit (const string unit, const int i) ;
 
   void setNumberOfTypes    (const int NumberOfTypes,
-			    const medEntityMesh Entity) 
+			    const MED_EN::medEntityMesh Entity) 
     throw (MEDEXCEPTION) ;
-  void setTypes            (const medGeometryElement * Types,
-			    const medEntityMesh Entity)
+  void setTypes            (const MED_EN::medGeometryElement * Types,
+			    const MED_EN::medEntityMesh Entity)
     throw (MEDEXCEPTION) ;
   void setNumberOfElements (const int * NumberOfElements,
-			    const medEntityMesh Entity)
+			    const MED_EN::medEntityMesh Entity)
     throw (MEDEXCEPTION) ;
   void setConnectivity     (const int * Connectivity,
-			    const medEntityMesh Entity,
-			    const medGeometryElement Type)
+			    const MED_EN::medEntityMesh Entity,
+			    const MED_EN::medGeometryElement Type)
     throw (MEDEXCEPTION) ;
 
   void setConnectivities   (const int * ConnectivityIndex,
 			    const int * ConnectivityValue,
-			    const medConnectivity ConnectivityType,
-			    const medEntityMesh Entity)
+			    const MED_EN::medConnectivity ConnectivityType,
+			    const MED_EN::medEntityMesh Entity)
     throw (MEDEXCEPTION) ;
 
 //   void setGroup            (const string name,

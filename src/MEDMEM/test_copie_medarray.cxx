@@ -1,4 +1,3 @@
-using namespace std;
 /* Programme de test du constructeur de copies de la classe MEDARRAY de MEDMEM
    jroy - 16/12/2002 */
 
@@ -18,7 +17,9 @@ using namespace std;
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
 
 void affiche_medarray(MEDARRAY<double> & myMedArray)
 {

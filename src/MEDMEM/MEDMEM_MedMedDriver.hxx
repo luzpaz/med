@@ -27,7 +27,7 @@ class MED_MED_DRIVER : public GENDRIVER
 protected:
   
   MED * const       _ptrMed;         // Store 'MED_DRIVER (0..n)----(1) MED' associations
-  med_idt           _medIdt;         // The _medIdt used to write/read Meshes to ::_filename
+  MED_EN::med_idt           _medIdt;         // The _medIdt used to write/read Meshes to ::_filename
    
   //private:
   //  MED_MED_DRIVER();

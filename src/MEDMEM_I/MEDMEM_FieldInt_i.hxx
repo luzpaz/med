@@ -27,7 +27,7 @@ private:
 
 public:
     ~FIELDINT_i();
-    FIELDINT_i(::FIELD<int> * const f, bool ownCppPtr=false);
+    FIELDINT_i(MEDMEM::FIELD<int> * const f, bool ownCppPtr=false);
     FIELDINT_i(FIELDINT_i & f);
     SALOME_MED::long_array * getValue (SALOME_MED::medModeSwitch mode ) 
 				   throw (SALOME::SALOME_Exception);

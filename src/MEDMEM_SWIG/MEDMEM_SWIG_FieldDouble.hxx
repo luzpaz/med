@@ -3,16 +3,16 @@
 
 #include "MEDMEM_Field.hxx"
 
-class FIELDDOUBLE : public FIELD<double>
+class FIELDDOUBLE : public MEDMEM::FIELD<double>
 {
 public:
   FIELDDOUBLE();
-  FIELDDOUBLE(const SUPPORT * Support, const int NumberOfComponents);
-  FIELDDOUBLE(const SUPPORT * Support, driverTypes driverType,
+  FIELDDOUBLE(const MEDMEM::SUPPORT * Support, const int NumberOfComponents);
+  FIELDDOUBLE(const MEDMEM::SUPPORT * Support, MEDMEM::driverTypes driverType,
 	      const string & fileName="", const string & fieldName="",
 	      const int iterationNumber=-1, const int orderNumber=-1);
   FIELDDOUBLE(const FIELDDOUBLE & m);
-  FIELDDOUBLE(const FIELD<double> & m);
+  FIELDDOUBLE(const MEDMEM::FIELD<double> & m);
   ~FIELDDOUBLE();
 };
 

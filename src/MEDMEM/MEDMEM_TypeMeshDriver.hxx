@@ -11,8 +11,6 @@
 #include "MEDMEM_Exception.hxx"
 #include "utilities.h"
 
-using namespace MEDMEM;
-
 /*!
 
   Driver TYPE for MESH.

@@ -1,13 +1,13 @@
-using namespace std;
 #include "utilities.h"
 #include "MEDMEM_Array.hxx"
 
+using namespace std;
 using namespace MEDMEM;
 int main (int argc, char ** argv) {
 
   int SpaceDimension = 3 ;
   int NumberOfNodes = 4 ; 
-  MEDARRAY<int> * myArray = new MEDARRAY<int>(SpaceDimension,NumberOfNodes,MED_FULL_INTERLACE) ;
+  MEDARRAY<int> * myArray = new MEDARRAY<int>(SpaceDimension,NumberOfNodes,MED_EN::MED_FULL_INTERLACE) ;
 
   //const int * value = myArray->get(MED_FULL_INTERLACE) ;
   for (int i=1; i<=NumberOfNodes; i++)
@@ -47,7 +47,7 @@ int main (int argc, char ** argv) {
   MESSAGE("Show all 0 :");
   numberof = myArray->getLeadingValue() ;
   int length = myArray->getLengthValue() ;
-  const int * NoInterlaceArray = myArray->get(MED_NO_INTERLACE) ;
+  const int * NoInterlaceArray = myArray->get(MED_EN::MED_NO_INTERLACE) ;
   for (int i=0; i<length ; i++) {
     cout << " - " ;
     for (int j=0;j<numberof;j++)

@@ -97,7 +97,7 @@ public:
 
   friend ostream & operator<<(ostream &os, const FAMILY &my) ;
 
-  bool build(medEntityMesh Entity,int **FamilyNumber);
+  bool build(MED_EN::medEntityMesh Entity,int **FamilyNumber);
 
   inline void setIdentifier             (int Identifier);        
   inline void setNumberOfAttributes     (int NumberOfAttribute);
@@ -121,9 +121,7 @@ public:
   inline string   getAttributeDescription(int i) const;
   inline string   getGroupName(int i)            const;
 };
-};
 
-using namespace MEDMEM;
 // inline methods :
 /*! Sets the attribute _identifier to Identifier. */
 //----------------------------------------------
@@ -264,4 +262,6 @@ inline string FAMILY::getGroupName(int i) const
 { 
     return _groupName[i-1] ; 
 }
+
+}//End namespace MEDMEM
 #endif /* FAMILY_HXX */

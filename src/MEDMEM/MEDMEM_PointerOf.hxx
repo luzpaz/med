@@ -39,15 +39,12 @@ public :
         void setShallowAndOwnership( const T *pointer );
 	PointerOf<T>& operator=( const PointerOf<T> &pointer ) ;
 } ;
-} ;
 
 // ------------------------------------------------------------ //
 //			         				//
 //			Implementation				//
 //			         				//
 // ------------------------------------------------------------ //
-
-using namespace MEDMEM;
 
 /*! Creates a null T* pointer and sets the boolean (for desallocation) to false. */
 template <typename T> PointerOf<T>::PointerOf() : _pointer(0), _done(false)
@@ -239,5 +236,7 @@ template <typename T> void PointerOf<T>::setShallowAndOwnership( const T *pointe
   _pointer=(T*)pointer;
   _done=true;
 }
+
+}//End namespace MEDMEM
 
 # endif		/* # if ! defined( __PointerOf_HXX__ ) */

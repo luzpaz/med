@@ -128,14 +128,14 @@ public:
 				  SALOMEDS::SObject_ptr theObject);
   
   private :
-  static map <string, string>_MedCorbaObj;
-  static string _myFileName;
-  static string _saveFileName;
+  static std::map <std::string, std::string>_MedCorbaObj;
+  static std::string _myFileName;
+  static std::string _saveFileName;
 
   private:
   bool   _duringLoad;
   int    _myStudyID;
-  string _myStudyName;
+  std::string _myStudyName;
   
   int myCounter;
   SALOME_NamingService *_NS;

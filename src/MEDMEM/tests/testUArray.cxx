@@ -22,10 +22,11 @@
 //  File   : testUArray.cxx
 //  Module : MED
 
-using namespace std;
 #include <cstdlib>	// pour l'acces à EXIT_SUCCESS et EXIT_FAILURE
 #include "utilities.h"
 #include "MEDMEM_Array.hxx"
+
+using namespace std;
 using namespace MEDMEM;
 
 void imprime(string titre,const int * myValues,const int * myOthers, int lignes, int colonnes)
@@ -88,10 +89,10 @@ int main (int argc, char ** argv)
 
 
   
-  MEDARRAY<int> * myArrayfull= new MEDARRAY<int>(SpaceDimension,NumberOfNodes,MED_FULL_INTERLACE);
+  MEDARRAY<int> * myArrayfull= new MEDARRAY<int>(SpaceDimension,NumberOfNodes,MED_EN::MED_FULL_INTERLACE);
   ASSERT(myArrayfull != NULL);
 
-  const int * myValues = myArrayfull->get(MED_FULL_INTERLACE);
+  const int * myValues = myArrayfull->get(MED_EN::MED_FULL_INTERLACE);
   ASSERT(myValues!= NULL);
 
   for (int i=0; i<NumberOfNodes; i++)
@@ -103,14 +104,14 @@ int main (int argc, char ** argv)
   	}
   }
   
-  const int * myOthers = myArrayfull->get(MED_NO_INTERLACE) ;
+  const int * myOthers = myArrayfull->get(MED_EN::MED_NO_INTERLACE) ;
   ASSERT(myOthers != NULL);
   
   imprime("Initialisation full interlace (xi=yi=zi=i+1)",myValues,myOthers,NumberOfNodes,SpaceDimension);
 
-  MEDARRAY<int> * myArrayno= new MEDARRAY<int>(SpaceDimension,NumberOfNodes,MED_NO_INTERLACE);
+  MEDARRAY<int> * myArrayno= new MEDARRAY<int>(SpaceDimension,NumberOfNodes,MED_EN::MED_NO_INTERLACE);
   ASSERT(myArrayno != NULL);
-  const int * myValuesno = myArrayno->get(MED_NO_INTERLACE);
+  const int * myValuesno = myArrayno->get(MED_EN::MED_NO_INTERLACE);
   ASSERT(myValuesno!= NULL);
 
   for (int k=0; k<SpaceDimension; k++)
@@ -122,7 +123,7 @@ int main (int argc, char ** argv)
   	}
   }
   
-  const int * myOthersno = myArrayno->get(MED_FULL_INTERLACE) ;
+  const int * myOthersno = myArrayno->get(MED_EN::MED_FULL_INTERLACE) ;
   ASSERT(myOthersno != NULL);
 
   imprime("Initialisation no interlace (xi=yi=zi=i+1)",myOthersno,myValuesno,NumberOfNodes,SpaceDimension);
@@ -239,9 +240,9 @@ int main (int argc, char ** argv)
   }
   try
   {
-  	myArrayfull->set(MED_FULL_INTERLACE,mynewvalues);
-  	myValues = myArrayfull->get(MED_FULL_INTERLACE);
-  	myOthers = myArrayfull->get(MED_NO_INTERLACE);
+  	myArrayfull->set(MED_EN::MED_FULL_INTERLACE,mynewvalues);
+  	myValues = myArrayfull->get(MED_EN::MED_FULL_INTERLACE);
+  	myOthers = myArrayfull->get(MED_EN::MED_NO_INTERLACE);
   }
   catch ( const std::exception &e )
   {
@@ -261,8 +262,8 @@ int main (int argc, char ** argv)
 
   try
   {
-  	myArrayno->set(MED_FULL_INTERLACE,mynewvalues);
-  	myValuesno = myArrayfull->get(MED_FULL_INTERLACE);
+  	myArrayno->set(MED_EN::MED_FULL_INTERLACE,mynewvalues);
+  	myValuesno = myArrayfull->get(MED_EN::MED_FULL_INTERLACE);
         myOthersno = NULL;
   }
   catch ( const std::exception &e )
@@ -290,8 +291,8 @@ int main (int argc, char ** argv)
   /* ---------------------------------------------------------- */
 
   MEDARRAY<int> * myArrayShare = new MEDARRAY<int>( *myArrayfull);
-  const int * sharevalues = myArrayShare->get(MED_FULL_INTERLACE);
-  const int * shareno = myArrayShare->get(MED_NO_INTERLACE);
+  const int * sharevalues = myArrayShare->get(MED_EN::MED_FULL_INTERLACE );
+  const int * shareno = myArrayShare->get(MED_EN::MED_NO_INTERLACE);
   imprime("test contructeur par recopie non profonde",sharevalues,shareno,NumberOfNodes,SpaceDimension);
 
   myArrayfull->setIJ(1,2,1992);
@@ -306,8 +307,8 @@ int main (int argc, char ** argv)
   imprime("tableau cible apres destruction tableau source",myValues,myOthers,NumberOfNodes,SpaceDimension);
 
   MEDARRAY<int> * myArrayShare2 = new MEDARRAY<int>( *myArrayfull,true);
-  sharevalues = myArrayShare2->get(MED_FULL_INTERLACE);
-  shareno = myArrayShare2->get(MED_NO_INTERLACE);
+  sharevalues = myArrayShare2->get(MED_EN::MED_FULL_INTERLACE );
+  shareno = myArrayShare2->get(MED_EN::MED_NO_INTERLACE );
   imprime("test contructeur par recopie profonde",sharevalues,shareno,NumberOfNodes,SpaceDimension);
 
   myArrayfull->setIJ(1,2,18);
@@ -316,15 +317,15 @@ int main (int argc, char ** argv)
   myArrayShare2->setIJ(1,2,19);
   imprime("change valeur tableau cible, impression tableau source",myValues,myOthers,NumberOfNodes,SpaceDimension);
 
-  myArrayno->set(MED_NO_INTERLACE,mynewvalues);
+  myArrayno->set(MED_EN::MED_NO_INTERLACE,mynewvalues);
   myArrayno->setIJ(2,1,1);
-  myValuesno = myArrayno->get(MED_NO_INTERLACE);
-  myOthersno = myArrayno->get(MED_FULL_INTERLACE);
+  myValuesno = myArrayno->get(MED_EN::MED_NO_INTERLACE);
+  myOthersno = myArrayno->get(MED_EN::MED_FULL_INTERLACE);
   imprime("Initialisation no interlace (0...11)",myOthersno,myValuesno,NumberOfNodes,SpaceDimension);
 
   MEDARRAY<int> * myArrayShare3 = new MEDARRAY<int>( *myArrayno);
-  sharevalues = myArrayShare3->get(MED_FULL_INTERLACE);
-  shareno = myArrayShare3->get(MED_NO_INTERLACE);
+  sharevalues = myArrayShare3->get(MED_EN::MED_FULL_INTERLACE);
+  shareno = myArrayShare3->get(MED_EN::MED_NO_INTERLACE);
   imprime("test contructeur par recopie non profonde",sharevalues,shareno,NumberOfNodes,SpaceDimension);
 
   myArrayno->setIJ(1,2,1992);

@@ -38,10 +38,10 @@
 /*********************************************************/
 
 #define NBR_MODELES_MAILLES_DEFINIS 15
-static int Equivalence_Local_MED[NBR_MODELES_MAILLES_DEFINIS] = { MED_POINT1 ,
-                                                           MED_SEG2   , MED_SEG3,
-							   MED_TRIA3  , MED_TRIA6   , MED_QUAD4 , MED_QUAD8  ,
-							   MED_TETRA4 , MED_TETRA10 , MED_HEXA8 , MED_HEXA20 , MED_PYRA5 , MED_PYRA13 , MED_PENTA6 , MED_PENTA15 };
+static int Equivalence_Local_MED[NBR_MODELES_MAILLES_DEFINIS] = { MED_EN::MED_POINT1 ,
+                                                           MED_EN::MED_SEG2   , MED_EN::MED_SEG3,
+							   MED_EN::MED_TRIA3  , MED_EN::MED_TRIA6   , MED_EN::MED_QUAD4 , MED_EN::MED_QUAD8  ,
+							   MED_EN::MED_TETRA4 , MED_EN::MED_TETRA10 , MED_EN::MED_HEXA8 , MED_EN::MED_HEXA20 , MED_EN::MED_PYRA5 , MED_EN::MED_PYRA13 , MED_EN::MED_PENTA6 , MED_EN::MED_PENTA15 };
 
 /*********************************************************/
 /*                                                       */

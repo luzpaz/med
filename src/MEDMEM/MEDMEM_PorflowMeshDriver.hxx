@@ -12,8 +12,6 @@
 #include "MEDMEM_Exception.hxx"
 #include "utilities.h"
 
-using namespace MEDMEM;
-
 /*!
 
   Driver PORFLOW for MESH.
@@ -39,14 +37,14 @@ protected:
 
   // tableau de correspondance des types géométriques de PORFLOW -> MED
   static const size_t nb_geometrie_porflow = 6;
-  static const medGeometryElement geomPORFLOWtoMED[nb_geometrie_porflow];
+  static const MED_EN::medGeometryElement geomPORFLOWtoMED[nb_geometrie_porflow];
   // indirection table from PORFLOW order to MED one for nodes numerotation in all PORFLOW geometries
   static const size_t nb_nodes_max = 8;  // maximal number of nodes for a porflow geometrie
   static const size_t nb_nodes2_max = 4; // maximal number of nodes for a 2D porflow geometrie
   static const size_t nb_faces_max = 6;  // maximal number of faces for a porflow geometrie
   static const int numPORFLOWtoMED[nb_geometrie_porflow] [nb_nodes_max];
   static const int connectivityPORFLOW[nb_geometrie_porflow][nb_faces_max][nb_nodes2_max];
-  inline static int geomMEDtoPorflow(medGeometryElement medGeo);
+  inline static int geomMEDtoPorflow(MED_EN::medGeometryElement medGeo);
 
 
 public :
@@ -60,7 +58,7 @@ public :
   */
   PORFLOW_MESH_DRIVER(const string & fileName,  
 		  MESH * ptrMesh, 
-		  med_mode_acces accessMode) ;
+		  MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.
   */

@@ -10,8 +10,8 @@ using namespace std ;
 
 #include "MEDMEM_define.hxx"
 #include "utilities.h"
-namespace MED_FR {
 
+namespace MED_EN {
 /*!  This Class inherits from  map. \n
      It is a constant map association int (which is a med_geometrie_element) and string. \n
      Operator [] returns the (string) name of the geometry of an element 
@@ -28,7 +28,7 @@ public :
   
   GEO_NAME();
   ~GEO_NAME();
-  string & operator[]( const MED_FR::med_geometrie_element &c ) const;
+  string & operator[]( const MED_EN::medGeometryElement &c ) const;
 } ;
 
 static const GEO_NAME geoNames ;
@@ -52,7 +52,7 @@ public :
 
   ENT_NAME ();
   ~ENT_NAME();
-  string & operator[]( const MED_FR::med_entite_maillage &c ) const;
+  string & operator[]( const MED_EN::medEntityMesh &c ) const;
 } ;
 
 static const ENT_NAME entNames ;
@@ -69,7 +69,7 @@ static const ENT_NAME entNames ;
 
 
 //--------------------------------------------------------------------------------
-class MESH_ENTITIES : public map<int, const list<MED_FR::med_geometrie_element> >
+class MESH_ENTITIES : public map<int, const list<MED_EN::medGeometryElement> >
 //--------------------------------------------------------------------------------
 {
 
@@ -77,18 +77,18 @@ public :
 
   MESH_ENTITIES ();
   ~MESH_ENTITIES();
-  const list<MED_FR::med_geometrie_element> & operator[]( const  MED_FR::med_entite_maillage &c ) const;
+  const list<MED_EN::medGeometryElement> & operator[]( const  MED_EN::medEntityMesh &c ) const;
   
 private:
   					/*! This operator is used to initialize class objects of 
 					    type  const list<med_geometrie_element> */
-  list<MED_FR::med_geometrie_element> & operator[]( const  MED_FR::med_entite_maillage &c );
+  list<MED_EN::medGeometryElement> & operator[]( const  MED_EN::medEntityMesh &c );
   
 } ;
 
 static const MESH_ENTITIES meshEntities ;
 
-} // End Of NameSpace MED_FR
+} // End Of NameSpace MED_EN
 
 #endif
 

@@ -15,8 +15,6 @@
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_GenDriver.hxx"
 
-using namespace MED_EN;
-
 /*! This class contains all the informations related with a MESH :
   - COORDINATES
   - CONNECTIVITIES
@@ -150,57 +148,57 @@ public :
   inline int 	                    getNumberOfNodes() const;
   virtual inline const COORDINATE * getCoordinateptr() const;
   inline string                     getCoordinatesSystem() const;
-  virtual inline const double *     getCoordinates(medModeSwitch Mode) const;
+  virtual inline const double *     getCoordinates(MED_EN::medModeSwitch Mode) const;
   virtual inline const double       getCoordinate(int Number,int Axis) const;
   inline const string *             getCoordinatesNames() const;
   inline const string *             getCoordinatesUnits() const;
   //inline int *                    getNodesNumbers();
 
-  virtual inline int             getNumberOfTypes(medEntityMesh Entity) const;
-  virtual inline const medGeometryElement * getTypes(medEntityMesh Entity) const;
-  virtual inline const CELLMODEL * getCellsTypes(medEntityMesh Entity) const;
-  virtual const int * getGlobalNumberingIndex(medEntityMesh Entity) const;
-  virtual inline int getNumberOfElements(medEntityMesh Entity,
-					 medGeometryElement Type) const;
-  virtual inline bool existConnectivity(medConnectivity ConnectivityType,
-					medEntityMesh Entity) const;
+  virtual inline int             getNumberOfTypes(MED_EN::medEntityMesh Entity) const;
+  virtual inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
+  virtual inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
+  virtual const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
+  virtual inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
+					 MED_EN::medGeometryElement Type) const;
+  virtual inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
+					MED_EN::medEntityMesh Entity) const;
 
-  virtual inline medGeometryElement getElementType(medEntityMesh Entity,
+  virtual inline MED_EN::medGeometryElement getElementType(MED_EN::medEntityMesh Entity,
 						   int Number) const;
-  virtual inline void calculateConnectivity(medModeSwitch Mode,
-					    medConnectivity ConnectivityType,
-					    medEntityMesh Entity) const ;
-  virtual inline int getConnectivityLength(medModeSwitch Mode,
-					     medConnectivity ConnectivityType,
-					     medEntityMesh Entity, 
-					     medGeometryElement Type) const;
-  virtual inline const int * getConnectivity(medModeSwitch Mode,
-					     medConnectivity ConnectivityType,
-					     medEntityMesh Entity, 
-					     medGeometryElement Type) const;
-  virtual inline const int * getConnectivityIndex(medConnectivity ConnectivityType,
-						  medEntityMesh Entity) const;
-  virtual int                 getElementNumber(medConnectivity ConnectivityType, 
-                                               medEntityMesh Entity, 
-                                               medGeometryElement Type, 
+  virtual inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
+					    MED_EN::medConnectivity ConnectivityType,
+					    MED_EN::medEntityMesh Entity) const ;
+  virtual inline int getConnectivityLength(MED_EN::medModeSwitch Mode,
+					     MED_EN::medConnectivity ConnectivityType,
+					     MED_EN::medEntityMesh Entity, 
+					     MED_EN::medGeometryElement Type) const;
+  virtual inline const int * getConnectivity(MED_EN::medModeSwitch Mode,
+					     MED_EN::medConnectivity ConnectivityType,
+					     MED_EN::medEntityMesh Entity, 
+					     MED_EN::medGeometryElement Type) const;
+  virtual inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+						  MED_EN::medEntityMesh Entity) const;
+  virtual int                 getElementNumber(MED_EN::medConnectivity ConnectivityType, 
+                                               MED_EN::medEntityMesh Entity, 
+                                               MED_EN::medGeometryElement Type, 
                                                int * connectivity) const;
-  virtual inline int getReverseConnectivityLength(medConnectivity ConnectivityType,
-						  medEntityMesh Entity=MED_CELL) const;
-  virtual inline const int * getReverseConnectivity(medConnectivity ConnectivityType,
-						    medEntityMesh Entity=MED_CELL) const;
-  virtual inline int getReverseConnectivityIndexLength(medConnectivity ConnectivityType,
-							 medEntityMesh Entity=MED_CELL) const;
-  virtual inline const int * getReverseConnectivityIndex(medConnectivity ConnectivityType,
-							 medEntityMesh Entity=MED_CELL) const;
+  virtual inline int getReverseConnectivityLength(MED_EN::medConnectivity ConnectivityType,
+						  MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+  virtual inline const int * getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,
+						    MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+  virtual inline int getReverseConnectivityIndexLength(MED_EN::medConnectivity ConnectivityType,
+							 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+  virtual inline const int * getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+							 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
 
-  virtual int                          getNumberOfFamilies(medEntityMesh Entity) const;
-  virtual inline const vector<FAMILY*> getFamilies(medEntityMesh Entity) const;
-  virtual inline const FAMILY*         getFamily(medEntityMesh Entity,int i) const;
-  virtual int          		       getNumberOfGroups(medEntityMesh Entity) const;
-  virtual inline const vector<GROUP*>  getGroups(medEntityMesh Entity) const;
-  virtual inline const GROUP*          getGroup(medEntityMesh Entity,int i) const;
+  virtual int                          getNumberOfFamilies(MED_EN::medEntityMesh Entity) const;
+  virtual inline const vector<FAMILY*> getFamilies(MED_EN::medEntityMesh Entity) const;
+  virtual inline const FAMILY*         getFamily(MED_EN::medEntityMesh Entity,int i) const;
+  virtual int          		       getNumberOfGroups(MED_EN::medEntityMesh Entity) const;
+  virtual inline const vector<GROUP*>  getGroups(MED_EN::medEntityMesh Entity) const;
+  virtual inline const GROUP*          getGroup(MED_EN::medEntityMesh Entity,int i) const;
   virtual inline const CONNECTIVITY* getConnectivityptr() const;
-  virtual SUPPORT *                    getBoundaryElements(medEntityMesh Entity) 
+  virtual SUPPORT *                    getBoundaryElements(MED_EN::medEntityMesh Entity) 
 						throw (MEDEXCEPTION);
   // problème avec le maillage dans le support : 
   //            le pointeur n'est pas const, mais sa valeur oui. A voir !!! PG
@@ -248,9 +246,7 @@ public :
    */
   void createFamilies();
 };
-};
 
-using namespace MEDMEM;
 // ---------------------------------------
 // 		Methodes Inline
 // ---------------------------------------
@@ -386,7 +382,7 @@ inline string MESH::getCoordinatesSystem() const
   - MED_NO_INTERLACE   :  X1 X2 Y1 Y2 Z1 Z2
   - MED_FULL_INTERLACE :  X1 Y1 Z1 X2 Y2 Z2
  */
-inline const double * MESH::getCoordinates(medModeSwitch Mode) const
+inline const double * MESH::getCoordinates(MED_EN::medModeSwitch Mode) const
 {
 //   checkGridFillCoords();
   return _coordinate->getCoordinates(Mode);
@@ -430,10 +426,10 @@ inline const string * MESH::getCoordinatesUnits() const
 
     If there is no connectivity, return an exception.
 */
-inline int MESH::getNumberOfTypes(medEntityMesh entity) const
+inline int MESH::getNumberOfTypes(MED_EN::medEntityMesh entity) const
 {
   MESSAGE("MESH::getNumberOfTypes(medEntityMesh entity) : "<<entity);
-  if (entity == MED_NODE)
+  if (entity == MED_EN::MED_NODE)
     return 1;
 //   checkGridFillConnectivity();
   if (_connectivity != NULL)
@@ -449,9 +445,9 @@ inline int MESH::getNumberOfTypes(medEntityMesh entity) const
 
   If entity is not defined, return an exception.
 */
-inline const medGeometryElement * MESH::getTypes(medEntityMesh entity) const
+inline const MED_EN::medGeometryElement * MESH::getTypes(MED_EN::medEntityMesh entity) const
 {
-  if (entity == MED_NODE)
+  if (entity == MED_EN::MED_NODE)
     throw MEDEXCEPTION(LOCALIZED("MESH::getTypes( medEntityMesh ) : No medGeometryElement with MED_NODE entity !"));
   // return un tableau de taille 1 contenant MED_NONE, comme les supports pour etre coherent avec getNumberOfTypes ???? PG
 
@@ -466,7 +462,7 @@ inline const medGeometryElement * MESH::getTypes(medEntityMesh entity) const
 
   REMARK : Don't use MED_NODE as medEntityMesh
 */
-inline const CELLMODEL * MESH::getCellsTypes(medEntityMesh Entity) const
+inline const CELLMODEL * MESH::getCellsTypes(MED_EN::medEntityMesh Entity) const
 {
   //  checkGridFillConnectivity();
   if (_connectivity != NULL)
@@ -484,7 +480,7 @@ inline const CELLMODEL * MESH::getCellsTypes(medEntityMesh Entity) const
     - GlobalNumberingIndex[1]=6 (the second type)
     - GlobalNumberingIndex[2]=10
 */
-inline const int * MESH::getGlobalNumberingIndex(medEntityMesh entity) const
+inline const int * MESH::getGlobalNumberingIndex(MED_EN::medEntityMesh entity) const
 {
   //  checkGridFillConnectivity();
   if (_connectivity != NULL)
@@ -502,11 +498,11 @@ inline const int * MESH::getGlobalNumberingIndex(medEntityMesh entity) const
   - getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) : return total number
   of elements defined in cell entity
  */
-inline int MESH::getNumberOfElements(medEntityMesh entity, medGeometryElement Type) const
+inline int MESH::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
 {
   //  const char * LOC = "MESH::getNumberOfElements(medEntityMesh,medGeometryElement) : ";
-  if (entity==MED_NODE)
-    if ((Type==MED_NONE)|(Type==MED_ALL_ELEMENTS))
+  if (entity==MED_EN::MED_NODE)
+    if ((Type==MED_EN::MED_NONE)|(Type==MED_EN::MED_ALL_ELEMENTS))
       return _numberOfNodes;
     else
       return 0;
@@ -525,7 +521,7 @@ inline int MESH::getNumberOfElements(medEntityMesh entity, medGeometryElement Ty
   Return true if the wanted connectivity exist, else return false
   (to use before a getSomething method).
  */
-inline bool MESH::existConnectivity(medConnectivity connectivityType, medEntityMesh entity) const
+inline bool MESH::existConnectivity(MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh entity) const
 {
 //   checkGridFillConnectivity();
   if (_connectivity==(CONNECTIVITY*)NULL)
@@ -537,7 +533,7 @@ inline bool MESH::existConnectivity(medConnectivity connectivityType, medEntityM
 
   Throw an exception if Entity is not defined or Number are wrong (too big).
  */
-inline medGeometryElement MESH::getElementType(medEntityMesh Entity,int Number) const
+inline MED_EN::medGeometryElement MESH::getElementType(MED_EN::medEntityMesh Entity,int Number) const
 {
   //  checkGridFillConnectivity();
   if (_connectivity==(CONNECTIVITY*)NULL)
@@ -549,10 +545,10 @@ inline medGeometryElement MESH::getElementType(medEntityMesh Entity,int Number) 
   done. Do nothing if connectivity already exist.
  */
 
-inline void MESH::calculateConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity) const
+inline void MESH::calculateConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity) const
 {
   //  checkGridFillConnectivity();
-  if (Mode==MED_FULL_INTERLACE)
+  if (Mode==MED_EN::MED_FULL_INTERLACE)
     _connectivity->calculateConnectivity(ConnectivityType,entity);
   else
     throw MEDEXCEPTION(LOCALIZED("MESH::calculateConnectivity : only for MED_FULL_INTERLACE mode"));
@@ -561,12 +557,12 @@ inline void MESH::calculateConnectivity(medModeSwitch Mode,medConnectivity Conne
  Return the corresponding length of the array returned by MESH::getConnectivity with exactly the same arguments.
  Used particulary for wrapping CORBA and python.
  */
-inline int MESH::getConnectivityLength(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity, medGeometryElement Type) const
+inline int MESH::getConnectivityLength(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
 {
   int nbOfElm = getNumberOfElements(entity,Type);
   int size;
   
-  if (Type == MED_ALL_ELEMENTS)
+  if (Type == MED_EN::MED_ALL_ELEMENTS)
     {
       size = getConnectivityIndex(ConnectivityType,entity)[nbOfElm]-1;
     }
@@ -584,10 +580,10 @@ inline int MESH::getConnectivityLength(medModeSwitch Mode,medConnectivity Connec
   and Type=MED_ALL_ELEMENTS.
   You must also get the corresponding index array.
  */
-inline const int * MESH::getConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity, medGeometryElement Type) const
+inline const int * MESH::getConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
 {
   //  checkGridFillConnectivity();
-  if (Mode==MED_FULL_INTERLACE)
+  if (Mode==MED_EN::MED_FULL_INTERLACE)
     return _connectivity->getConnectivity(ConnectivityType,entity,Type);
   throw MEDEXCEPTION(LOCALIZED("MESH::getConnectivity : only for MED_FULL_INTERLACE mode"));
 }
@@ -602,7 +598,7 @@ inline const int * MESH::getConnectivity(medModeSwitch Mode,medConnectivity Conn
   in Connectivity array (Connectivity[ConnectivityIndex[i-1]-1] is the
   first value)
  */
-inline const int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh entity) const
+inline const int * MESH::getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity) const
 {
   //  checkGridFillConnectivity();
   return _connectivity->getConnectivityIndex(ConnectivityType, entity);
@@ -612,24 +608,24 @@ inline const int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,m
   Used particulary for wrapping CORBA and python.
  */
 
-inline int MESH::getReverseConnectivityLength(medConnectivity ConnectivityType,
-						    medEntityMesh Entity) const
+inline int MESH::getReverseConnectivityLength(MED_EN::medConnectivity ConnectivityType,
+						    MED_EN::medEntityMesh Entity) const
 {
   int spaceDim = getSpaceDimension();
   int nb;
   
-  if (ConnectivityType == MED_NODAL)
+  if (ConnectivityType == MED_EN::MED_NODAL)
     {
       nb = getNumberOfNodes();
     }
   else
     {
       if (spaceDim == 2)
-	nb = getNumberOfElements(MED_EDGE,
-					MED_ALL_ELEMENTS);
+	nb = getNumberOfElements(MED_EN::MED_EDGE,
+					MED_EN::MED_ALL_ELEMENTS);
       else if (spaceDim == 3)
-	nb = getNumberOfElements(MED_FACE,
-					MED_ALL_ELEMENTS);
+	nb = getNumberOfElements(MED_EN::MED_FACE,
+					MED_EN::MED_ALL_ELEMENTS);
     }
   return getReverseConnectivityIndex(ConnectivityType)[nb]-1;
 }
@@ -641,7 +637,7 @@ inline int MESH::getReverseConnectivityLength(medConnectivity ConnectivityType,
   You must get ReverseConnectivityIndex array to use it.
  */
 
-inline const int * MESH::getReverseConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
+inline const int * MESH::getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
 {
   //  checkGridFillConnectivity();
   if (NULL==_connectivity)
@@ -653,21 +649,21 @@ inline const int * MESH::getReverseConnectivity(medConnectivity ConnectivityType
   Return the corresponding length of the array returned by MESH::getReverseConnectivityIndex with exactly the same arguments.
   Used particulary for wrapping CORBA and python.
  */
-inline int MESH::getReverseConnectivityIndexLength(medConnectivity ConnectivityType,
-							 medEntityMesh Entity) const
+inline int MESH::getReverseConnectivityIndexLength(MED_EN::medConnectivity ConnectivityType,
+							 MED_EN::medEntityMesh Entity) const
 {
   int spaceDim = getSpaceDimension();
 
-  if (ConnectivityType == MED_NODAL)
+  if (ConnectivityType == MED_EN::MED_NODAL)
     {
       return getNumberOfNodes()+1;
     }
   else
     {
       if (spaceDim == 2)
-	return getNumberOfElements(MED_EDGE,MED_ALL_ELEMENTS)+1;
+	return getNumberOfElements(MED_EN::MED_EDGE,MED_EN::MED_ALL_ELEMENTS)+1;
       else if (spaceDim == 3)
-	return getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS)+1;
+	return getNumberOfElements(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS)+1;
       else
 	throw MEDEXCEPTION("Invalid dimension");
     }
@@ -684,7 +680,7 @@ inline int MESH::getReverseConnectivityIndexLength(medConnectivity ConnectivityT
   ReverseConnectivity[ReverseConnectivityIndex[i-1]-1]
   is the first value)
  */
-inline const int * MESH::getReverseConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
+inline const int * MESH::getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
 {
   //  checkGridFillConnectivity();
   if (NULL==_connectivity)
@@ -694,87 +690,87 @@ inline const int * MESH::getReverseConnectivityIndex(medConnectivity Connectivit
 }
 
 
-inline int MESH::getNumberOfFamilies (medEntityMesh entity) const
+inline int MESH::getNumberOfFamilies (MED_EN::medEntityMesh entity) const
 {
   switch (entity) {
-  case MED_NODE :
+  case MED_EN::MED_NODE :
     return _familyNode.size();
-  case MED_CELL :
+  case MED_EN::MED_CELL :
     return _familyCell.size();
-  case MED_FACE :
+  case MED_EN::MED_FACE :
     return _familyFace.size();
-  case MED_EDGE :
+  case MED_EN::MED_EDGE :
     return _familyEdge.size();
   default :
     throw MEDEXCEPTION("MESH::getNumberOfFamilies : Unknown entity");
   }
 }
-inline int MESH::getNumberOfGroups (medEntityMesh entity) const
+inline int MESH::getNumberOfGroups (MED_EN::medEntityMesh entity) const
 {
   switch (entity) {
-  case MED_NODE :
+  case MED_EN::MED_NODE :
     return _groupNode.size();
-  case MED_CELL :
+  case MED_EN::MED_CELL :
     return _groupCell.size();
-  case MED_FACE :
+  case MED_EN::MED_FACE :
     return _groupFace.size();
-  case MED_EDGE :
+  case MED_EN::MED_EDGE :
     return _groupEdge.size();
   default :
     throw MEDEXCEPTION("MESH::getNumberOfGroups : Unknown entity");
   }
 }
-const vector<MEDMEM::FAMILY*> MESH::getFamilies(medEntityMesh entity) const
+const vector<MEDMEM::FAMILY*> MESH::getFamilies(MED_EN::medEntityMesh entity) const
 {
   switch (entity) {
-  case MED_NODE :
+  case MED_EN::MED_NODE :
     return _familyNode;
-  case MED_CELL :
+  case MED_EN::MED_CELL :
     return _familyCell;
-  case MED_FACE :
+  case MED_EN::MED_FACE :
     return _familyFace;
-  case MED_EDGE :
+  case MED_EN::MED_EDGE :
     return _familyEdge;
   default :
     throw MEDEXCEPTION("MESH::getFamilies : Unknown entity");
   }
 }
 
-const vector<GROUP*> MESH::getGroups(medEntityMesh entity) const
+const vector<GROUP*> MESH::getGroups(MED_EN::medEntityMesh entity) const
 {
   switch (entity) {
-  case MED_NODE :
+  case MED_EN::MED_NODE :
     return _groupNode;
-  case MED_CELL :
+  case MED_EN::MED_CELL :
     return _groupCell;
-  case MED_FACE :
+  case MED_EN::MED_FACE :
     return _groupFace;
-  case MED_EDGE :
+  case MED_EN::MED_EDGE :
     return _groupEdge;
   default :
     throw MEDEXCEPTION("MESH::getGroups : Unknown entity");
   }
 }
 
-const MEDMEM::FAMILY* MESH::getFamily(medEntityMesh entity, int i) const
+const MEDMEM::FAMILY* MESH::getFamily(MED_EN::medEntityMesh entity, int i) const
 {
   if (i<=0)
     throw MEDEXCEPTION("MESH::getFamily(i) : argument i must be > 0");
   vector<FAMILY*> Family;
   switch (entity) {
-  case MED_NODE : {
+  case MED_EN::MED_NODE : {
     Family = _familyNode;
     break;
   }
-  case MED_CELL : {
+  case MED_EN::MED_CELL : {
     Family = _familyCell;
     break;
   }
-  case MED_FACE : {
+  case MED_EN::MED_FACE : {
     Family = _familyFace;
     break;
   }
-  case MED_EDGE : {
+  case MED_EN::MED_EDGE : {
     Family = _familyEdge;
     break;
   }
@@ -786,26 +782,26 @@ const MEDMEM::FAMILY* MESH::getFamily(medEntityMesh entity, int i) const
   return Family[i-1];
 }
 
-const GROUP* MESH::getGroup(medEntityMesh entity, int i) const
+const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
 {
   const char * LOC = "MESH::getGroup(medEntityMesh entity, int i) : ";
   if (i<=0)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i must be > 0"));
   vector<GROUP*> Group;
   switch (entity) {
-  case MED_NODE : {
+  case MED_EN::MED_NODE : {
     Group = _groupNode;
     break;
   }
-  case MED_CELL : {
+  case MED_EN::MED_CELL : {
     Group = _groupCell;
     break;
   }
-  case MED_FACE : {
+  case MED_EN::MED_FACE : {
     Group = _groupFace;
     break;
   }
-  case MED_EDGE : {
+  case MED_EN::MED_EDGE : {
     Group = _groupEdge;
     break;
   }
@@ -831,6 +827,8 @@ inline bool MESH::getIsAGrid()
   SCRUTE(_isAGrid);
 
   return _isAGrid;
+}
+
 }
 
 #endif /* MESH_HXX */

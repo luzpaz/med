@@ -5,6 +5,10 @@
 #include "CONNECTIVITYClient.hxx"
 #include "FAMILYClient.hxx"
 #include "GROUPClient.hxx"
+
+using namespace MEDMEM;
+using namespace MED_EN;
+
 //=============================================================================
 /*!
  * Constructeur

@@ -22,12 +22,13 @@
 //  File   : readCoordinate.cxx
 //  Module : MED
 
-using namespace std;
 #include<string>
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
+
+using namespace std;
 using namespace MEDMEM;
 
 void usage(char * name)
@@ -49,11 +50,11 @@ int main (int argc, char ** argv) {
   string fileName = argv[1];
   string meshName = argv[2];
 
-  medModeSwitch Mode = MED_FULL_INTERLACE;
+  MED_EN::medModeSwitch Mode = MED_EN::MED_FULL_INTERLACE;
   if (argc==4)
   {
         string comp=argv[3];
-  	if ( comp == "MED_NO_INTERLACE" ) Mode = MED_NO_INTERLACE;
+  	if ( comp == "MED_NO_INTERLACE" ) Mode = MED_EN::MED_NO_INTERLACE;
 	else if ( comp != "MED_FULL_INTERLACE") usage(argv[0]);
   }
 

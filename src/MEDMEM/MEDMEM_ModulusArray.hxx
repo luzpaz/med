@@ -26,8 +26,6 @@ public:
   int compare(const MEDMODULUSARRAY &modulusArray) const;
 
 };
-};
-using namespace MEDMEM;
 
 MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) : 
   _length(length), _array(array)
@@ -99,6 +97,7 @@ int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
       // else we continue if there is another start point i
     }
     return ret ;
+}
 }
 
 # endif 	/* # ifndef __MEDMODULUSARRAY_H__ */

@@ -31,6 +31,9 @@
 #include "MEDMEM_SWIG_MedFieldDoubleDriver.hxx"
 #include "MEDMEM_SWIG_MedFieldIntDriver.hxx"
 #include "MEDMEM_Meshing.hxx"
+
+  using namespace MEDMEM;
+  using namespace MED_EN;
 %}
 
 %include "typemaps.i"
@@ -1628,8 +1631,7 @@ class MED
 
     SUPPORT * getSupport(char * meshName, medEntityMesh entity)
       {
-	return self->getSupport(string(meshName),
-				(MED_FR::med_entite_maillage) entity);
+	return self->getSupport(string(meshName),entity);
       }
   }
 };

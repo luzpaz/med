@@ -60,12 +60,13 @@ public :
 
 
   COORDINATE();
-  COORDINATE(int SpaceDimension, int NumberOfNodes, medModeSwitch Mode);
+  COORDINATE(int SpaceDimension, int NumberOfNodes, MED_EN::medModeSwitch Mode);
+  COORDINATE(int SpaceDimension,const string * CoordinateName, const string * CoordinateUnit);
   COORDINATE(const COORDINATE & m);
   virtual ~COORDINATE();
 
   void setCoordinates(MEDARRAY<double> *Coordinate,bool shallowCopy=false);
-  void setCoordinates(const medModeSwitch Mode, const double *Coordinate);
+  void setCoordinates(const MED_EN::medModeSwitch Mode, const double *Coordinate);
   void setCoordinatesNames(const string * CoordinateName);
   void setCoordinateName(const string CoordinateName, const int i);
   void setCoordinatesUnits(const string * CoordinateUnit);
@@ -80,7 +81,7 @@ public :
   //const int*            getNodesNumbers() ;
   string          getCoordinatesSystem() const;
 
-  virtual const double *  getCoordinates(medModeSwitch Mode);
+  virtual const double *  getCoordinates(MED_EN::medModeSwitch Mode);
   virtual double          getCoordinate(int Number,int Axis);
   virtual const double *  getCoordinateAxis(int Axis);
 

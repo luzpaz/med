@@ -11,13 +11,13 @@
 //exemple _FIELDClient<double,FIELDDOUBLE_ptr>
 //_FIELDClient<int,FIELDINT_ptr>
 template<class T1,class T2>
-class FIELDClient : public FIELD<T1>
+class FIELDClient : public MEDMEM::FIELD<T1>
 {
 private:
   typename T2::_ptr_type _fieldPtr;
   bool _ownSupport;
 public:
-  FIELDClient(typename T2::_ptr_type ptrCorba,SUPPORT * S = NULL);
+  FIELDClient(typename T2::_ptr_type ptrCorba,MEDMEM::SUPPORT * S = NULL);
   ~FIELDClient();
 private:
   void fillCopy();

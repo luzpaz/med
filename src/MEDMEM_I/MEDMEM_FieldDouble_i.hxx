@@ -27,7 +27,7 @@ private:
 public:
     FIELDDOUBLE_i();
     ~FIELDDOUBLE_i();
-    FIELDDOUBLE_i(::FIELD<double> * const f, bool ownCppPtr=false);
+    FIELDDOUBLE_i(MEDMEM::FIELD<double> * const f, bool ownCppPtr=false);
     FIELDDOUBLE_i(FIELDDOUBLE_i & f);
 
     SALOME_MED::double_array * getValue (SALOME_MED::medModeSwitch mode ) 

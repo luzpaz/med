@@ -25,7 +25,7 @@ class MESH_i: public POA_SALOME_MED::MESH,
 	      public SALOMEMultiComm
 {
 public :
-    static map < int,::MEDMEM::MESH *> meshMap;
+    static std::map < int,::MEDMEM::MESH *> meshMap;
 private :
     static int meshIndex;
 
@@ -35,7 +35,7 @@ protected:
     // C++ object containing values
     ::MEDMEM::MESH * const _mesh;
     const int      _corbaIndex;
-    string         _meshId;
+    std::string         _meshId;
 
 
 public:
@@ -168,7 +168,7 @@ public:
 			    throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
     void        addInStudy (SALOMEDS::Study_ptr myStudy, 
 			    SALOME_MED::MESH_ptr myIor,
-			    const string & fileName)   
+			    const std::string & fileName)   
 		            throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
     CORBA::Long addDriver  (SALOME_MED::medDriverTypes driverType, 
 			    const char* fileName, const char* meshName)

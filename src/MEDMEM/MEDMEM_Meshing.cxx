@@ -1,4 +1,3 @@
-using namespace std;
 /*
   File MEDMEM_Meshing.cxx
   $Header$
@@ -13,7 +12,10 @@ using namespace std;
 
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Group.hxx"
+
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
 
 /*! Create an empty MESH. */
 MESHING::MESHING(): MESH()
@@ -202,7 +204,7 @@ void MESHING::setTypes(const medGeometryElement * Types,
   we set 12 triangles and 23 quadrangles.
 */
 void MESHING::setNumberOfElements(const int * NumberOfElements,
-				  medEntityMesh Entity)
+				  const medEntityMesh Entity)
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESHING::setNumberOfElements(const int *, medEntityMesh) : " ;

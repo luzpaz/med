@@ -63,10 +63,8 @@ public:
   inline FAMILY * 	 getFamily(int i) const ;
 
 };
-};
 
 // inline method :
-using namespace MEDMEM;
 
 /*! set the attribut _numberOfFamilies to numberOfFamilies */
 //----------------------------------------------------------
@@ -108,6 +106,6 @@ FAMILY * GROUP::getFamily(int i) const
 { 
   return _family[i-1]; 
 };
-
+}//End namespace MEDMEM
 
 #endif /* GROUP_HXX */

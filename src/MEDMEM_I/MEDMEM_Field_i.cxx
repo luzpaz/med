@@ -8,6 +8,9 @@
 //=============================================================================
 #include "MEDMEM_Field_i.hxx"
 
+using namespace MEDMEM;
+using namespace MED_EN;
+
 map < int, ::FIELD_ * > FIELD_i::fieldMap ;
 int  FIELD_i::fieldIndex = 0;
 //=============================================================================
@@ -17,7 +20,7 @@ int  FIELD_i::fieldIndex = 0;
 //=============================================================================
 
 //FIELD_i::FIELD_i():_fieldTptr(FIELD_i::constructConstField())
-FIELD_i::FIELD_i():_fieldTptr(constructConstField())
+FIELD_i::FIELD_i():_fieldTptr(constructConstField()),_corbaIndex(FIELD_i::fieldIndex++)
 {
         BEGIN_OF("Default Constructor Field_i");
         END_OF(" Default Constructor Field_i");

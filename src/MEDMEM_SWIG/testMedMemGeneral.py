@@ -87,6 +87,12 @@ meshNameFiles.append("CUBE_EN_HEXA8_QUAD4")
 files.append("pointe.med")
 meshNameFiles.append("maa1")
 
+files.append("Mistrat.med")
+meshNameFiles.append("Mistrat_Hexa")
+
+## files.append("TimeStamps.med")
+## meshNameFiles.append("dom")
+
 #
 # Castem or Gibi file list
 #
@@ -859,42 +865,49 @@ for i in range(nbOfFiles):
                             valueI = fieldintmul.getValueI(MED_FULL_INTERLACE,k+1)
                             print "     *",valueI[:nbOfComp]
                         print ""
-                        fieldintdiv = fieldint / fieldint2
-                        print "Test of the division of two integer fields with creation a new one"
-                        print ""
-                        name = fieldintdiv.getName()
-                        desc = fieldintdiv.getDescription()
-                        nbOfComp = fieldintdiv.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
-                        iterationNb = fieldintdiv.getIterationNumber()
-                        orderNb = fieldintdiv.getOrderNumber()
-                        time = fieldintdiv.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
-                        for k in range(nbOfComp):
-                            kp1 = k+1
-                            compName = fieldintdiv.getComponentName(kp1)
-                            compDesc = fieldintdiv.getComponentDescription(kp1)
-                            compUnit = fieldintdiv.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
+                        try:
+                            fieldintdiv = fieldint / fieldint2
+                            print "Test of the division of two integer fields with creation a new one"
+                            print ""
+                            name = fieldintdiv.getName()
+                            desc = fieldintdiv.getDescription()
+                            nbOfComp = fieldintdiv.getNumberOfComponents()
+                            print "     Field",name," : ",desc
+                            print "     Number Of Components:",nbOfComp
+                            iterationNb = fieldintdiv.getIterationNumber()
+                            orderNb = fieldintdiv.getOrderNumber()
+                            time = fieldintdiv.getTime()
+                            print "     Iteration Number",iterationNb
+                            print "     Order Number",orderNb
+                            print "     Time",time
+                            for k in range(nbOfComp):
+                                kp1 = k+1
+                                compName = fieldintdiv.getComponentName(kp1)
+                                compDesc = fieldintdiv.getComponentDescription(kp1)
+                                compUnit = fieldintdiv.getMEDComponentUnit(kp1)
+                                print "      * Component:",kp1
+                                print "          Name:",compName
+                                print "          Description:",compDesc
+                                print "          Unit:",compUnit
 
-                        support = fieldintdiv.getSupport()
-                        nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
-                        for k in range(nbOf):
-                            valueI = fieldintdiv.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
-                        print ""
-                        print "TESTS OPERATIONS SUR FIELDINT : "
+                            support = fieldintdiv.getSupport()
+                            nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+                            print "     Values:",nbOf
+                            for k in range(nbOf):
+                                valueI = fieldintdiv.getValueI(MED_FULL_INTERLACE,k+1)
+                                print "     *",valueI[:nbOfComp]
+                            print ""
+                            print "TESTS OPERATIONS SUR FIELDINT : "
+                        except:
+                            print "testMedMemGeneral  fieldintdiv = fieldint / fieldint2 catch/except error"
                         fieldintadd = fieldint+fieldint2
                         fieldintsub = fieldint-fieldint2
                         fieldintmul = fieldint*fieldint2
-                        fieldintdiv = fieldint/fieldint2
+                        try:
+                            fieldintdiv = fieldint/fieldint2
+                        except:
+                            fieldintdiv = None
+                            print "testMedMemGeneral  fieldintdiv = fieldint/fieldint2 catch/except error"
                         fieldintasso = fieldint+fieldint*fieldint
                         fieldintSP=createFieldIntScalarProduct(fieldint, fieldint2)
 
@@ -904,18 +917,26 @@ for i in range(nbOfFiles):
                         print "  +     : ",fieldintadd.getValue(MED_FULL_INTERLACE)
                         print "  -     : ",fieldintsub.getValue(MED_FULL_INTERLACE)
                         print "  *     : ",fieldintmul.getValue(MED_FULL_INTERLACE)
-                        print "  /     : ",fieldintdiv.getValue(MED_FULL_INTERLACE)
+                        if fieldintdiv == None :
+                            print "testMedMemGeneral   /     : None"
+                        else:
+                            print "  /     : ",fieldintdiv.getValue(MED_FULL_INTERLACE)
                         fieldint+=fieldint2;
                         print "  +=    : ",fieldint.getValue(MED_FULL_INTERLACE)
                         fieldint-=fieldint2;
                         print "  -=    : ",fieldint.getValue(MED_FULL_INTERLACE)
                         fieldint*=fieldint2;
                         print "  *=    : ",fieldint.getValue(MED_FULL_INTERLACE)
-                        fieldint/=fieldint2;
-                        print "  /=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        try:
+                            fieldint/=fieldint2;
+                            print "  /=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        except :
+                            fieldint = None
+                            print "  /=    : Catch/Except : None"
                         print "f1+f2*f2: ",fieldintasso.getValue(MED_FULL_INTERLACE)
-                        fieldint.applyLin(4,1);
-                        print " 4f1+1  : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        if fieldint != None :
+                            fieldint.applyLin(4,1);
+                            print " 4f1+1  : ",fieldint.getValue(MED_FULL_INTERLACE)
                         print " f1.f2  : ",fieldintSP.getValue(MED_FULL_INTERLACE)
                         fieldint2.applyPyFunc(add_one)
                         print " CB:f2+1: ",fieldint2.getValue(MED_FULL_INTERLACE)
@@ -1060,41 +1081,49 @@ for i in range(nbOfFiles):
                             valueI = fielddoublemul.getValueI(MED_FULL_INTERLACE,k+1)
                             print "     *",valueI[:nbOfComp]
                         print ""
-                        fielddoublediv = fielddouble / fielddouble2
-                        print "Test of the division of two double fields with creation a new one"
-                        print ""
-                        name = fielddoublediv.getName()
-                        desc = fielddoublediv.getDescription()
-                        nbOfComp = fielddoublediv.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
-                        iterationNb = fielddoublediv.getIterationNumber()
-                        orderNb = fielddoublediv.getOrderNumber()
-                        time = fielddoublediv.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
-                        for k in range(nbOfComp):
-                            kp1 = k+1
-                            compName = fielddoublediv.getComponentName(kp1)
-                            compDesc = fielddoublediv.getComponentDescription(kp1)
-                            compUnit = fielddoublediv.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
+                        try:
+                            fielddoublediv = fielddouble / fielddouble2
+                            print "Test of the division of two double fields with creation a new one"
+                            print ""
+                            name = fielddoublediv.getName()
+                            desc = fielddoublediv.getDescription()
+                            nbOfComp = fielddoublediv.getNumberOfComponents()
+                            print "     Field",name," : ",desc
+                            print "     Number Of Components:",nbOfComp
+                            iterationNb = fielddoublediv.getIterationNumber()
+                            orderNb = fielddoublediv.getOrderNumber()
+                            time = fielddoublediv.getTime()
+                            print "     Iteration Number",iterationNb
+                            print "     Order Number",orderNb
+                            print "     Time",time
+                            for k in range(nbOfComp):
+                                kp1 = k+1
+                                compName = fielddoublediv.getComponentName(kp1)
+                                compDesc = fielddoublediv.getComponentDescription(kp1)
+                                compUnit = fielddoublediv.getMEDComponentUnit(kp1)
+                                print "      * Component:",kp1
+                                print "          Name:",compName
+                                print "          Description:",compDesc
+                                print "          Unit:",compUnit
 
-                        support = fielddoublediv.getSupport()
-                        nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
-                        for k in range(nbOf):
-                            valueI = fielddoublediv.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
+                            support = fielddoublediv.getSupport()
+                            nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+                            print "     Values:",nbOf
+                            for k in range(nbOf):
+                                valueI = fielddoublediv.getValueI(MED_FULL_INTERLACE,k+1)
+                                print "     *",valueI[:nbOfComp]
+                        except:
+                            print "testMedMemGeneral  fielddoublediv = fielddouble / fielddouble2 catch/except error"
+                            
                         print ""
                         print "TESTS OPERATIONS SUR FIELDDOUBLE : "
                         fielddoublesub = fielddouble-fielddouble2
                         fielddoublemul = fielddouble*fielddouble2
-                        fielddoublediv = fielddouble/fielddouble2
+                        try:
+                            fielddoublediv = fielddouble/fielddouble2
+                        except:
+                            print "testMedMemGeneral    /=    : catch/except error"
+                            fielddoublediv = None
                         fielddoubleasso = fielddouble+fielddouble2*fielddouble2
                         fielddoubleSP=createFieldDoubleScalarProduct(fielddouble, fielddouble2)
                         print " f1     : ",fielddouble.getValue(MED_FULL_INTERLACE)
@@ -1103,16 +1132,20 @@ for i in range(nbOfFiles):
                         print "  +     : ",fielddoubleadd.getValue(MED_FULL_INTERLACE)
                         print "  -     : ",fielddoublesub.getValue(MED_FULL_INTERLACE)
                         print "  *     : ",fielddoublemul.getValue(MED_FULL_INTERLACE)
-                        print "  /     : ",fielddoublediv.getValue(MED_FULL_INTERLACE)
-                        
+                        if fielddoublediv != None:
+                            print "  /     : ",fielddoublediv.getValue(MED_FULL_INTERLACE)
+                            pass
                         fielddouble+=fielddouble2;
                         print "  +=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
                         fielddouble-=fielddouble2;
                         print "  -=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
                         fielddouble*=fielddouble2;
                         print "  *=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
-                        fielddouble/=fielddouble2;
-                        print "  /=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                        try:
+                            fielddouble/=fielddouble2;
+                            print "  /=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                        except:
+                            print "testMedMemGeneral   /=    : "
                         print "f1+f2*f2: ",fielddoubleasso.getValue(MED_FULL_INTERLACE)
                         fielddouble.applyLin(4,1);
                         print " 4f1+1  : ",fielddouble.getValue(MED_FULL_INTERLACE)

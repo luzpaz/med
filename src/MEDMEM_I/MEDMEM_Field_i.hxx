@@ -48,7 +48,7 @@ protected :
     const int	_corbaIndex;
     string  _FieldId;
     FIELD_i();
-    FIELD_i(::FIELD_ * const field, bool ownCppPtr);
+    FIELD_i(MEDMEM::FIELD_ * const field, bool ownCppPtr);
     FIELD_i(FIELD_i & f);
 
 public :
@@ -89,7 +89,7 @@ public :
                     		          throw (SALOME::SALOME_Exception);
   void release();
     // Cuisine Interne
-    ::FIELD_ * constructConstField() const;
+    MEDMEM::FIELD_ * constructConstField() const;
 
  };
 }

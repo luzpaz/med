@@ -22,7 +22,6 @@
 //  File   : testUCellModel.cxx
 //  Module : MED
 
-using namespace std;
 #include <set>
 #include <cstdlib> 
 #include "utilities.h"
@@ -30,7 +29,10 @@ using namespace std;
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_DriversDef.hxx"
+
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
 
 void usage(char * name)
 {
@@ -71,7 +73,7 @@ int main (int argc, char ** argv)
   for (int i=0; i<MED_NBR_GEOMETRIE_MAILLE ; i++)
   {
 	cout << endl;
-	cout << MED_FR::geoNames[(MED_FR::med_geometrie_element)tous[i].getType()] << endl;
+	cout << geoNames[tous[i].getType()] << endl;
         cout << "__________________"  << endl;
 
 	try 
@@ -263,12 +265,12 @@ int main (int argc, char ** argv)
         			return EXIT_FAILURE ;
 			}
 		}
-
+*/
 /*
 		set <medGeometryElement>::iterator iter_s;
 		for (iter_s=setGeomElt.begin() ;iter_s!=setGeomElt.end();iter_s++)
 		{
-			cout << MED_FR::geoNames[(MED_FR::med_geometrie_element)(*iter_s)] << endl;	
+			cout << geoNames[(*iter_s)] << endl;	
 		}
 		
 		cout << "Impression des coordonnées du 1er Element de ce type" << endl;
@@ -334,7 +336,7 @@ int main (int argc, char ** argv)
 			for (iter_s=tous[i].getAllConstituentsType().begin() ;
 	     	     	iter_s!=tous[i].getAllConstituentsType().end();iter_s++)
 			{
-				cout << MED_FR::geoNames[(MED_FR::med_geometrie_element)(*iter_s)] << endl;	
+				cout << geoNames[*iter_s] << endl;	
 			}
 		}
 		catch ( const std::exception &e )

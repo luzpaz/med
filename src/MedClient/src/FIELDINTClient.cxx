@@ -6,7 +6,7 @@
  */
 //=============================================================================
 FIELDINTClient::FIELDINTClient(SALOME_MED::FIELDINT_ptr ptrCorba,
-				     SUPPORT * S) :
+				     MEDMEM::SUPPORT * S) :
   FIELDClient<int,SALOME_MED::FIELDINT>(ptrCorba,S)
 {
   BEGIN_OF("Constructor with arguments (for Python API) FIELDINTClient");

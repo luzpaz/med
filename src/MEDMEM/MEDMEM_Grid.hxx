@@ -24,7 +24,7 @@ class GRID: public MESH
   //-----------------------//
   
   // 1. grid type: MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED
-  med_grid_type     _gridType;
+  MED_EN::med_grid_type     _gridType;
   
   // 2. node coordinates
   // For MED_BODY_FITTED MESH::_coordinate is used
@@ -47,10 +47,9 @@ class GRID: public MESH
   //   Protected Methods
   //-----------------------//
 
-  CONNECTIVITY * makeConnectivity (const medEntityMesh Entity,
-				   const medGeometryElement Geometry,
-				   const int NbEntities, const int NbNodes,
-				   int * NodeNumbers) const ;
+  CONNECTIVITY * makeConnectivity (const MED_EN::medEntityMesh Entity, const MED_EN::medGeometryElement Geometry,
+				   const int NbEntities, int NbNodes, int nbMeshNodes,
+				   const int * NodeNumbers) const ;
   // creates nodal connectivity
 
   
@@ -76,9 +75,11 @@ class GRID: public MESH
   //-----------------------//
 
   GRID();
-  GRID(const med_grid_type type);
+  GRID(const MED_EN::med_grid_type type);
   GRID(const GRID &m);
   GRID( driverTypes driverType, const string & fileName="",const string & meshName="");
+  GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name,
+       const std::vector<std::string>& coord_unit, const MED_EN::med_grid_type type=MED_EN::MED_CARTESIAN);
   GRID & operator=(const GRID &m);
   virtual ~GRID();
   virtual void init();
@@ -187,7 +188,7 @@ class GRID: public MESH
 
   //  Access to fields
 
-  inline med_grid_type getGridType() const;
+  inline MED_EN::med_grid_type getGridType() const;
   // return MED_CARTESIAN, MED_POLAR or MED_BODY_FITTED
 
   int getArrayLength( const int Axis ) const throw (MEDEXCEPTION);
@@ -201,64 +202,62 @@ class GRID: public MESH
 
   inline const COORDINATE * getCoordinateptr() const;
 
-  inline const double * getCoordinates(medModeSwitch Mode) const;
+  inline const double * getCoordinates(MED_EN::medModeSwitch Mode) const;
 
   inline const double getCoordinate(int Number,int Axis) const;
 
-  inline int getNumberOfTypes(medEntityMesh Entity) const;
+  inline int getNumberOfTypes(MED_EN::medEntityMesh Entity) const;
 
-  inline const medGeometryElement * getTypes(medEntityMesh Entity) const;
+  inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
 
-  inline const CELLMODEL * getCellsTypes(medEntityMesh Entity) const;
+  inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
 
-  const int * getGlobalNumberingIndex(medEntityMesh Entity) const;
+  const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
 
-  inline int getNumberOfElements(medEntityMesh Entity,
-				 medGeometryElement Type) const;
+  inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
+				 MED_EN::medGeometryElement Type) const;
 
-  inline bool existConnectivity(medConnectivity ConnectivityType,
-				medEntityMesh Entity) const;
+  inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
+				MED_EN::medEntityMesh Entity) const;
 
-  inline medGeometryElement getElementType(medEntityMesh Entity,
+  inline MED_EN::medGeometryElement getElementType(MED_EN::medEntityMesh Entity,
 					   int Number) const;
 
-  inline void calculateConnectivity(medModeSwitch Mode,
-				    medConnectivity ConnectivityType,
-				    medEntityMesh Entity) const ;
+  inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
+				    MED_EN::medConnectivity ConnectivityType,
+				    MED_EN::medEntityMesh Entity) const ;
 
   inline const CONNECTIVITY* getConnectivityptr() const;
 
-  inline const int * getConnectivity(medModeSwitch Mode,
-				     medConnectivity ConnectivityType,
-				     medEntityMesh Entity, 
-				     medGeometryElement Type) const;
+  inline const int * getConnectivity(MED_EN::medModeSwitch Mode,
+				     MED_EN::medConnectivity ConnectivityType,
+				     MED_EN::medEntityMesh Entity, 
+				     MED_EN::medGeometryElement Type) const;
 
-  inline const int * getConnectivityIndex(medConnectivity ConnectivityType,
-					  medEntityMesh Entity) const;
+  inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+					  MED_EN::medEntityMesh Entity) const;
 
-  inline const int * getReverseConnectivity(medConnectivity ConnectivityType,
-					    medEntityMesh Entity=MED_CELL) const;
+  inline const int * getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,
+					    MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
 
-  inline const int * getReverseConnectivityIndex(medConnectivity ConnectivityType,
-						 medEntityMesh Entity=MED_CELL) const;
+  inline const int * getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+						 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
 
   //  Setting fields
 
-  inline void setGridType(med_grid_type gridType);
+  inline void setGridType(MED_EN::med_grid_type gridType);
 
   friend class MED_MESH_RDONLY_DRIVER;
   friend class MED_MESH_WRONLY_DRIVER;
 
 };
-};
-using namespace MEDMEM;
 
 
   //----------------------------------//
   //   Inline Methods Implementation
   //----------------------------------//
 
-inline med_grid_type GRID::getGridType() const
+inline MED_EN::med_grid_type GRID::getGridType() const
 {
   return _gridType;
 }
@@ -298,7 +297,7 @@ inline void GRID::makeUnstructured()
 //purpose : set the _gridType field od the class GRID
 //=======================================================================
 
-inline void GRID::setGridType(med_grid_type gridType)
+inline void GRID::setGridType(MED_EN::med_grid_type gridType)
 {
   _gridType = gridType;
 }
@@ -314,7 +313,7 @@ inline const COORDINATE * GRID::getCoordinateptr() const
   - MED_NO_INTERLACE   :  X1 X2 Y1 Y2 Z1 Z2
   - MED_FULL_INTERLACE :  X1 Y1 Z1 X2 Y2 Z2
  */
-inline const double * GRID::getCoordinates(medModeSwitch Mode) const
+inline const double * GRID::getCoordinates(MED_EN::medModeSwitch Mode) const
 {
   fillCoordinates();
   return _coordinate->getCoordinates(Mode);
@@ -332,42 +331,11 @@ inline const double GRID::getCoordinate(int number, int axis) const
     medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_NODE,
     MED_ALL_ENTITIES
 
-    If entity is not defined, return 0.
-
-    If there is no connectivity, return an exception.
 */
-inline int GRID::getNumberOfTypes(medEntityMesh entity) const
+inline int GRID::getNumberOfTypes(MED_EN::medEntityMesh entity) const
 {
   MESSAGE("GRID::getNumberOfTypes(medEntityMesh entity) : "<<entity);
-  if (entity == MED_NODE)
-    return 1;
-
-  fillConnectivity();
-
-  if (_connectivity != NULL)
-    return _connectivity->getNumberOfTypes(entity);
-  throw MEDEXCEPTION(LOCALIZED("GRID::getNumberOfTypes( medEntityMesh ) : Connectivity not defined !"));
-}
-
-/*!
-  Get the list of geometric types used by a given entity.
-  medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_ALL_ENTITIES
-
-  REM : Don't use MED_NODE
-
-  If entity is not defined, return an exception.
-*/
-inline const medGeometryElement * GRID::getTypes(medEntityMesh entity) const
-{
-  if (entity == MED_NODE)
-    throw MEDEXCEPTION(LOCALIZED("GRID::getTypes( medEntityMesh ) : No medGeometryElement with MED_NODE entity !"));
-  // return un tableau de taille 1 contenant MED_NONE, comme les supports pour etre coherent avec getNumberOfTypes ???? PG
-
-  fillConnectivity();
-
-  if (_connectivity != NULL)
-    return _connectivity->getGeometricTypes(entity);
-  throw MEDEXCEPTION(LOCALIZED("GRID::getTypes( medEntityMesh ) : Connectivity not defined !"));
+    return 1; // a grid has one type
 }
 
 /*!
@@ -375,7 +343,7 @@ inline const medGeometryElement * GRID::getTypes(medEntityMesh entity) const
 
   REMARK : Don't use MED_NODE as medEntityMesh
 */
-inline const CELLMODEL * GRID::getCellsTypes(medEntityMesh Entity) const
+inline const CELLMODEL * GRID::getCellsTypes(MED_EN::medEntityMesh Entity) const
 {
   fillConnectivity();
 
@@ -394,7 +362,7 @@ inline const CELLMODEL * GRID::getCellsTypes(medEntityMesh Entity) const
     - GlobalNumberingIndex[1]=6 (the second type)
     - GlobalNumberingIndex[2]=10
 */
-inline const int * GRID::getGlobalNumberingIndex(medEntityMesh entity) const
+inline const int * GRID::getGlobalNumberingIndex(MED_EN::medEntityMesh entity) const
 {
   fillConnectivity();
 
@@ -405,41 +373,42 @@ inline const int * GRID::getGlobalNumberingIndex(medEntityMesh entity) const
 
 /*!
   Return the number of element of given geometric type of given entity. Return 0 if query is not defined.
-
-  Example :
-  - getNumberOfElements(MED_NODE,MED_NONE) : number of node
-  - getNumberOfElements(MED_NODE,MED_TRIA3) : return 0 (not defined)
-  - getNumberOfElements(MED_FACE,MED_TRIA3) : return number of triangles
-  elements defined in face entity (0 if not defined)
-  - getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) : return total number
-  of elements defined in cell entity
 */
-inline int GRID::getNumberOfElements(medEntityMesh entity, medGeometryElement Type) const
+inline int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
 {
-  //  const char * LOC = "MESH::getNumberOfElements(medEntityMesh,medGeometryElement) : ";
-  if (entity==MED_NODE)
-    if ((Type==MED_NONE)|(Type==MED_ALL_ELEMENTS))
-      return _numberOfNodes;
-    else
-      return 0;
-  //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"wrong medGeometryElement with MED_NODE"));
-  else
-    {
-      fillConnectivity();
+  int numberOfElements=0;
+    
+    // Cas où le nombre d'éléments n'est pas nul
+    if (entity==MED_EN::MED_FACE && (Type==MED_EN::MED_QUAD4 || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>2)
+	numberOfElements=(_iArrayLength-1)*(_jArrayLength-1);
+    
+    else if (entity==MED_EN::MED_EDGE && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>1)
+	numberOfElements=_iArrayLength-1;
+    
+    else if (entity==MED_EN::MED_NODE && (Type==MED_EN::MED_NONE || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>0)
+	numberOfElements=_numberOfNodes;
+    
+    else if (entity==MED_EN::MED_CELL && _spaceDimension==3 && (Type==MED_EN::MED_HEXA8 || Type==MED_EN::MED_ALL_ELEMENTS) )
+	numberOfElements=(_iArrayLength-1)*(_jArrayLength-1)*(_kArrayLength-1);
+    
+    else if (entity==MED_EN::MED_CELL && _spaceDimension==2 && (Type==MED_EN::MED_QUAD4 || Type==MED_EN::MED_ALL_ELEMENTS))
+	numberOfElements=(_iArrayLength-1)*(_jArrayLength-1);
+    
+    else if (entity==MED_EN::MED_CELL && _spaceDimension==1 && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS) )
+	numberOfElements=_iArrayLength-1;
 
-      if (_connectivity != (CONNECTIVITY*)NULL)
-	return _connectivity->getNumberOf(entity,Type);
-      else
-	return 0;
-      //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"connectivity not defined !"));
-    }
+    MESSAGE("GRID::getNumberOfElements - entity=" << entity << " Type=" << Type);
+    MESSAGE("_spaceDimension=" << _spaceDimension << "  numberOfElements=" << numberOfElements);
+
+    return numberOfElements;
 }
+
 
 /*!
   Return true if the wanted connectivity exist, else return false
   (to use before a getSomething method).
  */
-inline bool GRID::existConnectivity(medConnectivity connectivityType, medEntityMesh entity) const
+inline bool GRID::existConnectivity(MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh entity) const
 {
   fillConnectivity();
 
@@ -453,7 +422,7 @@ inline bool GRID::existConnectivity(medConnectivity connectivityType, medEntityM
 
   Throw an exception if Entity is not defined or Number are wrong (too big).
  */
-inline medGeometryElement GRID::getElementType(medEntityMesh Entity,int Number) const
+inline MED_EN::medGeometryElement GRID::getElementType(MED_EN::medEntityMesh Entity,int Number) const
 {
   fillConnectivity();
 
@@ -467,11 +436,11 @@ inline medGeometryElement GRID::getElementType(medEntityMesh Entity,int Number) 
   done. Do nothing if connectivity already exist.
  */
 
-inline void GRID::calculateConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity) const
+inline void GRID::calculateConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity) const
 {
   fillConnectivity();
 
-  if (Mode==MED_FULL_INTERLACE)
+  if (Mode==MED_EN::MED_FULL_INTERLACE)
     _connectivity->calculateConnectivity(ConnectivityType,entity);
   else
     throw MEDEXCEPTION(LOCALIZED("GRID::calculateConnectivity : only for MED_FULL_INTERLACE mode"));
@@ -492,11 +461,11 @@ inline const CONNECTIVITY* GRID::getConnectivityptr() const
   and Type=MED_ALL_ELEMENTS.
   You must also get the corresponding index array.
  */
-inline const int * GRID::getConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity, medGeometryElement Type) const
+inline const int * GRID::getConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
 {
   fillConnectivity();
 
-  if (Mode==MED_FULL_INTERLACE)
+  if (Mode==MED_EN::MED_FULL_INTERLACE)
     return _connectivity->getConnectivity(ConnectivityType,entity,Type);
   throw MEDEXCEPTION(LOCALIZED("GRID::getConnectivity : only for MED_FULL_INTERLACE mode"));
 }
@@ -512,7 +481,7 @@ inline const int * GRID::getConnectivity(medModeSwitch Mode,medConnectivity Conn
   in Connectivity array (Connectivity[ConnectivityIndex[i-1]-1] is the
   first value)
  */
-inline const int * GRID::getConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh entity) const
+inline const int * GRID::getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity) const
 {
   fillConnectivity();
 
@@ -526,7 +495,7 @@ inline const int * GRID::getConnectivityIndex(medConnectivity ConnectivityType,m
 
   You must get ReverseConnectivityIndex array to use it.
  */
-inline const int * GRID::getReverseConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
+inline const int * GRID::getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
 {
   fillConnectivity();
 
@@ -548,7 +517,7 @@ inline const int * GRID::getReverseConnectivity(medConnectivity ConnectivityType
   ReverseConnectivity[ReverseConnectivityIndex[i-1]-1]
   is the first value)
  */
-inline const int * GRID::getReverseConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
+inline const int * GRID::getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
 {
   fillConnectivity();
 
@@ -556,6 +525,8 @@ inline const int * GRID::getReverseConnectivityIndex(medConnectivity Connectivit
     throw MEDEXCEPTION("GRID::getReverseConnectivityIndex : no connectivity defined in MESH !");
 
   return _connectivity->getReverseConnectivityIndex(ConnectivityType,Entity);
+}
+
 }
 
 #endif

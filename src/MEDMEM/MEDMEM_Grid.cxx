@@ -1,4 +1,3 @@
-using namespace std;
 // File      : MEDMEM_Grid.hxx
 // Created   : Wed Dec 18 08:35:26 2002
 // Descr     : class containing structured mesh data
@@ -13,7 +12,10 @@ using namespace std;
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
+
+using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
 
 //=======================================================================
 //function : GRID
@@ -23,6 +25,55 @@ using namespace MEDMEM;
 GRID::GRID() {
   init();
   MESSAGE("A GRID CREATED");
+}
+//
+//=======================================================================
+////function : GRID
+////purpose  : array constructor
+////=======================================================================
+GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name, 
+	   const std::vector<std::string>& coord_unit, const med_grid_type type) : _gridType(type)
+{
+    _spaceDimension = xyz_array.size();
+
+    // compute & set _numberOfNodes
+    int NumberOfNodes=1 ;
+    for(int i=0;i!=xyz_array.size();++i)
+	NumberOfNodes*=xyz_array[i].size();
+    _numberOfNodes = NumberOfNodes ;
+    
+    // create a non allocated COORDINATE
+    _coordinate = new COORDINATE(_spaceDimension, &coord_name[0], &coord_unit[0]);
+    string coordinateSystem = "UNDEFINED";
+    if( _gridType == MED_CARTESIAN) 
+	coordinateSystem = "CARTESIAN";
+    else if ( _gridType == MED_POLAR) 
+	coordinateSystem = "CYLINDRICAL";
+    _coordinate->setCoordinatesSystem(coordinateSystem);
+
+    // set the GRID part
+    if (_spaceDimension>=1)
+    {
+	_iArrayLength=xyz_array[0].size();
+	_iArray=new double[_iArrayLength];
+	std::copy(xyz_array[0].begin(),xyz_array[0].end(),_iArray);
+    }
+    if (_spaceDimension>=2)
+    {
+	_jArrayLength=xyz_array[1].size();
+	_jArray=new double[_jArrayLength];
+	std::copy(xyz_array[1].begin(),xyz_array[1].end(),_jArray);
+    }
+    if (_spaceDimension>=3)
+    {
+	_kArrayLength=xyz_array[2].size();
+	_kArray=new double[_kArrayLength];
+	std::copy(xyz_array[2].begin(),xyz_array[2].end(),_kArray);
+    }
+
+    _is_coordinates_filled  = false;
+    _is_connectivity_filled = false;
+    _isAGrid = true;
 }
 
 //=======================================================================
@@ -130,6 +181,28 @@ GRID::GRID(driverTypes driverType, const string &  fileName,
   END_OF(LOC);
 };
 
+/*!
+  return the GRID Geometric type, without computing all connectivity
+*/
+const medGeometryElement * GRID::getTypes(medEntityMesh entity) const
+{
+    static const medGeometryElement _gridGeometry[4]={MED_HEXA8,MED_QUAD4,MED_SEG2,MED_POINT1};
+    int i=0;
+    if(entity==MED_CELL)
+    {
+	i=3-_spaceDimension;
+    }
+    else if(entity==MED_FACE && _spaceDimension>2 )
+	i=1;
+    else if(entity==MED_EDGE && _spaceDimension>1 )
+	i=2;
+    else if(entity==MED_NODE && _spaceDimension>0)
+	i=3;
+    else 
+	throw MEDEXCEPTION(LOCALIZED("CONNECTIVITY::getGeometricTypes : Entity not defined !"));
+    return &_gridGeometry[i];
+}
+
 //=======================================================================
 //function : fillMeshAfterRead
 //purpose  : 
@@ -187,16 +260,16 @@ void GRID::fillMeshAfterRead()
 void GRID::fillCoordinates() const
 {
   if (_is_coordinates_filled)
-  {
-    MESSAGE("GRID::fillCoordinates(): Already filled");
     return;
-  }
   
   const char * LOC ="GRID::fillCoordinates()";
   BEGIN_OF(LOC);
   
-  double* myCoord =
-    const_cast <double *> ( _coordinate->getCoordinates(MED_FULL_INTERLACE) );
+  // if coordonate has not been allocated, perform shalow copy, transfer ownership of matrix
+  if(_coordinate->getSpaceDimension()*_coordinate->getNumberOfNodes() == 0)
+      _coordinate->setCoordinates(new MEDARRAY<double>(_spaceDimension,_numberOfNodes,MED_FULL_INTERLACE),true); 
+
+  double* myCoord = const_cast <double *> ( _coordinate->getCoordinates(MED_FULL_INTERLACE) );
 
   bool hasJ = _jArrayLength, hasK = _kArrayLength;
   int J = hasJ ? _jArrayLength : 1;
@@ -217,7 +290,7 @@ void GRID::fillCoordinates() const
           
           if (hasK)
           {
-            * myCoord = _jArray[ k ];
+            * myCoord = _kArray[ k ];
             ++ myCoord;
           }
         }
@@ -234,15 +307,16 @@ void GRID::fillCoordinates() const
 //purpose  : 
 //=======================================================================
 
-CONNECTIVITY * GRID::makeConnectivity (const medEntityMesh           Entity,
-				       const medGeometryElement Geometry,
-				       const int                NbEntities,
-				       const int                NbNodes,
-				       int *                    NodeNumbers)
+CONNECTIVITY * GRID::makeConnectivity (medEntityMesh           Entity,
+				       medGeometryElement Geometry,
+				       int                NbEntities,
+				       int                NbNodes,
+				       int                nbMeshNodes,
+				       const int *                    NodeNumbers)
   const
 {
   CONNECTIVITY * Connectivity     = new CONNECTIVITY(Entity) ;
-  Connectivity->_numberOfNodes    = NbNodes ;
+  Connectivity->_numberOfNodes    = nbMeshNodes ;
   Connectivity->_entityDimension  = Geometry/100 ;
   
   int numberOfGeometricType    = 1;
@@ -305,7 +379,7 @@ void GRID::fillConnectivity() const
   BEGIN_OF(LOC);
   
   int nbCells, nbFaces, nbEdges;
-  int nbCNodes, nbFNodes, nbENodes;
+  int nbCNodes, nbFNodes, nbENodes, nbMeshNodes;
   int indexC, indexF, indexE;
   int * nodeCNumbers, * nodeFNumbers, * nodeENumbers;
   // about descending connectivity
@@ -321,6 +395,7 @@ void GRID::fillConnectivity() const
   // nb of cells and of their connectivity nodes
 
   nbCells = iLenMin1 * jLenMin1 * kLenMin1;
+  nbMeshNodes = _iArrayLength * (_jArrayLength ? _jArrayLength : 1) * (_kArrayLength ? _kArrayLength : 1);
   nbCNodes = nbCells * 2 * (hasEdges ? 2 : 1) * (hasFaces ? 2 : 1);
   nodeCNumbers = new int [ nbCNodes ];
 
@@ -580,7 +655,7 @@ void GRID::fillConnectivity() const
   else                    aCellGeometry = MED_SEG2;
 
   // nodal
-  CellCNCT = makeConnectivity (MED_CELL, aCellGeometry, nbCells, nbCNodes, nodeCNumbers);
+  CellCNCT = makeConnectivity (MED_CELL, aCellGeometry, nbCells, nbCNodes, nbMeshNodes, nodeCNumbers);
 
   delete [] nodeCNumbers;
 
@@ -620,14 +695,14 @@ void GRID::fillConnectivity() const
   // make connectivity for FACE and/or EDGE
   
   if (hasFaces) {
-    FaceCNCT = makeConnectivity (MED_FACE, MED_QUAD4, nbFaces, nbFNodes, nodeFNumbers);
+    FaceCNCT = makeConnectivity (MED_FACE, MED_QUAD4, nbFaces, nbFNodes, nbMeshNodes, nodeFNumbers);
 
     delete [] nodeFNumbers;
 
     CellCNCT->_constituent = FaceCNCT;
   }
   if (hasEdges) {
-    EdgeCNCT = makeConnectivity (MED_EDGE, MED_SEG2, nbEdges, nbENodes, nodeENumbers);
+    EdgeCNCT = makeConnectivity (MED_EDGE, MED_SEG2, nbEdges, nbENodes, nbMeshNodes, nodeENumbers);
 
     delete [] nodeENumbers;
 

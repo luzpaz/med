@@ -8,8 +8,6 @@
 
 /* Generic Read/Write Driver Class for Meshes & Fields */
 
-
-using namespace MED_EN;
 using namespace std;
 
 /*!
@@ -29,7 +27,7 @@ protected :
                               // the MedMedDriver index of the driver vector in the MED object where it has been created
   /*File related part*/
   string         _fileName;   // The name of the file currently in use.
-  med_mode_acces _accessMode; // The file access mode set by the adequate construtor.
+  MED_EN::med_mode_acces _accessMode; // The file access mode set by the adequate construtor.
   int            _status;     // The file status {MED_INVALID, MED_OPENED, MED_CLOSED } 
   driverTypes    _driverType; //  A FAIRE LE POSITIONNER DS TOUTES LES SS CLASSES !!
 
@@ -42,7 +40,7 @@ public:
   /*!
     Constructor.
   */
-  GENDRIVER(const string & fileName,med_mode_acces accessMode);
+  GENDRIVER(const string & fileName,MED_EN::med_mode_acces accessMode);
   /*!
     Copy constructor.
   */
@@ -106,7 +104,7 @@ public:
   int    getId       ( void ) const ;
   string getFileName () const;
   void   setFileName ( const string & fileName);
-  med_mode_acces getAccessMode() const;
+  MED_EN::med_mode_acces getAccessMode() const;
 };
 };
 

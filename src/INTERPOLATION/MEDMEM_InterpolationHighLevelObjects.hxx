@@ -53,7 +53,7 @@ class Meta_Nuage_Maille : public Wrapper_Nuage_Maille<Wrapper_Med_Connectivity>
 protected :
 	Wrapper_Med_Connectivity * connectivite_med;
 public :
-	Meta_Nuage_Maille(CONNECTIVITY * connmed); 
+	Meta_Nuage_Maille(MEDMEM::CONNECTIVITY * connmed); 
 	Meta_Nuage_Maille():connectivite_med(NULL) {}
 	~Meta_Nuage_Maille() {if (connectivite_med) delete connectivite_med;}
 };
@@ -106,20 +106,20 @@ public :
 	Meta_Wrapper():noeuds(NULL),mailles(NULL),maillage(NULL),champ(NULL){}
 	~Meta_Wrapper();
 	inline void Construit_Wrapper_Nuage_Noeud  (     int nn, double * nodes     );
-	inline void Construit_Wrapper_Nuage_Maille (     CONNECTIVITY * connmed     );
+	inline void Construit_Wrapper_Nuage_Maille (     MEDMEM::CONNECTIVITY * connmed     );
 	inline void Construit_Wrapper_Maillage     (            void                );
-	inline void Construit_Wrapper_Champ        ( const FIELD<double> * medfield );
-	Meta_Wrapper(int nn,double *nodes,CONNECTIVITY *connmed, int flag_maillage=1);
+	inline void Construit_Wrapper_Champ        ( const MEDMEM::FIELD<double> * medfield );
+	Meta_Wrapper(int nn,double *nodes,MEDMEM::CONNECTIVITY *connmed, int flag_maillage=1);
 	Meta_Wrapper(int nn,double *nodes);
 	// defaultly, the connectivity (neighbouhood and so like) is built, 
 	// Set flag_mesh to 0 if you don't want these informations to be built
-	Meta_Wrapper(int nn,double *nodes,CONNECTIVITY *connmed, const FIELD<double> * c,int flag_mesh=1);
+	Meta_Wrapper(int nn,double *nodes,MEDMEM::CONNECTIVITY *connmed, const MEDMEM::FIELD<double> * c,int flag_mesh=1);
 	// fonctions d'acces sures
 	inline Wrapper_Nuage_Noeud<DIMENSION> * Get_Nuage_Noeuds  ( void );
 	inline Meta_Nuage_Maille              * Get_Nuage_Mailles ( void );
 	inline Meta_Maillage                  * Get_Maillage      ( void );
 	inline Wrapper_MED_Field              * Get_Champ         ( void );
-	inline void Change_Champ           ( const FIELD<double> * medfield );
+	inline void Change_Champ           ( const MEDMEM::FIELD<double> * medfield );
 };
 
 /*********************************************************/
@@ -159,18 +159,18 @@ public :
 		
 		mailles=nm;
 		
-		fonctions[MED_TRIA3  ]=new Calcul_Interpolation_Tria3  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[MED_QUAD4  ]=new Calcul_Interpolation_Quad4  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[MED_TETRA4 ]=new Calcul_Interpolation_Tetra4 <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[MED_HEXA8  ]=new Calcul_Interpolation_Hexa8  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[MED_PENTA6 ]=new Calcul_Interpolation_Penta6 <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[MED_PYRA5  ]=new Calcul_Interpolation_Pyra5  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[MED_TRIA6  ]=fonctions[MED_TRIA3  ];
-		fonctions[MED_QUAD8  ]=fonctions[MED_QUAD4  ];
-		fonctions[MED_TETRA10]=fonctions[MED_TETRA4 ];
-		fonctions[MED_HEXA20 ]=fonctions[MED_HEXA8  ];
-		fonctions[MED_PENTA15]=fonctions[MED_PENTA6 ];
-		fonctions[MED_PYRA13 ]=fonctions[MED_PYRA5  ];
+		fonctions[ MED_EN::MED_TRIA3  ]=new Calcul_Interpolation_Tria3  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		fonctions[ MED_EN::MED_QUAD4  ]=new Calcul_Interpolation_Quad4  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		fonctions[ MED_EN::MED_TETRA4 ]=new Calcul_Interpolation_Tetra4 <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		fonctions[ MED_EN::MED_HEXA8  ]=new Calcul_Interpolation_Hexa8  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		fonctions[ MED_EN::MED_PENTA6 ]=new Calcul_Interpolation_Penta6 <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		fonctions[ MED_EN::MED_PYRA5  ]=new Calcul_Interpolation_Pyra5  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		fonctions[ MED_EN::MED_TRIA6  ]=fonctions[ MED_EN::MED_TRIA3  ];
+		fonctions[ MED_EN::MED_QUAD8  ]=fonctions[ MED_EN::MED_QUAD4  ];
+		fonctions[ MED_EN::MED_TETRA10]=fonctions[ MED_EN::MED_TETRA4 ];
+		fonctions[ MED_EN::MED_HEXA20 ]=fonctions[ MED_EN::MED_HEXA8  ];
+		fonctions[ MED_EN::MED_PENTA15]=fonctions[ MED_EN::MED_PENTA6 ];
+		fonctions[ MED_EN::MED_PYRA13 ]=fonctions[ MED_EN::MED_PYRA5  ];
 		}
 	Valeur<double> operator() (Wrapper_Noeud<DIMENSION> & node, int num_maille){return Calcul_Hybride<Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>::operator()(node,num_maille);}
 	Valeur<double> operator() (double * node, int num_maille) 
@@ -305,7 +305,7 @@ template <int DIMENSION> inline int Meta_dTree<DIMENSION>::trouve_plus_proche_po
 /*                                                       */
 /*********************************************************/
 
-inline Meta_Nuage_Maille::Meta_Nuage_Maille(CONNECTIVITY * conmed):Wrapper_Nuage_Maille<Wrapper_Med_Connectivity>(connectivite_med=new Wrapper_Med_Connectivity(conmed))
+inline Meta_Nuage_Maille::Meta_Nuage_Maille(MEDMEM::CONNECTIVITY * conmed):Wrapper_Nuage_Maille<Wrapper_Med_Connectivity>(connectivite_med=new Wrapper_Med_Connectivity(conmed))
 	{
 	}
 
@@ -347,7 +347,7 @@ template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Construit_Wrapper
 		exit(-1);
 		}
 	}
-template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Construit_Wrapper_Nuage_Maille ( CONNECTIVITY * connmed )  
+template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Construit_Wrapper_Nuage_Maille ( MEDMEM::CONNECTIVITY * connmed )  
 	{ 
 	if (connmed) mailles=new Meta_Nuage_Maille(connmed);              
 	else
@@ -370,7 +370,7 @@ template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Construit_Wrapper
 		}
 	maillage=new Meta_Maillage(mailles,noeuds->SIZE());
 	}
-template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Construit_Wrapper_Champ        ( const FIELD<double> * medfield )
+template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Construit_Wrapper_Champ        ( const MEDMEM::FIELD<double> * medfield )
 	{
 	if (medfield) champ=new Wrapper_MED_Field(medfield);
 	else
@@ -379,7 +379,7 @@ template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Construit_Wrapper
 		exit(-1);
 		}
 	}
-template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Change_Champ           ( const FIELD<double> * medfield )
+template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Change_Champ           ( const MEDMEM::FIELD<double> * medfield )
 	{
 	if (medfield) 
 		{
@@ -392,14 +392,14 @@ template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Change_Champ     
 		exit(-1);
 		}
 	}
-template <int DIMENSION> 	Meta_Wrapper<DIMENSION>::Meta_Wrapper(int nn,double *nodes,CONNECTIVITY *connmed, int flag_maillage)
+template <int DIMENSION> 	Meta_Wrapper<DIMENSION>::Meta_Wrapper(int nn,double *nodes,MEDMEM::CONNECTIVITY *connmed, int flag_maillage)
 	{
 	init();
 	Construit_Wrapper_Nuage_Noeud(nn,nodes);
 	Construit_Wrapper_Nuage_Maille(connmed);
 	if (flag_maillage) Construit_Wrapper_Maillage();
 	}
-template <int DIMENSION> 	Meta_Wrapper<DIMENSION>::Meta_Wrapper(int nn,double *nodes,CONNECTIVITY *connmed, const FIELD<double> * c,int flag_maillage)
+template <int DIMENSION> 	Meta_Wrapper<DIMENSION>::Meta_Wrapper(int nn,double *nodes,MEDMEM::CONNECTIVITY *connmed, const MEDMEM::FIELD<double> * c,int flag_maillage)
 	{
 	init();
 	Construit_Wrapper_Nuage_Noeud(nn,nodes);

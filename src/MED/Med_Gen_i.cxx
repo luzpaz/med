@@ -26,7 +26,6 @@
 //  Module : MED
 //  $Header$
 
-using namespace std;
 #include "Med_Gen_i.hxx"
 
 #include "MEDMEM_Mesh_i.hxx"
@@ -59,6 +58,7 @@ using namespace std;
 #include <HDFascii.hxx>
 #include "SALOMEDS_Tool.hxx"
 
+using namespace std;
 using namespace MEDMEM;
 
 // Initialisation des variables statiques
@@ -284,7 +284,7 @@ throw (SALOME::SALOME_Exception)
   		myMeshDriver.setMeshName(meshName);
 		myMeshDriver.open();
 	}
-        catch (const exception & ex)
+        catch (const std::exception & ex)
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -296,7 +296,7 @@ throw (SALOME::SALOME_Exception)
                 MESSAGE("apres read");
 		myMeshDriver.close();
 	}
-        catch (const exception & ex)
+        catch (const std::exception & ex)
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -377,7 +377,7 @@ throw (SALOME::SALOME_Exception)
 
         }
         else
-                        MESSAGE("MED dejà dans l étude");
+                        MESSAGE("MED dejÃ  dans l Ã©tude");
 
 	MESSAGE("Lecture du fichier ")
 	SCRUTE(fileName);
@@ -410,7 +410,7 @@ throw (SALOME::SALOME_Exception)
 */
 		myField = mymed->getField(fieldName,iter,ordre);
 	}
-        catch (const exception & ex)
+        catch (const std::exception & ex)
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -428,7 +428,7 @@ throw (SALOME::SALOME_Exception)
 		SCRUTE(myMesh->getName());
 		fieldSupport->update();
 	}
-        catch (const exception & ex)
+        catch (const std::exception & ex)
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -438,7 +438,7 @@ throw (SALOME::SALOME_Exception)
 	med_type_champ type = myField->getValueType() ;
 	switch (type) 
 	{
-      	 case MED_FR::MED_INT32: 	
+      	 case MED_EN::MED_INT32: 	
 	 {
 		try 
 		{
@@ -450,7 +450,7 @@ throw (SALOME::SALOME_Exception)
         		return myFieldIOR;
 		}
 		catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
-        	catch (const exception & ex)
+        	catch (const std::exception & ex)
         	{
                		MESSAGE("Exception Interceptee : ");
                 	SCRUTE(ex.what());
@@ -458,7 +458,7 @@ throw (SALOME::SALOME_Exception)
         	};
 		break;
 	 }
-	 case MED_FR::MED_REEL64: 
+	 case MED_EN::MED_REEL64: 
 	 {
 		try 
 		{
@@ -470,7 +470,7 @@ throw (SALOME::SALOME_Exception)
         		return myFieldIOR;
 		}
 		catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
-        	catch (const exception & ex)
+        	catch (const std::exception & ex)
         	{
                		MESSAGE("Exception Interceptee : ");
                 	SCRUTE(ex.what());
@@ -668,8 +668,6 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
   if (!isMultiFile) SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.ToCString(), aSeq.in(), true);
   // Return the created byte stream
   return aStreamFile._retn();
-  
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -692,8 +690,6 @@ CORBA::Boolean Med_Gen_i::Load(SALOMEDS::SComponent_ptr theComponent,
   SALOMEDS::ListOfFileNames_var aSeq =
     SALOMEDS_Tool::PutStreamToFiles(theStream, aTmpDir.ToCString(), isMultiFile);
   return true;
-
-  END_OF(LOC);
 }
 
 CORBA::Boolean Med_Gen_i::LoadASCII(SALOMEDS::SComponent_ptr theComponent,
@@ -754,7 +750,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   SCRUTE(IORString);
 
 
-  if (string(IORString).size()==0) return "_MED";
+  if (string(IORString).size()==0) return CORBA::string_dup("_MED");
   // Well, we know where put object (_saveFilename) and we know object (IORString)
   // cast object :
   CORBA::Object_var myIOR = _orb->string_to_object(IORString);
@@ -812,9 +808,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   }
 
   //THROW_SALOME_CORBA_EXCEPTION("Unable to save IOR",SALOME::BAD_PARAM);
-  return "_MED";
-
-  END_OF(LOC) ;
+  return CORBA::string_dup("_MED");
 }
 
 //=============================================================================
@@ -859,7 +853,7 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
 	myMeshDriver.setMeshName(aMeshName);
 	myMeshDriver.open();
       }
-    catch (const exception & ex)
+    catch (const std::exception & ex)
       {
 	MESSAGE("Exception Interceptee : ");
 	SCRUTE(ex.what());
@@ -871,7 +865,7 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
 	MESSAGE("apres read");
 	myMeshDriver.close();
       }
-    catch (const exception & ex)
+    catch (const std::exception & ex)
       {
 	MESSAGE("Exception Interceptee : ");
 	SCRUTE(ex.what());
@@ -897,8 +891,6 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
   }
 
   return CORBA::string_dup("");
-
-  END_OF(LOC) ;
 }
 
 //=============================================================================
@@ -1008,10 +1000,13 @@ SALOMEDS::TMPFile* Med_Gen_i::CopyFrom(SALOMEDS::SObject_ptr theObject, CORBA::L
   strcpy(aFullName+strlen(aTmpDir), aSeq[0]);
   long driverId = aMesh->addDriver(SALOME_MED::MED_DRIVER,aFullName , aMesh->getName());
   aMesh->write(driverId,"");
-  delete(aFullName);
   
-  aStreamFile = SALOMEDS_Tool::PutFilesToStream(aTmpDir, aSeq.in(), false);
-  SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir, aSeq.in(), true);
+  //  aStreamFile = SALOMEDS_Tool::PutFilesToStream(aTmpDir.c_str(), aSeq.in(), false);
+  char* aFullName1 = new char[strlen(aTmpDir)+1];
+  strcpy(aFullName1, aTmpDir);
+  aStreamFile = SALOMEDS_Tool::PutFilesToStream(aFullName1, aSeq.in(), false);
+  //  SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq.in(), true);
+  SALOMEDS_Tool::RemoveTemporaryFiles(aFullName1, aSeq.in(), true);
   
   // Assign an ID = 1 the the type SALOME_MED::MESH
   theObjectID = 1;
@@ -1045,32 +1040,36 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   SALOMEDS::Study_var aStudy = theObject->GetStudy();
 
   CORBA::String_var aTmpDir = CORBA::string_dup(SALOMEDS_Tool::GetTmpDir().c_str());
-  SALOMEDS::ListOfFileNames_var aSeq = SALOMEDS_Tool::PutStreamToFiles(theStream, aTmpDir, false);
+  char* aFullName2 = new char[strlen(aTmpDir)+1];
+  strcpy(aFullName2,aTmpDir);
+  //  SALOMEDS::ListOfFileNames_var aSeq = SALOMEDS_Tool::PutStreamToFiles(theStream, aTmpDir, false);
+  SALOMEDS::ListOfFileNames_var aSeq = SALOMEDS_Tool::PutStreamToFiles(theStream, aFullName2, false);
   CORBA::String_var aMeshName = CORBA::string_dup(aSeq[0]);
   char* aFullName = new char[strlen(aTmpDir)+strlen(aMeshName)+1];
   strcpy(aFullName, aTmpDir);
   strcpy(aFullName+strlen(aTmpDir), aMeshName);
 
   MESH * myMesh= new MESH() ;
-  myMesh->setName((char*)aMeshName);
+  //  myMesh->setName(aMeshName.c_str());
+  char* aFullMeshName = new char[strlen(aMeshName)+1];
+  strcpy(aFullMeshName,aMeshName);
+  myMesh->setName(aFullMeshName);
   MED_MESH_RDONLY_DRIVER myMeshDriver(aFullName, myMesh);
   try {
-    myMeshDriver.setMeshName((char*)aMeshName);
+    myMeshDriver.setMeshName(aFullMeshName);
     myMeshDriver.open();
-  } catch (const exception & ex) {
+  } catch (const std::exception & ex) {
     MESSAGE("Exception Interceptee : ");
     SCRUTE(ex.what());
-    delete(aFullName);
     return aResultSO._retn();
   };
   try {
     myMeshDriver.read();
     ("apres read");
     myMeshDriver.close();
-  } catch (const exception & ex) {
+  } catch (const std::exception & ex) {
     MESSAGE("Exception Interceptee : ");
     SCRUTE(ex.what());
-    delete(aFullName);
     return aResultSO._retn();
   };
   // set new mesh name, becouse now there are no possibility to operate meshes with the same names
@@ -1087,8 +1086,10 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   CORBA::String_var anIORString = _orb->object_to_string(mesh);
   aResultSO = aStudy->FindObjectIOR(anIORString);
 
-  SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir, aSeq.in(), true);
-  delete(aFullName);
+  char * aFullName1 = new char[strlen(aTmpDir)+1];
+  strcpy(aFullName1,aTmpDir);
+  //  SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq.in(), true);
+  SALOMEDS_Tool::RemoveTemporaryFiles(aFullName1, aSeq.in(), true);
   return aResultSO._retn();
 }
 

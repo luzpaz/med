@@ -3,16 +3,16 @@
 
 #include "MEDMEM_Field.hxx"
 
-class FIELDINT : public FIELD<int>
+class FIELDINT : public MEDMEM::FIELD<int>
 {
 public:
   FIELDINT();
-  FIELDINT(const SUPPORT * Support, const int NumberOfComponents);
-  FIELDINT(const SUPPORT * Support, driverTypes driverType,
+  FIELDINT(const MEDMEM::SUPPORT * Support, const int NumberOfComponents);
+  FIELDINT(const MEDMEM::SUPPORT * Support, MEDMEM::driverTypes driverType,
 	   const string & fileName="", const string & fieldName="",
 	   const int iterationNumber=-1, const int orderNumber=-1);
   FIELDINT(const FIELDINT & m);
-  FIELDINT(const FIELD<int> & m);
+  FIELDINT(const MEDMEM::FIELD<int> & m);
   ~FIELDINT();
 };
 

@@ -19,8 +19,6 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_CellModel.hxx"
 
-using namespace MEDMEM ;
-
 
 /*!
 
@@ -66,7 +64,7 @@ public :
     Constructor.
   */
   VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField)
-    : GENDRIVER(fileName,MED_WRONLY),
+    : GENDRIVER(fileName,MED_EN::MED_WRONLY),
       _ptrField((FIELD<T> *) ptrField),
       _fieldName(fileName),_fieldNum(MED_INVALID) 
   {
@@ -265,7 +263,6 @@ private:
   GENDRIVER * copy ( void ) const ;
 
 };
-};
 
 /*-------------------------*/
 /* template implementation */
@@ -273,7 +270,6 @@ private:
 
 /*--------------------- DRIVER PART -------------------------------*/
 
-using namespace MEDMEM;
 template <class T> void VTK_FIELD_DRIVER<T>::setFieldName(const string & fieldName)
 {
   _fieldName = fieldName; 
@@ -323,7 +319,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   int SpaceDimension = meshField->getSpaceDimension() ;
   int NumberOfNodes = meshField->getNumberOfNodes() ;
   (*_vtkFile) << "POINTS " << NumberOfNodes << " float" << endl ;
-  const double *coordinate = meshField->getCoordinates(MED_FULL_INTERLACE) ;
+  const double *coordinate = meshField->getCoordinates(MED_EN::MED_FULL_INTERLACE) ;
   for (int i=0;i<NumberOfNodes;i++) {
     for (int j=0;j<SpaceDimension;j++)
       (*_vtkFile) << coordinate[i*SpaceDimension+j] << " " ;
@@ -336,15 +332,15 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
 
   // we put connectivity
   // how many cells and how many value in connectivity :
-  int cells_types_count = meshField->getNumberOfTypes(MED_CELL) ;
+  int cells_types_count = meshField->getNumberOfTypes(MED_EN::MED_CELL) ;
   //  int * cells_count = meshField->get_cells_count() ;
   //  int cells_sum = cells_count[cells_types_count] ;
-  int cells_sum = meshField->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) ;
-  const CELLMODEL * cells_type = meshField->getCellsTypes(MED_CELL) ;
+  int cells_sum = meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS) ;
+  const CELLMODEL * cells_type = meshField->getCellsTypes(MED_EN::MED_CELL) ;
   //  int connectivity_sum = 0 ;
 
   //const int * connectivity = meshField->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS) ; !! UNUSED VARIABLE !!
-  const int * connectivityIndex = meshField->getConnectivityIndex(MED_NODAL,MED_CELL) ;
+  const int * connectivityIndex = meshField->getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL) ;
 
   int connectivity_sum =  connectivityIndex[cells_sum]-1 ;
 
@@ -354,28 +350,28 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
     int *filter = (int*) NULL ; // index in vtk connectivity
     switch (cells_type[i].getType())
       {
-      case MED_POINT1  : {
+      case MED_EN::MED_POINT1  : {
 	filter = new int[1] ;
 	filter[0] = 0 ;
         break ;
       }
-      case MED_SEG2    : {
+      case MED_EN::MED_SEG2    : {
         filter = new int[2] ;
 	filter[0] = 0 ;
         filter[1] = 1 ;
         break ;
       }
-      case MED_SEG3    : {  
+      case MED_EN::MED_SEG3    : {  
         break ;
       }
-      case MED_TRIA3   : {
+      case MED_EN::MED_TRIA3   : {
         filter = new int[3] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
  	filter[2] = 2 ;
         break ;
       }
-      case MED_QUAD4   : {
+      case MED_EN::MED_QUAD4   : {
         filter = new int[4] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
@@ -383,13 +379,13 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   	filter[3] = 3 ;
         break ;
       }
-      case MED_TRIA6   : {
+      case MED_EN::MED_TRIA6   : {
         break ;
       }
-      case MED_QUAD8   : {
+      case MED_EN::MED_QUAD8   : {
         break ;
       }
-      case MED_TETRA4  : {
+      case MED_EN::MED_TETRA4  : {
         filter = new int[4] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
@@ -397,7 +393,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
         filter[3] = 2 ;  // 4th element in med are 3rd in vtk (array begin at 0 !)
         break ;
       }
-      case MED_PYRA5   : {
+      case MED_EN::MED_PYRA5   : {
         filter = new int[5] ;
         filter[0] = 0 ;
         filter[1] = 3 ;  // 2nd element in med are 4th in vtk (array begin at 0 !)
@@ -406,7 +402,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   	filter[4] = 4 ;
         break ;
       }
-      case MED_PENTA6  : {
+      case MED_EN::MED_PENTA6  : {
         filter = new int[6] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
@@ -416,7 +412,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   	filter[5] = 5 ;
 	break ;
       }
-      case MED_HEXA8   : {
+      case MED_EN::MED_HEXA8   : {
         filter = new int[8] ;
         filter[0] = 0 ;
         filter[1] = 3 ;
@@ -428,16 +424,16 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
 	filter[7] = 5 ;
         break ;
       }
-      case MED_TETRA10 : {
+      case MED_EN::MED_TETRA10 : {
         break ;
       }
-      case MED_PYRA13  : {
+      case MED_EN::MED_PYRA13  : {
         break ;
       }
-      case MED_PENTA15 : {
+      case MED_EN::MED_PENTA15 : {
         break ;
       }
-      case MED_HEXA20  : {
+      case MED_EN::MED_HEXA20  : {
         break ;
       }
       default : { 
@@ -447,8 +443,8 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
     if (filter==NULL) 
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getName() ) ) ;
     int nodes_cell = cells_type[i].getNumberOfNodes();
-    int numberOfCell = meshField->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
-    const int * connectivityArray = meshField->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
+    int numberOfCell = meshField->getNumberOfElements(MED_EN::MED_CELL,cells_type[i].getType()) ;
+    const int * connectivityArray = meshField->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,MED_EN::MED_CELL,cells_type[i].getType());
     for (int j=0;j<numberOfCell;j++) {
       (*_vtkFile) << nodes_cell << " " ;
       for (int k=0;k<nodes_cell;k++)
@@ -465,63 +461,63 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
     int vtkType = 0 ;
     switch (cells_type[i].getType())
       {
-      case MED_POINT1  : {
+      case MED_EN::MED_POINT1  : {
 	vtkType = 1 ;
         break ;
       }
-      case MED_SEG2    : {
+      case MED_EN::MED_SEG2    : {
 	vtkType = 3 ;
         break ;
       }
-      case MED_SEG3    : {  
+      case MED_EN::MED_SEG3    : {  
 	vtkType = 0 ;
         break ;
       }
-      case MED_TRIA3   : {
+      case MED_EN::MED_TRIA3   : {
 	vtkType = 5 ;
         break ;
       }
-      case MED_QUAD4   : {
+      case MED_EN::MED_QUAD4   : {
 	vtkType = 9 ;
         break ;
       }
-      case MED_TRIA6   : {
+      case MED_EN::MED_TRIA6   : {
 	vtkType = 0 ;
         break ;
       }
-      case MED_QUAD8   : {
+      case MED_EN::MED_QUAD8   : {
 	vtkType = 0 ;
         break ;
       }
-      case MED_TETRA4  : {
+      case MED_EN::MED_TETRA4  : {
 	vtkType = 10 ;
         break ;
       }
-      case MED_PYRA5   : {
+      case MED_EN::MED_PYRA5   : {
 	vtkType = 14 ;
         break ;
       }
-      case MED_PENTA6  : {
+      case MED_EN::MED_PENTA6  : {
 	vtkType = 13 ;
 	break ;
       }
-      case MED_HEXA8   : {
+      case MED_EN::MED_HEXA8   : {
 	vtkType = 12 ;
         break ;
       }
-      case MED_TETRA10 : {
+      case MED_EN::MED_TETRA10 : {
 	vtkType = 0 ;
         break ;
       }
-      case MED_PYRA13  : {
+      case MED_EN::MED_PYRA13  : {
 	vtkType = 0 ;
         break ;
       }
-      case MED_PENTA15 : {
+      case MED_EN::MED_PENTA15 : {
 	vtkType = 0 ;
         break ;
       }
-      case MED_HEXA20  : {
+      case MED_EN::MED_HEXA20  : {
 	vtkType = 0 ;
         break ;
       }
@@ -532,7 +528,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
       }
     if (vtkType == 0)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getType() ) ) ;
-    int numberOfCell = meshField->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
+    int numberOfCell = meshField->getNumberOfElements(MED_EN::MED_CELL,cells_type[i].getType()) ;
     for (int j=0;j<numberOfCell;j++)
       (*_vtkFile) << vtkType << endl ;
   }
@@ -548,34 +544,34 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
 
   ostringstream name ;
   string nameField = _ptrField->getName();
-  medEntityMesh entitySupport = supportField->getEntity();
+  MED_EN::medEntityMesh entitySupport = supportField->getEntity();
   name << nameField << "_" << dt << "_" << it ;
 
   if (!(supportField->isOnAllElements()))
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which is not on all entities of the mesh !" << entitySupport));
 
-  if (entitySupport == MED_NODE)
+  if (entitySupport == MED_EN::MED_NODE)
     (*_vtkFile) << "POINT_DATA " << meshField->getNumberOfNodes() << endl ;
-  else if (entitySupport == MED_CELL)
-    (*_vtkFile) << "CELL_DATA " << meshField->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) << endl ;
+  else if (entitySupport == MED_EN::MED_CELL)
+    (*_vtkFile) << "CELL_DATA " << meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS) << endl ;
   else
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which is not on all nodes or cells but it's on !" << entitySupport));
 
-  int NomberOfValue = supportField->getNumberOfElements(MED_ALL_ELEMENTS) ;
+  int NomberOfValue = supportField->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) ;
   int NomberOfComponents =  _ptrField->getNumberOfComponents() ;
 
-  med_type_champ fieldType = _ptrField->getValueType() ;
+  MED_EN::med_type_champ fieldType = _ptrField->getValueType() ;
 
   SCRUTE(name.str());
   SCRUTE(fieldType);
 
   switch (fieldType)
     {
-    case MED_INT32 :
+    case MED_EN::MED_INT32 :
       {
 	break ;
       }
-    case MED_REEL64 :
+    case MED_EN::MED_REEL64 :
       {
 	break ;
       }
@@ -595,7 +591,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   else
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" there are more than 4 components !"));
 
-  const T * value = _ptrField->getValue(MED_NO_INTERLACE) ;
+  const T * value = _ptrField->getValue(MED_EN::MED_NO_INTERLACE) ;
 
   for (int i=0; i<NomberOfValue; i++)
     {
@@ -632,33 +628,33 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
 
   ostringstream name ;
   string nameField = _ptrField->getName();
-  medEntityMesh entitySupport = supportField->getEntity();
+  MED_EN::medEntityMesh entitySupport = supportField->getEntity();
   name << nameField << "_" << dt << "_" << it ;
 
   if (!(supportField->isOnAllElements()))
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which is not on all entities of the mesh !" << entitySupport));
 
-  if (entitySupport == MED_NODE)
+  if (entitySupport == MED_EN::MED_NODE)
     (*_vtkFile) << "POINT_DATA " << meshField->getNumberOfNodes() << endl ;
-  else if (entitySupport == MED_CELL)
-    (*_vtkFile) << "CELL_DATA " << meshField->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) << endl ;
+  else if (entitySupport == MED_EN::MED_CELL)
+    (*_vtkFile) << "CELL_DATA " << meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS) << endl ;
   else
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which is not on all nodes or cells but it's on !" << entitySupport));
 
-  int NomberOfValue = supportField->getNumberOfElements(MED_ALL_ELEMENTS) ;
+  int NomberOfValue = supportField->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) ;
   int NomberOfComponents =  _ptrField->getNumberOfComponents() ;
 
-  med_type_champ fieldType = _ptrField->getValueType() ;
+  MED_EN::med_type_champ fieldType = _ptrField->getValueType() ;
 
   SCRUTE(name.str());
   SCRUTE(fieldType);
   switch (fieldType)
     {
-    case MED_INT32 :
+    case MED_EN::MED_INT32 :
       {
 	break ;
       }
-    case MED_REEL64 :
+    case MED_EN::MED_REEL64 :
       {
 	break ;
       }
@@ -678,7 +674,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   else
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" there are more than 4 components !"));
 
-  const T * value = _ptrField->getValue(MED_NO_INTERLACE) ;
+  const T * value = _ptrField->getValue(MED_EN::MED_NO_INTERLACE) ;
 
   for (int i=0; i<NomberOfValue; i++)
     {
@@ -688,5 +684,6 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
     }
   END_OF(LOC);
 }
+}//End namespace MEDMEM
 
 #endif /* VTK_FIELD_DRIVER_HXX */

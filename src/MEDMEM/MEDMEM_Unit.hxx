@@ -11,7 +11,6 @@
 #include "utilities.h"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
-//using namespace MED_EN;
 
 namespace MEDMEM {
 class UNIT { 
@@ -59,11 +58,9 @@ public:
   inline int    getLightIntensity() const ;
 
 } ;
-} ;
 
 // inline method :
 
-using namespace MEDMEM;
 inline void UNIT::setName(string Name) {
   _name = Name ;
 };
@@ -101,5 +98,6 @@ inline int    UNIT::getTemperature() const     { return _temperature ; } ;
 inline int    UNIT::getMatterQuantity() const  { return _matterQuantity ; } ;
 inline int    UNIT::getCurrentStrength() const { return _currentStrength ; } ;
 inline int    UNIT::getLightIntensity() const  { return _lightIntensity ; } ;
+}//End namespace MEDMEM
 
 #endif /* UNIT_HXX */
