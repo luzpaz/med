@@ -55,17 +55,17 @@
 {
   /* typemap in for double * */
   /* Check if is a list */
-  if (PyList_Check($source)) { 
-    int size = PyList_Size($source);
+  if (PyList_Check($input)) { 
+    int size = PyList_Size($input);
     int i = 0; 
-    $target = (double *) malloc(size*sizeof(double));
+    $1 = (double *) malloc(size*sizeof(double));
     for (i = 0; i < size; i++) {
-      PyObject *o = PyList_GetItem($source,i);
+      PyObject *o = PyList_GetItem($input,i);
       if (PyFloat_Check(o))
-	$target[i] = PyFloat_AsDouble(PyList_GetItem($source,i));
+	$1[i] = PyFloat_AsDouble(PyList_GetItem($input,i));
       else { 
 	PyErr_SetString(PyExc_TypeError,"list must contain floats");
-	free($target);
+	free($1);
 	return NULL;
       }
     }
@@ -81,17 +81,17 @@
 {
   /* typemap in for int * */
   /* Check if is a list */
-  if (PyList_Check($source)) { 
-    int size = PyList_Size($source);
+  if (PyList_Check($input)) { 
+    int size = PyList_Size($input);
     int i = 0; 
-    $target = (int *) malloc(size*sizeof(int));
+    $1 = (int *) malloc(size*sizeof(int));
     for (i = 0; i < size; i++) {
-      PyObject *o = PyList_GetItem($source,i);
+      PyObject *o = PyList_GetItem($input,i);
       if (PyInt_Check(o))
-	$target[i] = PyInt_AsLong(PyList_GetItem($source,i));
+	$1[i] = PyInt_AsLong(PyList_GetItem($input,i));
       else { 
 	PyErr_SetString(PyExc_TypeError,"list must contain integers");
-	free($target);
+	free($1);
 	return NULL;
       }
     }
@@ -108,17 +108,17 @@
 {
   /* typemap in for medGeometryElement * */
   /* Check if is a list */
-  if (PyList_Check($source)) { 
-    int size = PyList_Size($source);
+  if (PyList_Check($input)) { 
+    int size = PyList_Size($input);
     int i = 0; 
-    $target = (medGeometryElement *) malloc(size*sizeof(int));
+    $1 = (medGeometryElement *) malloc(size*sizeof(int));
     for (i = 0; i < size; i++) {
-      PyObject *o = PyList_GetItem($source,i);
+      PyObject *o = PyList_GetItem($input,i);
       if (PyInt_Check(o))
-	$target[i] = (medGeometryElement) PyInt_AsLong(PyList_GetItem($source,i));
+	$1[i] = (medGeometryElement) PyInt_AsLong(PyList_GetItem($input,i));
       else { 
 	PyErr_SetString(PyExc_TypeError,"list must contain integers");
-	free($target);
+	free($1);
 	return NULL;
       }
     }
@@ -134,9 +134,9 @@
   int i;
   list<string>::iterator iL;
 
-  $target = PyList_New($source->size());
-  for (i=0, iL=$source->begin(); iL!=$source->end(); i++, iL++)
-    PyList_SetItem($target,i,PyString_FromString((*iL).c_str())); 
+  $result = PyList_New($1->size());
+  for (i=0, iL=$1->begin(); iL!=$1->end(); i++, iL++)
+    PyList_SetItem($result,i,PyString_FromString((*iL).c_str())); 
 }
 
 %typemap(freearg) int * {

@@ -115,7 +115,7 @@ typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26,
 
 typedef struct { int dt; int it; } DT_IT_;
 
-%addmethods DT_IT_ {
+%extend DT_IT_ {
   int getdt()
     {
       return self->dt;
@@ -280,7 +280,7 @@ class SUPPORT
 
   void getBoundaryElements();
 
-  %addmethods {
+  %extend {
     SUPPORT(MESH* Mesh, char * Name="", medEntityMesh Entity=MED_CELL)
       {
 	return new SUPPORT(Mesh,string(Name),Entity);
@@ -354,7 +354,6 @@ class SUPPORT
 	PyObject * result = Py_BuildValue("O", py_list);
 	return result;
       }
-    */
 
     PyObject * getNumber(medGeometryElement GeometricType)
       {
@@ -435,7 +434,7 @@ class FAMILY : public SUPPORT
 
   int getNumberOfGroups() const;
 
-  %addmethods {
+  %extend {
     FAMILY(MESH* Mesh, int Identifier, char * Name, int NumberOfAttribute,
 	   int *AttributeIdentifier, int *AttributeValue,
 	   char * AttributeDescription, int NumberOfGroup,
@@ -1745,19 +1744,6 @@ public:
 	strcat(tmp,tmp_str.c_str());
 	return tmp;
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
@@ -1834,19 +1820,6 @@ public:
 	strcat(tmp,tmp_str.c_str());
 	return tmp;
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
@@ -1876,301 +1849,6 @@ public:
       }
 
     %newobject getFieldName();
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
-	return tmp;
-      }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
-	return tmp;
-      }
-  }
-};
-
-/*
-  API du driver MED_FIELDDOUBLE
-*/
-
-/*
-class MED_FIELDDOUBLE_DRIVER
-{
-public:
-  void open();
-
-  void close();
-
-  %addmethods {
-    MED_FIELDDOUBLE_DRIVER(char * fileName, FIELDDOUBLE * ptrField, 
-			   med_mode_acces accessMode)
-      {
-	return new MED_FIELDDOUBLE_DRIVER(string(fileName), ptrField,
-					  accessMode);
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
-	return tmp;
-      }
-  }
-};
-*/
-
-class MED_FIELDDOUBLE_RDONLY_DRIVER : public virtual MED_FIELDDOUBLE_DRIVER
-{
-public:
-
-  ~MED_FIELDDOUBLE_RDONLY_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
-  %addmethods {
-    MED_FIELDDOUBLE_RDONLY_DRIVER(char * fileName, FIELDDOUBLE * ptrField)
-      {
-	return new MED_FIELDDOUBLE_RDONLY_DRIVER(string(fileName), ptrField);
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
-	return tmp;
-      }
-  }
-};
-
-class MED_FIELDDOUBLE_WRONLY_DRIVER : public virtual MED_FIELDDOUBLE_DRIVER
-{
-public:
-
-  ~MED_FIELDDOUBLE_WRONLY_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
-  %addmethods {
-    MED_FIELDDOUBLE_WRONLY_DRIVER(char * fileName, FIELDDOUBLE * ptrField)
-      {
-	return new MED_FIELDDOUBLE_WRONLY_DRIVER(string(fileName), ptrField);
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
-	return tmp;
-      }
-  }
-};
-
-class MED_FIELDDOUBLE_RDWR_DRIVER : public virtual MED_FIELDDOUBLE_RDONLY_DRIVER, public virtual MED_FIELDDOUBLE_WRONLY_DRIVER
-{
-public:
-
-  ~MED_FIELDDOUBLE_RDWR_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
-  %addmethods {
-    MED_FIELDDOUBLE_RDWR_DRIVER(char * fileName, FIELDDOUBLE * ptrField)
-      {
-	return new MED_FIELDDOUBLE_RDWR_DRIVER(string(fileName), ptrField);
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
-	return tmp;
-      }
-  }
-};
-
-/*
-  API du driver MED_FIELDINT
-*/
-
-/*
-class MED_FIELDINT_DRIVER
-{
-public:
-  void open();
-
-  void close();
-
-  %addmethods {
-    MED_FIELDINT_DRIVER(char * fileName, FIELDINT * ptrField, 
-		        med_mode_acces accessMode)
-      {
-	return new MED_FIELDINT_DRIVER(string(fileName), ptrField,
-					  accessMode);
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
-	return tmp;
-      }
-  }
-};
-*/
-
-class MED_FIELDINT_RDONLY_DRIVER : public virtual MED_FIELDINT_DRIVER
-{
-public:
-
-  ~MED_FIELDINT_RDONLY_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
-  %addmethods {
-    MED_FIELDINT_RDONLY_DRIVER(char * fileName, FIELDINT * ptrField)
-      {
-	return new MED_FIELDINT_RDONLY_DRIVER(string(fileName), ptrField);
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
-	return tmp;
-      }
-  }
-};
-
-class MED_FIELDINT_WRONLY_DRIVER : public virtual MED_FIELDINT_DRIVER
-{
-public:
-
-  ~MED_FIELDINT_WRONLY_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
-  %addmethods {
-    MED_FIELDINT_WRONLY_DRIVER(char * fileName, FIELDINT * ptrField)
-      {
-	return new MED_FIELDINT_WRONLY_DRIVER(string(fileName), ptrField);
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
-	return tmp;
-      }
-  }
-};
-
-class MED_FIELDINT_RDWR_DRIVER : public virtual MED_FIELDINT_RDONLY_DRIVER, public virtual MED_FIELDINT_WRONLY_DRIVER
-{
-public:
-
-  ~MED_FIELDINT_RDWR_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
-  %addmethods {
-    MED_FIELDINT_RDWR_DRIVER(char * fileName, FIELDINT * ptrField)
-      {
-	return new MED_FIELDINT_RDWR_DRIVER(string(fileName), ptrField);
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
     char * getFieldName()
       {
 	string tmp_str = self->getFieldName();
