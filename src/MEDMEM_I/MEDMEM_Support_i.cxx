@@ -500,18 +500,19 @@ throw (SALOME::SALOME_Exception)
 void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr myIor)
   throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-  BEGIN_OF("SUPPORT_i::addInStudy");
+  const char * LOC = "SUPPORT_i::addInStudy";
+  BEGIN_OF(LOC);
 
   if ( _supportId != "" )
   {
-      MESSAGE("Support already in Study");
+      MESSAGE(LOC << "Support already in Study");
       THROW_SALOME_CORBA_EXCEPTION("Support already in Study", \
 				   SALOME::BAD_PARAM);
   };
 
   if ( CORBA::is_nil(myStudy) )
   {
-      MESSAGE("Study not found");
+      MESSAGE(LOC << "Study not found");
       THROW_SALOME_CORBA_EXCEPTION("Study deleted !!!",
                                     SALOME::INTERNAL_ERROR);
   }
@@ -523,22 +524,22 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   SALOMEDS::AttributeIOR_var     aIOR;
   
   // Find SComponent labelled 'Med'
-  MESSAGE("Find SComponent labelled 'MED'");
+  MESSAGE(LOC << " Find SComponent labelled 'MED'");
   SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
   if ( CORBA::is_nil(medfather) ) 
   { 
-    MESSAGE("MED not found");
+    MESSAGE(LOC << "MED not found");
     THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
   }
 
   // Find SObject MESH (represent mesh in support)
-  SALOMEDS::SObject_var medmeshfather = myStudy->FindObject("MEDMESH");
+  SALOMEDS::SObject_var medmeshfather = myStudy->FindObjectByPath("/Med/MEDMESH");
   if ( CORBA::is_nil(medmeshfather) )
   { 
-    MESSAGE("No MEDMESH Found in study")
+    MESSAGE(LOC << " No /Med/MEDMESH Found in study")
     THROW_SALOME_CORBA_EXCEPTION("SObject labelled 'MEDMESH' not Found",SALOME::INTERNAL_ERROR);
   }
-  cout << "Find SObject MESH (represent mesh in support)"<< flush;
+  MESSAGE(LOC << " Find SObject MESH (represent mesh in support)");
 
   string meshName = getMesh()->getName() ;
 
@@ -548,24 +549,51 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
     THROW_SALOME_CORBA_EXCEPTION("SObject Mesh in Support not Found",SALOME::INTERNAL_ERROR);
   // perhaps add MESH automatically ?
   
-  MESSAGE("Add a support Object under MED/MESH/MESHNAME");
-  SALOMEDS::SObject_var medsupfather = myStudy->FindObject("MEDSUPPORT");
+  MESSAGE("Add a support Object under /MED/MESH/MESHNAME");
+
+  char * medsupfatherName;
+  int lenName = 15 + strlen(meshName.c_str());
+  medsupfatherName = new char[lenName];
+  medsupfatherName = strcpy(medsupfatherName,"MEDSUPPORTS_OF_");
+  medsupfatherName = strcat(medsupfatherName,meshName.c_str());
+
+  SCRUTE(medsupfatherName);
+
+  SALOMEDS::SObject_var medsupfather = myStudy->FindObject(medsupfatherName);
   if ( CORBA::is_nil(medsupfather) )
   {
                 MESSAGE("Add Object MEDSUPPORT");
                 medsupfather = myBuilder->NewObject(medmeshfather);
                 anAttr = myBuilder->FindOrCreateAttribute(medsupfather, "AttributeName");
                 aName = SALOMEDS::AttributeName::_narrow(anAttr);
-                aName->SetValue("MEDSUPPORT");
+                aName->SetValue(medsupfatherName);
 
   } ;
 
-
   //myBuilder->NewCommand();
-  SALOMEDS::SObject_var supportEntry = myStudy->FindObject(_support->getName().c_str());
+
+  string supportName = _support->getName();
+
+  char * supportEntryPath;
+  lenName = 13 + 15 + strlen(meshName.c_str()) + 1 + strlen(supportName.c_str());
+  supportEntryPath = new char[lenName];
+  supportEntryPath = strcpy(supportEntryPath,"/MED/MEDMESH/");
+  supportEntryPath = strcat(supportEntryPath,"MEDSUPPORTS_OF_");
+  supportEntryPath = strcat(supportEntryPath,meshName.c_str());
+  supportEntryPath = strcat(supportEntryPath,"/");
+  supportEntryPath = strcat(supportEntryPath,supportName.c_str());
+
+  SCRUTE(supportEntryPath);
+
+  MESSAGE("supportEntryPath in support " << supportEntryPath << " length " << lenName);
+
+//   SALOMEDS::SObject_var supportEntry = myStudy->FindObject(_support->getName().c_str());
 			 // c'est pas bon, car il faut rechercher uniquement sous le bon MESH !!!
+  SALOMEDS::SObject_var supportEntry = myStudy->FindObjectByPath(supportEntryPath);
+
   if ( CORBA::is_nil(supportEntry) ) 
-  { 
+  {
+    MESSAGE(" supportEntry is a nil corba object and is going to be created");
     // not already in study : we create it !
     SALOMEDS::SObject_var newObj = myBuilder->NewObject(medsupfather);
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
@@ -591,7 +619,23 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
     aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
     aIOR->SetValue(iorStr.c_str());
   }
-    myBuilder->CommitCommand();
-  
-  END_OF("SUPPORT_i::addInStudy");
+  myBuilder->CommitCommand();
+
+  SALOMEDS::SObject_var supportEntryBis = myStudy->FindObjectByPath(supportEntryPath);
+
+  MESSAGE("Just for checking, reuse of the corba pointer");
+
+  if ( CORBA::is_nil(supportEntry) ) 
+    {
+      MESSAGE("The reuse is OK");
+    }
+  else 
+    {
+      MESSAGE("well !! the reuse is not OK and there was a problem in the storage in the study");
+    }
+
+  delete [] medsupfatherName;
+  delete [] supportEntryPath;
+
+  END_OF(LOC);
 }

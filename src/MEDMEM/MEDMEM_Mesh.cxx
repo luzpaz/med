@@ -34,14 +34,15 @@ using namespace MEDMEM;
 
 MESH::INSTANCE_DE<MED_MESH_RDWR_DRIVER>   MESH::inst_med   ;
 MESH::INSTANCE_DE<GIBI_MESH_RDWR_DRIVER>  MESH::inst_gibi ;
+MESH::INSTANCE_DE<PORFLOW_MESH_RDWR_DRIVER>  MESH::inst_porflow ;
 MESH::INSTANCE_DE<VTK_MESH_DRIVER> MESH::inst_vtk;
 
 // Add your own driver in the driver list       (step 4)
 // Note the list must be coherent with the driver type list defined in MEDMEM_DRIVER.hxx. 
-const MESH::INSTANCE * const MESH::instances[] =   {  &MESH::inst_med, &MESH::inst_gibi, &MESH::inst_vtk } ;
+const MESH::INSTANCE * const MESH::instances[] =   {  &MESH::inst_med, &MESH::inst_gibi, &MESH::inst_porflow, &MESH::inst_vtk } ;
 
-/*! Add a MESH driver of type (MED_DRIVER, ....) associated with file <fileName>. The meshname used in the file
-    is  <driverName>. addDriver returns an int handler. */
+/*! Add a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. The meshname used in the file
+    is  driverName. addDriver returns an integer handler. */
 int MESH::addDriver(driverTypes driverType, 
                     const string & fileName/*="Default File Name.med"*/,const string & driverName/*="Default Mesh Name"*/) {
 
@@ -69,8 +70,13 @@ int MESH::addDriver(driverTypes driverType,
       break ;
     }
 
+    case PORFLOW_DRIVER : {
+      itDriver = (int) driverType ;
+      break ;
+    }
+
     case VTK_DRIVER : {
-      itDriver = 2 ;
+      itDriver = 3 ;
       break ;
     }
 
@@ -80,7 +86,7 @@ int MESH::addDriver(driverTypes driverType,
     }
 
   if (itDriver == ((int) NO_DRIVER))
-    throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "othe driver than MED_DRIVER GIBI_DRIVER and VT_DRIVER has been specified to the method which is not allowed"));
+    throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "othe driver than MED_DRIVER GIBI_DRIVER PORFLOW_DRIVER and VT_DRIVER has been specified to the method which is not allowed"));
 
   driver = instances[itDriver]->run(fileName, this) ;
 
@@ -147,19 +153,11 @@ void MESH::init() {
   _spaceDimension        =          MED_INVALID; // 0 ?!?
   _meshDimension         =          MED_INVALID;
   _numberOfNodes         =          MED_INVALID;
-  
-  _numberOfNodesFamilies =          0; // MED_INVALID ?!?
-  _numberOfCellsFamilies =          0;
-  _numberOfFacesFamilies =          0;
-  _numberOfEdgesFamilies =          0;
-
-  _numberOfNodesGroups   =          0;  // MED_INVALID ?!?
-  _numberOfCellsGroups   =          0; 
-  _numberOfFacesGroups   =          0; 
-  _numberOfEdgesGroups   =          0; 
 
   _isAGrid = false;
  
+  _arePresentOptionnalNodesNumbers = 0;
+
   END_OF(LOC);
 };
 
@@ -187,65 +185,57 @@ MESH::MESH(MESH &m)
   _meshDimension = m._meshDimension;
   _numberOfNodes = m._numberOfNodes;
 
-  _numberOfNodesFamilies = m._numberOfNodesFamilies;
   _familyNode = m._familyNode;
-  for (int i=0; i<m._numberOfNodesFamilies; i++)
+  for (int i=0; i<m._familyNode.size(); i++)
     {
       _familyNode[i] = new FAMILY(* m._familyNode[i]);
       _familyNode[i]->setMesh(this);
     }
 
-  _numberOfCellsFamilies = m._numberOfCellsFamilies;
   _familyCell = m._familyCell;
-  for (int i=0; i<m._numberOfCellsFamilies; i++)
+  for (int i=0; i<m._familyCell.size(); i++)
     {
       _familyCell[i] = new FAMILY(* m._familyCell[i]);
       _familyCell[i]->setMesh(this);
     }
 
-  _numberOfFacesFamilies = m._numberOfFacesFamilies;
   _familyFace = m._familyFace;
-  for (int i=0; i<m._numberOfFacesFamilies; i++)
+  for (int i=0; i<m._familyFace.size(); i++)
     {
       _familyFace[i] = new FAMILY(* m._familyFace[i]);
       _familyFace[i]->setMesh(this);
     }
 
-  _numberOfEdgesFamilies = m._numberOfEdgesFamilies;
   _familyEdge = m._familyEdge;
-  for (int i=0; i<m._numberOfEdgesFamilies; i++)
+  for (int i=0; i<m._familyEdge.size(); i++)
     {
       _familyEdge[i] = new FAMILY(* m._familyEdge[i]);
       _familyEdge[i]->setMesh(this);
     }
 
-  _numberOfNodesGroups = m._numberOfNodesGroups;
   _groupNode = m._groupNode;
-  for (int i=0; i<m._numberOfNodesGroups; i++)
+  for (int i=0; i<m._groupNode.size(); i++)
     {
       _groupNode[i] = new GROUP(* m._groupNode[i]);
       _groupNode[i]->setMesh(this);
     }
 
-  _numberOfCellsGroups = m._numberOfCellsGroups;
   _groupCell = m._groupCell;
-  for (int i=0; i<m._numberOfCellsGroups; i++)
+  for (int i=0; i<m._groupCell.size(); i++)
     {
       _groupCell[i] = new GROUP(* m._groupCell[i]);
       _groupCell[i]->setMesh(this);
     }
 
-  _numberOfFacesGroups = m._numberOfFacesGroups;
   _groupFace = m._groupFace;
-  for (int i=0; i<m._numberOfFacesGroups; i++)
+  for (int i=0; i<m._groupFace.size(); i++)
     {
       _groupFace[i] = new GROUP(* m._groupFace[i]);
       _groupFace[i]->setMesh(this);
     }
 
-  _numberOfEdgesGroups = m._numberOfEdgesGroups;
   _groupEdge = m._groupEdge;
-  for (int i=0; i<m._numberOfEdgesGroups; i++)
+  for (int i=0; i<m._groupEdge.size(); i++)
     {
       _groupEdge[i] = new GROUP(* m._groupEdge[i]);
       _groupEdge[i]->setMesh(this);
@@ -338,8 +328,8 @@ MESH & MESH::operator=(const MESH &m)
   return *this;
 }
 
-/*! Create a MESH object using a MESH driver of type (MED_DRIVER, ....) associated with file <fileName>. 
-  The meshname <driverName> must already exists in the file.*/
+/*! Create a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. 
+  The meshname driverName must already exists in the file.*/
 MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION)
 {
   const char * LOC ="MESH::MESH(driverTypes driverType, const string &  fileName="", const string &  driverName="") : ";
@@ -361,6 +351,12 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
     case GIBI_DRIVER :
       {
 	GIBI_MESH_RDONLY_DRIVER myDriver(fileName,this);
+	current = addDriver(myDriver);
+	break;
+      }
+    case PORFLOW_DRIVER :
+      {
+	PORFLOW_MESH_RDONLY_DRIVER myDriver(fileName,this);
 	current = addDriver(myDriver);
 	break;
       }
@@ -1584,12 +1580,19 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 			      ((x4-x1)*(z2-z1) - (x2-x1)*(z4-z1)) +
 			      ((x2-x1)*(y4-y1) - (x4-x1)*(y2-y1))*
 			      ((x2-x1)*(y4-y1) - (x4-x1)*(y2-y1))) +
-			 sqrt(((y3-y2)*(z4-z3) - (y4-y3)*(z3-z2))*
-			      ((y3-y2)*(z4-z3) - (y4-y3)*(z3-z2)) +
-			      ((x4-x3)*(z2-z2) - (x3-x2)*(z4-z3))*
-			      ((x4-x3)*(z4-z2) - (x3-x2)*(z4-z3)) +
-			      ((x3-x2)*(y4-y3) - (x4-x3)*(y3-y2))*
-			      ((x3-x2)*(y4-y3) - (x4-x3)*(y3-y2))))/2.0;
+			 sqrt(((y4-y3)*(z2-z3) - (y2-y3)*(z4-z3))*
+			      ((y4-y3)*(z2-z3) - (y2-y3)*(z4-z3)) +
+			      ((x2-x3)*(z4-z3) - (x4-x3)*(z2-z3))*
+			      ((x2-x3)*(z4-z3) - (x4-x3)*(z2-z3)) +
+			      ((x4-x3)*(y2-y3) - (x2-x3)*(y4-y3))*
+			      ((x4-x3)*(y2-y3) - (x2-x3)*(y4-y3))))/2.0;
+
+// 			 sqrt(((y3-y2)*(z4-z3) - (y4-y3)*(z3-z2))*
+// 			      ((y3-y2)*(z4-z3) - (y4-y3)*(z3-z2)) +
+// 			      ((x4-x3)*(z2-z2) - (x3-x2)*(z4-z3))*
+// 			      ((x4-x3)*(z4-z2) - (x3-x2)*(z4-z3)) +
+// 			      ((x3-x2)*(y4-y3) - (x4-x3)*(y3-y2))*
+// 			      ((x3-x2)*(y4-y3) - (x4-x3)*(y3-y2))))/2.0;
 
 		xnormal1 = xnormal1*xarea;
 		xnormal2 = xnormal2*xarea;
@@ -2081,10 +2084,10 @@ bool MESH::isEmpty() const
 {
     bool notempty = _name != ""                || _coordinate != NULL           || _connectivity != NULL ||
 	         _spaceDimension !=MED_INVALID || _meshDimension !=MED_INVALID  || 
-		 _numberOfNodes !=MED_INVALID  || _numberOfNodesFamilies !=0    || 
-		 _familyNode.size() != 0       || _numberOfCellsFamilies != 0   || 
-		 _familyCell.size() != 0       || _numberOfFacesFamilies != 0   || 
-		 _familyFace.size() != 0       || _numberOfEdgesFamilies !=0    || 
+		 _numberOfNodes !=MED_INVALID  || _groupNode.size() != 0   || 
+		 _familyNode.size() != 0       || _groupCell.size() != 0   || 
+		 _familyCell.size() != 0       || _groupFace.size() != 0   || 
+		 _familyFace.size() != 0       || _groupEdge.size() != 0   || 
 		 _familyEdge.size() != 0       || _isAGrid != 0 ;
     return !notempty;
 }
@@ -2521,4 +2524,219 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) const throw 
 
   END_OF(LOC) ;
   return returnedSupport;
+}
+
+
+// internal helper type
+struct _cell
+{
+    //int number;
+    std::vector<int> groups;
+    MED_EN::medGeometryElement geometricType;
+};
+
+// Create families from groups
+void MESH::createFamilies() 
+{
+    int nbFam=0; // count the families we create, used as identifier ???????????
+
+    int idFamNode = 0; // identifier for node families
+    int idFamElement = 0; // identifier for cell, face or edge families
+
+    // Main loop on mesh's entities
+    for (medEntityMesh entity=MED_CELL; entity!=MED_ALL_ENTITIES; ++entity)
+    {
+	int numberofgroups = getNumberOfGroups(entity);
+	if(!numberofgroups)
+	    continue; // no groups for this entity
+	
+	vector< vector<FAMILY*> > whichFamilyInGroup(numberofgroups); // this container is used to update groups at the end
+
+	// make myFamilies points to the member corresponding to entity
+	vector<FAMILY*>* myFamilies;
+	switch ( entity )
+	{
+	    case MED_CELL :
+		myFamilies = & _familyCell;
+		break;
+	    case MED_FACE :
+		myFamilies = & _familyFace;
+		break;
+	    case MED_EDGE :
+		myFamilies = & _familyEdge;
+		break;
+	    case MED_NODE :
+		myFamilies = & _familyNode;
+		break;
+	}
+	
+	vector<GROUP*> myGroups=getGroups(entity); // get a copy of the groups ptr for the entity
+	// get a copy of the (old) family ptrs before clearing
+	vector<FAMILY*> myOldFamilies=getFamilies(entity); 
+	myFamilies->clear();
+
+
+	// 1 - Create a vector containing for each cell (of the entity) an information structure
+	//     giving geometric type and the groups it belong to
+
+	med_int numberOfTypes=getNumberOfTypes(entity);
+	const int * index=getGlobalNumberingIndex(entity);
+	const medGeometryElement* geometricTypes=_connectivity->getGeometricTypes(entity); // pb avec entity=MED_NODE???
+	med_int numberOfCells=index[numberOfTypes]-1;  // total number of cells for that entity
+	SCRUTE(numberOfTypes);
+	SCRUTE(numberOfCells);
+	vector< _cell > tab_cell(numberOfCells);
+	for(med_int t=0; t!=numberOfTypes; ++t)
+	    for(int n=index[t]-1; n!=index[t+1]-1; ++n)
+		tab_cell[n].geometricType=geometricTypes[t];
+
+	
+	// 2 - Scan cells in groups and update in tab_cell the container of groups a cell belong to
+	
+	for (unsigned g=0; g!=myGroups.size(); ++g)
+	{
+	    // scan cells that belongs to the group
+	    const med_int* groupCells=myGroups[g]->getnumber()->getValue();
+	    int nbCells=myGroups[g]->getnumber()->getLength();
+	    for(int c=0; c!=nbCells; ++c)
+		tab_cell[groupCells[c]-1].groups.push_back(g);
+	}
+
+
+	// 3 - Scan the cells vector, genarate family name, and create a map associating the family names 
+	//     whith the vector of contained cells
+	
+	map< string,vector<int> > tab_families;
+	map< string,vector<int> >::iterator fam;
+	for(int n=0; n!=numberOfCells; ++n)
+	{
+	    ostringstream key; // to generate the name of the family
+	    key << "FAM";
+	    if(tab_cell[n].groups.empty()) // this cell don't belong to any group
+		key << "_NONE" << entity;
+	    
+	    for(vector<int>::const_iterator it=tab_cell[n].groups.begin(); it!=tab_cell[n].groups.end(); ++it)
+	    {
+		string groupName=myGroups[*it]->getName();
+		if(groupName.empty())
+		    key << "_G" << *it;
+		else
+		    key << "_" << groupName;
+	    }
+	    
+	    tab_families[key.str()].push_back(n+1); // fill the vector of contained cells associated whith the family
+	/*    fam = tab_families.find(key.str());
+	    if( fam != tab_families.end())
+		fam->second.push_back(n+1); // +1 : convention Fortran de MED
+	    else
+	    {
+		vector<int> newfamily;
+		newfamily.push_back(n+1); // +1 : convention Fortran de MED
+		tab_families.insert(make_pair(key.str(),newfamily));
+	    }*/
+	}
+
+
+	// 4 - Scan the family map, create MED Families, check if it already exist.
+	
+	for( fam=tab_families.begin(); fam!=tab_families.end(); ++fam)
+	{
+	    vector<medGeometryElement> tab_types_geometriques;
+	    medGeometryElement geometrictype=MED_NONE;
+	    vector<int> tab_index_types_geometriques;
+	    vector<int> tab_nombres_elements;
+
+	    // scan family cells and fill the tab that are needed by the create a MED FAMILY
+	    for( int i=0; i!=fam->second.size(); ++i) 
+	    {
+		int ncell=fam->second[i]-1; 
+		if(tab_cell[ncell].geometricType != geometrictype)
+		{
+		    // new geometric type -> we store it and complete index tabs
+		    if(!tab_index_types_geometriques.empty())
+			tab_nombres_elements.push_back(i+1-tab_index_types_geometriques.back());
+		    tab_types_geometriques.push_back( (geometrictype=tab_cell[ncell].geometricType));
+		    tab_index_types_geometriques.push_back(i+1);
+		}
+	    }
+	    // store and complete index tabs for the last geometric type
+	    tab_nombres_elements.push_back(fam->second.size()+1-tab_index_types_geometriques.back());
+	    tab_index_types_geometriques.push_back(fam->second.size()+1);
+
+	    // create a empty MED FAMILY and fill it with the tabs we constructed
+	    FAMILY* newFam = new FAMILY();
+	    newFam->setTotalNumberOfElements(fam->second.size());
+	    newFam->setName(fam->first);
+	    newFam->setMesh(this);
+	    newFam->setNumberOfGeometricType(tab_types_geometriques.size());
+	    newFam->setGeometricType(&tab_types_geometriques[0]); // we know the tab is not empy
+	    newFam->setNumberOfElements(&tab_nombres_elements[0]);
+	    newFam->setNumber(&tab_index_types_geometriques[0],&fam->second[0]);
+	    newFam->setEntity(entity);
+	    newFam->setAll(false);
+
+	    int idFam = 0;
+
+	    switch ( entity )
+	      {
+	      case MED_NODE :
+		++idFamNode;
+		idFam = idFamNode;
+		break;
+	      case MED_CELL:
+		++idFamElement;
+		idFam = -idFamElement;
+		break;
+	      case MED_FACE :
+		++idFamElement;
+		idFam = -idFamElement;
+		break;
+	      case MED_EDGE :
+		++idFamElement;
+		idFam = -idFamElement;
+		break;
+	      }
+
+	    newFam->setIdentifier(idFam);
+
+	    // Update links between families and groups
+
+	    int ncell1=fam->second[0]-1;  // number of first cell in family
+	    int numberOfGroups=tab_cell[ncell1].groups.size(); // number of groups in the family
+	    if(numberOfGroups)
+	    {
+		newFam->setNumberOfGroups(numberOfGroups);
+		string * groupNames=new string[numberOfGroups];
+
+		// iterate on the groups the family belongs to
+		vector<int>::const_iterator it=tab_cell[ncell1].groups.begin();
+		for(int ng=0 ; it!=tab_cell[ncell1].groups.end(); ++it, ++ng)
+		{
+		    whichFamilyInGroup[*it].push_back(newFam);
+		    groupNames[ng]=myGroups[*it]->getName();
+		}
+		newFam->setGroupsNames(groupNames);
+	    }
+
+	    int sizeOfFamVect = myFamilies->size();
+
+	    MESSAGE("  MESH::createFamilies() entity " << entity << " size " << sizeOfFamVect);
+
+	    myFamilies->push_back(newFam);
+	}
+
+	// delete old families
+	for (int i=0;i<myOldFamilies.size();i++)
+	    delete myOldFamilies[i] ;
+
+	// update references in groups
+	for (int i=0;i<myGroups.size();i++)
+	{
+	    myGroups[i]->setNumberOfFamilies(whichFamilyInGroup[i].size());
+	    myGroups[i]->setFamilies(whichFamilyInGroup[i]);
+	}
+
+    // re-scan the cells vector, and fill the family vector with cells.
+    // creation of support, check if it already exist.
+    }
 }

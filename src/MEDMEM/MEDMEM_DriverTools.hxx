@@ -27,8 +27,11 @@ struct _maille
     typedef std::map<int,_noeud>::iterator iter;
     MED_EN::medGeometryElement geometricType;
     std::vector< iter > sommets;
-    mutable unsigned ordre; // l'ordre est fixÃ© aprÃ¨s insertion dans le set, et ne change ni l'Ã©tat, ni l'ordre -> mutable
+    mutable unsigned ordre; // l'ordre est fixé après insertion dans le set, et ne change ni l'état, ni l'ordre -> mutable
 
+    _maille() : geometricType(MED_EN::MED_NONE),ordre(0)
+    {
+    };
     _maille(MED_EN::medGeometryElement _geometricType, size_t nelem) : geometricType(_geometricType),ordre(0)
     {
 	sommets.reserve(nelem);
@@ -54,7 +57,7 @@ struct _groupe
     typedef std::set< std::set<_maille>::iterator>::const_iterator mailleIter;
     std::string nom;
     std::set< std::set<_maille>::iterator, _mailleIteratorCompare > mailles; // iterateurs sur les mailles composant le groupe
-    std::list<int> groupes; // indices des sous-groupes composant le groupe
+    std::vector<int> groupes; // indices des sous-groupes composant le groupe
 };
 
 /*!
@@ -74,8 +77,10 @@ struct _intermediateMED
     std::map< int, _noeud > points;
 
     CONNECTIVITY * getConnectivity(); // set MED connectivity from the intermediate structure
-    COORDINATE * getCoordinate(); // set MED coordinate from the intermediate structure
-    void getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP *> & _groupFace, std::vector<GROUP *> & _groupEdge, std::vector<GROUP *> & _groupNode, MESH * _ptrMesh);
+    COORDINATE * getCoordinate(const string & coordinateSystem="CARTESIAN"); // set MED coordinate from the 
+                                                                             // intermediate structure
+    void getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP *> & _groupFace, 
+	    std::vector<GROUP *> & _groupEdge, std::vector<GROUP *> & _groupNode, MESH * _ptrMesh);
 
     // used by previous functions to renumber points & mesh.
     void numerotationMaillage(); 

@@ -4,69 +4,64 @@
 #include <SALOMEconfig.h>
 #include <utilities.h>
 #include "MEDMEM_Field.hxx"
+#include "SUPPORTClient.hxx"
 #include CORBA_CLIENT_HEADER(MED)
 
-namespace MEDMEM {
-template <typename T>
-class FIELDClient : virtual public FIELD<T> {
-
-private :
-
-  const SALOME_MED::FIELD_var IOR_Field;
-
-  mutable bool _complete_field;
-
-public :
-
-  FIELDClient(const SALOME_MED::FIELD_ptr S, 
-		SUPPORT * S = NULL);
-  virtual ~FIELDClient();
-
-  void blankCopy();
-  void fillCopy();
 
 
-};
+
+void FIELDClient_value(FIELD<double> *F, 
+		       const SALOME_MED::FIELD_ptr IOR_Field);
+void FIELDClient_value(FIELD<int> *F, 
+		       const SALOME_MED::FIELD_ptr IOR_Field);
+  
 
 template <typename T>
-FIELDClient<T>::FIELDClient(const SALOME_MED::FIELD_ptr F,
-			    SUPPORT * S) : 
-  FIELD<T>(), 
-  IOR_Field(SALOME_MED::FIELD::_duplicate(F))
+FIELD<T> * FIELDClient(const SALOME_MED::FIELD_ptr IOR_Field, 
+			SUPPORT * S = NULL)
 {
-  BEGIN_OF("FIELDClient::FIELDClient(SALOME_MED::FIELD_ptr m)");
+  BEGIN_OF("FIELDClient<T>");
 
-  if (S) setSupport(S);
+  if (!S) S = new SUPPORTClient(IOR_Field->getSupport());
 
-  END_OF("FIELDClient::FIELDClient(SALOME_MED::FIELD_ptr m)");
-}
+  FIELD<T> *F = new FIELD<T>();
+  F->setSupport(S);
 
-template <typename T>
-void FIELDClient<T>::blankCopy()
-{
-  BEGIN_OF("FIELDClient::blankCopy");
+  F->setName(IOR_Field->getName());
+  SCRUTE(F->getName());
 
+  F->setDescription(IOR_Field->getDescription());
+  SCRUTE(F->getDescription());
 
-  END_OF("FIELDClient::blankCopy");
+  int nc = IOR_Field->getNumberOfComponents();
+  F->setNumberOfComponents(nc);
+  SCRUTE(F->getNumberOfComponents());
 
-}
+  F->setNumberOfValues(nc * S->getNumberOfElements(MED_ALL_ELEMENTS));
+  SCRUTE(F->getNumberOfValues());
 
-template <typename T>
-void FIELDClient<T>::fillCopy()
-{
-  BEGIN_OF("FIELDClient::fillCopy");
+  string * _s = new string[nc];
 
-  END_OF("FIELDClient::fillCopy");
-}
+  SALOME_MED::string_array_var s;
 
+  s = IOR_Field->getComponentsNames();
+  for (int i=0; i<nc; i++)
+    _s[i] = s[i];
+  F->setComponentsNames(_s);
 
-template <typename T>
-FIELDClient<T>::~FIELDClient()
-{
-  BEGIN_OF("FIELDClient::~FIELDClient");
+//  s = IOR_Field->getComponentsDescriptions();
+//  for (int i=0; i<nc; i++)
+//    _s[i] = s[i];
+//  F->setComponentsDescriptions(_s);
 
-  END_OF("FIELDClient::~FIELDClient");
-}
+  F->setIterationNumber(IOR_Field->getIterationNumber());
+  F->setTime(IOR_Field->getTime());
+  F->setOrderNumber(IOR_Field->getOrderNumber());
+
+  FIELDClient_value(F, IOR_Field);
+
+  END_OF("FIELDClient<T>");
+  return F;
 }
 
 #endif

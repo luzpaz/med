@@ -50,6 +50,10 @@ public:
 
   void initWithFieldType(SALOMEDS::Study_ptr myStudy, driverTypes driverType, const string & fileName); // Same method as above but with storage of fields with their type
 
+  void addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
+		  const char * medObjName)
+    throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
+
     // IDL Methods 
     CORBA::Long 	    getNumberOfMeshes() throw (SALOME::SALOME_Exception);
     CORBA::Long 	    getNumberOfFields() throw (SALOME::SALOME_Exception);
@@ -59,6 +63,10 @@ public:
 						throw (SALOME::SALOME_Exception);
     SALOME_MED::MESH_ptr    getMesh(SALOME_MED::FIELD_ptr fieldPtr) 
 						throw (SALOME::SALOME_Exception);
+    CORBA::Long getFieldNumberOfIteration(const char* fieldName) 
+      throw (SALOME::SALOME_Exception);
+    SALOME_MED::long_array * getFieldIteration(const char* fieldName, CORBA::Long i) 
+      throw (SALOME::SALOME_Exception);
     SALOME_MED::FIELD_ptr   getField(const char* fieldName,
 				     CORBA::Long pasTemps, 
                                      CORBA::Long numOrdre) 

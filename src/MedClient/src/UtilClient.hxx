@@ -90,14 +90,14 @@ template <typename TCorba,
 	  typename TLocal,
 	  typename TCorbaSeq,
 	  typename TInfo>
-inline void convertCorbaArray (vector<TLocal> & T, int &nT, 
+inline void convertCorbaArray (vector<TLocal> & T, 
 			       const TCorbaSeq & S,
 			       void *f, TInfo M)
 {
   int i, n = S->length();
   SCRUTE(n);
 
-  nT = n;
+  int nT = n;
   T.resize(nT);
 
   typedef TLocal (*pfn) (const TCorba & , TInfo);

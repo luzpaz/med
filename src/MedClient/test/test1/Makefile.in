@@ -33,7 +33,7 @@ VPATH=.:@srcdir@:@top_srcdir@/bin:@top_srcdir@/resources:@srcdir@/resources:@top
 @COMMENCE@
 
 RESOURCES_FILES = \
-	CatalogModuleTest.xml
+	Compo1PyCatalog.xml
 
 EXPORT_PYSCRIPTS = Compo1.py  Compo1Py.py \
 	${patsubst ${srcdir}/%, %, ${wildcard ${srcdir}/TestMedCorba*.py} } 

@@ -241,7 +241,7 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for a specific coordinate
  */
 //=============================================================================
-double MESH_i::getCoordinate(CORBA::Long Number, CORBA::Long Axis)
+CORBA::Double MESH_i::getCoordinate(CORBA::Long Number, CORBA::Long Axis)
 throw (SALOME::SALOME_Exception)
 {
         if (_mesh==NULL)
@@ -1318,17 +1318,26 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
 
  	// Create SObject labelled 'MESH' if it doesn't already exit
-	SALOMEDS::SObject_var medmeshfather = myStudy->FindObject("MEDMESH");
-  	if ( CORBA::is_nil(medmeshfather) ) 
-	{
-    		MESSAGE("Add Object MEDMESH");
-    		medmeshfather = myBuilder->NewObject(medfather);
-		//medmeshfather.Name = "MEDMESH" ;
-                anAttr = myBuilder->FindOrCreateAttribute(medmeshfather, "AttributeName");
-                aName = SALOMEDS::AttributeName::_narrow(anAttr);
-                aName->SetValue("MEDMESH");
+// 	SALOMEDS::SObject_var medmeshfather = myStudy->FindObject("MEDMESH");
+//   	if ( CORBA::is_nil(medmeshfather) ) 
+// 	{
+//     		MESSAGE("Add Object MEDMESH");
+//     		medmeshfather = myBuilder->NewObject(medfather);
+// 		//medmeshfather.Name = "MEDMESH" ;
+//                 anAttr = myBuilder->FindOrCreateAttribute(medmeshfather, "AttributeName");
+//                 aName = SALOMEDS::AttributeName::_narrow(anAttr);
+//                 aName->SetValue("MEDMESH");
 
-  	} ;
+//   	} ;
+
+	SALOMEDS::SObject_var medmeshfather = myStudy->FindObjectByPath("/Med/MEDMESH");
+  	if ( CORBA::is_nil(medmeshfather) ) 
+	  {
+	    MESSAGE("Add Object MEDMESH");
+
+	    myBuilder->AddDirectory("/Med/MEDMESH");
+            medmeshfather = myStudy->FindObjectByPath("/Med/MEDMESH");
+	  } ;
 
    	MESSAGE("Add a mesh Object under MED/MEDMESH");
   	SALOMEDS::SObject_var newObj = myBuilder->NewObject(medmeshfather);

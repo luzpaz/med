@@ -49,6 +49,7 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
 
   int numberOfFamilies = families.size();
   _name = name ;
+  _description = "GROUP";
   // description : none !
   // first FAMILY to set all !
   FAMILY * myFamily = families.front() ;
@@ -92,13 +93,39 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   }
   _isOnAllElts = false ;
   //_totalNumberOfEntities = myFamily->getNumberOfElements(MED_ALL_ELEMENTS) ;
-  _number = new MEDSKYLINEARRAY(*myFamily->getnumber()) ;
+
+
+  MEDSKYLINEARRAY * famNumber = myFamily->getnumber();
+
+  const int * famNumberValue = myFamily->getNumber(MED_ALL_ELEMENTS);
+
+  const int * famNumberIndex = myFamily->getNumberIndex();
+
+  int famNumberCount = famNumber->getNumberOf();
+  int famNumberLength = famNumber->getLength();
+
+  SCRUTE(famNumber);
+  SCRUTE(famNumberCount);
+  SCRUTE(famNumberLength);
+  SCRUTE(famNumberValue);
+  SCRUTE(famNumberIndex);
+
+//   _number = new MEDSKYLINEARRAY(*famNumber) ;
+  _number = new MEDSKYLINEARRAY(famNumberCount,famNumberLength,
+				famNumberIndex,famNumberValue) ;
+
+  SCRUTE(_number);
 
   _numberOfFamilies = families.size();
+
+  SCRUTE(numberOfFamilies);
+
+  //SCRUTE(_numberOfFamilies);
+
   _family.resize(_numberOfFamilies) ;
   list<FAMILY*>::const_iterator li ;
 
-  MESSAGE(LOC<<"Printing of the object GROUP built right before the blending"<< (SUPPORT) *this);
+  // MESSAGE(LOC<<"Printing of the object GROUP built right before the blending"<< (SUPPORT) *this);
 
 
   int it = 0 ;
@@ -108,7 +135,7 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
     it++ ;
   }
 
-  MESSAGE(LOC<<"Printing of the object GROUP built "<< (GROUP)*this);
+  //MESSAGE(LOC<<"Printing of the object GROUP built "<< (GROUP)*this);
 
   END_OF(LOC);
 };

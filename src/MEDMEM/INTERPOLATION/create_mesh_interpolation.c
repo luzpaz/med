@@ -18,7 +18,7 @@ void affiche_noeuds(med_float * nodes,int nnpl)
 	int nbr_nodes=nnpl*nnpl*nnpl;
 	int i;
 
-	for (i=0;i<nbr_nodes;i++) printf("Noeud %d : ( %4.5f ; %4.5f ; %4.5f )\n",i+1,nodes[3*i],nodes[3*i+1],nodes[3*i+2]);
+	for (i=0;i<nbr_nodes;i++) printf("Noeud %d : ( %4.5f ; %4.5f ; %4.5f )\n",i,nodes[3*i],nodes[3*i+1],nodes[3*i+2]);
 	
 	}
 
@@ -53,9 +53,9 @@ void cree_num_nodes(med_int * num_nodes,int nnpl)
 	int nbr_nodes=nnpl*nnpl*nnpl;
 	int i;
 	/*num_nodes=(med_int *) malloc(nbr_nodes*sizeof(med_int));*/
-	for (i=0;i<nbr_nodes;i++) num_nodes[i]=i+1;
+	for (i=0;i<nbr_nodes;i++) num_nodes[i]=i+1;//nbr_nodes+i;
 	}
-void cree_Hexa8(med_int * conn_hexa8, int nnpl)
+void cree_Hexa8(med_int * conn_hexa8, int nnpl,med_int * num_nodes)
 	{
 	int i,j,k;
 	int i0,j0,k0,i1,j1,k1;
@@ -72,8 +72,6 @@ void cree_Hexa8(med_int * conn_hexa8, int nnpl)
 		
 		num_hexa8=i+(nnpl-1)*j+(nnpl-1)*(nnpl-1)*k;
 		
-		printf("Maille numéro %4d :",num_hexa8);
-		
 		if (8*num_hexa8  >=8*nbr_hexa8) {printf("%d : OUT OF RANGE REQUEST\n",num_hexa8);exit(-1);}
 		if (8*num_hexa8+1>=8*nbr_hexa8) {printf("%d : OUT OF RANGE REQUEST\n",num_hexa8);exit(-1);}
 		if (8*num_hexa8+2>=8*nbr_hexa8) {printf("%d : OUT OF RANGE REQUEST\n",num_hexa8);exit(-1);}
@@ -83,15 +81,29 @@ void cree_Hexa8(med_int * conn_hexa8, int nnpl)
 		if (8*num_hexa8+6>=8*nbr_hexa8) {printf("%d : OUT OF RANGE REQUEST\n",num_hexa8);exit(-1);}
 		if (8*num_hexa8+7>=8*nbr_hexa8) {printf("%d : OUT OF RANGE REQUEST\n",num_hexa8);exit(-1);}
 		
-		conn_hexa8[8*num_hexa8  ] = 1 + i0+nnpl*j1+nnpl*nnpl*k1 ; printf("%4d ",1+i0+nnpl*j1+nnpl*nnpl*k1);
-		conn_hexa8[8*num_hexa8+1] = 1 + i0+nnpl*j0+nnpl*nnpl*k1 ; printf("%4d ",1+i0+nnpl*j0+nnpl*nnpl*k1);
-		conn_hexa8[8*num_hexa8+2] = 1 + i1+nnpl*j0+nnpl*nnpl*k1 ; printf("%4d ",1+i1+nnpl*j0+nnpl*nnpl*k1);
-		conn_hexa8[8*num_hexa8+3] = 1 + i1+nnpl*j1+nnpl*nnpl*k1 ; printf("%4d ",1+i1+nnpl*j1+nnpl*nnpl*k1);
-		conn_hexa8[8*num_hexa8+4] = 1 + i0+nnpl*j1+nnpl*nnpl*k0 ; printf("%4d ",1+i0+nnpl*j1+nnpl*nnpl*k0);
-		conn_hexa8[8*num_hexa8+5] = 1 + i0+nnpl*j0+nnpl*nnpl*k0 ; printf("%4d ",1+i0+nnpl*j0+nnpl*nnpl*k0);
-		conn_hexa8[8*num_hexa8+6] = 1 + i1+nnpl*j0+nnpl*nnpl*k0 ; printf("%4d ",1+i1+nnpl*j0+nnpl*nnpl*k0);
-		conn_hexa8[8*num_hexa8+7] = 1 + i1+nnpl*j1+nnpl*nnpl*k0 ; printf("%4d ",1+i1+nnpl*j1+nnpl*nnpl*k0);
+		conn_hexa8[8*num_hexa8  ] = num_nodes[ i0+nnpl*j1+nnpl*nnpl*k1 ]; 
+		conn_hexa8[8*num_hexa8+1] = num_nodes[ i0+nnpl*j0+nnpl*nnpl*k1 ]; 
+		conn_hexa8[8*num_hexa8+2] = num_nodes[ i1+nnpl*j0+nnpl*nnpl*k1 ]; 
+		conn_hexa8[8*num_hexa8+3] = num_nodes[ i1+nnpl*j1+nnpl*nnpl*k1 ]; 
+		conn_hexa8[8*num_hexa8+4] = num_nodes[ i0+nnpl*j1+nnpl*nnpl*k0 ]; 
+		conn_hexa8[8*num_hexa8+5] = num_nodes[ i0+nnpl*j0+nnpl*nnpl*k0 ]; 
+		conn_hexa8[8*num_hexa8+6] = num_nodes[ i1+nnpl*j0+nnpl*nnpl*k0 ]; 
+		conn_hexa8[8*num_hexa8+7] = num_nodes[ i1+nnpl*j1+nnpl*nnpl*k0 ]; 
 		
+		
+		}
+		
+	for (num_hexa8=0;num_hexa8<nbr_hexa8;num_hexa8++)
+		{		
+		printf("Maille numéro %4d :",num_hexa8);		
+		printf("%4d ",conn_hexa8[8*num_hexa8  ]);
+		printf("%4d ",conn_hexa8[8*num_hexa8+1]);
+		printf("%4d ",conn_hexa8[8*num_hexa8+2]);
+		printf("%4d ",conn_hexa8[8*num_hexa8+3]);
+		printf("%4d ",conn_hexa8[8*num_hexa8+4]);
+		printf("%4d ",conn_hexa8[8*num_hexa8+5]);
+		printf("%4d ",conn_hexa8[8*num_hexa8+6]);
+		printf("%4d ",conn_hexa8[8*num_hexa8+7]);
 		printf("\n");
 		}
 	}	
@@ -140,7 +152,7 @@ void cree_valeurs_champ_node(med_float * val,int nnpl)
 	int i,j,k;
 	int nbr_nodes=nnpl*nnpl*nnpl;
 	int num_noeud;
-	int diviseur=nnpl-1;
+	int diviseur=3*(nnpl-1);
 	
 	/*val=(med_float *) malloc(nbr_nodes*sizeof(med_float));*/
 	
@@ -149,24 +161,58 @@ void cree_valeurs_champ_node(med_float * val,int nnpl)
 		num_noeud=i+nnpl*j+nnpl*nnpl*k;
 		val[num_noeud] = (med_float) (i+j+k)/diviseur;
 		}
+	for (num_noeud=0;num_noeud<nbr_nodes;num_noeud++) printf("Valeur Scalaire noeud %5d : %4.5f\n",num_noeud,val[num_noeud]);
 	}
-void cree_valeurs_champ_vector_cell(med_float * val,int nnpl)
+void cree_valeurs_champ_vector_node(med_float * val,int nnpl)
+	{
+	int i,j,k;
+	int nbr_nodes=nnpl*nnpl*nnpl;
+	int num_noeud;
+	
+	/*val=(med_float *) malloc(nbr_nodes*sizeof(med_float));*/
+	
+	for (i=0;i<nnpl;i++) for (j=0;j<nnpl;j++) for (k=0;k<nnpl;k++) 
+		{
+		num_noeud=i+nnpl*j+nnpl*nnpl*k;
+		val[3*num_noeud  ] = (med_float) 0;
+		val[3*num_noeud+1] = (med_float) 1;
+		val[3*num_noeud+2] = (med_float) 2;
+		}
+	for (num_noeud=0;num_noeud<nbr_nodes;num_noeud++) printf("Valeur Vectorielle noeud %5d : %4.5f %4.5f %4.5f \n ",num_noeud,val[3*num_noeud],val[3*num_noeud+1],val[3*num_noeud+2]);
+	}
+void cree_valeurs_champ_cell(med_float * val,int nnpl)
 	{
 	int i,j,k;
 	int nbr_cells=(nnpl-1)*(nnpl-1)*(nnpl-1);	
 	int num_cell;
 	
-	int diviseur=nnpl-1;
+	med_float diviseur=3*(nnpl-2);
 	
 	/*val=(med_float *) malloc(3*nbr_cells*sizeof(med_float));*/
 	
 	for (i=0;i<nnpl-1;i++) for (j=0;j<nnpl-1;j++) for (k=0;k<nnpl-1;k++) 
 		{
 		num_cell=i+(nnpl-1)*j+(nnpl-1)*(nnpl-1)*k;
-		val[3*num_cell  ] = (med_float) i/diviseur;
-		val[3*num_cell+1] = (med_float) j/diviseur;
-		val[3*num_cell+2] = (med_float) k/diviseur;
+		val[num_cell  ] =  (med_float) (i+j+k)/diviseur;
 		}
+	for (num_cell=0;num_cell<nbr_cells;num_cell++) printf("Valeur scalaire maille %5d : %4.5f\n ",num_cell,val[num_cell]);
+	}	
+void cree_valeurs_champ_vector_cell(med_float * val,int nnpl)
+	{
+	int i,j,k;
+	int nbr_cells=(nnpl-1)*(nnpl-1)*(nnpl-1);	
+	int num_cell;
+	
+	/*val=(med_float *) malloc(3*nbr_cells*sizeof(med_float));*/
+	
+	for (i=0;i<nnpl-1;i++) for (j=0;j<nnpl-1;j++) for (k=0;k<nnpl-1;k++) 
+		{
+		num_cell=i+(nnpl-1)*j+(nnpl-1)*(nnpl-1)*k;
+		val[3*num_cell  ] = (med_float) 0;
+		val[3*num_cell+1] = (med_float) 1;
+		val[3*num_cell+2] = (med_float) 2; 	   
+		}
+	for (num_cell=0;num_cell<nbr_cells;num_cell++) printf("Valeur Vectorielle maille %5d : %4.5f %4.5f %4.5f \n ",num_cell,val[3*num_cell],val[3*num_cell+1],val[3*num_cell+2]);
 	}
 
 	
@@ -239,13 +285,23 @@ int main (int argc, char **argv)
 	/* Some fields : one on nodes : double , one on cells : double */
 
 	char champnode[MED_TAILLE_NOM+1]="fieldnodedouble" ;
-	char champnode_comp[MED_TAILLE_PNOM+1]="comp1   " ;
-	char champnode_unit[MED_TAILLE_PNOM+1]="J       " ;
+	char champnode_comp[MED_TAILLE_PNOM+1]="X+Y+Z   " ;
+	char champnode_unit[MED_TAILLE_PNOM+1]="X+Y+Z   " ;
 	med_float   * fieldnodedouble;
 
+	char champnodevector[MED_TAILLE_NOM+1]="fieldnodedoublevector" ;
+	char champnodevector_comp[MED_TAILLE_PNOM*3+1]="0	1	2	" ;
+	char champnodevector_unit[MED_TAILLE_PNOM*3+1]="O	1	2	" ;
+	med_float   * fieldnodedoublevector;
+
+	char champcellscalar[MED_TAILLE_NOM+1]="fieldcelldouble" ;
+	char champcellscalar_comp[MED_TAILLE_PNOM+1]="X+Y+Z   " ;
+	char champcellscalar_unit[MED_TAILLE_PNOM+1]="X+Y+Z   " ;
+	med_float   * fieldcelldouble;
+
 	char champcell[MED_TAILLE_NOM+1]="fieldcelldoublevector" ;
-	char champcell_comp[MED_TAILLE_PNOM*3+1]="comp1   comp2   comp3   " ;
-	char champcell_unit[MED_TAILLE_PNOM*3+1]="m/s     m/s     m/s     " ;
+	char champcell_comp[MED_TAILLE_PNOM*3+1]="0       1       2       " ;
+	char champcell_unit[MED_TAILLE_PNOM*3+1]="0       1       2       " ;
 	med_float   * fieldcelldoublevector;
 
 /*****************************************************************************************************/
@@ -259,6 +315,7 @@ int main (int argc, char **argv)
 
 	sscanf(argv[1],"%d",&nnpl);
 	
+	printf("VERSION 2.0\n");
 	printf("Traitement avec %d noeuds par ligne\n",nnpl);
 
 	fromnnoe   = nnpl*nnpl*nnpl             ;
@@ -274,13 +331,16 @@ int main (int argc, char **argv)
 	fromcoo       = (med_float *) malloc(3*nbr_nodes*sizeof(med_float));		  cree_nodes	    ( fromcoo	    , nnpl, 0 );
 	fromnumnoe    = (med_int *)   malloc(nbr_nodes*sizeof(med_int));		  cree_num_nodes    ( fromnumnoe    , nnpl );
 	fromnufano    = (med_int *)   malloc(nbr_nodes*sizeof(med_int));		  cree_fam_nodes    ( fromnufano    , nnpl );
-	fromhexa8     = (med_int *)   malloc(8*nbr_hexa8*sizeof(med_int));		  cree_Hexa8	    ( fromhexa8     , nnpl );
+	fromhexa8     = (med_int *)   malloc(8*nbr_hexa8*sizeof(med_int));		  cree_Hexa8	    ( fromhexa8     , nnpl ,fromnumnoe);
 	fromnomhexa8  = (char *)      malloc((nbr_hexa8*MED_TAILLE_PNOM+1)*sizeof(char)); cree_noms_mailles ( fromnomhexa8  , nnpl );
 	fromnumhexa8  = (med_int *)   malloc(nbr_hexa8*sizeof(med_int));		  cree_num_mailles  ( fromnumhexa8  , nnpl );
 	fromnufahexa8 = (med_int *)   malloc(nbr_hexa8*sizeof(med_int));		  cree_fam_mailles  ( fromnufahexa8 , nnpl );
 
 	fieldnodedouble       = (med_float *) malloc(nbr_nodes*sizeof(med_float));	    cree_valeurs_champ_node	   ( fieldnodedouble	   , nnpl );
+	fieldnodedoublevector = (med_float *) malloc(3*nbr_nodes*sizeof(med_float));	    cree_valeurs_champ_vector_node ( fieldnodedoublevector , nnpl );
+	fieldcelldouble       = (med_float *) malloc(nbr_hexa8*sizeof(med_float));	    cree_valeurs_champ_cell	   ( fieldcelldouble	   , nnpl );
 	fieldcelldoublevector = (med_float *) malloc(3*nbr_hexa8*sizeof(med_float));	    cree_valeurs_champ_vector_cell ( fieldcelldoublevector , nnpl );
+	
 
 	nbr_nodes=(nnpl-1)*(nnpl-1)*(nnpl-1);
 	nbr_hexa8=(nnpl-2)*(nnpl-2)*(nnpl-2);
@@ -288,7 +348,7 @@ int main (int argc, char **argv)
 	tocoo       = (med_float *) malloc(3*nbr_nodes*sizeof(med_float));	        cree_nodes	  ( tocoo       , nnpl-1, 1 );
 	tonumnoe    = (med_int *)   malloc(nbr_nodes*sizeof(med_int)); 		        cree_num_nodes    ( tonumnoe    , nnpl-1 );
 	tonufano    = (med_int *)   malloc(nbr_nodes*sizeof(med_int)); 		        cree_fam_nodes    ( tonufano    , nnpl-1 );
-	tohexa8     = (med_int *)   malloc(8*nbr_hexa8*sizeof(med_int));		cree_Hexa8	  ( tohexa8     , nnpl-1 );
+	tohexa8     = (med_int *)   malloc(8*nbr_hexa8*sizeof(med_int));		cree_Hexa8	  ( tohexa8     , nnpl-1 ,tonumnoe);
 	tonomhexa8  = (char *)      malloc((nbr_hexa8*MED_TAILLE_PNOM+1)*sizeof(char)); cree_noms_mailles ( tonomhexa8  , nnpl-1 );
 	tonumhexa8  = (med_int *)   malloc(nbr_hexa8*sizeof(med_int)); 		        cree_num_mailles  ( tonumhexa8  , nnpl-1 );
 	tonufahexa8 = (med_int *)   malloc(nbr_hexa8*sizeof(med_int)); 		        cree_fam_mailles  ( tonufahexa8 , nnpl-1 );
@@ -323,14 +383,16 @@ int main (int argc, char **argv)
 /*****************************************************************************************************/
 	if (ret == 0)
   		ret = MEDnoeudsEcr(fromfid,frommaa,mdim,fromcoo,MED_FULL_INTERLACE,MED_CART,
-        			     nomcoo,unicoo,nomnoe,MED_FAUX,fromnumnoe,MED_VRAI,
+        			     // nomcoo,unicoo,nomnoe,MED_FAUX,fromnumnoe,MED_VRAI,
+				     nomcoo,unicoo,nomnoe,MED_FAUX,fromnumnoe,MED_FAUX,
 	        		     fromnufano,fromnnoe,MED_ECRI);
 	printf("MEDnoeudsEcr : %d\n",ret);
 /*****************************************************************************************************/
 
 	if (ret == 0)
   		ret = MEDnoeudsEcr(tofid,tomaa,mdim,tocoo,MED_FULL_INTERLACE,MED_CART,
-        			     nomcoo,unicoo,nomnoe,MED_FAUX,tonumnoe,MED_VRAI,
+        			     //nomcoo,unicoo,nomnoe,MED_FAUX,tonumnoe,MED_VRAI,
+				     nomcoo,unicoo,nomnoe,MED_FAUX,tonumnoe,MED_FAUX,
 	        		     tonufano,tonnoe,MED_ECRI);
 	printf("MEDnoeudsEcr : %d\n",ret);
 
@@ -399,7 +461,7 @@ int main (int argc, char **argv)
     		if (ret == 0) 
 			{
       			ret = MEDchampEcr(fromfid, frommaa, champnode, (unsigned char *)fieldnodedouble,
-        					MED_NO_INTERLACE, fromnnoe,
+        					MED_FULL_INTERLACE, fromnnoe,
         					MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_NOEUD, 
         					0, MED_NOPDT,"        ", 0. , MED_NONOR);
       			printf("MEDchampEcr : %d \n",ret);
@@ -413,9 +475,37 @@ int main (int argc, char **argv)
     		if (ret == 0) 
 			{
       			ret = MEDchampEcr(fromfid, frommaa, champcell, (unsigned char *)fieldcelldoublevector,
-        					MED_NO_INTERLACE, fromnhexa8,
+        					MED_FULL_INTERLACE, fromnhexa8,
         					MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_MAILLE, 
         					MED_HEXA8, MED_NOPDT,"        ", 0., MED_NONOR);
+      			printf("MEDchampEcr : %d \n",ret);
+    			}
+  		}
+
+	if (ret == 0)
+  		{
+		ret = MEDchampCr(fromfid,champcellscalar,MED_REEL64,champcellscalar_comp,champcellscalar_unit,1); 
+		printf("MEDchampCr : %d \n",ret); 
+    		if (ret == 0) 
+			{
+      			ret = MEDchampEcr(fromfid, frommaa, champcellscalar, (unsigned char *)fieldcelldouble,
+        					MED_FULL_INTERLACE, fromnhexa8,
+        					MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_MAILLE, 
+        					MED_HEXA8, MED_NOPDT,"        ", 0., MED_NONOR);
+      			printf("MEDchampEcr : %d \n",ret);
+    			}
+  		}
+
+	if (ret == 0)
+  		{
+    		ret = MEDchampCr(fromfid,champnodevector,MED_REEL64,champnodevector_comp,champnodevector_unit,3);
+    		printf("MEDchampCr : %d \n",ret);
+    		if (ret == 0) 
+			{
+      			ret = MEDchampEcr(fromfid, frommaa, champnodevector, (unsigned char *)fieldnodedoublevector,
+        					MED_FULL_INTERLACE, fromnnoe,
+        					MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_NOEUD, 
+        					0, MED_NOPDT,"        ", 0. , MED_NONOR);
       			printf("MEDchampEcr : %d \n",ret);
     			}
   		}

@@ -293,22 +293,18 @@ void MESHING::addGroup(const GROUP & Group)
   switch(Group.getEntity()){
   case MED_CELL : {
     _groupCell.push_back(myGroup);
-    _numberOfCellsGroups++;
     break;
   }
   case MED_FACE : {
      _groupFace.push_back(myGroup);
-    _numberOfFacesGroups++;
     break;
   }
   case MED_EDGE : {
      _groupEdge.push_back(myGroup);
-    _numberOfEdgesGroups++;
     break;
   }
   case MED_NODE : {
      _groupNode.push_back(myGroup);
-    _numberOfNodesGroups++;
     break;
   }
   default :

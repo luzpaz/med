@@ -5,6 +5,8 @@
 #include "SUPPORTClient.hxx"
 #include "FIELDClient.hxx"
 #include CORBA_CLIENT_HEADER(MED)
+#define FIELDDOUBLEClient FIELDClient<double>
+#define FIELDINTClient FIELDClient<int>
 %}
 
 %include "libMedCorba_Swig.i"
@@ -28,23 +30,17 @@ class SUPPORTClient : public SUPPORT {
 
   SUPPORTClient(const SALOME_MED::SUPPORT_ptr S, 
 		MESH * M = NULL);
-  ~SUPPORTClient();
+  virtual ~SUPPORTClient();
 
   void blankCopy();
   void fillCopy();
 
 };
 
-template<typename T>
-class FIELDClient : public FIELD<T> {
+%rename(FIELDDOUBLEClient) FIELDClient<double>;
+FIELDDOUBLE * FIELDDOUBLEClient(const SALOME_MED::FIELDDOUBLE_ptr IOR_Field, 
+				SUPPORT * S = NULL);
 
- public:
-
-  FIELDClient(const SALOME_MED::FIELD_ptr S, 
-		MESH * M = NULL);
-  ~FIELDClient();
-
-  void blankCopy();
-  void fillCopy();
-
-};
+%rename(FIELDINTClient) FIELDClient<int>;
+FIELDDOUBLE * FIELDINTClient   (const SALOME_MED::FIELDINT_ptr IOR_Field, 
+				SUPPORT * S = NULL);

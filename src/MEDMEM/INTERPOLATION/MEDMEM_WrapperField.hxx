@@ -17,6 +17,9 @@
 /*                                                       */
 /*********************************************************/
 
+// permet de faire des opérations algébriques sur des Wrappers_MED_Field sans faire d'allocations inutiles
+// voir les articles de Valdhuizen pour la compréhension du processus
+
 template <class TYPE> class Valeur;
 
 struct Plus 
@@ -96,6 +99,8 @@ return X< double,Multiply,X<Left,Op,Right> >(((double) 1/x),l);
 /*********************************************************/
 
 // Problèmes : les constructeurs par copie ne sont pas satisfaisants
+// Valeur est symboliquement l'argument d'une classe formelle Vecteur<Valeur>
+// elle peut etre un réel ou un pointeur sur réel, simulant un vecteur de vecteur
 
 template <class TYPE> class Valeur
 {
@@ -139,21 +144,31 @@ public :
 	~Valeur(){if (a_detruire) delete [] valeurs;}
 	TYPE operator[](int i){return valeurs[i];}
 	int SIZE() const {return nbr_valeurs;}
+	double NormeAbs()
+		{
+		int i;
+		double tmp=0;
+		for (i=0;i<nbr_valeurs;i++) tmp+=fabs(valeurs[i]);
+		return tmp;
+		}
+
 };
 
 template <class TYPE> ostream &operator<<(ostream &os,Valeur<TYPE> v)
-{
-os<<"("<<flush;
-for (int i=0;i<v.SIZE();i++) os<<" "<<v[i]<<flush;
-os<<" ) "<<flush;
-return os;
-}
+	{	
+	os<<"("<<flush;
+	for (int i=0;i<v.SIZE();i++) os<<" "<<v[i]<<flush;
+	os<<" ) "<<flush;
+	return os;
+	}
 
 /*********************************************************/
 /*                                                       */
 /*               Classe Wrapper_MED_Field                */
 /*                                                       */
 /*********************************************************/
+
+// c'est la classe de Wrapping sur un objet FIELD<double> MEDMEMOIRE
 
 class Wrapper_MED_Field
 {
@@ -175,15 +190,6 @@ public :
 	~Wrapper_MED_Field(){}
 	inline Valeur<double> operator[](int i) 
 		{
-		if ((i<0)||(i>=nbr_valeurs))
-			{
-			cerr<<endl;
-			cerr<<"Outbound call dans Wrapper MED Field"<<endl;
-			cerr<<"Inférior Bound = "<<0<<endl;
-			cerr<<"Supérior Bound = "<<nbr_valeurs-1<<endl;
-			cerr<<"Call = "<<i<<endl;
-			exit(-1);
-			}
 		return Valeur<double>(&valeurs[nbr_composantes*i],nbr_composantes);
 		}
 	double * Get_Valeurs() {return valeurs;}

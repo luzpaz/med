@@ -867,14 +867,43 @@ Internal Corba method.
   // MED interface
 
   interface MED {
-
-
+    /*!
+      returns the number of meshes in the %MED object.
+     */
     long                   getNumberOfMeshes () raises (SALOME::SALOME_Exception);       
+    /*!
+      returns the number of fields in the %MED object.
+     */
     long                   getNumberOfFields () raises (SALOME::SALOME_Exception);
+    /*!
+      returns an array which contains the name of each meshes in the %MED object.
+     */
     SALOME_MED::string_array  getMeshNames      () raises (SALOME::SALOME_Exception);
+    /*!
+      returns an array which contains the name of each fields in the %MED object.
+     */
     SALOME_MED::string_array  getFieldNames     () raises (SALOME::SALOME_Exception);
+    /*!
+      giving a mesh name, it returns the corresponding %MESH pointer.
+     */
     MESH                   getMeshByName     ( in string  meshName)  raises (SALOME::SALOME_Exception);
+    /*!
+      giving a %FIELD pointer, it returns the corresponding %MESH pointer of the mesh
+      on which the field lies.
+     */
     MESH                   getMesh           ( in FIELD  fieldPtr)   raises (SALOME::SALOME_Exception);
+    /*!
+      giving a field name, it returns the number of iteration in the corresponding %FIELD object.
+     */
+    long getFieldNumberOfIteration(in string fieldName) raises (SALOME::SALOME_Exception);
+    /*!
+      giving a field name and an integer %i, it returns a couple of integers: the time iteration and
+      the order number of the %i^th iteration of the corresponding %FIELD object.
+     */
+    SALOME_MED::long_array  getFieldIteration(in string fieldName, in long i) raises (SALOME::SALOME_Exception);
+    /*!
+      giving a field name, a time iteration and an order number, it returns the corresponding %FIELD oject.
+     */
     FIELD                  getField          ( in string fieldName, 
 					       in long pasTemps,
 					       in long numOrdre )    raises (SALOME::SALOME_Exception);

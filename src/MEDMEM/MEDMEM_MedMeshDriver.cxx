@@ -166,7 +166,6 @@ void MED_MESH_RDONLY_DRIVER::read(void)
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY when the mesh is a grid")) ;
 
 	  buildAllGroups(_ptrMesh->_groupNode,_ptrMesh->_familyNode) ;
-	  _ptrMesh->_numberOfNodesGroups = _ptrMesh->_groupNode.size() ;
 	}
 
       END_OF(LOC);
@@ -187,16 +186,12 @@ void MED_MESH_RDONLY_DRIVER::read(void)
   // we build all groups
   // on node
   buildAllGroups(_ptrMesh->_groupNode,_ptrMesh->_familyNode) ;
-  _ptrMesh->_numberOfNodesGroups = _ptrMesh->_groupNode.size() ;
   // on cell
   buildAllGroups(_ptrMesh->_groupCell,_ptrMesh->_familyCell) ;
-  _ptrMesh->_numberOfCellsGroups = _ptrMesh->_groupCell.size() ;
   // on face
   buildAllGroups(_ptrMesh->_groupFace,_ptrMesh->_familyFace) ;
-  _ptrMesh->_numberOfFacesGroups = _ptrMesh->_groupFace.size() ;
   // on edge
   buildAllGroups(_ptrMesh->_groupEdge,_ptrMesh->_familyEdge) ;
-  _ptrMesh->_numberOfEdgesGroups = _ptrMesh->_groupEdge.size() ;
 
 //   MESSAGE(LOC<<"Checking of CellModel !!!!!!!");
 
@@ -261,6 +256,9 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
   char * tmp_unit= (const_cast <char *> ( tmp_unit_coord.c_str()) ) ;
   
   // Read node coordinates for MED_BODY_FITTED grid
+
+  SCRUTE(ptrGrid->getGridType());
+
   if (ptrGrid->getGridType() == MED_EN::MED_BODY_FITTED)
     {
       // Read nb of nodes
@@ -280,19 +278,39 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
 					     MED_EN::MED_FULL_INTERLACE);
 
       // Read coordinates and families
-      double * coo = const_cast <double *>
-	(_ptrMesh->_coordinate->getCoordinates(MED_EN::MED_FULL_INTERLACE));
+//       double * coo = const_cast <double *>
+// 	(_ptrMesh->_coordinate->getCoordinates(MED_EN::MED_FULL_INTERLACE));
     
+//       err = MED_FR::MEDbodyFittedLire (_medIdt,
+// 				       const_cast <char *> (_ptrMesh->_name.c_str()),
+// 				       _ptrMesh->_spaceDimension,
+// 				       coo,
+// 				       MED_FR::MED_FULL_INTERLACE,
+// 				       & rep,
+// 				       tmp_nom,
+// 				       tmp_unit,
+// 				       MEDArrayNodeFamily,
+// 				       NumberOfNodes);
+
       err = MED_FR::MEDbodyFittedLire (_medIdt,
 				       const_cast <char *> (_ptrMesh->_name.c_str()),
 				       _ptrMesh->_spaceDimension,
-				       coo,
+				       const_cast <double *> ( _ptrMesh->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE) ),
 				       MED_FR::MED_FULL_INTERLACE,
 				       & rep,
 				       tmp_nom,
 				       tmp_unit,
 				       MEDArrayNodeFamily,
 				       NumberOfNodes);
+
+      MESSAGE(LOC << " NumberOfNodes = " << NumberOfNodes << " SpaceDimension = " << SpaceDimension);
+
+      ptrGrid->_is_coordinates_filled = true;
+
+//       for (int icoor = 0 ; icoor<NumberOfNodes ; icoor++)
+//  	for(int jcoor = 0 ; jcoor<SpaceDimension ; jcoor++)
+//  	  MESSAGE(LOC << " icoor = " << icoor << " jcoor = " << jcoor << " COOR = " << _ptrMesh->getCoordinates(MED_FULL_INTERLACE)[icoor*SpaceDimension+jcoor]);
+
       delete[] MEDArrayNodeFamily;
       if (err != MED_VALID)
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"error in MEDbodyFittedLire()"));
@@ -507,12 +525,27 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
       err=MEDnumLire(_medIdt,const_cast <char*> (_ptrMesh->_name.c_str()),
 		     tmp_node_number,NumberOfNodes,MED_FR::MED_NOEUD,(MED_FR::med_geometrie_element)0);
       if (err == MED_VALID) {
-        MESSAGE(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
-        MESSAGE(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have numbers but we do not take care of them !");
-        MESSAGE(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
+        // INFOS(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
+        // INFOS(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have numbers but we do not take care of them !");
+        // INFOS(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
+	MESSAGE(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : Nodes have numbers, we DO TAKE care of them !");
 	_ptrMesh->_coordinate->_nodeNumber.set(NumberOfNodes) ; 
 	memcpy((int*)_ptrMesh->_coordinate->_nodeNumber,tmp_node_number,sizeof(int)*NumberOfNodes) ;
+	
+	//////////////////////////////////////////////////////////////////////////////////////
+  	///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
+  	//////////////////////////////////////////////////////////////////////////////////////
+  	///
+	/// Calcule _optionnalToCanonicNodesNumbers de telle sorte que _optionnalToCanonicNodesNumbers[OptionnalNumber]==CanonicNumber
+	
+// 	_ptrMesh->_arePresentOptionnalNodesNumbers=1;
+//   	for (int canonicNumber=1;canonicNumber<=NumberOfNodes;canonicNumber++) _ptrMesh->_optionnalToCanonicNodesNumbers[tmp_node_number[canonicNumber-1]]=canonicNumber;
+// ICI RETOUR A LA NORMALE::: AUCUNE PRISE EN COMPTE D'UN NUMEROTATION OPTIONNEL
+	_ptrMesh->_arePresentOptionnalNodesNumbers=0;
       } 
+      else _ptrMesh->_arePresentOptionnalNodesNumbers=0;
+
+  	//////////////////////////////////////////////////////////////////////////////////////
 
       delete[] tmp_node_number ;
       
@@ -817,10 +850,34 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	    return MED_ERROR ;
 	  }
 
-	  int * ConnectivityArray = NodalValue + NodalIndex[Connectivity->_count[i]-1]-1 ;
-	  for ( j=0; j<tmp_numberOfCells; j++)
-	    for (int k=0; k<NumberOfNodeByCell; k++) 
-	      ConnectivityArray[j*NumberOfNodeByCell+k]=tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k] ;
+  	  int * ConnectivityArray = NodalValue + NodalIndex[Connectivity->_count[i]-1]-1 ;
+
+	 // version originale sans prise en compte des numéros optionnels
+	 //
+	  for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
+	    ConnectivityArray[j*NumberOfNodeByCell+k]=tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k] ;
+
+	//////////////////////////////////////////////////////////////////////////////////////
+  	///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
+  	//////////////////////////////////////////////////////////////////////////////////////
+  	///
+	/// Rénumérote le tableau temporaire tmp_ConnectivityArray en utilisant _optionnalToCanonicNodesNumbers
+	/// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
+	
+// 	if (_ptrMesh->_arePresentOptionnalNodesNumbers==1) 
+// 		{
+// 	 	for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
+// 	 		ConnectivityArray[j*NumberOfNodeByCell+k]=_ptrMesh->_optionnalToCanonicNodesNumbers[tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k]] ;
+// 		}
+// 	else
+// 		{
+// 	 	for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
+// 	 		ConnectivityArray[j*NumberOfNodeByCell+k]=tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k] ;
+// 		}
+  	
+	//////////////////////////////////////////////////////////////////////////////////////
+	
+	
 	  delete[] tmp_ConnectivityArray;
   
 	}
@@ -917,9 +974,32 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	  }
 
 	  int * constituentArray = NodalValue + NodalIndex[constituent->_count[i]-1]-1 ;
+	  
+	  // version originale sans prise en compte des numéros optionnels
+	  //	
 	  for (int j=0; j<tmp_numberOfFaces; j++)
 	    for (int k=0; k<NumberOfNodeByFace; k++)
 	      constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace+1)+k] ;
+
+	//////////////////////////////////////////////////////////////////////////////////////
+  	///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
+  	//////////////////////////////////////////////////////////////////////////////////////
+  	///
+	/// Rénumérote le tableau temporaire tmp_constituentArray en utilisant _optionnalToCanonicNodesNumbers
+	/// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
+	
+// 	if (_ptrMesh->_arePresentOptionnalNodesNumbers) 
+// 		{
+// 		for (int j=0; j<tmp_numberOfFaces; j++) for (int k=0; k<NumberOfNodeByFace; k++)
+// 			constituentArray[j*NumberOfNodeByFace+k]=_ptrMesh->_optionnalToCanonicNodesNumbers[tmp_constituentArray[j*(NumberOfNodeByFace+1)+k]] ;
+// 		}
+// 	else
+// 		{
+// 		for (int j=0; j<tmp_numberOfFaces; j++) for (int k=0; k<NumberOfNodeByFace; k++)
+// 			constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace+1)+k] ;
+// 		}
+  	
+	//////////////////////////////////////////////////////////////////////////////////////
 	  
 	  delete[] tmp_constituentArray;
 	}
@@ -1005,9 +1085,32 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	  }
 
 	  int * constituentArray = NodalValue + NodalIndex[constituent->_count[i]-1]-1 ;
+	  
+	  // version originale sans prise en compte des numéros optionnels	
+	  //
 	  for (int j=0; j<tmp_numberOfEdges; j++)
 	    for (int k=0; k<NumberOfNodeByEdge; k++)
 	      constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge+1)+k] ;
+
+	//////////////////////////////////////////////////////////////////////////////////////
+  	///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
+  	//////////////////////////////////////////////////////////////////////////////////////
+  	///
+	/// Rénumérote le tableau temporaire tmp_constituentArray en utilisant _optionnalToCanonicNodesNumbers
+	/// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
+	
+// 	if (_ptrMesh->_arePresentOptionnalNodesNumbers) 
+// 		{
+// 		for (int j=0; j<tmp_numberOfEdges; j++) for (int k=0; k<NumberOfNodeByEdge; k++)
+// 			constituentArray[j*NumberOfNodeByEdge+k]=_ptrMesh->_optionnalToCanonicNodesNumbers[tmp_constituentArray[j*(NumberOfNodeByEdge+1)+k]] ;
+// 		}
+// 	else
+// 		{
+// 		for (int j=0; j<tmp_numberOfEdges; j++) for (int k=0; k<NumberOfNodeByEdge; k++)
+// 			constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge+1)+k] ;
+// 		}
+  	
+	//////////////////////////////////////////////////////////////////////////////////////
 
 	  delete[] tmp_constituentArray;
 	}
@@ -1192,11 +1295,11 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
 	throw MEDEXCEPTION("MED_MESH_RDONLY_DRIVER::getFAMILY() : NumberOfGroups" );
       
       int FamilyIdentifier ;
-      string FamilyName(MED_TAILLE_NOM,' ');
+      string FamilyName(MED_TAILLE_NOM,'\0 ');
       int *  AttributesIdentifier = new int[NumberOfAttributes] ;
       int *  AttributesValues     = new int[NumberOfAttributes] ;
       string AttributesDescription(MED_TAILLE_DESC*NumberOfAttributes,' ') ;
-      string GroupsNames(MED_TAILLE_LNOM*NumberOfGroups+1,' ') ;
+      string GroupsNames(MED_TAILLE_LNOM*NumberOfGroups+1,'\0') ;
       err = MED_FR::MEDfamInfo(_medIdt,const_cast <char *> (_meshName.c_str()),
 			       i+1,const_cast <char *> (FamilyName.c_str()),
 			       &FamilyIdentifier,AttributesIdentifier,AttributesValues,
@@ -1204,6 +1307,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
 			       &NumberOfAttributes,
 			       const_cast <char *> (GroupsNames.c_str()),&NumberOfGroups
 		       );
+
 
       SCRUTE(GroupsNames);
       SCRUTE(FamilyName);
@@ -1224,6 +1328,12 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
 				     ) ;
 	// All good ?
 	// if nothing found, delete Family
+
+
+	//MESSAGE(LOC << " Well is that OK now ?? " << (*Family));
+
+
+
 	if (Family->getNumberOfTypes() == 0) {
 	  MESSAGE(LOC<<"Nothing found for family "<<FamilyName<< " : skip");
 	  delete Family;
@@ -1246,6 +1356,12 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
 	    numberOfEdgesFamilies++ ;
 	    break ;
 	  }
+
+	//	MESSAGE(LOC << (*Family));
+
+
+
+
       }
 
       delete [] AttributesIdentifier ;
@@ -1270,11 +1386,6 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
       delete[] MEDArrayEdgeFamily ;
     }
 
-    _ptrMesh->_numberOfNodesFamilies = numberOfNodesFamilies ;
-    _ptrMesh->_numberOfCellsFamilies = numberOfCellsFamilies ;
-    _ptrMesh->_numberOfFacesFamilies = numberOfFacesFamilies ;
-    _ptrMesh->_numberOfEdgesFamilies = numberOfEdgesFamilies ;
-    
     END_OF(LOC);
     return MED_VALID ;
   }
@@ -1727,6 +1838,29 @@ int MED_MESH_WRONLY_DRIVER::writeCoordinates() const {
 				 << "| and units |"       << tmp_unit
 				 << " |")) ;    
     
+
+       //////////////////////////////////////////////////////////////////////////////////////
+       ///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
+       //////////////////////////////////////////////////////////////////////////////////////
+       ///
+       /// Ecrit les numéros optionnels des noeuds
+       /// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
+
+
+      if (_ptrMesh->_arePresentOptionnalNodesNumbers==1) {
+        
+        err =  MEDnumEcr(_medIdt,const_cast <char *> (_meshName.c_str()),
+                         const_cast <med_int *> (_ptrMesh->_coordinate->getNodesNumbers() ), 
+                         _ptrMesh->_numberOfNodes, MED_FR::MED_REMP,
+                         MED_FR::MED_NOEUD, MED_FR::med_geometrie_element(0) );
+		
+
+        if (err<0) 
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write optionnal numbers of mesh |" << _meshName.c_str() 
+                                       << "| in file |" << _fileName  << " |")) ;    
+      }
+      //////////////////////////////////////////////////////////////////////////////////////
+
   END_OF(LOC);
     
   return MED_VALID;
@@ -1768,12 +1902,44 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const {
 	  multi=1 ;
       int numberOfNodes = types[i]%100 ;
       int * connectivityArray = new int[numberOfElements*(numberOfNodes+multi)];
-      for (int j=0 ; j<numberOfElements; j++) {
-	for (int k=0; k<numberOfNodes; k++)
-	  connectivityArray[j*(numberOfNodes+multi)+k]=connectivity[j*numberOfNodes+k] ;
-	if (multi>0)
-	  connectivityArray[j*(numberOfNodes+multi)+numberOfNodes]=0;
-      }
+      
+      // version originale sans prise en compte des numéros optionnels 
+      //     
+      for (int j=0 ; j<numberOfElements; j++) 
+       	{
+	  for (int k=0; k<numberOfNodes; k++)
+	    connectivityArray[j*(numberOfNodes+multi)+k]=connectivity[j*numberOfNodes+k] ;
+
+	  if (multi>0) connectivityArray[j*(numberOfNodes+multi)+numberOfNodes]=0;
+	}
+      
+      //////////////////////////////////////////////////////////////////////////////////////
+      ///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
+      //////////////////////////////////////////////////////////////////////////////////////
+      ///
+      /// Dénumérote les sommets des mailles pour leur rendre leurs numéros optionnels
+      /// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
+
+//  	if (_ptrMesh->_arePresentOptionnalNodesNumbers==1) 
+// 		{
+// 		const int * nodesNumbers = _ptrMesh->_coordinate->getNodesNumbers();
+//       		for (int j=0 ; j<numberOfElements; j++) 
+// 			{
+// 			for (int k=0; k<numberOfNodes; k++) connectivityArray[j*(numberOfNodes+multi)+k]=nodesNumbers[connectivity[j*numberOfNodes+k]-1] ;
+// 			if (multi>0) connectivityArray[j*(numberOfNodes+multi)+numberOfNodes]=0;
+// 			}
+// 		}
+// 	else
+// 		{
+//       		for (int j=0 ; j<numberOfElements; j++) 
+// 			{
+// 			for (int k=0; k<numberOfNodes; k++) connectivityArray[j*(numberOfNodes+multi)+k]=connectivity[j*numberOfNodes+k] ;
+// 			if (multi>0) connectivityArray[j*(numberOfNodes+multi)+numberOfNodes]=0;
+// 			}
+// 		}
+
+      //////////////////////////////////////////////////////////////////////////////////////
+      
       err = MEDconnEcr( _medIdt, const_cast <char *> ( _meshName.c_str()), _ptrMesh->_spaceDimension,
 			connectivityArray, MED_FR::MED_FULL_INTERLACE , numberOfElements,
 			MED_FR::MED_REMP,

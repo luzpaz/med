@@ -3,10 +3,18 @@
 
 #% Test structured mesh (GRID) reading from file test19.med
 #% test19.med can be obtained by running test19_c.out executable
+# or locally in MEDMEM directory create_grid
 
 from libMEDMEM_Swig import *
 
-medFile = "test19.med"
+import os
+#
+#befor running this script, please be sure about the path the file fileName
+#
+filePath=os.environ["MED_ROOT_DIR"]
+filePath=filePath+"/share/salome/resources/"
+
+medFile = filePath + "test19.med"
 print "Read file", medFile
 
 md = MED()

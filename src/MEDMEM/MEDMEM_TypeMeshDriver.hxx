@@ -11,7 +11,7 @@
 #include "MEDMEM_Exception.hxx"
 #include "utilities.h"
 
-using namesapce MEDMEM;
+using namespace MEDMEM;
 
 /*!
 

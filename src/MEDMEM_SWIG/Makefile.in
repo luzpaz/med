@@ -51,7 +51,19 @@ LIB_SRC = MEDMEM_SWIG_FieldDouble.cxx \
 
 SWIG_DEF = libMEDMEM_Swig.i
 
-EXPORT_PYSCRIPTS = libMEDMEM_Swig.py med_test1.py med_test2.py med_test3.py med_test_grid.py med_test_skin.py medMeshing_test.py
+EXPORT_PYSCRIPTS = libMEDMEM_Swig.py \
+		   med_test1.py \
+		   med_test2.py \
+		   med_test3.py \
+		   med_test_grid.py \
+		   med_test_skin.py \
+		   medMeshing_test.py \
+		   med_field_anal.py \
+		   med_opfield_test.py \
+		   med_opsupp_test.py \
+		   test_gibi.py \
+		   test_porflow.py \
+		   testMedMemGeneral.py
 
 #############################################################################
 

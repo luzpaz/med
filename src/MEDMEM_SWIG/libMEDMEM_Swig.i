@@ -6,6 +6,8 @@
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
+#include "MEDMEM_GibiMeshDriver.hxx"
+#include "MEDMEM_PorflowMeshDriver.hxx"
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
@@ -223,7 +225,7 @@ typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
 
 typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ; 
 
-typedef enum {MED_DRIVER=0, GIBI_DRIVER=1, VTK_DRIVER=254,
+typedef enum {MED_DRIVER=0, GIBI_DRIVER=1, PORFLOW_DRIVER = 2, VTK_DRIVER=254,
 	      NO_DRIVER=255} driverTypes;
 
 typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26,
@@ -1308,11 +1310,12 @@ public :
 	return result;
       }
 
-    PyObject * getReverseConnectivity(medConnectivity ConnectivityType)
+    PyObject * getReverseConnectivity(medConnectivity ConnectivityType,
+				      medEntityMesh Entity=MED_CELL)
       {
 	PyObject *py_list;
 	const int * reverseconnectivity =
-	  self->getReverseConnectivity(ConnectivityType);
+	  self->getReverseConnectivity(ConnectivityType,Entity);
 	int spaceDim = self->getSpaceDimension();
 	int nb;
 
@@ -1330,7 +1333,8 @@ public :
 					      MED_ALL_ELEMENTS));
 	  }
 
-	int size = self->getReverseConnectivityIndex(ConnectivityType)[nb]-1;
+	int size = self->getReverseConnectivityIndex(ConnectivityType,
+						     Entity)[nb]-1;
 
 	py_list = PyList_New(size);
 	for (int i=0; i < size; i++)
@@ -1350,12 +1354,12 @@ public :
 	return result;
       }
 
-    PyObject * getReverseConnectivityIndex(medConnectivity
-					   ConnectivityType)
+    PyObject * getReverseConnectivityIndex(medConnectivity ConnectivityType,
+					   medEntityMesh Entity=MED_CELL)
       {
 	PyObject *py_list;
 	const int * reverseconnectivity_index =
-	  self->getReverseConnectivityIndex(ConnectivityType);
+	  self->getReverseConnectivityIndex(ConnectivityType,Entity);
 
 	int size;
 	int spaceDim = self->getSpaceDimension();
@@ -1759,6 +1763,298 @@ class MED_MED_RDWR_DRIVER : public virtual MED_MED_RDONLY_DRIVER,
 	ostringstream mess;
 	mess << "Python Printing MED_MED_RDWR_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
+      }
+  }
+};
+
+/*
+  API de GIBI_MESH_[RDONLY,WRONLY,RDWR]_DRIVER
+*/
+
+class GIBI_MESH_RDONLY_DRIVER
+{
+public :
+  GIBI_MESH_RDONLY_DRIVER() ;
+
+  GIBI_MESH_RDONLY_DRIVER(const GIBI_MESH_RDONLY_DRIVER & driver) ;
+
+  ~GIBI_MESH_RDONLY_DRIVER() ;
+
+  void open();
+
+  void write( void );
+
+  void read ( void );
+
+  void close();
+
+  %extend {
+    GIBI_MESH_RDONLY_DRIVER(char * fileName, MESH * ptrMesh)
+      {
+	return new GIBI_MESH_RDONLY_DRIVER(string(fileName), ptrMesh) ;
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing GIBI_MESH_RDONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
+    void setMeshName(char * meshName)
+      {
+	self->setMeshName(string(meshName));
+      }
+
+    %newobject getMeshName();
+    char * getMeshName()
+      {
+	string tmp_str = self->getMeshName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+
+class GIBI_MESH_WRONLY_DRIVER
+{
+public :
+  GIBI_MESH_WRONLY_DRIVER() ;
+
+  GIBI_MESH_WRONLY_DRIVER(const GIBI_MESH_WRONLY_DRIVER & driver) ;
+
+  ~GIBI_MESH_WRONLY_DRIVER() ;
+
+  void open();
+
+  void write( void );
+
+  void read ( void );
+
+  void close();
+
+  %extend {
+    GIBI_MESH_WRONLY_DRIVER(char * fileName, MESH * ptrMesh)
+      {
+	return new GIBI_MESH_WRONLY_DRIVER(string(fileName), ptrMesh) ;
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing GIBI_MESH_WRONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
+    void setMeshName(char * meshName)
+      {
+	self->setMeshName(string(meshName));
+      }
+
+    %newobject getMeshName();
+    char * getMeshName()
+      {
+	string tmp_str = self->getMeshName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+
+class GIBI_MESH_RDWR_DRIVER : public virtual GIBI_MESH_RDONLY_DRIVER,
+			      public virtual GIBI_MESH_WRONLY_DRIVER
+{
+public :
+  GIBI_MESH_RDWR_DRIVER() ;
+
+  GIBI_MESH_RDWR_DRIVER(const GIBI_MESH_RDWR_DRIVER & driver) ;
+
+  ~GIBI_MESH_RDWR_DRIVER() ;
+
+  void open();
+
+  void write( void );
+
+  void read ( void );
+
+  void close();
+
+  %extend {
+    GIBI_MESH_RDWR_DRIVER(char * fileName, MESH * ptrMesh)
+      {
+	return new GIBI_MESH_RDWR_DRIVER(string(fileName), ptrMesh) ;
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing GIBI_MESH_RDWR_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
+    void setMeshName(char * meshName)
+      {
+	self->setMeshName(string(meshName));
+      }
+
+    %newobject getMeshName();
+    char * getMeshName()
+      {
+	string tmp_str = self->getMeshName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+
+/*
+  API de PORFLOW_MESH_[RDONLY,WRONLY,RDWR]_DRIVER
+*/
+
+class PORFLOW_MESH_RDONLY_DRIVER
+{
+public :
+  PORFLOW_MESH_RDONLY_DRIVER() ;
+
+  PORFLOW_MESH_RDONLY_DRIVER(const PORFLOW_MESH_RDONLY_DRIVER & driver) ;
+
+  ~PORFLOW_MESH_RDONLY_DRIVER() ;
+
+  void open();
+
+  void write( void );
+
+  void read ( void );
+
+  void close();
+
+  %extend {
+    PORFLOW_MESH_RDONLY_DRIVER(char * fileName, MESH * ptrMesh)
+      {
+	return new PORFLOW_MESH_RDONLY_DRIVER(string(fileName), ptrMesh) ;
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing PORFLOW_MESH_RDONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
+    void setMeshName(char * meshName)
+      {
+	self->setMeshName(string(meshName));
+      }
+
+    %newobject getMeshName();
+    char * getMeshName()
+      {
+	string tmp_str = self->getMeshName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+
+class PORFLOW_MESH_WRONLY_DRIVER
+{
+public :
+  PORFLOW_MESH_WRONLY_DRIVER() ;
+
+  PORFLOW_MESH_WRONLY_DRIVER(const PORFLOW_MESH_WRONLY_DRIVER & driver) ;
+
+  ~PORFLOW_MESH_WRONLY_DRIVER() ;
+
+  void open();
+
+  void write( void );
+
+  void read ( void );
+
+  void close();
+
+  %extend {
+    PORFLOW_MESH_WRONLY_DRIVER(char * fileName, MESH * ptrMesh)
+      {
+	return new PORFLOW_MESH_WRONLY_DRIVER(string(fileName), ptrMesh) ;
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing PORFLOW_MESH_WRONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
+    void setMeshName(char * meshName)
+      {
+	self->setMeshName(string(meshName));
+      }
+
+    %newobject getMeshName();
+    char * getMeshName()
+      {
+	string tmp_str = self->getMeshName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+
+class PORFLOW_MESH_RDWR_DRIVER : public virtual PORFLOW_MESH_RDONLY_DRIVER,
+				 public virtual PORFLOW_MESH_WRONLY_DRIVER
+{
+public :
+  PORFLOW_MESH_RDWR_DRIVER() ;
+
+  PORFLOW_MESH_RDWR_DRIVER(const PORFLOW_MESH_RDWR_DRIVER & driver) ;
+
+  ~PORFLOW_MESH_RDWR_DRIVER() ;
+
+  void open();
+
+  void write( void );
+
+  void read ( void );
+
+  void close();
+
+  %extend {
+    PORFLOW_MESH_RDWR_DRIVER(char * fileName, MESH * ptrMesh)
+      {
+	return new PORFLOW_MESH_RDWR_DRIVER(string(fileName), ptrMesh) ;
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing PORFLOW_MESH_RDWR_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
+    void setMeshName(char * meshName)
+      {
+	self->setMeshName(string(meshName));
+      }
+
+    %newobject getMeshName();
+    char * getMeshName()
+      {
+	string tmp_str = self->getMeshName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
       }
   }
 };

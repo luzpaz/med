@@ -52,9 +52,13 @@ public :
 	void Cree_Mapping(int flag_convexe=0);                                             // SUPPOSE NON CONVEXE PAR DEFAUT
 	void Cree_Mapping(NUAGENOEUD * nf, int flag_convexe=0);                            // SUPPOSE NON CONVEXE PAR DEFAUT
 	inline int operator[](int i) const {return resultat_mapping[i];}                   // Renvoie la valeur mappé, si le mapping a été fait, sinon, n'importe quoi
-	inline vector<int> Get_Mapping() {return resultat_mapping;}                        // Renvoie le vector contenant le mapping
+	inline vector<int> & Get_Mapping() {return resultat_mapping;}                        // Renvoie le vector contenant le mapping
 	inline int Get_Noeud_Le_Plus_Proche(int i) const {return point_le_plus_proche[i];} // Invoque la méthode de d-Tree qui donne le noeud le plus proche
 	inline int Exist_dTree() const {return (my_dTree);}                                // Teste si le dTree existe
+	void affiche()
+		{
+		for (int i=0;i<resultat_mapping.size();i++) cout<<"Noeud "<<i<<" de noeud plus proche "<<point_le_plus_proche[i]<<" mappé dans maille "<<resultat_mapping[i]<<endl;		
+		}
 };
 
 //////////////////////////////////////////////////////////////////
@@ -71,26 +75,37 @@ _TEMPLATE_ void _MAPPING_::Cree_Mapping(NUAGENOEUD * nf, int flag_convexe)
 
 _TEMPLATE_ void _MAPPING_::Cree_Mapping(int flag_convexe)
 	{
-	if (!noeuds_front) 
-		 {
-		 cerr<<"Mapping : Pas de noeuds à mapper !"<<endl;
-		 exit(-1);
-		 }
-		 
-	int i,j,k;
-	int nbr_noeuds=noeuds_front->SIZE();
-	int num_maille_depart;
-	int nma=0;
-	resultat_mapping     = vector<int>(nbr_noeuds,UNDEFINED);
-	point_le_plus_proche = vector<int>(nbr_noeuds,UNDEFINED);
-	noeuds_back->affiche();
-		
-	for (i=0;i<nbr_noeuds;i++)
+	
+	if (resultat_mapping.size()==0) 
 		{
-		point_le_plus_proche[i]=my_dTree->trouve_plus_proche_point((*noeuds_front)[i]);
-		num_maille_depart=maillage_back->DONNE_PREMIERE_MAILLE_CONTENANT(point_le_plus_proche[i]);
-		resultat_mapping[i]=Trouve_Maille_Contenant_Point_Mth_Co((*noeuds_front)[i],num_maille_depart,num_maille_depart,NBR_MAX_MAILLES_EXAMINEES,nma,flag_convexe);
+		if (!noeuds_front) 
+			 {
+			 cerr<<"Mapping : Pas de noeuds à mapper !"<<endl;
+			 exit(-1);
+			 }
+		 
+		int i,j,k;
+		int nbr_noeuds=noeuds_front->SIZE();
+		int num_maille_depart;
+		int nma=0;
+		resultat_mapping     = vector<int>(nbr_noeuds,UNDEFINED);
+		point_le_plus_proche = vector<int>(nbr_noeuds,UNDEFINED);
+	
+		// noeuds_back->affiche();
+		
+		for (i=0;i<nbr_noeuds;i++)
+			{
+			point_le_plus_proche[i]=my_dTree->trouve_plus_proche_point((*noeuds_front)[i]);
+			num_maille_depart=maillage_back->DONNE_PREMIERE_MAILLE_CONTENANT(point_le_plus_proche[i]);
+			resultat_mapping[i]=Trouve_Maille_Contenant_Point_Mth_Co((*noeuds_front)[i],num_maille_depart,num_maille_depart,NBR_MAX_MAILLES_EXAMINEES,nma,flag_convexe);
+			}
 		}
+		
+	else
+		{
+		cout<<"Le mapping semble déja existé, interrogation sur l'existant"<<endl;
+		}
+		
 	}
 _TEMPLATE_ _MAPPING_::Mapping(MAILLAGE * mb,NUAGENOEUD * nb,NUAGENOEUD * nf):maillage_back(mb),noeuds_back(nb),noeuds_front(nf),my_dTree(NULL)
 	{
@@ -111,27 +126,28 @@ _TEMPLATE_ _MAPPING_::Mapping(MAILLAGE * mb,NUAGENOEUD * nb,NUAGENOEUD * nf):mai
 	
 	CB=new Coordonnees_Barycentriques<NUAGEMAILLE,NUAGENOEUD,NOEUD,DIMENSION>(mailles_back,noeuds_back);
 
-	cout<<"MAPPING : VERIFICATION REDONDANCES DANS NUAGE NOEUD BACK"<<endl;
-	
-	int i,j;
-	
+	// TEST REDONDANCE
+	/*
 	int nnb=noeuds_back->SIZE();
-	
-	vector<int> redondance(nnb,0);
-	
-	for (i=0;i<nnb;i++) 
+	if (nnb<20000) 
 		{
-		for (j=i+1;j<nnb;j++) if ((*noeuds_back)[i]==(*noeuds_back)[j]) 
+		cout<<"MAPPING : VERIFICATION REDONDANCES DANS NUAGE NOEUD BACK"<<endl;
+		noeuds_back->affiche();
+		int i,j;		
+		vector<int> redondance(nnb,0);
+		for (i=0;i<nnb;i++) 
 			{
-			cerr<<"Le Noeud "<<j<<" est identique au Noeud "<<i<<endl;
-			exit(-1);
+			for (j=i+1;j<nnb;j++) if ((*noeuds_back)[i]==(*noeuds_back)[j]) 
+				{
+				cerr<<"Le Noeud "<<j<<" est identique au Noeud "<<i<<endl;
+				exit(-1);
+				}
 			}
+		cout<<"FIN TEST VERIFICATION REDONDANCES"<<endl;
 		}
-	
-	cout<<"MAPPING : FIN VERIFICATION"<<endl;
+	// FIN TEST */
 	
 	my_dTree=new dTree<NOEUD,NUAGENOEUD,DIMENSION>(noeuds_back);
-
 
 	}
 // Renvoie :
@@ -148,7 +164,7 @@ _TEMPLATE_ int _MAPPING_::Donne_Directions(int num_maille,const NOEUD &n,int eta
 	int etat_int=VRAI;
 	int etat_ext_bord=FAUX;
 	int tf,tv,tb;
-	int nbr_faces=mailles_back->DONNE_NBR_FACES(num_maille);
+	int nbr_faces=(*mailles_back)[num_maille].DONNE_NBR_FACES();
 	for (int i=0;i<nbr_faces;i++)
 		{
 		tf=(ef[i]<0);

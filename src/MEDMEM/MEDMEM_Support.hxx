@@ -150,6 +150,8 @@ public:
   virtual ~SUPPORT();
   friend ostream & operator<<(ostream &os,const SUPPORT &my);
 
+  bool operator == (const SUPPORT &support) const;
+
   // function to set all value when SUPPORT was created by MedMedDriver without all MESH information !!! Change with new API !
   void update();
 
@@ -516,7 +518,7 @@ inline int SUPPORT::getNumberOfTypes() const
 }
 
 /*!
-  Returns the medEntityMesh's type used by the support.
+  Returns the %medEntityMesh's type used by the support.
   Note : A support deals only with one entity's type
   (for example : MED_FACE or MED_NODE)
 */
@@ -528,10 +530,8 @@ inline medEntityMesh SUPPORT::getEntity() const
 }
 
 /*!
-  If isOnAllElements is false, returns an array of <medGeometryElement>
+  If isOnAllElements is false, returns an array of %medGeometryElement
   types used by the support.
-
-  <medEntityMesh> is given by getEntity.
 */
 //---------------------------------------------------
 inline const medGeometryElement * SUPPORT::getTypes() const

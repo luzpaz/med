@@ -584,10 +584,10 @@ private:
   void _div_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode);
   //setValueType() ;
 
+  FIELD & operator=(const FIELD &m); 	// A FAIRE
 public:
   FIELD();
   FIELD(const FIELD &m);
-  FIELD & operator=(const FIELD &m); 	// A FAIRE
   FIELD(const SUPPORT * Support, const int NumberOfComponents, const medModeSwitch Mode=MED_FULL_INTERLACE)  throw (MEDEXCEPTION) ; // Ajout NB Constructeur FIELD avec allocation de memoire de tous ses attribut
   FIELD(const SUPPORT * Support, driverTypes driverType,
 	const string & fileName="", const string & fieldName="",
@@ -777,11 +777,16 @@ template <class T> FIELD<T>::FIELD(const FIELD & m):
 }
 
 /*!
-  
+  \if developper
+  Not implemented.
+  \endif
 */
 template <class T> FIELD<T> & FIELD<T>::operator=(const FIELD &m)
 {
-  MESSAGE("Appel de FIELD<T>::operator=");
+  MESSAGE("Appel de FIELD<T>::operator=") ;
+  // operator= on FIELD_
+  // ignore driver
+  // copy values array
 }
 
 /*!
