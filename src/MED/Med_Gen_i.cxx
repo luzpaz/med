@@ -35,7 +35,6 @@ using namespace std;
 #include "MEDMEM_FieldDouble_i.hxx"
 #include "MEDMEM_Support_i.hxx"
 
-
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_Med.hxx"
@@ -145,12 +144,11 @@ void Med_Gen_i::addInStudy(SALOMEDS::Study_var myStudy)
 {
   SALOMEDS::StudyBuilder_var  myBuilder = myStudy->NewBuilder();
   
-  myBuilder->NewCommand();
-  
   // Create SComponent labelled 'Med' if it doesn't already exit
   SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
   if ( CORBA::is_nil(medfather) )
     {
+      myBuilder->NewCommand();
       // mpv: component label must be created in spite of "Locked" study flag state
       bool aLocked = myStudy->GetProperties()->IsLocked();
       if (aLocked) myStudy->GetProperties()->SetLocked(false);
@@ -167,16 +165,16 @@ void Med_Gen_i::addInStudy(SALOMEDS::Study_var myStudy)
       if ( !Comp->_is_nil() ) {
 	aName->SetValue( Comp->componentusername() );
       }    
-
+      
       //	    Utilisation de this  deconseillee par Paul ??
-      //	    myBuilder->DefineComponentInstance(medfather,POA_Engines::Med_Gen::_this());
+      //	    myBuilder->DefineComponentInstance(medfather,POA_Engines::MED_Gen::_this());
       CORBA::Object_var myO = _poa->id_to_reference(*_id); // this ior...
       myBuilder->DefineComponentInstance(medfather,myO);
       
       if (aLocked) myStudy->GetProperties()->SetLocked(true);
+      myBuilder->CommitCommand();
     } 
   
-  myBuilder->CommitCommand();
    
 }
 
@@ -301,8 +299,8 @@ throw (SALOME::SALOME_Exception)
 	SALOME_MED::MESH_ptr mesh = meshi->_this();
 	try
         {
-	// add the mesh object in study
-	        if (!_duringLoad) meshi->addInStudy(myStudy,mesh);
+	  // add the mesh object in study
+	  if (!_duringLoad) meshi->addInStudy(myStudy,mesh);
 	}
         catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
         return SALOME_MED::MESH::_duplicate(mesh);
@@ -358,7 +356,7 @@ throw (SALOME::SALOME_Exception)
 		if ( !Comp->_is_nil() ) {
 		  aName->SetValue( Comp->componentusername() );
 		}    
-
+	
                 CORBA::Object_var myO = _poa->id_to_reference(*_id); // this ior...
                 myBuilder->DefineComponentInstance(medfather,myO);
 
@@ -506,7 +504,8 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
   SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
   TColStd_SequenceOfAsciiString aFileNames;
 
-  CORBA::String_var aSaveStudyName = strdup(SALOMEDS_Tool::GetNameFromPath(theComponent->GetStudy()->URL()));
+  CORBA::String_var aSaveStudyName("");
+  if (isMultiFile) aSaveStudyName = strdup(SALOMEDS_Tool::GetNameFromPath(theComponent->GetStudy()->URL()));
 
   SALOMEDS::SObject_var aMedMeshFather = theComponent->GetStudy()->FindObject("MEDMESH");
   if (!CORBA::is_nil(aMedMeshFather)) {
@@ -588,7 +587,8 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
   SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
   TColStd_SequenceOfAsciiString aFileNames;
   
-  CORBA::String_var aSaveStudyName = strdup(SALOMEDS_Tool::GetNameFromPath(theComponent->GetStudy()->URL()));
+  CORBA::String_var aSaveStudyName("");
+  if (isMultiFile) aSaveStudyName = strdup(SALOMEDS_Tool::GetNameFromPath(theComponent->GetStudy()->URL()));
   
   SALOMEDS::SObject_var aMedMeshFather = theComponent->GetStudy()->FindObject("MEDMESH");
   if (!CORBA::is_nil(aMedMeshFather)) {
@@ -740,10 +740,8 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   BEGIN_OF(LOC) ;
   SCRUTE(IORString);
 
-  string aSaveStudyName(strdup(SALOMEDS_Tool::GetNameFromPath(theSObject->GetStudy()->URL())));
-  
 
-  if (string(IORString).size()==0) return strdup((aSaveStudyName+"_MED").c_str());
+  if (string(IORString).size()==0) return "_MED";
   // Well, we know where put object (_saveFilename) and we know object (IORString)
   // cast object :
   CORBA::Object_var myIOR = _orb->string_to_object(IORString);
@@ -753,7 +751,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   if (! CORBA::is_nil(myMed)) 
   {
         // nothing to save : Support will be saved inside the mesh
-	string str_MedName=aSaveStudyName + "_MED Objet Med + /OBJ_MED/";
+	string str_MedName="_MED Objet Med + /OBJ_MED/";
         return strdup(str_MedName.c_str()) ; 
   }
  
@@ -761,7 +759,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   SALOME_MED::MESH_var myMesh = SALOME_MED::MESH::_narrow(myIOR);
   if (! CORBA::is_nil(myMesh)) 
   {
-    CORBA::String_var aName((aSaveStudyName+"_MEDMESH_"+ myMesh->getName() + ".med").c_str());
+    CORBA::String_var aName((string("_MEDMESH_")+ myMesh->getName() + ".med").c_str());
     return strdup(aName._retn()) ;
   }
     
@@ -783,7 +781,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
                 THROW_SALOME_CORBA_EXCEPTION("Unable to save Field in Med"\
                                               ,SALOME::INTERNAL_ERROR);
 	}
-    return strdup((aSaveStudyName+"_MED"+str_SupportName).c_str());
+    return strdup(("_MED"+str_SupportName).c_str());
   }
     
   SALOME_MED::FIELD_var myField = SALOME_MED::FIELD::_narrow(myIOR);
@@ -793,7 +791,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
     ostringstream a,b;
     a<< myField->getOrderNumber();
     b<< myField->getIterationNumber();
-    CORBA::String_var aName((aSaveStudyName+"_MEDFIELD_"+ myField->getName() +
+    CORBA::String_var aName((string("_MEDFIELD_")+ myField->getName() +
 			     string("_ORDRE_")+a.str()+
 			     string("_ITER_")+b.str() +
 			     ".med").c_str());
@@ -801,7 +799,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   }
 
   //THROW_SALOME_CORBA_EXCEPTION("Unable to save IOR",SALOME::BAD_PARAM);
-  return strdup((aSaveStudyName+"_MED").c_str());
+  return "_MED";
 
   END_OF(LOC) ;
 }
@@ -822,17 +820,16 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
   BEGIN_OF(LOC) ;
   TCollection_AsciiString aTmpDir(CORBA::string_dup(_saveFileName.c_str()));
 
-  string aSaveStudyName(strdup(SALOMEDS_Tool::GetNameFromPath(theSObject->GetStudy()->URL())));
-  int aStudyNameLen = strlen(aSaveStudyName.c_str());
+  TCollection_AsciiString aSaveStudyName("");
+  if (isMultiFile) aSaveStudyName = strdup(SALOMEDS_Tool::GetNameFromPath(theSObject->GetStudy()->URL()));
 
-  if (strlen(aLocalPersistentID) <= aStudyNameLen) return strdup("");
   if (strcmp(aLocalPersistentID, "Objet Med + /OBJ_MED/") == 0) return strdup(""); // MED
 
-  if (strncmp(&(aLocalPersistentID[aStudyNameLen]), "_MEDMESH_",9) == 0) {// MESH
+  if (strncmp(aLocalPersistentID, "_MEDMESH_",9) == 0) {// MESH
     MESH * myMesh= new MESH() ;
-    int aMeshNameLen = strlen(aLocalPersistentID) - 12 - aStudyNameLen;
+    int aMeshNameLen = strlen(aLocalPersistentID) - 12;
     char* aMeshName = new char[aMeshNameLen];
-    strncpy(aMeshName, &(aLocalPersistentID[aStudyNameLen + 9]), aMeshNameLen-1);
+    strncpy(aMeshName, &(aLocalPersistentID[9]), aMeshNameLen-1);
     aMeshName[aMeshNameLen-1] = 0;
     myMesh->setName(aMeshName);
 
@@ -842,7 +839,7 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
       aFileName = new char[strlen(aResultPath) + 19];
       sprintf(aFileName, "%shdf_from_ascii.hdf", aResultPath);
       delete(aResultPath);
-    } else aFileName = strdup((aTmpDir + strdup(aLocalPersistentID)).ToCString());
+    } else aFileName = strdup((aTmpDir + aSaveStudyName + strdup(aLocalPersistentID)).ToCString());
     MED_MESH_RDONLY_DRIVER myMeshDriver(aFileName,myMesh);
     try
       {
@@ -882,7 +879,7 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
     }
     delete(aFileName);
     return(CORBA::string_dup(_orb->object_to_string(mesh)));
-  } else if (strncmp(&(aLocalPersistentID[aStudyNameLen]), "_MEDFIELD_",14) == 0) { // FIELD
+  } else if (strncmp(aLocalPersistentID, "_MEDFIELD_",14) == 0) { // FIELD
     return(strdup("")); // not implemented yet
   }
 
@@ -959,10 +956,14 @@ CORBA::Boolean Med_Gen_i::CanCopy(SALOMEDS::SObject_ptr theObject) {
   // Try to retrieve known by MED component mesh by given IOR
   SALOMEDS::GenericAttribute_var anAttr;
   if (!theObject->FindAttribute(anAttr, "AttributeIOR")) return false;
-  CORBA::Object_var anObj = _orb->string_to_object(SALOMEDS::AttributeIOR::_narrow(anAttr)->Value());
-  SALOME_MED::MESH_var aMesh = SALOME_MED::MESH::_narrow(anObj);
-  // If the object is null one it can't be copied: return false
-  if (aMesh->_is_nil()) return false;
+  try {
+    CORBA::Object_var anObj = _orb->string_to_object(SALOMEDS::AttributeIOR::_narrow(anAttr)->Value());
+    SALOME_MED::MESH_var aMesh = SALOME_MED::MESH::_narrow(anObj);
+    // If the object is null one it can't be copied: return false
+    if (aMesh->_is_nil()) return false;
+  } catch(...) {
+    return false;
+  }
   return true;
 }
 

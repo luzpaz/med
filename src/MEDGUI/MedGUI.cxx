@@ -411,6 +411,7 @@ bool MedGUI::CustomPopup ( QAD_Desktop* parent,
 			   const QString & theObject )
 {
   MESSAGE("MedGUI::CustomPopup");
+  popup->clear();
   return true;
 }
 
