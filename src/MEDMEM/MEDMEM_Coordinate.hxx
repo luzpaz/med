@@ -16,9 +16,9 @@
 #include "MEDMEM_Array.hxx"
 
 /*!
-    This class contains coordinates of the nodes ./n
+    This class contains coordinates of the nodes .\n
     It could also store useful optional information about nodes
-    as  node numbers and about axes as names or units. /n
+    as  node numbers and about axes as names or units. \n
     spaceDimension and  numberOfNodes can be found in _coordinate object.
 */
 
@@ -33,10 +33,10 @@ protected:
 
 
 				     /*! _coordinate is a MEDARRAY<double> object : \n
-					 - spaceDimension /n
-					 - numberOfNodes /n
-					 - default storage mode /n
-					 - Up to 4 "PointerOf" to an array of size spaceDimension*NumberOfNodes/n
+					 - spaceDimension \n
+					 - numberOfNodes \n
+					 - default storage mode \n
+					 - Up to 4 "PointerOf" to an array of size spaceDimension*NumberOfNodes\n
 
 					 Storing the object (not a pointer to this object) is more convenient for memory
 					 management.
@@ -64,7 +64,7 @@ public :
   COORDINATE(const COORDINATE & m);
   virtual ~COORDINATE();
 
-  void setCoordinates(MEDARRAY<double> *Coordinate);
+  void setCoordinates(MEDARRAY<double> *Coordinate,bool shallowCopy=false);
   void setCoordinates(const medModeSwitch Mode, const double *Coordinate);
   void setCoordinatesNames(const string * CoordinateName);
   void setCoordinateName(const string CoordinateName, const int i);

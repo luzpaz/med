@@ -58,7 +58,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 		MESH_i * myMeshI = new MESH_i(myMesh);
 		SALOME_MED::MESH_ptr myMeshIOR = myMeshI->_this();
 		_meshes[meshesNames[i]] = myMeshIOR;
-		myMeshI->addInStudy(myStudy,myMeshIOR,fileName);
+// 		myMeshI->addInStudy(myStudy,myMeshIOR,fileName);
         }
 
   // SUPPORTS :
@@ -92,7 +92,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 		     {
 			  FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
 			  SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->POA_SALOME_MED::FAMILY::_this();
-			   myFamilyI->addInStudy(myStudy,myFamilyIOR);
+// 			   myFamilyI->addInStudy(myStudy,myFamilyIOR);
       		     }
 
 	       // group :
@@ -105,7 +105,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 		    {
 			 GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
 			 SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->POA_SALOME_MED::GROUP::_this();
-			 myGroupI->addInStudy(myStudy,myGroupIOR);
+// 			 myGroupI->addInStudy(myStudy,myGroupIOR);
       		    }
                 }      
 	}
@@ -121,7 +121,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 		    SUPPORT_i * mySupportI = new SUPPORT_i((*itSupport).second);
      		    SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this();
 		    mySupportsIOR[(*itSupport).first] = mySupportIOR;
-		    mySupportI->addInStudy(myStudy,mySupportIOR);
+// 		    mySupportI->addInStudy(myStudy,mySupportIOR);
 	      }
         }
 
@@ -160,23 +160,18 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
       		         case MED_FR::MED_INT32 : 
 			 {
 			     ((FIELD<int>*)myField)->read();
-			     FIELDINT_i * myFieldIntI = new FIELDINT_i(mySupportIOR,(FIELD<int>*)myField);
-		             POA_SALOME_MED::FIELD_tie<FIELD_i> * myFieldTie 
-					= new POA_SALOME_MED::FIELD_tie<FIELD_i>(myFieldIntI);
-			     myFieldIOR = myFieldTie->_this();
-	                     myFieldIntI->addInStudy(myStudy,myFieldIOR);
+			     FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
+			     myFieldIOR = myFieldIntI->_this();
+// 	                     myFieldIntI->addInStudy(myStudy,myFieldIOR);
 		             break;
       			 }
 
       			case MED_FR::MED_REEL64: 
                         {
 			     ((FIELD<double>*)myField)->read();
-			     FIELDDOUBLE_i * myFieldDoubleI 
-					= new FIELDDOUBLE_i(mySupportIOR,(FIELD<double>*)myField);
-			     POA_SALOME_MED::FIELD_tie<FIELD_i> * myFieldTie 
-					= new POA_SALOME_MED::FIELD_tie<FIELD_i>(myFieldDoubleI);
-			     myFieldIOR = myFieldTie->_this();
-			     myFieldDoubleI->addInStudy(myStudy,myFieldIOR);
+			     FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
+			     myFieldIOR = myFieldDoubleI->_this();
+// 			     myFieldDoubleI->addInStudy(myStudy,myFieldIOR);
 			     break;
       		        }
       			default: 
@@ -488,12 +483,9 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		     case MED_FR::MED_INT32: 
 		     {
 			((FIELD<int>*)myField)->read();
-			FIELDINT_i * myFieldIntI 
-				   = new FIELDINT_i(mySupportIOR,(FIELD<int>*)myField);
+			FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
 			SALOME_MED::FIELDINT_ptr myFieldIntIOR;
-			POA_SALOME_MED::FIELDINT_tie<FIELDINT_i> * myFieldIntTie 
-				= new POA_SALOME_MED::FIELDINT_tie<FIELDINT_i>(myFieldIntI);
-			myFieldIntIOR = myFieldIntTie->_this();
+			myFieldIntIOR = myFieldIntI->_this();
 
 			MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str() << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
@@ -505,12 +497,9 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
       		     case MED_FR::MED_REEL64: 
 		     {
 			((FIELD<double>*)myField)->read();
-			FIELDDOUBLE_i * myFieldDoubleI 
-				= new FIELDDOUBLE_i(mySupportIOR,(FIELD<double>*)myField);
+			FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
 			SALOME_MED::FIELDDOUBLE_ptr myFieldDoubleIOR;
-			POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i> * myFieldDoubleTie 
-				= new POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i>(myFieldDoubleI);
-			myFieldDoubleIOR = myFieldDoubleTie->_this();
+			myFieldDoubleIOR = myFieldDoubleI->_this();
 
 			MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str() << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
@@ -529,7 +518,6 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
   		     }
      		  }
 	     }
-
 
 	     MESSAGE("Here we are i="<< i);
 	}
@@ -796,9 +784,7 @@ throw (SALOME::SALOME_Exception)
         {
                 MESH * mesh=_med->getMesh(meshName);
                 MESH_i * m1 = new MESH_i(mesh);
-                SALOME_MED::MESH_ptr m2 = m1->POA_SALOME_MED::MESH::_this();
-                m1->_remove_ref();
-		return (SALOME_MED::MESH::_duplicate(m2));
+		return m1->POA_SALOME_MED::MESH::_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -829,22 +815,22 @@ throw (SALOME::SALOME_Exception)
 		SALOME_MED::FIELDDOUBLE_var fielddouble = 
 			    SALOME_MED::FIELDDOUBLE::_narrow(fieldPtr);
                 ASSERT(!CORBA::is_nil(fielddouble));
-                ASSERT(FIELDOF_i<double>::fieldMap.find(ind)
-			        !=FIELDOF_i<double>::fieldMap.end());
-                ::FIELD<double> * fdouble = FIELDOF_i<double>::fieldMap[ind];
+
+                ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
+
+                ::FIELD<double> * fdouble = (::FIELD<double> *)FIELD_i::fieldMap[ind];
                 MESH * mesh=_med->getMesh(fdouble);
         }
         else
         {
                 MESSAGE("Integer");
-                ASSERT(FIELDOF_i<int>::fieldMap.find(ind)!=FIELDOF_i<int>::fieldMap.end());
-                ::FIELD<int> * fint = FIELDOF_i<int>::fieldMap[ind];
+                ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
+
+                ::FIELD<int> * fint = (::FIELD<int> *)FIELD_i::fieldMap[ind];
                 MESH * mesh=_med->getMesh(fint);
         }
         MESH_i * meshi = new MESH_i(mesh);
-        SALOME_MED::MESH_ptr meshptr = meshi->POA_SALOME_MED::MESH::_this();
-        meshi->_remove_ref();
-	return (SALOME_MED::MESH::_duplicate(meshptr));
+	return meshi->POA_SALOME_MED::MESH::_this();
 
 }
 //=============================================================================
@@ -1129,17 +1115,18 @@ throw (SALOME::SALOME_Exception)
 		SALOME_MED::FIELDDOUBLE_var fielddouble = 
 			    SALOME_MED::FIELDDOUBLE::_narrow(ptrField);
                 ASSERT(!CORBA::is_nil(fielddouble));
-                ASSERT(FIELDOF_i<double>::fieldMap.find(ind)
-			        !=FIELDOF_i<double>::fieldMap.end());
-                ::FIELD<double> * fdouble = FIELDOF_i<double>::fieldMap[ind];
+
+                ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
+
+                ::FIELD<double> * fdouble = (::FIELD<double> *)FIELD_i::fieldMap[ind];
 		// A modifier
                 //_med->addField(fdouble);
         }
         else
         {
                 MESSAGE("Integer");
-                ASSERT(FIELDOF_i<int>::fieldMap.find(ind)!=FIELDOF_i<int>::fieldMap.end());
-                ::FIELD<int> * fint = FIELDOF_i<int>::fieldMap[ind];
+                ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
+                ::FIELD<int> * fint = (::FIELD<int> *)FIELD_i::fieldMap[ind];
                 //_med->addField(fint);
         }
 }

@@ -14,22 +14,25 @@
 #include CORBA_SERVER_HEADER(MED)
 
 #include "MEDMEM_Field_i.hxx"
-#include "MEDMEM_FieldOf_i.hxx"
 
 #include "MEDMEM_Field.hxx"
 
 namespace MEDMEM {
-class FIELDINT_i: public FIELDOF_i<int>
+  class FIELDINT_i: public POA_SALOME_MED::FIELDINT,
+		    public FIELD_i,
+		    public SALOMEMultiComm
 {
 private:
     FIELDINT_i();
 
 public:
     ~FIELDINT_i();
-    FIELDINT_i(SALOME_MED::SUPPORT_ptr mySupportIOR, ::FIELD<int> * const f);
+    FIELDINT_i(::FIELD<int> * const f, bool ownCppPtr=false);
     FIELDINT_i(FIELDINT_i & f);
     SALOME_MED::long_array * getValue (SALOME_MED::medModeSwitch mode ) 
 				   throw (SALOME::SALOME_Exception);
+    SALOME::Sender_ptr getSenderForValue(SALOME_MED::medModeSwitch mode)
+                                     throw (SALOME::SALOME_Exception);
 };
 }
 #endif /* MED_FIELDINT_I_HXX_ */

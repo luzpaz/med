@@ -13,20 +13,7 @@
 //#include "MEDMEM_Support.hxx"
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
-
-// Add your own driver header (step 2)
-#include "MEDMEM_MedMeshDriver.hxx"
-#include "MEDMEM_MedMedDriver.hxx"
-#include "MEDMEM_GibiMeshDriver.hxx"
-#include "MEDMEM_PorflowMeshDriver.hxx"
-
-#include "MEDMEM_VtkMeshDriver.hxx"
-
-
-
-//class GENDRIVER;
-//class MED_MESH_RDONLY_DRIVER;
-//class MED_MESH_WRONLY_DRIVER;
+#include "MEDMEM_GenDriver.hxx"
 
 using namespace MED_EN;
 
@@ -54,43 +41,6 @@ class SUPPORT;
 class MESH
 
 {
-
-
-public :
-
-  // ------- Drivers Management Part
-protected:
-
-  //-----------------------//
-  class INSTANCE
-  //-----------------------//
-  {
-  public:
-    virtual GENDRIVER * run(const string & fileName, MESH * ptrMesh) const = 0;
-  };
-
-  //-------------------------------------------------------//
-  template <class T> class INSTANCE_DE : public INSTANCE
-  //-------------------------------------------------------//
-  {
-  public :
-    GENDRIVER * run(const string & fileName, MESH * ptrMesh) const
-    { return new T(fileName,ptrMesh); }
-  };
-
-  // Add a similar line for your personnal driver (step 3)
-
-  static INSTANCE_DE<MED_MESH_RDWR_DRIVER>  inst_med;
-  static INSTANCE_DE<GIBI_MESH_RDWR_DRIVER> inst_gibi;
-  static INSTANCE_DE<PORFLOW_MESH_RDWR_DRIVER> inst_porflow;
-  static INSTANCE_DE<VTK_MESH_DRIVER> inst_vtk;
-
-  //static INSTANCE_DE<VTK_DRIVER>   inst_vtk  ;
-  static const INSTANCE * const instances[];
-
-  // ------ End of Drivers Management Part
-
-
   //-----------------------//
   //   Attributes
   //-----------------------//
@@ -181,9 +131,9 @@ public :
   void rmDriver(int index=0);
 
   virtual void read(int index=0);
-  inline void read(const MED_MED_DRIVER & genDriver);
+  inline void read(const GENDRIVER & genDriver);
   inline void write(int index=0, const string & driverName = "");
-  inline void write(const MED_MED_DRIVER & genDriver);
+  inline void write(const GENDRIVER & genDriver);
 
   //  void calculateReverseConnectivity();
   //  void createFaces(); 	//Faces creation => full constituent informations
@@ -220,6 +170,10 @@ public :
   virtual inline void calculateConnectivity(medModeSwitch Mode,
 					    medConnectivity ConnectivityType,
 					    medEntityMesh Entity) const ;
+  virtual inline int getConnectivityLength(medModeSwitch Mode,
+					     medConnectivity ConnectivityType,
+					     medEntityMesh Entity, 
+					     medGeometryElement Type) const;
   virtual inline const int * getConnectivity(medModeSwitch Mode,
 					     medConnectivity ConnectivityType,
 					     medEntityMesh Entity, 
@@ -230,9 +184,12 @@ public :
                                                medEntityMesh Entity, 
                                                medGeometryElement Type, 
                                                int * connectivity) const;
-
+  virtual inline int getReverseConnectivityLength(medConnectivity ConnectivityType,
+						  medEntityMesh Entity=MED_CELL) const;
   virtual inline const int * getReverseConnectivity(medConnectivity ConnectivityType,
 						    medEntityMesh Entity=MED_CELL) const;
+  virtual inline int getReverseConnectivityIndexLength(medConnectivity ConnectivityType,
+							 medEntityMesh Entity=MED_CELL) const;
   virtual inline const int * getReverseConnectivityIndex(medConnectivity ConnectivityType,
 							 medEntityMesh Entity=MED_CELL) const;
 
@@ -346,7 +303,7 @@ inline void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
 
 // This method is MED specific : don't use it
 // must be private.
-inline void MESH::write(const MED_MED_DRIVER & genDriver)
+inline void MESH::write(const GENDRIVER & genDriver)
 {
   const char * LOC = "MESH::write(const MED_MED_DRIVER & genDriver): ";
   BEGIN_OF(LOC);
@@ -365,7 +322,7 @@ inline void MESH::write(const MED_MED_DRIVER & genDriver)
 
 // This method is MED specific : don't use it
 // must be private.
-inline void MESH::read(const MED_MED_DRIVER & genDriver)
+inline void MESH::read(const GENDRIVER & genDriver)
 {
   const char * LOC = "MESH::read(const MED_MED_DRIVER & genDriver): ";
   BEGIN_OF(LOC);
@@ -601,6 +558,25 @@ inline void MESH::calculateConnectivity(medModeSwitch Mode,medConnectivity Conne
     throw MEDEXCEPTION(LOCALIZED("MESH::calculateConnectivity : only for MED_FULL_INTERLACE mode"));
 }
 /*!
+ Return the corresponding length of the array returned by MESH::getConnectivity with exactly the same arguments.
+ Used particulary for wrapping CORBA and python.
+ */
+inline int MESH::getConnectivityLength(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity, medGeometryElement Type) const
+{
+  int nbOfElm = getNumberOfElements(entity,Type);
+  int size;
+  
+  if (Type == MED_ALL_ELEMENTS)
+    {
+      size = getConnectivityIndex(ConnectivityType,entity)[nbOfElm]-1;
+    }
+  else
+    {
+      size = nbOfElm*(((int) Type)%100);
+    }
+  return size;
+}
+/*!
   Return the required connectivity in the right mode for the given
   geometric type of the given entity.
 
@@ -632,12 +608,39 @@ inline const int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,m
   return _connectivity->getConnectivityIndex(ConnectivityType, entity);
 }
 /*!
+  Return the corresponding length of the array returned by MESH::getReverseConnectivity with exactly the same arguments.
+  Used particulary for wrapping CORBA and python.
+ */
+
+inline int MESH::getReverseConnectivityLength(medConnectivity ConnectivityType,
+						    medEntityMesh Entity) const
+{
+  int spaceDim = getSpaceDimension();
+  int nb;
+  
+  if (ConnectivityType == MED_NODAL)
+    {
+      nb = getNumberOfNodes();
+    }
+  else
+    {
+      if (spaceDim == 2)
+	nb = getNumberOfElements(MED_EDGE,
+					MED_ALL_ELEMENTS);
+      else if (spaceDim == 3)
+	nb = getNumberOfElements(MED_FACE,
+					MED_ALL_ELEMENTS);
+    }
+  return getReverseConnectivityIndex(ConnectivityType)[nb]-1;
+}
+/*!
   Return the reverse connectivity required by ConnectivityType :
   - If ConnectivityType=MED_NODAL : return connectivity node-cell
   - If ConnectivityType=MED_DESCENDING : return connectivity face-cell
 
   You must get ReverseConnectivityIndex array to use it.
  */
+
 inline const int * MESH::getReverseConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
 {
   //  checkGridFillConnectivity();
@@ -645,6 +648,29 @@ inline const int * MESH::getReverseConnectivity(medConnectivity ConnectivityType
     throw MEDEXCEPTION("MESH::getReverseConnectivity : no connectivity defined in MESH !");
 
   return _connectivity->getReverseConnectivity(ConnectivityType,Entity);
+}
+/*!
+  Return the corresponding length of the array returned by MESH::getReverseConnectivityIndex with exactly the same arguments.
+  Used particulary for wrapping CORBA and python.
+ */
+inline int MESH::getReverseConnectivityIndexLength(medConnectivity ConnectivityType,
+							 medEntityMesh Entity) const
+{
+  int spaceDim = getSpaceDimension();
+
+  if (ConnectivityType == MED_NODAL)
+    {
+      return getNumberOfNodes()+1;
+    }
+  else
+    {
+      if (spaceDim == 2)
+	return getNumberOfElements(MED_EDGE,MED_ALL_ELEMENTS)+1;
+      else if (spaceDim == 3)
+	return getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS)+1;
+      else
+	throw MEDEXCEPTION("Invalid dimension");
+    }
 }
 /*!
   Return the index array required by ConnectivityType.

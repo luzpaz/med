@@ -573,16 +573,20 @@ int MED_MESH_RDONLY_DRIVER::getCONNECTIVITY()
       // if neither nodal nor descending connectivity exists
       // throw an exception.
       err = getNodalConnectivity(Connectivity) ;
-      if (err!=MED_VALID) {
-	Connectivity->_typeConnectivity = MED_DESCENDING ;
-	err = getDescendingConnectivity(Connectivity) ;
-      } else 
+      if (err!=MED_VALID)
+	{
+	  Connectivity->_typeConnectivity = MED_DESCENDING ;
+	  err = getDescendingConnectivity(Connectivity) ;
+	}
+      else 
 	getDescendingConnectivity(Connectivity) ; // we read it if there is one
       
-      if (err!=MED_VALID) {
-	delete Connectivity ;
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "We could not read any Connectivity")) ;
-      }
+      if (err!=MED_VALID)
+	{
+	  delete Connectivity ;
+	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "We could not read " <<
+				       "any Connectivity")) ;
+	}
 
       _ptrMesh->_meshDimension = Connectivity->_entityDimension ; 
 
@@ -596,72 +600,99 @@ int MED_MESH_RDONLY_DRIVER::getCONNECTIVITY()
 
       // PROVISOIRE : if we have some face or edge in MED_MAILLE, we don't read more. There could not be have face or edge !!!!
 
-      if(Connectivity->_constituent==NULL) {
-
-      SCRUTE(_ptrMesh->_meshDimension);
-      if (_ptrMesh->_meshDimension == 3) {
-        MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES FACES..." );
-        CONNECTIVITY * ConnectivityFace = new CONNECTIVITY(MED_EN::MED_FACE) ;
-	ConnectivityFace->_typeConnectivity = Connectivity->_typeConnectivity ; // NODAL or DESCENDING
-	SCRUTE(ConnectivityFace->_typeConnectivity);
-	if (Connectivity->_typeConnectivity == MED_DESCENDING) {
-          MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DESCENDANTE DES FACES" );
-	  err = getDescendingConnectivity(ConnectivityFace) ;
-	  if (err!=MED_VALID)
-	    throw MEDEXCEPTION ( LOCALIZED(STRING(LOC) << "No FACE in descending connectivity")) ;
-	  getNodalConnectivity(ConnectivityFace) ; // if any !
-	} else {
-          MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE NODALE DES FACES" );
-	  err = getNodalConnectivity(ConnectivityFace) ;
-	  if (err!=MED_VALID) { // or error ????? we are in NODAL mode.
-	    err = getDescendingConnectivity(ConnectivityFace) ;
-	  } else
-	    getDescendingConnectivity(ConnectivityFace); // if any !
-	}
-        if (err!=MED_VALID) {
-	  delete ConnectivityFace ;
-	  MESSAGE(LOC<<"No FACE defined.") ;
-	} else {
-          MESSAGE(LOC<<" SAUVEGARDE DE LA CONNECTIVITE DES FACES DANS L'OBJET CONNECTIVITY" );
-	  Connectivity->_constituent=ConnectivityFace ; 
-        }
-      }
-      
-      // read MED_EDGE connectivity
-      if (_ptrMesh->_meshDimension > 1) { // we are in 3 or 2D 
-        MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES ARRETES...." );
-	CONNECTIVITY * ConnectivityEdge = new CONNECTIVITY(MED_EDGE) ;
-	ConnectivityEdge->_typeConnectivity = Connectivity->_typeConnectivity ;
-	if (Connectivity->_typeConnectivity == MED_DESCENDING) {
-          MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DESCENDANTE DES ARRETES" );
-	  err = getDescendingConnectivity(ConnectivityEdge) ;
-	  if (err!=MED_VALID)
-	    throw MEDEXCEPTION ( LOCALIZED(STRING(LOC) << "No EDGE in descending connectivity")) ;
-	  getNodalConnectivity(ConnectivityEdge) ; // if any !
-	} else {
-          MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE NODALE DES ARRETES" );
-	  err = getNodalConnectivity(ConnectivityEdge) ;
-	  if (err!=MED_VALID) { // or error ????? we are in NODAL mode.
-	    err = getDescendingConnectivity(ConnectivityEdge) ;
-	  } else
-	    getDescendingConnectivity(ConnectivityEdge) ; // if any !
-	}
-	if (err!=MED_VALID) {
-	  delete ConnectivityEdge ;
-	  MESSAGE(LOC<<"No EDGE defined.") ;
-	} else {
+      if(Connectivity->_constituent==NULL)
+	{
+	  SCRUTE(_ptrMesh->_meshDimension);
 	  if (_ptrMesh->_meshDimension == 3)
-	    if (Connectivity->_constituent != NULL)
-	      Connectivity->_constituent->_constituent=ConnectivityEdge ;
-	    else
-	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "EDGE defined but there are no FACE !")) ;
-	  else { // IN 2D
-            MESSAGE(LOC<<" SAUVEGARDE DE LA CONNECTIVITE DES ARETES DANS L'OBJET CONNECTIVITY" );
-	    Connectivity->_constituent=ConnectivityEdge ;
-          }
-        }
-      }
-      }
+	    {
+	      MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES FACES..." );
+	      CONNECTIVITY * ConnectivityFace = new CONNECTIVITY(MED_EN::MED_FACE) ;
+	      ConnectivityFace->_typeConnectivity = Connectivity->_typeConnectivity ;
+	      // NODAL or DESCENDING
+	      SCRUTE(ConnectivityFace->_typeConnectivity);
+	      if (Connectivity->_typeConnectivity == MED_DESCENDING)
+		{
+		  MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DESCENDANTE DES FACES" );
+		  err = getDescendingConnectivity(ConnectivityFace) ;
+		  if (err!=MED_VALID)
+		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
+						 "No FACE in descending connectivity")) ;
+		  getNodalConnectivity(ConnectivityFace) ; // if any !
+		}
+	      else
+		{
+		  MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE NODALE DES FACES" );
+		  err = getNodalConnectivity(ConnectivityFace) ;
+		  if (err!=MED_VALID)
+		    { // or error ????? we are in NODAL mode.
+		      err = getDescendingConnectivity(ConnectivityFace) ;
+		    }
+		  else
+		    getDescendingConnectivity(ConnectivityFace); // if any !
+		}
+
+	      if (err!=MED_VALID)
+		{
+		  delete ConnectivityFace ;
+		  MESSAGE(LOC<<"No FACE defined.") ;
+		}
+	      else
+		{
+		  MESSAGE(LOC<<" SAUVEGARDE DE LA CONNECTIVITE DES " <<
+			  "FACES DANS L'OBJET CONNECTIVITY" );
+		  Connectivity->_constituent=ConnectivityFace ; 
+		}
+	    }
+      
+	  // read MED_EDGE connectivity
+	  if (_ptrMesh->_meshDimension > 1)
+	    { // we are in 3 or 2D 
+	      MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES ARRETES...." );
+	      CONNECTIVITY * ConnectivityEdge = new CONNECTIVITY(MED_EDGE) ;
+	      ConnectivityEdge->_typeConnectivity = Connectivity->_typeConnectivity ;
+	      if (Connectivity->_typeConnectivity == MED_DESCENDING)
+		{
+		  MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DESCENDANTE " <<
+			  "DES ARRETES" );
+		  err = getDescendingConnectivity(ConnectivityEdge) ;
+		  if (err!=MED_VALID)
+		    throw MEDEXCEPTION ( LOCALIZED(STRING(LOC) <<
+						   "No EDGE in descending connectivity")) ;
+		  getNodalConnectivity(ConnectivityEdge) ; // if any !
+		}
+	      else
+		{
+		  MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE NODALE DES ARRETES" );
+		  err = getNodalConnectivity(ConnectivityEdge) ;
+		  if (err!=MED_VALID)
+		    { // or error ????? we are in NODAL mode.
+		      err = getDescendingConnectivity(ConnectivityEdge) ;
+		    }
+		  else
+		    getDescendingConnectivity(ConnectivityEdge) ; // if any !
+		}
+
+	      if (err!=MED_VALID)
+		{
+		  delete ConnectivityEdge ;
+		  MESSAGE(LOC<<"No EDGE defined.") ;
+		}
+	      else
+		{
+		  if (_ptrMesh->_meshDimension == 3)
+		    if (Connectivity->_constituent != NULL)
+		      Connectivity->_constituent->_constituent=ConnectivityEdge ;
+		    else
+		      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "EDGE defined but there are no FACE !")) ;
+		  else
+		    { // IN 2D
+		      MESSAGE(LOC<<" SAUVEGARDE DE LA CONNECTIVITE DES " <<
+			      "ARETES DANS L'OBJET CONNECTIVITY" );
+		      Connectivity->_constituent=ConnectivityEdge ;
+		    }
+		}
+	    }
+	}
       _ptrMesh->_connectivity  = Connectivity ;                                      
 
       // all right !
@@ -691,6 +722,9 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER::getNodalConnectivity : " ;
   BEGIN_OF(LOC);
+
+  int spaceDimension = _ptrMesh->_spaceDimension;
+
   if (_status==MED_OPENED)
     {
       // Get the type of entity to work on (previously set in the Connectivity Object)
@@ -699,36 +733,40 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
       // Get the number of cells of each type & store it in <tmp_cells_count>.
       int * tmp_cells_count = new int[MED_NBR_GEOMETRIE_MAILLE] ;
       int i;
-      for (i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++) {                       // EF :ON SCANNE DES GEOMETRIES INUTILES, UTILISER LES MAPS
-	tmp_cells_count[i]=MEDnEntMaa(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())),
-				      MED_FR::MED_CONN,(MED_FR::med_entite_maillage) Entity,
-                                      all_cell_type[i],MED_FR::MED_NOD); 
+      for (i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++)
+	{ // EF :ON SCANNE DES GEOMETRIES INUTILES, UTILISER LES MAPS
 
+	  tmp_cells_count[i]=MEDnEntMaa(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())),
+					MED_FR::MED_CONN,(MED_FR::med_entite_maillage) Entity,
+					all_cell_type[i],MED_FR::MED_NOD); 
 
-        // Get the greatest dimension of the cells : Connectivity->_entityDimension
-        // We suppose there is no cells used as faces in MED 2.2.x , this is forbidden !!!
-	// In version prior to 2.2.x, it is possible
-	if (tmp_cells_count[i]>0) { 
-	  Connectivity->_entityDimension=all_cell_type[i]/100;  
-	  Connectivity->_numberOfTypes++;
+	  // Get the greatest dimension of the cells : Connectivity->_entityDimension
+	  // We suppose there is no cells used as faces in MED 2.2.x , this is forbidden !!!
+	  // In version prior to 2.2.x, it is possible
+	  if (tmp_cells_count[i]>0)
+	    { 
+	      Connectivity->_entityDimension=all_cell_type[i]/100;  
+	      Connectivity->_numberOfTypes++;
+	    }
 	}
-      }
       
 
       // If there is no nodal connectivity, we quit !
-      if ( Connectivity->_numberOfTypes == 0 ) {
-	delete[] tmp_cells_count ;
-	return MED_ERROR ;
-      }
+      if ( Connectivity->_numberOfTypes == 0 )
+	{
+	  delete[] tmp_cells_count ;
+	  return MED_ERROR ;
+	}
 
       // if MED version < 2.2.x, we read only entity with dimention = Connectivity->_entityDimension. Lesser dimension are face or edge !
 
       char version_med[10] ;
-      if ( MEDfichEntete(_medIdt,MED_FR::MED_VERSION,version_med) != 0 ){
-	// error : we suppose we have not a good med file !
-	delete[] tmp_cells_count ;
-	return MED_ERROR ;
-      }
+      if ( MEDfichEntete(_medIdt,MED_FR::MED_VERSION,version_med) != 0 )
+	{
+	  // error : we suppose we have not a good med file !
+	  delete[] tmp_cells_count ;
+	  return MED_ERROR ;
+	}
 
       // we get MED version number
       // If MED version is < 2.2 then the cells which dimension
@@ -744,38 +782,76 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
       tmpFaceCount[0]     = 0 ;
       int numberOfFacesTypes = 0;
   
-      if ((version_med != "2.2")&(Entity==MED_FR::MED_MAILLE)) {
+//       if ((version_med != "2.2")&(Entity==MED_FR::MED_MAILLE))
+// 	{
+// 	  Connectivity->_numberOfTypes=0;
 	
-        Connectivity->_numberOfTypes=0;
-	
-        for ( i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++) {
-	  tmpFaceCount[i]=0;
-	  tmpEdgeCount[i]=0;
-	  if (tmp_cells_count[i]!=0) {
-	    int dimension = all_cell_type[i]/100 ;
-	    if (Connectivity->_entityDimension==dimension) 
-	      Connectivity->_numberOfTypes++ ;
+// 	  for ( i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++)
+// 	    {
+// 	      tmpFaceCount[i]=0;
+// 	      tmpEdgeCount[i]=0;
+// 	      if (tmp_cells_count[i]!=0)
+// 		{
+// 		  int dimension = all_cell_type[i]/100 ;
+// 		  if (Connectivity->_entityDimension==dimension) 
+// 		    Connectivity->_numberOfTypes++ ;
 	    
-	    if (dimension == 2)
-	      if (Connectivity->_entityDimension==3) {
-		tmpFaceCount[i]=tmp_cells_count[i] ;
-		tmp_cells_count[i]=0 ;
-		numberOfFacesTypes++;
-	      }
-	    if (dimension == 1)
-	      if (Connectivity->_entityDimension>dimension) {
-		tmpEdgeCount[i]=tmp_cells_count[i] ;
-		tmp_cells_count[i]=0;
-		numberOfEdgesTypes++ ;
-	      }
-	  }
+// 		  if (dimension == 2)
+// 		    if (Connectivity->_entityDimension==3)
+// 		      {
+// 			tmpFaceCount[i]=tmp_cells_count[i] ;
+// 			tmp_cells_count[i]=0 ;
+// 			numberOfFacesTypes++;
+// 		      }
+// 		  if (dimension == 1)
+// 		    if (Connectivity->_entityDimension>dimension)
+// 		      {
+// 			tmpEdgeCount[i]=tmp_cells_count[i] ;
+// 			tmp_cells_count[i]=0;
+// 			numberOfEdgesTypes++ ;
+// 		      }
+// 		}
+// 	    }
+// 	}
+
+      if (Entity==MED_FR::MED_MAILLE)
+	{
+	  Connectivity->_numberOfTypes=0;
+	
+	  for ( i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++)
+	    {
+	      tmpFaceCount[i]=0;
+	      tmpEdgeCount[i]=0;
+	      if (tmp_cells_count[i]!=0)
+		{
+		  int dimension = all_cell_type[i]/100 ;
+		  if (Connectivity->_entityDimension==dimension) 
+		    Connectivity->_numberOfTypes++ ;
+	    
+		  if (dimension == 2)
+		    if (Connectivity->_entityDimension==3)
+		      {
+			tmpFaceCount[i]=tmp_cells_count[i] ;
+			//tmp_cells_count[i]=0 ;
+			//Connectivity->_numberOfTypes++ ;
+			numberOfFacesTypes++;
+		      }
+		  if (dimension == 1)
+		    if (Connectivity->_entityDimension>dimension)
+		      {
+			tmpEdgeCount[i]=tmp_cells_count[i] ;
+			//tmp_cells_count[i]=0;
+			//Connectivity->_numberOfTypes++ ;
+			numberOfEdgesTypes++ ;
+		      }
+		}
+	    }
 	}
-      }
 
       // bloc to read CELL :
       {
-      // Prepare an array of indexes on the different cell types to create a MEDSKYLINEARRAY
-      // We use <tmp_cells_count> to calculate <Connectivity->_count> then we release it
+	// Prepare an array of indexes on the different cell types to create a MEDSKYLINEARRAY
+	// We use <tmp_cells_count> to calculate <Connectivity->_count> then we release it
 	Connectivity->_geometricTypes = new MED_EN::medGeometryElement [Connectivity->_numberOfTypes]   ;  // Double emploi pour des raisons pratiques 
 	Connectivity->_type           = new CELLMODEL                  [Connectivity->_numberOfTypes]   ;  //
 	Connectivity->_count          = new int                        [Connectivity->_numberOfTypes+1] ;
@@ -784,27 +860,32 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	int size = 0 ; 
 	int typeNumber=1 ;
         int i;
-	for ( i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++)  { // no point1 cell type (?)
-	  if (tmp_cells_count[i]>0) {
-	    Connectivity->_count[typeNumber]=Connectivity->_count[typeNumber-1]+tmp_cells_count[i];
+	for ( i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++)
+	  { // no point1 cell type (?)
+	    int dimension = all_cell_type[i]/100 ;
+	    if ((tmp_cells_count[i]>0) && (Connectivity->_entityDimension == dimension))
+	      {
+		Connectivity->_count[typeNumber]=Connectivity->_count[typeNumber-1]+tmp_cells_count[i];
 
-	    CELLMODEL t( (MED_EN::medGeometryElement) MED_MESH_DRIVER::all_cell_type[i]) ;
-	    Connectivity->_type[typeNumber-1]=t ;
+		CELLMODEL t( (MED_EN::medGeometryElement) MED_MESH_DRIVER::all_cell_type[i]) ;
+
+		Connectivity->_type[typeNumber-1] = t ;
 	    
-	    Connectivity->_geometricTypes[typeNumber-1]=( MED_EN::medGeometryElement) MED_MESH_DRIVER::all_cell_type[i] ;
+		Connectivity->_geometricTypes[typeNumber-1]=( MED_EN::medGeometryElement) MED_MESH_DRIVER::all_cell_type[i] ;
 	    
-	    // probleme avec les mailles de dimension < a dimension du maillage :
-	    // Il faut oter le zero a la lecture est le remettre a l'ecriture : ce n'est pas fait !!!!! On interdit ce cas pour l'instant !!!
+		// probleme avec les mailles de dimension < a dimension du maillage :
+		// Il faut oter le zero a la lecture est le remettre a l'ecriture : ce n'est pas fait !!!!! On interdit ce cas pour l'instant !!!
 
 	      
-	    size+=tmp_cells_count[i]*((MED_MESH_DRIVER::all_cell_type[i])%100) ;
+		size+=tmp_cells_count[i]*((MED_MESH_DRIVER::all_cell_type[i])%100) ;
 	    
-	    MESSAGE(LOC
-		    << Connectivity->_count[typeNumber]-1 << " cells of type " 
-		    << all_cell_type_tab[i] ); 
-	    typeNumber++;
+		MESSAGE(LOC
+			<< Connectivity->_count[typeNumber]-1 << " cells of type " 
+			<< all_cell_type_tab[i] ); 
+
+		typeNumber++;
+	      }
 	  }
-	}
 	
 	// Creation of the MEDSKYLINEARRAY
 	//Connectivity->_nodal = new MEDSKYLINEARRAY(Connectivity->_count[Connectivity->_numberOfTypes]-1,size) ; 
@@ -815,79 +896,80 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	
 	// Fill the MEDSKYLINEARRAY by reading the MED file.
         int j=0;
-	for ( i=0;i<Connectivity->_numberOfTypes;i++) {
-	  int multi = 0 ;
-	  MED_FR::med_geometrie_element med_type = (MED_FR::med_geometrie_element) Connectivity->_type[i].getType() ;
-//  	  if ( Connectivity->_type[i].getDimension() < Connectivity->_entityDimension) 
-	  if (Connectivity->_entity == MED_CELL)
-	    if ( Connectivity->_type[i].getDimension() < _ptrMesh->_spaceDimension) 
-	      multi=1;
+	for ( i=0;i<Connectivity->_numberOfTypes;i++)
+	  {
+	    int multi = 0 ;
+	    MED_FR::med_geometrie_element med_type = (MED_FR::med_geometrie_element) Connectivity->_type[i].getType() ;
+	    //if ( Connectivity->_type[i].getDimension() < Connectivity->_entityDimension) 
+	    if (Connectivity->_entity == MED_CELL)
+	      if ( Connectivity->_type[i].getDimension() < _ptrMesh->_spaceDimension) 
+		multi=1;
 	  
-	  //	  int NumberOfCell = Connectivity->_count[i+1]-Connectivity->_count[i] ;
-	  int NumberOfNodeByCell = Connectivity->_type[i].getNumberOfNodes() ;
+	    //	  int NumberOfCell = Connectivity->_count[i+1]-Connectivity->_count[i] ;
+	    int NumberOfNodeByCell = Connectivity->_type[i].getNumberOfNodes() ;
 	  
-	  // initialise index
-	  for ( j=Connectivity->_count[i]; j<Connectivity->_count[i+1];j++)
-	    NodalIndex[j]=NodalIndex[j-1]+NumberOfNodeByCell ; 
+	    // initialise index
+	    for ( j=Connectivity->_count[i]; j<Connectivity->_count[i+1];j++)
+	      NodalIndex[j]=NodalIndex[j-1]+NumberOfNodeByCell ; 
 
-	  int tmp_numberOfCells = Connectivity->_count[i+1]-Connectivity->_count[i] ;
-	  int * tmp_ConnectivityArray = new int[(NumberOfNodeByCell+multi)*tmp_numberOfCells];
+	    int tmp_numberOfCells = Connectivity->_count[i+1]-Connectivity->_count[i] ;
+	    int * tmp_ConnectivityArray = new int[(NumberOfNodeByCell+multi)*tmp_numberOfCells];
 	  
-//  	  int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-//  			      Connectivity->_entityDimension,tmp_ConnectivityArray,
-//  			      MED_FR::MED_FULL_INTERLACE,NULL,0,Entity,med_type,MED_FR::MED_NOD);
-	  int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-			      _ptrMesh->_spaceDimension,tmp_ConnectivityArray,
-			      MED_FR::MED_FULL_INTERLACE,NULL,0,Entity,med_type,MED_FR::MED_NOD);
+	    //int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
+	    //                    Connectivity->_entityDimension,tmp_ConnectivityArray,
+	    //MED_FR::MED_FULL_INTERLACE,NULL,0,Entity,med_type,MED_FR::MED_NOD);
 
-	  if ( err != MED_VALID) {
-	    delete[] tmp_ConnectivityArray;
-	    delete[] tmp_cells_count;
-	    delete[] tmpFaceCount;
-	    delete[] tmpEdgeCount;
-	    MESSAGE(LOC<<": MEDconnLire returns "<<err) ;
-	    return MED_ERROR ;
+	    int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
+				_ptrMesh->_spaceDimension,tmp_ConnectivityArray,
+				MED_FR::MED_FULL_INTERLACE,NULL,0,Entity,med_type,
+				MED_FR::MED_NOD);
+
+	    if ( err != MED_VALID)
+	      {
+		delete[] tmp_ConnectivityArray;
+		delete[] tmp_cells_count;
+		delete[] tmpFaceCount;
+		delete[] tmpEdgeCount;
+		MESSAGE(LOC<<": MEDconnLire returns "<<err) ;
+		return MED_ERROR ;
+	      }
+
+	    int * ConnectivityArray = NodalValue + NodalIndex[Connectivity->_count[i]-1]-1 ;
+
+	    // version originale sans prise en compte des numéros optionnels
+	    //
+	    for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
+	      ConnectivityArray[j*NumberOfNodeByCell+k]=tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k] ;
+
+	    //////////////////////////////////////////////////////////////////////////////
+	    // Modification pour prise en compte de la numérotation optionnelle des noeuds ///
+	    //////////////////////////////////////////////////////////////////////////////
+	    //
+	    // Rénumérote le tableau temporaire tmp_ConnectivityArray en utilisant _optionnalToCanonicNodesNumbers
+	    // Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
+	    
+	    // 	if (_ptrMesh->_arePresentOptionnalNodesNumbers==1) 
+	    // 		{
+	    // 	 	for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
+	    // 	 		ConnectivityArray[j*NumberOfNodeByCell+k]=_ptrMesh->_optionnalToCanonicNodesNumbers[tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k]] ;
+	    // 		}
+	    // 	else
+	    // 		{
+	    // 	 	for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
+	    // 	 		ConnectivityArray[j*NumberOfNodeByCell+k]=tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k] ;
+	    // 		}
+	    ////////////////////////////////////////////////////////////////////////////
+	
+	    delete[] tmp_ConnectivityArray;  
 	  }
-
-  	  int * ConnectivityArray = NodalValue + NodalIndex[Connectivity->_count[i]-1]-1 ;
-
-	 // version originale sans prise en compte des numéros optionnels
-	 //
-	  for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
-	    ConnectivityArray[j*NumberOfNodeByCell+k]=tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k] ;
-
-	//////////////////////////////////////////////////////////////////////////////////////
-  	///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
-  	//////////////////////////////////////////////////////////////////////////////////////
-  	///
-	/// Rénumérote le tableau temporaire tmp_ConnectivityArray en utilisant _optionnalToCanonicNodesNumbers
-	/// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
-	
-// 	if (_ptrMesh->_arePresentOptionnalNodesNumbers==1) 
-// 		{
-// 	 	for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
-// 	 		ConnectivityArray[j*NumberOfNodeByCell+k]=_ptrMesh->_optionnalToCanonicNodesNumbers[tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k]] ;
-// 		}
-// 	else
-// 		{
-// 	 	for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
-// 	 		ConnectivityArray[j*NumberOfNodeByCell+k]=tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k] ;
-// 		}
-  	
-	//////////////////////////////////////////////////////////////////////////////////////
-	
-	
-	  delete[] tmp_ConnectivityArray;
-  
-	}
 
 	Connectivity->_nodal = new MEDSKYLINEARRAY(Connectivity->_count[Connectivity->_numberOfTypes]-1,
 						   size,
 						   NodalIndex,
 						   NodalValue) ; 
+
 	delete[] NodalIndex;
 	delete[] NodalValue;
-	
       } // end of bloc to read CELL
 
       delete[] tmp_cells_count; 
@@ -959,6 +1041,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             tmp_constituentArray = new int[NumberOfNodeByFace*tmp_numberOfFaces] ;
             MESSAGE(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !") ;
 	  }
+
 	  int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
 			      Connectivity->_entityDimension,tmp_constituentArray,
 			      MED_FR::MED_FULL_INTERLACE,NULL,0,MED_FR::MED_MAILLE,med_type,MED_FR::MED_NOD);
@@ -1207,7 +1290,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
 
 	MESSAGE(LOC << "error returned from getNodesFamiliesNumber " << err);
 
-	MEDArrayCellFamily = new (int*)[_ptrMesh->getNumberOfTypes(MED_CELL)] ; // ET SI IL N'Y A PAS DE CELLS ?
+	MEDArrayCellFamily = new int*[_ptrMesh->getNumberOfTypes(MED_CELL)] ; // ET SI IL N'Y A PAS DE CELLS ?
 	const medGeometryElement * myTypes = _ptrMesh->getTypes(MED_CELL);
 	for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_CELL);i++)
 	  MEDArrayCellFamily[i] = new int[_ptrMesh->getNumberOfElements(MED_CELL,myTypes[i])] ;
@@ -1219,7 +1302,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
 	if (_ptrMesh->_connectivity->_constituent != NULL) {
 	  if (_ptrMesh->_connectivity->_constituent->_entity == MED_EN::MED_FACE) {
 	    // FACE
-	    MEDArrayFaceFamily = new (int*)[_ptrMesh->getNumberOfTypes(MED_FACE)] ;
+	    MEDArrayFaceFamily = new int*[_ptrMesh->getNumberOfTypes(MED_FACE)] ;
 	    myTypes = _ptrMesh->getTypes(MED_FACE);
 	    for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_FACE);i++)
 	      MEDArrayFaceFamily[i] = new int[_ptrMesh->getNumberOfElements(MED_FACE,myTypes[i])] ;
@@ -1230,7 +1313,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
 
 	  } else {
 	    // EDGE in 2D
-	    MEDArrayEdgeFamily = new (int*)[_ptrMesh->getNumberOfTypes(MED_EDGE)] ;
+	    MEDArrayEdgeFamily = new int*[_ptrMesh->getNumberOfTypes(MED_EDGE)] ;
 	    myTypes = _ptrMesh->getTypes(MED_EDGE);
 	    for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_EDGE);i++)
 	      MEDArrayEdgeFamily[i] = new int[_ptrMesh->getNumberOfElements(MED_EDGE,myTypes[i])] ;
@@ -1241,7 +1324,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
 	  }
 	  // EDGE in 3D
 	  if (_ptrMesh->_connectivity->_constituent->_constituent != NULL) {
-	    MEDArrayEdgeFamily = new (int*)[_ptrMesh->getNumberOfTypes(MED_EDGE)] ;
+	    MEDArrayEdgeFamily = new int*[_ptrMesh->getNumberOfTypes(MED_EDGE)] ;
 	    myTypes = _ptrMesh->getTypes(MED_EDGE);
 	    for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_EDGE);i++)
 	      MEDArrayEdgeFamily[i] = new int[_ptrMesh->getNumberOfElements(MED_EDGE,myTypes[i])] ;
@@ -1400,7 +1483,7 @@ int  MED_MESH_RDONLY_DRIVER::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
     err = MEDfamLire(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())), 
 		     MEDArrayNodeFamily,
 		     _ptrMesh->getNumberOfNodes(),
-		     MED_FR::MED_NOEUD,(enum MED_FR::med_geometrie_element) MED_NONE);
+		     MED_FR::MED_NOEUD,(MED_FR::med_geometrie_element) MED_NONE);
     if ( err != MED_VALID) {
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "There is no family for the |"<< _ptrMesh->getNumberOfNodes() 
                                    << "| nodes in mesh |" 
@@ -2038,7 +2121,7 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
 		      MEDArrayNodeFamily, NumberOfNodes,MED_FR::MED_REMP ,
 		      MED_FR::MED_NOEUD,
-		      (enum MED_FR::med_geometrie_element) MED_NONE); 
+		      (MED_FR::med_geometrie_element) MED_NONE); 
     else
       err = MEDfamGridEcr(_medIdt,
 			  const_cast <char *> (_ptrMesh->_name.c_str()),

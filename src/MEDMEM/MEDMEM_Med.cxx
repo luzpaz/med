@@ -2,7 +2,7 @@ using namespace std;
 # include <string> 
 
 # include "MEDMEM_Med.hxx"
- 
+# include "MEDMEM_DriverFactory.hxx" 
 # include "MEDMEM_STRING.hxx"
 
 # include "MEDMEM_Mesh.hxx"
@@ -30,9 +30,7 @@ MED::MED(driverTypes driverType, const string & fileName)
 
   MESSAGE(LOC << "driverType = " << driverType);
 
-  MED_MED_RDONLY_DRIVER * myDriver = new MED_MED_RDONLY_DRIVER(fileName,this) ;
-  int current = addDriver(*myDriver);
-  //int current= addDriver(driverType,fileName);
+  int current = addDriver(driverType,fileName);
 
   _drivers[current]->open();
   _drivers[current]->readFileStruct();
@@ -144,14 +142,6 @@ MED::~MED()
   END_OF(LOC);
 } ;
 
-// ------- Drivers Management Part
-
-// Add your new driver instance declaration here (step 3-1)
-MED::INSTANCE_DE<MED_MED_RDWR_DRIVER> MED::inst_med ;
-MED::INSTANCE_DE<VTK_MED_DRIVER> MED::inst_vtk ;
-
-// Add your new driver instance in the MED instance list (step 3-2)
-const MED::INSTANCE * const MED::instances[] = { &MED::inst_med, &MED::inst_vtk }; 
 
 /*!
   Create the specified driver and return its index reference to path to 
@@ -160,9 +150,6 @@ const MED::INSTANCE * const MED::instances[] = { &MED::inst_med, &MED::inst_vtk 
 int MED::addDriver(driverTypes driverType, const string & fileName="Default File Name.med") {
 
   const char * LOC = "MED::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\") : ";
-  GENDRIVER * driver;
-  int current;
-  int itDriver = (int) NO_DRIVER;
 
   BEGIN_OF(LOC);
 
@@ -170,37 +157,11 @@ int MED::addDriver(driverTypes driverType, const string & fileName="Default File
 
   SCRUTE(driverType);
 
-  SCRUTE(instances[driverType]);
+  GENDRIVER *driver = DRIVERFACTORY::buildDriverForMed(driverType,fileName,this);
 
-  switch(driverType)
-    {
-    case MED_DRIVER : {
-      itDriver = (int) driverType ;
-      break ;
-    }
+  _drivers.push_back(driver);
 
-    case VTK_DRIVER : {
-      itDriver = 1 ;
-      break ;
-    }
-
-    case GIBI_DRIVER : {
-      throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "GIBI_DRIVER has been specified to the method which is not allowed because there is no GIBI driver for the MED object"));
-      break;
-    }
-
-    case NO_DRIVER : {
-      throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "NO_DRIVER has been specified to the method which is not allowed"));
-      break;
-    }
-    }
-
-  if (itDriver == ((int) NO_DRIVER))
-    throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "NO_DRIVER has been specified to the method which is not allowed"));
-
-  driver = instances[itDriver]->run(fileName, this) ;
-
-  current = _drivers.size()-1;
+  int current = _drivers.size()-1;
 
   driver->setId(current); 
 
@@ -231,13 +192,9 @@ int  MED::addDriver(GENDRIVER & driver) {
   current = _drivers.size()-1;
   SCRUTE(current);
   driver.setId(current); 
-  
-
-  MESSAGE(LOC << " je suis la 1");
 
   END_OF(LOC);
 
-  MESSAGE(LOC << " je suis la 2");
   return current;
   
 }

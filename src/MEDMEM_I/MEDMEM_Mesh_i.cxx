@@ -24,6 +24,9 @@
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_CellModel.hxx"
+
+#include "SenderFactory.hxx"
+#include "MultiCommException.hxx"
 using namespace MEDMEM;
 
 // Initialisation des variables statiques
@@ -291,6 +294,34 @@ throw (SALOME::SALOME_Exception)
 }
 //=============================================================================
 /*!
+ * CORBA: 2nd Accessor for Coordinates
+ */
+//=============================================================================
+SALOME::Sender_ptr MESH_i::getSenderForCoordinates(SALOME_MED::medModeSwitch typeSwitch)
+    throw (SALOME::SALOME_Exception)
+{
+  if (_mesh==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+				 SALOME::INTERNAL_ERROR);
+  SALOME::Sender_ptr ret;
+  try
+    {
+      int spaceDimension=_mesh->getSpaceDimension();
+      int nbNodes=_mesh->getNumberOfNodes();
+      const double * coordinates =_mesh->getCoordinates(convertIdlModeToMedMode(typeSwitch));
+      ret=SenderFactory::buildSender(*this,coordinates,nbNodes*spaceDimension);
+    }
+  catch (MEDEXCEPTION &ex)
+    {       
+      MESSAGE("Unable to acces the coordinates");
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+    }
+  catch(MultiCommException &ex2)
+    THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
+  return ret;
+}
+//=============================================================================
+/*!
  * CORBA: Accessor for Coordinates Names
  */
 //=============================================================================
@@ -541,6 +572,45 @@ SCRUTE(nbelements);
 }
 //=============================================================================
 /*!
+ * CORBA: 2nd Accessor for connectivities
+ */
+//=============================================================================
+SALOME::Sender_ptr MESH_i::getSenderForConnectivity(SALOME_MED::medModeSwitch typeSwitch,
+					       SALOME_MED::medConnectivity mode, 
+					       SALOME_MED::medEntityMesh entity, 
+					       SALOME_MED::medGeometryElement geomElement)
+throw (SALOME::SALOME_Exception)
+{
+  if (_mesh==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+				 SALOME::INTERNAL_ERROR);
+  if (verifieParam(entity,geomElement)==false)
+    THROW_SALOME_CORBA_EXCEPTION("parameters don't match",\
+				 SALOME::BAD_PARAM);
+  SALOME::Sender_ptr ret;
+  try
+    {
+      int nbelements=_mesh->getConnectivityLength(convertIdlModeToMedMode(typeSwitch),
+						 convertIdlConnToMedConn(mode),
+						 convertIdlEntToMedEnt(entity),
+						 convertIdlEltToMedElt(geomElement));
+      const int * numbers=_mesh->getConnectivity(convertIdlModeToMedMode(typeSwitch),
+						 convertIdlConnToMedConn(mode),
+						 convertIdlEntToMedEnt(entity),
+						 convertIdlEltToMedElt(geomElement));
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
+    }
+  catch (MEDEXCEPTION &ex)
+    {
+      MESSAGE("Unable to acces connectivities");
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+    }
+  catch(MultiCommException &ex2)
+    THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
+  return ret;
+}
+//=============================================================================
+/*!
  * CORBA: Accessor for connectivities
  */
 //=============================================================================
@@ -649,15 +719,7 @@ throw (SALOME::SALOME_Exception)
         SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
-                int nbelements; 
-		if ( mode == SALOME_MED::MED_DESCENDING)
-		{
-		   nbelements =(_mesh->getNumberOfNodes())+1;
-		}
-		else
-		{
-		   nbelements = _mesh->getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS);
-		}
+                int nbelements=_mesh->getReverseConnectivityLength(convertIdlConnToMedConn(mode));
 		SCRUTE(nbelements);
                 myseq->length(nbelements);
                 const int * numbers=_mesh->getReverseConnectivity(convertIdlConnToMedConn(mode));
@@ -687,24 +749,7 @@ throw (SALOME::SALOME_Exception)
         SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
-                int nbelements; 
-		if ( mode == SALOME_MED::MED_DESCENDING)
-		{
-		   nbelements =_mesh->getNumberOfNodes();
-		}
-		else
-		{
-		   int dim=_mesh->getMeshDimension();
-		   if ( dim == 3)	
-		   	nbelements = _mesh->getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS);
-		   else
-		   if (dim == 2)	
-		   	nbelements = _mesh->getNumberOfElements(MED_EDGE,MED_ALL_ELEMENTS);
-		   else
-                	THROW_SALOME_CORBA_EXCEPTION("Pb ", \
-                                             SALOME::INTERNAL_ERROR);
-		}
-
+                int nbelements=_mesh->getReverseConnectivityIndexLength(convertIdlConnToMedConn(mode));
                 myseq->length(nbelements);
                 const int * numbers=_mesh->getReverseConnectivityIndex(convertIdlConnToMedConn(mode));
                 for (int i=0;i<nbelements;i++)
@@ -782,10 +827,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbfam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(fam[i]);
-                        SALOME_MED::FAMILY_ptr f2 =
-                                        f1->POA_SALOME_MED::FAMILY::_this();
-                        f1->_remove_ref();
-                        myseq[i] = f2;
+                        myseq[i] = f1->POA_SALOME_MED::FAMILY::_this();
                 }
         }
         catch (MEDEXCEPTION &ex)
@@ -852,6 +894,7 @@ throw (SALOME::SALOME_Exception)
                                        convertIdlEntToMedEnt(entity));
                 all->meshTypes.length(nbTypes);
                 all->numberOfElements.length(nbTypes);
+		all->entityDimension=_mesh->getConnectivityptr()->getEntityDimension();
                 for (int i=0; i<nbTypes; i++)
                 {
                         all->meshTypes[i]=convertMedEltToIdlElt(elemts[i]);
@@ -883,9 +926,7 @@ throw (SALOME::SALOME_Exception)
         {
                 const FAMILY * fam = _mesh->getFamily(convertIdlEntToMedEnt(entity),i);
                 FAMILY_i * f1=new FAMILY_i(fam);
-                SALOME_MED::FAMILY_ptr f2 = f1->POA_SALOME_MED::FAMILY::_this();
-                f1->_remove_ref();
-	        return (SALOME_MED::FAMILY::_duplicate(f2));
+	        return f1->POA_SALOME_MED::FAMILY::_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -921,9 +962,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vNode[i]);
-                        SALOME_MED::FAMILY_ptr f2 = f1->POA_SALOME_MED::FAMILY::_this();
-                        f1->_remove_ref();
-                        all->famNode[i] = f2;
+                        all->famNode[i] = f1->POA_SALOME_MED::FAMILY::_this();
                 }
 
                 nbFam = _mesh->getNumberOfFamilies(MED_EDGE);
@@ -934,9 +973,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vEdge[i]);
-                        SALOME_MED::FAMILY_ptr f2 = f1->POA_SALOME_MED::FAMILY::_this();
-                        f1->_remove_ref();
-                        all->famEdge[i] = f2;
+                        all->famEdge[i] = f1->POA_SALOME_MED::FAMILY::_this();
                 }
 
                 nbFam = _mesh->getNumberOfFamilies(MED_FACE);
@@ -946,9 +983,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vFace[i]);
-                        SALOME_MED::FAMILY_ptr f2 = f1->POA_SALOME_MED::FAMILY::_this();
-                        f1->_remove_ref();
-                        all->famFace[i] = f2;
+                        all->famFace[i] = f1->POA_SALOME_MED::FAMILY::_this();
                 }
 
                 nbFam = _mesh->getNumberOfFamilies(MED_CELL);
@@ -958,9 +993,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vCell[i]);
-                        SALOME_MED::FAMILY_ptr f2 = f1->POA_SALOME_MED::FAMILY::_this();
-                        f1->_remove_ref();
-                        all->famCell[i] = f2;
+                        all->famCell[i] = f1->POA_SALOME_MED::FAMILY::_this();
                 }
 
                 int nbGroup = _mesh->getNumberOfGroups(MED_NODE);
@@ -970,9 +1003,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gNode[i]);
-                        SALOME_MED::GROUP_ptr f2 = f1->POA_SALOME_MED::GROUP::_this();
-                        f1->_remove_ref();
-                        all->groupNode[i] = f2;
+                        all->groupNode[i] = f1->POA_SALOME_MED::GROUP::_this();
                 }
 
                 nbGroup = _mesh->getNumberOfGroups(MED_EDGE);
@@ -982,9 +1013,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gEdge[i]);
-                        SALOME_MED::GROUP_ptr f2 = f1->POA_SALOME_MED::GROUP::_this();
-                        f1->_remove_ref();
-                        all->groupEdge[i] = f2;
+                        all->groupEdge[i] = f1->POA_SALOME_MED::GROUP::_this();
                 }
                 nbGroup = _mesh->getNumberOfGroups(MED_FACE);
                 all->groupFace.length(nbGroup);
@@ -993,9 +1022,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gFace[i]);
-                        SALOME_MED::GROUP_ptr f2 = f1->POA_SALOME_MED::GROUP::_this();
-                        f1->_remove_ref();
-                        all->groupFace[i] = f2;
+                        all->groupFace[i] = f1->POA_SALOME_MED::GROUP::_this();
                 }
 
                 nbGroup = _mesh->getNumberOfGroups(MED_CELL);
@@ -1005,9 +1032,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gCell[i]);
-                        SALOME_MED::GROUP_ptr f2 = f1->POA_SALOME_MED::GROUP::_this();
-                        f1->_remove_ref();
-                        all->groupCell[i] = f2;
+                        all->groupCell[i] = f1->POA_SALOME_MED::GROUP::_this();
                 }
 
         }
@@ -1039,9 +1064,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbgroups;i++)
                 {
                 	GROUP_i * f1=new GROUP_i(groups[i]);
-                	SALOME_MED::GROUP_ptr f2 = f1->POA_SALOME_MED::GROUP::_this();
-                        f1->_remove_ref();
-                        myseq[i] = f2;
+                        myseq[i] = f1->POA_SALOME_MED::GROUP::_this();
                 }
         }
         catch (MEDEXCEPTION &ex)
@@ -1067,9 +1090,7 @@ throw (SALOME::SALOME_Exception)
         {
                 const GROUP * grou = _mesh->getGroup(convertIdlEntToMedEnt(entity),i);
                 GROUP_i * f1=new GROUP_i(grou);
-                SALOME_MED::GROUP_ptr f2 = f1->POA_SALOME_MED::GROUP::_this();
-                f1->_remove_ref();
-	        return (SALOME_MED::GROUP::_duplicate(f2));
+	        return f1->POA_SALOME_MED::GROUP::_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1092,8 +1113,7 @@ throw (SALOME::SALOME_Exception)
         {
                 SUPPORT * myNewSupport = _mesh->getBoundaryElements(convertIdlEntToMedEnt(entity));
                 SUPPORT_i * mySupportI = new SUPPORT_i(myNewSupport);
-                SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this() ;
-                return (SALOME_MED::SUPPORT::_duplicate(mySupportIOR));
+                return mySupportI->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1117,12 +1137,8 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getVolume( myCppSupport);
-		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(mySupport,f);
-		POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i> * f1 = 
-		    new POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i>(medf,true);
-		SALOME_MED::FIELDDOUBLE_ptr f2 = f1->_this();
-                f1->_remove_ref();
-	        return (SALOME_MED::FIELD::_duplicate(f2));
+		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(f);
+		return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1148,8 +1164,7 @@ throw (SALOME::SALOME_Exception)
                 const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 SUPPORT * myNewSupport = _mesh->getSkin(myCppSupport);
                 SUPPORT_i * mySupportI = new SUPPORT_i(myNewSupport);
-                SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this() ;
-                return (SALOME_MED::SUPPORT::_duplicate(mySupportIOR));
+                return mySupportI->_this() ;
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1174,12 +1189,8 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getArea( myCppSupport);
-		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(mySupport,f);
-		POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i> * f1 = 
-		    new POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i>(medf,true);
-		SALOME_MED::FIELDDOUBLE_ptr f2 = f1->_this();
-                f1->_remove_ref();
-	        return (SALOME_MED::FIELD::_duplicate(f2));
+		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(f);
+		return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1204,12 +1215,8 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getLength( myCppSupport);
-		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(mySupport,f);
-		POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i> * f1 = 
-		    new POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i>(medf,true);
-		SALOME_MED::FIELDDOUBLE_ptr f2 = f1->_this();
-                f1->_remove_ref();
-	        return (SALOME_MED::FIELD::_duplicate(f2));
+		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(f);
+	        return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1234,12 +1241,8 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getNormal( myCppSupport);
-		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(mySupport,f);
-		POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i> * f1 = 
-		    new POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i>(medf,true);
-		SALOME_MED::FIELDDOUBLE_ptr f2 = f1->_this();
-                f1->_remove_ref();
-	        return (SALOME_MED::FIELD::_duplicate(f2));
+		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(f);
+	        return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1264,12 +1267,8 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getBarycenter( myCppSupport);
-		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(mySupport,f);
-		POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i> * f1 = 
-		    new POA_SALOME_MED::FIELDDOUBLE_tie<FIELDDOUBLE_i>(medf,true);
-		SALOME_MED::FIELDDOUBLE_ptr f2 = f1->_this();
-                f1->_remove_ref();
-	        return (SALOME_MED::FIELD::_duplicate(f2));
+		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(f);
+	        return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1513,3 +1512,14 @@ throw (SALOME::SALOME_Exception)
         }
 }
 
+//=============================================================================
+/*!
+ * CORBA : Servant destruction
+ */
+//=============================================================================
+void MESH_i::release()
+{
+  PortableServer::ObjectId_var oid=_default_POA()->servant_to_id(this);
+  _default_POA()->deactivate_object(oid);
+  _remove_ref();
+}

@@ -167,7 +167,7 @@ public:
   inline void setNumberOfElements(const int *NumberOfElements);
   inline void setTotalNumberOfElements(int TotalNumberOfElements);
   inline void setNumber(MEDSKYLINEARRAY * Number);
-  inline void setNumber(const int * index, const int* value);
+  inline void setNumber(const int * index, const int* value, bool shallowCopy=false);
 
   inline string getName() const;
   inline string getDescription() const;
@@ -459,11 +459,11 @@ inline void SUPPORT::setNumber(MEDSKYLINEARRAY * Number)
 
 /*! set the attribute _number with index and value arrays */
 //---------------------------------------------------
-inline void SUPPORT::setNumber(const int * index, const int* value)
+inline void SUPPORT::setNumber(const int * index, const int* value, bool shallowCopy)
 //---------------------------------------------------
 {
   if (_number != NULL) delete _number ;
-  _number= new MEDSKYLINEARRAY(_numberOfGeometricType,_totalNumberOfElements,index,value);
+  _number= new MEDSKYLINEARRAY(_numberOfGeometricType,_totalNumberOfElements,index,value,shallowCopy);
 }
 
 /*! returns the name of the support. */

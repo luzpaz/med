@@ -1,64 +1,72 @@
-#include "FIELDClient.hxx"
+//#include "ReceiverFactory.hxx"
 
-using namespace MEDMEM;
+//using namespace MEDMEM;
 
-//=============================================================================
-/*!
- *   Transfert les valeurs du "Champ Corba" dans le "Champ local"
- *   (version FIELD<double>)
- */
-//=============================================================================
-void FIELDClient_value(FIELD<double> *F, const SALOME_MED::FIELD_ptr IOR_Field)
+template<class T1,class T2>
+FIELDClient<T1,T2>::FIELDClient(typename T2::_ptr_type ptrCorba,SUPPORT * S):_fieldPtr(T2::_duplicate(ptrCorba)),_ownSupport(false)
 {
-  BEGIN_OF("FIELDClient_value(double)");
+  if (!S) 
+    {
+      _ownSupport=true;
+      S=new SUPPORTClient(_fieldPtr->getSupport());
+    }
+  FIELD<T1>::setSupport(S);
 
-  F->setValueType(MED_REEL64);
+  setName(_fieldPtr->getName());
 
-  const SALOME_MED::FIELDDOUBLE_var IOR_FieldDouble 
-    = SALOME_MED::FIELDDOUBLE::_narrow(IOR_Field);
-  SCRUTE(IOR_FieldDouble);
+  FIELD<T1>::setDescription(_fieldPtr->getDescription());
+  int nc = _fieldPtr->getNumberOfComponents();
+  FIELD<T1>::setNumberOfComponents(nc);
 
-  SALOME_MED::double_array_var v_corba 
-    = IOR_FieldDouble->getValue(MED_FULL_INTERLACE);
+  FIELD<T1>::setNumberOfValues( S->getNumberOfElements(MED_ALL_ELEMENTS));
 
-  long i, n = v_corba->length();
-  SCRUTE(n);
-  double *v = new double[n];
+  string * _s = new string[nc];
 
-  for (i=0; i<n; i++) v[i] = v_corba[i];
-  MEDARRAY<double> * M = new MEDARRAY<double> 
-    (v, F->getNumberOfComponents(),F->getNumberOfValues(), MED_FULL_INTERLACE);
-  F->setValue(M); 
+  SALOME_MED::string_array_var s;
+  s = _fieldPtr->getComponentsNames();
+  for (int i=0; i<nc; i++)
+    _s[i] = s[i];
+  FIELD<T1>::setComponentsNames(_s);
 
-  END_OF("FIELDClient_value(double)");
+  s = _fieldPtr->getComponentsDescriptions();
+  for (int i=0; i<nc; i++)
+    _s[i] = s[i];
+  FIELD<T1>::setComponentsDescriptions(_s);
+
+  s = _fieldPtr->getComponentsUnits();
+  for (int i=0; i<nc; i++)
+    _s[i] = s[i];
+  FIELD<T1>::setMEDComponentsUnits(_s);
+
+  delete [] _s;
+
+//  s = _fieldPtr->getComponentsDescriptions();
+//  for (int i=0; i<nc; i++)
+//    _s[i] = s[i];
+//  F->setComponentsDescriptions(_s);
+  setIterationNumber(_fieldPtr->getIterationNumber());
+  setTime(_fieldPtr->getTime());
+  setOrderNumber(_fieldPtr->getOrderNumber());
+  fillCopy();
 }
 
-//=============================================================================
-/*!
- *   Transfert les valeurs du "Champ Corba" dans le "Champ local"
- *   (version FIELD<int>)
- */
-//=============================================================================
-void FIELDClient_value(FIELD<int> *F, const SALOME_MED::FIELD_ptr IOR_Field)
+template<class T1,class T2>
+void FIELDClient<T1,T2>::fillCopy()
 {
-  BEGIN_OF("FIELDClient_value(int)");
-
-  F->setValueType(MED_INT32);
-
-  const SALOME_MED::FIELDINT_var IOR_FieldInt 
-    = SALOME_MED::FIELDINT::_narrow(IOR_Field);
-
-  SALOME_MED::long_array_var v_corba 
-    = IOR_FieldInt->getValue(MED_FULL_INTERLACE);
-
-  long i, n = v_corba->length();
-  SCRUTE(n);
-  int *v = new int[n];
-  for (i=0; i<n; i++) v[i] = v_corba[i];
-
-  MEDARRAY<int> * M = new MEDARRAY<int> 
-    (v, F->getNumberOfComponents(),F->getNumberOfValues(), MED_FULL_INTERLACE);
-  F->setValue(M); 
- 
-  END_OF("FIELDClient_value(int)");
+  //setValueType(typeChamps); WARNING TO DO.....
+  //setValueType(_fieldPtr->getValueType());
+  long n;
+  T1 *v = (T1 *)ReceiverFactory::getValue(_fieldPtr->getSenderForValue(MED_FULL_INTERLACE),n);
+  MEDARRAY<T1> * M = new MEDARRAY<T1>(v, FIELD<T1>::getNumberOfComponents(),FIELD<T1>::getNumberOfValues(),MED_FULL_INTERLACE,true,true);
+  setValue(M);
 }
+
+template<class T1,class T2>
+FIELDClient<T1,T2>::~FIELDClient()
+{
+  _fieldPtr->release();
+  CORBA::release(_fieldPtr);
+  if(_ownSupport)
+    delete FIELD<T1>::_support;
+}
+

@@ -24,7 +24,7 @@ public :
   MEDSKYLINEARRAY( const MEDSKYLINEARRAY &myArray );
   MEDSKYLINEARRAY( const med_int count, const med_int length );
   MEDSKYLINEARRAY( const med_int count, const med_int length,
-		   const med_int* index, const med_int* value );
+		   const med_int* index, const med_int* value, bool shallowCopy=false );
 
   //void setMEDSKYLINEARRAY( const med_int count, const med_int length, med_int* index , med_int* value ) ;
 

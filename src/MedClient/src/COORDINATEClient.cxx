@@ -3,6 +3,8 @@
 #include "UtilClient.hxx"
 #include "Utils_CorbaException.hxx"
 
+#include "ReceiverFactory.hxx"
+
 using namespace MEDMEM;
 //=============================================================================
 /*!
@@ -33,10 +35,10 @@ void COORDINATEClient::blankCopy()
 
   std::string *tA;
   long nA;
-  SALOME_MED::MESH::coordinateInfos *all = new SALOME_MED::MESH::coordinateInfos;
+  SALOME_MED::MESH::coordinateInfos_var all;
   try
   {
-        all= IOR_Mesh->getCoordGlobal();
+        all = IOR_Mesh->getCoordGlobal();
   }
   catch (const exception & ex)
   {
@@ -78,11 +80,11 @@ void COORDINATEClient::fillCopy()
   long nN = IOR_Mesh->getNumberOfNodes();
   double *tC;
   long nC;
-  convertCorbaArray(tC, nC, IOR_Mesh->getCoordinates(MED_FULL_INTERLACE));
+  tC=(double *)ReceiverFactory::getValue(IOR_Mesh->getSenderForCoordinates(MED_FULL_INTERLACE),nC);
   ASSERT(nC == (getSpaceDimension() * nN));
   
-  MEDARRAY<double> mC(tC, getSpaceDimension(), nN);
-  setCoordinates(&mC);
+  MEDARRAY<double> mC(tC, getSpaceDimension(), nN,MED_FULL_INTERLACE,true);
+  setCoordinates(&mC,true);
   
   _complete = true;
   

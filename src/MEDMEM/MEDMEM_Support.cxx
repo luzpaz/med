@@ -264,7 +264,7 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
   int * numberOfElements= new int[it];
   _totalNumberOfElements = 0 ;
   //int totalSize = 0 ;
-  int ** tmp_array = new (int*)[it];
+  int ** tmp_array = new int*[it];
   for (int i=0;i<it;i++) {
     int numberOfElementsInType = tmp_NumberOfElementsInType[i] ;
     numberOfElements[i] = numberOfElementsInType ;
@@ -617,7 +617,7 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
   _numberOfElements = new int[it] ;
   _totalNumberOfElements = 0 ;
   //int totalSize = 0 ;
-  int ** tmp_array = new (int*)[it];
+  int ** tmp_array = new int*[it];
   for (int i=0;i<it;i++) {
     int numberOfElementsInType = tmp_NumberOfElementsInType[i] ;
     _numberOfElements[i] = numberOfElementsInType ;

@@ -103,10 +103,7 @@ throw (SALOME::SALOME_Exception)
 		for (int i=0;i<nbfam;i++)
                 {
 			FAMILY_i * f1=new FAMILY_i(fam[i]);
-		        SALOME_MED::FAMILY_ptr f2 = 
-					f1->POA_SALOME_MED::FAMILY::_this();
-			f1->_remove_ref();
-			myseq[i] = f2;
+			myseq[i] = f1->POA_SALOME_MED::FAMILY::_this();
 		}
 	}
 	catch (MEDEXCEPTION &ex)
@@ -132,9 +129,7 @@ throw (SALOME::SALOME_Exception)
         {
 		FAMILY * fam=_group->getFamily(i);
 		FAMILY_i * f1=new FAMILY_i(fam);
-		SALOME_MED::FAMILY_ptr f2 = f1->POA_SALOME_MED::FAMILY::_this();
-		f1->_remove_ref();
-		return (SALOME_MED::FAMILY::_duplicate(f2));
+		return f1->POA_SALOME_MED::FAMILY::_this();
 	}
 	catch (MEDEXCEPTION &ex)
 	{

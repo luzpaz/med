@@ -29,11 +29,11 @@ class CELLMODEL
 {
 
 private:
-  			/*! private method : /n
+  			/*! private method : \n
 			    used by constructor and operator= */
   void init(const CELLMODEL &m);
 
-  			/*! private method : /n */
+  			/*! private method : \n */
   void clean();
 
 
@@ -93,7 +93,7 @@ public :
   			/*! returns number of nodes forming this type of cell    */
   inline int 			getNumberOfNodes()    const;
 
-  			/*! returns the dimension of this type of cell./n
+  			/*! returns the dimension of this type of cell.\n
 			    it can be different from mesh dimension              */
   inline int 			getDimension()        const;
 

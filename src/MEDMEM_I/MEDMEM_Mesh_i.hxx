@@ -13,15 +13,16 @@
 #include <string>
 
 #include <SALOMEconfig.h>
+#include "SALOMEMultiComm.hxx"
 #include CORBA_SERVER_HEADER(MED)
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
+#include CORBA_SERVER_HEADER(SALOME_Comm)
 
 namespace MEDMEM {
 class MESH;
-class MESH_i:
-		public POA_SALOME_MED::MESH,
-		public PortableServer::RefCountServantBase
-//		public SALOME_MED_Component_i
+class MESH_i: public POA_SALOME_MED::MESH,
+	      public PortableServer::RefCountServantBase,
+	      public SALOMEMultiComm
 {
 public :
     static map < int,::MEDMEM::MESH *> meshMap;
@@ -64,6 +65,9 @@ public:
   
   SALOME_MED::double_array* getCoordinates(SALOME_MED::medModeSwitch typeSwitch)
     		 	 throw (SALOME::SALOME_Exception);
+
+  SALOME::Sender_ptr getSenderForCoordinates(SALOME_MED::medModeSwitch typeSwitch)
+    throw (SALOME::SALOME_Exception);
   
   CORBA::Double  getCoordinate(CORBA::Long Number, CORBA::Long Axis)
                          throw (SALOME::SALOME_Exception);
@@ -96,6 +100,12 @@ public:
 					 SALOME_MED::medConnectivity mode, 
 					 SALOME_MED::medEntityMesh entity, 
 					 SALOME_MED::medGeometryElement geomElement)
+                         throw (SALOME::SALOME_Exception);
+
+  SALOME::Sender_ptr getSenderForConnectivity(SALOME_MED::medModeSwitch typeSwitch, 
+					      SALOME_MED::medConnectivity mode, 
+					      SALOME_MED::medEntityMesh entity, 
+					      SALOME_MED::medGeometryElement geomElement)
                          throw (SALOME::SALOME_Exception);
   
   SALOME_MED::long_array*   getConnectivityIndex(SALOME_MED::medConnectivity mode,
@@ -178,6 +188,8 @@ public:
     SALOME_MED::MESH::connectivityInfos * getConnectGlobal
 				  (SALOME_MED::medEntityMesh entity)
                                   throw (SALOME::SALOME_Exception);
+
+  void release();
 };
 }
 

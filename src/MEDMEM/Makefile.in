@@ -45,6 +45,7 @@ MEDMEM_Connectivity.hxx \
 MEDMEM_Coordinate.hxx \
 MEDMEM_define.hxx \
 MEDMEM_DriversDef.hxx \
+MEDMEM_DriverFactory.hxx \
 MEDMEM_Family.hxx \
 MEDMEM_Field.hxx \
 MEDMEM_GenDriver.hxx \
@@ -79,6 +80,7 @@ MEDMEM_CellModel.cxx \
 MEDMEM_Connectivity.cxx \
 MEDMEM_Coordinate.cxx \
 MEDMEM_DriversDef.cxx \
+MEDMEM_DriverFactory.cxx \
 MEDMEM_Family.cxx \
 MEDMEM_Field.cxx \
 MEDMEM_GenDriver.cxx \

@@ -18,12 +18,7 @@
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Array.hxx"
 #include "MEDMEM_GenDriver.hxx"
-
-#include "MEDMEM_MedFieldDriver.hxx"
-#include "MEDMEM_MedMedDriver.hxx"
-
-#include "MEDMEM_VtkFieldDriver.hxx"
-#include "MEDMEM_VtkMedDriver.hxx"
+#include "MEDMEM_DriverFactory.hxx"
 
 using namespace MED_EN;
 
@@ -37,6 +32,9 @@ using namespace MED_EN;
 */
 
 namespace MEDMEM {
+
+  template<class T> class FIELD;
+
 class FIELD_    // GENERIC POINTER TO a template <class T> class FIELD
 {
 protected:
@@ -77,13 +75,13 @@ protected:
 
   /*!
     \if developper
-    Array of size _numberOfComponents. /n
-    (constant, scalar, vector, tensor)/n
+    Array of size _numberOfComponents. \n
+    (constant, scalar, vector, tensor)\n
     We could use an array of integer to store
-    numbers of values: /n
-    - 1 for scalar,/n
-    - space dimension for vector,/n
-    - space dimension square for tensor./n
+    numbers of values: \n
+    - 1 for scalar,\n
+    - space dimension for vector,\n
+    - space dimension square for tensor.\n
     So numbers of values per entities would be
     sum of _componentsTypes array.
 
@@ -539,37 +537,14 @@ inline void FIELD_::setValueType (const med_type_champ ValueType)
 */
 
 namespace MEDMEM {
+
+  template<class T2> class MED_FIELD_RDONLY_DRIVER;
+  template<class T2> class MED_FIELD_WRONLY_DRIVER;
+  template<class T2> class VTK_FIELD_DRIVER;
+  
 template <class T> class FIELD : public FIELD_
 {
-
-  // ------- Drivers Management Part
 protected:
-
- //-----------------------//
-   class INSTANCE
-  //-----------------------//
-  {
-  public:
-    virtual GENDRIVER * run(const string & fileName, FIELD<T> * ptrFIELD) const = 0 ;
-  } ;
-
-  //-------------------------------------------------------//
-  template <class T2> class INSTANCE_DE : public INSTANCE
-  //-------------------------------------------------------//
-  {
-  public :
-    GENDRIVER * run(const string & fileName, FIELD<T> * ptrFIELD) const
-    {
-      return new T2(fileName,ptrFIELD);
-    }
-  } ;
-
-  //    static INSTANCE_DE<MED_FIELD_RDONLY_DRIVER> inst_med_rdonly ;
-  static INSTANCE_DE<MED_FIELD_RDWR_DRIVER<T> >   inst_med ;
-  static INSTANCE_DE<VTK_FIELD_DRIVER<T> >   inst_vtk ;
-
-  static const INSTANCE * const instances[] ;
-
   // ------ End of Drivers Management Part
 
   // array of value of type T
@@ -620,7 +595,6 @@ public:
 
   friend class MED_FIELD_RDONLY_DRIVER<T>;
   friend class MED_FIELD_WRONLY_DRIVER<T>;
-
   friend class VTK_FIELD_DRIVER<T>;
   //friend class MED_FIELD_RDWR_DRIVER  <T>;
 
@@ -647,6 +621,7 @@ public:
   inline void     setValue(MEDARRAY<T> *Value);
 
   inline MEDARRAY<T>* getvalue() const;
+  inline int getValueLength(medModeSwitch Mode) const;
   inline const T*       getValue(medModeSwitch Mode) const;
   inline const T*       getValueI(medModeSwitch Mode,int i) const;
   inline T        getValueIJ(int i,int j) const;
@@ -792,7 +767,7 @@ template <class T> FIELD<T> & FIELD<T>::operator=(const FIELD &m)
 /*!
      Overload addition operator.
      This operation is authorized only for compatible fields that have the same support.
-     The compatibility checking includes equality tests of the folowing data members:/n
+     The compatibility checking includes equality tests of the folowing data members:\n
      - _support
      - _numberOfComponents
      - _numberOfValues
@@ -801,11 +776,11 @@ template <class T> FIELD<T> & FIELD<T>::operator=(const FIELD &m)
 
      The data members of the returned field are initialized, based on the first field, except for the name, 
      which is the combination of the two field's names and the operator.
-     Advised Utilisation in C++ : <tt> FIELD<T> c = a + b; </tt> /n
+     Advised Utilisation in C++ : <tt> FIELD<T> c = a + b; </tt> \n
      In this case, the (recent) compilators perform optimisation and don't call the copy constructor.
      When using python, this operator calls the copy constructor in any case.
      The user has to be aware that when using operator + in associatives expressions like
-     <tt> a = b + c + d +e; </tt> /n
+     <tt> a = b + c + d +e; </tt> \n
      no optimisation is performed : the evaluation of last expression requires the construction of
      3 temporary fields.
 */
@@ -889,7 +864,7 @@ FIELD<T>* FIELD<T>::add(const FIELD& m, const FIELD& n)
 /*!
      Overload substraction operator.
      This operation is authorized only for compatible fields that have the same support.
-     The compatibility checking includes equality tests of the folowing data members:/n
+     The compatibility checking includes equality tests of the folowing data members:\n
      - _support
      - _numberOfComponents
      - _numberOfValues
@@ -898,11 +873,11 @@ FIELD<T>* FIELD<T>::add(const FIELD& m, const FIELD& n)
 
      The data members of the returned field are initialized, based on the first field, except for the name, 
      which is the combination of the two field's names and the operator.
-     Advised Utilisation in C++ : <tt> FIELD<T> c = a - b; </tt> /n
+     Advised Utilisation in C++ : <tt> FIELD<T> c = a - b; </tt> \n
      In this case, the (recent) compilators perform optimisation and don't call the copy constructor.
      When using python, this operator calls the copy constructor in any case.
      The user has to be aware that when using operator - in associatives expressions like
-     <tt> a = b - c - d -e; </tt> /n
+     <tt> a = b - c - d -e; </tt> \n
      no optimisation is performed : the evaluation of last expression requires the construction of
      3 temporary fields.
 */
@@ -1019,7 +994,7 @@ FIELD<T>* FIELD<T>::sub(const FIELD& m, const FIELD& n)
 /*!
      Overload multiplication operator.
      This operation is authorized only for compatible fields that have the same support.
-     The compatibility checking includes equality tests of the folowing data members:/n
+     The compatibility checking includes equality tests of the folowing data members:\n
      - _support
      - _numberOfComponents
      - _numberOfValues
@@ -1028,11 +1003,11 @@ FIELD<T>* FIELD<T>::sub(const FIELD& m, const FIELD& n)
 
      The data members of the returned field are initialized, based on the first field, except for the name, 
      which is the combination of the two field's names and the operator.
-     Advised Utilisation in C++ : <tt> FIELD<T> c = a * b; </tt> /n
+     Advised Utilisation in C++ : <tt> FIELD<T> c = a * b; </tt> \n
      In this case, the (recent) compilators perform optimisation and don't call the copy constructor.
      When using python, this operator calls the copy constructor in any case.
      The user has to be aware that when using operator * in associatives expressions like
-     <tt> a = b * c * d *e; </tt> /n
+     <tt> a = b * c * d *e; </tt> \n
      no optimisation is performed : the evaluation of last expression requires the construction of
      3 temporary fields.
 */
@@ -1118,7 +1093,7 @@ FIELD<T>* FIELD<T>::mul(const FIELD& m, const FIELD& n)
 /*!
      Overload division operator.
      This operation is authorized only for compatible fields that have the same support.
-     The compatibility checking includes equality tests of the folowing data members:/n
+     The compatibility checking includes equality tests of the folowing data members:\n
      - _support
      - _numberOfComponents
      - _numberOfValues
@@ -1127,11 +1102,11 @@ FIELD<T>* FIELD<T>::mul(const FIELD& m, const FIELD& n)
 
      The data members of the returned field are initialized, based on the first field, except for the name, 
      which is the combination of the two field's names and the operator.
-     Advised Utilisation in C++ : <tt> FIELD<T> c = a / b; </tt> /n
+     Advised Utilisation in C++ : <tt> FIELD<T> c = a / b; </tt> \n
      In this case, the (recent) compilators perform optimisation and don't call the copy constructor.
      When using python, this operator calls the copy constructor in any case.
      The user has to be aware that when using operator / in associatives expressions like
-     <tt> a = b / c / d /e; </tt> /n
+     <tt> a = b / c / d /e; </tt> \n
      no optimisation is performed : the evaluation of last expression requires the construction of
      3 temporary fields.
 */
@@ -1450,7 +1425,7 @@ template <class T> void FIELD<T>::applyLin(T a, T b)
 /*!
  *   Return a pointer to a new field that holds the scalar product. Static member function.
  *   This operation is authorized only for compatible fields that have the same support.
- *   The compatibility checking includes equality tests of the folowing data members:/n
+ *   The compatibility checking includes equality tests of the folowing data members:\n
  *   - _support
  *   - _numberOfComponents
  *   - _numberOfValues
@@ -1798,14 +1773,6 @@ template <class T> void FIELD<T>::deallocValue()
 // Methodes Inline
 // -----------------
 
-
-template <class T>       FIELD<T>::INSTANCE_DE<MED_FIELD_RDWR_DRIVER<T> >     FIELD<T>::inst_med  ;
-
-template <class T>       FIELD<T>::INSTANCE_DE<VTK_FIELD_DRIVER<T> >     FIELD<T>::inst_vtk  ;
-
-template <class T> const typename FIELD<T>::INSTANCE * const FIELD<T>::instances[] = { &FIELD<T>::inst_med,  &FIELD<T>::inst_vtk} ;
-
-
 /*!
   Create the specified driver and return its index reference to path to 
   read or write methods.
@@ -1818,46 +1785,16 @@ template <class T> int FIELD<T>::addDriver(driverTypes driverType,
   const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name\") : ";
 
   GENDRIVER * driver;
-  int current;
-  int itDriver = (int) NO_DRIVER;
 
   BEGIN_OF(LOC);
 
   SCRUTE(driverType);
 
-  SCRUTE(instances[driverType]);
-
-  switch(driverType)
-    {
-    case MED_DRIVER : {
-      itDriver = (int) driverType ;
-      break ;
-    }
-
-    case VTK_DRIVER : {
-      itDriver = 1 ;
-      break ;
-    }
-
-    case GIBI_DRIVER : {
-      throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD"));
-      break;
-    }
-
-    case NO_DRIVER : {
-      throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD"));
-      break;
-    }
-    }
-
-  if (itDriver == ((int) NO_DRIVER))
-    throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD"));
-
-  driver = instances[itDriver]->run(fileName, this) ;
+  driver = DRIVERFACTORY::buildDriverForField(driverType,fileName,this);
 
   _drivers.push_back(driver);
 
-  current = _drivers.size()-1;
+  int current = _drivers.size()-1;
 
   _drivers[current]->setFieldName(driverName);
 
@@ -2071,6 +2008,13 @@ template <class T> inline void FIELD<T>::setValue(MEDARRAY<T> *Value)
 template <class T> inline MEDARRAY<T>* FIELD<T>::getvalue() const
 {
   return _value ;
+}
+
+/*!
+  Return the actual length of the reference to values array returned by getValue.
+*/
+template <class T> inline int FIELD<T>::getValueLength(medModeSwitch Mode) const{
+  return _numberOfComponents*_numberOfValues;
 }
 
 /*!

@@ -1255,18 +1255,7 @@ public :
 	PyObject *py_list;
 	const int * connectivity = self->getConnectivity(Mode,ConnectivityType,
 						   Entity,Type);
-	int nbOfElm = self->getNumberOfElements(Entity,Type);
-	int size;
-
-	if (Type == MED_ALL_ELEMENTS)
-	  {
-	    size = self->getConnectivityIndex(ConnectivityType,Entity)[nbOfElm]-1;
-	  }
-	else
-	  {
-	    size = nbOfElm*(((int) Type)%100);
-	  }
-
+	int size = self->getConnectivityLength(Mode,ConnectivityType,Entity,Type);
 	py_list = PyList_New(size);
 	for (int i=0; i < size; i++)
 	  {
@@ -1316,26 +1305,7 @@ public :
 	PyObject *py_list;
 	const int * reverseconnectivity =
 	  self->getReverseConnectivity(ConnectivityType,Entity);
-	int spaceDim = self->getSpaceDimension();
-	int nb;
-
-	if (ConnectivityType == MED_NODAL)
-	  {
-	    nb = (self->getNumberOfNodes());
-	  }
-	else
-	  {
-	    if (spaceDim == 2)
-	      nb = (self->getNumberOfElements(MED_EDGE,
-					      MED_ALL_ELEMENTS));
-	    else if (spaceDim == 3)
-	      nb = (self->getNumberOfElements(MED_FACE,
-					      MED_ALL_ELEMENTS));
-	  }
-
-	int size = self->getReverseConnectivityIndex(ConnectivityType,
-						     Entity)[nb]-1;
-
+	int size = self->getReverseConnectivityLength(ConnectivityType,Entity);
 	py_list = PyList_New(size);
 	for (int i=0; i < size; i++)
 	  {
@@ -1360,22 +1330,7 @@ public :
 	PyObject *py_list;
 	const int * reverseconnectivity_index =
 	  self->getReverseConnectivityIndex(ConnectivityType,Entity);
-
-	int size;
-	int spaceDim = self->getSpaceDimension();
-
-	if (ConnectivityType == MED_NODAL)
-	  {
-	    size = (self->getNumberOfNodes())+1;
-	  }
-	else
-	  {
-	    if (spaceDim == 2)
-	      size = (self->getNumberOfElements(MED_EDGE,MED_ALL_ELEMENTS))+1;
-	    else if (spaceDim == 3)
-	      size = (self->getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS))+1;
-	  }
-
+	int size=self->getReverseConnectivityIndexLength(ConnectivityType,Entity);
 	py_list = PyList_New(size);
 	for (int i=0; i < size; i++)
 	  {

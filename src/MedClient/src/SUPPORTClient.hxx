@@ -14,6 +14,8 @@ private :
 
   const SALOME_MED::SUPPORT_var IOR_Support;
 
+  bool _ownMesh;
+
   mutable bool _complete_support;
 
 public :

@@ -1,0 +1,35 @@
+TEST en construction...
+
+TEST des classes MedClient :
+----------------------------
+
+- FieldClient
+- MeshClient
+- SupportClient
+- FamilyClient
+- GroupClient
+
+Le test utilise un composant nommé TESTMEDCLIENT qui tire à distance sur des objets MEDMEM en utilisant les classes MedClient.
+
+Le test repose sur l'echange d'information entre le composant MED et le composant TESTMEDClient.
+
+Les objets MEDMEM (Mesh, Field, Support), plus ou moins volumineux, sont obtenus à partir des executables de générations de fichiers MED.
+Ces executables sont abetenus apres compilation des fichiers :
+	- create_mesh_c2q4.c
+	- create_mesh_c2t3.c
+	- create_mesh_c3h8.c
+	- create_mesh_c2t4.c
+
+Le test chasse les fuites mémoires grace à un espion de mémoire dont le code est contenu dans :
+	- MemorySpy.hxx
+	- MemorySpy.cxx
+
+Le code du composant se trouve dans les fichiers :
+	- TESTMEDCLIENT_Gen.idl
+	- TESTMEDCLIENT_Gen_i.hxx
+	- TESTMEDCLIENT_Gen_i.cxx
+
+Le lancement du test est effectué par le script python :
+	- test_medclient.py
+
+Enfin MakefileForTest est une ébauche de Makefile nécessaire pour compiler completement le nouveau composant.

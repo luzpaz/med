@@ -55,8 +55,7 @@ GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, MESH *M)
 void MESHClient::blankCopy()
 {
   BEGIN_OF("MESHClient::blankCopy()");
-  SALOME_MED::MESH::meshInfos * all  = new SALOME_MED::MESH::meshInfos;
-  all = IOR_Mesh->getMeshGlobal();
+  SALOME_MED::MESH::meshInfos_var all = IOR_Mesh->getMeshGlobal();
 
   //CORBA::String_var s;
   //s= IOR_Mesh->getName(); _name = s;
@@ -165,6 +164,7 @@ void MESHClient::fillCopy()
 MESHClient::~MESHClient()
 {
   BEGIN_OF("MESHClient::~MESHClient()");
+  IOR_Mesh->release();
   END_OF("MESHClient::~MESHClient()");
 }
 

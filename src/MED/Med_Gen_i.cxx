@@ -187,9 +187,11 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
                                 const char* studyName)
   throw(SALOME::SALOME_Exception)
 {
+        beginService("Med_Gen_i::readStructFile");
+
 	SCRUTE(fileName);
   	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
-        if (!_duringLoad) addInStudy(myStudy) ;
+//         if (!_duringLoad) addInStudy(myStudy) ;
 
 	SALOME_MED::MED_ptr myMedIOR ;
 	try 
@@ -198,7 +200,7 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
 	  MED_i * myMedI = new MED_i();
 	  myMedIOR = myMedI->_this() ;
 // 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR) ;
-	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ; 	  
+// 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ; 	  
 	  // create ::MED object, read all and add in study !
 	  myMedI->init(myStudy,MED_DRIVER,fileName) ;
 	}
@@ -209,7 +211,9 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
                 THROW_SALOME_CORBA_EXCEPTION("Unable to open File "\
                                                 ,SALOME::BAD_PARAM);
         }
-	return SALOME_MED::MED::_duplicate(myMedIOR) ;
+
+        endService("Med_Gen_i::readStructFile");
+	return myMedIOR;
 }
 
 //=============================================================================
@@ -222,7 +226,9 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
 					     const char* studyName)
 throw (SALOME::SALOME_Exception)
 {
-  BEGIN_OF("Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)");
+        beginService("Med_Gen_i::readStructFileWithFieldType");
+
+	BEGIN_OF("Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)");
 
 	SCRUTE(fileName);
   	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
@@ -246,6 +252,7 @@ throw (SALOME::SALOME_Exception)
                                                 ,SALOME::BAD_PARAM);
         }
 
+        endService("Med_Gen_i::readStructFileWithFieldType");
 	END_OF("Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)");
 
 
@@ -261,10 +268,11 @@ SALOME_MED::MESH_ptr Med_Gen_i::readMeshInFile(const char* fileName,
 					       const char* meshName)
 throw (SALOME::SALOME_Exception)
 {
+        beginService("Med_Gen_i::readMeshInFile");
 	SCRUTE(fileName);
   	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
 
-	if (!_duringLoad) addInStudy(myStudy) ;
+// 	if (!_duringLoad) addInStudy(myStudy) ;
 
 // Creation du maillage
 
@@ -301,10 +309,12 @@ throw (SALOME::SALOME_Exception)
 	try
         {
 	  // add the mesh object in study
-	  if (!_duringLoad) meshi->addInStudy(myStudy,mesh);
+// 	  if (!_duringLoad) meshi->addInStudy(myStudy,mesh);
 	}
         catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
-        return SALOME_MED::MESH::_duplicate(mesh);
+
+        endService("Med_Gen_i::readMeshInFile");
+        return mesh;
 }
 //=============================================================================
 /*!
@@ -318,6 +328,7 @@ SALOME_MED::FIELD_ptr Med_Gen_i::readFieldInFile(const char* fileName,
 					       CORBA::Long iter)
 throw (SALOME::SALOME_Exception)
 {
+        beginService("Med_Gen_i::readFieldInFile");
 	SCRUTE(fileName);
 	string myStudyName(studyName);
 
@@ -373,7 +384,7 @@ throw (SALOME::SALOME_Exception)
 
 // Creation du champ
 
-	FIELD_ * myField= new FIELD_() ;
+	FIELD_ * myField;
         MED * mymed = new MED(MED_DRIVER,fileName) ;
 	try
 	{
@@ -407,7 +418,6 @@ throw (SALOME::SALOME_Exception)
         };
 	                
 	SUPPORT * fieldSupport;
-	SALOME_MED::SUPPORT_ptr mySupportIOR;
         try
 	{
 		fieldSupport=(SUPPORT *)myField->getSupport() ;
@@ -417,8 +427,6 @@ throw (SALOME::SALOME_Exception)
 		myMesh->read();
 		SCRUTE(myMesh->getName());
 		fieldSupport->update();
-        	SUPPORT_i * mySupportI = new SUPPORT_i(fieldSupport);
-		mySupportIOR=mySupportI->_this();
 	}
         catch (const exception & ex)
         {
@@ -435,11 +443,11 @@ throw (SALOME::SALOME_Exception)
 		try 
 		{
 			((FIELD<int>*)myField)->read() ;
-			FIELDINT_i * myFieldIntI = new FIELDINT_i(mySupportIOR,(FIELD<int>*)myField);
-        		POA_SALOME_MED::FIELD_tie<FIELD_i> * myFieldTie = new POA_SALOME_MED::FIELD_tie<FIELD_i>(myFieldIntI);
-        		SALOME_MED::FIELD_ptr myFieldIOR = myFieldTie->_this() ;
-        		if (!_duringLoad) myFieldIntI->addInStudy(myStudy,myFieldIOR) ;
-        		return SALOME_MED::FIELD::_duplicate(myFieldIOR);
+			FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
+        		SALOME_MED::FIELD_ptr myFieldIOR = myFieldIntI->_this();
+//         		if (!_duringLoad) myFieldIntI->addInStudy(myStudy,myFieldIOR) ;
+			endService("Med_Gen_i::readFieldInFile");
+        		return myFieldIOR;
 		}
 		catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
         	catch (const exception & ex)
@@ -455,11 +463,11 @@ throw (SALOME::SALOME_Exception)
 		try 
 		{
 			((FIELD<double>*)myField)->read() ;
-			FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i(mySupportIOR,(FIELD<double>*)myField);
-        		POA_SALOME_MED::FIELD_tie<FIELD_i> * myFieldTie = new POA_SALOME_MED::FIELD_tie<FIELD_i>(myFieldDoubleI);
-        		SALOME_MED::FIELD_ptr myFieldIOR = myFieldTie->_this() ;
-        		if (!_duringLoad) myFieldDoubleI->addInStudy(myStudy,myFieldIOR) ;
-        		return SALOME_MED::FIELD::_duplicate(myFieldIOR);
+			FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
+        		SALOME_MED::FIELD_ptr myFieldIOR = myFieldDoubleI->_this() ;
+//         		if (!_duringLoad) myFieldDoubleI->addInStudy(myStudy,myFieldIOR) ;
+			endService("Med_Gen_i::readFieldInFile");
+        		return myFieldIOR;
 		}
 		catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
         	catch (const exception & ex)

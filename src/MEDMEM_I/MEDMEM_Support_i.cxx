@@ -21,6 +21,9 @@
 #include "MEDMEM_Support_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_convert.hxx"
+
+#include "SenderFactory.hxx"
+#include "MultiCommException.hxx"
 using namespace MEDMEM;
 
 // Initialisation des variables statiques
@@ -153,6 +156,7 @@ throw (SALOME::SALOME_Exception)
                 all->description        = CORBA::string_dup(_support->getDescription().c_str());
                 const int numberOfTypes = _support->getNumberOfTypes();
                 all->numberOfGeometricType = numberOfTypes;
+		all->entity = _support->getEntity();
 
                 all->types.length(numberOfTypes);
                 all->nbEltTypes.length(numberOfTypes);
@@ -200,11 +204,9 @@ throw (SALOME::SALOME_Exception)
 		SCRUTE(m1);
 		SCRUTE(m2);
 
-		m1->_remove_ref();
-
 		END_OF("SALOME_MED::MESH_ptr SUPPORT_i::getMesh()");
 
-	        return (SALOME_MED::MESH::_duplicate(m2));
+	        return (m2);
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -384,6 +386,37 @@ SCRUTE(numbers[i]);
         return myseq._retn();
 	
 }
+
+//=============================================================================
+/*!
+ * CORBA: 2nd get Nodes 
+ */
+//=============================================================================
+SALOME::Sender_ptr SUPPORT_i::getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
+                                           throw (SALOME::SALOME_Exception)
+{
+  SCRUTE(_support);
+  SCRUTE(geomElement);
+  SCRUTE(convertIdlEltToMedElt(geomElement));
+  if (_support==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+				 SALOME::INTERNAL_ERROR);
+  SALOME::Sender_ptr ret;
+  try
+    {
+      int nbelements=_support->getNumberOfElements(convertIdlEltToMedElt(geomElement));
+      const int * numbers=_support->getNumber(convertIdlEltToMedElt(geomElement));
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
+    }
+  catch (MEDEXCEPTION &ex)
+    {
+      MESSAGE("Unable to access the support optionnal index");
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+    }
+  catch(MultiCommException &ex2)
+	  THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
+  return ret;
+}
 //=============================================================================
 /*!
  * CORBA: Global Nodes Index (optionnaly designed by the user)
@@ -416,6 +449,35 @@ throw (SALOME::SALOME_Exception)
         }
         return myseq._retn();
 	
+}
+//=============================================================================
+/*!
+ * CORBA: 2nd Global Nodes Index (optionnaly designed by the user)
+ */
+//=============================================================================
+
+SALOME::Sender_ptr SUPPORT_i::getSenderForNumberIndex() 
+  throw (SALOME::SALOME_Exception)
+{
+  if (_support==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+				 SALOME::INTERNAL_ERROR);
+  SALOME::Sender_ptr ret;
+  try
+    {
+      MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
+      int nbelements=_support->getNumberOfElements(::MED_ALL_ELEMENTS);
+      const int * numbers=_support->getNumberIndex();
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
+    }
+  catch (MEDEXCEPTION &ex)
+    {
+      MESSAGE("Unable to access the support index");
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+    }
+  catch(MultiCommException &ex2)
+	  THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
+  return ret;
 }
 //=============================================================================
 /*!
@@ -648,4 +710,16 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   delete [] supportEntryPath;
 
   END_OF(LOC);
+}
+
+//=============================================================================
+/*!
+ * CORBA: release <=> remote delete this
+ */
+//=============================================================================
+void SUPPORT_i::release()
+{
+  PortableServer::ObjectId_var oid=_default_POA()->servant_to_id(this);
+  _default_POA()->deactivate_object(oid);
+  _remove_ref();
 }

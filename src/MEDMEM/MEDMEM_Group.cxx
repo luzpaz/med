@@ -61,7 +61,7 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   SCRUTE(numberOfFamilies);
 
 
-  if ((numberOfFamilies==1)&(isOnAllElts))
+  if ((numberOfFamilies==1) || (isOnAllElts))
     {
       _numberOfFamilies = numberOfFamilies;
       _isOnAllElts = isOnAllElts ;

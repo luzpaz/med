@@ -8,6 +8,7 @@ using namespace std;
 
 #include <list>
 #include <map>
+#include <sstream>
 
 #include "MEDMEM_DriversDef.hxx"
 #include "MEDMEM_Field.hxx"
@@ -19,6 +20,9 @@ using namespace std;
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_CellModel.hxx"
+
+#include "MEDMEM_DriverFactory.hxx"
+
 using namespace MEDMEM;
 //#include "MEDMEM_Grid.hxx" this inclision should have never be here !!!
 
@@ -26,20 +30,6 @@ using namespace MEDMEM;
 //int family_count(int family_number, int count, int * entities_number, int * entities_list) ;
 
 // ------- Drivers Management Part
-
-// MESH::INSTANCE_DE<MED_MESH_RDONLY_DRIVER> MESH::inst_med_rdonly ;
-//const MESH::INSTANCE * const MESH::instances[] = { &MESH::inst_med_rdonly , &MESH::inst_med_rdwr } ;
-
-// Add a similar line for your personnal driver (step 3)
-
-MESH::INSTANCE_DE<MED_MESH_RDWR_DRIVER>   MESH::inst_med   ;
-MESH::INSTANCE_DE<GIBI_MESH_RDWR_DRIVER>  MESH::inst_gibi ;
-MESH::INSTANCE_DE<PORFLOW_MESH_RDWR_DRIVER>  MESH::inst_porflow ;
-MESH::INSTANCE_DE<VTK_MESH_DRIVER> MESH::inst_vtk;
-
-// Add your own driver in the driver list       (step 4)
-// Note the list must be coherent with the driver type list defined in MEDMEM_DRIVER.hxx. 
-const MESH::INSTANCE * const MESH::instances[] =   {  &MESH::inst_med, &MESH::inst_gibi, &MESH::inst_porflow, &MESH::inst_vtk } ;
 
 /*! Add a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. The meshname used in the file
     is  driverName. addDriver returns an integer handler. */
@@ -49,50 +39,16 @@ int MESH::addDriver(driverTypes driverType,
   const char * LOC = "MESH::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Mesh Name\") : ";
   
   GENDRIVER * driver;
-  int current;
-  int itDriver = (int) NO_DRIVER;
 
   BEGIN_OF(LOC);
   
   SCRUTE(driverType);
 
-  SCRUTE(instances[driverType]);
-
-  switch(driverType)
-    {
-    case MED_DRIVER : {
-      itDriver = (int) driverType ;
-      break ;
-    }
-
-    case GIBI_DRIVER : {
-      itDriver = (int) driverType ;
-      break ;
-    }
-
-    case PORFLOW_DRIVER : {
-      itDriver = (int) driverType ;
-      break ;
-    }
-
-    case VTK_DRIVER : {
-      itDriver = 3 ;
-      break ;
-    }
-
-    case NO_DRIVER : {
-      throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "NO_DRIVER has been specified to the method which is not allowed"));
-    }
-    }
-
-  if (itDriver == ((int) NO_DRIVER))
-    throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "othe driver than MED_DRIVER GIBI_DRIVER PORFLOW_DRIVER and VT_DRIVER has been specified to the method which is not allowed"));
-
-  driver = instances[itDriver]->run(fileName, this) ;
+  driver = DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName) ;
 
   _drivers.push_back(driver);
 
-  current = _drivers.size()-1;
+  int current = _drivers.size()-1;
   
   _drivers[current]->setMeshName(driverName);  
 
@@ -338,44 +294,9 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
   BEGIN_OF(LOC);
 
   init();
-  
-  switch(driverType)
-    {
-    case MED_DRIVER :
-      {
-	MED_MESH_RDONLY_DRIVER myDriver(fileName,this);
-	myDriver.setMeshName(driverName);
-	current = addDriver(myDriver);
-	break;
-      }
-    case GIBI_DRIVER :
-      {
-	GIBI_MESH_RDONLY_DRIVER myDriver(fileName,this);
-	current = addDriver(myDriver);
-	break;
-      }
-    case PORFLOW_DRIVER :
-      {
-	PORFLOW_MESH_RDONLY_DRIVER myDriver(fileName,this);
-	current = addDriver(myDriver);
-	break;
-      }
-    default :
-      {
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Driver type unknown : can't create driver!"));
-	break;
-      }
-    }
-  
-//   current = addDriver(driverType,fileName,driverName);
-//   switch(_drivers[current]->getAccessMode() ) {
-//   case MED_WRONLY : {
-//     MESSAGE("MESH::MESH(driverTypes driverType, .....) : driverType must not be a MED_WRONLY accessMode");
-//     rmDriver(current);
-//     break;}
-//   default : {
-//   }
-//   }
+  GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName);
+  current = addDriver(*myDriver);
+  delete myDriver;
   _drivers[current]->open();   
   _drivers[current]->read();
   _drivers[current]->close();

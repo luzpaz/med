@@ -40,18 +40,28 @@ def add_one(i):
 #
 # med file list
 #
+# from CODE_ASTER
+#
 
 ##files.append("maill.0.med")
 ##meshNameFiles.append("MAILTRQU")
 
-files.append("maillage_UniSegFam.med")
-meshNameFiles.append("maillage_CHEMVAL_100elts")
-
-##files.append("mesh.med")
-##meshNameFiles.append("Mesh 1")
-
 ##files.append("zzzz121b.med")
 ##meshNameFiles.append("MUN")
+
+#
+# from the SMESH Salome Module
+#
+
+files.append("mesh.med")
+meshNameFiles.append("Mesh 1")
+
+#
+# from other source including LGLS ones
+#
+
+files.append("maillage_UniSegFam.med")
+meshNameFiles.append("maillage_CHEMVAL_100elts")
 
 files.append("carre_en_quad4.med")
 meshNameFiles.append("carre_en_quad4")
@@ -389,32 +399,33 @@ for i in range(nbOfFiles):
             for j in range(nbElemType):
                 print "Element",(j+1)," ",connectivity[j*nbNodesPerConst:(j+1)*nbNodesPerConst]
 
-    print ""
-    print "Show the Face/Edge Reverse Nodal Connectivity:"
-    ReverseConnectivity = mesh.getReverseConnectivity(MED_NODAL,constituent)
-    ReverseConnectivityIndex = mesh.getReverseConnectivityIndex(MED_NODAL,constituent)
-    print ""
-    for j in range(nbNodes):
-        begin = ReverseConnectivityIndex[j]-1
-        end = ReverseConnectivityIndex[j+1]-1
-        print "Node",(j+1),"-->",ReverseConnectivity[begin:end]
-
-    print ""
-    try:
-        print "Show the Face/Edge Descending Connectivity:"
-        mesh.calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,constituent)
-        nbElemts = mesh.getNumberOfElements(constituent,MED_ALL_ELEMENTS)
-        Connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,constituent,MED_ALL_ELEMENTS)
-        ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,constituent)
+    if (meshDim == 3):
         print ""
-        for j in range(nbElemts):
-            begin = ConnectivityIndex[j]-1
-            end = ConnectivityIndex[j+1]-1
-            print "Element",(j+1),"-->",Connectivity[begin:end]
+        print "Show the Face/Edge Reverse Nodal Connectivity:"
+        ReverseConnectivity = mesh.getReverseConnectivity(MED_NODAL,constituent)
+        ReverseConnectivityIndex = mesh.getReverseConnectivityIndex(MED_NODAL,constituent)
+        print ""
+        for j in range(nbNodes):
+            begin = ReverseConnectivityIndex[j]-1
+            end = ReverseConnectivityIndex[j+1]-1
+            print "Node",(j+1),"-->",ReverseConnectivity[begin:end]
 
         print ""
-    except :
-        pass
+        try:
+            print "Show the Face/Edge Descending Connectivity:"
+            mesh.calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,constituent)
+            nbElemts = mesh.getNumberOfElements(constituent,MED_ALL_ELEMENTS)
+            Connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,constituent,MED_ALL_ELEMENTS)
+            ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,constituent)
+            print ""
+            for j in range(nbElemts):
+                begin = ConnectivityIndex[j]-1
+                end = ConnectivityIndex[j+1]-1
+                print "Element",(j+1),"-->",Connectivity[begin:end]
+
+            print ""
+        except :
+            pass
 
     for entity in [MED_NODE,MED_CELL,MED_FACE,MED_EDGE]:
         nbFam = mesh.getNumberOfFamilies(entity)
@@ -537,7 +548,7 @@ for i in range(nbOfFiles):
     barycenter.write(idVtk)
     print ""
 
-    if spaceDim == 3 :
+    if (spaceDim == 3) and (meshDim == spaceDim) :
         print "Getting volume of all Cells of the mesh:"
         volume = mesh.getVolume(supportCell)
         voltot = 0.
@@ -585,7 +596,7 @@ for i in range(nbOfFiles):
         print "but not in vtk format because vtk does not offer the possibility to view a field on edges or faces"
         print ""
 
-    elif spaceDim == 2:
+    elif (spaceDim == 2) and (meshDim == spaceDim):
         print "Getting area on all Cells of the mesh:"
         area = mesh.getArea(supportCell)
         areatot = 0.
@@ -633,7 +644,7 @@ for i in range(nbOfFiles):
 
     print ""
     print "Building support on Elements of the boundary"
-    if spaceDim == 3 :
+    if (spaceDim == 3) and (meshDim == spaceDim) :
         suppBound = mesh.getBoundaryElements(MED_FACE)
         nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
         print "Getting normal field on the boundary",nbElmBound
@@ -645,7 +656,7 @@ for i in range(nbOfFiles):
             value3 = normalBoundJ[2]
             norm = (value1*value1 + value2*value2 + value3*value3)**(0.5)
             print "    * ",normalBoundJ[:spaceDim],"norm:",norm
-    elif spaceDim == 2:
+    elif (spaceDim == 2) and (meshDim == spaceDim):
         suppBound = mesh.getBoundaryElements(MED_EDGE)
         nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
         print "Getting normal field on the boundary",nbElmBound

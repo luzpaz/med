@@ -30,7 +30,7 @@ private :
   MEDEXCEPTION(void);
 
 protected :
-  const char* _text ;
+  char* _text ;
 
 public :
   MEDEXCEPTION(const char *text, const char *fileName=0, 

@@ -36,6 +36,7 @@ public :
 	void set( const int &size ) ;
 	void set( const T *pointer ) ;
 	void set( const int &size, const T *pointer ) ;
+        void setShallowAndOwnership( const T *pointer );
 	PointerOf<T>& operator=( const PointerOf<T> &pointer ) ;
 } ;
 } ;
@@ -76,7 +77,7 @@ template <typename T> PointerOf<T>::PointerOf( const int &size, const PointerOf<
 }
 
 /*! If size <= 0, creates a null "T*" pointer\n
-    Else allocates memory and sets desallocation boolean to true./n
+    Else allocates memory and sets desallocation boolean to true.\n
     Memory will be desallocated  when erasing this PointerOf*/
 template <typename T> PointerOf<T>::PointerOf( const int &size )
 {
@@ -92,15 +93,15 @@ template <typename T> PointerOf<T>::PointerOf( const int &size )
         }
 }
 
-/*! Creates a standard pointer to the memory zone pointed by T*. /n
-   T* owner is in charged of memory desallocation. /n
+/*! Creates a standard pointer to the memory zone pointed by T*. \n
+   T* owner is in charged of memory desallocation. \n
    Memory will not be released when erasing this PointerOf*/
 template <typename T> PointerOf<T>::PointerOf( const T* pointer ) : _pointer( (T*)pointer ), _done(false)
 {
 }
 
 /*! If size <= 0, return an exception\n
-    Else duplicate array and sets desallocation boolean to true./n
+    Else duplicate array and sets desallocation boolean to true.\n
     Memory will be desallocated  when erasing this PointerOf*/
 template <typename T> PointerOf<T>::PointerOf( const int &size, const T* pointer)
 {
@@ -164,9 +165,9 @@ template <typename T> PointerOf<T>::operator const T*() const
 }
 
 
-/*! If necessary, released memory holded by PointerOf/n.
-    Else allocates memory and sets desallocation boolean to true./n
-    Can be used in order to "nullify" an existing PointerOf/n
+/*! If necessary, released memory holded by PointerOf\n.
+    Else allocates memory and sets desallocation boolean to true.\n
+    Can be used in order to "nullify" an existing PointerOf\n
     Memory will be desallocated  when erasing this PointerOf*/
 template <typename T> void PointerOf<T>::set( const int &size )
 {
@@ -187,9 +188,9 @@ template <typename T> void PointerOf<T>::set( const int &size )
 	return ;
 }
 
-/*! If necessary, released memory holded by PointerOf/n.
-    Then, sets _pointer to the memory zone pointed by T*. /n
-    T* owner is in charged of memory desallocation. /n
+/*! If necessary, released memory holded by PointerOf\n.
+    Then, sets _pointer to the memory zone pointed by T*. \n
+    T* owner is in charged of memory desallocation. \n
     memory will not be released when erasing this PointerOf*/
 template <typename T> void PointerOf<T>::set( const T *pointer )
 {
@@ -209,10 +210,10 @@ template <typename T> void PointerOf<T>::set( const T *pointer )
 	return ;
 }
 
-/*! If necessary, released memory holded by PointerOf/n.
+/*! If necessary, released memory holded by PointerOf\n.
     If size <= 0, return an exception\n.
-    Else allocates memory and sets desallocation boolean to true./n
-    Can be used in order to "nullify" an existing PointerOf/n
+    Else allocates memory and sets desallocation boolean to true.\n
+    Can be used in order to "nullify" an existing PointerOf\n
     Memory will be desallocated  when erasing this PointerOf*/
 template <typename T> void PointerOf<T>::set( const int &size, const T *pointer)
 {
@@ -229,6 +230,14 @@ template <typename T> void PointerOf<T>::set( const int &size, const T *pointer)
   _done=true;
 
   return ;
+}
+
+template <typename T> void PointerOf<T>::setShallowAndOwnership( const T *pointer )
+{
+  if ( _pointer && _done )
+    delete [] _pointer;
+  _pointer=(T*)pointer;
+  _done=true;
 }
 
 # endif		/* # if ! defined( __PointerOf_HXX__ ) */

@@ -2,6 +2,8 @@
 #define VTK_FIELD_DRIVER_HXX
 
 #include <string>
+#include <fstream>
+#include <sstream>
 
 #include "MEDMEM_define.hxx"
 
@@ -569,54 +571,38 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
 
   switch (fieldType)
     {
-    case MED_INT32 : {
-      MESSAGE("MED_INT32");
-      if (NomberOfComponents==3)
-	(*_vtkFile) << "VECTORS " << name.str() << " int" << endl ;
-      else if (NomberOfComponents<=4)
-	{
-	  (*_vtkFile) << "SCALARS " << name.str() << " int " << NomberOfComponents << endl ;
-	  (*_vtkFile) << "LOOKUP_TABLE default" << endl ;
-	}
-      else
-	throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" there are more than 4 components !"));
- 
-      //const int * value = ((FIELD<int>*)myField)->getValue(MED_NO_INTERLACE) ;
-      const int * value = ((FIELD<int>*)_ptrField)->getValue(MED_NO_INTERLACE) ;
-      for (int i=0; i<NomberOfValue; i++)
-	{
-	  for(int j=0; j<NomberOfComponents; j++)
-	    (*_vtkFile) << value[j*NomberOfValue+i] << " " ;
-	  (*_vtkFile) << endl ;
-	}
-      break ;
-    }
-    case MED_REEL64 : {
-      MESSAGE("MED_REEL64");
-      if (NomberOfComponents==3)
-	(*_vtkFile) << "VECTORS " << name.str() << " float" << endl ;
-      else if (NomberOfComponents<=4)
-	{
-	  (*_vtkFile) << "SCALARS " << name.str() << " float " << NomberOfComponents << endl ;
-	  (*_vtkFile) << "LOOKUP_TABLE default" << endl ;
-	}
-      else
-	throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" there are more than 4 components !"));
-
-      const double * value = ((FIELD<double>*)_ptrField)->getValue(MED_NO_INTERLACE) ;
-      for (int i=0; i<NomberOfValue; i++)
-	{
-	  for(int j=0; j<NomberOfComponents; j++)
-	    (*_vtkFile) << value[j*NomberOfValue+i] << " " ;
-	  (*_vtkFile) << endl ;
-	}
-      break ;
-    }
-    default : { 
+    case MED_INT32 :
+      {
+	break ;
+      }
+    case MED_REEL64 :
+      {
+	break ;
+      }
+    default :
+      { 
 	throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<< name.str() <<" the type is not int or double !"));
-    }
+      }
     }
 
+  if (NomberOfComponents==3)
+    (*_vtkFile) << "VECTORS " << name.str() << " int" << endl ;
+  else if (NomberOfComponents<=4)
+    {
+      (*_vtkFile) << "SCALARS " << name.str() << " int " << NomberOfComponents << endl ;
+      (*_vtkFile) << "LOOKUP_TABLE default" << endl ;
+    }
+  else
+    throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" there are more than 4 components !"));
+
+  const T * value = _ptrField->getValue(MED_NO_INTERLACE) ;
+
+  for (int i=0; i<NomberOfValue; i++)
+    {
+      for(int j=0; j<NomberOfComponents; j++)
+	(*_vtkFile) << value[j*NomberOfValue+i] << " " ;
+      (*_vtkFile) << endl ;
+    }
   END_OF(LOC);
 }
 
@@ -666,57 +652,40 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
 
   SCRUTE(name.str());
   SCRUTE(fieldType);
-
   switch (fieldType)
     {
-    case MED_INT32 : {
-      MESSAGE("MED_INT32");
-      if (NomberOfComponents==3)
-	(*_vtkFile) << "VECTORS " << name.str() << " int" << endl ;
-      else if (NomberOfComponents<=4)
-	{
-	  (*_vtkFile) << "SCALARS " << name.str() << " int " << NomberOfComponents << endl ;
-	  (*_vtkFile) << "LOOKUP_TABLE default" << endl ;
-	}
-      else
-	throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" there are more than 4 components !"));
- 
-      //const int * value = ((FIELD<int>*)myField)->getValue(MED_NO_INTERLACE) ;
-      const int * value = ((FIELD<int>*)_ptrField)->getValue(MED_NO_INTERLACE) ;
-      for (int i=0; i<NomberOfValue; i++)
-	{
-	  for(int j=0; j<NomberOfComponents; j++)
-	    (*_vtkFile) << value[j*NomberOfValue+i] << " " ;
-	  (*_vtkFile) << endl ;
-	}
-      break ;
-    }
-    case MED_REEL64 : {
-      MESSAGE("MED_REEL64");
-      if (NomberOfComponents==3)
-	(*_vtkFile) << "VECTORS " << name.str() << " float" << endl ;
-      else if (NomberOfComponents<=4)
-	{
-	  (*_vtkFile) << "SCALARS " << name.str() << " float " << NomberOfComponents << endl ;
-	  (*_vtkFile) << "LOOKUP_TABLE default" << endl ;
-	}
-      else
-	throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" there are more than 4 components !"));
-
-      const double * value = ((FIELD<double>*)_ptrField)->getValue(MED_NO_INTERLACE) ;
-      for (int i=0; i<NomberOfValue; i++)
-	{
-	  for(int j=0; j<NomberOfComponents; j++)
-	    (*_vtkFile) << value[j*NomberOfValue+i] << " " ;
-	  (*_vtkFile) << endl ;
-	}
-      break ;
-    }
-    default : { 
+    case MED_INT32 :
+      {
+	break ;
+      }
+    case MED_REEL64 :
+      {
+	break ;
+      }
+    default :
+      { 
 	throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<< name.str() <<" the type is not int or double !"));
-    }
+      }
     }
 
+  if (NomberOfComponents==3)
+    (*_vtkFile) << "VECTORS " << name.str() << " int" << endl ;
+  else if (NomberOfComponents<=4)
+    {
+      (*_vtkFile) << "SCALARS " << name.str() << " int " << NomberOfComponents << endl ;
+      (*_vtkFile) << "LOOKUP_TABLE default" << endl ;
+    }
+  else
+    throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" there are more than 4 components !"));
+
+  const T * value = _ptrField->getValue(MED_NO_INTERLACE) ;
+
+  for (int i=0; i<NomberOfValue; i++)
+    {
+      for(int j=0; j<NomberOfComponents; j++)
+	(*_vtkFile) << value[j*NomberOfValue+i] << " " ;
+      (*_vtkFile) << endl ;
+    }
   END_OF(LOC);
 }
 

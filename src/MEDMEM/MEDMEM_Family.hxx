@@ -6,10 +6,10 @@
 
 /*!
 
-  This class describe a family of elements on an entity./n
-  It inherits from support. /n
+  This class describe a family of elements on an entity.\n
+  It inherits from support. \n
   It contains a list of elements (by SUPPORT class inheritance)
-  and a description of some attributs./n
+  and a description of some attributs.\n
 
   All families on one entity represent a mesh partition for this entity.
 
@@ -27,7 +27,7 @@ protected :
   int      _identifier ;
   /*!
     \if developper
-    Number of attribute of the family ./n
+    Number of attribute of the family .\n
     Note that attributes are numbered from 1 to N.
     \endif
   */
@@ -180,7 +180,7 @@ inline void FAMILY::setGroupsNames(string * GroupName)
 { 
     _groupName = GroupName ; 
 }
-/*! Returns the attribute _identifier./n
+/*! Returns the attribute _identifier.\n
    Note that there is one identifier precisely for each family. */
 //--------------------------------------
 inline int FAMILY::getIdentifier() const
@@ -204,7 +204,7 @@ inline int * FAMILY::getAttributesIdentifiers() const
 { 
     return _attributeIdentifier ; 
 }
-/*! Returns identifer of the Ith attribute of the family./n
+/*! Returns identifer of the Ith attribute of the family.\n
    Note that they are numbered from 1 to N */
 //----------------------------------------------------
 inline int FAMILY::getAttributeIdentifier(int i) const     
@@ -220,7 +220,7 @@ inline int * FAMILY::getAttributesValues() const
 { 
     return _attributeValue ; 
 }
-/*! Returns value of the Ith attribute of the family./n
+/*! Returns value of the Ith attribute of the family.\n
    Note that they are numbered from 1 to N */
 //-----------------------------------------------
 inline int FAMILY::getAttributeValue(int i) const          
@@ -234,7 +234,7 @@ inline string * FAMILY::getAttributesDescriptions() const
 { 
     return _attributeDescription ; 
 }
-/*! Returns description of the Ith attribute of the family/n
+/*! Returns description of the Ith attribute of the family\n
    Note that they are numbered from 1 to N */
 //--------------------------------------------------------
 inline string FAMILY::getAttributeDescription(int i) const 
@@ -256,7 +256,7 @@ inline string * FAMILY::getGroupsNames() const
 { 
     return _groupName ; 
 }
-/*! Returns the name of the Ith group the family belongs to./n
+/*! Returns the name of the Ith group the family belongs to.\n
     Note that they are numbered from 1 to N*/
 //---------------------------------------------
 inline string FAMILY::getGroupName(int i) const            

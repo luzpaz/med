@@ -12,10 +12,10 @@ using namespace std ;
 #include "utilities.h"
 namespace MED_FR {
 
-/*!  This Class inherits from  map. /n
-     It is a constant map association int (which is a med_geometrie_element) and string. /n
+/*!  This Class inherits from  map. \n
+     It is a constant map association int (which is a med_geometrie_element) and string. \n
      Operator [] returns the (string) name of the geometry of an element 
-     given by a med_geometrie_element value. /n 
+     given by a med_geometrie_element value. \n 
      Such a static map is instancied and can be used in any code to have
      the name of the geometry of an element : MED_FR:GEO_NAME 
      A simple test/use case can be found in test/testUGeoNameMeshEntities.cxx  */
@@ -35,10 +35,10 @@ static const GEO_NAME geoNames ;
 
 //				____________________________	
   
-/*! This Class inherits from map. /n
-    It is a constant map association int (which is a med_entite_maillage) and string. /n
+/*! This Class inherits from map. \n
+    It is a constant map association int (which is a med_entite_maillage) and string. \n
     Operator[] returns the (string) name of the type of an entity given by 
-    a med_entite_maillage value. /n
+    a med_entite_maillage value. \n
     Such a static map is instancied and can be used in any code to have
     the name of the geometry of an element : MED_FR:ENT_NAME 
     A simple test/use case can be found in test/testUGeoNameMeshEntities.cxx  */
@@ -59,10 +59,10 @@ static const ENT_NAME entNames ;
 
 //				____________________________	
 
-/*! This Class inherits from map. /n
-    It is a constant map association int (which is a med_entite_maillage) and  a list. /n
+/*! This Class inherits from map. \n
+    It is a constant map association int (which is a med_entite_maillage) and  a list. \n
     Operator[] returns the list of all exisiting med_geometrie_element for 
-    a med_entite_maillage value. /n
+    a med_entite_maillage value. \n
     Such a static map is instancied and can be used in any code to have
     the name of the geometry of an element : MED_FR:MESH_ENTITIES
     A simple test/use case can be found in test/testUGeoNameMeshEntities.cxx  */

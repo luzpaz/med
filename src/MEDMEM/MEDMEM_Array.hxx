@@ -10,31 +10,31 @@ using namespace MED_EN;
 
 /*!
   A template class to generate an array of any particular type (int, long,
-  float, double) for our purpose in the MED++ library./n/n
+  float, double) for our purpose in the MED++ library.\n\n
 
   Arrays can be stored in MED_FULL_INTERLACE mode (ie : x1,y1,z1,x2,y2,z2...) or
-  in MED_NO_INTERLACE mode ( x1,x2,..xn, y1, y2 ..,yn,z1,...,zn)./n The alternate
+  in MED_NO_INTERLACE mode ( x1,x2,..xn, y1, y2 ..,yn,z1,...,zn).\n The alternate
   representation mode is calculate ONLY when it is usefull. We assure coherency
   for minor data modifications (element, line or column) if you use set methods.
   But, if you get a pointer and modify the array, no automatical coherency is possible.
-  You can use calculateOther to force a recalculation and insure the coherency./n
-  No recalculation is done, when the entire array is modified./n
+  You can use calculateOther to force a recalculation and insure the coherency.\n
+  No recalculation is done, when the entire array is modified.\n
   Theses arrays are "Med like" arrays; lower bound equals 1. (first element is element 1,
-  first coordinate is coordinate 1). /n
+  first coordinate is coordinate 1). \n
 
-  Available constructors are :/n
+  Available constructors are :\n
 
-  - default constructor (not very usefull)/n
-  - constructor asking for array dimensions and mode (does memory allocation for you)/n
+  - default constructor (not very usefull)\n
+  - constructor asking for array dimensions and mode (does memory allocation for you)\n
   - constructor asking for array dimensions, mode and values (doesn't do memory allocation
-    but copies pointers only.)/n
-  - a copy constructor which copies only pointers./n
+    but copies pointers only.)\n
+  - a copy constructor which copies only pointers.\n
     (be aware of coherency)
-  - a copy constructor which copies data (deepcopy)./n
-  - assignement operator is also available and only copies pointers (and not data)./n/n
+  - a copy constructor which copies data (deepcopy).\n
+  - assignement operator is also available and only copies pointers (and not data).\n\n
 
   Attribute "pointers" aren't standard pointers but class PointerOf objects in order to simplify
-  memory management./n
+  memory management.\n
 
   A simple test program (testUArray) allows to test this class.
 */
@@ -69,10 +69,12 @@ public :
   MEDARRAY  (const med_int ld_values, const med_int length_values,
 	     const medModeSwitch mode=MED_FULL_INTERLACE);
   MEDARRAY  (T* values, const med_int ld_values,
-	     const med_int length_values, const medModeSwitch mode=MED_FULL_INTERLACE);
+	     const med_int length_values, const medModeSwitch mode=MED_FULL_INTERLACE,bool shallowCopy=false, bool ownershipOfValues=false);
   MEDARRAY  (MEDARRAY const &m);
   MEDARRAY  (MEDARRAY const &m, bool copyOther);
   MEDARRAY & operator = (const MEDARRAY & m);
+
+  MEDARRAY & shallowCopy(const MEDARRAY & m);
 
   inline med_int getLeadingValue() const;
   inline med_int getLengthValue()  const;
@@ -126,7 +128,7 @@ template <class T> inline MEDARRAY<T>::~MEDARRAY()
 				    You don't have to know the T values when calling this construtor
 				    but you have to call "set" method to initialize them later.
 				    You also can  get the pointer to the memory zone (with "get" method),
-				    and work with it./n
+				    and work with it.\n
 				    The desallocation of T array is not your responsability. \n\n
 				    Throws MEDEXCEPTION if  T array length is < 1*/
 
@@ -180,7 +182,9 @@ template <class T> MEDARRAY<T>::MEDARRAY(const med_int ld_values,
 template <class T> MEDARRAY<T>::MEDARRAY( T*values,
 					  const med_int ld_values,
 					  const med_int length_values,
-					  const medModeSwitch mode):
+					  const medModeSwitch mode,
+					  bool shallowCopy,
+					  bool ownershipOfValues):
 						_ldValues(ld_values),
 						_lengthValues(length_values),
 						_mode(mode),
@@ -198,16 +202,41 @@ template <class T> MEDARRAY<T>::MEDARRAY( T*values,
   }
   if ( _mode == MED_FULL_INTERLACE)
   {
-  	_valuesFull.set(_ldValues*length_values,values);
-  	_valuesDefault.set((T*)_valuesFull);
+  	if(shallowCopy)
+	  {
+	    if(ownershipOfValues)
+	      {
+		_valuesFull.setShallowAndOwnership((const T*)values);
+	    }
+	    else
+	      {
+		_valuesFull.set((const T*)values);
+	      }
+	  }
+	else
+	  {
+	    _valuesFull.set(_ldValues*length_values,values);
+	  }
+	_valuesDefault.set((T*)_valuesFull);
   }
   else
   {
 	ASSERT (_mode == MED_NO_INTERLACE);
-  	_valuesNo.set(_ldValues*length_values,values);
+	if(shallowCopy)
+	{
+	  if(ownershipOfValues)
+	    {
+	      _valuesNo.setShallowAndOwnership((const T*)values);
+	    }
+	  else
+	    {
+	      _valuesNo.set((const T*)values);
+	    }
+	}
+	else
+	  _valuesNo.set(_ldValues*length_values,values);
   	_valuesDefault.set((T*)_valuesNo);
   }
-
   ASSERT( (T*)_valuesDefault != NULL);
   SCRUTE((T*)_valuesDefault);
   SCRUTE((T*)_valuesOther);
@@ -219,8 +248,8 @@ template <class T> MEDARRAY<T>::MEDARRAY( T*values,
 
 //				------------------
 
-				/*! This constructor allocates a new medarray and does a copy of pointers/n
-				    It DOES NOT copy the memory . The two objects will share the same data./n
+				/*! This constructor allocates a new medarray and does a copy of pointers\n
+				    It DOES NOT copy the memory . The two objects will share the same data.\n
 				    (for copying data, use constructor MEDARRAY(MEDARRAY<T> const & m,bool copyOther). */
 template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & m ):
   					_ldValues(m._ldValues),
@@ -241,11 +270,11 @@ template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & m ):
 }
 
 				/*! This constructor allocates a new array and does a copy of values
-				    included in the m arrays./n
+				    included in the m arrays.\n
 				    If the boolean is setted to true, both representations (in full mode
-				    and no interlace mode)  will be copied./n
-				    Otherwise, only _valuesDefault will be copied./n
-				    Desallocation of the arrays is not your reponsability./n/n
+				    and no interlace mode)  will be copied.\n
+				    Otherwise, only _valuesDefault will be copied.\n
+				    Desallocation of the arrays is not your reponsability.\n\n
 				    Throws MEDEXCEPTION if _valuesOther is null and copyOther equals true*/
 template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & p,bool copyOther ):
   					_ldValues(p._ldValues),
@@ -292,9 +321,9 @@ template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & p,bool copyOther ):
 
 //				------------------
 
-//  				/*! This operator does a copy of pointers/n
+//  				/*! This operator does a copy of pointers\n
 //  				    It DOES NOT copy of the memory.
-//  				    The two objects will share data./n */
+//  				    The two objects will share data.\n */
 
 template <class T> MEDARRAY<T> & MEDARRAY<T>::operator = (const MEDARRAY & m)
 {
@@ -334,6 +363,28 @@ template <class T> MEDARRAY<T> & MEDARRAY<T>::operator = (const MEDARRAY & m)
   SCRUTE((T*)_valuesFull);
 
   END_OF("Operator = MEDARRAY<T>");
+  return *this;
+}
+
+/*! Idem operator= but performs only shallow copy (just copy of pointers) of arrays contains in _valuesFull and _valuesNo \n
+ WARNING the MEDARRAY returned HAS THE OWNERSHIP OF THE ARRAY !!!! */
+
+template <class T> MEDARRAY<T> & MEDARRAY<T>::shallowCopy(const MEDARRAY & m)
+{
+  _ldValues=m._ldValues;
+  _lengthValues=m._lengthValues;
+  _mode=m._mode;
+  if ((const T*) m._valuesFull !=NULL)
+    _valuesFull.setShallowAndOwnership((const T*) m._valuesFull);
+  if ((const T*) m._valuesNo !=NULL)
+    _valuesNo.setShallowAndOwnership((const T*) m._valuesNo);
+  if (_mode == MED_FULL_INTERLACE) {
+    _valuesDefault.set((T*) _valuesFull);
+    _valuesOther.set((T*) _valuesNo);
+  } else {
+    _valuesDefault.set((T*) _valuesNo);
+    _valuesOther.set((T*) _valuesFull);
+  }
   return *this;
 }
 
@@ -388,9 +439,9 @@ template <class T> const T* MEDARRAY<T>::get(const medModeSwitch mode)
 //				------------------
 
 				/*! returns a pointer to ith element of the array.
-				    (ith line in a MED_FULL_INTERLACE representation )/n
+				    (ith line in a MED_FULL_INTERLACE representation )\n
 				    Be aware : if _mode is MED_NO_INTERLACE, the entire
-				    array will be recalculate in MED_FULL_INTERLACE representation./n*/
+				    array will be recalculate in MED_FULL_INTERLACE representation.\n*/
 				
 template <class T> const T* MEDARRAY<T>::getRow(const med_int i)
 {
@@ -426,11 +477,11 @@ template <class T> const T* MEDARRAY<T>::getRow(const med_int i)
 }
 //				------------------
 
-				/*! this method is similar to getRow method./n
+				/*! this method is similar to getRow method.\n
 				    It returns a pointer to jth line of the array in a MED_NO-INTERLACE representation
-				    (for example, 2nd coordinates)./n
+				    (for example, 2nd coordinates).\n
 				    Be aware : if _mode is MED_FULL_INTERLACE, the entire
-				    array will be recalculate in MED_NO_INTERLACE representation./n*/
+				    array will be recalculate in MED_NO_INTERLACE representation.\n*/
 
 template <class T> const T* MEDARRAY<T>::getColumn(const med_int j)
 {
@@ -502,7 +553,7 @@ template <class T> const T MEDARRAY<T>::getIJ(const med_int i,const  med_int j) 
 
 //				------------------
 
-				/*! returns the default mode (_mode)/n
+				/*! returns the default mode (_mode)\n
   				    (internal use : needed by write method) */
 template <class T> inline medModeSwitch MEDARRAY<T>::getMode() const
 {
@@ -585,7 +636,7 @@ template <class T> void MEDARRAY<T>::clearOtherMode()
 //				------------------
 
 					/*! Sets ith element to T* values\n
-					    if they both exist, both _valuesFull and _valuesNo arrays will be updated./n
+					    if they both exist, both _valuesFull and _valuesNo arrays will be updated.\n
 					    Throws exception if i < 1 or i > _lengthValues */
 template <class T> void MEDARRAY<T>::setI(const med_int i, const T* value)
 {
@@ -625,7 +676,7 @@ template <class T> void MEDARRAY<T>::setI(const med_int i, const T* value)
 //				------------------
 
 					/*! Sets ith element to T* values\n
-					    if they both exist, both _valuesFull and _valuesNo arrays will be updated./n
+					    if they both exist, both _valuesFull and _valuesNo arrays will be updated.\n
 					    Throws exception if i < 1 or i > _lengthValues */
 template <class T> void MEDARRAY<T>::setJ(const med_int j, const T* value)
 {
@@ -662,8 +713,8 @@ template <class T> void MEDARRAY<T>::setJ(const med_int j, const T* value)
 
 //				------------------
 
-					/*! Sets value of Jth coordinate of Ith element to T value./n
-					    Maintains coherency./n
+					/*! Sets value of Jth coordinate of Ith element to T value.\n
+					    Maintains coherency.\n
 					    Throws exception if we don't have
 					    1<=i<=_lengthValues and 1<=j<=_ldValues */
 template <class T> void MEDARRAY<T>::setIJ(const med_int i, const med_int j, const T value)
@@ -696,7 +747,7 @@ template <class T> void MEDARRAY<T>::setIJ(const med_int i, const med_int j, con
 }
 
 					/*! Calculates the other mode of representation : MED_FULL_INTERLACE
-					    if __mode = MED_NO_INTERLACE and vice versa./n
+					    if __mode = MED_NO_INTERLACE and vice versa.\n
 					    Throws exception if no value are setted */
 template <class T> void MEDARRAY<T>::calculateOther()
 {

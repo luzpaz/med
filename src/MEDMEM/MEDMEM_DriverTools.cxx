@@ -4,6 +4,7 @@ using namespace std;
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Group.hxx"
+#include <iomanip>
 #include <algorithm>
 using namespace MEDMEM;
 

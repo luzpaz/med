@@ -13,9 +13,9 @@
 
 /*!
 
-  This class describe a group of elements on an entity./n
-  It inherits from SUPPORT./n
-  It is a blending of some FAMILY class./n/n
+  This class describe a group of elements on an entity.\n
+  It inherits from SUPPORT.\n
+  It is a blending of some FAMILY class.\n\n
 
 */
 

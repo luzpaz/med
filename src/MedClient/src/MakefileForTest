@@ -1,0 +1,52 @@
+IDL = TESTMEDCLIENT_Gen.idl
+
+INC_IDL = $(patsubst %.idl,%.hh,  $(IDL))
+
+OBJ = TESTMEDCLIENT_GenSK.o TESTMEDCLIENT_Gen_i.o MemorySpy.o
+
+INC = -I$(KERNEL_ROOT_DIR)/include/salome -I$(MED_ROOT_DIR)/include/salome
+
+LINK = -L$(MED_ROOT_DIR)/lib/salome -lmedmem -lMEDClientcmodule -lMedCorba_Swigcmodule
+
+OPT = -D__x86__ -D__linux__ -DPCLINUX -DCOMPAT_DOUBLE_CORBA_DOUBLE
+
+OPTIONIDL = -bcxx -Wbexample
+
+INCIDL= -I$(KERNEL_ROOT_DIR)/idl/salome -I$(MED_ROOT_DIR)/idl/salome
+
+OMNIIDL = omniidl
+
+all : libTESTMEDCLIENTEngine.so TESTMEDCLIENTCatalog.xml pyTESTMEDCLIENT
+
+libTESTMEDCLIENTEngine.so : $(OBJ)
+	g++ -shared $(OBJ) $(LINK) -o $@
+	mv $@ lib/salome
+
+pyTESTMEDCLIENT : TESTMEDCLIENT_Gen.idl
+	omniidl -bpython $(INCIDL) $<
+	rm -rf lib/python2.2/site-packages/salome/*
+	mv SALOME_TESTMEDCLIENT SALOME_TESTMEDCLIENT__POA TESTMEDCLIENT_Gen_idl.py lib/python2.2/site-packages/salome
+
+TESTMEDCLIENTCatalog.xml : TESTMEDCLIENT_Gen.idl
+	omniidl -bIDLparser $(INCIDL) -Wbcatalog=$@,name='TESTMEDCLIENT',username='TESTMEDCLIENT' $^
+	sed -e 's/TESTMEDCLIENT_Gen/TESTMEDCLIENT/g' $@ > toto
+	mv toto ./share/salome/resources/$@
+	rm *.xml
+
+TESTMEDCLIENT_GenSK.o : $(INC_IDL) TESTMEDCLIENT_GenSK.cc
+	g++ -c $(INC) $(OPT) -Wno-deprecated TESTMEDCLIENT_GenSK.cc -o $@
+
+%.o : %.cxx %.hxx $(INC_IDL)
+	g++ -c $(INC) $(OPT) -Wno-deprecated $< -o $@
+
+%.o : %.cc $(INC_IDL)
+	g++ -c $(INC) $(OPT) -Wno-deprecated $< -o $@
+
+%.hh : %.idl
+	$(OMNIIDL) $(OPTIONIDL) $(INCIDL) $<
+
+%.cc : %.idl
+	$(OMNIIDL) $(OPTIONIDL) $(INCIDL) $<
+
+clean:
+	rm -f *.o *.so *.hh *.cc *.xml

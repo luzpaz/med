@@ -3,10 +3,11 @@
 %{
 #include "MESHClient.hxx"
 #include "SUPPORTClient.hxx"
-#include "FIELDClient.hxx"
+#include "FIELDDOUBLEClient.hxx"
+#include "FIELDINTClient.hxx"
 #include CORBA_CLIENT_HEADER(MED)
-#define FIELDDOUBLEClient FIELDClient<double>
-#define FIELDINTClient FIELDClient<int>
+/* #define FIELDDOUBLEClient FIELDClient<double,SALOME_MED::FIELDDOUBLE_ptr> */
+/* #define FIELDINTClient FIELDClient<int,SALOME_MED::FIELDINT_ptr> */
 %}
 
 %include "libMedCorba_Swig.i"
@@ -37,10 +38,34 @@ class SUPPORTClient : public SUPPORT {
 
 };
 
-%rename(FIELDDOUBLEClient) FIELDClient<double>;
-FIELDDOUBLE * FIELDDOUBLEClient(const SALOME_MED::FIELDDOUBLE_ptr IOR_Field, 
-				SUPPORT * S = NULL);
+class FIELDDOUBLEClient : public FIELDDOUBLE {
+public:
+  FIELDDOUBLEClient(SALOME_MED::FIELDDOUBLE_ptr ptrCorba,
+		    SUPPORT * S = NULL);
 
-%rename(FIELDINTClient) FIELDClient<int>;
-FIELDDOUBLE * FIELDINTClient   (const SALOME_MED::FIELDINT_ptr IOR_Field, 
-				SUPPORT * S = NULL);
+  ~FIELDDOUBLEClient();
+};
+
+class FIELDINTClient : public FIELDINT {
+public:
+  FIELDINTClient(SALOME_MED::FIELDINT_ptr ptrCorba,
+		 SUPPORT * S = NULL);
+
+  ~FIELDINTClient();
+};
+
+FIELDDOUBLE * getDoublePointer(FIELDDOUBLEClient * input);
+
+FIELDINT * getIntPointer(FIELDINTClient * input);
+
+%{
+  FIELDDOUBLE * getDoublePointer(FIELDDOUBLEClient * input)
+    {
+      return (FIELDDOUBLE *) input;
+    }
+
+  FIELDINT * getIntPointer(FIELDINTClient * input)
+  {
+      return (FIELDINT *) input;
+  }
+%}

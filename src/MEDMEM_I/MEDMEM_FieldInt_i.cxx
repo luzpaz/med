@@ -9,6 +9,8 @@
 #include "utilities.h"
 #include "MEDMEM_FieldInt_i.hxx"
 #include "MEDMEM_convert.hxx"
+#include "SenderFactory.hxx"
+#include "MultiCommException.hxx"
 using namespace MEDMEM;
 
 //=============================================================================
@@ -16,7 +18,7 @@ using namespace MEDMEM;
  * Default constructor
  */
 //=============================================================================
-FIELDINT_i::FIELDINT_i(): FIELDOF_i<int>()
+FIELDINT_i::FIELDINT_i(): FIELD_i()
 {
         BEGIN_OF("Default Constructor FIELDINT_i");
         END_OF("Default Constructor FIELDINT_i");
@@ -36,7 +38,8 @@ FIELDINT_i::~FIELDINT_i()
  * Default constructor
  */
 //=============================================================================
-FIELDINT_i::FIELDINT_i(SALOME_MED::SUPPORT_ptr mySupportIOR, ::FIELD<int> * const f): FIELDOF_i<int>(mySupportIOR,f)
+FIELDINT_i::FIELDINT_i(::FIELD<int> * const f, bool ownCppPtr):
+  FIELD_i(f,ownCppPtr)
 {
         BEGIN_OF("Constructor FIELDINT_i");
         END_OF(" Constructor FIELDINT_i");
@@ -46,8 +49,7 @@ FIELDINT_i::FIELDINT_i(SALOME_MED::SUPPORT_ptr mySupportIOR, ::FIELD<int> * cons
  * Constructor par recopie
  */
 //=============================================================================
-FIELDINT_i::FIELDINT_i(FIELDINT_i &fi):
-					FIELDOF_i<int>(fi._fieldTptr)
+FIELDINT_i::FIELDINT_i(FIELDINT_i &fi):FIELD_i(fi)
 {
         BEGIN_OF("Constructor FIELDINT_i");
         END_OF(" Constructor FIELDINT_i");
@@ -67,27 +69,15 @@ throw (SALOME::SALOME_Exception)
                                              SALOME::INTERNAL_ERROR);
         SALOME_MED::long_array_var myseq = new SALOME_MED::long_array;
         try
-        {
-                int nbval=_fieldTptr->getNumberOfComponents();
+	  {
+	    medModeSwitch modemed=convertIdlModeToMedMode(mode);
+// 	    ::FIELD<int> *ptrI=dynamic_cast< ::FIELD<int>* >(_fieldTptr);
+//the alternative is not safe but the previous one fails using the python API
+	    MEDMEM::FIELD<int> *ptrI = (MEDMEM::FIELD<int> *) _fieldTptr;
 
-		// Ajout NB pour avoir la valeur correct de nbval
-		SALOME_MED::medEntityMesh entity = _support->getEntity();
-		if (_support->isOnAllElements())
-		  {
-		    if (entity == SALOME_MED::MED_NODE)
-		      nbval = (_support->getMesh()->getNumberOfNodes())*nbval;
-		    else
-		      nbval = (_support->getMesh()->getNumberOfElements(entity,SALOME_MED::MED_ALL_ELEMENTS))*nbval;
-		  }
-		else
-		  {
-		    nbval = (_support->getNumberOfElements(SALOME_MED::MED_ALL_ELEMENTS))*nbval;
-		  }
-
-		medModeSwitch modemed=convertIdlModeToMedMode(mode);
-                const int * values =_fieldTptr->getValue(modemed);
-
-                myseq->length(nbval);
+	    const int * values =ptrI->getValue(modemed);
+	    int nbval=ptrI->getValueLength(modemed);
+	    myseq->length(nbval);
                 for (int i=0; i<nbval; i++)
                 {
                         myseq[i]=values[i];
@@ -99,4 +89,32 @@ throw (SALOME::SALOME_Exception)
                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
+}
+//=============================================================================
+/*!
+ * CORBA: Accessor for Field's values
+*/
+//=============================================================================
+
+SALOME::Sender_ptr FIELDINT_i::getSenderForValue( SALOME_MED::medModeSwitch mode ) 
+throw (SALOME::SALOME_Exception)
+{
+	if (_fieldTptr==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
+                                             SALOME::INTERNAL_ERROR);
+        SALOME::Sender_ptr ret;
+        try
+        {
+		medModeSwitch modemed=convertIdlModeToMedMode(mode);
+		::FIELD<int> *ptrI=dynamic_cast< ::FIELD<int>* >(_fieldTptr);
+                const int * values =ptrI->getValue(modemed);
+		int nbval=ptrI->getValueLength(modemed);
+		ret=SenderFactory::buildSender(*this,values,nbval);
+        }
+        catch(MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to acces Field");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+        return ret;
 }

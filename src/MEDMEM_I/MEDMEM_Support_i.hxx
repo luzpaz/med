@@ -14,15 +14,17 @@
 
 #include <SALOMEconfig.h>
 
+#include "SALOMEMultiComm.hxx"
 #include CORBA_SERVER_HEADER(MED)
+#include CORBA_SERVER_HEADER(SALOME_Comm)
 
 namespace MEDMEM {
 class SUPPORT;
 class SALOME_MED::MESH;
 
-class SUPPORT_i: 
-		public POA_SALOME_MED::SUPPORT,
-                public PortableServer::RefCountServantBase 
+class SUPPORT_i: public POA_SALOME_MED::SUPPORT,
+                public PortableServer::RefCountServantBase,
+		public SALOMEMultiComm
 {
 public :
     static map < int,::MEDMEM::SUPPORT *> supportMap;
@@ -57,8 +59,12 @@ public:
                                            throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumber(SALOME_MED::medGeometryElement geomElement) 
 					   throw (SALOME::SALOME_Exception);
+    SALOME::Sender_ptr getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
+                                           throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumberIndex() 
 					   throw (SALOME::SALOME_Exception);
+    SALOME::Sender_ptr getSenderForNumberIndex() 
+                                           throw (SALOME::SALOME_Exception);
     CORBA::Long          getNumberOfGaussPoint(SALOME_MED::medGeometryElement geomElement) 
 					   throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumbersOfGaussPoint()
@@ -75,7 +81,7 @@ public:
 			  SALOME_MED::SUPPORT_ptr myIor)
     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
-  
+  void release();
   //					Cuisine interne
   CORBA::Long 	 getCorbaIndex()   throw (SALOME::SALOME_Exception);
   SALOME_MED::SUPPORT::supportInfos * getSupportGlobal()   throw (SALOME::SALOME_Exception);

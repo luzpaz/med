@@ -55,13 +55,13 @@ int main (int argc, char **argv)
   */
 
   med_int nseg2 = 6;
-  med_int seg2[12] = {
-    6, 3,
-    8, 9,
-    3, 2,
-    9, 6,
-    2, 5,
-    5, 8
+  med_int seg2[18] = {
+    6, 3, 0,
+    8, 9, 0,
+    3, 2, 0,
+    9, 6, 0,
+    2, 5, 0,
+    5, 8, 0
   };
   char nomseg2[MED_TAILLE_PNOM*6+1] = "seg1    seg2    seg3    seg4    seg5    seg6    ";
   med_int numseg2[6] = {1,2,3,4,5,6};
@@ -140,7 +140,7 @@ int main (int argc, char **argv)
   if (ret == 0) 
     ret = MEDelementsEcr(fid,maa,mdim,seg2,MED_FULL_INTERLACE,
 			 nomseg2,MED_FAUX,numseg2,MED_VRAI,nufaseg2,nseg2,
-			 MED_ARETE,MED_SEG2,MED_NOD,MED_ECRI);
+			 MED_MAILLE,MED_SEG2,MED_NOD,MED_ECRI);
   printf("%d \n",ret);
 
   /***************************************************************************/

@@ -43,7 +43,7 @@ LIB_SRC = Med_Gen_i.cxx
 LIB_SERVER_IDL = MED_Gen.idl SALOME_Component.idl \
 	         SALOME_Exception.idl MED.idl             
 
-LIB_CLIENT_IDL = SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_ModuleCatalog.idl
+LIB_CLIENT_IDL = SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_ModuleCatalog.idl SALOME_Comm.idl
 
 # Executables targets
 BIN = 

@@ -43,6 +43,9 @@ EXPORT_HEADERS = \
 	FAMILYClient.hxx \
 	GROUPClient.hxx \
 	FIELDClient.hxx \
+	FIELDClient.cxx \
+	FIELDDOUBLEClient.hxx \
+	FIELDINTClient.hxx \
 	libMEDClient.i
 
 SWIG_DEF = libMEDClient.i
@@ -58,14 +61,16 @@ LIB_SRC = \
 	MESHClient.cxx \
 	SUPPORTClient.cxx \
 	FAMILYClient.cxx \
-	FIELDClient.cxx \
-	GROUPClient.cxx
+	GROUPClient.cxx \
+	FIELDDOUBLEClient.cxx \
+	FIELDINTClient.cxx
 
 LIB_CLIENT_IDL= \
 	SALOME_Component.idl \
 	SALOMEDS.idl \
 	SALOMEDS_Attributes.idl \
 	SALOME_Exception.idl \
+	SALOME_Comm.idl \
 	MED.idl
 
 # Executables targets

@@ -22,8 +22,8 @@ extern "C"
   \internal
   Function used to duplicate char * 
 */
-const char* duplicate( const char *const str ) ;
-const char* duplicate( const char *const str )
+char* duplicate( const char *const str ) ;
+char* duplicate( const char *const str )
 {
 	ASSERT(str!=NULL) ;
 	const size_t length = strlen( str ) ;
@@ -51,7 +51,7 @@ MEDEXCEPTION::MEDEXCEPTION( void ): exception() , _text(0)
   Function used to elaborate the text of the MEDEXCEPTION
 */
 // --------------------------------------------------------------------------------------- //
-const char *makeText( const char *text, const char *fileName, const unsigned int lineNumber )
+char *makeText( const char *text, const char *fileName, const unsigned int lineNumber )
 // --------------------------------------------------------------------------------------- //
 {
   char *newText = 0 ;
@@ -110,8 +110,7 @@ MEDEXCEPTION::~MEDEXCEPTION() throw ()
   if ( _text )
     {
       delete [] _text ;
-      char *& txt = (char*)_text ;
-      txt = 0 ;
+      _text = 0 ;
     }
   ASSERT(_text==NULL) ;
 }

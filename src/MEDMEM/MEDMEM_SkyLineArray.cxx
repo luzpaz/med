@@ -35,13 +35,20 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(const med_int count, const med_int length):
 }
 
 MEDSKYLINEARRAY::MEDSKYLINEARRAY(const med_int count, const med_int length,
-				 const med_int* index, const med_int* value):
-                                _count(count), _length(length),
-                                _index(_count+1),_value(_length)
+				 const med_int* index, const med_int* value,bool shallowCopy):
+                                _count(count), _length(length)
 {
 	MESSAGE("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
-	memcpy((med_int*)_index,index,sizeof(med_int)*(_count+1));
-	memcpy((med_int*)_value,value,sizeof(med_int)*_length);
+		if(shallowCopy)
+	  {
+	    _index.setShallowAndOwnership(index);
+	    _value.setShallowAndOwnership(value);
+	  }
+	else
+	  {
+	    _index.set(_count+1,index);
+	    _value.set(_length,value);
+	  }
 }
 
 //  void MEDSKYLINEARRAY::setMEDSKYLINEARRAY( const med_int count , const med_int length, med_int* index , med_int* value )

@@ -308,8 +308,8 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 		    if (nb_indices != nb_objets)
 		      {
 			throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " Could not read file " << _fileName 
-						     << "Erreur de lecture dans enregistrement de type " << ENREG_TYPE_2 
-						     << " (pile " << PILE_NOEUDS << ")" ));
+						     << "Erreur de lecture dans enregistrement de type " << (int)ENREG_TYPE_2 
+						     << " (pile " << (int)PILE_NOEUDS << ")" ));
 		      }
 		    
 		    place_noeuds.resize(nb_objets);
@@ -331,8 +331,8 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 		  // PROVISOIRE : certains fichier gibi n'ont 
 		  if (nb_reels < numero_noeuds.size()*(space_dimension))
 		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " Could not read file " << _fileName 
-						 << "Erreur de lecture dans enregistrement de type " << ENREG_TYPE_2 
-						 << " (pile " << PILE_COORDONNEES << ")" ));
+						 << "Erreur de lecture dans enregistrement de type " << (int)ENREG_TYPE_2 
+						 << " (pile " << (int)PILE_COORDONNEES << ")" ));
 
 		  for (unsigned i=0; i!=numero_noeuds.size(); ++i)
 		    {

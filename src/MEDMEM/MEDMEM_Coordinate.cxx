@@ -18,7 +18,7 @@ COORDINATE::COORDINATE():_coordinateSystem(""),
     BEGIN_OF("Default Constructor COORDINATE");
 }
 
-/*! This constructor allocate a MEDARRAY of SpaceDimension * NumberOfNodes./n
+/*! This constructor allocate a MEDARRAY of SpaceDimension * NumberOfNodes.\n
     It will create empty array for optional data (nodeNumber..) */
 //------------------------------------------------------------------------------//
 COORDINATE::COORDINATE(int SpaceDimension, int NumberOfNodes, medModeSwitch Mode):
@@ -33,7 +33,7 @@ COORDINATE::COORDINATE(int SpaceDimension, int NumberOfNodes, medModeSwitch Mode
     BEGIN_OF("Constructor COORDINATE");
 }
 
-/*! This constructor will COPY all data (it is a deep copy) included in m./n  
+/*! This constructor will COPY all data (it is a deep copy) included in m.\n  
     But only the default storage mode of coordinates array
     will be copied (not both storage representation modes even if they both
     exist in original object) :  for example only full_interlace mode  */
@@ -72,7 +72,7 @@ COORDINATE::~COORDINATE()
 
 /*! sets the attribute _coordinate with Coordinate           */
 //----------------------------------------------------------//
-void COORDINATE::setCoordinates(MEDARRAY<double> *Coordinate) 
+void COORDINATE::setCoordinates(MEDARRAY<double> *Coordinate,bool shallowCopy) 
 //----------------------------------------------------------//
 { 
 
@@ -81,14 +81,20 @@ void COORDINATE::setCoordinates(MEDARRAY<double> *Coordinate)
   //  const int  numberOfNodes  = (int) Coordinate->getLengthValue();
   if ( Coordinate->get(mode) != NULL)
   {
-      MEDARRAY<double> pourAttribut(*Coordinate,false);
-      _coordinate = pourAttribut;
-      //_coordinate.set(mode,Coordinate->get(mode));
+    if(shallowCopy)
+      {
+	_coordinate.shallowCopy(*Coordinate);
+      }
+    else
+      {
+	MEDARRAY<double> pourAttribut(*Coordinate,false);
+	_coordinate = pourAttribut;
+	//_coordinate.set(mode,Coordinate->get(mode));
+      }
   }
   else
   {
-	throw MED_EXCEPTION ( LOCALIZED(STRING("setCoordinates(MEDARRAY<double>
-	 *Coordinate)") << "No Coordinate"));
+	throw MED_EXCEPTION ( LOCALIZED(STRING("setCoordinates(MEDARRAY<double> *Coordinate)") << "No Coordinate"));
   }
 }
 
@@ -213,10 +219,10 @@ const double *  COORDINATE::getCoordinateAxis(int Axis)
      	 return _coordinate.getColumn(Axis) ;
 }
 
-/*! returns an array with names of coordinates. /n
-      Example : /n
-      - x,y,z /n
-      - r,teta,phi /n
+/*! returns an array with names of coordinates. \n
+      Example : \n
+      - x,y,z \n
+      - r,teta,phi \n
       - ... */
 //--------------------------------------//
 const string * COORDINATE::getCoordinatesNames() const

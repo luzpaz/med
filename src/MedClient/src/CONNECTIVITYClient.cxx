@@ -3,6 +3,7 @@
 #include "UtilClient.hxx"
 #include "CONNECTIVITYClient.hxx"
 
+#include "ReceiverFactory.hxx"
 using namespace MEDMEM;
 //=============================================================================
 /*!
@@ -50,8 +51,7 @@ CONNECTIVITYClient::~CONNECTIVITYClient()
 void CONNECTIVITYClient::blankCopy()
 {
   BEGIN_OF("CONNECTIVITYClient::blankCopy()");
-
-   SALOME_MED::MESH::connectivityInfos *all = new SALOME_MED::MESH::connectivityInfos;
+   SALOME_MED::MESH::connectivityInfos_var all;
    medEntityMesh Entity = getEntity();
    try
    {
@@ -65,7 +65,7 @@ void CONNECTIVITYClient::blankCopy()
 
   //_numberOfNodes = IOR_Mesh->getNumberOfNodes();
   _numberOfNodes = all->numberOfNodes;
-  
+  _entityDimension = all->entityDimension;
   medGeometryElement * Types;
 
   long iT, nT;
@@ -131,8 +131,7 @@ void CONNECTIVITYClient::fillCopy()
       int kT = Count[iT+1]-Count[iT];
       SCRUTE(kT);
       
-      convertCorbaArray(pC, nC, IOR_Mesh->getConnectivity
-			(MED_FULL_INTERLACE, MED_NODAL, Entity, T[iT]));
+      pC=(int *)ReceiverFactory::getValue(IOR_Mesh->getSenderForConnectivity(MED_FULL_INTERLACE, MED_NODAL, Entity, T[iT]),nC);
       SCRUTE(nC);
       ASSERT(nC == (T[iT]%100) * kT);
       

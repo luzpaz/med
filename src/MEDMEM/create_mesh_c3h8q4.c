@@ -77,15 +77,15 @@ int main (int argc, char **argv)
   */
 
   med_int nquad4 = 8;
-  med_int quad4[32] = {
-    20, 21, 24, 23,
-    22, 23, 26, 25,
-    19, 20, 23, 22,
-    23, 24, 27, 26,
-    1 , 4, 5, 2,
-    5, 8, 9, 6, 
-    2, 5, 6, 3, 
-    7, 8, 5, 4
+  med_int quad4[40] = {
+    20, 21, 24, 23, 0,
+    22, 23, 26, 25, 0,
+    19, 20, 23, 22, 0,
+    23, 24, 27, 26, 0,
+    1 , 4, 5, 2, 0,
+    5, 8, 9, 6, 0,
+    2, 5, 6, 3, 0,
+    7, 8, 5, 4, 0
   };
 
   char nomquad4[MED_TAILLE_PNOM*8+1] = "quad1   quad2   quad3   quad4   quad5   quad6   quad7   quad8  ";
@@ -167,7 +167,7 @@ int main (int argc, char **argv)
   if (ret == 0) 
     ret = MEDelementsEcr(fid,maa,mdim,quad4,MED_FULL_INTERLACE,
 			 nomquad4,MED_FAUX,numquad4,MED_VRAI,nufaquad4,nquad4,
-			 MED_FACE,MED_QUAD4,MED_NOD,MED_ECRI);
+			 MED_MAILLE,MED_QUAD4,MED_NOD,MED_ECRI);
   printf("%d \n",ret);
 
   /***************************************************************************/

@@ -9,12 +9,9 @@
 
 // LOCAL
 # include "MEDMEM_define.hxx"
-
-// Add your own driver header (step 2)
-# include "MEDMEM_MedMedDriver.hxx"
-# include "MEDMEM_VtkMedDriver.hxx"
-
 # include "MEDMEM_Exception.hxx"
+# include "MEDMEM_GenDriver.hxx"
+
 using namespace MED_EN;
 
 
@@ -85,31 +82,6 @@ public:
   
   void addField ( FIELD_  * const ptrField  ) throw (MED_EXCEPTION) ;
   void addMesh  ( MESH    * const ptrMesh   ) throw (MED_EXCEPTION) ;
-
-  // ------  Drivers Management Part
-protected:
-
-  class INSTANCE {
-  public:
-    virtual GENDRIVER * run(const string & fileName, MED * const ptrMed) const = 0 ;
-  } ;
-  
-  template <class T> class INSTANCE_DE : public INSTANCE {
-  public :
-    GENDRIVER * run(const string & fileName,  MED * const ptrMed) const 
-    { 
-      MESSAGE("GENDRIVER * run") ;
-      return new T(fileName,ptrMed) ; 
-    }
-  } ;
-  
-  // Add your new driver instance here (step 3)
-  static INSTANCE_DE<MED_MED_RDWR_DRIVER> inst_med ;
-  static INSTANCE_DE<VTK_MED_DRIVER> inst_vtk ;
-  static const INSTANCE * const instances[] ;
-
-public:
-
   int  addDriver     (driverTypes driverType, const string & fileName);
   int  addDriver     (GENDRIVER & driver);
   void rmDriver      (int index=0) throw (MEDEXCEPTION) ;

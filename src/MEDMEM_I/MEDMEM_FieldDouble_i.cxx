@@ -9,6 +9,8 @@
 #include "MEDMEM_FieldDouble_i.hxx"
 #include "utilities.h"
 #include "MEDMEM_convert.hxx"
+#include "SenderFactory.hxx"
+#include "MultiCommException.hxx"
 using namespace MEDMEM;
 
 //=============================================================================
@@ -16,7 +18,7 @@ using namespace MEDMEM;
  * Default constructor
  */
 //=============================================================================
-FIELDDOUBLE_i::FIELDDOUBLE_i(): FIELDOF_i<double>()
+FIELDDOUBLE_i::FIELDDOUBLE_i(): FIELD_i()
 {
         BEGIN_OF("Default Constructor FIELDDOUBLE_i");
         END_OF("Default Constructor FIELDDOUBLE_i");
@@ -37,7 +39,7 @@ FIELDDOUBLE_i::~FIELDDOUBLE_i()
  */
 //=============================================================================
 FIELDDOUBLE_i::FIELDDOUBLE_i(FIELDDOUBLE_i & fd):
-			       FIELDOF_i<double>(fd._fieldTptr)
+			       FIELD_i(fd)
 {
         BEGIN_OF("Default Constructor FIELDDOUBLE_i");
         END_OF("Default Constructor FIELDDOUBLE_i");
@@ -47,7 +49,8 @@ FIELDDOUBLE_i::FIELDDOUBLE_i(FIELDDOUBLE_i & fd):
  * Default constructor
  */
 //=============================================================================
-FIELDDOUBLE_i::FIELDDOUBLE_i(SALOME_MED::SUPPORT_ptr mySupportIOR,::FIELD<double> * const f): FIELDOF_i<double>(mySupportIOR,f)
+FIELDDOUBLE_i::FIELDDOUBLE_i(::FIELD<double> * const f, bool ownCppPtr):
+  FIELD_i(f,ownCppPtr)
 {
         BEGIN_OF("Constructor FIELDDOUBLE_i");
         END_OF(" Constructor FIELDDOUBLE_i");
@@ -68,25 +71,12 @@ throw (SALOME::SALOME_Exception)
         SALOME_MED::double_array_var myseq = new SALOME_MED::double_array;
         try
         {
-                int nbval=_fieldTptr->getNumberOfComponents();
-
-		// Ajout NB pour avoir la valeur correct de nbval
-		SALOME_MED::medEntityMesh entity = _support->getEntity();
-		if (_support->isOnAllElements())
-		  {
-		    if (entity == SALOME_MED::MED_NODE)
-		      nbval = (_support->getMesh()->getNumberOfNodes())*nbval;
-		    else
-		      nbval = (_support->getMesh()->getNumberOfElements(entity,SALOME_MED::MED_ALL_ELEMENTS))*nbval;
-		  }
-		else
-		  {
-		    nbval = (_support->getNumberOfElements(SALOME_MED::MED_ALL_ELEMENTS))*nbval;
-		  }
-
 		medModeSwitch modemed=convertIdlModeToMedMode(mode);
-                const double * values =_fieldTptr->getValue(modemed);
-
+// 		::FIELD<double> *ptrD=dynamic_cast< ::FIELD<double>* >(_fieldTptr);
+// the alternative is not safe but the previous fails using the python API
+		MEDMEM::FIELD<double> *ptrD = (MEDMEM::FIELD<double> *) _fieldTptr;
+                const double * values =ptrD->getValue(modemed);
+		int nbval=ptrD->getValueLength(modemed);
                 myseq->length(nbval);
                 for (int i=0; i<nbval; i++)
                 {
@@ -99,4 +89,32 @@ throw (SALOME::SALOME_Exception)
 		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
+}
+//=============================================================================
+/*!
+ * CORBA: Accessor for Field's values
+*/
+//=============================================================================
+
+SALOME::Sender_ptr FIELDDOUBLE_i::getSenderForValue( SALOME_MED::medModeSwitch mode ) 
+throw (SALOME::SALOME_Exception)
+{
+	if (_fieldTptr==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
+                                             SALOME::INTERNAL_ERROR);
+        SALOME::Sender_ptr ret;
+        try
+        {
+		medModeSwitch modemed=convertIdlModeToMedMode(mode);
+                ::FIELD<double> *ptrD=dynamic_cast< ::FIELD<double>* >(_fieldTptr);
+                const double * values =ptrD->getValue(modemed);
+		int nbval=ptrD->getValueLength(modemed);
+		ret=SenderFactory::buildSender(*this,values,nbval);
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to acces Field ");
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+        return ret;
 }

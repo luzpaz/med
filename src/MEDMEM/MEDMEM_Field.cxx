@@ -1,5 +1,6 @@
 using namespace std;
 #include "MEDMEM_Field.hxx"
+#include "MEDMEM_Mesh.hxx"
 using namespace MEDMEM;
 
 // ---------------------------------
@@ -210,13 +211,16 @@ void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (
 
     // check-up, fill diagnosis if some incompatibility is found.
     if(m._support != n._support)
-	diagnosis+="They don't have the same support!";
+      {
+	if(!(*m._support==*n._support))
+	  diagnosis+="They don't have the same support!";
+      }
     else if(m._numberOfComponents != n._numberOfComponents)
-	diagnosis+="They don't have the same number of components!";
+      diagnosis+="They don't have the same number of components!";
     else if(m._numberOfValues != n._numberOfValues)
-	diagnosis+="They don't have the same number of values!";
+      diagnosis+="They don't have the same number of values!";
     else
-    {
+      {
 	for(int i=0; i<m._numberOfComponents; i++)
 	{
 // Not yet implemented   
@@ -225,13 +229,13 @@ void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (
 //		diagnosis+="Components don't have the same types!";
 //		break;
 //	    }
-	    if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
+	  if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
 	    {
-		diagnosis+="Components don't have the same units!";
-		break;
+	      diagnosis+="Components don't have the same units!";
+	      break;
 	    }
 	}
-    }
+      }
 
     if(diagnosis.size()) // if fields are not compatible : complete diagnosis and throw exception
     {

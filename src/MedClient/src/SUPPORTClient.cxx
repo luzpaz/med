@@ -2,6 +2,7 @@
 #include "UtilClient.hxx"
 #include "SUPPORTClient.hxx"
 #include "MESHClient.hxx"
+#include "ReceiverFactory.hxx"
 
 using namespace MEDMEM;
 
@@ -14,15 +15,20 @@ using namespace MEDMEM;
 SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
 			     MESH * M) : 
   SUPPORT(), 
-  IOR_Support(SALOME_MED::SUPPORT::_duplicate(S))
+  IOR_Support(SALOME_MED::SUPPORT::_duplicate(S)),
+  _ownMesh(false)
 {
   BEGIN_OF("SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)");
 
   SCRUTE(S);
   SCRUTE(M);
-
-  setMesh(M ? M : new MESHClient(IOR_Support->getMesh()));
-
+  if(M)
+    _mesh=M;
+  else
+    {
+      _mesh=new MESHClient(IOR_Support->getMesh());
+      _ownMesh=true;
+    }
   blankCopy();
 
   END_OF("SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)");
@@ -38,8 +44,7 @@ void SUPPORTClient::blankCopy()
 
  try
   {
-        SALOME_MED::SUPPORT::supportInfos *all = new SALOME_MED::SUPPORT::supportInfos;
-        all= IOR_Support->getSupportGlobal();
+        SALOME_MED::SUPPORT::supportInfos_var all = IOR_Support->getSupportGlobal();
 
         _name = all->name;
         _description = all->description;
@@ -67,6 +72,9 @@ void SUPPORTClient::blankCopy()
     		nE[i] = all->nbEltTypes[i];
   	}
   	setNumberOfElements(nE);
+
+	delete [] nE;
+
   	SCRUTE(_totalNumberOfElements);
   	_complete_support = false;
   }
@@ -91,20 +99,15 @@ void SUPPORTClient::fillCopy()
 
   if (!_complete_support) {
 
-    int * index, * value;
+    const int * index, * value;
     long n_index, n_value;
 
-    convertCorbaArray(value, n_value, 
-		      IOR_Support->getNumber(MED_ALL_ELEMENTS));
-    convertCorbaArray(index, n_index, 
-		      IOR_Support->getNumberIndex());
+    value=(const int *)ReceiverFactory::getValue(IOR_Support->getSenderForNumber(MED_ALL_ELEMENTS),n_value);
+    index=(const int *)ReceiverFactory::getValue(IOR_Support->getSenderForNumberIndex(),n_index);
     
     SCRUTE(n_index);
     SCRUTE(n_value);
-    setNumber(index, value);
-      
-    delete [] index;
-    delete [] value;
+    setNumber(index, value,true);
 
     _complete_support = true;
   }
@@ -119,7 +122,9 @@ void SUPPORTClient::fillCopy()
 SUPPORTClient::~SUPPORTClient()
 {
   BEGIN_OF("SUPPORTClient::~SUPPORTClient");
-
+  IOR_Support->release();
+  if(_ownMesh)
+     delete _mesh;
   END_OF("SUPPORTClient::~SUPPORTClient");
 }
 
