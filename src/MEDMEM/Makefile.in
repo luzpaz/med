@@ -69,7 +69,8 @@ MEDMEM_Meshing.hxx \
 MEDMEM_STRING.hxx \
 MEDMEM_Support.hxx \
 MEDMEM_Unit.hxx \
-MEDMEM_Grid.hxx
+MEDMEM_Grid.hxx \
+MEDMEM_RCBase.hxx
 
 # Libraries targets
 

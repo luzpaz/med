@@ -738,9 +738,9 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
 
   bool operatorReturn = false;
 
-  operatorReturn = (_mesh == support._mesh) && (_entity == support._entity) &&
+  operatorReturn = (*_mesh == *support._mesh) && (_entity == support._entity) &&
     (_numberOfGeometricType == support._numberOfGeometricType) &&
-    (_isOnAllElts == support._isOnAllElts) &&
+    ( (_isOnAllElts && support._isOnAllElts) || (!_isOnAllElts  && !support._isOnAllElts) ) &&
     (_totalNumberOfElements == support._totalNumberOfElements);
 
   if (operatorReturn)
@@ -771,3 +771,18 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
 
   return operatorReturn;
 };
+
+
+/*!
+  addReference : reference counter presently disconnected in C++ -> just connected for client.
+*/
+void MEDMEM::SUPPORT::addReference() const
+{
+}
+
+/*!
+  removeReference : reference counter presently disconnected in C++ -> just connected for client.
+*/
+void MEDMEM::SUPPORT::removeReference() const
+{
+}

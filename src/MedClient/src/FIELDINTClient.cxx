@@ -1,5 +1,6 @@
 #include "FIELDINTClient.hxx"
-
+namespace MEDMEM{
+    
 //=============================================================================
 /*!
  * Constructor with arguments
@@ -23,4 +24,6 @@ FIELDINTClient::~FIELDINTClient()
   BEGIN_OF("Default Destructor (for Python API) FIELDINTClient");
 
   END_OF("Default Destructor (for Python API) FIELDINTClient");
+}
+
 }

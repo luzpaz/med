@@ -14,6 +14,8 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
+#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_RCBase.hxx"
 
 /*!
 
@@ -26,7 +28,7 @@
 
 namespace MEDMEM {
 class MESH ;
-class SUPPORT
+  class SUPPORT : public RCBASE
 {
 protected:
   /*!
@@ -191,6 +193,9 @@ public:
   void getBoundaryElements() throw (MEDEXCEPTION);
 
   void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
+  //A.G. Addings for RC
+  virtual void addReference() const;
+  virtual void removeReference() const;
 };
 
 // _____________________
@@ -337,7 +342,11 @@ inline void SUPPORT::setDescription(string Description)
 inline void SUPPORT::setMesh(MESH *Mesh)
 //--------------------------------------
 {
+  if(_mesh)
+    _mesh->removeReference();
   _mesh=Mesh;
+  if(_mesh)
+    _mesh->addReference();
 }
 
 /*! set the attribute _isOnAllElts to All */

@@ -1,20 +1,18 @@
 template<class T1,class T2>
-FIELDClient<T1,T2>::FIELDClient(typename T2::_ptr_type ptrCorba,MEDMEM::SUPPORT * S):_fieldPtr(T2::_duplicate(ptrCorba)),_ownSupport(false)
+FIELDClient<T1,T2>::FIELDClient(typename T2::_ptr_type ptrCorba,MEDMEM::SUPPORT * S):_fieldPtr(T2::_duplicate(ptrCorba)),_refCounter(1)
 {
   if (!S) 
-    {
-      _ownSupport=true;
-      S=new MEDMEM::SUPPORTClient(_fieldPtr->getSupport());
-    }
-  MEDMEM::FIELD<T1>::setSupport(S);
-
+    MEDMEM::FIELD<T1>::_support=new MEDMEM::SUPPORTClient(_fieldPtr->getSupport());
+  else
+    MEDMEM::FIELD<T1>::setSupport(S);
+  
   setName(_fieldPtr->getName());
 
   MEDMEM::FIELD<T1>::setDescription(_fieldPtr->getDescription());
   int nc = _fieldPtr->getNumberOfComponents();
   MEDMEM::FIELD<T1>::setNumberOfComponents(nc);
 
-  MEDMEM::FIELD<T1>::setNumberOfValues( S->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
+  MEDMEM::FIELD<T1>::setNumberOfValues( MEDMEM::FIELD<T1>::_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
   string * _s = new string[nc];
 
@@ -62,7 +60,7 @@ FIELDClient<T1,T2>::~FIELDClient()
 {
   _fieldPtr->release();
   CORBA::release(_fieldPtr);
-  if(_ownSupport)
-    delete MEDMEM::FIELD<T1>::_support;
+  if(_support)
+    _support->removeReference();
 }
 

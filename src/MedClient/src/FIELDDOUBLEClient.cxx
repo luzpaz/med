@@ -1,4 +1,5 @@
 #include "FIELDDOUBLEClient.hxx"
+namespace MEDMEM{
 
 //=============================================================================
 /*!
@@ -23,4 +24,6 @@ FIELDDOUBLEClient::~FIELDDOUBLEClient()
   BEGIN_OF("Default Destructor (for Python API) FIELDDOUBLEClient");
 
   END_OF("Default Destructor (for Python API) FIELDDOUBLEClient");
+}
+
 }

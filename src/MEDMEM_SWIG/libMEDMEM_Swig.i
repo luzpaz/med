@@ -32,6 +32,10 @@
 #include "MEDMEM_SWIG_MedFieldIntDriver.hxx"
 #include "MEDMEM_Meshing.hxx"
 
+#ifdef _DEBUG_
+#include "LocalTraceCollector.hxx"
+#endif /* ifdef _DEBUG_*/
+
   using namespace MEDMEM;
   using namespace MED_EN;
 %}
@@ -55,6 +59,17 @@
       return NULL;
     }
 }
+
+/*
+  Initialisation block in the case of the debug mode (definition of _DEBUG_
+  compilation switch) and due to the LocalTraceCollector mechanism
+*/
+
+%init %{
+#ifdef _DEBUG_
+  LocalTraceCollector::instance();
+#endif /* ifdef _DEBUG_*/
+%}
 
 /*
   managing the use of operator= of any class by renaming it assign()
@@ -1870,6 +1885,74 @@ public :
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
+  }
+};
+
+class GIBI_MED_RDONLY_DRIVER
+{
+public :
+  GIBI_MED_RDONLY_DRIVER() ;
+
+  GIBI_MED_RDONLY_DRIVER(const GIBI_MED_RDONLY_DRIVER & driver) ;
+
+  ~GIBI_MED_RDONLY_DRIVER() ;
+
+  void open();
+
+  void write( void );
+
+  void read ( void );
+
+  void close();
+
+  %extend {
+    GIBI_MED_RDONLY_DRIVER(char * fileName, MED * ptrMed)
+      {
+	return new GIBI_MED_RDONLY_DRIVER(string(fileName), ptrMed) ;
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing GIBI_MED_RDONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
+  }
+};
+
+class GIBI_MED_WRONLY_DRIVER
+{
+public :
+  GIBI_MED_WRONLY_DRIVER() ;
+
+  GIBI_MED_WRONLY_DRIVER(const GIBI_MED_WRONLY_DRIVER & driver) ;
+
+  ~GIBI_MED_WRONLY_DRIVER() ;
+
+  void open();
+
+  void write( void );
+
+  void read ( void );
+
+  void close();
+
+  %extend {
+    GIBI_MED_WRONLY_DRIVER(char * fileName, MED * ptrMed, MESH * ptrMesh)
+      {
+	return new GIBI_MED_WRONLY_DRIVER(string(fileName), ptrMed, ptrMesh) ;
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing GIBI_MED_WRONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
   }
 };
 

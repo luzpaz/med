@@ -71,9 +71,9 @@ throw (SALOME::SALOME_Exception)
         try
 	  {
 	    medModeSwitch modemed=convertIdlModeToMedMode(mode);
-// 	    ::FIELD<int> *ptrI=dynamic_cast< ::FIELD<int>* >(_fieldTptr);
-//the alternative is not safe but the previous one fails using the python API
-	    MEDMEM::FIELD<int> *ptrI = (MEDMEM::FIELD<int> *) _fieldTptr;
+	    // 	    ::FIELD<int> *ptrI=dynamic_cast< ::FIELD<int>* >(_fieldTptr);
+	    //the alternative is not safe but the previous one fails using the python API
+	    MEDMEM::FIELD<int> *ptrI = static_cast< MEDMEM::FIELD<int>* >(_fieldTptr);
 
 	    const int * values =ptrI->getValue(modemed);
 	    int nbval=ptrI->getValueLength(modemed);
@@ -106,7 +106,9 @@ throw (SALOME::SALOME_Exception)
         try
         {
 		medModeSwitch modemed=convertIdlModeToMedMode(mode);
-		::FIELD<int> *ptrI=dynamic_cast< ::FIELD<int>* >(_fieldTptr);
+		//::FIELD<int> *ptrI=dynamic_cast< ::FIELD<int>* >(_fieldTptr);
+		//the alternative is not safe but the previous one fails using the python API
+		MEDMEM::FIELD<int> *ptrI=static_cast< MEDMEM::FIELD<int>* >(_fieldTptr);
                 const int * values =ptrI->getValue(modemed);
 		int nbval=ptrI->getValueLength(modemed);
 		ret=SenderFactory::buildSender(*this,values,nbval);
