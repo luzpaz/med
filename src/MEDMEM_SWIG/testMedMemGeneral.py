@@ -526,7 +526,7 @@ for i in range(nbOfFiles):
     print "Saving in file the mesh under the med and vtk format"
     print "Med file = ",medFileName
     print "vtk file = ",vtkFileName
-    idMed = mesh.addDriver(MED_DRIVER,medFileName,mesh.getName())
+    idMed = mesh.addDriver(MED_DRIVER,medFileName,mesh.getName(),MED_REMP)
     mesh.write(idMed)
 
     idVtk = mesh.addDriver(VTK_DRIVER,vtkFileName,mesh.getName())
