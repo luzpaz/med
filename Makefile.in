@@ -18,7 +18,7 @@ SUBDIRS = idl src
 
 RESOURCES_FILES = \
 MEDCatalog.xml \
-Med_en.xml \
+MED_en.xml \
 Data.png \
 Infos.png \
 Structure.png \

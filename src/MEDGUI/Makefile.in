@@ -21,13 +21,13 @@ EXPORT_HEADERS=
 
 # .po files to transform in .qm
 PO_FILES = \
-           MedGUI_icons.po \
-           MedGUI_msg_fr.po \
-           MedGUI_msg_en.po \
+           MED_icons.po \
+           MED_msg_fr.po \
+           MED_msg_en.po \
 
 
 # Libraries targets
-LIB = libMedGUI.la
+LIB = libMEDGUI.la
 LIB_SRC = MedGUI.cxx  
 LIB_MOC = MedGUI.h
 
@@ -44,7 +44,7 @@ LIB_SERVER_IDL =
 CPPFLAGS += $(QT_INCLUDES) $(VTK_INCLUDES) $(OCC_INCLUDES) $(PYTHON_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
 CXXFLAGS += -I${KERNEL_ROOT_DIR}/include/salome
 
-LDFLAGS += -lSalomeGUI -lmedmem -lMEDImpl -lMedEngine -L${KERNEL_ROOT_DIR}/lib/salome
+LDFLAGS += -lSalomeGUI -lmedmem -lMEDImpl -lMEDEngine -L${KERNEL_ROOT_DIR}/lib/salome
 
 
 MED.hh MEDSK.cc: MED.idl
