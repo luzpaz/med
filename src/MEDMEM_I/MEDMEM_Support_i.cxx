@@ -558,7 +558,7 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   MESSAGE("Add a support Object under /Med/MESH/MESHNAME");
 
   char * medsupfatherName;
-  int lenName = 15 + strlen(meshName.c_str());
+  int lenName = 15 + strlen(meshName.c_str()) + 1;
   medsupfatherName = new char[lenName];
   medsupfatherName = strcpy(medsupfatherName,"MEDSUPPORTS_OF_");
   medsupfatherName = strcat(medsupfatherName,meshNameStudy.c_str());

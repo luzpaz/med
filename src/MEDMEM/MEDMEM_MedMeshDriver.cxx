@@ -1294,7 +1294,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
 	throw MEDEXCEPTION("MED_MESH_RDONLY_DRIVER::getFAMILY() : NumberOfGroups" );
       
       int FamilyIdentifier ;
-      string FamilyName(MED_TAILLE_NOM,'\0 ');
+      string FamilyName(MED_TAILLE_NOM,'\0');
       int *  AttributesIdentifier = new int[NumberOfAttributes] ;
       int *  AttributesValues     = new int[NumberOfAttributes] ;
       string AttributesDescription(MED_TAILLE_DESC*NumberOfAttributes,' ') ;

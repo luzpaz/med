@@ -1811,8 +1811,8 @@ public :
     char * getMeshName()
       {
 	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -1858,8 +1858,8 @@ public :
     char * getMeshName()
       {
 	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -1906,8 +1906,8 @@ public :
     char * getMeshName()
       {
 	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -1957,8 +1957,8 @@ public :
     char * getMeshName()
       {
 	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -2004,8 +2004,8 @@ public :
     char * getMeshName()
       {
 	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -2052,8 +2052,8 @@ public :
     char * getMeshName()
       {
 	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -2100,8 +2100,8 @@ class MED_MESH_RDONLY_DRIVER
     char * getMeshName()
       {
 	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -2143,8 +2143,8 @@ class MED_MESH_WRONLY_DRIVER
     char * getMeshName()
       {
 	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -2188,8 +2188,8 @@ class MED_MESH_RDWR_DRIVER : public virtual MED_MESH_RDONLY_DRIVER,
     char * getMeshName()
       {
 	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -2236,8 +2236,8 @@ public:
     char * getFieldName()
       {
 	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -2280,8 +2280,8 @@ public:
     char * getFieldName()
       {
 	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -2324,8 +2324,8 @@ public:
     char * getFieldName()
       {
 	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -2372,8 +2372,8 @@ public:
     char * getFieldName()
       {
 	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -2416,8 +2416,8 @@ public:
     char * getFieldName()
       {
 	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }
@@ -2460,8 +2460,8 @@ public:
     char * getFieldName()
       {
 	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str())];
-	strcat(tmp,tmp_str.c_str());
+	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
   }

@@ -147,10 +147,10 @@ find_in . configure.in_tmp2
 
 # _CS_gbo_100204 Mise à jour du filtre pour prise en compte des
 # restrictions imposées par les versions récente de autoconf.
-sed -e '/^     \.\/salome_adm/d' \
-    -e '/configure.in/d'         \
-    -e '/^     \.\/adm_local/d'  \
-    -e 's/.in / /' configure.in_tmp2 >> configure.in_tmp1
+    sed -e '/^	\.\/salome_adm/d' \
+	-e '/configure.in/d'      \
+	-e '/^	\.\/adm_local/d'  \
+	-e 's/.in / /' configure.in_tmp2 >> configure.in_tmp1
 
 echo  "])" >> configure.in_tmp1
 

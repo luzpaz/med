@@ -1232,7 +1232,7 @@ void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
 
 	SCRUTE(fileNameShort);
 
-	int lenName = 21 + strlen(fileNameShort.c_str());
+	int lenName = 21 + strlen(fileNameShort.c_str()) + 1;
 	medObjName = new char[lenName];
 	medObjName = strcpy(medObjName,"MED_OBJECT_FROM_FILE_");
 	medObjName = strcat(medObjName,fileNameShort.c_str());

@@ -64,7 +64,8 @@ install-python: $(bindir) $(EXPORT_PYSCRIPTS:%=install-%)
 $(EXPORT_PYSCRIPTS:%=install-%): install-%: %
 	$(INSTALL_PROGRAM) $< $(bindir)/.
 
-@MODULE@
+# _CS_gbo_240504 Il s'agit d'un répertoire feuille
+@CONCLUDE@
 
 bin: pyscripts
 
