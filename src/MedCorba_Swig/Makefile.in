@@ -6,9 +6,9 @@
 
 # source path
 top_srcdir=@top_srcdir@
-top_builddir=../../..
+top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:$(srcdir):$(top_srcdir)/idl
+VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl:${KERNEL_ROOT_DIR}/idl/salome
 
 @COMMENCE@
 
@@ -28,15 +28,15 @@ EXPORT_PYSCRIPTS = libMedCorba_Swig.py medcorba_test.py batchmode_medcorba_test.
 
 #############################################################################
 
-CPPFLAGS+= $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES)
-CXXFLAGS=-g -D_DEBUG_ -D__x86__ -D__linux__ 
-CXXFLAGS+=-ftemplate-depth-42
+CPPFLAGS+= $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
+CXXFLAGS=-g -D_DEBUG_ -D__x86__ -D__linux__
+CXXFLAGS+=-ftemplate-depth-42 -I${KERNEL_ROOT_DIR}/include/salome
 LIBS= $(PYTHON_LIBS) 
-LDFLAGS+= -lMEDImpl -lMEDMEM_Swigcmodule
+LDFLAGS+= -lMEDImpl -lMEDMEM_Swigcmodule -L${KERNEL_ROOT_DIR}/lib/salome
 
 #############################################################################
 
 MED.hh MEDSK.cc: MED.idl
-	omniidl -bcxx -Wbtp $^
+	omniidl -bcxx -Wbtp -I$(top_builddir)/idl $^
 
 @CONCLUDE@

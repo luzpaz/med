@@ -19,8 +19,6 @@
 #include "QAD_Tools.h"
 #include "QAD_FileDlg.h"
 
-#include "SMESH_TypeFilter.hxx"
-
 // QT Includes
 #include <qinputdialog.h>
 
@@ -210,7 +208,7 @@ bool MedGUI::OnGUIEvent (int theCommandID, QAD_Desktop* parent)
 	int nbSel = Sel->IObjectCount();
 	if ( nbSel == 1 ) 
 	  {
-	    SMESH::SMESH_Mesh_var aM;
+	    //	    SMESH::SMESH_Mesh_var aM;
 	    SALOME_MED::MESH_var aMesh;
 	    Handle(SALOME_InteractiveObject) IObject = Sel->firstIObject();
 	    if ( IObject->hasEntry() ) 
@@ -226,17 +224,17 @@ bool MedGUI::OnGUIEvent (int theCommandID, QAD_Desktop* parent)
 			aMesh = SALOME_MED::MESH::_narrow( _orb->string_to_object(anIOR->Value()) );
 			if ( aMesh->_is_nil() )
 			  {
-			    aM = SMESH::SMESH_Mesh::_narrow(_orb->string_to_object(anIOR->Value()));
-			    if ( aM->_is_nil() )
-			      {
-				QAD_MessageBox::warn1
-				  ( QAD_Application::getDesktop(),
-				    tr ("MED_WRN_WARNING"),
-				    tr ("MED_INF_NOTIMPL"),
-				    tr ("MED_BUT_OK") );
-				break;
-			      }
-			    aMesh = aM->GetMEDMesh();
+			    //			    aM = SMESH::SMESH_Mesh::_narrow(_orb->string_to_object(anIOR->Value()));
+			    //			    if ( aM->_is_nil() )
+			    //			      {
+			    //				QAD_MessageBox::warn1
+			    //				  ( QAD_Application::getDesktop(),
+			    //				    tr ("MED_WRN_WARNING"),
+			    //				    tr ("MED_INF_NOTIMPL"),
+			    //				    tr ("MED_BUT_OK") );
+			    //				break;
+			    //			      }
+			    //			    aMesh = aM->GetMEDMesh();
 			    if ( aMesh->_is_nil() )
 			      {
 				QAD_MessageBox::warn1
@@ -274,7 +272,7 @@ bool MedGUI::OnGUIEvent (int theCommandID, QAD_Desktop* parent)
 	int nbSel = Sel->IObjectCount();
 	if ( nbSel == 1 ) 
 	  {
-	    SMESH::SMESH_subMesh_var aSubM;
+	    //	    SMESH::SMESH_subMesh_var aSubM;
 	    SALOME_MED::FAMILY_var aFam;
 	    Handle(SALOME_InteractiveObject) IObject = Sel->firstIObject();
 	    if ( IObject->hasEntry() ) 
@@ -287,26 +285,26 @@ bool MedGUI::OnGUIEvent (int theCommandID, QAD_Desktop* parent)
 		    if (aMorSM->FindAttribute(anAttr, "AttributeIOR")) 
 		      {
 			anIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
-			aSubM = SMESH::SMESH_subMesh::_narrow( _orb->string_to_object(anIOR->Value()) );
-			if ( aSubM->_is_nil() )
-			  {
-			    aFam=SALOME_MED::FAMILY::_narrow( _orb->string_to_object(anIOR->Value()));
-			    if ( aFam->_is_nil() )
-			      {
-				QAD_MessageBox::warn1
-				  ( QAD_Application::getDesktop(),
-				    tr ("MED_WRN_WARNING"),
-				    tr ("MED_INF_NOTIMPL"),
-				    tr ("MED_BUT_OK") );
-				break;
-			      }
-			    DumpSubMesh( aFam );
-			  }
-			else
-			  {
-			    DumpSubMesh( aSubM );
+			//			aSubM = SMESH::SMESH_subMesh::_narrow( _orb->string_to_object(anIOR->Value()) );
+			//			if ( aSubM->_is_nil() )
+			//			  {
+			//			    aFam=SALOME_MED::FAMILY::_narrow( _orb->string_to_object(anIOR->Value()));
+			//			    if ( aFam->_is_nil() )
+			//			      {
+			//				QAD_MessageBox::warn1
+			//				  ( QAD_Application::getDesktop(),
+			//				    tr ("MED_WRN_WARNING"),
+			//				    tr ("MED_INF_NOTIMPL"),
+			//				    tr ("MED_BUT_OK") );
+			//				break;
+			//			      }
+			//			    DumpSubMesh( aFam );
+			//			  }
+			//			else
+			  //			  {
+			    //			    DumpSubMesh( aSubM );
 			    //Sel->ClearFilters() ;
-			  }
+			    //			  }
 		      }
 		    else
 		      {
@@ -489,21 +487,21 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
  *
  */
 //=============================================================================
-bool MedGUI::DumpSubMesh( SMESH::SMESH_subMesh_ptr aSubMesh )
-{
-  if ( aSubMesh->_is_nil() )
-    return false;
-
-  SALOME_MED::FAMILY_var Fam = aSubMesh->GetFamily();
-  if ( Fam->_is_nil() )
-    return false;
-
-  Engines::long_array_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
-  for (int l=0;l<tabnoeuds->length();l++)
-    SCRUTE(tabnoeuds[l]); 
-
-  return true;
-}
+//bool MedGUI::DumpSubMesh( SMESH::SMESH_subMesh_ptr aSubMesh )
+//{
+//  if ( aSubMesh->_is_nil() )
+//    return false;
+//
+//  SALOME_MED::FAMILY_var Fam = aSubMesh->GetFamily();
+//  if ( Fam->_is_nil() )
+//    return false;
+//
+//  Engines::long_array_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
+//  for (int l=0;l<tabnoeuds->length();l++)
+//    SCRUTE(tabnoeuds[l]); 
+//
+//  return true;
+//}
 //=============================================================================
 /*!
  *

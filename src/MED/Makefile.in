@@ -9,9 +9,9 @@
 
 # source path
 top_srcdir=@top_srcdir@
-top_builddir=../../..
+top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:$(srcdir):$(top_builddir)/share/salome/idl
+VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl:${KERNEL_ROOT_DIR}/idl/salome
 
 @COMMENCE@
 
@@ -33,13 +33,13 @@ BIN_SRC =
 
 # additionnal information to compil and link file
 
-CPPFLAGS += $(OCC_INCLUDES) $(MED2_INCLUDES)  $(HDF5_INCLUDES) 
-CXXFLAGS += $(OCC_CXXFLAGS) 
+CPPFLAGS += $(OCC_INCLUDES) $(MED2_INCLUDES)  $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
+CXXFLAGS += $(OCC_CXXFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
 
-LDFLAGS+=  $(OCC_LIBS) $(HDF5_LIBS) -lSalomeContainer -lSalomeHDFPersist -lSalomeDS -lSalomeNS -lRegistry -lOpUtil -lmedmem -lMEDImpl
+LDFLAGS+=  $(OCC_LIBS) $(HDF5_LIBS) -lSalomeContainer -lSalomeHDFPersist -lSalomeDS -lSalomeNS -lRegistry -lOpUtil -lmedmem -lMEDImpl -L${KERNEL_ROOT_DIR}/lib/salome
 
 
 MED.hh MEDSK.cc: MED.idl
-	omniidl -bcxx -Wbtp $^
+	omniidl -bcxx -Wbtp -I$(top_builddir)/idl $^
 
 @CONCLUDE@
