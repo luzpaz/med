@@ -58,6 +58,7 @@ LIB_SRC = \
 	MESHClient.cxx \
 	SUPPORTClient.cxx \
 	FAMILYClient.cxx \
+	FIELDClient.cxx \
 	GROUPClient.cxx
 
 LIB_CLIENT_IDL= \
