@@ -17,6 +17,7 @@ VPATH=.:@srcdir@:@top_srcdir@/bin:@top_srcdir@/resources:./bin:@top_srcdir@/idl:
 SUBDIRS = idl src
 
 RESOURCES_FILES = \
+MEDCatalog.xml \
 Med_en.xml \
 Data.png \
 Infos.png \
