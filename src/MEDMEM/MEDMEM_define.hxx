@@ -27,8 +27,10 @@ namespace MED_EN {
 #define MED_TAILLE_IDENT  8
 #define MED_TAILLE_NOM   32
 #define MED_TAILLE_LNOM  80    
-#define MED_TAILLE_PNOM   8 
+#define MED_TAILLE_PNOM   16 
 
+#define MED_PNOM_BLANC "                "
+#define MED_NOM_BLANC  "                                "
 
     typedef long medGeometryElement;
     const medGeometryElement MED_NONE = 0;
@@ -47,6 +49,8 @@ namespace MED_EN {
     const medGeometryElement MED_PYRA13 = 313;
     const medGeometryElement MED_PENTA15 = 315;
     const medGeometryElement MED_HEXA20 = 320;
+    const medGeometryElement MED_POLYGONE = 400;
+    const medGeometryElement MED_POLYEDRE = 500;
     const medGeometryElement MED_ALL_ELEMENTS = 999;
 
     typedef long medEntityMesh;
@@ -59,18 +63,31 @@ namespace MED_EN {
     typedef long medModeSwitch;
     const medModeSwitch MED_FULL_INTERLACE = 0;
     const medModeSwitch MED_NO_INTERLACE = 1;
+
+    typedef enum {MED_NO_PFLMOD, MED_GLOBAL, MED_COMPACT }  med_mode_profil; 
     
     typedef long medConnectivity;
     const medConnectivity MED_NODAL = 0;
     const medConnectivity MED_DESCENDING = 1;
     
-    typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
+//     typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
+//     V2_1->V2_2
     
-    typedef enum {MED_LECT,MED_ECRI,MED_REMP} med_mode_acces; 
+//     typedef enum {MED_LECT,MED_ECRI,MED_REMP} med_mode_acces; V2_1->V2_2
     
-    typedef enum {MED_COOR, MED_CONN, MED_NOM, MED_NUM, MED_FAM} med_table;
+    typedef enum {MED_LECTURE, MED_LECTURE_ECRITURE, MED_LECTURE_AJOUT,
+		  MED_CREATION} med_mode_acces; 
+
+    typedef enum {MED_NON_STRUCTURE, MED_STRUCTURE} med_maillage;
+
+    typedef enum {MED_GRILLE_CARTESIENNE, MED_GRILLE_POLAIRE,
+		  MED_GRILLE_STANDARD} med_type_grille;
+
+    typedef enum {MED_COOR, MED_CONN, MED_NOM, MED_NUM, MED_FAM, MED_COOR_IND1,
+		  MED_COOR_IND2,MED_COOR_IND3} med_table;
     
-    typedef enum {MED_REEL64=6, MED_INT32=24,MED_INT64=26, MED_INT} med_type_champ;
+    typedef enum {MED_REEL64=6, MED_INT32=24,MED_INT64=26,
+		  MED_INT=28} med_type_champ;
 
 #define MED_NBR_GEOMETRIE_MAILLE 15
 #define MED_NBR_GEOMETRIE_FACE 4
@@ -87,14 +104,20 @@ typedef enum {MED_COMP, MED_DTYPE} med_dim_champ;
 typedef enum {MED_HDF_VERSION, MED_VERSION, MED_FICH_DES} med_fich_info; 
 
 #define MED_NOPG   1                   /* -> pas de point de Gauss                    */
+#define MED_NOGAUSS  ""                 /* -> pas de point de Gauss                    */
+#define MED_NOGAUSSi  MED_NOM_BLANC     /* Variable Interne                            */
 #define MED_NOPFL  ""                  /* -> pas de profils utilisateur               */
-#define MED_NOPFLi "                                "  /* Variable Interne                      */
+#define MED_NOPFLi MED_NOM_BLANC /* Variable Interne                      */
+#define MED_NOLIEN  ""
+#define MED_NOLIENi MED_NOM_BLANC      /* Variable Interne                            */
 #define MED_NOPF   0                   /* -> pas de profils pour _MEDdataseNnumEcrire */
 #define MED_NOPDT -1                   /* rem: pas de pas de temps negatifs           */
 #define MED_NONOR -1                   /* rem: pas de n°ordre negatif                 */
 #define MED_DIM1   1                   /* PAS */
   //#define MED_ALL    0 !!!!! NB: WARNING MED_ALL deja utilise dans l'enum medGeometryElement !!!!!!!!
 #define MED_ALL    0
+#define MED_NOREF  ""
+#define MED_DEFAUT ""                  /* Toutes les donnees champs ou maillage pour le montage */
 
 #if defined(SUN4SOL2) || defined(PCLINUX) || defined(OSF1) || defined(IRIX64_32) || defined(RS6000)
 /* interface C/FORTRAN */
@@ -186,14 +209,17 @@ typedef double         med_float;
 #define MED_VALID    0
 //#define MED_NULL     NULL
 
-#define MED_RDONLY MED_LECT
+//#define MED_RDONLY MED_LECT V2_1->V2_2
+#define MED_RDONLY MED_LECTURE
   //   rem: MED_WRONLY=MED_ECR n'empêche malheureusement pas de lire le fichier
   //   mais permet de conserver l'existant. Attention à la création d'objet 
   //   ne prenant pas de paramètre de type mode d'accès il faut tester si il
   //   est déjà présent dans le fichier. Si  MED_WRONLY=MED_REMP le fichier est
   //   réinitialisé. Cf une évolution de MED.
-#define MED_WRONLY MED_ECRI
-#define MED_RDWR   MED_ECRI
+  //#define MED_WRONLY MED_ECRI V2_1->V2_2
+#define MED_WRONLY MED_LECTURE_AJOUT
+  //#define MED_RDWR   MED_ECRI V2_1->V2_2
+#define MED_RDWR   MED_LECTURE_ECRITURE
 // Fin
 
 #define FAUX 0

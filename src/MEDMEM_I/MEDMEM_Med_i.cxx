@@ -168,7 +168,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 		             break;
       			 }
 
-      			case MED_FR::MED_REEL64: 
+      			case MED_FR::MED_FLOAT64: 
                         {
 			     ((FIELD<double>*)myField)->read();
 			     FIELDDOUBLE_i * myFieldDoubleI 
@@ -471,7 +471,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 			break;
   		     }
 
-      		     case MED_FR::MED_REEL64: 
+      		     case MED_FR::MED_FLOAT64: 
 		     {
 			((FIELD<double>*)myField)->read();
 			FIELDDOUBLE_i * myFieldDoubleI 

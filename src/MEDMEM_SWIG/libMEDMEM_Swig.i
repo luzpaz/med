@@ -207,11 +207,20 @@
   enum of the C++ MED used in the Python API
 */
 
-typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type; 
+typedef enum {MED_NON_STRUCTURE, MED_STRUCTURE} med_maillage;
+
+typedef enum {MED_GRILLE_CARTESIENNE, MED_GRILLE_POLAIRE,
+	      MED_GRILLE_STANDARD} med_type_grille;
 
 typedef enum {MED_FULL_INTERLACE, MED_NO_INTERLACE} medModeSwitch; 
 
+/*
 typedef enum {MED_LECT, MED_ECRI, MED_REMP} med_mode_acces;
+                     V2_1->V2_2
+*/
+
+typedef enum {MED_LECTURE, MED_LECTURE_ECRITURE, MED_LECTURE_AJOUT,
+	      MED_CREATION} med_mode_acces;
 
 typedef enum {MED_CELL, MED_FACE, MED_EDGE, MED_NODE,
 	      MED_ALL_ENTITIES} medEntityMesh; 
@@ -220,8 +229,8 @@ typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
 	      MED_TRIA3=203, MED_QUAD4=204, MED_TRIA6=206, MED_QUAD8=208,
 	      MED_TETRA4=304, MED_PYRA5=305, MED_PENTA6=306,
 	      MED_HEXA8=308, MED_TETRA10=310, MED_PYRA13=313,
-	      MED_PENTA15=315, MED_HEXA20=320,
-	      MED_ALL_ELEMENTS=999} medGeometryElement;
+	      MED_PENTA15=315, MED_HEXA20=320, MED_POLYGONE=400,
+	      MED_POLYEDRE=500, MED_ALL_ELEMENTS=999} medGeometryElement;
 
 typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ; 
 
@@ -229,7 +238,7 @@ typedef enum {MED_DRIVER=0, GIBI_DRIVER=1, PORFLOW_DRIVER = 2, VTK_DRIVER=254,
 	      NO_DRIVER=255} driverTypes;
 
 typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26,
-	      MED_INT} med_type_champ;
+	      MED_INT=28} med_type_champ;
 
 typedef struct { int dt; int it; } DT_IT_;
 
@@ -1524,13 +1533,15 @@ class GRID : public MESH
 
   int getFaceNumber(const int Axis, const int i, const int j=0, const int k=0) const ;
   
-  med_grid_type getGridType();
+/*   med_grid_type getGridType(); */
+  med_type_grille getGridType();
   
   int getArrayLength( const int Axis );
 
   const double getArrayValue (const int Axis, const int i);
 
-  void setGridType(med_grid_type gridType);
+/*   void setGridType(med_grid_type gridType); */
+  void setGridType(med_type_grille gridType);
 
   %extend {
     GRID(driverTypes driverType, const char * fileName="", const char * meshName="")

@@ -366,9 +366,13 @@ int      MED::getNumberOfMeshes ( void ) const {
   const char * LOC = "MED::getNumberOfMeshes ( void ) const : ";
   BEGIN_OF(LOC);
 
-  return _meshes.size();
+  int size = _meshes.size();
+
+  SCRUTE(size);
 
   END_OF(LOC);
+
+  return size;
 };   
     
 /*!
@@ -454,9 +458,10 @@ deque<string> MED::getMeshNames      () const {
 MESH   * MED::getMesh           ( const string & meshName )  const
   throw (MED_EXCEPTION)
 {
-
   const char * LOC = "MED::getMesh ( const string & meshName ) const : ";
   BEGIN_OF(LOC);
+
+  SCRUTE(meshName);
 
   map<MESH_NAME_,MESH*>::const_iterator itMeshes =  _meshes.find(meshName);
 
