@@ -61,28 +61,45 @@ def AnalyzeField(field):
 
 #==============================================================================
 
-def getMeshObjectFromStudy(number):
-    mySO = batchmode_salome.myStudy.FindObject("MEDMESH")
-    mysub = mySO.FindSubObject(number)[1]
-    if mysub:
-        Builder = batchmode_salome.myStudy.NewBuilder()
-        anAttr = Builder.FindOrCreateAttribute(mysub, "AttributeIOR")
+def getMeshObjectFromStudy(meshName):
+    objNameInStudy = "/Med/MEDMESH/"+meshName
+    mySO = batchmode_salome.myStudy.FindObjectByPath(objNameInStudy)
+    if (mySO == None) :
+        print "ERROR: ",objNameInStudy," cannot be found in the Study"
+        return mySO
+    else:
+        anAttr = mySO.FindAttribute("AttributeIOR")[1]
         obj = batchmode_salome.orb.string_to_object(anAttr.Value())
         myObj = obj._narrow(SALOME_MED.MESH)
+        if (myObj == None) :
+            print "ERROR: ",objNameInStudy," has been found in the Study but with the wrong type"
         return myObj
-    else:
-        print "ERROR: No Mesh Object stored in this Study"
-        return None
 
 #==============================================================================
 
-def getMedObjectFromStudy():
-    mySO = batchmode_salome.myStudy.FindObject("Objet MED")
-    Builder = batchmode_salome.myStudy.NewBuilder()
-    anAttr = Builder.FindOrCreateAttribute(mySO, "AttributeIOR")
-    obj = batchmode_salome.orb.string_to_object(anAttr.Value())
-    myObj = obj._narrow(SALOME_MED.MED)
-    return myObj
+def getMedObjectFromStudy(file):
+    objNameInStudy = "MED_OBJECT_FROM_FILE_"+file
+    compNameInStudy= "MED"
+    listOfSO = batchmode_salome.myStudy.FindObjectByName(objNameInStudy,
+                                                         compNameInStudy)
+    listLength = len(listOfSO)
+    if (listLength == 0) :
+        print "ERROR: ",objNameInStudy," cannot be found in the Study under the component ",compNameInStudy
+        return None
+    elif (listLength > 1) :
+        print "ERROR: there are more than one instance of ",objNameInStudy," in the Study under the component ",compNameInStudy
+        return None
+    mySO = listOfSO[0]
+    if (mySO == None) :
+        print "ERROR: ",objNameInStudy," cannot be found in the Study"
+        return mySO
+    else:
+        anAttr = mySO.FindAttribute("AttributeIOR")[1]
+        obj = batchmode_salome.orb.string_to_object(anAttr.Value())
+        myObj = obj._narrow(SALOME_MED.MED)
+        if (myObj == None) :
+            print "ERROR: ",objNameInStudy," has been found in the Study but with the wrong type"
+        return myObj
 
 #==============================================================================
 #
@@ -105,8 +122,9 @@ studyCurrentId = batchmode_salome.myStudyId
 print "We are working in the study ",studyCurrent," with the ID ",studyCurrentId
 print ""
 
+fileName = "cube_hexa8_quad4.med"
 #medFile = "carre_en_quad4_seg2.med"
-medFile = filePath + "cube_hexa8_quad4.med"
+medFile = filePath + fileName
 
 print "Loading of the Med Component"
 print ""
@@ -115,25 +133,27 @@ med_comp = batchmode_salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
 
 med_comp.readStructFile(medFile,studyCurrent)
 
-med_obj = getMedObjectFromStudy()
+med_obj = getMedObjectFromStudy(fileName)
 
 nbMeshes = med_obj.getNumberOfMeshes()
 
 nbFields = med_obj.getNumberOfFields()
 
+meshNames = med_obj.getMeshNames()
+
 print ""
 print "The med file ",medFile," has ",nbMeshes," Meshe(s) and ",nbFields," Field(s)"
 print ""
 
-meshcorba = getMeshObjectFromStudy(1)
+meshName = meshNames[0]
 
-name = meshcorba.getName()
+meshcorba = getMeshObjectFromStudy(meshName)
 
 nbNodes = meshcorba.getNumberOfNodes()
 
 spaceDim = meshcorba.getSpaceDimension()
 
-print "The mesh from the Study is ",name,".It is a ",spaceDim,"-D mesh and it has ",nbNodes," Nodes"
+print "The mesh from the Study is ",meshName,".It is a ",spaceDim,"-D mesh and it has ",nbNodes," Nodes"
 print ""
 
 for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOME_MED.MED_EDGE]:
