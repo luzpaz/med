@@ -450,7 +450,7 @@ throw (SALOME::SALOME_Exception)
         	};
 		break;
 	 }
-	 case MED_FR::MED_FLOAT64: 
+	 case MED_FR::MED_REEL64: 
 	 {
 		try 
 		{

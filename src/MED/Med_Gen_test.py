@@ -4,6 +4,8 @@
 # the CORBA Med API
 #
 ####################################################################################################
+import string
+
 import salome
 
 import SALOME_MED
@@ -20,6 +22,17 @@ def print_ord(i):
         return 'third'
     else:
         return `(i+1)`+'th'
+
+def changeBlankToUnderScore(stringWithBlank):
+    blank = ' '
+    underscore = '_'
+    decompString = string.split(stringWithBlank,blank)
+    length = len(decompString)
+    stringWithUnderScore = decompString[0]
+    for i in range(1,length):
+        stringWithUnderScore += underscore
+        stringWithUnderScore += decompString[i]
+    return stringWithUnderScore
 
 def getMedObjectFromStudy(file):
     objNameInStudy = "MED_OBJECT_FROM_FILE_"+file
@@ -59,7 +72,8 @@ def getMeshObjectFromStudy(meshName):
         return myObj
 
 def getSupportObjectFromStudy(meshName,supportName):
-    objNameInStudy = "/Med/MEDMESH/MEDSUPPORTS_OF_"+meshName+"/"+supportName
+    meshNameStudy = changeBlankToUnderScore(meshName)
+    objNameInStudy = "/Med/MEDMESH/MEDSUPPORTS_OF_"+meshNameStudy+"/"+supportName
     mySO = salome.myStudy.FindObjectByPath(objNameInStudy)
     if (mySO == None) :
         print "PROBLEM ",objNameInStudy," cannot be found in the Study"
@@ -73,7 +87,8 @@ def getSupportObjectFromStudy(meshName,supportName):
         return myObj
 
 def getFieldObjectFromStudy(dt,it,fieldName,supportName,meshName):
-    objNameInStudy = "/Med/MEDFIELD/"+fieldName+"/("+str(dt)+","+str(it)+")_ON_"+supportName+"_OF_"+meshName
+    meshNameStudy = changeBlankToUnderScore(meshName)
+    objNameInStudy = "/Med/MEDFIELD/"+fieldName+"/("+str(dt)+","+str(it)+")_ON_"+supportName+"_OF_"+meshNameStudy
     mySO = salome.myStudy.FindObjectByPath(objNameInStudy)
     if (mySO == None) :
         print "PROBLEM ",objNameInStudy," cannot be found in the Study"

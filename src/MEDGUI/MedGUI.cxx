@@ -58,6 +58,10 @@ static CORBA::ORB_var   _orb;
  *
  */
 //=============================================================================
+MedGUI::MedGUI( const QString& theName, QObject* theParent ) :
+  SALOMEGUI( theName, theParent )
+{}
+
 bool MedGUI::OnGUIEvent (int theCommandID, QAD_Desktop* parent)
 {
   setOrb();
@@ -420,8 +424,9 @@ bool MedGUI::CustomPopup ( QAD_Desktop* parent,
  *
  */
 //=============================================================================
-void MedGUI::ActiveStudyChanged( QAD_Desktop* parent )
+bool MedGUI::ActiveStudyChanged( QAD_Desktop* parent )
 {
+  return true;
 }
 
 //=============================================================================
@@ -578,61 +583,10 @@ void MedGUI::setOrb()
   ASSERT(! CORBA::is_nil(_orb));
 }
 
-//=============================================================================
-/*!
- *
- */
-//=============================================================================
+static MedGUI aGUI("");
 extern "C"
 {
-  bool OnGUIEvent(int theCommandID, QAD_Desktop* parent)
-  {
-    return MedGUI::OnGUIEvent(theCommandID, parent);
-  }
-
-  bool OnKeyPress (QKeyEvent* pe,
-		   QAD_Desktop* parent, 
-		   QAD_StudyFrame* studyFrame)
-  {
-    return MedGUI::OnKeyPress (pe, parent, studyFrame);
-  }
-
-  bool OnMousePress (QMouseEvent* pe,
-		     QAD_Desktop* parent,
-		     QAD_StudyFrame* studyFrame)
-  {
-    return MedGUI::OnMousePress (pe, parent, studyFrame);
-  }
-
-  bool OnMouseMove (QMouseEvent* pe,
-		    QAD_Desktop* parent, 
-		    QAD_StudyFrame* studyFrame)
-  {
-    return MedGUI::OnMouseMove (pe, parent, studyFrame);
-  }
-
-  bool SetSettings ( QAD_Desktop* parent )
-  {
-    return MedGUI::SetSettings( parent );
-  }
-
-  bool customPopup ( QAD_Desktop* parent,
-		     QPopupMenu* popup,
-		     const QString & theContext,
-		     const QString & theParent,
-		     const QString & theObject )
-  {
-    return MedGUI::CustomPopup( parent, popup, theContext,
-				theParent, theObject );
-  }
-
-  void definePopup ( QString & theContext, QString & theParent, QString & theObject )
-  {
-    MedGUI::DefinePopup( theContext, theParent, theObject );
-  }
-  
-  bool activeStudyChanged ( QAD_Desktop* parent )
-  {
-    MedGUI::ActiveStudyChanged( parent );
+  Standard_EXPORT SALOMEGUI* GetComponentGUI() {
+    return &aGUI;
   }
 }

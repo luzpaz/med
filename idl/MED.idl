@@ -902,6 +902,13 @@ Internal Corba method.
      */
     SALOME_MED::long_array  getFieldIteration(in string fieldName, in long i) raises (SALOME::SALOME_Exception);
     /*!
+      giving a field name, it returns an array of integers: the list of the time iteration and
+      the order number couple of all iterations of the corresponding %FIELD object.
+
+      (DT1, IT1, DT2, IT2, ... , DTn, ITn) when n is the number of the %FIELD iterations.
+     */
+    SALOME_MED::long_array  getFieldIterations(in string fieldName) raises (SALOME::SALOME_Exception);
+    /*!
       giving a field name, a time iteration and an order number, it returns the corresponding %FIELD oject.
      */
     FIELD                  getField          ( in string fieldName, 
