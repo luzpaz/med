@@ -28,7 +28,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:@srcdir@:@top_srcdir@/idl:$(top_builddir)/idl:${KERNEL_ROOT_DIR}/idl/salome
+VPATH=.:@srcdir@:@top_srcdir@/idl:$(top_builddir)/idl
 
 MACHINE=PCLINUX
 

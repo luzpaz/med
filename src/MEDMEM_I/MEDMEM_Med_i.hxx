@@ -67,6 +67,8 @@ public:
       throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array * getFieldIteration(const char* fieldName, CORBA::Long i) 
       throw (SALOME::SALOME_Exception);
+    SALOME_MED::long_array * getFieldIterations(const char* fieldName) 
+      throw (SALOME::SALOME_Exception);
     SALOME_MED::FIELD_ptr   getField(const char* fieldName,
 				     CORBA::Long pasTemps, 
                                      CORBA::Long numOrdre) 

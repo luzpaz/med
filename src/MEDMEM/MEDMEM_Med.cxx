@@ -229,9 +229,15 @@ int  MED::addDriver(GENDRIVER & driver) {
   SCRUTE(driver);
 
   current = _drivers.size()-1;
+  SCRUTE(current);
   driver.setId(current); 
   
+
+  MESSAGE(LOC << " je suis la 1");
+
   END_OF(LOC);
+
+  MESSAGE(LOC << " je suis la 2");
   return current;
   
 }
@@ -366,13 +372,9 @@ int      MED::getNumberOfMeshes ( void ) const {
   const char * LOC = "MED::getNumberOfMeshes ( void ) const : ";
   BEGIN_OF(LOC);
 
-  int size = _meshes.size();
-
-  SCRUTE(size);
+  return _meshes.size();
 
   END_OF(LOC);
-
-  return size;
 };   
     
 /*!
@@ -458,10 +460,9 @@ deque<string> MED::getMeshNames      () const {
 MESH   * MED::getMesh           ( const string & meshName )  const
   throw (MED_EXCEPTION)
 {
+
   const char * LOC = "MED::getMesh ( const string & meshName ) const : ";
   BEGIN_OF(LOC);
-
-  SCRUTE(meshName);
 
   map<MESH_NAME_,MESH*>::const_iterator itMeshes =  _meshes.find(meshName);
 
@@ -599,15 +600,29 @@ deque<DT_IT_> MED::getFieldIteration (const string & fieldName) const
   //  const MAP_DT_IT_ & myIterationMap =  const_cast<const MAP_DT_IT_ & > ((*itFields).second);
   const MAP_DT_IT_ & myIterationMap =  (*itFields).second ;
   MAP_DT_IT_::const_iterator currentIterator ;
+
+  int iterationSize = myIterationMap.size();
   
-  deque<DT_IT_> Iteration(myIterationMap.size());
+  SCRUTE(iterationSize);
+
+  deque<DT_IT_> Iteration(iterationSize);
   
   int iterationIndex = 0;
   
-  for ( currentIterator=myIterationMap.begin();currentIterator != myIterationMap.end(); currentIterator++ ) {
-    Iteration[iterationIndex]=(*currentIterator).first;
-    iterationIndex++;                               // CF OPTIMISATION
-  }
+  for (currentIterator = myIterationMap.begin();
+       currentIterator != myIterationMap.end(); currentIterator++ )
+    {
+      SCRUTE(((*currentIterator).first).dt);
+      SCRUTE(((*currentIterator).first).it);
+
+      Iteration[iterationIndex].dt = ((*currentIterator).first).dt;
+      Iteration[iterationIndex].it = ((*currentIterator).first).it;
+
+      //      Iteration[iterationIndex]=(*currentIterator).first;
+      SCRUTE(Iteration[iterationIndex].dt);
+      SCRUTE(Iteration[iterationIndex].it);
+      iterationIndex++;                               // CF OPTIMISATION
+    }
 
   END_OF(LOC);
   return Iteration ;

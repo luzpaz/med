@@ -168,7 +168,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 		             break;
       			 }
 
-      			case MED_FR::MED_FLOAT64: 
+      			case MED_FR::MED_REEL64: 
                         {
 			     ((FIELD<double>*)myField)->read();
 			     FIELDDOUBLE_i * myFieldDoubleI 
@@ -210,6 +210,10 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 	BEGIN_OF(LOC);
 
   // we create all IOR from _med
+
+	SCRUTE(driverType);
+	SCRUTE(fileName)
+
 	_med = new ::MED(driverType,fileName);
 
 	int numberOfMeshes = _med->getNumberOfMeshes();
@@ -422,12 +426,39 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 	SCRUTE(numberOfFields);
 
 	for (int i=0; i<numberOfFields; i++) 
-	{
+	  {
+	    MESSAGE("The name of the " << i << "^th fields is "<< fieldsNames[i]);
+
+	    deque<DT_IT_> myIteration = _med->getFieldIteration (fieldsNames[i]);
+	    int numberOfIteration = myIteration.size();
+
+	    SCRUTE(numberOfIteration);
+
+	    for (int j=0; j<numberOfIteration; j++) 
+	      {
+		MESSAGE("its " << i << "^th iteration is dt = " << myIteration[j].dt << " it = " << myIteration[j].it);
+	      }
+	  }
+
+	for (int i=0; i<numberOfFields; i++) 
+	  {
+
+	    MESSAGE("dealing with the fields collection " << fieldsNames[i]);
+
              deque<DT_IT_> myIteration = _med->getFieldIteration (fieldsNames[i]);
              int numberOfIteration = myIteration.size();
+
+	     SCRUTE(numberOfIteration);
+
              for (int j=0; j<numberOfIteration; j++) 
              {
-		  ::FIELD_ * myField = _med->getField(fieldsNames[i],myIteration[j].dt,myIteration[j].it);
+	       int dt = myIteration[j].dt;
+	       int it = myIteration[j].it;
+
+	       MESSAGE("Treatement of " << fieldsNames[i] << " dt = " << dt << " it = " << it);
+
+		  ::FIELD_ * myField = _med->getField(fieldsNames[i],dt,it);
+
 		  string meshName = myField->getSupport()->getMesh()->getName();
 		  medEntityMesh myEntity = myField->getSupport()->getEntity();
 		  map<string, map<MED_FR::med_entite_maillage,SALOME_MED::SUPPORT_ptr> >::const_iterator 
@@ -449,8 +480,8 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		  med_type_champ type = myField->getValueType();
 
 		  DT_IT_ dtIt;
-		  dtIt.dt  = myIteration[j].dt;
-		  dtIt.it  = myIteration[j].it;
+		  dtIt.dt  = dt;
+		  dtIt.it  = it;
 
 		  switch (type) 
 		  {
@@ -471,7 +502,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 			break;
   		     }
 
-      		     case MED_FR::MED_FLOAT64: 
+      		     case MED_FR::MED_REEL64: 
 		     {
 			((FIELD<double>*)myField)->read();
 			FIELDDOUBLE_i * myFieldDoubleI 
@@ -498,6 +529,9 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
   		     }
      		  }
 	     }
+
+
+	     MESSAGE("Here we are i="<< i);
 	}
   
 
@@ -862,6 +896,44 @@ SALOME_MED::long_array * MED_i::getFieldIteration(const char* fieldName,CORBA::L
       myseq->length(2);
       myseq[0] = fieldIteration[i].dt;
       myseq[1] = fieldIteration[i].it;
+      return myseq._retn();
+    }
+  catch (MEDEXCEPTION &ex)
+    {
+      MESSAGE("Unable to get the sequence of DT_IT of the given field");
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+    }
+}
+//=============================================================================
+/*!
+ * CORBA: Accessor for the list of Corba equivalent DT_IT_ (see MEDMEM direcrtory)
+ * of a given field by its name (sequence of two by iteration number long integers).
+ */
+//=============================================================================
+SALOME_MED::long_array * MED_i::getFieldIterations(const char* fieldName) 
+  throw (SALOME::SALOME_Exception)
+{
+  if (_med==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
+				 SALOME::INTERNAL_ERROR);
+
+  SALOME_MED::long_array_var myseq = new SALOME_MED::long_array;
+  try
+    {
+      deque<DT_IT_> fieldIteration = _med->getFieldIteration(string(fieldName));
+      int numberOfIteration = fieldIteration.size();
+      int size = 2*numberOfIteration;
+
+      myseq->length(size);
+
+      for (int i=0; i<numberOfIteration; i++)
+	{
+	  int index = 2*i;
+	  myseq[index] = fieldIteration[i].dt;
+	  index = index+1;
+	  myseq[index] = fieldIteration[i].it;
+	}
+
       return myseq._retn();
     }
   catch (MEDEXCEPTION &ex)

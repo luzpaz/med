@@ -11,7 +11,7 @@
 using namespace MED_EN;
 
 /*!
-  This class %MESHING is a special class to set a %MESH object.
+  This class MESHING is a special class to set a MESH object.
 */
 
 namespace MEDMEM {

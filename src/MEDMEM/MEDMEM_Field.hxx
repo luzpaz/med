@@ -1874,15 +1874,24 @@ template <class T> int FIELD<T>::addDriver(driverTypes driverType,
 template <class T> inline int FIELD<T>::addDriver (GENDRIVER & driver )
 {
   const char * LOC = "FIELD<T>::addDriver(GENDRIVER &) : ";
+  int current;
+
   BEGIN_OF(LOC);
 
   // duplicate driver to delete it with destructor !
   GENDRIVER * newDriver = driver.copy() ;
 
   _drivers.push_back(newDriver);
-  return _drivers.size() -1 ;
 
+  current = _drivers.size()-1;
+  SCRUTE(current);
+  driver.setId(current); 
+
+  MESSAGE(LOC << " je suis la 1");
   END_OF(LOC);
+  MESSAGE(LOC << " je suis la 2");
+
+  return current ;
 };
 
 /*!

@@ -61,7 +61,7 @@ if K != 0:
 
 grid_type = grid.getGridType()
 print "grid_type =", grid_type
-if grid_type != MED_GRILLE_CARTESIENNE:
+if grid_type != MED_CARTESIAN:
   raise  RuntimeError, "Wrong grid type"
 
 spaceDim = grid.getSpaceDimension()
@@ -256,7 +256,7 @@ if K != 0:
 
 grid_type = grid.getGridType()
 print "grid_type =", grid_type
-if grid_type != MED_GRILLE_STANDARD:
+if grid_type != MED_BODY_FITTED:
   raise  RuntimeError, "Wrong grid type"
 
 spaceDim = grid.getSpaceDimension()

@@ -24,12 +24,8 @@ class GRID: public MESH
   //-----------------------//
   
   // 1. grid type: MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED
-//   med_grid_type     _gridType;
-
-  // 1. grid type MED_GRILLE_CARTESIENNE, MED_GRILLE_POLAIRE,
-  //              MED_GRILLE_STANDARD
-  med_type_grille _gridType;
-
+  med_grid_type     _gridType;
+  
   // 2. node coordinates
   // For MED_BODY_FITTED MESH::_coordinate is used
   
@@ -80,8 +76,7 @@ class GRID: public MESH
   //-----------------------//
 
   GRID();
-//   GRID(const med_grid_type type);
-  GRID(const med_type_grille type);
+  GRID(const med_grid_type type);
   GRID(const GRID &m);
   GRID( driverTypes driverType, const string & fileName="",const string & meshName="");
   GRID & operator=(const GRID &m);
@@ -192,11 +187,8 @@ class GRID: public MESH
 
   //  Access to fields
 
-//   inline med_grid_type getGridType() const;
+  inline med_grid_type getGridType() const;
   // return MED_CARTESIAN, MED_POLAR or MED_BODY_FITTED
-
-  inline med_type_grille getGridType() const;
-  // returns MED_GRILLE_CARTESIENNE, MED_GRILLE_POLAIRE, MED_GRILLE_STANDARD
 
   int getArrayLength( const int Axis ) const throw (MEDEXCEPTION);
   // return array length. Axis = [1,2,3] meaning [i,j,k],
@@ -252,8 +244,7 @@ class GRID: public MESH
 
   //  Setting fields
 
-//   inline void setGridType(med_grid_type gridType);
-  inline void setGridType(med_type_grille gridType);
+  inline void setGridType(med_grid_type gridType);
 
   friend class MED_MESH_RDONLY_DRIVER;
   friend class MED_MESH_WRONLY_DRIVER;
@@ -267,12 +258,7 @@ using namespace MEDMEM;
   //   Inline Methods Implementation
   //----------------------------------//
 
-// inline med_grid_type GRID::getGridType() const
-// {
-//   return _gridType;
-// }
-
-inline med_type_grille GRID::getGridType() const
+inline med_grid_type GRID::getGridType() const
 {
   return _gridType;
 }
@@ -312,12 +298,7 @@ inline void GRID::makeUnstructured()
 //purpose : set the _gridType field od the class GRID
 //=======================================================================
 
-// inline void GRID::setGridType(med_grid_type gridType)
-// {
-//   _gridType = gridType;
-// }
-
-inline void GRID::setGridType(med_type_grille gridType)
+inline void GRID::setGridType(med_grid_type gridType)
 {
   _gridType = gridType;
 }

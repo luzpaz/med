@@ -509,23 +509,40 @@ template <class T> void FIELDOF_i<T>::addInStudy(SALOMEDS::Study_ptr myStudy,
         ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
         CORBA::ORB_var &orb = init(0,0);
 
+	int iterationNumber = _fieldTptr->getIterationNumber();
+	SCRUTE(iterationNumber);
+
+	int orderNumber = _fieldTptr->getOrderNumber();
+	SCRUTE(orderNumber);
+
 	ostringstream iterationName ;
-	iterationName<<"("<<_fieldTptr->getIterationNumber()<<","<<_fieldTptr->getOrderNumber()<<")";
+	iterationName<<"(" << iterationNumber << "," << orderNumber << ")";
 	//	string supportName = _support->getName();
 	string supportName = (_fieldTptr->getSupport())->getName();
 	//	string meshName = (_support->getMesh())->getName();
 	string meshName = ((_fieldTptr->getSupport())->getMesh())->getName();
+	string meshNameStudy = meshName;
 
 	char * fieldEntryName;
-	int lenName = strlen(iterationName.str().c_str()) + 4 + strlen(supportName.c_str()) + 4 +
-	  strlen(meshName.c_str());
+	int lenName = strlen(iterationName.str().c_str()) + 4 +
+	  strlen(supportName.c_str()) + 4 + strlen(meshName.c_str()) + 1;
 
 	fieldEntryName = new char[lenName];
 	fieldEntryName = strcpy(fieldEntryName,iterationName.str().c_str());
 	fieldEntryName = strcat(fieldEntryName,"_ON_");
 	fieldEntryName = strcat(fieldEntryName,supportName.c_str());
 	fieldEntryName = strcat(fieldEntryName,"_OF_");
-	fieldEntryName = strcat(fieldEntryName,meshName.c_str());
+
+	for (string::size_type pos=0; pos<meshNameStudy.size();++pos)
+	  {
+	    if (isspace(meshNameStudy[pos])) meshNameStudy[pos] = '_';
+	  }
+
+	SCRUTE(meshNameStudy);
+
+	fieldEntryName = strcat(fieldEntryName,meshNameStudy.c_str());
+
+	SCRUTE(fieldEntryName);
 
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
         aName = SALOMEDS::AttributeName::_narrow(anAttr);
@@ -539,12 +556,14 @@ template <class T> void FIELDOF_i<T>::addInStudy(SALOMEDS::Study_ptr myStudy,
         myBuilder->CommitCommand();
         _FieldId = newObj->GetID();
 
+	MESSAGE("Computing path to Support");
+
 	char * supportEntryPath;
-	lenName = 13 + 15 + strlen(meshName.c_str()) + 1 + strlen(supportName.c_str());
+	lenName = 28 + 15 + strlen(meshName.c_str()) + 1 +
+	  strlen(supportName.c_str()) + 1;
 	supportEntryPath = new char[lenName];
-	supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/");
-	supportEntryPath = strcat(supportEntryPath,"MEDSUPPORTS_OF_");
-	supportEntryPath = strcat(supportEntryPath,meshName.c_str());
+	supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/MEDSUPPORTS_OF_");
+	supportEntryPath = strcat(supportEntryPath,meshNameStudy.c_str());
 	supportEntryPath = strcat(supportEntryPath,"/");
 	supportEntryPath = strcat(supportEntryPath,supportName.c_str());
 
@@ -567,14 +586,17 @@ template <class T> void FIELDOF_i<T>::addInStudy(SALOMEDS::Study_ptr myStudy,
 	  MESSAGE("supportObject is OK and is now going to be referenced !");
 	  SALOMEDS::SObject_var newObjSupport = myBuilder->NewObject(newObj);
 	  myBuilder->Addreference(newObjSupport,supportObject);
+	  MESSAGE(" OUF !!!");
 	}
 
         myBuilder->CommitCommand();
 
-	MESSAGE("FIELDOF_i::addInStudy _FieldId="<< _FieldId);
+	delete [] supportEntryPath;
+	delete [] fieldEntryName;
 
-        END_OF(" FIELDOF_i::addInStudy");
+	MESSAGE("FIELDOF_i::addInStudy");
 
+        //END_OF("FIELDOF_i::addInStudy");
 }
 //=============================================================================
 /*!

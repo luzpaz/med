@@ -28,7 +28,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl:${KERNEL_ROOT_DIR}/idl/salome
+VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl
 
 @COMMENCE@
 
@@ -44,7 +44,7 @@ LIB_SERVER_IDL = MED.idl
 
 LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl
 
-EXPORT_PYSCRIPTS = libMedCorba_Swig.py medcorba_test.py batchmode_medcorba_test.py
+EXPORT_PYSCRIPTS = libMedCorba_Swig.py medcorba_test.py batchmode_medcorba_test.py batchmode_medcorba_test1.py
 
 EXPORT_HEADERS = libMedCorba_Swig.i
 

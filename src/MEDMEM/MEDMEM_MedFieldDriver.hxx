@@ -119,7 +119,7 @@ public :
     MED_FR::med_int err = 0;
     if (_status == MED_OPENED) {
       err=MED_FR::MEDfermer(_medIdt);
-      H5close(); // If we call H5close() all the files are closed.
+      //H5close(); // If we call H5close() all the files are closed.
       _status = MED_CLOSED;
       _medIdt = MED_INVALID;
       MESSAGE(" MED_FIELD_DRIVER::close() : MEDfermer : _medIdt= " << _medIdt );
@@ -478,32 +478,19 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
       for (int i=0; i<NumberOfTypes; i++) {
 	MESSAGE ("Type["<<i+1<<"] :"<< Types[i]);
 	MESSAGE ("Entity :"<<_ptrField->_support->getEntity());
-// 	NumberOfValues[i] = 
-// 	  MEDnVal(_medIdt,
-// 		  const_cast <char*> (_fieldName.c_str()),
-// 		  (MED_FR::med_entite_maillage)_ptrField->_support->getEntity(),
-// 		  (MED_FR::med_geometrie_element)Types[i],
-// 		  _ptrField->_iterationNumber,
-// 		  _ptrField->_orderNumber) ; // no time step ! prend en compte le nbre de pt de gauss
-	// test if NumberOfValues is the same in _support !!! TODO that !!
-	// we suppose it is
-	// we could allocate array
-	// Be really carefull about the profil; especially the last arg of
-	// MEDnVal
-
-	NumberOfValues[i] =
+	NumberOfValues[i] = 
 	  MEDnVal(_medIdt,
 		  const_cast <char*> (_fieldName.c_str()),
 		  (MED_FR::med_entite_maillage)_ptrField->_support->getEntity(),
-		  (MED_FR::med_geometrie_element) Types[i],
-		  _ptrField->_iterationNumber, _ptrField->_orderNumber,
-		  const_cast <char*> (_ptrField->_support->getMesh()->getName().c_str()),
-		  MED_FR::MED_COMPACT) ;
-
+		  (MED_FR::med_geometrie_element)Types[i],
+		  _ptrField->_iterationNumber,
+		  _ptrField->_orderNumber) ; // no time step ! prend en compte le nbre de pt de gauss
+	// test if NumberOfValues is the same in _support !!! TODO that !!
+	// we suppose it is
+	// we could allocate array
 	myValues[i] = new T[ NumberOfValues[i]*numberOfComponents ] ;
 	TotalNumberOfValues+=NumberOfValues[i] ;// diviser par le nombre de point de gauss 
 	char * ProfilName = new char[MED_TAILLE_NOM+1];
-	char * LocalGaussName = new char[MED_TAILLE_NOM+1];
 	MESSAGE ("NumberOfValues :"<< NumberOfValues[i]);
 	MESSAGE ("NumberOfComponents :"<< numberOfComponents);
 	MESSAGE ("MESH_NAME :"<< MeshName.c_str());
@@ -513,25 +500,22 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 	MESSAGE("Iteration :"<<_ptrField->getIterationNumber());
 	MESSAGE("Order :"<<_ptrField->getOrderNumber());
         _ptrField->_numberOfValues+=NumberOfValues[i]; // problem with gauss point : _numberOfValues != TotalNumberOfValues !!!!!!!
-
-	err = MEDchampLire(_medIdt,const_cast <char*> (MeshName.c_str()),
-			   const_cast <char*> (_fieldName.c_str()),
-			   (unsigned char*) myValues[i],
-			   MED_FR::MED_NO_INTERLACE,MED_ALL,
-			   LocalGaussName,ProfilName,
-			   MED_FR::MED_NO_PFLMOD,
-			   (MED_FR::med_entite_maillage) _ptrField->_support->getEntity(),(MED_FR::med_geometrie_element)Types[i],
-			   _ptrField->getIterationNumber(),
-			   _ptrField->getOrderNumber());
-
-	if ( err < 0) {
+	if ( MED_FR::MEDchampLire(_medIdt,const_cast <char*> (MeshName.c_str()),
+				  const_cast <char*> (_fieldName.c_str()),
+				  (unsigned char*) myValues[i],
+				  MED_FR::MED_NO_INTERLACE,
+				  MED_ALL,
+				  ProfilName,
+				  (MED_FR::med_entite_maillage) _ptrField->_support->getEntity(),(MED_FR::med_geometrie_element)Types[i],
+				  _ptrField->getIterationNumber(),
+				  _ptrField->getOrderNumber()
+				  ) < 0) {
 	  // we must do some delete !!!
 	  for(int j=0; j<=i;j++)
 	    delete[] myValues[j];
 	  delete[] myValues;
 	  delete[] NumberOfValues ;
 	  delete[] ProfilName;
-	  delete[] LocalGaussName;
 	  delete[] _ptrField->_componentsTypes ;
 	  delete[] _ptrField->_componentsNames ;
 	  delete[] _ptrField->_componentsUnits ;
@@ -546,10 +530,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
  	  throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<": ERROR when read value")) ;
 	}
 
-	// At this time ProfilName should be MED_FR::MED_NOPFL and
-	// LocalGaussName should be MED_FR::MED_NOGAUSS
 	delete[] ProfilName ;
-	delete[] LocalGaussName ;
       }
       // allocate _value
       // probleme avec les points de gauss : voir lorsqu-il y en a (!= 1)
@@ -762,32 +743,16 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
 	cout<<"==================> valeur de MED_FR::MED_REEL64 = "<<MED_FR::MED_REEL64<<endl;
 */	
 
-// 	err=MED_FR::MEDchampEcr(_medIdt, 
-// 				const_cast <char*> ( MeshName.c_str()) ,                         //( string(mesh_name).resize(MED_TAILLE_NOM).c_str())
-// 				const_cast <char*> ( (_ptrField->getName()).c_str()),
-// 				(unsigned char*)value, 
-// 				MED_FR::MED_FULL_INTERLACE,
-// 				NumberOfElements,
-// 				NumberOfGaussPoint[i],
-// 				MED_ALL,
-// 				MED_NOPFL,
-// 				MED_FR::MED_REMP,  // PROFIL NON GERE, mode de remplacement non géré
-// 				(MED_FR::med_entite_maillage)mySupport->getEntity(),
-// 				(MED_FR::med_geometrie_element)Types[i],
-// 				_ptrField->getIterationNumber(),
-// 				"        ",
-// 				_ptrField->getTime(),
-// 				_ptrField->getOrderNumber()
-// 				);
-
 	err=MED_FR::MEDchampEcr(_medIdt, 
 				const_cast <char*> ( MeshName.c_str()) ,                         //( string(mesh_name).resize(MED_TAILLE_NOM).c_str())
 				const_cast <char*> ( (_ptrField->getName()).c_str()),
-				(unsigned char*)value,
+				(unsigned char*)value, 
 				MED_FR::MED_FULL_INTERLACE,
-				NumberOfElements*NumberOfGaussPoint[i],
-				MED_NOGAUSS, MED_ALL, MED_NOPFL,
-				MED_FR::MED_NO_PFLMOD, // PROFIL NON GERE, mode de remplacement non géré
+				NumberOfElements,
+				NumberOfGaussPoint[i],
+				MED_ALL,
+				MED_NOPFL,
+				MED_FR::MED_REMP,  // PROFIL NON GERE, mode de remplacement non géré
 				(MED_FR::med_entite_maillage)mySupport->getEntity(),
 				(MED_FR::med_geometrie_element)Types[i],
 				_ptrField->getIterationNumber(),
@@ -795,7 +760,6 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
 				_ptrField->getTime(),
 				_ptrField->getOrderNumber()
 				);
-
 	if (err < MED_VALID )
 	  throw MEDEXCEPTION(LOCALIZED( STRING(LOC)
 					<<": Error in writing Field "<< _ptrField->getName() <<", type "<<Types[i]

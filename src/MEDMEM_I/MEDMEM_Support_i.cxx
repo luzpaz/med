@@ -542,6 +542,12 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   MESSAGE(LOC << " Find SObject MESH (represent mesh in support)");
 
   string meshName = getMesh()->getName() ;
+  string meshNameStudy = meshName;
+
+  for (string::size_type pos=0; pos<meshNameStudy.size();++pos)
+    {
+      if (isspace(meshNameStudy[pos])) meshNameStudy[pos] = '_';
+    }
 
 		// seulement sous Med : il peut y avoir le meme sous SMESH !!!
   SALOMEDS::SObject_var medsupportfather = myStudy->FindObject(meshName.c_str()); 
@@ -549,13 +555,13 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
     THROW_SALOME_CORBA_EXCEPTION("SObject Mesh in Support not Found",SALOME::INTERNAL_ERROR);
   // perhaps add MESH automatically ?
   
-  MESSAGE("Add a support Object under /MED/MESH/MESHNAME");
+  MESSAGE("Add a support Object under /Med/MESH/MESHNAME");
 
   char * medsupfatherName;
   int lenName = 15 + strlen(meshName.c_str());
   medsupfatherName = new char[lenName];
   medsupfatherName = strcpy(medsupfatherName,"MEDSUPPORTS_OF_");
-  medsupfatherName = strcat(medsupfatherName,meshName.c_str());
+  medsupfatherName = strcat(medsupfatherName,meshNameStudy.c_str());
 
   SCRUTE(medsupfatherName);
 
@@ -574,16 +580,20 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
 
   string supportName = _support->getName();
 
+  SCRUTE(supportName);
+
+  SCRUTE(meshNameStudy);
+
   char * supportEntryPath;
-  lenName = 13 + 15 + strlen(meshName.c_str()) + 1 + strlen(supportName.c_str());
+  lenName = 13 + 15 + strlen(meshName.c_str()) + 1 + strlen(supportName.c_str())+1;
   supportEntryPath = new char[lenName];
-  supportEntryPath = strcpy(supportEntryPath,"/MED/MEDMESH/");
+  supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/");
   supportEntryPath = strcat(supportEntryPath,"MEDSUPPORTS_OF_");
-  supportEntryPath = strcat(supportEntryPath,meshName.c_str());
+  supportEntryPath = strcat(supportEntryPath,meshNameStudy.c_str());
   supportEntryPath = strcat(supportEntryPath,"/");
   supportEntryPath = strcat(supportEntryPath,supportName.c_str());
 
-  SCRUTE(supportEntryPath);
+  //SCRUTE(supportEntryPath);
 
   MESSAGE("supportEntryPath in support " << supportEntryPath << " length " << lenName);
 

@@ -197,10 +197,7 @@ void MED_MED_RDONLY_DRIVER::readFileStruct( void )
   {
     int          numberOfMeshes;
     char         meshName[MED_TAILLE_NOM+1]="";
-    char         meshDescription[MED_TAILLE_DESC+1]="";
     int          meshDim;
-    MED_FR::med_maillage meshType;
-
     MESH *       ptrMesh;
     //    MED_MESH_RDWR_DRIVER * ptrDriver; !! UNUSED VARIABLE !!
     
@@ -209,122 +206,79 @@ void MED_MED_RDONLY_DRIVER::readFileStruct( void )
       MESSAGE(LOC << "Be careful there is no mesh in file |"<<_fileName<<"| !");
 
     MESH_ENTITIES::const_iterator currentEntity; 
-    for (i=1;i<=numberOfMeshes;i++)
-      {
-	//get infoamation on the i^th mesh
+    for (i=1;i<=numberOfMeshes;i++) {
 
-	err = MEDmaaInfo(_medIdt, i ,meshName, &meshDim, &meshType,
-			 meshDescription) ;
-
-	if (err != MED_VALID) 
-	  throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << ": can't get information about the mesh n°" << i << " of the file |" << _fileName << "| !"));
-
-	switch (meshType)
-	  {
-	  case MED_FR::MED_STRUCTURE:
-	    MESSAGE(LOC<<": Mesh n°"<< i <<" nammed "<< meshName << " with the description " << meshDescription << " is structured");
-
-	    MED_FR::med_type_grille type;
-
-	    err = MEDnatureGrilleLire(_medIdt, meshName, &type);
-
-	    if (err != MED_VALID)
-	      throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << ": can't get the nature of the grid which is the mesh n°" << i << " of the file |" << _fileName << "| !"));
-
-	    ptrMesh = new GRID((MED_EN::med_type_grille) type);
-	    break;
-	  case MED_FR::MED_NON_STRUCTURE:
-	    MESSAGE(LOC<<": Mesh n°"<< i <<" nammed "<< meshName << " with the description " << meshDescription << " is not structured");
-
-	    ptrMesh = new MESH();
-	    break;
-	  default:
-	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mesh type !"));
-	  }
-
-// 	// find out if the mesh is a Grid
+      // find out if the mesh is a Grid
       
- 	bool isAGrid = ptrMesh->getIsAGrid();
-
-// 	MED_FR::med_grid_type type;
+      int isAGrid = false;
+      MED_FR::med_grid_type type;
       
-// 	err = MEDgridInfo (_medIdt, i, &isAGrid, &type);
-// 	if (err != MED_VALID) 
-// 	  throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "error in MEDgridInfo()") );
+      err = MEDgridInfo (_medIdt, i, &isAGrid, &type);
+      if (err != MED_VALID) 
+        throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "error in MEDgridInfo()") );
 
-// 	err = MEDmaaInfo(_medIdt, i ,meshName, &meshDim) ;
-// 	if (err != MED_VALID) 
-// 	  throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << ": can't get information about the mesh n°"
-// 					   << i <<" of the file |" << _fileName << "| !"
-// 					   )
-// 				);   
-// 	MESSAGE(LOC<<": Mesh n°"<<i<<" nammed "<<meshName);
+      err = MEDmaaInfo(_medIdt, i ,meshName, &meshDim) ;
+      if (err != MED_VALID) 
+        throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << ": can't get information about the mesh n°"
+                                         << i <<" of the file |" << _fileName << "| !"
+                                         )
+                              );   
+      MESSAGE(LOC<<": Mesh n°"<<i<<" nammed "<<meshName);
 
-// 	if (isAGrid)
-// 	  ptrMesh = new GRID((MED_EN::med_grid_type) type);
-// 	else
-// 	  ptrMesh = new MESH();
+      if (isAGrid)
+        ptrMesh = new GRID((MED_EN::med_grid_type) type);
+      else
+	ptrMesh = new MESH();
 
-	//MED_MESH_RDWR_DRIVER * _ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
-	MED_EN::med_mode_acces myMode = getAccessMode();
-	MED_MESH_DRIVER * ptrDriver ;
-	switch (myMode) {
-	  //      case MED_EN::MED_LECT: V2_1->V2_2
-	case MED_EN::MED_LECTURE:
-	  ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
-	  break ;
-	  //      case MED_EN::MED_REMP:	V2_1->V2_2
-	case MED_EN::MED_LECTURE_ECRITURE:	
-	  ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
-	  break ;
-	  //      case MED_EN::MED_ECRI: // should never append !! V2_1->V2_2
-	case MED_EN::MED_LECTURE_AJOUT: // should never append !!
-	  //	ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
-	  ptrDriver = new MED_MESH_WRONLY_DRIVER(_fileName, ptrMesh);
-	  break;
-	case MED_EN::MED_CREATION: // V2_1->V2_2
-	  ptrDriver = new MED_MESH_WRONLY_DRIVER(_fileName, ptrMesh);
-	  break;
-	default:
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
-	}
-	ptrDriver->setId       ( getId() );
-	ptrDriver->setMeshName ( meshName );
-	ptrMesh->addDriver(*ptrDriver);
-	delete ptrDriver ;
+      //MED_MESH_RDWR_DRIVER * _ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
+      MED_EN::med_mode_acces myMode = getAccessMode();
+      MED_MESH_DRIVER * ptrDriver ;
+      switch (myMode) {
+      case MED_EN::MED_LECT:
+	ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
+	break ;
+      case MED_EN::MED_REMP:	
+	ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
+	break ;
+      case MED_EN::MED_ECRI: // should never append !!
+	ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
+	break;
+      default:
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+      }
+      ptrDriver->setId       ( getId() );
+      ptrDriver->setMeshName ( meshName );
+      ptrMesh->addDriver(*ptrDriver);
+      delete ptrDriver ;
 
-	if (isAGrid)
-	  _ptrMed->_meshes[meshName] = (MESH *) ptrMesh;
-	else
-	  _ptrMed->_meshes[meshName] = ptrMesh;
-
+      if (isAGrid)
+	_ptrMed->_meshes[meshName] = (MESH *) ptrMesh;
+      else
 	_ptrMed->_meshes[meshName] = ptrMesh;
 
-	ptrMesh->setName(meshName);
+      ptrMesh->setName(meshName);
 
-	ptrMesh->setDescription(meshDescription);
+      SCRUTE(ptrMesh);
 
-	SCRUTE(ptrMesh);
+      MESSAGE(LOC<<"is" << (isAGrid ? "" : " NOT") << " a GRID and its name is "<<ptrMesh->getName());
 
-	MESSAGE(LOC<<"is" << (isAGrid ? "" : " NOT") << " a GRID and its name is "<<ptrMesh->getName());
-
-	// we create all global support (for each entity type :
-	int index = 0;
-	for (currentEntity=meshEntities.begin();currentEntity != meshEntities.end(); currentEntity++) {
-	  string supportName="SupportOnAll_" ;
-	  supportName+=entNames[(MED_FR::med_entite_maillage)(*currentEntity).first] ;
-	  //(_ptrMed->_support)[meshName][(MED_FR::med_entite_maillage)(*currentEntity).first]=new SUPPORT(ptrMesh,supportName,(MED_EN::medEntityMesh) (*currentEntity).first) ;
-	  SUPPORT* mySupport = new SUPPORT() ;
-	  mySupport->setName(supportName);
-	  mySupport->setMesh(ptrMesh);
-	  mySupport->setEntity((MED_EN::medEntityMesh) (*currentEntity).first);
-	  mySupport->setAll(true);
-	  (_ptrMed->_support)[meshName][(MED_FR::med_entite_maillage)(*currentEntity).first] = mySupport ;
-	  MESSAGE(LOC<< "The support " << supportName.c_str() << " on entity " << (*currentEntity).first << " is built");
-	  index++;
-	}
-	MESSAGE(LOC <<"The mesh " <<ptrMesh->getName() << " has " << index << " support(s)");
+      // we create all global support (for each entity type :
+      int index = 0;
+      for (currentEntity=meshEntities.begin();currentEntity != meshEntities.end(); currentEntity++) {
+	string supportName="SupportOnAll_" ;
+	supportName+=entNames[(MED_FR::med_entite_maillage)(*currentEntity).first] ;
+	//(_ptrMed->_support)[meshName][(MED_FR::med_entite_maillage)(*currentEntity).first]=new SUPPORT(ptrMesh,supportName,(MED_EN::medEntityMesh) (*currentEntity).first) ;
+	SUPPORT* mySupport = new SUPPORT() ;
+	mySupport->setName(supportName);
+	mySupport->setMesh(ptrMesh);
+	mySupport->setEntity((MED_EN::medEntityMesh) (*currentEntity).first);
+	mySupport->setAll(true);
+	(_ptrMed->_support)[meshName][(MED_FR::med_entite_maillage)(*currentEntity).first] = mySupport ;
+	MESSAGE(LOC<< "The support " << supportName.c_str() << " on entity " << (*currentEntity).first << " is built");
+	index++;
       }
+      MESSAGE(LOC <<"The mesh " <<ptrMesh->getName() << " has " << index << " support(s)");
+    }
 
     map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::const_iterator const_itSupportOnMesh ;
 
@@ -386,319 +340,219 @@ void MED_MED_RDONLY_DRIVER::readFileStruct( void )
     char                          timeStepUnit[MED_TAILLE_PNOM+1] ;
     double                        timeStep                     = 0.0;
     int                           orderNumber                  =  -1;                           //???init?????
-    int                           numberOfRefMesh = 0;
-    MED_FR::med_booleen           meshLink;
     map<MESH_NAME_,MESH*>      & _meshes   =  _ptrMed->_meshes; 
     map<FIELD_NAME_,MAP_DT_IT_> & _fields   =  _ptrMed->_fields; 
     map<FIELD_ *, MESH_NAME_>  & _meshName =  _ptrMed->_meshName; 
     map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> > & _support = _ptrMed->_support;
 
+    
     numberOfFields = MEDnChamp(_medIdt,0) ;
     if ( numberOfFields <= 0 ) 
-      MESSAGE(LOC << "Be careful there is no field in file |"<<
-	      _fileName<<"| !");
+      MESSAGE(LOC << "Be careful there is no field in file |"<<_fileName<<"| !");
+  
+    for (i=1;i<=numberOfFields;i++) {
 
-    for (i=1;i<=numberOfFields;i++)
-      {
-	numberOfComponents = MEDnChamp(_medIdt,i) ;
-
-	if ( numberOfComponents <= 0 ) 
-	  if (err != MED_VALID)
-	    throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Be careful there is no compound for field n°" << i << "in file |"<<_fileName<<"| !"));
-
-	componentName = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;
-	unitName      = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;   
+      numberOfComponents = MEDnChamp(_medIdt,i) ;
+      if ( numberOfComponents <= 0 ) 
+        if (err != MED_VALID) 
+          throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) <<  "Be careful there is no compound for field n°" 
+                                           << i << "in file |"<<_fileName<<"| !"));
       
-	err = MEDchampInfo(_medIdt, i, fieldName, &type, componentName, 
-			   unitName, numberOfComponents) ;
+      componentName = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;
+      unitName      = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;   
+      
+      err = MEDchampInfo(_medIdt, i, fieldName, &type, componentName, 
+                         unitName, numberOfComponents) ;
 
-	if (err != MED_VALID)
-	  throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << ": can't get information about the field n°" << i <<" of the file |" << _fileName << "| !")); 
+      if (err != MED_VALID) 
+        throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+                                         << ": can't get information about the field n°"
+                                         << i <<" of the file |" << _fileName << "| !")); 
+      
+      MESSAGE(LOC << "Field n°"<<i<<" nammed "<< fieldName 
+              << " ,component(s)  : " << componentName 
+              <<" ,unit(s) : "        << unitName);
+      
 
-	MESSAGE(LOC << "Field n°"<<i<<" nammed "<< fieldName 
-		<< " ,component(s)  : " << componentName 
-		<<" ,unit(s) : "        << unitName);
-
-	// Loop on all (entity type,geometry type) until you find an existing
-	// one then get the (n°dt,n°it) pairs list for the current
-	// (field,entity type,geometry type) We suppose there is the same list
-	// whatever the existing (entity type,geometry type) pair 
-
-	// support map :
-
-	for (currentEntity=meshEntities.begin();currentEntity != meshEntities.end(); currentEntity++)
-	  { 
-	    //         numberOfTimeSteps  MUST be given by MEDchampInfo !!!!!
-	    for (currentGeometry  = (*currentEntity).second.begin();
-		 currentGeometry != (*currentEntity).second.end();
-		 currentGeometry++)
-	      {
-		MESSAGE("Field information with Entity,Geom = "<<
-			(*currentEntity).first<<","<<(*currentGeometry));
-
-		numberOfTimeSteps =
-		  MEDnPasdetemps(_medIdt, fieldName,
-				 (MED_FR::med_entite_maillage)(*currentEntity).first,
-				 (MED_FR::med_geometrie_element) (*currentGeometry) );
-
-		MESSAGE("Field information 2 : NumberOfTimeStep :"<<
-			numberOfTimeSteps);
-
-		if ( numberOfTimeSteps > MED_VALID ) 
-		  break ;
-		// There are value for some med_geometrie_element of this
-		// med_entite_maillage.
-	      }
-	    if (numberOfTimeSteps>0) // we have at least one
+      // Loop on all (entity type,geometry type) until you find an existing one then
+      // get the (n°dt,n°it) pairs list for the current (field,entity type,geometry type)
+      // We suppose there is the same list whatever the existing (entity type,geometry type) pair  
+      // support map :
+      for (currentEntity=meshEntities.begin();currentEntity != meshEntities.end(); currentEntity++) { 
+	//         numberOfTimeSteps  MUST be given by MEDchampInfo !!!!!
+	for (currentGeometry  = (*currentEntity).second.begin();currentGeometry != (*currentEntity).second.end(); currentGeometry++) {
+	  MESSAGE("Field information with Entity,Geom = "<<(*currentEntity).first<<","<<(*currentGeometry));
+	  numberOfTimeSteps = MEDnPasdetemps(_medIdt, fieldName,
+					     (MED_FR::med_entite_maillage)(*currentEntity).first,
+					     (MED_FR::med_geometrie_element) (*currentGeometry) );
+	  MESSAGE("Field information 2 : NumberOfTimeStep :"<<numberOfTimeSteps);
+	  if ( numberOfTimeSteps > MED_VALID ) 
+	    break ; // There are value for some med_geometrie_element of this med_entite_maillage.
+	}
+	if (numberOfTimeSteps>0) // we have at least one
 	  
-	      for (currentGeometry = (*currentEntity).second.begin();
-		   currentGeometry != (*currentEntity).second.end();
-		   currentGeometry++)
-		{
-		  MESSAGE("Field information 3 : Geom : "<<(*currentGeometry));
-
-		  for (j=1;j <= numberOfTimeSteps; j++)
-		    {
-		      MESSAGE("Field information 4 : time step j = "<<j);
-
-		      // err = MEDpasdetempsInfo( _medIdt, fieldName,
-		      // (MED_FR::med_entite_maillage) (*currentEntity).first, 
-		      // (*currentGeometry),j, meshName,
-		      // &NbOfGaussPts, &timeStepNumber,
-		      // timeStepUnit, &timeStep, &orderNumber);
-
-		      err = MEDpasdetempsInfo(_medIdt, fieldName,
-					      (MED_FR::med_entite_maillage)
-					      (*currentEntity).first,
-					      (MED_FR::med_geometrie_element)
-					      (*currentGeometry),j,
-					      &NbOfGaussPts, &timeStepNumber,
-					      &orderNumber, timeStepUnit,
-					      &timeStep, meshName, &meshLink,
-					      &numberOfRefMesh);
-
-		      if (err == MED_VALID)
-			{ // we have found for (*currentEntity).first and
-			  // (*currentGeometry)
-			  MESSAGE("Field information 5 ;: NumberOfGaussPoint : " << NbOfGaussPts << ", timeStepNumber : " << timeStepNumber << ", orderNumber : " << orderNumber);
-			  // CORRECT a bug in MEDpasdetempsInfo :
-			  // we get a value n'importe quoi in NbOfGaussPts !!!!
-
-			  if (timeStepNumber<0)  timeStepNumber=-1 ;
-			  if ((numberOfRefMesh != 1) ||
-			      (meshLink != MED_FR::MED_VRAI) ||
-			      (NbOfGaussPts != 1))
-			    {
-			      NbOfGaussPts = 1;
-			      numberOfRefMesh=1;
-			      meshLink != MED_FR::MED_VRAI;
-			      MESSAGE("This field is Med Memory compliant because NumberOfGaussPoint : " << NbOfGaussPts << ", or  numberOfRefMesh : " << numberOfRefMesh << ", or meshLink : " << meshLink);
-			    }
-
-			  // ATTENTION TRAITER L'EXCEPTION CI DESSUS !!!!!!!!
+	  for (currentGeometry  = (*currentEntity).second.begin();currentGeometry != (*currentEntity).second.end(); currentGeometry++) {	    
+	    
+	    MESSAGE("Field information 3 : Geom : "<<(*currentGeometry));
+	    for (j=1;j <= numberOfTimeSteps; j++) {
+	      
+	      MESSAGE("Field information 4 : time step j = "<<j);
+	      err = MEDpasdetempsInfo( _medIdt, fieldName,
+				       (MED_FR::med_entite_maillage) (*currentEntity).first, 
+				       (*currentGeometry),j, 
+				       meshName, &NbOfGaussPts,
+				       &timeStepNumber, timeStepUnit, &timeStep,
+				       &orderNumber);
+	      if (err == MED_VALID) { // we have found for (*currentEntity).first and (*currentGeometry)
 		
-			  // Il faudra traiter le cas d'un champ qui utilise
-			  // +sieurs (entity,geom) voir le travail de patrick
-			  // Il faudra traiter le cas des profils...
-			  // ptrField = new FIELD();
-			  // _ptrDriver = new MED_FIELD_RDWR_DRIVER(_fileName,
-			  //                                        ptrField);
-			  // ptrField->addDriver(_ptrDriver);
-			  // _fields[fieldName]=ptrField;
+		MESSAGE("Field information 5 ;: NumberOfGaussPoint : "<<NbOfGaussPts<<", timeStepNumber : "<<timeStepNumber);
+		// CORRECT a bug in MEDpasdetempsInfo :
+		// we get a value n'importe quoi in NbOfGaussPts !!!!
 		
-			  // Verify meshName is already known
+		if (NbOfGaussPts>100)
+		  NbOfGaussPts=1 ;
+		if (timeStepNumber<0)
+		  timeStepNumber=-1 ;
 		
-			  map<MESH_NAME_,MESH*>::iterator _meshesIt =
-			    _meshes.find(meshName);
-			  if ( _meshesIt == _meshes.end() ) {
-			    MESSAGE(LOC << "There is no mesh |" << meshName <<
-				    "| in the file |" << _fileName <<
-				    "|, but  |" << meshName <<
-				    "| is referenced by field |" <<
-				    fieldName <<"|, entity : |" <<
-				    entNames [ (MED_FR::med_entite_maillage)
-					       (*currentEntity).first] <<
-				    "|, geometric element of type |"  <<
-				    geoNames [ (MED_FR::med_geometrie_element)
-					       (*currentGeometry)]     <<"|"); 
-			  }
-			  // POURQUOI SI JE NE MET PAS DE BLOCK J'AI UN PARSE
-			  // ERROR : PG : c'est la macro MESSAGE qui fait ca !
-			  else
-			    ptrMesh = _meshes[meshName];
+		
+		// ATTENTION TRAITER L'EXCEPTION !!!!!!!!!!!!
+		
+		// Il faudra traiter le cas d'un champ qui utilise +sieurs (entity,geom) voir le travail de patrick
+		// Il faudra traiter le cas des profils...
+		//             ptrField = new FIELD();
+		//             _ptrDriver = new MED_FIELD_RDWR_DRIVER(_fileName, ptrField);
+		//             ptrField->addDriver(_ptrDriver);
+		//             _fields[fieldName]=ptrField;
+		
+		// Verify meshName is already known
+		
+		map<MESH_NAME_,MESH*>::iterator _meshesIt = _meshes.find(meshName);
+		if ( _meshesIt == _meshes.end() ) {
+		  MESSAGE(LOC << "There is no mesh |"
+			  << meshName                            <<"| in the file |"
+			  << _fileName <<"|, but  |" << meshName <<"| is referenced by field |"
+			  << fieldName                           <<"|, entity : |"
+			  << entNames [ (MED_FR::med_entite_maillage)   (*currentEntity).first] <<"|, geometric element of type |" 
+			  << geoNames [ (MED_FR::med_geometrie_element) (*currentGeometry)]     <<"|" 
+			  ); 
+		}  // POURQUOI SI JE NE MET PAS DE BLOCK J'AI UN PARSE ERROR : PG : c'est la macro MESSAGE qui fait ca !
+		else 
+		  ptrMesh = _meshes[meshName];
+		
+		ptrSupport     =  _support[meshName][(MED_FR::med_entite_maillage) (*currentEntity).first];
+		if (NbOfGaussPts != 1)
+		  throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<"Number of Gauss Point must be equal to 1 for instance")) ;
+		
+		// init to null to prevent some error if not correctly allocated !
+		ptrField = (FIELD_*)NULL ;
+		ptrDriver = (GENDRIVER*)NULL ;
 
-			  ptrSupport = _support[meshName][(MED_FR::med_entite_maillage) (*currentEntity).first];
-			  if (NbOfGaussPts != 1)
-			    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Number of Gauss Point must be equal to 1 for instance")) ;
+		switch ( type) {
+		case MED_FR::MED_INT64 :
+		  if ( sizeof(MED_FR::med_int) != 8 )
+		    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) <<
+						     " The Field type of |"
+						     << fieldName                         <<"|, entity : |"
+						     << entNames [(MED_FR::med_entite_maillage)   (*currentEntity).first] <<"|, geometric element of type |" 
+						     << geoNames [(MED_FR::med_geometrie_element) (*currentGeometry) ]    <<
+						     "| is  MED_INT64 but size of med_int is not equal to 8 bytes !" 
+						     ) 
+					  );
+		  break;
+		case MED_FR::MED_INT32 : {
+//  		  throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) <<
+//  						   "NOT IMPLEMENTED : BUG IN STL !")
+//  					) ;
+  		  // ptrField       =  new FIELD<MED_FR::med_int>   ( ptrSupport,numberOfComponents );   // Les valeurs du champ ne doivent pas être lue pour l'instant
 
-			  // init to null to prevent some error if not
-			  // correctly allocated !
+		  ptrField       =  new FIELD<MED_FR::med_int> ( );   // Les valeurs du champ ne doivent pas être lue pour l'instant
+		  ((FIELD<MED_FR::med_int>*) ptrField)->setSupport(ptrSupport);
+		  ((FIELD<MED_FR::med_int>*) ptrField)->setNumberOfComponents(numberOfComponents);
+  		  ((FIELD<MED_FR::med_int>*) ptrField)->setName(fieldName) ; //provisoire, pour debug
+  		  MESSAGE("#### SET NAME in FIELD : "<<fieldName);
 
-			  ptrField = (FIELD_*)NULL ;
-			  ptrDriver = (GENDRIVER*)NULL ;
-
-			  switch ( type) {
-			  case MED_FR::MED_INT64 :
-			    if ( sizeof(MED_FR::med_int) != 8 )
-			      throw MED_EXCEPTION(LOCALIZED(STRING(LOC) <<" The Field type of |" << fieldName <<"|, entity : |" << entNames [(MED_FR::med_entite_maillage) (*currentEntity).first] <<"|, geometric element of type |" << geoNames [(MED_FR::med_geometrie_element) (*currentGeometry) ] << "| is  MED_INT64 but size of med_int is not equal to 8 bytes !"));
-			    break;
-			  case MED_FR::MED_INT32 : {
-			    // throw MED_EXCEPTION(LOCALIZED(STRING(LOC) <<
-			    // "NOT IMPLEMENTED : BUG IN STL !")
-			    //) ;
-			    // ptrField = new FIELD<MED_FR::med_int> (ptrSupport,numberOfComponents);
-			    // Les valeurs du champ ne doivent pas être lue
-			    // pour l'instant
-
-			    ptrField =  new FIELD<MED_FR::med_int> ( );
-			    // Les valeurs du champ ne doivent pas être lue
-			    // pour l'instant
-			    ((FIELD<MED_FR::med_int>*)
-			     ptrField)->setSupport(ptrSupport);
-			    ((FIELD<MED_FR::med_int>*)
-			     ptrField)->setNumberOfComponents(numberOfComponents);
-			    ((FIELD<MED_FR::med_int>*)
-			     ptrField)->setName(fieldName) ;
-			    //provisoire, pour debug
-			    MESSAGE("#### SET NAME in FIELD : "<<fieldName);
-
-			    MED_EN::med_mode_acces myMode = getAccessMode();
-			    switch (myMode) {
-			      // case MED_EN::MED_LECT: V2_1->V2_2
-			    case MED_EN::MED_LECTURE:
-			      ptrDriver = new
-				MED_FIELD_RDONLY_DRIVER<MED_FR::med_int>
-				(_fileName, (FIELD<MED_FR::med_int> *)
-				 ptrField);
-			      break ;
-			      // case MED_EN::MED_REMP:	V2_1->V2_2
-			    case MED_EN::MED_LECTURE_ECRITURE:	
-			      ptrDriver = new
-				MED_FIELD_RDWR_DRIVER<MED_FR::med_int>
-				(_fileName, (FIELD<MED_FR::med_int> *)
-				 ptrField);
-			      break ;
-			      // case MED_EN::MED_ECRI:
-			      // should never append !! V2_1->V2_2
-			    case MED_EN::MED_LECTURE_AJOUT:
-			      // should never append !!
-			      // ptrDriver = new
-			      // MED_FIELD_RDONLY_DRIVER<MED_FR::med_int>
-			      // (_fileName, (FIELD<MED_FR::med_int> *)
-			      // ptrField);
-			      ptrDriver = new
-				MED_FIELD_WRONLY_DRIVER<MED_FR::med_int>
-				(_fileName, (FIELD<MED_FR::med_int> *)
-				 ptrField);
-			      break;
-			    case MED_EN::MED_CREATION: // V2_1->V2_2
-			      ptrDriver = new
-				MED_FIELD_WRONLY_DRIVER<MED_FR::med_int>
-				(_fileName, (FIELD<MED_FR::med_int> *)
-				 ptrField);
-			      break;
-			    default:
-			      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
-			    }
-			    break;
-			  }
-			  case MED_EN::MED_REEL64 : {
-			    // ptrField =  new FIELD<MED_FR::med_float>
-			    // (ptrSupport,numberOfComponents );
-			    // Les valeurs du champ ne doivent pas être lue
-			    // pour l'instant
-			    ptrField = new FIELD<MED_FR::med_float> ( );
-			    // Les valeurs du champ ne doivent pas être lue
-			    // pour l'instant
-			    ((FIELD<MED_FR::med_float>*)
-			     ptrField)->setSupport(ptrSupport);
-			    ((FIELD<MED_FR::med_float>*)
-			     ptrField)->setNumberOfComponents(numberOfComponents);
-			    ((FIELD<MED_FR::med_float>*)
-			     ptrField)->setName(fieldName) ;
-			    //provisoire, pour debug
-			    MESSAGE("#### SET NAME in FIELD : "<<fieldName);
-
-			    MED_EN::med_mode_acces myMode = getAccessMode();
-			    switch (myMode) {
-			      // case MED_EN::MED_LECT: V2_1->V2_2
-			    case MED_EN::MED_LECTURE:
-			      ptrDriver = new
-				MED_FIELD_RDONLY_DRIVER<MED_FR::med_float>
-				(_fileName, (FIELD<MED_FR::med_float> *)
-				 ptrField);
-			      break ;
-			      // case MED_EN::MED_REMP:	V2_1->V2_2
-			    case MED_EN::MED_LECTURE_ECRITURE:
-			      ptrDriver = new
-				MED_FIELD_RDWR_DRIVER<MED_FR::med_float>
-				(_fileName, (FIELD<MED_FR::med_float> *)
-				 ptrField);
-			      break ;
-			      // case MED_EN::MED_ECRI:
-			      // should never append !! V2_1->V2_2
-			    case MED_EN::MED_LECTURE_AJOUT:
-			      // should never append !!
-			      // ptrDriver = new
-			      // MED_FIELD_RDONLY_DRIVER<MED_FR::med_float>
-			      // (_fileName, (FIELD<MED_FR::med_float> *)
-			      // ptrField);
-			      ptrDriver = new
-				MED_FIELD_WRONLY_DRIVER<MED_FR::med_float>
-				(_fileName, (FIELD<MED_FR::med_float> *)
-				 ptrField);
-			      break;
-			    case MED_EN::MED_CREATION:
-			      // should never append !!
-			      ptrDriver = new
-				MED_FIELD_WRONLY_DRIVER<MED_FR::med_float>
-				(_fileName, (FIELD<MED_FR::med_float> *)
-				 ptrField);
-			      break;
-			    default:
-			      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+		  MED_EN::med_mode_acces myMode = getAccessMode();
+		  switch (myMode) {
+		  case MED_EN::MED_LECT:
+		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<MED_FR::med_int>(_fileName, (FIELD<MED_FR::med_int> *)ptrField);
+		    break ;
+		  case MED_EN::MED_REMP:	
+		    ptrDriver = new MED_FIELD_RDWR_DRIVER<MED_FR::med_int>(_fileName, (FIELD<MED_FR::med_int> *)ptrField);
+		    break ;
+		  case MED_EN::MED_ECRI: // should never append !!
+		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<MED_FR::med_int>(_fileName, (FIELD<MED_FR::med_int> *)ptrField);
+		    break;
+		  default:
+		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
 		  }
-			    break;
-			  }
-			  default : {
-			    if ( numberOfTimeSteps > 1) 
-			      throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << " The Field type of |" << fieldName <<"|, entity : |" << entNames [(MED_FR::med_entite_maillage) (*currentEntity).first] <<"|, geometric element of type |" << geoNames [(MED_FR::med_geometrie_element) (*currentGeometry)] <<"| is neither MED_INT, MED_INT32, MED_INT64 nor MED_REEL64 !"));
-			    break ;
-			  }
-			  }
-			  ptrField->setValueType((MED_EN::med_type_champ)
-						 type) ;
-			  // need to write field !
-		
-			  MESSAGE("timeStepNumber :"<<timeStepNumber<<
-				  ",orderNumber :"<<orderNumber);
-			  ptrField->setIterationNumber ( timeStepNumber);
-			  // A ajouter dans la classe FIELD
-			  ptrField->setOrderNumber     ( orderNumber); 
-			  ptrField->setTime            ( timeStep); 
-		
-			  // Create a driver for this (field n°dt,n°it)
-			  ptrDriver->setId            ( getId() );
-			  MESSAGE("###### ptrDriver->setFieldName : #"<<
-				  fieldName<<"#");
-			  ptrDriver->setFieldName(fieldName);
-			  ptrField->addDriver(*ptrDriver);
-			  // driver is duplicated : remove it
-			  delete ptrDriver;
-
-			  DT_IT_ dtIt;
-			  dtIt.dt  = timeStepNumber;
-			  dtIt.it  = orderNumber;
-		
-			  (_fields  [fieldName])[dtIt] = ptrField;
-			  _meshName[ptrField ]       = meshName;
-			}
-		    }
+  		  break;
 		}
+		case MED_FR::MED_REEL64 : {
+		  //		  ptrField       =  new FIELD<MED_FR::med_float> ( ptrSupport,numberOfComponents );   // Les valeurs du champ ne doivent pas être lue pour l'instant
+		  ptrField       =  new FIELD<MED_FR::med_float> ( );   // Les valeurs du champ ne doivent pas être lue pour l'instant
+		  ((FIELD<MED_FR::med_float>*) ptrField)->setSupport(ptrSupport);
+		  ((FIELD<MED_FR::med_float>*) ptrField)->setNumberOfComponents(numberOfComponents);
+		  ((FIELD<MED_FR::med_float>*) ptrField)->setName(fieldName) ; //provisoire, pour debug
+		  MESSAGE("#### SET NAME in FIELD : "<<fieldName);
+
+		  MED_EN::med_mode_acces myMode = getAccessMode();
+		  switch (myMode) {
+		  case MED_EN::MED_LECT:
+		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<MED_FR::med_float>(_fileName, (FIELD<MED_FR::med_float> *)ptrField);
+		    break ;
+		  case MED_EN::MED_REMP:	
+		    ptrDriver = new MED_FIELD_RDWR_DRIVER<MED_FR::med_float>(_fileName, (FIELD<MED_FR::med_float> *)ptrField);
+		    break ;
+		  case MED_EN::MED_ECRI: // should never append !!
+		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<MED_FR::med_float>(_fileName, (FIELD<MED_FR::med_float> *)ptrField);
+		    break;
+		  default:
+		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+		  }
+		  break;
+		}
+		default : {
+		  if ( numberOfTimeSteps > 1) 
+		    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) <<
+						     " The Field type of |"
+						     << fieldName                         <<"|, entity : |"
+						     << entNames [(MED_FR::med_entite_maillage)   (*currentEntity).first] 
+						     <<"|, geometric element of type |" 
+						     << geoNames [(MED_FR::med_geometrie_element) (*currentGeometry)]     
+						     <<"| is neither MED_INT, MED_INT32, MED_INT64 nor MED_REEL64 !" 
+						     ) 
+					  );
+		  break ;
+		}
+		}
+		ptrField->setValueType((MED_EN::med_type_champ) type) ; // need to write field !
+		
+		MESSAGE("timeStepNumber :"<<timeStepNumber<<",orderNumber :"<<orderNumber);
+		ptrField->setIterationNumber ( timeStepNumber);      // A ajouter dans la classe FIELD
+		ptrField->setOrderNumber     ( orderNumber); 
+		ptrField->setTime            ( timeStep); 
+		
+		// Create a driver for this (field n°dt,n°it)
+                ptrDriver->setId            ( getId() );
+		MESSAGE("###### ptrDriver->setFieldName : #"<<fieldName<<"#");
+		ptrDriver->setFieldName(fieldName);
+		ptrField->addDriver(*ptrDriver);
+		// driver is duplicated : remove it
+		delete ptrDriver;
+
+		DT_IT_ dtIt;
+		dtIt.dt  = timeStepNumber;
+		dtIt.it  = orderNumber;
+		
+		(_fields  [fieldName])[dtIt] = ptrField;
+		_meshName[ptrField ]       = meshName;
+	      }
+	    }
 	  }
-	delete[] componentName ;
-	delete[] unitName ;
       }
+      delete[] componentName ;
+      delete[] unitName ;
+    }
   }
   
   // read profil count and their names

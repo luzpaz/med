@@ -155,12 +155,13 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
     medGeometryElement * types = my._geometricType;
     for (int j=0;j<numberoftypes;j++) {
       int numberOfElements = my._numberOfElements[j];
-      os << "    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) : ";
-      const int * number = my.getNumber(types[j]);
-      SCRUTE(number);
-      for (int k=0; k<numberOfElements;k++)
-	os << number[k] << " ";
-      os << endl ;
+      os << "    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) :" << endl;
+//       const int * number = my.getNumber(types[j]);
+//       SCRUTE(number);
+//       os << " --> ";
+//       for (int k=0; k<numberOfElements;k++)
+// 	os << number[k] << " ";
+//       os << endl ;
     }
   } else
     os << "Is on all entities !"<< endl;

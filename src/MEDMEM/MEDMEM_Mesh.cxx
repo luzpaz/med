@@ -147,8 +147,6 @@ void MESH::init() {
 
   string        _name = "NOT DEFINED"; // A POSITIONNER EN FCT DES IOS ?
 
-  string        _decription = "NOT DEFINED"; // A POSITIONNER EN FCT DES IOS ?
-
   _coordinate   = (COORDINATE   *) NULL;
   _connectivity = (CONNECTIVITY *) NULL;
 
@@ -170,8 +168,7 @@ MESH::MESH():_coordinate(NULL),_connectivity(NULL), _isAGrid(false) {
 
 MESH::MESH(MESH &m)
 {
-  _name = m._name;
-  _description = m._description;
+  _name=m._name;
   _isAGrid = m._isAGrid;
 
   if (m._coordinate != NULL)
@@ -2085,16 +2082,14 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 
 bool MESH::isEmpty() const 
 {
-  bool notempty = _name != "" || _description != "" ||
-                  _coordinate != NULL || _connectivity != NULL ||
-                  _spaceDimension !=MED_INVALID ||
-                  _meshDimension !=MED_INVALID || 
-                  _numberOfNodes !=MED_INVALID || _groupNode.size() != 0 || 
-                  _familyNode.size() != 0 || _groupCell.size() != 0 || 
-                  _familyCell.size() != 0 || _groupFace.size() != 0 || 
-                  _familyFace.size() != 0 || _groupEdge.size() != 0 || 
-                  _familyEdge.size() != 0 || _isAGrid != 0 ;
-  return !notempty;
+    bool notempty = _name != ""                || _coordinate != NULL           || _connectivity != NULL ||
+	         _spaceDimension !=MED_INVALID || _meshDimension !=MED_INVALID  || 
+		 _numberOfNodes !=MED_INVALID  || _groupNode.size() != 0   || 
+		 _familyNode.size() != 0       || _groupCell.size() != 0   || 
+		 _familyCell.size() != 0       || _groupFace.size() != 0   || 
+		 _familyFace.size() != 0       || _groupEdge.size() != 0   || 
+		 _familyEdge.size() != 0       || _isAGrid != 0 ;
+    return !notempty;
 }
 
 void MESH::read(int index)  

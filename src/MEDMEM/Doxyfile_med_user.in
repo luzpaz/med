@@ -58,6 +58,9 @@ EXCLUDE_PATTERNS       = MEDMEM_DriversDef.* \
 			 MEDMEM_DriverTools.* \
                          MEDMEM_SkyLineArray.* \
 			 MEDMEM_TypeMeshDriver.* \
+			 MEDMEM_CellModel.* \
+			 MEDMEM_Exception.* \
+			 MEDMEM_GenDriver.* \
 			 MEDMEM_Array.hxx \
                          MEDMEM_PointerOf.hxx \
 			 MEDMEM_STRING.hxx \

@@ -98,7 +98,6 @@ protected:
 protected :
 
   string        _name; // A POSITIONNER EN FCT DES IOS ?
-  string        _description;
 
   mutable COORDINATE *   _coordinate;
   mutable CONNECTIVITY * _connectivity;
@@ -192,9 +191,8 @@ public :
 
 
   inline void 	      setName(string name);
-  inline void 	      setDescription(string description);
+
   inline string       getName() const;
-  inline string       getDescription() const;
   inline int 	      getSpaceDimension() const;
   inline int 	      getMeshDimension() const;
   inline bool	      getIsAGrid();
@@ -394,18 +392,6 @@ inline void MESH::setName(string name)
 inline string MESH::getName() const
 {
   return _name;
-}
-
-/*! Set the MESH description */
-inline void MESH::setDescription(string description)
-{
-  _description=description; //NOM interne à la classe
-}
-
-/*! Get the MESH description */
-inline string MESH::getDescription() const
-{
-  return _description;
 }
 
 /*! Get the dimension of the space */
