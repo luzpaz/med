@@ -1,3 +1,12 @@
+#  MED MedCorba_Swig : binding of MED CORBA objects woth Python
+#
+#  Copyright (C) 2003  CEA/DEN, EDF R&D
+#
+#
+#
+#  File   : batchmode_medcorba_test.py
+#  Module : MED
+
 import batchmode_salome
 
 import SALOME_MED

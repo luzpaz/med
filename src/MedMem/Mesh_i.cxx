@@ -1,12 +1,32 @@
-using namespace std;
-//=============================================================================
-// File      : Mesh_i.cxx
-// Project   : SALOME
-// Author    : EDF 
-// Copyright : EDF 2002
-// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Mesh_i.cxx
-//=============================================================================
+//  MED MedMem : MED idl descriptions implementation based on the classes of MEDMEM
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : Mesh_i.cxx
+//  Author : EDF 
+//  Module : MED
+//  $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Mesh_i.cxx
 
+using namespace std;
 #include <vector>
 
 #include "utilities.h"
@@ -244,7 +264,7 @@ throw (SALOME::SALOME_Exception)
 	try
 	{
 		int spaceDimension=_mesh->getSpaceDimension();
-		string * coordinatesName =_mesh->getCoordinatesNames();
+		const string * coordinatesName =_mesh->getCoordinatesNames();
 		myseq->length(spaceDimension);
 		for (int i=0; i<spaceDimension; i++)
         	{
@@ -275,7 +295,7 @@ throw (SALOME::SALOME_Exception)
 	try
 	{
 		int spaceDimension=_mesh->getSpaceDimension();
-		string * coordinatesUnits =_mesh->getCoordinatesUnits();
+		const string * coordinatesUnits =_mesh->getCoordinatesUnits();
 		myseq->length(spaceDimension);
 		for (int i=0; i<spaceDimension; i++)
         	{
@@ -355,7 +375,7 @@ throw (SALOME::SALOME_Exception)
 	try
 	{
 		int nbTypes=_mesh->getNumberOfTypes(convertIdlEntToMedEnt(entity));
-		medGeometryElement * elemts  =_mesh->getTypes(
+		const medGeometryElement * elemts  =_mesh->getTypes(
 			               convertIdlEntToMedEnt(entity));
 		myseq->length(nbTypes);
 		for (int i=0; i<nbTypes; i++)
@@ -437,7 +457,7 @@ SCRUTE(elt2);
 		else
 		{
 MESSAGE("MED_NODAL");
-			int * tab=_mesh->getConnectivityIndex(
+			const int * tab=_mesh->getConnectivityIndex(
 				convertIdlConnToMedConn(mode),
 				convertIdlEntToMedEnt(entity));
 			nbelements = elt1*(convertIdlEltToMedElt(geomElement)%100);
@@ -447,7 +467,7 @@ SCRUTE(entity);
 SCRUTE(geomElement);
 SCRUTE(nbelements);
                 myseq->length(nbelements);
-                int * numbers=_mesh->getConnectivity(convertIdlModeToMedMode(typeSwitch),
+                const int * numbers=_mesh->getConnectivity(convertIdlModeToMedMode(typeSwitch),
 						     convertIdlConnToMedConn(mode),
 						     convertIdlEntToMedEnt(entity),
 						     convertIdlEltToMedElt(geomElement));
@@ -483,7 +503,7 @@ throw (SALOME::SALOME_Exception)
 					convertIdlEntToMedEnt(entity),
 					MED_ALL_ELEMENTS);
                 myseq->length(nbelements);
-                int * numbers=_mesh->getConnectivityIndex(convertIdlConnToMedConn(mode),
+                const int * numbers=_mesh->getConnectivityIndex(convertIdlConnToMedConn(mode),
 						          convertIdlEntToMedEnt(entity));
                 for (int i=0;i<nbelements;i++)
                 {
@@ -556,7 +576,7 @@ throw (SALOME::SALOME_Exception)
 		}
 		SCRUTE(nbelements);
                 myseq->length(nbelements);
-                int * numbers=_mesh->getReverseConnectivity(convertIdlConnToMedConn(mode));
+                const int * numbers=_mesh->getReverseConnectivity(convertIdlConnToMedConn(mode));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -604,7 +624,7 @@ throw (SALOME::SALOME_Exception)
 		}
 
                 myseq->length(nbelements);
-                int * numbers=_mesh->getReverseConnectivityIndex(convertIdlConnToMedConn(mode));
+                const int * numbers=_mesh->getReverseConnectivityIndex(convertIdlConnToMedConn(mode));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -711,7 +731,7 @@ throw (SALOME::SALOME_Exception)
                                              SALOME::INTERNAL_ERROR);
         try
         {
-                FAMILY * fam = _mesh->getFamily(convertIdlEntToMedEnt(entity),i);
+                const FAMILY * fam = _mesh->getFamily(convertIdlEntToMedEnt(entity),i);
                 FAMILY_i * f1=new FAMILY_i(fam);
                 SALOME_MED::FAMILY_ptr f2 = f1->POA_SALOME_MED::FAMILY::_this();
                 f1->_remove_ref();
@@ -773,7 +793,7 @@ throw (SALOME::SALOME_Exception)
                                               SALOME::INTERNAL_ERROR);
         try
         {
-                GROUP * grou = _mesh->getGroup(convertIdlEntToMedEnt(entity),i);
+                const GROUP * grou = _mesh->getGroup(convertIdlEntToMedEnt(entity),i);
                 GROUP_i * f1=new GROUP_i(grou);
                 SALOME_MED::GROUP_ptr f2 = f1->POA_SALOME_MED::GROUP::_this();
                 f1->_remove_ref();
