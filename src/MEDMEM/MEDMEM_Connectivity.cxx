@@ -1576,7 +1576,7 @@ void CONNECTIVITY::calculateDescendingConnectivity()
       int * ConstituentNodalConnectivityIndex = new int[TotalNumberOfConstituents+1];
       ConstituentNodalConnectivityIndex[0]=1;
 
-      _constituent->_entityDimension=ConstituentsTypes[0]/100;
+      _constituent->_entityDimension = _entityDimension-1;
       if (ConstituentsTypes[1]==MED_NONE)
 	_constituent->_numberOfTypes = 1;
       else
@@ -1785,6 +1785,8 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 
       delete [] ConstituentNodalConnectivityIndex;
       delete [] ConstituentNodalConnectivity;
+      delete [] ReverseDescendingConnectivityValue;
+      delete [] tmp_NumberOfConstituentsForeachType;
 
       _descending = new MEDSKYLINEARRAY(_count[_numberOfTypes]-1,
 					DescendingSize,
@@ -1792,26 +1794,182 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 					descend_connectivity);
       delete [] descend_connectivity_index;
       delete [] descend_connectivity;
-      _reverseDescendingConnectivity = new MEDSKYLINEARRAY(NumberOfConstituent,
-							   2*NumberOfConstituent,
-							   reverseDescendingConnectivityIndex,
-							   reverseDescendingConnectivityValue);
-      delete [] reverseDescendingConnectivityIndex;
-      delete [] reverseDescendingConnectivityValue;
 
-      _constituent->_count[1]=tmp_NumberOfConstituentsForeachType[0]+1;
-      delete [] tmp_NumberOfConstituentsForeachType;
-      
-      //delete _constituent->_nodal;
+      ////
+      vector<int> PolyDescending;
+      vector<int> Reversedescendingconnectivityvalue(reverseDescendingConnectivityValue,reverseDescendingConnectivityValue + 2*NumberOfConstituent);
+      vector<int> Reversedescendingconnectivityindex(reverseDescendingConnectivityIndex,reverseDescendingConnectivityIndex + NumberOfConstituent);
+      delete [] reverseDescendingConnectivityValue;
+      delete [] reverseDescendingConnectivityIndex;
+
+
+      // polygons (2D mesh)
+
+      vector<int> Constituentnodalvalue(ConstituentNodalValue,ConstituentNodalValue + SizeOfConstituentNodal);
+      vector<int> Constituentnodalindex(ConstituentNodalIndex,ConstituentNodalIndex + NumberOfConstituent+1);
+      delete [] ConstituentNodalValue;
+      delete [] ConstituentNodalIndex;
+      int NumberOfNewSeg = 0;
+
+      for (int i=0; i <getNumberOfPolygons(); i++) // for each polygon
+	{
+	  const int * vector_begin = &_polygonsNodal->getValue()[_polygonsNodal->getIndex()[i]-1];
+	  int vector_size = _polygonsNodal->getIndex()[i+1]-_polygonsNodal->getIndex()[i]+1;
+	  vector<int> myPolygon(vector_begin, vector_begin+vector_size);
+	  myPolygon[myPolygon.size()-1] = myPolygon[0]; // because first and last point make a segment
+
+	  for (int j=0; j<myPolygon.size()-1; j++) // for each segment of polygon
+	    {
+	      MEDMODULUSARRAY segment_poly(2,&myPolygon[j]);
+	      int ret_compare = 0;
+
+	      // we search it in existing segments
+
+	      for (int k=0; k<Constituentnodalindex.size()-1; k++)
+		{
+		  MEDMODULUSARRAY segment(2,&Constituentnodalvalue[0] + Constituentnodalindex[k]-1);
+		  ret_compare = segment_poly.compare(segment);
+		  if (ret_compare) // segment_poly already exists
+		    {
+		      PolyDescending.push_back(ret_compare*(k+1)); // we had it to the connectivity
+		      insert_vector(Reversedescendingconnectivityvalue, 2*k+1, i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polygon i to reverse descending connectivity for segment_poly (in 2sd place)
+		      break;
+		    }
+		}
+
+	      // segment_poly must be created
+
+	      if (!ret_compare)
+		{
+		  NumberOfNewSeg++;
+		  PolyDescending.push_back(NumberOfConstituent+NumberOfNewSeg); // we had it to the connectivity
+		  Constituentnodalvalue.push_back(segment_poly[0]);
+		  Constituentnodalvalue.push_back(segment_poly[1]);
+		  Constituentnodalindex.push_back(Constituentnodalindex[Constituentnodalindex.size()-1] + 2); // we have only segments
+		  insert_vector(Reversedescendingconnectivityvalue, 2*(NumberOfConstituent+NumberOfNewSeg-1), i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polygon i to reverse descending connectivity for segment_poly (in 1st place)
+		  insert_vector(Reversedescendingconnectivityindex, NumberOfConstituent+NumberOfNewSeg-1, 2*(NumberOfConstituent+NumberOfNewSeg-1)+1); // idem with index
+		}
+	    }
+	}
+
+      if (getNumberOfPolygons() > 0)
+	{
+	  _polygonsDescending = new MEDSKYLINEARRAY(getNumberOfPolygons(),_polygonsNodal->getLength(),_polygonsNodal->getIndex(),&PolyDescending[0]); // index are the same for polygons nodal and descending connectivities
+
+	  NumberOfConstituent += NumberOfNewSeg;
+	  SizeOfConstituentNodal += 2*NumberOfNewSeg;
+	  _constituent->_count[1] = NumberOfConstituent+1;
+	}
+
+
+      // polyhedron (3D mesh)
+
+      vector<int> Constituentpolygonsnodalvalue;
+      vector<int> Constituentpolygonsnodalindex(1,1);
+      int NumberOfNewFaces = 0; // by convention new faces are polygons
+
+      for (int i=0; i<getNumberOfPolyhedron(); i++) // for each polyhedron
+	{
+	  // we create a POLYHEDRONARRAY containing only this polyhedra
+	  int myNumberOfFaces = _polyhedronNodal->getPolyhedronIndex()[i+1]-_polyhedronNodal->getPolyhedronIndex()[i];
+	  int myNumberOfNodes = _polyhedronNodal->getFacesIndex()[_polyhedronNodal->getPolyhedronIndex()[i+1]-1]-_polyhedronNodal->getFacesIndex()[_polyhedronNodal->getPolyhedronIndex()[i]-1];
+	  POLYHEDRONARRAY myPolyhedra(1,myNumberOfFaces,myNumberOfNodes);
+	  vector<int> myFacesIndex(_polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1, _polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1 + myNumberOfFaces+1);
+	  for (int j=myNumberOfFaces; j>=0; j--)
+	    myFacesIndex[j] -= myFacesIndex[0]-1;
+	  myPolyhedra.setFacesIndex(&myFacesIndex[0]);
+	  myPolyhedra.setNodes(_polyhedronNodal->getNodes() + _polyhedronNodal->getFacesIndex()[_polyhedronNodal->getPolyhedronIndex()[i]-1]-1);
+
+	  for (int j=0; j<myPolyhedra.getNumberOfFaces(); j++) // for each face of polyhedra
+	    {
+	      int myFaceNumberOfNodes = myPolyhedra.getFacesIndex()[j+1]-myPolyhedra.getFacesIndex()[j];
+	      MEDMODULUSARRAY face_poly(myFaceNumberOfNodes,myPolyhedra.getNodes() + myPolyhedra.getFacesIndex()[j]-1);
+	      int ret_compare = 0;
+
+	      // we search it in existing faces
+
+	      // we search first in TRIA3 and QUAD4
+	      if (myFaceNumberOfNodes == 3 || myFaceNumberOfNodes == 4)
+		{
+		  int Begin = -1; // first TRIA3 or QUAD4
+		  int Number = 0; // number of TRIA3 or QUAD4
+		  for (int k=0; k<Constituentnodalindex.size()-1; k++)
+		    if (Constituentnodalindex[k+1]-Constituentnodalindex[k] == myFaceNumberOfNodes)
+		      {
+			if (Begin == -1)
+			  Begin = k;
+			Number++;
+		      }
+
+		  for (int k=0; k<Number; k++)
+		    {
+		      MEDMODULUSARRAY face(myFaceNumberOfNodes,&Constituentnodalvalue[0] + Constituentnodalindex[Begin+k]-1);
+		      ret_compare = face_poly.compare(face);
+		      if (ret_compare)
+			{
+			  PolyDescending.push_back(ret_compare*(Begin+k+1)); // we had it to the connectivity
+			  insert_vector(Reversedescendingconnectivityvalue, 2*(Begin+k)+1, i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polyhedra i to reverse descending connectivity for face_poly (in 2sd place)
+			  break;
+			}
+		    }
+		}
+
+	      // we search last in POLYGONS
+	      if (!ret_compare)
+		{
+		  for (int k=0; k<static_cast<int>(Constituentpolygonsnodalindex.size())-1; k++) // we must cast the unsigned int into int before doing -1
+		    {
+		      if (Constituentpolygonsnodalindex[k+1]-Constituentpolygonsnodalindex[k] == myFaceNumberOfNodes)
+			{
+			  MEDMODULUSARRAY face(myFaceNumberOfNodes,&Constituentpolygonsnodalvalue[0] + Constituentpolygonsnodalindex[k]-1);
+			  ret_compare = face_poly.compare(face);
+			  if (ret_compare)
+			    {
+			      PolyDescending.push_back(ret_compare*(NumberOfConstituent+k+1)); // we had it to the connectivity
+			      insert_vector(Reversedescendingconnectivityvalue, 2*(NumberOfConstituent+k)+1, i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polyhedra i to reverse descending connectivity for face_poly (in 2sd place)
+			      break;
+			    }
+			}
+		    }
+		}
+
+	      // if not found, face_poly must be created
+
+	      if (!ret_compare)
+		{
+		  NumberOfNewFaces++;
+		  PolyDescending.push_back(NumberOfConstituent+NumberOfNewFaces); // we had it to the connectivity
+		  for (int k=0; k<myFaceNumberOfNodes; k++)
+		    Constituentpolygonsnodalvalue.push_back(face_poly[k]);
+		  Constituentpolygonsnodalindex.push_back(Constituentpolygonsnodalindex[Constituentpolygonsnodalindex.size()-1]+myFaceNumberOfNodes);
+		  insert_vector(Reversedescendingconnectivityvalue, 2*(NumberOfConstituent+NumberOfNewFaces-1), i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polyhedra i to reverse descending connectivity for face_poly (in 1st place)
+		  insert_vector(Reversedescendingconnectivityindex, NumberOfConstituent+NumberOfNewFaces-1, 2*(NumberOfConstituent+NumberOfNewFaces-1)+1); // idem with index
+		}
+	    }
+	}
+
+      if (getNumberOfPolyhedron() > 0)
+	{
+	  _polyhedronDescending = new MEDSKYLINEARRAY(getNumberOfPolyhedron(),_polyhedronNodal->getNumberOfFaces(),_polyhedronNodal->getPolyhedronIndex(),&PolyDescending[0]); // polyhedron index are the same for nodal and descending connectivities
+
+	  if (_constituent->_polygonsNodal != NULL)
+	    delete [] _constituent->_polygonsNodal;
+	  _constituent->_polygonsNodal = new MEDSKYLINEARRAY(Constituentpolygonsnodalindex.size()-1,Constituentpolygonsnodalvalue.size(),&Constituentpolygonsnodalindex[0],&Constituentpolygonsnodalvalue[0]);
+	}
+
+      // delete _constituent->_nodal
       _constituent->_nodal = new MEDSKYLINEARRAY(NumberOfConstituent,
 						 SizeOfConstituentNodal,
-						 ConstituentNodalIndex,
-						 ConstituentNodalValue);
-    
-      delete [] ConstituentNodalIndex;
-      delete [] ConstituentNodalValue;
+						 &Constituentnodalindex[0],
+						 &Constituentnodalvalue[0]);
 
-      delete [] ReverseDescendingConnectivityValue;
+      int NumberOfConstituentWithPolygons = NumberOfConstituent + NumberOfNewFaces;
+      Reversedescendingconnectivityindex.push_back(Reversedescendingconnectivityindex[Reversedescendingconnectivityindex.size()-1]+2); // we complete the index
+      _reverseDescendingConnectivity = new MEDSKYLINEARRAY(NumberOfConstituentWithPolygons+1,
+							   2*NumberOfConstituentWithPolygons,
+							   &Reversedescendingconnectivityindex[0],
+							   &Reversedescendingconnectivityvalue[0]);
+      ////
     }
   END_OF(LOC);
 }
@@ -1928,9 +2086,9 @@ ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
 	os << "  -> Type " << co._geometricTypes[i] << " (" << co._type[i].getName() << ") : " 
 	   << co._count[i+1]-co._count[i] << " elements" << endl;
 
-    if (co._typeConnectivity == MED_NODAL )
+    if (co._typeConnectivity == MED_NODAL && co._descending == NULL) // we have only nodal connectivity
     {
-	for (int i=0; i<co._numberOfTypes; i++) 
+      for (int i=0; i<co._numberOfTypes; i++) 
 	{
 	    os << endl << co._type[i].getName() << " : " << endl;
 	    int numberofelements = co._count[i+1]-co._count[i];
@@ -1982,15 +2140,15 @@ ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
 	  }
 
     }
-    else if (co._typeConnectivity == MED_DESCENDING)
+    else if (co._descending != NULL) // we have nodal and descending connectivities, or only descending
     {
 	int numberofelements = co.getNumberOf( co._entity , MED_ALL_ELEMENTS);
 	if (numberofelements > 0)
 	  {
-	    const med_int *connectivity =  co.getConnectivity( co._typeConnectivity, co._entity, MED_ALL_ELEMENTS);
-	    const int *connectivity_index =  co.getConnectivityIndex( co._typeConnectivity, co._entity );
-	
-	    for ( int j=0; j!=numberofelements; j++ ) 
+	    const med_int *connectivity = co.getConnectivity(MED_DESCENDING, co._entity, MED_ALL_ELEMENTS);
+	    const int *connectivity_index = co.getConnectivityIndex(MED_DESCENDING, co._entity );
+
+	    for ( int j=0; j!=numberofelements; j++ )
 	      {
 		os << "Element " << j+1 << " : ";
 		for ( int k=connectivity_index[j]; k!=connectivity_index[j+1]; k++ )
