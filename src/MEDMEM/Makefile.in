@@ -68,7 +68,8 @@ MEDMEM_Meshing.hxx \
 MEDMEM_STRING.hxx \
 MEDMEM_Support.hxx \
 MEDMEM_Unit.hxx \
-MEDMEM_Grid.hxx
+MEDMEM_Grid.hxx \
+MEDMEM_PolyhedronArray.hxx
 
 # Libraries targets
 
@@ -97,7 +98,8 @@ MEDMEM_Support.cxx \
 MEDMEM_Unit.cxx \
 MEDMEM_VtkMedDriver.cxx \
 MEDMEM_VtkMeshDriver.cxx \
-MEDMEM_Grid.cxx
+MEDMEM_Grid.cxx \
+MEDMEM_PolyhedronArray.cxx
 
 
 # Executables targets
@@ -106,7 +108,7 @@ BIN_SRC =
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit testUGeoNameMeshEntities testUMedException testUModulusArray testUSkyLineArray testUArray testUCellModel readEntete readCoordinate test_copie_field_ test_copie_fieldT test_copie_coordinate test_copie_medarray test_copie_connectivity test_copie_support test_copie_family test_copie_group test_copie_mesh test_affect_medarray test_MEDMEM_Meshing test_operation_fielddouble test_operation_fieldint test_gibi_driver test_porflow_driver
+TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit testUGeoNameMeshEntities testUMedException testUModulusArray testUSkyLineArray testUArray testUCellModel readEntete readCoordinate test_copie_field_ test_copie_fieldT test_copie_coordinate test_copie_medarray test_copie_connectivity test_copie_support test_copie_family test_copie_group test_copie_mesh test_affect_medarray test_MEDMEM_Meshing test_operation_fielddouble test_operation_fieldint test_gibi_driver test_porflow_driver test_MEDMEM_PolyhedronArray test_MEDMEM_PolyConnectivity
 
 # testUCellModel -> a revoir car l'API a changee (plus de vector)
 
