@@ -508,17 +508,18 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
 
   SALOMEDS::TMPFile_var aStreamFile;
   // Get a temporary directory to store a file
-  TCollection_AsciiString aTmpDir = (isMultiFile)?TCollection_AsciiString((char*)theURL):SALOMEDS_Tool::GetTmpDir();
+  TCollection_AsciiString aTmpDir = (isMultiFile)?TCollection_AsciiString((char*)theURL):(char*)SALOMEDS_Tool::GetTmpDir().c_str();
   // Create a list to store names of created files
   SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
   TColStd_SequenceOfAsciiString aFileNames;
 
   CORBA::String_var aSaveStudyName("");
-  if (isMultiFile) aSaveStudyName = strdup(SALOMEDS_Tool::GetNameFromPath(theComponent->GetStudy()->URL()));
+  if (isMultiFile) aSaveStudyName = CORBA::string_dup(SALOMEDS_Tool::GetNameFromPath(theComponent->GetStudy()->URL()).c_str());
 
   SALOMEDS::SObject_var aMedMeshFather = theComponent->GetStudy()->FindObject("MEDMESH");
   if (!CORBA::is_nil(aMedMeshFather)) {
     SALOMEDS::ChildIterator_var anIter = theComponent->GetStudy()->NewChildIterator(aMedMeshFather);
+    anIter->InitEx(1);
     for(; anIter->More(); anIter->Next()) {
       SALOMEDS::SObject_var aSO = anIter->Value();
       SALOMEDS::GenericAttribute_var anAttr;
@@ -526,7 +527,7 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
 	CORBA::Object_var myIOR = _orb->string_to_object(SALOMEDS::AttributeIOR::_narrow(anAttr)->Value());
 	SALOME_MED::MESH_var myMesh = SALOME_MED::MESH::_narrow(myIOR);
 	if (! CORBA::is_nil(myMesh)) {
-	  TCollection_AsciiString aName(strdup(aSaveStudyName));
+	  TCollection_AsciiString aName(aSaveStudyName);
 	  aName += "_MEDMESH_";
 	  aName += myMesh->getName();
 	  aName += ".med";
@@ -542,6 +543,7 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
   SALOMEDS::SObject_var aMedFieldFather = theComponent->GetStudy()->FindObject("MEDFIELD");
   if (!CORBA::is_nil(aMedFieldFather)) {
     SALOMEDS::ChildIterator_var anIter = theComponent->GetStudy()->NewChildIterator(aMedFieldFather);
+    anIter->InitEx(1);  
     for(; anIter->More(); anIter->Next()) {
       SALOMEDS::SObject_var aSO = anIter->Value();
       SALOMEDS::GenericAttribute_var anAttr;
@@ -553,13 +555,13 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
 	  a<< myField->getOrderNumber();
 	  b<< myField->getIterationNumber();
 
-	  TCollection_AsciiString aName(strdup(aSaveStudyName));
+	  TCollection_AsciiString aName(aSaveStudyName);
 	  aName += "_MEDFIELD_";
 	  aName += myField->getName();
 	  aName += "_ORDRE_";
-	  aName += strdup(a.str().c_str());
+	  aName += (char*)(a.str().c_str());
 	  aName += "_ITER_";
-	  aName += strdup(b.str().c_str());
+	  aName += (char*)(b.str().c_str());
 	  aName += ".med";
 	  MESSAGE("Save mesh with name "<<aName.ToCString());
 	  long driverId = myField->addDriver(SALOME_MED::MED_DRIVER,(aTmpDir+aName).ToCString(),myField->getName());
@@ -591,17 +593,18 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
   
   SALOMEDS::TMPFile_var aStreamFile;
   // Get a temporary directory to store a file
-  TCollection_AsciiString aTmpDir = (isMultiFile)?TCollection_AsciiString((char*)theURL):SALOMEDS_Tool::GetTmpDir();
+  TCollection_AsciiString aTmpDir = (isMultiFile)?TCollection_AsciiString((char*)theURL):(char*)SALOMEDS_Tool::GetTmpDir().c_str();
   // Create a list to store names of created files
   SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
   TColStd_SequenceOfAsciiString aFileNames;
   
   CORBA::String_var aSaveStudyName("");
-  if (isMultiFile) aSaveStudyName = strdup(SALOMEDS_Tool::GetNameFromPath(theComponent->GetStudy()->URL()));
+  if (isMultiFile) aSaveStudyName = CORBA::string_dup(SALOMEDS_Tool::GetNameFromPath(theComponent->GetStudy()->URL()).c_str());
   
   SALOMEDS::SObject_var aMedMeshFather = theComponent->GetStudy()->FindObject("MEDMESH");
   if (!CORBA::is_nil(aMedMeshFather)) {
     SALOMEDS::ChildIterator_var anIter = theComponent->GetStudy()->NewChildIterator(aMedMeshFather);
+    anIter->InitEx(1); 
     for(; anIter->More(); anIter->Next()) {
       SALOMEDS::SObject_var aSO = anIter->Value();
       SALOMEDS::GenericAttribute_var anAttr;
@@ -609,14 +612,14 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
 	CORBA::Object_var myIOR = _orb->string_to_object(SALOMEDS::AttributeIOR::_narrow(anAttr)->Value());
 	SALOME_MED::MESH_var myMesh = SALOME_MED::MESH::_narrow(myIOR);
 	if (! CORBA::is_nil(myMesh)) {
-	  TCollection_AsciiString aName(strdup(aSaveStudyName));
+	  TCollection_AsciiString aName(aSaveStudyName);
 	  aName += "_MEDMESH_";
 	  aName += myMesh->getName();
 	  aName += ".med";
 	  MESSAGE("Save mesh with name "<<aName.ToCString());
 	  long driverId = myMesh->addDriver(SALOME_MED::MED_DRIVER,(aTmpDir+aName).ToCString(),myMesh->getName());
 	  myMesh->write(driverId,"");
-	  HDFascii::ConvertFromHDFToASCII(strdup((aTmpDir+aName).ToCString()), true);
+	  HDFascii::ConvertFromHDFToASCII((aTmpDir+aName).ToCString(), true);
 	  aFileNames.Append(aName);
 	}
       }
@@ -626,6 +629,7 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
   SALOMEDS::SObject_var aMedFieldFather = theComponent->GetStudy()->FindObject("MEDFIELD");
   if (!CORBA::is_nil(aMedFieldFather)) {
     SALOMEDS::ChildIterator_var anIter = theComponent->GetStudy()->NewChildIterator(aMedFieldFather);
+    anIter->InitEx(1);  
     for(; anIter->More(); anIter->Next()) {
       SALOMEDS::SObject_var aSO = anIter->Value();
       SALOMEDS::GenericAttribute_var anAttr;
@@ -637,18 +641,18 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
 	  a<< myField->getOrderNumber();
 	  b<< myField->getIterationNumber();
 
-	  TCollection_AsciiString aName(strdup(aSaveStudyName));
+	  TCollection_AsciiString aName(aSaveStudyName);
 	  aName += "_MEDFIELD_";
 	  aName += myField->getName();
 	  aName += "_ORDRE_";
-	  aName += strdup(a.str().c_str());
+	  aName += (char*)(a.str().c_str());
 	  aName += "_ITER_";
-	  aName += strdup(b.str().c_str());
+	  aName += (char*)(b.str().c_str());
 	  aName += ".med";
 	  MESSAGE("Save mesh with name "<<aName.ToCString());
 	  long driverId = myField->addDriver(SALOME_MED::MED_DRIVER,(aTmpDir+aName).ToCString(),myField->getName());
 	  myField->write(driverId,"");
-	  HDFascii::ConvertFromHDFToASCII(strdup((aTmpDir+aName).ToCString()), true);
+	  HDFascii::ConvertFromHDFToASCII((aTmpDir+aName).ToCString(), true);
 	  aFileNames.Append(aName);
 	}
       }
@@ -683,7 +687,7 @@ CORBA::Boolean Med_Gen_i::Load(SALOMEDS::SComponent_ptr theComponent,
 
   // Get a temporary directory for a file
   TCollection_AsciiString aTmpDir =
-    (isMultiFile)?TCollection_AsciiString((char*)theURL):SALOMEDS_Tool::GetTmpDir();
+    (isMultiFile)?TCollection_AsciiString((char*)theURL):(char*)SALOMEDS_Tool::GetTmpDir().c_str();
   _saveFileName = CORBA::string_dup(aTmpDir.ToCString());
   SALOMEDS::ListOfFileNames_var aSeq =
     SALOMEDS_Tool::PutStreamToFiles(theStream, aTmpDir.ToCString(), isMultiFile);
@@ -732,7 +736,7 @@ void Med_Gen_i::Close(SALOMEDS::SComponent_ptr theComponent)
 char* Med_Gen_i::ComponentDataType()
 {
   MESSAGE("Med_Gen_i::ComponentDataType");
-  return strdup("MED") ; /* What is this type ? */
+  return CORBA::string_dup("MED") ; /* What is this type ? */
 }
     
 //=============================================================================
@@ -761,7 +765,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   {
         // nothing to save : Support will be saved inside the mesh
 	string str_MedName="_MED Objet Med + /OBJ_MED/";
-        return strdup(str_MedName.c_str()) ; 
+        return CORBA::string_dup(str_MedName.c_str()) ; 
   }
  
   // MESH
@@ -769,7 +773,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   if (! CORBA::is_nil(myMesh)) 
   {
     CORBA::String_var aName((string("_MEDMESH_")+ myMesh->getName() + ".med").c_str());
-    return strdup(aName._retn()) ;
+    return aName._retn() ;
   }
     
   // SUPPORT
@@ -790,7 +794,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
                 THROW_SALOME_CORBA_EXCEPTION("Unable to save Field in Med"\
                                               ,SALOME::INTERNAL_ERROR);
 	}
-    return strdup(("_MED"+str_SupportName).c_str());
+    return CORBA::string_dup(("_MED"+str_SupportName).c_str());
   }
     
   SALOME_MED::FIELD_var myField = SALOME_MED::FIELD::_narrow(myIOR);
@@ -804,7 +808,7 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
 			     string("_ORDRE_")+a.str()+
 			     string("_ITER_")+b.str() +
 			     ".med").c_str());
-    return strdup(aName._retn());
+    return aName._retn();
   }
 
   //THROW_SALOME_CORBA_EXCEPTION("Unable to save IOR",SALOME::BAD_PARAM);
@@ -827,12 +831,12 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
 {
   const char * LOC = "Med_Gen_i::LocalPersistentIDToIOR" ;
   BEGIN_OF(LOC) ;
-  TCollection_AsciiString aTmpDir(CORBA::string_dup(_saveFileName.c_str()));
+  TCollection_AsciiString aTmpDir((char*)(_saveFileName.c_str()));
 
   TCollection_AsciiString aSaveStudyName("");
-  if (isMultiFile) aSaveStudyName = strdup(SALOMEDS_Tool::GetNameFromPath(theSObject->GetStudy()->URL()));
+  if (isMultiFile) aSaveStudyName = (char*)SALOMEDS_Tool::GetNameFromPath(theSObject->GetStudy()->URL()).c_str();
 
-  if (strcmp(aLocalPersistentID, "Objet Med + /OBJ_MED/") == 0) return strdup(""); // MED
+  if (strcmp(aLocalPersistentID, "Objet Med + /OBJ_MED/") == 0) return CORBA::string_dup(""); // MED
 
   if (strncmp(aLocalPersistentID, "_MEDMESH_",9) == 0) {// MESH
     MESH * myMesh= new MESH() ;
@@ -844,11 +848,11 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
 
     char* aFileName;
     if (isASCII) {
-      char* aResultPath = HDFascii::ConvertFromASCIIToHDF((aTmpDir + strdup(aLocalPersistentID)).ToCString());
+      char* aResultPath = HDFascii::ConvertFromASCIIToHDF((aTmpDir + aSaveStudyName + (char*)aLocalPersistentID).ToCString());
       aFileName = new char[strlen(aResultPath) + 19];
       sprintf(aFileName, "%shdf_from_ascii.hdf", aResultPath);
       delete(aResultPath);
-    } else aFileName = strdup((aTmpDir + aSaveStudyName + strdup(aLocalPersistentID)).ToCString());
+    } else aFileName = CORBA::string_dup((aTmpDir + aSaveStudyName + (char*)aLocalPersistentID).ToCString());
     MED_MESH_RDONLY_DRIVER myMeshDriver(aFileName,myMesh);
     try
       {
@@ -883,16 +887,16 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
     if (isASCII) {
       SALOMEDS::ListOfFileNames_var aFilesToRemove = new SALOMEDS::ListOfFileNames;
       aFilesToRemove->length(1);
-      aFilesToRemove[0] = strdup(&(aFileName[strlen(SALOMEDS_Tool::GetDirFromPath(aFileName))]));
-      SALOMEDS_Tool::RemoveTemporaryFiles(SALOMEDS_Tool::GetDirFromPath(aFileName), aFilesToRemove, true);
+      aFilesToRemove[0] = CORBA::string_dup(&(aFileName[strlen(SALOMEDS_Tool::GetDirFromPath(aFileName).c_str())]));
+      SALOMEDS_Tool::RemoveTemporaryFiles(SALOMEDS_Tool::GetDirFromPath(aFileName).c_str(), aFilesToRemove, true);
     }
     delete(aFileName);
     return(CORBA::string_dup(_orb->object_to_string(mesh)));
   } else if (strncmp(aLocalPersistentID, "_MEDFIELD_",14) == 0) { // FIELD
-    return(strdup("")); // not implemented yet
+    return(CORBA::string_dup("")); // not implemented yet
   }
 
-  return strdup("");
+  return CORBA::string_dup("");
 
   END_OF(LOC) ;
 }
@@ -988,21 +992,21 @@ SALOMEDS::TMPFile* Med_Gen_i::CopyFrom(SALOMEDS::SObject_ptr theObject, CORBA::L
   // Try to get GEOM_Shape object by given SObject
   SALOMEDS::GenericAttribute_var anAttr;
   if (!theObject->FindAttribute(anAttr, "AttributeIOR")) return new SALOMEDS::TMPFile(0);
-  CORBA::String_var anIOR = strdup(SALOMEDS::AttributeIOR::_narrow(anAttr)->Value());
+  CORBA::String_var anIOR = CORBA::string_dup(SALOMEDS::AttributeIOR::_narrow(anAttr)->Value());
   CORBA::Object_var anObj = _orb->string_to_object(anIOR);
   SALOME_MED::MESH_var aMesh = SALOME_MED::MESH::_narrow(anObj);
   if (aMesh->_is_nil()) return new SALOMEDS::TMPFile(0);
 
   // Get a temporary directory to store a temporary file
-  CORBA::String_var aTmpDir = SALOMEDS_Tool::GetTmpDir();
+  CORBA::String_var aTmpDir = SALOMEDS_Tool::GetTmpDir().c_str();
   // Create a list to store names of created files
   SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
   aSeq->length(1);
-  aSeq[0] = strdup(aMesh->getName());
+  aSeq[0] = CORBA::string_dup(aMesh->getName());
   char* aFullName = new char[strlen(aTmpDir)+strlen(aSeq[0])+1];
   strcpy(aFullName, aTmpDir);
   strcpy(aFullName+strlen(aTmpDir), aSeq[0]);
-  long driverId = aMesh->addDriver(SALOME_MED::MED_DRIVER,strdup(aFullName) , aMesh->getName());
+  long driverId = aMesh->addDriver(SALOME_MED::MED_DRIVER,aFullName , aMesh->getName());
   aMesh->write(driverId,"");
   delete(aFullName);
   
@@ -1040,9 +1044,9 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   
   SALOMEDS::Study_var aStudy = theObject->GetStudy();
 
-  CORBA::String_var aTmpDir = strdup(SALOMEDS_Tool::GetTmpDir());
+  CORBA::String_var aTmpDir = CORBA::string_dup(SALOMEDS_Tool::GetTmpDir().c_str());
   SALOMEDS::ListOfFileNames_var aSeq = SALOMEDS_Tool::PutStreamToFiles(theStream, aTmpDir, false);
-  CORBA::String_var aMeshName = strdup(aSeq[0]);
+  CORBA::String_var aMeshName = CORBA::string_dup(aSeq[0]);
   char* aFullName = new char[strlen(aTmpDir)+strlen(aMeshName)+1];
   strcpy(aFullName, aTmpDir);
   strcpy(aFullName+strlen(aTmpDir), aMeshName);

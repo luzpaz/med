@@ -8,7 +8,7 @@ class FIELDINTClient :
 {
 public:
   FIELDINTClient(SALOME_MED::FIELDINT_ptr ptrCorba,
-		    SUPPORT * S = NULL);
+		 MEDMEM::SUPPORT * S = NULL);
   ~FIELDINTClient();
 };
 
