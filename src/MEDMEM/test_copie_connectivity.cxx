@@ -1,3 +1,29 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : test_copie_connectivity.cxx
+//  Module : MED
+
 using namespace std;
 /* Programme de test du constructeur de copies de la classe CONNECTIVITY de MEDMEM
    jroy - 19/12/2002 */
@@ -18,20 +44,20 @@ using namespace std;
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
-void affiche_connectivity(CONNECTIVITY * myConnectivity, MESH * myMesh)
+void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
 {
   int SpaceDimension = myMesh->getSpaceDimension() ;
   int MeshDimension  = myMesh->getMeshDimension() ;
   int NumberOfNodes  = myMesh->getNumberOfNodes() ;
 
-  int NumberOfTypes = myMesh->getNumberOfTypes(MED_CELL) ;
-  medGeometryElement  * Types = myMesh->getTypes(MED_CELL) ;
+  int NumberOfTypes                 = myMesh->getNumberOfTypes(MED_CELL) ;
+  const medGeometryElement  * Types = myMesh->getTypes(MED_CELL) ;
 
   cout << "Show Connectivity (Nodal) :" << endl ;
   for (int i=0; i<NumberOfTypes; i++) {
     cout << "For type " << Types[i] << " : " << endl ;
     int NumberOfElements = myMesh->getNumberOfElements(MED_CELL,Types[i]);
-    int * connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,Types[i]);
+    const int * connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,Types[i]);
     int NomberOfNodesPerCell = Types[i]%100 ;
     for (int j=0;j<NumberOfElements;j++){
       cout << "Element "<< j+1 <<" : " ;
@@ -42,8 +68,8 @@ void affiche_connectivity(CONNECTIVITY * myConnectivity, MESH * myMesh)
   }
 
   cout << "Show Reverse Nodal Connectivity :" << endl ;
-  int * ReverseNodalConnectivity = myMesh->getReverseConnectivity(MED_NODAL) ;
-  int * ReverseNodalConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_NODAL) ;
+  const int * ReverseNodalConnectivity = myMesh->getReverseConnectivity(MED_NODAL) ;
+  const int * ReverseNodalConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_NODAL) ;
   for (int i=0; i<NumberOfNodes; i++) {
     cout << "Node "<<i+1<<" : " ;
     for (int j=ReverseNodalConnectivityIndex[i];j<ReverseNodalConnectivityIndex[i+1];j++)
@@ -53,8 +79,8 @@ void affiche_connectivity(CONNECTIVITY * myConnectivity, MESH * myMesh)
 
   cout << "Show Connectivity (Descending) :" << endl ;
   int NumberOfElements ;
-  int * connectivity ;
-  int * connectivity_index ;
+  const int * connectivity ;
+  const int * connectivity_index ;
   myMesh->calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL);
   try {
     NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
@@ -73,8 +99,8 @@ void affiche_connectivity(CONNECTIVITY * myConnectivity, MESH * myMesh)
   }
 
   cout << "Show Reverse Descending Connectivity :" << endl ;
-  int * ReverseDescendingConnectivity = myMesh->getReverseConnectivity(MED_DESCENDING) ;
-  int * ReverseDescendingConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_DESCENDING) ;
+  const int * ReverseDescendingConnectivity = myMesh->getReverseConnectivity(MED_DESCENDING) ;
+  const int * ReverseDescendingConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_DESCENDING) ;
 
   int NumberOfConstituents  = 0;
   string constituent ;
@@ -103,8 +129,8 @@ void affiche_connectivity(CONNECTIVITY * myConnectivity, MESH * myMesh)
     }
   }
   cout << "Show "<<constituent<<" Connectivity (Nodal) :" << endl ;
-  int * face_connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
-  int * face_connectivity_index =  myMesh->getConnectivityIndex(MED_NODAL,constituentEntity);
+  const int * face_connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
+  const int * face_connectivity_index =  myMesh->getConnectivityIndex(MED_NODAL,constituentEntity);
   for (int i=0; i<NumberOfConstituents; i++) {
     cout << constituent <<i+1<<" : " ;
     for (int j=face_connectivity_index[i];j<face_connectivity_index[i+1];j++)
@@ -117,7 +143,7 @@ void affiche_connectivity(CONNECTIVITY * myConnectivity, MESH * myMesh)
 int main (int argc, char ** argv) {
 
 
-  if (argc !=3) {
+  if (argc <3) { // after 3, ignored !
     cerr << "Usage : " << argv[0] 
 	 << " filename meshname" << endl << endl;
     exit(-1);
@@ -134,11 +160,18 @@ int main (int argc, char ** argv) {
   myMeshDriver.read() ; //A partir d'ici la connectivité est construite
   myMeshDriver.close() ;
 
-  CONNECTIVITY * myConnectivity = myMesh->getConnectivityptr();
+  const CONNECTIVITY * myConnectivity = myMesh->getConnectivityptr();
   affiche_connectivity(myConnectivity, myMesh);
+
   CONNECTIVITY * myConnectivity2 = new CONNECTIVITY(* myConnectivity);
   affiche_connectivity(myConnectivity2, myMesh);
-  delete myConnectivity;//myConnectivity utile pour afficher myConnectivity2 via myMesh!
+
+  CONNECTIVITY * myConnectivity3 = new CONNECTIVITY(* myConnectivity2);
+  delete myConnectivity2;
+  affiche_connectivity(myConnectivity3, myMesh);
+  delete myConnectivity3;
+
+  delete myMesh ;
 
   return 0;
 }
