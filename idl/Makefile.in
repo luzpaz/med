@@ -6,7 +6,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=..
 srcdir=@srcdir@
-VPATH=.:$(srcdir)
+VPATH=.:$(srcdir):${KERNEL_ROOT_DIR}/idl/salome
 
 @COMMENCE@
 

@@ -11,7 +11,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:$(srcdir):$(top_srcdir)/idl
+VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl
 
 
 @COMMENCE@
@@ -43,7 +43,7 @@ LIB_SERVER_IDL =
 CPPFLAGS += $(QT_INCLUDES) $(VTK_INCLUDES) $(OCC_INCLUDES) $(PYTHON_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
 CXXFLAGS += -I${KERNEL_ROOT_DIR}/include/salome
 
-LDFLAGS += -lSalomeGUI -lmedmem -lMEDImpl -lMedEngine -lSMESHFiltersSelection -L${KERNEL_ROOT_DIR}/lib
+LDFLAGS += -lSalomeGUI -lmedmem -lMEDImpl -lMedEngine -lSMESHFiltersSelection -L${KERNEL_ROOT_DIR}/lib/salome
 
 
 MED.hh MEDSK.cc: MED.idl
