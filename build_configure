@@ -97,6 +97,9 @@ then
 fi
 chmod u-w configure.in.base 
 
+# make a link allowing AC_OUTPUT to find the salome_adm/.../*.in  files
+echo "" >> configure.in_tmp1
+echo 'ln -fs ${KERNEL_ROOT_DIR}/salome_adm ${ROOT_SRCDIR}/salome_adm' >> configure.in_tmp1
 
 echo  "" >> configure.in_tmp1
 echo "AC_OUTPUT([ \\" >> configure.in_tmp1
@@ -107,15 +110,15 @@ echo "AC_OUTPUT([ \\" >> configure.in_tmp1
 # put them "manually"
 #
 
-echo "	${KERNEL_ROOT_DIR}/salome_adm/unix/SALOMEconfig.h \\" >> configure.in_tmp1
-echo "	${KERNEL_ROOT_DIR}/salome_adm/unix/F77config.h \\" >> configure.in_tmp1
-echo "	${KERNEL_ROOT_DIR}/salome_adm/unix/sstream \\" >> configure.in_tmp1
-echo "	${KERNEL_ROOT_DIR}/salome_adm/unix/depend \\" >> configure.in_tmp1
-echo "	${KERNEL_ROOT_DIR}/salome_adm/unix/make_omniorb \\" >> configure.in_tmp1
-echo "	${KERNEL_ROOT_DIR}/salome_adm/unix/envScript \\" >> configure.in_tmp1
-echo "	${KERNEL_ROOT_DIR}/salome_adm/unix/make_commence \\" >> configure.in_tmp1
-echo "	${KERNEL_ROOT_DIR}/salome_adm/unix/make_conclude \\" >> configure.in_tmp1
-echo "	${KERNEL_ROOT_DIR}/salome_adm/unix/make_module \\" >> configure.in_tmp1
+echo "	./salome_adm/unix/SALOMEconfig.h \\" >> configure.in_tmp1
+echo "	./salome_adm/unix/F77config.h \\" >> configure.in_tmp1
+echo "	./salome_adm/unix/sstream \\" >> configure.in_tmp1
+echo "	./salome_adm/unix/depend \\" >> configure.in_tmp1
+echo "	./salome_adm/unix/make_omniorb \\" >> configure.in_tmp1
+echo "	./salome_adm/unix/envScript \\" >> configure.in_tmp1
+echo "	./salome_adm/unix/make_commence \\" >> configure.in_tmp1
+echo "	./salome_adm/unix/make_conclude \\" >> configure.in_tmp1
+echo "	./salome_adm/unix/make_module \\" >> configure.in_tmp1
 
 \rm -f configure.in_tmp2 configure.in_tmp3
 touch configure.in_tmp2
@@ -125,6 +128,10 @@ sed '/configure.in/d' configure.in_tmp3 >  configure.in_tmp2
 sed 's/.in / /' configure.in_tmp2 >> configure.in_tmp1
 
 echo  "])" >> configure.in_tmp1
+
+# delete the link created for AC_OUTPUT
+echo "" >> configure.in_tmp1
+echo 'rm -f ${ROOT_SRCDIR}/salome_adm' >> configure.in_tmp1
 \mv configure.in_tmp1 configure.in_new
 \rm  -f configure.in_tmp2 configure.in_tmp3
 
