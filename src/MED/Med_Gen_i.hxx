@@ -14,6 +14,7 @@
 #include <map>
 #include CORBA_SERVER_HEADER(Med_Gen)
 #include CORBA_SERVER_HEADER(MED)
+#include CORBA_SERVER_HEADER(SALOME_ModuleCatalog)
 
 #include "SALOME_Component_i.hxx"
 #include "SALOME_NamingService.hxx"
