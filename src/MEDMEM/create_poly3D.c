@@ -1,9 +1,11 @@
 /*
   creation d'une geometrie 3d : 
-  maillé en 2 polyedres
-  ayant pour faces 3 polygones
-                   9 quadrangles
-		   6 triangles
+  maillé en :
+  - 2 polyedres
+    ayant pour faces 3 polygones
+                     9 quadrangles
+		     6 triangles
+  - 1 tetra4
 
 */
 
@@ -15,13 +17,13 @@ int main (int argc, char **argv)
   med_err ret;
   med_idt fid;
   char maa[MED_TAILLE_NOM+1] = "poly3D";
-  char maadesc[MED_TAILLE_DESC+1] = "Example de maillage non structure 3D avec 2 polyedres comme mailles et 3 polygones comme faces";
+  char maadesc[MED_TAILLE_DESC+1] = "Example de maillage non structure 3D avec 2 polyedres+1tetra4 comme mailles et 3 polygones comme faces";
   med_int mdim = 3;
-  med_int nnoe = 18;
+  med_int nnoe = 19;
   /*
     les noeuds:
   */
-  med_float coo[54] = {
+  med_float coo[57] = {
     2.0, 3.0, 2.0,
     3.0, 2.0, 2.0,
     4.0, 1.0, 2.0,
@@ -39,33 +41,33 @@ int main (int argc, char **argv)
     6.0, 0.0, 2.0,
     6.0, 3.0, 0.0,
     7.0, 2.0, 0.0,
-    6.0, 0.0, -1.0
+    6.0, 0.0, -1.0,
+    5.0, 1.0, -3.0 
   };
   char nomcoo[3*MED_TAILLE_PNOM+1] = "x               y               z               ";
   char unicoo[3*MED_TAILLE_PNOM+1] = "cm              cm              cm              ";
   /*  char nomnoe[18*MED_TAILLE_PNOM+1] = "nom1    nom2    nom3    nom4";*/
   char *nomnoe ;
-  med_int numnoe[18] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18};
-  med_int nufano[18] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  med_int numnoe[19] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
+  med_int nufano[19] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
   /*
     les elements:
   */
   /* Faces QUAD4 */
-  med_int nquad4 = 9;
-  med_int quad4[36] = {
+  med_int nquad4 = 8;
+  med_int quad4[32] = {
     1, 7, 8, 2,
     2, 8, 9, 3,
     4, 3, 9, 10,
     5, 4, 10, 11,
     6, 5, 11, 12,
     1, 6, 12, 7,
-    13, 2, 8, 16,
     14, 13, 16, 17,
     8, 9, 17, 16
   };
-  char nomquad4[MED_TAILLE_PNOM*9+1] = "quad1           quad2           quad3           quad4           quad5           quad6           quad7           quad8           quad9           ";
-  med_int numquad4[9] = {2,3,4,5,6,7,11,12,17};
-  med_int nufaquad4[9] = {-1,-1,-1,-1,-1,-1,-1,-1,-1};
+  char nomquad4[MED_TAILLE_PNOM*8+1] = "quad1           quad2           quad3           quad4           quad5           quad6           quad7           quad8           ";
+  med_int numquad4[9] = {2,3,4,5,6,7,12,17};
+  med_int nufaquad4[9] = {-1,-1,-1,-1,-1,-1,-1,-1};
 
   /* Faces TRIA3 */
   med_int ntria3 = 6;
@@ -106,8 +108,17 @@ int main (int argc, char **argv)
 				      39,44,48,52,55,58,61,64,68,72,75};
   med_int polyhedronindex[3] = {1,10,20};
   char nompolyhedron[MED_TAILLE_PNOM*2+1] = "polyhedron1     polyhedron2     ";
-  med_int numpolyhedron[2] = {1,2};
+  med_int numpolyhedron[2] = {2,3};
   med_int nufapolyhedron[2] = {-4,-4};
+
+  /* Mailles TETRA4 */
+  med_int ntetra4 = 1;
+  med_int tetra4[4] = {
+    17, 9, 18, 19
+  };
+  char nomtetra4[MED_TAILLE_PNOM*1+1] = "tetra1          ";
+  med_int numtetra4[1] = {1};
+  med_int nufatetra4[1] = {-5};
 
 
   char nomfam[MED_TAILLE_NOM+1];
@@ -128,13 +139,13 @@ int main (int argc, char **argv)
   char champ1[MED_TAILLE_NOM+1]="fieldnodeint" ;
   char champ1_comp[MED_TAILLE_PNOM+1]="comp1           " ;
   char champ1_unit[MED_TAILLE_PNOM+1]="M               " ;
-  med_int     fieldnodeint[18]    = {1,1,3,2,2,3,4,4,5,6,6,7,8,8,9,9,9,10};
+  med_int     fieldnodeint[19]    = {1,1,3,2,2,3,4,4,5,6,6,7,8,8,9,9,9,10,5};
 
   char champ2[MED_TAILLE_NOM+1]="fieldnodedouble" ;
   char champ2_comp[MED_TAILLE_PNOM+1]="comp1           " ;
   char champ2_unit[MED_TAILLE_PNOM+1]="J               " ;
-  med_float   fieldnodedouble1[18] = {1.,3.,4.,1.,3.,4.,3.,2.,5.,6.,4.,3.,1.,5.,6.,4.,3.,7.};
-  med_float   fieldnodedouble2[18] = {1.,2.,2.,3.,3.,3.,4.,4.,5.,2.,8.,9.,6.,7.,1.,2.,5.,8.};
+  med_float   fieldnodedouble1[19] = {1.,3.,4.,1.,3.,4.,3.,2.,5.,6.,4.,3.,1.,5.,6.,4.,3.,7.,3.};
+  med_float   fieldnodedouble2[19] = {1.,2.,2.,3.,3.,3.,4.,4.,5.,2.,8.,9.,6.,7.,1.,2.,5.,8.,4.};
 
   char champ3[MED_TAILLE_NOM+1]="fieldfacedouble" ;
   char champ3_comp[MED_TAILLE_PNOM*2+1]="comp1           comp2           " ;
@@ -186,7 +197,7 @@ int main (int argc, char **argv)
 			 MED_MAILLE,MED_TRIA3,MED_NOD);
   printf("MEDelementsEcr for tria : %d \n",ret);
 
-  /* ecriture des faces MED_POLYGONE:
+  /* ecriture des faces MED_POLYGONE :
      - connectivite
      - noms (optionnel) 
      - numeros (optionnel)
@@ -209,7 +220,7 @@ int main (int argc, char **argv)
     MEDfamEcr(fid,maa,nufapolygon,npolygon,MED_MAILLE,MED_POLYGONE);
   printf("MEDfamEcr for polygon : %d \n",ret);
 
-  /* ecriture des mailles MED_POLYEDRE:
+  /* ecriture des mailles MED_POLYEDRE :
      - connectivite
      - noms (optionnel) 
      - numeros (optionnel)
@@ -231,6 +242,16 @@ int main (int argc, char **argv)
     ret = MEDfamEcr(fid,maa,nufapolyhedron,npolyhedron,MED_MAILLE,MED_POLYEDRE);
   printf("MEDfamEcr for polyhedron : %d \n",ret);
 
+  /* ecriture des mailles TETRA4 :
+     - connectivite
+     - noms (optionnel) 
+     - numeros (optionnel)
+     - numeros des familles */
+  if (ret == 0)
+    ret = MEDelementsEcr(fid,maa,mdim,tetra4,MED_FULL_INTERLACE,
+			 nomtetra4,MED_FAUX,numtetra4,MED_VRAI,nufatetra4,ntetra4,
+			 MED_MAILLE,MED_TETRA4,MED_NOD);
+  printf("MEDelementsEcr for tetra : %d \n",ret);
 
   /***************************************************************************/
   /* ecriture des familles */
@@ -257,6 +278,7 @@ int main (int argc, char **argv)
       - 2 familles d'elements de dimension (d)
         en fait de face (-10)
   */
+  /*
   if (ret == 0)
     {
       numfam = -1;
@@ -314,8 +336,22 @@ int main (int argc, char **argv)
       ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
 		     natt,gro,ngro);
       printf("MEDfamCr : %d\n",ret);
-    }
 
+      numfam = -5;
+      strcpy(nomfam,"FAMILLE_MAILLE_TETRA4");
+      sprintf(nomfam,"%s%d",nomfam,-numfam);
+      attide = 1;
+      attval = numfam*100;
+      natt = 1;
+      strcpy(attdes,"description attribut");
+      strcpy(gro,"groupe0");
+      ngro = 1;
+
+      ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
+		     natt,gro,ngro);
+      printf("MEDfamCr : %d\n",ret);
+    }
+  */
   /***************************************************************************/
   /*
     Les champs
@@ -374,7 +410,6 @@ int main (int argc, char **argv)
 	printf("MEDchampEcr : %d \n",ret);
       }
     }
-
   /***************************************************************************/
 
   ret = MEDfermer(fid);

@@ -180,7 +180,7 @@ void MED_MESH_RDONLY_DRIVER::read(void)
   
   if (getFAMILY()!=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY"      )) ;
-  
+
   updateFamily();
 
   // we build all groups
@@ -639,7 +639,7 @@ int MED_MESH_RDONLY_DRIVER::getCONNECTIVITY()
 	  Connectivity->_constituent=ConnectivityFace ; 
         }
       }
-      
+
       // read MED_EDGE connectivity
       if (_ptrMesh->_meshDimension > 1) { // we are in 3 or 2D 
         MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES ARRETES...." );
@@ -1000,10 +1000,10 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 		  int * constituentArray = NodalValue + NodalIndex[constituent->_count[i]-1]-1 ;
 	  
 		  // version originale sans prise en compte des numéros optionnels
-		  //	
+		  int multi = 0; // quand est-ce que multi vaut 1 ?? en MED-fichier < 2.2 ??
 		  for (int j=0; j<tmp_numberOfFaces; j++)
 		    for (int k=0; k<NumberOfNodeByFace; k++)
-		      constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace+1)+k] ;
+		      constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace+multi)+k] ;
 
 		  //////////////////////////////////////////////////////////////////////////////////////
 		  ///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
@@ -1119,10 +1119,10 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 		  int * constituentArray = NodalValue + NodalIndex[constituent->_count[i]-1]-1 ;
 	  
 		  // version originale sans prise en compte des numéros optionnels	
-		  //
+		  int multi = 0; // quand est-ce que multi vaut 1 ?? en MED-fichier < 2.2 ??
 		  for (int j=0; j<tmp_numberOfEdges; j++)
 		    for (int k=0; k<NumberOfNodeByEdge; k++)
-		      constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge+1)+k] ;
+		      constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge+multi)+k] ;
 
 		  //////////////////////////////////////////////////////////////////////////////////////
 		  ///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
