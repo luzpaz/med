@@ -11,8 +11,24 @@ VPATH=.:$(srcdir)
 @COMMENCE@
 
 IDL_FILES = \
+  SALOME_Exception.idl \
+  SALOME_ModuleCatalog.idl \
+  SALOME_DataTypeCatalog.idl \
+  SALOME_RessourcesCatalog.idl \
+  SALOMEDS.idl \
+  SALOMEDS_Attributes.idl \
+  SALOME_Session.idl \
   SALOME_Component.idl \
-  MED.idl
+  SALOME_TestComponent.idl \
+  SALOME_Registry.idl \
+  MED.idl \
+  Med_Gen.idl \
+  Logger.idl \
+  SMESH_Mesh.idl \
+  SMESH_Hypothesis.idl \
+  SMESH_BasicHypothesis.idl \
+  GEOM_Shape.idl \
+  VISU_Gen.idl
 
 PY_CLIENT_IDL = $(IDL_FILES)
 

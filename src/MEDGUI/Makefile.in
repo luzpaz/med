@@ -11,7 +11,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:$(srcdir):$(top_builddir)/share/salome/idl
+VPATH=.:$(srcdir):$(top_srcdir)/idl
 
 
 @COMMENCE@

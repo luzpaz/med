@@ -20,6 +20,12 @@ if test ! -d "${KERNEL_ROOT_DIR}"; then
     exit
 fi
 
+# Test if the KERNEL_SRC is set correctly
+
+if test ! -d "${KERNEL_SRC}"; then
+    echo "failed : KERNEL_SRC variable is not correct !"
+    exit
+fi
 ########################################################################
 # find_in - utility function
 #
