@@ -429,7 +429,8 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(field);
 
-      field->setName("Corba Double Field");
+      // MT : Keep the local field name
+      //      field->setName("Corba Double Field");
 
       field->setDescription("Got From A Local One");
 
@@ -471,7 +472,8 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(field);
 
-      field->setName("Corba Integer Field");
+      // MT : Keep the local field name
+      //    field->setName("Corba Integer Field");
 
       field->setDescription("Got From A Local One");
 
