@@ -1,32 +1,11 @@
-//  MED MedMem : MED idl descriptions implementation based on the classes of MEDMEM
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : Mesh_i.cxx
-//  Author : EDF 
-//  Module : MED
-//  $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Mesh_i.cxx
+//=============================================================================
+// File      : Mesh_i.cxx
+// Project   : SALOME
+// Author    : EDF 
+// Copyright : EDF 2002
+// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Mesh_i.cxx
+//=============================================================================
 
-using namespace std;
 #include <vector>
 
 #include "utilities.h"
@@ -91,7 +70,7 @@ MESH_i::MESH_i(::MESH * const m ) :_mesh(m),
 }
 //=============================================================================
 /*!
- * Constructor par recopie
+ * Copy Constructor 
  */
 //=============================================================================
 //MESH_i::MESH_i(const MESH_i & m) :_mesh(m._mesh),
@@ -105,7 +84,7 @@ MESH_i::MESH_i( MESH_i & m) :_mesh(m._mesh),
 }
 //=============================================================================
 /*!
- * 
+ * Internal Method in order to have a const ptr
  */
 //=============================================================================
 ::MESH * MESH_i::constructConstMesh() const
@@ -198,7 +177,7 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Coordinates System
  */
 //=============================================================================
-char * MESH_i::getCoordinateSystem()
+char * MESH_i::getCoordinatesSystem()
 throw (SALOME::SALOME_Exception)
 {
 	if (_mesh==NULL)
@@ -460,8 +439,7 @@ MESSAGE("MED_NODAL");
 			const int * tab=_mesh->getConnectivityIndex(
 				convertIdlConnToMedConn(mode),
 				convertIdlEntToMedEnt(entity));
-			nbelements = elt1*(convertIdlEltToMedElt(geomElement)%100);
-			//nbelements = tab[elt1 ] - 1 ;
+			nbelements = tab[elt1 ] - 1 ;
 		}
 SCRUTE(entity);
 SCRUTE(geomElement);
@@ -604,7 +582,6 @@ throw (SALOME::SALOME_Exception)
         Engines::long_array_var myseq= new Engines::long_array;
         try
         {
-                //int nbelements= ????
                 int nbelements; 
 		if ( mode == SALOME_MED::MED_DESCENDING)
 		{
@@ -980,7 +957,7 @@ throw (SALOME::SALOME_Exception)
  */
 //=============================================================================
 void MESH_i::addInStudy(SALOMEDS::Study_ptr myStudy,SALOME_MED::MESH_ptr myIor )
-throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
+throw (SALOME::SALOME_Exception)
 {
 	BEGIN_OF("MED_Mesh_i::addInStudy");
 	if ( _meshId != "" )
@@ -996,13 +973,12 @@ throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
         SALOMEDS::AttributeIOR_var     aIOR;
 
  	// Find SComponent labelled 'MED'
-	SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
+	SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
   	if ( CORBA::is_nil(medfather) ) 
 	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
 
  	// Create SObject labelled 'MESH' if it doesn't already exit
 	SALOMEDS::SObject_var medmeshfather = myStudy->FindObject("MEDMESH");
- 	myBuilder->NewCommand();
   	if ( CORBA::is_nil(medmeshfather) ) 
 	{
     		MESSAGE("Add Object MEDMESH");
@@ -1015,6 +991,7 @@ throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
   	} ;
 
    	MESSAGE("Add a mesh Object under MED/MEDMESH");
+ 	myBuilder->NewCommand();
   	SALOMEDS::SObject_var newObj = myBuilder->NewObject(medmeshfather);
 
 	ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
@@ -1038,7 +1015,7 @@ throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
  */
 //=============================================================================
 void MESH_i::addInStudy(SALOMEDS::Study_ptr myStudy,SALOME_MED::MESH_ptr myIor,const string & fileName )
-throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
+throw (SALOME::SALOME_Exception)
 {
         BEGIN_OF("MED_Mesh_i::addInStudy");
         if ( _meshId != "" )
@@ -1055,13 +1032,12 @@ throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
         SALOMEDS::AttributeComment_var aComment;
 
         // Find SComponent labelled 'Med'
-        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
+        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
         if ( CORBA::is_nil(medfather) )
           THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
 
         // Create SObject labelled 'MESH' if it doesn't already exit
         SALOMEDS::SObject_var medmeshfather = myStudy->FindObject("MEDMESH");
-        myBuilder->NewCommand();
         if ( CORBA::is_nil(medmeshfather) )
         {
                 MESSAGE("Add Object MEDMESH");
@@ -1074,6 +1050,7 @@ throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
         } ;
 
         MESSAGE("Add a mesh Object under MED/MEDMESH");
+        myBuilder->NewCommand();
         SALOMEDS::SObject_var newObj = myBuilder->NewObject(medmeshfather);
 
         ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;

@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_Array.hxx
-//  Module : MED
-
 #ifndef __MEDARRAY_H__
 #define __MEDARRAY_H__
 
@@ -119,6 +93,8 @@ public :
   void setIJ (const med_int i, const med_int j, const T  value);
 
   void calculateOther();
+  bool isOtherCalculated() const {return (const T*)_valuesOther != NULL;}
+  void clearOtherMode();
 };
 
 //-------------------------------------------------//
@@ -273,9 +249,9 @@ template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & p,bool copyOther ):
   					_ldValues(p._ldValues),
 					_lengthValues(p._lengthValues),
   					_mode(p._mode),
-					_valuesDefault(),
-					_valuesNo(),
 					_valuesFull(),
+					_valuesNo(),
+					_valuesDefault(),
 					_valuesOther()
 {
   BEGIN_OF("Constructeur deepCopy MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & m,bool copyOther");
@@ -318,7 +294,7 @@ template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & p,bool copyOther ):
 //  				    It DOES NOT copy of the memory.
 //  				    The two objects will share data./n */
 
-template <class T> MEDARRAY<T> & MEDARRAY<T>::MEDARRAY::operator = (const MEDARRAY & m)
+template <class T> MEDARRAY<T> & MEDARRAY<T>::operator = (const MEDARRAY & m)
 {
 
   BEGIN_OF("Operator = MEDARRAY<T>");
@@ -584,9 +560,24 @@ template <class T> void MEDARRAY<T>::set(const medModeSwitch mode, const T* valu
     }
   _valuesOther.set(0);
 
-   END_OF("MEDARRAY<T>::set(mode,i,value)");
+  END_OF("MEDARRAY<T>::set(mode,i,value)");
 }
 
+/*! This function clears the other mode of representation if it exists
+ *  It is usefull for people who needs for optimisation reasons to work directly
+ *  on the inside array without using set-functions 
+ */
+template <class T> void MEDARRAY<T>::clearOtherMode()
+{
+    if(isOtherCalculated())
+    {
+	if ( _mode == MED_FULL_INTERLACE)
+	    _valuesNo.set(0);
+	else
+	    _valuesFull.set(0);
+	_valuesOther.set(0);
+    }
+}
 
 
 //				------------------

@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_Coordinate.hxx
-//  Module : MED
-
 /*
  File Coordinate.hxx
  $Header$
@@ -66,7 +40,7 @@ protected:
 					 Storing the object (not a pointer to this object) is more convenient for memory
 					 management.
 					 */
-  MEDARRAY<double>            _coordinate;
+  mutable MEDARRAY<double>            _coordinate;
 
 				     /*! PointerOf to an array of size spaceDimension storing axes names*/
   PointerOf<string>          _coordinateName;
@@ -87,7 +61,7 @@ public :
   COORDINATE();
   COORDINATE(int SpaceDimension, int NumberOfNodes, medModeSwitch Mode);
   COORDINATE(const COORDINATE & m);
-  ~COORDINATE();
+  virtual ~COORDINATE();
 
   void setCoordinates(MEDARRAY<double> *Coordinate);
   void setCoordinates(const medModeSwitch Mode, const double *Coordinate);
@@ -101,13 +75,13 @@ public :
   int             getSpaceDimension() const;
   int             getNumberOfNodes() const;
 
-  const int*      getNodesNumbers() const;
+  virtual const int*      getNodesNumbers() const;
   //const int*            getNodesNumbers() ;
   string          getCoordinatesSystem() const;
 
-  const double *  getCoordinates(medModeSwitch Mode);
-  double          getCoordinate(int Number,int Axis);
-  const double *  getCoordinateAxis(int Axis);
+  virtual const double *  getCoordinates(medModeSwitch Mode);
+  virtual double          getCoordinate(int Number,int Axis);
+  virtual const double *  getCoordinateAxis(int Axis);
 
   const string * getCoordinatesNames() const;
   string   getCoordinateName(int Axis) const;

@@ -1,12 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  CEA/DEN, EDF R&D
-//
-//
-//
-//  File   : MEDMEM_Meshing.cxx
-//  Module : MED
-
 using namespace std;
 /*
   File MEDMEM_Meshing.cxx
@@ -262,6 +253,10 @@ void MESHING::setConnectivities (const int * ConnectivityIndex,
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESHING::setConnectivities : " ;
+  SCRUTE(Entity);
+  SCRUTE(ConnectivityType);
+  SCRUTE(ConnectivityValue);
+  SCRUTE(ConnectivityIndex);
 
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not Yet Implemented :: Warning !"));
 }

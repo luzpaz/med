@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_DriversDef.hxx
-//  Module : MED
-
 # ifndef DRIVERS_DEF_HXX
 # define DRIVERS_DEF_HXX
 
@@ -35,6 +9,7 @@
 using namespace std ;
 
 #include "MEDMEM_define.hxx"
+#include "utilities.h"
 namespace MED_FR 
 {
 
@@ -53,6 +28,7 @@ class GEO_NAME : public map<int,string>
 public :
   
   GEO_NAME();
+  ~GEO_NAME();
   string & operator[]( const MED_FR::med_geometrie_element &c ) const;
 } ;
 
@@ -76,6 +52,7 @@ class ENT_NAME : public map<int,string>
 public :
 
   ENT_NAME ();
+  ~ENT_NAME();
   string & operator[]( const MED_FR::med_entite_maillage &c ) const;
 } ;
 
@@ -100,6 +77,7 @@ class MESH_ENTITIES : public map<int, const list<MED_FR::med_geometrie_element> 
 public :
 
   MESH_ENTITIES ();
+  ~MESH_ENTITIES();
   const list<MED_FR::med_geometrie_element> & operator[]( const  MED_FR::med_entite_maillage &c ) const;
   
 private:

@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_MedFieldDriver.hxx
-//  Module : MED
-
 #ifndef MED_FIELD_DRIVER_HXX
 #define MED_FIELD_DRIVER_HXX
 
@@ -522,6 +496,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 	MESSAGE("MED_GEOM :"<<(MED_FR::med_geometrie_element)Types[i]);
 	MESSAGE("Iteration :"<<_ptrField->getIterationNumber());
 	MESSAGE("Order :"<<_ptrField->getOrderNumber());
+        _ptrField->_numberOfValues+=NumberOfValues[i]; // problem with gauss point : _numberOfValues != TotalNumberOfValues !!!!!!!
 	if ( MED_FR::MEDchampLire(_medIdt,const_cast <char*> (MeshName.c_str()),
 				  const_cast <char*> (_fieldName.c_str()),
 				  (unsigned char*) myValues[i],
@@ -574,7 +549,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 	for (int j=0; j<NumberOfTypes; j++) {
 	  T * myValue = myValues[j] ;
 	  int NumberOf = NumberOfValues[j] ;
-	  _ptrField->_numberOfValues+=NumberOf; // problem with gauss point : _numberOfValues != TotalNumberOfValues !!!!!!!
+//	  _ptrField->_numberOfValues+=NumberOf; // problem with gauss point : _numberOfValues != TotalNumberOfValues !!!!!!!
 	  int offset = NumberOf*i ;
 	  for (int k=0 ; k<NumberOf; k++) {
 	    //ValuesT[Count]=myValue[k+offset] ;
@@ -647,6 +622,8 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
       MESSAGE("component_unit=|"<<component_unit<<"|");
 
       MED_EN::med_type_champ ValueType=_ptrField->getValueType() ;
+      
+      MESSAGE("Template Type =|"<<ValueType<<"|");
       
       // le champ existe deja ???
       char * champName = new char[MED_TAILLE_NOM+1] ;
@@ -729,33 +706,63 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
       for (int i=0;i<NumberOfType;i++) {
 	int NumberOfElements = mySupport->getNumberOfElements(Types[i]) ;
 	
-	MESSAGE(" "<<_ptrField->getName());
-	MESSAGE(" "<<NumberOfElements);
-	MESSAGE(" "<<NumberOfGaussPoint[i]);
-	MESSAGE(" "<<mySupport->getEntity());
-	MESSAGE(" "<<Types[i]);
-	MESSAGE(" "<<_ptrField->getIterationNumber());
-	MESSAGE(" "<<_ptrField->getTime());
-	MESSAGE(" "<<_ptrField->getOrderNumber());
-	MESSAGE("MEDchampEcr :"<<MeshName.c_str());
-	
 	const T * value = _ptrField->getValueI(MED_EN::MED_FULL_INTERLACE,Index) ;
+	
+	MESSAGE("_medIdt                         : "<<_medIdt);
+	MESSAGE("MeshName.c_str()                : "<<MeshName.c_str());
+	MESSAGE("_ptrField->getName()            : "<<_ptrField->getName());
+	MESSAGE("value                           : "<<value);
+	MESSAGE("NumberOfElements                : "<<NumberOfElements);
+	MESSAGE("NumberOfGaussPoint[i]           : "<<NumberOfGaussPoint[i]);
+	MESSAGE("mySupport->getEntity()          : "<<mySupport->getEntity());
+	MESSAGE("Types[i]                        : "<<Types[i]);
+	MESSAGE("_ptrField->getIterationNumber() : "<<_ptrField->getIterationNumber());
+	MESSAGE("_ptrField->getTime()            : "<<_ptrField->getTime());
+	MESSAGE("_ptrField->getOrderNumber()     : "<<_ptrField->getOrderNumber());
+	
+/*	char chanom[MED_TAILLE_NOM+1];
+	char chacomp[MED_TAILLE_NOM+1];
+	char chaunit[MED_TAILLE_NOM+1];
+	MED_FR::med_type_champ chatype;
+	med_int chancomp=1;
+	
+	err=MED_FR::MEDchampInfo(_medIdt,1,chanom,&chatype,chacomp,chaunit,chancomp);
 
-	err=MED_FR::MEDchampEcr(_medIdt, const_cast <char*> ( MeshName.c_str()) ,                         //( string(mesh_name).resize(MED_TAILLE_NOM).c_str())
+	if (err<0) 
+		{
+		cout<<"=======================================================================> gros probleme"<<endl;
+		exit(-1);
+		}
+	cout<<"==================> nom lu            = "<<chanom<<endl;
+	cout<<"==================> type lu           = "<<chatype<<endl;
+	cout<<"==================> nom composante lu = "<<chacomp<<endl;
+	cout<<"==================> nom unit lu       = "<<chaunit<<endl;
+	cout<<"==================> valeur de MED_FR::MED_REEL64 = "<<MED_FR::MED_REEL64<<endl;
+*/	
+
+	err=MED_FR::MEDchampEcr(_medIdt, 
+				const_cast <char*> ( MeshName.c_str()) ,                         //( string(mesh_name).resize(MED_TAILLE_NOM).c_str())
 				const_cast <char*> ( (_ptrField->getName()).c_str()),
-				(unsigned char*)value, MED_FR::MED_FULL_INTERLACE,
+				(unsigned char*)value, 
+				MED_FR::MED_FULL_INTERLACE,
 				NumberOfElements,
-				NumberOfGaussPoint[i],MED_ALL, MED_NOPFL, MED_FR::MED_REMP,  // PROFIL NON GERE, mode de remplacement non géré
+				NumberOfGaussPoint[i],
+				MED_ALL,
+				MED_NOPFL,
+				MED_FR::MED_REMP,  // PROFIL NON GERE, mode de remplacement non géré
 				(MED_FR::med_entite_maillage)mySupport->getEntity(),
 				(MED_FR::med_geometrie_element)Types[i],
-				_ptrField->getIterationNumber(),"        ",
-				_ptrField->getTime(),_ptrField->getOrderNumber()
+				_ptrField->getIterationNumber(),
+				"        ",
+				_ptrField->getTime(),
+				_ptrField->getOrderNumber()
 				);
 	if (err < MED_VALID )
 	  throw MEDEXCEPTION(LOCALIZED( STRING(LOC)
 					<<": Error in writing Field "<< _ptrField->getName() <<", type "<<Types[i]
 					)
 			     );
+
 	Index += NumberOfElements ;
 	
       }

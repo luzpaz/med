@@ -1,30 +1,11 @@
-//  MED MedMem : MED idl descriptions implementation based on the classes of MEDMEM
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : FieldOf_i.hxx
-//  Author : EDF
-//  Module : MED
-//  $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/FieldOf_i.hxx
+//=============================================================================
+// File      : FieldOf_i.hxx
+// Project   : SALOME
+// Author    : EDF
+// Copyright : EDF 2002
+// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/FieldOf_i.hxx
+//=============================================================================
+
 
 #ifndef MED_FIELDOF_I_HXX_
 #define MED_FIELDOF_I_HXX_
@@ -93,7 +74,7 @@ public :
     Engines::string_array * getComponentsNames()  throw (SALOME::SALOME_Exception);
     Engines::string_array * getComponentsUnits()  throw (SALOME::SALOME_Exception);
     void addInStudy(SALOMEDS::Study_ptr myStudy, 
-		    SALOME_MED::FIELD_ptr myIor)  throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
+		    SALOME_MED::FIELD_ptr myIor)  throw (SALOME::SALOME_Exception);
 
     CORBA::Long addDriver (SALOME_MED::medDriverTypes driverType, 
 			   const char* fileName, const char* fieldName)
@@ -472,7 +453,7 @@ throw (SALOME::SALOME_Exception)
 //=============================================================================
 template <class T> void FIELDOF_i<T>::addInStudy(SALOMEDS::Study_ptr myStudy, 
 						 SALOME_MED::FIELD_ptr myIor )
-throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
+throw (SALOME::SALOME_Exception)
 {
         BEGIN_OF(" FIELDOF_i::addInStudy");
         if (_fieldTptr==NULL)
@@ -492,14 +473,12 @@ throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
         SALOMEDS::AttributeIOR_var     aIOR;
 
         // Create SComponent labelled 'Med'
-        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
+        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
         if ( CORBA::is_nil(medfather) )
 	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
 
  	// Create SObject labelled 'MEDFIELD' if it doesn't already exit
 	SALOMEDS::SObject_var medfieldfather = myStudy->FindObject("MEDFIELD");
-	
-	myBuilder->NewCommand();
   	if ( CORBA::is_nil(medfieldfather) ) 
 	{
 	  MESSAGE("Add Object 'MEDFIELD'");
@@ -525,6 +504,7 @@ throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
         // Create object labelled according to Field's Name
 
         MESSAGE("Add a Field Object under "<<_fieldTptr->getName());
+        myBuilder->NewCommand();
         SALOMEDS::SObject_var newObj = myBuilder->NewObject(medfieldnamefather);
 
         ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
@@ -549,7 +529,6 @@ throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
 	  SALOMEDS::SObject_var newObjSupport = myBuilder->NewObject(newObj);
 	  myBuilder->Addreference(newObjSupport,supportObject);
 	}
-	myBuilder->CommitCommand();
         _FieldId = newObj->GetID();
 	MESSAGE("FIELDOF_i::addInStudy _FieldId="<< _FieldId);
 

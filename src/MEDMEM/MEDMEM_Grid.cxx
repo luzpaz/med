@@ -1,15 +1,15 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  CEA/DEN, EDF R&D
-//
-//
-//
-//  File   : MEDMEM_Grid.hxx
-//  Author : Edward AGAPOV (eap)
-//  Module : MED
-//  $Header$
-
 using namespace std;
+// File      : MEDMEM_Grid.hxx
+// Created   : Wed Dec 18 08:35:26 2002
+// Descr     : class containing structured mesh data
+
+// Author    : Edward AGAPOV (eap)
+// Project   : SALOME Pro
+// Module    : MED 
+// Copyright : Open CASCADE
+// $Header$
+
+
 #include "MEDMEM_Grid.hxx"
 #include <MEDMEM_CellModel.hxx>
 #include <MEDMEM_SkyLineArray.hxx>
@@ -96,17 +96,17 @@ GRID & GRID::operator=(const GRID & otherGrid)
 //           (MED_DRIVER, ....) associated with file <fileName>. 
 //=======================================================================
 
-GRID::GRID(driverTypes driverType,
-           const string &  fileName,
-           const string &  driverName) {
+GRID::GRID(driverTypes driverType, const string &  fileName,
+           const string &  driverName) : MESH(driverType, fileName, driverName)
+{
   const char * LOC ="GRID::GRID(driverTypes , const string &  , const string &) : ";
   
   BEGIN_OF(LOC);
   
 //  int current;
 
-  init();
-  MESH(driverType,fileName,driverName);
+//   init();
+//   MESH(driverType,fileName,driverName);
 
 //   current = addDriver(driverType,fileName,driverName);
   
@@ -123,6 +123,8 @@ GRID::GRID(driverTypes driverType,
 
 //   // fill some fields of MESH
 //   fillMeshAfterRead();
+
+  fillMeshAfterRead();
     
   END_OF(LOC);
 };
@@ -181,7 +183,7 @@ void GRID::fillMeshAfterRead()
 //purpose  : 
 //=======================================================================
 
-void GRID::fillCoordinates()
+void GRID::fillCoordinates() const
 {
   if (_is_coordinates_filled)
   {
@@ -198,7 +200,8 @@ void GRID::fillCoordinates()
   bool hasJ = _jArrayLength, hasK = _kArrayLength;
   int J = hasJ ? _jArrayLength : 1;
   int K = hasK ? _kArrayLength : 1;
-  int nb, i, j, k;
+  //int nb, !! UNUSED VARIABLE !!
+  int i, j, k;
   for (k=0; k < K; ++k) {
     for (j=0; j < J; ++j) {
       for (i=0; i < _iArrayLength; ++i) {
@@ -221,7 +224,7 @@ void GRID::fillCoordinates()
     }
   }
       
-  _is_coordinates_filled = true;
+  (const_cast <GRID *> (this))->_is_coordinates_filled = true;
   END_OF(LOC);
 }
 
@@ -231,10 +234,11 @@ void GRID::fillCoordinates()
 //=======================================================================
 
 CONNECTIVITY * GRID::makeConnectivity (const medEntityMesh           Entity,
-                                            const medGeometryElement Geometry,
-                                            const int                NbEntities,
-                                            const int                NbNodes,
-                                            int *                    NodeNumbers)
+				       const medGeometryElement Geometry,
+				       const int                NbEntities,
+				       const int                NbNodes,
+				       int *                    NodeNumbers)
+  const
 {
   CONNECTIVITY * Connectivity     = new CONNECTIVITY(Entity) ;
   Connectivity->_numberOfNodes    = NbNodes ;
@@ -288,7 +292,7 @@ CONNECTIVITY * GRID::makeConnectivity (const medEntityMesh           Entity,
 //purpose  : fill _coordinates and _connectivity of MESH if not yet done
 //=======================================================================
 
-void GRID::fillConnectivity()
+void GRID::fillConnectivity() const
 {
   if (_is_connectivity_filled)
   {
@@ -634,7 +638,7 @@ void GRID::fillConnectivity()
 
   MESH::_connectivity  = CellCNCT;
 
-  _is_connectivity_filled = true;
+  (const_cast <GRID *> (this))->_is_connectivity_filled = true;
 
   END_OF(LOC);
 }
@@ -644,7 +648,7 @@ void GRID::fillConnectivity()
 //purpose  : return array length. Axis = [1,2,3] meaning [i,j,k],
 //=======================================================================
 
-int GRID::getArrayLength( const int Axis ) throw (MEDEXCEPTION)
+int GRID::getArrayLength( const int Axis ) const throw (MEDEXCEPTION)
 {
   switch (Axis) {
   case 1: return _iArrayLength;
@@ -663,8 +667,7 @@ int GRID::getArrayLength( const int Axis ) throw (MEDEXCEPTION)
 //           exception if i is out of range 0 <= i < getArrayLength(Axis);
 //=======================================================================
 
-const double GRID::getArrayValue (const int Axis, const int i)
-     throw (MEDEXCEPTION)
+const double GRID::getArrayValue (const int Axis, const int i) const throw (MEDEXCEPTION)
 {
   if (i < 0 || i >= getArrayLength(Axis))
     throw MED_EXCEPTION
@@ -684,9 +687,11 @@ const double GRID::getArrayValue (const int Axis, const int i)
 //=======================================================================
 
 int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
-     throw (MEDEXCEPTION)
+  const throw (MEDEXCEPTION)
 {
   const char * LOC = "GRID::getEdgeNumber(Axis, i,j,k) :";
+
+  BEGIN_OF(LOC);
 
   int Len[4] = {0,_iArrayLength, _jArrayLength, _kArrayLength }, I=1, J=2, K=3;
   int maxAxis = Len[ K ] ? 3 : 2;
@@ -710,7 +715,9 @@ int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
     Len[J]-- ;
     Nb += Len[ I ]*Len[ J ]*Len[ K ];
   }
-  
+
+  END_OF(LOC);
+
   return Nb;
 }
 
@@ -725,10 +732,12 @@ int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
 //=======================================================================
 
 int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
-     throw (MEDEXCEPTION)
+  const throw (MEDEXCEPTION)
 {
   const char * LOC = "GRID::getFaceNumber(Axis, i,j,k) :";
   
+  BEGIN_OF(LOC);
+
 //  if (Axis <= 0 || Axis > 3)
   if (Axis < 0 || Axis > 3)
     throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "Axis = " << Axis));
@@ -748,7 +757,9 @@ int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
     Len[J]++ ;
     Nb += Len[ I ]*Len[ J ]*Len[ K ];
   }
-  
+
+  END_OF(LOC);
+
   return Nb;
 }
 
@@ -757,15 +768,18 @@ int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
 //purpose  : 
 //=======================================================================
 
-void GRID::getNodePosition(const int Number, int& i, int& j, int& k)
-     throw (MEDEXCEPTION)
+void GRID::getNodePosition(const int Number, int& i, int& j, int& k) const
+  throw (MEDEXCEPTION)
 {
   const char * LOC = "GRID::getNodePosition(Number, i,j,k) :";
   
+  BEGIN_OF(LOC);
+
   if (Number <= 0 || Number > _numberOfNodes)
     throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "Number is out of range: " << Number));
 
-  int Len[] = {_iArrayLength, _jArrayLength, _kArrayLength }, I=0, J=1, K=2;
+  int Len[] = {_iArrayLength, _jArrayLength, _kArrayLength }, I=0, J=1;
+  // , K=2; !! UNUSED VARIABLE !!
 
   int ijLen = Len[I] * Len[J]; // nb in a full k layer
   int kLen = (Number - 1) % ijLen;    // nb in the non full k layer
@@ -775,6 +789,9 @@ void GRID::getNodePosition(const int Number, int& i, int& j, int& k)
   k = (Number - 1) / ijLen;
 
   ////cout <<" NODE POS: " << Number << " - " << i << ", " << j << ", " << k << endl;
+
+  END_OF(LOC);
+
 }
 
 //=======================================================================
@@ -782,12 +799,15 @@ void GRID::getNodePosition(const int Number, int& i, int& j, int& k)
 //purpose  : 
 //=======================================================================
 
-void GRID::getCellPosition(const int Number, int& i, int& j, int& k)
-     throw (MEDEXCEPTION)
+void GRID::getCellPosition(const int Number, int& i, int& j, int& k) const
+  throw (MEDEXCEPTION)
 {
   const char * LOC = "GRID::getCellPosition(Number, i,j,k) :";
   
-  int Len[4] = {0,_iArrayLength-1, _jArrayLength-1, _kArrayLength-1 }, I=1, J=2, K=3;
+  BEGIN_OF(LOC);
+
+  int Len[4] = {0,_iArrayLength-1, _jArrayLength-1, _kArrayLength-1 }, I=1, J=2;
+  // , K=3; !! UNUSED VARIABLE !!
 
 //  if (Number <= 0 || Number > getCellNumber(Len[I]-1, Len[J]-1, Len[K]-1))
 //    throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "Number is out of range: " << Number));
@@ -798,6 +818,8 @@ void GRID::getCellPosition(const int Number, int& i, int& j, int& k)
   i = kLen % Len[J];
   j = kLen / Len[J];
   k = (Number - 1) / ijLen;
+
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -806,9 +828,11 @@ void GRID::getCellPosition(const int Number, int& i, int& j, int& k)
 //=======================================================================
 
 void GRID::getEdgePosition(const int Number, int& Axis, int& i, int& j, int& k)
-     throw (MEDEXCEPTION)
+  const throw (MEDEXCEPTION)
 {
   const char * LOC = "GRID::getEdgePosition(Number, i,j,k) :";
+
+  BEGIN_OF(LOC);
 
   if (!_jArrayLength)
     throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "no edges in the grid: "));
@@ -849,6 +873,9 @@ void GRID::getEdgePosition(const int Number, int& Axis, int& i, int& j, int& k)
       j = kLen / Len[J];
       k = (theNb - 1) / ijLen;
     }
+
+    END_OF(LOC);
+
     return;
   }
   
@@ -866,15 +893,17 @@ void GRID::getEdgePosition(const int Number, int& Axis, int& i, int& j, int& k)
 //=======================================================================
 
 void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
-     throw (MEDEXCEPTION)
+  const throw (MEDEXCEPTION)
 {
   const char * LOC = "GRID::getFacePosition(Number, i,j,k) :";
 
-     if (_kArrayLength == 0) {
-         getCellPosition(Number, i, j, k);
-         Axis = 1;
-         return;
-     };
+  BEGIN_OF(LOC);
+
+  if (_kArrayLength == 0) {
+    getCellPosition(Number, i, j, k);
+    Axis = 1;
+    return;
+  };
 
   if (!_kArrayLength)
     throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "no faces in the grid: "));
@@ -913,6 +942,9 @@ void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
       j = kLen / Len[J];
       k = (theNb - 1) / ijLen;
     }
+
+    END_OF(LOC);
+
     return;
   }
   
@@ -947,5 +979,27 @@ void GRID::writeUnstructured(int index, const string & driverName)
                                     << _drivers.size() 
                                     )
                          ); 
+  END_OF(LOC);
+}
+
+void GRID::read(int index)  
+{ 
+  const char * LOC = "GRID::read(int index=0) : ";
+  BEGIN_OF(LOC);
+
+  if (_drivers[index]) {
+    _drivers[index]->open();   
+    _drivers[index]->read(); 
+    _drivers[index]->close(); 
+  }
+  else
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+                                     << "The index given is invalid, index must be between  0 and |" 
+                                     << _drivers.size() 
+                                     )
+                          );
+  if (_isAGrid)
+    fillMeshAfterRead();
+
   END_OF(LOC);
 }

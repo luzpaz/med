@@ -1,12 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  CEA/DEN, EDF R&D
-//
-//
-//
-//  File   : test_copie_mesh.cxx
-//  Module : MED
-
 using namespace std;
 #include<string>
 

@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_Med.cxx
-//  Module : MED
-
 using namespace std;
 # include <string> 
 
@@ -52,6 +26,8 @@ MED::MED(driverTypes driverType, const string & fileName)
 {
   const char * LOC = "MED::MED(driverTypes driverType, const string & fileName) : ";
   BEGIN_OF(LOC);
+
+  MESSAGE(LOC << "driverType = " << driverType);
 
   MED_MED_RDONLY_DRIVER * myDriver = new MED_MED_RDONLY_DRIVER(fileName,this) ;
   int current = addDriver(*myDriver);
@@ -122,18 +98,15 @@ MED::~MED()
     if ( (*currentField).first != NULL) {
       // cast in right type to delete it !
       switch ((*currentField).first->getValueType()) {
-      case MED_INT32 :
-        // mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	//delete (FIELD<int>*) (*currentField).first ;
+      case MED_INT32 : 
+	delete (FIELD<int>*) (*currentField).first ;
 	break ;
       case MED_REEL64 :
-        // mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	//delete (FIELD<double>*) (*currentField).first ;
+	delete (FIELD<double>*) (*currentField).first ;
 	break ;
       default : 
-	INFOS("Field has type different of int or double, could not destroy its values array !") ;
-        // mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	//delete (*currentField).first;
+	MESSAGE(LOC << "Field has type different of int or double, could not destroy its values array !") ;
+	delete (*currentField).first;
       }
     }
   }
@@ -141,8 +114,7 @@ MED::~MED()
   for ( itSupportOnMesh=_support.begin();itSupportOnMesh != _support.end(); itSupportOnMesh++ ) {
     map<MED_FR::med_entite_maillage,SUPPORT *>::iterator itSupport ;
     for ( itSupport=(*itSupportOnMesh).second.begin();itSupport!=(*itSupportOnMesh).second.end();itSupport++)
-        ;// mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	//delete (*itSupport).second ;
+	delete (*itSupport).second ;
   }
 
   //  map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
@@ -150,11 +122,9 @@ MED::~MED()
     if ( (*currentMesh).second != NULL)
       {
 	if (!((*currentMesh).second)->getIsAGrid())
-          ;// mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	  //delete (*currentMesh).second;
+	  delete (*currentMesh).second;
 	else
-          ;// mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	  //delete (GRID *) (*currentMesh).second;
+	  delete (GRID *) (*currentMesh).second;
       }
   }
 
@@ -162,7 +132,7 @@ MED::~MED()
 
   MESSAGE(LOC << "In this object MED there is(are) " << index << " driver(s):");
 
-  for (int ind=0; ind < _drivers.size(); ind++ )
+  for (unsigned int ind=0; ind < _drivers.size(); ind++ )
     {
       SCRUTE(_drivers[ind]);
       if ( _drivers[ind] != NULL) delete _drivers[ind];
@@ -191,15 +161,50 @@ int MED::addDriver(driverTypes driverType, const string & fileName="Default File
   const char * LOC = "MED::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\") : ";
   GENDRIVER * driver;
   int current;
+  int itDriver = (int) NO_DRIVER;
 
   BEGIN_OF(LOC);
 
   MESSAGE(LOC << " the file name is " << fileName);
-  driver = instances[driverType]->run(fileName, this) ;
+
+  SCRUTE(driverType);
+
+  SCRUTE(instances[driverType]);
+
+  switch(driverType)
+    {
+    case MED_DRIVER : {
+      itDriver = (int) driverType ;
+      break ;
+    }
+
+    case VTK_DRIVER : {
+      itDriver = 1 ;
+      break ;
+    }
+
+    case GIBI_DRIVER : {
+      throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "GIBI_DRIVER has been specified to the method which is not allowed because there is no GIBI driver for the MED object"));
+      break;
+    }
+
+    case NO_DRIVER : {
+      throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "NO_DRIVER has been specified to the method which is not allowed"));
+      break;
+    }
+    }
+
+  if (itDriver == ((int) NO_DRIVER))
+    throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "NO_DRIVER has been specified to the method which is not allowed"));
+
+  driver = instances[itDriver]->run(fileName, this) ;
+
   current = _drivers.size()-1;
+
   driver->setId(current); 
 
   END_OF(LOC);
+
   return current;
 }
 
@@ -392,7 +397,7 @@ void MED::getMeshNames      ( string * meshNames ) const
 {
   const char * LOC = "MED::getMeshNames ( string * ) const : ";
   BEGIN_OF(LOC);
-  int meshNamesSize;
+  unsigned int meshNamesSize;
   
   if (  ( meshNamesSize = sizeof(meshNames) / sizeof(string *) )
        != _meshes.size() )
@@ -518,7 +523,7 @@ void MED::getFieldNames     ( string * fieldNames ) const
   const char * LOC = "MED::getFieldNames ( string * ) const : ";
   BEGIN_OF(LOC);
 
-  int fieldNamesSize =  sizeof(fieldNames) / sizeof(string *);
+  unsigned int fieldNamesSize =  sizeof(fieldNames) / sizeof(string *);
  
   if ( fieldNamesSize != _fields.size() )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -684,16 +689,51 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_FR::med_entite_maillage 
   const char * LOC = "MED::getSupport ( const string, MED_FR::med_entite_maillage ) const : ";
   BEGIN_OF(LOC);
 
-  map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::const_iterator itSupportOnMesh = _support.find(meshName) ;
+  int index = 0;
+  for (map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::const_iterator const_itSupportOnMesh=_support.begin(); const_itSupportOnMesh != _support.end();
+       const_itSupportOnMesh++ )
+    {
+      map<MED_FR::med_entite_maillage,SUPPORT *>::const_iterator const_itSupport ;
+      for (const_itSupport=(*const_itSupportOnMesh).second.begin();
+	   const_itSupport!=(*const_itSupportOnMesh).second.end();const_itSupport++) index++;
+    }
+
+  MESSAGE(LOC << "In this MED object there is(are) " << index << " support(s):");
+
+  for (map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::const_iterator const_itSupportOnMesh=_support.begin();const_itSupportOnMesh != _support.end(); const_itSupportOnMesh++ )
+    {
+      map<MED_FR::med_entite_maillage,SUPPORT *>::const_iterator const_itSupport ;
+      for (const_itSupport=(*const_itSupportOnMesh).second.begin();
+	   const_itSupport!=(*const_itSupportOnMesh).second.end();const_itSupport++)
+	{
+	  MESSAGE(LOC << "Support on mesh " << (*const_itSupportOnMesh).first << " on entity " << (*const_itSupport).first << " : " << *((*const_itSupport).second));
+	}
+  }
+
+
+  map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::const_iterator const_itSupportOnMesh = _support.find(meshName) ;
   
-  if ( itSupportOnMesh == _support.end() )
+  if ( const_itSupportOnMesh == _support.end() )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
                                      << "There is no support on mesh named |" 
                                      << meshName << "|"
                                      )
                           );
  
-  map<MED_FR::med_entite_maillage,SUPPORT *> & SupportOnMesh = (map<MED_FR::med_entite_maillage,SUPPORT *>&) ((*itSupportOnMesh).second) ;
+//   map<MED_FR::med_entite_maillage,SUPPORT *> & SupportOnMesh = (map<MED_FR::med_entite_maillage,SUPPORT *>&) ((*itSupportOnMesh).second) ;
+//   map<MED_FR::med_entite_maillage,SUPPORT *>::const_iterator itSupport = SupportOnMesh.find(entity) ;
+  
+//   if (itSupport == SupportOnMesh.end() )
+//     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+//                                      << "There is no support on entity "
+// 				     << entity << " in mesh named |" 
+//                                      << meshName << "|"
+//                                      )
+//                           );
+
+
+  map<MED_FR::med_entite_maillage,SUPPORT *> SupportOnMesh = ((*const_itSupportOnMesh).second);
+
   map<MED_FR::med_entite_maillage,SUPPORT *>::const_iterator itSupport = SupportOnMesh.find(entity) ;
   
   if (itSupport == SupportOnMesh.end() )
@@ -755,7 +795,11 @@ void MED::addMesh( MESH * const ptrMesh)
   if ( ! ( meshName = ptrMesh->getName()).size() ) 
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "ptrMesh->_name must not be NULL !"));
 
+//   MESH * meshToMed = new MESH(*ptrMesh); DO WE HAVE TO COPY THE ENTRY MESH OR NOT ????? (NB)
+
   _meshes[meshName] = ptrMesh; // if ptrMesh->meshName already exists it is modified
+
+//   _meshes[meshName] = meshToMed;
 
   END_OF(LOC);
 }
@@ -799,7 +843,7 @@ void MED::addField( FIELD_ * const ptrField)
   _meshName [ptrField]        = meshName; // if it already exists it is replaced
   _meshes   [meshName]        = ptrMesh;  // if it already exists it is replaced
 
-  int  numberOfTypes = ptrSupport->getNumberOfTypes();
+  //  int  numberOfTypes = ptrSupport->getNumberOfTypes(); !! UNUSED VARIABLE !!
   _support  [meshName][ (MED_FR::med_entite_maillage) ptrSupport->getEntity()] = ptrSupport;// if it already exists it is replaced
 
 

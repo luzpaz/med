@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_Mesh.cxx
-//  Module : MED
-
 using namespace std;
 /*
  File Mesh.cxx
@@ -45,7 +19,7 @@ using namespace std;
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_CellModel.hxx"
-#include "MEDMEM_Grid.hxx"
+//#include "MEDMEM_Grid.hxx" this inclision should have never be here !!!
 
 //update Families with content list
 //int family_count(int family_number, int count, int * entities_number, int * entities_list) ;
@@ -56,11 +30,14 @@ using namespace std;
 //const MESH::INSTANCE * const MESH::instances[] = { &MESH::inst_med_rdonly , &MESH::inst_med_rdwr } ;
 
 // Add a similar line for your personnal driver (step 3)
+
 MESH::INSTANCE_DE<MED_MESH_RDWR_DRIVER>   MESH::inst_med   ;
 MESH::INSTANCE_DE<GIBI_MESH_RDWR_DRIVER>  MESH::inst_gibi ;
+MESH::INSTANCE_DE<VTK_MESH_DRIVER> MESH::inst_vtk;
+
 // Add your own driver in the driver list       (step 4)
 // Note the list must be coherent with the driver type list defined in MEDMEM_DRIVER.hxx. 
-const MESH::INSTANCE * const MESH::instances[] =   {  &MESH::inst_med, &MESH::inst_gibi } ;
+const MESH::INSTANCE * const MESH::instances[] =   {  &MESH::inst_med, &MESH::inst_gibi, &MESH::inst_vtk } ;
 
 /*! Add a MESH driver of type (MED_DRIVER, ....) associated with file <fileName>. The meshname used in the file
     is  <driverName>. addDriver returns an int handler. */
@@ -71,18 +48,50 @@ int MESH::addDriver(driverTypes driverType,
   
   GENDRIVER * driver;
   int current;
+  int itDriver = (int) NO_DRIVER;
 
   BEGIN_OF(LOC);
   
-  driver = instances[driverType]->run(fileName, this) ;
+  SCRUTE(driverType);
+
+  SCRUTE(instances[driverType]);
+
+  switch(driverType)
+    {
+    case MED_DRIVER : {
+      itDriver = (int) driverType ;
+      break ;
+    }
+
+    case GIBI_DRIVER : {
+      itDriver = (int) driverType ;
+      break ;
+    }
+
+    case VTK_DRIVER : {
+      itDriver = 2 ;
+      break ;
+    }
+
+    case NO_DRIVER : {
+      throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "NO_DRIVER has been specified to the method which is not allowed"));
+    }
+    }
+
+  if (itDriver == ((int) NO_DRIVER))
+    throw MED_EXCEPTION (LOCALIZED(STRING(LOC)<< "othe driver than MED_DRIVER GIBI_DRIVER and VT_DRIVER has been specified to the method which is not allowed"));
+
+  driver = instances[itDriver]->run(fileName, this) ;
+
   _drivers.push_back(driver);
+
   current = _drivers.size()-1;
   
   _drivers[current]->setMeshName(driverName);  
-  return current;
 
   END_OF(LOC);
 
+  return current;
 }
 
 /*! Add an existing MESH driver. */
@@ -131,8 +140,8 @@ void MESH::init() {
 
   string        _name = "NOT DEFINED"; // A POSITIONNER EN FCT DES IOS ?
 
-  COORDINATE   * _coordinate   = (COORDINATE   *) NULL;
-  CONNECTIVITY * _connectivity = (CONNECTIVITY *) NULL;
+  _coordinate   = (COORDINATE   *) NULL;
+  _connectivity = (CONNECTIVITY *) NULL;
 
   _spaceDimension        =          MED_INVALID; // 0 ?!?
   _meshDimension         =          MED_INVALID;
@@ -149,10 +158,12 @@ void MESH::init() {
   _numberOfEdgesGroups   =          0; 
 
   _isAGrid = false;
+ 
+  END_OF(LOC);
 };
 
 /*! Create an empty MESH. */
-MESH::MESH():_coordinate(NULL),_connectivity(NULL) {
+MESH::MESH():_coordinate(NULL),_connectivity(NULL), _isAGrid(false) {
   init();
 };
 
@@ -250,40 +261,32 @@ MESH::~MESH() {
   int size ;
   size = _familyNode.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _familyNode[i] ;
+    delete _familyNode[i] ;
   size = _familyCell.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _familyCell[i] ;
+    delete _familyCell[i] ;
   size = _familyFace.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _familyFace[i] ;
+    delete _familyFace[i] ;
   size = _familyEdge.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _familyEdge[i] ;
+    delete _familyEdge[i] ;
   size = _groupNode.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _groupNode[i] ;
+    delete _groupNode[i] ;
   size = _groupCell.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _groupCell[i] ;
+    delete _groupCell[i] ;
   size = _groupFace.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _groupFace[i] ;
+    delete _groupFace[i] ;
   size = _groupEdge.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _groupEdge[i] ;
+    delete _groupEdge[i] ;
 
   MESSAGE("In this object MESH there is(are) " << _drivers.size() << " driver(s)");
 
-  for (int index=0; index < _drivers.size(); index++ )
+  for (unsigned int index=0; index < _drivers.size(); index++ )
     {
       SCRUTE(_drivers[index]);
       if ( _drivers[index] != NULL) delete _drivers[index];
@@ -293,7 +296,10 @@ MESH::~MESH() {
 
 MESH & MESH::operator=(const MESH &m)
 {
+  const char * LOC = "MESH & MESH::operator=(const MESH &m) : ";
+  BEGIN_OF(LOC);
 
+  MESSAGE(LOC <<"Not yet implemented, operating on the object " << m);
   //  A FAIRE.........
 
   // ATTENTION CET OPERATEUR DE RECOPIE EST DANGEREUX POUR LES
@@ -326,23 +332,44 @@ MESH & MESH::operator=(const MESH &m)
 //        reverse_nodal_connectivity = m.reverse_nodal_connectivity;
 //        reverse_nodal_connectivity_index = m.reverse_nodal_connectivity_index ;
 //      }
+  END_OF(LOC);
+
   return *this;
 }
 
 /*! Create a MESH object using a MESH driver of type (MED_DRIVER, ....) associated with file <fileName>. 
   The meshname <driverName> must already exists in the file.*/
-MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) {
+MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION)
+{
   const char * LOC ="MESH::MESH(driverTypes driverType, const string &  fileName="", const string &  driverName="") : ";
-  
   int current;
   
   BEGIN_OF(LOC);
 
   init();
-
-  MED_MESH_RDONLY_DRIVER myDriver(fileName,this) ;
-  myDriver.setMeshName(driverName);
-  current = addDriver(myDriver);
+  
+  switch(driverType)
+    {
+    case MED_DRIVER :
+      {
+	MED_MESH_RDONLY_DRIVER myDriver(fileName,this);
+	myDriver.setMeshName(driverName);
+	current = addDriver(myDriver);
+	break;
+      }
+    case GIBI_DRIVER :
+      {
+	GIBI_MESH_RDONLY_DRIVER myDriver(fileName,this);
+	current = addDriver(myDriver);
+	break;
+      }
+    default :
+      {
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Driver type unknown : can't create driver!"));
+	break;
+      }
+    }
+  
 //   current = addDriver(driverType,fileName,driverName);
 //   switch(_drivers[current]->getAccessMode() ) {
 //   case MED_WRONLY : {
@@ -356,8 +383,8 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
   _drivers[current]->read();
   _drivers[current]->close();
 
-  if (_isAGrid)
-    ((GRID *) this)->fillMeshAfterRead();
+//   if (_isAGrid)
+//     ((GRID *) this)->fillMeshAfterRead();
 
   END_OF(LOC);
 };
@@ -371,7 +398,7 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
 //    return N;
 //  }
 
-ostream & operator<<(ostream &os, MESH &myMesh)
+ostream & operator<<(ostream &os, const MESH &myMesh)
 {
   int spacedimension = myMesh.getSpaceDimension();
   int meshdimension  = myMesh.getMeshDimension();
@@ -404,49 +431,8 @@ ostream & operator<<(ostream &os, MESH &myMesh)
       os << endl;
     }
 
-  const CONNECTIVITY * myConnectivity = myMesh.getConnectivityptr();
-  if (!myConnectivity->existConnectivity(MED_NODAL,MED_CELL) && myConnectivity->existConnectivity(MED_DESCENDING,MED_CELL))
-    {
-      os << endl << "SHOW CONNECTIVITY (DESCENDING) :" << endl;
-      int numberofelements;
-      const int * connectivity;
-      const int * connectivity_index;
-      myMesh.calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL);
-      try {
-	numberofelements = myMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
-	connectivity =  myMesh.getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
-	connectivity_index =  myMesh.getConnectivityIndex(MED_DESCENDING,MED_CELL);
-      }
-      catch (MEDEXCEPTION m) {
-	os << m.what() << endl;
-	exit (-1);
-      }
-      for (int j=0;j<numberofelements;j++) {
-	os << "Element "<<j+1<<" : ";
-	for (int k=connectivity_index[j];k<connectivity_index[j+1];k++)
-	  os << connectivity[k-1]<<" ";
-	os << endl;
-      }
-    }
-  else
-    {
-      int numberoftypes = myMesh.getNumberOfTypes(MED_CELL);
-      const medGeometryElement  * types = myMesh.getTypes(MED_CELL);
-      os << endl << "SHOW CONNECTIVITY (NODAL) :" << endl;
-      for (int i=0; i<numberoftypes; i++) {
-	os << "For type " << types[i] << " : " << endl;
-	int numberofelements = myMesh.getNumberOfElements(MED_CELL,types[i]);
-	const int * connectivity =  myMesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,types[i]);
-	int numberofnodespercell = types[i]%100;
-	for (int j=0;j<numberofelements;j++){
-	  os << "Element "<< j+1 <<" : ";
-	  for (int k=0;k<numberofnodespercell;k++)
-	    os << connectivity[j*numberofnodespercell+k]<<" ";
-	  os << endl;
-	}
-      }
-    }
-
+  os << endl << "SHOW CONNECTIVITY  :" << endl;
+  os << *myMesh._connectivity << endl;
 
   medEntityMesh entity;
   os << endl << "SHOW FAMILIES :" << endl << endl;
@@ -629,7 +615,7 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
     }
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
-    const medGeometryElement *  allType = getTypes(Entity);
+    //const medGeometryElement *  allType = getTypes(Entity); !! UNUSZED VARIABLE !!
     numberOfGaussPoint = new int[numberOfGeometricType] ;
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfElements = new int[numberOfGeometricType] ;
@@ -1085,6 +1071,8 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Volumes on it !"));
 	  break;
 	}
+
+      if (!onAll) delete [] global_connectivity ;
     }
 
   return Volume;
@@ -1289,6 +1277,8 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Areas on it !"));
 	  break;
 	}
+
+      if (!onAll) delete [] global_connectivity ;
     }
 
   Area->setValue(MED_FULL_INTERLACE,area);
@@ -1406,6 +1396,8 @@ FIELD<double>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Lengths on it !"));
 	  break;
 	}
+
+      if (!onAll) delete [] global_connectivity ;
     }
 
   return Length;
@@ -1523,7 +1515,7 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 		int N2 = global_connectivity[tria_index+1]-1;
 		int N3 = global_connectivity[tria_index+2]-1;
 
-		double xarea;
+		//double xarea; !! UNUSED VARIABLE !!
 		double x1 = coord[dim_space*N1];
 		double x2 = coord[dim_space*N2];
 		double x3 = coord[dim_space*N3];
@@ -1639,6 +1631,8 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Normals on it !"));
 	  break;
 	}
+
+      if (!onAll) delete [] global_connectivity ;
     }
 
   Normal->setValue(MED_FULL_INTERLACE,normal);
@@ -2047,6 +2041,8 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get a barycenter on it (in fact unknown type) !"));
 	  break;
 	}
+
+      if (!onAll) delete [] global_connectivity ;
     }
 
   Barycenter->setValue(MED_FULL_INTERLACE,barycenter);
@@ -2063,23 +2059,34 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 //purpose  : if this->_isAGrid, assure that _coordinate is filled
 //=======================================================================
 
-inline void MESH::checkGridFillCoords() const
-{
-  if (_isAGrid)
-    ((GRID *) this)->fillCoordinates();
-}
+// inline void MESH::checkGridFillCoords() const
+// {
+//   if (_isAGrid)
+//     ((GRID *) this)->fillCoordinates();
+// }
 
 //=======================================================================
 //function : checkGridFillConnectivity
 //purpose  : if this->_isAGrid, assure that _connectivity is filled
 //=======================================================================
 
-inline void MESH::checkGridFillConnectivity() const
-{
-  if (_isAGrid)
-    ((GRID *) this)->fillConnectivity();
-}
+// inline void MESH::checkGridFillConnectivity() const
+// {
+//   if (_isAGrid)
+//     ((GRID *) this)->fillConnectivity();
+// }
 
+bool MESH::isEmpty() const 
+{
+    bool notempty = _name != ""                || _coordinate != NULL           || _connectivity != NULL ||
+	         _spaceDimension !=MED_INVALID || _meshDimension !=MED_INVALID  || 
+		 _numberOfNodes !=MED_INVALID  || _numberOfNodesFamilies !=0    || 
+		 _familyNode.size() != 0       || _numberOfCellsFamilies != 0   || 
+		 _familyCell.size() != 0       || _numberOfFacesFamilies != 0   || 
+		 _familyFace.size() != 0       || _numberOfEdgesFamilies !=0    || 
+		 _familyEdge.size() != 0       || _isAGrid != 0 ;
+    return !notempty;
+}
 
 void MESH::read(int index)  
 { 
@@ -2097,8 +2104,8 @@ void MESH::read(int index)
                                      << _drivers.size() 
                                      )
                           );
-  if (_isAGrid)
-    ((GRID *) this)->fillMeshAfterRead();
+//   if (_isAGrid)
+//     ((GRID *) this)->fillMeshAfterRead();
 
   END_OF(LOC);
 }
@@ -2220,7 +2227,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     }
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
-    const medGeometryElement *  allType = getTypes(MED_FACE);
+    //const medGeometryElement *  allType = getTypes(MED_FACE); !! UNUSED VARIABLE !!
     numberOfGaussPoint = new int[numberOfGeometricType] ;
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfEntities = new int[numberOfGeometricType] ;
@@ -2259,4 +2266,258 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   END_OF(LOC) ;
   return mySupport ;
  
+}
+
+/*!
+  return a SUPPORT pointer on the union of all SUPPORTs in Supports.
+  You should delete this pointer after use to avoid memory leaks.
+*/
+SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "MESH:::mergeSupports(const vector<SUPPORT *> ) : " ;
+  BEGIN_OF(LOC) ;
+
+  SUPPORT * returnedSupport;
+  string returnedSupportName;
+  string returnedSupportDescription;
+  char * returnedSupportNameChar;
+  char * returnedSupportDescriptionChar;
+  int size = Supports.size();
+
+  if (size == 1)
+    {
+      MESSAGE(LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
+      SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
+
+      returnedSupport = new SUPPORT(*obj);
+
+      int lenName = strlen((Supports[0]->getName()).c_str()) + 8 + 1;
+      int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 8 + 1;
+
+      returnedSupportNameChar = new char[lenName];
+      returnedSupportDescriptionChar = new char[lenDescription];
+
+      returnedSupportNameChar = strcpy(returnedSupportNameChar,"Copy of ");
+      returnedSupportNameChar = strcat(returnedSupportNameChar,(Supports[0]->getName()).c_str());
+      returnedSupportDescriptionChar = strcpy(returnedSupportDescriptionChar,"Copy of ");
+      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
+					      (Supports[0]->getDescription()).c_str());
+
+      returnedSupportName = string(returnedSupportNameChar);
+      returnedSupportDescription = string(returnedSupportDescriptionChar);
+
+      returnedSupport->setName(returnedSupportName);
+      returnedSupport->setDescription(returnedSupportDescription);
+
+      delete [] returnedSupportNameChar;
+      delete [] returnedSupportDescriptionChar;
+    }
+  else
+    {
+      SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
+      returnedSupport = new SUPPORT(*obj);
+
+      int lenName = strlen((Supports[0]->getName()).c_str()) + 9 + 1;
+      int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 9 + 1;
+
+      for(int i = 1;i<size;i++)
+	{
+	  obj = const_cast <SUPPORT *> (Supports[i]);
+	  returnedSupport->blending(obj);
+
+	  if (i == (size-1))
+	    {
+	      lenName = lenName + 5 + strlen((Supports[i]->getName()).c_str());
+	      lenDescription = lenDescription + 5 +
+		strlen((Supports[i]->getDescription()).c_str());
+	    }
+	  else
+	    {
+	      lenName = lenName + 2 + strlen((Supports[i]->getName()).c_str());
+	      lenDescription = lenDescription + 2 +
+		strlen((Supports[i]->getDescription()).c_str());
+	    }
+	}
+
+      returnedSupportNameChar = new char[lenName];
+      returnedSupportDescriptionChar = new char[lenDescription];
+
+      returnedSupportNameChar = strcpy(returnedSupportNameChar,"Merge of ");
+      returnedSupportDescriptionChar = strcpy(returnedSupportDescriptionChar,"Merge of ");
+
+      returnedSupportNameChar = strcat(returnedSupportNameChar,(Supports[0]->getName()).c_str());
+      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
+					      (Supports[0]->getDescription()).c_str());
+
+      for(int i = 1;i<size;i++)
+	{
+	  if (i == (size-1))
+	    {
+	      returnedSupportNameChar = strcat(returnedSupportNameChar," and ");
+	      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar," and ");
+
+	      returnedSupportNameChar = strcat(returnedSupportNameChar,
+					       (Supports[i]->getName()).c_str());
+	      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
+						      (Supports[i]->getDescription()).c_str());
+	    }
+	  else
+	    {
+	      returnedSupportNameChar = strcat(returnedSupportNameChar,", ");
+	      returnedSupportNameChar = strcat(returnedSupportNameChar,
+					       (Supports[i]->getName()).c_str());
+
+	      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,", ");
+	      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
+						      (Supports[i]->getDescription()).c_str());
+	    }
+	}
+
+      returnedSupportName = string(returnedSupportNameChar);
+      returnedSupport->setName(returnedSupportName);
+
+      returnedSupportDescription = string(returnedSupportDescriptionChar);
+      returnedSupport->setDescription(returnedSupportDescription);
+
+      delete [] returnedSupportNameChar;
+      delete [] returnedSupportDescriptionChar;
+    }
+
+  END_OF(LOC) ;
+  return returnedSupport;
+}
+
+/*!
+  return a SUPPORT pointer on the intersection of all SUPPORTs in Supports.
+  The (SUPPORT *) NULL pointer is returned if the intersection is empty.
+  You should delete this pointer after use to avois memory leaks.
+*/
+SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "MESH:::intersectSupports(const vector<SUPPORT *> ) : " ;
+  BEGIN_OF(LOC) ;
+
+  SUPPORT * returnedSupport;
+  string returnedSupportName;
+  string returnedSupportDescription;
+  char * returnedSupportNameChar;
+  char * returnedSupportDescriptionChar;
+  int size = Supports.size();
+
+  if (size == 1)
+    {
+      MESSAGE(LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
+      SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
+
+      returnedSupport = new SUPPORT(*obj);
+
+      int lenName = strlen((Supports[0]->getName()).c_str()) + 8 + 1;
+      int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 8 + 1;
+
+      returnedSupportNameChar = new char[lenName];
+      returnedSupportDescriptionChar = new char[lenDescription];
+
+      returnedSupportNameChar = strcpy(returnedSupportNameChar,"Copy of ");
+      returnedSupportNameChar = strcat(returnedSupportNameChar,(Supports[0]->getName()).c_str());
+      returnedSupportDescriptionChar = strcpy(returnedSupportDescriptionChar,"Copy of ");
+      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
+					      (Supports[0]->getDescription()).c_str());
+
+      returnedSupportName = string(returnedSupportNameChar);
+      returnedSupportDescription = string(returnedSupportDescriptionChar);
+
+      returnedSupport->setName(returnedSupportName);
+      returnedSupport->setDescription(returnedSupportDescription);
+
+      delete [] returnedSupportNameChar;
+      delete [] returnedSupportDescriptionChar;
+    }
+  else
+    {
+      SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
+      returnedSupport = new SUPPORT(*obj);
+
+      int lenName = strlen((Supports[0]->getName()).c_str()) + 16 + 1;
+      int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 16 + 1;
+
+      for(int i = 1;i<size;i++)
+	{
+	  obj = const_cast <SUPPORT *> (Supports[i]);
+	  returnedSupport->intersecting(obj);
+
+	  if (i == (size-1))
+	    {
+	      lenName = lenName + 5 + strlen((Supports[i]->getName()).c_str());
+	      lenDescription = lenDescription + 5 +
+		strlen((Supports[i]->getDescription()).c_str());
+	    }
+	  else
+	    {
+	      lenName = lenName + 2 + strlen((Supports[i]->getName()).c_str());
+	      lenDescription = lenDescription + 2 +
+		strlen((Supports[i]->getDescription()).c_str());
+	    }
+	}
+
+      if(returnedSupport != (SUPPORT *) NULL)
+	{
+	  returnedSupportNameChar = new char[lenName];
+	  returnedSupportDescriptionChar = new char[lenDescription];
+
+	  returnedSupportNameChar = strcpy(returnedSupportNameChar,
+					   "Intersection of ");
+	  returnedSupportDescriptionChar =
+	    strcpy(returnedSupportDescriptionChar,"Intersection of ");
+
+	  returnedSupportNameChar = strcat(returnedSupportNameChar,
+					   (Supports[0]->getName()).c_str());
+	  returnedSupportDescriptionChar =
+	    strcat(returnedSupportDescriptionChar,
+		   (Supports[0]->getDescription()).c_str());
+
+	  for(int i = 1;i<size;i++)
+	    {
+	      if (i == (size-1))
+		{
+		  returnedSupportNameChar = strcat(returnedSupportNameChar,
+						   " and ");
+		  returnedSupportDescriptionChar =
+		    strcat(returnedSupportDescriptionChar," and ");
+
+		  returnedSupportNameChar =
+		    strcat(returnedSupportNameChar,
+			   (Supports[i]->getName()).c_str());
+		  returnedSupportDescriptionChar =
+		    strcat(returnedSupportDescriptionChar,
+			   (Supports[i]->getDescription()).c_str());
+		}
+	      else
+		{
+		  returnedSupportNameChar = strcat(returnedSupportNameChar,
+						   ", ");
+		  returnedSupportNameChar =
+		    strcat(returnedSupportNameChar,
+			   (Supports[i]->getName()).c_str());
+
+		  returnedSupportDescriptionChar =
+		    strcat(returnedSupportDescriptionChar,", ");
+		  returnedSupportDescriptionChar =
+		    strcat(returnedSupportDescriptionChar,
+			   (Supports[i]->getDescription()).c_str());
+		}
+	    }
+
+	  returnedSupportName = string(returnedSupportNameChar);
+	  returnedSupport->setName(returnedSupportName);
+
+	  returnedSupportDescription = string(returnedSupportDescriptionChar);
+	  returnedSupport->setDescription(returnedSupportDescription);
+
+	  delete [] returnedSupportNameChar;
+	  delete [] returnedSupportDescriptionChar;
+	}
+    }
+
+  END_OF(LOC) ;
+  return returnedSupport;
 }

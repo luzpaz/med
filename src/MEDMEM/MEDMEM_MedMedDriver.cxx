@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_MedMedDriver.cxx
-//  Module : MED
-
 using namespace std;
 # include <string>
 
@@ -87,6 +61,7 @@ void MED_MED_DRIVER::write() const
 }
 GENDRIVER * MED_MED_DRIVER::copy(void) const
 {
+  return new MED_MED_DRIVER(*this) ;
 }
 void MED_MED_DRIVER::writeFrom() const
 {
@@ -223,7 +198,7 @@ void MED_MED_RDONLY_DRIVER::readFileStruct( void )
     char         meshName[MED_TAILLE_NOM+1]="";
     int          meshDim;
     MESH *       ptrMesh;
-    MED_MESH_RDWR_DRIVER * ptrDriver;
+    //    MED_MESH_RDWR_DRIVER * ptrDriver; !! UNUSED VARIABLE !!
     
     numberOfMeshes = MEDnMaa(_medIdt) ;
     if ( numberOfMeshes <= 0 ) 
@@ -287,6 +262,7 @@ void MED_MED_RDONLY_DRIVER::readFileStruct( void )
       MESSAGE(LOC<<"is" << (isAGrid ? "" : " NOT") << " a GRID and its name is "<<ptrMesh->getName());
 
       // we create all global support (for each entity type :
+      int index = 0;
       for (currentEntity=meshEntities.begin();currentEntity != meshEntities.end(); currentEntity++) {
 	string supportName="SupportOnAll_" ;
 	supportName+=entNames[(MED_FR::med_entite_maillage)(*currentEntity).first] ;
@@ -297,8 +273,44 @@ void MED_MED_RDONLY_DRIVER::readFileStruct( void )
 	mySupport->setEntity((MED_EN::medEntityMesh) (*currentEntity).first);
 	mySupport->setAll(true);
 	(_ptrMed->_support)[meshName][(MED_FR::med_entite_maillage)(*currentEntity).first] = mySupport ;
+	MESSAGE(LOC<< "The support " << supportName.c_str() << " on entity " << (*currentEntity).first << " is built");
+	index++;
       }
+      MESSAGE(LOC <<"The mesh " <<ptrMesh->getName() << " has " << index << " support(s)");
     }
+
+    map<MESH_NAME_, map<MED_FR::med_entite_maillage,SUPPORT *> >::const_iterator const_itSupportOnMesh ;
+
+    int index = 0;
+
+    vector<SUPPORT *> vectSupp;
+    for (const_itSupportOnMesh=_ptrMed->_support.begin(); const_itSupportOnMesh != _ptrMed->_support.end();
+	 const_itSupportOnMesh++ )
+      {
+	map<MED_FR::med_entite_maillage,SUPPORT *>::const_iterator const_itSupport ;
+	for (const_itSupport=(*const_itSupportOnMesh).second.begin();
+	     const_itSupport!=(*const_itSupportOnMesh).second.end();const_itSupport++) index++;
+      }
+
+    MESSAGE(LOC << "In this MED object there is(are) " << index << " support(s):");
+
+    vectSupp.resize(index);
+
+    index = 0;
+    for (const_itSupportOnMesh=_ptrMed->_support.begin(); const_itSupportOnMesh != _ptrMed->_support.end();
+	 const_itSupportOnMesh++ )
+      {
+	map<MED_FR::med_entite_maillage,SUPPORT *>::const_iterator const_itSupport ;
+	for (const_itSupport=(*const_itSupportOnMesh).second.begin();
+	     const_itSupport!=(*const_itSupportOnMesh).second.end();const_itSupport++)
+	  {
+	    vectSupp[index] = (*const_itSupport).second;
+	    SCRUTE(vectSupp[index]);
+	    MESSAGE(LOC << "Support number " << index << " is "<< *vectSupp[index]);
+	    index++;
+	  }
+      }
+
   }
   
   
@@ -543,7 +555,7 @@ void MED_MED_RDONLY_DRIVER::readFileStruct( void )
   }
   
   // read profil count and their names
-  int support_count_= 0 ;
+  //  int support_count_= 0 ; !! UNUSED VARIABLE !!
   // il faut lire les champs pour avoir les profils stockes !!!
   // il faudrait implémenter la lecture des profils dans med !!!
   

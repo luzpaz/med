@@ -1,29 +1,3 @@
-//  MED MEDMEM_SWIG : binding of C++ implementation and Python
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_SWIG_FieldDouble.cxx
-//  Module : MED
-
 using namespace std;
 #include "MEDMEM_SWIG_FieldDouble.hxx"
 
@@ -59,13 +33,42 @@ FIELDDOUBLE::FIELDDOUBLE(const SUPPORT * Support, const int NumberOfComponents) 
  */
 //=============================================================================
 FIELDDOUBLE::FIELDDOUBLE(const SUPPORT * Support, driverTypes driverType,
-			 const string & fileName,
-			 const string & fieldName) :
-  FIELD<double>(Support, driverType, fileName, fieldName)
+			 const string & fileName, const string & fieldName,
+			 const int iterationNumber, const int orderNumber) :
+  FIELD<double>(Support, driverType, fileName, fieldName,
+		iterationNumber, orderNumber)
 {
   BEGIN_OF("Another constructor with arguments (for Python API) FIELDDOUBLE");
 
+  med_type_champ type = MED_REEL64;
+
+  setValueType(type);
+
   END_OF("Another constructor with arguments (for Python API) FIELDDOUBLE");
+}
+//=============================================================================
+/*!
+ * Copy constructor
+ */
+//=============================================================================
+FIELDDOUBLE::FIELDDOUBLE(const FIELDDOUBLE & m) :
+  FIELD<double>( (FIELD<double> &) m)
+{
+  BEGIN_OF("Copy constructor (for Python API) FIELDDOUBLE");
+
+  END_OF("Copy constructor (for Python API) FIELDDOUBLE");
+}
+//=============================================================================
+/*!
+ * Copy constructor from a FIELD<double>
+ */
+//=============================================================================
+FIELDDOUBLE::FIELDDOUBLE(const FIELD<double> & m) :
+  FIELD<double>( m)
+{
+  BEGIN_OF("Copy constructor (for Python API) FIELDDOUBLE from a FIELD<double>");
+
+  END_OF("Copy constructor (for Python API) FIELDDOUBLE from a FIELD<double>");
 }
 //=============================================================================
 /*!

@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_define.hxx
-//  Module : MED
-
 #ifndef DEFINE_HXX
 #define DEFINE_HXX	
 
@@ -55,29 +29,52 @@ namespace MED_EN {
 #define MED_TAILLE_LNOM  80    
 #define MED_TAILLE_PNOM   8 
 
-typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
 
-typedef enum {MED_FULL_INTERLACE,
-	      MED_NO_INTERLACE}  medModeSwitch; 
+    typedef long medGeometryElement;
+    const medGeometryElement MED_NONE = 0;
+    const medGeometryElement MED_POINT1 = 1;
+    const medGeometryElement MED_SEG2 = 102;
+    const medGeometryElement MED_SEG3 = 103;
+    const medGeometryElement MED_TRIA3 = 203;
+    const medGeometryElement MED_QUAD4 = 204;
+    const medGeometryElement MED_TRIA6 = 206;
+    const medGeometryElement MED_QUAD8 = 208;
+    const medGeometryElement MED_TETRA4 = 304;
+    const medGeometryElement MED_PYRA5 = 305;
+    const medGeometryElement MED_PENTA6 = 306;
+    const medGeometryElement MED_HEXA8 = 308;
+    const medGeometryElement MED_TETRA10 = 310;
+    const medGeometryElement MED_PYRA13 = 313;
+    const medGeometryElement MED_PENTA15 = 315;
+    const medGeometryElement MED_HEXA20 = 320;
+    const medGeometryElement MED_ALL_ELEMENTS = 999;
 
-typedef enum {MED_LECT,MED_ECRI,MED_REMP} med_mode_acces; 
-
-typedef enum {MED_CELL, MED_FACE, MED_EDGE, MED_NODE, MED_ALL_ENTITIES} medEntityMesh; 
-
-typedef enum {MED_COOR, MED_CONN, MED_NOM, MED_NUM, MED_FAM} med_table;
-
-typedef enum {MED_REEL64=6, MED_INT32=24,MED_INT64=26, MED_INT} med_type_champ;
+    typedef long medEntityMesh;
+    const medEntityMesh MED_CELL = 0;
+    const medEntityMesh MED_FACE = 1;
+    const medEntityMesh MED_EDGE = 2;
+    const medEntityMesh MED_NODE = 3;
+    const medEntityMesh MED_ALL_ENTITIES = 4;
+    
+    typedef long medModeSwitch;
+    const medModeSwitch MED_FULL_INTERLACE = 0;
+    const medModeSwitch MED_NO_INTERLACE = 1;
+    
+    typedef long medConnectivity;
+    const medConnectivity MED_NODAL = 0;
+    const medConnectivity MED_DESCENDING = 1;
+    
+    typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
+    
+    typedef enum {MED_LECT,MED_ECRI,MED_REMP} med_mode_acces; 
+    
+    typedef enum {MED_COOR, MED_CONN, MED_NOM, MED_NUM, MED_FAM} med_table;
+    
+    typedef enum {MED_REEL64=6, MED_INT32=24,MED_INT64=26, MED_INT} med_type_champ;
 
 #define MED_NBR_GEOMETRIE_MAILLE 15
 #define MED_NBR_GEOMETRIE_FACE 4
 #define MED_NBR_GEOMETRIE_ARETE 2
-typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103, MED_TRIA3=203,
-	      MED_QUAD4=204, MED_TRIA6=206,MED_QUAD8=208, MED_TETRA4=304,
-	      MED_PYRA5=305, MED_PENTA6=306, MED_HEXA8=308, MED_TETRA10=310, 
-	      MED_PYRA13=313, MED_PENTA15=315, MED_HEXA20=320, MED_ALL_ELEMENTS=999}
-medGeometryElement;
-
-typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ; 
 
 typedef enum {MED_CART, MED_CYL, MED_SPHER} med_repere; 
 

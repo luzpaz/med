@@ -1,30 +1,10 @@
-//  MED MedMem : MED idl descriptions implementation based on the classes of MEDMEM
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : Support_i.hxx
-//  Author : EDF 
-//  Module : MED
-//  $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Support_i.hxx
+//=============================================================================
+// File      : Support_i.hxx
+// Project   : SALOME
+// Author    : EDF 
+// Copyright : EDF 2002
+// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Support_i.hxx
+//=============================================================================
 
 #ifndef _MED_SUPPORT_I_HXX_
 #define _MED_SUPPORT_I_HXX_
@@ -84,7 +64,7 @@ public:
   // Others
   void           addInStudy (SALOMEDS::Study_ptr myStudy, 
 			  SALOME_MED::SUPPORT_ptr myIor)
-    throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
+    throw (SALOME::SALOME_Exception);
   
   //					Cuisine interne
   CORBA::Long 	 getCorbaIndex()   throw (SALOME::SALOME_Exception);

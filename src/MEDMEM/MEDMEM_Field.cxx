@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_Field.cxx
-//  Module : MED
-
 using namespace std;
 #include "MEDMEM_Field.hxx"
 
@@ -131,26 +105,176 @@ FIELD_::~FIELD_()
 
   MESSAGE("In this object FIELD_ there is(are) " << _drivers.size() << " driver(s)");
 
-  for (int index=0; index < _drivers.size(); index++ )
+  for (unsigned int index=0; index < _drivers.size(); index++ )
     {
       SCRUTE(_drivers[index]);
       if ( _drivers[index] != NULL) delete _drivers[index];
     }
 }
 
+/*! 
+  \if developper
+  PROVISOIRE : retourne des volumes, surfaces ou longueurs suivant les cas
+  \endif
+*/
+FIELD<double>* FIELD_::_getFieldSize() const
+{
+    FIELD<double>* p_field_size;
+    switch (getSupport()->getEntity())
+    {
+	case MED_CELL :
+	    switch (getSupport()->getMesh()->getSpaceDimension() ) 
+	    {
+		case 1:
+		    p_field_size=getSupport()->getMesh()->getLength(getSupport() );
+		    break;
+		case 2:
+		    p_field_size=getSupport()->getMesh()->getArea(getSupport() );
+		    break;
+		case 3:
+		    p_field_size=getSupport()->getMesh()->getVolume(getSupport() );
+		    break;
+	    }
+	    break;
+	    
+	case MED_FACE :
+	    p_field_size=getSupport()->getMesh()->getArea(getSupport() );
+	    break;
+
+	case MED_EDGE :
+	    p_field_size=getSupport()->getMesh()->getLength(getSupport() );
+	    break;
+    }
+    return p_field_size;
+}
+
+
+/*! 
+  \if developper
+  Check up the compatibility of field before computing sobolev norm 
+  \endif
+*/
+void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume) const throw (MEDEXCEPTION)
+{
+    string diagnosis;
+    if( getSupport()->getEntity() == MED_NODE )
+    {
+	diagnosis="Cannot compute sobolev norm on a field "+getName()+
+	    " : it has support on nodes!";
+	throw MEDEXCEPTION(diagnosis.c_str());
+    }
+	
+    if (getNumberOfValues()*getNumberOfComponents()<= 0) // Size of array has to be strictly positive
+    {
+	diagnosis="Cannot compute the norm of "+getName()+
+	    " : it size is non positive!";
+	throw MEDEXCEPTION(diagnosis.c_str());
+    }
+
+    const int* nbGauss=getSupport()->getNumberOfGaussPoint();
+    for (int i=0; i<getSupport()->getNumberOfTypes(); ++i)
+	if(nbGauss[i]!=1)
+	{
+	    diagnosis="Cannot compute Lnorm of "+getName()+
+	    " : Gauss numbers greater than one are not yet implemented!";
+	    throw MEDEXCEPTION(diagnosis.c_str());
+	}
+
+    if(support_volume) // if the user has supplied the volume
+    {
+	if(support_volume->getSupport()!=getSupport())
+	{
+	    diagnosis="Cannot compute Lnorm of "+getName()+
+	    " : the volume furnished has not the same support!";
+	    throw MEDEXCEPTION(diagnosis.c_str());
+	}
+	if(support_volume->getNumberOfValues()!=getNumberOfValues())
+	{
+	    diagnosis="Cannot compute Lnorm of "+getName()+
+	    " : the volume furnished has not the same number of values!";
+	    throw MEDEXCEPTION(diagnosis.c_str());
+	}
+    }
+
+}
+
+/*! 
+  \if developper
+   Check up the compatibility of fields before performing an arithmetic operation
+  \endif
+*/
+void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (MEDEXCEPTION)
+{
+    string diagnosis;
+
+    // check-up, fill diagnosis if some incompatibility is found.
+    if(m._support != n._support)
+	diagnosis+="They don't have the same support!";
+    else if(m._numberOfComponents != n._numberOfComponents)
+	diagnosis+="They don't have the same number of components!";
+    else if(m._numberOfValues != n._numberOfValues)
+	diagnosis+="They don't have the same number of values!";
+    else
+    {
+	for(int i=0; i<m._numberOfComponents; i++)
+	{
+// Not yet implemented   
+//	    if(m._componentsTypes[i] != n._componentsTypes[i])
+//	    {
+//		diagnosis+="Components don't have the same types!";
+//		break;
+//	    }
+	    if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
+	    {
+		diagnosis+="Components don't have the same units!";
+		break;
+	    }
+	}
+    }
+
+    if(diagnosis.size()) // if fields are not compatible : complete diagnosis and throw exception
+    {
+	diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
+	         + n._name + " are not compatible.\n" + diagnosis;
+	throw MEDEXCEPTION(diagnosis.c_str());
+    }
+
+    if( m.getNumberOfValues()<=0 || m.getNumberOfComponents()<=0) // check up the size is strictly positive
+    {
+	diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
+	         + n._name + " are empty! (size<=0).\n";
+	throw MEDEXCEPTION(diagnosis.c_str());
+    }
+
+}
+
 //  void     FIELD_::setIterationNumber (int IterationNumber)           {};
 //  void     FIELD_::setOrderNumber     (int OrderNumber)               {}; 
 //  void     FIELD_::setFieldName       (string& fieldName)             {}; 
          
-void     FIELD_::rmDriver      (int index)                            {};
+void     FIELD_::rmDriver      (int index)
+{
+  MESSAGE("void FIELD_::rmDriver(int index) : removing the driver " << index);
+};
 int      FIELD_::addDriver     (driverTypes driverType, 
                                 const string & fileName,
-				const string & driverFieldName)       {};
-int      FIELD_::addDriver     (GENDRIVER & driver)                   {};
+				const string & driverFieldName)
+{
+  MESSAGE("int FIELD_::addDriver(driverTypes driverType, const string & fileName, const string & driverFieldName) : adding the driver " << driverType << " fileName = " << fileName.c_str() << " driverFieldName = " << driverFieldName.c_str());
+  return 0;
+};
+int      FIELD_::addDriver     (GENDRIVER & driver)
+{
+  MESSAGE("int FIELD_::addDriver(GENDRIVER & driver) : driver " << driver);
+  return 0;
+};
+void     FIELD_::openAppend    ( void )                               {};
 void     FIELD_::write         (const GENDRIVER &)                    {};
+void     FIELD_::writeAppend   (const GENDRIVER &)                    {};
 void     FIELD_::read          (const GENDRIVER &)                    {};
-void     FIELD_::write         (int index, const string & driverName) {};
-void     FIELD_::read          (int index)                                  {};
+void     FIELD_::write         (int , const string & ) {};
+void     FIELD_::writeAppend   (int , const string & ) {};
+void     FIELD_::read          (int )                                  {};
 
 //  void                     FIELD_::setValueType(med_type_champ ValueType) {};
 //  med_type_champ FIELD_::getValueType() {};

@@ -1,29 +1,3 @@
-//  MED MedCorba_Swig : binding of MED CORBA objects woth Python
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : libMedCorba_Swig.i
-//  Module : MED
-
 %module libMedCorba_Swig
 
 %include "libMEDMEM_Swig.i"
@@ -444,6 +418,8 @@ FIELDDOUBLE * createLocalFieldDouble(const int, const int);
 
 FIELDINT * createLocalFieldInt(const int, const int);
 
+SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
+
 %{
   SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDDOUBLE * field)
     {
@@ -548,6 +524,28 @@ FIELDINT * createLocalFieldInt(const int, const int);
       END_OF("SALOME_MED::SUPPORT_ptr createCorbaSupport from libMedCorba_Swig");
 
       return supportcorba;
+    }
+
+  SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh)
+    {
+      BEGIN_OF("SALOME_MED::MESH_ptr createCorbaMesh from libMedCorba_Swig");
+
+      SCRUTE(mesh);
+
+      MESH_i * meshimpl = new MESH_i(mesh);
+
+      SALOME_MED::MESH_ptr meshcorba =
+	meshimpl->POA_SALOME_MED::MESH::_this();
+
+      SCRUTE(meshimpl);
+
+      SCRUTE(meshcorba);
+
+      meshimpl->_remove_ref();
+
+      END_OF("SALOME_MED::MESH_ptr createCorbaMesh from libMedCorba_Swig");
+
+      return meshcorba;
     }
 
   FIELDDOUBLE * createLocalFieldDouble(const int NumberOfComponents,

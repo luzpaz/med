@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_Support.hxx
-//  Module : MED
-
 /*
   File Support.hxx
   $Header$
@@ -78,7 +52,7 @@ protected:
     Reference to the mesh on which the support is defined.
     \endif
   */
-  MESH *                   _mesh;
+  mutable MESH *                   _mesh;
 
   /*!
     \if developper
@@ -109,7 +83,7 @@ protected:
     (not yet implemented).
     \endif
   */
-  int *                    _numberOfGaussPoint ;
+  mutable int *                    _numberOfGaussPoint ;
 
    /*
     \if developper
@@ -167,13 +141,13 @@ protected:
     Defined only if _isOnAllElts is false.
     \endif
   */
-  MEDSKYLINEARRAY * _number;
+  mutable MEDSKYLINEARRAY * _number;
 
 public:
   SUPPORT();
   SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL);
   SUPPORT(const SUPPORT & m);
-  ~SUPPORT();
+  virtual ~SUPPORT();
   friend ostream & operator<<(ostream &os,const SUPPORT &my);
 
   // function to set all value when SUPPORT was created by MedMedDriver without all MESH information !!! Change with new API !
@@ -195,7 +169,7 @@ public:
 
   inline string getName() const;
   inline string getDescription() const;
-  inline MESH * getMesh() const;
+  virtual inline MESH * getMesh() const;
   inline medEntityMesh getEntity() const;
 
   inline bool   isOnAllElements() const;
@@ -206,31 +180,36 @@ public:
   //inline int *  getGeometricTypeNumber() const;
   //inline int    getTotalNumberOfElement() const;
   inline int    getNumberOfElements(medGeometryElement GeometricType) const throw (MEDEXCEPTION);
-  inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
-  inline const int *  getNumber(medGeometryElement GeometricType) const throw (MEDEXCEPTION);
-  inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
+  virtual inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
+  virtual inline const int *  getNumber(medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+  virtual inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
 
-  void blending(SUPPORT * mySupport);
+  void blending(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
 
   void setpartial(string Description, int NumberOfGeometricType,
 		  int TotalNumberOfEntity, medGeometryElement *GeometricType,
 		  int *NumberOfEntity, int *NumberValue);
 
   void getBoundaryElements() throw (MEDEXCEPTION);
+
+  void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
 };
 // _____________________
 // Methodes Inline
 // _____________________
 
 /*!
-  If isOnAllElements is false, returns number of elements in the
-  support else returns number of nodes.
+  This method returns the number of all elements of the type GeometricType.
+
+  If isOnAllElements is false, it returns the number of elements in the
+  support else it returns number of elements in the whole mesh.
 
   Example : number of MED_TRIA3 or MED_ALL_ELEMENTS elements
   in entity of support.
 
-  Note : If SUPPORT is defined on MED_NODE, use MED_NONE
-  medGeometryElement type.
+  Note : If SUPPORT is defined on MED_NODE, use MED_ALL_ELEMENTS as
+         medGeometryElement GeometricType and it will returns the number
+	 of nodes in the support (or in the whole mesh).
 */
 //-----------------------------------------------------------------------------
 inline int SUPPORT::getNumberOfElements(medGeometryElement GeometricType) const

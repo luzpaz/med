@@ -1,32 +1,11 @@
-//  MED MedMem : MED idl descriptions implementation based on the classes of MEDMEM
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : Support_i.cxx
-//  Author : EDF
-//  Module : MED
-//  $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Support_i.cxx
+//=============================================================================
+// File      : Support_i.cxx
+// Project   : SALOME
+// Author    : EDF
+// Copyright : EDF 2002
+// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Support_i.cxx
+//=============================================================================
 
-using namespace std;
 #include "utilities.h"
 #include "Utils_CorbaException.hxx"
 #include "Utils_ORB_INIT.hxx"
@@ -292,6 +271,10 @@ throw (SALOME::SALOME_Exception)
 CORBA::Long SUPPORT_i::getNumberOfElements(SALOME_MED::medGeometryElement geomElement) 
 throw (SALOME::SALOME_Exception)
 {
+
+  SCRUTE(geomElement);
+  SCRUTE(SALOME_MED::MED_ALL_ELEMENTS);
+
 	if (_support==NULL)
 		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
 				             SALOME::INTERNAL_ERROR);
@@ -317,6 +300,10 @@ throw (SALOME::SALOME_Exception)
 Engines::long_array *  SUPPORT_i::getNumber(SALOME_MED::medGeometryElement geomElement) 
 throw (SALOME::SALOME_Exception)
 {
+  SCRUTE(_support);
+  SCRUTE(geomElement);
+  SCRUTE(convertIdlEltToMedElt(geomElement));
+
 	if (_support==NULL)
 		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
 				             SALOME::INTERNAL_ERROR);
@@ -409,16 +396,16 @@ throw (SALOME::SALOME_Exception)
  */
 //=============================================================================
 void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr myIor)
-  throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
+  throw (SALOME::SALOME_Exception)
 {
   BEGIN_OF("SUPPORT_i::addInStudy");
 
   if ( _supportId != "" )
-    {
+  {
       MESSAGE("Support already in Study");
       THROW_SALOME_CORBA_EXCEPTION("Support already in Study", \
 				   SALOME::BAD_PARAM);
-    };
+  };
   
   SALOMEDS::StudyBuilder_var     myBuilder = myStudy->NewBuilder();
   SALOMEDS::GenericAttribute_var anAttr;
@@ -427,44 +414,50 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   
   // Find SComponent labelled 'Med'
   MESSAGE("Find SComponent labelled 'Med'");
-  SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
+  SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
   if ( CORBA::is_nil(medfather) ) 
     THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
   
-  // Find SObject labelled 'MEDMESH'
-  MESSAGE("Find SObject labelled 'MEDMESH'");
-  cerr<<flush;
-  MESSAGE(flush);
   if ( CORBA::is_nil(myStudy) ) 
     THROW_SALOME_CORBA_EXCEPTION("Study deleted !!!",SALOME::INTERNAL_ERROR);
+
+  // Find SObject MESH (represent mesh in support)
   SALOMEDS::SObject_var medmeshfather = myStudy->FindObject("MEDMESH");
-  MESSAGE("Find SObject labelled 'MEDMESH' 2");
-  cerr<<flush;
-  MESSAGE(flush);
-  if ( CORBA::is_nil(medmeshfather) ){ 
-    MESSAGE( "On a leve l exception" << flush);
+  if ( CORBA::is_nil(medmeshfather) )
+  { 
+    cout << "On a leve l exception" << flush;
     THROW_SALOME_CORBA_EXCEPTION("SObject labelled 'MEDMESH' not Found",SALOME::INTERNAL_ERROR);
   }
-  // Find SObject MESH (represent mesh in support)
-  MESSAGE( "Find SObject MESH (represent mesh in support)"<< flush);
-  cerr<<flush;
-  MESSAGE(flush);
+  cout << "Find SObject MESH (represent mesh in support)"<< flush;
+
   string meshName = getMesh()->getName() ;
-  SALOMEDS::SObject_var medsupportfather = myStudy->FindObject(meshName.c_str()); // seulement sous Med : il peut y avoir le meme sous SMESH !!!
+
+		// seulement sous Med : il peut y avoir le meme sous SMESH !!!
+  SALOMEDS::SObject_var medsupportfather = myStudy->FindObject(meshName.c_str()); 
   if ( CORBA::is_nil(medsupportfather) ) 
     THROW_SALOME_CORBA_EXCEPTION("SObject Mesh in Support not Found",SALOME::INTERNAL_ERROR);
   // perhaps add MESH automatically ?
   
   MESSAGE("Add a support Object under MED/MESH/MESHNAME");
-  cerr<<flush;
-  MESSAGE(flush);
-  myBuilder->NewCommand();
+  SALOMEDS::SObject_var medsupfather = myStudy->FindObject("MEDSUPPORT");
+  if ( CORBA::is_nil(medsupfather) )
+  {
+                MESSAGE("Add Object MEDSUPPORT");
+                medsupfather = myBuilder->NewObject(medmeshfather);
+                anAttr = myBuilder->FindOrCreateAttribute(medsupfather, "AttributeName");
+                aName = SALOMEDS::AttributeName::_narrow(anAttr);
+                aName->SetValue("MEDSUPPORT");
 
-  SALOMEDS::SObject_var supportEntry = myStudy->FindObject(_support->getName().c_str()); // c'est pas bon, car il faut rechercher uniquement sous le bon MESH !!!
-  if ( CORBA::is_nil(supportEntry) ) { 
+  } ;
+
+
+  //myBuilder->NewCommand();
+  SALOMEDS::SObject_var supportEntry = myStudy->FindObject(_support->getName().c_str());
+			 // c'est pas bon, car il faut rechercher uniquement sous le bon MESH !!!
+  if ( CORBA::is_nil(supportEntry) ) 
+  { 
     // not already in study : we create it !
-    SALOMEDS::SObject_var newObj = myBuilder->NewObject(medsupportfather);
-    
+    SALOMEDS::SObject_var newObj = myBuilder->NewObject(medsupfather);
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
     ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
     CORBA::ORB_var &orb = init(0,0);
@@ -476,7 +469,9 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
     aName = SALOMEDS::AttributeName::_narrow(anAttr);
     aName->SetValue(_support->getName().c_str());
     _supportId = newObj->GetID();
-  } else {
+  } 
+  else 
+  {
     // already in study : put new AttributeIOR !
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
     ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;

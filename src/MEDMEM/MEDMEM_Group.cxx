@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_Group.cxx
-//  Module : MED
-
 using namespace std;
 /*
  File Group.cxx
@@ -80,12 +54,18 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   _mesh =  myFamily->getMesh() ;
   _entity = myFamily->getEntity() ;
   bool isOnAllElts = myFamily->isOnAllElements() ;
+
+  SCRUTE(isOnAllElts);
+  SCRUTE(numberOfFamilies);
+
+
   if ((numberOfFamilies==1)&(isOnAllElts))
     {
       _numberOfFamilies = numberOfFamilies;
-      _isOnAllElts = false ;
+      _isOnAllElts = isOnAllElts ;
       _family.resize(_numberOfFamilies) ;
       _family[0] = myFamily;
+      update();
       return;
     }
   else if ((!(numberOfFamilies==1))&(isOnAllElts))
@@ -99,11 +79,15 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   const medGeometryElement * geometricType = myFamily->getTypes() ;
   //int * geometricTypeNumber = myFamily->getGeometricTypeNumber() ;
   const int * numberOfGaussPoint = myFamily->getNumberOfGaussPoint() ;
+
+  SCRUTE(_numberOfGeometricType);
+
   for (int i=0 ; i<_numberOfGeometricType; i++) {
     _geometricType[i]= geometricType[i] ;
     // _geometricTypeNumber[i] = geometricTypeNumber[i] ;
     _numberOfGaussPoint[i] = numberOfGaussPoint[i] ;
     _numberOfElements[i]=myFamily->getNumberOfElements(geometricType[i]);
+    MESSAGE(LOC << " Type : " << _geometricType[i] << " number of element(s) " << _numberOfElements[i]);
   }
   _isOnAllElts = false ;
   //_totalNumberOfEntities = myFamily->getNumberOfElements(MED_ALL_ELEMENTS) ;
@@ -112,12 +96,18 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   _numberOfFamilies = families.size();
   _family.resize(_numberOfFamilies) ;
   list<FAMILY*>::const_iterator li ;
+
+  MESSAGE(LOC<<"Printing of the object GROUP built right before the blending"<< (SUPPORT) *this);
+
+
   int it = 0 ;
   for (li=families.begin();li!=families.end();li++) {
     blending(*li);
     _family[it] = (*li) ;
     it++ ;
   }
+
+  MESSAGE(LOC<<"Printing of the object GROUP built "<< *this);
 
   END_OF(LOC);
 };

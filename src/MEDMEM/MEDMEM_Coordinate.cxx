@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_Coordinate.cxx
-//  Module : MED
-
 using namespace std;
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Exception.hxx"
@@ -33,10 +7,10 @@ using namespace std;
 
 /*! Default Constructor : should not be used */
 //----------------------------------------------------------//
-COORDINATE::COORDINATE():_coordinate(MEDARRAY<double>()),
+COORDINATE::COORDINATE():_coordinateSystem(""),
+			 _coordinate(MEDARRAY<double>()),
 			 _coordinateName(),
 			 _coordinateUnit(),
-			 _coordinateSystem(""),
 			 _nodeNumber()
 //----------------------------------------------------------//
 {
@@ -47,11 +21,11 @@ COORDINATE::COORDINATE():_coordinate(MEDARRAY<double>()),
     It will create empty array for optional data (nodeNumber..) */
 //------------------------------------------------------------------------------//
 COORDINATE::COORDINATE(int SpaceDimension, int NumberOfNodes, medModeSwitch Mode):
-                        _nodeNumber(),
-                        _coordinateUnit(SpaceDimension),
-			_coordinateSystem(""),
-			_coordinateName(SpaceDimension),
-			_coordinate(SpaceDimension,NumberOfNodes,Mode)
+  _coordinateSystem(""),
+  _coordinate(SpaceDimension,NumberOfNodes,Mode),
+  _coordinateName(SpaceDimension),
+  _coordinateUnit(SpaceDimension),
+  _nodeNumber()
 
 //------------------------------------------------------------------------------//
 {
@@ -102,8 +76,8 @@ void COORDINATE::setCoordinates(MEDARRAY<double> *Coordinate)
 { 
 
   const medModeSwitch mode = Coordinate->getMode(); 
-  const int  spaceDimension = (int) Coordinate->getLeadingValue();
-  const int  numberOfNodes  = (int) Coordinate->getLengthValue();
+  //  const int  spaceDimension = (int) Coordinate->getLeadingValue();
+  //  const int  numberOfNodes  = (int) Coordinate->getLengthValue();
   if ( Coordinate->get(mode) != NULL)
   {
       MEDARRAY<double> pourAttribut(*Coordinate,false);
@@ -196,12 +170,12 @@ void COORDINATE::setNodesNumbers(const int * NodeNumber)
 
 int COORDINATE::getSpaceDimension() const
 { 	
-  _coordinate.getLeadingValue() ; 
+  return _coordinate.getLeadingValue() ; 
 }
 
 int COORDINATE::getNumberOfNodes() const
 { 	
-  _coordinate.getLengthValue() ; 
+  return _coordinate.getLengthValue() ; 
 }
 
 

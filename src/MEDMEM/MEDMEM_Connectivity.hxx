@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_Connectivity.hxx
-//  Module : MED
-
 #ifndef CONNECTIVITY_HXX
 #define CONNECTIVITY_HXX
 
@@ -38,6 +12,7 @@ using namespace MED_EN;
 class MEDSKYLINEARRAY;
 class CELLMODEL;
 class FAMILY;
+class GROUP;
 
 /*!
 	This class deals with all type of connectivity ./n
@@ -142,6 +117,7 @@ public:
 
   friend class MED_MESH_RDONLY_DRIVER;
   friend class MED_MESH_WRONLY_DRIVER;
+  friend ostream & operator<<(ostream &os, CONNECTIVITY &connectivity);
 
   // in order to fill CONNECTIVITY of MESH
   friend class GRID;
@@ -149,7 +125,7 @@ public:
   CONNECTIVITY  (medEntityMesh Entity=MED_CELL);
   CONNECTIVITY  (int numberOfTypes, medEntityMesh Entity=MED_CELL);
   CONNECTIVITY  (const CONNECTIVITY & m);
-  ~CONNECTIVITY ();
+  virtual ~CONNECTIVITY ();
 
   void setConstituent (CONNECTIVITY * Constituent)
                        			throw (MEDEXCEPTION);
@@ -166,11 +142,16 @@ public:
 		 const medGeometryElement Type)
                                         throw (MEDEXCEPTION);
 
+  inline void setNumberOfNodes(med_int NumberOfNodes);
+  
+  inline void setEntityDimension(med_int EntityDimension);
+
   inline bool   existConnectivity     (medConnectivity connectivityType, medEntityMesh Entity) const;
 
-  void          calculateConnectivity (medConnectivity connectivityType, medEntityMesh Entity);
+  virtual void          calculateConnectivity (medConnectivity connectivityType, medEntityMesh Entity);
 
-  void          updateFamily (vector<FAMILY*> myFamilies);
+  virtual void          updateFamily (vector<FAMILY*> myFamilies);
+  virtual void          updateGroup (vector<GROUP*> myFamilies);
 
   inline medEntityMesh              getEntity               ()                     const;
   inline med_int                    getNumberOfTypes        (medEntityMesh Entity) const;
@@ -178,13 +159,13 @@ public:
                                     			     throw (MEDEXCEPTION);
   medGeometryElement                getElementType          (medEntityMesh Entity,
 							     int Number)           const;
-  inline const int *                getGlobalNumberingIndex (medEntityMesh Entity) const
+  virtual inline const int *                getGlobalNumberingIndex (medEntityMesh Entity) const
                                     			     throw (MEDEXCEPTION);
 
-  const med_int *     getConnectivity      (medConnectivity ConnectivityType, 
+  virtual const med_int *     getConnectivity      (medConnectivity ConnectivityType, 
 					    medEntityMesh Entity,
                                             medGeometryElement Type);
-  const med_int *     getConnectivityIndex (medConnectivity ConnectivityType,
+  virtual const med_int *     getConnectivityIndex (medConnectivity ConnectivityType,
 					    medEntityMesh Entity);
  
   const CELLMODEL &   getType              (medGeometryElement Type) const; 
@@ -193,16 +174,16 @@ public:
  
   med_int       getNumberOfNodesInType     (medGeometryElement Type) const; 
   med_int       getNumberOfSubCellInType   (medGeometryElement Type) const; 
-  med_int 	getNumberOf                (medEntityMesh Entity, 
+  virtual med_int 	getNumberOf                (medEntityMesh Entity, 
 					    medGeometryElement Type) const;
-  const med_int*      getValue             (medConnectivity TypeConnectivity, 
+  virtual const med_int*      getValue             (medConnectivity TypeConnectivity, 
                                             medGeometryElement Type); 
-  const med_int*      getValueIndex        (medConnectivity TypeConnectivity);
+  virtual const med_int*      getValueIndex        (medConnectivity TypeConnectivity);
 
-  inline const med_int* getReverseConnectivity (medConnectivity ConnectivityType, 
+  virtual inline const med_int* getReverseConnectivity (medConnectivity ConnectivityType, 
                                                 medEntityMesh Entity=MED_CELL)
                                     	        throw (MEDEXCEPTION);
-  inline const med_int* getReverseConnectivityIndex (medConnectivity ConnectivityType, 
+  virtual inline const med_int* getReverseConnectivityIndex (medConnectivity ConnectivityType, 
 						     medEntityMesh Entity=MED_CELL)
                                     	             throw (MEDEXCEPTION);
 
@@ -233,6 +214,33 @@ inline med_int CONNECTIVITY::getNumberOfTypes(medEntityMesh Entity) const
 	return _numberOfTypes; 
   else if (_constituent!=NULL)
 	return _constituent->getNumberOfTypes(Entity);
+  else if (_constituent == NULL)
+    {
+      MESSAGE("CONNECTIVITY::getNumberOfTypes : _constituent == NULL");
+      try
+	{
+	  (const_cast <CONNECTIVITY *> (this))->calculateDescendingConnectivity();
+	}
+      catch (MEDEXCEPTION & ex)
+	{
+	  return 0 ;
+	}
+
+      SCRUTE(_entityDimension);
+
+      if (_entityDimension != 2 && _entityDimension != 3) return 0;
+
+      try
+	{
+	  _constituent->calculateConnectivity(MED_NODAL,Entity);
+	}
+      catch (MEDEXCEPTION & ex)
+	{
+	  return 0 ;
+	}
+
+      return _constituent->getNumberOfTypes(Entity);
+    }
   else
 	return 0; // because it is the right information (no exception needed)!
 }
@@ -251,10 +259,23 @@ inline const medGeometryElement* CONNECTIVITY::getGeometricTypes(medEntityMesh E
   else if (_constituent!=NULL)
 	return _constituent->getGeometricTypes(Entity);
   else
-	throw MEDEXCEPTION("Entity not defined !");
+	throw MEDEXCEPTION("CONNECTIVITY::getGeometricTypes : Entity not defined !");
 }
 
-/*! A DOCUMENTER */
+/*!   Returns an array containing the accumulated number of entities sorted by the geometric type./n
+
+      Exemple :/n
+
+      In case of a CONNECTIVITY containing 3*MED_TRIA3 et 2*MED_QUAD4 : /n
+            int * count = getGlobalNumberingIndex(MED_CELL)/n
+      count[0] is always set to 1/n
+      count[1] is set to 1+3=4/n
+      count[2] is set to 4+2=6 = total number of cells + 1/n
+
+      Note : Not implemented for MED_ALL_ENTITIES. /n
+      Note : The geometric type order is given by the typedef enum medGeometryElement.
+                      
+*/
 //----------------------------------------------------------------------------------//
 inline const int * CONNECTIVITY::getGlobalNumberingIndex(medEntityMesh Entity) const 
 						throw (MEDEXCEPTION)
@@ -265,7 +286,7 @@ inline const int * CONNECTIVITY::getGlobalNumberingIndex(medEntityMesh Entity) c
   else if (_constituent!=NULL)
 	return _constituent->getGlobalNumberingIndex(Entity);
   else
-	throw MEDEXCEPTION("Entity not defined !");
+	throw MEDEXCEPTION("CONNECTIVITY::getGlobalNumberingIndex : Entity not defined !");
 }
 
 /*!  Returns true if a connectivity exists on elements of type "Entity" */
@@ -299,8 +320,8 @@ inline const CELLMODEL * CONNECTIVITY::getCellsTypes(medEntityMesh Entity) const
     if (_type!=NULL)
       return _type;
     else
-      throw MEDEXCEPTION("CONNECTIVITY::getCellsTypes(medEntityMesh) :
-			   CELLMODEL array is not defined !");
+      throw MEDEXCEPTION("CONNECTIVITY::getCellsTypes(medEntityMesh) :"
+			 " CELLMODEL array is not defined !");
   else
     if (_constituent != NULL)
       return _constituent->getCellsTypes(Entity);
@@ -348,6 +369,17 @@ inline const med_int* CONNECTIVITY::getReverseConnectivityIndex(medConnectivity 
   if (NULL==_constituent)
     calculateDescendingConnectivity();
   return _constituent->getReverseConnectivityIndex(ConnectivityType,Entity);
+}
+
+
+inline void CONNECTIVITY::setNumberOfNodes(med_int NumberOfNodes)
+{
+    _numberOfNodes=NumberOfNodes;
+}
+  
+inline void CONNECTIVITY::setEntityDimension(med_int EntityDimension)
+{
+    _entityDimension=EntityDimension;
 }
 
 #endif /* CONNECTIVITY_HXX */

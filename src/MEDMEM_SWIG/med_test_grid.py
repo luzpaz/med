@@ -1,11 +1,5 @@
-#  MED MEDMEM_SWIG : binding of C++ implementation and Python
-#
-#  Copyright (C) 2003  CEA/DEN, EDF R&D
-#
-#
-#
-#  File   : med_test_grid.py
-#  Module : MED
+#    Python script for testing T5.10 task
+# ###########################################
 
 #% Test structured mesh (GRID) reading from file test19.med
 #% test19.med can be obtained by running test19_c.out executable

@@ -1,12 +1,3 @@
-#  MED MEDMEM_SWIG : binding of C++ implementation and Python
-#
-#  Copyright (C) 2003  CEA/DEN, EDF R&D
-#
-#
-#
-#  File   : med_test_skin.py
-#  Module : MED
-
 #% Test function MESH::getSkin() on mesh from file cube_hexa8_quad4.med
 #% The med file can be obtained by running create_mesh_c3h8q4 executable
 

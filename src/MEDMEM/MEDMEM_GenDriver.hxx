@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_GenDriver.hxx
-//  Module : MED
-
 #ifndef GENDRIVER_HXX
 #define GENDRIVER_HXX
 
@@ -57,6 +31,7 @@ protected :
   med_mode_acces _accessMode; // The file access mode set by the adequate construtor.
   int            _status;     // The file status {MED_INVALID, MED_OPENED, MED_CLOSED } 
   driverTypes    _driverType; //  A FAIRE LE POSITIONNER DS TOUTES LES SS CLASSES !!
+
 
 public:
   /*!
@@ -93,6 +68,11 @@ public:
   */
   virtual void open ( void ) = 0;
   /*!
+    Open file with the append option. This method is used especially
+    on ASCII drivers (e.g. VTK_DRIVER).
+  */
+  virtual void openAppend ( void );
+  /*!
     Close file.
   */
   virtual void close( void ) = 0;
@@ -100,6 +80,11 @@ public:
     Write object in opened file.
   */
   virtual void write( void ) const = 0;
+  /*!
+    Write object in opened file. This method is used especially
+    on ASCII drivers (e.g. VTK_DRIVER).
+  */
+  virtual void writeAppend( void ) const;
   /*!
     Read object in opened file.
   */
@@ -122,7 +107,6 @@ public:
   void   setFileName ( const string & fileName);
   med_mode_acces getAccessMode() const;
 };
-
 
 
 #endif /* GENDRIVER_HXX */

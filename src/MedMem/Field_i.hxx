@@ -1,31 +1,11 @@
-//  MED MedMem : MED idl descriptions implementation based on the classes of MEDMEM
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : Field_i.hxx
-//  Author : EDF
-//  Module : MED
-//  $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Field_i.hxx
-
+//=============================================================================
+// File      : Field_i.hxx
+// Created   : mer fév 20 15:47:57 CET 2002
+// Author    : EDF
+// Project   : SALOME
+// Copyright : EDF 2002
+// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Field_i.hxx
+//=============================================================================
 # ifndef __FIELD_I_H__
 # define __FIELD_I_H__
 
@@ -71,7 +51,7 @@ public :
 		 		     throw (SALOME::SALOME_Exception) = 0;
         virtual void             addInStudy(SALOMEDS::Study_ptr myStudy , 
 					    SALOME_MED::FIELD_ptr myIor)
-		 		     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection) = 0;
+		 		     throw (SALOME::SALOME_Exception) = 0;
         virtual CORBA::Long      addDriver (SALOME_MED::medDriverTypes driverType, 
 					    const char* fileName, 
 					    const char* fieldName)

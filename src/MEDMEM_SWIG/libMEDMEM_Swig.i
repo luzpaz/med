@@ -1,32 +1,8 @@
-//  MED MEDMEM_SWIG : binding of C++ implementation and Python
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : libMEDMEM_Swig.i
-//  Module : MED
-
 %module libMEDMEM_Swig
 
 %{
+#include <sstream>
+#include <string>
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
@@ -66,7 +42,7 @@
 {
   try
     {
-      $action   ;
+      $action
     }
   catch(MEDEXCEPTION& exception)
     {
@@ -85,6 +61,145 @@
 */
 
 %rename(assign) *::operator=;
+
+/*
+  typemap for vector<FAMILY *> C++ object
+*/
+
+%typemap(python,in) vector<FAMILY *>, const vector<FAMILY *>
+{
+  /* typemap in for vector<FAMILY *> */
+  /* Check if is a list */
+
+  if (PyList_Check($input)) { 
+    int size = PyList_Size($input);
+    $1.resize(size);
+
+    for (int i=0; i < size; i++)
+      {
+	PyObject * tmp = PyList_GetItem($input,i);
+	FAMILY * f;
+
+	int err = SWIG_ConvertPtr(tmp, (void **) &f, $descriptor(FAMILY *),
+				  SWIG_POINTER_EXCEPTION);
+
+	if (err == -1)
+	  {
+	    char * message = "Error in typemap(python,in) for vector<FAMILY *> each component should be a FAMILY pointer";
+	    PyErr_SetString(PyExc_RuntimeError, message);
+	    return NULL;
+	  }
+
+	$1[i] = f;
+      }
+  } 
+  else
+    { 
+      PyErr_SetString(PyExc_TypeError,"not a list");
+      return NULL;
+    }
+} 
+
+%typemap(python,out) vector<FAMILY *>
+{
+  /* typemap out for vector<FAMILY *> */
+  int size = $1.size();
+  $result = PyList_New(size);
+
+  for (int i=0;i<size;i++)
+    {
+      PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FAMILY *),0);
+
+      PyList_SetItem($result,i,tmp);
+    }
+}
+
+/*
+  typemap for vector<SUPPORT *> C++ object
+*/
+
+%typemap(python,in) vector<SUPPORT *>, const vector<SUPPORT *>
+{
+  /* typemap in for vector<SUPPORT *> */
+  /* Check if is a list */
+
+  if (PyList_Check($input)) { 
+    int size = PyList_Size($input);
+    $1.resize(size);
+
+    for (int i=0; i < size; i++)
+      {
+	PyObject * tmp = PyList_GetItem($input,i);
+	SUPPORT * s;
+
+	int err = SWIG_ConvertPtr(tmp, (void **) &s, $descriptor(SUPPORT *),
+				  SWIG_POINTER_EXCEPTION);
+
+	if (err == -1)
+	  {
+	    char * message = "Error in typemap(python,in) for vector<SUPPORT *> each component should be a SUPPORT pointer";
+	    PyErr_SetString(PyExc_RuntimeError, message);
+	    return NULL;
+	  }
+
+	$1[i] = s;
+      }
+  } 
+  else
+    { 
+      PyErr_SetString(PyExc_TypeError,"not a list");
+      return NULL;
+    }
+} 
+
+%typemap(python,out) vector<SUPPORT *>
+{
+  /* typemap out for vector<SUPPORT *> */
+  int size = $1.size();
+  $result = PyList_New(size);
+
+  for (int i=0;i<size;i++)
+    {
+      PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(SUPPORT *),0);
+
+      PyList_SetItem($result,i,tmp);
+    }
+}
+
+%typemap(python,out) char *
+{
+  /* typemap out for char * */
+
+  $result = PyString_FromString($1);
+}
+
+%typemap(python,out) string {
+    $result = PyString_FromString($1.c_str());
+}
+
+%typemap(python,in) string {
+  $1=string(PyString_AsString($input));
+}
+
+/*
+  typemap in for PyObject * fonction Python wrapping of a
+  double or int fonction pointeur
+*/
+
+%typemap(python,in) PyObject * double_function, PyObject * integer_function
+{
+  /* typemap in for double or integer callable fonction pointeur */
+  /* Check if it is a callable fonction pointer */
+
+  if(PyCallable_Check($input) == 0)
+    {
+      char * message = "Error in typemap(python,in) for double or integer callable fonction pointeur : the argument should be a callable object";
+      PyErr_SetString(PyExc_RuntimeError, message);
+      return NULL;
+    }
+
+  $1 = $input;
+}
 
 /*
   enum of the C++ MED used in the Python API
@@ -108,7 +223,8 @@ typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
 
 typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ; 
 
-typedef enum {MED_DRIVER=0, VTK_DRIVER=1, NO_DRIVER=255} driverTypes;
+typedef enum {MED_DRIVER=0, GIBI_DRIVER=1, VTK_DRIVER=254,
+	      NO_DRIVER=255} driverTypes;
 
 typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26,
 	      MED_INT} med_type_champ;
@@ -155,70 +271,6 @@ class CELLMODEL
 
   int getNumberOfConstituentsType();
 
-
-
-/*   int* getNodesConstituent(int dim,int num) const; */
-
-
-
-
-
-
-
-
-
-/*   medGeometryElement*  getConstituentsType(int dim) const; */
-
-
-
-
-
-
-
-
-
-
-
-/*   set<medGeometryElement>  getAllConstituentsType() const; */
-
-
-/*   map<medGeometryElement,int>  getNumberOfConstituentsForeachType() const; */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   ~CELLMODEL();
 
   %extend {
@@ -234,11 +286,9 @@ class CELLMODEL
     %newobject __str__();
     const char* __str__()
       {
-	ostrstream line;
-	line << "Python Printing CELLMODEL : " << *self << endl;
-	char * tmp = new char[strlen(line.str())+1];
-	strcpy(tmp,line.str());
-	return tmp;
+	ostringstream mess;
+	mess << "Python Printing CELLMODEL : " << *self << endl;
+	return strdup(mess.str().c_str());
       }
   }
 };
@@ -280,6 +330,8 @@ class SUPPORT
 
   void getBoundaryElements();
 
+  void setNumber(const int * index, const int* value);
+
   %extend {
     SUPPORT(MESH* Mesh, char * Name="", medEntityMesh Entity=MED_CELL)
       {
@@ -289,11 +341,11 @@ class SUPPORT
     %newobject __str__();
     const char* __str__()
       {
-	ostrstream line;
-	line << "Python Printing SUPPORT : " << *self << endl;
-	char * tmp = new char[strlen(line.str())+1];
-	strcpy(tmp,line.str());
-	return tmp;
+	ostringstream mess;
+	mess << "Python Printing SUPPORT : " << *self << endl;
+	char * tmp = const_cast <char *> (mess.str().c_str());
+	char * returned = strdup(tmp);
+	return returned;
       }
 
     void setpartial(char * Description, int NumberOfGeometricType,
@@ -352,6 +404,7 @@ class SUPPORT
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -375,6 +428,7 @@ class SUPPORT
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -398,6 +452,7 @@ class SUPPORT
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
   }
@@ -453,10 +508,9 @@ class FAMILY : public SUPPORT
     %newobject __str__();
     const char* __str__()
       {
-	ostrstream line;
-	line << "Python Printing Family : " << *self << endl;
-	char * tmp = new char[strlen(line.str())+1];
-	strcpy(tmp,line.str());
+	ostringstream mess;
+	mess << "Python Printing Family : " << *self << endl;
+	return strdup(mess.str().c_str());
       }
 
     %newobject getAttributeDescription(int );
@@ -497,6 +551,7 @@ class FAMILY : public SUPPORT
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -520,10 +575,14 @@ class FAMILY : public SUPPORT
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
   }
 }; 
+
+
+
 
 class FIELD_
 {
@@ -555,6 +614,17 @@ public:
   void setNumberOfValues(int NumberOfValues);
   int getNumberOfValues() const;
 
+  string   getName() const;
+  string   getDescription() const;
+  string   getComponentName(int i) const;
+  string   getComponentDescription(int i) const;
+  string   getMEDComponentUnit(int i) const;
+  void     setName(string Name);
+  void     setComponentName(int i, string ComponentName);
+  void     setMEDComponentUnit(int i, string MEDComponentUnit);
+  void     setDescription(string Description);
+  void     setComponentDescription(int i, string ComponentDescription);
+
   %extend {
     int addDriver(driverTypes driverType,
 		  char * fileName="Default File Name.med",
@@ -564,77 +634,9 @@ public:
 			       string(driverName));
       }
 
-    void setName(char * name)
-      {
-	self->setName(string(name));
-      }
-
-    %newobject getName();
-    const char * getName()
-      {
-	string tmp_str = self->getName();
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;	
-      }
-
-    void setDescription(char * Description)
-      {
-	self->setDescription(string(Description));
-      }
-
-    %newobject getDescription();
-    const char * getDescription() const
-      {
-	string tmp_str = self->getDescription();
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
-
-    %newobject getComponentName(int );
-    const char * getComponentName(int i)
-      {
-	string tmp_str = self->getComponentName(i);
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;	
-      }
-
-    void setComponentName(int i, char * ComponentName)
-      {
-	self->setComponentName(i,string(ComponentName));
-      }
-
-    %newobject getComponentDescription(int );
-    const char * getComponentDescription(int i)
-      {
-	string tmp_str = self->getComponentDescription(i);
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;	
-      }
-
-    void setComponentDescription(int i, char * ComponentDescription)
-      {
-	self->setComponentDescription(i,string(ComponentDescription));
-      }
-
-    %newobject getMEDComponentUnit(int );
-    const char * getMEDComponentUnit(int i)
-      {
-	string tmp_str = self->getMEDComponentUnit(i);
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
-
-    void setMEDComponentUnit(int i, char * MEDComponentUnit)
-      {
-	self->setMEDComponentUnit(i,string(MEDComponentUnit));
-      }
   }
 }; 
+
 
 class FIELDDOUBLE : public FIELD_
 {
@@ -653,6 +655,8 @@ public:
 
   FIELDDOUBLE();    
 
+  FIELDDOUBLE(const FIELDDOUBLE & m);
+
   void read(int index=0);
 
   double getValueIJ(int i,int j) const;
@@ -667,17 +671,93 @@ public:
 
   void deallocValue();
 
+  void applyLin(double a, double n);
+
+  double normMax();
+  double norm2();
+  double normL2(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
+  double normL2(const FIELDDOUBLE * p_field_volume=NULL) const;
+  double normL1(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
+  double normL1(const FIELDDOUBLE * p_field_volume=NULL) const;
+
+
   %extend {
+    PyObject *  applyPyFunc( PyObject * func )
+    {
+	MESSAGE("Appel de applyPyFunc");
+	if (!PyCallable_Check(func)) {
+	    PyErr_SetString(PyExc_TypeError, "FIELDDOUBLE.applyPyFunc prend en argument une fonction");
+	    return NULL;
+	}
+
+    	int nComp=self->getNumberOfComponents();
+    	int nVal=self->getNumberOfValues();
+	for (int i=1; i!=nVal+1; ++i)
+	    for ( int j=1 ;j!=nComp+1 ;++j )
+	    {
+		self->setValueIJ(i,j,PyFloat_AsDouble (PyObject_CallFunction( func, "f", self->getValueIJ(i,j) ) ) );
+	        //cout << "value(" << i << "," << j << ") = " << self->getValueIJ(i,j) << " -> ";
+		//cout << PyFloat_AsDouble (PyObject_CallFunction( func, "f", self->getValueIJ(i,j) ) ) << endl;
+	    }
+	 PyObject * result = Py_BuildValue("d", nComp*nVal);
+	 return result;
+    }
+
+    %newobject __add__(const FIELDDOUBLE & );
+    FIELDDOUBLE * __add__(const FIELDDOUBLE & m)
+      {
+	MESSAGE("operator +  : Creation of the addition of two FIELDDOUBLEs");
+
+	FIELD<double>* result = FIELD<double>::add( *(FIELD<double>*)self , (FIELD<double>&)m );
+	return (FIELDDOUBLE*) result;
+
+/*	const FIELD<double> result = (*(FIELD<double>*)self) +
+	  (FIELD<double>&)m;
+	return new FIELDDOUBLE(result); */
+      }
+
+    %newobject __sub__(const FIELDDOUBLE & );
+    FIELDDOUBLE * __sub__(const FIELDDOUBLE & m)
+      {
+	MESSAGE("operator -  : Creation of the substraction of two FIELDDOUBLEs");
+	FIELD<double>* result = FIELD<double>::sub( *(FIELD<double>*)self , (FIELD<double>&)m );
+	return (FIELDDOUBLE*) result;
+      }
+
+    %newobject __mul__(const FIELDDOUBLE & );
+    FIELDDOUBLE * __mul__(const FIELDDOUBLE & m)
+      {
+	MESSAGE("operator *  : Creation of the multiplication of two FIELDDOUBLEs");
+	FIELD<double>* result = FIELD<double>::mul( *(FIELD<double>*)self , (FIELD<double>&)m );
+	return (FIELDDOUBLE*) result;
+      }
+
+    %newobject __div__(const FIELDDOUBLE & );
+    FIELDDOUBLE * __div__(const FIELDDOUBLE & m)
+      {
+	MESSAGE("operator /  : Creation of the division of two FIELDDOUBLEs");
+	FIELD<double>* result = FIELD<double>::div( *(FIELD<double>*)self , (FIELD<double>&)m );
+	return (FIELDDOUBLE*) result;
+      }
+
     FIELDDOUBLE (const SUPPORT * Support, driverTypes driverType,
-		 char * fileName, char * fieldName)
+		 char * fileName, char * fieldName,
+		 const int iterationNumber,
+		 const int orderNumber)
       {
 	return new FIELDDOUBLE(Support, driverType, string(fileName),
-			       string(fieldName));
+			       string(fieldName),iterationNumber,
+			       orderNumber);
       }
 
     void write(int index=0, char * driverName="")
       {
 	self->write(index, string(driverName));
+      }
+
+    void writeAppend(int index=0, char * driverName="")
+      {
+	self->writeAppend(index, string(driverName));
       }
 
     PyObject * getValue(medModeSwitch Mode)
@@ -702,6 +782,7 @@ public:
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -729,6 +810,7 @@ public:
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -757,6 +839,8 @@ public:
 
   FIELDINT();
 
+  FIELDINT(const FIELDINT & m);
+
   void read(int index=0);
 
   int getValueIJ(int i,int j) const;
@@ -771,17 +855,84 @@ public:
 
   void deallocValue();
 
+  void applyLin(int a, int n);
+
+  double normMax();
+  double norm2();
+  double normL2(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
+  double normL2(const FIELDDOUBLE * p_field_volume=NULL) const;
+  double normL1(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
+  double normL1(const FIELDDOUBLE * p_field_volume=NULL) const;
+
+
   %extend {
+
+    PyObject *  applyPyFunc( PyObject * func )
+    {
+	if (!PyCallable_Check(func)) {
+	    PyErr_SetString(PyExc_TypeError, "FIELDDOUBLE.applyPyFunc prend en argument une fonction");
+	    return NULL;
+	}
+
+    	int nComp=self->getNumberOfComponents();
+    	int nVal=self->getNumberOfValues();
+	for (int i=1; i!=nVal+1; ++i)
+	    for ( int j=1 ;j!=nComp+1 ;++j )
+		self->setValueIJ(i,j,PyInt_AsLong (PyObject_CallFunction( func, "i", self->getValueIJ(i,j) ) ) );
+	 PyObject * result = Py_BuildValue("d", nComp*nVal);
+	 return result;
+    }
+
+    %newobject __add__(const FIELDINT & );
+    FIELDINT * __add__(const FIELDINT & m)
+      {
+	MESSAGE("operator +  : Creation of the addition of two FIELDINTs");
+	FIELD<int>* result = FIELD<int>::add( *(FIELD<int>*)self , (FIELD<int>&)m );
+	return (FIELDINT*) result;
+      }
+
+    %newobject __sub__(const FIELDINT & );
+    FIELDINT * __sub__(const FIELDINT & m)
+      {
+	MESSAGE("operator -  : Creation of the substraction of two FIELDINTs");
+	FIELD<int>* result = FIELD<int>::sub( *(FIELD<int>*)self , (FIELD<int>&)m );
+	return (FIELDINT*) result;
+      }
+
+    %newobject __mul__(const FIELDINT & );
+    FIELDINT * __mul__(const FIELDINT & m)
+      {
+	MESSAGE("operator *  : Creation of the multiplication of two FIELDINTs");
+	FIELD<int>* result = FIELD<int>::mul( *(FIELD<int>*)self , (FIELD<int>&)m );
+	return (FIELDINT*) result;
+      }
+
+    %newobject __div__(const FIELDINT & );
+    FIELDINT * __div__(const FIELDINT & m)
+      {
+	MESSAGE("operator /  : Creation of the division of two FIELDINTs");
+	FIELD<int>* result = FIELD<int>::div( *(FIELD<int>*)self , (FIELD<int>&)m );
+	return (FIELDINT*) result;
+      }
+
     FIELDINT(const SUPPORT * Support, driverTypes driverType,
-             char * fileName, char * fieldName)
+             char * fileName, char * fieldName,
+	     const int iterationNumber,
+	     const int orderNumber)
       {
 	return new FIELDINT(Support, driverType, string(fileName),
-			    string(fieldName));
+			    string(fieldName), iterationNumber,
+			    orderNumber);
       }
 
     void write(int index=0, char * driverName="")
       {
 	self->write(index, string(driverName));
+      }
+
+    void writeAppend(int index=0, char * driverName="")
+      {
+	self->writeAppend(index, string(driverName));
       }
 
     PyObject * getValue(medModeSwitch Mode)
@@ -806,6 +957,7 @@ public:
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -832,6 +984,7 @@ public:
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -919,6 +1072,18 @@ public :
 	return self->getSkin(Support3D);
       }
 
+    %newobject mergeSupports(const vector<SUPPORT *> );
+    SUPPORT * mergeSupports(const vector<SUPPORT *> Supports)
+      {
+	return self->mergeSupports(Supports);
+      }
+
+    %newobject intersectSupports(const vector<SUPPORT *> );
+    SUPPORT * intersectSupports(const vector<SUPPORT *> Supports)
+      {
+	return self->intersectSupports(Supports);
+      }
+
     CELLMODEL getCellType(medEntityMesh Entity,int i)
       {
 	return self->getCellsTypes(Entity)[i];
@@ -965,6 +1130,14 @@ public :
 	return tmp;
       }
 
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MESH : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
     %newobject getCoordinateName(int );
     const char * getCoordinateName(int i)
       {
@@ -1001,6 +1174,7 @@ public :
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -1022,6 +1196,7 @@ public :
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -1043,6 +1218,7 @@ public :
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -1065,6 +1241,7 @@ public :
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -1101,6 +1278,7 @@ public :
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -1126,6 +1304,7 @@ public :
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -1167,6 +1346,7 @@ public :
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -1207,6 +1387,31 @@ public :
 	      }
 	  }
 	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
+	return result;
+      }
+
+    PyObject * getGlobalNumberingIndex(medEntityMesh Entity)
+      {
+	PyObject *py_list;
+	const int * numberingIndex = self->getGlobalNumberingIndex(Entity);
+	int nbOfTypes = self->getNumberOfTypes(Entity);
+	int size = nbOfTypes+1;
+
+	py_list = PyList_New(size);
+	for (int i=0; i < size; i++)
+	  {
+	    int err = PyList_SetItem(py_list, i,
+				     Py_BuildValue("i", numberingIndex[i]));
+	    if(err)
+	      {
+		char * message = "Error in MESH::getGlobalNumberingIndex";
+		PyErr_SetString(PyExc_RuntimeError, message);
+		return NULL;
+	      }
+	  }
+	PyObject * result = Py_BuildValue("O", py_list);
+	Py_DECREF(py_list);
 	return result;
       }
 
@@ -1307,13 +1512,13 @@ class GRID : public MESH
 
   ~GRID();
 
-  int getNodeNumber(const int i, const int j=0, const int k=0);
+  int getNodeNumber(const int i, const int j=0, const int k=0) const ;
 
-  int getCellNumber(const int i, const int j=0, const int k=0) ;
+  int getCellNumber(const int i, const int j=0, const int k=0) const ;
 
-  int getEdgeNumber(const int Axis, const int i, const int j=0, const int k=0);
+  int getEdgeNumber(const int Axis, const int i, const int j=0, const int k=0) const ;
 
-  int getFaceNumber(const int Axis, const int i, const int j=0, const int k=0);
+  int getFaceNumber(const int Axis, const int i, const int j=0, const int k=0) const ;
   
   med_grid_type getGridType();
   
@@ -1372,6 +1577,7 @@ class GRID : public MESH
         PyList_SetItem(py_list, 0, Py_BuildValue("i", Axis));
       
       PyObject * result = Py_BuildValue("O", py_list);
+      Py_DECREF(py_list);
       return result;
     }
   }
@@ -1393,6 +1599,10 @@ class MED
   void updateSupport () ;
 
   void write (int index=0);
+
+  void addField ( FIELD_  * const ptrField  );
+
+  void addMesh  ( MESH    * const ptrMesh   );
 
   %extend {
     /*
@@ -1456,6 +1666,12 @@ class MED
       {
 	return self->getField(string(fieldName),dt,it);
       }
+
+    SUPPORT * getSupport(char * meshName, medEntityMesh entity)
+      {
+	return self->getSupport(string(meshName),
+				(MED_FR::med_entite_maillage) entity);
+      }
   }
 };
 
@@ -1479,6 +1695,14 @@ class MED_MED_RDONLY_DRIVER
       {
 	return new MED_MED_RDONLY_DRIVER(string(fileName), ptrMed);
       }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_MED_RDONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
   }
 };
 
@@ -1497,6 +1721,14 @@ class MED_MED_WRONLY_DRIVER
     MED_MED_WRONLY_DRIVER(char * fileName,  MED * ptrMed)
       {
 	return new MED_MED_WRONLY_DRIVER(string(fileName), ptrMed);
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_MED_WRONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
       }
   }
 };
@@ -1519,6 +1751,14 @@ class MED_MED_RDWR_DRIVER : public virtual MED_MED_RDONLY_DRIVER,
     MED_MED_RDWR_DRIVER(char * fileName,  MED * ptrMed)
       {
 	return new MED_MED_RDWR_DRIVER(string(fileName), ptrMed);
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_MED_RDWR_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
       }
   }
 };
@@ -1545,6 +1785,14 @@ class MED_MESH_RDONLY_DRIVER
     MED_MESH_RDONLY_DRIVER(char * fileName,  MESH * ptrMesh)
       {
 	return new MED_MESH_RDONLY_DRIVER(string(fileName), ptrMesh);
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_MESH_RDONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
       }
 
     void setMeshName(char * meshName)
@@ -1582,6 +1830,14 @@ class MED_MESH_WRONLY_DRIVER
 	return new MED_MESH_WRONLY_DRIVER(string(fileName), ptrMesh);
       }
 
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_MESH_WRONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
     void setMeshName(char * meshName)
       {
 	self->setMeshName(string(meshName));
@@ -1617,6 +1873,14 @@ class MED_MESH_RDWR_DRIVER : public virtual MED_MESH_RDONLY_DRIVER,
     MED_MESH_RDWR_DRIVER(char * fileName,  MESH * ptrMesh)
       {
 	return new MED_MESH_RDWR_DRIVER(string(fileName), ptrMesh);
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_MESH_RDWR_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
       }
 
     void setMeshName(char * meshName)
@@ -1659,6 +1923,14 @@ public:
 	return new MED_FIELDDOUBLE_RDONLY_DRIVER(string(fileName), ptrField);
       }
 
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_FIELDDOUBLE_RDONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
     void setFieldName(char * fieldName)
       {
 	self->setFieldName(string(fieldName));
@@ -1695,6 +1967,14 @@ public:
 	return new MED_FIELDDOUBLE_WRONLY_DRIVER(string(fileName), ptrField);
       }
 
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_FIELDDOUBLE_WRONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
     void setFieldName(char * fieldName)
       {
 	self->setFieldName(string(fieldName));
@@ -1729,6 +2009,14 @@ public:
     MED_FIELDDOUBLE_RDWR_DRIVER(char * fileName, FIELDDOUBLE * ptrField)
       {
 	return new MED_FIELDDOUBLE_RDWR_DRIVER(string(fileName), ptrField);
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_FIELDDOUBLE_RDWR_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
       }
 
     void setFieldName(char * fieldName)
@@ -1771,6 +2059,14 @@ public:
 	return new MED_FIELDINT_RDONLY_DRIVER(string(fileName), ptrField);
       }
 
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_FIELDINT_RDONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
     void setFieldName(char * fieldName)
       {
 	self->setFieldName(string(fieldName));
@@ -1805,6 +2101,14 @@ public:
     MED_FIELDINT_WRONLY_DRIVER(char * fileName, FIELDINT * ptrField)
       {
 	return new MED_FIELDINT_WRONLY_DRIVER(string(fileName), ptrField);
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_FIELDINT_WRONLY_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
       }
 
     void setFieldName(char * fieldName)
@@ -1843,6 +2147,14 @@ public:
 	return new MED_FIELDINT_RDWR_DRIVER(string(fileName), ptrField);
       }
 
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MED_FIELDINT_RDWR_DRIVER : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
     void setFieldName(char * fieldName)
       {
 	self->setFieldName(string(fieldName));
@@ -1859,25 +2171,445 @@ public:
   }
 };
 
+%newobject createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
+FIELDDOUBLE * createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
+
+%newobject createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) ;
+FIELDINT * createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) ;
+
 FIELDDOUBLE * createFieldDoubleFromField(FIELD_ * field) ;
 
 FIELDINT * createFieldIntFromField(FIELD_ * field) ;
 
+%newobject createFieldDoubleFromAnalytic(SUPPORT * , int , PyObject *);
+FIELDDOUBLE * createFieldDoubleFromAnalytic(SUPPORT * Support,
+					    int NumberOfComponents,
+					    PyObject * double_function) ;
+
+%newobject createFieldIntFromAnalytic(SUPPORT * , int , PyObject *);
+FIELDINT * createFieldIntFromAnalytic(SUPPORT * Support,
+				      int NumberOfComponents,
+				      PyObject * integer_function) ;
+
 GRID * createGridFromMesh( MESH * aMesh );
 
 %{
+  FIELDDOUBLE * createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE * field2) 
+  {
+     return (FIELDDOUBLE *) FIELD<double>::scalarProduct( (FIELD<double>)*field1, (FIELD<double>)*field2);
+  }
+  
+  FIELDINT * createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) 
+  {
+     return (FIELDINT *) FIELD<int>::scalarProduct( (FIELD<int>)*field1, (FIELD<int>)*field2);
+  }
+  
   FIELDDOUBLE * createFieldDoubleFromField(FIELD_ * field)
     {
-      MESSAGE("creatFieldDoubleFromField : Constructor (for Python API) FIELDDOUBLE with parameter FIELD_");
+      MESSAGE("createFieldDoubleFromField : Constructor (for Python API) FIELDDOUBLE with parameter FIELD_");
       MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELDDOUBLE");
       return (FIELDDOUBLE *) field;
     }
 
   FIELDINT * createFieldIntFromField(FIELD_ * field)
     {
-      MESSAGE("creatFieldIntFromField : Constructor (for Python API) FIELDINT with parameter FIELD_");
+      MESSAGE("createFieldIntFromField : Constructor (for Python API) FIELDINT with parameter FIELD_");
       MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELDINT");
       return (FIELDINT *) field;
+    }
+
+  FIELDDOUBLE * createFieldDoubleFromAnalytic(SUPPORT * Support,
+					      int NumberOfComponents,
+					      PyObject * double_function)
+    {
+      MESSAGE("createFieldDoubleFromAnalytic : Constructor (for Python API) FIELDDOUBLE from an analytic fonction");
+
+      FIELDDOUBLE * fieldDouble  = new FIELDDOUBLE(Support,NumberOfComponents);
+
+      int NumberOfValues = fieldDouble->getNumberOfValues();
+      double * values = new double[NumberOfValues*NumberOfComponents];
+
+      const double * x = (const double *) NULL;
+      const double * y = (const double *) NULL;
+      const double * z = (const double *) NULL;
+
+      FIELD<double> * barycenterField = (FIELD<double> *) NULL;
+
+      medEntityMesh entity = Support->getEntity();
+      bool onAll = Support->isOnAllElements();
+
+      MESH * mesh = Support->getMesh();
+      int spaceDim = mesh->getSpaceDimension();
+
+      if (entity == MED_NODE)
+	{
+	  if (onAll)
+	    {
+	      const double * coord = mesh->getCoordinates(MED_NO_INTERLACE);
+
+	      x = coord;
+	      y = coord+NumberOfValues;
+	      if (spaceDim == 3) z = y+NumberOfValues;
+	    }
+	  else
+	    {
+	      const int * nodesNumber = Support->getNumber(MED_ALL_ELEMENTS);
+	      const double * coord = mesh->getCoordinates(MED_FULL_INTERLACE);
+
+	      double * x_tmp = new double [NumberOfValues];
+	      double * y_tmp = new double [NumberOfValues];
+
+	      for (int i=0; i<NumberOfValues; i++)
+		{
+		  int j = nodesNumber[i]*spaceDim;
+		  x_tmp[i] = coord[j];
+		  y_tmp[i] = coord[j+1];
+		}
+
+	      x = x_tmp;
+	      y = y_tmp;
+
+	      if (spaceDim == 3)
+		{
+		  double * z_tmp = new double [NumberOfValues];
+
+		  for (int i=0; i<NumberOfValues; i++)
+		    {
+		      int j = nodesNumber[i]*spaceDim + 2;
+		      z_tmp[i] = coord[j];
+		    }
+
+		  z = z_tmp;
+		}
+	    }
+	}
+      else
+	{
+	  barycenterField = mesh->getBarycenter(Support);
+	  const double * barycenter =
+	    barycenterField->getValue(MED_NO_INTERLACE);
+
+	  x = barycenter;
+	  y = barycenter+NumberOfValues;
+	  if (spaceDim == 3) z = y+NumberOfValues;
+	}
+
+      for (int i=0; i<NumberOfValues; i++)
+	{
+	  double x_val = x[i];
+	  double y_val = y[i];
+	  double z_val = 0.0;
+
+	  if (spaceDim == 2)
+	    {
+	    MESSAGE("debug ...... x = " << x_val << " y = " << y_val);
+	    }
+	  else if (spaceDim == 3)
+	    {
+	      z_val = z[i];
+	      MESSAGE("debug ...... x = " << x_val << " y = " << y_val << " z = " << z_val);
+	    }
+
+	  PyObject * tuple;
+
+	  if (spaceDim == 2) tuple = PyTuple_New(2);
+	  else if (spaceDim == 3) tuple = PyTuple_New(3);
+
+	  int index = 0;
+	  int err = PyTuple_SetItem(tuple,index,Py_BuildValue("d",x_val));
+
+	  if (err != 0)
+	    throw MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic");
+
+	  index = 1;
+	  err = PyTuple_SetItem(tuple,index,Py_BuildValue("d",y_val));
+
+	  if (err != 0)
+	    throw MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic");
+
+	  if (spaceDim == 3)
+	    {
+	      index = 2;
+	      err = PyTuple_SetItem(tuple,index,Py_BuildValue("d",z_val));
+
+	      if (err != 0)
+		throw MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic");
+	    }
+
+	  PyObject * function_ret = PyObject_CallObject(double_function,
+							tuple);
+
+	  SCRUTE(function_ret);
+
+	  if ((function_ret == (PyObject *) NULL) && (spaceDim == 2))
+	    throw MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic : the call to the user callable fonction has failed (check its API (double, double))");
+	  else if ((function_ret == (PyObject *) NULL) && (spaceDim == 3))
+	    throw MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic : the call to the user callable fonction has failed (check its API (double, double, double))");
+
+	  err = PyList_Check(function_ret);
+
+	  if (!err)
+	    if (spaceDim == 2)
+	      {
+		Py_DECREF(function_ret);
+		throw MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic : the call to the user callable fonction has failed (check its API list of double fonct (double, double))");
+	      }
+	    else if (spaceDim == 3)
+	      {
+		Py_DECREF(function_ret);
+		throw MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic : the call to the user callable fonction has failed (check its API list of double fonct (double, double, double))");
+	      }
+
+	  int size = PyList_Size(function_ret);
+
+	  if (size != NumberOfComponents)
+	    if (spaceDim == 2)
+	      {
+		Py_DECREF(function_ret);
+		throw MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic : the call to the user callable fonction has failed (check its API list of double fonct (double, double), especially the size of the returned list)");
+	      }
+	    else if (spaceDim == 3)
+	      {
+		Py_DECREF(function_ret);
+		throw MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic : the call to the user callable fonction has failed (check its API list of double fonct (double, double, double), especially the size of the returned list)");
+	      }
+
+	  for (int j=0; j<NumberOfComponents; j++)
+	    {
+	      PyObject * tmp = PyList_GetItem(function_ret,j);
+
+	      err = PyFloat_Check(tmp);
+
+	      if (!err)
+		if (spaceDim == 2)
+		  {
+		    Py_DECREF(function_ret);
+		    throw MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic : the call to the user callable fonction has failed (check its API list of double fonct (double, double), especially the type of the returned list)");
+		  }
+		else if (spaceDim == 3)
+		  {
+		    Py_DECREF(function_ret);
+		    throw MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic : the call to the user callable fonction has failed (check its API list of double fonct (double, double, double), especially the type of the returned list)");
+		  }
+
+	      values[i*NumberOfComponents+j] = PyFloat_AsDouble(tmp);
+	    }
+
+	  Py_DECREF(function_ret);
+	  Py_DECREF(tuple);
+	}
+
+      fieldDouble->setValue(MED_FULL_INTERLACE,values);
+
+      delete [] values;
+
+      if ((entity == MED_NODE) && (!onAll))
+	{
+	  delete [] x;
+	  delete [] y;
+
+	  if (Support->getMesh()->getSpaceDimension() == 3)
+	    delete [] z;
+	}
+      else if (entity != MED_NODE) delete barycenterField ;
+
+      return fieldDouble;
+    }
+
+  FIELDINT * createFieldIntFromAnalytic(SUPPORT * Support,
+					int NumberOfComponents,
+					PyObject * integer_function)
+    {
+      MESSAGE("createFieldIntFromAnalytic : Constructor (for Python API) FIELDINT from an analytic fonction");
+
+      FIELDINT * fieldInt = new FIELDINT(Support,NumberOfComponents);
+
+      int NumberOfValues = fieldInt->getNumberOfValues();
+      int * values = new int[NumberOfValues*NumberOfComponents];
+
+      const double * x = (const double *) NULL;
+      const double * y = (const double *) NULL;
+      const double * z = (const double *) NULL;
+
+      FIELD<double> * barycenterField = (FIELD<double> *) NULL;
+
+      medEntityMesh entity = Support->getEntity();
+      bool onAll = Support->isOnAllElements();
+
+      MESH * mesh = Support->getMesh();
+      int spaceDim = mesh->getSpaceDimension();
+
+      if (entity == MED_NODE)
+	{
+	  if (onAll)
+	    {
+	      const double * coord = mesh->getCoordinates(MED_NO_INTERLACE);
+
+	      x = coord;
+	      y = coord+NumberOfValues;
+	      if (spaceDim == 3) z = y+NumberOfValues;
+	    }
+	  else
+	    {
+	      const int * nodesNumber = Support->getNumber(MED_ALL_ELEMENTS);
+	      const double * coord = mesh->getCoordinates(MED_FULL_INTERLACE);
+
+	      double * x_tmp = new double [NumberOfValues];
+	      double * y_tmp = new double [NumberOfValues];
+
+	      for (int i=0; i<NumberOfValues; i++)
+		{
+		  int j = nodesNumber[i]*spaceDim;
+		  x_tmp[i] = coord[j];
+		  y_tmp[i] = coord[j+1];
+		}
+
+	      x = x_tmp;
+	      y = y_tmp;
+
+	      if (spaceDim == 3)
+		{
+		  double * z_tmp = new double [NumberOfValues];
+
+		  for (int i=0; i<NumberOfValues; i++)
+		    {
+		      int j = nodesNumber[i]*spaceDim + 2;
+		      z_tmp[i] = coord[j];
+		    }
+
+		  z = z_tmp;
+		}
+	    }
+	}
+      else
+	{
+	  barycenterField = mesh->getBarycenter(Support);
+	  const double * barycenter =
+	    barycenterField->getValue(MED_NO_INTERLACE);
+
+	  x = barycenter;
+	  y = barycenter+NumberOfValues;
+	  if (spaceDim == 3) z = y+NumberOfValues;
+	}
+
+      for (int i=0; i<NumberOfValues; i++)
+	{
+	  double x_val = x[i];
+	  double y_val = y[i];
+	  double z_val = 0.0;
+
+	  if (spaceDim == 2)
+	    {
+	    MESSAGE("debug ...... x = " << x_val << " y = " << y_val);
+	    }
+	  else if (spaceDim == 3)
+	    {
+	      z_val = z[i];
+	      MESSAGE("debug ...... x = " << x_val << " y = " << y_val << " z = " << z_val);
+	    }
+
+	  PyObject * tuple;
+
+	  if (spaceDim == 2) tuple = PyTuple_New(2);
+	  else if (spaceDim == 3) tuple = PyTuple_New(3);
+
+	  int index = 0;
+	  int err = PyTuple_SetItem(tuple,index,Py_BuildValue("d",x_val));
+
+	  if (err != 0)
+	    throw MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic");
+
+	  index = 1;
+	  err = PyTuple_SetItem(tuple,index,Py_BuildValue("d",y_val));
+
+	  if (err != 0)
+	    throw MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic");
+
+	  if (spaceDim == 3)
+	    {
+	      index = 2;
+	      err = PyTuple_SetItem(tuple,index,Py_BuildValue("d",z_val));
+
+	      if (err != 0)
+		throw MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic");
+	    }
+
+	  PyObject * function_ret = PyObject_CallObject(integer_function,
+							tuple);
+
+	  if ((function_ret == (PyObject *) NULL) && (spaceDim == 2))
+	    throw MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API (double, double))");
+	  else if ((function_ret == (PyObject *) NULL) && (spaceDim == 3))
+	    throw MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API (double, double, double))");
+
+	  err = PyList_Check(function_ret);
+
+	  if (!err)
+	    if (spaceDim == 2)
+	      {
+		Py_DECREF(function_ret);
+		throw MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API list of integer fonct (double, double))");
+	      }
+	    else if (spaceDim == 3)
+	      {
+		Py_DECREF(function_ret);
+		throw MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API list of integer fonct (double, double, double))");
+	      }
+
+	  int size = PyList_Size(function_ret);
+
+	  if (size != NumberOfComponents)
+	    if (spaceDim == 2)
+	      {
+		Py_DECREF(function_ret);
+		throw MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API list of integer fonct (double, double), especially the size of the returned list)");
+	      }
+	    else if (spaceDim == 3)
+	      {
+		Py_DECREF(function_ret);
+		throw MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API list of integer fonct (double, double, double), especially the size of the returned list)");
+	      }
+
+	  for (int j=0; j<NumberOfComponents; j++)
+	    {
+	      PyObject * tmp = PyList_GetItem(function_ret,j);
+
+	      err = PyInt_Check(tmp);
+
+	      if (!err)
+		if (spaceDim == 2)
+		  {
+		    Py_DECREF(function_ret);
+		    throw MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API list of integer fonct (double, double), especially the type of the returned list)");
+		  }
+		else if (spaceDim == 3)
+		  {
+		    Py_DECREF(function_ret);
+		    throw MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API list of integer fonct (double, double, double), especially the type of the returned list)");
+		  }
+
+	      values[i*NumberOfComponents+j] = (int) PyInt_AsLong(tmp);
+	    }
+
+	  Py_DECREF(function_ret);
+	  Py_DECREF(tuple);
+	}
+
+      fieldInt->setValue(MED_FULL_INTERLACE,values);
+
+      delete [] values;
+
+      if ((entity == MED_NODE) && (!onAll))
+	{
+	  delete [] x;
+	  delete [] y;
+
+	  if (Support->getMesh()->getSpaceDimension() == 3)
+	    delete [] z;
+	}
+      else if (entity != MED_NODE) delete barycenterField ;
+
+      return fieldInt;
     }
 
   GRID * createGridFromMesh( MESH * aMesh )

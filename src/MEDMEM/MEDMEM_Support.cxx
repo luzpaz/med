@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_Support.cxx
-//  Module : MED
-
 using namespace std;
 /*
  File Support.cxx
@@ -31,6 +5,7 @@ using namespace std;
 */
 
 #include <set>
+#include <algorithm>
 #include <list>
 
 //#include "utilities.h"
@@ -164,10 +139,10 @@ SUPPORT::~SUPPORT()
 ostream & operator<<(ostream &os, const SUPPORT &my)
 //--------------------------------------------------
 {
-  os << "Name : "<< my._name << endl ;
-  os << "Description : "<< my._description << endl ;
+  os << "Name : "<< my.getName() << endl ;
+  os << "Description : "<< my.getDescription() << endl ;
   os << "Mesh name : ";
-  if (my._mesh==NULL)
+  if (my.getMesh() == NULL)
     os << "ERROR : Mesh not defined !" << endl ;
   else
     os << my._mesh->getName() << endl ;
@@ -178,9 +153,10 @@ ostream & operator<<(ostream &os, const SUPPORT &my)
     os << "NumberOfTypes : "<<numberoftypes<<endl;
     medGeometryElement * types = my._geometricType;
     for (int j=0;j<numberoftypes;j++) {
-      os << "    * Type "<<types[j]<<" : ";
       int numberOfElements = my._numberOfElements[j];
-      const int * number = my._number->getI(j+1);
+      os << "    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) : ";
+      const int * number = my.getNumber(types[j]);
+      SCRUTE(number);
       for (int k=0; k<numberOfElements;k++)
 	os << number[k] << " ";
       os << endl ;
@@ -236,10 +212,10 @@ void SUPPORT::update()
 };
 
 /*!
-  Blend the given SUPPORT into it.
+  Blend the given SUPPORT mySupport into the calling object SUPPORT.
 */
 //-------------------
-void SUPPORT::blending(SUPPORT * mySupport) 
+void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
 //-------------------
 {
   const char * LOC = "SUPPORT::blending() : " ;
@@ -257,33 +233,39 @@ void SUPPORT::blending(SUPPORT * mySupport)
   //MESH_ENTITIES myMeshEntities() ;
   list<MED_FR::med_geometrie_element>::const_iterator listIt ;
   int it=0 ;
-  for(listIt=(MED_FR::meshEntities[(MED_FR::med_entite_maillage)_entity]).begin();listIt!=(MED_FR::meshEntities[(MED_FR::med_entite_maillage)_entity]).end();listIt++){
+  for(listIt=(MED_FR::meshEntities[(MED_FR::med_entite_maillage)_entity]).begin();listIt!=(MED_FR::meshEntities[(MED_FR::med_entite_maillage)_entity]).end();listIt++) {
     tmp_NumberOfElementsInType[it]=0;
     whereIsType[it]=0 ;
     try {
-      tmp_NumberOfElementsInType[it]+=getNumberOfElements((medGeometryElement)(*listIt)) ;
+      int tmp_int = 0;
+      tmp_int = getNumberOfElements((medGeometryElement)(*listIt)) ;
+      tmp_NumberOfElementsInType[it]+=tmp_int ;
       whereIsType[it]+=1 ;
     }
-    catch (const MEDEXCEPTION & ex) {};
+    catch (MEDEXCEPTION & ex) { SCRUTE(sizeof(ex)); };
     try {
-      tmp_NumberOfElementsInType[it]+=mySupport->getNumberOfElements((medGeometryElement)(*listIt)) ;
+      int tmp_int = 0;
+      tmp_int = mySupport->getNumberOfElements((medGeometryElement)(*listIt)) ;
+      tmp_NumberOfElementsInType[it]+=tmp_int ;
       whereIsType[it]+=2 ;
     }
     catch (const MEDEXCEPTION & ex) {};
     if (whereIsType[it]!=0) {
       myType[it]=(medGeometryElement)(*listIt) ;
+      SCRUTE(myType[it]);SCRUTE(it);SCRUTE((*listIt));
       it++;
     }
   }
   // set new value :
-  int * numberOfElements=_numberOfElements ;
-  _numberOfElements = new int[it] ;
+//   int * numberOfElements=_numberOfElements ;
+//   _numberOfElements = new int[it] ;
+  int * numberOfElements= new int[it];
   _totalNumberOfElements = 0 ;
   //int totalSize = 0 ;
   int ** tmp_array = new (int*)[it];
   for (int i=0;i<it;i++) {
     int numberOfElementsInType = tmp_NumberOfElementsInType[i] ;
-    _numberOfElements[i] = numberOfElementsInType ;
+    numberOfElements[i] = numberOfElementsInType ;
     tmp_array[i] = new int[numberOfElementsInType] ;
     //totalSize+=numberOfElementsInType*(myType[i]%100) ;
     _totalNumberOfElements+=numberOfElementsInType ;
@@ -293,8 +275,8 @@ void SUPPORT::blending(SUPPORT * mySupport)
       memcpy(tmp_array[i],mySupport->getNumber(myType[i]),sizeof(int)*numberOfElementsInType);
     } else if (whereIsType[i] == 3) { // more difficult :-)
       set<int> elementList ;
-      int i1 = 0 ;
-      int i2 = 0 ;
+      //int i1 = 0 ; !! UNUSED VARIABLE !!
+      //int i2 = 0 ; !!UNUSED VARIABLE !!
       int ii = 0 ;
       const int * number1 = getNumber(myType[i]) ;
       const int * number2 = mySupport->getNumber(myType[i]) ;
@@ -302,24 +284,28 @@ void SUPPORT::blending(SUPPORT * mySupport)
       SCRUTE(number1);
       SCRUTE(number2);
 
-      int numberOfElements1 = numberOfElements[i] ;
+      int numberOfElements1 = getNumberOfElements(myType[i]) ;
       int numberOfElements2 = mySupport->getNumberOfElements(myType[i]) ;
 
       SCRUTE(numberOfElements1);
       SCRUTE(numberOfElements2);
+
+      MESSAGE(LOC << " Type : " << myType[i] << " " << i);
 
       for(int j=0;j<numberOfElements1;j++){
 	elementList.insert(number1[j]) ;
       }
 
       for(int j=0;j<numberOfElements2;j++){
-	SCRUTE(number2[j]);
 	elementList.insert(number2[j]) ;
       }
 
       //create the array !
       int newNumberOfElements = elementList.size() ;
-      _numberOfElements[i] = newNumberOfElements ;
+
+      SCRUTE(newNumberOfElements);
+
+      numberOfElements[i] = newNumberOfElements ;
       int * tmp_arrayNew = new int[newNumberOfElements];
 
       set<int>::iterator its ;
@@ -337,6 +323,9 @@ void SUPPORT::blending(SUPPORT * mySupport)
   }
   delete[] whereIsType ;
   delete[] tmp_NumberOfElementsInType ;
+  delete [] _numberOfElements;
+
+  _numberOfElements = numberOfElements;
 
   _numberOfGeometricType = it ;
   medGeometryElement * geometricType=_geometricType ;
@@ -375,7 +364,15 @@ void SUPPORT::blending(SUPPORT * mySupport)
   delete[] geometricType ;
   delete[] numberOfGaussPoint ;
 //    delete[] geometricTypeNumber ;
-  delete[] numberOfElements ;
+//  delete[] numberOfElements ;
+
+
+
+
+  MESSAGE(LOC<<"Printing of the object SUPPORT blended "<< *this);
+
+
+
 
   END_OF(LOC);
 };
@@ -514,7 +511,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
     }
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
-    const medGeometryElement *  allType = _mesh->getTypes(_entity);
+    //const medGeometryElement *  allType = _mesh->getTypes(_entity); !! UNUSED VARIABLE !!
     numberOfGaussPoint = new int[numberOfGeometricType] ;
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfElements = new int[numberOfGeometricType] ;
@@ -566,3 +563,162 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
 
   END_OF(LOC) ;
 }
+
+/*!
+  intersect the given SUPPORT mySupport into the calling SUPPORT object.
+*/
+//-------------------
+void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
+//-------------------
+{
+  const char * LOC = "SUPPORT::intersecting(SUPPORT *) : " ;
+  BEGIN_OF(LOC) ;
+
+  MESSAGE(LOC<< "SUPPORT entry : " << *mySupport) ;
+
+  MESSAGE(LOC<< "SUPPORT (calling object) : " << *this) ;
+
+  // on same entity :
+  if ( _entity != mySupport->getEntity() )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entities are different !"));
+
+  int * tmp_NumberOfElementsInType = new int[MED_NBR_GEOMETRIE_MAILLE];
+  medGeometryElement * myType = new medGeometryElement[MED_NBR_GEOMETRIE_MAILLE];
+  int * whereIsType = new int[MED_NBR_GEOMETRIE_MAILLE];
+  //MESH_ENTITIES myMeshEntities() ;
+  list<MED_FR::med_geometrie_element>::const_iterator listIt ;
+  int it=0 ;
+  for(listIt=(MED_FR::meshEntities[(MED_FR::med_entite_maillage)_entity]).begin();listIt!=(MED_FR::meshEntities[(MED_FR::med_entite_maillage)_entity]).end();listIt++) {
+    tmp_NumberOfElementsInType[it]=0;
+    whereIsType[it]=0 ;
+    myType[it]= MED_NONE;
+    try {
+      tmp_NumberOfElementsInType[it]+=getNumberOfElements((medGeometryElement)(*listIt)) ;
+      whereIsType[it]+=1 ;
+    }
+    catch (const MEDEXCEPTION & ex) {};
+    try {
+      tmp_NumberOfElementsInType[it]+=mySupport->getNumberOfElements((medGeometryElement)(*listIt)) ;
+      whereIsType[it]+=2 ;
+    }
+    catch (const MEDEXCEPTION & ex) {};
+    if (whereIsType[it]==3) {
+      myType[it]=(medGeometryElement)(*listIt) ;
+      it++;
+    }
+  }
+
+  MESSAGE("it = "<< it);
+
+  // set new value :
+  int * numberOfElements=_numberOfElements ;
+  _numberOfElements = new int[it] ;
+  _totalNumberOfElements = 0 ;
+  //int totalSize = 0 ;
+  int ** tmp_array = new (int*)[it];
+  for (int i=0;i<it;i++) {
+    int numberOfElementsInType = tmp_NumberOfElementsInType[i] ;
+    _numberOfElements[i] = numberOfElementsInType ;
+    tmp_array[i] = new int[numberOfElementsInType] ;
+    _totalNumberOfElements+=numberOfElementsInType ;
+    if (whereIsType[i] == 3) {
+      const int * number1 = getNumber(myType[i]) ;
+      const int * number2 = mySupport->getNumber(myType[i]) ;
+
+      SCRUTE(number1);
+      SCRUTE(number2);
+
+      int numberOfElements1 = numberOfElements[i] ;
+      int numberOfElements2 = mySupport->getNumberOfElements(myType[i]) ;
+
+      SCRUTE(numberOfElements1);
+      SCRUTE(numberOfElements2);
+
+      set<int> setList1(number1,number1+numberOfElements1);
+      set<int> setList2(number2,number2+numberOfElements2);
+
+      for(set<int>::iterator its=setList1.begin();its!=setList1.end(); its++)
+	{
+	  MESSAGE("Number1 " << *its);
+	}
+
+      for(set<int>::iterator its=setList2.begin();its!=setList2.end(); its++)
+	{
+	  MESSAGE("Number2 " << *its);
+	}
+
+      set<int> setListIntersect;
+
+      set_intersection(setList1.begin(),setList1.end(),setList2.begin(),
+		       setList2.end(),inserter(setListIntersect,
+					       setListIntersect.begin()));
+
+      for(set<int>::iterator its=setListIntersect.begin();
+	  its!=setListIntersect.end(); its++)
+	{
+	  MESSAGE("Number1 intersect Number2 " << *its);
+	}
+
+      int newNumberOfElements = setListIntersect.size() ;
+
+      SCRUTE(newNumberOfElements);
+
+      _numberOfElements[i] = newNumberOfElements ;
+      int * tmp_arrayNew = new int[newNumberOfElements];
+
+      int ii = 0 ;
+
+      for(set<int>::iterator its=setListIntersect.begin();
+	  its!=setListIntersect.end(); its++) {
+	tmp_arrayNew[ii]=*its ;
+	SCRUTE(tmp_arrayNew[ii]);
+	ii++;
+      }
+
+      delete[] tmp_array[i] ;
+      tmp_array[i] = tmp_arrayNew ;
+      _totalNumberOfElements-=(numberOfElementsInType-newNumberOfElements) ;
+
+    } else
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"ERROR")) ;
+  }
+  delete[] whereIsType ;
+  delete[] tmp_NumberOfElementsInType ;
+
+  _numberOfGeometricType = it ;
+  medGeometryElement * geometricType=_geometricType ;
+  _geometricType = new medGeometryElement[it] ;
+  int * numberOfGaussPoint=_numberOfGaussPoint ;
+  _numberOfGaussPoint= new int[it] ;
+
+  int size = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
+  if (_totalNumberOfElements == size) _isOnAllElts = true;
+
+  int * numberValue = new int[_totalNumberOfElements] ;
+  int * numberIndex = new int[it+1] ;
+  numberIndex[0]=1;
+  for (int i=0;i<it;i++) {
+    memcpy(numberValue+numberIndex[i]-1,tmp_array[i],sizeof(int)*_numberOfElements[i]) ;
+    delete[] tmp_array[i] ;
+    numberIndex[i+1]=numberIndex[i]+_numberOfElements[i] ;
+
+    _geometricType[i]=myType[i] ;
+    _numberOfGaussPoint[i]=1 ;
+  }
+  if ( _number != (MEDSKYLINEARRAY *) NULL) delete _number ;
+
+  _number = new MEDSKYLINEARRAY(it,_totalNumberOfElements,numberIndex,numberValue);
+  delete[] numberIndex;
+
+  delete[] numberValue;
+
+  delete[] myType ;
+  delete[] tmp_array ;
+
+  delete[] geometricType ;
+  delete[] numberOfGaussPoint ;
+//    delete[] geometricTypeNumber ;
+  delete[] numberOfElements ;
+
+  END_OF(LOC);
+};

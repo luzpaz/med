@@ -1,12 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  CEA/DEN, EDF R&D
-//
-//
-//
-//  File   : MEDMEM_TypeMeshDriver.cxx
-//  Module : MED
-
 #include "MEDMEM_TypeMeshDriver.hxx"
 
 #include "MEDMEM_DriversDef.hxx"

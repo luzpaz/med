@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_VtkMedDriver.cxx
-//  Module : MED
-
 using namespace std;
 #include "MEDMEM_VtkMedDriver.hxx"
 
@@ -66,8 +40,13 @@ VTK_MED_DRIVER::VTK_MED_DRIVER(const VTK_MED_DRIVER & driver):
 
 VTK_MED_DRIVER::~VTK_MED_DRIVER()
 {
+  const char * LOC ="VTK_MED_DRIVER::~VTK_MED_DRIVER()";
+  BEGIN_OF(LOC);
+
   close();
   delete _vtkFile ;
+
+  END_OF(LOC);
 }
 
 GENDRIVER * VTK_MED_DRIVER::copy() const
@@ -143,13 +122,13 @@ void VTK_MED_DRIVER::write() const {
 
   int NumberOfMeshes = _ptrMed->getNumberOfMeshes() ;
   deque<string> MeshNames = _ptrMed->getMeshNames() ;
-  deque<string>::const_iterator  currentMesh ;
+  //deque<string>::const_iterator  currentMesh ; !! UNUSED VARIABLE !!
   // In fact, we must take care of all supports 
   // We restrict Field on all nodes or cells
 
   int NumberOfFields = _ptrMed->getNumberOfFields() ;
   deque<string> FieldNames = _ptrMed->getFieldNames() ;
-  deque<string>::const_iterator  currentField ;
+  //deque<string>::const_iterator  currentField ; !! UNUSED VARIABLE !!
 
   //  for ( currentMesh=MeshName.begin();currentMesh != MeshName.end(); currentMesh++) {
   for (int i=0; i<NumberOfMeshes; i++) {
@@ -174,7 +153,7 @@ void VTK_MED_DRIVER::write() const {
 	      name << myField->getName() << "_" << dt << "_" << it ;
 	      writeField(myField,name.str()) ;
 	    } else
-	      INFOS("Could not write field "<<myField->getName()<<" which is not on all nodes !");
+	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
 	}
       }
     }
@@ -196,7 +175,7 @@ void VTK_MED_DRIVER::write() const {
 	      name << myField->getName() << "_" << dt << "_" << it ;
 	      writeField(myField,name.str()) ;
 	    } else
-	      INFOS("Could not write field "<<myField->getName()<<" which is not on all cells !");
+	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all cells !");
 	}
       }
     }
@@ -205,7 +184,7 @@ void VTK_MED_DRIVER::write() const {
 
   // Well we must close vtk file first, because there are
   // no other driver than MED for VTK that do it !
-  closeConst() ;
+  //  closeConst() ;
   
   END_OF(LOC);
 }
@@ -240,7 +219,7 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
   const CELLMODEL * cells_type = myMesh->getCellsTypes(MED_CELL) ;
   //  int connectivity_sum = 0 ;
 
-  const int * connectivity = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS) ;
+  //const int * connectivity = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS) ; !! UNUSED VARIABLE !!
   const int * connectivityIndex = myMesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
 
   int connectivity_sum =  connectivityIndex[cells_sum]-1 ;
@@ -468,7 +447,7 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 	(*_vtkFile) << "SCALARS " << name << " int " << NomberOfComponents << endl ;
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
       } else {
-	INFOS("Could not write field "<<myField->getName()<<" there are more than 4 components !");
+	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
  
@@ -489,7 +468,7 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 	(*_vtkFile) << "SCALARS " << name << " float " << NomberOfComponents << endl ;
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
       } else {
-	INFOS("Could not write field "<<myField->getName()<<" there are more than 4 components !");
+	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
       const double * value = ((FIELD<double>*)myField)->getValue(MED_NO_INTERLACE) ;
@@ -501,7 +480,7 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
       break ;
     }
     default : { 
-	      INFOS("Could not write field "<<name<<" the type is not int or double !");
+      MESSAGE(LOC << "Could not write field "<<name<<" the type is not int or double !");
     }
     }
   
@@ -509,7 +488,8 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 }
 
 void VTK_MED_DRIVER::writeSupport(SUPPORT * mySupport) const {
-  const char * LOC = "VTK_MED_DRIVER::writeSupport(SUPPORT *)" ;
+  const char * LOC = "VTK_MED_DRIVER::writeSupport(SUPPORT *) : " ;
   BEGIN_OF(LOC) ;
+  MESSAGE(LOC << "Not yet implemented, acting on the object " << *mySupport);
   END_OF(LOC) ;
 }

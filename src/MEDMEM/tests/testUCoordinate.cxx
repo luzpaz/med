@@ -330,7 +330,7 @@ int main (int argc, char ** argv)
   			{
 				try
 				{
-					double d = mycoo.getCoordinate(num + 1,axe+1);
+					const double d = mycoo.getCoordinate(num + 1,axe+1);
 					cout << d <<" , ";
 					ASSERT(fabs(d - coor3[num])  < pouieme);
        	         			ASSERT(fabs(d - coor2[(num * SpaceDim)+axe]) < pouieme);

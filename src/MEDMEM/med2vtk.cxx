@@ -1,12 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  CEA/DEN, EDF R&D
-//
-//
-//
-//  File   : med2vtk.cxx
-//  Module : MED
-
 using namespace std;
 #include<string>
 #include<deque>

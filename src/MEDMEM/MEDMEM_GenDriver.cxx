@@ -1,29 +1,3 @@
-//  MED MEDMEM : MED files in memory
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : MEDMEM_GenDriver.cxx
-//  Module : MED
-
 using namespace std;
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_STRING.hxx"
@@ -71,8 +45,11 @@ GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver) {
 void GENDRIVER::writeFrom      ( void ) {};
 void GENDRIVER::readFileStruct ( void ) {};
 
-void GENDRIVER::setMeshName    (const string & meshName) {};
-void GENDRIVER::setFieldName   (const string & fieldName) {};
+void GENDRIVER::setMeshName    (const string & ) {};
+void GENDRIVER::setFieldName   (const string & ) {};
+
+void GENDRIVER::openAppend ( void ) {};
+void GENDRIVER::writeAppend ( void ) const {};
 
 void GENDRIVER::setId ( int id ) {
   const char * LOC = "void GENDRIVER::setId ( int id ) : ";
@@ -142,6 +119,9 @@ ostream & operator<<(ostream &os,const GENDRIVER & drv)
     case MED_RDWR :
       os<<"C'est un IO d'READ/WRITE"<<endl;
       break;
+    case MED_REMP :
+      os <<"C'est un IO de remplacement"<<endl;
+      break;
     }
   switch (drv._status)
     {
@@ -149,7 +129,7 @@ ostream & operator<<(ostream &os,const GENDRIVER & drv)
       os<<"L'IO_Mesh_MED est open"<<endl;
       break;
     case MED_CLOSED :
-      os<<"L'IO_Mesh_MED est fermé"<<endl;
+      os<<"L'IO_Mesh_MED est fermÃ©"<<endl;
       break;
     case MED_INVALID :
       os<<"L'IO_Mesh_MED est non-valide"<<endl;
@@ -169,3 +149,4 @@ bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
     ( _driverType == genDriver._driverType );
   
 };
+
