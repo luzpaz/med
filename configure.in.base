@@ -332,7 +332,8 @@ do
 #   if test ! -d $rep ; then
 #      eval mkdir $rep
 #   fi
-    $INSTALL -d $rep
+#    $INSTALL -d $rep
+    mkdir -p $rep
 done
 
 echo 

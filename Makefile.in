@@ -130,10 +130,10 @@ install-end:
 
 install-include: $(include_list)
 	$(INSTALL) -d  $(includedir)
-	@for f in X $(include_list); do				\
-	   if test $$f != X; then				\
-	     (cp -p $$f $(includedir) || exit 1);		\
-	   fi;							\
+#	@for f in X $(include_list); do				\
+#	   if test $$f != X; then				\
+#	     (cp -p $$f $(includedir) || exit 1);		\
+#	   fi;							\
 	done
 
 # install script in $(bindir) :
