@@ -2,6 +2,7 @@
 #define CONNECTIVITY_HXX
 
 #include <vector>
+#include <map>
 
 #include "utilities.h"
 #include "MEDMEM_Exception.hxx"
@@ -445,6 +446,18 @@ inline void CONNECTIVITY::setNumberOfNodes(med_int NumberOfNodes)
 inline void CONNECTIVITY::setEntityDimension(med_int EntityDimension)
 {
     _entityDimension=EntityDimension;
+}
+
+// Enlarge the vector if necessary to insert the element
+static inline void insert_vector(vector<int> &Vect, int Indice, int Element)
+{
+  if (Indice >= Vect.capacity())
+    Vect.reserve(Indice + 1000);
+
+  if (Indice >= Vect.size())
+    Vect.resize(Indice+1);
+
+  Vect[Indice] = Element;
 }
 
 #endif /* CONNECTIVITY_HXX */
