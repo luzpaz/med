@@ -80,12 +80,12 @@ UseCaseWrapper_Maillage
 
 
 CPPFLAGS+=-U_DEBUG_ $(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome -I../
-CXXFLAGS+=-U_DEBUG_ -ftemplate-depth-42 -I${KERNEL_ROOT_DIR}/include/salome 
+CXXFLAGS+=-U_DEBUG_ @CXXTMPDPTHFLAGS@ -I${KERNEL_ROOT_DIR}/include/salome 
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome
+LDFLAGS+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -L../.libs -lmedmem -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
-LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -L../.libs -lmedmem -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -L../.libs -lmedmem -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome
 
 LIBSFORBIN=
 
