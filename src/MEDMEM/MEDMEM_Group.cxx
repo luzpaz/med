@@ -1,3 +1,29 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : MEDMEM_Group.cxx
+//  Module : MED
+
 using namespace std;
 /*
  File Group.cxx
@@ -24,6 +50,18 @@ GROUP & GROUP::operator=(const GROUP &group)
   _numberOfFamilies = group._numberOfFamilies ;
   _family      	    = group._family ;
   return *this;
+};
+
+ostream & operator<<(ostream &os, GROUP &myGroup)
+{
+  os << (SUPPORT) myGroup;
+
+  int numberoffamilies = myGroup.getNumberOfFamilies();
+  os << "  - Families ("<<numberoffamilies<<") :"<<endl;
+  for (int j=1;j<numberoffamilies+1;j++)
+    os << "    * "<<myGroup.getFamily(j)->getName().c_str()<<endl ;
+
+  return os;
 };
 
 GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCEPTION)
@@ -57,18 +95,18 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   _geometricType = new medGeometryElement[_numberOfGeometricType];
   //_geometricTypeNumber = new int[_numberOfGeometricType] ;
   _numberOfGaussPoint = new int[_numberOfGeometricType] ;
-  _numberOfEntities = new int[_numberOfGeometricType] ;
-  medGeometryElement * geometricType = myFamily->getTypes() ;
+  _numberOfElements = new int[_numberOfGeometricType] ;
+  const medGeometryElement * geometricType = myFamily->getTypes() ;
   //int * geometricTypeNumber = myFamily->getGeometricTypeNumber() ;
-  int * numberOfGaussPoint = myFamily->getNumberOfGaussPoint() ;
+  const int * numberOfGaussPoint = myFamily->getNumberOfGaussPoint() ;
   for (int i=0 ; i<_numberOfGeometricType; i++) {
     _geometricType[i]= geometricType[i] ;
     // _geometricTypeNumber[i] = geometricTypeNumber[i] ;
     _numberOfGaussPoint[i] = numberOfGaussPoint[i] ;
-    _numberOfEntities[i]=myFamily->getNumberOfElements(geometricType[i]);
+    _numberOfElements[i]=myFamily->getNumberOfElements(geometricType[i]);
   }
   _isOnAllElts = false ;
-  _totalNumberOfEntities = myFamily->getNumberOfElements(MED_ALL_ELEMENTS) ;
+  //_totalNumberOfEntities = myFamily->getNumberOfElements(MED_ALL_ELEMENTS) ;
   _number = new MEDSKYLINEARRAY(*myFamily->getnumber()) ;
 
   _numberOfFamilies = families.size();
@@ -84,7 +122,7 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   END_OF(LOC);
 };
 
-GROUP::GROUP(GROUP & m):SUPPORT(m)
+GROUP::GROUP(const GROUP & m):SUPPORT(m)
 {
   _numberOfFamilies = m._numberOfFamilies;
   _family = m._family;
@@ -113,7 +151,7 @@ GROUP::GROUP(GROUP & m):SUPPORT(m)
 //   _geometricType = new medGeometryElement[_numberOfGeometricType];
 //   //_geometricTypeNumber = new int[_numberOfGeometricType] ;
 //   _numberOfGaussPoint = new int[_numberOfGeometricType] ;
-//   _numberOfEntities = new int[_numberOfGeometricType] ;
+//   _numberOfElements = new int[_numberOfGeometricType] ;
 //   medGeometryElement * geometricType = myFamily->getTypes() ;
 //   //int * geometricTypeNumber = myFamily->getGeometricTypeNumber() ;
 //   int * numberOfGaussPoint = myFamily->getNumberOfGaussPoint() ;
@@ -121,7 +159,7 @@ GROUP::GROUP(GROUP & m):SUPPORT(m)
 //     _geometricType[i]= geometricType[i] ;
 //     // _geometricTypeNumber[i] = geometricTypeNumber[i] ;
 //     _numberOfGaussPoint[i] = numberOfGaussPoint[i] ;
-//     _numberOfEntities[i]=myFamily->getNumberOfElements(geometricType[i]);
+//     _numberOfElements[i]=myFamily->getNumberOfElements(geometricType[i]);
 //   }
 //   _isOnAllElts = false ;
 //   _totalNumberOfEntities = myFamily->getNumberOfElements(MED_ALL_ELEMENTS) ;

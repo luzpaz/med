@@ -1,3 +1,29 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : MEDMEM_CellModel.hxx
+//  Module : MED
+
 /*
  File MEDMEM_CellModel.hxx
  $Header$
@@ -6,50 +32,142 @@
 #ifndef CELLMODEL_HXX
 #define CELLMODEL_HXX
 
-//#include <vector>
 #include <set>
 #include <map>
 #include <string>
 
+#include "utilities.h"
 #include "MEDMEM_define.hxx"
 
 using namespace std ;
-
 using namespace MED_EN;
 
-class CELLMODEL {
+/*!
+  This class is an internal class and should not be used by the end-user.
+  This class describes all possible cell models and is used in order
+  to acces informations about geometric type of the cell : 
+  Each object (if instancied), contains generic informations about
+  the cell model it describes as cell dimensions, number of nodes...
+*/
+
+class CELLMODEL 
+{
 
 private:
-  // use in constructor and operator=
-  void init(const CELLMODEL &m) ;
-  // use in operator= and destructor
-  void clean() ;
+  			/*! private method : /n
+			    used by constructor and operator= */
+  void init(const CELLMODEL &m);
 
-protected:
+  			/*! private method : /n */
+  void clean();
 
-  string _name ;
-  medGeometryElement _type ;
-  int _dimension ;     // Cell _dimension (!= space _dimension)
-  int _numberOfNodes ;
-  int _numberOfVertexes ;
-  int    _numberOfConstituentsDimension ; // 2 in 3D, 1 in 2D
-  // Array of size _numberOfConstituentsDimension
-  int*   _numberOfConstituents ; 
-  // Array of size _numberOfConstituentsDimensionx_numberOfConstituents[i]
-  int**  _numberOfNodeOfEachConstituent ;
-  // Define nodal local connectivity for each constituent for each dimension
-  int*** _constituents ; 
-  // define local connectivity for each constituents 
-  // composing it ( 
-  // first vector : for each cell _dimension 
-  // (first : dim-1, second if any : dim-2)
-  // second vector : for each constituents of this _dimension,
-  // third vector : list of local nodes
-  medGeometryElement** _constituentsType ;
+
+  //protected:
+			/*! explicit name (as MED_POINT1)           */
+  string             _name;
+			/*! type of cell (cf define.h)              */
+  medGeometryElement _type;
+                        /*! Cell dimension (not space dimension)    */
+  int 		     _dimension;
+                        /*! number of nodes forming this type of a cell    */
+  int 		     _numberOfNodes;
+                        /*! number of vertexes forming this type of a cell */
+  int 		     _numberOfVertexes;
+                        /*!  2 for a  3D Cell and 1 for a 2DCell */
+  int    	     _numberOfConstituentsDimension;
+  			/*! Array of size numberOfConstituentsDimension */
+  int*   	     _numberOfConstituents ;
+  			/*! Array of size _numberOfConstituentsDimension
+			    x_numberOfConstituents[i]               */
+  int**  	     _numberOfNodeOfEachConstituent ;
+   			/*! defines nodal local connectivity for each 
+			    constituents of each dimension: 
+			    should be seen as a vector<vector<vector>> \n
+        		    - first vector : for each cell dimension 
+			      (first : dim-1, second if any : dim-2)\n
+        		    - second vector : for each constituent of 
+			      this dimension\n
+        		    - third vector : list of local nodes    */
+  int*** 		_constituents ;
+  medGeometryElement** 	_constituentsType ;
 
 public :
 
-  CELLMODEL():
+  			/*! Constructor. */
+  inline CELLMODEL();
+  			/*! Constructor. */
+  CELLMODEL(medGeometryElement t);
+  			/*! Copy constructor. */
+  inline CELLMODEL(const CELLMODEL &m);
+  			/*! Destructor. */
+  inline ~CELLMODEL();
+
+  			/*! Operator = : duplicate CELLMODEL. */
+  inline CELLMODEL & operator=(const CELLMODEL &m);
+
+  			/*! Operator << : print CELLMODEL to the given stream. */
+  friend ostream & operator<<(ostream &os,const CELLMODEL &my);
+
+  			/*! returns _name attribute (ie: MED_PENTA15).\n
+		    	    see med.h (in med/include) */
+  inline string                 getName()             const;
+
+  			/*! returns number of vertexes forming this type of cell */
+  inline int 			getNumberOfVertexes() const;
+
+  			/*! returns number of nodes forming this type of cell    */
+  inline int 			getNumberOfNodes()    const;
+
+  			/*! returns the dimension of this type of cell./n
+			    it can be different from mesh dimension              */
+  inline int 			getDimension()        const;
+
+			/*! returns the geometric type of the cell. \n
+		   	    see med.h (in med/include) */
+  inline medGeometryElement     getType()             const;
+
+  			/*! returns all constituents which dimension is _dimension-dim.*/
+  int** getConstituents(int dim) const;
+
+			/*! returns number of constituents which dimension is _dimension-dim.*/
+  int   getNumberOfConstituents(int dim) const;
+
+			/*! returns local nodes numbers vector for num-th constituent 
+			    which dimension is _dimension-dim.*/
+  int* getNodesConstituent(int dim,int num) const;
+
+			/*! returns local node number of nodes_index-th node for 
+			    num-th constituent which dimension is _dimension-dim.*/
+  int getNodeConstituent(int dim,int num,int nodes_index) const;
+
+			/*! returns types of each constituents which dimension 
+			    is _dimension-dim.*/
+  medGeometryElement*  getConstituentsType(int dim) const;
+
+			/*! returns type of num-th constituent which dimension 
+			    is _dimension-dim.*/
+  medGeometryElement getConstituentType(int dim,int num) const;
+
+			/*! returns number of constituents type 
+			    (which dimension is _dimension-1).*/
+  int getNumberOfConstituentsType() const;
+
+			/*! returns all types of constituents which dimension 
+			    is (_dimension-1).*/
+  set<medGeometryElement>  getAllConstituentsType() const;
+
+			/*! returns number of constituents foreach type (which dimension 
+			    is _dimension-1).*/
+  map<medGeometryElement,int>  getNumberOfConstituentsForeachType() const;
+
+
+};
+
+// ------------------------------------------
+//	Methodes Inline
+// ------------------------------------------
+
+inline CELLMODEL::CELLMODEL():
     _type(MED_NONE),
     _dimension(0),
     _numberOfNodes(0),
@@ -59,65 +177,23 @@ public :
     _numberOfNodeOfEachConstituent((int**)NULL),
     _constituents((int***)NULL),
     _constituentsType((medGeometryElement**)NULL)
-  {
-  }
-  CELLMODEL(medGeometryElement t) ;
-  CELLMODEL(const CELLMODEL &m){
+{
+}
+inline CELLMODEL::CELLMODEL(const CELLMODEL &m)
+{
     init(m) ;
-  }
-  ~CELLMODEL() {
-    clean() ;
-  };
-
-  CELLMODEL & operator=(const CELLMODEL &m) {
+}
+inline CELLMODEL::~CELLMODEL() 
+{
+  MESSAGE("CELLMODEL::~CELLMODEL() destroying the cell");
+  clean() ;
+};
+inline CELLMODEL & CELLMODEL::operator=(const CELLMODEL &m) 
+{
     clean() ;
     init(m) ;
     return *this ;
-  }
-  friend ostream & operator<<(ostream &os,const CELLMODEL &my);
-
-  inline string                 getName() const ;
-  inline int 			getNumberOfVertexes() const;
-  inline int 			getNumberOfNodes() const;
-  inline int 			getDimension() const;
-  inline medGeometryElement  getType() const;
-
-  // Return all constituents which dimension is _dimension-dim.
-  //  vector< vector<int> > getConstituents(int dim) const; 
-  int** getConstituents(int dim) const; 
-
-  // Return number of constituents which dimension is _dimension-dim.
-  int getNumberOfConstituents(int dim) const;
-
-  // Return local nodes numbers vector for num-th constituent which dimension is _dimension-dim.
-  int* getNodesConstituent(int dim,int num) const; 
-
-  // Return local node number of nodes_index-th node for num-th constituent which dimension is _dimension-dim.
-  int getNodeConstituent(int dim,int num,int nodes_index); 
-
-  // Return types of each constituents which dimension is _dimension-dim.
-  medGeometryElement*  getConstituentsType(int dim) const; 
-
-  // Return type of num-th constituent which dimension is _dimension-dim.
-  medGeometryElement getConstituentType(int dim,int num) const;
-
-
-  // Return number of constituents type (which dimension is _dimension-1).
-  int getNumberOfConstituentsType() const;
-
-  // Return all types of constituents which dimension is (_dimension-1).
-  set<medGeometryElement>  getAllConstituentsType() const; 
-
-  // Return number of constituents foreach type (which dimension is _dimension-1).
-  map<medGeometryElement,int>  getNumberOfConstituentsForeachType() const; 
-
-
-};
-
-// ------------------------------------------
-//	Methodes Inline
-// ------------------------------------------
-
+}
 inline string CELLMODEL::getName() const
 {
   return _name ;
@@ -138,7 +214,6 @@ inline medGeometryElement CELLMODEL::getType() const
 {
   return _type;
 }
-//inline vector< vector<int> > CELLMODEL::getConstituents(int dim) const
 inline int** CELLMODEL::getConstituents(int dim) const
 {
   return _constituents[dim-1] ;
@@ -146,18 +221,15 @@ inline int** CELLMODEL::getConstituents(int dim) const
 inline int CELLMODEL::getNumberOfConstituents(int dim) const
 {
   return _numberOfConstituents[dim-1] ;
-  //return _constituents[dim-1].size() ;
 }
-//inline vector<int> CELLMODEL::getNodesConstituent(int dim,int num) const
 inline int* CELLMODEL::getNodesConstituent(int dim,int num) const
 {
   return _constituents[dim-1][num-1];
 }
-inline int CELLMODEL::getNodeConstituent(int dim,int num,int nodesNumber)
+inline int CELLMODEL::getNodeConstituent(int dim,int num,int nodesNumber) const
 {
   return _constituents[dim-1][num-1][nodesNumber-1] ;
 }
-//inline vector<medGeometryElement> CELLMODEL::getConstituentsType(int dim) const
 inline medGeometryElement* CELLMODEL::getConstituentsType(int dim) const
 {
   return _constituentsType[dim-1];
