@@ -193,9 +193,13 @@ public:
   void getBoundaryElements() throw (MEDEXCEPTION);
 
   void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
+  bool belongsTo(const SUPPORT& other, bool deepCompare=false) const;
+  SUPPORT *getComplement() const;
   //A.G. Addings for RC
   virtual void addReference() const;
   virtual void removeReference() const;
+protected:
+  static int *sub(int start,int end,const int *idsToSuppress,int lgthIdsToSuppress,int &lgthRet);
 };
 
 // _____________________

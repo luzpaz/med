@@ -812,6 +812,206 @@ bool MEDMEM::SUPPORT::deepCompare(const SUPPORT &support) const
 }
 
 /*!
+ States if this is included in other.
+ */
+bool MEDMEM::SUPPORT::belongsTo(const SUPPORT& other, bool deepCompare) const
+{
+  if(!(*_mesh == *other._mesh))
+    {
+      if(!deepCompare)
+	return false;
+      if(deepCompare && !_mesh->deepCompare(*other._mesh))
+	return false;
+    }
+  if(_entity!=other._entity)
+    return false;
+  if(_isOnAllElts && other._isOnAllElts)
+    return true;
+  if(_numberOfGeometricType>other._numberOfGeometricType)
+    return false;
+  for(int i=0; i<_numberOfGeometricType; i++)
+    {
+      MED_EN::medGeometryElement curGeomType=_geometricType[i];
+      int iOther=-1;
+      for(int j=0; j<other._numberOfGeometricType; j++)
+	  if(other._geometricType[j]==curGeomType)
+	      iOther=j;
+      if(iOther==-1)
+	return false;
+      if(_numberOfElements[i]>other._numberOfElements[iOther])
+	return false;
+      const int *numbers1=_number->getI(i+1);
+      const int *numbers2=other._number->getI(iOther+1);
+      for (int k=0; k<_numberOfElements[i]; k++)
+	{
+	  bool found=false;
+	  for(int l=0;l<other._numberOfElements[iOther] && !found;l++)
+	    {
+	      if(numbers1[k]==numbers2[l])
+		found=true;
+	    }
+	  if(!found)
+	    return false;
+	}
+    }
+  return true;
+}
+/*!
+  Method used to sort array of id.
+ */
+int compareId(const void *x, const void *y)
+{
+  const int *x1=(const int *)x;
+  const int *y1=(const int *)y;
+  if(*x1<*y1)
+    return -1;
+  else if(*x1>*y1)
+    return 1;
+  else
+    return 0;
+}
+
+/*!
+  performs a common operation : Sub builds a sorted int array of size lgthRet, that is obtained by supression of all ids contained
+  in array defined by (idsToSuppress,lgthIdsToSuppress) from array [start ... end]
+  Example sub(0,7,{1,2,5},3,i) => {0,3,4,6,7} i=5
+ */
+int *MEDMEM::SUPPORT::sub(int start,int end,const int *idsToSuppress,int lgthIdsToSuppress,int &lgthRet)
+{
+  int size=end-start+1;
+  int sizeRet=size-lgthIdsToSuppress;
+  int *ret;
+  if(sizeRet<0)
+    throw MEDEXCEPTION("MEDMEM::SUPPORT::sub");
+  else if(sizeRet==0)
+    {
+      lgthRet=0;
+      return 0;
+    }
+  if(idsToSuppress==0)
+    {
+      ret=new int[size];
+      for(int l=0;l<size;l++)
+	ret[l]=start+l;
+      return ret;
+    }
+  ret=new int[sizeRet];
+  int *temp=new int[lgthIdsToSuppress];
+  memcpy(temp,idsToSuppress,sizeof(int)*lgthIdsToSuppress);
+  qsort(temp,lgthIdsToSuppress,sizeof(int),compareId);
+  int j=0,k=0;
+  for(int i=start;i<=end;i++)
+    if(temp[k]!=i)
+      ret[j++]=i;
+    else
+      k++;
+  delete [] temp;
+  lgthRet=j;
+  return ret;
+}
+
+/*!
+  returns a new SUPPORT (responsability to caller to destroy it)
+  that is the complement to "this", lying on the same entity than "this".
+ */
+SUPPORT *MEDMEM::SUPPORT::getComplement() const
+{
+  SUPPORT *ret=new SUPPORT;
+  ret->setMesh(_mesh);
+  ret->setEntity(_entity);
+  string name="Complement of ";
+  name+=_name;
+  ret->setName(name);
+  if(_isOnAllElts)
+    return ret;
+  const int nbOfElt=_mesh->getNumberOfElements(_entity,MED_EN::MED_ALL_ELEMENTS);
+  int nbOfEltInSupp=getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+
+  int numberOfGeometricType;
+  int *numberOfGaussPoint = new int[1];
+  numberOfGaussPoint[0] = 1;
+  int *numberOfElements;
+  medGeometryElement *geometricType;
+  MEDSKYLINEARRAY *mySkyLineArray;
+
+  if (_entity==MED_EN::MED_NODE)
+    {
+      if(nbOfElt==nbOfEltInSupp)
+	return ret;
+      int sizeTab;
+      const int *nbs=_number->getValue();
+      int *tab=sub(1,nbOfElt,nbs,nbOfEltInSupp,sizeTab);
+      int *mySkyLineArrayIndex = new int[2];
+      mySkyLineArrayIndex[0]=1;
+      mySkyLineArrayIndex[1]=1+sizeTab;
+      mySkyLineArray=new MEDSKYLINEARRAY(1,sizeTab,mySkyLineArrayIndex,tab,true);
+      numberOfGeometricType=1;
+      geometricType = new medGeometryElement[1] ;
+      geometricType[0] = MED_NONE;
+      numberOfElements=new int[1];
+      numberOfElements[0]=sizeTab;
+      ret->setTotalNumberOfElements(sizeTab);
+    }
+  else
+    {
+      const MED_EN::medGeometryElement *types=_mesh->getTypes(_entity);
+      int nbOfTypes=_mesh->getNumberOfTypes(_entity);
+      int index=1;
+
+      numberOfGeometricType=0;
+      geometricType=new MED_EN::medGeometryElement[nbOfTypes];
+      numberOfElements=new int[nbOfTypes];
+      int *mySkyLineArrayIndex = new int[nbOfTypes+1];
+      int **tabs=new int*[nbOfTypes];
+      int totalNbOfElt=0;
+      for(int i2=0;i2<nbOfTypes;i2++)
+	{
+	  int sizeTab;
+	  int curNumberOfElementOnSupport=-1,indexTypeInSupport;
+	  const int *nbs=0;
+	  for (int j2=0;j2<_numberOfGeometricType;j2++)
+	    if (_geometricType[j2]==types[i2])
+	      {
+		curNumberOfElementOnSupport=_numberOfElements[j2];
+		indexTypeInSupport=j2;
+	      }
+	  if(curNumberOfElementOnSupport!=-1)
+	    nbs=_number->getI(indexTypeInSupport+1);
+	  const int curNbOfElt=_mesh->getNumberOfElements(_entity,types[i2]);
+	  int *tab=sub(index,index+curNbOfElt-1,nbs,curNumberOfElementOnSupport,sizeTab);
+	  if(sizeTab>0)
+	    {
+	      geometricType[numberOfGeometricType]=types[i2];
+	      numberOfElements[numberOfGeometricType]=sizeTab;
+	      tabs[numberOfGeometricType]=tab;
+	      mySkyLineArrayIndex[numberOfGeometricType]=totalNbOfElt+1;
+	      numberOfGeometricType++;
+	      totalNbOfElt+=sizeTab;
+	    }
+	  index+=curNbOfElt;
+	}
+      mySkyLineArrayIndex[numberOfGeometricType]=totalNbOfElt+1;
+      int *temp=new int[totalNbOfElt];
+      int it=0;
+      for(int k2=0;k2<numberOfGeometricType;k2++)
+	{
+	  for(int l2=0;l2<numberOfElements[k2];l2++)
+	    temp[it++]=tabs[k2][l2];
+	  delete [] tabs[k2];
+	}
+      delete [] tabs;
+      mySkyLineArray=new MEDSKYLINEARRAY(numberOfGeometricType,totalNbOfElt,mySkyLineArrayIndex,temp,true);
+      ret->setTotalNumberOfElements(totalNbOfElt);
+    }
+  ret->setNumberOfElements(numberOfElements);
+  ret->setGeometricType(geometricType);
+  ret->setNumberOfGeometricType(numberOfGeometricType);
+  ret->setNumberOfGaussPoint(numberOfGaussPoint);
+  ret->setNumber(mySkyLineArray);
+  return ret;
+}
+
+/*!
   addReference : reference counter presently disconnected in C++ -> just connected for client.
 */
 void MEDMEM::SUPPORT::addReference() const

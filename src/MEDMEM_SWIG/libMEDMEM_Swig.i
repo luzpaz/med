@@ -475,6 +475,11 @@ class SUPPORT
 	Py_DECREF(py_list);
 	return result;
       }
+    %newobject getComplement() const;
+    SUPPORT *getComplement() const
+      {
+	return self->getComplement();
+      }
   }
 };
 
@@ -693,6 +698,8 @@ public:
   void deallocValue();
 
   void applyLin(double a, double n);
+
+  void applyPow(double scalar);
 
   double normMax();
   double norm2();
@@ -914,6 +921,8 @@ public:
   void deallocValue();
 
   void applyLin(int a, int n);
+
+  void applyPow(int scalar);
 
   double normMax();
   double norm2();

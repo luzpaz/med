@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <math.h>
 #include <cmath>
 
 #include "utilities.h"
@@ -555,6 +556,8 @@ protected:
 
   // array of value of type T
   MEDARRAY<T> *_value ;
+  static T _scalarForPow;
+  static T pow(T x);
 
 private:
   void _operation(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode, char* Op);
@@ -597,6 +600,7 @@ public:
   double norm2() const throw (MEDEXCEPTION);
   void   applyLin(T a, T b);
   template <T T_function(T)> void applyFunc();
+  void applyPow(T scalar);
   static FIELD* scalarProduct(const FIELD& m, const FIELD& n, bool deepCheck=false);
   double normL2(int component, const FIELD<double> * p_field_volume=NULL) const;
   double normL2(const FIELD<double> * p_field_volume=NULL) const;
@@ -694,6 +698,8 @@ public:
    */
   void getBarycenter() const throw (MEDEXCEPTION) ;
 };
+
+template <class T> T FIELD<T>::_scalarForPow=1;
 
 // --------------------
 // Implemented Methods
@@ -1513,7 +1519,24 @@ void FIELD<T>::applyFunc()
 	getvalue()->clearOtherMode();
     }
 }
-    
+
+template <class T> T FIELD<T>::pow(T x)
+{
+  return ::pow(x,FIELD<T>::_scalarForPow);
+}
+
+/*!  Apply to each (scalar) field component the math function pow.
+ *   calculation is done "in place".
+ *   Use examples : 
+ *   
+ *   \code  myField.applyFunc<std::sqrt>();  // apply sqare root function \endcode
+ *     \code myField.applyFunc<myFunction>(); // apply your own created function \endcode
+ */
+template <class T> void FIELD<T>::applyPow(T scalar)
+{
+  FIELD<T>::_scalarForPow=scalar;
+  applyFunc<FIELD<T>::pow>();
+}    
   
 /*!  Apply to each (scalar) field component the linear function x -> ax+b.
  *   calculation is done "in place".
