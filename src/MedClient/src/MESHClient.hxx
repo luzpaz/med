@@ -19,7 +19,7 @@ private :
 public :
 
   MESHClient(const SALOME_MED::MESH_ptr m);
-
+  virtual bool operator==(const MESH& other) const;
   virtual ~MESHClient();
 
   void blankCopy();

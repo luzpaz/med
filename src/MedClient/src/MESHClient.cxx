@@ -161,6 +161,26 @@ void MESHClient::fillCopy()
 
 //=============================================================================
 /*!
+ *  Test equality between 2 MESHClients.
+ */
+//=============================================================================
+bool MESHClient::operator==(const MESH& other) const
+{
+  BEGIN_OF("MESHClient::operator==");
+  const MESHClient* otherClt=dynamic_cast<const MESHClient *>(&other);
+  if(otherClt)
+    {
+      if(this==otherClt)
+	{
+	  return true;
+	}
+      return IOR_Mesh->areEquals(otherClt->IOR_Mesh);
+    }
+  return false;
+}
+
+//=============================================================================
+/*!
  * Destructeur
  */
 //=============================================================================
