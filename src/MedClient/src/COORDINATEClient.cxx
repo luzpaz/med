@@ -1,4 +1,3 @@
-#define _DEBUG_
 #include "COORDINATEClient.hxx"
 #include <string>
 #include "UtilClient.hxx"
