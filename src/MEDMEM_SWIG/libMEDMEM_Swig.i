@@ -761,6 +761,43 @@ public:
 	return (FIELDDOUBLE*) result;
       }
 
+    %newobject __add__(const FIELDDOUBLE & );
+    FIELDDOUBLE * __add__(const FIELDDOUBLE & m)
+      {
+	MESSAGE("operator +  : Creation of the addition of two FIELDDOUBLEs");
+
+	FIELD<double>* result = FIELD<double>::add( *(FIELD<double>*)self , (FIELD<double>&)m );
+	return (FIELDDOUBLE*) result;
+
+/*	const FIELD<double> result = (*(FIELD<double>*)self) +
+	  (FIELD<double>&)m;
+	return new FIELDDOUBLE(result); */
+      }
+
+    %newobject subDeep(const FIELDDOUBLE & );
+    FIELDDOUBLE * subDeep(const FIELDDOUBLE & m)
+      {
+	MESSAGE("operator -  : Creation of the substraction of two FIELDDOUBLEs");
+	FIELD<double>* result = FIELD<double>::subDeep( *(FIELD<double>*)self , (FIELD<double>&)m );
+	return (FIELDDOUBLE*) result;
+      }
+
+    %newobject mulDeep_(const FIELDDOUBLE & );
+    FIELDDOUBLE * mulDeep(const FIELDDOUBLE & m)
+      {
+	MESSAGE("operator *  : Creation of the multiplication of two FIELDDOUBLEs");
+	FIELD<double>* result = FIELD<double>::mulDeep( *(FIELD<double>*)self , (FIELD<double>&)m );
+	return (FIELDDOUBLE*) result;
+      }
+
+    %newobject divDeep(const FIELDDOUBLE & );
+    FIELDDOUBLE * divDeep(const FIELDDOUBLE & m)
+      {
+	MESSAGE("operator /  : Creation of the division of two FIELDDOUBLEs");
+	FIELD<double>* result = FIELD<double>::divDeep( *(FIELD<double>*)self , (FIELD<double>&)m );
+	return (FIELDDOUBLE*) result;
+      }
+
     FIELDDOUBLE (const SUPPORT * Support, driverTypes driverType,
 		 char * fileName, char * fieldName,
 		 const int iterationNumber,
@@ -932,7 +969,39 @@ public:
     FIELDINT * __div__(const FIELDINT & m)
       {
 	MESSAGE("operator /  : Creation of the division of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::div( *(FIELD<int>*)self , (FIELD<int>&)m );
+	FIELD<int>* result = FIELD<int>::divDeep( *(FIELD<int>*)self , (FIELD<int>&)m );
+	return (FIELDINT*) result;
+      }
+
+    %newobject addDeep(const FIELDINT & );
+    FIELDINT * addDeep(const FIELDINT & m)
+      {
+	MESSAGE("operator +  : Creation of the addition of two FIELDINTs");
+	FIELD<int>* result = FIELD<int>::addDeep( *(FIELD<int>*)self , (FIELD<int>&)m );
+	return (FIELDINT*) result;
+      }
+
+    %newobject subDeep(const FIELDINT & );
+    FIELDINT * subDeep(const FIELDINT & m)
+      {
+	MESSAGE("operator -  : Creation of the substraction of two FIELDINTs");
+	FIELD<int>* result = FIELD<int>::subDeep( *(FIELD<int>*)self , (FIELD<int>&)m );
+	return (FIELDINT*) result;
+      }
+
+    %newobject mulDeep(const FIELDINT & );
+    FIELDINT * mulDeep(const FIELDINT & m)
+      {
+	MESSAGE("operator *  : Creation of the multiplication of two FIELDINTs");
+	FIELD<int>* result = FIELD<int>::mulDeep( *(FIELD<int>*)self , (FIELD<int>&)m );
+	return (FIELDINT*) result;
+      }
+
+    %newobject divDeep(const FIELDINT & );
+    FIELDINT * divDeep(const FIELDINT & m)
+      {
+	MESSAGE("operator /  : Creation of the division of two FIELDINTs");
+	FIELD<int>* result = FIELD<int>::divDeep( *(FIELD<int>*)self , (FIELD<int>&)m );
 	return (FIELDINT*) result;
       }
 
@@ -2516,6 +2585,12 @@ FIELDDOUBLE * createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE *
 %newobject createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) ;
 FIELDINT * createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) ;
 
+%newobject createFieldDoubleScalarProductDeep(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
+FIELDDOUBLE * createFieldDoubleScalarProductDeep(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
+
+%newobject createFieldIntScalarProductDeep(FIELDINT * field1, FIELDINT * field2) ;
+FIELDINT * createFieldIntScalarProductDeep(FIELDINT * field1, FIELDINT * field2) ;
+
 FIELDDOUBLE * createFieldDoubleFromField(FIELD_ * field) ;
 
 FIELDINT * createFieldIntFromField(FIELD_ * field) ;
@@ -2541,6 +2616,16 @@ GRID * createGridFromMesh( MESH * aMesh );
   FIELDINT * createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) 
   {
      return (FIELDINT *) FIELD<int>::scalarProduct( (FIELD<int>)*field1, (FIELD<int>)*field2);
+  }
+
+  FIELDDOUBLE * createFieldDoubleScalarProductDeep(FIELDDOUBLE * field1, FIELDDOUBLE * field2) 
+  {
+     return (FIELDDOUBLE *) FIELD<double>::scalarProduct( (FIELD<double>)*field1, (FIELD<double>)*field2, true);
+  }
+  
+  FIELDINT * createFieldIntScalarProductDeep(FIELDINT * field1, FIELDINT * field2) 
+  {
+     return (FIELDINT *) FIELD<int>::scalarProduct( (FIELD<int>)*field1, (FIELD<int>)*field2, true);
   }
   
   FIELDDOUBLE * createFieldDoubleFromField(FIELD_ * field)
