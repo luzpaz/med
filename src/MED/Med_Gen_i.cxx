@@ -998,20 +998,17 @@ SALOMEDS::TMPFile* Med_Gen_i::CopyFrom(SALOMEDS::SObject_ptr theObject, CORBA::L
   if (aMesh->_is_nil()) return new SALOMEDS::TMPFile(0);
 
   // Get a temporary directory to store a temporary file
-  CORBA::String_var aTmpDir = SALOMEDS_Tool::GetTmpDir().c_str();
+  string aTmpDir = SALOMEDS_Tool::GetTmpDir();
   // Create a list to store names of created files
   SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
   aSeq->length(1);
   aSeq[0] = CORBA::string_dup(aMesh->getName());
-  char* aFullName = new char[strlen(aTmpDir)+strlen(aSeq[0])+1];
-  strcpy(aFullName, aTmpDir);
-  strcpy(aFullName+strlen(aTmpDir), aSeq[0]);
-  long driverId = aMesh->addDriver(SALOME_MED::MED_DRIVER,aFullName , aMesh->getName());
+  string aFullName = aTmpDir + string(aSeq[0]);
+  long driverId = aMesh->addDriver(SALOME_MED::MED_DRIVER, aFullName.c_str(), aMesh->getName());
   aMesh->write(driverId,"");
-  delete(aFullName);
   
-  aStreamFile = SALOMEDS_Tool::PutFilesToStream(aTmpDir, aSeq.in(), false);
-  SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir, aSeq.in(), true);
+  aStreamFile = SALOMEDS_Tool::PutFilesToStream(aTmpDir.c_str(), aSeq.in(), false);
+  SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq.in(), true);
   
   // Assign an ID = 1 the the type SALOME_MED::MESH
   theObjectID = 1;
@@ -1044,23 +1041,20 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   
   SALOMEDS::Study_var aStudy = theObject->GetStudy();
 
-  CORBA::String_var aTmpDir = CORBA::string_dup(SALOMEDS_Tool::GetTmpDir().c_str());
-  SALOMEDS::ListOfFileNames_var aSeq = SALOMEDS_Tool::PutStreamToFiles(theStream, aTmpDir, false);
-  CORBA::String_var aMeshName = CORBA::string_dup(aSeq[0]);
-  char* aFullName = new char[strlen(aTmpDir)+strlen(aMeshName)+1];
-  strcpy(aFullName, aTmpDir);
-  strcpy(aFullName+strlen(aTmpDir), aMeshName);
+  string aTmpDir = SALOMEDS_Tool::GetTmpDir();
+  SALOMEDS::ListOfFileNames_var aSeq = SALOMEDS_Tool::PutStreamToFiles(theStream, aTmpDir.c_str(), false);
+  string aMeshName = string(aSeq[0]);
+  string aFullName = aTmpDir + aMeshName;
 
   MESH * myMesh= new MESH() ;
-  myMesh->setName((char*)aMeshName);
+  myMesh->setName(aMeshName.c_str());
   MED_MESH_RDONLY_DRIVER myMeshDriver(aFullName, myMesh);
   try {
-    myMeshDriver.setMeshName((char*)aMeshName);
+    myMeshDriver.setMeshName(aMeshName.c_str());
     myMeshDriver.open();
   } catch (const exception & ex) {
     MESSAGE("Exception Interceptee : ");
     SCRUTE(ex.what());
-    delete(aFullName);
     return aResultSO._retn();
   };
   try {
@@ -1070,7 +1064,6 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   } catch (const exception & ex) {
     MESSAGE("Exception Interceptee : ");
     SCRUTE(ex.what());
-    delete(aFullName);
     return aResultSO._retn();
   };
   // set new mesh name, becouse now there are no possibility to operate meshes with the same names
@@ -1087,8 +1080,7 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   CORBA::String_var anIORString = _orb->object_to_string(mesh);
   aResultSO = aStudy->FindObjectIOR(anIORString);
 
-  SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir, aSeq.in(), true);
-  delete(aFullName);
+  SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq.in(), true);
   return aResultSO._retn();
 }
 
