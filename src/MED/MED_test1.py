@@ -9,7 +9,7 @@
 
 import salome
 
-med=salome.lcc.FindOrLoadComponent("FactoryServer", "Med")
+med=salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
 
 import os
 filePath=os.getenv("SALOME_BUILD")

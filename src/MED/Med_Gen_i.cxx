@@ -127,7 +127,7 @@ void Med_Gen_i::addInStudy(SALOMEDS::Study_var myStudy)
   myBuilder->NewCommand();
   
   // Create SComponent labelled 'Med' if it doesn't already exit
-  SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
+  SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
   if ( CORBA::is_nil(medfather) )
     {
       // mpv: component label must be created in spite of "Locked" study flag state
@@ -135,10 +135,18 @@ void Med_Gen_i::addInStudy(SALOMEDS::Study_var myStudy)
       if (aLocked) myStudy->GetProperties()->SetLocked(false);
       
       MESSAGE("Add Component Med");
-      medfather = myBuilder->NewComponent("Med");
+      medfather = myBuilder->NewComponent("MED");
       SALOMEDS::GenericAttribute_var anAttr = myBuilder->FindOrCreateAttribute(medfather, "AttributeName");
       SALOMEDS::AttributeName_var aName = SALOMEDS::AttributeName::_narrow(anAttr);
-      aName->SetValue("Med");
+      //NRI      aName->SetValue("Med");
+
+      CORBA::Object_var objVarN = _NS->Resolve("/Kernel/ModulCatalog");
+      SALOME_ModuleCatalog::ModuleCatalog_var Catalogue  = SALOME_ModuleCatalog::ModuleCatalog::_narrow(objVarN);
+      SALOME_ModuleCatalog::Acomponent_var Comp = Catalogue->GetComponent( "MED" );
+      if ( !Comp->_is_nil() ) {
+	aName->SetValue( Comp->componentusername() );
+      }    
+
       //	    Utilisation de this  deconseillee par Paul ??
       //	    myBuilder->DefineComponentInstance(medfather,POA_Engines::Med_Gen::_this());
       CORBA::Object_var myO = _poa->id_to_reference(*_id); // this ior...
@@ -310,7 +318,7 @@ throw (SALOME::SALOME_Exception)
                                  SALOME::BAD_PARAM);
 
         SALOMEDS::StudyBuilder_var myBuilder = myStudy->NewBuilder();
-        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
+        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
         if (CORBA::is_nil(medfather))
         {
 		myBuilder->NewCommand();
@@ -318,10 +326,18 @@ throw (SALOME::SALOME_Exception)
 	        bool aLocked = myStudy->GetProperties()->IsLocked();
 		if (aLocked) myStudy->GetProperties()->SetLocked(false);
 
-                medfather = myBuilder->NewComponent("Med");
+                medfather = myBuilder->NewComponent("MED");
 		SALOMEDS::AttributeName_var aName = SALOMEDS::AttributeName::_narrow(
                       myBuilder->FindOrCreateAttribute(medfather, "AttributeName"));
-		aName->SetValue("Med");
+		//NRI		aName->SetValue("Med");
+
+		CORBA::Object_var objVarN = _NS->Resolve("/Kernel/ModulCatalog");
+		SALOME_ModuleCatalog::ModuleCatalog_var Catalogue  = SALOME_ModuleCatalog::ModuleCatalog::_narrow(objVarN);
+		SALOME_ModuleCatalog::Acomponent_var Comp = Catalogue->GetComponent( "MED" );
+		if ( !Comp->_is_nil() ) {
+		  aName->SetValue( Comp->componentusername() );
+		}    
+
                 CORBA::Object_var myO = _poa->id_to_reference(*_id); // this ior...
                 myBuilder->DefineComponentInstance(medfather,myO);
 
@@ -595,7 +611,7 @@ void Med_Gen_i::Close(SALOMEDS::SComponent_ptr theComponent)
 char* Med_Gen_i::ComponentDataType()
 {
   MESSAGE("Med_Gen_i::ComponentDataType");
-  return strdup("Med") ; /* What is this type ? */
+  return strdup("MED") ; /* What is this type ? */
 }
     
 //=============================================================================
@@ -777,14 +793,21 @@ SALOMEDS::SObject_ptr Med_Gen_i::PublishInStudy(SALOMEDS::Study_ptr theStudy,
   SALOMEDS::GenericAttribute_var anAttr;
   SALOMEDS::AttributeName_var    aName;
   SALOMEDS::AttributeIOR_var     anIOR;
-  SALOMEDS::SComponent_var aFather = theStudy->FindComponent("Med");
+  SALOMEDS::SComponent_var aFather = theStudy->FindComponent("MED");
 
   if (aFather->_is_nil()) {
-    aFather = aBuilder->NewComponent("Med");
+    aFather = aBuilder->NewComponent("MED");
     if (aFather->_is_nil()) return aResultSO;
     anAttr = aBuilder->FindOrCreateAttribute(aFather, "AttributeName");
     aName = SALOMEDS::AttributeName::_narrow(anAttr);
-    aName->SetValue("MED");
+    //NRI    aName->SetValue("MED");
+
+    CORBA::Object_var objVarN = _NS->Resolve("/Kernel/ModulCatalog");
+    SALOME_ModuleCatalog::ModuleCatalog_var Catalogue  = SALOME_ModuleCatalog::ModuleCatalog::_narrow(objVarN);
+    SALOME_ModuleCatalog::Acomponent_var Comp = Catalogue->GetComponent( "MED" );
+    if ( !Comp->_is_nil() ) {
+      aName->SetValue( Comp->componentusername() );
+    }    
     aBuilder->DefineComponentInstance(aFather, Med_Gen::_this());
   }
 

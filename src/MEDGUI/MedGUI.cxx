@@ -532,7 +532,7 @@ bool MedGUI::DumpSubMesh( SALOME_MED::FAMILY_var Fam )
 Engines::Med_Gen_ptr MedGUI::InitMedGen(QAD_Desktop* parent)
 {
   Engines::Component_var comp = 
-    parent->getEngine("FactoryServer", "Med");
+    parent->getEngine("FactoryServer", "MED");
   MESSAGE("_________________________________________");
   Engines::Med_Gen_var clr = Engines::Med_Gen::_narrow(comp);
   ASSERT(!CORBA::is_nil(clr));

@@ -976,7 +976,7 @@ throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
         SALOMEDS::AttributeIOR_var     aIOR;
 
  	// Find SComponent labelled 'MED'
-	SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
+	SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
   	if ( CORBA::is_nil(medfather) ) 
 	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
 
@@ -1035,7 +1035,7 @@ throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
         SALOMEDS::AttributeComment_var aComment;
 
         // Find SComponent labelled 'Med'
-        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
+        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
         if ( CORBA::is_nil(medfather) )
           THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
 

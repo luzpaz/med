@@ -805,7 +805,7 @@ throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
         SALOMEDS::AttributeIOR_var     aIOR;
 
         // Create SComponent labelled 'MED' if it doesn't already exit
-        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
+        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
         if ( CORBA::is_nil(medfather) )
         {
 	  THROW_SALOME_CORBA_EXCEPTION("Component Med not found",

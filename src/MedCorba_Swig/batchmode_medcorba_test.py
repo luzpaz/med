@@ -97,7 +97,7 @@ medFile = "cube_hexa8_quad4.med"
 print "Loading of the Med Component"
 print ""
 
-med_comp = batchmode_salome.lcc.FindOrLoadComponent("FactoryServer", "Med")
+med_comp = batchmode_salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
 
 med_comp.readStructFile(medFile,studyCurrent)
 
