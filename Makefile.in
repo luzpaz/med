@@ -1,23 +1,20 @@
-#==============================================================================
-#  File      : Makefile.in
-#  Created   : ven déc  7 13:32:08 CET 2001
-#  Author    : Paul RASCLE, EDF
-#  Project   : SALOME
-#  Copyright : EDF 2001
-#  $Header$
-#==============================================================================
+# -* Makefile *- 
+#
+# Author : Patrick GOLDBRONN (CEA)
+# Date : 28/06/2001
+# $Header$
+#
 
 # source path
 top_srcdir=@top_srcdir@
 top_builddir=.
 srcdir=@srcdir@
-VPATH=.:@srcdir@:@top_srcdir@/resources:@top_srcdir@/idl
+VPATH=.:@srcdir@:@top_srcdir@/bin:@top_srcdir@/resources:./bin:@top_srcdir@/idl
+
 
 @COMMENCE@
 
-SUBDIRS = idl src
-
-MODULE = MED
+SUBDIRS = idl src salome_adm
 
 RESOURCES_FILES = \
 Med_en.xml \
@@ -25,6 +22,10 @@ Data.png \
 Infos.png \
 Structure.png \
 ModuleMed.png
+
+BIN_SCRIPT= \
+README
+
 
 # copy header files in common directory
 ifeq ($(HAVE_SSTREAM),yes)
@@ -37,11 +38,11 @@ inc: idl $(include_list)
 
 include/salome/SALOMEconfig.h: salome_adm/unix/SALOMEconfig.h
 	-$(RM) $@
-	$(LN_S) ../$< $@
+	$(LN_S) ../../$< $@
 
 include/salome/sstream: salome_adm/unix/sstream
 	-$(RM) $@
-	$(LN_S) ../$< $@
+	$(LN_S) ../../$< $@
 
 depend: depend_idl
 
@@ -85,3 +86,4 @@ distclean-other:
 @MODULE@
 
 install: install-bin install-include install-end
+
