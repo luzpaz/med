@@ -1,8 +1,11 @@
-//=============================================================================
-// File      : MEDGUI.h
-// Project   : SALOME
-// Copyright : EDF 2001
-//=============================================================================
+//  MED MEDGUI : MED component GUI implemetation 
+//
+//  Copyright (C) 2003  CEA/DEN, EDF R&D
+//
+//
+//
+//  File   : MEDGUI.h
+//  Module : MED
 
 #ifndef _MEDGUI_H_
 #define _MEDGUI_H_

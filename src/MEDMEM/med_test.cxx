@@ -1,3 +1,30 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : med_test.cxx
+//  Module : MED
+
+using namespace std;
 #include<string>
 
 #include <math.h>
@@ -21,59 +48,59 @@ double dmin(double x, double y) { return (x>y)?y:x;}
 
 double infty = 1.e20;
 
-void affiche_support(SUPPORT * mySupport) 
+void affiche_support(const SUPPORT * mySupport) 
 {
-  MESSAGE( "  - Name : "<<mySupport->getName().c_str());
-  MESSAGE( "  - Description : "<<mySupport->getDescription().c_str());
-  MESSAGE( "  - Entity : "<<mySupport->getEntity());
-  MESSAGE( "  - Entities list : ");
+  cout << "  - Name : "<<mySupport->getName().c_str()<<endl ;
+  cout << "  - Description : "<<mySupport->getDescription().c_str()<<endl ;
+  cout << "  - Entity : "<<mySupport->getEntity()<<endl ;
+  cout << "  - Entities list : "<<endl ;
   if (!(mySupport->isOnAllElements())) {
     int NumberOfTypes = mySupport->getNumberOfTypes() ;
-    MESSAGE("  - NumberOfTypes : "<<NumberOfTypes);
-    medGeometryElement * Types = mySupport->getTypes() ;
+    cout<<"  - NumberOfTypes : "<<NumberOfTypes<<endl;
+    const medGeometryElement * Types = mySupport->getTypes() ;
     for (int j=0;j<NumberOfTypes;j++) {
-      MESSAGE( "    * Type "<<Types[j]<<" : " );
+      cout << "    * Type "<<Types[j]<<" : " ;
       int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
-      int * Number = mySupport->getNumber(Types[j]) ;
+      const int * Number = mySupport->getNumber(Types[j]) ;
       for (int k=0; k<NumberOfElements;k++)
-	MESSAGE( Number[k] << " ");
-      MESSAGE("");
+	cout << Number[k] << " ";
+      cout << endl ;
     }
   } else
-    MESSAGE( "    Is on all entities !");
+    cout << "    Is on all entities !"<< endl;
 }
 
 
 void affiche_famille(MESH *myMesh,medEntityMesh Entity) 
 {
   int NumberOfFamilies = myMesh->getNumberOfFamilies(Entity) ;
-  MESSAGE( "NumberOfFamilies : "<<NumberOfFamilies);
+  cout << "NumberOfFamilies : "<<NumberOfFamilies<<endl;
   for (int i=1; i<NumberOfFamilies+1;i++) {
-    FAMILY* myFamily = myMesh->getFamily(Entity,i);
+    const FAMILY* myFamily = myMesh->getFamily(Entity,i);
     affiche_support(myFamily);
-    MESSAGE( "  - Identifier : "<<myFamily->getIdentifier());
+    cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
     int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
-    MESSAGE( "  - Attributes ("<<NumberOfAttributes<<") :");
+    cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
     for (int j=1;j<NumberOfAttributes+1;j++)
-      MESSAGE( "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str());
+      cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
     int NumberOfGroups = myFamily->getNumberOfGroups() ;
-    MESSAGE( "  - Groups ("<<NumberOfGroups<<") :");
+    cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
     for (int j=1;j<NumberOfGroups+1;j++)
-      MESSAGE( "    * "<<myFamily->getGroupName(j).c_str());
+      cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
   }
 }
 
 void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
 {
   int NumberOfGroups = myMesh->getNumberOfGroups(Entity) ;
-  MESSAGE( "NumberOfGroups : "<<NumberOfGroups);
+  cout << "NumberOfGroups : "<<NumberOfGroups<<endl;
   for (int i=1; i<NumberOfGroups+1;i++) {
-    GROUP* myGroup = myMesh->getGroup(Entity,i);
+    const GROUP* myGroup = myMesh->getGroup(Entity,i);
     affiche_support(myGroup);
     int NumberOfFamillies = myGroup->getNumberOfFamilies() ;
-    MESSAGE( "  - Families ("<<NumberOfFamillies<<") :");
+    cout << "  - Families ("<<NumberOfFamillies<<") :"<<endl;
     for (int j=1;j<NumberOfFamillies+1;j++)
-      MESSAGE( "    * "<<myGroup->getFamily(j)->getName().c_str());
+      cout << "    * "<<myGroup->getFamily(j)->getName().c_str()<<endl ;
   }
 }
 
@@ -107,74 +134,74 @@ int main (int argc, char ** argv) {
   int MeshDimension  = myMesh->getMeshDimension() ;
   int NumberOfNodes  = myMesh->getNumberOfNodes() ;
 
-  MESSAGE( "Space Dimension : " << SpaceDimension << endl ); 
+  cout << "Space Dimension : " << SpaceDimension << endl << endl ; 
 
-  MESSAGE( "Mesh Dimension : " << MeshDimension << endl ); 
+  cout << "Mesh Dimension : " << MeshDimension << endl << endl ; 
 
   const double * Coordinates = myMesh->getCoordinates(MED_FULL_INTERLACE) ;
 
-  MESSAGE( "Show Nodes Coordinates : " );
+  cout << "Show Nodes Coordinates : " << endl ;
 
-  MESSAGE( "Name :" );
-  string * CoordinatesNames = myMesh->getCoordinatesNames() ;
+  cout << "Name :" << endl ;
+  const string * CoordinatesNames = myMesh->getCoordinatesNames() ;
   for(int i=0; i<SpaceDimension ; i++) {
-    MESSAGE( " - " << CoordinatesNames[i] );
+    cout << " - " << CoordinatesNames[i] << endl ;
   }
-  MESSAGE( "Unit :" );
-  string * CoordinatesUnits = myMesh->getCoordinatesUnits() ;
+  cout << "Unit :" << endl ;
+  const string * CoordinatesUnits = myMesh->getCoordinatesUnits() ;
   for(int i=0; i<SpaceDimension ; i++) {
-    MESSAGE( " - " << CoordinatesUnits[i] );
+    cout << " - " << CoordinatesUnits[i] << endl ;
   }
   for(int i=0; i<NumberOfNodes ; i++) {
-    MESSAGE( "Nodes " << i+1 << " : " );
+    cout << "Nodes " << i+1 << " : " ;
     for (int j=0; j<SpaceDimension ; j++)
-      MESSAGE( Coordinates[i*SpaceDimension+j] << " " );
-    MESSAGE("");
+      cout << Coordinates[i*SpaceDimension+j] << " " ;
+    cout << endl ;
   }
 
   int NumberOfTypes = myMesh->getNumberOfTypes(MED_CELL) ;
-  medGeometryElement  * Types = myMesh->getTypes(MED_CELL) ;
+  const medGeometryElement  * Types = myMesh->getTypes(MED_CELL) ;
 
-  MESSAGE( "Show Connectivity (Nodal) :" );
+  cout << "Show Connectivity (Nodal) :" << endl ;
   for (int i=0; i<NumberOfTypes; i++) {
-    MESSAGE( "For type " << Types[i] << " : " );
+    cout << "For type " << Types[i] << " : " << endl ;
     int NumberOfElements = myMesh->getNumberOfElements(MED_CELL,Types[i]);
-    int * connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,Types[i]);
+    const int * connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,Types[i]);
     int NomberOfNodesPerCell = Types[i]%100 ;
     for (int j=0;j<NumberOfElements;j++){
-      MESSAGE( "Element "<< j+1 <<" : " );
+      cout << "Element "<< j+1 <<" : " ;
       for (int k=0;k<NomberOfNodesPerCell;k++)
-	MESSAGE( connectivity[j*NomberOfNodesPerCell+k]<<" ");
-      MESSAGE("");
+	cout << connectivity[j*NomberOfNodesPerCell+k]<<" ";
+      cout << endl ;
     }
   }
 
-  MESSAGE( "Show Family :");
+  cout << "Show Family :"<<endl ;
   affiche_famille(myMesh,MED_NODE);
   affiche_famille(myMesh,MED_CELL);
   affiche_famille(myMesh,MED_FACE);
   affiche_famille(myMesh,MED_EDGE);
 
-  MESSAGE( "Show Group :");
+  cout << "Show Group :"<<endl ;
   affiche_groupe(myMesh,MED_NODE);
   affiche_groupe(myMesh,MED_CELL);
   affiche_groupe(myMesh,MED_FACE);
   affiche_groupe(myMesh,MED_EDGE);
 
-  MESSAGE( "Show Reverse Nodal Connectivity :" );
-  int * ReverseNodalConnectivity = myMesh->getReverseConnectivity(MED_NODAL) ;
-  int * ReverseNodalConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_NODAL) ;
+  cout << "Show Reverse Nodal Connectivity :" << endl ;
+  const int * ReverseNodalConnectivity = myMesh->getReverseConnectivity(MED_NODAL) ;
+  const int * ReverseNodalConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_NODAL) ;
   for (int i=0; i<NumberOfNodes; i++) {
-    MESSAGE( "Node "<<i+1<<" : " );
+    cout << "Node "<<i+1<<" : " ;
     for (int j=ReverseNodalConnectivityIndex[i];j<ReverseNodalConnectivityIndex[i+1];j++)
-      MESSAGE( ReverseNodalConnectivity[j-1] << " " );
-    MESSAGE("");
+      cout << ReverseNodalConnectivity[j-1] << " " ;
+    cout << endl ;
   }
 
-  MESSAGE( "Show Connectivity (Descending) :" );
+  cout << "Show Connectivity (Descending) :" << endl ;
   int NumberOfElements ;
-  int * connectivity ;
-  int * connectivity_index ;
+  const int * connectivity ;
+  const int * connectivity_index ;
   myMesh->calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL);
   try {
     NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
@@ -182,19 +209,19 @@ int main (int argc, char ** argv) {
     connectivity_index =  myMesh->getConnectivityIndex(MED_DESCENDING,MED_CELL);
   }
   catch (MEDEXCEPTION m) {
-    MESSAGE( m.what() );
+    cout << m.what() << endl ;
     exit (-1) ;
   }
   for (int j=0;j<NumberOfElements;j++) {
-    MESSAGE( "Element "<<j+1<<" : " );
+    cout << "Element "<<j+1<<" : " ;
     for (int k=connectivity_index[j];k<connectivity_index[j+1];k++)
-      MESSAGE( connectivity[k-1]<<" ");
-    MESSAGE("");
+      cout << connectivity[k-1]<<" ";
+    cout << endl ;
   }
 
-  MESSAGE( "Show Reverse Descending Connectivity :" );
-  int * ReverseDescendingConnectivity = myMesh->getReverseConnectivity(MED_DESCENDING) ;
-  int * ReverseDescendingConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_DESCENDING) ;
+  cout << "Show Reverse Descending Connectivity :" << endl ;
+  const int * ReverseDescendingConnectivity = myMesh->getReverseConnectivity(MED_DESCENDING) ;
+  const int * ReverseDescendingConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_DESCENDING) ;
 
   int NumberOfConstituents  = 0;
   string constituent ;
@@ -211,44 +238,44 @@ int main (int argc, char ** argv) {
   }
 
   if (MeshDimension==1) {
-    MESSAGE("ERROR : MeshDimension = 1 !");
-    MESSAGE("We could not see Reverse Descending Connectivity.") ;
+    INFOS("ERROR : MeshDimension = 1 !");
+    INFOS("We could not see Reverse Descending Connectivity.") ;
   } else {
     NumberOfConstituents = myMesh->getNumberOfElements (constituentEntity,MED_ALL_ELEMENTS);
     for (int i=0; i<NumberOfConstituents; i++) {
-      MESSAGE( constituent <<i+1<<" : " );
+      cout << constituent <<i+1<<" : " ;
       for (int j=ReverseDescendingConnectivityIndex[i];j<ReverseDescendingConnectivityIndex[i+1];j++)
-	MESSAGE( ReverseDescendingConnectivity[j-1] << " " );
-      MESSAGE("");
+	cout << ReverseDescendingConnectivity[j-1] << " " ;
+      cout << endl ;
     }
   }
-  MESSAGE( "Show "<<constituent<<" Connectivity (Nodal) :" );
-  int * face_connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
-  int * face_connectivity_index =  myMesh->getConnectivityIndex(MED_NODAL,constituentEntity);
+  cout << "Show "<<constituent<<" Connectivity (Nodal) :" << endl ;
+  const int * face_connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
+  const int * face_connectivity_index =  myMesh->getConnectivityIndex(MED_NODAL,constituentEntity);
   for (int i=0; i<NumberOfConstituents; i++) {
-    MESSAGE( constituent <<i+1<<" : " );
+    cout << constituent <<i+1<<" : " ;
     for (int j=face_connectivity_index[i];j<face_connectivity_index[i+1];j++)
-      MESSAGE( face_connectivity[j-1]<<" ");
-    MESSAGE("");
+      cout << face_connectivity[j-1]<<" ";
+    cout << endl ;
   }
 
   /* test of normal, area, volume, barycenter */
 
   SUPPORT * support1 = (SUPPORT*) NULL;
   
-  FIELD<double>* normal = new FIELD<double>::FIELD();
-  FIELD<double>* length = new FIELD<double>::FIELD();
-  normal = NULL;
-  length = NULL;
+  //FIELD<double>* normal = new FIELD<double>::FIELD();
+  //FIELD<double>* length = new FIELD<double>::FIELD();
+  //normal = NULL;
+  //length = NULL;
   string support_name = "Support on all " ;
   support_name+=constituent;
   support1 = new SUPPORT(myMesh,support_name,constituentEntity);
-  MESSAGE( "Building of the Support on all cells dimensionned (Meshdim-1) of the mesh :");
-  MESSAGE( "Face in 3D or Edge in 2D" );
+  cout << "Building of the Support on all cells dimensionned (Meshdim-1) of the mesh :"<< endl ;
+  cout << "Face in 3D or Edge in 2D" << endl;
   
-  MESSAGE( "Getting the normal of each face of this support !" );
+  cout << "Getting the normal of each face of this support !" << endl ;
   
-  normal = myMesh->getNormal(support1);
+  FIELD<double>* normal = myMesh->getNormal(support1);
   
   double normal_square, norm ;
   double maxnorm=-infty;
@@ -256,25 +283,26 @@ int main (int argc, char ** argv) {
   double tmp_value ;
   for (int i = 1; i<=NumberOfConstituents;i++) {
     normal_square = 0. ;
-    MESSAGE( "Normal " << i << " " ); 
+    cout << "Normal " << i << " " ; 
     for (int j=1; j<=SpaceDimension; j++) {
       tmp_value = normal->getValueIJ(i,j) ;
       normal_square += tmp_value*tmp_value ;
-      MESSAGE( tmp_value << " " );
+      cout << tmp_value << " " ;
     }
     norm = sqrt(normal_square);
     maxnorm = dmax(maxnorm,norm);
     minnorm = dmin(minnorm,norm);
-    MESSAGE( ", Norm = " << norm );
+    cout << ", Norm = " << norm << endl;
   }
-  MESSAGE( "Max Norm " << maxnorm << " Min Norm " << minnorm );
+  cout << "Max Norm " << maxnorm << " Min Norm " << minnorm << endl;
   
+  delete normal ;
 
   if (SpaceDimension == 2)
     {
-      MESSAGE( "Getting the length of each edge !" );
+      cout << "Getting the length of each edge !" << endl ;
 
-      length = myMesh->getLength(support1);
+      FIELD<double>* length = myMesh->getLength(support1);
 
       double length_value,maxlength,minlength;
       maxlength = -infty;
@@ -282,42 +310,48 @@ int main (int argc, char ** argv) {
       for (int i = 1; i<=NumberOfConstituents;i++)
 	{
 	  length_value = length->getValueIJ(i,1) ;
-	  MESSAGE( "Length " << i << " " << length_value );
+	  cout << "Length " << i << " " << length_value << endl;
 	  maxlength = dmax(maxlength,length_value);
 	  minlength = dmin(minlength,length_value);
 	}
-      MESSAGE( "Max Length " << maxlength << " Min Length " << minlength );
+      cout << "Max Length " << maxlength << " Min Length " << minlength << endl;
+
+      delete length ;
     }
 
-  MESSAGE( "Building of the Support on all space-dimensionned cells of the mesh :");
+  delete support1 ;
+
+  cout << "Building of the Support on all space-dimensionned cells of the mesh :"<< endl ;
   SUPPORT * support = new SUPPORT(myMesh);
 
-  MESSAGE( "Getting the barycenter of each element of this support !" );
+  cout << "Getting the barycenter of each element of this support !" << endl ;
 
-  FIELD<double>* barycenter = new FIELD<double>::FIELD();
+  //FIELD<double>* barycenter = new FIELD<double>::FIELD();
 
-  barycenter = myMesh->getBarycenter(support);
+  FIELD<double>* barycenter = myMesh->getBarycenter(support);
   NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
 
   for (int i = 1; i<=NumberOfElements;i++)
     {
       if (SpaceDimension == 3)
-	MESSAGE( "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << " " << barycenter->getValueIJ(i,3) );
+	cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << " " << barycenter->getValueIJ(i,3) << endl;
 
       if (SpaceDimension == 2)
-	MESSAGE( "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) );
+	cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << endl;
     }
 
-  FIELD<double>* volume = new FIELD<double>::FIELD();
-  FIELD<double>* area = new FIELD<double>::FIELD();
-  volume = NULL;
-  area = NULL;
+  delete barycenter ;
+
+  //FIELD<double>* volume = new FIELD<double>::FIELD();
+  //FIELD<double>* area = new FIELD<double>::FIELD();
+  //volume = NULL;
+  //area = NULL;
 
   if (SpaceDimension == 3)
     {
-      MESSAGE( "Getting the Volume of each element of this support which is a 3D one !" );
+      cout << "Getting the Volume of each element of this support which is a 3D one !" << endl;
 
-      volume = myMesh->getVolume(support);
+      FIELD<double>* volume = myMesh->getVolume(support);
 
       double maxvol,minvol,voltot;
       maxvol = -infty;
@@ -325,22 +359,24 @@ int main (int argc, char ** argv) {
       voltot = 0.0;
       for (int i = 1; i<=NumberOfElements;i++)
 	{
-	  MESSAGE( "Volume " << i << " " << volume->getValueIJ(i,1) );
+	  cout << "Volume " << i << " " << volume->getValueIJ(i,1) << endl;
 	  maxvol = dmax(maxvol,volume->getValueIJ(i,1));
 	  minvol = dmin(minvol,volume->getValueIJ(i,1));
 	  voltot = voltot + volume->getValueIJ(i,1);
 	}
 
-      MESSAGE( "Max Volume " << maxvol << " Min Volume " << minvol );
-      MESSAGE( "Support Volume " << voltot );
+      cout << "Max Volume " << maxvol << " Min Volume " << minvol << endl;
+      cout << "Support Volume " << voltot << endl;
+
+      delete volume ;
     }
   else if (SpaceDimension == 2)
     {
-      MESSAGE( "Getting the Area of each element of this support which is a 2D one !" );
+      cout << "Getting the Area of each element of this support which is a 2D one !" << endl;
 
-      area = myMesh->getArea(support);
+      FIELD<double>* area = myMesh->getArea(support);
 
-      //    MESSAGE( "nb of comp "<< area->getNumberOfComponents() << " length " << area->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS) );
+      //    cout << "nb of comp "<< area->getNumberOfComponents() << " length " << area->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS) << endl;
 
       double maxarea,minarea,areatot;
       maxarea = -infty;
@@ -348,19 +384,23 @@ int main (int argc, char ** argv) {
       areatot = 0.0;
       for (int i = 1; i<=NumberOfElements;i++)
 	{
-	  MESSAGE( "Area " << i << " " << area->getValueIJ(i,1) );
+	  cout << "Area " << i << " " << area->getValueIJ(i,1) << endl;
 	  maxarea = dmax(maxarea,area->getValueIJ(i,1));
 	  minarea = dmin(minarea,area->getValueIJ(i,1));
 	  areatot = areatot + area->getValueIJ(i,1);
 	}
 
-      MESSAGE( "Max Area " << maxarea << " Min Area " << minarea );
-      MESSAGE( "Support Area " << areatot );
+      cout << "Max Area " << maxarea << " Min Area " << minarea << endl;
+      cout << "Support Area " << areatot << endl;
+
+      delete area ;
     }
 
-  if (barycenter != NULL) delete barycenter;
-  if (volume != NULL ) delete volume;
-  if (area != NULL ) delete area;
+  delete support ;
+
+  //if (barycenter != NULL) delete barycenter;
+  //if (volume != NULL ) delete volume;
+  //if (area != NULL ) delete area;
 
 
   if (argc < 4) return 0;
@@ -398,35 +438,42 @@ int main (int argc, char ** argv) {
   
   myFieldDriver.close() ;
 
-  MESSAGE( "Field "<< myField->getName() << " : " <<myField->getDescription() );
+  cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
-  MESSAGE( "- Nombre de composantes : "<< NumberOfComponents );
+  cout << "- Nombre de composantes : "<< NumberOfComponents << endl ;
   for (int i=1; i<NumberOfComponents+1; i++) {
-    MESSAGE( "  - composante "<<i<<" :");
-    MESSAGE( "      - nom         : "<<myField->getComponentName(i));
-    MESSAGE( "      - description : "<<myField->getComponentDescription(i) );
-    MESSAGE( "      - units       : "<<myField->getMEDComponentUnit(i) );
+    cout << "  - composante "<<i<<" :"<<endl ;
+    cout << "      - nom         : "<<myField->getComponentName(i)<< endl;
+    cout << "      - description : "<<myField->getComponentDescription(i) << endl;
+    cout << "      - units       : "<<myField->getMEDComponentUnit(i) << endl;
   }
-  MESSAGE( "- iteration :" );
-  MESSAGE( "    - numero : " << myField->getIterationNumber());
-  MESSAGE( "    - ordre  : " << myField->getOrderNumber());
-  MESSAGE( "    - temps  : " << myField->getTime());
+  cout << "- iteration :" << endl ;
+  cout << "    - numero : " << myField->getIterationNumber()<< endl  ;
+  cout << "    - ordre  : " << myField->getOrderNumber()<< endl  ;
+  cout << "    - temps  : " << myField->getTime()<< endl  ;
 
-  MESSAGE( "- Valeurs :");
+  cout << "- Valeurs :"<<endl;
   int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
   //    for (int i=1; i<NumberOfComponents+1; i++) {
   //      double * value = myField->getValueI(MED_NO_INTERLACE,i) ;
   //      for (int j=0; j<NumberOf; j++)
-  //        MESSAGE( value[j]<< " ");
-  //      MESSAGE();
+  //        cout << value[j]<< " ";
+  //      cout<<endl;
   //    }
+  MEDARRAY<double> * myvalue = myField->getvalue();
+  const double * value ;
   for (int i=1; i<NumberOf+1; i++) {
-    double * value = myField->getValueI(MED_FULL_INTERLACE,i) ;
+    value = myvalue->getRow(i) ;
     for (int j=0; j<NumberOfComponents; j++)
-      MESSAGE( value[j]<< " ");
-    MESSAGE("");
+      cout << value[j]<< " ";
+    cout<<endl;
   }
+  cout<<endl;
+  
+  delete myField;
+  delete mySupport;
 
+  delete myMesh ;
 
   return 0;
 }

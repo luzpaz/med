@@ -1,88 +1,225 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : MEDMEM_Coordinate.cxx
+//  Module : MED
+
+using namespace std;
 #include "MEDMEM_Coordinate.hxx"
+#include "MEDMEM_Exception.hxx"
+#include "MEDMEM_STRING.hxx"
+
 #include "utilities.h"
 
-/*! This class contains coordinates of the nodes */
+/*! Default Constructor : should not be used */
 //----------------------------------------------------------//
-COORDINATE::COORDINATE():_coordinate((MEDARRAY<double>*)NULL),
-			 _coordinateName((string*)NULL),
-			 _coordinateUnit((string*)NULL),
-			 _nodeNumber((int*)NULL)
+COORDINATE::COORDINATE():_coordinate(MEDARRAY<double>()),
+			 _coordinateName(),
+			 _coordinateUnit(),
+			 _coordinateSystem(""),
+			 _nodeNumber()
 //----------------------------------------------------------//
 {
     BEGIN_OF("Default Constructor COORDINATE");
 }
 
+/*! This constructor allocate a MEDARRAY of SpaceDimension * NumberOfNodes./n
+    It will create empty array for optional data (nodeNumber..) */
 //------------------------------------------------------------------------------//
-COORDINATE::COORDINATE(medModeSwitch Mode,int SpaceDimension, int NumberOfNodes):
-			_nodeNumber((int*)NULL) 
+COORDINATE::COORDINATE(int SpaceDimension, int NumberOfNodes, medModeSwitch Mode):
+                        _nodeNumber(),
+                        _coordinateUnit(SpaceDimension),
+			_coordinateSystem(""),
+			_coordinateName(SpaceDimension),
+			_coordinate(SpaceDimension,NumberOfNodes,Mode)
+
 //------------------------------------------------------------------------------//
 {
     BEGIN_OF("Constructor COORDINATE");
-    _coordinateName = new string[SpaceDimension] ;
-    _coordinateUnit = new string[SpaceDimension] ;
-    _coordinate = new MEDARRAY<double>(SpaceDimension,NumberOfNodes,Mode);
 }
+
+/*! This constructor will COPY all data (it is a deep copy) included in m./n  
+    But only the default storage mode of coordinates array
+    will be copied (not both storage representation modes even if they both
+    exist in original object) :  for example only full_interlace mode  */
+//------------------------------------------------------------------------------//
+COORDINATE::COORDINATE(const COORDINATE & m):
+  _coordinateSystem(m._coordinateSystem),
+  _coordinate(m._coordinate,false)
+//------------------------------------------------------------------------------//
+{
+  BEGIN_OF("Copy Constructor COORDINATE");
+
+  int spaceDimension = _coordinate.getLeadingValue();
+  int numberOfNodes = _coordinate.getLengthValue();
+
+  SCRUTE(spaceDimension);
+  setCoordinatesNames((const string*)m._coordinateName) ;
+  setCoordinatesUnits((const string*)m._coordinateUnit) ;
+
+  if ( (const int * const) m._nodeNumber != NULL)
+    _nodeNumber.set(numberOfNodes,(const med_int*)m._nodeNumber);
+  // PG : it's default no ?
+//    else
+//      {
+//        _nodeNumber.set(0);
+//      }
+}
+
+
+/* does nothing :   all attributs are object (not pointers) */
 //----------------------//
 COORDINATE::~COORDINATE()
 //----------------------//
 {
-    MESSAGE("Debut Destructeur COORDINATE");
-    if (_coordinate!=NULL)
-      delete _coordinate ;
-    if (_coordinateName!=NULL)
-      delete[] _coordinateName ;
-    if (_coordinateUnit!=NULL)
-      delete[] _coordinateUnit ;
-    if (_nodeNumber!=NULL)
-      delete[] _nodeNumber ;
-  }
+  MESSAGE("~COORDINATE()");
+}
 
-/*! set the attribute _coordinate with Coordinate           */
+/*! sets the attribute _coordinate with Coordinate           */
 //----------------------------------------------------------//
 void COORDINATE::setCoordinates(MEDARRAY<double> *Coordinate) 
 //----------------------------------------------------------//
 { 
-	_coordinate=Coordinate ; 
+
+  const medModeSwitch mode = Coordinate->getMode(); 
+  const int  spaceDimension = (int) Coordinate->getLeadingValue();
+  const int  numberOfNodes  = (int) Coordinate->getLengthValue();
+  if ( Coordinate->get(mode) != NULL)
+  {
+      MEDARRAY<double> pourAttribut(*Coordinate,false);
+      _coordinate = pourAttribut;
+      //_coordinate.set(mode,Coordinate->get(mode));
+  }
+  else
+  {
+	throw MED_EXCEPTION ( LOCALIZED(STRING("setCoordinates(MEDARRAY<double>
+	 *Coordinate)") << "No Coordinate"));
+  }
 }
 
-/*! set the attribute _coordinateName with CoordinateName   */
+/*!
+  Sets the value in attribute _coordinate with Coordinate.
+  _coordinate must be allocated (with 
+  COORDINATE::COORDINATE(int,int,medModeSwitch).
+*/
 //----------------------------------------------------------//
-void COORDINATE::setCoordinatesNames(string * CoordinateName) 
-//----------------------------------------------------------//
-{ 	
-	_coordinateName=CoordinateName ; 
-}
-
-/*! set the attribute _coordinateUnit with CoordinateUnit   */
-//----------------------------------------------------------//
-void COORDINATE::setCoordinatesUnits(string * CoordinateUnit) 
+void COORDINATE::setCoordinates(const medModeSwitch Mode, 
+				const double *Coordinate) 
 //----------------------------------------------------------//
 { 
-	_coordinateUnit=CoordinateUnit ; 
+//    if (_coordinate == NULL)
+//      throw MEDEXCEPTION("COORDINATE::setCoordinates(double*) : coordinate array not allocated !");
+
+  _coordinate.set(Mode,Coordinate);
 }
 
-/*! set the attribute _nodeNumber with NodeNumber */
+/*! sets the attribute _coordinateName with CoordinateName   */
+//----------------------------------------------------------//
+void COORDINATE::setCoordinatesNames(const string * CoordinateName) 
+//----------------------------------------------------------//
+{
+  int SpaceDimension = getSpaceDimension() ;
+  _coordinateName.set(SpaceDimension) ;
+  for (int i=0; i<SpaceDimension; i++)
+    _coordinateName[i]=CoordinateName[i];
+}
+
+/*!
+  sets the (i+1)^th component of the attribute _coordinateName with
+  CoordinateName
+*/
+//----------------------------------------------------------//
+void COORDINATE::setCoordinateName(const string CoordinateName, const int i)
+//----------------------------------------------------------//
+{
+  _coordinateName[i]=CoordinateName;
+}
+
+/*! sets the attribute _coordinateUnit with CoordinateUnit   */
+//----------------------------------------------------------//
+void COORDINATE::setCoordinatesUnits(const string * CoordinateUnit) 
+//----------------------------------------------------------//
+{ 
+  int SpaceDimension = getSpaceDimension() ;
+  _coordinateUnit.set(SpaceDimension) ; 
+  for (int i=0; i<SpaceDimension; i++)
+    _coordinateUnit[i]=CoordinateUnit[i];
+}
+
+/*!
+  sets the (i+1)^th component of the attribute _coordinateUnit with
+  CoordinateUnit
+*/
+//----------------------------------------------------------//
+void COORDINATE::setCoordinateUnit(const string CoordinateUnit, const int i) 
+//----------------------------------------------------------//
+{ 
+  _coordinateUnit[i]=CoordinateUnit;
+}
+
+/*! sets the attribute _coordinateSystem with CoordinateSystem   */
+//----------------------------------------------------------//
+void COORDINATE::setCoordinatesSystem(const string CoordinateSystem) 
+//----------------------------------------------------------//
+{ 
+	_coordinateSystem=CoordinateSystem; 
+}
+
+/*! sets the attribute _nodeNumber with NodeNumber */
 //------------------------------------------------//
-void COORDINATE::setNodesNumbers(int * NodeNumber) 
+void COORDINATE::setNodesNumbers(const int * NodeNumber) 
 //------------------------------------------------//
 { 	
-	_nodeNumber=NodeNumber ; 
+  int NumberOfNodes = getNumberOfNodes() ;
+  _nodeNumber.set(NumberOfNodes,NodeNumber) ; 
 }
 
-/*! returns the number of nodes defined in the mesh*/
-//-------------------------------------------------//
-int * COORDINATE::getNodesNumbers() const
-//-------------------------------------------------//
-{
-	return _nodeNumber;
+int COORDINATE::getSpaceDimension() const
+{ 	
+  _coordinate.getLeadingValue() ; 
 }
 
-/*! returns the mode of coordinates (FULL_INTERLACE or NO_INTERLACE) */
-//-------------------------------------------------------------------//
-const double *  COORDINATE::getCoordinates (medModeSwitch Mode) 
-//-------------------------------------------------------------------//
+int COORDINATE::getNumberOfNodes() const
+{ 	
+  _coordinate.getLengthValue() ; 
+}
+
+
+/*! returns a pointer to the optional array storing 
+    eventual nodes numbers */
+//-------------------------------------------------//
+const int * COORDINATE::getNodesNumbers() const
+//-------------------------------------------------//
 {
-	return _coordinate->get(Mode) ;
+	return  (const int *)_nodeNumber;
+}
+
+/*! returns a Pointer to Coordinates Array in specified mode representation */
+//--------------------------------------------------------------------------//
+const double *  COORDINATE::getCoordinates (medModeSwitch Mode)
+//--------------------------------------------------------------------------//
+{
+	return _coordinate.get(Mode) ;
 }
 
 /* returns the coordinate of node Number on axis Axis */
@@ -90,53 +227,53 @@ const double *  COORDINATE::getCoordinates (medModeSwitch Mode)
 double COORDINATE::getCoordinate(int Number,int Axis) 
 //----------------------------------------------------//
 { 	
-      	return _coordinate->getIJ(Number,Axis) ;
+      	return _coordinate.getIJ(Number,Axis) ;
 }
 
 /* returns all nodes coordinates from  axis Axis      */
 //----------------------------------------------------//
-const double *  COORDINATE::getCoordinateAxis(int Axis) 
+const double *  COORDINATE::getCoordinateAxis(int Axis)
 //----------------------------------------------------//
 { 			//< return all nodes coordinates from axis Axis
-     	 return _coordinate->getI(MED_NO_INTERLACE,Axis) ;
+     	 return _coordinate.getColumn(Axis) ;
 }
 
-/*! Returns an array with names of coordinates.
-      Example :
-      - x,y,z
-      - r,teta,phi
+/*! returns an array with names of coordinates. /n
+      Example : /n
+      - x,y,z /n
+      - r,teta,phi /n
       - ... */
 //--------------------------------------//
-string * COORDINATE::getCoordinatesNames() 
+const string * COORDINATE::getCoordinatesNames() const
 {
       	return _coordinateName ;
 }
 
 /* returns the name of axis Axis             */
 //-------------------------------------------//
-string COORDINATE::getCoordinateName(int Axis) 
+string COORDINATE::getCoordinateName(int Axis) const
 //-------------------------------------------//
 {
       	return _coordinateName[Axis-1];
 }
 
-/*!  Returns an array with units of coordinates (cm, m, mm, ...)
+/*!  returns an array with units of coordinates (cm, m, mm, ...)
      It could be empty. We suppose we are IS (meter).  */
 //-----------------------------------------------------//
-string * COORDINATE::getCoordinatesUnits() 
+const string * COORDINATE::getCoordinatesUnits() const
 //-----------------------------------------------------//
 {
       	return _coordinateUnit ;
 }
 
-/*! Returns the unit of axis Axis           */
+/*! returns the unit of axis Axis           */
 //------------------------------------------//
-string COORDINATE::getCoordinateUnit(int Axis) 
+string COORDINATE::getCoordinateUnit(int Axis) const
 //------------------------------------------//
 {
       	return _coordinateUnit[Axis-1] ;
 }
-/*! Returns "CARTESIAN", "CYLINDRICAL" or "SPHERICAL"*/
+/*! returns "CARTESIAN", "CYLINDRICAL" or "SPHERICAL"*/
 //---------------------------------------------------//
 string COORDINATE::getCoordinatesSystem() const
 //---------------------------------------------------//

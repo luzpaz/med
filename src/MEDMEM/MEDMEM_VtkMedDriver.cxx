@@ -1,198 +1,255 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : MEDMEM_VtkMedDriver.cxx
+//  Module : MED
+
+using namespace std;
 #include "MEDMEM_VtkMedDriver.hxx"
 
+#include <sstream>
+
+#include "MEDMEM_define.hxx"
 #include "MEDMEM_Med.hxx"
+#include "MEDMEM_Field.hxx"
+#include "MEDMEM_Support.hxx"
+#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_CellModel.hxx"
 
 VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(), 
-                                  _ptrMed((MED * const)MED_NULL), 
-                                  _vtkFile(MED_INVALID) 
+                                  _ptrMed((MED * const)MED_NULL)
 {
+  _vtkFile = new ofstream();
   // What about _id in Gendriver ?
   // _driverType ???
 }
 
 
 VTK_MED_DRIVER::VTK_MED_DRIVER(const string & fileName,  MED * const ptrMed):
-  GENDRIVER(fileName,MED_EN::MED_RDWR), _ptrMed(ptrMed), _vtkFile(MED_INVALID)
+  GENDRIVER(fileName,MED_EN::MED_RDWR), _ptrMed(ptrMed)
 {
+  _ptrMed->addDriver(*this); // OU RECUPERER L'ID.
+  _vtkFile = new ofstream(); 
   // What about _id in Gendriver ?
   // _driverType ???
 }
 
+VTK_MED_DRIVER::VTK_MED_DRIVER(const VTK_MED_DRIVER & driver):
+  GENDRIVER(driver), 
+  _ptrMed(driver._ptrMed)
+{
+  _ptrMed->addDriver(*this); // OU RECUPERER L'ID.
+  _vtkFile = new ofstream(); 
+  // What about _id in Gendriver ?
+  // _driverType ???
+}
+
+VTK_MED_DRIVER::~VTK_MED_DRIVER()
+{
+  close();
+  delete _vtkFile ;
+}
+
+GENDRIVER * VTK_MED_DRIVER::copy() const
+{
+  return new VTK_MED_DRIVER(*this) ;
+}
+
 //REM :  As t'on besoin du champ _status :  _vtkFile <-> _status  ?  Oui
 
-
-void VTK_MED_DRIVER::open() {
+void VTK_MED_DRIVER::openConst() const {
 
   const char * LOC ="VTK_MED_DRIVER::open() : ";
   BEGIN_OF(LOC);
 
-  // REFLECHIR SUR CE TEST PAR RAPPORT A L'OUVERTURE/FERMETURE
-//    if ( _vtkFile != MED_INVALID ) 
-//      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-//                                       << "_vtkFile is already in use, please close the file |" 
-//                                       << _fileName << "| before calling open()"
-//                                       )
-//                            );   
-  
-  if ( _status != MED_CLOSED ) 
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "_status is not closed, please close the file |"
-                                     << _fileName << "| before calling open()"
-                                     )
-                          );
-  
   if ( _fileName == "" )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
                                      << "_fileName is |\"\"|, please set a correct fileName before calling open()"
                                      )
                           );
-  _vtkFile.open(filename.c_str()) ; // ? if error ????
-  _status = MED_OPENED ;
-  
-//    if (_vtkFile > 0) _status=MED_OPENED; 
-//    else {
-//      _status = MED_CLOSED;
-//      _vtkFile = MED_INVALID;
-//      throw MED_EXCEPTION (LOCALIZED( STRING(LOC) 
-//                                      << "Can't open |"  << _fileName 
-//                                      << "|, _vtkFile : " << _vtkFile
-//                                      )
-//                           );
-//  }
-  
+
+  if (!(*_vtkFile).is_open())
+    (*_vtkFile).open(_fileName.c_str()) ; 
+//    if (*_vtkFile)
+//      _status = MED_OPENED ;
+//    else
+  if (!(*_vtkFile))
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
+				     << _fileName)
+			  );
   END_OF(LOC);
 }
 
+void VTK_MED_DRIVER::open() {
+  openConst() ;
+}
+
+void VTK_MED_DRIVER::closeConst() const {
+
+  const char * LOC = "VTK_MED_DRIVER::close() : ";
+  BEGIN_OF(LOC);
+  
+  (*_vtkFile).close();
+  
+//    if (*_vtkFile)
+//      _status = MED_CLOSED ;
+//    else
+  if (!(*_vtkFile))
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
+				     << _fileName)
+			  );
+  END_OF(LOC);
+}
 
 void VTK_MED_DRIVER::close() {
-
-  const char * LOC = "MED_MED_DRIVER::close() : ";
-  BEGIN_OF(LOC);
-  
-  if ( _status == MED_CLOSED)
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << ": the file |" 
-				     << _fileName << "| is already closed"
-				     )
-			  );
-   
-  //    if ( _vtkFile == MED_INVALID ) 
-//      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "_vtkFile invalid, but the file |" 
-//                                       << _fileName << "| seems to be openned !"
-//                                       )
-//                            );   
-  vtkFile_.close();
-  
-  _status = MED_CLOSED;
-  //  _vtkFile = MED_INVALID;
-
-//    if (err != MED_VALID) 
-//      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "the file |" 
-//                                       << _fileName << "| couldn't be closed"
-//                                       )
-//                            );   
-  
-  END_OF(LOC);
+  closeConst() ;
 }
 
 
-void VTK_MED_DRIVER::write() {
+void VTK_MED_DRIVER::write() const {
 
-  const char * LOC = "MED_MED_DRIVER::write() : ";
+  const char * LOC = "VTK_MED_DRIVER::write() : ";
   BEGIN_OF(LOC);
 
-  // could we put more than one Mesh ?????
-  _vtkFile << "# vtk DataFile Version 2.0" << endl 
-	   << "maillage SALOLME"  << endl ;
-  // only ASCII for the moment (binary came latest :-)
-  _vtkFile << "ASCII" << endl ;
+  // Well we must open vtk file first, because there are
+  // no other driver than MED for VTK that do it !
+  openConst() ;
 
-  int NumberOfMeshes = _ptrMED->getNumberOfMeshes() ;
-  string * MeshName = new string[NumberOfMeshes] ;
-  _ptrMED->getMeshNames(MeshName) ;
+  // could we put more than one Mesh ?????
+  (*_vtkFile) << "# vtk DataFile Version 2.0" << endl 
+	   << "maillage from MedMemory"  << endl ;
+  // only ASCII for the moment (binary came later :-)
+  (*_vtkFile) << "ASCII" << endl ;
+
+  int NumberOfMeshes = _ptrMed->getNumberOfMeshes() ;
+  deque<string> MeshNames = _ptrMed->getMeshNames() ;
+  deque<string>::const_iterator  currentMesh ;
   // In fact, we must take care of all supports 
   // We restrict Field on all nodes or cells
+
+  int NumberOfFields = _ptrMed->getNumberOfFields() ;
+  deque<string> FieldNames = _ptrMed->getFieldNames() ;
+  deque<string>::const_iterator  currentField ;
+
+  //  for ( currentMesh=MeshName.begin();currentMesh != MeshName.end(); currentMesh++) {
   for (int i=0; i<NumberOfMeshes; i++) {
-    MESH * myMesh = _ptrMED->getMesh(MeshName[i]) ;
+    MESH * myMesh = _ptrMed->getMesh(MeshNames[i]) ;
     writeMesh(myMesh) ;
     // get all field which values are on this mesh => revoir api de Med !!!
-    _vtkFile << "NODE" << endl ;
     // first : field on node
+    // fields is on all node !
+    (*_vtkFile) << "POINT_DATA " << myMesh->getNumberOfNodes() << endl ;
     for (int j=0; j<NumberOfFields; j++) {
-      FIELD_ * myField = _ptrMED->getField() ;
-      if (myField->getSupport()->getEntity()!=MED_NODE)
-	if (myField->getSupport()->isOnAllElements())
-	  writeField(myField) ;
-      
+      deque<DT_IT_> timeStep = _ptrMed->getFieldIteration(FieldNames[j]) ;
+      deque<DT_IT_>::const_iterator currentTimeStep ;
+      for ( currentTimeStep=timeStep.begin(); currentTimeStep!=timeStep.end(); currentTimeStep++) {
+	int dt = (*currentTimeStep).dt ;
+	int it = (*currentTimeStep).it ;
+	FIELD_ * myField = _ptrMed->getField(FieldNames[j],dt,it) ;
+	if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
+	  // rigth in all case : better compare pointeur ?
+	  if (MED_NODE == myField->getSupport()->getEntity())
+	    if (myField->getSupport()->isOnAllElements()) {
+	      ostringstream name ; 
+	      name << myField->getName() << "_" << dt << "_" << it ;
+	      writeField(myField,name.str()) ;
+	    } else
+	      INFOS("Could not write field "<<myField->getName()<<" which is not on all nodes !");
+	}
+      }
     }
-    _vtkFile << "CELL" << endl ;
+
+    (*_vtkFile) << "CELL_DATA " << myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) << endl ;
     // second : field on cell
     for (int j=0; j<NumberOfFields; j++) {
-      FIELD_ * myField = _ptrMED->getField() ;
-      if (myField->getSupport()->getEntity()!=MED_CELL)
-	if (myField->getSupport()->isOnAllElements())
-	  writeField(myField) ;
-      
+      deque<DT_IT_> timeStep = _ptrMed->getFieldIteration(FieldNames[j]) ;
+      deque<DT_IT_>::const_iterator currentTimeStep ;
+      for ( currentTimeStep=timeStep.begin(); currentTimeStep!=timeStep.end(); currentTimeStep++) {
+	int dt ;
+	int it ;
+	FIELD_ * myField = _ptrMed->getField(FieldNames[j],dt,it) ;
+	if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
+	  // rigth in all case : better compare pointeur ?
+	  if (MED_CELL == myField->getSupport()->getEntity())
+	    if (myField->getSupport()->isOnAllElements()) {
+	      ostringstream name ; 
+	      name << myField->getName() << "_" << dt << "_" << it ;
+	      writeField(myField,name.str()) ;
+	    } else
+	      INFOS("Could not write field "<<myField->getName()<<" which is not on all cells !");
+	}
+      }
     }
     
   }
 
+  // Well we must close vtk file first, because there are
+  // no other driver than MED for VTK that do it !
+  closeConst() ;
+  
   END_OF(LOC);
 }
 
-void VTK_MED_DRIVER::writeMesh(MESH * myMesh) {
+void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
 
-  const char * LOC = "MED_MED_DRIVER::writeMesh() : ";
+  const char * LOC = "VTK_MED_DRIVER::writeMesh() : ";
   BEGIN_OF(LOC);
 
-  _vtkFile << "DATASET UNSTRUCTURED_GRID" << endl ;
+  (*_vtkFile) << "DATASET UNSTRUCTURED_GRID" << endl ;
   // put points (all point are in 3D, so if we are in 1D or 2D, we complete by zero !
   int SpaceDimension = myMesh->getSpaceDimension() ;
   int NumberOfNodes = myMesh->getNumberOfNodes() ;
-  _vtkFile << "POINTS " << NumberOfNodes << " float" << endl ;
-  double *coordinate = myMesh->getCoordinates(MED_FULL_ENTERLACE) ;
-  if (SpaceDimension<3) { // 1D or 2D
-    coordinate_z = new double[NumberOfNodes] ;
-    // we put zero :
-    for (int i=0;i<NumberOfNodes;i++)
-      coordinate_z[i] = 0.0 ;
-    if (SpaceDimension==1) 
-      coordinate_y = coordinate_z ; // only one array of zero !
-    else
-      coordinate_y = coordinate_x + NumberOfNodes ;
-  } else {
-    coordinate_y = coordinate_x + NumberOfNodes ;
-    coordinate_z = coordinate_y + NumberOfNodes ;
-  }
-  for (int i=0;i<NumberOfNodes;i++) 
+  (*_vtkFile) << "POINTS " << NumberOfNodes << " float" << endl ;
+  const double *coordinate = myMesh->getCoordinates(MED_FULL_INTERLACE) ;
+  for (int i=0;i<NumberOfNodes;i++) {
     for (int j=0;j<SpaceDimension;j++)
-      _vtkFile << coordinate[i*SpaceDimension+j] << " " ;
-  if (SpaceDimension==1) 
-    _vtkFile << "0 0" ;
-  if (SpaceDimension==2) 
-    _vtkFile << "0" ;
-  _vtkFile << endl ;
+      (*_vtkFile) << coordinate[i*SpaceDimension+j] << " " ;
+    if (SpaceDimension==1) 
+      (*_vtkFile) << "0 0" ;
+    if (SpaceDimension==2) 
+      (*_vtkFile) << "0" ;
+    (*_vtkFile) << endl ;
+  }
 
   // we put connectivity
   // how many cells and how many value in connectivity :
   int cells_types_count = myMesh->getNumberOfTypes(MED_CELL) ;
-  int * cells_count = myMesh->get_cells_count() ;
-  int cells_sum = cells_count[cells_types_count] ;
-  CellModel * cells_type = myMesh->get_cells_type() ; 
-  int connectivity_sum = 0 ;
+  //  int * cells_count = myMesh->get_cells_count() ;
+  //  int cells_sum = cells_count[cells_types_count] ;
+  int cells_sum = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) ;
+  const CELLMODEL * cells_type = myMesh->getCellsTypes(MED_CELL) ;
+  //  int connectivity_sum = 0 ;
 
-  int * connectivity = myMesh->getConnectivity(MED_FULL_ENTERLACE,MED_CELL,MED_ALL_ELEMENTS) ;
-  int * connectivityIndex = myMesh->getConnectivityIndex(MED_CELL) ;
+  const int * connectivity = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS) ;
+  const int * connectivityIndex = myMesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
 
-  for (int i=0;i<cells_types_count;i++) {
-    int nodes_cell = cells_type[i].getNumberOfNodes();
-    connectivity_sum+= (cells_count[i+1]-cells_count[i])*(nodes_cell + 1);
-    // we add 1 because we put nodes count in vtk file !
-  }
-  _vtkFile << "CELLS " << cells_sum << " " << connectivity_sum << endl ;
+  int connectivity_sum =  connectivityIndex[cells_sum]-1 ;
+
+  (*_vtkFile) << "CELLS " << cells_sum << " " << connectivity_sum+cells_sum << endl ;
   // we put connectivity
   for (int i=0;i<cells_types_count;i++) {
     int *filter = (int*) NULL ; // index in vtk connectivity
-    switch (cells_type[i].get_type())
+    switch (cells_type[i].getType())
       {
       case MED_POINT1  : {
 	filter = new int[1] ;
@@ -285,21 +342,25 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) {
       }
       }
     if (filter==NULL) 
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].get_type() ) ) ;
-    int nodes_cell = cells_type[i].get_NumberOfNodes();
-    for (int j=0;j<cells_count[i+1]-cells_count[i];j++) {
-      _vtkFile << nodes_cell << " " ;
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getName() ) ) ;
+    int nodes_cell = cells_type[i].getNumberOfNodes();
+    int numberOfCell = myMesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
+    const int * connectivityArray = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
+    for (int j=0;j<numberOfCell;j++) {
+      (*_vtkFile) << nodes_cell << " " ;
       for (int k=0;k<nodes_cell;k++)
-	_vtkFile << (myMesh->get_nodal_connectivity(i+1))[j*nodes_cell+filter[k]] - 1 << " " ;
-      _vtkFile << endl ;
+	(*_vtkFile) << connectivityArray[j*nodes_cell+filter[k]] - 1 << " " ;
+      (*_vtkFile) << endl ;
     }
+    if (filter != NULL)
+      delete[] filter ;
   }
-  _vtkFile << endl ;
+  (*_vtkFile) << endl ;
   // we put cells type
-  _vtkFile << "CELL_TYPES " << cells_sum << endl ;
+  (*_vtkFile) << "CELL_TYPES " << cells_sum << endl ;
   for (int i=0;i<cells_types_count;i++) {
     int vtkType = 0 ;
-    switch (cells_type[i].get_type())
+    switch (cells_type[i].getType())
       {
       case MED_POINT1  : {
 	vtkType = 1 ;
@@ -367,11 +428,10 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) {
       }
       }
     if (vtkType == 0)
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].get_type() ) ) ;
-    for (int j=0;j<cells_count[i+1]-cells_count[i];j++)
-      _vtkFile << vtkType << endl ;
-    if (filter != NULL)
-      delete[] filter ;
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getType() ) ) ;
+    int numberOfCell = myMesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
+    for (int j=0;j<numberOfCell;j++)
+      (*_vtkFile) << vtkType << endl ;
   }
 
   // add a constant field on all node to test !
@@ -381,18 +441,75 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) {
   //    for (int i=0;i<NumberOfNodes;i++)
   //      _vtkFile << i << endl ;
   
-  return 1 ;
+  return ;
 
 
   END_OF(LOC);
 }
 
-void VTK_MED_DRIVER::writeField(FIELD * myField) {
+void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 
-  const char * LOC = "MED_MED_DRIVER::writeField() : ";
+  const char * LOC = "VTK_MED_DRIVER::writeField() : ";
   BEGIN_OF(LOC);
-
   
+  int NomberOfValue = myField->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS) ;
+  int NomberOfComponents =  myField->getNumberOfComponents() ;
 
+  med_type_champ type = myField->getValueType() ;
+  SCRUTE(name);
+  SCRUTE(type);
+  switch (type)
+    {
+    case MED_INT32 : {
+      MESSAGE("MED_INT32");
+      if (NomberOfComponents==3) {
+	(*_vtkFile) << "VECTORS " << name << " int" << endl ;
+      } else if (NomberOfComponents<=4) {
+	(*_vtkFile) << "SCALARS " << name << " int " << NomberOfComponents << endl ;
+	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
+      } else {
+	INFOS("Could not write field "<<myField->getName()<<" there are more than 4 components !");
+	return ;
+      }
+ 
+      //const int * value = ((FIELD<int>*)myField)->getValue(MED_NO_INTERLACE) ;
+      const int * value = ((FIELD<int>*)myField)->getValue(MED_NO_INTERLACE) ;
+      for (int i=0; i<NomberOfValue; i++) {
+	for(int j=0; j<NomberOfComponents; j++)
+	  (*_vtkFile) << value[j*NomberOfValue+i] << " " ;
+	(*_vtkFile) << endl ;
+      }
+      break ;
+    }
+    case MED_REEL64 : {
+      MESSAGE("MED_REEL64");
+      if (NomberOfComponents==3) {
+	(*_vtkFile) << "VECTORS " << name << " float" << endl ;
+      } else if (NomberOfComponents<=4) {
+	(*_vtkFile) << "SCALARS " << name << " float " << NomberOfComponents << endl ;
+	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
+      } else {
+	INFOS("Could not write field "<<myField->getName()<<" there are more than 4 components !");
+	return ;
+      }
+      const double * value = ((FIELD<double>*)myField)->getValue(MED_NO_INTERLACE) ;
+      for (int i=0; i<NomberOfValue; i++) {
+	for(int j=0; j<NomberOfComponents; j++)
+	  (*_vtkFile) << value[j*NomberOfValue+i] << " " ;
+	(*_vtkFile) << endl ;
+      }
+      break ;
+    }
+    default : { 
+	      INFOS("Could not write field "<<name<<" the type is not int or double !");
+    }
+    }
+  
   END_OF(LOC);
+}
+
+void VTK_MED_DRIVER::writeSupport(SUPPORT * mySupport) const {
+  const char * LOC = "VTK_MED_DRIVER::writeSupport(SUPPORT *)" ;
+  BEGIN_OF(LOC) ;
+  END_OF(LOC) ;
 }

@@ -1,0 +1,244 @@
+CELLMODEL Test
+--------------
+
+MED_POINT1
+__________________
+CellModel de Nom : MED_POINT1
+Nb de Vertexes   : 1
+Nb de Noeuds     : 1
+Dimension        : 0
+
+
+MED_SEG2
+__________________
+CellModel de Nom : MED_SEG2
+Nb de Vertexes   : 2
+Nb de Noeuds     : 2
+Dimension        : 1
+
+
+MED_SEG3
+__________________
+CellModel de Nom : MED_SEG3
+Nb de Vertexes   : 2
+Nb de Noeuds     : 3
+Dimension        : 1
+
+
+MED_TRIA3
+__________________
+CellModel de Nom : MED_TRIA3
+Nb de Vertexes   : 3
+Nb de Noeuds     : 3
+Dimension        : 2
+Nb d elements de dimension 1 : 3
+Types de ces elements 
+MED_SEG2
+Impression des coordonnées du 1er Element de ce type
+1 2 
+
+Informations particulieres -  dimension 1
+MED_SEG2
+
+MED_QUAD4
+__________________
+CellModel de Nom : MED_QUAD4
+Nb de Vertexes   : 4
+Nb de Noeuds     : 4
+Dimension        : 2
+Nb d elements de dimension 1 : 4
+Types de ces elements 
+MED_SEG2
+Impression des coordonnées du 1er Element de ce type
+1 2 
+
+Informations particulieres -  dimension 1
+MED_SEG2
+
+MED_TRIA6
+__________________
+CellModel de Nom : MED_TRIA6
+Nb de Vertexes   : 3
+Nb de Noeuds     : 6
+Dimension        : 2
+Nb d elements de dimension 1 : 3
+Types de ces elements 
+MED_SEG3
+Impression des coordonnées du 1er Element de ce type
+1 2 4 
+
+Informations particulieres -  dimension 1
+MED_SEG3
+
+MED_QUAD8
+__________________
+CellModel de Nom : MED_QUAD8
+Nb de Vertexes   : 4
+Nb de Noeuds     : 8
+Dimension        : 2
+Nb d elements de dimension 1 : 4
+Types de ces elements 
+MED_SEG3
+Impression des coordonnées du 1er Element de ce type
+1 2 5 
+
+Informations particulieres -  dimension 1
+MED_SEG3
+
+MED_TETRA4
+__________________
+CellModel de Nom : MED_TETRA4
+Nb de Vertexes   : 4
+Nb de Noeuds     : 4
+Dimension        : 3
+Nb d elements de dimension 1 : 6
+Types de ces elements 
+MED_SEG2
+Impression des coordonnées du 1er Element de ce type
+1 2 
+Nb d elements de dimension 2 : 4
+Types de ces elements 
+MED_TRIA3
+Impression des coordonnées du 1er Element de ce type
+1 2 3 
+
+Informations particulieres -  dimension 2
+MED_TRIA3
+
+MED_PYRA5
+__________________
+CellModel de Nom : MED_PYRA5
+Nb de Vertexes   : 5
+Nb de Noeuds     : 5
+Dimension        : 3
+Nb d elements de dimension 1 : 8
+Types de ces elements 
+MED_SEG2
+Impression des coordonnées du 1er Element de ce type
+1 2 
+Nb d elements de dimension 2 : 5
+Types de ces elements 
+MED_TRIA3
+MED_QUAD4
+Impression des coordonnées du 1er Element de ce type
+1 2 3 4 
+
+Informations particulieres -  dimension 2
+
+MED_PENTA6
+__________________
+CellModel de Nom : MED_PENTA6
+Nb de Vertexes   : 6
+Nb de Noeuds     : 6
+Dimension        : 3
+Nb d elements de dimension 1 : 9
+Types de ces elements 
+MED_SEG2
+Impression des coordonnées du 1er Element de ce type
+1 2 
+Nb d elements de dimension 2 : 5
+Types de ces elements 
+MED_TRIA3
+MED_QUAD4
+Impression des coordonnées du 1er Element de ce type
+1 2 3 
+
+Informations particulieres -  dimension 2
+
+MED_HEXA8
+__________________
+CellModel de Nom : MED_HEXA8
+Nb de Vertexes   : 8
+Nb de Noeuds     : 8
+Dimension        : 3
+Nb d elements de dimension 1 : 12
+Types de ces elements 
+MED_SEG2
+Impression des coordonnées du 1er Element de ce type
+1 2 
+Nb d elements de dimension 2 : 6
+Types de ces elements 
+MED_QUAD4
+Impression des coordonnées du 1er Element de ce type
+1 2 3 4 
+
+Informations particulieres -  dimension 2
+
+MED_TETRA10
+__________________
+CellModel de Nom : MED_TETRA10
+Nb de Vertexes   : 4
+Nb de Noeuds     : 10
+Dimension        : 3
+Nb d elements de dimension 1 : 6
+Types de ces elements 
+MED_SEG3
+Impression des coordonnées du 1er Element de ce type
+1 2 5 
+Nb d elements de dimension 2 : 4
+Types de ces elements 
+MED_TRIA6
+Impression des coordonnées du 1er Element de ce type
+1 2 3 5 6 7 
+
+Informations particulieres -  dimension 2
+MED_TRIA6
+
+MED_PYRA13
+__________________
+CellModel de Nom : MED_PYRA13
+Nb de Vertexes   : 5
+Nb de Noeuds     : 13
+Dimension        : 3
+Nb d elements de dimension 1 : 8
+Types de ces elements 
+MED_SEG3
+Impression des coordonnées du 1er Element de ce type
+1 2 6 
+Nb d elements de dimension 2 : 5
+Types de ces elements 
+MED_TRIA6
+MED_QUAD8
+Impression des coordonnées du 1er Element de ce type
+1 2 3 4 6 7 8 9 
+
+Informations particulieres -  dimension 2
+
+MED_PENTA15
+__________________
+CellModel de Nom : MED_PENTA15
+Nb de Vertexes   : 6
+Nb de Noeuds     : 15
+Dimension        : 3
+Nb d elements de dimension 1 : 9
+Types de ces elements 
+MED_SEG3
+Impression des coordonnées du 1er Element de ce type
+1 2 7 
+Nb d elements de dimension 2 : 5
+Types de ces elements 
+MED_TRIA6
+MED_QUAD8
+Impression des coordonnées du 1er Element de ce type
+1 2 3 7 8 9 
+
+Informations particulieres -  dimension 2
+
+MED_HEXA20
+__________________
+CellModel de Nom : MED_HEXA20
+Nb de Vertexes   : 8
+Nb de Noeuds     : 20
+Dimension        : 3
+Nb d elements de dimension 1 : 12
+Types de ces elements 
+MED_SEG3
+Impression des coordonnées du 1er Element de ce type
+1 2 9 
+Nb d elements de dimension 2 : 6
+Types de ces elements 
+MED_QUAD8
+Impression des coordonnées du 1er Element de ce type
+1 2 3 4 9 10 11 12 
+
+Informations particulieres -  dimension 2

@@ -1,12 +1,28 @@
-###################################################################################
+#  MED MEDMEM_SWIG : binding of C++ implementation and Python
 #
-# This Python script is parsing a MED file using MED Memory from SALOME platform:
-# It analyses all meshes in the MED file (coordinates, connectivity of d-cells as
-# well as (d-1)-cells, families), it tests all fields generated ine the MESH class
-# and write them in a new file , it gives only the number of fields stored in the
-# MED file (d is the space dimension).
+#  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+# 
+#  This library is free software; you can redistribute it and/or 
+#  modify it under the terms of the GNU Lesser General Public 
+#  License as published by the Free Software Foundation; either 
+#  version 2.1 of the License. 
+# 
+#  This library is distributed in the hope that it will be useful, 
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+#  Lesser General Public License for more details. 
+# 
+#  You should have received a copy of the GNU Lesser General Public 
+#  License along with this library; if not, write to the Free Software 
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+# 
+#  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
 #
-###################################################################################
+#
+#
+#  File   : med_test2.py
+#  Module : MED
 
 from libMEDMEM_Swig import *
 from random import *

@@ -1,3 +1,29 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : test_affect_medarray.cxx
+//  Module : MED
+
 using namespace std;
 /* Programme de test du constructeur de copies de la classe MEDARRAY de MEDMEM
    jroy - 16/12/2002 */
@@ -25,7 +51,7 @@ void affiche_medarray(MEDARRAY<double> & myMedArray)
   MESSAGE("Show all 1 :");
   numberof = myMedArray.getLeadingValue() ;
   for (int i=1; i<=myMedArray.getLengthValue() ; i++) {
-    double * node = myMedArray.getI(MED_FULL_INTERLACE,i) ;
+    const double * node = myMedArray.getRow(i) ;
     cout << " - " ;
     for (int j=0;j<numberof;j++)
       cout << node[j] << " " ;
@@ -34,7 +60,7 @@ void affiche_medarray(MEDARRAY<double> & myMedArray)
   MESSAGE("Show all 2 :");
   numberof = myMedArray.getLengthValue() ;
   for (int i=1; i<=myMedArray.getLeadingValue() ; i++) {
-    double * node = myMedArray.getI(MED_NO_INTERLACE,i) ;
+    const double * node = myMedArray.getColumn(i) ;
     cout << " - " ;
     for (int j=0;j<numberof;j++)
       cout << node[j] << " " ;
@@ -52,7 +78,7 @@ void affiche_medarray(MEDARRAY<double> & myMedArray)
   MESSAGE("Show all 0 :");
   numberof = myMedArray.getLeadingValue() ;
   int length = myMedArray.getLengthValue() ;
-  double * NoInterlaceArray = myMedArray.get(MED_NO_INTERLACE) ;
+  const double * NoInterlaceArray = myMedArray.get(MED_NO_INTERLACE) ;
   for (int i=0; i<length ; i++) {
     cout << " - " ;
     for (int j=0;j<numberof;j++)
@@ -98,8 +124,9 @@ int main (int argc, char ** argv) {
   affiche_medarray(* myMedArray);
   MEDARRAY<double> * myMedArray2 = new MEDARRAY<double>();
   * myMedArray2 = * myMedArray;
-  delete myMedArray;
+  //  delete myMedArray;  // si on recopie les tableaux
   affiche_medarray(* myMedArray2);
+  delete myMedArray;      // si on ne recopie pas les tableaux
   delete myMedArray2;
 
   return 0;

@@ -1,3 +1,30 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : test_MEDMEM_Array.cxx
+//  Module : MED
+
+using namespace std;
 #include "utilities.h"
 #include "MEDMEM_Array.hxx"
 
@@ -7,48 +34,53 @@ int main (int argc, char ** argv) {
   int NumberOfNodes = 4 ; 
   MEDARRAY<int> * myArray = new MEDARRAY<int>(SpaceDimension,NumberOfNodes,MED_FULL_INTERLACE) ;
 
-  int * value = myArray->get(MED_FULL_INTERLACE) ;
-  for (int i=0; i<SpaceDimension*NumberOfNodes; i++)
-    value[i]=i ; 
+  //const int * value = myArray->get(MED_FULL_INTERLACE) ;
+  for (int i=1; i<=NumberOfNodes; i++)
+    for (int j=1; j<=SpaceDimension; j++)
+      myArray->setIJ(i,j,i) ;
   
   int numberof ;
   MESSAGE("Show all 1 :");
   numberof = myArray->getLeadingValue() ;
   for (int i=1; i<=myArray->getLengthValue() ; i++) {
-    int * node = myArray->getI(MED_FULL_INTERLACE,i) ;
-    MESSAGE( " - " );
+    //int * node = myArray->getI(MED_FULL_INTERLACE,i) ;
+    const int * node = myArray->getRow(i) ;
+    cout << " - " ;
     for (int j=0;j<numberof;j++)
-      MESSAGE( node[j] << " " );
-    MESSAGE("");
+      cout << node[j] << " " ;
+    cout << endl ;
   }
   MESSAGE("Show all 2 :");
   numberof = myArray->getLengthValue() ;
   for (int i=1; i<=myArray->getLeadingValue() ; i++) {
-    int * node = myArray->getI(MED_NO_INTERLACE,i) ;
-    MESSAGE( " - " );
+    //int * node = myArray->getJ(MED_NO_INTERLACE,i) ;
+    const int * node = myArray->getColumn(i) ;
+    cout << " - " ;
     for (int j=0;j<numberof;j++)
-      MESSAGE( node[j] << " " );
-    MESSAGE("");
+      cout << node[j] << " " ;
+    cout << endl ;
   }
   MESSAGE("Show all 3 :");
   numberof = myArray->getLeadingValue() ;
   for (int i=1; i<=myArray->getLengthValue() ; i++) {
-    MESSAGE( " - " );
+    cout << " - " ;
     for (int j=1;j<numberof+1;j++)
-      MESSAGE( myArray->getIJ(i,j) << " " );
-    MESSAGE("");
+      cout << myArray->getIJ(i,j) << " " ;
+    cout << endl ;
   }
 
   MESSAGE("Show all 0 :");
   numberof = myArray->getLeadingValue() ;
   int length = myArray->getLengthValue() ;
-  int * NoInterlaceArray = myArray->get(MED_NO_INTERLACE) ;
+  const int * NoInterlaceArray = myArray->get(MED_NO_INTERLACE) ;
   for (int i=0; i<length ; i++) {
-    MESSAGE( " - " );
+    cout << " - " ;
     for (int j=0;j<numberof;j++)
-      MESSAGE( NoInterlaceArray[j*length+i] << " " );
-    MESSAGE("");
+      cout << NoInterlaceArray[j*length+i] << " " ;
+    cout << endl ;
   }
+
+  delete myArray ;
+
   return 0 ;
 }
-  

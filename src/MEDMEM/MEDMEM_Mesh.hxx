@@ -1,3 +1,29 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : MEDMEM_Mesh.hxx
+//  Module : MED
+
 #ifndef MESH_HXX
 #define MESH_HXX
 
@@ -13,12 +39,15 @@
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
 
+// Add your own driver header (step 2)
 #include "MEDMEM_MedMeshDriver.hxx"
+#include "MEDMEM_MedMedDriver.hxx"
+#include "MEDMEM_GibiMeshDriver.hxx"
 
 class CELLMODEL;
-class FAMILY; 
-class GROUP; 
-class SUPPORT; 
+class FAMILY;
+class GROUP;
+class SUPPORT;
 
 template <class T> class FIELD;
 
@@ -28,17 +57,17 @@ template <class T> class FIELD;
 
 using namespace MED_EN;
 
-/*! This class contains all the informations related with a MESH : 
+/*! This class contains all the informations related with a MESH :
   - COORDINATES
   - CONNECTIVITIES
   - FAMILIES OF NODES
   - FAMILIES OF CELLS
   - FAMILIES OF FACES
   - FAMILIES OF EDGES
-  
+
   NOTE: A Family is only on one type of entity (MED_CELL, MED_FACE, MED_EDGE, MED_NODE).
   You can't have a family on MED_CELL and MED_FACE
-  
+
 */
 
 class MESH
@@ -49,25 +78,27 @@ public :
 
   // ------- Drivers Management Part
 protected:
-  
+
   //-----------------------//
-  class INSTANCE 
+  class INSTANCE
   //-----------------------//
   {
   public:
     virtual GENDRIVER * run(const string & fileName, MESH * ptrMesh) const = 0 ;
   } ;
-  
+
   //-------------------------------------------------------//
-  template <class T> class INSTANCE_DE : public INSTANCE 
+  template <class T> class INSTANCE_DE : public INSTANCE
   //-------------------------------------------------------//
   {
   public :
-    GENDRIVER * run(const string & fileName, MESH * ptrMesh) const 
+    GENDRIVER * run(const string & fileName, MESH * ptrMesh) const
     { return new T(fileName,ptrMesh) ; }
   } ;
-  
-  static INSTANCE_DE<MED_MESH_RDWR_DRIVER> inst_med ;
+
+  // Add a similar line for your personnal driver (step 3)
+  static INSTANCE_DE<MED_MESH_RDWR_DRIVER>  inst_med ;
+  static INSTANCE_DE<GIBI_MESH_RDWR_DRIVER> inst_gibi ;
   //static INSTANCE_DE<VTK_DRIVER>   inst_vtk   ;
   static const INSTANCE * const instances[] ;
 
@@ -82,15 +113,6 @@ protected :
 
   string        _name; // A POSITIONNER EN FCT DES IOS ?
 
-  int           _numberOfMEDNodeFamily ; // INUTILE
-  int *         _MEDArrayNodeFamily ;    // SOLUTION TEMPORAIRE
-  int *         _numberOfMEDCellFamily ; // INUTILE
-  int *         _numberOfMEDFaceFamily ; // INUTILE
-  int *         _numberOfMEDEdgeFamily ; // INUTILE
-  int **        _MEDArrayCellFamily ;    // SOLUTION TEMPORAIRE
-  int **        _MEDArrayFaceFamily ;    // SOLUTION TEMPORAIRE
-  int **        _MEDArrayEdgeFamily ;    // SOLUTION TEMPORAIRE
-  
   COORDINATE *   _coordinate;
   CONNECTIVITY * _connectivity;
 
@@ -99,58 +121,69 @@ protected :
   int           _numberOfNodes    ;
 
   int             _numberOfNodesFamilies;  //INUTILE ? -> _familyNode.size()
-  vector<FAMILY*> _familyNode ;  // array of size _numberOfNodesFamilies; 
+  vector<FAMILY*> _familyNode ;  // array of size _numberOfNodesFamilies;
   int             _numberOfCellsFamilies;
-  vector<FAMILY*> _familyCell ;  // array of size _numberOfCellsFamilies; 
+  vector<FAMILY*> _familyCell ;  // array of size _numberOfCellsFamilies;
   int             _numberOfFacesFamilies;
-  vector<FAMILY*> _familyFace ;  // array of size _numberOfFacesFamilies; 
+  vector<FAMILY*> _familyFace ;  // array of size _numberOfFacesFamilies;
   int             _numberOfEdgesFamilies;
   vector<FAMILY*> _familyEdge ;  // array of size _numberOfEdgesFamilies;
 
   int   	 _numberOfNodesGroups; //INUTILE ?
-  vector<GROUP*> _groupNode;    // array of size _numberOfNodesGroups; 
+  vector<GROUP*> _groupNode;    // array of size _numberOfNodesGroups;
   int   	 _numberOfCellsGroups; //INUTILE ?
-  vector<GROUP*> _groupCell;    // array of size _numberOfCellsGroups; 
+  vector<GROUP*> _groupCell;    // array of size _numberOfCellsGroups;
   int   	 _numberOfFacesGroups; //INUTILE ?
-  vector<GROUP*> _groupFace;    // array of size _numberOfFacesGroups; 
+  vector<GROUP*> _groupFace;    // array of size _numberOfFacesGroups;
   int   	 _numberOfEdgesGroups; //INUTILE ?
-  vector<GROUP*> _groupEdge;    // array of size _numberOfEdgesGroups; 
+  vector<GROUP*> _groupEdge;    // array of size _numberOfEdgesGroups;
   // list of all Group
 
   vector<GENDRIVER *> _drivers; // Storage of the drivers currently in use
- 
+
+  bool           _isAGrid;      // am I a GRID or not
+
   //-----------------------//
   //   Methods
   //-----------------------//
 
+  inline void checkGridFillCoords() const;
+  inline void checkGridFillConnectivity() const;
+  // if this->_isAGrid, assure that _coordinate and _connectivity are filled
+
 public :
 
+  // Add your personnal driver line (step 2)
   friend class MED_MESH_RDONLY_DRIVER;
   friend class MED_MESH_WRONLY_DRIVER;
 
+  friend class MED_MED_RDONLY_DRIVER;
+  friend class MED_MED_WRONLY_DRIVER;
+  friend class MED_MED_RDWR_DRIVER;
+
+  friend class GIBI_MESH_RDONLY_DRIVER;
+  friend class GIBI_MESH_WRONLY_DRIVER;
+  friend class GIBI_MESH_RDWR_DRIVER;
+
   void init();
   MESH();
-  MESH(const MESH &m);
+  MESH(MESH &m);
   MESH & operator=(const MESH &m);
-  MESH( driverTypes driverType, const string & fileName="", 
-	      const string & meshName="");
+  MESH( driverTypes driverType, const string & fileName="",
+	const string & meshName="");
   ~MESH();
   friend ostream & operator<<(ostream &os, MESH &my) ;
 
-  int  addDriver(driverTypes driverType, 
-		      const string & fileName ="Default File Name.med",
-                 const string & driverName="Default Mesh Name");
+  int  addDriver(driverTypes driverType,
+		 const string & fileName  ="Default File Name.med",
+		 const string & driverName="Default Mesh Name");
   int  addDriver(GENDRIVER & driver);
   void rmDriver(int index=0);
 
-  inline void read(int index=0);  
+  void read(int index=0);
+  inline void read(const MED_MED_DRIVER & genDriver);
   inline void write(int index=0, const string & driverName = "");
-  inline void write(const GENDRIVER &);
-
-  inline int *  getMEDArrayNodeFamily() ;
-  inline int ** getMEDArrayCellFamily() ;
-  inline int ** getMEDArrayFaceFamily() ;
-  inline int ** getMEDArrayEdgeFamily() ;
+  inline void write(const MED_MED_DRIVER & genDriver);
 
   //  void calculateReverseConnectivity();
   //  void createFaces(); 	//Faces creation => full constituent informations
@@ -160,175 +193,205 @@ public :
   inline void 	      setName(string name);
 
   inline string       getName() const;
-  inline int 	      getSpaceDimension();
-  inline int 	      getMeshDimension();
+  inline int 	      getSpaceDimension() const ;
+  inline int 	      getMeshDimension() const ;
+  inline bool	      getIsAGrid();
 
-  inline int 	      getNumberOfNodes();
-  inline COORDINATE * getCoordinateptr();
-  inline string       getCoordinatesSystem();
-  inline const double *     getCoordinates(medModeSwitch Mode);
-  inline const double       getCoordinate(int Number,int Axis);
-  inline string *     getCoordinatesNames();
-  inline string *     getCoordinatesUnits();
+  inline int 	      getNumberOfNodes() const ;
+  inline const COORDINATE * getCoordinateptr() const ;
+  inline string       getCoordinatesSystem() const ;
+  inline const double *     getCoordinates(medModeSwitch Mode) const ;
+  inline const double       getCoordinate(int Number,int Axis) const ;
+  inline const string *     getCoordinatesNames() const ;
+  inline const string *     getCoordinatesUnits() const ;
   //  inline int *        getNodesNumbers();
 
-  inline int          getNumberOfTypes(medEntityMesh Entity);
-  inline medGeometryElement *  getTypes(medEntityMesh Entity);
-  inline CELLMODEL *  getCellsTypes(medEntityMesh Entity);
-  inline int *        getGlobalNumberingIndex(medEntityMesh Entity);
-  inline int          getNumberOfElements(medEntityMesh Entity,medGeometryElement Type);
-  inline bool         existConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity);
-  inline medGeometryElement getElementType(medEntityMesh Entity,int Number) ;
-  inline void         calculateConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh Entity);
-  inline int *        getConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh Entity, medGeometryElement Type);
-  inline int *        getConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity);
-  int                 getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type, int * connectivity) ;
-  inline int *        getReverseConnectivity(medConnectivity ConnectivityType);
-  inline int *        getReverseConnectivityIndex(medConnectivity ConnectivityType);
+  inline int          getNumberOfTypes(medEntityMesh Entity) const ;
+  inline const medGeometryElement *  getTypes(medEntityMesh Entity) const ;
+  inline const CELLMODEL *  getCellsTypes(medEntityMesh Entity) const ;
+  inline const int *        getGlobalNumberingIndex(medEntityMesh Entity) const ;
+  inline int          getNumberOfElements(medEntityMesh Entity,medGeometryElement Type) const ;
+  inline bool         existConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity) const ;
+  inline medGeometryElement getElementType(medEntityMesh Entity,int Number) const ;
+  inline void         calculateConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh Entity) ;
+  inline const int *        getConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh Entity, medGeometryElement Type) const ;
+  inline const int *        getConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity) const ;
+  int                 getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type, int * connectivity) const ;
+  inline const int *        getReverseConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity=MED_CELL) const ;
+  inline const int *        getReverseConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity=MED_CELL) const ;
 
-  inline int          getNumberOfFamilies(medEntityMesh Entity);
-  inline vector<FAMILY*> getFamilies(medEntityMesh Entity);
-  inline FAMILY*      getFamily(medEntityMesh Entity,int i);
-  inline int          getNumberOfGroups(medEntityMesh Entity);
-  inline vector<GROUP*> getGroups(medEntityMesh Entity);
-  inline GROUP*      getGroup(medEntityMesh Entity,int i);
-
-
+  inline int          getNumberOfFamilies(medEntityMesh Entity) const ;
+  inline const vector<FAMILY*> getFamilies(medEntityMesh Entity) const ;
+  inline const FAMILY*      getFamily(medEntityMesh Entity,int i) const ;
+  inline int          getNumberOfGroups(medEntityMesh Entity) const ;
+  inline const vector<GROUP*> getGroups(medEntityMesh Entity) const ;
+  inline const GROUP*      getGroup(medEntityMesh Entity,int i) const ;
+  inline const CONNECTIVITY* getConnectivityptr() const ;
   SUPPORT * getBoundaryElements(medEntityMesh Entity) throw (MEDEXCEPTION) ;
+  //SUPPORT * getBoundaryElements(medEntityMesh Entity) const throw (MEDEXCEPTION) ; // problème avec le maillage dans le support : le pointeur n'est pas const, mais sa valeur oui. A voir !!! PG
+
+  SUPPORT * getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION) ;
 
   //  Node DonneBarycentre(const Cell &m) const;
-  FIELD<double>* getVolume(const SUPPORT * Support) throw (MEDEXCEPTION) ; // Support must be on 3D elements
-  FIELD<double>* getArea(const SUPPORT * Support) throw (MEDEXCEPTION) ; // Support must be on 2D elements
-  FIELD<double>* getLength(const SUPPORT * Support) throw (MEDEXCEPTION) ; // Support must be on 1D elements
-  FIELD<double>* getNormal(const SUPPORT * Support) throw (MEDEXCEPTION) ; // Support must be on 2D elements
-  FIELD<double>* getBarycenter(const SUPPORT * Support) throw (MEDEXCEPTION) ;
-  //  FIELD<int>* getNeighbourhood(SUPPORT * Support) throw (MEDEXCEPTION) ; // Il faut preciser !
+  FIELD<double>* getVolume(const SUPPORT * Support) const throw (MEDEXCEPTION) ; // Support must be on 3D elements
+  FIELD<double>* getArea(const SUPPORT * Support) const throw (MEDEXCEPTION) ; // Support must be on 2D elements
+  FIELD<double>* getLength(const SUPPORT * Support) const throw (MEDEXCEPTION) ; // Support must be on 1D elements
+  FIELD<double>* getNormal(const SUPPORT * Support) const throw (MEDEXCEPTION) ; // Support must be on 2D elements
+  FIELD<double>* getBarycenter(const SUPPORT * Support) const throw (MEDEXCEPTION) ;
+  //  FIELD<int>* getNeighbourhood(SUPPORT * Support) const throw (MEDEXCEPTION) ; // Il faut preciser !
 };
 
 // ---------------------------------------
 // 		Methodes Inline
 // ---------------------------------------
 
-inline void MESH::read(int index=0)  
-{ 
-  const char * LOC = "MESH::read(int index=0) : ";
-  BEGIN_OF(LOC);
+inline const CONNECTIVITY* MESH::getConnectivityptr() const
+{
+  return _connectivity;
+}
 
-  if (_drivers[index]) {
-    _drivers[index]->open();   
-    _drivers[index]->read(); 
-    _drivers[index]->close(); 
-  }
-  else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "The index given is invalid, index must be between  0 and |" 
-                                     << _drivers.size() 
-                                     )
-                          ); 
-  END_OF(LOC);
-} 
+// inline void MESH::read(int index/*=0*/)
+// {
+//   const char * LOC = "MESH::read(int index=0) : ";
+//   BEGIN_OF(LOC);
+
+//   if (_drivers[index]) {
+//     _drivers[index]->open();
+//     _drivers[index]->read();
+//     _drivers[index]->close();
+//   }
+//   else
+//     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
+//                                      << "The index given is invalid, index must be between  0 and |"
+//                                      << _drivers.size()
+//                                      )
+//                           );
+//   END_OF(LOC);
+// }
 
 /*! Write all the content of the MESH using driver referenced by the handler <index>*/
-inline void MESH::write(int index=0, const string & driverName = "") 
-{ 
+inline void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
+{
   const char * LOC = "MESH::write(int index=0, const string & driverName = \"\") : ";
   BEGIN_OF(LOC);
 
   if ( _drivers[index] ) {
-    _drivers[index]->open();   
-    if (driverName != "") _drivers[index]->setMeshName(driverName); 
-    _drivers[index]->write(); 
-    _drivers[index]->close(); 
+    _drivers[index]->open();
+    if (driverName != "") _drivers[index]->setMeshName(driverName);
+    _drivers[index]->write();
+    _drivers[index]->close();
   }
   else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "The index given is invalid, index must be between  0 and |" 
-                                     << _drivers.size() 
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
+                                     << "The index given is invalid, index must be between  0 and |"
+                                     << _drivers.size()
                                      )
-                          ); 
+                          );
   END_OF(LOC);
-} 
+}
 
-// This method is MED specific : don't use it 
-// must be private. 
-inline void MESH::write(const GENDRIVER & genDriver) 
-{ 
-  const char * LOC = "MESH::write(const GENDRIVER & genDriver): ";
+// This method is MED specific : don't use it
+// must be private.
+inline void MESH::write(const MED_MED_DRIVER & genDriver)
+{
+  const char * LOC = "MESH::write(const MED_MED_DRIVER & genDriver): ";
   BEGIN_OF(LOC);
 
   for (int index=0; index < _drivers.size(); index++ )
-    if ( *_drivers[index] == genDriver ) { 
-      _drivers[index]->open();   
-      _drivers[index]->write(); 
+    if ( *_drivers[index] == genDriver ) {
+      _drivers[index]->open();
+      _drivers[index]->write();
       _drivers[index]->close();
       // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
     }
-  
+
   END_OF(LOC);
-  
-} 
+
+}
+
+// This method is MED specific : don't use it
+// must be private.
+inline void MESH::read(const MED_MED_DRIVER & genDriver)
+{
+  const char * LOC = "MESH::read(const MED_MED_DRIVER & genDriver): ";
+  BEGIN_OF(LOC);
+
+  for (int index=0; index < _drivers.size(); index++ )
+    if ( *_drivers[index] == genDriver ) {
+      _drivers[index]->open();
+      _drivers[index]->read();
+      _drivers[index]->close();
+      // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
+    }
+
+  END_OF(LOC);
+
+}
 
 /*! Set the MESH name */
-inline void MESH::setName(string name) 
+inline void MESH::setName(string name)
 {
   _name=name ; //NOM interne à la classe
 }
 
 /*! Get the MESH name */
-inline string MESH::getName() const 
+inline string MESH::getName() const
 {
   return _name ;
 }
 
 /*! Get the dimension of the space */
-inline int MESH::getSpaceDimension() 
+inline int MESH::getSpaceDimension() const
 {
   return _spaceDimension;
 }
 
 /*! Get the dimension of the MESH */
-inline int MESH::getMeshDimension() 
+inline int MESH::getMeshDimension() const
 {
   return _meshDimension;
 }
 
 /*! Get the number of nodes used in the MESH */
-inline int MESH::getNumberOfNodes() 
+inline int MESH::getNumberOfNodes() const
 {
   return _numberOfNodes;
 }
 
 /*! Get the COORDINATES object. Use it only if you need COORDINATES informations not provided by the MESH class.*/
-inline COORDINATE * MESH::getCoordinateptr() 
+inline const COORDINATE * MESH::getCoordinateptr() const
 {
+  checkGridFillCoords();
   return _coordinate;
 }
 
 /*! Get the system in which coordinates are given (CARTESIAN,CYLINDRICAL,SPHERICAL) __??MED_CART??__. */
-inline string MESH::getCoordinatesSystem()
+inline string MESH::getCoordinatesSystem() const
 {
   return _coordinate->getCoordinatesSystem();
 }
 
 /*! Get the whole coordinates array in a given interlacing mode. The interlacing mode are :
   - MED_NO_INTERLACE   :  X1 X2 Y1 Y2 Z1 Z2
-  - MED_FULL_INTERLACE :  X1 Y1 Z1 X2 Y2 Z2 
+  - MED_FULL_INTERLACE :  X1 Y1 Z1 X2 Y2 Z2
  */
-inline const double * MESH::getCoordinates(medModeSwitch Mode)
+inline const double * MESH::getCoordinates(medModeSwitch Mode) const
 {
+  checkGridFillCoords();
   return _coordinate->getCoordinates(Mode);
 }
 
 /*! Get the coordinate n° number on axis n°axis*/
-inline const double MESH::getCoordinate(int number, int axis)
+inline const double MESH::getCoordinate(int number, int axis) const
 {
+  checkGridFillCoords();
   return _coordinate->getCoordinate(number,axis);
 }
 
 /*! Get the coordinate names array ("x       ","y       ","z       ")
   of size n*MED_TAILLE_PNOM
 */
-inline string * MESH::getCoordinatesNames() 
+inline const string * MESH::getCoordinatesNames() const
 {
   return _coordinate->getCoordinatesNames();
 }
@@ -336,65 +399,99 @@ inline string * MESH::getCoordinatesNames()
 /*! Get the coordinate unit names array ("cm       ","cm       ","cm       ")
   of size n*MED_TAILLE_PNOM
 */
-inline string * MESH::getCoordinatesUnits() 
+inline const string * MESH::getCoordinatesUnits() const
 {
   return _coordinate->getCoordinatesUnits();
 }
-//  int * MESH::getNodesNumbers() {
+//  int * MESH::getNodesNumbers() const
+//  {
 //    return nodesNumbers;
 //  }
 
 /*! Get the number of different geometric types for a given entity type.
-  For exemple getNumberOfTypes(MED_CELL) would return 2 is the MESH have some MED_TETRA4 and MED_HEXA6 in it. 
-  medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_NODE, MED_ALL_ENTITIES
+
+    For exemple getNumberOfTypes(MED_CELL) would return 3 is the MESH
+    have some MED_TETRA4, MED_PYRA5 and MED_HEXA6 in it.
+
+    medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_NODE, MED_ALL_ENTITIES
+
+    If entity is not defined, return 0.
+
+    If there is no connectivity, return an exception.
 */
-inline int MESH::getNumberOfTypes(medEntityMesh entity)
+inline int MESH::getNumberOfTypes(medEntityMesh entity) const
 {
   MESSAGE("MESH::getNumberOfTypes(medEntityMesh entity) : "<<entity);
   if (entity == MED_NODE)
     return 1 ;
+  checkGridFillConnectivity();
   if (_connectivity != NULL)
     return _connectivity->getNumberOfTypes(entity) ;
   throw MEDEXCEPTION(LOCALIZED("MESH::getNumberOfTypes( medEntityMesh ) : Connectivity not defined !"));
 }
 
-/*! 
+/*!
   Get the list of geometric types used by a given entity.
   medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_ALL_ENTITIES
-  REM : Don't use MED_NODE 
+
+  REM : Don't use MED_NODE
+
+  If entity is not defined, return an exception.
 */
-inline medGeometryElement * MESH::getTypes(medEntityMesh entity)
+inline const medGeometryElement * MESH::getTypes(medEntityMesh entity) const
 {
   if (entity == MED_NODE)
     throw MEDEXCEPTION(LOCALIZED("MESH::getTypes( medEntityMesh ) : No medGeometryElement with MED_NODE entity !"));
-  
+  // return un tableau de taille 1 contenant MED_NONE, comme les supports pour etre coherent avec getNumberOfTypes ???? PG
+
+  checkGridFillConnectivity();
   if (_connectivity != NULL)
     return _connectivity->getGeometricTypes(entity) ;
   throw MEDEXCEPTION(LOCALIZED("MESH::getTypes( medEntityMesh ) : Connectivity not defined !"));
 }
 
-/*! 
+/*!
   Get the whole list of CELLMODEL used by cells of given type (medEntityMesh).
+
   REMARK : Don't use MED_NODE as medEntityMesh
 */
-inline CELLMODEL * MESH::getCellsTypes(medEntityMesh Entity)
+inline const CELLMODEL * MESH::getCellsTypes(medEntityMesh Entity) const
 {
+  checkGridFillConnectivity();
   if (_connectivity != NULL)
-  return _connectivity->getCellsTypes(Entity) ;
+    return _connectivity->getCellsTypes(Entity) ;
   throw MEDEXCEPTION(LOCALIZED("MESH::getCellsTypes( medEntityMesh ) : Connectivity not defined !"));
 }
 
-/*! Since informations related with an entity type are stored in independent arrays, the only way to
-    get a uniq index is to call this method.
-    For exemple if you want the global numbers of your ... ????? size ????? 
+/*! Return an array of size NumbreOfTypes+1 which contains, for each
+    geometric type of the given entity, the first global element number
+    of this type.
+
+    For exemple, if we have a mesh with 5 triangles and 4 quadrangle :
+    - size of GlobalNumberingIndex is 3
+    - GlobalNumberingIndex[0]=1 (the first type)
+    - GlobalNumberingIndex[1]=6 (the second type)
+    - GlobalNumberingIndex[2]=10
 */
-inline int * MESH::getGlobalNumberingIndex(medEntityMesh entity)
+inline const int * MESH::getGlobalNumberingIndex(medEntityMesh entity) const
 {
+  checkGridFillConnectivity();
   if (_connectivity != NULL)
-  return _connectivity->getGlobalNumberingIndex(entity);
+    return _connectivity->getGlobalNumberingIndex(entity);
   throw MEDEXCEPTION(LOCALIZED("MESH::getNumberOfTypes( medEntityMesh ) : Connectivity not defined !"));
 }
-inline int MESH::getNumberOfElements(medEntityMesh entity, medGeometryElement Type)
+/*!
+  Return the number of element of given geometric type of given entity. Return 0 if query is not defined.
+
+  Example :
+  - getNumberOfElements(MED_NODE,MED_NONE) : number of node
+  - getNumberOfElements(MED_NODE,MED_TRIA3) : return 0 (not defined)
+  - getNumberOfElements(MED_FACE,MED_TRIA3) : return number of triangles
+  elements defined in face entity (0 if not defined)
+  - getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) : return total number
+  of elements defined in cell entity
+ */
+inline int MESH::getNumberOfElements(medEntityMesh entity, medGeometryElement Type) const
 {
   const char * LOC = "MESH::getNumberOfElements(medEntityMesh,medGeometryElement) : " ;
   if (entity==MED_NODE)
@@ -402,72 +499,127 @@ inline int MESH::getNumberOfElements(medEntityMesh entity, medGeometryElement Ty
       return _numberOfNodes ;
     else
       return 0 ;
-      //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"wrong medGeometryElement with MED_NODE"));
-  else 
-    if (_connectivity != (CONNECTIVITY*)NULL)
-      return _connectivity->getNumberOf(entity,Type) ;
-    else
-      return 0 ;
+  //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"wrong medGeometryElement with MED_NODE"));
+  else
+    {
+      checkGridFillConnectivity();
+      if (_connectivity != (CONNECTIVITY*)NULL)
+	return _connectivity->getNumberOf(entity,Type) ;
+      else
+	return 0 ;
       //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"connectivity not defined !"));
+    }
 }
-inline bool MESH::existConnectivity(medConnectivity connectivityType, medEntityMesh entity)
+/*!
+  Return true if the wanted connectivity exist, else return false
+  (to use before a getSomething method).
+ */
+inline bool MESH::existConnectivity(medConnectivity connectivityType, medEntityMesh entity) const
 {
+  checkGridFillConnectivity();
   if (_connectivity==(CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("MESH::existConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
   return _connectivity->existConnectivity(connectivityType,entity) ;
 }
 /*!
-  Return the geometric type of element Number of entity Entity.
+  Return the geometric type of global element Number of entity Entity.
 
   Throw an exception if Entity is not defined or Number are wrong (too big).
  */
-inline medGeometryElement MESH::getElementType(medEntityMesh Entity,int Number)
+inline medGeometryElement MESH::getElementType(medEntityMesh Entity,int Number) const
 {
+  checkGridFillConnectivity();
   if (_connectivity==(CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("MESH::getElementType(medEntityMesh,int) : no connectivity defined !");
   return _connectivity->getElementType(Entity,Number) ;
 }
+/*!
+  Calculate the ask connectivity. Return an exception if this could not be
+  done. Do nothing if connectivity already exist.
+ */
+
 inline void MESH::calculateConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity)
 {
+  checkGridFillConnectivity();
   if (Mode==MED_FULL_INTERLACE)
     _connectivity->calculateConnectivity(ConnectivityType,entity) ;
   else
     throw MEDEXCEPTION(LOCALIZED("MESH::calculateConnectivity : only for MED_FULL_INTERLACE mode"));
 }
-inline int * MESH::getConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity, medGeometryElement Type)
+/*!
+  Return the required connectivity in the right mode for the given
+  geometric type of the given entity.
+
+  To get connectivity for all geometric type, use Mode=MED_FULL_INTERLACE
+  and Type=MED_ALL_ELEMENTS.
+  You must also get the corresponding index array.
+ */
+inline const int * MESH::getConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity, medGeometryElement Type) const
 {
+  checkGridFillConnectivity();
   if (Mode==MED_FULL_INTERLACE)
     return _connectivity->getConnectivity(ConnectivityType,entity,Type) ;
   throw MEDEXCEPTION(LOCALIZED("MESH::getConnectivity : only for MED_FULL_INTERLACE mode"));
 }
-inline int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh entity)
+/*!
+  Return the required index array for a connectivity received in
+  MED_FULL_ENTERLACE mode and MED_ALL_ELEMENTS type.
+
+  This array allow to find connectivity of each elements.
+
+  Example : Connectivity of i^{th} elements (1<=i<=NumberOfElement) begin
+  at index ConnectivityIndex[i-1] and end at index ConnectivityIndex[i]-1
+  in Connectivity array (Connectivity[ConnectivityIndex[i-1]-1] is the
+  first value)
+ */
+inline const int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh entity) const
 {
+  checkGridFillConnectivity();
   return _connectivity->getConnectivityIndex(ConnectivityType, entity) ;
 }
-inline int * MESH::getReverseConnectivity(medConnectivity ConnectivityType)
+/*!
+  Return the reverse connectivity required by ConnectivityType :
+  - If ConnectivityType=MED_NODAL : return connectivity node-cell
+  - If ConnectivityType=MED_DESCENDING : return connectivity face-cell
+
+  You must get ReverseConnectivityIndex array to use it.
+ */
+inline const int * MESH::getReverseConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
 {
-  if (ConnectivityType==MED_NODAL)
-    return _connectivity->getReverseNodalConnectivity() ;
-  else if (ConnectivityType==MED_DESCENDING)
-    return _connectivity->getReverseDescendingConnectivity() ;
-  throw MEDEXCEPTION("MESH::getReverseConnectivity : connectivity mode not supported !");
+  checkGridFillConnectivity();
+  if (NULL==_connectivity)
+    throw MEDEXCEPTION("MESH::getReverseConnectivity : no connectivity defined in MESH !");
+
+  return _connectivity->getReverseConnectivity(ConnectivityType,Entity) ;
 }
-inline int * MESH::getReverseConnectivityIndex(medConnectivity ConnectivityType)
+/*!
+  Return the index array required by ConnectivityType.
+
+  This array allow to find reverse connectivity of each elements.
+
+  Example : Reverse connectivity of i^{th} elements (1<=i<=NumberOfElement)
+  begin at index ReverseConnectivityIndex[i-1] and end at index
+  ReverseConnectivityIndex[i]-1
+  in ReverseConnectivity array (
+  ReverseConnectivity[ReverseConnectivityIndex[i-1]-1]
+  is the first value)
+ */
+inline const int * MESH::getReverseConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
 {
-  if (ConnectivityType==MED_NODAL)
-    return _connectivity->getReverseNodalConnectivityIndex() ;
-  else if (ConnectivityType==MED_DESCENDING)
-    return _connectivity->getReverseDescendingConnectivityIndex() ;
-  throw MEDEXCEPTION("MESH::getReverseConnectivityIndex : connectivity mode not supported !");
+  checkGridFillConnectivity();
+  if (NULL==_connectivity)
+    throw MEDEXCEPTION("MESH::getReverseConnectivityIndex : no connectivity defined in MESH !");
+
+  return _connectivity->getReverseConnectivityIndex(ConnectivityType,Entity) ;
 }
 
 
-inline int MESH::getNumberOfFamilies (medEntityMesh entity) 
+inline int MESH::getNumberOfFamilies (medEntityMesh entity) const
 {
   switch (entity) {
-  case MED_NODE : 
+  case MED_NODE :
     return _numberOfNodesFamilies ;
-  case MED_CELL : 
+  case MED_CELL :
     return _numberOfCellsFamilies ;
   case MED_FACE :
     return _numberOfFacesFamilies ;
@@ -477,12 +629,12 @@ inline int MESH::getNumberOfFamilies (medEntityMesh entity)
     throw MEDEXCEPTION("MESH::getNumberOfFamilies : Unknown entity");
   }
 }
-inline int MESH::getNumberOfGroups (medEntityMesh entity) 
+inline int MESH::getNumberOfGroups (medEntityMesh entity) const
 {
   switch (entity) {
-  case MED_NODE : 
+  case MED_NODE :
     return _numberOfNodesGroups ;
-  case MED_CELL : 
+  case MED_CELL :
     return _numberOfCellsGroups ;
   case MED_FACE :
     return _numberOfFacesGroups ;
@@ -492,11 +644,12 @@ inline int MESH::getNumberOfGroups (medEntityMesh entity)
     throw MEDEXCEPTION("MESH::getNumberOfGroups : Unknown entity");
   }
 }
-vector<FAMILY*> MESH::getFamilies(medEntityMesh entity) {
+const vector<FAMILY*> MESH::getFamilies(medEntityMesh entity) const
+{
   switch (entity) {
-  case MED_NODE : 
+  case MED_NODE :
     return _familyNode ;
-  case MED_CELL : 
+  case MED_CELL :
     return _familyCell ;
   case MED_FACE :
     return _familyFace ;
@@ -507,11 +660,12 @@ vector<FAMILY*> MESH::getFamilies(medEntityMesh entity) {
   }
 }
 
-vector<GROUP*> MESH::getGroups(medEntityMesh entity) {
+const vector<GROUP*> MESH::getGroups(medEntityMesh entity) const
+{
   switch (entity) {
-  case MED_NODE : 
+  case MED_NODE :
     return _groupNode ;
-  case MED_CELL : 
+  case MED_CELL :
     return _groupCell ;
   case MED_FACE :
     return _groupFace ;
@@ -522,8 +676,9 @@ vector<GROUP*> MESH::getGroups(medEntityMesh entity) {
   }
 }
 
-FAMILY* MESH::getFamily(medEntityMesh entity, int i) {
-  if (i<=0) 
+const FAMILY* MESH::getFamily(medEntityMesh entity, int i) const
+{
+  if (i<=0)
     throw MEDEXCEPTION("MESH::getFamily(i) : argument i must be > 0");
   int NumberOfFamilies = 0 ;
   vector<FAMILY*> Family ;
@@ -551,14 +706,15 @@ FAMILY* MESH::getFamily(medEntityMesh entity, int i) {
   default :
     throw MEDEXCEPTION("MESH::getFamilies : Unknown entity");
   }
-  if (i>NumberOfFamilies) 
+  if (i>NumberOfFamilies)
     throw MEDEXCEPTION("MESH::getFamily(entity,i) : argument i must be <= _numberOfFamilies");
-  return Family[i-1]; 
+  return Family[i-1];
 }
 
-GROUP* MESH::getGroup(medEntityMesh entity, int i) {
+const GROUP* MESH::getGroup(medEntityMesh entity, int i) const
+{
   const char * LOC = "MESH::getGroup(medEntityMesh entity, int i) : " ;
-  if (i<=0) 
+  if (i<=0)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i must be > 0"));
   int NumberOfGroups = 0 ;
   vector<GROUP*> Group ;
@@ -586,9 +742,9 @@ GROUP* MESH::getGroup(medEntityMesh entity, int i) {
   default :
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Unknown entity"));
   }
-  if (i>NumberOfGroups) 
+  if (i>NumberOfGroups)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i="<<i<<" must be <= _numberOfGroups="<<NumberOfGroups));
-  return Group[i-1]; 
+  return Group[i-1];
 }
 
 
@@ -596,23 +752,13 @@ GROUP* MESH::getGroup(medEntityMesh entity, int i) {
 //      return  ;
 //    }
 
-//inline void MESH::write(const string & driverName)  { 
+//inline void MESH::write(const string & driverName)  {
 //  write(0,driverName);
 //}
 
-
-// this method are temporary, perhaps we remove it if we put information in an other place
-inline int * MESH::getMEDArrayNodeFamily() {
-  return _MEDArrayNodeFamily ;
-}
-inline int ** MESH::getMEDArrayCellFamily() {
-  return _MEDArrayCellFamily ;
-}
-inline int ** MESH::getMEDArrayFaceFamily() {
-  return _MEDArrayFaceFamily ;
-}
-inline int ** MESH::getMEDArrayEdgeFamily() {
-  return _MEDArrayEdgeFamily ;
+inline bool MESH::getIsAGrid()
+{
+  return _isAGrid;
 }
 
 #endif /* MESH_HXX */

@@ -1,3 +1,30 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : MEDMEM_MedMedDriver.cxx
+//  Module : MED
+
+using namespace std;
 # include <string>
 
 # include "MEDMEM_MedMedDriver.hxx"
@@ -5,6 +32,7 @@
 # include "MEDMEM_DriversDef.hxx"
 
 # include "MEDMEM_Mesh.hxx"
+# include "MEDMEM_Grid.hxx"
 # include "MEDMEM_Field.hxx"
 // EN ATTENDANT L'utilisation de MedFieldDriver.hxx ds Field.hxx
 # include "MEDMEM_MedFieldDriver.hxx"
@@ -15,42 +43,78 @@
 using namespace MED_FR;
 
 MED_MED_DRIVER::MED_MED_DRIVER(): GENDRIVER(), 
-  _ptrMed((MED * const)MED_NULL), 
-  _medIdt(MED_INVALID) 
+                                  _ptrMed((MED * const)MED_NULL),_medIdt(MED_INVALID) 
 {}
 
 MED_MED_DRIVER::MED_MED_DRIVER(const string & fileName,  MED * const ptrMed):
   GENDRIVER(fileName,MED_EN::MED_RDWR), _ptrMed(ptrMed), _medIdt(MED_INVALID)
-{}
+{
+  _ptrMed->addDriver(*this); // The specific MED driver id is set within the addDriver method.
+}
 
 MED_MED_DRIVER::MED_MED_DRIVER(const string & fileName,
 			       MED * const ptrMed,
 			       MED_EN::med_mode_acces accessMode):
   GENDRIVER(fileName,accessMode), _ptrMed(ptrMed), _medIdt(MED_INVALID)
-{}
-
+{
+}
 //REM :  As t'on besoin du champ _status :  _medIdt <-> _status  ?  Oui
 
+MED_MED_DRIVER::MED_MED_DRIVER(const MED_MED_DRIVER & driver):
+  GENDRIVER(driver),
+  _ptrMed(driver._ptrMed),
+  _medIdt(MED_INVALID)
+{
+}
 
-void MED_MED_DRIVER::open() {
+MED_MED_DRIVER::~MED_MED_DRIVER()
+{
+  MESSAGE("MED_MED_DRIVER::~MED_MED_DRIVER() has been destroyed");
+}
+
+//  GENDRIVER * MED_MED_DRIVER::copy(void) const
+//  {
+//    return new MED_MED_DRIVER(*this) ;
+//  }
+void MED_MED_DRIVER::read()
+{
+}
+void MED_MED_DRIVER::readFileStruct()
+{
+}
+void MED_MED_DRIVER::write() const
+{
+}
+GENDRIVER * MED_MED_DRIVER::copy(void) const
+{
+}
+void MED_MED_DRIVER::writeFrom() const
+{
+}
+
+
+
+void MED_MED_DRIVER::open()
+  throw (MEDEXCEPTION)
+{
 
   const char * LOC ="MED_MED_DRIVER::open() : ";
   BEGIN_OF(LOC);
 
   // REFLECHIR SUR CE TEST PAR RAPPORT A L'OUVERTURE/FERMETURE
-  if ( _medIdt != MED_INVALID ) 
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "_medIdt is already in use, please close the file |" 
-                                     << _fileName << "| before calling open()"
-                                     )
-                          );   
+//    if ( _medIdt != MED_INVALID ) 
+//      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+//                                       << "_medIdt is already in use, please close the file |" 
+//                                       << _fileName << "| before calling open()"
+//                                       )
+//                            );   
   
-  if ( _status != MED_CLOSED ) 
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "_status is closed, please close the file |"
-                                     << _fileName << "| before calling open()"
-                                     )
-                          );
+//    if ( _status != MED_CLOSED ) 
+//      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+//                                       << "_status is closed, please close the file |"
+//                                       << _fileName << "| before calling open()"
+//                                       )
+//                            );
   
   if ( _fileName == "" )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -58,9 +122,12 @@ void MED_MED_DRIVER::open() {
                                      )
                           );
   
+  MESSAGE(LOC<<"_fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
   _medIdt = MEDouvrir( (const_cast <char *> (_fileName.c_str())), (MED_FR::med_mode_acces) _accessMode);
+  MESSAGE(LOC<<" _medIdt = "<<_medIdt);
   
-  if (_medIdt > 0) _status=MED_OPENED; 
+  if (_medIdt > 0) 
+    _status=MED_OPENED; 
   else {
     _status = MED_CLOSED;
     _medIdt = MED_INVALID;
@@ -70,45 +137,74 @@ void MED_MED_DRIVER::open() {
                                     )
                          );
   }
-  
+
   END_OF(LOC);
 }
 
 
-void MED_MED_DRIVER::close() {
+void MED_MED_DRIVER::close()
+{
   MED_FR::med_int err = 0;
   const char * LOC = "MED_MED_DRIVER::close() : ";
   
   
-  if ( _status == MED_CLOSED)
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << ": the file |" 
-                                     << _fileName << "| is already closed"
-                                     )
-                          );
+//    if ( _status == MED_CLOSED)
+//      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << ": the file |" 
+//                                       << _fileName << "| is already closed"
+//                                       )
+//                            );
    
-  if ( _medIdt == MED_INVALID ) 
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "_medIdt invalid, but the file |" 
-                                     << _fileName << "| seems to be openned !"
-                                     )
-                          );   
+//    if ( _medIdt == MED_INVALID ) 
+//      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "_medIdt invalid, but the file |" 
+//                                       << _fileName << "| seems to be openned !"
+//                                       )
+//                            );   
+
+  if ( _medIdt != MED_INVALID )
+    err=MEDfermer(_medIdt);
   
-  err=MEDfermer(_medIdt);
+//    if (err != MED_VALID) 
+//      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "the file |" 
+//                                       << _fileName << "| couldn't be closed"
+//                                       )
+//                            );   
   
   _status = MED_CLOSED;
   _medIdt = MED_INVALID;
-
-  if (err != MED_VALID) 
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "the file |" 
-                                     << _fileName << "| couldn't be closed"
-                                     )
-                          );   
-  
+    
   END_OF(LOC);
 }
 
 
+// ------------- Read Only Part --------------
 
-void MED_MED_DRIVER::readFileStruct( void ) 
+MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER():MED_MED_DRIVER()
+{
+}
+
+MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed):
+  MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_RDONLY)
+{
+  MESSAGE("MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed) Constructeur read only");
+}
+
+MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const MED_MED_RDONLY_DRIVER & driver):
+  MED_MED_DRIVER(driver)
+{
+}
+
+MED_MED_RDONLY_DRIVER::~MED_MED_RDONLY_DRIVER()
+{
+  MESSAGE("MED_MED_RDONLY_DRIVER::~MED_MED_RDONLY_DRIVER() has been destroyed");
+} 
+
+GENDRIVER * MED_MED_RDONLY_DRIVER::copy(void) const
+{
+  return new MED_MED_RDONLY_DRIVER(*this) ;
+}
+
+void MED_MED_RDONLY_DRIVER::readFileStruct( void ) 
+  throw (MEDEXCEPTION)
 {
   const char * LOC = "MED_MED_DRIVER::readFileStruct() : ";
   int          err,i,j;
@@ -135,6 +231,16 @@ void MED_MED_DRIVER::readFileStruct( void )
 
     MESH_ENTITIES::const_iterator currentEntity; 
     for (i=1;i<=numberOfMeshes;i++) {
+
+      // find out if the mesh is a Grid
+      
+      int isAGrid = false;
+      MED_FR::med_grid_type type;
+      
+      err = MEDgridInfo (_medIdt, i, &isAGrid, &type);
+      if (err != MED_VALID) 
+        throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "error in MEDgridInfo()") );
+
       err = MEDmaaInfo(_medIdt, i ,meshName, &meshDim) ;
       if (err != MED_VALID) 
         throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << ": can't get information about the mesh n°"
@@ -143,19 +249,54 @@ void MED_MED_DRIVER::readFileStruct( void )
                               );   
       MESSAGE(LOC<<": Mesh n°"<<i<<" nammed "<<meshName);
 
-      ptrMesh = new MESH();
-      // NO : create a  MED_MESH_RDWR_DRIVER with the currently used 
-      // _medIdt which remains VALID as long as _fileName is openned
-      // NO: then as long as the MED driver remains open 
-      MED_MESH_RDWR_DRIVER * _ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
-      _ptrDriver->setMeshName(meshName);
-      ptrMesh->addDriver(*_ptrDriver);
-      _ptrMed->_meshes[meshName] = ptrMesh;
+      if (isAGrid)
+        ptrMesh = new GRID((MED_EN::med_grid_type) type);
+      else
+	ptrMesh = new MESH();
+
+      //MED_MESH_RDWR_DRIVER * _ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
+      MED_EN::med_mode_acces myMode = getAccessMode();
+      MED_MESH_DRIVER * ptrDriver ;
+      switch (myMode) {
+      case MED_EN::MED_LECT:
+	ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
+	break ;
+      case MED_EN::MED_REMP:	
+	ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
+	break ;
+      case MED_EN::MED_ECRI: // should never append !!
+	ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
+	break;
+      default:
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+      }
+      ptrDriver->setId       ( getId() );
+      ptrDriver->setMeshName ( meshName );
+      ptrMesh->addDriver(*ptrDriver);
+      delete ptrDriver ;
+
+      if (isAGrid)
+	_ptrMed->_meshes[meshName] = (MESH *) ptrMesh;
+      else
+	_ptrMed->_meshes[meshName] = ptrMesh;
+
+      ptrMesh->setName(meshName);
+
+      SCRUTE(ptrMesh);
+
+      MESSAGE(LOC<<"is" << (isAGrid ? "" : " NOT") << " a GRID and its name is "<<ptrMesh->getName());
+
       // we create all global support (for each entity type :
       for (currentEntity=meshEntities.begin();currentEntity != meshEntities.end(); currentEntity++) {
 	string supportName="SupportOnAll_" ;
 	supportName+=entNames[(MED_FR::med_entite_maillage)(*currentEntity).first] ;
-	(_ptrMed->_support)[meshName][(MED_FR::med_entite_maillage)(*currentEntity).first]=new SUPPORT(ptrMesh,supportName,(MED_EN::medEntityMesh) (*currentEntity).first) ;
+	//(_ptrMed->_support)[meshName][(MED_FR::med_entite_maillage)(*currentEntity).first]=new SUPPORT(ptrMesh,supportName,(MED_EN::medEntityMesh) (*currentEntity).first) ;
+	SUPPORT* mySupport = new SUPPORT() ;
+	mySupport->setName(supportName);
+	mySupport->setMesh(ptrMesh);
+	mySupport->setEntity((MED_EN::medEntityMesh) (*currentEntity).first);
+	mySupport->setAll(true);
+	(_ptrMed->_support)[meshName][(MED_FR::med_entite_maillage)(*currentEntity).first] = mySupport ;
       }
     }
   }
@@ -316,7 +457,21 @@ void MED_MED_DRIVER::readFileStruct( void )
 		  ((FIELD<MED_FR::med_int>*) ptrField)->setNumberOfComponents(numberOfComponents);
   		  ((FIELD<MED_FR::med_int>*) ptrField)->setName(fieldName) ; //provisoire, pour debug
   		  MESSAGE("#### SET NAME in FIELD : "<<fieldName);
-  		  ptrDriver      =  new MED_FIELD_RDWR_DRIVER<MED_FR::med_int> (_fileName, (FIELD<MED_FR::med_int> *) ptrField);
+
+		  MED_EN::med_mode_acces myMode = getAccessMode();
+		  switch (myMode) {
+		  case MED_EN::MED_LECT:
+		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<MED_FR::med_int>(_fileName, (FIELD<MED_FR::med_int> *)ptrField);
+		    break ;
+		  case MED_EN::MED_REMP:	
+		    ptrDriver = new MED_FIELD_RDWR_DRIVER<MED_FR::med_int>(_fileName, (FIELD<MED_FR::med_int> *)ptrField);
+		    break ;
+		  case MED_EN::MED_ECRI: // should never append !!
+		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<MED_FR::med_int>(_fileName, (FIELD<MED_FR::med_int> *)ptrField);
+		    break;
+		  default:
+		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+		  }
   		  break;
 		}
 		case MED_FR::MED_REEL64 : {
@@ -327,7 +482,20 @@ void MED_MED_DRIVER::readFileStruct( void )
 		  ((FIELD<MED_FR::med_float>*) ptrField)->setName(fieldName) ; //provisoire, pour debug
 		  MESSAGE("#### SET NAME in FIELD : "<<fieldName);
 
-		  ptrDriver      =  new MED_FIELD_RDWR_DRIVER<MED_FR::med_float>(_fileName, (FIELD<MED_FR::med_float> *) ptrField);
+		  MED_EN::med_mode_acces myMode = getAccessMode();
+		  switch (myMode) {
+		  case MED_EN::MED_LECT:
+		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<MED_FR::med_float>(_fileName, (FIELD<MED_FR::med_float> *)ptrField);
+		    break ;
+		  case MED_EN::MED_REMP:	
+		    ptrDriver = new MED_FIELD_RDWR_DRIVER<MED_FR::med_float>(_fileName, (FIELD<MED_FR::med_float> *)ptrField);
+		    break ;
+		  case MED_EN::MED_ECRI: // should never append !!
+		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<MED_FR::med_float>(_fileName, (FIELD<MED_FR::med_float> *)ptrField);
+		    break;
+		  default:
+		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+		  }
 		  break;
 		}
 		default : {
@@ -349,15 +517,16 @@ void MED_MED_DRIVER::readFileStruct( void )
 		MESSAGE("timeStepNumber :"<<timeStepNumber<<",orderNumber :"<<orderNumber);
 		ptrField->setIterationNumber ( timeStepNumber);      // A ajouter dans la classe FIELD
 		ptrField->setOrderNumber     ( orderNumber); 
-		ptrField->setTime     ( timeStep); 
+		ptrField->setTime            ( timeStep); 
 		
 		// Create a driver for this (field n°dt,n°it)
-
+                ptrDriver->setId            ( getId() );
 		MESSAGE("###### ptrDriver->setFieldName : #"<<fieldName<<"#");
 		ptrDriver->setFieldName(fieldName);
-
 		ptrField->addDriver(*ptrDriver);
-		
+		// driver is duplicated : remove it
+		delete ptrDriver;
+
 		DT_IT_ dtIt;
 		dtIt.dt  = timeStepNumber;
 		dtIt.it  = orderNumber;
@@ -382,17 +551,88 @@ void MED_MED_DRIVER::readFileStruct( void )
   
 }
 
-void MED_MED_DRIVER::read( void ) {
-
+// This method ask the drivers of all MESH/FIELD objects created from this MED driver
+// to read themselves
+void MED_MED_RDONLY_DRIVER::read( void )
+  throw (MEDEXCEPTION) // from objects method read !
+{
   const char * LOC = "MED_MED_DRIVER::read() : ";
  
   BEGIN_OF(LOC);
-  MESSAGE("METHODE PAS ENCORE IMPLEMENTEE !!! ");
+
+  const map<MESH_NAME_, MESH*> & _meshes = const_cast<const map<MESH_NAME_, MESH*>& > (_ptrMed->_meshes); 
+  map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
+
+  const map<FIELD_ *, MESH_NAME_> & _meshName = const_cast<const map<FIELD_ *, MESH_NAME_>& > (_ptrMed->_meshName);
+  map<FIELD_ *, MESH_NAME_>::const_iterator currentField;
+  
+  for ( currentMesh=_meshes.begin();currentMesh != _meshes.end(); currentMesh++ ) 
+    (*currentMesh).second->read(*this); 
+  //(*currentMesh).second->read(); // default reader, from readFileStruct
+    
+  // PROVISOIRE
+  _ptrMed->updateSupport() ;
+
+  for ( currentField =_meshName.begin(); currentField != _meshName.end(); currentField++ )
+    (*currentField).first->read(*this);
+  //(*currentField).first->read(); // default reader, from readFileStruct
+
   END_OF(LOC);
 }
 
-void MED_MED_DRIVER::writeFrom( void) const {
-  
+void MED_MED_RDONLY_DRIVER::write(void) const
+  throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("MED_MED_RDONLY_DRIVER::write : Can't write with a RDONLY driver !");
+}
+
+void MED_MED_RDONLY_DRIVER::writeFrom(void) const
+  throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("MED_MED_RDONLY_DRIVER::writeFrom : Can't write with a RDONLY driver !");
+}
+
+// ------------- Write Only Part --------------
+
+MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER():MED_MED_DRIVER()
+{
+}
+
+MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed):
+  MED_MED_DRIVER(fileName,ptrMed)
+{}
+
+MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER(const MED_MED_WRONLY_DRIVER & driver):
+  MED_MED_DRIVER(driver)
+{}
+
+MED_MED_WRONLY_DRIVER::~MED_MED_WRONLY_DRIVER()
+{
+  MESSAGE("MED_MED_WRONLY_DRIVER::~MED_MED_WRONLY_DRIVER() has been destroyed");
+} 
+
+GENDRIVER * MED_MED_WRONLY_DRIVER::copy(void) const
+{
+  return new MED_MED_WRONLY_DRIVER(*this) ;
+}
+
+void MED_MED_WRONLY_DRIVER::read(void)
+  throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("MED_MED_WRONLY_DRIVER::read : Can't read with a WRONLY driver !");
+}
+
+void MED_MED_WRONLY_DRIVER::readFileStruct(void)
+  throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("MED_MED_WRONLY_DRIVER::read : Can't read with a WRONLY driver !");
+}
+
+// This method ask the drivers of all MESH/FIELD objects created from this MED driver
+// to write themselves
+void MED_MED_WRONLY_DRIVER::writeFrom( void) const
+  throw (MEDEXCEPTION) //from object method write !
+{
   const char * LOC = "MED_MED_DRIVER::writeFrom() : ";
 
   BEGIN_OF(LOC);
@@ -406,14 +646,11 @@ void MED_MED_DRIVER::writeFrom( void) const {
   for ( currentMesh=_meshes.begin();currentMesh != _meshes.end(); currentMesh++ ) {
     try {
       (*currentMesh).second->write(*this); 
-      // A CREER pour les objects MESH ET FIELD le write(GENDRIVER *) et le == ds GENDRIVER avec eventuellement 1 id 
+      // On utilise pour les objects MESH ET FIELD le write(GENDRIVER *) et le == ds GENDRIVER avec eventuellement 1 id 
     }
     catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ex ) {
       continue;
     }
-    //     catch (const MED_EXCEPTION & ex) {
-    //       throw ex; // DOIT-ON CREER UNE NOUVELLE EXCEPTION AVEC UN MESSAGE INDIQUANT LA PILE 
-    //     }
   }
 
   for ( currentField=_meshName.begin();currentField != _meshName.end(); currentField++ ) {
@@ -429,110 +666,94 @@ void MED_MED_DRIVER::writeFrom( void) const {
 
 }
 
-void MED_MED_DRIVER::write(void ) const {
-  
+void MED_MED_WRONLY_DRIVER::write(void ) const
+  throw (MEDEXCEPTION) // from object method write !
+{
   const char * LOC = "MED_MED_DRIVER::write() : ";
+  int current;
 
   BEGIN_OF(LOC);
 
-  // BCLE SUR LES DRIVERS AVEC APPELS WriteFrom
+  // BCLE SUR LES OBJETS AVEC AJOUT DE DRIVER ET APPELS write
+
+  const map<MESH_NAME_, MESH*> & _meshes = const_cast<const map<MESH_NAME_, MESH*>& > (_ptrMed->_meshes); 
+  map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
+
+  const map<FIELD_ *, MESH_NAME_> & _meshName = const_cast<const map<FIELD_ *, MESH_NAME_>& > (_ptrMed->_meshName);
+  map<FIELD_ *, MESH_NAME_>::const_iterator currentField;
+  
+  for ( currentMesh=_meshes.begin();currentMesh != _meshes.end(); currentMesh++ ) {
+    //current = (*currentMesh).second->addDriver(MED_DRIVER,_fileName);
+    current = (*currentMesh).second->addDriver(MED_DRIVER,_fileName,(*currentMesh).second->getName());
+    // put right _id in Mesh driver (same as this._id)
+    (*currentMesh).second->_drivers[current]->setId( getId() );
+    //(*currentMesh).second->write(current) ;
+  }
+
+  for ( currentField=_meshName.begin();currentField != _meshName.end(); currentField++ ) {
+    //current = (*currentField).first->addDriver(MED_DRIVER,_fileName);
+    current = (*currentField).first->addDriver(MED_DRIVER,_fileName,(*currentField).first->getName());
+    // put right _id in Field driver (same as this._id)
+    (*currentField).first->_drivers[current]->setId( getId() );
+    //(*currentField).first->write(current) ;
+  }
+
+  // that's work, but it is more efficenty to write directly when we had driver, no ?
+  writeFrom();
+  
   END_OF(LOC);
 
 }
 
-MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed):
-  MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_RDONLY)
-{
-  MESSAGE("MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed) Constructeur read only");
-}
+// ------------- Read Write Part --------------
 
-void MED_MED_RDONLY_DRIVER::open() {
-  BEGIN_OF("MED_MED_RDONLY_DRIVER::open()");
-  MED_MED_DRIVER::open();
-  END_OF("MED_MED_RDONLY_DRIVER::open()");
-}
-
-void MED_MED_RDONLY_DRIVER::close() {
-  BEGIN_OF("MED_MED_RDONLY_DRIVER::close()");
-  MED_MED_DRIVER::close();
-  END_OF("MED_MED_RDONLY_DRIVER::clode()");
-}
-
-void MED_MED_RDONLY_DRIVER::read(void) {
-  BEGIN_OF("MED_MED_RDONLY_DRIVER::read(void)");
-  MED_MED_DRIVER::read();
-  END_OF("MED_MED_RDONLY_DRIVER::read(void)");
-}
-
-void MED_MED_RDONLY_DRIVER::readFileStruct(void)  {
-  BEGIN_OF("MED_MED_RDONLY_DRIVER::readFileStruct(void)");
-  MED_MED_DRIVER::readFileStruct();
-  END_OF("MED_MED_RDONLY_DRIVER::readFileStruct(void)");
-}
-
-MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed):
-  MED_MED_DRIVER(fileName,ptrMed)
+MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER()
 {}
-
-void MED_MED_WRONLY_DRIVER::open() {
-  BEGIN_OF("MED_MED_WRONLY_DRIVER::open()");
-  MED_MED_DRIVER::open();
-  END_OF("MED_MED_WRONLY_DRIVER::open()");
-}
-
-void MED_MED_WRONLY_DRIVER::close() {
-  BEGIN_OF("MED_MED_WRONLY_DRIVER::close()");
-  MED_MED_DRIVER::close();
-  END_OF("MED_MED_WRONLY_DRIVER::clode()");
-}
-
-void MED_MED_WRONLY_DRIVER::write(void) const {
-  BEGIN_OF("MED_MED_WRONLY_DRIVER::write(void) const");
-  MED_MED_DRIVER::write();
-  END_OF("MED_MED_WRONLY_DRIVER::write(void) const");
-}
-
-void MED_MED_WRONLY_DRIVER::writeFrom(void) const {
-  BEGIN_OF("MED_MED_WRONLY_DRIVER::writeFrom(void) const");
-  MED_MED_DRIVER::writeFrom();
-  END_OF("MED_MED_WRONLY_DRIVER::writeFrom(void) const");
-}
 
 MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER(const string & fileName,  MED * const ptrMed):
   MED_MED_DRIVER(fileName,ptrMed)
 {}
 
-void MED_MED_RDWR_DRIVER::open() {
-  BEGIN_OF("MED_MED_RDWR_DRIVER::open()");
-  MED_MED_DRIVER::open();
-  END_OF("MED_MED_RDWR_DRIVER::open()");
+MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER(const MED_MED_RDWR_DRIVER & driver):
+  MED_MED_DRIVER(driver)
+{}
+
+MED_MED_RDWR_DRIVER::~MED_MED_RDWR_DRIVER() { 
+  MESSAGE("MED_MED_RDWR_DRIVER::~MED_MED_RDWR_DRIVER() has been destroyed");
 }
 
-void MED_MED_RDWR_DRIVER::close() {
-  BEGIN_OF("MED_MED_RDWR_DRIVER::close()");
-  MED_MED_DRIVER::close();
-  END_OF("MED_MED_RDWR_DRIVER::clode()");
+GENDRIVER * MED_MED_RDWR_DRIVER::copy(void) const
+{
+  return new MED_MED_RDWR_DRIVER(*this) ;
 }
 
-void MED_MED_RDWR_DRIVER::read(void) {
+void MED_MED_RDWR_DRIVER::read(void)
+  throw (MEDEXCEPTION) // from MED_MED_RDONLY_DRIVER::read()
+{
   BEGIN_OF("MED_MED_RDWR_DRIVER::read(void)");
   MED_MED_RDONLY_DRIVER::read();
   END_OF("MED_MED_RDWR_DRIVER::read(void)");
 }
 
-void MED_MED_RDWR_DRIVER::readFileStruct(void) {
+void MED_MED_RDWR_DRIVER::readFileStruct(void)
+  throw (MEDEXCEPTION) // from MED_MED_RDONLY_DRIVER::readFileStruct()
+{
   BEGIN_OF("MED_MED_RDWR_DRIVER::readFileStruct(void)");
   MED_MED_RDONLY_DRIVER::readFileStruct();
   END_OF("MED_MED_RDWR_DRIVER::readFileStruct(void)");
 }
 
-void MED_MED_RDWR_DRIVER::write(void) const {
+void MED_MED_RDWR_DRIVER::write(void) const
+  throw (MEDEXCEPTION) // from MED_MED_WRONLY_DRIVER::write()
+{
   BEGIN_OF("MED_MED_RDWR_DRIVER::write(void) const");
   MED_MED_WRONLY_DRIVER::write();
   END_OF("MED_MED_RDWR_DRIVER::write(void) const");
 }
 
-void MED_MED_RDWR_DRIVER::writeFrom(void) const {
+void MED_MED_RDWR_DRIVER::writeFrom(void) const
+  throw (MEDEXCEPTION) // from MED_MED_WRONLY_DRIVER::writeFrom();
+{
   BEGIN_OF("MED_MED_RDWR_DRIVER::writeFrom(void) const");
   MED_MED_WRONLY_DRIVER::writeFrom();
   END_OF("MED_MED_RDWR_DRIVER::writeFrom(void) const");

@@ -1,11 +1,32 @@
-//=============================================================================
-// File      : Med_i.cxx
-// Project   : SALOME
-// Author    : EDF
-// Copyright : EDF 2002
-// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Med_i.cxx
-//=============================================================================
+//  MED MedMem : MED idl descriptions implementation based on the classes of MEDMEM
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : Med_i.cxx
+//  Author : EDF
+//  Module : MED
+//  $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Med_i.cxx
 
+using namespace std;
 #include <deque>
 
 //#include "MEDMEM_Field.hxx"
@@ -201,6 +222,36 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
   // SUPPORT :
   _med->updateSupport() ;
+  
+  // we add all group and family in study :
+  // we add all families 
+  vector<FAMILY*> familyVector ;
+  vector<FAMILY*>::iterator familyVectorIt ;
+  // we add all groups
+  vector<GROUP*> groupVector ;
+  vector<GROUP*>::iterator groupVectorIt ;
+  
+  MED_FR::MESH_ENTITIES::const_iterator currentEntity; 
+  for (int i=0; i<numberOfMeshes; i++) {
+    ::MESH * ptrMesh = _med->getMesh(meshesNames[i]) ;
+    for (currentEntity=MED_FR::meshEntities.begin();currentEntity != MED_FR::meshEntities.end(); currentEntity++) {
+      // family :
+      familyVector = ptrMesh->getFamilies((MED_EN::medEntityMesh)(*currentEntity).first) ;
+      for(familyVectorIt=familyVector.begin();familyVectorIt!=familyVector.end();familyVectorIt++) {
+	FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
+	SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->POA_SALOME_MED::FAMILY::_this() ;
+	myFamilyI->addInStudy(myStudy,myFamilyIOR) ;
+      }
+      // group :
+      groupVector = ptrMesh->getGroups((MED_EN::medEntityMesh)(*currentEntity).first) ;
+      for(groupVectorIt=groupVector.begin();groupVectorIt!=groupVector.end();groupVectorIt++) {
+	GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
+	SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->POA_SALOME_MED::GROUP::_this() ;
+	myGroupI->addInStudy(myStudy,myGroupIOR) ;
+      }
+    }      
+  }
+
   for (int i=0; i<numberOfMeshes; i++) {
     map<MED_FR::med_entite_maillage,::SUPPORT*> mySupports = _med->getSupports(meshesNames[i]) ;
     map<MED_FR::med_entite_maillage,::SUPPORT*>::const_iterator itSupport ;

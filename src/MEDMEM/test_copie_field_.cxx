@@ -1,4 +1,29 @@
-using namespace std;
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : test_copie_field_.cxx
+//  Module : MED
+
 /* Programme de test du constructeur de copies de la classe FIELD_ de MEDMEM
    jroy - 12/12/2002 */
 
@@ -92,6 +117,7 @@ int main (int argc, char ** argv) {
   //  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
   SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_cell",MED_CELL);
   FIELD<double> * myField = new FIELD<double>() ;
+  myField->setValueType(MED_REEL64);
 
   myField->setName(fieldname);
   myField->setSupport(mySupport);
@@ -120,6 +146,11 @@ int main (int argc, char ** argv) {
   FIELD_ * pt_field_2 = new FIELD_(* pt_field_);
   delete myField;
   affiche_field(pt_field_2, pt_field_2->getSupport());
+  
+  delete pt_field_2 ;
+
+  delete mySupport ;
+  delete myMesh ;
 
   return 0;
 }

@@ -1,3 +1,29 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : MEDMEM_MedMeshDriver.hxx
+//  Module : MED
+
 #ifndef MED_MESH_DRIVER_HXX
 #define MED_MESH_DRIVER_HXX
 
@@ -15,6 +41,14 @@ class FAMILY;
 class GROUP;
 class CONNECTIVITY;
 
+/*!
+
+  Driver Med for MESH.
+
+  Generic part : implement open and close methods.
+
+*/
+
 class MED_MESH_DRIVER : public GENDRIVER
 {
 protected:
@@ -30,136 +64,199 @@ public :
   static const MED_FR::med_geometrie_element all_cell_type[MED_NBR_GEOMETRIE_MAILLE];
   
   static const char * const all_cell_type_tab [MED_NBR_GEOMETRIE_MAILLE];
- 
-  MED_MESH_DRIVER():GENDRIVER(),
-                    _ptrMesh(( MESH *)MED_NULL),_medIdt(MED_INVALID),
-                    _meshName(""),_meshNum(MED_INVALID)
-  {
-  }
-  MED_MESH_DRIVER(const string & fileName,  MESH * ptrMesh, med_mode_acces accessMode): 
-    GENDRIVER(fileName,accessMode),
-    _ptrMesh(ptrMesh),_medIdt(MED_INVALID), 
-    _meshName(""),_meshNum(MED_INVALID) 
-  {
-  }
-  
-  void open() {
-    BEGIN_OF("MED_MESH_DRIVER::open()");
-    _medIdt = MED_FR::MEDouvrir( (const_cast <char *> (_fileName.c_str())),(MED_FR::med_mode_acces) _accessMode);
-    MESSAGE("MED_MESH_DRIVER::open() _medIdt : "<< _medIdt );
-    if (_medIdt > 0) _status=MED_OPENED; else {
-      MESSAGE(" MED_MESH__DRIVER::open() : MEDouvrir : _medIdt= " << _medIdt );
-      _status = MED_INVALID;
-    }
-    END_OF("MED_MESH_DRIVER::open()");
-  }
-  
-  void close() {
-    const char * LOC = "MED_MESH_DRIVER::close() " ;
-    BEGIN_OF(LOC);
-    med_int err = 0;
-    if ( _status == MED_OPENED) {
-      err=MED_FR::MEDfermer(_medIdt);
-      H5close();
-      if (err != 0)
-	throw MEDEXCEPTION( LOCALIZED(STRING(LOC)
-				      <<" Error when closing file !"
-				      )
-			    );
-      MESSAGE(LOC <<": _medIdt= " << _medIdt );
-      MESSAGE(LOC<<": MEDfermer : err    = " << err );
-      _status = MED_CLOSED;
-      _medIdt = MED_INVALID;
-    }
-    END_OF(LOC);
-  }
+
+  /*!
+    Constructor.
+  */
+  MED_MESH_DRIVER() ;
+  /*!
+    Constructor.
+  */
+  MED_MESH_DRIVER(const string & fileName,  
+		  MESH * ptrMesh, 
+		  med_mode_acces accessMode) ;
+  /*!
+    Copy constructor.
+  */
+  MED_MESH_DRIVER(const MED_MESH_DRIVER & driver) ;
+
+  /*!
+    Destructor.
+  */
+  virtual ~MED_MESH_DRIVER() ;
+
+  void open() throw (MEDEXCEPTION);
+  void close() throw (MEDEXCEPTION);
 
   virtual void write( void ) const = 0 ;
   virtual void read ( void ) = 0 ;
- 
+
+  /*!
+    Set the name of the MESH asked in file.
+
+    It could be different than the name of the MESH object.
+  */
   void   setMeshName(const string & meshName) ;
+  /*!
+    Get the name of the MESH asked in file.
+  */
   string getMeshName() const ;
 
+private:
+  virtual GENDRIVER * copy ( void ) const = 0 ;
+
 };
+
+/*!
+
+  Driver Med for MESH : Read only.
+
+  Implement read method.
+
+*/
 
 class MED_MESH_RDONLY_DRIVER : public virtual MED_MESH_DRIVER
 {
  
 public :
   
-  MED_MESH_RDONLY_DRIVER():MED_MESH_DRIVER() {};
-  
-  MED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh):
-    MED_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY) { 
-    MESSAGE("MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
-  }
-  
-  ~MED_MESH_RDONLY_DRIVER() { 
-    MESSAGE("MED_MESH_RDONLY_DRIVER::~MED_MESH_RDONLY_DRIVER() has been destroyed");
-  } 
+  /*!
+    Constructor.
+  */
+  MED_MESH_RDONLY_DRIVER() ;
+  /*!
+    Constructor.
+  */
+  MED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) ;
+  /*!
+    Copy constructor.
+  */
+  MED_MESH_RDONLY_DRIVER(const MED_MESH_RDONLY_DRIVER & driver) ;
+
+  /*!
+    Destructor.
+  */
+  virtual ~MED_MESH_RDONLY_DRIVER() ;
   
   // CREER UNE METHODE POUR LIRE LA LISTE DES MAILLAGES .....
+
+  /*!
+    Return a MEDEXCEPTION : it is the read-only driver.
+  */
+  void write( void ) const throw (MEDEXCEPTION);
+  /*!
+    Read MESH in the specified file.
+  */
+  void read ( void ) throw (MEDEXCEPTION);
+
+private:
   int getCOORDINATE();
   int getCONNECTIVITY();
   int getFAMILY();
-  void write( void ) const ;
-  void read ( void ) ;
-
-private:
   int getNodalConnectivity(CONNECTIVITY * Connectivity) ;
   int getDescendingConnectivity(CONNECTIVITY * Connectivity) ;
-  int getNodesFamiliesNumber() ;
+  int getNodesFamiliesNumber(int * MEDArrayNodeFamily) ;
   int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity) ;
   void updateFamily() ;
   void buildAllGroups(vector<GROUP*> & Groups, vector<FAMILY*> & Families) ;
-  
+  void getGRID ();
+
+  GENDRIVER * copy ( void ) const ;
+
 };
+
+/*!
+
+  Driver Med for MESH : Write only.
+
+  Implement write method.
+
+*/
 
 class MED_MESH_WRONLY_DRIVER : public virtual MED_MESH_DRIVER {
   
 public :
   
-  MED_MESH_WRONLY_DRIVER():MED_MESH_DRIVER() {}
-  
-  MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh):
-    MED_MESH_DRIVER(fileName,ptrMesh,MED_WRONLY)
-  {
-    MESSAGE("MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
-  };
+  /*!
+    Constructor.
+  */
+  MED_MESH_WRONLY_DRIVER() ;
+  /*!
+    Constructor.
+  */
+  MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) ;
+  /*!
+    Copy constructor.
+  */
+  MED_MESH_WRONLY_DRIVER(const MED_MESH_WRONLY_DRIVER & driver) ;
 
-  ~MED_MESH_WRONLY_DRIVER() {  
-    MESSAGE("MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
-  }
+  /*!
+    Destructor.
+  */
+  virtual ~MED_MESH_WRONLY_DRIVER() ;
 
-  void write( void ) const ;
-  void read ( void ) ;
+  /*!
+    Write MESH in the specified file.
+  */
+  void write( void ) const throw (MEDEXCEPTION);
+  /*!
+    Return a MEDEXCEPTION : it is the write-only driver.
+  */
+  void read ( void ) throw (MEDEXCEPTION);
 
-  int writeCoordinates    ()                         const;
-  int writeConnectivities (medEntityMesh entity)     const;
-  int writeFamilyNumbers  ()                         const;
+private:
+  int writeCoordinates    ()                           const;
+  int writeConnectivities (medEntityMesh entity)       const;
+  int writeFamilyNumbers  ()                           const;
   int writeFamilies       (vector<FAMILY*> & families) const;
+  int writeGRID() const;
+
+  GENDRIVER * copy ( void ) const ;
 };
 
+
+/*!
+
+  Driver Med for MESH : Read write.
+  - Use read method from MED_MESH_RDONLY_DRIVER
+  - Use write method from MED_MESH_WRONLY_DRIVER
+
+*/
 
 class MED_MESH_RDWR_DRIVER : public MED_MESH_RDONLY_DRIVER, public MED_MESH_WRONLY_DRIVER {
 
 public :
 
-  MED_MESH_RDWR_DRIVER():MED_MESH_DRIVER() {}
+  /*!
+    Constructor.
+  */
+  MED_MESH_RDWR_DRIVER() ;
+  /*!
+    Constructor.
+  */
+  MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) ;
+  /*!
+    Copy constructor.
+  */
+  MED_MESH_RDWR_DRIVER(const MED_MESH_RDWR_DRIVER & driver) ;
 
-  MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh):
-    MED_MESH_DRIVER(fileName,ptrMesh,MED_RDWR)
-  {
-    MESSAGE("MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
-  };
+  /*!
+    Destructor.
+  */
+  ~MED_MESH_RDWR_DRIVER() ;
 
-  ~MED_MESH_RDWR_DRIVER() {
-    MESSAGE("MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
-  } 
-  
-  void write(void) const ;
-  void read (void)       ;
+  /*!
+    Write MESH in the specified file.
+  */
+  void write(void) const throw (MEDEXCEPTION);
+  /*!
+    Read MESH in the specified file.
+  */
+  void read (void) throw (MEDEXCEPTION);
+
+private:
+  GENDRIVER * copy(void) const ;
+
 };
-
 
 #endif /* MED_MESH_DRIVER_HXX */

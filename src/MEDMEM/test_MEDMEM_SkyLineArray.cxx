@@ -1,3 +1,30 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : test_MEDMEM_SkyLineArray.cxx
+//  Module : MED
+
+using namespace std;
 #include "utilities.h"
 #include "MEDMEM_SkyLineArray.hxx"
 
@@ -5,14 +32,13 @@ int main (int argc, char ** argv) {
 
   int NumberOfCell = 3 ; // 1 triangle,1 quadrangle,1 triangle
   int Size = 10 ; // 10 nodes
-  MEDSKYLINEARRAY * myArray = new MEDSKYLINEARRAY(NumberOfCell,Size) ;
 
-  int * index = myArray->getIndex() ;
+  int * index = new int[NumberOfCell+1] ;
   index[0]=1;
   index[1]=4;
   index[2]=8;
   index[3]=11;
-  int * value = myArray->getValue() ;
+  int * value = new int[Size] ;
   value[0]=1; // first
   value[1]=2;
   value[2]=5;
@@ -25,36 +51,41 @@ int main (int argc, char ** argv) {
   value[9]=6;
   //  value[]=; // forth
 
-  MESSAGE( "Show all 1 :" );
+  MEDSKYLINEARRAY * myArray = new MEDSKYLINEARRAY(NumberOfCell,Size,index,value) ;
+
+  cout << "Show all 1 :" << endl ;
   for (int i=1; i<NumberOfCell+1 ; i++) {
-    int * cell = myArray->getI(i) ;
+    const int * cell = myArray->getI(i) ;
     int numberof = myArray->getNumberOfI(i) ;
-    MESSAGE( " - " );
+    cout << " - " ;
     for (int j=0;j<numberof;j++)
-      MESSAGE( cell[j] << " " );
-    MESSAGE("");
+      cout << cell[j] << " " ;
+    cout << endl ;
   }
-  MESSAGE( "Show all 2 :" );
+  cout << "Show all 2 :" << endl ;
   for (int i=1; i<NumberOfCell+1 ; i++) {
-    MESSAGE( " - " );
+    cout << " - " ;
     int numberof = myArray->getNumberOfI(i) ;
     for (int j=1;j<numberof+1;j++)
-      MESSAGE( myArray->getIJ(i,j) << " " );
-    MESSAGE("");
+      cout << myArray->getIJ(i,j) << " " ;
+    cout << endl ;
   }
 
   MEDSKYLINEARRAY * myArray2 = new MEDSKYLINEARRAY(*myArray) ;
   delete myArray ;
   
-  MESSAGE( "Show all 3 :" );
-  for (int i=1; i<NumberOfCell+1 ; i++) {
-    int * cell = myArray2->getI(i) ;
-    int numberof = myArray2->getNumberOfI(i) ;
-    MESSAGE( " - " );
-    for (int j=0;j<numberof;j++)
-      MESSAGE( cell[j] << " " );
-    MESSAGE("");
+  cout << "Show all 3 :" << endl ;
+  const int * index2 = myArray2->getIndex() ;
+  for (int i=1; i<=NumberOfCell ; i++) {
+    cout << " - " ;
+    for (int j=index2[i-1];j<index2[i];j++)
+      cout << myArray2->getIndexValue(j) << " " ;
+    cout << endl ;
   }
+
+  delete myArray2 ;
+  delete[] index ;
+  delete[] value ;
 
   return 0 ;
 }

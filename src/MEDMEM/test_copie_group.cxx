@@ -1,3 +1,29 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : test_copie_group.cxx
+//  Module : MED
+
 using namespace std;
 #include<string>
 
@@ -16,7 +42,7 @@ using namespace std;
 #include "MEDMEM_define.hxx"
 
 
-void affiche_support(SUPPORT * mySupport) 
+void affiche_support(const SUPPORT * mySupport) 
 {
   cout << "  - Name : "<<mySupport->getName().c_str()<<endl ;
   cout << "  - Description : "<<mySupport->getDescription().c_str()<<endl ;
@@ -25,11 +51,11 @@ void affiche_support(SUPPORT * mySupport)
   if (!(mySupport->isOnAllElements())) {
     int NumberOfTypes = mySupport->getNumberOfTypes() ;
     cout<<"  - NumberOfTypes : "<<NumberOfTypes<<endl;
-    medGeometryElement * Types = mySupport->getTypes() ;
+    const medGeometryElement * Types = mySupport->getTypes() ;
     for (int j=0;j<NumberOfTypes;j++) {
       cout<<"    * Type "<<Types[j]<<" : ";
       int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
-      int * Number = mySupport->getNumber(Types[j]) ;
+      const int * Number = mySupport->getNumber(Types[j]) ;
       for (int k=0; k<NumberOfElements;k++)
 	cout << Number[k] << " ";
       cout << endl ;
@@ -39,7 +65,7 @@ void affiche_support(SUPPORT * mySupport)
 }
 
 
-void affiche_famille(FAMILY * myFamily)
+void affiche_famille(const FAMILY * myFamily)
 {
     affiche_support(myFamily);
     cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
@@ -53,7 +79,7 @@ void affiche_famille(FAMILY * myFamily)
       cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
 }
 
-void affiche_groupe(GROUP * myGroup) 
+void affiche_groupe(const GROUP * myGroup) 
 {
     affiche_support(myGroup);
     int NumberOfFamillies = myGroup->getNumberOfFamilies() ;
@@ -66,7 +92,7 @@ int main (int argc, char ** argv) {
 
   int read;
 
-  if (argc !=3) {
+  if (argc <3) { // after 3, ignored !
     cerr << "Usage : " << argv[0] 
 	 << " filename meshname" << endl << endl;
     exit(-1);
@@ -83,13 +109,18 @@ int main (int argc, char ** argv) {
   myMeshDriver.read() ;
   myMeshDriver.close() ;
 
-  GROUP * myGroup = myMesh->getGroup(MED_NODE,1);
+  const GROUP * myGroup = myMesh->getGroup(MED_NODE,1);
   cout << "Show Group :"<<endl ;
   affiche_groupe(myGroup);
   GROUP * myGroup2 = new GROUP(* myGroup);
-  delete myGroup;
+  //delete myGroup; // no because in mesh !!
   affiche_groupe(myGroup2);
+  GROUP * myGroup3 = new GROUP(* myGroup2);
   delete myGroup2;
+  affiche_groupe(myGroup3);
+  delete myGroup3;
+
+  delete myMesh ;
 
   return 0;
 }

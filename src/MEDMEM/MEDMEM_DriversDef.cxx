@@ -1,10 +1,38 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : MEDMEM_DriversDef.cxx
+//  Module : MED
+
+using namespace std;
 #include "MEDMEM_DriversDef.hxx"
 
-namespace MED_FR {
+namespace MED_FR 
+{
 
 // Returns the (string) name of the geometry of 
 // an element given by a med_geometrie_element value
-GEO_NAME::GEO_NAME () : map<int,string>()
+GEO_NAME::GEO_NAME() : map<int,string>()
 {
   map<int,string> &table  = (map<int,string>&)*this ;
   table[(int)0 ] = "MED_NONE" ;
@@ -37,7 +65,7 @@ string & GEO_NAME::operator[]( const med_geometrie_element &c ) const
 // Returns the (string) name of the type of 
 // an entity given by a med_entite_maillage value
 
-ENT_NAME:: ENT_NAME () : map<int,string>()
+ENT_NAME::ENT_NAME() : map<int,string>()
 {
   map<int,string> &table = (map<int,string>&)*this ;
   table[(int)MED_MAILLE ] = "MED_MAILLE";

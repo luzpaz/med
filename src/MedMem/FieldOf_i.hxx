@@ -1,11 +1,30 @@
-//=============================================================================
-// File      : FieldOf_i.hxx
-// Project   : SALOME
-// Author    : EDF
-// Copyright : EDF 2002
-// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/FieldOf_i.hxx
-//=============================================================================
-
+//  MED MedMem : MED idl descriptions implementation based on the classes of MEDMEM
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : FieldOf_i.hxx
+//  Author : EDF
+//  Module : MED
+//  $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/FieldOf_i.hxx
 
 #ifndef MED_FIELDOF_I_HXX_
 #define MED_FIELDOF_I_HXX_
@@ -402,7 +421,7 @@ throw (SALOME::SALOME_Exception)
         {
 		int nbcom = _fieldTptr->getNumberOfComponents();
 		myseq->length(nbcom);
-		string * namecom=_fieldTptr->getComponentsNames();
+		const string * namecom=_fieldTptr->getComponentsNames();
 		for (int i=0;i<nbcom;i++)
                 {
                         myseq[i]=CORBA::string_dup(namecom[i].c_str());
@@ -432,7 +451,7 @@ throw (SALOME::SALOME_Exception)
         {
 		int nbcom = _fieldTptr->getNumberOfComponents();
 		myseq->length(nbcom);
-		string * unitcom=_fieldTptr->getMEDComponentsUnits();
+		const string * unitcom=_fieldTptr->getMEDComponentsUnits();
 		for (int i=0;i<nbcom;i++)
                 {
                         myseq[i]=CORBA::string_dup(unitcom[i].c_str());
