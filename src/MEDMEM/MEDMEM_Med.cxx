@@ -122,18 +122,15 @@ MED::~MED()
     if ( (*currentField).first != NULL) {
       // cast in right type to delete it !
       switch ((*currentField).first->getValueType()) {
-      case MED_INT32 :
-        // mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	//delete (FIELD<int>*) (*currentField).first ;
+      case MED_INT32 : 
+	delete (FIELD<int>*) (*currentField).first ;
 	break ;
       case MED_REEL64 :
-        // mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	//delete (FIELD<double>*) (*currentField).first ;
+	delete (FIELD<double>*) (*currentField).first ;
 	break ;
       default : 
 	INFOS("Field has type different of int or double, could not destroy its values array !") ;
-        // mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	//delete (*currentField).first;
+	delete (*currentField).first;
       }
     }
   }
@@ -141,8 +138,7 @@ MED::~MED()
   for ( itSupportOnMesh=_support.begin();itSupportOnMesh != _support.end(); itSupportOnMesh++ ) {
     map<MED_FR::med_entite_maillage,SUPPORT *>::iterator itSupport ;
     for ( itSupport=(*itSupportOnMesh).second.begin();itSupport!=(*itSupportOnMesh).second.end();itSupport++)
-        ;// mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	//delete (*itSupport).second ;
+	delete (*itSupport).second ;
   }
 
   //  map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
@@ -150,11 +146,9 @@ MED::~MED()
     if ( (*currentMesh).second != NULL)
       {
 	if (!((*currentMesh).second)->getIsAGrid())
-          ;// mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	  //delete (*currentMesh).second;
+	  delete (*currentMesh).second;
 	else
-          ;// mpv: such recursive destructors call is problematic for current ALLIANCES algorithms 
-	  //delete (GRID *) (*currentMesh).second;
+	  delete (GRID *) (*currentMesh).second;
       }
   }
 

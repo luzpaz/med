@@ -31,7 +31,7 @@ import SALOME
 import os
 
 filePath=os.getenv("SALOME_BUILD")
-filePath=filePath+"/../SALOME_ROOT/data/"
+filePath=filePath+"/data/"
 
 med=salome.lcc.FindOrLoadComponent("FactoryServer", "Med")
 

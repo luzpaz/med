@@ -250,36 +250,28 @@ MESH::~MESH() {
   int size ;
   size = _familyNode.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _familyNode[i] ;
+    delete _familyNode[i] ;
   size = _familyCell.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _familyCell[i] ;
+    delete _familyCell[i] ;
   size = _familyFace.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _familyFace[i] ;
+    delete _familyFace[i] ;
   size = _familyEdge.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _familyEdge[i] ;
+    delete _familyEdge[i] ;
   size = _groupNode.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _groupNode[i] ;
+    delete _groupNode[i] ;
   size = _groupCell.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _groupCell[i] ;
+    delete _groupCell[i] ;
   size = _groupFace.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _groupFace[i] ;
+    delete _groupFace[i] ;
   size = _groupEdge.size() ;
   for (int i=0;i<size;i++)
-    ;// mpv such destructors call is problemmatic for ALLIANCES algorithms
-    //delete _groupEdge[i] ;
+    delete _groupEdge[i] ;
 
   MESSAGE("In this object MESH there is(are) " << _drivers.size() << " driver(s)");
 

@@ -87,22 +87,43 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<med_geometrie_element> >()
   
   // Initialize the value associated with the ROUGE_ key ( use the private operator = )
   {
-    const med_geometrie_element T[] =  { MED_POINT1,  MED_SEG2,  MED_SEG3,   MED_TRIA3,
-                                         MED_TRIA6,   MED_QUAD4, MED_QUAD8,  MED_TETRA4,
-                                         MED_TETRA10, MED_HEXA8, MED_HEXA20, MED_PENTA6,
-                                         MED_PENTA15,MED_PYRA5, MED_PYRA13 };
+    const med_geometrie_element T[] =  {
+      MED_POINT1,
+      MED_SEG2,
+      MED_SEG3,
+      MED_TRIA3,
+      MED_QUAD4,
+      MED_TRIA6,
+      MED_QUAD8,
+      MED_TETRA4,
+      MED_PYRA5,
+      MED_PENTA6,
+      MED_HEXA8,
+      MED_TETRA10,
+      MED_PYRA13,
+      MED_PENTA15,
+      MED_HEXA20};
+
     static const list<med_geometrie_element> geomList(T,T+sizeof(T)/sizeof(med_geometrie_element));   
     (*this)[MED_MAILLE] = geomList;
   }
   
   {
-    const med_geometrie_element T[] =  { MED_TRIA3,MED_TRIA6, MED_QUAD4,MED_QUAD8 };
+    const med_geometrie_element T[] =  {
+      MED_TRIA3,
+      MED_QUAD4,
+      MED_TRIA6,
+      MED_QUAD8};
+
     static const list<med_geometrie_element> geomList(T,T+sizeof(T)/sizeof(med_geometrie_element));   
     (*this)[MED_FACE] = geomList; 
   }
   
   {
-    const med_geometrie_element T[] =  { MED_SEG2,MED_SEG3 };
+    const med_geometrie_element T[] =  {
+      MED_SEG2,
+      MED_SEG3 };
+
     static const list<med_geometrie_element> geomList(T,T+sizeof(T)/sizeof(med_geometrie_element));   
     (*this)[MED_ARETE] = geomList; 
   }

@@ -103,8 +103,9 @@ TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray
 
 # testUCellModel -> a revoir car l'API a changee (plus de vector)
 
-CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) -I$(inc_builddir) -I$(srcdir) -I.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -L$(top_builddir)/lib -lstdc++ -lSalomeLoggerServer
+CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES)
+CXXFLAGS=-g -ftemplate-depth-42 $(CORBA_CXXFLAGS)
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer
 
 # build create_mesh :
 bin: create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_mesh_c3h8q4_wrong create_mesh_c2q4s2_wrong create_grid

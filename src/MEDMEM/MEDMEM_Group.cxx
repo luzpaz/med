@@ -83,9 +83,10 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   if ((numberOfFamilies==1)&(isOnAllElts))
     {
       _numberOfFamilies = numberOfFamilies;
-      _isOnAllElts = false ;
+      _isOnAllElts = isOnAllElts ;
       _family.resize(_numberOfFamilies) ;
       _family[0] = myFamily;
+      update() ;
       return;
     }
   else if ((!(numberOfFamilies==1))&(isOnAllElts))

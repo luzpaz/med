@@ -526,9 +526,9 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
 		  // else nothing to do
 
 		} else {// else we are on border and we do nothing !!!!!!!!
-		  INFOS("WARNING,WARNING,WARNING,WARNING,WARNING,WARNING");
-		  INFOS(LOC<<" Boudary FACE "<<iOldFace+1<<" are wrong oriented !");
-		  INFOS("WARNING,WARNING,WARNING,WARNING,WARNING,WARNING");
+		  // INFOS("WARNING,WARNING,WARNING,WARNING,WARNING,WARNING");
+		  // INFOS(LOC<<" Boudary FACE "<<iOldFace+1<<" are wrong oriented !");
+		  // INFOS("WARNING,WARNING,WARNING,WARNING,WARNING,WARNING");
 		}
 	      }
 	
