@@ -473,7 +473,8 @@ throw (SALOME::SALOME_Exception)
         SALOMEDS::AttributeIOR_var     aIOR;
 
         // Create SComponent labelled 'Med'
-        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
+	//        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
+        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
         if ( CORBA::is_nil(medfather) )
 	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
 
