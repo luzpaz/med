@@ -3,6 +3,7 @@
 
 #include "FIELDClient.hxx"
 
+namespace MEDMEM{
 class FIELDINTClient :
   public FIELDClient<int,SALOME_MED::FIELDINT>
 {
@@ -11,5 +12,5 @@ public:
 		 MEDMEM::SUPPORT * S = NULL);
   ~FIELDINTClient();
 };
-
+}
 #endif

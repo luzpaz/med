@@ -8,6 +8,8 @@
 #include "ReceiverFactory.hxx"
 #include CORBA_CLIENT_HEADER(MED)
 
+namespace MEDMEM{
+    
 //exemple _FIELDClient<double,FIELDDOUBLE_ptr>
 //_FIELDClient<int,FIELDINT_ptr>
 template<class T1,class T2>
@@ -22,7 +24,7 @@ public:
 private:
   void fillCopy();
 };
-
 #include "FIELDClient.cxx"
 
+}
 #endif
