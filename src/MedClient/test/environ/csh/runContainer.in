@@ -4,20 +4,20 @@ set CONTAINER_NAME=$1
 
 set PYTHON_VERSION=python@PYTHON_VERSION@
 
-# you must define SALOME_ROOT_DIR and SALOME_SITE_DIR (if you need it)
+# you must define KERNEL_ROOT_DIR and MED_ROOT_DIR (if you need it)
 
-setenv SALOME_ROOT_DIR @prefix@
+setenv KERNEL_ROOT_DIR @prefix@
 
-if ( ${?SALOME_ROOT_DIR} ) then
-  setenv PATH ${SALOME_ROOT_DIR}/bin:${SALOME_ROOT_DIR}/Tests:${PATH}
-  setenv LD_LIBRARY_PATH ${SALOME_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
-  setenv PYTHONPATH ${SALOME_ROOT_DIR}/lib:${SALOME_ROOT_DIR}/lib/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
+if ( ${?KERNEL_ROOT_DIR} ) then
+  setenv PATH ${KERNEL_ROOT_DIR}/bin:${KERNEL_ROOT_DIR}/Tests:${PATH}
+  setenv LD_LIBRARY_PATH ${KERNEL_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
+  setenv PYTHONPATH ${KERNEL_ROOT_DIR}/lib:${KERNEL_ROOT_DIR}/lib/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
 endif
 
-if ( ${?SALOME_SITE_DIR} ) then
-  setenv PATH ${SALOME_SITE_DIR}/bin:${PATH}
-  setenv LD_LIBRARY_PATH ${SALOME_SITE_DIR}/lib:${LD_LIBRARY_PATH}
-  setenv PYTHONPATH ${SALOME_SITE_DIR}/lib:${SALOME_SITE_DIR}/lib/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
+if ( ${?MED_ROOT_DIR} ) then
+  setenv PATH ${MED_ROOT_DIR}/bin:${PATH}
+  setenv LD_LIBRARY_PATH ${MED_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
+  setenv PYTHONPATH ${MED_ROOT_DIR}/lib:${MED_ROOT_DIR}/lib/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
 endif
 
 if ( -d ${HOME}/.salome/bin ) then
@@ -50,8 +50,8 @@ set CONTAINER_TYPE = `echo ${CONTAINER_NAME} | grep 'Py$'`
 echo ${?CONTAINER_TYPE}
 
 if ( ${?CONTAINER_TYPE} ) then
-	( ${SALOME_ROOT_DIR}/bin/SALOME_ContainerPy.py ${CONTAINER_NAME} &)
+	( ${KERNEL_ROOT_DIR}/bin/SALOME_ContainerPy.py ${CONTAINER_NAME} &)
 else
-	( ${SALOME_ROOT_DIR}/bin/SALOME_Container ${CONTAINER_NAME} & )
+	( ${KERNEL_ROOT_DIR}/bin/SALOME_Container ${CONTAINER_NAME} & )
 endif
 
