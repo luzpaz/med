@@ -41,7 +41,7 @@ class SUPPORTClient : public SUPPORT {
 class FIELDDOUBLEClient : public FIELDDOUBLE {
 public:
   FIELDDOUBLEClient(SALOME_MED::FIELDDOUBLE_ptr ptrCorba,
-		    SUPPORT * S = NULL);
+		    MEDMEM::SUPPORT * S = NULL);
 
   ~FIELDDOUBLEClient();
 };
@@ -49,7 +49,7 @@ public:
 class FIELDINTClient : public FIELDINT {
 public:
   FIELDINTClient(SALOME_MED::FIELDINT_ptr ptrCorba,
-		 SUPPORT * S = NULL);
+		 MEDMEM::SUPPORT * S = NULL);
 
   ~FIELDINTClient();
 };

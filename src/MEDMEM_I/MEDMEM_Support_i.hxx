@@ -27,7 +27,7 @@ class SUPPORT_i: public POA_SALOME_MED::SUPPORT,
 		public SALOMEMultiComm
 {
 public :
-    static map < int,::MEDMEM::SUPPORT *> supportMap;
+    static std::map < int,::MEDMEM::SUPPORT *> supportMap;
 private :
     static int supportIndex;
 
@@ -36,7 +36,7 @@ protected :
      // C++ object containing values
      const ::MEDMEM::SUPPORT * const _support;
      const int   _corbaIndex ;
-     string      _supportId ;
+     std::string      _supportId ;
 
 public:
 
