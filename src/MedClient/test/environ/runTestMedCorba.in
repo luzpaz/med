@@ -1,0 +1,22 @@
+#! /bin/bash
+ 
+PYTHON_VERSION=python@PYTHON_VERSION@                                                                 
+
+if test -n $SALOME_ROOT_DIR
+then
+  export PATH=$SALOME_ROOT_DIR/bin:${PATH}
+  export LD_LIBRARY_PATH=$SALOME_ROOT_DIR/lib:${LD_LIBRARY_PATH}
+  export PYTHONPATH=${SALOME_ROOT_DIR}/lib:${SALOME_ROOT_DIR}/lib/$PYTHON_VERSION/site-packages/salome:${SALOME_ROOT_DIR}/share/salome/resources:${PYTHONPATH}
+  # add bin, because some script are in (SALOME_SWIG) !!!!
+  export PYTHONPATH=${SALOME_ROOT_DIR}/bin:${PYTHONPATH}
+fi
+if test -n $SALOME_SITE_DIR
+then
+  export PATH=$SALOME_SITE_DIR/bin:${PATH}
+  export LD_LIBRARY_PATH=$SALOME_SITE_DIR/lib:${LD_LIBRARY_PATH}
+  export PYTHONPATH=${SALOME_SITE_DIR}/lib:${SALOME_SITE_DIR}/lib/$PYTHON_VERSION/site-packages/salome:${SALOME_SITE_DIR}/share/salome/resources:${PYTHONPATH}
+fi
+
+mkdir -p resultats
+((python $1 2>&1 1>&3 | tee resultats/$1_err) 3>&1 1>&2 | tee resultats/$1_out ) 2>&1
+      

@@ -1,0 +1,14 @@
+#include "SALOME_Component.idl"
+#include "MED.idl"
+
+module Engines
+{
+ 
+  interface Compo1Py : Component
+  {
+    void Initialise(in string medFile);
+    SALOME_MED::MESH Calcul1();
+    SALOME_MED::SUPPORT Calcul2();
+  };
+ 
+};

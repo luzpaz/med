@@ -1,0 +1,32 @@
+#
+[ -f ~/.Xresources ] && xrdb ~/.Xresources
+
+setenv SALOME_BIN_TESTS ${SALOME_ROOT_DIR}/MED/src/MedClient/test/environ
+
+[ -f ${SALOME_BIN_TESTS}/killEnviron ] && ${SALOME_BIN_TESTS}/killEnviron
+
+
+set TERMINAL="konsole --caption"
+set TERMINAL="xterm -vb -sl 1000 -title"
+
+\rm -f ${SALOME_BIN_TESTS}/killEnviron
+touch  ${SALOME_BIN_TESTS}/killEnviron
+chmod u+x ${SALOME_BIN_TESTS}/killEnviron
+
+set TITRE1="Session"
+set TITRE2="Container"
+set TITRE3="Essais"
+
+setenv PATH .:${PATH}
+
+echo "#! /bin/sh" >> ${SALOME_BIN_TESTS}/killEnviron
+${TERMINAL} ${TITRE1} -e ${SALOME_BIN_TESTS}/csh/init1 &
+echo "kill -9 $! >& /dev/null" >> ${SALOME_BIN_TESTS}/killEnviron
+${TERMINAL} ${TITRE2} -e ${SALOME_BIN_TESTS}/csh/init2 &
+echo "kill -9 $! >& /dev/null" >> ${SALOME_BIN_TESTS}/killEnviron
+${TERMINAL} ${TITRE3} -e ${SALOME_BIN_TESTS}/csh/init3 &
+echo "kill -9 $! >& /dev/null" >> ${SALOME_BIN_TESTS}/killEnviron
+
+echo "cd ${SALOME_ROOT_DIR}/bin ; ./allkill ; killall python >& /dev/null" >> ${SALOME_BIN_TESTS}/killEnviron
+echo "\\rm -f ${SALOME_BIN_TESTS}/killEnviron" >> ${SALOME_BIN_TESTS}/killEnviron
+chmod u+x ${SALOME_BIN_TESTS}/killEnviron

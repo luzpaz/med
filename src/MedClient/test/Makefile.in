@@ -1,3 +1,5 @@
+#  MED MedClient : tool to transfer MED CORBA from server producer of MED object to a client using those MED object
+#
 #  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 #  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
 # 
@@ -20,17 +22,18 @@
 #
 #
 #  File   : Makefile.in
-#  Author : Paul RASCLE, EDF
+#  Author : Nadir BOUHAMOU (CEA/DEN/DM2S/SFME/LGLS)
 #  Module : MED
-#  $Header$
-
+# source path
 top_srcdir=@top_srcdir@
-top_builddir=..
+top_builddir=../../..
 srcdir=@srcdir@
-VPATH=.:@srcdir@
+VPATH=.:@srcdir@:@srcdir@/resources
 
 @COMMENCE@
 
-SUBDIRS = MEDMEM MEDMEM_SWIG MedMem MED MEDGUI MedCorba_Swig MED_SWIG MedClient
+RESOURCES_FILES = pointe.med carre_en_quad4_seg2.med maill.0.med test_hydro_darcy1a_out.med
+
+SUBDIRS = environ test1 test2
 
 @MODULE@

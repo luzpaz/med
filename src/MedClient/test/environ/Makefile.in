@@ -1,3 +1,5 @@
+#  MED MedClient : tool to transfer MED CORBA from server producer of MED object to a client using those MED object
+#
 #  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 #  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
 # 
@@ -20,17 +22,52 @@
 #
 #
 #  File   : Makefile.in
-#  Author : Paul RASCLE, EDF
+#  Author : Nadir BOUHAMOU (CEA/DEN/DM2S/SFME/LGLS)
 #  Module : MED
-#  $Header$
-
+# source path
 top_srcdir=@top_srcdir@
-top_builddir=..
+top_builddir=../../../..
 srcdir=@srcdir@
 VPATH=.:@srcdir@
 
-@COMMENCE@
+BIN=	runEnvironTests 
 
-SUBDIRS = MEDMEM MEDMEM_SWIG MedMem MED MEDGUI MedCorba_Swig MED_SWIG MedClient
+all:
+	$(MAKE) inc
+	$(MAKE) depend_idl
+	$(MAKE) depend
+	$(MAKE) lib
+	$(MAKE) bin
+	$(MAKE) resources
 
-@MODULE@
+depend depend_idl clean_dep lib idl resources:
+
+inc: ${BIN} Makefile 
+
+
+bin:
+	chmod u+x ${BIN}
+	cp -f runTestMedCorba ${top_builddir}/bin
+	chmod +x ${top_builddir}/bin/runTestMedCorba
+	chmod +x runContainer stopContainer runEnvironTests
+	chmod +x csh/*
+
+install:
+	mkdir -p @prefix@/Tests/environ
+	cp -rf ${BIN} csh @prefix@/Tests/environ
+	cd @prefix@/Tests/environ ; chmod u+x ${BIN}
+	cp -f ${top_builddir}/bin/runTestMedCorba @prefix@/bin
+	chmod +x @prefix@/bin/runTestMedCorba
+
+./%: @srcdir@/%.in
+	cd $(top_builddir) ; \
+	./config.status 
+
+$(top_builddir)/config.status: $(top_srcdir)/configure
+	cd $(top_builddir) ; ./config.status --recheck
+
+clean:
+	\rm -f dummy *~ */*~
+
+cleandep:
+

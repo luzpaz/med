@@ -1,0 +1,2 @@
+cd ${SALOME_ROOT_DIR}/bin
+csh

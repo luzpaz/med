@@ -1,0 +1,83 @@
+#! /bin/sh
+
+EXEC_DIR=`echo $0 | sed -e "s,[^/]*$,,;s,/$,,;s,^$,.,"`
+
+removeTree() {
+
+   local list
+   local noeud=$1
+
+   case $noeud in
+   *.dir/ | *.dir)
+        j=`echo $noeud | sed -e 's,^/,,' -e 's,/$,,' -`
+        list=`nameclt list $j 2> /dev/null`
+        for i in "$list"
+        do 
+            [ -n "$i" ] && removeTree "$j/$i"
+        done
+	nameclt remove_context $j 2> /dev/null
+        ;;
+   *)
+	nameclt unbind $noeud 2> /dev/null
+	;;
+   esac
+
+}
+
+CONTAINER_NAME="$1"
+if test -z ${CONTAINER_NAME=}
+then
+	echo "Usage : $0 <container name>"
+	exit -1	
+fi
+
+
+PYTHON_VERSION=python2.2
+
+# you must define SALOME_ROOT_DIR and SALOME_SITE_DIR (if you need it)
+
+if test -n ${SALOME_ROOT_DIR}
+then
+  export PATH=${SALOME_ROOT_DIR}/bin:${PATH}
+  export LD_LIBRARY_PATH=${SALOME_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
+  export PYTHONPATH=${SALOME_ROOT_DIR}/lib:${SALOME_ROOT_DIR}/lib/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
+fi
+if test -n ${SALOME_SITE_DIR}
+then
+  export PATH=${SALOME_SITE_DIR}/bin:${PATH}
+  export LD_LIBRARY_PATH=${SALOME_SITE_DIR}/lib:${LD_LIBRARY_PATH}
+  export PYTHONPATH=${SALOME_SITE_DIR}/lib:${SALOME_SITE_DIR}/lib/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
+fi
+
+if test -d ${HOME}/.salome/bin
+then
+  export PATH=${HOME}/.salome/bin:${PATH}
+fi
+if test -d ${HOME}/.salome/lib
+then
+  export LD_LIBRARY_PATH=${HOME}/.salome/lib:${LD_LIBRARY_PATH}
+fi
+
+export tmp=/usr/tmp
+
+NODE=Containers.dir/${HOSTNAME}.dir/${CONTAINER_NAME}
+removeTree ${NODE}.object
+removeTree ${NODE}.dir/
+
+
+PROCESS=`ps --width 200 -f -u ${USER} | \
+	 grep -w ${CONTAINER_NAME} | \
+	 grep SALOME_Container |
+	 awk '{print \$2}'`
+
+
+if test -n "${PROCESS}"
+then
+	kill -9 `echo ${PROCESS}` >& /dev/null
+	echo
+	echo "     Stop container ${CONTAINER_NAME}"
+	echo
+	exit 12
+fi
+
+exit 11

@@ -1,0 +1,17 @@
+#
+
+set xTest = 1
+test "$xTest" = 1 && goto CSH
+
+echo BASH
+`dirname $0`/bash/stopContainer $1
+
+exit 0
+
+CSH:
+
+echo CSH
+set dir=`expr "x$0" : 'x\(.*\)/[^/]*' \| '.'`
+${dir}/csh/stopContainer $1
+
+

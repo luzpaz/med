@@ -39,49 +39,44 @@ module SALOME_MED {
   interface MESH;
   interface SUPPORT;
 
-  enum medGeometryElement {
-    MED_NONE,
-    MED_POINT1,
-    MED_SEG2,
-    MED_SEG3,
-    MED_TRIA3,
-    MED_QUAD4,
-    MED_TRIA6,
-    MED_QUAD8,
-    MED_TETRA4,
-    MED_PYRA5,
-    MED_PENTA6,
-    MED_HEXA8,
-    MED_TETRA10,
-    MED_PYRA13,
-    MED_PENTA15,
-    MED_HEXA20,
-    MED_ALL_ELEMENTS
-  };
+  typedef long medGeometryElement;
+  const medGeometryElement MED_NONE = 0;
+  const medGeometryElement MED_POINT1 = 1;
+  const medGeometryElement MED_SEG2 = 102;
+  const medGeometryElement MED_SEG3 = 103;
+  const medGeometryElement MED_TRIA3 = 203;
+  const medGeometryElement MED_QUAD4 = 204;
+  const medGeometryElement MED_TRIA6 = 206;
+  const medGeometryElement MED_QUAD8 = 208;
+  const medGeometryElement MED_TETRA4 = 304;
+  const medGeometryElement MED_PYRA5 = 305;
+  const medGeometryElement MED_PENTA6 = 306;
+  const medGeometryElement MED_HEXA8 = 308;
+  const medGeometryElement MED_TETRA10 = 310;
+  const medGeometryElement MED_PYRA13 = 313;
+  const medGeometryElement MED_PENTA15 = 315;
+  const medGeometryElement MED_HEXA20 = 320;
+  const medGeometryElement MED_ALL_ELEMENTS = 999;
 
-  enum medEntityMesh {
-    MED_CELL,
-    MED_FACE,
-    MED_EDGE,
-    MED_NODE,
-    MED_ALL_ENTITIES
-  };
+  typedef long medEntityMesh;
+  const medEntityMesh MED_CELL = 0;
+  const medEntityMesh MED_FACE = 1;
+  const medEntityMesh MED_EDGE = 2;
+  const medEntityMesh MED_NODE = 3;
+  const medEntityMesh MED_ALL_ENTITIES = 4;
+  
+  typedef long medModeSwitch;
+  const medModeSwitch MED_FULL_INTERLACE = 0;
+  const medModeSwitch MED_NO_INTERLACE = 1;
 
-  enum medModeSwitch {
-    MED_FULL_INTERLACE,
-    MED_NO_INTERLACE
-  };
+  typedef long medConnectivity;
+  const medConnectivity MED_NODAL = 0;
+  const medConnectivity MED_DESCENDING = 1;
 
-  enum medConnectivity {
-    MED_NODAL,
-    MED_DESCENDING
-  };
-
-  enum medDriverTypes {
-    MED_DRIVER , 
-    VTK_DRIVER , 
-    NO_DRIVER  
-  };
+  typedef long medDriverTypes;
+  const medDriverTypes MED_DRIVER  = 0;
+  const medDriverTypes VTK_DRIVER = 1; 
+  const medDriverTypes NO_DRIVER = 2; 
 
   /*!
     An array of medGeometryElement
@@ -135,7 +130,7 @@ module SALOME_MED {
       - "CYLINDRICAL"
       - "SPHERICAL"
     */
-    string getCoordinateSystem() raises (SALOME::SALOME_Exception); 
+    string getCoordinatesSystem() raises (SALOME::SALOME_Exception); 
 
     /*!
       Returns the number of nodes defined in mesh.
@@ -456,7 +451,10 @@ module SALOME_MED {
     /*!
       If isOnAllElements is false, returns index of element number.
       
-      Use it with getNumber(MED_ALL_ELEMENTS). 
+      Use it with getNumber(MED_ALL_ELEMENTS).
+      _numberOfCellsFamilies, 
+      IOR_Mesh->getFamilies(MED_CELL),
+      (void *) (convertFamily), this);
       
       Note : See getConnectivityIndex for details.
     */
