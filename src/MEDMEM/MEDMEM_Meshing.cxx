@@ -15,7 +15,7 @@ using namespace std;
 #include "MEDMEM_Group.hxx"
 using namespace MEDMEM;
 
-/*! Create an empty MESH. */
+/*! Create an empty %MESH. */
 MESHING::MESHING(): MESH()
 {
   MESSAGE("MESHING::MESHING()");
@@ -35,12 +35,12 @@ void MESHING::setSpaceDimension(const int SpaceDimension)
 }
 
 /* Set the dimension of the MESHING */
-// void MESHING::setMeshDimension(const int MeshDimension)
-// {
-//    _meshDimension = MeshDimension ;
-// }
+void MESHING::setMeshDimension(const int MeshDimension)
+{
+  _meshDimension = MeshDimension ;
+}
 
-/*! Set the number of nodes used in the MESH */
+/*! Set the number of nodes used in the %MESH */
 void MESHING::setNumberOfNodes(const int NumberOfNodes)
 {
   _numberOfNodes = NumberOfNodes ;
@@ -53,8 +53,8 @@ void MESHING::setNumberOfNodes(const int NumberOfNodes)
     - "CYLINDRICAL"
     - "SPHERICAL"
   The interlacing mode are :
-    - MED_NO_INTERLACE   :  X1 X2 Y1 Y2 Z1 Z2
-    - MED_FULL_INTERLACE :  X1 Y1 Z1 X2 Y2 Z2
+    - %MED_NO_INTERLACE   :  X1 X2 Y1 Y2 Z1 Z2
+    - %MED_FULL_INTERLACE :  X1 Y1 Z1 X2 Y2 Z2
 */
 void MESHING::setCoordinates(const int SpaceDimension,
 			     const int NumberOfNodes,
@@ -76,7 +76,10 @@ void MESHING::setCoordinates(const int SpaceDimension,
   _coordinate->setCoordinatesSystem(System);
 }
 
-/*! Set the system in which coordinates are given (CARTESIAN,CYLINDRICAL,SPHERICAL) __??MED_CART??__. */
+/*! Set the system in which coordinates are given
+      - "CARTESIAN"
+      - "CYLINDRICAL"
+      - "SPHERICAL". */
 void MESHING::setCoordinatesSystem(const string System)
   throw (MEDEXCEPTION)
 {
@@ -86,7 +89,7 @@ void MESHING::setCoordinatesSystem(const string System)
 }
 
 /*! Set the coordinate names array ("x       ","y       ","z       ")
-  of size n*MED_TAILLE_PNOM
+  of size n*%MED_TAILLE_PNOM
 */
 void MESHING::setCoordinatesNames(const string * name)
 {
@@ -97,7 +100,7 @@ void MESHING::setCoordinatesNames(const string * name)
 
 /*!
   Set the (i+1)^th component of coordinate names array
-  ("x       ","y       ","z       ") of size n*MED_TAILLE_PNOM
+  ("x       ","y       ","z       ") of size n*%MED_TAILLE_PNOM
 */
 void MESHING::setCoordinateName(const string name, const int i)
 {
@@ -105,7 +108,7 @@ void MESHING::setCoordinateName(const string name, const int i)
 }
 
 /*! Set the coordinate unit names array ("cm       ","cm       ","cm       ")
-  of size n*MED_TAILLE_PNOM
+  of size n*%MED_TAILLE_PNOM
 */
 void MESHING::setCoordinatesUnits(const string * units)
 {
@@ -116,7 +119,7 @@ void MESHING::setCoordinatesUnits(const string * units)
 
 /*!
   Set the (i+1)^th component of the coordinate unit names array
-  ("cm       ","cm       ","cm       ") of size n*MED_TAILLE_PNOM
+  ("cm       ","cm       ","cm       ") of size n*%MED_TAILLE_PNOM
 */
 void MESHING::setCoordinateUnit(const string unit, const int i)
 {
@@ -179,7 +182,7 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
 
   REM : Don't use MED_NODE and MED_ALL_ENTITIES
 
-  If entity is not defined, throw an exception.
+  If entity is not defined, throws an exception.
 */
 void MESHING::setTypes(const medGeometryElement * Types,
 		       const medEntityMesh entity)

@@ -48,6 +48,7 @@ class MESH
 protected :
 
   string        _name; // A POSITIONNER EN FCT DES IOS ?
+  string        _description;
 
   mutable COORDINATE *   _coordinate;
   mutable CONNECTIVITY * _connectivity;
@@ -126,7 +127,8 @@ public :
 
   int  addDriver(driverTypes driverType,
 		 const string & fileName  ="Default File Name.med",
-		 const string & driverName="Default Mesh Name");
+		 const string & driverName="Default Mesh Name",
+		 med_mode_acces accessMode=MED_RDWR);
   int  addDriver(GENDRIVER & driver);
   void rmDriver(int index=0);
 
@@ -141,8 +143,9 @@ public :
 
 
   inline void 	      setName(string name);
-
+  inline void 	      setDescription(string description);
   inline string       getName() const;
+  inline string       getDescription() const;
   inline int 	      getSpaceDimension() const;
   inline int 	      getMeshDimension() const;
   inline bool	      getIsAGrid();
@@ -164,6 +167,10 @@ public :
 					 medGeometryElement Type) const;
   virtual inline bool existConnectivity(medConnectivity ConnectivityType,
 					medEntityMesh Entity) const;
+  inline bool existPolygonsConnectivity(medConnectivity ConnectivityType,
+					medEntityMesh Entity) const;
+  inline bool existPolyhedronConnectivity(medConnectivity ConnectivityType,
+					  medEntityMesh Entity) const;
 
   virtual inline medGeometryElement getElementType(medEntityMesh Entity,
 						   int Number) const;
@@ -180,6 +187,15 @@ public :
 					     medGeometryElement Type) const;
   virtual inline const int * getConnectivityIndex(medConnectivity ConnectivityType,
 						  medEntityMesh Entity) const;
+  inline const int * getPolygonsConnectivity(medConnectivity ConnectivityType,                                                   medEntityMesh Entity) const;
+  inline const int * getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
+                                                  medEntityMesh Entity) const;
+  inline int getNumberOfPolygons() const;
+  inline const int * getPolyhedronConnectivity(medConnectivity ConnectivityType) const;
+  inline const int * getPolyhedronFacesIndex() const;
+  inline const int * getPolyhedronIndex(medConnectivity ConnectivityType) const;
+  inline int getNumberOfPolyhedronFaces() const;
+  inline int getNumberOfPolyhedron() const;
   virtual int                 getElementNumber(medConnectivity ConnectivityType, 
                                                medEntityMesh Entity, 
                                                medGeometryElement Type, 
@@ -349,6 +365,18 @@ inline void MESH::setName(string name)
 inline string MESH::getName() const
 {
   return _name;
+}
+
+/*! Set the MESH description */
+inline void MESH::setDescription(string description)
+{
+  _description=description; //NOM interne à la classe
+}
+
+/*! Get the MESH description */
+inline string MESH::getDescription() const
+{
+  return _description;
 }
 
 /*! Get the dimension of the space */
@@ -522,8 +550,8 @@ inline int MESH::getNumberOfElements(medEntityMesh entity, medGeometryElement Ty
     }
 }
 /*!
-  Return true if the wanted connectivity exist, else return false
-  (to use before a getSomething method).
+ Returns true if the wanted connectivity exist, else returns false
+ (to use before a getSomething method).
  */
 inline bool MESH::existConnectivity(medConnectivity connectivityType, medEntityMesh entity) const
 {
@@ -531,6 +559,24 @@ inline bool MESH::existConnectivity(medConnectivity connectivityType, medEntityM
   if (_connectivity==(CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("MESH::existConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
   return _connectivity->existConnectivity(connectivityType,entity);
+}
+/*!
+  Returns true if the wanted polygons connectivity exist, else returns false
+*/
+inline bool MESH::existPolygonsConnectivity(medConnectivity connectivityType, medEntityMesh entity) const
+{
+  if (_connectivity == (CONNECTIVITY*) NULL)
+    throw MEDEXCEPTION("MESH::existPolygonsConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
+  return _connectivity->existPolygonsConnectivity(connectivityType,entity);
+}
+/*!
+  Returns true if the wanted polyhedron connectivity exist, else returns false
+*/
+inline bool MESH::existPolyhedronConnectivity(medConnectivity connectivityType, medEntityMesh entity) const
+{
+  if (_connectivity == (CONNECTIVITY*) NULL)
+    throw MEDEXCEPTION("MESH::existPolyhedronConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
+  return _connectivity->existPolyhedronConnectivity(connectivityType,entity);
 }
 /*!
   Return the geometric type of global element Number of entity Entity.
@@ -611,7 +657,6 @@ inline const int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,m
   Return the corresponding length of the array returned by MESH::getReverseConnectivity with exactly the same arguments.
   Used particulary for wrapping CORBA and python.
  */
-
 inline int MESH::getReverseConnectivityLength(medConnectivity ConnectivityType,
 						    medEntityMesh Entity) const
 {
@@ -632,6 +677,69 @@ inline int MESH::getReverseConnectivityLength(medConnectivity ConnectivityType,
 					MED_ALL_ELEMENTS);
     }
   return getReverseConnectivityIndex(ConnectivityType)[nb]-1;
+}
+/*!
+  Return the required connectivity of polygons for the given entity.
+  You must also get the corresponding index array.
+ */
+inline const int * MESH::getPolygonsConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity) const
+{
+  return _connectivity->getPolygonsConnectivity(ConnectivityType,Entity);
+}
+/*!
+  Return the required index array for polygons connectivity.
+ */
+inline const int * MESH::getPolygonsConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity) const
+{
+  return _connectivity->getPolygonsConnectivityIndex(ConnectivityType,Entity);
+}
+/*!
+  Return the number of polygons.
+ */
+inline int MESH::getNumberOfPolygons() const
+{
+  return _connectivity->getNumberOfPolygons();
+}
+/*!
+  Return the required connectivity of polyhedron :
+  - in nodal mode, it gives you the polyhedron faces nodal connectivity.
+  - in descending mode, it gives you the polyhedron faces list.
+  You must also get :
+  - faces index and polyhedron index arrays in nodal mode.
+  - polyhedron index array in descending mode.
+ */
+inline const int * MESH::getPolyhedronConnectivity(medConnectivity ConnectivityType) const
+{
+  return _connectivity->getPolyhedronConnectivity(ConnectivityType);
+}
+/*!
+  Return the index array of polyhedron faces in nodal mode.
+  You must also get the polyhedron index array.
+ */
+inline const int * MESH::getPolyhedronFacesIndex() const
+{
+  return _connectivity->getPolyhedronFacesIndex();
+}
+/*!
+  Return the required polyhedron index array.
+ */
+inline const int * MESH::getPolyhedronIndex(medConnectivity ConnectivityType) const
+{
+  return _connectivity->getPolyhedronIndex(ConnectivityType);
+}
+/*!
+  Return the number of polyhedron faces.
+ */
+inline int MESH::getNumberOfPolyhedronFaces() const
+{
+  return _connectivity->getNumberOfPolyhedronFaces();
+}
+/*!
+  Return the number of polyhedron.
+ */
+inline int MESH::getNumberOfPolyhedron() const
+{
+  return _connectivity->getNumberOfPolyhedron();
 }
 /*!
   Return the reverse connectivity required by ConnectivityType :

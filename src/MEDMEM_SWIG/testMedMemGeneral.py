@@ -70,10 +70,10 @@ files.append("cube_hexa8.med")
 meshNameFiles.append("CUBE_EN_HEXA8")
 
 files.append("test19.med")
-meshNameFiles.append("CartGrid")
+meshNameFiles.append("Grille Cartesienne")
 
 files.append("test19.med")
-meshNameFiles.append("bodyfitted")
+meshNameFiles.append("Grille Standard")
 
 files.append("test19.med")
 meshNameFiles.append("maa1")
@@ -175,6 +175,9 @@ meshNameFiles.append("")
 files.append("mail-test1-4-2.sauve")
 meshNameFiles.append("")
 
+files.append("maill_mistra_elim.sauve")
+meshNameFiles.append("")
+
 #
 # Porflow file list
 #
@@ -247,8 +250,8 @@ for i in range(nbOfFiles):
         meshDriver.close()
         print "The mesh stored in the file ",file," is perhaps a GRID."
         try:
-            print "... of MED_CARTESIAN type ?"
-            type = MED_CARTESIAN
+            print "... of MED_GRILLE_CARTESIENNE type ?"
+            type = MED_GRILLE_CARTESIENNE
             mesh = GRID()
             mesh.setGridType(type)
             if (extensionFile == "med"):
@@ -268,9 +271,9 @@ for i in range(nbOfFiles):
         except:
             meshDriver.close()
             try:
-                print "... of MED_POLAR type ?"
+                print "... of MED_GRILLE_POLAIRE type ?"
                 mesh = GRID()
-                type = MED_POLAR
+                type = MED_GRILLE_POLAIRE
                 mesh.setGridType(type)
                 if (extensionFile == "med"):
                     meshDriver = MED_MESH_RDONLY_DRIVER(file,mesh)
@@ -285,9 +288,9 @@ for i in range(nbOfFiles):
                 meshDriver.read()
             except:
                 meshDriver.close()
-                print "... of MED_BODY_FITTED type ?"
+                print "... of MED_GRIILE_STANDARD type ?"
                 mesh = GRID()
-                type = MED_BODY_FITTED
+                type = MED_GRILLE_STANDARD
                 mesh.setGridType(type)
                 if (extensionFile == "med"):
                     meshDriver = MED_MESH_RDONLY_DRIVER(file,mesh)
@@ -302,6 +305,7 @@ for i in range(nbOfFiles):
                 meshDriver.read()
 
     meshDriver.close()
+    fileReal = meshDriver.getFileName()
 
     meshName = mesh.getName()
     spaceDim = mesh.getSpaceDimension()
@@ -520,7 +524,8 @@ for i in range(nbOfFiles):
     print "Saving in file the mesh under the med and vtk format"
     print "Med file = ",medFileName
     print "vtk file = ",vtkFileName
-    idMed = mesh.addDriver(MED_DRIVER,medFileName,mesh.getName())
+    idMed = mesh.addDriver(MED_DRIVER,medFileName,mesh.getName(),
+                           MED_LECTURE_AJOUT)
     mesh.write(idMed)
 
     idVtk = mesh.addDriver(VTK_DRIVER,vtkFileName,mesh.getName())
@@ -673,6 +678,7 @@ for i in range(nbOfFiles):
         md = MED()
 
         mdDriver = MED_MED_RDONLY_DRIVER(file,md)
+        mdDriver.setFileName(fileReal)
 
         mdDriver.open()
         mdDriver.readFileStruct()

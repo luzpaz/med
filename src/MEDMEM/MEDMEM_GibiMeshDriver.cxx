@@ -360,7 +360,7 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 
     // impression résultats
     MESSAGE(LOC << "GIBI_MESH_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
-    MESSAGE(LOC <<  medi );
+    //    MESSAGE(LOC <<  medi );
 
 	    // TRANSFORMATION EN STRUCTURES MED
     if ( ! _ptrMesh->isEmpty() )

@@ -110,30 +110,43 @@ med_mode_acces GENDRIVER::getAccessMode() const {
   END_OF(LOC);
 }
 
+void GENDRIVER::setAccessMode(med_mode_acces accessMode)
+{
+  const char * LOC = "void GENDRIVER::setAccessMode(med_mode_acces accessMode): ";
+
+  BEGIN_OF(LOC);
+
+  _accessMode = accessMode;
+
+  END_OF(LOC);
+}
+
 ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
 {
   switch (drv._accessMode)
     {
     case MED_RDONLY : 
-      os<<"C'est un IO de READ"<<endl;
+      os << "C'est un IO de READ" << endl;
       break;
     case MED_RDWR :
-      os<<"C'est un IO d'READ/WRITE"<<endl;
+      os << "C'est un IO d'READ/WRITE" << endl;
       break;
-    case MED_REMP :
-      os <<"C'est un IO de remplacement"<<endl;
+    case MED_WRONLY :
+      os << "C'est un IO de READ et AJOUT" << endl;
       break;
+    case MED_CREATION :
+      os << "C'est un IO de CREATION" << endl;
     }
   switch (drv._status)
     {
     case MED_OPENED :
-      os<<"L'IO_Mesh_MED est open"<<endl;
+      os << "L'IO_Mesh_MED est open" << endl;
       break;
     case MED_CLOSED :
-      os<<"L'IO_Mesh_MED est fermé"<<endl;
+      os << "L'IO_Mesh_MED est fermé" << endl;
       break;
     case MED_INVALID :
-      os<<"L'IO_Mesh_MED est non-valide"<<endl;
+      os << "L'IO_Mesh_MED est non-valide" << endl;
       break;
     }
   return os;

@@ -5,6 +5,10 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Med.hxx"
 
+#include "MEDMEM_MedMeshDriver.hxx"
+#include "MEDMEM_MedFieldDriver.hxx"
+#include "MEDMEM_MedMedDriver.hxx"
+
 main () {
   
   const char * fileName   = "pointe.med";

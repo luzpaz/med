@@ -1,15 +1,6 @@
 #include <med.h>
 #include <string.h>
 
-#define MED_NOPG   1                   /* -> pas de point de Gauss                    */
-#define MED_NOPFL  ""                  /* -> pas de profils utilisateur               */
-#define MED_NOPFLi "                                "  /* Variable Interne                      */
-#define MED_NOPF   0                   /* -> pas de profils pour _MEDdataseNnumEcrire */
-#define MED_NOPDT -1                   /* rem: pas de pas de temps negatifs           */
-#define MED_NONOR -1                   /* rem: pas de n°ordre negatif                 */
-#define MED_DIM1   1                   /* PAS */
-
-#define MED_ALL    0
 
 /*****************************************************************************************************/
 
@@ -232,6 +223,9 @@ int main (int argc, char **argv)
 	med_idt tofid;
 	char frommaa[MED_TAILLE_NOM+1] = "fromMesh";
 	char tomaa[MED_TAILLE_NOM+1]   = "toMesh";
+	char frommaadesc[MED_TAILLE_DESC+1] = "Initial Mesh description";
+	char tomaadesc[MED_TAILLE_DESC+1] = "Target Mesh description";
+	med_maillage type = MED_NON_STRUCTURE;
 	const med_int mdim = 3;
 	med_int fromnnoe;
 	med_int   tonnoe;
@@ -355,7 +349,7 @@ int main (int argc, char **argv)
 
 	
 /*****************************************************************************************************/
-	fromfid = MEDouvrir("fromMesh.med",MED_REMP);
+	fromfid = MEDouvrir("fromMesh.med",MED_LECTURE_AJOUT);
 	if (fromfid < 0)
 		ret = -1;
 	else
@@ -363,7 +357,7 @@ int main (int argc, char **argv)
 	printf("MEDouvrir : %d\n",ret);
 
 /*****************************************************************************************************/
-	tofid = MEDouvrir("toMesh.med",MED_REMP);
+	tofid = MEDouvrir("toMesh.med",MED_LECTURE_AJOUT);
 	if (tofid < 0)
 		ret = -1;
 	else
@@ -371,13 +365,13 @@ int main (int argc, char **argv)
 	printf("MEDouvrir : %d\n",ret);
 /*****************************************************************************************************/
 	if (ret == 0)
-  		ret = MEDmaaCr(fromfid,frommaa,mdim);
+  		ret = MEDmaaCr(fromfid,frommaa,mdim,type,frommaadesc);
 	printf("MEDmaaCr : %d\n",ret);
 
 /*****************************************************************************************************/
 
 	if (ret == 0)
-  		ret = MEDmaaCr(tofid,tomaa,mdim);
+  		ret = MEDmaaCr(tofid,tomaa,mdim,type,tomaadesc);
 	printf("MEDmaaCr : %d\n",ret);
 
 /*****************************************************************************************************/
@@ -385,7 +379,7 @@ int main (int argc, char **argv)
   		ret = MEDnoeudsEcr(fromfid,frommaa,mdim,fromcoo,MED_FULL_INTERLACE,MED_CART,
         			     // nomcoo,unicoo,nomnoe,MED_FAUX,fromnumnoe,MED_VRAI,
 				     nomcoo,unicoo,nomnoe,MED_FAUX,fromnumnoe,MED_FAUX,
-	        		     fromnufano,fromnnoe,MED_ECRI);
+	        		     fromnufano,fromnnoe);
 	printf("MEDnoeudsEcr : %d\n",ret);
 /*****************************************************************************************************/
 
@@ -393,7 +387,7 @@ int main (int argc, char **argv)
   		ret = MEDnoeudsEcr(tofid,tomaa,mdim,tocoo,MED_FULL_INTERLACE,MED_CART,
         			     //nomcoo,unicoo,nomnoe,MED_FAUX,tonumnoe,MED_VRAI,
 				     nomcoo,unicoo,nomnoe,MED_FAUX,tonumnoe,MED_FAUX,
-	        		     tonufano,tonnoe,MED_ECRI);
+	        		     tonufano,tonnoe);
 	printf("MEDnoeudsEcr : %d\n",ret);
 
 
@@ -406,7 +400,7 @@ int main (int argc, char **argv)
 	if (ret == 0) 
   		ret = MEDelementsEcr(fromfid,frommaa,mdim,fromhexa8,MED_FULL_INTERLACE,
         		       		fromnomhexa8,MED_FAUX,fromnumhexa8,MED_VRAI,fromnufahexa8,fromnhexa8,
-        	       			MED_MAILLE,MED_HEXA8,MED_NOD,MED_ECRI);
+        	       			MED_MAILLE,MED_HEXA8,MED_NOD);
 	printf("MEDelementsEcr : %d \n",ret);
 
 /*****************************************************************************************************/
@@ -419,7 +413,7 @@ int main (int argc, char **argv)
 	if (ret == 0) 
   		ret = MEDelementsEcr(tofid,tomaa,mdim,tohexa8,MED_FULL_INTERLACE,
         	       			tonomhexa8,MED_FAUX,tonumhexa8,MED_VRAI,tonufahexa8,tonhexa8,
-		        	        MED_MAILLE,MED_HEXA8,MED_NOD,MED_ECRI);
+		        	        MED_MAILLE,MED_HEXA8,MED_NOD);
 	printf("MEDelementsEcr : %d \n",ret);
 
 /*****************************************************************************************************/
@@ -456,13 +450,13 @@ int main (int argc, char **argv)
 
 	if (ret == 0)
   		{
-		ret = MEDchampCr(fromfid,champnode,MED_REEL64,champnode_comp,champnode_unit,1); 
+		ret = MEDchampCr(fromfid,champnode,MED_FLOAT64,champnode_comp,champnode_unit,1); 
 		printf("MEDchampCr : %d \n",ret); 
     		if (ret == 0) 
 			{
       			ret = MEDchampEcr(fromfid, frommaa, champnode, (unsigned char *)fieldnodedouble,
         					MED_FULL_INTERLACE, fromnnoe,
-        					MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_NOEUD, 
+        					MED_NOGAUSS, MED_ALL, MED_NOPFL, MED_NO_PFLMOD, MED_NOEUD, 
         					0, MED_NOPDT,"        ", 0. , MED_NONOR);
       			printf("MEDchampEcr : %d \n",ret);
     			}
@@ -470,13 +464,13 @@ int main (int argc, char **argv)
 
 	if (ret == 0)
   		{
-    		ret = MEDchampCr(fromfid,champcell,MED_REEL64,champcell_comp,champcell_unit,3);
+    		ret = MEDchampCr(fromfid,champcell,MED_FLOAT64,champcell_comp,champcell_unit,3);
     		printf("MEDchampCr : %d \n",ret);
     		if (ret == 0) 
 			{
       			ret = MEDchampEcr(fromfid, frommaa, champcell, (unsigned char *)fieldcelldoublevector,
         					MED_FULL_INTERLACE, fromnhexa8,
-        					MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_MAILLE, 
+        					MED_NOGAUSS, MED_ALL, MED_NOPFL, MED_NO_PFLMOD, MED_MAILLE, 
         					MED_HEXA8, MED_NOPDT,"        ", 0., MED_NONOR);
       			printf("MEDchampEcr : %d \n",ret);
     			}
@@ -484,13 +478,13 @@ int main (int argc, char **argv)
 
 	if (ret == 0)
   		{
-		ret = MEDchampCr(fromfid,champcellscalar,MED_REEL64,champcellscalar_comp,champcellscalar_unit,1); 
+		ret = MEDchampCr(fromfid,champcellscalar,MED_FLOAT64,champcellscalar_comp,champcellscalar_unit,1); 
 		printf("MEDchampCr : %d \n",ret); 
     		if (ret == 0) 
 			{
       			ret = MEDchampEcr(fromfid, frommaa, champcellscalar, (unsigned char *)fieldcelldouble,
         					MED_FULL_INTERLACE, fromnhexa8,
-        					MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_MAILLE, 
+        					MED_NOGAUSS, MED_ALL, MED_NOPFL, MED_NO_PFLMOD, MED_MAILLE, 
         					MED_HEXA8, MED_NOPDT,"        ", 0., MED_NONOR);
       			printf("MEDchampEcr : %d \n",ret);
     			}
@@ -498,13 +492,13 @@ int main (int argc, char **argv)
 
 	if (ret == 0)
   		{
-    		ret = MEDchampCr(fromfid,champnodevector,MED_REEL64,champnodevector_comp,champnodevector_unit,3);
+    		ret = MEDchampCr(fromfid,champnodevector,MED_FLOAT64,champnodevector_comp,champnodevector_unit,3);
     		printf("MEDchampCr : %d \n",ret);
     		if (ret == 0) 
 			{
       			ret = MEDchampEcr(fromfid, frommaa, champnodevector, (unsigned char *)fieldnodedoublevector,
         					MED_FULL_INTERLACE, fromnnoe,
-        					MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_NOEUD, 
+        					MED_NOGAUSS, MED_ALL, MED_NOPFL, MED_NO_PFLMOD, MED_NOEUD, 
         					0, MED_NOPDT,"        ", 0. , MED_NONOR);
       			printf("MEDchampEcr : %d \n",ret);
     			}

@@ -61,7 +61,7 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   SCRUTE(numberOfFamilies);
 
 
-  if ((numberOfFamilies==1) || (isOnAllElts))
+  if ((numberOfFamilies==1) && (isOnAllElts))
     {
       _numberOfFamilies = numberOfFamilies;
       _isOnAllElts = isOnAllElts ;
@@ -70,7 +70,7 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
       update();
       return;
     }
-  else if ((!(numberOfFamilies==1))&(isOnAllElts))
+  else if ((!(numberOfFamilies==1)) && (isOnAllElts))
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "building of a GROUP object from several FAMILY, and one of them is on all entities"  )) ;
 
   _numberOfGeometricType = myFamily->getNumberOfTypes() ;

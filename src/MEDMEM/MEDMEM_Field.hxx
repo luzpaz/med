@@ -166,7 +166,8 @@ public:
   virtual  void     rmDriver(int index);
   virtual   int     addDriver(driverTypes driverType,
                               const string & fileName="Default File Name.med",
-			      const string & driverFieldName="Default Field Nam") ;
+			      const string & driverFieldName="Default Field Name",
+			      med_mode_acces accessMode=MED_RDWR) ;
   virtual  int      addDriver( GENDRIVER & driver);
   virtual  void     read (const GENDRIVER &);
   virtual  void     read(int index=0);
@@ -602,7 +603,8 @@ public:
   void rmDriver(int index=0);
   int  addDriver(driverTypes driverType,
 		 const string & fileName="Default File Name.med",
-		 const string & driverFieldName="Default Field Name") ;
+		 const string & driverFieldName="Default Field Name",
+		 med_mode_acces accessMode=MED_RDWR) ;
   int  addDriver(GENDRIVER & driver);
 
   void allocValue(const int NumberOfComponents);
@@ -1780,7 +1782,8 @@ template <class T> void FIELD<T>::deallocValue()
 
 template <class T> int FIELD<T>::addDriver(driverTypes driverType,
 					   const string & fileName/*="Default File Name.med"*/,
-					   const string & driverName/*="Default Field Name"*/)
+					   const string & driverName/*="Default Field Name"*/,
+					   med_mode_acces accessMode)
 {
   const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name\") : ";
 
@@ -1791,6 +1794,8 @@ template <class T> int FIELD<T>::addDriver(driverTypes driverType,
   SCRUTE(driverType);
 
   driver = DRIVERFACTORY::buildDriverForField(driverType,fileName,this);
+
+  driver->setAccessMode(accessMode);
 
   _drivers.push_back(driver);
 

@@ -166,7 +166,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 		             break;
       			 }
 
-      			case MED_FR::MED_REEL64: 
+      			case MED_FR::MED_FLOAT64: 
                         {
 			     ((FIELD<double>*)myField)->read();
 			     FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
@@ -494,7 +494,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 			break;
   		     }
 
-      		     case MED_FR::MED_REEL64: 
+      		     case MED_FR::MED_FLOAT64: 
 		     {
 			((FIELD<double>*)myField)->read();
 			FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
@@ -819,7 +819,7 @@ throw (SALOME::SALOME_Exception)
                 ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
 
                 ::FIELD<double> * fdouble = (::FIELD<double> *)FIELD_i::fieldMap[ind];
-                MESH * mesh=_med->getMesh(fdouble);
+                mesh=_med->getMesh(fdouble);
         }
         else
         {
@@ -827,7 +827,7 @@ throw (SALOME::SALOME_Exception)
                 ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
 
                 ::FIELD<int> * fint = (::FIELD<int> *)FIELD_i::fieldMap[ind];
-                MESH * mesh=_med->getMesh(fint);
+                mesh=_med->getMesh(fint);
         }
         MESH_i * meshi = new MESH_i(mesh);
 	return meshi->POA_SALOME_MED::MESH::_this();

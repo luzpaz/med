@@ -34,8 +34,10 @@ using namespace MEDMEM;
 /*! Add a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. The meshname used in the file
     is  driverName. addDriver returns an integer handler. */
 int MESH::addDriver(driverTypes driverType, 
-                    const string & fileName/*="Default File Name.med"*/,const string & driverName/*="Default Mesh Name"*/) {
-
+                    const string & fileName/*="Default File Name.med"*/,
+		    const string & driverName/*="Default Mesh Name"*/,
+		    med_mode_acces accessMode)
+{
   const char * LOC = "MESH::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Mesh Name\") : ";
   
   GENDRIVER * driver;
@@ -45,6 +47,8 @@ int MESH::addDriver(driverTypes driverType,
   SCRUTE(driverType);
 
   driver = DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName) ;
+
+  driver->setAccessMode(accessMode);
 
   _drivers.push_back(driver);
 
@@ -101,7 +105,9 @@ void MESH::init() {
 
   BEGIN_OF(LOC);
 
-  string        _name = "NOT DEFINED"; // A POSITIONNER EN FCT DES IOS ?
+  _name = "NOT DEFINED"; // A POSITIONNER EN FCT DES IOS ?
+
+  _description = "NOT DEFINED"; // A POSITIONNER EN FCT DES IOS ?
 
   _coordinate   = (COORDINATE   *) NULL;
   _connectivity = (CONNECTIVITY *) NULL;
@@ -124,7 +130,8 @@ MESH::MESH():_coordinate(NULL),_connectivity(NULL), _isAGrid(false) {
 
 MESH::MESH(MESH &m)
 {
-  _name=m._name;
+  _name = m._name;
+  _description = m._description;
   _isAGrid = m._isAGrid;
 
   if (m._coordinate != NULL)
@@ -2003,14 +2010,16 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 
 bool MESH::isEmpty() const 
 {
-    bool notempty = _name != ""                || _coordinate != NULL           || _connectivity != NULL ||
-	         _spaceDimension !=MED_INVALID || _meshDimension !=MED_INVALID  || 
-		 _numberOfNodes !=MED_INVALID  || _groupNode.size() != 0   || 
-		 _familyNode.size() != 0       || _groupCell.size() != 0   || 
-		 _familyCell.size() != 0       || _groupFace.size() != 0   || 
-		 _familyFace.size() != 0       || _groupEdge.size() != 0   || 
-		 _familyEdge.size() != 0       || _isAGrid != 0 ;
-    return !notempty;
+  bool notempty = _name != "NOT DEFINED" || _description != "NOT DEFINED" ||
+                  _coordinate != NULL || _connectivity != NULL ||
+                  _spaceDimension !=MED_INVALID ||
+                  _meshDimension !=MED_INVALID || 
+                  _numberOfNodes !=MED_INVALID || _groupNode.size() != 0 || 
+                  _familyNode.size() != 0 || _groupCell.size() != 0 || 
+                  _familyCell.size() != 0 || _groupFace.size() != 0 || 
+                  _familyFace.size() != 0 || _groupEdge.size() != 0 || 
+                  _familyEdge.size() != 0 || _isAGrid != 0 ;
+  return !notempty;
 }
 
 void MESH::read(int index)  

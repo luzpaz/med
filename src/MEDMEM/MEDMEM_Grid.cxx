@@ -30,7 +30,14 @@ GRID::GRID() {
 //purpose  : empty constructor
 //=======================================================================
 
-GRID::GRID(const med_grid_type type)
+// GRID::GRID(const med_grid_type type)
+// {
+//   init();
+//   _gridType = type;
+//   MESSAGE("A TYPED GRID CREATED");
+// }
+
+GRID::GRID(const med_type_grille type)
 {
   init();
   _gridType = type;
@@ -65,7 +72,8 @@ GRID::~GRID() {
 
 void GRID::init()
 {
-  _gridType = MED_CARTESIAN;
+//   _gridType = MED_CARTESIAN;
+  _gridType = MED_GRILLE_CARTESIENNE;
     
   _iArray = _jArray = _kArray = (double* ) NULL;
   _iArrayLength = _jArrayLength = _kArrayLength = 0;
@@ -141,7 +149,8 @@ void GRID::fillMeshAfterRead()
   _is_coordinates_filled  = false;
   _is_connectivity_filled = false;
 
-  if (_gridType == MED_BODY_FITTED)
+//   if (_gridType == MED_BODY_FITTED)
+  if (_gridType == MED_GRILLE_STANDARD)
   {
     _is_coordinates_filled = true;
 

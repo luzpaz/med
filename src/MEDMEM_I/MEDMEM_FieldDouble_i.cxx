@@ -106,7 +106,9 @@ throw (SALOME::SALOME_Exception)
         try
         {
 		medModeSwitch modemed=convertIdlModeToMedMode(mode);
-                ::FIELD<double> *ptrD=dynamic_cast< ::FIELD<double>* >(_fieldTptr);
+//                 ::FIELD<double> *ptrD=dynamic_cast< ::FIELD<double>* >(_fieldTptr);
+// the alternative is not safe but the previous fails using the python API
+		MEDMEM::FIELD<double> *ptrD = (MEDMEM::FIELD<double> *) _fieldTptr;
                 const double * values =ptrD->getValue(modemed);
 		int nbval=ptrD->getValueLength(modemed);
 		ret=SenderFactory::buildSender(*this,values,nbval);

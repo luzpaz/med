@@ -82,7 +82,7 @@ public:
   
   void addField ( FIELD_  * const ptrField  ) throw (MED_EXCEPTION) ;
   void addMesh  ( MESH    * const ptrMesh   ) throw (MED_EXCEPTION) ;
-  int  addDriver     (driverTypes driverType, const string & fileName);
+  int  addDriver     (driverTypes driverType, const string & fileName, med_mode_acces accessMode=MED_RDWR);
   int  addDriver     (GENDRIVER & driver);
   void rmDriver      (int index=0) throw (MEDEXCEPTION) ;
 

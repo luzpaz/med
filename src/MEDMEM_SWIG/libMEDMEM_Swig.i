@@ -207,11 +207,20 @@
   enum of the C++ MED used in the Python API
 */
 
-typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type; 
+typedef enum {MED_NON_STRUCTURE, MED_STRUCTURE} med_maillage;
+
+typedef enum {MED_GRILLE_CARTESIENNE, MED_GRILLE_POLAIRE,
+	      MED_GRILLE_STANDARD} med_type_grille;
 
 typedef enum {MED_FULL_INTERLACE, MED_NO_INTERLACE} medModeSwitch; 
 
+/*
 typedef enum {MED_LECT, MED_ECRI, MED_REMP} med_mode_acces;
+                     V2_1->V2_2
+*/
+
+typedef enum {MED_LECTURE, MED_LECTURE_ECRITURE, MED_LECTURE_AJOUT,
+	      MED_CREATION} med_mode_acces;
 
 typedef enum {MED_CELL, MED_FACE, MED_EDGE, MED_NODE,
 	      MED_ALL_ENTITIES} medEntityMesh; 
@@ -220,8 +229,8 @@ typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
 	      MED_TRIA3=203, MED_QUAD4=204, MED_TRIA6=206, MED_QUAD8=208,
 	      MED_TETRA4=304, MED_PYRA5=305, MED_PENTA6=306,
 	      MED_HEXA8=308, MED_TETRA10=310, MED_PYRA13=313,
-	      MED_PENTA15=315, MED_HEXA20=320,
-	      MED_ALL_ELEMENTS=999} medGeometryElement;
+	      MED_PENTA15=315, MED_HEXA20=320, MED_POLYGON=400,
+	      MED_POLYHEDRA=500, MED_ALL_ELEMENTS=999} medGeometryElement;
 
 typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ; 
 
@@ -229,7 +238,7 @@ typedef enum {MED_DRIVER=0, GIBI_DRIVER=1, PORFLOW_DRIVER = 2, VTK_DRIVER=254,
 	      NO_DRIVER=255} driverTypes;
 
 typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26,
-	      MED_INT} med_type_champ;
+	      MED_INT=28} med_type_champ;
 
 typedef struct { int dt; int it; } DT_IT_;
 
@@ -630,10 +639,11 @@ public:
   %extend {
     int addDriver(driverTypes driverType,
 		  char * fileName="Default File Name.med",
-		  char * driverName="Default Field Name")
+		  char * driverName="Default Field Name",
+		  med_mode_acces accessMode=MED_RDWR)
       {
 	return self->addDriver(driverType,string(fileName),
-			       string(driverName));
+			       string(driverName),accessMode);
       }
 
   }
@@ -1098,10 +1108,11 @@ public :
 
     int addDriver(driverTypes driverType,
 		  char * fileName="Default File Name.med",
-		  char * driverName="Default Mesh Name")
+		  char * driverName="Default Mesh Name",
+		  med_mode_acces accessMode=MED_RDWR)
       {
 	return self->addDriver(driverType,string(fileName),
-			       string(driverName));
+			       string(driverName),accessMode);
       }
 
     void write(int index=0, char * driverName="")
@@ -1414,6 +1425,8 @@ public :
 
   void setSpaceDimension   (const int SpaceDimension) ;
 
+  void setMeshDimension    (const int MeshDimension) ;
+
   void setNumberOfNodes    (const int NumberOfNodes) ;
 
   void setNumberOfTypes    (const int NumberOfTypes,
@@ -1479,13 +1492,15 @@ class GRID : public MESH
 
   int getFaceNumber(const int Axis, const int i, const int j=0, const int k=0) const ;
   
-  med_grid_type getGridType();
+/*   med_grid_type getGridType(); */
+  med_type_grille getGridType();
   
   int getArrayLength( const int Axis );
 
   const double getArrayValue (const int Axis, const int i);
 
-  void setGridType(med_grid_type gridType);
+/*   void setGridType(med_grid_type gridType); */
+  void setGridType(med_type_grille gridType);
 
   %extend {
     GRID(driverTypes driverType, const char * fileName="", const char * meshName="")
@@ -1578,9 +1593,10 @@ class MED
       }
 
     int addDriver(driverTypes driverType,
-		  char * fileName="Default File Name.med")
+		  char * fileName="Default File Name.med",
+		  med_mode_acces accessMode=MED_RDWR)
       {
-	return self->addDriver(driverType,string(fileName));
+	return self->addDriver(driverType,string(fileName),accessMode);
       }
 
     %newobject getMeshName(int );
@@ -1662,6 +1678,20 @@ class MED_MED_RDONLY_DRIVER
 	mess << "Python Printing MED_MED_RDONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
   }
 };
 
@@ -1688,6 +1718,20 @@ class MED_MED_WRONLY_DRIVER
 	ostringstream mess;
 	mess << "Python Printing MED_MED_WRONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
+      }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
       }
   }
 };
@@ -1770,6 +1814,20 @@ public :
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
   }
 };
 
@@ -1814,6 +1872,20 @@ public :
       {
 	string tmp_str = self->getMeshName();
 	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
@@ -1916,6 +1988,20 @@ public :
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
   }
 };
 
@@ -1960,6 +2046,20 @@ public :
       {
 	string tmp_str = self->getMeshName();
 	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
@@ -2059,6 +2159,20 @@ class MED_MESH_RDONLY_DRIVER
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
   }
 };
 
@@ -2099,6 +2213,20 @@ class MED_MESH_WRONLY_DRIVER
       {
 	string tmp_str = self->getMeshName();
 	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
@@ -2195,6 +2323,20 @@ public:
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
   }
 };
 
@@ -2236,6 +2378,20 @@ public:
       {
 	string tmp_str = self->getFieldName();
 	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
@@ -2331,6 +2487,20 @@ public:
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
   }
 };
 
@@ -2372,6 +2542,20 @@ public:
       {
 	string tmp_str = self->getFieldName();
 	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
+
+    void setFileName(char * fileName)
+      {
+	self->setFileName(string(fileName));
+      }
+
+    %newobject getFileName();
+    char * getFileName()
+      {
+	string tmp_str = self->getFileName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }

@@ -23,6 +23,8 @@ myMeshing.setName("meshing")
 
 spaceDimension = 3
 
+meshDimension = spaceDimension
+
 numberOfNodes = 19
 
 coordinates = []
@@ -103,6 +105,8 @@ coordinate = [0.0, 0.0, 5.0]
 coordinates.append(coordinate[0])
 coordinates.append(coordinate[1])
 coordinates.append(coordinate[2])
+
+myMeshing.setMeshDimension(meshDimension)
 
 myMeshing.setCoordinates(spaceDimension,numberOfNodes,coordinates,"CARTESIAN",MED_FULL_INTERLACE)
 

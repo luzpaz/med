@@ -107,6 +107,7 @@ public:
   string getFileName () const;
   void   setFileName ( const string & fileName);
   med_mode_acces getAccessMode() const;
+  void setAccessMode(med_mode_acces accessMode);
 };
 };
 

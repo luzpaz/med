@@ -263,9 +263,10 @@ void     FIELD_::rmDriver      (int index)
 };
 int      FIELD_::addDriver     (driverTypes driverType, 
                                 const string & fileName,
-				const string & driverFieldName)
+				const string & driverFieldName,
+				med_mode_acces accessMode)
 {
-  MESSAGE("int FIELD_::addDriver(driverTypes driverType, const string & fileName, const string & driverFieldName) : adding the driver " << driverType << " fileName = " << fileName.c_str() << " driverFieldName = " << driverFieldName.c_str());
+  MESSAGE("int FIELD_::addDriver(driverTypes driverType, const string & fileName, const string & driverFieldName) : adding the driver " << driverType << " fileName = " << fileName.c_str() << " driverFieldName = " << driverFieldName.c_str() << " mode " << accessMode);
   return 0;
 };
 int      FIELD_::addDriver     (GENDRIVER & driver)
