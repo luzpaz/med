@@ -24,7 +24,8 @@ Infos.png \
 Structure.png \
 ModuleMed.png
 
-BIN_SCRIPT=
+BIN_SCRIPT= \
+VERSION
 
 
 # copy header files in common directory
