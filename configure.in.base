@@ -191,7 +191,7 @@ CHECK_CORBA
 
 AC_SUBST_FILE(CORBA)
 corba=make_$ORB
-CORBA=${KERNEL_ROOT_DIR}/salome_adm/unix/$corba
+CORBA=salome_adm/unix/$corba
 
 echo
 echo ---------------------------------------------
@@ -270,12 +270,12 @@ echo
 
 dnl generals files which could be included in every makefile
 
-AC_SUBST_FILE(COMMENCE) COMMENCE=${KERNEL_ROOT_DIR}/salome_adm/unix/make_commence
-AC_SUBST_FILE(CONCLUDE) CONCLUDE=${KERNEL_ROOT_DIR}/salome_adm/unix/make_conclude
-AC_SUBST_FILE(MODULE) MODULE=${KERNEL_ROOT_DIR}/salome_adm/unix/make_module
+AC_SUBST_FILE(COMMENCE) COMMENCE=salome_adm/unix/make_commence
+AC_SUBST_FILE(CONCLUDE) CONCLUDE=salome_adm/unix/make_conclude
+AC_SUBST_FILE(MODULE) MODULE=salome_adm/unix/make_module
 
 dnl les dependences
-AC_SUBST_FILE(DEPEND) DEPEND=${KERNEL_ROOT_DIR}/salome_adm/unix/depend
+AC_SUBST_FILE(DEPEND) DEPEND=salome_adm/unix/depend
 
 dnl We don t need to say when we re entering directories if we re using
 dnl GNU make becuase make does it for us.
@@ -331,7 +331,7 @@ do
 done
 cd $ROOT_BUILDDIR
 
-AC_SUBST_FILE(ENVSCRIPT) ENVSCRIPT=${KERNEL_ROOT_DIR}/salome_adm/unix/envScript
+AC_SUBST_FILE(ENVSCRIPT) ENVSCRIPT=salome_adm/unix/envScript
 
 dnl copy xml files to the build tree (lib directory)
 dnl pourquoi ????
