@@ -289,6 +289,12 @@ MESH & MESH::operator=(const MESH &m)
   return *this;
 }
 
+bool MESH::operator==(const MESH& other) const
+{
+  BEGIN_OF("MESH::operator==");
+  return this==&other;
+}
+
 /*! Create a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. 
   The meshname driverName must already exists in the file.*/
 MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION)
@@ -2663,4 +2669,14 @@ void MESH::createFamilies()
     // re-scan the cells vector, and fill the family vector with cells.
     // creation of support, check if it already exist.
     }
+}
+
+//Presently disconnected in C++
+void MESH::addReference() const
+{
+}
+
+//Presently disconnected in C++
+void MESH::removeReference() const
+{
 }

@@ -3,6 +3,8 @@
 
 #include "FIELDClient.hxx"
 
+namespace MEDMEM{
+    
 class FIELDDOUBLEClient :
   public FIELDClient<double,SALOME_MED::FIELDDOUBLE>
 {
@@ -12,4 +14,5 @@ public:
   ~FIELDDOUBLEClient();
 };
 
+}
 #endif

@@ -16,7 +16,7 @@ using namespace MED_EN;
 //=============================================================================
 
 MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) : 
-  MESH(), 
+  MESH(), _refCounter(1),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m)),
   _complete(false)
 
@@ -161,6 +161,26 @@ void MESHClient::fillCopy()
 
 //=============================================================================
 /*!
+ *  Test equality between 2 MESHClients.
+ */
+//=============================================================================
+bool MESHClient::operator==(const MESH& other) const
+{
+  BEGIN_OF("MESHClient::operator==");
+  const MESHClient* otherClt=dynamic_cast<const MESHClient *>(&other);
+  if(otherClt)
+    {
+      if(this==otherClt)
+	{
+	  return true;
+	}
+      return IOR_Mesh->areEquals(otherClt->IOR_Mesh);
+    }
+  return false;
+}
+
+//=============================================================================
+/*!
  * Destructeur
  */
 //=============================================================================
@@ -172,3 +192,27 @@ MESHClient::~MESHClient()
   END_OF("MESHClient::~MESHClient()");
 }
 
+//=============================================================================
+/*!
+ * For refCounter
+ */
+//=============================================================================
+
+void MESHClient::addReference() const
+{
+  _refCounter++;
+}
+
+//=============================================================================
+/*!
+ * For refCounter
+ */
+//=============================================================================
+
+void MESHClient::removeReference() const
+{
+  if (--_refCounter <= 0)
+    {
+      delete this;
+    }
+}

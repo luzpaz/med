@@ -509,6 +509,7 @@ Internal Corba method.
     	   Group_array  groupCell;
     };
     meshInfos getMeshGlobal()		raises (SALOME::SALOME_Exception);
+    boolean areEquals(in MESH other);
   };
 
   
