@@ -51,7 +51,6 @@ EXPORT_HEADERS = libMedCorba_Swig.i
 #############################################################################
 
 CPPFLAGS+= $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
-CXXFLAGS=-g -D_DEBUG_ -D__x86__ -D__linux__
 CXXFLAGS+=-ftemplate-depth-42 -I${KERNEL_ROOT_DIR}/include/salome
 LIBS= $(PYTHON_LIBS) 
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDMEMImpl -lmedmem -lMEDMEM_Swigcmodule -L${KERNEL_ROOT_DIR}/lib/salome -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
