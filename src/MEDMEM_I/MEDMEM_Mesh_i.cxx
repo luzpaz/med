@@ -1514,6 +1514,29 @@ throw (SALOME::SALOME_Exception)
 
 //=============================================================================
 /*!
+ * CORBA : Test if this and other aggregate the same MESH using the virtual MESH::operator==
+ */
+//=============================================================================
+CORBA::Boolean MESH_i::areEquals(SALOME_MED::MESH_ptr other)
+{
+  PortableServer::ServantBase *baseServ;
+  try {
+    baseServ=_default_POA()->reference_to_servant(other);
+  }
+  catch(...){
+    baseServ=0;
+  }
+  if(baseServ)
+    {
+     baseServ->_remove_ref();
+     MESH_i *otherServ=dynamic_cast<MESH_i *>(baseServ);
+     return *_mesh==*otherServ->_mesh;
+    }
+  return false;
+}
+
+//=============================================================================
+/*!
  * CORBA : Servant destruction
  */
 //=============================================================================

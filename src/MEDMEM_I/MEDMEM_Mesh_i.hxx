@@ -188,6 +188,7 @@ public:
     SALOME_MED::MESH::connectivityInfos * getConnectGlobal
 				  (SALOME_MED::medEntityMesh entity)
                                   throw (SALOME::SALOME_Exception);
+    CORBA::Boolean areEquals(SALOME_MED::MESH_ptr other);
 
   void release();
 };
