@@ -1,0 +1,56 @@
+#==============================================================================
+// File      : Field_i.hxx
+// Author    : Marc Tajchman
+// Project   : SALOME
+// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Makefile.in
+//=============================================================================
+
+# source path
+top_srcdir=@top_srcdir@
+top_builddir=../../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@top_srcdir@/idl:$(top_srcdir)/idl
+
+MACHINE=PCLINUX
+
+@COMMENCE@
+
+
+#EXPORT_PYSCRIPTS = \
+#  testMed.py
+
+EXPORT_HEADERS = \
+  convert.hxx \
+  Med_i.hxx \
+  Family_i.hxx \
+  FieldDouble_i.hxx \
+  FieldInt_i.hxx \
+  FieldOf_i.hxx \
+  Field_i.hxx \
+  Group_i.hxx \
+  Mesh_i.hxx \
+  Support_i.hxx 
+
+# Libraries targets
+
+LIB=libMEDImpl.la
+LIB_SRC = Med_i.cxx  Family_i.cxx FieldDouble_i.cxx FieldInt_i.cxx Field_i.cxx Group_i.cxx Mesh_i.cxx Support_i.cxx convert.cxx   
+LIB_SERVER_IDL = MED.idl 
+LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl
+
+# Executables targets
+BIN_SRC = 
+BIN_SERVER_IDL = 
+BIN_CLIENT_IDL = 
+
+
+CPPFLAGS+= $(MED2_INCLUDES) $(HDF5_INCLUDES)
+CXXFLAGS=-g -D_DEBUG_ -D__x86__ -D__linux__ 
+LDFLAGS+=-lmedmem -lOpUtil
+#LDFLAGS+=-lmedmem  -L. -lSalomeContainer -lSalomeNS -lRegistry -lOpUtil -lSalomeNotification
+# does we put only -lSalomeContainer and compiler retrieves -lSalomeNS -lRegistry -lOpUtil ????
+
+MED.hh MEDSK.cc: MED.idl
+	omniidl -bcxx -Wbtp $^
+
+@CONCLUDE@

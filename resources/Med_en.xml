@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='us-ascii'?>
+<!DOCTYPE application PUBLIC "" "desktop.dtd">
+
+<!--  GUI customization for MED component  -->
+
+<application
+	     title="MED component"
+	     author="Paul RASCLE"
+	     appId=" MED integrated in SALOME" >
+
+  <desktop>
+
+  <!-- ### MENUBAR ###  -->
+
+    <menubar>
+      <menu-item label-id="MED" item-id="90" pos-id="3">
+        <popup-item item-id="931" pos-id="1" label-id="Mesh selection" icon-id="" tooltip-id="read a Mesh" accel-id="" toggle-id="" execute-action=""/>
+        <popup-item item-id="932" pos-id="2" label-id="Field Selection" icon-id="" tooltip-id="read a Field" accel-id="" toggle-id="" execute-action=""/>
+        <popup-item item-id="933" pos-id="3" label-id="Explore Med File" icon-id="" tooltip-id="explore Med File" accel-id="" toggle-id="" execute-action=""/>
+	<popup-item item-id="934" pos-id="4" label-id="Dump Mesh" icon-id="" tooltip-id="dump Mesh" accel-id="" toggle-id="" execute-action=""/>
+	<popup-item item-id="935" pos-id="5" label-id="Dump SubMesh" icon-id="" tooltip-id="dump Mesh" accel-id="" toggle-id="" execute-action=""/>
+      </menu-item>
+
+    </menubar>
+
+  <!-- ### TOOLBAR ###  -->
+
+    <toolbar label-id="Mesh Generation">
+      <toolbutton-item item-id="4031" label-id="Mesh Selection" icon-id="Data.png" tooltip-id="read a Mesh" accel-id="" toggle-id="" execute-action=""/>
+      <toolbutton-item item-id="4032" label-id="Field Selection" icon-id="Infos.png" tooltip-id="read a Field" accel-id="" toggle-id="" execute-action=""/>
+      <toolbutton-item item-id="4033" label-id="Explore Med File" icon-id="Structure.png" tooltip-id="explore Med File " accel-id="" toggle-id="" execute-action=""/>
+    </toolbar>
+
+  <!-- ### POPUP MENU ###  -->
+
+    <popupmenu label-id="Popup for Viewer" context-id="" parent-id="Viewer" object-id="">
+      <popup-item item-id="8031" pos-id="" label-id="Test Popup" icon-id="" tooltip-id="Just a test for Popup" accel-id="" toggle-id="" execute-action=""/>
+    </popupmenu>
+
+    <popupmenu label-id="Popup for ObjectBrowser" context-id="" parent-id="ObjectBrowser" object-id="">
+      <popup-item item-id="9002" pos-id="" label-id="Erase" icon-id="" tooltip-id="" accel-id="Remove CL from viewer" toggle-id="" execute-action=""/>
+      <popup-item item-id="903" pos-id="" label-id="Display" icon-id="" tooltip-id="Display CL on viewer" accel-id="" toggle-id="" execute-action=""/>
+    </popupmenu>
+
+  </desktop>	
+</application>

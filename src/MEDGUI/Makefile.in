@@ -1,0 +1,52 @@
+#==============================================================================
+#  File      : Makefile.in
+#  Created   : dim déc  9 18:35:11 CET 2001
+#  Author    : Paul RASCLE, EDF
+#  Project   : SALOME
+#  Copyright : EDF 2001
+#  $Header$
+#==============================================================================
+
+# source path
+top_srcdir=@top_srcdir@
+top_builddir=../../..
+srcdir=@srcdir@
+VPATH=.:$(srcdir):$(top_builddir)/share/salome/idl
+
+
+@COMMENCE@
+
+# header files 
+EXPORT_HEADERS=
+
+# .po files to transform in .qm
+PO_FILES = \
+           MedGUI_icons.po \
+           MedGUI_msg_fr.po \
+           MedGUI_msg_en.po \
+
+
+# Libraries targets
+LIB = libMedGUI.la
+LIB_SRC = MedGUI.cxx  
+LIB_MOC = MedGUI.h
+
+LIB_CLIENT_IDL = SALOMEDS.idl SALOME_Exception.idl \
+                 Med_Gen.idl  MED.idl \
+		 SMESH_Mesh.idl SMESH_Hypothesis.idl SMESH_BasicHypothesis.idl \
+		 GEOM_Shape.idl SALOMEDS_Attributes.idl
+
+LIB_SERVER_IDL = 
+
+# additionnal information to compil and link file
+
+CPPFLAGS += $(QT_INCLUDES) $(VTK_INCLUDES) $(OCC_INCLUDES) $(PYTHON_INCLUDES)
+CXXFLAGS += 
+
+LDFLAGS += -lSalomeGUI -lmedmem -lMEDImpl -lMedEngine -lSMESHFiltersSelection
+
+
+MED.hh MEDSK.cc: MED.idl
+	omniidl -bcxx -Wbtp $^
+
+@CONCLUDE@

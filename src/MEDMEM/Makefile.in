@@ -1,0 +1,88 @@
+#==============================================================================
+#  File      : Makefile.in
+#  Author    : Patrick GOLDBRONN (CEA/DEN/DM2S/SFME/LGLS)
+#  CVS       : $Header$
+#==============================================================================
+
+# source path
+top_srcdir=@top_srcdir@
+top_builddir=../../..
+srcdir=@srcdir@
+VPATH=.:$(srcdir)
+
+MACHINE=PCLINUX
+
+@COMMENCE@
+
+
+EXPORT_PYSCRIPTS = \
+
+
+EXPORT_HEADERS = \
+MEDMEM_CellModel.hxx \
+MEDMEM_Connectivity.hxx \
+MEDMEM_Coordinate.hxx \
+MEDMEM_define.hxx \
+MEDMEM_DriversDef.hxx \
+MEDMEM_Family.hxx \
+MEDMEM_Field.hxx \
+MEDMEM_GenDriver.hxx \
+MEDMEM_Group.hxx \
+MEDMEM_Array.hxx \
+MEDMEM_Exception.hxx \
+MEDMEM_MedFieldDriver.hxx \
+MEDMEM_Med.hxx \
+MEDMEM_MedMedDriver.hxx \
+MEDMEM_MedMeshDriver.hxx \
+MEDMEM_ModulusArray.hxx \
+MEDMEM_SkyLineArray.hxx \
+MEDMEM_VtkMedDriver.hxx \
+MEDMEM_Mesh.hxx \
+MEDMEM_STRING.hxx \
+MEDMEM_Support.hxx \
+MEDMEM_Unit.hxx
+
+# Libraries targets
+
+LIB=libmedmem.la
+
+LIB_SRC = \
+MEDMEM_CellModel.cxx \
+MEDMEM_Connectivity.cxx \
+MEDMEM_Coordinate.cxx \
+MEDMEM_DriversDef.cxx \
+MEDMEM_Family.cxx \
+MEDMEM_Field.cxx \
+MEDMEM_GenDriver.cxx \
+MEDMEM_Group.cxx \
+MEDMEM_Med.cxx \
+MEDMEM_Exception.cxx \
+MEDMEM_MedMedDriver.cxx \
+MEDMEM_MedMeshDriver.cxx \
+MEDMEM_SkyLineArray.cxx \
+MEDMEM_Mesh.cxx \
+MEDMEM_Support.cxx \
+MEDMEM_Unit.cxx \
+
+#VtkMedDriver.cxx \
+
+
+# Executables targets
+BIN = duplicateMED med_test duplicateMEDMESH
+BIN_SRC = 
+BIN_SERVER_IDL = 
+BIN_CLIENT_IDL = 
+
+TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray test_MEDMEM_CellModel
+
+CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) 
+CXXFLAGS+=-ftemplate-depth-42
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer 
+
+# build create_mesh :
+bin: create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_mesh_c3h8q4_wrong create_mesh_c2q4s2_wrong
+
+create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4: %: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $(MED2_LIBS) $(HDF5_LIBS) $(LDFLAGS) $< 
+
+@CONCLUDE@

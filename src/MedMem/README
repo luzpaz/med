@@ -1,0 +1,15 @@
+Users Guide
+
+1. You can see file med_test2.cxx for an example of using library
+
+2. To get meshes and fields from an MED file, the simplest way is to create a MED object with argument string filename. It scan MED file to get all meshes and fields in it. After you could say to MED object to read a particular mesh or field and get it with appropriate method of MED object (see MED.hxx and med_test2.cxx)
+
+3. When you have a Mesh object (or Field object), you could get information in using get_... methods (see Mesh.hxx, Support.hxx, Field.hxx and med_test2.cxx)
+
+I work on documentation with doxygen tool.
+
+
+Patrick GOLDBRONN
+DEN/DM2S/SFME/LGLS
+patrick.goldbronn@cea.fr
+tel : 0169087355

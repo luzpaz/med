@@ -1,0 +1,42 @@
+#==============================================================================
+#  File      : Makefile.in
+#  Author    : Nadir BOUHAMOU (CEA/DEN/DM2S/SFME/LGLS)
+#  CVS       : $Header$
+#==============================================================================
+
+# source path
+top_srcdir=@top_srcdir@
+top_builddir=../../..
+srcdir=@srcdir@
+VPATH=.:$(srcdir)
+
+@COMMENCE@
+
+EXPORT_HEADERS = \
+	libMEDMEM_Swig.i \
+	my_typemap.i \
+	MEDMEM_SWIG_FieldDouble.hxx \
+	MEDMEM_SWIG_FieldInt.hxx
+
+# Libraries targets
+
+LIB = libMEDMEM_Swigcmodule.la
+
+LIB_SRC = MEDMEM_SWIG_FieldDouble.cxx \
+	  MEDMEM_SWIG_FieldInt.cxx
+
+SWIG_DEF = libMEDMEM_Swig.i
+
+EXPORT_PYSCRIPTS = libMEDMEM_Swig.py med_test1.py med_test2.py med_test3.py
+
+#############################################################################
+
+CPPFLAGS+= $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES)
+CXXFLAGS=-g -D_DEBUG_ -D__x86__ -D__linux__ 
+CXXFLAGS+=-ftemplate-depth-42
+LIBS= $(PYTHON_LIBS) 
+LDFLAGS+= -lmedmem $(MED2_LIBS) $(HDF5_LIBS)
+
+#############################################################################
+
+@CONCLUDE@
