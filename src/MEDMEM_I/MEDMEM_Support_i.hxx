@@ -20,7 +20,6 @@
 
 namespace MEDMEM {
 class SUPPORT;
-class SALOME_MED::MESH;
 
 class SUPPORT_i: public POA_SALOME_MED::SUPPORT,
                 public PortableServer::RefCountServantBase,

@@ -24,7 +24,7 @@ mLocal.read()
 
 from omniORB import CORBA
 from LifeCycleCORBA import *
-from libSALOME_Swig import *
+#CCRTfrom libSALOME_Swig import *
 
 orb = CORBA.ORB_init([''], CORBA.ORB_ID)
 lcc = LifeCycleCORBA(orb)

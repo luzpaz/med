@@ -22,7 +22,6 @@
 //  File   : testUCellModel.cxx
 //  Module : MED
 
-using namespace std;
 #include <set>
 #include <cstdlib> 
 #include "utilities.h"
@@ -30,6 +29,8 @@ using namespace std;
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_DriversDef.hxx"
+
+using namespace std;
 using namespace MEDMEM;
 
 void usage(char * name)
@@ -263,7 +264,7 @@ int main (int argc, char ** argv)
         			return EXIT_FAILURE ;
 			}
 		}
-
+*/
 /*
 		set <medGeometryElement>::iterator iter_s;
 		for (iter_s=setGeomElt.begin() ;iter_s!=setGeomElt.end();iter_s++)

@@ -17,7 +17,7 @@ int  FIELD_i::fieldIndex = 0;
 //=============================================================================
 
 //FIELD_i::FIELD_i():_fieldTptr(FIELD_i::constructConstField())
-FIELD_i::FIELD_i():_fieldTptr(constructConstField())
+FIELD_i::FIELD_i():_fieldTptr(constructConstField()),_corbaIndex(FIELD_i::fieldIndex++)
 {
         BEGIN_OF("Default Constructor Field_i");
         END_OF(" Default Constructor Field_i");

@@ -22,11 +22,11 @@
 //  File   : testUUnit.cxx
 //  Module : MED
 
-using namespace std;
 #include <cstdlib>
 #include <exception>
 
 #include "MEDMEM_Unit.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 int main (int argc, char ** argv)

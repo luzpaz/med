@@ -22,9 +22,9 @@
 //  File   : testUGeoNameMeshEntities.cxx
 //  Module : MED
 
-using namespace std;
 #include "MEDMEM_DriversDef.hxx"
 
+using namespace std;
 void usage(char * name)
 {
   cout << "    " << name << endl;

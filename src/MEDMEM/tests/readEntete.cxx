@@ -22,13 +22,14 @@
 //  File   : readEntete.cxx
 //  Module : MED
 
-using namespace std;
 #include<string>
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_DriversDef.hxx"
+
+using namespace std;
 using namespace MEDMEM;
 
 void usage(char * name)

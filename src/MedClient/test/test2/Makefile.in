@@ -42,6 +42,9 @@ LIB = libCompo2cmodule.la
 LIB_SRC = Compo2.cxx
 LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl SALOME_Comm.idl MED.idl
 
+LDFLAGS= -L$(top_builddir)/lib/salome 
+LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
+
 CPPFLAGS += ${MED2_INCLUDES} ${HDF5_INCLUDES} ${PYTHON_INCLUDES} -I${KERNEL_ROOT_DIR}/include/salome
 LIBS = -L${KERNEL_ROOT_DIR}/lib/salome -lMEDClientcmodule -lMEDMEM_Swigcmodule -lmedmem -lMEDMEMImpl  ${MED2_LIBS} ${HDF5_LIBS}
 

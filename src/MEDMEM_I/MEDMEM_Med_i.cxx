@@ -1,4 +1,3 @@
-using namespace std;
 //=============================================================================
 // File      : MEDMEM_Med_i.cxx
 // Project   : SALOME
@@ -23,6 +22,8 @@ using namespace std;
 #include "MEDMEM_DriversDef.hxx"
 #include "utilities.h"
 #include "Utils_CorbaException.hxx"
+
+using namespace std;
 using namespace MEDMEM;
 
 //=============================================================================
