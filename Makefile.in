@@ -75,7 +75,9 @@ boitenew.xyz \
 Case1.xyz \
 cube.xyz \
 test3.xyz \
-titi.xyz
+titi.xyz \
+polygones.med \
+polyedres.med
 
 BIN_SCRIPT= \
 VERSION
