@@ -16,7 +16,7 @@ using namespace MED_EN;
 //=============================================================================
 
 MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) : 
-  MESH(), 
+  MESH(), _refCounter(1),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m)),
   _complete(false)
 
@@ -192,3 +192,27 @@ MESHClient::~MESHClient()
   END_OF("MESHClient::~MESHClient()");
 }
 
+//=============================================================================
+/*!
+ * For refCounter
+ */
+//=============================================================================
+
+void MESHClient::addReference() const
+{
+  _refCounter++;
+}
+
+//=============================================================================
+/*!
+ * For refCounter
+ */
+//=============================================================================
+
+void MESHClient::removeReference() const
+{
+  if (--_refCounter <= 0)
+    {
+      delete this;
+    }
+}

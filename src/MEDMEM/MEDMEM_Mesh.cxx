@@ -2670,3 +2670,13 @@ void MESH::createFamilies()
     // creation of support, check if it already exist.
     }
 }
+
+//Presently disconnected in C++
+void MESH::addReference() const
+{
+}
+
+//Presently disconnected in C++
+void MESH::removeReference() const
+{
+}

@@ -15,16 +15,20 @@ private :
 
   mutable bool _complete;
   
+  mutable int _refCounter;
 
 public :
 
   MESHClient(const SALOME_MED::MESH_ptr m);
   virtual bool operator==(const MESH& other) const;
-  virtual ~MESHClient();
 
   void blankCopy();
   void fillCopy();
+  virtual void addReference() const;
+  virtual void removeReference() const;
 
+private:
+  virtual ~MESHClient();
 };
 }
 

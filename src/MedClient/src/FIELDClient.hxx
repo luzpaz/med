@@ -17,7 +17,7 @@ class FIELDClient : public MEDMEM::FIELD<T1>
 {
 private:
   typename T2::_ptr_type _fieldPtr;
-  bool _ownSupport;
+  int _refCounter;
 public:
   FIELDClient(typename T2::_ptr_type ptrCorba,MEDMEM::SUPPORT * S = NULL);
   ~FIELDClient();

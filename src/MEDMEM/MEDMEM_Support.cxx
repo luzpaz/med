@@ -771,3 +771,18 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
 
   return operatorReturn;
 };
+
+
+/*!
+  addReference : reference counter presently disconnected in C++ -> just connected for client.
+*/
+void MEDMEM::SUPPORT::addReference() const
+{
+}
+
+/*!
+  removeReference : reference counter presently disconnected in C++ -> just connected for client.
+*/
+void MEDMEM::SUPPORT::removeReference() const
+{
+}

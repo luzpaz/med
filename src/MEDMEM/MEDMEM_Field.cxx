@@ -38,6 +38,8 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
   for(int i=0;i<NumberOfComponents;i++) {
     _componentsTypes[i] = 0 ;
   }
+  if(_support)
+    _support->addReference();
 }
 
 FIELD_::FIELD_(const FIELD_ &m)
@@ -46,6 +48,8 @@ FIELD_::FIELD_(const FIELD_ &m)
   _name = m._name;
   _description = m._description;
   _support = m._support;
+  if(_support)
+    _support->addReference();
   _numberOfComponents = m._numberOfComponents;
   _numberOfValues = m._numberOfValues;
 
@@ -103,7 +107,6 @@ FIELD_::~FIELD_()
     delete[] _componentsUnits ;
   if ( _MEDComponentsUnits !=NULL)
     delete[] _MEDComponentsUnits ;
-
   // delete driver
 //   vector<GENDRIVER *>::const_iterator it ;
 //   SCRUTE(_drivers.size());

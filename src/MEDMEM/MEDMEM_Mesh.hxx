@@ -14,6 +14,7 @@
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_GenDriver.hxx"
+#include "MEDMEM_RCBase.hxx"
 
 /*! This class contains all the informations related with a MESH :
   - COORDINATES
@@ -36,7 +37,7 @@ class CELLMODEL;
 class FAMILY;
 class GROUP;
 class SUPPORT;
-class MESH
+  class MESH : public RCBASE
 
 {
   //-----------------------//
@@ -247,6 +248,11 @@ public :
    * (There is no way to know which family has change.)
    */
   void createFamilies();
+  /*!
+   *For ref counter. Only for client
+   */
+  virtual void addReference() const;
+  virtual void removeReference() const;
 };
 
 // ---------------------------------------

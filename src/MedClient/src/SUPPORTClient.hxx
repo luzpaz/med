@@ -14,15 +14,18 @@ private :
 
   const SALOME_MED::SUPPORT_var IOR_Support;
 
-  bool _ownMesh;
-
   mutable bool _complete_support;
+
+  mutable int _refCounter;
+
+protected:
+
+  virtual ~SUPPORTClient();
 
 public :
 
   SUPPORTClient(const SALOME_MED::SUPPORT_ptr S, 
 		MESH * M = NULL);
-  virtual ~SUPPORTClient();
 
   void blankCopy();
   void fillCopy();
@@ -33,7 +36,8 @@ public :
     const throw (MEDEXCEPTION);
   const int *  getNumberIndex()
     const throw (MEDEXCEPTION);
-
+  void addReference() const;
+  void removeReference() const;
 };
 }
 

@@ -21,11 +21,14 @@ class MESHClient : public MESH {
  public:
   
   MESHClient(const SALOME_MED::MESH_ptr m);
-  virtual ~MESHClient();
 
   void blankCopy();
   void fillCopy();
-
+  %extend {
+    ~MESHClient(){
+      self->removeReference();
+    }
+  }
 };
 
 class SUPPORTClient : public SUPPORT {
@@ -34,10 +37,14 @@ class SUPPORTClient : public SUPPORT {
 
   SUPPORTClient(const SALOME_MED::SUPPORT_ptr S, 
 		MESH * M = NULL);
-  virtual ~SUPPORTClient();
 
   void blankCopy();
   void fillCopy();
+  %extend {
+    ~SUPPORTClient() {
+      self->removeReference();
+    }
+  }
 
 };
 

@@ -506,7 +506,12 @@ inline  const SUPPORT * FIELD_::getSupport() const
 */
 inline void FIELD_::setSupport(const SUPPORT * support)
 {
+  //A.G. Addings for RC
+  if(_support)
+    _support->removeReference();
   _support = support ;
+  if(_support)
+    _support->addReference();
 }
 /*!
   Get the FIELD med value type (MED_INT32 or MED_REEL64).
@@ -1640,6 +1645,9 @@ template <class T> FIELD<T>::FIELD(const SUPPORT * Support,
   init();
 
   _support = Support;
+  //A.G. Addings for RC
+  if(_support)
+    _support->addReference();
   _value = (MEDARRAY<T>*)NULL;
 
   _iterationNumber = iterationNumber;
