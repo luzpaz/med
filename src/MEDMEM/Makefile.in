@@ -110,9 +110,13 @@ TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray
 
 CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
 CXXFLAGS+=-ftemplate-depth-42 -I${KERNEL_ROOT_DIR}/include/salome
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
+#LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
+# change motivated by the bug KERNEL4778.
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome
 
-LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
+#LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
+# change motivated by the bug KERNEL4778.
+LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome
 
 LIBSFORBIN=
 
