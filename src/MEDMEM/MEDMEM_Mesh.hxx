@@ -216,6 +216,10 @@ public :
 					 medGeometryElement Type) const;
   virtual inline bool existConnectivity(medConnectivity ConnectivityType,
 					medEntityMesh Entity) const;
+  inline bool existPolygonsConnectivity(medConnectivity ConnectivityType,
+					medEntityMesh Entity) const;
+  inline bool existPolyhedronConnectivity(medConnectivity ConnectivityType,
+					  medEntityMesh Entity) const;
 
   virtual inline medGeometryElement getElementType(medEntityMesh Entity,
 						   int Number) const;
@@ -588,8 +592,8 @@ inline int MESH::getNumberOfElements(medEntityMesh entity, medGeometryElement Ty
     }
 }
 /*!
-  Return true if the wanted connectivity exist, else return false
-  (to use before a getSomething method).
+ Returns true if the wanted connectivity exist, else returns false
+ (to use before a getSomething method).
  */
 inline bool MESH::existConnectivity(medConnectivity connectivityType, medEntityMesh entity) const
 {
@@ -597,6 +601,24 @@ inline bool MESH::existConnectivity(medConnectivity connectivityType, medEntityM
   if (_connectivity==(CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("MESH::existConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
   return _connectivity->existConnectivity(connectivityType,entity);
+}
+/*!
+  Returns true if the wanted polygons connectivity exist, else returns false
+*/
+inline bool MESH::existPolygonsConnectivity(medConnectivity connectivityType, medEntityMesh entity) const
+{
+  if (_connectivity == (CONNECTIVITY*) NULL)
+    throw MEDEXCEPTION("MESH::existPolygonsConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
+  return _connectivity->existPolygonsConnectivity(connectivityType,entity);
+}
+/*!
+  Returns true if the wanted polyhedron connectivity exist, else returns false
+*/
+inline bool MESH::existPolyhedronConnectivity(medConnectivity connectivityType, medEntityMesh entity) const
+{
+  if (_connectivity == (CONNECTIVITY*) NULL)
+    throw MEDEXCEPTION("MESH::existPolyhedronConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
+  return _connectivity->existPolyhedronConnectivity(connectivityType,entity);
 }
 /*!
   Return the geometric type of global element Number of entity Entity.
