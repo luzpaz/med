@@ -20,6 +20,7 @@ private :
 public :
   POLYHEDRONARRAY();
   POLYHEDRONARRAY(med_int numberofpolyhedron,med_int numberoffaces,med_int numberofnodes);
+  POLYHEDRONARRAY(const POLYHEDRONARRAY& m);
 
   inline  med_int   getNumberOfPolyhedron()     const;
   inline  med_int   getNumberOfFaces()          const;
@@ -66,11 +67,11 @@ inline const med_int* POLYHEDRONARRAY::getNodes() const
 
 inline void POLYHEDRONARRAY::setPolyhedronIndex(const med_int* polyhedronindex)
 {
-  _polyhedronIndex.set(_numberOfPolyhedron, polyhedronindex);
+  _polyhedronIndex.set(_numberOfPolyhedron+1, polyhedronindex);
 }
 inline void POLYHEDRONARRAY::setFacesIndex(const med_int* facesindex)
 {
-  _facesIndex.set(_numberOfFaces, facesindex);
+  _facesIndex.set(_numberOfFaces+1, facesindex);
 }
 inline void POLYHEDRONARRAY::setNodes(const med_int* nodes)
 {
