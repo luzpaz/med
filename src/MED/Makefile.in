@@ -19,7 +19,7 @@ EXPORT_PYSCRIPTS =  MED_test1.py MED_test2.py
 
 # Libraries targets
 
-LIB = libMedEngine.la
+LIB = libMEDEngine.la
 
 LIB_SRC = Med_Gen_i.cxx 
 LIB_SERVER_IDL = Med_Gen.idl SALOME_Component.idl \

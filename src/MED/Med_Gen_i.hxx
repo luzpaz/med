@@ -64,13 +64,25 @@ public:
 
 //    void Save(const char *IORSComponent, const char *aUrlOfFile);
 //    void Load(const char *IORSComponent, const char *aUrlOfFile); 
-  SALOMEDS::TMPFile* Save(SALOMEDS::SComponent_ptr theComponent);
-  CORBA::Boolean Load(SALOMEDS::SComponent_ptr theComponent, const SALOMEDS::TMPFile& theStream);
-  void Close(const char *IORSComponent); 
+  SALOMEDS::TMPFile* Save(SALOMEDS::SComponent_ptr theComponent,
+			  const char* theURL,
+			  bool isMultiFile);
+
+  CORBA::Boolean Load(SALOMEDS::SComponent_ptr theComponent,
+		      const SALOMEDS::TMPFile& theStream,
+		      const char* theURL,
+		      bool isMultiFile);
+
+  void Close(SALOMEDS::SComponent_ptr theComponent);
   char* ComponentDataType();
     
-  char* IORToLocalPersistentID(const char* IORString, CORBA::Boolean& IsAFile);
-  char* LocalPersistentIDToIOR(const char* aLocalPersistentID);
+  char* IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
+			       const char* IORString,
+			       CORBA::Boolean isMultiFile);
+  char* LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
+			       const char* aLocalPersistentID,
+			       CORBA::Boolean isMultiFile)
+    throw(SALOME::SALOME_Exception);
 
   bool CanPublishInStudy(CORBA::Object_ptr theIOR);
 
@@ -78,6 +90,14 @@ public:
 				       SALOMEDS::SObject_ptr theSObject,
 				       CORBA::Object_ptr theObject,
 				       const char* theName) throw (SALOME::SALOME_Exception) ;
+
+  CORBA::Boolean CanCopy(SALOMEDS::SObject_ptr theObject);
+  SALOMEDS::TMPFile* CopyFrom(SALOMEDS::SObject_ptr theObject, CORBA::Long& theObjectID);
+  CORBA::Boolean CanPaste(const char* theComponentName, CORBA::Long theObjectID);
+  SALOMEDS::SObject_ptr PasteInto(const SALOMEDS::TMPFile& theStream,
+				  CORBA::Long theObjectID,
+				  SALOMEDS::SObject_ptr theObject);
+  
   private :
   static map <string, string>_MedCorbaObj;
   static string _myFileName;
