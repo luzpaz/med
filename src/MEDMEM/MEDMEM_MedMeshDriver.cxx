@@ -372,10 +372,7 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
       if (gridType == MED_EN::MED_GRILLE_CARTESIENNE)
 	rep = MED_FR::MED_CART;
       else if (gridType == MED_EN::MED_GRILLE_POLAIRE)
-	{
-	  if (SpaceDimension == 2) rep = MED_FR::MED_CYL;
-	  else if (SpaceDimension == 3) rep = MED_FR::MED_SPHER;
-	}
+	rep = MED_FR::MED_CYL;
     }
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<" bad grid type : " << gridType));
