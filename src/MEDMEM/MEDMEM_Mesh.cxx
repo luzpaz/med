@@ -1,4 +1,3 @@
-using namespace std;
 /*
  File Mesh.cxx
  $Header$
@@ -19,6 +18,7 @@ using namespace std;
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_CellModel.hxx"
+using namespace std;
 using namespace MEDMEM;
 //#include "MEDMEM_Grid.hxx" this inclision should have never be here !!!
 
@@ -488,8 +488,10 @@ int MESH::getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entit
   else
     numberOfValue = myType.getNumberOfNodes() ; // nodes
   
-  const int * myReverseConnectivityValue = getReverseConnectivity(ConnectivityType,Entity) ;
-  const int * myReverseConnectivityIndex = getReverseConnectivityIndex(ConnectivityType,Entity) ;
+//CCRT  const int * myReverseConnectivityValue = getReverseConnectivity(ConnectivityType,Entity) ;
+  const med_int * myReverseConnectivityValue = getReverseConnectivity(ConnectivityType,Entity) ;
+//CCRT  const int * myReverseConnectivityIndex = getReverseConnectivityIndex(ConnectivityType,Entity) ;
+  const med_int * myReverseConnectivityIndex = getReverseConnectivityIndex(ConnectivityType,Entity) ;
 
   // First node or face/edge
   int indexBegin = myReverseConnectivityIndex[connectivity[0]-1] ;
@@ -558,8 +560,10 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   mySupport->setAll(false);
   
 
-  const int * myConnectivityValue = getReverseConnectivity(MED_DESCENDING) ;
-  const int * myConnectivityIndex = getReverseConnectivityIndex(MED_DESCENDING) ;
+//CCRT  const int * myConnectivityValue = getReverseConnectivity(MED_DESCENDING) ;
+  const med_int * myConnectivityValue = getReverseConnectivity(MED_DESCENDING) ;
+//CCRT  const int * myConnectivityIndex = getReverseConnectivityIndex(MED_DESCENDING) ;
+  const med_int * myConnectivityIndex = getReverseConnectivityIndex(MED_DESCENDING) ;
   int numberOf = getNumberOfElements(Entity,MED_ALL_ELEMENTS) ;
   list<int> myElementsList ;
   int size = 0 ;
@@ -569,7 +573,8 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
       size++ ;
     }
   // Well, we must know how many geometric type we have found
-  int * myListArray = new int[size] ;
+//CCRT  int * myListArray = new int[size] ;
+  med_int * myListArray = new med_int[size] ;
   int id = 0 ;
   list<int>::iterator myElementsListIt ;
   for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
@@ -583,7 +588,8 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   int * geometricTypeNumber ;
   int * numberOfElements ;
   //MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY() ;
-  int * mySkyLineArrayIndex ;
+//CCRT  int * mySkyLineArrayIndex ;
+  med_int * mySkyLineArrayIndex ;
 
   int numberOfType = getNumberOfTypes(Entity) ;
   if (numberOfType == 1) { // wonderfull : it's easy !
@@ -597,7 +603,8 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
     geometricTypeNumber[0] = 0 ;
     numberOfElements = new int[1] ;
     numberOfElements[0] = size ;
-    mySkyLineArrayIndex = new int[2] ;
+//CCRT    mySkyLineArrayIndex = new int[2] ;
+    mySkyLineArrayIndex = new med_int[2] ;
     mySkyLineArrayIndex[0]=1 ;
     mySkyLineArrayIndex[1]=1+size ;
   }
@@ -616,7 +623,8 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
     numberOfGaussPoint = new int[numberOfGeometricType] ;
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfElements = new int[numberOfGeometricType] ;
-    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
+//CCRT    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
+    mySkyLineArrayIndex = new med_int[numberOfGeometricType+1] ;
     int index = 0 ;
     mySkyLineArrayIndex[0]=1 ;
     map<medGeometryElement,int>::iterator theTypeIt ;
@@ -673,7 +681,8 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
   const medGeometryElement* types;
   int nb_entity_type;
   // !!!! WARNING : use of nodal global numbering in the mesh !!!!
-  const int* global_connectivity;
+//CCRT  const int* global_connectivity;
+  const med_int* global_connectivity;
 
 //    if (onAll)
 //      {
@@ -689,7 +698,8 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
     }
 
   int index;
-  FIELD<double>* Volume = new FIELD<double>::FIELD(Support,1);
+//CCRT  FIELD<double>* Volume = new FIELD<double>::FIELD(Support,1);
+  FIELD<double>* Volume = new FIELD<double>(Support,1);
   //  double *volume = new double [length_values];
   Volume->setName("VOLUME");
   Volume->setDescription("cells volume");
@@ -730,10 +740,14 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
 
  	  nb_entity_type = Support->getNumberOfElements(type);
 	  
- 	  const int * supp_number = Support->getNumber(type);
- 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
- 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
- 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+//CCRT 	  const int * supp_number = Support->getNumber(type);
+ 	  const med_int * supp_number = Support->getNumber(type);
+//CCRT 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+ 	  const med_int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+//CCRT 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+ 	  const med_int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+//CCRT 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+ 	  med_int * global_connectivity_tmp = new med_int[(type%100)*nb_entity_type];
 	  
  	  for (int k_type = 0; k_type<nb_entity_type; k_type++) {
  	    for (int j_ent = 0; j_ent<(type%100); j_ent++) {
@@ -1096,7 +1110,8 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
   const medGeometryElement* types;
   int nb_entity_type;
   // !!!! WARNING : use of nodal global numbering in the mesh !!!!
-  const int* global_connectivity;
+//CCRT  const int* global_connectivity;
+  const med_int* global_connectivity;
 
 //    if (onAll)
 //      {
@@ -1114,7 +1129,8 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
   int index;
   FIELD<double>* Area;
 
-  Area = new FIELD<double>::FIELD(Support,1);
+//CCRT  Area = new FIELD<double>::FIELD(Support,1);
+  Area = new FIELD<double>(Support,1);
   Area->setName("AREA");
   Area->setDescription("cells or faces area");
 
@@ -1155,10 +1171,14 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 
  	  nb_entity_type = Support->getNumberOfElements(type);
 	  
- 	  const int * supp_number = Support->getNumber(type);
- 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
- 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
- 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+//CCRT 	  const int * supp_number = Support->getNumber(type);
+ 	  const med_int * supp_number = Support->getNumber(type);
+//CCRT 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+ 	  const med_int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+//CCRT 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+ 	  const med_int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+//CCRT 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+ 	  med_int * global_connectivity_tmp = new med_int[(type%100)*nb_entity_type];
 	  
  	  for (int k_type = 0; k_type<nb_entity_type; k_type++) {
  	    for (int j_ent = 0; j_ent<(type%100); j_ent++) {
@@ -1304,7 +1324,8 @@ FIELD<double>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTIO
   const medGeometryElement* types;
   int nb_entity_type;
   // !!!! WARNING : use of nodal global numbering in the mesh !!!!
-  const int* global_connectivity;
+//CCRT  const int* global_connectivity;
+  const med_int* global_connectivity;
 
 //    if (onAll)
 //      {
@@ -1322,7 +1343,8 @@ FIELD<double>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTIO
   int index;
   FIELD<double>* Length;
 
-  Length = new FIELD<double>::FIELD(Support,1);
+//CCRT  Length = new FIELD<double>::FIELD(Support,1);
+  Length = new FIELD<double>(Support,1);
   //  double *length = new double [length_values];
   Length->setValueType(MED_REEL64);
 
@@ -1348,10 +1370,14 @@ FIELD<double>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTIO
 
  	  nb_entity_type = Support->getNumberOfElements(type);
 
- 	  const int * supp_number = Support->getNumber(type);
- 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
- 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
-	  int* global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+//CCRT 	  const int * supp_number = Support->getNumber(type);
+ 	  const med_int * supp_number = Support->getNumber(type);
+//CCRT 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+ 	  const med_int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+//CCRT 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+ 	  const med_int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+//CCRT	  int* global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+	  med_int* global_connectivity_tmp = new med_int[(type%100)*nb_entity_type];
 
  	  for (int k_type = 0; k_type<nb_entity_type; k_type++) {
  	    for (int j_ent = 0; j_ent<(type%100); j_ent++) {
@@ -1421,7 +1447,8 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
   const medGeometryElement* types;
   int nb_entity_type;
   // !!!! WARNING : use of nodal global numbering in the mesh !!!!
-  const int* global_connectivity;
+//CCRT  const int* global_connectivity;
+  const med_int* global_connectivity;
 
 //    if (onAll)
 //      {
@@ -1438,7 +1465,8 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 
   int index;
 
-  FIELD<double>* Normal = new FIELD<double>::FIELD(Support,dim_space);
+//CCRT  FIELD<double>* Normal = new FIELD<double>::FIELD(Support,dim_space);
+  FIELD<double>* Normal = new FIELD<double>(Support,dim_space);
   Normal->setName("NORMAL");
   Normal->setDescription("cells or faces normal");
   for (int k=1;k<=dim_space;k++) {
@@ -1485,10 +1513,14 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	  // throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support must be on all for instance !"));
  	  nb_entity_type = Support->getNumberOfElements(type);
 	  
- 	  const int * supp_number = Support->getNumber(type);
- 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
- 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
- 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+//CCRT 	  const int * supp_number = Support->getNumber(type);
+ 	  const med_int * supp_number = Support->getNumber(type);
+//CCRT 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+ 	  const med_int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+//CCRT 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+ 	  const med_int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+//CCRT 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+ 	  med_int * global_connectivity_tmp = new med_int[(type%100)*nb_entity_type];
 	  
  	  for (int k_type = 0; k_type<nb_entity_type; k_type++) {
  	    for (int j_ent = 0; j_ent<(type%100); j_ent++) {
@@ -1639,6 +1671,17 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
       if (!onAll) delete [] global_connectivity ;
     }
 
+#if DIFF_PC_ALPHA
+  for (int k=0;k<dim_space*length_values;k++) {
+    normal[k] = Arrondi( normal[k] ) ;
+#if TRACE_DBLE_HEXA
+    DI di ;
+    di.d = normal[k] ;
+    printf( "testMedMemGeneral %d %0#8x%0#8x \n" , k , di.i[1] , di.i[0] ) ;
+#endif
+  }
+#endif
+
   Normal->setValue(MED_FULL_INTERLACE,normal);
   delete[] normal ;
 
@@ -1666,7 +1709,8 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
   const medGeometryElement* types;
   int nb_entity_type;
   // !!!! WARNING : use of nodal global numbering in the mesh !!!!
-  const int* global_connectivity;
+//CCRT  const int* global_connectivity;
+  const med_int* global_connectivity;
 
 //    if (onAll)
 //      {
@@ -1684,7 +1728,8 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
   int index;
   FIELD<double>* Barycenter;
 
-  Barycenter = new FIELD<double>::FIELD(Support,dim_space);
+//CCRT  Barycenter = new FIELD<double>::FIELD(Support,dim_space);
+  Barycenter = new FIELD<double>(Support,dim_space);
   Barycenter->setName("BARYCENTER");
   Barycenter->setDescription("cells or faces barycenter");
 
@@ -1722,10 +1767,14 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 	  // throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support must be on all !"));
  	  nb_entity_type = Support->getNumberOfElements(type);
 	  
- 	  const int * supp_number = Support->getNumber(type);
- 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
- 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
- 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+//CCRT 	  const int * supp_number = Support->getNumber(type);
+ 	  const med_int * supp_number = Support->getNumber(type);
+//CCRT 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+ 	  const med_int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+//CCRT 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+ 	  const med_int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+//CCRT 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+ 	  med_int * global_connectivity_tmp = new med_int[(type%100)*nb_entity_type];
 	  
  	  for (int k_type = 0; k_type<nb_entity_type; k_type++) {
  	    for (int j_ent = 0; j_ent<(type%100); j_ent++) {
@@ -2049,6 +2098,17 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
       if (!onAll) delete [] global_connectivity ;
     }
 
+#if DIFF_PC_ALPHA
+  for (int k=0;k<dim_space*length_values;k++) {
+    barycenter[k] = Arrondi( barycenter[k] ) ;
+#if TRACE_DBLE_HEXA
+    DI di ;
+    di.d = barycenter[k] ;
+    printf( "testMedMemGeneral %d %0#8x%0#8x \n" , k , di.i[1] , di.i[0] ) ;
+#endif
+  }
+#endif
+
   Barycenter->setValue(MED_FULL_INTERLACE,barycenter);
 
   delete[] barycenter ;
@@ -2138,7 +2198,8 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL);
   if (Support3D->isOnAllElements())
   {
-    int * myConnectivityValue = const_cast <int*> (getReverseConnectivity(MED_DESCENDING)) ;
+//CCRT    int * myConnectivityValue = const_cast <int*> (getReverseConnectivity(MED_DESCENDING)) ;
+    med_int * myConnectivityValue = const_cast <med_int*> (getReverseConnectivity(MED_DESCENDING)) ;
     int nbFaces = getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS);
     for (i=0, j=1 ; j<=nbFaces; ++j, i += 2)
     {
@@ -2156,11 +2217,14 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   {
     map<int,int> FaceNbEncounterNb;
     
-    int * myConnectivityValue = const_cast <int *>
+//CCRT    int * myConnectivityValue = const_cast <int *>
+    med_int * myConnectivityValue = const_cast <med_int *>
       (getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING,
 		       MED_CELL, MED_ALL_ELEMENTS));
-    int * myConnectivityIndex = const_cast <int *> (getConnectivityIndex(MED_DESCENDING, MED_CELL));
-    int * myCellNbs = const_cast <int *> (Support3D->getnumber()->getValue());
+//CCRT    int * myConnectivityIndex = const_cast <int *> (getConnectivityIndex(MED_DESCENDING, MED_CELL));
+    med_int * myConnectivityIndex = const_cast <med_int *> (getConnectivityIndex(MED_DESCENDING, MED_CELL));
+//CCRT    int * myCellNbs = const_cast <int *> (Support3D->getnumber()->getValue());
+    med_int * myCellNbs = const_cast <med_int *> (Support3D->getnumber()->getValue());
     int nbCells = Support3D->getnumber()->getLength();
     for (i=0; i<nbCells; ++i)
     {
@@ -2188,7 +2252,8 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
       }
   }   
   // Well, we must know how many geometric type we have found
-  int * myListArray = new int[size] ;
+//CCRT  int * myListArray = new int[size] ;
+  med_int * myListArray = new med_int[size] ;
   int id = 0 ;
   list<int>::iterator myElementsListIt ;
   for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
@@ -2199,10 +2264,12 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   int numberOfGeometricType ;
   medGeometryElement* geometricType ;
   int * numberOfGaussPoint ;
-  int * geometricTypeNumber ;
+//CCRT  int * geometricTypeNumber ;
+  med_int * geometricTypeNumber ;
   int * numberOfEntities ;
   //  MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY() ;
-  int * mySkyLineArrayIndex ;
+//CCRT  int * mySkyLineArrayIndex ;
+  med_int * mySkyLineArrayIndex ;
 
   int numberOfType = getNumberOfTypes(MED_FACE) ;
   if (numberOfType == 1) { // wonderfull : it's easy !
@@ -2212,11 +2279,13 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     geometricType[0] = allType[0] ;
     numberOfGaussPoint = new int[1] ;
     numberOfGaussPoint[0] = 1 ;
-    geometricTypeNumber = new int[1] ; // not use, but initialized to nothing
+//CCRT    geometricTypeNumber = new int[1] ; // not use, but initialized to nothing
+    geometricTypeNumber = new med_int[1] ; // not use, but initialized to nothing
     geometricTypeNumber[0] = 0 ;
     numberOfEntities = new int[1] ;
     numberOfEntities[0] = size ;
-    mySkyLineArrayIndex = new int[2] ;
+//CCRT    mySkyLineArrayIndex = new int[2] ;
+    mySkyLineArrayIndex = new med_int[2] ;
     mySkyLineArrayIndex[0]=1 ;
     mySkyLineArrayIndex[1]=1+size ;
   }
@@ -2232,10 +2301,11 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
     //const medGeometryElement *  allType = getTypes(MED_FACE); !! UNUSED VARIABLE !!
-    numberOfGaussPoint = new int[numberOfGeometricType] ;
-    geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
+//CCRT    numberOfGaussPoint = new int[numberOfGeometricType] ;
+    geometricTypeNumber = new med_int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfEntities = new int[numberOfGeometricType] ;
-    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
+//CCRT    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
+    mySkyLineArrayIndex = new med_int[numberOfGeometricType+1] ;
     int index = 0 ;
     mySkyLineArrayIndex[0]=1 ;
     map<medGeometryElement,int>::iterator theTypeIt ;
@@ -2580,7 +2650,8 @@ void MESH::createFamilies()
 	//     giving geometric type and the groups it belong to
 
 	med_int numberOfTypes=getNumberOfTypes(entity);
-	const int * index=getGlobalNumberingIndex(entity);
+//CCRT	const int * index=getGlobalNumberingIndex(entity);
+	const med_int * index=getGlobalNumberingIndex(entity);
 	const medGeometryElement* geometricTypes=_connectivity->getGeometricTypes(entity); // pb avec entity=MED_NODE???
 	med_int numberOfCells=index[numberOfTypes]-1;  // total number of cells for that entity
 	SCRUTE(numberOfTypes);
@@ -2606,8 +2677,10 @@ void MESH::createFamilies()
 	// 3 - Scan the cells vector, genarate family name, and create a map associating the family names 
 	//     whith the vector of contained cells
 	
-	map< string,vector<int> > tab_families;
-	map< string,vector<int> >::iterator fam;
+//CCRT	map< string,vector<int> > tab_families;
+	map< string,vector<med_int> > tab_families;
+//CCRT	map< string,vector<int> >::iterator fam;
+	map< string,vector<med_int> >::iterator fam;
 	for(int n=0; n!=numberOfCells; ++n)
 	{
 	    ostringstream key; // to generate the name of the family
@@ -2643,7 +2716,8 @@ void MESH::createFamilies()
 	{
 	    vector<medGeometryElement> tab_types_geometriques;
 	    medGeometryElement geometrictype=MED_NONE;
-	    vector<int> tab_index_types_geometriques;
+//CCRT	    vector<int> tab_index_types_geometriques;
+	    vector<med_int> tab_index_types_geometriques;
 	    vector<int> tab_nombres_elements;
 
 	    // scan family cells and fill the tab that are needed by the create a MED FAMILY

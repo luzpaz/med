@@ -38,14 +38,16 @@ protected :
     There is one for each attribute.
     \endif
   */ 
-  int *    _attributeIdentifier ;
+//CCRT  int *    _attributeIdentifier ;
+  med_int *    _attributeIdentifier ;
   /*!
     \if developper
     Array of all attributes' values.
     There is one for each attribute.
     \endif
   */
-  int *    _attributeValue ;
+//CCRT  int *    _attributeValue ;
+  med_int *    _attributeValue ;
   /*!
     \if developper
     Array of all attributes' descriptions.
@@ -74,14 +76,22 @@ public:
     Constructor to use with med driver.
     \endif
   */
+//CCRT  FAMILY( MESH* Mesh, int Identifier, string Name, 
+//CCRT	  int NumberOfAttribute, int *AttributeIdentifier,
+//CCRT          int *AttributeValue, string AttributeDescription,
+//CCRT          int NumberOfGroup,   string GroupName,
+//CCRT	  int * MEDArrayNodeFamily,
+//CCRT	  int ** MEDArrayCellFamily,
+//CCRT	  int ** MEDArrayFaceFamily,
+//CCRT	  int ** MEDArrayEdgeFamily
   FAMILY( MESH* Mesh, int Identifier, string Name, 
-	  int NumberOfAttribute, int *AttributeIdentifier,
-          int *AttributeValue, string AttributeDescription,
+	  int NumberOfAttribute, med_int *AttributeIdentifier,
+          med_int *AttributeValue, string AttributeDescription,
           int NumberOfGroup,   string GroupName,
-	  int * MEDArrayNodeFamily,
-	  int ** MEDArrayCellFamily,
-	  int ** MEDArrayFaceFamily,
-	  int ** MEDArrayEdgeFamily
+	  med_int * MEDArrayNodeFamily,
+	  med_int ** MEDArrayCellFamily,
+	  med_int ** MEDArrayFaceFamily,
+	  med_int ** MEDArrayEdgeFamily
 	  ) ;
 
 			/*! Copy Constructor. */
@@ -97,20 +107,25 @@ public:
 
   friend ostream & operator<<(ostream &os, const FAMILY &my) ;
 
-  bool build(medEntityMesh Entity,int **FamilyNumber);
+//CCRT  bool build(medEntityMesh Entity,int **FamilyNumber);
+  bool build(medEntityMesh Entity,med_int **FamilyNumber);
 
   inline void setIdentifier             (int Identifier);        
   inline void setNumberOfAttributes     (int NumberOfAttribute);
-  inline void setAttributesIdentifiers  (int * AttributeIdentifier);
-  inline void setAttributesValues       (int * AttributeValue);
+//CCRT  inline void setAttributesIdentifiers  (int * AttributeIdentifier);
+  inline void setAttributesIdentifiers  (med_int * AttributeIdentifier);
+//CCRT  inline void setAttributesValues       (int * AttributeValue);
+  inline void setAttributesValues       (med_int * AttributeValue);
   inline void setAttributesDescriptions (string * AttributeDescription); 
   inline void setNumberOfGroups         (int NumberOfGroups);
   inline void setGroupsNames            (string * GroupName);
 
   inline int      getIdentifier()              const;
   inline int      getNumberOfAttributes()      const;
-  inline int *    getAttributesIdentifiers()   const;
-  inline int *    getAttributesValues()        const;
+//CCRT  inline int *    getAttributesIdentifiers()   const;
+  inline med_int *    getAttributesIdentifiers()   const;
+//CCRT  inline int *    getAttributesValues()        const;
+  inline med_int *    getAttributesValues()        const;
   inline string * getAttributesDescriptions()  const;
   inline int      getNumberOfGroups()          const;
   inline string * getGroupsNames()             const;
@@ -143,7 +158,8 @@ inline void FAMILY::setNumberOfAttributes(int NumberOfAttribute)
 
 /*! Sets the attribute _attributeIdentifier to AttributeIdentifier. */
 //---------------------------------------------------------------------
-inline void FAMILY::setAttributesIdentifiers(int * AttributeIdentifier) 
+//CCRTinline void FAMILY::setAttributesIdentifiers(int * AttributeIdentifier) 
+inline void FAMILY::setAttributesIdentifiers(med_int * AttributeIdentifier) 
 //---------------------------------------------------------------------
 { 
     _attributeIdentifier = AttributeIdentifier ; 
@@ -151,7 +167,8 @@ inline void FAMILY::setAttributesIdentifiers(int * AttributeIdentifier)
 
 /*! Sets the attribute _attributeValue to AttributeValue. */
 //-----------------------------------------------------------
-inline void FAMILY::setAttributesValues(int * AttributeValue) 
+//CCRTinline void FAMILY::setAttributesValues(int * AttributeValue) 
+inline void FAMILY::setAttributesValues(med_int * AttributeValue) 
 //-----------------------------------------------------------
 { 
     _attributeValue = AttributeValue ; 
@@ -199,7 +216,8 @@ inline int FAMILY::getNumberOfAttributes() const
 /*! Returns a pointer to attributes identifiers .
     (There are _numberOfAttribute attributes) */
 //---------------------------------------------------
-inline int * FAMILY::getAttributesIdentifiers() const
+//CCRTinline int * FAMILY::getAttributesIdentifiers() const
+inline med_int * FAMILY::getAttributesIdentifiers() const
 //---------------------------------------------------
 { 
     return _attributeIdentifier ; 
@@ -215,7 +233,8 @@ inline int FAMILY::getAttributeIdentifier(int i) const
 /*! Returns a pointer to attributes values.
     (There are _numberOfAttribute attributes)*/
 //----------------------------------------------
-inline int * FAMILY::getAttributesValues() const             
+//CCRTinline int * FAMILY::getAttributesValues() const             
+inline med_int * FAMILY::getAttributesValues() const             
 //----------------------------------------------
 { 
     return _attributeValue ; 

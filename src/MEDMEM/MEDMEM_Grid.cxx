@@ -1,4 +1,3 @@
-using namespace std;
 // File      : MEDMEM_Grid.hxx
 // Created   : Wed Dec 18 08:35:26 2002
 // Descr     : class containing structured mesh data
@@ -13,6 +12,7 @@ using namespace std;
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 //=======================================================================
@@ -238,7 +238,8 @@ CONNECTIVITY * GRID::makeConnectivity (const medEntityMesh           Entity,
 				       const medGeometryElement Geometry,
 				       const int                NbEntities,
 				       const int                NbNodes,
-				       int *                    NodeNumbers)
+//CCRT				       int *                    NodeNumbers)
+				       med_int *                    NodeNumbers)
   const
 {
   CONNECTIVITY * Connectivity     = new CONNECTIVITY(Entity) ;
@@ -248,7 +249,8 @@ CONNECTIVITY * GRID::makeConnectivity (const medEntityMesh           Entity,
   int numberOfGeometricType    = 1;
   Connectivity->_numberOfTypes = numberOfGeometricType;
 
-  Connectivity->_count    = new int [numberOfGeometricType + 1] ;
+//CCRT  Connectivity->_count    = new int [numberOfGeometricType + 1] ;
+  Connectivity->_count    = new med_int [numberOfGeometricType + 1] ;
   Connectivity->_count[0] = 1;
   Connectivity->_count[1] = 1 + NbEntities;
 
@@ -259,7 +261,8 @@ CONNECTIVITY * GRID::makeConnectivity (const medEntityMesh           Entity,
   Connectivity->_geometricTypes[0] = Geometry;
 
   //  Connectivity->_nodal = new MEDSKYLINEARRAY() ;
-  int * skyLineArrayIndex = new int [NbEntities + 1];
+//CCRT  int * skyLineArrayIndex = new int [NbEntities + 1];
+  med_int * skyLineArrayIndex = new med_int [NbEntities + 1];
   int i, j, nbEntityNodes = Connectivity->_type[0].getNumberOfNodes();
   for (i=0, j=1; i <= NbEntities; ++i, j += nbEntityNodes)
     skyLineArrayIndex [ i ] = j;
@@ -307,9 +310,12 @@ void GRID::fillConnectivity() const
   int nbCells, nbFaces, nbEdges;
   int nbCNodes, nbFNodes, nbENodes;
   int indexC, indexF, indexE;
-  int * nodeCNumbers, * nodeFNumbers, * nodeENumbers;
+//CCRT  int * nodeCNumbers, * nodeFNumbers, * nodeENumbers;
+  med_int * nodeCNumbers, * nodeFNumbers, * nodeENumbers;
   // about descending connectivity
-  int nbSub, nbRevSub, indexSub, indexRevSub, * subNumbers, * subRevNumbers;
+//CCRT  int nbSub, nbRevSub, indexSub, indexRevSub, * subNumbers, * subRevNumbers;
+  int nbSub, nbRevSub, indexSub, indexRevSub ;
+  med_int * subNumbers, * subRevNumbers;
 
   bool hasFaces = _kArrayLength, hasEdges = _jArrayLength;
   
@@ -322,7 +328,8 @@ void GRID::fillConnectivity() const
 
   nbCells = iLenMin1 * jLenMin1 * kLenMin1;
   nbCNodes = nbCells * 2 * (hasEdges ? 2 : 1) * (hasFaces ? 2 : 1);
-  nodeCNumbers = new int [ nbCNodes ];
+//CCRT  nodeCNumbers = new int [ nbCNodes ];
+  nodeCNumbers = new med_int [ nbCNodes ];
 
   // nb of faces and of their connectivity nodes
 
@@ -331,7 +338,8 @@ void GRID::fillConnectivity() const
     nbFaces += _jArrayLength * kLenMin1 * iLenMin1;
     nbFaces += _kArrayLength * iLenMin1 * jLenMin1;
     nbFNodes = nbFaces * 4;
-    nodeFNumbers = new int [ nbFNodes ];
+//CCRT    nodeFNumbers = new int [ nbFNodes ];
+    nodeFNumbers = new med_int [ nbFNodes ];
   } else
     nbFaces = nbFNodes = 0;
 
@@ -348,7 +356,8 @@ void GRID::fillConnectivity() const
       nbEdges += jLenMin1 * _iArrayLength;
     }
     nbENodes = nbEdges * 2;
-    nodeENumbers = new int [ nbENodes ];
+//CCRT    nodeENumbers = new int [ nbENodes ];
+    nodeENumbers = new med_int [ nbENodes ];
   } else
     nbEdges = nbENodes = 0;
 
@@ -364,8 +373,10 @@ void GRID::fillConnectivity() const
     nbSub = nbCells * 4;
     nbRevSub = nbEdges * 2;
   }
-  subNumbers = new int [ nbSub ];
-  subRevNumbers = new int [ nbRevSub ];
+//CCRT  subNumbers = new int [ nbSub ];
+  subNumbers = new med_int [ nbSub ];
+//CCRT  subRevNumbers = new int [ nbRevSub ];
+  subRevNumbers = new med_int [ nbRevSub ];
   for (int r=0; r<nbRevSub; ++r)
     subRevNumbers[ r ] = 0;
 
@@ -587,7 +598,8 @@ void GRID::fillConnectivity() const
   // descending
   {
     //    CellCNCT->_descending = new MEDSKYLINEARRAY() ;
-    int * skyLineArrayIndex = new int [nbCells + 1];
+//CCRT    int * skyLineArrayIndex = new int [nbCells + 1];
+    med_int * skyLineArrayIndex = new med_int [nbCells + 1];
     int nbEntitySub = CellCNCT->_type[0].getNumberOfConstituents(1);
     for (i=0, j=1; i <= nbCells; ++i, j += nbEntitySub)
       skyLineArrayIndex [ i ] = j;
@@ -604,7 +616,8 @@ void GRID::fillConnectivity() const
   {
     //    CellCNCT->_reverseDescendingConnectivity = new MEDSKYLINEARRAY() ;
     nbSub = nbRevSub/2;
-    int * skyLineArrayIndex = new int [nbSub + 1];
+//CCRT    int * skyLineArrayIndex = new int [nbSub + 1];
+    med_int * skyLineArrayIndex = new med_int [nbSub + 1];
     for (i=0, j=1; i <= nbSub; ++i, j += 2)
       skyLineArrayIndex [ i ] = j;
     //    CellCNCT->_reverseDescendingConnectivity->setMEDSKYLINEARRAY
@@ -679,7 +692,7 @@ const double GRID::getArrayValue (const int Axis, const int i) const throw (MEDE
   case 2:  return _jArray[ i ];
   default: return _kArray[ i ];
   }
-  return 0.0;
+//CCRT  return 0.0;
 }
 
 //=======================================================================

@@ -1,4 +1,3 @@
-using namespace std;
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_Group.hxx"
@@ -10,6 +9,7 @@ using namespace std;
 #include "MEDMEM_STRING.hxx"
 #include <iomanip>
 
+using namespace std;
 using namespace MEDMEM;
 /*!
    Default Constructor. /n
@@ -23,7 +23,8 @@ CONNECTIVITY::CONNECTIVITY(medEntityMesh Entity /* =MED_CELL */) :
   				_geometricTypes((medGeometryElement*)NULL),
   				_type((CELLMODEL*)NULL),
   				_entityDimension(0),
-  				_count((int*)NULL),
+//CCRT  				_count((int*)NULL),
+  				_count((med_int*)NULL),
   				_nodal((MEDSKYLINEARRAY*)NULL),
   				_descending((MEDSKYLINEARRAY*)NULL),
   				_reverseNodalConnectivity((MEDSKYLINEARRAY*)NULL),
@@ -54,7 +55,8 @@ CONNECTIVITY::CONNECTIVITY(int numberOfTypes,medEntityMesh Entity /* =MED_CELL *
   MESSAGE("CONNECTIVITY(int numberOfTypes,medEntityMesh Entity=MED_CELL)");
   _geometricTypes = new medGeometryElement[numberOfTypes];
   _type = new CELLMODEL[numberOfTypes];
-  _count = new int[numberOfTypes+1];
+//CCRT  _count = new int[numberOfTypes+1];
+  _count = new med_int[numberOfTypes+1];
 }
 
 /*!
@@ -200,13 +202,15 @@ void CONNECTIVITY::setGeometricTypes(const medGeometryElement * Types,
 
 /*! A DOCUMENTER */
 //--------------------------------------------------------------------//
-void CONNECTIVITY::setCount(const int * Count, const medEntityMesh Entity)
+//CCRTvoid CONNECTIVITY::setCount(const int * Count, const medEntityMesh Entity)
+void CONNECTIVITY::setCount(const med_int * Count, const medEntityMesh Entity)
   			    throw (MEDEXCEPTION)
 //--------------------------------------------------------------------//
 {
   if (Entity == _entity) 
   {
-    int * index = new int[Count[_numberOfTypes]];
+//CCRT    int * index = new int[Count[_numberOfTypes]];
+    med_int * index = new med_int[Count[_numberOfTypes]];
     index[0]=1;
     _count[0]=1;
     for (int i=0; i<_numberOfTypes; i++) {
@@ -230,7 +234,8 @@ void CONNECTIVITY::setCount(const int * Count, const medEntityMesh Entity)
 }
 
 //--------------------------------------------------------------------//
-void CONNECTIVITY::setNodal(const int * Connectivity,
+//CCRTvoid CONNECTIVITY::setNodal(const int * Connectivity,
+void CONNECTIVITY::setNodal(const med_int * Connectivity,
 			    const medEntityMesh Entity,
 			    const medGeometryElement Type)
   			    throw (MEDEXCEPTION)
@@ -330,20 +335,26 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
 	throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"We have no nodal connectivity of sub cell"));
       }
     int oldNumberOfFace = oldConstituent->_nodal->getNumberOf();
-    const int * oldConstituentValue = oldConstituent->_nodal->getValue();
-    const int * oldConstituentIndex = oldConstituent->_nodal->getIndex();
+//CCRT    const int * oldConstituentValue = oldConstituent->_nodal->getValue();
+    const med_int * oldConstituentValue = oldConstituent->_nodal->getValue();
+//CCRT    const int * oldConstituentIndex = oldConstituent->_nodal->getIndex();
+    const med_int * oldConstituentIndex = oldConstituent->_nodal->getIndex();
 
     calculateDescendingConnectivity();
 
     MESSAGE(LOC << " Right after the call to calculateDescendingConnectivity");
     //    int newNumberOfFace = _constituent->_nodal->getNumberOf();
-    const int * newConstituentValue = _constituent->_nodal->getValue();
-    const int * newConstituentIndex = _constituent->_nodal->getIndex();
+//CCRT    const int * newConstituentValue = _constituent->_nodal->getValue();
+    const med_int * newConstituentValue = _constituent->_nodal->getValue();
+//CCRT    const int * newConstituentIndex = _constituent->_nodal->getIndex();
+    const med_int * newConstituentIndex = _constituent->_nodal->getIndex();
     
-    const int * newReverseDescendingIndex =
+//CCRT    const int * newReverseDescendingIndex =
+    const med_int * newReverseDescendingIndex =
       _reverseDescendingConnectivity->getIndex();
     
-    const int * newDescendingIndex = _descending->getIndex();
+//CCRT    const int * newDescendingIndex = _descending->getIndex();
+    const med_int * newDescendingIndex = _descending->getIndex();
     //    const int * newDescendingValue = _descending->getValue();
 
     // loop on all family,
@@ -364,7 +375,8 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
     // newConstituentIndex with a negative sign if the face is not
     // right orented
 
-    int * renumberingFromOldToNew = new int [oldNumberOfFace];
+//CCRT    int * renumberingFromOldToNew = new int [oldNumberOfFace];
+    med_int * renumberingFromOldToNew = new med_int [oldNumberOfFace];
     int index1 = 0;
     int indexm1 = 0;
 
@@ -387,18 +399,22 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
 	int face_it_endOld = oldConstituentIndex[iOldFace+1];
 	int face_size_itOld = face_it_endOld - face_it_beginOld;
 
-	const int* NodesLists = oldConstituentValue + (face_it_beginOld-1);
+//CCRT	const int* NodesLists = oldConstituentValue + (face_it_beginOld-1);
+	const med_int* NodesLists = oldConstituentValue + (face_it_beginOld-1);
 	int face_size_itNew;
 	
-	const int * reverseFaceNodal = _constituent->getReverseNodalConnectivity();
-	const int * reverseFaceNodalIndex = _constituent->getReverseNodalConnectivityIndex();
+//CCRT	const int * reverseFaceNodal = _constituent->getReverseNodalConnectivity();
+	const med_int * reverseFaceNodal = _constituent->getReverseNodalConnectivity();
+//CCRT	const int * reverseFaceNodalIndex = _constituent->getReverseNodalConnectivityIndex();
+	const med_int * reverseFaceNodalIndex = _constituent->getReverseNodalConnectivityIndex();
 
 	// set an array wich contains faces numbers arround first node 
 	int BeginIndexFaceArrayFirstNode=reverseFaceNodalIndex[NodesLists[0]-1];
 	int EndIndexFaceArrayFirstNode=reverseFaceNodalIndex[NodesLists[0]];
 	int NumberOfFacesInList=EndIndexFaceArrayFirstNode-BeginIndexFaceArrayFirstNode;
 
-	int * FacesList = new int[NumberOfFacesInList];
+//CCRT	int * FacesList = new int[NumberOfFacesInList];
+	med_int * FacesList = new med_int[NumberOfFacesInList];
 
 	for (int l=BeginIndexFaceArrayFirstNode; l<EndIndexFaceArrayFirstNode; l++){
 	  FacesList[l-BeginIndexFaceArrayFirstNode]=reverseFaceNodal[l-1];
@@ -409,7 +425,8 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
 	for (int nodeFaceOld=1; nodeFaceOld<face_size_itOld; nodeFaceOld++)
 	  {
 	    int NewNumberOfFacesInList = 0;
-	    int * NewFacesList = new int[NumberOfFacesInList];
+//CCRT	    int * NewFacesList = new int[NumberOfFacesInList];
+	    med_int * NewFacesList = new med_int[NumberOfFacesInList];
 
 	    for (int l1=0; l1<NumberOfFacesInList; l1++) {
 	      for (int l2=reverseFaceNodalIndex[NodesLists[nodeFaceOld]-1]; l2<reverseFaceNodalIndex[NodesLists[nodeFaceOld]]; l2++) {
@@ -440,7 +457,8 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
 	    int face_it_endNew = newConstituentIndex[FacesList[0]];
 	    face_size_itNew = face_it_endNew - face_it_beginNew;
 
-	    const int * newNodesLists = newConstituentValue+newConstituentIndex[FacesList[0]-1]-1;
+//CCRT	    const int * newNodesLists = newConstituentValue+newConstituentIndex[FacesList[0]-1]-1;
+	    const med_int * newNodesLists = newConstituentValue+newConstituentIndex[FacesList[0]-1]-1;
 	    MEDMODULUSARRAY modulusArrayNew(face_size_itNew,newNodesLists);
 	
 	    int retCompareNewOld = modulusArrayNew.compare(modulusArrayOld);
@@ -485,7 +503,8 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
 	      
 		  _reverseDescendingConnectivity->setIJ(FacesList[0],1,cell2);
 		  // Updating _constituent->_nodal because of reversity
-		  const int * oldArray = oldConstituentValue+face_it_beginOld-1;
+//CCRT		  const int * oldArray = oldConstituentValue+face_it_beginOld-1;
+		  const med_int * oldArray = oldConstituentValue+face_it_beginOld-1;
 		  for(int iarray=1;iarray<=face_size_itNew;iarray++){
 		    _constituent->_nodal->setIJ(FacesList[0],iarray,oldArray[iarray-1]);
 		  }
@@ -545,14 +564,18 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
 	  throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"We have a family which is already in all constituent !"));
 	myFamily->setAll(false);
 	// values array :
-	int * values = new int[oldNumberOfFace] ;
+//CCRT	int * values = new int[oldNumberOfFace] ;
+	med_int * values = new med_int[oldNumberOfFace] ;
 	for (int ind=0;ind<oldNumberOfFace;ind++)
 	  values[ind]=ind+1;
 	// index array
 	int NumberOfTypes = myFamily->getNumberOfTypes();
-	const int * count = oldConstituent->getGlobalNumberingIndex(_constituent->getEntity());
-	int * index = new int[NumberOfTypes+1] ;
-	memcpy(index,count,(NumberOfTypes+1)*sizeof(int));
+//CCRT	const int * count = oldConstituent->getGlobalNumberingIndex(_constituent->getEntity());
+	const med_int * count = oldConstituent->getGlobalNumberingIndex(_constituent->getEntity());
+//CCRT	int * index = new int[NumberOfTypes+1] ;
+	med_int * index = new med_int[NumberOfTypes+1] ;
+//CCRT	memcpy(index,count,(NumberOfTypes+1)*sizeof(int));
+	memcpy(index,count,(NumberOfTypes+1)*sizeof(med_int));
 	// build new number attribut
 	myFamily->setNumber(index,values);
       }
@@ -565,7 +588,8 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
 
       SCRUTE(numberOfLines_skyline);
 
-      const int * index_skyline = number->getIndex();
+//CCRT      const int * index_skyline = number->getIndex();
+      const med_int * index_skyline = number->getIndex();
       
       SCRUTE(index_skyline);
 
@@ -627,19 +651,25 @@ void CONNECTIVITY::updateGroup(vector<GROUP*> myFamilies)
 	throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"We have no nodal connectivity of sub cell"));
       }
     int oldNumberOfFace = oldConstituent->_nodal->getNumberOf();
-    const int * oldConstituentValue = oldConstituent->_nodal->getValue();
-    const int * oldConstituentIndex = oldConstituent->_nodal->getIndex();
+//CCRT    const int * oldConstituentValue = oldConstituent->_nodal->getValue();
+    const med_int * oldConstituentValue = oldConstituent->_nodal->getValue();
+//CCRT    const int * oldConstituentIndex = oldConstituent->_nodal->getIndex();
+    const med_int * oldConstituentIndex = oldConstituent->_nodal->getIndex();
 
     calculateDescendingConnectivity();
 
     //    int newNumberOfFace = _constituent->_nodal->getNumberOf();
-    const int * newConstituentValue = _constituent->_nodal->getValue();
-    const int * newConstituentIndex = _constituent->_nodal->getIndex();
+//CCRT    const int * newConstituentValue = _constituent->_nodal->getValue();
+    const med_int * newConstituentValue = _constituent->_nodal->getValue();
+//CCRT    const int * newConstituentIndex = _constituent->_nodal->getIndex();
+    const med_int * newConstituentIndex = _constituent->_nodal->getIndex();
     
-    const int * newReverseDescendingIndex =
+//CCRT    const int * newReverseDescendingIndex =
+    const med_int * newReverseDescendingIndex =
       _reverseDescendingConnectivity->getIndex();
     
-    const int * newDescendingIndex = _descending->getIndex();
+//CCRT    const int * newDescendingIndex = _descending->getIndex();
+    const med_int * newDescendingIndex = _descending->getIndex();
     //    const int * newDescendingValue = _descending->getValue();
 
     // loop on all family,
@@ -660,7 +690,8 @@ void CONNECTIVITY::updateGroup(vector<GROUP*> myFamilies)
     // newConstituentIndex with a negative sign if the face is not
     // right orented
 
-    int * renumberingFromOldToNew = new int [oldNumberOfFace];
+//CCRT    int * renumberingFromOldToNew = new int [oldNumberOfFace];
+    med_int * renumberingFromOldToNew = new med_int [oldNumberOfFace];
     int index1 = 0;
     int indexm1 = 0;
 
@@ -677,18 +708,22 @@ void CONNECTIVITY::updateGroup(vector<GROUP*> myFamilies)
 	int face_it_endOld = oldConstituentIndex[iOldFace+1];
 	int face_size_itOld = face_it_endOld - face_it_beginOld;
 
-	const int* NodesLists = oldConstituentValue + (face_it_beginOld-1);
+//CCRT	const int* NodesLists = oldConstituentValue + (face_it_beginOld-1);
+	const med_int* NodesLists = oldConstituentValue + (face_it_beginOld-1);
 	int face_size_itNew;
 	
-	const int * reverseFaceNodal = _constituent->getReverseNodalConnectivity();
-	const int * reverseFaceNodalIndex = _constituent->getReverseNodalConnectivityIndex();
+//CCRT	const int * reverseFaceNodal = _constituent->getReverseNodalConnectivity();
+	const med_int * reverseFaceNodal = _constituent->getReverseNodalConnectivity();
+//CCRT	const int * reverseFaceNodalIndex = _constituent->getReverseNodalConnectivityIndex();
+	const med_int * reverseFaceNodalIndex = _constituent->getReverseNodalConnectivityIndex();
 
 	// set an array wich contains faces numbers arround first node 
 	int BeginIndexFaceArrayFirstNode=reverseFaceNodalIndex[NodesLists[0]-1];
 	int EndIndexFaceArrayFirstNode=reverseFaceNodalIndex[NodesLists[0]];
 	int NumberOfFacesInList=EndIndexFaceArrayFirstNode-BeginIndexFaceArrayFirstNode;
 
-	int * FacesList = new int[NumberOfFacesInList];
+//CCRT	int * FacesList = new int[NumberOfFacesInList];
+	med_int * FacesList = new med_int[NumberOfFacesInList];
 
 	for (int l=BeginIndexFaceArrayFirstNode; l<EndIndexFaceArrayFirstNode; l++){
 	  FacesList[l-BeginIndexFaceArrayFirstNode]=reverseFaceNodal[l-1];
@@ -699,7 +734,8 @@ void CONNECTIVITY::updateGroup(vector<GROUP*> myFamilies)
 	for (int nodeFaceOld=1; nodeFaceOld<face_size_itOld; nodeFaceOld++)
 	  {
 	    int NewNumberOfFacesInList = 0;
-	    int * NewFacesList = new int[NumberOfFacesInList];
+//CCRT	    int * NewFacesList = new int[NumberOfFacesInList];
+	    med_int * NewFacesList = new med_int[NumberOfFacesInList];
 
 	    for (int l1=0; l1<NumberOfFacesInList; l1++) {
 	      for (int l2=reverseFaceNodalIndex[NodesLists[nodeFaceOld]-1]; l2<reverseFaceNodalIndex[NodesLists[nodeFaceOld]]; l2++) {
@@ -730,7 +766,8 @@ void CONNECTIVITY::updateGroup(vector<GROUP*> myFamilies)
 	    int face_it_endNew = newConstituentIndex[FacesList[0]];
 	    face_size_itNew = face_it_endNew - face_it_beginNew;
 
-	    const int * newNodesLists = newConstituentValue+newConstituentIndex[FacesList[0]-1]-1;
+//CCRT	    const int * newNodesLists = newConstituentValue+newConstituentIndex[FacesList[0]-1]-1;
+	    const med_int * newNodesLists = newConstituentValue+newConstituentIndex[FacesList[0]-1]-1;
 	    MEDMODULUSARRAY modulusArrayNew(face_size_itNew,newNodesLists);
 	
 	    int retCompareNewOld = modulusArrayNew.compare(modulusArrayOld);
@@ -775,7 +812,8 @@ void CONNECTIVITY::updateGroup(vector<GROUP*> myFamilies)
 	      
 		  _reverseDescendingConnectivity->setIJ(FacesList[0],1,cell2);
 		  // Updating _constituent->_nodal because of reversity
-		  const int * oldArray = oldConstituentValue+face_it_beginOld-1;
+//CCRT		  const int * oldArray = oldConstituentValue+face_it_beginOld-1;
+		  const med_int * oldArray = oldConstituentValue+face_it_beginOld-1;
 		  for(int iarray=1;iarray<=face_size_itNew;iarray++){
 		    _constituent->_nodal->setIJ(FacesList[0],iarray,oldArray[iarray-1]);
 		  }
@@ -825,7 +863,8 @@ void CONNECTIVITY::updateGroup(vector<GROUP*> myFamilies)
       
       MEDSKYLINEARRAY * number = myFamily->getnumber();
       int numberOfLines_skyline = number->getNumberOf();
-      const int * index_skyline = number->getIndex();
+//CCRT      const int * index_skyline = number->getIndex();
+      const med_int * index_skyline = number->getIndex();
       
       for (int i=0;i<numberOfLines_skyline;i++) {
 	for (int j=index_skyline[i]; j<index_skyline[i+1];j++) {
@@ -866,13 +905,15 @@ const med_int * CONNECTIVITY::getConnectivity(medConnectivity ConnectivityType, 
       }
     
     if (Connectivity!=NULL)
-      if (Type==MED_ALL_ELEMENTS)
+      if (Type==MED_ALL_ELEMENTS) {
 	return Connectivity->getValue();
+      }
       else {
 	for (med_int i=0; i<_numberOfTypes; i++)
-	  if (_geometricTypes[i]==Type)
+	  if (_geometricTypes[i]==Type) {
 	    //return Connectivity->getI(i+1);
 	    return Connectivity->getI(_count[i]);
+	  }
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Type not found !"));
       }
     else
@@ -1162,8 +1203,10 @@ void CONNECTIVITY::calculateReverseNodalConnectivity()
       size_reverse_nodal_connectivity += reverse_connectivity[i].size();
   
     //MEDSKYLINEARRAY * ReverseConnectivity = new MEDSKYLINEARRAY(_numberOfNodes,size_reverse_nodal_connectivity);
-    med_int * reverse_nodal_connectivity_index = new (med_int)[_numberOfNodes+1];
-    med_int * reverse_nodal_connectivity = new (med_int)[size_reverse_nodal_connectivity];
+//CCRT    med_int * reverse_nodal_connectivity_index = new (med_int)[_numberOfNodes+1];
+    med_int * reverse_nodal_connectivity_index = new med_int[_numberOfNodes+1];
+//CCRT    med_int * reverse_nodal_connectivity = new (med_int)[size_reverse_nodal_connectivity];
+    med_int * reverse_nodal_connectivity = new med_int[size_reverse_nodal_connectivity];
     //const med_int * reverse_nodal_connectivity = ReverseConnectivity->getValue();
     //const med_int * reverse_nodal_connectivity_index = ReverseConnectivity->getIndex();
 
@@ -1226,16 +1269,19 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 	DescendingSize+=(_count[i+1]-_count[i])*_type[i].getNumberOfConstituents(1);
       //_descending = new MEDSKYLINEARRAY(_count[_numberOfTypes]-1,DescendingSize);
       //const int * descend_connectivity = _descending->getValue();
-      int * descend_connectivity = new int[DescendingSize];
+//CCRT      int * descend_connectivity = new int[DescendingSize];
+      med_int * descend_connectivity = new med_int[DescendingSize];
       for (int i=0; i<DescendingSize; i++)
 	descend_connectivity[i]=0;
       //const int * descend_connectivity_index = _descending->getIndex();
-      int * descend_connectivity_index = new int[_count[_numberOfTypes]];
+//CCRT      int * descend_connectivity_index = new int[_count[_numberOfTypes]];
+      med_int * descend_connectivity_index = new med_int[_count[_numberOfTypes]];
       descend_connectivity_index[0]=1;
       medGeometryElement* ConstituentsTypes = new medGeometryElement[2];
       ConstituentsTypes[0]=MED_NONE;
       ConstituentsTypes[1]=MED_NONE;
-      int * NumberOfConstituentsForeachType = new int[2];
+//CCRT      int * NumberOfConstituentsForeachType = new int[2];
+      med_int * NumberOfConstituentsForeachType = new med_int[2];
       NumberOfConstituentsForeachType[0]=0;
       NumberOfConstituentsForeachType[1]=0;
       for(int i=0; i<_numberOfTypes; i++)
@@ -1276,8 +1322,10 @@ void CONNECTIVITY::calculateDescendingConnectivity()
       // we use _constituent->_nodal 
       //const int * ConstituentNodalConnectivity = _constituent->_nodal->getValue();
       //const int * ConstituentNodalConnectivityIndex = _constituent->_nodal->getIndex();
-      int * ConstituentNodalConnectivity = new int[TotalNumberOfNodes];
-      int * ConstituentNodalConnectivityIndex = new int[TotalNumberOfConstituents+1];
+//CCRT      int * ConstituentNodalConnectivity = new int[TotalNumberOfNodes];
+      med_int * ConstituentNodalConnectivity = new med_int[TotalNumberOfNodes];
+//CCRT      int * ConstituentNodalConnectivityIndex = new int[TotalNumberOfConstituents+1];
+      med_int * ConstituentNodalConnectivityIndex = new med_int[TotalNumberOfConstituents+1];
       ConstituentNodalConnectivityIndex[0]=1;
 
       _constituent->_entityDimension=ConstituentsTypes[0]/100;
@@ -1289,7 +1337,8 @@ void CONNECTIVITY::calculateDescendingConnectivity()
       _constituent->_type = new CELLMODEL[_constituent->_numberOfTypes];
       _constituent->_count = new med_int[_constituent->_numberOfTypes+1];
       _constituent->_count[0]=1;
-      int* tmp_NumberOfConstituentsForeachType = new med_int[_constituent->_numberOfTypes+1];
+//CCRT      int* tmp_NumberOfConstituentsForeachType = new med_int[_constituent->_numberOfTypes+1];
+      med_int* tmp_NumberOfConstituentsForeachType = new med_int[_constituent->_numberOfTypes+1];
       tmp_NumberOfConstituentsForeachType[0]=0; // to count constituent of each type
       for (int i=0; i<_constituent->_numberOfTypes;i++) {
 	_constituent->_geometricTypes[i]=ConstituentsTypes[i];
@@ -1306,11 +1355,14 @@ void CONNECTIVITY::calculateDescendingConnectivity()
       // we need reverse nodal connectivity
       if (! _reverseNodalConnectivity)
 	calculateReverseNodalConnectivity();
-      const int * ReverseNodalConnectivityIndex = _reverseNodalConnectivity->getIndex();
-      const int * ReverseNodalConnectivityValue = _reverseNodalConnectivity->getValue();
+//CCRT      const int * ReverseNodalConnectivityIndex = _reverseNodalConnectivity->getIndex();
+      const med_int * ReverseNodalConnectivityIndex = _reverseNodalConnectivity->getIndex();
+//CCRT      const int * ReverseNodalConnectivityValue = _reverseNodalConnectivity->getValue();
+      const med_int * ReverseNodalConnectivityValue = _reverseNodalConnectivity->getValue();
 
       // array to keep reverse descending connectivity
-      int * ReverseDescendingConnectivityValue = new int[TotalNumberOfConstituents*2];
+//CCRT      int * ReverseDescendingConnectivityValue = new int[TotalNumberOfConstituents*2];
+      med_int * ReverseDescendingConnectivityValue = new med_int[TotalNumberOfConstituents*2];
       
       int TotalNumberOfSubCell = 0;
       for (int i=0; i<_numberOfTypes; i++)
@@ -1338,7 +1390,8 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 		  ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2]=j;
 		  int NumberOfNodesPerConstituent = Type.getConstituentType(1,k)%100;
 	    
-		  int * NodesLists = new int[NumberOfNodesPerConstituent];
+//CCRT		  int * NodesLists = new int[NumberOfNodesPerConstituent];
+		  med_int * NodesLists = new med_int[NumberOfNodesPerConstituent];
 		  for (int l=0; l<NumberOfNodesPerConstituent; l++) {
 		    NodesLists[l]=_nodal->getIJ(j,Type.getNodeConstituent(1,k,l+1));
 		    ConstituentNodalConnectivity[ConstituentNodalConnectivityIndex[TotalNumberOfSubCell-1]-1+l]=NodesLists[l];
@@ -1352,7 +1405,8 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 
 		  if (NumberOfCellsInList > 0)
 		    { // we could have no element !
-		      int * CellsList = new int[NumberOfCellsInList];
+//CCRT		      int * CellsList = new int[NumberOfCellsInList];
+		      med_int * CellsList = new med_int[NumberOfCellsInList];
 		      for (int l=ReverseNodalConnectivityIndex_0; l<ReverseNodalConnectivityIndex_1; l++)
 			CellsList[l-ReverseNodalConnectivityIndex_0]=ReverseNodalConnectivityValue[l-1];
 		  
@@ -1361,7 +1415,8 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 
 		      for (int l=1; l<NumberOfNodesPerConstituent; l++) {
 			int NewNumberOfCellsInList = 0;
-			int * NewCellsList = new int[NumberOfCellsInList];
+//CCRT			int * NewCellsList = new int[NumberOfCellsInList];
+			med_int * NewCellsList = new med_int[NumberOfCellsInList];
 			for (int l1=0; l1<NumberOfCellsInList; l1++)
 			  for (int l2=ReverseNodalConnectivityIndex[NodesLists[l]-1]; l2<ReverseNodalConnectivityIndex[NodesLists[l]]; l2++)
 			    {
@@ -1442,15 +1497,19 @@ void CONNECTIVITY::calculateDescendingConnectivity()
       //MEDSKYLINEARRAY *ConstituentNodal = new MEDSKYLINEARRAY(NumberOfConstituent,SizeOfConstituentNodal);
       //const int *ConstituentNodalValue = ConstituentNodal->getValue();
       //const int *ConstituentNodalIndex = ConstituentNodal->getIndex();
-      int *ConstituentNodalValue = new int[SizeOfConstituentNodal];
-      int *ConstituentNodalIndex = new int[NumberOfConstituent+1];
+//CCRT      int *ConstituentNodalValue = new int[SizeOfConstituentNodal];
+      med_int *ConstituentNodalValue = new med_int[SizeOfConstituentNodal];
+//CCRT      int *ConstituentNodalIndex = new int[NumberOfConstituent+1];
+      med_int *ConstituentNodalIndex = new med_int[NumberOfConstituent+1];
       ConstituentNodalIndex[0]=1;
       // we build _reverseDescendingConnectivity 
       //_reverseDescendingConnectivity = new MEDSKYLINEARRAY(NumberOfConstituent,2*NumberOfConstituent);
       //const int *reverseDescendingConnectivityValue = _reverseDescendingConnectivity->getValue();
       //const int *reverseDescendingConnectivityIndex = _reverseDescendingConnectivity->getIndex();
-      int *reverseDescendingConnectivityValue = new int[2*NumberOfConstituent];
-      int *reverseDescendingConnectivityIndex = new int[NumberOfConstituent+1];
+//CCRT      int *reverseDescendingConnectivityValue = new int[2*NumberOfConstituent];
+      med_int *reverseDescendingConnectivityValue = new med_int[2*NumberOfConstituent];
+//CCRT      int *reverseDescendingConnectivityIndex = new int[NumberOfConstituent+1];
+      med_int *reverseDescendingConnectivityIndex = new med_int[NumberOfConstituent+1];
       reverseDescendingConnectivityIndex[0]=1;
 
       // first constituent type
@@ -1653,7 +1712,8 @@ ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
     {
 	int numberofelements = co.getNumberOf( co._entity , MED_ALL_ELEMENTS);
 	const med_int *connectivity =  co.getConnectivity( co._typeConnectivity, co._entity, MED_ALL_ELEMENTS);
-	const int *connectivity_index =  co.getConnectivityIndex( co._typeConnectivity, co._entity );
+//CCRT	const int *connectivity_index =  co.getConnectivityIndex( co._typeConnectivity, co._entity );
+	const med_int *connectivity_index =  co.getConnectivityIndex( co._typeConnectivity, co._entity );
 	
 	for ( int j=0; j!=numberofelements; j++ ) 
 	{

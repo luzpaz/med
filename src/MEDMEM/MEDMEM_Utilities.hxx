@@ -4,6 +4,7 @@
 
 #else
 
+
 #ifndef __MEDMEM_UTILITIES
 #define __MEDMEM_UTILITIES
 

@@ -1,4 +1,3 @@
-using namespace std;
 #include "MEDMEM_VtkMedDriver.hxx"
 
 #include <sstream>
@@ -9,6 +8,7 @@ using namespace std;
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_CellModel.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(), 
@@ -221,7 +221,8 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
   //  int connectivity_sum = 0 ;
 
   //const int * connectivity = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS) ; !! UNUSED VARIABLE !!
-  const int * connectivityIndex = myMesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
+//CCRT  const int * connectivityIndex = myMesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
+  const med_int * connectivityIndex = myMesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
 
   int connectivity_sum =  connectivityIndex[cells_sum]-1 ;
 
@@ -325,7 +326,8 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getName() ) ) ;
     int nodes_cell = cells_type[i].getNumberOfNodes();
     int numberOfCell = myMesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
-    const int * connectivityArray = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
+//CCRT    const int * connectivityArray = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
+    const med_int * connectivityArray = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
     for (int j=0;j<numberOfCell;j++) {
       (*_vtkFile) << nodes_cell << " " ;
       for (int k=0;k<nodes_cell;k++)

@@ -1,4 +1,3 @@
-using namespace std;
 /* Programme de test du constructeur de copies de la classe CONNECTIVITY de MEDMEM
    jroy - 19/12/2002 */
 
@@ -17,6 +16,7 @@ using namespace std;
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
@@ -32,7 +32,8 @@ void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
   for (int i=0; i<NumberOfTypes; i++) {
     cout << "For type " << Types[i] << " : " << endl ;
     int NumberOfElements = myMesh->getNumberOfElements(MED_CELL,Types[i]);
-    const int * connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,Types[i]);
+//CCRT    const int * connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,Types[i]);
+    const med_int * connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,Types[i]);
     int NomberOfNodesPerCell = Types[i]%100 ;
     for (int j=0;j<NumberOfElements;j++){
       cout << "Element "<< j+1 <<" : " ;
@@ -43,8 +44,10 @@ void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
   }
 
   cout << "Show Reverse Nodal Connectivity :" << endl ;
-  const int * ReverseNodalConnectivity = myMesh->getReverseConnectivity(MED_NODAL) ;
-  const int * ReverseNodalConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_NODAL) ;
+//CCRT  const int * ReverseNodalConnectivity = myMesh->getReverseConnectivity(MED_NODAL) ;
+  const med_int * ReverseNodalConnectivity = myMesh->getReverseConnectivity(MED_NODAL) ;
+//CCRT  const int * ReverseNodalConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_NODAL) ;
+  const med_int * ReverseNodalConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_NODAL) ;
   for (int i=0; i<NumberOfNodes; i++) {
     cout << "Node "<<i+1<<" : " ;
     for (int j=ReverseNodalConnectivityIndex[i];j<ReverseNodalConnectivityIndex[i+1];j++)
@@ -54,8 +57,10 @@ void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
 
   cout << "Show Connectivity (Descending) :" << endl ;
   int NumberOfElements ;
-  const int * connectivity ;
-  const int * connectivity_index ;
+//CCRT  const int * connectivity ;
+  const med_int * connectivity ;
+//CCRT  const int * connectivity_index ;
+  const med_int * connectivity_index ;
   myMesh->calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL);
   try {
     NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
@@ -74,8 +79,10 @@ void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
   }
 
   cout << "Show Reverse Descending Connectivity :" << endl ;
-  const int * ReverseDescendingConnectivity = myMesh->getReverseConnectivity(MED_DESCENDING) ;
-  const int * ReverseDescendingConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_DESCENDING) ;
+//CCRT  const int * ReverseDescendingConnectivity = myMesh->getReverseConnectivity(MED_DESCENDING) ;
+  const med_int * ReverseDescendingConnectivity = myMesh->getReverseConnectivity(MED_DESCENDING) ;
+//CCRT  const int * ReverseDescendingConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_DESCENDING) ;
+  const med_int * ReverseDescendingConnectivityIndex = myMesh->getReverseConnectivityIndex(MED_DESCENDING) ;
 
   int NumberOfConstituents  = 0;
   string constituent ;
@@ -104,8 +111,10 @@ void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
     }
   }
   cout << "Show "<<constituent<<" Connectivity (Nodal) :" << endl ;
-  const int * face_connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
-  const int * face_connectivity_index =  myMesh->getConnectivityIndex(MED_NODAL,constituentEntity);
+//CCRT  const int * face_connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
+  const med_int * face_connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
+//CCRT  const int * face_connectivity_index =  myMesh->getConnectivityIndex(MED_NODAL,constituentEntity);
+  const med_int * face_connectivity_index =  myMesh->getConnectivityIndex(MED_NODAL,constituentEntity);
   for (int i=0; i<NumberOfConstituents; i++) {
     cout << constituent <<i+1<<" : " ;
     for (int j=face_connectivity_index[i];j<face_connectivity_index[i+1];j++)

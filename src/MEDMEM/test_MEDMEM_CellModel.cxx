@@ -1,8 +1,8 @@
-using namespace std;
 #include "utilities.h"
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_DriversDef.hxx"
 
+using namespace std;
 using namespace MEDMEM;
 int main (int argc, char ** argv) {
   list<MED_FR::med_geometrie_element> geomList = MED_FR::meshEntities[MED_FR::MED_MAILLE] ;

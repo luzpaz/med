@@ -83,7 +83,8 @@ protected:
     (not yet implemented).
     \endif
   */
-  mutable int *                    _numberOfGaussPoint ;
+//CCRT  mutable int *                    _numberOfGaussPoint ;
+  mutable med_int *                    _numberOfGaussPoint ;
 
    /*
     \if developper
@@ -167,7 +168,8 @@ public:
   inline void setNumberOfElements(const int *NumberOfElements);
   inline void setTotalNumberOfElements(int TotalNumberOfElements);
   inline void setNumber(MEDSKYLINEARRAY * Number);
-  inline void setNumber(const int * index, const int* value);
+//CCRT  inline void setNumber(const int * index, const int* value);
+  inline void setNumber(const med_int * index, const med_int* value);
 
   inline string getName() const;
   inline string getDescription() const;
@@ -177,20 +179,24 @@ public:
   inline bool   isOnAllElements() const;
   inline int    getNumberOfTypes() const;
   inline const medGeometryElement* getTypes() const ;
-  inline const int *  getNumberOfGaussPoint() const throw (MEDEXCEPTION);
+//CCRT  inline const int *  getNumberOfGaussPoint() const throw (MEDEXCEPTION);
+  inline const med_int *  getNumberOfGaussPoint() const throw (MEDEXCEPTION);
   inline int          getNumberOfGaussPoint(medGeometryElement geomElement) const throw (MEDEXCEPTION);
   //inline int *  getGeometricTypeNumber() const;
   //inline int    getTotalNumberOfElement() const;
   inline int    getNumberOfElements(medGeometryElement GeometricType) const throw (MEDEXCEPTION);
   virtual inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
-  virtual inline const int *  getNumber(medGeometryElement GeometricType) const throw (MEDEXCEPTION);
-  virtual inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
+//CCRT  virtual inline const int *  getNumber(medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+  virtual inline const med_int *  getNumber(medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+//CCRT  virtual inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
+  virtual inline const med_int *  getNumberIndex() const throw (MEDEXCEPTION);
 
   void blending(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
 
   void setpartial(string Description, int NumberOfGeometricType,
 		  int TotalNumberOfEntity, medGeometryElement *GeometricType,
-		  int *NumberOfEntity, int *NumberValue);
+//CCRT		  int *NumberOfEntity, int *NumberValue);
+		  int *NumberOfEntity, med_int *NumberValue);
 
   void getBoundaryElements() throw (MEDEXCEPTION);
 
@@ -250,7 +256,8 @@ inline MEDSKYLINEARRAY * SUPPORT::getnumber() const
   medGeometryElement type.
 */
 //---------------------------------------------------------------------
-inline const int * SUPPORT::getNumber(medGeometryElement GeometricType) const
+//CCRTinline const int * SUPPORT::getNumber(medGeometryElement GeometricType) const
+inline const med_int * SUPPORT::getNumber(medGeometryElement GeometricType) const
   throw (MEDEXCEPTION)
 //---------------------------------------------------------------------
 {
@@ -272,7 +279,8 @@ inline const int * SUPPORT::getNumber(medGeometryElement GeometricType) const
   Note : See getConnectivityIndex for details.
 */
 //-------------------------------------------
-inline const int * SUPPORT::getNumberIndex() const
+//CCRTinline const int * SUPPORT::getNumberIndex() const
+inline const med_int * SUPPORT::getNumberIndex() const
 //-------------------------------------------
   throw (MEDEXCEPTION)
 {
@@ -283,7 +291,8 @@ inline const int * SUPPORT::getNumberIndex() const
 
 /*! A DOCUMENTER */
 //-------------------------------------------------
-inline const int * SUPPORT::getNumberOfGaussPoint() const
+//CCRTinline const int * SUPPORT::getNumberOfGaussPoint() const
+inline const med_int * SUPPORT::getNumberOfGaussPoint() const
   throw (MEDEXCEPTION)
 //-------------------------------------------------
 {
@@ -410,7 +419,8 @@ inline void SUPPORT::setNumberOfGaussPoint(const int *NumberOfGaussPoint)
 //-----------------------------------------------------------------
 {
   if (NULL == _numberOfGaussPoint)
-    _numberOfGaussPoint=new int[_numberOfGeometricType];
+//CCRT    _numberOfGaussPoint=new int[_numberOfGeometricType];
+    _numberOfGaussPoint=new med_int[_numberOfGeometricType];
   for (int i=0;i<_numberOfGeometricType;i++)
     _numberOfGaussPoint[i] = NumberOfGaussPoint[i];
   //  _numberOfGaussPoint = NumberOfGaussPoint ;
@@ -459,7 +469,8 @@ inline void SUPPORT::setNumber(MEDSKYLINEARRAY * Number)
 
 /*! set the attribute _number with index and value arrays */
 //---------------------------------------------------
-inline void SUPPORT::setNumber(const int * index, const int* value)
+//CCRTinline void SUPPORT::setNumber(const int * index, const int* value)
+inline void SUPPORT::setNumber(const med_int * index, const med_int* value)
 //---------------------------------------------------
 {
   if (_number != NULL) delete _number ;

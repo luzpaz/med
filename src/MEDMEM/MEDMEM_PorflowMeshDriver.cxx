@@ -1,4 +1,3 @@
-using namespace std;
 
 #include "MEDMEM_PorflowMeshDriver.hxx"
 #include "MEDMEM_DriversDef.hxx"
@@ -16,6 +15,8 @@ using namespace std;
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+
+using namespace std;
 
 using namespace MED_EN;
 using namespace MEDMEM;

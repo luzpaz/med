@@ -1,5 +1,3 @@
-using namespace std;
-
 #include <algorithm>
 
 #include "MEDMEM_GibiMeshDriver.hxx"
@@ -14,6 +12,8 @@ using namespace std;
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_DriverTools.hxx"
+
+using namespace std;
 
 /////
 using namespace MED_EN;
@@ -157,8 +157,9 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
     while ( getline(_gibi, buf_ligne) ) // boucle externe de recherche de "ENREGISTREMENT DE TYPE"
     {
 	string::size_type pos = buf_ligne.find(enregistrement_type);
-	if ( pos==string::npos )
+	if ( pos==string::npos ) {
 	    continue; // "ENREGISTREMENT DE TYPE" non trouvé -> on lit la ligne suivante
+	}
 
 	// lecture du numéro d'enregistrement
 	int numero_enregistrement;
@@ -290,7 +291,12 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 			      {
 				// pour chacun des sous-maillages j, on recupere les iterateurs *k sur les  maille 
 				// contenues et on les insere dans le groupe i
-				std::set< std::set<_maille>::iterator >::const_iterator k=medi.groupes[*j-1].mailles.begin();
+//CCRT				std::set< std::set<_maille>::iterator >::const_iterator k=medi.groupes[*j-1].mailles.begin();
+				std::set< std::set<_maille, std::less<_maille>,
+                                std::allocator<_maille> >::iterator,
+                                _mailleIteratorCompare,
+                                std::allocator< std::set<_maille, std::less<_maille>,
+                                std::allocator<_maille> >::iterator> >::iterator k=medi.groupes[*j-1].mailles.begin();
 				for( ; k!=medi.groupes[*j-1].mailles.end(); ++k)
 				  i->mailles.insert(*k);
 			      }
@@ -308,8 +314,10 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 		    if (nb_indices != nb_objets)
 		      {
 			throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " Could not read file " << _fileName 
-						     << "Erreur de lecture dans enregistrement de type " << ENREG_TYPE_2 
-						     << " (pile " << PILE_NOEUDS << ")" ));
+//CCRT						     << "Erreur de lecture dans enregistrement de type " << ENREG_TYPE_2 
+						     << "Erreur de lecture dans enregistrement de type " << (int ) ENREG_TYPE_2 
+//CCRT						     << " (pile " << PILE_NOEUDS << ")" ));
+						     << " (pile " << (int ) PILE_NOEUDS << ")" ));
 		      }
 		    
 		    place_noeuds.resize(nb_objets);
@@ -331,8 +339,10 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 		  // PROVISOIRE : certains fichier gibi n'ont 
 		  if (nb_reels < numero_noeuds.size()*(space_dimension))
 		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " Could not read file " << _fileName 
-						 << "Erreur de lecture dans enregistrement de type " << ENREG_TYPE_2 
-						 << " (pile " << PILE_COORDONNEES << ")" ));
+//CCRT						 << "Erreur de lecture dans enregistrement de type " << ENREG_TYPE_2 
+						 << "Erreur de lecture dans enregistrement de type " << (int ) ENREG_TYPE_2 
+//CCRT						 << " (pile " << PILE_COORDONNEES << ")" ));
+						 << " (pile " << (int ) PILE_COORDONNEES << ")" ));
 
 		  for (unsigned i=0; i!=numero_noeuds.size(); ++i)
 		    {

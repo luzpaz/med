@@ -1,5 +1,5 @@
-using namespace std;
 #include "MEDMEM_Field.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 // ---------------------------------
@@ -172,7 +172,8 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume) const 
 	throw MEDEXCEPTION(diagnosis.c_str());
     }
 
-    const int* nbGauss=getSupport()->getNumberOfGaussPoint();
+//CCRT    const int* nbGauss=getSupport()->getNumberOfGaussPoint();
+    const med_int* nbGauss=getSupport()->getNumberOfGaussPoint();
     for (int i=0; i<getSupport()->getNumberOfTypes(); ++i)
 	if(nbGauss[i]!=1)
 	{

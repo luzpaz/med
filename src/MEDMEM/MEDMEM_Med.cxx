@@ -1,4 +1,4 @@
-using namespace std;
+
 # include <string> 
 
 # include "MEDMEM_Med.hxx"
@@ -11,6 +11,7 @@ using namespace std;
 
 # include "MEDMEM_Exception.hxx"
 # include "utilities.h"
+using namespace std;
 using namespace MEDMEM;
 
 /*!
@@ -281,7 +282,7 @@ void MED::writeFrom (int index/*=0*/)
                                    << _drivers.size()
                                    )
                         ); 
-  END_OF(LOC);
+//CCRT  END_OF(LOC);
 }; 
 
 /*!
@@ -374,7 +375,7 @@ int      MED::getNumberOfMeshes ( void ) const {
 
   return _meshes.size();
 
-  END_OF(LOC);
+//CCRT  END_OF(LOC);
 };   
     
 /*!
@@ -387,7 +388,7 @@ int      MED::getNumberOfFields ( void ) const {
 
   return _fields.size(); // we get number of field with different name
 
-  END_OF(LOC);
+//CCRT  END_OF(LOC);
 };       
 
 /*!

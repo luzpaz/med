@@ -22,10 +22,12 @@
 //  File   : testUSkyLineArray.cxx
 //  Module : MED
 
-using namespace std;
 #include <cstdlib>
 #include "utilities.h"
 #include "MEDMEM_SkyLineArray.hxx"
+
+using namespace std;
+
 using namespace MEDMEM;
 
 int main (int argc, char ** argv)
@@ -34,13 +36,15 @@ int main (int argc, char ** argv)
   int NumberOfCell = 3 ; // 1 triangle,1 quadrangle,1 triangle
   int Size = 10 ;	 // 10 nodes
 
-  int * index = new int[NumberOfCell+1];
+//CCRT  int * index = new int[NumberOfCell+1];
+  med_int * index = new med_int[NumberOfCell+1];
   index[0]=1;
   index[1]=4;
   index[2]=8;
   index[3]=11;
 
-  int * value = new int[Size];
+//CCRT  int * value = new int[Size];
+  med_int * value = new med_int[Size];
   value[0]=1; // first
   value[1]=2;
   value[2]=5;
@@ -54,7 +58,8 @@ int main (int argc, char ** argv)
 
   MEDSKYLINEARRAY * myArray = new MEDSKYLINEARRAY(NumberOfCell,Size,index,value) ;
 
-  const int * ArrayIndex ;
+//CCRT  const int * ArrayIndex ;
+  const med_int * ArrayIndex ;
   try
   {
   	ArrayIndex = myArray->getIndex() ;
@@ -75,7 +80,8 @@ int main (int argc, char ** argv)
         return EXIT_FAILURE ;
   }
 
-  const int * ArrayValue ;
+//CCRT  const int * ArrayValue ;
+  const med_int * ArrayValue ;
   try
   {
         ArrayValue  = myArray->getValue() ;
@@ -142,7 +148,8 @@ int main (int argc, char ** argv)
   cout << "Show all :" << endl ;
   for (int i=1; i< NumberOfCell+1 ; i++) 
   {
-    const int * cell;
+//CCRT    const int * cell;
+    const med_int * cell;
     try
     {
 	cell = myArray->getI(i) ;

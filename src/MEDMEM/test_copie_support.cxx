@@ -1,4 +1,3 @@
-using namespace std;
 #include<string>
 
 #include <math.h>
@@ -14,6 +13,7 @@ using namespace std;
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 
@@ -30,7 +30,8 @@ void affiche_support(const SUPPORT * mySupport)
     for (int j=0;j<NumberOfTypes;j++) {
       cout<<"    * Type "<<Types[j]<<" : ";
       int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
-      const int * Number = mySupport->getNumber(Types[j]) ;
+//CCRT      const int * Number = mySupport->getNumber(Types[j]) ;
+      const med_int * Number = mySupport->getNumber(Types[j]) ;
       for (int k=0; k<NumberOfElements;k++)
 	cout << Number[k] << " ";
       cout << endl ;
@@ -117,7 +118,8 @@ int main (int argc, char ** argv) {
   int * NumberOfElements = new int[myMesh->getNumberOfTypes(MED_CELL)];
   //  NumberOfEntity[0] = 2;
   //  int * NumberValue = new int[TotalNumberOfEntity];
-  int * NumberValue = new int[myMesh->getGlobalNumberingIndex(MED_CELL)[myMesh->getNumberOfTypes(MED_CELL)]-1];
+//CCRT  int * NumberValue = new int[myMesh->getGlobalNumberingIndex(MED_CELL)[myMesh->getNumberOfTypes(MED_CELL)]-1];
+  med_int * NumberValue = new med_int[myMesh->getGlobalNumberingIndex(MED_CELL)[myMesh->getNumberOfTypes(MED_CELL)]-1];
   //  NumberValue[0] = 14;
   //  NumberValue[1] = 15;
   int cmp = 0;

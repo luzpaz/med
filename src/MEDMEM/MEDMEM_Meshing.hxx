@@ -42,16 +42,20 @@ public :
   void setTypes            (const medGeometryElement * Types,
 			    const medEntityMesh Entity)
     throw (MEDEXCEPTION) ;
-  void setNumberOfElements (const int * NumberOfElements,
+//CCRT  void setNumberOfElements (const int * NumberOfElements,
+  void setNumberOfElements (const med_int * NumberOfElements,
 			    const medEntityMesh Entity)
     throw (MEDEXCEPTION) ;
-  void setConnectivity     (const int * Connectivity,
+//CCRT  void setConnectivity     (const int * Connectivity,
+  void setConnectivity     (const med_int * Connectivity,
 			    const medEntityMesh Entity,
 			    const medGeometryElement Type)
     throw (MEDEXCEPTION) ;
 
-  void setConnectivities   (const int * ConnectivityIndex,
-			    const int * ConnectivityValue,
+//CCRT  void setConnectivities   (const int * ConnectivityIndex,
+  void setConnectivities   (const med_int * ConnectivityIndex,
+//CCRT			    const int * ConnectivityValue,
+			    const med_int * ConnectivityValue,
 			    const medConnectivity ConnectivityType,
 			    const medEntityMesh Entity)
     throw (MEDEXCEPTION) ;

@@ -209,7 +209,8 @@ public :
   virtual inline int             getNumberOfTypes(medEntityMesh Entity) const;
   virtual inline const medGeometryElement * getTypes(medEntityMesh Entity) const;
   virtual inline const CELLMODEL * getCellsTypes(medEntityMesh Entity) const;
-  virtual const int * getGlobalNumberingIndex(medEntityMesh Entity) const;
+//CCRT  virtual const int * getGlobalNumberingIndex(medEntityMesh Entity) const;
+  virtual const med_int * getGlobalNumberingIndex(medEntityMesh Entity) const;
   virtual inline int getNumberOfElements(medEntityMesh Entity,
 					 medGeometryElement Type) const;
   virtual inline bool existConnectivity(medConnectivity ConnectivityType,
@@ -220,20 +221,24 @@ public :
   virtual inline void calculateConnectivity(medModeSwitch Mode,
 					    medConnectivity ConnectivityType,
 					    medEntityMesh Entity) const ;
-  virtual inline const int * getConnectivity(medModeSwitch Mode,
+//CCRT  virtual inline const int * getConnectivity(medModeSwitch Mode,
+  virtual inline const med_int * getConnectivity(medModeSwitch Mode,
 					     medConnectivity ConnectivityType,
 					     medEntityMesh Entity, 
 					     medGeometryElement Type) const;
-  virtual inline const int * getConnectivityIndex(medConnectivity ConnectivityType,
+//CCRT  virtual inline const int * getConnectivityIndex(medConnectivity ConnectivityType,
+  virtual inline const med_int * getConnectivityIndex(medConnectivity ConnectivityType,
 						  medEntityMesh Entity) const;
   virtual int                 getElementNumber(medConnectivity ConnectivityType, 
                                                medEntityMesh Entity, 
                                                medGeometryElement Type, 
                                                int * connectivity) const;
 
-  virtual inline const int * getReverseConnectivity(medConnectivity ConnectivityType,
+//CCRT  virtual inline const int * getReverseConnectivity(medConnectivity ConnectivityType,
+  virtual inline const med_int * getReverseConnectivity(medConnectivity ConnectivityType,
 						    medEntityMesh Entity=MED_CELL) const;
-  virtual inline const int * getReverseConnectivityIndex(medConnectivity ConnectivityType,
+//CCRT  virtual inline const int * getReverseConnectivityIndex(medConnectivity ConnectivityType,
+  virtual inline const med_int * getReverseConnectivityIndex(medConnectivity ConnectivityType,
 							 medEntityMesh Entity=MED_CELL) const;
 
   virtual int                          getNumberOfFamilies(medEntityMesh Entity) const;
@@ -439,7 +444,19 @@ inline const double * MESH::getCoordinates(medModeSwitch Mode) const
 inline const double MESH::getCoordinate(int number, int axis) const
 {
 //   checkGridFillCoords();
-  return _coordinate->getCoordinate(number,axis);
+
+  double valret = _coordinate->getCoordinate(number,axis) ;
+#if DIFF_PC_ALPHA
+  valret = Arrondi( valret ) ;
+#if TRACE_DBLE_HEXA
+  DI di ;
+  di.d = valret ;
+  printf( "testMedMemGeneral %0#8x%0#8x \n" , di.i[1] , di.i[0] ) ;
+#endif
+#endif
+
+//CCRT  return _coordinate->getCoordinate(number,axis);
+  return valret ;
 }
 
 /*! Get the coordinate names array ("x       ","y       ","z       ")
@@ -527,7 +544,8 @@ inline const CELLMODEL * MESH::getCellsTypes(medEntityMesh Entity) const
     - GlobalNumberingIndex[1]=6 (the second type)
     - GlobalNumberingIndex[2]=10
 */
-inline const int * MESH::getGlobalNumberingIndex(medEntityMesh entity) const
+//CCRTinline const int * MESH::getGlobalNumberingIndex(medEntityMesh entity) const
+inline const med_int * MESH::getGlobalNumberingIndex(medEntityMesh entity) const
 {
   //  checkGridFillConnectivity();
   if (_connectivity != NULL)
@@ -608,10 +626,12 @@ inline void MESH::calculateConnectivity(medModeSwitch Mode,medConnectivity Conne
   and Type=MED_ALL_ELEMENTS.
   You must also get the corresponding index array.
  */
-inline const int * MESH::getConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity, medGeometryElement Type) const
+//CCRTinline const int * MESH::getConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity, medGeometryElement Type) const
+inline const med_int * MESH::getConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity, medGeometryElement Type) const
 {
   //  checkGridFillConnectivity();
   if (Mode==MED_FULL_INTERLACE)
+//CCRT    return _connectivity->getConnectivity(ConnectivityType,entity,Type);
     return _connectivity->getConnectivity(ConnectivityType,entity,Type);
   throw MEDEXCEPTION(LOCALIZED("MESH::getConnectivity : only for MED_FULL_INTERLACE mode"));
 }
@@ -626,7 +646,8 @@ inline const int * MESH::getConnectivity(medModeSwitch Mode,medConnectivity Conn
   in Connectivity array (Connectivity[ConnectivityIndex[i-1]-1] is the
   first value)
  */
-inline const int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh entity) const
+//CCRTinline const int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh entity) const
+inline const med_int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh entity) const
 {
   //  checkGridFillConnectivity();
   return _connectivity->getConnectivityIndex(ConnectivityType, entity);
@@ -638,7 +659,8 @@ inline const int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,m
 
   You must get ReverseConnectivityIndex array to use it.
  */
-inline const int * MESH::getReverseConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
+//CCRTinline const int * MESH::getReverseConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
+inline const med_int * MESH::getReverseConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
 {
   //  checkGridFillConnectivity();
   if (NULL==_connectivity)
@@ -658,7 +680,8 @@ inline const int * MESH::getReverseConnectivity(medConnectivity ConnectivityType
   ReverseConnectivity[ReverseConnectivityIndex[i-1]-1]
   is the first value)
  */
-inline const int * MESH::getReverseConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
+//CCRTinline const int * MESH::getReverseConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
+inline const med_int * MESH::getReverseConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/) const
 {
   //  checkGridFillConnectivity();
   if (NULL==_connectivity)

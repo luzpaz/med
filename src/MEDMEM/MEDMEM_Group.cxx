@@ -1,4 +1,3 @@
-using namespace std;
 /*
  File Group.cxx
  $Header$
@@ -7,6 +6,7 @@ using namespace std;
 
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Family.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 GROUP::GROUP():_numberOfFamilies(0),_family() 
@@ -76,11 +76,13 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   _numberOfGeometricType = myFamily->getNumberOfTypes() ;
   _geometricType = new medGeometryElement[_numberOfGeometricType];
   //_geometricTypeNumber = new int[_numberOfGeometricType] ;
-  _numberOfGaussPoint = new int[_numberOfGeometricType] ;
+//CCRT  _numberOfGaussPoint = new int[_numberOfGeometricType] ;
+  _numberOfGaussPoint = new med_int[_numberOfGeometricType] ;
   _numberOfElements = new int[_numberOfGeometricType] ;
   const medGeometryElement * geometricType = myFamily->getTypes() ;
   //int * geometricTypeNumber = myFamily->getGeometricTypeNumber() ;
-  const int * numberOfGaussPoint = myFamily->getNumberOfGaussPoint() ;
+//CCRT  const int * numberOfGaussPoint = myFamily->getNumberOfGaussPoint() ;
+  const med_int * numberOfGaussPoint = myFamily->getNumberOfGaussPoint() ;
 
   SCRUTE(_numberOfGeometricType);
 
@@ -97,9 +99,11 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
 
   MEDSKYLINEARRAY * famNumber = myFamily->getnumber();
 
-  const int * famNumberValue = myFamily->getNumber(MED_ALL_ELEMENTS);
+//CCRT  const int * famNumberValue = myFamily->getNumber(MED_ALL_ELEMENTS);
+  const med_int * famNumberValue = myFamily->getNumber(MED_ALL_ELEMENTS);
 
-  const int * famNumberIndex = myFamily->getNumberIndex();
+//CCRT  const int * famNumberIndex = myFamily->getNumberIndex();
+  const med_int * famNumberIndex = myFamily->getNumberIndex();
 
   int famNumberCount = famNumber->getNumberOf();
   int famNumberLength = famNumber->getLength();

@@ -262,7 +262,8 @@ inline string FIELD_::getDescription() const
 /*!
   Set FIELD number of components.
 */
-inline void FIELD_::setNumberOfComponents(int NumberOfComponents)
+//CCRTinline void FIELD_::setNumberOfComponents(int NumberOfComponents)
+inline void FIELD_::setNumberOfComponents(const int NumberOfComponents)
 {
   _numberOfComponents=NumberOfComponents;
 }
@@ -278,7 +279,8 @@ inline int FIELD_::getNumberOfComponents() const
 
   It must be the same than in the associated SUPPORT object.
 */
-inline void FIELD_::setNumberOfValues(int NumberOfValues)
+//CCRTinline void FIELD_::setNumberOfValues(int NumberOfValues)
+inline void FIELD_::setNumberOfValues(const int NumberOfValues)
 {
   _numberOfValues=NumberOfValues;
 }
@@ -581,7 +583,7 @@ private:
   void _add_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode);
   void _sub_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode);
   void _mul_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode);
-  void _div_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode);
+  void _div_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode) throw (MEDEXCEPTION) ;
   //setValueType() ;
 
   FIELD & operator=(const FIELD &m); 	// A FAIRE
@@ -1326,7 +1328,7 @@ void FIELD<T>::_mul_in_place(const FIELD& m,const FIELD& n, const medModeSwitch 
   \endif
 */
 template <class T>
-void FIELD<T>::_div_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode)
+void FIELD<T>::_div_in_place(const FIELD& m,const FIELD& n, const medModeSwitch mode) throw (MEDEXCEPTION)
 {
     // get pointers to the values we are adding
     const T* value1=m.getValue(mode);
@@ -1337,8 +1339,14 @@ void FIELD<T>::_div_in_place(const FIELD& m,const FIELD& n, const medModeSwitch 
     const int size=getNumberOfValues()*getNumberOfComponents();
     SCRUTE(size);
     const T* endV1=value1+size;
-    for(;value1!=endV1; value1++,value2++,value++)
+    for(;value1!=endV1; value1++,value2++,value++) {
+        if ( *value2 == 0 ) {
+	  string diagnosis;
+	  diagnosis="FIELD<T>::_div_in_place(...) : Divide by zero !";
+	  throw MEDEXCEPTION(diagnosis.c_str());
+	}
 	*value=(*value1)/(*value2);
+    }
 }
 
 /*!  Return Max Norm 

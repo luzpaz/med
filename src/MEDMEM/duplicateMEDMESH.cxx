@@ -1,4 +1,3 @@
-using namespace std;
 #include<string>
 #include<deque>
 
@@ -14,6 +13,7 @@ using namespace std;
 #include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 
+using namespace std;
 using namespace MEDMEM;
 int main (int argc, char ** argv) {
   

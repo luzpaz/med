@@ -22,7 +22,6 @@
 //  File   : testUCoordinate.cxx
 //  Module : MED
 
-using namespace std;
 #include <cstdlib>
 #include <cmath>
 #include "utilities.h"
@@ -31,6 +30,9 @@ using namespace std;
 #include "MEDMEM_Array.hxx"
 #include "MEDMEM_Coordinate.hxx"
 #include <string> 
+
+using namespace std;
+
 using namespace MEDMEM;
 
 void usage(char * name)
@@ -62,7 +64,8 @@ int main (int argc, char ** argv)
   units[1]=" m ";
   units[2]=" m ";
 
-  int * numbers=new int[5];
+//CCRT  int * numbers=new int[5];
+  med_int * numbers=new med_int[5];
   for (int i=0; i< 5; i++) numbers[i] =10+i;
 
   MED_EN::medModeSwitch ModeFull=MED_EN::MED_FULL_INTERLACE;

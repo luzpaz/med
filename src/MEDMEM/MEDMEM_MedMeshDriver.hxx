@@ -129,8 +129,10 @@ private:
   int getFAMILY();
   int getNodalConnectivity(CONNECTIVITY * Connectivity) ;
   int getDescendingConnectivity(CONNECTIVITY * Connectivity) ;
-  int getNodesFamiliesNumber(int * MEDArrayNodeFamily) ;
-  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity) ;
+//CCRT  int getNodesFamiliesNumber(int * MEDArrayNodeFamily) ;
+  int getNodesFamiliesNumber(MED_FR::med_int * MEDArrayNodeFamily) ;
+//CCRT  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity) ;
+  int getCellsFamiliesNumber(MED_FR::med_int** Arrays, CONNECTIVITY* Connectivity) ;
   void updateFamily() ;
   void buildAllGroups(vector<GROUP*> & Groups, vector<FAMILY*> & Families) ;
   void getGRID ();

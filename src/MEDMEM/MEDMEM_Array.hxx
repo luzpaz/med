@@ -370,6 +370,7 @@ template <class T> const T* MEDARRAY<T>::get(const medModeSwitch mode)
   {
 	//PN : pour enlever les warning compilateurs
     	//return (const T*)_valuesDefault;
+        END_OF("MEDARRAY<T>::get(const medModeSwitch mode)");
     	return  (T*) _valuesDefault;
   }
   else
@@ -380,9 +381,10 @@ template <class T> const T* MEDARRAY<T>::get(const medModeSwitch mode)
 	}
 	//PN : pour enlever les warning compilateurs
     	//return (const T*)_valuesDefault;
+        END_OF("MEDARRAY<T>::get(const medModeSwitch mode)");
       	return  (T*) _valuesOther;
   }
-  END_OF("MEDARRAY<T>::get(const medModeSwitch mode)");
+//CCRT  END_OF("MEDARRAY<T>::get(const medModeSwitch mode)");
 }
 
 //				------------------

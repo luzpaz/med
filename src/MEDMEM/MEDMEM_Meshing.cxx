@@ -1,4 +1,3 @@
-using namespace std;
 /*
   File MEDMEM_Meshing.cxx
   $Header$
@@ -13,6 +12,7 @@ using namespace std;
 
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Group.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 /*! Create an empty MESH. */
@@ -201,8 +201,9 @@ void MESHING::setTypes(const medGeometryElement * Types,
   if we have two type of face (MED_TRIA3 and MED_QUAD4), 
   we set 12 triangles and 23 quadrangles.
 */
-void MESHING::setNumberOfElements(const int * NumberOfElements,
-				  medEntityMesh Entity)
+//CCRTvoid MESHING::setNumberOfElements(const int * NumberOfElements,
+void MESHING::setNumberOfElements(const med_int * NumberOfElements,
+				  const medEntityMesh Entity)
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESHING::setNumberOfElements(const int *, medEntityMesh) : " ;
@@ -214,7 +215,8 @@ void MESHING::setNumberOfElements(const int * NumberOfElements,
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity defined !"));
 
   int NumberOfTypes = getNumberOfTypes(Entity) ;
-  int * Count = new int[NumberOfTypes+1] ;
+//CCRT  int * Count = new int[NumberOfTypes+1] ;
+  med_int * Count = new med_int[NumberOfTypes+1] ;
   Count[0]=1 ;
   for (int i=0; i<NumberOfTypes; i++)
     Count[i+1]=Count[i]+NumberOfElements[i] ;
@@ -228,7 +230,8 @@ void MESHING::setNumberOfElements(const int * NumberOfElements,
   Example : setConnectivity({1,2,3,1,4,2},MED_FACE,MED_TRIA3)
   Define 2 triangles face defined with nodes 1,2,3 and 1,4,2.
 */
-void MESHING::setConnectivity(const int * Connectivity,
+//CCRTvoid MESHING::setConnectivity(const int * Connectivity,
+void MESHING::setConnectivity(const med_int * Connectivity,
 			      const medEntityMesh Entity,
 			      const medGeometryElement Type)
   throw (MEDEXCEPTION)
@@ -247,8 +250,10 @@ void MESHING::setConnectivity(const int * Connectivity,
 /*!
   NOT YET IMPLEMENTED !! WARNING
 */
-void MESHING::setConnectivities (const int * ConnectivityIndex,
-				 const int * ConnectivityValue,
+//CCRTvoid MESHING::setConnectivities (const int * ConnectivityIndex,
+void MESHING::setConnectivities (const med_int * ConnectivityIndex,
+//CCRT				 const int * ConnectivityValue,
+				 const med_int * ConnectivityValue,
 				 const medConnectivity ConnectivityType,
 				 const medEntityMesh Entity)
   throw (MEDEXCEPTION)

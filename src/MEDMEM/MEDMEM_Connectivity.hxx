@@ -135,10 +135,12 @@ public:
 			   const medEntityMesh Entity)
                                         throw (MEDEXCEPTION);
 
-  void setCount (const int * Count, const medEntityMesh Entity)
+//CCRT  void setCount (const int * Count, const medEntityMesh Entity)
+  void setCount (const med_int * Count, const medEntityMesh Entity)
                                         throw (MEDEXCEPTION);
 
-  void setNodal (const int * Connectivity,
+//CCRT  void setNodal (const int * Connectivity,
+  void setNodal (const med_int * Connectivity,
 	         const medEntityMesh Entity,
 		 const medGeometryElement Type)
                                         throw (MEDEXCEPTION);
@@ -160,7 +162,8 @@ public:
                                     			     throw (MEDEXCEPTION);
   medGeometryElement                getElementType          (medEntityMesh Entity,
 							     int Number)           const;
-  virtual inline const int *                getGlobalNumberingIndex (medEntityMesh Entity) const
+//CCRT  virtual inline const int *                getGlobalNumberingIndex (medEntityMesh Entity) const
+  virtual inline const med_int *                getGlobalNumberingIndex (medEntityMesh Entity) const
                                     			     throw (MEDEXCEPTION);
 
   virtual const med_int *     getConnectivity      (medConnectivity ConnectivityType, 
@@ -280,7 +283,8 @@ inline const medGeometryElement* CONNECTIVITY::getGeometricTypes(medEntityMesh E
                       
 */
 //----------------------------------------------------------------------------------//
-inline const int * CONNECTIVITY::getGlobalNumberingIndex(medEntityMesh Entity) const 
+//CCRTinline const int * CONNECTIVITY::getGlobalNumberingIndex(medEntityMesh Entity) const 
+inline const med_int * CONNECTIVITY::getGlobalNumberingIndex(medEntityMesh Entity) const 
 						throw (MEDEXCEPTION)
 //----------------------------------------------------------------------------------//
 {

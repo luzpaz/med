@@ -3,6 +3,8 @@
 
 #include "utilities.h"
 
+#include "MEDMEM_define.hxx"
+
 /*
   This class is use to set cyclic (modulus length) array.
   (array[length+1]==array[1])
@@ -11,14 +13,18 @@
   they are the same (positive or negative cycle) !
 */
 
+using namespace MED_EN;
+
 namespace MEDMEM {
 class MEDMODULUSARRAY {
 private:
   int   _length ;
-  const int * _array ;
+//CCRT  const int * _array ;
+  const med_int * _array ;
 
 public:
-  MEDMODULUSARRAY(int length, const int * array) ;
+//CCRT  MEDMODULUSARRAY(int length, const int * array) ;
+  MEDMODULUSARRAY(int length, const med_int * array) ;
   ~MEDMODULUSARRAY() ;
   
   const int & operator[](const int &i) const ;
@@ -29,7 +35,8 @@ public:
 };
 using namespace MEDMEM;
 
-MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) : 
+//CCRTMEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) : 
+MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const med_int * array) : 
   _length(length), _array(array)
 {
 //    SCRUTE(_length);

@@ -1,8 +1,8 @@
-using namespace std;
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_STRING.hxx"
 
+using namespace std;
 #include "utilities.h"
 using namespace MEDMEM;
 
@@ -52,8 +52,11 @@ COORDINATE::COORDINATE(const COORDINATE & m):
   setCoordinatesNames((const string*)m._coordinateName) ;
   setCoordinatesUnits((const string*)m._coordinateUnit) ;
 
-  if ( (const int * const) m._nodeNumber != NULL)
-    _nodeNumber.set(numberOfNodes,(const med_int*)m._nodeNumber);
+  const med_int * nodeNumber = m._nodeNumber ;//CCRT
+//CCRT  if ( (const int * const) m._nodeNumber != NULL)
+  if ( nodeNumber != NULL)
+//CCRT    _nodeNumber.set(numberOfNodes,(const med_int*)m._nodeNumber);
+    _nodeNumber.set(numberOfNodes,nodeNumber);
   // PG : it's default no ?
 //    else
 //      {
@@ -87,8 +90,7 @@ void COORDINATE::setCoordinates(MEDARRAY<double> *Coordinate)
   }
   else
   {
-	throw MED_EXCEPTION ( LOCALIZED(STRING("setCoordinates(MEDARRAY<double>
-	 *Coordinate)") << "No Coordinate"));
+	throw MED_EXCEPTION ( LOCALIZED(STRING("setCoordinates(MEDARRAY<double>*Coordinate)") << "No Coordinate"));
   }
 }
 
@@ -162,7 +164,9 @@ void COORDINATE::setCoordinatesSystem(const string CoordinateSystem)
 
 /*! sets the attribute _nodeNumber with NodeNumber */
 //------------------------------------------------//
-void COORDINATE::setNodesNumbers(const int * NodeNumber) 
+//CCRTvoid COORDINATE::setNodesNumbers(const int * NodeNumber) 
+//CCRT-errvoid COORDINATE::setNodesNumbers(const long * NodeNumber) 
+void COORDINATE::setNodesNumbers(const med_int * NodeNumber) 
 //------------------------------------------------//
 { 	
   int NumberOfNodes = getNumberOfNodes() ;
@@ -183,10 +187,14 @@ int COORDINATE::getNumberOfNodes() const
 /*! returns a pointer to the optional array storing 
     eventual nodes numbers */
 //-------------------------------------------------//
-const int * COORDINATE::getNodesNumbers() const
+//CCRTconst int * COORDINATE::getNodesNumbers() const
+//CCRT-errconst long * COORDINATE::getNodesNumbers() const
+const med_int * COORDINATE::getNodesNumbers() const
 //-------------------------------------------------//
 {
-	return  (const int *)_nodeNumber;
+//CCRT	return  (const int *)_nodeNumber;
+//CCRT-err	return  (const long *)_nodeNumber;
+	return  (const med_int *)_nodeNumber;
 }
 
 /*! returns a Pointer to Coordinates Array in specified mode representation */

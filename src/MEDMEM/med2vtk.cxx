@@ -1,4 +1,3 @@
-using namespace std;
 #include<string>
 #include<deque>
 
@@ -12,6 +11,7 @@ using namespace std;
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_VtkMedDriver.hxx"
 
+using namespace std;
 using namespace MEDMEM;
 void usage(char * name)
 {

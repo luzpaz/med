@@ -1,4 +1,3 @@
-using namespace std;
 /*
  File Support.cxx
  $Header$
@@ -16,6 +15,7 @@ using namespace std;
 //#include "MEDMEM_Group.hxx"
 #include "MEDMEM_Mesh.hxx"
 
+using namespace std;
 using namespace MED_EN;
 using namespace MEDMEM;
 
@@ -28,7 +28,8 @@ using namespace MEDMEM;
 SUPPORT::SUPPORT(): _name(""),	_description("None"), _mesh((MESH*)NULL),
 		    _entity(MED_CELL), _numberOfGeometricType(0),
 	    	    _geometricType((medGeometryElement*)NULL),
-		    _numberOfGaussPoint((int*)NULL),
+//CCRT		    _numberOfGaussPoint((int*)NULL),
+		    _numberOfGaussPoint((med_int*)NULL),
 		    //_geometricTypeNumber((int*)NULL),
 		    _isOnAllElts(false),
 		    _numberOfElements((int*)NULL),
@@ -47,7 +48,8 @@ SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL
 		_name(Name), _description("None"), _mesh(Mesh), _entity(Entity),
 		_numberOfGeometricType(0),
 		_geometricType((medGeometryElement*)NULL),
-		_numberOfGaussPoint((int*)NULL),
+//CCRT		_numberOfGaussPoint((int*)NULL),
+		_numberOfGaussPoint((med_int*)NULL),
 		//_geometricTypeNumber((int*)NULL),
 		_isOnAllElts(true), 
 		_numberOfElements((int*)NULL),
@@ -83,11 +85,14 @@ SUPPORT::SUPPORT(const SUPPORT & m)
     _geometricType = (medGeometryElement *) NULL;
   if (m._numberOfGaussPoint != NULL)
     {
-      _numberOfGaussPoint = new int[m._numberOfGeometricType];
-      memcpy(_numberOfGaussPoint,m._numberOfGaussPoint,m._numberOfGeometricType*sizeof(int));
+//CCRT      _numberOfGaussPoint = new int[m._numberOfGeometricType];
+      _numberOfGaussPoint = new med_int[m._numberOfGeometricType];
+//CCRT      memcpy(_numberOfGaussPoint,m._numberOfGaussPoint,m._numberOfGeometricType*sizeof(int));
+      memcpy(_numberOfGaussPoint,m._numberOfGaussPoint,m._numberOfGeometricType*sizeof(med_int));
     }
   else
-    _numberOfGaussPoint = (int *) NULL;
+//CCRT    _numberOfGaussPoint = (int *) NULL;
+    _numberOfGaussPoint = (med_int *) NULL;
 //    if (m._geometricTypeNumber != NULL)
 //      {
 //        _geometricTypeNumber = new int[m._numberOfGeometricType];
@@ -123,7 +128,8 @@ SUPPORT::~SUPPORT()
   MESSAGE("Destructeur ~SUPPORT()");
   if (_geometricType != (medGeometryElement *) NULL) 
     delete [] _geometricType ;
-  if (_numberOfGaussPoint != (int *) NULL) 
+//CCRT  if (_numberOfGaussPoint != (int *) NULL) 
+  if (_numberOfGaussPoint != (med_int *) NULL) 
     delete [] _numberOfGaussPoint ;
   //      if (_geometricTypeNumber!=NULL) 
   //        		delete[] _geometricTypeNumber ;
@@ -191,7 +197,8 @@ void SUPPORT::update()
       _numberOfElements = new int[1] ;
       _numberOfElements[0]=_mesh->getNumberOfNodes();
       _totalNumberOfElements=_numberOfElements[0];
-      _numberOfGaussPoint = new int[1] ;
+//CCRT      _numberOfGaussPoint = new int[1] ;
+      _numberOfGaussPoint = new med_int[1] ;
       _numberOfGaussPoint[0]=1;
     } else { // we duplicate information from _mesh
       _numberOfGeometricType=_mesh->getNumberOfTypes(_entity);
@@ -200,8 +207,10 @@ void SUPPORT::update()
       memcpy(_geometricType,_mesh->getTypes(_entity),_numberOfGeometricType*sizeof(medGeometryElement));
       if (_numberOfElements == (int *) NULL)
 	_numberOfElements = new int[_numberOfGeometricType] ;
-      if (_numberOfGaussPoint == (int *) NULL)
-	_numberOfGaussPoint = new int[_numberOfGeometricType] ;
+//CCRT      if (_numberOfGaussPoint == (int *) NULL)
+      if (_numberOfGaussPoint == (med_int *) NULL)
+//CCRT	_numberOfGaussPoint = new int[_numberOfGeometricType] ;
+	_numberOfGaussPoint = new med_int[_numberOfGeometricType] ;
       _totalNumberOfElements=0;
       for (int i=0;i<_numberOfGeometricType;i++) {
 	_numberOfElements[i]=_mesh->getNumberOfElements(_entity,_geometricType[i]) ;
@@ -264,24 +273,31 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
   int * numberOfElements= new int[it];
   _totalNumberOfElements = 0 ;
   //int totalSize = 0 ;
-  int ** tmp_array = new (int*)[it];
+//CCRT  int ** tmp_array = new (int*)[it];
+//CCRT  int ** tmp_array = new int*[it];
+  med_int ** tmp_array = new med_int*[it];
   for (int i=0;i<it;i++) {
     int numberOfElementsInType = tmp_NumberOfElementsInType[i] ;
     numberOfElements[i] = numberOfElementsInType ;
-    tmp_array[i] = new int[numberOfElementsInType] ;
+//CCRT    tmp_array[i] = new int[numberOfElementsInType] ;
+    tmp_array[i] = new med_int[numberOfElementsInType] ;
     //totalSize+=numberOfElementsInType*(myType[i]%100) ;
     _totalNumberOfElements+=numberOfElementsInType ;
     if (whereIsType[i] == 1) { // only first Support
-      memcpy(tmp_array[i],getNumber(myType[i]),sizeof(int)*numberOfElementsInType);
+//CCRT      memcpy(tmp_array[i],getNumber(myType[i]),sizeof(int)*numberOfElementsInType);
+      memcpy(tmp_array[i],getNumber(myType[i]),sizeof(med_int)*numberOfElementsInType);
     } else if (whereIsType[i] == 2) { // only second Support
-      memcpy(tmp_array[i],mySupport->getNumber(myType[i]),sizeof(int)*numberOfElementsInType);
+//CCRT      memcpy(tmp_array[i],mySupport->getNumber(myType[i]),sizeof(int)*numberOfElementsInType);
+      memcpy(tmp_array[i],mySupport->getNumber(myType[i]),sizeof(med_int)*numberOfElementsInType);
     } else if (whereIsType[i] == 3) { // more difficult :-)
       set<int> elementList ;
       //int i1 = 0 ; !! UNUSED VARIABLE !!
       //int i2 = 0 ; !!UNUSED VARIABLE !!
       int ii = 0 ;
-      const int * number1 = getNumber(myType[i]) ;
-      const int * number2 = mySupport->getNumber(myType[i]) ;
+//CCRT      const int * number1 = getNumber(myType[i]) ;
+      const med_int * number1 = getNumber(myType[i]) ;
+//CCRT      const int * number2 = mySupport->getNumber(myType[i]) ;
+      const med_int * number2 = mySupport->getNumber(myType[i]) ;
 
       SCRUTE(number1);
       SCRUTE(number2);
@@ -308,7 +324,8 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
       SCRUTE(newNumberOfElements);
 
       numberOfElements[i] = newNumberOfElements ;
-      int * tmp_arrayNew = new int[newNumberOfElements];
+//CCRT      int * tmp_arrayNew = new int[newNumberOfElements];
+      med_int * tmp_arrayNew = new med_int[newNumberOfElements];
 
       set<int>::iterator its ;
       for(its=elementList.begin();its!=elementList.end(); its++) {
@@ -332,8 +349,10 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
   _numberOfGeometricType = it ;
   medGeometryElement * geometricType=_geometricType ;
   _geometricType = new medGeometryElement[it] ;
-  int * numberOfGaussPoint=_numberOfGaussPoint ;
-  _numberOfGaussPoint= new int[it] ;
+//CCRT  int * numberOfGaussPoint=_numberOfGaussPoint ;
+  med_int * numberOfGaussPoint=_numberOfGaussPoint ;
+//CCRT  _numberOfGaussPoint= new int[it] ;
+  _numberOfGaussPoint= new med_int[it] ;
 //    int * geometricTypeNumber=_geometricTypeNumber ;
 //    _geometricTypeNumber = new int[it] ;
 
@@ -342,11 +361,14 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
   int size = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
   if (_totalNumberOfElements == size) _isOnAllElts = true;
 
-  int * numberValue = new int[_totalNumberOfElements] ;
-  int * numberIndex = new int[it+1] ;
+//CCRT  int * numberValue = new int[_totalNumberOfElements] ;
+  med_int * numberValue = new med_int[_totalNumberOfElements] ;
+//CCRT  int * numberIndex = new int[it+1] ;
+  med_int * numberIndex = new med_int[it+1] ;
   numberIndex[0]=1;
   for (int i=0;i<it;i++) {
-    memcpy(numberValue+numberIndex[i]-1,tmp_array[i],sizeof(int)*_numberOfElements[i]) ;
+//CCRT    memcpy(numberValue+numberIndex[i]-1,tmp_array[i],sizeof(int)*_numberOfElements[i]) ;
+    memcpy(numberValue+numberIndex[i]-1,tmp_array[i],sizeof(med_int)*_numberOfElements[i]) ;
     delete[] tmp_array[i] ;
     numberIndex[i+1]=numberIndex[i]+_numberOfElements[i] ;
 
@@ -391,7 +413,8 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
 void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
 			 int TotalNumberOfElements,
 			 medGeometryElement *GeometricType,
-			 int *NumberOfElements, int *NumberValue) 
+//CCRT			 int *NumberOfElements, int *NumberValue) 
+			 int *NumberOfElements, med_int *NumberValue) 
 //-------------------
 {
   const char * LOC = "SUPPORT::setpartial(string , int , int , medGeometryElement * , int * , int *) : " ;
@@ -409,8 +432,10 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   _numberOfElements = new int[NumberOfGeometricType];
   _totalNumberOfElements = TotalNumberOfElements;
   if (_numberOfGaussPoint!=NULL) delete[] _numberOfGaussPoint ;
-  _numberOfGaussPoint = new int[NumberOfGeometricType];
-  int * index = new int[_numberOfGeometricType+1];
+//CCRT  _numberOfGaussPoint = new int[NumberOfGeometricType];
+  _numberOfGaussPoint = new med_int[NumberOfGeometricType];
+//CCRT  int * index = new int[_numberOfGeometricType+1];
+  med_int * index = new med_int[_numberOfGeometricType+1];
   index[0]=1;
   for (int i=0;i<_numberOfGeometricType;i++) {
     _geometricType[i] = GeometricType[i] ;
@@ -454,8 +479,10 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
 
   setAll(false);
 
-  const int * myConnectivityValue = _mesh->getReverseConnectivity(MED_DESCENDING) ;
-  const int * myConnectivityIndex = _mesh->getReverseConnectivityIndex(MED_DESCENDING) ;
+//CCRT  const int * myConnectivityValue = _mesh->getReverseConnectivity(MED_DESCENDING) ;
+  const med_int * myConnectivityValue = _mesh->getReverseConnectivity(MED_DESCENDING) ;
+//CCRT  const int * myConnectivityIndex = _mesh->getReverseConnectivityIndex(MED_DESCENDING) ;
+  const med_int * myConnectivityIndex = _mesh->getReverseConnectivityIndex(MED_DESCENDING) ;
   int numberOf = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS) ;
   list<int> myElementsList ;
   int size = 0 ;
@@ -468,7 +495,8 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
     }
   SCRUTE(size) ;
   // Well, we must know how many geometric type we have found
-  int * myListArray = new int[size] ;
+//CCRT  int * myListArray = new int[size] ;
+  med_int * myListArray = new med_int[size] ;
   int id = 0 ;
   list<int>::iterator myElementsListIt ;
   for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
@@ -484,7 +512,8 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   int * geometricTypeNumber ;
   int * numberOfElements ;
   //MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY() ;
-  int * mySkyLineArrayIndex ;
+//CCRT  int * mySkyLineArrayIndex ;
+  med_int * mySkyLineArrayIndex ;
 
   int numberOfType = _mesh->getNumberOfTypes(_entity) ;
   if (numberOfType == 1) { // wonderfull : it's easy !
@@ -498,7 +527,8 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
     geometricTypeNumber[0] = 0 ;
     numberOfElements = new int[1] ;
     numberOfElements[0] = size ;
-    mySkyLineArrayIndex = new int[2] ;
+//CCRT    mySkyLineArrayIndex = new int[2] ;
+    mySkyLineArrayIndex = new med_int[2] ;
     mySkyLineArrayIndex[0]=1 ;
     mySkyLineArrayIndex[1]=1+size ;
   }
@@ -517,7 +547,8 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
     numberOfGaussPoint = new int[numberOfGeometricType] ;
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfElements = new int[numberOfGeometricType] ;
-    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
+//CCRT    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
+    mySkyLineArrayIndex = new med_int[numberOfGeometricType+1] ;
     int index = 0 ;
     mySkyLineArrayIndex[0]=1 ;
     map<medGeometryElement,int>::iterator theTypeIt ;
@@ -617,15 +648,20 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
   _numberOfElements = new int[it] ;
   _totalNumberOfElements = 0 ;
   //int totalSize = 0 ;
-  int ** tmp_array = new (int*)[it];
+//CCRT  int ** tmp_array = new (int*)[it];
+//CCRT  int ** tmp_array = new int*[it];
+  med_int ** tmp_array = new med_int*[it];
   for (int i=0;i<it;i++) {
     int numberOfElementsInType = tmp_NumberOfElementsInType[i] ;
     _numberOfElements[i] = numberOfElementsInType ;
-    tmp_array[i] = new int[numberOfElementsInType] ;
+//CCRT    tmp_array[i] = new int[numberOfElementsInType] ;
+    tmp_array[i] = new med_int[numberOfElementsInType] ;
     _totalNumberOfElements+=numberOfElementsInType ;
     if (whereIsType[i] == 3) {
-      const int * number1 = getNumber(myType[i]) ;
-      const int * number2 = mySupport->getNumber(myType[i]) ;
+//CCRT      const int * number1 = getNumber(myType[i]) ;
+      const med_int * number1 = getNumber(myType[i]) ;
+//CCRT      const int * number2 = mySupport->getNumber(myType[i]) ;
+      const med_int * number2 = mySupport->getNumber(myType[i]) ;
 
       SCRUTE(number1);
       SCRUTE(number2);
@@ -666,7 +702,8 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
       SCRUTE(newNumberOfElements);
 
       _numberOfElements[i] = newNumberOfElements ;
-      int * tmp_arrayNew = new int[newNumberOfElements];
+//CCRT      int * tmp_arrayNew = new int[newNumberOfElements];
+      med_int * tmp_arrayNew = new med_int[newNumberOfElements];
 
       int ii = 0 ;
 
@@ -690,17 +727,22 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
   _numberOfGeometricType = it ;
   medGeometryElement * geometricType=_geometricType ;
   _geometricType = new medGeometryElement[it] ;
-  int * numberOfGaussPoint=_numberOfGaussPoint ;
-  _numberOfGaussPoint= new int[it] ;
+//CCRT  int * numberOfGaussPoint=_numberOfGaussPoint ;
+  med_int * numberOfGaussPoint=_numberOfGaussPoint ;
+//CCRT  _numberOfGaussPoint= new int[it] ;
+  _numberOfGaussPoint= new med_int[it] ;
 
   int size = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
   if (_totalNumberOfElements == size) _isOnAllElts = true;
 
-  int * numberValue = new int[_totalNumberOfElements] ;
-  int * numberIndex = new int[it+1] ;
+//CCRT  int * numberValue = new int[_totalNumberOfElements] ;
+  med_int * numberValue = new med_int[_totalNumberOfElements] ;
+//CCRT  int * numberIndex = new int[it+1] ;
+  med_int * numberIndex = new med_int[it+1] ;
   numberIndex[0]=1;
   for (int i=0;i<it;i++) {
-    memcpy(numberValue+numberIndex[i]-1,tmp_array[i],sizeof(int)*_numberOfElements[i]) ;
+//CCRT    memcpy(numberValue+numberIndex[i]-1,tmp_array[i],sizeof(int)*_numberOfElements[i]) ;
+    memcpy(numberValue+numberIndex[i]-1,tmp_array[i],sizeof(med_int)*_numberOfElements[i]) ;
     delete[] tmp_array[i] ;
     numberIndex[i+1]=numberIndex[i]+_numberOfElements[i] ;
 

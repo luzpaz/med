@@ -471,7 +471,8 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
       // read values for each geometric type in _support
       int NumberOfTypes = _ptrField->_support->getNumberOfTypes() ;
       const medGeometryElement *Types = _ptrField->_support->getTypes() ;
-      T ** myValues = new (T*)[NumberOfTypes] ;
+//CCRT      T ** myValues = new (T*)[NumberOfTypes] ;
+      T ** myValues = new T*[NumberOfTypes] ;
       int * NumberOfValues = new int[NumberOfTypes] ;
       int TotalNumberOfValues = 0 ;
       MESSAGE ("NumberOfTypes :"<< NumberOfTypes);
@@ -705,7 +706,8 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
       int NumberOfType = mySupport->getNumberOfTypes() ;
       int Index = 1 ;
       const medGeometryElement * Types = mySupport->getTypes() ;
-      const int * NumberOfGaussPoint = mySupport->getNumberOfGaussPoint() ;
+//CCRT      const int * NumberOfGaussPoint = mySupport->getNumberOfGaussPoint() ;
+      const med_int * NumberOfGaussPoint = mySupport->getNumberOfGaussPoint() ;
       for (int i=0;i<NumberOfType;i++) {
 	int NumberOfElements = mySupport->getNumberOfElements(Types[i]) ;
 	

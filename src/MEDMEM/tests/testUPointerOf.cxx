@@ -5,10 +5,12 @@
 //  File   : testUPointerOf.cxx
 //  Module : MED
 
-using namespace std;
 #include "utilities.h"
 #include "MEDMEM_PointerOf.hxx"
 #include "MEDMEM_Exception.hxx"
+
+using namespace std;
+
 using namespace MEDMEM;
 
 

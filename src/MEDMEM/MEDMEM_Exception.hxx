@@ -23,7 +23,8 @@ using namespace std;
 */
 namespace MEDMEM {
 //--------------------------------------//
-  class MEDEXCEPTION : public exception
+//CCRT  class MEDEXCEPTION : public exception
+  class MEDEXCEPTION : public std::exception
 //--------------------------------------//
 {
 private :

@@ -1,4 +1,3 @@
-using namespace std;
 #include<string>
 
 #include <math.h>
@@ -15,6 +14,7 @@ using namespace std;
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
+using namespace std;
 using namespace MEDMEM;
 
 void affiche_support(const SUPPORT * mySupport) 
@@ -30,7 +30,8 @@ void affiche_support(const SUPPORT * mySupport)
     for (int j=0;j<NumberOfTypes;j++) {
       cout<<"    * Type "<<Types[j]<<" : ";
       int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
-      const int * Number = mySupport->getNumber(Types[j]) ;
+//CCRT      const int * Number = mySupport->getNumber(Types[j]) ;
+      const med_int * Number = mySupport->getNumber(Types[j]) ;
       for (int k=0; k<NumberOfElements;k++)
 	cout << Number[k] << " ";
       cout << endl ;

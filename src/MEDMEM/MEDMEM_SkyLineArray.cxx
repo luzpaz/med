@@ -1,6 +1,6 @@
-using namespace std;
 #include "MEDMEM_SkyLineArray.hxx"
 #include "utilities.h"
+using namespace std;
 using namespace MEDMEM;
 
 MEDSKYLINEARRAY::MEDSKYLINEARRAY(): _count(0), _length(0),
@@ -39,7 +39,8 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(const med_int count, const med_int length,
                                 _count(count), _length(length),
                                 _index(_count+1),_value(_length)
 {
-	MESSAGE("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
+
+//	MESSAGE("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
 	memcpy((med_int*)_index,index,sizeof(med_int)*(_count+1));
 	memcpy((med_int*)_value,value,sizeof(med_int)*_length);
 }

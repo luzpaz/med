@@ -1,13 +1,13 @@
-using namespace std;
 /*
  File MedException.cxx
  $Header$
 */
 
-using namespace std;
-
 #include "utilities.h"
 #include "MEDMEM_Exception.hxx"
+
+using namespace std;
+
 using namespace MEDMEM;
 
 extern "C"
@@ -107,11 +107,13 @@ MEDEXCEPTION::MEDEXCEPTION( const char *text, const char *fileName, const unsign
 MEDEXCEPTION::~MEDEXCEPTION() throw ()
 // ------------------------------------//
 {
+  SCRUTE( _text ) ;
   if ( _text )
     {
       delete [] _text ;
       char *& txt = (char*)_text ;
-      txt = 0 ;
+//CCRT      txt = 0 ;
+      _text = NULL ;
     }
   ASSERT(_text==NULL) ;
 }

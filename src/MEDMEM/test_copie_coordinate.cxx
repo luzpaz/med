@@ -1,4 +1,3 @@
-using namespace std;
 /* Programme de test du constructeur de copies de la classe COORDINATE de MEDMEM
    jroy - 17/12/2002 */
 
@@ -17,6 +16,7 @@ using namespace std;
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 
@@ -88,7 +88,8 @@ int main (int argc, char ** argv) {
   if (spaceDimension >= 3) myCoordinatesUnits[2] = "m";
 
   //construction des indices des noeuds
-  int * myNodeNumber = new int[numberofNodes];
+//CCRT  int * myNodeNumber = new int[numberofNodes];
+  med_int * myNodeNumber = new med_int[numberofNodes];
   for (int i=0; i<numberofNodes; i++)
     myNodeNumber[i]=numberofNodes-i-1;
 

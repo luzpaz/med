@@ -9,6 +9,45 @@
 // UTILE AUX DEUX NAMESPACES
 #include <hdf5.h>
 
+// Arrondis pour le diff entre PCLINUX et ALPHA_OSF
+#define DIFF_PC_ALPHA 0
+// Trace des valeurs hexadecimales des double
+#define TRACE_DBLE_HEXA 0
+typedef union { double d ;
+                int i[2] ; } DI ;
+inline double Arrondi( double avalret ) {
+  DI valret ;
+  valret.d = avalret ;
+  DI val ;
+  DI valeps ;
+  DI valeps1 ;
+  val.d = valret.d ;
+  bool kneg = false ;
+  if ( valret.i[1] == 0x80000000 && valret.i[0] == 0x00000000 ) {
+    valret.d = 0.0 ;
+  }
+  if ( valret.d < 0 ) {
+    kneg = true ;
+    valret.d = - valret.d ;
+  }
+  if ( valret.d != 0 ) {
+    valeps.i[1] = valret.i[1] & 0xfff00000 ;
+    valeps.i[0] = 1 ;
+    valeps1.i[1] = valret.i[1] & 0xfff00000 ;
+    valeps1.i[0] = 0 ;
+    valeps.d = valeps.d - valeps1.d ;
+    valret.d = valret.d + valeps.d ;
+    valret.i[0] = valret.i[0] & 0xfffffff0 ;
+    if ( kneg ) {
+      valret.d = - valret.d ;
+    }
+  }
+//#if TRACE_DBLE_HEXA
+//  printf( "testMedMemGeneral %0#8x%0#8x Arrondi : %0#8x%0#8x \n" , val.i[1] , val.i[0] , valret.i[1] , valret.i[0] ) ;
+//#endif
+  return valret.d ;
+}
+
 namespace MED_FR {
   extern "C" { 
 # include <med.h>
@@ -96,7 +135,10 @@ typedef enum {MED_HDF_VERSION, MED_VERSION, MED_FICH_DES} med_fich_info;
   //#define MED_ALL    0 !!!!! NB: WARNING MED_ALL deja utilise dans l'enum medGeometryElement !!!!!!!!
 #define MED_ALL    0
 
-#if defined(SUN4SOL2) || defined(PCLINUX) || defined(OSF1) || defined(IRIX64_32) || defined(RS6000)
+//CCRT#if defined(SUN4SOL2) || defined(PCLINUX) || defined(OSF1) || defined(IRIX64_32) || defined(RS6000)
+// Copy of med.h with OSF1 instead of OSF1_32 :
+// mismatch between definitions of MEDMEM and med-2.1.6 !!! ...
+#if defined(SUN4SOL2) || defined(PCLINUX) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000)
 /* interface C/FORTRAN */
 /* this true only with g77 and gcc : we must change it to use directly NOMF_... and INT32 or INT64 - it will be more simple to understand and to use ! */
 #define NOMF_POST_UNDERSCORE 
@@ -124,7 +166,9 @@ typedef int            med_int;
 typedef double         med_float;
 #endif
 
-#if defined(IRIX64)
+// Copy of med.h without OSF1 :
+// mismatch between definitions of MEDMEM and med-2.1.6 !!! ...
+#if defined(IRIX64) || defined(OSF1)
 #define NOMF_POST_UNDERSCORE
 
 /* correspondance des types avec HDF 5 */

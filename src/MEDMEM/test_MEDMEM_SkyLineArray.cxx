@@ -1,6 +1,6 @@
-using namespace std;
 #include "utilities.h"
 #include "MEDMEM_SkyLineArray.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 int main (int argc, char ** argv) {
@@ -8,12 +8,14 @@ int main (int argc, char ** argv) {
   int NumberOfCell = 3 ; // 1 triangle,1 quadrangle,1 triangle
   int Size = 10 ; // 10 nodes
 
-  int * index = new int[NumberOfCell+1] ;
+//CCRT  int * index = new int[NumberOfCell+1] ;
+  med_int * index = new med_int[NumberOfCell+1] ;
   index[0]=1;
   index[1]=4;
   index[2]=8;
   index[3]=11;
-  int * value = new int[Size] ;
+//CCRT  int * value = new int[Size] ;
+  med_int * value = new med_int[Size] ;
   value[0]=1; // first
   value[1]=2;
   value[2]=5;
@@ -30,7 +32,8 @@ int main (int argc, char ** argv) {
 
   cout << "Show all 1 :" << endl ;
   for (int i=1; i<NumberOfCell+1 ; i++) {
-    const int * cell = myArray->getI(i) ;
+//CCRT    const int * cell = myArray->getI(i) ;
+    const med_int * cell = myArray->getI(i) ;
     int numberof = myArray->getNumberOfI(i) ;
     cout << " - " ;
     for (int j=0;j<numberof;j++)
@@ -50,7 +53,8 @@ int main (int argc, char ** argv) {
   delete myArray ;
   
   cout << "Show all 3 :" << endl ;
-  const int * index2 = myArray2->getIndex() ;
+//CCRT  const int * index2 = myArray2->getIndex() ;
+  const med_int * index2 = myArray2->getIndex() ;
   for (int i=1; i<=NumberOfCell ; i++) {
     cout << " - " ;
     for (int j=index2[i-1];j<index2[i];j++)

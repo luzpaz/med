@@ -1,10 +1,10 @@
-using namespace std;
 #include "MEDMEM_DriverTools.hxx"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Group.hxx"
 #include <algorithm>
+using namespace std;
 using namespace MEDMEM;
 
 
@@ -85,7 +85,13 @@ std::ostream& MEDMEM::operator << (std::ostream& os, const _groupe& gr)
     for( std::vector<int>::const_iterator i=gr.groupes.begin(); i!=gr.groupes.end(); ++i)
 	os << *i << " ";
     os << std::endl << " -> liste des mailles : " << std::endl;
-    for( _groupe::mailleIter i=gr.mailles.begin(); i!=gr.mailles.end(); i++)
+//CCRT    for( _groupe::mailleIter i=gr.mailles.begin(); i!=gr.mailles.end(); i++)
+    std::set< std::set< _maille, std::less< _maille >,
+    std::allocator< _maille > >::iterator,
+    _mailleIteratorCompare,
+    std::allocator< std::set< _maille, std::less< _maille >,
+    std::allocator< _maille > >::iterator > >::const_iterator i ;
+    for( i=gr.mailles.begin(); i!=gr.mailles.end(); i++)
 	os << "    " << *(*i) << std::endl;
     return os;
 }
@@ -187,8 +193,10 @@ _intermediateMED::getConnectivity()
     int numberOfTypes=0;
     medEntityMesh entity;
     medGeometryElement * types=NULL; // pointeurs pour allouer les structures MED
-    int * count=NULL;
-    int * connectivity=NULL;
+//CCRT    int * count=NULL;
+    med_int * count=NULL;
+//CCRT    int * connectivity=NULL;
+    med_int * connectivity=NULL;
     CONNECTIVITY *Connectivity, *Constituent;
 
     medGeometryElement type=0; // variables de travail
@@ -261,7 +269,8 @@ _intermediateMED::getConnectivity()
 	Connectivity->setGeometricTypes(types,entity);
 	delete [] types;
 
-	count = new int[numberOfTypes+1];
+//CCRT	count = new int[numberOfTypes+1];
+	count = new med_int[numberOfTypes+1];
 	count[0]=1;
 	for (unsigned int k=0; k!=vcount.size(); ++k )
 	  count[k+1]=count[k]+vcount[k];
@@ -273,23 +282,27 @@ _intermediateMED::getConnectivity()
 	    // pour chaque type géometrique k, copie des sommets dans connectivity et set dans Connectivity
 	    int nbSommetsParMaille = j->sommets.size();
 	    int nbSommets = vcount[k] * j->sommets.size();
-	    connectivity = new int[ nbSommets ];
+//CCRT	    connectivity = new int[ nbSommets ];
+	    connectivity = new med_int[ nbSommets ];
 	    for (int l=0; l!=vcount[k]; ++l, ++j)
 	    {
-		for ( unsigned n=0; n != j->sommets.size(); ++n)
+		for ( unsigned n=0; n != j->sommets.size(); ++n) {
 		    connectivity[nbSommetsParMaille*l+n] = j->sommets[n]->second.number;
-		maillage.erase(j);    ; // dangereux, mais optimise la mémoire consommée!
+		}
+//CCRT		maillage.erase(j);    ; // dangereux, mais optimise la mémoire consommée!
 	    }
 
 	    Connectivity->setNodal  (connectivity, entity, vtype[k]);
 	    delete [] connectivity;
 	  }
 		
-	if (i!=j)
+	if (i!=j) {
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Erreur de lecture des mailles ."));
+	}
 
-	if ( ! first)
+	if ( ! first) {
 	    Connectivity->setConstituent (Constituent);
+	}
 	else
 	    first = false;
 	Constituent = Connectivity; // stocke Connectivity pour utilisation dans setConstituent lors de la boucle suivante
@@ -330,7 +343,13 @@ _intermediateMED::getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP
 	    continue; 
 
 	int nb_geometric_types=1;
-	_groupe::mailleIter j=groupes[i].mailles.begin(); 
+//CCRT	_groupe::mailleIter j=groupes[i].mailles.begin(); 
+        std::set< std::set< _maille, std::less< _maille >,
+        std::allocator< _maille > >::iterator,
+        _mailleIteratorCompare,
+        std::allocator< std::set< _maille, std::less<_maille >,
+        std::allocator< _maille > >::iterator > >::iterator j ;
+	j=groupes[i].mailles.begin(); 
 	// initialise groupe_entity a l'entite de la premiere maille du groupe
 	medEntityMesh groupe_entity = (**j).getEntity(dimension_maillage);
 	medGeometryElement geometrictype=(**j).geometricType;
@@ -352,8 +371,10 @@ _intermediateMED::getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP
 
 	// le groupe est valide -> on le traite
 	MED_EN::medGeometryElement * tab_types_geometriques = new MED_EN::medGeometryElement[nb_geometric_types];
-	int * tab_index_types_geometriques = new int[nb_geometric_types+1];
-	int * tab_numeros_elements = new int[groupes[i].mailles.size()];
+//CCRT	int * tab_index_types_geometriques = new int[nb_geometric_types+1];
+	med_int * tab_index_types_geometriques = new med_int[nb_geometric_types+1];
+//CCRT	int * tab_numeros_elements = new int[groupes[i].mailles.size()];
+	med_int * tab_numeros_elements = new med_int[groupes[i].mailles.size()];
 	int * tab_nombres_elements = new int[nb_geometric_types];
 
 	//Remplit tableaux entree des methodes set

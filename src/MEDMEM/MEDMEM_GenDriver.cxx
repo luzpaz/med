@@ -1,7 +1,7 @@
-using namespace std;
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 GENDRIVER::GENDRIVER(): _id(MED_INVALID),
@@ -40,7 +40,7 @@ GENDRIVER & MEDMEM::GENDRIVER::operator=(const GENDRIVER &  genDriver)
   _id          = genDriver._id;
   return *this;
 
-  END_OF(LOC);
+//CCRT  END_OF(LOC);
 }
 
 void GENDRIVER::writeFrom      ( void ) {};
@@ -69,7 +69,7 @@ int GENDRIVER::getId ( void) const {
 
   return _id ;
 
-  END_OF(LOC);
+//CCRT  END_OF(LOC);
 };
 
 string GENDRIVER::getFileName() const {
@@ -79,7 +79,7 @@ string GENDRIVER::getFileName() const {
   
   return _fileName;
 
-  END_OF(LOC);
+//CCRT  END_OF(LOC);
 }
     
 
@@ -107,7 +107,7 @@ med_mode_acces GENDRIVER::getAccessMode() const {
 
   return _accessMode;
 
-  END_OF(LOC);
+//CCRT  END_OF(LOC);
 }
 
 ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)

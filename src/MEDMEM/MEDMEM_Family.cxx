@@ -1,4 +1,3 @@
-using namespace std;
 /*
  File MEDMEM_Family.cxx
  $Header$
@@ -6,22 +5,31 @@ using namespace std;
 
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Family.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), 
-                 _attributeIdentifier((int*)NULL),_attributeValue((int*)NULL), _attributeDescription((string*)NULL),
+//CCRT                 _attributeIdentifier((int*)NULL),_attributeValue((int*)NULL), _attributeDescription((string*)NULL),
+                 _attributeIdentifier((med_int*)NULL),_attributeValue((med_int*)NULL), _attributeDescription((string*)NULL),
 		 _numberOfGroup(0), _groupName((string*)NULL) 
 {
     MESSAGE("FAMILY::FAMILY()");
 };
 
+//CCRTFAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
+//CCRT               int *AttributeIdentifier, int *AttributeValue, string AttributeDescription,
+//CCRT               int NumberOfGroup, string GroupName,
+//CCRT	       int * MEDArrayNodeFamily,
+//CCRT	       int ** MEDArrayCellFamily,
+//CCRT	       int ** MEDArrayFaceFamily,
+//CCRT	       int ** MEDArrayEdgeFamily
 FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
-               int *AttributeIdentifier, int *AttributeValue, string AttributeDescription,
+               med_int *AttributeIdentifier, med_int *AttributeValue, string AttributeDescription,
                int NumberOfGroup, string GroupName,
-	       int * MEDArrayNodeFamily,
-	       int ** MEDArrayCellFamily,
-	       int ** MEDArrayFaceFamily,
-	       int ** MEDArrayEdgeFamily
+	       med_int * MEDArrayNodeFamily,
+	       med_int ** MEDArrayCellFamily,
+	       med_int ** MEDArrayFaceFamily,
+	       med_int ** MEDArrayEdgeFamily
 	       ): SUPPORT(Mesh,Name),
 		  _identifier(Identifier), 
 		  _numberOfAttribute(NumberOfAttribute), 
@@ -31,10 +39,14 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
 
   _isOnAllElts = false ;
   // replace them by pointerOf ?
-  _attributeIdentifier = new int[_numberOfAttribute] ;
-  memcpy(_attributeIdentifier,AttributeIdentifier,_numberOfAttribute*sizeof(int));
-  _attributeValue = new int[_numberOfAttribute] ;
-  memcpy(_attributeValue,AttributeValue,_numberOfAttribute*sizeof(int));
+//CCRT  _attributeIdentifier = new int[_numberOfAttribute] ;
+  _attributeIdentifier = new med_int[_numberOfAttribute] ;
+//CCRT  memcpy(_attributeIdentifier,AttributeIdentifier,_numberOfAttribute*sizeof(int));
+  memcpy(_attributeIdentifier,AttributeIdentifier,_numberOfAttribute*sizeof(med_int));
+//CCRT  _attributeValue = new int[_numberOfAttribute] ;
+  _attributeValue = new med_int[_numberOfAttribute] ;
+//CCRT  memcpy(_attributeValue,AttributeValue,_numberOfAttribute*sizeof(int));
+  memcpy(_attributeValue,AttributeValue,_numberOfAttribute*sizeof(med_int));
 
   _attributeDescription=new string[_numberOfAttribute];
   for (int i=0;i<NumberOfAttribute;i++) {
@@ -99,8 +111,10 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
 //        _number=new MEDSKYLINEARRAY(1,NumberOfNodesInFamily) ;
 //        int * NumberIndex = _number->getIndex();
 //        int * NumberValue = _number->getValue();
-      int * NumberIndex = new int[2];
-      int * NumberValue = new int[NumberOfNodesInFamily];
+//CCRT      int * NumberIndex = new int[2];
+      med_int * NumberIndex = new med_int[2];
+//CCRT      int * NumberValue = new int[NumberOfNodesInFamily];
+      med_int * NumberValue = new med_int[NumberOfNodesInFamily];
 
       NumberIndex[0]=1;                          //set the MEDSKYLINEARRAY Index table
       NumberIndex[1]=1+NumberOfNodesInFamily;    //set the MEDSKYLINEARRAY Index table
@@ -168,7 +182,8 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
     for (int j=0;j<numberoftypes;j++) {
       int numberOfElements = getNumberOfElements(types[j]);
       MESSAGE("    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) : ");
-      const int * number = getNumber(types[j]);
+//CCRT      const int * number = getNumber(types[j]);
+      const med_int * number = getNumber(types[j]);
       SCRUTE(number);
       for (int k=0; k<numberOfElements;k++)
 	MESSAGE("________________ " << number[k]);
@@ -187,18 +202,24 @@ FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
   _numberOfAttribute = m._numberOfAttribute;
   if (m._attributeIdentifier != NULL)
     {
-      _attributeIdentifier = new int[m._numberOfAttribute];
-      memcpy(_attributeIdentifier,m._attributeIdentifier,m._numberOfAttribute*sizeof(int));
+//CCRT      _attributeIdentifier = new int[m._numberOfAttribute];
+      _attributeIdentifier = new med_int[m._numberOfAttribute];
+//CCRT      memcpy(_attributeIdentifier,m._attributeIdentifier,m._numberOfAttribute*sizeof(int));
+      memcpy(_attributeIdentifier,m._attributeIdentifier,m._numberOfAttribute*sizeof(med_int));
     }
   else
-    _attributeIdentifier = (int *) NULL;
+//CCRT    _attributeIdentifier = (int *) NULL;
+    _attributeIdentifier = (med_int *) NULL;
   if (m._attributeValue != NULL)
     {
-      _attributeValue = new int[m._numberOfAttribute];
-      memcpy(_attributeValue,m._attributeValue,m._numberOfAttribute*sizeof(int));
+//CCRT      _attributeValue = new int[m._numberOfAttribute];
+      _attributeValue = new med_int[m._numberOfAttribute];
+//CCRT      memcpy(_attributeValue,m._attributeValue,m._numberOfAttribute*sizeof(int));
+      memcpy(_attributeValue,m._attributeValue,m._numberOfAttribute*sizeof(med_int));
     }
   else
-    _attributeValue = (int *) NULL;
+//CCRT    _attributeValue = (int *) NULL;
+    _attributeValue = (med_int *) NULL;
   if (m._attributeDescription != NULL)
     {
       _attributeDescription = new string[m._numberOfAttribute];
@@ -224,8 +245,10 @@ FAMILY::FAMILY(const SUPPORT & s):SUPPORT(s)
 
   _identifier = 0;
   _numberOfAttribute = 0;
-  _attributeIdentifier = (int*) NULL;
-  _attributeValue = (int*) NULL;
+//CCRT  _attributeIdentifier = (int*) NULL;
+  _attributeIdentifier = (med_int*) NULL;
+//CCRT  _attributeValue = (int*) NULL;
+  _attributeValue = (med_int*) NULL;
   _attributeDescription = (string*) NULL;
   _numberOfGroup = 0;
   _groupName= (string*) NULL;
@@ -293,7 +316,8 @@ ostream & MEDMEM::operator<<(ostream &os, const FAMILY &myFamily)
   return os;
 };
 
-bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
+//CCRTbool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
+bool FAMILY::build(medEntityMesh Entity,med_int **FamilyNumber /* from MED file */)
 {
   MESSAGE("FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)");
   bool Find = false ;
@@ -307,7 +331,8 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
   medGeometryElement * tmp_Types  = new medGeometryElement[numberOfTypes];
   int ** tmp_ElementsLists                = new int*[numberOfTypes] ;
   //  int *  GeometricTypeNumber           = new int[numberOfTypes] ;
-  const int *  GlobalNumberingIndex          = _mesh->getGlobalNumberingIndex(Entity);
+//CCRT  const int *  GlobalNumberingIndex          = _mesh->getGlobalNumberingIndex(Entity);
+  const med_int *  GlobalNumberingIndex          = _mesh->getGlobalNumberingIndex(Entity);
   
 
   SCRUTE(numberOfTypes);
@@ -317,7 +342,8 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
     
     int NumberOfElements             = _mesh->getNumberOfElements(Entity,types[TypeNumber]) ;
     int NumberOfElementsInThisFamily = 0 ;
-    int * ElementsOfThisFamilyNumber = FamilyNumber[TypeNumber];
+//CCRT    int * ElementsOfThisFamilyNumber = FamilyNumber[TypeNumber];
+    med_int * ElementsOfThisFamilyNumber = FamilyNumber[TypeNumber];
     int * tmp_ElementsList           = new int[NumberOfElements];
       
     for (int i=0; i<NumberOfElements; i++)
@@ -379,8 +405,10 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
       for (int i=0; i<_numberOfGeometricType; i++)
 	delete[] tmp_ElementsLists[i];
     } else {
-      int *NumberValue = new int[_totalNumberOfElements];
-      int *NumberIndex = new int[_numberOfGeometricType+1];
+//CCRT      int *NumberValue = new int[_totalNumberOfElements];
+      med_int *NumberValue = new med_int[_totalNumberOfElements];
+//CCRT      int *NumberIndex = new int[_numberOfGeometricType+1];
+      med_int *NumberIndex = new med_int[_numberOfGeometricType+1];
       NumberIndex[0]=1;
       for (int i=0; i<_numberOfGeometricType; i++) {
 	NumberIndex[i+1]=NumberIndex[i]+_numberOfElements[i];
