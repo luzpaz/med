@@ -1,3 +1,29 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : MEDMEM_GenDriver.cxx
+//  Module : MED
+
 using namespace std;
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_STRING.hxx"
@@ -16,9 +42,15 @@ GENDRIVER::GENDRIVER(const string & fileName,
                                                                               _status(MED_CLOSED),
                                                                               _driverType(NO_DRIVER) {}
 
-GENDRIVER::GENDRIVER(const GENDRIVER & genDriver):_id(MED_INVALID), _fileName(genDriver._fileName),
-                                                  _accessMode(genDriver._accessMode),
-                                                  _status(genDriver._status),_driverType(NO_DRIVER) {}
+GENDRIVER::GENDRIVER(const GENDRIVER & genDriver):
+  //_id(MED_INVALID), 
+  _id(genDriver._id),
+  _fileName(genDriver._fileName),
+  _accessMode(genDriver._accessMode),
+  _status(genDriver._status),
+  _driverType(genDriver._driverType) 
+{}
+
 GENDRIVER::~GENDRIVER() {}
 
 
@@ -131,7 +163,7 @@ bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
   
   const char * LOC = "bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const : ";
 
-  BEGIN_OF(LOC);
+  MESSAGE(LOC);
 
   return ( _id == genDriver._id )  &&
     ( _driverType == genDriver._driverType );

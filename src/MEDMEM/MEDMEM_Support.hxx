@@ -1,6 +1,32 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : MEDMEM_Support.hxx
+//  Module : MED
+
 /*
- File Support.hxx
- $Header$
+  File Support.hxx
+  $Header$
 */
 
 #ifndef SUPPORT_HXX
@@ -10,221 +36,272 @@
 #include <string>
 
 #include "utilities.h"
+#include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 
 #include "MEDMEM_SkyLineArray.hxx"
-#include "MEDMEM_Mesh.hxx"
+//#include "MEDMEM_Mesh.hxx"
 
 using namespace MED_EN;
 
 class MESH ;
 
-class SUPPORT 
+/*!
+
+  This class describe a support of elements on an entity of the mesh.
+
+  It contains the list of meshes elements for an entity (MED_NODE, 
+  MED_CELL, MED_FACE or MED_EDGE).
+
+*/
+
+class SUPPORT
 {
 protected:
-					         /*! name of the support */
+  /*!
+    \if developper
+    Support name.
+    \endif
+  */
   string                   _name;
-					         /*! description of the support (optionnal) */
+
+  /*!
+    \if developper
+    Description of the support (optional).
+    \endif
+  */
   string                   _description;
-						 /*! reference to the mesh on which the support is defined */
+
+  /*!
+    \if developper
+    Reference to the mesh on which the support is defined.
+    \endif
+  */
   MESH *                   _mesh;
-						 /*! type of entity on which the support is defined 
-						     (only one for each support) */
+
+  /*!
+    \if developper
+    Type of entity on which the support is defined
+    (only one for each support).
+    \endif
+  */
   medEntityMesh            _entity ;
-						 /*! number of geometric type defined in the support */
+
+  /*!
+    \if developper
+    Number of geometric type defined in the support.
+    \endif
+  */
   int                      _numberOfGeometricType;
-						 /*! array of all geometric type defined in the support */
+
+  /*!
+    \if developper
+    Array of all geometric type defined in the support.
+    \endif
+  */
   medGeometryElement *     _geometricType;
-						 /*! array of size _numberOfGeometricType which contains 
-						     for each type the number of gauss point 
-						     (not yet implemented) */
-  int *                    _numberOfGaussPoint ; 
-						 /*! array of size _numberOfGeometricType 
-						     which contains number of geometric
-						     entity type in Mesh 
-						     (to get corresponding CellModel)*/
-  int *                    _geometricTypeNumber; 
-						 /*! If true, we consider all entities of type _entity */
-  bool       		   _isOnAllElts; 	
-						 /*! array of size _numberOfGeometricType wich contains
-			                 	     for each geometric type, count of entities. 
-						     (if _isOnAllElts is true, we could get same 
-						     information from _mesh) */
-  int *      		   _numberOfEntities;   
-						 /*! sum of each _numberOfEntities component (if 
-						     _isOnAllElts is true, we could get same 
-						     information from _mesh) */
-  int        		   _totalNumberOfEntities;    
+
+  /*!
+    \if developper
+    Array of size _numberOfGeometricType which contains
+    for each type the number of gauss point
+    (not yet implemented).
+    \endif
+  */
+  int *                    _numberOfGaussPoint ;
+
+   /*
+    \if developper
+    Array of size _numberOfGeometricType
+    which contains number of geometric
+    entity type in Mesh
+    (to get corresponding CellModel).
+    \endif
+  */
+  //int *                    _geometricTypeNumber;
+
+  /*!
+    \if developper
+    If true, we consider all entities of type _entity.
+    \endif
+  */
+  bool                     _isOnAllElts; 
+
+  /*!
+    \if developper
+    Index array of size _numberOfGeometricType wich contains
+    for each geometric type, the number of elements of this type.
+    \endif
+  */
+  int *                    _numberOfElements;
+
+  /*!
+    \if developper
+    Sum of each _numberOfElements component.
+    \endif
+  */
+  int                      _totalNumberOfElements;
 
   // the two following arrays are defined only if _isOnAllElts is false :
 
-			     /* array of size _numberOfType+1 wich contains for 
-                                 each geometric type, index in _number._value 
-                                 (if _all is true, we must ask _mesh to get 
-                                 information). _typeIndex[i+1]-_typeIndex[i] 
-                                 represents count of entities of ith geometric 
-                                 type. _typeIndex[_numberOfType] contains total 
-                                 entities count. If _numberOf[i]=0, 
-                                 _typeIndex[i+1]=_typeIndex[i] 
-				 defined only if _isOnAllElts is false*/
-  //  int *      _typeIndex; 
-			     /*! array of size _index[_numberOfType] wich contain number of 
-                                 entities of each geometric type. We use global numbering.
-				 defined only if _isOnAllElts is false*/
-  MEDSKYLINEARRAY * _number;   
+  /*
+    \if developper
+    array of size _numberOfType+1 wich contains for
+    each geometric type, index in _number._value
+    (if _all is true, we must ask _mesh to get
+    information). _typeIndex[i+1]-_typeIndex[i]
+    represents count of entities of ith geometric
+    type. _typeIndex[_numberOfType] contains total
+    entities count. If _numberOf[i]=0,
+    _typeIndex[i+1]=_typeIndex[i]
+    defined only if _isOnAllElts is false
+    \endif
+  */
+  //  int *      _typeIndex;
+
+  /*!
+    \if developper
+    Array of size _index[_numberOfType]-1 wich contain number of
+    entities of each geometric type. We use global numbering.\n
+    Defined only if _isOnAllElts is false.
+    \endif
+  */
+  MEDSKYLINEARRAY * _number;
 
 public:
-  SUPPORT(); 
-  SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL); 
-  SUPPORT(SUPPORT & m);
+  SUPPORT();
+  SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL);
+  SUPPORT(const SUPPORT & m);
   ~SUPPORT();
   friend ostream & operator<<(ostream &os,const SUPPORT &my);
-  
+
   // function to set all value when SUPPORT was created by MedMedDriver without all MESH information !!! Change with new API !
   void update();
-  
+
   inline void setName(string Name);
-  inline void setDescription(string Description); 
-  inline void setMesh(MESH *Mesh); 		 
-  inline void setAll(bool All); 			 
-  inline void setEntity(medEntityMesh Entity); 
-  inline void setNumberOfGeometricType(int NumberOfGeometricType); 
-  inline void setGeometricType(medGeometryElement *GeometricType); 
-  inline void setNumberOfGaussPoint(int *NumberOfGaussPoint);
-  //  inline void setGeometricTypeNumber(int *GeometricTypeNumber); 
-  inline void setNumberOfEntities(int *NumberOfEntities); 
-  inline void setTotalNumberOfEntities(int TotalNumberOfEntities); 
-  inline void setNumber(MEDSKYLINEARRAY * Number); 
-  
-  inline string getName() const; 
-  inline string getDescription() const; 
-  inline MESH * getMesh() const; 
+  inline void setDescription(string Description);
+  inline void setMesh(MESH *Mesh);
+  inline void setAll(bool All);
+  inline void setEntity(medEntityMesh Entity);
+  inline void setNumberOfGeometricType(int NumberOfGeometricType);
+  inline void setGeometricType(const medGeometryElement *GeometricType);
+  inline void setNumberOfGaussPoint(const int *NumberOfGaussPoint);
+  //  inline void setGeometricTypeNumber(int *GeometricTypeNumber);
+  inline void setNumberOfElements(const int *NumberOfElements);
+  inline void setTotalNumberOfElements(int TotalNumberOfElements);
+  inline void setNumber(MEDSKYLINEARRAY * Number);
+  inline void setNumber(const int * index, const int* value);
+
+  inline string getName() const;
+  inline string getDescription() const;
+  inline MESH * getMesh() const;
   inline medEntityMesh getEntity() const;
 
-  inline bool   isOnAllElements() const; 
+  inline bool   isOnAllElements() const;
   inline int    getNumberOfTypes() const;
-  inline medGeometryElement* getTypes() const ;
-  inline int *  getNumberOfGaussPoint() const throw (MEDEXCEPTION);
-  inline int    getNumberOfGaussPoint(medGeometryElement geomElement) const throw (MEDEXCEPTION);
-  //inline int *  getGeometricTypeNumber() const; 
-  //  inline int    getNumberOfTotalEntity() const;
+  inline const medGeometryElement* getTypes() const ;
+  inline const int *  getNumberOfGaussPoint() const throw (MEDEXCEPTION);
+  inline int          getNumberOfGaussPoint(medGeometryElement geomElement) const throw (MEDEXCEPTION);
+  //inline int *  getGeometricTypeNumber() const;
+  //inline int    getTotalNumberOfElement() const;
   inline int    getNumberOfElements(medGeometryElement GeometricType) const throw (MEDEXCEPTION);
   inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
-  inline int *  getNumber(medGeometryElement GeometricType) const throw (MEDEXCEPTION);
-  inline int *  getNumberIndex() const throw (MEDEXCEPTION);
+  inline const int *  getNumber(medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+  inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
 
   void blending(SUPPORT * mySupport);
-
-  /*
-    This function allows the user to set a support not on all entities Entity,
-    it should be used after an initialisation with the constructor
-    SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL) and
-    after the call to the function setAll(false).
-    It allocates and initialises all the attributs of the class SUPPORT.
-  */
 
   void setpartial(string Description, int NumberOfGeometricType,
 		  int TotalNumberOfEntity, medGeometryElement *GeometricType,
 		  int *NumberOfEntity, int *NumberValue);
+
+  void getBoundaryElements() throw (MEDEXCEPTION);
 };
 // _____________________
 // Methodes Inline
 // _____________________
 
-/*!  If isOnAllElements is false, returns number of elements in the
-     support else returns number of nodes.
+/*!
+  If isOnAllElements is false, returns number of elements in the
+  support else returns number of nodes.
 
-      Example : number of MED_TRIA3 or MED_ALL_ELEMENTS elements
-      in entity of support.
+  Example : number of MED_TRIA3 or MED_ALL_ELEMENTS elements
+  in entity of support.
 
-      Note : If SUPPORT is defined on MED_NODE, use MED_NONE
-      medGeometryElement type.  */
+  Note : If SUPPORT is defined on MED_NODE, use MED_NONE
+  medGeometryElement type.
+*/
 //-----------------------------------------------------------------------------
 inline int SUPPORT::getNumberOfElements(medGeometryElement GeometricType) const
-throw (MEDEXCEPTION) 
+  throw (MEDEXCEPTION)
 //-----------------------------------------------------------------------------
 {
-  if (_isOnAllElts){ 
-    return _mesh->getNumberOfElements(_entity,GeometricType);
-  } else {
-    if (GeometricType==MED_ALL_ELEMENTS)
-      return _totalNumberOfEntities;
-    for (int i=0;i<_numberOfGeometricType;i++)
-      if (_geometricType[i]==GeometricType)
-	return _numberOfEntities[i] ;
-    throw MEDEXCEPTION("Support::getNumberOfElements : Type not found !") ;
-  }
+  if (GeometricType==MED_ALL_ELEMENTS)
+    return _totalNumberOfElements;
+  for (int i=0;i<_numberOfGeometricType;i++)
+    if (_geometricType[i]==GeometricType)
+      return _numberOfElements[i];
+  throw MEDEXCEPTION("Support::getNumberOfElements : Geometric type not found !") ;
 }
-//  inline int SUPPORT::getNumberOf(medGeometryElement GeometricType) const 
-//  throw (MEDEXCEPTION) 
-//  {
-//      if (GeometricType==MED_ALL_ELEMENTS)
-//          return _totalNumberOfEntities ; 
-//      for (int i=0;i<_numberOfGeometricType;i++)
-//          if (_geometricType[i]==GeometricType)
-//      return _numberOfEntities[i] ;
-//      throw MEDEXCEPTION("Support::getNumberOf: GeometricType not found !");
-//  }
-
-//  inline int SUPPORT::getNumberOfTotalEntity() const 
-//  { 
-//    return _totalNumberOfEntities ; 
-//  }
 
 //---------------------------------------------------------------------
-inline MEDSKYLINEARRAY * SUPPORT::getnumber() const 
-  throw (MEDEXCEPTION) 
+inline MEDSKYLINEARRAY * SUPPORT::getnumber() const
+  throw (MEDEXCEPTION)
 //---------------------------------------------------------------------
 {
-  if (_number==NULL) 
+  if (_number==NULL)
     throw MEDEXCEPTION("Support::getnumber : Not defined !") ;
   return _number ;
 }
 
-/*!   If isOnAllElements is false, returns an array which contains
-      all number of given medGeometryElement.
+/*!
+  If isOnAllElements is false, returns an array which contains
+  all number of given medGeometryElement.
 
-      Numbering is global, ie numbers are bounded by 1 and
-      MESH::getNumberOfElement(entity,MED_ALL_ELEMENTS) and not by 1 and
-      MESH::getNumberOfElement(entity,geomElement).
+  Numbering is global, ie numbers are bounded by 1 and
+  MESH::getNumberOfElement(entity,MED_ALL_ELEMENTS) and not by 1 and
+  MESH::getNumberOfElement(entity,geomElement).
 
-      Note : If SUPPORT is defined on MED_NODE, use MED_NONE
-      medGeometryElement type. */
+  Note : If SUPPORT is defined on MED_NODE, use MED_NONE
+  medGeometryElement type.
+*/
 //---------------------------------------------------------------------
-inline int * SUPPORT::getNumber(medGeometryElement GeometricType) const 
-  throw (MEDEXCEPTION) 
+inline const int * SUPPORT::getNumber(medGeometryElement GeometricType) const
+  throw (MEDEXCEPTION)
 //---------------------------------------------------------------------
 {
   const char * LOC = "Support::getNumber : " ;
-  if (_isOnAllElts) 
+  if (_isOnAllElts)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined, support is on all entity !")) ;
   if (GeometricType==MED_ALL_ELEMENTS)
-    return _number->getValue() ; 
+    return _number->getValue() ;
   for (int i=0;i<_numberOfGeometricType;i++)
     if (_geometricType[i]==GeometricType)
       return _number->getI(i+1) ;
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"GeometricType not found !")) ;
 }
 
-/*!  If isOnAllElements is false, returns index of element number.
-      Use it with getNumber(MED_ALL_ELEMENTS).
+/*!
+  If isOnAllElements is false, returns index of element number.
+  Use it with getNumber(MED_ALL_ELEMENTS).
 
-      Note : See getConnectivityIndex for details.  */
+  Note : See getConnectivityIndex for details.
+*/
 //-------------------------------------------
-inline int * SUPPORT::getNumberIndex() const 
+inline const int * SUPPORT::getNumberIndex() const
 //-------------------------------------------
-throw (MEDEXCEPTION) 
+  throw (MEDEXCEPTION)
 {
-    if (_isOnAllElts) 
-      throw MEDEXCEPTION("Support::getNumberIndex : Not defined, support is on all entity !") ;
-      return _number->getIndex() ;
+  if (_isOnAllElts)
+    throw MEDEXCEPTION("Support::getNumberIndex : Not defined, support is on all entity !") ;
+  return _number->getIndex() ;
 }
 
 /*! A DOCUMENTER */
 //-------------------------------------------------
-inline int * SUPPORT::getNumberOfGaussPoint() const 
-throw (MEDEXCEPTION) 
+inline const int * SUPPORT::getNumberOfGaussPoint() const
+  throw (MEDEXCEPTION)
 //-------------------------------------------------
 {
   if (_numberOfGaussPoint!=NULL)
@@ -233,14 +310,16 @@ throw (MEDEXCEPTION)
     throw MEDEXCEPTION("Support::getNumberOfGaussPoint : Not defined !") ;
 }
 
-/*!  Returns number of Gauss points for this medGeometryElement.
+/*!
+  Returns number of Gauss points for this medGeometryElement.
 
-      Note :
-      - Not defined if SUPPORT is on MED_NODE.
-      - Not defined for MED_ALL_ELEMENTS medGeometryElement type.  */
+  Note :
+  - Not defined if SUPPORT is on MED_NODE.
+  - Not defined for MED_ALL_ELEMENTS medGeometryElement type.
+*/
 //-----------------------------------------------------------------------------
-inline int SUPPORT::getNumberOfGaussPoint(medGeometryElement geomElement) const 
-throw (MEDEXCEPTION) 
+inline int SUPPORT::getNumberOfGaussPoint(medGeometryElement geomElement) const
+  throw (MEDEXCEPTION)
 //-----------------------------------------------------------------------------
 {
   if (_numberOfGaussPoint!=NULL) {
@@ -251,183 +330,236 @@ throw (MEDEXCEPTION)
   } else
     throw MEDEXCEPTION("Support::getNumberOfGaussPoint : Not defined !") ;
 }
-//  inline int SUPPORT::getNumberLength() const 
-//  throw (MEDEXCEPTION) 
+//  inline int SUPPORT::getNumberLength() const
+//  throw (MEDEXCEPTION)
 //  {
-//      if (_isOnAllElts) 
+//      if (_isOnAllElts)
 //        throw MEDEXCEPTION("Support::getNumberLength : Not defined, support is on all entity !") ;
 //        return _number->getLength() ;
 //  }
 
-/*! set the attribute _name to Name   */
+/*! set the attribute _name to Name */
 //--------------------------------------
 inline void SUPPORT::setName(string Name)
 //--------------------------------------
-{ 
-  _name=Name; 
+{
+  _name=Name;
 }
 
 /*! set the attribute _description to Description */
 //--------------------------------------------------
 inline void SUPPORT::setDescription(string Description)
 //--------------------------------------------------
-{ 
-  _description=Description; 
+{
+  _description=Description;
 }
 
-/*! set the reference _mesh to Mesh   */
+/*! set the reference _mesh to Mesh */
 //--------------------------------------
 inline void SUPPORT::setMesh(MESH *Mesh)
 //--------------------------------------
-{ 
-  _mesh=Mesh; 
+{
+  _mesh=Mesh;
 }
 
 /*! set the attribute _isOnAllElts to All */
 //------------------------------------------
 inline void SUPPORT::setAll(bool All)
 //------------------------------------------
-{ 
-  _isOnAllElts=All; 
+{
+  _isOnAllElts=All;
 }
 
 /*! set the attribute _entity to Entity */
 //------------------------------------------
 inline void SUPPORT::setEntity(medEntityMesh Entity)
-{ 
-  _entity=Entity; 
-  if ( Entity == MED_NODE) {
-    _numberOfGeometricType=1 ;
-    _geometricType=new medGeometryElement[1] ; // delete previous ???
-    _geometricType[0]=MED_NONE ;
-  }
+{
+  _entity=Entity;
+//   if ( Entity == MED_NODE) {
+//     _numberOfGeometricType=1 ;
+//     if (_geometricType == (medGeometryElement *) NULL)
+//       _geometricType=new medGeometryElement[1] ;
+//     else 
+//       {
+// 	// delete previous ???
+// 	delete [] _geometricType;
+// 	_geometricType=new medGeometryElement[1] ;
+//       }
+//     _geometricType[0]=MED_NONE ;
+//   }
 }
 
 /*! set the attribute _numberOfGeometricType to NumberOfGeometricType */
 //---------------------------------------------------------------------
 inline void SUPPORT::setNumberOfGeometricType(int NumberOfGeometricType)
 //---------------------------------------------------------------------
-{ 
-  _numberOfGeometricType=NumberOfGeometricType; 
+{
+  _numberOfGeometricType=NumberOfGeometricType;
+  if (_geometricType!=NULL) {
+    delete[] _geometricType ;
+    _geometricType = NULL ;
+  }
+  if (_numberOfElements!=NULL) {
+    delete[] _numberOfElements ;
+    _numberOfElements = NULL ;
+  }
+  if (_numberOfGaussPoint!=NULL) {
+    delete[] _numberOfGaussPoint ;
+    _numberOfGaussPoint = NULL ;
+  }
 }
 
-/*! set the attribute _geometricType to geometricType                */
+/*! set the attribute _geometricType to geometricType */
 //---------------------------------------------------------------------
-inline void SUPPORT::setGeometricType(medGeometryElement *GeometricType)
+inline void SUPPORT::setGeometricType(const medGeometryElement *GeometricType)
 //---------------------------------------------------------------------
-{ 
-  _geometricType=GeometricType; 
+{
+  if (NULL == _geometricType)
+    _geometricType=new medGeometryElement[_numberOfGeometricType];
+  for (int i=0;i<_numberOfGeometricType;i++)
+    _geometricType[i] = GeometricType[i];
+  //  _geometricType=GeometricType;
 }
 
-/*! set the attribute _numberOfGaussPoint to NumberOfGaussPoint  */
+/*! set the attribute _numberOfGaussPoint to NumberOfGaussPoint */
 //-----------------------------------------------------------------
-inline void SUPPORT::setNumberOfGaussPoint(int *NumberOfGaussPoint)
+inline void SUPPORT::setNumberOfGaussPoint(const int *NumberOfGaussPoint)
 //-----------------------------------------------------------------
 {
-  _numberOfGaussPoint = NumberOfGaussPoint ;
+  if (NULL == _numberOfGaussPoint)
+    _numberOfGaussPoint=new int[_numberOfGeometricType];
+  for (int i=0;i<_numberOfGeometricType;i++)
+    _numberOfGaussPoint[i] = NumberOfGaussPoint[i];
+  //  _numberOfGaussPoint = NumberOfGaussPoint ;
 }
 
-/*! set the attribute _geometricTypeNumber to GeometricTypeNumber  */
+/*! set the attribute _geometricTypeNumber to GeometricTypeNumber */
 //-------------------------------------------------------------------
 //inline void SUPPORT::setGeometricTypeNumber(int *GeometricTypeNumber)
 //-------------------------------------------------------------------
-//{ 
-//  _geometricTypeNumber=GeometricTypeNumber; 
+//{
+//  _geometricTypeNumber=GeometricTypeNumber;
 //}
 
-/*! set the attribute _numberOfEntities to NumberOfEntities */
+/*!
+  Set the attribute _numberOfElements to NumberOfElements and 
+  calculate the total number of elements.
+*/
 //----------------------------------------------------------
-inline void SUPPORT::setNumberOfEntities(int *NumberOfEntities)
+inline void SUPPORT::setNumberOfElements(const int *NumberOfElements)
 //----------------------------------------------------------
-{ 
-  _numberOfEntities=NumberOfEntities; 
+{
+  if (NULL == _numberOfElements)
+    _numberOfElements=new int[_numberOfGeometricType];
+  memcpy(_numberOfElements,NumberOfElements,sizeof(int)*_numberOfGeometricType);
+  _totalNumberOfElements = 0 ;
+  for (int i=0;i<_numberOfGeometricType;i++)
+    _totalNumberOfElements+=_numberOfElements[i];
 }
 
-/*! set the attribute _totalNumberOfEntities to TotalNumberOfEntities */
+/*! set the attribute _totalNumberOfElements to TotalNumberOfElements */
 //--------------------------------------------------------------------
-inline void SUPPORT::setTotalNumberOfEntities(int TotalNumberOfEntities)
+inline void SUPPORT::setTotalNumberOfElements(int TotalNumberOfElements)
 //--------------------------------------------------------------------
-{ 
-  _totalNumberOfEntities=TotalNumberOfEntities; 
+{
+  _totalNumberOfElements=TotalNumberOfElements;
 }
 
-/*! set the attribute _number to Number           */
+/*! set the attribute _number to Number */
 //---------------------------------------------------
 inline void SUPPORT::setNumber(MEDSKYLINEARRAY * Number)
 //---------------------------------------------------
-{ 
-  _number=Number; 
+{
+  if (_number != NULL) delete _number ;
+  _number=Number;
+}
+
+/*! set the attribute _number with index and value arrays */
+//---------------------------------------------------
+inline void SUPPORT::setNumber(const int * index, const int* value)
+//---------------------------------------------------
+{
+  if (_number != NULL) delete _number ;
+  _number= new MEDSKYLINEARRAY(_numberOfGeometricType,_totalNumberOfElements,index,value);
 }
 
 /*! returns the name of the support. */
 //------------------------------------
-inline string SUPPORT::getName() const 
+inline string SUPPORT::getName() const
 //------------------------------------
-{ 
-  return _name; 
+{
+  return _name;
 }
 
 
 /*! returns the description of the support. */
 //--------------------------------------------
-inline string SUPPORT::getDescription() const 
+inline string SUPPORT::getDescription() const
 //--------------------------------------------
-{ 
-  return _description; 
+{
+  return _description;
 }
 
-/*! returns a refernce to the mesh  */
+/*! returns a reference to the mesh */
 //------------------------------------
-inline MESH * SUPPORT::getMesh() const 
+inline MESH * SUPPORT::getMesh() const
 //------------------------------------
-{ 
-  return _mesh; 
+{
+  return _mesh;
 }
 
-/*!  Returns true if all elements of this entity are
-     concerned, false otherwise.
-     If true, you must use mesh reference (getMesh) to get more information.*/
+/*!
+  Returns true if all elements of this entity are
+  concerned, false otherwise.
+  If true, you must use mesh reference (getMesh) to get more information.
+*/
 //------------------------------------------
-inline bool SUPPORT::isOnAllElements() const 
+inline bool SUPPORT::isOnAllElements() const
 //------------------------------------------
-{ 
-  return _isOnAllElts; 
+{
+  return _isOnAllElts;
 }
 
-/*!  Returns number of geometric Types
-     defines in the support              */ 
+/*!
+  Returns number of geometric Types
+  defines in the support
+*/
 //------------------------------------------
-inline int SUPPORT::getNumberOfTypes() const 
+inline int SUPPORT::getNumberOfTypes() const
 //------------------------------------------
-{ 
-  if ((_isOnAllElts)&(_entity != MED_NODE))
-    return _mesh->getNumberOfTypes(_entity) ;
-  else
-    return _numberOfGeometricType ; 
+{
+  //    if ((_isOnAllElts)&(_entity != MED_NODE))
+  //      return _mesh->getNumberOfTypes(_entity) ;
+  //    else
+  return _numberOfGeometricType ;
 }
 
-/*!  Returns the medEntityMesh's type used by the support.
-     Note : A support deals only with one entity's type
-     (for example : MED_FACE or MED_NODE)*/
+/*!
+  Returns the medEntityMesh's type used by the support.
+  Note : A support deals only with one entity's type
+  (for example : MED_FACE or MED_NODE)
+*/
 //---------------------------------------------
-inline medEntityMesh SUPPORT::getEntity() const 
+inline medEntityMesh SUPPORT::getEntity() const
 //---------------------------------------------
-{ 
-  return _entity; 
+{
+  return _entity;
 }
 
-/*!  If isOnAllElements is false, returns an array of <medGeometryElement>
-     types used by the support.
+/*!
+  If isOnAllElements is false, returns an array of <medGeometryElement>
+  types used by the support.
 
-     <medEntityMesh> is given by getEntity.  */
+  <medEntityMesh> is given by getEntity.
+*/
 //---------------------------------------------------
-inline medGeometryElement * SUPPORT::getTypes() const 
+inline const medGeometryElement * SUPPORT::getTypes() const
 //---------------------------------------------------
 {
-  if ((_isOnAllElts)&(_entity != MED_NODE))
-    return _mesh->getTypes(_entity) ;
-  else
-    return _geometricType; 
+  //    if ((_isOnAllElts)&(_entity != MED_NODE))
+  //      return _mesh->getTypes(_entity) ;
+  //    else
+  return _geometricType;
 }
 
 //---------------------------------------------------
@@ -439,8 +571,8 @@ inline medGeometryElement * SUPPORT::getTypes() const
 //      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined (is on all elements) !"));
 //    if (_geometricTypeNumber==NULL)
 //      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined !"));
-//    return _geometricTypeNumber; 
+//    return _geometricTypeNumber;
 //  }
 
-    
+
 #endif /* SUPPORT_HXX */
