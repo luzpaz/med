@@ -143,7 +143,7 @@ install-bin: $(BIN_SCRIPT)
 	$(INSTALL) -d  $(bindir)
 	for f in X $(BIN_SCRIPT); do				\
 	   if test $$f != X; then				\
-	     (cp -p ./bin/salome/$$f $(bindir) || exit 1);	\
+	     (cp -p -f ./bin/salome/$$f $(bindir) || exit 1);	\
 	   fi;							\
 	done
 
