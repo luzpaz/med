@@ -2,15 +2,20 @@
 // Project: SALOME
 // Copyright : CEA/DEN/DMSS/LGLS
 // $Header$
-
+/*! 
+This file contains the main IDL difinitions of the %MED component in %SALOME application.
+*/
 #ifndef MED_IDL
 #define MED_IDL
+/*!
+ \defgroup MED SALOME MED component
+*/
 
 #include "SALOME_Exception.idl"
 #include "SALOME_Component.idl"
 #include "SALOMEDS.idl"
 
-module Engines {
+module SALOME_MED {
   /*!
     An array of long
   */
@@ -28,17 +33,21 @@ module Engines {
   */
   typedef sequence<boolean> boolean_array;
 
-};
+/*! \ingroup MED
+This package contains a set of interfaces used for %SALOME %MED component.
+*/ 
 
-module SALOME_MED {
 
-  //  interface FIELD;
   interface FIELD;
   interface FAMILY;
   interface GROUP;
   interface MESH;
   interface SUPPORT;
 
+/*! 
+This enumeration contains a set of elements difining the type of geometrical elements which constitue 
+a %Mesh.
+*/
   typedef long medGeometryElement;
   const medGeometryElement MED_NONE = 0;
   const medGeometryElement MED_POINT1 = 1;
@@ -58,13 +67,18 @@ module SALOME_MED {
   const medGeometryElement MED_HEXA20 = 320;
   const medGeometryElement MED_ALL_ELEMENTS = 999;
 
+
+/*! 
+This enumeration contains a set of elements difining the structural elements (entities) which constitue 
+a %Mesh.
+*/
   typedef long medEntityMesh;
   const medEntityMesh MED_CELL = 0;
   const medEntityMesh MED_FACE = 1;
   const medEntityMesh MED_EDGE = 2;
   const medEntityMesh MED_NODE = 3;
   const medEntityMesh MED_ALL_ENTITIES = 4;
-  
+
   typedef long medModeSwitch;
   const medModeSwitch MED_FULL_INTERLACE = 0;
   const medModeSwitch MED_NO_INTERLACE = 1;
@@ -73,21 +87,26 @@ module SALOME_MED {
   const medConnectivity MED_NODAL = 0;
   const medConnectivity MED_DESCENDING = 1;
 
-  typedef long medDriverTypes;
-  const medDriverTypes MED_DRIVER  = 0;
-  const medDriverTypes VTK_DRIVER = 1; 
-  const medDriverTypes NO_DRIVER = 2; 
+
+/*! 
+   enumeration contains a set of elements difining the type of driver.
+*/
+    typedef long medDriverTypes;
+    /*!<This driver is used for reading into memory of the mesh from %MED file.*/
+    const medDriverTypes MED_DRIVER  = 0;
+    const medDriverTypes VTK_DRIVER = 1;
+    const medDriverTypes NO_DRIVER = 2;
 
   /*!
-    An array of medGeometryElement
+    An array of <VAR>medGeometryElement</VAR>
   */
   typedef sequence<medGeometryElement> medGeometryElement_array;
   /*!
-    An array of FAMILY
+    An array of %FAMILY
   */
   typedef sequence<FAMILY> Family_array;
   /*!
-    An array of GROUP
+    An array of %GROUP
   */
   typedef sequence<GROUP> Group_array;
   
@@ -96,13 +115,13 @@ module SALOME_MED {
   // ----------------------
 
   interface MESH {
-    // Index range begins at 1
+    // Index range begins from 1
 
     // General Informations
     //---------------------
 
     /*!
-      Returns mesh name.
+      Returns the name of the mesh .
     */
     string getName() raises (SALOME::SALOME_Exception);
     
@@ -115,17 +134,29 @@ module SALOME_MED {
       Returns mesh dimension.
       
       Example :
-      - we have only MED_TETRA4 in MED_CELL : MeshDimension = 3
-      - we have only MED_QUAD4 in MED_CELL : MeshDimension = 2
-      - we have both MED_SEG2 and MED_TRIA3 in MED_CELL : MeshDimension = 2
+      - we have only MED_TETRA4 in MED_CELL : MeshDimension = 3D
+      - we have only MED_QUAD4 in MED_CELL : MeshDimension = 2D
+      - we have both MED_SEG2 and MED_TRIA3 in MED_CELL : MeshDimension = 2D
     */
     long getMeshDimension() raises (SALOME::SALOME_Exception);
+
+    /*!
+	Pour Alliances
+    */
+    boolean getIsAGrid() raises (SALOME::SALOME_Exception);
+
+    /*!
+	Pour Alliances
+    */
+    boolean existConnectivity (in medConnectivity mode,
+			       in medEntityMesh entity)
+			       raises (SALOME::SALOME_Exception);
 
     // Coordinates
     //------------
 
     /*!
-      Returns coordinate's system :
+      Returns coordinate system :
       - "CARTESIAN"
       - "CYLINDRICAL"
       - "SPHERICAL"
@@ -133,20 +164,27 @@ module SALOME_MED {
     string getCoordinatesSystem() raises (SALOME::SALOME_Exception); 
 
     /*!
-      Returns the number of nodes defined in mesh.
+      Returns the number of nodes defined in the mesh.
     */
     long getNumberOfNodes() raises (SALOME::SALOME_Exception);
 
     /*!
-      Returns coordinates array :
+      Returns an array of coordinates  :
       - X1,Y1,Z1,X2,Y2,...,Zn if MED_FULL_INTERLACE
       - X1,X2,...Xn,Y1,Y2,...Zn if MED_NO_INTERLACE
     */
-    Engines::double_array getCoordinates(in medModeSwitch typeSwitch)
+    SALOME_MED::double_array getCoordinates(in medModeSwitch typeSwitch)
       raises (SALOME::SALOME_Exception);
 
     /*!
-      Returns an array with names of coordinates.
+     Returns coordinate  n° Number on axis n° Axis 
+    */
+    double getCoordinate(in long Number, in long Axis)
+      raises (SALOME::SALOME_Exception);
+      
+
+    /*!
+      Returns an array containing the names of coordinates.
       
       Example :
       - x,y,z
@@ -155,40 +193,57 @@ module SALOME_MED {
       
       It could be empty.
     */
-    Engines::string_array getCoordinatesNames()
+    SALOME_MED::string_array getCoordinatesNames()
       raises (SALOME::SALOME_Exception);
 
     /*!
-      Returns an array with units of coordinates (cm, m, mm, ...)
+      Returns an array containing the units of coordinates (cm, m, mm, ...)
 
-      It could be empty. We suppose we are IS (meter).
+      It could be empty. By defult IS is used (meter).
     */
-    Engines::string_array getCoordinatesUnits()
+    SALOME_MED::string_array getCoordinatesUnits()
       raises (SALOME::SALOME_Exception);
+
+    SUPPORT getBoundaryElements(in medEntityMesh Entity)            
+					     raises (SALOME::SALOME_Exception);
+    SUPPORT getSkin(in SUPPORT mySupport3D ) raises (SALOME::SALOME_Exception);
+
+    SALOME_MED::long_array getGlobalNumberingIndex(in medEntityMesh entity) ;
+    struct coordinateInfos
+    {
+    	string 			coordSystem;
+    	SALOME_MED::string_array   coordNames;
+    	SALOME_MED::string_array   coordUnits;
+    };
+    coordinateInfos getCoordGlobal()	raises (SALOME::SALOME_Exception);
+
+
 
     // Connectivity
     // ------------
 
     /*!
-      Returns the number of different <medGeometryElement> types existing 
+      Returns the number of different <VAR>medGeometryElement</VAR> types existing 
       in the specified entity.
 
-      Note : Not implemented for MED_ALL_ENTITIES.
+      \note 
+      Not implemented for MED_ALL_ENTITIES.
     */
     long getNumberOfTypes(in medEntityMesh entity)
       raises (SALOME::SALOME_Exception);
 
     /*!
-      Returns an array of all <med geometry elements> types existing 
+      Returns an array of all <VAR>medGeometryElement</VAR> types existing 
       in the mesh.
 
-      Note : Not implemented for MED_ALL_ENTITIES.
+      \note 
+       Not implemented for MED_ALL_ENTITIES.
     */
     medGeometryElement_array getTypes(in medEntityMesh entity)
       raises (SALOME::SALOME_Exception);
 
     /*!
-      Returns the number of elements of type <med geometrie element>.
+      Returns the number of elements of type <VAR>medGeometryElement</VAR>.
 
       Note : 
       - Implemented for MED_ALL_ELEMENTS
@@ -202,10 +257,10 @@ module SALOME_MED {
       Give, in full or no interlace mode (for nodal connectivity),
       descending or nodal connectivity.
 
-      You must give a <medEntityMesh> (ie:MED_EDGE) and a 
-      <medGeometryElement> (ie:MED_SEG3).
+      You must give a <VAR>medEntityMesh</VAR> (ie:MED_EDGE) and a 
+      <VAR>medGeometryElement</VAR> (ie:MED_SEG3).
     */
-    Engines::long_array getConnectivity(in medModeSwitch typeSwitch,
+    SALOME_MED::long_array getConnectivity(in medModeSwitch typeSwitch,
 					in medConnectivity mode,
 					in medEntityMesh entity,
 					in medGeometryElement geomElement)
@@ -222,22 +277,26 @@ module SALOME_MED {
       - In C mode : Connectivity[ConnectivityIndex[i]-1+j-1]
       - In fortran mode : Connectivity[ConnectivityIndex[i]+j]
     */
-    Engines::long_array getConnectivityIndex(in medConnectivity mode,
+    SALOME_MED::long_array getConnectivityIndex(in medConnectivity mode,
 					     in medEntityMesh entity)
       raises (SALOME::SALOME_Exception);
 
     /*!
-      Get global number of element which have same connectivity than 
+      Gets a global number of the element which have the same connectivity as the  
       connectivity argument.
     */
     long getElementNumber(in medConnectivity mode, 
 			  in medEntityMesh entity, 
 			  in medGeometryElement type, 
-			  in Engines::long_array connectivity) 
+			  in SALOME_MED::long_array connectivity) 
+      raises (SALOME::SALOME_Exception);
+
+    medGeometryElement   getElementType (in  medEntityMesh entity, 
+				       in long number)
       raises (SALOME::SALOME_Exception);
 
     /*!
-      Return a reverse connectivity to MED_CELL.
+      Returns a reverse connectivity to MED_CELL.
 
       If mode=MED_NODAL, the array contains, for each node, all cells 
       arround it.
@@ -245,19 +304,28 @@ module SALOME_MED {
       If mode=MED_DESCENDING, the array contains, for each face (or edge), 
       the 2 cells of each side. First is cell which face normal is outgoing.
     */
-    Engines::long_array getReverseConnectivity(in medConnectivity mode)
+    SALOME_MED::long_array getReverseConnectivity(in medConnectivity mode)
       raises (SALOME::SALOME_Exception);
 
     /*!
       Give index array to use with getReverseConnectivity(MED_NODAL).
 
-      It is unusefull with MED_DESCENDING mode, 
+      This method is not used with MED_DESCENDING mode, 
       because we have allways two cells.
 
       See getConnectivityIndex for details.
     */
-    Engines::long_array getReverseConnectivityIndex(in medConnectivity mode)
+    SALOME_MED::long_array getReverseConnectivityIndex(in medConnectivity mode)
       raises (SALOME::SALOME_Exception);
+
+    struct connectivityInfos
+    {
+    	long                     numberOfNodes;
+        medGeometryElement_array meshTypes;
+    	SALOME_MED::long_array      numberOfElements;
+    };
+    connectivityInfos getConnectGlobal(in medEntityMesh entity) 
+    raises (SALOME::SALOME_Exception);
 
     // Families and Groups
     // -------------------
@@ -281,9 +349,10 @@ module SALOME_MED {
       raises (SALOME::SALOME_Exception);
 
     /*!
-      Returns a reference to i-th to family.
+      Returns the reference to i-th family.
 
-      Note : i is bounded by 1 and NumberOfFamilies.
+      \note 
+      i is bounded by 1 and NumberOfFamilies.
     */
     FAMILY getFamily(in medEntityMesh entity,in long familyNumber)
       raises (SALOME::SALOME_Exception);
@@ -295,9 +364,10 @@ module SALOME_MED {
       raises (SALOME::SALOME_Exception);
 
     /*!
-      Returns a reference to i-th group.
+      Returns the reference to i-th group.
 
-      Note : i is bounded by 1 and NumberOfGroups.
+      \note 
+     i is bounded by 1 and NumberOfGroups.
     */
     GROUP getGroup(in medEntityMesh entity,in long groupNumber)
       raises (SALOME::SALOME_Exception);
@@ -308,7 +378,8 @@ module SALOME_MED {
     /*!
       Returns a field on mySupport containing volume.
 
-      Note : mySupport must be on MED_CELL entity and MeshDimension must be 3.
+      \note 
+      mySupport must be on MED_CELL entity and MeshDimension must be 3D.
     */
     FIELD getVolume(in SUPPORT mySupport)
       raises (SALOME::SALOME_Exception);
@@ -316,7 +387,8 @@ module SALOME_MED {
     /*!
       Returns a field on mySupport containing area.
 
-      Note : mySupport must be on MED_FACE entity.
+      \note 
+      mySupport must be on MED_FACE entity.
     */
     FIELD getArea(in SUPPORT mySupport)
       raises (SALOME::SALOME_Exception);
@@ -324,7 +396,8 @@ module SALOME_MED {
     /*!
       Returns a field on mySupport containing length.
 
-      Note : mySupport must be on MED_EDGE entity.
+    \note
+     mySupport must be on MED_EDGE entity.
     */
     FIELD getLength(in SUPPORT mySupport)
       raises (SALOME::SALOME_Exception);
@@ -332,8 +405,9 @@ module SALOME_MED {
     /*!
       Returns a field on mySupport containing normal.
 
-      Note : mySupport must be on MED_FACE entity if MeshDimension and 
-      SpaceDimension=3 and on MED_EDGE if MeshDimension and SpaceDimension=2.
+      \note
+      mySupport must be on MED_FACE entity if MeshDimension and 
+      SpaceDimension=3D and on MED_EDGE if MeshDimension and SpaceDimension=2D.
     */
     FIELD getNormal(in SUPPORT mySupport)
       raises (SALOME::SALOME_Exception);
@@ -354,7 +428,7 @@ module SALOME_MED {
     // -----------
 
     /*!
-      Add the Mesh in the StudyManager.
+      Adds the Mesh in the StudyManager.
     */
     void addInStudy(in SALOMEDS::Study myStudy, in MESH myIor )
       raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
@@ -371,8 +445,27 @@ module SALOME_MED {
     void write         (in long i, in string driverMeshName)  
                                     raises (SALOME::SALOME_Exception);
   
-  //				Cuisine Interne/Internal Kitchen
+/*!
+Internal Corba method. 
+*/ 
     long getCorbaIndex() 	raises (SALOME::SALOME_Exception);
+    struct meshInfos
+    {
+           string name ;
+           long spaceDimension ;
+  	   long meshDimension;
+  	   long numberOfNodes ;
+           boolean isAGrid;
+           Family_array famNode;
+           Family_array famEdge;
+           Family_array famFace;
+           Family_array famCell;
+    	   Group_array  groupNode;
+    	   Group_array  groupEdge;
+    	   Group_array  groupFace;
+    	   Group_array  groupCell;
+    };
+    meshInfos getMeshGlobal()		raises (SALOME::SALOME_Exception);
   };
 
   
@@ -398,80 +491,101 @@ module SALOME_MED {
     MESH getMesh() raises (SALOME::SALOME_Exception);
 
     /*!
-      Returns the medEntityMesh's type used by the support. 
+      Returns the type of <VAR>medEntityMesh</VAR> used by the support. 
 
-      Note : A support deals only with one entity's type 
+      \note 
+      A support deals only with one entity's type 
       (for example : MED_FACE or MED_NODE)
     */
     medEntityMesh getEntity() raises (SALOME::SALOME_Exception);
 
     /*!
-      Returns true if all elements of this entity are
-      concerned, false otherwise.
+      Returns True if all elements of this entity are
+      engaged, False otherwise.
 
-      If true, you must use mesh reference (getMesh) to get more information.
+      If True, you must use mesh reference (getMesh) to get more information.
     */
     boolean isOnAllElements() raises (SALOME::SALOME_Exception);
 
     /*!
-      If isOnAllElements is false, returns number of elements in the
-      support.
+      If the method <VAR>isOnAllElements</VAR> returns False, this method 
+     returns the number of elements in the support.
 
       Example : number of MED_TRIA3 or MED_ALL_ELEMETNS elements 
       in entity of support.
 
-      Note : If SUPPORT is defined on MED_NODE, use MED_NONE 
-      medGeometryElement type.
+      \note 
+      If %SUPPORT is defined on MED_NODE, use MED_NONE <VAR>medGeometryElement</VAR> type.
     */
     long getNumberOfElements(in medGeometryElement geomElement)
       raises (SALOME::SALOME_Exception);
 
+     long  getNumberOfTypes() raises (SALOME::SALOME_Exception);
     /*!
-      If isOnAllElements is false, returns an array of <medGeometryElement>
+      If isOnAllElements is False, returns an array of <VAR>medGeometryElement</VAR>
       types used by the support.
 
-      <medEntityMesh> is given by getEntity.
+      <VAR>medEntityMesh</VAR> is given by getEntity.
     */
     medGeometryElement_array getTypes() raises (SALOME::SALOME_Exception);
 
+
     /*!
-      If isOnAllElements is false, returns an array which contains
-      all number of given medGeometryElement.
+      If the method <VAR>isOnAllElements</VAR> returns False, this method returns an array which 
+     contains all numbers of given <VAR>medGeometryElement</VAR>.
 
       Numbering is global, ie numbers are bounded by 1 and 
       MESH::getNumberOfElement(entity,MED_ALL_ELEMENTS) and not by 1 and 
       MESH::getNumberOfElement(entity,geomElement).
 
-      Note : If SUPPORT is defined on MED_NODE, use MED_NONE 
-      medGeometryElement type.
+      \note
+      If %SUPPORT is defined on MED_NODE, use MED_NONE <VAR>medGeometryElement</VAR> type.
     */
-    Engines::long_array getNumber(in medGeometryElement geomElement)
+    SALOME_MED::long_array getNumber(in medGeometryElement geomElement)
       raises (SALOME::SALOME_Exception);
 
     /*!
-      If isOnAllElements is false, returns index of element number.
+      If the method <VAR>isOnAllElements</VAR> returns False, this method returns the index 
+      of element number.
       
-      Use it with getNumber(MED_ALL_ELEMENTS).
-      _numberOfCellsFamilies, 
-      IOR_Mesh->getFamilies(MED_CELL),
-      (void *) (convertFamily), this);
+      Use it with getNumber(MED_ALL_ELEMENTS). 
       
-      Note : See getConnectivityIndex for details.
+      \note 
+       See the method <VAR>getConnectivityIndex</VAR> for more details.
     */
-    Engines::long_array getNumberIndex()
+    SALOME_MED::long_array getNumberIndex()
       raises (SALOME::SALOME_Exception);
     /*!
-      Returns number of Gauss points for this medGeometryElement.
+      Returns the number of Gauss points for this <VAR>medGeometryElement</VAR>.
 
-      Note : 
-      - Not defined if SUPPORT is on MED_NODE.
-      - Not defined for MED_ALL_ELEMENTS medGeometryElement type.
+      \note 
+      - Not defined if %SUPPORT is on MED_NODE.
+      - Not defined for MED_ALL_ELEMENTS <VAR>medGeometryElement</VAR> type.
      */
-    long getNumberOfGaussPoints(in medGeometryElement geomElement)
-      					raises (SALOME::SALOME_Exception);
+    long getNumberOfGaussPoint(in medGeometryElement geomElement)
+      				raises (SALOME::SALOME_Exception);
 
-    //				        Cuisine Interne
+    SALOME_MED::long_array getNumbersOfGaussPoint()
+      				raises (SALOME::SALOME_Exception);
+
+    void getBoundaryElements()
+      					raises (SALOME::SALOME_Exception);
+/*!
+Internal Corba method. 
+*/    
     long getCorbaIndex() 	        raises (SALOME::SALOME_Exception);
+    struct supportInfos
+    {
+           string  	 name;
+	   string  	 description;
+	   boolean       isOnAllElements;
+    	   medEntityMesh entity;
+           long          numberOfGeometricType; 
+           medGeometryElement_array types;
+           SALOME_MED::long_array nbEltTypes; 
+    };
+    supportInfos getSupportGlobal()		raises (SALOME::SALOME_Exception);
+
   };
 
 
@@ -486,7 +600,8 @@ module SALOME_MED {
 	Returns Family identifier (Identifier
 	of the family in the mesh). 
 
-	Note : There is precisely one for each family.
+	\note
+      There is precisely only one indentifier for each family.
       */
       long getIdentifier() raises (SALOME::SALOME_Exception);
 
@@ -499,44 +614,71 @@ module SALOME_MED {
 	Returns an array of all attributes' identifiers.
 	There is one for each attribute.
       */
-      Engines::long_array getAttributesIdentifiers() 
+      SALOME_MED::long_array getAttributesIdentifiers() 
 	raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns identifier of i-th attribute.
 
-	Note : i is bounded by 1 and NumberOfAttributes.
+	\note 
+      i is bounded by 1 and NumberOfAttributes.
       */
       long getAttributeIdentifier(in long i) raises (SALOME::SALOME_Exception);
 
       /*!
-	Returns an array of all attributes values.
-	There is one for each attribute.
+	Returns an array of all values of the attributes .
+	There is one value for each attribute.
       */
-      Engines::long_array getAttributesValues() 
+      SALOME_MED::long_array getAttributesValues() 
 	raises (SALOME::SALOME_Exception);
 
       /*!
-	Returns value of i-th attribute.
+	Returns the value of i-th attribute.
 
-	Note : i is bounded by 1 and NumberOfAttributes.
+	\note 
+      i is bounded by 1 and NumberOfAttributes.
       */
       long getAttributeValue(in long i) raises (SALOME::SALOME_Exception);
 
       /*!
-	Returns an array of all attributes descriptions.
-	There is one for each attribute.
+	Returns an array of all descriptions of the attributes .
+	There is one description for each attribute.
       */
-      Engines::string_array getAttributesDescriptions() 
+      SALOME_MED::string_array getAttributesDescriptions() 
 	raises (SALOME::SALOME_Exception);
 
       /*!
-	Returns description of i-th attribute.
+	Returns the description of i-th attribute.
 
-	Note : i is bounded by 1 and NumberOfAttributes.
+	\note 
+      i is bounded by 1 and NumberOfAttributes.
       */
       string getAttributeDescription(in long i) 
 	raises (SALOME::SALOME_Exception);
+
+     /*!
+	Returns the number of groups the family belongs to.
+      */
+      long getNumberOfGroups()
+	raises (SALOME::SALOME_Exception);
+
+      /*!
+	Returns an array of names of groups the family belongs to .
+	There is one name for each group.
+      */
+      SALOME_MED::string_array getGroupsNames() 
+	raises (SALOME::SALOME_Exception);
+
+      /*!
+	Returns the name of i-th group.
+
+	\note 
+      i is bounded by 1 and NumberOfAttributes.
+      */
+      string getGroupName(in long i) 
+	raises (SALOME::SALOME_Exception);
+
+
     };
 
 
@@ -547,19 +689,20 @@ module SALOME_MED {
     {
 
       /*!
-	Returns number of families in this group.
+	Returns the number of families in this group.
       */
       long getNumberOfFamilies() raises (SALOME::SALOME_Exception);
 
       /*!
-	Returns array of all families.
+	Returns an array of all families.
       */
       Family_array getFamilies() raises (SALOME::SALOME_Exception);
 
       /*!
-	Returns a reference for the i-th family.
+	Returns a reference to the i-th family.
 
-	Note : i is bounded by 1 and NumberOfFamilies.
+	\note 
+      i is bounded by 1 and NumberOfFamilies.
       */
       FAMILY getFamily(in long i) raises (SALOME::SALOME_Exception);
 
@@ -597,28 +740,29 @@ module SALOME_MED {
       /*!
 	Returns an array containing components names.
       */
-      Engines::string_array getComponentsNames() 
+      SALOME_MED::string_array getComponentsNames() 
 	raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns the name of i-th component.
 
-	Note : 
+	\note  
 	- i is bounded by 1 and NumberOfComponents.
-	- Name is mandatory foreach field's component.
+	- Name is mandatory for each field's component.
       */
       string getComponentName(in long i) raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns an array containing components units.
       */
-      Engines::string_array getComponentsUnits()
+      SALOME_MED::string_array getComponentsUnits()
 	raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns the unit of i-th component.
 
-	Note : i is bounded by 1 and NumberOfComponents.
+	\note 
+      i is bounded by 1 and NumberOfComponents.
       */
       string getComponentUnit(in long i) raises (SALOME::SALOME_Exception);
 
@@ -642,7 +786,9 @@ module SALOME_MED {
       long addDriver (in medDriverTypes driverType, in string  fileName, in string fieldName) 
 	raises (SALOME::SALOME_Exception);
       
-      //                          Remove a driver
+      /*!
+     Removes a driver
+     */
       void rmDriver (in long i)
 	raises (SALOME::SALOME_Exception);
       
@@ -651,18 +797,20 @@ module SALOME_MED {
 	raises (SALOME::SALOME_Exception);
 
       /*!
-	Write field.
+	Writes a field.
       */
       void write (in long i, in string driverFieldName)  
 	raises (SALOME::SALOME_Exception);
       
       /*!
-	Add the Field in the StudyManager.
+	Adds the Field in the StudyManager.
       */
       void addInStudy(in SALOMEDS::Study myStudy, in FIELD myIor )
 	raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
-      //					Cuisine Interne
+/*!
+Internal Corba method.
+*/
       long getCorbaIndex()
 	raises (SALOME::SALOME_Exception);
 
@@ -672,18 +820,18 @@ module SALOME_MED {
   interface FIELDDOUBLE : FIELD {
 
     /*!
-      Returns the field values array
+      Returns an array of values of the field  
     */
-    Engines::double_array getValue(in medModeSwitch mode)
+    SALOME_MED::double_array getValue(in medModeSwitch mode)
       raises (SALOME::SALOME_Exception);
   };
 
   interface FIELDINT : FIELD {
 
     /*!
-      Returns the field values array
+      Returns an array of values of the field  
     */
-    Engines::long_array getValue(in medModeSwitch mode)
+    SALOME_MED::long_array getValue(in medModeSwitch mode)
       raises (SALOME::SALOME_Exception);
 
   };
@@ -695,8 +843,8 @@ module SALOME_MED {
 
     long                   getNumberOfMeshes () raises (SALOME::SALOME_Exception);       
     long                   getNumberOfFields () raises (SALOME::SALOME_Exception);
-    Engines::string_array  getMeshNames      () raises (SALOME::SALOME_Exception);
-    Engines::string_array  getFieldNames     () raises (SALOME::SALOME_Exception);
+    SALOME_MED::string_array  getMeshNames      () raises (SALOME::SALOME_Exception);
+    SALOME_MED::string_array  getFieldNames     () raises (SALOME::SALOME_Exception);
     MESH                   getMeshByName     ( in string  meshName)  raises (SALOME::SALOME_Exception);
     MESH                   getMesh           ( in FIELD  fieldPtr)   raises (SALOME::SALOME_Exception);
     FIELD                  getField          ( in string fieldName, 
@@ -710,9 +858,13 @@ module SALOME_MED {
     // The access point in the <long> returned
     long addDriver     (in medDriverTypes driverType, in string  fileName) 
                                         raises (SALOME::SALOME_Exception);
-    // Remove the driver
+    /*! 
+   Removes the driver
+    */ 
     void rmDriver      (in long i)  raises (SALOME::SALOME_Exception);
-    
+    /*! 
+    Reads the structure of the %MED file
+    */
     void readFileStruct(in long i)  raises (SALOME::SALOME_Exception);
     void writeFrom     (in long i)  raises (SALOME::SALOME_Exception);
     void write         (in long i)  raises (SALOME::SALOME_Exception);
