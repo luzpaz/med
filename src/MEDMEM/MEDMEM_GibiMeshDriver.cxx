@@ -1738,7 +1738,7 @@ void GIBI_MESH_WRONLY_DRIVER::addName(map<string,int>& nameMap,
       ok = nameMap.insert( make_pair( name, index )).second;
     }
     if ( !ok ) {
-      char str[ prefix.size() + 13 ];
+      char *str=new char[ prefix.size() + 13 ];
       int j = 1;
       do {
         sprintf( str, "%s_%d", prefix.c_str(), nameMap.size()+j );
@@ -1746,6 +1746,7 @@ void GIBI_MESH_WRONLY_DRIVER::addName(map<string,int>& nameMap,
         j++;
       } while ( !ok );
       INFOS( "Save <" << name << "> as <" << str << ">");
+      delete [] str;
     }
   }
 }
@@ -2302,7 +2303,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   list<pair<int,int> >           subIdSizeList; // pair( <submesh id>, <submesh size> );
   list<pair<int,int> >::iterator idsize;
 
-  string names[ nbFileds ];
+  string *names=new string[ nbFileds ];
   _med->getFieldNames( names );
   for ( iField = 0; iField < nbFileds; ++iField )
   {
@@ -2430,6 +2431,6 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
     } // loop on fields
   }
   me->writeLastRecord();
-
+  delete [] names;
   END_OF(LOC);
 }
