@@ -53,6 +53,7 @@ MEDMEM_Group.hxx \
 MEDMEM_Array.hxx \
 MEDMEM_Exception.hxx \
 MEDMEM_MedFieldDriver.hxx \
+MEDMEM_MedFieldDriver21.hxx \
 MEDMEM_Med.hxx \
 MEDMEM_MedMedDriver.hxx \
 MEDMEM_MedMeshDriver.hxx \
@@ -69,7 +70,9 @@ MEDMEM_Meshing.hxx \
 MEDMEM_STRING.hxx \
 MEDMEM_Support.hxx \
 MEDMEM_Unit.hxx \
-MEDMEM_Grid.hxx
+MEDMEM_Grid.hxx \
+MEDMEM_MedMeshDriver21.hxx \
+MEDMEM_MedMedDriver21.hxx
 
 # Libraries targets
 
@@ -99,7 +102,9 @@ MEDMEM_Support.cxx \
 MEDMEM_Unit.cxx \
 MEDMEM_VtkMedDriver.cxx \
 MEDMEM_VtkMeshDriver.cxx \
-MEDMEM_Grid.cxx
+MEDMEM_Grid.cxx \
+MEDMEM_MedMeshDriver21.cxx \
+MEDMEM_MedMedDriver21.cxx
 
 
 # Executables targets

@@ -49,9 +49,9 @@ typedef map<DT_IT_, FIELD_*, LT_DT_IT_ > MAP_DT_IT_;
 class MED
 {
   // Add your personnal driver line (step 2)
-  friend class MED_MED_RDONLY_DRIVER;
-  friend class MED_MED_WRONLY_DRIVER;
-  friend class MED_MED_RDWR_DRIVER;
+  friend class MED_MED_RDONLY_DRIVER21;
+  friend class MED_MED_WRONLY_DRIVER21;
+  friend class MED_MED_RDWR_DRIVER21;
 
 private:
 

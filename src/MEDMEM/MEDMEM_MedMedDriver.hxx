@@ -27,10 +27,6 @@ class MED_MED_DRIVER : public GENDRIVER
 protected:
   
   MED * const       _ptrMed;         // Store 'MED_DRIVER (0..n)----(1) MED' associations
-  MED_EN::med_idt           _medIdt;         // The _medIdt used to write/read Meshes to ::_filename
-   
-  //private:
-  //  MED_MED_DRIVER();
 
 public :
   /*!
@@ -58,22 +54,19 @@ public :
   */
   virtual ~MED_MED_DRIVER() ;
 
-  void open() throw (MEDEXCEPTION) ;
-  void close();
+  virtual void open() throw (MEDEXCEPTION) = 0  ;
+  virtual void close() = 0 ;
+  virtual void write          ( void ) const = 0 ;
+  virtual void writeFrom      ( void ) const = 0 ;
+  virtual void read           ( void ) = 0 ;
+  virtual void readFileStruct ( void ) = 0 ;
 
-  //virtual void write          ( void ) const = 0 ;
-  virtual void write          ( void ) const ;
-  //virtual void writeFrom      ( void ) const = 0 ;
-  virtual void writeFrom      ( void ) const  ;
-  //virtual void read           ( void ) = 0 ;
-  virtual void read           ( void )  ;
-  //virtual void readFileStruct ( void ) = 0 ;
-  virtual void readFileStruct ( void ) ;
+protected:
+  virtual GENDRIVER * copy ( void ) const = 0 ;
 
-private:
-  //virtual GENDRIVER * copy ( void ) const = 0 ;
-  virtual GENDRIVER * copy ( void ) const  ;
-
+  friend class MED_MED_RDONLY_DRIVER;
+  friend class MED_MED_WRONLY_DRIVER;
+  friend class MED_MED_RDWR_DRIVER;
 };
 
 /*!
@@ -84,26 +77,26 @@ private:
 
 */
 
-class MED_MED_RDONLY_DRIVER : public virtual MED_MED_DRIVER
+class IMED_MED_RDONLY_DRIVER : public virtual MED_MED_DRIVER
 {
 public :
   /*!
     Constructor.
   */
-  MED_MED_RDONLY_DRIVER();
+  IMED_MED_RDONLY_DRIVER();
   /*!
     Constructor.
   */
-  MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed);
+  IMED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed);
   /*!
     Copy constructor.
   */
-  MED_MED_RDONLY_DRIVER(const MED_MED_RDONLY_DRIVER & driver);
+  IMED_MED_RDONLY_DRIVER(const IMED_MED_RDONLY_DRIVER & driver);
 
   /*!
     Destructor.
   */
-  virtual ~MED_MED_RDONLY_DRIVER();
+  virtual ~IMED_MED_RDONLY_DRIVER();
 
   /*!
     Return a MEDEXCEPTION : it is the read-only driver.
@@ -113,20 +106,6 @@ public :
     Return a MEDEXCEPTION : it is the read-only driver.
   */
   void writeFrom      ( void ) const throw (MEDEXCEPTION) ;
-  /*!
-    Read all from the file.
-  */
-  void read           ( void ) throw (MEDEXCEPTION);
-  /*!
-    Read only table of contents of the file.
-
-    All objects are created but there values are not read.
-  */
-  void readFileStruct ( void ) throw (MEDEXCEPTION) ;
-
-private:
-  virtual GENDRIVER * copy ( void ) const ;
-
 };
 
 /*!
@@ -137,36 +116,28 @@ private:
 
 */
 
-class MED_MED_WRONLY_DRIVER : public virtual MED_MED_DRIVER
+class IMED_MED_WRONLY_DRIVER : public virtual MED_MED_DRIVER
 {
 
 public :
   /*!
     Constructor.
   */
-  MED_MED_WRONLY_DRIVER();
+  IMED_MED_WRONLY_DRIVER();
   /*!
     Constructor.
   */
-  MED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed);
+  IMED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed);
   /*!
     Copy constructor.
   */
-  MED_MED_WRONLY_DRIVER(const MED_MED_WRONLY_DRIVER & driver);
+  IMED_MED_WRONLY_DRIVER(const IMED_MED_WRONLY_DRIVER & driver);
 
   /*!
     Destructor.
   */
-  virtual ~MED_MED_WRONLY_DRIVER();
+  virtual ~IMED_MED_WRONLY_DRIVER();
 
-  /*!
-    Write all in file.
-  */
-  void write          ( void ) const throw (MEDEXCEPTION);
-  /*!
-    Write only objects created from this MED driver in file.
-  */
-  void writeFrom      ( void ) const throw (MEDEXCEPTION);
   /*!
     Return a MEDEXCEPTION : it is the write-only driver.
   */
@@ -175,9 +146,6 @@ public :
     Return a MEDEXCEPTION : it is the write-only driver.
   */
   void readFileStruct ( void ) throw (MEDEXCEPTION) ;
-
-private:
-  virtual GENDRIVER * copy ( void ) const ;
 
 };
 
@@ -189,52 +157,87 @@ private:
 
 */
 
-class MED_MED_RDWR_DRIVER : public virtual MED_MED_RDONLY_DRIVER,
-			    public virtual MED_MED_WRONLY_DRIVER
+class IMED_MED_RDWR_DRIVER : public virtual IMED_MED_RDONLY_DRIVER,
+			     public virtual IMED_MED_WRONLY_DRIVER
 {
 
 public :
   /*!
     Constructor.
   */
-  MED_MED_RDWR_DRIVER();
+  IMED_MED_RDWR_DRIVER();
   /*!
     Constructor.
   */
-  MED_MED_RDWR_DRIVER(const string & fileName,  MED * const ptrMed);
+  IMED_MED_RDWR_DRIVER(const string & fileName,  MED * const ptrMed);
   /*!
     Copy constructor.
   */
-  MED_MED_RDWR_DRIVER(const MED_MED_RDWR_DRIVER & driver);
+  IMED_MED_RDWR_DRIVER(const IMED_MED_RDWR_DRIVER & driver);
 
   /*!
     Destructor.
   */
-  ~MED_MED_RDWR_DRIVER();
+  ~IMED_MED_RDWR_DRIVER();
 
-  /*!
-    Write all in file.
-  */
-  void write          ( void ) const throw (MEDEXCEPTION);
-  /*!
-    Write only objects created from this MED driver in file.
-  */
-  void writeFrom      ( void ) const throw (MEDEXCEPTION);
-  /*!
-    Read all from the file.
-  */
-  void read           ( void ) throw (MEDEXCEPTION);
-  /*!
-    Read only table of contents of the file.
+};
 
-    All objects are created but there values are not read.
-  */
-  void readFileStruct ( void ) throw (MEDEXCEPTION);
-
+class MED_MED_RDONLY_DRIVER : public virtual IMED_MED_RDONLY_DRIVER
+{
+public :
+  MED_MED_RDONLY_DRIVER();
+  MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed);
+  MED_MED_RDONLY_DRIVER(const MED_MED_RDONLY_DRIVER & driver);
+  virtual ~MED_MED_RDONLY_DRIVER();
+  void write          ( void ) const throw (MEDEXCEPTION) ;
+  void writeFrom      ( void ) const throw (MEDEXCEPTION) ;
+  virtual void open() throw (MEDEXCEPTION) ;
+  virtual void close() ;
+  virtual void read           ( void ) ;
+  virtual void readFileStruct ( void ) ;
 private:
-  virtual GENDRIVER * copy ( void ) const ;
+  GENDRIVER * copy ( void ) const;
+  IMED_MED_RDONLY_DRIVER *_concreteRd;
+};
 
+class MED_MED_WRONLY_DRIVER : public virtual IMED_MED_WRONLY_DRIVER
+{
+
+public :
+  MED_MED_WRONLY_DRIVER();
+  MED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed);
+  MED_MED_WRONLY_DRIVER(const MED_MED_WRONLY_DRIVER & driver);
+  virtual ~MED_MED_WRONLY_DRIVER();
+  void write          ( void ) const throw (MEDEXCEPTION) ;
+  void writeFrom      ( void ) const throw (MEDEXCEPTION) ;
+  virtual void open() throw (MEDEXCEPTION) ;
+  virtual void close() ;
+  virtual void read           ( void ) throw (MEDEXCEPTION) ;
+  virtual void readFileStruct ( void ) throw (MEDEXCEPTION) ;
+private:
+  GENDRIVER * copy ( void ) const;
+  IMED_MED_WRONLY_DRIVER *_concreteWr;
 };
+
+class MED_MED_RDWR_DRIVER : public IMED_MED_RDWR_DRIVER
+{
+
+public :
+  MED_MED_RDWR_DRIVER();
+  MED_MED_RDWR_DRIVER(const string & fileName,  MED * const ptrMed);
+  MED_MED_RDWR_DRIVER(const MED_MED_RDWR_DRIVER & driver);
+  ~MED_MED_RDWR_DRIVER();
+  void write          ( void ) const throw (MEDEXCEPTION) ;
+  void writeFrom      ( void ) const throw (MEDEXCEPTION) ;
+  virtual void open() throw (MEDEXCEPTION) ;
+  virtual void close() ;
+  virtual void read           ( void ) throw (MEDEXCEPTION) ;
+  virtual void readFileStruct ( void ) throw (MEDEXCEPTION) ;
+private:
+  GENDRIVER * copy ( void ) const;
+  IMED_MED_RDWR_DRIVER *_concreteRdWr;
 };
+
+}
 
 #endif /* MED_MED_DRIVER_HXX */

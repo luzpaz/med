@@ -133,9 +133,9 @@ protected:
 
 public:
 
-  friend class MED_MED_RDONLY_DRIVER;
-  friend class MED_MED_WRONLY_DRIVER;
-  friend class MED_MED_RDWR_DRIVER;
+  friend class MED_MED_RDONLY_DRIVER21;
+  friend class MED_MED_WRONLY_DRIVER21;
+  friend class MED_MED_RDWR_DRIVER21;
 
   friend class VTK_MED_DRIVER;
 
@@ -593,8 +593,8 @@ public:
   double normL1(int component, const FIELD<double> * p_field_volume=NULL) const;
   double normL1(const FIELD<double> * p_field_volume=NULL) const;
 
-  friend class MED_FIELD_RDONLY_DRIVER<T>;
-  friend class MED_FIELD_WRONLY_DRIVER<T>;
+  friend class MED_FIELD_RDONLY_DRIVER21<T>;
+  friend class MED_FIELD_WRONLY_DRIVER21<T>;
   friend class VTK_FIELD_DRIVER<T>;
   //friend class MED_FIELD_RDWR_DRIVER  <T>;
 
@@ -710,7 +710,7 @@ template <class T>  FIELD<T>::FIELD(const SUPPORT * Support,
   SCRUTE(this);
 
   try {
-    _numberOfValues = Support->getNumberOfElements(MED_ALL_ELEMENTS);
+    _numberOfValues = Support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   }
   catch (MEDEXCEPTION &ex) {
     MESSAGE("No value defined ! ("<<ex.what()<<")");
@@ -1715,7 +1715,7 @@ template <class T> void FIELD<T>::allocValue(const int NumberOfComponents)
   }
 
   try {
-    _numberOfValues = _support->getNumberOfElements(MED_ALL_ELEMENTS);
+    _numberOfValues = _support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
     MESSAGE(LOC <<" : "<<_numberOfValues <<" et "<< NumberOfComponents);
 
     _value = new MEDARRAY<T>(_numberOfComponents,_numberOfValues);

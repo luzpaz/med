@@ -32,21 +32,19 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
       switch(access)
 	{
 	case MED_LECT : {
-	  MED_MESH_RDONLY_DRIVER *retmed=new MED_MESH_RDONLY_DRIVER(fileName,
-								    mesh);
-	  retmed->setMeshName(driverName);
-	  return retmed;
+	  ret = new MED_MESH_RDONLY_DRIVER(fileName, mesh);
+	  ret->setMeshName(driverName);
+	  return ret;
 	}
 	case MED_ECRI : {
-	  MED_MESH_WRONLY_DRIVER *retmed=new MED_MESH_WRONLY_DRIVER(fileName,
-								    mesh);
-	  retmed->setMeshName(driverName);
-	  return retmed;
+	  ret = new MED_MESH_WRONLY_DRIVER(fileName, mesh);
+	  ret->setMeshName(driverName);
+	  return ret;
 	}
 	case MED_REMP : {
-	  MED_MESH_RDWR_DRIVER *retmed=new MED_MESH_RDWR_DRIVER(fileName,mesh);
-	  retmed->setMeshName(driverName);
-	  return retmed;
+	  ret = new MED_MESH_RDWR_DRIVER(fileName, mesh);
+	  ret->setMeshName(driverName);
+	  return ret;
 	}
 	default:
 	  throw MED_EXCEPTION ("access type has not been properly specified to the method");

@@ -46,7 +46,7 @@ MED_FIELDINT_DRIVER::~MED_FIELDINT_DRIVER()
  */
 //=============================================================================
 MED_FIELDINT_RDONLY_DRIVER::MED_FIELDINT_RDONLY_DRIVER() :
-  MED_FIELD_RDONLY_DRIVER<int>()
+  MEDMEM::MED_FIELD_RDONLY_DRIVER<int>()
 {
   BEGIN_OF("Default Constructor (for Python API) MED_FIELDINT_RDONLY_DRIVER");
 
@@ -59,7 +59,7 @@ MED_FIELDINT_RDONLY_DRIVER::MED_FIELDINT_RDONLY_DRIVER() :
 //=============================================================================
 MED_FIELDINT_RDONLY_DRIVER::MED_FIELDINT_RDONLY_DRIVER(const string & fileName,
 							     FIELDINT * ptrField) : 
-  MED_FIELD_RDONLY_DRIVER<int>(fileName,(FIELD<int> *) ptrField)
+  MEDMEM::MED_FIELD_RDONLY_DRIVER<int>(fileName,(FIELD<int> *) ptrField)
 {
   BEGIN_OF("Constructor with arguments (for Python API) MED_FIELDINT_RDONLY_DRIVER");
 
@@ -82,7 +82,7 @@ MED_FIELDINT_RDONLY_DRIVER::~MED_FIELDINT_RDONLY_DRIVER()
  */
 //=============================================================================
 MED_FIELDINT_WRONLY_DRIVER::MED_FIELDINT_WRONLY_DRIVER() :
-  MED_FIELD_WRONLY_DRIVER<int>()
+  MEDMEM::MED_FIELD_WRONLY_DRIVER<int>()
 {
   BEGIN_OF("Default Constructor (for Python API) MED_FIELDINT_WRONLY_DRIVER");
 
@@ -95,7 +95,7 @@ MED_FIELDINT_WRONLY_DRIVER::MED_FIELDINT_WRONLY_DRIVER() :
 //=============================================================================
 MED_FIELDINT_WRONLY_DRIVER::MED_FIELDINT_WRONLY_DRIVER(const string & fileName,
 							     FIELDINT * ptrField) : 
-  MED_FIELD_WRONLY_DRIVER<int>(fileName,(FIELD<int> *) ptrField)
+  MEDMEM::MED_FIELD_WRONLY_DRIVER<int>(fileName,(FIELD<int> *) ptrField)
 {
   BEGIN_OF("Constructor with arguments (for Python API) MED_FIELDINT_WRONLY_DRIVER");
 
@@ -118,7 +118,7 @@ MED_FIELDINT_WRONLY_DRIVER::~MED_FIELDINT_WRONLY_DRIVER()
  */
 //=============================================================================
 MED_FIELDINT_RDWR_DRIVER::MED_FIELDINT_RDWR_DRIVER() :
-  MED_FIELD_RDWR_DRIVER<int>()
+  MEDMEM::MED_FIELD_RDWR_DRIVER<int>()
 {
   BEGIN_OF("Default Constructor (for Python API) MED_FIELDINT_RDWR_DRIVER");
 
@@ -131,7 +131,7 @@ MED_FIELDINT_RDWR_DRIVER::MED_FIELDINT_RDWR_DRIVER() :
 //=============================================================================
 MED_FIELDINT_RDWR_DRIVER::MED_FIELDINT_RDWR_DRIVER(const string & fileName,
 							 FIELDINT * ptrField) : 
-  MED_FIELD_RDWR_DRIVER<int>(fileName,(FIELD<int> *) ptrField)
+  MEDMEM::MED_FIELD_RDWR_DRIVER<int>(fileName,(FIELD<int> *) ptrField)
 {
   BEGIN_OF("Constructor with arguments (for Python API) MED_FIELDINT_RDWR_DRIVER");
 

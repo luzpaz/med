@@ -28,16 +28,10 @@ class MED_MESH_DRIVER : public GENDRIVER
 protected:
   
   MESH *   _ptrMesh;
-  med_2_1::med_idt        _medIdt;
   string         _meshName;    // const ?
   int            _meshNum;     // INUTILE ?
   
 public :
-
-  // all MED cell type
-  static const med_2_1::med_geometrie_element all_cell_type[MED_NBR_GEOMETRIE_MAILLE];
-  
-  static const char * const all_cell_type_tab [MED_NBR_GEOMETRIE_MAILLE];
 
   /*!
     Constructor.
@@ -59,8 +53,8 @@ public :
   */
   virtual ~MED_MESH_DRIVER() ;
 
-  void open();
-  void close();
+  virtual void open() = 0;
+  virtual void close() = 0;
 
   virtual void write( void ) const = 0 ;
   virtual void read ( void ) = 0 ;
@@ -70,13 +64,13 @@ public :
 
     It could be different than the name of the MESH object.
   */
-  void   setMeshName(const string & meshName) ;
+  virtual void   setMeshName(const string & meshName) ;
   /*!
     Get the name of the MESH asked in file.
   */
-  string getMeshName() const ;
+  virtual string getMeshName() const ;
 
-private:
+public:
   virtual GENDRIVER * copy ( void ) const = 0 ;
 
 };
@@ -89,7 +83,7 @@ private:
 
 */
 
-class MED_MESH_RDONLY_DRIVER : public virtual MED_MESH_DRIVER
+  class IMED_MESH_RDONLY_DRIVER : public virtual MED_MESH_DRIVER
 {
  
 public :
@@ -97,45 +91,35 @@ public :
   /*!
     Constructor.
   */
-  MED_MESH_RDONLY_DRIVER() ;
+  IMED_MESH_RDONLY_DRIVER() ;
   /*!
     Constructor.
   */
-  MED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) ;
+  IMED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) ;
   /*!
     Copy constructor.
   */
-  MED_MESH_RDONLY_DRIVER(const MED_MESH_RDONLY_DRIVER & driver) ;
-
-  /*!
-    Destructor.
-  */
-  virtual ~MED_MESH_RDONLY_DRIVER() ;
+  IMED_MESH_RDONLY_DRIVER(const IMED_MESH_RDONLY_DRIVER & driver) ;
   
   // CREER UNE METHODE POUR LIRE LA LISTE DES MAILLAGES .....
-
   /*!
     Return a MEDEXCEPTION : it is the read-only driver.
   */
   void write( void ) const;
-  /*!
-    Read MESH in the specified file.
-  */
-  void read ( void );
 
-private:
-  int getCOORDINATE();
-  int getCONNECTIVITY();
-  int getFAMILY();
-  int getNodalConnectivity(CONNECTIVITY * Connectivity) ;
-  int getDescendingConnectivity(CONNECTIVITY * Connectivity) ;
-  int getNodesFamiliesNumber(int * MEDArrayNodeFamily) ;
-  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity) ;
+protected:
+  virtual int getCOORDINATE() = 0 ;
+  virtual int getCONNECTIVITY() = 0 ;
+  virtual int getFAMILY() = 0 ;
+  virtual int getNodalConnectivity(CONNECTIVITY * Connectivity) = 0 ;
+  int getDescendingConnectivity(CONNECTIVITY * Connectivity);
+  virtual int getNodesFamiliesNumber(int * MEDArrayNodeFamily) = 0 ;
+  virtual int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity) = 0 ;
   void updateFamily() ;
   void buildAllGroups(vector<GROUP*> & Groups, vector<FAMILY*> & Families) ;
-  void getGRID ();
+  virtual void getGRID () = 0 ;
 
-  GENDRIVER * copy ( void ) const ;
+  friend class MED_MESH_RDONLY_DRIVER;
 
 };
 
@@ -147,45 +131,41 @@ private:
 
 */
 
-class MED_MESH_WRONLY_DRIVER : public virtual MED_MESH_DRIVER {
+class IMED_MESH_WRONLY_DRIVER : public virtual MED_MESH_DRIVER {
   
 public :
   
   /*!
     Constructor.
   */
-  MED_MESH_WRONLY_DRIVER() ;
+  IMED_MESH_WRONLY_DRIVER() ;
   /*!
     Constructor.
   */
-  MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) ;
+  IMED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) ;
   /*!
     Copy constructor.
   */
-  MED_MESH_WRONLY_DRIVER(const MED_MESH_WRONLY_DRIVER & driver) ;
+  IMED_MESH_WRONLY_DRIVER(const IMED_MESH_WRONLY_DRIVER & driver) ;
 
   /*!
     Destructor.
   */
-  virtual ~MED_MESH_WRONLY_DRIVER() ;
+  virtual ~IMED_MESH_WRONLY_DRIVER() ;
 
-  /*!
-    Write MESH in the specified file.
-  */
-  void write( void ) const;
   /*!
     Return a MEDEXCEPTION : it is the write-only driver.
   */
   void read ( void );
 
-private:
-  int writeCoordinates    ()                           const;
-  int writeConnectivities (MED_EN::medEntityMesh entity)       const;
-  int writeFamilyNumbers  ()                           const;
-  int writeFamilies       (vector<FAMILY*> & families) const;
-  int writeGRID() const;
+protected:
+  virtual int writeCoordinates    ()                           const = 0 ;
+  virtual int writeConnectivities (MED_EN::medEntityMesh entity)       const = 0 ;
+  virtual int writeFamilyNumbers  ()                           const = 0 ;
+  virtual int writeFamilies       (vector<FAMILY*> & families) const = 0 ;
+  virtual int writeGRID() const = 0 ;
 
-  GENDRIVER * copy ( void ) const ;
+  friend class MED_MESH_WRONLY_DRIVER;
 };
 
 
@@ -197,41 +177,110 @@ private:
 
 */
 
-class MED_MESH_RDWR_DRIVER : public MED_MESH_RDONLY_DRIVER, public MED_MESH_WRONLY_DRIVER {
+class IMED_MESH_RDWR_DRIVER : public virtual IMED_MESH_RDONLY_DRIVER, public virtual IMED_MESH_WRONLY_DRIVER {
 
 public :
 
   /*!
     Constructor.
   */
-  MED_MESH_RDWR_DRIVER() ;
+  IMED_MESH_RDWR_DRIVER() ;
   /*!
     Constructor.
   */
-  MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) ;
+  IMED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) ;
   /*!
     Copy constructor.
   */
-  MED_MESH_RDWR_DRIVER(const MED_MESH_RDWR_DRIVER & driver) ;
+  IMED_MESH_RDWR_DRIVER(const IMED_MESH_RDWR_DRIVER & driver) ;
 
   /*!
     Destructor.
   */
-  ~MED_MESH_RDWR_DRIVER() ;
+  ~IMED_MESH_RDWR_DRIVER() ;
 
-  /*!
-    Write MESH in the specified file.
-  */
-  void write(void) const;
-  /*!
-    Read MESH in the specified file.
-  */
-  void read (void);
-
-private:
-  GENDRIVER * copy(void) const ;
+  friend class MED_MESH_RDWR_DRIVER;
 
 };
+
+class MED_MESH_RDONLY_DRIVER : public virtual IMED_MESH_RDONLY_DRIVER
+{
+public:
+  MED_MESH_RDONLY_DRIVER();
+  MED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh);
+  MED_MESH_RDONLY_DRIVER(const MED_MESH_RDONLY_DRIVER & driver);
+  ~MED_MESH_RDONLY_DRIVER();
+  void   setMeshName(const string & meshName);
+  string getMeshName() const;
+  void write( void ) const;
+  void read ( void );
+  void open();
+  void close();
+protected:
+  int getCOORDINATE();
+  int getCONNECTIVITY();
+  int getFAMILY();
+  int getNodalConnectivity(CONNECTIVITY * Connectivity);
+  int getDescendingConnectivity(CONNECTIVITY * Connectivity);
+  int getNodesFamiliesNumber(int * MEDArrayNodeFamily);
+  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity);
+  void getGRID ();
+  GENDRIVER * copy ( void ) const;
+  IMED_MESH_RDONLY_DRIVER *_concreteDriverRd;
+};
+
+class MED_MESH_WRONLY_DRIVER : public virtual IMED_MESH_WRONLY_DRIVER {
+public :
+  MED_MESH_WRONLY_DRIVER();
+  MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh);
+  MED_MESH_WRONLY_DRIVER(const MED_MESH_WRONLY_DRIVER & driver);
+  ~MED_MESH_WRONLY_DRIVER();
+  void   setMeshName(const string & meshName);
+  string getMeshName() const;
+  void read ( void );
+  void write( void ) const;
+  void open();
+  void close();
+protected:
+  int writeCoordinates    ()                           const;
+  int writeConnectivities (MED_EN::medEntityMesh entity)       const;
+  int writeFamilyNumbers  ()                           const;
+  int writeFamilies       (vector<FAMILY*> & families) const;
+  int writeGRID() const;
+  GENDRIVER * copy ( void ) const;
+  IMED_MESH_WRONLY_DRIVER *_concreteDriverWr; 
+};
+
+class MED_MESH_RDWR_DRIVER : public IMED_MESH_RDWR_DRIVER {
+public :
+  MED_MESH_RDWR_DRIVER();
+  MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh);
+  MED_MESH_RDWR_DRIVER(const MED_MESH_RDWR_DRIVER & driver);
+  ~MED_MESH_RDWR_DRIVER();
+  void   setMeshName(const string & meshName);
+  string getMeshName() const;
+  void read ( void );
+  void write( void ) const;
+  void open();
+  void close();
+protected:
+  int getCOORDINATE();
+  int getCONNECTIVITY();
+  int getFAMILY();
+  int getNodalConnectivity(CONNECTIVITY * Connectivity);
+  int getDescendingConnectivity(CONNECTIVITY * Connectivity);
+  int getNodesFamiliesNumber(int * MEDArrayNodeFamily);
+  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity);
+  void getGRID ();
+  int writeCoordinates    ()                           const;
+  int writeConnectivities (MED_EN::medEntityMesh entity)       const;
+  int writeFamilyNumbers  ()                           const;
+  int writeFamilies       (vector<FAMILY*> & families) const;
+  int writeGRID() const;
+  GENDRIVER * copy ( void ) const;
+  IMED_MESH_RDWR_DRIVER *_concreteDriverRdWr;
+};
+
 };
 
 #endif /* MED_MESH_DRIVER_HXX */

@@ -321,7 +321,7 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
 //    return N;
 //  }
 
-ostream & MEDMEM::operator<<(ostream &os, const MESH &myMesh)
+ostream & ::MEDMEM::operator<<(ostream &os, const MESH &myMesh)
 {
   int spacedimension = myMesh.getSpaceDimension();
   int meshdimension  = myMesh.getMeshDimension();

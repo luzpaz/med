@@ -46,6 +46,7 @@ class MESH
 protected :
 
   string        _name; // A POSITIONNER EN FCT DES IOS ?
+  string        _description;
 
   mutable COORDINATE *   _coordinate;
   mutable CONNECTIVITY * _connectivity;
@@ -96,12 +97,14 @@ protected :
 public :
 
   // Add your personnal driver line (step 2)
-  friend class MED_MESH_RDONLY_DRIVER;
-  friend class MED_MESH_WRONLY_DRIVER;
+  friend class IMED_MESH_RDONLY_DRIVER;
+  friend class IMED_MESH_WRONLY_DRIVER;
+  friend class MED_MESH_RDONLY_DRIVER21;
+  friend class MED_MESH_WRONLY_DRIVER21;
 
-  friend class MED_MED_RDONLY_DRIVER;
-  friend class MED_MED_WRONLY_DRIVER;
-  friend class MED_MED_RDWR_DRIVER;
+  friend class MED_MED_RDONLY_DRIVER21;
+  friend class MED_MED_WRONLY_DRIVER21;
+  friend class MED_MED_RDWR_DRIVER21;
 
   friend class GIBI_MESH_RDONLY_DRIVER;
   friend class GIBI_MESH_WRONLY_DRIVER;
@@ -140,8 +143,9 @@ public :
 
 
   inline void 	      setName(string name);
-
+  inline void 	      setDescription(string description);
   inline string       getName() const;
+  inline string       getDescription() const;
   inline int 	      getSpaceDimension() const;
   inline int 	      getMeshDimension() const;
   inline bool	      getIsAGrid();
@@ -226,13 +230,13 @@ public :
   //				throw (MEDEXCEPTION); // Il faut preciser !
 
   /*!
-    return a SUPPORT pointer on the union of all SUPPORTs in Supports.
+    returns a SUPPORT pointer on the union of all SUPPORTs in Supports.
     You should delete this pointer after use to avois memory leaks.
   */
   SUPPORT * mergeSupports(const vector<SUPPORT *> Supports) const throw (MEDEXCEPTION) ;
 
   /*!
-    return a SUPPORT pointer on the intersection of all SUPPORTs in Supports.
+    returns a SUPPORT pointer on the intersection of all SUPPORTs in Supports.
     The (SUPPORT *) NULL pointer is returned if the intersection is empty.
     You should delete this pointer after use to avois memory leaks.
    */
@@ -348,6 +352,18 @@ inline string MESH::getName() const
   return _name;
 }
 
+/*! Set the MESH description */
+inline void MESH::setDescription(string description)
+{
+  _description=description; //NOM interne à la classe
+}
+
+/*! Get the MESH description */
+inline string MESH::getDescription() const
+{
+  return _description;
+}
+
 /*! Get the dimension of the space */
 inline int MESH::getSpaceDimension() const
 {
@@ -439,12 +455,12 @@ inline int MESH::getNumberOfTypes(MED_EN::medEntityMesh entity) const
 }
 
 /*!
-  Get the list of geometric types used by a given entity.
+  Gets the list of geometric types used by a given entity.
   medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_ALL_ENTITIES
 
   REM : Don't use MED_NODE
 
-  If entity is not defined, return an exception.
+  If entity is not defined, it returns an exception.
 */
 inline const MED_EN::medGeometryElement * MESH::getTypes(MED_EN::medEntityMesh entity) const
 {
@@ -471,7 +487,7 @@ inline const CELLMODEL * MESH::getCellsTypes(MED_EN::medEntityMesh Entity) const
   throw MEDEXCEPTION(LOCALIZED("MESH::getCellsTypes( medEntityMesh ) : Connectivity not defined !"));
 }
 
-/*! Return an array of size NumbreOfTypes+1 which contains, for each
+/*! Returns an array of size NumbreOfTypes+1 which contains, for each
     geometric type of the given entity, the first global element number
     of this type.
 
@@ -489,14 +505,14 @@ inline const int * MESH::getGlobalNumberingIndex(MED_EN::medEntityMesh entity) c
   throw MEDEXCEPTION(LOCALIZED("MESH::getNumberOfTypes( medEntityMesh ) : Connectivity not defined !"));
 }
 /*!
-  Return the number of element of given geometric type of given entity. Return 0 if query is not defined.
+  Returns the number of element of given geometric type of given entity. Return 0 if query is not defined.
 
   Example :
   - getNumberOfElements(MED_NODE,MED_NONE) : number of node
-  - getNumberOfElements(MED_NODE,MED_TRIA3) : return 0 (not defined)
-  - getNumberOfElements(MED_FACE,MED_TRIA3) : return number of triangles
+  - getNumberOfElements(MED_NODE,MED_TRIA3) : returns 0 (not defined)
+  - getNumberOfElements(MED_FACE,MED_TRIA3) : returns number of triangles
   elements defined in face entity (0 if not defined)
-  - getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) : return total number
+  - getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) : returns total number
   of elements defined in cell entity
  */
 inline int MESH::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
@@ -519,7 +535,7 @@ inline int MESH::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
     }
 }
 /*!
-  Return true if the wanted connectivity exist, else return false
+  Returns true if the wanted connectivity exist, else returns false
   (to use before a getSomething method).
  */
 inline bool MESH::existConnectivity(MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh entity) const
@@ -530,7 +546,7 @@ inline bool MESH::existConnectivity(MED_EN::medConnectivity connectivityType, ME
   return _connectivity->existConnectivity(connectivityType,entity);
 }
 /*!
-  Return the geometric type of global element Number of entity Entity.
+  Returns the geometric type of global element Number of entity Entity.
 
   Throw an exception if Entity is not defined or Number are wrong (too big).
  */
@@ -542,7 +558,7 @@ inline MED_EN::medGeometryElement MESH::getElementType(MED_EN::medEntityMesh Ent
   return _connectivity->getElementType(Entity,Number);
 }
 /*!
-  Calculate the ask connectivity. Return an exception if this could not be
+  Calculate the ask connectivity. Returns an exception if this could not be
   done. Do nothing if connectivity already exist.
  */
 
@@ -555,7 +571,7 @@ inline void MESH::calculateConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medCo
     throw MEDEXCEPTION(LOCALIZED("MESH::calculateConnectivity : only for MED_FULL_INTERLACE mode"));
 }
 /*!
- Return the corresponding length of the array returned by MESH::getConnectivity with exactly the same arguments.
+ Returns the corresponding length of the array returned by MESH::getConnectivity with exactly the same arguments.
  Used particulary for wrapping CORBA and python.
  */
 inline int MESH::getConnectivityLength(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
@@ -574,7 +590,7 @@ inline int MESH::getConnectivityLength(MED_EN::medModeSwitch Mode,MED_EN::medCon
   return size;
 }
 /*!
-  Return the required connectivity in the right mode for the given
+  Returns the required connectivity in the right mode for the given
   geometric type of the given entity.
 
   To get connectivity for all geometric type, use Mode=MED_FULL_INTERLACE
@@ -589,7 +605,7 @@ inline const int * MESH::getConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medC
   throw MEDEXCEPTION(LOCALIZED("MESH::getConnectivity : only for MED_FULL_INTERLACE mode"));
 }
 /*!
-  Return the required index array for a connectivity received in
+  Returns the required index array for a connectivity received in
   MED_FULL_ENTERLACE mode and MED_ALL_ELEMENTS type.
 
   This array allow to find connectivity of each elements.
@@ -605,7 +621,7 @@ inline const int * MESH::getConnectivityIndex(MED_EN::medConnectivity Connectivi
   return _connectivity->getConnectivityIndex(ConnectivityType, entity);
 }
 /*!
-  Return the corresponding length of the array returned by MESH::getReverseConnectivity with exactly the same arguments.
+  Returns the corresponding length of the array returned by MESH::getReverseConnectivity with exactly the same arguments.
   Used particulary for wrapping CORBA and python.
  */
 
@@ -631,9 +647,9 @@ inline int MESH::getReverseConnectivityLength(MED_EN::medConnectivity Connectivi
   return getReverseConnectivityIndex(ConnectivityType)[nb]-1;
 }
 /*!
-  Return the reverse connectivity required by ConnectivityType :
-  - If ConnectivityType=MED_NODAL : return connectivity node-cell
-  - If ConnectivityType=MED_DESCENDING : return connectivity face-cell
+  Returns the reverse connectivity required by ConnectivityType :
+  - If ConnectivityType=MED_NODAL : returns connectivity node-cell
+  - If ConnectivityType=MED_DESCENDING : returns connectivity face-cell
 
   You must get ReverseConnectivityIndex array to use it.
  */
@@ -647,7 +663,7 @@ inline const int * MESH::getReverseConnectivity(MED_EN::medConnectivity Connecti
   return _connectivity->getReverseConnectivity(ConnectivityType,Entity);
 }
 /*!
-  Return the corresponding length of the array returned by MESH::getReverseConnectivityIndex with exactly the same arguments.
+  Returns the corresponding length of the array returned by MESH::getReverseConnectivityIndex with exactly the same arguments.
   Used particulary for wrapping CORBA and python.
  */
 inline int MESH::getReverseConnectivityIndexLength(MED_EN::medConnectivity ConnectivityType,
@@ -670,7 +686,7 @@ inline int MESH::getReverseConnectivityIndexLength(MED_EN::medConnectivity Conne
     }
 }
 /*!
-  Return the index array required by ConnectivityType.
+  Returns the index array required by ConnectivityType.
 
   This array allow to find reverse connectivity of each elements.
 

@@ -114,8 +114,10 @@ private:
 
 public:
 
-  friend class MED_MESH_RDONLY_DRIVER;
-  friend class MED_MESH_WRONLY_DRIVER;
+  friend class IMED_MESH_RDONLY_DRIVER;
+  friend class MED_MESH_RDONLY_DRIVER21;
+  friend class IMED_MESH_WRONLY_DRIVER;
+  friend class MED_MESH_WRONLY_DRIVER21;
   friend ostream & operator<<(ostream &os, CONNECTIVITY &connectivity);
 
   // in order to fill CONNECTIVITY of MESH
