@@ -470,7 +470,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
       int * NumberOfValues = new int[NumberOfTypes] ;
       int TotalNumberOfValues = 0 ;
       MESSAGE ("NumberOfTypes :"<< NumberOfTypes);
-      _ptrField->_numberOfValues=0 ;
+      MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues=0 ;
       for (int i=0; i<NumberOfTypes; i++) {
 	MESSAGE ("Type["<<i+1<<"] :"<< Types[i]);
 	MESSAGE ("Entity :"<<MED_FIELD_DRIVER<T>::_ptrField->_support->getEntity());

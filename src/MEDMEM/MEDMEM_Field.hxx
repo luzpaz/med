@@ -710,7 +710,7 @@ template <class T>  FIELD<T>::FIELD(const SUPPORT * Support,
   SCRUTE(this);
 
   try {
-    _numberOfValues = Support->getNumberOfElements(MED_ALL_ELEMENTS);
+    _numberOfValues = Support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   }
   catch (MEDEXCEPTION &ex) {
     MESSAGE("No value defined ! ("<<ex.what()<<")");
@@ -1489,8 +1489,8 @@ template <class T> double FIELD<T>::normL2(int component, const FIELD<double> * 
 	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue(MED_FULL_INTERLACE); 
-    const T* value=getValueI( MED_NO_INTERLACE, component); // get pointer to the component's values
+    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE); 
+    const T* value=getValueI( MED_EN::MED_NO_INTERLACE, component); // get pointer to the component's values
     const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
 
     double integrale=0.0;
@@ -1521,9 +1521,9 @@ template <class T> double FIELD<T>::normL2(const FIELD<double> * p_field_volume)
 	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue(MED_FULL_INTERLACE); 
+    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE); 
     const double* lastvol=vol+getNumberOfValues(); // pointing just after the end of vol
-    const T* value=getValue( MED_NO_INTERLACE); // get pointer to the field's values
+    const T* value=getValue( MED_EN::MED_NO_INTERLACE); // get pointer to the field's values
 
     double totVol=0.0;
     const double* p_vol=vol;
@@ -1558,8 +1558,8 @@ template <class T> double FIELD<T>::normL1(int component, const FIELD<double> * 
 	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue(MED_FULL_INTERLACE); 
-    const T* value=getValueI( MED_NO_INTERLACE, component); // get pointer to the component's values
+    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE); 
+    const T* value=getValueI( MED_EN::MED_NO_INTERLACE, component); // get pointer to the component's values
     const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
 
     double integrale=0.0;
@@ -1590,9 +1590,9 @@ template <class T> double FIELD<T>::normL1(const FIELD<double> * p_field_volume)
 	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue(MED_FULL_INTERLACE); 
+    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE); 
     const double* lastvol=vol+getNumberOfValues(); // pointing just after the end of vol
-    const T* value=getValue( MED_NO_INTERLACE); // get pointer to the field's values
+    const T* value=getValue( MED_EN::MED_NO_INTERLACE); // get pointer to the field's values
 
     double totVol=0.0;
     const double* p_vol=vol;
@@ -1646,7 +1646,7 @@ template <class T> FIELD<T>::FIELD(const SUPPORT * Support,
   _time = 0.0;
   _orderNumber = orderNumber;
 
-  current = addDriver(driverType,fileName,fieldDriverName,MED_LECT);
+  current = addDriver(driverType,fileName,fieldDriverName,MED_EN::MED_LECT);
 
 //   switch(driverType)
 //     {
@@ -1715,7 +1715,7 @@ template <class T> void FIELD<T>::allocValue(const int NumberOfComponents)
   }
 
   try {
-    _numberOfValues = _support->getNumberOfElements(MED_ALL_ELEMENTS);
+    _numberOfValues = _support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
     MESSAGE(LOC <<" : "<<_numberOfValues <<" et "<< NumberOfComponents);
 
     _value = new MEDARRAY<T>(_numberOfComponents,_numberOfValues);
@@ -2103,7 +2103,7 @@ template <class T> void FIELD<T>::getVolume() const throw (MEDEXCEPTION)
   // number of components = 1 and its value type has to be set to MED_REEL64
   // (ie a FIELD<double>)
 
-  if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_REEL64))
+  if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
 
   END_OF(LOC);
@@ -2121,7 +2121,7 @@ template <class T> void FIELD<T>::getArea() const throw (MEDEXCEPTION)
   // number of components = 1 and its value type has to be set to MED_REEL64
   // (ie a FIELD<double>)
 
-  if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_REEL64))
+  if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
 
   END_OF(LOC);
@@ -2139,7 +2139,7 @@ template <class T> void FIELD<T>::getLength() const throw (MEDEXCEPTION)
   // number of components = 1 and its value type has to be set to MED_REEL64
   // (ie a FIELD<double>)
 
-  if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_REEL64))
+  if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
 
   END_OF(LOC);
@@ -2162,7 +2162,7 @@ template <class T> void FIELD<T>::getNormal() const throw (MEDEXCEPTION)
 
   int dim_space = _support->getMesh()->getSpaceDimension();
 
-  if ((_numberOfComponents != dim_space) || (_valueType != MED_REEL64))
+  if ((_numberOfComponents != dim_space) || (_valueType != MED_EN::MED_REEL64))
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
 
   END_OF(LOC);
@@ -2185,7 +2185,7 @@ template <class T> void FIELD<T>::getBarycenter() const throw (MEDEXCEPTION)
 
   int dim_space = _support->getMesh()->getSpaceDimension();
 
-  if ((_numberOfComponents != dim_space) || (_valueType != MED_REEL64))
+  if ((_numberOfComponents != dim_space) || (_valueType != MED_EN::MED_REEL64))
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
 
   END_OF(LOC);
