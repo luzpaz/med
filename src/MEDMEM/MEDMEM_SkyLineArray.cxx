@@ -1,3 +1,29 @@
+//  MED MEDMEM : MED files in memory
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+// 
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
+// 
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//
+//
+//
+//  File   : MEDMEM_SkyLineArray.cxx
+//  Module : MED
+
 using namespace std;
 #include "MEDMEM_SkyLineArray.hxx"
 #include "utilities.h"
@@ -26,22 +52,32 @@ MEDSKYLINEARRAY::~MEDSKYLINEARRAY()
   //if (_value != NULL) delete [] _value;
 }
 
-MEDSKYLINEARRAY::MEDSKYLINEARRAY(const med_int count , const med_int length ) :
-    		             _count(count), _length(length),
-			     _index(_count+1),_value(_length)
+MEDSKYLINEARRAY::MEDSKYLINEARRAY(const med_int count, const med_int length):
+                                _count(count), _length(length),
+                                _index(_count+1),_value(_length)
 {
 	MESSAGE("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
 }
 
-void MEDSKYLINEARRAY::setMEDSKYLINEARRAY( const med_int count , const med_int length, med_int* index , med_int* value ) 
+MEDSKYLINEARRAY::MEDSKYLINEARRAY(const med_int count, const med_int length,
+				 const med_int* index, const med_int* value):
+                                _count(count), _length(length),
+                                _index(_count+1),_value(_length)
 {
-  MESSAGE("void MEDSKYLINEARRAY::setMEDSKYLINEARRAY(count, length, index, value)");
-  _count  = count  ;
-  _length = length ;
-
-  //if (_index != NULL) delete [] _index;
-  //if (_value != NULL) delete [] _value;
-
-	  _index.set(index);
-	  _value.set(value);
+	MESSAGE("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
+	memcpy((med_int*)_index,index,sizeof(med_int)*(_count+1));
+	memcpy((med_int*)_value,value,sizeof(med_int)*_length);
 }
+
+//  void MEDSKYLINEARRAY::setMEDSKYLINEARRAY( const med_int count , const med_int length, med_int* index , med_int* value )
+//  {
+//    MESSAGE("void MEDSKYLINEARRAY::setMEDSKYLINEARRAY(count, length, index, value)");
+//    _count  = count  ;
+//    _length = length ;
+
+//    //if (_index != NULL) delete [] _index;
+//    //if (_value != NULL) delete [] _value;
+
+//  	  _index.set(index);
+//  	  _value.set(value);
+//  }
