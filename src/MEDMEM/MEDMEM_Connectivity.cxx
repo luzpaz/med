@@ -1945,7 +1945,7 @@ ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
 	    }
 	}
 
-	os << "Polygons : " << co.getNumberOfPolygons() << " polygons" << endl;
+	os << endl << "MED_POLYGON : " << co.getNumberOfPolygons() << " polygons" << endl;
 	if (co.getNumberOfPolygons() > 0)
 	  {
 	    const med_int* polygonsconnectivity = co.getPolygonsConnectivity(MED_NODAL,co.getEntity());
@@ -1960,7 +1960,7 @@ ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
 	      }
 	  }
 
-	os << "Polyhedron : " << co.getNumberOfPolyhedron() << " polyhedron" << endl;
+	os << endl << "MED_POLYHEDRA : " << co.getNumberOfPolyhedron() << " polyhedron" << endl;
 	if (co.getNumberOfPolyhedron() > 0)
 	  {
 	    const med_int* polyhedronconnectivity = co.getPolyhedronConnectivity(MED_NODAL);
@@ -1999,7 +1999,7 @@ ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
 	      }
 	  }
 
-	os << "Polygons : " << co.getNumberOfPolygons() << " polygons" << endl;
+	os << endl << "MED_POLYGON : " << co.getNumberOfPolygons() << " polygons" << endl;
 	if (co.getNumberOfPolygons() > 0)
 	  {
 	    const med_int* polygonsconnectivity = co.getPolygonsConnectivity(MED_DESCENDING,co.getEntity());
@@ -2014,7 +2014,7 @@ ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
 	      }
 	  }
 
-	os << "Polyhedron : " << co.getNumberOfPolyhedron() << " polyhedron" << endl;
+	os << endl << "MED_POLYHEDRA : " << co.getNumberOfPolyhedron() << " polyhedron" << endl;
 	if (co.getNumberOfPolyhedron() > 0)
 	  {
 	    const med_int* polyhedronconnectivity = co.getPolyhedronConnectivity(MED_DESCENDING);
