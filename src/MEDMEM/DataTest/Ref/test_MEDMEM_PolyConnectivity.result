@@ -1,0 +1,26 @@
+
+------------- Entity = MED_CELL -------------
+
+MedConnectivity : MED_NODAL
+Entity dimension : 0
+Number of nodes : 0
+Number of types : 0
+Polygons : 2 polygons
+1 2 3 4 5 10 
+10 5 6 7 8 9 
+Polyhedron : 2 polyhedron
+1 2 3 4 5 6 | 1 7 8 2 | 2 8 9 3 | 4 3 9 10 | 5 4 10 11 | 6 5 11 12 | 1 6 12 7 | 7 12 8 | 10 9 8 12 11 
+13 14 15 3 2 | 13 2 8 16 | 14 13 16 17 | 15 14 17 | 15 17 18 | 15 18 9 | 3 15 9 | 2 3 9 8 | 8 9 17 16 | 9 18 17 
+
+------------- Entity = MED_CELL -------------
+
+MedConnectivity : MED_DESCENDING
+Entity dimension : 0
+Number of nodes : 0
+Number of types : 0
+Polygons : 2 polygons
+1 2 3 4 11 10 
+11 5 6 7 8 9 
+Polyhedron : 2 polyhedron
+1 2 3 4 5 6 7 8 9 
+10 11 12 13 14 15 16 3 17 18 

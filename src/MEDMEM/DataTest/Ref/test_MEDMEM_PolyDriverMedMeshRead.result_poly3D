@@ -1,0 +1,103 @@
+Space Dimension : 3
+
+Mesh Dimension : 3
+
+SHOW NODES COORDINATES : 
+Name :
+ - x
+ - y
+ - z
+Unit :
+ - cm
+ - cm
+ - cm
+Nodes 1 : 2 3 2 
+Nodes 2 : 3 2 2 
+Nodes 3 : 4 1 2 
+Nodes 4 : 2 0 2 
+Nodes 5 : 0 1 2 
+Nodes 6 : 1 2 2 
+Nodes 7 : 2 3 1 
+Nodes 8 : 3 2 0 
+Nodes 9 : 4 1 0 
+Nodes 10 : 2 0 0 
+Nodes 11 : 0 1 0 
+Nodes 12 : 1 2 0 
+Nodes 13 : 5 3 2 
+Nodes 14 : 7 2 2 
+Nodes 15 : 6 0 2 
+Nodes 16 : 6 3 0 
+Nodes 17 : 7 2 0 
+Nodes 18 : 6 0 -1 
+Nodes 19 : 5 1 -3 
+
+SHOW CONNECTIVITY  :
+
+------------- Entity = MED_CELL -------------
+
+MedConnectivity : MED_NODAL
+Entity dimension : 3
+Number of nodes : 19
+Number of types : 1
+  -> Type 304 (MED_TETRA4) : 1 elements
+
+MED_TETRA4 : 
+     1 : 17 9 18 19 
+
+MED_POLYGON : 3 polygons
+1 2 3 4 5 6 
+10 9 8 12 11 
+13 14 15 3 2 
+
+MED_POLYHEDRA : 2 polyhedron
+1 2 3 4 5 6 | 1 7 8 2 | 2 8 9 3 | 4 3 9 10 | 5 4 10 11 | 6 5 11 12 | 1 6 12 7 | 7 12 8 | 10 9 8 12 11 
+13 14 15 3 2 | 13 2 8 16 | 14 13 16 17 | 15 14 17 | 15 17 18 | 15 18 9 | 3 15 9 | 2 3 9 8 | 8 9 17 16 | 9 18 17 
+
+
+------------- Entity = MED_FACE -------------
+
+MedConnectivity : MED_NODAL
+Entity dimension : 2
+Number of nodes : 0
+Number of types : 2
+  -> Type 203 (MED_TRIA3) : 6 elements
+  -> Type 204 (MED_QUAD4) : 8 elements
+
+MED_TRIA3 : 
+     1 : 7 12 8 
+     2 : 15 14 17 
+     3 : 15 17 18 
+     4 : 15 18 9 
+     5 : 3 15 9 
+     6 : 18 17 9 
+
+MED_QUAD4 : 
+     1 : 1 7 8 2 
+     2 : 2 8 9 3 
+     3 : 4 3 9 10 
+     4 : 5 4 10 11 
+     5 : 6 5 11 12 
+     6 : 1 6 12 7 
+     7 : 14 13 16 17 
+     8 : 8 9 17 16 
+
+MED_POLYGON : 0 polygons
+
+MED_POLYHEDRA : 0 polyhedron
+
+
+
+SHOW FAMILIES :
+
+NumberOfFamilies on MED_NOEUD : 0
+NumberOfFamilies on MED_MAILLE : 0
+NumberOfFamilies on MED_FACE : 0
+NumberOfFamilies on MED_ARETE : 0
+
+SHOW GROUPS :
+
+NumberOfGroups on MED_NOEUD : 0
+NumberOfGroups on MED_MAILLE : 0
+NumberOfGroups on MED_FACE : 0
+NumberOfGroups on MED_ARETE : 0
+

@@ -1,0 +1,131 @@
+- Lecture du fichier à l'aide de la bibliothèque MED-fichier V2.2.1 
+
+ >>>>>> DUMP DU FICHIER poly2D.med_copy >>>>>>
+(*****************)
+(* PARAMETRAGE : *)
+(*****************)
+- Mode d'affichage des coordonnées des noeuds ? 
+  1. Mode entrelacé : taper 1 
+  2. Mode non entrelacé : taper 2 
+  Reponse : - Connectivité des éléments ? 
+  1. Nodale : taper 1 
+  2. Descendante : taper 2 
+  Reponse : - Il y a 1 maillages dans ce fichier 
+  Lequel voulez-vous lire (1|2|3|...|n) ?
+  Reponse : 
+(*******************************)
+(* SCALAIRES HORS MODELE MED : *)
+(*******************************)
+- Nombre de variables scalaires : 0
+
+(********************************************)
+(* INFORMATIONS GENERALES SUR LE MAILLAGE : *)
+(********************************************)
+- Nom du maillage : <<poly2D>>
+- Dimension du maillage : 2
+- Type du maillage : MED_NON_STRUCTURE 
+- Description associee au maillage : 
+- Pas de nom universel 
+- Nombre de noeuds : 11 
+- Nombre de mailles de type MED_POINT1 : 0 
+- Nombre de mailles de type MED_SEG2 : 0 
+- Nombre de mailles de type MED_SEG3 : 0 
+- Nombre de mailles de type MED_TRIA3 : 1 
+- Nombre de mailles de type MED_TRIA6 : 0 
+- Nombre de mailles de type MED_QUAD4 : 4 
+- Nombre de mailles de type MED_QUAD8 : 0 
+- Nombre de mailles de type MED_TETRA4 : 0 
+- Nombre de mailles de type MED_TETRA10 : 0 
+- Nombre de mailles de type MED_HEXA8 : 0 
+- Nombre de mailles de type MED_HEXA20 : 0 
+- Nombre de mailles de type MED_PENTA6 : 0 
+- Nombre de mailles de type MED_PENTA15 : 0 
+- Nombre de mailles de type MED_PYRA5 : 0 
+- Nombre de mailles de type MED_PYRA13 : 0 
+- Nombre de mailles de type MED_POLYGONE : 1 
+- Nombre de mailles de type MED_POLYEDRE : 0 
+- Nombre de faces de type MED_TRIA3 : 0 
+- Nombre de faces de type MED_TRIA6 : 0 
+- Nombre de faces de type MED_QUAD4 : 0 
+- Nombre de faces de type MED_QUAD8 : 0 
+- Nombre de faces de type MED_POLYGONE : 0 
+- Nombre d'aretes de type MED_SEG2 : 0 
+- Nombre d'aretes de type MED_SEG3 : 0 
+- Nombre de familles : 3 
+- Nombre d'equivalences : 0 
+
+(************************)
+(* NOEUDS DU MAILLAGE : *)
+(************************)
+- Type de repere des coordonnees : 0 
+- Nom des coordonnees : 
+ x                 y 
+- Unites des coordonnees : 
+ cm                cm 
+- Coordonnees des noeuds : 
+ 0.000000  0.000000  0.500000  0.000000  1.000000  0.000000  0.250000  0.500000  0.500000  0.500000  0.750000  0.500000  0.000000  1.000000  0.500000  1.000000  1.000000  1.000000  1.500000  0.000000  1.500000  1.000000 
+- Numeros des familles des noeuds : 
+ 0  0  0  0  0  0  0  0  0  0  0 
+
+(**************************)
+(* ELEMENTS DU MAILLAGE : *)
+(**************************)
+
+- Mailles de type MED_TRIA3 : 
+  - Connectivité : 
+ 7  4  1 
+  - Numéros de familles : 
+ -2 
+
+- Mailles de type MED_QUAD4 : 
+  - Connectivité : 
+ 4  5  2  1  5  6  3  2  7  8  5  4  8  9  6  5 
+  - Numéros de familles : 
+ -1  -1  0  0 
+
+- Mailles de type MED_POLYGONE : 
+ >> Maille MED_POLYGONE 1 : 
+
+  - Connectivité :  9  11  10  3  6 
+  - Numéro de famille : 0 
+
+(*************************)
+(* FAMILLES DU MAILLAGE : *)
+(*************************)
+- Famille 1 a 1 attribut(s) et 1 groupe(s) 
+  - Famille de nom FAMILLE_CELL_1 et de numero -1 : 
+  - Attributs : 
+   identificateur = 1 - valeur = -100 - description = description attribut
+  - Groupes :
+   groupe 0  = groupe0
+- Famille 2 a 1 attribut(s) et 1 groupe(s) 
+  - Famille de nom FAMILLE_CELL_2 et de numero -2 : 
+  - Attributs : 
+   identificateur = 1 - valeur = -200 - description = description attribut
+  - Groupes :
+   groupe 0  = groupe0
+- Famille 3 a 0 attribut(s) et 0 groupe(s) 
+  - Famille de nom FAMILLE_ZERO et de numero 0 : 
+  - Attributs : 
+  - Groupes :
+
+(******************************)
+(* EQUIVALENCES DU MAILLAGE : *)
+(******************************)
+- Aucune équivalence 
+
+(************************)
+(* CHAMPS DU MAILLAGE : *)
+(************************)
+- Nombre de champs : 0 
+
+Nombre de profils stockes : 0
+
+
+Nombre de liens stockes : 0
+
+
+Nombre de localisations stockees : 0
+
+
+ >>>>>> FIN DU DUMP DU FICHIER poly2D.med_copy >>>>>>
