@@ -37,6 +37,6 @@ LDFLAGS+= -lMEDImpl -lMEDMEM_Swigcmodule -L${KERNEL_ROOT_DIR}/lib/salome
 #############################################################################
 
 MED.hh MEDSK.cc: MED.idl
-	omniidl -bcxx -Wbtp -I$(top_builddir)/idl $^
+	omniidl -bcxx -Wbtp -I$(top_builddir)/idl -I${KERNEL_ROOT_DIR}/idl/salome $^
 
 @CONCLUDE@

@@ -40,6 +40,6 @@ LDFLAGS+=  $(OCC_LIBS) $(HDF5_LIBS) -lSalomeContainer -lSalomeHDFPersist -lSalom
 
 
 MED.hh MEDSK.cc: MED.idl
-	omniidl -bcxx -Wbtp -I$(top_builddir)/idl $^
+	omniidl -bcxx -Wbtp -I$(top_builddir)/idl -I${KERNEL_ROOT_DIR}/idl/salome $^
 
 @CONCLUDE@

@@ -48,6 +48,6 @@ LDFLAGS += -lSalomeGUI -lmedmem -lMEDImpl -lMEDEngine -L${KERNEL_ROOT_DIR}/lib/s
 
 
 MED.hh MEDSK.cc: MED.idl
-	omniidl -bcxx -Wbtp -I$(top_builddir)/idl $^
+	omniidl -bcxx -Wbtp -I$(top_builddir)/idl -I${KERNEL_ROOT_DIR}/idl/salome $^
 
 @CONCLUDE@

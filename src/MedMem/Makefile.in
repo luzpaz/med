@@ -51,6 +51,6 @@ LDFLAGS+=-lmedmem -lOpUtil -L${KERNEL_ROOT_DIR}/lib/salome
 # does we put only -lSalomeContainer and compiler retrieves -lSalomeNS -lRegistry -lOpUtil ????
 
 MED.hh MEDSK.cc: MED.idl
-	omniidl -bcxx -Wbtp -I$(top_builddir)/idl $^
+	omniidl -bcxx -Wbtp -I$(top_builddir)/idl -I${KERNEL_ROOT_DIR}/idl/salome $^
 
 @CONCLUDE@
