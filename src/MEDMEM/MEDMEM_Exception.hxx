@@ -21,6 +21,7 @@ using namespace std;
   Class used to throws exception.\n
   Inherits from public exception.
 */
+namespace MEDMEM {
 //--------------------------------------//
   class MEDEXCEPTION : public exception
 //--------------------------------------//
@@ -54,6 +55,7 @@ public :
   MED_DRIVER_NOT_FOUND_EXCEPTION(const MED_DRIVER_NOT_FOUND_EXCEPTION &ex );
   ~MED_DRIVER_NOT_FOUND_EXCEPTION() throw();
 
+};
 };
 
 #endif	/* MEDEXCEPTION_HXX */

@@ -14,6 +14,7 @@ using namespace std;
 #include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 
+using namespace MEDMEM;
 int main (int argc, char ** argv) {
   
     string filenameIN = argv[1] ;

@@ -2,6 +2,7 @@ using namespace std;
 #include "utilities.h"
 #include "MEDMEM_Array.hxx"
 
+using namespace MEDMEM;
 int main (int argc, char ** argv) {
 
   int SpaceDimension = 3 ;

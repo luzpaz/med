@@ -24,6 +24,7 @@ using namespace MED_EN;
   the cell model it describes as cell dimensions, number of nodes...
 */
 
+namespace MEDMEM {
 class CELLMODEL 
 {
 
@@ -136,11 +137,13 @@ public :
 
 
 };
+};
 
 // ------------------------------------------
 //	Methodes Inline
 // ------------------------------------------
 
+using namespace MEDMEM;
 inline CELLMODEL::CELLMODEL():
     _type(MED_NONE),
     _dimension(0),

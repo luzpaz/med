@@ -5,6 +5,7 @@ using namespace std;
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Group.hxx"
 #include <algorithm>
+using namespace MEDMEM;
 
 
 // Cet opérateur permet d'ordonner les mailles dans un set suivant l'ordre requis par MED
@@ -66,7 +67,7 @@ return entity;
 END_OF(LOC);
 };
 
-std::ostream& operator << (std::ostream& os, const _maille& ma)
+std::ostream& MEDMEM::operator << (std::ostream& os, const _maille& ma)
 {
     os << "maille " << ma.ordre << " (" << ma.geometricType << ") : < ";
     std::vector< std::map<int,_noeud>::iterator >::const_iterator i=ma.sommets.begin();
@@ -77,7 +78,7 @@ std::ostream& operator << (std::ostream& os, const _maille& ma)
     return os;
 }
 
-std::ostream& operator << (std::ostream& os, const _groupe& gr)
+std::ostream& MEDMEM::operator << (std::ostream& os, const _groupe& gr)
 {
     os << "--- Groupe " << gr.nom << " --- " << std::endl ;
     os << " -> liste des sous-groupes : ";
@@ -89,7 +90,7 @@ std::ostream& operator << (std::ostream& os, const _groupe& gr)
     return os;
 }
 
-std::ostream& operator << (std::ostream& os, const _noeud& no)
+std::ostream& MEDMEM::operator << (std::ostream& os, const _noeud& no)
 {
     os << "noeud " << no.number << " : < ";
     std::vector<double>::const_iterator i=no.coord.begin();
@@ -100,7 +101,7 @@ std::ostream& operator << (std::ostream& os, const _noeud& no)
     return os;
 }
 
-std::ostream& operator << (std::ostream& os, const _intermediateMED& mi)
+std::ostream& MEDMEM::operator << (std::ostream& os, const _intermediateMED& mi)
 {
     os << "Set des mailles : " << std::endl;
     for( std::set<_maille>::const_iterator i=mi.maillage.begin(); i!=mi.maillage.end(); ++i)

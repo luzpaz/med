@@ -85,7 +85,7 @@ bool MedGUI::OnGUIEvent (int theCommandID, QAD_Desktop* parent)
 	int myStudyId = myActiveStudy->getStudyId();
 
 	// load MED engine
-	Engines::Med_Gen_ptr medgen = InitMedGen(parent);
+	SALOME_MED::MED_Gen_ptr medgen = InitMedGen(parent);
 
 	// Selection du Fichier
 	file = QAD_FileDlg::getFileName(parent,
@@ -139,7 +139,7 @@ bool MedGUI::OnGUIEvent (int theCommandID, QAD_Desktop* parent)
 	int myStudyId = myActiveStudy->getStudyId();
 
 	// load MED engine
-	Engines::Med_Gen_ptr medgen = InitMedGen(parent);
+	SALOME_MED::MED_Gen_ptr medgen = InitMedGen(parent);
 
 	// Selection du Fichier
 	file = QAD_FileDlg::getFileName(parent,
@@ -192,7 +192,7 @@ bool MedGUI::OnGUIEvent (int theCommandID, QAD_Desktop* parent)
 	int myStudyId = myActiveStudy->getStudyId();
 
 	// load MED engine
-	Engines::Med_Gen_ptr medgen = InitMedGen(parent);
+	SALOME_MED::MED_Gen_ptr medgen = InitMedGen(parent);
 
 	// Selection du Fichier
 	file = QAD_FileDlg::getFileName(parent,
@@ -458,7 +458,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
 
   int k = MEDMesh->getNumberOfNodes() ;
   SCRUTE(k);
-  Engines::double_array_var coords = MEDMesh->getCoordinates( SALOME_MED::MED_FULL_INTERLACE );
+  SALOME_MED::double_array_var coords = MEDMesh->getCoordinates( SALOME_MED::MED_FULL_INTERLACE );
   int i = 0;
   int lu = 0;
   while (lu < k ) {
@@ -487,7 +487,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
     SCRUTE(identfam);
     int nbelemnts=Families[k]->getNumberOfElements(SALOME_MED::MED_NONE);
     SCRUTE(nbelemnts);
-    Engines::long_array_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MED_NONE);
+    SALOME_MED::long_array_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MED_NONE);
     for (int l=0;l<tabnoeuds->length();l++)
       SCRUTE(tabnoeuds[l]); 
   }
@@ -499,7 +499,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
   //     SCRUTE(nomFam);
   //     int identfam=Family->getIdentifier();
   //     SCRUTE(identfam);
-  //     Engines::long_array_var tabnoeuds=Family->getNumber(SALOME_MED::MED_NONE);
+  //     SALOME_MED::long_array_var tabnoeuds=Family->getNumber(SALOME_MED::MED_NONE);
   //     for (int l=0;l<tabnoeuds->length();l++)
   //       SCRUTE(tabnoeuds[l]); 
 
@@ -520,7 +520,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
 //    if ( Fam->_is_nil() )
 //      return false;
 
-//    Engines::long_array_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
+//    SALOME_MED::long_array_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
 //    for (int l=0;l<tabnoeuds->length();l++)
 //      SCRUTE(tabnoeuds[l]); 
 
@@ -537,7 +537,7 @@ bool MedGUI::DumpSubMesh( SALOME_MED::FAMILY_var Fam )
   if ( Fam->_is_nil() )
     return false;
 
-  Engines::long_array_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
+  SALOME_MED::long_array_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
   for (int l=0;l<tabnoeuds->length();l++)
     SCRUTE(tabnoeuds[l]); 
 
@@ -549,12 +549,12 @@ bool MedGUI::DumpSubMesh( SALOME_MED::FAMILY_var Fam )
  *
  */
 //=============================================================================
-Engines::Med_Gen_ptr MedGUI::InitMedGen(QAD_Desktop* parent)
+SALOME_MED::MED_Gen_ptr MedGUI::InitMedGen(QAD_Desktop* parent)
 {
   Engines::Component_var comp = 
     parent->getEngine("FactoryServer", "MED");
   MESSAGE("_________________________________________");
-  Engines::Med_Gen_var clr = Engines::Med_Gen::_narrow(comp);
+  SALOME_MED::MED_Gen_var clr = SALOME_MED::MED_Gen::_narrow(comp);
   ASSERT(!CORBA::is_nil(clr));
   return clr._retn();
 }

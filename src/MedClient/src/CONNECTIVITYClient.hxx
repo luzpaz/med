@@ -5,6 +5,7 @@
 #include "MEDMEM_Connectivity.hxx"
 #include CORBA_CLIENT_HEADER(MED)
 
+namespace MEDMEM {
 class CONNECTIVITYClient : public CONNECTIVITY {
 
 protected:
@@ -56,6 +57,7 @@ public:
  
   const med_int* getValueIndex        (medConnectivity TypeConnectivity);
   const med_int* getNeighbourhood() const;
+};
 };
 
 

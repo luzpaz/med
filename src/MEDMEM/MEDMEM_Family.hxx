@@ -14,7 +14,7 @@
   All families on one entity represent a mesh partition for this entity.
 
 */
-
+namespace MEDMEM {
 class FAMILY : virtual public SUPPORT
 {
 protected :
@@ -119,9 +119,10 @@ public:
   inline string   getAttributeDescription(int i) const;
   inline string   getGroupName(int i)            const;
 };
+};
 
+using namespace MEDMEM;
 // inline methods :
-
 /*! Sets the attribute _identifier to Identifier. */
 //----------------------------------------------
 inline void FAMILY::setIdentifier(int Identifier)         
@@ -261,6 +262,4 @@ inline string FAMILY::getGroupName(int i) const
 { 
     return _groupName[i-1] ; 
 }
-  
-
 #endif /* FAMILY_HXX */

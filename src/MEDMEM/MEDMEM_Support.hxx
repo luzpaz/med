@@ -13,13 +13,11 @@
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
-
 #include "MEDMEM_SkyLineArray.hxx"
-//#include "MEDMEM_Mesh.hxx"
 
 using namespace MED_EN;
+using namespace MEDMEM;
 
-class MESH ;
 
 /*!
 
@@ -30,6 +28,8 @@ class MESH ;
 
 */
 
+namespace MEDMEM {
+class MESH ;
 class SUPPORT
 {
 protected:
@@ -194,10 +194,12 @@ public:
 
   void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
 };
+};
 // _____________________
 // Methodes Inline
 // _____________________
 
+using namespace MEDMEM;
 /*!
   This method returns the number of all elements of the type GeometricType.
 

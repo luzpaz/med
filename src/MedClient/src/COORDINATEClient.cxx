@@ -1,6 +1,15 @@
+#define _DEBUG_
 #include "COORDINATEClient.hxx"
 #include <string>
 #include "UtilClient.hxx"
+#include "Utils_CorbaException.hxx"
+
+using namespace MEDMEM;
+//=============================================================================
+/*!
+ * Constructeur
+ */
+//=============================================================================
 
 COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m, 
 				   medModeSwitch Mode) :
@@ -14,35 +23,59 @@ COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
 
   END_OF("COORDINATEClient::COORDINATEClient(...)");
 }
-
+//=============================================================================
+/*!
+ * Remplit les informations générales
+ */
+//=============================================================================
 void COORDINATEClient::blankCopy()
 {
   BEGIN_OF("void COORDINATEClient::blankCopy()");
 
   std::string *tA;
   long nA;
-  
-  convertCorbaArray(tA, nA, IOR_Mesh->getCoordinatesNames());
+  SALOME_MED::MESH::coordinateInfos *all = new SALOME_MED::MESH::coordinateInfos;
+  try
+  {
+        all= IOR_Mesh->getCoordGlobal();
+  }
+  catch (const exception & ex)
+  {
+        MESSAGE("Unable to acces Global information");
+        THROW_SALOME_CORBA_EXCEPTION(ex.what() ,SALOME::INTERNAL_ERROR);
+  }
+
+  //convertCorbaArray(tA, nA, IOR_Mesh->getCoordinatesNames());
+  convertCorbaArray(tA, nA, &all->coordNames);
   ASSERT(nA == getSpaceDimension());
   setCoordinatesNames(tA);
   delete [] tA;
   
-  convertCorbaArray(tA, nA, IOR_Mesh->getCoordinatesUnits());
+  //convertCorbaArray(tA, nA, IOR_Mesh->getCoordinatesUnits());
+  convertCorbaArray(tA, nA, &all->coordUnits);
   ASSERT(nA == getSpaceDimension());
   setCoordinatesUnits(tA);
   delete [] tA;
   
-  setCoordinatesSystem(IOR_Mesh->getCoordinatesSystem());
+
+  setCoordinatesSystem( CORBA::string_dup(all->coordSystem));
   
   _complete = false;
 
   END_OF("void COORDINATEClient::blankCopy()");
 }
+//=============================================================================
+/*!
+ * Remplit les coordonnées 
+ */
+//=============================================================================
 
 void COORDINATEClient::fillCopy()
 {
   BEGIN_OF("void COORDINATEClient::fillCopy()");
 
+  //PN ?? Est-ce qu on peut pas mettre une variable dans COORDINATEClient
+  // qu on remplirait dans blankCopy ??
   long nN = IOR_Mesh->getNumberOfNodes();
   double *tC;
   long nC;
@@ -57,6 +90,11 @@ void COORDINATEClient::fillCopy()
   END_OF("void COORDINATEClient::fillCopy()");
 }
 
+//=============================================================================
+/*!
+ * Retourne les coordonnées 
+ */
+//=============================================================================
 
 const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 {
@@ -69,8 +107,13 @@ const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 
   return c;
 }
+//=============================================================================
+/*!
+ * Retourne une coordonnée 
+ */
+//=============================================================================
 
-double          COORDINATEClient::getCoordinate(int Number,int Axis)
+double COORDINATEClient::getCoordinate(int Number,int Axis)
 {
   BEGIN_OF("void COORDINATEClient::getCoordinate()");
 
@@ -81,7 +124,11 @@ double          COORDINATEClient::getCoordinate(int Number,int Axis)
 
   return d;
 }
-
+//=============================================================================
+/*!
+ * Retourne un axe 
+ */
+//=============================================================================
 const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 {
   BEGIN_OF("void COORDINATEClient::getCoordinateAxis()");
@@ -93,7 +140,11 @@ const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 
   return c;
 }
-
+//=============================================================================
+/*!
+ * Retourne le nombre de noeuds
+ */
+//=============================================================================
 const int*      COORDINATEClient::getNodesNumbers() const
 {
   BEGIN_OF("void COORDINATEClient::getNodesNumbers()");

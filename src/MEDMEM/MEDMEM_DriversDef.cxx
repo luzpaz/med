@@ -28,12 +28,12 @@ GEO_NAME::GEO_NAME() : map<int,string>()
   assert( table.find( (int)MED_PYRA13 ) != table.end() ) ;
 }
  
-// GEO_NAME::~GEO_NAME()
-// {
+GEO_NAME::~GEO_NAME()
+{
 //   MESSAGE(" destructor GEO_NAME::~GEO_NAME() "<< size() );
-//   //  clear();
+//   clear();
 //   MESSAGE(" end of destructor GEO_NAME::~GEO_NAME() "<< size() );
-// }
+}
  
 string & GEO_NAME::operator[]( const med_geometrie_element &c ) const
 {
@@ -55,12 +55,12 @@ ENT_NAME::ENT_NAME() : map<int,string>()
   table[(int)MED_NOEUD  ] = "MED_NOEUD";
 }
 
-// ENT_NAME::~ENT_NAME()
-// {
+ENT_NAME::~ENT_NAME()
+{
 //   MESSAGE(" destructor ENT_NAME::~ENT_NAME() "<< size() );
-//   //  clear();
+//   clear();
 //   MESSAGE(" end of destructor ENT_NAME::~ENT_NAME() "<< size() );
-// }
+}
 
 string & ENT_NAME::operator[]( const med_entite_maillage &c ) const
 {
@@ -126,12 +126,12 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<med_geometrie_element> >()
   
 }
 
-// MESH_ENTITIES::~MESH_ENTITIES()
-// {
+MESH_ENTITIES::~MESH_ENTITIES()
+{
 //   MESSAGE(" destructor MESH_ENTITIES::~MESH_ENTITIES() "<< size() );
-//   //  clear();
+//   clear();
 //   MESSAGE(" end of destructor MESH_ENTITIES::~MESH_ENTITIES() "<< size() );
-// }
+}
 
 const list<med_geometrie_element> & MESH_ENTITIES::operator[]( const  med_entite_maillage &c ) const
 {

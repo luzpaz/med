@@ -1,6 +1,8 @@
+using namespace std;
+
 #include "MEDMEM_GibiMeshDriver.hxx"
 #include "MEDMEM_Mesh.hxx"
-
+using namespace MEDMEM;
 int main (int argc, char ** argv)
 {
     /* process the arguments */

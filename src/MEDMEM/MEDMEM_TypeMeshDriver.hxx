@@ -11,10 +11,7 @@
 #include "MEDMEM_Exception.hxx"
 #include "utilities.h"
 
-class MESH;
-class FAMILY;
-class GROUP;
-class CONNECTIVITY;
+using namesapce MEDMEM;
 
 /*!
 
@@ -25,6 +22,11 @@ class CONNECTIVITY;
 */
 
 
+namespace MEDMEM {
+class MESH;
+class FAMILY;
+class GROUP;
+class CONNECTIVITY;
 class TYPE_MESH_DRIVER : public GENDRIVER
 {
 protected:
@@ -203,6 +205,7 @@ public :
 private:
   GENDRIVER * copy(void) const ;
 
+};
 };
 
 

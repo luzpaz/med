@@ -16,6 +16,7 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
+using namespace MEDMEM;
 int myfunction1(int x)
 {
     return 2*x;

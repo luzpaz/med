@@ -5,6 +5,7 @@
 #include "MEDMEM_Coordinate.hxx"
 #include CORBA_CLIENT_HEADER(MED)
 
+namespace MEDMEM {
 class COORDINATEClient : public COORDINATE {
 
 protected:
@@ -54,6 +55,7 @@ public:
   virtual const double *  getCoordinateAxis(int Axis);
   virtual const int*      getNodesNumbers() const;
 
+};
 };
 
 #endif

@@ -12,6 +12,7 @@ using namespace std;
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_VtkMedDriver.hxx"
 
+using namespace MEDMEM;
 void usage(char * name)
 {
   cout << "  " << name << " <input med file> <output vtk file> " <<endl ;

@@ -10,8 +10,7 @@ using namespace std ;
 
 #include "MEDMEM_define.hxx"
 #include "utilities.h"
-namespace MED_FR 
-{
+namespace MED_FR {
 
 /*!  This Class inherits from  map. /n
      It is a constant map association int (which is a med_geometrie_element) and string. /n
@@ -28,7 +27,7 @@ class GEO_NAME : public map<int,string>
 public :
   
   GEO_NAME();
-  //  ~GEO_NAME();
+  ~GEO_NAME();
   string & operator[]( const MED_FR::med_geometrie_element &c ) const;
 } ;
 
@@ -52,7 +51,7 @@ class ENT_NAME : public map<int,string>
 public :
 
   ENT_NAME ();
-  //  ~ENT_NAME();
+  ~ENT_NAME();
   string & operator[]( const MED_FR::med_entite_maillage &c ) const;
 } ;
 
@@ -77,7 +76,7 @@ class MESH_ENTITIES : public map<int, const list<MED_FR::med_geometrie_element> 
 public :
 
   MESH_ENTITIES ();
-  //  ~MESH_ENTITIES();
+  ~MESH_ENTITIES();
   const list<MED_FR::med_geometrie_element> & operator[]( const  MED_FR::med_entite_maillage &c ) const;
   
 private:

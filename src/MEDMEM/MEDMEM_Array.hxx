@@ -39,6 +39,7 @@ using namespace MED_EN;
   A simple test program (testUArray) allows to test this class.
 */
 
+namespace MEDMEM {
 template <class T> class MEDARRAY
 {
 private :
@@ -96,6 +97,7 @@ public :
   bool isOtherCalculated() const {return (const T*)_valuesOther != NULL;}
   void clearOtherMode();
 };
+}
 
 //-------------------------------------------------//
 //                                                 //

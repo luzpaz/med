@@ -1,6 +1,7 @@
 using namespace std;
 #include "MEDMEM_SkyLineArray.hxx"
 #include "utilities.h"
+using namespace MEDMEM;
 
 MEDSKYLINEARRAY::MEDSKYLINEARRAY(): _count(0), _length(0),
 				_index((med_int*)NULL),_value((med_int*)NULL)

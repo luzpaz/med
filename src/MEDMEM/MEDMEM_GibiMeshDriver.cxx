@@ -17,6 +17,7 @@ using namespace std;
 
 /////
 using namespace MED_EN;
+using namespace MEDMEM;
 /////
 
 

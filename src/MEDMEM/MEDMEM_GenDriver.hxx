@@ -8,8 +8,6 @@
 
 /* Generic Read/Write Driver Class for Meshes & Fields */
 
-/* Modify the following line to add a new driver type (step 1) */
-typedef enum { MED_DRIVER = 0, GIBI_DRIVER = 1, VTK_DRIVER = 254, NO_DRIVER = 255 } driverTypes;
 
 using namespace MED_EN;
 using namespace std;
@@ -19,7 +17,10 @@ using namespace std;
   Virtual class GENDRIVER use by all driver.
 
 */
+namespace MEDMEM {
 
+/* Modify the following line to add a new driver type (step 1) */
+typedef enum { MED_DRIVER = 0, GIBI_DRIVER = 1, VTK_DRIVER = 254, NO_DRIVER = 255 } driverTypes;
 class GENDRIVER {
 
 protected :
@@ -106,6 +107,7 @@ public:
   string getFileName () const;
   void   setFileName ( const string & fileName);
   med_mode_acces getAccessMode() const;
+};
 };
 
 

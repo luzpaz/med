@@ -4,6 +4,7 @@
 #include <vector>
 #include <utilities.h>
 
+namespace MEDMEM {
 template <typename TLocal, 
 	  typename TCorbaSeq,
 	  typename Tint>
@@ -108,6 +109,7 @@ inline void convertCorbaArray (vector<TLocal> & T, int &nT,
     SCRUTE(T[i]);
   }
  
+}
 }
 
 #endif

@@ -7,6 +7,7 @@
 #include CORBA_CLIENT_HEADER(MED)
 #include "SUPPORTClient.hxx"
 
+namespace MEDMEM {
 class GROUPClient : 
   public SUPPORTClient,
   public GROUP
@@ -28,5 +29,6 @@ public :
   virtual void fillCopy();
 };
 
+}
 
 #endif

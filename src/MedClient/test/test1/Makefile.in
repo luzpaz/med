@@ -28,7 +28,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=../../../..
 srcdir=@srcdir@
-VPATH=.:@srcdir@:@top_srcdir@/bin:@top_srcdir@/resources:@top_builddir@/bin:@top_srcdir@/idl:${KERNEL_ROOT_DIR}/idl/salome
+VPATH=.:@srcdir@:@top_srcdir@/bin:@top_srcdir@/resources:@srcdir@/resources:@top_srcdir@/idl:${KERNEL_ROOT_DIR}/idl/salome
 
 @COMMENCE@
 
@@ -51,6 +51,21 @@ BIN_SRC =
 
 LDFLAGS+=
 
+# copy python scripts in $(top_builddir)/bin/salome
+#
+DEST_PYSCRIPTS = $(EXPORT_PYSCRIPTS:%=$(top_builddir)/bin/salome/%)
+pyscripts: $(DEST_PYSCRIPTS)
+$(DEST_PYSCRIPTS): $(top_builddir)/bin/salome/%: %
+	cp -f $< $@
+
+# Install python script in $(bindir)
+install-python: $(bindir) $(EXPORT_PYSCRIPTS:%=install-%)
+
+$(EXPORT_PYSCRIPTS:%=install-%): install-%: %
+	$(INSTALL_PROGRAM) $< $(bindir)/.
 
 @MODULE@
 
+bin: pyscripts
+
+install: install-python

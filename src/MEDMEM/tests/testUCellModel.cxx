@@ -30,6 +30,7 @@ using namespace std;
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_DriversDef.hxx"
+using namespace MEDMEM;
 
 void usage(char * name)
 {

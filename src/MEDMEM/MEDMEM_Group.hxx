@@ -8,10 +8,8 @@
 
 #include <vector>
 #include <list>
-//#include "MEDMEM_Support.hxx"
 #include "MEDMEM_Family.hxx"
 
-class FAMILY;
 
 /*!
 
@@ -21,6 +19,8 @@ class FAMILY;
 
 */
 
+namespace MEDMEM {
+class FAMILY;
 class GROUP : virtual public SUPPORT
 {
 protected :
@@ -63,8 +63,10 @@ public:
   inline FAMILY * 	 getFamily(int i) const ;
 
 };
+};
 
 // inline method :
+using namespace MEDMEM;
 
 /*! set the attribut _numberOfFamilies to numberOfFamilies */
 //----------------------------------------------------------

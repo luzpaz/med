@@ -1,9 +1,9 @@
 //=============================================================================
-// File      : Mesh_i.cxx
+// File      : MEDMEM_Mesh_i.cxx
 // Project   : SALOME
 // Author    : EDF 
 // Copyright : EDF 2002
-// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Mesh_i.cxx
+// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Mesh_i.cxx
 //=============================================================================
 
 #include <vector>
@@ -13,17 +13,18 @@
 #include "Utils_ORB_INIT.hxx"
 #include "Utils_SINGLETON.hxx"
 
-#include "convert.hxx"
-#include "Mesh_i.hxx"
-#include "Support_i.hxx"
-#include "Family_i.hxx"
-#include "Group_i.hxx"
-#include "FieldDouble_i.hxx"
+#include "MEDMEM_convert.hxx"
+#include "MEDMEM_Mesh_i.hxx"
+#include "MEDMEM_Support_i.hxx"
+#include "MEDMEM_Family_i.hxx"
+#include "MEDMEM_Group_i.hxx"
+#include "MEDMEM_FieldDouble_i.hxx"
 
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_CellModel.hxx"
+using namespace MEDMEM;
 
 // Initialisation des variables statiques
 map < int, ::MESH *> MESH_i::meshMap ;
@@ -63,7 +64,6 @@ MESH_i::MESH_i(::MESH * const m ) :_mesh(m),
 {
         BEGIN_OF("Constructor MESH_i(::MESH * const m )");
         MESH_i::meshMap[_corbaIndex]=_mesh;
-
 	SCRUTE(_mesh);
 
         END_OF("Constructor MESH_i(::MESH * const m )");
@@ -108,11 +108,10 @@ throw (SALOME::SALOME_Exception)
         {
 		return CORBA::string_dup(_mesh->getName().c_str());
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces the mesh name");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 }
 //=============================================================================
@@ -143,11 +142,10 @@ throw (SALOME::SALOME_Exception)
         {
 		return _mesh->getSpaceDimension();
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces the space dimension ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 }
 //=============================================================================
@@ -165,13 +163,57 @@ throw (SALOME::SALOME_Exception)
         {
 		return _mesh->getMeshDimension();
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces the mesh dimension ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 }
+//=============================================================================
+/*!
+ * CORBA: boolean indicating if mesh is a Grid
+ */
+//=============================================================================
+CORBA::Boolean MESH_i::getIsAGrid()
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                             SALOME::INTERNAL_ERROR);
+        try
+        {
+                return _mesh->getIsAGrid();
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to acces mesh flag isAGrid");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+}
+//=============================================================================
+/*!
+ * CORBA: boolean indicating if connectivity exists
+ */
+//=============================================================================
+CORBA::Boolean MESH_i::existConnectivity
+                       (SALOME_MED::medConnectivity connectivityType,
+                        SALOME_MED::medEntityMesh entity)
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                             SALOME::INTERNAL_ERROR);
+        try
+        {
+                return _mesh->existConnectivity(connectivityType,
+                                                convertIdlEntToMedEnt(entity));        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to acces mesh flag existConnectivity");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+}
+
 //=============================================================================
 /*!
  * CORBA: Accessor for Coordinates System
@@ -188,25 +230,45 @@ throw (SALOME::SALOME_Exception)
         {
 		return CORBA::string_dup(_mesh->getCoordinatesSystem().c_str());
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces the type of CoordinatesSystem");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
+}
+//=============================================================================
+/*!
+ * CORBA: Accessor for a specific coordinate
+ */
+//=============================================================================
+double MESH_i::getCoordinate(CORBA::Long Number, CORBA::Long Axis)
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                             SALOME::INTERNAL_ERROR);
+        try
+        {
+                 return _mesh->getCoordinate(Number,Axis);
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to acces this coordinate");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
 }
 //=============================================================================
 /*!
  * CORBA: Accessor for Coordinates
  */
 //=============================================================================
-Engines::double_array * MESH_i::getCoordinates(SALOME_MED::medModeSwitch typeSwitch)
+SALOME_MED::double_array * MESH_i::getCoordinates(SALOME_MED::medModeSwitch typeSwitch)
 throw (SALOME::SALOME_Exception)
 {
 	if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-	Engines::double_array_var myseq = new Engines::double_array;
+	SALOME_MED::double_array_var myseq = new SALOME_MED::double_array;
 	try
 	{
 		int spaceDimension=_mesh->getSpaceDimension();
@@ -220,11 +282,10 @@ throw (SALOME::SALOME_Exception)
 			myseq[i]=coordinates[i];
 		};
 	}
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {       
                 MESSAGE("Unable to acces the coordinates");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 	return myseq._retn();
 }
@@ -233,13 +294,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Coordinates Names
  */
 //=============================================================================
-Engines::string_array  * MESH_i::getCoordinatesNames() 
+SALOME_MED::string_array  * MESH_i::getCoordinatesNames() 
 throw (SALOME::SALOME_Exception)
 {
 	if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-	Engines::string_array_var myseq = new Engines::string_array;
+	SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
 	try
 	{
 		int spaceDimension=_mesh->getSpaceDimension();
@@ -250,11 +311,10 @@ throw (SALOME::SALOME_Exception)
                		myseq[i]=CORBA::string_dup(coordinatesName[i].c_str());
         	}
 	}
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {       
                 MESSAGE("Unable to acces the coordinates names");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
 
@@ -264,13 +324,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Coordinates Units
  */
 //=============================================================================
-Engines::string_array *  MESH_i::getCoordinatesUnits()
+SALOME_MED::string_array *  MESH_i::getCoordinatesUnits()
 throw (SALOME::SALOME_Exception)
 {
 	if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-	Engines::string_array_var myseq = new Engines::string_array;
+	SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
 	try
 	{
 		int spaceDimension=_mesh->getSpaceDimension();
@@ -281,11 +341,10 @@ throw (SALOME::SALOME_Exception)
                		 myseq[i]=CORBA::string_dup(coordinatesUnits[i].c_str());
         	};
 	}
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {       
                 MESSAGE("Unable to acces the coordinates units");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
 }
@@ -304,11 +363,10 @@ throw (SALOME::SALOME_Exception)
 	{
         	return _mesh->getNumberOfNodes();
 	}
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {       
                 MESSAGE("Unable to acces number of nodes");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -326,11 +384,32 @@ throw (SALOME::SALOME_Exception)
 	{
         	return _mesh->getNumberOfTypes(convertIdlEntToMedEnt(entity));
 	}
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {       
                 MESSAGE("Unable to acces number of differents types");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+}
+//=============================================================================
+/*!
+ * CORBA: Accessor for existing geometry element types
+ */
+//=============================================================================
+SALOME_MED::medGeometryElement MESH_i::getElementType (SALOME_MED::medEntityMesh entity,
+                                                       CORBA::Long number)
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                             SALOME::INTERNAL_ERROR);
+        try
+        {
+                return _mesh->getElementType(convertIdlEntToMedEnt(entity),number);
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to acces number of differents element types");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 
@@ -362,11 +441,10 @@ throw (SALOME::SALOME_Exception)
                         myseq[i]=convertMedEltToIdlElt(elemts[i]);
 		};
 	}
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {       
                 MESSAGE("Unable to acces coordinates");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 	return myseq._retn();
 }
@@ -393,11 +471,10 @@ throw (SALOME::SALOME_Exception)
 		return _mesh->getNumberOfElements(convertIdlEntToMedEnt(entity),
 						  convertIdlEltToMedElt(geomElement));
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces number of elements");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 }
 //=============================================================================
@@ -405,7 +482,7 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for connectivities
  */
 //=============================================================================
-Engines::long_array *  MESH_i::getConnectivity(SALOME_MED::medModeSwitch typeSwitch,
+SALOME_MED::long_array *  MESH_i::getConnectivity(SALOME_MED::medModeSwitch typeSwitch,
 					       SALOME_MED::medConnectivity mode, 
 					       SALOME_MED::medEntityMesh entity, 
 					       SALOME_MED::medGeometryElement geomElement)
@@ -417,7 +494,7 @@ throw (SALOME::SALOME_Exception)
 	if (verifieParam(entity,geomElement)==false)
                 THROW_SALOME_CORBA_EXCEPTION("parameters don't match",\
                                              SALOME::BAD_PARAM);
-        Engines::long_array_var myseq= new Engines::long_array;
+        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
                 int nbelements; 
@@ -454,11 +531,10 @@ SCRUTE(nbelements);
                         myseq[i]=numbers[i];
                 }
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces connectivities");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
 }
@@ -467,14 +543,14 @@ SCRUTE(nbelements);
  * CORBA: Accessor for connectivities
  */
 //=============================================================================
-Engines::long_array* MESH_i::getConnectivityIndex(SALOME_MED::medConnectivity mode, 
+SALOME_MED::long_array* MESH_i::getConnectivityIndex(SALOME_MED::medConnectivity mode, 
 						  SALOME_MED::medEntityMesh entity) 
 throw (SALOME::SALOME_Exception)
 {
 	if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-        Engines::long_array_var myseq= new Engines::long_array;
+        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
 		int nbelements = _mesh->getNumberOfElements(
@@ -488,14 +564,43 @@ throw (SALOME::SALOME_Exception)
                         myseq[i]=numbers[i];
                 }
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces connectivities index");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
 }
+//=============================================================================
+/*!
+ * CORBA: Accessor for connectivities
+ */
+//=============================================================================
+SALOME_MED::long_array* MESH_i::getGlobalNumberingIndex( SALOME_MED::medEntityMesh entity)
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                             SALOME::INTERNAL_ERROR);
+        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        try
+        {
+                int nbelements = _mesh->getNumberOfTypes( convertIdlEntToMedEnt(entity)) + 1;
+                myseq->length(nbelements);
+                const int * numbers=_mesh->getGlobalNumberingIndex( convertIdlEntToMedEnt(entity));
+                for (int i=0;i<nbelements;i++)
+                {
+                        myseq[i]=numbers[i];
+                }
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to acces global index");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+        return myseq._retn();
+}
+
 //=============================================================================
 /*!
  * CORBA: get global element number in connectivity array
@@ -506,7 +611,7 @@ throw (SALOME::SALOME_Exception)
 CORBA::Long MESH_i::getElementNumber(SALOME_MED::medConnectivity mode,
 				     SALOME_MED::medEntityMesh entity,
 				     SALOME_MED::medGeometryElement type,
-				     const Engines::long_array& connectivity)
+				     const SALOME_MED::long_array& connectivity)
   throw (SALOME::SALOME_Exception)
 {
   if (_mesh==NULL)
@@ -534,13 +639,13 @@ CORBA::Long MESH_i::getElementNumber(SALOME_MED::medConnectivity mode,
  * not implemented for MED_ALL_ENTITIES and MED_MAILLE
  */
 //=============================================================================
-Engines::long_array* MESH_i::getReverseConnectivity(SALOME_MED::medConnectivity mode)
+SALOME_MED::long_array* MESH_i::getReverseConnectivity(SALOME_MED::medConnectivity mode)
 throw (SALOME::SALOME_Exception)
 {
 	if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-        Engines::long_array_var myseq= new Engines::long_array;
+        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
                 int nbelements; 
@@ -560,11 +665,10 @@ throw (SALOME::SALOME_Exception)
                         myseq[i]=numbers[i];
                 }
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces reverse connectivities");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
 }
@@ -573,13 +677,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for connectivities
  */
 //=============================================================================
-Engines::long_array* MESH_i::getReverseConnectivityIndex(SALOME_MED::medConnectivity mode)
+SALOME_MED::long_array* MESH_i::getReverseConnectivityIndex(SALOME_MED::medConnectivity mode)
 throw (SALOME::SALOME_Exception)
 {
 	if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-        Engines::long_array_var myseq= new Engines::long_array;
+        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
                 int nbelements; 
@@ -607,11 +711,10 @@ throw (SALOME::SALOME_Exception)
                         myseq[i]=numbers[i];
                 }
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces reverse connectivities index");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
 }
@@ -630,11 +733,10 @@ throw (SALOME::SALOME_Exception)
         {
 		return _mesh->getNumberOfFamilies(convertIdlEntToMedEnt(entity));
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces number of families of the mesh");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 }
 //=============================================================================
@@ -652,11 +754,10 @@ throw (SALOME::SALOME_Exception)
         {
 		return _mesh->getNumberOfGroups(convertIdlEntToMedEnt(entity));
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces number of groups of the mesh");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 }
 //=============================================================================
@@ -686,14 +787,85 @@ throw (SALOME::SALOME_Exception)
                         myseq[i] = f2;
                 }
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces families of the mesh");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
 }
+//=============================================================================
+/*!
+ * CORBA: Returns Coordinates global informations
+ */
+//=============================================================================
+SALOME_MED::MESH::coordinateInfos *  MESH_i::getCoordGlobal()
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                             SALOME::INTERNAL_ERROR);
+        SALOME_MED::MESH::coordinateInfos_var all = new SALOME_MED::MESH::coordinateInfos;
+        try
+        {
+                all->coordSystem = CORBA::string_dup(_mesh->getCoordinatesSystem().c_str());
+
+                int spaceDimension=_mesh->getSpaceDimension();
+                const string * coordinatesUnits =_mesh->getCoordinatesUnits();
+                const string * coordinatesName =_mesh->getCoordinatesNames();
+
+                all->coordUnits.length(spaceDimension);
+                all->coordNames.length(spaceDimension);
+                for (int i=0; i<spaceDimension; i++)
+                {
+                         all->coordUnits[i]=CORBA::string_dup(coordinatesUnits[i].c_str());
+                         all->coordNames[i]=CORBA::string_dup(coordinatesName[i].c_str());
+                }
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to acces coordinate information ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+        return all._retn();
+}
+//=============================================================================
+/*!
+ * CORBA: Returns connectivity global informations
+ */
+//=============================================================================
+SALOME_MED::MESH::connectivityInfos * MESH_i::getConnectGlobal
+                        (SALOME_MED::medEntityMesh entity)
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                             SALOME::INTERNAL_ERROR);
+        SALOME_MED::MESH::connectivityInfos_var all=new SALOME_MED::MESH::connectivityInfos;
+        try
+        {
+                all->numberOfNodes  = _mesh->getNumberOfNodes();
+
+                int nbTypes=_mesh->getNumberOfTypes(convertIdlEntToMedEnt(entity));
+                const medGeometryElement * elemts  =_mesh->getTypes(
+                                       convertIdlEntToMedEnt(entity));
+                all->meshTypes.length(nbTypes);
+                all->numberOfElements.length(nbTypes);
+                for (int i=0; i<nbTypes; i++)
+                {
+                        all->meshTypes[i]=convertMedEltToIdlElt(elemts[i]);
+                        all->numberOfElements[i]=_mesh->getNumberOfElements(
+                                       convertIdlEntToMedEnt(entity),elemts[i]);
+                }
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to acces connectivities informations");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+        return all._retn();
+}
+
 //=============================================================================
 /*!
  * CORBA: Returns references for family i within the mesh
@@ -714,16 +886,139 @@ throw (SALOME::SALOME_Exception)
                 f1->_remove_ref();
 	        return (SALOME_MED::FAMILY::_duplicate(f2));
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces specified family of the mesh");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Family C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 
 }
 //=============================================================================
-/*!
+/*
+ * CORBA: Returns Mesh global informations
+ */
+//=============================================================================
+SALOME_MED::MESH::meshInfos *  MESH_i::getMeshGlobal()
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                             SALOME::INTERNAL_ERROR);
+        SALOME_MED::MESH::meshInfos_var all = new SALOME_MED::MESH::meshInfos;
+        try
+        {
+                all->name = CORBA::string_dup(_mesh->getName().c_str());
+                all->spaceDimension = _mesh->getSpaceDimension();
+                all->meshDimension  = _mesh->getMeshDimension();
+                all->numberOfNodes  = _mesh->getNumberOfNodes();
+                all->isAGrid        = _mesh->getIsAGrid();
+
+                int nbFam= _mesh->getNumberOfFamilies(MED_NODE);
+                all->famNode.length(nbFam);
+                vector<FAMILY*> vNode (nbFam);
+                vNode = _mesh->getFamilies(MED_NODE);
+                for (int i=0;i<nbFam;i++)
+                {
+                        FAMILY_i * f1=new FAMILY_i(vNode[i]);
+                        SALOME_MED::FAMILY_ptr f2 = f1->POA_SALOME_MED::FAMILY::_this();
+                        f1->_remove_ref();
+                        all->famNode[i] = f2;
+                }
+
+                nbFam = _mesh->getNumberOfFamilies(MED_EDGE);
+                all->famEdge.length(nbFam);
+                vector<FAMILY*> vEdge (nbFam);
+                vEdge = _mesh->getFamilies(MED_EDGE);
+                for (int i=0;i<nbFam;i++)
+                for (int i=0;i<nbFam;i++)
+                {
+                        FAMILY_i * f1=new FAMILY_i(vEdge[i]);
+                        SALOME_MED::FAMILY_ptr f2 = f1->POA_SALOME_MED::FAMILY::_this();
+                        f1->_remove_ref();
+                        all->famEdge[i] = f2;
+                }
+
+                nbFam = _mesh->getNumberOfFamilies(MED_FACE);
+                all->famFace.length(nbFam);
+                vector<FAMILY*> vFace (nbFam);
+                vFace = _mesh->getFamilies(MED_FACE);
+                for (int i=0;i<nbFam;i++)
+                {
+                        FAMILY_i * f1=new FAMILY_i(vFace[i]);
+                        SALOME_MED::FAMILY_ptr f2 = f1->POA_SALOME_MED::FAMILY::_this();
+                        f1->_remove_ref();
+                        all->famFace[i] = f2;
+                }
+
+                nbFam = _mesh->getNumberOfFamilies(MED_CELL);
+                all->famCell.length(nbFam);
+                vector<FAMILY*> vCell (nbFam);
+                vCell = _mesh->getFamilies(MED_CELL);
+                for (int i=0;i<nbFam;i++)
+                {
+                        FAMILY_i * f1=new FAMILY_i(vCell[i]);
+                        SALOME_MED::FAMILY_ptr f2 = f1->POA_SALOME_MED::FAMILY::_this();
+                        f1->_remove_ref();
+                        all->famCell[i] = f2;
+                }
+
+                int nbGroup = _mesh->getNumberOfGroups(MED_NODE);
+                all->groupNode.length(nbGroup);
+                vector<GROUP*> gNode (nbGroup);
+                gNode = _mesh->getGroups(MED_NODE);
+                for (int i=0;i<nbGroup;i++)
+                {
+                        GROUP_i * f1=new GROUP_i(gNode[i]);
+                        SALOME_MED::GROUP_ptr f2 = f1->POA_SALOME_MED::GROUP::_this();
+                        f1->_remove_ref();
+                        all->groupNode[i] = f2;
+                }
+
+                nbGroup = _mesh->getNumberOfGroups(MED_EDGE);
+                all->groupEdge.length(nbGroup);
+                vector<GROUP*> gEdge (nbGroup);
+                gEdge = _mesh->getGroups(MED_EDGE);
+                for (int i=0;i<nbGroup;i++)
+                {
+                        GROUP_i * f1=new GROUP_i(gEdge[i]);
+                        SALOME_MED::GROUP_ptr f2 = f1->POA_SALOME_MED::GROUP::_this();
+                        f1->_remove_ref();
+                        all->groupEdge[i] = f2;
+                }
+                nbGroup = _mesh->getNumberOfGroups(MED_FACE);
+                all->groupFace.length(nbGroup);
+                vector<GROUP*> gFace (nbGroup);
+                gFace = _mesh->getGroups(MED_FACE);
+                for (int i=0;i<nbGroup;i++)
+                {
+                        GROUP_i * f1=new GROUP_i(gFace[i]);
+                        SALOME_MED::GROUP_ptr f2 = f1->POA_SALOME_MED::GROUP::_this();
+                        f1->_remove_ref();
+                        all->groupFace[i] = f2;
+                }
+
+                nbGroup = _mesh->getNumberOfGroups(MED_CELL);
+                all->groupCell.length(nbGroup);
+                vector<GROUP*> gCell (nbGroup);
+                gCell = _mesh->getGroups(MED_CELL);
+                for (int i=0;i<nbGroup;i++)
+                {
+                        GROUP_i * f1=new GROUP_i(gCell[i]);
+                        SALOME_MED::GROUP_ptr f2 = f1->POA_SALOME_MED::GROUP::_this();
+                        f1->_remove_ref();
+                        all->groupCell[i] = f2;
+                }
+
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to acces mesh");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+        return all._retn();
+}
+//=============================================================================
+ /*
  * CORBA: Returns references for groups within the mesh
  */
 //=============================================================================
@@ -748,11 +1043,10 @@ throw (SALOME::SALOME_Exception)
                         myseq[i] = f2;
                 }
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces number of groups of the mesh");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
 }
@@ -776,11 +1070,34 @@ throw (SALOME::SALOME_Exception)
                 f1->_remove_ref();
 	        return (SALOME_MED::GROUP::_duplicate(f2));
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces specified group of the mesh");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Mesh C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+}
+//=============================================================================
+/*!
+ * CORBA:
+ */
+//=============================================================================
+SALOME_MED::SUPPORT_ptr MESH_i::getBoundaryElements(SALOME_MED::medEntityMesh entity)
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                              SALOME::INTERNAL_ERROR);
+        try
+        {
+                SUPPORT * myNewSupport = _mesh->getBoundaryElements(convertIdlEntToMedEnt(entity));
+                SUPPORT_i * mySupportI = new SUPPORT_i(myNewSupport);
+                SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this() ;
+                return (SALOME_MED::SUPPORT::_duplicate(mySupportIOR));
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to get the volume ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -793,8 +1110,7 @@ throw (SALOME::SALOME_Exception)
 {
 	if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
-                                              SALOME::INTERNAL_ERROR);
-        try
+                                              SALOME::INTERNAL_ERROR); try
         {
 		int sup = mySupport->getCorbaIndex();
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
@@ -807,11 +1123,37 @@ throw (SALOME::SALOME_Exception)
                 f1->_remove_ref();
 	        return (SALOME_MED::FIELD::_duplicate(f2));
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to get the volume ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+}
+//=============================================================================
+/*!
+ * CORBA:
+ */
+//=============================================================================
+SALOME_MED::SUPPORT_ptr MESH_i::getSkin(SALOME_MED::SUPPORT_ptr mySupport3D)
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                              SALOME::INTERNAL_ERROR);
+        try
+        {
+                int sup = mySupport3D->getCorbaIndex();
+                ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
+                const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
+                SUPPORT * myNewSupport = _mesh->getSkin(myCppSupport);
+                SUPPORT_i * mySupportI = new SUPPORT_i(myNewSupport);
+                SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this() ;
+                return (SALOME_MED::SUPPORT::_duplicate(mySupportIOR));
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to get the volume ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -838,11 +1180,10 @@ throw (SALOME::SALOME_Exception)
                 f1->_remove_ref();
 	        return (SALOME_MED::FIELD::_duplicate(f2));
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to get the area ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -869,11 +1210,10 @@ throw (SALOME::SALOME_Exception)
                 f1->_remove_ref();
 	        return (SALOME_MED::FIELD::_duplicate(f2));
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to get the length ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -900,11 +1240,10 @@ throw (SALOME::SALOME_Exception)
                 f1->_remove_ref();
 	        return (SALOME_MED::FIELD::_duplicate(f2));
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to get the normal ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -931,11 +1270,10 @@ throw (SALOME::SALOME_Exception)
                 f1->_remove_ref();
 	        return (SALOME_MED::FIELD::_duplicate(f2));
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to get the barycenter ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -957,7 +1295,7 @@ throw (SALOME::SALOME_Exception)
  */
 //=============================================================================
 void MESH_i::addInStudy(SALOMEDS::Study_ptr myStudy,SALOME_MED::MESH_ptr myIor )
-throw (SALOME::SALOME_Exception)
+throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
 	BEGIN_OF("MED_Mesh_i::addInStudy");
 	if ( _meshId != "" )
@@ -973,8 +1311,8 @@ throw (SALOME::SALOME_Exception)
         SALOMEDS::AttributeIOR_var     aIOR;
 
  	// Find SComponent labelled 'MED'
-	//	SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
 	SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
+        myBuilder->NewCommand();
   	if ( CORBA::is_nil(medfather) ) 
 	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
 
@@ -992,7 +1330,6 @@ throw (SALOME::SALOME_Exception)
   	} ;
 
    	MESSAGE("Add a mesh Object under MED/MEDMESH");
- 	myBuilder->NewCommand();
   	SALOMEDS::SObject_var newObj = myBuilder->NewObject(medmeshfather);
 
 	ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
@@ -1016,7 +1353,7 @@ throw (SALOME::SALOME_Exception)
  */
 //=============================================================================
 void MESH_i::addInStudy(SALOMEDS::Study_ptr myStudy,SALOME_MED::MESH_ptr myIor,const string & fileName )
-throw (SALOME::SALOME_Exception)
+throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
         BEGIN_OF("MED_Mesh_i::addInStudy");
         if ( _meshId != "" )
@@ -1033,7 +1370,6 @@ throw (SALOME::SALOME_Exception)
         SALOMEDS::AttributeComment_var aComment;
 
         // Find SComponent labelled 'Med'
-	//        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
         SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
         if ( CORBA::is_nil(medfather) )
           THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
@@ -1090,11 +1426,10 @@ throw (SALOME::SALOME_Exception)
         {
                 _mesh->write(i,driverMeshName);
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to write the mesh ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 }
 //=============================================================================
@@ -1112,11 +1447,10 @@ throw (SALOME::SALOME_Exception)
         {
                 _mesh->read(i);
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to read the mesh ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 }
 //=============================================================================
@@ -1134,9 +1468,10 @@ throw (SALOME::SALOME_Exception)
         {
                 _mesh->rmDriver();
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to unlink the mesh from the driver ");
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
                 THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
                                                 ,SALOME::INTERNAL_ERROR);
 	}
@@ -1161,11 +1496,10 @@ throw (SALOME::SALOME_Exception)
                                         meshName);
                 return drivernum;
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to link the mesh to the driver ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 

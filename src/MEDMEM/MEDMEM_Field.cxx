@@ -1,5 +1,6 @@
 using namespace std;
 #include "MEDMEM_Field.hxx"
+using namespace MEDMEM;
 
 // ---------------------------------
 // FIELD_ : Constructors

@@ -17,11 +17,6 @@
 #include <iomanip>
 /////
 
-class MESH;
-class FAMILY;
-class GROUP;
-class CONNECTIVITY;
-
 /*!
 
   Driver GIBI for MESH.
@@ -30,7 +25,11 @@ class CONNECTIVITY;
   
 */
 
-
+namespace MEDMEM {
+class MESH;
+class FAMILY;
+class GROUP;
+class CONNECTIVITY;
 class GIBI_MESH_DRIVER : public GENDRIVER
 {
 protected:
@@ -226,6 +225,7 @@ public :
 private:
   GENDRIVER * copy(void) const ;
 
+};
 };
 
 

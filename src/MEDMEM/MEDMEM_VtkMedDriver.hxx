@@ -12,11 +12,12 @@
 
 using namespace std ;
 
+
+namespace MEDMEM {
 class MESH;
 class SUPPORT;
 class FIELD_;
 class MED;
-
 // This driver pilots within a VTK class read/write accesses of fields/meshes
 class VTK_MED_DRIVER : public GENDRIVER
 {
@@ -54,6 +55,7 @@ private :
   void writeSupport(SUPPORT * mySupport) const ;
   void writeField(FIELD_ * myField,string name) const ;
 
+};
 };
 
 

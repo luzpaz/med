@@ -3,6 +3,7 @@
 #include "MEDMEM_Field.hxx"
 
 using namespace std;
+using namespace MEDMEM;
 
 int main (int argc, char ** argv) {
 

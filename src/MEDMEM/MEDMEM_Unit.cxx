@@ -5,6 +5,7 @@ using namespace std;
 */
 
 #include "MEDMEM_Unit.hxx"
+using namespace MEDMEM;
 
 UNIT::UNIT():_name(""),_description(""),_masse(0),_length(0),_time(0),_temperature(0),_matterQuantity(0),_currentStrength(0),_lightIntensity(0) {
   MESSAGE("UNIT()");

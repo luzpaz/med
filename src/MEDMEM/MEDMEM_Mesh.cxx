@@ -19,6 +19,7 @@ using namespace std;
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_CellModel.hxx"
+using namespace MEDMEM;
 //#include "MEDMEM_Grid.hxx" this inclision should have never be here !!!
 
 //update Families with content list
@@ -398,7 +399,7 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
 //    return N;
 //  }
 
-ostream & operator<<(ostream &os, const MESH &myMesh)
+ostream & MEDMEM::operator<<(ostream &os, const MESH &myMesh)
 {
   int spacedimension = myMesh.getSpaceDimension();
   int meshdimension  = myMesh.getMeshDimension();

@@ -15,6 +15,7 @@ using namespace std;
 # include "MEDMEM_define.hxx"
 
 using namespace MED_FR;
+using namespace MEDMEM;
 
 MED_MED_DRIVER::MED_MED_DRIVER(): GENDRIVER(), 
                                   _ptrMed((MED * const)MED_NULL),_medIdt(MED_INVALID) 

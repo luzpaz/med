@@ -11,6 +11,7 @@ using namespace std;
 
 # include "MEDMEM_Exception.hxx"
 # include "utilities.h"
+using namespace MEDMEM;
 
 /*!
   Constructor.

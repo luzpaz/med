@@ -1,15 +1,16 @@
 //=============================================================================
-// File      : Group_i.hxx
+// File      : MEDMEM_Group_i.hxx
 // Project   : SALOME
 // Author    : EDF
 // Copyright : EDF 2002
-// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Group_i.hxx
+// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Group_i.hxx
 //=============================================================================
 #ifndef MED_GROUP_I_HXX_
 #define MED_GROUP_I_HXX_
 
-#include "Support_i.hxx"
+#include "MEDMEM_Support_i.hxx"
 
+namespace MEDMEM {
 class FAMILY_i;
 class GROUP;
 
@@ -22,11 +23,11 @@ protected :
     ~GROUP_i();
 
     // C++ object containing values
-    const ::GROUP * const  _group;
+    const ::MEDMEM::GROUP * const  _group;
 
 public :
     // Constructors and associated internal methods
-    GROUP_i(const ::GROUP * const g);
+    GROUP_i(const ::MEDMEM::GROUP * const g);
     GROUP_i(const GROUP_i & g);
 
     CORBA::Long    	      getNumberOfFamilies() 
@@ -36,5 +37,6 @@ public :
     SALOME_MED::FAMILY_ptr    getFamily(CORBA::Long i) 
 					throw (SALOME::SALOME_Exception);
 };
+}
 
 #endif /* MED_GROUP_I_HXX_ */

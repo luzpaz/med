@@ -1,9 +1,9 @@
 //=============================================================================
-// File      : FieldOf_i.hxx
+// File      : MEDMEM_FieldOf_i.hxx
 // Project   : SALOME
 // Author    : EDF
 // Copyright : EDF 2002
-// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/FieldOf_i.hxx
+// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_FieldOf_i.hxx
 //=============================================================================
 
 
@@ -22,25 +22,26 @@
 #include CORBA_SERVER_HEADER(MED)
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
 
-#include "Field_i.hxx"
-#include "Support_i.hxx"
+#include "MEDMEM_Field_i.hxx"
+#include "MEDMEM_Support_i.hxx"
 
-#include "convert.hxx"
+#include "MEDMEM_convert.hxx"
 
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
 
+namespace MEDMEM {
 template <class T> class FIELDOF_i: public FIELD_i
 {
 public :
-        static map < int, ::FIELD<T> * > fieldMap ;
+        static map < int, ::MEDMEM::FIELD<T> * > fieldMap ;
 protected :
         static int fieldIndex ;
 
 protected :
     // C++ object containing values
 
-    ::FIELD<T> * const  _fieldTptr;
+    ::MEDMEM::FIELD<T> * const  _fieldTptr;
     const int	_corbaIndex;
     string  _FieldId;
 
@@ -71,10 +72,12 @@ public :
     CORBA::Double           getTime()        throw (SALOME::SALOME_Exception);
     CORBA::Long             getCorbaIndex()  throw (SALOME::SALOME_Exception);
 
-    Engines::string_array * getComponentsNames()  throw (SALOME::SALOME_Exception);
-    Engines::string_array * getComponentsUnits()  throw (SALOME::SALOME_Exception);
+    SALOME_MED::string_array * getComponentsNames()  throw (SALOME::SALOME_Exception);
+    SALOME_MED::string_array * getComponentsUnits()  throw (SALOME::SALOME_Exception);
     void addInStudy(SALOMEDS::Study_ptr myStudy, 
-		    SALOME_MED::FIELD_ptr myIor)  throw (SALOME::SALOME_Exception);
+		    SALOME_MED::FIELD_ptr myIor)  
+		    throw (SALOME::SALOME_Exception, 
+                           SALOMEDS::StudyBuilder::LockProtection);
 
     CORBA::Long addDriver (SALOME_MED::medDriverTypes driverType, 
 			   const char* fileName, const char* fieldName)
@@ -88,6 +91,8 @@ public :
     ::FIELD<T> * constructConstField() const;
 
  };
+}
+using namespace MEDMEM;
 template <class T> map < int, ::FIELD<T> * > FIELDOF_i<T>::fieldMap ;
 template <class T> int  FIELDOF_i<T>::fieldIndex = 0;
 //=============================================================================
@@ -183,11 +188,10 @@ throw (SALOME::SALOME_Exception)
         {
                 return CORBA::string_dup(_fieldTptr->getName().c_str());
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au nom");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -205,11 +209,10 @@ throw (SALOME::SALOME_Exception)
         {
                 return CORBA::string_dup(_fieldTptr->getDescription().c_str());
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant a la description");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -255,11 +258,10 @@ throw (SALOME::SALOME_Exception)
         {
                 return _fieldTptr->getNumberOfComponents();
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au support");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -277,11 +279,10 @@ throw (SALOME::SALOME_Exception)
         {
                 return CORBA::string_dup(_fieldTptr->getComponentName(i).c_str());
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au nom d un component");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -299,11 +300,10 @@ throw (SALOME::SALOME_Exception)
         {
                 return CORBA::string_dup(_fieldTptr->getMEDComponentUnit(i).c_str());
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au nom d un component");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -321,11 +321,10 @@ throw (SALOME::SALOME_Exception)
         {
                 return _fieldTptr->getIterationNumber();
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au champ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -357,11 +356,10 @@ throw (SALOME::SALOME_Exception)
         {
                 return _fieldTptr->getOrderNumber();
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au champ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -379,11 +377,10 @@ throw (SALOME::SALOME_Exception)
         {
                 return _fieldTptr->getTime();
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au champ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -391,13 +388,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Fields's Components names
  */
 //=============================================================================
-template <class T> Engines::string_array * FIELDOF_i<T>::getComponentsNames()
+template <class T> SALOME_MED::string_array * FIELDOF_i<T>::getComponentsNames()
 throw (SALOME::SALOME_Exception)    
 {
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-	Engines::string_array_var myseq = new Engines::string_array;
+	SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
         try
         {
 		int nbcom = _fieldTptr->getNumberOfComponents();
@@ -408,11 +405,10 @@ throw (SALOME::SALOME_Exception)
                         myseq[i]=CORBA::string_dup(namecom[i].c_str());
                 }
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au champ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 	return myseq._retn();
 }
@@ -421,13 +417,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Fields's Components units
  */
 //=============================================================================
-template <class T> Engines::string_array * FIELDOF_i<T>::getComponentsUnits()
+template <class T> SALOME_MED::string_array * FIELDOF_i<T>::getComponentsUnits()
 throw (SALOME::SALOME_Exception)
 {
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-	Engines::string_array_var myseq = new Engines::string_array;
+	SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
         try
         {
 		int nbcom = _fieldTptr->getNumberOfComponents();
@@ -438,11 +434,10 @@ throw (SALOME::SALOME_Exception)
                         myseq[i]=CORBA::string_dup(unitcom[i].c_str());
                 }
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au champ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 	return myseq._retn();
 }
@@ -453,7 +448,7 @@ throw (SALOME::SALOME_Exception)
 //=============================================================================
 template <class T> void FIELDOF_i<T>::addInStudy(SALOMEDS::Study_ptr myStudy, 
 						 SALOME_MED::FIELD_ptr myIor )
-throw (SALOME::SALOME_Exception)
+		    throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
 {
         BEGIN_OF(" FIELDOF_i::addInStudy");
         if (_fieldTptr==NULL)
@@ -473,10 +468,9 @@ throw (SALOME::SALOME_Exception)
         SALOMEDS::AttributeIOR_var     aIOR;
 
         // Create SComponent labelled 'Med'
-	//        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
         SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
         if ( CORBA::is_nil(medfather) )
-	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
+	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'MED' not Found",SALOME::INTERNAL_ERROR);
 
  	// Create SObject labelled 'MEDFIELD' if it doesn't already exit
 	SALOMEDS::SObject_var medfieldfather = myStudy->FindObject("MEDFIELD");
@@ -524,12 +518,16 @@ throw (SALOME::SALOME_Exception)
         aIOR->SetValue(iorStr.c_str());
 
 	SALOMEDS::SObject_var supportObject = myStudy->FindObject(_support->getName());
-  	if ( CORBA::is_nil(supportObject) ) {
+  	if ( CORBA::is_nil(supportObject) ) 
+        {
 	  MESSAGE("FIELDOF_i::addInStudy : SUPPORT not found") ;
-	} else {
+	} 
+        else 
+        {
 	  SALOMEDS::SObject_var newObjSupport = myBuilder->NewObject(newObj);
 	  myBuilder->Addreference(newObjSupport,supportObject);
 	}
+        myBuilder->CommitCommand();
         _FieldId = newObj->GetID();
 	MESSAGE("FIELDOF_i::addInStudy _FieldId="<< _FieldId);
 
@@ -551,7 +549,7 @@ throw (SALOME::SALOME_Exception)
 	{
 		_fieldTptr->write(i,driverFieldName);
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au champ");
                 THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
@@ -573,11 +571,10 @@ throw (SALOME::SALOME_Exception)
 	{
 		_fieldTptr->read(i);
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au champ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -595,11 +592,10 @@ throw (SALOME::SALOME_Exception)
 	{
 		_fieldTptr->rmDriver(i);
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au champ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -621,11 +617,10 @@ template <class T> CORBA::Long FIELDOF_i<T>::addDriver (SALOME_MED::medDriverTyp
 				        fieldName);
 		return drivernum;
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
 		MESSAGE("Exception en accedant au champ");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 

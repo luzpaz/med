@@ -14,6 +14,7 @@ using namespace std;
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
+using namespace MEDMEM;
 
 
 int main (int argc, char ** argv) {

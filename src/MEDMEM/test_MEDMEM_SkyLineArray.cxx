@@ -1,6 +1,7 @@
 using namespace std;
 #include "utilities.h"
 #include "MEDMEM_SkyLineArray.hxx"
+using namespace MEDMEM;
 
 int main (int argc, char ** argv) {
 

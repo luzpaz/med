@@ -1,5 +1,12 @@
 #include "GROUPClient.hxx"
 #include "MESHClient.hxx"
+using namespace MEDMEM;
+
+//=============================================================================
+/*!
+ * Constructeur
+ */
+//=============================================================================
 
 GROUPClient::GROUPClient(const SALOME_MED::GROUP_ptr G,
 			 MESH * M) 
@@ -15,7 +22,11 @@ GROUPClient::GROUPClient(const SALOME_MED::GROUP_ptr G,
   END_OF("GROUPClient::GROUPClient()");
 }
 
-
+//=============================================================================
+/*!
+ * Remplit les informations générales
+ */
+//=============================================================================
 void GROUPClient::blankCopy()
 {
   BEGIN_OF("GROUPClient::blankCopy()");
@@ -25,6 +36,11 @@ void GROUPClient::blankCopy()
 
   END_OF("GROUPClient::blankCopy()");
 }
+//=============================================================================
+/*!
+ * Remplit les informations 
+ */
+//=============================================================================
 
 void GROUPClient::fillCopy()
 {
@@ -36,6 +52,11 @@ void GROUPClient::fillCopy()
   END_OF("GROUPClient::fillCopy()");
 }
 
+//=============================================================================
+/*!
+ * Destructeur
+ */
+//=============================================================================
 
 GROUPClient::~GROUPClient()
 {

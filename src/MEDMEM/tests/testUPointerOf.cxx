@@ -9,6 +9,7 @@ using namespace std;
 #include "utilities.h"
 #include "MEDMEM_PointerOf.hxx"
 #include "MEDMEM_Exception.hxx"
+using namespace MEDMEM;
 
 
 int main (int argc, char ** argv) 

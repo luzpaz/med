@@ -4,6 +4,9 @@
 
 #else
 
+#ifndef __MEDMEM_UTILITIES
+#define __MEDMEM_UTILITIES
+
 #  include <cstdlib>
 #  include <iostream>
 using namespace std;
@@ -30,7 +33,7 @@ using namespace std;
 # endif
 
 # ifdef INFOS_COMPILATION
-# error INFOS_COMPILATION already defined
+# undef INFOS_COMPILATION
 # endif
 # define INFOS_COMPILATION	{\
 					cerr << flush;\
@@ -79,3 +82,5 @@ using namespace std;
 
 #endif
 
+#endif
+#endif

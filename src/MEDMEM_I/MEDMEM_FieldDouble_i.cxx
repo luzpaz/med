@@ -1,55 +1,56 @@
 //=============================================================================
-// File      : Fieldint_i.hxx
+// File      : MEDMEM_Fielddouble_i.hxx
 // Project   : SALOME
 // Author    : EDF 
 // Copyright : EDF 2002
-// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Fieldint_i.hxx
+// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Fielddouble_i.hxx
 //=============================================================================
 
-#include "FieldInt_i.hxx"
+#include "MEDMEM_FieldDouble_i.hxx"
 #include "utilities.h"
-#include "convert.hxx"
+#include "MEDMEM_convert.hxx"
+using namespace MEDMEM;
 
 //=============================================================================
 /*!
  * Default constructor
  */
 //=============================================================================
-FIELDINT_i::FIELDINT_i(): FIELDOF_i<int>()
+FIELDDOUBLE_i::FIELDDOUBLE_i(): FIELDOF_i<double>()
 {
-        BEGIN_OF("Default Constructor FIELDINT_i");
-        END_OF("Default Constructor FIELDINT_i");
+        BEGIN_OF("Default Constructor FIELDDOUBLE_i");
+        END_OF("Default Constructor FIELDDOUBLE_i");
 }
 //=============================================================================
 /*!
  * Destructor
  */
 //=============================================================================
-FIELDINT_i::~FIELDINT_i()
+FIELDDOUBLE_i::~FIELDDOUBLE_i()
 {
-        BEGIN_OF("Default Destructor FIELDINT_i");
-        END_OF("Default Destructor FIELDINT_i");
-}
-//=============================================================================
-/*!
- * Default constructor
- */
-//=============================================================================
-FIELDINT_i::FIELDINT_i(SALOME_MED::SUPPORT_ptr mySupportIOR, ::FIELD<int> * const f): FIELDOF_i<int>(mySupportIOR,f)
-{
-        BEGIN_OF("Constructor FIELDINT_i");
-        END_OF(" Constructor FIELDINT_i");
+        BEGIN_OF("Default Destructor FIELDDOUBLE_i");
+        END_OF("Default Destructor FIELDDOUBLE_i");
 }
 //=============================================================================
 /*!
  * Constructor par recopie
  */
 //=============================================================================
-FIELDINT_i::FIELDINT_i(FIELDINT_i &fi):
-					FIELDOF_i<int>(fi._fieldTptr)
+FIELDDOUBLE_i::FIELDDOUBLE_i(FIELDDOUBLE_i & fd):
+			       FIELDOF_i<double>(fd._fieldTptr)
 {
-        BEGIN_OF("Constructor FIELDINT_i");
-        END_OF(" Constructor FIELDINT_i");
+        BEGIN_OF("Default Constructor FIELDDOUBLE_i");
+        END_OF("Default Constructor FIELDDOUBLE_i");
+}
+//=============================================================================
+/*!
+ * Default constructor
+ */
+//=============================================================================
+FIELDDOUBLE_i::FIELDDOUBLE_i(SALOME_MED::SUPPORT_ptr mySupportIOR,::FIELD<double> * const f): FIELDOF_i<double>(mySupportIOR,f)
+{
+        BEGIN_OF("Constructor FIELDDOUBLE_i");
+        END_OF(" Constructor FIELDDOUBLE_i");
 }
 
 //=============================================================================
@@ -58,13 +59,13 @@ FIELDINT_i::FIELDINT_i(FIELDINT_i &fi):
 */
 //=============================================================================
 
-Engines::long_array* FIELDINT_i::getValue( SALOME_MED::medModeSwitch mode ) 
+SALOME_MED::double_array* FIELDDOUBLE_i::getValue( SALOME_MED::medModeSwitch mode ) 
 throw (SALOME::SALOME_Exception)
 {
 	if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-        Engines::long_array_var myseq = new Engines::long_array;
+        SALOME_MED::double_array_var myseq = new SALOME_MED::double_array;
         try
         {
                 int nbval=_fieldTptr->getNumberOfComponents();
@@ -84,7 +85,7 @@ throw (SALOME::SALOME_Exception)
 		  }
 
 		medModeSwitch modemed=convertIdlModeToMedMode(mode);
-                const int * values =_fieldTptr->getValue(modemed);
+                const double * values =_fieldTptr->getValue(modemed);
 
                 myseq->length(nbval);
                 for (int i=0; i<nbval; i++)
@@ -92,11 +93,10 @@ throw (SALOME::SALOME_Exception)
                         myseq[i]=values[i];
                 };
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
-                MESSAGE("Unable to acces Field");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+                MESSAGE("Unable to acces Field ");
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
 }

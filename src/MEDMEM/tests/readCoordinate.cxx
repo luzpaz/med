@@ -27,6 +27,7 @@ using namespace std;
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Mesh.hxx"
+using namespace MEDMEM;
 
 void usage(char * name)
 {

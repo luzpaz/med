@@ -1,9 +1,9 @@
 //=============================================================================
-// File      : Group_i.cxx
+// File      : MEDMEM_Group_i.cxx
 // Project   : SALOME
 // Author    : EDF 
 // Copyright : EDF 2002
-// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/
+// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Group_i.cxx
 //=============================================================================
 
 #include <vector>
@@ -11,11 +11,12 @@
 #include "utilities.h"
 #include "Utils_CorbaException.hxx"
 
-#include "Group_i.hxx"
-#include "Family_i.hxx"
+#include "MEDMEM_Group_i.hxx"
+#include "MEDMEM_Family_i.hxx"
 
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Family.hxx"
+using namespace MEDMEM;
 
 //=============================================================================
 /*!
@@ -74,11 +75,10 @@ throw (SALOME::SALOME_Exception)
         {
                 return _group->getNumberOfFamilies();
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to get number of families of the group");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Group C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 };
 //=============================================================================
@@ -109,11 +109,10 @@ throw (SALOME::SALOME_Exception)
 			myseq[i] = f2;
 		}
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
 	{
                 MESSAGE("Unable to access families");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Family C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 	return myseq._retn();
 };
@@ -137,10 +136,9 @@ throw (SALOME::SALOME_Exception)
 		f1->_remove_ref();
 		return (SALOME_MED::FAMILY::_duplicate(f2));
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
 	{
                 MESSAGE("Unable to acces to the specified family");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Family C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 };

@@ -13,6 +13,7 @@
         In these cases, memory will be desallocated at object destruction. In all other cases,
 	the desallocator will only nullify pointers.
 */
+namespace MEDMEM {
 
 template <typename T> class PointerOf
 {
@@ -37,6 +38,7 @@ public :
 	void set( const int &size, const T *pointer ) ;
 	PointerOf<T>& operator=( const PointerOf<T> &pointer ) ;
 } ;
+} ;
 
 // ------------------------------------------------------------ //
 //			         				//
@@ -44,6 +46,7 @@ public :
 //			         				//
 // ------------------------------------------------------------ //
 
+using namespace MEDMEM;
 
 /*! Creates a null T* pointer and sets the boolean (for desallocation) to false. */
 template <typename T> PointerOf<T>::PointerOf() : _pointer(0), _done(false)

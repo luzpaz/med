@@ -7,6 +7,7 @@
 #include CORBA_CLIENT_HEADER(MED)
 
 
+namespace MEDMEM {
 class SUPPORTClient : virtual public SUPPORT {
 
 private :
@@ -32,6 +33,7 @@ public :
     const throw (MEDEXCEPTION);
 
 };
+}
 
 
 #endif

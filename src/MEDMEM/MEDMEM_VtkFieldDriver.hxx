@@ -17,9 +17,8 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_CellModel.hxx"
 
-//using namespace MED_FR ;
+using namespace MEDMEM ;
 
-template <class T> class FIELD;
 
 /*!
 
@@ -29,6 +28,8 @@ template <class T> class FIELD;
 
 */
 
+namespace MEDMEM {
+template <class T> class FIELD;
 template <class T> class VTK_FIELD_DRIVER : public GENDRIVER
 {
 protected:
@@ -262,6 +263,7 @@ private:
   GENDRIVER * copy ( void ) const ;
 
 };
+};
 
 /*-------------------------*/
 /* template implementation */
@@ -269,6 +271,7 @@ private:
 
 /*--------------------- DRIVER PART -------------------------------*/
 
+using namespace MEDMEM;
 template <class T> void VTK_FIELD_DRIVER<T>::setFieldName(const string & fieldName)
 {
   _fieldName = fieldName; 

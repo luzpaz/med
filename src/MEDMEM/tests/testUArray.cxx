@@ -26,6 +26,7 @@ using namespace std;
 #include <cstdlib>	// pour l'acces à EXIT_SUCCESS et EXIT_FAILURE
 #include "utilities.h"
 #include "MEDMEM_Array.hxx"
+using namespace MEDMEM;
 
 void imprime(string titre,const int * myValues,const int * myOthers, int lignes, int colonnes)
 {

@@ -1,16 +1,16 @@
 //=============================================================================
-// File      : convert.cxx
+// File      : MEDMEM_convert.cxx
 // Created   : mer fév 20 15:47:57 CET 2002
 // Author    : EDF
 // Project   : SALOME
 // Copyright : EDF 2002
-// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/convert.cxx
+// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_convert.cxx
 //=============================================================================
 
 #include "utilities.h"
 #include "Utils_CorbaException.hxx"
 
-#include "convert.hxx"
+#include "MEDMEM_convert.hxx"
 
 
 SALOME_MED::medGeometryElement convertMedEltToIdlElt(medGeometryElement element) 
@@ -169,14 +169,14 @@ throw (SALOME::SALOME_Exception)
         } 
    }
 }
-SALOME_MED::medDriverTypes convertMedDriverToIdlDriver(driverTypes driverType)
+SALOME_MED::medDriverTypes convertMedDriverToIdlDriver(MEDMEM::driverTypes driverType)
 throw (SALOME::SALOME_Exception)
 {
   switch (driverType)
     {
-    case MED_DRIVER  :  return SALOME_MED::MED_DRIVER; 
-    case VTK_DRIVER  :  return SALOME_MED::VTK_DRIVER; 
-    case NO_DRIVER   :  return SALOME_MED::NO_DRIVER;
+    case MEDMEM::MED_DRIVER  :  return SALOME_MED::MED_DRIVER; 
+    case MEDMEM::VTK_DRIVER  :  return SALOME_MED::VTK_DRIVER; 
+    case MEDMEM::NO_DRIVER   :  return SALOME_MED::NO_DRIVER;
     default :
 	{ MESSAGE("Unknown driver type");
 	  THROW_SALOME_CORBA_EXCEPTION("Unknown driver type",
@@ -185,14 +185,14 @@ throw (SALOME::SALOME_Exception)
    }
 }
 
-driverTypes convertIdlDriverToMedDriver(SALOME_MED::medDriverTypes driverType)
+MEDMEM::driverTypes convertIdlDriverToMedDriver(SALOME_MED::medDriverTypes driverType)
 throw (SALOME::SALOME_Exception)
 {
   switch (driverType)
     {
-    case SALOME_MED::MED_DRIVER  :  return MED_DRIVER; 
-    case SALOME_MED::VTK_DRIVER  :  return VTK_DRIVER; 
-    case SALOME_MED::NO_DRIVER   :  return NO_DRIVER;
+    case SALOME_MED::MED_DRIVER  :  return MEDMEM::MED_DRIVER; 
+    case SALOME_MED::VTK_DRIVER  :  return MEDMEM::VTK_DRIVER; 
+    case SALOME_MED::NO_DRIVER   :  return MEDMEM::NO_DRIVER;
     default :
 	{ MESSAGE("Unknown driver type");
 	  THROW_SALOME_CORBA_EXCEPTION("Unknown driver type",

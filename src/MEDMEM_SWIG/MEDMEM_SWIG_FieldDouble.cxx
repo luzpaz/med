@@ -1,5 +1,6 @@
 using namespace std;
 #include "MEDMEM_SWIG_FieldDouble.hxx"
+using namespace MEDMEM;
 
 //=============================================================================
 /*!

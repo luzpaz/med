@@ -17,6 +17,7 @@ using namespace std;
 #include "MEDMEM_Mesh.hxx"
 
 using namespace MED_EN;
+using namespace MEDMEM;
 
 /* This class is a generic class for family and group */
 
@@ -136,7 +137,7 @@ SUPPORT::~SUPPORT()
   operator <<.
 */
 //--------------------------------------------------
-ostream & operator<<(ostream &os, const SUPPORT &my)
+ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
 //--------------------------------------------------
 {
   os << "Name : "<< my.getName() << endl ;

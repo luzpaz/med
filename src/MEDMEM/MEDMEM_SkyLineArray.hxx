@@ -6,8 +6,9 @@
 #include "MEDMEM_PointerOf.hxx"
 #include "MEDMEM_define.hxx"
 
-using  MED_EN::med_int ;
+using MED_EN::med_int;
 
+namespace MEDMEM {
 class MEDSKYLINEARRAY
 {
 private :
@@ -41,8 +42,9 @@ public :
   inline void setIJ(med_int i, med_int j, med_int value) throw (MEDEXCEPTION) ;
   inline void setIndexValue(med_int i, med_int value) throw (MEDEXCEPTION) ;
 
-} ;
-
+};
+}
+using namespace MEDMEM;
 // ---------------------------------------
 //              Methodes Inline
 // ---------------------------------------
@@ -140,5 +142,4 @@ inline void MEDSKYLINEARRAY::setIndexValue(med_int i, med_int value) throw (MEDE
     throw MEDEXCEPTION("MEDSKYLINEARRAY::setIndexValue : argument is out of range") ;
   _value[i-1]=value ;
 }
-
 # endif

@@ -1,9 +1,9 @@
 //=============================================================================
-// File      : Med_i.hxx
+// File      : MEDMEM_Med_i.hxx
 // Project   : SALOME
 // Author    : EDF
 // Copyright : EDF 2002
-// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Med_i.hxx
+// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Med_i.hxx
 //=============================================================================
 
 #ifndef _MED_MED_I_HXX_
@@ -19,6 +19,7 @@
 
 #include "MEDMEM_Med.hxx"
 
+namespace MEDMEM {
 typedef map<DT_IT_, SALOME_MED::FIELD_ptr, LT_DT_IT_ > MAP_IOR_DT_IT_; 
 
 class MED_i: public POA_SALOME_MED::MED
@@ -29,7 +30,7 @@ private :
 protected:
     // C++ object containing values
   //::MED * const _med;
-  ::MED * _med;
+  ::MEDMEM::MED * _med;
   string _medId;
 
   map<string,SALOME_MED::MESH_ptr>    _meshes;   // We can't have two MESHes with the same name.  
@@ -52,8 +53,8 @@ public:
     // IDL Methods 
     CORBA::Long 	    getNumberOfMeshes() throw (SALOME::SALOME_Exception);
     CORBA::Long 	    getNumberOfFields() throw (SALOME::SALOME_Exception);
-    Engines::string_array * getMeshNames()      throw (SALOME::SALOME_Exception);
-    Engines::string_array * getFieldNames()     throw (SALOME::SALOME_Exception);
+    SALOME_MED::string_array * getMeshNames()      throw (SALOME::SALOME_Exception);
+    SALOME_MED::string_array * getFieldNames()     throw (SALOME::SALOME_Exception);
     SALOME_MED::MESH_ptr    getMeshByName(const char* meshName) 
 						throw (SALOME::SALOME_Exception);
     SALOME_MED::MESH_ptr    getMesh(SALOME_MED::FIELD_ptr fieldPtr) 
@@ -79,7 +80,9 @@ public:
 						throw (SALOME::SALOME_Exception);
     void 		    addInStudy(SALOMEDS::Study_ptr myStudy,
 				       SALOME_MED::MED_ptr myIor) 
-						throw (SALOME::SALOME_Exception);
+						throw (SALOME::SALOME_Exception,
+						       SALOMEDS::StudyBuilder::LockProtection);
 };
+}
 
 #endif /* _MED_MED_I_HXX_ */

@@ -6,6 +6,7 @@
 #include "MEDMEM_Field.hxx"
 #include CORBA_CLIENT_HEADER(MED)
 
+namespace MEDMEM {
 template <typename T>
 class FIELDClient : virtual public FIELD<T> {
 
@@ -65,6 +66,7 @@ FIELDClient<T>::~FIELDClient()
   BEGIN_OF("FIELDClient::~FIELDClient");
 
   END_OF("FIELDClient::~FIELDClient");
+}
 }
 
 #endif

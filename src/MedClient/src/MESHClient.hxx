@@ -6,6 +6,7 @@
 #include "MEDMEM_Mesh.hxx"
 #include CORBA_CLIENT_HEADER(MED)
 
+namespace MEDMEM {
 class MESHClient : public MESH {
 
 private :
@@ -25,6 +26,7 @@ public :
   void fillCopy();
 
 };
+}
 
 #endif
 

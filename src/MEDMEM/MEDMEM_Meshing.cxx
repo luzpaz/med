@@ -13,6 +13,7 @@ using namespace std;
 
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Group.hxx"
+using namespace MEDMEM;
 
 /*! Create an empty MESH. */
 MESHING::MESHING(): MESH()

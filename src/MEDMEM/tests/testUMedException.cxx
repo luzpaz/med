@@ -26,6 +26,7 @@ using namespace std;
 #include <cstdlib>
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
+using namespace MEDMEM;
 
 int main (int argc, char ** argv)
 {

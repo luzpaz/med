@@ -12,10 +12,6 @@
 
 #include <fstream>
 
-class MESH;
-class FAMILY;
-class GROUP;
-class CONNECTIVITY;
 
 /*!
 
@@ -24,6 +20,11 @@ class CONNECTIVITY;
   Generic part : implement open and close methods.
 
 */
+namespace MEDMEM {
+class MESH;
+class FAMILY;
+class GROUP;
+class CONNECTIVITY;
 class VTK_MESH_DRIVER : public GENDRIVER
 {
 protected:
@@ -75,6 +76,7 @@ public :
 private:
   GENDRIVER * copy ( void ) const;
 
+};
 };
 
 #endif /* VTK_MESH_DRIVER_HXX */

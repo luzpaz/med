@@ -36,6 +36,7 @@ using namespace MED_EN;
 
 */
 
+namespace MEDMEM {
 class FIELD_    // GENERIC POINTER TO a template <class T> class FIELD
 {
 protected:
@@ -220,10 +221,12 @@ public:
   inline med_type_champ getValueType () const;
 
 };
+};
 
 // ---------------------------------
 // Implemented Methods : constructor
 // ---------------------------------
+using namespace MEDMEM;
 
 // -----------------
 // Methodes Inline
@@ -535,6 +538,7 @@ inline void FIELD_::setValueType (const med_type_champ ValueType)
 
 */
 
+namespace MEDMEM {
 template <class T> class FIELD : public FIELD_
 {
 
@@ -703,10 +707,12 @@ public:
    */
   void getBarycenter() const throw (MEDEXCEPTION) ;
 };
+};
 
 // --------------------
 // Implemented Methods
 // --------------------
+using namespace MEDMEM;
 
 /*!
   Constructor with no parameter, most of the attribut members are set to NULL.
@@ -719,7 +725,7 @@ template <class T>  FIELD<T>::FIELD():
 
 /*!
   Constructor with parameters such that all attrribut are set but the _value
-  attrribut is allocated but not set.
+  attribut is allocated but not set.
 */
 template <class T>  FIELD<T>::FIELD(const SUPPORT * Support,
 				    const int NumberOfComponents, const medModeSwitch Mode) throw (MEDEXCEPTION) :

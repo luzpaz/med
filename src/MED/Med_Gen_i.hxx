@@ -31,7 +31,7 @@
 
 #include <SALOMEconfig.h>
 #include <map>
-#include CORBA_SERVER_HEADER(Med_Gen)
+#include CORBA_SERVER_HEADER(MED_Gen)
 #include CORBA_SERVER_HEADER(MED)
 #include CORBA_SERVER_HEADER(SALOME_ModuleCatalog)
 
@@ -41,7 +41,7 @@
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
 
 class Med_Gen_i:
-  public POA_Engines::Med_Gen,
+  public POA_SALOME_MED::MED_Gen,
   public Engines_Component_i 
 {
 private:

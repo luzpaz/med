@@ -1,6 +1,14 @@
-#include <convert.hxx>
+#include "MEDMEM_convert.hxx"
+#include "Utils_CorbaException.hxx"
 #include "UtilClient.hxx"
 #include "CONNECTIVITYClient.hxx"
+
+using namespace MEDMEM;
+//=============================================================================
+/*!
+ * Constructeur
+ */
+//=============================================================================
 
 CONNECTIVITYClient::CONNECTIVITYClient(const SALOME_MED::MESH_ptr m,
 				       medEntityMesh Entity) :
@@ -18,6 +26,11 @@ CONNECTIVITYClient::CONNECTIVITYClient(const SALOME_MED::MESH_ptr m,
   END_OF("CONNECTIVITYClient::CONNECTIVITYClient()");
 }
 
+//=============================================================================
+/*!
+ * Destructeur
+ */
+//=============================================================================
 CONNECTIVITYClient::~CONNECTIVITYClient()
 {
   BEGIN_OF("CONNECTIVITYClient::~CONNECTIVITYClient()");
@@ -28,18 +41,38 @@ CONNECTIVITYClient::~CONNECTIVITYClient()
   END_OF("CONNECTIVITYClient::~CONNECTIVITYClient()");
 }
 
+//=============================================================================
+/*!
+ * Remplit les informations nécessaires
+ * 1 seul appel Corba
+ */
+//=============================================================================
 void CONNECTIVITYClient::blankCopy()
 {
   BEGIN_OF("CONNECTIVITYClient::blankCopy()");
 
-  _numberOfNodes = IOR_Mesh->getNumberOfNodes();
+   SALOME_MED::MESH::connectivityInfos *all = new SALOME_MED::MESH::connectivityInfos;
+   medEntityMesh Entity = getEntity();
+   try
+   {
+        all= IOR_Mesh->getConnectGlobal(Entity);
+   }
+   catch (const exception & ex)
+   {
+        MESSAGE("Unable to acces Global information");
+        THROW_SALOME_CORBA_EXCEPTION(ex.what() ,SALOME::INTERNAL_ERROR);
+   }
+
+  //_numberOfNodes = IOR_Mesh->getNumberOfNodes();
+  _numberOfNodes = all->numberOfNodes;
   
-  medEntityMesh Entity = getEntity();
   medGeometryElement * Types;
 
   long iT, nT;
+  //convertCorbaArray<SALOME_MED::medGeometryElement>
+  //  (Types, nT, IOR_Mesh->getTypes(Entity));
   convertCorbaArray<SALOME_MED::medGeometryElement>
-    (Types, nT, IOR_Mesh->getTypes(Entity));
+    (Types, nT, &all->meshTypes);
 
   ASSERT(nT == (int) getNumberOfTypes(Entity));
   SCRUTE(nT);
@@ -48,9 +81,11 @@ void CONNECTIVITYClient::blankCopy()
   
   _totalNumberOfElements_client = 0L;
   _numberOfElements_client = new long[nT];
-  for (iT=0; iT<nT; iT++) {
-    _numberOfElements_client[iT] 
-      = IOR_Mesh->getNumberOfElements(Entity, Types[iT]);
+  for (iT=0; iT<nT; iT++) 
+   {
+    //_numberOfElements_client[iT] 
+    //  = IOR_Mesh->getNumberOfElements(Entity, Types[iT]);
+    _numberOfElements_client[iT] =  all->numberOfElements[iT];
     _totalNumberOfElements_client += _numberOfElements_client[iT];
     SCRUTE(iT);
     SCRUTE(_numberOfElements_client[iT]);
@@ -61,6 +96,10 @@ void CONNECTIVITYClient::blankCopy()
   END_OF("CONNECTIVITYClient::blankCopy()");
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 
 void CONNECTIVITYClient::fillCopy()
 {
@@ -109,6 +148,10 @@ void CONNECTIVITYClient::fillCopy()
   END_OF("void CONNECTIVITYClient::fillCopy()");
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 med_int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity, 
 					medGeometryElement Type) const
 {
@@ -146,6 +189,10 @@ med_int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity,
   return n;
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 const med_int * CONNECTIVITYClient::getConnectivity
                       (medConnectivity ConnectivityType, 
 		       medEntityMesh Entity,
@@ -163,6 +210,10 @@ const med_int * CONNECTIVITYClient::getConnectivity
   return c;
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 const med_int * CONNECTIVITYClient::getConnectivityIndex
                       (medConnectivity ConnectivityType,
 		       medEntityMesh Entity)
@@ -179,6 +230,10 @@ const med_int * CONNECTIVITYClient::getConnectivityIndex
   return c;
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 void CONNECTIVITYClient::calculateConnectivity
                       (medConnectivity connectivityType, 
 		       medEntityMesh Entity)
@@ -193,6 +248,10 @@ void CONNECTIVITYClient::calculateConnectivity
   END_OF("void CONNECTIVITYClient::calculateConnectivity()");
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 void  CONNECTIVITYClient::updateFamily (vector<FAMILY*> myFamilies)
 {
   BEGIN_OF("void CONNECTIVITYClient::updateFamily()");
@@ -205,6 +264,10 @@ void  CONNECTIVITYClient::updateFamily (vector<FAMILY*> myFamilies)
   END_OF("void CONNECTIVITYClient::updateFamily()");
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 const int * CONNECTIVITYClient::getGlobalNumberingIndex 
                       (medEntityMesh Entity) const throw (MEDEXCEPTION)
 {
@@ -218,6 +281,10 @@ const int * CONNECTIVITYClient::getGlobalNumberingIndex
   END_OF("void CONNECTIVITYClient::getGlobalNumberingIndex()");
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 bool CONNECTIVITYClient::existConnectivity(medConnectivity ConnectivityType, 
 					   medEntityMesh Entity) const
 { 
@@ -233,6 +300,10 @@ bool CONNECTIVITYClient::existConnectivity(medConnectivity ConnectivityType,
   return b;
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 const med_int * CONNECTIVITYClient::getReverseConnectivity
                       (medConnectivity ConnectivityType, 
 		       medEntityMesh Entity) throw (MEDEXCEPTION)
@@ -250,6 +321,10 @@ const med_int * CONNECTIVITYClient::getReverseConnectivity
   return c;
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 const med_int * CONNECTIVITYClient::getReverseConnectivityIndex
                       (medConnectivity ConnectivityType,
 		       medEntityMesh Entity) throw (MEDEXCEPTION)
@@ -267,6 +342,10 @@ const med_int * CONNECTIVITYClient::getReverseConnectivityIndex
   return c;
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 const med_int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity, 
 			medGeometryElement Type)
 {
@@ -282,6 +361,10 @@ const med_int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity,
   return c;
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 const med_int* CONNECTIVITYClient::getValueIndex(medConnectivity TypeConnectivity)
 {
   BEGIN_OF("void CONNECTIVITYClient::getValueIndex()");
@@ -296,6 +379,10 @@ const med_int* CONNECTIVITYClient::getValueIndex(medConnectivity TypeConnectivit
   return c;
 }
 
+//=============================================================================
+/*!
+ */
+//=============================================================================
 const med_int* CONNECTIVITYClient::getNeighbourhood() const
 {
   BEGIN_OF("void CONNECTIVITYClient::getNeighbourhood()");

@@ -18,6 +18,7 @@ using namespace std;
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
+using namespace MEDMEM;
 
 void affiche_medarray(MEDARRAY<double> & myMedArray)
 {

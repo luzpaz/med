@@ -50,7 +50,7 @@ LIB_SRC = MedGUI.cxx
 LIB_MOC = MedGUI.h
 
 LIB_CLIENT_IDL = SALOMEDS.idl SALOME_Exception.idl \
-                 Med_Gen.idl  MED.idl \
+                 MED_Gen.idl  MED.idl \
 		 SALOMEDS_Attributes.idl
 #		 SMESH_Mesh.idl SMESH_Hypothesis.idl SMESH_BasicHypothesis.idl \
 #		 GEOM_Shape.idl SALOMEDS_Attributes.idl
@@ -62,7 +62,7 @@ LIB_SERVER_IDL =
 CPPFLAGS += $(QT_INCLUDES) $(VTK_INCLUDES) $(OCC_INCLUDES) $(PYTHON_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
 CXXFLAGS += -I${KERNEL_ROOT_DIR}/include/salome
 
-LDFLAGS += -lSalomeGUI -lmedmem -lMEDImpl -lMEDEngine -L${KERNEL_ROOT_DIR}/lib/salome
+LDFLAGS += -lSalomeGUI -lMEDMEMImpl -lmedmem -lMEDEngine -L${KERNEL_ROOT_DIR}/lib/salome
 
 
 MED.hh MEDSK.cc: MED.idl

@@ -11,11 +11,11 @@
 #include <map>
 #include <iostream>
 
+namespace MEDMEM {
 class MESH;
 class CONNECTIVITY;
 class COORDINATE;
 class GROUP;
-
 struct _noeud
 {
     mutable int number;
@@ -88,4 +88,5 @@ std::ostream& operator << (std::ostream& , const _groupe& );
 std::ostream& operator << (std::ostream& , const _noeud& );
 std::ostream& operator << (std::ostream& , const _intermediateMED& );
 
+};
 #endif /* DRIVERTOOLS_HXX */

@@ -31,12 +31,14 @@ import salome
 med=salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
 
 import os
-filePath=os.getenv("SALOME_BUILD")
-filePath=filePath+"/../SALOME_ROOT/data/"
+#
+#befor running this script, please be sure about the path the file fileName
+#
+filePath=os.environ["MED_ROOT_DIR"]
+filePath=filePath+"/share/salome/resources/"
 fileName="pointe.med"
 fileTout=filePath+fileName
 
 print fileTout
 
 med.readStructFile(fileTout,salome.myStudyName)
-

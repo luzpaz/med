@@ -5,16 +5,8 @@
 #include "MEDMEM_STRING.hxx"
 #include "utilities.h"
 #include "MEDMEM_Exception.hxx"
-
 #include "MEDMEM_GenDriver.hxx"
-
 #include "MEDMEM_define.hxx"
-
-//using namaspace MED_FR ;
-
-class MESH;
-class FIELD_;
-class MED;
 
 /*!
 
@@ -25,6 +17,11 @@ class MED;
 */
 
 // This driver pilots within a MED class read/write accesses of fields/meshes
+namespace MEDMEM {
+class MESH;
+class FIELD_;
+class MED;
+
 class MED_MED_DRIVER : public GENDRIVER
 {
 protected:
@@ -237,6 +234,7 @@ public :
 private:
   virtual GENDRIVER * copy ( void ) const ;
 
+};
 };
 
 #endif /* MED_MED_DRIVER_HXX */

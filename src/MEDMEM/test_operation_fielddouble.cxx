@@ -23,6 +23,7 @@ double myfunction1(double x)
 
 
 using namespace std;
+using namespace MEDMEM;
 void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;

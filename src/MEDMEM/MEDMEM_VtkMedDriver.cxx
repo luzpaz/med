@@ -9,6 +9,7 @@ using namespace std;
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_CellModel.hxx"
+using namespace MEDMEM;
 
 VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(), 
                                   _ptrMed((MED * const)MED_NULL)

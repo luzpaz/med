@@ -15,6 +15,7 @@
 
 // class containing structured mesh data
 
+namespace MEDMEM {
 class GRID: public MESH
 {
  protected:
@@ -249,6 +250,8 @@ class GRID: public MESH
   friend class MED_MESH_WRONLY_DRIVER;
 
 };
+};
+using namespace MEDMEM;
 
 
   //----------------------------------//

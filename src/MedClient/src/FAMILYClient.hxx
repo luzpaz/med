@@ -8,6 +8,7 @@
 #include "SUPPORTClient.hxx"
 
 
+namespace MEDMEM {
 class FAMILYClient : 
   public SUPPORTClient, public FAMILY {
 
@@ -27,5 +28,6 @@ public :
   virtual void fillCopy(bool fillSupport = true);
 };
 
+};
 
 #endif

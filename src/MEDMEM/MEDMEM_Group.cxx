@@ -7,6 +7,7 @@ using namespace std;
 
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Family.hxx"
+using namespace MEDMEM;
 
 GROUP::GROUP():_numberOfFamilies(0),_family() 
 {
@@ -26,7 +27,7 @@ GROUP & GROUP::operator=(const GROUP &group)
   return *this;
 };
 
-ostream & operator<<(ostream &os, GROUP &myGroup)
+ostream & MEDMEM::operator<<(ostream &os, GROUP &myGroup)
 {
   os << (SUPPORT) myGroup;
 
@@ -107,7 +108,7 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
     it++ ;
   }
 
-  MESSAGE(LOC<<"Printing of the object GROUP built "<< *this);
+  MESSAGE(LOC<<"Printing of the object GROUP built "<< (GROUP)*this);
 
   END_OF(LOC);
 };

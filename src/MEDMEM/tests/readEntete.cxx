@@ -28,6 +28,7 @@ using namespace std;
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_DriversDef.hxx"
+using namespace MEDMEM;
 
 void usage(char * name)
 {

@@ -11,7 +11,7 @@
   they are the same (positive or negative cycle) !
 */
 
-
+namespace MEDMEM {
 class MEDMODULUSARRAY {
 private:
   int   _length ;
@@ -26,6 +26,8 @@ public:
   int compare(const MEDMODULUSARRAY &modulusArray) const;
 
 };
+};
+using namespace MEDMEM;
 
 MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) : 
   _length(length), _array(array)

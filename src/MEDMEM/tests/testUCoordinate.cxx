@@ -31,6 +31,7 @@ using namespace std;
 #include "MEDMEM_Array.hxx"
 #include "MEDMEM_Coordinate.hxx"
 #include <string> 
+using namespace MEDMEM;
 
 void usage(char * name)
 {

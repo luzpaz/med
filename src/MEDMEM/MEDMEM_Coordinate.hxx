@@ -22,6 +22,7 @@
     spaceDimension and  numberOfNodes can be found in _coordinate object.
 */
 
+namespace MEDMEM {
 class COORDINATE
 {
 
@@ -87,6 +88,7 @@ public :
   string   getCoordinateName(int Axis) const;
   const string * getCoordinatesUnits() const;
   string   getCoordinateUnit(int Axis) const;
+};
 };
 
 #endif /* COORDINATE_HXX */

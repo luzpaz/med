@@ -2,6 +2,7 @@ using namespace std;
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
+using namespace MEDMEM;
 
 GENDRIVER::GENDRIVER(): _id(MED_INVALID),
                         _fileName(""),
@@ -28,11 +29,11 @@ GENDRIVER::GENDRIVER(const GENDRIVER & genDriver):
 GENDRIVER::~GENDRIVER() {}
 
 
-GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver) {
+GENDRIVER & MEDMEM::GENDRIVER::operator=(const GENDRIVER &  genDriver) 
+{
   const char * LOC = " GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver)  : ";
   
   BEGIN_OF(LOC);
-
   _fileName    = genDriver._fileName;
   _accessMode  = genDriver._accessMode;
   _status      = genDriver._status;
@@ -109,7 +110,7 @@ med_mode_acces GENDRIVER::getAccessMode() const {
   END_OF(LOC);
 }
 
-ostream & operator<<(ostream &os,const GENDRIVER & drv)
+ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
 {
   switch (drv._accessMode)
     {
@@ -139,7 +140,7 @@ ostream & operator<<(ostream &os,const GENDRIVER & drv)
 }
 
 // Test if this driver has been created from  MED driver
-bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
+bool MEDMEM::GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
   
   const char * LOC = "bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const : ";
 

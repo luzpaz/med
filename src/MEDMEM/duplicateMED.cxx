@@ -4,6 +4,7 @@ using namespace std;
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Med.hxx"
 
+using namespace MEDMEM;
 void usage(char * name)
 {
   cout << "  " << name << " <input med file> <output med file> " <<endl ;

@@ -1,31 +1,38 @@
 #include "FAMILYClient.hxx"
 #include "MESHClient.hxx"
 #include "UtilClient.hxx"
-
-FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr F,
-			   MESH * M) 
-  : SUPPORTClient(F, M), 
+using namespace MEDMEM;
+//=============================================================================
+/*!
+ * Constructeur
+ */
+//=============================================================================
+FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr S,
+			     MESH * M) 
+  : SUPPORTClient(S, M), 
     FAMILY(), 
-    IOR_Family(SALOME_MED::FAMILY::_duplicate(F))
+    IOR_Family(SALOME_MED::FAMILY::_duplicate(S))
 {
   BEGIN_OF("FAMILYClient::FAMILYClient(SALOME_MED::FAMILY_ptr m)");
 
-  SCRUTE(F);
+  SCRUTE(S);
   SCRUTE(M);
 
   blankCopy(false);
 
   END_OF("FAMILYClient::FAMILYClient(SALOME_MED::FAMILY_ptr m)");
 }
-
+//=============================================================================
+/*!
+ * Remplit les informations générales
+ */
+//=============================================================================
 void FAMILYClient::blankCopy(bool blankSupport)
 {
   BEGIN_OF("FAMILYClient::blankCopy()");
 
   if (blankSupport)
     SUPPORTClient::blankCopy();
-
-  MESSAGE("");
 
 //   setIdentifier(IOR_Family->getIdentifier());
 
@@ -60,6 +67,11 @@ void FAMILYClient::blankCopy(bool blankSupport)
   END_OF("FAMILYClient::blankCopy()");
 }
 
+//=============================================================================
+/*!
+ * Remplit les informations générales
+ */
+//=============================================================================
 void FAMILYClient::fillCopy(bool fillSupport)
 {
   BEGIN_OF("FAMILYClient::fillCopy()");
@@ -75,6 +87,11 @@ void FAMILYClient::fillCopy(bool fillSupport)
   END_OF("FAMILYClient::fillCopy()");
 }
 
+//=============================================================================
+/*!
+ * Destructeur
+ */
+//=============================================================================
 
 FAMILYClient::~FAMILYClient()
 {

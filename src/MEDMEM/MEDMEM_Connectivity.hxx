@@ -9,6 +9,7 @@
 
 using namespace MED_EN;
 
+namespace MEDMEM {
 class MEDSKYLINEARRAY;
 class CELLMODEL;
 class FAMILY;
@@ -190,9 +191,11 @@ public:
   const med_int*      getNeighbourhood() const;
 
 };
+};
 /*----------------------*/
 /* Methodes Inline	*/
 /*----------------------*/
+using namespace MEDMEM;
 
 /*! Returns the  medEntityMesh */
 //--------------------------------------------------//

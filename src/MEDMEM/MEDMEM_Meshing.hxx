@@ -14,6 +14,7 @@ using namespace MED_EN;
   This class MESHING is a special class to set a MESH object.
 */
 
+namespace MEDMEM {
 class MESHING: public MESH
 {
 public :
@@ -62,6 +63,7 @@ public :
 // 			    const medEntityMesh Entity) ;
   void addGroup            (const GROUP & Group)
     throw (MEDEXCEPTION) ;
+};
 };
 
 #endif /* MESHING_HXX */

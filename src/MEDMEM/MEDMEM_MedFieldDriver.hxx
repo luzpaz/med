@@ -18,6 +18,7 @@
 
 //using namespace MED_FR ;
 
+namespace MEDMEM {
 template <class T> class FIELD;
 
 // A QD LA CLASSE MED_ALL_ELEMENTS_DRIVER.... :) pour mutualiser le open ..... avec led _medIdt...
@@ -305,12 +306,14 @@ private:
   GENDRIVER * copy( void ) const ;
 
 };
+}
 
 
 /*-------------------------*/
 /* template implementation */
 /*-------------------------*/
 
+using namespace MEDMEM;
 /*--------------------- DRIVER PART -------------------------------*/
 
 template <class T> void MED_FIELD_DRIVER<T>::setFieldName(const string & fieldName)
@@ -795,7 +798,6 @@ template <class T> void MED_FIELD_RDWR_DRIVER<T>::read (void)
   MED_FIELD_RDONLY_DRIVER<T>::read();
   END_OF("MED_FIELD_RDWR_DRIVER::read(void)");
 }
-
 /*-----------------------------------------------------------------*/
 
 #endif /* MED_FIELD_DRIVER_HXX */

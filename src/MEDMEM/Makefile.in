@@ -112,10 +112,18 @@ CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
 CXXFLAGS+=-ftemplate-depth-42 -I${KERNEL_ROOT_DIR}/include/salome
 LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
 
+LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
+
+LIBSFORBIN=
+
+LDFLAGS=
+
+LIBS=
+
 # build create_mesh :
 bin: create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_mesh_c3h8q4_wrong create_mesh_c2q4s2_wrong create_grid create_mesh_c2q4 create_mesh_c3h8
 
-create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_grid create_mesh_c2q4 create_mesh_c3h8: %: %.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $(MED2_LIBS) $(HDF5_LIBS) $(LDFLAGS) $< 
+create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_grid create_mesh_c2q4 create_mesh_c3h8 create_mesh_c3h8q4_wrong create_mesh_c2q4s2_wrong: %: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $(MED2_LIBS) $(HDF5_LIBS) $< 
 
 @CONCLUDE@

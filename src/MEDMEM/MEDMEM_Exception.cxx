@@ -8,6 +8,7 @@ using namespace std;
 
 #include "utilities.h"
 #include "MEDMEM_Exception.hxx"
+using namespace MEDMEM;
 
 extern "C"
 {
@@ -130,7 +131,7 @@ MEDEXCEPTION::MEDEXCEPTION( const MEDEXCEPTION &ex ): _text(duplicate(ex._text))
   Operator << : put the message to the given stream.
 */
 // ------------------------------------------------------- //
-ostream & operator<<( ostream &os , const MEDEXCEPTION &ex )
+ostream & MEDMEM::operator<<( ostream &os , const MEDEXCEPTION &ex )
 // ------------------------------------------------------- //
 {
   os << ex._text ;

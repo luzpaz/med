@@ -12,6 +12,7 @@ using namespace std;
 #include "MEDMEM_Grid.hxx"
 
 #include <sstream>
+using namespace MEDMEM;
 
 VTK_MESH_DRIVER::VTK_MESH_DRIVER(): GENDRIVER(), 
 				    _ptrMesh((MESH * const)MED_NULL)

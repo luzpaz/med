@@ -27,6 +27,7 @@ using namespace std;
 #include <exception>
 
 #include "MEDMEM_Unit.hxx"
+using namespace MEDMEM;
 
 int main (int argc, char ** argv)
 {

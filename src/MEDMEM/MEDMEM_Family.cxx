@@ -6,6 +6,7 @@ using namespace std;
 
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Family.hxx"
+using namespace MEDMEM;
 
 FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), 
                  _attributeIdentifier((int*)NULL),_attributeValue((int*)NULL), _attributeDescription((string*)NULL),
@@ -229,7 +230,7 @@ FAMILY & FAMILY::operator=(const FAMILY &fam)
     return *this;
 };
 
-ostream & operator<<(ostream &os, FAMILY &myFamily)
+ostream & MEDMEM::operator<<(ostream &os, FAMILY &myFamily)
 {
   // how do cast without duplicate ?
   os << (SUPPORT) myFamily;

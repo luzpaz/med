@@ -27,6 +27,7 @@ using namespace std;
 #include <exception>
 #include "utilities.h"
 #include "MEDMEM_ModulusArray.hxx"
+using namespace MEDMEM;
 
 int main (int argc, char ** argv) 
 {

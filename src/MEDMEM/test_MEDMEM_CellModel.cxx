@@ -3,6 +3,7 @@ using namespace std;
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_DriversDef.hxx"
 
+using namespace MEDMEM;
 int main (int argc, char ** argv) {
   list<MED_FR::med_geometrie_element> geomList = MED_FR::meshEntities[MED_FR::MED_MAILLE] ;
   list<MED_FR::med_geometrie_element>::iterator itGeomList ;

@@ -7,10 +7,10 @@
 # (avoids incomplete import at run time)
 
 print "============== import MED_idl ======================="
-print "============== import Med_Gen_idl ======================="
+print "============== import MED_Gen_idl ======================="
 
 import MED_idl
-import Med_Gen_idl
+import MED_Gen_idl
 
 # this function is required
 

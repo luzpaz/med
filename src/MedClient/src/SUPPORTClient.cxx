@@ -1,6 +1,15 @@
+#include "Utils_CorbaException.hxx"
 #include "UtilClient.hxx"
 #include "SUPPORTClient.hxx"
 #include "MESHClient.hxx"
+
+using namespace MEDMEM;
+
+//=============================================================================
+/*!
+ * Constructeur
+ */
+//=============================================================================
 
 SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
 			     MESH * M) : 
@@ -18,79 +27,95 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
 
   END_OF("SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)");
 }
-
+//=============================================================================
+/*!
+ * Remplit les informations générales
+ */
+//=============================================================================
 void SUPPORTClient::blankCopy()
 {
   BEGIN_OF("SUPPORTClient::blankCopy");
 
-  setName(IOR_Support->getName());
-  setDescription(IOR_Support->getDescription());
-  setAll(IOR_Support->isOnAllElements());
-  setEntity(IOR_Support->getEntity());
+ try
+  {
+        SALOME_MED::SUPPORT::supportInfos *all = new SALOME_MED::SUPPORT::supportInfos;
+        all= IOR_Support->getSupportGlobal();
 
-  convertCorbaArray(_geometricType, _numberOfGeometricType,
-		    IOR_Support->getTypes());
+        _name = all->name;
+        _description = all->description;
+	setAll(all->isOnAllElements);
+	setEntity(all->entity);
+// modifs PN 
+        setNumberOfGeometricType(all->numberOfGeometricType);
+  	convertCorbaArray(_geometricType, _numberOfGeometricType,
+		           &all->types);
 
-  int *nE = new int[_numberOfGeometricType];
-  int i;
-  for (i=0; i<_numberOfGeometricType; i++)
-    nE[i] = IOR_Support->getNumberOfElements(_geometricType[i]);
-  setNumberOfElements(nE);
-  SCRUTE(_totalNumberOfElements);
+        //_name = IOR_Support->getName();
+        //_description = IOR_Support->getDescription();
+  	//setAll(IOR_Support->isOnAllElements());
+  	//setEntity(IOR_Support->getEntity());
 
-  SCRUTE(_name);
-  SCRUTE(_description);
+        SCRUTE(_name);
+        SCRUTE(_description);
+  	//convertCorbaArray(_geometricType, _numberOfGeometricType,
+	//	    IOR_Support->getTypes());
 
-  _complete_support = false;
+        int *nE = new int[_numberOfGeometricType];
+        int i;
+  	for (i=0; i<_numberOfGeometricType; i++)
+	{
+    		nE[i] = all->nbEltTypes[i];
+  	}
+  	setNumberOfElements(nE);
+  	SCRUTE(_totalNumberOfElements);
+  	_complete_support = false;
+  }
+  catch( const CORBA::Exception &ex )
+  {
+         MESSAGE("Erreur CORBA dans la communication" ) ;
+         THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                       SALOME::INTERNAL_ERROR);
+  }
 
   END_OF("SUPPORTClient::blankCopy");
 
 }
-
+//=============================================================================
+/*!
+ *  
+ */
+//=============================================================================
 void SUPPORTClient::fillCopy()
 {
   BEGIN_OF("SUPPORTClient::fillCopy");
 
-  int * index, * value;
-  long n_index, n_value;
-  
-  MESSAGE("");
-  try {
+  if (!_complete_support) {
+
+    int * index, * value;
+    long n_index, n_value;
+
     convertCorbaArray(value, n_value, 
 		      IOR_Support->getNumber(MED_ALL_ELEMENTS));
-  }
-  catch (...) {
-    std::cerr << "erreur ...." << std::endl;
-    exit(-1);
-  }
-
-  SCRUTE(n_value);
-  SCRUTE(value[0]);
-  SCRUTE(value[1]);
-  MESSAGE("");
-
-  try {
     convertCorbaArray(index, n_index, 
 		      IOR_Support->getNumberIndex());
-  }
-  catch (...) {
-    std::cerr << "erreur ...." << std::endl;
-    exit(-1);
-  }
+    
+    SCRUTE(n_index);
+    SCRUTE(n_value);
+    setNumber(index, value);
+      
+    delete [] index;
+    delete [] value;
 
-  SCRUTE(n_index);
-  SCRUTE(n_value);
-  setNumber(index, value);
-  
-  delete [] index;
-  delete [] value;
-  
-  _complete_support = true;
+    _complete_support = true;
+  }
 
   END_OF("SUPPORTClient::fillCopy");
 }
-
-
+//=============================================================================
+/*!
+ * Destructeur
+ */
+//=============================================================================
 SUPPORTClient::~SUPPORTClient()
 {
   BEGIN_OF("SUPPORTClient::~SUPPORTClient");
@@ -98,6 +123,11 @@ SUPPORTClient::~SUPPORTClient()
   END_OF("SUPPORTClient::~SUPPORTClient");
 }
 
+//=============================================================================
+/*!
+ * Destructeur
+ */
+//=============================================================================
 MEDSKYLINEARRAY *  SUPPORTClient::getnumber() const throw (MEDEXCEPTION)
 {
   BEGIN_OF("SUPPORTClient::getnumber()");
@@ -109,6 +139,11 @@ MEDSKYLINEARRAY *  SUPPORTClient::getnumber() const throw (MEDEXCEPTION)
   return m;
 }
 
+//=============================================================================
+/*!
+ * 
+ */
+//=============================================================================
 const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType) 
     const throw (MEDEXCEPTION)
 {
@@ -121,6 +156,11 @@ const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType)
   return n;
 }
 
+//=============================================================================
+/*!
+ * 
+ */
+//=============================================================================
 const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION) 
 {
   BEGIN_OF("SUPPORTClient::getnumberIndex()");

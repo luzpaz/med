@@ -13,9 +13,9 @@
 #include "SALOMEDS.idl"
 #include "MED.idl"
 
-module Engines
+module SALOME_MED
 {
-  interface Med_Gen : Engines::Component, SALOMEDS::Driver
+  interface MED_Gen : Engines::Component, SALOMEDS::Driver
   {
 	SALOME_MED::MESH readMeshInFile(in string fileName,
 					in string studyName,

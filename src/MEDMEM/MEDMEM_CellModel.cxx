@@ -6,6 +6,7 @@ using namespace std;
 
 #include "utilities.h"
 #include "MEDMEM_CellModel.hxx"
+using namespace MEDMEM;
 
 CELLMODEL::CELLMODEL(medGeometryElement t)
 {
@@ -1352,7 +1353,7 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
     }
 }
 
-ostream & operator<<(ostream &os,const CELLMODEL &my)
+ostream & MEDMEM::operator<<(ostream &os,const CELLMODEL &my)
 {
   os << "Cell Model :" << endl ;
   os << "  - name               : " << my._name << endl;
@@ -1380,6 +1381,8 @@ ostream & operator<<(ostream &os,const CELLMODEL &my)
     }
   return os;
 }
+/*
+*/
 
 // Return number of constituents type (which dimension is _dimension-1).
 int CELLMODEL::getNumberOfConstituentsType() const

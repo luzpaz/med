@@ -27,14 +27,13 @@
 //  $Header$
 
 using namespace std;
-using namespace std;
 #include "Med_Gen_i.hxx"
 
-#include "Mesh_i.hxx"
-#include "Med_i.hxx"
-#include "FieldInt_i.hxx"
-#include "FieldDouble_i.hxx"
-#include "Support_i.hxx"
+#include "MEDMEM_Mesh_i.hxx"
+#include "MEDMEM_Med_i.hxx"
+#include "MEDMEM_FieldInt_i.hxx"
+#include "MEDMEM_FieldDouble_i.hxx"
+#include "MEDMEM_Support_i.hxx"
 
 
 #include "MEDMEM_Mesh.hxx"
@@ -60,6 +59,8 @@ using namespace std;
 #include <TColStd_SequenceOfAsciiString.hxx>
 #include <HDFascii.hxx>
 #include "SALOMEDS_Tool.hxx"
+
+using namespace MEDMEM;
 
 // Initialisation des variables statiques
  map <string, string> Med_Gen_i::_MedCorbaObj;
@@ -934,7 +935,7 @@ SALOMEDS::SObject_ptr Med_Gen_i::PublishInStudy(SALOMEDS::Study_ptr theStudy,
     if ( !Comp->_is_nil() ) {
       aName->SetValue( Comp->componentusername() );
     }    
-    aBuilder->DefineComponentInstance(aFather, Med_Gen::_this());
+    aBuilder->DefineComponentInstance(aFather, MED_Gen::_this());
   }
 
   if (CORBA::is_nil(theSObject)) {

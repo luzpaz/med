@@ -15,9 +15,10 @@
 # include "MEDMEM_VtkMedDriver.hxx"
 
 # include "MEDMEM_Exception.hxx"
-//using namespace MED_EN;
+using namespace MED_EN;
 
 
+namespace MEDMEM {
 class MESH;
 class FIELD_;
 class SUPPORT ;
@@ -143,6 +144,7 @@ public:
  
   //friend ostream & operator<<(ostream &os,const MED & med);
 
+};
 };
 
 #endif

@@ -10,6 +10,7 @@ using namespace std;
 #include "MEDMEM_STRING.hxx"
 #include <iomanip>
 
+using namespace MEDMEM;
 /*!
    Default Constructor. /n
    Default for Entity is MED_CELL and type of Connectivity is MED_NODAL */
@@ -1523,7 +1524,7 @@ medGeometryElement CONNECTIVITY::getElementType(medEntityMesh Entity,int globalN
 }
 
 
-ostream & operator<<(ostream &os, CONNECTIVITY &co)
+ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
 {
     os << endl << "------------- Entity = ";
     switch (co._entity)

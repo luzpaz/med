@@ -11,6 +11,7 @@ using namespace std;
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_Grid.hxx"
 
+using namespace MEDMEM;
 extern "C" {
   extern med_idt _MEDdatagroupOuvrir(med_idt pid, char *nom);
   extern med_err _MEDdatagroupFermer(med_idt id);

@@ -4,6 +4,7 @@ using namespace std;
 #include "MEDMEM_STRING.hxx"
 
 #include "utilities.h"
+using namespace MEDMEM;
 
 /*! Default Constructor : should not be used */
 //----------------------------------------------------------//

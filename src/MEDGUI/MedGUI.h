@@ -14,7 +14,7 @@
 #include "QAD_StudyFrame.h"
 
 #include <SALOMEconfig.h>
-#include CORBA_CLIENT_HEADER(Med_Gen)
+#include CORBA_CLIENT_HEADER(MED_Gen)
 //#include CORBA_CLIENT_HEADER(SMESH_Mesh)
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
 
@@ -50,7 +50,7 @@ public:
 
   static void ActiveStudyChanged ( QAD_Desktop* parent );
 
-  static Engines::Med_Gen_ptr InitMedGen(QAD_Desktop* parent);
+  static SALOME_MED::MED_Gen_ptr InitMedGen(QAD_Desktop* parent);
 
   static bool DumpMesh( SALOME_MED::MESH_var aMesh );
   //  static bool DumpSubMesh( SMESH::SMESH_subMesh_ptr aSubMesh ) ;

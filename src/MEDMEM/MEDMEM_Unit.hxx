@@ -13,6 +13,7 @@
 #include "MEDMEM_define.hxx"
 //using namespace MED_EN;
 
+namespace MEDMEM {
 class UNIT { 
 protected:
   string _name ;
@@ -58,9 +59,11 @@ public:
   inline int    getLightIntensity() const ;
 
 } ;
+} ;
 
 // inline method :
 
+using namespace MEDMEM;
 inline void UNIT::setName(string Name) {
   _name = Name ;
 };

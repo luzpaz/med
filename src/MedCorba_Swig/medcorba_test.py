@@ -32,6 +32,11 @@ from libMedCorba_Swig import *
 
 from random import *
 
+import os
+
+filePath=os.environ["MED_ROOT_DIR"]
+filePath=filePath+"/share/salome/resources/"
+
 #==============================================================================
 
 def AnalyzeField(field):
@@ -105,7 +110,7 @@ print "We are working in the study ",studyCurrent," with the ID ",studyCurrentId
 print ""
 
 #medFile = "carre_en_quad4_seg2.med"
-medFile = "cube_hexa8_quad4.med"
+medFile = filePath + "cube_hexa8_quad4.med"
 
 print "Loading of the Med Component"
 print ""

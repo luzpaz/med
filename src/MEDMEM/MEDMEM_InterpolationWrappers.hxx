@@ -4,6 +4,7 @@
 
 // les classes de wrapping
 
+namespace MEDMEM {
 template <int DIMENSION> class Wrapper_Noeud
 {
 protected :
@@ -71,5 +72,6 @@ template <int DIMENSION> class Wrapper_Nuage
 			}
 		int size() const {return nbr_noeuds;}
 	};
+};
 
 #endif

@@ -1,9 +1,9 @@
 //=============================================================================
-// File      : Support_i.cxx
+// File      : MEDMEM_Support_i.cxx
 // Project   : SALOME
 // Author    : EDF
 // Copyright : EDF 2002
-// $Header: /export/home/CVS/SALOME_ROOT/MED/src/MedMem/Support_i.cxx
+// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Support_i.cxx
 //=============================================================================
 
 #include "utilities.h"
@@ -18,9 +18,10 @@
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Support.hxx"
 
-#include "Support_i.hxx"
-#include "Mesh_i.hxx"
-#include "convert.hxx"
+#include "MEDMEM_Support_i.hxx"
+#include "MEDMEM_Mesh_i.hxx"
+#include "MEDMEM_convert.hxx"
+using namespace MEDMEM;
 
 // Initialisation des variables statiques
 map < int, ::SUPPORT *> SUPPORT_i::supportMap ;
@@ -102,11 +103,10 @@ throw (SALOME::SALOME_Exception)
 	{
 		return CORBA::string_dup(_support->getName().c_str());
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
 	{
                 MESSAGE("Unable to access the name of the support ");
-		THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-						,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 
 }
@@ -127,13 +127,51 @@ throw (SALOME::SALOME_Exception)
 	{
   		return CORBA::string_dup(_support->getDescription().c_str());
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
 	{
                 MESSAGE("Unable to access the description of the support ");
-		THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-						,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 }
+
+//=============================================================================
+/*!
+ * CORBA: Accessor for Description and Name
+ */
+//=============================================================================
+
+SALOME_MED::SUPPORT::supportInfos * SUPPORT_i::getSupportGlobal()
+throw (SALOME::SALOME_Exception)
+{
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
+        SALOME_MED::SUPPORT::supportInfos_var all = new SALOME_MED::SUPPORT::supportInfos;
+        try
+        {
+                all->name               = CORBA::string_dup(_support->getName().c_str());
+                all->description        = CORBA::string_dup(_support->getDescription().c_str());
+                const int numberOfTypes = _support->getNumberOfTypes();
+                all->numberOfGeometricType = numberOfTypes;
+
+                all->types.length(numberOfTypes);
+                all->nbEltTypes.length(numberOfTypes);
+                const medGeometryElement * elemts = _support->getTypes();
+                for (int i=0;i<numberOfTypes;i++)
+                {
+                        all->types[i]      = convertMedEltToIdlElt(elemts[i]);
+                        all->nbEltTypes[i] = _support->getNumberOfElements(elemts[i]);
+                }
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to access the description of the support ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+        return all._retn();
+
+}
+
 
 //=============================================================================
 /*!
@@ -157,9 +195,6 @@ throw (SALOME::SALOME_Exception)
 
 		MESH_i * m1 = new MESH_i(mesh);
 		SALOME_MED::MESH_ptr m2 = m1->POA_SALOME_MED::MESH::_this();
-
-
-
 		MESSAGE("SALOME_MED::MESH_ptr SUPPORT_i::getMesh() checking des pointeurs CORBA");
 
 		SCRUTE(m1);
@@ -171,11 +206,10 @@ throw (SALOME::SALOME_Exception)
 
 	        return (SALOME_MED::MESH::_duplicate(m2));
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to access the assoicated mesh");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 
@@ -195,13 +229,36 @@ throw (SALOME::SALOME_Exception)
 	{
 		return _support->isOnAllElements();
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
 	{
                 MESSAGE("Unable to access the type of the support");
-		THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-						,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 }
+
+//=============================================================================
+/*!
+ * CORBA:
+ */
+//=============================================================================
+CORBA::Long SUPPORT_i::getNumberOfTypes()
+throw (SALOME::SALOME_Exception)
+{
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
+        try
+        {
+                return _support->getNumberOfTypes();
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to access  number of support different types");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+
+}
+
 
 //=============================================================================
 /*!
@@ -222,11 +279,10 @@ throw (SALOME::SALOME_Exception)
       END_OF("SALOME_MED::medEntityMesh SUPPORT_i::getEntity()");
       return convertMedEntToIdlEnt(_support->getEntity());
     }
-  catch(...)
+  catch (MEDEXCEPTION &ex)
     {
       MESSAGE("Unable to access support s entity");
-      THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object", \
-				   SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
     }
 }
 
@@ -253,11 +309,10 @@ throw (SALOME::SALOME_Exception)
 			myseq[i]=convertMedEltToIdlElt(elemts[i]);
 		}
         }
-	catch(...)
+	catch (MEDEXCEPTION &ex)
         {
       		MESSAGE("Unable to access support different types");
-		THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object", \
-                                              SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 	return myseq._retn();
 }
@@ -282,11 +337,10 @@ throw (SALOME::SALOME_Exception)
         {
 		return _support->getNumberOfElements(convertIdlEltToMedElt(geomElement));
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
         {
       		MESSAGE("Unable to access the number of support different types");
-		THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 
 }
@@ -297,7 +351,7 @@ throw (SALOME::SALOME_Exception)
  */
 //=============================================================================
 
-Engines::long_array *  SUPPORT_i::getNumber(SALOME_MED::medGeometryElement geomElement) 
+SALOME_MED::long_array *  SUPPORT_i::getNumber(SALOME_MED::medGeometryElement geomElement) 
 throw (SALOME::SALOME_Exception)
 {
   SCRUTE(_support);
@@ -307,7 +361,7 @@ throw (SALOME::SALOME_Exception)
 	if (_support==NULL)
 		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
 				             SALOME::INTERNAL_ERROR);
-        Engines::long_array_var myseq= new Engines::long_array;
+        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
                 int nbelements=_support->getNumberOfElements(convertIdlEltToMedElt(geomElement));
@@ -322,11 +376,10 @@ SCRUTE(convertIdlEltToMedElt(geomElement));
 SCRUTE(numbers[i]);
                 }
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
       		MESSAGE("Unable to access the support optionnal index");
-		THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
 	
@@ -338,13 +391,13 @@ SCRUTE(numbers[i]);
  */
 //=============================================================================
 
-Engines::long_array *  SUPPORT_i::getNumberIndex()
+SALOME_MED::long_array *  SUPPORT_i::getNumberIndex()
 throw (SALOME::SALOME_Exception)
 {
 	if (_support==NULL)
 		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
 				             SALOME::INTERNAL_ERROR);
-        Engines::long_array_var myseq= new Engines::long_array;
+        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
 		MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
@@ -356,15 +409,38 @@ throw (SALOME::SALOME_Exception)
                         myseq[i]=numbers[i];
                 }
         }
-        catch(...)
+        catch (MEDEXCEPTION &ex)
         {
       		MESSAGE("Unable to access the support index");
-		THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
 	
 }
+//=============================================================================
+/*!
+ * CORBA:
+ */
+//=============================================================================
+
+void SUPPORT_i::getBoundaryElements()
+throw (SALOME::SALOME_Exception)
+{
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
+        try
+        {
+                (const_cast< ::SUPPORT *>(_support))->getBoundaryElements();
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to access elements");
+                THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
+                                                ,SALOME::INTERNAL_ERROR);
+        }
+}
+
 
 //=============================================================================
 /*!
@@ -372,7 +448,7 @@ throw (SALOME::SALOME_Exception)
  */
 //=============================================================================
 
-CORBA::Long SUPPORT_i::getNumberOfGaussPoints(SALOME_MED::medGeometryElement geomElement)
+CORBA::Long SUPPORT_i::getNumberOfGaussPoint(SALOME_MED::medGeometryElement geomElement)
 throw (SALOME::SALOME_Exception)
 {
 	if (_support==NULL)
@@ -382,21 +458,47 @@ throw (SALOME::SALOME_Exception)
         {
 		return _support->getNumberOfGaussPoint(convertIdlEltToMedElt(geomElement));
 	}
-	catch(...)
+	catch (MEDEXCEPTION &ex)
         {
       		MESSAGE("Unable to access number of Gauss points");
-		THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
-                                                ,SALOME::INTERNAL_ERROR);
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
 	}
 }
-
+//=============================================================================
+/*!
+ * CORBA: Global Nodes Index (optionnaly designed by the user)
+ */
+//=============================================================================
+SALOME_MED::long_array *  SUPPORT_i::getNumbersOfGaussPoint()
+throw (SALOME::SALOME_Exception)
+{
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
+        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        try
+        {
+                int mySeqLength=_support->getNumberOfTypes();
+                myseq->length(mySeqLength);
+                const medGeometryElement * elemts = _support->getTypes();
+                for (int i=0;i<mySeqLength;i++)
+                {
+                        myseq[i]= _support->getNumberOfGaussPoint(elemts[i]);
+                }
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to access number of Gauss points");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+}
 //=============================================================================
 /*!
  * CORBA: add the Support in the StudyManager 
  */
 //=============================================================================
 void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr myIor)
-  throw (SALOME::SALOME_Exception)
+  throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
   BEGIN_OF("SUPPORT_i::addInStudy");
 
@@ -406,6 +508,14 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
       THROW_SALOME_CORBA_EXCEPTION("Support already in Study", \
 				   SALOME::BAD_PARAM);
   };
+
+  if ( CORBA::is_nil(myStudy) )
+  {
+      MESSAGE("Study not found");
+      THROW_SALOME_CORBA_EXCEPTION("Study deleted !!!",
+                                    SALOME::INTERNAL_ERROR);
+  }
+
   
   SALOMEDS::StudyBuilder_var     myBuilder = myStudy->NewBuilder();
   SALOMEDS::GenericAttribute_var anAttr;
@@ -413,20 +523,19 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   SALOMEDS::AttributeIOR_var     aIOR;
   
   // Find SComponent labelled 'Med'
-  MESSAGE("Find SComponent labelled 'Med'");
-  //  SALOMEDS::SComponent_var medfather = myStudy->FindComponent("Med");
+  MESSAGE("Find SComponent labelled 'MED'");
   SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
   if ( CORBA::is_nil(medfather) ) 
+  { 
+    MESSAGE("MED not found");
     THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
-  
-  if ( CORBA::is_nil(myStudy) ) 
-    THROW_SALOME_CORBA_EXCEPTION("Study deleted !!!",SALOME::INTERNAL_ERROR);
+  }
 
   // Find SObject MESH (represent mesh in support)
   SALOMEDS::SObject_var medmeshfather = myStudy->FindObject("MEDMESH");
   if ( CORBA::is_nil(medmeshfather) )
   { 
-    cout << "On a leve l exception" << flush;
+    MESSAGE("No MEDMESH Found in study")
     THROW_SALOME_CORBA_EXCEPTION("SObject labelled 'MEDMESH' not Found",SALOME::INTERNAL_ERROR);
   }
   cout << "Find SObject MESH (represent mesh in support)"<< flush;

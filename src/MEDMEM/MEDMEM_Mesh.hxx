@@ -20,12 +20,7 @@
 
 #include "MEDMEM_VtkMeshDriver.hxx"
 
-class CELLMODEL;
-class FAMILY;
-class GROUP;
-class SUPPORT;
 
-template <class T> class FIELD;
 
 //class GENDRIVER;
 //class MED_MESH_RDONLY_DRIVER;
@@ -46,6 +41,14 @@ using namespace MED_EN;
 
 */
 
+namespace MEDMEM {
+
+template <class T> class FIELD;
+
+class CELLMODEL;
+class FAMILY;
+class GROUP;
+class SUPPORT;
 class MESH
 {
 
@@ -264,7 +267,9 @@ public :
    */
   SUPPORT * intersectSupports(const vector<SUPPORT *> Supports) const throw (MEDEXCEPTION) ;
 };
+};
 
+using namespace MEDMEM;
 // ---------------------------------------
 // 		Methodes Inline
 // ---------------------------------------
@@ -669,7 +674,7 @@ inline int MESH::getNumberOfGroups (medEntityMesh entity) const
     throw MEDEXCEPTION("MESH::getNumberOfGroups : Unknown entity");
   }
 }
-const vector<FAMILY*> MESH::getFamilies(medEntityMesh entity) const
+const vector<MEDMEM::FAMILY*> MESH::getFamilies(medEntityMesh entity) const
 {
   switch (entity) {
   case MED_NODE :
@@ -701,7 +706,7 @@ const vector<GROUP*> MESH::getGroups(medEntityMesh entity) const
   }
 }
 
-const FAMILY* MESH::getFamily(medEntityMesh entity, int i) const
+const MEDMEM::FAMILY* MESH::getFamily(medEntityMesh entity, int i) const
 {
   if (i<=0)
     throw MEDEXCEPTION("MESH::getFamily(i) : argument i must be > 0");
