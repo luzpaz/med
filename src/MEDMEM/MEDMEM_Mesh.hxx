@@ -228,6 +228,15 @@ public :
 					     medGeometryElement Type) const;
   virtual inline const int * getConnectivityIndex(medConnectivity ConnectivityType,
 						  medEntityMesh Entity) const;
+  inline const int * getPolygonsConnectivity(medConnectivity ConnectivityType,                                                   medEntityMesh Entity) const;
+  inline const int * getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
+                                                  medEntityMesh Entity) const;
+  inline int getNumberOfPolygons() const;
+  inline const int * getPolyhedronConnectivity(medConnectivity ConnectivityType) const;
+  inline const int * getPolyhedronFacesIndex() const;
+  inline const int * getPolyhedronIndex(medConnectivity ConnectivityType) const;
+  inline int getNumberOfPolyhedronFaces() const;
+  inline int getNumberOfPolyhedron() const;
   virtual int                 getElementNumber(medConnectivity ConnectivityType, 
                                                medEntityMesh Entity, 
                                                medGeometryElement Type, 
@@ -644,6 +653,69 @@ inline const int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,m
 {
   //  checkGridFillConnectivity();
   return _connectivity->getConnectivityIndex(ConnectivityType, entity);
+}
+/*!
+  Return the required connectivity of polygons for the given entity.
+  You must also get the corresponding index array.
+ */
+inline const int * MESH::getPolygonsConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity) const
+{
+  return _connectivity->getPolygonsConnectivity(ConnectivityType,Entity);
+}
+/*!
+  Return the required index array for polygons connectivity.
+ */
+inline const int * MESH::getPolygonsConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity) const
+{
+  return _connectivity->getPolygonsConnectivityIndex(ConnectivityType,Entity);
+}
+/*!
+  Return the number of polygons.
+ */
+inline int MESH::getNumberOfPolygons() const
+{
+  return _connectivity->getNumberOfPolygons();
+}
+/*!
+  Return the required connectivity of polyhedron :
+  - in nodal mode, it gives you the polyhedron faces nodal connectivity.
+  - in descending mode, it gives you the polyhedron faces list.
+  You must also get :
+  - faces index and polyhedron index arrays in nodal mode.
+  - polyhedron index array in descending mode.
+ */
+inline const int * MESH::getPolyhedronConnectivity(medConnectivity ConnectivityType) const
+{
+  return _connectivity->getPolyhedronConnectivity(ConnectivityType);
+}
+/*!
+  Return the index array of polyhedron faces in nodal mode.
+  You must also get the polyhedron index array.
+ */
+inline const int * MESH::getPolyhedronFacesIndex() const
+{
+  return _connectivity->getPolyhedronFacesIndex();
+}
+/*!
+  Return the required polyhedron index array.
+ */
+inline const int * MESH::getPolyhedronIndex(medConnectivity ConnectivityType) const
+{
+  return _connectivity->getPolyhedronIndex(ConnectivityType);
+}
+/*!
+  Return the number of polyhedron faces.
+ */
+inline int MESH::getNumberOfPolyhedronFaces() const
+{
+  return _connectivity->getNumberOfPolyhedronFaces();
+}
+/*!
+  Return the number of polyhedron.
+ */
+inline int MESH::getNumberOfPolyhedron() const
+{
+  return _connectivity->getNumberOfPolyhedron();
 }
 /*!
   Return the reverse connectivity required by ConnectivityType :
