@@ -6,10 +6,10 @@
 #ifndef MEDEXCEPTION_HXX
 #define MEDEXCEPTION_HXX
 
-using namespace std;
-
 #include <exception>
 #include <iostream>
+
+using namespace std;
 
 #ifndef LOCALIZED
 #define LOCALIZED(message) message , __FILE__ , __LINE__

@@ -56,9 +56,9 @@ EXPORT_PYSCRIPTS = libMEDMEM_Swig.py med_test1.py med_test2.py med_test3.py med_
 #############################################################################
 
 CPPFLAGS+= $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
-CXXFLAGS=-g -D__x86__ -D__linux__ 
+CXXFLAGS+=-g -D__x86__ -D__linux__ 
 CXXFLAGS+=-ftemplate-depth-42 -I${KERNEL_ROOT_DIR}/include/salome
-LIBS= $(PYTHON_LIBS) 
+LIBS= $(PYTHON_LIBS)
 #LDFLAGS+= -lmedmem $(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
 # change motivated by the bug KERNEL4778.
 LDFLAGS+= -lmedmem $(MED2_LIBS) $(HDF5_LIBS) -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome

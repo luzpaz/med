@@ -59,8 +59,8 @@ public :
   */
   virtual ~MED_MESH_DRIVER() ;
 
-  void open() throw (MEDEXCEPTION);
-  void close() throw (MEDEXCEPTION);
+  void open();
+  void close();
 
   virtual void write( void ) const = 0 ;
   virtual void read ( void ) = 0 ;
@@ -117,11 +117,11 @@ public :
   /*!
     Return a MEDEXCEPTION : it is the read-only driver.
   */
-  void write( void ) const throw (MEDEXCEPTION);
+  void write( void ) const;
   /*!
     Read MESH in the specified file.
   */
-  void read ( void ) throw (MEDEXCEPTION);
+  void read ( void );
 
 private:
   int getCOORDINATE();
@@ -172,11 +172,11 @@ public :
   /*!
     Write MESH in the specified file.
   */
-  void write( void ) const throw (MEDEXCEPTION);
+  void write( void ) const;
   /*!
     Return a MEDEXCEPTION : it is the write-only driver.
   */
-  void read ( void ) throw (MEDEXCEPTION);
+  void read ( void );
 
 private:
   int writeCoordinates    ()                           const;
@@ -222,11 +222,11 @@ public :
   /*!
     Write MESH in the specified file.
   */
-  void write(void) const throw (MEDEXCEPTION);
+  void write(void) const;
   /*!
     Read MESH in the specified file.
   */
-  void read (void) throw (MEDEXCEPTION);
+  void read (void);
 
 private:
   GENDRIVER * copy(void) const ;

@@ -112,11 +112,11 @@ CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
 CXXFLAGS+=-ftemplate-depth-42 -I${KERNEL_ROOT_DIR}/include/salome
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome
+LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
 
 LIBSFORBIN=
 

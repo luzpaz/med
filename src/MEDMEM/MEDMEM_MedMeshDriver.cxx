@@ -53,7 +53,6 @@ MED_MESH_DRIVER::~MED_MESH_DRIVER()
 }
 
 void MED_MESH_DRIVER::open()
-  throw (MEDEXCEPTION)
 {
   const char * LOC = "MED_MESH_DRIVER::open()" ;
   BEGIN_OF(LOC);
@@ -72,7 +71,6 @@ void MED_MESH_DRIVER::open()
 }
   
 void MED_MESH_DRIVER::close()
-  throw (MEDEXCEPTION)
 {
   const char * LOC = "MED_MESH_DRIVER::close() " ;
   BEGIN_OF(LOC);
@@ -137,7 +135,6 @@ GENDRIVER * MED_MESH_RDONLY_DRIVER::copy(void) const
 }
 
 void MED_MESH_RDONLY_DRIVER::read(void)
-  throw (MEDEXCEPTION)
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER::read() : " ;
   BEGIN_OF(LOC);
@@ -363,8 +360,8 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
   // set coordinate names
 
   for (i=0; i<_ptrMesh->_spaceDimension; ++i ) {
-    string myStringName(tmp_nom,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
-    string myStringUnit(tmp_unit,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
+    string myStringName(tmp_nom_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
+    string myStringUnit(tmp_unit_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
     // suppress space at the end
     int j ;
     for(j=MED_TAILLE_PNOM-1;j>=0;j--)
@@ -454,8 +451,8 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
       
 
       for (int i=0;i<_ptrMesh->_spaceDimension;i++) {
-	string myStringName(tmp_nom,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
-	string myStringUnit(tmp_unit,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
+	string myStringName(tmp_nom_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
+	string myStringUnit(tmp_unit_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
 	// suppress space at the end
 	int j ;
 	for(j=MED_TAILLE_PNOM-1;j>=0;j--)
@@ -1389,7 +1386,6 @@ void MED_MESH_RDONLY_DRIVER::updateFamily()
 
 
 void MED_MESH_RDONLY_DRIVER::write( void ) const
-  throw (MEDEXCEPTION)
 {
   throw MEDEXCEPTION("MED_MESH_RDONLY_DRIVER::write : Can't write with a RDONLY driver !");
 }
@@ -1423,13 +1419,11 @@ GENDRIVER * MED_MESH_WRONLY_DRIVER::copy(void) const
 }
 
 void MED_MESH_WRONLY_DRIVER::read (void)
-  throw (MEDEXCEPTION)
 {
   throw MEDEXCEPTION("MED_MESH_WRONLY_DRIVER::read : Can't read with a WRONLY driver !");
 }
 
 void MED_MESH_WRONLY_DRIVER::write(void) const
-  throw (MEDEXCEPTION)
 { 
   const char * LOC = "void MED_MESH_WRONLY_DRIVER::write(void) const : ";
   BEGIN_OF(LOC);
@@ -2233,12 +2227,10 @@ GENDRIVER * MED_MESH_RDWR_DRIVER::copy(void) const
 }
 
 void MED_MESH_RDWR_DRIVER::write(void) const
-  throw (MEDEXCEPTION)
 {
   MED_MESH_WRONLY_DRIVER::write();
 }
 void MED_MESH_RDWR_DRIVER::read (void)
-  throw (MEDEXCEPTION)
 {
   MED_MESH_RDONLY_DRIVER::read();
 }

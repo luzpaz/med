@@ -34,19 +34,19 @@ fi
 
 PYTHON_VERSION=python2.2
 
-# you must define SALOME_ROOT_DIR and SALOME_SITE_DIR (if you need it)
+# you must define KERNEL_ROOT_DIR and MED_ROOT_DIR (if you need it)
 
-if test -n ${SALOME_ROOT_DIR}
+if test -n ${KERNEL_ROOT_DIR}
 then
-  export PATH=${SALOME_ROOT_DIR}/bin:${PATH}
-  export LD_LIBRARY_PATH=${SALOME_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
-  export PYTHONPATH=${SALOME_ROOT_DIR}/lib:${SALOME_ROOT_DIR}/lib/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
+  export PATH=${KERNEL_ROOT_DIR}/bin:${PATH}
+  export LD_LIBRARY_PATH=${KERNEL_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
+  export PYTHONPATH=${KERNEL_ROOT_DIR}/lib:${KERNEL_ROOT_DIR}/lib/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
 fi
-if test -n ${SALOME_SITE_DIR}
+if test -n ${MED_ROOT_DIR}
 then
-  export PATH=${SALOME_SITE_DIR}/bin:${PATH}
-  export LD_LIBRARY_PATH=${SALOME_SITE_DIR}/lib:${LD_LIBRARY_PATH}
-  export PYTHONPATH=${SALOME_SITE_DIR}/lib:${SALOME_SITE_DIR}/lib/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
+  export PATH=${MED_ROOT_DIR}/bin:${PATH}
+  export LD_LIBRARY_PATH=${MED_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
+  export PYTHONPATH=${MED_ROOT_DIR}/lib:${MED_ROOT_DIR}/lib/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
 fi
 
 if test -d ${HOME}/.salome/bin
