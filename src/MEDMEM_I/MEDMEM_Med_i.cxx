@@ -1,4 +1,3 @@
-using namespace std;
 //=============================================================================
 // File      : MEDMEM_Med_i.cxx
 // Project   : SALOME
@@ -23,6 +22,7 @@ using namespace std;
 #include "MEDMEM_DriversDef.hxx"
 #include "utilities.h"
 #include "Utils_CorbaException.hxx"
+using namespace std;
 using namespace MEDMEM;
 
 //=============================================================================
@@ -159,8 +159,10 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 		 {
       		         case MED_FR::MED_INT32 : 
 			 {
-			     ((FIELD<int>*)myField)->read();
-			     FIELDINT_i * myFieldIntI = new FIELDINT_i(mySupportIOR,(FIELD<int>*)myField);
+//CCRT			     ((FIELD<int>*)myField)->read();
+			     ((FIELD<med_int>*)myField)->read();
+//CCRT			     FIELDINT_i * myFieldIntI = new FIELDINT_i(mySupportIOR,(FIELD<int>*)myField);
+			     FIELDINT_i * myFieldIntI = new FIELDINT_i(mySupportIOR,(FIELD<med_int>*)myField);
 		             POA_SALOME_MED::FIELD_tie<FIELD_i> * myFieldTie 
 					= new POA_SALOME_MED::FIELD_tie<FIELD_i>(myFieldIntI);
 			     myFieldIOR = myFieldTie->_this();
@@ -487,9 +489,11 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		  {
 		     case MED_FR::MED_INT32: 
 		     {
-			((FIELD<int>*)myField)->read();
+//CCRT			((FIELD<int>*)myField)->read();
+			((FIELD<med_int>*)myField)->read();
 			FIELDINT_i * myFieldIntI 
-				   = new FIELDINT_i(mySupportIOR,(FIELD<int>*)myField);
+//CCRT				   = new FIELDINT_i(mySupportIOR,(FIELD<int>*)myField);
+				   = new FIELDINT_i(mySupportIOR,(FIELD<med_int>*)myField);
 			SALOME_MED::FIELDINT_ptr myFieldIntIOR;
 			POA_SALOME_MED::FIELDINT_tie<FIELDINT_i> * myFieldIntTie 
 				= new POA_SALOME_MED::FIELDINT_tie<FIELDINT_i>(myFieldIntI);
@@ -837,8 +841,10 @@ throw (SALOME::SALOME_Exception)
         else
         {
                 MESSAGE("Integer");
-                ASSERT(FIELDOF_i<int>::fieldMap.find(ind)!=FIELDOF_i<int>::fieldMap.end());
-                ::FIELD<int> * fint = FIELDOF_i<int>::fieldMap[ind];
+//CCRT                ASSERT(FIELDOF_i<int>::fieldMap.find(ind)!=FIELDOF_i<int>::fieldMap.end());
+                ASSERT(FIELDOF_i<med_int>::fieldMap.find(ind)!=FIELDOF_i<med_int>::fieldMap.end());
+//CCRT                ::FIELD<int> * fint = FIELDOF_i<int>::fieldMap[ind];
+                ::FIELD<med_int> * fint = FIELDOF_i<med_int>::fieldMap[ind];
                 MESH * mesh=_med->getMesh(fint);
         }
         MESH_i * meshi = new MESH_i(mesh);
@@ -1138,8 +1144,10 @@ throw (SALOME::SALOME_Exception)
         else
         {
                 MESSAGE("Integer");
-                ASSERT(FIELDOF_i<int>::fieldMap.find(ind)!=FIELDOF_i<int>::fieldMap.end());
-                ::FIELD<int> * fint = FIELDOF_i<int>::fieldMap[ind];
+//CCRT                ASSERT(FIELDOF_i<int>::fieldMap.find(ind)!=FIELDOF_i<int>::fieldMap.end());
+                ASSERT(FIELDOF_i<med_int>::fieldMap.find(ind)!=FIELDOF_i<med_int>::fieldMap.end());
+//CCRT                ::FIELD<int> * fint = FIELDOF_i<int>::fieldMap[ind];
+                ::FIELD<med_int> * fint = FIELDOF_i<med_int>::fieldMap[ind];
                 //_med->addField(fint);
         }
 }

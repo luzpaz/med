@@ -103,7 +103,10 @@ template <class T> int  FIELDOF_i<T>::fieldIndex = 0;
 //=============================================================================
 
 //template <class T> FIELDOF_i<T>::FIELDOF_i():_fieldTptr(FIELDOF_i<T>::constructConstField())
+//CCRTtemplate <class T> FIELDOF_i<T>::FIELDOF_i():_fieldTptr(constructConstField()),
+//CCRT					     _support((SALOME_MED::SUPPORT_ptr) NULL)
 template <class T> FIELDOF_i<T>::FIELDOF_i():_fieldTptr(constructConstField()),
+                                             _corbaIndex(0),
 					     _support((SALOME_MED::SUPPORT_ptr) NULL)
 {
         BEGIN_OF("Default Constructor Field_i");

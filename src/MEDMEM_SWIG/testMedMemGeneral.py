@@ -203,7 +203,7 @@ for i in range(nbOfFiles):
     lenDecompFileM1 = len(decompFile)-1
 
     if (lenDecompFileM1 == 0) :
-        print "The file ",file," should have at least a . in its name "
+        print "testMedMemGeneral The file ",file," should have at least a . in its name "
         sys.exit(1)
 
     extensionFile = decompFile[lenDecompFileM1]
@@ -218,26 +218,26 @@ for i in range(nbOfFiles):
     try:
         mesh = MESH()
         if (extensionFile == "med"):
-            print "The file ",file," is a MED file and the name of the mesh is ", meshNameFiles[i]
+            print "testMedMemGeneral The file ",file," is a MED file and the name of the mesh is ", meshNameFiles[i]
             meshDriver = MED_MESH_RDONLY_DRIVER(file,mesh)
             meshDriver.setMeshName(meshNameFiles[i])
         elif (extensionFile == "sauve"):
-            print "The file ",file," is a GIBI file"
+            print "testMedMemGeneral The file ",file," is a GIBI file"
             meshDriver = GIBI_MESH_RDONLY_DRIVER(file,mesh)
         elif (extensionFile == "inp"):
-            print "The file ",file," is a PORFLOW file"
+            print "testMedMemGeneral The file ",file," is a PORFLOW file"
             meshDriver = PORFLOW_MESH_RDONLY_DRIVER(file,mesh)
         else :
-            print "the file ",file,"has an unknow extension"
+            print "testMedMemGeneral the file ",file,"has an unknow extension"
             sys.exit(1)
 
         meshDriver.open()
         meshDriver.read()
     except:
         meshDriver.close()
-        print "The mesh stored in the file ",file," is perhaps a GRID."
+        print "testMedMemGeneral The mesh stored in the file ",file," is perhaps a GRID."
         try:
-            print "... of MED_CARTESIAN type ?"
+            print "testMedMemGeneral ... of MED_CARTESIAN type ?"
             type = MED_CARTESIAN
             mesh = GRID()
             mesh.setGridType(type)
@@ -247,10 +247,10 @@ for i in range(nbOfFiles):
             elif (extensionFile == "sauve"):
                 meshDriver = GIBI_MESH_RDONLY_DRIVER(file,mesh)
             elif (extensionFile == "inp"):
-                print "The file ",file," is a PORFLOW file"
+                print "testMedMemGeneral The file ",file," is a PORFLOW file"
                 meshDriver = PORFLOW_MESH_RDONLY_DRIVER(file,mesh)
             else :
-                print "the file ",file,"has an unknow extension"
+                print "testMedMemGeneral the file ",file,"has an unknow extension"
                 sys.exit(1)
 
             meshDriver.open()
@@ -258,7 +258,7 @@ for i in range(nbOfFiles):
         except:
             meshDriver.close()
             try:
-                print "... of MED_POLAR type ?"
+                print "testMedMemGeneral ... of MED_POLAR type ?"
                 mesh = GRID()
                 type = MED_POLAR
                 mesh.setGridType(type)
@@ -268,14 +268,14 @@ for i in range(nbOfFiles):
                 elif (extensionFile == "sauve"):
                     meshDriver = GIBI_MESH_RDONLY_DRIVER(file,mesh)
                 else :
-                    print "the file ",file,"has an unknow extension"
+                    print "testMedMemGeneral the file ",file,"has an unknow extension"
                     sys.exit(1)
 
                 meshDriver.open()
                 meshDriver.read()
             except:
                 meshDriver.close()
-                print "... of MED_BODY_FITTED type ?"
+                print "testMedMemGeneral ... of MED_BODY_FITTED type ?"
                 mesh = GRID()
                 type = MED_BODY_FITTED
                 mesh.setGridType(type)
@@ -285,7 +285,7 @@ for i in range(nbOfFiles):
                 elif (extensionFile == "sauve"):
                     meshDriver = GIBI_MESH_RDONLY_DRIVER(file,mesh)
                 else :
-                    print "the file ",file,"has an unknow extension"
+                    print "testMedMemGeneral the file ",file,"has an unknow extension"
                     sys.exit(1)
 
                 meshDriver.open()
@@ -296,29 +296,29 @@ for i in range(nbOfFiles):
     meshName = mesh.getName()
     spaceDim = mesh.getSpaceDimension()
     meshDim = mesh.getMeshDimension()
-    print "The mesh ",meshName," is a ",spaceDim,"D mesh on a ",meshDim,"D geometry"
+    print "testMedMemGeneral The mesh ",meshName," is a ",spaceDim,"D mesh on a ",meshDim,"D geometry"
 
     if (extensionFile == "med"):
-        print "and is mounted via the MED driver"
+        print "testMedMemGeneral and is mounted via the MED driver"
     elif (extensionFile == "sauve"):
-        print "and is mounted via the GIBI driver"
+        print "testMedMemGeneral and is mounted via the GIBI driver"
     elif (extensionFile == "inp"):
-        print "and is mounted via the PORFLOW driver"
+        print "testMedMemGeneral and is mounted via the PORFLOW driver"
 
     nbNodes = mesh.getNumberOfNodes()
-    print "The mesh ",meshName," has",nbNodes,"Nodes"
+    print "testMedMemGeneral The mesh ",meshName," has",nbNodes,"Nodes"
     coordSyst = mesh.getCoordinatesSystem()
-    print "The coordinates system is",coordSyst
-    print "The Coordinates :"
+    print "testMedMemGeneral The coordinates system is",coordSyst
+    print "testMedMemGeneral The Coordinates :"
     coordNames = []
     coordUnits = []
     for isd in range(spaceDim):
         coordNames.append(mesh.getCoordinateName(isd))
         coordUnits.append(mesh.getCoordinateUnit(isd))
 
-    print "names:", coordNames
-    print "units", coordUnits
-    print "values:"
+    print "testMedMemGeneral names:", coordNames
+    print "testMedMemGeneral units", coordUnits
+    print "testMedMemGeneral values:"
     coordinates = mesh.getCoordinates(MED_FULL_INTERLACE)
     for k in range(nbNodes):
         kp1 = k+1
@@ -326,93 +326,92 @@ for i in range(nbOfFiles):
         for isd in range(spaceDim):
             isdp1 = isd+1
             coords.append(mesh.getCoordinate(kp1,isdp1))
+        print "testMedMemGeneral ",coords," ---- ", coordinates[k*spaceDim:((k+1)*spaceDim)]
 
-        print coords," ---- ", coordinates[k*spaceDim:((k+1)*spaceDim)]
-
-    print ""
-    print "Show the Cell Nodal Connectivity of the Cells:"
+    print "testMedMemGeneral "
+    print "testMedMemGeneral Show the Cell Nodal Connectivity of the Cells:"
     nbTypesCell = mesh.getNumberOfTypes(MED_CELL)
-    print ""
+    print "testMedMemGeneral "
     if (nbTypesCell>0):
-        print "The Mesh has",nbTypesCell,"Type(s) of Cell"
+        print "testMedMemGeneral The Mesh has",nbTypesCell,"Type(s) of Cell"
         types = mesh.getTypes(MED_CELL)
         for k in range(nbTypesCell):
             type = types[k]
             nbElemType = mesh.getNumberOfElements(MED_CELL,type)
-            print "For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
+            print "testMedMemGeneral For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
             connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,type)
             nbNodesPerCell = type%100
             for j in range(nbElemType):
-                print "Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
+                print "testMedMemGeneral Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
 
-    print ""
-    print "Show the Cell Reverse Nodal Connectivity:"
+    print "testMedMemGeneral "
+    print "testMedMemGeneral Show the Cell Reverse Nodal Connectivity:"
     ReverseConnectivity = mesh.getReverseConnectivity(MED_NODAL)
     ReverseConnectivityIndex = mesh.getReverseConnectivityIndex(MED_NODAL)
-    print ""
+    print "testMedMemGeneral "
     for j in range(nbNodes):
         begin = ReverseConnectivityIndex[j]-1
         end = ReverseConnectivityIndex[j+1]-1
-        print "Node",(j+1),"-->",ReverseConnectivity[begin:end]
+        print "testMedMemGeneral Node",(j+1),"-->",ReverseConnectivity[begin:end]
 
-    print ""
-    print "Show the Cell Descending Connectivity:"
+    print "testMedMemGeneral "
+    print "testMedMemGeneral Show the Cell Descending Connectivity:"
     mesh.calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL)
     nbElemts = mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)
     Connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
     ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,MED_CELL)
-    print ""
+    print "testMedMemGeneral "
     for j in range(nbElemts):
         begin = ConnectivityIndex[j]-1
         end = ConnectivityIndex[j+1]-1
-        print "Element",(j+1),"-->",Connectivity[begin:end]
+        print "testMedMemGeneral Element",(j+1),"-->",Connectivity[begin:end]
 
-    print ""
+    print "testMedMemGeneral "
 
     if (spaceDim == 3):
         constituent = MED_FACE
     elif (spaceDim == 2):
         constituent = MED_EDGE
 
-    print "Show the Face/Edge Nodal Connectivity:"
+    print "testMedMemGeneral Show the Face/Edge Nodal Connectivity:"
     nbTypesConst = mesh.getNumberOfTypes(constituent)
-    print ""
+    print "testMedMemGeneral "
     if (nbTypesConst>0):
-        print "The Mesh has",nbTypesConst,"Type(s) of Constituent"
+        print "testMedMemGeneral The Mesh has",nbTypesConst,"Type(s) of Constituent"
         types = mesh.getTypes(constituent)
         for k in range(nbTypesConst):
             type = types[k]
             nbElemType = mesh.getNumberOfElements(constituent,type)
-            print "For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
+            print "testMedMemGeneral For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
             connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituent,type)
             nbNodesPerConst = type%100
             for j in range(nbElemType):
-                print "Element",(j+1)," ",connectivity[j*nbNodesPerConst:(j+1)*nbNodesPerConst]
+                print "testMedMemGeneral Element",(j+1)," ",connectivity[j*nbNodesPerConst:(j+1)*nbNodesPerConst]
 
-    print ""
-    print "Show the Face/Edge Reverse Nodal Connectivity:"
+    print "testMedMemGeneral "
+    print "testMedMemGeneral Show the Face/Edge Reverse Nodal Connectivity:"
     ReverseConnectivity = mesh.getReverseConnectivity(MED_NODAL,constituent)
     ReverseConnectivityIndex = mesh.getReverseConnectivityIndex(MED_NODAL,constituent)
-    print ""
+    print "testMedMemGeneral "
     for j in range(nbNodes):
         begin = ReverseConnectivityIndex[j]-1
         end = ReverseConnectivityIndex[j+1]-1
-        print "Node",(j+1),"-->",ReverseConnectivity[begin:end]
+        print "testMedMemGeneral Node",(j+1),"-->",ReverseConnectivity[begin:end]
 
-    print ""
+    print "testMedMemGeneral "
     try:
-        print "Show the Face/Edge Descending Connectivity:"
+        print "testMedMemGeneral Show the Face/Edge Descending Connectivity:"
         mesh.calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,constituent)
         nbElemts = mesh.getNumberOfElements(constituent,MED_ALL_ELEMENTS)
         Connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,constituent,MED_ALL_ELEMENTS)
         ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,constituent)
-        print ""
+        print "testMedMemGeneral "
         for j in range(nbElemts):
             begin = ConnectivityIndex[j]-1
             end = ConnectivityIndex[j+1]-1
-            print "Element",(j+1),"-->",Connectivity[begin:end]
+            print "testMedMemGeneral Element",(j+1),"-->",Connectivity[begin:end]
 
-        print ""
+        print "testMedMemGeneral "
     except :
         pass
 
@@ -420,152 +419,152 @@ for i in range(nbOfFiles):
         nbFam = mesh.getNumberOfFamilies(entity)
         nbGrp = mesh.getNumberOfGroups(entity)
         if (entity == MED_NODE) :
-            if (nbFam > 0) : print "This mesh has",nbFam,"Node Family(ies)"
-            if (nbGrp > 0) : print "This mesh has",nbGrp,"Node Group(s)"
+            if (nbFam > 0) : print "testMedMemGeneral This mesh has",nbFam,"Node Family(ies)"
+            if (nbGrp > 0) : print "testMedMemGeneral This mesh has",nbGrp,"Node Group(s)"
         elif (entity == MED_CELL) :
-            if (nbFam > 0) : print "This mesh has",nbFam,"Cell Family(ies)"
-            if (nbGrp > 0) : print "This mesh has",nbGrp,"Cell Group(s)"
+            if (nbFam > 0) : print "testMedMemGeneral This mesh has",nbFam,"Cell Family(ies)"
+            if (nbGrp > 0) : print "testMedMemGeneral This mesh has",nbGrp,"Cell Group(s)"
         elif (entity == MED_FACE) :
-            if (nbFam > 0) : print "This mesh has",nbFam,"Face Family(ies)"
-            if (nbGrp > 0) : print "This mesh has",nbGrp,"Face Group(s)"
+            if (nbFam > 0) : print "testMedMemGeneral This mesh has",nbFam,"Face Family(ies)"
+            if (nbGrp > 0) : print "testMedMemGeneral This mesh has",nbGrp,"Face Group(s)"
         elif (entity == MED_EDGE) :
-            if (nbFam > 0) : print "This mesh has",nbFam,"Edge Family(ies)"
-            if (nbGrp > 0) : print "This mesh has",nbGrp,"Edge Group(s)"
+            if (nbFam > 0) : print "testMedMemGeneral This mesh has",nbFam,"Edge Family(ies)"
+            if (nbGrp > 0) : print "testMedMemGeneral This mesh has",nbGrp,"Edge Group(s)"
 
     for entity in [MED_NODE,MED_CELL,MED_FACE,MED_EDGE]:
         nbFam = mesh.getNumberOfFamilies(entity)
         nbGrp = mesh.getNumberOfGroups(entity)
         if nbFam > 0:
             for j in range(nbFam):
-                print ""
+                print "testMedMemGeneral "
                 family = mesh.getFamily(entity,j+1)
                 familyName = family.getName()
                 familyDescription = family.getDescription()
                 familyEntity = family.getEntity()
                 familyBool = family.isOnAllElements()
-                print "  -Name:",familyName
-                print "  -Description:",familyDescription
-                print "  -Entity:",familyEntity
+                print "testMedMemGeneral   -Name:",familyName
+                print "testMedMemGeneral   -Description:",familyDescription
+                print "testMedMemGeneral   -Entity:",familyEntity
                 familyIdentifier = family.getIdentifier()
                 nbOfAtt = family.getNumberOfAttributes()
-                print "  -Identifier:",familyIdentifier
-                print "  -Number Of Attributes:",nbOfAtt
+                print "testMedMemGeneral   -Identifier:",familyIdentifier
+                print "testMedMemGeneral   -Number Of Attributes:",nbOfAtt
                 attributesids = family.getAttributesIdentifiers()
                 attributesvals = family.getAttributesValues()
                 for k in range(nbOfAtt):
-                    print "    * Attributes:",attributesids[k],":",attributesvals[k],",",family.getAttributeDescription(k+1)
+                    print "testMedMemGeneral     * Attributes:",attributesids[k],":",attributesvals[k],",",family.getAttributeDescription(k+1)
                 nbOfGrp = family.getNumberOfGroups()
-                print "  -Number Of Groups:",nbOfGrp
+                print "testMedMemGeneral   -Number Of Groups:",nbOfGrp
                 for k in range(nbOfGrp):
-                    print "    * Group:",family.getGroupName(k+1)
-                print "  -Entities list:"
+                    print "testMedMemGeneral     * Group:",family.getGroupName(k+1)
+                print "testMedMemGeneral   -Entities list:"
                 if (familyBool):
-                    print "  -Is on all entities"
+                    print "testMedMemGeneral   -Is on all entities"
                 else:
                     nbOfTypes = family.getNumberOfTypes()
                     types = family.getTypes()
-                    print "  -Number Of Types:",nbOfTypes
+                    print "testMedMemGeneral   -Number Of Types:",nbOfTypes
                     for k in range(nbOfTypes):
                         type = types[k]
                         nbOfElmtsOfType = family.getNumberOfElements(type)
                         number = family.getNumber(type)
-                        print "    * Type",type
-                        print "    * Number",number[0:nbOfElmtsOfType]
-                    print ""
-        print ""
+                        print "testMedMemGeneral     * Type",type
+                        print "testMedMemGeneral     * Number",number[0:nbOfElmtsOfType]
+                    print "testMedMemGeneral "
+        print "testMedMemGeneral "
 
         if nbGrp > 0:
             for j in range(nbGrp):
-                print ""
+                print "testMedMemGeneral "
                 group = mesh.getGroup(entity,j+1)
                 groupName = group.getName()
                 groupDescription = group.getDescription()
                 groupEntity = group.getEntity()
                 groupBool = group.isOnAllElements()
-                print "  -Name:",groupName
-                print "  -Description:",groupDescription
-                print "  -Entity:",groupEntity
+                print "testMedMemGeneral   -Name:",groupName
+                print "testMedMemGeneral   -Description:",groupDescription
+                print "testMedMemGeneral   -Entity:",groupEntity
                 nbOfFam = group.getNumberOfFamilies()
-                print "  -Number Of Families:",nbOfFam
+                print "testMedMemGeneral   -Number Of Families:",nbOfFam
                 for k in range(nbOfFam):
-                    print "    * Family:",group.getFamily(k+1).getName()
-                print "  -Entities list:"
+                    print "testMedMemGeneral     * Family:",group.getFamily(k+1).getName()
+                print "testMedMemGeneral   -Entities list:"
                 if (groupBool):
-                    print "  -Is on all entities"
+                    print "testMedMemGeneral   -Is on all entities"
                 else:
                     nbOfTypes = group.getNumberOfTypes()
                     types = group.getTypes()
-                    print "  -Number Of Types:",nbOfTypes
+                    print "testMedMemGeneral   -Number Of Types:",nbOfTypes
                     for k in range(nbOfTypes):
                         type = types[k]
                         nbOfElmtsOfType = group.getNumberOfElements(type)
                         number = group.getNumber(type)
-                        print "    * Type",type
-                        print "    * Number",number[0:nbOfElmtsOfType]
-                    print ""
-            print ""
+                        print "testMedMemGeneral     * Type",type
+                        print "testMedMemGeneral     * Number",number[0:nbOfElmtsOfType]
+                    print "testMedMemGeneral "
+            print "testMedMemGeneral "
 
 
-    print "Saving in file the mesh under the med and vtk format"
-    print "Med file = ",medFileName
-    print "vtk file = ",vtkFileName
+    print "testMedMemGeneral Saving in file the mesh under the med and vtk format"
+    print "testMedMemGeneral Med file = ",medFileName
+    print "testMedMemGeneral vtk file = ",vtkFileName
     idMed = mesh.addDriver(MED_DRIVER,medFileName,mesh.getName())
     mesh.write(idMed)
 
     idVtk = mesh.addDriver(VTK_DRIVER,vtkFileName,mesh.getName())
     mesh.write(idVtk)
-    print ""
+    print "testMedMemGeneral "
 
-    print "Building of the support on all Cells of the mesh."
+    print "testMedMemGeneral Building of the support on all Cells of the mesh."
     supportCell = SUPPORT(mesh)
     supportCell.update()
-    print ""
+    print "testMedMemGeneral "
     barycenter = mesh.getBarycenter(supportCell)
-    print "Getting barycenter of all Cells of the mesh"
+    print "testMedMemGeneral Getting barycenter of all Cells of the mesh"
     for j in range(nbElemts):
         barycenterCell = barycenter.getValueI(MED_FULL_INTERLACE,j+1)
-        print "    * ",barycenterCell[:spaceDim]
-    print ""
+        print "testMedMemGeneral ",j,"    * ",barycenterCell[:spaceDim]
+    print "testMedMemGeneral "
 
-    print "Saving in file the cell barycenter field under the med and vtk format"
-    print "Med file = ",medFileName
-    print "vtk file = ",vtkFileName
+    print "testMedMemGeneral Saving in file the cell barycenter field under the med and vtk format"
+    print "testMedMemGeneral Med file = ",medFileName
+    print "testMedMemGeneral vtk file = ",vtkFileName
     idMed = barycenter.addDriver(MED_DRIVER,medFileName,barycenter.getName())
     barycenter.write(idMed)
 
     idVtk = barycenter.addDriver(VTK_DRIVER,vtkFileName,barycenter.getName())
     barycenter.write(idVtk)
-    print ""
+    print "testMedMemGeneral "
 
     if spaceDim == 3 :
-        print "Getting volume of all Cells of the mesh:"
+        print "testMedMemGeneral Getting volume of all Cells of the mesh:"
         volume = mesh.getVolume(supportCell)
         voltot = 0.
         for j in range(nbElemts):
             volumeCell = volume.getValueIJ(j+1,1)
-            print "    * ",volumeCell
+            print "testMedMemGeneral     * ",volumeCell
             voltot = voltot + volumeCell
-        print "Volume of the mesh:",voltot
-        print ""
+        print "testMedMemGeneral Volume of the mesh:",voltot
+        print "testMedMemGeneral "
 
-        print "Saving in file the cell volume field under the med and vtk format"
-        print "Med file = ",medFileName
-        print "vtk file = ",vtkFileName
+        print "testMedMemGeneral Saving in file the cell volume field under the med and vtk format"
+        print "testMedMemGeneral Med file = ",medFileName
+        print "testMedMemGeneral vtk file = ",vtkFileName
         idMed = volume.addDriver(MED_DRIVER,medFileName,volume.getName())
         volume.write(idMed)
 
         idVtk = volume.addDriver(VTK_DRIVER,vtkFileName,volume.getName())
         volume.write(idVtk)
-        print ""
+        print "testMedMemGeneral "
 
-        print "Building of the support on all Faces of the mesh."
+        print "testMedMemGeneral Building of the support on all Faces of the mesh."
         supportFace = SUPPORT(mesh,"Support on all faces of the mesh",MED_FACE)
         nbFace = mesh.getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS)
-        print ""
-        print "Getting normal of each face of this support",nbFace
+        print "testMedMemGeneral "
+        print "testMedMemGeneral Getting normal of each face of this support",nbFace
         nbTypeFace = mesh.getNumberOfTypes(MED_FACE)
         TypeFace = mesh.getTypes(MED_FACE)
-        print "nbTypeFace:",nbTypeFace,"----",TypeFace[:nbTypeFace]
+        print "testMedMemGeneral nbTypeFace:",nbTypeFace,"----",TypeFace[:nbTypeFace]
         normal = mesh.getNormal(supportFace)
         area = mesh.getArea(supportFace)
         for j in range(nbFace):
@@ -575,88 +574,104 @@ for i in range(nbOfFiles):
             value2 = normalFace[1]
             value3 = normalFace[2]
             norm = (value1*value1 + value2*value2 + value3*value3)**(0.5)
-            print "    * ",normalFace[:spaceDim],"norm:",norm," --> area ",areaFace[0]
-        print ""
+            if norm == -0.0 :
+                norm = 0.0
+            print "testMedMemGeneral ",j,"    * ",normalFace[:spaceDim],"norm:",norm," --> area ",areaFace[0]
+        print "testMedMemGeneral "
 
-        print "Saving in file the face normal field under the med format"
-        print "Med file = ",medFileName
+        print "testMedMemGeneral Saving in file the face normal field under the med format"
+        print "testMedMemGeneral Med file = ",medFileName
         idMed = normal.addDriver(MED_DRIVER,medFileName,normal.getName())
         normal.write(idMed)
-        print "but not in vtk format because vtk does not offer the possibility to view a field on edges or faces"
-        print ""
+        print "testMedMemGeneral but not in vtk format because vtk does not offer the possibility to view a field on edges or faces"
+        print "testMedMemGeneral "
 
     elif spaceDim == 2:
-        print "Getting area on all Cells of the mesh:"
+        print "testMedMemGeneral Getting area on all Cells of the mesh:"
         area = mesh.getArea(supportCell)
         areatot = 0.
         for j in range(nbElemts):
             areaCell = area.getValueIJ(j+1,1)
-            print "    * ",areaCell
+            print "testMedMemGeneral     * ",areaCell
             areatot = areatot + areaCell
-        print "Area of the mesh:",areatot
-        print ""            
+        print "testMedMemGeneral Area of the mesh:",areatot
+        print "testMedMemGeneral "            
 
-        print "Saving in file the cell area field under the med and vtk format"
-        print "Med file = ",medFileName
-        print "vtk file = ",vtkFileName
+        print "testMedMemGeneral Saving in file the cell area field under the med and vtk format"
+        print "testMedMemGeneral Med file = ",medFileName
+        print "testMedMemGeneral vtk file = ",vtkFileName
         idMed = area.addDriver(MED_DRIVER,medFileName,area.getName())
         area.write(idMed)
 
         idVtk = area.addDriver(VTK_DRIVER,vtkFileName,area.getName())
         area.write(idVtk)
-        print ""
+        print "testMedMemGeneral "
 
-        print "Building of the support on all Edges of the mesh."
+        print "testMedMemGeneral Building of the support on all Edges of the mesh."
         supportEdge = SUPPORT(mesh,"Support on all edges of the mesh",MED_EDGE)
         nbEdge = mesh.getNumberOfElements(MED_EDGE,MED_ALL_ELEMENTS)
-        print ""
-        print "Getting normal of each edge of this support",nbEdge
+        print "testMedMemGeneral "
+        print "testMedMemGeneral Getting normal of each edge of this support",nbEdge
         nbTypeEdge = mesh.getNumberOfTypes(MED_EDGE)
         TypeEdge = mesh.getTypes(MED_EDGE)
-        print "nbTypeEdge:",nbTypeEdge,"----",TypeEdge[:nbTypeEdge]
+        print "testMedMemGeneral nbTypeEdge:",nbTypeEdge,"----",TypeEdge[:nbTypeEdge]
         normal = mesh.getNormal(supportEdge)
         length = mesh.getLength(supportEdge)
         for j in range(nbEdge):
             normalEdge = normal.getValueI(MED_FULL_INTERLACE,j+1)
             lengthEdge = length.getValueI(MED_FULL_INTERLACE,j+1)
+            if normalEdge[0] == -0.0 :
+                normalEdge[0] = 0.0
+            if normalEdge[1] == -0.0 :
+                normalEdge[1] = 0.0
             value1 = normalEdge[0]
             value2 = normalEdge[1]
             norm = (value1*value1 + value2*value2)**(0.5)
-            print "    * ",normalEdge[:spaceDim],"norm:",norm," --> length ",lengthEdge[0]
-        print ""
+            print "testMedMemGeneral ",j,"    * ",normalEdge[:spaceDim],"norm:",norm," --> length ",lengthEdge[0]
+        print "testMedMemGeneral "
 
-        print "Saving in file the face normal field under the med format"
-        print "Med file = ",medFileName
+        print "testMedMemGeneral Saving in file the face normal field under the med format"
+        print "testMedMemGeneral Med file = ",medFileName
         idMed = normal.addDriver(MED_DRIVER,medFileName,normal.getName())
         normal.write(idMed)
-        print "but no in vtk format because vtk does not offer the possibility to view a field on edges or faces"
+        print "testMedMemGeneral but no in vtk format because vtk does not offer the possibility to view a field on edges or faces"
 
-    print ""
-    print "Building support on Elements of the boundary"
+    print "testMedMemGeneral "
+    print "testMedMemGeneral Building support on Elements of the boundary"
     if spaceDim == 3 :
         suppBound = mesh.getBoundaryElements(MED_FACE)
         nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
-        print "Getting normal field on the boundary",nbElmBound
+        print "testMedMemGeneral Getting normal field on the boundary",nbElmBound
         normalBound = mesh.getNormal(suppBound)
         for j in range(nbElmBound):
             normalBoundJ = normalBound.getValueI(MED_FULL_INTERLACE,j+1)
+            if normalBoundJ[0] == -0.0 :
+                normalBoundJ[0] = 0.0
+            if normalBoundJ[1] == -0.0 :
+                normalBoundJ[1] = 0.0
+            if normalBoundJ[2] == -0.0 :
+                normalBoundJ[2] = 0.0
             value1 = normalBoundJ[0]
             value2 = normalBoundJ[1]
             value3 = normalBoundJ[2]
             norm = (value1*value1 + value2*value2 + value3*value3)**(0.5)
-            print "    * ",normalBoundJ[:spaceDim],"norm:",norm
+            print "testMedMemGeneral ",j,"    * ",normalBoundJ[:spaceDim],"norm:",norm
     elif spaceDim == 2:
         suppBound = mesh.getBoundaryElements(MED_EDGE)
         nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
-        print "Getting normal field on the boundary",nbElmBound
+        print "testMedMemGeneral Getting normal field on the boundary",nbElmBound
         normalBound = mesh.getNormal(suppBound)
         for j in range(nbElmBound):
             normalBoundJ = normalBound.getValueI(MED_FULL_INTERLACE,j+1)
+            if normalBoundJ[0] == -0.0 :
+                normalBoundJ[0] = 0.0
+            if normalBoundJ[1] == -0.0 :
+                normalBoundJ[1] = 0.0
             value1 = normalBoundJ[0]
             value2 = normalBoundJ[1]
             norm = (value1*value1 + value2*value2)**(0.5)
-            print "    * ",normalBoundJ[:spaceDim],"norm:",norm
-    print ""
+            print "testMedMemGeneral ",j,"    * ",normalBoundJ[:spaceDim],"norm:",norm
+    print "testMedMemGeneral "
 
     if (extensionFile == "med"):
         md = MED()
@@ -669,23 +684,23 @@ for i in range(nbOfFiles):
         nbMeshes = md.getNumberOfMeshes()
         nbFields = md.getNumberOfFields()
 
-        print "The med file", file, "contains", nbMeshes, "mesh(es) and", nbFields, "field(s)"
+        print "testMedMemGeneral The med file", file, "contains", nbMeshes, "mesh(es) and", nbFields, "field(s)"
 
         if (nbMeshes>0):
-            print "Mesh(es) Name(s) is(are) "
+            print "testMedMemGeneral Mesh(es) Name(s) is(are) "
 
             for imsh in range(nbMeshes):
                 mesh_name = md.getMeshName(imsh)
-                print "   - ",mesh_name
-        print ""
+                print "testMedMemGeneral    - ",mesh_name
+        print "testMedMemGeneral "
         if (nbFields>0):
-            print "Field(s) Name(s) is(are) "
+            print "testMedMemGeneral Field(s) Name(s) is(are) "
 
             for ifld in range(nbFields):
                 field_name = md.getFieldName(ifld)
-                print "   - ",field_name
+                print "testMedMemGeneral    - ",field_name
 
-        print ""
+        print "testMedMemGeneral "
 
         mesh_name = md.getMeshName(0)
         mesh = md.getMesh(mesh_name)
@@ -693,422 +708,452 @@ for i in range(nbOfFiles):
         spaceDim = mesh.getSpaceDimension()
         meshDim = mesh.getMeshDimension()
         nbNodes = mesh.getNumberOfNodes()
-        print "The first mesh",mesh_name,"is a",spaceDim,"D mesh on a",meshDim,"D geometry and has",nbNodes,"Nodes"
+        print "testMedMemGeneral The first mesh",mesh_name,"is a",spaceDim,"D mesh on a",meshDim,"D geometry and has",nbNodes,"Nodes"
 
         if (nbFields>0):
-            print "Updating supports in the Med Object"
+            print "testMedMemGeneral Updating supports in the Med Object"
             md.updateSupport()
-            print "Field(s) Analysis "
+            print "testMedMemGeneral Field(s) Analysis "
             for ifld in range(nbFields):
                 field_name = md.getFieldName(ifld)
                 nbOfIt = md.getFieldNumberOfIteration(field_name)
-                print "The",print_ord(ifld),"field is",field_name,"with",nbOfIt,"iteration(s)"
+                print "testMedMemGeneral The",print_ord(ifld),"field is",field_name,"with",nbOfIt,"iteration(s)"
                 for j in range(nbOfIt):
                     dtitfield = md.getFieldIteration(field_name,j)
                     dt = dtitfield.getdt()
                     it = dtitfield.getit()
                     field = md.getField(field_name,dt,it)
                     type = field.getValueType()
-                    print "     * Iteration:",dt,"Order number:",it,"Type:",type
+                    print "testMedMemGeneral      * Iteration:",dt,"Order number:",it,"Type:",type
                     if type == MED_INT32:
                         fieldint = createFieldIntFromField(field)
                         fieldint.read()
                         name = fieldint.getName()
                         desc = fieldint.getDescription()
                         nbOfComp = fieldint.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
+                        print "testMedMemGeneral      Field",name," : ",desc
+                        print "testMedMemGeneral      Number Of Components:",nbOfComp
                         iterationNb = fieldint.getIterationNumber()
                         orderNb = fieldint.getOrderNumber()
                         time = fieldint.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
-                        print "     Norme  2  : ", fieldint.norm2()
-                        print "     Norme Max : ", fieldint.normMax()
+                        print "testMedMemGeneral      Iteration Number",iterationNb
+                        print "testMedMemGeneral      Order Number",orderNb
+                        print "testMedMemGeneral      Time",time
+                        print "testMedMemGeneral      Norme  2  : ", fieldint.norm2()
+                        print "testMedMemGeneral      Norme Max : ", fieldint.normMax()
 
                         if fielddouble.getSupport().getEntity()!=MED_NODE:
                             fieldint_vol=fieldint.getSupport().getMesh().getVolume(fieldint.getSupport())
-                            print "     Norme L1  : ", fieldint.normL1()
-                            print "     Norme L2  : ", fieldint.normL2()
-                            print "     Norme L2(vol) : ", fieldint.normL2(fieldint_vol)
+                            print "testMedMemGeneral      Norme L1  : ", fieldint.normL1()
+                            print "testMedMemGeneral      Norme L2  : ", fieldint.normL2()
+                            print "testMedMemGeneral      Norme L2(vol) : ", fieldint.normL2(fieldint_vol)
 
                         for k in range(nbOfComp):
                             kp1 = k+1
                             compName = fieldint.getComponentName(kp1)
                             compDesc = fieldint.getComponentDescription(kp1)
                             compUnit = fieldint.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
+                            print "testMedMemGeneral       * Component:",kp1
+                            print "testMedMemGeneral           Name:",compName
+                            print "testMedMemGeneral           Description:",compDesc
+                            print "testMedMemGeneral           Unit:",compUnit
                             if fielddouble.getSupport().getEntity()!=MED_NODE:
-                                print "          Norme L1  : ", fieldint.normL1(kp1)
-                                print "          Norme L2  : ", fieldint.normL2(kp1)
-                                print "          Norme L2(vol) : ", fieldint.normL2(kp1,fieldint_vol)
+                                print "testMedMemGeneral           Norme L1  : ", fieldint.normL1(kp1)
+                                print "testMedMemGeneral           Norme L2  : ", fieldint.normL2(kp1)
+                                print "testMedMemGeneral           Norme L2(vol) : ", fieldint.normL2(kp1,fieldint_vol)
 
                         support = fieldint.getSupport()
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
+                        print "testMedMemGeneral      Values:",nbOf
                         for k in range(nbOf):
                             valueI = fieldint.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
+                            print "testMedMemGeneral      *",valueI[:nbOfComp]
                         fieldint2 = FIELDINT(fieldint)
-                        print ""
+                        print "testMedMemGeneral "
                         fieldintadd = fieldint + fieldint2
-                        print "Test of the addition of two integer fields with creation a new one"
-                        print ""
+                        print "testMedMemGeneral Test of the addition of two integer fields with creation a new one"
+                        print "testMedMemGeneral "
                         name = fieldintadd.getName()
                         desc = fieldintadd.getDescription()
                         nbOfComp = fieldintadd.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
+                        print "testMedMemGeneral      Field",name," : ",desc
+                        print "testMedMemGeneral      Number Of Components:",nbOfComp
                         iterationNb = fieldintadd.getIterationNumber()
                         orderNb = fieldintadd.getOrderNumber()
                         time = fieldintadd.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
+                        print "testMedMemGeneral      Iteration Number",iterationNb
+                        print "testMedMemGeneral      Order Number",orderNb
+                        print "testMedMemGeneral      Time",time
                         for k in range(nbOfComp):
                             kp1 = k+1
                             compName = fieldintadd.getComponentName(kp1)
                             compDesc = fieldintadd.getComponentDescription(kp1)
                             compUnit = fieldintadd.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
+                            print "testMedMemGeneral       * Component:",kp1
+                            print "testMedMemGeneral           Name:",compName
+                            print "testMedMemGeneral           Description:",compDesc
+                            print "testMedMemGeneral           Unit:",compUnit
 
                         support = fieldintadd.getSupport()
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
+                        print "testMedMemGeneral      Values:",nbOf
                         for k in range(nbOf):
                             valueI = fieldintadd.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
-                        print ""
+                            print "testMedMemGeneral      *",valueI[:nbOfComp]
+                        print "testMedMemGeneral "
                         fieldintsub = fieldint - fieldint2
-                        print "Test of the substraction of two integer fields with creation a new one"
-                        print ""
+                        print "testMedMemGeneral Test of the substraction of two integer fields with creation a new one"
+                        print "testMedMemGeneral "
                         name = fieldintsub.getName()
                         desc = fieldintsub.getDescription()
                         nbOfComp = fieldintsub.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
+                        print "testMedMemGeneral      Field",name," : ",desc
+                        print "testMedMemGeneral      Number Of Components:",nbOfComp
                         iterationNb = fieldintsub.getIterationNumber()
                         orderNb = fieldintsub.getOrderNumber()
                         time = fieldintsub.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
+                        print "testMedMemGeneral      Iteration Number",iterationNb
+                        print "testMedMemGeneral      Order Number",orderNb
+                        print "testMedMemGeneral      Time",time
                         for k in range(nbOfComp):
                             kp1 = k+1
                             compName = fieldintsub.getComponentName(kp1)
                             compDesc = fieldintsub.getComponentDescription(kp1)
                             compUnit = fieldintsub.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
+                            print "testMedMemGeneral       * Component:",kp1
+                            print "testMedMemGeneral           Name:",compName
+                            print "testMedMemGeneral           Description:",compDesc
+                            print "testMedMemGeneral           Unit:",compUnit
 
                         support = fieldintsub.getSupport()
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
+                        print "testMedMemGeneral      Values:",nbOf
                         for k in range(nbOf):
                             valueI = fieldintsub.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
-                        print ""
+                            print "testMedMemGeneral      *",valueI[:nbOfComp]
+                        print "testMedMemGeneral "
                         fieldintmul = fieldint * fieldint2
-                        print "Test of the multiplication of two integer fields with creation a new one"
-                        print ""
+                        print "testMedMemGeneral Test of the multiplication of two integer fields with creation a new one"
+                        print "testMedMemGeneral "
                         name = fieldintmul.getName()
                         desc = fieldintmul.getDescription()
                         nbOfComp = fieldintmul.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
+                        print "testMedMemGeneral      Field",name," : ",desc
+                        print "testMedMemGeneral      Number Of Components:",nbOfComp
                         iterationNb = fieldintmul.getIterationNumber()
                         orderNb = fieldintmul.getOrderNumber()
                         time = fieldintmul.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
+                        print "testMedMemGeneral      Iteration Number",iterationNb
+                        print "testMedMemGeneral      Order Number",orderNb
+                        print "testMedMemGeneral      Time",time
                         for k in range(nbOfComp):
                             kp1 = k+1
                             compName = fieldintmul.getComponentName(kp1)
                             compDesc = fieldintmul.getComponentDescription(kp1)
                             compUnit = fieldintmul.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
+                            print "testMedMemGeneral       * Component:",kp1
+                            print "testMedMemGeneral           Name:",compName
+                            print "testMedMemGeneral           Description:",compDesc
+                            print "testMedMemGeneral           Unit:",compUnit
 
                         support = fieldintmul.getSupport()
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
+                        print "testMedMemGeneral      Values:",nbOf
                         for k in range(nbOf):
                             valueI = fieldintmul.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
-                        print ""
-                        fieldintdiv = fieldint / fieldint2
-                        print "Test of the division of two integer fields with creation a new one"
-                        print ""
-                        name = fieldintdiv.getName()
-                        desc = fieldintdiv.getDescription()
-                        nbOfComp = fieldintdiv.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
-                        iterationNb = fieldintdiv.getIterationNumber()
-                        orderNb = fieldintdiv.getOrderNumber()
-                        time = fieldintdiv.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
-                        for k in range(nbOfComp):
-                            kp1 = k+1
-                            compName = fieldintdiv.getComponentName(kp1)
-                            compDesc = fieldintdiv.getComponentDescription(kp1)
-                            compUnit = fieldintdiv.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
+                            print "testMedMemGeneral      *",valueI[:nbOfComp]
+                        print "testMedMemGeneral "
+                        print "testMedMemGeneral Try of the division of two integer fields with creation a new one"
+                        try :
+                            fieldintdiv = fieldint / fieldint2
+                            print "testMedMemGeneral Test of the division of two integer fields with creation a new one"
+                            print "testMedMemGeneral "
+                            name = fieldintdiv.getName()
+                            desc = fieldintdiv.getDescription()
+                            nbOfComp = fieldintdiv.getNumberOfComponents()
+                            print "testMedMemGeneral      Field",name," : ",desc
+                            print "testMedMemGeneral      Number Of Components:",nbOfComp
+                            iterationNb = fieldintdiv.getIterationNumber()
+                            orderNb = fieldintdiv.getOrderNumber()
+                            time = fieldintdiv.getTime()
+                            print "testMedMemGeneral      Iteration Number",iterationNb
+                            print "testMedMemGeneral      Order Number",orderNb
+                            print "testMedMemGeneral      Time",time
+                            for k in range(nbOfComp):
+                                kp1 = k+1
+                                compName = fieldintdiv.getComponentName(kp1)
+                                compDesc = fieldintdiv.getComponentDescription(kp1)
+                                compUnit = fieldintdiv.getMEDComponentUnit(kp1)
+                                print "testMedMemGeneral       * Component:",kp1
+                                print "testMedMemGeneral           Name:",compName
+                                print "testMedMemGeneral           Description:",compDesc
+                                print "testMedMemGeneral           Unit:",compUnit
 
-                        support = fieldintdiv.getSupport()
-                        nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
-                        for k in range(nbOf):
-                            valueI = fieldintdiv.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
-                        print ""
-                        print "TESTS OPERATIONS SUR FIELDINT : "
+                            support = fieldintdiv.getSupport()
+                            nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+                            print "testMedMemGeneral      Values:",nbOf
+                            for k in range(nbOf):
+                                valueI = fieldintdiv.getValueI(MED_FULL_INTERLACE,k+1)
+                                print "testMedMemGeneral      *",valueI[:nbOfComp]
+                            print "testMedMemGeneral "
+                        except :
+                            print "testMedMemGeneral  fieldintdiv = fieldint / fieldint2 catch/except error"
+                        print "testMedMemGeneral TESTS OPERATIONS SUR FIELDINT : "
                         fieldintadd = fieldint+fieldint2
                         fieldintsub = fieldint-fieldint2
                         fieldintmul = fieldint*fieldint2
-                        fieldintdiv = fieldint/fieldint2
+                        try :
+                            fieldintdiv = fieldint/fieldint2
+                        except :
+                            fieldintdiv = None
+                            print "testMedMemGeneral  fieldintdiv = fieldint/fieldint2 catch/except error"
                         fieldintasso = fieldint+fieldint*fieldint
                         fieldintSP=createFieldIntScalarProduct(fieldint, fieldint2)
 
-                        print " f1     : ",fieldint.getValue(MED_FULL_INTERLACE)
-                        print " f2     : ",fieldint2.getValue(MED_FULL_INTERLACE)
-                        print "--------------------------------------------------------------------------------------------------------------"
-                        print "  +     : ",fieldintadd.getValue(MED_FULL_INTERLACE)
-                        print "  -     : ",fieldintsub.getValue(MED_FULL_INTERLACE)
-                        print "  *     : ",fieldintmul.getValue(MED_FULL_INTERLACE)
-                        print "  /     : ",fieldintdiv.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral  f1     : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral  f2     : ",fieldint2.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral --------------------------------------------------------------------------------------------------------------"
+                        print "testMedMemGeneral   +     : ",fieldintadd.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral   -     : ",fieldintsub.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral   *     : ",fieldintmul.getValue(MED_FULL_INTERLACE)
+                        if fieldintdiv == None :
+                            print "testMedMemGeneral   /     : None"
+                        else :
+                            print "testMedMemGeneral   /     : ",fieldintdiv.getValue(MED_FULL_INTERLACE)
                         fieldint+=fieldint2;
-                        print "  +=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral   +=    : ",fieldint.getValue(MED_FULL_INTERLACE)
                         fieldint-=fieldint2;
-                        print "  -=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral   -=    : ",fieldint.getValue(MED_FULL_INTERLACE)
                         fieldint*=fieldint2;
-                        print "  *=    : ",fieldint.getValue(MED_FULL_INTERLACE)
-                        fieldint/=fieldint2;
-                        print "  /=    : ",fieldint.getValue(MED_FULL_INTERLACE)
-                        print "f1+f2*f2: ",fieldintasso.getValue(MED_FULL_INTERLACE)
-                        fieldint.applyLin(4,1);
-                        print " 4f1+1  : ",fieldint.getValue(MED_FULL_INTERLACE)
-                        print " f1.f2  : ",fieldintSP.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral   *=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        try :
+                            fieldint/=fieldint2;
+                            print "testMedMemGeneral   /=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        except :
+                            fieldint = None
+                            print "testMedMemGeneral   /=    : Catch/Except : None"
+                        print "testMedMemGeneral f1+f2*f2: ",fieldintasso.getValue(MED_FULL_INTERLACE)
+                        if fieldint != None :
+                            fieldint.applyLin(4,1);
+                            print "testMedMemGeneral  4f1+1  : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral  f1.f2  : ",fieldintSP.getValue(MED_FULL_INTERLACE)
                         fieldint2.applyPyFunc(add_one)
-                        print " CB:f2+1: ",fieldint2.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral  CB:f2+1: ",fieldint2.getValue(MED_FULL_INTERLACE)
                     elif type == MED_REEL64:
                         fielddouble = createFieldDoubleFromField(field)
                         fielddouble.read()
                         name = fielddouble.getName()
                         desc = fielddouble.getDescription()
                         nbOfComp = fielddouble.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
+                        print "testMedMemGeneral      Field",name," : ",desc
+                        print "testMedMemGeneral      Number Of Components:",nbOfComp
                         iterationNb = fielddouble.getIterationNumber()
                         orderNb = fielddouble.getOrderNumber()
                         time = fielddouble.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
-                        print "     Norme  2  : ", fielddouble.norm2()
-                        print "     Norme Max : ", fielddouble.normMax()
-                        print "try sobolev",fielddouble.getSupport().getEntity()
+                        print "testMedMemGeneral      Iteration Number",iterationNb
+                        print "testMedMemGeneral      Order Number",orderNb
+                        print "testMedMemGeneral      Time",time
+                        print "testMedMemGeneral      Norme  2  : ", fielddouble.norm2()
+                        print "testMedMemGeneral      Norme Max : ", fielddouble.normMax()
+                        print "testMedMemGeneral try sobolev",fielddouble.getSupport().getEntity()
                         if fielddouble.getSupport().getEntity()!=MED_NODE:
                             if (spaceDim == 3):
                                 fielddouble_vol=fielddouble.getSupport().getMesh().getVolume(fielddouble.getSupport())
                             elif (spaceDim == 2):
                                 fielddouble_vol=fielddouble.getSupport().getMesh().getArea(fielddouble.getSupport())
-                            print "Norme L1  : ", fielddouble.normL1()
-                            print "Norme L2  : ", fielddouble.normL2()
-                            print "Norme L2(vol) : ", fielddouble.normL2(fielddouble_vol)
+                            print "testMedMemGeneral Norme L1  : ", fielddouble.normL1()
+                            print "testMedMemGeneral Norme L2  : ", fielddouble.normL2()
+                            print "testMedMemGeneral Norme L2(vol) : ", fielddouble.normL2(fielddouble_vol)
 
                         for k in range(nbOfComp):
                             kp1 = k+1
                             compName = fielddouble.getComponentName(kp1)
                             compDesc = fielddouble.getComponentDescription(kp1)
                             compUnit = fielddouble.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
+                            print "testMedMemGeneral       * Component:",kp1
+                            print "testMedMemGeneral           Name:",compName
+                            print "testMedMemGeneral           Description:",compDesc
+                            print "testMedMemGeneral           Unit:",compUnit
                             if fielddouble.getSupport().getEntity()!=MED_NODE:
-                                print "          Norme L1  : ", fielddouble.normL1(kp1)
-                                print "          Norme L2  : ", fielddouble.normL2(kp1)
-                                print "          Norme L2(vol) : ", fielddouble.normL2(kp1, fielddouble_vol)
+                                print "testMedMemGeneral           Norme L1  : ", fielddouble.normL1(kp1)
+                                print "testMedMemGeneral           Norme L2  : ", fielddouble.normL2(kp1)
+                                print "testMedMemGeneral           Norme L2(vol) : ", fielddouble.normL2(kp1, fielddouble_vol)
 
                         support = fielddouble.getSupport()
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
+                        print "testMedMemGeneral      Values:",nbOf
                         for k in range(nbOf):
                             valueI = fielddouble.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
+                            print "testMedMemGeneral      *",valueI[:nbOfComp]
                         fielddouble2 = FIELDDOUBLE(fielddouble)
-                        print ""
+                        print "testMedMemGeneral "
                         fielddoubleadd = fielddouble + fielddouble2
-                        print "Test of the addition of two double fields with creation a new one"
-                        print ""
+                        print "testMedMemGeneral Test of the addition of two double fields with creation a new one"
+                        print "testMedMemGeneral "
                         name = fielddoubleadd.getName()
                         desc = fielddoubleadd.getDescription()
                         nbOfComp = fielddoubleadd.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
+                        print "testMedMemGeneral      Field",name," : ",desc
+                        print "testMedMemGeneral      Number Of Components:",nbOfComp
                         iterationNb = fielddoubleadd.getIterationNumber()
                         orderNb = fielddoubleadd.getOrderNumber()
                         time = fielddoubleadd.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
+                        print "testMedMemGeneral      Iteration Number",iterationNb
+                        print "testMedMemGeneral      Order Number",orderNb
+                        print "testMedMemGeneral      Time",time
                         for k in range(nbOfComp):
                             kp1 = k+1
                             compName = fielddoubleadd.getComponentName(kp1)
                             compDesc = fielddoubleadd.getComponentDescription(kp1)
                             compUnit = fielddoubleadd.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
+                            print "testMedMemGeneral       * Component:",kp1
+                            print "testMedMemGeneral           Name:",compName
+                            print "testMedMemGeneral           Description:",compDesc
+                            print "testMedMemGeneral           Unit:",compUnit
 
                         support = fielddoubleadd.getSupport()
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
+                        print "testMedMemGeneral      Values:",nbOf
                         for k in range(nbOf):
                             valueI = fielddoubleadd.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
-                        print ""
+                            print "testMedMemGeneral      *",valueI[:nbOfComp]
+                        print "testMedMemGeneral "
                         fielddoublesub = fielddouble - fielddouble2
-                        print "Test of the substraction of two double fields with creation a new one"
-                        print ""
+                        print "testMedMemGeneral Test of the substraction of two double fields with creation a new one"
+                        print "testMedMemGeneral "
                         name = fielddoublesub.getName()
                         desc = fielddoublesub.getDescription()
                         nbOfComp = fielddoublesub.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
+                        print "testMedMemGeneral      Field",name," : ",desc
+                        print "testMedMemGeneral      Number Of Components:",nbOfComp
                         iterationNb = fielddoublesub.getIterationNumber()
                         orderNb = fielddoublesub.getOrderNumber()
                         time = fielddoublesub.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
+                        print "testMedMemGeneral      Iteration Number",iterationNb
+                        print "testMedMemGeneral      Order Number",orderNb
+                        print "testMedMemGeneral      Time",time
                         for k in range(nbOfComp):
                             kp1 = k+1
                             compName = fielddoublesub.getComponentName(kp1)
                             compDesc = fielddoublesub.getComponentDescription(kp1)
                             compUnit = fielddoublesub.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
+                            print "testMedMemGeneral       * Component:",kp1
+                            print "testMedMemGeneral           Name:",compName
+                            print "testMedMemGeneral           Description:",compDesc
+                            print "testMedMemGeneral           Unit:",compUnit
 
                         support = fielddoublesub.getSupport()
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
+                        print "testMedMemGeneral      Values:",nbOf
                         for k in range(nbOf):
                             valueI = fielddoublesub.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
-                        print ""
+                            print "testMedMemGeneral      *",valueI[:nbOfComp]
+                        print "testMedMemGeneral "
                         fielddoublemul = fielddouble * fielddouble2
-                        print "Test of the multiplication of two double fields with creation a new one"
-                        print ""
+                        print "testMedMemGeneral Test of the multiplication of two double fields with creation a new one"
+                        print "testMedMemGeneral "
                         name = fielddoublemul.getName()
                         desc = fielddoublemul.getDescription()
                         nbOfComp = fielddoublemul.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
+                        print "testMedMemGeneral      Field",name," : ",desc
+                        print "testMedMemGeneral      Number Of Components:",nbOfComp
                         iterationNb = fielddoublemul.getIterationNumber()
                         orderNb = fielddoublemul.getOrderNumber()
                         time = fielddoublemul.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
+                        print "testMedMemGeneral      Iteration Number",iterationNb
+                        print "testMedMemGeneral      Order Number",orderNb
+                        print "testMedMemGeneral      Time",time
                         for k in range(nbOfComp):
                             kp1 = k+1
                             compName = fielddoublemul.getComponentName(kp1)
                             compDesc = fielddoublemul.getComponentDescription(kp1)
                             compUnit = fielddoublemul.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
+                            print "testMedMemGeneral       * Component:",kp1
+                            print "testMedMemGeneral           Name:",compName
+                            print "testMedMemGeneral           Description:",compDesc
+                            print "testMedMemGeneral           Unit:",compUnit
 
                         support = fielddoublemul.getSupport()
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
+                        print "testMedMemGeneral      Values:",nbOf
                         for k in range(nbOf):
                             valueI = fielddoublemul.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
-                        print ""
-                        fielddoublediv = fielddouble / fielddouble2
-                        print "Test of the division of two double fields with creation a new one"
-                        print ""
-                        name = fielddoublediv.getName()
-                        desc = fielddoublediv.getDescription()
-                        nbOfComp = fielddoublediv.getNumberOfComponents()
-                        print "     Field",name," : ",desc
-                        print "     Number Of Components:",nbOfComp
-                        iterationNb = fielddoublediv.getIterationNumber()
-                        orderNb = fielddoublediv.getOrderNumber()
-                        time = fielddoublediv.getTime()
-                        print "     Iteration Number",iterationNb
-                        print "     Order Number",orderNb
-                        print "     Time",time
-                        for k in range(nbOfComp):
-                            kp1 = k+1
-                            compName = fielddoublediv.getComponentName(kp1)
-                            compDesc = fielddoublediv.getComponentDescription(kp1)
-                            compUnit = fielddoublediv.getMEDComponentUnit(kp1)
-                            print "      * Component:",kp1
-                            print "          Name:",compName
-                            print "          Description:",compDesc
-                            print "          Unit:",compUnit
-
-                        support = fielddoublediv.getSupport()
-                        nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                        print "     Values:",nbOf
-                        for k in range(nbOf):
-                            valueI = fielddoublediv.getValueI(MED_FULL_INTERLACE,k+1)
-                            print "     *",valueI[:nbOfComp]
-                        print ""
-                        print "TESTS OPERATIONS SUR FIELDDOUBLE : "
+                            print "testMedMemGeneral      *",valueI[:nbOfComp]
+                        print "testMedMemGeneral "
+                        print "testMedMemGeneral Try of the division of two double fields with creation a new one"
+                        try :
+                            fielddoublediv = fielddouble / fielddouble2
+                            print "testMedMemGeneral Test of the division of two double fields with creation a new one"
+                            print "testMedMemGeneral "
+                            name = fielddoublediv.getName()
+                            desc = fielddoublediv.getDescription()
+                            nbOfComp = fielddoublediv.getNumberOfComponents()
+                            print "testMedMemGeneral      Field",name," : ",desc
+                            print "testMedMemGeneral      Number Of Components:",nbOfComp
+                            iterationNb = fielddoublediv.getIterationNumber()
+                            orderNb = fielddoublediv.getOrderNumber()
+                            time = fielddoublediv.getTime()
+                            print "testMedMemGeneral      Iteration Number",iterationNb
+                            print "testMedMemGeneral      Order Number",orderNb
+                            print "testMedMemGeneral      Time",time
+                            for k in range(nbOfComp):
+                                kp1 = k+1
+                                compName = fielddoublediv.getComponentName(kp1)
+                                compDesc = fielddoublediv.getComponentDescription(kp1)
+                                compUnit = fielddoublediv.getMEDComponentUnit(kp1)
+                                print "testMedMemGeneral       * Component:",kp1
+                                print "testMedMemGeneral           Name:",compName
+                                print "testMedMemGeneral           Description:",compDesc
+                                print "testMedMemGeneral           Unit:",compUnit
+                            support = fielddoublediv.getSupport()
+                            nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+                            print "testMedMemGeneral      Values:",nbOf
+                            for k in range(nbOf):
+                                valueI = fielddoublediv.getValueI(MED_FULL_INTERLACE,k+1)
+                                print "testMedMemGeneral      *",valueI[:nbOfComp]
+                            print "testMedMemGeneral "
+                        except :
+                            print "testMedMemGeneral  fielddoublediv = fielddouble / fielddouble2 catch/except error"
+                        print "testMedMemGeneral TESTS OPERATIONS SUR FIELDDOUBLE : "
                         fielddoublesub = fielddouble-fielddouble2
                         fielddoublemul = fielddouble*fielddouble2
-                        fielddoublediv = fielddouble/fielddouble2
+                        try :
+                            fielddoublediv = fielddouble/fielddouble2
+                        except :
+                            print "testMedMemGeneral  fielddoublediv = fielddouble/fielddouble2 catch/except error"
+                            fielddoublediv = None
                         fielddoubleasso = fielddouble+fielddouble2*fielddouble2
                         fielddoubleSP=createFieldDoubleScalarProduct(fielddouble, fielddouble2)
-                        print " f1     : ",fielddouble.getValue(MED_FULL_INTERLACE)
-                        print " f2     : ",fielddouble2.getValue(MED_FULL_INTERLACE)
-                        print "--------------------------------------------------------------------------------------------------------------"
-                        print "  +     : ",fielddoubleadd.getValue(MED_FULL_INTERLACE)
-                        print "  -     : ",fielddoublesub.getValue(MED_FULL_INTERLACE)
-                        print "  *     : ",fielddoublemul.getValue(MED_FULL_INTERLACE)
-                        print "  /     : ",fielddoublediv.getValue(MED_FULL_INTERLACE)
-                        
+                        print "testMedMemGeneral  f1     : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral  f2     : ",fielddouble2.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral --------------------------------------------------------------------------------------------------------------"
+                        print "testMedMemGeneral   +     : ",fielddoubleadd.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral   -     : ",fielddoublesub.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral   *     : ",fielddoublemul.getValue(MED_FULL_INTERLACE)
+                        if fielddoublediv == None :
+                            print "testMedMemGeneral   /     : None"
+                        else :
+                            print "testMedMemGeneral   /     : ",fielddoublediv.getValue(MED_FULL_INTERLACE)
                         fielddouble+=fielddouble2;
-                        print "  +=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral   +=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
                         fielddouble-=fielddouble2;
-                        print "  -=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral   -=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
                         fielddouble*=fielddouble2;
-                        print "  *=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
-                        fielddouble/=fielddouble2;
-                        print "  /=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
-                        print "f1+f2*f2: ",fielddoubleasso.getValue(MED_FULL_INTERLACE)
-                        fielddouble.applyLin(4,1);
-                        print " 4f1+1  : ",fielddouble.getValue(MED_FULL_INTERLACE)
-                        print " f1.f2  : ",fielddoubleSP.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral   *=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                        try :
+                            fielddouble/=fielddouble2;
+                            print "testMedMemGeneral   /=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                        except :
+                            fielddouble = None
+                            print "testMedMemGeneral    /=    : catch/except error"
+                        print "testMedMemGeneral f1+f2*f2: ",fielddoubleasso.getValue(MED_FULL_INTERLACE)
+                        if fielddouble != None :
+                            fielddouble.applyLin(4,1);
+                            print "testMedMemGeneral  4f1+1  : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral  f1.f2  : ",fielddoubleSP.getValue(MED_FULL_INTERLACE)
                         fielddouble2.applyPyFunc(add_one)
-                        print " CB:f2+1: ",fielddouble2.getValue(MED_FULL_INTERLACE)
+                        print "testMedMemGeneral  CB:f2+1: ",fielddouble2.getValue(MED_FULL_INTERLACE)
                     else:
-                        print "  !!!! Bad type of Field !!!!"
+                        print "testMedMemGeneral   !!!! Bad type of Field !!!!"
 
-print "END of the Pyhton script ..... Ctrl D to exit"
+print "testMedMemGeneral END of the Pyhton script ..... Ctrl D to exit"

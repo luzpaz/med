@@ -16,7 +16,8 @@ using namespace MEDMEM;
  * Default constructor
  */
 //=============================================================================
-FIELDINT_i::FIELDINT_i(): FIELDOF_i<int>()
+//CCRTFIELDINT_i::FIELDINT_i(): FIELDOF_i<int>()
+FIELDINT_i::FIELDINT_i(): FIELDOF_i<med_int>()
 {
         BEGIN_OF("Default Constructor FIELDINT_i");
         END_OF("Default Constructor FIELDINT_i");
@@ -36,7 +37,8 @@ FIELDINT_i::~FIELDINT_i()
  * Default constructor
  */
 //=============================================================================
-FIELDINT_i::FIELDINT_i(SALOME_MED::SUPPORT_ptr mySupportIOR, ::FIELD<int> * const f): FIELDOF_i<int>(mySupportIOR,f)
+//CCRTFIELDINT_i::FIELDINT_i(SALOME_MED::SUPPORT_ptr mySupportIOR, ::FIELD<int> * const f): FIELDOF_i<int>(mySupportIOR,f)
+FIELDINT_i::FIELDINT_i(SALOME_MED::SUPPORT_ptr mySupportIOR, ::FIELD<med_int> * const f): FIELDOF_i<med_int>(mySupportIOR,f)
 {
         BEGIN_OF("Constructor FIELDINT_i");
         END_OF(" Constructor FIELDINT_i");
@@ -47,7 +49,8 @@ FIELDINT_i::FIELDINT_i(SALOME_MED::SUPPORT_ptr mySupportIOR, ::FIELD<int> * cons
  */
 //=============================================================================
 FIELDINT_i::FIELDINT_i(FIELDINT_i &fi):
-					FIELDOF_i<int>(fi._fieldTptr)
+//CCRT					FIELDOF_i<int>(fi._fieldTptr)
+					FIELDOF_i<med_int>(fi._fieldTptr)
 {
         BEGIN_OF("Constructor FIELDINT_i");
         END_OF(" Constructor FIELDINT_i");
@@ -85,7 +88,8 @@ throw (SALOME::SALOME_Exception)
 		  }
 
 		medModeSwitch modemed=convertIdlModeToMedMode(mode);
-                const int * values =_fieldTptr->getValue(modemed);
+//CCRT                const int * values =_fieldTptr->getValue(modemed);
+                const med_int * values =_fieldTptr->getValue(modemed);
 
                 myseq->length(nbval);
                 for (int i=0; i<nbval; i++)

@@ -513,7 +513,8 @@ SCRUTE(elt2);
 		else
 		{
 MESSAGE("MED_NODAL");
-			const int * tab=_mesh->getConnectivityIndex(
+//CCRT			const int * tab=_mesh->getConnectivityIndex(
+			const med_int * tab=_mesh->getConnectivityIndex(
 				convertIdlConnToMedConn(mode),
 				convertIdlEntToMedEnt(entity));
 			nbelements = elt1*(convertIdlEltToMedElt(geomElement)%100);
@@ -523,7 +524,8 @@ SCRUTE(entity);
 SCRUTE(geomElement);
 SCRUTE(nbelements);
                 myseq->length(nbelements);
-                const int * numbers=_mesh->getConnectivity(convertIdlModeToMedMode(typeSwitch),
+//CCRT                const int * numbers=_mesh->getConnectivity(convertIdlModeToMedMode(typeSwitch),
+                const med_int * numbers=_mesh->getConnectivity(convertIdlModeToMedMode(typeSwitch),
 						     convertIdlConnToMedConn(mode),
 						     convertIdlEntToMedEnt(entity),
 						     convertIdlEltToMedElt(geomElement));
@@ -558,7 +560,8 @@ throw (SALOME::SALOME_Exception)
 					convertIdlEntToMedEnt(entity),
 					MED_ALL_ELEMENTS);
                 myseq->length(nbelements);
-                const int * numbers=_mesh->getConnectivityIndex(convertIdlConnToMedConn(mode),
+//CCRT                const int * numbers=_mesh->getConnectivityIndex(convertIdlConnToMedConn(mode),
+                const med_int * numbers=_mesh->getConnectivityIndex(convertIdlConnToMedConn(mode),
 						          convertIdlEntToMedEnt(entity));
                 for (int i=0;i<nbelements;i++)
                 {
@@ -588,7 +591,8 @@ throw (SALOME::SALOME_Exception)
         {
                 int nbelements = _mesh->getNumberOfTypes( convertIdlEntToMedEnt(entity)) + 1;
                 myseq->length(nbelements);
-                const int * numbers=_mesh->getGlobalNumberingIndex( convertIdlEntToMedEnt(entity));
+//CCRT                const int * numbers=_mesh->getGlobalNumberingIndex( convertIdlEntToMedEnt(entity));
+                const med_int * numbers=_mesh->getGlobalNumberingIndex( convertIdlEntToMedEnt(entity));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -660,7 +664,8 @@ throw (SALOME::SALOME_Exception)
 		}
 		SCRUTE(nbelements);
                 myseq->length(nbelements);
-                const int * numbers=_mesh->getReverseConnectivity(convertIdlConnToMedConn(mode));
+//CCRT                const int * numbers=_mesh->getReverseConnectivity(convertIdlConnToMedConn(mode));
+                const med_int * numbers=_mesh->getReverseConnectivity(convertIdlConnToMedConn(mode));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -706,7 +711,8 @@ throw (SALOME::SALOME_Exception)
 		}
 
                 myseq->length(nbelements);
-                const int * numbers=_mesh->getReverseConnectivityIndex(convertIdlConnToMedConn(mode));
+//CCRT                const int * numbers=_mesh->getReverseConnectivityIndex(convertIdlConnToMedConn(mode));
+                const med_int * numbers=_mesh->getReverseConnectivityIndex(convertIdlConnToMedConn(mode));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];

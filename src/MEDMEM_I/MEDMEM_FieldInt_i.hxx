@@ -19,14 +19,16 @@
 #include "MEDMEM_Field.hxx"
 
 namespace MEDMEM {
-class FIELDINT_i: public FIELDOF_i<int>
+//CCRTclass FIELDINT_i: public FIELDOF_i<int>
+class FIELDINT_i: public FIELDOF_i<med_int>
 {
 private:
     FIELDINT_i();
 
 public:
     ~FIELDINT_i();
-    FIELDINT_i(SALOME_MED::SUPPORT_ptr mySupportIOR, ::FIELD<int> * const f);
+//CCRT    FIELDINT_i(SALOME_MED::SUPPORT_ptr mySupportIOR, ::FIELD<int> * const f);
+    FIELDINT_i(SALOME_MED::SUPPORT_ptr mySupportIOR, ::FIELD<med_int> * const f);
     FIELDINT_i(FIELDINT_i & f);
     SALOME_MED::long_array * getValue (SALOME_MED::medModeSwitch mode ) 
 				   throw (SALOME::SALOME_Exception);

@@ -1,12 +1,13 @@
-using namespace std;
 #include "MEDMEM_SWIG_FieldInt.hxx"
+using namespace std;
 
 //=============================================================================
 /*!
  * Default constructor
  */
 //=============================================================================
-FIELDINT::FIELDINT() : FIELD<int>()
+//CCRTFIELDINT::FIELDINT() : FIELD<int>()
+FIELDINT::FIELDINT() : FIELD<med_int>()
 {
         BEGIN_OF("Default Constructor (for Python API) FIELDINT");
 
@@ -17,10 +18,12 @@ FIELDINT::FIELDINT() : FIELD<int>()
  * Constructor with arguments
  */
 //=============================================================================
-FIELDINT::FIELDINT(const SUPPORT * Support, const int NumberOfComponents) : FIELD<int>(Support,NumberOfComponents)
+//CCRTFIELDINT::FIELDINT(const SUPPORT * Support, const int NumberOfComponents) : FIELD<int>(Support,NumberOfComponents)
+FIELDINT::FIELDINT(const SUPPORT * Support, const int NumberOfComponents) : FIELD<med_int>(Support,NumberOfComponents)
 {
   BEGIN_OF("Constructor with arguments (for Python API) FIELDINT");
 
+//CCRT In fact med_int is defined by Med as int on PCLINUX and as long (64 bits) on Alpha-OSF
   med_type_champ type = MED_INT32;
 
   setValueType(type);
@@ -35,7 +38,8 @@ FIELDINT::FIELDINT(const SUPPORT * Support, const int NumberOfComponents) : FIEL
 FIELDINT::FIELDINT(const SUPPORT * Support, driverTypes driverType,
 		   const string & fileName, const string & fieldName,
 		   const int iterationNumber, const int orderNumber) :
-  FIELD<int>(Support, driverType, fileName, fieldName,
+//CCRT  FIELD<int>(Support, driverType, fileName, fieldName,
+  FIELD<med_int>(Support, driverType, fileName, fieldName,
 	     iterationNumber, orderNumber)
 {
   BEGIN_OF("Another constructor with arguments (for Python API) FIELDINT");
@@ -51,7 +55,8 @@ FIELDINT::FIELDINT(const SUPPORT * Support, driverTypes driverType,
  * Copy constructor
  */
 //=============================================================================
-FIELDINT::FIELDINT(const FIELDINT & m) : FIELD<int>( (FIELD<int> &) m)
+//CCRTFIELDINT::FIELDINT(const FIELDINT & m) : FIELD<int>( (FIELD<int> &) m)
+FIELDINT::FIELDINT(const FIELDINT & m) : FIELD<med_int>( (FIELD<med_int> &) m)
 {
   BEGIN_OF("Copy constructor (for Python API) FIELDINT");
 
@@ -62,12 +67,14 @@ FIELDINT::FIELDINT(const FIELDINT & m) : FIELD<int>( (FIELD<int> &) m)
  * Copy constructor from a FIELD<int>
  */
 //=============================================================================
-FIELDINT::FIELDINT(const FIELD<int> & m) :
-  FIELD<int>( m)
+//CCRTFIELDINT::FIELDINT(const FIELD<int> & m) :
+FIELDINT::FIELDINT(const FIELD<med_int> & m) :
+//CCRT  FIELD<int>( m)
+  FIELD<med_int>( m)
 {
-  BEGIN_OF("Copy constructor (for Python API) FIELDINT from a FIELD<int>");
+  BEGIN_OF("Copy constructor (for Python API) FIELDINT from a FIELD<med_int>");
 
-  END_OF("Copy constructor (for Python API) FIELDINT from a FIELD<int>");
+  END_OF("Copy constructor (for Python API) FIELDINT from a FIELD<med_int>");
 }
 //=============================================================================
 /*!

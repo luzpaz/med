@@ -53,14 +53,16 @@
     }
 } 
 
-%typemap(python,in) int *
+//CCRT%typemap(python,in) int *
+%typemap(python,in) med_int *
 {
-  /* typemap in for int * */
+  /* typemap in for med_int * */
   /* Check if is a list */
   if (PyList_Check($input)) { 
     int size = PyList_Size($input);
     int i = 0; 
-    $1 = (int *) malloc(size*sizeof(int));
+//CCRT    $1 = (int *) malloc(size*sizeof(int));
+    $1 = (med_int *) malloc(size*sizeof(med_int));
     for (i = 0; i < size; i++) {
       PyObject *o = PyList_GetItem($input,i);
       if (PyInt_Check(o))
@@ -115,7 +117,8 @@
     PyList_SetItem($result,i,PyString_FromString((*iL).c_str())); 
 }
 
-%typemap(freearg) int * {
+//CCRT%typemap(freearg) int * {
+%typemap(freearg) med_int * {
   /* free the memory allocated in the typemap in for int * */
   free($1);
 }

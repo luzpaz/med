@@ -332,7 +332,8 @@ class SUPPORT
 
   void getBoundaryElements();
 
-  void setNumber(const int * index, const int* value);
+//CCRT  void setNumber(const int * index, const int* value);
+  void setNumber(const med_int * index, const med_int* value);
 
   %extend {
     SUPPORT(MESH* Mesh, char * Name="", medEntityMesh Entity=MED_CELL)
@@ -352,7 +353,8 @@ class SUPPORT
 
     void setpartial(char * Description, int NumberOfGeometricType,
 		    int TotalNumberOfElements, medGeometryElement *GeometricType,
-		    int *NumberOfElements, int *NumberValue)
+//CCRT		    int *NumberOfElements, int *NumberValue)
+		    int *NumberOfElements, med_int *NumberValue)
       {
 	self->setpartial(string(Description), NumberOfGeometricType,
 			 TotalNumberOfElements, GeometricType,
@@ -414,7 +416,8 @@ class SUPPORT
       {
 	PyObject *py_list;
 
-	const int * number = self->getNumber(GeometricType);
+//CCRT	const int * number = self->getNumber(GeometricType);
+	const med_int * number = self->getNumber(GeometricType);
 	int size = self->getNumberOfElements(GeometricType);
 
 	py_list = PyList_New(size);
@@ -438,7 +441,8 @@ class SUPPORT
       {
 	PyObject *py_list;
 
-	const int * numberindex = self->getNumberIndex();
+//CCRT	const int * numberindex = self->getNumberIndex();
+	const med_int * numberindex = self->getNumberIndex();
 	int size = (self->getNumberOfElements(MED_ALL_ELEMENTS))+1;
 
 	py_list = PyList_New(size);
@@ -475,9 +479,11 @@ class FAMILY : public SUPPORT
 
   void setNumberOfAttributes(int NumberOfAttribute);
 
-  void setAttributesIdentifiers(int * AttributeIdentifier);
+//CCRT  void setAttributesIdentifiers(int * AttributeIdentifier);
+  void setAttributesIdentifiers(med_int * AttributeIdentifier);
 
-  void setAttributesValues(int * AttributeValue);
+//CCRT  void setAttributesValues(int * AttributeValue);
+  void setAttributesValues(med_int * AttributeValue);
 
   void setAttributesDescriptions(string * AttributeDescription); 
 
@@ -493,11 +499,15 @@ class FAMILY : public SUPPORT
 
   %extend {
     FAMILY(MESH* Mesh, int Identifier, char * Name, int NumberOfAttribute,
-	   int *AttributeIdentifier, int *AttributeValue,
+//CCRT	   int *AttributeIdentifier, int *AttributeValue,
+	   med_int *AttributeIdentifier, med_int *AttributeValue,
 	   char * AttributeDescription, int NumberOfGroup,
-	   char * GroupName, int * MEDArrayNodeFamily,
-	   int ** MEDArrayCellFamily, int ** MEDArrayFaceFamily,
-	   int ** MEDArrayEdgeFamily)
+//CCRT	   char * GroupName, int * MEDArrayNodeFamily,
+	   char * GroupName, med_int * MEDArrayNodeFamily,
+//CCRT	   int ** MEDArrayCellFamily, int ** MEDArrayFaceFamily,
+	   med_int ** MEDArrayCellFamily, med_int ** MEDArrayFaceFamily,
+//CCRT	   int ** MEDArrayEdgeFamily)
+	   med_int ** MEDArrayEdgeFamily)
       {
 	return new FAMILY(Mesh,Identifier,string(Name),NumberOfAttribute,
 			  AttributeIdentifier,AttributeValue,
@@ -537,7 +547,8 @@ class FAMILY : public SUPPORT
       {
 	PyObject *py_list;
 
-	const int * attributesids = self->getAttributesIdentifiers();
+//CCRT	const int * attributesids = self->getAttributesIdentifiers();
+	const med_int * attributesids = self->getAttributesIdentifiers();
 	int size = self->getNumberOfAttributes();
 
 	py_list = PyList_New(size);
@@ -561,7 +572,8 @@ class FAMILY : public SUPPORT
       {
 	PyObject *py_list;
 
-	const int * attributesvals = self->getAttributesValues();
+//CCRT	const int * attributesvals = self->getAttributesValues();
+	const med_int * attributesvals = self->getAttributesValues();
 	int size = self->getNumberOfAttributes();
 
 	py_list = PyList_New(size);
@@ -847,11 +859,14 @@ public:
 
   int getValueIJ(int i,int j) const;
 
-  void setValue(medModeSwitch mode, int* value);
+//CCRT  void setValue(medModeSwitch mode, int* value);
+  void setValue(medModeSwitch mode, med_int* value);
 
-  void setValueI(medModeSwitch mode, int i, int* value);
+//CCRT  void setValueI(medModeSwitch mode, int i, int* value);
+  void setValueI(medModeSwitch mode, int i, med_int* value);
 
-  void setValueIJ(int i, int j, int value);
+//CCRT  void setValueIJ(int i, int j, int value);
+  void setValueIJ(int i, int j, med_int value);
 
   void allocValue(const int NumberOfComponents);
 
@@ -861,9 +876,11 @@ public:
 
   double normMax();
   double norm2();
-  double normL2(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
+//CCRT  double normL2(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
+  double normL2(med_int component, const FIELDDOUBLE * p_field_volume=NULL) const;
   double normL2(const FIELDDOUBLE * p_field_volume=NULL) const;
-  double normL1(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
+//CCRT  double normL1(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
+  double normL1(med_int component, const FIELDDOUBLE * p_field_volume=NULL) const;
   double normL1(const FIELDDOUBLE * p_field_volume=NULL) const;
 
 
@@ -889,7 +906,8 @@ public:
     FIELDINT * __add__(const FIELDINT & m)
       {
 	MESSAGE("operator +  : Creation of the addition of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::add( *(FIELD<int>*)self , (FIELD<int>&)m );
+//CCRT	FIELD<int>* result = FIELD<int>::add( *(FIELD<int>*)self , (FIELD<int>&)m );
+	FIELD<med_int>* result = FIELD<med_int>::add( *(FIELD<med_int>*)self , (FIELD<med_int>&)m );
 	return (FIELDINT*) result;
       }
 
@@ -897,7 +915,8 @@ public:
     FIELDINT * __sub__(const FIELDINT & m)
       {
 	MESSAGE("operator -  : Creation of the substraction of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::sub( *(FIELD<int>*)self , (FIELD<int>&)m );
+//CCRT	FIELD<int>* result = FIELD<int>::sub( *(FIELD<int>*)self , (FIELD<int>&)m );
+	FIELD<med_int>* result = FIELD<med_int>::sub( *(FIELD<med_int>*)self , (FIELD<med_int>&)m );
 	return (FIELDINT*) result;
       }
 
@@ -905,7 +924,8 @@ public:
     FIELDINT * __mul__(const FIELDINT & m)
       {
 	MESSAGE("operator *  : Creation of the multiplication of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::mul( *(FIELD<int>*)self , (FIELD<int>&)m );
+//CCRT	FIELD<int>* result = FIELD<int>::mul( *(FIELD<int>*)self , (FIELD<int>&)m );
+	FIELD<med_int>* result = FIELD<med_int>::mul( *(FIELD<med_int>*)self , (FIELD<med_int>&)m );
 	return (FIELDINT*) result;
       }
 
@@ -913,7 +933,8 @@ public:
     FIELDINT * __div__(const FIELDINT & m)
       {
 	MESSAGE("operator /  : Creation of the division of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::div( *(FIELD<int>*)self , (FIELD<int>&)m );
+//CCRT	FIELD<int>* result = FIELD<int>::div( *(FIELD<int>*)self , (FIELD<int>&)m );
+	FIELD<med_int>* result = FIELD<med_int>::div( *(FIELD<med_int>*)self , (FIELD<med_int>&)m );
 	return (FIELDINT*) result;
       }
 
@@ -944,7 +965,8 @@ public:
 	int size = (self->getNumberOfComponents())*
 	  ((self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS));
 
-	const int * value = self->getValue(Mode);
+//CCRT	const int * value = self->getValue(Mode);
+	const med_int * value = self->getValue(Mode);
 
 	py_list = PyList_New(size);
 	for (int i=0; i < size; i++)
@@ -971,7 +993,8 @@ public:
 
 	if ( Mode == MED_NO_INTERLACE ) size = (self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS);
 
-	const int * value = self->getValueI(Mode,index);
+//CCRT	const int * value = self->getValueI(Mode,index);
+	const med_int * value = self->getValueI(Mode,index);
 
 	py_list = PyList_New(size);
 	for (int i=0; i < size; i++)
@@ -1253,7 +1276,8 @@ public :
 			       medGeometryElement Type)
       {
 	PyObject *py_list;
-	const int * connectivity = self->getConnectivity(Mode,ConnectivityType,
+//CCRT	const int * connectivity = self->getConnectivity(Mode,ConnectivityType,
+	const med_int * connectivity = self->getConnectivity(Mode,ConnectivityType,
 						   Entity,Type);
 	int nbOfElm = self->getNumberOfElements(Entity,Type);
 	int size;
@@ -1288,7 +1312,8 @@ public :
 				    medEntityMesh Entity)
       {
 	PyObject *py_list;
-	const int * connectivity_index =
+//CCRT	const int * connectivity_index =
+	const med_int * connectivity_index =
 	  self->getConnectivityIndex(ConnectivityType,Entity);
 	int size = (self->getNumberOfElements(Entity,MED_ALL_ELEMENTS))+1;
 
@@ -1314,7 +1339,8 @@ public :
 				      medEntityMesh Entity=MED_CELL)
       {
 	PyObject *py_list;
-	const int * reverseconnectivity =
+//CCRT	const int * reverseconnectivity =
+	const med_int * reverseconnectivity =
 	  self->getReverseConnectivity(ConnectivityType,Entity);
 	int spaceDim = self->getSpaceDimension();
 	int nb;
@@ -1358,7 +1384,8 @@ public :
 					   medEntityMesh Entity=MED_CELL)
       {
 	PyObject *py_list;
-	const int * reverseconnectivity_index =
+//CCRT	const int * reverseconnectivity_index =
+	const med_int * reverseconnectivity_index =
 	  self->getReverseConnectivityIndex(ConnectivityType,Entity);
 
 	int size;
@@ -1398,7 +1425,8 @@ public :
     PyObject * getGlobalNumberingIndex(medEntityMesh Entity)
       {
 	PyObject *py_list;
-	const int * numberingIndex = self->getGlobalNumberingIndex(Entity);
+//CCRT	const int * numberingIndex = self->getGlobalNumberingIndex(Entity);
+	const med_int * numberingIndex = self->getGlobalNumberingIndex(Entity);
 	int nbOfTypes = self->getNumberOfTypes(Entity);
 	int size = nbOfTypes+1;
 
@@ -1467,15 +1495,19 @@ public :
   void setTypes            (const medGeometryElement * Types,
 			    const medEntityMesh Entity) ;
 
-  void setNumberOfElements (const int * NumberOfElements,
+//CCRT  void setNumberOfElements (const int * NumberOfElements,
+  void setNumberOfElements (const med_int * NumberOfElements,
 			    const medEntityMesh Entity) ;
 
-  void setConnectivity     (const int * Connectivity,
+//CCRT  void setConnectivity     (const int * Connectivity,
+  void setConnectivity     (const med_int * Connectivity,
 			    const medEntityMesh Entity,
 			    const medGeometryElement Type) ;
 
-  void setConnectivities   (const int * ConnectivityIndex,
-			    const int * ConnectivityValue,
+//CCRT  void setConnectivities   (const int * ConnectivityIndex,
+  void setConnectivities   (const med_int * ConnectivityIndex,
+//CCRT			    const int * ConnectivityValue,
+			    const med_int * ConnectivityValue,
 			    const medConnectivity ConnectivityType,
 			    const medEntityMesh Entity) ;
 
@@ -2497,7 +2529,8 @@ GRID * createGridFromMesh( MESH * aMesh );
   
   FIELDINT * createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) 
   {
-     return (FIELDINT *) FIELD<int>::scalarProduct( (FIELD<int>)*field1, (FIELD<int>)*field2);
+//CCRT     return (FIELDINT *) FIELD<int>::scalarProduct( (FIELD<int>)*field1, (FIELD<int>)*field2);
+     return (FIELDINT *) FIELD<med_int>::scalarProduct( (FIELD<med_int>)*field1, (FIELD<med_int>)*field2);
   }
   
   FIELDDOUBLE * createFieldDoubleFromField(FIELD_ * field)
@@ -2549,7 +2582,8 @@ GRID * createGridFromMesh( MESH * aMesh );
 	    }
 	  else
 	    {
-	      const int * nodesNumber = Support->getNumber(MED_ALL_ELEMENTS);
+//CCRT	      const int * nodesNumber = Support->getNumber(MED_ALL_ELEMENTS);
+	      const med_int * nodesNumber = Support->getNumber(MED_ALL_ELEMENTS);
 	      const double * coord = mesh->getCoordinates(MED_FULL_INTERLACE);
 
 	      double * x_tmp = new double [NumberOfValues];
@@ -2721,7 +2755,8 @@ GRID * createGridFromMesh( MESH * aMesh );
       FIELDINT * fieldInt = new FIELDINT(Support,NumberOfComponents);
 
       int NumberOfValues = fieldInt->getNumberOfValues();
-      int * values = new int[NumberOfValues*NumberOfComponents];
+//CCRT      int * values = new int[NumberOfValues*NumberOfComponents];
+      med_int * values = new med_int[NumberOfValues*NumberOfComponents];
 
       const double * x = (const double *) NULL;
       const double * y = (const double *) NULL;
@@ -2747,7 +2782,8 @@ GRID * createGridFromMesh( MESH * aMesh );
 	    }
 	  else
 	    {
-	      const int * nodesNumber = Support->getNumber(MED_ALL_ELEMENTS);
+//CCRT	      const int * nodesNumber = Support->getNumber(MED_ALL_ELEMENTS);
+	      const med_int * nodesNumber = Support->getNumber(MED_ALL_ELEMENTS);
 	      const double * coord = mesh->getCoordinates(MED_FULL_INTERLACE);
 
 	      double * x_tmp = new double [NumberOfValues];

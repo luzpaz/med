@@ -18,7 +18,7 @@
 
 namespace MEDMEM {
 class SUPPORT;
-class SALOME_MED::MESH;
+//CCRTclass SALOME_MED::MESH;
 
 class SUPPORT_i: 
 		public POA_SALOME_MED::SUPPORT,

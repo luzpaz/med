@@ -62,10 +62,15 @@ BIN_SRC =
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
+LDFLAGS= -L$(top_builddir)/lib/salome 
+LDFLAGSFORBIN= -L$(top_builddir)/lib/salome 
+
+
 
 CPPFLAGS+= $(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
 CXXFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmedmem -lOpUtil -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
+#CCRTLDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmedmem -lOpUtil -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmedmem -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
 #LDFLAGS+=-lmedmem  -L. -lSalomeContainer -lSalomeNS -lRegistry -lOpUtil -lSalomeNotification
 # does we put only -lSalomeContainer and compiler retrieves -lSalomeNS -lRegistry -lOpUtil ????
 

@@ -3,7 +3,8 @@
 
 #include "MEDMEM_Field.hxx"
 
-class FIELDINT : public FIELD<int>
+//CCRTclass FIELDINT : public FIELD<int>
+class FIELDINT : public FIELD<med_int>
 {
 public:
   FIELDINT();
@@ -12,7 +13,8 @@ public:
 	   const string & fileName="", const string & fieldName="",
 	   const int iterationNumber=-1, const int orderNumber=-1);
   FIELDINT(const FIELDINT & m);
-  FIELDINT(const FIELD<int> & m);
+//CCRT  FIELDINT(const FIELD<int> & m);
+  FIELDINT(const FIELD<med_int> & m);
   ~FIELDINT();
 };
 

@@ -33,7 +33,9 @@ int SUPPORT_i::supportIndex = 0 ;
  * Default constructor
  */
 //=============================================================================
-SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL)
+//CCRTSUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL)
+SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL),
+                        _corbaIndex(0)
 {
 	BEGIN_OF("Default Constructor SUPPORT_i");
 	END_OF("Default Constructor SUPPORT_i");
@@ -369,7 +371,8 @@ throw (SALOME::SALOME_Exception)
 SCRUTE(_support->getName());
 SCRUTE(nbelements);
 SCRUTE(convertIdlEltToMedElt(geomElement));
-                const int * numbers=_support->getNumber(convertIdlEltToMedElt(geomElement));
+//CCRT                const int * numbers=_support->getNumber(convertIdlEltToMedElt(geomElement));
+                const med_int * numbers=_support->getNumber(convertIdlEltToMedElt(geomElement));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -403,7 +406,8 @@ throw (SALOME::SALOME_Exception)
 		MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
                 int nbelements=_support->getNumberOfElements(::MED_ALL_ELEMENTS);
                 myseq->length(nbelements);
-                const int * numbers=_support->getNumberIndex();
+//CCRT                const int * numbers=_support->getNumberIndex();
+                const med_int * numbers=_support->getNumberIndex();
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
