@@ -130,7 +130,7 @@ private:
   int getNodalConnectivity(CONNECTIVITY * Connectivity) ;
   int getDescendingConnectivity(CONNECTIVITY * Connectivity) ;
   int getNodesFamiliesNumber(int * MEDArrayNodeFamily) ;
-  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity) ;
+  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity) ;
   void updateFamily() ;
   void buildAllGroups(vector<GROUP*> & Groups, vector<FAMILY*> & Families) ;
   void getGRID ();

@@ -501,7 +501,29 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 	MESSAGE("Iteration :"<<MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
 	MESSAGE("Order :"<<MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
         MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues+=NumberOfValues[i]; // problem with gauss point : _numberOfValues != TotalNumberOfValues !!!!!!!
-	if ( MED_FR::MEDchampLire(MED_FIELD_DRIVER<T>::_medIdt,const_cast <char*> (MeshName.c_str()),
+	MED_FR::med_err ret;
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+	int lgth2=NumberOfValues[i]*numberOfComponents;
+	if(_ptrField->getValueType()==MED_EN::MED_INT32)
+	  {
+	    MED_FR::med_int *temp=new MED_FR::med_int[lgth2];
+	    ret=MED_FR::MEDchampLire(MED_FIELD_DRIVER<T>::_medIdt,const_cast <char*> (MeshName.c_str()),
+				  const_cast <char*> (MED_FIELD_DRIVER<T>::_fieldName.c_str()),
+				  (unsigned char*) temp,
+				  MED_FR::MED_NO_INTERLACE,
+				  MED_ALL,
+				  ProfilName,
+				  (MED_FR::med_entite_maillage) MED_FIELD_DRIVER<T>::_ptrField->_support->getEntity(),(MED_FR::med_geometrie_element)Types[i],
+				  MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber(),
+				  MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()
+				 );
+	    for(int i2=0;i2<lgth2;i2++)
+	      myValues[i][i2]=(int)(temp[i2]);
+	    delete [] temp;
+	  }
+	else
+#endif
+	ret=MED_FR::MEDchampLire(MED_FIELD_DRIVER<T>::_medIdt,const_cast <char*> (MeshName.c_str()),
 				  const_cast <char*> (MED_FIELD_DRIVER<T>::_fieldName.c_str()),
 				  (unsigned char*) myValues[i],
 				  MED_FR::MED_NO_INTERLACE,
@@ -510,7 +532,8 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 				  (MED_FR::med_entite_maillage) MED_FIELD_DRIVER<T>::_ptrField->_support->getEntity(),(MED_FR::med_geometrie_element)Types[i],
 				  MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber(),
 				  MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()
-				  ) < 0) {
+				 ); 
+	  if (ret < 0) {
 	  // we must do some delete !!!
 	  for(int j=0; j<=i;j++)
 	    delete[] myValues[j];
@@ -743,7 +766,34 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
 	cout<<"==================> nom unit lu       = "<<chaunit<<endl;
 	cout<<"==================> valeur de MED_FR::MED_REEL64 = "<<MED_FR::MED_REEL64<<endl;
 */	
-
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+	if(_ptrField->getValueType()==MED_EN::MED_INT32)
+	  {
+	    int lgth2=_ptrField->getNumberOfValues();
+	    MED_FR::med_int *temp=new MED_FR::med_int[lgth2];
+	    for(int i2=0;i2<lgth2;i2++)
+	      temp[i2]=(int)(value[i2]);
+	    err=MED_FR::MEDchampEcr(MED_FIELD_DRIVER<T>::_medIdt, 
+				    const_cast <char*> ( MeshName.c_str()) ,                         //( string(mesh_name).resize(MED_TAILLE_NOM).c_str())
+				    const_cast <char*> ( (MED_FIELD_DRIVER<T>::_ptrField->getName()).c_str()),
+				    (unsigned char*)temp, 
+				    MED_FR::MED_FULL_INTERLACE,
+				    NumberOfElements,
+				    NumberOfGaussPoint[i],
+				    MED_ALL,
+				    MED_NOPFL,
+				    MED_FR::MED_REMP,  // PROFIL NON GERE, mode de remplacement non géré
+				    (MED_FR::med_entite_maillage)mySupport->getEntity(),
+				    (MED_FR::med_geometrie_element)Types[i],
+				    MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber(),
+				    "        ",
+				    MED_FIELD_DRIVER<T>::_ptrField->getTime(),
+				    MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()
+				    );
+	    delete [] temp;
+	  }
+	else
+#endif
 	err=MED_FR::MEDchampEcr(MED_FIELD_DRIVER<T>::_medIdt, 
 				const_cast <char*> ( MeshName.c_str()) ,                         //( string(mesh_name).resize(MED_TAILLE_NOM).c_str())
 				const_cast <char*> ( (MED_FIELD_DRIVER<T>::_ptrField->getName()).c_str()),
