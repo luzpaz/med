@@ -16,14 +16,19 @@ EXPORT_HEADERS = \
 	libMEDMEM_Swig.i \
 	my_typemap.i \
 	MEDMEM_SWIG_FieldDouble.hxx \
-	MEDMEM_SWIG_FieldInt.hxx
+	MEDMEM_SWIG_FieldInt.hxx \
+	MEDMEM_SWIG_MedFieldDoubleDriver.hxx \
+	MEDMEM_SWIG_MedFieldIntDriver.hxx
 
 # Libraries targets
 
 LIB = libMEDMEM_Swigcmodule.la
 
 LIB_SRC = MEDMEM_SWIG_FieldDouble.cxx \
-	  MEDMEM_SWIG_FieldInt.cxx
+	  MEDMEM_SWIG_FieldInt.cxx \
+	  MEDMEM_SWIG_MedFieldDoubleDriver.cxx \
+	  MEDMEM_SWIG_MedFieldIntDriver.cxx
+
 
 SWIG_DEF = libMEDMEM_Swig.i
 

@@ -77,6 +77,7 @@ protected:
 public:
   SUPPORT(); 
   SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL); 
+  SUPPORT(SUPPORT & m);
   ~SUPPORT();
   friend ostream & operator<<(ostream &os,const SUPPORT &my);
   
@@ -91,7 +92,7 @@ public:
   inline void setNumberOfGeometricType(int NumberOfGeometricType); 
   inline void setGeometricType(medGeometryElement *GeometricType); 
   inline void setNumberOfGaussPoint(int *NumberOfGaussPoint);
-  inline void setGeometricTypeNumber(int *GeometricTypeNumber); 
+  //  inline void setGeometricTypeNumber(int *GeometricTypeNumber); 
   inline void setNumberOfEntities(int *NumberOfEntities); 
   inline void setTotalNumberOfEntities(int TotalNumberOfEntities); 
   inline void setNumber(MEDSKYLINEARRAY * Number); 
@@ -106,7 +107,7 @@ public:
   inline medGeometryElement* getTypes() const ;
   inline int *  getNumberOfGaussPoint() const throw (MEDEXCEPTION);
   inline int    getNumberOfGaussPoint(medGeometryElement geomElement) const throw (MEDEXCEPTION);
-  inline int *  getGeometricTypeNumber() const; 
+  //inline int *  getGeometricTypeNumber() const; 
   //  inline int    getNumberOfTotalEntity() const;
   inline int    getNumberOfElements(medGeometryElement GeometricType) const throw (MEDEXCEPTION);
   inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
@@ -328,11 +329,11 @@ inline void SUPPORT::setNumberOfGaussPoint(int *NumberOfGaussPoint)
 
 /*! set the attribute _geometricTypeNumber to GeometricTypeNumber  */
 //-------------------------------------------------------------------
-inline void SUPPORT::setGeometricTypeNumber(int *GeometricTypeNumber)
+//inline void SUPPORT::setGeometricTypeNumber(int *GeometricTypeNumber)
 //-------------------------------------------------------------------
-{ 
-  _geometricTypeNumber=GeometricTypeNumber; 
-}
+//{ 
+//  _geometricTypeNumber=GeometricTypeNumber; 
+//}
 
 /*! set the attribute _numberOfEntities to NumberOfEntities */
 //----------------------------------------------------------
@@ -430,16 +431,16 @@ inline medGeometryElement * SUPPORT::getTypes() const
 }
 
 //---------------------------------------------------
-inline int * SUPPORT::getGeometricTypeNumber() const
+//inline int * SUPPORT::getGeometricTypeNumber() const
 //---------------------------------------------------
-{
-  const char * LOC = "SUPPORT::getGeometricTypeNumber() : ";
-  if (_isOnAllElts)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined (is on all elements) !"));
-  if (_geometricTypeNumber==NULL)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined !"));
-  return _geometricTypeNumber; 
-}
+//  {
+//    const char * LOC = "SUPPORT::getGeometricTypeNumber() : ";
+//    if (_isOnAllElts)
+//      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined (is on all elements) !"));
+//    if (_geometricTypeNumber==NULL)
+//      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined !"));
+//    return _geometricTypeNumber; 
+//  }
 
     
 #endif /* SUPPORT_HXX */

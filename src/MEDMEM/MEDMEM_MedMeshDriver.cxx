@@ -1,3 +1,4 @@
+using namespace std;
 #include "MEDMEM_MedMeshDriver.hxx"
 
 #include "MEDMEM_DriversDef.hxx"
@@ -70,6 +71,14 @@ void MED_MESH_RDONLY_DRIVER::read(void)
   // on edge
   buildAllGroups(_ptrMesh->_groupEdge,_ptrMesh->_familyEdge) ;
   _ptrMesh->_numberOfEdgesGroups = _ptrMesh->_groupEdge.size() ;
+
+  MESSAGE(LOC<<"Checking of CellModel !!!!!!!");
+
+  int nbOfTypes =  _ptrMesh->_connectivity->_numberOfTypes;
+  for(int i=0;i<nbOfTypes;i++)
+    {
+      MESSAGE(LOC << _ptrMesh->_connectivity->_type[i]) ;
+    }
 
   END_OF(LOC);
 }
@@ -869,12 +878,12 @@ void MED_MESH_RDONLY_DRIVER::buildAllGroups(vector<GROUP*> & Groups, vector<FAMI
   map< string,list<FAMILY*> >::const_iterator currentGroup ;
   int it = 0 ;
   for(currentGroup=groupsNames.begin();currentGroup!=groupsNames.end();currentGroup++) {
-    //    GROUP * myGroup = new GROUP((*currentGroup).first,(*currentGroup).second) ;
-    GROUP * myGroup = new GROUP() ;
-    myGroup->setName((*currentGroup).first);
-    SCRUTE(myGroup->getName());
-    //myGroup->setMesh(_ptrMesh);
-    myGroup->init((*currentGroup).second);
+    GROUP * myGroup = new GROUP((*currentGroup).first,(*currentGroup).second) ;
+//     GROUP * myGroup = new GROUP() ;
+//     myGroup->setName((*currentGroup).first);
+//     SCRUTE(myGroup->getName());
+//     //myGroup->setMesh(_ptrMesh);
+//     myGroup->init((*currentGroup).second);
     Groups[it]=myGroup;
     //SCRUTE(it);
     it++;
@@ -914,7 +923,7 @@ void MED_MESH_WRONLY_DRIVER::write(void) const {
   BEGIN_OF(LOC);
 
   // we must first create mesh !!
-  MESSAGE(LOC<< "MeshName : "<< _meshName <<"FileName : "<<_fileName<<" MedIdt : "<< _medIdt);
+  MESSAGE(LOC << "MeshName : |" << _meshName << "| FileName : |"<<_fileName<<"| MedIdt : | "<< _medIdt << "|");
 
   if (writeCoordinates()!=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERROR in writeCoordinates()"  )) ;
@@ -995,7 +1004,7 @@ int MED_MESH_WRONLY_DRIVER::writeCoordinates() const {
     int dim = MEDdimLire(_medIdt, const_cast <char *> (_meshName.c_str()) );
     if (dim < MED_VALID) 
       if (MEDmaaCr(_medIdt,const_cast <char *> (_meshName.c_str()),_ptrMesh->_spaceDimension) != 0 )
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Unable to create Mesh"));
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Unable to create Mesh : |" << _meshName << "|"));
       else 
 	{
 	  MESSAGE(LOC<<"Mesh "<<_meshName<<" created in file "<<_fileName<<" !");
@@ -1085,7 +1094,8 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const {
 	for (int j=0 ; j<numberOfElements; j++) {
 	  for (int k=0; k<numberOfNodes; k++)
 	    connectivityArray[j*(numberOfNodes+multi)+k]=connectivity[j*numberOfNodes+k] ;
-	  connectivityArray[j*(numberOfNodes+multi)+numberOfNodes]=0;
+	  if (multi>0)
+	    connectivityArray[j*(numberOfNodes+multi)+numberOfNodes]=0;
 	}
         err = MEDconnEcr( _medIdt, const_cast <char *> ( _meshName.c_str()), _ptrMesh->_spaceDimension,
                           connectivityArray, MED_FR::MED_FULL_INTERLACE , numberOfElements,
@@ -1094,30 +1104,6 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const {
                           (MED_FR::med_geometrie_element) types[i], MED_NOD );
 	delete[] connectivityArray ;
 
-        if (err<0) // ETENDRE LES EXPLICATIONS
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write connectivities of mesh |" << _meshName.c_str() << "| in file |" << _fileName
-                                       << "| with dimension |"  << _ptrMesh->_spaceDimension <<"| and" 
-				       )) ;
-      }
-    }
-    // Connctivity descending :
-    if   ( _ptrMesh->existConnectivity(MED_DESCENDING,entity) ) { 
-      
-      int numberOfTypes           = _ptrMesh->getNumberOfTypes (entity) ;
-      medGeometryElement  * types = _ptrMesh->getTypes         (entity) ;
-      
-      for (int i=0; i<numberOfTypes; i++) {
-	
-        int    numberOfElements = _ptrMesh->getNumberOfElements (entity,types[i]);
-        int * connectivity = _ptrMesh->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_DESCENDING, entity, types[i]); 
-      
-        // Pour l'instant la class utilise le multi.....
-        err = MEDconnEcr( _medIdt, const_cast <char *> ( _meshName.c_str()), _ptrMesh->_spaceDimension,
-                          connectivity, MED_FR::MED_FULL_INTERLACE , numberOfElements,
-                          MED_FR::MED_REMP,
-                          (MED_FR::med_entite_maillage  ) entity, 
-                          (MED_FR::med_geometrie_element) types[i], MED_DESC );
-	
         if (err<0) // ETENDRE LES EXPLICATIONS
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write connectivities of mesh |" << _meshName.c_str() << "| in file |" << _fileName
                                        << "| with dimension |"  << _ptrMesh->_spaceDimension <<"| and" 

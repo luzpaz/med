@@ -60,7 +60,7 @@ public :
     med_int err = 0;
     if ( _status == MED_OPENED) {
       err=MED_FR::MEDfermer(_medIdt);
-      H5close();
+      H5close(); // If we call H5close() all the files are closed.
       if (err != 0)
 	throw MEDEXCEPTION( LOCALIZED(STRING(LOC)
 				      <<" Error when closing file !"

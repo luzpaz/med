@@ -1,3 +1,4 @@
+using namespace std;
 # include "MEDMEM_Med.hxx"
  
 # include "MEDMEM_STRING.hxx"
@@ -48,16 +49,31 @@ int MED::addDriver(driverTypes driverType, const string & fileName="Default File
   BEGIN_OF(LOC);
 
   driver = instances[driverType]->run(fileName, this) ;
-  _drivers.push_back(driver);
+  driver->setId(current); 
   current = _drivers.size()-1;
-  // _drivers[current]->set... 
+  driver->setId(current); 
 
   END_OF(LOC);
   return current;
 }
 
+/*! Add an existing MESH driver. */
+int  MED::addDriver(GENDRIVER & driver) {
+  const char * LOC = "MED::addDriver(GENDRIVER &) : ";
+  int current;
 
-void MED::rmDriver (int index=0) {
+  BEGIN_OF(LOC);
+  
+  _drivers.push_back(&driver);
+  current = _drivers.size()-1;
+  driver.setId(current); 
+  
+  return current;
+  
+  END_OF(LOC);
+}
+
+void MED::rmDriver (int index/*=0*/) {
   const char * LOC = "MED::rmDriver (int index=0): ";
   BEGIN_OF(LOC);
 
@@ -74,7 +90,7 @@ void MED::rmDriver (int index=0) {
 }
 
 
-void MED::writeFrom (int index=0)
+void MED::writeFrom (int index/*=0*/)
 {
   const char * LOC = "MED::write (int index=0): ";
   BEGIN_OF(LOC);
@@ -93,7 +109,7 @@ void MED::writeFrom (int index=0)
 }; 
 
 
-void MED::write (int index=0)
+void MED::write (int index/*=0*/)
 {
   const char * LOC = "MED::writeAll (int index=0): ";
   BEGIN_OF(LOC);
@@ -113,7 +129,7 @@ void MED::write (int index=0)
 }; 
 
 
-void MED::readFileStruct (int index=0) {
+void MED::readFileStruct (int index/*=0*/) {
   const char * LOC = "MED::readFileStruct (int index=0): ";
   BEGIN_OF(LOC);
   

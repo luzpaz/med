@@ -23,7 +23,8 @@ protected :
   
 public:
   GROUP();
-  GROUP(const string & name, const list<FAMILY*> & family);
+  GROUP(const string & name, const list<FAMILY*> & family) throw (MEDEXCEPTION) ;
+  GROUP(GROUP & m);
   ~GROUP();
   GROUP & operator=(const GROUP &group);
   
@@ -34,7 +35,7 @@ public:
   inline vector<FAMILY*> getFamilies() const ;
   inline FAMILY * 	 getFamily(int i) const ;
 
-  void init(const list<FAMILY*> & family);
+//   void init(const list<FAMILY*> & family);
 };
 
 // inline method :

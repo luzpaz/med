@@ -37,7 +37,7 @@ typedef map<DT_IT_, FIELD_*, LT_DT_IT_ > MAP_DT_IT_;
 //   CONTAINNED WITHIN A FILE <fileName> OF TYPE GIVEN BY THE  <driverType> PARAMETER
 // - IN THE SECOND CASE THE USER BEGINS HIS WORK WITH A MESH OR A FIELD, 
 //   ?? GET A MED POINTER THEN CAN ADD MESHes OR FIELDs ??
-
+//
 class MED
 {
   friend class MED_MED_DRIVER;
@@ -90,6 +90,7 @@ protected:
 public:
 
   int  addDriver     (driverTypes driverType, const string & fileName);
+  int  addDriver     (GENDRIVER & driver);
   void rmDriver      (int index=0);
   void readFileStruct(int index=0);
   // void read          (int index=0);

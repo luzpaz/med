@@ -26,6 +26,8 @@
 #include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_SWIG_FieldDouble.hxx"
 #include "MEDMEM_SWIG_FieldInt.hxx"
+#include "MEDMEM_SWIG_MedFieldDoubleDriver.hxx"
+#include "MEDMEM_SWIG_MedFieldIntDriver.hxx"
 %}
 
 /*
@@ -55,7 +57,7 @@ typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26,
 
 typedef struct { int dt; int it; } DT_IT_;
 
-%extend DT_IT_ {
+%addmethods DT_IT_ {
   int getdt()
     {
       return self->dt;
@@ -70,7 +72,23 @@ typedef struct { int dt; int it; } DT_IT_;
   Class et methodes du MED++ que l'on utilise dans l'API Python
 */
 
-class CELLMODEL;
+class CELLMODEL
+{
+ public:
+  medGeometryElement getType();
+
+  int getNumberOfNodes();
+
+  %addmethods {
+    char * getName()
+      {
+	string tmp_str = self->getName();
+	char * tmp = new char[strlen(tmp_str.c_str())+1];
+	strcpy(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
 
 class SUPPORT
 {
@@ -100,13 +118,13 @@ class SUPPORT
 
   void setGeometricType(medGeometryElement *GeometricType);
 
-  void setGeometricTypeNumber(int *GeometricTypeNumber); 
+  /*  void setGeometricTypeNumber(int *GeometricTypeNumber); */
 
   void setNumberOfEntities(int *NumberOfEntities);
 
   void setTotalNumberOfEntities(int TotalNumberOfEntities);
 
-  %extend {
+  %addmethods {
     SUPPORT(MESH* Mesh, char * Name="", medEntityMesh Entity=MED_CELL)
       {
 	return new SUPPORT(Mesh,string(Name),Entity);
@@ -168,6 +186,7 @@ class SUPPORT
 	return Py_BuildValue("O", py_list);
       }
 
+    /*
     PyObject * getGeometricTypeNumber()
       {
 	PyObject *py_list;
@@ -189,6 +208,7 @@ class SUPPORT
 	  }
 	return Py_BuildValue("O", py_list);
       }
+    */
 
     PyObject * getNumber(medGeometryElement GeometricType)
       {
@@ -257,7 +277,7 @@ class FAMILY : public SUPPORT
   int getNumberOfGroups() const;
   /*  string * getGroupsNames() const;*/
 
-  %extend {
+  %addmethods {
     FAMILY(MESH* Mesh, int Identifier, char * Name, int NumberOfAttribute,
 	   int *AttributeIdentifier, int *AttributeValue,
 	   char * AttributeDescription, int NumberOfGroup,
@@ -357,7 +377,7 @@ public:
   void  setNumberOfComponents(int NumberOfComponents);
   int getNumberOfComponents() const;
 
-  %extend {
+  %addmethods {
     int addDriver(driverTypes driverType,
 		  char * fileName="Default File Name.med",
 		  char * driverName="Default Field Name")
@@ -440,6 +460,16 @@ public:
 
   FIELDDOUBLE(const SUPPORT * Support, const int NumberOfComponents);
 
+  /*
+    WARNING:
+    other constructor of FIELDDOUBLE (C++ FIELD<double>) object.
+    Only one constructor could be wrapped and
+    the others commented out when using 
+    SWIG with a version lesser than 1.3
+  */
+
+  //FIELDDOUBLE();    
+
   void read(int index=0);
 
   double getValueIJ(int i,int j) const;
@@ -454,14 +484,15 @@ public:
 
   void deallocValue();
 
-  %extend {
+  %addmethods {
     /*
-    FIELDDOUBLE(FIELD_ * field)
+    FIELDDOUBLE (const SUPPORT * Support, driverTypes driverType,
+		 char * fileName, char * fieldName)
       {
-	MESSAGE("Constructor (pour API Python) FIELDDOUBLE avec parameters");
-	return (FIELDDOUBLE *) field;
+	return new FIELDDOUBLE(Support, driverType, string(fileName),
+			       string(fieldName));
       }
-    */
+    <*/
 
     void write(int index=0, char * driverName="")
       {
@@ -531,6 +562,19 @@ public:
 
   FIELDINT(const SUPPORT * Support, const int NumberOfComponents);
 
+  /*
+    WARNING:
+    other constructor of FIELDINT (C++ FIELD<int>) object.
+    other constructor of MED object.
+    Only one constructor could be wrapped and
+    the others commented out when using 
+    SWIG with a version lesser than 1.3
+  */
+
+  /*
+  FIELDINT();
+  */
+
   void read(int index=0);
 
   int getValueIJ(int i,int j) const;
@@ -545,12 +589,13 @@ public:
 
   void deallocValue();
 
-  %extend {
+  %addmethods {
     /*
-    FIELDINT(FIELD_ * field)
+    FIELDINT(const SUPPORT * Support, driverTypes driverType,
+             char * fileName, char * fieldName)
       {
-	MESSAGE("Constructor (pour API Python) FIELDINT avec parameters");
-	return (FIELDINT *) field;
+	return new FIELDDOUBLE(Support, driverType, string(fileName),
+			       string(fieldName));
       }
     */
 
@@ -631,7 +676,17 @@ public:
 
 class MESH
 {
- public :
+public :
+  /*
+    WARNING:
+    other constructor of MESH object.
+    Only one constructor could be wrapped and
+    the others commented out when using 
+    SWIG with a version lesser than 1.3
+  */
+
+  //  MESH();    
+
   void rmDriver(int index=0);
 
   void read(int index=0);
@@ -654,6 +709,8 @@ class MESH
 
   int getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type, int * connectivity);
 
+  CELLMODEL * getCellsTypes(medEntityMesh Entity);
+
   FAMILY* getFamily(medEntityMesh Entity,int i);
 
   int getNumberOfGroups(medEntityMesh Entity);
@@ -664,7 +721,17 @@ class MESH
 
   SUPPORT * getBoundaryElements(medEntityMesh Entity) ;
 
-  %extend {
+  %addmethods {
+    CELLMODEL getCellType(medEntityMesh Entity,int i)
+      {
+	return self->getCellsTypes(Entity)[i];
+      };
+
+    MESH (driverTypes driverType, char * fileName, char * meshName)
+      {
+	return new MESH(driverType, string(fileName), string(meshName));
+      }
+
     int addDriver(driverTypes driverType,
 		  char * fileName="Default File Name.med",
 		  char * driverName="Default Mesh Name")
@@ -714,6 +781,47 @@ class MESH
 	strcpy(tmp,tmp_str.c_str());
 	return tmp;
       }
+
+    PyObject * getCoordinatesNames()
+      {
+	PyObject *py_list;
+	string * array = self->getCoordinatesNames();
+	int size = self->getSpaceDimension();
+	py_list = PyList_New(size);
+	for (int i=0; i < size; i++)
+	  {
+	    int err = PyList_SetItem(py_list, i,
+				     Py_BuildValue("s", array[i].c_str()));
+	    if(err)
+	      {
+		char * message = "Error in MESH::getCoordinatesNames";
+		PyErr_SetString(PyExc_RuntimeError, message);
+		return NULL;
+	      }
+	  }
+	return Py_BuildValue("O", py_list);
+      }
+
+    PyObject * getCoordinatesUnits()
+      {
+	PyObject *py_list;
+	string * array = self->getCoordinatesUnits();
+	int size = self->getSpaceDimension();
+	py_list = PyList_New(size);
+	for (int i=0; i < size; i++)
+	  {
+	    int err = PyList_SetItem(py_list, i,
+				     Py_BuildValue("s", array[i].c_str()));
+	    if(err)
+	      {
+		char * message = "Error in MESH::getCoordinatesUnits";
+		PyErr_SetString(PyExc_RuntimeError, message);
+		return NULL;
+	      }
+	  }
+	return Py_BuildValue("O", py_list);
+      }
+
     PyObject * getCoordinates(medModeSwitch Mode)
       {
 	PyObject *py_list;
@@ -927,13 +1035,36 @@ class MED
 
   ~MED();
 
+  void rmDriver (int index=0);
+
   int getNumberOfMeshes ( void ) const;       
 
   int getNumberOfFields ( void ) const;
 
   void updateSupport ( void ) ;
 
-  %extend {
+  void write (int index=0);
+
+  %addmethods {
+    /*
+      WARNING:
+      other constructor of MED object.
+      Only one constructor could be wrapped and
+      the others commented out when using 
+      SWIG with a version lesser than 1.3
+    */
+    /*
+    MED(driverTypes driverType, char * fileName)
+      {
+	return new MED(driverType,string(fileName));
+      }
+    */
+    int addDriver(driverTypes driverType,
+		  char * fileName="Default File Name.med")
+      {
+	return self->addDriver(driverType,string(fileName));
+      }
+
     const char * getMeshName(int i)
       {
 	deque<string> list_string = self->getMeshNames();
@@ -992,7 +1123,7 @@ class MED_MED_DRIVER
   virtual void read           ( void ) ;
   virtual void readFileStruct ( void ) ;
 
-  %extend {
+  %addmethods {
     MED_MED_DRIVER(char * fileName,  MED * ptrMed)
       {
 	return new MED_MED_DRIVER(string(fileName), ptrMed);
@@ -1009,7 +1140,7 @@ class MED_MED_RDONLY_DRIVER : public virtual MED_MED_DRIVER
   void read           ( void ) ;
   void readFileStruct ( void ) ;
 
-  %extend {
+  %addmethods {
     MED_MED_RDONLY_DRIVER(char * fileName,  MED * ptrMed)
       {
 	return new MED_MED_RDONLY_DRIVER(string(fileName), ptrMed);
@@ -1026,7 +1157,7 @@ class MED_MED_WRONLY_DRIVER : public virtual MED_MED_DRIVER
   void write          ( void ) const ;
   void writeFrom      ( void ) const ;
 
-  %extend {
+  %addmethods {
     MED_MED_WRONLY_DRIVER(char * fileName,  MED * ptrMed)
       {
 	return new MED_MED_WRONLY_DRIVER(string(fileName), ptrMed);
@@ -1047,7 +1178,7 @@ class MED_MED_RDWR_DRIVER : public virtual MED_MED_RDONLY_DRIVER,
   void read           ( void ) ;
   void readFileStruct ( void ) ;
 
-  %extend {
+  %addmethods {
     MED_MED_RDWR_DRIVER(char * fileName,  MED * ptrMed)
       {
 	return new MED_MED_RDWR_DRIVER(string(fileName), ptrMed);
@@ -1062,21 +1193,17 @@ class MED_MED_RDWR_DRIVER : public virtual MED_MED_RDONLY_DRIVER,
 /*
 class MED_MESH_DRIVER
 {
- public :
-   //  MED_MESH_DRIVER();
-
-   //  MED_MESH_DRIVER(const string & fileName,  MESH * ptrMesh, med_mode_acces accessMode);
+public :
 
   void open();
+
   void close();
 
-  //  virtual void write( void ) const = 0;
-  //  virtual void read ( void ) = 0;
- 
-  //  void   setMeshName(const string & meshName) ;
-  //  string getMeshName() const ;
+  virtual void write( void ) const = 0 ;
 
-  %extend {
+  virtual void read ( void ) = 0 ;
+
+  %addmethods {
     MED_MESH_DRIVER(char * fileName,  MESH * ptrMesh,
 		    med_mode_acces accessMode)
       {
@@ -1099,8 +1226,7 @@ class MED_MESH_DRIVER
 };
 */
 
-class MED_MESH_RDONLY_DRIVER
-// : public virtual MED_MESH_DRIVER
+class MED_MESH_RDONLY_DRIVER : public virtual MED_MESH_DRIVER
 {
  public :
  
@@ -1116,20 +1242,36 @@ class MED_MESH_RDONLY_DRIVER
 
   int getFAMILY();
 
+  void open();
+
+  void close();
+
   void write( void ) ;
 
   void read ( void ) ;
 
-  %extend {
+  %addmethods {
     MED_MESH_RDONLY_DRIVER(char * fileName,  MESH * ptrMesh)
       {
 	return new MED_MESH_RDONLY_DRIVER(string(fileName), ptrMesh);
       }
+
+    void setMeshName(char * meshName)
+      {
+	self->setMeshName(string(meshName));
+      }
+
+    char * getMeshName()
+      {
+	string tmp_str = self->getMeshName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
   }
 };
 
-class MED_MESH_WRONLY_DRIVER
-// : public virtual MED_MESH_DRIVER
+class MED_MESH_WRONLY_DRIVER : public virtual MED_MESH_DRIVER
 {
  public :
   
@@ -1140,22 +1282,44 @@ class MED_MESH_WRONLY_DRIVER
   ~MED_MESH_WRONLY_DRIVER();
 
   void write( void ) const ;
+
   void read ( void ) ;
 
+  void open();
+
+  void close();
+
   int writeCoordinates    ()                         const;
+
   int writeConnectivities (medEntityMesh entity)     const;
+
   int writeFamilyNumbers  ()                         const;
+
   int writeFamilies       (vector<FAMILY*> & families) const;
 
-  %extend {
+  %addmethods {
     MED_MESH_WRONLY_DRIVER(char * fileName,  MESH * ptrMesh)
       {
 	return new MED_MESH_WRONLY_DRIVER(string(fileName), ptrMesh);
       }
+
+    void setMeshName(char * meshName)
+      {
+	self->setMeshName(string(meshName));
+      }
+
+    char * getMeshName()
+      {
+	string tmp_str = self->getMeshName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
   }
 };
 
-class MED_MESH_RDWR_DRIVER : public MED_MESH_RDONLY_DRIVER, public MED_MESH_WRONLY_DRIVER
+class MED_MESH_RDWR_DRIVER : public virtual MED_MESH_RDONLY_DRIVER,
+			     public virtual MED_MESH_WRONLY_DRIVER
 {
  public :
 
@@ -1166,12 +1330,312 @@ class MED_MESH_RDWR_DRIVER : public MED_MESH_RDONLY_DRIVER, public MED_MESH_WRON
   ~MED_MESH_RDWR_DRIVER();
   
   void write(void) const ;
+
   void read (void)       ;
 
-  %extend {
+  void open();
+
+  void close();
+
+  %addmethods {
     MED_MESH_RDWR_DRIVER(char * fileName,  MESH * ptrMesh)
       {
 	return new MED_MESH_RDWR_DRIVER(string(fileName), ptrMesh);
+      }
+
+    void setMeshName(char * meshName)
+      {
+	self->setMeshName(string(meshName));
+      }
+
+    char * getMeshName()
+      {
+	string tmp_str = self->getMeshName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+
+/*
+  API du driver MED_FIELDDOUBLE
+*/
+
+/*
+class MED_FIELDDOUBLE_DRIVER
+{
+public:
+  void open();
+
+  void close();
+
+  %addmethods {
+    MED_FIELDDOUBLE_DRIVER(char * fileName, FIELDDOUBLE * ptrField, 
+			   med_mode_acces accessMode)
+      {
+	return new MED_FIELDDOUBLE_DRIVER(string(fileName), ptrField,
+					  accessMode);
+      }
+
+    void setFieldName(char * fieldName)
+      {
+	self->setFieldName(string(fieldName));
+      }
+
+    char * getFieldName()
+      {
+	string tmp_str = self->getFieldName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+*/
+
+class MED_FIELDDOUBLE_RDONLY_DRIVER : public virtual MED_FIELDDOUBLE_DRIVER
+{
+public:
+
+  ~MED_FIELDDOUBLE_RDONLY_DRIVER();
+
+  void open();
+
+  void close();
+
+  void write( void ) const ;
+
+  void read ( void ) ;
+
+  %addmethods {
+    MED_FIELDDOUBLE_RDONLY_DRIVER(char * fileName, FIELDDOUBLE * ptrField)
+      {
+	return new MED_FIELDDOUBLE_RDONLY_DRIVER(string(fileName), ptrField);
+      }
+
+    void setFieldName(char * fieldName)
+      {
+	self->setFieldName(string(fieldName));
+      }
+
+    char * getFieldName()
+      {
+	string tmp_str = self->getFieldName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+
+class MED_FIELDDOUBLE_WRONLY_DRIVER : public virtual MED_FIELDDOUBLE_DRIVER
+{
+public:
+
+  ~MED_FIELDDOUBLE_WRONLY_DRIVER();
+
+  void open();
+
+  void close();
+
+  void write( void ) const ;
+
+  void read ( void ) ;
+
+  %addmethods {
+    MED_FIELDDOUBLE_WRONLY_DRIVER(char * fileName, FIELDDOUBLE * ptrField)
+      {
+	return new MED_FIELDDOUBLE_WRONLY_DRIVER(string(fileName), ptrField);
+      }
+
+    void setFieldName(char * fieldName)
+      {
+	self->setFieldName(string(fieldName));
+      }
+
+    char * getFieldName()
+      {
+	string tmp_str = self->getFieldName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+
+class MED_FIELDDOUBLE_RDWR_DRIVER : public virtual MED_FIELDDOUBLE_RDONLY_DRIVER, public virtual MED_FIELDDOUBLE_WRONLY_DRIVER
+{
+public:
+
+  ~MED_FIELDDOUBLE_RDWR_DRIVER();
+
+  void open();
+
+  void close();
+
+  void write( void ) const ;
+
+  void read ( void ) ;
+
+  %addmethods {
+    MED_FIELDDOUBLE_RDWR_DRIVER(char * fileName, FIELDDOUBLE * ptrField)
+      {
+	return new MED_FIELDDOUBLE_RDWR_DRIVER(string(fileName), ptrField);
+      }
+
+    void setFieldName(char * fieldName)
+      {
+	self->setFieldName(string(fieldName));
+      }
+
+    char * getFieldName()
+      {
+	string tmp_str = self->getFieldName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+
+/*
+  API du driver MED_FIELDINT
+*/
+
+/*
+class MED_FIELDINT_DRIVER
+{
+public:
+  void open();
+
+  void close();
+
+  %addmethods {
+    MED_FIELDINT_DRIVER(char * fileName, FIELDINT * ptrField, 
+		        med_mode_acces accessMode)
+      {
+	return new MED_FIELDINT_DRIVER(string(fileName), ptrField,
+					  accessMode);
+      }
+
+    void setFieldName(char * fieldName)
+      {
+	self->setFieldName(string(fieldName));
+      }
+
+    char * getFieldName()
+      {
+	string tmp_str = self->getFieldName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+*/
+
+class MED_FIELDINT_RDONLY_DRIVER : public virtual MED_FIELDINT_DRIVER
+{
+public:
+
+  ~MED_FIELDINT_RDONLY_DRIVER();
+
+  void open();
+
+  void close();
+
+  void write( void ) const ;
+
+  void read ( void ) ;
+
+  %addmethods {
+    MED_FIELDINT_RDONLY_DRIVER(char * fileName, FIELDINT * ptrField)
+      {
+	return new MED_FIELDINT_RDONLY_DRIVER(string(fileName), ptrField);
+      }
+
+    void setFieldName(char * fieldName)
+      {
+	self->setFieldName(string(fieldName));
+      }
+
+    char * getFieldName()
+      {
+	string tmp_str = self->getFieldName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+
+class MED_FIELDINT_WRONLY_DRIVER : public virtual MED_FIELDINT_DRIVER
+{
+public:
+
+  ~MED_FIELDINT_WRONLY_DRIVER();
+
+  void open();
+
+  void close();
+
+  void write( void ) const ;
+
+  void read ( void ) ;
+
+  %addmethods {
+    MED_FIELDINT_WRONLY_DRIVER(char * fileName, FIELDINT * ptrField)
+      {
+	return new MED_FIELDINT_WRONLY_DRIVER(string(fileName), ptrField);
+      }
+
+    void setFieldName(char * fieldName)
+      {
+	self->setFieldName(string(fieldName));
+      }
+
+    char * getFieldName()
+      {
+	string tmp_str = self->getFieldName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
+      }
+  }
+};
+
+class MED_FIELDINT_RDWR_DRIVER : public virtual MED_FIELDINT_RDONLY_DRIVER, public virtual MED_FIELDINT_WRONLY_DRIVER
+{
+public:
+
+  ~MED_FIELDINT_RDWR_DRIVER();
+
+  void open();
+
+  void close();
+
+  void write( void ) const ;
+
+  void read ( void ) ;
+
+  %addmethods {
+    MED_FIELDINT_RDWR_DRIVER(char * fileName, FIELDINT * ptrField)
+      {
+	return new MED_FIELDINT_RDWR_DRIVER(string(fileName), ptrField);
+      }
+
+    void setFieldName(char * fieldName)
+      {
+	self->setFieldName(string(fieldName));
+      }
+
+    char * getFieldName()
+      {
+	string tmp_str = self->getFieldName();
+	char * tmp = new char[strlen(tmp_str.c_str())];
+	strcat(tmp,tmp_str.c_str());
+	return tmp;
       }
   }
 };

@@ -1,3 +1,4 @@
+using namespace std;
 #include "MEDMEM_SWIG_FieldInt.hxx"
 
 //=============================================================================
@@ -26,15 +27,20 @@ FIELDINT::FIELDINT(const SUPPORT * Support, const int NumberOfComponents) : FIEL
 
   END_OF("Constructor with arguments (for Python API) FIELDINT");
 }
-/*
-FIELDINT::FIELDINT(FIELD_ * field)
-  : FIELD<int> ( * (FIELD<int> *) (field))
+//=============================================================================
+/*!
+ * Another constructor with arguments
+ */
+//=============================================================================
+FIELDINT::FIELDINT(const SUPPORT * Support, driverTypes driverType,
+		   const string & fileName,
+		   const string & fieldName) :
+  FIELD<int>(Support, driverType, fileName, fieldName)
 {
-  BEGIN_OF("Constructor (for Python API) FIELDINT avec parametre");
+  BEGIN_OF("Another constructor with arguments (for Python API) FIELDINT");
 
-  END_OF("Constructor (for Python API) FIELDINT avec parametre");
+  END_OF("Another constructor with arguments (for Python API) FIELDINT");
 }
-*/
 //=============================================================================
 /*!
  * Destructor

@@ -1,3 +1,4 @@
+using namespace std;
 //=============================================================================
 // File      : Fielddouble_i.hxx
 // Project   : SALOME

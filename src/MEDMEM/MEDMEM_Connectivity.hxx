@@ -93,6 +93,12 @@ private:
 					/*! does nothing if already exists, else
 					    evaluates from _descending */
   //  void calculateReverseDescendingConnectivity(CONNECTIVITY *myConnectivity) ;
+
+  med_int*      getReverseNodalConnectivity           ()               ;
+  med_int*      getReverseNodalConnectivityIndex      ()               ;
+  med_int*      getReverseDescendingConnectivity      ()               ;
+  med_int*      getReverseDescendingConnectivityIndex ()               ;
+
 					/*! does nothing if already exists, else
 					    evaluates _neighbourhood from _descending */
   void calculateNeighbourhood(CONNECTIVITY &myConnectivity) ;
@@ -104,6 +110,7 @@ public:
 
   CONNECTIVITY(medEntityMesh Entity=MED_CELL);
   CONNECTIVITY(int numberOfTypes, medEntityMesh Entity=MED_CELL);
+  CONNECTIVITY(CONNECTIVITY & m);
   ~CONNECTIVITY();
 
   inline bool   existConnectivity     (medConnectivity connectivityType, medEntityMesh Entity) const ;
@@ -125,13 +132,13 @@ public:
  
   med_int       getNumberOfNodesInType    (medGeometryElement Type)                                    const; 
   med_int       getNumberOfSubCellInType  (medGeometryElement Type)                                    const; 
-  med_int 	getNumberOf               (medEntityMesh Entity, medGeometryElement Type) 	        const;
+  med_int 	getNumberOf               (medEntityMesh Entity, medGeometryElement Type) 	       const;
   med_int*      getValue                  (medConnectivity TypeConnectivity, medGeometryElement Type) ; 
   med_int*      getValueIndex             (medConnectivity TypeConnectivity) ;
-  med_int*      getReverseNodalConnectivity           ()               ;
-  med_int*      getReverseNodalConnectivityIndex      ()               ;
-  med_int*      getReverseDescendingConnectivity      ()               ;
-  med_int*      getReverseDescendingConnectivityIndex ()               ;
+
+  inline med_int* getReverseConnectivity     (medConnectivity ConnectivityType, medEntityMesh Entity=MED_CELL) ;
+  inline med_int* getReverseConnectivityIndex(medConnectivity ConnectivityType, medEntityMesh Entity=MED_CELL) ;
+
   med_int*      getNeighbourhood() 				   const;
 
 } ;
@@ -215,6 +222,38 @@ inline CELLMODEL * CONNECTIVITY::getCellsTypes(medEntityMesh Entity) const
       return _constituent->getCellsTypes(Entity) ;
     else
       throw MEDEXCEPTION("CONNECTIVITY::getCellsTypes(medEntityMesh) : Not found Entity !");
+}
+
+inline med_int* CONNECTIVITY::getReverseConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity) 
+{
+  if(_entity==Entity)
+    if (ConnectivityType==MED_NODAL)
+      return getReverseNodalConnectivity() ;
+    else if (ConnectivityType==MED_DESCENDING)
+      return getReverseDescendingConnectivity() ;
+    else
+      throw MEDEXCEPTION("MESH::getReverseConnectivity : connectivity mode not supported !");
+
+  // other entity :
+  if (NULL==_constituent)
+    calculateDescendingConnectivity() ;
+  return _constituent->getReverseConnectivity(ConnectivityType,Entity) ;
+}
+
+inline med_int* CONNECTIVITY::getReverseConnectivityIndex(medConnectivity ConnectivityType, medEntityMesh Entity) 
+{
+  if(_entity==Entity)
+    if (ConnectivityType==MED_NODAL)
+      return getReverseNodalConnectivityIndex() ;
+    else if (ConnectivityType==MED_DESCENDING)
+      return getReverseDescendingConnectivityIndex() ;
+    else
+      throw MEDEXCEPTION("MESH::getReverseConnectivityIndex : connectivity mode not supported !");
+  
+  // other entity :
+  if (NULL==_constituent)
+    calculateDescendingConnectivity() ;
+  return _constituent->getReverseConnectivityIndex(ConnectivityType,Entity) ;
 }
 
 #endif /* CONNECTIVITY_HXX */

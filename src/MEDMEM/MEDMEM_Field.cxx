@@ -1,3 +1,4 @@
+using namespace std;
 #include "MEDMEM_Field.hxx"
 
 // ---------------------------------
@@ -38,11 +39,33 @@ FIELD_::FIELD_(const FIELD_ &m)
   _description = m._description;
   _support = m._support;
   _numberOfComponents = m._numberOfComponents;
-  _componentsTypes = m._componentsTypes;
-  _componentsNames = m._componentsNames;
-  _componentsDescriptions = m._componentsDescriptions;
-  _componentsUnits = m._componentsUnits;
-  _MEDComponentsUnits = m._MEDComponentsUnits;
+
+  if (m._componentsTypes != NULL)
+    {
+      _componentsTypes = new int[m._numberOfComponents] ;
+      memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
+      /*
+      _componentsTypes = new int[m._numberOfComponents] ;
+      for(int i=0;i<m._numberOfComponents;i++) {
+	_componentsTypes[i] = m._componentsTypes[i] ;
+      }
+      */
+    }
+  else _componentsTypes = (int *) NULL;
+
+  _componentsNames = new string[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    {_componentsNames[i]=m._componentsNames[i];}
+  _componentsDescriptions = new string[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    {_componentsDescriptions[i]=m._componentsDescriptions[i];}
+  _componentsUnits = new UNIT[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    {_componentsUnits[i] = m._componentsUnits[i];}
+  // L'operateur '=' est defini dans la classe UNIT
+  _MEDComponentsUnits = new string[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    {_MEDComponentsUnits[i] = m._MEDComponentsUnits[i];}
   _iterationNumber = m._iterationNumber;
   _time = m._time;
   _orderNumber = m._orderNumber;
@@ -74,6 +97,7 @@ int      FIELD_::addDriver          (driverTypes driverType,
                                    const string & driverFieldName) {} ;
 int      FIELD_::addDriver          (GENDRIVER & driver)            {};
 void     FIELD_::write              (const GENDRIVER &)             {};
+void     FIELD_::read               (const GENDRIVER &)             {};
 
 //  void                     FIELD_::setValueType(med_type_champ ValueType) {};
 //  med_type_champ FIELD_::getValueType() {};

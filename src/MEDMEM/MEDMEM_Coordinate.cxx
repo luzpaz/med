@@ -1,48 +1,97 @@
+using namespace std;
 #include "MEDMEM_Coordinate.hxx"
 #include "utilities.h"
 
 /*! This class contains coordinates of the nodes */
 //----------------------------------------------------------//
-COORDINATE::COORDINATE():_coordinate((MEDARRAY<double>*)NULL),
-			 _coordinateName((string*)NULL),
-			 _coordinateUnit((string*)NULL),
-			 _nodeNumber((int*)NULL)
+COORDINATE::COORDINATE():_coordinate(),
+			 _coordinateName(),
+			 _coordinateUnit(),
+			 _coordinateSystem(""),
+			 _nodeNumber()
 //----------------------------------------------------------//
 {
     BEGIN_OF("Default Constructor COORDINATE");
 }
 
 //------------------------------------------------------------------------------//
-COORDINATE::COORDINATE(medModeSwitch Mode,int SpaceDimension, int NumberOfNodes):
-			_nodeNumber((int*)NULL) 
+COORDINATE::COORDINATE(medModeSwitch Mode, int SpaceDimension, int NumberOfNodes):
+                        _nodeNumber(),_coordinateUnit(SpaceDimension),
+			_coordinateSystem(""),
+			_coordinateName(SpaceDimension)
 //------------------------------------------------------------------------------//
 {
     BEGIN_OF("Constructor COORDINATE");
-    _coordinateName = new string[SpaceDimension] ;
-    _coordinateUnit = new string[SpaceDimension] ;
     _coordinate = new MEDARRAY<double>(SpaceDimension,NumberOfNodes,Mode);
 }
+
+//------------------------------------------------------------------------------//
+COORDINATE::COORDINATE(const COORDINATE & m):
+    			_coordinateSystem(m._coordinateSystem)
+//------------------------------------------------------------------------------//
+{
+  BEGIN_OF("Copy Constructor COORDINATE");
+  int spaceDimension;
+  int numberOfNodes;
+  if (m._coordinate != NULL)
+    {
+      spaceDimension = (int) m._coordinate->getLeadingValue();
+      numberOfNodes = (int) m._coordinate->getLengthValue();
+      _coordinate = new MEDARRAY<double>(*m._coordinate);
+    }
+  else 
+    {
+      _coordinate = (MEDARRAY<double>*) NULL;
+      spaceDimension = 0;
+      numberOfNodes = 0;
+    } 
+  
+  _coordinateName.set(spaceDimension);
+  for (int i=0; i<spaceDimension; i++)
+    {
+      _coordinateName[i]=m._coordinateName[i];
+    }
+  
+  _coordinateUnit.set(spaceDimension);
+  for (int i=0; i<spaceDimension; i++)
+    {
+      _coordinateUnit[i]=m._coordinateUnit[i];
+    }
+  
+  // PN A VERIFIER
+  _nodeNumber.set(numberOfNodes);
+  if (m._nodeNumber != NULL)
+    {
+      memcpy(_nodeNumber,m._nodeNumber,numberOfNodes*sizeof(int));
+    }
+}
+
+
 //----------------------//
 COORDINATE::~COORDINATE()
 //----------------------//
 {
-    MESSAGE("Debut Destructeur COORDINATE");
-    if (_coordinate!=NULL)
+  MESSAGE("~COORDINATE()");
+  if (_coordinate!=NULL)
+    {
+      MESSAGE("deleting _coordinate" ) ;
       delete _coordinate ;
-    if (_coordinateName!=NULL)
-      delete[] _coordinateName ;
-    if (_coordinateUnit!=NULL)
-      delete[] _coordinateUnit ;
-    if (_nodeNumber!=NULL)
-      delete[] _nodeNumber ;
-  }
+    }
+  // all other attribut are object (not pointer)
+}
 
 /*! set the attribute _coordinate with Coordinate           */
 //----------------------------------------------------------//
 void COORDINATE::setCoordinates(MEDARRAY<double> *Coordinate) 
 //----------------------------------------------------------//
 { 
-	_coordinate=Coordinate ; 
+//PN a voir ...
+    if ((_coordinate!=NULL) )
+    {
+      MESSAGE("deleting  old _coordinate" ) ;
+      delete _coordinate ;
+    }
+    _coordinate=Coordinate ; 
 }
 
 /*! set the attribute _coordinateName with CoordinateName   */
@@ -58,7 +107,15 @@ void COORDINATE::setCoordinatesNames(string * CoordinateName)
 void COORDINATE::setCoordinatesUnits(string * CoordinateUnit) 
 //----------------------------------------------------------//
 { 
-	_coordinateUnit=CoordinateUnit ; 
+	_coordinateUnit.set( CoordinateUnit ) ; 
+}
+
+/*! set the attribute _coordinateSystem with CoordinateSystem   */
+//----------------------------------------------------------//
+void COORDINATE::setCoordinatesSystem(string CoordinateSystem) 
+//----------------------------------------------------------//
+{ 
+	_coordinateSystem=CoordinateSystem; 
 }
 
 /*! set the attribute _nodeNumber with NodeNumber */
@@ -66,15 +123,15 @@ void COORDINATE::setCoordinatesUnits(string * CoordinateUnit)
 void COORDINATE::setNodesNumbers(int * NodeNumber) 
 //------------------------------------------------//
 { 	
-	_nodeNumber=NodeNumber ; 
+	_nodeNumber.set(NodeNumber) ; 
 }
 
 /*! returns the number of nodes defined in the mesh*/
 //-------------------------------------------------//
-int * COORDINATE::getNodesNumbers() const
+int * COORDINATE::getNodesNumbers() 
 //-------------------------------------------------//
 {
-	return _nodeNumber;
+	return  _nodeNumber;
 }
 
 /*! returns the mode of coordinates (FULL_INTERLACE or NO_INTERLACE) */

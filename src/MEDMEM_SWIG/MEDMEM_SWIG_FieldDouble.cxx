@@ -1,3 +1,4 @@
+using namespace std;
 #include "MEDMEM_SWIG_FieldDouble.hxx"
 
 //=============================================================================
@@ -26,17 +27,20 @@ FIELDDOUBLE::FIELDDOUBLE(const SUPPORT * Support, const int NumberOfComponents) 
 
   END_OF("Constructor with arguments (for Python API) FIELDDOUBLE");
 }
-/*
-FIELDDOUBLE::FIELDDOUBLE(FIELD_ *field) 
-  : FIELD<double> ( * (FIELD<double> *)(field))
+//=============================================================================
+/*!
+ * Another constructor with arguments
+ */
+//=============================================================================
+FIELDDOUBLE::FIELDDOUBLE(const SUPPORT * Support, driverTypes driverType,
+			 const string & fileName,
+			 const string & fieldName) :
+  FIELD<double>(Support, driverType, fileName, fieldName)
 {
-  BEGIN_OF("Constructor (for Python API) FIELDDOUBLE avec parametre");
+  BEGIN_OF("Another constructor with arguments (for Python API) FIELDDOUBLE");
 
-  SCRUTE(_value);
-
-  END_OF("Constructor(for Python API) FIELDDOUBLE avec parametre");
+  END_OF("Another constructor with arguments (for Python API) FIELDDOUBLE");
 }
-*/
 //=============================================================================
 /*!
  * Destructor

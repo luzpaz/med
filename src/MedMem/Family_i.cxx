@@ -1,3 +1,4 @@
+using namespace std;
 //=============================================================================
 // File      :  Family_i.cxx
 // Project   :  SALOME

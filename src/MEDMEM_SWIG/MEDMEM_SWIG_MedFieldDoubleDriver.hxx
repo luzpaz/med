@@ -1,0 +1,51 @@
+#ifndef MEDMEM_SWIG_MEDFIELDDOUBLEDRIVER_HXX_
+#define MEDMEM_SWIG_MEDFIELDDOUBLEDRIVER_HXX_
+
+#include "MEDMEM_MedFieldDriver.hxx"
+#include "MEDMEM_SWIG_FieldDouble.hxx"
+
+class MED_FIELDDOUBLE_DRIVER : public MED_FIELD_DRIVER<double>
+{
+public:
+  MED_FIELDDOUBLE_DRIVER();
+
+  MED_FIELDDOUBLE_DRIVER(const string & fileName, FIELDDOUBLE * ptrField, 
+			 med_mode_acces accessMode);
+
+  ~MED_FIELDDOUBLE_DRIVER();
+};
+
+class MED_FIELDDOUBLE_RDONLY_DRIVER : public MED_FIELD_RDONLY_DRIVER<double>
+{
+public:
+  MED_FIELDDOUBLE_RDONLY_DRIVER();
+
+  MED_FIELDDOUBLE_RDONLY_DRIVER(const string & fileName,
+				FIELDDOUBLE * ptrField);
+
+  ~MED_FIELDDOUBLE_RDONLY_DRIVER();
+};
+
+class MED_FIELDDOUBLE_WRONLY_DRIVER : public MED_FIELD_WRONLY_DRIVER<double>
+{
+public:
+  MED_FIELDDOUBLE_WRONLY_DRIVER();
+
+  MED_FIELDDOUBLE_WRONLY_DRIVER(const string & fileName,
+				FIELDDOUBLE * ptrField);
+
+  ~MED_FIELDDOUBLE_WRONLY_DRIVER();
+};
+
+class MED_FIELDDOUBLE_RDWR_DRIVER : public MED_FIELD_RDWR_DRIVER<double>
+{
+public:
+  MED_FIELDDOUBLE_RDWR_DRIVER();
+
+  MED_FIELDDOUBLE_RDWR_DRIVER(const string & fileName,
+			      FIELDDOUBLE * ptrField);
+
+  ~MED_FIELDDOUBLE_RDWR_DRIVER();
+};
+
+#endif /* MEDMEM_SWIG_MEDFIELDDOUBLEDRIVER_HXX_ */

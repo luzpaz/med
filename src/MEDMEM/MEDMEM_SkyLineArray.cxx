@@ -1,3 +1,4 @@
+using namespace std;
 #include "MEDMEM_SkyLineArray.hxx"
 #include "utilities.h"
 
@@ -7,32 +8,29 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(): _count(0), _length(0),
   MESSAGE("Constructeur MEDSKYLINEARRAY sans parametre");
 }
 
-MEDSKYLINEARRAY::MEDSKYLINEARRAY(const MEDSKYLINEARRAY &myArray)
+MEDSKYLINEARRAY::MEDSKYLINEARRAY(const MEDSKYLINEARRAY &myArray):
+			        _count(myArray._count),_length(myArray._length),
+				_index(_count+1),_value(_length)
 {
-  MESSAGE("MEDSKYLINEARRAY(const MEDSKYLINEARRAY &)");
-  _count = myArray._count ;
-  _length = myArray._length ;
-  _index = new med_int[_count+1] ;
-  _value = new med_int[_length] ;
-  memcpy(_index,myArray._index,sizeof(med_int)*(_count+1));
-  memcpy(_value,myArray._value,sizeof(med_int)*_length);
+	BEGIN_OF("MEDSKYLINEARRAY(const MEDSKYLINEARRAY &)");
+	memcpy(_index,myArray._index,sizeof(med_int)*(_count+1));
+	memcpy(_value,myArray._value,sizeof(med_int)*_length);
+	END_OF("MEDSKYLINEARRAY(const MEDSKYLINEARRAY &)");
 }
 
 MEDSKYLINEARRAY::~MEDSKYLINEARRAY()
 {
   MESSAGE("Destructeur ~MEDSKYLINEARRAY");
 
-  if (_index != NULL) delete [] _index;
-  if (_value != NULL) delete [] _value;
+  //if (_index != NULL) delete [] _index;
+  //if (_value != NULL) delete [] _value;
 }
 
 MEDSKYLINEARRAY::MEDSKYLINEARRAY(const med_int count , const med_int length ) :
-    		             _count(count), _length(length)
+    		             _count(count), _length(length),
+			     _index(_count+1),_value(_length)
 {
-  MESSAGE("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
-
-  _index = new med_int[count+1] ;
-  _value = new med_int[length] ;
+	MESSAGE("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
 }
 
 void MEDSKYLINEARRAY::setMEDSKYLINEARRAY( const med_int count , const med_int length, med_int* index , med_int* value ) 
@@ -41,9 +39,9 @@ void MEDSKYLINEARRAY::setMEDSKYLINEARRAY( const med_int count , const med_int le
   _count  = count  ;
   _length = length ;
 
-  if (_index != NULL) delete [] _index;
-  if (_value != NULL) delete [] _value;
+  //if (_index != NULL) delete [] _index;
+  //if (_value != NULL) delete [] _value;
 
-  _index = index;
-  _value = value;
+	  _index.set(index);
+	  _value.set(value);
 }

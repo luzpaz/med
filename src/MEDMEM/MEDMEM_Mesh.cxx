@@ -1,3 +1,4 @@
+using namespace std;
 /*
  File Mesh.cxx
  $Header$
@@ -30,7 +31,7 @@ const MESH::INSTANCE * const MESH::instances[] =   {  &MESH::inst_med } ;
 /*! Add a MESH driver of type (MED_DRIVER, ....) associated with file <fileName>. The meshname used in the file
     is  <driverName>. addDriver returns an int handler. */
 int MESH::addDriver(driverTypes driverType, 
-                    const string & fileName="Default File Name.med",const string & driverName="Default Mesh Name") {
+                    const string & fileName/*="Default File Name.med"*/,const string & driverName/*="Default Mesh Name"*/) {
 
   const char * LOC = "MESH::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Mesh Name\") : ";
   
@@ -51,11 +52,11 @@ int MESH::addDriver(driverTypes driverType,
 }
 
 /*! Add an existing MESH driver. */
-int  MESH::addDriver(GENDRIVER & driver) {
+int  MESH::addDriver(MED_MESH_DRIVER & driver) {
   const char * LOC = "MESH::addDriver(GENDRIVER &) : ";
   BEGIN_OF(LOC);
 
-  // A FAIRE VERIFIER QUE LE DRIVER EST DE TYPE MESH !!
+  // A faire : Vérifier que le driver est de type MESH.
   _drivers.push_back(&driver);
   return _drivers.size()-1;
    
@@ -63,7 +64,7 @@ int  MESH::addDriver(GENDRIVER & driver) {
 }
 
 /*! Remove an existing MESH driver. */
-void MESH::rmDriver (int index=0) {
+void MESH::rmDriver (int index/*=0*/) {
   const char * LOC = "MESH::rmDriver (int index=0): ";
   BEGIN_OF(LOC);
 
@@ -211,7 +212,7 @@ MESH & MESH::operator=(const MESH &m)
 
 /*! Create a MESH object using a MESH driver of type (MED_DRIVER, ....) associated with file <fileName>. 
   The meshname <driverName> must already exists in the file.*/
-MESH::MESH(driverTypes driverType, const string &  fileName="", const string &  driverName="") {
+MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) {
   const char * LOC ="MESH::MESH(driverTypes driverType, const string &  fileName="", const string &  driverName="") : ";
   
   int current;
@@ -299,7 +300,11 @@ ostream & operator<<(ostream &os, MESH &myMesh)
 }
 
 /*!
-  Get global number of element which have same connectivity than connectivity argument
+  Get global number of element which have same connectivity than connectivity argument.
+
+  It do not take care of connectivity order (3,4,7,10 is same as 7,3,10,4).
+
+  Return -1 if not found.
 */
 int MESH::getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type, int * connectivity) 
 {
@@ -313,8 +318,8 @@ int MESH::getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entit
   else
     numberOfValue = myType.getNumberOfNodes() ; // nodes
   
-  int * myReverseConnectivityValue = getReverseConnectivity(ConnectivityType) ;
-  int * myReverseConnectivityIndex = getReverseConnectivityIndex(ConnectivityType) ;
+  int * myReverseConnectivityValue = getReverseConnectivity(ConnectivityType,Entity) ;
+  int * myReverseConnectivityIndex = getReverseConnectivityIndex(ConnectivityType,Entity) ;
 
   // First node or face/edge
   int indexBegin = myReverseConnectivityIndex[connectivity[0]-1] ;
@@ -463,7 +468,7 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity) throw (MEDEXCEPTION)
   mySupport->setNumberOfGeometricType(numberOfGeometricType) ;
   mySupport->setGeometricType(geometricType) ;
   mySupport->setNumberOfGaussPoint(numberOfGaussPoint) ;
-  mySupport->setGeometricTypeNumber(geometricTypeNumber) ;
+  // mySupport->setGeometricTypeNumber(geometricTypeNumber) ;
   mySupport->setNumberOfEntities(numberOfEntities) ;
   mySupport->setTotalNumberOfEntities(size) ;
   mySupport->setNumber(mySkyLineArray) ;

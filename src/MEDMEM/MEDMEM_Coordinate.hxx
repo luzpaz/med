@@ -8,6 +8,7 @@
 
 #include <string>
 
+#include "MEDMEM_PointerOf.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 //using namespace MED_EN;
@@ -27,13 +28,22 @@ protected:
   //  int               _numberOfNodes;
 
 				     /*! array of size spaceDimension*NumberOfNodes */
-  MEDARRAY<double>* _coordinate;     
+  //PointerOf< MEDARRAY<double> > _coordinate;     
+  //bool				_allocateCoordinate;
+  					MEDARRAY<double>* _coordinate;     
+
 				     /*! array of size spaceDimension */
-  string *          _coordinateName; 
+  PointerOf<string>          _coordinateName; 
+ 					 //string *          _coordinateName; 
+
 				     /*! array of size spaceDimension */
-  string *          _coordinateUnit; 
+  PointerOf<string>          _coordinateUnit; 
+  					//string *          _coordinateUnit; 
+
 				     /*! array of size NumberOfNodes : optionnal nodes numbers */
-  int    *          _nodeNumber;     
+  PointerOf<int>             _nodeNumber;     
+  					//int    *          _nodeNumber;     
+
 
 public :
 
@@ -43,14 +53,17 @@ public :
 
   COORDINATE();
   COORDINATE(medModeSwitch Mode,int SpaceDimension, int NumberOfNodes);
+  COORDINATE(const COORDINATE & m);
   ~COORDINATE();
 
   void setCoordinates(MEDARRAY<double> *Coordinate);
   void setCoordinatesNames(string * CoordinateName);
   void setCoordinatesUnits(string * CoordinateUnit);
+  void setCoordinatesSystem(string CoordinateSystem);
   void setNodesNumbers(int * NodeNumber);
 
   int*            getNodesNumbers() const;
+  int*            getNodesNumbers() ;
   string          getCoordinatesSystem() const;
   const double *  getCoordinates(medModeSwitch Mode);
   double          getCoordinate(int Number,int Axis); 

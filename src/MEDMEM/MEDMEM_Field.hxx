@@ -18,10 +18,7 @@
 #include "MEDMEM_GenDriver.hxx"
 
 #include "MEDMEM_MedFieldDriver.hxx"
-
-// template <class T> class MED_FIELD_RDONLY_DRIVER;
-// template <class T> class MED_FIELD_WRONLY_DRIVER;
-// template <class T> class MED_FIELD_RDWR_DRIVER;
+#include "MEDMEM_MedMedDriver.hxx"
 
 using namespace MED_EN;
 
@@ -73,8 +70,9 @@ public:
   virtual   int     addDriver(driverTypes driverType, 
                               const string & fileName,
                               const string & driverFieldName) ;
-  virtual   int     addDriver(GENDRIVER & driver);
+  virtual  int      addDriver( GENDRIVER & driver);
   virtual  void     write(const GENDRIVER &);
+  virtual  void     read (const GENDRIVER &);
 
   //  virtual  void     getValueType (MED_FR::med_type_champ ValueType) ;
   //  virtual  void     setValueType (/*MED_EN::*/med_type_champ ValueType) ;
@@ -314,11 +312,11 @@ private:
 
 public:
   FIELD();
-  FIELD(const FIELD &m); 		// A FAIRE
+  FIELD(const FIELD &m);
   FIELD & operator=(const FIELD &m); 	// A FAIRE
   FIELD(const SUPPORT * Support, const int NumberOfComponents); // Ajout NB Constructeur FIELD avec allocation de memoire de tous ses attribut
-  FIELD(driverTypes driverType, const string & fileName="", 
-	const string & fieldName="");
+  FIELD(const SUPPORT * Support, driverTypes driverType,
+	const string & fileName="", const string & fieldName="");
   ~FIELD();   
 
   friend class MED_FIELD_RDONLY_DRIVER<T>;
@@ -338,6 +336,7 @@ public:
   void deallocValue();
   
   inline void read(int index=0);  
+  inline void read(const GENDRIVER & genDriver); 
   inline void write(int index=0, const string & driverName = "");
   inline void write(const GENDRIVER &);
 
@@ -389,10 +388,15 @@ template <class T> void FIELD<T>::init ()
 {
 }
 
-template <class T> FIELD<T>::FIELD(const FIELD &m):
+template <class T> FIELD<T>::FIELD(const FIELD & m):
   FIELD_((FIELD_) m)
 {
-  _value = m._value;
+  if (m._value != NULL)
+    {
+      _value = new MEDARRAY<T>::MEDARRAY(* m._value);
+    }
+  else
+    _value = (MEDARRAY<T> *) NULL;
   _drivers = m._drivers;
 }
 
@@ -400,10 +404,36 @@ template <class T> FIELD<T> & FIELD<T>::FIELD::operator=(const FIELD &m)
 {
 }
 
-template <class T> FIELD<T>::FIELD(driverTypes driverType, 
-				   const string & fileName="", 
-				   const string & fieldName="")
+template <class T> FIELD<T>::FIELD(const SUPPORT * Support,
+				   driverTypes driverType, 
+				   const string & fileName/*=""*/, 
+				   const string & fieldDriverName/*=""*/)
 {
+  const char * LOC = "template <class T> FIELD<T>::FIELD(const SUPPORT * Support, driverTypes driverType, const string & fileName="", const string & fieldName="") : ";
+  
+  int current;
+  
+  BEGIN_OF(LOC);
+  
+  init();
+
+  _support = Support;
+  _value = (MEDARRAY<T>*)NULL;
+
+  current = addDriver(driverType,fileName,fieldDriverName);
+  switch(_drivers[current]->getAccessMode() ) {
+  case MED_RDONLY : {
+    MESSAGE("MESH::MESH(driverTypes driverType, .....) : driverType must have a MED_RDWR accessMode");
+    rmDriver(current);
+    break;}
+  default : {
+  }
+  }
+  _drivers[current]->open();   
+  _drivers[current]->read();
+  _drivers[current]->close();
+  END_OF(LOC);
+
 }
 
 template <class T> FIELD<T>::~FIELD() 
@@ -493,8 +523,8 @@ template <class T> const FIELD<T>::INSTANCE * const FIELD<T>::instances[] = { &F
 
 
 template <class T> int FIELD<T>::addDriver(driverTypes driverType, 
-					   const string & fileName="Default File Name.med",
-					   const string & driverName="Default Field Name")
+					   const string & fileName/*="Default File Name.med"*/,
+					   const string & driverName/*="Default Field Name"*/)
 {
   const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name\") : ";
   
@@ -514,18 +544,19 @@ template <class T> int FIELD<T>::addDriver(driverTypes driverType,
 
 }
 
+
 template <class T> inline int FIELD<T>::addDriver (GENDRIVER & driver )
 {
   const char * LOC = "FIELD<T>::addDriver(GENDRIVER &) : ";
   BEGIN_OF(LOC);
-
+  
   _drivers.push_back(&driver);
   return _drivers.size() -1 ;
-
+  
   END_OF(LOC);
 };
 
-template <class T> void FIELD<T>::rmDriver (int index=0)
+template <class T> void FIELD<T>::rmDriver (int index/*=0*/)
 {
   const char * LOC = "FIELD<T>::rmDriver (int index=0): ";
   BEGIN_OF(LOC);
@@ -545,7 +576,7 @@ template <class T> void FIELD<T>::rmDriver (int index=0)
   END_OF(LOC);
 }
   
-template <class T> inline  void FIELD<T>::read(int index=0)  
+template <class T> inline  void FIELD<T>::read(int index/*=0*/)  
 {  
   const char * LOC = "FIELD<T>::read(int index=0) : ";
   BEGIN_OF(LOC);
@@ -564,7 +595,7 @@ template <class T> inline  void FIELD<T>::read(int index=0)
   END_OF(LOC);
 }
 
-template <class T> inline void FIELD<T>::write(int index=0, const string & driverName = "") 
+template <class T> inline void FIELD<T>::write(int index/*=0*/, const string & driverName /*= ""*/) 
 { 
   const char * LOC = "FIELD<T>::write(int index=0, const string & driverName = \"\") : ";
   BEGIN_OF(LOC);
@@ -593,6 +624,22 @@ template <class T> inline void FIELD<T>::write(const GENDRIVER & genDriver)
     if ( *_drivers[index] == genDriver ) { 
       _drivers[index]->open();   
       _drivers[index]->write(); 
+      _drivers[index]->close();
+    }
+  
+  END_OF(LOC);
+ 
+} 
+
+template <class T> inline void FIELD<T>::read(const GENDRIVER & genDriver) 
+{ 
+  const char * LOC = " FIELD<T>::read(const GENDRIVER &) : ";
+  BEGIN_OF(LOC);
+
+  for (int index=0; index < _drivers.size(); index++ )
+    if ( *_drivers[index] == genDriver ) { 
+      _drivers[index]->open();   
+      _drivers[index]->read(); 
       _drivers[index]->close();
     }
   

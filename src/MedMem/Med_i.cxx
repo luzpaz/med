@@ -1,3 +1,4 @@
+using namespace std;
 //=============================================================================
 // File      : Med_i.cxx
 // Project   : SALOME
@@ -201,6 +202,36 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
   // SUPPORT :
   _med->updateSupport() ;
+  
+  // we add all group and family in study :
+  // we add all families 
+  vector<FAMILY*> familyVector ;
+  vector<FAMILY*>::iterator familyVectorIt ;
+  // we add all groups
+  vector<GROUP*> groupVector ;
+  vector<GROUP*>::iterator groupVectorIt ;
+  
+  MED_FR::MESH_ENTITIES::const_iterator currentEntity; 
+  for (int i=0; i<numberOfMeshes; i++) {
+    ::MESH * ptrMesh = _med->getMesh(meshesNames[i]) ;
+    for (currentEntity=MED_FR::meshEntities.begin();currentEntity != MED_FR::meshEntities.end(); currentEntity++) {
+      // family :
+      familyVector = ptrMesh->getFamilies((MED_EN::medEntityMesh)(*currentEntity).first) ;
+      for(familyVectorIt=familyVector.begin();familyVectorIt!=familyVector.end();familyVectorIt++) {
+	FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
+	SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->POA_SALOME_MED::FAMILY::_this() ;
+	myFamilyI->addInStudy(myStudy,myFamilyIOR) ;
+      }
+      // group :
+      groupVector = ptrMesh->getGroups((MED_EN::medEntityMesh)(*currentEntity).first) ;
+      for(groupVectorIt=groupVector.begin();groupVectorIt!=groupVector.end();groupVectorIt++) {
+	GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
+	SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->POA_SALOME_MED::GROUP::_this() ;
+	myGroupI->addInStudy(myStudy,myGroupIOR) ;
+      }
+    }      
+  }
+
   for (int i=0; i<numberOfMeshes; i++) {
     map<MED_FR::med_entite_maillage,::SUPPORT*> mySupports = _med->getSupports(meshesNames[i]) ;
     map<MED_FR::med_entite_maillage,::SUPPORT*>::const_iterator itSupport ;

@@ -2,8 +2,8 @@
 #define DEFINE_HXX	
 
 #include <stdio.h>
-#include <iostream.h>
-#include <string.h>
+#include <iostream>
+#include <string>
 #include <assert.h>
 
 // UTILE AUX DEUX NAMESPACES

@@ -1,3 +1,4 @@
+using namespace std;
 #include "MEDMEM_DriversDef.hxx"
 
 namespace MED_FR {

@@ -1,3 +1,4 @@
+using namespace std;
 # include <string>
 
 # include "MEDMEM_MedMedDriver.hxx"
@@ -15,20 +16,21 @@
 using namespace MED_FR;
 
 MED_MED_DRIVER::MED_MED_DRIVER(): GENDRIVER(), 
-  _ptrMed((MED * const)MED_NULL), 
-  _medIdt(MED_INVALID) 
+                                  _ptrMed((MED * const)MED_NULL),_medIdt(MED_INVALID) 
 {}
 
 MED_MED_DRIVER::MED_MED_DRIVER(const string & fileName,  MED * const ptrMed):
   GENDRIVER(fileName,MED_EN::MED_RDWR), _ptrMed(ptrMed), _medIdt(MED_INVALID)
-{}
+{
+  _ptrMed->addDriver(*this); // OU RECUPERER L'ID.
+}
 
 MED_MED_DRIVER::MED_MED_DRIVER(const string & fileName,
 			       MED * const ptrMed,
 			       MED_EN::med_mode_acces accessMode):
   GENDRIVER(fileName,accessMode), _ptrMed(ptrMed), _medIdt(MED_INVALID)
-{}
-
+{
+}
 //REM :  As t'on besoin du champ _status :  _medIdt <-> _status  ?  Oui
 
 
@@ -144,11 +146,9 @@ void MED_MED_DRIVER::readFileStruct( void )
       MESSAGE(LOC<<": Mesh n°"<<i<<" nammed "<<meshName);
 
       ptrMesh = new MESH();
-      // NO : create a  MED_MESH_RDWR_DRIVER with the currently used 
-      // _medIdt which remains VALID as long as _fileName is openned
-      // NO: then as long as the MED driver remains open 
       MED_MESH_RDWR_DRIVER * _ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
-      _ptrDriver->setMeshName(meshName);
+      _ptrDriver->setId       ( getId() );
+      _ptrDriver->setMeshName ( meshName );
       ptrMesh->addDriver(*_ptrDriver);
       _ptrMed->_meshes[meshName] = ptrMesh;
       // we create all global support (for each entity type :
@@ -349,13 +349,12 @@ void MED_MED_DRIVER::readFileStruct( void )
 		MESSAGE("timeStepNumber :"<<timeStepNumber<<",orderNumber :"<<orderNumber);
 		ptrField->setIterationNumber ( timeStepNumber);      // A ajouter dans la classe FIELD
 		ptrField->setOrderNumber     ( orderNumber); 
-		ptrField->setTime     ( timeStep); 
+		ptrField->setTime            ( timeStep); 
 		
 		// Create a driver for this (field n°dt,n°it)
-
+                ptrDriver->setId            ( getId() );
 		MESSAGE("###### ptrDriver->setFieldName : #"<<fieldName<<"#");
 		ptrDriver->setFieldName(fieldName);
-
 		ptrField->addDriver(*ptrDriver);
 		
 		DT_IT_ dtIt;
@@ -382,15 +381,30 @@ void MED_MED_DRIVER::readFileStruct( void )
   
 }
 
+// This method ask the drivers of all MESH/FIELD objects created from this MED driver
+// to read themselves
 void MED_MED_DRIVER::read( void ) {
 
   const char * LOC = "MED_MED_DRIVER::read() : ";
  
   BEGIN_OF(LOC);
-  MESSAGE("METHODE PAS ENCORE IMPLEMENTEE !!! ");
+  const map<MESH_NAME_, MESH*> & _meshes = const_cast<const map<MESH_NAME_, MESH*>& > (_ptrMed->_meshes); 
+  map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
+
+  const map<FIELD_ *, MESH_NAME_> & _meshName = const_cast<const map<FIELD_ *, MESH_NAME_>& > (_ptrMed->_meshName);
+  map<FIELD_ *, MESH_NAME_>::const_iterator currentField;
+  
+  for ( currentMesh=_meshes.begin();currentMesh != _meshes.end(); currentMesh++ ) 
+    (*currentMesh).second->read(*this); 
+    
+  for ( currentField =_meshName.begin(); currentField != _meshName.end(); currentField++ )
+    (*currentField).first->read(*this);
+
   END_OF(LOC);
 }
 
+// This method ask the drivers of all MESH/FIELD objects created from this MED driver
+// to write themselves
 void MED_MED_DRIVER::writeFrom( void) const {
   
   const char * LOC = "MED_MED_DRIVER::writeFrom() : ";
@@ -410,10 +424,7 @@ void MED_MED_DRIVER::writeFrom( void) const {
     }
     catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ex ) {
       continue;
-    }
-    //     catch (const MED_EXCEPTION & ex) {
-    //       throw ex; // DOIT-ON CREER UNE NOUVELLE EXCEPTION AVEC UN MESSAGE INDIQUANT LA PILE 
-    //     }
+}
   }
 
   for ( currentField=_meshName.begin();currentField != _meshName.end(); currentField++ ) {
@@ -432,10 +443,30 @@ void MED_MED_DRIVER::writeFrom( void) const {
 void MED_MED_DRIVER::write(void ) const {
   
   const char * LOC = "MED_MED_DRIVER::write() : ";
+  int current;
 
   BEGIN_OF(LOC);
 
-  // BCLE SUR LES DRIVERS AVEC APPELS WriteFrom
+  // BCLE SUR LES OBJETS AVEC AJOUT DE DRIVER ET APPELS write
+
+  const map<MESH_NAME_, MESH*> & _meshes = const_cast<const map<MESH_NAME_, MESH*>& > (_ptrMed->_meshes); 
+  map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
+
+  const map<FIELD_ *, MESH_NAME_> & _meshName = const_cast<const map<FIELD_ *, MESH_NAME_>& > (_ptrMed->_meshName);
+  map<FIELD_ *, MESH_NAME_>::const_iterator currentField;
+  
+  for ( currentMesh=_meshes.begin();currentMesh != _meshes.end(); currentMesh++ ) {
+    current = (*currentMesh).second->addDriver(MED_DRIVER,_fileName);
+    (*currentMesh).second->_drivers[current]->setId( getId() );
+  }
+
+  // for ( currentField=_meshName.begin();currentField != _meshName.end(); currentField++ ) {
+  //     current = (*currentField).first->addDriver(MED_DRIVER,_fileName);
+  //     (*currentField).first->_drivers[current]->setId( getId() );
+  //   }
+
+  // *this.writeFrom();
+  
   END_OF(LOC);
 
 }
@@ -511,7 +542,7 @@ void MED_MED_RDWR_DRIVER::open() {
 void MED_MED_RDWR_DRIVER::close() {
   BEGIN_OF("MED_MED_RDWR_DRIVER::close()");
   MED_MED_DRIVER::close();
-  END_OF("MED_MED_RDWR_DRIVER::clode()");
+  END_OF("MED_MED_RDWR_DRIVER::close()");
 }
 
 void MED_MED_RDWR_DRIVER::read(void) {

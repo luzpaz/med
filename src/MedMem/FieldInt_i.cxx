@@ -1,3 +1,4 @@
+using namespace std;
 //=============================================================================
 // File      : Fieldint_i.hxx
 // Project   : SALOME

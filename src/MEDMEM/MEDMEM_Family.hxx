@@ -33,6 +33,8 @@ public:
   // constructor to use with med driver
   FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,int *AttributeIdentifier,int *AttributeValue,string AttributeDescription,int NumberOfGroup,string GroupName) ;
 
+  FAMILY(FAMILY & m);
+
   ~FAMILY();
   FAMILY & operator=(const FAMILY &fam);
 

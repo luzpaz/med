@@ -8,6 +8,8 @@ class FIELDDOUBLE : public FIELD<double>
 public:
   FIELDDOUBLE();
   FIELDDOUBLE(const SUPPORT * Support, const int NumberOfComponents);
+  FIELDDOUBLE(const SUPPORT * Support, driverTypes driverType,
+	      const string & fileName="", const string & fieldName="");
   ~FIELDDOUBLE();
 };
 

@@ -1,3 +1,4 @@
+using namespace std;
 #include "MEDMEM_VtkMedDriver.hxx"
 
 #include "MEDMEM_Med.hxx"

@@ -1,3 +1,4 @@
+using namespace std;
 /*
  File MedException.cxx
  $Header$
@@ -41,26 +42,27 @@ const char *makeText( const char *text, const char *fileName, const unsigned int
   char *newText = 0 ;
 
   ASSERT(text) ;
-  const size_t l1 = 1+strlen(text) ;
-  ASSERT(l1>1) ;
+  const size_t l1 = strlen(text) ;
 
   const char* prefix = "MED Exception" ;
-  const size_t l0 = 2+strlen(prefix) ;
+  const size_t l0 = strlen(prefix) ;
 
   if ( fileName )
     {
-      const size_t l2 = 4+strlen(fileName) ;
-      ASSERT(l2>4) ;
+      const size_t l2 = strlen(fileName) ;
 
       ASSERT(lineNumber>=1) ;
-      const size_t l3 = 4+int(log10(float(lineNumber))) ;
-		
-      newText = new char [ 1+l0+l1+l2+l3 ] ;
+      const size_t l3 = 1+int(log10(float(lineNumber))) ;
+	
+      const size_t l4 =  l0+l1+l2+l3+10+1 ;
+      newText = new char [ l4 ] ;
       sprintf( newText , "%s in %s [%u] : %s" , prefix, fileName, lineNumber, text ) ;
+      ASSERT(newText[l4-1] == '\0' );
+
     }
   else
     {
-      newText = new char [ 1+l0+l1 ] ;
+      newText = new char [ l0+l1+3+1 ] ;
       sprintf( newText , "%s : %s" , prefix, text ) ;
     }
   ASSERT(newText) ;
@@ -115,8 +117,8 @@ MED_DRIVER_NOT_FOUND_EXCEPTION::MED_DRIVER_NOT_FOUND_EXCEPTION(const MED_DRIVER_
 
 MED_DRIVER_NOT_FOUND_EXCEPTION::MED_DRIVER_NOT_FOUND_EXCEPTION
 (
- const char *text, const char *fileName=0, 
- const unsigned int lineNumber=0 
+ const char *text, const char *fileName/*=0*/, 
+ const unsigned int lineNumber/*=0*/ 
  ) : MEDEXCEPTION(text, fileName, lineNumber) {};
 
 MED_DRIVER_NOT_FOUND_EXCEPTION::~MED_DRIVER_NOT_FOUND_EXCEPTION() throw (){};

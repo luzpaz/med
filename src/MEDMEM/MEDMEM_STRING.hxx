@@ -2,31 +2,47 @@
 # define STRING_HXX
 
 # include <string>
-# include <sstream>
+//# include <sstream>
+# include <strstream>
 
 using namespace std;
 
 class STRING : public string
 {
+
 private :
-	ostringstream _s ;
+  //  ostringstream _s ;
+  ostrstream _s ;
+
 public :
-	operator const char*() const
-	{
-		return _s.str().c_str() ;
-	}
-	STRING() : _s()
-	{
-	}
-	template <class T> STRING( const T &valeur ) : _s()
-	{
-		_s << valeur ;
-	}
-	template <class T> STRING &operator<<( const T &valeur )
-	{
-		_s << valeur ;
-		return *this ;
-	}
+  
+  operator  const char * () const {     
+    return const_cast <const char *> (this->c_str()) ;
+  }
+
+  ~STRING()
+  {
+    _s.freeze(false);
+  }
+  
+  STRING() :string() , _s()
+  {
+  }
+
+  template <class T> STRING( const T &valeur ) : string() ,  _s()
+  {
+    _s.freeze(false);
+    _s << valeur ;
+    this->string::operator =( _s.str());  // freeze is true by now
+  }
+
+  template <class T> STRING &operator<<( const T &valeur )
+  {
+    _s.freeze(false);
+    _s << valeur ;
+    this->string::operator = ( _s.str()) ;  // freeze is true by now
+    return *this ;
+  }
 } ;
 
 // Exemple d'utilisation avec les exceptions SALOME

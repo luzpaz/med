@@ -1,3 +1,4 @@
+using namespace std;
 //=============================================================================
 // File      : Mesh_i.cxx
 // Project   : SALOME
@@ -439,7 +440,8 @@ MESSAGE("MED_NODAL");
 			int * tab=_mesh->getConnectivityIndex(
 				convertIdlConnToMedConn(mode),
 				convertIdlEntToMedEnt(entity));
-			nbelements = tab[elt1 ] - 1 ;
+			nbelements = elt1*(convertIdlEltToMedElt(geomElement)%100);
+			//nbelements = tab[elt1 ] - 1 ;
 		}
 SCRUTE(entity);
 SCRUTE(geomElement);

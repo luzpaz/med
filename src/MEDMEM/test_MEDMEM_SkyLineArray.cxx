@@ -1,3 +1,4 @@
+using namespace std;
 #include "utilities.h"
 #include "MEDMEM_SkyLineArray.hxx"
 
@@ -25,35 +26,35 @@ int main (int argc, char ** argv) {
   value[9]=6;
   //  value[]=; // forth
 
-  MESSAGE( "Show all 1 :" );
+  cout << "Show all 1 :" << endl ;
   for (int i=1; i<NumberOfCell+1 ; i++) {
     int * cell = myArray->getI(i) ;
     int numberof = myArray->getNumberOfI(i) ;
-    MESSAGE( " - " );
+    cout << " - " ;
     for (int j=0;j<numberof;j++)
-      MESSAGE( cell[j] << " " );
-    MESSAGE("");
+      cout << cell[j] << " " ;
+    cout << endl ;
   }
-  MESSAGE( "Show all 2 :" );
+  cout << "Show all 2 :" << endl ;
   for (int i=1; i<NumberOfCell+1 ; i++) {
-    MESSAGE( " - " );
+    cout << " - " ;
     int numberof = myArray->getNumberOfI(i) ;
     for (int j=1;j<numberof+1;j++)
-      MESSAGE( myArray->getIJ(i,j) << " " );
-    MESSAGE("");
+      cout << myArray->getIJ(i,j) << " " ;
+    cout << endl ;
   }
 
   MEDSKYLINEARRAY * myArray2 = new MEDSKYLINEARRAY(*myArray) ;
   delete myArray ;
   
-  MESSAGE( "Show all 3 :" );
+  cout << "Show all 3 :" << endl ;
   for (int i=1; i<NumberOfCell+1 ; i++) {
     int * cell = myArray2->getI(i) ;
     int numberof = myArray2->getNumberOfI(i) ;
-    MESSAGE( " - " );
+    cout << " - " ;
     for (int j=0;j<numberof;j++)
-      MESSAGE( cell[j] << " " );
-    MESSAGE("");
+      cout << cell[j] << " " ;
+    cout << endl ;
   }
 
   return 0 ;

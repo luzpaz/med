@@ -14,6 +14,7 @@
 #include "MEDMEM_Connectivity.hxx"
 
 #include "MEDMEM_MedMeshDriver.hxx"
+#include "MEDMEM_MedMedDriver.hxx"
 
 class CELLMODEL;
 class FAMILY; 
@@ -127,6 +128,7 @@ public :
 
   friend class MED_MESH_RDONLY_DRIVER;
   friend class MED_MESH_WRONLY_DRIVER;
+  friend class MED_MED_DRIVER;
 
   void init();
   MESH();
@@ -138,14 +140,15 @@ public :
   friend ostream & operator<<(ostream &os, MESH &my) ;
 
   int  addDriver(driverTypes driverType, 
-		      const string & fileName ="Default File Name.med",
+                 const string & fileName  ="Default File Name.med",
                  const string & driverName="Default Mesh Name");
-  int  addDriver(GENDRIVER & driver);
+  int  addDriver(MED_MESH_DRIVER & driver);
   void rmDriver(int index=0);
 
   inline void read(int index=0);  
+  inline void read(const MED_MED_DRIVER & genDriver);
   inline void write(int index=0, const string & driverName = "");
-  inline void write(const GENDRIVER &);
+  inline void write(const MED_MED_DRIVER & genDriver);
 
   inline int *  getMEDArrayNodeFamily() ;
   inline int ** getMEDArrayCellFamily() ;
@@ -183,8 +186,8 @@ public :
   inline int *        getConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh Entity, medGeometryElement Type);
   inline int *        getConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity);
   int                 getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type, int * connectivity) ;
-  inline int *        getReverseConnectivity(medConnectivity ConnectivityType);
-  inline int *        getReverseConnectivityIndex(medConnectivity ConnectivityType);
+  inline int *        getReverseConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity=MED_CELL);
+  inline int *        getReverseConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity=MED_CELL);
 
   inline int          getNumberOfFamilies(medEntityMesh Entity);
   inline vector<FAMILY*> getFamilies(medEntityMesh Entity);
@@ -192,8 +195,7 @@ public :
   inline int          getNumberOfGroups(medEntityMesh Entity);
   inline vector<GROUP*> getGroups(medEntityMesh Entity);
   inline GROUP*      getGroup(medEntityMesh Entity,int i);
-
-
+  inline CONNECTIVITY* getConnectivityptr();
   SUPPORT * getBoundaryElements(medEntityMesh Entity) throw (MEDEXCEPTION) ;
 
   //  Node DonneBarycentre(const Cell &m) const;
@@ -209,7 +211,9 @@ public :
 // 		Methodes Inline
 // ---------------------------------------
 
-inline void MESH::read(int index=0)  
+inline CONNECTIVITY* MESH::getConnectivityptr() {return _connectivity;}
+
+inline void MESH::read(int index/*=0*/)  
 { 
   const char * LOC = "MESH::read(int index=0) : ";
   BEGIN_OF(LOC);
@@ -229,7 +233,7 @@ inline void MESH::read(int index=0)
 } 
 
 /*! Write all the content of the MESH using driver referenced by the handler <index>*/
-inline void MESH::write(int index=0, const string & driverName = "") 
+inline void MESH::write(int index/*=0*/, const string & driverName/* = ""*/) 
 { 
   const char * LOC = "MESH::write(int index=0, const string & driverName = \"\") : ";
   BEGIN_OF(LOC);
@@ -251,15 +255,34 @@ inline void MESH::write(int index=0, const string & driverName = "")
 
 // This method is MED specific : don't use it 
 // must be private. 
-inline void MESH::write(const GENDRIVER & genDriver) 
+inline void MESH::write(const MED_MED_DRIVER & genDriver) 
 { 
-  const char * LOC = "MESH::write(const GENDRIVER & genDriver): ";
+  const char * LOC = "MESH::write(const MED_MED_DRIVER & genDriver): ";
   BEGIN_OF(LOC);
 
   for (int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) { 
       _drivers[index]->open();   
       _drivers[index]->write(); 
+      _drivers[index]->close();
+      // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
+    }
+  
+  END_OF(LOC);
+  
+} 
+
+// This method is MED specific : don't use it 
+// must be private. 
+inline void MESH::read(const MED_MED_DRIVER & genDriver) 
+{ 
+  const char * LOC = "MESH::read(const MED_MED_DRIVER & genDriver): ";
+  BEGIN_OF(LOC);
+
+  for (int index=0; index < _drivers.size(); index++ )
+    if ( *_drivers[index] == genDriver ) { 
+      _drivers[index]->open();   
+      _drivers[index]->read(); 
       _drivers[index]->close();
       // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
     }
@@ -345,8 +368,15 @@ inline string * MESH::getCoordinatesUnits()
 //  }
 
 /*! Get the number of different geometric types for a given entity type.
-  For exemple getNumberOfTypes(MED_CELL) would return 2 is the MESH have some MED_TETRA4 and MED_HEXA6 in it. 
-  medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_NODE, MED_ALL_ENTITIES
+
+    For exemple getNumberOfTypes(MED_CELL) would return 3 is the MESH 
+    have some MED_TETRA4, MED_PYRA5 and MED_HEXA6 in it. 
+
+    medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_NODE, MED_ALL_ENTITIES
+
+    If entity is not defined, return 0.
+
+    If there is no connectivity, return an exception.
 */
 inline int MESH::getNumberOfTypes(medEntityMesh entity)
 {
@@ -361,13 +391,17 @@ inline int MESH::getNumberOfTypes(medEntityMesh entity)
 /*! 
   Get the list of geometric types used by a given entity.
   medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_ALL_ENTITIES
+
   REM : Don't use MED_NODE 
+
+  If entity is not defined, return an exception.
 */
 inline medGeometryElement * MESH::getTypes(medEntityMesh entity)
 {
   if (entity == MED_NODE)
     throw MEDEXCEPTION(LOCALIZED("MESH::getTypes( medEntityMesh ) : No medGeometryElement with MED_NODE entity !"));
-  
+  // return un tableau de taille 1 contenant MED_NONE, comme les supports pour etre coherent avec getNumberOfTypes ???? PG
+
   if (_connectivity != NULL)
     return _connectivity->getGeometricTypes(entity) ;
   throw MEDEXCEPTION(LOCALIZED("MESH::getTypes( medEntityMesh ) : Connectivity not defined !"));
@@ -375,6 +409,7 @@ inline medGeometryElement * MESH::getTypes(medEntityMesh entity)
 
 /*! 
   Get the whole list of CELLMODEL used by cells of given type (medEntityMesh).
+
   REMARK : Don't use MED_NODE as medEntityMesh
 */
 inline CELLMODEL * MESH::getCellsTypes(medEntityMesh Entity)
@@ -384,9 +419,15 @@ inline CELLMODEL * MESH::getCellsTypes(medEntityMesh Entity)
   throw MEDEXCEPTION(LOCALIZED("MESH::getCellsTypes( medEntityMesh ) : Connectivity not defined !"));
 }
 
-/*! Since informations related with an entity type are stored in independent arrays, the only way to
-    get a uniq index is to call this method.
-    For exemple if you want the global numbers of your ... ????? size ????? 
+/*! Return an array of size NumbreOfTypes+1 which contains, for each 
+    geometric type of the given entity, the first global element number 
+    of this type.
+
+    For exemple, if we have a mesh with 5 triangles and 4 quadrangle : 
+    - size of GlobalNumberingIndex is 3
+    - GlobalNumberingIndex[0]=1 (the first type)
+    - GlobalNumberingIndex[1]=6 (the second type)
+    - GlobalNumberingIndex[2]=10
 */
 inline int * MESH::getGlobalNumberingIndex(medEntityMesh entity)
 {
@@ -394,6 +435,17 @@ inline int * MESH::getGlobalNumberingIndex(medEntityMesh entity)
   return _connectivity->getGlobalNumberingIndex(entity);
   throw MEDEXCEPTION(LOCALIZED("MESH::getNumberOfTypes( medEntityMesh ) : Connectivity not defined !"));
 }
+/*!
+  Return the number of element of given geometric type of given entity. Return 0 if query is not defined.
+
+  Example :
+  - getNumberOfElements(MED_NODE,MED_NONE) : number of node
+  - getNumberOfElements(MED_NODE,MED_TRIA3) : return 0 (not defined)
+  - getNumberOfElements(MED_FACE,MED_TRIA3) : return number of triangles 
+  elements defined in face entity (0 if not defined)
+  - getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) : return total number 
+  of elements defined in cell entity
+ */
 inline int MESH::getNumberOfElements(medEntityMesh entity, medGeometryElement Type)
 {
   const char * LOC = "MESH::getNumberOfElements(medEntityMesh,medGeometryElement) : " ;
@@ -410,6 +462,10 @@ inline int MESH::getNumberOfElements(medEntityMesh entity, medGeometryElement Ty
       return 0 ;
       //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"connectivity not defined !"));
 }
+/*!
+  Return true if the wanted connectivity exist, else return false
+  (to use before a getSomething method).
+ */
 inline bool MESH::existConnectivity(medConnectivity connectivityType, medEntityMesh entity)
 {
   if (_connectivity==(CONNECTIVITY*)NULL)
@@ -417,7 +473,7 @@ inline bool MESH::existConnectivity(medConnectivity connectivityType, medEntityM
   return _connectivity->existConnectivity(connectivityType,entity) ;
 }
 /*!
-  Return the geometric type of element Number of entity Entity.
+  Return the geometric type of global element Number of entity Entity.
 
   Throw an exception if Entity is not defined or Number are wrong (too big).
  */
@@ -427,6 +483,11 @@ inline medGeometryElement MESH::getElementType(medEntityMesh Entity,int Number)
     throw MEDEXCEPTION("MESH::getElementType(medEntityMesh,int) : no connectivity defined !");
   return _connectivity->getElementType(Entity,Number) ;
 }
+/*!
+  Calculate the ask connectivity. Return an exception if this could not be 
+  done. Do nothing if connectivity already exist.
+ */
+
 inline void MESH::calculateConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity)
 {
   if (Mode==MED_FULL_INTERLACE)
@@ -434,31 +495,67 @@ inline void MESH::calculateConnectivity(medModeSwitch Mode,medConnectivity Conne
   else
     throw MEDEXCEPTION(LOCALIZED("MESH::calculateConnectivity : only for MED_FULL_INTERLACE mode"));
 }
+/*!
+  Return the required connectivity in the right mode for the given 
+  geometric type of the given entity.
+
+  To get connectivity for all geometric type, use Mode=MED_FULL_INTERLACE 
+  and Type=MED_ALL_ELEMENTS. 
+  You must also get the corresponding index array.
+ */
 inline int * MESH::getConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh entity, medGeometryElement Type)
 {
   if (Mode==MED_FULL_INTERLACE)
     return _connectivity->getConnectivity(ConnectivityType,entity,Type) ;
   throw MEDEXCEPTION(LOCALIZED("MESH::getConnectivity : only for MED_FULL_INTERLACE mode"));
 }
+/*!
+  Return the required index array for a connectivity received in 
+  MED_FULL_ENTERLACE mode and MED_ALL_ELEMENTS type.
+
+  This array allow to find connectivity of each elements.
+
+  Example : Connectivity of i^{th} elements (1<=i<=NumberOfElement) begin
+  at index ConnectivityIndex[i-1] and end at index ConnectivityIndex[i]-1 
+  in Connectivity array (Connectivity[ConnectivityIndex[i-1]-1] is the 
+  first value)
+ */
 inline int * MESH::getConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh entity)
 {
   return _connectivity->getConnectivityIndex(ConnectivityType, entity) ;
 }
-inline int * MESH::getReverseConnectivity(medConnectivity ConnectivityType)
+/*!
+  Return the reverse connectivity required by ConnectivityType :
+  - If ConnectivityType=MED_NODAL : return connectivity node-cell
+  - If ConnectivityType=MED_DESCENDING : return connectivity face-cell
+
+  You must get ReverseConnectivityIndex array to use it.
+ */
+inline int * MESH::getReverseConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/)
 {
-  if (ConnectivityType==MED_NODAL)
-    return _connectivity->getReverseNodalConnectivity() ;
-  else if (ConnectivityType==MED_DESCENDING)
-    return _connectivity->getReverseDescendingConnectivity() ;
-  throw MEDEXCEPTION("MESH::getReverseConnectivity : connectivity mode not supported !");
+  if (NULL==_connectivity)
+    throw MEDEXCEPTION("MESH::getReverseConnectivity : no connectivity defined in MESH !");
+  
+  return _connectivity->getReverseConnectivity(ConnectivityType,Entity) ;
 }
-inline int * MESH::getReverseConnectivityIndex(medConnectivity ConnectivityType)
+/*!
+  Return the index array required by ConnectivityType.
+
+  This array allow to find reverse connectivity of each elements.
+
+  Example : Reverse connectivity of i^{th} elements (1<=i<=NumberOfElement) 
+  begin at index ReverseConnectivityIndex[i-1] and end at index 
+  ReverseConnectivityIndex[i]-1 
+  in ReverseConnectivity array (
+  ReverseConnectivity[ReverseConnectivityIndex[i-1]-1] 
+  is the first value)
+ */
+inline int * MESH::getReverseConnectivityIndex(medConnectivity ConnectivityType,medEntityMesh Entity/*=MED_CELL*/)
 {
-  if (ConnectivityType==MED_NODAL)
-    return _connectivity->getReverseNodalConnectivityIndex() ;
-  else if (ConnectivityType==MED_DESCENDING)
-    return _connectivity->getReverseDescendingConnectivityIndex() ;
-  throw MEDEXCEPTION("MESH::getReverseConnectivityIndex : connectivity mode not supported !");
+  if (NULL==_connectivity)
+    throw MEDEXCEPTION("MESH::getReverseConnectivityIndex : no connectivity defined in MESH !");
+  
+  return _connectivity->getReverseConnectivityIndex(ConnectivityType,Entity) ;
 }
 
 

@@ -11,6 +11,8 @@
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Unit.hxx"
+#include "MEDMEM_Array.hxx"
+#include "MEDMEM_Support.hxx"
 //#include "MEDMEM_Field.hxx"
 
 //using namespace MED_FR ;
@@ -68,7 +70,7 @@ public :
     MED_FR::med_int err = 0;
     if (_status == MED_OPENED) {
       err=MED_FR::MEDfermer(_medIdt);
-      H5close();
+      H5close(); // If we call H5close() all the files are closed.
       _status = MED_CLOSED;
       _medIdt = MED_INVALID;
       MESSAGE(" MED_FIELD_DRIVER::close() : MEDfermer : _medIdt= " << _medIdt );

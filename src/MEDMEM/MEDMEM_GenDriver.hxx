@@ -51,8 +51,10 @@ public:
   // FIELD related Part
   virtual void setFieldName   ( const string & fieldName);
 
+  void   setId       ( int id = MED_INVALID );
+  int    getId       ( void ) const ;
   string getFileName () const;
-  void   setFileName (const string & fileName);
+  void   setFileName ( const string & fileName);
   med_mode_acces getAccessMode() const;
 };
 

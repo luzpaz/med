@@ -3,6 +3,7 @@
 
 #include "MEDMEM_Exception.hxx"
 
+#include "MEDMEM_PointerOf.hxx"
 #include "MEDMEM_define.hxx"
 
 using  MED_EN::med_int ;
@@ -12,9 +13,9 @@ class MEDSKYLINEARRAY
 private :
   med_int   _count ;
   med_int   _length ;
-  med_int * _index ; // array of size _count+1 : _index[0]=1 and 
-		     // _index[_count]=length+1
-  med_int * _value ; // array of size _length
+  PointerOf <med_int> _index ; // array of size _count+1 : _index[0]=1 and 
+		               // _index[_count]=length+1
+  PointerOf <med_int> _value ; // array of size _length
 
 public :
   MEDSKYLINEARRAY();
@@ -26,10 +27,10 @@ public :
 
   inline med_int  getNumberOf()       const;
   inline med_int  getLength()         const;
-  inline med_int* getIndex()  	      const; 
-  inline med_int* getValue()	      const; 
+  inline med_int* getIndex()  	      ; 
+  inline med_int* getValue()	      ; 
   inline med_int  getNumberOfI(int i) const throw (MEDEXCEPTION) ;
-  inline med_int* getI(int i) 	      const throw (MEDEXCEPTION) ;
+  inline med_int* getI(int i) 	       throw (MEDEXCEPTION) ;
   inline med_int  getIJ(int i, int j) const throw (MEDEXCEPTION) ;
   
 } ;
@@ -45,13 +46,13 @@ inline med_int MEDSKYLINEARRAY::getLength() const
 {
   return _length ;
 };
-inline med_int* MEDSKYLINEARRAY::getIndex() const 
+inline med_int* MEDSKYLINEARRAY::getIndex()  
 { 
-	return _index ; 
+	return (med_int*)_index ; 
 } ;
-inline med_int* MEDSKYLINEARRAY::getValue() const 
+inline med_int* MEDSKYLINEARRAY::getValue()  
 { 
-	return _value ; 
+	return (med_int*)_value ; 
 } ;
 inline med_int MEDSKYLINEARRAY::getNumberOfI(int i) const throw (MEDEXCEPTION)
 {
@@ -61,7 +62,7 @@ inline med_int MEDSKYLINEARRAY::getNumberOfI(int i) const throw (MEDEXCEPTION)
     throw MEDEXCEPTION("MEDSKYLINEARRAY::getNumberOfI : argument is out of range");
   return _index[i]-_index[i-1] ;
 } ;
-inline med_int* MEDSKYLINEARRAY::getI(int i) const throw (MEDEXCEPTION)
+inline med_int* MEDSKYLINEARRAY::getI(int i)  throw (MEDEXCEPTION)
 { 
     if (i<1)
       throw MEDEXCEPTION("MEDSKYLINEARRAY::getI : argument must be >= 1");

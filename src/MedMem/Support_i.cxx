@@ -1,3 +1,4 @@
+using namespace std;
 //=============================================================================
 // File      : Support_i.cxx
 // Project   : SALOME
