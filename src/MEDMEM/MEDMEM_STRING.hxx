@@ -23,21 +23,21 @@ private :
 
 public :
   
-  STRING::STRING() :string(), _s() 
+  STRING() :string(), _s() 
    {
    }
 
-  STRING::~STRING()
+  ~STRING()
    {
 	_s.freeze(false);
    }
 
-  STRING::operator const char * () const 
+  operator const char * () const 
    {     
         return const_cast <const char *> (this->c_str()) ;
    }
 
-   template <class T> STRING::STRING( const T &valeur ) : string(), _s() 
+   template <class T> STRING( const T &valeur ) : string(), _s() 
    {
     	_s.freeze(false);
 
@@ -47,7 +47,7 @@ public :
     	this->string::operator =( _s.str());  // freeze is true by now
    }
 
-   template <class T> STRING & STRING::operator<<( const T &valeur )
+   template <class T> STRING & operator<<( const T &valeur )
    {
   
         if ( _s.pcount() )

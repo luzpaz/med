@@ -1,5 +1,6 @@
-using namespace std;
 #include "MEDMEM_SWIG_MedFieldDoubleDriver.hxx"
+
+using namespace std;
 
 //=============================================================================
 /*!

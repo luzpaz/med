@@ -1,5 +1,6 @@
-using namespace std;
 #include "MEDMEM_SWIG_FieldInt.hxx"
+
+using namespace std;
 
 //=============================================================================
 /*!

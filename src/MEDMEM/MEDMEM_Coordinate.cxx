@@ -1,9 +1,10 @@
-using namespace std;
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_STRING.hxx"
 
 #include "utilities.h"
+
+using namespace std;
 using namespace MEDMEM;
 
 /*! Default Constructor : should not be used */
@@ -53,7 +54,7 @@ COORDINATE::COORDINATE(const COORDINATE & m):
   setCoordinatesUnits((const string*)m._coordinateUnit) ;
 
   if ( (const int * const) m._nodeNumber != NULL)
-    _nodeNumber.set(numberOfNodes,(const med_int*)m._nodeNumber);
+    _nodeNumber.set(numberOfNodes,(const int*)m._nodeNumber);
   // PG : it's default no ?
 //    else
 //      {

@@ -1,11 +1,11 @@
-using namespace std;
 /*
  File MEDMEM_CellModel.cxx
  $Header$
 */
 
-#include "utilities.h"
 #include "MEDMEM_CellModel.hxx"
+
+using namespace std;
 using namespace MEDMEM;
 
 CELLMODEL::CELLMODEL(medGeometryElement t)

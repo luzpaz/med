@@ -1,4 +1,3 @@
-using namespace std;
 #include "MEDMEM_DriverTools.hxx"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
@@ -6,6 +5,8 @@ using namespace std;
 #include "MEDMEM_Group.hxx"
 #include <iomanip>
 #include <algorithm>
+
+using namespace std;
 using namespace MEDMEM;
 
 
@@ -86,7 +87,12 @@ std::ostream& MEDMEM::operator << (std::ostream& os, const _groupe& gr)
     for( std::vector<int>::const_iterator i=gr.groupes.begin(); i!=gr.groupes.end(); ++i)
 	os << *i << " ";
     os << std::endl << " -> liste des mailles : " << std::endl;
-    for( _groupe::mailleIter i=gr.mailles.begin(); i!=gr.mailles.end(); i++)
+    std::set< std::set< _maille, std::less< _maille >,
+    std::allocator< _maille > >::iterator,
+    _mailleIteratorCompare,
+    std::allocator< std::set< _maille, std::less< _maille >,
+    std::allocator< _maille > >::iterator > >::const_iterator i ;
+    for( i=gr.mailles.begin(); i!=gr.mailles.end(); i++)
 	os << "    " << *(*i) << std::endl;
     return os;
 }
@@ -279,7 +285,7 @@ _intermediateMED::getConnectivity()
 	    {
 		for ( unsigned n=0; n != j->sommets.size(); ++n)
 		    connectivity[nbSommetsParMaille*l+n] = j->sommets[n]->second.number;
-		maillage.erase(j);    ; // dangereux, mais optimise la mémoire consommée!
+		//CCRT maillage.erase(j);    ; // dangereux, mais optimise la mémoire consommée!
 	    }
 
 	    Connectivity->setNodal  (connectivity, entity, vtype[k]);
@@ -331,7 +337,12 @@ _intermediateMED::getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP
 	    continue; 
 
 	int nb_geometric_types=1;
-	_groupe::mailleIter j=groupes[i].mailles.begin(); 
+	std::set< std::set< _maille, std::less< _maille >,
+        std::allocator< _maille > >::iterator,
+        _mailleIteratorCompare,
+        std::allocator< std::set< _maille, std::less<_maille >,
+        std::allocator< _maille > >::iterator > >::iterator j ;
+	j=groupes[i].mailles.begin(); 
 	// initialise groupe_entity a l'entite de la premiere maille du groupe
 	medEntityMesh groupe_entity = (**j).getEntity(dimension_maillage);
 	medGeometryElement geometrictype=(**j).geometricType;

@@ -1,13 +1,12 @@
-using namespace std;
 /*
  File MedException.cxx
  $Header$
 */
 
-using namespace std;
-
 #include "utilities.h"
 #include "MEDMEM_Exception.hxx"
+
+using namespace std;
 using namespace MEDMEM;
 
 extern "C"
@@ -16,7 +15,6 @@ extern "C"
 #include <stdio.h>
 #include <string.h>
 }
-
 
 /*!
   \internal

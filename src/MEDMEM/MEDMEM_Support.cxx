@@ -1,4 +1,3 @@
-using namespace std;
 /*
  File Support.cxx
  $Header$
@@ -16,6 +15,7 @@ using namespace std;
 //#include "MEDMEM_Group.hxx"
 #include "MEDMEM_Mesh.hxx"
 
+using namespace std;
 using namespace MED_EN;
 using namespace MEDMEM;
 

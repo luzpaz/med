@@ -218,7 +218,7 @@ public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	cout<<"  ### Mu1 = "<<mu1<<endl;
 	cout<<"  ### Mu2 = "<<mu2<<endl;
 	cout<<"  ### Mu3 = "<<mu3<<endl;
-	//*/
+	*/
 	VALEURCHAMP retour(v0.SIZE()); //		
 
 	retour=(mu0*v0+mu1*v1+mu2*v2+mu3*v3)/delta;
@@ -328,7 +328,7 @@ public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	cout<<"  ### Lambda2 = "<<lambda2<<endl;
 	cout<<"  ### Lambda3 = "<<lambda3<<endl;
 	cout<<"  ### Controle = "<<(lambda0+lambda1+lambda2+lambda3)<<endl;
-	//*/
+	*/
 
 	VALEURCHAMP retour(v0.SIZE()); //		
 

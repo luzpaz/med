@@ -1,4 +1,3 @@
-using namespace std;
 /*
  File Mesh.cxx
  $Header$
@@ -23,6 +22,7 @@ using namespace std;
 
 #include "MEDMEM_DriverFactory.hxx"
 
+using namespace std;
 using namespace MEDMEM;
 //#include "MEDMEM_Grid.hxx" this inclision should have never be here !!!
 
@@ -101,7 +101,7 @@ void MESH::init() {
 
   BEGIN_OF(LOC);
 
-  string        _name = "NOT DEFINED"; // A POSITIONNER EN FCT DES IOS ?
+  _name = "NOT DEFINED"; // A POSITIONNER EN FCT DES IOS ?
 
   _coordinate   = (COORDINATE   *) NULL;
   _connectivity = (CONNECTIVITY *) NULL;
@@ -610,7 +610,7 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
     }
 
   int index;
-  FIELD<double>* Volume = new FIELD<double>::FIELD(Support,1);
+  FIELD<double>* Volume = new FIELD<double>(Support,1);
   //  double *volume = new double [length_values];
   Volume->setName("VOLUME");
   Volume->setDescription("cells volume");
@@ -1035,7 +1035,7 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
   int index;
   FIELD<double>* Area;
 
-  Area = new FIELD<double>::FIELD(Support,1);
+  Area = new FIELD<double>(Support,1);
   Area->setName("AREA");
   Area->setDescription("cells or faces area");
 
@@ -1243,7 +1243,7 @@ FIELD<double>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTIO
   int index;
   FIELD<double>* Length;
 
-  Length = new FIELD<double>::FIELD(Support,1);
+  Length = new FIELD<double>(Support,1);
   //  double *length = new double [length_values];
   Length->setValueType(MED_REEL64);
 
@@ -1359,7 +1359,7 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 
   int index;
 
-  FIELD<double>* Normal = new FIELD<double>::FIELD(Support,dim_space);
+  FIELD<double>* Normal = new FIELD<double>(Support,dim_space);
   Normal->setName("NORMAL");
   Normal->setDescription("cells or faces normal");
   for (int k=1;k<=dim_space;k++) {
@@ -1605,7 +1605,7 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
   int index;
   FIELD<double>* Barycenter;
 
-  Barycenter = new FIELD<double>::FIELD(Support,dim_space);
+  Barycenter = new FIELD<double>(Support,dim_space);
   Barycenter->setName("BARYCENTER");
   Barycenter->setDescription("cells or faces barycenter");
 
@@ -2003,7 +2003,7 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 
 bool MESH::isEmpty() const 
 {
-    bool notempty = _name != ""                || _coordinate != NULL           || _connectivity != NULL ||
+    bool notempty = _name != "NOT DEFINED"                || _coordinate != NULL           || _connectivity != NULL ||
 	         _spaceDimension !=MED_INVALID || _meshDimension !=MED_INVALID  || 
 		 _numberOfNodes !=MED_INVALID  || _groupNode.size() != 0   || 
 		 _familyNode.size() != 0       || _groupCell.size() != 0   || 
@@ -2517,7 +2517,7 @@ void MESH::createFamilies()
 	for (unsigned g=0; g!=myGroups.size(); ++g)
 	{
 	    // scan cells that belongs to the group
-	    const med_int* groupCells=myGroups[g]->getnumber()->getValue();
+	    const int* groupCells=myGroups[g]->getnumber()->getValue();
 	    int nbCells=myGroups[g]->getnumber()->getLength();
 	    for(int c=0; c!=nbCells; ++c)
 		tab_cell[groupCells[c]-1].groups.push_back(g);

@@ -112,20 +112,21 @@ TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray
 
 # testUCellModel -> a revoir car l'API a changee (plus de vector)
 
+LDFLAGS+= -L$(top_builddir)/lib/salome 
+LDFLAGSFORBIN+= -L$(top_builddir)/lib/salome
+
 CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
 
-CXXFLAGS+=-ftemplate-depth-42 -I${KERNEL_ROOT_DIR}/include/salome
+CXXFLAGS+=@CXXTMPDPTHFLAGS@ -I${KERNEL_ROOT_DIR}/include/salome
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace $(STDLIB)
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
 
 LIBSFORBIN=
-
-LDFLAGS=
 
 LIBS=
 

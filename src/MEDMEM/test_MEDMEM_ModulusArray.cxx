@@ -1,7 +1,8 @@
-using namespace std;
 #include "utilities.h"
 
 #include "MEDMEM_ModulusArray.hxx"
+
+using namespace std;
 using namespace MEDMEM;
 
 int main (int argc, char ** argv) {

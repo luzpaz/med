@@ -1,4 +1,3 @@
-using namespace std;
 // File      : MEDMEM_Grid.hxx
 // Created   : Wed Dec 18 08:35:26 2002
 // Descr     : class containing structured mesh data
@@ -13,6 +12,8 @@ using namespace std;
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
+
+using namespace std;
 using namespace MEDMEM;
 
 //=======================================================================

@@ -26,12 +26,12 @@ public:
   void fillCopy();
   void blankCopy();
  
-  med_int getNumberOf(medEntityMesh Entity, medGeometryElement Type) const;
+  int getNumberOf(medEntityMesh Entity, medGeometryElement Type) const;
 
-  const med_int * getConnectivity      (medConnectivity ConnectivityType, 
+  const int * getConnectivity      (medConnectivity ConnectivityType, 
 					medEntityMesh Entity,
 					medGeometryElement Type);
-  const med_int * getConnectivityIndex (medConnectivity ConnectivityType,
+  const int * getConnectivityIndex (medConnectivity ConnectivityType,
 					medEntityMesh Entity);
   
   void  calculateConnectivity (medConnectivity connectivityType, 
@@ -44,19 +44,19 @@ public:
   bool existConnectivity(medConnectivity ConnectivityType, 
 			 medEntityMesh Entity) const;
 
-  const med_int* getReverseConnectivity (medConnectivity ConnectivityType, 
+  const int* getReverseConnectivity (medConnectivity ConnectivityType, 
 					 medEntityMesh Entity=MED_CELL)
     throw (MEDEXCEPTION);
 
-  const med_int* getReverseConnectivityIndex (medConnectivity ConnectivityType,
+  const int* getReverseConnectivityIndex (medConnectivity ConnectivityType,
 					      medEntityMesh Entity=MED_CELL)
     throw (MEDEXCEPTION);
 
-  const med_int* getValue (medConnectivity TypeConnectivity, 
+  const int* getValue (medConnectivity TypeConnectivity, 
 			   medGeometryElement Type);
  
-  const med_int* getValueIndex        (medConnectivity TypeConnectivity);
-  const med_int* getNeighbourhood() const;
+  const int* getValueIndex        (medConnectivity TypeConnectivity);
+  const int* getNeighbourhood() const;
 };
 };
 

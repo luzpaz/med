@@ -1,9 +1,9 @@
-using namespace std;
 #include<string>
 
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Med.hxx"
 
+using namespace std;
 using namespace MEDMEM;
 void usage(char * name)
 {
