@@ -146,12 +146,12 @@ int main (int argc, char **argv)
   char champ2_unit[MED_TAILLE_PNOM+1]="J               " ;
   med_float   fieldnodedouble1[19] = {1.,3.,4.,1.,3.,4.,3.,2.,5.,6.,4.,3.,1.,5.,6.,4.,3.,7.,3.};
   med_float   fieldnodedouble2[19] = {1.,2.,2.,3.,3.,3.,4.,4.,5.,2.,8.,9.,6.,7.,1.,2.,5.,8.,4.};
-
+  /*
   char champ3[MED_TAILLE_NOM+1]="fieldfacedouble" ;
   char champ3_comp[MED_TAILLE_PNOM*2+1]="comp1           comp2           " ;
   char champ3_unit[MED_TAILLE_PNOM*2+1]="M/S             m/s             " ;
   med_float   fieldfacedouble[6*2] = {0.,1.,1.,1.,1.,2.,2.,3.,3.,4.,4.,6.};
-
+  */
   /***************************************************************************/
   fid = MEDouvrir("poly3D.med",MED_LECTURE_ECRITURE);
   if (fid < 0)
@@ -397,7 +397,7 @@ int main (int argc, char **argv)
 			MED_NOPDT,"        ", 0. , MED_NONOR);
       printf("MEDchampEcr : %d \n",ret); 
     }
-
+  /*
   if (ret == 0)
     {
       ret = MEDchampCr(fid,champ3,MED_FLOAT64,champ3_comp,champ3_unit,2);
@@ -410,6 +410,7 @@ int main (int argc, char **argv)
 	printf("MEDchampEcr : %d \n",ret);
       }
     }
+  */
   /***************************************************************************/
 
   ret = MEDfermer(fid);

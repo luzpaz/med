@@ -90,19 +90,19 @@ int main (int argc, char **argv)
   char champ1[MED_TAILLE_NOM+1]="fieldnodeint" ;
   char champ1_comp[MED_TAILLE_PNOM+1]="comp1           " ;
   char champ1_unit[MED_TAILLE_PNOM+1]="M               " ;
-  med_int     fieldnodeint[9]    = {1,1,3,2,2,3,4,4,5};
+  med_int     fieldnodeint[11]    = {1,1,3,2,2,3,4,4,5,6,6};
 
   char champ2[MED_TAILLE_NOM+1]="fieldnodedouble" ;
   char champ2_comp[MED_TAILLE_PNOM+1]="comp1           " ;
   char champ2_unit[MED_TAILLE_PNOM+1]="J               " ;
-  med_float   fieldnodedouble1[9] = {1.,3.,4.,1.,3.,4.,3.,2.,5.};
-  med_float   fieldnodedouble2[9] = {1.,2.,2.,3.,3.,3.,4.,4.,5.};
-
+  med_float   fieldnodedouble1[11] = {1.,3.,4.,1.,3.,4.,3.,2.,5.,6.,6.};
+  med_float   fieldnodedouble2[11] = {1.,2.,2.,3.,3.,3.,4.,4.,5.,6.,6.};
+  /*
   char champ3[MED_TAILLE_NOM+1]="fieldcelldouble" ;
   char champ3_comp[MED_TAILLE_PNOM*2+1]="comp1           comp2           " ;
   char champ3_unit[MED_TAILLE_PNOM*2+1]="M/S             m/s             " ;
   med_float   fieldcelldouble[4*2] = {0.,1.,1.,1.,1.,2.,2.,3.};
-
+  */
   /***************************************************************************/
   fid = MEDouvrir("poly2D.med",MED_LECTURE_ECRITURE);
   if (fid < 0)
@@ -289,7 +289,7 @@ int main (int argc, char **argv)
 			MED_NOPDT,"        ", 0. , MED_NONOR);
       printf("MEDchampEcr : %d \n",ret); 
     }
-
+  /*
   if (ret == 0)
     {
       ret = MEDchampCr(fid,champ3,MED_FLOAT64,champ3_comp,champ3_unit,2);
@@ -302,7 +302,7 @@ int main (int argc, char **argv)
 	printf("MEDchampEcr : %d \n",ret);
       }
     }
-
+  */
   /***************************************************************************/
 
   ret = MEDfermer(fid);
