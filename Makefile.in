@@ -14,7 +14,12 @@ VPATH=.:@srcdir@:@top_srcdir@/bin:@top_srcdir@/resources:./bin:@top_srcdir@/idl:
 
 @COMMENCE@
 
-SUBDIRS = idl src doc
+ifeq (@WITHIHM@,no)
+      SUBDIRS = idl src
+endif
+ifeq (@WITHIHM@,yes)
+      SUBDIRS = idl src doc
+endif
 
 RESOURCES_FILES = \
 MEDCatalog.xml \
@@ -81,6 +86,8 @@ titi.xyz
 BIN_SCRIPT= \
 VERSION
 
+LDFLAGS= -L$(top_builddir)/lib/salome 
+LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
 
 # copy header files in common directory
 ifeq ($(HAVE_SSTREAM),yes)
@@ -125,16 +132,18 @@ install-include: $(include_list)
 	$(INSTALL) -d  $(includedir)
 	@for f in X $(include_list); do				\
 	   if test $$f != X; then				\
-	     ($(INSTALL_DATA) -p $$f $(includedir)/. || exit 1);	\
+	     (cp -p $$f $(includedir) || exit 1);		\
 	   fi;							\
 	done
 
 # install script in $(bindir) :
 install-bin: $(BIN_SCRIPT)
 	$(INSTALL) -d  $(bindir)
-	if test $(BIN_SCRIPT)X != X; then 			\
-		$(INSTALL_PROGRAM) $^ $(bindir);		\
-	fi
+	for f in X $(BIN_SCRIPT); do				\
+	   if test $$f != X; then				\
+	     (cp -p ./bin/salome/$$f $(bindir) || exit 1);	\
+	   fi;							\
+	done
 
 uninstall: uninstall-idl
 

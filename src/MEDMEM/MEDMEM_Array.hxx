@@ -45,9 +45,9 @@ template <class T> class MEDARRAY
 private :
 				
   				/*! leading dimension of value (example : space dimension for coordinates) */
-  med_int 	_ldValues;
+  int 	_ldValues;
   				/*! length of values (example : number of nodes for coordinates) */
-  med_int 	_lengthValues;
+  int 	_lengthValues;
   				/*! data access mode. possible values are :\n
         		          -  MED_FULL_INTERLACE (default mode) \n
 			          -  MED_NO_INTERLACE */
@@ -66,34 +66,34 @@ public :
   inline  MEDARRAY();
   inline ~MEDARRAY();
 
-  MEDARRAY  (const med_int ld_values, const med_int length_values,
+  MEDARRAY  (const int ld_values, const int length_values,
 	     const medModeSwitch mode=MED_FULL_INTERLACE);
-  MEDARRAY  (T* values, const med_int ld_values,
-	     const med_int length_values, const medModeSwitch mode=MED_FULL_INTERLACE,bool shallowCopy=false, bool ownershipOfValues=false);
+  MEDARRAY  (T* values, const int ld_values,
+	     const int length_values, const medModeSwitch mode=MED_FULL_INTERLACE,bool shallowCopy=false, bool ownershipOfValues=false);
   MEDARRAY  (MEDARRAY const &m);
   MEDARRAY  (MEDARRAY const &m, bool copyOther);
   MEDARRAY & operator = (const MEDARRAY & m);
 
   MEDARRAY & shallowCopy(const MEDARRAY & m);
 
-  inline med_int getLeadingValue() const;
-  inline med_int getLengthValue()  const;
+  inline int getLeadingValue() const;
+  inline int getLengthValue()  const;
 
   const T * get        (const medModeSwitch mode) ;
-  const T * getRow     (const med_int i) ;
-  const T * getColumn  (const med_int j) ;
-  const T   getIJ (const med_int i, const med_int j) const;
+  const T * getRow     (const int i) ;
+  const T * getColumn  (const int j) ;
+  const T   getIJ (const int i, const int j) const;
 //    T * const get        (const medModeSwitch mode) const;
-//    T * const getRow     (const med_int i) const;
-//    T * const getColumn  (const med_int j) const;
-//    T   const getIJ (const med_int i, const med_int j) const;
+//    T * const getRow     (const int i) const;
+//    T * const getColumn  (const int j) const;
+//    T   const getIJ (const int i, const int j) const;
 
   inline medModeSwitch getMode() const;
 
   void set   (const medModeSwitch mode,const T* value);
-  void setI  (const med_int i, 	       const T* value);
-  void setJ  (const med_int j, 	       const T* value);
-  void setIJ (const med_int i, const med_int j, const T  value);
+  void setI  (const int i, 	       const T* value);
+  void setJ  (const int j, 	       const T* value);
+  void setIJ (const int i, const int j, const T  value);
 
   void calculateOther();
   bool isOtherCalculated() const {return (const T*)_valuesOther != NULL;}
@@ -132,8 +132,8 @@ template <class T> inline MEDARRAY<T>::~MEDARRAY()
 				    The desallocation of T array is not your responsability. \n\n
 				    Throws MEDEXCEPTION if  T array length is < 1*/
 
-template <class T> MEDARRAY<T>::MEDARRAY(const med_int ld_values,
-					 const med_int length_values,
+template <class T> MEDARRAY<T>::MEDARRAY(const int ld_values,
+					 const int length_values,
 					 const medModeSwitch mode):
 
 						_ldValues(ld_values),
@@ -142,7 +142,7 @@ template <class T> MEDARRAY<T>::MEDARRAY(const med_int ld_values,
 						_valuesFull(), _valuesNo(),
 						_valuesDefault(),_valuesOther()
 {
-  BEGIN_OF("constructor MEDARRAY<T>::MEDARRAY(const med_int, const med_int, const medModeSwitch)");
+  BEGIN_OF("constructor MEDARRAY<T>::MEDARRAY(const int, const int, const medModeSwitch)");
 
   // if ld_values < 1 or length_values < 1
   // throws an exception
@@ -150,7 +150,7 @@ template <class T> MEDARRAY<T>::MEDARRAY(const med_int ld_values,
 
   if ((ld_values<1)|(length_values<1))
   {
-    	throw MEDEXCEPTION(LOCALIZED("MEDARRAY<T>::MEDARRAY(const med_int, const med_int, const medModeSwitch) : dimension < 1 !"));
+    	throw MEDEXCEPTION(LOCALIZED("MEDARRAY<T>::MEDARRAY(const int, const int, const medModeSwitch) : dimension < 1 !"));
   }
 
   if ( _mode == MED_FULL_INTERLACE)
@@ -171,7 +171,7 @@ template <class T> MEDARRAY<T>::MEDARRAY(const med_int ld_values,
   SCRUTE((T*)_valuesNo);
   SCRUTE((T*)_valuesFull);
 
-  END_OF("constructor MEDARRAY<T>::MEDARRAY(const med_int, const med_int, const medModeSwitch ()");
+  END_OF("constructor MEDARRAY<T>::MEDARRAY(const int, const int, const medModeSwitch ()");
 }
 
 //				------------------
@@ -180,8 +180,8 @@ template <class T> MEDARRAY<T>::MEDARRAY(const med_int ld_values,
 				    
 				    Throws MEDEXCEPTION if  the lenght of T is < 1*/
 template <class T> MEDARRAY<T>::MEDARRAY( T*values,
-					  const med_int ld_values,
-					  const med_int length_values,
+					  const int ld_values,
+					  const int length_values,
 					  const medModeSwitch mode,
 					  bool shallowCopy,
 					  bool ownershipOfValues):
@@ -191,14 +191,14 @@ template <class T> MEDARRAY<T>::MEDARRAY( T*values,
 						_valuesFull(),_valuesNo(),
 						_valuesDefault(),_valuesOther()
 {
-  BEGIN_OF("constructor MEDARRAY<T>::MEDARRAY(T* values, const med_int, const med_int, const medModeSwitch)");
+  BEGIN_OF("constructor MEDARRAY<T>::MEDARRAY(T* values, const int, const int, const medModeSwitch)");
 
   // if ld_values < 1 or length_values < 1, we could not allocate
   // throws an exception
 
   if ( (ld_values<1) | (length_values<1) )
   {
- 	   throw MEDEXCEPTION(LOCALIZED("MEDARRAY<T>::MEDARRAY(T* values, const med_int, const medModeSwitch) : dimension < 1 !"));
+ 	   throw MEDEXCEPTION(LOCALIZED("MEDARRAY<T>::MEDARRAY(T* values, const int, const medModeSwitch) : dimension < 1 !"));
   }
   if ( _mode == MED_FULL_INTERLACE)
   {
@@ -243,7 +243,7 @@ template <class T> MEDARRAY<T>::MEDARRAY( T*values,
   SCRUTE((T*)_valuesNo);
   SCRUTE((T*)_valuesFull);
 
-  END_OF("constructor MEDARRAY<T>::MEDARRAY(T* values, const med_int, const med_int, const medModeSwitch)");
+  END_OF("constructor MEDARRAY<T>::MEDARRAY(T* values, const int, const int, const medModeSwitch)");
 }
 
 //				------------------
@@ -391,7 +391,7 @@ template <class T> MEDARRAY<T> & MEDARRAY<T>::shallowCopy(const MEDARRAY & m)
 //				------------------
 
 				/*! returns _ldValues. (for example, space dimension for coordinates array)*/
-template <class T> inline med_int MEDARRAY<T>::getLeadingValue() const
+template <class T> inline int MEDARRAY<T>::getLeadingValue() const
 {
   return _ldValues;
 };
@@ -399,7 +399,7 @@ template <class T> inline med_int MEDARRAY<T>::getLeadingValue() const
 //				------------------
 
 				/*! returns _ldValues. (for example, number of nodes for coordinates array)*/
-template <class T> inline med_int MEDARRAY<T>::getLengthValue() const
+template <class T> inline int MEDARRAY<T>::getLengthValue() const
 {
   return _lengthValues;
 };
@@ -433,7 +433,6 @@ template <class T> const T* MEDARRAY<T>::get(const medModeSwitch mode)
     	//return (const T*)_valuesDefault;
       	return  (T*) _valuesOther;
   }
-  END_OF("MEDARRAY<T>::get(const medModeSwitch mode)");
 }
 
 //				------------------
@@ -443,10 +442,10 @@ template <class T> const T* MEDARRAY<T>::get(const medModeSwitch mode)
 				    Be aware : if _mode is MED_NO_INTERLACE, the entire
 				    array will be recalculate in MED_FULL_INTERLACE representation.\n*/
 				
-template <class T> const T* MEDARRAY<T>::getRow(const med_int i)
+template <class T> const T* MEDARRAY<T>::getRow(const int i)
 {
 
-  BEGIN_OF("MEDARRAY<T>::getRow(const med_int i)");
+  BEGIN_OF("MEDARRAY<T>::getRow(const int i)");
 
   if ((T*)_valuesDefault == NULL)
   {
@@ -472,7 +471,7 @@ template <class T> const T* MEDARRAY<T>::getRow(const med_int i)
   //const T* ptr = (const T*)_valuesFull + (i-1)*_ldValues;
   const T* ptr =  (T*) _valuesFull + (i-1)*_ldValues;
 
-  END_OF("MEDARRAY<T>::getRow(const med_int i )");
+  END_OF("MEDARRAY<T>::getRow(const int i )");
   return ptr;
 }
 //				------------------
@@ -483,9 +482,9 @@ template <class T> const T* MEDARRAY<T>::getRow(const med_int i)
 				    Be aware : if _mode is MED_FULL_INTERLACE, the entire
 				    array will be recalculate in MED_NO_INTERLACE representation.\n*/
 
-template <class T> const T* MEDARRAY<T>::getColumn(const med_int j)
+template <class T> const T* MEDARRAY<T>::getColumn(const int j)
 {
-  BEGIN_OF("MEDARRAY<T>::getColumn(const med_int j)");
+  BEGIN_OF("MEDARRAY<T>::getColumn(const int j)");
   if ((T*)_valuesDefault == NULL)
   {
   	throw MEDEXCEPTION("MEDARRAY::getColumn(j) : No values defined !");
@@ -515,7 +514,7 @@ template <class T> const T* MEDARRAY<T>::getColumn(const med_int j)
 
 				/*! returns Jth value of Ith element .\n
 				    don't forget first element is element 1 (and not element 0). */
-template <class T> const T MEDARRAY<T>::getIJ(const med_int i,const  med_int j) const
+template <class T> const T MEDARRAY<T>::getIJ(const int i,const  int j) const
 {
 
   if (i<1)
@@ -638,7 +637,7 @@ template <class T> void MEDARRAY<T>::clearOtherMode()
 					/*! Sets ith element to T* values\n
 					    if they both exist, both _valuesFull and _valuesNo arrays will be updated.\n
 					    Throws exception if i < 1 or i > _lengthValues */
-template <class T> void MEDARRAY<T>::setI(const med_int i, const T* value)
+template <class T> void MEDARRAY<T>::setI(const int i, const T* value)
 {
   BEGIN_OF("MEDARRAY<T>::setI(i,value)");
 
@@ -678,7 +677,7 @@ template <class T> void MEDARRAY<T>::setI(const med_int i, const T* value)
 					/*! Sets ith element to T* values\n
 					    if they both exist, both _valuesFull and _valuesNo arrays will be updated.\n
 					    Throws exception if i < 1 or i > _lengthValues */
-template <class T> void MEDARRAY<T>::setJ(const med_int j, const T* value)
+template <class T> void MEDARRAY<T>::setJ(const int j, const T* value)
 {
   BEGIN_OF("MEDARRAY::setJ(j,value)");
   if (( T*)_valuesDefault == NULL)
@@ -717,7 +716,7 @@ template <class T> void MEDARRAY<T>::setJ(const med_int j, const T* value)
 					    Maintains coherency.\n
 					    Throws exception if we don't have
 					    1<=i<=_lengthValues and 1<=j<=_ldValues */
-template <class T> void MEDARRAY<T>::setIJ(const med_int i, const med_int j, const T value)
+template <class T> void MEDARRAY<T>::setIJ(const int i, const int j, const T value)
 {
   // 1<=i<=_lengthValues and 1<=j<=_ldValues
 
