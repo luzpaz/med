@@ -199,7 +199,6 @@ int main (int argc, char **argv)
       - 2 familles d'elements de dimension (d)
         en fait de face (-10)
   */
-
   if (ret == 0)
     {
       numfam = -1;
@@ -244,6 +243,7 @@ int main (int argc, char **argv)
 		     natt,gro,ngro);
       printf("MEDfamCr : %d\n",ret);
     }
+
   /***************************************************************************/
   /*
     Les champs
@@ -302,7 +302,7 @@ int main (int argc, char **argv)
 	printf("MEDchampEcr : %d \n",ret);
       }
     }
-  
+
   /***************************************************************************/
 
   ret = MEDfermer(fid);
