@@ -1,69 +1,19 @@
 #ifndef COORDONNEES_BARYCENTRIQUES_HPP
 #define COORDONNEES_BARYCENTRIQUES_HPP
 
-#define _TEMPLATE_SPE_ template <class NUAGEMAILLE, class NUAGENOEUD, class NOEUD>
+// DECLARATIONS
+
+#define _TEMPL_SPE_ template <class NUAGEMAILLE, class NUAGENOEUD, class NOEUD>
 #define _COORDBARYC_ Coordonnees_Barycentriques<NUAGEMAILLE,NUAGENOEUD,NOEUD,DIMENSION>
 #define _COORDBARY_2D_ Coordonnees_Barycentriques<NUAGEMAILLE,NUAGENOEUD,NOEUD,2>
 #define _COORDBARY_3D_ Coordonnees_Barycentriques<NUAGEMAILLE,NUAGENOEUD,NOEUD,3>
-
-//////////////////////////////////////////////////////////////////
-///                                                            ///
-///                        DECLARATIONS                        ///
-///                                                            ///
-//////////////////////////////////////////////////////////////////
-
-/*********************************************************/
-/*                                                       */
-/*           Classe Coordonnees_Barycentriques           */
-/*                                                       */
-/*********************************************************/
-
-// C'est la définition de la classe générique template qui n'est utilisée qu'à travers ses spécialisations
-// vu que le nombre de spécialisations a faire est petit (nombre de dimensions utilisée, 3 pour MED)
-// et vu que l'acces a ces classes doit etre rapide, car ce sont des classes de calcul
-// la technique de spécialisation, plus lourde, mais plus rapide, a été préférée aux techniques d'héritage
 
 template <class NUAGEMAILLE, class NUAGENOEUD, class NOEUD, int DIMENSION> class Coordonnees_Barycentriques
 {
 // TEMPLATE GENERIQUE VIDE OBLIGE DE PASSER PAR UNE SPECIALISATION
 };
 
-/*********************************************************/
-/*                                                       */
-/*                   Spécialisation 2D                   */
-/*                                                       */
-/*********************************************************/
-
-_TEMPLATE_SPE_ class _COORDBARY_2D_
-{
-protected :
-	NUAGEMAILLE * mailles;
-	NUAGENOEUD * sommets;
-	
-	vector<int> etat_coord_baryc;
-	vector< vector< vector<double> > > coord_baryc;
-	
-public :
-	
-	Coordonnees_Barycentriques():mailles(NULL),sommets(NULL) {}
-	Coordonnees_Barycentriques(NUAGEMAILLE * m, NUAGENOEUD *n);
-	~Coordonnees_Barycentriques() {}
-	// donne les pseudos coordonnées barycentriques de M dans ma maille de numéro global num_maille dans mailles
-	// la pseudo coordonnées barycentrique par rapport a une face est la distance normalisée a cette face, 
-	// dans le cas d'une face triangulaire, c'est la coordonnées ba
-	vector<double> Donne_Pseudo_Coord_Baryc(int num_maille,const NOEUD &M);
-	vector<double> Calcule_Base_Coord_Baryc(const vector<int> &simplexe_base);	
-	vector<double> Calcule_Coord_Baryc(int num_maille, const NOEUD & M);
-};
-
-/*********************************************************/
-/*                                                       */
-/*                   Spécialisation 3D                   */
-/*                                                       */
-/*********************************************************/
-
-
-_TEMPLATE_SPE_ class _COORDBARY_3D_
+_TEMPL_SPE_ class _COORDBARY_2D_
 {
 protected :
 	NUAGEMAILLE * mailles;
@@ -82,13 +32,28 @@ public :
 	vector<double> Calcule_Coord_Baryc(int num_maille, const NOEUD & M);
 };
 
-//////////////////////////////////////////////////////////////////
-///                                                            ///
-///                            CODE                            ///
-///                                                            ///
-//////////////////////////////////////////////////////////////////
+_TEMPL_SPE_ class _COORDBARY_3D_
+{
+protected :
+	NUAGEMAILLE * mailles;
+	NUAGENOEUD * sommets;
+	
+	vector<int> etat_coord_baryc;
+	vector< vector< vector<double> > > coord_baryc;
+	
+public :
+	
+	Coordonnees_Barycentriques():mailles(NULL),sommets(NULL) {}
+	Coordonnees_Barycentriques(NUAGEMAILLE * m, NUAGENOEUD *n);
+	~Coordonnees_Barycentriques() {}
+	vector<double> Donne_Pseudo_Coord_Baryc(int num_maille,const NOEUD &M);
+	vector<double> Calcule_Base_Coord_Baryc(const vector<int> &simplexe_base);	
+	vector<double> Calcule_Coord_Baryc(int num_maille, const NOEUD & M);
+};
 
-_TEMPLATE_SPE_ _COORDBARY_2D_::Coordonnees_Barycentriques(NUAGEMAILLE * m, NUAGENOEUD *n):mailles(m),sommets(n)
+// CODE
+
+_TEMPL_SPE_ _COORDBARY_2D_::Coordonnees_Barycentriques(NUAGEMAILLE * m, NUAGENOEUD *n):mailles(m),sommets(n)
 		{
 		cout<<"Creation des Coordonnées Barycentriques : "<<flush;
 		int nbr_mailles=mailles->SIZE();
@@ -97,18 +62,18 @@ _TEMPLATE_SPE_ _COORDBARY_2D_::Coordonnees_Barycentriques(NUAGEMAILLE * m, NUAGE
 		cout<<"OK ! "<<endl;
 		}
 
-_TEMPLATE_SPE_ vector<double> _COORDBARY_2D_::Donne_Pseudo_Coord_Baryc(int num_maille,const NOEUD &M)
+_TEMPL_SPE_ vector<double> _COORDBARY_2D_::Donne_Pseudo_Coord_Baryc(int num_maille,const NOEUD &M)
 	{
 	int i,j,nbr_faces;
 	if (etat_coord_baryc[num_maille]==FAUX) 
 		{
-		nbr_faces=(*mailles).DONNE_NBR_FACES();
+		nbr_faces=mailles->DONNE_NBR_FACES(num_maille);
 		
 		coord_baryc[num_maille]=vector< vector<double> >(nbr_faces);
 		
 		for (i=0;i<nbr_faces;i++)
 			{
-			vector<int> simplexe_base=(*mailles).DONNE_SIMPLEXE_BASE(i);
+			vector<int> simplexe_base=mailles->DONNE_SIMPLEXE_BASE(num_maille,i);
 			coord_baryc[num_maille][i]=Calcule_Base_Coord_Baryc(simplexe_base);
 			etat_coord_baryc[num_maille]=VRAI;
 			}
@@ -116,7 +81,7 @@ _TEMPLATE_SPE_ vector<double> _COORDBARY_2D_::Donne_Pseudo_Coord_Baryc(int num_m
 	return Calcule_Coord_Baryc(num_maille,M);
 	}
 
-_TEMPLATE_SPE_ vector<double> _COORDBARY_2D_::Calcule_Base_Coord_Baryc(const vector<int> &simplexe_base)
+_TEMPL_SPE_ vector<double> _COORDBARY_2D_::Calcule_Base_Coord_Baryc(const vector<int> &simplexe_base)
 	{
 	const vector<int> &ref=simplexe_base;
 	vector<double> retour(3);
@@ -138,7 +103,7 @@ _TEMPLATE_SPE_ vector<double> _COORDBARY_2D_::Calcule_Base_Coord_Baryc(const vec
 	return retour;
 	}
 
-_TEMPLATE_SPE_ vector<double> _COORDBARY_2D_::Calcule_Coord_Baryc(int num_maille, const NOEUD & M)
+_TEMPL_SPE_ vector<double> _COORDBARY_2D_::Calcule_Coord_Baryc(int num_maille, const NOEUD & M)
 	{
 	int i,j;
 	vector<double> coord_baryc_M(3,0);
@@ -150,7 +115,7 @@ _TEMPLATE_SPE_ vector<double> _COORDBARY_2D_::Calcule_Coord_Baryc(int num_maille
 	return coord_baryc_M;
 	}
 
-_TEMPLATE_SPE_ _COORDBARY_3D_::Coordonnees_Barycentriques(NUAGEMAILLE * m, NUAGENOEUD *n):mailles(m),sommets(n)
+_TEMPL_SPE_ _COORDBARY_3D_::Coordonnees_Barycentriques(NUAGEMAILLE * m, NUAGENOEUD *n):mailles(m),sommets(n)
 		{
 		cout<<"Creation des Coordonnées Barycentriques : "<<flush;
 		int nbr_mailles=mailles->SIZE();
@@ -159,21 +124,19 @@ _TEMPLATE_SPE_ _COORDBARY_3D_::Coordonnees_Barycentriques(NUAGEMAILLE * m, NUAGE
 		cout<<"OK ! "<<endl;
 		}
 	
-_TEMPLATE_SPE_ vector<double> _COORDBARY_3D_::Donne_Pseudo_Coord_Baryc(int num_maille,const NOEUD &M)
+_TEMPL_SPE_ vector<double> _COORDBARY_3D_::Donne_Pseudo_Coord_Baryc(int num_maille,const NOEUD &M)
 	{
 	int i,j,nbr_faces;
 	if (etat_coord_baryc[num_maille]==FAUX) 
 		{
-		nbr_faces=(*mailles)[num_maille].DONNE_NBR_FACES();
+		nbr_faces=mailles->DONNE_NBR_FACES(num_maille);
 		
 		coord_baryc[num_maille]=vector< vector<double> >(nbr_faces);
 		
-		type_retour simplexe_base;
-		
 		for (i=0;i<nbr_faces;i++)
 			{
-			(*mailles)[num_maille].DONNE_SIMPLEXE_BASE(i,simplexe_base);
-			coord_baryc[num_maille][i]=Calcule_Base_Coord_Baryc(vector<int>(&simplexe_base.quoi[0],&simplexe_base.quoi[simplexe_base.combien]));
+			vector<int> simplexe_base=mailles->DONNE_SIMPLEXE_BASE(num_maille,i);
+			coord_baryc[num_maille][i]=Calcule_Base_Coord_Baryc(simplexe_base);
 			etat_coord_baryc[num_maille]=VRAI;
 			}
 		}	
@@ -181,7 +144,7 @@ _TEMPLATE_SPE_ vector<double> _COORDBARY_3D_::Donne_Pseudo_Coord_Baryc(int num_m
 	}
 
 
-_TEMPLATE_SPE_ vector<double> _COORDBARY_3D_::Calcule_Base_Coord_Baryc(const vector<int> &simplexe_base)
+_TEMPL_SPE_ vector<double> _COORDBARY_3D_::Calcule_Base_Coord_Baryc(const vector<int> &simplexe_base)
 	{
 	const vector<int> &ref=simplexe_base;
 	vector<double> retour(4);
@@ -214,7 +177,7 @@ _TEMPLATE_SPE_ vector<double> _COORDBARY_3D_::Calcule_Base_Coord_Baryc(const vec
 	return retour;
 	}
 
-_TEMPLATE_SPE_ vector<double> _COORDBARY_3D_::Calcule_Coord_Baryc(int num_maille, const NOEUD & M)
+_TEMPL_SPE_ vector<double> _COORDBARY_3D_::Calcule_Coord_Baryc(int num_maille, const NOEUD & M)
 	{
 	int i,j;
 	int nbr_faces=coord_baryc[num_maille].size();
@@ -229,13 +192,8 @@ _TEMPLATE_SPE_ vector<double> _COORDBARY_3D_::Calcule_Coord_Baryc(int num_maille
 
 //*/
 
-#undef _TEMPLATE_SPE_
-// template <class NUAGEMAILLE, class NUAGENOEUD, class NOEUD, int DIMENSION>
-#undef _COORDBARYC_
-// Coordonnees_Barycentriques<NUAGEMAILLE,NUAGENOEUD,NOEUD,DIMENSION>
-#undef _COORDBARY_2D_
-// Coordonnees_Barycentriques<NUAGEMAILLE,NUAGENOEUD,NOEUD,2>
-#undef _COORDBARY_3D_
-// Coordonnees_Barycentriques<NUAGEMAILLE,NUAGENOEUD,NOEUD,3>
+#undef _TEMPLATE_SPE_ template <class NUAGEMAILLE, class NUAGENOEUD, class NOEUD, int DIMENSION>
+#undef _COORDBARYC_2D_ Coordonnees_Barycentriques<NUAGEMAILLE,NUAGENOEUD,NOEUD,2>
+#undef _COORDBARYC_3D_ Coordonnees_Barycentriques<NUAGEMAILLE,NUAGENOEUD,NOEUD,3>
 
 #endif

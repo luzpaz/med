@@ -20,7 +20,7 @@ using namespace std;
 namespace MEDMEM {
 
 /* Modify the following line to add a new driver type (step 1) */
-typedef enum { MED_DRIVER = 0, GIBI_DRIVER = 1, PORFLOW_DRIVER = 2, VTK_DRIVER = 254, NO_DRIVER = 255 } driverTypes;
+typedef enum { MED_DRIVER = 0, GIBI_DRIVER = 1, VTK_DRIVER = 254, NO_DRIVER = 255 } driverTypes;
 class GENDRIVER {
 
 protected :

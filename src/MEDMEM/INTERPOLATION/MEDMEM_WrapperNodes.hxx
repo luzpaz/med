@@ -6,17 +6,7 @@
 #define NULL 0
 #endif
 
-//////////////////////////////////////////////////////////////////
-///                                                            ///
-///                        DECLARATIONS                        ///
-///                                                            ///
-//////////////////////////////////////////////////////////////////
-
-/*********************************************************/
-/*                                                       */
-/*                Classe Wrapper_Noeud                   */
-/*                                                       */
-/*********************************************************/
+// les classes de wrapping
 
 template <int DIMENSION> class Wrapper_Noeud
 {
@@ -78,19 +68,12 @@ public :
 		return os;
 		}
 	};
-
-/*********************************************************/
-/*                                                       */
-/*             Classe Nuage_Wrapper_Noeud                */
-/*                                                       */
-/*********************************************************/
-
 	
 template <int DIMENSION> class Wrapper_Nuage_Noeud
 	{
 	protected : 
 		int nbr_noeuds;
-		double * noeuds;
+		double *noeuds;
 		Wrapper_Noeud<DIMENSION> show;
 	public :
 		Wrapper_Nuage_Noeud():nbr_noeuds(0),noeuds(NULL) {}
@@ -98,6 +81,14 @@ template <int DIMENSION> class Wrapper_Nuage_Noeud
 		~Wrapper_Nuage_Noeud() {}
 		Wrapper_Noeud<DIMENSION> & operator [] (int i)
 			{
+			if ((i<0)||(i>=nbr_noeuds))
+				{
+				cerr<<"Outbound call dans Wrapper Nuage Noeud"<<endl;
+				cerr<<"Inférior Bound = "<<0<<endl;
+				cerr<<"Supérior Bound = "<<nbr_noeuds-1<<endl;
+				cerr<<"Call = "<<i<<endl;
+				exit(-1);
+				}
 			show.positionne((double *) &noeuds[DIMENSION*i]);
 			return show;
 			}
@@ -114,6 +105,5 @@ template <int DIMENSION> class Wrapper_Nuage_Noeud
 				}
 			}
 	};
-
 
 #endif

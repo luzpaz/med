@@ -250,7 +250,7 @@ int main (int argc, char **argv)
       }
     }
   
-  // on met champ2 sans pas de temps pour pouvoir le lire aussi par defaut !
+  /* on met champ2 sans pas de temps pour pouvoir le lire aussi par defaut !*/
   if (ret == 0)
     {
       ret = MEDchampEcr(fid, maa, champ2, (unsigned char *)fieldnodedouble1,

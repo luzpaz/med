@@ -28,7 +28,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl:${KERNEL_ROOT_DIR}/idl/salome
+VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl
 
 @COMMENCE@
 
@@ -44,18 +44,19 @@ LIB_SERVER_IDL = MED.idl
 
 LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl
 
-EXPORT_PYSCRIPTS = libMedCorba_Swig.py medcorba_test.py batchmode_medcorba_test.py
+EXPORT_PYSCRIPTS = libMedCorba_Swig.py medcorba_test.py batchmode_medcorba_test.py batchmode_medcorba_test1.py
 
 EXPORT_HEADERS = libMedCorba_Swig.i
 
 #############################################################################
 
 CPPFLAGS+= $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
+CXXFLAGS+=-g -D__x86__ -D__linux__
 CXXFLAGS+=-ftemplate-depth-42 -I${KERNEL_ROOT_DIR}/include/salome
 LIBS= $(PYTHON_LIBS) 
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDMEMImpl -lmedmem -lMEDMEM_Swigcmodule -L${KERNEL_ROOT_DIR}/lib/salome -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDMEMImpl -lmedmem -lMEDMEM_Swigcmodule -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDMEMImpl -lmedmem -lMEDMEM_Swigcmodule -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome
 
 #############################################################################
 

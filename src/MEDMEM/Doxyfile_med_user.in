@@ -3,11 +3,11 @@
 #---------------------------------------------------------------------------
 # General configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = "Med Memory Users'"
-PROJECT_NUMBER         = 1.0.2
+PROJECT_NAME           = MED
+PROJECT_NUMBER         = 1.0
 OUTPUT_DIRECTORY       = doc_ref_user
 OUTPUT_LANGUAGE        = English
-EXTRACT_ALL            = YES
+EXTRACT_ALL            = NO
 EXTRACT_PRIVATE        = NO
 EXTRACT_STATIC         = NO
 HIDE_UNDOC_MEMBERS     = YES
@@ -45,7 +45,7 @@ QUIET                  = NO
 WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = YES
 WARN_FORMAT            = "$file:$line: $text"
-WARN_LOGFILE           = log_user
+WARN_LOGFILE           = 
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
@@ -53,20 +53,15 @@ INPUT                  = @srcdir@
 FILE_PATTERNS          = MEDMEM*.hxx \
                          MEDMEM*.cxx
 RECURSIVE              = NO
-EXCLUDE                = CVS
+EXCLUDE                = /export/home/pgoldb/SALOME_ROOT/MED/src/MEDMEM/MEDMEM_STRING.hxx \
+                         /export/home/pgoldb/SALOME_ROOT/MED/src/MEDMEM/MEDMEM_MedMeshDriver.cxx \
+                         /export/home/pgoldb/SALOME_ROOT/MED/src/MEDMEM/MEDMEM_Array.hxx \
+                         /export/home/pgoldb/SALOME_ROOT/MED/src/MEDMEM/MEDMEM_PointerOf.hxx \
+                         /export/home/pgoldb/SALOME_ROOT/MED/src/MEDMEM/MEDMEM_ModulusArray.hxx
 EXCLUDE_PATTERNS       = MEDMEM_DriversDef.* \
-			 MEDMEM_DriverTools.* \
                          MEDMEM_SkyLineArray.* \
-			 MEDMEM_TypeMeshDriver.* \
-			 MEDMEM_Array.hxx \
-                         MEDMEM_PointerOf.hxx \
-			 MEDMEM_STRING.hxx \
-			 MEDMEM_Utilities.hxx \
-			 MEDMEM_Connectivity.cxx \
-			 MEDMEM_Connectivity.hxx \
-			 MEDMEM_Coordinate.cxx \
-			 MEDMEM_Coordinate.hxx \
-                         MEDMEM_ModulusArray.hxx
+                         MEDMEM_Connectivity.* \
+                         MEDMEM_Coordinate.*
 EXAMPLE_PATH           = 
 EXAMPLE_PATTERNS       = 
 EXAMPLE_RECURSIVE      = NO
@@ -83,7 +78,7 @@ REFERENCES_RELATION    = YES
 #---------------------------------------------------------------------------
 # configuration options related to the alphabetical class index
 #---------------------------------------------------------------------------
-ALPHABETICAL_INDEX     = YES
+ALPHABETICAL_INDEX     = NO
 COLS_IN_ALPHA_INDEX    = 5
 IGNORE_PREFIX          = 
 #---------------------------------------------------------------------------
@@ -95,13 +90,13 @@ HTML_HEADER            =
 HTML_FOOTER            = 
 HTML_STYLESHEET        = 
 HTML_ALIGN_MEMBERS     = YES
-GENERATE_HTMLHELP      = YES
-GENERATE_CHI           = YES
+GENERATE_HTMLHELP      = NO
+GENERATE_CHI           = NO
 BINARY_TOC             = NO
 TOC_EXPAND             = YES
 DISABLE_INDEX          = NO
 ENUM_VALUES_PER_LINE   = 4
-GENERATE_TREEVIEW      = YES
+GENERATE_TREEVIEW      = NO
 TREEVIEW_WIDTH         = 250
 #---------------------------------------------------------------------------
 # configuration options related to the LaTeX output
@@ -166,7 +161,7 @@ HIDE_UNDOC_RELATIONS   = YES
 INCLUDE_GRAPH          = YES
 INCLUDED_BY_GRAPH      = YES
 GRAPHICAL_HIERARCHY    = YES
-DOT_PATH               = 
+DOT_PATH               = /export/home/LGLS/bin/
 DOTFILE_DIRS           = 
 MAX_DOT_GRAPH_WIDTH    = 1024
 MAX_DOT_GRAPH_HEIGHT   = 1024

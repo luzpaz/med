@@ -27,18 +27,8 @@ template <int DIMENSION> class Meta_Wrapper;
 
 template <int DIMENSION> class Meta_dTree : public dTree<Wrapper_Noeud<DIMENSION>,Wrapper_Nuage_Noeud<DIMENSION>,DIMENSION>
 {
-protected : 
-	// PATCH
-	Wrapper_Nuage_Noeud<DIMENSION> * noeuds;
-	// FIN PATCH
 public :
-	// PATCH
-	Meta_dTree():noeuds(NULL) {}
-	~Meta_dTree() {if (noeuds) delete noeuds;}
-	Meta_dTree(int nbr_noeuds,double *coord):dTree<Wrapper_Noeud<DIMENSION>,Wrapper_Nuage_Noeud<DIMENSION>,DIMENSION>(noeuds=new Wrapper_Nuage_Noeud<DIMENSION>(nbr_noeuds,coord)) {}
-	inline int trouve_plus_proche_point_bourrin(double *node);
-	// FIN PATCH
-	inline int trouve_plus_proche_point(double * node);
+	inline int trouve_plus_proche_point(double *node);
 };
 
 /*********************************************************/
@@ -78,11 +68,7 @@ template <int DIMENSION> class Meta_Mapping : public Mapping<Meta_Maillage,Meta_
 public :
 	Meta_Mapping(Meta_Wrapper<DIMENSION> * MW):Mapping<Meta_Maillage,Meta_Nuage_Maille,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,DIMENSION>(MW->Get_Maillage(),MW->Get_Nuage_Noeuds(),NULL) {}
 	Meta_Mapping(Meta_Wrapper<DIMENSION> * MW,Meta_Wrapper<DIMENSION> * TWB):Mapping<Meta_Maillage,Meta_Nuage_Maille,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,DIMENSION>(MW->Get_Maillage(),MW->Get_Nuage_Noeuds(),TWB->Get_Nuage_Noeuds()) {}
-	// PATCH
-	inline void Cree_Mapping(Meta_Wrapper<DIMENSION> * MWB, int flag_convexe) {Mapping<Meta_Maillage,Meta_Nuage_Maille,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,DIMENSION>::Cree_Mapping(MWB->Get_Nuage_Noeuds(),flag_convexe);} 
-	inline void Cree_Mapping(int flag_convexe) {Mapping<Meta_Maillage,Meta_Nuage_Maille,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,DIMENSION>::Cree_Mapping(flag_convexe);} 
-	inline vector<int> & Get_Mapping() {return Mapping<Meta_Maillage,Meta_Nuage_Maille,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,DIMENSION>::Get_Mapping();} 
-	//FIN PATCH	
+	void Cree_Mapping(Meta_Wrapper<DIMENSION> * MWB, int flag_convexe) {Mapping<Meta_Maillage,Meta_Nuage_Maille,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,DIMENSION>::Cree_Mapping(MWB->Get_Nuage_Noeuds(),flag_convexe);} 
 	inline int Trouve_Maille_Contenant_Noeud(double * node,int num_maille, int flag_convexe=0);
 };
 
@@ -119,7 +105,6 @@ public :
 	inline Meta_Nuage_Maille              * Get_Nuage_Mailles ( void );
 	inline Meta_Maillage                  * Get_Maillage      ( void );
 	inline Wrapper_MED_Field              * Get_Champ         ( void );
-	inline void Change_Champ           ( const FIELD<double> * medfield );
 };
 
 /*********************************************************/
@@ -220,9 +205,6 @@ public :
 		{
 		int i;
 		
-		int ni=0;
-		int ne=0;
-		
   		int nbr_composantes = fromWrapper->Get_Champ()->Get_Nbr_Composantes();
   		int nbr_valeurs     = toNodes->SIZE();
   
@@ -234,38 +216,31 @@ public :
 		
 		for (i=0;i<nbr_valeurs;i++) 
 			{
-			//cout<<"Interpolation du noeud "<<i<<flush;
+			cout<<"Interpolation du noeud "<<i<<flush;
 			nmc = (*mapping)[i];
-			//cout<<" | mappé dans la maille "<<nmc<<flush;
-			//cout<<" | coordonnées = "<<flush<<(*toNodes)[i]<<flush;
+			cout<<" | mappé dans la maille "<<nmc<<flush;
+			cout<<" | coordonnées = "<<flush<<(*toNodes)[i]<<flush;
 			if (nmc>=0) 
 				{
-				//cout<<" | valeurs qui va etre assignée = "<<flush<<(*fct)((*toNodes)[i],nmc)<<flush;
+				cout<<" | valeurs qui va etre assignée = "<<flush<<(*fct)((*toNodes)[i],nmc)<<flush;
 				resultat[i]=(*fct)((*toNodes)[i],nmc);
-				ni++;
 				}
 			else 
 				{
 				nlpp = mapping->Get_Noeud_Le_Plus_Proche(i);
-				//cout<<" | et dont le point le plus proche a pour numéro : "<<nlpp<<flush;
-				//cout<<" | valeurs qui va etre assignée = "<<(*fromWrapper->Get_Champ())[nlpp]<<flush;
-				if (nlpp!=UNDEFINED) 
-					{
-					resultat[i]=(*fromWrapper->Get_Champ())[nlpp];
-					ne++;
-					}
+				cout<<" | et dont le point le plus proche a pour numéro : "<<nlpp<<flush;
+				cout<<" | valeurs qui va etre assignée = "<<(*fromWrapper->Get_Champ())[nlpp]<<flush;
+				if (nlpp!=UNDEFINED) resultat[i]=(*fromWrapper->Get_Champ())[nlpp];
 				else
 					{
 					cerr<<"Meta_Interpolateur : Le noeud "<<i+1<<" n'a ni maille contenante, ni point le plus proche"<<flush;
 					exit(-1);
 					}
 				}
-			//cout<<" | => OK ! "<<endl;
+			cout<<" | => OK ! "<<endl;
 			}
 		
-		cout<<"Résultat de l'interpolation : "<<endl;
-		cout<<"Nombre de noeuds intérieurs = "<<ni<<endl;
-		cout<<"Nombre de noeuds extérieurs = "<<ne<<endl;
+		cout<<"Avant return"<<endl;
 			
 		return resultat;
 		
@@ -292,13 +267,7 @@ template <int DIMENSION> inline int Meta_dTree<DIMENSION>::trouve_plus_proche_po
 	nodetmp.positionne(node);
 	return dTree<Wrapper_Noeud<DIMENSION>,Wrapper_Nuage_Noeud<DIMENSION>,DIMENSION>::trouve_plus_proche_point(Wrapper_Noeud<DIMENSION>(nodetmp));
 	}
-// PATCH
-template <int DIMENSION> inline int Meta_dTree<DIMENSION>::trouve_plus_proche_point_bourrin(double *node)
-	{
-	static Wrapper_Noeud<DIMENSION> nodetmp;
-	nodetmp.positionne(node);
-	return dTree<Wrapper_Noeud<DIMENSION>,Wrapper_Nuage_Noeud<DIMENSION>,DIMENSION>::trouve_plus_proche_point_bourrin(Wrapper_Noeud<DIMENSION>(nodetmp));
-	}
+	
 /*********************************************************/
 /*                                                       */
 /*                 Meta_Nuage_Maille                     */
@@ -379,27 +348,14 @@ template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Construit_Wrapper
 		exit(-1);
 		}
 	}
-template <int DIMENSION> 	inline void Meta_Wrapper<DIMENSION>::Change_Champ           ( const FIELD<double> * medfield )
-	{
-	if (medfield) 
-		{
-		if (champ) delete champ;
-		champ=new Wrapper_MED_Field(medfield);
-		}
-	else
-		{
-		cerr<<"Meta_Wrapper : FIELD MED vide passé en argument Change_Champ"<<endl;
-		exit(-1);
-		}
-	}
-template <int DIMENSION> 	Meta_Wrapper<DIMENSION>::Meta_Wrapper(int nn,double *nodes,CONNECTIVITY *connmed, int flag_maillage)
+template <int DIMENSION> 	Meta_Wrapper<DIMENSION>::Meta_Wrapper(int nn,double *nodes,CONNECTIVITY *connmed, int flag_maillage=1)
 	{
 	init();
 	Construit_Wrapper_Nuage_Noeud(nn,nodes);
 	Construit_Wrapper_Nuage_Maille(connmed);
 	if (flag_maillage) Construit_Wrapper_Maillage();
 	}
-template <int DIMENSION> 	Meta_Wrapper<DIMENSION>::Meta_Wrapper(int nn,double *nodes,CONNECTIVITY *connmed, const FIELD<double> * c,int flag_maillage)
+template <int DIMENSION> 	Meta_Wrapper<DIMENSION>::Meta_Wrapper(int nn,double *nodes,CONNECTIVITY *connmed, const FIELD<double> * c,int flag_maillage=1)
 	{
 	init();
 	Construit_Wrapper_Nuage_Noeud(nn,nodes);

@@ -3,9 +3,9 @@
 #---------------------------------------------------------------------------
 # General configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = "Med Memory Developpers'"
-PROJECT_NUMBER         = 1.0.2
-OUTPUT_DIRECTORY       = doc_ref_devel
+PROJECT_NAME           = medmemoire
+PROJECT_NUMBER         = 1.0
+OUTPUT_DIRECTORY       = doc_ref
 OUTPUT_LANGUAGE        = English
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
@@ -54,10 +54,9 @@ FILE_PATTERNS          = MEDMEM*.hxx \
                          MEDMEM*.cxx
 RECURSIVE              = NO
 EXCLUDE                = CVS
-EXCLUDE_PATTERNS       = MEDMEM_TypeMeshDriver.* \
-			 MEDMEM_Utilities.hxx
+EXCLUDE_PATTERNS       = 
 EXAMPLE_PATH           = 
-EXAMPLE_PATTERNS       =
+EXAMPLE_PATTERNS       = 
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = 
 INPUT_FILTER           = 
@@ -79,7 +78,7 @@ IGNORE_PREFIX          =
 # configuration options related to the HTML output
 #---------------------------------------------------------------------------
 GENERATE_HTML          = YES
-HTML_OUTPUT            = html
+HTML_OUTPUT            = 
 HTML_HEADER            = 
 HTML_FOOTER            = 
 HTML_STYLESHEET        = 
@@ -96,7 +95,7 @@ TREEVIEW_WIDTH         = 250
 # configuration options related to the LaTeX output
 #---------------------------------------------------------------------------
 GENERATE_LATEX         = YES
-LATEX_OUTPUT           = latex
+LATEX_OUTPUT           = 
 COMPACT_LATEX          = NO
 PAPER_TYPE             = a4wide
 EXTRA_PACKAGES         = 

@@ -205,7 +205,7 @@ inline medEntityMesh CONNECTIVITY::getEntity() const
  	return _entity; 
 }
 
-/*!  Returns the number of different %medGeometryElement types 
+/*!  Returns the number of different <medGeometryElement> types 
      existing in the specified entity. /n
      Note : Not implemented for MED_ALL_ENTITIES. */
 //-----------------------------------------------------------------------//
@@ -248,9 +248,9 @@ inline med_int CONNECTIVITY::getNumberOfTypes(medEntityMesh Entity) const
 	return 0; // because it is the right information (no exception needed)!
 }
 
-/*!  Returns an array of all %medGeometryElement types existing in the mesh 
-     for the given %medEntityMesh.
-     Note : Not implemented for MED_ALL_ENTITIES.
+/*!  Returns an array of all <med geometry elements> types existing in the mesh 
+     for the given medEntityMesh./n
+     Note : Not implemented for MED_ALL_ENTITIES. /n
      Throws an exception if Entity is unknown */
 //------------------------------------------------------------------------------------------//
 inline const medGeometryElement* CONNECTIVITY::getGeometricTypes(medEntityMesh Entity) const 

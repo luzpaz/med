@@ -329,7 +329,7 @@ int main (int argc, char **argv)
       }
     }
   
-  // on met champ2 sans pas de temps pour pouvoir le lire aussi par defaut !
+  /* on met champ2 sans pas de temps pour pouvoir le lire aussi par defaut !*/
   if (ret == 0)
     {
 /*        ret = MEDchampCr(fid,champ2,MED_REEL64,champ2_comp,champ2_unit,1); */

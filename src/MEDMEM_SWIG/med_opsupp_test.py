@@ -7,14 +7,8 @@
 
 from libMEDMEM_Swig import *
 from random import *
-import os
-#
-#befor running this script, please be sure about the path the file fileName
-#
-filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/"
 
-medFile = filePath + "pointe.med"
+medFile = "pointe.med"
 
 def print_ord(i):
     if i == 0:

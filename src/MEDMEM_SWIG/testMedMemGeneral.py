@@ -237,8 +237,8 @@ for i in range(nbOfFiles):
         meshDriver.close()
         print "The mesh stored in the file ",file," is perhaps a GRID."
         try:
-            print "... of MED_CARTESIAN type ?"
-            type = MED_CARTESIAN
+            print "... of MED_GRILLE_CARTESIENNE type ?"
+            type = MED_GRILLE_CARTESIENNE
             mesh = GRID()
             mesh.setGridType(type)
             if (extensionFile == "med"):
@@ -258,9 +258,9 @@ for i in range(nbOfFiles):
         except:
             meshDriver.close()
             try:
-                print "... of MED_POLAR type ?"
+                print "... of MED_GRILLE_POLAIRE type ?"
                 mesh = GRID()
-                type = MED_POLAR
+                type = MED_GRILLE_POLAIRE
                 mesh.setGridType(type)
                 if (extensionFile == "med"):
                     meshDriver = MED_MESH_RDONLY_DRIVER(file,mesh)
@@ -275,9 +275,9 @@ for i in range(nbOfFiles):
                 meshDriver.read()
             except:
                 meshDriver.close()
-                print "... of MED_BODY_FITTED type ?"
+                print "... of MED_GRILLE_STANDARD type ?"
                 mesh = GRID()
-                type = MED_BODY_FITTED
+                type = MED_GRILLE_STANDARD
                 mesh.setGridType(type)
                 if (extensionFile == "med"):
                     meshDriver = MED_MESH_RDONLY_DRIVER(file,mesh)

@@ -25,7 +25,7 @@ using namespace MEDMEM;
   Constructor.
 */
 //--------------------------------------------------------------------------
-SUPPORT::SUPPORT(): _name(""),	_description("None"), _mesh((MESH*)NULL),
+SUPPORT::SUPPORT(): _name(""),	_description(""), _mesh((MESH*)NULL),
 		    _entity(MED_CELL), _numberOfGeometricType(0),
 	    	    _geometricType((medGeometryElement*)NULL),
 		    _numberOfGaussPoint((int*)NULL),
@@ -44,7 +44,7 @@ SUPPORT::SUPPORT(): _name(""),	_description("None"), _mesh((MESH*)NULL),
 */
 //--------------------------------------------------------------------------
 SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL*/):
-		_name(Name), _description("None"), _mesh(Mesh), _entity(Entity),
+		_name(Name), _description(""), _mesh(Mesh), _entity(Entity),
 		_numberOfGeometricType(0),
 		_geometricType((medGeometryElement*)NULL),
 		_numberOfGaussPoint((int*)NULL),
@@ -722,51 +722,4 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
   delete[] numberOfElements ;
 
   END_OF(LOC);
-};
-
-/*!
-  operator == This operator does not compare attributs _name and _description.
-*/
-//--------------------------------------------------
-bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
-//--------------------------------------------------
-{
-  const char * LOC = "bool SUPPORT::operator ==(const SUPPORT &support) const : ";
-
-  BEGIN_OF(LOC);
-
-  bool operatorReturn = false;
-
-  operatorReturn = (_mesh == support._mesh) && (_entity == support._entity) &&
-    (_numberOfGeometricType == support._numberOfGeometricType) &&
-    (_isOnAllElts == support._isOnAllElts) &&
-    (_totalNumberOfElements == support._totalNumberOfElements);
-
-  if (operatorReturn)
-    {
-      if (!_isOnAllElts)
-	{
-	  for (int i=0; i<_numberOfGeometricType; i++)
-	    {
-	      operatorReturn = operatorReturn &&
-		(_geometricType[i] == support._geometricType[i]) &&
-		(_numberOfElements[i] == support._numberOfElements[i]) &&
-		(_numberOfGaussPoint[i] == support._numberOfGaussPoint[i]);
-
-	      if (operatorReturn)
-		{
-		  for (int j=0; j<_numberOfElements[i]; j++)
-		    {
-		      operatorReturn = operatorReturn &&
-			(getNumber(_geometricType[i])[j] ==
-			 support.getNumber(_geometricType[i])[j]);
-		    }
-		}
-	    }
-	}
-    }
-
-  END_OF(LOC);
-
-  return operatorReturn;
 };

@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <map>
 
 #include "utilities.h"
 #include "MEDMEM_STRING.hxx"
@@ -18,7 +17,6 @@
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_GibiMeshDriver.hxx"
-#include "MEDMEM_PorflowMeshDriver.hxx"
 
 #include "MEDMEM_VtkMeshDriver.hxx"
 
@@ -52,7 +50,6 @@ class FAMILY;
 class GROUP;
 class SUPPORT;
 class MESH
-
 {
 
 
@@ -82,7 +79,6 @@ protected:
 
   static INSTANCE_DE<MED_MESH_RDWR_DRIVER>  inst_med;
   static INSTANCE_DE<GIBI_MESH_RDWR_DRIVER> inst_gibi;
-  static INSTANCE_DE<PORFLOW_MESH_RDWR_DRIVER> inst_porflow;
   static INSTANCE_DE<VTK_MESH_DRIVER> inst_vtk;
 
   //static INSTANCE_DE<VTK_DRIVER>   inst_vtk  ;
@@ -105,31 +101,24 @@ protected :
   int   _spaceDimension;
   int   _meshDimension;
   int   _numberOfNodes;
-  
-  
-  //////////////////////////////////////////////////////////////////////////////////////
-  ///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
-  //////////////////////////////////////////////////////////////////////////////////////
-  ///
-  ///  La map suivante donne le lien numérotation optionnelle => numérotation cannonique
-  ///  Elle  sera calculée apres l'appel de MEDnumLire(...)                                
-  ///  Et sera utilisée avant chaque appel a MEDconnLire(...) pour renuméroter toutes les mailles de façon canonique [1...n]
-  ///  _coordinate->NodeNumber sera utilisé avant chaque appel à MEDconnEcri pour démunéroter les mailles en leur numérotation originelle
-  ///  Ce traitement devrait prévenir tout plantage du aux numérotations optionnelles DES NOEUDS
-  ///  Et ne ralentira que tres peu les traitements sans numéros optionnels
-  
-  int _arePresentOptionnalNodesNumbers;	
-  map<int,int> _optionnalToCanonicNodesNumbers;
 
-  vector<FAMILY*> _familyNode;
-  vector<FAMILY*> _familyCell;
-  vector<FAMILY*> _familyFace;
-  vector<FAMILY*> _familyEdge;
+  int             _numberOfNodesFamilies;  //INUTILE ? -> _familyNode.size()
+  vector<FAMILY*> _familyNode;  // array of size _numberOfNodesFamilies;
+  int             _numberOfCellsFamilies;
+  vector<FAMILY*> _familyCell;  // array of size _numberOfCellsFamilies;
+  int             _numberOfFacesFamilies;
+  vector<FAMILY*> _familyFace;  // array of size _numberOfFacesFamilies;
+  int             _numberOfEdgesFamilies;
+  vector<FAMILY*> _familyEdge;  // array of size _numberOfEdgesFamilies;
 
-  vector<GROUP*> _groupNode;
-  vector<GROUP*> _groupCell;
-  vector<GROUP*> _groupFace;
-  vector<GROUP*> _groupEdge;
+  int   	 _numberOfNodesGroups; //INUTILE ?
+  vector<GROUP*> _groupNode;    // array of size _numberOfNodesGroups;
+  int   	 _numberOfCellsGroups; //INUTILE ?
+  vector<GROUP*> _groupCell;    // array of size _numberOfCellsGroups;
+  int   	 _numberOfFacesGroups; //INUTILE ?
+  vector<GROUP*> _groupFace;    // array of size _numberOfFacesGroups;
+  int   	 _numberOfEdgesGroups; //INUTILE ?
+  vector<GROUP*> _groupEdge;    // array of size _numberOfEdgesGroups;
   // list of all Group
 
   vector<GENDRIVER *> _drivers; // Storage of the drivers currently in use
@@ -158,10 +147,6 @@ public :
   friend class GIBI_MESH_RDONLY_DRIVER;
   friend class GIBI_MESH_WRONLY_DRIVER;
   friend class GIBI_MESH_RDWR_DRIVER;
-
-  friend class PORFLOW_MESH_RDONLY_DRIVER;
-  friend class PORFLOW_MESH_WRONLY_DRIVER;
-  friend class PORFLOW_MESH_RDWR_DRIVER;
 
   friend class VTK_MESH_DRIVER;
 
@@ -245,7 +230,7 @@ public :
   virtual inline const CONNECTIVITY* getConnectivityptr() const;
   virtual SUPPORT *                    getBoundaryElements(medEntityMesh Entity) 
 						throw (MEDEXCEPTION);
-  // problème avec le maillage dans le support : 
+  // probl�me avec le maillage dans le support : 
   //            le pointeur n'est pas const, mais sa valeur oui. A voir !!! PG
 
   SUPPORT *                            getSkin(const SUPPORT * Support3D) 
@@ -281,15 +266,6 @@ public :
     You should delete this pointer after use to avois memory leaks.
    */
   SUPPORT * intersectSupports(const vector<SUPPORT *> Supports) const throw (MEDEXCEPTION) ;
-
-  /*!
-   * Create families from groups.
-   * This function is automaticaly called whenever we ask for families that are not up-to-date.
-   * (The creation of families is delayed to the need of user.)
-   * If a new created family hapen to already exist, we keep the old one.
-   * (There is no way to know which family has change.)
-   */
-  void createFamilies();
 };
 };
 
@@ -323,7 +299,7 @@ inline const CONNECTIVITY* MESH::getConnectivityptr() const
 //   END_OF(LOC);
 // }
 
-/*! Write all the content of the MESH using driver referenced by the integer handler index.*/
+/*! Write all the content of the MESH using driver referenced by the handler <index>*/
 inline void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
 {
   const char * LOC = "MESH::write(int index=0, const string & driverName = \"\") : ";
@@ -385,7 +361,7 @@ inline void MESH::read(const MED_MED_DRIVER & genDriver)
 /*! Set the MESH name */
 inline void MESH::setName(string name)
 {
-  _name=name; //NOM interne à la classe
+  _name=name; //NOM interne � la classe
 }
 
 /*! Get the MESH name */
@@ -435,7 +411,7 @@ inline const double * MESH::getCoordinates(medModeSwitch Mode) const
   return _coordinate->getCoordinates(Mode);
 }
 
-/*! Get the coordinate n° number on axis n°axis*/
+/*! Get the coordinate n� number on axis n�axis*/
 inline const double MESH::getCoordinate(int number, int axis) const
 {
 //   checkGridFillCoords();
@@ -672,13 +648,13 @@ inline int MESH::getNumberOfFamilies (medEntityMesh entity) const
 {
   switch (entity) {
   case MED_NODE :
-    return _familyNode.size();
+    return _numberOfNodesFamilies;
   case MED_CELL :
-    return _familyCell.size();
+    return _numberOfCellsFamilies;
   case MED_FACE :
-    return _familyFace.size();
+    return _numberOfFacesFamilies;
   case MED_EDGE :
-    return _familyEdge.size();
+    return _numberOfEdgesFamilies;
   default :
     throw MEDEXCEPTION("MESH::getNumberOfFamilies : Unknown entity");
   }
@@ -687,13 +663,13 @@ inline int MESH::getNumberOfGroups (medEntityMesh entity) const
 {
   switch (entity) {
   case MED_NODE :
-    return _groupNode.size();
+    return _numberOfNodesGroups;
   case MED_CELL :
-    return _groupCell.size();
+    return _numberOfCellsGroups;
   case MED_FACE :
-    return _groupFace.size();
+    return _numberOfFacesGroups;
   case MED_EDGE :
-    return _groupEdge.size();
+    return _numberOfEdgesGroups;
   default :
     throw MEDEXCEPTION("MESH::getNumberOfGroups : Unknown entity");
   }
@@ -734,28 +710,33 @@ const MEDMEM::FAMILY* MESH::getFamily(medEntityMesh entity, int i) const
 {
   if (i<=0)
     throw MEDEXCEPTION("MESH::getFamily(i) : argument i must be > 0");
+  int NumberOfFamilies = 0;
   vector<FAMILY*> Family;
   switch (entity) {
   case MED_NODE : {
+    NumberOfFamilies = _numberOfNodesFamilies;
     Family = _familyNode;
     break;
   }
   case MED_CELL : {
+    NumberOfFamilies = _numberOfCellsFamilies;
     Family = _familyCell;
     break;
   }
   case MED_FACE : {
+    NumberOfFamilies = _numberOfFacesFamilies;
     Family = _familyFace;
     break;
   }
   case MED_EDGE : {
+    NumberOfFamilies = _numberOfEdgesFamilies;
     Family = _familyEdge;
     break;
   }
   default :
     throw MEDEXCEPTION("MESH::getFamilies : Unknown entity");
   }
-  if (i>Family.size())
+  if (i>NumberOfFamilies)
     throw MEDEXCEPTION("MESH::getFamily(entity,i) : argument i must be <= _numberOfFamilies");
   return Family[i-1];
 }
@@ -765,29 +746,34 @@ const GROUP* MESH::getGroup(medEntityMesh entity, int i) const
   const char * LOC = "MESH::getGroup(medEntityMesh entity, int i) : ";
   if (i<=0)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i must be > 0"));
+  int NumberOfGroups = 0;
   vector<GROUP*> Group;
   switch (entity) {
   case MED_NODE : {
+    NumberOfGroups = _numberOfNodesGroups;
     Group = _groupNode;
     break;
   }
   case MED_CELL : {
+    NumberOfGroups = _numberOfCellsGroups;
     Group = _groupCell;
     break;
   }
   case MED_FACE : {
+    NumberOfGroups = _numberOfFacesGroups;
     Group = _groupFace;
     break;
   }
   case MED_EDGE : {
+    NumberOfGroups = _numberOfEdgesGroups;
     Group = _groupEdge;
     break;
   }
   default :
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Unknown entity"));
   }
-  if (i>Group.size())
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i="<<i<<" must be <= _numberOfGroups="<<Group.size()));
+  if (i>NumberOfGroups)
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i="<<i<<" must be <= _numberOfGroups="<<NumberOfGroups));
   return Group[i-1];
 }
 

@@ -20,7 +20,6 @@
 # include "Utils_SINGLETON.hxx"
 
 #include CORBA_SERVER_HEADER(MED)
-#include CORBA_SERVER_HEADER(SALOMEDS)
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
 
 #include "MEDMEM_Field_i.hxx"
@@ -485,23 +484,21 @@ template <class T> void FIELDOF_i<T>::addInStudy(SALOMEDS::Study_ptr myStudy,
 	  
   	} ;
 
-	string fieldName = _fieldTptr->getName();
-
  	// Create SObject labelled 'FIELDNAME' if it doesn't already exit
-	SALOMEDS::SObject_var medfieldnamefather = myStudy->FindObject(fieldName.c_str());
+	SALOMEDS::SObject_var medfieldnamefather = myStudy->FindObject((_fieldTptr->getName()).c_str());
   	if ( CORBA::is_nil(medfieldnamefather) ) 
 	{
-	  MESSAGE("Add Object "<<fieldName);
+	  MESSAGE("Add Object "<<_fieldTptr->getName());
 	  medfieldnamefather = myBuilder->NewObject(medfieldfather);
 	  anAttr = myBuilder->FindOrCreateAttribute(medfieldnamefather, "AttributeName");
 	  aName = SALOMEDS::AttributeName::_narrow(anAttr);
-	  aName->SetValue(fieldName.c_str());
+	  aName->SetValue((_fieldTptr->getName()).c_str());
 
   	} ;
 
         // Create object labelled according to Field's Name
 
-        MESSAGE("Add a Field Object under "<<fieldName);
+        MESSAGE("Add a Field Object under "<<_fieldTptr->getName());
         myBuilder->NewCommand();
         SALOMEDS::SObject_var newObj = myBuilder->NewObject(medfieldnamefather);
 
@@ -511,66 +508,27 @@ template <class T> void FIELDOF_i<T>::addInStudy(SALOMEDS::Study_ptr myStudy,
 
 	ostringstream iterationName ;
 	iterationName<<"("<<_fieldTptr->getIterationNumber()<<","<<_fieldTptr->getOrderNumber()<<")";
-	//	string supportName = _support->getName();
-	string supportName = (_fieldTptr->getSupport())->getName();
-	//	string meshName = (_support->getMesh())->getName();
-	string meshName = ((_fieldTptr->getSupport())->getMesh())->getName();
-
-	char * fieldEntryName;
-	int lenName = strlen(iterationName.str().c_str()) + 4 + strlen(supportName.c_str()) + 4 +
-	  strlen(meshName.c_str());
-
-	fieldEntryName = new char[lenName];
-	fieldEntryName = strcpy(fieldEntryName,iterationName.str().c_str());
-	fieldEntryName = strcat(fieldEntryName,"_ON_");
-	fieldEntryName = strcat(fieldEntryName,supportName.c_str());
-	fieldEntryName = strcat(fieldEntryName,"_OF_");
-	fieldEntryName = strcat(fieldEntryName,meshName.c_str());
-
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
         aName = SALOMEDS::AttributeName::_narrow(anAttr);
-//         aName->SetValue(iterationName.str().c_str());
-        aName->SetValue(fieldEntryName);
+        aName->SetValue(iterationName.str().c_str());
 
 	string iorStr = orb->object_to_string(myIor);
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
         aIOR->SetValue(iorStr.c_str());
-        myBuilder->CommitCommand();
-        _FieldId = newObj->GetID();
 
-	char * supportEntryPath;
-	lenName = 13 + 15 + strlen(meshName.c_str()) + 1 + strlen(supportName.c_str());
-	supportEntryPath = new char[lenName];
-	supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/");
-	supportEntryPath = strcat(supportEntryPath,"MEDSUPPORTS_OF_");
-	supportEntryPath = strcat(supportEntryPath,meshName.c_str());
-	supportEntryPath = strcat(supportEntryPath,"/");
-	supportEntryPath = strcat(supportEntryPath,supportName.c_str());
-
-	SCRUTE(supportEntryPath);
-
-	MESSAGE("supportEntryPath in fieldof " << supportEntryPath << " length " << lenName);
-
-// 	SALOMEDS::SObject_var supportObject = myStudy->FindObject(supportName.c_str());
-	SALOMEDS::SObject_var supportObject = myStudy->FindObjectByPath(supportEntryPath);
-
-	SCRUTE(supportObject);
-
+	SALOMEDS::SObject_var supportObject = myStudy->FindObject(_support->getName());
   	if ( CORBA::is_nil(supportObject) ) 
         {
-	  MESSAGE("supportObject is a nil corba object");
 	  MESSAGE("FIELDOF_i::addInStudy : SUPPORT not found") ;
 	} 
         else 
         {
-	  MESSAGE("supportObject is OK and is now going to be referenced !");
 	  SALOMEDS::SObject_var newObjSupport = myBuilder->NewObject(newObj);
 	  myBuilder->Addreference(newObjSupport,supportObject);
 	}
-
         myBuilder->CommitCommand();
-
+        _FieldId = newObj->GetID();
 	MESSAGE("FIELDOF_i::addInStudy _FieldId="<< _FieldId);
 
         END_OF(" FIELDOF_i::addInStudy");

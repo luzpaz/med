@@ -6,14 +6,8 @@
 
 from libMEDMEM_Swig import *
 from random import *
-import os
-#
-#befor running this script, please be sure about the path the file fileName
-#
-filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/"
 
-medFile = filePath + "pointe.med"
+medFile = "pointe.med"
 
 def add_one(i):
     return i+1
@@ -270,10 +264,7 @@ if (nbFields>0):
 		print "Norme Max : ", fielddouble.normMax()
 		print "try sobolev",fielddouble.getSupport().getEntity()
 		if fielddouble.getSupport().getEntity()!=MED_NODE:
-                    if (spaceDim == 3) :
-                        fielddouble_vol=fielddouble.getSupport().getMesh().getVolume(fielddouble.getSupport())
-                    elif (spaceDim == 2):
-                        fielddouble_vol=fielddouble.getSupport().getMesh().getArea(fielddouble.getSupport())
+		    fielddouble_vol=fielddouble.getSupport().getMesh().getVolume(fielddouble.getSupport())
 		    print "Norme L1  : ", fielddouble.normL1()
 		    print "Norme L2  : ", fielddouble.normL2()
 		    print "Norme L2(vol) : ", fielddouble.normL2(fielddouble_vol)

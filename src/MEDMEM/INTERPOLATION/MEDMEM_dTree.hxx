@@ -12,7 +12,7 @@
 #define DTREE_AUCUNE 0
 #define DTREE_VALIDE 1
 // val min nbr noeud
-#define DTREE_NBR_MIN_NOEUDS 2
+#define DTREE_NBR_MIN_NOEUDS 1
 #define DTREE_NBR_MAX_DESC 8
 // pour meilleu re lecture
 #define _TEMPLATE_ template <class NOEUD,class NUAGENOEUD,int DIMENSION,int NBR_NOEUDS_PAR_CASE> 
@@ -48,8 +48,7 @@ template <> struct DeuxPuissance<0>
 /*                                                       */
 /*********************************************************/
 
-// Construit un d-Tree sur un nuage de noeud et pour un noeud donné donne lequel des noeuds du nuage est le plus proche
-
+// Classe Utilisateur
 // # Bugs connus : 
 //      -  Problemes avec points sur les faces des hypercubes ?
 //      -  Plantage sauvage si le point est plus loin de l'hypercube père que le diametre Linf de celui-ci.
@@ -57,8 +56,7 @@ template <> struct DeuxPuissance<0>
 //      - NOEUD : voir dans MEDMEM_WrapperNodes.hxx la classe Wrapper_Noeud<..>
 //      - NUAGENOEUD : typiquement, c'est vector<NOEUD> en rédefinissant NUAGENOEUD<...>::SIZE()=vector<...>::size()
 // Remarques :
-//      - NBR_NOEUDS_PAR_CASE ne doit pas être modifié sauf peut-être dans le cas où l'utilisateur veut utiliser des d-Tree parallèles 
-//	  ou utilise des nuages de noeud trop grands
+//      - NBR_NOEUDS_PAR_CASE ne doit pas être modifié sauf peut-être dans le cas où l'utilisateur veut utiliser des d-Tree parallèles
 
 template <class NOEUD,class NUAGENOEUD,int DIMENSION,int NBR_NOEUDS_PAR_CASE=DTREE_NBR_MIN_NOEUDS> class dTree
 {
@@ -70,53 +68,35 @@ protected :
 	// champs
 	NUAGENOEUD * nuage;
 	Ptr_dTree descendant[nbr_descendants];
-	// numéro des noeuds contenus
 	vector<int> * noeud_contenu;
 	int etat;
 	int niveau;
 	dTree * pere;
-	// extrémités de l'hypercube du dTree
 	Sommet_dTree<DIMENSION> coord_max;
 	Sommet_dTree<DIMENSION> coord_min;
 public :
 
 	void init();
 	dTree();
-	// Ce constructeur est le seul constructeur utilisateur, il construit le père puis tous les descendants
 	dTree(NUAGENOEUD *n);
-	// Ce Constructeur est utilisé par le précédent, pour un pere donné, avec deux extrémités données, 
-	// il instantie un dTree sans en calculer les noeuds contenus
 	dTree(const Sommet_dTree<DIMENSION> &A,const Sommet_dTree<DIMENSION> &B,dTree *mypere);
 	dTree(const dTree &F);
 	~dTree();
-	// Renvoie les numéros de noeuds contenus dans le dTree
 	void Get_Noeuds_Filtre(vector<int> &tmp);
-	// renvoie les extrémités
 	Sommet_dTree<DIMENSION> Get_Max() const;
 	Sommet_dTree<DIMENSION> Get_Min() const;
-	// renvoie vrai si P est dans le dTree
 	int is_in_dTree(NOEUD P) const;
-	// calcule la distance topologique locale de P au dTree
 	double calcule_distance(NOEUD P) const;
 	dTree & operator = (const dTree & F);
-	// retourne le sommet du dTree codé par l'entier selecteur (voir explications dans le code)
-	Sommet_dTree<DIMENSION> donne_sommet(int selecteur) const;
+	Sommet_dTree<DIMENSION> dTree::donne_sommet(int selecteur) const;
 	int a_des_fils() const;
-	// renvoi une reference sur le dTree terminal descendant de this contenant P
 	dTree * trouve_dTree_contenant(NOEUD P) const;
-	// renvoie le point le plus proche de P dans this par la méthode exhaustive brutale
 	int trouve_plus_proche_point_bourrin(NOEUD P) const;
-	// renvoie le point le plus proche de p dans this par la méthode dtree
 	int trouve_plus_proche_point(NOEUD P) const;
-	// renvoie un numéro de point contenu dans this
 	int trouve_un_point() const;
-	// méthode récursive utilisée par trouve_plus_proche_point
 	int tppp_rec(NOEUD P,double &delta,int &flag) const;
-	// dit si P est d-proche de l'hypercube de this
 	int Localise_Point(NOEUD P,double d) const;
-	// utilisé par le constructeur pour créer tout la filiation du dTree
 	void cree_filiation();
-	// méthodes de mesure
 	int Get_Nbr_Descendants_Non_Vides() const;
 	int Get_Nbr_Descendants_Vides() const;
 	int Get_Profondeur_Max() const;
@@ -147,6 +127,7 @@ _TEMPLATE_ _DTREE_::dTree()
 	}
 _TEMPLATE_ _DTREE_::dTree(NUAGENOEUD *n)
 	{
+	
 	int i,j;
 	double tmp;
 	
@@ -162,7 +143,6 @@ _TEMPLATE_ _DTREE_::dTree(NUAGENOEUD *n)
 	noeud_contenu=new vector<int>(nuage->size());
 	niveau=0;
 	
-	// calcule les extrémités du dTree pere
 	for (i=0;i<DIMENSION;i++)
 		{
 		coord_max[i]=(*nuage)[0][i];
@@ -185,7 +165,6 @@ _TEMPLATE_ _DTREE_::dTree(NUAGENOEUD *n)
 		coord_min[j]-=tmp;
 		}
 	
-	// méthode récursive qui construit la filiation
 	cree_filiation();
 	
 	}
@@ -193,7 +172,6 @@ _TEMPLATE_ _DTREE_::dTree(const Sommet_dTree<DIMENSION> &A,const Sommet_dTree<DI
 	{
 	if (mypere!=NULL)
 		{
-		
 		int i,j;
 		double tmp;
 		
@@ -377,7 +355,7 @@ _TEMPLATE_ _DTREE_ * _DTREE_::trouve_dTree_contenant(NOEUD P) const
 _TEMPLATE_ int _DTREE_::trouve_plus_proche_point_bourrin(NOEUD P) const
 	{
 	int i;
-	int num_sol=0;
+	int num_sol;
 	double min;
 	double tmp;
 	if (etat!=DTREE_TERMINAL)
@@ -469,16 +447,14 @@ _TEMPLATE_ int _DTREE_::trouve_un_point() const
 			}
 		}
 	}
-// partie recursive de trouve_plus_proche_point
+// partie recursive de l'algo ci dessus
 // change le flag en 1 si un point plus proche est trouvé
 // adapte automatiquement la distance delta de filtrage
 _TEMPLATE_ int _DTREE_::tppp_rec(NOEUD P,double &delta,int &flag) const
 	{
 	if (Localise_Point(P,delta)==0) 
 		{
-	
-	// La distance du point à l'octree est plus grande que delta
-	
+		// La distance du point à l'octree est plus grande que delta
 		return DTREE_FANTOME;
 		}
 	int num_Ptmp;
@@ -491,24 +467,18 @@ _TEMPLATE_ int _DTREE_::tppp_rec(NOEUD P,double &delta,int &flag) const
 			dtmp=DistanceL2((*nuage)[num_Ptmp],P);
 			if (dtmp<=delta) 
 				{
-	
-	// Le point le plus proche minimise delta, c'est un bon candidat, on l'envoie !
-	
+				// Le point le plus proche minimise delta, c'est un bon candidat, on l'envoie !
 				delta=dtmp;
 				flag=1;
 				return num_Ptmp;
 				}
-	
-	// Le point le plus proche ne minimise pas delta
-	
+			// Le point le plus proche ne minimise pas delta
 			// ===========> peut etre rajouter exit(-1); ??????????
 			return DTREE_FANTOME;
 			}
 		else 
 			{
-	
-	// L'octree qui contient P ne contient aucun point
-	
+			// L'octree qui contient P ne contient aucun point
 			return DTREE_FANTOME;
 			}
 		}
@@ -519,18 +489,13 @@ _TEMPLATE_ int _DTREE_::tppp_rec(NOEUD P,double &delta,int &flag) const
 		num_Ptmp=descendant[i]->tppp_rec(P,delta,flag);
 		if ((num_Ptmp!=DTREE_FANTOME)&&(flag==1)) 
 			{
-	
-	// On a trouvé un point qui minimise delta dans une branche
-	
+			// On a trouvé un point qui minimise delta dans une branche
 			num_sol=num_Ptmp;
 			}
 		}
 	// A ce stade, on a trouvé un point qui minimise tous les deltas, c'est donc le point le plus proche
-	// REMARQUE : cette affirmation est à la base de l'algorithme par dTree mais est loin d'étre évidente
-	
 	return num_sol;
 	}
-	
 // renvoie 1 si la distance L inf du noeud a l'octree est plus petite que d, 0 sinon
 _TEMPLATE_ int _DTREE_::Localise_Point(NOEUD P,double d) const
 	{
@@ -542,7 +507,6 @@ _TEMPLATE_ int _DTREE_::Localise_Point(NOEUD P,double d) const
 		}
 	return 1;
 	}
-	
 // Méthode de construction du dTree par propagation
 _TEMPLATE_ void _DTREE_::cree_filiation()
 	{

@@ -197,8 +197,7 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
 	  // we create a new MED_i and add in study
 	  MED_i * myMedI = new MED_i();
 	  myMedIOR = myMedI->_this() ;
-// 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR) ;
-	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ; 	  
+	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR) ; 	  
 	  // create ::MED object, read all and add in study !
 	  myMedI->init(myStudy,MED_DRIVER,fileName) ;
 	}
@@ -234,7 +233,7 @@ throw (SALOME::SALOME_Exception)
 	  // we create a new MED_i and add in study
 	  MED_i * myMedI = new MED_i();
 	  SALOME_MED::MED_ptr myMedIOR = myMedI->_this() ;
-	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ;	  
+	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR) ;	  
 	  // create ::MED object, read all and add in study !
 	  myMedI->initWithFieldType(myStudy,MED_DRIVER,fileName) ;
 	}

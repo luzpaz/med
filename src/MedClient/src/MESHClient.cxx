@@ -81,48 +81,56 @@ void MESHClient::blankCopy()
 
   convertCorbaArray<SALOME_MED::FAMILY_ptr>
     (_familyNode, 
+     _numberOfNodesFamilies, 
      //IOR_Mesh->getFamilies(MED_NODE),
      &all->famNode,
      (void *) (convertFamily), this);
  
   convertCorbaArray<SALOME_MED::FAMILY_ptr>
     (_familyEdge, 
+     _numberOfEdgesFamilies, 
      //IOR_Mesh->getFamilies(MED_EDGE),
      &all->famEdge,
      (void *) (convertFamily), this);
  
   convertCorbaArray<SALOME_MED::FAMILY_ptr>
     (_familyFace, 
+     _numberOfFacesFamilies, 
      //IOR_Mesh->getFamilies(MED_FACE),
      &all->famFace,
      (void *) (convertFamily), this);
  
   convertCorbaArray<SALOME_MED::FAMILY_ptr>
     (_familyCell, 
+     _numberOfCellsFamilies, 
      //IOR_Mesh->getFamilies(MED_CELL),
      &all->famCell,
      (void *) (convertFamily), this);
  
   convertCorbaArray<SALOME_MED::GROUP_ptr>
     (_groupNode, 
+     _numberOfNodesGroups, 
      //IOR_Mesh->getGroups(MED_NODE),
      &all->groupNode,
      (void *) (convertGroup), this);
  
   convertCorbaArray<SALOME_MED::GROUP_ptr>
     (_groupEdge, 
+     _numberOfEdgesGroups, 
      //IOR_Mesh->getGroups(MED_EDGE),
      &all->groupEdge,
      (void *) (convertGroup), this);
  
   convertCorbaArray<SALOME_MED::GROUP_ptr>
     (_groupFace, 
+     _numberOfFacesGroups, 
      //IOR_Mesh->getGroups(MED_FACE),
      &all->groupFace,
      (void *) (convertGroup), this);
  
   convertCorbaArray<SALOME_MED::GROUP_ptr>
     (_groupCell, 
+     _numberOfCellsGroups, 
      //IOR_Mesh->getGroups(MED_CELL),
      &all->groupCell,
      (void *) (convertGroup), this);

@@ -9,15 +9,9 @@
 
 from libMEDMEM_Swig import *
 from random import *
-import os
-#
-#befor running this script, please be sure about the path the file fileName
-#
-filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/"
 
-medFile = filePath + "carre_en_quad4_seg2.med"
-#medFile = filePath + "cube_hexa8_quad4.med"
+medFile = "carre_en_quad4_seg2.med"
+#medFile = "cube_hexa8_quad4.med"
 
 def print_ord(i):
     if i == 0:
@@ -93,7 +87,7 @@ if (nbMeshes>0):
             print coords," ---- ", coordinates[k*spaceDim:((k+1)*spaceDim)]
 
         print ""
-        print "Show the Nodal Connectivity of Cells:"
+        print "Show the Nodal Connectivity:"
         nbTypesCell = mesh.getNumberOfTypes(MED_CELL)
         print ""
         if (nbTypesCell>0):
@@ -104,27 +98,6 @@ if (nbMeshes>0):
                 nbElemType = mesh.getNumberOfElements(MED_CELL,type)
                 print "For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
                 connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,type)
-                nbNodesPerCell = type%100
-                for j in range(nbElemType):
-                    print "Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
-
-        print ""
-        print "Show the Nodal Connectivity of constituents (Faces in 3D or Edges in 2D):"
-
-        if (spaceDim == 3) : constituent = MED_FACE
-        elif (spaceDim == 2) : constituent = MED_EDGE
-        else : print "proble with the sapce dimension : ",spaceDim
-
-        nbTypesConst = mesh.getNumberOfTypes(constituent)
-        print ""
-        if (nbTypesConst>0):
-            print "The Mesh has",nbTypesConst,"Type(s) of Constituent"
-            types = mesh.getTypes(constituent)
-            for k in range(nbTypesConst):
-                type = types[k]
-                nbElemType = mesh.getNumberOfElements(constituent,type)
-                print "For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-                connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituent,type)
                 nbNodesPerCell = type%100
                 for j in range(nbElemType):
                     print "Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
@@ -381,15 +354,13 @@ if (nbMeshes>0):
             TypeFace = mesh.getTypes(MED_FACE)
             print "nbTypeFace:",nbTypeFace,"----",TypeFace[:nbTypeFace]
             normal = mesh.getNormal(supportFace)
-            area = mesh.getArea(supportFace)
             for j in range(nbFace):
                 normalFace = normal.getValueI(MED_FULL_INTERLACE,j+1)
-                areaFace = area.getValueI(MED_FULL_INTERLACE,j+1)
                 value1 = normalFace[0]
                 value2 = normalFace[1]
                 value3 = normalFace[2]
                 norm = (value1*value1 + value2*value2 + value3*value3)**(0.5)
-                print "    * ",normalFace[:spaceDim],"norm:",norm," --> area ",areaFace[0]
+                print "    * ",normalFace[:spaceDim],"norm:",norm
         elif spaceDim == 2:
             print "Getting area on all Cells of the mesh:"
             area = mesh.getArea(supportCell)
@@ -409,14 +380,12 @@ if (nbMeshes>0):
             TypeEdge = mesh.getTypes(MED_EDGE)
             print "nbTypeEdge:",nbTypeEdge,"----",TypeEdge[:nbTypeEdge]
             normal = mesh.getNormal(supportEdge)
-            length = mesh.getLength(supportEdge)
             for j in range(nbEdge):
                 normalEdge = normal.getValueI(MED_FULL_INTERLACE,j+1)
-                lengthEdge = length.getValueI(MED_FULL_INTERLACE,j+1)
                 value1 = normalEdge[0]
                 value2 = normalEdge[1]
                 norm = (value1*value1 + value2*value2)**(0.5)
-                print "    * ",normalEdge[:spaceDim],"norm:",norm," --> length ",lengthEdge[0]
+                print "    * ",normalEdge[:spaceDim],"norm:",norm
         print ""
         print "Building support on Elements of the boundary"
         if spaceDim == 3 :

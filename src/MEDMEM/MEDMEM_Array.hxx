@@ -466,7 +466,7 @@ template <class T> const T* MEDARRAY<T>::getColumn(const med_int j)
 				    don't forget first element is element 1 (and not element 0). */
 template <class T> const T MEDARRAY<T>::getIJ(const med_int i,const  med_int j) const
 {
-
+  BEGIN_OF("MEDARRAY<T>::getIJ(const med_int i, const med_int j)");
   if (i<1)
   {
 	throw MEDEXCEPTION("MEDARRAY::getIJ(i,j) : argument i must be >= 1");
@@ -497,7 +497,7 @@ template <class T> const T MEDARRAY<T>::getIJ(const med_int i,const  med_int j) 
   {
   	return _valuesDefault[(j-1)*_lengthValues+i-1];
   }
- 
+  END_OF("MEDARRAY<T>::getIJ(const med_int i, const med_int j)");
 }
 
 //				------------------

@@ -1,0 +1,43 @@
+
+# -* Makefile *- 
+#
+# Author : Patrick GOLDBRONN (CEA)
+# Date : 30/11/2001
+# $Header$
+#
+# source path
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@
+
+SUBDIRS= tui
+
+@COMMENCE@
+
+docs:
+	@@SETX@; for d in $(SUBDIRS); do 	\
+	   (cd $$d && $(MAKE) $@) || exit 1; 	\
+	done; \
+	cp -f $(srcdir)/MED_index.html MED_index.html
+
+clean:
+	@@SETX@; for d in $(SUBDIRS); do 	\
+	   (cd $$d && $(MAKE) $@) || exit 1; 	\
+	done
+
+distclean: clean
+	@@SETX@; for d in $(SUBDIRS); do 	\
+	   (cd $$d && $(MAKE) $@) || exit 1; 	\
+	done
+
+install:
+	$(MAKE) docs
+	(cd tui && $(MAKE) install);
+	cp -f MED_index.html $(docdir)
+
+uninstall:
+	@@SETX@; for d in $(SUBDIRS); do 	\
+	   (cd $$d && $(MAKE) $@) || exit 1; 	\
+	done; \
+	rm -fr $(docdir)/MED_index.html

@@ -287,8 +287,8 @@ void CONNECTIVITY::calculateConnectivity(medConnectivity ConnectivityType, medEn
 /*!  Give, in full or no interlace mode (for nodal connectivity),
      descending or nodal connectivity.
 
-      You must give a %medEntityMesh (ie:MED_EDGE) 
-      and a %medGeometryElement (ie:MED_SEG3).  */
+      You must give a <medEntityMesh> (ie:MED_EDGE) 
+      and a <medGeometryElement> (ie:MED_SEG3).  */
 
 //------------------------------------------------------------//
 void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies) 
@@ -335,7 +335,6 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
 
     calculateDescendingConnectivity();
 
-    MESSAGE(LOC << " Right after the call to calculateDescendingConnectivity");
     //    int newNumberOfFace = _constituent->_nodal->getNumberOf();
     const int * newConstituentValue = _constituent->_nodal->getValue();
     const int * newConstituentIndex = _constituent->_nodal->getIndex();
@@ -368,14 +367,8 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
     int index1 = 0;
     int indexm1 = 0;
 
-    MESSAGE(LOC << " Right before the call to _constituent->calculateReverseNodalConnectivity");
     _constituent->calculateReverseNodalConnectivity();
-    MESSAGE(LOC << " Right after the call to _constituent->calculateReverseNodalConnectivity");
     
-
-    SCRUTE(oldNumberOfFace);
-
-
     for (int iOldFace=0;iOldFace<oldNumberOfFace;iOldFace++)
       {
 	int index = 0;
@@ -530,51 +523,19 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
 
     // Updating the Family
     
-    SCRUTE(numberOfFamilies);
-
     for(int i=0; i<numberOfFamilies; i++) {
       FAMILY * myFamily = myFamilies[i];
-
-      SCRUTE(myFamily);
-      //    MESSAGE(LOC<<(*myFamily));
-
-      if (myFamily->isOnAllElements()) {
-	// we build number
-	// we must have more constituent ?
-	if (oldNumberOfFace==_constituent->getNumberOf(_constituent->getEntity(),MED_ALL_ELEMENTS))
-	  throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"We have a family which is already in all constituent !"));
-	myFamily->setAll(false);
-	// values array :
-	int * values = new int[oldNumberOfFace] ;
-	for (int ind=0;ind<oldNumberOfFace;ind++)
-	  values[ind]=ind+1;
-	// index array
-	int NumberOfTypes = myFamily->getNumberOfTypes();
-	const int * count = oldConstituent->getGlobalNumberingIndex(_constituent->getEntity());
-	int * index = new int[NumberOfTypes+1] ;
-	memcpy(index,count,(NumberOfTypes+1)*sizeof(int));
-	// build new number attribut
-	myFamily->setNumber(index,values);
-      }
-
-      //    MESSAGE(LOC<<(*myFamily));
+      
       MEDSKYLINEARRAY * number = myFamily->getnumber();
-
       int numberOfLines_skyline = number->getNumberOf();
-
-
-      SCRUTE(numberOfLines_skyline);
-
       const int * index_skyline = number->getIndex();
       
-      SCRUTE(index_skyline);
-
       for (int i=0;i<numberOfLines_skyline;i++) {
 	for (int j=index_skyline[i]; j<index_skyline[i+1];j++) {
 	  number->setIndexValue(j,renumberingFromOldToNew[number->getIndexValue(j)-1]);
 	}
       }
-      //    MESSAGE(LOC<<"updating the family (END) : " << *myFamily);
+      MESSAGE(LOC<<"updating the family (END) : " << *myFamily);
     }
 
     delete oldConstituent ;
@@ -591,7 +552,7 @@ void CONNECTIVITY::updateFamily(vector<FAMILY*> myFamilies)
 void CONNECTIVITY::updateGroup(vector<GROUP*> myFamilies)
 //------------------------------------------------------------//
 {
-  const char * LOC = "CONNECTIVITY::updateGroup(vector<GROUP*>) ";
+  const char * LOC = "CONNECTIVITY::updateFamily(vector<GROUP*>) ";
   BEGIN_OF(LOC);
 
   int numberOfFamilies = myFamilies.size();
@@ -935,7 +896,7 @@ const CELLMODEL & CONNECTIVITY::getType(medGeometryElement Type) const
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : medGeometryElement not found !"));
 }
 
-/*!  Returns the number of elements of type %medGeometryElement.
+/*!  Returns the number of elements of type <med geometrie element>.
      Note : not implemented for MED_ALL_ELEMENTS nor for MED_NONE */
 //------------------------------------------------------------------------//
 med_int CONNECTIVITY::getNumberOfNodesInType(medGeometryElement Type) const
@@ -952,7 +913,7 @@ med_int CONNECTIVITY::getNumberOfNodesInType(medGeometryElement Type) const
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : medGeometryElement not found !"));
 }
 
-/*!  Returns the number of geometric sub cells of %medGeometryElement type.
+/*!  Returns the number of geometric sub cells of <med geometrie element> type.
 not implemented for MED_ALL_ELEMENTS nor for MED_NONE */
 //------------------------------------------------------------------------//
 med_int CONNECTIVITY::getNumberOfSubCellInType(medGeometryElement Type) const
@@ -966,7 +927,7 @@ med_int CONNECTIVITY::getNumberOfSubCellInType(medGeometryElement Type) const
   throw MEDEXCEPTION("CONNECTIVITY::getNumberOfSubCell : medGeometryElement not found !");
 }
 
-/*!  Returns the number of elements of type %medGeometryElement.
+/*!  Returns the number of elements of type <med geometrie element>.
 
      Note :
       - Implemented for MED_ALL_ELEMENTS
@@ -1125,10 +1086,6 @@ void CONNECTIVITY::calculateReverseNodalConnectivity()
   const char * LOC = "CONNECTIVITY::calculateReverseNodalConnectivity : ";
   BEGIN_OF(LOC);
 
-  SCRUTE(_nodal);
-  SCRUTE(_reverseNodalConnectivity);
-
-
   if (_nodal==NULL) 
     calculateNodalConnectivity();
   
@@ -1182,25 +1139,23 @@ void CONNECTIVITY::calculateReverseNodalConnectivity()
 						    reverse_nodal_connectivity);
     delete [] reverse_nodal_connectivity_index;
     delete [] reverse_nodal_connectivity;
-  }
-  END_OF(LOC);
+ }
 }
 
 /*! If not yet done, calculate the Descending Connectivity */
 //-------------------------------------------------//
 void CONNECTIVITY::calculateDescendingConnectivity()
-  //-------------------------------------------------//
+//-------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::calculateDescendingConnectivity() : ";
   BEGIN_OF(LOC);
   
   if (_descending==NULL)
     {
-      if (_nodal==NULL)
-	{
-	  MESSAGE(LOC<<"No connectivity found !");
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity found !"));
-	}
+      if (_nodal==NULL) {
+	MESSAGE(LOC<<"No connectivity found !");
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity found !"));
+      }
       // calcul _descending from _nodal
       // we need CONNECTIVITY for constituent
       
@@ -1212,11 +1167,10 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 	_constituent = new CONNECTIVITY(MED_FACE);
       else if (_entityDimension == 2)
 	_constituent = new CONNECTIVITY(MED_EDGE);
-      else
-	{
-	  MESSAGE(LOC<<"We are in 1D");
-	  return;
-	}
+      else {
+	MESSAGE(LOC<<"We are in 1D");
+	return;
+      }
 
       _constituent->_typeConnectivity = MED_NODAL;
       _constituent->_numberOfNodes = _numberOfNodes;
@@ -1238,34 +1192,29 @@ void CONNECTIVITY::calculateDescendingConnectivity()
       int * NumberOfConstituentsForeachType = new int[2];
       NumberOfConstituentsForeachType[0]=0;
       NumberOfConstituentsForeachType[1]=0;
-      for(int i=0; i<_numberOfTypes; i++)
-	{
-	  // initialize descend_connectivity_index array :
-	  int NumberOfConstituents = _type[i].getNumberOfConstituents(1);
-	  for (int j=_count[i];j<_count[i+1];j++)
-	    {
-	      descend_connectivity_index[j]=descend_connectivity_index[j-1]+NumberOfConstituents;
-	      // compute number of constituent of all cell for each type
-	      for(int k=1;k<NumberOfConstituents+1;k++)
-		{
-		  medGeometryElement MEDType = _type[i].getConstituentType(1,k);
-		  if (ConstituentsTypes[0]==MED_NONE)
-		    {
-		      ConstituentsTypes[0]=MEDType;
-		      NumberOfConstituentsForeachType[0]++;
-		    } else if (ConstituentsTypes[0]==MEDType)
-		      NumberOfConstituentsForeachType[0]++;
-		  else if (ConstituentsTypes[1]==MED_NONE)
-		    {
-		      ConstituentsTypes[1]=MEDType;
-		      NumberOfConstituentsForeachType[1]++;
-		    } else if (ConstituentsTypes[1]==MEDType)
-		      NumberOfConstituentsForeachType[1]++;
-		  else
-		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<MEDType<<" is different of "<<ConstituentsTypes[0]<<" and "<<ConstituentsTypes[1]));
-		}
-	    }
+      for(int i=0; i<_numberOfTypes; i++) {
+	// initialize descend_connectivity_index array :
+	int NumberOfConstituents = _type[i].getNumberOfConstituents(1);
+	for (int j=_count[i];j<_count[i+1];j++){
+	  descend_connectivity_index[j]=descend_connectivity_index[j-1]+NumberOfConstituents;
+	  // compute number of constituent of all cell for each type
+	  for(int k=1;k<NumberOfConstituents+1;k++) {
+	    medGeometryElement MEDType = _type[i].getConstituentType(1,k);
+	    if (ConstituentsTypes[0]==MED_NONE) {
+	      ConstituentsTypes[0]=MEDType;
+	      NumberOfConstituentsForeachType[0]++;
+	    } else if (ConstituentsTypes[0]==MEDType)
+	      NumberOfConstituentsForeachType[0]++;
+	    else if (ConstituentsTypes[1]==MED_NONE) {
+	      ConstituentsTypes[1]=MEDType;
+	      NumberOfConstituentsForeachType[1]++;
+	    } else if (ConstituentsTypes[1]==MEDType)
+	      NumberOfConstituentsForeachType[1]++;
+	    else
+	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<MEDType<<" is different of "<<ConstituentsTypes[0]<<" and "<<ConstituentsTypes[1]));
+	  }
 	}
+      }
 
       // we could built _constituent !
       int TotalNumberOfConstituents = NumberOfConstituentsForeachType[0]+NumberOfConstituentsForeachType[1];
@@ -1313,124 +1262,118 @@ void CONNECTIVITY::calculateDescendingConnectivity()
       int * ReverseDescendingConnectivityValue = new int[TotalNumberOfConstituents*2];
       
       int TotalNumberOfSubCell = 0;
-      for (int i=0; i<_numberOfTypes; i++)
-	{ // loop on all cell type
-	  CELLMODEL Type = _type[i];
-	  //      int NumberOfNodesPerCell = Type.getNumberOfNodes();
-	  int NumberOfConstituentPerCell = Type.getNumberOfConstituents(1);
-	  for (int j=_count[i]; j<_count[i+1]; j++) // we loop on all cell of this type
-	    for (int k=1; k<=NumberOfConstituentPerCell; k++)
-	      { // we loop on all sub cell of it
-		if (descend_connectivity[descend_connectivity_index[j-1]+k-2]==0) {
-		  // it is a new sub cell !
-		  //	    TotalNumberOfSubCell++;
-		  // Which type ?
-		  if (Type.getConstituentType(1,k)==_constituent->_geometricTypes[0]){
-		    tmp_NumberOfConstituentsForeachType[0]++;
-		    TotalNumberOfSubCell=tmp_NumberOfConstituentsForeachType[0];
-		  } else {
-		    tmp_NumberOfConstituentsForeachType[1]++;
-		    TotalNumberOfSubCell=tmp_NumberOfConstituentsForeachType[1];
-		  }
-		  //we have maximum two types
-		
-		  descend_connectivity[descend_connectivity_index[j-1]+k-2]=TotalNumberOfSubCell;
-		  ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2]=j;
-		  int NumberOfNodesPerConstituent = Type.getConstituentType(1,k)%100;
-	    
-		  int * NodesLists = new int[NumberOfNodesPerConstituent];
-		  for (int l=0; l<NumberOfNodesPerConstituent; l++) {
-		    NodesLists[l]=_nodal->getIJ(j,Type.getNodeConstituent(1,k,l+1));
-		    ConstituentNodalConnectivity[ConstituentNodalConnectivityIndex[TotalNumberOfSubCell-1]-1+l]=NodesLists[l];
-		  }
-		  // we use reverse_nodal_connectivity to find the other element which contain this sub cell
-
-		  // all elements which contains first node of sub cell :
-		  int ReverseNodalConnectivityIndex_0 = ReverseNodalConnectivityIndex[NodesLists[0]-1];
-		  int ReverseNodalConnectivityIndex_1 = ReverseNodalConnectivityIndex[NodesLists[0]];
-		  int NumberOfCellsInList = ReverseNodalConnectivityIndex_1-ReverseNodalConnectivityIndex_0;
-
-		  if (NumberOfCellsInList > 0)
-		    { // we could have no element !
-		      int * CellsList = new int[NumberOfCellsInList];
-		      for (int l=ReverseNodalConnectivityIndex_0; l<ReverseNodalConnectivityIndex_1; l++)
-			CellsList[l-ReverseNodalConnectivityIndex_0]=ReverseNodalConnectivityValue[l-1];
-		  
-		      // foreach node in sub cell, we search elements which are in common
-		      // at the end, we must have only one !
-
-		      for (int l=1; l<NumberOfNodesPerConstituent; l++) {
-			int NewNumberOfCellsInList = 0;
-			int * NewCellsList = new int[NumberOfCellsInList];
-			for (int l1=0; l1<NumberOfCellsInList; l1++)
-			  for (int l2=ReverseNodalConnectivityIndex[NodesLists[l]-1]; l2<ReverseNodalConnectivityIndex[NodesLists[l]]; l2++)
-			    {
-			      if (CellsList[l1]<ReverseNodalConnectivityValue[l2-1])
-				// increasing order : CellsList[l1] are not in elements list of node l
-				break;
-			      if ((CellsList[l1]==ReverseNodalConnectivityValue[l2-1])&(CellsList[l1]!=j)) {
-				// we have found one
-				NewCellsList[NewNumberOfCellsInList]=CellsList[l1];
-				NewNumberOfCellsInList++;
-				break;
-			      }
-			    }
-			NumberOfCellsInList = NewNumberOfCellsInList;
-
-			delete [] CellsList;
-			CellsList = NewCellsList;
-		      }
-	    
-		      if (NumberOfCellsInList > 0) { // We have found some elements !
-			int CellNumber = CellsList[0];
-			//delete [] CellsList;
-			if (NumberOfCellsInList>1)
-			  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"More than one other Cell ("<<NumberOfCellsInList<<") !"));
-
-			if (NumberOfCellsInList==1)
-			  {
-			    ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2+1]=CellNumber;
-		      
-			    // we search sub cell number in this cell to not calculate it another time
-			    // which type ?
-			    CELLMODEL Type2;
-			    for (int l=0; l<_numberOfTypes; l++)
-			      if (CellNumber < _count[l+1]) {
-				Type2=_type[l];
-				break;
-			      }
-			    //int sub_cell_count2 = Type2.get_entities_count(1);
-			    //int nodes_cell_count2 = Type2.get_nodes_count();
-			    bool find2 = false;
-			    for (int l=1; l<=Type2.getNumberOfConstituents(1);l++) { // on all sub cell
-			      int counter = 0;
-			      for (int m=1; m<=Type2.getConstituentType(1,l)%100; m++)
-				for (int n=1; n<=Type.getConstituentType(1,k)%100; n++)
-				  { 
-				    if (_nodal->getIJ(CellNumber,Type2.getNodeConstituent(1,l,m)) == NodesLists[n-1])
-				      counter++;
-				  }
-			      if (counter==Type.getConstituentType(1,k)%100)
-				{
-				  descend_connectivity[descend_connectivity_index[CellNumber-1]+l-2]=-1*TotalNumberOfSubCell; // because, see it in other side !
-				  find2 = true;
-				}
-			      if (find2)
-				break;
-			    }
-			    if (!find2)
-			      MESSAGE(LOC<<"ERROR ERROR ERROR ERROR ERROR : we find any subcell !!!"); // exception ?
-			  } 
-		      } else {
-			ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2+1]=0;
-		      }
-		      delete [] CellsList;
-		    }
-
-		  delete [] NodesLists;
+      for (int i=0; i<_numberOfTypes; i++) { // loop on all cell type
+	CELLMODEL Type = _type[i];
+	//      int NumberOfNodesPerCell = Type.getNumberOfNodes();
+	int NumberOfConstituentPerCell = Type.getNumberOfConstituents(1);
+	for (int j=_count[i]; j<_count[i+1]; j++) // we loop on all cell of this type
+	  for (int k=1; k<=NumberOfConstituentPerCell; k++)
+	    { // we loop on all sub cell of it
+	      if (descend_connectivity[descend_connectivity_index[j-1]+k-2]==0) {
+		// it is a new sub cell !
+		//	    TotalNumberOfSubCell++;
+		// Which type ?
+		if (Type.getConstituentType(1,k)==_constituent->_geometricTypes[0]){
+		  tmp_NumberOfConstituentsForeachType[0]++;
+		  TotalNumberOfSubCell=tmp_NumberOfConstituentsForeachType[0];
+		} else {
+		  tmp_NumberOfConstituentsForeachType[1]++;
+		  TotalNumberOfSubCell=tmp_NumberOfConstituentsForeachType[1];
 		}
+	      //we have maximum two types
+		
+		descend_connectivity[descend_connectivity_index[j-1]+k-2]=TotalNumberOfSubCell;
+		ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2]=j;
+		int NumberOfNodesPerConstituent = Type.getConstituentType(1,k)%100;
+	    
+		int * NodesLists = new int[NumberOfNodesPerConstituent];
+		for (int l=0; l<NumberOfNodesPerConstituent; l++) {
+		  NodesLists[l]=_nodal->getIJ(j,Type.getNodeConstituent(1,k,l+1));
+		  ConstituentNodalConnectivity[ConstituentNodalConnectivityIndex[TotalNumberOfSubCell-1]-1+l]=NodesLists[l];
+		}
+		// we use reverse_nodal_connectivity to find the other element which contain this sub cell
+
+		// all elements which contains first node of sub cell :
+		int ReverseNodalConnectivityIndex_0 = ReverseNodalConnectivityIndex[NodesLists[0]-1];
+		int ReverseNodalConnectivityIndex_1 = ReverseNodalConnectivityIndex[NodesLists[0]];
+		int NumberOfCellsInList = ReverseNodalConnectivityIndex_1-ReverseNodalConnectivityIndex_0;
+
+		if (NumberOfCellsInList > 0)  { // we could have no element !
+		  int * CellsList = new int[NumberOfCellsInList];
+		  for (int l=ReverseNodalConnectivityIndex_0; l<ReverseNodalConnectivityIndex_1; l++)
+		    CellsList[l-ReverseNodalConnectivityIndex_0]=ReverseNodalConnectivityValue[l-1];
+		  
+		  // foreach node in sub cell, we search elements which are in common
+		  // at the end, we must have only one !
+
+		  for (int l=1; l<NumberOfNodesPerConstituent; l++) {
+		    int NewNumberOfCellsInList = 0;
+		    int * NewCellsList = new int[NumberOfCellsInList];
+		    for (int l1=0; l1<NumberOfCellsInList; l1++)
+		      for (int l2=ReverseNodalConnectivityIndex[NodesLists[l]-1]; l2<ReverseNodalConnectivityIndex[NodesLists[l]]; l2++) {
+			if (CellsList[l1]<ReverseNodalConnectivityValue[l2-1])
+			  // increasing order : CellsList[l1] are not in elements list of node l
+			  break;
+			if ((CellsList[l1]==ReverseNodalConnectivityValue[l2-1])&(CellsList[l1]!=j)) {
+			  // we have found one
+			  NewCellsList[NewNumberOfCellsInList]=CellsList[l1];
+			  NewNumberOfCellsInList++;
+			  break;
+			}
+		      }
+		    NumberOfCellsInList = NewNumberOfCellsInList;
+
+		    delete [] CellsList;
+		    CellsList = NewCellsList;
+		  }
+	    
+		  if (NumberOfCellsInList > 0) { // We have found some elements !
+		    int CellNumber = CellsList[0];
+		    //delete [] CellsList;
+		    if (NumberOfCellsInList>1)
+		      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"More than one other Cell ("<<NumberOfCellsInList<<") !"));
+
+		    if (NumberOfCellsInList==1) {
+		      ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2+1]=CellNumber;
+		      
+		      // we search sub cell number in this cell to not calculate it another time
+		      // which type ?
+		      CELLMODEL Type2;
+		      for (int l=0; l<_numberOfTypes; l++)
+			if (CellNumber < _count[l+1]) {
+			  Type2=_type[l];
+			  break;
+			}
+		      //int sub_cell_count2 = Type2.get_entities_count(1);
+		      //int nodes_cell_count2 = Type2.get_nodes_count();
+		      bool find2 = false;
+		      for (int l=1; l<=Type2.getNumberOfConstituents(1);l++) { // on all sub cell
+			int counter = 0;
+			for (int m=1; m<=Type2.getConstituentType(1,l)%100; m++)
+			  for (int n=1; n<=Type.getConstituentType(1,k)%100; n++) { 
+			    if (_nodal->getIJ(CellNumber,Type2.getNodeConstituent(1,l,m)) == NodesLists[n-1])
+			      counter++;
+			  }
+			if (counter==Type.getConstituentType(1,k)%100) {
+			  descend_connectivity[descend_connectivity_index[CellNumber-1]+l-2]=-1*TotalNumberOfSubCell; // because, see it in other side !
+			  find2 = true;
+			}
+			if (find2)
+			  break;
+		      }
+		      if (!find2)
+			MESSAGE(LOC<<"ERROR ERROR ERROR ERROR ERROR : we find any subcell !!!"); // exception ?
+		    } 
+		  } else {
+		    ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2+1]=0;
+		  }
+		  delete [] CellsList;
+		}
+
+		delete [] NodesLists;
 	      }
-	}
+	    }
+      }
       // we adjust _constituent
       int NumberOfConstituent=0;
       int SizeOfConstituentNodal=0;
@@ -1560,19 +1503,11 @@ medGeometryElement CONNECTIVITY::getElementType(medEntityMesh Entity,int globalN
 {
   const char * LOC = "medGeometryElement CONNECTIVITY::getElementType(medEntityMesh Entity, int globalNumber) const : ";
   BEGIN_OF(LOC);
-  int globalNumberMin = 1;
-  int globalNumberMax ;
-
-  if (_entity==Entity) globalNumberMax = _count[_numberOfTypes];
-  else if (_constituent!=NULL) globalNumberMax = _constituent->_count[_constituent->_numberOfTypes];
-  else
-    throw MEDEXCEPTION(LOCALIZED("getElementType : Entity not defined !"));
 
   // The globalNumber must verify  : 1 <=  globalNumber < _count[_numberOfTypes] (== totalNumberOfElement+1)
-
-  if ( (globalNumber < globalNumberMin) || (globalNumber >  globalNumberMax-1 )  )
+  if ( (globalNumber < 1) || (globalNumber >  _count[_numberOfTypes]-1 )  )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "globalNumber must be between >= |" 
-                                 << globalNumberMin <<"| and <= |" << globalNumberMax-1 ));
+                                 << 1 <<"| and <= |" << _count[_numberOfTypes]-1 ));
 
   if (_entity==Entity) {
     for(int i=1; i<=_numberOfTypes;i++)

@@ -95,8 +95,6 @@ public:
   FAMILY & operator=(const FAMILY &fam);
   friend ostream & operator<<(ostream &os, FAMILY &my) ;
 
-  friend ostream & operator<<(ostream &os, const FAMILY &my) ;
-
   bool build(medEntityMesh Entity,int **FamilyNumber);
 
   inline void setIdentifier             (int Identifier);        

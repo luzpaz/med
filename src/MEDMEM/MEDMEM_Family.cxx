@@ -68,8 +68,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
       tmp_NodesList[NumberOfNodesInFamily]=i+1 ;
       NumberOfNodesInFamily++;
     }
-
-  SCRUTE(NumberOfNodesInFamily);
+  //SCRUTE(NumberOfNodesInFamily);
 
   // If we found nodes set the family attributes adequatly
   if (NumberOfNodesInFamily>0) {
@@ -152,32 +151,6 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
 //      for (int i=0; i<_numberOfGeometricType; i++)
 //        _numberOfGaussPoint[i]=1 ;
 //    }
-
-
-  MESSAGE("Well now ??? :::");
-
-  MESSAGE("Name : "<< getName());
-  MESSAGE("Description : "<< getDescription());
-  MESSAGE("Mesh name : " << getMesh()->getName());
-  MESSAGE("Entity : "<< getEntity());
-  MESSAGE("Entity list :");
-  if (!(isOnAllElements())) {
-    int numberoftypes = getNumberOfTypes() ;
-    MESSAGE("NumberOfTypes : "<<numberoftypes);
-    const medGeometryElement * types = getTypes();
-    for (int j=0;j<numberoftypes;j++) {
-      int numberOfElements = getNumberOfElements(types[j]);
-      MESSAGE("    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) : ");
-      const int * number = getNumber(types[j]);
-      SCRUTE(number);
-      for (int k=0; k<numberOfElements;k++)
-	MESSAGE("________________ " << number[k]);
-    }
-  } else
-    MESSAGE("Is on all entities !");
-  
-
-
 };
 
 FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
@@ -275,24 +248,6 @@ ostream & MEDMEM::operator<<(ostream &os, FAMILY &myFamily)
   return os;
 };
 
-ostream & MEDMEM::operator<<(ostream &os, const FAMILY &myFamily)
-{
-  // how do cast without duplicate ?
-  os << (SUPPORT) myFamily;
-
-  os << "  - Identifier : "<<myFamily.getIdentifier()<<endl;
-  int numberofattributes = myFamily.getNumberOfAttributes();
-  os << "  - Attributes ("<<numberofattributes<<") :"<<endl;
-  for (int j=1;j<numberofattributes+1;j++)
-    os << "    * "<<myFamily.getAttributeIdentifier(j)<<" : "<<myFamily.getAttributeValue(j)<<", "<<myFamily.getAttributeDescription(j).c_str()<<endl;
-  int numberofgroups = myFamily.getNumberOfGroups();
-  os << "  - Groups ("<<numberofgroups<<") :"<<endl;
-  for (int j=1;j<numberofgroups+1;j++)
-    os << "    * "<<myFamily.getGroupName(j).c_str()<<endl ;
-
-  return os;
-};
-
 bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
 {
   MESSAGE("FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)");
@@ -309,9 +264,6 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
   //  int *  GeometricTypeNumber           = new int[numberOfTypes] ;
   const int *  GlobalNumberingIndex          = _mesh->getGlobalNumberingIndex(Entity);
   
-
-  SCRUTE(numberOfTypes);
-
   // we search for all elements in this family
   for (int TypeNumber=0; TypeNumber < numberOfTypes; TypeNumber++) {
     
@@ -321,12 +273,9 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
     int * tmp_ElementsList           = new int[NumberOfElements];
       
     for (int i=0; i<NumberOfElements; i++)
-      {
-	SCRUTE(ElementsOfThisFamilyNumber[i]);
-	if (_identifier == ElementsOfThisFamilyNumber[i]) {
-	  tmp_ElementsList[NumberOfElementsInThisFamily]=i+GlobalNumberingIndex[TypeNumber] ;
-	  NumberOfElementsInThisFamily++;
-	}
+      if (_identifier == ElementsOfThisFamilyNumber[i]) {
+	tmp_ElementsList[NumberOfElementsInThisFamily]=i+GlobalNumberingIndex[TypeNumber] ;
+	NumberOfElementsInThisFamily++;
       }
     
     if (NumberOfElementsInThisFamily>0) {// we have found some elements

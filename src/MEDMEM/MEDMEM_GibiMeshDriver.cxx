@@ -35,6 +35,8 @@ const medGeometryElement GIBI_MESH_DRIVER::geomGIBItoMED[nb_geometrie_gibi] =
        /*36*/ MED_NONE   ,/*37*/ MED_NONE   ,/*38*/ MED_NONE   ,/*39*/ MED_NONE   ,/*40*/ MED_NONE   ,
        /*41*/ MED_NONE   ,/*42*/ MED_NONE   ,/*43*/ MED_NONE   ,/*44*/ MED_NONE   ,/*45*/ MED_NONE   ,
        /*46*/ MED_NONE   ,/*47*/ MED_NONE   };
+
+//const medGeometryElement GIBI_MESH_DRIVER::geomGIBItoMED[nb_geometrie_gibi];
 /////
 
 // Every memory allocation made in the MedDriver members function are desallocated in the Mesh destructor 
@@ -54,13 +56,7 @@ GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const string & fileName,
   _ptrMesh(ptrMesh)
   // A VOIR _medIdt(MED_INVALID), 
 {
-//   _meshName=fileName.substr(0,fileName.rfind("."));
-    // mesh name construction from fileName
-    const string ext=".sauve"; // expected extension
-    string::size_type pos=fileName.find(ext,0);
-    string::size_type pos1=fileName.rfind('/');
-    _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
-    SCRUTE(_meshName);
+  _meshName=fileName.substr(0,fileName.rfind("."));
 }
   
 GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const GIBI_MESH_DRIVER & driver): 
@@ -286,7 +282,7 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 		      {
 			if( i->groupes.size() ) // le groupe i contient des sous-maillages
 			  {
-			    for( std::vector<int>::iterator j=i->groupes.begin(); j!=i->groupes.end(); ++j)
+			    for( std::list<int>::iterator j=i->groupes.begin(); j!=i->groupes.end(); ++j)
 			      {
 				// pour chacun des sous-maillages j, on recupere les iterateurs *k sur les  maille 
 				// contenues et on les insere dans le groupe i
@@ -294,7 +290,7 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 				for( ; k!=medi.groupes[*j-1].mailles.end(); ++k)
 				  i->mailles.insert(*k);
 			      }
-			    i->groupes.clear(); // après avoir inséré leur mailles, on efface les groupes composites
+			    i->groupes.clear(); // après avoir insere leur mailles, on efface les groupes composites
 			  }
 		      }
 		    
@@ -389,18 +385,21 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 	_ptrMesh->_groupEdge = groupEdge;
 	_ptrMesh->_groupNode = groupNode;
 
+	//Affectation derniers attributs objet Mesh
+	_ptrMesh->_numberOfCellsGroups = _ptrMesh->_groupCell.size();
+	_ptrMesh->_numberOfFacesGroups = _ptrMesh->_groupFace.size();
+	_ptrMesh->_numberOfEdgesGroups = _ptrMesh->_groupEdge.size();
+	_ptrMesh->_numberOfNodesGroups = _ptrMesh->_groupNode.size();
+
 	// appele en dernier car cette fonction detruit le maillage intermediaire!
 	_ptrMesh->_connectivity = medi.getConnectivity(); 
 
 	// calcul de la connectivite d-1 complete, avec renumerotation des groupes
-	//if (_ptrMesh->_spaceDimension==3)
-	//    _ptrMesh->_connectivity->updateGroup(_ptrMesh->_groupFace) ;
-	//else if (_ptrMesh->_spaceDimension==2)
-	//    _ptrMesh->_connectivity->updateGroup(_ptrMesh->_groupEdge) ;
+	if (_ptrMesh->_spaceDimension==3)
+	    _ptrMesh->_connectivity->updateGroup(_ptrMesh->_groupFace) ;
+	else if (_ptrMesh->_spaceDimension==2)
+	    _ptrMesh->_connectivity->updateGroup(_ptrMesh->_groupEdge) ;
 	
-	// Creation des familles à partir des groupes
-	// NC : Cet appel pourra être différé quand la gestion de la cohérence famille/groupes sera assurée
-	_ptrMesh->createFamilies();
     }
 
 

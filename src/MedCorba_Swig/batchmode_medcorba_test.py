@@ -17,8 +17,8 @@ from random import *
 
 import os
 
-filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/"
+filePath=os.environ["KERNEL_ROOT_DIR"]
+filePath=filePath+"/examples/"
 
 #==============================================================================
 
@@ -72,6 +72,48 @@ def getMeshObjectFromStudy(number):
         return myObj
     else:
         print "ERROR: No Mesh Object stored in this Study"
+        return None
+
+
+#==============================================================================
+
+def getFieldDoubleObjectFromStudy(number,subnumber):
+    mySO = batchmode_salome.myStudy.FindObject("MEDFIELD")
+    mysub = mySO.FindSubObject(number)[1]
+    if mysub:
+        mysubsub = mysub.FindSubObject(subnumber)[1]
+        if mysubsub:
+            Builder = batchmode_salome.myStudy.NewBuilder()
+            anAttr = Builder.FindOrCreateAttribute(mysubsub, "AttributeIOR")
+            obj = batchmode_salome.orb.string_to_object(anAttr.Value())
+            myObj = obj._narrow(SALOME_MED.FIELDDOUBLE)
+            return myObj
+        else:
+            print "ERROR: No FieldDouble Object stored in this Study"
+            return None
+    else:
+        print "ERROR: No FieldDouble Object stored in this Study"
+        return None
+
+
+#==============================================================================
+
+def getFieldIntObjectFromStudy(number,subnumber):
+    mySO = batchmode_salome.myStudy.FindObject("MEDFIELD")
+    mysub = mySO.FindSubObject(number)[1]
+    if mysub:
+        mysubsub = mysub.FindSubObject(subnumber)[1]
+        if mysubsub:
+            Builder = batchmode_salome.myStudy.NewBuilder()
+            anAttr = Builder.FindOrCreateAttribute(mysubsub, "AttributeIOR")
+            obj = batchmode_salome.orb.string_to_object(anAttr.Value())
+            myObj = obj._narrow(SALOME_MED.FIELDINT)
+            return myObj
+        else:
+            print "ERROR: No FieldInt Object stored in this Study"
+            return None
+    else:
+        print "ERROR: No FieldInt Object stored in this Study"
         return None
 
 #==============================================================================

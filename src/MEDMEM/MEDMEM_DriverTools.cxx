@@ -8,11 +8,11 @@ using namespace std;
 using namespace MEDMEM;
 
 
-// Cet opérateur permet d'ordonner les mailles dans un set suivant l'ordre requis par MED
+// Cet opÃ©rateur permet d'ordonner les mailles dans un set suivant l'ordre requis par MED
 bool _maille::operator < (const _maille& ma) const
 {
-    // si le type géométrique differe, la comparaison est basée dessus
-    // sinon on se base sur une comparaison des numéros de sommets 
+    // si le type gÃ©omÃ©trique differe, la comparaison est basÃ©e dessus
+    // sinon on se base sur une comparaison des numÃ©ros de sommets 
     if(geometricType==ma.geometricType)
     {
 	// construction de deux vecteur temporaire contenant les numeros de sommets
@@ -30,14 +30,14 @@ bool _maille::operator < (const _maille& ma) const
 	for(std::vector<int>::const_iterator i1=v1.begin(), i2=v2.begin(); i1!=v1.end(); ++i1, ++i2)
 	    if(*i1 != *i2)
 		return *i1 < *i2;
-	return false; // cas d'égalité
+	return false; // cas d'Ã©galitÃ©
     }
     else
 	return geometricType<ma.geometricType;
 };
 
 
-// retourne l'entité d'une maille en fonction de la dimension du maillage.
+// retourne l'entitÃ© d'une maille en fonction de la dimension du maillage.
 MED_EN::medEntityMesh _maille::getEntity(const int meshDimension) const throw (MEDEXCEPTION)
 {
   const char * LOC = "_maille::getEntity(const int meshDimension)" ;
@@ -82,7 +82,7 @@ std::ostream& MEDMEM::operator << (std::ostream& os, const _groupe& gr)
 {
     os << "--- Groupe " << gr.nom << " --- " << std::endl ;
     os << " -> liste des sous-groupes : ";
-    for( std::vector<int>::const_iterator i=gr.groupes.begin(); i!=gr.groupes.end(); ++i)
+    for( std::list<int>::const_iterator i=gr.groupes.begin(); i!=gr.groupes.end(); ++i)
 	os << *i << " ";
     os << std::endl << " -> liste des mailles : " << std::endl;
     for( _groupe::mailleIter i=gr.mailles.begin(); i!=gr.mailles.end(); i++)
@@ -120,7 +120,7 @@ std::ostream& MEDMEM::operator << (std::ostream& os, const _intermediateMED& mi)
 
 void _intermediateMED::numerotationMaillage()
 {
-    // numerotation des mailles par entité
+    // numerotation des mailles par entitÃ©
     int i_maille=0;
     std::set<_maille>::iterator i=maillage.begin();
     int dimension=i->dimension();
@@ -150,9 +150,11 @@ void _intermediateMED::numerotationPoints()
  * \endif
  */
 COORDINATE *
-_intermediateMED::getCoordinate(const string & coordinateSystem)
+_intermediateMED::getCoordinate()
 {
     const medModeSwitch mode=MED_FULL_INTERLACE;
+    const string coordinateSystem="CARTESIAN";
+
     int spaceDimension=points.begin()->second.coord.size();
     int numberOfNodes=points.size();
 
@@ -208,7 +210,7 @@ _intermediateMED::getConnectivity()
     do 
     {
 	// boucle sur les entites de la structure maillage :
-	//   - on parcourt une premiere fois avec i les mailles d'une entite pour récupérer 
+	//   - on parcourt une premiere fois avec i les mailles d'une entite pour rÃ©cupÃ©rer 
 	//     des infos sur les types geometriques, leur nombre et le nombre d'elements.
 	//   - on alloue la connectivite
 	//   - on parcourt une deuxieme fois avec j pour lire les noeuds.
@@ -232,7 +234,7 @@ _intermediateMED::getConnectivity()
 
 	    ++nbtype;
 	}
-	vcount.push_back(nbtype); // n'a pas été stocké dans la boucle
+	vcount.push_back(nbtype); // n'a pas Ã©tÃ© stockÃ© dans la boucle
 
 	
 	// Pour l'entite qu'on vient de parcourir, allocation des tableau et creation de la connectivite
@@ -270,7 +272,7 @@ _intermediateMED::getConnectivity()
 
 	for (int k=0; k!=numberOfTypes; ++k )
 	  {
-	    // pour chaque type géometrique k, copie des sommets dans connectivity et set dans Connectivity
+	    // pour chaque type geometrique k, copie des sommets dans connectivity et set dans Connectivity
 	    int nbSommetsParMaille = j->sommets.size();
 	    int nbSommets = vcount[k] * j->sommets.size();
 	    connectivity = new int[ nbSommets ];
@@ -278,7 +280,7 @@ _intermediateMED::getConnectivity()
 	    {
 		for ( unsigned n=0; n != j->sommets.size(); ++n)
 		    connectivity[nbSommetsParMaille*l+n] = j->sommets[n]->second.number;
-		maillage.erase(j);    ; // dangereux, mais optimise la mémoire consommée!
+		maillage.erase(j);    ; // dangereux, mais optimise la mÃ©moire consommÃ©e!
 	    }
 
 	    Connectivity->setNodal  (connectivity, entity, vtype[k]);
@@ -325,9 +327,8 @@ _intermediateMED::getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP
 
     for (unsigned int i=0; i!=this->groupes.size(); ++i)
     {
-	// si le groupe est vide, ou si le groupe n'est pas nommé : on passe au suivant
-	if (groupes[i].mailles.empty() || groupes[i].nom.empty())
-	    continue; 
+	if (groupes[i].mailles.size()==0)
+	    continue; // si le groupe est vide, on passe au suivant
 
 	int nb_geometric_types=1;
 	_groupe::mailleIter j=groupes[i].mailles.begin(); 
