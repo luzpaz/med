@@ -5,28 +5,27 @@
 
 using namespace MEDMEM;
 
+
 //=============================================================================
 /*!
  * Constructeur
  */
 //=============================================================================
-
-SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
-			     MESH * M) : 
-  SUPPORT(), 
-  IOR_Support(SALOME_MED::SUPPORT::_duplicate(S))
+SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr theSupport, MESH *theMesh):
+  IOR_Support(SALOME_MED::SUPPORT::_duplicate(theSupport)),
+  myMeshHolder(theMesh)
 {
-  BEGIN_OF("SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)");
-
-  SCRUTE(S);
-  SCRUTE(M);
-
-  setMesh(M ? M : new MESHClient(IOR_Support->getMesh()));
+  INFOS("SUPPORTClient:::SUPPORTClient = "<<this);
+  if(!theMesh){
+    SALOME_MED::MESH_var aMesh = theSupport->getMesh();
+    myMeshHolder.reset(new MESHClient(aMesh));
+  }
+  setMesh(myMeshHolder.get());
 
   blankCopy();
-
-  END_OF("SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)");
 }
+
+
 //=============================================================================
 /*!
  * Remplit les informations générales
@@ -118,9 +117,7 @@ void SUPPORTClient::fillCopy()
 //=============================================================================
 SUPPORTClient::~SUPPORTClient()
 {
-  BEGIN_OF("SUPPORTClient::~SUPPORTClient");
-
-  END_OF("SUPPORTClient::~SUPPORTClient");
+  INFOS("SUPPORTClient:::~SUPPORTClient = "<<this);
 }
 
 //=============================================================================

@@ -120,13 +120,14 @@ def getFieldIntObjectFromStudy(number,subnumber):
 #==============================================================================
 
 def getMedObjectFromStudy():
-    mySO = batchmode_salome.myStudy.FindObject("Objet MED")
-    Builder = batchmode_salome.myStudy.NewBuilder()
-    anAttr = Builder.FindOrCreateAttribute(mySO, "AttributeIOR")
-    obj = batchmode_salome.orb.string_to_object(anAttr.Value())
-    myObj = obj._narrow(SALOME_MED.MED)
-    return myObj
-
+    mySO = batchmode_salome.myStudy.FindObject("Med")
+    anIsPresent, aSObject = mySO.FindSubObject(1)
+    if aSObject:
+        anAttr = aSObject.FindAttribute("AttributeIOR")[1]
+        anObj = batchmode_salome.orb.string_to_object(anAttr.Value())
+        return  anObj._narrow(SALOME_MED.MED)
+    return None
+    
 studyCurrent = batchmode_salome.myStudyName
 studyCurrentId = batchmode_salome.myStudyId
 

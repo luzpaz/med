@@ -17,6 +17,7 @@ MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) :
   _complete(false)
 
 {
+  INFOS("MESHClient:::MESHClient = "<<this);
   BEGIN_OF("MESHClient::MESHClient(SALOME_MED::MESH_ptr m)");
 
   ASSERT(m);
@@ -164,6 +165,7 @@ void MESHClient::fillCopy()
 
 MESHClient::~MESHClient()
 {
+  INFOS("MESHClient:::~MESHClient = "<<this);
   BEGIN_OF("MESHClient::~MESHClient()");
   END_OF("MESHClient::~MESHClient()");
 }

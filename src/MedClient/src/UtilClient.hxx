@@ -2,7 +2,7 @@
 #define UTILCLIENT_HXX_
 
 #include <vector>
-#include <utilities.h>
+#include "utilities.h"
 
 namespace MEDMEM {
 template <typename TLocal, 
@@ -44,7 +44,7 @@ inline void convertCorbaArray (TLocal * & T, long &nT, const TCorbaSeq & S,
 
 template <typename TLocal,
 	  typename TCorbaSeq>
-inline void convertCorbaArray (vector<TLocal> & T, int &nT, 
+inline void convertCorbaArray (std::vector<TLocal> & T, int &nT, 
 			       const TCorbaSeq & S)
 {
   int i, n = S->length();
@@ -64,7 +64,7 @@ inline void convertCorbaArray (vector<TLocal> & T, int &nT,
 template <typename TCorba,
 	  typename TLocal,
 	  typename TCorbaSeq>
-inline void convertCorbaArray (vector<TLocal> & T, int &nT, 
+inline void convertCorbaArray (std::vector<TLocal> & T, int &nT, 
 			       const TCorbaSeq & S,
 			       void *f)
 {
@@ -90,7 +90,7 @@ template <typename TCorba,
 	  typename TLocal,
 	  typename TCorbaSeq,
 	  typename TInfo>
-inline void convertCorbaArray (vector<TLocal> & T, 
+inline void convertCorbaArray (std::vector<TLocal> & T, 
 			       const TCorbaSeq & S,
 			       void *f, TInfo M)
 {

@@ -4,9 +4,6 @@
 #include "MESHClient.hxx"
 #include "SUPPORTClient.hxx"
 #include "FIELDClient.hxx"
-#include CORBA_CLIENT_HEADER(MED)
-#define FIELDDOUBLEClient FIELDClient<double>
-#define FIELDINTClient FIELDClient<int>
 %}
 
 %include "libMedCorba_Swig.i"
@@ -37,10 +34,16 @@ class SUPPORTClient : public SUPPORT {
 
 };
 
-%rename(FIELDDOUBLEClient) FIELDClient<double>;
-FIELDDOUBLE * FIELDDOUBLEClient(const SALOME_MED::FIELDDOUBLE_ptr IOR_Field, 
-				SUPPORT * S = NULL);
 
-%rename(FIELDINTClient) FIELDClient<int>;
-FIELDDOUBLE * FIELDINTClient   (const SALOME_MED::FIELDINT_ptr IOR_Field, 
-				SUPPORT * S = NULL);
+class FIELDDOUBLEClient : public FIELDDOUBLE{
+public:
+  FIELDDOUBLEClient(const SALOME_MED::FIELDDOUBLE_ptr theField, SUPPORT *theSupport = NULL);
+  FIELDDOUBLE* GetPointer();
+};
+
+
+class FIELDINTClient : public FIELDINT{
+public:
+  FIELDINTClient(const SALOME_MED::FIELDINT_ptr theField, SUPPORT *theSupport = NULL);
+  FIELDINT* GetPointer();
+};

@@ -1,67 +1,79 @@
 #ifndef _FIELDCLIENT_HXX
 #define _FIELDCLIENT_HXX
 
-#include <SALOMEconfig.h>
-#include <utilities.h>
+#include <memory>
+
 #include "MEDMEM_Field.hxx"
+#include "MEDMEM_SWIG_FieldDouble.hxx"
+#include "MEDMEM_SWIG_FieldInt.hxx"
 #include "SUPPORTClient.hxx"
+
+#include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MED)
-
-
 
 
 void FIELDClient_value(FIELD<double> *F, 
 		       const SALOME_MED::FIELD_ptr IOR_Field);
 void FIELDClient_value(FIELD<int> *F, 
 		       const SALOME_MED::FIELD_ptr IOR_Field);
+
+typedef std::auto_ptr<MEDMEM::SUPPORT> TSupportHolder;
   
 
-template <typename T>
-FIELD<T> * FIELDClient(const SALOME_MED::FIELD_ptr IOR_Field, 
-			SUPPORT * S = NULL)
+template<typename TField>
+void FIELDClientInit(FIELD<TField>* theTarget, 
+		     const SALOME_MED::FIELD_ptr theSource, 
+		     TSupportHolder& theSupportHolder)
 {
-  BEGIN_OF("FIELDClient<T>");
-
-  if (!S) S = new SUPPORTClient(IOR_Field->getSupport());
-
-  FIELD<T> *F = new FIELD<T>();
-  F->setSupport(S);
-
-  F->setName(IOR_Field->getName());
-  SCRUTE(F->getName());
-
-  F->setDescription(IOR_Field->getDescription());
-  SCRUTE(F->getDescription());
-
-  int nc = IOR_Field->getNumberOfComponents();
-  F->setNumberOfComponents(nc);
-  SCRUTE(F->getNumberOfComponents());
-
-  F->setNumberOfValues(nc * S->getNumberOfElements(MED_ALL_ELEMENTS));
-  SCRUTE(F->getNumberOfValues());
-
-  string * _s = new string[nc];
-
-  SALOME_MED::string_array_var s;
-
-  s = IOR_Field->getComponentsNames();
-  for (int i=0; i<nc; i++)
-    _s[i] = s[i];
-  F->setComponentsNames(_s);
-
-//  s = IOR_Field->getComponentsDescriptions();
-//  for (int i=0; i<nc; i++)
-//    _s[i] = s[i];
-//  F->setComponentsDescriptions(_s);
-
-  F->setIterationNumber(IOR_Field->getIterationNumber());
-  F->setTime(IOR_Field->getTime());
-  F->setOrderNumber(IOR_Field->getOrderNumber());
-
-  FIELDClient_value(F, IOR_Field);
-
-  END_OF("FIELDClient<T>");
-  return F;
+  if(!theSupportHolder.get()){
+    SALOME_MED::SUPPORT_var aSupport = theSource->getSupport();
+    theSupportHolder.reset(new SUPPORTClient(aSupport));
+  }
+  theTarget->setSupport(theSupportHolder.get());
+  theTarget->setName(theSource->getName());
+  theTarget->setDescription(theSource->getDescription());
+  int aNbOfComponents = theSource->getNumberOfComponents();
+  theTarget->setNumberOfComponents(aNbOfComponents);
+  int aNbOfElements = theSupportHolder->getNumberOfElements(MED_ALL_ELEMENTS);
+  theTarget->setNumberOfValues(aNbOfComponents*aNbOfElements);
+  
+  std::vector<std::string> aComponentNames(aNbOfComponents);
+  SALOME_MED::string_array_var aNames = theSource->getComponentsNames();
+  for(int i = 0; i < aNbOfComponents; i++)
+    aComponentNames[i] = aNames[i];
+  theTarget->setComponentsNames(&aComponentNames[0]);
+  
+  theTarget->setIterationNumber(theSource->getIterationNumber());
+  theTarget->setTime(theSource->getTime());
+  theTarget->setOrderNumber(theSource->getOrderNumber());
+  
+  FIELDClient_value(theTarget,theSource);
 }
+
+
+
+class FIELDDOUBLEClient : public virtual FIELDDOUBLE{
+  TSupportHolder mySupportHolder;
+public:
+  FIELDDOUBLEClient(const SALOME_MED::FIELD_ptr theField, SUPPORT *theSupport = NULL):
+    mySupportHolder(theSupport)
+  {
+    FIELDClientInit(this,theField,mySupportHolder);
+  }
+  FIELDDOUBLE* GetPointer(){ return this;}
+};
+
+
+class FIELDINTClient : public virtual FIELDINT{
+  TSupportHolder mySupportHolder;
+public:
+  FIELDINTClient(const SALOME_MED::FIELDINT_ptr theField, SUPPORT *theSupport = NULL):
+    mySupportHolder(theSupport)
+  {
+    FIELDClientInit(this,theField,mySupportHolder);
+  }
+  FIELDINT* GetPointer(){ return this;}
+};
+
 
 #endif
