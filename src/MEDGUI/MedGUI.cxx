@@ -19,8 +19,6 @@
 #include "QAD_Tools.h"
 #include "QAD_FileDlg.h"
 
-#include "SMESH_TypeFilter.hxx"
-
 // QT Includes
 #include <qinputdialog.h>
 
