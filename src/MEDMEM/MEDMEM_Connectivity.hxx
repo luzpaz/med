@@ -6,6 +6,7 @@
 #include "utilities.h"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
+#include "MEDMEM_PolyhedronArray.hxx"
 
 using namespace MED_EN;
 
@@ -62,9 +63,17 @@ protected:
 
 					/*! pointer to an array which stores the nodal connectivity */
   MEDSKYLINEARRAY* _nodal;
+                                        /*! pointer to an array which stores the nodal connectivity only for polygons */
+  MEDSKYLINEARRAY* _polygonsNodal;
+                                        /*! pointer to an array which stores the nodal connectivity only for polyhedron */
+  POLYHEDRONARRAY* _polyhedronNodal;
 					/*! pointer to an array which stores 
 					    the descending connectivity */
   MEDSKYLINEARRAY* _descending;
+                                        /*!  pointer to an array which stores the descending connectivity only for polygons */
+  MEDSKYLINEARRAY* _polygonsDescending;
+                                        /*!  pointer to an array which stores the descending connectivity only for polyhedron */
+  MEDSKYLINEARRAY* _polyhedronDescending;
 					/*! pointer to an array which stores 
 					    the reverse nodal connectivity */
   MEDSKYLINEARRAY* _reverseNodalConnectivity;
@@ -147,6 +156,10 @@ public:
   
   inline void setEntityDimension(med_int EntityDimension);
 
+  void setPolygonsConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity, med_int* PolygonsConnectivity, med_int* PolygonsConnectivityIndex, med_int ConnectivitySize, med_int NumberOfPolygons);
+
+  void setPolyhedronConnectivity(medConnectivity ConnectivityType, med_int* PolyhedronConnectivity, med_int* PolyhedronIndex, med_int ConnectivitySize, med_int NumberOfPolyhedron, med_int* PolyhedronFacesIndex=(med_int*)NULL, med_int NumberOfFaces=0);
+
   inline bool   existConnectivity     (medConnectivity connectivityType, medEntityMesh Entity) const;
 
   virtual void          calculateConnectivity (medConnectivity connectivityType, medEntityMesh Entity);
@@ -168,7 +181,14 @@ public:
                                             medGeometryElement Type);
   virtual const med_int *     getConnectivityIndex (medConnectivity ConnectivityType,
 					    medEntityMesh Entity);
- 
+  const med_int* getPolygonsConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity);
+  const med_int* getPolygonsConnectivityIndex(medConnectivity ConnectivityType, medEntityMesh Entity);
+  med_int getNumberOfPolygons() const;
+  const med_int* getPolyhedronConnectivity(medConnectivity ConnectivityType);
+  const med_int* getPolyhedronFacesIndex();
+  const med_int* getPolyhedronIndex(medConnectivity ConnectivityType);
+  med_int getNumberOfPolyhedronFaces() const;
+  med_int getNumberOfPolyhedron() const;
   const CELLMODEL &   getType              (medGeometryElement Type) const; 
   const CELLMODEL *   getCellsTypes        (medEntityMesh Entity)    const 
                                     	    throw (MEDEXCEPTION);
