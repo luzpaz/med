@@ -561,11 +561,12 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	if ( isGroupAList[i] ) 
 	{
 	    // medi.groupes[i].groupes is a vector of element numbers; it points to it
+  	    medi.groupes[i].mailles.resize( medi.groupes[i].groupes.size() );
 	    std::vector<int>::const_iterator it=medi.groupes[i].groupes.begin();
-	    for(  ; it!=medi.groupes[i].groupes.end(); ++it)
+	    for(int j = 0 ; it!=medi.groupes[i].groupes.end(); ++it, ++j)
 	    {
 		// insert the iterator to the corresponding cell we stored in p_ma_table
-		medi.groupes[i].mailles.insert( p_ma_table[*it] );
+		medi.groupes[i].mailles[j] = p_ma_table[*it];
 	    }
 	    
 	}
@@ -574,12 +575,14 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	    int nelem=0;
 	    int nface=0;
 	    int ngeom=0;
+	    int ielem=0;
 	    std::set<_maille>::iterator p_ma;
 	    _maille maille2D;
 	    
 	    // medi.groupes[i].groupes is a vector of paired element and surface numbers
 	    // *it points to the element number,  *(it+1) points to the surface number
 	    std::vector<int>::const_iterator it=medi.groupes[i].groupes.begin();
+	    medi.groupes[i].mailles.resize( medi.groupes[i].groupes.size() / 2 );
 	    for(  ; it!=medi.groupes[i].groupes.end(); ++it)
 	    {
 		nelem=*it;
@@ -598,7 +601,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 		maille2D.sommets.resize(l);
 		maille2D.geometricType = get2DMedGeomType(l);
 		p_ma = medi.maillage.insert(maille2D).first; // we insert the face in our mesh
-		medi.groupes[i].mailles.insert(p_ma); // and insert an iterator on it in our group
+		medi.groupes[i].mailles[ielem++]=p_ma; // and insert an iterator on it in our group
 		maille2D.sommets.clear();
 	    }
 
