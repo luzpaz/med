@@ -217,7 +217,7 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume) const 
    Check up the compatibility of fields before performing an arithmetic operation
   \endif
 */
-void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (MEDEXCEPTION)
+void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n , bool checkUnit ) throw (MEDEXCEPTION)
 {
     string diagnosis;
 
@@ -233,20 +233,23 @@ void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (
       diagnosis+="They don't have the same number of values!";
     else
       {
-	for(int i=0; i<m._numberOfComponents; i++)
-	{
-// Not yet implemented   
-//	    if(m._componentsTypes[i] != n._componentsTypes[i])
-//	    {
-//		diagnosis+="Components don't have the same types!";
-//		break;
-//	    }
-	  if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
-	    {
-	      diagnosis+="Components don't have the same units!";
-	      break;
-	    }
-	}
+	if(checkUnit)
+	  {
+	    for(int i=0; i<m._numberOfComponents; i++)
+	      {
+		// Not yet implemented   
+		//	    if(m._componentsTypes[i] != n._componentsTypes[i])
+		//	    {
+		//		diagnosis+="Components don't have the same types!";
+		//		break;
+		//	    }
+		if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
+		  {
+		    diagnosis+="Components don't have the same units!";
+		    break;
+		  }
+	      }
+	  }
       }
 
     if(diagnosis.size()) // if fields are not compatible : complete diagnosis and throw exception
@@ -263,6 +266,50 @@ void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (
 	throw MEDEXCEPTION(diagnosis.c_str());
     }
 
+}
+
+void FIELD_::_deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n , bool checkUnit ) throw (MEDEXCEPTION)
+{
+  string diagnosis;
+
+    // check-up, fill diagnosis if some incompatibility is found.
+    if(m._support != n._support)
+      {
+	if(!(m._support->deepCompare(*n._support)))
+	  diagnosis+="They don't have the same support!";
+      }
+    else if(m._numberOfComponents != n._numberOfComponents)
+      diagnosis+="They don't have the same number of components!";
+    else if(m._numberOfValues != n._numberOfValues)
+      diagnosis+="They don't have the same number of values!";
+    else
+      {
+	if(checkUnit)
+	  {
+	    for(int i=0; i<m._numberOfComponents; i++)
+	      {
+		if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
+		  {
+		    diagnosis+="Components don't have the same units!";
+		    break;
+		  }
+	      }
+	  }
+      }
+
+    if(diagnosis.size()) // if fields are not compatible : complete diagnosis and throw exception
+    {
+	diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
+	         + n._name + " are not compatible.\n" + diagnosis;
+	throw MEDEXCEPTION(diagnosis.c_str());
+    }
+
+    if( m.getNumberOfValues()<=0 || m.getNumberOfComponents()<=0) // check up the size is strictly positive
+    {
+	diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
+	         + n._name + " are empty! (size<=0).\n";
+	throw MEDEXCEPTION(diagnosis.c_str());
+    }
 }
 
 //  void     FIELD_::setIterationNumber (int IterationNumber)           {};

@@ -318,6 +318,29 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
   END_OF(LOC);
 };
 
+/*
+  for a deep comparison of 2 meshes.
+*/
+bool MESH::deepCompare(const MESH& other) const
+{
+  int size1=getSpaceDimension()*getNumberOfNodes();
+  int size2=other.getSpaceDimension()*other.getNumberOfNodes();
+  if(size1!=size2)
+    return false;
+  const double* coord1=getCoordinates(MED_FULL_INTERLACE);
+  const double* coord2=other.getCoordinates(MED_FULL_INTERLACE);
+  bool ret=true;
+  for(int i=0;i<size1 && ret;i++)
+    {
+      ret=(fabs(coord1[i]-coord2[i])<1e-15);
+    }
+  if(ret)
+    {
+      return _connectivity->deepCompare(*other._connectivity);
+    }
+  return ret;
+}
+
 
 //  Node MESH::Donne_Barycentre(const Maille &m) const
 //  {

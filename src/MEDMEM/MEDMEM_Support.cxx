@@ -772,6 +772,44 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
   return operatorReturn;
 };
 
+/*!
+  operator == + in case false a test if coordinates and connectivity of _mesh and support->_mesh are the same
+*/
+bool MEDMEM::SUPPORT::deepCompare(const SUPPORT &support) const
+{
+  bool operatorReturn =(_entity == support._entity) &&
+    (_numberOfGeometricType == support._numberOfGeometricType) &&
+    ( (_isOnAllElts && support._isOnAllElts) || (!_isOnAllElts  && !support._isOnAllElts) ) &&
+    (_totalNumberOfElements == support._totalNumberOfElements);
+  if (operatorReturn)
+    {
+      if (!_isOnAllElts)
+	{
+	  for (int i=0; i<_numberOfGeometricType && operatorReturn; i++)
+	    {
+	      operatorReturn = (_geometricType[i] == support._geometricType[i]) &&
+		(_numberOfElements[i] == support._numberOfElements[i]) &&
+		(_numberOfGaussPoint[i] == support._numberOfGaussPoint[i]);
+	      if (operatorReturn)
+		{
+		  for (int j=0; j<_numberOfElements[i]; j++)
+		    {
+		      operatorReturn = (getNumber(_geometricType[i])[j] ==
+			 support.getNumber(_geometricType[i])[j]);
+		    }
+		}
+	    }
+	}
+    }
+  if(operatorReturn)
+    {
+      if(!(*_mesh == *support._mesh))
+	{
+	  return _mesh->deepCompare(*support._mesh);
+	}
+    }
+  return operatorReturn;
+}
 
 /*!
   addReference : reference counter presently disconnected in C++ -> just connected for client.

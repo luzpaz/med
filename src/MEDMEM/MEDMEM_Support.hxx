@@ -149,7 +149,7 @@ public:
   friend ostream & operator<<(ostream &os,const SUPPORT &my);
 
   bool operator == (const SUPPORT &support) const;
-
+  bool deepCompare(const SUPPORT &support) const;
   // function to set all value when SUPPORT was created by MedMedDriver without all MESH information !!! Change with new API !
   void update();
 

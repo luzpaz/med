@@ -119,6 +119,7 @@ public :
   MESH(MESH &m);
   MESH & operator=(const MESH &m);
   virtual bool operator==(const MESH& other) const;
+  virtual bool deepCompare(const MESH& other) const;
   MESH( driverTypes driverType, const string & fileName="",
 	const string & meshName="") throw (MEDEXCEPTION);
   virtual ~MESH();

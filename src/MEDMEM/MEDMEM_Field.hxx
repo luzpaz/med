@@ -127,7 +127,8 @@ protected:
   MED_EN::med_type_champ _valueType ;
 
   vector<GENDRIVER *> _drivers; // Storage of the drivers currently in use
-  static void _checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (MEDEXCEPTION);
+  static void _checkFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true ) throw (MEDEXCEPTION);
+  static void _deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true ) throw (MEDEXCEPTION);
   void _checkNormCompatibility(const FIELD<double>* p_field_volume=NULL) const  throw (MEDEXCEPTION);
   FIELD<double>* _getFieldSize() const;
 
@@ -585,14 +586,18 @@ public:
   FIELD& operator*=(const FIELD& m);
   FIELD& operator/=(const FIELD& m);
   static FIELD* add(const FIELD& m, const FIELD& n);
+  static FIELD* addDeep(const FIELD& m, const FIELD& n);
   static FIELD* sub(const FIELD& m, const FIELD& n);
+  static FIELD* subDeep(const FIELD& m, const FIELD& n);
   static FIELD* mul(const FIELD& m, const FIELD& n);
+  static FIELD* mulDeep(const FIELD& m, const FIELD& n);
   static FIELD* div(const FIELD& m, const FIELD& n);
+  static FIELD* divDeep(const FIELD& m, const FIELD& n);
   double normMax() const throw (MEDEXCEPTION);
   double norm2() const throw (MEDEXCEPTION);
   void   applyLin(T a, T b);
   template <T T_function(T)> void applyFunc();
-  static FIELD* scalarProduct(const FIELD& m, const FIELD& n);
+  static FIELD* scalarProduct(const FIELD& m, const FIELD& n, bool deepCheck=false);
   double normL2(int component, const FIELD<double> * p_field_volume=NULL) const;
   double normL2(const FIELD<double> * p_field_volume=NULL) const;
   double normL1(int component, const FIELD<double> * p_field_volume=NULL) const;
@@ -866,6 +871,30 @@ FIELD<T>* FIELD<T>::add(const FIELD& m, const FIELD& n)
     return result;
 }
 
+/*! Same as add method except that field check is deeper.
+ */
+template <class T>
+FIELD<T>* FIELD<T>::addDeep(const FIELD& m, const FIELD& n)
+{
+    BEGIN_OF("FIELD<T>::addDeep(const FIELD & m, const FIELD& n)");
+    FIELD_::_deepCheckFieldCompatibility(m, n); // may throw exception
+
+    // Select mode : avoid if possible any calculation of other mode for fields m or *this
+    MED_EN::medModeSwitch mode;
+    if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
+	mode=m.getvalue()->getMode();
+    else
+	mode=n.getvalue()->getMode();
+    
+    // Creation of a new field
+    FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
+    result->_operationInitialize(m,n,"+"); // perform Atribute's initialization
+    result->_add_in_place(m,n,mode); // perform addition
+
+    END_OF("FIELD<T>::addDeep(const FIELD & m, const FIELD& n)");
+    return result;
+}
+
 /*!
      Overload substraction operator.
      This operation is authorized only for compatible fields that have the same support.
@@ -995,6 +1024,30 @@ FIELD<T>* FIELD<T>::sub(const FIELD& m, const FIELD& n)
     return result;
 }
 
+/*! Same as sub method except that field check is deeper.
+ */
+template <class T>
+FIELD<T>* FIELD<T>::subDeep(const FIELD& m, const FIELD& n)
+{
+    BEGIN_OF("FIELD<T>::subDeep(const FIELD & m, const FIELD& n)");
+    FIELD_::_deepCheckFieldCompatibility(m, n); // may throw exception
+
+    // Select mode : avoid if possible any calculation of other mode for fields m or *this
+    MED_EN::medModeSwitch mode;
+    if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
+	mode=m.getvalue()->getMode();
+    else
+	mode=n.getvalue()->getMode();
+    
+    // Creation of a new field
+    FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
+    result->_operationInitialize(m,n,"-"); // perform Atribute's initialization
+    result->_sub_in_place(m,n,mode); // perform substraction
+
+    END_OF("FIELD<T>::subDeep(const FIELD & m, const FIELD& n)");
+    return result;
+}
+
 /*!
      Overload multiplication operator.
      This operation is authorized only for compatible fields that have the same support.
@@ -1019,7 +1072,7 @@ template <class T>
 const FIELD<T> FIELD<T>::operator*(const FIELD & m) const
 {
     BEGIN_OF("FIELD<T>::operator*(const FIELD & m)");
-    FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
+    FIELD_::_checkFieldCompatibility(*this, m, false); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
     MED_EN::medModeSwitch mode;
@@ -1046,7 +1099,7 @@ template <class T>
 FIELD<T>& FIELD<T>::operator*=(const FIELD & m)
 {
     BEGIN_OF("FIELD<T>::operator*=(const FIELD & m)");
-    FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
+    FIELD_::_checkFieldCompatibility(*this, m, false); // may throw exception
 
     // We choose to keep *this mode, even if it may cost a re-calculation for m
     MED_EN::medModeSwitch mode=this->getvalue()->getMode();
@@ -1075,7 +1128,7 @@ template <class T>
 FIELD<T>* FIELD<T>::mul(const FIELD& m, const FIELD& n)
 {
     BEGIN_OF("FIELD<T>::mul(const FIELD & m, const FIELD& n)");
-    FIELD_::_checkFieldCompatibility(m, n); // may throw exception
+    FIELD_::_checkFieldCompatibility(m, n, false); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
     MED_EN::medModeSwitch mode;
@@ -1093,6 +1146,29 @@ FIELD<T>* FIELD<T>::mul(const FIELD& m, const FIELD& n)
     return result;
 }
 
+/*! Same as mul method except that field check is deeper.
+ */
+template <class T>
+FIELD<T>* FIELD<T>::mulDeep(const FIELD& m, const FIELD& n)
+{
+    BEGIN_OF("FIELD<T>::mulDeep(const FIELD & m, const FIELD& n)");
+    FIELD_::_deepCheckFieldCompatibility(m, n, false); // may throw exception
+
+    // Select mode : avoid if possible any calculation of other mode for fields m or *this
+    MED_EN::medModeSwitch mode;
+    if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
+	mode=m.getvalue()->getMode();
+    else
+	mode=n.getvalue()->getMode();
+    
+    // Creation of a new field
+    FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
+    result->_operationInitialize(m,n,"*"); // perform Atribute's initialization
+    result->_mul_in_place(m,n,mode); // perform multiplication
+
+    END_OF("FIELD<T>::mulDeep(const FIELD & m, const FIELD& n)");
+    return result;
+}
 
 /*!
      Overload division operator.
@@ -1118,7 +1194,7 @@ template <class T>
 const FIELD<T> FIELD<T>::operator/(const FIELD & m) const
 {
     BEGIN_OF("FIELD<T>::operator/(const FIELD & m)");
-    FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
+    FIELD_::_checkFieldCompatibility(*this, m, false); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
     MED_EN::medModeSwitch mode;
@@ -1146,7 +1222,7 @@ template <class T>
 FIELD<T>& FIELD<T>::operator/=(const FIELD & m)
 {
     BEGIN_OF("FIELD<T>::operator/=(const FIELD & m)");
-    FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
+    FIELD_::_checkFieldCompatibility(*this, m, false); // may throw exception
 
     // We choose to keep *this mode, even if it may cost a re-calculation for m
     MED_EN::medModeSwitch mode=this->getvalue()->getMode();
@@ -1175,7 +1251,7 @@ template <class T>
 FIELD<T>* FIELD<T>::div(const FIELD& m, const FIELD& n)
 {
     BEGIN_OF("FIELD<T>::div(const FIELD & m, const FIELD& n)");
-    FIELD_::_checkFieldCompatibility(m, n); // may throw exception
+    FIELD_::_checkFieldCompatibility(m, n, false); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
     MED_EN::medModeSwitch mode;
@@ -1191,6 +1267,30 @@ FIELD<T>* FIELD<T>::div(const FIELD& m, const FIELD& n)
 
     END_OF("FIELD<T>::div(const FIELD & m, const FIELD& n)");
     return result;
+}
+
+/*! Same as div method except that field check is deeper.
+ */
+template <class T>
+FIELD<T>* FIELD<T>::divDeep(const FIELD& m, const FIELD& n)
+{
+  BEGIN_OF("FIELD<T>::divDeep(const FIELD & m, const FIELD& n)");
+  FIELD_::_deepCheckFieldCompatibility(m, n, false); // may throw exception
+
+  // Select mode : avoid if possible any calculation of other mode for fields m or *this
+  MED_EN::medModeSwitch mode;
+  if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
+    mode=m.getvalue()->getMode();
+  else
+    mode=n.getvalue()->getMode();
+    
+  // Creation of a new field
+  FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
+  result->_operationInitialize(m,n,"/"); // perform Atribute's initialization
+  result->_div_in_place(m,n,mode); // perform division
+
+  END_OF("FIELD<T>::divDeep(const FIELD & m, const FIELD& n)");
+  return result;
 }
 
 
@@ -1451,9 +1551,12 @@ template <class T> void FIELD<T>::applyLin(T a, T b)
  *   Each value of it is the scalar product of the two argument's fields.
  *   The user is in charge of memory deallocation.
  */
-template <class T> FIELD<T>* FIELD<T>::scalarProduct(const FIELD & m, const FIELD & n)
+template <class T> FIELD<T>* FIELD<T>::scalarProduct(const FIELD & m, const FIELD & n, bool deepCheck)
 {
-    FIELD_::_checkFieldCompatibility( m, n); // may throw exception
+  if(!deepCheck)
+    FIELD_::_checkFieldCompatibility( m, n, false); // may throw exception
+  else
+    FIELD_::_deepCheckFieldCompatibility(m, n, false);
     // we need a MED_FULL_INTERLACE representation of m & n to compute the scalar product
     const MED_EN::medModeSwitch mode=MED_EN::MED_FULL_INTERLACE; 
 

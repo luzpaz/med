@@ -846,7 +846,7 @@ void CONNECTIVITY::updateGroup(vector<GROUP*> myFamilies)
 }
 
 //------------------------------------------------------------------------------------------------------------------//
-const int * CONNECTIVITY::getConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type) 
+const int * CONNECTIVITY::getConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type)
 //------------------------------------------------------------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::getConnectivity";
@@ -881,6 +881,46 @@ const int * CONNECTIVITY::getConnectivity(medConnectivity ConnectivityType, medE
   } else 
     if (_constituent != NULL)
       return _constituent->getConnectivity(ConnectivityType,Entity,Type);
+  
+  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Entity not defined !"));
+}  
+
+//------------------------------------------------------------------------------------------------------------------//
+int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type)
+//------------------------------------------------------------------------------------------------------------------//
+{
+  const char * LOC = "CONNECTIVITY::getConnectivity";
+  BEGIN_OF(LOC);
+
+  MEDSKYLINEARRAY * Connectivity;
+  if (Entity==_entity) {
+    
+    if (ConnectivityType==MED_NODAL)
+      {
+	calculateNodalConnectivity();
+	Connectivity=_nodal;
+      }
+    else
+      {
+	calculateDescendingConnectivity();
+	Connectivity=_descending;
+      }
+    
+    if (Connectivity!=NULL)
+      if (Type==MED_ALL_ELEMENTS)
+	return Connectivity->getLength();
+      else {
+	for (int i=0; i<_numberOfTypes; i++)
+	  if (_geometricTypes[i]==Type)
+	    //return Connectivity->getI(i+1);
+	    return Connectivity->getNumberOfI(_count[i]);
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Type not found !"));
+      }
+    else
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Connectivity not defined !"));
+  } else 
+    if (_constituent != NULL)
+      return _constituent->getConnectivityLength(ConnectivityType,Entity,Type);
   
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Entity not defined !"));
 }  
@@ -1721,4 +1761,25 @@ ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
 	os << endl << *co._constituent << endl;
 
     return os;
+}
+
+/*! 
+  Perform a deep comparison of the 2 connectivities in NODAL mode and on all elements.
+*/
+bool CONNECTIVITY::deepCompare(const CONNECTIVITY& other) const
+{
+  CONNECTIVITY* temp=(CONNECTIVITY* )this;
+  const int *conn1=temp->getConnectivity(MED_NODAL,_entity,MED_ALL_ELEMENTS);
+  int size1=temp->getConnectivityLength(MED_NODAL,_entity,MED_ALL_ELEMENTS);
+  temp=(CONNECTIVITY* )(&other);
+  const int *conn2=temp->getConnectivity(MED_NODAL,_entity,MED_ALL_ELEMENTS);
+  int size2=temp->getConnectivityLength(MED_NODAL,_entity,MED_ALL_ELEMENTS);
+  if(size1!=size2)
+    return false;
+  bool ret=true;
+  for(int i=0;i<size1 && ret;i++)
+    {
+      ret=(conn1[i]==conn2[i]);
+    }
+  return ret;
 }
