@@ -929,7 +929,7 @@ SUPPORT *MEDMEM::SUPPORT::getComplement() const
 
   int numberOfGeometricType;
   int *numberOfGaussPoint = new int[1];
-  numberOfGaussPoint[0] = 1;
+  numberOfGaussPoint[0]=1;
   int *numberOfElements;
   medGeometryElement *geometricType;
   MEDSKYLINEARRAY *mySkyLineArray;
@@ -1008,7 +1008,59 @@ SUPPORT *MEDMEM::SUPPORT::getComplement() const
   ret->setNumberOfGeometricType(numberOfGeometricType);
   ret->setNumberOfGaussPoint(numberOfGaussPoint);
   ret->setNumber(mySkyLineArray);
+
+  delete [] numberOfElements;
+  delete [] geometricType;
+  delete [] numberOfGaussPoint;
   return ret;
+}
+
+/*!
+  returns a new support the user has to delete. Entity is either MED_NODE to obtain node elements lying on boundary of "this"
+  or MED_FACE,MED_EDGE (depends on the this->_mesh dimension).
+ */
+SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) : ";
+  BEGIN_OF(LOC);
+  int spaceDimension=_mesh->getSpaceDimension();
+  MED_EN::medEntityMesh baseEntity=Entity;
+  if (spaceDimension == 3) 
+    if (Entity!=MED_FACE)
+      if(Entity==MED_NODE)
+	baseEntity=MED_FACE;
+      else
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
+  if (spaceDimension == 2) 
+    if (Entity!=MED_EDGE)
+      if(Entity==MED_NODE)
+	baseEntity=MED_EDGE;
+      else
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
+  if(_isOnAllElts)
+    return _mesh->getBoundaryElements(Entity);
+
+  SUPPORT* mySupport=new SUPPORT(_mesh,"Boundary",Entity);
+  mySupport->setAll(false);
+  const int * myConnectivityValue=_mesh->getReverseConnectivity(MED_DESCENDING);
+  const int * myConnectivityIndex=_mesh->getReverseConnectivityIndex(MED_DESCENDING);
+  int numberOf=_mesh->getNumberOfElements(baseEntity,MED_ALL_ELEMENTS);
+  const int *ids=_number->getValue();
+  set<int> idsSet(ids,ids+_totalNumberOfElements);
+  list<int> myElementsList;
+  for (int i=0;i<numberOf;i++)
+    if (myConnectivityValue[myConnectivityIndex[i]]==0 && idsSet.find(myConnectivityValue[myConnectivityIndex[i]+1])!=idsSet.end())
+      {
+	  myElementsList.push_back(i+1);
+      }
+  if(Entity==MED_NODE)
+    {
+      return _mesh->buildSupportOnNodeFromElementList(myElementsList,baseEntity);
+    }
+  else
+    {
+      return _mesh->buildSupportOnElementsFromElementList(myElementsList,baseEntity);
+    }
 }
 
 /*!

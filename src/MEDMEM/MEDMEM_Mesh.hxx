@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <map>
 
 #include "utilities.h"
@@ -94,6 +95,7 @@ protected :
   bool isEmpty() const;
   // if this->_isAGrid, assure that _coordinate and _connectivity are filled
 
+  virtual SUPPORT *getBoundaryNodes() throw (MEDEXCEPTION);
 public :
 
   // Add your personnal driver line (step 2)
@@ -249,6 +251,8 @@ public :
    * (There is no way to know which family has change.)
    */
   void createFamilies();
+  SUPPORT *buildSupportOnNodeFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) throw (MEDEXCEPTION);
+  SUPPORT *buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) throw (MEDEXCEPTION);
   /*!
    *For ref counter. Only for client
    */

@@ -195,6 +195,7 @@ public:
   void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
   bool belongsTo(const SUPPORT& other, bool deepCompare=false) const;
   SUPPORT *getComplement() const;
+  SUPPORT *getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION);
   //A.G. Addings for RC
   virtual void addReference() const;
   virtual void removeReference() const;

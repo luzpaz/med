@@ -480,6 +480,12 @@ class SUPPORT
       {
 	return self->getComplement();
       }
+
+    %newobject getBoundaryElements(MED_EN::medEntityMesh Entity) const;
+    SUPPORT *getBoundaryElements(MED_EN::medEntityMesh Entity) const
+      {
+	return self->getBoundaryElements(Entity);
+      }
   }
 };
 

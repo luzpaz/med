@@ -4,8 +4,6 @@
 */
 
 #include <math.h>
-
-#include <list>
 #include <map>
 #include <sstream>
 
@@ -498,17 +496,14 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   BEGIN_OF(LOC) ;
   // some test :
   // actually we could only get face (in 3D) and edge (in 2D)
+  if(Entity==MED_NODE)
+    return getBoundaryNodes();
   if (_spaceDimension == 3) 
     if (Entity != MED_FACE)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
   if (_spaceDimension == 2) 
     if (Entity != MED_EDGE)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
-  
-  // well, all rigth !
-  SUPPORT * mySupport = new SUPPORT(this,"Boundary",Entity);
-  //mySupport.setDescription("boundary of type ...");
-  mySupport->setAll(false);
   
 
   const int * myConnectivityValue = getReverseConnectivity(MED_DESCENDING) ;
@@ -521,15 +516,102 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
       myElementsList.push_back(i+1) ;
       size++ ;
     }
+  return buildSupportOnElementsFromElementList(myElementsList,Entity);
+}
+
+SUPPORT *MESH::getBoundaryNodes() throw (MEDEXCEPTION)
+{
+  MED_EN::medEntityMesh entityToParse;
+  if (_spaceDimension == 3) 
+    entityToParse=MED_FACE;
+  if (_spaceDimension == 2) 
+    entityToParse=MED_EDGE;
+
+  SUPPORT * mySupport = new SUPPORT(this,"Boundary",MED_EN::MED_NODE);
+  mySupport->setAll(false);
+  const int *myConnectivityValue=getReverseConnectivity(MED_DESCENDING);
+  const int *myConnectivityIndex=getReverseConnectivityIndex(MED_DESCENDING);
+
+  int numberOf = getNumberOfElements(entityToParse,MED_ALL_ELEMENTS);
+  list<int> myElementsList;
+  int i;
+  for (i=0;i<numberOf;i++)
+    if (myConnectivityValue[myConnectivityIndex[i]]== 0)
+      {
+	myElementsList.push_back(i+1);
+      }
+  return buildSupportOnNodeFromElementList(myElementsList,entityToParse);
+}
+
+
+/*!
+  Method created to factorize code. This method creates a new support on NODE (to deallocate) containing all the nodes id contained in elements 'listOfElt' of
+  entity 'entity'.
+ */
+SUPPORT *MESH::buildSupportOnNodeFromElementList(const list<int>& listOfElt,MED_EN::medEntityMesh entity) throw (MEDEXCEPTION)
+{
+  SUPPORT * mySupport = new SUPPORT(this,"Boundary",MED_EN::MED_NODE);
+  mySupport->setAll(false);
+  const int *myConnectivityValueNodal=getConnectivity(MED_FULL_INTERLACE,MED_NODAL,entity,MED_ALL_ELEMENTS);
+  const int *myConnectivityIndexNodal=getConnectivityIndex(MED_NODAL,entity);
+
+  int i;
+  set<int> nodes;
+  for(list<int>::const_iterator iter=listOfElt.begin();iter!=listOfElt.end();iter++)
+    {
+      for(i=myConnectivityIndexNodal[*iter-1]-1;i<myConnectivityIndexNodal[*iter]-1;i++)
+	nodes.insert(myConnectivityValueNodal[i]);
+    }
+
+  int numberOfGeometricType=1;
+  medGeometryElement* geometricType=new medGeometryElement[1];
+  geometricType[0]=MED_POINT1;
+  int *numberOfGaussPoint=new int[1];
+  numberOfGaussPoint[0]=1;
+  int *numberOfElements=new int[1];
+  numberOfElements[0]=nodes.size();
+  int *mySkyLineArrayIndex=new int[2];
+  mySkyLineArrayIndex[0]=1;
+  mySkyLineArrayIndex[1]=1+numberOfElements[0];
+  int *tab=new int[numberOfElements[0]];
+  i=0;
+  for(set<int>::iterator iter2=nodes.begin();iter2!=nodes.end();iter2++)
+    tab[i++]=*iter2;
+  MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(1,numberOfElements[0],mySkyLineArrayIndex,tab,true);
+
+  mySupport->setNumberOfGeometricType(numberOfGeometricType);
+  mySupport->setGeometricType(geometricType);
+  mySupport->setNumberOfGaussPoint(numberOfGaussPoint);
+  mySupport->setNumberOfElements(numberOfElements);
+  mySupport->setTotalNumberOfElements(numberOfElements[0]);
+  mySupport->setNumber(mySkyLineArray);
+  
+  delete[] numberOfElements;
+  delete[] numberOfGaussPoint;
+  delete[] geometricType;
+  return mySupport;
+}
+
+/*!
+  Method created to factorize code. This method creates a new support on entity 'entity' (to deallocate) containing all the entities contained in 
+  elements 'listOfElt' of entity 'entity'.
+ */
+SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) throw (MEDEXCEPTION)
+{
+  const char * LOC = "MESH::buildSupportOnElementsFromElementList : " ;
+  BEGIN_OF(LOC) ;
+  SUPPORT * mySupport = new SUPPORT(this,"Boundary",entity);
+  //mySupport.setDescription("boundary of type ...");
+  mySupport->setAll(false);
   // Well, we must know how many geometric type we have found
+  int size=listOfElt.size();
   int * myListArray = new int[size] ;
   int id = 0 ;
-  list<int>::iterator myElementsListIt ;
-  for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
+  list<int>::const_iterator myElementsListIt ;
+  for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++) {
     myListArray[id]=(*myElementsListIt) ;
     id ++ ;
   }
-
   int numberOfGeometricType ;
   medGeometryElement* geometricType ;
   int * numberOfGaussPoint ;
@@ -538,11 +620,11 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   //MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY() ;
   int * mySkyLineArrayIndex ;
 
-  int numberOfType = getNumberOfTypes(Entity) ;
+  int numberOfType = getNumberOfTypes(entity) ;
   if (numberOfType == 1) { // wonderfull : it's easy !
     numberOfGeometricType = 1 ;
     geometricType = new medGeometryElement[1] ;
-    const medGeometryElement *  allType = getTypes(Entity);
+    const medGeometryElement *  allType = getTypes(entity);
     geometricType[0] = allType[0] ;
     numberOfGaussPoint = new int[1] ;
     numberOfGaussPoint[0] = 1 ;
@@ -556,8 +638,8 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   }
   else {// hemmm
     map<medGeometryElement,int> theType ;
-    for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
-      medGeometryElement myType = getElementType(Entity,*myElementsListIt) ;
+    for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++) {
+      medGeometryElement myType = getElementType(entity,*myElementsListIt) ;
       if (theType.find(myType) != theType.end() )
 	theType[myType]+=1 ;
       else
@@ -565,7 +647,7 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
     }
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
-    //const medGeometryElement *  allType = getTypes(Entity); !! UNUSZED VARIABLE !!
+    //const medGeometryElement *  allType = getTypes(entity); !! UNUSZED VARIABLE !!
     numberOfGaussPoint = new int[numberOfGeometricType] ;
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfElements = new int[numberOfGeometricType] ;
