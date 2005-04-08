@@ -481,8 +481,8 @@ class SUPPORT
 	return self->getComplement();
       }
 
-    %newobject getBoundaryElements(MED_EN::medEntityMesh Entity) const;
-    SUPPORT *getBoundaryElements(MED_EN::medEntityMesh Entity) const
+    %newobject getBoundaryElements(medEntityMesh Entity) const;
+    SUPPORT *getBoundaryElements(medEntityMesh Entity) const
       {
 	return self->getBoundaryElements(Entity);
       }
@@ -1163,6 +1163,8 @@ public :
   GROUP * getGroup(medEntityMesh Entity,int i);
 
   medGeometryElement getElementType(medEntityMesh Entity,int Number);
+
+  int getElementContainingPoint(const double *coord);
 
   %extend {
     %newobject getBoundaryElements(medEntityMesh );
