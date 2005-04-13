@@ -96,13 +96,13 @@ throw (SALOME::SALOME_Exception)
 */
 //=============================================================================
 
-SALOME::Sender_ptr FIELDINT_i::getSenderForValue( SALOME_MED::medModeSwitch mode ) 
+SALOME::SenderInt_ptr FIELDINT_i::getSenderForValue( SALOME_MED::medModeSwitch mode ) 
 throw (SALOME::SALOME_Exception)
 {
 	if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME::Sender_ptr ret;
+        SALOME::SenderInt_ptr ret;
         try
         {
 		medModeSwitch modemed=convertIdlModeToMedMode(mode);
