@@ -607,7 +607,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	    }
 
 	}
-	// medi.groupes[i].groupes.clear(); // we don't need element numbers anymore
+        medi.groupes[i].groupes.clear(); // we don't need element numbers anymore
 	
     }
 
