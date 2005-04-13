@@ -1803,7 +1803,7 @@ template <class T> int FIELD<T>::addDriver(driverTypes driverType,
 					   const string & driverName/*="Default Field Name"*/,
 					   MED_EN::med_mode_acces access)
 {
-  const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name\,MED_EN::med_mode_acces access) : ";
+  const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName,const string & driverName,MED_EN::med_mode_acces access) :";
 
   GENDRIVER * driver;
 
