@@ -196,8 +196,6 @@ void _intermediateMED::treatGroupes()
     while( j!=grp.groupes.end() ) {
       int grpInd = *j-1;
       if ( grpInd < 0 || grpInd >= groupes.size() ) {
-	cout << "Bad subgroup index: " << grpInd << ", in " << i << " groupe.nom=" << grp.nom << endl;
-
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad subgroup index: " << grpInd <<
                                      ", in " << i << " groupe.nom=" << grp.nom));
       }
