@@ -5,7 +5,7 @@
 
 namespace MEDMEM{
 class FIELDINTClient :
-  public FIELDClient<int,SALOME_MED::FIELDINT>
+  public FIELDClient<int>
 {
 public:
   FIELDINTClient(SALOME_MED::FIELDINT_ptr ptrCorba,

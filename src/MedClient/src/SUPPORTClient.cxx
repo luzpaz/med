@@ -104,9 +104,11 @@ void SUPPORTClient::fillCopy()
 
     const int * index, * value;
     long n_index, n_value;
-
-    value=(const int *)ReceiverFactory::getValue(IOR_Support->getSenderForNumber(MED_ALL_ELEMENTS),n_value);
-    index=(const int *)ReceiverFactory::getValue(IOR_Support->getSenderForNumberIndex(),n_index);
+    
+    SALOME::SenderInt_var senderForValue=IOR_Support->getSenderForNumber(MED_ALL_ELEMENTS);
+    value=(const int *)ReceiverFactory::getValue(senderForValue,n_value);
+    SALOME::SenderInt_var senderForIndex=IOR_Support->getSenderForNumberIndex();
+    index=(const int *)ReceiverFactory::getValue(senderForIndex,n_index);
     
     SCRUTE(n_index);
     SCRUTE(n_value);

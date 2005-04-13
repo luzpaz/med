@@ -6,7 +6,7 @@
 namespace MEDMEM{
     
 class FIELDDOUBLEClient :
-  public FIELDClient<double,SALOME_MED::FIELDDOUBLE>
+  public FIELDClient<double>
 {
 public:
   FIELDDOUBLEClient(SALOME_MED::FIELDDOUBLE_ptr ptrCorba,

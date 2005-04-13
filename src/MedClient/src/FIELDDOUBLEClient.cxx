@@ -8,7 +8,7 @@ namespace MEDMEM{
 //=============================================================================
 FIELDDOUBLEClient::FIELDDOUBLEClient(SALOME_MED::FIELDDOUBLE_ptr ptrCorba,
 				     MEDMEM::SUPPORT * S) :
-  FIELDClient<double,SALOME_MED::FIELDDOUBLE>(ptrCorba,S)
+  FIELDClient<double>(ptrCorba,S)
 {
   BEGIN_OF("Constructor with arguments (for Python API) FIELDDOUBLEClient");
 

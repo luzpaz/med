@@ -1,18 +1,18 @@
-template<class T1,class T2>
-FIELDClient<T1,T2>::FIELDClient(typename T2::_ptr_type ptrCorba,MEDMEM::SUPPORT * S):_fieldPtr(T2::_duplicate(ptrCorba)),_refCounter(1)
+template<class T>
+FIELDClient<T>::FIELDClient(typename MapCppFieldServ<T>::FieldPtrType ptrCorba,MEDMEM::SUPPORT * S):_fieldPtr(MapCppFieldServ<T>::FieldGlobalType::_duplicate(ptrCorba)),_refCounter(1)
 {
   if (!S) 
-    MEDMEM::FIELD<T1>::_support=new MEDMEM::SUPPORTClient(_fieldPtr->getSupport());
+    MEDMEM::FIELD<T>::_support=new MEDMEM::SUPPORTClient(_fieldPtr->getSupport());
   else
-    MEDMEM::FIELD<T1>::setSupport(S);
+    MEDMEM::FIELD<T>::setSupport(S);
   
   setName(_fieldPtr->getName());
 
-  MEDMEM::FIELD<T1>::setDescription(_fieldPtr->getDescription());
+  MEDMEM::FIELD<T>::setDescription(_fieldPtr->getDescription());
   int nc = _fieldPtr->getNumberOfComponents();
-  MEDMEM::FIELD<T1>::setNumberOfComponents(nc);
+  MEDMEM::FIELD<T>::setNumberOfComponents(nc);
 
-  MEDMEM::FIELD<T1>::setNumberOfValues( MEDMEM::FIELD<T1>::_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
+  MEDMEM::FIELD<T>::setNumberOfValues( MEDMEM::FIELD<T>::_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
   string * _s = new string[nc];
 
@@ -20,17 +20,17 @@ FIELDClient<T1,T2>::FIELDClient(typename T2::_ptr_type ptrCorba,MEDMEM::SUPPORT 
   s = _fieldPtr->getComponentsNames();
   for (int i=0; i<nc; i++)
     _s[i] = s[i];
-  MEDMEM::FIELD<T1>::setComponentsNames(_s);
+  MEDMEM::FIELD<T>::setComponentsNames(_s);
 
   s = _fieldPtr->getComponentsDescriptions();
   for (int i=0; i<nc; i++)
     _s[i] = s[i];
-  MEDMEM::FIELD<T1>::setComponentsDescriptions(_s);
+  MEDMEM::FIELD<T>::setComponentsDescriptions(_s);
 
   s = _fieldPtr->getComponentsUnits();
   for (int i=0; i<nc; i++)
     _s[i] = s[i];
-  MEDMEM::FIELD<T1>::setMEDComponentsUnits(_s);
+  MEDMEM::FIELD<T>::setMEDComponentsUnits(_s);
 
   delete [] _s;
 
@@ -44,19 +44,20 @@ FIELDClient<T1,T2>::FIELDClient(typename T2::_ptr_type ptrCorba,MEDMEM::SUPPORT 
   fillCopy();
 }
 
-template<class T1,class T2>
-void FIELDClient<T1,T2>::fillCopy()
+template<class T>
+void FIELDClient<T>::fillCopy()
 {
   //setValueType(typeChamps); WARNING TO DO.....
   //setValueType(_fieldPtr->getValueType());
   long n;
-  T1 *v = (T1 *)ReceiverFactory::getValue(_fieldPtr->getSenderForValue(MED_EN::MED_FULL_INTERLACE),n);
-  MEDMEM::MEDARRAY<T1> * M = new MEDMEM::MEDARRAY<T1>(v, MEDMEM::FIELD<T1>::getNumberOfComponents(),MEDMEM::FIELD<T1>::getNumberOfValues(),MED_EN::MED_FULL_INTERLACE,true,true);
+  typename mapCppSender<T>::SenderVarType sender=_fieldPtr->getSenderForValue(MED_EN::MED_FULL_INTERLACE);
+  T *v = (T *)ReceiverFactory::getValue(sender,n);
+  MEDMEM::MEDARRAY<T> * M = new MEDMEM::MEDARRAY<T>(v, MEDMEM::FIELD<T>::getNumberOfComponents(),MEDMEM::FIELD<T>::getNumberOfValues(),MED_EN::MED_FULL_INTERLACE,true,true);
   setValue(M);
 }
 
-template<class T1,class T2>
-FIELDClient<T1,T2>::~FIELDClient()
+template<class T>
+FIELDClient<T>::~FIELDClient()
 {
   _fieldPtr->release();
   CORBA::release(_fieldPtr);
