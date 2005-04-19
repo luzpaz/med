@@ -38,7 +38,18 @@ LIB = libMedCorba_Swigcmodule.la
 
 LIB_SRC = 
 
+ifeq (@SWIG_VERSION@, 1.3.21)
+SWIG_DEF = libMedCorba_Swig.i dummy.i
+
+dummy_wrap.cxx: libMedCorba_Swig_wrap.cxx
+	sed -e 's/SwigValueWrapper< vector<FAMILY \* > >/vector<FAMILY \* >/g' libMedCorba_Swig_wrap.cxx > toto
+	mv toto libMedCorba_Swig_wrap.cxx
+	sed -e 's/SwigValueWrapper< vector<SUPPORT \* > const >/vector<SUPPORT \* >/g' libMedCorba_Swig_wrap.cxx > toto
+	mv toto libMedCorba_Swig_wrap.cxx
+	touch dummy_wrap.cxx
+else
 SWIG_DEF = libMedCorba_Swig.i
+endif
 
 LIB_SERVER_IDL = MED.idl
 
