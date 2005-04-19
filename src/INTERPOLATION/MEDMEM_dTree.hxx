@@ -319,7 +319,7 @@ _TEMPLATE_ _DTREE_ & _DTREE_::operator = (const _DTREE_ & F)
 	// Pas Super Top Moumoute ... Recopie de pointeurs et pas de contenus, merdique
 	int i,j;
 	init();
-	for (i=0;i<nbr_descendans;i++) descendant[i]=F.descendant[i];
+	for (i=0;i<_DTREE_::nbr_descendans;i++) descendant[i]=F.descendant[i];
 	noeud_contenu=F.noeud_contenu;
 	etat=F.etat;
 	niveau=F.niveau;

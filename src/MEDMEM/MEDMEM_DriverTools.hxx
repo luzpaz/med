@@ -193,7 +193,7 @@ std::list<MEDMEM::FIELD_*> MEDMEM::_field< T >::getField(std::vector<_groupe> & 
     MESSAGE(" make field <" << name << "> on group_id " << group_id <<
             " relocMap.size: " << nb_val << " nb mailles: " << grp.mailles.size());
     // set values
-    MEDARRAY< T > * medarray = new MEDARRAY< T >( nb_components, nb_val, MED_NO_INTERLACE );
+    MEDARRAY< T > * medarray = new MEDARRAY< T >( nb_components, nb_val, MED_EN::MED_NO_INTERLACE );
     f->setValue( medarray );
     for ( j = 1; j <= nb_components; ++j ) {
       // loop on arrays of j-th component

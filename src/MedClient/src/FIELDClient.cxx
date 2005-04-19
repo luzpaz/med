@@ -61,7 +61,7 @@ FIELDClient<T>::~FIELDClient()
 {
   _fieldPtr->release();
   CORBA::release(_fieldPtr);
-  if(_support)
-    _support->removeReference();
+  if(FIELD<T>::_support)
+    FIELD<T>::_support->removeReference();
 }
 

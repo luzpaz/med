@@ -87,7 +87,7 @@ _TEMPLATE_ class Calcul_Interpolation_P0      : public Calcul_Interpolation<_PAR
 public : Calcul_Interpolation_P0(NUAGENOEUD * nn,NUAGEMAILLE * nm,CHAMP * c):Calcul_Interpolation<_PARAM_>(nn,nm,c) {}
 public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	{
-	return (*champ)[num_maille];
+	return (*Calcul_Interpolation<_PARAM_>::champ)[num_maille];
 	}
 };
 _TEMPLATE_ class Calcul_Interpolation_Tria3   : public Calcul_Interpolation<_PARAM_>
@@ -95,20 +95,20 @@ _TEMPLATE_ class Calcul_Interpolation_Tria3   : public Calcul_Interpolation<_PAR
 public : Calcul_Interpolation_Tria3(NUAGENOEUD * nn,NUAGEMAILLE * nm,CHAMP * c):Calcul_Interpolation<_PARAM_>(nn,nm,c) {}
 public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	{
-	int num0=(*mailles)[num_maille][0];
-	int num1=(*mailles)[num_maille][1];
-	int num2=(*mailles)[num_maille][2];
+	int num0=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][0];
+	int num1=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][1];
+	int num2=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][2];
 	
-	double x0=(*noeuds)[num0][0];
-	double y0=(*noeuds)[num0][1];
-	double x1=(*noeuds)[num1][0];
-	double y1=(*noeuds)[num1][1];
-	double x2=(*noeuds)[num2][0];
-	double y2=(*noeuds)[num2][1];
+	double x0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][0];
+	double y0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][1];
+	double x1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][0];
+	double y1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][1];
+	double x2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][0];
+	double y2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][1];
 	
-	VALEURCHAMP v0=(*champ)[num0];
-	VALEURCHAMP v1=(*champ)[num1];
-	VALEURCHAMP v2=(*champ)[num2];
+	VALEURCHAMP v0=(*Calcul_Interpolation<_PARAM_>::champ)[num0];
+	VALEURCHAMP v1=(*Calcul_Interpolation<_PARAM_>::champ)[num1];
+	VALEURCHAMP v2=(*Calcul_Interpolation<_PARAM_>::champ)[num2];
 	
 	double x=n[0];
 	double y=n[1];
@@ -132,25 +132,25 @@ public : Calcul_Interpolation_Tria6(NUAGENOEUD * nn,NUAGEMAILLE * nm,CHAMP * c):
 public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	{
 	// ON SUPPOSE IMPLICITEMENT QUE LES NOEUDS SUPPLEMENTAIRES SONT BIEN DES NOEUDS MILIEUX
-	int num0 =(*mailles)[num_maille][0];
-	int num1 =(*mailles)[num_maille][1];
-	int num2 =(*mailles)[num_maille][2];
-	int num01=(*mailles)[num_maille][3];
-	int num12=(*mailles)[num_maille][4];
-	int num20=(*mailles)[num_maille][5];
+	int num0 =(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][0];
+	int num1 =(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][1];
+	int num2 =(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][2];
+	int num01=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][3];
+	int num12=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][4];
+	int num20=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][5];
 	
-	double x0=(*noeuds)[num0][0];
-	double y0=(*noeuds)[num0][1];
-	double x1=(*noeuds)[num1][0];
-	double y1=(*noeuds)[num1][1];
-	double x2=(*noeuds)[num2][0];
-	double y2=(*noeuds)[num2][1];
+	double x0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][0];
+	double y0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][1];
+	double x1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][0];
+	double y1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][1];
+	double x2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][0];
+	double y2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][1];
 	
-	VALEURCHAMP v0=(*champ)[num0];
-	VALEURCHAMP v1=(*champ)[num1];
-	VALEURCHAMP v2=(*champ)[num2];
-	VALEURCHAMP v01=(*champ)[num01];
-	VALEURCHAMP v12=(*champ)[num12];
+	VALEURCHAMP v0=(*Calcul_Interpolation<_PARAM_>::champ)[num0];
+	VALEURCHAMP v1=(*Calcul_Interpolation<_PARAM_>::champ)[num1];
+	VALEURCHAMP v2=(*Calcul_Interpolation<_PARAM_>::champ)[num2];
+	VALEURCHAMP v01=(*Calcul_Interpolation<_PARAM_>::champ)[num01];
+	VALEURCHAMP v12=(*Calcul_Interpolation<_PARAM_>::champ)[num12];
 	VALEURCHAMP v20=(*champ)[num20];
 	
 	double x=n[0];
@@ -181,24 +181,24 @@ _TEMPLATE_ class Calcul_Interpolation_Quad4   : public Calcul_Interpolation<_PAR
 public : Calcul_Interpolation_Quad4(NUAGENOEUD * nn,NUAGEMAILLE * nm,CHAMP * c):Calcul_Interpolation<_PARAM_>(nn,nm,c) {}
 public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	{
-	int num0=(*mailles)[num_maille][0];
-	int num1=(*mailles)[num_maille][1];
-	int num2=(*mailles)[num_maille][2];
-	int num3=(*mailles)[num_maille][3];
+	int num0=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][0];
+	int num1=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][1];
+	int num2=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][2];
+	int num3=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][3];
 	
-	double x0=(*noeuds)[num0][0];
-	double y0=(*noeuds)[num0][1];
-	double x1=(*noeuds)[num1][0];
-	double y1=(*noeuds)[num1][1];
-	double x2=(*noeuds)[num2][0];
-	double y2=(*noeuds)[num2][1];
-	double x3=(*noeuds)[num3][0];
-	double y3=(*noeuds)[num3][1];
+	double x0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][0];
+	double y0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][1];
+	double x1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][0];
+	double y1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][1];
+	double x2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][0];
+	double y2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][1];
+	double x3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][0];
+	double y3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][1];
 	
-	VALEURCHAMP v0=(*champ)[num0];
-	VALEURCHAMP v1=(*champ)[num1];
-	VALEURCHAMP v2=(*champ)[num2];
-	VALEURCHAMP v3=(*champ)[num3];
+	VALEURCHAMP v0=(*Calcul_Interpolation<_PARAM_>::champ)[num0];
+	VALEURCHAMP v1=(*Calcul_Interpolation<_PARAM_>::champ)[num1];
+	VALEURCHAMP v2=(*Calcul_Interpolation<_PARAM_>::champ)[num2];
+	VALEURCHAMP v3=(*Calcul_Interpolation<_PARAM_>::champ)[num3];
 	
 	double x=n[0];
 	double y=n[1];
@@ -240,28 +240,28 @@ _TEMPLATE_ class Calcul_Interpolation_Tetra4  : public Calcul_Interpolation<_PAR
 public : Calcul_Interpolation_Tetra4(NUAGENOEUD * nn,NUAGEMAILLE * nm,CHAMP * c):Calcul_Interpolation<_PARAM_>(nn,nm,c) {}
 public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	{
-	int num0=(*mailles)[num_maille][0];
-	int num1=(*mailles)[num_maille][1];
-	int num2=(*mailles)[num_maille][2];
-	int num3=(*mailles)[num_maille][3];
+	int num0=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][0];
+	int num1=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][1];
+	int num2=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][2];
+	int num3=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][3];
 	
-	double x0=(*noeuds)[num0][0];
-	double y0=(*noeuds)[num0][1];
-	double z0=(*noeuds)[num0][2];
-	double x1=(*noeuds)[num1][0];
-	double y1=(*noeuds)[num1][1];
-	double z1=(*noeuds)[num1][2];
-	double x2=(*noeuds)[num2][0];
-	double y2=(*noeuds)[num2][1];
-	double z2=(*noeuds)[num2][2];
-	double x3=(*noeuds)[num3][0];
-	double y3=(*noeuds)[num3][1];
-	double z3=(*noeuds)[num3][2];
+	double x0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][0];
+	double y0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][1];
+	double z0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][2];
+	double x1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][0];
+	double y1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][1];
+	double z1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][2];
+	double x2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][0];
+	double y2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][1];
+	double z2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][2];
+	double x3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][0];
+	double y3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][1];
+	double z3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][2];
 	
-	VALEURCHAMP v0=(*champ)[num0];
-	VALEURCHAMP v1=(*champ)[num1];
-	VALEURCHAMP v2=(*champ)[num2];
-	VALEURCHAMP v3=(*champ)[num3];
+	VALEURCHAMP v0=(*Calcul_Interpolation<_PARAM_>::champ)[num0];
+	VALEURCHAMP v1=(*Calcul_Interpolation<_PARAM_>::champ)[num1];
+	VALEURCHAMP v2=(*Calcul_Interpolation<_PARAM_>::champ)[num2];
+	VALEURCHAMP v3=(*Calcul_Interpolation<_PARAM_>::champ)[num3];
 	
 	double x=n[0];
 	double y=n[1];
@@ -285,32 +285,32 @@ public : Calcul_Interpolation_Tetra10(NUAGENOEUD * nn,NUAGEMAILLE * nm,CHAMP * c
 public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	{
 	// ON SUPPOSE IMPLICITEMENT QUE LES NOEUDS SUPPLEMENTAIRES SONT BIEN DES NOEUDS MILIEUX
-	int num0 =(*mailles)[num_maille][0];
-	int num1 =(*mailles)[num_maille][1];
-	int num2 =(*mailles)[num_maille][2];
-	int num3 =(*mailles)[num_maille][3];
-	int num01=(*mailles)[num_maille][4];
-	int num02=(*mailles)[num_maille][6];
-	int num03=(*mailles)[num_maille][7];
-	int num12=(*mailles)[num_maille][5];
-	int num13=(*mailles)[num_maille][8];
-	int num23=(*mailles)[num_maille][9];
+	int num0 =(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][0];
+	int num1 =(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][1];
+	int num2 =(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][2];
+	int num3 =(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][3];
+	int num01=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][4];
+	int num02=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][6];
+	int num03=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][7];
+	int num12=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][5];
+	int num13=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][8];
+	int num23=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][9];
 	
-	double x0=(*noeuds)[num0][0];double y0=(*noeuds)[num0][1];double z0=(*noeuds)[num0][2];
-	double x1=(*noeuds)[num1][0];double y1=(*noeuds)[num1][1];double z1=(*noeuds)[num1][2];
-	double x2=(*noeuds)[num2][0];double y2=(*noeuds)[num2][1];double z2=(*noeuds)[num2][2];
-	double x3=(*noeuds)[num3][0];double y3=(*noeuds)[num3][1];double z3=(*noeuds)[num3][2];
+	double x0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][0];double y0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][1];double z0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][2];
+	double x1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][0];double y1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][1];double z1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][2];
+	double x2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][0];double y2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][1];double z2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][2];
+	double x3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][0];double y3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][1];double z3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][2];
 	
-	VALEURCHAMP v0=(*champ)[num0];  
-	VALEURCHAMP v1=(*champ)[num1];  
-	VALEURCHAMP v2=(*champ)[num2];  
-	VALEURCHAMP v3=(*champ)[num3];  
-	VALEURCHAMP v01=(*champ)[num01];
-	VALEURCHAMP v02=(*champ)[num02];
-	VALEURCHAMP v03=(*champ)[num03];
-	VALEURCHAMP v12=(*champ)[num12];
-	VALEURCHAMP v13=(*champ)[num13];
-	VALEURCHAMP v23=(*champ)[num23];
+	VALEURCHAMP v0=(*Calcul_Interpolation<_PARAM_>::champ)[num0];  
+	VALEURCHAMP v1=(*Calcul_Interpolation<_PARAM_>::champ)[num1];  
+	VALEURCHAMP v2=(*Calcul_Interpolation<_PARAM_>::champ)[num2];  
+	VALEURCHAMP v3=(*Calcul_Interpolation<_PARAM_>::champ)[num3];  
+	VALEURCHAMP v01=(*Calcul_Interpolation<_PARAM_>::champ)[num01];
+	VALEURCHAMP v02=(*Calcul_Interpolation<_PARAM_>::champ)[num02];
+	VALEURCHAMP v03=(*Calcul_Interpolation<_PARAM_>::champ)[num03];
+	VALEURCHAMP v12=(*Calcul_Interpolation<_PARAM_>::champ)[num12];
+	VALEURCHAMP v13=(*Calcul_Interpolation<_PARAM_>::champ)[num13];
+	VALEURCHAMP v23=(*Calcul_Interpolation<_PARAM_>::champ)[num23];
 	
 	double x=n[0];
 	double y=n[1];
