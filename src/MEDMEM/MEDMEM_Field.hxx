@@ -606,6 +606,7 @@ public:
   double normL2(const FIELD<double> * p_field_volume=NULL) const;
   double normL1(int component, const FIELD<double> * p_field_volume=NULL) const;
   double normL1(const FIELD<double> * p_field_volume=NULL) const;
+  FIELD* extract(const SUPPORT *subSupport) const throw (MEDEXCEPTION);
 
   friend class MED_FIELD_RDONLY_DRIVER<T>;
   friend class MED_FIELD_WRONLY_DRIVER<T>;
@@ -641,6 +642,7 @@ public:
   inline const T*       getValue(MED_EN::medModeSwitch Mode) const;
   inline const T*       getValueI(MED_EN::medModeSwitch Mode,int i) const;
   inline T        getValueIJ(int i,int j) const;
+  bool getValueOnElement(int eltIdInSup,T* retValues) const;
 
   inline void setValue(MED_EN::medModeSwitch mode, T* value);
   inline void setValueI(MED_EN::medModeSwitch mode, int i, T* value);
@@ -1522,7 +1524,7 @@ void FIELD<T>::applyFunc()
 
 template <class T> T FIELD<T>::pow(T x)
 {
-  return ::pow(x,FIELD<T>::_scalarForPow);
+  return (T)::pow(x,FIELD<T>::_scalarForPow);
 }
 
 /*!  Apply to each (scalar) field component the math function pow.
@@ -1748,8 +1750,33 @@ template <class T> double FIELD<T>::normL1(const FIELD<double> * p_field_volume)
     return integrale/totVol;
 }
 
-
-
+/*! Return a new field (to deallocate with delete) lying on subSupport that is included by
+ *   this->_support with corresponding values extracting from this->_value.
+ */
+template <class T> FIELD<T>* FIELD<T>::extract(const SUPPORT *subSupport) const throw (MEDEXCEPTION)
+{
+  if(!subSupport->belongsTo(*_support))
+    throw MEDEXCEPTION("FIELD<T>::extract : subSupport not included in this->_support !");
+  if(_support->isOnAllElements() && subSupport->isOnAllElements())
+    return new FIELD<T>(*this);
+  FIELD<T> *ret=new FIELD<T>(subSupport,_numberOfComponents,MED_EN::MED_FULL_INTERLACE);
+  if(!ret->_value)
+    throw MEDEXCEPTION("FIELD<T>::extract : unvalid support detected !");
+  T* valuesToSet=(T*)ret->_value->get(MED_EN::MED_FULL_INTERLACE);
+  int nbOfEltsSub=subSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  const int *eltsSub=subSupport->getNumber(MED_EN::MED_ALL_ELEMENTS);
+  T* tempVals=new T[_numberOfComponents];
+  for(int i=0;i<nbOfEltsSub;i++)
+    {
+      if(!getValueOnElement(eltsSub[i],tempVals))
+	throw MEDEXCEPTION("Problem in belongsTo function !!!");
+      for(int j=0;j<_numberOfComponents;j++)
+	valuesToSet[i*_numberOfComponents+j]=tempVals[j];
+    }
+  delete [] tempVals;
+  ret->setValueType(_valueType);
+  return ret;
+}
 
 /*!
   Constructor with parameters; the object is set via a file and its associated
@@ -2192,6 +2219,39 @@ template <class T> inline const T* FIELD<T>::getValueI(MED_EN::medModeSwitch Mod
 template <class T> inline T FIELD<T>::getValueIJ(int i,int j) const
 {
   return _value->getIJ(i,j) ;
+}
+
+/*!
+  Fills in already allocated retValues array the values related to eltIdInSup.
+  If the element does not exist in this->_support false is returned, true otherwise.
+ */
+template <class T> bool FIELD<T>::getValueOnElement(int eltIdInSup,T* retValues) const
+{
+  if(eltIdInSup<1)
+    return false;
+  if(_support->isOnAllElements())
+    {
+      int nbOfEltsThis=_support->getMesh()->getNumberOfElements(_support->getEntity(),MED_EN::MED_ALL_ELEMENTS);
+      if(eltIdInSup>nbOfEltsThis)
+	return false;
+      const T* valsThis=getValue(MED_EN::MED_FULL_INTERLACE);
+      for(int j=0;j<_numberOfComponents;j++)
+	retValues[j]=valsThis[(eltIdInSup-1)*_numberOfComponents+j];
+      return true;
+    }
+  else
+    {
+      int nbOfEltsThis=_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+      const int *eltsThis=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+      int iThis;
+      for(iThis=0;iThis<nbOfEltsThis && eltsThis[iThis]!=eltIdInSup;iThis++);
+      if(iThis==nbOfEltsThis)
+	return false;
+      const T* valsThis=getValue(MED_EN::MED_FULL_INTERLACE);
+      for(int j=0;j<_numberOfComponents;j++)
+	retValues[j]=valsThis[iThis*_numberOfComponents+j];
+      return true;
+    }
 }
 
 /*!

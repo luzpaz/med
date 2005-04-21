@@ -2197,7 +2197,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   return a SUPPORT pointer on the union of all SUPPORTs in Supports.
   You should delete this pointer after use to avoid memory leaks.
 */
-SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) const throw (MEDEXCEPTION)
+SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH:::mergeSupports(const vector<SUPPORT *> ) : " ;
   BEGIN_OF(LOC) ;
@@ -2317,7 +2317,7 @@ SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) const throw (MED
   The (SUPPORT *) NULL pointer is returned if the intersection is empty.
   You should delete this pointer after use to avois memory leaks.
 */
-SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) const throw (MEDEXCEPTION)
+SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH:::intersectSupports(const vector<SUPPORT *> ) : " ;
   BEGIN_OF(LOC) ;
