@@ -186,6 +186,102 @@
     }
 }
 
+%typemap(python,in) vector< FIELD<double> * >, const vector< FIELD<double> * >
+{
+    /* typemap in for vector<FIELD<double> *> */
+  /* Check if is a list */
+
+  if (PyList_Check($input)) { 
+    int size = PyList_Size($input);
+    $1.resize(size);
+
+    for (int i=0; i < size; i++)
+      {
+	PyObject * tmp = PyList_GetItem($input,i);
+	FIELDDOUBLE * s;
+
+	int err = SWIG_ConvertPtr(tmp, (void **) &s, $descriptor(FIELDDOUBLE *),
+				  SWIG_POINTER_EXCEPTION);
+
+	if (err == -1)
+	  {
+	    char * message = "Error in typemap(python,in) for vector<FIELD<double> *> each component should be a SUPPORT pointer";
+	    PyErr_SetString(PyExc_RuntimeError, message);
+	    return NULL;
+	  }
+
+	$1[i] = s;
+      }
+  } 
+  else
+    { 
+      PyErr_SetString(PyExc_TypeError,"not a list");
+      return NULL;
+    }
+}
+
+%typemap(python,out) vector<FIELD<double> *>
+{
+  /* typemap out for vector<FIELD<double> *> */
+  int size = $1.size();
+  $result = PyList_New(size);
+
+  for (int i=0;i<size;i++)
+    {
+      PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FIELD<double> *),0);
+
+      PyList_SetItem($result,i,tmp);
+    }
+}
+
+%typemap(python,in) vector<FIELD<int> *>, const vector<FIELD<int> *>
+{
+    /* typemap in for vector<FIELD<int> *> */
+  /* Check if is a list */
+
+  if (PyList_Check($input)) { 
+    int size = PyList_Size($input);
+    $1.resize(size);
+
+    for (int i=0; i < size; i++)
+      {
+	PyObject * tmp = PyList_GetItem($input,i);
+	FIELD<int> * s;
+
+	int err = SWIG_ConvertPtr(tmp, (void **) &s, $descriptor(FIELD<int> *),
+				  SWIG_POINTER_EXCEPTION);
+
+	if (err == -1)
+	  {
+	    char * message = "Error in typemap(python,in) for vector<FIELD<int> *> each component should be a SUPPORT pointer";
+	    PyErr_SetString(PyExc_RuntimeError, message);
+	    return NULL;
+	  }
+
+	$1[i] = s;
+      }
+  } 
+  else
+    { 
+      PyErr_SetString(PyExc_TypeError,"not a list");
+      return NULL;
+    }
+}
+
+%typemap(python,out) vector<FIELD<int> *>
+{
+  /* typemap out for vector<FIELD<int> *> */
+  int size = $1.size();
+  $result = PyList_New(size);
+
+  for (int i=0;i<size;i++)
+    {
+      PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FIELD<int> *),0);
+
+      PyList_SetItem($result,i,tmp);
+    }
+}
+
 %typemap(python,out) char *
 {
   /* typemap out for char * */
@@ -665,7 +761,11 @@ public:
 	return self->addDriver(driverType,string(fileName),
 			       string(driverName),access);
       }
-
+    %newobject getSupportAndOwner();
+    SUPPORT * getSupportAndOwner()
+      {
+	return (SUPPORT *)self->getSupport();
+      }
   }
 }; 
 
@@ -889,6 +989,13 @@ public:
       {
 	self->allocValue(NumberOfComponents, LengthValue);
       }
+
+    %newobject extract(const SUPPORT *subSupport);
+    FIELDDOUBLE *extract(const SUPPORT *subSupport)
+      {
+	FIELD<double>* result=self->extract(subSupport);
+	return (FIELDDOUBLE *)result;
+      }
   }
 };
 
@@ -1097,6 +1204,13 @@ public:
       {
 	self->allocValue(NumberOfComponents, LengthValue);
       }
+
+    %newobject extract(const SUPPORT *subSupport);
+    FIELDINT *extract(const SUPPORT *subSupport)
+      {
+	FIELD<int>* result=self->extract(subSupport);
+	return (FIELDINT *)result;
+      }
   }
 };
 
@@ -1189,6 +1303,18 @@ public :
     SUPPORT * intersectSupports(const vector<SUPPORT *> Supports)
       {
 	return self->intersectSupports(Supports);
+      }
+
+    %newobject mergeFieldsDouble(const vector< FIELD<double>* > others);
+    FIELDDOUBLE * mergeFieldsDouble(const vector< FIELD<double>* > others)
+      {
+	return (FIELDDOUBLE *)self->mergeFields<double>(others);
+      }
+
+    %newobject mergeFieldsInt(const vector< FIELD<int>* > others);
+    FIELDINT * mergeFieldsInt(const vector< FIELD<int>* > others)
+      {
+	return (FIELDINT *)self->mergeFields<int>(others);
       }
 
     CELLMODEL getCellType(medEntityMesh Entity,int i)
@@ -1731,6 +1857,11 @@ class MED
     FIELD_ * getField(char * fieldName, int dt, int it)
       {
 	return self->getField(string(fieldName),dt,it);
+      }
+
+    FIELD_ * getField2(char * fieldName,double time, int it=0)
+      {
+	return self->getField2(string(fieldName),time,it);
       }
 
     SUPPORT * getSupport(char * meshName, medEntityMesh entity)

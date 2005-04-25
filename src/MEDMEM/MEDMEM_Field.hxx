@@ -2244,8 +2244,13 @@ template <class T> bool FIELD<T>::getValueOnElement(int eltIdInSup,T* retValues)
       int nbOfEltsThis=_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
       const int *eltsThis=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
       int iThis;
-      for(iThis=0;iThis<nbOfEltsThis && eltsThis[iThis]!=eltIdInSup;iThis++);
-      if(iThis==nbOfEltsThis)
+      bool found=false;
+      for(iThis=0;iThis<nbOfEltsThis && !found;)
+	if(eltsThis[iThis]==eltIdInSup)
+	  found=true;
+	else
+	  iThis++;
+      if(!found)
 	return false;
       const T* valsThis=getValue(MED_EN::MED_FULL_INTERLACE);
       for(int j=0;j<_numberOfComponents;j++)

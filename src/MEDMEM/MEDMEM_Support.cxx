@@ -458,7 +458,7 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
   set<int>::iterator iter;
   list<int> idsList;
   for(iter=idsSet.begin();iter!=idsSet.end();iter++)
-    if(idsSetMySupport.find(*iter)==idsSetMySupport.end())
+    if(idsSetMySupport.find(*iter)!=idsSetMySupport.end())
       idsList.push_back(*iter);
   int size=idsSet.size();
   if(size!=0)
@@ -799,8 +799,6 @@ SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) cons
   if(_isOnAllElts)
     return _mesh->getBoundaryElements(Entity);
 
-  SUPPORT* mySupport=new SUPPORT(_mesh,"Boundary",Entity);
-  mySupport->setAll(false);
   const int * myConnectivityValue=_mesh->getReverseConnectivity(MED_DESCENDING);
   const int * myConnectivityIndex=_mesh->getReverseConnectivityIndex(MED_DESCENDING);
   int numberOf=_mesh->getNumberOfElements(baseEntity,MED_ALL_ELEMENTS);
