@@ -38,7 +38,8 @@ EXPORT_HEADERS = \
 	MEDMEM_SWIG_FieldDouble.hxx \
 	MEDMEM_SWIG_FieldInt.hxx \
 	MEDMEM_SWIG_MedFieldDoubleDriver.hxx \
-	MEDMEM_SWIG_MedFieldIntDriver.hxx
+	MEDMEM_SWIG_MedFieldIntDriver.hxx \
+	MEDMEM_SWIG_Templates.hxx
 
 # Libraries targets
 
