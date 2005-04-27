@@ -2033,7 +2033,8 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh()
   {
     for ( int iCoord = 0; iCoord < dim; ++iCoord, fcount++ )
       _gibi << setw(22) << coords[ j + iCoord ];
-    _gibi << setw(22) << 0.0; // densitéŠ    fcount++;
+    _gibi << setw(22) << 0.0; // densité
+    fcount++;
   }
   fcount.stop();
 
