@@ -177,6 +177,7 @@ public:
   void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
   bool belongsTo(const SUPPORT& other, bool deepCompare=false) const;
   SUPPORT *getComplement() const;
+  SUPPORT *substract(const SUPPORT& other) const throw (MEDEXCEPTION) ;
   SUPPORT *getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION);
   void fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION);
   void fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION);
@@ -186,6 +187,7 @@ public:
   virtual void removeReference() const;
 protected:
   static list<int> *sub(int start,int end,const int *idsToSuppress,int lgthIdsToSuppress);
+  static list<int> *sub(const int *ids,int lgthIds,const int *idsToSuppress,int lgthIdsToSuppress);
 };
 
 // _____________________

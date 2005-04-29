@@ -652,7 +652,7 @@ FIELD_  *MED::getField2(const string & fieldName, double time, int it) const thr
   FIELD_  *ret;
   for(;iters!=(*itFields).second.end() && !found;iters++)
     if(fabs((*iters).second->getTime()-time)<eps)
-      if(it==(*iters).first.it)
+      //if(it==(*iters).first.it)
 	{
 	  ret=(*iters).second;
 	  found=true;

@@ -68,7 +68,9 @@ namespace MED_EN {
     
     typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
     
-    typedef enum {MED_LECT,MED_ECRI,MED_REMP} med_mode_acces; 
+    typedef enum {MED_LECT,MED_ECRI,MED_REMP} med_mode_acces;
+    
+    typedef enum {ASCENDING,DESCENDING} med_sort_direc;
     
     typedef enum {MED_COOR, MED_CONN, MED_NOM, MED_NUM, MED_FAM} med_table;
     

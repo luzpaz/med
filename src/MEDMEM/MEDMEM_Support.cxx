@@ -134,12 +134,12 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
     for (int j=0;j<numberoftypes;j++) {
       int numberOfElements = my._numberOfElements[j];
       os << "    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) :" << endl;
-//       const int * number = my.getNumber(types[j]);
+      const int * number = my.getNumber(types[j]);
 //       SCRUTE(number);
-//       os << " --> ";
-//       for (int k=0; k<numberOfElements;k++)
-// 	os << number[k] << " ";
-//       os << endl ;
+      os << " --> ";
+      for (int k=0; k<numberOfElements;k++)
+	os << number[k] << " ";
+      os << endl ;
     }
   } else
     os << "Is on all entities !"<< endl;
@@ -696,7 +696,7 @@ int compareId(const void *x, const void *y)
 /*!
   performs a common operation : Sub builds a sorted int array that is obtained by supression of all ids contained
   in array defined by (idsToSuppress,lgthIdsToSuppress) from array [start ... end]
-  Example sub(0,7,{1,2,5},3) => {0,3,4,6,7}
+  Example sub(0,7,{1,2,5},3) => {0,3,4,6,7} - WARNING returned list should be deallocated !
  */
 list<int> *MEDMEM::SUPPORT::sub(int start,int end,const int *idsToSuppress,int lgthIdsToSuppress)
 {
@@ -731,26 +731,51 @@ list<int> *MEDMEM::SUPPORT::sub(int start,int end,const int *idsToSuppress,int l
 }
 
 /*!
+  performs a common operation : Sub builds a sorted int array that is obtained by supression of all ids contained
+  in array defined by (idsToSuppress,lgthIdsToSuppress) from array [start ... end]
+  Example sub({1,3,4,5,6,7,9},7,{1,2,5},3) => {3,4,6,7,9}  - WARNING returned list should be deallocated !
+ */
+list<int> *MEDMEM::SUPPORT::sub(const int *ids,int lgthIds,const int *idsToSuppress,int lgthIdsToSuppress)
+{
+  list<int> *ret;
+  int i,j=0;
+  if(lgthIds<0)
+    throw MEDEXCEPTION("MEDMEM::SUPPORT::sub");
+  else if(lgthIds==0)
+    return 0;
+  ret=new list<int>;
+  int *temp1=new int[lgthIds];
+  memcpy(temp1,ids,sizeof(int)*lgthIds);
+  qsort(temp1,lgthIds,sizeof(int),compareId);
+  int *temp2=new int[lgthIdsToSuppress];
+  memcpy(temp2,idsToSuppress,sizeof(int)*lgthIdsToSuppress);
+  qsort(temp2,lgthIdsToSuppress,sizeof(int),compareId);
+  for(i=0;i<lgthIds;)
+    {
+      if(j>=lgthIdsToSuppress)
+	  ret->push_back(temp1[i++]);
+      else if(temp1[i]>temp2[j])
+	j++;
+      else if(temp1[i]<temp2[j])
+	ret->push_back(temp1[i++]);
+      else
+	i++;
+    }
+  delete [] temp1;
+  delete [] temp2;
+  return ret;
+}
+
+/*!
   returns a new SUPPORT (responsability to caller to destroy it)
   that is the complement to "this", lying on the same entity than "this".
  */
 SUPPORT *MEDMEM::SUPPORT::getComplement() const
 {
   SUPPORT *ret;
-  if(_isOnAllElts)
-    {
-      ret=new SUPPORT;
-      ret->setMesh(_mesh);
-      ret->setEntity(_entity);
-      string name="Complement of ";
-      name+=_name;
-      ret->setName(name);
-      return ret;
-    }
   const int nbOfElt=_mesh->getNumberOfElements(_entity,MED_EN::MED_ALL_ELEMENTS);
   int nbOfEltInSupp=getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-  
-  if(nbOfElt==nbOfEltInSupp)
+  if(_isOnAllElts || nbOfElt==nbOfEltInSupp)
     {
       ret=new SUPPORT;
       ret->setMesh(_mesh);
@@ -763,15 +788,46 @@ SUPPORT *MEDMEM::SUPPORT::getComplement() const
   const int *nbs=_number->getValue();
   list<int> *ids=sub(1,nbOfElt,nbs,nbOfEltInSupp);
   if(_entity==MED_EN::MED_NODE)
-    {
-      ret=_mesh->buildSupportOnNodeFromElementList(*ids,_entity);
-    }
+    ret=_mesh->buildSupportOnNodeFromElementList(*ids,_entity);
   else
-    {
-      ret=_mesh->buildSupportOnElementsFromElementList(*ids,_entity);
-    }
+    ret=_mesh->buildSupportOnElementsFromElementList(*ids,_entity);
   delete ids;
   return ret;
+}
+
+/*!
+  returns a new support the user should delete.
+ */
+SUPPORT *MEDMEM::SUPPORT::substract(const SUPPORT& other) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "SUPPORT *MEDMEM::subtract(const SUPPORT * other) : ";
+  BEGIN_OF(LOC);
+  SUPPORT *ret;
+  if (_entity!=other.getEntity())
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entities are different !"));
+  if(!(*_mesh == *other.getMesh()))
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Mesh are different !"));
+  if(other._isOnAllElts)
+    {
+      ret=new SUPPORT;
+      ret->setMesh(_mesh);
+      ret->setEntity(_entity);
+      return ret;
+    }
+  if(_isOnAllElts)
+    return other.getComplement();
+  int nbOfEltInThis=getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  const int *nbsThis=_number->getValue();
+  int nbOfEltInOther=other.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  const int *nbsOther=other._number->getValue();
+  list<int> *ids=sub(nbsThis,nbOfEltInThis,nbsOther,nbOfEltInOther);
+  if(_entity==MED_EN::MED_NODE)
+    ret=_mesh->buildSupportOnNodeFromElementList(*ids,_entity);
+  else
+    ret=_mesh->buildSupportOnElementsFromElementList(*ids,_entity);
+  delete ids;
+  return ret;
+  END_OF(LOC);
 }
 
 /*!
@@ -866,45 +922,112 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
 {
   clearDataOnNumbers();
   _isOnAllElts=false;
+  // Well, we must know how many geometric type we have found
   int size=listOfElt.size();
-  if(size==0)
-    return;
-  int numberOfType=_mesh->getNumberOfTypes(_entity);
-  const MED_EN::medGeometryElement *geomsElt=_mesh->getTypes(_entity);
-  map<MED_EN::medGeometryElement, vector<int> > nbOfEltsPerType;
-  map<MED_EN::medGeometryElement, vector<int> >::iterator iter;
-  int i;
-  for(i=0;i<numberOfType;i++)
-    nbOfEltsPerType[geomsElt[i]]=vector<int>();
-  list<int>::const_iterator iter2;
-  vector<int>::iterator iter3;
-  for(iter2=listOfElt.begin();iter2!=listOfElt.end();iter2++)
-    nbOfEltsPerType[_mesh->getElementType(_entity,*iter2)].push_back(*iter2);
-  _numberOfGeometricType=0;
-  for(iter=nbOfEltsPerType.begin();iter!=nbOfEltsPerType.end();iter++)
-    if((*iter).second.size()>0)
-      _numberOfGeometricType++;
-  _geometricType=new MED_EN::medGeometryElement[_numberOfGeometricType];
-  int *index=new int[_numberOfGeometricType+1];
-  int *nbs=new int[size];
-  _totalNumberOfElements=size;
-  _numberOfElements=new int[_numberOfGeometricType];
-  int pt=0,currentType=0;
-  for(iter=nbOfEltsPerType.begin();iter!=nbOfEltsPerType.end();iter++)
-    {
-      int sizeOfCurrentType=(*iter).second.size();
-      if(sizeOfCurrentType>0)
-	{
-	  _numberOfElements[currentType]=sizeOfCurrentType;
-	  index[currentType]=pt+1;
-	  _geometricType[currentType]=(*iter).first;
-	  for(iter3=(*iter).second.begin();iter3!=(*iter).second.end();iter3++)
-	    nbs[pt++]=*iter3;
-	  currentType++;
-	}
+  int * myListArray = new int[size] ;
+  int id = 0 ;
+  list<int>::const_iterator myElementsListIt ;
+  for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++) {
+    myListArray[id]=(*myElementsListIt) ;
+    id ++ ;
+  }
+  int numberOfGeometricType ;
+  medGeometryElement* geometricType ;
+  int * numberOfGaussPoint ;
+  int * numberOfElements ;
+  int * mySkyLineArrayIndex ;
+
+  int numberOfType = _mesh->getNumberOfTypes(_entity) ;
+  if (numberOfType == 1) {
+    numberOfGeometricType = 1 ;
+    geometricType = new medGeometryElement[1] ;
+    const medGeometryElement *  allType = _mesh->getTypes(_entity);
+    geometricType[0] = allType[0] ;
+    numberOfGaussPoint = new int[1] ;
+    numberOfGaussPoint[0] = 1 ;
+    numberOfElements = new int[1] ;
+    numberOfElements[0] = size ;
+    mySkyLineArrayIndex = new int[2] ;
+    mySkyLineArrayIndex[0]=1 ;
+    mySkyLineArrayIndex[1]=1+size ;
+  }
+  else {// hemmm
+    map<medGeometryElement,int> theType ;
+    for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++) {
+      medGeometryElement myType = _mesh->getElementType(_entity,*myElementsListIt) ;
+      if (theType.find(myType) != theType.end() )
+	theType[myType]+=1 ;
+      else
+	theType[myType]=1 ;
     }
-  index[_numberOfGeometricType]=size+1;
-  _number=new MEDSKYLINEARRAY(_numberOfGeometricType,size,index,nbs,true);
+    numberOfGeometricType = theType.size() ;
+    geometricType = new medGeometryElement[numberOfGeometricType] ;
+    numberOfGaussPoint = new int[numberOfGeometricType] ;
+    numberOfElements = new int[numberOfGeometricType] ;
+    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
+    int index = 0 ;
+    mySkyLineArrayIndex[0]=1 ;
+    map<medGeometryElement,int>::iterator theTypeIt ;
+    for (theTypeIt=theType.begin();theTypeIt!=theType.end();theTypeIt++) {
+      geometricType[index] = (*theTypeIt).first ;
+      numberOfGaussPoint[index] = 1 ;
+      numberOfElements[index] = (*theTypeIt).second ;
+      mySkyLineArrayIndex[index+1]=mySkyLineArrayIndex[index]+numberOfElements[index] ;
+      index++ ;
+    }
+  }
+  MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray,true) ;
+  setNumberOfGeometricType(numberOfGeometricType) ;
+  setGeometricType(geometricType) ;
+  setNumberOfGaussPoint(numberOfGaussPoint) ;
+  setNumberOfElements(numberOfElements) ;
+  setTotalNumberOfElements(size) ;
+  setNumber(mySkyLineArray) ;
+
+  delete[] numberOfElements;
+  delete[] numberOfGaussPoint;
+  delete[] geometricType;
+//   clearDataOnNumbers();
+//   _isOnAllElts=false;
+//   int size=listOfElt.size();
+//   if(size==0)
+//     return;
+//   int numberOfType=_mesh->getNumberOfTypes(_entity);
+//   const MED_EN::medGeometryElement *geomsElt=_mesh->getTypes(_entity);
+//   map<MED_EN::medGeometryElement, vector<int> > nbOfEltsPerType;
+//   map<MED_EN::medGeometryElement, vector<int> >::iterator iter;
+//   int i;
+//   for(i=0;i<numberOfType;i++)
+//     nbOfEltsPerType[geomsElt[i]]=vector<int>();
+//   list<int>::const_iterator iter2;
+//   vector<int>::iterator iter3;
+//   for(iter2=listOfElt.begin();iter2!=listOfElt.end();iter2++)
+//     nbOfEltsPerType[_mesh->getElementType(_entity,*iter2)].push_back(*iter2);
+//   _numberOfGeometricType=0;
+//   for(iter=nbOfEltsPerType.begin();iter!=nbOfEltsPerType.end();iter++)
+//     if((*iter).second.size()>0)
+//       _numberOfGeometricType++;
+//   _geometricType=new MED_EN::medGeometryElement[_numberOfGeometricType];
+//   int *index=new int[_numberOfGeometricType+1];
+//   int *nbs=new int[size];
+//   _totalNumberOfElements=size;
+//   _numberOfElements=new int[_numberOfGeometricType];
+//   int pt=0,currentType=0;
+//   for(iter=nbOfEltsPerType.begin();iter!=nbOfEltsPerType.end();iter++)
+//     {
+//       int sizeOfCurrentType=(*iter).second.size();
+//       if(sizeOfCurrentType>0)
+// 	{
+// 	  _numberOfElements[currentType]=sizeOfCurrentType;
+// 	  index[currentType]=pt+1;
+// 	  _geometricType[currentType]=(*iter).first;
+// 	  for(iter3=(*iter).second.begin();iter3!=(*iter).second.end();iter3++)
+// 	    nbs[pt++]=*iter3;
+// 	  currentType++;
+// 	}
+//     }
+//   index[_numberOfGeometricType]=size+1;
+//   _number=new MEDSKYLINEARRAY(_numberOfGeometricType,size,index,nbs,true);
 }
 
 /*!

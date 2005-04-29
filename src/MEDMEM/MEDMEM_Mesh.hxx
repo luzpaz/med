@@ -864,20 +864,37 @@ FIELD<T> *MESH::mergeFields(const vector< FIELD<T>* >& others,bool meshCompare)
   ret->setValueType((*iter)->getValueType());
   T* valuesToSet=(T*)ret->getValue(MED_EN::MED_FULL_INTERLACE);
   int nbOfEltsRetSup=retSup->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-  const int *eltsRetSup=retSup->getNumber(MED_EN::MED_ALL_ELEMENTS);
   T* tempValues=new T[retNumberOfComponents];
-  for(i=0;i<nbOfEltsRetSup;i++)
+  if(retSup->isOnAllElements())
     {
-      bool found=false;
-      for(iter=others.begin();iter!=others.end() && !found;iter++)
+      for(i=0;i<nbOfEltsRetSup;i++)
 	{
-	  found=(*iter)->getValueOnElement(eltsRetSup[i],tempValues);
-	  if(found)
-	    for(j=0;j<retNumberOfComponents;j++)
-	      valuesToSet[i*retNumberOfComponents+j]=tempValues[j];
+	  bool found=false;
+	  for(iter=others.begin();iter!=others.end() && !found;iter++)
+	    {
+	      found=(*iter)->getValueOnElement(i+1,tempValues);
+	      if(found)
+		for(j=0;j<retNumberOfComponents;j++)
+		  valuesToSet[i*retNumberOfComponents+j]=tempValues[j];
+	    }
 	}
-      if(!found)
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Merging error due to an error in merging support"));
+    }
+  else
+    {
+      const int *eltsRetSup=retSup->getNumber(MED_EN::MED_ALL_ELEMENTS);
+      for(i=0;i<nbOfEltsRetSup;i++)
+	{
+	  bool found=false;
+	  for(iter=others.begin();iter!=others.end() && !found;iter++)
+	    {
+	      found=(*iter)->getValueOnElement(eltsRetSup[i],tempValues);
+	      if(found)
+		for(j=0;j<retNumberOfComponents;j++)
+		  valuesToSet[i*retNumberOfComponents+j]=tempValues[j];
+	    }
+	  if(!found)
+	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Merging error due to an error in merging support"));
+	}
     }
   delete [] tempValues;
   END_OF(LOC);

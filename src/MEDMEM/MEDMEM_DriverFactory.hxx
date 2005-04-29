@@ -4,6 +4,7 @@
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_VtkFieldDriver.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
+#include "MEDMEM_AsciiFieldDriver.hxx"
 #include <string>
 
 namespace MEDMEM {
@@ -86,6 +87,19 @@ GENDRIVER *DRIVERFACTORY::buildDriverForField(driverTypes driverType,
 
     case PORFLOW_DRIVER : {
       throw MED_EXCEPTION ("driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD");
+      break;
+    }
+
+    case ASCII_DRIVER : {
+      switch(access)
+	{
+	case MED_EN::MED_ECRI : {
+	  ret=new ASCII_FIELD_DRIVER<T>(fileName,field);
+	  break;
+	}
+	default:
+	  throw MED_EXCEPTION ("driver ASCII_DRIVER on FIELD only in write mod");
+	}
       break;
     }
 

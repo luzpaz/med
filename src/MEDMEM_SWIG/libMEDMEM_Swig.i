@@ -30,6 +30,8 @@
 #include "MEDMEM_SWIG_FieldInt.hxx"
 #include "MEDMEM_SWIG_MedFieldDoubleDriver.hxx"
 #include "MEDMEM_SWIG_MedFieldIntDriver.hxx"
+#include "MEDMEM_SWIG_AsciiFieldDoubleDriver.hxx"
+#include "MEDMEM_SWIG_AsciiFieldIntDriver.hxx"
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_SWIG_Templates.hxx"
 
@@ -328,6 +330,8 @@ typedef enum {MED_FULL_INTERLACE, MED_NO_INTERLACE} medModeSwitch;
 
 typedef enum {MED_LECT, MED_ECRI, MED_REMP} med_mode_acces;
 
+typedef enum {ASCENDING,DESCENDING} med_sort_direc;
+
 typedef enum {MED_CELL, MED_FACE, MED_EDGE, MED_NODE,
 	      MED_ALL_ENTITIES} medEntityMesh; 
 
@@ -341,7 +345,7 @@ typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
 typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ; 
 
 typedef enum {MED_DRIVER=0, GIBI_DRIVER=1, PORFLOW_DRIVER = 2, VTK_DRIVER=254,
-	      NO_DRIVER=255} driverTypes;
+	      NO_DRIVER=255, ASCII_DRIVER = 3} driverTypes;
 
 typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26,
 	      MED_INT} med_type_champ;
@@ -448,6 +452,8 @@ class SUPPORT
   void getBoundaryElements();
 
   void setNumber(const int * index, const int* value);
+
+  bool deepCompare(const SUPPORT &support) const;
 
   %extend {
     SUPPORT(MESH* Mesh, char * Name="", medEntityMesh Entity=MED_CELL)
@@ -576,6 +582,12 @@ class SUPPORT
     SUPPORT *getComplement() const
       {
 	return self->getComplement();
+      }
+
+    %newobject substract(const SUPPORT& other) const;
+    SUPPORT *substract(const SUPPORT& other) const
+      {
+	return self->substract(other);
       }
 
     %newobject getBoundaryElements(medEntityMesh Entity) const;

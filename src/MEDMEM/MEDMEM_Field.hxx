@@ -699,6 +699,8 @@ public:
     setValueType(MED_REEL64) call.
    */
   void getBarycenter() const throw (MEDEXCEPTION) ;
+  template<void T_Analytic(const double *,T*)>
+  void fillFromAnalytic();
 };
 
 template <class T> T FIELD<T>::_scalarForPow=1;
@@ -2393,6 +2395,68 @@ template <class T> void FIELD<T>::getBarycenter() const throw (MEDEXCEPTION)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
 
   END_OF(LOC);
+}
+
+/*!
+  Fill array by using T_Analytic. 
+  WARNING : "this" must have allocated its array by setting this->_support and this->_numberOfComponents properly.
+  Typically you should use it on a field built with constructor FIELD<T>::FIELD<T>(SUPPORT *,int nbOfComponents)
+ */
+template <class T> 
+template<void T_Analytic(const double *,T*)>
+void FIELD<T>::fillFromAnalytic()
+{
+  int i,j;
+  MESH * mesh = _support->getMesh();
+  int spaceDim = mesh->getSpaceDimension();
+  const double * coord;
+  FIELD<double> * barycenterField=0;
+  double ** xyz=new double* [spaceDim];
+  bool deallocateXyz=false;
+  if(_support->getEntity()==MED_EN::MED_NODE)
+    {
+      if (_support->isOnAllElements())
+	{
+	  coord=mesh->getCoordinates(MED_EN::MED_NO_INTERLACE);
+	  for(i=0; i<spaceDim; i++)
+	    xyz[i]=(double *)coord+i*_numberOfValues;  
+	}
+      else
+	{
+	  coord = mesh->getCoordinates(MED_EN::MED_FULL_INTERLACE);
+	  const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+	  for(i=0; i<spaceDim; i++)
+	    xyz[i]=new double[_numberOfValues];
+	  deallocateXyz=true;
+	  for(i=0;i<_numberOfValues;i++)
+	    {
+	      for(j=0;j<spaceDim;j++)
+		xyz[j][i]=coord[(nodesNumber[i]-1)*spaceDim+j];
+	    }
+	}
+    }
+  else
+    {
+      barycenterField = mesh->getBarycenter(_support);
+      coord=barycenterField->getValue(MED_EN::MED_NO_INTERLACE);
+      for(i=0; i<spaceDim; i++)
+	xyz[i]=(double *)(coord+i*_numberOfValues);
+    }
+  T* valsToSet=(T*)getValue(MED_EN::MED_FULL_INTERLACE);
+  double *temp=new double[spaceDim];
+  for(i=0;i<_numberOfValues;i++)
+  {
+    for(j=0;j<spaceDim;j++)
+      temp[j]=xyz[j][i];
+    T_Analytic(temp,valsToSet+i*_numberOfComponents);
+  }
+  delete [] temp;
+  if(barycenterField)
+    delete barycenterField;
+  if(deallocateXyz)
+    for(j=0;j<spaceDim;j++)
+      delete [] xyz[j];
+  delete [] xyz;
 }
 
 }//End namespace MEDMEM
