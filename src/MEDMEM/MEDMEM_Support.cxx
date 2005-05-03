@@ -134,12 +134,12 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
     for (int j=0;j<numberoftypes;j++) {
       int numberOfElements = my._numberOfElements[j];
       os << "    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) :" << endl;
-      const int * number = my.getNumber(types[j]);
+//       const int * number = my.getNumber(types[j]);
 //       SCRUTE(number);
-      os << " --> ";
-      for (int k=0; k<numberOfElements;k++)
-	os << number[k] << " ";
-      os << endl ;
+//       os << " --> ";
+//       for (int k=0; k<numberOfElements;k++)
+// 	os << number[k] << " ";
+//       os << endl ;
     }
   } else
     os << "Is on all entities !"<< endl;
@@ -225,7 +225,7 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
     {
       list<int> idsList;
       for(iter=idsSet.begin();iter!=idsSet.end();iter++)
-	  idsList.push_back(*iter);
+	idsList.push_back(*iter);
       if(_entity==MED_NODE)
 	fillFromNodeList(idsList);
       else
@@ -269,7 +269,7 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   _numberOfGaussPoint = new int[NumberOfGeometricType];
   int * index = new int[_numberOfGeometricType+1];
   index[0]=1;
-  int elemDim = -1;GeometricType[0]/100;
+  int elemDim = -1;
   for (int i=0;i<_numberOfGeometricType;i++) {
     if(GeometricType[i]/100 != elemDim)
       if(i==0)
@@ -886,13 +886,21 @@ SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) cons
  */
 void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION)
 {
+  setEntity(MED_EN::MED_NODE);
+  clearDataOnNumbers();
+  int size=listOfNode.size();
+  int totalNbInMesh=_mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
+  if(totalNbInMesh==size)
+    _isOnAllElts=true;
+  else
+    _isOnAllElts=false;
   int numberOfGeometricType=1;
   medGeometryElement* geometricType=new medGeometryElement[1];
   geometricType[0]=MED_NONE;
   int *numberOfGaussPoint=new int[1];
   numberOfGaussPoint[0]=1;
   int *numberOfElements=new int[1];
-  numberOfElements[0]=listOfNode.size();
+  numberOfElements[0]=size;
   int *mySkyLineArrayIndex=new int[2];
   mySkyLineArrayIndex[0]=1;
   mySkyLineArrayIndex[1]=1+numberOfElements[0];
@@ -901,7 +909,6 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
   for(list<int>::const_iterator iter2=listOfNode.begin();iter2!=listOfNode.end();iter2++)
     tab[i++]=*iter2;
   MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(1,numberOfElements[0],mySkyLineArrayIndex,tab,true);
-  setEntity(MED_EN::MED_NODE);
   setNumberOfGeometricType(numberOfGeometricType);
   setGeometricType(geometricType);
   setNumberOfGaussPoint(numberOfGaussPoint);
@@ -921,16 +928,18 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
 void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION)
 {
   clearDataOnNumbers();
+  int size=listOfElt.size();
+  int totalNbInMesh=_mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
+  if(totalNbInMesh==size)
+    _isOnAllElts=true;
+  else
   _isOnAllElts=false;
   // Well, we must know how many geometric type we have found
-  int size=listOfElt.size();
   int * myListArray = new int[size] ;
   int id = 0 ;
   list<int>::const_iterator myElementsListIt ;
-  for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++) {
-    myListArray[id]=(*myElementsListIt) ;
-    id ++ ;
-  }
+  for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++)
+    myListArray[id++]=(*myElementsListIt) ;
   int numberOfGeometricType ;
   medGeometryElement* geometricType ;
   int * numberOfGaussPoint ;
@@ -988,8 +997,12 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
   delete[] numberOfGaussPoint;
   delete[] geometricType;
 //   clearDataOnNumbers();
-//   _isOnAllElts=false;
 //   int size=listOfElt.size();
+//   int totalNbInMesh=_mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
+//   if(totalNbInMesh==size)
+//     _isOnAllElts=true;
+//   else
+//     _isOnAllElts=false;
 //   if(size==0)
 //     return;
 //   int numberOfType=_mesh->getNumberOfTypes(_entity);
