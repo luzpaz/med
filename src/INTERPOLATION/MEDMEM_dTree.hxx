@@ -194,8 +194,7 @@ _TEMPLATE_ _DTREE_::dTree(const Sommet_dTree<DIMENSION> &A,const Sommet_dTree<DI
 	if (mypere!=NULL)
 		{
 		
-		int i,j;
-		double tmp;
+		int i;
 		
 		init();
 		
@@ -369,8 +368,10 @@ _TEMPLATE_ _DTREE_ * _DTREE_::trouve_dTree_contenant(NOEUD P) const
 			if (!test) break;
 			}
 
-		if (test) return descendant[i]->trouve_dTree_contenant(P); // Propagation
+		if (test)
+		  return descendant[i]->trouve_dTree_contenant(P); // Propagation
 		}
+	return NULL;
 	}
 // si de le dTree n'est pas TERMINAL, scanne tous les points du nuage du pere pour trouver le point le plus proche
 // sinon scanne uniquement les points contenus dans le dTree
