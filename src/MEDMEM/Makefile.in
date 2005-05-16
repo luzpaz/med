@@ -53,6 +53,7 @@ MEDMEM_Group.hxx \
 MEDMEM_Array.hxx \
 MEDMEM_Exception.hxx \
 MEDMEM_MedFieldDriver.hxx \
+MEDMEM_AsciiFieldDriver.hxx \
 MEDMEM_Med.hxx \
 MEDMEM_MedMedDriver.hxx \
 MEDMEM_MedMeshDriver.hxx \

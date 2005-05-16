@@ -166,6 +166,9 @@ public:
   virtual const int *     getConnectivity      (MED_EN::medConnectivity ConnectivityType, 
 					    MED_EN::medEntityMesh Entity,
                                             MED_EN::medGeometryElement Type);
+  virtual int getConnectivityLength        (MED_EN::medConnectivity ConnectivityType, 
+					    MED_EN::medEntityMesh Entity,
+                                            MED_EN::medGeometryElement Type);
   virtual const int *     getConnectivityIndex (MED_EN::medConnectivity ConnectivityType,
 					    MED_EN::medEntityMesh Entity);
  
@@ -190,6 +193,7 @@ public:
 
   const int*      getNeighbourhood() const;
 
+  bool deepCompare(const CONNECTIVITY& other) const;
 };
 /*----------------------*/
 /* Methodes Inline	*/
