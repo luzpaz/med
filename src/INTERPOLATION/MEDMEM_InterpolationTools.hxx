@@ -151,7 +151,7 @@ public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	VALEURCHAMP v2=(*Calcul_Interpolation<_PARAM_>::champ)[num2];
 	VALEURCHAMP v01=(*Calcul_Interpolation<_PARAM_>::champ)[num01];
 	VALEURCHAMP v12=(*Calcul_Interpolation<_PARAM_>::champ)[num12];
-	VALEURCHAMP v20=(*champ)[num20];
+	VALEURCHAMP v20=(*Calcul_Interpolation<_PARAM_>::champ)[num20];
 	
 	double x=n[0];
 	double y=n[1];
@@ -355,34 +355,34 @@ public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	
 	// Tres probablement numériquement mauvais, à revoir
 	
-	int num0=(*mailles)[num_maille][0];
-	int num1=(*mailles)[num_maille][1];
-	int num2=(*mailles)[num_maille][2];
-	int num3=(*mailles)[num_maille][3];
-	int num4=(*mailles)[num_maille][4];
-	int num5=(*mailles)[num_maille][5];
-	int num6=(*mailles)[num_maille][6];
-	int num7=(*mailles)[num_maille][7];
+	int num0=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][0];
+	int num1=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][1];
+	int num2=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][2];
+	int num3=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][3];
+	int num4=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][4];
+	int num5=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][5];
+	int num6=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][6];
+	int num7=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][7];
 	
 	
-	double x0=(*noeuds)[num0][0];double y0=(*noeuds)[num0][1];double z0=(*noeuds)[num0][2];
-	double x1=(*noeuds)[num1][0];double y1=(*noeuds)[num1][1];double z1=(*noeuds)[num1][2];
-	double x2=(*noeuds)[num2][0];double y2=(*noeuds)[num2][1];double z2=(*noeuds)[num2][2];
-	double x3=(*noeuds)[num3][0];double y3=(*noeuds)[num3][1];double z3=(*noeuds)[num3][2];
-	double x4=(*noeuds)[num4][0];double y4=(*noeuds)[num4][1];double z4=(*noeuds)[num4][2];
-	double x5=(*noeuds)[num5][0];double y5=(*noeuds)[num5][1];double z5=(*noeuds)[num5][2];
-	double x6=(*noeuds)[num6][0];double y6=(*noeuds)[num6][1];double z6=(*noeuds)[num6][2];
-	double x7=(*noeuds)[num7][0];double y7=(*noeuds)[num7][1];double z7=(*noeuds)[num7][2];
+	double x0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][0];double y0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][1];double z0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][2];
+	double x1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][0];double y1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][1];double z1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][2];
+	double x2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][0];double y2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][1];double z2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][2];
+	double x3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][0];double y3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][1];double z3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][2];
+	double x4=(*Calcul_Interpolation<_PARAM_>::noeuds)[num4][0];double y4=(*Calcul_Interpolation<_PARAM_>::noeuds)[num4][1];double z4=(*Calcul_Interpolation<_PARAM_>::noeuds)[num4][2];
+	double x5=(*Calcul_Interpolation<_PARAM_>::noeuds)[num5][0];double y5=(*Calcul_Interpolation<_PARAM_>::noeuds)[num5][1];double z5=(*Calcul_Interpolation<_PARAM_>::noeuds)[num5][2];
+	double x6=(*Calcul_Interpolation<_PARAM_>::noeuds)[num6][0];double y6=(*Calcul_Interpolation<_PARAM_>::noeuds)[num6][1];double z6=(*Calcul_Interpolation<_PARAM_>::noeuds)[num6][2];
+	double x7=(*Calcul_Interpolation<_PARAM_>::noeuds)[num7][0];double y7=(*Calcul_Interpolation<_PARAM_>::noeuds)[num7][1];double z7=(*Calcul_Interpolation<_PARAM_>::noeuds)[num7][2];
 	
 	
-	VALEURCHAMP v0=(*champ)[num0];
-	VALEURCHAMP v1=(*champ)[num1];
-	VALEURCHAMP v2=(*champ)[num2];
-	VALEURCHAMP v3=(*champ)[num3];
-	VALEURCHAMP v4=(*champ)[num4];
-	VALEURCHAMP v5=(*champ)[num5];
-	VALEURCHAMP v6=(*champ)[num6];
-	VALEURCHAMP v7=(*champ)[num7];
+	VALEURCHAMP v0=(*Calcul_Interpolation<_PARAM_>::champ)[num0];
+	VALEURCHAMP v1=(*Calcul_Interpolation<_PARAM_>::champ)[num1];
+	VALEURCHAMP v2=(*Calcul_Interpolation<_PARAM_>::champ)[num2];
+	VALEURCHAMP v3=(*Calcul_Interpolation<_PARAM_>::champ)[num3];
+	VALEURCHAMP v4=(*Calcul_Interpolation<_PARAM_>::champ)[num4];
+	VALEURCHAMP v5=(*Calcul_Interpolation<_PARAM_>::champ)[num5];
+	VALEURCHAMP v6=(*Calcul_Interpolation<_PARAM_>::champ)[num6];
+	VALEURCHAMP v7=(*Calcul_Interpolation<_PARAM_>::champ)[num7];
 
 	double x=n[0];
 	double y=n[1];
@@ -427,26 +427,26 @@ _TEMPLATE_ class Calcul_Interpolation_Penta6  : public Calcul_Interpolation<_PAR
 public : Calcul_Interpolation_Penta6(NUAGENOEUD * nn,NUAGEMAILLE * nm,CHAMP * c):Calcul_Interpolation<_PARAM_>(nn,nm,c) {}
 public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	{
-	int num0=(*mailles)[num_maille][0];
-	int num1=(*mailles)[num_maille][1];
-	int num2=(*mailles)[num_maille][2];
-	int num3=(*mailles)[num_maille][3];
-	int num4=(*mailles)[num_maille][4];
-	int num5=(*mailles)[num_maille][5];    
+	int num0=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][0];
+	int num1=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][1];
+	int num2=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][2];
+	int num3=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][3];
+	int num4=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][4];
+	int num5=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][5];    
 	
-	double x0=(*noeuds)[num0][0];double y0=(*noeuds)[num0][1];double z0=(*noeuds)[num0][2];
-	double x1=(*noeuds)[num1][0];double y1=(*noeuds)[num1][1];double z1=(*noeuds)[num1][2];
-	double x2=(*noeuds)[num2][0];double y2=(*noeuds)[num2][1];double z2=(*noeuds)[num2][2];
-	double x3=(*noeuds)[num3][0];double y3=(*noeuds)[num3][1];double z3=(*noeuds)[num3][2];
-	double x4=(*noeuds)[num4][0];double y4=(*noeuds)[num4][1];double z4=(*noeuds)[num4][2];
-	double x5=(*noeuds)[num5][0];double y5=(*noeuds)[num5][1];double z5=(*noeuds)[num5][2];	
+	double x0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][0];double y0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][1];double z0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][2];
+	double x1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][0];double y1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][1];double z1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][2];
+	double x2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][0];double y2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][1];double z2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][2];
+	double x3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][0];double y3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][1];double z3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][2];
+	double x4=(*Calcul_Interpolation<_PARAM_>::noeuds)[num4][0];double y4=(*Calcul_Interpolation<_PARAM_>::noeuds)[num4][1];double z4=(*Calcul_Interpolation<_PARAM_>::noeuds)[num4][2];
+	double x5=(*Calcul_Interpolation<_PARAM_>::noeuds)[num5][0];double y5=(*Calcul_Interpolation<_PARAM_>::noeuds)[num5][1];double z5=(*Calcul_Interpolation<_PARAM_>::noeuds)[num5][2];	
 	
-	VALEURCHAMP v0=(*champ)[num0];
-	VALEURCHAMP v1=(*champ)[num1];
-	VALEURCHAMP v2=(*champ)[num2];
-	VALEURCHAMP v3=(*champ)[num3];
-	VALEURCHAMP v4=(*champ)[num4];
-	VALEURCHAMP v5=(*champ)[num5];
+	VALEURCHAMP v0=(*Calcul_Interpolation<_PARAM_>::champ)[num0];
+	VALEURCHAMP v1=(*Calcul_Interpolation<_PARAM_>::champ)[num1];
+	VALEURCHAMP v2=(*Calcul_Interpolation<_PARAM_>::champ)[num2];
+	VALEURCHAMP v3=(*Calcul_Interpolation<_PARAM_>::champ)[num3];
+	VALEURCHAMP v4=(*Calcul_Interpolation<_PARAM_>::champ)[num4];
+	VALEURCHAMP v5=(*Calcul_Interpolation<_PARAM_>::champ)[num5];
 
 	double x=n[0];
 	double y=n[1];
@@ -481,23 +481,23 @@ public : Calcul_Interpolation_Pyra5(NUAGENOEUD * nn,NUAGEMAILLE * nm,CHAMP * c):
 public : VALEURCHAMP operator() (const NOEUD & n, int num_maille)
 	{
 	// NON TESTE
-	int num0=(*mailles)[num_maille][0];
-	int num1=(*mailles)[num_maille][1];
-	int num2=(*mailles)[num_maille][2];
-	int num3=(*mailles)[num_maille][3];
-	int num4=(*mailles)[num_maille][4];
+	int num0=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][0];
+	int num1=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][1];
+	int num2=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][2];
+	int num3=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][3];
+	int num4=(*Calcul_Interpolation<_PARAM_>::mailles)[num_maille][4];
 	
-	double x0=(*noeuds)[num0][0];double y0=(*noeuds)[num0][1];double z0=(*noeuds)[num0][2];
-	double x1=(*noeuds)[num1][0];double y1=(*noeuds)[num1][1];double z1=(*noeuds)[num1][2];
-	double x2=(*noeuds)[num2][0];double y2=(*noeuds)[num2][1];double z2=(*noeuds)[num2][2];
-	double x3=(*noeuds)[num3][0];double y3=(*noeuds)[num3][1];double z3=(*noeuds)[num3][2];
-	double x4=(*noeuds)[num4][0];double y4=(*noeuds)[num4][1];double z4=(*noeuds)[num4][2];
+	double x0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][0];double y0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][1];double z0=(*Calcul_Interpolation<_PARAM_>::noeuds)[num0][2];
+	double x1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][0];double y1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][1];double z1=(*Calcul_Interpolation<_PARAM_>::noeuds)[num1][2];
+	double x2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][0];double y2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][1];double z2=(*Calcul_Interpolation<_PARAM_>::noeuds)[num2][2];
+	double x3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][0];double y3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][1];double z3=(*Calcul_Interpolation<_PARAM_>::noeuds)[num3][2];
+	double x4=(*Calcul_Interpolation<_PARAM_>::noeuds)[num4][0];double y4=(*Calcul_Interpolation<_PARAM_>::noeuds)[num4][1];double z4=(*Calcul_Interpolation<_PARAM_>::noeuds)[num4][2];
 	
-	VALEURCHAMP v0=(*champ)[num0];
-	VALEURCHAMP v1=(*champ)[num1];
-	VALEURCHAMP v2=(*champ)[num2];
-	VALEURCHAMP v3=(*champ)[num3];
-	VALEURCHAMP v4=(*champ)[num4];
+	VALEURCHAMP v0=(*Calcul_Interpolation<_PARAM_>::champ)[num0];
+	VALEURCHAMP v1=(*Calcul_Interpolation<_PARAM_>::champ)[num1];
+	VALEURCHAMP v2=(*Calcul_Interpolation<_PARAM_>::champ)[num2];
+	VALEURCHAMP v3=(*Calcul_Interpolation<_PARAM_>::champ)[num3];
+	VALEURCHAMP v4=(*Calcul_Interpolation<_PARAM_>::champ)[num4];
 
 	double x=n[0];
 	double y=n[1];
