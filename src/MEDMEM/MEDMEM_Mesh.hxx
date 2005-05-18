@@ -842,6 +842,12 @@ inline bool MESH::getIsAGrid()
   return _isAGrid;
 }
 
+}
+
+#include "MEDMEM_Support.hxx"
+
+namespace MEDMEM {
+
 //Create a new FIELD that should be deallocated based on a SUPPORT that should be deallocated too.
 template<class T>
 FIELD<T> *MESH::mergeFields(const vector< FIELD<T>* >& others,bool meshCompare)

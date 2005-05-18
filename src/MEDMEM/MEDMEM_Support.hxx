@@ -15,7 +15,6 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
-#include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_RCBase.hxx"
 
 /*!
@@ -140,7 +139,7 @@ public:
 
   inline void setName(string Name);
   inline void setDescription(string Description);
-  inline void setMesh(MESH *Mesh);
+  void setMesh(MESH *Mesh);
   inline void setAll(bool All);
   inline void setEntity(MED_EN::medEntityMesh Entity);
   inline void setNumberOfGeometricType(int NumberOfGeometricType);
@@ -320,18 +319,6 @@ inline void SUPPORT::setDescription(string Description)
 //--------------------------------------------------
 {
   _description=Description;
-}
-
-/*! set the reference _mesh to Mesh */
-//--------------------------------------
-inline void SUPPORT::setMesh(MESH *Mesh)
-//--------------------------------------
-{
-  if(_mesh)
-    _mesh->removeReference();
-  _mesh=Mesh;
-  if(_mesh)
-    _mesh->addReference();
 }
 
 /*! set the attribute _isOnAllElts to All */

@@ -1005,6 +1005,18 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
   delete[] geometricType;
 }
 
+/*! set the reference _mesh to Mesh */
+//--------------------------------------
+void SUPPORT::setMesh(MESH *Mesh)
+//--------------------------------------
+{
+  if(_mesh)
+    _mesh->removeReference();
+  _mesh=Mesh;
+  if(_mesh)
+    _mesh->addReference();
+}
+
 /*!
   addReference : reference counter presently disconnected in C++ -> just connected for client.
 */

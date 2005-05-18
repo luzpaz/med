@@ -19,7 +19,6 @@
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Array.hxx"
 #include "MEDMEM_GenDriver.hxx"
-#include "MEDMEM_DriverFactory.hxx"
 
 /*!
 
@@ -703,6 +702,12 @@ public:
   template<void T_Analytic(const double *,T*)>
   void fillFromAnalytic();
 };
+
+}
+
+#include "MEDMEM_DriverFactory.hxx"
+
+namespace MEDMEM {
 
 template <class T> T FIELD<T>::_scalarForPow=1;
 

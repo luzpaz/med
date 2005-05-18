@@ -6,7 +6,6 @@
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Unit.hxx"
-//#include "MEDMEM_Field.hxx"
 
 #include <list>
 #include <string>
@@ -22,11 +21,14 @@
 
 namespace MEDMEM {
 
+  template<class T>
+  class FIELD;
+
   template<int N,unsigned int CODE>
   void fill(double *a, const double *b)
   {
     a[N]=b[CODE & 0x3 ];
-    fill<N-1, CODE>>2 >(a,b);
+    fill<N-1, (CODE>>2) >(a,b);
   }
 
   template<int N>
@@ -93,6 +95,11 @@ namespace MEDMEM {
     //static void copyInfo(const double *a,T *b);
     //static void copyInfo2(const double *,T *);
   };
+}
+
+#include "MEDMEM_Field.hxx"
+
+namespace MEDMEM {
 
   template <class T, int SPACEDIMENSION, unsigned int SORTSTRATEGY>
   SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY>::SDForSorting(const double *coords, const T* comp, int nbComponents):_nbComponents(nbComponents)

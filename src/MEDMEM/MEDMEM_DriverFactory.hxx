@@ -1,11 +1,9 @@
 #ifndef DRIVERFACTORY_HXX
 #define DRIVERFACTORY_HXX
 
-#include "MEDMEM_GenDriver.hxx"
-#include "MEDMEM_VtkFieldDriver.hxx"
-#include "MEDMEM_MedFieldDriver.hxx"
-#include "MEDMEM_AsciiFieldDriver.hxx"
 #include <string>
+#include "MEDMEM_define.hxx"
+#include "MEDMEM_GenDriver.hxx"
 
 namespace MEDMEM {
 
@@ -28,7 +26,13 @@ namespace MEDMEM {
 				 MED *mede,
 				 MED_EN::med_mode_acces access);
   }
+}
 
+#include "MEDMEM_VtkFieldDriver.hxx"
+#include "MEDMEM_MedFieldDriver.hxx"
+#include "MEDMEM_AsciiFieldDriver.hxx"
+
+namespace MEDMEM {
 template<class T>
 GENDRIVER *DRIVERFACTORY::buildDriverForField(driverTypes driverType,
 					      const std::string & fileName,
