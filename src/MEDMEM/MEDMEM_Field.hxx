@@ -136,6 +136,9 @@ public:
   friend class MED_MED_RDONLY_DRIVER21;
   friend class MED_MED_WRONLY_DRIVER21;
   friend class MED_MED_RDWR_DRIVER21;
+  friend class MED_MED_RDONLY_DRIVER22;
+  friend class MED_MED_WRONLY_DRIVER22;
+  friend class MED_MED_RDWR_DRIVER22;
 
   friend class VTK_MED_DRIVER;
 
@@ -595,6 +598,8 @@ public:
 
   friend class MED_FIELD_RDONLY_DRIVER21<T>;
   friend class MED_FIELD_WRONLY_DRIVER21<T>;
+  friend class MED_FIELD_RDONLY_DRIVER22<T>;
+  friend class MED_FIELD_WRONLY_DRIVER22<T>;
   friend class VTK_FIELD_DRIVER<T>;
   //friend class MED_FIELD_RDWR_DRIVER  <T>;
 
@@ -1790,7 +1795,7 @@ template <class T> int FIELD<T>::addDriver(driverTypes driverType,
 					   const string & driverName/*="Default Field Name"*/,
 					   MED_EN::med_mode_acces access)
 {
-  const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name\,MED_EN::med_mode_acces access) : ";
+  const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name,MED_EN::med_mode_acces access) : ";
 
   GENDRIVER * driver;
 

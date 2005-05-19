@@ -19,6 +19,8 @@ using namespace std;
 using namespace MED_EN;
 using namespace MEDMEM;
 
+#define MED_NBR_GEOMETRIE_MAILLE 15
+
 /* This class is a generic class for family and group */
 
 /*!

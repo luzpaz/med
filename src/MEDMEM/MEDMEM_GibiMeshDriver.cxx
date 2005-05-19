@@ -19,6 +19,7 @@ using namespace MED_EN;
 using namespace MEDMEM;
 /////
 
+#define MED_NULL     NULL
 
 /////
 const size_t GIBI_MESH_DRIVER::nb_geometrie_gibi;

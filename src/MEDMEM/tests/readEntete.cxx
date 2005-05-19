@@ -95,7 +95,7 @@ int main (int argc, char ** argv) {
   cout << "(* INFORMATIONS GENERALES : *)" << endl;
   cout << "(****************************)" << endl;
 
-  string chainevide(MED_TAILLE_PNOM+2,' ');
+  //  string chainevide(MED_TAILLE_PNOM+2,' ');
   cout << "- Nom du maillage : <<"    << meshName       << ">>" << endl;
   cout << "- Dimension d'espace : "<< SpaceDimension <<  endl;
   cout << "- Dimension du maillage : "<< MeshDimension <<  endl;

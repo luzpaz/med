@@ -10,6 +10,13 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
+/*
+  Those defines are from the med File V2.1 and for this class they are fixed.
+*/
+
+#define MED_TAILLE_DESC 200
+#define MED_TAILLE_LNOM  80
+
 FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), 
                  _attributeIdentifier((int*)NULL),_attributeValue((int*)NULL), _attributeDescription((string*)NULL),
 		 _numberOfGroup(0), _groupName((string*)NULL) 

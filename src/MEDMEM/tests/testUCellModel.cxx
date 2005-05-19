@@ -34,6 +34,8 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
+#define MED_NBR_GEOMETRIE_MAILLE 15
+
 void usage(char * name)
 {
   cout << "    " << name << endl;
@@ -48,140 +50,140 @@ int main (int argc, char ** argv)
   cout << "CELLMODEL Test" << endl ;
   cout << "--------------" << endl;
 
-/*	-----------------------------------------------------
+  /*	-----------------------------------------------------
 	Construction de tous les types de cellmodel possibles
 	-----------------------------------------------------
-*/
+  */
 
-   CELLMODEL * tous  =new CELLMODEL[MED_NBR_GEOMETRIE_MAILLE ];
-   const medGeometryElement  allCellType[MED_NBR_GEOMETRIE_MAILLE ]=
-	     {MED_POINT1, MED_SEG2,    MED_SEG3,   MED_TRIA3,
-              MED_QUAD4,  MED_TRIA6,   MED_QUAD8,  MED_TETRA4,
-              MED_PYRA5,  MED_PENTA6,  MED_HEXA8,  MED_TETRA10,
-              MED_PYRA13, MED_PENTA15, MED_HEXA20 };
+  CELLMODEL * tous  =new CELLMODEL[MED_NBR_GEOMETRIE_MAILLE ];
+  const medGeometryElement  allCellType[MED_NBR_GEOMETRIE_MAILLE ]=
+    {MED_POINT1, MED_SEG2,    MED_SEG3,   MED_TRIA3,
+     MED_QUAD4,  MED_TRIA6,   MED_QUAD8,  MED_TETRA4,
+     MED_PYRA5,  MED_PENTA6,  MED_HEXA8,  MED_TETRA10,
+     MED_PYRA13, MED_PENTA15, MED_HEXA20 };
 
   for (int i=0; i<MED_NBR_GEOMETRIE_MAILLE ; i++)
-  {
-	tous[i]=CELLMODEL(allCellType[i]);
-  }
+    {
+      tous[i]=CELLMODEL(allCellType[i]);
+    }
 
-/*	-----------------------------------------------------
+  /*	-----------------------------------------------------
 	Boucle sur  tous les types de cellmodel possibles
 	- Chaque Méthode de cellmodel est appelee
 	-----------------------------------------------------
-*/
+  */
   for (int i=0; i<MED_NBR_GEOMETRIE_MAILLE ; i++)
-  {
-	cout << endl;
-	cout << geoNames[tous[i].getType()] << endl;
-        cout << "__________________"  << endl;
+    {
+      cout << endl;
+      cout << geoNames[tous[i].getType()] << endl;
+      cout << "__________________"  << endl;
 
-	try 
+      try 
 	{
-        	cout << "CellModel de Nom : " << tous[i].getName() << endl;
+	  cout << "CellModel de Nom : " << tous[i].getName() << endl;
 	}
-	catch ( const std::exception &e )
+      catch ( const std::exception &e )
 	{
-       		cout << "-------------------------------" << endl;
-		cout << "	Pb au getName()		" << endl;
-        	cout << "-------------------------------" << endl;
-        	MESSAGE( "catched exception : " << e.what() ) ;
-        	return EXIT_FAILURE ;
+	  cout << "-------------------------------" << endl;
+	  cout << "	Pb au getName()		" << endl;
+	  cout << "-------------------------------" << endl;
+	  MESSAGE( "catched exception : " << e.what() ) ;
+	  return EXIT_FAILURE ;
   	}
-	catch (...)
+      catch (...)
 	{
-		cout << "-------------------------------" << endl;
-		cout << "	Pb au getName()		" << endl;
-		cout << "-------------------------------" << endl;
-        	return EXIT_FAILURE ;
+	  cout << "-------------------------------" << endl;
+	  cout << "	Pb au getName()		" << endl;
+	  cout << "-------------------------------" << endl;
+	  return EXIT_FAILURE ;
 	};
 
-	try 
+      try 
 	{
-		cout << "Nb de Vertexes   : " << tous[i].getNumberOfVertexes() << endl;
+	  cout << "Nb de Vertexes   : " << tous[i].getNumberOfVertexes() << endl;
 	}
-	catch ( const std::exception &e )
+      catch ( const std::exception &e )
 	{
-       		cout << "-------------------------------" << endl;
-		cout << "	Pb au getNumberOfVertexes()	" << endl;
-        	cout << "-------------------------------" << endl;
-        	MESSAGE( "catched exception : " << e.what() ) ;
-        	return EXIT_FAILURE ;
+	  cout << "-------------------------------" << endl;
+	  cout << "	Pb au getNumberOfVertexes()	" << endl;
+	  cout << "-------------------------------" << endl;
+	  MESSAGE( "catched exception : " << e.what() ) ;
+	  return EXIT_FAILURE ;
   	}
-	catch (...)
+      catch (...)
 	{
-		cout << "---------------------------------------" << endl;
-		cout << "	Pb au getNumberOfVertexes()	" << endl;
-		cout << "---------------------------------------" << endl;
-        	return EXIT_FAILURE ;
+	  cout << "---------------------------------------" << endl;
+	  cout << "	Pb au getNumberOfVertexes()	" << endl;
+	  cout << "---------------------------------------" << endl;
+	  return EXIT_FAILURE ;
 	};
 
-	try 
+      try 
 	{
-		cout << "Nb de Noeuds     : " << tous[i].getNumberOfNodes() << endl;
+	  cout << "Nb de Noeuds     : " << tous[i].getNumberOfNodes() << endl;
 	}
-	catch ( const std::exception &e )
+      catch ( const std::exception &e )
 	{
-       		cout << "-------------------------------" << endl;
-		cout << "	Pb au getNumberOfNodes()  " << endl;
-        	cout << "-------------------------------" << endl;
-        	MESSAGE( "catched exception : " << e.what() ) ;
-        	return EXIT_FAILURE ;
+	  cout << "-------------------------------" << endl;
+	  cout << "	Pb au getNumberOfNodes()  " << endl;
+	  cout << "-------------------------------" << endl;
+	  MESSAGE( "catched exception : " << e.what() ) ;
+	  return EXIT_FAILURE ;
   	}
-	catch (...)
+      catch (...)
 	{
-		cout << "---------------------------------" << endl;
-		cout << "	Pb au getNumberOfNodes()  " << endl;
-		cout << "---------------------------------" << endl;
-        	return EXIT_FAILURE ;
+	  cout << "---------------------------------" << endl;
+	  cout << "	Pb au getNumberOfNodes()  " << endl;
+	  cout << "---------------------------------" << endl;
+	  return EXIT_FAILURE ;
 	};
 
-	int dimension;
-	try 
+      int dimension;
+      try 
 	{
-		dimension=tous[i].getDimension();
-		cout << "Dimension        : " << dimension << endl;	
+	  dimension=tous[i].getDimension();
+	  cout << "Dimension        : " << dimension << endl;	
 	}
-	catch ( const std::exception &e )
+      catch ( const std::exception &e )
 	{
-       		cout << "-------------------------------" << endl;
-		cout << "	Pb au getDimension()	" << endl;
-        	cout << "-------------------------------" << endl;
-        	MESSAGE( "catched exception : " << e.what() ) ;
-        	return EXIT_FAILURE ;
+	  cout << "-------------------------------" << endl;
+	  cout << "	Pb au getDimension()	" << endl;
+	  cout << "-------------------------------" << endl;
+	  MESSAGE( "catched exception : " << e.what() ) ;
+	  return EXIT_FAILURE ;
   	}
-	catch (...)
+      catch (...)
 	{
-		cout << "-------------------------------" << endl;
-		cout << "	Pb au getDimension()	" << endl;
-		cout << "-------------------------------" << endl;
-        	return EXIT_FAILURE ;
+	  cout << "-------------------------------" << endl;
+	  cout << "	Pb au getDimension()	" << endl;
+	  cout << "-------------------------------" << endl;
+	  return EXIT_FAILURE ;
 	}
 
-	for (int dim=1; dim< dimension; dim++)
+      for (int dim=1; dim< dimension; dim++)
 	{
-		int dim2=dimension - dim;
-		cout << "Nb d elements de dimension " << dim << " : ";
+	  int dim2=dimension - dim;
+	  cout << "Nb d elements de dimension " << dim << " : ";
 
-		try
-		{
-			cout << tous[i].getNumberOfConstituents(dim)<< endl;
-		}
-		catch ( const std::exception &e )
-		{
-       			cout << "------------------------------------" << endl;
-			cout << "  Pb au getNumberOfConstituents()   " << endl;
-        		cout << "------------------------------------" << endl;
-        		MESSAGE( "catched exception : " << e.what() ) ;
-        		return EXIT_FAILURE ;
-  		}
-		catch (...)
-		{
-			cout << "------------------------------------" << endl;
-			cout << "  Pb au getNumberOfConstituents()   " << endl;
-			cout << "------------------------------------" << endl;
-        		return EXIT_FAILURE ;
-		};
+	  try
+	    {
+	      cout << tous[i].getNumberOfConstituents(dim)<< endl;
+	    }
+	  catch ( const std::exception &e )
+	    {
+	      cout << "------------------------------------" << endl;
+	      cout << "  Pb au getNumberOfConstituents()   " << endl;
+	      cout << "------------------------------------" << endl;
+	      MESSAGE( "catched exception : " << e.what() ) ;
+	      return EXIT_FAILURE ;
+	    }
+	  catch (...)
+	    {
+	      cout << "------------------------------------" << endl;
+	      cout << "  Pb au getNumberOfConstituents()   " << endl;
+	      cout << "------------------------------------" << endl;
+	      return EXIT_FAILURE ;
+	    };
 	}
 /*
 
@@ -325,7 +327,7 @@ int main (int argc, char ** argv)
 		}
 */
 
-	cout << endl;
+      cout << endl;
 /*
 	if ( dimension > 1 )
 	{
@@ -357,13 +359,13 @@ int main (int argc, char ** argv)
 	}
 */
 
-  }
+    }
 
   delete[] tous ;
 
   return EXIT_SUCCESS ;
 /*
-Reste a Tester
+  Reste a Tester
   // Return number of constituents foreach type (which dimension is _dimension-1).
   map <medGeometryElement,int>  getNumberOfConstituentsForeachType() const; 
 */

@@ -2,11 +2,19 @@
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_DriversDef.hxx"
 
+#ifdef _DEBUG_
+#include "LocalTraceCollector.hxx"
+#endif /* ifdef _DEBUG_*/
+
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
 int main (int argc, char ** argv) {
+#ifdef _DEBUG_
+  LocalTraceCollector::instance();
+#endif /* ifdef _DEBUG_*/
+
   list<medGeometryElement> geomList = meshEntities[MED_CELL] ;
   list<medGeometryElement>::iterator itGeomList ;
   for(itGeomList=geomList.begin();itGeomList!=geomList.end();itGeomList++) {

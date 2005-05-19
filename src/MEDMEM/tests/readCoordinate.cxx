@@ -31,6 +31,8 @@
 using namespace std;
 using namespace MEDMEM;
 
+#define MED_TAILLE_PNOM  16
+
 void usage(char * name)
 {
   cout << "    " << name <<" <file name>"<< " <mesh name> " << " <interlace mode>" << endl;

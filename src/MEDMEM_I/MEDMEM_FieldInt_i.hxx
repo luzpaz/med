@@ -31,7 +31,7 @@ public:
     FIELDINT_i(FIELDINT_i & f);
     SALOME_MED::long_array * getValue (SALOME_MED::medModeSwitch mode ) 
 				   throw (SALOME::SALOME_Exception);
-    SALOME::Sender_ptr getSenderForValue(SALOME_MED::medModeSwitch mode)
+    SALOME::SenderInt_ptr getSenderForValue(SALOME_MED::medModeSwitch mode)
                                      throw (SALOME::SALOME_Exception);
 };
 }

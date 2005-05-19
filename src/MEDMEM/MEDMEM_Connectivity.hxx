@@ -6,6 +6,7 @@
 #include "utilities.h"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
+#include "MEDMEM_PolyhedronArray.hxx"
 
 namespace MEDMEM {
 class MEDSKYLINEARRAY;
@@ -60,9 +61,17 @@ protected:
 
 					/*! pointer to an array which stores the nodal connectivity */
   MEDSKYLINEARRAY* _nodal;
+                                        /*! pointer to an array which stores the nodal connectivity only for polygons */
+  MEDSKYLINEARRAY* _polygonsNodal;
+                                        /*! pointer to an array which stores the nodal connectivity only for polyhedron */
+  POLYHEDRONARRAY* _polyhedronNodal;
 					/*! pointer to an array which stores 
 					    the descending connectivity */
   MEDSKYLINEARRAY* _descending;
+                                        /*!  pointer to an array which stores the descending connectivity only for polygons */
+  MEDSKYLINEARRAY* _polygonsDescending;
+                                        /*!  pointer to an array which stores the descending connectivity only for polyhedron */
+  MEDSKYLINEARRAY* _polyhedronDescending;
 					/*! pointer to an array which stores 
 					    the reverse nodal connectivity */
   MEDSKYLINEARRAY* _reverseNodalConnectivity;
@@ -118,6 +127,10 @@ public:
   friend class MED_MESH_RDONLY_DRIVER21;
   friend class IMED_MESH_WRONLY_DRIVER;
   friend class MED_MESH_WRONLY_DRIVER21;
+  friend class MED_MESH_RDONLY_DRIVER22;
+  friend class MED_MESH_WRONLY_DRIVER22;
+
+
   friend ostream & operator<<(ostream &os, CONNECTIVITY &connectivity);
 
   // in order to fill CONNECTIVITY of MESH
@@ -149,7 +162,26 @@ public:
 
   inline void setEntityDimension(int EntityDimension);
 
+  void setPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
+			       MED_EN::medEntityMesh Entity,
+			       int* PolygonsConnectivity,
+			       int* PolygonsConnectivityIndex,
+			       int ConnectivitySize, int NumberOfPolygons);
+
+  void setPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,
+				 int* PolyhedronConnectivity,
+				 int* PolyhedronIndex, int ConnectivitySize,
+				 int NumberOfPolyhedron,
+				 int* PolyhedronFacesIndex= (int*) NULL,
+				 int NumberOfFaces=0);
+
   inline bool   existConnectivity     (MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh Entity) const;
+  
+  inline bool existPolygonsConnectivity(MED_EN::medConnectivity connectivityType,
+					MED_EN::medEntityMesh Entity) const;
+
+  inline bool existPolyhedronConnectivity(MED_EN::medConnectivity connectivityType,
+					  MED_EN::medEntityMesh Entity) const;
 
   virtual void          calculateConnectivity (MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh Entity);
 
@@ -170,6 +202,17 @@ public:
                                             MED_EN::medGeometryElement Type);
   virtual const int *     getConnectivityIndex (MED_EN::medConnectivity ConnectivityType,
 					    MED_EN::medEntityMesh Entity);
+
+  const int* getPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
+				     MED_EN::medEntityMesh Entity);
+  const int* getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+					  MED_EN::medEntityMesh Entity);
+  int getNumberOfPolygons() const;
+  const int* getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType);
+  const int* getPolyhedronFacesIndex();
+  const int* getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType);
+  int getNumberOfPolyhedronFaces() const;
+  int getNumberOfPolyhedron() const;
  
   const CELLMODEL &   getType              (MED_EN::medGeometryElement Type) const; 
   const CELLMODEL *   getCellsTypes        (MED_EN::medEntityMesh Entity)    const 
@@ -306,6 +349,44 @@ inline bool CONNECTIVITY::existConnectivity( MED_EN::medConnectivity Connectivit
       return true;
   } else if (_constituent!=NULL)
     return _constituent->existConnectivity(ConnectivityType,Entity);
+  return false;
+}
+
+/*! Returns true if a polygons connectivity exists on elements of type "Entity" */
+//-----------------------------------------------------------------------------//
+inline bool CONNECTIVITY::existPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
+						    MED_EN::medEntityMesh Entity) const
+//-----------------------------------------------------------------------------//
+{
+  if (_entity == Entity)
+    {
+      MESSAGE("existPolygonsConnectivity : _entity == Entity = "<<Entity);
+      if (ConnectivityType == MED_EN::MED_NODAL && _polygonsNodal != (MEDSKYLINEARRAY*) NULL)
+	return true;
+      if (ConnectivityType == MED_EN::MED_DESCENDING && _polygonsDescending != (MEDSKYLINEARRAY*) NULL)
+	return true;
+    }
+  else if (_constituent != (CONNECTIVITY*) NULL)
+    return _constituent->existPolygonsConnectivity(ConnectivityType,Entity);
+  return false;
+}
+
+/*! Returns true if a polyhedron connectivity exists on elements of type "Entity" */
+//-----------------------------------------------------------------------------//
+inline bool CONNECTIVITY::existPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,
+						      MED_EN::medEntityMesh Entity) const
+//-----------------------------------------------------------------------------//
+{
+  if (_entity == Entity)
+    {
+      MESSAGE("existPolyhedronConnectivity : _entity == Entity = "<<Entity);
+      if (ConnectivityType == MED_EN::MED_NODAL && _polyhedronNodal != (POLYHEDRONARRAY*) NULL)
+	return true;
+      if (ConnectivityType == MED_EN::MED_DESCENDING && _polyhedronDescending != (MEDSKYLINEARRAY*) NULL)
+	return true;
+    }
+  else if (_constituent != (CONNECTIVITY*) NULL)
+    return _constituent->existPolyhedronConnectivity(ConnectivityType,Entity);
   return false;
 }
 

@@ -289,6 +289,12 @@ MESH & MESH::operator=(const MESH &m)
   return *this;
 }
 
+bool MESH::operator==(const MESH& other) const
+{
+  BEGIN_OF("MESH::operator==");
+  return this==&other;
+}
+
 /*! Create a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. 
   The meshname driverName must already exists in the file.*/
 MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION)
@@ -2462,8 +2468,6 @@ struct _cell
 // Create families from groups
 void MESH::createFamilies() 
 {
-    int nbFam=0; // count the families we create, used as identifier ???????????
-
     int idFamNode = 0; // identifier for node families
     int idFamElement = 0; // identifier for cell, face or edge families
 

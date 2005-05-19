@@ -1,4 +1,5 @@
 #include "MEDMEM_MedMedDriver.hxx"
+#include "MEDMEM_Compatibility21_22.hxx"
 #include "MEDMEM_MedMedDriver21.hxx"
 #include "MEDMEM_define.hxx"
 

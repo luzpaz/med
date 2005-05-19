@@ -32,6 +32,10 @@
 #include "MEDMEM_SWIG_MedFieldIntDriver.hxx"
 #include "MEDMEM_Meshing.hxx"
 
+#ifdef _DEBUG_
+#include "LocalTraceCollector.hxx"
+#endif /* ifdef _DEBUG_*/
+
   using namespace MEDMEM;
   using namespace MED_EN;
 %}
@@ -55,6 +59,17 @@
       return NULL;
     }
 }
+
+/*
+  Initialisation block in the case of the debug mode (definition of _DEBUG_
+  compilation switch) and due to the LocalTraceCollector mechanism
+*/
+
+%init %{
+#ifdef _DEBUG_
+  LocalTraceCollector::instance();
+#endif /* ifdef _DEBUG_*/
+%}
 
 /*
   managing the use of operator= of any class by renaming it assign()
@@ -231,8 +246,7 @@ typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ;
 typedef enum {MED_DRIVER=0, GIBI_DRIVER=1, PORFLOW_DRIVER = 2, VTK_DRIVER=254,
 	      NO_DRIVER=255} driverTypes;
 
-typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26,
-	      MED_INT} med_type_champ;
+typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26} med_type_champ;
 
 typedef struct { int dt; int it; } DT_IT_;
 

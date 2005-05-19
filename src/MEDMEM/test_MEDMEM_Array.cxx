@@ -1,9 +1,17 @@
 #include "utilities.h"
 #include "MEDMEM_Array.hxx"
 
+#ifdef _DEBUG_
+#include "LocalTraceCollector.hxx"
+#endif /* ifdef _DEBUG_*/
+
 using namespace std;
 using namespace MEDMEM;
 int main (int argc, char ** argv) {
+
+#ifdef _DEBUG_
+  LocalTraceCollector::instance();
+#endif /* ifdef _DEBUG_*/
 
   int SpaceDimension = 3 ;
   int NumberOfNodes = 4 ; 

@@ -14,6 +14,7 @@
 #include "MEDMEM_Array.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Compatibility21_22.hxx"
 
 namespace MEDMEM {
 template <class T> class FIELD;
@@ -37,7 +38,7 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_DRIVER():_ptrField((FIELD<T> *)MED_NULL),
+  MED_FIELD_DRIVER():_ptrField((FIELD<T> *) NULL),
                      _fieldName(""),_fieldNum(MED_INVALID) {}
   /*!
     Constructor.
@@ -227,6 +228,8 @@ public :
 }
 
 #include "MEDMEM_MedFieldDriver21.hxx"
+
+#include "MEDMEM_MedFieldDriver22.hxx"
 
 namespace MEDMEM {
 

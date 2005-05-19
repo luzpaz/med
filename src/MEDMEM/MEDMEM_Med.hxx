@@ -25,7 +25,7 @@ struct LT_DT_IT_
 {
   bool operator() (const DT_IT_ &p1, const DT_IT_ &p2) const
   {
-    if ( bool test = p1.dt == p2.dt)
+    if ( p1.dt == p2.dt)
       return p1.it < p2.it ;
     else
       return  p1.dt < p2.dt ;
@@ -52,6 +52,9 @@ class MED
   friend class MED_MED_RDONLY_DRIVER21;
   friend class MED_MED_WRONLY_DRIVER21;
   friend class MED_MED_RDWR_DRIVER21;
+  friend class MED_MED_RDONLY_DRIVER22;
+  friend class MED_MED_WRONLY_DRIVER22;
+  friend class MED_MED_RDWR_DRIVER22;
 
 private:
 

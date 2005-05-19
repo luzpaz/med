@@ -249,15 +249,14 @@ inline const int * SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) 
   throw (MEDEXCEPTION)
 //---------------------------------------------------------------------
 {
-  const char * LOC = "Support::getNumber : " ;
   if (_isOnAllElts)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined, support is on all entity !")) ;
+    throw MEDEXCEPTION("Support::getNumber : Not defined, support is on all entity !") ;
   if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
     return _number->getValue() ;
   for (int i=0;i<_numberOfGeometricType;i++)
     if (_geometricType[i]==GeometricType)
       return _number->getI(i+1) ;
-  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"GeometricType not found !")) ;
+  throw MEDEXCEPTION("Support::getNumber : GeometricType not found !") ;
 }
 
 /*!
@@ -532,23 +531,8 @@ inline MED_EN::medEntityMesh SUPPORT::getEntity() const
 inline const MED_EN::medGeometryElement * SUPPORT::getTypes() const
 //---------------------------------------------------
 {
-  //    if ((_isOnAllElts)&(_entity != MED_NODE))
-  //      return _mesh->getTypes(_entity) ;
-  //    else
   return _geometricType;
 }
-
-//---------------------------------------------------
-//inline int * SUPPORT::getGeometricTypeNumber() const
-//---------------------------------------------------
-//  {
-//    const char * LOC = "SUPPORT::getGeometricTypeNumber() : ";
-//    if (_isOnAllElts)
-//      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined (is on all elements) !"));
-//    if (_geometricTypeNumber==NULL)
-//      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined !"));
-//    return _geometricTypeNumber;
-//  }
 
 }//End namespace MEDMEM
 

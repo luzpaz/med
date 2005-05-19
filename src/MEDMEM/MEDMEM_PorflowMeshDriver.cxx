@@ -19,6 +19,8 @@ using namespace std;
 using namespace MED_EN;
 using namespace MEDMEM;
 
+#define MED_NULL     NULL
+
 // geometric types conversion from PORFLOW -> MED
 const size_t PORFLOW_MESH_DRIVER::nb_geometrie_porflow;
 const medGeometryElement PORFLOW_MESH_DRIVER::geomPORFLOWtoMED[nb_geometrie_porflow] =
@@ -192,17 +194,19 @@ inline int PORFLOW_MESH_DRIVER::geomMEDtoPorflow(medGeometryElement medGeo)
 // Correspondance between the number of nodes and the Med face geometric type
 inline static medGeometryElement get2DMedGeomType(int nbSommets)
 {
-    switch (nbSommets)
+  switch (nbSommets)
     {
-	case 2:
-	    return MED_SEG2;
-	    break;
-	case 3:
-	    return MED_TRIA3;
-	    break;
-	case 4:
-	    return MED_QUAD4;
-	    break;
+    case 2:
+      return MED_SEG2;
+      break;
+    case 3:
+      return MED_TRIA3;
+      break;
+    case 4:
+      return MED_QUAD4;
+      break;
+    default:
+      throw MED_EXCEPTION ("the argument of this method is somehow bad fifferent from 2, 3, 4");
     } 
 }
 
@@ -398,7 +402,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the syntax corresponding to the use of input file is not implemented
 	if ( isKeyWord(buf_ligne,"LOCA") )
 	{
-	    MESSAGE("Mot clé LOCA détecté");
+	    MESSAGE("Mot cle LOCA detecte") ;
 	    processLoca=true;
 	    // if currentGroup is not empty, a group has been precessed 
 	    //  -> we store it, clear currentGroup, and start the precessing of a new group
@@ -436,7 +440,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the syntax corresponding to structured grids is not implemented
 	else if ( isKeyWord(buf_ligne,"GRID") )
 	{
-	    MESSAGE("Mot clé GRID détecté");
+	    MESSAGE("Mot cle GRID detecte");
 	    processLoca=false;
 	    pos=buf_ligne.find("UNST",0);
 	    if ( pos != string::npos ) // unstructured grid
@@ -468,7 +472,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the default option is HYBR
 	else if ( isKeyWord(buf_ligne,"CONN") )
 	{
-	    MESSAGE("Mot clé CONN détecté");
+	    MESSAGE("Mot cle CONN detecte");
 	    processLoca=false;
 	    string fileCONN=getPorflowFileName(buf_ligne,"CONN");
 	    
@@ -488,7 +492,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   expected syntax : COOR {VERT} {filename}
 	else if ( isKeyWord(buf_ligne,"COOR") )
 	{
-	    MESSAGE("Mot clé COOR détecté");
+	    MESSAGE("Mot cle COOR detecte");
 	    processLoca=false;
 	    string fileCOOR=getPorflowFileName(buf_ligne,"COOR");
 
@@ -647,9 +651,8 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	// else if (_ptrMesh->_spaceDimension==2)
 	//     _ptrMesh->_connectivity->updateGroup(_ptrMesh->_groupEdge) ;
 	
-	// Creation des familles à partir des groupes
-	// NC : Cet appel pourra être différé quand la gestion de la cohérence famille/groupes sera assurée
-	_ptrMesh->createFamilies();
+	// Creation des familles ?artir des groupes
+	// NC : Cet appel pourra ?e diffé²© quand la gestion de la cohé²¥nce famille/groupes sera assuré¥Š	_ptrMesh->createFamilies();
     }
 
 

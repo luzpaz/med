@@ -101,10 +101,15 @@ public :
   friend class IMED_MESH_WRONLY_DRIVER;
   friend class MED_MESH_RDONLY_DRIVER21;
   friend class MED_MESH_WRONLY_DRIVER21;
+  friend class MED_MESH_RDONLY_DRIVER22;
+  friend class MED_MESH_WRONLY_DRIVER22;
 
   friend class MED_MED_RDONLY_DRIVER21;
   friend class MED_MED_WRONLY_DRIVER21;
   friend class MED_MED_RDWR_DRIVER21;
+  friend class MED_MED_RDONLY_DRIVER22;
+  friend class MED_MED_WRONLY_DRIVER22;
+  friend class MED_MED_RDWR_DRIVER22;
 
   friend class GIBI_MESH_RDONLY_DRIVER;
   friend class GIBI_MESH_WRONLY_DRIVER;
@@ -120,6 +125,7 @@ public :
   MESH();
   MESH(MESH &m);
   MESH & operator=(const MESH &m);
+  virtual bool operator==(const MESH& other) const;
   MESH( driverTypes driverType, const string & fileName="",
 	const string & meshName="") throw (MEDEXCEPTION);
   virtual ~MESH();
@@ -167,6 +173,10 @@ public :
 					 MED_EN::medGeometryElement Type) const;
   virtual inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
 					MED_EN::medEntityMesh Entity) const;
+  inline bool existPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
+					MED_EN::medEntityMesh Entity) const;
+  inline bool existPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,
+					  MED_EN::medEntityMesh Entity) const;
 
   virtual inline MED_EN::medGeometryElement getElementType(MED_EN::medEntityMesh Entity,
 						   int Number) const;
@@ -183,6 +193,18 @@ public :
 					     MED_EN::medGeometryElement Type) const;
   virtual inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
 						  MED_EN::medEntityMesh Entity) const;
+
+  inline const int * getPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
+					     MED_EN::medEntityMesh Entity) const;
+  inline const int * getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+                                                  MED_EN::medEntityMesh Entity) const;
+  inline int getNumberOfPolygons() const;
+  inline const int * getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const;
+  inline const int * getPolyhedronFacesIndex() const;
+  inline const int * getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const;
+  inline int getNumberOfPolyhedronFaces() const;
+  inline int getNumberOfPolyhedron() const;
+
   virtual int                 getElementNumber(MED_EN::medConnectivity ConnectivityType, 
                                                MED_EN::medEntityMesh Entity, 
                                                MED_EN::medGeometryElement Type, 
@@ -546,6 +568,24 @@ inline bool MESH::existConnectivity(MED_EN::medConnectivity connectivityType, ME
   return _connectivity->existConnectivity(connectivityType,entity);
 }
 /*!
+  Returns true if the wanted polygons connectivity exist, else returns false
+*/
+inline bool MESH::existPolygonsConnectivity(MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh entity) const
+{
+  if (_connectivity == (CONNECTIVITY*) NULL)
+    throw MEDEXCEPTION("MESH::existPolygonsConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
+  return _connectivity->existPolygonsConnectivity(connectivityType,entity);
+}
+/*!
+  Returns true if the wanted polyhedron connectivity exist, else returns false
+*/
+inline bool MESH::existPolyhedronConnectivity(MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh entity) const
+{
+  if (_connectivity == (CONNECTIVITY*) NULL)
+    throw MEDEXCEPTION("MESH::existPolyhedronConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
+  return _connectivity->existPolyhedronConnectivity(connectivityType,entity);
+}
+/*!
   Returns the geometric type of global element Number of entity Entity.
 
   Throw an exception if Entity is not defined or Number are wrong (too big).
@@ -619,6 +659,71 @@ inline const int * MESH::getConnectivityIndex(MED_EN::medConnectivity Connectivi
 {
   //  checkGridFillConnectivity();
   return _connectivity->getConnectivityIndex(ConnectivityType, entity);
+}
+/*!
+  Return the required connectivity of polygons for the given entity.
+  You must also get the corresponding index array.
+ */
+inline const int * MESH::getPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
+						 MED_EN::medEntityMesh Entity) const
+{
+  return _connectivity->getPolygonsConnectivity(ConnectivityType,Entity);
+}
+/*!
+  Return the required index array for polygons connectivity.
+ */
+inline const int * MESH::getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+						      MED_EN::medEntityMesh Entity) const
+{
+  return _connectivity->getPolygonsConnectivityIndex(ConnectivityType,Entity);
+}
+/*!
+  Return the number of polygons.
+ */
+inline int MESH::getNumberOfPolygons() const
+{
+  return _connectivity->getNumberOfPolygons();
+}
+/*!
+  Return the required connectivity of polyhedron :
+  - in nodal mode, it gives you the polyhedron faces nodal connectivity.
+  - in descending mode, it gives you the polyhedron faces list.
+  You must also get :
+  - faces index and polyhedron index arrays in nodal mode.
+  - polyhedron index array in descending mode.
+ */
+inline const int * MESH::getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const
+{
+  return _connectivity->getPolyhedronConnectivity(ConnectivityType);
+}
+/*!
+  Return the index array of polyhedron faces in nodal mode.
+  You must also get the polyhedron index array.
+ */
+inline const int * MESH::getPolyhedronFacesIndex() const
+{
+  return _connectivity->getPolyhedronFacesIndex();
+}
+/*!
+  Return the required polyhedron index array.
+ */
+inline const int * MESH::getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const
+{
+  return _connectivity->getPolyhedronIndex(ConnectivityType);
+}
+/*!
+  Return the number of polyhedron faces.
+ */
+inline int MESH::getNumberOfPolyhedronFaces() const
+{
+  return _connectivity->getNumberOfPolyhedronFaces();
+}
+/*!
+  Return the number of polyhedron.
+ */
+inline int MESH::getNumberOfPolyhedron() const
+{
+  return _connectivity->getNumberOfPolyhedron();
 }
 /*!
   Returns the corresponding length of the array returned by MESH::getReverseConnectivity with exactly the same arguments.

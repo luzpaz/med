@@ -82,7 +82,10 @@ void COORDINATEClient::fillCopy()
   long nN = IOR_Mesh->getNumberOfNodes();
   double *tC;
   long nC;
-  tC=(double *)ReceiverFactory::getValue(IOR_Mesh->getSenderForCoordinates(MED_FULL_INTERLACE),nC);
+
+  SALOME::SenderDouble_var senderForCoords=IOR_Mesh->getSenderForCoordinates(MED_FULL_INTERLACE);
+  tC=ReceiverFactory::getValue(senderForCoords,nC);
+
   ASSERT(nC == (getSpaceDimension() * nN));
   
   MEDARRAY<double> mC(tC, getSpaceDimension(), nN,MED_FULL_INTERLACE,true);
