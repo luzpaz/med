@@ -1,4 +1,5 @@
 # include <string> 
+# include <math.h>
 
 # include "MEDMEM_Med.hxx"
 # include "MEDMEM_DriverFactory.hxx" 
@@ -7,6 +8,8 @@
 # include "MEDMEM_Mesh.hxx"
 # include "MEDMEM_Grid.hxx"
 # include "MEDMEM_Field.hxx"
+# include "MEDMEM_Group.hxx"
+# include "MEDMEM_Family.hxx"
 
 # include "MEDMEM_Exception.hxx"
 # include "utilities.h"
@@ -115,6 +118,8 @@ MED::~MED()
   for ( itSupportOnMesh=_support.begin();itSupportOnMesh != _support.end(); itSupportOnMesh++ ) {
     map<MED_EN::medEntityMesh,SUPPORT *>::iterator itSupport ;
     for ( itSupport=(*itSupportOnMesh).second.begin();itSupport!=(*itSupportOnMesh).second.end();itSupport++)
+      if (! dynamic_cast<GROUP*>( (*itSupport).second ) &&
+          ! dynamic_cast<FAMILY*>( (*itSupport).second ) )
 	delete (*itSupport).second ;
   }
 
@@ -488,15 +493,15 @@ void MED::getFieldNames     ( string * fieldNames ) const
   const char * LOC = "MED::getFieldNames ( string * ) const : ";
   BEGIN_OF(LOC);
 
-  unsigned int fieldNamesSize =  sizeof(fieldNames) / sizeof(string *);
+//  unsigned int fieldNamesSize =  sizeof(fieldNames) / sizeof(string *);
  
-  if ( fieldNamesSize != _fields.size() )
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "Size of parameter fieldNames is |" 
-                                     << fieldNamesSize     << "| and should be |" 
-                                     << _fields.size() << "| and should be |" 
-                                     )
-                          );   
+//  if ( fieldNamesSize != _fields.size() )
+//    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+//                                     << "Size of parameter fieldNames is |" 
+//                                     << fieldNamesSize     << "| and should be |" 
+//                                     << _fields.size() << "| and should be |" 
+//                                     )
+//                         );   
   
   // REM : ALLOCATION D'UN TABLEAU DE POINTEURS SUR STRING FAITE PAR LE CLIENT
   map<FIELD_NAME_,MAP_DT_IT_>::const_iterator  currentField;
@@ -631,6 +636,32 @@ FIELD_  * MED::getField          ( const string & fieldName, const int dt=MED_NO
   
 };
 
+/*!
+ Return a reference to the FIELD object named fieldName with 
+ time and iteration nb it.
+*/
+FIELD_  *MED::getField2(const string & fieldName, double time, int it) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "MED::getField2 ( const string &, const int, const int ) const : ";
+  const double eps=1e-9;
+  map<FIELD_NAME_,MAP_DT_IT_>::const_iterator itFields=_fields.find(fieldName);
+  if ( itFields == _fields.end() ) 
+    throw MED_EXCEPTION (LOCALIZED( STRING(LOC) << "There is no known field named |" << fieldName << "|"));
+  MAP_DT_IT_::const_iterator iters=(*itFields).second.begin();
+  bool found=false;
+  FIELD_  *ret;
+  for(;iters!=(*itFields).second.end() && !found;iters++)
+    if(fabs((*iters).second->getTime()-time)<eps)
+      //if(it==(*iters).first.it)
+	{
+	  ret=(*iters).second;
+	  found=true;
+	}
+  if(!found)
+    throw MED_EXCEPTION(LOCALIZED( STRING(LOC) << "There is no known field existing at specified time and iteration !!! "));
+  return ret;
+  END_OF(LOC);
+}
 
 // fiend ostream & MED::operator<<(ostream &os,const MED & med) const {
 //   return os;

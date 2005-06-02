@@ -131,7 +131,8 @@ void CONNECTIVITYClient::fillCopy()
       int kT = Count[iT+1]-Count[iT];
       SCRUTE(kT);
       
-      pC=(int *)ReceiverFactory::getValue(IOR_Mesh->getSenderForConnectivity(MED_FULL_INTERLACE, MED_NODAL, Entity, T[iT]),nC);
+      SALOME::SenderInt_var senderForConnectivity=IOR_Mesh->getSenderForConnectivity(MED_FULL_INTERLACE, MED_NODAL, Entity, T[iT]);
+      pC=ReceiverFactory::getValue(senderForConnectivity,nC);
       SCRUTE(nC);
       ASSERT(nC == (T[iT]%100) * kT);
       

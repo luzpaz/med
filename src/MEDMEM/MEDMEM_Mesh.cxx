@@ -4,8 +4,6 @@
 */
 
 #include <math.h>
-
-#include <list>
 #include <map>
 #include <sstream>
 
@@ -19,7 +17,7 @@
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_CellModel.hxx"
-
+#include "MEDMEM_InterpolationHighLevelObjects.hxx"
 #include "MEDMEM_DriverFactory.hxx"
 
 using namespace std;
@@ -289,6 +287,12 @@ MESH & MESH::operator=(const MESH &m)
   return *this;
 }
 
+bool MESH::operator==(const MESH& other) const
+{
+  BEGIN_OF("MESH::operator==");
+  return this==&other;
+}
+
 /*! Create a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. 
   The meshname driverName must already exists in the file.*/
 MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION)
@@ -311,6 +315,29 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
 
   END_OF(LOC);
 };
+
+/*
+  for a deep comparison of 2 meshes.
+*/
+bool MESH::deepCompare(const MESH& other) const
+{
+  int size1=getSpaceDimension()*getNumberOfNodes();
+  int size2=other.getSpaceDimension()*other.getNumberOfNodes();
+  if(size1!=size2)
+    return false;
+  const double* coord1=getCoordinates(MED_FULL_INTERLACE);
+  const double* coord2=other.getCoordinates(MED_FULL_INTERLACE);
+  bool ret=true;
+  for(int i=0;i<size1 && ret;i++)
+    {
+      ret=(fabs(coord1[i]-coord2[i])<1e-15);
+    }
+  if(ret)
+    {
+      return _connectivity->deepCompare(*other._connectivity);
+    }
+  return ret;
+}
 
 
 //  Node MESH::Donne_Barycentre(const Maille &m) const
@@ -469,114 +496,84 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   BEGIN_OF(LOC) ;
   // some test :
   // actually we could only get face (in 3D) and edge (in 2D)
-  if (_spaceDimension == 3) 
+  medEntityMesh entityToParse=Entity;
+  if(_spaceDimension == 3) 
     if (Entity != MED_FACE)
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
-  if (_spaceDimension == 2) 
-    if (Entity != MED_EDGE)
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
+      if(Entity==MED_NODE)
+	entityToParse=MED_FACE;
+      else
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
+  if(_spaceDimension == 2)
+    if(Entity != MED_EDGE)
+      if(Entity==MED_NODE)
+	entityToParse=MED_EDGE;
+      else
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
   
-  // well, all rigth !
-  SUPPORT * mySupport = new SUPPORT(this,"Boundary",Entity);
-  //mySupport.setDescription("boundary of type ...");
-  mySupport->setAll(false);
-  
-
   const int * myConnectivityValue = getReverseConnectivity(MED_DESCENDING) ;
   const int * myConnectivityIndex = getReverseConnectivityIndex(MED_DESCENDING) ;
-  int numberOf = getNumberOfElements(Entity,MED_ALL_ELEMENTS) ;
-  list<int> myElementsList ;
-  int size = 0 ;
+  int numberOf = getNumberOfElements(entityToParse,MED_ALL_ELEMENTS) ;
+  list<int> myElementsList;
   for (int i=0 ; i<numberOf; i++)
     if (myConnectivityValue[myConnectivityIndex[i]] == 0) {
-      myElementsList.push_back(i+1) ;
-      size++ ;
+      myElementsList.push_back(i+1);
     }
-  // Well, we must know how many geometric type we have found
-  int * myListArray = new int[size] ;
-  int id = 0 ;
-  list<int>::iterator myElementsListIt ;
-  for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
-    myListArray[id]=(*myElementsListIt) ;
-    id ++ ;
-  }
+  if(Entity==MED_NODE)
+    return buildSupportOnNodeFromElementList(myElementsList,entityToParse);
+  else
+    return buildSupportOnElementsFromElementList(myElementsList,entityToParse);
+}
 
-  int numberOfGeometricType ;
-  medGeometryElement* geometricType ;
-  int * numberOfGaussPoint ;
-  int * geometricTypeNumber ;
-  int * numberOfElements ;
-  //MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY() ;
-  int * mySkyLineArrayIndex ;
+/*!
+  Method that do the same thing as buildSupportOnNodeFromElementList except that a SUPPORT is not created.
+ */
+void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT *supportToFill) const throw (MEDEXCEPTION)
+{
+  MED_EN::medEntityMesh entity=supportToFill->getEntity();
+  supportToFill->setAll(false);
+  supportToFill->setMesh((MESH *)this);
+  const int *myConnectivityValueNodal=getConnectivity(MED_FULL_INTERLACE,MED_NODAL,entity,MED_ALL_ELEMENTS);
+  const int *myConnectivityIndexNodal=getConnectivityIndex(MED_NODAL,entity);
 
-  int numberOfType = getNumberOfTypes(Entity) ;
-  if (numberOfType == 1) { // wonderfull : it's easy !
-    numberOfGeometricType = 1 ;
-    geometricType = new medGeometryElement[1] ;
-    const medGeometryElement *  allType = getTypes(Entity);
-    geometricType[0] = allType[0] ;
-    numberOfGaussPoint = new int[1] ;
-    numberOfGaussPoint[0] = 1 ;
-    geometricTypeNumber = new int[1] ; // not use, but initialized to nothing
-    geometricTypeNumber[0] = 0 ;
-    numberOfElements = new int[1] ;
-    numberOfElements[0] = size ;
-    mySkyLineArrayIndex = new int[2] ;
-    mySkyLineArrayIndex[0]=1 ;
-    mySkyLineArrayIndex[1]=1+size ;
-  }
-  else {// hemmm
-    map<medGeometryElement,int> theType ;
-    for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
-      medGeometryElement myType = getElementType(Entity,*myElementsListIt) ;
-      if (theType.find(myType) != theType.end() )
-	theType[myType]+=1 ;
-      else
-	theType[myType]=1 ;
+  int i;
+  set<int> nodes;
+  for(list<int>::const_iterator iter=listOfElt.begin();iter!=listOfElt.end();iter++)
+    {
+      for(i=myConnectivityIndexNodal[*iter-1]-1;i<myConnectivityIndexNodal[*iter]-1;i++)
+	nodes.insert(myConnectivityValueNodal[i]);
     }
-    numberOfGeometricType = theType.size() ;
-    geometricType = new medGeometryElement[numberOfGeometricType] ;
-    //const medGeometryElement *  allType = getTypes(Entity); !! UNUSZED VARIABLE !!
-    numberOfGaussPoint = new int[numberOfGeometricType] ;
-    geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
-    numberOfElements = new int[numberOfGeometricType] ;
-    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
-    int index = 0 ;
-    mySkyLineArrayIndex[0]=1 ;
-    map<medGeometryElement,int>::iterator theTypeIt ;
-    for (theTypeIt=theType.begin();theTypeIt!=theType.end();theTypeIt++) {
-      geometricType[index] = (*theTypeIt).first ;
-      numberOfGaussPoint[index] = 1 ;
-      geometricTypeNumber[index] = 0 ;
-      numberOfElements[index] = (*theTypeIt).second ;
-      mySkyLineArrayIndex[index+1]=mySkyLineArrayIndex[index]+numberOfElements[index] ;
-      index++ ;
-    }
-  }
-  //mySkyLineArray->setMEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
-  MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
+  list<int> nodesList;
+  for(set<int>::iterator iter2=nodes.begin();iter2!=nodes.end();iter2++)
+    nodesList.push_back(*iter2);
+  supportToFill->fillFromNodeList(nodesList);
+}
 
-  mySupport->setNumberOfGeometricType(numberOfGeometricType) ;
-  mySupport->setGeometricType(geometricType) ;
-  mySupport->setNumberOfGaussPoint(numberOfGaussPoint) ;
-  mySupport->setNumberOfElements(numberOfElements) ;
-  mySupport->setTotalNumberOfElements(size) ;
-  // mySupport->setGeometricTypeNumber(geometricTypeNumber) ;
-  mySupport->setNumber(mySkyLineArray) ;
-    
-  delete[] numberOfElements;
-  delete[] geometricTypeNumber;
-  delete[] numberOfGaussPoint;
-  delete[] geometricType;
-  delete[] mySkyLineArrayIndex;
-  delete[] myListArray;
-//   delete mySkyLineArray;
+/*!
+  Method created to factorize code. This method creates a new support on NODE (to deallocate) containing all the nodes id contained in elements 'listOfElt' of
+  entity 'entity'.
+ */
+SUPPORT *MESH::buildSupportOnNodeFromElementList(const list<int>& listOfElt,MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION)
+{
+  SUPPORT * mySupport = new SUPPORT((MESH *)this,"Boundary",entity);
+  fillSupportOnNodeFromElementList(listOfElt,mySupport);
+  return mySupport;
+}
 
+/*!
+  Method created to factorize code. This method creates a new support on entity 'entity' (to deallocate) containing all the entities contained in 
+  elements 'listOfElt' of entity 'entity'.
+ */
+SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "MESH::buildSupportOnElementsFromElementList : " ;
+  BEGIN_OF(LOC);
+  SUPPORT *mySupport=new SUPPORT((MESH *)this,"Boundary",entity);
+  mySupport->fillFromElementList(listOfElt);
   END_OF(LOC) ;
   return mySupport ;
 }
 
-FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTION)
+FIELD<double>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getVolume(SUPPORT*) : ";
   BEGIN_OF(LOC);
@@ -2200,7 +2197,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   return a SUPPORT pointer on the union of all SUPPORTs in Supports.
   You should delete this pointer after use to avoid memory leaks.
 */
-SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) const throw (MEDEXCEPTION)
+SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH:::mergeSupports(const vector<SUPPORT *> ) : " ;
   BEGIN_OF(LOC) ;
@@ -2320,7 +2317,7 @@ SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) const throw (MED
   The (SUPPORT *) NULL pointer is returned if the intersection is empty.
   You should delete this pointer after use to avois memory leaks.
 */
-SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) const throw (MEDEXCEPTION)
+SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH:::intersectSupports(const vector<SUPPORT *> ) : " ;
   BEGIN_OF(LOC) ;
@@ -2367,7 +2364,7 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) const throw 
 
       int lenName = strlen((Supports[0]->getName()).c_str()) + 16 + 1;
       int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 16 + 1;
-
+      
       for(int i = 1;i<size;i++)
 	{
 	  obj = const_cast <SUPPORT *> (Supports[i]);
@@ -2386,7 +2383,6 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) const throw 
 		strlen((Supports[i]->getDescription()).c_str());
 	    }
 	}
-
       if(returnedSupport != (SUPPORT *) NULL)
 	{
 	  returnedSupportNameChar = new char[lenName];
@@ -2663,4 +2659,40 @@ void MESH::createFamilies()
     // re-scan the cells vector, and fill the family vector with cells.
     // creation of support, check if it already exist.
     }
+}
+
+int MESH::getElementContainingPoint(const double *coord)
+{
+  if(_spaceDimension==3)
+    {
+      Meta_Wrapper<3> *fromWrapper=new Meta_Wrapper<3> (getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
+							const_cast<CONNECTIVITY *>(getConnectivityptr()));
+      Meta_Wrapper<3> *toWrapper=new Meta_Wrapper<3> (1,const_cast<double *>(coord));
+      Meta_Mapping<3> *mapping=new Meta_Mapping<3> (fromWrapper,toWrapper);
+      mapping->Cree_Mapping(1);
+      vector<int> vectormapping=mapping->Get_Mapping();
+      return vectormapping[0]+1;
+    }
+  else if(_spaceDimension==2)
+    {
+      Meta_Wrapper<2> *fromWrapper=new Meta_Wrapper<2> (getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
+							const_cast<CONNECTIVITY *>(getConnectivityptr()));
+      Meta_Wrapper<2> *toWrapper=new Meta_Wrapper<2> (1,const_cast<double *>(coord));
+      Meta_Mapping<2> *mapping=new Meta_Mapping<2> (fromWrapper,toWrapper);
+      mapping->Cree_Mapping(1);
+      vector<int> vectormapping=mapping->Get_Mapping();
+      return vectormapping[0]+1;
+      }
+  else
+    throw MEDEXCEPTION("MESH::getElementContainingPoint : invalid _spaceDimension must be equal to 2 or 3 !!!");
+}
+
+//Presently disconnected in C++
+void MESH::addReference() const
+{
+}
+
+//Presently disconnected in C++
+void MESH::removeReference() const
+{
 }

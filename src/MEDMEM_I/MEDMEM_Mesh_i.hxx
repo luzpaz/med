@@ -66,7 +66,7 @@ public:
   SALOME_MED::double_array* getCoordinates(SALOME_MED::medModeSwitch typeSwitch)
     		 	 throw (SALOME::SALOME_Exception);
 
-  SALOME::Sender_ptr getSenderForCoordinates(SALOME_MED::medModeSwitch typeSwitch)
+  SALOME::SenderDouble_ptr getSenderForCoordinates(SALOME_MED::medModeSwitch typeSwitch)
     throw (SALOME::SALOME_Exception);
   
   CORBA::Double  getCoordinate(CORBA::Long Number, CORBA::Long Axis)
@@ -102,7 +102,7 @@ public:
 					 SALOME_MED::medGeometryElement geomElement)
                          throw (SALOME::SALOME_Exception);
 
-  SALOME::Sender_ptr getSenderForConnectivity(SALOME_MED::medModeSwitch typeSwitch, 
+  SALOME::SenderInt_ptr getSenderForConnectivity(SALOME_MED::medModeSwitch typeSwitch, 
 					      SALOME_MED::medConnectivity mode, 
 					      SALOME_MED::medEntityMesh entity, 
 					      SALOME_MED::medGeometryElement geomElement)
@@ -188,6 +188,7 @@ public:
     SALOME_MED::MESH::connectivityInfos * getConnectGlobal
 				  (SALOME_MED::medEntityMesh entity)
                                   throw (SALOME::SALOME_Exception);
+    CORBA::Boolean areEquals(SALOME_MED::MESH_ptr other);
 
   void release();
 };

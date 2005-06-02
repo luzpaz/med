@@ -143,7 +143,6 @@ void Med_Gen_i::addInStudy(SALOMEDS::Study_var myStudy)
   throw(SALOME::SALOME_Exception)
 {
   SALOMEDS::StudyBuilder_var  myBuilder = myStudy->NewBuilder();
-  
   // Create SComponent labelled 'Med' if it doesn't already exit
   SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
   if ( CORBA::is_nil(medfather) )
@@ -232,7 +231,6 @@ throw (SALOME::SALOME_Exception)
 
 	SCRUTE(fileName);
   	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
-
 	if (!_duringLoad) addInStudy(myStudy) ;
 
 	try 

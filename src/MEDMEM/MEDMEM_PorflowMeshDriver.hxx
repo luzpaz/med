@@ -6,11 +6,14 @@
 
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_GenDriver.hxx"
-#include "MEDMEM_DriverTools.hxx"
+//#include "MEDMEM_DriverTools.hxx"
 
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "utilities.h"
+
+#include <vector>
+#include <set>
 
 /*!
 
@@ -26,6 +29,8 @@ class MESH;
 class FAMILY;
 class GROUP;
 class CONNECTIVITY;
+class _intermediateMED;
+class _maille;
 class PORFLOW_MESH_DRIVER : public GENDRIVER
 {
 protected:

@@ -38,6 +38,8 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
   for(int i=0;i<NumberOfComponents;i++) {
     _componentsTypes[i] = 0 ;
   }
+  if(_support)
+    _support->addReference();
 }
 
 FIELD_::FIELD_(const FIELD_ &m)
@@ -46,41 +48,13 @@ FIELD_::FIELD_(const FIELD_ &m)
   _name = m._name;
   _description = m._description;
   _support = m._support;
+  if(_support)
+    _support->addReference();
   _numberOfComponents = m._numberOfComponents;
   _numberOfValues = m._numberOfValues;
-
-  if (m._componentsTypes != NULL)
-    {
-      _componentsTypes = new int[m._numberOfComponents] ;
-      memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
-      /*
-      _componentsTypes = new int[m._numberOfComponents] ;
-      for(int i=0;i<m._numberOfComponents;i++) {
-	_componentsTypes[i] = m._componentsTypes[i] ;
-      }
-      */
-    }
-  else _componentsTypes = (int *) NULL;
-
-  _componentsNames = new string[m._numberOfComponents];
-  for (int i=0; i<m._numberOfComponents; i++)
-    {_componentsNames[i]=m._componentsNames[i];}
-  _componentsDescriptions = new string[m._numberOfComponents];
-  for (int i=0; i<m._numberOfComponents; i++)
-    {_componentsDescriptions[i]=m._componentsDescriptions[i];}
-  _componentsUnits = new UNIT[m._numberOfComponents];
-  for (int i=0; i<m._numberOfComponents; i++)
-    {_componentsUnits[i] = m._componentsUnits[i];}
-  // L'operateur '=' est defini dans la classe UNIT
-  _MEDComponentsUnits = new string[m._numberOfComponents];
-  for (int i=0; i<m._numberOfComponents; i++)
-    {_MEDComponentsUnits[i] = m._MEDComponentsUnits[i];}
-  _iterationNumber = m._iterationNumber;
-  _time = m._time;
-  _orderNumber = m._orderNumber;
+  copyGlobalInfo(m);
   _valueType = m._valueType;
   //_drivers = m._drivers ; // PG : Well, same driver, what about m destructor !
-
 }
 
 FIELD_::~FIELD_()
@@ -96,7 +70,6 @@ FIELD_::~FIELD_()
     delete[] _componentsUnits ;
   if ( _MEDComponentsUnits !=NULL)
     delete[] _MEDComponentsUnits ;
-
   // delete driver
 //   vector<GENDRIVER *>::const_iterator it ;
 //   SCRUTE(_drivers.size());
@@ -207,7 +180,7 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume) const 
    Check up the compatibility of fields before performing an arithmetic operation
   \endif
 */
-void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (MEDEXCEPTION)
+void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n , bool checkUnit ) throw (MEDEXCEPTION)
 {
     string diagnosis;
 
@@ -223,20 +196,23 @@ void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (
       diagnosis+="They don't have the same number of values!";
     else
       {
-	for(int i=0; i<m._numberOfComponents; i++)
-	{
-// Not yet implemented   
-//	    if(m._componentsTypes[i] != n._componentsTypes[i])
-//	    {
-//		diagnosis+="Components don't have the same types!";
-//		break;
-//	    }
-	  if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
-	    {
-	      diagnosis+="Components don't have the same units!";
-	      break;
-	    }
-	}
+	if(checkUnit)
+	  {
+	    for(int i=0; i<m._numberOfComponents; i++)
+	      {
+		// Not yet implemented   
+		//	    if(m._componentsTypes[i] != n._componentsTypes[i])
+		//	    {
+		//		diagnosis+="Components don't have the same types!";
+		//		break;
+		//	    }
+		if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
+		  {
+		    diagnosis+="Components don't have the same units!";
+		    break;
+		  }
+	      }
+	  }
       }
 
     if(diagnosis.size()) // if fields are not compatible : complete diagnosis and throw exception
@@ -253,6 +229,50 @@ void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (
 	throw MEDEXCEPTION(diagnosis.c_str());
     }
 
+}
+
+void FIELD_::_deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n , bool checkUnit ) throw (MEDEXCEPTION)
+{
+  string diagnosis;
+
+    // check-up, fill diagnosis if some incompatibility is found.
+    if(m._support != n._support)
+      {
+	if(!(m._support->deepCompare(*n._support)))
+	  diagnosis+="They don't have the same support!";
+      }
+    else if(m._numberOfComponents != n._numberOfComponents)
+      diagnosis+="They don't have the same number of components!";
+    else if(m._numberOfValues != n._numberOfValues)
+      diagnosis+="They don't have the same number of values!";
+    else
+      {
+	if(checkUnit)
+	  {
+	    for(int i=0; i<m._numberOfComponents; i++)
+	      {
+		if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
+		  {
+		    diagnosis+="Components don't have the same units!";
+		    break;
+		  }
+	      }
+	  }
+      }
+
+    if(diagnosis.size()) // if fields are not compatible : complete diagnosis and throw exception
+    {
+	diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
+	         + n._name + " are not compatible.\n" + diagnosis;
+	throw MEDEXCEPTION(diagnosis.c_str());
+    }
+
+    if( m.getNumberOfValues()<=0 || m.getNumberOfComponents()<=0) // check up the size is strictly positive
+    {
+	diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
+	         + n._name + " are empty! (size<=0).\n";
+	throw MEDEXCEPTION(diagnosis.c_str());
+    }
 }
 
 //  void     FIELD_::setIterationNumber (int IterationNumber)           {};
@@ -283,6 +303,41 @@ void     FIELD_::read          (const GENDRIVER &)                    {};
 void     FIELD_::write         (int , const string & ) {};
 void     FIELD_::writeAppend   (int , const string & ) {};
 void     FIELD_::read          (int )                                  {};
+
+void     FIELD_::copyGlobalInfo(const FIELD_& m)
+{  
+  if (m._componentsTypes != NULL)
+    {
+      _componentsTypes = new int[m._numberOfComponents] ;
+      memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
+    }
+  else
+    _componentsTypes = (int *) NULL;
+
+  _componentsNames = new string[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    _componentsNames[i]=m._componentsNames[i];
+  _componentsDescriptions = new string[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    _componentsDescriptions[i]=m._componentsDescriptions[i];
+
+  if (m._componentsUnits != NULL)
+    {
+      _componentsUnits = new UNIT[m._numberOfComponents];
+      for (int i=0; i<m._numberOfComponents; i++)
+	_componentsUnits[i] = m._componentsUnits[i];
+    }
+  else
+    _componentsUnits=(UNIT*)NULL;
+  
+  // L'operateur '=' est defini dans la classe UNIT
+  _MEDComponentsUnits = new string[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    {_MEDComponentsUnits[i] = m._MEDComponentsUnits[i];}
+  _iterationNumber = m._iterationNumber;
+  _time = m._time;
+  _orderNumber = m._orderNumber;
+}
 
 //  void                     FIELD_::setValueType(med_type_champ ValueType) {};
 //  med_type_champ FIELD_::getValueType() {};

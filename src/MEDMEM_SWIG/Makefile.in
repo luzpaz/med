@@ -38,7 +38,10 @@ EXPORT_HEADERS = \
 	MEDMEM_SWIG_FieldDouble.hxx \
 	MEDMEM_SWIG_FieldInt.hxx \
 	MEDMEM_SWIG_MedFieldDoubleDriver.hxx \
-	MEDMEM_SWIG_MedFieldIntDriver.hxx
+	MEDMEM_SWIG_MedFieldIntDriver.hxx \
+	MEDMEM_SWIG_AsciiFieldDoubleDriver.hxx \
+	MEDMEM_SWIG_AsciiFieldIntDriver.hxx \
+	MEDMEM_SWIG_Templates.hxx
 
 # Libraries targets
 
@@ -47,9 +50,22 @@ LIB = libMEDMEM_Swigcmodule.la
 LIB_SRC = MEDMEM_SWIG_FieldDouble.cxx \
 	  MEDMEM_SWIG_FieldInt.cxx \
 	  MEDMEM_SWIG_MedFieldDoubleDriver.cxx \
-	  MEDMEM_SWIG_MedFieldIntDriver.cxx
+	  MEDMEM_SWIG_MedFieldIntDriver.cxx \
+	  MEDMEM_SWIG_AsciiFieldDoubleDriver.cxx \
+	  MEDMEM_SWIG_AsciiFieldIntDriver.cxx
 
+ifeq (@SWIG_VERSION@, 1.3.21)
+SWIG_DEF = libMEDMEM_Swig.i dummy.i
+
+dummy_wrap.cxx: libMEDMEM_Swig_wrap.cxx
+	sed -e 's/SwigValueWrapper< vector<FAMILY \* > >/vector<FAMILY \* >/g' libMEDMEM_Swig_wrap.cxx > toto
+	mv toto libMEDMEM_Swig_wrap.cxx
+	sed -e 's/SwigValueWrapper< vector<SUPPORT \* > const >/vector<SUPPORT \* >/g' libMEDMEM_Swig_wrap.cxx > toto
+	mv toto libMEDMEM_Swig_wrap.cxx
+	touch dummy_wrap.cxx
+else
 SWIG_DEF = libMEDMEM_Swig.i
+endif
 
 EXPORT_PYSCRIPTS = libMEDMEM_Swig.py \
 		   med_test1.py \

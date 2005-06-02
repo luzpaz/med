@@ -58,11 +58,11 @@ public:
                                            throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumber(SALOME_MED::medGeometryElement geomElement) 
 					   throw (SALOME::SALOME_Exception);
-    SALOME::Sender_ptr getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
+    SALOME::SenderInt_ptr getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumberIndex() 
 					   throw (SALOME::SALOME_Exception);
-    SALOME::Sender_ptr getSenderForNumberIndex() 
+    SALOME::SenderInt_ptr getSenderForNumberIndex() 
                                            throw (SALOME::SALOME_Exception);
     CORBA::Long          getNumberOfGaussPoint(SALOME_MED::medGeometryElement geomElement) 
 					   throw (SALOME::SALOME_Exception);

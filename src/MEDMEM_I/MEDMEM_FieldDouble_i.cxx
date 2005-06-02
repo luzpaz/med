@@ -73,8 +73,8 @@ throw (SALOME::SALOME_Exception)
         {
 		medModeSwitch modemed=convertIdlModeToMedMode(mode);
 // 		::FIELD<double> *ptrD=dynamic_cast< ::FIELD<double>* >(_fieldTptr);
-// the alternative is not safe but the previous fails using the python API
-		MEDMEM::FIELD<double> *ptrD = (MEDMEM::FIELD<double> *) _fieldTptr;
+// the alternative is not safe but the dynamic_cast fails using the python API
+		MEDMEM::FIELD<double> *ptrD = static_cast<MEDMEM::FIELD<double>* >(_fieldTptr);
                 const double * values =ptrD->getValue(modemed);
 		int nbval=ptrD->getValueLength(modemed);
                 myseq->length(nbval);
@@ -96,17 +96,19 @@ throw (SALOME::SALOME_Exception)
 */
 //=============================================================================
 
-SALOME::Sender_ptr FIELDDOUBLE_i::getSenderForValue( SALOME_MED::medModeSwitch mode ) 
+SALOME::SenderDouble_ptr FIELDDOUBLE_i::getSenderForValue( SALOME_MED::medModeSwitch mode ) 
 throw (SALOME::SALOME_Exception)
 {
 	if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME::Sender_ptr ret;
+        SALOME::SenderDouble_ptr ret;
         try
         {
 		medModeSwitch modemed=convertIdlModeToMedMode(mode);
-                ::FIELD<double> *ptrD=dynamic_cast< ::FIELD<double>* >(_fieldTptr);
+                // ::FIELD<double> *ptrD=dynamic_cast< ::FIELD<double>* >(_fieldTptr);
+		// the alternative is not safe but the dynamic_cast fails using the python API
+                MEDMEM::FIELD<double> *ptrD=static_cast< MEDMEM::FIELD<double>* >(_fieldTptr);
                 const double * values =ptrD->getValue(modemed);
 		int nbval=ptrD->getValueLength(modemed);
 		ret=SenderFactory::buildSender(*this,values,nbval);

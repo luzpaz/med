@@ -195,7 +195,7 @@ This enumeration contains a set of elements defining the type of connectivity.
       Returns an array (Sender) of coordinates stored in any type.\n
       It could be used in a Client code using the MED Client classes.
      */
-    SALOME::Sender getSenderForCoordinates(in medModeSwitch typeSwitch)
+    SALOME::SenderDouble getSenderForCoordinates(in medModeSwitch typeSwitch)
       raises (SALOME::SALOME_Exception);
     /*!
      Returns coordinate  n° Number on axis n° Axis 
@@ -302,7 +302,7 @@ This enumeration contains a set of elements defining the type of connectivity.
       Idem getConnectivity but return a Sender.\n
       It could be used in a Client code using the MED Client classes.
      */
-    SALOME::Sender getSenderForConnectivity(in medModeSwitch typeSwitch,
+    SALOME::SenderInt getSenderForConnectivity(in medModeSwitch typeSwitch,
 					in medConnectivity mode,
 					in medEntityMesh entity,
 					in medGeometryElement geomElement)
@@ -509,6 +509,7 @@ Internal Corba method.
     	   Group_array  groupCell;
     };
     meshInfos getMeshGlobal()		raises (SALOME::SALOME_Exception);
+    boolean areEquals(in MESH other);
   };
 
   
@@ -593,7 +594,7 @@ Internal Corba method.
       It could be used in a Client code using the MED Client classes.
      */
 
-    SALOME::Sender getSenderForNumber(in medGeometryElement geomElement)
+    SALOME::SenderInt getSenderForNumber(in medGeometryElement geomElement)
       raises (SALOME::SALOME_Exception);
     
     /*!
@@ -612,7 +613,7 @@ Internal Corba method.
       Idem SALOME_MED::long_array getNumberIndex() but return a Sender.\n
       It could be used in a Client code using the MED Client classes.
      */
-    SALOME::Sender getSenderForNumberIndex()
+    SALOME::SenderInt getSenderForNumberIndex()
       raises (SALOME::SALOME_Exception);
 
     /*!
@@ -906,7 +907,7 @@ Internal Corba method.
       Idem as getValue but it could be used in a Client code using the
       MED Client classes.
     */
-    SALOME::Sender getSenderForValue(in medModeSwitch mode)
+    SALOME::SenderDouble getSenderForValue(in medModeSwitch mode)
       raises (SALOME::SALOME_Exception);
   };
 
@@ -922,7 +923,7 @@ Internal Corba method.
       Idem as getValue but it could be used in a Client code using the
       MED Client classes.
     */
-    SALOME::Sender getSenderForValue(in medModeSwitch mode)
+    SALOME::SenderInt getSenderForValue(in medModeSwitch mode)
       raises (SALOME::SALOME_Exception);
   };
 

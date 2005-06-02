@@ -84,7 +84,7 @@ _TEMPLATE_ void _MAPPING_::Cree_Mapping(int flag_convexe)
 			 exit(-1);
 			 }
 		 
-		int i,j,k;
+		int i;
 		int nbr_noeuds=noeuds_front->SIZE();
 		int num_maille_depart;
 		int nma=0;

@@ -1,4 +1,4 @@
-#  MED MEDGUI : MED component GUI implemetation 
+#  MED MEDGUI : MED component GUI implemetation
 #
 #  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 #  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
@@ -68,3 +68,53 @@ msgstr "Please enter the name of the mesh you want to read"
 #: MedGUI.cxx:297
 msgid "MED_INF_FIELDNAME"
 msgstr "Please enter the name of the field you want to read"
+
+
+# Menu items
+
+msgid "TOP_MESHSEL"
+msgstr "Mesh selection"
+
+msgid "MEN_MESHSEL"
+msgstr "Mesh selection"
+
+msgid "STB_MESHSEL"
+msgstr "Read a mesh"
+
+msgid "TOP_FIELDSEL"
+msgstr "Field selection"
+
+msgid "MEN_FIELDSEL"
+msgstr "Field selection"
+
+msgid "STB_FIELDSEL"
+msgstr "Read a field"
+
+msgid "TOP_EXPLORE"
+msgstr "Explore Med File"
+
+msgid "MEN_EXPLORE"
+msgstr "Explore Med File"
+
+msgid "STB_EXPLORE"
+msgstr "Explore Med File"
+
+msgid "TOP_DUMPMESH"
+msgstr "Dump Mesh"
+
+msgid "MEN_DUMPMESH"
+msgstr "Dump Mesh"
+
+msgid "STB_DUMPMESH"
+msgstr "dump Mesh"
+
+msgid "TOP_DUMPSUBMESH"
+msgstr "Dump SubMesh"
+
+msgid "MEN_DUMPSUBMESH"
+msgstr "Dump SubMesh"
+
+msgid "STB_DUMPSUBMESH"
+msgstr "dump Mesh"
+
+

@@ -10,12 +10,10 @@
 #include "MEDMEM_GenDriver.hxx"
 #include "utilities.h"
 
-#include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Array.hxx"
 #include "MEDMEM_Support.hxx"
-//#include "MEDMEM_Field.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_CellModel.hxx"
 
