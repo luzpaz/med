@@ -82,7 +82,8 @@ LIB_CLIENT_IDL= \
 	SALOMEDS_Attributes.idl \
 	SALOME_Exception.idl \
 	SALOME_Comm.idl \
-	MED.idl
+	MED.idl \
+	SALOME_GenericObj.idl
 
 # Executables targets
 BIN_SRC = 

@@ -40,7 +40,7 @@ EXPORT_PYSCRIPTS = \
 
 LIB = libCompo2cmodule.la
 LIB_SRC = Compo2.cxx
-LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl SALOME_Comm.idl MED.idl
+LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl SALOME_Comm.idl MED.idl SALOME_GenericObj.idl
 
 LDFLAGS= -L$(top_builddir)/lib/salome 
 LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
