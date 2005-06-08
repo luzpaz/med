@@ -52,8 +52,8 @@ signals :
   void                        SignalCloseAllDialogs();
 
 public slots:
-  virtual void                deactivateModule( SUIT_Study* );
-  virtual void                activateModule( SUIT_Study* );
+  virtual bool                deactivateModule( SUIT_Study* );
+  virtual bool                activateModule( SUIT_Study* );
 
 protected:
 private slots:

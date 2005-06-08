@@ -144,7 +144,7 @@ void MedGUI::EmitSignalCloseAllDialogs()
  *
  */
 //=============================================================================
-void MedGUI::deactivateModule( SUIT_Study* study )
+bool MedGUI::deactivateModule( SUIT_Study* study )
 {
   setMenuShown( false );
 
@@ -153,7 +153,7 @@ void MedGUI::deactivateModule( SUIT_Study* study )
 
   EmitSignalCloseAllDialogs();
 
-  SalomeApp_Module::deactivateModule( study );
+  return SalomeApp_Module::deactivateModule( study );
 }
 
 //=============================================================================
@@ -161,14 +161,15 @@ void MedGUI::deactivateModule( SUIT_Study* study )
  *
  */
 //=============================================================================
-void MedGUI::activateModule( SUIT_Study* study )
+bool MedGUI::activateModule( SUIT_Study* study )
 {
-  SalomeApp_Module::activateModule( study );
+  bool res = SalomeApp_Module::activateModule( study );
 
   setMenuShown( true );
 
   connect( application()->desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
 	  this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
+  return res;
 }
 
 //=============================================================================
