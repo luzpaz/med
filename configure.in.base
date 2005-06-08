@@ -248,7 +248,7 @@ echo testing MSG2QM
 echo ---------------------------------------------
 echo
 
-CHECK_NSG2QM
+CHECK_MSG2QM
 
 echo
 echo ---------------------------------------------
