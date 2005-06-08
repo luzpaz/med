@@ -112,8 +112,9 @@
 	    PyErr_SetString(PyExc_RuntimeError, message);
 	    return NULL;
 	  }
-
-	$1[i] = f;
+	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
+	// $1[i] = f;
+	$1.at(i) = f;
       }
   } 
   else
@@ -131,7 +132,9 @@
 
   for (int i=0;i<size;i++)
     {
-      PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FAMILY *),0);
+      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
+      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FAMILY *),0);
+      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(FAMILY *),0);
 
       PyList_SetItem($result,i,tmp);
     }
@@ -164,8 +167,9 @@
 	    PyErr_SetString(PyExc_RuntimeError, message);
 	    return NULL;
 	  }
-
-	$1[i] = s;
+	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
+	//$1[i] = s;
+	$1.at(i) = s;
       }
   } 
   else
@@ -183,7 +187,9 @@
 
   for (int i=0;i<size;i++)
     {
-      PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(SUPPORT *),0);
+      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
+      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(SUPPORT *),0);
+      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(SUPPORT *),0);
 
       PyList_SetItem($result,i,tmp);
     }
@@ -213,7 +219,9 @@
 	    return NULL;
 	  }
 
-	$1[i] = s;
+	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
+	//$1[i] = s;
+	$1.at(i) = s;
       }
   } 
   else
@@ -231,7 +239,9 @@
 
   for (int i=0;i<size;i++)
     {
-      PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FIELD<double> *),0);
+      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
+      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FIELD<double> *),0);
+      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(FIELD<double> *),0);
 
       PyList_SetItem($result,i,tmp);
     }
@@ -261,7 +271,9 @@
 	    return NULL;
 	  }
 
-	$1[i] = s;
+	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
+	//$1[i] = s;
+	$1.at(i) = s;
       }
   } 
   else
@@ -279,7 +291,9 @@
 
   for (int i=0;i<size;i++)
     {
-      PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FIELD<int> *),0);
+      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
+      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FIELD<int> *),0);
+      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(FIELD<int> *),0);
 
       PyList_SetItem($result,i,tmp);
     }
