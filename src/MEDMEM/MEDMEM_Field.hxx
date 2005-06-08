@@ -162,7 +162,7 @@ public:
 //    virtual  void     setOrderNumber     (int OrderNumber);
 //    virtual  void     setFieldName       (string& fieldName);
 
-  virtual  void     rmDriver(int index);
+  virtual  void     rmDriver(int index=0);
   virtual   int     addDriver(driverTypes driverType,
                               const string & fileName="Default File Name.med",
 			      const string & driverFieldName="Default Field Nam",

@@ -501,7 +501,7 @@ FIELDINT * createLocalFieldInt(const int, const int);
 SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
 %{
-  SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDDOUBLE * field, bool ownCppPtr)
+  SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDDOUBLE * field, bool ownCppPtr=false)
     {
       BEGIN_OF("SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble from libMedCorba_Swig");
 
@@ -533,7 +533,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
      return fieldcorba2;
     }
 
-  SALOME_MED::FIELDINT_ptr createCorbaFieldInt(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDINT * field, bool ownCppPtr)
+  SALOME_MED::FIELDINT_ptr createCorbaFieldInt(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDINT * field, bool ownCppPtr=false)
     {
       BEGIN_OF("SALOME_MED::FIELDINT_ptr createCorbaFieldInt from libMedCorba_Swig");
 
