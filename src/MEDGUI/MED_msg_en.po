@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "POT-Creation-Date: 2001-09-21 14:31:28 METDST\n"
-"PO-Revision-Date: YYYY-MM-DD\n"
+"PO-Revision-Date: 2005-06-09 14:38+0400\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 
@@ -38,6 +38,7 @@ msgid "MedGUI::MED_MEN_ALL_FILES"
 msgstr "All Files ( * )"
 
 #: MedGUI.cxx:167
+#, fuzzy
 msgid "MedGUI::MED_MEN_IMPORT"
 msgstr "Import"
 
@@ -117,4 +118,29 @@ msgstr "Dump SubMesh"
 msgid "STB_DUMPSUBMESH"
 msgstr "dump Mesh"
 
+msgid "TOP_POPUPTEST"
+msgstr "Popup test"
 
+msgid "MEN_POPUPTEST"
+msgstr "Popup test"
+
+msgid "STB_POPUPTEST"
+msgstr "Popup test"
+
+msgid "TOP_ERASE"
+msgstr "Erase"
+
+msgid "MEN_ERASE"
+msgstr "Erase"
+
+msgid "STB_ERASE"
+msgstr "Erase"
+
+msgid "TOP_DISPLAY"
+msgstr "Display"
+
+msgid "MEN_DISPLAY"
+msgstr "Display"
+
+msgid "STB_DISPLAY"
+msgstr "Display"

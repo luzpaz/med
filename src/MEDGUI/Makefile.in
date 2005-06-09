@@ -38,14 +38,14 @@ EXPORT_HEADERS=
 
 # .po files to transform in .qm
 PO_FILES = \
-           MED_icons.po \
+           MED_images.po \
            MED_msg_fr.po \
            MED_msg_en.po \
 
 
 # Libraries targets
 LIB = libMED.la
-LIB_SRC = MedGUI.cxx  
+LIB_SRC = MedGUI.cxx MedGUI_Selection.cxx
 LIB_MOC = MedGUI.h
 
 LIB_CLIENT_IDL = SALOMEDS.idl SALOME_Exception.idl SALOME_Component.idl \

@@ -32,6 +32,12 @@ public:
   virtual bool OnKeyPress        (QKeyEvent* pe, SUIT_ViewWindow* );
   virtual bool OnMousePress      (QMouseEvent* pe, SUIT_ViewWindow* );
   virtual bool OnMouseMove       (QMouseEvent* pe, SUIT_ViewWindow* );
+
+  void createMedAction( const int, const QString&, const QString& = "" );
+  void createPopupItem( const int, const QString&, const QString&, const QString& = "", const int = -1 );
+
+  virtual void contextMenuPopup( const QString&, QPopupMenu*, QString& );
+
   //virtual bool SetSettings       ();
   //virtual bool CustomPopup       ( QAD_Desktop* parent, QPopupMenu* popup, const QString & theContext,
   //                                 const QString & theParent, const QString & theObject );

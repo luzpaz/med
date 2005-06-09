@@ -40,6 +40,7 @@ using namespace std;
 #include <SUIT_MessageBox.h>
 #include <SUIT_Tools.h>
 #include <SUIT_FileDlg.h>
+#include <SUIT_ResourceMgr.h>
 
 #include <CAM_Application.h>
 #include <SalomeApp_Application.h>
@@ -52,6 +53,8 @@ using namespace std;
 #include <OB_Browser.h>
 
 //#include "SMESH_TypeFilter.hxx"
+
+#include <MedGUI_Selection.h>
 
 // QT Includes
 #include <qinputdialog.h>
@@ -78,25 +81,104 @@ MedGUI::MedGUI() :
  *
  */
 //=============================================================================
+void MedGUI::createPopupItem( const int id,
+                              const QString& clients,
+                              const QString& types,
+                              const QString& theRule,
+			      const int pId )
+{
+  int parentId = pId;
+  if( pId!=-1 )
+    parentId = popupMgr()->actionId( action( pId ) );
+
+  if( !popupMgr()->contains( popupMgr()->actionId( action( id ) ) ) )
+    popupMgr()->insert( action( id ), parentId, 0 );
+
+  QChar lc = QtxPopupMgr::Selection::defEquality();
+  QString rule = "(%1)";
+  if( !types.isEmpty() ) 
+    rule += " and (%2) and (%3)";
+
+  rule = rule.arg( QString( "client in {%1}" ).arg( clients ) );
+
+  if( !types.isEmpty() )
+  {
+    rule = rule.arg( QString( "%1>0" ).arg( QtxPopupMgr::Selection::defSelCountParam() ) );
+    rule = rule.arg( QString( "%1type in {%2}" ).arg( lc ).arg( types ) );
+  }
+  rule += theRule;
+  popupMgr()->setRule( action( id ), rule, true );
+}
+
+void MedGUI::createMedAction( const int id, const QString& po_id, const QString& icon_id )
+{
+  QWidget* parent = application()->desktop();
+  SUIT_ResourceMgr* mgr = application()->resourceMgr();
+
+  QPixmap pix; QIconSet icon;
+  if( !icon_id.isEmpty() )
+    pix = mgr->loadPixmap( "MED", tr( icon_id ) );
+  else
+    pix = mgr->loadPixmap( "MED", tr( QString( "ICO_" )+po_id ) );
+  if ( !pix.isNull() )
+    icon = QIconSet( pix );
+
+  createAction( id, tr( "TOP_" + po_id ), icon, tr( "MEN_" + po_id ), tr( "STB_" + po_id ), 0, parent, false, this, SLOT( onGUIEvent() ) );
+}
+
+//=============================================================================
+/*!
+ *
+ */
+//=============================================================================
 void MedGUI::initialize( CAM_Application* app )
 {
   SalomeApp_Module::initialize( app );
   
   QWidget* parent = application()->desktop();
 
-  createAction( 931, tr( "TOP_MESHSEL" ),     QIconSet(), tr( "MEN_MESHSEL" ),     tr( "STB_MESHSEL" ),     0, parent, false, this, SLOT( onGUIEvent() ) );
-  createAction( 932, tr( "TOP_FIELDSEL" ),    QIconSet(), tr( "MEN_FIELDSEL" ),    tr( "STB_FIELDSEL" ),    0, parent, false, this, SLOT( onGUIEvent() ) );
-  createAction( 933, tr( "TOP_EXPLORE" ),     QIconSet(), tr( "MEN_EXPLORE" ),     tr( "STB_EXPLORE" ),     0, parent, false, this, SLOT( onGUIEvent() ) );
-  createAction( 934, tr( "TOP_DUMPMESH" ),    QIconSet(), tr( "MEN_DUMPMESH" ),    tr( "STB_DUMPMESH" ),    0, parent, false, this, SLOT( onGUIEvent() ) );
-  createAction( 935, tr( "TOP_DUMPSUBMESH" ), QIconSet(), tr( "MEN_DUMPSUBMESH" ), tr( "STB_DUMPSUBMESH" ), 0, parent, false, this, SLOT( onGUIEvent() ) );
+  createMedAction( 931, "MESHSEL" );
+  createMedAction( 932, "FIELDSEL" );
+  createMedAction( 933, "EXPLORE" );
+  createMedAction( 934, "DUMPMESH" );
+  createMedAction( 935, "DUMPSUBMESH" );
+  createMedAction( 8031, "POPUPTEST" );
+  createMedAction( 9002, "ERASE" );
+  createMedAction( 903, "DISPLAY" );
+  createMedAction( 4031, "MESHSEL", "ICO_TB_MESHSEL" );
+  createMedAction( 4032, "FIELDSEL", "ICO_TB_FIELDSEL" );
+  createMedAction( 4033, "EXPLORE", "ICO_TB_EXPLORE" );
 
-  int MedId = createMenu( tr( "MED" ), -1, 20 );
+  int MedId = createMenu( tr( "MED" ), -1, 50, 10 );
   createMenu( separator(), MedId, 10 );
   createMenu( 931, MedId, 11 );
   createMenu( 932, MedId, 11 );
   createMenu( 933, MedId, 11 );
   createMenu( 934, MedId, 11 );
   createMenu( 935, MedId, 11 );
+
+  int medTb = createTool( tr( "TB_MED" ) );
+  createTool( 4031, medTb );
+  createTool( 4032, medTb );
+  createTool( 4033, medTb );
+
+  QString OB = "'ObjectBrowser'",
+          View = QString("'%1'").arg( "VTKViewer" /* SVTK_Viewer::Type()*/ );
+
+  createPopupItem( 8031, View, "", "" );
+  createPopupItem( 9002, OB, "", "" );
+  createPopupItem( 903,  OB, "", "" );
+}
+
+void MedGUI::contextMenuPopup( const QString& client, QPopupMenu* menu, QString& /*title*/ )
+{
+  MedGUI_Selection sel;
+  SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( application() );
+  if( app )
+  {
+    sel.init( client, app->selectionMgr() );
+    popupMgr()->updatePopup( menu, &sel );
+  }
 }
 
 QString MedGUI::engineIOR() const
@@ -147,6 +229,7 @@ void MedGUI::EmitSignalCloseAllDialogs()
 bool MedGUI::deactivateModule( SUIT_Study* study )
 {
   setMenuShown( false );
+  setToolShown( false );
 
   disconnect( application()->desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
 	     this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
@@ -166,6 +249,7 @@ bool MedGUI::activateModule( SUIT_Study* study )
   bool res = SalomeApp_Module::activateModule( study );
 
   setMenuShown( true );
+  setToolShown( true );
 
   connect( application()->desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
 	  this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
