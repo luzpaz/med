@@ -30,7 +30,8 @@ protected:
   MESH *   _ptrMesh;
   string         _meshName;    // const ?
   int            _meshNum;     // INUTILE ?
-  
+
+
 public :
 
   /*!
@@ -108,16 +109,16 @@ public :
   void write( void ) const;
 
 protected:
-  virtual int getCOORDINATE() = 0 ;
-  virtual int getCONNECTIVITY() = 0 ;
-  virtual int getFAMILY() = 0 ;
-  virtual int getNodalConnectivity(CONNECTIVITY * Connectivity) = 0 ;
+//   virtual int getCOORDINATE() = 0 ;
+//   virtual int getCONNECTIVITY() = 0 ;
+//   virtual int getFAMILY() = 0 ;
+//   virtual int getNodalConnectivity(CONNECTIVITY * Connectivity) = 0 ;
   int getDescendingConnectivity(CONNECTIVITY * Connectivity);
-  virtual int getNodesFamiliesNumber(int * MEDArrayNodeFamily) = 0 ;
-  virtual int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity) = 0 ;
+//   virtual int getNodesFamiliesNumber(int * MEDArrayNodeFamily) = 0 ;
+//   virtual int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity) = 0 ;
   void updateFamily() ;
   void buildAllGroups(vector<GROUP*> & Groups, vector<FAMILY*> & Families) ;
-  virtual void getGRID () = 0 ;
+//   virtual void getGRID () = 0 ;
 
   friend class MED_MESH_RDONLY_DRIVER;
 
@@ -158,12 +159,12 @@ public :
   */
   void read ( void );
 
-protected:
-  virtual int writeCoordinates    ()                           const = 0 ;
-  virtual int writeConnectivities (MED_EN::medEntityMesh entity)       const = 0 ;
-  virtual int writeFamilyNumbers  ()                           const = 0 ;
-  virtual int writeFamilies       (vector<FAMILY*> & families) const = 0 ;
-  virtual int writeGRID() const = 0 ;
+// protected:
+//   virtual int writeCoordinates    ()                           const = 0 ;
+//   virtual int writeConnectivities (MED_EN::medEntityMesh entity)       const = 0 ;
+//   virtual int writeFamilyNumbers  ()                           const = 0 ;
+//   virtual int writeFamilies       (vector<FAMILY*> & families) const = 0 ;
+//   virtual int writeGRID() const = 0 ;
 
   friend class MED_MESH_WRONLY_DRIVER;
 };
@@ -217,16 +218,16 @@ public:
   void open();
   void close();
 protected:
-  int getCOORDINATE();
-  int getCONNECTIVITY();
-  int getFAMILY();
-  int getNodalConnectivity(CONNECTIVITY * Connectivity);
-  int getDescendingConnectivity(CONNECTIVITY * Connectivity);
-  int getNodesFamiliesNumber(int * MEDArrayNodeFamily);
-  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity);
-  void getGRID ();
+  GENDRIVER * _concreteMeshDrv;
+//   int getCOORDINATE();
+//   int getCONNECTIVITY();
+//   int getFAMILY();
+//   int getNodalConnectivity(CONNECTIVITY * Connectivity);
+//   int getDescendingConnectivity(CONNECTIVITY * Connectivity);
+//   int getNodesFamiliesNumber(int * MEDArrayNodeFamily);
+//   int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity);
+//   void getGRID ();
   GENDRIVER * copy ( void ) const;
-  IMED_MESH_RDONLY_DRIVER *_concreteDriverRd;
 };
 
 class MED_MESH_WRONLY_DRIVER : public virtual IMED_MESH_WRONLY_DRIVER {
@@ -242,13 +243,13 @@ public :
   void open();
   void close();
 protected:
-  int writeCoordinates    ()                           const;
-  int writeConnectivities (MED_EN::medEntityMesh entity)       const;
-  int writeFamilyNumbers  ()                           const;
-  int writeFamilies       (vector<FAMILY*> & families) const;
-  int writeGRID() const;
+  GENDRIVER * _concreteMeshDrv;
+//   int writeCoordinates    ()                           const;
+//   int writeConnectivities (MED_EN::medEntityMesh entity)       const;
+//   int writeFamilyNumbers  ()                           const;
+//   int writeFamilies       (vector<FAMILY*> & families) const;
+//   int writeGRID() const;
   GENDRIVER * copy ( void ) const;
-  IMED_MESH_WRONLY_DRIVER *_concreteDriverWr; 
 };
 
 class MED_MESH_RDWR_DRIVER : public IMED_MESH_RDWR_DRIVER {
@@ -264,21 +265,21 @@ public :
   void open();
   void close();
 protected:
-  int getCOORDINATE();
-  int getCONNECTIVITY();
-  int getFAMILY();
-  int getNodalConnectivity(CONNECTIVITY * Connectivity);
-  int getDescendingConnectivity(CONNECTIVITY * Connectivity);
-  int getNodesFamiliesNumber(int * MEDArrayNodeFamily);
-  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity);
-  void getGRID ();
-  int writeCoordinates    ()                           const;
-  int writeConnectivities (MED_EN::medEntityMesh entity)       const;
-  int writeFamilyNumbers  ()                           const;
-  int writeFamilies       (vector<FAMILY*> & families) const;
-  int writeGRID() const;
+  GENDRIVER * _concreteMeshDrv;
+//   int getCOORDINATE();
+//   int getCONNECTIVITY();
+//   int getFAMILY();
+//   int getNodalConnectivity(CONNECTIVITY * Connectivity);
+//   int getDescendingConnectivity(CONNECTIVITY * Connectivity);
+//   int getNodesFamiliesNumber(int * MEDArrayNodeFamily);
+//   int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity);
+//   void getGRID ();
+//   int writeCoordinates    ()                           const;
+//   int writeConnectivities (MED_EN::medEntityMesh entity)       const;
+//   int writeFamilyNumbers  ()                           const;
+//   int writeFamilies       (vector<FAMILY*> & families) const;
+//   int writeGRID() const;
   GENDRIVER * copy ( void ) const;
-  IMED_MESH_RDWR_DRIVER *_concreteDriverRdWr;
 };
 
 };

@@ -252,20 +252,24 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
       
 
       MED_EN::med_mode_acces myMode = getAccessMode();
-      MED_MESH_DRIVER * ptrDriver ;
-      switch (myMode) {
-      case MED_EN::MED_LECT: // V2_1->V2_2
-	ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
-	break ;
-      case MED_EN::MED_REMP:	// V2_1->V2_2
-	ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
-	break ;
-      case MED_EN::MED_ECRI: // should never append !! V2_1->V2_2
-	ptrDriver = new MED_MESH_WRONLY_DRIVER(_fileName, ptrMesh);
-	break;
-      default:
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
-      }
+//       MED_MESH_DRIVER * ptrDriver ;
+//       switch (myMode) {
+//       case MED_EN::MED_LECT: // V2_1->V2_2
+// 	ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
+// 	break ;
+//       case MED_EN::MED_REMP:	// V2_1->V2_2
+// 	ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
+// 	break ;
+//       case MED_EN::MED_ECRI: // should never append !! V2_1->V2_2
+// 	ptrDriver = new MED_MESH_WRONLY_DRIVER(_fileName, ptrMesh);
+// 	break;
+//       default:
+// 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+//       }
+
+      GENDRIVER * ptrDriver =
+	DRIVERFACTORY::buildConcreteMedDriverForMesh(_fileName, ptrMesh,
+						     meshName, myMode, V22);
 
       ptrDriver->setId       ( getId() );
       ptrDriver->setMeshName ( meshName );
@@ -368,7 +372,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
     int                           numberOfTimeSteps            =  -1;
     med_2_2::med_int                           timeStepNumber               =  -1;
     //    char                          timeStepUnit[MED_TAILLE_PNOM]= "";
-    char                          timeStepUnit[MED_TAILLE_PNOM+1] ;
+    char                          timeStepUnit[MED_TAILLE_PNOM22+1] ;
     double                        timeStep                     = 0.0;
     int                           orderNumber                  =  -1;                           //???init?????
     int                           numberOfRefMesh = 0;
@@ -391,8 +395,8 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 	  if (err != MED_VALID)
 	    throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Be careful there is no compound for field n°" << i << "in file |"<<_fileName<<"| !"));
 
-	componentName = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;
-	unitName      = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;   
+	componentName = new char[numberOfComponents*MED_TAILLE_PNOM22+1] ;
+	unitName      = new char[numberOfComponents*MED_TAILLE_PNOM22+1] ;   
       
 	err = MEDchampInfo(_medIdt, i, fieldName, &type, componentName, 
 			   unitName, numberOfComponents) ;
@@ -538,28 +542,34 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 			    MESSAGE("#### SET NAME in FIELD : "<<fieldName);
 
 			    MED_EN::med_mode_acces myMode = getAccessMode();
-			    switch (myMode) {
-			    case MED_EN::MED_LECT: // V2_1->V2_2
-			      ptrDriver = new
-				MED_FIELD_RDONLY_DRIVER<int>
-				(_fileName, (FIELD<int> *)
-				 ptrField);
-			      break ;
-			    case MED_EN::MED_REMP:	// V2_1->V2_2
-			      ptrDriver = new
-				MED_FIELD_RDWR_DRIVER<int>
-				(_fileName, (FIELD<int> *)
-				 ptrField);
-			      break ;
-			    case MED_EN::MED_ECRI: // should never append !! V2_1->V2_2
-			      ptrDriver = new
-				MED_FIELD_WRONLY_DRIVER<int>
-				(_fileName, (FIELD<int> *)
-				 ptrField);
-			      break;
-			    default:
-			      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
-			    }
+// 			    switch (myMode) {
+// 			    case MED_EN::MED_LECT: // V2_1->V2_2
+// 			      ptrDriver = new
+// 				MED_FIELD_RDONLY_DRIVER<int>
+// 				(_fileName, (FIELD<int> *)
+// 				 ptrField);
+// 			      break ;
+// 			    case MED_EN::MED_REMP:	// V2_1->V2_2
+// 			      ptrDriver = new
+// 				MED_FIELD_RDWR_DRIVER<int>
+// 				(_fileName, (FIELD<int> *)
+// 				 ptrField);
+// 			      break ;
+// 			    case MED_EN::MED_ECRI: // should never append !! V2_1->V2_2
+// 			      ptrDriver = new
+// 				MED_FIELD_WRONLY_DRIVER<int>
+// 				(_fileName, (FIELD<int> *)
+// 				 ptrField);
+// 			      break;
+// 			    default:
+// 			      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+// 			    }
+
+			    ptrDriver = DRIVERFACTORY::buildConcreteMedDriverForField<int>(_fileName, (FIELD<int> *)ptrField, myMode, V22);
+
+			    SCRUTE(ptrDriver);
+
+
 			    break;
 			  }
 			  case MED_EN::MED_REEL64 : {
@@ -576,28 +586,32 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 			    MESSAGE("#### SET NAME in FIELD : "<<fieldName);
 
 			    MED_EN::med_mode_acces myMode = getAccessMode();
-			    switch (myMode) {
-			    case MED_EN::MED_LECT: // V2_1->V2_2
-			      ptrDriver = new
-				MED_FIELD_RDONLY_DRIVER<double>
-				(_fileName, (FIELD<double> *)
-				 ptrField);
-			      break ;
-			    case MED_EN::MED_REMP:	// V2_1->V2_2
-			      ptrDriver = new
-				MED_FIELD_RDWR_DRIVER<double>
-				(_fileName, (FIELD<double> *)
-				 ptrField);
-			      break ;
-			    case MED_EN::MED_ECRI: // should never append !! V2_1->V2_2
-			      ptrDriver = new
-				MED_FIELD_WRONLY_DRIVER<double>
-				(_fileName, (FIELD<double> *)
-				 ptrField);
-			      break;
-			    default:
-			      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
-			    }
+// 			    switch (myMode) {
+// 			    case MED_EN::MED_LECT: // V2_1->V2_2
+// 			      ptrDriver = new
+// 				MED_FIELD_RDONLY_DRIVER<double>
+// 				(_fileName, (FIELD<double> *)
+// 				 ptrField);
+// 			      break ;
+// 			    case MED_EN::MED_REMP:	// V2_1->V2_2
+// 			      ptrDriver = new
+// 				MED_FIELD_RDWR_DRIVER<double>
+// 				(_fileName, (FIELD<double> *)
+// 				 ptrField);
+// 			      break ;
+// 			    case MED_EN::MED_ECRI: // should never append !! V2_1->V2_2
+// 			      ptrDriver = new
+// 				MED_FIELD_WRONLY_DRIVER<double>
+// 				(_fileName, (FIELD<double> *)
+// 				 ptrField);
+// 			      break;
+// 			    default:
+// 			      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+// 			    }
+
+			    ptrDriver = DRIVERFACTORY::buildConcreteMedDriverForField<double>(_fileName, (FIELD<double> *)ptrField, myMode, V22);
+			    SCRUTE(ptrDriver);
+
 			    break;
 			  }
 			  default : {
@@ -690,7 +704,7 @@ MED_MED_WRONLY_DRIVER22::MED_MED_WRONLY_DRIVER22(const string & fileName,  MED *
 {}
 
 MED_MED_WRONLY_DRIVER22::MED_MED_WRONLY_DRIVER22(const MED_MED_WRONLY_DRIVER22 & driver):
-  IMED_MED_WRONLY_DRIVER(driver),MED_MED_DRIVER(driver),MED_MED_DRIVER(driver)
+  IMED_MED_WRONLY_DRIVER(driver),MED_MED_DRIVER(driver),MED_MED_DRIVER22(driver)
 {}
 
 MED_MED_WRONLY_DRIVER22::~MED_MED_WRONLY_DRIVER22()
@@ -798,14 +812,22 @@ MED_MED_RDWR_DRIVER22::MED_MED_RDWR_DRIVER22()
 {}
 
 MED_MED_RDWR_DRIVER22::MED_MED_RDWR_DRIVER22(const string & fileName,  MED * const ptrMed):
-  MED_MED_RDONLY_DRIVER22(fileName,ptrMed),MED_MED_WRONLY_DRIVER22(fileName,ptrMed),IMED_MED_RDWR_DRIVER(fileName,ptrMed),
-  MED_MED_DRIVER22(fileName,ptrMed,MED_REMP),IMED_MED_WRONLY_DRIVER(fileName,ptrMed),IMED_MED_RDONLY_DRIVER(fileName,ptrMed),
+  MED_MED_RDONLY_DRIVER22(fileName,ptrMed),
+  MED_MED_WRONLY_DRIVER22(fileName,ptrMed),
+  IMED_MED_RDWR_DRIVER(fileName,ptrMed),
+  MED_MED_DRIVER22(fileName,ptrMed,MED_REMP),
+  IMED_MED_WRONLY_DRIVER(fileName,ptrMed),
+  IMED_MED_RDONLY_DRIVER(fileName,ptrMed),
   MED_MED_DRIVER(fileName,ptrMed,MED_REMP)
 {}
 
 MED_MED_RDWR_DRIVER22::MED_MED_RDWR_DRIVER22(const MED_MED_RDWR_DRIVER22 & driver):
-  MED_MED_RDONLY_DRIVER22(driver),MED_MED_WRONLY_DRIVER22(driver),IMED_MED_RDWR_DRIVER(driver),
-  MED_MED_DRIVER22(driver),IMED_MED_WRONLY_DRIVER(driver),IMED_MED_RDONLY_DRIVER(driver),
+  MED_MED_RDONLY_DRIVER22(driver),
+  MED_MED_WRONLY_DRIVER22(driver),
+  IMED_MED_RDWR_DRIVER(driver),
+  MED_MED_DRIVER22(driver),
+  IMED_MED_WRONLY_DRIVER(driver),
+  IMED_MED_RDONLY_DRIVER(driver),
   MED_MED_DRIVER(driver)
 {}
 

@@ -220,8 +220,15 @@ typedef double         med_float;
 // retour des fonctions
 #define OK 0
 #define KO 1
-// fin
 
+  /*
+    enum definition for the used Med File version V2.1 or V2.2
+    because of incompatibility between them.
+  */
+
+  typedef enum {V21 = 26, V22 = 75} medFileVersion;
+
+// fin
 }
 // End Of NameSpace MED_EN
 

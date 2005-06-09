@@ -59,8 +59,7 @@ public :
     Copy constructor.
   */
   MED_FIELD_DRIVER21(const MED_FIELD_DRIVER21 & fieldDriver):
-    MED_FIELD_DRIVER<T>(fieldDriver),
-    _medIdt(MED_INVALID)
+    MED_FIELD_DRIVER<T>(fieldDriver), _medIdt(fieldDriver._medIdt)
   {
   }
 
@@ -114,11 +113,6 @@ public :
     END_OF("MED_FIELD_DRIVER21::close()");
   }
 
-  virtual void write( void ) const = 0 ;
-  virtual void read ( void ) = 0 ;
-
-private:
-  virtual GENDRIVER * copy ( void ) const = 0 ;
 
 };
 
@@ -144,7 +138,10 @@ public :
     Constructor.
   */
   MED_FIELD_RDONLY_DRIVER21(const string & fileName,  FIELD<T> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY) { 
+    IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField),
+    MED_FIELD_DRIVER21<T>(fileName,ptrField,MED_EN::MED_RDONLY),
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY)
+  { 
     BEGIN_OF("MED_FIELD_RDONLY_DRIVER21::MED_FIELD_RDONLY_DRIVER21(const string & fileName, const FIELD<T> * ptrField)");
     END_OF("MED_FIELD_RDONLY_DRIVER21::MED_FIELD_RDONLY_DRIVER21(const string & fileName, const FIELD<T> * ptrField)");
   }
@@ -153,7 +150,10 @@ public :
     Copy constructor.
   */
   MED_FIELD_RDONLY_DRIVER21(const MED_FIELD_RDONLY_DRIVER21 & fieldDriver):
-    MED_FIELD_DRIVER<T>(fieldDriver) {};
+    IMED_FIELD_RDONLY_DRIVER<T>(fieldDriver),
+    MED_FIELD_DRIVER21<T>(fieldDriver),
+    MED_FIELD_DRIVER<T>(fieldDriver)
+  {};
   
   /*!
     Destructor.
@@ -197,6 +197,8 @@ public :
     Constructor.
   */
   MED_FIELD_WRONLY_DRIVER21(const string & fileName, FIELD<T> * ptrField):
+    IMED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField),
+    MED_FIELD_DRIVER21<T>(fileName,ptrField,MED_EN::MED_WRONLY),
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_WRONLY)
   {
     BEGIN_OF("MED_FIELD_WRONLY_DRIVER21::MED_FIELD_WRONLY_DRIVER21(const string & fileName, const FIELD<T> * ptrField)");
@@ -207,7 +209,10 @@ public :
     Copy constructor.
   */
   MED_FIELD_WRONLY_DRIVER21(const MED_FIELD_WRONLY_DRIVER21 & fieldDriver):
-    MED_FIELD_DRIVER<T>(fieldDriver) {}
+    IMED_FIELD_WRONLY_DRIVER<T>(fieldDriver),
+    MED_FIELD_DRIVER21<T>(fieldDriver),
+    MED_FIELD_DRIVER<T>(fieldDriver)
+  {}
   
   /*!
     Destructor.
@@ -250,7 +255,12 @@ public :
     Constructor.
   */
   MED_FIELD_RDWR_DRIVER21(const string & fileName, FIELD<T> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDWR)
+    MED_FIELD_WRONLY_DRIVER21<T>(fileName,ptrField),
+    MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField),
+    IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField),
+    IMED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField),
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDWR),
+    IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
   {
     BEGIN_OF("MED_FIELD_RDWR_DRIVER21::MED_FIELD_RDWR_DRIVER21(const string & fileName, const FIELD<T> * ptrField)");
     //_accessMode = MED_RDWR ;
@@ -261,7 +271,13 @@ public :
     Copy constructor.
   */
   MED_FIELD_RDWR_DRIVER21(const MED_FIELD_RDWR_DRIVER21 & fieldDriver):
-    MED_FIELD_DRIVER<T>(fieldDriver) {};
+    MED_FIELD_WRONLY_DRIVER21<T>(fieldDriver),
+    MED_FIELD_RDONLY_DRIVER21<T>(fieldDriver),
+    IMED_FIELD_RDWR_DRIVER<T>(fieldDriver),
+    IMED_FIELD_RDONLY_DRIVER<T>(fieldDriver),
+    IMED_FIELD_WRONLY_DRIVER<T>(fieldDriver),
+    MED_FIELD_DRIVER<T>(fieldDriver)
+  {};
   
   /*!
     Destructor.
@@ -331,9 +347,7 @@ private:
 
 template <class T> GENDRIVER * MED_FIELD_RDONLY_DRIVER21<T>::copy(void) const
 {
-  MED_FIELD_RDONLY_DRIVER21<T> * myDriver = 
-    new MED_FIELD_RDONLY_DRIVER21<T>(*this);
-  return myDriver ;
+  return new MED_FIELD_RDONLY_DRIVER21<T>(*this);
 }
 
 template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
@@ -379,8 +393,8 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
 	    //  					       << i << "in file |"<<_fileName<<"| !"));
 	    MESSAGE(LOC<<"Be careful there is no compound for field n°"<<i<<"in file |"<<_fileName<<"| !");
 
-	  componentName = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;
-	  unitName      = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;   
+	  componentName = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;
+	  unitName      = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;   
 	    
 	  err = med_2_1::MEDchampInfo(MED_FIELD_DRIVER21<T>::_medIdt, i, fieldName, &type, componentName, 
 				     unitName, numberOfComponents) ;
@@ -418,9 +432,9 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
 	MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes[i] = 1 ;
 
 	// PG : what about space !!!
-	MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i] = string(componentName,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
+	MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i] = string(componentName,i*MED_TAILLE_PNOM21,MED_TAILLE_PNOM21) ;
 	SCRUTE(MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i]);
-	MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits[i] = string(unitName,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
+	MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits[i] = string(unitName,i*MED_TAILLE_PNOM21,MED_TAILLE_PNOM21) ;
 	SCRUTE(MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits[i]);
       }
       delete[] componentName;
@@ -567,9 +581,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::write( void ) const
 
 template <class T> GENDRIVER * MED_FIELD_WRONLY_DRIVER21<T>::copy(void) const
 {
-  MED_FIELD_WRONLY_DRIVER21<T> * myDriver = 
-    new MED_FIELD_WRONLY_DRIVER21<T>(*this);
-  return myDriver ;
+  return new MED_FIELD_WRONLY_DRIVER21<T>(*this);
 }
 
 template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::read (void)
@@ -588,18 +600,18 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
       int err ;
 
       int component_count=MED_FIELD_DRIVER<T>::_ptrField->getNumberOfComponents();
-      string   component_name(component_count*MED_TAILLE_PNOM,' ') ;
-      string   component_unit(component_count*MED_TAILLE_PNOM,' ') ;
+      string   component_name(component_count*MED_TAILLE_PNOM21,' ') ;
+      string   component_unit(component_count*MED_TAILLE_PNOM21,' ') ;
 
       const string * listcomponent_name=MED_FIELD_DRIVER<T>::_ptrField->getComponentsNames() ;
       const string * listcomponent_unit=MED_FIELD_DRIVER<T>::_ptrField->getMEDComponentsUnits() ;
       int length ;
       for (int i=0; i < component_count ; i++) {
-	length = min(MED_TAILLE_PNOM,(int)listcomponent_name[i].size());
-	component_name.replace(i*MED_TAILLE_PNOM,length,
+	length = min(MED_TAILLE_PNOM21,(int)listcomponent_name[i].size());
+	component_name.replace(i*MED_TAILLE_PNOM21,length,
 			       listcomponent_name[i],0,length);
-	length = min(MED_TAILLE_PNOM,(int)listcomponent_unit[i].size());
-	component_unit.replace(i*MED_TAILLE_PNOM,length,
+	length = min(MED_TAILLE_PNOM21,(int)listcomponent_unit[i].size());
+	component_unit.replace(i*MED_TAILLE_PNOM21,length,
 			       listcomponent_unit[i],0,length);
       }
 
@@ -620,8 +632,8 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
       int nbComp ;
       for (int i=1; i<=n; i++) {
 	nbComp = med_2_1::MEDnChamp(MED_FIELD_DRIVER21<T>::_medIdt,i);
-	compName = new char[MED_TAILLE_PNOM*nbComp+1];
-	compUnit = new char[MED_TAILLE_PNOM*nbComp+1];
+	compName = new char[MED_TAILLE_PNOM21*nbComp+1];
+	compUnit = new char[MED_TAILLE_PNOM21*nbComp+1];
 	err = med_2_1::MEDchampInfo(MED_FIELD_DRIVER21<T>::_medIdt,i,champName,&type,compName,compUnit,nbComp);
 	if (err == 0)
 	  if (strcmp(champName,MED_FIELD_DRIVER<T>::_ptrField->getName().c_str())==0) { // Found !
@@ -787,9 +799,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 
 template <class T> GENDRIVER * MED_FIELD_RDWR_DRIVER21<T>::copy(void) const
 {
-  MED_FIELD_RDWR_DRIVER21<T> * myDriver = 
-    new MED_FIELD_RDWR_DRIVER21<T>(*this);
-  return myDriver ;
+  return new MED_FIELD_RDWR_DRIVER21<T>(*this);
 }
 
 template <class T> void MED_FIELD_RDWR_DRIVER21<T>::write(void) const

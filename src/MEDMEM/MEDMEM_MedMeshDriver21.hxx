@@ -3,13 +3,7 @@
 
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_define.hxx"
-
-/*
-  Med File V 2.1 attributes
-*/
-
-# include <med.hxx>
-# include <med_proto.hxx>
+#include "MEDMEM_Compatibility21_22.hxx"
 
 /*!
 

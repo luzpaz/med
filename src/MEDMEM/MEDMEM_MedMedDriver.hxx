@@ -27,6 +27,7 @@ class MED_MED_DRIVER : public GENDRIVER
 protected:
   
   MED * const       _ptrMed;         // Store 'MED_DRIVER (0..n)----(1) MED' associations
+  GENDRIVER * _concreteMedDrv;
 
 public :
   /*!
@@ -197,7 +198,6 @@ public :
   virtual void readFileStruct ( void ) ;
 private:
   GENDRIVER * copy ( void ) const;
-  IMED_MED_RDONLY_DRIVER *_concreteRd;
 };
 
 class MED_MED_WRONLY_DRIVER : public virtual IMED_MED_WRONLY_DRIVER
@@ -216,7 +216,6 @@ public :
   virtual void readFileStruct ( void ) throw (MEDEXCEPTION) ;
 private:
   GENDRIVER * copy ( void ) const;
-  IMED_MED_WRONLY_DRIVER *_concreteWr;
 };
 
 class MED_MED_RDWR_DRIVER : public IMED_MED_RDWR_DRIVER
@@ -235,9 +234,7 @@ public :
   virtual void readFileStruct ( void ) throw (MEDEXCEPTION) ;
 private:
   GENDRIVER * copy ( void ) const;
-  IMED_MED_RDWR_DRIVER *_concreteRdWr;
 };
-
 }
 
 #endif /* MED_MED_DRIVER_HXX */

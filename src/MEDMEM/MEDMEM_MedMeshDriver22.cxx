@@ -105,13 +105,13 @@ MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22()
   
 MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22(const string & fileName,
 						   MESH * ptrMesh):
-  MED_MESH_DRIVER22(fileName,ptrMesh,MED_RDONLY),IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY)
+  IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER22(fileName,ptrMesh,MED_RDONLY),MED_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY)
 { 
   MESSAGE("MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22(const string & fileName, MESH * ptrMesh) has been created");
 }
   
 MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22(const MED_MESH_RDONLY_DRIVER22 & driver): 
-   MED_MESH_DRIVER22(driver),IMED_MESH_RDONLY_DRIVER(driver),MED_MESH_DRIVER(driver)
+   IMED_MESH_RDONLY_DRIVER(driver),MED_MESH_DRIVER22(driver),MED_MESH_DRIVER(driver)
 {
 }
 
@@ -262,8 +262,8 @@ void MED_MESH_RDONLY_DRIVER22::getGRID()
   _ptrMesh->_spaceDimension = SpaceDimension;
 
   med_2_2::med_repere rep ;
-  string tmp_nom_coord (MED_TAILLE_PNOM*(_ptrMesh->_spaceDimension)+1,' ');
-  string tmp_unit_coord(MED_TAILLE_PNOM*(_ptrMesh->_spaceDimension)+1,' ');
+  string tmp_nom_coord (MED_TAILLE_PNOM22*(_ptrMesh->_spaceDimension)+1,' ');
+  string tmp_unit_coord(MED_TAILLE_PNOM22*(_ptrMesh->_spaceDimension)+1,' ');
   char * tmp_nom = (const_cast <char *> ( tmp_nom_coord.c_str())  ) ;
   char * tmp_unit= (const_cast <char *> ( tmp_unit_coord.c_str()) ) ;
 
@@ -375,8 +375,8 @@ void MED_MESH_RDONLY_DRIVER22::getGRID()
 					    (_ptrMesh->_name.c_str()),
 					    _ptrMesh->_meshDimension,
 					    Array [idim], length, (idim+1),
-					    tmp_nom+(idim*MED_TAILLE_PNOM),
-					    tmp_unit+(idim*MED_TAILLE_PNOM));
+					    tmp_nom+(idim*MED_TAILLE_PNOM22),
+					    tmp_unit+(idim*MED_TAILLE_PNOM22));
 
 	  if (err != MED_VALID)
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Error in reading coordinates indices " <<
@@ -408,14 +408,14 @@ void MED_MESH_RDONLY_DRIVER22::getGRID()
   // set coordinate names
 
   for (i=0; i<_ptrMesh->_spaceDimension; ++i ) {
-    string myStringName(tmp_nom_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
-    string myStringUnit(tmp_unit_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
+    string myStringName(tmp_nom_coord,i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
+    string myStringUnit(tmp_unit_coord,i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
     // suppress space at the end
     int j ;
-    for(j=MED_TAILLE_PNOM-1;j>=0;j--)
+    for(j=MED_TAILLE_PNOM22-1;j>=0;j--)
       if (myStringName[j] != ' ') break ;
     _ptrMesh->_coordinate->_coordinateName[i]=string(myStringName,0,j+1);
-    for(j=MED_TAILLE_PNOM-1;j>=0;j--)
+    for(j=MED_TAILLE_PNOM22-1;j>=0;j--)
       if (myStringUnit[j] != ' ') break ;
     _ptrMesh->_coordinate->_coordinateUnit[i]=string(myStringUnit,0,j+1);
   }
@@ -510,8 +510,8 @@ int  MED_MESH_RDONLY_DRIVER22::getCOORDINATE()
       _ptrMesh->_coordinate = new COORDINATE(SpaceDimension, NumberOfNodes, MED_EN::MED_FULL_INTERLACE);
       
       med_2_2::med_repere rep ; // ATTENTION ---> DOIT ETRE INTEGRE DS MESH EF: FAIT NON?
-      string tmp_nom_coord (MED_TAILLE_PNOM*(_ptrMesh->_spaceDimension)+1,'\0');
-      string tmp_unit_coord(MED_TAILLE_PNOM*(_ptrMesh->_spaceDimension)+1,'\0');
+      string tmp_nom_coord (MED_TAILLE_PNOM22*(_ptrMesh->_spaceDimension)+1,'\0');
+      string tmp_unit_coord(MED_TAILLE_PNOM22*(_ptrMesh->_spaceDimension)+1,'\0');
       char * tmp_nom = (const_cast <char *> ( tmp_nom_coord.c_str())  ) ;
       char * tmp_unit= (const_cast <char *> ( tmp_unit_coord.c_str()) ) ;
 
@@ -535,14 +535,14 @@ int  MED_MESH_RDONLY_DRIVER22::getCOORDINATE()
       
 
       for (int i=0;i<_ptrMesh->_spaceDimension;i++) {
-	string myStringName(tmp_nom_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
-	string myStringUnit(tmp_unit_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM) ;
+	string myStringName(tmp_nom_coord,i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
+	string myStringUnit(tmp_unit_coord,i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
 	// suppress space at the end
 	int j ;
-	for(j=MED_TAILLE_PNOM-1;j>=0;j--)
+	for(j=MED_TAILLE_PNOM22-1;j>=0;j--)
 	  if (myStringName[j] != ' ') break ;
 	_ptrMesh->_coordinate->_coordinateName[i]=string(myStringName,0,j+1);
-	for(j=MED_TAILLE_PNOM-1;j>=0;j--)
+	for(j=MED_TAILLE_PNOM22-1;j>=0;j--)
 	  if (myStringUnit[j] != ' ') break ;
 	_ptrMesh->_coordinate->_coordinateUnit[i]=string(myStringUnit,0,j+1);
       }
@@ -573,10 +573,10 @@ int  MED_MESH_RDONLY_DRIVER22::getCOORDINATE()
 	}
 
       // Read the unused optional node Names
-      char * tmp_node_name = new char[NumberOfNodes*MED_TAILLE_PNOM+1];
+      char * tmp_node_name = new char[NumberOfNodes*MED_TAILLE_PNOM22+1];
       tmp_node_name[NumberOfNodes]='\0' ;
       err=MEDnomLire(_medIdt,const_cast <char*> (_ptrMesh->_name.c_str()),
-		     tmp_node_name,NumberOfNodes*MED_TAILLE_PNOM,med_2_2::MED_NOEUD,
+		     tmp_node_name,NumberOfNodes*MED_TAILLE_PNOM22,med_2_2::MED_NOEUD,
 		     (med_2_2::med_geometrie_element) MED_NONE);
       if (err == MED_VALID) 
         MESSAGE(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have names but we do not read them !");
@@ -1746,7 +1746,7 @@ MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22(const string & fileName,
 }
 
 MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22(const MED_MESH_WRONLY_DRIVER22 & driver):
-  MED_MESH_DRIVER22(driver),IMED_MESH_WRONLY_DRIVER(driver),MED_MESH_DRIVER(driver)
+  IMED_MESH_WRONLY_DRIVER(driver),MED_MESH_DRIVER22(driver),MED_MESH_DRIVER(driver)
 {
 }
 
@@ -1859,8 +1859,8 @@ int MED_MESH_WRONLY_DRIVER22::writeGRID() const
   
   med_2_2::med_err err = MED_ERROR;
   med_2_2::med_repere rep;
-  string tmp_name(_ptrMesh->_spaceDimension*MED_TAILLE_PNOM,' ');
-  string tmp_unit(_ptrMesh->_spaceDimension*MED_TAILLE_PNOM,' ');
+  string tmp_name(_ptrMesh->_spaceDimension*MED_TAILLE_PNOM22,' ');
+  string tmp_unit(_ptrMesh->_spaceDimension*MED_TAILLE_PNOM22,' ');
 
   // Test if the mesh <_meshName> already exists
   // If it doesn't exists create it
@@ -1918,11 +1918,11 @@ int MED_MESH_WRONLY_DRIVER22::writeGRID() const
   for (int i=0;i<_ptrMesh->_spaceDimension;i++) {
     SCRUTE(i);
     valueString = _ptrMesh->_coordinate->_coordinateName[i] ;
-    lengthString = (MED_TAILLE_PNOM<valueString.size())?MED_TAILLE_PNOM:valueString.size() ;
-    tmp_name.replace(i*MED_TAILLE_PNOM,i*MED_TAILLE_PNOM+lengthString,valueString,0,lengthString);
+    lengthString = (MED_TAILLE_PNOM22<valueString.size())?MED_TAILLE_PNOM22:valueString.size() ;
+    tmp_name.replace(i*MED_TAILLE_PNOM22,i*MED_TAILLE_PNOM22+lengthString,valueString,0,lengthString);
     valueString = _ptrMesh->_coordinate->_coordinateUnit[i];
-    lengthString = (MED_TAILLE_PNOM<valueString.size())?MED_TAILLE_PNOM:valueString.size() ;
-    tmp_unit.replace(i*MED_TAILLE_PNOM,i*MED_TAILLE_PNOM+lengthString,valueString,0,lengthString);
+    lengthString = (MED_TAILLE_PNOM22<valueString.size())?MED_TAILLE_PNOM22:valueString.size() ;
+    tmp_unit.replace(i*MED_TAILLE_PNOM22,i*MED_TAILLE_PNOM22+lengthString,valueString,0,lengthString);
   }
 
   // Pourquoi le stocker sous forme de chaîne ?
@@ -1992,10 +1992,10 @@ int MED_MESH_WRONLY_DRIVER22::writeGRID() const
 
       for (int idim = 0; idim < _ptrMesh->_meshDimension; ++idim)
 	{
-	  string str_name = string (tmp_name,idim*MED_TAILLE_PNOM,
-				    MED_TAILLE_PNOM);
-	  string str_unit = string (tmp_unit,idim*MED_TAILLE_PNOM,
-				    MED_TAILLE_PNOM);
+	  string str_name = string (tmp_name,idim*MED_TAILLE_PNOM22,
+				    MED_TAILLE_PNOM22);
+	  string str_unit = string (tmp_unit,idim*MED_TAILLE_PNOM22,
+				    MED_TAILLE_PNOM22);
 
 	  err = med_2_2::MEDindicesCoordEcr(_medIdt, const_cast <char *>
 					   (_ptrMesh->_name.c_str()),
@@ -2029,19 +2029,19 @@ int MED_MESH_WRONLY_DRIVER22::writeCoordinates() const {
 
   med_2_2::med_err err = MED_ERROR;
   med_2_2::med_repere rep;
-  string tmp_name(_ptrMesh->_spaceDimension*MED_TAILLE_PNOM,' ');
-  string tmp_unit(_ptrMesh->_spaceDimension*MED_TAILLE_PNOM,' ');
+  string tmp_name(_ptrMesh->_spaceDimension*MED_TAILLE_PNOM22,' ');
+  string tmp_unit(_ptrMesh->_spaceDimension*MED_TAILLE_PNOM22,' ');
     
   // Recompose the <_spaceDimension> strings in 1 string 
   int lengthString ;
   string valueString ;
   for (int i=0;i<_ptrMesh->_spaceDimension;i++) {
     valueString = _ptrMesh->_coordinate->_coordinateName[i] ;
-    lengthString = (MED_TAILLE_PNOM<valueString.size())?MED_TAILLE_PNOM:valueString.size() ;
-    tmp_name.replace(i*MED_TAILLE_PNOM,i*MED_TAILLE_PNOM+lengthString,valueString,0,lengthString);
+    lengthString = (MED_TAILLE_PNOM22<valueString.size())?MED_TAILLE_PNOM22:valueString.size() ;
+    tmp_name.replace(i*MED_TAILLE_PNOM22,i*MED_TAILLE_PNOM22+lengthString,valueString,0,lengthString);
     valueString = _ptrMesh->_coordinate->_coordinateUnit[i];
-    lengthString = (MED_TAILLE_PNOM<valueString.size())?MED_TAILLE_PNOM:valueString.size() ;
-    tmp_unit.replace(i*MED_TAILLE_PNOM,i*MED_TAILLE_PNOM+lengthString,valueString,0,lengthString);
+    lengthString = (MED_TAILLE_PNOM22<valueString.size())?MED_TAILLE_PNOM22:valueString.size() ;
+    tmp_unit.replace(i*MED_TAILLE_PNOM22,i*MED_TAILLE_PNOM22+lengthString,valueString,0,lengthString);
   }
 
   // Test if the mesh <_meshName> already exists
@@ -2833,15 +2833,25 @@ MED_MESH_RDWR_DRIVER22::MED_MESH_RDWR_DRIVER22()
 
 MED_MESH_RDWR_DRIVER22::MED_MESH_RDWR_DRIVER22(const string & fileName,
 					       MESH * ptrMesh):
-  MED_MESH_DRIVER(fileName,ptrMesh,MED_RDWR),IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),IMED_MESH_RDWR_DRIVER(fileName,ptrMesh),
-  MED_MESH_DRIVER22(fileName,ptrMesh,MED_RDWR),MED_MESH_RDONLY_DRIVER22(fileName,ptrMesh),MED_MESH_WRONLY_DRIVER22(fileName,ptrMesh)
+  MED_MESH_DRIVER(fileName,ptrMesh,MED_RDWR),
+  IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),
+  IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),
+  IMED_MESH_RDWR_DRIVER(fileName,ptrMesh),
+  MED_MESH_DRIVER22(fileName,ptrMesh,MED_RDWR),
+  MED_MESH_RDONLY_DRIVER22(fileName,ptrMesh),
+  MED_MESH_WRONLY_DRIVER22(fileName,ptrMesh)
 {
   MESSAGE("MED_MESH_RDWR_DRIVER22::MED_MESH_RDWR_DRIVER22(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 MED_MESH_RDWR_DRIVER22::MED_MESH_RDWR_DRIVER22(const MED_MESH_RDWR_DRIVER22 & driver):
-  MED_MESH_DRIVER(driver),IMED_MESH_RDONLY_DRIVER(driver),IMED_MESH_WRONLY_DRIVER(driver),IMED_MESH_RDWR_DRIVER(driver),
-  MED_MESH_DRIVER22(driver),MED_MESH_RDONLY_DRIVER22(driver),MED_MESH_WRONLY_DRIVER22(driver)
+  MED_MESH_DRIVER(driver),
+  IMED_MESH_RDONLY_DRIVER(driver),
+  IMED_MESH_WRONLY_DRIVER(driver),
+  IMED_MESH_RDWR_DRIVER(driver),
+  MED_MESH_DRIVER22(driver),
+  MED_MESH_RDONLY_DRIVER22(driver),
+  MED_MESH_WRONLY_DRIVER22(driver)
 {
 }
 

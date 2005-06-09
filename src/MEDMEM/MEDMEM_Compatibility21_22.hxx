@@ -33,6 +33,12 @@ namespace med_2_2 {
   }
 }
 
+/*
+  Core of the management V2.1 V2.2 of the Med File
+*/
+
+#undef MED_TAILLE_PNOM
+#undef MED_NOPFLi
 
 #define MED_TAILLE_PNOM21   8
 #define MED_TAILLE_PNOM22  16

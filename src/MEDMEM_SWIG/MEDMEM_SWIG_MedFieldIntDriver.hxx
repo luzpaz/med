@@ -1,8 +1,8 @@
 #ifndef MEDMEM_SWIG_MEDFIELDINTDRIVER_HXX_
 #define MEDMEM_SWIG_MEDFIELDINTDRIVER_HXX_
 
-#include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_SWIG_FieldInt.hxx"
+#include "MEDMEM_MedFieldDriver.hxx"
 
 class MED_FIELDINT_DRIVER : public MEDMEM::MED_FIELD_DRIVER<int>
 {

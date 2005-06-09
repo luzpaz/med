@@ -71,6 +71,7 @@ MEDMEM_Support.hxx \
 MEDMEM_Unit.hxx \
 MEDMEM_Grid.hxx \
 MEDMEM_medimport_src.hxx \
+MEDMEM_MedVersion.hxx \
 MEDMEM_Compatibility21_22.hxx \
 MEDMEM_MedFieldDriver21.hxx \
 MEDMEM_MedMeshDriver21.hxx \
@@ -109,6 +110,7 @@ MEDMEM_Unit.cxx \
 MEDMEM_VtkMedDriver.cxx \
 MEDMEM_VtkMeshDriver.cxx \
 MEDMEM_Grid.cxx \
+MEDMEM_MedVersion.cxx \
 MEDMEM_MedMeshDriver21.cxx \
 MEDMEM_MedMedDriver21.cxx \
 MEDMEM_medimport_src.cxx \

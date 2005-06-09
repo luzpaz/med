@@ -1,5 +1,6 @@
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_MedMeshDriver21.hxx"
+#include "MEDMEM_DriverFactory.hxx" 
 #include "MEDMEM_DriversDef.hxx"
 
 #include "MEDMEM_Family.hxx"
@@ -31,7 +32,7 @@ MED_MESH_DRIVER::MED_MESH_DRIVER(const string & fileName,
   GENDRIVER(fileName,accessMode),
   _ptrMesh(ptrMesh), 
   _meshName(""),
-  _meshNum(MED_INVALID) 
+  _meshNum(MED_INVALID)
 {
 }
   
@@ -39,12 +40,15 @@ MED_MESH_DRIVER::MED_MESH_DRIVER(const MED_MESH_DRIVER & driver):
   GENDRIVER(driver),
   _ptrMesh(driver._ptrMesh),
   _meshName(driver._meshName),
-  _meshNum(driver._meshNum) 
+  _meshNum(driver._meshNum)
 {
+
 }
 
 MED_MESH_DRIVER::~MED_MESH_DRIVER()
 {
+  MESSAGE("MED_MESH_DRIVER::~MED_MESH_DRIVER()has been destroyed");
+
 }
 
 void MED_MESH_DRIVER::setMeshName(const string & meshName) 
@@ -64,9 +68,10 @@ IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(): MED_MESH_DRIVER()
 }
   
 IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(const string & fileName,
-					       MESH * ptrMesh):MED_MESH_DRIVER(fileName, ptrMesh, MED_EN::MED_RDONLY)
+						 MESH * ptrMesh):
+  MED_MESH_DRIVER(fileName, ptrMesh, MED_EN::MED_RDONLY)
 { 
-  MESSAGE("MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE("IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
   
 IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(const IMED_MESH_RDONLY_DRIVER & driver): 
@@ -198,295 +203,297 @@ IMED_MESH_RDWR_DRIVER::~IMED_MESH_RDWR_DRIVER() {
 
 MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER()
 {
-  _concreteDriverRd=new MED_MESH_RDONLY_DRIVER21;
+  MESSAGE("You are using the default constructor of the Mesh read only Driver and it is 2.1 one");
+  _concreteMeshDrv = new MED_MESH_RDONLY_DRIVER21();
 }
 
 MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh)
 {
-  _concreteDriverRd=new MED_MESH_RDONLY_DRIVER21(fileName,ptrMesh);
+  _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,MED_LECT);
 }
 
-MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER(const MED_MESH_RDONLY_DRIVER & driver)
+MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER(const MED_MESH_RDONLY_DRIVER & driver):MED_MESH_DRIVER(driver)
 {
-  _concreteDriverRd=new MED_MESH_RDONLY_DRIVER21;//to complete
+  _concreteMeshDrv = driver._concreteMeshDrv->copy();
 }
 
 MED_MESH_RDONLY_DRIVER::~MED_MESH_RDONLY_DRIVER()
 {
-  delete _concreteDriverRd;
+  if (_concreteMeshDrv) delete _concreteMeshDrv;
 }
 
 void MED_MESH_RDONLY_DRIVER::write( void ) const
 {
-  _concreteDriverRd->write();
+  _concreteMeshDrv->write();
 }
 
 void MED_MESH_RDONLY_DRIVER::read ( void )
 {
-  _concreteDriverRd->read();
+  _concreteMeshDrv->read();
 }
 
 void MED_MESH_RDONLY_DRIVER::open()
 {
-  _concreteDriverRd->open();
+  _concreteMeshDrv->open();
 }
 
 void MED_MESH_RDONLY_DRIVER::close()
 {
-  _concreteDriverRd->close();
+  _concreteMeshDrv->close();
 }
 
 void MED_MESH_RDONLY_DRIVER::setMeshName(const string & meshName)
 {
-  _concreteDriverRd->setMeshName(meshName);
+  _concreteMeshDrv->setMeshName(meshName);
 }
 
 string MED_MESH_RDONLY_DRIVER::getMeshName() const
 {
-  return _concreteDriverRd->getMeshName();
+  return MED_MESH_DRIVER::getMeshName();
 }
 
 GENDRIVER * MED_MESH_RDONLY_DRIVER::copy ( void ) const
 {
-  return _concreteDriverRd->copy();
+  return new MED_MESH_RDONLY_DRIVER(*this);
 }
 
-int MED_MESH_RDONLY_DRIVER::getCOORDINATE()
-{
-  return _concreteDriverRd->getCOORDINATE();
-}
+// int MED_MESH_RDONLY_DRIVER::getCOORDINATE()
+// {
+//   return _concreteMeshDrv->getCOORDINATE();
+// }
 
-int MED_MESH_RDONLY_DRIVER::getCONNECTIVITY()
-{
-  return _concreteDriverRd->getCONNECTIVITY();
-}
+// int MED_MESH_RDONLY_DRIVER::getCONNECTIVITY()
+// {
+//   return _concreteMeshDrv->getCONNECTIVITY();
+// }
 
-int MED_MESH_RDONLY_DRIVER::getFAMILY()
-{
-  return _concreteDriverRd->getFAMILY();
-}
+// int MED_MESH_RDONLY_DRIVER::getFAMILY()
+// {
+//   return _concreteMeshDrv->getFAMILY();
+// }
 
-int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
-{
-  return _concreteDriverRd->getNodalConnectivity(Connectivity);
-}
+// int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
+// {
+//   return _concreteMeshDrv->getNodalConnectivity(Connectivity);
+// }
 
-int MED_MESH_RDONLY_DRIVER::getDescendingConnectivity(CONNECTIVITY * Connectivity)
-{
-  return _concreteDriverRd->getDescendingConnectivity(Connectivity);
-}
+// int MED_MESH_RDONLY_DRIVER::getDescendingConnectivity(CONNECTIVITY * Connectivity)
+// {
+//   return _concreteMeshDrv->getDescendingConnectivity(Connectivity);
+// }
 
-int MED_MESH_RDONLY_DRIVER::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
-{
-  return _concreteDriverRd->getNodesFamiliesNumber(MEDArrayNodeFamily);
-}
+// int MED_MESH_RDONLY_DRIVER::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
+// {
+//   return _concreteMeshDrv->getNodesFamiliesNumber(MEDArrayNodeFamily);
+// }
 
-int MED_MESH_RDONLY_DRIVER::getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity)
-{
-  return _concreteDriverRd->getCellsFamiliesNumber(Arrays,Connectivity,entity);
-}
+// int MED_MESH_RDONLY_DRIVER::getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity)
+// {
+//   return _concreteMeshDrv->getCellsFamiliesNumber(Arrays,Connectivity,entity);
+// }
 
-void MED_MESH_RDONLY_DRIVER::getGRID()
-{
-  _concreteDriverRd->getGRID();
-}
+// void MED_MESH_RDONLY_DRIVER::getGRID()
+// {
+//   _concreteMeshDrv->getGRID();
+// }
 
 MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER()
 {
-  _concreteDriverWr=new MED_MESH_WRONLY_DRIVER21;
+  MESSAGE("You are using the default constructor of the Mesh write only Driver and it is 2.1 one");
+  _concreteMeshDrv = new MED_MESH_WRONLY_DRIVER21();
 }
 
 MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh)
 {
-  _concreteDriverWr=new MED_MESH_WRONLY_DRIVER21(fileName,ptrMesh);
+  _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,MED_ECRI);
 }
 
-MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const MED_MESH_WRONLY_DRIVER & driver)
+MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const MED_MESH_WRONLY_DRIVER & driver):MED_MESH_DRIVER(driver)
 {
-  _concreteDriverWr=new MED_MESH_WRONLY_DRIVER21;
+  _concreteMeshDrv = driver._concreteMeshDrv->copy();
 }
 
 MED_MESH_WRONLY_DRIVER::~MED_MESH_WRONLY_DRIVER()
 {
-  delete _concreteDriverWr;
+  if (_concreteMeshDrv) delete _concreteMeshDrv;
 }
 
 void MED_MESH_WRONLY_DRIVER::open()
 {
-  _concreteDriverWr->open();
+  _concreteMeshDrv->open();
 }
 
 void MED_MESH_WRONLY_DRIVER::close()
 {
-  _concreteDriverWr->close();
+  _concreteMeshDrv->close();
 }
 
 void MED_MESH_WRONLY_DRIVER::setMeshName(const string & meshName)
 {
-  _concreteDriverWr->setMeshName(meshName);
+  _concreteMeshDrv->setMeshName(meshName);
 }
 
 string MED_MESH_WRONLY_DRIVER::getMeshName() const
 {
-  return _concreteDriverWr->getMeshName();
+  return MED_MESH_DRIVER::getMeshName();
 }
 
 GENDRIVER * MED_MESH_WRONLY_DRIVER::copy ( void ) const
 {
-  return _concreteDriverWr->copy();
+  return new MED_MESH_WRONLY_DRIVER(*this);
 }
 
 void MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::read ( void )
 {
-  _concreteDriverWr->read();
+  _concreteMeshDrv->read();
 }
 
 void MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::write( void ) const
 {
-  _concreteDriverWr->write();
+  _concreteMeshDrv->write();
 }
 
-int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeCoordinates    ()                           const
-{
-  return _concreteDriverWr->writeCoordinates();
-}
+// int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeCoordinates    ()                           const
+// {
+//   return _concreteMeshDrv->writeCoordinates();
+// }
 
-int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeConnectivities (MED_EN::medEntityMesh entity)       const
-{
-  return _concreteDriverWr->writeConnectivities(entity);
-}
+// int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeConnectivities (MED_EN::medEntityMesh entity)       const
+// {
+//   return _concreteMeshDrv->writeConnectivities(entity);
+// }
 
-int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeFamilyNumbers  ()                           const
-{
-  return _concreteDriverWr->writeFamilyNumbers();
-}
+// int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeFamilyNumbers  ()                           const
+// {
+//   return _concreteMeshDrv->writeFamilyNumbers();
+// }
 
-int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeFamilies       (vector<FAMILY*> & families) const
-{
-  return _concreteDriverWr->writeFamilies(families);
-}
+// int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeFamilies       (vector<FAMILY*> & families) const
+// {
+//   return _concreteMeshDrv->writeFamilies(families);
+// }
 
-int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeGRID() const
-{
-  return _concreteDriverWr->writeGRID();
-}
+// int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeGRID() const
+// {
+//   return _concreteMeshDrv->writeGRID();
+// }
 
 MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER()
 {
-  _concreteDriverRdWr=new MED_MESH_RDWR_DRIVER21;
+  _concreteMeshDrv=new MED_MESH_RDWR_DRIVER21();
 }
 
 MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh)
 {
-  _concreteDriverRdWr=new MED_MESH_RDWR_DRIVER21(fileName,ptrMesh);
+  _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,MED_REMP);
 }
 
-MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const MED_MESH_RDWR_DRIVER & driver)
+MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const MED_MESH_RDWR_DRIVER & driver): MED_MESH_DRIVER(driver)
 {
-  _concreteDriverRdWr=new MED_MESH_RDWR_DRIVER21;
+  _concreteMeshDrv = driver._concreteMeshDrv->copy();
 }
 
 MED_MESH_RDWR_DRIVER::~MED_MESH_RDWR_DRIVER()
 {
-  delete _concreteDriverRdWr;
+  if (_concreteMeshDrv) delete _concreteMeshDrv;
 }
 
 void MED_MESH_RDWR_DRIVER::read ( void )
 {
-  _concreteDriverRdWr->read();
+  _concreteMeshDrv->read();
 }
 
 void MED_MESH_RDWR_DRIVER::write( void ) const
 {
-  _concreteDriverRdWr->write();
+  _concreteMeshDrv->write();
 }
  
 void MED_MESH_RDWR_DRIVER::open()
 {
-  _concreteDriverRdWr->open();
+  _concreteMeshDrv->open();
 }
 
 void MED_MESH_RDWR_DRIVER::close()
 {
-  _concreteDriverRdWr->close();
+  _concreteMeshDrv->close();
 }
 
-int MED_MESH_RDWR_DRIVER::getCOORDINATE()
-{
-  return _concreteDriverRdWr->getCOORDINATE();
-}
+// int MED_MESH_RDWR_DRIVER::getCOORDINATE()
+// {
+//   return _concreteMeshDrv->getCOORDINATE();
+// }
 
-int MED_MESH_RDWR_DRIVER::getCONNECTIVITY()
-{
-  return _concreteDriverRdWr->getCONNECTIVITY();
-}
+// int MED_MESH_RDWR_DRIVER::getCONNECTIVITY()
+// {
+//   return _concreteMeshDrv->getCONNECTIVITY();
+// }
 
-int MED_MESH_RDWR_DRIVER::getFAMILY()
-{
-  return _concreteDriverRdWr->getFAMILY();
-}
+// int MED_MESH_RDWR_DRIVER::getFAMILY()
+// {
+//   return _concreteMeshDrv->getFAMILY();
+// }
 
-int MED_MESH_RDWR_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
-{
-  return _concreteDriverRdWr->getNodalConnectivity(Connectivity);
-}
+// int MED_MESH_RDWR_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
+// {
+//   return _concreteMeshDrv->getNodalConnectivity(Connectivity);
+// }
 
-int MED_MESH_RDWR_DRIVER::getDescendingConnectivity(CONNECTIVITY * Connectivity)
-{
-  return _concreteDriverRdWr->getDescendingConnectivity(Connectivity);
-}
+// int MED_MESH_RDWR_DRIVER::getDescendingConnectivity(CONNECTIVITY * Connectivity)
+// {
+//   return _concreteMeshDrv->getDescendingConnectivity(Connectivity);
+// }
  
-int MED_MESH_RDWR_DRIVER::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
-{
-  return _concreteDriverRdWr->getNodesFamiliesNumber(MEDArrayNodeFamily);
-}
+// int MED_MESH_RDWR_DRIVER::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
+// {
+//   return _concreteMeshDrv->getNodesFamiliesNumber(MEDArrayNodeFamily);
+// }
 
-int MED_MESH_RDWR_DRIVER::getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity)
-{
-  return _concreteDriverRdWr->getCellsFamiliesNumber(Arrays,Connectivity,entity);
-}
+// int MED_MESH_RDWR_DRIVER::getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity)
+// {
+//   return _concreteMeshDrv->getCellsFamiliesNumber(Arrays,Connectivity,entity);
+// }
 
-void MED_MESH_RDWR_DRIVER::getGRID ()
-{
-  _concreteDriverRdWr->getGRID();
-}
+// void MED_MESH_RDWR_DRIVER::getGRID ()
+// {
+//   _concreteMeshDrv->getGRID();
+// }
 
-int MED_MESH_RDWR_DRIVER::writeCoordinates    ()                           const
-{
-  _concreteDriverRdWr->writeCoordinates();
-}
+// int MED_MESH_RDWR_DRIVER::writeCoordinates    ()                           const
+// {
+//   _concreteMeshDrv->writeCoordinates();
+// }
 
-int MED_MESH_RDWR_DRIVER::writeConnectivities (MED_EN::medEntityMesh entity)       const
-{
-  return _concreteDriverRdWr->writeConnectivities (entity);
-}
+// int MED_MESH_RDWR_DRIVER::writeConnectivities (MED_EN::medEntityMesh entity)       const
+// {
+//   return _concreteMeshDrv->writeConnectivities (entity);
+// }
 
-int MED_MESH_RDWR_DRIVER::writeFamilyNumbers  ()                           const
-{
-  return _concreteDriverRdWr->writeFamilyNumbers();
-}
+// int MED_MESH_RDWR_DRIVER::writeFamilyNumbers  ()                           const
+// {
+//   return _concreteMeshDrv->writeFamilyNumbers();
+// }
 
-int MED_MESH_RDWR_DRIVER::writeFamilies       (vector<FAMILY*> & families) const
-{
-  return _concreteDriverRdWr->writeFamilies(families);
-}
+// int MED_MESH_RDWR_DRIVER::writeFamilies       (vector<FAMILY*> & families) const
+// {
+//   return _concreteMeshDrv->writeFamilies(families);
+// }
 
-int MED_MESH_RDWR_DRIVER::writeGRID() const
-{
-  return _concreteDriverRdWr->writeGRID();
-}
+// int MED_MESH_RDWR_DRIVER::writeGRID() const
+// {
+//   return _concreteMeshDrv->writeGRID();
+// }
 
 void MED_MESH_RDWR_DRIVER::setMeshName(const string & meshName)
 {
-  _concreteDriverRdWr->setMeshName(meshName);
+  _concreteMeshDrv->setMeshName(meshName);
 }
 
 string MED_MESH_RDWR_DRIVER::getMeshName() const
 {
-  return _concreteDriverRdWr->getMeshName();
+  return MED_MESH_DRIVER::getMeshName();
 }
 
 GENDRIVER * MED_MESH_RDWR_DRIVER::copy ( void ) const
 {
-  return _concreteDriverRdWr->copy();
+  return new MED_MESH_RDWR_DRIVER(*this);
 }

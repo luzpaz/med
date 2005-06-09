@@ -35,7 +35,7 @@ MED_MED_DRIVER21::MED_MED_DRIVER21(const string & fileName,
 //REM :  As t'on besoin du champ _status :  _medIdt <-> _status  ?  Oui
 
 MED_MED_DRIVER21::MED_MED_DRIVER21(const MED_MED_DRIVER21 & driver):
-  MED_MED_DRIVER(driver),_medIdt(MED_INVALID)
+  MED_MED_DRIVER(driver),_medIdt(driver._medIdt)
 {
 }
 
@@ -237,24 +237,31 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 
       //MED_MESH_RDWR_DRIVER * _ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
       MED_EN::med_mode_acces myMode = getAccessMode();
-      MED_MESH_DRIVER * ptrDriver ;
-      switch (myMode) {
-      case MED_EN::MED_LECT:
-	ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
-	break ;
-      case MED_EN::MED_REMP:	
-	ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
-	break ;
-      case MED_EN::MED_ECRI: // should never append !!
-	ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
-	break;
-      default:
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
-      }
+//       MED_MESH_DRIVER * ptrDriver ;
+//       switch (myMode) {
+//       case MED_EN::MED_LECT:
+// 	ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
+// 	break ;
+//       case MED_EN::MED_REMP:	
+// 	ptrDriver = new MED_MESH_RDWR_DRIVER(_fileName, ptrMesh);
+// 	break ;
+//       case MED_EN::MED_ECRI: // should never append !!
+// 	ptrDriver = new MED_MESH_RDONLY_DRIVER(_fileName, ptrMesh);
+// 	break;
+//       default:
+// 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+//       }
+
+      GENDRIVER * ptrDriver =
+	DRIVERFACTORY::buildConcreteMedDriverForMesh(_fileName, ptrMesh,
+						     meshName, myMode, V21);
 
       ptrDriver->setId       ( getId() );
       ptrDriver->setMeshName ( meshName );
       ptrMesh->setDescription(meshDescription);
+
+      SCRUTE(ptrDriver);
+
       ptrMesh->addDriver(*ptrDriver);
       delete ptrDriver ;
 
@@ -344,7 +351,7 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
     int                           numberOfTimeSteps            =  -1;
     med_2_1::med_int                           timeStepNumber               =  -1;
     //    char                          timeStepUnit[MED_TAILLE_PNOM]= "";
-    char                          timeStepUnit[MED_TAILLE_PNOM+1] ;
+    char                          timeStepUnit[MED_TAILLE_PNOM21+1] ;
     double                        timeStep                     = 0.0;
     med_2_1::med_int                           orderNumber                  =  -1;                           //???init?????
     map<MESH_NAME_,MESH*>      & _meshes   =  _ptrMed->_meshes; 
@@ -365,8 +372,8 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
           throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) <<  "Be careful there is no compound for field n°" 
                                            << i << "in file |"<<_fileName<<"| !"));
       
-      componentName = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;
-      unitName      = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;   
+      componentName = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;
+      unitName      = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;   
       
       err = MEDchampInfo(_medIdt, i, fieldName, &type, componentName, 
                          unitName, numberOfComponents) ;
@@ -452,7 +459,7 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 		
 		// init to null to prevent some error if not correctly allocated !
 		ptrField = (FIELD_*)NULL ;
-		ptrDriver = (GENDRIVER*)NULL ;
+// 		ptrDriver = (GENDRIVER*)NULL ;
 
 		switch ( type) {
 		case med_2_1::MED_INT64 :
@@ -479,19 +486,24 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
   		  MESSAGE("#### SET NAME in FIELD : "<<fieldName);
 
 		  MED_EN::med_mode_acces myMode = getAccessMode();
-		  switch (myMode) {
-		  case MED_EN::MED_LECT:
-		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<int>(_fileName, (FIELD<int> *)ptrField);
-		    break ;
-		  case MED_EN::MED_REMP:	
-		    ptrDriver = new MED_FIELD_RDWR_DRIVER<int>(_fileName, (FIELD<int> *)ptrField);
-		    break ;
-		  case MED_EN::MED_ECRI: // should never append !!
-		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<int>(_fileName, (FIELD<int> *)ptrField);
-		    break;
-		  default:
-		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
-		  }
+// 		  switch (myMode) {
+// 		  case MED_EN::MED_LECT:
+// 		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<int>(_fileName, (FIELD<int> *)ptrField);
+// 		    break ;
+// 		  case MED_EN::MED_REMP:	
+// 		    ptrDriver = new MED_FIELD_RDWR_DRIVER<int>(_fileName, (FIELD<int> *)ptrField);
+// 		    break ;
+// 		  case MED_EN::MED_ECRI: // should never append !!
+// 		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<int>(_fileName, (FIELD<int> *)ptrField);
+// 		    break;
+// 		  default:
+// 		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+// 		  }
+
+		  ptrDriver = DRIVERFACTORY::buildConcreteMedDriverForField<int>(_fileName, (FIELD<int> *)ptrField, myMode, V21);
+
+		  SCRUTE(ptrDriver);
+
   		  break;
 		}
 		case med_2_1::MED_REEL64 : {
@@ -503,19 +515,23 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 		  MESSAGE("#### SET NAME in FIELD : "<<fieldName);
 
 		  MED_EN::med_mode_acces myMode = getAccessMode();
-		  switch (myMode) {
-		  case MED_EN::MED_LECT:
-		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<med_2_1::med_float>(_fileName, (FIELD<med_2_1::med_float> *)ptrField);
-		    break ;
-		  case MED_EN::MED_REMP:	
-		    ptrDriver = new MED_FIELD_RDWR_DRIVER<med_2_1::med_float>(_fileName, (FIELD<med_2_1::med_float> *)ptrField);
-		    break ;
-		  case MED_EN::MED_ECRI: // should never append !!
-		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<med_2_1::med_float>(_fileName, (FIELD<med_2_1::med_float> *)ptrField);
-		    break;
-		  default:
-		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
-		  }
+// 		  switch (myMode) {
+// 		  case MED_EN::MED_LECT:
+// 		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<med_2_1::med_float>(_fileName, (FIELD<med_2_1::med_float> *)ptrField);
+// 		    break ;
+// 		  case MED_EN::MED_REMP:	
+// 		    ptrDriver = new MED_FIELD_RDWR_DRIVER<med_2_1::med_float>(_fileName, (FIELD<med_2_1::med_float> *)ptrField);
+// 		    break ;
+// 		  case MED_EN::MED_ECRI: // should never append !!
+// 		    ptrDriver = new MED_FIELD_RDONLY_DRIVER<med_2_1::med_float>(_fileName, (FIELD<med_2_1::med_float> *)ptrField);
+// 		    break;
+// 		  default:
+// 		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access !"));
+// 		  }
+
+		  ptrDriver = DRIVERFACTORY::buildConcreteMedDriverForField<med_2_1::med_float>(_fileName, (FIELD<med_2_1::med_float> *)ptrField, myMode, V21);
+		  SCRUTE(ptrDriver);
+
 		  break;
 		}
 		default : {
@@ -611,7 +627,7 @@ MED_MED_WRONLY_DRIVER21::MED_MED_WRONLY_DRIVER21(const string & fileName,  MED *
 {}
 
 MED_MED_WRONLY_DRIVER21::MED_MED_WRONLY_DRIVER21(const MED_MED_WRONLY_DRIVER21 & driver):
-  IMED_MED_WRONLY_DRIVER(driver),MED_MED_DRIVER(driver),MED_MED_DRIVER(driver)
+  IMED_MED_WRONLY_DRIVER(driver),MED_MED_DRIVER(driver),MED_MED_DRIVER21(driver)
 {}
 
 MED_MED_WRONLY_DRIVER21::~MED_MED_WRONLY_DRIVER21()
@@ -717,14 +733,22 @@ MED_MED_RDWR_DRIVER21::MED_MED_RDWR_DRIVER21()
 {}
 
 MED_MED_RDWR_DRIVER21::MED_MED_RDWR_DRIVER21(const string & fileName,  MED * const ptrMed):
-  MED_MED_RDONLY_DRIVER21(fileName,ptrMed),MED_MED_WRONLY_DRIVER21(fileName,ptrMed),IMED_MED_RDWR_DRIVER(fileName,ptrMed),
-  MED_MED_DRIVER21(fileName,ptrMed,MED_REMP),IMED_MED_WRONLY_DRIVER(fileName,ptrMed),IMED_MED_RDONLY_DRIVER(fileName,ptrMed),
+  MED_MED_RDONLY_DRIVER21(fileName,ptrMed),
+  MED_MED_WRONLY_DRIVER21(fileName,ptrMed),
+  IMED_MED_RDWR_DRIVER(fileName,ptrMed),
+  MED_MED_DRIVER21(fileName,ptrMed,MED_REMP),
+  IMED_MED_WRONLY_DRIVER(fileName,ptrMed),
+  IMED_MED_RDONLY_DRIVER(fileName,ptrMed),
   MED_MED_DRIVER(fileName,ptrMed,MED_REMP)
 {}
 
 MED_MED_RDWR_DRIVER21::MED_MED_RDWR_DRIVER21(const MED_MED_RDWR_DRIVER21 & driver):
-  MED_MED_RDONLY_DRIVER21(driver),MED_MED_WRONLY_DRIVER21(driver),IMED_MED_RDWR_DRIVER(driver),
-  MED_MED_DRIVER21(driver),IMED_MED_WRONLY_DRIVER(driver),IMED_MED_RDONLY_DRIVER(driver),
+  MED_MED_RDONLY_DRIVER21(driver),
+  MED_MED_WRONLY_DRIVER21(driver),
+  IMED_MED_RDWR_DRIVER(driver),
+  MED_MED_DRIVER21(driver),
+  IMED_MED_WRONLY_DRIVER(driver),
+  IMED_MED_RDONLY_DRIVER(driver),
   MED_MED_DRIVER(driver)
 {}
 

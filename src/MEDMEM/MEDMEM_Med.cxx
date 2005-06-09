@@ -15,6 +15,8 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
+#define MED_NOPDT -1
+
 /*!
   Constructor.
 */

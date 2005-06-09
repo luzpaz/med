@@ -26,6 +26,9 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
+#define MED_NOPDT -1
+#define MED_NONOR -1
+
 //#include "MEDMEM_Grid.hxx" this inclision should have never be here !!!
 
 //update Families with content list

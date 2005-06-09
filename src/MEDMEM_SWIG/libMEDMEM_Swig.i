@@ -18,7 +18,6 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_DriversDef.hxx"
-#include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_Med.hxx"
@@ -28,9 +27,11 @@
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_SWIG_FieldDouble.hxx"
 #include "MEDMEM_SWIG_FieldInt.hxx"
+#include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_SWIG_MedFieldDoubleDriver.hxx"
 #include "MEDMEM_SWIG_MedFieldIntDriver.hxx"
 #include "MEDMEM_Meshing.hxx"
+#include "MEDMEM_DriverFactory.hxx"
 
 #ifdef _DEBUG_
 #include "LocalTraceCollector.hxx"
@@ -249,6 +250,24 @@ typedef enum {MED_DRIVER=0, GIBI_DRIVER=1, PORFLOW_DRIVER = 2, VTK_DRIVER=254,
 typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26} med_type_champ;
 
 typedef struct { int dt; int it; } DT_IT_;
+
+typedef enum {V21 = 26, V22 = 75} medFileVersion;
+
+medFileVersion getMedFileVersionForWriting();
+
+void setMedFileVersionForWriting(medFileVersion version);
+
+%{
+  medFileVersion getMedFileVersionForWriting()
+    {
+      return (medFileVersion) DRIVERFACTORY::getMedFileVersionForWriting();
+    }
+
+  void setMedFileVersionForWriting(medFileVersion version)
+    {
+      DRIVERFACTORY::setMedFileVersionForWriting((medFileVersion) version);
+    }
+%}
 
 %extend DT_IT_ {
   int getdt()
