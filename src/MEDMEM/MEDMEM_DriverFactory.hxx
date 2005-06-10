@@ -65,6 +65,8 @@ namespace MEDMEM {
 
 #include "MEDMEM_VtkFieldDriver.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
+#include "MEDMEM_MedFieldDriver21.hxx"
+#include "MEDMEM_MedFieldDriver22.hxx"
 
 namespace MEDMEM {
   template<class T>

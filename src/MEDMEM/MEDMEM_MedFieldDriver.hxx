@@ -229,20 +229,13 @@ public :
 
 }
 
-#include "MEDMEM_MedFieldDriver21.hxx"
-
-#include "MEDMEM_MedFieldDriver22.hxx"
-
 namespace MEDMEM {
 
 template <class T> class MED_FIELD_RDONLY_DRIVER : public virtual IMED_FIELD_RDONLY_DRIVER<T>
 {
  
 public :
-  MED_FIELD_RDONLY_DRIVER() {
-    MESSAGE("You are using the default constructor of the Field read only Driver and it is 2.1 one");
-    _concreteFieldDrv=new MED_FIELD_RDONLY_DRIVER21<T>(); 
-}
+  MED_FIELD_RDONLY_DRIVER();
   MED_FIELD_RDONLY_DRIVER(const string & fileName,  FIELD<T> * ptrField);
 
   MED_FIELD_RDONLY_DRIVER(const MED_FIELD_RDONLY_DRIVER & fieldDriver):IMED_FIELD_RDONLY_DRIVER<T>(fieldDriver) { _concreteFieldDrv = fieldDriver._concreteFieldDrv->copy(); }
@@ -261,11 +254,7 @@ protected:
 
 template <class T> class MED_FIELD_WRONLY_DRIVER : public virtual IMED_FIELD_WRONLY_DRIVER<T> { 
 public :
-  MED_FIELD_WRONLY_DRIVER() {
-    MESSAGE("You are using the default constructor of the Field write only Driver and it is 2.1 one");
-
-    _concreteFieldDrv=new MED_FIELD_WRONLY_DRIVER21<T>();
-}
+  MED_FIELD_WRONLY_DRIVER();
   MED_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField);
 
   MED_FIELD_WRONLY_DRIVER(const MED_FIELD_WRONLY_DRIVER & fieldDriver):IMED_FIELD_WRONLY_DRIVER<T>(fieldDriver) { _concreteFieldDrv = fieldDriver._concreteFieldDrv->copy(); }
@@ -284,11 +273,7 @@ protected:
 
 template <class T> class MED_FIELD_RDWR_DRIVER : public virtual IMED_FIELD_RDWR_DRIVER<T> {
 public:
-  MED_FIELD_RDWR_DRIVER() {
-    MESSAGE("You are using the default constructor of the Field read/write Driver and it is 2.1 one");
-
-    _concreteFieldDrv=new MED_FIELD_RDWR_DRIVER21<T>();
-}
+  MED_FIELD_RDWR_DRIVER();
   /*!
     Constructor.
   */
@@ -309,6 +294,7 @@ private:
 protected:
   GENDRIVER * _concreteFieldDrv;
 };
+}
 
 /*-------------------------*/
 /* template implementation */
@@ -326,8 +312,12 @@ protected:
 // }
   
 #include "MEDMEM_DriverFactory.hxx" 
+#include "MEDMEM_MedFieldDriver21.hxx"
+#include "MEDMEM_MedFieldDriver22.hxx"
+
 
 /*--------------------- RDONLY PART -------------------------------*/
+namespace MEDMEM {
 
 template <class T> void IMED_FIELD_RDONLY_DRIVER<T>::write( void ) const
   throw (MEDEXCEPTION)
@@ -335,6 +325,10 @@ template <class T> void IMED_FIELD_RDONLY_DRIVER<T>::write( void ) const
   throw MEDEXCEPTION("MED_FIELD_RDONLY_DRIVER::write : Can't write with a RDONLY driver !");
 }
 
+template <class T>  MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER() {
+    MESSAGE("You are using the default constructor of the Field read only Driver and it is 2.1 one");
+    _concreteFieldDrv=new MED_FIELD_RDONLY_DRIVER21<T>(); 
+}
 
 template <class T>  MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER(const string & fileName, FIELD<T> * ptrField)
   {
@@ -353,6 +347,12 @@ template <class T> void IMED_FIELD_WRONLY_DRIVER<T>::read (void)
   throw MEDEXCEPTION("MED_FIELD_WRONLY_DRIVER::read : Can't read with a WRONLY driver !");
 }
 
+template <class T>  MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER() {
+    MESSAGE("You are using the default constructor of the Field write only Driver and it is 2.1 one");
+
+    _concreteFieldDrv=new MED_FIELD_WRONLY_DRIVER21<T>();
+}
+
 template <class T>  MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField)
   {
     BEGIN_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
@@ -363,6 +363,12 @@ template <class T>  MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER(const st
 }
 
 /*--------------------- RDWR PART -------------------------------*/
+
+template <class T>  MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER() {
+    MESSAGE("You are using the default constructor of the Field read/write Driver and it is 2.1 one");
+
+    _concreteFieldDrv=new MED_FIELD_RDWR_DRIVER21<T>();
+}
 
 template <class T>  MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER(const string & fileName, FIELD<T> * ptrField)
   {
