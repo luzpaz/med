@@ -81,11 +81,11 @@ meshNameFiles.append("CUBE_EN_HEXA8")
 files.append("cube_hexa8_import22.med")
 meshNameFiles.append("CUBE_EN_HEXA8")
 
-##files.append("test19.med")
-##meshNameFiles.append("CartGrid")
+files.append("test19.med")
+meshNameFiles.append("CartGrid")
 
-##files.append("test19.med")
-##meshNameFiles.append("bodyfitted")
+files.append("test19.med")
+meshNameFiles.append("bodyfitted")
 
 ##files.append("test19.med")
 ##meshNameFiles.append("maa1")
@@ -813,7 +813,8 @@ for i in range(nbOfFiles):
 
         print ""
 
-        mesh_name = md.getMeshName(0)
+#        mesh_name = md.getMeshName(0)
+        mesh_name = meshNameFiles[i]
         mesh = md.getMesh(mesh_name)
         mesh.read()
         spaceDim = mesh.getSpaceDimension()

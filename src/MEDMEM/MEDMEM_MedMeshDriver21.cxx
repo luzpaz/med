@@ -216,6 +216,8 @@ void MED_MESH_RDONLY_DRIVER21::getGRID()
                                  _meshName << "|")) ;
   _ptrMesh->_spaceDimension = SpaceDimension;
 
+  _ptrMesh->_meshDimension = SpaceDimension;
+
   // Read Array length
   int * ArrayLen[] = { & ptrGrid->_iArrayLength,
                        & ptrGrid->_jArrayLength,
