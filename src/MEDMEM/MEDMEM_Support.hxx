@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <string>
+#include <list>
 
 #include "utilities.h"
 #include "MEDMEM_STRING.hxx"
@@ -189,8 +190,11 @@ public:
 		  int *NumberOfEntity, int *NumberValue);
 
   void getBoundaryElements() throw (MEDEXCEPTION);
-
+  void changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumberingFromOldToNew, int limitNbClassicPoly, const int *renumberingFromOldToNewPoly=0);
   void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
+  void fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION);
+  void fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION);
+  void clearDataOnNumbers();
 };
 
 // _____________________

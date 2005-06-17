@@ -121,6 +121,8 @@ private:
 					    evaluates _neighbourhood from _descending */
   void calculateNeighbourhood(CONNECTIVITY &myConnectivity);
 
+  int getIndexOfEndClassicElementInReverseNodal(const int *reverseNodalValue, const int *reverseNodalIndex, int rk)  const;
+
 public:
 
   friend class IMED_MESH_RDONLY_DRIVER;
@@ -190,10 +192,22 @@ public:
 
   inline MED_EN::medEntityMesh              getEntity               ()                     const;
   inline int                    getNumberOfTypes        (MED_EN::medEntityMesh Entity) const;
+  int                    getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
+  const int * getConnectivityOfAnElementWithPoly(MED_EN::medConnectivity ConnectivityType,
+						 MED_EN::medEntityMesh Entity,
+						 int Number, int &lgth);
+  int getNumberOfPolyType()  const;
+  int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const;
+  int getNumberOfElementOfPolyType(MED_EN::medEntityMesh Entity)  const;
   inline const MED_EN::medGeometryElement * getGeometricTypes       (MED_EN::medEntityMesh Entity) const
+                                    			     throw (MEDEXCEPTION);
+  MED_EN::medGeometryElement * getGeometricTypesWithPoly       (MED_EN::medEntityMesh Entity) const
                                     			     throw (MEDEXCEPTION);
   MED_EN::medGeometryElement                getElementType          (MED_EN::medEntityMesh Entity,
 							     int Number)           const;
+  MED_EN::medGeometryElement                getElementTypeWithPoly          (MED_EN::medEntityMesh Entity,
+							     int Number)           const;
+  inline MED_EN::medGeometryElement                getPolyTypeRelativeTo() const;
   virtual inline const int *                getGlobalNumberingIndex (MED_EN::medEntityMesh Entity) const
                                     			     throw (MEDEXCEPTION);
 
@@ -208,12 +222,13 @@ public:
   const int* getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
 					  MED_EN::medEntityMesh Entity);
   int getNumberOfPolygons() const;
-  const int* getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType);
-  const int* getPolyhedronFacesIndex();
-  const int* getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType);
+  const int* getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const;
+  const int* getPolyhedronFacesIndex() const;
+  const int* getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const;
   int getNumberOfPolyhedronFaces() const;
   int getNumberOfPolyhedron() const;
- 
+  int *getNodesOfPolyhedron(int polyhedronId, int& lgthOfTab) const;
+  int **getNodesPerFaceOfPolyhedron(int polyhedronId, int& nbOfFaces, int* & nbOfNodesPerFaces) const;
   const CELLMODEL &   getType              (MED_EN::medGeometryElement Type) const; 
   const CELLMODEL *   getCellsTypes        (MED_EN::medEntityMesh Entity)    const 
                                     	    throw (MEDEXCEPTION);
@@ -234,6 +249,7 @@ public:
                                     	             throw (MEDEXCEPTION);
 
   const int*      getNeighbourhood() const;
+  void invertConnectivityForAFace(int faceId, const int *nodalConnForFace, bool polygonFace=false);
 
 };
 /*----------------------*/
@@ -260,35 +276,35 @@ inline int CONNECTIVITY::getNumberOfTypes(MED_EN::medEntityMesh Entity) const
     return _numberOfTypes; 
   else if (_constituent!=NULL)
     return _constituent->getNumberOfTypes(Entity);
-//   else if (_constituent == NULL)
-//     {
-//       MESSAGE("CONNECTIVITY::getNumberOfTypes : _constituent == NULL");
-//       try
-// 	{
-// 	  (const_cast <CONNECTIVITY *> (this))->calculateDescendingConnectivity();
-// 	}
-//       catch (MEDEXCEPTION & ex)
-// 	{
-// 	  return 0 ;
-// 	}
+  else if (_constituent == NULL)
+    {
+      MESSAGE("CONNECTIVITY::getNumberOfTypes : _constituent == NULL");
+      try
+	{
+	  (const_cast <CONNECTIVITY *> (this))->calculateDescendingConnectivity();
+	}
+      catch (MEDEXCEPTION & ex)
+	{
+	  return 0 ;
+	}
 
-//       SCRUTE(_entityDimension);
+      SCRUTE(_entityDimension);
 
-//       if (_entityDimension != 2 && _entityDimension != 3) return 0;
+      if (_entityDimension != 2 && _entityDimension != 3) return 0;
 
-//       try
-// 	{
-// 	  _constituent->calculateConnectivity(MED_NODAL,Entity);
-// 	}
-//       catch (MEDEXCEPTION & ex)
-// 	{
-// 	  return 0 ;
-// 	}
+      try
+	{
+	  _constituent->calculateConnectivity(MED_EN::MED_NODAL,Entity);
+	}
+      catch (MEDEXCEPTION & ex)
+	{
+	  return 0 ;
+	}
 
-//       return _constituent->getNumberOfTypes(Entity);
-//     }
+      return _constituent->getNumberOfTypes(Entity);
+    }
   else
-    return 0; // because it is the right information (no exception needed)!
+	return 0; // because it is the right information (no exception needed)!
 }
 
 /*!  Returns an array of all %medGeometryElement types existing in the mesh 
@@ -342,7 +358,6 @@ inline bool CONNECTIVITY::existConnectivity( MED_EN::medConnectivity Connectivit
 //-----------------------------------------------------------------------------//
 {
   if (_entity==Entity) { 
-    MESSAGE("existConnectivity : _entity==Entity="<<Entity);
     if ((ConnectivityType==MED_EN::MED_NODAL)&(_nodal!=(MEDSKYLINEARRAY*)NULL))
       return true;
     if ((ConnectivityType==MED_EN::MED_DESCENDING)&(_descending!=(MEDSKYLINEARRAY*)NULL))
@@ -469,6 +484,16 @@ inline void CONNECTIVITY::setEntityDimension(int EntityDimension)
 int CONNECTIVITY::getEntityDimension() const
 {
   return _entityDimension;
+}
+
+MED_EN::medGeometryElement CONNECTIVITY::getPolyTypeRelativeTo() const
+{
+  if(_entity==MED_EN::MED_CELL && _entityDimension==3)
+    return MED_EN::MED_POLYHEDRA;
+  else if((_entity==MED_EN::MED_CELL && _entityDimension==2) || (_entity==MED_EN::MED_FACE && _entityDimension==2))
+    return MED_EN::MED_POLYGON;
+  else
+    throw MEDEXCEPTION("getPolyTypeRelativeTo : ");
 }
 
 }//End namespace MEDMEM

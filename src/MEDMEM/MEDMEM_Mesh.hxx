@@ -143,11 +143,6 @@ public :
   inline void write(int index=0, const string & driverName = "");
   inline void write(const GENDRIVER & genDriver);
 
-  //  void calculateReverseConnectivity();
-  //  void createFaces(); 	//Faces creation => full constituent informations
-  //  void buildConstituent(); // calculate descendent connectivity + face-cell connectivity
-
-
   inline void 	      setName(string name);
   inline void 	      setDescription(string description);
   inline string       getName() const;
@@ -166,10 +161,14 @@ public :
   //inline int *                    getNodesNumbers();
 
   virtual inline int             getNumberOfTypes(MED_EN::medEntityMesh Entity) const;
+  virtual int getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
   virtual inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
+  virtual MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
   virtual inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
   virtual const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
   virtual inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
+					 MED_EN::medGeometryElement Type) const;
+  virtual int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity,
 					 MED_EN::medGeometryElement Type) const;
   virtual inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
 					MED_EN::medEntityMesh Entity) const;
@@ -179,6 +178,8 @@ public :
 					  MED_EN::medEntityMesh Entity) const;
 
   virtual inline MED_EN::medGeometryElement getElementType(MED_EN::medEntityMesh Entity,
+						   int Number) const;
+  virtual inline MED_EN::medGeometryElement getElementTypeWithPoly(MED_EN::medEntityMesh Entity,
 						   int Number) const;
   virtual inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
 					    MED_EN::medConnectivity ConnectivityType,
@@ -597,6 +598,17 @@ inline MED_EN::medGeometryElement MESH::getElementType(MED_EN::medEntityMesh Ent
     throw MEDEXCEPTION("MESH::getElementType(medEntityMesh,int) : no connectivity defined !");
   return _connectivity->getElementType(Entity,Number);
 }
+
+/*
+  Method equivalent to getElementType except that it includes not only classical Types but polygons/polyhedra also.
+ */
+MED_EN::medGeometryElement MESH::getElementTypeWithPoly(MED_EN::medEntityMesh Entity, int Number) const
+{
+  if (_connectivity==(CONNECTIVITY*)NULL)
+    throw MEDEXCEPTION("MESH::getElementType(medEntityMesh,int) : no connectivity defined !");
+  return _connectivity->getElementTypeWithPoly(Entity,Number);
+}
+
 /*!
   Calculate the ask connectivity. Returns an exception if this could not be
   done. Do nothing if connectivity already exist.

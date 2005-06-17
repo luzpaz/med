@@ -203,6 +203,14 @@ const medGeometryElement * GRID::getTypes(medEntityMesh entity) const
     return &_gridGeometry[i];
 }
 
+MED_EN::medGeometryElement * GRID::getTypesWithPoly(MED_EN::medEntityMesh Entity) const
+{
+  int size=getNumberOfTypesWithPoly(Entity);
+  MED_EN::medGeometryElement *ret=new MED_EN::medGeometryElement[size];
+  memcpy(ret,getTypes(Entity),size*sizeof(MED_EN::medGeometryElement));
+  return ret;
+}
+
 //=======================================================================
 //function : fillMeshAfterRead
 //purpose  : 

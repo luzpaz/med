@@ -441,9 +441,6 @@ template <class T> const T* MEDARRAY<T>::get(const MED_EN::medModeSwitch mode)
 				
 template <class T> const T* MEDARRAY<T>::getRow(const int i)
 {
-
-  BEGIN_OF("MEDARRAY<T>::getRow(const int i)");
-
   if ((T*)_valuesDefault == NULL)
   {
   	throw MEDEXCEPTION("MEDARRAY::getRow(i) : No values defined !");
@@ -459,7 +456,6 @@ template <class T> const T* MEDARRAY<T>::getRow(const int i)
 
   if ((T*)_valuesFull == NULL)
   {
-	ASSERT(((T*) _valuesDefault)==((T*) _valuesNo));
   	calculateOther();
   }
   ASSERT((T*)_valuesFull != NULL);
@@ -468,7 +464,6 @@ template <class T> const T* MEDARRAY<T>::getRow(const int i)
   //const T* ptr = (const T*)_valuesFull + (i-1)*_ldValues;
   const T* ptr =  (T*) _valuesFull + (i-1)*_ldValues;
 
-  END_OF("MEDARRAY<T>::getRow(const int i )");
   return ptr;
 }
 //				------------------
@@ -481,7 +476,6 @@ template <class T> const T* MEDARRAY<T>::getRow(const int i)
 
 template <class T> const T* MEDARRAY<T>::getColumn(const int j)
 {
-  BEGIN_OF("MEDARRAY<T>::getColumn(const int j)");
   if ((T*)_valuesDefault == NULL)
   {
   	throw MEDEXCEPTION("MEDARRAY::getColumn(j) : No values defined !");
@@ -553,8 +547,6 @@ template <class T> const T MEDARRAY<T>::getIJ(const int i,const  int j) const
   				    (internal use : needed by write method) */
 template <class T> inline MED_EN::medModeSwitch MEDARRAY<T>::getMode() const
 {
-  BEGIN_OF("MEDARRAY<T>::getMode()");
-  END_OF("MEDARRAY<T>::getMode()");
   return _mode;
 }
 

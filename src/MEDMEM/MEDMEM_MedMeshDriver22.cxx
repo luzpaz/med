@@ -1107,7 +1107,7 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	  
 	  // version originale sans prise en compte des numéros optionnels
 	  //	
-
+		  int multi = 0; // quand est-ce que multi vaut 1 ?? en MED-fichier < 2.2 ??
 	    MESSAGE(LOC << "Med file version used here " << major << " " << minor << " " << release);
 
 	    if ((major == 2) && (minor <= 1))
@@ -1117,7 +1117,7 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	    else if ((major == 2) && (minor >= 2))
 		  for (int j=0; j<tmp_numberOfFaces; j++)
 		    for (int k=0; k<NumberOfNodeByFace; k++)
-		  constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace)+k] ;
+		  constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace+multi)+k] ;
 
 		  //////////////////////////////////////////////////////////////////////////////////////
 		  ///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
@@ -1237,13 +1237,13 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	  
 	  // version originale sans prise en compte des numéros optionnels	
 	  //
-
+		  int multi = 0; // quand est-ce que multi vaut 1 ?? en MED-fichier < 2.2 ??
 	      MESSAGE(LOC << "Med file version used here " << major << " " << minor << " " << release);
 
 	      if ((major == 2) && (minor <= 1))
 		  for (int j=0; j<tmp_numberOfEdges; j++)
 		    for (int k=0; k<NumberOfNodeByEdge; k++)
-		    constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge+1)+k] ;
+		    constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge+multi)+k] ;
 	      else if ((major == 2) && (minor >= 2))
 		for (int j=0; j<tmp_numberOfEdges; j++)
 		  for (int k=0; k<NumberOfNodeByEdge; k++)
@@ -1306,6 +1306,8 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 					med_2_2::MED_NOD);
       if (NumberOfPolygons > 0)
 	{
+	  if (Connectivity->_entityDimension == 1)
+	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 2D mesh, polygons need at least one 2D cell of a classic geometric type !"));
 	  med_int ConnectivitySize;
 	  med_err err1 = MEDpolygoneInfo(_medIdt,
 					 const_cast <char *> (_ptrMesh->_name.c_str()),
@@ -1334,7 +1336,14 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	      return MED_ERROR;
 	    }
       
-	  Connectivity->setPolygonsConnectivity(MED_NODAL,(medEntityMesh) Entity,PolygonsConnectivity,PolygonsConnectivityIndex,ConnectivitySize,NumberOfPolygons);
+	  if (Connectivity->_entityDimension == 2) // 2D mesh : polygons in Connectivity
+	    Connectivity->setPolygonsConnectivity(MED_NODAL,(medEntityMesh) Entity,PolygonsConnectivity,PolygonsConnectivityIndex,ConnectivitySize,NumberOfPolygons);
+	  else if (Connectivity->_entityDimension == 3)
+	    {
+	      if (Connectivity->_constituent == NULL) // 3D mesh : polygons in Connectivity->_constituent
+		Connectivity->_constituent = new CONNECTIVITY(MED_FACE);
+	      Connectivity->_constituent->setPolygonsConnectivity(MED_NODAL,MED_FACE,PolygonsConnectivity,PolygonsConnectivityIndex,ConnectivitySize,NumberOfPolygons);
+	    }
       
 	  delete[] PolygonsConnectivity;
 	  delete[] PolygonsConnectivityIndex;
@@ -1351,6 +1360,8 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 					      med_2_2::MED_NOD);
       if (NumberOfPolyhedron > 0)
 	{
+	  if (Connectivity->_entityDimension == 2 || Connectivity->_entityDimension == 1)
+	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 3D mesh, polyhedron need at least one 3D cell of a classic geometric type !"));
 	  med_int FacesIndexSize, NumberOfNodes, NumberOfFaces;
 	  med_err err3 = MEDpolyedreInfo(_medIdt,
 					 const_cast <char *> (_ptrMesh->_name.c_str()),
@@ -1414,9 +1425,6 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
       int ** MEDArrayFaceFamily = NULL ;
       int ** MEDArrayEdgeFamily = NULL ;
 
-//     if ( !_ptrMesh->getIsAGrid() )
-//       {
-    // read number :
     // NODE :
       MEDArrayNodeFamily = new int[_ptrMesh->getNumberOfNodes()] ;
 
@@ -1426,16 +1434,17 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 
       MESSAGE(LOC << "error returned from getNodesFamiliesNumber " << err);
 
-      MEDArrayCellFamily = new (int*)[_ptrMesh->getNumberOfTypes(MED_CELL)] ;
+      MEDArrayCellFamily = new (int*)[_ptrMesh->getNumberOfTypesWithPoly(MED_CELL)] ;
       // ET SI IL N'Y A PAS DE CELLS ?
 
-      const medGeometryElement * myTypes = _ptrMesh->getTypes(MED_CELL);
-      for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_CELL);i++)
+      medGeometryElement * myTypes = _ptrMesh->getTypesWithPoly(MED_CELL);
+      for (int i=0;i<_ptrMesh->getNumberOfTypesWithPoly(MED_CELL);i++)
 	MEDArrayCellFamily[i] = new
-	  int[_ptrMesh->getNumberOfElements(MED_CELL,myTypes[i])] ;
+	  int[_ptrMesh->getNumberOfElementsWithPoly(MED_CELL,myTypes[i])] ;
 
       err = getCellsFamiliesNumber(MEDArrayCellFamily,
 				   _ptrMesh->_connectivity,MED_CELL) ;
+      delete [] myTypes;
 
       MESSAGE(LOC << "error returned from getCellsFamiliesNumber for Cells " << err);
 
@@ -1445,17 +1454,17 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	  {
 	    // FACE
 	    MEDArrayFaceFamily = new
-	      (int*)[_ptrMesh->getNumberOfTypes(MED_FACE)] ;
+	      (int*)[_ptrMesh->getNumberOfTypesWithPoly(MED_FACE)] ;
 
-	    myTypes = _ptrMesh->getTypes(MED_FACE);
-	    for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_FACE);i++)
+	    myTypes = _ptrMesh->getTypesWithPoly(MED_FACE);
+	    for (int i=0;i<_ptrMesh->getNumberOfTypesWithPoly(MED_FACE);i++)
 	      MEDArrayFaceFamily[i] = new
-		int[_ptrMesh->getNumberOfElements(MED_FACE,myTypes[i])] ;
+		int[_ptrMesh->getNumberOfElementsWithPoly(MED_FACE,myTypes[i])] ;
 
 	    err =
 	      getCellsFamiliesNumber(MEDArrayFaceFamily,
 				     _ptrMesh->_connectivity->_constituent,MED_FACE) ;
-
+	    delete [] myTypes;
 	    MESSAGE(LOC << "error returned from getCellsFamiliesNumber for Faces " << err);
 	  }
 	else
@@ -1464,10 +1473,10 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	    MEDArrayEdgeFamily = new
 	      (int*)[_ptrMesh->getNumberOfTypes(MED_EDGE)] ;
 
-	    myTypes = _ptrMesh->getTypes(MED_EDGE);
+	    const medGeometryElement *myTypes2 = _ptrMesh->getTypes(MED_EDGE);
 	    for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_EDGE);i++)
 	      MEDArrayEdgeFamily[i] = new
-		int[_ptrMesh->getNumberOfElements(MED_EDGE,myTypes[i])] ;
+		int[_ptrMesh->getNumberOfElements(MED_EDGE,myTypes2[i])] ;
 
 	    err =
 	      getCellsFamiliesNumber(MEDArrayEdgeFamily,
@@ -1481,10 +1490,10 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	    MEDArrayEdgeFamily = new
 	      (int*)[_ptrMesh->getNumberOfTypes(MED_EDGE)] ;
 
-	    myTypes = _ptrMesh->getTypes(MED_EDGE);
+	    const medGeometryElement *myTypes2 = _ptrMesh->getTypes(MED_EDGE);
 	    for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_EDGE);i++)
 	      MEDArrayEdgeFamily[i] = new
-		int[_ptrMesh->getNumberOfElements(MED_EDGE,myTypes[i])] ;
+		int[_ptrMesh->getNumberOfElements(MED_EDGE,myTypes2[i])] ;
 
 	    err =
 	      getCellsFamiliesNumber(MEDArrayEdgeFamily,
@@ -1495,23 +1504,6 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 
 	  }
       }
-//       }
-//     else
-//       {
-// 	// node 
-// 	int NumberOfNodes =  _ptrMesh->getNumberOfNodes() ;
-// 	MEDArrayNodeFamily = new int[ NumberOfNodes ];
-// 	err = MED_FR::MEDfamGridLire (_medIdt,
-// 				      const_cast <char *> (_ptrMesh->_name.c_str()),
-// 				      MEDArrayNodeFamily,
-// 				      NumberOfNodes,
-// 				      MED_FR::MED_NOEUD);
-
-// 	// what about cell face and edge ?
-//       }
-
-    // Creation of the families
-//     int NumberOfFamilies = MEDnFam(_medIdt,const_cast <char *> (_meshName.c_str()),0,MED_FR::MED_FAMILLE) ;
 
     int NumberOfFamilies = med_2_2::MEDnFam(_medIdt, const_cast <char *>
 					   (_meshName.c_str())) ;
@@ -1533,9 +1525,6 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 
     for (int i=0;i<NumberOfFamilies;i++)
       {
-	// int NumberOfAttributes = MEDnFam(_medIdt,const_cast <char *>
-	//       (_meshName.c_str()),i+1,med_2_2::MED_ATTR) ;
-
 	int NumberOfAttributes = med_2_2::MEDnAttribut(_medIdt,
 						      const_cast <char *>
 						      (_meshName.c_str()),
@@ -1543,10 +1532,7 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
       
       if (NumberOfAttributes < 0) 
 	throw MEDEXCEPTION("MED_MESH_RDONLY_DRIVER22::getFAMILY() : NumberOfAttributes" );
-    
-	// int NumberOfGroups = MEDnFam(_medIdt,const_cast <char *>
-	//    (_meshName.c_str()),i+1,MED_FR::MED_GROUPE) ;
-      
+
 	int NumberOfGroups = med_2_2::MEDnGroupe(_medIdt, const_cast <char *>
 						(_meshName.c_str()),(i+1)) ;
 
@@ -1593,9 +1579,6 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 
 	    // All good ?
 	    // if nothing found, delete Family
-
-
-	    //MESSAGE(LOC << " Well is that OK now ?? " << (*Family));
 
 	    if (Family->getNumberOfTypes() == 0)
 	      {
@@ -1697,39 +1680,29 @@ int  MED_MESH_RDONLY_DRIVER22::getCellsFamiliesNumber(int **MEDArrayFamily,
   if (_status==MED_OPENED)
     {
     int i, err = 0 ;
-
-      SCRUTE(Connectivity->_numberOfTypes);
-
-      for (i=0;i<Connectivity->_numberOfTypes;i++)
-	{
-	  int NumberOfCell = Connectivity->_count[i+1]-Connectivity->_count[i];
-
-	  SCRUTE(NumberOfCell);
-
-      err=MEDfamLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-                     MEDArrayFamily[i],NumberOfCell,
-                     (med_2_2::med_entite_maillage) Connectivity->_entity,
-			 (med_2_2::med_geometrie_element)
-			 Connectivity->_geometricTypes[i]);
-
-      // provisoire : si les faces ou les aretes sont des mailles !!!
-	  if (err != MED_VALID)
-	    {
-	MESSAGE(LOC<<"search face/edge family on cell !!!");
-	      err=MEDfamLire(_medIdt,const_cast <char *>
-			     (_ptrMesh->_name.c_str()),
+    MED_EN::medGeometryElement *types=Connectivity->getGeometricTypesWithPoly(Connectivity->_entity);
+    for (i=0;i<Connectivity->getNumberOfTypesWithPoly(Connectivity->_entity);i++)
+      {
+	int NumberOfCell=Connectivity->getNumberOfElementsWithPoly(Connectivity->_entity,types[i]);
+	err=MEDfamLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
 		       MEDArrayFamily[i],NumberOfCell,
-		       med_2_2::MED_MAILLE,
-			     (med_2_2::med_geometrie_element)
-			     Connectivity->_geometricTypes[i]);
+		       (med_2_2::med_entite_maillage) Connectivity->_entity,
+		       (med_2_2::med_geometrie_element)types[i]);
+	if (err != MED_VALID)
+	  {
+	    err=MEDfamLire(_medIdt,const_cast <char *>
+			   (_ptrMesh->_name.c_str()),
+			   MEDArrayFamily[i],NumberOfCell,
+			   med_2_2::MED_MAILLE,
+			   (med_2_2::med_geometrie_element)types[i]);
+	    if (err != MED_VALID)
+	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<Connectivity->_geometricTypes[i]));
+	  }
       }
-
-	  if (err != MED_VALID) 
-	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<Connectivity->_geometricTypes[i]));
-	}
-      return MED_VALID;
+    delete [] types;
+    return MED_VALID;
     }
-  return MED_ERROR;  
+  return MED_ERROR;
 }
 
 /*--------------------- WRONLY PART -------------------------------*/

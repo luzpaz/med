@@ -19,7 +19,7 @@
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_CellModel.hxx"
-
+#include "MEDMEM_Formulae.hxx"
 #include "MEDMEM_DriverFactory.hxx"
 
 using namespace std;
@@ -28,11 +28,6 @@ using namespace MED_EN;
 
 #define MED_NOPDT -1
 #define MED_NONOR -1
-
-//#include "MEDMEM_Grid.hxx" this inclision should have never be here !!!
-
-//update Families with content list
-//int family_count(int family_number, int count, int * entities_number, int * entities_list) ;
 
 // ------- Drivers Management Part
 
@@ -249,6 +244,49 @@ MESH::~MESH() {
 
 }
 
+/*
+  Method equivalent to getNumberOfTypes except that it includes not only classical Types but polygons/polyhedra also.
+ */
+int MESH::getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const
+{
+  if(_connectivity!= NULL)
+    return _connectivity->getNumberOfTypesWithPoly(Entity);
+  throw MEDEXCEPTION(LOCALIZED("MESH::getNumberOfTypesWithPoly( medEntityMesh ) : Connectivity not defined !"));
+}
+
+/*
+  Method equivalent to getTypesWithPoly except that it includes not only classical Types but polygons/polyhedra also.
+  WARNING the returned array MUST be deallocated.
+ */
+MED_EN::medGeometryElement * MESH::getTypesWithPoly(MED_EN::medEntityMesh Entity) const
+{
+  if (Entity == MED_EN::MED_NODE)
+    throw MEDEXCEPTION(LOCALIZED("MESH::getTypes( medEntityMesh ) : No medGeometryElement with MED_NODE entity !"));
+  if (_connectivity != NULL)
+    return _connectivity->getGeometricTypesWithPoly(Entity);
+  throw MEDEXCEPTION(LOCALIZED("MESH::getTypes( medEntityMesh ) : Connectivity not defined !"));
+}
+
+/*
+  Method equivalent to getNumberOfElementsWithPoly except that it includes not only classical Types but polygons/polyhedra also.
+ */
+int MESH::getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const
+{
+  if(Type==MED_POLYGON || Type==MED_POLYHEDRA)
+    {
+      int nbOfPolygs=_connectivity->getNumberOfElementOfPolyType(Entity);
+      return nbOfPolygs;
+    }
+  else if(Type==MED_ALL_ELEMENTS)
+    {
+      int nbOfClassicalTypes=getNumberOfElements(Entity,MED_ALL_ELEMENTS);
+      int nbOfClassicalTypes2=_connectivity->getNumberOfElementOfPolyType(Entity);
+      return nbOfClassicalTypes+nbOfClassicalTypes2;
+    }
+  else
+    return getNumberOfElements(Entity,Type);
+}
+
 MESH & MESH::operator=(const MESH &m)
 {
   const char * LOC = "MESH & MESH::operator=(const MESH &m) : ";
@@ -315,20 +353,8 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
   _drivers[current]->read();
   _drivers[current]->close();
 
-//   if (_isAGrid)
-//     ((GRID *) this)->fillMeshAfterRead();
-
   END_OF(LOC);
 };
-
-
-//  Node MESH::Donne_Barycentre(const Maille &m) const
-//  {
-//    Node N=node[m[0]];
-//    for (int i=1;i<m.donne_nbr_sommets();i++) N=N+node[m[i]];
-//    N=N*(1.0/m.donne_nbr_sommets());
-//    return N;
-//  }
 
 ostream & ::MEDMEM::operator<<(ostream &os, const MESH &myMesh)
 {
@@ -487,10 +513,8 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   
   // well, all rigth !
   SUPPORT * mySupport = new SUPPORT(this,"Boundary",Entity);
-  //mySupport.setDescription("boundary of type ...");
   mySupport->setAll(false);
   
-
   const int * myConnectivityValue = getReverseConnectivity(MED_DESCENDING) ;
   const int * myConnectivityIndex = getReverseConnectivityIndex(MED_DESCENDING) ;
   int numberOf = getNumberOfElements(Entity,MED_ALL_ELEMENTS) ;
@@ -515,7 +539,6 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   int * numberOfGaussPoint ;
   int * geometricTypeNumber ;
   int * numberOfElements ;
-  //MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY() ;
   int * mySkyLineArrayIndex ;
 
   int numberOfType = getNumberOfTypes(Entity) ;
@@ -545,7 +568,6 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
     }
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
-    //const medGeometryElement *  allType = getTypes(Entity); !! UNUSZED VARIABLE !!
     numberOfGaussPoint = new int[numberOfGeometricType] ;
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfElements = new int[numberOfGeometricType] ;
@@ -562,7 +584,6 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
       index++ ;
     }
   }
-  //mySkyLineArray->setMEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
   MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
 
   mySupport->setNumberOfGeometricType(numberOfGeometricType) ;
@@ -570,7 +591,6 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   mySupport->setNumberOfGaussPoint(numberOfGaussPoint) ;
   mySupport->setNumberOfElements(numberOfElements) ;
   mySupport->setTotalNumberOfElements(size) ;
-  // mySupport->setGeometricTypeNumber(geometricTypeNumber) ;
   mySupport->setNumber(mySkyLineArray) ;
     
   delete[] numberOfElements;
@@ -579,8 +599,6 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   delete[] geometricType;
   delete[] mySkyLineArrayIndex;
   delete[] myListArray;
-//   delete mySkyLineArray;
-
   END_OF(LOC) ;
   return mySupport ;
 }
@@ -607,20 +625,9 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
   int nb_entity_type;
   // !!!! WARNING : use of nodal global numbering in the mesh !!!!
   const int* global_connectivity;
-
-//    if (onAll)
-//      {
-//        nb_type = myMesh->getNumberOfTypes(support_entity);
-//        length_values = getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
-//        types = getTypes(support_entity);
-//      }
-//    else
-    {
-      nb_type = Support->getNumberOfTypes();
-      length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
-      types = Support->getTypes();
-    }
-
+  nb_type = Support->getNumberOfTypes();
+  length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
+  types = Support->getTypes();
   int index;
   FIELD<double>* Volume = new FIELD<double>(Support,1);
   //  double *volume = new double [length_values];
@@ -640,10 +647,7 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
   Volume->setIterationNumber(0);
   Volume->setOrderNumber(0);
   Volume->setTime(0.0);
-
-  //const double *volume = Volume->getValue(MED_FULL_INTERLACE);
   MEDARRAY<double> *volume = Volume->getvalue();
-
   index = 1;
   const double * coord = getCoordinates(MED_FULL_INTERLACE);
 
@@ -651,29 +655,27 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
     {
       medGeometryElement type = types[i] ;
       double xvolume;
-
-      if (onAll)
+      nb_entity_type = Support->getNumberOfElements(type);
+      if(type != MED_EN::MED_POLYHEDRA)
 	{
-	  nb_entity_type = getNumberOfElements(support_entity,type);
-	  global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
-	}
-      else
-	{
-	  // throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support must be on all"));
-
- 	  nb_entity_type = Support->getNumberOfElements(type);
+	  if (onAll)
+	    {
+	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
+	    }
+	  else
+	    {
+	      const int * supp_number = Support->getNumber(type);
+	      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+	      const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+	      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 	  
- 	  const int * supp_number = Support->getNumber(type);
- 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
- 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
- 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
-	  
- 	  for (int k_type = 0; k_type<nb_entity_type; k_type++) {
- 	    for (int j_ent = 0; j_ent<(type%100); j_ent++) {
- 	      global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
- 	    }
- 	  }
-	  global_connectivity = global_connectivity_tmp ;
+	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
+		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
+		}
+	      }
+	      global_connectivity = global_connectivity_tmp ;
+	    }
 	}
 
       switch (type)
@@ -683,32 +685,11 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	    for (int tetra=0;tetra<nb_entity_type;tetra++)
 	      {
 		int tetra_index = (type%100)*tetra;
-
 		int N1 = global_connectivity[tetra_index]-1;
 		int N2 = global_connectivity[tetra_index+1]-1;
 		int N3 = global_connectivity[tetra_index+2]-1;
 		int N4 = global_connectivity[tetra_index+3]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-		double x4 = coord[dim_space*N4];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-		double y4 = coord[dim_space*N4+1];
-
-		double z1 = coord[dim_space*N1+2];
-		double z2 = coord[dim_space*N2+2];
-		double z3 = coord[dim_space*N3+2];
-		double z4 = coord[dim_space*N4+2];
-
-		xvolume = ((x3-x1)*((y2-y1)*(z4-z1) - (z2-z1)*(y4-y1)) -
-			   (x2-x1)*((y3-y1)*(z4-z1) - (z3-z1)*(y4-y1)) +
-			   (x4-x1)*((y3-y1)*(z2-z1) - (z3-z1)*(y2-y1)))/6.0;
-
-		//volume[index] = xvolume ;
+		xvolume=CalculateVolumeForTetra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4);
 		volume->setIJ(index,1,xvolume) ;
 		index++;
 	      }
@@ -719,40 +700,12 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	    for (int pyra=0;pyra<nb_entity_type;pyra++)
 	      {
 		int pyra_index = (type%100)*pyra;
-
 		int N1 = global_connectivity[pyra_index]-1;
 		int N2 = global_connectivity[pyra_index+1]-1;
 		int N3 = global_connectivity[pyra_index+2]-1;
 		int N4 = global_connectivity[pyra_index+3]-1;
 		int N5 = global_connectivity[pyra_index+4]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-		double x4 = coord[dim_space*N4];
-		double x5 = coord[dim_space*N5];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-		double y4 = coord[dim_space*N4+1];
-		double y5 = coord[dim_space*N5+1];
-
-		double z1 = coord[dim_space*N1+2];
-		double z2 = coord[dim_space*N2+2];
-		double z3 = coord[dim_space*N3+2];
-		double z4 = coord[dim_space*N4+2];
-		double z5 = coord[dim_space*N5+2];
-
-		xvolume = (((x3-x1)*((y2-y1)*(z5-z1) - (z2-z1)*(y5-y1)) -
-			    (x2-x1)*((y3-y1)*(z5-z1) - (z3-z1)*(y5-y1)) +
-			    (x5-x1)*((y3-y1)*(z2-z1) - (z3-z1)*(y2-y1))) +
-			   ((x4-x1)*((y3-y1)*(z5-z1) - (z3-z1)*(y5-y1)) -
-			    (x3-x1)*((y4-y1)*(z5-z1) - (z4-z1)*(y5-y1)) +
-			    (x5-x1)*((y4-y1)*(z3-z1) - (z4-z1)*(y3-y1)))
-			   )/6.0;
-
-		//volume[index] = xvolume ;
+		xvolume=CalculateVolumeForPyra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5);
 		volume->setIJ(index,1,xvolume) ;
 		index = index++;
 	      }
@@ -763,68 +716,13 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	    for (int penta=0;penta<nb_entity_type;penta++)
 	      {
 		int penta_index = (type%100)*penta;
-
 		int N1 = global_connectivity[penta_index]-1;
 		int N2 = global_connectivity[penta_index+1]-1;
 		int N3 = global_connectivity[penta_index+2]-1;
 		int N4 = global_connectivity[penta_index+3]-1;
 		int N5 = global_connectivity[penta_index+4]-1;
 		int N6 = global_connectivity[penta_index+5]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-		double x4 = coord[dim_space*N4];
-		double x5 = coord[dim_space*N5];
-		double x6 = coord[dim_space*N6];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-		double y4 = coord[dim_space*N4+1];
-		double y5 = coord[dim_space*N5+1];
-		double y6 = coord[dim_space*N6+1];
-
-		double z1 = coord[dim_space*N1+2];
-		double z2 = coord[dim_space*N2+2];
-		double z3 = coord[dim_space*N3+2];
-		double z4 = coord[dim_space*N4+2];
-		double z5 = coord[dim_space*N5+2];
-		double z6 = coord[dim_space*N6+2];
-
-		double a1 = (x2-x3)/2.0, a2 = (y2-y3)/2.0, a3 = (z2-z3)/2.0;
-		double b1 = (x5-x6)/2.0, b2 = (y5-y6)/2.0, b3 = (z5-z6)/2.0;
-		double c1 = (x4-x1)/2.0, c2 = (y4-y1)/2.0, c3 = (z4-z1)/2.0;
-		double d1 = (x5-x2)/2.0, d2 = (y5-y2)/2.0, d3 = (z5-z2)/2.0;
-		double e1 = (x6-x3)/2.0, e2 = (y6-y3)/2.0, e3 = (z6-z3)/2.0;
-		double f1 = (x1-x3)/2.0, f2 = (y1-y3)/2.0, f3 = (z1-z3)/2.0;
-		double h1 = (x4-x6)/2.0, h2 = (y4-y6)/2.0, h3 = (z4-z6)/2.0;
-
-		double A = a1*c2*f3 - a1*c3*f2 - a2*c1*f3 + a2*c3*f1 +
-		  a3*c1*f2 - a3*c2*f1;
-		double B = b1*c2*h3 - b1*c3*h2 - b2*c1*h3 + b2*c3*h1 +
-		  b3*c1*h2 - b3*c2*h1;
-		double C = (a1*c2*h3 + b1*c2*f3) - (a1*c3*h2 + b1*c3*f2) -
-		  (a2*c1*h3 + b2*c1*f3) + (a2*c3*h1 + b2*c3*f1) +
-		  (a3*c1*h2 + b3*c1*f2) - (a3*c2*h1 + b3*c2*f1);
-		double D = a1*d2*f3 - a1*d3*f2 - a2*d1*f3 + a2*d3*f1 +
-		  a3*d1*f2 - a3*d2*f1;
-		double E = b1*d2*h3 - b1*d3*h2 - b2*d1*h3 + b2*d3*h1 +
-		  b3*d1*h2 - b3*d2*h1;
-		double F = (a1*d2*h3 + b1*d2*f3) - (a1*d3*h2 + b1*d3*f2) -
-		  (a2*d1*h3 + b2*d1*f3) + (a2*d3*h1 + b2*d3*f1) +
-		  (a3*d1*h2 + b3*d1*f2) - (a3*d2*h1 + b3*d2*f1);
-		double G = a1*e2*f3 - a1*e3*f2 - a2*e1*f3 + a2*e3*f1 +
-		  a3*e1*f2 - a3*e2*f1;
-		double H = b1*e2*h3 - b1*e3*h2 - b2*e1*h3 + b2*e3*h1 +
-		  b3*e1*h2 - b3*e2*h1;
-		double P = (a1*e2*h3 + b1*e2*f3) - (a1*e3*h2 + b1*e3*f2) -
-		  (a2*e1*h3 + b2*e1*f3) + (a2*e3*h1 + b2*e3*f1) +
-		  (a3*e1*h2 + b3*e1*f2) - (a3*e2*h1 + b3*e2*f1);
-
-		xvolume = -2.0*(2.0*(A + B + D + E + G + H) + C + F + P)/9.0;
-
-		//volume[index] = xvolume ;
+		xvolume=CalculateVolumeForPenta(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6);
 		volume->setIJ(index,1,xvolume) ;
 		index++;
 	      }
@@ -844,156 +742,78 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
 		int N6 = global_connectivity[hexa_index+5]-1;
 		int N7 = global_connectivity[hexa_index+6]-1;
 		int N8 = global_connectivity[hexa_index+7]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-		double x4 = coord[dim_space*N4];
-		double x5 = coord[dim_space*N5];
-		double x6 = coord[dim_space*N6];
-		double x7 = coord[dim_space*N7];
-		double x8 = coord[dim_space*N8];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-		double y4 = coord[dim_space*N4+1];
-		double y5 = coord[dim_space*N5+1];
-		double y6 = coord[dim_space*N6+1];
-		double y7 = coord[dim_space*N7+1];
-		double y8 = coord[dim_space*N8+1];
-
-		double z1 = coord[dim_space*N1+2];
-		double z2 = coord[dim_space*N2+2];
-		double z3 = coord[dim_space*N3+2];
-		double z4 = coord[dim_space*N4+2];
-		double z5 = coord[dim_space*N5+2];
-		double z6 = coord[dim_space*N6+2];
-		double z7 = coord[dim_space*N7+2];
-		double z8 = coord[dim_space*N8+2];
-
-		double a1 = (x3-x4)/8.0, a2 = (y3-y4)/8.0, a3 = (z3-z4)/8.0;
-		double b1 = (x2-x1)/8.0, b2 = (y2-y1)/8.0, b3 = (z2-z1)/8.0;
-		double c1 = (x7-x8)/8.0, c2 = (y7-y8)/8.0, c3 = (z7-z8)/8.0;
-		double d1 = (x6-x5)/8.0, d2 = (y6-y5)/8.0, d3 = (z6-z5)/8.0;
-		double e1 = (x3-x2)/8.0, e2 = (y3-y2)/8.0, e3 = (z3-z2)/8.0;
-		double f1 = (x4-x1)/8.0, f2 = (y4-y1)/8.0, f3 = (z4-z1)/8.0;
-		double h1 = (x7-x6)/8.0, h2 = (y7-y6)/8.0, h3 = (z7-z6)/8.0;
-		double p1 = (x8-x5)/8.0, p2 = (y8-y5)/8.0, p3 = (z8-z5)/8.0;
-		double q1 = (x3-x7)/8.0, q2 = (y3-y7)/8.0, q3 = (z3-z7)/8.0;
-		double r1 = (x4-x8)/8.0, r2 = (y4-y8)/8.0, r3 = (z4-z8)/8.0;
-		double s1 = (x2-x6)/8.0, s2 = (y2-y6)/8.0, s3 = (z2-z6)/8.0;
-		double t1 = (x1-x5)/8.0, t2 = (y1-y5)/8.0, t3 = (z1-z5)/8.0;
-
-		double A = a1*e2*q3 - a1*e3*q2 - a2*e1*q3 + a2*e3*q1 +
-		  a3*e1*q2 - a3*e2*q1;
-		double B = c1*h2*q3 - c1*h3*q2 - c2*h1*q3 + c2*h3*q1 +
-		  c3*h1*q2 - c3*h2*q1;
-		double C = (a1*h2 + c1*e2)*q3 - (a1*h3 + c1*e3)*q2 -
-		  (a2*h1 + c2*e1)*q3 + (a2*h3 + c2*e3)*q1 +
-		  (a3*h1 + c3*e1)*q2 - (a3*h2 + c3*e2)*q1;
-		double D = b1*e2*s3 - b1*e3*s2 - b2*e1*s3 + b2*e3*s1 +
-		  b3*e1*s2 - b3*e2*s1;
-		double E = d1*h2*s3 - d1*h3*s2 - d2*h1*s3 + d2*h3*s1 +
-		  d3*h1*s2 - d3*h2*s1;
-		double F = (b1*h2 + d1*e2)*s3 - (b1*h3 + d1*e3)*s2 -
-		  (b2*h1 + d2*e1)*s3 + (b2*h3 + d2*e3)*s1 +
-		  (b3*h1 + d3*e1)*s2 - (b3*h2 + d3*e2)*s1;
-		double G = (a1*e2*s3 + b1*e2*q3) - (a1*e3*s2 + b1*e3*q2) -
-		  (a2*e1*s3 + b2*e1*q3) + (a2*e3*s1 + b2*e3*q1) +
-		  (a3*e1*s2 + b3*e1*q2) - (a3*e2*s1 + b3*e2*q1);
-		double H = (c1*h2*s3 + d1*h2*q3) - (c1*h3*s2 + d1*h3*q2) -
-		  (c2*h1*s3 + d2*h1*q3) + (c2*h3*s1 + d2*h3*q1) +
-		  (c3*h1*s2 + d3*h1*q2) - (c3*h2*s1 + d3*h2*q1);
-		double I = ((a1*h2 + c1*e2)*s3 + (b1*h2 + d1*e2)*q3) -
-		  ((a1*h3 + c1*e3)*s2 + (b1*h3 + d1*e3)*q2) -
-		  ((a2*h1 + c2*e1)*s3 + (b2*h1 + d2*e1)*q3) +
-		  ((a2*h3 + c2*e3)*s1 + (b2*h3 + d2*e3)*q1) +
-		  ((a3*h1 + c3*e1)*s2 + (b3*h1 + d3*e1)*q2) -
-		  ((a3*h2 + c3*e2)*s1 + (b3*h2 + d3*e2)*q1);
-		double J = a1*f2*r3 - a1*f3*r2 - a2*f1*r3 + a2*f3*r1 +
-		  a3*f1*r2 - a3*f2*r1;
-		double K = c1*p2*r3 - c1*p3*r2 - c2*p1*r3 + c2*p3*r1 +
-		  c3*p1*r2 - c3*p2*r1;
-		double L = (a1*p2 + c1*f2)*r3 - (a1*p3 + c1*f3)*r2 -
-		  (a2*p1 + c2*f1)*r3 + (a2*p3 + c2*f3)*r1 +
-		  (a3*p1 + c3*f1)*r2 - (a3*p2 + c3*f2)*r1;
-		double M = b1*f2*t3 - b1*f3*t2 - b2*f1*t3 + b2*f3*t1 +
-		  b3*f1*t2 - b3*f2*t1;
-		double N = d1*p2*t3 - d1*p3*t2 - d2*p1*t3 + d2*p3*t1 +
-		  d3*p1*t2 - d3*p2*t1;
-		double O = (b1*p2 + d1*f2)*t3 - (b1*p3 + d1*f3)*t2 -
-		  (b2*p1 + d2*f1)*t3 + (b2*p3 + d2*f3)*t1 +
-		  (b3*p1 + d3*f1)*t2 - (b3*p2 + d3*f2)*t1;
-		double P = (a1*f2*t3 + b1*f2*r3) - (a1*f3*t2 + b1*f3*r2) -
-		  (a2*f1*t3 + b2*f1*r3) + (a2*f3*t1 + b2*f3*r1) +
-		  (a3*f1*t2 + b3*f1*r2) - (a3*f2*t1 + b3*f2*r1);
-		double Q = (c1*p2*t3 + d1*p2*r3) - (c1*p3*t2 + d1*p3*r2) -
-		  (c2*p1*t3 + d2*p1*r3) + (c2*p3*t1 + d2*p3*r1) +
-		  (c3*p1*t2 + d3*p1*r2) - (c3*p2*t1 + d3*p2*r1);
-		double R = ((a1*p2 + c1*f2)*t3 + (b1*p2 + d1*f2)*r3) -
-		  ((a1*p3 + c1*f3)*t2 + (b1*p3 + d1*f3)*r2) -
-		  ((a2*p1 + c2*f1)*t3 + (b2*p1 + d2*f1)*r3) +
-		  ((a2*p3 + c2*f3)*t1 + (b2*p3 + d2*f3)*r1) +
-		  ((a3*p1 + c3*f1)*t2 + (b3*p1 + d3*f1)*r2) -
-		  ((a3*p2 + c3*f2)*t1 + (b3*p2 + d3*f2)*r1);
-		double S = (a1*e2*r3 + a1*f2*q3) - (a1*e3*r2 + a1*f3*q2) -
-		  (a2*e1*r3 + a2*f1*q3) + (a2*e3*r1 + a2*f3*q1) +
-		  (a3*e1*r2 + a3*f1*q2) - (a3*e2*r1 + a3*f2*q1);
-		double T = (c1*h2*r3 + c1*p2*q3) - (c1*h3*r2 + c1*p3*q2) -
-		  (c2*h1*r3 + c2*p1*q3) + (c2*h3*r1 + c2*p3*q1) +
-		  (c3*h1*r2 + c3*p1*q2) - (c3*h2*r1 + c3*p2*q1);
-		double U = ((a1*h2 + c1*e2)*r3 + (a1*p2 + c1*f2)*q3) -
-		  ((a1*h3 + c1*e3)*r2 + (a1*p3 + c1*f3)*q2) -
-		  ((a2*h1 + c2*e1)*r3 + (a2*p1 + c2*f1)*q3) +
-		  ((a2*h3 + c2*e3)*r1 + (a2*p3 + c2*f3)*q1) +
-		  ((a3*h1 + c3*e1)*r2 + (a3*p1 + c3*f1)*q2) -
-		  ((a3*h2 + c3*e2)*r1 + (a3*p2 + c3*f2)*q1);
-		double V = (b1*e2*t3 + b1*f2*s3) - (b1*e3*t2 + b1*f3*s2) -
-		  (b2*e1*t3 + b2*f1*s3) + (b2*e3*t1 + b2*f3*s1) +
-		  (b3*e1*t2 + b3*f1*s2) - (b3*e2*t1 + b3*f2*s1);
-		double W = (d1*h2*t3 + d1*p2*s3) - (d1*h3*t2 + d1*p3*s2) -
-		  (d2*h1*t3 + d2*p1*s3) + (d2*h3*t1 + d2*p3*s1) +
-		  (d3*h1*t2 + d3*p1*s2) - (d3*h2*t1 + d3*p2*s1);
-		double X = ((b1*h2 + d1*e2)*t3 + (b1*p2 + d1*f2)*s3) -
-		  ((b1*h3 + d1*e3)*t2 + (b1*p3 + d1*f3)*s2) -
-		  ((b2*h1 + d2*e1)*t3 + (b2*p1 + d2*f1)*s3) +
-		  ((b2*h3 + d2*e3)*t1 + (b2*p3 + d2*f3)*s1) +
-		  ((b3*h1 + d3*e1)*t2 + (b3*p1 + d3*f1)*s2) -
-		  ((b3*h2 + d3*e2)*t1 + (b3*p2 + d3*f2)*s1);
-		double Y = (a1*e2*t3 + a1*f2*s3 + b1*e2*r3 + b1*f2*q3) -
-		  (a1*e3*t2 + a1*f3*s2 + b1*e3*r2 + b1*f3*q2) -
-		  (a2*e1*t3 + a2*f1*s3 + b2*e1*r3 + b2*f1*q3) +
-		  (a2*e3*t1 + a2*f3*s1 + b2*e3*r1 + b2*f3*q1) +
-		  (a3*e1*t2 + a3*f1*s2 + b3*e1*r2 + b3*f1*q2) -
-		  (a3*e2*t1 + a3*f2*s1 + b3*e2*r1 + b3*f2*q1);
-		double Z = (c1*h2*t3 + c1*p2*s3 + d1*h2*r3 + d1*p2*q3) -
-		  (c1*h3*t2 + c1*p3*s2 + d1*h3*r2 + d1*p3*q2) -
-		  (c2*h1*t3 + c2*p1*s3 + d2*h1*r3 + d2*p1*q3) +
-		  (c2*h3*t1 + c2*p3*s1 + d2*h3*r1 + d2*p3*q1) +
-		  (c3*h1*t2 + c3*p1*s2 + d3*h1*r2 + d3*p1*q2) -
-		  (c3*h2*t1 + c3*p2*s1 + d3*h2*r1 + d3*p2*q1);
-		double AA = ((a1*h2 + c1*e2)*t3 + (a1*p2 + c1*f2)*s3 +
-			     (b1*h2 + d1*e2)*r3 + (b1*p2 + d1*f2)*q3) -
-		  ((a1*h3 + c1*e3)*t2 + (a1*p3 + c1*f3)*s2 +
-		   (b1*h3 + d1*e3)*r2 + (b1*p3 + d1*f3)*q2) -
-		  ((a2*h1 + c2*e1)*t3 + (a2*p1 + c2*f1)*s3 +
-		   (b2*h1 + d2*e1)*r3 + (b2*p1 + d2*f1)*q3) +
-		  ((a2*h3 + c2*e3)*t1 + (a2*p3 + c2*f3)*s1 +
-		   (b2*h3 + d2*e3)*r1 + (b2*p3 + d2*f3)*q1) +
-		  ((a3*h1 + c3*e1)*t2 + (a3*p1 + c3*f1)*s2 +
-		   (b3*h1 + d3*e1)*r2 + (b3*p1 + d3*f1)*q2) -
-		  ((a3*h2 + c3*e2)*t1 + (a3*p2 + c3*f2)*s1 +
-		   (b3*h2 + d3*e2)*r1 + (b3*p2 + d3*f2)*q1);
-
-		xvolume = 64.0*(8.0*(A + B + D + E + J + K + M + N) +
-				4.0*(C + F + G + H + L + O + P + Q + S + T +
-				     V + W) + 2.0*(I + R + U + X + Y + Z) +
-				AA)/27.0;
-
-		//volume[index] = xvolume ;
+		xvolume=CalculateVolumeForHexa(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6,coord+dim_space*N7,coord+dim_space*N8);
 		volume->setIJ(index,1,xvolume) ;
 		index++;
+	      }
+	    break;
+	  }
+	case MED_POLYHEDRA:
+	  {
+	    double bary[3];
+	    if(onAll)
+	      {
+		for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
+		  {
+		    int lgthNodes,iPts,iFaces,iPtsInFace;
+		    int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
+		    int *nodes=_connectivity->getNodesOfPolyhedron(offsetWithClassicType+polyhs+1,lgthNodes);
+		    int nbOfFaces,*nbOfNodesPerFaces;
+		    int **nodes1=_connectivity->getNodesPerFaceOfPolyhedron(offsetWithClassicType+polyhs+1,nbOfFaces,nbOfNodesPerFaces);
+		    double **pts=new double * [lgthNodes];
+		    double ***pts1=new double ** [nbOfFaces];
+		    for(iPts=0;iPts<lgthNodes;iPts++)
+		      pts[iPts]=(double *)(coord+3*(nodes[iPts]-1));
+		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
+		      {
+			pts1[iFaces]=new double* [nbOfNodesPerFaces[iFaces]];
+			for(iPtsInFace=0;iPtsInFace<nbOfNodesPerFaces[iFaces];iPtsInFace++)
+			  pts1[iFaces][iPtsInFace]=(double *)(coord+3*(nodes1[iFaces][iPtsInFace]-1));
+		      }
+		    delete [] nodes1;
+		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
+		    delete [] nodes;
+		    delete [] pts;
+		    xvolume=CalculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+		    delete [] nbOfNodesPerFaces;
+		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
+			delete [] pts1[iFaces];
+		    delete [] pts1;
+		    volume->setIJ(index,1,xvolume) ;
+		    index++;
+		  }
+	      }
+	    else
+	      {
+		const int * supp_number = Support->getNumber(MED_EN::MED_POLYHEDRA);
+		for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
+		  {
+		    int lgthNodes,iPts,iFaces,iPtsInFace;
+		    int *nodes=_connectivity->getNodesOfPolyhedron(supp_number[polyhs],lgthNodes);
+		    int nbOfFaces,*nbOfNodesPerFaces;
+		    int **nodes1=_connectivity->getNodesPerFaceOfPolyhedron(supp_number[polyhs],nbOfFaces,nbOfNodesPerFaces);
+		    double **pts=new double * [lgthNodes];
+		    double ***pts1=new double ** [nbOfFaces];
+		    for(iPts=0;iPts<lgthNodes;iPts++)
+		      pts[iPts]=(double *)(coord+3*(nodes[iPts]-1));
+		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
+		      {
+			pts1[iFaces]=new double* [nbOfNodesPerFaces[iFaces]];
+			for(iPtsInFace=0;iPtsInFace<nbOfNodesPerFaces[iFaces];iPtsInFace++)
+			  pts1[iFaces][iPtsInFace]=(double *)(coord+3*(nodes1[iFaces][iPtsInFace]-1));
+		      }
+		    delete [] nodes1;
+		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
+		    delete [] nodes;
+		    delete [] pts;
+		    xvolume=CalculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+		    delete [] nbOfNodesPerFaces;
+		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
+			delete [] pts1[iFaces];
+		    delete [] pts1;
+		    volume->setIJ(index,1,xvolume) ;    
+		    index++;
+		  }
 	      }
 	    break;
 	  }
@@ -1002,7 +822,8 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	  break;
 	}
 
-      if (!onAll) delete [] global_connectivity ;
+      if (!onAll && type!=MED_EN::MED_POLYHEDRA) 
+	delete [] global_connectivity ;
     }
 
   return Volume;
@@ -1031,18 +852,9 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
   // !!!! WARNING : use of nodal global numbering in the mesh !!!!
   const int* global_connectivity;
 
-//    if (onAll)
-//      {
-//        nb_type = myMesh->getNumberOfTypes(support_entity);
-//        length_values = getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
-//        types = getTypes(support_entity);
-//      }
-//    else
-    {
-      nb_type = Support->getNumberOfTypes();
-      length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
-      types = Support->getTypes();
-    }
+  nb_type = Support->getNumberOfTypes();
+  length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
+  types = Support->getTypes();
 
   int index;
   FIELD<double>* Area;
@@ -1066,8 +878,7 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
   Area->setOrderNumber(0);
   Area->setTime(0.0);
 
-  double *area = new double[length_values];
-  //double *area = Area->getValue(MED_FULL_INTERLACE);
+  double *area = (double *)Area->getValue(MED_FULL_INTERLACE);
 
   const double * coord = getCoordinates(MED_FULL_INTERLACE);
   index = 0;
@@ -1075,34 +886,28 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
   for (int i=0;i<nb_type;i++)
     {
       medGeometryElement type = types[i] ;
-      double xarea;
-
-      if (onAll)
-	{
-	  nb_entity_type = getNumberOfElements(support_entity,type);
-	  global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
-	}
-      else
-	{
-	  // throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support must be on all !"));
-
- 	  nb_entity_type = Support->getNumberOfElements(type);
+      nb_entity_type = Support->getNumberOfElements(type);
+      const int *global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+      if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
+	{ 
+	  if (onAll)
+	    {
+	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
+	    }
+	  else
+	    {  
+	      const int * supp_number = Support->getNumber(type);
+	      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+	      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 	  
- 	  const int * supp_number = Support->getNumber(type);
- 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
- 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
- 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
-	  
- 	  for (int k_type = 0; k_type<nb_entity_type; k_type++) {
- 	    for (int j_ent = 0; j_ent<(type%100); j_ent++) {
- 	      global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
- 	    }
- 	  }
-
-	  global_connectivity = global_connectivity_tmp ;
-
+	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
+		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[global_connectivityIndex[supp_number[k_type]-1]+j_ent-1];
+		}
+	      }
+	      global_connectivity = global_connectivity_tmp ;
+	    }
 	}
-
       switch (type)
 	{
 	case MED_TRIA3 : case MED_TRIA6 :
@@ -1115,33 +920,9 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 		int N2 = global_connectivity[tria_index+1]-1;
 		int N3 = global_connectivity[tria_index+2]-1;
 
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-
-		if (dim_space==2)
-		  {
-		    xarea = - ((x2-x1)*(y3-y1) - (x3-x1)*(y2-y1))/2.0;
-		  }
-		else
-		  {
-		    double z1 = coord[dim_space*N1+2];
-		    double z2 = coord[dim_space*N2+2];
-		    double z3 = coord[dim_space*N3+2];
-
-		    xarea = sqrt(((y2-y1)*(z3-z1) - (y3-y1)*(z2-z1))*
-				 ((y2-y1)*(z3-z1) - (y3-y1)*(z2-z1)) +
-				 ((x3-x1)*(z2-z1) - (x2-x1)*(z3-z1))*
-				 ((x3-x1)*(z2-z1) - (x2-x1)*(z3-z1)) +
-				 ((x2-x1)*(y3-y1) - (x3-x1)*(y2-y1))*
-				 ((x2-x1)*(y3-y1) - (x3-x1)*(y2-y1)))/2.0;
-		  }
-
-		area[index] = xarea ;
+		area[index]=CalculateAreaForTria(coord+(dim_space*N1),
+						   coord+(dim_space*N2),
+						   coord+(dim_space*N3),dim_space);
 		index++;
 	      }
 	    break;
@@ -1156,50 +937,48 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 		int N2 = global_connectivity[quad_index+1]-1;
 		int N3 = global_connectivity[quad_index+2]-1;
 		int N4 = global_connectivity[quad_index+3]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-		double x4 = coord[dim_space*N4];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-		double y4 = coord[dim_space*N4+1];
-
-		if (dim_space==2)
-		  {
-		    double a1 = (x2-x1)/4.0, a2 = (y2-y1)/4.0;
-		    double b1 = (x3-x4)/4.0, b2 = (y3-y4)/4.0;
-		    double c1 = (x3-x2)/4.0, c2 = (y3-y2)/4.0;
-		    double d1 = (x4-x1)/4.0, d2 = (y4-y1)/4.0;
-
-		    xarea = - 4.0*(b1*c2 - c1*b2 + a1*c2 - c1*a2 + b1*d2 -
-				 d1*b2 + a1*d2 - d1*a2);
-		  }
-		else
-		  {
-		    double z1 = coord[dim_space*N1+2];
-		    double z2 = coord[dim_space*N2+2];
-		    double z3 = coord[dim_space*N3+2];
-		    double z4 = coord[dim_space*N4+2];
-
-		    xarea = (sqrt(((y2-y1)*(z4-z1) - (y4-y1)*(z2-z1))*
-				  ((y2-y1)*(z4-z1) - (y4-y1)*(z2-z1)) +
-				  ((x4-x1)*(z2-z1) - (x2-x1)*(z4-z1))*
-				  ((x4-x1)*(z2-z1) - (x2-x1)*(z4-z1)) +
-				  ((x2-x1)*(y4-y1) - (x4-x1)*(y2-y1))*
-				  ((x2-x1)*(y4-y1) - (x4-x1)*(y2-y1))) +
-			     sqrt(((y4-y3)*(z2-z3) - (y2-y3)*(z4-z3))*
-				  ((y4-y3)*(z2-z3) - (y2-y3)*(z4-z3)) +
-				  ((x2-x3)*(z4-z3) - (x4-x3)*(z2-z3))*
-				  ((x2-x3)*(z4-z3) - (x4-x3)*(z2-z3)) +
-				  ((x4-x3)*(y2-y3) - (x2-x3)*(y4-y3))*
-				  ((x4-x3)*(y2-y3) - (x2-x3)*(y4-y3))))/2.0;
-		  }
-
-		area[index] = xarea ;
+		
+		area[index]=CalculateAreaForQuad(coord+dim_space*N1,
+						   coord+dim_space*N2,
+						   coord+dim_space*N3,
+						   coord+dim_space*N4,dim_space);
 		index++;
+	      }
+	    break;
+	  }
+	case MED_POLYGON :
+	  {
+	    if(onAll)
+	      {
+		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+		for (int polygs=0;polygs<nb_entity_type;polygs++)
+		  {
+		    int size=connectivity_index[polygs+1]-connectivity_index[polygs];
+		    double **pts=new double * [size];
+		    for(int iPts=0;iPts<size;iPts++)
+		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1]-1));
+		    area[index] = CalculateAreaForPolyg((const double **)pts,size,dim_space);
+		    delete [] pts;
+		    index++;
+		  }
+	      }
+	    else
+	      {
+		const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
+		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+		int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
+		for (int polygs=0;polygs<nb_entity_type;polygs++)
+		  {
+		    int size=connectivity_index[supp_number[polygs]-offsetWithClassicType]-connectivity_index[supp_number[polygs]-offsetWithClassicType-1];
+		    double **pts=new double * [size];
+		    for(int iPts=0;iPts<size;iPts++)
+		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[supp_number[polygs]-offsetWithClassicType-1]+iPts-1]-1));
+		    area[index]=CalculateAreaForPolyg((const double **)pts,size,dim_space);
+		    delete [] pts;
+		    index++;
+		  }
 	      }
 	    break;
 	  }
@@ -1208,11 +987,10 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 	  break;
 	}
 
-      if (!onAll) delete [] global_connectivity ;
+      if (!onAll) 
+	if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
+	  delete [] global_connectivity ;
     }
-
-  Area->setValue(MED_FULL_INTERLACE,area);
-  delete[] area;
   return Area;
 }
 
@@ -1239,18 +1017,9 @@ FIELD<double>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTIO
   // !!!! WARNING : use of nodal global numbering in the mesh !!!!
   const int* global_connectivity;
 
-//    if (onAll)
-//      {
-//        nb_type = myMesh->getNumberOfTypes(support_entity);
-//        length_values = getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
-//        types = getTypes(support_entity);
-//      }
-//    else
-    {
-      nb_type = Support->getNumberOfTypes();
-      length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
-      types = Support->getTypes();
-    }
+  nb_type = Support->getNumberOfTypes();
+  length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
+  types = Support->getTypes();
 
   int index;
   FIELD<double>* Length;
@@ -1277,10 +1046,7 @@ FIELD<double>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	}
       else
 	{
-	  //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support must be on all !"));
-
  	  nb_entity_type = Support->getNumberOfElements(type);
-
  	  const int * supp_number = Support->getNumber(type);
  	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
  	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
@@ -1347,27 +1113,21 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"no compatibility between *this and SUPPORT::_mesh : pointeur problem !"));
 
   int dim_space = getSpaceDimension();
+  int mesh_dim=getMeshDimension();
   medEntityMesh support_entity = Support->getEntity();
   bool onAll = Support->isOnAllElements();
 
+  if( support_entity!=MED_EDGE && (mesh_dim!=1 || support_entity!=MED_CELL) && ( mesh_dim!=2 || support_entity!=MED_CELL ) && ( mesh_dim!=3 || support_entity!=MED_FACE ))
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"incompatible mesh dimension and entity"));
   int nb_type, length_values;
   const medGeometryElement* types;
   int nb_entity_type;
   // !!!! WARNING : use of nodal global numbering in the mesh !!!!
   const int* global_connectivity;
 
-//    if (onAll)
-//      {
-//        nb_type = myMesh->getNumberOfTypes(support_entity);
-//        length_values = getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
-//        types = getTypes(support_entity);
-//      }
-//    else
-    {
-      nb_type = Support->getNumberOfTypes();
-      length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
-      types = Support->getTypes();
-    }
+  nb_type = Support->getNumberOfTypes();
+  length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
+  types = Support->getTypes();
 
   int index;
 
@@ -1385,9 +1145,7 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
   Normal->setIterationNumber(MED_NOPDT);
   Normal->setOrderNumber(MED_NONOR);
   Normal->setTime(0.0);
-
-  double * normal = new double [dim_space*length_values];
-  //double *normal = Normal->getValue(MED_FULL_INTERLACE);
+  double *normal = (double *)Normal->getValue(MED_FULL_INTERLACE);
 
   const double * coord = getCoordinates(MED_FULL_INTERLACE);
   index = 0;
@@ -1395,42 +1153,38 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
   for (int i=0;i<nb_type;i++)
     {
       medGeometryElement type = types[i] ;
-
+      nb_entity_type = Support->getNumberOfElements(type);
+      
       // Make sure we trying to get Normals on
       // TRIA3 or TRIA6 or QUAD4 QUAD8 (2D) cells on a 3D mesh
       // or on SEG2 or SEG3 (1D) cells on a 2D mesh
 
       if ( (((type==MED_TRIA3) || (type==MED_TRIA6) ||
-	     (type==MED_QUAD4) || (type==MED_QUAD8)) &&
+	     (type==MED_QUAD4) || (type==MED_QUAD8) || (type==MED_POLYGON)) &&
       	    (dim_space != 3)) || (((type==MED_SEG2) || (type==MED_SEG3)) &&
 				  (dim_space != 2)) )
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"no compatibility between *this and SUPPORT::_mesh : dimension problem !"));
-
-      double xnormal1, xnormal2, xnormal3 ;
-
-      if (onAll)
+      if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
 	{
-	  nb_entity_type = getNumberOfElements(support_entity,type);
-	  global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
-	}
-      else
-	{
-	  // throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support must be on all for instance !"));
- 	  nb_entity_type = Support->getNumberOfElements(type);
-	  
- 	  const int * supp_number = Support->getNumber(type);
- 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
- 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
- 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
-	  
- 	  for (int k_type = 0; k_type<nb_entity_type; k_type++) {
- 	    for (int j_ent = 0; j_ent<(type%100); j_ent++) {
- 	      global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
- 	    }
- 	  }
-
-	  global_connectivity = global_connectivity_tmp ;
-
+	  if (onAll)
+	    {
+	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
+	    }
+	  else
+	    {  
+	      const int * supp_number = Support->getNumber(type);
+	      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+	      const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+	      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+	      
+	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
+		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
+		}
+	      }
+	      
+	      global_connectivity = global_connectivity_tmp ;
+	    }
 	}
 
       switch (type)
@@ -1440,32 +1194,10 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	    for (int tria=0;tria<nb_entity_type;tria++)
 	      {
 		int tria_index = (type%100)*tria;
-
 		int N1 = global_connectivity[tria_index]-1;
 		int N2 = global_connectivity[tria_index+1]-1;
 		int N3 = global_connectivity[tria_index+2]-1;
-
-		//double xarea; !! UNUSED VARIABLE !!
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-
-		double z1 = coord[dim_space*N1+2];
-		double z2 = coord[dim_space*N2+2];
-		double z3 = coord[dim_space*N3+2];
-
-		xnormal1 = ((y2-y1)*(z3-z1) - (y3-y1)*(z2-z1))/2.0;
-		xnormal2 = ((x3-x1)*(z2-z1) - (x2-x1)*(z3-z1))/2.0;
-		xnormal3 = ((x2-x1)*(y3-y1) - (x3-x1)*(y2-y1))/2.0;
-
-		normal[3*index] = xnormal1 ;
-		normal[3*index+1] = xnormal2 ;
-		normal[3*index+2] = xnormal3 ;
-
+		CalculateNormalForTria(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,normal+3*index);
 		index++;
 	      }
 	    break;
@@ -1475,72 +1207,18 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	    for (int quad=0;quad<nb_entity_type;quad++)
 	      {
 		int quad_index = (type%100)*quad;
-
 		int N1 = global_connectivity[quad_index]-1;
 		int N2 = global_connectivity[quad_index+1]-1;
 		int N3 = global_connectivity[quad_index+2]-1;
 		int N4 = global_connectivity[quad_index+3]-1;
-
-		double xarea;
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-		double x4 = coord[dim_space*N4];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-		double y4 = coord[dim_space*N4+1];
-
-		double z1 = coord[dim_space*N1+2];
-		double z2 = coord[dim_space*N2+2];
-		double z3 = coord[dim_space*N3+2];
-		double z4 = coord[dim_space*N4+2];
-
-		xnormal1 = (y2-y1)*(z4-z1) - (y4-y1)*(z2-z1);
-		xnormal2 = (x4-x1)*(z2-z1) - (x2-x1)*(z4-z1);
-		xnormal3 = (x2-x1)*(y4-y1) - (x4-x1)*(y2-y1);
-		xarea = sqrt(xnormal1*xnormal1 + xnormal2*xnormal2 +
-			     xnormal3*xnormal3);
-
-		xnormal1 = xnormal1/xarea;
-		xnormal2 = xnormal2/xarea;
-		xnormal3 = xnormal3/xarea;
-
-		xarea = (sqrt(((y2-y1)*(z4-z1) - (y4-y1)*(z2-z1))*
-			      ((y2-y1)*(z4-z1) - (y4-y1)*(z2-z1)) +
-			      ((x4-x1)*(z2-z1) - (x2-x1)*(z4-z1))*
-			      ((x4-x1)*(z2-z1) - (x2-x1)*(z4-z1)) +
-			      ((x2-x1)*(y4-y1) - (x4-x1)*(y2-y1))*
-			      ((x2-x1)*(y4-y1) - (x4-x1)*(y2-y1))) +
-			 sqrt(((y4-y3)*(z2-z3) - (y2-y3)*(z4-z3))*
-			      ((y4-y3)*(z2-z3) - (y2-y3)*(z4-z3)) +
-			      ((x2-x3)*(z4-z3) - (x4-x3)*(z2-z3))*
-			      ((x2-x3)*(z4-z3) - (x4-x3)*(z2-z3)) +
-			      ((x4-x3)*(y2-y3) - (x2-x3)*(y4-y3))*
-			      ((x4-x3)*(y2-y3) - (x2-x3)*(y4-y3))))/2.0;
-
-// 			 sqrt(((y3-y2)*(z4-z3) - (y4-y3)*(z3-z2))*
-// 			      ((y3-y2)*(z4-z3) - (y4-y3)*(z3-z2)) +
-// 			      ((x4-x3)*(z2-z2) - (x3-x2)*(z4-z3))*
-// 			      ((x4-x3)*(z4-z2) - (x3-x2)*(z4-z3)) +
-// 			      ((x3-x2)*(y4-y3) - (x4-x3)*(y3-y2))*
-// 			      ((x3-x2)*(y4-y3) - (x4-x3)*(y3-y2))))/2.0;
-
-		xnormal1 = xnormal1*xarea;
-		xnormal2 = xnormal2*xarea;
-		xnormal3 = xnormal3*xarea;
-
-		normal[3*index] = xnormal1 ;
-		normal[3*index+1] = xnormal2 ;
-		normal[3*index+2] = xnormal3 ;
-
+		CalculateNormalForQuad(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,normal+3*index);
 		index++;
 	      }
 	    break;
 	  }
 	case MED_SEG2 : case MED_SEG3 :
 	  {
+	    double xnormal1, xnormal2;
 	    for (int edge=0;edge<nb_entity_type;edge++)
 	      {
 		int edge_index = (type%100)*edge;
@@ -1564,17 +1242,50 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	      }
 	    break;
 	  }
+	case MED_POLYGON :
+	  {
+	    if(onAll)
+	      {
+		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+		for (int polygs=0;polygs<nb_entity_type;polygs++)
+		  {
+		    int size=connectivity_index[polygs+1]-connectivity_index[polygs];
+		    double **pts=new double * [size];
+		    for(int iPts=0;iPts<size;iPts++)
+		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1])-1);
+		    CalculateNormalForPolyg((const double **)pts,size,normal+3*index);
+		    delete [] pts;
+		    index++;
+		  }
+	      }
+	    else
+	      {
+		const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
+		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+		int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
+		for (int polygs=0;polygs<nb_entity_type;polygs++)
+		  {
+		    int localPolygsNbP1=supp_number[polygs]-offsetWithClassicType;
+		    int size=connectivity_index[localPolygsNbP1]-connectivity_index[localPolygsNbP1-1];
+		    double **pts=new double * [size];
+		    for(int iPts=0;iPts<size;iPts++)
+		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[localPolygsNbP1-1]+iPts-1])-1);
+		    CalculateNormalForPolyg((const double **)pts,size,normal+3*index);
+		    delete [] pts;
+		    index++;
+		  }
+	      }
+	    break;
+	  }
 	default :
 	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Normals on it !"));
 	  break;
 	}
-
-      if (!onAll) delete [] global_connectivity ;
+      if (!onAll && type!=MED_EN::MED_POLYGON) 
+	delete [] global_connectivity ;
     }
-
-  Normal->setValue(MED_FULL_INTERLACE,normal);
-  delete[] normal ;
-
   END_OF(LOC);
 
   return Normal;
@@ -1583,10 +1294,6 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getBarycenter(SUPPORT*) : ";
-  BEGIN_OF(LOC);
-
-  // Make sure that the MESH class is the same as the MESH class attribut
-  // in the class Support
   MESH* myMesh = Support->getMesh();
   if (this != myMesh)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"no compatibility between *this and SUPPORT::_mesh !"));
@@ -1598,25 +1305,14 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
   int nb_type, length_values;
   const medGeometryElement* types;
   int nb_entity_type;
-  // !!!! WARNING : use of nodal global numbering in the mesh !!!!
   const int* global_connectivity;
+  const int * global_connectivityIndex;
 
-//    if (onAll)
-//      {
-//        nb_type = myMesh->getNumberOfTypes(support_entity);
-//        length_values = getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
-//        types = getTypes(support_entity);
-//      }
-//    else
-    {
-      nb_type = Support->getNumberOfTypes();
-      length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
-      types = Support->getTypes();
-    }
+  nb_type = Support->getNumberOfTypes();
+  length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
+  types = Support->getTypes();
 
-  int index;
   FIELD<double>* Barycenter;
-
   Barycenter = new FIELD<double>(Support,dim_space);
   Barycenter->setName("BARYCENTER");
   Barycenter->setDescription("cells or faces barycenter");
@@ -1627,45 +1323,37 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
     Barycenter->setComponentDescription(kp1,"desc-comp");
     Barycenter->setMEDComponentUnit(kp1,myMesh->getCoordinatesUnits()[k]);
   }
-
   Barycenter->setValueType(MED_REEL64);
-
   Barycenter->setIterationNumber(0);
   Barycenter->setOrderNumber(0);
   Barycenter->setTime(0.0);
-
-  double *barycenter = new double [dim_space*length_values];
-  //  double *barycenter = Barycenter->getValue(MED_FULL_INTERLACE);
-
+  double *barycenter=(double *)Barycenter->getValue(MED_FULL_INTERLACE);
   const double * coord = getCoordinates(MED_FULL_INTERLACE);
-  index = 0;
-
+  int index=0;
   for (int i=0;i<nb_type;i++)
     {
       medGeometryElement type = types[i] ;
-      double xbarycenter1, xbarycenter2, xbarycenter3;
+      nb_entity_type = Support->getNumberOfElements(type);
+      global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+      if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA )
+	{
+	  if (onAll)
+	    {
+	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
+	    }
+	  else
+	    {
+	      const int * supp_number = Support->getNumber(type);
+	      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+	      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
-      if (onAll)
-	{
-	  nb_entity_type = getNumberOfElements(support_entity,type);
-	  global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
-	}
-      else
-	{
-	  // throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support must be on all !"));
- 	  nb_entity_type = Support->getNumberOfElements(type);
-	  
- 	  const int * supp_number = Support->getNumber(type);
- 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
- 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
- 	  int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
-	  
- 	  for (int k_type = 0; k_type<nb_entity_type; k_type++) {
- 	    for (int j_ent = 0; j_ent<(type%100); j_ent++) {
- 	      global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
- 	    }
- 	  }
-	  global_connectivity = global_connectivity_tmp;
+	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
+		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[global_connectivityIndex[supp_number[k_type]-1]+j_ent-1];
+		}
+	      }
+	      global_connectivity = global_connectivity_tmp;
+	    }
 	}
 
       switch (type)
@@ -1680,28 +1368,12 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 		int N2 = global_connectivity[tetra_index+1]-1;
 		int N3 = global_connectivity[tetra_index+2]-1;
 		int N4 = global_connectivity[tetra_index+3]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-		double x4 = coord[dim_space*N4];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-		double y4 = coord[dim_space*N4+1];
-
-		double z1 = coord[dim_space*N1+2];
-		double z2 = coord[dim_space*N2+2];
-		double z3 = coord[dim_space*N3+2];
-		double z4 = coord[dim_space*N4+2];
-
-		xbarycenter1 = (x1 + x2 + x3 + x4)/4.0;
-		xbarycenter2 = (y1 + y2 + y3 + y4)/4.0;
-		xbarycenter3 = (z1 + z2 + z3 + z4)/4.0;
-		barycenter[3*index] = xbarycenter1 ;
-		barycenter[3*index+1] = xbarycenter2 ;
-		barycenter[3*index+2] = xbarycenter3 ;
+		double *pts[4];
+		pts[0]=(double *)coord+dim_space*N1;
+		pts[1]=(double *)coord+dim_space*N2;
+		pts[2]=(double *)coord+dim_space*N3;
+		pts[3]=(double *)coord+dim_space*N4;
+		CalculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1717,31 +1389,13 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 		int N3 = global_connectivity[pyra_index+2]-1;
 		int N4 = global_connectivity[pyra_index+3]-1;
 		int N5 = global_connectivity[pyra_index+4]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-		double x4 = coord[dim_space*N4];
-		double x5 = coord[dim_space*N5];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-		double y4 = coord[dim_space*N4+1];
-		double y5 = coord[dim_space*N5+1];
-
-		double z1 = coord[dim_space*N1+2];
-		double z2 = coord[dim_space*N2+2];
-		double z3 = coord[dim_space*N3+2];
-		double z4 = coord[dim_space*N4+2];
-		double z5 = coord[dim_space*N5+2];
-
-		xbarycenter1 = (x1 + x2 + x3 + x4 + x5)/5.0;
-		xbarycenter2 = (y1 + y2 + y3 + y4 + y5)/5.0;
-		xbarycenter3 = (z1 + z2 + z3 + z4 + z5)/5.0;
-		barycenter[3*index] = xbarycenter1 ;
-		barycenter[3*index+1] = xbarycenter2 ;
-		barycenter[3*index+2] = xbarycenter3 ;
+		double *pts[5];
+		pts[0]=(double *)coord+dim_space*N1;
+		pts[1]=(double *)coord+dim_space*N2;
+		pts[2]=(double *)coord+dim_space*N3;
+		pts[3]=(double *)coord+dim_space*N4;
+		pts[4]=(double *)coord+dim_space*N5;
+		CalculateBarycenter<5,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1758,34 +1412,14 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 		int N4 = global_connectivity[penta_index+3]-1;
 		int N5 = global_connectivity[penta_index+4]-1;
 		int N6 = global_connectivity[penta_index+5]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-		double x4 = coord[dim_space*N4];
-		double x5 = coord[dim_space*N5];
-		double x6 = coord[dim_space*N6];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-		double y4 = coord[dim_space*N4+1];
-		double y5 = coord[dim_space*N5+1];
-		double y6 = coord[dim_space*N6+1];
-
-		double z1 = coord[dim_space*N1+2];
-		double z2 = coord[dim_space*N2+2];
-		double z3 = coord[dim_space*N3+2];
-		double z4 = coord[dim_space*N4+2];
-		double z5 = coord[dim_space*N5+2];
-		double z6 = coord[dim_space*N6+2];
-
-		xbarycenter1 = (x1 + x2 + x3 + x4 + x5 + x6)/6.0;
-		xbarycenter2 = (y1 + y2 + y3 + y4 + y5 + y6)/6.0;
-		xbarycenter3 = (z1 + z2 + z3 + z4 + z5 + z6)/6.0;
-		barycenter[3*index] = xbarycenter1 ;
-		barycenter[3*index+1] = xbarycenter2 ;
-		barycenter[3*index+2] = xbarycenter3 ;
+		double *pts[6];
+		pts[0]=(double *)coord+dim_space*N1;
+		pts[1]=(double *)coord+dim_space*N2;
+		pts[2]=(double *)coord+dim_space*N3;
+		pts[3]=(double *)coord+dim_space*N4;
+		pts[4]=(double *)coord+dim_space*N5;
+		pts[5]=(double *)coord+dim_space*N6;
+		CalculateBarycenter<6,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1804,42 +1438,16 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 		int N6 = global_connectivity[hexa_index+5]-1;
 		int N7 = global_connectivity[hexa_index+6]-1;
 		int N8 = global_connectivity[hexa_index+7]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-		double x4 = coord[dim_space*N4];
-		double x5 = coord[dim_space*N5];
-		double x6 = coord[dim_space*N6];
-		double x7 = coord[dim_space*N7];
-		double x8 = coord[dim_space*N8];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-		double y4 = coord[dim_space*N4+1];
-		double y5 = coord[dim_space*N5+1];
-		double y6 = coord[dim_space*N6+1];
-		double y7 = coord[dim_space*N7+1];
-		double y8 = coord[dim_space*N8+1];
-
-		double z1 = coord[dim_space*N1+2];
-		double z2 = coord[dim_space*N2+2];
-		double z3 = coord[dim_space*N3+2];
-		double z4 = coord[dim_space*N4+2];
-		double z5 = coord[dim_space*N5+2];
-		double z6 = coord[dim_space*N6+2];
-		double z7 = coord[dim_space*N7+2];
-		double z8 = coord[dim_space*N8+2];
-
-		xbarycenter1 = (x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8)/8.0;
-		xbarycenter2 = (y1 + y2 + y3 + y4 + y5 + y6 + y7 + y8)/8.0;
-		xbarycenter3 = (z1 + z2 + z3 + z4 + z5 + z6 + z7 + z8)/8.0;
-
-		barycenter[3*index] = xbarycenter1 ;
-		barycenter[3*index+1] = xbarycenter2 ;
-		barycenter[3*index+2] = xbarycenter3 ;
-
+		double *pts[8];
+		pts[0]=(double *)coord+dim_space*N1;
+		pts[1]=(double *)coord+dim_space*N2;
+		pts[2]=(double *)coord+dim_space*N3;
+		pts[3]=(double *)coord+dim_space*N4;
+		pts[4]=(double *)coord+dim_space*N5;
+		pts[5]=(double *)coord+dim_space*N6;
+		pts[6]=(double *)coord+dim_space*N7;
+		pts[7]=(double *)coord+dim_space*N8;
+		CalculateBarycenter<8,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1849,43 +1457,17 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 	    for (int tria=0;tria<nb_entity_type;tria++)
 	      {
 		int tria_index = (type%100)*tria;
-
 		int N1 = global_connectivity[tria_index]-1;
 		int N2 = global_connectivity[tria_index+1]-1;
 		int N3 = global_connectivity[tria_index+2]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-
-		xbarycenter1 = (x1 + x2 + x3)/3.0;
-		xbarycenter2 = (y1 + y2 + y3)/3.0;
-
+		double *pts[3];
+		pts[0]=(double *)coord+dim_space*N1;
+		pts[1]=(double *)coord+dim_space*N2;
+		pts[2]=(double *)coord+dim_space*N3;
 		if (dim_space==2)
-		  {
-		    barycenter[2*index] = xbarycenter1 ;
-		    barycenter[2*index+1] = xbarycenter2 ;
-		  }
+		  CalculateBarycenter<3,2>((const double **)pts,barycenter+2*index);
 		else
-		  {
-		    double z1 =
-		      coord[dim_space*N1+2];
-		    double z2 =
-		      coord[dim_space*N2+2];
-		    double z3 =
-		      coord[dim_space*N3+2];
-
-		    xbarycenter3 = (z1 + z2 + z3)/3.0;
-
-		    barycenter[3*index] = xbarycenter1 ;
-		    barycenter[3*index+1] = xbarycenter2 ;
-		    barycenter[3*index+2] = xbarycenter3 ;
-		  }
-
+		  CalculateBarycenter<3,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1895,43 +1477,19 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 	    for (int quad=0;quad<nb_entity_type;quad++)
 	      {
 		int quad_index = (type%100)*quad;
-
 		int N1 = global_connectivity[quad_index]-1;
 		int N2 = global_connectivity[quad_index+1]-1;
 		int N3 = global_connectivity[quad_index+2]-1;
 		int N4 = global_connectivity[quad_index+3]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-		double x3 = coord[dim_space*N3];
-		double x4 = coord[dim_space*N4];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-		double y3 = coord[dim_space*N3+1];
-		double y4 = coord[dim_space*N4+1];
-
-		xbarycenter1 = (x1 + x2 + x3 + x4)/4.0;
-		xbarycenter2 = (y1 + y2 + y3 + y4)/4.0;
-
+		double *pts[4];
+		pts[0]=(double *)coord+dim_space*N1;
+		pts[1]=(double *)coord+dim_space*N2;
+		pts[2]=(double *)coord+dim_space*N3;
+		pts[3]=(double *)coord+dim_space*N4;
 		if (dim_space==2)
-		  {
-		    barycenter[2*index] = xbarycenter1 ;
-		    barycenter[2*index+1] = xbarycenter2 ;
-		  }
+		  CalculateBarycenter<4,2>((const double **)pts,barycenter+2*index);
 		else
-		  {
-		    double z1 = coord[dim_space*N1+2];
-		    double z2 = coord[dim_space*N2+2];
-		    double z3 = coord[dim_space*N3+2];
-		    double z4 = coord[dim_space*N4+2];
-
-		    xbarycenter3 = (z1 + z2 + z3 + z4)/4.0;
-
-		    barycenter[3*index] = xbarycenter1 ;
-		    barycenter[3*index+1] = xbarycenter2 ;
-		    barycenter[3*index+2] = xbarycenter3 ;
-		  }
+		  CalculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1941,36 +1499,88 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 	    for (int edge=0;edge<nb_entity_type;edge++)
 	      {
 		int edge_index = (type%100)*edge;
-
 		int N1 = global_connectivity[edge_index]-1;
 		int N2 = global_connectivity[edge_index+1]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-
-		xbarycenter1 = (x1 + x2)/2.0;
-		xbarycenter2 = (y1 + y2)/2.0;
-
+		double *pts[2];
+		pts[0]=(double *)coord+dim_space*N1;
+		pts[1]=(double *)coord+dim_space*N2;
 		if (dim_space==2)
-		  {
-		    barycenter[2*index] = xbarycenter1 ;
-		    barycenter[2*index+1] = xbarycenter2 ;
-		  }
+		  CalculateBarycenter<2,2>((const double **)pts,barycenter+2*index);
 		else
-		  {
-		    double z1 = coord[dim_space*N1+2];
-		    double z2 = coord[dim_space*N2+2];
-
-		    xbarycenter3 = (z1 + z2)/2.0;
-
-		    barycenter[3*index] = xbarycenter1 ;
-		    barycenter[3*index+1] = xbarycenter2 ;
-		    barycenter[3*index+2] = xbarycenter3 ;
-		  }
+		  CalculateBarycenter<2,3>((const double **)pts,barycenter+3*index);
 		index++;
+	      }
+	    break;
+	  }
+	case MED_POLYGON :
+	  {
+	    if(onAll)
+	      {
+		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+		for (int polygs=0;polygs<nb_entity_type;polygs++)
+		  {
+		    int size=connectivity_index[polygs+1]-connectivity_index[polygs];
+		    double **pts=new double * [size];
+		    for(int iPts=0;iPts<size;iPts++)
+		      pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1]-1);
+		    CalculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
+		    delete [] pts;
+		  }
+	      }
+	    else
+	      {
+		const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
+		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+		int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
+		for (int polygs=0;polygs<nb_entity_type;polygs++)
+		  {
+		    int localPolygsNbP1=supp_number[polygs]-offsetWithClassicType;
+		    int size=connectivity_index[localPolygsNbP1]-connectivity_index[localPolygsNbP1-1];
+		    double **pts=new double * [size];
+		    for(int iPts=0;iPts<size;iPts++)
+		      pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[localPolygsNbP1-1]+iPts-1]-1);
+		    CalculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
+		    delete [] pts;
+		  }
+	      }
+	    index++;
+	    break;
+	  }
+	case MED_EN::MED_POLYHEDRA:
+	  {
+	    if(onAll)
+	      {
+		for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
+		  {
+		    int lgthNodes;
+		    int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
+		    int *nodes=_connectivity->getNodesOfPolyhedron(offsetWithClassicType+polyhs+1,lgthNodes);
+		    double **pts=new double * [lgthNodes];
+		    for(int iPts=0;iPts<lgthNodes;iPts++)
+		      pts[iPts]=(double *)coord+3*(nodes[iPts]-1);
+		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
+		    delete [] pts;
+		    delete [] nodes;
+		    index++;
+		  }
+	      }
+	    else
+	      {
+		const int * supp_number = Support->getNumber(MED_EN::MED_POLYHEDRA);
+		for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
+		  {
+		    int lgthNodes;
+		    int *nodes=_connectivity->getNodesOfPolyhedron(supp_number[polyhs],lgthNodes);
+		    double **pts=new double * [lgthNodes];
+		    for(int iPts=0;iPts<lgthNodes;iPts++)
+		      pts[iPts]=(double *)coord+3*(nodes[iPts]-1);
+		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
+		    delete [] pts;
+		    delete [] nodes;
+		    index++;
+		  }
 	      }
 	    break;
 	  }
@@ -1979,39 +1589,13 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
 	  break;
 	}
 
-      if (!onAll) delete [] global_connectivity ;
+      if (!onAll)
+	if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
+	  delete [] global_connectivity;
     }
-
-  Barycenter->setValue(MED_FULL_INTERLACE,barycenter);
-
-  delete[] barycenter ;
-
   END_OF(LOC);
-
   return Barycenter;
 }
-
-//=======================================================================
-//function : checkGridFillCoords
-//purpose  : if this->_isAGrid, assure that _coordinate is filled
-//=======================================================================
-
-// inline void MESH::checkGridFillCoords() const
-// {
-//   if (_isAGrid)
-//     ((GRID *) this)->fillCoordinates();
-// }
-
-//=======================================================================
-//function : checkGridFillConnectivity
-//purpose  : if this->_isAGrid, assure that _connectivity is filled
-//=======================================================================
-
-// inline void MESH::checkGridFillConnectivity() const
-// {
-//   if (_isAGrid)
-//     ((GRID *) this)->fillConnectivity();
-// }
 
 bool MESH::isEmpty() const 
 {
@@ -2041,9 +1625,6 @@ void MESH::read(int index)
                                      << _drivers.size() 
                                      )
                           );
-//   if (_isAGrid)
-//     ((GRID *) this)->fillMeshAfterRead();
-
   END_OF(LOC);
 }
 //=======================================================================
@@ -2463,7 +2044,6 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) const throw 
 // internal helper type
 struct _cell
 {
-    //int number;
     std::vector<int> groups;
     MED_EN::medGeometryElement geometricType;
 };
@@ -2556,15 +2136,6 @@ void MESH::createFamilies()
 	    }
 	    
 	    tab_families[key.str()].push_back(n+1); // fill the vector of contained cells associated whith the family
-	/*    fam = tab_families.find(key.str());
-	    if( fam != tab_families.end())
-		fam->second.push_back(n+1); // +1 : convention Fortran de MED
-	    else
-	    {
-		vector<int> newfamily;
-		newfamily.push_back(n+1); // +1 : convention Fortran de MED
-		tab_families.insert(make_pair(key.str(),newfamily));
-	    }*/
 	}
 
 
@@ -2671,3 +2242,6 @@ void MESH::createFamilies()
     // creation of support, check if it already exist.
     }
 }
+
+
+

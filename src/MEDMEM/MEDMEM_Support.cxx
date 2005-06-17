@@ -7,12 +7,8 @@
 #include <algorithm>
 #include <list>
 
-//#include "utilities.h"
-//#include "MEDMEM_define.hxx"
 #include "MEDMEM_DriversDef.hxx"
 #include "MEDMEM_Support.hxx"
-//#include "MEDMEM_Family.hxx"
-//#include "MEDMEM_Group.hxx"
 #include "MEDMEM_Mesh.hxx"
 
 using namespace std;
@@ -123,16 +119,7 @@ SUPPORT::~SUPPORT()
 //-----------------
 {
   MESSAGE("Destructeur ~SUPPORT()");
-  if (_geometricType != (medGeometryElement *) NULL) 
-    delete [] _geometricType ;
-  if (_numberOfGaussPoint != (int *) NULL) 
-    delete [] _numberOfGaussPoint ;
-  //      if (_geometricTypeNumber!=NULL) 
-  //        		delete[] _geometricTypeNumber ;
-  if (_numberOfElements != (int *) NULL) 
-    delete[] _numberOfElements ;
-  if (_number != (MEDSKYLINEARRAY *) NULL) 
-    delete _number ;
+  clearDataOnNumbers();
 }
 
 /*!
@@ -196,17 +183,18 @@ void SUPPORT::update()
       _numberOfGaussPoint = new int[1] ;
       _numberOfGaussPoint[0]=1;
     } else { // we duplicate information from _mesh
-      _numberOfGeometricType=_mesh->getNumberOfTypes(_entity);
+      _numberOfGeometricType=_mesh->getNumberOfTypesWithPoly(_entity);
       if (_geometricType == (medGeometryElement *) NULL)
-	_geometricType = new medGeometryElement[_numberOfGeometricType] ;
-      memcpy(_geometricType,_mesh->getTypes(_entity),_numberOfGeometricType*sizeof(medGeometryElement));
+	_geometricType=_mesh->getTypesWithPoly(_entity);
+      else
+	memcpy(_geometricType,_mesh->getTypes(_entity),_numberOfGeometricType*sizeof(medGeometryElement));
       if (_numberOfElements == (int *) NULL)
 	_numberOfElements = new int[_numberOfGeometricType] ;
       if (_numberOfGaussPoint == (int *) NULL)
 	_numberOfGaussPoint = new int[_numberOfGeometricType] ;
       _totalNumberOfElements=0;
       for (int i=0;i<_numberOfGeometricType;i++) {
-	_numberOfElements[i]=_mesh->getNumberOfElements(_entity,_geometricType[i]) ;
+	_numberOfElements[i]=_mesh->getNumberOfElementsWithPoly(_entity,_geometricType[i]) ;
 	_totalNumberOfElements+=_numberOfElements[i];
 	_numberOfGaussPoint[i]=1 ;
       }
@@ -222,164 +210,43 @@ void SUPPORT::update()
 void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
 //-------------------
 {
-  const char * LOC = "SUPPORT::blending() : " ;
-  BEGIN_OF(LOC) ;
-
-  MESSAGE(LOC<< "SUPPORT entry : " << *mySupport) ;
-
-  // on same entity :
-  if ( _entity != mySupport->getEntity() )
+  const char * LOC="SUPPORT::blending(SUPPORT *) : ";
+  BEGIN_OF(LOC);
+  if (_entity!=mySupport->getEntity())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entities are different !"));
-
-  int * tmp_NumberOfElementsInType = new int[MED_NBR_GEOMETRIE_MAILLE];
-  medGeometryElement * myType = new medGeometryElement[MED_NBR_GEOMETRIE_MAILLE];
-  int * whereIsType = new int[MED_NBR_GEOMETRIE_MAILLE];
-  //MESH_ENTITIES myMeshEntities() ;
-  list<MED_EN::medGeometryElement>::const_iterator listIt ;
-  int it=0 ;
-  for(listIt=(meshEntities[_entity]).begin();listIt!=(meshEntities[_entity]).end();listIt++) {
-    tmp_NumberOfElementsInType[it]=0;
-    whereIsType[it]=0 ;
-    try {
-      int tmp_int = 0;
-      tmp_int = getNumberOfElements((medGeometryElement)(*listIt)) ;
-      tmp_NumberOfElementsInType[it]+=tmp_int ;
-      whereIsType[it]+=1 ;
+  if(!(*_mesh == *mySupport->getMesh()))
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Mesh are different !"));
+  if(_isOnAllElts)
+    return;
+  if(mySupport->isOnAllElements())
+    {
+      *this=*mySupport;
+      return;
     }
-    catch (MEDEXCEPTION & ex) { SCRUTE(sizeof(ex)); };
-    try {
-      int tmp_int = 0;
-      tmp_int = mySupport->getNumberOfElements((medGeometryElement)(*listIt)) ;
-      tmp_NumberOfElementsInType[it]+=tmp_int ;
-      whereIsType[it]+=2 ;
+  if(mySupport->_totalNumberOfElements==0)
+    return;
+  const int *ids=getNumber(MED_ALL_ELEMENTS);
+  set<int> idsSet(ids,ids+getNumberOfElements(MED_ALL_ELEMENTS));
+  const int *idsMySupport=mySupport->getNumber(MED_ALL_ELEMENTS);
+  int mySupportSize=mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
+  set<int>::iterator iter;
+  for(int i=0;i<mySupportSize;i++)
+    idsSet.insert(idsMySupport[i]);
+  int size=idsSet.size();
+  if(size!=0)
+    {
+      list<int> idsList;
+      for(iter=idsSet.begin();iter!=idsSet.end();iter++)
+	idsList.push_back(*iter);
+      if(_entity==MED_NODE)
+	fillFromNodeList(idsList);
+      else
+	fillFromElementList(idsList);
     }
-    catch (const MEDEXCEPTION & ex) {};
-    if (whereIsType[it]!=0) {
-      myType[it]=(medGeometryElement)(*listIt) ;
-      SCRUTE(myType[it]);SCRUTE(it);SCRUTE((*listIt));
-      it++;
-    }
-  }
-  // set new value :
-//   int * numberOfElements=_numberOfElements ;
-//   _numberOfElements = new int[it] ;
-  int * numberOfElements= new int[it];
-  _totalNumberOfElements = 0 ;
-  //int totalSize = 0 ;
-  int ** tmp_array = new int*[it];
-  for (int i=0;i<it;i++) {
-    int numberOfElementsInType = tmp_NumberOfElementsInType[i] ;
-    numberOfElements[i] = numberOfElementsInType ;
-    tmp_array[i] = new int[numberOfElementsInType] ;
-    //totalSize+=numberOfElementsInType*(myType[i]%100) ;
-    _totalNumberOfElements+=numberOfElementsInType ;
-    if (whereIsType[i] == 1) { // only first Support
-      memcpy(tmp_array[i],getNumber(myType[i]),sizeof(int)*numberOfElementsInType);
-    } else if (whereIsType[i] == 2) { // only second Support
-      memcpy(tmp_array[i],mySupport->getNumber(myType[i]),sizeof(int)*numberOfElementsInType);
-    } else if (whereIsType[i] == 3) { // more difficult :-)
-      set<int> elementList ;
-      //int i1 = 0 ; !! UNUSED VARIABLE !!
-      //int i2 = 0 ; !!UNUSED VARIABLE !!
-      int ii = 0 ;
-      const int * number1 = getNumber(myType[i]) ;
-      const int * number2 = mySupport->getNumber(myType[i]) ;
-
-      SCRUTE(number1);
-      SCRUTE(number2);
-
-      int numberOfElements1 = getNumberOfElements(myType[i]) ;
-      int numberOfElements2 = mySupport->getNumberOfElements(myType[i]) ;
-
-      SCRUTE(numberOfElements1);
-      SCRUTE(numberOfElements2);
-
-      MESSAGE(LOC << " Type : " << myType[i] << " " << i);
-
-      for(int j=0;j<numberOfElements1;j++){
-	elementList.insert(number1[j]) ;
-      }
-
-      for(int j=0;j<numberOfElements2;j++){
-	elementList.insert(number2[j]) ;
-      }
-
-      //create the array !
-      int newNumberOfElements = elementList.size() ;
-
-      SCRUTE(newNumberOfElements);
-
-      numberOfElements[i] = newNumberOfElements ;
-      int * tmp_arrayNew = new int[newNumberOfElements];
-
-      set<int>::iterator its ;
-      for(its=elementList.begin();its!=elementList.end(); its++) {
-	tmp_arrayNew[ii]=*its ;
-	ii++;
-      }
-
-      delete[] tmp_array[i] ;
-      tmp_array[i] = tmp_arrayNew ;
-      _totalNumberOfElements-=(numberOfElementsInType-newNumberOfElements) ;
-
-    } else
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"ERROR")) ;
-  }
-  delete[] whereIsType ;
-  delete[] tmp_NumberOfElementsInType ;
-  delete [] _numberOfElements;
-
-  _numberOfElements = numberOfElements;
-
-  _numberOfGeometricType = it ;
-  medGeometryElement * geometricType=_geometricType ;
-  _geometricType = new medGeometryElement[it] ;
-  int * numberOfGaussPoint=_numberOfGaussPoint ;
-  _numberOfGaussPoint= new int[it] ;
-//    int * geometricTypeNumber=_geometricTypeNumber ;
-//    _geometricTypeNumber = new int[it] ;
-
-//    MEDSKYLINEARRAY* numberNew = new MEDSKYLINEARRAY(it,_totalNumberOfElements);
-//    int * numberIndex = numberNew->getIndex() ;
-  int size = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
-  if (_totalNumberOfElements == size) _isOnAllElts = true;
-
-  int * numberValue = new int[_totalNumberOfElements] ;
-  int * numberIndex = new int[it+1] ;
-  numberIndex[0]=1;
-  for (int i=0;i<it;i++) {
-    memcpy(numberValue+numberIndex[i]-1,tmp_array[i],sizeof(int)*_numberOfElements[i]) ;
-    delete[] tmp_array[i] ;
-    numberIndex[i+1]=numberIndex[i]+_numberOfElements[i] ;
-
-    _geometricType[i]=myType[i] ;
-    _numberOfGaussPoint[i]=1 ;
-  }
-  if ( _number != (MEDSKYLINEARRAY *) NULL) delete _number ;
-  //_number = numberNew ;
-  _number = new MEDSKYLINEARRAY(it,_totalNumberOfElements,numberIndex,numberValue);
-  delete[] numberIndex;
-
-  delete[] numberValue;
-
-  delete[] myType ;
-  delete[] tmp_array ;
-
-  delete[] geometricType ;
-  delete[] numberOfGaussPoint ;
-//    delete[] geometricTypeNumber ;
-//  delete[] numberOfElements ;
-
-
-
-
-  MESSAGE(LOC<<"Printing of the object SUPPORT blended "<< *this);
-
-
-
-
+  else
+    clearDataOnNumbers();
   END_OF(LOC);
-};
+}
 
 /*!
     This function allows the user to set a support not on all entities Entity,
@@ -728,6 +595,37 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
 };
 
 /*!
+  Method that cleans up all the fields related to _numbers. Defined for code factorization.
+ */
+//--------------------------------------------------
+void MEDMEM::SUPPORT::clearDataOnNumbers()
+//--------------------------------------------------
+{
+  _numberOfGeometricType=0;
+  _totalNumberOfElements=0;
+  if(_geometricType)
+    {
+      delete [] _geometricType;
+      _geometricType=(medGeometryElement *) NULL;
+    }
+  if(_numberOfGaussPoint)
+    {
+      delete [] _numberOfGaussPoint;
+      _numberOfGaussPoint=(int *) NULL;
+    }
+  if(_numberOfElements)
+    {
+      delete [] _numberOfElements;
+      _numberOfElements=(int *) NULL;
+    }
+  if(_number)
+    {
+      delete _number;
+      _number=(MEDSKYLINEARRAY *) NULL;
+    }
+}
+
+/*!
   operator == This operator does not compare attributs _name and _description.
 */
 //--------------------------------------------------
@@ -773,3 +671,151 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
 
   return operatorReturn;
 };
+
+void SUPPORT::changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumberingFromOldToNew, int limitNbClassicPoly, const int *renumberingFromOldToNewPoly)
+{
+  if(entity != _entity)
+    throw MEDEXCEPTION("SUPPORT::changeElementsNbs : Renumbering on a mismatch entity");
+  list<int> newNbs;
+  if(!_isOnAllElts)
+    {
+      const int *oldNbs=_number->getValue();
+      for(int i=0;i<_totalNumberOfElements;i++)
+	{
+	  int globNb=oldNbs[i];
+	  if(globNb<=limitNbClassicPoly)
+	    newNbs.push_back(renumberingFromOldToNew[globNb-1]);
+	  else
+	    newNbs.push_back(renumberingFromOldToNewPoly[globNb-limitNbClassicPoly-1]);
+	}
+      newNbs.sort();
+      fillFromElementList(newNbs);
+    }
+  else
+    update();
+}
+
+/*!
+  Method that fills this and updates all its attributes in order to lye on the the listOfNode.
+ */
+void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION)
+{
+  setEntity(MED_EN::MED_NODE);
+  clearDataOnNumbers();
+  int size=listOfNode.size();
+  int totalNbInMesh=_mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
+  if(totalNbInMesh==size)
+    {
+    _isOnAllElts=true;
+    update();
+    return;
+    }
+  else
+    _isOnAllElts=false;
+  int numberOfGeometricType=1;
+  medGeometryElement* geometricType=new medGeometryElement[1];
+  geometricType[0]=MED_NONE;
+  int *numberOfGaussPoint=new int[1];
+  numberOfGaussPoint[0]=1;
+  int *numberOfElements=new int[1];
+  numberOfElements[0]=size;
+  int *mySkyLineArrayIndex=new int[2];
+  mySkyLineArrayIndex[0]=1;
+  mySkyLineArrayIndex[1]=1+numberOfElements[0];
+  int *tab=new int[numberOfElements[0]];
+  int i=0;
+  for(list<int>::const_iterator iter2=listOfNode.begin();iter2!=listOfNode.end();iter2++)
+    tab[i++]=*iter2;
+  MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(1,numberOfElements[0],mySkyLineArrayIndex,tab,true);
+  setNumberOfGeometricType(numberOfGeometricType);
+  setGeometricType(geometricType);
+  setNumberOfGaussPoint(numberOfGaussPoint);
+  setNumberOfElements(numberOfElements);
+  setTotalNumberOfElements(numberOfElements[0]);
+  setNumber(mySkyLineArray);
+  
+  delete[] numberOfElements;
+  delete[] numberOfGaussPoint;
+  delete[] geometricType;
+}
+
+/*
+  Method created to factorize code. This method fills the current SUPPORT on entity 'entity' containing all the entities contained in 
+  elements 'listOfElt' of entity 'entity'. Warning this method should be called after both the attributes this->_mesh and this->_entity are correctly set.
+ */
+void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION)
+{
+  clearDataOnNumbers();
+  int size=listOfElt.size();
+  int totalNbInMesh=_mesh->getNumberOfElementsWithPoly(_entity,MED_ALL_ELEMENTS);
+  if(totalNbInMesh==size){
+    _isOnAllElts=true;
+    update();
+    return;
+  }
+  else
+  _isOnAllElts=false;
+  // Well, we must know how many geometric type we have found
+  int * myListArray = new int[size] ;
+  int id = 0 ;
+  list<int>::const_iterator myElementsListIt ;
+  for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++)
+    myListArray[id++]=(*myElementsListIt) ;
+  int numberOfGeometricType ;
+  medGeometryElement* geometricType ;
+  int * numberOfGaussPoint ;
+  int * numberOfElements ;
+  int * mySkyLineArrayIndex ;
+
+  int numberOfType = _mesh->getNumberOfTypesWithPoly(_entity) ;
+  if (numberOfType == 1) {
+    numberOfGeometricType = 1 ;
+    geometricType = new medGeometryElement[1] ;
+    const medGeometryElement *  allType = _mesh->getTypes(_entity);
+    geometricType[0] = allType[0] ;
+    numberOfGaussPoint = new int[1] ;
+    numberOfGaussPoint[0] = 1 ;
+    numberOfElements = new int[1] ;
+    numberOfElements[0] = size ;
+    mySkyLineArrayIndex = new int[2] ;
+    mySkyLineArrayIndex[0]=1 ;
+    mySkyLineArrayIndex[1]=1+size ;
+  }
+  else {// hemmm
+    map<medGeometryElement,int> theType ;
+    for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++) {
+      medGeometryElement myType = _mesh->getElementTypeWithPoly(_entity,*myElementsListIt) ;
+      if (theType.find(myType) != theType.end() )
+	theType[myType]+=1 ;
+      else
+	theType[myType]=1 ;
+    }
+    numberOfGeometricType = theType.size() ;
+    geometricType = new medGeometryElement[numberOfGeometricType] ;
+    numberOfGaussPoint = new int[numberOfGeometricType] ;
+    numberOfElements = new int[numberOfGeometricType] ;
+    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
+    int index = 0 ;
+    mySkyLineArrayIndex[0]=1 ;
+    map<medGeometryElement,int>::iterator theTypeIt ;
+    for (theTypeIt=theType.begin();theTypeIt!=theType.end();theTypeIt++) {
+      geometricType[index] = (*theTypeIt).first ;
+      numberOfGaussPoint[index] = 1 ;
+      numberOfElements[index] = (*theTypeIt).second ;
+      mySkyLineArrayIndex[index+1]=mySkyLineArrayIndex[index]+numberOfElements[index] ;
+      index++ ;
+    }
+  }
+  MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray,true) ;
+  setNumberOfGeometricType(numberOfGeometricType) ;
+  setGeometricType(geometricType) ;
+  setNumberOfGaussPoint(numberOfGaussPoint) ;
+  setNumberOfElements(numberOfElements) ;
+  setTotalNumberOfElements(size) ;
+  setNumber(mySkyLineArray) ;
+
+  delete[] numberOfElements;
+  delete[] numberOfGaussPoint;
+  delete[] geometricType;
+}
+
