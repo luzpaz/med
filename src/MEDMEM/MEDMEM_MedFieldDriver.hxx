@@ -18,6 +18,9 @@
 
 namespace MEDMEM {
 template <class T> class FIELD;
+template <class T> class MED_FIELD_RDWR_DRIVER;
+template <class T> class MED_FIELD_RDONLY_DRIVER;
+template <class T> class MED_FIELD_WRONLY_DRIVER;
 
 template <class T> class MED_FIELD_DRIVER : public GENDRIVER
 {
@@ -86,9 +89,9 @@ public :
   virtual string getFieldName() const { return _fieldName; } 
 protected:
   virtual GENDRIVER * copy ( void ) const = 0 ;
-  friend class MED_FIELD_RDWR_DRIVER;
-  friend class MED_FIELD_RDONLY_DRIVER;
-  friend class MED_FIELD_WRONLY_DRIVER;
+  friend class MED_FIELD_RDWR_DRIVER<T>;
+  friend class MED_FIELD_RDONLY_DRIVER<T>;
+  friend class MED_FIELD_WRONLY_DRIVER<T>;
 };
 
 /*!
@@ -136,7 +139,7 @@ public :
   */
   void write( void ) const throw (MEDEXCEPTION) ;
 
-  friend class MED_FIELD_RDONLY_DRIVER;
+  friend class MED_FIELD_RDONLY_DRIVER<T>;
 };
 
 /*!
@@ -181,7 +184,7 @@ public :
   */
   void read ( void ) throw (MEDEXCEPTION) ;
 
-  friend class MED_FIELD_WRONLY_DRIVER;
+  friend class MED_FIELD_WRONLY_DRIVER<T>;
 };
 
 
@@ -224,7 +227,7 @@ public :
   */
   ~IMED_FIELD_RDWR_DRIVER() {}
 
-  friend class MED_FIELD_RDWR_DRIVER;
+  friend class MED_FIELD_RDWR_DRIVER<T>;
 };
 
 }

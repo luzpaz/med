@@ -1434,7 +1434,7 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 
       MESSAGE(LOC << "error returned from getNodesFamiliesNumber " << err);
 
-      MEDArrayCellFamily = new (int*)[_ptrMesh->getNumberOfTypesWithPoly(MED_CELL)] ;
+      MEDArrayCellFamily = new int* [_ptrMesh->getNumberOfTypesWithPoly(MED_CELL)] ;
       // ET SI IL N'Y A PAS DE CELLS ?
 
       medGeometryElement * myTypes = _ptrMesh->getTypesWithPoly(MED_CELL);
@@ -1454,7 +1454,7 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	  {
 	    // FACE
 	    MEDArrayFaceFamily = new
-	      (int*)[_ptrMesh->getNumberOfTypesWithPoly(MED_FACE)] ;
+	      int* [_ptrMesh->getNumberOfTypesWithPoly(MED_FACE)] ;
 
 	    myTypes = _ptrMesh->getTypesWithPoly(MED_FACE);
 	    for (int i=0;i<_ptrMesh->getNumberOfTypesWithPoly(MED_FACE);i++)
@@ -1471,7 +1471,7 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	  {
 	    // EDGE in 2D
 	    MEDArrayEdgeFamily = new
-	      (int*)[_ptrMesh->getNumberOfTypes(MED_EDGE)] ;
+	      int* [_ptrMesh->getNumberOfTypes(MED_EDGE)] ;
 
 	    const medGeometryElement *myTypes2 = _ptrMesh->getTypes(MED_EDGE);
 	    for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_EDGE);i++)
@@ -1488,7 +1488,7 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	if (_ptrMesh->_connectivity->_constituent->_constituent != NULL)
 	  {
 	    MEDArrayEdgeFamily = new
-	      (int*)[_ptrMesh->getNumberOfTypes(MED_EDGE)] ;
+	      int* [_ptrMesh->getNumberOfTypes(MED_EDGE)] ;
 
 	    const medGeometryElement *myTypes2 = _ptrMesh->getTypes(MED_EDGE);
 	    for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_EDGE);i++)
@@ -1657,7 +1657,7 @@ int  MED_MESH_RDONLY_DRIVER22::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
       err = MEDfamLire(_medIdt, const_cast <char *>
 		       (_ptrMesh->_name.c_str()), MEDArrayNodeFamily,
 		       _ptrMesh->getNumberOfNodes(), med_2_2::MED_NOEUD,
-		       (enum med_2_2::med_geometrie_element) MED_NONE);
+		       (med_2_2::med_geometrie_element) MED_NONE);
 
       if ( err != MED_VALID)
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "There is no family for the |"<< _ptrMesh->getNumberOfNodes() << "| nodes in mesh |" << _ptrMesh->_name.c_str() << "|"));
@@ -2410,7 +2410,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 
       err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
 		    MEDArrayNodeFamily, NumberOfNodes, med_2_2::MED_NOEUD,
-		    (enum med_2_2::med_geometrie_element) MED_NONE);
+		    (med_2_2::med_geometrie_element) MED_NONE);
 
 //     else
 //       err = MEDfamGridEcr(_medIdt,

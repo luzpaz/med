@@ -111,7 +111,7 @@
 	    return NULL;
 	  }
 
-	$1[i] = f;
+	$1.at(i) = f;
       }
   } 
   else
@@ -129,7 +129,7 @@
 
   for (int i=0;i<size;i++)
     {
-      PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FAMILY *),0);
+      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(FAMILY *),0);
 
       PyList_SetItem($result,i,tmp);
     }
@@ -163,7 +163,7 @@
 	    return NULL;
 	  }
 
-	$1[i] = s;
+	$1.at(i) = s;
       }
   } 
   else
@@ -181,7 +181,7 @@
 
   for (int i=0;i<size;i++)
     {
-      PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(SUPPORT *),0);
+      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(SUPPORT *),0);
 
       PyList_SetItem($result,i,tmp);
     }
@@ -1111,14 +1111,14 @@ public :
 	return self->getSkin(Support3D);
       }
 
-    %newobject mergeSupports(const vector<SUPPORT *> );
-    SUPPORT * mergeSupports(const vector<SUPPORT *> Supports)
+    %newobject mergeSupports( vector<SUPPORT *> );
+    SUPPORT * mergeSupports( vector<SUPPORT *> Supports)
       {
 	return self->mergeSupports(Supports);
       }
 
-    %newobject intersectSupports(const vector<SUPPORT *> );
-    SUPPORT * intersectSupports(const vector<SUPPORT *> Supports)
+    %newobject intersectSupports( vector<SUPPORT *> );
+    SUPPORT * intersectSupports( vector<SUPPORT *> Supports)
       {
 	return self->intersectSupports(Supports);
       }

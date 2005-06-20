@@ -106,9 +106,9 @@ public :
 
 
 template <class T> inline MEDARRAY<T>::MEDARRAY():
-			_ldValues(0), _lengthValues(0), _mode(MED_FULL_INTERLACE),
-			_valuesFull(), _valuesNo(),
-	      		_valuesDefault(), _valuesOther()
+  _ldValues(0), _lengthValues(0), _mode(MED_EN::MED_FULL_INTERLACE),
+  _valuesFull(), _valuesNo(),
+  _valuesDefault(), _valuesOther()
 {
 };
 

@@ -75,23 +75,23 @@ public :
     BEGIN_OF(LOC);
 
     // we must set fieldname before open, because we must find field number in file (if it exist !!!)
-    if ( _fileName == "" )
+    if ( MED_FIELD_DRIVER<T>::_fileName == "" )
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
 				       << "_fileName is |\"\"|, please set a correct fileName before calling open()"
 				       )
 			    );
 
-    MESSAGE(LOC<<"_fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
-    _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (_fileName.c_str())),(med_2_1::med_mode_acces) _accessMode);
+    MESSAGE(LOC<<"_fileName.c_str : "<< MED_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< MED_FIELD_DRIVER<T>::_accessMode);
+    _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (MED_FIELD_DRIVER<T>::_fileName.c_str())),(med_2_1::med_mode_acces) MED_FIELD_DRIVER<T>::_accessMode);
     MESSAGE(LOC<<"_medIdt : "<< _medIdt );
     if (_medIdt > 0) 
-      _status=MED_OPENED;
+      MED_FIELD_DRIVER<T>::_status=MED_OPENED;
     else {
-      _status = MED_INVALID;
-      _medIdt = MED_INVALID;
+      MED_FIELD_DRIVER<T>::_status = MED_INVALID;
+      MED_FIELD_DRIVER21<T>::_medIdt = MED_INVALID;
       throw MED_EXCEPTION (LOCALIZED( STRING(LOC) 
-				      << "Can't open |"  << _fileName 
-				      << "|, _medIdt : " << _medIdt
+				      << "Can't open |"  << MED_FIELD_DRIVER<T>::_fileName 
+				      << "|, _medIdt : " << MED_FIELD_DRIVER21<T>::_medIdt
 				      )
 			   );
     }
@@ -102,12 +102,12 @@ public :
   void close() {
     BEGIN_OF("MED_FIELD_DRIVER21::close()");
     med_2_1::med_int err = 0;
-    if (_status == MED_OPENED) {
-      err=med_2_1::MEDfermer(_medIdt);
+    if (MED_FIELD_DRIVER<T>::_status == MED_OPENED) {
+      err=med_2_1::MEDfermer(MED_FIELD_DRIVER21<T>::_medIdt);
       //H5close(); // If we call H5close() all the files are closed.
-      _status = MED_CLOSED;
-      _medIdt = MED_INVALID;
-      MESSAGE(" MED_FIELD_DRIVER21::close() : MEDfermer : _medIdt= " << _medIdt );
+      MED_FIELD_DRIVER<T>::_status = MED_CLOSED;
+      MED_FIELD_DRIVER21<T>::_medIdt = MED_INVALID;
+      MESSAGE(" MED_FIELD_DRIVER21::close() : MEDfermer : MED_FIELD_DRIVER<T>::_medIdt= " << _medIdt );
       MESSAGE(" MED_FIELD_DRIVER21::close() : MEDfermer : err    = " << err );
     }
     END_OF("MED_FIELD_DRIVER21::close()");
@@ -391,7 +391,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
 	    //  	      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
 	    //  					       <<  "Be careful there is no compound for field n°" 
 	    //  					       << i << "in file |"<<_fileName<<"| !"));
-	    MESSAGE(LOC<<"Be careful there is no compound for field n°"<<i<<"in file |"<<_fileName<<"| !");
+	    MESSAGE(LOC<<"Be careful there is no compound for field n°"<<i<<"in file |"<<MED_FIELD_DRIVER<T>::_fileName<<"| !");
 
 	  componentName = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;
 	  unitName      = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;   
@@ -447,7 +447,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
       int * NumberOfValues = new int[NumberOfTypes] ;
       int TotalNumberOfValues = 0 ;
       MESSAGE ("NumberOfTypes :"<< NumberOfTypes);
-      _ptrField->_numberOfValues=0 ;
+      MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues=0 ;
       for (int i=0; i<NumberOfTypes; i++) {
 	MESSAGE ("Type["<<i+1<<"] :"<< Types[i]);
 	MESSAGE ("Entity :"<<MED_FIELD_DRIVER<T>::_ptrField->_support->getEntity());

@@ -14,7 +14,6 @@
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Array.hxx"
 #include "MEDMEM_Support.hxx"
-//#include "MEDMEM_Field.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_CellModel.hxx"
 
@@ -547,7 +546,7 @@ namespace MEDMEM {
 
   template <class T>   VTK_FIELD_DRIVER<T>::VTK_FIELD_DRIVER():
     GENDRIVER(),
-    _ptrField((FIELD<T> *)MED_NULL),
+    _ptrField((FIELD<T> *)0),
     _fieldName(""),
     _fieldNum(MED_INVALID)
   {
