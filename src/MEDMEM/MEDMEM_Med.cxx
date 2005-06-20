@@ -633,6 +633,32 @@ FIELD_  * MED::getField          ( const string & fieldName, const int dt=MED_NO
   
 };
 
+/*!
+ Return a reference to the FIELD object named fieldName with 
+ time and iteration nb it.
+*/
+FIELD_  *MED::getField2(const string & fieldName, double time, int it) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "MED::getField2 ( const string &, const int, const int ) const : ";
+  const double eps=1e-9;
+  map<FIELD_NAME_,MAP_DT_IT_>::const_iterator itFields=_fields.find(fieldName);
+  if ( itFields == _fields.end() ) 
+    throw MED_EXCEPTION (LOCALIZED( STRING(LOC) << "There is no known field named |" << fieldName << "|"));
+  MAP_DT_IT_::const_iterator iters=(*itFields).second.begin();
+  bool found=false;
+  FIELD_  *ret;
+  for(;iters!=(*itFields).second.end() && !found;iters++)
+    if(fabs((*iters).second->getTime()-time)<eps)
+      //if(it==(*iters).first.it)
+	{
+	  ret=(*iters).second;
+	  found=true;
+	}
+  if(!found)
+    throw MED_EXCEPTION(LOCALIZED( STRING(LOC) << "There is no known field existing at specified time and iteration !!! "));
+  return ret;
+  END_OF(LOC);
+}
 
 // fiend ostream & MED::operator<<(ostream &os,const MED & med) const {
 //   return os;

@@ -19,8 +19,6 @@ using namespace std;
 using namespace MED_EN;
 using namespace MEDMEM;
 
-#define MED_NULL     NULL
-
 // geometric types conversion from PORFLOW -> MED
 const size_t PORFLOW_MESH_DRIVER::nb_geometrie_porflow;
 const medGeometryElement PORFLOW_MESH_DRIVER::geomPORFLOWtoMED[nb_geometrie_porflow] =
@@ -194,19 +192,17 @@ inline int PORFLOW_MESH_DRIVER::geomMEDtoPorflow(medGeometryElement medGeo)
 // Correspondance between the number of nodes and the Med face geometric type
 inline static medGeometryElement get2DMedGeomType(int nbSommets)
 {
-  switch (nbSommets)
+    switch (nbSommets)
     {
-    case 2:
-      return MED_SEG2;
-      break;
-    case 3:
-      return MED_TRIA3;
-      break;
-    case 4:
-      return MED_QUAD4;
-      break;
-    default:
-      throw MED_EXCEPTION ("the argument of this method is somehow bad fifferent from 2, 3, 4");
+	case 2:
+	    return MED_SEG2;
+	    break;
+	case 3:
+	    return MED_TRIA3;
+	    break;
+	case 4:
+	    return MED_QUAD4;
+	    break;
     } 
 }
 
@@ -402,7 +398,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the syntax corresponding to the use of input file is not implemented
 	if ( isKeyWord(buf_ligne,"LOCA") )
 	{
-	    MESSAGE("Mot cle LOCA detecte") ;
+	    MESSAGE("Mot clé LOCA détecté");
 	    processLoca=true;
 	    // if currentGroup is not empty, a group has been precessed 
 	    //  -> we store it, clear currentGroup, and start the precessing of a new group
@@ -440,7 +436,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the syntax corresponding to structured grids is not implemented
 	else if ( isKeyWord(buf_ligne,"GRID") )
 	{
-	    MESSAGE("Mot cle GRID detecte");
+	    MESSAGE("Mot clé GRID détecté");
 	    processLoca=false;
 	    pos=buf_ligne.find("UNST",0);
 	    if ( pos != string::npos ) // unstructured grid
@@ -472,7 +468,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the default option is HYBR
 	else if ( isKeyWord(buf_ligne,"CONN") )
 	{
-	    MESSAGE("Mot cle CONN detecte");
+	    MESSAGE("Mot clé CONN détecté");
 	    processLoca=false;
 	    string fileCONN=getPorflowFileName(buf_ligne,"CONN");
 	    
@@ -482,6 +478,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 
 	    if(fileCONN.rfind('/') == string::npos)
 		// no directory was specified -> we add dirName, which may be empty
+
 		connFileName=dirName+fileCONN;
 	    else
 		connFileName=fileCONN;
@@ -492,7 +489,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   expected syntax : COOR {VERT} {filename}
 	else if ( isKeyWord(buf_ligne,"COOR") )
 	{
-	    MESSAGE("Mot cle COOR detecte");
+	    MESSAGE("Mot clé COOR");
 	    processLoca=false;
 	    string fileCOOR=getPorflowFileName(buf_ligne,"COOR");
 
@@ -565,11 +562,12 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	if ( isGroupAList[i] ) 
 	{
 	    // medi.groupes[i].groupes is a vector of element numbers; it points to it
+  	    medi.groupes[i].mailles.resize( medi.groupes[i].groupes.size() );
 	    std::vector<int>::const_iterator it=medi.groupes[i].groupes.begin();
-	    for(  ; it!=medi.groupes[i].groupes.end(); ++it)
+	    for(int j = 0 ; it!=medi.groupes[i].groupes.end(); ++it, ++j)
 	    {
 		// insert the iterator to the corresponding cell we stored in p_ma_table
-		medi.groupes[i].mailles.insert( p_ma_table[*it] );
+		medi.groupes[i].mailles[j] = p_ma_table[*it];
 	    }
 	    
 	}
@@ -578,12 +576,14 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	    int nelem=0;
 	    int nface=0;
 	    int ngeom=0;
+	    int ielem=0;
 	    std::set<_maille>::iterator p_ma;
 	    _maille maille2D;
 	    
 	    // medi.groupes[i].groupes is a vector of paired element and surface numbers
 	    // *it points to the element number,  *(it+1) points to the surface number
 	    std::vector<int>::const_iterator it=medi.groupes[i].groupes.begin();
+	    medi.groupes[i].mailles.resize( medi.groupes[i].groupes.size() / 2 );
 	    for(  ; it!=medi.groupes[i].groupes.end(); ++it)
 	    {
 		nelem=*it;
@@ -602,17 +602,17 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 		maille2D.sommets.resize(l);
 		maille2D.geometricType = get2DMedGeomType(l);
 		p_ma = medi.maillage.insert(maille2D).first; // we insert the face in our mesh
-		medi.groupes[i].mailles.insert(p_ma); // and insert an iterator on it in our group
+		medi.groupes[i].mailles[ielem++]=p_ma; // and insert an iterator on it in our group
 		maille2D.sommets.clear();
 	    }
 
 	}
-	// medi.groupes[i].groupes.clear(); // we don't need element numbers anymore
+        medi.groupes[i].groupes.clear(); // we don't need element numbers anymore
 	
     }
 
     p_ma_table.clear(); // we don't need it anymore
-    MESSAGE(LOC << "GIBI_MESH_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
+    MESSAGE(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
     MESSAGE(LOC <<  medi );
 	    // TRANSFORMATION EN STRUCTURES MED
     if ( ! _ptrMesh->isEmpty() )
@@ -643,7 +643,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 
 	// appele en dernier car cette fonction detruit le maillage intermediaire!
 	_ptrMesh->_connectivity = medi.getConnectivity(); 
-	MESSAGE(LOC << "GIBI_MESH_RDONLY_DRIVER::read : FIN ");
+	MESSAGE(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : FIN ");
 
 	// calcul de la connectivite d-1 complete, avec renumerotation des groupes
 	// if (_ptrMesh->_spaceDimension==3)

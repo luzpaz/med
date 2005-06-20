@@ -5,14 +5,9 @@
 #include "MEDMEM_GibiMeshDriver.hxx"
 #include "MEDMEM_PorflowMeshDriver.hxx"
 #include "MEDMEM_VtkMeshDriver.hxx"
-
 #include "MEDMEM_VtkMedDriver.hxx"
 
-//#include "MEDMEM_Field.hxx"
-
 #include "MEDMEM_Exception.hxx"
-//#include "MEDMEM_STRING.hxx"
-//#include "utilities.h"
 
 #include "MEDMEM_MedVersion.hxx"
 #include "MEDMEM_Compatibility21_22.hxx"
@@ -23,6 +18,17 @@
 
 using namespace MEDMEM;
 using namespace MED_EN;
+
+template<>
+void fill<-1,0x3>(double *a, const double *b)
+{
+}
+
+template<>
+bool compare<-1>(const double *a, const double *b)
+{
+  return false;
+}
 
 medFileVersion DRIVERFACTORY::getMedFileVersionForWriting()
 {

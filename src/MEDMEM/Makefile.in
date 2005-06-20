@@ -53,6 +53,7 @@ MEDMEM_Group.hxx \
 MEDMEM_Array.hxx \
 MEDMEM_Exception.hxx \
 MEDMEM_MedFieldDriver.hxx \
+MEDMEM_AsciiFieldDriver.hxx \
 MEDMEM_Med.hxx \
 MEDMEM_MedMedDriver.hxx \
 MEDMEM_MedMeshDriver.hxx \
@@ -70,6 +71,7 @@ MEDMEM_STRING.hxx \
 MEDMEM_Support.hxx \
 MEDMEM_Unit.hxx \
 MEDMEM_Grid.hxx \
+MEDMEM_RCBase.hxx \
 MEDMEM_medimport_src.hxx \
 MEDMEM_MedVersion.hxx \
 MEDMEM_Compatibility21_22.hxx \

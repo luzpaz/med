@@ -27,7 +27,6 @@ SUPPORT::SUPPORT(): _name(""),	_description("None"), _mesh((MESH*)NULL),
 		    _entity(MED_CELL), _numberOfGeometricType(0),
 	    	    _geometricType((medGeometryElement*)NULL),
 		    _numberOfGaussPoint((int*)NULL),
-		    //_geometricTypeNumber((int*)NULL),
 		    _isOnAllElts(false),
 		    _numberOfElements((int*)NULL),
 		    _totalNumberOfElements(0),
@@ -46,7 +45,6 @@ SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL
 		_numberOfGeometricType(0),
 		_geometricType((medGeometryElement*)NULL),
 		_numberOfGaussPoint((int*)NULL),
-		//_geometricTypeNumber((int*)NULL),
 		_isOnAllElts(true), 
 		_numberOfElements((int*)NULL),
 		_totalNumberOfElements(0),
@@ -86,13 +84,6 @@ SUPPORT::SUPPORT(const SUPPORT & m)
     }
   else
     _numberOfGaussPoint = (int *) NULL;
-//    if (m._geometricTypeNumber != NULL)
-//      {
-//        _geometricTypeNumber = new int[m._numberOfGeometricType];
-//        memcpy(_geometricTypeNumber,m._geometricTypeNumber,m._numberOfGeometricType*sizeof(int));
-//      }
-//    else
-//      _geometricTypeNumber = (int *) NULL;
   _isOnAllElts = m._isOnAllElts;
   if (m._numberOfElements != NULL)
     {
@@ -281,7 +272,13 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   _numberOfGaussPoint = new int[NumberOfGeometricType];
   int * index = new int[_numberOfGeometricType+1];
   index[0]=1;
+  int elemDim = -1;
   for (int i=0;i<_numberOfGeometricType;i++) {
+    if(GeometricType[i]/100 != elemDim)
+      if(i==0)
+	elemDim=GeometricType[i]/100;
+      else
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"unhomogeneous geometric types (dimension) !"));
     _geometricType[i] = GeometricType[i] ;
     _numberOfElements[i] = NumberOfElements[i] ;
     _numberOfGaussPoint[i] = 1 ;
@@ -442,157 +439,84 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
 void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
 //-------------------
 {
-  const char * LOC = "SUPPORT::intersecting(SUPPORT *) : " ;
-  BEGIN_OF(LOC) ;
-
-  MESSAGE(LOC<< "SUPPORT entry : " << *mySupport) ;
-
-  MESSAGE(LOC<< "SUPPORT (calling object) : " << *this) ;
-
-  // on same entity :
-  if ( _entity != mySupport->getEntity() )
+  const char * LOC="SUPPORT::intersecting(SUPPORT *) : ";
+  BEGIN_OF(LOC);
+  if (_entity!=mySupport->getEntity())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entities are different !"));
-
-  int * tmp_NumberOfElementsInType = new int[MED_NBR_GEOMETRIE_MAILLE];
-  medGeometryElement * myType = new medGeometryElement[MED_NBR_GEOMETRIE_MAILLE];
-  int * whereIsType = new int[MED_NBR_GEOMETRIE_MAILLE];
-  //MESH_ENTITIES myMeshEntities() ;
-  list<MED_EN::medGeometryElement>::const_iterator listIt ;
-  int it=0 ;
-  for(listIt=(meshEntities[_entity]).begin();listIt!=(meshEntities[_entity]).end();listIt++) {
-    tmp_NumberOfElementsInType[it]=0;
-    whereIsType[it]=0 ;
-    myType[it]= MED_NONE;
-    try {
-      tmp_NumberOfElementsInType[it]+=getNumberOfElements((medGeometryElement)(*listIt)) ;
-      whereIsType[it]+=1 ;
+  if(!(*_mesh == *mySupport->getMesh()))
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Mesh are different !"));
+  if(mySupport->isOnAllElements())
+    return;
+  if(_isOnAllElts)
+    {
+      *this=*mySupport;
+      return;
     }
-    catch (const MEDEXCEPTION & ex) {};
-    try {
-      tmp_NumberOfElementsInType[it]+=mySupport->getNumberOfElements((medGeometryElement)(*listIt)) ;
-      whereIsType[it]+=2 ;
+  if(_totalNumberOfElements==0)
+    return;
+  const int *ids=getNumber(MED_ALL_ELEMENTS);
+  set<int> idsSet(ids,ids+getNumberOfElements(MED_ALL_ELEMENTS));
+  const int *idsMySupport=mySupport->getNumber(MED_ALL_ELEMENTS);
+  int mySupportSize=mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
+  set<int> idsSetMySupport(idsMySupport,idsMySupport+mySupportSize);
+  set<int>::iterator iter;
+  list<int> idsList;
+  for(iter=idsSet.begin();iter!=idsSet.end();iter++)
+    if(idsSetMySupport.find(*iter)!=idsSetMySupport.end())
+      idsList.push_back(*iter);
+  int size=idsSet.size();
+  if(size!=0)
+    {
+      if(_entity==MED_NODE)
+	fillFromNodeList(idsList);
+      else
+	fillFromElementList(idsList);
     }
-    catch (const MEDEXCEPTION & ex) {};
-    if (whereIsType[it]==3) {
-      myType[it]=(medGeometryElement)(*listIt) ;
-      it++;
+  else
+    {
+      clearDataOnNumbers();
     }
-  }
-
-  MESSAGE("it = "<< it);
-
-  // set new value :
-  int * numberOfElements=_numberOfElements ;
-  _numberOfElements = new int[it] ;
-  _totalNumberOfElements = 0 ;
-  //int totalSize = 0 ;
-  int ** tmp_array = new int*[it];
-  for (int i=0;i<it;i++) {
-    int numberOfElementsInType = tmp_NumberOfElementsInType[i] ;
-    _numberOfElements[i] = numberOfElementsInType ;
-    tmp_array[i] = new int[numberOfElementsInType] ;
-    _totalNumberOfElements+=numberOfElementsInType ;
-    if (whereIsType[i] == 3) {
-      const int * number1 = getNumber(myType[i]) ;
-      const int * number2 = mySupport->getNumber(myType[i]) ;
-
-      SCRUTE(number1);
-      SCRUTE(number2);
-
-      int numberOfElements1 = numberOfElements[i] ;
-      int numberOfElements2 = mySupport->getNumberOfElements(myType[i]) ;
-
-      SCRUTE(numberOfElements1);
-      SCRUTE(numberOfElements2);
-
-      set<int> setList1(number1,number1+numberOfElements1);
-      set<int> setList2(number2,number2+numberOfElements2);
-
-      for(set<int>::iterator its=setList1.begin();its!=setList1.end(); its++)
-	{
-	  MESSAGE("Number1 " << *its);
-	}
-
-      for(set<int>::iterator its=setList2.begin();its!=setList2.end(); its++)
-	{
-	  MESSAGE("Number2 " << *its);
-	}
-
-      set<int> setListIntersect;
-
-      set_intersection(setList1.begin(),setList1.end(),setList2.begin(),
-		       setList2.end(),inserter(setListIntersect,
-					       setListIntersect.begin()));
-
-      for(set<int>::iterator its=setListIntersect.begin();
-	  its!=setListIntersect.end(); its++)
-	{
-	  MESSAGE("Number1 intersect Number2 " << *its);
-	}
-
-      int newNumberOfElements = setListIntersect.size() ;
-
-      SCRUTE(newNumberOfElements);
-
-      _numberOfElements[i] = newNumberOfElements ;
-      int * tmp_arrayNew = new int[newNumberOfElements];
-
-      int ii = 0 ;
-
-      for(set<int>::iterator its=setListIntersect.begin();
-	  its!=setListIntersect.end(); its++) {
-	tmp_arrayNew[ii]=*its ;
-	SCRUTE(tmp_arrayNew[ii]);
-	ii++;
-      }
-
-      delete[] tmp_array[i] ;
-      tmp_array[i] = tmp_arrayNew ;
-      _totalNumberOfElements-=(numberOfElementsInType-newNumberOfElements) ;
-
-    } else
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"ERROR")) ;
-  }
-  delete[] whereIsType ;
-  delete[] tmp_NumberOfElementsInType ;
-
-  _numberOfGeometricType = it ;
-  medGeometryElement * geometricType=_geometricType ;
-  _geometricType = new medGeometryElement[it] ;
-  int * numberOfGaussPoint=_numberOfGaussPoint ;
-  _numberOfGaussPoint= new int[it] ;
-
-  int size = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
-  if (_totalNumberOfElements == size) _isOnAllElts = true;
-
-  int * numberValue = new int[_totalNumberOfElements] ;
-  int * numberIndex = new int[it+1] ;
-  numberIndex[0]=1;
-  for (int i=0;i<it;i++) {
-    memcpy(numberValue+numberIndex[i]-1,tmp_array[i],sizeof(int)*_numberOfElements[i]) ;
-    delete[] tmp_array[i] ;
-    numberIndex[i+1]=numberIndex[i]+_numberOfElements[i] ;
-
-    _geometricType[i]=myType[i] ;
-    _numberOfGaussPoint[i]=1 ;
-  }
-  if ( _number != (MEDSKYLINEARRAY *) NULL) delete _number ;
-
-  _number = new MEDSKYLINEARRAY(it,_totalNumberOfElements,numberIndex,numberValue);
-  delete[] numberIndex;
-
-  delete[] numberValue;
-
-  delete[] myType ;
-  delete[] tmp_array ;
-
-  delete[] geometricType ;
-  delete[] numberOfGaussPoint ;
-//    delete[] geometricTypeNumber ;
-  delete[] numberOfElements ;
-
   END_OF(LOC);
 };
+
+/*!
+  operator = perform et deep copy except for attribute _mesh
+ */
+SUPPORT& MEDMEM::SUPPORT::operator=(const SUPPORT &other)
+{
+  const char * LOC = "SUPPORT::operator=(const SUPPORT & m) : ";
+  BEGIN_OF(LOC);
+
+  _name=other._name;
+  _description=other._description;
+  _mesh=other._mesh;
+  _entity=other._entity;
+  _isOnAllElts=other._isOnAllElts;
+  clearDataOnNumbers();
+  _numberOfGeometricType=other._numberOfGeometricType;
+  _totalNumberOfElements=other._totalNumberOfElements;
+
+  if(other._geometricType != NULL)
+    {
+      _geometricType=new medGeometryElement[other._numberOfGeometricType];
+      memcpy(_geometricType,other._geometricType,other._numberOfGeometricType*sizeof(medGeometryElement));
+    }
+  if (other._numberOfGaussPoint != NULL)
+    {
+      _numberOfGaussPoint=new int[other._numberOfGeometricType];
+      memcpy(_numberOfGaussPoint,other._numberOfGaussPoint,other._numberOfGeometricType*sizeof(int));
+    }
+  if(other._numberOfElements != NULL)
+    {
+      _numberOfElements=new int[_numberOfGeometricType];
+      memcpy(_numberOfElements,other._numberOfElements,_numberOfGeometricType*sizeof(int));
+    }
+  if(!_isOnAllElts)
+    {
+      _number=new MEDSKYLINEARRAY(* other._number);
+    }
+  return *this;
+}
 
 /*!
   Method that cleans up all the fields related to _numbers. Defined for code factorization.
@@ -638,9 +562,9 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
 
   bool operatorReturn = false;
 
-  operatorReturn = (_mesh == support._mesh) && (_entity == support._entity) &&
+  operatorReturn = (*_mesh == *support._mesh) && (_entity == support._entity) &&
     (_numberOfGeometricType == support._numberOfGeometricType) &&
-    (_isOnAllElts == support._isOnAllElts) &&
+    ((_isOnAllElts && support._isOnAllElts) || (!_isOnAllElts && !support._isOnAllElts)) &&
     (_totalNumberOfElements == support._totalNumberOfElements);
 
   if (operatorReturn)
@@ -696,6 +620,295 @@ void SUPPORT::changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumbe
 }
 
 /*!
+  operator == + in case false a test if coordinates and connectivity of _mesh and support->_mesh are the same
+*/
+bool MEDMEM::SUPPORT::deepCompare(const SUPPORT &support) const
+{
+  bool operatorReturn =(_entity == support._entity) &&
+    (_numberOfGeometricType == support._numberOfGeometricType) &&
+    ( (_isOnAllElts && support._isOnAllElts) || (!_isOnAllElts  && !support._isOnAllElts) ) &&
+    (_totalNumberOfElements == support._totalNumberOfElements);
+  if (operatorReturn)
+    {
+      if (!_isOnAllElts)
+	{
+	  for (int i=0; i<_numberOfGeometricType && operatorReturn; i++)
+	    {
+	      operatorReturn = (_geometricType[i] == support._geometricType[i]) &&
+		(_numberOfElements[i] == support._numberOfElements[i]) &&
+		(_numberOfGaussPoint[i] == support._numberOfGaussPoint[i]);
+	      if (operatorReturn)
+		{
+		  for (int j=0; j<_numberOfElements[i]; j++)
+		    {
+		      operatorReturn = (getNumber(_geometricType[i])[j] ==
+			 support.getNumber(_geometricType[i])[j]);
+		    }
+		}
+	    }
+	}
+    }
+  if(operatorReturn)
+    {
+      if(!(*_mesh == *support._mesh))
+	{
+	  return _mesh->deepCompare(*support._mesh);
+	}
+    }
+  return operatorReturn;
+}
+
+/*!
+ States if this is included in other.
+ */
+bool MEDMEM::SUPPORT::belongsTo(const SUPPORT& other, bool deepCompare) const
+{
+  if(!(*_mesh == *other._mesh))
+    {
+      if(!deepCompare)
+	return false;
+      if(!_mesh->deepCompare(*other._mesh))
+	return false;
+    }
+  if(_entity!=other._entity)
+    return false;
+  if(other._isOnAllElts)
+    return true;
+  if(_isOnAllElts && !other._isOnAllElts)
+    return false;
+  if(_numberOfGeometricType>other._numberOfGeometricType)
+    return false;
+  for(int i=0; i<_numberOfGeometricType; i++)
+    {
+      MED_EN::medGeometryElement curGeomType=_geometricType[i];
+      int iOther=-1;
+      for(int j=0; j<other._numberOfGeometricType; j++)
+	  if(other._geometricType[j]==curGeomType)
+	      iOther=j;
+      if(iOther==-1)
+	return false;
+      if(_numberOfElements[i]>other._numberOfElements[iOther])
+	return false;
+      const int *numbers1=_number->getI(i+1);
+      const int *numbers2=other._number->getI(iOther+1);
+      for (int k=0; k<_numberOfElements[i]; k++)
+	{
+	  bool found=false;
+	  for(int l=0;l<other._numberOfElements[iOther] && !found;l++)
+	    {
+	      if(numbers1[k]==numbers2[l])
+		found=true;
+	    }
+	  if(!found)
+	    return false;
+	}
+    }
+  return true;
+}
+/*!
+  Method used to sort array of id.
+ */
+int compareId(const void *x, const void *y)
+{
+  const int *x1=(const int *)x;
+  const int *y1=(const int *)y;
+  if(*x1<*y1)
+    return -1;
+  else if(*x1>*y1)
+    return 1;
+  else
+    return 0;
+}
+
+/*!
+  performs a common operation : Sub builds a sorted int array that is obtained by supression of all ids contained
+  in array defined by (idsToSuppress,lgthIdsToSuppress) from array [start ... end]
+  Example sub(0,7,{1,2,5},3) => {0,3,4,6,7} - WARNING returned list should be deallocated !
+ */
+list<int> *MEDMEM::SUPPORT::sub(int start,int end,const int *idsToSuppress,int lgthIdsToSuppress)
+{
+  int size=end-start+1;
+  int sizeRet=size-lgthIdsToSuppress;
+  list<int> *ret;
+  if(sizeRet<0)
+    throw MEDEXCEPTION("MEDMEM::SUPPORT::sub");
+  else if(sizeRet==0)
+    {
+      return 0;
+    }
+  if(idsToSuppress==0)
+    {
+      ret=new list<int>;
+      for(int l=0;l<size;l++)
+	ret->push_back(start+l);
+      return ret;
+    }
+  ret=new list<int>;
+  int *temp=new int[lgthIdsToSuppress];
+  memcpy(temp,idsToSuppress,sizeof(int)*lgthIdsToSuppress);
+  qsort(temp,lgthIdsToSuppress,sizeof(int),compareId);
+  int k=0;
+  for(int i=start;i<=end;i++)
+    if(temp[k]!=i)
+      ret->push_back(i);
+    else
+      k++;
+  delete [] temp;
+  return ret;
+}
+
+/*!
+  performs a common operation : Sub builds a sorted int array that is obtained by supression of all ids contained
+  in array defined by (idsToSuppress,lgthIdsToSuppress) from array [start ... end]
+  Example sub({1,3,4,5,6,7,9},7,{1,2,5},3) => {3,4,6,7,9}  - WARNING returned list should be deallocated !
+ */
+list<int> *MEDMEM::SUPPORT::sub(const int *ids,int lgthIds,const int *idsToSuppress,int lgthIdsToSuppress)
+{
+  list<int> *ret;
+  int i,j=0;
+  if(lgthIds<0)
+    throw MEDEXCEPTION("MEDMEM::SUPPORT::sub");
+  else if(lgthIds==0)
+    return 0;
+  ret=new list<int>;
+  int *temp1=new int[lgthIds];
+  memcpy(temp1,ids,sizeof(int)*lgthIds);
+  qsort(temp1,lgthIds,sizeof(int),compareId);
+  int *temp2=new int[lgthIdsToSuppress];
+  memcpy(temp2,idsToSuppress,sizeof(int)*lgthIdsToSuppress);
+  qsort(temp2,lgthIdsToSuppress,sizeof(int),compareId);
+  for(i=0;i<lgthIds;)
+    {
+      if(j>=lgthIdsToSuppress)
+	  ret->push_back(temp1[i++]);
+      else if(temp1[i]>temp2[j])
+	j++;
+      else if(temp1[i]<temp2[j])
+	ret->push_back(temp1[i++]);
+      else
+	i++;
+    }
+  delete [] temp1;
+  delete [] temp2;
+  return ret;
+}
+
+/*!
+  returns a new SUPPORT (responsability to caller to destroy it)
+  that is the complement to "this", lying on the same entity than "this".
+ */
+SUPPORT *MEDMEM::SUPPORT::getComplement() const
+{
+  SUPPORT *ret;
+  const int nbOfElt=_mesh->getNumberOfElements(_entity,MED_EN::MED_ALL_ELEMENTS);
+  int nbOfEltInSupp=getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  if(_isOnAllElts || nbOfElt==nbOfEltInSupp)
+    {
+      ret=new SUPPORT;
+      ret->setMesh(_mesh);
+      ret->setEntity(_entity);
+      string name="Complement of ";
+      name+=_name;
+      ret->setName(name);
+      return ret;
+    }
+  const int *nbs=_number->getValue();
+  list<int> *ids=sub(1,nbOfElt,nbs,nbOfEltInSupp);
+  if(_entity==MED_EN::MED_NODE)
+    ret=_mesh->buildSupportOnNodeFromElementList(*ids,_entity);
+  else
+    ret=_mesh->buildSupportOnElementsFromElementList(*ids,_entity);
+  delete ids;
+  return ret;
+}
+
+/*!
+  returns a new support the user should delete.
+ */
+SUPPORT *MEDMEM::SUPPORT::substract(const SUPPORT& other) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "SUPPORT *MEDMEM::subtract(const SUPPORT * other) : ";
+  BEGIN_OF(LOC);
+  SUPPORT *ret;
+  if (_entity!=other.getEntity())
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entities are different !"));
+  if(!(*_mesh == *other.getMesh()))
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Mesh are different !"));
+  if(other._isOnAllElts)
+    {
+      ret=new SUPPORT;
+      ret->setMesh(_mesh);
+      ret->setEntity(_entity);
+      return ret;
+    }
+  if(_isOnAllElts)
+    return other.getComplement();
+  int nbOfEltInThis=getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  const int *nbsThis=_number->getValue();
+  int nbOfEltInOther=other.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  const int *nbsOther=other._number->getValue();
+  list<int> *ids=sub(nbsThis,nbOfEltInThis,nbsOther,nbOfEltInOther);
+  if(_entity==MED_EN::MED_NODE)
+    ret=_mesh->buildSupportOnNodeFromElementList(*ids,_entity);
+  else
+    ret=_mesh->buildSupportOnElementsFromElementList(*ids,_entity);
+  delete ids;
+  return ret;
+  END_OF(LOC);
+}
+
+/*!
+  returns a new support the user has to delete. Entity is either MED_NODE to obtain node elements lying on boundary of "this"
+  or MED_FACE,MED_EDGE (depends on the this->_mesh dimension).
+ */
+SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) : ";
+  BEGIN_OF(LOC);
+  int spaceDimension=_mesh->getSpaceDimension();
+  MED_EN::medEntityMesh baseEntity=Entity;
+  if (spaceDimension == 3) 
+    if (Entity!=MED_FACE)
+      if(Entity==MED_NODE)
+	baseEntity=MED_FACE;
+      else
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
+  if (spaceDimension == 2) 
+    if (Entity!=MED_EDGE)
+      if(Entity==MED_NODE)
+	baseEntity=MED_EDGE;
+      else
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
+  if(_isOnAllElts)
+    return _mesh->getBoundaryElements(Entity);
+
+  const int * myConnectivityValue=_mesh->getReverseConnectivity(MED_DESCENDING);
+  const int * myConnectivityIndex=_mesh->getReverseConnectivityIndex(MED_DESCENDING);
+  int numberOf=_mesh->getNumberOfElements(baseEntity,MED_ALL_ELEMENTS);
+  const int *ids=_number->getValue();
+  set<int> idsSet(ids,ids+_totalNumberOfElements);
+  list<int> myElementsList;
+  for (int i=0;i<numberOf;i++)
+    {
+      int nbOfDP1EntitySharing=0;
+      if(idsSet.find(myConnectivityValue[myConnectivityIndex[i]-1])!=idsSet.end())
+	nbOfDP1EntitySharing++;
+      if(idsSet.find(myConnectivityValue[myConnectivityIndex[i]])!=idsSet.end())
+	nbOfDP1EntitySharing++;
+      if(nbOfDP1EntitySharing==1)
+	myElementsList.push_back(i+1);
+    }
+  if(Entity==MED_NODE)
+    {
+      return _mesh->buildSupportOnNodeFromElementList(myElementsList,baseEntity);
+    }
+  else
+    {
+      return _mesh->buildSupportOnElementsFromElementList(myElementsList,baseEntity);
+    }
+}
+
+/*!
   Method that fills this and updates all its attributes in order to lye on the the listOfNode.
  */
 void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION)
@@ -747,7 +960,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
 {
   clearDataOnNumbers();
   int size=listOfElt.size();
-  int totalNbInMesh=_mesh->getNumberOfElementsWithPoly(_entity,MED_ALL_ELEMENTS);
+  int totalNbInMesh=_mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
   if(totalNbInMesh==size){
     _isOnAllElts=true;
     update();
@@ -767,7 +980,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
   int * numberOfElements ;
   int * mySkyLineArrayIndex ;
 
-  int numberOfType = _mesh->getNumberOfTypesWithPoly(_entity) ;
+  int numberOfType = _mesh->getNumberOfTypes(_entity) ;
   if (numberOfType == 1) {
     numberOfGeometricType = 1 ;
     geometricType = new medGeometryElement[1] ;
@@ -784,7 +997,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
   else {// hemmm
     map<medGeometryElement,int> theType ;
     for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++) {
-      medGeometryElement myType = _mesh->getElementTypeWithPoly(_entity,*myElementsListIt) ;
+      medGeometryElement myType = _mesh->getElementType(_entity,*myElementsListIt) ;
       if (theType.find(myType) != theType.end() )
 	theType[myType]+=1 ;
       else
@@ -819,3 +1032,28 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
   delete[] geometricType;
 }
 
+/*! set the reference _mesh to Mesh */
+//--------------------------------------
+void SUPPORT::setMesh(MESH *Mesh)
+//--------------------------------------
+{
+  if(_mesh)
+    _mesh->removeReference();
+  _mesh=Mesh;
+  if(_mesh)
+    _mesh->addReference();
+}
+
+/*!
+  addReference : reference counter presently disconnected in C++ -> just connected for client.
+*/
+void MEDMEM::SUPPORT::addReference() const
+{
+}
+
+/*!
+  removeReference : reference counter presently disconnected in C++ -> just connected for client.
+*/
+void MEDMEM::SUPPORT::removeReference() const
+{
+}

@@ -13,12 +13,10 @@
 #include "utilities.h"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
-
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Array.hxx"
 #include "MEDMEM_GenDriver.hxx"
-#include "MEDMEM_DriverFactory.hxx"
 
 /*!
 
@@ -127,7 +125,8 @@ protected:
   MED_EN::med_type_champ _valueType ;
 
   vector<GENDRIVER *> _drivers; // Storage of the drivers currently in use
-  static void _checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (MEDEXCEPTION);
+  static void _checkFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true) throw (MEDEXCEPTION);
+  static void _deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true ) throw (MEDEXCEPTION);
   void _checkNormCompatibility(const FIELD<double>* p_field_volume=NULL) const  throw (MEDEXCEPTION);
   FIELD<double>* _getFieldSize() const;
 
@@ -164,7 +163,7 @@ public:
 //    virtual  void     setOrderNumber     (int OrderNumber);
 //    virtual  void     setFieldName       (string& fieldName);
 
-  virtual  void     rmDriver(int index);
+  virtual  void     rmDriver(int index=0);
   virtual   int     addDriver(driverTypes driverType,
                               const string & fileName="Default File Name.med",
 			      const string & driverFieldName="Default Field Nam",
@@ -220,7 +219,8 @@ public:
 
   inline void     setValueType (const MED_EN::med_type_champ ValueType) ;
   inline MED_EN::med_type_champ getValueType () const;
-
+protected:
+  void copyGlobalInfo(const FIELD_& m);
 };
 
 // ---------------------------------
@@ -541,8 +541,10 @@ inline void FIELD_::setValueType (const MED_EN::med_type_champ ValueType)
 
 namespace MEDMEM {
 
-  template<class T2> class MED_FIELD_RDONLY_DRIVER;
-  template<class T2> class MED_FIELD_WRONLY_DRIVER;
+  template<class T2> class MED_FIELD_RDONLY_DRIVER21;
+  template<class T2> class MED_FIELD_WRONLY_DRIVER21;
+  template<class T2> class MED_FIELD_RDONLY_DRIVER22;
+  template<class T2> class MED_FIELD_WRONLY_DRIVER22;
   template<class T2> class VTK_FIELD_DRIVER;
   
 template <class T> class FIELD : public FIELD_
@@ -552,7 +554,8 @@ protected:
 
   // array of value of type T
   MEDARRAY<T> *_value ;
-
+  static T _scalarForPow;
+  static T pow(T x);
 private:
   void _operation(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode, char* Op);
   void _operationInitialize(const FIELD& m,const FIELD& n, char* Op);
@@ -583,18 +586,24 @@ public:
   FIELD& operator*=(const FIELD& m);
   FIELD& operator/=(const FIELD& m);
   static FIELD* add(const FIELD& m, const FIELD& n);
+  static FIELD* addDeep(const FIELD& m, const FIELD& n);
   static FIELD* sub(const FIELD& m, const FIELD& n);
+  static FIELD* subDeep(const FIELD& m, const FIELD& n);
   static FIELD* mul(const FIELD& m, const FIELD& n);
+  static FIELD* mulDeep(const FIELD& m, const FIELD& n);
   static FIELD* div(const FIELD& m, const FIELD& n);
+  static FIELD* divDeep(const FIELD& m, const FIELD& n);
   double normMax() const throw (MEDEXCEPTION);
   double norm2() const throw (MEDEXCEPTION);
   void   applyLin(T a, T b);
   template <T T_function(T)> void applyFunc();
-  static FIELD* scalarProduct(const FIELD& m, const FIELD& n);
+  void applyPow(T scalar);
+  static FIELD* scalarProduct(const FIELD& m, const FIELD& n, bool deepCheck=false);
   double normL2(int component, const FIELD<double> * p_field_volume=NULL) const;
   double normL2(const FIELD<double> * p_field_volume=NULL) const;
   double normL1(int component, const FIELD<double> * p_field_volume=NULL) const;
   double normL1(const FIELD<double> * p_field_volume=NULL) const;
+  FIELD* extract(const SUPPORT *subSupport) const throw (MEDEXCEPTION);
 
   friend class MED_FIELD_RDONLY_DRIVER21<T>;
   friend class MED_FIELD_WRONLY_DRIVER21<T>;
@@ -632,6 +641,7 @@ public:
   inline const T*       getValue(MED_EN::medModeSwitch Mode) const;
   inline const T*       getValueI(MED_EN::medModeSwitch Mode,int i) const;
   inline T        getValueIJ(int i,int j) const;
+  bool getValueOnElement(int eltIdInSup,T* retValues) const;
 
   inline void setValue(MED_EN::medModeSwitch mode, T* value);
   inline void setValueI(MED_EN::medModeSwitch mode, int i, T* value);
@@ -688,7 +698,16 @@ public:
     setValueType(MED_REEL64) call.
    */
   void getBarycenter() const throw (MEDEXCEPTION) ;
+  template<void T_Analytic(const double *,T*)>
+  void fillFromAnalytic();
 };
+}
+
+#include "MEDMEM_DriverFactory.hxx"
+
+namespace MEDMEM {
+
+template <class T> T FIELD<T>::_scalarForPow=1;
 
 // --------------------
 // Implemented Methods
@@ -866,6 +885,30 @@ FIELD<T>* FIELD<T>::add(const FIELD& m, const FIELD& n)
     return result;
 }
 
+/*! Same as add method except that field check is deeper.
+ */
+template <class T>
+FIELD<T>* FIELD<T>::addDeep(const FIELD& m, const FIELD& n)
+{
+    BEGIN_OF("FIELD<T>::addDeep(const FIELD & m, const FIELD& n)");
+    FIELD_::_deepCheckFieldCompatibility(m, n); // may throw exception
+
+    // Select mode : avoid if possible any calculation of other mode for fields m or *this
+    MED_EN::medModeSwitch mode;
+    if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
+	mode=m.getvalue()->getMode();
+    else
+	mode=n.getvalue()->getMode();
+    
+    // Creation of a new field
+    FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
+    result->_operationInitialize(m,n,"+"); // perform Atribute's initialization
+    result->_add_in_place(m,n,mode); // perform addition
+
+    END_OF("FIELD<T>::addDeep(const FIELD & m, const FIELD& n)");
+    return result;
+}
+
 /*!
      Overload substraction operator.
      This operation is authorized only for compatible fields that have the same support.
@@ -995,6 +1038,30 @@ FIELD<T>* FIELD<T>::sub(const FIELD& m, const FIELD& n)
     return result;
 }
 
+/*! Same as sub method except that field check is deeper.
+ */
+template <class T>
+FIELD<T>* FIELD<T>::subDeep(const FIELD& m, const FIELD& n)
+{
+    BEGIN_OF("FIELD<T>::subDeep(const FIELD & m, const FIELD& n)");
+    FIELD_::_deepCheckFieldCompatibility(m, n); // may throw exception
+
+    // Select mode : avoid if possible any calculation of other mode for fields m or *this
+    MED_EN::medModeSwitch mode;
+    if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
+	mode=m.getvalue()->getMode();
+    else
+	mode=n.getvalue()->getMode();
+    
+    // Creation of a new field
+    FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
+    result->_operationInitialize(m,n,"-"); // perform Atribute's initialization
+    result->_sub_in_place(m,n,mode); // perform substraction
+
+    END_OF("FIELD<T>::subDeep(const FIELD & m, const FIELD& n)");
+    return result;
+}
+
 /*!
      Overload multiplication operator.
      This operation is authorized only for compatible fields that have the same support.
@@ -1019,7 +1086,7 @@ template <class T>
 const FIELD<T> FIELD<T>::operator*(const FIELD & m) const
 {
     BEGIN_OF("FIELD<T>::operator*(const FIELD & m)");
-    FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
+    FIELD_::_checkFieldCompatibility(*this, m, false); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
     MED_EN::medModeSwitch mode;
@@ -1046,7 +1113,7 @@ template <class T>
 FIELD<T>& FIELD<T>::operator*=(const FIELD & m)
 {
     BEGIN_OF("FIELD<T>::operator*=(const FIELD & m)");
-    FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
+    FIELD_::_checkFieldCompatibility(*this, m, false); // may throw exception
 
     // We choose to keep *this mode, even if it may cost a re-calculation for m
     MED_EN::medModeSwitch mode=this->getvalue()->getMode();
@@ -1075,7 +1142,7 @@ template <class T>
 FIELD<T>* FIELD<T>::mul(const FIELD& m, const FIELD& n)
 {
     BEGIN_OF("FIELD<T>::mul(const FIELD & m, const FIELD& n)");
-    FIELD_::_checkFieldCompatibility(m, n); // may throw exception
+    FIELD_::_checkFieldCompatibility(m, n, false); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
     MED_EN::medModeSwitch mode;
@@ -1093,6 +1160,29 @@ FIELD<T>* FIELD<T>::mul(const FIELD& m, const FIELD& n)
     return result;
 }
 
+/*! Same as mul method except that field check is deeper.
+ */
+template <class T>
+FIELD<T>* FIELD<T>::mulDeep(const FIELD& m, const FIELD& n)
+{
+    BEGIN_OF("FIELD<T>::mulDeep(const FIELD & m, const FIELD& n)");
+    FIELD_::_deepCheckFieldCompatibility(m, n, false); // may throw exception
+
+    // Select mode : avoid if possible any calculation of other mode for fields m or *this
+    MED_EN::medModeSwitch mode;
+    if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
+	mode=m.getvalue()->getMode();
+    else
+	mode=n.getvalue()->getMode();
+    
+    // Creation of a new field
+    FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
+    result->_operationInitialize(m,n,"*"); // perform Atribute's initialization
+    result->_mul_in_place(m,n,mode); // perform multiplication
+
+    END_OF("FIELD<T>::mulDeep(const FIELD & m, const FIELD& n)");
+    return result;
+}
 
 /*!
      Overload division operator.
@@ -1118,7 +1208,7 @@ template <class T>
 const FIELD<T> FIELD<T>::operator/(const FIELD & m) const
 {
     BEGIN_OF("FIELD<T>::operator/(const FIELD & m)");
-    FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
+    FIELD_::_checkFieldCompatibility(*this, m, false); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
     MED_EN::medModeSwitch mode;
@@ -1146,7 +1236,7 @@ template <class T>
 FIELD<T>& FIELD<T>::operator/=(const FIELD & m)
 {
     BEGIN_OF("FIELD<T>::operator/=(const FIELD & m)");
-    FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
+    FIELD_::_checkFieldCompatibility(*this, m, false); // may throw exception
 
     // We choose to keep *this mode, even if it may cost a re-calculation for m
     MED_EN::medModeSwitch mode=this->getvalue()->getMode();
@@ -1175,7 +1265,7 @@ template <class T>
 FIELD<T>* FIELD<T>::div(const FIELD& m, const FIELD& n)
 {
     BEGIN_OF("FIELD<T>::div(const FIELD & m, const FIELD& n)");
-    FIELD_::_checkFieldCompatibility(m, n); // may throw exception
+    FIELD_::_checkFieldCompatibility(m, n, false); // may throw exception
 
     // Select mode : avoid if possible any calculation of other mode for fields m or *this
     MED_EN::medModeSwitch mode;
@@ -1193,6 +1283,29 @@ FIELD<T>* FIELD<T>::div(const FIELD& m, const FIELD& n)
     return result;
 }
 
+/*! Same as div method except that field check is deeper.
+ */
+template <class T>
+FIELD<T>* FIELD<T>::divDeep(const FIELD& m, const FIELD& n)
+{
+  BEGIN_OF("FIELD<T>::divDeep(const FIELD & m, const FIELD& n)");
+  FIELD_::_deepCheckFieldCompatibility(m, n, false); // may throw exception
+
+  // Select mode : avoid if possible any calculation of other mode for fields m or *this
+  MED_EN::medModeSwitch mode;
+  if(m.getvalue()->getMode()==n.getvalue()->getMode() || n.getvalue()->isOtherCalculated())
+    mode=m.getvalue()->getMode();
+  else
+    mode=n.getvalue()->getMode();
+    
+  // Creation of a new field
+  FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
+  result->_operationInitialize(m,n,"/"); // perform Atribute's initialization
+  result->_div_in_place(m,n,mode); // perform division
+
+  END_OF("FIELD<T>::divDeep(const FIELD & m, const FIELD& n)");
+  return result;
+}
 
 /*!
   \if developper
@@ -1408,7 +1521,24 @@ void FIELD<T>::applyFunc()
 	getvalue()->clearOtherMode();
     }
 }
-    
+
+template <class T> T FIELD<T>::pow(T x)
+{
+  return (T)::pow(x,FIELD<T>::_scalarForPow);
+}
+
+/*!  Apply to each (scalar) field component the math function pow.
+ *   calculation is done "in place".
+ *   Use examples : 
+ *   
+ *   \code  myField.applyFunc<std::sqrt>();  // apply sqare root function \endcode
+ *     \code myField.applyFunc<myFunction>(); // apply your own created function \endcode
+ */
+template <class T> void FIELD<T>::applyPow(T scalar)
+{
+  FIELD<T>::_scalarForPow=scalar;
+  applyFunc<FIELD<T>::pow>();
+}
   
 /*!  Apply to each (scalar) field component the linear function x -> ax+b.
  *   calculation is done "in place".
@@ -1446,10 +1576,13 @@ template <class T> void FIELD<T>::applyLin(T a, T b)
  *   Each value of it is the scalar product of the two argument's fields.
  *   The user is in charge of memory deallocation.
  */
-template <class T> FIELD<T>* FIELD<T>::scalarProduct(const FIELD & m, const FIELD & n)
+template <class T> FIELD<T>* FIELD<T>::scalarProduct(const FIELD & m, const FIELD & n, bool deepCheck)
 {
-    FIELD_::_checkFieldCompatibility( m, n); // may throw exception
-    // we need a MED_FULL_INTERLACE representation of m & n to compute the scalar product
+  if(!deepCheck)
+    FIELD_::_checkFieldCompatibility( m, n, false); // may throw exception
+  else
+    FIELD_::_deepCheckFieldCompatibility(m, n, false);
+  // we need a MED_FULL_INTERLACE representation of m & n to compute the scalar product
     const MED_EN::medModeSwitch mode=MED_EN::MED_FULL_INTERLACE; 
 
     const int numberOfElements=m.getNumberOfValues(); // strictly positive
@@ -1617,8 +1750,34 @@ template <class T> double FIELD<T>::normL1(const FIELD<double> * p_field_volume)
     return integrale/totVol;
 }
 
-
-
+/*! Return a new field (to deallocate with delete) lying on subSupport that is included by
+ *   this->_support with corresponding values extracting from this->_value.
+ */
+template <class T> FIELD<T>* FIELD<T>::extract(const SUPPORT *subSupport) const throw (MEDEXCEPTION)
+{
+  if(!subSupport->belongsTo(*_support))
+    throw MEDEXCEPTION("FIELD<T>::extract : subSupport not included in this->_support !");
+  if(_support->isOnAllElements() && subSupport->isOnAllElements())
+    return new FIELD<T>(*this);
+  FIELD<T> *ret=new FIELD<T>(subSupport,_numberOfComponents,MED_EN::MED_FULL_INTERLACE);
+  if(!ret->_value)
+    throw MEDEXCEPTION("FIELD<T>::extract : unvalid support detected !");
+  T* valuesToSet=(T*)ret->_value->get(MED_EN::MED_FULL_INTERLACE);
+  int nbOfEltsSub=subSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  const int *eltsSub=subSupport->getNumber(MED_EN::MED_ALL_ELEMENTS);
+  T* tempVals=new T[_numberOfComponents];
+  for(int i=0;i<nbOfEltsSub;i++)
+    {
+      if(!getValueOnElement(eltsSub[i],tempVals))
+	throw MEDEXCEPTION("Problem in belongsTo function !!!");
+      for(int j=0;j<_numberOfComponents;j++)
+	valuesToSet[i*_numberOfComponents+j]=tempVals[j];
+    }
+  delete [] tempVals;
+  ret->setValueType(_valueType);
+  ret->copyGlobalInfo(*this);
+  return ret;
+}
 
 /*!
   Constructor with parameters; the object is set via a file and its associated
@@ -2003,6 +2162,44 @@ template <class T> inline void FIELD<T>::read(const GENDRIVER & genDriver)
 }
 
 /*!
+  Fills in already allocated retValues array the values related to eltIdInSup.
+  If the element does not exist in this->_support false is returned, true otherwise.
+ */
+template <class T> bool FIELD<T>::getValueOnElement(int eltIdInSup,T* retValues) const
+{
+  if(eltIdInSup<1)
+    return false;
+  if(_support->isOnAllElements())
+    {
+      int nbOfEltsThis=_support->getMesh()->getNumberOfElements(_support->getEntity(),MED_EN::MED_ALL_ELEMENTS);
+      if(eltIdInSup>nbOfEltsThis)
+	return false;
+      const T* valsThis=getValue(MED_EN::MED_FULL_INTERLACE);
+      for(int j=0;j<_numberOfComponents;j++)
+	retValues[j]=valsThis[(eltIdInSup-1)*_numberOfComponents+j];
+      return true;
+    }
+  else
+    {
+      int nbOfEltsThis=_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+      const int *eltsThis=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+      int iThis;
+      bool found=false;
+      for(iThis=0;iThis<nbOfEltsThis && !found;)
+	if(eltsThis[iThis]==eltIdInSup)
+	  found=true;
+	else
+	  iThis++;
+      if(!found)
+	return false;
+      const T* valsThis=getValue(MED_EN::MED_FULL_INTERLACE);
+      for(int j=0;j<_numberOfComponents;j++)
+	retValues[j]=valsThis[iThis*_numberOfComponents+j];
+      return true;
+    }
+}
+
+/*!
   \if developper
   Destroy the MEDARRAY<T> in FIELD and put the new one without copy.
   \endif
@@ -2194,6 +2391,68 @@ template <class T> void FIELD<T>::getBarycenter() const throw (MEDEXCEPTION)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
 
   END_OF(LOC);
+}
+
+/*!
+  Fill array by using T_Analytic. 
+  WARNING : "this" must have allocated its array by setting this->_support and this->_numberOfComponents properly.
+  Typically you should use it on a field built with constructor FIELD<T>::FIELD<T>(SUPPORT *,int nbOfComponents)
+ */
+template <class T> 
+template<void T_Analytic(const double *,T*)>
+void FIELD<T>::fillFromAnalytic()
+{
+  int i,j;
+  MESH * mesh = _support->getMesh();
+  int spaceDim = mesh->getSpaceDimension();
+  const double * coord;
+  FIELD<double> * barycenterField=0;
+  double ** xyz=new double* [spaceDim];
+  bool deallocateXyz=false;
+  if(_support->getEntity()==MED_EN::MED_NODE)
+    {
+      if (_support->isOnAllElements())
+	{
+	  coord=mesh->getCoordinates(MED_EN::MED_NO_INTERLACE);
+	  for(i=0; i<spaceDim; i++)
+	    xyz[i]=(double *)coord+i*_numberOfValues;  
+	}
+      else
+	{
+	  coord = mesh->getCoordinates(MED_EN::MED_FULL_INTERLACE);
+	  const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+	  for(i=0; i<spaceDim; i++)
+	    xyz[i]=new double[_numberOfValues];
+	  deallocateXyz=true;
+	  for(i=0;i<_numberOfValues;i++)
+	    {
+	      for(j=0;j<spaceDim;j++)
+		xyz[j][i]=coord[(nodesNumber[i]-1)*spaceDim+j];
+	    }
+	}
+    }
+  else
+    {
+      barycenterField = mesh->getBarycenter(_support);
+      coord=barycenterField->getValue(MED_EN::MED_NO_INTERLACE);
+      for(i=0; i<spaceDim; i++)
+	xyz[i]=(double *)(coord+i*_numberOfValues);
+    }
+  T* valsToSet=(T*)getValue(MED_EN::MED_FULL_INTERLACE);
+  double *temp=new double[spaceDim];
+  for(i=0;i<_numberOfValues;i++)
+  {
+    for(j=0;j<spaceDim;j++)
+      temp[j]=xyz[j][i];
+    T_Analytic(temp,valsToSet+i*_numberOfComponents);
+  }
+  delete [] temp;
+  if(barycenterField)
+    delete barycenterField;
+  if(deallocateXyz)
+    for(j=0;j<spaceDim;j++)
+      delete [] xyz[j];
+  delete [] xyz;
 }
 
 }//End namespace MEDMEM

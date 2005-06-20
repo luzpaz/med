@@ -286,7 +286,7 @@ support1 = SUPPORT(mesh,"Partial_Support_1",MED_CELL)
 support1Description = "Partial Support 1"
 support1NbOfTypes = 3
 support1TotNbElm = 8
-support1GeoType = [MED_TRIA3,MED_HEXA8,MED_PYRA5]
+support1GeoType = [MED_TETRA4,MED_HEXA8,MED_PYRA5]
 support1NbOfElm = [4,2,2]
 support1NbValue = [1,2,3,4,15,16,13,14]
 
@@ -319,7 +319,7 @@ support2 = SUPPORT(mesh,"Partial_Support_2",MED_CELL)
 support2Description = "Partial Support 2"
 support2NbOfTypes = 3
 support2TotNbElm = 8
-support2GeoType = [MED_TRIA3,MED_HEXA8,MED_PYRA5]
+support2GeoType = [MED_TETRA4,MED_HEXA8,MED_PYRA5]
 support2NbOfElm = [6,1,1]
 support2NbValue = [3,4,9,10,11,12,16,14]
 

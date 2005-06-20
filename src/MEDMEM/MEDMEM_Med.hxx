@@ -108,6 +108,8 @@ public:
   deque<DT_IT_> getFieldIteration (const string & fieldName) const throw (MEDEXCEPTION) ;
   FIELD_   * getField          ( const string & fieldName,
                                  const int dt,  const int it) const throw (MEDEXCEPTION) ;
+  FIELD_   * getField2          ( const string & fieldName,
+				 double time, int it=0) const throw (MEDEXCEPTION) ;
 
   const map<MED_EN::medEntityMesh,SUPPORT *> & getSupports(const string & meshName) const throw (MEDEXCEPTION) ;
 

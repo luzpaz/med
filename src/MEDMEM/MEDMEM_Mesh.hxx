@@ -3,17 +3,17 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <map>
 
 #include "utilities.h"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
-
-//#include "MEDMEM_Support.hxx"
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_GenDriver.hxx"
+#include "MEDMEM_RCBase.hxx"
 
 /*! This class contains all the informations related with a MESH :
   - COORDINATES
@@ -36,7 +36,7 @@ class CELLMODEL;
 class FAMILY;
 class GROUP;
 class SUPPORT;
-class MESH
+class MESH : public RCBASE
 
 {
   //-----------------------//
@@ -93,7 +93,6 @@ protected :
 //   inline void checkGridFillConnectivity() const;
   bool isEmpty() const;
   // if this->_isAGrid, assure that _coordinate and _connectivity are filled
-
 public :
 
   // Add your personnal driver line (step 2)
@@ -126,6 +125,7 @@ public :
   MESH(MESH &m);
   MESH & operator=(const MESH &m);
   virtual bool operator==(const MESH& other) const;
+  virtual bool deepCompare(const MESH& other) const;
   MESH( driverTypes driverType, const string & fileName="",
 	const string & meshName="") throw (MEDEXCEPTION);
   virtual ~MESH();
@@ -256,14 +256,14 @@ public :
     returns a SUPPORT pointer on the union of all SUPPORTs in Supports.
     You should delete this pointer after use to avois memory leaks.
   */
-  SUPPORT * mergeSupports(const vector<SUPPORT *> Supports) const throw (MEDEXCEPTION) ;
+  static SUPPORT * mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION) ;
 
   /*!
     returns a SUPPORT pointer on the intersection of all SUPPORTs in Supports.
     The (SUPPORT *) NULL pointer is returned if the intersection is empty.
     You should delete this pointer after use to avois memory leaks.
    */
-  SUPPORT * intersectSupports(const vector<SUPPORT *> Supports) const throw (MEDEXCEPTION) ;
+  static SUPPORT * intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION) ;
 
   /*!
    * Create families from groups.
@@ -273,6 +273,17 @@ public :
    * (There is no way to know which family has change.)
    */
   void createFamilies();
+  SUPPORT *buildSupportOnNodeFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
+  void fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT *supportToFill) const throw (MEDEXCEPTION);
+  SUPPORT *buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
+  int getElementContainingPoint(const double *coord);
+  template<class T>
+  static FIELD<T> *mergeFields(const vector< FIELD<T>* >& others,bool meshCompare=false);
+  /*!
+   *For ref counter. Only for client
+   */
+  virtual void addReference() const;
+  virtual void removeReference() const;
 };
 
 // ---------------------------------------
@@ -961,6 +972,71 @@ inline bool MESH::getIsAGrid()
   SCRUTE(_isAGrid);
 
   return _isAGrid;
+}
+
+}
+
+#include "MEDMEM_Support.hxx"
+
+namespace MEDMEM {
+
+//Create a new FIELD that should be deallocated based on a SUPPORT that should be deallocated too.
+template<class T>
+FIELD<T> *MESH::mergeFields(const vector< FIELD<T>* >& others,bool meshCompare)
+{
+  const char * LOC = "MESH::mergeFields(const vector< FIELD<T>* >& others,bool meshCompare): ";
+  BEGIN_OF(LOC);
+  int i,j;
+  if(others.size()==0)
+    return 0;
+  vector<SUPPORT *> sup;
+  typename vector< FIELD<T>* >::const_iterator iter;
+  for(iter=others.begin();iter!=others.end();iter++)
+    {
+      sup.push_back((SUPPORT *)(*iter)->getSupport());
+    }
+  iter=others.begin();
+  SUPPORT *retSup=mergeSupports(sup);
+  int retNumberOfComponents=(*iter)->getNumberOfComponents();
+  FIELD<T> *ret=new FIELD<T>(retSup,retNumberOfComponents,MED_EN::MED_FULL_INTERLACE);
+  ret->setValueType((*iter)->getValueType());
+  T* valuesToSet=(T*)ret->getValue(MED_EN::MED_FULL_INTERLACE);
+  int nbOfEltsRetSup=retSup->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  T* tempValues=new T[retNumberOfComponents];
+  if(retSup->isOnAllElements())
+    {
+      for(i=0;i<nbOfEltsRetSup;i++)
+	{
+	  bool found=false;
+	  for(iter=others.begin();iter!=others.end() && !found;iter++)
+	    {
+	      found=(*iter)->getValueOnElement(i+1,tempValues);
+	      if(found)
+		for(j=0;j<retNumberOfComponents;j++)
+		  valuesToSet[i*retNumberOfComponents+j]=tempValues[j];
+	    }
+	}
+    }
+  else
+    {
+      const int *eltsRetSup=retSup->getNumber(MED_EN::MED_ALL_ELEMENTS);
+      for(i=0;i<nbOfEltsRetSup;i++)
+	{
+	  bool found=false;
+	  for(iter=others.begin();iter!=others.end() && !found;iter++)
+	    {
+	      found=(*iter)->getValueOnElement(eltsRetSup[i],tempValues);
+	      if(found)
+		for(j=0;j<retNumberOfComponents;j++)
+		  valuesToSet[i*retNumberOfComponents+j]=tempValues[j];
+	    }
+	  if(!found)
+	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Merging error due to an error in merging support"));
+	}
+    }
+  delete [] tempValues;
+  END_OF(LOC);
+  return ret;
 }
 
 }
