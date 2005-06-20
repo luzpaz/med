@@ -99,17 +99,19 @@ _TEMPLATE_SPE_ _COORDBARY_2D_::Coordonnees_Barycentriques(NUAGEMAILLE * m, NUAGE
 
 _TEMPLATE_SPE_ vector<double> _COORDBARY_2D_::Donne_Pseudo_Coord_Baryc(int num_maille,const NOEUD &M)
 	{
-	int i,j,nbr_faces;
+	int i,nbr_faces;
 	if (etat_coord_baryc[num_maille]==FAUX) 
 		{
-		nbr_faces=(*mailles).DONNE_NBR_FACES();
+		nbr_faces=(*mailles)[num_maille].DONNE_NBR_FACES();
 		
 		coord_baryc[num_maille]=vector< vector<double> >(nbr_faces);
 		
+		type_retour simplexe_base;
+		
 		for (i=0;i<nbr_faces;i++)
 			{
-			vector<int> simplexe_base=(*mailles).DONNE_SIMPLEXE_BASE(i);
-			coord_baryc[num_maille][i]=Calcule_Base_Coord_Baryc(simplexe_base);
+			(*mailles)[num_maille].DONNE_SIMPLEXE_BASE(i,simplexe_base);
+			coord_baryc[num_maille][i]=Calcule_Base_Coord_Baryc(vector<int>(&simplexe_base.quoi[0],&simplexe_base.quoi[simplexe_base.combien]));
 			etat_coord_baryc[num_maille]=VRAI;
 			}
 		}	
@@ -120,7 +122,6 @@ _TEMPLATE_SPE_ vector<double> _COORDBARY_2D_::Calcule_Base_Coord_Baryc(const vec
 	{
 	const vector<int> &ref=simplexe_base;
 	vector<double> retour(3);
-	int i,j;
 		
 	double x0=(*sommets)[ref[0]][0];
 	double y0=(*sommets)[ref[0]][1];
@@ -161,7 +162,7 @@ _TEMPLATE_SPE_ _COORDBARY_3D_::Coordonnees_Barycentriques(NUAGEMAILLE * m, NUAGE
 	
 _TEMPLATE_SPE_ vector<double> _COORDBARY_3D_::Donne_Pseudo_Coord_Baryc(int num_maille,const NOEUD &M)
 	{
-	int i,j,nbr_faces;
+	int i,nbr_faces;
 	if (etat_coord_baryc[num_maille]==FAUX) 
 		{
 		nbr_faces=(*mailles)[num_maille].DONNE_NBR_FACES();
@@ -185,7 +186,6 @@ _TEMPLATE_SPE_ vector<double> _COORDBARY_3D_::Calcule_Base_Coord_Baryc(const vec
 	{
 	const vector<int> &ref=simplexe_base;
 	vector<double> retour(4);
-	int i,j;
 		
 	double x0=(*sommets)[ref[0]][0];
 	double y0=(*sommets)[ref[0]][1];
