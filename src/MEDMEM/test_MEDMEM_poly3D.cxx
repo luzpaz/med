@@ -162,10 +162,6 @@ int main (int argc, char ** argv)
   FAMILY *fam2=*(iter++);
   FAMILY *fam3=*(iter);
   const int *nbs;
-  const int *nbIndexFacePoly=((CONNECTIVITY *)myMesh->getConnectivityptr())->getPolygonsConnectivity(MED_NODAL,MED_FACE);
-  const int *nbsFacePoly=((CONNECTIVITY *)myMesh->getConnectivityptr())->getPolygonsConnectivityIndex(MED_NODAL,MED_FACE);
-  const int *nbsFace=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivity(MED_NODAL,MED_FACE,MED_ALL_ELEMENTS);
-  const int *nbIndexFace=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityIndex(MED_NODAL,MED_FACE);
   // family 1
   if(fam1->getNumberOfTypes()==1 && fam1->getTypes()[0]==MED_POLYGON && fam1->getNumberOfElements(MED_ALL_ELEMENTS)==3)
     nbOfPtsForTest++;
