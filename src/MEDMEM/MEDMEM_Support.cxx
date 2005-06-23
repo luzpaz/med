@@ -960,7 +960,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
 {
   clearDataOnNumbers();
   int size=listOfElt.size();
-  int totalNbInMesh=_mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
+  int totalNbInMesh=_mesh->getNumberOfElementsWithPoly(_entity,MED_ALL_ELEMENTS);
   if(totalNbInMesh==size){
     _isOnAllElts=true;
     update();
@@ -980,11 +980,11 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
   int * numberOfElements ;
   int * mySkyLineArrayIndex ;
 
-  int numberOfType = _mesh->getNumberOfTypes(_entity) ;
+  int numberOfType = _mesh->getNumberOfTypesWithPoly(_entity) ;
   if (numberOfType == 1) {
     numberOfGeometricType = 1 ;
     geometricType = new medGeometryElement[1] ;
-    const medGeometryElement *  allType = _mesh->getTypes(_entity);
+    medGeometryElement *  allType = _mesh->getTypesWithPoly(_entity);
     geometricType[0] = allType[0] ;
     numberOfGaussPoint = new int[1] ;
     numberOfGaussPoint[0] = 1 ;
@@ -993,11 +993,12 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
     mySkyLineArrayIndex = new int[2] ;
     mySkyLineArrayIndex[0]=1 ;
     mySkyLineArrayIndex[1]=1+size ;
+    delete [] allType;
   }
   else {// hemmm
     map<medGeometryElement,int> theType ;
     for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++) {
-      medGeometryElement myType = _mesh->getElementType(_entity,*myElementsListIt) ;
+      medGeometryElement myType = _mesh->getElementTypeWithPoly(_entity,*myElementsListIt) ;
       if (theType.find(myType) != theType.end() )
 	theType[myType]+=1 ;
       else
