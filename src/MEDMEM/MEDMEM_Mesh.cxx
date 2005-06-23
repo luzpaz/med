@@ -541,7 +541,7 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   
   const int * myConnectivityValue = getReverseConnectivity(MED_DESCENDING) ;
   const int * myConnectivityIndex = getReverseConnectivityIndex(MED_DESCENDING) ;
-  int numberOf = getNumberOfElements(entityToParse,MED_ALL_ELEMENTS) ;
+  int numberOf = getNumberOfElementsWithPoly(entityToParse,MED_ALL_ELEMENTS) ;
   list<int> myElementsList;
 
   for (int i=0 ; i<numberOf; i++)
@@ -563,15 +563,15 @@ void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT 
   MED_EN::medEntityMesh entity=supportToFill->getEntity();
   supportToFill->setAll(false);
   supportToFill->setMesh((MESH *)this);
-  const int *myConnectivityValueNodal=getConnectivity(MED_FULL_INTERLACE,MED_NODAL,entity,MED_ALL_ELEMENTS);
-  const int *myConnectivityIndexNodal=getConnectivityIndex(MED_NODAL,entity);
 
   int i;
   set<int> nodes;
   for(list<int>::const_iterator iter=listOfElt.begin();iter!=listOfElt.end();iter++)
     {
-      for(i=myConnectivityIndexNodal[*iter-1]-1;i<myConnectivityIndexNodal[*iter]-1;i++)
-	nodes.insert(myConnectivityValueNodal[i]);
+      int lgth;
+      const int *conn=_connectivity->getConnectivityOfAnElementWithPoly(MED_NODAL,entity,*iter,lgth);
+      for(i=0;i<lgth;i++)
+	nodes.insert(conn[i]);
     }
   list<int> nodesList;
   for(set<int>::iterator iter2=nodes.begin();iter2!=nodes.end();iter2++)
