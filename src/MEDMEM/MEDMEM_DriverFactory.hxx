@@ -18,10 +18,10 @@ namespace MEDMEM {
 
     /*
       definition of static variable across the Med Memory of a Med File version
-      for the writing of Med File set to V21
+      for the writing of Med File set to V22
     */
 
-    static MED_EN::medFileVersion globalMedFileVersionForWriting = MED_EN::V21;
+    static MED_EN::medFileVersion globalMedFileVersionForWriting = MED_EN::V22;
 
     MED_EN::medFileVersion getMedFileVersionForWriting();
 

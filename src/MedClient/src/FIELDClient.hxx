@@ -6,18 +6,37 @@
 #include "MEDMEM_Field.hxx"
 #include "SUPPORTClient.hxx"
 #include "ReceiverFactory.hxx"
+#include "SenderFactory.hxx"
 #include CORBA_CLIENT_HEADER(MED)
 
-//exemple _FIELDClient<double,FIELDDOUBLE_ptr>
-//_FIELDClient<int,FIELDINT_ptr>
-template<class T1,class T2>
-class FIELDClient : public MEDMEM::FIELD<T1>
+template<class T>
+struct MapCppFieldServ {
+  typedef T FieldPtrType;
+  typedef T FieldGlobalType;
+};
+
+template<>
+struct MapCppFieldServ<int> {
+  typedef SALOME_MED::FIELDINT_ptr FieldPtrType;
+  typedef SALOME_MED::FIELDINT FieldGlobalType;
+};
+
+template<>
+struct MapCppFieldServ<double> {
+  typedef SALOME_MED::FIELDDOUBLE_ptr FieldPtrType;
+  typedef SALOME_MED::FIELDDOUBLE FieldGlobalType;
+};
+
+namespace MEDMEM{
+
+template<class T>
+class FIELDClient : public MEDMEM::FIELD<T>
 {
 private:
-  typename T2::_ptr_type _fieldPtr;
-  bool _ownSupport;
+  typename MapCppFieldServ<T>::FieldPtrType _fieldPtr;
+  int _refCounter;
 public:
-  FIELDClient(typename T2::_ptr_type ptrCorba,MEDMEM::SUPPORT * S = NULL);
+  FIELDClient(typename MapCppFieldServ<T>::FieldPtrType ptrCorba,MEDMEM::SUPPORT * S = NULL);
   ~FIELDClient();
 private:
   void fillCopy();
@@ -25,4 +44,5 @@ private:
 
 #include "FIELDClient.cxx"
 
+}
 #endif
