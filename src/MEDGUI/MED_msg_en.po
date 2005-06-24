@@ -144,3 +144,9 @@ msgstr "Display"
 
 msgid "STB_DISPLAY"
 msgstr "Display"
+
+
+
+msgid "TB_MED"
+msgstr "Med Toolbar"
+
