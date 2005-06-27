@@ -7,13 +7,10 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_ModulusArray.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
+#include "LocalTraceCollector.hxx"
 #include <vector>
 
 #define MESHNAME "poly3D"
-
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
 
 using namespace std;
 using namespace MEDMEM;
