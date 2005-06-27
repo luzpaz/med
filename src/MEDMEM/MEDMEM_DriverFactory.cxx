@@ -30,6 +30,8 @@ bool compare<-1>(const double *a, const double *b)
   return false;
 }
 
+MED_EN::medFileVersion DRIVERFACTORY::globalMedFileVersionForWriting = MED_EN::V22;
+
 medFileVersion DRIVERFACTORY::getMedFileVersionForWriting()
 {
   return DRIVERFACTORY::globalMedFileVersionForWriting;

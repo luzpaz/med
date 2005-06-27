@@ -21,7 +21,7 @@ namespace MEDMEM {
       for the writing of Med File set to V22
     */
 
-    static MED_EN::medFileVersion globalMedFileVersionForWriting = MED_EN::V22;
+    extern MED_EN::medFileVersion globalMedFileVersionForWriting;
 
     MED_EN::medFileVersion getMedFileVersionForWriting();
 
