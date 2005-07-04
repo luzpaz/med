@@ -289,8 +289,6 @@ int main (int argc, char ** argv) {
   fieldDoubleScalarOnNodes->setComponentDescription(1,"comp1");
   fieldDoubleScalarOnNodes->setMEDComponentUnit(1,"unit1");
 
-  fieldDoubleScalarOnNodes->setValueType(MED_REEL64);
-
   FIELD<double> * fieldDoubleVectorOnNodes = new FIELD<double>(supportOnNodes,SpaceDimension);
   fieldDoubleVectorOnNodes->setName("fieldVectorDoubleNode");
   fieldDoubleVectorOnNodes->setIterationNumber(-1);
@@ -307,7 +305,6 @@ int main (int argc, char ** argv) {
   fieldDoubleVectorOnNodes->setComponentDescription(3,"comp3");
   fieldDoubleVectorOnNodes->setMEDComponentUnit(3,"unit3");
 
-  fieldDoubleVectorOnNodes->setValueType(MED_REEL64);
 
   FIELD<double> * fieldDoubleScalarOnCells = new FIELD<double>(supportOnCells,1);
   fieldDoubleScalarOnCells->setName("fieldScalarDoubleCell");
@@ -319,8 +316,7 @@ int main (int argc, char ** argv) {
   fieldDoubleScalarOnCells->setComponentDescription(1,"comp1");
   fieldDoubleScalarOnCells->setMEDComponentUnit(1,"unit1");
 
-  fieldDoubleScalarOnCells->setValueType(MED_REEL64);
-
+  
   FIELD<double> * fieldDoubleVectorOnCells = new FIELD<double>(supportOnCells,SpaceDimension);
   fieldDoubleVectorOnCells->setName("fieldVectorrDoubleCell");
   fieldDoubleVectorOnCells->setIterationNumber(-1);
@@ -337,8 +333,6 @@ int main (int argc, char ** argv) {
   fieldDoubleVectorOnCells->setComponentDescription(3,"comp3");
   fieldDoubleVectorOnCells->setMEDComponentUnit(3,"unit3");
 
-  fieldDoubleVectorOnCells->setValueType(MED_REEL64);
-
   FIELD<int> * fieldIntScalarOnNodes = new FIELD<int>(supportOnNodes,1);
   fieldIntScalarOnNodes->setName("fieldScalarIntNode");
   fieldIntScalarOnNodes->setIterationNumber(-1);
@@ -349,7 +343,6 @@ int main (int argc, char ** argv) {
   fieldIntScalarOnNodes->setComponentDescription(1,"comp1");
   fieldIntScalarOnNodes->setMEDComponentUnit(1,"unit1");
 
-  fieldIntScalarOnNodes->setValueType(MED_INT32);
 
   FIELD<int> * fieldIntVectorOnNodes = new FIELD<int>(supportOnNodes,SpaceDimension);
   fieldIntVectorOnNodes->setName("fieldVectorIntNode");
@@ -367,7 +360,6 @@ int main (int argc, char ** argv) {
   fieldIntVectorOnNodes->setComponentDescription(3,"comp3");
   fieldIntVectorOnNodes->setMEDComponentUnit(3,"unit3");
 
-  fieldIntVectorOnNodes->setValueType(MED_INT32);
 
   FIELD<int> * fieldIntScalarOnCells = new FIELD<int>(supportOnCells,1);
   fieldIntScalarOnCells->setName("fieldScalarIntCell");
@@ -379,7 +371,6 @@ int main (int argc, char ** argv) {
   fieldIntScalarOnCells->setComponentDescription(1,"comp1");
   fieldIntScalarOnCells->setMEDComponentUnit(1,"unit1");
 
-  fieldIntScalarOnCells->setValueType(MED_INT32);
 
   FIELD<int> * fieldIntVectorOnCells = new FIELD<int>(supportOnCells,SpaceDimension);
   fieldIntVectorOnCells->setName("fieldVectorrIntCell");
@@ -397,7 +388,6 @@ int main (int argc, char ** argv) {
   fieldIntVectorOnCells->setComponentDescription(3,"comp3");
   fieldIntVectorOnCells->setMEDComponentUnit(3,"unit3");
 
-  fieldIntVectorOnCells->setValueType(MED_INT32);
 
   for (int i = 0; i<numberOfNodes; i++)
     {

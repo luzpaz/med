@@ -9,6 +9,8 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_CellModel.hxx"
 
+#include "MEDMEM_ArrayConvert.hxx"
+
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -433,9 +435,12 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 
   const char * LOC = "VTK_MED_DRIVER::writeField() : ";
   BEGIN_OF(LOC);
-  
-  int NomberOfValue = myField->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS) ;
-  int NomberOfComponents =  myField->getNumberOfComponents() ;
+
+  typedef MEDMEM_ArrayInterface<int,NoInterlace,NoGauss>::Array ArrayIntNo;
+  typedef MEDMEM_ArrayInterface<double,NoInterlace,NoGauss>::Array ArrayDoubleNo;
+
+  int NumberOfValue = myField->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS) ;
+  int NumberOfComponents =  myField->getNumberOfComponents() ;
 
   med_type_champ type = myField->getValueType() ;
   SCRUTE(name);
@@ -444,49 +449,79 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
     {
     case MED_INT32 : {
       MESSAGE("MED_INT32");
-      if (NomberOfComponents==3) {
+      if (NumberOfComponents==3) {
 	(*_vtkFile) << "VECTORS " << name << " int" << endl ;
-      } else if (NomberOfComponents<=4) {
-	(*_vtkFile) << "SCALARS " << name << " int " << NomberOfComponents << endl ;
+      } else if (NumberOfComponents<=4) {
+	(*_vtkFile) << "SCALARS " << name << " int " << NumberOfComponents << endl ;
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
       } else {
 	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
- 
-      //const int * value = ((FIELD<int>*)myField)->getValue(MED_NO_INTERLACE) ;
-      const int * value = ((FIELD<int>*)myField)->getValue(MED_NO_INTERLACE) ;
-      for (int i=0; i<NomberOfValue; i++) {
-	for(int j=0; j<NomberOfComponents; j++)
-	  (*_vtkFile) << value[j*NomberOfValue+i] << " " ;
+
+      const int * value;
+      ArrayIntNo * myArray;
+      if ( myField->getInterlacingType() == MED_FULL_INTERLACE ) {
+	myArray = ArrayConvert( *( dynamic_cast< FIELD<int,FullInterlace>* >
+				   (myField)->getArrayNoGauss() 
+				   )
+				);
+	value = myArray->getPtr();
+      } else {
+	value = ((FIELD<int>*)myField)->getValue() ;
+      }
+
+      for (int i=0; i<NumberOfValue; i++) {
+	for(int j=0; j<NumberOfComponents; j++)
+	  (*_vtkFile) << value[j*NumberOfValue+i] << " " ;
 	(*_vtkFile) << endl ;
       }
+
+      if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
+	delete[] myArray;
+
       break ;
     }
+
     case MED_REEL64 : {
       MESSAGE("MED_REEL64");
-      if (NomberOfComponents==3) {
+      if (NumberOfComponents==3) {
 	(*_vtkFile) << "VECTORS " << name << " float" << endl ;
-      } else if (NomberOfComponents<=4) {
-	(*_vtkFile) << "SCALARS " << name << " float " << NomberOfComponents << endl ;
+      } else if (NumberOfComponents<=4) {
+	(*_vtkFile) << "SCALARS " << name << " float " << NumberOfComponents << endl ;
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
       } else {
 	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
-      const double * value = ((FIELD<double>*)myField)->getValue(MED_NO_INTERLACE) ;
-      for (int i=0; i<NomberOfValue; i++) {
-	for(int j=0; j<NomberOfComponents; j++)
-	  (*_vtkFile) << value[j*NomberOfValue+i] << " " ;
+      const double * value;
+      ArrayDoubleNo * myArray;
+      if ( myField->getInterlacingType() == MED_FULL_INTERLACE ) {
+	myArray = ArrayConvert( *( dynamic_cast< FIELD<double,FullInterlace>* >
+				   (myField)->getArrayNoGauss()
+				   )
+				);
+	value = myArray->getPtr();
+      } else {
+	value = ((FIELD<double>*)myField)->getValue() ;
+      }
+
+      for (int i=0; i<NumberOfValue; i++) {
+	for(int j=0; j<NumberOfComponents; j++)
+	  (*_vtkFile) << value[j*NumberOfValue+i] << " " ;
 	(*_vtkFile) << endl ;
       }
+
+      if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
+	delete[] myArray;
+
       break ;
     }
-    default : { 
+    default : {
       MESSAGE(LOC << "Could not write field "<<name<<" the type is not int or double !");
     }
     }
-  
+
   END_OF(LOC);
 }
 

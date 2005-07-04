@@ -13,7 +13,8 @@
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Unit.hxx"
-#include "MEDMEM_Array.hxx"
+#include "MEDMEM_nArray.hxx"
+#include "MEDMEM_ArrayConvert.hxx"
 #include "MEDMEM_Support.hxx"
 //#include "MEDMEM_Field.hxx"
 #include "MEDMEM_Mesh.hxx"
@@ -29,8 +30,8 @@
 */
 
 namespace MEDMEM {
-template <class T> class FIELD;
-template <class T> class VTK_FIELD_DRIVER : public GENDRIVER
+  //  template <class T,class INTERLACING_TAG=FullInterlace> class FIELD;
+  template <class T> class VTK_FIELD_DRIVER : public GENDRIVER
 {
 protected:
   
@@ -547,6 +548,9 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   MED_EN::medEntityMesh entitySupport = supportField->getEntity();
   name << nameField << "_" << dt << "_" << it ;
 
+  if ( _ptrField->getGaussPresence() )
+    throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which use Gauss Points !" << entitySupport));
+
   if (!(supportField->isOnAllElements()))
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which is not on all entities of the mesh !" << entitySupport));
 
@@ -591,7 +595,17 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   else
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" there are more than 4 components !"));
 
-  const T * value = _ptrField->getValue(MED_EN::MED_NO_INTERLACE) ;
+  // IL EST POSSIBLE D'AVOIR LES DEUX BOUCLES D'ECRITURE POUR EVITER
+  // DE CONVERTIR LE CHAMP DANS LE BON TYPE D'ENTRELACEMENT
+  const T * value;
+  if ( _ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+    value = _ptrField->getValue();
+  else {
+    MEDMEM_Array_ * ptrArray = _ptrField->getArray();
+    MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * temp = dynamic_cast<MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * >  ( ptrArray );
+    MEDMEM_Array<T,NoInterlaceNoGaussPolicy> * array = ArrayConvert( *temp );
+    value = array->getPtr();
+  }
 
   for (int i=0; i<NomberOfValue; i++)
     {
@@ -599,6 +613,10 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
 	(*_vtkFile) << value[j*NomberOfValue+i] << " " ;
       (*_vtkFile) << endl ;
     }
+
+  if ( _ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
+    delete value;
+
   END_OF(LOC);
 }
 
@@ -631,6 +649,9 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   MED_EN::medEntityMesh entitySupport = supportField->getEntity();
   name << nameField << "_" << dt << "_" << it ;
 
+  if ( _ptrField->getGaussPresence() )
+    throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which use Gauss Points !" << entitySupport));
+
   if (!(supportField->isOnAllElements()))
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which is not on all entities of the mesh !" << entitySupport));
 
@@ -674,7 +695,16 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   else
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" there are more than 4 components !"));
 
-  const T * value = _ptrField->getValue(MED_EN::MED_NO_INTERLACE) ;
+
+  const T * value ;
+  if ( _ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+    value = _ptrField->getValue();
+  else {
+    MEDMEM_Array_ * ptrArray = _ptrField->getArray();
+    MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * temp = dynamic_cast<MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * >  ( ptrArray );
+    MEDMEM_Array<T,NoInterlaceNoGaussPolicy> * array = ArrayConvert( *temp );
+    value = array->getPtr();
+  }
 
   for (int i=0; i<NomberOfValue; i++)
     {
@@ -682,6 +712,10 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
 	(*_vtkFile) << value[j*NomberOfValue+i] << " " ;
       (*_vtkFile) << endl ;
     }
+
+  if ( _ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
+    delete value;
+
   END_OF(LOC);
 }
 }//End namespace MEDMEM

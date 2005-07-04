@@ -25,7 +25,7 @@ struct LT_DT_IT_
 {
   bool operator() (const DT_IT_ &p1, const DT_IT_ &p2) const
   {
-    if ( bool test = p1.dt == p2.dt)
+    if (  p1.dt == p2.dt)
       return p1.it < p2.it ;
     else
       return  p1.dt < p2.dt ;

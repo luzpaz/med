@@ -93,7 +93,6 @@ int main (int argc, char ** argv) {
   //  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
   SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_cell",MED_EN::MED_CELL);
   FIELD<double> * myField = new FIELD<double>() ;
-  myField->setValueType(MED_EN::MED_REEL64);
 
   myField->setName(fieldname);
   myField->setSupport(mySupport);

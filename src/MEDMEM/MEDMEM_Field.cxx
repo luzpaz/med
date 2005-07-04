@@ -5,6 +5,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
+
 // ---------------------------------
 // FIELD_ : Constructors
 // ---------------------------------
@@ -16,7 +17,10 @@ FIELD_::FIELD_():
   _componentsDescriptions((string *)NULL),
   _componentsUnits((UNIT*)NULL),
   _MEDComponentsUnits((string *)NULL),
-  _iterationNumber(-1),_time(0.0),_orderNumber(-1)
+  _iterationNumber(-1),_time(0.0),_orderNumber(-1),
+  _valueType(MED_EN::MED_UNDEFINED_TYPE),
+  _interlacingType(MED_EN::MED_UNDEFINED_INTERLACE)
+
 {
   MESSAGE("Constructeur FIELD_ sans parametre");
 }
@@ -25,7 +29,9 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
   _isRead(false),
   _name(""), _description(""), _support(Support),
   _numberOfComponents(NumberOfComponents),
-  _iterationNumber(-1),_time(0.0),_orderNumber(-1)
+  _iterationNumber(-1),_time(0.0),_orderNumber(-1),
+  _valueType(MED_EN::MED_UNDEFINED_TYPE),
+  _interlacingType(MED_EN::MED_UNDEFINED_INTERLACE)
 {
   MESSAGE("FIELD_(const SUPPORT * Support, const int NumberOfComponents)");
 
@@ -79,6 +85,7 @@ FIELD_::FIELD_(const FIELD_ &m)
   _time = m._time;
   _orderNumber = m._orderNumber;
   _valueType = m._valueType;
+  _interlacingType = m._interlacingType;
   //_drivers = m._drivers ; // PG : Well, same driver, what about m destructor !
 
 }
@@ -212,11 +219,15 @@ void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n ) throw (
     string diagnosis;
 
     // check-up, fill diagnosis if some incompatibility is found.
-    if(m._support != n._support)
-      {
-	if(!(*m._support==*n._support))
-	  diagnosis+="They don't have the same support!";
-      }
+//     if ( m._interlacingType != n._interlacingType )
+//       diagnosis +="The don't have the same interlacing type!";
+//     else 
+    if (m._valueType != n._valueType)
+      diagnosis+="They don't have the same type!";
+    else if (m._support != n._support) {
+      if(!(*m._support==*n._support))
+	diagnosis+="They don't have the same support!";
+    }
     else if(m._numberOfComponents != n._numberOfComponents)
       diagnosis+="They don't have the same number of components!";
     else if(m._numberOfValues != n._numberOfValues)

@@ -57,7 +57,7 @@ void affiche_fieldT(FIELD<double> * myField, const SUPPORT * mySupport)
   int NumberOfComponents = myField->getNumberOfComponents() ;
 
   for (int i=1; i<NumberOf+1; i++) {
-    const double * value = myField->getValueI(MED_FULL_INTERLACE,i) ;
+    const double * value = myField->getRow(i) ;
     for (int j=0; j<NumberOfComponents; j++)
       cout << value[j]<< " ";
     cout<<endl;
@@ -85,7 +85,7 @@ void affiche_valeur_field(const FIELD<double>& f)
 {
     const int tailleMax=12;
     const int taille=f.getNumberOfValues()*f.getNumberOfComponents();
-    const double * value=f.getValue(f.getvalue()->getMode());
+    const double * value=f.getValue();
     if(taille<=tailleMax)
 	for(int i=0;i<taille;i++)
 	    cout << setw(3) << value[i] << " ";
@@ -105,10 +105,9 @@ void checkOperation(const FIELD<double>& resOp, const FIELD<double>& f1, const F
     int res=0;
 
     // get pointers to inside arrays of values
-    medModeSwitch mode=resOp.getvalue()->getMode();
-    const double * value=resOp.getValue(mode);
-    const double * value1=f1.getValue(mode);
-    const double * value2=f2.getValue(mode);
+    const double * value=resOp.getValue();
+    const double * value1=f1.getValue();
+    const double * value2=f2.getValue();
     const int size=f1.getNumberOfValues()*f1.getNumberOfComponents(); // size of field1
  
     // check size compatibility
@@ -202,7 +201,6 @@ int main (int argc, char ** argv)
     {
 	mySupport = new SUPPORT(myMesh,"Support on all Cells",MED_CELL);
 	myField1 = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
-	myField1->setValueType(MED_REEL64);
     }
     catch (MEDEXCEPTION &ex)
     {
@@ -330,7 +328,7 @@ int main (int argc, char ** argv)
     }
     try
     {
-	double mynorm2=myField1->norm2();
+      double mynorm2=myField1->norm2();
     }
     catch (MEDEXCEPTION & ex)
     {

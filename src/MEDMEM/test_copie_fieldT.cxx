@@ -52,7 +52,7 @@ void affiche_fieldT(FIELD<double> * myField, const SUPPORT * mySupport)
   int NumberOfComponents = myField->getNumberOfComponents() ;
 
   for (int i=1; i<NumberOf+1; i++) {
-    const double * value = myField->getValueI(MED_FULL_INTERLACE,i) ;
+    const double * value = myField->getRow(i) ;
     for (int j=0; j<NumberOfComponents; j++)
       cout << value[j]<< " ";
     cout<<endl;
@@ -89,13 +89,11 @@ int main (int argc, char ** argv) {
   SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_cell",MED_CELL);
   try {
     myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
-    myField->setValueType(MED_REEL64);
   } catch (...) {
     delete mySupport ;
     mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
     try {
       myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
-      myField->setValueType(MED_REEL64);
     } catch (...) {
       cout << "Field double " << fieldname << " not found !!!" << endl ;
       exit (-1) ;

@@ -6,10 +6,11 @@
 #include "MEDMEM_MedFieldDriver.hxx"
 #include <string>
 
+#include "MEDMEM_FieldForward.hxx"
+
 namespace MEDMEM {
 
   class MESH;
-  template<class T> class FIELD;
   class MED;
 
   namespace DRIVERFACTORY {

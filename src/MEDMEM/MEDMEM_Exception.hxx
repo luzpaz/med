@@ -12,7 +12,7 @@
 using namespace std;
 
 #ifndef LOCALIZED
-#define LOCALIZED(message) message , __FILE__ , __LINE__
+#define LOCALIZED(message)  static_cast<const char *> (message)   , __FILE__ , __LINE__
 #endif
 
 #define MED_EXCEPTION MEDEXCEPTION

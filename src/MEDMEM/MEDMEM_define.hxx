@@ -61,6 +61,7 @@ namespace MED_EN {
     typedef long medModeSwitch;
     const medModeSwitch MED_FULL_INTERLACE = 0;
     const medModeSwitch MED_NO_INTERLACE = 1;
+    const medModeSwitch MED_UNDEFINED_INTERLACE = 3;
     
     typedef long medConnectivity;
     const medConnectivity MED_NODAL = 0;
@@ -72,7 +73,7 @@ namespace MED_EN {
     
     typedef enum {MED_COOR, MED_CONN, MED_NOM, MED_NUM, MED_FAM} med_table;
     
-    typedef enum {MED_REEL64=6, MED_INT32=24,MED_INT64=26, MED_INT} med_type_champ;
+    typedef enum {MED_REEL64=6, MED_INT32=24,MED_INT64=26, MED_INT, MED_UNDEFINED_TYPE=0 } med_type_champ;
 
 #define MED_NBR_GEOMETRIE_MAILLE 15
 #define MED_NBR_GEOMETRIE_FACE 4
