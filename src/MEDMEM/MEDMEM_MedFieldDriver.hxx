@@ -402,7 +402,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
   MESSAGE("###### "<<LOC<<" fieldNameDRIVER : "<<MED_FIELD_DRIVER<T>::_fieldName<<" fieldName : "<<MED_FIELD_DRIVER<T>::_fieldName);
 
 
-  // EF : A CHANGER, le champ doit posséder le nom du maillage au pire le support
+  // EF : A CHANGER, le champ doit posséder le nom du maillage
   string MeshName =  MED_FIELD_DRIVER<T>::_ptrField->getSupport()->getMesh()->getName() ;
 
   if (MED_FIELD_DRIVER<T>::_status!=MED_OPENED) {
