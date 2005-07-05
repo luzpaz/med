@@ -187,8 +187,7 @@ public:
 
   virtual void          calculateConnectivity (MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh Entity);
 
-  virtual void          updateFamily (vector<FAMILY*> myFamilies);
-  virtual void          updateGroup (vector<GROUP*> myFamilies);
+  virtual void          updateFamily (const vector<FAMILY*>& myFamilies);
 
   inline MED_EN::medEntityMesh              getEntity               ()                     const;
   inline int                    getNumberOfTypes        (MED_EN::medEntityMesh Entity) const;
