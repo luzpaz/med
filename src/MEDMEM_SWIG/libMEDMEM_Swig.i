@@ -1704,6 +1704,17 @@ public :
 
   void addGroup            (const GROUP & Group) ;
 
+  void setPolygonsConnectivity     (const int * ConnectivityIndex,
+				    const int * ConnectivityValue,
+				    int nbOfPolygons,
+				    const medEntityMesh Entity);
+
+  void setPolyhedraConnectivity     (const int * PolyhedronIndex,
+				     const int * FacesIndex,
+				     const int * Nodes,
+				     int nbOfPolyhedra,
+				     const MED_EN::medEntityMesh Entity);
+
   %extend {
     void setCoordinates(const int SpaceDimension, const int NumberOfNodes,
 			const double * Coordinates, const char * System,
