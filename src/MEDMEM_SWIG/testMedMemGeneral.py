@@ -16,6 +16,8 @@ import sys,os,string
 filesPath=os.environ["MED_ROOT_DIR"]
 filesPath=filesPath+"/share/salome/resources/"
 
+os.system("rm -rf "+filesPath+"*_test.*")
+
 files = []
 meshNameFiles = []
 
