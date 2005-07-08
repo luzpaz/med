@@ -312,7 +312,7 @@ void CONNECTIVITY::setNodal(const int * Connectivity,
 
 
 //--------------------------------------------------------------------//
-void CONNECTIVITY::setPolygonsConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity, int* PolygonsConnectivity, int* PolygonsConnectivityIndex, int ConnectivitySize, int NumberOfPolygons)
+void CONNECTIVITY::setPolygonsConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity, const int* PolygonsConnectivity, const int* PolygonsConnectivityIndex, int ConnectivitySize, int NumberOfPolygons)
 //--------------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::setPolygonsConnectivity";
@@ -347,7 +347,7 @@ void CONNECTIVITY::setPolygonsConnectivity(medConnectivity ConnectivityType, med
 
 
 //--------------------------------------------------------------------//
-void CONNECTIVITY::setPolyhedronConnectivity(medConnectivity ConnectivityType, int* PolyhedronConnectivity, int* PolyhedronIndex, int ConnectivitySize, int NumberOfPolyhedron, int* PolyhedronFacesIndex /* =(int*)NULL */, int NumberOfFaces /* =0 */)
+void CONNECTIVITY::setPolyhedronConnectivity(medConnectivity ConnectivityType, const int* PolyhedronConnectivity, const int* PolyhedronIndex, int ConnectivitySize, int NumberOfPolyhedron, const int* PolyhedronFacesIndex /* =(int*)NULL */, int NumberOfFaces /* =0 */)
 //--------------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::setPolyhedronConnectivity";

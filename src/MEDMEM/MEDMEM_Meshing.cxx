@@ -40,6 +40,7 @@ void MESHING::setSpaceDimension(const int SpaceDimension)
 void MESHING::setMeshDimension(const int MeshDimension)
 {
    _meshDimension = MeshDimension ;
+   _connectivity->setEntityDimension(MeshDimension);
 }
 
 /*! Set the number of nodes used in the MESH */
@@ -244,6 +245,40 @@ void MESHING::setConnectivity(const int * Connectivity,
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity defined !"));
 
   _connectivity->setNodal(Connectivity,Entity,Type) ;
+}
+
+void MESHING::setPolygonsConnectivity     (const int * ConnectivityIndex,
+					   const int * ConnectivityValue,
+					   int nbOfPolygons,
+					   const MED_EN::medEntityMesh Entity)
+  throw (MEDEXCEPTION)
+{
+  if (_connectivity == (CONNECTIVITY*)NULL)
+    throw MEDEXCEPTION("No connectivity defined !");
+  if(_connectivity->getPolyTypeRelativeTo()==MED_EN::MED_POLYGON)
+    {
+      _connectivity->setPolygonsConnectivity(MED_NODAL, Entity, ConnectivityValue, ConnectivityIndex,ConnectivityIndex[nbOfPolygons]-1,nbOfPolygons) ;
+    }
+  else
+    throw MEDEXCEPTION("Invalid connectivity for polygons !!!");
+}
+
+void MESHING::setPolyhedraConnectivity     (const int * PolyhedronIndex,
+					    const int * FacesIndex,
+					    const int * Nodes,
+					    int nbOfPolyhedra,
+					    const MED_EN::medEntityMesh Entity)
+  throw (MEDEXCEPTION)
+{
+  if (_connectivity == (CONNECTIVITY*)NULL)
+    throw MEDEXCEPTION("No connectivity defined !");
+  if(_connectivity->getPolyTypeRelativeTo()==MED_EN::MED_POLYHEDRA)
+    {
+      int nbOfFacesOfAllPolyhedra=PolyhedronIndex[nbOfPolyhedra]-1;
+      _connectivity->setPolyhedronConnectivity(MED_NODAL, Nodes, PolyhedronIndex, FacesIndex[nbOfFacesOfAllPolyhedra]-1 , nbOfPolyhedra, FacesIndex, nbOfFacesOfAllPolyhedra) ;
+    }
+  else
+    throw MEDEXCEPTION("Invalid connectivity for polyhedra !!!");
 }
 
 /*!

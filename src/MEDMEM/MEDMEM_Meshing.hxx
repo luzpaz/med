@@ -47,6 +47,19 @@ public :
 			    const MED_EN::medEntityMesh Entity,
 			    const MED_EN::medGeometryElement Type)
     throw (MEDEXCEPTION) ;
+  
+  void setPolygonsConnectivity     (const int * ConnectivityIndex,
+				    const int * ConnectivityValue,
+				    int nbOfPolygons,
+				    const MED_EN::medEntityMesh Entity)
+    throw (MEDEXCEPTION) ;
+
+  void setPolyhedraConnectivity     (const int * PolyhedronIndex,
+				     const int * FacesIndex,
+				     const int * Nodes,
+				     int nbOfPolyhedra,
+				     const MED_EN::medEntityMesh Entity)
+    throw (MEDEXCEPTION) ;
 
   void setConnectivities   (const int * ConnectivityIndex,
 			    const int * ConnectivityValue,

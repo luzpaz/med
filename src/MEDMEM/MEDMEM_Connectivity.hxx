@@ -166,15 +166,15 @@ public:
 
   void setPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
 			       MED_EN::medEntityMesh Entity,
-			       int* PolygonsConnectivity,
-			       int* PolygonsConnectivityIndex,
+			       const int* PolygonsConnectivity,
+			       const int* PolygonsConnectivityIndex,
 			       int ConnectivitySize, int NumberOfPolygons);
 
   void setPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,
-				 int* PolyhedronConnectivity,
-				 int* PolyhedronIndex, int ConnectivitySize,
+				 const int* PolyhedronConnectivity,
+				 const int* PolyhedronIndex, int ConnectivitySize,
 				 int NumberOfPolyhedron,
-				 int* PolyhedronFacesIndex= (int*) NULL,
+				 const int* PolyhedronFacesIndex= (int*) NULL,
 				 int NumberOfFaces=0);
 
   inline bool   existConnectivity     (MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh Entity) const;
