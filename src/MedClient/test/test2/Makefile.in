@@ -40,7 +40,7 @@ EXPORT_PYSCRIPTS = \
 
 LIB = libCompo2cmodule.la
 LIB_SRC = Compo2.cxx
-LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl SALOME_Comm.idl MED.idl
+LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl SALOME_Comm.idl MED.idl SALOME_GenericObj.idl
 
 LDFLAGS= -L$(top_builddir)/lib/salome 
 LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
@@ -50,7 +50,18 @@ LIBS = -L${KERNEL_ROOT_DIR}/lib/salome -lMEDClientcmodule -lMEDMEM_Swigcmodule -
 
 # Executables targets
 
+ifeq (@SWIG_VERSION@, 1.3.21)
+SWIG_DEF = libCompo2.i dummy.i
+
+dummy_wrap.cxx: libCompo2_wrap.cxx
+	sed -e 's/SwigValueWrapper< vector<FAMILY \* > >/vector<FAMILY \* >/g' libCompo2_wrap.cxx > toto
+	mv toto libCompo2_wrap.cxx
+	sed -e 's/SwigValueWrapper< vector<SUPPORT \* > const >/vector<SUPPORT \* >/g' libCompo2_wrap.cxx > toto
+	mv toto libCompo2_wrap.cxx
+	touch dummy_wrap.cxx
+else
 SWIG_DEF = libCompo2.i
+endif
 
 MED.hh MEDSK.cc: MED.idl
 	omniidl -bcxx -Wbtp -I$(top_builddir)/idl -I${KERNEL_ROOT_DIR}/idl/salome $^

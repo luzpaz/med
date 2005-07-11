@@ -16,7 +16,7 @@
 		<component-username>Med</component-username>
 		<component-type>MESH</component-type>
 		<component-author>Patrick GOLDBRONN</component-author>
-		<component-version>2.2.0</component-version>
+		<component-version>3.0.1</component-version>
 		<component-comment>MED memory component</component-comment>
 		<component-multistudy>1</component-multistudy>
 		<component-icone>ModuleMed.png</component-icone>
