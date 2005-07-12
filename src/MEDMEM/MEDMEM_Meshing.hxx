@@ -20,7 +20,7 @@ public :
   ~MESHING();
 
   void setSpaceDimension   (const int SpaceDimension) ;
-  //void setMeshDimension    (const int MeshDimension) ;
+  void setMeshDimension    (const int MeshDimension) ;
   void setNumberOfNodes    (const int NumberOfNodes) ;
   void setCoordinates      (const int SpaceDimension,
 			    const int NumberOfNodes,
@@ -46,6 +46,19 @@ public :
   void setConnectivity     (const int * Connectivity,
 			    const MED_EN::medEntityMesh Entity,
 			    const MED_EN::medGeometryElement Type)
+    throw (MEDEXCEPTION) ;
+  
+  void setPolygonsConnectivity     (const int * ConnectivityIndex,
+				    const int * ConnectivityValue,
+				    int nbOfPolygons,
+				    const MED_EN::medEntityMesh Entity)
+    throw (MEDEXCEPTION) ;
+
+  void setPolyhedraConnectivity     (const int * PolyhedronIndex,
+				     const int * FacesIndex,
+				     const int * Nodes,
+				     int nbOfPolyhedra,
+				     const MED_EN::medEntityMesh Entity)
     throw (MEDEXCEPTION) ;
 
   void setConnectivities   (const int * ConnectivityIndex,

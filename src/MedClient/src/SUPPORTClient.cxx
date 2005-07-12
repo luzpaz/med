@@ -16,8 +16,7 @@ using namespace MED_EN;
 SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
 			     MESH * M) : 
   SUPPORT(), 
-  IOR_Support(SALOME_MED::SUPPORT::_duplicate(S)),
-  _ownMesh(false)
+  IOR_Support(SALOME_MED::SUPPORT::_duplicate(S)),_refCounter(1)
 {
   BEGIN_OF("SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)");
 
@@ -28,7 +27,6 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
   else
     {
       _mesh=new MESHClient(IOR_Support->getMesh());
-      _ownMesh=true;
     }
   blankCopy();
 
@@ -78,6 +76,10 @@ void SUPPORTClient::blankCopy()
 
   	SCRUTE(_totalNumberOfElements);
   	_complete_support = false;
+	//Gauss points settings
+	_numberOfGaussPoint = new int[_numberOfGeometricType];
+	for (int i=0;i<_numberOfGeometricType;i++)
+	  _numberOfGaussPoint[i] = 1 ;
   }
   catch( const CORBA::Exception &ex )
   {
@@ -102,9 +104,11 @@ void SUPPORTClient::fillCopy()
 
     const int * index, * value;
     long n_index, n_value;
-
-    value=(const int *)ReceiverFactory::getValue(IOR_Support->getSenderForNumber(MED_ALL_ELEMENTS),n_value);
-    index=(const int *)ReceiverFactory::getValue(IOR_Support->getSenderForNumberIndex(),n_index);
+    
+    SALOME::SenderInt_var senderForValue=IOR_Support->getSenderForNumber(MED_ALL_ELEMENTS);
+    value=(const int *)ReceiverFactory::getValue(senderForValue,n_value);
+    SALOME::SenderInt_var senderForIndex=IOR_Support->getSenderForNumberIndex();
+    index=(const int *)ReceiverFactory::getValue(senderForIndex,n_index);
     
     SCRUTE(n_index);
     SCRUTE(n_value);
@@ -124,8 +128,8 @@ SUPPORTClient::~SUPPORTClient()
 {
   BEGIN_OF("SUPPORTClient::~SUPPORTClient");
   IOR_Support->release();
-  if(_ownMesh)
-     delete _mesh;
+  if(_mesh)
+    _mesh->removeReference();
   END_OF("SUPPORTClient::~SUPPORTClient");
 }
 
@@ -178,3 +182,25 @@ const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION)
   return n;
 }
 
+//=============================================================================
+/*!
+ * 
+ */
+//=============================================================================
+void SUPPORTClient::addReference() const
+{
+  _refCounter++;
+}
+
+//=============================================================================
+/*!
+ * 
+ */
+//=============================================================================
+void SUPPORTClient::removeReference() const
+{
+  if (--_refCounter <= 0)
+    {
+      delete this;
+    }
+}

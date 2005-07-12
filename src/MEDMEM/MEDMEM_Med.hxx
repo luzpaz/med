@@ -25,7 +25,7 @@ struct LT_DT_IT_
 {
   bool operator() (const DT_IT_ &p1, const DT_IT_ &p2) const
   {
-    if ( bool test = p1.dt == p2.dt)
+    if ( p1.dt == p2.dt)
       return p1.it < p2.it ;
     else
       return  p1.dt < p2.dt ;
@@ -49,9 +49,12 @@ typedef map<DT_IT_, FIELD_*, LT_DT_IT_ > MAP_DT_IT_;
 class MED
 {
   // Add your personnal driver line (step 2)
-  friend class MED_MED_RDONLY_DRIVER;
-  friend class MED_MED_WRONLY_DRIVER;
-  friend class MED_MED_RDWR_DRIVER;
+  friend class MED_MED_RDONLY_DRIVER21;
+  friend class MED_MED_WRONLY_DRIVER21;
+  friend class MED_MED_RDWR_DRIVER21;
+  friend class MED_MED_RDONLY_DRIVER22;
+  friend class MED_MED_WRONLY_DRIVER22;
+  friend class MED_MED_RDWR_DRIVER22;
 
 private:
 
@@ -105,6 +108,8 @@ public:
   deque<DT_IT_> getFieldIteration (const string & fieldName) const throw (MEDEXCEPTION) ;
   FIELD_   * getField          ( const string & fieldName,
                                  const int dt,  const int it) const throw (MEDEXCEPTION) ;
+  FIELD_   * getField2          ( const string & fieldName,
+				 double time, int it=0) const throw (MEDEXCEPTION) ;
 
   const map<MED_EN::medEntityMesh,SUPPORT *> & getSupports(const string & meshName) const throw (MEDEXCEPTION) ;
 

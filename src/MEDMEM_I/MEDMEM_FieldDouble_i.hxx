@@ -32,7 +32,7 @@ public:
 
     SALOME_MED::double_array * getValue (SALOME_MED::medModeSwitch mode ) 
 				     throw (SALOME::SALOME_Exception);
-    SALOME::Sender_ptr getSenderForValue(SALOME_MED::medModeSwitch mode)
+    SALOME::SenderDouble_ptr getSenderForValue(SALOME_MED::medModeSwitch mode)
                                      throw (SALOME::SALOME_Exception);
 };
 }

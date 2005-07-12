@@ -8,11 +8,15 @@
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_Group.hxx"
 
-#include "MEDMEM_MedMeshDriver.hxx"
-#include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
+#include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_define.hxx"
+
+#ifdef _DEBUG_
+#include "LocalTraceCollector.hxx"
+#endif /* ifdef _DEBUG_*/
 
 using namespace std;
 using namespace MEDMEM;
@@ -81,6 +85,9 @@ void affiche_groupe(MESH *myMesh,medEntityMesh Entity)
 }
 
 int main (int argc, char ** argv) {
+#ifdef _DEBUG_
+  LocalTraceCollector::instance();
+#endif /* ifdef _DEBUG_*/
 
   int read;
 

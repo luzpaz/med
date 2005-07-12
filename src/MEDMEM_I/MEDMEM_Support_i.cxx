@@ -392,7 +392,7 @@ SCRUTE(numbers[i]);
  * CORBA: 2nd get Nodes 
  */
 //=============================================================================
-SALOME::Sender_ptr SUPPORT_i::getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
+SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception)
 {
   SCRUTE(_support);
@@ -401,7 +401,7 @@ SALOME::Sender_ptr SUPPORT_i::getSenderForNumber(SALOME_MED::medGeometryElement 
   if (_support==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
 				 SALOME::INTERNAL_ERROR);
-  SALOME::Sender_ptr ret;
+  SALOME::SenderInt_ptr ret;
   try
     {
       int nbelements=_support->getNumberOfElements(convertIdlEltToMedElt(geomElement));
@@ -456,13 +456,13 @@ throw (SALOME::SALOME_Exception)
  */
 //=============================================================================
 
-SALOME::Sender_ptr SUPPORT_i::getSenderForNumberIndex() 
+SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumberIndex() 
   throw (SALOME::SALOME_Exception)
 {
   if (_support==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
 				 SALOME::INTERNAL_ERROR);
-  SALOME::Sender_ptr ret;
+  SALOME::SenderInt_ptr ret;
   try
     {
       MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");

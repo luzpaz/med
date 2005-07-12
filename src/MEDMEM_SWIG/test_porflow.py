@@ -13,7 +13,7 @@ import os
 filePath=os.environ["MED_ROOT_DIR"]
 filePath=filePath+"/share/salome/resources/"
 porflowFile = "boitenew.inp"
-mesh1Name = string.split(gibiFile,".")[0]+"_fromPorflowDriver"
+mesh1Name = string.split(porflowFile,".")[0]+"_fromPorflowDriver"
 
 porflowFile = filePath + porflowFile
 medFile = string.split(porflowFile,".")[0]+"_fromPorflowDriver.med"

@@ -48,7 +48,18 @@ EXPORT_HEADERS = \
 	FIELDINTClient.hxx \
 	libMEDClient.i
 
+ifeq (@SWIG_VERSION@, 1.3.21)
+SWIG_DEF = libMEDClient.i dummy.i
+
+dummy_wrap.cxx: libMEDClient_wrap.cxx
+	sed -e 's/SwigValueWrapper< vector<FAMILY \* > >/vector<FAMILY \* >/g' libMEDClient_wrap.cxx > toto
+	mv toto libMEDClient_wrap.cxx
+	sed -e 's/SwigValueWrapper< vector<SUPPORT \* > const >/vector<SUPPORT \* >/g' libMEDClient_wrap.cxx > toto
+	mv toto libMEDClient_wrap.cxx
+	touch dummy_wrap.cxx
+else
 SWIG_DEF = libMEDClient.i
+endif
 
 EXPORT_PYSCRIPTS = libMEDClient.py
 
@@ -71,7 +82,8 @@ LIB_CLIENT_IDL= \
 	SALOMEDS_Attributes.idl \
 	SALOME_Exception.idl \
 	SALOME_Comm.idl \
-	MED.idl
+	MED.idl \
+	SALOME_GenericObj.idl
 
 # Executables targets
 BIN_SRC = 

@@ -398,7 +398,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the syntax corresponding to the use of input file is not implemented
 	if ( isKeyWord(buf_ligne,"LOCA") )
 	{
-	    MESSAGE("Mot clé LOCA détecté");
+	    MESSAGE("Mot clÃ© LOCA dÃ©tectÃ©");
 	    processLoca=true;
 	    // if currentGroup is not empty, a group has been precessed 
 	    //  -> we store it, clear currentGroup, and start the precessing of a new group
@@ -436,7 +436,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the syntax corresponding to structured grids is not implemented
 	else if ( isKeyWord(buf_ligne,"GRID") )
 	{
-	    MESSAGE("Mot clé GRID détecté");
+	    MESSAGE("Mot clÃ© GRID dÃ©tectÃ©");
 	    processLoca=false;
 	    pos=buf_ligne.find("UNST",0);
 	    if ( pos != string::npos ) // unstructured grid
@@ -468,7 +468,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the default option is HYBR
 	else if ( isKeyWord(buf_ligne,"CONN") )
 	{
-	    MESSAGE("Mot clé CONN détecté");
+	    MESSAGE("Mot clÃ© CONN dÃ©tectÃ©");
 	    processLoca=false;
 	    string fileCONN=getPorflowFileName(buf_ligne,"CONN");
 	    
@@ -478,6 +478,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 
 	    if(fileCONN.rfind('/') == string::npos)
 		// no directory was specified -> we add dirName, which may be empty
+
 		connFileName=dirName+fileCONN;
 	    else
 		connFileName=fileCONN;
@@ -488,7 +489,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   expected syntax : COOR {VERT} {filename}
 	else if ( isKeyWord(buf_ligne,"COOR") )
 	{
-	    MESSAGE("Mot clé COOR détecté");
+	    MESSAGE("Mot clÃ© COOR");
 	    processLoca=false;
 	    string fileCOOR=getPorflowFileName(buf_ligne,"COOR");
 
@@ -561,11 +562,12 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	if ( isGroupAList[i] ) 
 	{
 	    // medi.groupes[i].groupes is a vector of element numbers; it points to it
+  	    medi.groupes[i].mailles.resize( medi.groupes[i].groupes.size() );
 	    std::vector<int>::const_iterator it=medi.groupes[i].groupes.begin();
-	    for(  ; it!=medi.groupes[i].groupes.end(); ++it)
+	    for(int j = 0 ; it!=medi.groupes[i].groupes.end(); ++it, ++j)
 	    {
 		// insert the iterator to the corresponding cell we stored in p_ma_table
-		medi.groupes[i].mailles.insert( p_ma_table[*it] );
+		medi.groupes[i].mailles[j] = p_ma_table[*it];
 	    }
 	    
 	}
@@ -574,12 +576,14 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	    int nelem=0;
 	    int nface=0;
 	    int ngeom=0;
+	    int ielem=0;
 	    std::set<_maille>::iterator p_ma;
 	    _maille maille2D;
 	    
 	    // medi.groupes[i].groupes is a vector of paired element and surface numbers
 	    // *it points to the element number,  *(it+1) points to the surface number
 	    std::vector<int>::const_iterator it=medi.groupes[i].groupes.begin();
+	    medi.groupes[i].mailles.resize( medi.groupes[i].groupes.size() / 2 );
 	    for(  ; it!=medi.groupes[i].groupes.end(); ++it)
 	    {
 		nelem=*it;
@@ -598,17 +602,17 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 		maille2D.sommets.resize(l);
 		maille2D.geometricType = get2DMedGeomType(l);
 		p_ma = medi.maillage.insert(maille2D).first; // we insert the face in our mesh
-		medi.groupes[i].mailles.insert(p_ma); // and insert an iterator on it in our group
+		medi.groupes[i].mailles[ielem++]=p_ma; // and insert an iterator on it in our group
 		maille2D.sommets.clear();
 	    }
 
 	}
-	// medi.groupes[i].groupes.clear(); // we don't need element numbers anymore
+        medi.groupes[i].groupes.clear(); // we don't need element numbers anymore
 	
     }
 
     p_ma_table.clear(); // we don't need it anymore
-    MESSAGE(LOC << "GIBI_MESH_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
+    MESSAGE(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
     MESSAGE(LOC <<  medi );
 	    // TRANSFORMATION EN STRUCTURES MED
     if ( ! _ptrMesh->isEmpty() )
@@ -639,7 +643,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 
 	// appele en dernier car cette fonction detruit le maillage intermediaire!
 	_ptrMesh->_connectivity = medi.getConnectivity(); 
-	MESSAGE(LOC << "GIBI_MESH_RDONLY_DRIVER::read : FIN ");
+	MESSAGE(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : FIN ");
 
 	// calcul de la connectivite d-1 complete, avec renumerotation des groupes
 	// if (_ptrMesh->_spaceDimension==3)
@@ -647,9 +651,8 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	// else if (_ptrMesh->_spaceDimension==2)
 	//     _ptrMesh->_connectivity->updateGroup(_ptrMesh->_groupEdge) ;
 	
-	// Creation des familles à partir des groupes
-	// NC : Cet appel pourra être différé quand la gestion de la cohérence famille/groupes sera assurée
-	_ptrMesh->createFamilies();
+	// Creation des familles ?artir des groupes
+	// NC : Cet appel pourra ?e diffé²© quand la gestion de la cohé²¥nce famille/groupes sera assuré¥Š	_ptrMesh->createFamilies();
     }
 
 

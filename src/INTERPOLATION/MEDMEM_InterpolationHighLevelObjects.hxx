@@ -11,6 +11,8 @@
 #include "MEDMEM_WrapperField.hxx"
 #include "MEDMEM_InterpolationTools.hxx"
 
+#define _CALCUL_HYBRIDE_ Calcul_Hybride<Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>
+
 //////////////////////////////////////////////////////////////////
 ///                                                            ///
 ///                        DECLARATIONS                        ///
@@ -157,20 +159,20 @@ public :
 		Meta_Nuage_Maille *              nm = MW->Get_Nuage_Mailles();
 		Wrapper_MED_Field *              c  = MW->Get_Champ();
 		
-		mailles=nm;
+		_CALCUL_HYBRIDE_::mailles=nm;
 		
-		fonctions[ MED_EN::MED_TRIA3  ]=new Calcul_Interpolation_Tria3  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[ MED_EN::MED_QUAD4  ]=new Calcul_Interpolation_Quad4  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[ MED_EN::MED_TETRA4 ]=new Calcul_Interpolation_Tetra4 <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[ MED_EN::MED_HEXA8  ]=new Calcul_Interpolation_Hexa8  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[ MED_EN::MED_PENTA6 ]=new Calcul_Interpolation_Penta6 <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[ MED_EN::MED_PYRA5  ]=new Calcul_Interpolation_Pyra5  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
-		fonctions[ MED_EN::MED_TRIA6  ]=fonctions[ MED_EN::MED_TRIA3  ];
-		fonctions[ MED_EN::MED_QUAD8  ]=fonctions[ MED_EN::MED_QUAD4  ];
-		fonctions[ MED_EN::MED_TETRA10]=fonctions[ MED_EN::MED_TETRA4 ];
-		fonctions[ MED_EN::MED_HEXA20 ]=fonctions[ MED_EN::MED_HEXA8  ];
-		fonctions[ MED_EN::MED_PENTA15]=fonctions[ MED_EN::MED_PENTA6 ];
-		fonctions[ MED_EN::MED_PYRA13 ]=fonctions[ MED_EN::MED_PYRA5  ];
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_TRIA3  ]=new Calcul_Interpolation_Tria3  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_QUAD4  ]=new Calcul_Interpolation_Quad4  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_TETRA4 ]=new Calcul_Interpolation_Tetra4 <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_HEXA8  ]=new Calcul_Interpolation_Hexa8  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_PENTA6 ]=new Calcul_Interpolation_Penta6 <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_PYRA5  ]=new Calcul_Interpolation_Pyra5  <Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>(nn,nm,c);
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_TRIA6  ]=_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_TRIA3  ];
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_QUAD8  ]=_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_QUAD4  ];
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_TETRA10]=_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_TETRA4 ];
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_HEXA20 ]=_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_HEXA8  ];
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_PENTA15]=_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_PENTA6 ];
+		_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_PYRA13 ]=_CALCUL_HYBRIDE_::fonctions[ MED_EN::MED_PYRA5  ];
 		}
 	Valeur<double> operator() (Wrapper_Noeud<DIMENSION> & node, int num_maille){return Calcul_Hybride<Wrapper_MED_Field,Valeur<double>,Wrapper_Nuage_Noeud<DIMENSION>,Wrapper_Noeud<DIMENSION>,Meta_Nuage_Maille>::operator()(node,num_maille);}
 	Valeur<double> operator() (double * node, int num_maille) 

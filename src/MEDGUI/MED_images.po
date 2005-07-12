@@ -1,4 +1,4 @@
-#  MED MEDGUI : MED component GUI implemetation 
+#  MED MEDGUI : MED component GUI implemetation
 #
 #  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 #  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
@@ -32,4 +32,13 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 
-<
+msgid "ICO_TB_MESHSEL"
+msgstr "Data.png"
+
+msgid "ICO_TB_FIELDSEL"
+msgstr "Infos.png"
+
+msgid "ICO_TB_EXPLORE"
+msgstr "Structure.png"
+
+

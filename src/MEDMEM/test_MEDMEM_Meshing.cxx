@@ -2,6 +2,10 @@
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Field.hxx"
 
+#ifdef _DEBUG_
+#include "LocalTraceCollector.hxx"
+#endif /* ifdef _DEBUG_*/
+
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -15,6 +19,10 @@ int main (int argc, char ** argv) {
     cerr << "        2 files filenameRoot.med and filenameRoot.vtk" << endl << endl;
     exit(-1);
   }
+
+#ifdef _DEBUG_
+  LocalTraceCollector::instance();
+#endif /* ifdef _DEBUG_*/
 
   // filename to save the generated MESH
   string filenameRoot = argv[1] ;

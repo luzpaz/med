@@ -297,13 +297,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: 2nd Accessor for Coordinates
  */
 //=============================================================================
-SALOME::Sender_ptr MESH_i::getSenderForCoordinates(SALOME_MED::medModeSwitch typeSwitch)
+SALOME::SenderDouble_ptr MESH_i::getSenderForCoordinates(SALOME_MED::medModeSwitch typeSwitch)
     throw (SALOME::SALOME_Exception)
 {
   if (_mesh==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
 				 SALOME::INTERNAL_ERROR);
-  SALOME::Sender_ptr ret;
+  SALOME::SenderDouble_ptr ret;
   try
     {
       int spaceDimension=_mesh->getSpaceDimension();
@@ -575,7 +575,7 @@ SCRUTE(nbelements);
  * CORBA: 2nd Accessor for connectivities
  */
 //=============================================================================
-SALOME::Sender_ptr MESH_i::getSenderForConnectivity(SALOME_MED::medModeSwitch typeSwitch,
+SALOME::SenderInt_ptr MESH_i::getSenderForConnectivity(SALOME_MED::medModeSwitch typeSwitch,
 					       SALOME_MED::medConnectivity mode, 
 					       SALOME_MED::medEntityMesh entity, 
 					       SALOME_MED::medGeometryElement geomElement)
@@ -587,7 +587,7 @@ throw (SALOME::SALOME_Exception)
   if (verifieParam(entity,geomElement)==false)
     THROW_SALOME_CORBA_EXCEPTION("parameters don't match",\
 				 SALOME::BAD_PARAM);
-  SALOME::Sender_ptr ret;
+  SALOME::SenderInt_ptr ret;
   try
     {
       int nbelements=_mesh->getConnectivityLength(convertIdlModeToMedMode(typeSwitch),
@@ -1510,6 +1510,29 @@ throw (SALOME::SALOME_Exception)
                 MESSAGE("Unable to link the mesh to the driver ");
 		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
+}
+
+//=============================================================================
+/*!
+ * CORBA : Test if this and other aggregate the same MESH using the virtual MESH::operator==
+ */
+//=============================================================================
+CORBA::Boolean MESH_i::areEquals(SALOME_MED::MESH_ptr other)
+{
+  PortableServer::ServantBase *baseServ;
+  try {
+    baseServ=_default_POA()->reference_to_servant(other);
+  }
+  catch(...){
+    baseServ=0;
+  }
+  if(baseServ)
+    {
+     baseServ->_remove_ref();
+     MESH_i *otherServ=dynamic_cast<MESH_i *>(baseServ);
+     return *_mesh==*otherServ->_mesh;
+    }
+  return false;
 }
 
 //=============================================================================

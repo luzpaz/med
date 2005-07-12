@@ -17,6 +17,10 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
+#ifdef _DEBUG_
+#include "LocalTraceCollector.hxx"
+#endif /* ifdef _DEBUG_*/
+
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -57,6 +61,9 @@ void affiche_coordinate(COORDINATE & myCoordinate, int _numberofNodes, int _spac
 
 
 int main (int argc, char ** argv) {
+#ifdef _DEBUG_
+  LocalTraceCollector::instance();
+#endif /* ifdef _DEBUG_*/
 
   /*
   if ((argc !=3) && (argc != 4)) {

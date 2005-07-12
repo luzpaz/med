@@ -11,6 +11,10 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_VtkMedDriver.hxx"
 
+#ifdef _DEBUG_
+#include "LocalTraceCollector.hxx"
+#endif /* ifdef _DEBUG_*/
+
 using namespace std;
 using namespace MEDMEM;
 void usage(char * name)
@@ -21,7 +25,10 @@ void usage(char * name)
 }
 
 int main (int argc, char ** argv) {
-  
+#ifdef _DEBUG_
+  LocalTraceCollector::instance();
+#endif /* ifdef _DEBUG_*/
+
   if (argc != 3) usage(argv[0]);
   
   string filenameIN = argv[1] ;

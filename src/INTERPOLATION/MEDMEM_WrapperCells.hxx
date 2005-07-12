@@ -293,8 +293,6 @@ inline int  Wrapper_Maille::DONNE_NUM_LOC_FACE_EGALE_A_FORMANT(const type_retour
 	{
 	type_retour face_loc;
 	int num_face;
-	int taille_face_exam;
-	int test=FAUX;
 	for (num_face=0;num_face<DONNE_NBR_FACES();num_face++)
 		{
 		DONNE_FACE(num_face,face_loc);

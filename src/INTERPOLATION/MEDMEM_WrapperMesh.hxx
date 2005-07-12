@@ -141,12 +141,11 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 		exit(-1);
 		}
 		
-	int i,j,k;
+	int i,j;
 	int num_local_face;
-	int ind_num_noeud,num_noeud;
+	int num_noeud;
 	int num_maille;
 	int ind_num_maille_sec,num_maille_sec;
-	int num_local_sec;
 	int flag_existence;
 	int nbr_mailles=mailles->SIZE();
 	int nbr_formants=0;

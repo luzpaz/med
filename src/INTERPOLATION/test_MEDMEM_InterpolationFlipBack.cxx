@@ -10,6 +10,10 @@
 
 #include "stdio.h"
 
+#ifdef _DEBUG_
+#include "LocalTraceCollector.hxx"
+#endif /* ifdef _DEBUG_*/
+
 using namespace MEDMEM;
 
 // pour gestion timings
@@ -134,6 +138,9 @@ void Flipback(FIELD<double> * firstField, FIELD<double> * secondField)
 #include "MEDMEM_WrapperCells.hxx"
 
 main () {
+#ifdef _DEBUG_
+  LocalTraceCollector::instance();
+#endif /* ifdef _DEBUG_*/
 
   const char * fromFileName   = "ResultatSyrthes.med";
   const char * toFileName     = "MaillageAster.med";
