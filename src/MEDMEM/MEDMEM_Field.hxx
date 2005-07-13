@@ -24,7 +24,6 @@
 #include "MEDMEM_FieldForward.hxx"
 
 
-
 /*!
 
   This class contains all the informations related with a template class FIELD :
@@ -168,6 +167,8 @@ public:
     Destructor.
   */
   virtual ~FIELD_();
+
+  FIELD_& operator=(const FIELD_ &m);
 
   virtual  void     rmDriver(int index);
   virtual   int     addDriver(driverTypes driverType,
@@ -572,9 +573,6 @@ private:
   void _mul_in_place(const FIELD& m,const FIELD& n);
   void _div_in_place(const FIELD& m,const FIELD& n) throw (MEDEXCEPTION);
 
-  FIELD & operator=(const FIELD &m);	// A FAIRE
-
-
 public:
 
   FIELD();
@@ -585,6 +583,8 @@ public:
 	const int iterationNumber = -1, const int orderNumber = -1)
     throw (MEDEXCEPTION);
   ~FIELD();
+
+  FIELD& operator=(const FIELD& m);
 
   const FIELD operator+(const FIELD& m) const;
   const FIELD operator-(const FIELD& m) const;
@@ -648,9 +648,8 @@ public:
   inline const T*     getColumn(int j) const;
   inline T            getValueIJ(int i,int j) const;
 
-  inline void setValue(MEDMEM_Array<T,INTERLACING_TAG> *value);
+  inline void setArray(MEDMEM_Array_ *value);
   inline void setValue( T* value);
-  //  inline void setValueI( int i, T* value); --> A REMPLACER PAR setRow et setColumn
   inline void setValueIJ(int i, int j, T value);
 
   /*!
@@ -777,6 +776,9 @@ template <class T, class INTERLACING_TAG>  FIELD<T,INTERLACING_TAG>::FIELD(const
   FIELD_((FIELD_) m)
 {
   MESSAGE("Constructeur FIELD de recopie");
+
+  // VOIR A APPELER L'OPERATEUR D'AFFECTATION, EN CORRIGEANT L'OPERATEUR D'AFFECTATION
+  // POUR AVOIR UNE RECOPIE PROFONDE
   if (m._value != NULL)
     {
       if ( m.getGaussPresence() )
@@ -786,6 +788,9 @@ template <class T, class INTERLACING_TAG>  FIELD<T,INTERLACING_TAG>::FIELD(const
     }
   else
     _value = (ArrayNoGauss *) NULL;
+
+  _valueType       = m._valueType;
+  _interlacingType = m._interlacingType;
   //_drivers = m._drivers;
 }
 
@@ -794,15 +799,21 @@ template <class T, class INTERLACING_TAG>  FIELD<T,INTERLACING_TAG>::FIELD(const
   Not implemented.
   \endif
 */
-template <class T, class INTERLACING_TAG>  
+template <class T, class INTERLACING_TAG>
 FIELD<T,INTERLACING_TAG> & FIELD<T,INTERLACING_TAG>::operator=(const FIELD &m)
 {
   MESSAGE("Appel de FIELD<T>::operator=") ;
   if ( this == &m) return *this;
 
-  // Appel de operator= on FIELD_
-  // ignore driver
   // copy values array
+  FIELD_::operator=(m);  // Driver are ignored & ?copie su pointeur de Support?
+
+  _value           = m._value; //PROBLEME RECOPIE DES POINTEURS PAS COHERENT AVEC LE
+                               //CONSTRUCTEUR PAR RECOPIE
+                               //CF :Commentaire dans MEDMEM_Array 
+  _valueType       = m._valueType;
+  _interlacingType = m._interlacingType;
+
 }
 
 /*!
@@ -1477,7 +1488,7 @@ double FIELD<T,INTERLACING_TAG>::normL2(int component,
 
     double integrale=0.0;
     double totVol=0.0;
-    for (; value!=lastvalue ; ++value ,++vol) 
+    for (; value!=lastvalue ; ++value ,++vol)
     {
 	integrale += static_cast<double>((*value) * (*value)) * (*vol);
 	totVol+=*vol;
@@ -1497,7 +1508,7 @@ double FIELD<T,INTERLACING_TAG>::normL2(int component,
 //  *   Cannot be applied to a field with a support on nodes.
 //  *   If the optional p_field_volume argument is furnished, the volume is not re-calculated.
 //  */
-template <class T,class INTERLACING_TAG> 
+template <class T,class INTERLACING_TAG>
 double FIELD<T,INTERLACING_TAG>::normL2(const FIELD<double,FullInterlace> * p_field_volume) const
 {
     _checkNormCompatibility(p_field_volume); // may throw exception
@@ -1610,10 +1621,10 @@ double FIELD<T,INTERLACING_TAG>::normL1(const FIELD<double,FullInterlace> * p_fi
     const double* p_vol=vol;
     for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
 	totVol+=*p_vol;
-    
+
     double integrale=0.0;
     for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
-	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) 
+	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
 	    integrale += std::abs( static_cast<double>(*value) ) * (*p_vol);
 
     if(!p_field_volume) // if the user didn't supply the volume
@@ -1658,7 +1669,7 @@ template <class T, class INTERLACING_TAG>  FIELD<T,INTERLACING_TAG>::FIELD(const
 
   //INITIALISATION DE _interlacingType DS LE CONSTRUCTEUR DE FIELD_
   ASSERT(FIELD_::_interlacingType == MED_EN::MED_UNDEFINED_TYPE)
-  FIELD_::_interlacingType=SET_INTERLACING_TYPE<FullInterlace>::_interlacingType;
+  FIELD_::_interlacingType=SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType;
 
   _support = Support;
   _value = (MEDMEM_Array<T,INTERLACING_TAG> *)NULL;
@@ -2023,7 +2034,7 @@ template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::r
   Destroy the MEDARRAY<T,INTERLACING_TAG> in FIELD and put the new one without copy.
   \endif
 */
-template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::setValue(MEDMEM_Array<T,INTERLACING_TAG> *Value)
+template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::setArray(MEDMEM_Array_ *Value)
 {
   if (NULL != _value) delete _value ;
   _value=Value ;

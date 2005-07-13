@@ -46,27 +46,22 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
   }
 }
 
-FIELD_::FIELD_(const FIELD_ &m)
-{
-  _isRead = m._isRead ;
-  _name = m._name;
-  _description = m._description;
-  _support = m._support;
-  _numberOfComponents = m._numberOfComponents;
-  _numberOfValues = m._numberOfValues;
+FIELD_& FIELD_::operator=(const FIELD_ &m) {
 
-  if (m._componentsTypes != NULL)
-    {
-      _componentsTypes = new int[m._numberOfComponents] ;
-      memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
-      /*
-      _componentsTypes = new int[m._numberOfComponents] ;
-      for(int i=0;i<m._numberOfComponents;i++) {
-	_componentsTypes[i] = m._componentsTypes[i] ;
-      }
-      */
-    }
-  else _componentsTypes = (int *) NULL;
+  if ( this == &m) return *this;
+
+  _isRead             = m._isRead ;
+  _name               = m._name;
+  _description        = m._description;
+  _support            = m._support;   //Cf Opérateur de recopie du Support?
+  _numberOfComponents = m._numberOfComponents;
+  _numberOfValues     = m._numberOfValues;
+
+  if (m._componentsTypes != NULL) {
+    _componentsTypes = new int[m._numberOfComponents] ;
+    memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
+  } else 
+    _componentsTypes = (int *) NULL;
 
   _componentsNames = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
@@ -81,13 +76,22 @@ FIELD_::FIELD_(const FIELD_ &m)
   _MEDComponentsUnits = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_MEDComponentsUnits[i] = m._MEDComponentsUnits[i];}
+
   _iterationNumber = m._iterationNumber;
-  _time = m._time;
-  _orderNumber = m._orderNumber;
-  _valueType = m._valueType;
-  _interlacingType = m._interlacingType;
+  _time            = m._time;
+  _orderNumber     = m._orderNumber;
+
+  // _valueType et _interlacingType doivent uniquement être recopiés 
+  // par l'opérateur de recopie de FIELD<T,...>
+
   //_drivers = m._drivers ; // PG : Well, same driver, what about m destructor !
 
+  return *this;
+}
+
+FIELD_::FIELD_(const FIELD_ &m)
+{
+  *this = m;
 }
 
 FIELD_::~FIELD_()

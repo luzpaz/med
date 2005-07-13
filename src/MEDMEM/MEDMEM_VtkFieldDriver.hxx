@@ -50,8 +50,9 @@ public :
   /*!
     Constructor.
   */
+  template <class INTERLACING_TAG>
   VTK_FIELD_DRIVER():GENDRIVER(),
-                     _ptrField((FIELD<T> *)MED_NULL), _fieldName(""),
+		     _ptrField((FIELD<T,INTERLACING_TAG> *)MED_NULL), _fieldName(""),
 		     _fieldNum(MED_INVALID)
   {
     const char * LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER() ";
@@ -64,7 +65,8 @@ public :
   /*!
     Constructor.
   */
-  VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField)
+  template <class INTERLACING_TAG>
+  VTK_FIELD_DRIVER(const string & fileName, FIELD<T,INTERLACING_TAG> * ptrField)
     : GENDRIVER(fileName,MED_EN::MED_WRONLY),
       _ptrField((FIELD<T> *) ptrField),
       _fieldName(fileName),_fieldNum(MED_INVALID) 

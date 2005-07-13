@@ -75,7 +75,8 @@ MEDMEM_IndexCheckingPolicy.hxx \
 MEDMEM_InterlacingPolicy.hxx \
 MEDMEM_InterlacingTraits.hxx \
 MEDMEM_nArray.hxx \
-MEDMEM_Tags.hxx
+MEDMEM_Tags.hxx \
+MEDMEM_FieldConvert.hxx
 
 
 # Libraries targets

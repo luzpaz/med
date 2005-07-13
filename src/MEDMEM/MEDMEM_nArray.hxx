@@ -106,9 +106,9 @@ public  :
 
   };
 
-  // Constructeur de recopie pour un MEDMEM_Array avec les mêmes 
+  // Constructeur de recopie pour un MEDMEM_Array avec les mêmes
   // paramètres template qu'à la construction
-  inline MEDMEM_Array(const MEDMEM_Array & array, bool shallowCopy=true)
+  inline MEDMEM_Array(const MEDMEM_Array & array, bool shallowCopy=false)
     :InterlacingPolicy(array,shallowCopy)
   {
     if (shallowCopy)
@@ -118,14 +118,8 @@ public  :
   }
 
 
-//   inline MEDMEM_Array( const MEDMEM_Array< class ARRAY_ELEMENT_TYPE_OTHER,
-// 		       class INTERLACING_POLICY_OTHER,
-// 		       class CHECKING_POLICY_OTHER > & array )
-//   {
-//     //ERREUR
-//   }
-
-
+  // L'utilisation d'une copie superficielle pour l'opérateur d'affectation
+  // ne me parait pas être une bonne ideé : Compatibilité ancienne version MEDARRAY?
   inline MEDMEM_Array<ElementType,InterlacingPolicy,CheckingPolicy> &
          operator=( const MEDMEM_Array & array) {
     if ( this == &array) return *this;

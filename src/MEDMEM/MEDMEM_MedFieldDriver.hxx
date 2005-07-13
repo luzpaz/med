@@ -36,6 +36,14 @@ template <class T> class MED_FIELD_DRIVER : public GENDRIVER
 protected:
 
   FIELD<T> *     _ptrField;
+  // Developement plus propre :
+  // - Il faudrait soit utiliser le type FIELD_ et ajouter à cette classe
+  //   les accesseurs de FIELD<> utilisés dans les drivers
+  // - Ou bien avoir des drivers à deux paramètres template (le top)
+  // - Remarquez l'affreux cast dans le second constructeur :
+  //      _ptrField( (FIELD<T> *) ptrField )
+  //   Celà cast toujours le ptrField en FullInterlace
+  //   Celà ne pose cependant pas de pb de fonctionement car les drivers
   med_2_1::med_idt        _medIdt;
   string         _fieldName;
   int            _fieldNum;
@@ -52,12 +60,13 @@ public :
     Constructor.
   */
   MED_FIELD_DRIVER():GENDRIVER(),
-                     _ptrField((FIELD<T> *)MED_NULL),_medIdt(MED_INVALID),
+		     _ptrField((FIELD<T> *)MED_NULL),_medIdt(MED_INVALID),
                      _fieldName(""),_fieldNum(MED_INVALID) {}
   /*!
     Constructor.
   */
-  MED_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField,
+  template <class INTERLACING_TAG>
+  MED_FIELD_DRIVER(const string & fileName, FIELD<T,INTERLACING_TAG> * ptrField,
 		   MED_EN::med_mode_acces accessMode)
     : GENDRIVER(fileName,accessMode),
       _ptrField((FIELD<T> *) ptrField),_medIdt(MED_INVALID),
@@ -167,7 +176,8 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_RDONLY_DRIVER(const string & fileName,  FIELD<T> * ptrField):
+  template <class INTERLACING_TAG>
+  MED_FIELD_RDONLY_DRIVER(const string & fileName,  FIELD<T,INTERLACING_TAG> * ptrField):
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY) {
     BEGIN_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
     END_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
@@ -220,7 +230,8 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField):
+  template <class INTERLACING_TAG>
+  MED_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T,INTERLACING_TAG> * ptrField):
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_WRONLY)
   {
     BEGIN_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
@@ -273,7 +284,8 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_RDWR_DRIVER(const string & fileName, FIELD<T> * ptrField):
+  template <class INTERLACING_TAG>
+  MED_FIELD_RDWR_DRIVER(const string & fileName, FIELD<T,INTERLACING_TAG> * ptrField):
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDWR)
   {
     BEGIN_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
