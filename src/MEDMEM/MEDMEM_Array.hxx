@@ -41,7 +41,7 @@ namespace MEDMEM {
 template <class T> class MEDARRAY
 {
 private :
-				
+
   				/*! leading dimension of value (example : space dimension for coordinates) */
   int 	_ldValues;
   				/*! length of values (example : number of nodes for coordinates) */
@@ -106,9 +106,9 @@ public :
 
 
 template <class T> inline MEDARRAY<T>::MEDARRAY():
-			_ldValues(0), _lengthValues(0), _mode(MED_EN::MED_FULL_INTERLACE),
-			_valuesFull(), _valuesNo(),
-	      		_valuesDefault(), _valuesOther()
+  _ldValues(0), _lengthValues(0), _mode(MED_EN::MED_FULL_INTERLACE),
+  _valuesFull(), _valuesNo(),
+  _valuesDefault(), _valuesOther()
 {
 };
 
@@ -174,7 +174,7 @@ template <class T> MEDARRAY<T>::MEDARRAY(const int ld_values,
 //				------------------
 
   				/*! This constructor duplicate T*values.\n
-				    
+
 				    Throws MEDEXCEPTION if  the lenght of T is < 1*/
 template <class T> MEDARRAY<T>::MEDARRAY( T*values,
 					  const int ld_values,
@@ -290,7 +290,7 @@ template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & p,bool copyOther ):
 //      {
 //        throw MEDEXCEPTION("MEDARRAY MEDARRAY const &m,bool copyOther : No Other values defined and bool = true !");
 //      }
-  
+
   if ( _mode == MED_EN::MED_FULL_INTERLACE)
     {
       _valuesFull.set(p._ldValues*p._lengthValues,(const T*)p._valuesFull);
@@ -330,7 +330,7 @@ template <class T> MEDARRAY<T> & MEDARRAY<T>::operator = (const MEDARRAY & m)
   _ldValues=m._ldValues;
   _lengthValues=m._lengthValues;
   _mode=m._mode;
-  
+
   //  SCRUTE(_mode);
 
   if ((const T*) m._valuesFull !=NULL)
@@ -338,7 +338,7 @@ template <class T> MEDARRAY<T> & MEDARRAY<T>::operator = (const MEDARRAY & m)
 
   if ((const T*) m._valuesNo !=NULL)
     _valuesNo.set(_ldValues*_lengthValues,(const T*) m._valuesNo);
-  
+
   if (_mode == MED_EN::MED_FULL_INTERLACE) {
     //PN : pour enlever les warning compilateur
     //_valuesDefault.set((const T*) _valuesFull);
@@ -438,12 +438,9 @@ template <class T> const T* MEDARRAY<T>::get(const MED_EN::medModeSwitch mode)
 				    (ith line in a MED_FULL_INTERLACE representation )\n
 				    Be aware : if _mode is MED_NO_INTERLACE, the entire
 				    array will be recalculate in MED_FULL_INTERLACE representation.\n*/
-				
+
 template <class T> const T* MEDARRAY<T>::getRow(const int i)
 {
-
-  //  BEGIN_OF("MEDARRAY<T>::getRow(const int i)");
-
   if ((T*)_valuesDefault == NULL)
   {
   	throw MEDEXCEPTION("MEDARRAY::getRow(i) : No values defined !");
@@ -459,7 +456,6 @@ template <class T> const T* MEDARRAY<T>::getRow(const int i)
 
   if ((T*)_valuesFull == NULL)
   {
-	ASSERT(((T*) _valuesDefault)==((T*) _valuesNo));
   	calculateOther();
   }
   ASSERT((T*)_valuesFull != NULL);
@@ -468,7 +464,6 @@ template <class T> const T* MEDARRAY<T>::getRow(const int i)
   //const T* ptr = (const T*)_valuesFull + (i-1)*_ldValues;
   const T* ptr =  (T*) _valuesFull + (i-1)*_ldValues;
 
-  //  END_OF("MEDARRAY<T>::getRow(const int i )");
   return ptr;
 }
 //				------------------
@@ -481,7 +476,6 @@ template <class T> const T* MEDARRAY<T>::getRow(const int i)
 
 template <class T> const T* MEDARRAY<T>::getColumn(const int j)
 {
-  //  BEGIN_OF("MEDARRAY<T>::getColumn(const int j)");
   if ((T*)_valuesDefault == NULL)
   {
   	throw MEDEXCEPTION("MEDARRAY::getColumn(j) : No values defined !");
@@ -544,7 +538,7 @@ template <class T> const T MEDARRAY<T>::getIJ(const int i,const  int j) const
   {
   	return _valuesDefault[(j-1)*_lengthValues+i-1];
   }
- 
+
 }
 
 //				------------------
@@ -553,8 +547,6 @@ template <class T> const T MEDARRAY<T>::getIJ(const int i,const  int j) const
   				    (internal use : needed by write method) */
 template <class T> inline MED_EN::medModeSwitch MEDARRAY<T>::getMode() const
 {
-  //  BEGIN_OF("MEDARRAY<T>::getMode()");
-  //  END_OF("MEDARRAY<T>::getMode()");
   return _mode;
 }
 
@@ -587,7 +579,7 @@ template <class T> inline MED_EN::medModeSwitch MEDARRAY<T>::getMode() const
 //    END_OF("MEDARRAY<T>::set(mode,i,value)");
 //  }
 
-// set with duplication because we don't know were value come and 
+// set with duplication because we don't know were value come and
 // MEDARRAY must have properties on it !!!!
 template <class T> void MEDARRAY<T>::set(const MED_EN::medModeSwitch mode, const T* value)
 {
@@ -614,7 +606,7 @@ template <class T> void MEDARRAY<T>::set(const MED_EN::medModeSwitch mode, const
 
 /*! This function clears the other mode of representation if it exists
  *  It is usefull for people who needs for optimisation reasons to work directly
- *  on the inside array without using set-functions 
+ *  on the inside array without using set-functions
  */
 template <class T> void MEDARRAY<T>::clearOtherMode()
 {

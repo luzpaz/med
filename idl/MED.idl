@@ -2,11 +2,14 @@
 // Project: SALOME
 // Copyright : CEA/DEN/DMSS/LGLS
 // $Header$
-/*! 
+
+/*!
 This file contains the main IDL definitions of the %MED component in %SALOME application.
 */
+
 #ifndef MED_IDL
 #define MED_IDL
+
 /*!
  \defgroup MED SALOME MED component
 
@@ -40,7 +43,7 @@ module SALOME_MED {
 
 /*! \ingroup MED
 This package contains a set of interfaces used for %SALOME %MED component.
-*/ 
+*/
 
 
   interface FIELD;
@@ -49,8 +52,8 @@ This package contains a set of interfaces used for %SALOME %MED component.
   interface MESH;
   interface SUPPORT;
 
-/*! 
-This enumeration contains a set of elements defining the type of geometrical elements which constitue 
+/*!
+This enumeration contains a set of elements defining the type of geometrical elements which constitue
 a %Mesh.
 */
   typedef long medGeometryElement;
@@ -73,8 +76,8 @@ a %Mesh.
   const medGeometryElement MED_ALL_ELEMENTS = 999;
 
 
-/*! 
-This enumeration contains a set of elements defining the structural elements (entities) which constitue 
+/*!
+This enumeration contains a set of elements defining the structural elements (entities) which constitue
 a %Mesh.
 */
   typedef long medEntityMesh;
@@ -84,7 +87,7 @@ a %Mesh.
   const medEntityMesh MED_NODE = 3;
   const medEntityMesh MED_ALL_ENTITIES = 4;
 
-/*! 
+/*!
 This enumeration contains a set of modes to store data in an array.
 For example an array of coordinates in 3D; tow storage may be considered:
 
@@ -95,7 +98,7 @@ For example an array of coordinates in 3D; tow storage may be considered:
   const medModeSwitch MED_FULL_INTERLACE = 0;
   const medModeSwitch MED_NO_INTERLACE = 1;
 
-/*! 
+/*!
 This enumeration contains a set of elements defining the type of connectivity.
 */
   typedef long medConnectivity;
@@ -103,7 +106,7 @@ This enumeration contains a set of elements defining the type of connectivity.
   const medConnectivity MED_DESCENDING = 1;
 
 
-/*! 
+/*!
    enumeration contains a set of elements defining the type of driver.
 */
     typedef long medDriverTypes;
@@ -126,7 +129,7 @@ This enumeration contains a set of elements defining the type of connectivity.
     An array of %GROUP
   */
   typedef sequence<GROUP> Group_array;
-  
+
   // ----------------------
   // mesh interface
   // ----------------------
@@ -141,7 +144,7 @@ This enumeration contains a set of elements defining the type of connectivity.
       Returns the name of the mesh .
     */
     string getName() raises (SALOME::SALOME_Exception);
-    
+
     /*!
       Returns space dimension.
     */
@@ -149,7 +152,7 @@ This enumeration contains a set of elements defining the type of connectivity.
 
     /*!
       Returns mesh dimension.
-      
+
       Example :
       - we have only MED_TETRA4 in MED_CELL : MeshDimension = 3D
       - we have only MED_QUAD4 in MED_CELL : MeshDimension = 2D
@@ -178,7 +181,7 @@ This enumeration contains a set of elements defining the type of connectivity.
       - "CYLINDRICAL"
       - "SPHERICAL"
     */
-    string getCoordinatesSystem() raises (SALOME::SALOME_Exception); 
+    string getCoordinatesSystem() raises (SALOME::SALOME_Exception);
 
     /*!
       Returns the number of nodes defined in the mesh.
@@ -190,7 +193,7 @@ This enumeration contains a set of elements defining the type of connectivity.
     */
     SALOME_MED::double_array getCoordinates(in medModeSwitch typeSwitch)
       raises (SALOME::SALOME_Exception);
-    
+
     /*!
       Returns an array (Sender) of coordinates stored in any type.\n
       It could be used in a Client code using the MED Client classes.
@@ -198,20 +201,20 @@ This enumeration contains a set of elements defining the type of connectivity.
     SALOME::SenderDouble getSenderForCoordinates(in medModeSwitch typeSwitch)
       raises (SALOME::SALOME_Exception);
     /*!
-     Returns coordinate  n° Number on axis n° Axis 
+     Returns coordinate  n° Number on axis n° Axis
     */
     double getCoordinate(in long Number, in long Axis)
       raises (SALOME::SALOME_Exception);
-      
+
 
     /*!
       Returns an array containing the names of coordinates.
-      
+
       Example :
       - x,y,z
       - r,teta,phi
       - ...
-      
+
       It could be empty.
     */
     SALOME_MED::string_array getCoordinatesNames()
@@ -255,20 +258,20 @@ This enumeration contains a set of elements defining the type of connectivity.
     // ------------
 
     /*!
-      Returns the number of defferent %medGeometryElement types existing 
+      Returns the number of defferent %medGeometryElement types existing
       in the specified entity.
 
-      \note 
+      \note
       Not implemented for MED_ALL_ENTITIES.
     */
     long getNumberOfTypes(in medEntityMesh entity)
       raises (SALOME::SALOME_Exception);
 
     /*!
-      Returns an array of all %medGeometryElement types existing 
+      Returns an array of all %medGeometryElement types existing
       in the mesh.
 
-      \note 
+      \note
        Not implemented for MED_ALL_ENTITIES.
     */
     medGeometryElement_array getTypes(in medEntityMesh entity)
@@ -277,7 +280,7 @@ This enumeration contains a set of elements defining the type of connectivity.
     /*!
       Returns the number of elements of type %medGeometryElement.
 
-      Note : 
+      Note :
       - Implemented for MED_ALL_ELEMENTS
       - Not implemented for MED_ALL_ENTITIES
     */
@@ -289,7 +292,7 @@ This enumeration contains a set of elements defining the type of connectivity.
       Give, in full or no interlace mode (for nodal connectivity),
       descending or nodal connectivity.
 
-      You must give a %medEntityMesh (ie:MED_EDGE) and a 
+      You must give a %medEntityMesh (ie:MED_EDGE) and a
       %medGeometryElement (ie:MED_SEG3).
     */
     SALOME_MED::long_array getConnectivity(in medModeSwitch typeSwitch,
@@ -309,10 +312,10 @@ This enumeration contains a set of elements defining the type of connectivity.
       raises (SALOME::SALOME_Exception);
 
     /*!
-      Give morse index array to use with 
+      Give morse index array to use with
       getConnectivity(MED_FULL_INTERLACE,mode,entity,MED_ALL_ELEMENTS).
 
-      Each value give start index for corresponding entity in 
+      Each value give start index for corresponding entity in
       connectivity array.
 
       Example : i-th element, j-th node of it :
@@ -324,26 +327,26 @@ This enumeration contains a set of elements defining the type of connectivity.
       raises (SALOME::SALOME_Exception);
 
     /*!
-      Gets a global number of the element which have the same connectivity as the  
+      Gets a global number of the element which have the same connectivity as the
       connectivity argument.
     */
-    long getElementNumber(in medConnectivity mode, 
-			  in medEntityMesh entity, 
-			  in medGeometryElement type, 
-			  in SALOME_MED::long_array connectivity) 
+    long getElementNumber(in medConnectivity mode,
+			  in medEntityMesh entity,
+			  in medGeometryElement type,
+			  in SALOME_MED::long_array connectivity)
       raises (SALOME::SALOME_Exception);
 
-    medGeometryElement   getElementType (in  medEntityMesh entity, 
+    medGeometryElement   getElementType (in  medEntityMesh entity,
 				       in long number)
       raises (SALOME::SALOME_Exception);
 
     /*!
       Returns a reverse connectivity to MED_CELL.
 
-      If mode=MED_NODAL, the array contains, for each node, all cells 
+      If mode=MED_NODAL, the array contains, for each node, all cells
       arround it.
 
-      If mode=MED_DESCENDING, the array contains, for each face (or edge), 
+      If mode=MED_DESCENDING, the array contains, for each face (or edge),
       the 2 cells of each side. First is cell which face normal is outgoing.
     */
     SALOME_MED::long_array getReverseConnectivity(in medConnectivity mode)
@@ -352,7 +355,7 @@ This enumeration contains a set of elements defining the type of connectivity.
     /*!
       Give index array to use with getReverseConnectivity(MED_NODAL).
 
-      This method is not used with MED_DESCENDING mode, 
+      This method is not used with MED_DESCENDING mode,
       because we have allways two cells.
 
       See getConnectivityIndex for details.
@@ -367,7 +370,7 @@ This enumeration contains a set of elements defining the type of connectivity.
     	SALOME_MED::long_array      numberOfElements;
         long                       entityDimension;
     };
-    connectivityInfos getConnectGlobal(in medEntityMesh entity) 
+    connectivityInfos getConnectGlobal(in medEntityMesh entity)
     raises (SALOME::SALOME_Exception);
 
     // Families and Groups
@@ -394,7 +397,7 @@ This enumeration contains a set of elements defining the type of connectivity.
     /*!
       Returns the reference to i-th family.
 
-      \note 
+      \note
       i is bounded by 1 and NumberOfFamilies.
     */
     FAMILY getFamily(in medEntityMesh entity,in long familyNumber)
@@ -409,7 +412,7 @@ This enumeration contains a set of elements defining the type of connectivity.
     /*!
       Returns the reference to i-th group.
 
-      \note 
+      \note
      i is bounded by 1 and NumberOfGroups.
     */
     GROUP getGroup(in medEntityMesh entity,in long groupNumber)
@@ -421,7 +424,7 @@ This enumeration contains a set of elements defining the type of connectivity.
     /*!
       Returns a field on mySupport containing volume.
 
-      \note 
+      \note
       mySupport must be on MED_CELL entity and MeshDimension must be 3D.
     */
     FIELD getVolume(in SUPPORT mySupport)
@@ -430,7 +433,7 @@ This enumeration contains a set of elements defining the type of connectivity.
     /*!
       Returns a field on mySupport containing area.
 
-      \note 
+      \note
       mySupport must be on MED_FACE entity.
     */
     FIELD getArea(in SUPPORT mySupport)
@@ -449,7 +452,7 @@ This enumeration contains a set of elements defining the type of connectivity.
       Returns a field on mySupport containing normal.
 
       \note
-      mySupport must be on MED_FACE entity if MeshDimension and 
+      mySupport must be on MED_FACE entity if MeshDimension and
       SpaceDimension=3D and on MED_EDGE if MeshDimension and SpaceDimension=2D.
     */
     FIELD getNormal(in SUPPORT mySupport)
@@ -478,19 +481,19 @@ This enumeration contains a set of elements defining the type of connectivity.
 
     // 		                Add a MED/VTK/... driver
     //                          Multiple drivers can be added whatever the type
-    long addDriver     (in medDriverTypes driverType, in string  fileName, in string meshName) 
+    long addDriver     (in medDriverTypes driverType, in string  fileName, in string meshName)
                                         raises (SALOME::SALOME_Exception);
     //                          Remove a driver
     void rmDriver      (in long i)  raises (SALOME::SALOME_Exception);
 
    //
     void read          (in long i)  raises (SALOME::SALOME_Exception);
-    void write         (in long i, in string driverMeshName)  
+    void write         (in long i, in string driverMeshName)
                                     raises (SALOME::SALOME_Exception);
-  
+
 /*!
-Internal Corba method. 
-*/ 
+Internal Corba method.
+*/
     long getCorbaIndex() 	raises (SALOME::SALOME_Exception);
     struct meshInfos
     {
@@ -512,13 +515,13 @@ Internal Corba method.
     boolean areEquals(in MESH other);
   };
 
-  
+
   // ----------------------
   // Support interface
   // ----------------------
-  
+
   interface SUPPORT : SALOME::MultiCommClass, SALOME::ServantLifeCycle {
-    
+
     /*!
       Returns the name of the support.
     */
@@ -535,10 +538,10 @@ Internal Corba method.
     MESH getMesh() raises (SALOME::SALOME_Exception);
 
     /*!
-      Returns the type of %medEntityMesh used by the support. 
+      Returns the type of %medEntityMesh used by the support.
 
-      \note 
-      A support deals only with one entity's type 
+      \note
+      A support deals only with one entity's type
       (for example : MED_FACE or MED_NODE)
     */
     medEntityMesh getEntity() raises (SALOME::SALOME_Exception);
@@ -552,13 +555,13 @@ Internal Corba method.
     boolean isOnAllElements() raises (SALOME::SALOME_Exception);
 
     /*!
-      If the method %isOnAllElements() returns False, this method 
+      If the method %isOnAllElements() returns False, this method
      returns the number of elements in the support.
 
-      Example : number of MED_TRIA3 or MED_ALL_ELEMETNS elements 
+      Example : number of MED_TRIA3 or MED_ALL_ELEMETNS elements
       in entity of support.
 
-      \note 
+      \note
       If %SUPPORT is defined on MED_NODE, use MED_NONE %medGeometryElement
       type.
     */
@@ -576,11 +579,11 @@ Internal Corba method.
 
 
     /*!
-      If the method %isOnAllElements() returns False, this method returns an array which 
+      If the method %isOnAllElements() returns False, this method returns an array which
      contains all numbers of given %medGeometryElement.
 
-      Numbering is global, ie numbers are bounded by 1 and 
-      MESH::getNumberOfElement(entity,MED_ALL_ELEMENTS) and not by 1 and 
+      Numbering is global, ie numbers are bounded by 1 and
+      MESH::getNumberOfElement(entity,MED_ALL_ELEMENTS) and not by 1 and
       MESH::getNumberOfElement(entity,geomElement).
 
       \note
@@ -596,14 +599,14 @@ Internal Corba method.
 
     SALOME::SenderInt getSenderForNumber(in medGeometryElement geomElement)
       raises (SALOME::SALOME_Exception);
-    
+
     /*!
-      If the method %isOnAllElements() returns False, this method returns the index 
+      If the method %isOnAllElements() returns False, this method returns the index
       of element number.
-      
-      Use it with getNumber(MED_ALL_ELEMENTS). 
-      
-      \note 
+
+      Use it with getNumber(MED_ALL_ELEMENTS).
+
+      \note
        See the method %getConnectivityIndex for more details.
     */
     SALOME_MED::long_array getNumberIndex()
@@ -619,7 +622,7 @@ Internal Corba method.
     /*!
       Returns the number of Gauss points for this %medGeometryElement.
 
-      \note 
+      \note
       - Not defined if %SUPPORT is on MED_NODE.
       - Not defined for MED_ALL_ELEMENTS %medGeometryElement type.
      */
@@ -632,8 +635,8 @@ Internal Corba method.
     void getBoundaryElements()
       					raises (SALOME::SALOME_Exception);
 /*!
-Internal Corba method. 
-*/    
+Internal Corba method.
+*/
     long getCorbaIndex() 	        raises (SALOME::SALOME_Exception);
     struct supportInfos
     {
@@ -641,9 +644,9 @@ Internal Corba method.
 	   string  	 description;
 	   boolean       isOnAllElements;
     	   medEntityMesh entity;
-           long          numberOfGeometricType; 
+           long          numberOfGeometricType;
            medGeometryElement_array types;
-           SALOME_MED::long_array nbEltTypes; 
+           SALOME_MED::long_array nbEltTypes;
     };
     supportInfos getSupportGlobal()		raises (SALOME::SALOME_Exception);
 
@@ -654,12 +657,12 @@ Internal Corba method.
   // Family interface
   //-----------------
 
-  interface FAMILY : SUPPORT 
+  interface FAMILY : SUPPORT
     {
 
       /*!
 	Returns Family identifier (Identifier
-	of the family in the mesh). 
+	of the family in the mesh).
 
 	\note
       There is precisely only one indentifier for each family.
@@ -675,13 +678,13 @@ Internal Corba method.
 	Returns an array of all attributes' identifiers.
 	There is one for each attribute.
       */
-      SALOME_MED::long_array getAttributesIdentifiers() 
+      SALOME_MED::long_array getAttributesIdentifiers()
 	raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns identifier of i-th attribute.
 
-	\note 
+	\note
       i is bounded by 1 and NumberOfAttributes.
       */
       long getAttributeIdentifier(in long i) raises (SALOME::SALOME_Exception);
@@ -690,13 +693,13 @@ Internal Corba method.
 	Returns an array of all values of the attributes .
 	There is one value for each attribute.
       */
-      SALOME_MED::long_array getAttributesValues() 
+      SALOME_MED::long_array getAttributesValues()
 	raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns the value of i-th attribute.
 
-	\note 
+	\note
       i is bounded by 1 and NumberOfAttributes.
       */
       long getAttributeValue(in long i) raises (SALOME::SALOME_Exception);
@@ -705,16 +708,16 @@ Internal Corba method.
 	Returns an array of all descriptions of the attributes .
 	There is one description for each attribute.
       */
-      SALOME_MED::string_array getAttributesDescriptions() 
+      SALOME_MED::string_array getAttributesDescriptions()
 	raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns the description of i-th attribute.
 
-	\note 
+	\note
       i is bounded by 1 and NumberOfAttributes.
       */
-      string getAttributeDescription(in long i) 
+      string getAttributeDescription(in long i)
 	raises (SALOME::SALOME_Exception);
 
      /*!
@@ -727,16 +730,16 @@ Internal Corba method.
 	Returns an array of names of groups the family belongs to .
 	There is one name for each group.
       */
-      SALOME_MED::string_array getGroupsNames() 
+      SALOME_MED::string_array getGroupsNames()
 	raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns the name of i-th group.
 
-	\note 
+	\note
       i is bounded by 1 and NumberOfAttributes.
       */
-      string getGroupName(in long i) 
+      string getGroupName(in long i)
 	raises (SALOME::SALOME_Exception);
 
 
@@ -746,7 +749,7 @@ Internal Corba method.
   //----------------
   // Group interface
   //----------------
-  interface GROUP : SUPPORT 
+  interface GROUP : SUPPORT
     {
 
       /*!
@@ -762,7 +765,7 @@ Internal Corba method.
       /*!
 	Returns a reference to the i-th family.
 
-	\note 
+	\note
       i is bounded by 1 and NumberOfFamilies.
       */
       FAMILY getFamily(in long i) raises (SALOME::SALOME_Exception);
@@ -801,13 +804,13 @@ Internal Corba method.
       /*!
 	Returns an array containing components names.
       */
-      SALOME_MED::string_array getComponentsNames() 
+      SALOME_MED::string_array getComponentsNames()
 	raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns the name of i-th component.
 
-	\note  
+	\note
 	- i is bounded by 1 and NumberOfComponents.
 	- Name is mandatory for each field's component.
       */
@@ -822,7 +825,7 @@ Internal Corba method.
       /*!
 	Returns the unit of i-th component.
 
-	\note 
+	\note
       i is bounded by 1 and NumberOfComponents.
       */
       string getComponentUnit(in long i) raises (SALOME::SALOME_Exception);
@@ -830,13 +833,13 @@ Internal Corba method.
       /*!
 	Returns an array containing components descriptions.
       */
-      SALOME_MED::string_array getComponentsDescriptions() 
+      SALOME_MED::string_array getComponentsDescriptions()
 	raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns the description of i-th component.
 
-	\note  
+	\note
 	- i is bounded by 1 and NumberOfComponents.
 	- Name is mandatory for each field's component.
       */
@@ -853,23 +856,23 @@ Internal Corba method.
       double getTime() raises (SALOME::SALOME_Exception);
 
       /*!
-	Returns order number use for 
+	Returns order number use for
 	internal step in this iteration.
       */
       long getOrderNumber() raises (SALOME::SALOME_Exception);
 
       // Read & Write
       // -----------
-      
-      long addDriver (in medDriverTypes driverType, in string  fileName, in string fieldName) 
+
+      long addDriver (in medDriverTypes driverType, in string  fileName, in string fieldName)
 	raises (SALOME::SALOME_Exception);
-      
+
       /*!
      Removes a driver
      */
       void rmDriver (in long i)
 	raises (SALOME::SALOME_Exception);
-      
+
       //
       void read (in long i)
 	raises (SALOME::SALOME_Exception);
@@ -877,9 +880,9 @@ Internal Corba method.
       /*!
 	Writes a field.
       */
-      void write (in long i, in string driverFieldName)  
+      void write (in long i, in string driverFieldName)
 	raises (SALOME::SALOME_Exception);
-      
+
       /*!
 	Adds the Field in the StudyManager.
       */
@@ -898,7 +901,7 @@ Internal Corba method.
   interface FIELDDOUBLE : FIELD , SALOME::MultiCommClass {
 
     /*!
-      Returns an array of values of the field  
+      Returns an array of values of the field
     */
     SALOME_MED::double_array getValue(in medModeSwitch mode)
       raises (SALOME::SALOME_Exception);
@@ -914,7 +917,7 @@ Internal Corba method.
   interface FIELDINT : FIELD , SALOME::MultiCommClass {
 
     /*!
-      Returns an array of values of the field  
+      Returns an array of values of the field
     */
     SALOME_MED::long_array getValue(in medModeSwitch mode)
       raises (SALOME::SALOME_Exception);
@@ -933,7 +936,7 @@ Internal Corba method.
     /*!
       returns the number of meshes in the %MED object.
      */
-    long                   getNumberOfMeshes () raises (SALOME::SALOME_Exception);       
+    long                   getNumberOfMeshes () raises (SALOME::SALOME_Exception);
     /*!
       returns the number of fields in the %MED object.
      */
@@ -974,22 +977,22 @@ Internal Corba method.
     /*!
       giving a field name, a time iteration and an order number, it returns the corresponding %FIELD oject.
      */
-    FIELD                  getField          ( in string fieldName, 
+    FIELD                  getField          ( in string fieldName,
 					       in long pasTemps,
 					       in long numOrdre )    raises (SALOME::SALOME_Exception);
 
 
-    // Add a MED/VTK/... driver to a MED'GEN' object to 
+    // Add a MED/VTK/... driver to a MED'GEN' object to
     // be able to read/write files preserving  meshes<-->fields association
     // Multiple drivers can be added whatever the type.
     // The access point in the <long> returned
-    long addDriver     (in medDriverTypes driverType, in string  fileName) 
+    long addDriver     (in medDriverTypes driverType, in string  fileName)
                                         raises (SALOME::SALOME_Exception);
-    /*! 
+    /*!
    Removes the driver
-    */ 
+    */
     void rmDriver      (in long i)  raises (SALOME::SALOME_Exception);
-    /*! 
+    /*!
     Reads the structure of the %MED file
     */
     void readFileStruct(in long i)  raises (SALOME::SALOME_Exception);
@@ -998,7 +1001,7 @@ Internal Corba method.
 
     void addMesh  (in MESH   ptrMesh   ) raises (SALOME::SALOME_Exception);
     void addField (in FIELD  ptrField  ) raises (SALOME::SALOME_Exception);
-    
+
     void addInStudy (in SALOMEDS::Study myStudy, in MED medPtr) raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
   };
 };

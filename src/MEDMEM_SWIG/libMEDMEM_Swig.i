@@ -33,6 +33,7 @@
 #include "MEDMEM_SWIG_AsciiFieldDoubleDriver.hxx"
 #include "MEDMEM_SWIG_AsciiFieldIntDriver.hxx"
 #include "MEDMEM_Meshing.hxx"
+#include "MEDMEM_DriverFactory.hxx"
 #include "MEDMEM_SWIG_Templates.hxx"
 
 #ifdef _DEBUG_
@@ -94,7 +95,7 @@
   /* typemap in for vector<FAMILY *> */
   /* Check if is a list */
 
-  if (PyList_Check($input)) { 
+  if (PyList_Check($input)) {
     int size = PyList_Size($input);
     $1.resize(size);
 
@@ -116,13 +117,13 @@
 	// $1[i] = f;
 	$1.at(i) = f;
       }
-  } 
+  }
   else
-    { 
+    {
       PyErr_SetString(PyExc_TypeError,"not a list");
       return NULL;
     }
-} 
+}
 
 %typemap(python,out) vector<FAMILY *>
 {
@@ -149,7 +150,7 @@
   /* typemap in for vector<SUPPORT *> */
   /* Check if is a list */
 
-  if (PyList_Check($input)) { 
+  if (PyList_Check($input)) {
     int size = PyList_Size($input);
     $1.resize(size);
 
@@ -171,13 +172,13 @@
 	//$1[i] = s;
 	$1.at(i) = s;
       }
-  } 
+  }
   else
-    { 
+    {
       PyErr_SetString(PyExc_TypeError,"not a list");
       return NULL;
     }
-} 
+}
 
 %typemap(python,out) vector<SUPPORT *>
 {
@@ -200,7 +201,7 @@
     /* typemap in for vector<FIELD<double> *> */
   /* Check if is a list */
 
-  if (PyList_Check($input)) { 
+  if (PyList_Check($input)) {
     int size = PyList_Size($input);
     $1.resize(size);
 
@@ -223,9 +224,9 @@
 	//$1[i] = s;
 	$1.at(i) = s;
       }
-  } 
+  }
   else
-    { 
+    {
       PyErr_SetString(PyExc_TypeError,"not a list");
       return NULL;
     }
@@ -252,7 +253,7 @@
     /* typemap in for vector<FIELD<int> *> */
   /* Check if is a list */
 
-  if (PyList_Check($input)) { 
+  if (PyList_Check($input)) {
     int size = PyList_Size($input);
     $1.resize(size);
 
@@ -275,9 +276,9 @@
 	//$1[i] = s;
 	$1.at(i) = s;
       }
-  } 
+  }
   else
-    { 
+    {
       PyErr_SetString(PyExc_TypeError,"not a list");
       return NULL;
     }
@@ -338,16 +339,16 @@
   enum of the C++ MED used in the Python API
 */
 
-typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type; 
+typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
 
-typedef enum {MED_FULL_INTERLACE, MED_NO_INTERLACE} medModeSwitch; 
+typedef enum {MED_FULL_INTERLACE, MED_NO_INTERLACE} medModeSwitch;
 
 typedef enum {MED_LECT, MED_ECRI, MED_REMP} med_mode_acces;
 
 typedef enum {ASCENDING=7,DESCENDING=77} med_sort_direc;
 
 typedef enum {MED_CELL, MED_FACE, MED_EDGE, MED_NODE,
-	      MED_ALL_ENTITIES} medEntityMesh; 
+	      MED_ALL_ENTITIES} medEntityMesh;
 
 typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
 	      MED_TRIA3=203, MED_QUAD4=204, MED_TRIA6=206, MED_QUAD8=208,
@@ -356,15 +357,32 @@ typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
 	      MED_PENTA15=315, MED_HEXA20=320,
 	      MED_ALL_ELEMENTS=999} medGeometryElement;
 
-typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ; 
+typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ;
 
 typedef enum {MED_DRIVER=0, GIBI_DRIVER=1, PORFLOW_DRIVER = 2, VTK_DRIVER=254,
 	      NO_DRIVER=255, ASCII_DRIVER = 3} driverTypes;
 
-typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26,
-	      MED_INT} med_type_champ;
+typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26} med_type_champ;
 
 typedef struct { int dt; int it; } DT_IT_;
+
+typedef enum {V21 = 26, V22 = 75} medFileVersion;
+
+medFileVersion getMedFileVersionForWriting();
+
+void setMedFileVersionForWriting(medFileVersion version);
+
+%{
+  medFileVersion getMedFileVersionForWriting()
+    {
+      return (medFileVersion) DRIVERFACTORY::getMedFileVersionForWriting();
+    }
+
+  void setMedFileVersionForWriting(medFileVersion version)
+    {
+      DRIVERFACTORY::setMedFileVersionForWriting((medFileVersion) version);
+    }
+%}
 
 %extend DT_IT_ {
   int getdt()
@@ -525,7 +543,7 @@ class SUPPORT
     PyObject * getTypes()
       {
 	PyObject *py_list;
-       
+
 	const medGeometryElement * types = self->getTypes();
 	int size = self->getNumberOfTypes();
 	py_list = PyList_New(size);
@@ -623,7 +641,7 @@ class FAMILY : public SUPPORT
 
   FAMILY & operator=(const FAMILY &fam);
 
-  void setIdentifier(int Identifier);        
+  void setIdentifier(int Identifier);
 
   void setNumberOfAttributes(int NumberOfAttribute);
 
@@ -631,7 +649,7 @@ class FAMILY : public SUPPORT
 
   void setAttributesValues(int * AttributeValue);
 
-  void setAttributesDescriptions(string * AttributeDescription); 
+  void setAttributesDescriptions(string * AttributeDescription);
 
   void setNumberOfGroups(int NumberOfGroups);
 
@@ -733,7 +751,7 @@ class FAMILY : public SUPPORT
 	return result;
       }
   }
-}; 
+};
 
 
 
@@ -744,7 +762,7 @@ public:
   FIELD_(const SUPPORT * Support, const int NumberOfComponents);
 
   ~FIELD_();
-  
+
   void rmDriver(int index=0);
 
   void setIterationNumber (int IterationNumber);
@@ -753,7 +771,7 @@ public:
   void setTime(double Time);
   double   getTime() const;
 
-  void setOrderNumber (int OrderNumber); 
+  void setOrderNumber (int OrderNumber);
   int getOrderNumber() const;
 
   void setValueType(med_type_champ ValueType) ;
@@ -794,7 +812,7 @@ public:
 	return (SUPPORT *)self->getSupport();
       }
   }
-}; 
+};
 
 
 class FIELDDOUBLE : public FIELD_
@@ -808,11 +826,11 @@ public:
     WARNING:
     other constructor of FIELDDOUBLE (C++ FIELD<double>) object.
     Only one constructor could be wrapped and
-    the others commented out when using 
+    the others commented out when using
     SWIG with a version lesser than 1.3
   */
 
-  FIELDDOUBLE();    
+  FIELDDOUBLE();
 
   FIELDDOUBLE(const FIELDDOUBLE & m);
 
@@ -1029,7 +1047,7 @@ public:
     other constructor of FIELDINT (C++ FIELD<int>) object.
     other constructor of MED object.
     Only one constructor could be wrapped and
-    the others commented out when using 
+    the others commented out when using
     SWIG with a version lesser than 1.3
   */
 
@@ -1245,7 +1263,7 @@ public:
   int getNumberOfFamilies() const ;
   vector<FAMILY*> getFamilies() const ;
   FAMILY * getFamily(int i) const ;
-}; 
+};
 
 class MESH
 {
@@ -1254,13 +1272,13 @@ public :
     WARNING:
     other constructor of MESH object.
     Only one constructor could be wrapped and
-    the others commented out when using 
+    the others commented out when using
     SWIG with a version lesser than 1.3
   */
 
-  MESH();    
+  MESH();
 
-  ~MESH();    
+  ~MESH();
 
   void rmDriver(int index=0);
 
@@ -1477,7 +1495,7 @@ public :
     PyObject * getTypes(medEntityMesh Entity)
       {
 	PyObject *py_list;
-       
+
 	const medGeometryElement * types = self->getTypes(Entity);
 	int size = self->getNumberOfTypes(Entity);
 	py_list = PyList_New(size);
@@ -1686,6 +1704,17 @@ public :
 
   void addGroup            (const GROUP & Group) ;
 
+  void setPolygonsConnectivity     (const int * ConnectivityIndex,
+				    const int * ConnectivityValue,
+				    int nbOfPolygons,
+				    const medEntityMesh Entity);
+
+  void setPolyhedraConnectivity     (const int * PolyhedronIndex,
+				     const int * FacesIndex,
+				     const int * Nodes,
+				     int nbOfPolyhedra,
+				     const MED_EN::medEntityMesh Entity);
+
   %extend {
     void setCoordinates(const int SpaceDimension, const int NumberOfNodes,
 			const double * Coordinates, const char * System,
@@ -1728,9 +1757,9 @@ class GRID : public MESH
   int getEdgeNumber(const int Axis, const int i, const int j=0, const int k=0) const ;
 
   int getFaceNumber(const int Axis, const int i, const int j=0, const int k=0) const ;
-  
+
   med_grid_type getGridType();
-  
+
   int getArrayLength( const int Axis );
 
   const double getArrayValue (const int Axis, const int i);
@@ -1784,7 +1813,7 @@ class GRID : public MESH
       }
       if (Entity == MED_FACE || Entity == MED_EDGE)
         PyList_SetItem(py_list, 0, Py_BuildValue("i", Axis));
-      
+
       PyObject * result = Py_BuildValue("O", py_list);
       Py_DECREF(py_list);
       return result;
@@ -1801,7 +1830,7 @@ class MED
 
   void rmDriver (int index=0);
 
-  int getNumberOfMeshes ( void ) const;       
+  int getNumberOfMeshes ( void ) const;
 
   int getNumberOfFields ( void ) const;
 
@@ -1818,7 +1847,7 @@ class MED
       WARNING:
       other constructor of MED object.
       Only one constructor could be wrapped and
-      the others commented out when using 
+      the others commented out when using
       SWIG with a version lesser than 1.3
     */
 
@@ -2344,7 +2373,7 @@ public :
 class MED_MESH_RDONLY_DRIVER
 {
  public :
- 
+
   ~MED_MESH_RDONLY_DRIVER();
 
   void open();
@@ -2434,7 +2463,7 @@ class MED_MESH_RDWR_DRIVER : public virtual MED_MESH_RDONLY_DRIVER,
  public :
 
   ~MED_MESH_RDWR_DRIVER();
-  
+
   void write(void) const ;
 
   void read (void)       ;
@@ -2812,26 +2841,26 @@ FIELDINT * createFieldIntFromAnalytic(SUPPORT * Support,
 GRID * createGridFromMesh( MESH * aMesh );
 
 %{
-  FIELDDOUBLE * createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE * field2) 
+  FIELDDOUBLE * createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE * field2)
   {
      return (FIELDDOUBLE *) FIELD<double>::scalarProduct( (FIELD<double>)*field1, (FIELD<double>)*field2);
   }
-  
-  FIELDINT * createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) 
+
+  FIELDINT * createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2)
   {
      return (FIELDINT *) FIELD<int>::scalarProduct( (FIELD<int>)*field1, (FIELD<int>)*field2);
   }
 
-  FIELDDOUBLE * createFieldDoubleScalarProductDeep(FIELDDOUBLE * field1, FIELDDOUBLE * field2) 
+  FIELDDOUBLE * createFieldDoubleScalarProductDeep(FIELDDOUBLE * field1, FIELDDOUBLE * field2)
   {
      return (FIELDDOUBLE *) FIELD<double>::scalarProduct( (FIELD<double>)*field1, (FIELD<double>)*field2, true);
   }
-  
-  FIELDINT * createFieldIntScalarProductDeep(FIELDINT * field1, FIELDINT * field2) 
+
+  FIELDINT * createFieldIntScalarProductDeep(FIELDINT * field1, FIELDINT * field2)
   {
      return (FIELDINT *) FIELD<int>::scalarProduct( (FIELD<int>)*field1, (FIELD<int>)*field2, true);
   }
-  
+
   FIELDDOUBLE * createFieldDoubleFromField(FIELD_ * field)
     {
       MESSAGE("createFieldDoubleFromField : Constructor (for Python API) FIELDDOUBLE with parameter FIELD_");

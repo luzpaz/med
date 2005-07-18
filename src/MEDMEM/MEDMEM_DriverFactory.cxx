@@ -1,20 +1,20 @@
 #include "MEDMEM_DriverFactory.hxx"
-
-#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
+#include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_GibiMeshDriver.hxx"
 #include "MEDMEM_PorflowMeshDriver.hxx"
 #include "MEDMEM_VtkMeshDriver.hxx"
-
-#include "MEDMEM_Med.hxx"
-#include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_VtkMedDriver.hxx"
 
-//#include "MEDMEM_Field.hxx"
-
 #include "MEDMEM_Exception.hxx"
-//#include "MEDMEM_STRING.hxx"
-//#include "utilities.h"
+
+#include "MEDMEM_MedVersion.hxx"
+#include "MEDMEM_Compatibility21_22.hxx"
+#include "MEDMEM_MedMedDriver21.hxx"
+#include "MEDMEM_MedMedDriver22.hxx"
+#include "MEDMEM_MedMeshDriver21.hxx"
+#include "MEDMEM_MedMeshDriver22.hxx"
 
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -30,6 +30,18 @@ bool compare<-1>(const double *a, const double *b)
   return false;
 }
 
+MED_EN::medFileVersion DRIVERFACTORY::globalMedFileVersionForWriting = MED_EN::V22;
+
+medFileVersion DRIVERFACTORY::getMedFileVersionForWriting()
+{
+  return DRIVERFACTORY::globalMedFileVersionForWriting;
+}
+
+void DRIVERFACTORY::setMedFileVersionForWriting(medFileVersion version)
+{
+  DRIVERFACTORY::globalMedFileVersionForWriting = version;
+}
+
 GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
 					     const std::string & fileName,
 					     MESH *mesh,
@@ -43,21 +55,19 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
       switch(access)
 	{
 	case MED_LECT : {
-	  MED_MESH_RDONLY_DRIVER *retmed=new MED_MESH_RDONLY_DRIVER(fileName,
-								    mesh);
-	  retmed->setMeshName(driverName);
-	  return retmed;
+	  ret = new MED_MESH_RDONLY_DRIVER(fileName, mesh);
+	  ret->setMeshName(driverName);
+	  return ret;
 	}
 	case MED_ECRI : {
-	  MED_MESH_WRONLY_DRIVER *retmed=new MED_MESH_WRONLY_DRIVER(fileName,
-								    mesh);
-	  retmed->setMeshName(driverName);
-	  return retmed;
+	  ret = new MED_MESH_WRONLY_DRIVER(fileName, mesh);
+	  ret->setMeshName(driverName);
+	  return ret;
 	}
 	case MED_REMP : {
-	  MED_MESH_RDWR_DRIVER *retmed=new MED_MESH_RDWR_DRIVER(fileName,mesh);
-	  retmed->setMeshName(driverName);
-	  return retmed;
+	  ret = new MED_MESH_RDWR_DRIVER(fileName, mesh);
+	  ret->setMeshName(driverName);
+	  return ret;
 	}
 	default:
 	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
@@ -200,3 +210,136 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
   return ret;
 }
 
+GENDRIVER * DRIVERFACTORY::buildMedDriverFromFile(const string & fileName,
+						  MED * const ptrMed,
+						  MED_EN::med_mode_acces access)
+{
+  medFileVersion version;
+
+  try
+    {
+      version = getMedFileVersion(fileName);
+    }
+  catch (MEDEXCEPTION & ex)
+    {
+      version = DRIVERFACTORY::globalMedFileVersionForWriting;
+    }
+
+  MESSAGE("buildMedDriverFromFile version of the file " << version);
+
+  GENDRIVER * driver;
+
+  switch(access)
+    {
+    case MED_LECT : {
+      if (version == V21)
+	driver = new MED_MED_RDONLY_DRIVER21(fileName,ptrMed);
+      else if (version == V22)
+	driver = new MED_MED_RDONLY_DRIVER22(fileName,ptrMed);
+      return driver;
+    }
+    case MED_ECRI : {
+      if (version == V21)
+	driver = new MED_MED_WRONLY_DRIVER21(fileName,ptrMed);
+      else if (version == V22)
+	driver = new MED_MED_WRONLY_DRIVER22(fileName,ptrMed);
+      return driver;
+    }
+    case MED_REMP : {
+      if (version == V21)
+	driver = new MED_MED_RDWR_DRIVER21(fileName,ptrMed);
+      else if (version == V22)
+	driver = new MED_MED_RDWR_DRIVER22(fileName,ptrMed);
+      return driver;
+    }
+    default:
+      throw MED_EXCEPTION ("access type has not been properly specified to the method");
+    }
+}
+
+GENDRIVER * DRIVERFACTORY::buildMeshDriverFromFile(const string & fileName,
+						   MESH * ptrMesh,
+						   MED_EN::med_mode_acces access)
+{
+  medFileVersion version;
+
+  try
+    {
+      version = getMedFileVersion(fileName);
+    }
+  catch (MEDEXCEPTION & ex)
+    {
+      version = DRIVERFACTORY::globalMedFileVersionForWriting;
+    }
+
+  MESSAGE("buildMeshDriverFromFile version of the file " << version);
+
+  GENDRIVER * driver;
+
+  switch(access)
+    {
+    case MED_LECT : {
+      if (version == V21)
+	driver = new MED_MESH_RDONLY_DRIVER21(fileName,ptrMesh);
+      else if (version == V22)
+	driver = new MED_MESH_RDONLY_DRIVER22(fileName,ptrMesh);
+      return driver;
+    }
+    case MED_ECRI : {
+      if (version == V21)
+	driver = new MED_MESH_WRONLY_DRIVER21(fileName,ptrMesh);
+      else if (version == V22)
+	driver = new MED_MESH_WRONLY_DRIVER22(fileName,ptrMesh);
+      return driver;
+    }
+    case MED_REMP : {
+      if (version == V21)
+	driver = new MED_MESH_RDWR_DRIVER21(fileName,ptrMesh);
+      else if (version == V22)
+	driver = new MED_MESH_RDWR_DRIVER22(fileName,ptrMesh);
+      return driver;
+    }
+    default:
+      throw MED_EXCEPTION ("access type has not been properly specified to the method");
+    }
+}
+
+GENDRIVER * DRIVERFACTORY::buildConcreteMedDriverForMesh(const std::string & fileName,
+							 MESH *ptrMesh,const string &  driverName,
+							 MED_EN::med_mode_acces access,
+							 MED_EN::medFileVersion version)
+{
+  GENDRIVER * driver;
+
+  MESSAGE("buildConcreteMedDriverForMesh version of the file " << version);
+
+  switch(access)
+    {
+    case MED_LECT : {
+      if (version == V21)
+	driver = new MED_MESH_RDONLY_DRIVER21(fileName,ptrMesh);
+      else if (version == V22)
+	driver = new MED_MESH_RDONLY_DRIVER22(fileName,ptrMesh);
+      driver->setMeshName(driverName);
+      return driver;
+    }
+    case MED_ECRI : {
+      if (version == V21)
+	driver = new MED_MESH_WRONLY_DRIVER21(fileName,ptrMesh);
+      else if (version == V22)
+	driver = new MED_MESH_WRONLY_DRIVER22(fileName,ptrMesh);
+      driver->setMeshName(driverName);
+      return driver;
+    }
+    case MED_REMP : {
+      if (version == V21)
+	driver = new MED_MESH_RDWR_DRIVER21(fileName,ptrMesh);
+      else if (version == V22)
+	driver = new MED_MESH_RDWR_DRIVER22(fileName,ptrMesh);
+      driver->setMeshName(driverName);
+      return driver;
+    }
+    default:
+      throw MED_EXCEPTION ("access type has not been properly specified to the method");
+    }
+}

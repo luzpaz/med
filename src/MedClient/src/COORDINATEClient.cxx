@@ -14,10 +14,10 @@ using namespace MED_EN;
  */
 //=============================================================================
 
-COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m, 
+COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
 				   medModeSwitch Mode) :
   COORDINATE(m->getSpaceDimension(), 1, Mode),
-  _complete(false), 
+  _complete(false),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m))
 {
   BEGIN_OF("COORDINATEClient::COORDINATEClient(...)");
@@ -53,23 +53,23 @@ void COORDINATEClient::blankCopy()
   ASSERT(nA == getSpaceDimension());
   setCoordinatesNames(tA);
   delete [] tA;
-  
+
   //convertCorbaArray(tA, nA, IOR_Mesh->getCoordinatesUnits());
   convertCorbaArray(tA, nA, &all->coordUnits);
   ASSERT(nA == getSpaceDimension());
   setCoordinatesUnits(tA);
   delete [] tA;
-  
+
 
   setCoordinatesSystem( CORBA::string_dup(all->coordSystem));
-  
+
   _complete = false;
 
   END_OF("void COORDINATEClient::blankCopy()");
 }
 //=============================================================================
 /*!
- * Remplit les coordonnées 
+ * Remplit les coordonnées
  */
 //=============================================================================
 
@@ -85,19 +85,20 @@ void COORDINATEClient::fillCopy()
 
   SALOME::SenderDouble_var senderForCoords=IOR_Mesh->getSenderForCoordinates(MED_FULL_INTERLACE);
   tC=ReceiverFactory::getValue(senderForCoords,nC);
+
   ASSERT(nC == (getSpaceDimension() * nN));
-  
+
   MEDARRAY<double> mC(tC, getSpaceDimension(), nN,MED_FULL_INTERLACE,true);
   setCoordinates(&mC,true);
-  
+
   _complete = true;
-  
+
   END_OF("void COORDINATEClient::fillCopy()");
 }
 
 //=============================================================================
 /*!
- * Retourne les coordonnées 
+ * Retourne les coordonnées
  */
 //=============================================================================
 
@@ -114,7 +115,7 @@ const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 }
 //=============================================================================
 /*!
- * Retourne une coordonnée 
+ * Retourne une coordonnée
  */
 //=============================================================================
 
@@ -131,7 +132,7 @@ double COORDINATEClient::getCoordinate(int Number,int Axis)
 }
 //=============================================================================
 /*!
- * Retourne un axe 
+ * Retourne un axe
  */
 //=============================================================================
 const double *  COORDINATEClient::getCoordinateAxis(int Axis)

@@ -71,7 +71,17 @@ MEDMEM_STRING.hxx \
 MEDMEM_Support.hxx \
 MEDMEM_Unit.hxx \
 MEDMEM_Grid.hxx \
-MEDMEM_RCBase.hxx
+MEDMEM_RCBase.hxx \
+MEDMEM_medimport_src.hxx \
+MEDMEM_MedVersion.hxx \
+MEDMEM_Compatibility21_22.hxx \
+MEDMEM_MedFieldDriver21.hxx \
+MEDMEM_MedMeshDriver21.hxx \
+MEDMEM_MedMedDriver21.hxx \
+MEDMEM_PolyhedronArray.hxx \
+MEDMEM_MedFieldDriver22.hxx \
+MEDMEM_MedMedDriver22.hxx \
+MEDMEM_MedMeshDriver22.hxx
 
 # Libraries targets
 
@@ -101,16 +111,23 @@ MEDMEM_Support.cxx \
 MEDMEM_Unit.cxx \
 MEDMEM_VtkMedDriver.cxx \
 MEDMEM_VtkMeshDriver.cxx \
-MEDMEM_Grid.cxx
-
+MEDMEM_Grid.cxx \
+MEDMEM_MedVersion.cxx \
+MEDMEM_MedMeshDriver21.cxx \
+MEDMEM_MedMedDriver21.cxx \
+MEDMEM_medimport_src.cxx \
+MEDMEM_PolyhedronArray.cxx \
+MEDMEM_MedMedDriver22.cxx \
+MEDMEM_MedMeshDriver22.cxx
 
 # Executables targets
-BIN = med2vtk duplicateMED med_test duplicateMEDMESH 
+BIN = med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH 
 BIN_SRC = 
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit testUGeoNameMeshEntities testUMedException testUModulusArray testUSkyLineArray testUArray testUCellModel readEntete readCoordinate test_copie_field_ test_copie_fieldT test_copie_coordinate test_copie_medarray test_copie_connectivity test_copie_support test_copie_family test_copie_group test_copie_mesh test_affect_medarray test_MEDMEM_Meshing test_operation_fielddouble test_operation_fieldint test_gibi_driver test_porflow_driver test_grid
+TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit testUGeoNameMeshEntities testUMedException testUModulusArray testUSkyLineArray testUArray testUCellModel readEntete readCoordinate test_copie_field_ test_copie_fieldT test_copie_coordinate test_copie_medarray test_copie_connectivity test_copie_support test_copie_family test_copie_group test_copie_mesh test_affect_medarray test_MEDMEM_Meshing test_MEDMEM_MeshingPoly test_operation_fielddouble test_operation_fieldint test_gibi_driver test_porflow_driver test_grid test_MEDMEM_PolyhedronArray test_MEDMEM_PolyConnectivity test_MEDMEM_PolyDriverMedMeshRead test_MEDMEM_PolyDriverMedMeshWrite test_MEDMEM_poly3D
+# test_MEDMEM_Meshing_poly
 
 # testUCellModel -> a revoir car l'API a changee (plus de vector)
 

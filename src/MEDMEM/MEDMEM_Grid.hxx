@@ -208,7 +208,11 @@ class GRID: public MESH
 
   inline int getNumberOfTypes(MED_EN::medEntityMesh Entity) const;
 
+  inline int getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
+
   inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
+
+  MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
 
   inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
 
@@ -217,11 +221,17 @@ class GRID: public MESH
   inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
 				 MED_EN::medGeometryElement Type) const;
 
+  inline int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity,
+					 MED_EN::medGeometryElement Type) const;
+
   inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
 				MED_EN::medEntityMesh Entity) const;
 
   inline MED_EN::medGeometryElement getElementType(MED_EN::medEntityMesh Entity,
 					   int Number) const;
+
+  inline MED_EN::medGeometryElement getElementTypeWithPoly(MED_EN::medEntityMesh Entity,
+							   int Number) const;
 
   inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
 				    MED_EN::medConnectivity ConnectivityType,
@@ -247,9 +257,12 @@ class GRID: public MESH
 
   inline void setGridType(MED_EN::med_grid_type gridType);
 
-  friend class MED_MESH_RDONLY_DRIVER;
-  friend class MED_MESH_WRONLY_DRIVER;
-
+  friend class IMED_MESH_RDONLY_DRIVER;
+  friend class IMED_MESH_WRONLY_DRIVER;
+  friend class MED_MESH_RDONLY_DRIVER21;
+  friend class MED_MESH_WRONLY_DRIVER21;
+  friend class MED_MESH_RDONLY_DRIVER22;
+  friend class MED_MESH_WRONLY_DRIVER22;
 };
 
 
@@ -338,6 +351,13 @@ inline int GRID::getNumberOfTypes(MED_EN::medEntityMesh entity) const
     return 1; // a grid has one type
 }
 
+
+inline int GRID::getNumberOfTypesWithPoly(MED_EN::medEntityMesh entity) const
+{
+  MESSAGE("GRID::getNumberOfTypes(medEntityMesh entity) : "<<entity);
+    return 1; // a grid has one type
+}
+
 /*!
   Get the whole list of CELLMODEL used by cells of given type (medEntityMesh).
 
@@ -403,6 +423,11 @@ inline int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
     return numberOfElements;
 }
 
+int GRID::getNumberOfElementsWithPoly(MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
+{
+  return getNumberOfElements(entity,Type);
+}
+
 
 /*!
   Return true if the wanted connectivity exist, else return false
@@ -429,6 +454,11 @@ inline MED_EN::medGeometryElement GRID::getElementType(MED_EN::medEntityMesh Ent
   if (_connectivity==(CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("GRID::getElementType(medEntityMesh,int) : no connectivity defined !");
   return _connectivity->getElementType(Entity,Number);
+}
+
+inline MED_EN::medGeometryElement GRID::getElementTypeWithPoly(MED_EN::medEntityMesh Entity,int Number) const
+{
+  return getElementType(Entity,Number);
 }
 
 /*!

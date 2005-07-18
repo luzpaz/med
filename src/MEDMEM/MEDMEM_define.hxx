@@ -1,5 +1,5 @@
 #ifndef DEFINE_HXX
-#define DEFINE_HXX	
+#define DEFINE_HXX
 
 #include <stdio.h>
 #include <iostream>
@@ -7,29 +7,22 @@
 #include <assert.h>
 
 // UTILE AUX DEUX NAMESPACES
+extern "C"{
 #include <hdf5.h>
+}
 
-# include <med.hxx>
-# include <med_proto.hxx>
-
-// namespace MED_FR {
-//   extern "C" { 
-// # include <med.h>
-// # include <med_proto.h>
-//   }
-// }
 
 namespace MED_EN {
-  extern "C" { 
-  
-#define MED_NULL       (void *) NULL
-#define MED_MAX_PARA     20
+  extern "C" { // on est la
 
-#define MED_TAILLE_DESC 200
-#define MED_TAILLE_IDENT  8
-#define MED_TAILLE_NOM   32
-#define MED_TAILLE_LNOM  80    
-#define MED_TAILLE_PNOM   8 
+// #define MED_NULL       (void *) NULL
+// #define MED_MAX_PARA     20
+
+// #define MED_TAILLE_DESC 200
+// #define MED_TAILLE_IDENT  8
+// #define MED_TAILLE_NOM   32
+// #define MED_TAILLE_LNOM  80
+// #define MED_TAILLE_PNOM   8
 
 
     typedef long medGeometryElement;
@@ -49,6 +42,8 @@ namespace MED_EN {
     const medGeometryElement MED_PYRA13 = 313;
     const medGeometryElement MED_PENTA15 = 315;
     const medGeometryElement MED_HEXA20 = 320;
+    const medGeometryElement MED_POLYGON = 400;
+    const medGeometryElement MED_POLYHEDRA = 500;
     const medGeometryElement MED_ALL_ELEMENTS = 999;
 
     typedef long medEntityMesh;
@@ -57,58 +52,56 @@ namespace MED_EN {
     const medEntityMesh MED_EDGE = 2;
     const medEntityMesh MED_NODE = 3;
     const medEntityMesh MED_ALL_ENTITIES = 4;
-    
+
     typedef long medModeSwitch;
     const medModeSwitch MED_FULL_INTERLACE = 0;
     const medModeSwitch MED_NO_INTERLACE = 1;
-    
+
     typedef long medConnectivity;
     const medConnectivity MED_NODAL = 0;
     const medConnectivity MED_DESCENDING = 1;
-    
+
     typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
-    
+
     typedef enum {MED_LECT,MED_ECRI,MED_REMP} med_mode_acces;
-    
+
     typedef enum {ASCENDING=7,DESCENDING=77} med_sort_direc;
-    
-    typedef enum {MED_COOR, MED_CONN, MED_NOM, MED_NUM, MED_FAM} med_table;
-    
-    typedef enum {MED_REEL64=6, MED_INT32=24,MED_INT64=26, MED_INT} med_type_champ;
 
-#define MED_NBR_GEOMETRIE_MAILLE 15
-#define MED_NBR_GEOMETRIE_FACE 4
-#define MED_NBR_GEOMETRIE_ARETE 2
+    typedef enum {MED_REEL64=6, MED_INT32=24,MED_INT64=26} med_type_champ;
 
-typedef enum {MED_CART, MED_CYL, MED_SPHER} med_repere; 
+// #define MED_NBR_GEOMETRIE_MAILLE 15
+// #define MED_NBR_GEOMETRIE_FACE 4
+// #define MED_NBR_GEOMETRIE_ARETE 2
 
-typedef enum {MED_FAUX, MED_VRAI} med_booleen ; 
+typedef enum {MED_CART, MED_CYL, MED_SPHER} med_repere;
 
-typedef enum {MED_GROUPE, MED_ATTR, MED_FAMILLE} med_dim_famille; 
+typedef enum {MED_FAUX, MED_VRAI} med_booleen ;
 
-typedef enum {MED_COMP, MED_DTYPE} med_dim_champ; 
+typedef enum {MED_GROUPE, MED_ATTR, MED_FAMILLE} med_dim_famille;
 
-typedef enum {MED_HDF_VERSION, MED_VERSION, MED_FICH_DES} med_fich_info; 
+typedef enum {MED_COMP, MED_DTYPE} med_dim_champ;
 
-#define MED_NOPG   1                   /* -> pas de point de Gauss                    */
-#define MED_NOPFL  ""                  /* -> pas de profils utilisateur               */
-#define MED_NOPFLi "                                "  /* Variable Interne                      */
-#define MED_NOPF   0                   /* -> pas de profils pour _MEDdataseNnumEcrire */
-#define MED_NOPDT -1                   /* rem: pas de pas de temps negatifs           */
-#define MED_NONOR -1                   /* rem: pas de n°ordre negatif                 */
-#define MED_DIM1   1                   /* PAS */
-  //#define MED_ALL    0 !!!!! NB: WARNING MED_ALL deja utilise dans l'enum medGeometryElement !!!!!!!!
-#define MED_ALL    0
+typedef enum {MED_HDF_VERSION, MED_VERSION, MED_FICH_DES} med_fich_info;
+
+// #define MED_NOPG   1                   /* -> pas de point de Gauss                    */
+// #define MED_NOPFL  ""                  /* -> pas de profils utilisateur               */
+// #define MED_NOPFLi "                                "  /* Variable Interne                      */
+// #define MED_NOPF   0                   /* -> pas de profils pour _MEDdataseNnumEcrire */
+// #define MED_NOPDT -1                   /* rem: pas de pas de temps negatifs           */
+// #define MED_NONOR -1                   /* rem: pas de n°ordre negatif                 */
+// #define MED_DIM1   1                   /* PAS */
+//   //#define MED_ALL    0 !!!!! NB: WARNING MED_ALL deja utilise dans l'enum medGeometryElement !!!!!!!!
+// #define MED_ALL    0
 
 #if defined(SUN4SOL2) || defined(PCLINUX) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000)
 /* interface C/FORTRAN */
 /* this true only with g77 and gcc : we must change it to use directly NOMF_... and INT32 or INT64 - it will be more simple to understand and to use ! */
-#define NOMF_POST_UNDERSCORE 
+// #define NOMF_POST_UNDERSCORE
 
 /* correspondance des types avec HDF 5 */
 typedef hsize_t        med_size;
 typedef hssize_t       med_ssize;
-typedef hid_t          med_idt;
+    //typedef hid_t          med_idt;
 typedef herr_t         med_err;
 
 /* types elementaires */
@@ -120,7 +113,7 @@ typedef double         med_float;
 /* correspondance des types avec HDF 5 */
 typedef hsize_t        med_size;
 typedef hssize_t       med_ssize;
-typedef hid_t          med_idt;
+    //typedef hid_t          med_idt;
 typedef herr_t         med_err;
 
 /* types elementaires */
@@ -129,12 +122,12 @@ typedef double         med_float;
 #endif
 
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
-#define NOMF_POST_UNDERSCORE
+// #define NOMF_POST_UNDERSCORE
 
 /* correspondance des types avec HDF 5 */
 typedef hsize_t        med_size;
 typedef hssize_t       med_ssize;
-typedef hid_t          med_idt;
+    //typedef hid_t          med_idt;
 typedef herr_t         med_err;
 
 /* types elementaires */
@@ -143,11 +136,11 @@ typedef double         med_float;
 #endif
 
 
-#if defined(PPRO_NT) 
+#if defined(PPRO_NT)
 /* correspondance des types avec HDF 5 */
 typedef hsize_t        med_size;
 typedef hssize_t       med_ssize;
-typedef hid_t          med_idt;
+    //typedef hid_t          med_idt;
 typedef herr_t         med_err;
 
 /* types elementaires */
@@ -156,18 +149,18 @@ typedef double         med_float;
 #endif
 
 
-#if defined(NOMF_PRE_UNDERSCORE) && defined(NOMF_POST_UNDERSCORE)
-#   define NOMF(x)     _##x##_
-#endif
-#if defined(NOMF_PRE_UNDERSCORE) && !defined(NOMF_POST_UNDERSCORE)
-#   define NOMF(x)     _##x
-#endif
-#if !defined(NOMF_PRE_UNDERSCORE) && defined(NOMF_POST_UNDERSCORE)
-#   define NOMF(x)     x##_
-#endif
-#if !defined(NOMF_PRE_UNDERSCORE) && !defined(NOMF_POST_UNDERSCORE)
-#   define NOMF(x)     x
-#endif
+// #if defined(NOMF_PRE_UNDERSCORE) && defined(NOMF_POST_UNDERSCORE)
+// #   define NOMF(x)     _##x##_
+// #endif
+// #if defined(NOMF_PRE_UNDERSCORE) && !defined(NOMF_POST_UNDERSCORE)
+// #   define NOMF(x)     _##x
+// #endif
+// #if !defined(NOMF_PRE_UNDERSCORE) && defined(NOMF_POST_UNDERSCORE)
+// #   define NOMF(x)     x##_
+// #endif
+// #if !defined(NOMF_PRE_UNDERSCORE) && !defined(NOMF_POST_UNDERSCORE)
+// #   define NOMF(x)     x
+// #endif
 
   //#include "med_proto.h"
 
@@ -192,7 +185,7 @@ typedef double         med_float;
 
 #define MED_RDONLY MED_LECT
   //   rem: MED_WRONLY=MED_ECR n'empêche malheureusement pas de lire le fichier
-  //   mais permet de conserver l'existant. Attention à la création d'objet 
+  //   mais permet de conserver l'existant. Attention à la création d'objet
   //   ne prenant pas de paramètre de type mode d'accès il faut tester si il
   //   est déjà présent dans le fichier. Si  MED_WRONLY=MED_REMP le fichier est
   //   réinitialisé. Cf une évolution de MED.
@@ -229,11 +222,16 @@ typedef double         med_float;
 // retour des fonctions
 #define OK 0
 #define KO 1
-// fin
 
+  /*
+    enum definition for the used Med File version V2.1 or V2.2
+    because of incompatibility between them.
+  */
+
+  typedef enum {V21 = 26, V22 = 75} medFileVersion;
+
+// fin
 }
 // End Of NameSpace MED_EN
 
-
 #endif /* DEFINE_HXX */
-

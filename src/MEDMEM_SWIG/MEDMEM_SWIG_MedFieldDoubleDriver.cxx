@@ -46,7 +46,7 @@ MED_FIELDDOUBLE_DRIVER::~MED_FIELDDOUBLE_DRIVER()
  */
 //=============================================================================
 MED_FIELDDOUBLE_RDONLY_DRIVER::MED_FIELDDOUBLE_RDONLY_DRIVER() :
-  MED_FIELD_RDONLY_DRIVER<double>()
+  MEDMEM::MED_FIELD_RDONLY_DRIVER<double>()
 {
   BEGIN_OF("Default Constructor (for Python API) MED_FIELDDOUBLE_RDONLY_DRIVER");
 
@@ -59,7 +59,7 @@ MED_FIELDDOUBLE_RDONLY_DRIVER::MED_FIELDDOUBLE_RDONLY_DRIVER() :
 //=============================================================================
 MED_FIELDDOUBLE_RDONLY_DRIVER::MED_FIELDDOUBLE_RDONLY_DRIVER(const string & fileName,
 							     FIELDDOUBLE * ptrField) : 
-  MED_FIELD_RDONLY_DRIVER<double>(fileName,(FIELD<double> *) ptrField)
+  MEDMEM::MED_FIELD_RDONLY_DRIVER<double>(fileName,(FIELD<double> *) ptrField)
 {
   BEGIN_OF("Constructor with arguments (for Python API) MED_FIELDDOUBLE_RDONLY_DRIVER");
 
@@ -82,7 +82,7 @@ MED_FIELDDOUBLE_RDONLY_DRIVER::~MED_FIELDDOUBLE_RDONLY_DRIVER()
  */
 //=============================================================================
 MED_FIELDDOUBLE_WRONLY_DRIVER::MED_FIELDDOUBLE_WRONLY_DRIVER() :
-  MED_FIELD_WRONLY_DRIVER<double>()
+  MEDMEM::MED_FIELD_WRONLY_DRIVER<double>()
 {
   BEGIN_OF("Default Constructor (for Python API) MED_FIELDDOUBLE_WRONLY_DRIVER");
 
@@ -95,7 +95,7 @@ MED_FIELDDOUBLE_WRONLY_DRIVER::MED_FIELDDOUBLE_WRONLY_DRIVER() :
 //=============================================================================
 MED_FIELDDOUBLE_WRONLY_DRIVER::MED_FIELDDOUBLE_WRONLY_DRIVER(const string & fileName,
 							     FIELDDOUBLE * ptrField) : 
-  MED_FIELD_WRONLY_DRIVER<double>(fileName,(FIELD<double> *) ptrField)
+  MEDMEM::MED_FIELD_WRONLY_DRIVER<double>(fileName,(FIELD<double> *) ptrField)
 {
   BEGIN_OF("Constructor with arguments (for Python API) MED_FIELDDOUBLE_WRONLY_DRIVER");
 
@@ -118,7 +118,7 @@ MED_FIELDDOUBLE_WRONLY_DRIVER::~MED_FIELDDOUBLE_WRONLY_DRIVER()
  */
 //=============================================================================
 MED_FIELDDOUBLE_RDWR_DRIVER::MED_FIELDDOUBLE_RDWR_DRIVER() :
-  MED_FIELD_RDWR_DRIVER<double>()
+  MEDMEM::MED_FIELD_RDWR_DRIVER<double>()
 {
   BEGIN_OF("Default Constructor (for Python API) MED_FIELDDOUBLE_RDWR_DRIVER");
 
@@ -131,7 +131,7 @@ MED_FIELDDOUBLE_RDWR_DRIVER::MED_FIELDDOUBLE_RDWR_DRIVER() :
 //=============================================================================
 MED_FIELDDOUBLE_RDWR_DRIVER::MED_FIELDDOUBLE_RDWR_DRIVER(const string & fileName,
 							 FIELDDOUBLE * ptrField) : 
-  MED_FIELD_RDWR_DRIVER<double>(fileName,(FIELD<double> *) ptrField)
+  MEDMEM::MED_FIELD_RDWR_DRIVER<double>(fileName,(FIELD<double> *) ptrField)
 {
   BEGIN_OF("Constructor with arguments (for Python API) MED_FIELDDOUBLE_RDWR_DRIVER");
 

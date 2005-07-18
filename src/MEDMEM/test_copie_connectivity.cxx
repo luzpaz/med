@@ -17,6 +17,10 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
+#ifdef _DEBUG_
+#include "LocalTraceCollector.hxx"
+#endif /* ifdef _DEBUG_*/
+
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -119,12 +123,16 @@ void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
 
 int main (int argc, char ** argv) {
 
-
   if (argc <3) { // after 3, ignored !
     cerr << "Usage : " << argv[0] 
 	 << " filename meshname" << endl << endl;
     exit(-1);
   }
+
+#ifdef _DEBUG_
+  LocalTraceCollector::instance();
+#endif /* ifdef _DEBUG_*/
+
   string filename = argv[1] ;
   string meshname = argv[2] ;
 

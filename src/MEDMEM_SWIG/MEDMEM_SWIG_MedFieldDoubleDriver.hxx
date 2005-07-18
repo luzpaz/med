@@ -1,8 +1,10 @@
 #ifndef MEDMEM_SWIG_MEDFIELDDOUBLEDRIVER_HXX_
 #define MEDMEM_SWIG_MEDFIELDDOUBLEDRIVER_HXX_
 
-#include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_SWIG_FieldDouble.hxx"
+#include "MEDMEM_MedFieldDriver.hxx"
+
+class FIELDDOUBLE;
 
 class MED_FIELDDOUBLE_DRIVER : public MEDMEM::MED_FIELD_DRIVER<double>
 {

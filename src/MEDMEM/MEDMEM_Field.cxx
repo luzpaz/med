@@ -180,7 +180,7 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume) const 
    Check up the compatibility of fields before performing an arithmetic operation
   \endif
 */
-void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n , bool checkUnit ) throw (MEDEXCEPTION)
+void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit) throw (MEDEXCEPTION)
 {
     string diagnosis;
 
@@ -273,11 +273,7 @@ void FIELD_::_deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n , boo
 	         + n._name + " are empty! (size<=0).\n";
 	throw MEDEXCEPTION(diagnosis.c_str());
     }
-}
-
-//  void     FIELD_::setIterationNumber (int IterationNumber)           {};
-//  void     FIELD_::setOrderNumber     (int OrderNumber)               {}; 
-//  void     FIELD_::setFieldName       (string& fieldName)             {}; 
+} 
          
 void     FIELD_::rmDriver      (int index)
 {
@@ -291,11 +287,13 @@ int      FIELD_::addDriver     (driverTypes driverType,
   MESSAGE("int FIELD_::addDriver(driverTypes driverType, const string & fileName, const string & driverFieldName) : adding the driver " << driverType << " fileName = " << fileName.c_str() << " driverFieldName = " << driverFieldName.c_str());
   return 0;
 };
+
 int      FIELD_::addDriver     (GENDRIVER & driver)
 {
   MESSAGE("int FIELD_::addDriver(GENDRIVER & driver) : driver " << driver);
   return 0;
 };
+
 void     FIELD_::openAppend    ( void )                               {};
 void     FIELD_::write         (const GENDRIVER &)                    {};
 void     FIELD_::writeAppend   (const GENDRIVER &)                    {};
@@ -338,6 +336,3 @@ void     FIELD_::copyGlobalInfo(const FIELD_& m)
   _time = m._time;
   _orderNumber = m._orderNumber;
 }
-
-//  void                     FIELD_::setValueType(med_type_champ ValueType) {};
-//  med_type_champ FIELD_::getValueType() {};

@@ -9,6 +9,7 @@
 #include <list>
 #include <vector>
 #include <string>
+#include <list>
 
 #include "utilities.h"
 #include "MEDMEM_STRING.hxx"
@@ -21,14 +22,15 @@
 
   This class describe a support of elements on an entity of the mesh.
 
-  It contains the list of meshes elements for an entity (MED_NODE, 
+  It contains the list of meshes elements for an entity (MED_NODE,
   MED_CELL, MED_FACE or MED_EDGE).
 
 */
 
 namespace MEDMEM {
 class MESH ;
-  class SUPPORT : public RCBASE
+
+class SUPPORT : public RCBASE
 {
 protected:
   /*!
@@ -98,7 +100,7 @@ protected:
     If true, we consider all entities of type _entity.
     \endif
   */
-  bool                     _isOnAllElts; 
+  bool                     _isOnAllElts;
 
   /*!
     \if developper
@@ -114,6 +116,8 @@ protected:
     \endif
   */
   int                      _totalNumberOfElements;
+
+  // the two following arrays are defined only if _isOnAllElts is false :
 
   /*!
     \if developper
@@ -172,7 +176,7 @@ public:
 		  int *NumberOfEntity, int *NumberValue);
 
   void getBoundaryElements() throw (MEDEXCEPTION);
-
+  void changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumberingFromOldToNew, int limitNbClassicPoly, const int *renumberingFromOldToNewPoly=0);
   void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
   bool belongsTo(const SUPPORT& other, bool deepCompare=false) const;
   SUPPORT *getComplement() const;
@@ -245,15 +249,14 @@ inline const int * SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) 
   throw (MEDEXCEPTION)
 //---------------------------------------------------------------------
 {
-  const char * LOC = "Support::getNumber : " ;
   if (_isOnAllElts)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined, support is on all entity !")) ;
+    throw MEDEXCEPTION("Support::getNumber : Not defined, support is on all entity !") ;
   if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
     return _number->getValue() ;
   for (int i=0;i<_numberOfGeometricType;i++)
     if (_geometricType[i]==GeometricType)
       return _number->getI(i+1) ;
-  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"GeometricType not found !")) ;
+  throw MEDEXCEPTION("Support::getNumber : GeometricType not found !") ;
 }
 
 /*!
@@ -379,7 +382,7 @@ inline void SUPPORT::setNumberOfGaussPoint(const int *NumberOfGaussPoint)
 }
 
 /*!
-  Set the attribute _numberOfElements to NumberOfElements and 
+  Set the attribute _numberOfElements to NumberOfElements and
   calculate the total number of elements.
 */
 //----------------------------------------------------------
@@ -491,9 +494,6 @@ inline MED_EN::medEntityMesh SUPPORT::getEntity() const
 inline const MED_EN::medGeometryElement * SUPPORT::getTypes() const
 //---------------------------------------------------
 {
-  //    if ((_isOnAllElts)&(_entity != MED_NODE))
-  //      return _mesh->getTypes(_entity) ;
-  //    else
   return _geometricType;
 }
 
