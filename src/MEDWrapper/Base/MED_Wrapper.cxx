@@ -19,8 +19,10 @@ static int MYVALUEDEBUG = 0;
 
 namespace MED{
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  PMeshInfo TWrapper::GetPMeshInfo(TInt theId,
-				   TErr* theErr)
+  PMeshInfo
+  TWrapper
+  ::GetPMeshInfo(TInt theId,
+		 TErr* theErr)
   {
     PMeshInfo anInfo = CrMeshInfo();
     GetMeshInfo(theId,*anInfo,theErr);
@@ -29,9 +31,11 @@ namespace MED{
 
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  PFamilyInfo TWrapper::GetPFamilyInfo(const PMeshInfo& theMeshInfo, 
-				       TInt theId,
-				       TErr* theErr)
+  PFamilyInfo 
+  TWrapper
+  ::GetPFamilyInfo(const PMeshInfo& theMeshInfo, 
+		   TInt theId,
+		   TErr* theErr)
   {
     TInt aNbAttr = GetNbFamAttr(theId,*theMeshInfo);
     TInt aNbGroup = GetNbFamGroup(theId,*theMeshInfo);
@@ -55,8 +59,10 @@ namespace MED{
 
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  PNodeInfo TWrapper::GetPNodeInfo(const PMeshInfo& theMeshInfo,
-				   TErr* theErr)
+  PNodeInfo
+  TWrapper
+  ::GetPNodeInfo(const PMeshInfo& theMeshInfo,
+		 TErr* theErr)
   {
     TInt aNbElems = GetNbNodes(*theMeshInfo);
     PNodeInfo anInfo = CrNodeInfo(theMeshInfo,aNbElems);
@@ -65,30 +71,32 @@ namespace MED{
 #ifdef _DEBUG_
     TInt aDim = theMeshInfo->myDim;
     TInt aNbElem = anInfo->GetNbElem();
-    INITMSG(MYDEBUG,"GetPNodeInfo - aCoords: "<<aNbElem<<": ");
-    TNodeCoord& aCoord = anInfo->myCoord;
-    for(TInt iElem = 0; iElem < aNbElem; iElem++){
-      for(TInt iDim = 0, anId = iElem*aDim; iDim < aDim; iDim++, anId++){
-	ADDMSG(MYVALUEDEBUG,aCoord[anId]<<",");
-      }
-      ADDMSG(MYVALUEDEBUG," ");
-    }
-    ADDMSG(MYDEBUG,endl);
-
-    BEGMSG(MYDEBUG,"GetPNodeInfo - GetFamNum: ");
-    for(TInt iElem = 0; iElem < aNbElem; iElem++){
-      ADDMSG(MYVALUEDEBUG,anInfo->GetFamNum(iElem)<<", ");
-    }
-    ADDMSG(MYDEBUG,endl);
-
-    if(anInfo->IsElemNum()){
-      BEGMSG(MYDEBUG,"GetPNodeInfo - GetElemNum: ");
+    INITMSG(MYDEBUG,"GetPNodeInfo: ");
+    {
+      INITMSG(MYDEBUG,"aCoords: "<<aNbElem<<": ");
+      TNodeCoord& aCoord = anInfo->myCoord;
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
-	ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
+	for(TInt iDim = 0, anId = iElem*aDim; iDim < aDim; iDim++, anId++){
+	  ADDMSG(MYVALUEDEBUG,aCoord[anId]<<",");
+	}
+	ADDMSG(MYVALUEDEBUG," ");
       }
       ADDMSG(MYDEBUG,endl);
+      
+      BEGMSG(MYVALUEDEBUG,"GetFamNum: ");
+      for(TInt iElem = 0; iElem < aNbElem; iElem++){
+	ADDMSG(MYVALUEDEBUG,anInfo->GetFamNum(iElem)<<", ");
+      }
+      ADDMSG(MYVALUEDEBUG,endl);
+      
+      if(anInfo->IsElemNum()){
+	BEGMSG(MYVALUEDEBUG,"GetElemNum: ");
+	for(TInt iElem = 0; iElem < aNbElem; iElem++){
+	  ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
+	}
+	ADDMSG(MYVALUEDEBUG,endl);
+      }
     }
-
     ADDMSG(MYDEBUG,endl);
 #endif
     
@@ -96,19 +104,21 @@ namespace MED{
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  PPolygoneInfo TWrapper::GetPPolygoneInfo(const PMeshInfo& theMeshInfo,
-					   EEntiteMaillage theEntity, 
-					   EGeometrieElement theGeom, 
-					   EConnectivite theConn)
+  PPolygoneInfo
+  TWrapper
+  ::GetPPolygoneInfo(const PMeshInfo& theMeshInfo,
+		     EEntiteMaillage theEntity, 
+		     EGeometrieElement theGeom, 
+		     EConnectivite theConnMode)
   {
-    TInt aNbElem = GetNbPolygones(*theMeshInfo,theEntity,theGeom,theConn);
-    TInt aNbConn = GetNbPolygoneConn(*theMeshInfo,theEntity,theGeom,theConn);
-    PPolygoneInfo anInfo = CrPolygoneInfo(theMeshInfo,aNbElem,aNbConn,theEntity,theGeom,theConn);
-    GetPolygoneInfo(*anInfo);
+    TInt aNbElem = GetNbPolygones(theMeshInfo,theEntity,theGeom,theConnMode);
+    TInt aConnSize = GetPolygoneConnSize(theMeshInfo,theEntity,theGeom,theConnMode);
+    PPolygoneInfo anInfo = CrPolygoneInfo(theMeshInfo,theEntity,theGeom,aNbElem,aConnSize,theConnMode);
+    GetPolygoneInfo(anInfo);
 
 #ifdef _DEBUG_
-    TElemNum aConn  = anInfo->GetConnectivite();
-    TElemNum aIndex = anInfo->GetIndex();
+    const TElemNum& aConn  = anInfo->GetConnectivite();
+    const TElemNum& aIndex = anInfo->GetIndex();
     TInt aNbIndex = aIndex.size();
     TInt aIndex0 = aIndex[0];
     INITMSG(MYDEBUG,"theGeom = "<<theGeom<<"; aNbElem = "<<aNbIndex-1<<": ");
@@ -130,24 +140,25 @@ namespace MED{
   }
   
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  PPolyedreInfo TWrapper::GetPPolyedreInfo(const PMeshInfo& theMeshInfo,
-					   EEntiteMaillage theEntity, 
-					   EGeometrieElement theGeom, 
-					   EConnectivite theConn)
+  PPolyedreInfo
+  TWrapper
+  ::GetPPolyedreInfo(const PMeshInfo& theMeshInfo,
+		     EEntiteMaillage theEntity, 
+		     EGeometrieElement theGeom, 
+		     EConnectivite theConnMode)
   {
-    TInt aNbElem  = GetNbPolyedres(*theMeshInfo,theEntity,theGeom,theConn);
-    TInt aNbConn = 0;
-    TInt aNbFaces = 0;
-    GetNbPolyedreConnF(*theMeshInfo,theConn,aNbFaces,aNbConn);
-    PPolyedreInfo anInfo = CrPolyedreInfo(theMeshInfo,aNbElem,aNbConn,aNbFaces,theEntity,theGeom,theConn);
-    GetPolyedreInfo(*anInfo);
+    TInt aNbElem  = GetNbPolyedres(theMeshInfo,theEntity,theGeom,theConnMode);
+    TInt aNbFaces, aConnSize;
+    GetPolyedreConnSize(theMeshInfo,aNbFaces,aConnSize,theConnMode);
+    PPolyedreInfo anInfo = CrPolyedreInfo(theMeshInfo,theEntity,theGeom,aNbElem,aNbFaces,aConnSize,theConnMode);
+    GetPolyedreInfo(anInfo);
 
 #ifdef _DEBUG_
-    TElemNum aConn        = anInfo->GetConnectivite();
-    TElemNum aFacesIndex  = anInfo->GetFacesIndex();
-    TElemNum aIndex       = anInfo->GetIndex();
+    const TElemNum& aConn = anInfo->GetConnectivite();
+    const TElemNum& aFaces = anInfo->GetFaces();
+    const TElemNum& aIndex = anInfo->GetIndex();
     
-    TInt aNbIndex      = aIndex.size();
+    TInt aNbIndex = aIndex.size();
     
     for (int aNp = 0; aNp < aNbIndex-1;aNp++){
       if (anInfo->IsElemNames())
@@ -157,7 +168,7 @@ namespace MED{
       
       for (int aNf = aIndex[aNp]-1;aNf < aIndex[aNp+1]-1;aNf++){
 	ADDMSG(MYDEBUG,"Face "<<aNf-aIndex[aNp]+2<<": [");
-	for (int aNc = aFacesIndex[aNf]-1; aNc < aFacesIndex[aNf+1]-1;aNc++){
+	for (int aNc = aFaces[aNf]-1; aNc < aFaces[aNf+1]-1;aNc++){
 	  ADDMSG(MYDEBUG," "<<aConn[aNc]);
 	}
 	ADDMSG(MYDEBUG," ]"<<endl;);
@@ -169,15 +180,17 @@ namespace MED{
   }
   
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  PCellInfo TWrapper::GetPCellInfo(const PMeshInfo& theMeshInfo,
-				   EEntiteMaillage theEntity, 
-				   EGeometrieElement theGeom, 
-				   EConnectivite theConn,
-				   TErr* theErr)
+  PCellInfo 
+  TWrapper
+  ::GetPCellInfo(const PMeshInfo& theMeshInfo,
+		 EEntiteMaillage theEntity, 
+		 EGeometrieElement theGeom, 
+		 EConnectivite theConnMode,
+		 TErr* theErr)
   {
-    TInt aNbElem = GetNbCells(*theMeshInfo,theEntity,theGeom,theConn);
-    PCellInfo anInfo = CrCellInfo(theMeshInfo,aNbElem,theEntity,theGeom,theConn);
-    GetCellInfo(*anInfo,theErr);
+    TInt aNbElem = GetNbCells(theMeshInfo,theEntity,theGeom,theConnMode);
+    PCellInfo anInfo = CrCellInfo(theMeshInfo,theEntity,theGeom,aNbElem,theConnMode);
+    GetCellInfo(anInfo,theErr);
 
 #ifdef _DEBUG_
     TInt aConnDim = anInfo->GetConnDim();
@@ -191,18 +204,18 @@ namespace MED{
     }
     ADDMSG(MYDEBUG,endl);
 
-    BEGMSG(MYDEBUG,"GetPCellInfo - GetFamNum: ");
+    BEGMSG(MYVALUEDEBUG,"GetPCellInfo - GetFamNum: ");
     for(TInt iElem = 0; iElem < aNbElem; iElem++){
       ADDMSG(MYVALUEDEBUG,anInfo->GetFamNum(iElem)<<", ");
     }
-    ADDMSG(MYDEBUG,endl);
+    ADDMSG(MYVALUEDEBUG,endl);
 
     if(anInfo->IsElemNum()){
-      BEGMSG(MYDEBUG,"GetPCellInfo - GetElemNum: ");
+      BEGMSG(MYVALUEDEBUG,"GetPCellInfo - GetElemNum: ");
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
 	ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
       }
-      ADDMSG(MYDEBUG,endl);
+      ADDMSG(MYVALUEDEBUG,endl);
     }
     ADDMSG(MYDEBUG,endl);
 #endif
@@ -212,9 +225,11 @@ namespace MED{
 
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  PFieldInfo TWrapper::GetPFieldInfo(const PMeshInfo& theMeshInfo, 
-				     TInt theId,
-				     TErr* theErr)
+  PFieldInfo
+  TWrapper
+  ::GetPFieldInfo(const PMeshInfo& theMeshInfo, 
+		  TInt theId,
+		  TErr* theErr)
   {
     TInt aNbComp = GetNbComp(theId);
     PFieldInfo anInfo = CrFieldInfo(theMeshInfo,aNbComp);
@@ -222,8 +237,10 @@ namespace MED{
 
 #ifdef _DEBUG_
     INITMSG(MYDEBUG,
-	    "GetPFieldInfo - aNbComp = "<<aNbComp<<
-	    "; aType = "<<anInfo->GetType()<<"\n");
+	    "GetPFieldInfo - aName = '"<<anInfo->GetName()<<"'"<<
+	    "; aType = "<<anInfo->GetType()<<
+	    "; aNbComp = "<<aNbComp<<
+	    endl);
 #endif
     
     return anInfo;
@@ -231,18 +248,21 @@ namespace MED{
 
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  PTimeStampInfo TWrapper::GetPTimeStampInfo(const PFieldInfo& theFieldInfo,
-					     EEntiteMaillage theEntity,
-					     const MED::TGeom& theGeom,
-					     TInt theId,
-					     TErr* theErr)
+  PTimeStampInfo
+  TWrapper
+  ::GetPTimeStampInfo(const PFieldInfo& theFieldInfo,
+		      EEntiteMaillage theEntity,
+		      const TGeom2Size& theGeom2Size,
+		      TInt theId,
+		      TErr* theErr)
   {
-    PTimeStampInfo anInfo = CrTimeStampInfo(theFieldInfo,theEntity,theGeom);
+    PTimeStampInfo anInfo = CrTimeStampInfo(theFieldInfo,theEntity,theGeom2Size);
     GetTimeStampInfo(theId,*anInfo,theErr);
 
 #ifdef _DEBUG_
     INITMSG(MYDEBUG,
-	    "GetPTimeStampInfo - aNbGauss = "<<anInfo->GetNbGauss()<<
+	    "GetPTimeStampInfo - anEntity = "<<anInfo->GetEntity()<<
+	    "; aNbGauss = "<<anInfo->GetNbGauss()<<
 	    "; aNumDt = "<<anInfo->GetNumDt()<<"\n");
 #endif
 
@@ -251,11 +271,15 @@ namespace MED{
 
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  PTimeStampVal TWrapper::GetPTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-					   TErr* theErr)
+  PTimeStampVal 
+  TWrapper
+  ::GetPTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
+		     const TMKey2Profile& theMKey2Profile,
+		     const TKey2Gauss& theKey2Gauss,
+		     TErr* theErr)
   {
     PTimeStampVal anInfo = CrTimeStampVal(theTimeStampInfo);
-    GetTimeStampVal(*anInfo,theErr);
+    GetTimeStampVal(*anInfo,theMKey2Profile,theKey2Gauss,theErr);
 
 #ifdef _DEBUG_
     TInt aNbGauss = theTimeStampInfo->GetNbGauss();

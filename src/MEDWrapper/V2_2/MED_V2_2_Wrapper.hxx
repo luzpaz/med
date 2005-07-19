@@ -126,64 +126,64 @@ namespace MED{
       void
       GetNames(TElemInfo& theInfo,
 	       TInt nb,
-	       EEntiteMaillage theTEntity, 
-	       EGeometrieElement theTGeom,
+	       EEntiteMaillage theEntity, 
+	       EGeometrieElement theGeom,
 	       TErr* theErr = NULL);
 
       virtual
       void
       GetNumeration(TElemInfo& theInfo,
 		    TInt nb,
-		    EEntiteMaillage theTEntity, 
-		    EGeometrieElement theTGeom,
+		    EEntiteMaillage theEntity, 
+		    EGeometrieElement theGeom,
 		    TErr* theErr = NULL);
 
       virtual
       void
       GetFamilies(TElemInfo& theInfo,
 		  TInt nb,
-		  EEntiteMaillage theTEntity, 
-		  EGeometrieElement theTGeom,
+		  EEntiteMaillage theEntity, 
+		  EGeometrieElement theGeom,
 		  TErr* theErr = NULL);
 
       virtual
       void
       SetNames(const TElemInfo& theInfo,
-	       EEntiteMaillage theTEntity, 
-	       EGeometrieElement theTGeom,
+	       EEntiteMaillage theEntity, 
+	       EGeometrieElement theGeom,
 	       TErr* theErr = NULL);
 
       void
       SetNames(const TElemInfo& theInfo,
 	       EModeAcces theMode,
-	       EEntiteMaillage theTEntity, 
-	       EGeometrieElement theTGeom,
+	       EEntiteMaillage theEntity, 
+	       EGeometrieElement theGeom,
 	       TErr* theErr = NULL);
       
       virtual
       void
       SetNumeration(const TElemInfo& theInfo,
-		    EEntiteMaillage theTEntity, 
-		    EGeometrieElement theTGeom,
+		    EEntiteMaillage theEntity, 
+		    EGeometrieElement theGeom,
 		    TErr* theErr = NULL);
       void
       SetNumeration(const TElemInfo& theInfo,
 		    EModeAcces theMode,
-		    EEntiteMaillage theTEntity, 
-		    EGeometrieElement theTGeom,
+		    EEntiteMaillage theEntity, 
+		    EGeometrieElement theGeom,
 		    TErr* theErr = NULL);
       
       virtual
       void
       SetFamilies(const TElemInfo& theInfo,
-		  EEntiteMaillage theTEntity, 
-		  EGeometrieElement theTGeom,
+		  EEntiteMaillage theEntity, 
+		  EGeometrieElement theGeom,
 		  TErr* theErr = NULL);
       void
       SetFamilies(const TElemInfo& theInfo,
 		  EModeAcces theMode,
-		  EEntiteMaillage theTEntity, 
-		  EGeometrieElement theTGeom,
+		  EEntiteMaillage theEntity, 
+		  EGeometrieElement theGeom,
 		  TErr* theErr = NULL);
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -226,17 +226,17 @@ namespace MED{
       virtual 
       TInt
       GetNbPolygones(const TMeshInfo& theMeshInfo,
-		     EEntiteMaillage,
-		     EGeometrieElement,
-		     EConnectivite,
-		     TErr* theErr = NULL);
+		   EEntiteMaillage theEntity,
+		   EGeometrieElement theGeom,
+		   EConnectivite theConnMode = eNOD,
+		   TErr* theErr = NULL);
       
       virtual 
       TInt
-      GetNbPolygoneConn(const TMeshInfo& theMeshInfo,
-			EEntiteMaillage,
-			EGeometrieElement,
-			EConnectivite,
+      GetPolygoneConnSize(const TMeshInfo& theMeshInfo,
+			EEntiteMaillage theEntity,
+			EGeometrieElement theGeom,
+			EConnectivite theConnMode = eNOD,
 			TErr* theErr = NULL);
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -265,17 +265,17 @@ namespace MED{
       
       virtual 
       void
-      GetNbPolyedreConnF(const TMeshInfo& theMeshInfo,
-			 EConnectivite,
-			 TInt& nf,
-			 TInt& nc,
-			 TErr* theErr = NULL);
+      GetPolyedreConnSize(const TMeshInfo& theMeshInfo,
+			  TInt& theNbFaces,
+			  TInt& theConnSize,
+			  EConnectivite theConnMode = eNOD,
+			  TErr* theErr = NULL);
       
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       virtual
       TEntityInfo
       GetEntityInfo(const MED::TMeshInfo& theMeshInfo,
-		    EConnectivite theTConn = eNOD,
+		    EConnectivite theConnMode = eNOD,
 		    TErr* theErr = NULL);
       
       virtual 
@@ -283,7 +283,7 @@ namespace MED{
       GetNbCells(const MED::TMeshInfo& theMeshInfo, 
 		 EEntiteMaillage, 
 		 EGeometrieElement, 
-		 EConnectivite theTConn = eNOD,
+		 EConnectivite theConnMode = eNOD,
 		 TErr* theErr = NULL);
       
       virtual
@@ -328,14 +328,46 @@ namespace MED{
 		   EModeAcces theMode,
 		   TErr* theErr = NULL);
       
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      virtual 
+      TInt
+      GetNbGauss(TErr* theErr = NULL);
+
+      virtual 
+      TGaussInfo::TInfo
+      GetGaussPreInfo(TInt theId, 
+		      TErr* theErr = NULL);
+
+      virtual 
+      void
+      GetGaussInfo(TInt theId, 
+		   TGaussInfo& theInfo,
+		   TErr* theErr = NULL);
+
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      virtual 
+      TInt
+      GetNbProfiles(TErr* theErr = NULL);
+
+      virtual 
+      TProfileInfo::TInfo
+      GetProfilePreInfo(TInt theId, 
+			TErr* theErr = NULL);
       
+      virtual 
+      void
+      GetProfileInfo(TInt theId, 
+		     TProfileInfo& theInfo,
+		     TErr* theErr = NULL);
+
+
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       virtual 
       TInt
       GetNbTimeStamps(const MED::TFieldInfo& theInfo, 
 		      const MED::TEntityInfo& theEntityInfo,
 		      EEntiteMaillage& theEntity,
-		      TGeom& theGeom,
+		      TGeom2Size& theGeom2Size,
 		      TErr* theErr = NULL);
       
       virtual 
@@ -347,6 +379,8 @@ namespace MED{
       virtual
       void
       GetTimeStampVal(MED::TTimeStampVal& theVal,
+		      const TMKey2Profile& theMKey2Profile,
+		      const TKey2Gauss& theKey2Gauss,
 		      TErr* theErr = NULL);
       
       virtual

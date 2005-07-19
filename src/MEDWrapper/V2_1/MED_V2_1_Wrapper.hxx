@@ -68,116 +68,187 @@ namespace MED{
 
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      virtual TInt GetNbMeshes(TErr* theErr = NULL);
+      virtual
+      TInt
+      GetNbMeshes(TErr* theErr = NULL);
       
-      virtual void GetMeshInfo(TInt theMeshId, MED::TMeshInfo&,
-			       TErr* theErr = NULL);
+      virtual
+      void
+      GetMeshInfo(TInt theMeshId, MED::TMeshInfo&,
+		  TErr* theErr = NULL);
 
-      virtual void SetMeshInfo(const MED::TMeshInfo& theInfo,
-			       TErr* theErr = NULL);
+      virtual 
+      void
+      SetMeshInfo(const MED::TMeshInfo& theInfo,
+		  TErr* theErr = NULL);
       
-      void SetMeshInfo(const MED::TMeshInfo& theInfo,
-		       EModeAcces theMode,
-		       TErr* theErr = NULL);
+      void
+      SetMeshInfo(const MED::TMeshInfo& theInfo,
+		  EModeAcces theMode,
+		  TErr* theErr = NULL);
+      
+      
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      virtual
+      TInt
+      GetNbFamilies(const MED::TMeshInfo& theMeshInfo,
+		    TErr* theErr = NULL);
+      virtual 
+      TInt
+      GetNbFamAttr(TInt theFamId, 
+		   const MED::TMeshInfo& theInfo,
+		   TErr* theErr = NULL);
+      virtual 
+      TInt
+      GetNbFamGroup(TInt theFamId, 
+		    const MED::TMeshInfo& theInfo,
+		    TErr* theErr = NULL);
+      
+      virtual 
+      void
+      GetFamilyInfo(TInt theFamId, 
+		    MED::TFamilyInfo& theInfo,
+		    TErr* theErr = NULL);
+
+      virtual 
+      void
+      SetFamilyInfo(const MED::TFamilyInfo& theInfo,
+		    TErr* theErr = NULL);
+      
+      void
+      SetFamilyInfo(const MED::TFamilyInfo& theInfo,
+		    EModeAcces theMode,
+		    TErr* theErr = NULL);
+      
+      
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      virtual
+      TInt
+      GetNbNodes(const MED::TMeshInfo& theMeshInfo,
+		 TErr* theErr = NULL);
+      
+      virtual 
+      void
+      GetNodeInfo(MED::TNodeInfo& theInfo,
+		  TErr* theErr = NULL);
+      
+      virtual
+      void
+      SetNodeInfo(const MED::TNodeInfo& theInfo,
+		  TErr* theErr = NULL);
+      
+      void 
+      SetNodeInfo(const MED::TNodeInfo& theInfo,
+		  EModeAcces theMode,
+		  TErr* theErr = NULL);
+      
+      
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      virtual
+      TEntityInfo
+      GetEntityInfo(const MED::TMeshInfo& theMeshInfo,
+		    EConnectivite theConn = eNOD,
+		    TErr* theErr = NULL);
+      
+      virtual
+      TInt
+      GetNbCells(const MED::TMeshInfo& theMeshInfo, 
+		 EEntiteMaillage, 
+		 EGeometrieElement, 
+		 EConnectivite theConn = eNOD,
+		 TErr* theErr = NULL);
+      
+      virtual 
+      void
+      GetCellInfo(MED::TCellInfo& theInfo,
+		  TErr* theErr = NULL);
+      
+      virtual
+      void
+      SetCellInfo(const MED::TCellInfo& theInfo,
+		  TErr* theErr = NULL);
+      
+      void 
+      SetCellInfo(const MED::TCellInfo& theInfo,
+		  EModeAcces theMode,
+		  TErr* theErr = NULL);
 
       
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      virtual TInt GetNbFamilies(const MED::TMeshInfo& theMeshInfo,
-				 TErr* theErr = NULL);
-      virtual TInt GetNbFamAttr(TInt theFamId, 
-				const MED::TMeshInfo& theInfo,
-				TErr* theErr = NULL);
-      virtual TInt GetNbFamGroup(TInt theFamId, 
-				 const MED::TMeshInfo& theInfo,
-				 TErr* theErr = NULL);
+      virtual 
+      TInt
+      GetNbFields(TErr* theErr = NULL);
       
-      virtual void GetFamilyInfo(TInt theFamId, 
-				 MED::TFamilyInfo& theInfo,
-				 TErr* theErr = NULL);
+      virtual
+      TInt
+      GetNbComp(TInt theFieldId,
+		TErr* theErr = NULL);
+      
+      virtual 
+      void
+      GetFieldInfo(TInt theFieldId, 
+		   MED::TFieldInfo& theInfo,
+		   TErr* theErr = NULL);
 
-      virtual void SetFamilyInfo(const MED::TFamilyInfo& theInfo,
-				 TErr* theErr = NULL);
+      virtual 
+      void
+      SetFieldInfo(const MED::TFieldInfo& theInfo,
+		   TErr* theErr = NULL);
       
-      void SetFamilyInfo(const MED::TFamilyInfo& theInfo,
-			 EModeAcces theMode,
-			 TErr* theErr = NULL);
-
-      
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      virtual TInt GetNbNodes(const MED::TMeshInfo& theMeshInfo,
-			      TErr* theErr = NULL);
-      
-      virtual void GetNodeInfo(MED::TNodeInfo& theInfo,
-			       TErr* theErr = NULL);
-
-      virtual void SetNodeInfo(const MED::TNodeInfo& theInfo,
-			       TErr* theErr = NULL);
-      
-      void SetNodeInfo(const MED::TNodeInfo& theInfo,
-		       EModeAcces theMode,
-		       TErr* theErr = NULL);
+      void 
+      SetFieldInfo(const MED::TFieldInfo& theInfo,
+		   EModeAcces theMode,
+		   TErr* theErr = NULL);
 
       
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      virtual TEntityInfo GetEntityInfo(const MED::TMeshInfo& theMeshInfo,
-					EConnectivite theTConn = eNOD,
-					TErr* theErr = NULL);
-      
-      virtual TInt GetNbCells(const MED::TMeshInfo& theMeshInfo, 
-			      EEntiteMaillage, 
-			      EGeometrieElement, 
-			      EConnectivite theTConn = eNOD,
-			      TErr* theErr = NULL);
-      
-      virtual void GetCellInfo(MED::TCellInfo& theInfo,
-			       TErr* theErr = NULL);
+      virtual 
+      TInt
+      GetNbProfiles(TErr* theErr = NULL);
 
-      virtual void SetCellInfo(const MED::TCellInfo& theInfo,
-			       TErr* theErr = NULL);
-      
-      void SetCellInfo(const MED::TCellInfo& theInfo,
-		       EModeAcces theMode,
-		       TErr* theErr = NULL);
-
-      
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      virtual TInt GetNbFields(TErr* theErr = NULL);
-      
-      virtual TInt GetNbComp(TInt theFieldId,
-			     TErr* theErr = NULL);
-      
-      virtual void GetFieldInfo(TInt theFieldId, 
-				MED::TFieldInfo& theInfo,
-				TErr* theErr = NULL);
-
-      virtual void SetFieldInfo(const MED::TFieldInfo& theInfo,
-				TErr* theErr = NULL);
-      
-      void SetFieldInfo(const MED::TFieldInfo& theInfo,
-			EModeAcces theMode,
+      virtual 
+      TProfileInfo::TInfo
+      GetProfilePreInfo(TInt theId, 
 			TErr* theErr = NULL);
+      
+      virtual 
+      void
+      GetProfileInfo(TInt theId, 
+		     TProfileInfo& theInfo,
+		     TErr* theErr = NULL);
 
       
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      virtual TInt GetNbTimeStamps(const MED::TFieldInfo& theInfo, 
-				   const MED::TEntityInfo& theEntityInfo,
-				   EEntiteMaillage& theEntity,
-				   TGeom& theGeom,
-				   TErr* theErr = NULL);
+      virtual 
+      TInt
+      GetNbTimeStamps(const MED::TFieldInfo& theInfo, 
+		      const MED::TEntityInfo& theEntityInfo,
+		      EEntiteMaillage& theEntity,
+		      TGeom2Size& theGeom2Size,
+		      TErr* theErr = NULL);
       
-      virtual void GetTimeStampInfo(TInt theTimeStampId, 
-				    MED::TTimeStampInfo& theInfo,
-				    TErr* theErr = NULL);
+      virtual 
+      void
+      GetTimeStampInfo(TInt theTimeStampId, 
+		       MED::TTimeStampInfo& theInfo,
+		       TErr* theErr = NULL);
 
-      virtual void GetTimeStampVal(MED::TTimeStampVal& theVal,
-				   TErr* theErr = NULL);
+      virtual 
+      void
+      GetTimeStampVal(TTimeStampVal& theVal,
+		      const TMKey2Profile& theMKey2Profile,
+		      const TKey2Gauss& theKey2Gauss,
+		      TErr* theErr = NULL);
       
-      virtual void SetTimeStamp(const MED::TTimeStampVal& theTimeStampVal,
-				TErr* theErr = NULL);
+      virtual 
+      void
+      SetTimeStamp(const MED::TTimeStampVal& theTimeStampVal,
+		   TErr* theErr = NULL);
       
-      void SetTimeStamp(const MED::TTimeStampVal& theTimeStampVal,
-			EModeAcces theMode,
-			TErr* theErr = NULL);
+      void
+      SetTimeStamp(const MED::TTimeStampVal& theTimeStampVal,
+		   EModeAcces theMode,
+		   TErr* theErr = NULL);
 
     protected:
       PFile myFile;

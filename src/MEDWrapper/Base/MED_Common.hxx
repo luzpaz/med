@@ -40,6 +40,7 @@ extern "C"{
 #include <hdf5.h>
 }  
 
+#include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "SALOMEconfig.h"
@@ -89,38 +90,49 @@ namespace MED{
 
 
   template<class TContainer> 
-  class ConstSliceArray
+  class TCSlice
   {
-    const TContainer& myConstContainer;
+    typedef const TContainer* PCContainer;
+    PCContainer myContainer;
     std::slice mySlice;
   protected:
-    size_t GetID(size_t theId) const
+    size_t
+    GetID(size_t theId) const
     {
+#ifdef _DEBUG_
       if(theId < mySlice.size()){
 	size_t anId = mySlice.start() + theId*mySlice.stride();
-	if(anId < myConstContainer.size())
+	if(anId < myContainer->size())
 	  return anId;
       }
-      throw std::out_of_range();
+      throw std::out_of_range(std::string("TCSlice::GetID"));
       return -1;
+#else
+      return mySlice.start() + theId*mySlice.stride();
+#endif
     }
     
   public:
-    typedef typename TContainer::value_type TValue;
+    typedef typename TContainer::value_type value_type;
 
-    ConstSliceArray(const TContainer& theContainer,
-		    const std::slice& theSlice): 
-      myConstContainer(theContainer),
+    TCSlice(const TContainer& theContainer,
+	    const std::slice& theSlice): 
+      myContainer(&theContainer),
       mySlice(theSlice)
+    {}
+    
+    TCSlice():
+      myContainer(NULL)
+    {}
+
+    const value_type& 
+    operator[](size_t theId) const
     {
+      return (*myContainer)[GetID(theId)];
     }
     
-    const TValue& operator[](size_t theId) const
-    {
-      return myConstContainer[GetID(theId)];
-    }
-    
-    size_t size() const
+    size_t
+    size() const
     {
       return mySlice.size();
     }
@@ -128,20 +140,24 @@ namespace MED{
   
 
   template<class TContainer> 
-  class SliceArray: public ConstSliceArray<TContainer>
+  class TSlice: public TCSlice<TContainer>
   {
-    TContainer& myContainer;
+    typedef TContainer* PContainer;
+    PContainer myContainer;
     
   public:
-    typedef ConstSliceArray<TContainer> TSupperClass;
-    SliceArray(TContainer& theContainer,
-	       const std::slice& theSlice): 
+    typedef typename TContainer::value_type value_type;
+    typedef TCSlice<TContainer> TSupperClass;
+
+    TSlice(TContainer& theContainer,
+	   const std::slice& theSlice): 
       TSupperClass(theContainer,theSlice),
-      myContainer(theContainer)
+      myContainer(&theContainer)
     {
     }
     
-    typename TSupperClass::TValue& operator[](size_t theId)
+    value_type& 
+    operator[](size_t theId)
     {
       return myContainer[this->GetID(theId)];
     }
@@ -158,6 +174,8 @@ namespace MED{
 #endif
   typedef hid_t TIdt;
   typedef herr_t TErr;
+
+  typedef enum {eFULL_INTERLACE, eNO_INTERLACE} EModeSwitch;
 
   typedef enum {eFLOAT64=6, eINT=26} ETypeChamp;
 
@@ -182,31 +200,35 @@ namespace MED{
   typedef std::vector<TInt> TIntVector;
   typedef std::set<std::string> TStringSet;
   
-  typedef std::map<EGeometrieElement,TInt> TGeom;
-  typedef std::map<EEntiteMaillage,TGeom> TEntityInfo;
+  typedef std::map<EGeometrieElement,TInt> TGeom2Size;
+  typedef std::map<EEntiteMaillage,TGeom2Size> TEntityInfo;
 
   typedef std::set<EGeometrieElement> TGeomSet;
   typedef std::map<EEntiteMaillage,TGeomSet> TEntity2GeomSet;
 
-  const TEntity2GeomSet& GetEntity2GeomSet();
+  const TEntity2GeomSet& 
+  GetEntity2GeomSet();
 
   template<int>
-
-  TInt GetNbConn(EGeometrieElement typmai,
-		 EEntiteMaillage typent,
-		 TInt mdim);
+  TInt
+  GetNbConn(EGeometrieElement typmai,
+	    EEntiteMaillage typent,
+	    TInt mdim);
   
   template<>
-  TInt GetNbConn<eV2_1>(EGeometrieElement typmai,
-			EEntiteMaillage typent,
-			TInt mdim);
-
+  TInt
+  GetNbConn<eV2_1>(EGeometrieElement typmai,
+		   EEntiteMaillage typent,
+		   TInt mdim);
+  
   template<>
-  TInt GetNbConn<eV2_2>(EGeometrieElement typmai,
-			EEntiteMaillage typent,
-			TInt mdim);
+  TInt
+  GetNbConn<eV2_2>(EGeometrieElement typmai,
+		   EEntiteMaillage typent,
+		   TInt mdim);
 
-  TInt GetNbNodes(EGeometrieElement typmai);
+  TInt 
+  GetNbNodes(EGeometrieElement typmai);
 
   struct TNameInfo;
   typedef SharedPtr<TNameInfo> PNameInfo;
@@ -237,6 +259,12 @@ namespace MED{
 
   struct TTimeStampInfo;
   typedef SharedPtr<TTimeStampInfo> PTimeStampInfo;
+
+  struct TProfileInfo;
+  typedef SharedPtr<TProfileInfo> PProfileInfo;
+  
+  struct TGaussInfo;
+  typedef SharedPtr<TGaussInfo> PGaussInfo;
   
   struct TTimeStampVal;
   typedef SharedPtr<TTimeStampVal> PTimeStampVal;

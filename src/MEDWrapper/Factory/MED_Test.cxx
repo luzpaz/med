@@ -47,9 +47,15 @@ void CheckMed(const std::string& theFileName)
 {
   MSG(MYDEBUG,"CheckMed - theFileName = '"<<theFileName<<"'");
   {
+    //TErr anErr;
     PWrapper aMed = CrWrapper(theFileName);
+
+    TKey2Gauss aKey2Gauss = GetKey2Gauss(aMed);
+    TMKey2Profile aMKey2Profile = GetMKey2Profile(aMed);
+    INITMSG(MYDEBUG,"aMed->GetNbProfiles() = "<<aMed->GetNbProfiles()<<endl);
+
     TInt aNbMeshes = aMed->GetNbMeshes();
-    INITMSG(MYDEBUG,"GetNbMeshes() = "<<aNbMeshes<<endl);
+    BEGMSG(MYDEBUG,"GetNbMeshes() = "<<aNbMeshes<<endl);
     for(TInt iMesh = 1; iMesh <= aNbMeshes; iMesh++){
       
       PMeshInfo aMeshInfo = aMed->GetPMeshInfo(iMesh);
@@ -60,6 +66,27 @@ void CheckMed(const std::string& theFileName)
       TEntityInfo aEntityInfo = aMed->GetEntityInfo(aMeshInfo);
       
       TElemGroup aElemGroup = GetElemsByEntity(aMed,aMeshInfo,aEntityInfo);
+
+      PNodeInfo aNodeInfo = aMed->GetPNodeInfo(aMeshInfo);
+      TElemGroup::const_iterator anIter = aElemGroup.begin();
+      for(; anIter != aElemGroup.end(); anIter++){
+	const EEntiteMaillage& anEntity = anIter->first;
+	if(anEntity != eNOEUD){
+	  const TElemMap& anElemMap = anIter->second;
+	  TKey2Gauss::const_iterator anIter2 = aKey2Gauss.begin();
+	  for(; anIter2 != aKey2Gauss.end(); anIter2++){
+	    const TGaussInfo::TKey& aKey = anIter2->first;
+	    EGeometrieElement aGeom = boost::get<1>(aKey);
+	    TElemMap::const_iterator anIter3 = anElemMap.find(aGeom);
+	    if(anIter3 != anElemMap.end()){
+	      PCellInfo aCellInfo = anIter3->second;
+	      PGaussInfo aGaussInfo = anIter2->second;
+	      TNodeCoord aGaussCoord;
+	      GetGaussCoord3D(aGaussInfo,aCellInfo,aNodeInfo,aGaussCoord);
+	    }
+	  }
+	}
+      }
       
       TFamilyGroup aFamilyGroup = GetFamilies(aMed,aMeshInfo);
       
@@ -81,8 +108,9 @@ void CheckMed(const std::string& theFileName)
 	  TTimeStampSet::const_iterator aTTimeStampSetIter = aTimeStampSet.begin();
 	  for(; aTTimeStampSetIter != aTimeStampSet.end(); aTTimeStampSetIter++){
 	    PTimeStampInfo aTimeStampInfo = *aTTimeStampSetIter;
-	    TErr anErr;
-	    PTimeStampVal aTimeStampVal = aMed->GetPTimeStampVal(aTimeStampInfo,&anErr);
+	    PTimeStampVal aTimeStampVal = aMed->GetPTimeStampVal(aTimeStampInfo,
+								 aMKey2Profile,
+								 aKey2Gauss);
 	  }
 	}
       }
@@ -97,6 +125,9 @@ void CopyMed(const PWrapper& theMed,
 	     const PWrapper& theMed2, 
 	     int theIncr)
 {
+  TKey2Gauss aKey2Gauss = GetKey2Gauss(*theMed);
+  TMKey2Profile aMKey2Profile = GetMKey2Profile(*theMed);
+
   TInt aNbMeshes = theMed->GetNbMeshes();
   MSG(MYDEBUG,"aNbMeshes = "<<aNbMeshes);
   std::string aName;
@@ -135,14 +166,14 @@ void CopyMed(const PWrapper& theMed,
       }
 
       EEntiteMaillage anEntity;
-      TGeom aTGeom;
+      TGeom2Size aGeom2Size;
       TInt aNbTimeStamps = 
-	theMed->GetNbTimeStamps(aFieldInfo,aEntityInfo,anEntity,aTGeom);
+	theMed->GetNbTimeStamps(aFieldInfo,aEntityInfo,anEntity,aGeom2Size);
       {
 	INITMSG(MYDEBUG,"GetNbTimeStamps = "<<aNbTimeStamps<<endl);
 	for(TInt iTimeStamp = 0; iTimeStamp < aNbTimeStamps; iTimeStamp++){
 	  PTimeStampInfo aTimeStampInfo = 
-	  theMed->GetPTimeStampInfo(aFieldInfo,anEntity,aTGeom,iTimeStamp+1);
+	  theMed->GetPTimeStampInfo(aFieldInfo,anEntity,aGeom2Size,iTimeStamp+1);
 	  TInt aNumDt = aTimeStampInfo->GetNumDt();
 	  TInt aNbGauss = aTimeStampInfo->GetNbGauss();
 	  INITMSG(MYDEBUG,"aNbGauss = "<<aNbGauss<<"; aNumDt = "<<aNumDt<<"\n");
@@ -150,9 +181,12 @@ void CopyMed(const PWrapper& theMed,
 	  PTimeStampInfo aTimeStampInfo2 = 
 	    theMed->CrTimeStampInfo(aFieldInfo2,aTimeStampInfo);
 	  
-	  PTimeStampVal aTimeStampVal = theMed->GetPTimeStampVal(aTimeStampInfo);
+	  PTimeStampVal aTimeStampVal = theMed->GetPTimeStampVal(aTimeStampInfo,
+								 aMKey2Profile,
+								 aKey2Gauss);
 	  
-	  PTimeStampVal aTimeStampVal2 = theMed->CrTimeStampVal(aTimeStampInfo2,aTimeStampVal);
+	  PTimeStampVal aTimeStampVal2 = theMed->CrTimeStampVal(aTimeStampInfo2,
+								aTimeStampVal);
 	  
 	  if(MYWRITEDEBUG) theMed2->SetTimeStamp(aTimeStampVal2);
 	  
@@ -215,11 +249,11 @@ void CopyMed(const PWrapper& theMed,
 	if(MYWRITEDEBUG) theMed2->SetNodeInfo(aNodeInfo2);
 	continue;
       }
-      TGeom& aTGeom = anEntityInfoIter->second;
-      TGeom::iterator anTGeomIter = aTGeom.begin();
-      for(; anTGeomIter != aTGeom.end(); anTGeomIter++){
-	const EGeometrieElement& aGeom = anTGeomIter->first;
-	const TInt& aNbElem = anTGeomIter->second;
+      TGeom2Size& aGeom2Size = anEntityInfoIter->second;
+      TGeom2Size::iterator aGeomIter = aGeom2Size.begin();
+      for(; aGeomIter != aGeom2Size.end(); aGeomIter++){
+	const EGeometrieElement& aGeom = aGeomIter->first;
+	const TInt& aNbElem = aGeomIter->second;
 	INITMSG(MYDEBUG,"aGeom = "<<aGeom<<"; aNbElem = "<<aNbElem<<": ");
 	switch(aGeom){
 	case ePOLYGONE:
@@ -248,9 +282,9 @@ void CopyMed(const PWrapper& theMed,
 	case ePOLYEDRE:
 	  {
 	    PPolyedreInfo aPolyedreInfo = theMed->GetPPolyedreInfo(aMeshInfo,anEntity,aGeom);
-	    TElemNum aConn        = aPolyedreInfo->GetConnectivite();
-	    TElemNum aFacesIndex  = aPolyedreInfo->GetFacesIndex();
-	    TElemNum aIndex       = aPolyedreInfo->GetIndex();
+	    TElemNum aConn = aPolyedreInfo->GetConnectivite();
+	    TElemNum aFaces = aPolyedreInfo->GetFaces();
+	    TElemNum aIndex = aPolyedreInfo->GetIndex();
 	    
 	    TInt aNbIndex      = aIndex.size();
 	    
@@ -262,7 +296,7 @@ void CopyMed(const PWrapper& theMed,
 
 	      for (int aNf = aIndex[aNp]-1;aNf < aIndex[aNp+1]-1;aNf++){
 		ADDMSG(MYDEBUG,"Face "<<aNf-aIndex[aNp]+2<<": [");
-		for (int aNc = aFacesIndex[aNf]-1; aNc < aFacesIndex[aNf+1]-1;aNc++){
+		for (int aNc = aFaces[aNf]-1; aNc < aFaces[aNf+1]-1;aNc++){
 		  ADDMSG(MYDEBUG," "<<aConn[aNc]);
 		}
 		ADDMSG(MYDEBUG," ]"<<endl;);
@@ -317,7 +351,9 @@ void ReadMed(const char* theFileName,
 
 
 int main(int argc, char** argv){ 
+#ifndef _DEBUG_
   try{
+#endif
     if(argc == 2)
       CheckMed(argv[1]);
     if(argc == 3)
@@ -327,10 +363,12 @@ int main(int argc, char** argv){
     if(argc == 5)
       ReadMed(argv[1],argv[2],MED::EVersion(atoi(argv[3])),atoi(argv[4]));
     return 0;
+#ifndef _DEBUG_
   }catch(std::exception& exc){
     MSG(MYDEBUG,"Follow exception was accured :\n"<<exc.what());
   }catch(...){
     MSG(MYDEBUG,"Unknown exception was accured");
   } 
+#endif 
   return 1;
 }

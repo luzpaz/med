@@ -60,6 +60,14 @@ namespace MED{
 
 
   //---------------------------------------------------------------
+  struct TModeSwitchInfo: virtual TBase
+  {
+    EModeSwitch myModeSwitch;
+    EModeSwitch GetModeSwitch() const { return myModeSwitch;}
+  };
+
+
+  //---------------------------------------------------------------
   struct TMeshInfo: virtual TNameInfo
   {
     TInt myDim;
@@ -75,7 +83,8 @@ namespace MED{
   
 
   //---------------------------------------------------------------
-  typedef std::vector<TInt> TFamAttr;
+  typedef std::vector<TInt> TIntVector;
+  typedef TIntVector TFamAttr;
 
   struct TFamilyInfo: virtual TNameInfo
   {
@@ -111,7 +120,7 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  typedef std::vector<TInt> TElemNum;
+  typedef TIntVector TElemNum;
   
   struct TElemInfo: virtual TBase
   {
@@ -142,11 +151,21 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  typedef std::vector<TFloat> TNodeCoord;
+  typedef std::vector<TFloat> TFloatVector;
+  typedef TFloatVector TNodeCoord;
 
-  struct TNodeInfo: virtual TElemInfo
+  typedef TSlice<TNodeCoord> TCoordSlice;
+  typedef TCSlice<TNodeCoord> TCCoordSlice;
+
+  struct TNodeInfo: 
+    virtual TElemInfo,
+    virtual TModeSwitchInfo 
   {
     TNodeCoord myCoord;
+
+    TCCoordSlice GetCoordSlice(TInt theId) const;
+    TCoordSlice GetCoordSlice(TInt theId);
+
     TFloat GetNodeCoord(TInt theId, TInt theComp) const;
     void SetNodeCoord(TInt theId, TInt theComp, TFloat theVal);
 
@@ -165,24 +184,26 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  typedef SliceArray<TElemNum> TConnSlice;
-  typedef ConstSliceArray<TElemNum> TConstConnSlice;
+  typedef TSlice<TElemNum> TConnSlice;
+  typedef TCSlice<TElemNum> TCConnSlice;
 
-  struct TCellInfo: virtual TElemInfo
+  struct TCellInfo: 
+    virtual TElemInfo,
+    virtual TModeSwitchInfo 
   {
-    EEntiteMaillage myTEntity;
-    EEntiteMaillage GetEntity() const { return myTEntity;}
+    EEntiteMaillage myEntity;
+    EEntiteMaillage GetEntity() const { return myEntity;}
 
-    EGeometrieElement myTGeom;
-    EGeometrieElement GetGeom() const { return myTGeom;}
+    EGeometrieElement myGeom;
+    EGeometrieElement GetGeom() const { return myGeom;}
 
-    EConnectivite myTConn;
-    EConnectivite GetConn() const { return myTConn;}
+    EConnectivite myConnMode;
+    EConnectivite GetConnMode() const { return myConnMode;}
 
     virtual TInt GetConnDim() const = 0;
 
     TElemNum myConn;
-    TConstConnSlice GetConnSlice(TInt theElemId) const;
+    TCConnSlice GetConnSlice(TInt theElemId) const;
     TConnSlice GetConnSlice(TInt theElemId);
 
     TInt GetConn(TInt theElemId, TInt theConnId) const;
@@ -190,59 +211,62 @@ namespace MED{
   };
 
   //---------------------------------------------------------------
-  struct TPolygoneInfo: virtual TElemInfo
+  struct TPolygoneInfo: 
+    virtual TElemInfo
   {
-    EEntiteMaillage myTEntity; // MED_FACE|MED_MAILLE
-    EEntiteMaillage GetEntity() const { return myTEntity;}
+    EEntiteMaillage myEntity; // MED_FACE|MED_MAILLE
+    EEntiteMaillage GetEntity() const { return myEntity;}
 
-    EGeometrieElement myTGeom; // ePOLYGONE
+    EGeometrieElement myGeom; // ePOLYGONE
     EGeometrieElement GetGeom() const { return ePOLYGONE;}
 
-    EConnectivite myTConn; // eNOD|eDESC(eDESC not used)
-    EConnectivite GetConn() const { return myTConn;}
+    EConnectivite myConnMode; // eNOD|eDESC(eDESC not used)
+    EConnectivite GetConnMode() const { return myConnMode;}
 
-    TInt myConnDim;
-    TInt GetConnDim() const { return myConnDim;}
+    TInt myConnSize;
+    TInt GetConnSize() const { return myConnSize;}
 
     TElemNum myConn; // Table de connectivities
-    TElemNum GetConnectivite() const { return myConn;}
+    const TElemNum& GetConnectivite() const { return myConn;}
 
     TElemNum myIndex; // Table de indexes
-    TElemNum GetIndex() {return myIndex;}
+    const TElemNum& GetIndex() const { return myIndex;}
     TInt GetNbConn(TInt theElemId) const;
   };
 
   //---------------------------------------------------------------
-  struct TPolyedreInfo: virtual TElemInfo
+  struct TPolyedreInfo: 
+    virtual TElemInfo
   {
-    EEntiteMaillage myTEntity; // MED_FACE|MED_MAILLE
-    EEntiteMaillage GetEntity() const { return myTEntity;}
+    EEntiteMaillage myEntity; // MED_FACE|MED_MAILLE
+    EEntiteMaillage GetEntity() const { return myEntity;}
 
-    EGeometrieElement myTGeom; // ePOLYEDRE
+    EGeometrieElement myGeom; // ePOLYEDRE
     EGeometrieElement GetGeom() const { return ePOLYEDRE;}
 
-    EConnectivite myTConn; // eNOD|eDESC(eDESC not used)
-    EConnectivite GetConn() const { return myTConn;}
+    EConnectivite myConnMode; // eNOD|eDESC(eDESC not used)
+    EConnectivite GetConnMode() const { return myConnMode;}
 
-    TInt myNbConn;
-    TInt GetNbConn() const { return myNbConn;}
+    TInt myConnSize;
+    TInt GetConnSize() const { return myConnSize;}
 
     TElemNum myConn; // Table de connectivities
     TElemNum GetConnectivite() const { return myConn;}
     
-    TInt myNbFacesIndex;
-    TInt GetNbFacesIndex() const { return myNbFacesIndex;}
+    TInt myNbFaces;
+    TInt GetNbFaces() const { return myNbFaces;}
     
-    TElemNum myFacesIndex; // Table de faces indexes
-    TElemNum GetFacesIndex() {return myFacesIndex;}
+    TElemNum myFaces; // Table de faces indexes
+    const TElemNum& GetFaces() const { return myFaces;}
     
     TElemNum myIndex; // Table de indexes
-    TElemNum GetIndex() {return myIndex;}
+    const TElemNum& GetIndex() const { return myIndex;}
     TInt GetNbConn(TInt theElemId) const;
   };
 
   //---------------------------------------------------------------
-  struct TFieldInfo: virtual TNameInfo
+  struct TFieldInfo: 
+    virtual TNameInfo
   {
     PMeshInfo myMeshInfo;
     const PMeshInfo& GetMeshInfo() const { return myMeshInfo;}
@@ -270,7 +294,60 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  struct TTimeStampInfo: virtual TBase
+  TInt
+  GetDimGaussCoord(EGeometrieElement theGeom);
+
+  TInt
+  GetNbRefCoord(EGeometrieElement theGeom);
+
+  typedef TFloatVector TWeight;
+
+  struct TGaussInfo: 
+    virtual TNameInfo,
+    virtual TModeSwitchInfo 
+  {
+    typedef boost::tuple<std::string,EGeometrieElement> TKey;
+    typedef boost::tuple<TKey,TInt> TInfo;
+    struct TLess
+    {
+      bool
+      operator()(const TKey& theLeft, const TKey& theRight) const
+      {
+	std::string aLStr = boost::get<0>(theLeft);
+	std::string aRStr = boost::get<0>(theRight);
+	if(aLStr != aRStr)
+	  return aLStr < aRStr;
+
+	EGeometrieElement aLGeom = boost::get<1>(theLeft);
+	EGeometrieElement aRGeom = boost::get<1>(theRight);
+	return aLGeom < aRGeom;
+      }
+    };
+
+    EGeometrieElement myGeom;
+    EGeometrieElement GetGeom() const { return myGeom;}
+
+    TNodeCoord myRefCoord;
+    TCCoordSlice GetRefCoordSlice(TInt theId) const;
+    TCoordSlice GetRefCoordSlice(TInt theId);
+
+    TNodeCoord myGaussCoord;
+    TCCoordSlice GetGaussCoordSlice(TInt theId) const;
+    TCoordSlice GetGaussCoordSlice(TInt theId);
+
+    TWeight myWeight;
+
+    TInt GetNbRef() const { return GetNbRefCoord(GetGeom());}
+    TInt GetDim() const { return GetDimGaussCoord(GetGeom());}
+    TInt GetNbGauss() const { return myGaussCoord.size()/GetDim();}
+  };
+
+
+  //---------------------------------------------------------------
+  typedef std::map<EGeometrieElement,PGaussInfo> TGeom2Gauss;
+
+  struct TTimeStampInfo: 
+    virtual TBase
   {
     PFieldInfo myFieldInfo;
     const PFieldInfo& GetFieldInfo() const { return myFieldInfo;}
@@ -278,8 +355,8 @@ namespace MED{
     EEntiteMaillage myEntity;
     EEntiteMaillage GetEntity() const { return myEntity;}
 
-    TGeom myGeom;
-    const TGeom& GetGeom() const { return myGeom;}
+    TGeom2Size myGeom2Size;
+    const TGeom2Size& GetGeom2Size() const { return myGeom2Size;}
 
     TInt myNbGauss, myNumDt, myNumOrd;
     TInt GetNbGauss() const { return myNbGauss;}
@@ -289,9 +366,8 @@ namespace MED{
     TFloat myDt;
     TFloat GetDt() const { return myDt;}
 
-    TString myGaussName;
-    virtual std::string GetGaussName() const = 0;
-    virtual void SetGaussName(const std::string& theValue) = 0;
+    TGeom2Gauss myGeom2Gauss;
+    const TGeom2Gauss& GetGeom2Gauss() const { return myGeom2Gauss;}
 
     TString myUnitDt;
     virtual std::string GetUnitDt() const = 0;
@@ -300,13 +376,38 @@ namespace MED{
   
 
   //---------------------------------------------------------------
-  typedef std::vector<TFloat> TValue;
-  typedef std::map<EGeometrieElement,TValue> TMeshValue;
+  struct TProfileInfo: 
+    virtual TNameInfo
+  {
+    typedef std::string TKey;
+    typedef boost::tuple<TKey,TInt> TInfo;
 
-  struct TTimeStampVal: virtual TBase
+    EModeProfil myMode;
+    EModeProfil GetMode() const { return myMode;}
+    void SetMode(EModeProfil theMode) { myMode = theMode;}
+
+    TElemNum myElemNum;
+    TInt GetElemNum(TInt theId) const;
+    void SetElemNum(TInt theId, TInt theVal);
+
+    bool IsPresent() const { return GetName() != "";}
+    TInt GetSize() const { return myElemNum.size();}
+  };
+
+
+  //---------------------------------------------------------------
+  typedef TFloatVector TValue;
+  typedef std::map<EGeometrieElement,TValue> TMeshValue;
+  typedef std::map<EGeometrieElement,PProfileInfo> TGeom2Profile;
+
+  struct TTimeStampVal: 
+    virtual TModeSwitchInfo 
   {
     PTimeStampInfo myTimeStampInfo;
     const PTimeStampInfo& GetTimeStampInfo() const { return myTimeStampInfo;}
+
+    TGeom2Profile myGeom2Profile;
+    const TGeom2Profile& GetGeom2Profile() const { return myGeom2Profile;}
 
     TMeshValue myMeshValue;
     TFloat GetVal(EGeometrieElement theGeom, TInt theId, 
@@ -314,13 +415,6 @@ namespace MED{
 
     void SetVal(EGeometrieElement theGeom, TInt theId, 
 		TInt theComp, TFloat theVal, TInt theGauss = 0);
-    EModeProfil myPflMode;
-    EModeProfil GetPflMode() const { return myPflMode;}
-    void GetPflMode(EModeProfil theVal) { myPflMode = theVal;}
-
-    TString myPflName;
-    virtual std::string GetPflName() const = 0;
-    virtual void SetPflName(const std::string& theValue) = 0;
   };
 
 }
