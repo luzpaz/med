@@ -84,6 +84,9 @@ namespace MED{
 
   //---------------------------------------------------------------
   typedef std::vector<TInt> TIntVector;
+  typedef TSlice<TIntVector> TIntVecSlice;
+  typedef TCSlice<TIntVector> TCIntVecSlice;
+
   typedef TIntVector TFamAttr;
 
   struct TFamilyInfo: virtual TNameInfo
@@ -152,10 +155,12 @@ namespace MED{
 
   //---------------------------------------------------------------
   typedef std::vector<TFloat> TFloatVector;
-  typedef TFloatVector TNodeCoord;
+  typedef TSlice<TFloatVector> TFloatVecSlice;
+  typedef TCSlice<TFloatVector> TCFloatVecSlice;
 
-  typedef TSlice<TNodeCoord> TCoordSlice;
-  typedef TCSlice<TNodeCoord> TCCoordSlice;
+  typedef TFloatVector TNodeCoord;
+  typedef TFloatVecSlice TCoordSlice;
+  typedef TCFloatVecSlice TCCoordSlice;
 
   struct TNodeInfo: 
     virtual TElemInfo,
@@ -184,8 +189,8 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  typedef TSlice<TElemNum> TConnSlice;
-  typedef TCSlice<TElemNum> TCConnSlice;
+  typedef TIntVecSlice TConnSlice;
+  typedef TCIntVecSlice TCConnSlice;
 
   struct TCellInfo: 
     virtual TElemInfo,

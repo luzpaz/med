@@ -115,12 +115,44 @@ namespace MED{
 
 
   //---------------------------------------------------------------
+  typedef std::vector<TCCoordSlice> TCCoordSliceArr;
+  typedef std::vector<TCoordSlice> TCoordSliceArr;
+
+  class TGaussCoord:
+    virtual TModeSwitchInfo 
+  {
+    TInt myNbElem;
+    TInt myNbGauss;
+    TInt myDim;
+
+    TInt myGaussStep;
+
+    TNodeCoord myGaussCoord;
+
+  public:
+
+    TCCoordSliceArr
+    GetCoordSliceArr(TInt theElemId) const;
+
+    TCoordSliceArr 
+    GetCoordSliceArr(TInt theElemId);
+
+    void
+    Init(TInt theNbElem,
+	 TInt theNbGauss,
+	 TInt theDim,
+	 EModeSwitch theMode = eFULL_INTERLACE);
+  };
+
+
+  //---------------------------------------------------------------
   void
   GetGaussCoord3D(const TGaussInfo& theGaussInfo, 
 		  const TCellInfo& theCellInfo,
 		  const TNodeInfo& theNodeInfo,
-		  TNodeCoord& theGaussCoord,
-		  const TElemNum& theElemNum = TElemNum());
+		  TGaussCoord& theGaussCoord,
+		  const TElemNum& theElemNum = TElemNum(),
+		  EModeSwitch theMode = eFULL_INTERLACE);
 }
 
 #endif

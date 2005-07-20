@@ -331,6 +331,72 @@ namespace MED{
 
 
   //---------------------------------------------------------------
+  void
+  TGaussCoord
+  ::Init(TInt theNbElem,
+	 TInt theNbGauss,
+	 TInt theDim,
+	 EModeSwitch theMode)
+  {
+    myModeSwitch = theMode;
+
+    myNbElem = theNbElem;
+    myNbGauss = theNbGauss;
+    myDim = theDim;
+
+    myGaussStep = myNbGauss*myDim;
+
+    myGaussCoord.resize(theNbElem*myGaussStep);
+  }
+
+
+  TCCoordSliceArr 
+  TGaussCoord
+  ::GetCoordSliceArr(TInt theElemId) const
+  {
+    TCCoordSliceArr aCoordSliceArr(myNbGauss);
+    if(GetModeSwitch() == eFULL_INTERLACE){
+      TInt anId = theElemId*myGaussStep;
+      for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
+	aCoordSliceArr[anGaussId] =
+	  TCCoordSlice(myGaussCoord,std::slice(anId,myDim,1));
+	anId += myDim;
+      }
+    }
+    else{
+      for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
+	aCoordSliceArr[anGaussId] =
+	  TCCoordSlice(myGaussCoord,std::slice(theElemId,myDim,myGaussStep));
+      }
+    }
+    return aCoordSliceArr;
+  }
+
+
+  TCoordSliceArr 
+  TGaussCoord
+  ::GetCoordSliceArr(TInt theElemId)
+  {
+    TCoordSliceArr aCoordSliceArr(myNbGauss);
+    if(GetModeSwitch() == eFULL_INTERLACE){
+      TInt anId = theElemId*myGaussStep;
+      for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
+	aCoordSliceArr[anGaussId] =
+	  TCoordSlice(myGaussCoord,std::slice(anId,myDim,1));
+	anId += myDim;
+      }
+    }
+    else{
+      for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
+	aCoordSliceArr[anGaussId] =
+	  TCoordSlice(myGaussCoord,std::slice(theElemId,myDim,myGaussStep));
+      }
+    }
+    return aCoordSliceArr;
+  }
+
+
+  //---------------------------------------------------------------
   inline
   bool 
   IsEqual(TFloat theLeft, TFloat theRight)
@@ -342,26 +408,51 @@ namespace MED{
 
   struct TShapeFun
   {
-    typedef std::vector<TCCoordSlice> TSliceArr;
+    class TFun
+    {
+      TFloatVector myFun;
+      TInt myNbRef;
 
+    public:
+
+      void
+      Init(TInt theNbGauss,
+	   TInt theNbRef)
+      {
+	myFun.resize(theNbGauss*theNbRef);
+	myNbRef = theNbRef;
+      }
+
+      TCFloatVecSlice 
+      GetFunSlice(TInt theGaussId) const
+      {
+	return TCFloatVecSlice(myFun,std::slice(theGaussId*myNbRef,myNbRef,1));
+      }
+
+      TFloatVecSlice
+      GetFunSlice(TInt theGaussId)
+      {
+	return TFloatVecSlice(myFun,std::slice(theGaussId*myNbRef,myNbRef,1));
+      }
+    };
+
+    typedef std::vector<TCCoordSlice> TSliceArr;
+    
     void 
     GetFun(const TShapeFun::TSliceArr& theRef,
 	   const TShapeFun::TSliceArr& theGauss,
-	   TFloatVector& theFun) const
+	   TFun& theFun) const
     {
       TInt aNbRef = theRef.size();
       TInt aNbGauss = theGauss.size();
-      theFun.resize(aNbGauss*aNbRef);
+      theFun.Init(aNbGauss,aNbRef);
     }
 
     virtual 
     void
     InitFun(const TShapeFun::TSliceArr& theRef,
 	    const TShapeFun::TSliceArr& theGauss,
-	    TFloatVector& theFun) const
-    {
-      GetFun(theRef,theGauss,theFun);
-    }
+	    TFun& theFun) const = 0;
     
     virtual
     bool 
@@ -394,7 +485,8 @@ namespace MED{
 	 const TElemNum& theElemNum,
 	 const TShapeFun::TSliceArr& theRef,
 	 const TShapeFun::TSliceArr& theGauss,
-	 TNodeCoord& theGaussCoord)
+	 TGaussCoord& theGaussCoord,
+	 EModeSwitch theMode)
     {
       int MYDEBUG = true;
       INITMSG(MYDEBUG,"TShapeFun::Eval"<<endl);
@@ -411,52 +503,47 @@ namespace MED{
 	else
 	  aNbElem = theCellInfo.GetNbElem();
 	
-	theGaussCoord.resize(aNbElem*aNbGauss*aDim);
-	
-	TFloatVector aFun;
+	theGaussCoord.Init(aNbElem,aNbGauss,aDim,theMode);
+
+	TFun aFun;
 	InitFun(theRef,theGauss,aFun);
 	TInt aConnDim = theCellInfo.GetConnDim();
 	
-	TInt aNbNodes = theNodeInfo.GetNbElem();
 	INITMSG(MYDEBUG,"aDim = "<<aDim<<
 		"; aNbGauss = "<<aNbGauss<<
 		"; aNbElem = "<<aNbElem<<
-		"; aNbNodes = "<<aNbNodes<<
+		"; aNbNodes = "<<theNodeInfo.GetNbElem()<<
 		endl);
-	for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
-	  TInt aCellId = anElemId;
-	  if(anIsSubMesh)
-	    aCellId = theElemNum[anElemId] - 1;
-	  INITMSG(MYDEBUG,"aCellId = "<<aCellId<<":\n");
 
-	  TCConnSlice aConnSlice = theCellInfo.GetConnSlice(anElemId);
+	for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
+	  TInt aCellId = anIsSubMesh? theElemNum[anElemId]-1: anElemId;
+	  TCConnSlice aConnSlice = theCellInfo.GetConnSlice(aCellId);
+	  TCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(aCellId);
 
 	  for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
-	    INITMSG(MYDEBUG,"aGaussId = "<<aGaussId<<": ");
+	    TCoordSlice& aGaussCoordSlice = aCoordSliceArr[aGaussId];
+	    TCFloatVecSlice aFunSlice = aFun.GetFunSlice(aGaussId);
+
 	    for(TInt aConnId = 0; aConnId < aConnDim; aConnId++){
 	      TInt aNodeId = aConnSlice[aConnId] - 1;      
-	      TCCoordSlice aCoordSlice = theNodeInfo.GetCoordSlice(aNodeId);
-	      TInt anGaussFunId = aConnId*aNbGauss+aGaussId;
-	      ADDMSG(MYDEBUG,aNodeId<<"-"<<aConnId<<" {");
+	      TCCoordSlice aNodeCoordSlice = theNodeInfo.GetCoordSlice(aNodeId);
+
 	      for(TInt aDimId = 0; aDimId < aDim; aDimId++){
-		TInt anGaussPntId = anElemId*aNbGauss*aDim+aGaussId*aDim+aDimId;
-		theGaussCoord[anGaussPntId] += aCoordSlice[aDimId] * aFun[anGaussFunId];
-		//ADDMSG(MYDEBUG,anGaussPntId<<"-"<<anGaussFunId<<" ");
-		//ADDMSG(MYDEBUG,anGaussPntId<<" ");
+		aGaussCoordSlice[aDimId] += aNodeCoordSlice[aDimId]*aFunSlice[aConnId];
 	      }
-	      ADDMSG(MYDEBUG,"} ");
 	    }
-	    ADDMSG(MYDEBUG,endl);
 	  }
 	}
 
 #ifdef _DEBUG_
-	for(TInt anElemId = 0, anId = 0; anElemId < aNbElem; anElemId++){
-	  INITMSG(MYDEBUG,anElemId<<": ");
+	for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
+	  TCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(anElemId);
+	  INITMSG(MYDEBUG,"");
 	  for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+	    TCoordSlice& aCoordSlice = aCoordSliceArr[aGaussId];
 	    ADDMSG(MYDEBUG,"{");
 	    for(TInt aDimId = 0; aDimId < aDim; aDimId++){
-	      ADDMSG(MYDEBUG,theGaussCoord[anId++]<<" ");
+	      ADDMSG(MYDEBUG,aCoordSlice[aDimId]<<" ");
 	    }
 	    ADDMSG(MYDEBUG,"} ");
 	  }
@@ -477,7 +564,7 @@ namespace MED{
     void
     InitFun(const TShapeFun::TSliceArr& theRef,
 	    const TShapeFun::TSliceArr& theGauss,
-	    TFloatVector& theFun) const
+	    TFun& theFun) const
     {
     }
 
@@ -496,20 +583,22 @@ namespace MED{
     void
     InitFun(const TShapeFun::TSliceArr& theRef,
 	    const TShapeFun::TSliceArr& theGauss,
-	    TFloatVector& theFun) const
+	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
 
       TInt aNbGauss = theGauss.size();
-      for(TInt aGaussId = 0, anId = 0; aGaussId < aNbGauss; aGaussId++){
+      for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
 	const TCCoordSlice& aCoord = theGauss[aGaussId];
-	theFun[anId++] = (1.0 - aCoord[0] - aCoord[1])*(1.0 - 2.0*aCoord[0] - 2.0*aCoord[1]);
-	theFun[anId++] = aCoord[0]*(2.0*aCoord[0] - 1.0);
-	theFun[anId++] = aCoord[1]*(2.0*aCoord[1] - 1.0);
+	TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+	aSlice[0] = (1.0 - aCoord[0] - aCoord[1])*(1.0 - 2.0*aCoord[0] - 2.0*aCoord[1]);
+	aSlice[1] = aCoord[0]*(2.0*aCoord[0] - 1.0);
+	aSlice[2] = aCoord[1]*(2.0*aCoord[1] - 1.0);
 	
-	theFun[anId++] = 4.0*aCoord[0]*(1.0 - aCoord[0] - aCoord[1]);
-	theFun[anId++] = 4.0*aCoord[0]*aCoord[1];
-	theFun[anId++] = 4.0*aCoord[1]*(1.0 - aCoord[0] - aCoord[1]);
+	aSlice[3] = 4.0*aCoord[0]*(1.0 - aCoord[0] - aCoord[1]);
+	aSlice[4] = 4.0*aCoord[0]*aCoord[1];
+	aSlice[5] = 4.0*aCoord[1]*(1.0 - aCoord[0] - aCoord[1]);
       }
     }
 
@@ -528,17 +617,19 @@ namespace MED{
     void
     InitFun(const TShapeFun::TSliceArr& theRef,
 	    const TShapeFun::TSliceArr& theGauss,
-	    TFloatVector& theFun) const
+	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
 
       TInt aNbGauss = theGauss.size();
-      for(TInt aGaussId = 0, anId = 0; aGaussId < aNbGauss; aGaussId++){
+      for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
 	const TCCoordSlice& aCoord = theGauss[aGaussId];
-	theFun[anId++] = 0.25*(1.0 + aCoord[1])*(1.0 - aCoord[0]);
-	theFun[anId++] = 0.25*(1.0 - aCoord[1])*(1.0 - aCoord[0]);
-	theFun[anId++] = 0.25*(1.0 - aCoord[1])*(1.0 + aCoord[0]);
-	theFun[anId++] = 0.25*(1.0 + aCoord[0])*(1.0 + aCoord[1]);
+	TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+	aSlice[0] = 0.25*(1.0 + aCoord[1])*(1.0 - aCoord[0]);
+	aSlice[1] = 0.25*(1.0 - aCoord[1])*(1.0 - aCoord[0]);
+	aSlice[2] = 0.25*(1.0 - aCoord[1])*(1.0 + aCoord[0]);
+	aSlice[3] = 0.25*(1.0 + aCoord[0])*(1.0 + aCoord[1]);
       }
     }
 
@@ -557,22 +648,24 @@ namespace MED{
     void
     InitFun(const TShapeFun::TSliceArr& theRef,
 	    const TShapeFun::TSliceArr& theGauss,
-	    TFloatVector& theFun) const
+	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
 
       TInt aNbGauss = theGauss.size();
-      for(TInt aGaussId = 0, anId = 0; aGaussId < aNbGauss; aGaussId++){
+      for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
 	const TCCoordSlice& aCoord = theGauss[aGaussId];
-	theFun[anId++] = 0.125*(1.0 - aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[2]);
-	theFun[anId++] = 0.125*(1.0 + aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[2]);
-	theFun[anId++] = 0.125*(1.0 + aCoord[0])*(1.0 + aCoord[1])*(1.0 - aCoord[2]);
-	theFun[anId++] = 0.125*(1.0 - aCoord[0])*(1.0 + aCoord[1])*(1.0 - aCoord[2]);
+	TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
 
-	theFun[anId++] = 0.125*(1.0 - aCoord[0])*(1.0 - aCoord[1])*(1.0 + aCoord[2]);
-	theFun[anId++] = 0.125*(1.0 + aCoord[0])*(1.0 - aCoord[1])*(1.0 + aCoord[2]);
-	theFun[anId++] = 0.125*(1.0 + aCoord[0])*(1.0 + aCoord[1])*(1.0 + aCoord[2]);
-	theFun[anId++] = 0.125*(1.0 - aCoord[0])*(1.0 + aCoord[1])*(1.0 + aCoord[2]);
+	aSlice[0] = 0.125*(1.0 - aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[2]);
+	aSlice[1] = 0.125*(1.0 + aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[2]);
+	aSlice[2] = 0.125*(1.0 + aCoord[0])*(1.0 + aCoord[1])*(1.0 - aCoord[2]);
+	aSlice[3] = 0.125*(1.0 - aCoord[0])*(1.0 + aCoord[1])*(1.0 - aCoord[2]);
+
+	aSlice[4] = 0.125*(1.0 - aCoord[0])*(1.0 - aCoord[1])*(1.0 + aCoord[2]);
+	aSlice[5] = 0.125*(1.0 + aCoord[0])*(1.0 - aCoord[1])*(1.0 + aCoord[2]);
+	aSlice[6] = 0.125*(1.0 + aCoord[0])*(1.0 + aCoord[1])*(1.0 + aCoord[2]);
+	aSlice[7] = 0.125*(1.0 - aCoord[0])*(1.0 + aCoord[1])*(1.0 + aCoord[2]);
       }
     }
 
@@ -590,8 +683,9 @@ namespace MED{
   GetGaussCoord3D(const TGaussInfo& theGaussInfo, 
 		  const TCellInfo& theCellInfo,
 		  const TNodeInfo& theNodeInfo,
-		  TNodeCoord& theGaussCoord,
-		  const TElemNum& theElemNum)
+		  TGaussCoord& theGaussCoord,
+		  const TElemNum& theElemNum,
+		  EModeSwitch theMode)
   {
     int MYDEBUG = 1;
     INITMSG(MYDEBUG,"GetGaussCoord3D\n");
@@ -626,10 +720,10 @@ namespace MED{
       case eTRIA6: {
 	INITMSG(MYDEBUG,"eTRIA6"<<endl);
 
-	if(TTria6a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord))
+	if(TTria6a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return;
 
-	if(TTria6b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord))
+	if(TTria6b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return;
 	
 	break;
@@ -637,7 +731,7 @@ namespace MED{
       case eQUAD4: {
 	INITMSG(MYDEBUG,"eQUAD4"<<endl);
 
-	if(TQuad4a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord))
+	if(TQuad4a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return;
 
 	break;
@@ -661,7 +755,7 @@ namespace MED{
       case eHEXA8: {
 	INITMSG(MYDEBUG,"eHEXA8"<<endl);
 
-	if(THexa8a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord))
+	if(THexa8a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return;
 
 	break;

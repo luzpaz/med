@@ -93,7 +93,7 @@ namespace MED{
   class TCSlice
   {
     typedef const TContainer* PCContainer;
-    PCContainer myContainer;
+    PCContainer myCContainer;
     std::slice mySlice;
   protected:
     size_t
@@ -102,7 +102,7 @@ namespace MED{
 #ifdef _DEBUG_
       if(theId < mySlice.size()){
 	size_t anId = mySlice.start() + theId*mySlice.stride();
-	if(anId < myContainer->size())
+	if(anId < myCContainer->size())
 	  return anId;
       }
       throw std::out_of_range(std::string("TCSlice::GetID"));
@@ -117,18 +117,18 @@ namespace MED{
 
     TCSlice(const TContainer& theContainer,
 	    const std::slice& theSlice): 
-      myContainer(&theContainer),
+      myCContainer(&theContainer),
       mySlice(theSlice)
     {}
     
     TCSlice():
-      myContainer(NULL)
+      myCContainer(NULL)
     {}
 
     const value_type& 
     operator[](size_t theId) const
     {
-      return (*myContainer)[GetID(theId)];
+      return (*myCContainer)[GetID(theId)];
     }
     
     size_t
@@ -156,10 +156,14 @@ namespace MED{
     {
     }
     
+    TSlice():
+      myContainer(NULL)
+    {}
+
     value_type& 
     operator[](size_t theId)
     {
-      return myContainer[this->GetID(theId)];
+      return (*myContainer)[this->GetID(theId)];
     }
   };
   
