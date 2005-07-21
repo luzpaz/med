@@ -36,6 +36,8 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 
 EXPORT_HEADERS = \
 	MED_Common.hxx \
+	MED_SharedPtr.hxx \
+	MED_SliceArray.hxx \
 	MED_Wrapper.hxx \
 	MED_TWrapper.hxx \
 	MED_Structures.hxx \

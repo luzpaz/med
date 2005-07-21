@@ -29,8 +29,6 @@
 #ifndef MED_Common_HeaderFile
 #define MED_Common_HeaderFile
 
-#include <stdexcept>
-#include <valarray>
 #include <vector>
 #include <string>
 #include <set>
@@ -41,133 +39,16 @@ extern "C"{
 }  
 
 #include <boost/tuple/tuple.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "SALOMEconfig.h"
+
+#include "MED_SharedPtr.hxx"
+#include "MED_SliceArray.hxx"
 
 namespace MED{
 
   enum EVersion {eVUnknown = -1, eV2_1, eV2_2};
   
-
-  template<class T> class SharedPtr: public boost::shared_ptr<T>
-  {
-  public:
-    SharedPtr() {}
-
-    template<class Y>
-    explicit SharedPtr(Y * p): 
-      boost::shared_ptr<T>(p) 
-    {}
-
-    template<class Y>
-    SharedPtr(SharedPtr<Y> const & r):
-      boost::shared_ptr<T>(r,boost::detail::polymorphic_cast_tag())
-    {}
-
-    template<class Y>
-    SharedPtr& operator=(SharedPtr<Y> const & r)
-    {
-      boost::shared_ptr<T>(r,boost::detail::polymorphic_cast_tag()).swap(*this);
-      return *this;
-    }
-
-    template<class Y> SharedPtr& operator()(Y * p) // Y must be complete
-    {
-      return operator=<Y>(SharedPtr<Y>(p));
-    }
-
-    operator const T& () const 
-    { 
-      return *(this->get());
-    }
-
-    operator T& () 
-    { 
-      return *(this->get());
-    }
-  };
-
-
-  template<class TContainer> 
-  class TCSlice
-  {
-    typedef const TContainer* PCContainer;
-    PCContainer myCContainer;
-    std::slice mySlice;
-  protected:
-    size_t
-    GetID(size_t theId) const
-    {
-#ifdef _DEBUG_
-      if(theId < mySlice.size()){
-	size_t anId = mySlice.start() + theId*mySlice.stride();
-	if(anId < myCContainer->size())
-	  return anId;
-      }
-      throw std::out_of_range(std::string("TCSlice::GetID"));
-      return -1;
-#else
-      return mySlice.start() + theId*mySlice.stride();
-#endif
-    }
-    
-  public:
-    typedef typename TContainer::value_type value_type;
-
-    TCSlice(const TContainer& theContainer,
-	    const std::slice& theSlice): 
-      myCContainer(&theContainer),
-      mySlice(theSlice)
-    {}
-    
-    TCSlice():
-      myCContainer(NULL)
-    {}
-
-    const value_type& 
-    operator[](size_t theId) const
-    {
-      return (*myCContainer)[GetID(theId)];
-    }
-    
-    size_t
-    size() const
-    {
-      return mySlice.size();
-    }
-  };
-  
-
-  template<class TContainer> 
-  class TSlice: public TCSlice<TContainer>
-  {
-    typedef TContainer* PContainer;
-    PContainer myContainer;
-    
-  public:
-    typedef typename TContainer::value_type value_type;
-    typedef TCSlice<TContainer> TSupperClass;
-
-    TSlice(TContainer& theContainer,
-	   const std::slice& theSlice): 
-      TSupperClass(theContainer,theSlice),
-      myContainer(&theContainer)
-    {
-    }
-    
-    TSlice():
-      myContainer(NULL)
-    {}
-
-    value_type& 
-    operator[](size_t theId)
-    {
-      return (*myContainer)[this->GetID(theId)];
-    }
-  };
-  
-
   typedef enum {eFAUX, eVRAI} EBooleen ; 
   typedef double TFloat;
 #if defined(SUN4SOL2) || defined(PCLINUX) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000) || defined(HP9000)
