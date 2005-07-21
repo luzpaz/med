@@ -255,6 +255,20 @@ TProfileInfo
 }
 
 //---------------------------------------------------------------
+bool
+TGaussInfo::TLess
+::operator()(const TKey& theLeft, const TKey& theRight) const
+{
+  EGeometrieElement aLGeom = boost::get<0>(theLeft);
+  EGeometrieElement aRGeom = boost::get<0>(theRight);
+  if(aLGeom != aRGeom)
+    return aLGeom < aRGeom;
+
+  const std::string& aLStr = boost::get<1>(theLeft);
+  const std::string& aRStr = boost::get<1>(theRight);
+  return aLStr < aRStr;
+}
+
 TCCoordSlice 
 TGaussInfo
 ::GetRefCoordSlice(TInt theId) const

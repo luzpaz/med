@@ -785,11 +785,11 @@ namespace MED{
 
       const TGaussInfo::TKey& aKey = boost::get<0>(theInfo);
 
-      const std::string& aName = boost::get<0>(aKey);
-      TNameInfoBase::SetName(aName);
-
-      myGeom = boost::get<1>(aKey);
+      myGeom = boost::get<0>(aKey);
       myRefCoord.resize(GetNbRef()*GetDim());
+
+      const std::string& aName = boost::get<1>(aKey);
+      TNameInfoBase::SetName(aName);
 
       TInt aNbGauss = boost::get<1>(theInfo);
       myGaussCoord.resize(aNbGauss*GetDim());

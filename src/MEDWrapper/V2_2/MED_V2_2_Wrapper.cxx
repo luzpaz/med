@@ -1219,7 +1219,7 @@ namespace MED{
       else if(aRet < 0)
 	EXCEPTION(runtime_error,"GetGaussPreInfo - MEDgaussInfo(...)");
       
-      return TGaussInfo::TInfo(TGaussInfo::TKey(&aName[0],EGeometrieElement(aGeom)),
+      return TGaussInfo::TInfo(TGaussInfo::TKey(EGeometrieElement(aGeom),&aName[0]),
 			       TInt(aNbGaussPoints));
     }
 
@@ -1510,7 +1510,7 @@ namespace MED{
 	}
 
 	MED::PGaussInfo aGaussInfo;
-	TGaussInfo::TKey aKey(aProfileName,aGeom);
+	TGaussInfo::TKey aKey(aGeom,aGaussName);
 	if(strcmp(aGaussName,"") != 0){
 	  MED::TKey2Gauss::const_iterator anIter = theKey2Gauss.find(aKey);
 	  if(anIter != theKey2Gauss.end()){

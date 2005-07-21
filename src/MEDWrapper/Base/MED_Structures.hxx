@@ -311,22 +311,12 @@ namespace MED{
     virtual TNameInfo,
     virtual TModeSwitchInfo 
   {
-    typedef boost::tuple<std::string,EGeometrieElement> TKey;
+    typedef boost::tuple<EGeometrieElement,std::string> TKey;
     typedef boost::tuple<TKey,TInt> TInfo;
     struct TLess
     {
       bool
-      operator()(const TKey& theLeft, const TKey& theRight) const
-      {
-	std::string aLStr = boost::get<0>(theLeft);
-	std::string aRStr = boost::get<0>(theRight);
-	if(aLStr != aRStr)
-	  return aLStr < aRStr;
-
-	EGeometrieElement aLGeom = boost::get<1>(theLeft);
-	EGeometrieElement aRGeom = boost::get<1>(theRight);
-	return aLGeom < aRGeom;
-      }
+      operator()(const TKey& theLeft, const TKey& theRight) const;
     };
 
     EGeometrieElement myGeom;
