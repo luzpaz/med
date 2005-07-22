@@ -414,14 +414,12 @@ namespace MED{
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     virtual
     PProfileInfo
-    CrProfileInfo(const std::string& theName = "",
-		  EModeProfil theMode = eNO_PFLMOD,
-		  TInt theSize = 0)
+    CrProfileInfo(const TProfileInfo::TInfo& theInfo,
+		  EModeProfil theMode = eCOMPACT)
     {
       return PProfileInfo(new TTProfileInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
-			   (theName,
-			    theMode,
-			    theSize));
+			   (theInfo,
+			    theMode));
     }
     
 

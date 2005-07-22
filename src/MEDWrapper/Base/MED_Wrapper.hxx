@@ -566,9 +566,13 @@ namespace MED{
 		   TErr* theErr = NULL) = 0;
     virtual
     PProfileInfo
-    CrProfileInfo(const std::string& theName = "",
-		  EModeProfil theMode = eNO_PFLMOD,
-		  TInt theSize = 0) = 0;
+    CrProfileInfo(const TProfileInfo::TInfo& theInfo,
+		  EModeProfil theMode = eCOMPACT) = 0;
+
+    PProfileInfo
+    GetPProfileInfo(TInt theId,
+		    EModeProfil theMode = eCOMPACT,
+		    TErr* theErr = NULL);
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

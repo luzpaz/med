@@ -271,6 +271,21 @@ namespace MED{
 
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  PProfileInfo
+  TWrapper
+  ::GetPProfileInfo(TInt theId,
+		    EModeProfil theMode,
+		    TErr* theErr)
+  {
+    TProfileInfo::TInfo aPreInfo = GetProfilePreInfo(theId);
+    PProfileInfo anInfo = CrProfileInfo(aPreInfo,theMode);
+    GetProfileInfo(theId,*anInfo,theErr);
+
+    return anInfo;
+  }
+
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   PTimeStampVal 
   TWrapper
   ::GetPTimeStampVal(const PTimeStampInfo& theTimeStampInfo,

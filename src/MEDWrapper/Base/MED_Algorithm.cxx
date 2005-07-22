@@ -122,7 +122,7 @@ namespace MED
     if(MYDEBUG){
       TGroupInfo::const_iterator anIter = aGroup.begin();
       for(; anIter != aGroup.end(); anIter++){
-	string aName = anIter->first;
+	const std::string& aName = anIter->first;
 	INITMSG(MYDEBUG,"aGroupName = '"<<aName<<"'\n");
 	const TFamilyGroup& aFamilyGroup = anIter->second;
 	TFamilyGroup::const_iterator anFamIter = aFamilyGroup.begin();
@@ -295,14 +295,10 @@ namespace MED
     PProfileInfo anInfo;
     TInt aNbProfiles = theWrapper.GetNbProfiles(theErr);
     for(TInt anId = 1; anId <= aNbProfiles; anId++){
-      TProfileInfo::TInfo aTInfo = theWrapper.GetProfilePreInfo(anId);
-      std::string aName = boost::get<0>(aTInfo);
-      if(aName == theProfileName){
-	TInt aSize = boost::get<1>(aTInfo);
-	anInfo = theWrapper.CrProfileInfo(aName,theMode,aSize);
-	theWrapper.GetProfileInfo(anId,anInfo,theErr);
-	break;
-      }
+      TProfileInfo::TInfo aPreInfo = theWrapper.GetProfilePreInfo(anId);
+      const std::string& aName = boost::get<0>(aPreInfo);
+      if(aName == theProfileName)
+	return theWrapper.GetPProfileInfo(anId,theMode,theErr);
     }
     return anInfo;
   }
@@ -319,24 +315,22 @@ namespace MED
     TInt aNbProfiles = theWrapper.GetNbProfiles(theErr);
     for(TInt anId = 1; anId <= aNbProfiles; anId++){
       TProfileInfo::TInfo aPreInfo = theWrapper.GetProfilePreInfo(anId);
-      std::string aName = boost::get<0>(aPreInfo);
-      TInt aSize = boost::get<1>(aPreInfo);
-      PProfileInfo anInfo = theWrapper.CrProfileInfo(aName,theMode,aSize);
-      theWrapper.GetProfileInfo(anId,anInfo,theErr);
+      PProfileInfo anInfo = theWrapper.GetPProfileInfo(anId,theMode,theErr);
+      const std::string& aName = boost::get<0>(aPreInfo);
       aKey2Profile[aName] = anInfo;
-
+      
 #ifdef _DEBUG_
-    INITMSG(MYDEBUG,
-	    "- aName = '"<<anInfo->GetName()<<"'"<<
-	    " : "<<
-	    endl);
-    TInt aNbElem = anInfo->myElemNum.size();
-    for(TInt iElem = 0; iElem < aNbElem; iElem++){
-      ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
-    }
-    ADDMSG(MYVALUEDEBUG,endl);
+      INITMSG(MYDEBUG,
+	      "- aName = '"<<aName<<"'"<<
+	      " : "<<
+	      endl);
+      TInt aNbElem = anInfo->myElemNum.size();
+      for(TInt iElem = 0; iElem < aNbElem; iElem++){
+	ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
+      }
+      ADDMSG(MYVALUEDEBUG,endl);
 #endif
-
+      
     }
     return TMKey2Profile(theMode,aKey2Profile);
   }

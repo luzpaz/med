@@ -870,13 +870,13 @@ namespace MED{
   {
     typedef TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TNameInfoBase;
 
-    TTProfileInfo(const std::string& theName = "",
-		  EModeProfil theMode = eNO_PFLMOD,
-		  TInt theSize = 0):
-      TNameInfoBase(theName)
+    TTProfileInfo(const TProfileInfo::TInfo& theInfo,
+		  EModeProfil theMode = eCOMPACT):
+      TNameInfoBase(boost::get<0>(theInfo))
     {
-      myElemNum.resize(theSize);
-      myMode = theMode;
+      TInt aSize = boost::get<1>(theInfo);
+      myElemNum.resize(aSize);
+      myMode = aSize > 0? theMode: eNO_PFLMOD;
     }
   };
 
