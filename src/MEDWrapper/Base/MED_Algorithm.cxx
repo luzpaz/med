@@ -39,7 +39,8 @@ static int MYDEBUG = 0;
 static int MYVALUEDEBUG = 0;
 #endif
 
-namespace MED{
+namespace MED
+{
 
   TElemGroup 
   GetElemsByEntity(TWrapper& theWrapper, 
@@ -350,6 +351,13 @@ namespace MED{
   }
 
 
+  TInt
+  TGaussCoord
+  ::size() const
+  {
+    return myNbElem;
+  }
+
   TCCoordSliceArr 
   TGaussCoord
   ::GetCoordSliceArr(TInt theElemId) const
@@ -518,7 +526,7 @@ namespace MED{
 	for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
 	  TInt aCellId = anIsSubMesh? theElemNum[anElemId]-1: anElemId;
 	  TCConnSlice aConnSlice = theCellInfo.GetConnSlice(aCellId);
-	  TCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(aCellId);
+	  TCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(anElemId);
 
 	  for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
 	    TCoordSlice& aGaussCoordSlice = aCoordSliceArr[aGaussId];

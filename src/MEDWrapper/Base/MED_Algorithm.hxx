@@ -142,6 +142,9 @@ namespace MED{
 	 TInt theNbGauss,
 	 TInt theDim,
 	 EModeSwitch theMode = eFULL_INTERLACE);
+
+    TInt
+    size() const;
   };
 
 
