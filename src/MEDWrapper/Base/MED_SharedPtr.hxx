@@ -46,13 +46,13 @@ namespace MED
 
     template<class Y>
     SharedPtr(SharedPtr<Y> const & r):
-      boost::shared_ptr<T>(r,boost::detail::polymorphic_cast_tag())
+      boost::shared_ptr<T>(r,boost::detail::dynamic_cast_tag())
     {}
 
     template<class Y>
     SharedPtr& operator=(SharedPtr<Y> const & r)
     {
-      boost::shared_ptr<T>(r,boost::detail::polymorphic_cast_tag()).swap(*this);
+      boost::shared_ptr<T>(r,boost::detail::dynamic_cast_tag()).swap(*this);
       return *this;
     }
 
