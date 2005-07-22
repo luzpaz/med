@@ -1438,6 +1438,8 @@ namespace MED{
       TGeom2Size::iterator anIter = aGeom2Size.begin();
       for(; anIter != aGeom2Size.end(); anIter++){
 	EGeometrieElement aGeom = anIter->first;
+	TInt aNbCells = anIter->second;
+
 	TInt aNbVal = MEDnVal(anId,
 			      &aFieldInfo.myName[0],
 			      med_entite_maillage(aTimeStampInfo.myEntity),
@@ -1527,9 +1529,65 @@ namespace MED{
 	    aGeom2Profile[aGeom] = aProfileInfo;
 	  }
 	}
+
+	TInt aNbMeshRef = MEDnChampRef(anId,
+				       &aFieldInfo.myName[0],
+				       med_entite_maillage(aTimeStampInfo.myEntity),
+				       med_geometrie_element(aGeom),
+				       aTimeStampInfo.myNumDt,
+				       aTimeStampInfo.myNumOrd);
+	if(aNbMeshRef < 1){
+	  if(theErr){
+	    *theErr = MED_FAUX;
+	    return;
+	  }
+	  EXCEPTION(runtime_error,"GetValTimeStamp - MEDnChampRef(...) < 1");
+	}
+	
+	med_int aNbGauss = -1;
+	aRet = MEDchampRefInfo(anId,
+			       &aFieldInfo.myName[0],
+			       med_entite_maillage(aTimeStampInfo.myEntity),
+			       med_geometrie_element(aGeom),
+			       aNbMeshRef,
+			       aTimeStampInfo.myNumDt,
+			       aTimeStampInfo.myNumOrd, 
+			       &aMeshInfo.myName[0],
+			       (med_booleen*)&aFieldInfo.myIsLocal,
+			       &aNbGauss);
+
+	if(aRet < 0){
+	  if(theErr){
+	    *theErr = MED_FAUX;
+	    return;
+	  }
+	  EXCEPTION(runtime_error,"GetValTimeStamp - MEDchampRefInfo(...)");
+	}
+ 
+	if(aNbGauss > 1 && !aGaussInfo){
+	  if(theErr){
+	    *theErr = MED_FAUX;
+	    return;
+	  }
+	  EXCEPTION(runtime_error,"GetValTimeStamp "<<
+		    "- aNbGauss("<<aNbGauss<<") > 1 && !aGaussInfo"<<
+		    "; aGaussName = '"<<aGaussName<<"'"<<
+		    "; aGeom = "<<aGeom<<
+		    "");
+	}
 	  
+	if(aGaussInfo && aNbGauss != aGaussInfo->GetNbGauss()){
+	  if(theErr){
+	    *theErr = MED_FAUX;
+	    return;
+	  }
+	  EXCEPTION(runtime_error,"GetValTimeStamp - aNbGauss != aGaussInfo->GetNbGauss()");
+	}
+	
 	if(aProfileInfo && aProfileInfo->IsPresent()){
-	  TInt aSize = aProfileInfo->GetSize()*aFieldInfo.myNbComp*aTimeStampInfo.myNbGauss;
+	  TInt aNbSubCells = aProfileInfo->GetSize();
+
+	  TInt aSize = aNbSubCells*aFieldInfo.myNbComp*aNbGauss;
 	  if(aSize != aValue.size()){
 	    if(theErr){
 	      *theErr = -1;
@@ -1540,20 +1598,29 @@ namespace MED{
 		      ") != aValue.size()("<<aValue.size()<<
 		      "); aNbVal = "<<aNbVal<<
 		      "; anEntity = "<<aTimeStampInfo.myEntity<<
-		      "; aGeom = "<<aGeom);
-	  }else{
-	    if(iEnd != aValue.size()){
-	      if(theErr){
-		*theErr = -1;
-		return;
-	      }
-	      EXCEPTION(runtime_error,
-			"GetTimeStampInfo - iEnd("<<iEnd<<
-			") != aValue.size()("<<aValue.size()<<
-			"); aNbVal = "<<aNbVal<<
-			"; anEntity = "<<aTimeStampInfo.myEntity<<
-			"; aGeom = "<<aGeom);
+		      "; aGeom = "<<aGeom<<
+		      "; aNbCells = "<<aNbCells<<
+		      "; aNbSubCells = "<<aNbSubCells<<
+		      "; aNbComp = "<<aFieldInfo.myNbComp<<
+		      "; aNbGauss = "<<aNbGauss<<
+		      "");
+	  }
+	}else{
+	  if(iEnd != aValue.size()){
+	    if(theErr){
+	      *theErr = -1;
+	      return;
 	    }
+	    EXCEPTION(runtime_error,
+		      "GetTimeStampInfo - iEnd("<<iEnd<<
+		      ") != aValue.size()("<<aValue.size()<<
+		      "); aNbVal = "<<aNbVal<<
+		      "; anEntity = "<<aTimeStampInfo.myEntity<<
+		      "; aGeom = "<<aGeom<<
+		      "; aNbCells = "<<aNbCells<<
+		      "; aNbComp = "<<aFieldInfo.myNbComp<<
+		      "; aNbGauss = "<<aNbGauss<<
+		      "");
 	  }
 	}
       }
