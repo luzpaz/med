@@ -42,6 +42,7 @@ static int MYWRITEDEBUG = 1;
 
 using namespace MED;
 
+#undef _DEBUG_
 
 void CheckMed(const std::string& theFileName)
 {
@@ -59,41 +60,12 @@ void CheckMed(const std::string& theFileName)
     for(TInt iMesh = 1; iMesh <= aNbMeshes; iMesh++){
       
       PMeshInfo aMeshInfo = aMed->GetPMeshInfo(iMesh);
-      INITMSG(MYDEBUG,"aMeshInfo->GetName() = "<<aMeshInfo->GetName()<<endl);
-
-      //continue;
+      INITMSG(MYDEBUG,"aMeshInfo->GetName() = '"<<aMeshInfo->GetName()<<"'"<<endl);
 
       TEntityInfo aEntityInfo = aMed->GetEntityInfo(aMeshInfo);
       
       TElemGroup aElemGroup = GetElemsByEntity(aMed,aMeshInfo,aEntityInfo);
 
-      PNodeInfo aNodeInfo = aMed->GetPNodeInfo(aMeshInfo);
-      TElemGroup::const_iterator anIter = aElemGroup.begin();
-      for(; anIter != aElemGroup.end(); anIter++){
-	const EEntiteMaillage& anEntity = anIter->first;
-	if(anEntity != eNOEUD){
-	  const TElemMap& anElemMap = anIter->second;
-	  TKey2Gauss::const_iterator anIter2 = aKey2Gauss.begin();
-	  for(; anIter2 != aKey2Gauss.end(); anIter2++){
-	    const TGaussInfo::TKey& aKey = anIter2->first;
-	    EGeometrieElement aGeom = boost::get<1>(aKey);
-	    TElemMap::const_iterator anIter3 = anElemMap.find(aGeom);
-	    if(anIter3 != anElemMap.end()){
-	      PCellInfo aCellInfo = anIter3->second;
-	      PGaussInfo aGaussInfo = anIter2->second;
-	      TNodeCoord aGaussCoord;
-	      GetGaussCoord3D(aGaussInfo,aCellInfo,aNodeInfo,aGaussCoord);
-	    }
-	  }
-	}
-      }
-      
-      TFamilyGroup aFamilyGroup = GetFamilies(aMed,aMeshInfo);
-      
-      TFamilyByEntity aFamilyByEntity = GetFamiliesByEntity(aMed,aElemGroup,aFamilyGroup);
-      
-      TGroupInfo aGroupInfo = GetFamiliesByGroup(aFamilyGroup);
-      
       TTimeStampGroup aTimeStampGroup = GetFieldsByEntity(aMed,aMeshInfo,aEntityInfo);
       
       TFieldGroup aFieldGroup = GetFieldsByEntity(aTimeStampGroup);
@@ -115,6 +87,35 @@ void CheckMed(const std::string& theFileName)
 	}
       }
 
+      continue;
+
+      TFamilyGroup aFamilyGroup = GetFamilies(aMed,aMeshInfo);
+      
+      TFamilyByEntity aFamilyByEntity = GetFamiliesByEntity(aMed,aElemGroup,aFamilyGroup);
+      
+      TGroupInfo aGroupInfo = GetFamiliesByGroup(aFamilyGroup);
+      
+      PNodeInfo aNodeInfo = aMed->GetPNodeInfo(aMeshInfo);
+      TElemGroup::const_iterator anIter = aElemGroup.begin();
+      for(; anIter != aElemGroup.end(); anIter++){
+	const EEntiteMaillage& anEntity = anIter->first;
+	if(anEntity != eNOEUD){
+	  const TElemMap& anElemMap = anIter->second;
+	  TKey2Gauss::const_iterator anIter2 = aKey2Gauss.begin();
+	  for(; anIter2 != aKey2Gauss.end(); anIter2++){
+	    const TGaussInfo::TKey& aKey = anIter2->first;
+	    EGeometrieElement aGeom = boost::get<0>(aKey);
+	    TElemMap::const_iterator anIter3 = anElemMap.find(aGeom);
+	    if(anIter3 != anElemMap.end()){
+	      PCellInfo aCellInfo = anIter3->second;
+	      PGaussInfo aGaussInfo = anIter2->second;
+	      TGaussCoord aGaussCoord;
+	      GetGaussCoord3D(aGaussInfo,aCellInfo,aNodeInfo,aGaussCoord);
+	    }
+	  }
+	}
+      }
+      
     }
   }
   MSG(MYDEBUG,"OK");
