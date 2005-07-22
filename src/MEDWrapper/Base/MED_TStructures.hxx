@@ -904,6 +904,7 @@ namespace MED{
 
       TInt aNbComp = theTimeStampInfo->myFieldInfo->myNbComp;
       TInt aNbGauss = theTimeStampInfo->myNbGauss;
+
       const TGeom2Size& aGeom2Size = theTimeStampInfo->myGeom2Size;
       TGeom2Size::const_iterator anIter = aGeom2Size.begin();
       for(; anIter != aGeom2Size.end(); anIter++){

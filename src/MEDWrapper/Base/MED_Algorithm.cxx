@@ -261,6 +261,7 @@ namespace MED
 	       TErr* theErr,
 	       EModeSwitch theMode)
   {
+    INITMSG(MYDEBUG,"GetKey2Gauss - theMode = "<<theMode<<endl);
     TKey2Gauss aKey2Gauss;
     TInt aNbGauss = theWrapper.GetNbGauss(theErr);
     for(TInt anId = 1; anId <= aNbGauss; anId++){
@@ -269,7 +270,16 @@ namespace MED
       theWrapper.GetGaussInfo(anId,anInfo,theErr);
       TGaussInfo::TKey aKey = boost::get<0>(aPreInfo);
       aKey2Gauss[aKey] = anInfo;
-      break;
+
+#ifdef _DEBUG_
+      const EGeometrieElement& aGeom = boost::get<0>(aKey);
+      const std::string& aName = boost::get<1>(aKey);
+      INITMSG(MYDEBUG,
+	      "- aGeom = "<<aGeom<<
+	      "; aName = '"<<aName<<"'"<<
+	      endl);
+#endif
+
     }
     return aKey2Gauss;
   }
@@ -304,6 +314,7 @@ namespace MED
 		  TErr* theErr,
 		  EModeProfil theMode)
   {
+    INITMSG(MYDEBUG,"GetMKey2Profile - theMode = "<<theMode<<endl);
     TKey2Profile aKey2Profile;
     TInt aNbProfiles = theWrapper.GetNbProfiles(theErr);
     for(TInt anId = 1; anId <= aNbProfiles; anId++){
@@ -316,9 +327,9 @@ namespace MED
 
 #ifdef _DEBUG_
     INITMSG(MYDEBUG,
-	    "GetProfileInfo - aName = '"<<anInfo->GetName()<<"'"<<
+	    "- aName = '"<<anInfo->GetName()<<"'"<<
+	    " : "<<
 	    endl);
-    BEGMSG(MYVALUEDEBUG,"GetProfileInfo - GetElemNum: ");
     TInt aNbElem = anInfo->myElemNum.size();
     for(TInt iElem = 0; iElem < aNbElem; iElem++){
       ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
@@ -467,7 +478,7 @@ namespace MED
     IsSatisfy(const TShapeFun::TSliceArr& theRefCoord) const
     {
 #ifdef _DEBUG_
-      int MYDEBUG = true;
+      int MYDEBUG = false;
 
       TInt aNbRef = theRefCoord.size();
       INITMSG(MYDEBUG,"TShapeFun::IsSatisfy - aNbRef = "<<aNbRef<<": ");
@@ -496,7 +507,7 @@ namespace MED
 	 TGaussCoord& theGaussCoord,
 	 EModeSwitch theMode)
     {
-      int MYDEBUG = true;
+      int MYDEBUG = false;
       INITMSG(MYDEBUG,"TShapeFun::Eval"<<endl);
 
       if(IsSatisfy(theRef)){
