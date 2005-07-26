@@ -998,7 +998,7 @@ namespace MED{
       TMeshValue::iterator anIter = aMeshValue.begin();
       for(; anIter != aMeshValue.end(); anIter++){
 	EGeometrieElement aGeom = anIter->first;
-	med_geometrie_element& aMEDGeom = med_geometrie_element(aGeom);
+	med_geometrie_element aMEDGeom = med_geometrie_element(aGeom);
 
 	MED::TProfileInfo& aProfileInfo = aGeom2Profile[aGeom];
 
