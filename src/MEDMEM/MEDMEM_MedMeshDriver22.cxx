@@ -1404,11 +1404,12 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 
       // If there is no nodal connectivity, we return MED_ERROR !
       if (Connectivity->_numberOfTypes == 0 && NumberOfPolygons == 0 && NumberOfPolyhedron == 0)
-	return MED_ERROR ;
+	return MED_ERROR;
       else
 	return MED_VALID;
 
     }
+  return MED_ERROR;
 }
 
 int  MED_MESH_RDONLY_DRIVER22::getFAMILY() 
