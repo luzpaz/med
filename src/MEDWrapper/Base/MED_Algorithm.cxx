@@ -356,13 +356,6 @@ namespace MED
   }
 
 
-  TInt
-  TGaussCoord
-  ::size() const
-  {
-    return myNbElem;
-  }
-
   TCCoordSliceArr 
   TGaussCoord
   ::GetCoordSliceArr(TInt theElemId) const
@@ -585,7 +578,7 @@ namespace MED
     bool 
     IsSatisfy(const TShapeFun::TSliceArr& theRef) const
     {
-      return IsEqual(theRef[0][0],-1.0);
+      return theRef.size() == 6 && IsEqual(theRef[0][0],-1.0);
     }
   };
 
@@ -619,7 +612,7 @@ namespace MED
     bool
     IsSatisfy(const TShapeFun::TSliceArr& theRef) const
     {
-      return IsEqual(theRef[2][0],1.0);
+      return theRef.size() == 6 && IsEqual(theRef[2][0],1.0);
     }
   };
 
@@ -650,7 +643,7 @@ namespace MED
     bool
     IsSatisfy(const TShapeFun::TSliceArr& theRef) const
     {
-      return IsEqual(theRef[0][0],-1.0);
+      return theRef.size() == 4 && IsEqual(theRef[0][0],-1.0);
     }
   };
 
@@ -686,7 +679,7 @@ namespace MED
     bool
     IsSatisfy(const TShapeFun::TSliceArr& theRef) const
     {
-      return IsEqual(theRef[0][0],-1.0);
+      return theRef.size() == 8 && IsEqual(theRef[0][0],-1.0);
     }
   };
 

@@ -144,7 +144,16 @@ namespace MED{
 	 EModeSwitch theMode = eFULL_INTERLACE);
 
     TInt
-    size() const;
+    GetNbElem() const { return myNbElem; }
+
+    TInt
+    GetNbGauss() const { return myNbGauss; }
+
+    TInt
+    GetDim() const { return myDim; }
+
+    TInt
+    size() const { return GetNbElem(); }
   };
 
 
