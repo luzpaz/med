@@ -892,7 +892,7 @@ namespace MED{
 
       myGeom2Profile = theInfo->GetGeom2Profile();
 
-      myMeshValue = theInfo->myMeshValue;
+      myGeom2Value = theInfo->myGeom2Value;
     }
 
     TTTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
@@ -909,20 +909,18 @@ namespace MED{
       TGeom2Size::const_iterator anIter = aGeom2Size.begin();
       for(; anIter != aGeom2Size.end(); anIter++){
 	const EGeometrieElement& aGeom = anIter->first;
-	TInt aSize = anIter->second;
+	TInt aNbElem = anIter->second;
 
 	MED::PProfileInfo aProfileInfo;
 	MED::TGeom2Profile::const_iterator anIter = theGeom2Profile.find(aGeom);
 	if(anIter != theGeom2Profile.end())
 	  aProfileInfo = anIter->second;
 
-	TInt aNb = -1;
 	if(aProfileInfo && aProfileInfo->IsPresent())
-	  aNb = aProfileInfo->GetSize()*aNbComp*aNbGauss;
-	else
-	  aNb = aSize*aNbComp*aNbGauss;
+	  aNbElem = aProfileInfo->GetSize();
 
-	myMeshValue[aGeom].resize(aNb);
+	TMeshValue& aMeshValue = GetMeshValue(aGeom);
+	aMeshValue.Init(aNbElem,aNbGauss,aNbComp);
       }
     }
   };

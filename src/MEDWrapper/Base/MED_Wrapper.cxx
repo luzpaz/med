@@ -297,22 +297,24 @@ namespace MED{
     GetTimeStampVal(*anInfo,theMKey2Profile,theKey2Gauss,theErr);
 
 #ifdef _DEBUG_
-    TInt aNbGauss = theTimeStampInfo->GetNbGauss();
     PFieldInfo aFieldInfo = theTimeStampInfo->GetFieldInfo();
-    TInt aNbComp = aFieldInfo->GetNbComp();
     INITMSG(MYDEBUG,"GetPTimeStampVal\n");
-    TMeshValue& aMeshValue = anInfo->myMeshValue;
-    TMeshValue::const_iterator aMeshValueIter = aMeshValue.begin();
-    for(; aMeshValueIter != aMeshValue.end(); aMeshValueIter++){
-      const EGeometrieElement& aGeom = aMeshValueIter->first;
-      const TValue& aValue = aMeshValueIter->second;
-      TInt iElemEnd = aValue.size() / aNbComp / aNbGauss;
-      INITMSG(MYDEBUG,"aGeom = "<<aGeom<<" - "<<iElemEnd<<": ");
-      for(TInt iElem = 0, anId = 0; iElem < iElemEnd; iElem++){
+    TGeom2Value& aGeom2Value = anInfo->myGeom2Value;
+    TGeom2Value::const_iterator anIter = aGeom2Value.begin();
+    for(; anIter != aGeom2Value.end(); anIter++){
+      const EGeometrieElement& aGeom = anIter->first;
+      const TMeshValue& aMeshValue = anIter->second;
+      TInt aNbElem = aMeshValue.myNbElem;
+      TInt aNbGauss = aMeshValue.myNbGauss;
+      TInt aNbComp = aMeshValue.myNbComp;
+      INITMSG(MYDEBUG,"aGeom = "<<aGeom<<" - "<<aNbElem<<": ");
+      for(TInt iElem = 0; iElem < aNbElem; iElem++){
+	TCValueSliceArr aValueSliceArr = aMeshValue.GetValueSliceArr(iElem);
 	ADDMSG(MYVALUEDEBUG,"{");
-	for(TInt iComp = 0; iComp < aNbComp; iComp++){
-	  for(TInt iGauss = 0; iGauss < aNbGauss; iGauss++){
-	    ADDMSG(MYVALUEDEBUG,aValue[anId++]<<" ");
+	for(TInt iGauss = 0; iGauss < aNbGauss; iGauss++){
+	  const TCValueSlice& aValueSlice = aValueSliceArr[iGauss];
+	  for(TInt iComp = 0; iComp < aNbComp; iComp++){
+	    ADDMSG(MYVALUEDEBUG,aValueSlice[iComp]<<" ");
 	  }
 	  ADDMSG(MYVALUEDEBUG,"| ");
 	}

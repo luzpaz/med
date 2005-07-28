@@ -392,7 +392,38 @@ namespace MED{
 
   //---------------------------------------------------------------
   typedef TFloatVector TValue;
-  typedef std::map<EGeometrieElement,TValue> TMeshValue;
+  typedef TSlice<TValue> TValueSlice;
+  typedef TCSlice<TValue> TCValueSlice;
+
+  typedef std::vector<TCValueSlice> TCValueSliceArr;
+  typedef std::vector<TValueSlice> TValueSliceArr;
+
+  struct TMeshValue:
+    virtual TModeSwitchInfo 
+  {
+    TValue myValue;
+
+    TInt myNbElem;
+    TInt myNbComp;
+    TInt myNbGauss;
+    TInt myStep;
+
+    void
+    Init(TInt theNbElem,
+	 TInt theNbGauss,
+	 TInt theNbComp,
+	 EModeSwitch theMode = eFULL_INTERLACE);
+
+    TCValueSliceArr
+    GetValueSliceArr(TInt theElemId) const;
+
+    TValueSliceArr 
+    GetValueSliceArr(TInt theElemId);
+  };
+
+
+  //---------------------------------------------------------------
+  typedef std::map<EGeometrieElement,TMeshValue> TGeom2Value;
   typedef std::map<EGeometrieElement,PProfileInfo> TGeom2Profile;
 
   struct TTimeStampVal: 
@@ -404,12 +435,9 @@ namespace MED{
     TGeom2Profile myGeom2Profile;
     const TGeom2Profile& GetGeom2Profile() const { return myGeom2Profile;}
 
-    TMeshValue myMeshValue;
-    TFloat GetVal(EGeometrieElement theGeom, TInt theId, 
-		  TInt theComp, TInt theGauss = 0) const;
-
-    void SetVal(EGeometrieElement theGeom, TInt theId, 
-		TInt theComp, TFloat theVal, TInt theGauss = 0);
+    TGeom2Value myGeom2Value;
+    const TMeshValue& GetMeshValue(EGeometrieElement theGeom) const;
+    TMeshValue& GetMeshValue(EGeometrieElement theGeom);
   };
 
 }

@@ -1440,6 +1440,41 @@ namespace MED{
 	EGeometrieElement aGeom = anIter->first;
 	TInt aNbCells = anIter->second;
 
+	TInt aNbMeshRef = MEDnChampRef(anId,
+				       &aFieldInfo.myName[0],
+				       med_entite_maillage(aTimeStampInfo.myEntity),
+				       med_geometrie_element(aGeom),
+				       aTimeStampInfo.myNumDt,
+				       aTimeStampInfo.myNumOrd);
+	if(aNbMeshRef < 1){
+	  if(theErr){
+	    *theErr = MED_FAUX;
+	    return;
+	  }
+	  EXCEPTION(runtime_error,"GetValTimeStamp - MEDnChampRef(...) < 1");
+	}
+	
+	TErr aRet;
+	med_int aNbGauss = aTimeStampInfo.myNbGauss;
+	aRet = MEDchampRefInfo(anId,
+			       &aFieldInfo.myName[0],
+			       med_entite_maillage(aTimeStampInfo.myEntity),
+			       med_geometrie_element(aGeom),
+			       aNbMeshRef,
+			       aTimeStampInfo.myNumDt,
+			       aTimeStampInfo.myNumOrd, 
+			       &aMeshInfo.myName[0],
+			       (med_booleen*)&aFieldInfo.myIsLocal,
+			       &aNbGauss);
+
+	if(aRet < 0){
+	  if(theErr){
+	    *theErr = MED_FAUX;
+	    return;
+	  }
+	  EXCEPTION(runtime_error,"GetValTimeStamp - MEDchampRefInfo(...)");
+	}
+ 
 	TInt aNbVal = MEDnVal(anId,
 			      &aFieldInfo.myName[0],
 			      med_entite_maillage(aTimeStampInfo.myEntity),
@@ -1456,14 +1491,17 @@ namespace MED{
 	  EXCEPTION(runtime_error,"GetTimeStampInfo - MEDnVal(...) - aNbVal == "<<aNbVal<<" <= 0");
 	}
 	
-	TValue& aValue = theVal.myMeshValue[aGeom];
-	TInt iEnd = aNbVal*aFieldInfo.myNbComp;
-	aValue.resize(iEnd);
-	
-	TErr aRet;
+	TMeshValue& aMeshValue = theVal.GetMeshValue(aGeom);
+	TInt aNbElem = aNbVal / aNbGauss;
+	aMeshValue.Init(aNbElem,
+			aNbGauss,
+			aFieldInfo.myNbComp);
+	TValue& aValue = aMeshValue.myValue;
+	TInt anEnd = aValue.size();
+
 	switch(aFieldInfo.myType){
 	case eFLOAT64: {
-	  std::vector<TFloat> anArray(iEnd);
+	  std::vector<TFloat> anArray(anEnd);
 	  aRet = MEDchampLire(anId,
 			      &aMeshInfo.myName[0],
 			      &aFieldInfo.myName[0],
@@ -1478,12 +1516,12 @@ namespace MED{
 			      aTimeStampInfo.myNumDt,
 			      aTimeStampInfo.myNumOrd);
 	  if(aRet >= 0) 
-	    for(TInt i = 0; i < iEnd; i++)
-	      aValue[i] = anArray[i];
+	    for(TInt anId = 0; anId < anEnd; anId++)
+	      aValue[anId] = anArray[anId];
 	  break;
 	}
 	default: {
-	  std::vector<TInt> anArray(iEnd);
+	  std::vector<TInt> anArray(anEnd);
 	  aRet = MEDchampLire(anId,
 			      &aMeshInfo.myName[0],
 			      &aFieldInfo.myName[0],
@@ -1498,8 +1536,8 @@ namespace MED{
 			      aTimeStampInfo.myNumDt,
 			      aTimeStampInfo.myNumOrd);
 	  if(aRet >= 0) 
-	    for(med_int i = 0; i < iEnd; i++) 
-	      aValue[i] = anArray[i];
+	    for(TInt anId = 0; anId < anEnd; anId++)
+	      aValue[anId] = anArray[anId];
 	  break;
 	}}
 
@@ -1530,40 +1568,6 @@ namespace MED{
 	  }
 	}
 
-	TInt aNbMeshRef = MEDnChampRef(anId,
-				       &aFieldInfo.myName[0],
-				       med_entite_maillage(aTimeStampInfo.myEntity),
-				       med_geometrie_element(aGeom),
-				       aTimeStampInfo.myNumDt,
-				       aTimeStampInfo.myNumOrd);
-	if(aNbMeshRef < 1){
-	  if(theErr){
-	    *theErr = MED_FAUX;
-	    return;
-	  }
-	  EXCEPTION(runtime_error,"GetValTimeStamp - MEDnChampRef(...) < 1");
-	}
-	
-	med_int aNbGauss = -1;
-	aRet = MEDchampRefInfo(anId,
-			       &aFieldInfo.myName[0],
-			       med_entite_maillage(aTimeStampInfo.myEntity),
-			       med_geometrie_element(aGeom),
-			       aNbMeshRef,
-			       aTimeStampInfo.myNumDt,
-			       aTimeStampInfo.myNumOrd, 
-			       &aMeshInfo.myName[0],
-			       (med_booleen*)&aFieldInfo.myIsLocal,
-			       &aNbGauss);
-
-	if(aRet < 0){
-	  if(theErr){
-	    *theErr = MED_FAUX;
-	    return;
-	  }
-	  EXCEPTION(runtime_error,"GetValTimeStamp - MEDchampRefInfo(...)");
-	}
- 
 	if(aNbGauss > 1 && !aGaussInfo){
 	  if(theErr){
 	    *theErr = MED_FAUX;
@@ -1606,13 +1610,13 @@ namespace MED{
 		      "");
 	  }
 	}else{
-	  if(iEnd != aValue.size()){
+	  if(anEnd != aValue.size()){
 	    if(theErr){
 	      *theErr = -1;
 	      return;
 	    }
 	    EXCEPTION(runtime_error,
-		      "GetTimeStampInfo - iEnd("<<iEnd<<
+		      "GetTimeStampInfo - anEnd("<<anEnd<<
 		      ") != aValue.size()("<<aValue.size()<<
 		      "); aNbVal = "<<aNbVal<<
 		      "; anEntity = "<<aTimeStampInfo.myEntity<<
@@ -1646,14 +1650,15 @@ namespace MED{
       MED::TTimeStampInfo& aTimeStampInfo = *aVal.myTimeStampInfo;
       MED::TFieldInfo& aFieldInfo = *aTimeStampInfo.myFieldInfo;
       MED::TMeshInfo& aMeshInfo = *aFieldInfo.myMeshInfo;
-      MED::TMeshValue& aMeshValue = aVal.myMeshValue;
+      MED::TGeom2Value& aGeom2Value = aVal.myGeom2Value;
       
       MED::TGeom2Gauss& aGeom2Gauss = aTimeStampInfo.myGeom2Gauss;
       MED::TGeom2Profile& aGeom2Profile = aVal.myGeom2Profile;
 
-      TMeshValue::iterator anIter = aMeshValue.begin();
-      for(; anIter != aMeshValue.end(); anIter++){
+      TGeom2Value::iterator anIter = aGeom2Value.begin();
+      for(; anIter != aGeom2Value.end(); anIter++){
 	EGeometrieElement aGeom = anIter->first;
+	TMeshValue& aMeshValue = anIter->second;
 
 	char aGaussName[NOM+1] = "";
 	MED::TGeom2Gauss::const_iterator aGaussIter = aGeom2Gauss.find(aGeom);
@@ -1671,9 +1676,9 @@ namespace MED{
 	  strcpy(aProfileName,&aProfileInfo->myName[0]);
 	}
 
-	TValue& aValue = aVal.myMeshValue[aGeom];
-	med_int iEnd = aValue.size();
-	med_int aNbVal = iEnd / aFieldInfo.myNbComp;
+	med_int aNbVal = aMeshValue.myNbElem / aFieldInfo.myNbComp;
+	TValue& aValue = aMeshValue.myValue;
+	TInt anEnd = aValue.size();
 	
 	switch(aFieldInfo.myType){
 	case eFLOAT64: {
@@ -1698,8 +1703,9 @@ namespace MED{
 	  break;
 	}
 	default: {
-	  vector<TInt> anArray(iEnd);
-	  for(TInt i = 0; i< iEnd; i++) anArray[i] = TInt(aValue[i]);
+	  vector<TInt> anArray(anEnd);
+	  for(TInt anID = 0; anID < anEnd; anID++)
+	    anArray[anID] = TInt(aValue[anID]);
 	  
 	  aRet = MEDchampEcr(anId,
 			     &aMeshInfo.myName[0],

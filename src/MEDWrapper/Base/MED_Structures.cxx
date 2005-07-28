@@ -311,34 +311,84 @@ TGaussInfo
 
 
 //---------------------------------------------------------------
-TFloat
-TTimeStampVal
-::GetVal(EGeometrieElement theGeom, 
-	 TInt theId, 
-	 TInt theComp, 
-	 TInt theGauss) const 
+void
+TMeshValue
+::Init(TInt theNbElem,
+       TInt theNbGauss,
+       TInt theNbComp,
+       EModeSwitch theMode)
 {
-  TInt aNbComp = myTimeStampInfo->myFieldInfo->myNbComp;
-  TInt aNbGauss = myTimeStampInfo->myNbGauss;
-  TInt aStep = aNbComp*aNbGauss;
-  TMeshValue::const_iterator anIter = myMeshValue.find(theGeom);
-  if(anIter != myMeshValue.end()){
-    TFloat aRet=GETINDEX(anIter->second,theId*aStep + theComp*aNbGauss + theGauss);
-    return aRet;
-  }
-  return TFloat();
+  myModeSwitch = theMode;
+  
+  myNbElem = theNbElem;
+  myNbGauss = theNbGauss;
+  myNbComp = theNbComp;
+  
+  myStep = theNbComp*theNbGauss;
+  
+  myValue.resize(theNbElem*myStep);
 }
 
-void
-TTimeStampVal
-::SetVal(EGeometrieElement theGeom, 
-	 TInt theId, 
-	 TInt theComp, 
-	 TFloat theVal, 
-	 TInt theGauss)
+TCValueSliceArr 
+TMeshValue
+::GetValueSliceArr(TInt theElemId) const
 {
-  TInt aNbComp = myTimeStampInfo->myFieldInfo->myNbComp;
-  TInt aNbGauss = myTimeStampInfo->myNbGauss;
-  TInt aStep = aNbComp*aNbGauss;
-  GETINDEX(myMeshValue[theGeom],theId*aStep + theComp*aNbGauss + theGauss) = theVal;
+  TCValueSliceArr aValueSliceArr(myNbGauss);
+  if(GetModeSwitch() == eFULL_INTERLACE){
+    TInt anId = theElemId*myStep;
+    for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+      aValueSliceArr[aGaussId] =
+	TCValueSlice(myValue,std::slice(anId,myNbComp,1));
+      anId += myNbComp;
+    }
+  }
+  else{
+    for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+      aValueSliceArr[aGaussId] =
+	TCValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
+    }
+  }
+  return aValueSliceArr;
+}
+
+
+TValueSliceArr 
+TMeshValue
+::GetValueSliceArr(TInt theElemId)
+{
+  TValueSliceArr aValueSliceArr(myNbGauss);
+  if(GetModeSwitch() == eFULL_INTERLACE){
+    TInt anId = theElemId*myStep;
+    for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+      aValueSliceArr[aGaussId] =
+	TValueSlice(myValue,std::slice(anId,myNbComp,1));
+      anId += myNbComp;
+    }
+  }
+  else{
+    for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+      aValueSliceArr[aGaussId] =
+	TValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
+    }
+  }
+  return aValueSliceArr;
+}
+
+
+//---------------------------------------------------------------
+const TMeshValue& 
+TTimeStampVal
+::GetMeshValue(EGeometrieElement theGeom) const
+{
+  TGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
+  if(anIter == myGeom2Value.end())
+    EXCEPTION(runtime_error,"TTimeStampVal::GetMeshValue - myGeom2Value.find(theGeom) fails");
+  return anIter->second;
+}
+
+TMeshValue& 
+TTimeStampVal
+::GetMeshValue(EGeometrieElement theGeom)
+{
+  return myGeom2Value[theGeom];
 }
