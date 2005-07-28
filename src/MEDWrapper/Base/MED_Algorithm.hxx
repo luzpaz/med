@@ -151,9 +151,6 @@ namespace MED{
 
     TInt
     GetDim() const { return myDim; }
-
-    TInt
-    size() const { return GetNbElem(); }
   };
 
 
