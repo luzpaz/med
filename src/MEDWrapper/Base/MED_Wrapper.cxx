@@ -117,7 +117,8 @@ namespace MED{
     GetPolygoneInfo(anInfo);
 
 #ifdef _DEBUG_
-    INITMSG(MYDEBUG,"GetPPolygoneInfo - theGeom = "<<theGeom<<
+    INITMSG(MYDEBUG,"GetPPolygoneInfo"<<
+	    " - theGeom = "<<theGeom<<
 	    "; aNbElem = "<<aNbElem<<": ");
     for(TInt iElem = 1; iElem < aNbElem; iElem++){
       TCConnSlice aConnSlice = anInfo->GetConnSlice(iElem);
@@ -148,26 +149,25 @@ namespace MED{
     GetPolyedreInfo(anInfo);
 
 #ifdef _DEBUG_
-    const TElemNum& aConn = anInfo->GetConnectivite();
-    const TElemNum& aFaces = anInfo->GetFaces();
-    const TElemNum& aIndex = anInfo->GetIndex();
-    
-    TInt aNbIndex = aIndex.size();
-    
-    for (int aNp = 0; aNp < aNbIndex-1;aNp++){
-      if (anInfo->IsElemNames())
-	ADDMSG(MYDEBUG,anInfo->GetElemName(aNp)<<endl);
-      else 
-	ADDMSG(MYDEBUG,"POLYEDRE "<<aNp+1<<endl);
-      
-      for (int aNf = aIndex[aNp]-1;aNf < aIndex[aNp+1]-1;aNf++){
-	ADDMSG(MYDEBUG,"Face "<<aNf-aIndex[aNp]+2<<": [");
-	for (int aNc = aFaces[aNf]-1; aNc < aFaces[aNf+1]-1;aNc++){
-	  ADDMSG(MYDEBUG," "<<aConn[aNc]);
+    INITMSG(MYDEBUG,"GetPPolyedreInfo"<<
+	    " - theGeom = "<<theGeom<<
+	    "; aNbElem = "<<aNbElem<<": ");
+    for(TInt iElem = 0; iElem < aNbElem; iElem++){
+      TCConnSliceArr aConnSliceArr = anInfo->GetConnSliceArr(iElem);
+      TInt aNbFaces = aConnSliceArr.size();
+      ADDMSG(MYDEBUG,"{");
+      for(TInt iFace = 0; iFace < aNbFaces; iFace++){
+	TCConnSlice aConnSlice = aConnSliceArr[iFace];
+	TInt aNbConn = aConnSlice.size();
+	ADDMSG(MYDEBUG,"[");
+	for(TInt iConn = 0; iConn < aNbConn; iConn++){
+	  ADDMSG(MYVALUEDEBUG,aConnSlice[iConn]<<",");
 	}
-	ADDMSG(MYDEBUG," ]"<<endl;);
+	ADDMSG(MYDEBUG,"] ");
       }
+      ADDMSG(MYDEBUG,"} ");
     }
+    ADDMSG(MYDEBUG,endl);
 #endif
 
     return anInfo;

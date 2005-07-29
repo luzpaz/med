@@ -514,7 +514,7 @@ namespace MED{
 		   const TIntVector& theElemNums,
 		   const TStringVector& theElemNames):
       TElemInfoBase(theMeshInfo,
-		    theIndexes.size()-1,
+		    theIndexes.size() - 1,
 		    theFamilyNums,
 		    theElemNums,
 		    theElemNames)
@@ -524,8 +524,6 @@ namespace MED{
 
       myIndex = theIndexes;
       myConn = theConnectivities;
-
-      myConnSize = theConnectivities.size();
 
       myConnMode = theConnMode;
     }
@@ -545,12 +543,9 @@ namespace MED{
       myEntity = theInfo->GetEntity();
       myGeom = theInfo->GetGeom();
 
-      myIndex = theInfo->GetIndex();
-      myFaces = theInfo->GetFaces();
-      myConn = theInfo->GetConnectivite();
-
-      myConnSize = theInfo->GetConnSize();
-      myNbFaces = theInfo->GetNbFaces();
+      myIndex = theInfo->myIndex;
+      myFaces = theInfo->myFaces;
+      myConn = theInfo->myConn;
 
       myConnMode = theInfo->GetConnMode();
     }
@@ -572,12 +567,9 @@ namespace MED{
       myEntity = theEntity;
       myGeom = theGeom;
 
-      myIndex.resize(theNbElem+1);
+      myIndex.resize(theNbElem + 1);
       myFaces.resize(theNbFaces);
       myConn.resize(theConnSize);
-
-      myConnSize = theConnSize;
-      myNbFaces = theNbFaces;
 
       myConnMode = theConnMode;
     }
@@ -604,9 +596,6 @@ namespace MED{
       myIndex = theIndexes;
       myFaces = theFaces;
       myConn = theConnectivities;
-
-      myConnSize = theConnectivities.size();
-      myNbFaces = theFaces.size();
 
       myConnMode = theConnMode;
     }

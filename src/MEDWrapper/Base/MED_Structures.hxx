@@ -243,6 +243,9 @@ namespace MED
   };
 
   //---------------------------------------------------------------
+  typedef TVector<TCConnSlice> TCConnSliceArr;
+  typedef TVector<TConnSlice> TConnSliceArr;
+
   struct TPolyedreInfo: 
     virtual TElemInfo
   {
@@ -255,21 +258,14 @@ namespace MED
     EConnectivite myConnMode; // eNOD|eDESC(eDESC not used)
     EConnectivite GetConnMode() const { return myConnMode;}
 
-    TInt myConnSize;
-    TInt GetConnSize() const { return myConnSize;}
-
     TElemNum myConn; // Table de connectivities
-    TElemNum GetConnectivite() const { return myConn;}
-    
-    TInt myNbFaces;
-    TInt GetNbFaces() const { return myNbFaces;}
-    
     TElemNum myFaces; // Table de faces indexes
-    const TElemNum& GetFaces() const { return myFaces;}
-    
     TElemNum myIndex; // Table de indexes
-    const TElemNum& GetIndex() const { return myIndex;}
-    TInt GetNbConn(TInt theElemId) const;
+
+    TInt GetNbFaces(TInt theElemId) const;
+
+    TCConnSliceArr GetConnSliceArr(TInt theElemId) const;
+    TConnSliceArr GetConnSliceArr(TInt theElemId);
   };
 
   //---------------------------------------------------------------

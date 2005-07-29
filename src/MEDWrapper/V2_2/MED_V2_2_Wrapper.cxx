@@ -789,7 +789,7 @@ namespace MED{
     void 
     TVWrapper
     ::GetPolyedreInfo(TPolyedreInfo& theInfo,
-				    TErr* theErr)
+		      TErr* theErr)
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
 
@@ -803,9 +803,9 @@ namespace MED{
       aRet = MEDpolyedreConnLire(myFile->Id(), 
 				 &aMeshInfo.myName[0],
 				 (med_int*)&theInfo.myIndex[0],
-				 aNbElem+1,
+				 aNbElem + 1,
 				 (med_int*)&theInfo.myFaces[0],
-				 theInfo.myNbFaces,
+				 theInfo.myFaces.size(),
 				 (med_int*)&theInfo.myConn[0],
 				 med_connectivite(theInfo.myConnMode));
 
@@ -855,7 +855,7 @@ namespace MED{
 				(med_int*)&anInfo.myIndex[0],
 				anInfo.myNbElem+1,
 				(med_int*)&anInfo.myFaces[0],
-				anInfo.myNbFaces,
+				anInfo.myFaces.size(),
 				(med_int*)&anInfo.myConn[0],
 				med_connectivite(theInfo.myConnMode));
       
