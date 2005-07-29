@@ -29,12 +29,12 @@
 #ifndef MED_Common_HeaderFile
 #define MED_Common_HeaderFile
 
-#include <vector>
 #include <string>
 #include <set>
 #include <map>
 
-extern "C"{
+extern "C"
+{
 #include <hdf5.h>
 }  
 
@@ -42,6 +42,7 @@ extern "C"{
 
 #include "SALOMEconfig.h"
 
+#include "MED_Vector.hxx"
 #include "MED_SharedPtr.hxx"
 #include "MED_SliceArray.hxx"
 
@@ -80,9 +81,9 @@ namespace MED{
 
   typedef enum {eNO_PFLMOD, eGLOBAL, eCOMPACT}  EModeProfil; 
 
-  typedef std::vector<TFloat> TFloatVector;
-  typedef std::vector<std::string> TStringVector;
-  typedef std::vector<TInt> TIntVector;
+  typedef TVector<TFloat> TFloatVector;
+  typedef TVector<std::string> TStringVector;
+  typedef TVector<TInt> TIntVector;
   typedef std::set<std::string> TStringSet;
   
   typedef std::map<EGeometrieElement,TInt> TGeom2Size;

@@ -31,10 +31,11 @@
 
 #include "MED_Common.hxx"
 
-namespace MED{
+namespace MED
+{
 
   //---------------------------------------------------------------
-  typedef std::vector<char> TString;
+  typedef TVector<char> TString;
 
   std::string GetString(TInt theId, TInt theStep, 
 			const TString& theString);
@@ -62,6 +63,13 @@ namespace MED{
   //---------------------------------------------------------------
   struct TModeSwitchInfo: virtual TBase
   {
+    TModeSwitchInfo() 
+    {}
+
+    TModeSwitchInfo(EModeSwitch theModeSwitch):
+      myModeSwitch(theModeSwitch)
+    {}
+
     EModeSwitch myModeSwitch;
     EModeSwitch GetModeSwitch() const { return myModeSwitch;}
   };
@@ -83,7 +91,7 @@ namespace MED{
   
 
   //---------------------------------------------------------------
-  typedef std::vector<TInt> TIntVector;
+  typedef TVector<TInt> TIntVector;
   typedef TSlice<TIntVector> TIntVecSlice;
   typedef TCSlice<TIntVector> TCIntVecSlice;
 
@@ -154,7 +162,7 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  typedef std::vector<TFloat> TFloatVector;
+  typedef TVector<TFloat> TFloatVector;
   typedef TSlice<TFloatVector> TFloatVecSlice;
   typedef TCSlice<TFloatVector> TCFloatVecSlice;
 
@@ -170,9 +178,6 @@ namespace MED{
 
     TCCoordSlice GetCoordSlice(TInt theId) const;
     TCoordSlice GetCoordSlice(TInt theId);
-
-    TFloat GetNodeCoord(TInt theId, TInt theComp) const;
-    void SetNodeCoord(TInt theId, TInt theComp, TFloat theVal);
 
     ERepere mySystem;
     ERepere GetSystem() const { return mySystem;}
@@ -210,9 +215,6 @@ namespace MED{
     TElemNum myConn;
     TCConnSlice GetConnSlice(TInt theElemId) const;
     TConnSlice GetConnSlice(TInt theElemId);
-
-    TInt GetConn(TInt theElemId, TInt theConnId) const;
-    void SetConn(TInt theElemId, TInt theConnId, TInt theVal);
   };
 
   //---------------------------------------------------------------
@@ -232,11 +234,12 @@ namespace MED{
     TInt GetConnSize() const { return myConnSize;}
 
     TElemNum myConn; // Table de connectivities
-    const TElemNum& GetConnectivite() const { return myConn;}
-
     TElemNum myIndex; // Table de indexes
-    const TElemNum& GetIndex() const { return myIndex;}
+
     TInt GetNbConn(TInt theElemId) const;
+
+    TCConnSlice GetConnSlice(TInt theElemId) const;
+    TConnSlice GetConnSlice(TInt theElemId);
   };
 
   //---------------------------------------------------------------
@@ -395,8 +398,8 @@ namespace MED{
   typedef TSlice<TValue> TValueSlice;
   typedef TCSlice<TValue> TCValueSlice;
 
-  typedef std::vector<TCValueSlice> TCValueSliceArr;
-  typedef std::vector<TValueSlice> TValueSliceArr;
+  typedef TVector<TCValueSlice> TCValueSliceArr;
+  typedef TVector<TValueSlice> TValueSliceArr;
 
   struct TMeshValue:
     virtual TModeSwitchInfo 

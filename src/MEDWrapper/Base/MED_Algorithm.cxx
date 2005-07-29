@@ -442,7 +442,7 @@ namespace MED
       }
     };
 
-    typedef std::vector<TCCoordSlice> TSliceArr;
+    typedef TVector<TCCoordSlice> TSliceArr;
     
     void 
     GetFun(const TShapeFun::TSliceArr& theRef,
@@ -465,8 +465,6 @@ namespace MED
     IsSatisfy(const TShapeFun::TSliceArr& theRefCoord) const
     {
 #ifdef _DEBUG_
-      int MYDEBUG = false;
-
       TInt aNbRef = theRefCoord.size();
       INITMSG(MYDEBUG,"TShapeFun::IsSatisfy - aNbRef = "<<aNbRef<<": ");
 
@@ -494,7 +492,6 @@ namespace MED
 	 TGaussCoord& theGaussCoord,
 	 EModeSwitch theMode)
     {
-      int MYDEBUG = false;
       INITMSG(MYDEBUG,"TShapeFun::Eval"<<endl);
 
       if(IsSatisfy(theRef)){
@@ -693,13 +690,12 @@ namespace MED
 		  const TElemNum& theElemNum,
 		  EModeSwitch theMode)
   {
-    int MYDEBUG = 1;
     INITMSG(MYDEBUG,"GetGaussCoord3D\n");
 
     if(theGaussInfo.myGeom == theCellInfo.myGeom){
       EGeometrieElement aGeom = theGaussInfo.myGeom;
 
-      typedef std::vector<TCCoordSlice> TSliceArr;
+      typedef TVector<TCCoordSlice> TSliceArr;
       TInt aNbRef = theGaussInfo.GetNbRef();
       TSliceArr aRefSlice(aNbRef);
       for(TInt anId = 0; anId < aNbRef; anId++)

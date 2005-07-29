@@ -413,7 +413,8 @@ namespace MED{
 	       TInt theNbElem,
 	       EConnectivite theConnMode = eNOD,
 	       EBooleen theIsElemNum = eVRAI,
-	       EBooleen theIsElemNames = eVRAI) = 0;
+	       EBooleen theIsElemNames = eVRAI,
+	       EModeSwitch theMode = eFULL_INTERLACE) = 0;
     
     virtual
     PCellInfo
@@ -424,7 +425,8 @@ namespace MED{
 	       EConnectivite theConnMode = eNOD,
 	       const TIntVector& theFamilyNums = TIntVector(),
 	       const TIntVector& theElemNums = TIntVector(),
-	       const TStringVector& theElemNames = TStringVector()) = 0;
+	       const TStringVector& theElemNames = TStringVector(),
+	       EModeSwitch theMode = eFULL_INTERLACE) = 0;
     
     virtual
     PCellInfo
@@ -591,7 +593,8 @@ namespace MED{
     virtual
     PTimeStampVal
     CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const TGeom2Profile& theGeom2Profile = TGeom2Profile()) = 0;
+		   const TGeom2Profile& theGeom2Profile = TGeom2Profile(),
+		   EModeSwitch theMode = eFULL_INTERLACE) = 0;
 
     virtual 
     PTimeStampVal

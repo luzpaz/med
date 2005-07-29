@@ -42,7 +42,7 @@ namespace MED{
   template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
   struct TTNameInfo: virtual TNameInfo
   {
-    TTNameInfo(const std::string& theValue = "")
+    TTNameInfo(const std::string& theValue)
     {
       myName.resize(nNOM+1);
       SetName(theValue);
@@ -82,10 +82,10 @@ namespace MED{
       SetDesc(theInfo->GetDesc());
     }
 
-    TTMeshInfo(TInt theDim = 0,
-	       const std::string& theValue = "",
-	       EMaillage theType = eNON_STRUCTURE,
-	       const std::string& theDesc = ""):
+    TTMeshInfo(TInt theDim,
+	       const std::string& theValue,
+	       EMaillage theType,
+	       const std::string& theDesc):
       TNameInfoBase(theValue)
     {
       myDim = theDim;
@@ -148,10 +148,10 @@ namespace MED{
     }
 
     TTFamilyInfo(const PMeshInfo& theMeshInfo,
-		 TInt theNbGroup = 0, 
-		 TInt theNbAttr = 0,
-		 TInt theId = 0,
-		 const std::string& theValue = ""):
+		 TInt theNbGroup, 
+		 TInt theNbAttr,
+		 TInt theId,
+		 const std::string& theValue):
       TNameInfoBase(theValue)
     {
       myMeshInfo = theMeshInfo;
@@ -159,9 +159,14 @@ namespace MED{
       myId = theId;
 
       myNbGroup = theNbGroup;
+      if(!theNbGroup)
+	theNbGroup = 1;
       myGroupNames.resize(theNbGroup*nLNOM+1);
 
       myNbAttr = theNbAttr;
+
+      if(!theNbAttr)
+	theNbAttr = 1;
       myAttrId.resize(theNbAttr);
       myAttrVal.resize(theNbAttr);
       myAttrDesc.resize(theNbAttr*nDESC+1);
@@ -171,9 +176,9 @@ namespace MED{
 		 const std::string& theValue,
 		 TInt theId,
 		 const TStringSet& theGroupNames, 
-		 const TStringVector& theAttrDescs = TStringVector(), 
-		 const TIntVector& theAttrIds = TIntVector(), 
-		 const TIntVector& theAttrVals = TIntVector()):
+		 const TStringVector& theAttrDescs, 
+		 const TIntVector& theAttrIds, 
+		 const TIntVector& theAttrVals):
       TNameInfoBase(theValue)
     {
       myMeshInfo = theMeshInfo;
@@ -269,8 +274,8 @@ namespace MED{
 
     TTElemInfo(const PMeshInfo& theMeshInfo, 
 	       TInt theNbElem,
-	       EBooleen theIsElemNum = eVRAI,
-	       EBooleen theIsElemNames = eVRAI)
+	       EBooleen theIsElemNum,
+	       EBooleen theIsElemNames)
     {
       myMeshInfo = theMeshInfo;
 
@@ -288,9 +293,9 @@ namespace MED{
     
     TTElemInfo(const PMeshInfo& theMeshInfo, 
 	       TInt theNbElem,
-	       const TIntVector& theFamilyNums = TIntVector(),
-	       const TIntVector& theElemNums = TIntVector(),
-	       const TStringVector& theElemNames = TStringVector())
+	       const TIntVector& theFamilyNums,
+	       const TIntVector& theElemNums,
+	       const TStringVector& theElemNames)
     {
       myMeshInfo = theMeshInfo;
       
@@ -369,17 +374,16 @@ namespace MED{
 
     TTNodeInfo(const PMeshInfo& theMeshInfo, 
 	       TInt theNbElem,
-	       EModeSwitch theMode = eFULL_INTERLACE,
-	       ERepere theSystem = eCART, 
-	       EBooleen theIsElemNum = eVRAI,
-	       EBooleen theIsElemNames = eVRAI):
+	       EModeSwitch theMode,
+	       ERepere theSystem, 
+	       EBooleen theIsElemNum,
+	       EBooleen theIsElemNames):
       TElemInfoBase(theMeshInfo,
 		    theNbElem,
 		    theIsElemNum,
-		    theIsElemNames)
+		    theIsElemNames),
+      TModeSwitchInfo(theMode)
     {
-      myModeSwitch = theMode;
-
       mySystem = theSystem;
 
       myCoord.resize(theNbElem*theMeshInfo->myDim);
@@ -394,21 +398,20 @@ namespace MED{
     
     TTNodeInfo(const PMeshInfo& theMeshInfo, 
 	       const TFloatVector& theNodeCoords,
-	       EModeSwitch theMode = eFULL_INTERLACE,
-	       ERepere theSystem = eCART, 
-	       const TStringVector& theCoordNames = TStringVector(),
-	       const TStringVector& theCoordUnits = TStringVector(),
-	       const TIntVector& theFamilyNums = TIntVector(),
-	       const TIntVector& theElemNums = TIntVector(),
-	       const TStringVector& theElemNames = TStringVector()):
+	       EModeSwitch theMode,
+	       ERepere theSystem, 
+	       const TStringVector& theCoordNames,
+	       const TStringVector& theCoordUnits,
+	       const TIntVector& theFamilyNums,
+	       const TIntVector& theElemNums,
+	       const TStringVector& theElemNames):
       TElemInfoBase(theMeshInfo,
 		    theNodeCoords.size(),
 		    theFamilyNums,
 		    theElemNums,
-		    theElemNames)
+		    theElemNames),
+      TModeSwitchInfo(theMode)
     {
-      myModeSwitch = theMode;
-
       mySystem = theSystem;
 
       myCoord = theNodeCoords;
@@ -469,8 +472,8 @@ namespace MED{
       myEntity = theInfo->GetEntity();
       myGeom = theInfo->GetGeom();
 
-      myIndex = theInfo->GetIndex();
-      myConn = theInfo->GetConnectivite();
+      myIndex = theInfo->myIndex;
+      myConn = theInfo->myConn;
 
       myConnSize = theInfo->GetConnSize();
 
@@ -482,9 +485,9 @@ namespace MED{
 		   EGeometrieElement theGeom,
 		   TInt theNbElem,
 		   TInt theConnSize,
-		   EConnectivite theConnMode = eNOD,
-		   EBooleen theIsElemNum = eVRAI,
-		   EBooleen theIsElemNames = eVRAI):
+		   EConnectivite theConnMode,
+		   EBooleen theIsElemNum,
+		   EBooleen theIsElemNames):
       TElemInfoBase(theMeshInfo,
 		    theNbElem,
 		    theIsElemNum,
@@ -506,10 +509,10 @@ namespace MED{
 		   EGeometrieElement theGeom,
 		   const TIntVector& theIndexes,
 		   const TIntVector& theConnectivities,
-		   EConnectivite theConnMode = eNOD,
-		   const TIntVector& theFamilyNums = TIntVector(),
-		   const TIntVector& theElemNums = TIntVector(),
-		   const TStringVector& theElemNames = TStringVector()):
+		   EConnectivite theConnMode,
+		   const TIntVector& theFamilyNums,
+		   const TIntVector& theElemNums,
+		   const TStringVector& theElemNames):
       TElemInfoBase(theMeshInfo,
 		    theIndexes.size()-1,
 		    theFamilyNums,
@@ -558,9 +561,9 @@ namespace MED{
 		   TInt theNbElem,
 		   TInt theNbFaces,
 		   TInt theConnSize,
-		   EConnectivite theConnMode = eNOD,
-		   EBooleen theIsElemNum = eVRAI,
-		   EBooleen theIsElemNames = eVRAI):
+		   EConnectivite theConnMode,
+		   EBooleen theIsElemNum,
+		   EBooleen theIsElemNames):
       TElemInfoBase(theMeshInfo,
 		    theNbElem,
 		    theIsElemNum,
@@ -585,10 +588,10 @@ namespace MED{
 		   const TIntVector& theIndexes,
 		   const TIntVector& theFaces,
 		   const TIntVector& theConnectivities,
-		   EConnectivite theConnMode = eNOD,
-		   const TIntVector& theFamilyNums = TIntVector(),
-		   const TIntVector& theElemNums = TIntVector(),
-		   const TStringVector& theElemNames = TStringVector()):
+		   EConnectivite theConnMode,
+		   const TIntVector& theFamilyNums,
+		   const TIntVector& theElemNums,
+		   const TStringVector& theElemNames):
       TElemInfoBase(theMeshInfo,
 		    theIndexes.size()-1,
 		    theFamilyNums,
@@ -627,8 +630,10 @@ namespace MED{
       TInt aConnDim = GetNbNodes(myGeom);
       myConn.resize(myNbElem*GetNbConn<nV>(myGeom,myEntity,myMeshInfo->myDim));
       for(TInt anElemId = 0; anElemId < myNbElem; anElemId++){
+	TConnSlice aConnSlice = GetConnSlice(anElemId);
+	TCConnSlice aConnSlice2 = theInfo->GetConnSlice(anElemId);
 	for(TInt anConnId = 0; anConnId < aConnDim; anConnId++){
-	  SetConn(anElemId,anConnId,theInfo->GetConn(anElemId,anConnId));
+	  aConnSlice[anConnId] = aConnSlice2[anConnId];
 	}
       }
     }
@@ -637,13 +642,15 @@ namespace MED{
 	       EEntiteMaillage theEntity, 
 	       EGeometrieElement theGeom,
 	       TInt theNbElem,
-	       EConnectivite theConnMode = eNOD,
-	       EBooleen theIsElemNum = eVRAI,
-	       EBooleen theIsElemNames = eVRAI):
+	       EConnectivite theConnMode,
+	       EBooleen theIsElemNum,
+	       EBooleen theIsElemNames,
+	       EModeSwitch theMode):
       TElemInfoBase(theMeshInfo,
 		    theNbElem,
 		    theIsElemNum,
-		    theIsElemNames)
+		    theIsElemNames),
+      TModeSwitchInfo(theMode)
     {
       myEntity = theEntity;
       myGeom = theGeom;
@@ -656,15 +663,17 @@ namespace MED{
 	       EEntiteMaillage theEntity, 
 	       EGeometrieElement theGeom,
 	       const TIntVector& theConnectivities,
-	       EConnectivite theConnMode = eNOD,
-	       const TIntVector& theFamilyNums = TIntVector(),
-	       const TIntVector& theElemNums = TIntVector(),
-	       const TStringVector& theElemNames = TStringVector()):
+	       EConnectivite theConnMode,
+	       const TIntVector& theFamilyNums,
+	       const TIntVector& theElemNums,
+	       const TStringVector& theElemNames,
+	       EModeSwitch theMode):
       TElemInfoBase(theMeshInfo,
 		    theConnectivities.size()/GetNbNodes(theGeom),
 		    theFamilyNums,
 		    theElemNums,
-		    theElemNames)
+		    theElemNames),
+      TModeSwitchInfo(theMode)
     {
       myEntity = theEntity;
       myGeom = theGeom;
@@ -673,8 +682,9 @@ namespace MED{
       TInt aConnDim = GetNbNodes(myGeom);
       myConn.resize(myNbElem*GetNbConn<nV>(myGeom,myEntity,myMeshInfo->myDim));
       for(TInt anElemId = 0; anElemId < myNbElem; anElemId++){
+	TConnSlice aConnSlice = GetConnSlice(anElemId);
 	for(TInt anConnId = 0; anConnId < aConnDim; anConnId++){
-	  SetConn(anElemId,anConnId,theConnectivities[anElemId*aConnDim+anConnId]);
+	  aConnSlice[anConnId] = theConnectivities[anElemId*aConnDim+anConnId];
 	}
       }
 
@@ -721,11 +731,11 @@ namespace MED{
     }
 
     TTFieldInfo(const PMeshInfo& theMeshInfo, 
-		TInt theNbComp = 0,
-		ETypeChamp theType = eFLOAT64,
-		const std::string& theValue = "",
-		EBooleen theIsLocal = eVRAI,
-		TInt theNbRef = 1):
+		TInt theNbComp,
+		ETypeChamp theType,
+		const std::string& theValue,
+		EBooleen theIsLocal,
+		TInt theNbRef):
       TNameInfoBase(theValue)
     {
       myMeshInfo = theMeshInfo;
@@ -779,17 +789,14 @@ namespace MED{
     typedef TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TNameInfoBase;
 
     TTGaussInfo(const TGaussInfo::TInfo& theInfo,
-		EModeSwitch theMode = eFULL_INTERLACE)
+		EModeSwitch theMode):
+      TNameInfoBase(boost::get<1>(boost::get<0>(theInfo))),
+      TModeSwitchInfo(theMode)
     {
-      myModeSwitch = theMode;
-
       const TGaussInfo::TKey& aKey = boost::get<0>(theInfo);
 
       myGeom = boost::get<0>(aKey);
       myRefCoord.resize(GetNbRef()*GetDim());
-
-      const std::string& aName = boost::get<1>(aKey);
-      TNameInfoBase::SetName(aName);
 
       TInt aNbGauss = boost::get<1>(theInfo);
       myGaussCoord.resize(aNbGauss*GetDim());
@@ -823,12 +830,12 @@ namespace MED{
     TTTimeStampInfo(const PFieldInfo& theFieldInfo, 
 		    EEntiteMaillage theEntity,
 		    const TGeom2Size& theGeom2Size,
-		    TInt theNbGauss = 0,
-		    TInt theNumDt = 0,
-		    TInt theNumOrd = 0,
-		    TFloat theDt = 0,
-		    const std::string& theUnitDt = "",
-		    const TGeom2Gauss& theGeom2Gauss = TGeom2Gauss())
+		    TInt theNbGauss,
+		    TInt theNumDt,
+		    TInt theNumOrd,
+		    TFloat theDt,
+		    const std::string& theUnitDt,
+		    const TGeom2Gauss& theGeom2Gauss)
     {
       myFieldInfo = theFieldInfo;
 
@@ -871,7 +878,7 @@ namespace MED{
     typedef TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TNameInfoBase;
 
     TTProfileInfo(const TProfileInfo::TInfo& theInfo,
-		  EModeProfil theMode = eCOMPACT):
+		  EModeProfil theMode):
       TNameInfoBase(boost::get<0>(theInfo))
     {
       TInt aSize = boost::get<1>(theInfo);
@@ -896,7 +903,9 @@ namespace MED{
     }
 
     TTTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const TGeom2Profile& theGeom2Profile)
+		   const TGeom2Profile& theGeom2Profile,
+		   EModeSwitch theMode):
+      TModeSwitchInfo(theMode)
     {
       myTimeStampInfo = theTimeStampInfo;
 

@@ -117,21 +117,15 @@ namespace MED{
     GetPolygoneInfo(anInfo);
 
 #ifdef _DEBUG_
-    const TElemNum& aConn  = anInfo->GetConnectivite();
-    const TElemNum& aIndex = anInfo->GetIndex();
-    TInt aNbIndex = aIndex.size();
-    TInt aIndex0 = aIndex[0];
-    INITMSG(MYDEBUG,"theGeom = "<<theGeom<<"; aNbElem = "<<aNbIndex-1<<": ");
-    for(TInt iElem = 1; iElem < aNbIndex; iElem++){
-      for (TInt i = aIndex0; i < aIndex[iElem];i++)
-	ADDMSG(MYVALUEDEBUG,aConn[i-1]<<",");
+    INITMSG(MYDEBUG,"GetPPolygoneInfo - theGeom = "<<theGeom<<
+	    "; aNbElem = "<<aNbElem<<": ");
+    for(TInt iElem = 1; iElem < aNbElem; iElem++){
+      TCConnSlice aConnSlice = anInfo->GetConnSlice(iElem);
+      TInt aConnDim = aConnSlice.size();
+      for(TInt iConn = 0; iConn < aConnDim; iConn++){
+	ADDMSG(MYVALUEDEBUG,aConnSlice[iConn]<<",");
+      }
       ADDMSG(MYDEBUG," ");
-      aIndex0 = aIndex[iElem];
-    }
-    ADDMSG(MYDEBUG,endl);
-    BEGMSG(MYDEBUG,"Indexes: ");
-    for(TInt iElem = 0; iElem < aIndex.size(); iElem++){
-      ADDMSG(MYVALUEDEBUG,aIndex[iElem]<<",");
     }
     ADDMSG(MYDEBUG,endl);
 #endif
@@ -197,8 +191,9 @@ namespace MED{
     INITMSG(MYDEBUG,"GetPCellInfo - theEntity = "<<theEntity<<"; theGeom = "<<theGeom<<"; aConnDim: "<<aConnDim<<"\n");
     BEGMSG(MYDEBUG,"GetPCellInfo - aNbElem: "<<aNbElem<<": ");
     for(TInt iElem = 0; iElem < aNbElem; iElem++){
+      TCConnSlice aConnSlice = anInfo->GetConnSlice(iElem);
       for(TInt iConn = 0; iConn < aConnDim; iConn++){
-	ADDMSG(MYVALUEDEBUG,anInfo->GetConn(iElem,iConn)<<",");
+	ADDMSG(MYVALUEDEBUG,aConnSlice[iConn]<<",");
       }
       ADDMSG(MYVALUEDEBUG," ");
     }

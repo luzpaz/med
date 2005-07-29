@@ -288,7 +288,8 @@ namespace MED{
 	       TInt theNbElem,
 	       EConnectivite theConnMode = eNOD,
 	       EBooleen theIsElemNum = eVRAI,
-	       EBooleen theIsElemNames = eVRAI)
+	       EBooleen theIsElemNames = eVRAI,
+	       EModeSwitch theMode = eFULL_INTERLACE)
     {
       return PCellInfo(new TTCellInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
 		       (theMeshInfo,
@@ -297,7 +298,8 @@ namespace MED{
 			theNbElem,
 			theConnMode,
 			theIsElemNum,
-			theIsElemNames));
+			theIsElemNames,
+			theMode));
     }
 
     virtual
@@ -309,7 +311,8 @@ namespace MED{
 	       EConnectivite theConnMode = eNOD,
 	       const TIntVector& theFamilyNums = TIntVector(),
 	       const TIntVector& theElemNums = TIntVector(),
-	       const TStringVector& theElemNames = TStringVector())
+	       const TStringVector& theElemNames = TStringVector(),
+	       EModeSwitch theMode = eFULL_INTERLACE)
     {
       return PCellInfo(new TTCellInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
 		       (theMeshInfo,
@@ -319,7 +322,8 @@ namespace MED{
 			theConnMode,
 			theFamilyNums,
 			theElemNums,
-			theElemNames));
+			theElemNames,
+			theMode));
     }
 
     virtual
@@ -427,11 +431,13 @@ namespace MED{
     virtual
     PTimeStampVal
     CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const TGeom2Profile& theGeom2Profile)
+		   const TGeom2Profile& theGeom2Profile = TGeom2Profile(),
+		   EModeSwitch theMode = eFULL_INTERLACE)
     {
       return PTimeStampVal(new TTTimeStampVal<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
 			   (theTimeStampInfo,
-			    theGeom2Profile));
+			    theGeom2Profile,
+			    theMode));
     }
 
     virtual

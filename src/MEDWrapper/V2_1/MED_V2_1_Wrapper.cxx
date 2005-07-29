@@ -370,7 +370,7 @@ namespace MED{
 				&aMeshInfo.myName[0],
 				aMeshInfo.myDim,
 				&theInfo.myCoord[0],
-				MED_FULL_INTERLACE,
+				med_mode_switch(theInfo.myModeSwitch),
 				(med_repere*)&theInfo.mySystem,
 				&theInfo.myCoordNames[0],
 				&theInfo.myCoordUnits[0],
@@ -406,7 +406,7 @@ namespace MED{
 			       &aMeshInfo.myName[0],
 			       aMeshInfo.myDim,
 			       &anInfo.myCoord[0],
-			       MED_FULL_INTERLACE,
+			       med_mode_switch(theInfo.myModeSwitch),
 			       med_repere(theInfo.mySystem),
 			       &anInfo.myCoordNames[0],
 			       &anInfo.myCoordUnits[0],
@@ -515,7 +515,7 @@ namespace MED{
 			     &aMeshInfo.myName[0],
 			     aMeshInfo.myDim,
 			     (med_int*)&theInfo.myConn[0],
-			     MED_FULL_INTERLACE,
+			     med_mode_switch(theInfo.myModeSwitch),
 			     &theInfo.myElemNames[0],
 			     (med_booleen*)&theInfo.myIsElemNames,
 			     (med_int*)&theInfo.myElemNum[0],
@@ -552,7 +552,7 @@ namespace MED{
 			    &aMeshInfo.myName[0],
 			    aMeshInfo.myDim,
 			    (med_int*)&anInfo.myConn[0],
-			    MED_FULL_INTERLACE,
+			    med_mode_switch(theInfo.myModeSwitch),
 			    &anInfo.myElemNames[0],
 			    med_booleen(theInfo.myIsElemNames),
 			    (med_int*)&anInfo.myElemNum[0],
@@ -711,7 +711,7 @@ namespace MED{
 	return TProfileInfo::TInfo("",-1);
       
       TInt aSize = -1;
-      std::vector<char> aName(NOM+1);
+      TVector<char> aName(NOM+1);
 
       TErr aRet;
       aRet = MEDprofilInfo(myFile->Id(),
@@ -892,12 +892,12 @@ namespace MED{
 	TErr aRet;
 	switch(aFieldInfo.myType){
 	case eFLOAT64: {
-	  std::vector<TFloat> anArray(anEnd);
+	  TVector<TFloat> anArray(anEnd);
 	  aRet = MEDchampLire(anId,
 			      &aMeshInfo.myName[0],
 			      &aFieldInfo.myName[0],
 			      (unsigned char*)&anArray[0],
-			      MED_FULL_INTERLACE,
+			      med_mode_switch(theVal.myModeSwitch),
 			      MED_ALL,
 			      aProfileName,
 			      med_entite_maillage(aTimeStampInfo.myEntity),
@@ -910,12 +910,12 @@ namespace MED{
 	  break;
 	}
 	default: {
-	  std::vector<TInt> anArray(anEnd);
+	  TVector<TInt> anArray(anEnd);
 	  aRet = MEDchampLire(anId,
 			      &aMeshInfo.myName[0],
 			      &aFieldInfo.myName[0],
 			      (unsigned char*)&anArray[0],
-			      MED_FULL_INTERLACE,
+			      med_mode_switch(theVal.myModeSwitch),
 			      MED_ALL,
 			      aProfileName,
 			      med_entite_maillage(aTimeStampInfo.myEntity),
@@ -1014,13 +1014,13 @@ namespace MED{
 	
 	switch(aFieldInfo.myType){
 	case eFLOAT64: {
-	  std::vector<TFloat>& anArray = aValue;
+	  TVector<TFloat>& anArray = aValue;
 	  
 	  aRet = MEDchampEcr(anId,
 			     &aMeshInfo.myName[0],
 			     &aFieldInfo.myName[0],
 			     (unsigned char*)&anArray[0],
-			     MED_FULL_INTERLACE,
+			     med_mode_switch(theVal.myModeSwitch),
 			     aNbVal,
 			     aTimeStampInfo.myNbGauss,
 			     MED_ALL,
@@ -1043,7 +1043,7 @@ namespace MED{
 			     &aMeshInfo.myName[0],
 			     &aFieldInfo.myName[0],
 			     (unsigned char*)&anArray[0],
-			     MED_FULL_INTERLACE,
+			     med_mode_switch(theVal.myModeSwitch),
 			     aNbVal,
 			     aTimeStampInfo.myNbGauss,
 			     MED_ALL,

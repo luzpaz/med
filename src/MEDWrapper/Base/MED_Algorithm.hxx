@@ -115,8 +115,8 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  typedef std::vector<TCCoordSlice> TCCoordSliceArr;
-  typedef std::vector<TCoordSlice> TCoordSliceArr;
+  typedef TVector<TCCoordSlice> TCCoordSliceArr;
+  typedef TVector<TCoordSlice> TCoordSliceArr;
 
   class TGaussCoord:
     virtual TModeSwitchInfo 

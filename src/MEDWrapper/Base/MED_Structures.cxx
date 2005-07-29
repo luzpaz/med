@@ -8,22 +8,11 @@
 
 #include "MED_Structures.hxx"
 #include "MED_Utilities.hxx"
+
 using namespace MED;
 
-#if defined __GNUC__
-  #if __GNUC__ == 2
-    #define __GNUC_2__
-  #endif
-#endif
-
-#if defined __GNUC_2__
-#define GETINDEX(anArray,ind) anArray[ind]
-#else
-#define GETINDEX(anArray,ind) anArray.at(ind)
-#endif
-
-namespace MED{
-
+namespace MED
+{
   TInt
   GetNbNodes(EGeometrieElement typmai)
   {
@@ -66,7 +55,7 @@ namespace MED{
 	    TInt theStep, 
 	    const TString& theString)
   {
-    const char* aPos = &GETINDEX(theString,theId*theStep);
+    const char* aPos = &theString[theId*theStep];
     TInt aSize = std::min(TInt(strlen(aPos)),theStep);
     return std::string(aPos,aSize);
   }
@@ -78,7 +67,7 @@ namespace MED{
 	    const std::string& theValue)
   {
     TInt aSize = std::min(TInt(theValue.size()+1),theStep);
-    char* aPos = &GETINDEX(theString,theId*theStep);
+    char* aPos = &theString[theId*theStep];
     strncpy(aPos,theValue.c_str(),aSize);
   }
 
@@ -101,28 +90,28 @@ TInt
 TFamilyInfo
 ::GetAttrId(TInt theId) const 
 {
-  return GETINDEX(myAttrId,theId);
+  return myAttrId[theId];
 }
 
 TInt
 TFamilyInfo
 ::GetAttrVal(TInt theId) const 
 {
-  return GETINDEX(myAttrVal,theId);
+  return myAttrVal[theId];
 }
 
 void
 TFamilyInfo
 ::SetAttrId(TInt theId,TInt theVal) 
 {
-  GETINDEX(myAttrId,theId) = theVal;
+  myAttrId[theId] = theVal;
 }
 
 void
 TFamilyInfo
 ::SetAttrVal(TInt theId,TInt theVal) 
 {
-  GETINDEX(myAttrVal,theId) = theVal;
+  myAttrVal[theId] = theVal;
 }
 
 //---------------------------------------------------------------
@@ -130,21 +119,21 @@ TInt
 TElemInfo
 ::GetFamNum(TInt theId) const 
 {
-  return GETINDEX(myFamNum,theId);
+  return myFamNum[theId];
 }
 
 TInt
 TElemInfo
 ::GetElemNum(TInt theId) const 
 {
-  return GETINDEX(myElemNum,theId);
+  return myElemNum[theId];
 }
 
 void
 TElemInfo
 ::SetFamNum(TInt theId,TInt theVal) 
 {
-  GETINDEX(myFamNum,theId) = theVal;
+  myFamNum[theId] = theVal;
 }
 
 //---------------------------------------------------------------
@@ -170,88 +159,80 @@ TNodeInfo
     return TCoordSlice(myCoord,std::slice(theId,aDim,aDim));
 }
 
-TFloat
-TNodeInfo
-::GetNodeCoord(TInt theId,TInt theComp) const 
-{
-  return GETINDEX(myCoord,myMeshInfo->myDim*theId + theComp);
-}
-
-void
-TNodeInfo
-::SetNodeCoord(TInt theId,TInt theComp,TFloat theVal) 
-{
-  GETINDEX(myCoord,myMeshInfo->myDim*theId + theComp) = theVal;
-}
-
 //---------------------------------------------------------------
-TInt
-TCellInfo
-::GetConn(TInt theElemId, TInt theConnId) const 
-{
-  return GETINDEX(myConn,GetConnDim()*theElemId + theConnId);
-}
-
-void
-TCellInfo
-::SetConn(TInt theElemId, TInt theConnId, TInt theVal)
-{
-  GETINDEX(myConn,GetConnDim()*theElemId + theConnId) = theVal;
-}
-
 TCConnSlice 
 TCellInfo
 ::GetConnSlice(TInt theElemId) const
 {
-  return TCConnSlice(myConn,std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
+  if(GetModeSwitch() == eFULL_INTERLACE)
+    return TCConnSlice(myConn,std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
+  else
+    return TCConnSlice(myConn,std::slice(theElemId,GetNbNodes(myGeom),GetConnDim()));
 }
 
 TConnSlice 
 TCellInfo
 ::GetConnSlice(TInt theElemId)
 {
-  return TConnSlice(myConn,std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
+  if(GetModeSwitch() == eFULL_INTERLACE)
+    return TConnSlice(myConn,std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
+  else
+    return TConnSlice(myConn,std::slice(theElemId,GetNbNodes(myGeom),GetConnDim()));
 }
+
 
 //---------------------------------------------------------------
 TInt
 TPolygoneInfo
 ::GetNbConn(TInt theElemId) const 
 {
-  TInt i1 = GETINDEX(myIndex,theElemId);
-  TInt i2 = GETINDEX(myIndex,theElemId+1);
-  TInt ret = i2 - i1;
-  return ret;
+  return myIndex[theElemId + 1] - myIndex[theElemId];
 }
+
+TCConnSlice 
+TPolygoneInfo
+::GetConnSlice(TInt theElemId) const
+{
+  return TCConnSlice(myConn,std::slice(myIndex[theElemId],GetNbConn(theElemId),1));
+}
+
+TConnSlice 
+TPolygoneInfo
+::GetConnSlice(TInt theElemId)
+{
+  return TConnSlice(myConn,std::slice(myIndex[theElemId],GetNbConn(theElemId),1));
+}
+
 
 //---------------------------------------------------------------
 TInt 
 TPolyedreInfo
 ::GetNbConn(TInt theElemId) const 
 {
-  TInt ind1 = GETINDEX(myIndex,theElemId);
-  TInt ind2 = GETINDEX(myIndex,theElemId+1);
+  TInt ind1 = myIndex[theElemId];
+  TInt ind2 = myIndex[theElemId + 1];
 
-  TInt inf1 = GETINDEX(myFaces,ind1-1);
-  TInt inf2 = GETINDEX(myFaces,ind2-1);
+  TInt inf1 = myFaces[ind1 - 1];
+  TInt inf2 = myFaces[ind2 - 1];
 
   TInt ret = inf2-inf1;
   return ret;
 }
+
 
 //---------------------------------------------------------------
 TInt
 TProfileInfo
 ::GetElemNum(TInt theId) const 
 {
-  return GETINDEX(myElemNum,theId);
+  return myElemNum[theId];
 }
 
 void
 TProfileInfo
 ::SetElemNum(TInt theId,TInt theVal) 
 {
-  GETINDEX(myElemNum,theId) = theVal;
+  myElemNum[theId] = theVal;
 }
 
 //---------------------------------------------------------------
