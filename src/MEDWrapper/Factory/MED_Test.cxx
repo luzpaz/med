@@ -36,8 +36,6 @@ static int MYDEBUG = 1;
 static int MYDEBUG = 0;
 #endif
 
-static int MYVALUEDEBUG = 0;
-
 static int MYWRITEDEBUG = 1;
 
 using namespace MED;
@@ -190,21 +188,6 @@ void CopyMed(const PWrapper& theMed,
 								aTimeStampVal);
 	  
 	  if(MYWRITEDEBUG) theMed2->SetTimeStamp(aTimeStampVal2);
-	  
-	  TMeshValue& aMeshValue = aTimeStampVal->myMeshValue;
-	  TMeshValue::iterator aMeshValueIter = aMeshValue.begin();
-	  for(; aMeshValueIter != aMeshValue.end(); aMeshValueIter++){
-	    EGeometrieElement aGeom = aMeshValueIter->first;
-	    TValue aValue = aMeshValueIter->second;
-	    INITMSG(MYDEBUG,"aGeom = "<<aGeom<<"; aValue = "<<aValue.size()<<": ");
-	    for(TInt i = 0, iEnd = aValue.size()/aNbComp; i < iEnd; i++){
-	      for(TInt j = 0, ij = i*aNbComp; j < aNbComp; j++, ij++){
-		ADDMSG(MYVALUEDEBUG,aValue[ij]<<",");
-	      }
-	      ADDMSG(MYVALUEDEBUG," ");
-	    }
-	    ADDMSG(MYDEBUG,"\n");
-	  }
 	}
       }
     }
@@ -257,57 +240,18 @@ void CopyMed(const PWrapper& theMed,
 	const TInt& aNbElem = aGeomIter->second;
 	INITMSG(MYDEBUG,"aGeom = "<<aGeom<<"; aNbElem = "<<aNbElem<<": ");
 	switch(aGeom){
-	case ePOLYGONE:
-	  {
-	    PPolygoneInfo aPolygoneInfo = theMed->GetPPolygoneInfo(aMeshInfo,anEntity,aGeom);
-	    TElemNum aConn  = aPolygoneInfo->GetConnectivite();
-	    TElemNum aIndex = aPolygoneInfo->GetIndex();
-	    TInt aNbIndex = aIndex.size();
-	    TInt aIndex0 = aIndex[0];
-	    for(TInt iElem = 1; iElem < aNbIndex; iElem++){
-	      for (TInt i = aIndex0; i < aIndex[iElem];i++)
-		ADDMSG(MYVALUEDEBUG,aConn[i-1]<<",");
-	      ADDMSG(MYDEBUG," ");
-	      aIndex0 = aIndex[iElem];
-	    }
-	    ADDMSG(MYDEBUG,endl);
-	    INITMSG(MYDEBUG,"Indexes :");
-	    for(TInt iElem = 0; iElem < aIndex.size(); iElem++){
-	      ADDMSG(MYVALUEDEBUG,aIndex[iElem]<<",");
-	    }
-	    ADDMSG(MYDEBUG,endl);
-	    PPolygoneInfo aPolygoneInfo2 = theMed->CrPolygoneInfo(aMeshInfo2,aPolygoneInfo);
-	    if(MYWRITEDEBUG) theMed2->SetPolygoneInfo(aPolygoneInfo2);
-	    break;
-	  }
-	case ePOLYEDRE:
-	  {
-	    PPolyedreInfo aPolyedreInfo = theMed->GetPPolyedreInfo(aMeshInfo,anEntity,aGeom);
-	    TElemNum aConn = aPolyedreInfo->GetConnectivite();
-	    TElemNum aFaces = aPolyedreInfo->GetFaces();
-	    TElemNum aIndex = aPolyedreInfo->GetIndex();
-	    
-	    TInt aNbIndex      = aIndex.size();
-	    
-	    for (int aNp = 0; aNp < aNbIndex-1;aNp++){
-	      if (aPolyedreInfo->IsElemNames())
-		ADDMSG(MYDEBUG,aPolyedreInfo->GetElemName(aNp)<<endl);
-	      else 
-		ADDMSG(MYDEBUG,"POLYEDRE "<<aNp+1<<endl);
-
-	      for (int aNf = aIndex[aNp]-1;aNf < aIndex[aNp+1]-1;aNf++){
-		ADDMSG(MYDEBUG,"Face "<<aNf-aIndex[aNp]+2<<": [");
-		for (int aNc = aFaces[aNf]-1; aNc < aFaces[aNf+1]-1;aNc++){
-		  ADDMSG(MYDEBUG," "<<aConn[aNc]);
-		}
-		ADDMSG(MYDEBUG," ]"<<endl;);
-	      }
-	    }
-
-	    PPolyedreInfo aPolyedreInfo2 = theMed->CrPolyedreInfo(aMeshInfo2,aPolyedreInfo);
-	    if(MYWRITEDEBUG) theMed2->SetPolyedreInfo(aPolyedreInfo2);
-	    break;
-	  }
+	case ePOLYGONE: {
+	  PPolygoneInfo aPolygoneInfo = theMed->GetPPolygoneInfo(aMeshInfo,anEntity,aGeom);
+	  PPolygoneInfo aPolygoneInfo2 = theMed->CrPolygoneInfo(aMeshInfo2,aPolygoneInfo);
+	  if(MYWRITEDEBUG) theMed2->SetPolygoneInfo(aPolygoneInfo2);
+	  break;
+	}
+	case ePOLYEDRE: {
+	  PPolyedreInfo aPolyedreInfo = theMed->GetPPolyedreInfo(aMeshInfo,anEntity,aGeom);
+	  PPolyedreInfo aPolyedreInfo2 = theMed->CrPolyedreInfo(aMeshInfo2,aPolyedreInfo);
+	  if(MYWRITEDEBUG) theMed2->SetPolyedreInfo(aPolyedreInfo2);
+	  break;
+	}
 	default:
 	  PCellInfo aCellInfo = theMed->GetPCellInfo(aMeshInfo,anEntity,aGeom);
 	  PCellInfo aCellInfo2 = theMed2->CrCellInfo(aMeshInfo2,aCellInfo);
