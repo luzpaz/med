@@ -77,10 +77,23 @@ namespace MED
       superclass(__first, __last, __a)
     {}
 
+    template<typename _Yp, typename _Al>
+    TVector(TVector<_Yp, _Al> __y):
+      superclass(__y.begin(), __y.end())
+    {}
+
     TVector&
     operator=(const TVector& __x)
     {
       superclass::operator=(__x);
+      return *this;
+    }
+
+    template<typename _Yp, typename _Al>
+    TVector&
+    operator=(TVector<_Yp, _Al> __y)
+    {
+      this->assign(__y.begin(), __y.end());
       return *this;
     }
 
