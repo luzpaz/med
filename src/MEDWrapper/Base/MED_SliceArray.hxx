@@ -46,13 +46,14 @@ namespace MED
     GetID(size_t theId) const
     {
 #ifdef _DEBUG_
+      size_t anId = -1;
       if(theId < mySlice.size()){
-	size_t anId = mySlice.start() + theId*mySlice.stride();
+	anId = mySlice.start() + theId*mySlice.stride();
 	if(anId < myCContainer->size())
 	  return anId;
       }
       throw std::out_of_range(std::string("TCSlice::GetID"));
-      return -1;
+      return anId;
 #else
       return mySlice.start() + theId*mySlice.stride();
 #endif
