@@ -337,6 +337,16 @@ namespace MED
 
 
   //---------------------------------------------------------------
+  TGaussCoord
+  ::TGaussCoord():
+    TModeSwitchInfo(eFULL_INTERLACE),
+    myNbElem(0),
+    myNbGauss(0),
+    myDim(0),
+    myGaussStep(0)
+  {
+  }
+
   void
   TGaussCoord
   ::Init(TInt theNbElem,
@@ -690,6 +700,7 @@ namespace MED
 		  const TElemNum& theElemNum,
 		  EModeSwitch theMode)
   {
+    int MYDEBUG = true;
     INITMSG(MYDEBUG,"GetGaussCoord3D\n");
 
     if(theGaussInfo.myGeom == theCellInfo.myGeom){

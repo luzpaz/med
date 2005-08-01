@@ -130,6 +130,8 @@ namespace MED{
     TNodeCoord myGaussCoord;
 
   public:
+    
+    TGaussCoord();
 
     TCCoordSliceArr
     GetCoordSliceArr(TInt theElemId) const;
