@@ -44,14 +44,18 @@ EXPORT_HEADERS = \
 	MED_Structures.hxx \
 	MED_TStructures.hxx \
 	MED_Algorithm.hxx \
+	MED_GaussUtils.hxx \
 	MED_Utilities.hxx
 
 # Libraries targets
 
 LIB = libMEDWrapperBase.la
 LIB_SRC = \
-	MED_Structures.cxx MED_Wrapper.cxx \
-	MED_Algorithm.cxx MED_Utilities.cxx
+	MED_Structures.cxx \
+	MED_Wrapper.cxx \
+	MED_Algorithm.cxx \
+	MED_GaussUtils.cxx \
+	MED_Utilities.cxx
 
 # Executables targets
 BIN = 

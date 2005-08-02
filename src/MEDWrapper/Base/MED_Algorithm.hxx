@@ -33,7 +33,8 @@
 
 #include <set>
 
-namespace MED{
+namespace MED
+{
 
   struct TWrapper;
 
@@ -112,58 +113,6 @@ namespace MED{
   GetMKey2Profile(TWrapper& theWrapper, 
 		  TErr* theErr = NULL,
 		  EModeProfil theMode = eCOMPACT);
-
-
-  //---------------------------------------------------------------
-  typedef TVector<TCCoordSlice> TCCoordSliceArr;
-  typedef TVector<TCoordSlice> TCoordSliceArr;
-
-  class TGaussCoord:
-    virtual TModeSwitchInfo 
-  {
-    TInt myNbElem;
-    TInt myNbGauss;
-    TInt myDim;
-
-    TInt myGaussStep;
-
-    TNodeCoord myGaussCoord;
-
-  public:
-    
-    TGaussCoord();
-
-    TCCoordSliceArr
-    GetCoordSliceArr(TInt theElemId) const;
-
-    TCoordSliceArr 
-    GetCoordSliceArr(TInt theElemId);
-
-    void
-    Init(TInt theNbElem,
-	 TInt theNbGauss,
-	 TInt theDim,
-	 EModeSwitch theMode = eFULL_INTERLACE);
-
-    TInt
-    GetNbElem() const { return myNbElem; }
-
-    TInt
-    GetNbGauss() const { return myNbGauss; }
-
-    TInt
-    GetDim() const { return myDim; }
-  };
-
-
-  //---------------------------------------------------------------
-  void
-  GetGaussCoord3D(const TGaussInfo& theGaussInfo, 
-		  const TCellInfo& theCellInfo,
-		  const TNodeInfo& theNodeInfo,
-		  TGaussCoord& theGaussCoord,
-		  const TElemNum& theElemNum = TElemNum(),
-		  EModeSwitch theMode = eFULL_INTERLACE);
 }
 
 #endif
