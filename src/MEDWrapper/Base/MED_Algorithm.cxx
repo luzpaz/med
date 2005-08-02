@@ -571,6 +571,73 @@ namespace MED
   };
 
 
+  //---------------------------------------------------------------
+  struct TTria3a: TShapeFun
+  {
+    virtual 
+    void
+    InitFun(const TShapeFun::TSliceArr& theRef,
+	    const TShapeFun::TSliceArr& theGauss,
+	    TFun& theFun) const
+    {
+      GetFun(theRef,theGauss,theFun);
+
+      TInt aNbGauss = theGauss.size();
+      for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+	const TCCoordSlice& aCoord = theGauss[aGaussId];
+	TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+	aSlice[0] = 0.5*(1.0 + aCoord[1]);
+	aSlice[1] = -0.5*(aCoord[0] + aCoord[1]);
+	aSlice[2] = 0.5*(1.0 + aCoord[0]);
+      }
+    }
+
+    virtual 
+    bool 
+    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
+    {
+      return theRef.size() == 3 && 
+	IsEqual(theRef[0][0],-1.0) && 
+	IsEqual(theRef[0][1],1.0);
+    }
+  };
+
+
+  //---------------------------------------------------------------
+  struct TTria3b: TShapeFun
+  {
+    virtual 
+    void
+    InitFun(const TShapeFun::TSliceArr& theRef,
+	    const TShapeFun::TSliceArr& theGauss,
+	    TFun& theFun) const
+    {
+      GetFun(theRef,theGauss,theFun);
+
+      TInt aNbGauss = theGauss.size();
+      for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+	const TCCoordSlice& aCoord = theGauss[aGaussId];
+	TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+	aSlice[0] = 1.0 - aCoord[0] - aCoord[1];
+	aSlice[1] = aCoord[0];
+	aSlice[2] = aCoord[1];
+      }
+    }
+
+    virtual 
+    bool 
+    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
+    {
+      return theRef.size() == 3 && 
+	IsEqual(theRef[1][0],1.0) &&
+	IsEqual(theRef[2][1],1.0);
+    }
+  };
+
+
+  //---------------------------------------------------------------
   struct TTria6a: TShapeFun
   {
     virtual 
@@ -579,17 +646,35 @@ namespace MED
 	    const TShapeFun::TSliceArr& theGauss,
 	    TFun& theFun) const
     {
+      GetFun(theRef,theGauss,theFun);
+
+      TInt aNbGauss = theGauss.size();
+      for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+	const TCCoordSlice& aCoord = theGauss[aGaussId];
+	TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+	aSlice[0] = 0.5*(1.0 + aCoord[1])*aCoord[1];
+	aSlice[1] = 0.5*(aCoord[0] + aCoord[1])*(aCoord[0] + aCoord[1] + 1);
+	aSlice[2] = 0.5*(1.0 + aCoord[0])*aCoord[0];
+	
+	aSlice[3] = -1.0*(1.0 + aCoord[1])*(aCoord[0] + aCoord[1]);
+	aSlice[4] = -1.0*(1.0 + aCoord[0])*(aCoord[0] + aCoord[1]);
+	aSlice[5] = (1.0 + aCoord[1])*(1.0 + aCoord[1]);
+      }
     }
 
     virtual 
     bool 
     IsSatisfy(const TShapeFun::TSliceArr& theRef) const
     {
-      return theRef.size() == 6 && IsEqual(theRef[0][0],-1.0);
+      return theRef.size() == 6 && 
+	IsEqual(theRef[0][0],-1.0) && 
+	IsEqual(theRef[0][1],1.0);
     }
   };
 
 
+  //---------------------------------------------------------------
   struct TTria6b: TShapeFun
   {
     virtual 
@@ -619,11 +704,14 @@ namespace MED
     bool
     IsSatisfy(const TShapeFun::TSliceArr& theRef) const
     {
-      return theRef.size() == 6 && IsEqual(theRef[2][0],1.0);
+      return theRef.size() == 6 && 
+	IsEqual(theRef[1][0],1.0) &&
+	IsEqual(theRef[2][1],1.0);
     }
   };
 
 
+  //---------------------------------------------------------------
   struct TQuad4a: TShapeFun
   {
     virtual 
@@ -650,11 +738,14 @@ namespace MED
     bool
     IsSatisfy(const TShapeFun::TSliceArr& theRef) const
     {
-      return theRef.size() == 4 && IsEqual(theRef[0][0],-1.0);
+      return theRef.size() == 4 && 
+	IsEqual(theRef[0][0],-1.0) &&
+	IsEqual(theRef[0][1],1.0);
     }
   };
 
 
+  //---------------------------------------------------------------
   struct THexa8a: TShapeFun
   {
     virtual 
@@ -686,7 +777,94 @@ namespace MED
     bool
     IsSatisfy(const TShapeFun::TSliceArr& theRef) const
     {
-      return theRef.size() == 8 && IsEqual(theRef[0][0],-1.0);
+      return theRef.size() == 8 && 
+	IsEqual(theRef[0][0],-1.0);
+    }
+  };
+
+
+  //---------------------------------------------------------------
+  struct TPenta6a: TShapeFun
+  {
+    virtual 
+    void
+    InitFun(const TShapeFun::TSliceArr& theRef,
+	    const TShapeFun::TSliceArr& theGauss,
+	    TFun& theFun) const
+    {
+      GetFun(theRef,theGauss,theFun);
+
+      TInt aNbGauss = theGauss.size();
+      for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+	const TCCoordSlice& aCoord = theGauss[aGaussId];
+	TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+	aSlice[0] = 0.5*aCoord[1]*(aCoord[0] - 1.0);
+	aSlice[1] = 0.5*aCoord[2]*(aCoord[0] - 1.0);
+	aSlice[2] = 0.5*(1.0 - aCoord[1] - aCoord[2])*(1.0 - aCoord[0]);
+
+	aSlice[3] = 0.5*aCoord[1]*(aCoord[0] + 1.0);
+	aSlice[4] = 0.5*aCoord[2]*(aCoord[0] + 1.0);
+	aSlice[5] = 0.5*(1.0 - aCoord[1] - aCoord[2])*(1.0 + aCoord[0]);
+      }
+    }
+
+    virtual 
+    bool
+    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
+    {
+      return theRef.size() == 6 && 
+	IsEqual(theRef[0][0],-1.0) &&
+	IsEqual(theRef[0][1],1.0);
+    }
+  };
+
+
+  //---------------------------------------------------------------
+  struct TPenta15a: TShapeFun
+  {
+    virtual 
+    void
+    InitFun(const TShapeFun::TSliceArr& theRef,
+	    const TShapeFun::TSliceArr& theGauss,
+	    TFun& theFun) const
+    {
+      GetFun(theRef,theGauss,theFun);
+
+      TInt aNbGauss = theGauss.size();
+      for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+	const TCCoordSlice& aCoord = theGauss[aGaussId];
+	TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+	aSlice[0] = 0.5*aCoord[1]*(1.0 - aCoord[0])*(2.0*aCoord[1] - 2.0 - aCoord[0]);
+	aSlice[1] = 0.5*aCoord[2]*(1.0 - aCoord[0])*(2.0*aCoord[2] - 2.0 - aCoord[0]);
+	aSlice[2] = 0.5*(aCoord[0] - 1.0)*(1.0 - aCoord[1] - aCoord[2])*(aCoord[0] + 2.0*aCoord[1] + 2.0*aCoord[2]);
+
+	aSlice[3] = 0.5*aCoord[1]*(1.0 + aCoord[0])*(2.0*aCoord[1] - 2.0 - aCoord[0]);
+	aSlice[4] = 0.5*aCoord[2]*(1.0 + aCoord[0])*(2.0*aCoord[2] - 2.0 - aCoord[0]);
+	aSlice[5] = -0.5*(aCoord[0] + 1.0)*(1.0 - aCoord[1] - aCoord[2])*(-aCoord[0] + 2.0*aCoord[1] + 2.0*aCoord[2]);
+
+	aSlice[6] = 2.0*aCoord[1]*aCoord[2]*(1.0 - aCoord[0]);
+	aSlice[7] = 2.0*aCoord[2]*(1.0 - aCoord[1] - aCoord[2])*(1.0 - aCoord[0]);
+	aSlice[8] = 2.0*aCoord[1]*(1.0 - aCoord[1] - aCoord[2])*(1.0 - aCoord[0]);
+
+	aSlice[9] = aCoord[1]*(1.0 - aCoord[0]*aCoord[0]);
+	aSlice[10] = aCoord[2]*(1.0 - aCoord[0]*aCoord[0]);
+	aSlice[11] = (1.0 - aCoord[1] - aCoord[2])*(1.0 - aCoord[0]*aCoord[0]);
+
+	aSlice[12] = 2.0*aCoord[1]*aCoord[2]*(1.0 + aCoord[0]);
+	aSlice[13] = 2.0*aCoord[2]*(1.0 - aCoord[1] - aCoord[2])*(1.0 + aCoord[0]);
+	aSlice[14] = 2.0*aCoord[1]*(1.0 - aCoord[1] - aCoord[2])*(1.0 + aCoord[0]);
+      }
+    }
+
+    virtual 
+    bool
+    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
+    {
+      return theRef.size() == 15 && 
+	IsEqual(theRef[0][0],-1.0) &&
+	IsEqual(theRef[0][1],1.0);
     }
   };
 
@@ -728,6 +906,13 @@ namespace MED
       }
       case eTRIA3: {
 	INITMSG(MYDEBUG,"eTRIA3"<<endl);
+
+	if(TTria3a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+	  return;
+
+	if(TTria3b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+	  return;
+
 	break;
       }
       case eTRIA6: {
@@ -763,6 +948,10 @@ namespace MED
       }
       case ePENTA6: {
 	INITMSG(MYDEBUG,"ePENTA6"<<endl);
+
+	if(TPenta6a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+	  return;
+
 	break;
       }
       case eHEXA8: {
