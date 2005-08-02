@@ -479,7 +479,66 @@ namespace MED
     IsSatisfy(const TShapeFun::TSliceArr& theRef) const
     {
       return theRef.size() == 8 && 
-	IsEqual(theRef[0][0],-1.0);
+	IsEqual(theRef[0][0],-1.0) &&
+	IsEqual(theRef[0][1],-1.0);
+    }
+  };
+
+
+  struct THexa20a: TShapeFun
+  {
+    virtual 
+    void
+    InitFun(const TShapeFun::TSliceArr& theRef,
+	    const TShapeFun::TSliceArr& theGauss,
+	    TFun& theFun) const
+    {
+      GetFun(theRef,theGauss,theFun);
+
+      TInt aNbGauss = theGauss.size();
+      for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+	const TCCoordSlice& aCoord = theGauss[aGaussId];
+	TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+	aSlice[0] = 0.125*(1.0 - aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[2])*
+	  (-2.0 - aCoord[0] - aCoord[1] - aCoord[2]);
+	aSlice[1] = 0.125*(1.0 + aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[2])*
+	  (-2.0 + aCoord[0] - aCoord[1] - aCoord[2]);
+	aSlice[2] = 0.125*(1.0 + aCoord[0])*(1.0 + aCoord[1])*(1.0 - aCoord[2])*
+	  (-2.0 + aCoord[0] + aCoord[1] - aCoord[2]);
+	aSlice[3] = 0.125*(1.0 - aCoord[0])*(1.0 + aCoord[1])*(1.0 - aCoord[2])*
+	  (-2.0 - aCoord[0] + aCoord[1] - aCoord[2]);
+	aSlice[4] = 0.125*(1.0 - aCoord[0])*(1.0 - aCoord[1])*(1.0 + aCoord[2])*
+	  (-2.0 - aCoord[0] - aCoord[1] + aCoord[2]);
+	aSlice[5] = 0.125*(1.0 + aCoord[0])*(1.0 - aCoord[1])*(1.0 + aCoord[2])*
+	  (-2.0 + aCoord[0] - aCoord[1] + aCoord[2]);
+	aSlice[6] = 0.125*(1.0 + aCoord[0])*(1.0 + aCoord[1])*(1.0 + aCoord[2])*
+	  (-2.0 + aCoord[0] + aCoord[1] + aCoord[2]);
+	aSlice[7] = 0.125*(1.0 - aCoord[0])*(1.0 + aCoord[1])*(1.0 + aCoord[2])*
+	  (-2.0 - aCoord[0] + aCoord[1] + aCoord[2]);
+
+	aSlice[8] = 0.25*(1.0 - aCoord[0]*aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[2]);
+	aSlice[9] = 0.25*(1.0 - aCoord[1]*aCoord[1])*(1.0 + aCoord[0])*(1.0 - aCoord[2]);
+	aSlice[10] = 0.25*(1.0 - aCoord[0]*aCoord[0])*(1.0 + aCoord[0])*(1.0 - aCoord[2]);
+	aSlice[11] = 0.25*(1.0 - aCoord[1]*aCoord[1])*(1.0 - aCoord[0])*(1.0 - aCoord[2]);
+	aSlice[12] = 0.25*(1.0 - aCoord[2]*aCoord[2])*(1.0 - aCoord[0])*(1.0 - aCoord[1]);
+	aSlice[13] = 0.25*(1.0 - aCoord[2]*aCoord[2])*(1.0 + aCoord[0])*(1.0 - aCoord[1]);
+	aSlice[14] = 0.25*(1.0 - aCoord[2]*aCoord[2])*(1.0 + aCoord[0])*(1.0 + aCoord[1]);
+	aSlice[15] = 0.25*(1.0 - aCoord[2]*aCoord[2])*(1.0 - aCoord[0])*(1.0 + aCoord[1]);
+	aSlice[16] = 0.25*(1.0 - aCoord[0]*aCoord[0])*(1.0 - aCoord[1])*(1.0 + aCoord[2]);
+	aSlice[17] = 0.25*(1.0 - aCoord[1]*aCoord[1])*(1.0 + aCoord[0])*(1.0 + aCoord[2]);
+	aSlice[18] = 0.25*(1.0 - aCoord[0]*aCoord[0])*(1.0 + aCoord[1])*(1.0 + aCoord[2]);
+	aSlice[19] = 0.25*(1.0 - aCoord[1]*aCoord[1])*(1.0 - aCoord[0])*(1.0 + aCoord[2]);
+      }
+    }
+
+    virtual 
+    bool
+    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
+    {
+      return theRef.size() == 20 && 
+	IsEqual(theRef[0][0],-1.0) &&
+	IsEqual(theRef[0][1],-1.0);
     }
   };
 
@@ -677,6 +736,10 @@ namespace MED
       }
       case eHEXA20: {
 	INITMSG(MYDEBUG,"eHEXA20"<<endl);
+
+	if(THexa20a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+	  return true;
+
 	break;
       }
       default: 
