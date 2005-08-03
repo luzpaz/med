@@ -30,9 +30,11 @@
 #include "MED_Utilities.hxx"
  
 #ifdef _DEBUG_
-static int MYDEBUG = 0;
+static int MYDEBUG = 1;
+static int MYVALUEDEBUG = 0;
 #else
 static int MYDEBUG = 0;
+static int MYVALUEDEBUG = 0;
 #endif
 
 namespace MED
@@ -119,7 +121,9 @@ namespace MED
   IsEqual(TFloat theLeft, TFloat theRight)
   {
     static TFloat EPS = 1.0E-3;
-    return fabs(theLeft-theRight)/(fabs(theLeft)+fabs(theRight)) < EPS;
+    if(fabs(theLeft) + fabs(theRight) > EPS)
+      return fabs(theLeft-theRight)/(fabs(theLeft)+fabs(theRight)) < EPS;
+    return true;
   }
 
 
@@ -153,11 +157,32 @@ namespace MED
       }
     };
 
-    typedef TVector<TCCoordSlice> TSliceArr;
+    typedef TVector<TCCoordSlice> TCCoordSliceArr;
+    typedef TVector<TCoordSlice> TCoordSliceArr;
+    
+    TFloatVector myRefCoord;
+    TInt myDim;
+
+    TShapeFun(TInt theDim = 0, TInt theNbRef = 0):
+      myDim(theDim),
+      myRefCoord(theNbRef*theDim)
+    {}
+
+    TCCoordSlice 
+    GetCoord(TInt theRefId) const
+    {
+      return TCCoordSlice(myRefCoord,std::slice(theRefId*myDim,myDim,1));
+    }
+    
+    TCoordSlice
+    GetCoord(TInt theRefId)
+    {
+      return TCoordSlice(myRefCoord,std::slice(theRefId*myDim,myDim,1));
+    }
     
     void 
-    GetFun(const TShapeFun::TSliceArr& theRef,
-	   const TShapeFun::TSliceArr& theGauss,
+    GetFun(const TShapeFun::TCCoordSliceArr& theRef,
+	   const TShapeFun::TCCoordSliceArr& theGauss,
 	   TFun& theFun) const
     {
       TInt aNbRef = theRef.size();
@@ -167,39 +192,56 @@ namespace MED
 
     virtual 
     void
-    InitFun(const TShapeFun::TSliceArr& theRef,
-	    const TShapeFun::TSliceArr& theGauss,
+    InitFun(const TShapeFun::TCCoordSliceArr& theRef,
+	    const TShapeFun::TCCoordSliceArr& theGauss,
 	    TFun& theFun) const = 0;
     
     virtual
     bool 
-    IsSatisfy(const TShapeFun::TSliceArr& theRefCoord) const
+    IsSatisfy(const TShapeFun::TCCoordSliceArr& theRefCoord) const
     {
-#ifdef _DEBUG_
       TInt aNbRef = theRefCoord.size();
-      INITMSG(MYDEBUG,"TShapeFun::IsSatisfy - aNbRef = "<<aNbRef<<": ");
-
-      for(TInt aRefId = 0; aRefId < aNbRef; aRefId++){
-	const TCCoordSlice& aCoord = theRefCoord[aRefId];
-	TInt aDim = aCoord.size();
-	ADDMSG(MYDEBUG,"{");
-	for(TInt anId = 0; anId < aDim; anId++){
-	  ADDMSG(MYDEBUG,aCoord[anId]<<" ");
-	}
-	ADDMSG(MYDEBUG,"} ");
-      }
-      ADDMSG(MYDEBUG,endl);
+      TInt aNbRef2 = myRefCoord.size()/myDim;
+      INITMSG(MYDEBUG,"TShapeFun::IsSatisfy "<<
+	      "- aNbRef("<<aNbRef<<")"<<
+	      "; aNbRef2("<<aNbRef2<<")\n");
+      bool anIsSatisfy = (aNbRef == aNbRef2);
+      if(anIsSatisfy){
+	for(TInt aRefId = 0; aRefId < aNbRef; aRefId++){
+	  const TCCoordSlice& aCoord2 = theRefCoord[aRefId];
+	  TCCoordSlice aCoord = GetCoord(aRefId);
+	  TInt aDim = aCoord.size();
+	  bool anIsEqual = false;
+	  for(TInt anId = 0; anId < aDim; anId++){
+	    anIsEqual = IsEqual(aCoord[anId],aCoord2[anId]);
+	    if(!anIsEqual){
+	      anIsSatisfy = false;
+	      break;
+	    }
+	  }
+	  if(!anIsEqual){
+	    const TCCoordSlice& aCoord = theRefCoord[aRefId];
+	    INITMSG(MYDEBUG,aRefId + 1<<":{");
+	    TInt aDim = aCoord.size();
+	    for(TInt anId = 0; anId < aDim; anId++)
+	      ADDMSG(MYDEBUG,"\t"<<aCoord[anId]);
+	    ADDMSG(MYDEBUG,"}\n");
+#ifndef _DEBUG_
+	    return anIsSatisfy;
 #endif
+	  }
+	}
+      }
 
-      return false;
+      return anIsSatisfy;
     }
 
     bool
     Eval(const TCellInfo& theCellInfo,
 	 const TNodeInfo& theNodeInfo,
 	 const TElemNum& theElemNum,
-	 const TShapeFun::TSliceArr& theRef,
-	 const TShapeFun::TSliceArr& theGauss,
+	 const TShapeFun::TCCoordSliceArr& theRef,
+	 const TShapeFun::TCCoordSliceArr& theGauss,
 	 TGaussCoord& theGaussCoord,
 	 EModeSwitch theMode)
     {
@@ -252,16 +294,16 @@ namespace MED
 #ifdef _DEBUG_
 	for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
 	  TCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(anElemId);
-	  INITMSG(MYDEBUG,"");
+	  INITMSG(MYVALUEDEBUG,"");
 	  for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
 	    TCoordSlice& aCoordSlice = aCoordSliceArr[aGaussId];
-	    ADDMSG(MYDEBUG,"{");
+	    ADDMSG(MYVALUEDEBUG,"{");
 	    for(TInt aDimId = 0; aDimId < aDim; aDimId++){
-	      ADDMSG(MYDEBUG,aCoordSlice[aDimId]<<" ");
+	      ADDMSG(MYVALUEDEBUG,aCoordSlice[aDimId]<<" ");
 	    }
-	    ADDMSG(MYDEBUG,"} ");
+	    ADDMSG(MYVALUEDEBUG,"} ");
 	  }
-	  ADDMSG(MYDEBUG,endl);
+	  ADDMSG(MYVALUEDEBUG,endl);
 	}
 #endif
 	return true;
@@ -277,8 +319,8 @@ namespace MED
   {
     virtual 
     void
-    InitFun(const TShapeFun::TSliceArr& theRef,
-	    const TShapeFun::TSliceArr& theGauss,
+    InitFun(const TShapeFun::TCCoordSliceArr& theRef,
+	    const TShapeFun::TCCoordSliceArr& theGauss,
 	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
@@ -296,7 +338,7 @@ namespace MED
 
     virtual 
     bool 
-    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
+    IsSatisfy(const TShapeFun::TCCoordSliceArr& theRef) const
     {
       return theRef.size() == 3 && 
 	IsEqual(theRef[0][0],-1.0) && 
@@ -310,8 +352,8 @@ namespace MED
   {
     virtual 
     void
-    InitFun(const TShapeFun::TSliceArr& theRef,
-	    const TShapeFun::TSliceArr& theGauss,
+    InitFun(const TShapeFun::TCCoordSliceArr& theRef,
+	    const TShapeFun::TCCoordSliceArr& theGauss,
 	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
@@ -329,7 +371,7 @@ namespace MED
 
     virtual 
     bool 
-    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
+    IsSatisfy(const TShapeFun::TCCoordSliceArr& theRef) const
     {
       return theRef.size() == 3 && 
 	IsEqual(theRef[1][0],1.0) &&
@@ -343,8 +385,8 @@ namespace MED
   {
     virtual 
     void
-    InitFun(const TShapeFun::TSliceArr& theRef,
-	    const TShapeFun::TSliceArr& theGauss,
+    InitFun(const TShapeFun::TCCoordSliceArr& theRef,
+	    const TShapeFun::TCCoordSliceArr& theGauss,
 	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
@@ -366,7 +408,7 @@ namespace MED
 
     virtual 
     bool 
-    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
+    IsSatisfy(const TShapeFun::TCCoordSliceArr& theRef) const
     {
       return theRef.size() == 6 && 
 	IsEqual(theRef[0][0],-1.0) && 
@@ -380,8 +422,8 @@ namespace MED
   {
     virtual 
     void
-    InitFun(const TShapeFun::TSliceArr& theRef,
-	    const TShapeFun::TSliceArr& theGauss,
+    InitFun(const TShapeFun::TCCoordSliceArr& theRef,
+	    const TShapeFun::TCCoordSliceArr& theGauss,
 	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
@@ -403,7 +445,7 @@ namespace MED
 
     virtual 
     bool
-    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
+    IsSatisfy(const TShapeFun::TCCoordSliceArr& theRef) const
     {
       return theRef.size() == 6 && 
 	IsEqual(theRef[1][0],1.0) &&
@@ -415,10 +457,25 @@ namespace MED
   //---------------------------------------------------------------
   struct TQuad4a: TShapeFun
   {
+    TQuad4a():
+      TShapeFun(2,4)
+    {
+      TInt aNbRef = myRefCoord.size();
+      for(TInt aRefId = 0; aRefId < aNbRef; aRefId++){
+	TCoordSlice aCoord = GetCoord(aRefId);
+	switch(aRefId){
+	case  0: aCoord[0] = -1.0;  aCoord[1] =  1.0; break;
+	case  1: aCoord[0] = -1.0;  aCoord[1] = -1.0; break;
+	case  2: aCoord[0] =  1.0;  aCoord[1] = -1.0; break;
+	case  3: aCoord[0] =  1.0;  aCoord[1] =  1.0; break;
+	}
+      }
+    }
+
     virtual 
     void
-    InitFun(const TShapeFun::TSliceArr& theRef,
-	    const TShapeFun::TSliceArr& theGauss,
+    InitFun(const TShapeFun::TCCoordSliceArr& theRef,
+	    const TShapeFun::TCCoordSliceArr& theGauss,
 	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
@@ -434,25 +491,35 @@ namespace MED
 	aSlice[3] = 0.25*(1.0 + aCoord[0])*(1.0 + aCoord[1]);
       }
     }
-
-    virtual 
-    bool
-    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
-    {
-      return theRef.size() == 4 && 
-	IsEqual(theRef[0][0],-1.0) &&
-	IsEqual(theRef[0][1],1.0);
-    }
   };
 
 
   //---------------------------------------------------------------
   struct THexa8a: TShapeFun
   {
+    THexa8a():
+      TShapeFun(3,8)
+    {
+      TInt aNbRef = myRefCoord.size();
+      for(TInt aRefId = 0; aRefId < aNbRef; aRefId++){
+	TCoordSlice aCoord = GetCoord(aRefId);
+	switch(aRefId){
+	case  0: aCoord[0] = -1.0;  aCoord[1] = -1.0;  aCoord[2] = -1.0; break;
+	case  1: aCoord[0] =  1.0;  aCoord[1] = -1.0;  aCoord[2] = -1.0; break;
+	case  2: aCoord[0] =  1.0;  aCoord[1] =  1.0;  aCoord[2] = -1.0; break;
+	case  3: aCoord[0] = -1.0;  aCoord[1] =  1.0;  aCoord[2] = -1.0; break;
+	case  4: aCoord[0] = -1.0;  aCoord[1] = -1.0;  aCoord[2] =  1.0; break;
+	case  5: aCoord[0] =  1.0;  aCoord[1] = -1.0;  aCoord[2] =  1.0; break;
+	case  6: aCoord[0] =  1.0;  aCoord[1] =  1.0;  aCoord[2] =  1.0; break;
+	case  7: aCoord[0] = -1.0;  aCoord[1] =  1.0;  aCoord[2] =  1.0; break;
+	}
+      }
+    }
+
     virtual 
     void
-    InitFun(const TShapeFun::TSliceArr& theRef,
-	    const TShapeFun::TSliceArr& theGauss,
+    InitFun(const TShapeFun::TCCoordSliceArr& theRef,
+	    const TShapeFun::TCCoordSliceArr& theGauss,
 	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
@@ -473,24 +540,46 @@ namespace MED
 	aSlice[7] = 0.125*(1.0 - aCoord[0])*(1.0 + aCoord[1])*(1.0 + aCoord[2]);
       }
     }
-
-    virtual 
-    bool
-    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
-    {
-      return theRef.size() == 8 && 
-	IsEqual(theRef[0][0],-1.0) &&
-	IsEqual(theRef[0][1],-1.0);
-    }
   };
 
 
   struct THexa20a: TShapeFun
   {
+    THexa20a():
+      TShapeFun(3,20)
+    {
+      TInt aNbRef = myRefCoord.size();
+      for(TInt aRefId = 0; aRefId < aNbRef; aRefId++){
+	TCoordSlice aCoord = GetCoord(aRefId);
+	switch(aRefId){
+	case  0: aCoord[0] = -1.0;  aCoord[1] = -1.0;  aCoord[2] = -1.0; break;
+	case  1: aCoord[0] =  1.0;  aCoord[1] = -1.0;  aCoord[2] = -1.0; break;
+	case  2: aCoord[0] =  1.0;  aCoord[1] =  1.0;  aCoord[2] = -1.0; break;
+	case  3: aCoord[0] = -1.0;  aCoord[1] =  1.0;  aCoord[2] = -1.0; break;
+	case  4: aCoord[0] = -1.0;  aCoord[1] = -1.0;  aCoord[2] =  1.0; break;
+	case  5: aCoord[0] =  1.0;  aCoord[1] = -1.0;  aCoord[2] =  1.0; break;
+	case  6: aCoord[0] =  1.0;  aCoord[1] =  1.0;  aCoord[2] =  1.0; break;
+	case  7: aCoord[0] = -1.0;  aCoord[1] =  1.0;  aCoord[2] =  1.0; break;
+	case  8: aCoord[0] =  0.0;  aCoord[1] = -1.0;  aCoord[2] = -1.0; break;
+	case  9: aCoord[0] =  1.0;  aCoord[1] =  0.0;  aCoord[2] = -1.0; break;
+	case 10: aCoord[0] =  0.0;  aCoord[1] =  1.0;  aCoord[2] = -1.0; break;
+	case 11: aCoord[0] = -1.0;  aCoord[1] =  0.0;  aCoord[2] = -1.0; break;
+	case 12: aCoord[0] = -1.0;  aCoord[1] = -1.0;  aCoord[2] =  0.0; break;
+	case 13: aCoord[0] =  1.0;  aCoord[1] = -1.0;  aCoord[2] =  0.0; break;
+	case 14: aCoord[0] =  1.0;  aCoord[1] =  1.0;  aCoord[2] =  0.0; break;
+	case 15: aCoord[0] = -1.0;  aCoord[1] =  1.0;  aCoord[2] =  0.0; break;
+	case 16: aCoord[0] =  0.0;  aCoord[1] = -1.0;  aCoord[2] =  1.0; break;
+	case 17: aCoord[0] =  1.0;  aCoord[1] =  0.0;  aCoord[2] =  1.0; break;
+	case 18: aCoord[0] =  0.0;  aCoord[1] =  1.0;  aCoord[2] =  1.0; break;
+	case 19: aCoord[0] = -1.0;  aCoord[1] =  0.0;  aCoord[2] =  1.0; break;
+	}
+      }
+    }
+
     virtual 
     void
-    InitFun(const TShapeFun::TSliceArr& theRef,
-	    const TShapeFun::TSliceArr& theGauss,
+    InitFun(const TShapeFun::TCCoordSliceArr& theRef,
+	    const TShapeFun::TCCoordSliceArr& theGauss,
 	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
@@ -531,15 +620,6 @@ namespace MED
 	aSlice[19] = 0.25*(1.0 - aCoord[1]*aCoord[1])*(1.0 - aCoord[0])*(1.0 + aCoord[2]);
       }
     }
-
-    virtual 
-    bool
-    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
-    {
-      return theRef.size() == 20 && 
-	IsEqual(theRef[0][0],-1.0) &&
-	IsEqual(theRef[0][1],-1.0);
-    }
   };
 
 
@@ -548,8 +628,8 @@ namespace MED
   {
     virtual 
     void
-    InitFun(const TShapeFun::TSliceArr& theRef,
-	    const TShapeFun::TSliceArr& theGauss,
+    InitFun(const TShapeFun::TCCoordSliceArr& theRef,
+	    const TShapeFun::TCCoordSliceArr& theGauss,
 	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
@@ -571,11 +651,11 @@ namespace MED
 
     virtual 
     bool
-    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
+    IsSatisfy(const TShapeFun::TCCoordSliceArr& theRef) const
     {
-      return theRef.size() == 6 && 
-	IsEqual(theRef[0][0],-1.0) &&
-	IsEqual(theRef[0][1],1.0);
+      if(theRef.size() == 6 && IsEqual(theRef[0][0],-1.0) && IsEqual(theRef[0][1],1.0))
+	return true;
+      return TShapeFun::IsSatisfy(theRef);
     }
   };
 
@@ -585,8 +665,8 @@ namespace MED
   {
     virtual 
     void
-    InitFun(const TShapeFun::TSliceArr& theRef,
-	    const TShapeFun::TSliceArr& theGauss,
+    InitFun(const TShapeFun::TCCoordSliceArr& theRef,
+	    const TShapeFun::TCCoordSliceArr& theGauss,
 	    TFun& theFun) const
     {
       GetFun(theRef,theGauss,theFun);
@@ -620,7 +700,7 @@ namespace MED
 
     virtual 
     bool
-    IsSatisfy(const TShapeFun::TSliceArr& theRef) const
+    IsSatisfy(const TShapeFun::TCCoordSliceArr& theRef) const
     {
       return theRef.size() == 15 && 
 	IsEqual(theRef[0][0],-1.0) &&
@@ -638,20 +718,18 @@ namespace MED
 		  const TElemNum& theElemNum,
 		  EModeSwitch theMode)
   {
-    int MYDEBUG = true;
     INITMSG(MYDEBUG,"GetGaussCoord3D\n");
 
     if(theGaussInfo.myGeom == theCellInfo.myGeom){
       EGeometrieElement aGeom = theGaussInfo.myGeom;
 
-      typedef TVector<TCCoordSlice> TSliceArr;
       TInt aNbRef = theGaussInfo.GetNbRef();
-      TSliceArr aRefSlice(aNbRef);
+      TCCoordSliceArr aRefSlice(aNbRef);
       for(TInt anId = 0; anId < aNbRef; anId++)
 	aRefSlice[anId] = theGaussInfo.GetRefCoordSlice(anId);
 
       TInt aNbGauss = theGaussInfo.GetNbGauss();
-      TSliceArr aGaussSlice(aNbGauss);
+      TCCoordSliceArr aGaussSlice(aNbGauss);
       for(TInt anId = 0; anId < aNbGauss; anId++)
 	aGaussSlice[anId] = theGaussInfo.GetGaussCoordSlice(anId);
 
