@@ -83,6 +83,15 @@ namespace MED
 		  TGaussCoord& theGaussCoord,
 		  const TElemNum& theElemNum = TElemNum(),
 		  EModeSwitch theMode = eFULL_INTERLACE);
+
+
+  //---------------------------------------------------------------
+  bool
+  GetBaryCenter(const TCellInfo& theCellInfo,
+		const TNodeInfo& theNodeInfo,
+		TGaussCoord& theGaussCoord,
+		const TElemNum& theElemNum = TElemNum(),
+		EModeSwitch theMode = eFULL_INTERLACE);
 }
 
 #endif
