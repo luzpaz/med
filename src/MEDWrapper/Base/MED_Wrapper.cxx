@@ -232,7 +232,8 @@ namespace MED{
 
 #ifdef _DEBUG_
     INITMSG(MYDEBUG,
-	    "GetPFieldInfo - aName = '"<<anInfo->GetName()<<"'"<<
+	    "GetPFieldInfo "<<
+	    "- aName = '"<<anInfo->GetName()<<"'"<<
 	    "; aType = "<<anInfo->GetType()<<
 	    "; aNbComp = "<<aNbComp<<
 	    endl);

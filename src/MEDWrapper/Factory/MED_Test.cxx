@@ -28,6 +28,7 @@
 
 #include "MED_Utilities.hxx"
 #include "MED_Algorithm.hxx"
+#include "MED_GaussUtils.hxx"
 #include "MED_Factory.hxx"
 
 #ifdef _DEBUG_
@@ -74,10 +75,22 @@ void CheckMed(const std::string& theFileName)
 	TTimeStampGroup::const_iterator aTTimeStampGroupIter = aTTimeStampGroup.begin();
 	for(; aTTimeStampGroupIter != aTTimeStampGroup.end(); aTTimeStampGroupIter++){
 	  PFieldInfo aFieldInfo = aTTimeStampGroupIter->first;
+	  INITMSG(MYDEBUG,
+		  "GetPFieldInfo "<<
+		  "- aName = '"<<aFieldInfo->GetName()<<"'"<<
+		  "; aType = "<<aFieldInfo->GetType()<<
+		  "; aNbComp = "<<aFieldInfo->GetNbComp()<<
+		  endl);
 	  const TTimeStampSet& aTimeStampSet = aTTimeStampGroupIter->second;
 	  TTimeStampSet::const_iterator aTTimeStampSetIter = aTimeStampSet.begin();
 	  for(; aTTimeStampSetIter != aTimeStampSet.end(); aTTimeStampSetIter++){
 	    PTimeStampInfo aTimeStampInfo = *aTTimeStampSetIter;
+	    INITMSG(MYDEBUG,
+		    "GetPTimeStampInfo "<<
+		    "- anEntity = "<<aTimeStampInfo->GetEntity()<<
+		    "; aNbGauss = "<<aTimeStampInfo->GetNbGauss()<<
+		    "; aNumDt = "<<aTimeStampInfo->GetNumDt()<<
+		    endl);
 	    PTimeStampVal aTimeStampVal = aMed->GetPTimeStampVal(aTimeStampInfo,
 								 aMKey2Profile,
 								 aKey2Gauss);
