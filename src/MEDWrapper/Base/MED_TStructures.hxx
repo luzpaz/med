@@ -475,8 +475,6 @@ namespace MED{
       myIndex = theInfo->myIndex;
       myConn = theInfo->myConn;
 
-      myConnSize = theInfo->GetConnSize();
-
       myConnMode = theInfo->GetConnMode();
     }
 
@@ -498,8 +496,6 @@ namespace MED{
 
       myIndex.resize(theNbElem+1);
       myConn.resize(theConnSize);
-
-      myConnSize = theConnSize;
 
       myConnMode = theConnMode;
     }
