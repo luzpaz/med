@@ -230,9 +230,6 @@ namespace MED
     EConnectivite myConnMode; // eNOD|eDESC(eDESC not used)
     EConnectivite GetConnMode() const { return myConnMode;}
 
-    TInt myConnSize;
-    TInt GetConnSize() const { return myConnSize;}
-
     TElemNum myConn; // Table de connectivities
     TElemNum myIndex; // Table de indexes
 
@@ -263,6 +260,7 @@ namespace MED
     TElemNum myIndex; // Table de indexes
 
     TInt GetNbFaces(TInt theElemId) const;
+    TInt GetNbNodes(TInt theElemId) const;
 
     TCConnSliceArr GetConnSliceArr(TInt theElemId) const;
     TConnSliceArr GetConnSliceArr(TInt theElemId);

@@ -212,6 +212,21 @@ TPolyedreInfo
   return myIndex[theElemId+1] - myIndex[theElemId];
 }
 
+TInt 
+TPolyedreInfo
+::GetNbNodes(TInt theElemId) const 
+{
+  TInt aNbNodes = 0;
+  TInt aNbFaces = GetNbFaces(theElemId);
+  TInt aStartId = myIndex[theElemId] - 1;
+  for(TInt aFaceId = 0; aFaceId < aNbFaces; aFaceId++){
+    TInt aFinishId = myIndex[theElemId + 1] - 1;
+    aNbNodes += aFinishId - aStartId;
+    aStartId = aFinishId;
+  }
+  return aNbNodes;
+}
+
 TCConnSliceArr 
 TPolyedreInfo
 ::GetConnSliceArr(TInt theElemId) const
@@ -220,7 +235,7 @@ TPolyedreInfo
   TCConnSliceArr aConnSliceArr(aNbFaces);
   TInt aStartId = myIndex[theElemId] - 1;
   for(TInt aFaceId = 0; aFaceId < aNbFaces; aFaceId++){
-    TInt aFinishId = myIndex[theElemId+1] - 1;
+    TInt aFinishId = myIndex[theElemId + 1] - 1;
     TInt aDiff = aFinishId - aStartId;
     aConnSliceArr[aFaceId] =
       TCConnSlice(myConn,std::slice(aStartId,aDiff,1));
