@@ -643,7 +643,7 @@ namespace MED
 
 	aSlice[8] = 0.25*(1.0 - aCoord[0]*aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[2]);
 	aSlice[9] = 0.25*(1.0 - aCoord[1]*aCoord[1])*(1.0 + aCoord[0])*(1.0 - aCoord[2]);
-	aSlice[10] = 0.25*(1.0 - aCoord[0]*aCoord[0])*(1.0 + aCoord[0])*(1.0 - aCoord[2]);
+	aSlice[10] = 0.25*(1.0 - aCoord[0]*aCoord[0])*(1.0 + aCoord[1])*(1.0 - aCoord[2]);
 	aSlice[11] = 0.25*(1.0 - aCoord[1]*aCoord[1])*(1.0 - aCoord[0])*(1.0 - aCoord[2]);
 	aSlice[12] = 0.25*(1.0 - aCoord[2]*aCoord[2])*(1.0 - aCoord[0])*(1.0 - aCoord[1]);
 	aSlice[13] = 0.25*(1.0 - aCoord[2]*aCoord[2])*(1.0 + aCoord[0])*(1.0 - aCoord[1]);
@@ -691,8 +691,8 @@ namespace MED
 	const TCCoordSlice& aCoord = theGauss[aGaussId];
 	TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
 
-	aSlice[0] = 0.5*aCoord[1]*(aCoord[0] - 1.0);
-	aSlice[1] = 0.5*aCoord[2]*(aCoord[0] - 1.0);
+	aSlice[0] = 0.5*aCoord[1]*(1.0 - aCoord[0]);
+	aSlice[1] = 0.5*aCoord[2]*(1.0 - aCoord[0]);
 	aSlice[2] = 0.5*(1.0 - aCoord[1] - aCoord[2])*(1.0 - aCoord[0]);
 
 	aSlice[3] = 0.5*aCoord[1]*(aCoord[0] + 1.0);
