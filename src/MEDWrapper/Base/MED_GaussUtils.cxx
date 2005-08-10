@@ -298,11 +298,23 @@ namespace MED
 	}
 
 #ifdef _DEBUG_
+	{
+	  INITMSG(MYVALUEDEBUG,"theGauss: ");
+	  for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+	    TCCoordSlice aCoordSlice = theGauss[aGaussId];
+	    ADDMSG(MYVALUEDEBUG,"{");
+	    for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+	      ADDMSG(MYVALUEDEBUG,aCoordSlice[aDimId]<<" ");
+	    }
+	    ADDMSG(MYVALUEDEBUG,"} ");
+	  }
+	  ADDMSG(MYVALUEDEBUG,endl);
+	}
 	for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
-	  TCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(anElemId);
+	  TCCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(anElemId);
 	  INITMSG(MYVALUEDEBUG,"");
 	  for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
-	    TCoordSlice& aCoordSlice = aCoordSliceArr[aGaussId];
+	    TCCoordSlice aCoordSlice = aCoordSliceArr[aGaussId];
 	    ADDMSG(MYVALUEDEBUG,"{");
 	    for(TInt aDimId = 0; aDimId < aDim; aDimId++){
 	      ADDMSG(MYVALUEDEBUG,aCoordSlice[aDimId]<<" ");
