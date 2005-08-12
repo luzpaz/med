@@ -63,28 +63,32 @@ void CheckMed(const std::string& theFileName)
 
       TEntityInfo aEntityInfo = aMed->GetEntityInfo(aMeshInfo);
       
-      TElemGroup aElemGroup = GetElemsByEntity(aMed,aMeshInfo,aEntityInfo);
+      TEntity2TGeom2ElemInfo anEntity2TGeom2ElemInfo = 
+	GetEntity2TGeom2ElemInfo(aMed,aMeshInfo,aEntityInfo);
 
-      TTimeStampGroup aTimeStampGroup = GetFieldsByEntity(aMed,aMeshInfo,aEntityInfo);
+      TFieldInfo2TimeStampInfoSet aFieldInfo2TimeStampInfoSet = 
+	GetFieldInfo2TimeStampInfoSet(aMed,aMeshInfo,aEntityInfo);
       
-      TFieldGroup aFieldGroup = GetFieldsByEntity(aTimeStampGroup);
+      TEntite2TFieldInfo2TimeStampInfoSet anEntite2TFieldInfo2TimeStampInfoSet = 
+	GetEntite2TFieldInfo2TimeStampInfoSet(aFieldInfo2TimeStampInfoSet);
 
-      TFieldGroup::const_iterator aFieldGroupIter = aFieldGroup.begin();
-      for(; aFieldGroupIter != aFieldGroup.end(); aFieldGroupIter++){
-	const TTimeStampGroup& aTTimeStampGroup = aFieldGroupIter->second;
-	TTimeStampGroup::const_iterator aTTimeStampGroupIter = aTTimeStampGroup.begin();
-	for(; aTTimeStampGroupIter != aTTimeStampGroup.end(); aTTimeStampGroupIter++){
-	  PFieldInfo aFieldInfo = aTTimeStampGroupIter->first;
+      TEntite2TFieldInfo2TimeStampInfoSet::const_iterator anEntite2TFieldInfo2TimeStampInfoSetIter = 
+	anEntite2TFieldInfo2TimeStampInfoSet.begin();
+      for(; anEntite2TFieldInfo2TimeStampInfoSetIter != anEntite2TFieldInfo2TimeStampInfoSet.end(); anEntite2TFieldInfo2TimeStampInfoSetIter++){
+	const TFieldInfo2TimeStampInfoSet& aFieldInfo2TimeStampInfoSet = anEntite2TFieldInfo2TimeStampInfoSetIter->second;
+	TFieldInfo2TimeStampInfoSet::const_iterator aFieldInfo2TimeStampInfoSetIter = aFieldInfo2TimeStampInfoSet.begin();
+	for(; aFieldInfo2TimeStampInfoSetIter != aFieldInfo2TimeStampInfoSet.end(); aFieldInfo2TimeStampInfoSetIter++){
+	  PFieldInfo aFieldInfo = aFieldInfo2TimeStampInfoSetIter->first;
 	  INITMSG(MYDEBUG,
 		  "GetPFieldInfo "<<
 		  "- aName = '"<<aFieldInfo->GetName()<<"'"<<
 		  "; aType = "<<aFieldInfo->GetType()<<
 		  "; aNbComp = "<<aFieldInfo->GetNbComp()<<
 		  endl);
-	  const TTimeStampSet& aTimeStampSet = aTTimeStampGroupIter->second;
-	  TTimeStampSet::const_iterator aTTimeStampSetIter = aTimeStampSet.begin();
-	  for(; aTTimeStampSetIter != aTimeStampSet.end(); aTTimeStampSetIter++){
-	    PTimeStampInfo aTimeStampInfo = *aTTimeStampSetIter;
+	  const TTimeStampInfoSet& aTimeStampInfoSet = aFieldInfo2TimeStampInfoSetIter->second;
+	  TTimeStampInfoSet::const_iterator aTimeStampInfoSettIter = aTimeStampInfoSet.begin();
+	  for(; aTimeStampInfoSettIter != aTimeStampInfoSet.end(); aTimeStampInfoSettIter++){
+	    PTimeStampInfo aTimeStampInfo = *aTimeStampInfoSettIter;
 	    INITMSG(MYDEBUG,
 		    "GetPTimeStampInfo "<<
 		    "- anEntity = "<<aTimeStampInfo->GetEntity()<<
@@ -100,28 +104,30 @@ void CheckMed(const std::string& theFileName)
 
       continue;
 
-      TFamilyGroup aFamilyGroup = GetFamilies(aMed,aMeshInfo);
+      TFamilyInfoSet aFamilyInfoSet = GetFamilyInfoSet(aMed,aMeshInfo);
       
-      TFamilyByEntity aFamilyByEntity = GetFamiliesByEntity(aMed,aElemGroup,aFamilyGroup);
+      TEntity2FamilySet aEntity2FamilySet = 
+	GetEntity2FamilySet(aMed,anEntity2TGeom2ElemInfo,aFamilyInfoSet);
       
-      TGroupInfo aGroupInfo = GetFamiliesByGroup(aFamilyGroup);
+      TGroupInfo aGroupInfo = GetGroupInfo(aFamilyInfoSet);
       
       PNodeInfo aNodeInfo = aMed->GetPNodeInfo(aMeshInfo);
-      TElemGroup::const_iterator anIter = aElemGroup.begin();
-      for(; anIter != aElemGroup.end(); anIter++){
+      TEntity2TGeom2ElemInfo::const_iterator anIter = anEntity2TGeom2ElemInfo.begin();
+      for(; anIter != anEntity2TGeom2ElemInfo.end(); anIter++){
 	const EEntiteMaillage& anEntity = anIter->first;
 	if(anEntity != eNOEUD){
-	  const TElemMap& anElemMap = anIter->second;
+	  const TGeom2ElemInfo& aGeom2ElemInfo = anIter->second;
 	  TKey2Gauss::const_iterator anIter2 = aKey2Gauss.begin();
 	  for(; anIter2 != aKey2Gauss.end(); anIter2++){
 	    const TGaussInfo::TKey& aKey = anIter2->first;
 	    EGeometrieElement aGeom = boost::get<0>(aKey);
-	    TElemMap::const_iterator anIter3 = anElemMap.find(aGeom);
-	    if(anIter3 != anElemMap.end()){
-	      PCellInfo aCellInfo = anIter3->second;
-	      PGaussInfo aGaussInfo = anIter2->second;
-	      TGaussCoord aGaussCoord;
-	      GetGaussCoord3D(aGaussInfo,aCellInfo,aNodeInfo,aGaussCoord);
+	    TGeom2ElemInfo::const_iterator anIter3 = aGeom2ElemInfo.find(aGeom);
+	    if(anIter3 != aGeom2ElemInfo.end()){
+	      if(PCellInfo aCellInfo = anIter3->second){
+		PGaussInfo aGaussInfo = anIter2->second;
+		TGaussCoord aGaussCoord;
+		GetGaussCoord3D(aGaussInfo,aCellInfo,aNodeInfo,aGaussCoord);
+	      }
 	    }
 	  }
 	}

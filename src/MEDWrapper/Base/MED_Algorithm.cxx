@@ -140,13 +140,13 @@ namespace MED
 
 
   //---------------------------------------------------------------
-  TTimeStampGroup 
-  GetFieldsByEntity(TWrapper& theWrapper, 
-		    const PMeshInfo& theMeshInfo,
-		    const MED::TEntityInfo& theEntityInfo)
+  TFieldInfo2TimeStampInfoSet 
+  GetFieldInfo2TimeStampInfoSet(TWrapper& theWrapper, 
+				const PMeshInfo& theMeshInfo,
+				const MED::TEntityInfo& theEntityInfo)
   {
     MSG(MYDEBUG,"GetFieldsByEntity(...)");
-    TTimeStampGroup aGroup;
+    TFieldInfo2TimeStampInfoSet aFieldInfo2TimeStampInfoSet;
     TInt aNbFields = theWrapper.GetNbFields();
     INITMSG(MYDEBUG,"GetNbFields() = "<<aNbFields<<"\n");
     for(TInt iField = 1; iField <= aNbFields; iField++){
@@ -160,31 +160,32 @@ namespace MED
       for(TInt iTimeStamp = 1; iTimeStamp <= aNbTimeStamps; iTimeStamp++){
 	PTimeStampInfo aTimeStamp = 
 	  theWrapper.GetPTimeStampInfo(aFieldInfo,anEntity,aGeom2Size,iTimeStamp);
-	aGroup[aFieldInfo].insert(aTimeStamp);
+	aFieldInfo2TimeStampInfoSet[aFieldInfo].insert(aTimeStamp);
 	INITMSG(MYDEBUG,"aDt = "<<aTimeStamp->GetDt()
 		<<", Unit = \'"<<aTimeStamp->GetUnitDt()
 		<<"\', aNbGauss = "<<aTimeStamp->GetNbGauss()<<"\n");
       }
     }
     ADDMSG(MYDEBUG,"\n");
-    return aGroup;
+    return aFieldInfo2TimeStampInfoSet;
   }
   
 
   //---------------------------------------------------------------
-  TFieldGroup 
-  GetFieldsByEntity(const TTimeStampGroup& theTimeStampGroup)
+  TEntite2TFieldInfo2TimeStampInfoSet 
+  GetEntite2TFieldInfo2TimeStampInfoSet(const TFieldInfo2TimeStampInfoSet& theFieldInfo2TimeStampInfoSet)
   {
-    TFieldGroup aGroup;
-    TTimeStampGroup::const_iterator anIter = theTimeStampGroup.begin();
-    for(; anIter != theTimeStampGroup.end(); anIter++){
+    TEntite2TFieldInfo2TimeStampInfoSet anEntite2TFieldInfo2TimeStampInfoSet;
+    TFieldInfo2TimeStampInfoSet::const_iterator anIter = theFieldInfo2TimeStampInfoSet.begin();
+    for(; anIter != theFieldInfo2TimeStampInfoSet.end(); anIter++){
+      const TTimeStampInfoSet& aTimeStampInfoSet = anIter->second;
       //const PFieldInfo& aFieldInfo = anIter->first;
-      const TTimeStampSet& aTimeStampSet = anIter->second;
-      if(aTimeStampSet.empty()) continue;
-      const PTimeStampInfo& aTimeStampInfo = *aTimeStampSet.begin();
-      aGroup[aTimeStampInfo->GetEntity()].insert(*anIter);
+      if(aTimeStampInfoSet.empty()) 
+	continue;
+      const PTimeStampInfo& aTimeStampInfo = *aTimeStampInfoSet.begin();
+      anEntite2TFieldInfo2TimeStampInfoSet[aTimeStampInfo->GetEntity()].insert(*anIter);
     }
-    return aGroup;
+    return anEntite2TFieldInfo2TimeStampInfoSet;
   }
   
 

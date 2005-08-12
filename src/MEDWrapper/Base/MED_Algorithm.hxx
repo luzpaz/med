@@ -81,20 +81,20 @@ namespace MED
   
   
   //---------------------------------------------------------------
-  typedef std::set<PTimeStampInfo> TTimeStampSet;
-  typedef std::map<PFieldInfo,TTimeStampSet> TTimeStampGroup;
+  typedef std::set<PTimeStampInfo> TTimeStampInfoSet;
+  typedef std::map<PFieldInfo,TTimeStampInfoSet> TFieldInfo2TimeStampInfoSet;
 
-  TTimeStampGroup
-  GetFieldsByEntity(TWrapper& theWrapper, 
-		    const PMeshInfo& theMeshInfo,
-		    const MED::TEntityInfo& theEntityInfo);
+  TFieldInfo2TimeStampInfoSet
+  GetFieldInfo2TimeStampInfoSet(TWrapper& theWrapper, 
+				const PMeshInfo& theMeshInfo,
+				const MED::TEntityInfo& theEntityInfo);
   
 
   //---------------------------------------------------------------
-  typedef std::map<EEntiteMaillage,TTimeStampGroup> TFieldGroup;
+  typedef std::map<EEntiteMaillage,TFieldInfo2TimeStampInfoSet> TEntite2TFieldInfo2TimeStampInfoSet;
 
-  TFieldGroup
-  GetFieldsByEntity(const TTimeStampGroup& theTimeStampGroup);
+  TEntite2TFieldInfo2TimeStampInfoSet
+  GetEntite2TFieldInfo2TimeStampInfoSet(const TFieldInfo2TimeStampInfoSet& theFieldInfo2TimeStampInfoSet);
 
 
   //---------------------------------------------------------------
