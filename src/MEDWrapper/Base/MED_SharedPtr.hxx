@@ -50,15 +50,25 @@ namespace MED
     {}
 
     template<class Y>
-    SharedPtr& operator=(SharedPtr<Y> const & r)
+    SharedPtr& 
+    operator=(SharedPtr<Y> const & r)
     {
       boost::shared_ptr<T>(r,boost::detail::dynamic_cast_tag()).swap(*this);
       return *this;
     }
 
-    template<class Y> SharedPtr& operator()(Y * p) // Y must be complete
+    template<class Y> 
+    SharedPtr& 
+    operator()(Y * p) // Y must be complete
     {
       return operator=<Y>(SharedPtr<Y>(p));
+    }
+
+    template<class Y> 
+    SharedPtr& 
+    operator()(SharedPtr<Y> const & r) // Y must be complete
+    {
+      return operator=<Y>(SharedPtr<Y>(r));
     }
 
     operator const T& () const 
