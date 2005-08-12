@@ -39,37 +39,45 @@ namespace MED
   struct TWrapper;
 
   //---------------------------------------------------------------
-  typedef std::map<EGeometrieElement,PElemInfo> TElemMap;
-  typedef std::map<EEntiteMaillage,TElemMap> TElemGroup;
+  typedef std::map<EGeometrieElement,PElemInfo> TGeom2ElemInfo;
+  typedef std::map<EEntiteMaillage,TGeom2ElemInfo> TEntity2TGeom2ElemInfo;
 
-  TElemGroup
-  GetElemsByEntity(TWrapper& theWrapper, 
-		   const PMeshInfo& theMeshInfo,
-		   const MED::TEntityInfo& theEntityInfo);
+  TEntity2TGeom2ElemInfo
+  GetEntity2TGeom2ElemInfo(TWrapper& theWrapper, 
+			   const PMeshInfo& theMeshInfo,
+			   const MED::TEntityInfo& theEntityInfo);
 
 
   //---------------------------------------------------------------
-  typedef std::set<PFamilyInfo> TFamilyGroup;
+  typedef std::set<PFamilyInfo> TFamilyInfoSet;
 
-  TFamilyGroup
-  GetFamilies(TWrapper& theWrapper, 
-	      const PMeshInfo& theMeshInfo);
+  TFamilyInfoSet
+  GetFamilyInfoSet(TWrapper& theWrapper, 
+		   const PMeshInfo& theMeshInfo);
   
 
   //---------------------------------------------------------------
-  typedef std::map<EEntiteMaillage,TFamilyGroup> TFamilyByEntity;
+  typedef boost::tuple<PFamilyInfo,TInt> TFamilyTSize;
+
+  bool
+  operator<(const TFamilyTSize& theLeft, const TFamilyTSize& theRight);
+  typedef std::set<TFamilyTSize> TFamilyTSizeSet;
+
+
+  //---------------------------------------------------------------
+  typedef std::map<EEntiteMaillage,TFamilyTSizeSet> TEntity2FamilySet;
   
-  TFamilyByEntity 
-  GetFamiliesByEntity(TWrapper& theWrapper, 
-		      const TElemGroup& theElemGroup,
-		      const TFamilyGroup& theFamilyGroup);
+  TEntity2FamilySet 
+  GetEntity2FamilySet(TWrapper& theWrapper, 
+		      const TEntity2TGeom2ElemInfo& theEntity2TGeom2ElemInfo,
+		      const TFamilyInfoSet& theFamilyInfoSet);
   
 
   //---------------------------------------------------------------
-  typedef std::map<std::string,TFamilyGroup> TGroupInfo;
+  typedef std::map<std::string,TFamilyInfoSet> TGroupInfo;
   
   TGroupInfo
-  GetFamiliesByGroup(const TFamilyGroup& theGroupInfo);
+  GetGroupInfo(const TFamilyInfoSet& theFamilyInfoSet);
   
   
   //---------------------------------------------------------------
