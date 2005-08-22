@@ -57,7 +57,7 @@ namespace MED{
 #else
   #define MSG(deb,msg)
   #define BEGMSG(deb,msg)
-  #define INITAMSG(deb,lev,msg)
+  #define INITMSGA(deb,lev,msg)
   #define INITMSG(deb,msg)
   #define ADDMSG(deb,msg)
 #endif
