@@ -35,10 +35,6 @@
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_SWIG_Templates.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
   using namespace MEDMEM;
   using namespace MED_EN;
 %}
@@ -67,12 +63,6 @@
   Initialisation block in the case of the debug mode (definition of _DEBUG_
   compilation switch) and due to the LocalTraceCollector mechanism
 */
-
-%init %{
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
-%}
 
 /*
   managing the use of operator= of any class by renaming it assign()
