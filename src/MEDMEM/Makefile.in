@@ -78,6 +78,7 @@ MEDMEM_RCBase.hxx
 LIB=libmedmem.la
 
 LIB_SRC = \
+MEDMEM_Init.cxx \
 MEDMEM_CellModel.cxx \
 MEDMEM_Connectivity.cxx \
 MEDMEM_Coordinate.cxx \
