@@ -36,8 +36,8 @@ class CELLMODEL;
 class FAMILY;
 class GROUP;
 class SUPPORT;
-class MESH : public RCBASE
 
+class MESH : public RCBASE
 {
   //-----------------------//
   //   Attributes
@@ -54,20 +54,20 @@ protected :
   int   _spaceDimension;
   int   _meshDimension;
   int   _numberOfNodes;
-  
-  
+
+
   //////////////////////////////////////////////////////////////////////////////////////
   ///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
   //////////////////////////////////////////////////////////////////////////////////////
   ///
   ///  La map suivante donne le lien numérotation optionnelle => numérotation cannonique
-  ///  Elle  sera calculée apres l'appel de MEDnumLire(...)                                
+  ///  Elle  sera calculée apres l'appel de MEDnumLire(...)
   ///  Et sera utilisée avant chaque appel a MEDconnLire(...) pour renuméroter toutes les mailles de façon canonique [1...n]
   ///  _coordinate->NodeNumber sera utilisé avant chaque appel à MEDconnEcri pour démunéroter les mailles en leur numérotation originelle
   ///  Ce traitement devrait prévenir tout plantage du aux numérotations optionnelles DES NOEUDS
   ///  Et ne ralentira que tres peu les traitements sans numéros optionnels
-  
-  int _arePresentOptionnalNodesNumbers;	
+
+  int _arePresentOptionnalNodesNumbers;
   map<int,int> _optionnalToCanonicNodesNumbers;
 
   vector<FAMILY*> _familyNode;
@@ -186,11 +186,11 @@ public :
 					    MED_EN::medEntityMesh Entity) const ;
   virtual inline int getConnectivityLength(MED_EN::medModeSwitch Mode,
 					     MED_EN::medConnectivity ConnectivityType,
-					     MED_EN::medEntityMesh Entity, 
+					     MED_EN::medEntityMesh Entity,
 					     MED_EN::medGeometryElement Type) const;
   virtual inline const int * getConnectivity(MED_EN::medModeSwitch Mode,
 					     MED_EN::medConnectivity ConnectivityType,
-					     MED_EN::medEntityMesh Entity, 
+					     MED_EN::medEntityMesh Entity,
 					     MED_EN::medGeometryElement Type) const;
   virtual inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
 						  MED_EN::medEntityMesh Entity) const;
@@ -206,9 +206,9 @@ public :
   inline int getNumberOfPolyhedronFaces() const;
   inline int getNumberOfPolyhedron() const;
 
-  virtual int                 getElementNumber(MED_EN::medConnectivity ConnectivityType, 
-                                               MED_EN::medEntityMesh Entity, 
-                                               MED_EN::medGeometryElement Type, 
+  virtual int                 getElementNumber(MED_EN::medConnectivity ConnectivityType,
+                                               MED_EN::medEntityMesh Entity,
+                                               MED_EN::medGeometryElement Type,
                                                int * connectivity) const;
   virtual inline int getReverseConnectivityLength(MED_EN::medConnectivity ConnectivityType,
 						  MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
@@ -226,30 +226,30 @@ public :
   virtual inline const vector<GROUP*>  getGroups(MED_EN::medEntityMesh Entity) const;
   virtual inline const GROUP*          getGroup(MED_EN::medEntityMesh Entity,int i) const;
   virtual inline const CONNECTIVITY* getConnectivityptr() const;
-  virtual SUPPORT *                    getBoundaryElements(MED_EN::medEntityMesh Entity) 
+  virtual SUPPORT *                    getBoundaryElements(MED_EN::medEntityMesh Entity)
 						throw (MEDEXCEPTION);
-  // problème avec le maillage dans le support : 
+  // problème avec le maillage dans le support :
   //            le pointeur n'est pas const, mais sa valeur oui. A voir !!! PG
 
-  SUPPORT *                            getSkin(const SUPPORT * Support3D) 
+  SUPPORT *                            getSkin(const SUPPORT * Support3D)
 						throw (MEDEXCEPTION);
 
   //  Node DonneBarycentre(const Cell &m) const;
-  virtual FIELD<double>* getVolume (const SUPPORT * Support) const 
-				throw (MEDEXCEPTION); 
-				// Support must be on 3D elements
-  virtual FIELD<double>* getArea (const SUPPORT * Support) const 
-				throw (MEDEXCEPTION); 
-				// Support must be on 2D elements
-  virtual FIELD<double>* getLength (const SUPPORT * Support) const 
-				throw (MEDEXCEPTION); 
-				// Support must be on 1D elements
-  virtual FIELD<double>* getNormal (const SUPPORT * Support) const 
-				throw (MEDEXCEPTION); 
-				// Support must be on 2D elements
-  virtual FIELD<double>* getBarycenter (const SUPPORT * Support) const 
+  virtual FIELD<double>* getVolume (const SUPPORT * Support) const
 				throw (MEDEXCEPTION);
-  //  FIELD<int>* getNeighbourhood(SUPPORT * Support) const 
+				// Support must be on 3D elements
+  virtual FIELD<double>* getArea (const SUPPORT * Support) const
+				throw (MEDEXCEPTION);
+				// Support must be on 2D elements
+  virtual FIELD<double>* getLength (const SUPPORT * Support) const
+				throw (MEDEXCEPTION);
+				// Support must be on 1D elements
+  virtual FIELD<double>* getNormal (const SUPPORT * Support) const
+				throw (MEDEXCEPTION);
+				// Support must be on 2D elements
+  virtual FIELD<double>* getBarycenter (const SUPPORT * Support) const
+				throw (MEDEXCEPTION);
+  //  FIELD<int>* getNeighbourhood(SUPPORT * Support) const
   //				throw (MEDEXCEPTION); // Il faut preciser !
 
   /*!
@@ -641,7 +641,7 @@ inline int MESH::getConnectivityLength(MED_EN::medModeSwitch Mode,MED_EN::medCon
 {
   int nbOfElm = getNumberOfElements(entity,Type);
   int size;
-  
+
   if (Type == MED_EN::MED_ALL_ELEMENTS)
     {
       size = getConnectivityIndex(ConnectivityType,entity)[nbOfElm]-1;
@@ -758,7 +758,7 @@ inline int MESH::getReverseConnectivityLength(MED_EN::medConnectivity Connectivi
 {
   int spaceDim = getSpaceDimension();
   int nb;
-  
+
   if (ConnectivityType == MED_EN::MED_NODAL)
     {
       nb = getNumberOfNodes();

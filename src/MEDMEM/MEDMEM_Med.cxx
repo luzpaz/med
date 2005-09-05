@@ -1,4 +1,5 @@
 # include <string> 
+# include <math.h>
 
 # include "MEDMEM_Med.hxx"
 # include "MEDMEM_DriverFactory.hxx" 
@@ -7,6 +8,8 @@
 # include "MEDMEM_Mesh.hxx"
 # include "MEDMEM_Grid.hxx"
 # include "MEDMEM_Field.hxx"
+# include "MEDMEM_Group.hxx"
+# include "MEDMEM_Family.hxx"
 
 # include "MEDMEM_Exception.hxx"
 # include "utilities.h"
@@ -117,6 +120,8 @@ MED::~MED()
   for ( itSupportOnMesh=_support.begin();itSupportOnMesh != _support.end(); itSupportOnMesh++ ) {
     map<MED_EN::medEntityMesh,SUPPORT *>::iterator itSupport ;
     for ( itSupport=(*itSupportOnMesh).second.begin();itSupport!=(*itSupportOnMesh).second.end();itSupport++)
+      if (! dynamic_cast<GROUP*>( (*itSupport).second ) &&
+          ! dynamic_cast<FAMILY*>( (*itSupport).second ) )
 	delete (*itSupport).second ;
   }
 
@@ -490,15 +495,15 @@ void MED::getFieldNames     ( string * fieldNames ) const
   const char * LOC = "MED::getFieldNames ( string * ) const : ";
   BEGIN_OF(LOC);
 
-  unsigned int fieldNamesSize =  sizeof(fieldNames) / sizeof(string *);
+//  unsigned int fieldNamesSize =  sizeof(fieldNames) / sizeof(string *);
  
-  if ( fieldNamesSize != _fields.size() )
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "Size of parameter fieldNames is |" 
-                                     << fieldNamesSize     << "| and should be |" 
-                                     << _fields.size() << "| and should be |" 
-                                     )
-                          );   
+//  if ( fieldNamesSize != _fields.size() )
+//    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+//                                     << "Size of parameter fieldNames is |" 
+//                                     << fieldNamesSize     << "| and should be |" 
+//                                     << _fields.size() << "| and should be |" 
+//                                     )
+//                         );   
   
   // REM : ALLOCATION D'UN TABLEAU DE POINTEURS SUR STRING FAITE PAR LE CLIENT
   map<FIELD_NAME_,MAP_DT_IT_>::const_iterator  currentField;

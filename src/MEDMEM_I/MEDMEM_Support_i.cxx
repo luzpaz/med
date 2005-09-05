@@ -617,7 +617,7 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
     THROW_SALOME_CORBA_EXCEPTION("SObject Mesh in Support not Found",SALOME::INTERNAL_ERROR);
   // perhaps add MESH automatically ?
   
-  MESSAGE("Add a support Object under /Med/MESH/MESHNAME");
+  MESSAGE("Add a support Object under /MED/MESH/MESHNAME");
 
   char * medsupfatherName;
   int lenName = 15 + strlen(meshName.c_str()) + 1;

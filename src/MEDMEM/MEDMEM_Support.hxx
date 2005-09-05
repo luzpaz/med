@@ -6,6 +6,7 @@
 #ifndef SUPPORT_HXX
 #define SUPPORT_HXX
 
+#include <list>
 #include <vector>
 #include <string>
 #include <list>
@@ -21,13 +22,14 @@
 
   This class describe a support of elements on an entity of the mesh.
 
-  It contains the list of meshes elements for an entity (MED_NODE, 
+  It contains the list of meshes elements for an entity (MED_NODE,
   MED_CELL, MED_FACE or MED_EDGE).
 
 */
 
 namespace MEDMEM {
 class MESH ;
+
 class SUPPORT : public RCBASE
 {
 protected:
@@ -98,7 +100,7 @@ protected:
     If true, we consider all entities of type _entity.
     \endif
   */
-  bool                     _isOnAllElts; 
+  bool                     _isOnAllElts;
 
   /*!
     \if developper
@@ -380,7 +382,7 @@ inline void SUPPORT::setNumberOfGaussPoint(const int *NumberOfGaussPoint)
 }
 
 /*!
-  Set the attribute _numberOfElements to NumberOfElements and 
+  Set the attribute _numberOfElements to NumberOfElements and
   calculate the total number of elements.
 */
 //----------------------------------------------------------

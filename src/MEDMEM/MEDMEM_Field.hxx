@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <math.h>
 #include <cmath>
 
 #include "utilities.h"
@@ -91,7 +92,7 @@ protected:
     storing components names if any.
     \endif
   */
-  string * 	  _componentsNames;   	
+  string * 	  _componentsNames;
   /*!
     \if developper
     Array of size _numberOfComponents
@@ -117,7 +118,7 @@ protected:
   double   	  _time;
   int      	  _orderNumber ;
 
-  // _valueType should be a static const. Here is an initialization exemple 
+  // _valueType should be a static const. Here is an initialization exemple
   // template < classType T > struct SET_VALUE_TYPE { static const med_type_champ _valueType = 0; }
   // template < > struct SET_VALUE_TYPE<double> { static const med_type_champ _valueType = MED_EN::MED_REEL64; }
   // template < > struct SET_VALUE_TYPE<int> { static const med_type_champ _valueType = MED_EN::MED_INT32; }
@@ -126,7 +127,7 @@ protected:
 
   vector<GENDRIVER *> _drivers; // Storage of the drivers currently in use
   static void _checkFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true) throw (MEDEXCEPTION);
-  static void _deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true ) throw (MEDEXCEPTION);
+  static void _deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true) throw (MEDEXCEPTION);
   void _checkNormCompatibility(const FIELD<double>* p_field_volume=NULL) const  throw (MEDEXCEPTION);
   FIELD<double>* _getFieldSize() const;
 
@@ -343,7 +344,7 @@ inline string FIELD_::getComponentName(int i) const
 /*!
   Set FIELD components descriptions.
 
-  Duplicate the ComponentsDescriptions string array to put components 
+  Duplicate the ComponentsDescriptions string array to put components
   descriptions in FIELD.
   ComponentsDescriptions size must be equal to number of components.
 */
@@ -384,7 +385,7 @@ inline string FIELD_::getComponentDescription(int i) const
   \todo
   Set FIELD components UNIT.
 
-  Duplicate the ComponentsUnits UNIT array to put components 
+  Duplicate the ComponentsUnits UNIT array to put components
   units in FIELD.
   ComponentsUnits size must be equal to number of components.
 */
@@ -414,10 +415,10 @@ inline const UNIT * FIELD_::getComponentUnit(int i) const
 /*!
   Set FIELD components unit.
 
-  Duplicate the MEDComponentsUnits string array to put components 
+  Duplicate the MEDComponentsUnits string array to put components
   units in FIELD.
   MEDComponentsUnits size must be equal to number of components.
-  
+
 */
 inline void FIELD_::setMEDComponentsUnits(const string * MEDComponentsUnits)
 {
@@ -509,7 +510,12 @@ inline  const SUPPORT * FIELD_::getSupport() const
 */
 inline void FIELD_::setSupport(const SUPPORT * support)
 {
+  //A.G. Addings for RC
+  if(_support)
+    _support->removeReference();
   _support = support ;
+  if(_support)
+    _support->addReference();
 }
 /*!
   Get the FIELD med value type (MED_INT32 or MED_REEL64).
@@ -546,7 +552,7 @@ namespace MEDMEM {
   template<class T2> class MED_FIELD_RDONLY_DRIVER22;
   template<class T2> class MED_FIELD_WRONLY_DRIVER22;
   template<class T2> class VTK_FIELD_DRIVER;
-  
+
 template <class T> class FIELD : public FIELD_
 {
 protected:
@@ -554,8 +560,10 @@ protected:
 
   // array of value of type T
   MEDARRAY<T> *_value ;
+
   static T _scalarForPow;
   static T pow(T x);
+
 private:
   void _operation(const FIELD& m,const FIELD& n, const MED_EN::medModeSwitch mode, char* Op);
   void _operationInitialize(const FIELD& m,const FIELD& n, char* Op);
@@ -798,7 +806,7 @@ template <class T> FIELD<T> & FIELD<T>::operator=(const FIELD &m)
      - _componentsTypes
      - _MEDComponentsUnits.
 
-     The data members of the returned field are initialized, based on the first field, except for the name, 
+     The data members of the returned field are initialized, based on the first field, except for the name,
      which is the combination of the two field's names and the operator.
      Advised Utilisation in C++ : <tt> FIELD<T> c = a + b; </tt> \n
      In this case, the (recent) compilators perform optimisation and don't call the copy constructor.
@@ -820,7 +828,7 @@ const FIELD<T> FIELD<T>::operator+(const FIELD & m) const
 	mode=m.getvalue()->getMode();
     else
 	mode=this->getvalue()->getMode();
-    
+
     // Creation of the result - memory is allocated by FIELD constructor
     FIELD<T> result(this->getSupport(),this->getNumberOfComponents(),mode);
     //result._operation(*this,m,mode,"+"); // perform Atribute's initialization & addition
@@ -875,7 +883,7 @@ FIELD<T>* FIELD<T>::add(const FIELD& m, const FIELD& n)
 	mode=m.getvalue()->getMode();
     else
 	mode=n.getvalue()->getMode();
-    
+
     // Creation of a new field
     FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
     result->_operationInitialize(m,n,"+"); // perform Atribute's initialization
@@ -899,7 +907,7 @@ FIELD<T>* FIELD<T>::addDeep(const FIELD& m, const FIELD& n)
 	mode=m.getvalue()->getMode();
     else
 	mode=n.getvalue()->getMode();
-    
+
     // Creation of a new field
     FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
     result->_operationInitialize(m,n,"+"); // perform Atribute's initialization
@@ -919,7 +927,7 @@ FIELD<T>* FIELD<T>::addDeep(const FIELD& m, const FIELD& n)
      - _componentsTypes
      - _MEDComponentsUnits.
 
-     The data members of the returned field are initialized, based on the first field, except for the name, 
+     The data members of the returned field are initialized, based on the first field, except for the name,
      which is the combination of the two field's names and the operator.
      Advised Utilisation in C++ : <tt> FIELD<T> c = a - b; </tt> \n
      In this case, the (recent) compilators perform optimisation and don't call the copy constructor.
@@ -940,7 +948,7 @@ const FIELD<T> FIELD<T>::operator-(const FIELD & m) const
 	mode=m.getvalue()->getMode();
     else
 	mode=this->getvalue()->getMode();
-    
+
     // Creation of the result - memory is allocated by FIELD constructor
     FIELD<T> result(this->getSupport(),this->getNumberOfComponents(),mode);
     //result._operation(*this,m,mode,"-"); // perform Atribute's initialization & substraction
@@ -959,7 +967,7 @@ const FIELD<T> FIELD<T>::operator-() const
     MED_EN::medModeSwitch mode=this->getvalue()->getMode();
     // Creation of the result - memory is allocated by FIELD constructor
     FIELD<T> result(this->getSupport(),this->getNumberOfComponents(),mode);
-    // Atribute's initialization 
+    // Atribute's initialization
     result.setName("- "+getName());
     result.setComponentsNames(getComponentsNames());
     // not yet implemented    setComponentType(getComponentType());
@@ -971,7 +979,7 @@ const FIELD<T> FIELD<T>::operator-() const
     result.setOrderNumber(getOrderNumber());
     result.setValueType(getValueType());
 
-    const T* value1=getValue(mode); 
+    const T* value1=getValue(mode);
     // get a non const pointer to the inside array of values and perform operation
     T * value=const_cast<T *> (result.getValue(mode));
     const int size=getNumberOfValues()*getNumberOfComponents(); // size of array
@@ -1028,7 +1036,7 @@ FIELD<T>* FIELD<T>::sub(const FIELD& m, const FIELD& n)
 	mode=m.getvalue()->getMode();
     else
 	mode=n.getvalue()->getMode();
-    
+
     // Creation of a new field
     FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
     result->_operationInitialize(m,n,"-"); // perform Atribute's initialization
@@ -1052,7 +1060,7 @@ FIELD<T>* FIELD<T>::subDeep(const FIELD& m, const FIELD& n)
 	mode=m.getvalue()->getMode();
     else
 	mode=n.getvalue()->getMode();
-    
+
     // Creation of a new field
     FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
     result->_operationInitialize(m,n,"-"); // perform Atribute's initialization
@@ -1072,7 +1080,7 @@ FIELD<T>* FIELD<T>::subDeep(const FIELD& m, const FIELD& n)
      - _componentsTypes
      - _MEDComponentsUnits.
 
-     The data members of the returned field are initialized, based on the first field, except for the name, 
+     The data members of the returned field are initialized, based on the first field, except for the name,
      which is the combination of the two field's names and the operator.
      Advised Utilisation in C++ : <tt> FIELD<T> c = a * b; </tt> \n
      In this case, the (recent) compilators perform optimisation and don't call the copy constructor.
@@ -1094,7 +1102,7 @@ const FIELD<T> FIELD<T>::operator*(const FIELD & m) const
 	mode=m.getvalue()->getMode();
     else
 	mode=this->getvalue()->getMode();
-    
+
     // Creation of the result - memory is allocated by FIELD constructor
     FIELD<T> result(this->getSupport(),this->getNumberOfComponents(),mode);
     //result._operation(*this,m,mode,"*"); // perform Atribute's initialization & multiplication
@@ -1150,7 +1158,7 @@ FIELD<T>* FIELD<T>::mul(const FIELD& m, const FIELD& n)
 	mode=m.getvalue()->getMode();
     else
 	mode=n.getvalue()->getMode();
-    
+
     // Creation of a new field
     FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
     result->_operationInitialize(m,n,"*"); // perform Atribute's initialization
@@ -1174,7 +1182,7 @@ FIELD<T>* FIELD<T>::mulDeep(const FIELD& m, const FIELD& n)
 	mode=m.getvalue()->getMode();
     else
 	mode=n.getvalue()->getMode();
-    
+
     // Creation of a new field
     FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
     result->_operationInitialize(m,n,"*"); // perform Atribute's initialization
@@ -1194,7 +1202,7 @@ FIELD<T>* FIELD<T>::mulDeep(const FIELD& m, const FIELD& n)
      - _componentsTypes
      - _MEDComponentsUnits.
 
-     The data members of the returned field are initialized, based on the first field, except for the name, 
+     The data members of the returned field are initialized, based on the first field, except for the name,
      which is the combination of the two field's names and the operator.
      Advised Utilisation in C++ : <tt> FIELD<T> c = a / b; </tt> \n
      In this case, the (recent) compilators perform optimisation and don't call the copy constructor.
@@ -1216,7 +1224,7 @@ const FIELD<T> FIELD<T>::operator/(const FIELD & m) const
 	mode=m.getvalue()->getMode();
     else
 	mode=this->getvalue()->getMode();
-    
+
     // Creation of the result - memory is allocated by FIELD constructor
     FIELD<T> result(this->getSupport(),this->getNumberOfComponents(),mode);
     //result._operation(*this,m,mode,"/"); // perform Atribute's initialization & division
@@ -1273,7 +1281,7 @@ FIELD<T>* FIELD<T>::div(const FIELD& m, const FIELD& n)
 	mode=m.getvalue()->getMode();
     else
 	mode=n.getvalue()->getMode();
-    
+
     // Creation of a new field
     FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
     result->_operationInitialize(m,n,"/"); // perform Atribute's initialization
@@ -1297,7 +1305,7 @@ FIELD<T>* FIELD<T>::divDeep(const FIELD& m, const FIELD& n)
     mode=m.getvalue()->getMode();
   else
     mode=n.getvalue()->getMode();
-    
+
   // Creation of a new field
   FIELD<T>* result = new FIELD<T>(m.getSupport(),m.getNumberOfComponents(),mode);
   result->_operationInitialize(m,n,"/"); // perform Atribute's initialization
@@ -1329,7 +1337,12 @@ void FIELD<T>::_operationInitialize(const FIELD& m,const FIELD& n, char* Op)
 
     // The following data member may differ from field m to n.
     // The initialization is done based on the first field.
-    setComponentsUnits(m.getComponentsUnits());
+
+    if(m.getComponentsUnits() != NULL)
+      setComponentsUnits(m.getComponentsUnits());
+    else
+      _componentsUnits = (UNIT *) NULL;
+
     setIterationNumber(m.getIterationNumber());
     setTime(m.getTime());
     setOrderNumber(m.getOrderNumber());
@@ -1341,7 +1354,7 @@ void FIELD<T>::_operationInitialize(const FIELD& m,const FIELD& n, char* Op)
   \if developper
   Internal method called by FIELD<T>::operator+ and FIELD<T>::add to perform addition "in place".
   This method is applied to a just created field with medModeSwitch mode.
-  For this reason, the alternate mode doesn't need to be set to 0 after performing operation : 
+  For this reason, the alternate mode doesn't need to be set to 0 after performing operation :
   it doesn't exist!
   \endif
 */
@@ -1365,7 +1378,7 @@ void FIELD<T>::_add_in_place(const FIELD& m,const FIELD& n, const MED_EN::medMod
   \if developper
   Internal method called by FIELD<T>::operator- and FIELD<T>::sub to perform substraction "in place".
   This method is applied to a just created field with medModeSwitch mode.
-  For this reason, the alternate mode doesn't need to be set to 0 after performing operation : 
+  For this reason, the alternate mode doesn't need to be set to 0 after performing operation :
   it doesn't exist!
   \endif
 */
@@ -1389,7 +1402,7 @@ void FIELD<T>::_sub_in_place(const FIELD& m,const FIELD& n, const MED_EN::medMod
   \if developper
   Internal method called by FIELD<T>::operator* and FIELD<T>::mul to perform multiplication "in place".
   This method is applied to a just created field with medModeSwitch mode.
-  For this reason, the alternate mode doesn't need to be set to 0 after performing operation : 
+  For this reason, the alternate mode doesn't need to be set to 0 after performing operation :
   it doesn't exist!
   \endif
 */
@@ -1413,7 +1426,7 @@ void FIELD<T>::_mul_in_place(const FIELD& m,const FIELD& n, const MED_EN::medMod
   \if developper
   Internal method called by FIELD<T>::operator/ and FIELD<T>::div to perform division "in place".
   This method is applied to a just created field with medModeSwitch mode.
-  For this reason, the alternate mode doesn't need to be set to 0 after performing operation : 
+  For this reason, the alternate mode doesn't need to be set to 0 after performing operation :
   it doesn't exist!
   \endif
 */
@@ -1439,7 +1452,7 @@ void FIELD<T>::_div_in_place(const FIELD& m,const FIELD& n, const MED_EN::medMod
     }
 }
 
-/*!  Return Max Norm 
+/*!  Return Max Norm
  */
 template <class T> double FIELD<T>::normMax() const throw (MEDEXCEPTION)
 {
@@ -1471,7 +1484,7 @@ template <class T> double FIELD<T>::normMax() const throw (MEDEXCEPTION)
     return Max>Min ? static_cast<double>(Max) : static_cast<double>(Min);
 }
 
-/*!  Return Euclidien norm 
+/*!  Return Euclidien norm
  */
 template <class T> double FIELD<T>::norm2() const throw (MEDEXCEPTION)
 {
@@ -1485,25 +1498,25 @@ template <class T> double FIELD<T>::norm2() const throw (MEDEXCEPTION)
 	throw MEDEXCEPTION(diagnosis.c_str());
     }
     const T* lastvalue=value+size; // point just after last value
-    
+
     T result((T)0); // init
     for( ; value!=lastvalue ; ++value)
 	result += (*value) * (*value);
-    
+
     return std::sqrt(static_cast<double> (result));
 }
 
 
-/*!  Apply to each (scalar) field component the template parameter T_function, 
+/*!  Apply to each (scalar) field component the template parameter T_function,
  *   which is a pointer to function.
  *   Since the pointer is known at compile time, the function is inlined into the inner loop!
  *   calculation is done "in place".
- *   Use examples : 
- *   
+ *   Use examples :
+ *
  *   \code  myField.applyFunc<std::sqrt>();  // apply sqare root function \endcode
  *     \code myField.applyFunc<myFunction>(); // apply your own created function \endcode
  */
-template <class T> template <T T_function(T)> 
+template <class T> template <T T_function(T)>
 void FIELD<T>::applyFunc()
 {
     MED_EN::medModeSwitch mode=getvalue()->getMode();
@@ -1529,8 +1542,8 @@ template <class T> T FIELD<T>::pow(T x)
 
 /*!  Apply to each (scalar) field component the math function pow.
  *   calculation is done "in place".
- *   Use examples : 
- *   
+ *   Use examples :
+ *
  *   \code  myField.applyFunc<std::sqrt>();  // apply sqare root function \endcode
  *     \code myField.applyFunc<myFunction>(); // apply your own created function \endcode
  */
@@ -1539,7 +1552,7 @@ template <class T> void FIELD<T>::applyPow(T scalar)
   FIELD<T>::_scalarForPow=scalar;
   applyFunc<FIELD<T>::pow>();
 }
-  
+
 /*!  Apply to each (scalar) field component the linear function x -> ax+b.
  *   calculation is done "in place".
  */
@@ -1578,12 +1591,13 @@ template <class T> void FIELD<T>::applyLin(T a, T b)
  */
 template <class T> FIELD<T>* FIELD<T>::scalarProduct(const FIELD & m, const FIELD & n, bool deepCheck)
 {
-  if(!deepCheck)
-    FIELD_::_checkFieldCompatibility( m, n, false); // may throw exception
-  else
-    FIELD_::_deepCheckFieldCompatibility(m, n, false);
-  // we need a MED_FULL_INTERLACE representation of m & n to compute the scalar product
-    const MED_EN::medModeSwitch mode=MED_EN::MED_FULL_INTERLACE; 
+    if(!deepCheck)
+      FIELD_::_checkFieldCompatibility( m, n, false); // may throw exception
+    else
+      FIELD_::_deepCheckFieldCompatibility(m, n, false);
+
+    // we need a MED_FULL_INTERLACE representation of m & n to compute the scalar product
+    const MED_EN::medModeSwitch mode=MED_EN::MED_FULL_INTERLACE;
 
     const int numberOfElements=m.getNumberOfValues(); // strictly positive
     const int NumberOfComponents=m.getNumberOfComponents(); // strictly positive
@@ -1600,7 +1614,7 @@ template <class T> FIELD<T>* FIELD<T>::scalarProduct(const FIELD & m, const FIEL
     const T* value2=n.getValue(mode); // get const pointer to the values
     // get a non const pointer to the inside array of values and perform operation
     T * value=const_cast<T *> (result->getValue(mode));
-    
+
     const T* lastvalue=value+numberOfElements; // pointing just after last value of result
     for ( ; value!=lastvalue ; ++value ) // loop on all elements
     {
@@ -1627,13 +1641,13 @@ template <class T> double FIELD<T>::normL2(int component, const FIELD<double> * 
 	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE); 
+    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE);
     const T* value=getValueI( MED_EN::MED_NO_INTERLACE, component); // get pointer to the component's values
     const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
 
     double integrale=0.0;
     double totVol=0.0;
-    for (; value!=lastvalue ; ++value ,++vol) 
+    for (; value!=lastvalue ; ++value ,++vol)
     {
 	integrale += static_cast<double>((*value) * (*value)) * (*vol);
 	totVol+=*vol;
@@ -1659,7 +1673,7 @@ template <class T> double FIELD<T>::normL2(const FIELD<double> * p_field_volume)
 	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE); 
+    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE);
     const double* lastvol=vol+getNumberOfValues(); // pointing just after the end of vol
     const T* value=getValue( MED_EN::MED_NO_INTERLACE); // get pointer to the field's values
 
@@ -1667,10 +1681,10 @@ template <class T> double FIELD<T>::normL2(const FIELD<double> * p_field_volume)
     const double* p_vol=vol;
     for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
 	totVol+=*p_vol;
-    
+
     double integrale=0.0;
     for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
-	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) 
+	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
 	    integrale += static_cast<double>((*value) * (*value)) * (*p_vol);
 
     if(!p_field_volume) // if the user didn't supply the volume
@@ -1696,13 +1710,13 @@ template <class T> double FIELD<T>::normL1(int component, const FIELD<double> * 
 	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE); 
+    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE);
     const T* value=getValueI( MED_EN::MED_NO_INTERLACE, component); // get pointer to the component's values
     const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
 
     double integrale=0.0;
     double totVol=0.0;
-    for (; value!=lastvalue ; ++value ,++vol) 
+    for (; value!=lastvalue ; ++value ,++vol)
     {
 	integrale += std::abs( static_cast<double>(*value) ) * (*vol);
 	totVol+=*vol;
@@ -1728,7 +1742,7 @@ template <class T> double FIELD<T>::normL1(const FIELD<double> * p_field_volume)
 	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE); 
+    const double* vol=p_field_size->getValue(MED_EN::MED_FULL_INTERLACE);
     const double* lastvol=vol+getNumberOfValues(); // pointing just after the end of vol
     const T* value=getValue( MED_EN::MED_NO_INTERLACE); // get pointer to the field's values
 
@@ -1736,10 +1750,10 @@ template <class T> double FIELD<T>::normL1(const FIELD<double> * p_field_volume)
     const double* p_vol=vol;
     for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
 	totVol+=*p_vol;
-    
+
     double integrale=0.0;
     for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
-	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) 
+	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
 	    integrale += std::abs( static_cast<double>(*value) ) * (*p_vol);
 
     if(!p_field_volume) // if the user didn't supply the volume
@@ -1804,6 +1818,9 @@ template <class T> FIELD<T>::FIELD(const SUPPORT * Support,
   init();
 
   _support = Support;
+  //A.G. Addings for RC
+  if(_support)
+    _support->addReference();
   _value = (MEDARRAY<T>*)NULL;
 
   _iterationNumber = iterationNumber;
@@ -1856,7 +1873,7 @@ template <class T> FIELD<T>::~FIELD()
 }
 
 /*!
-  
+
 */
 template <class T> void FIELD<T>::allocValue(const int NumberOfComponents)
 {
@@ -1896,7 +1913,7 @@ template <class T> void FIELD<T>::allocValue(const int NumberOfComponents)
 }
 
 /*!
-  
+
 */
 template <class T> void FIELD<T>::allocValue(const int NumberOfComponents, const int LengthValue)
 {
@@ -1927,7 +1944,7 @@ template <class T> void FIELD<T>::allocValue(const int NumberOfComponents, const
 }
 
 /*!
-  
+
 */
 template <class T> void FIELD<T>::deallocValue()
 {
@@ -1945,7 +1962,7 @@ template <class T> void FIELD<T>::deallocValue()
 // -----------------
 
 /*!
-  Create the specified driver and return its index reference to path to 
+  Create the specified driver and return its index reference to path to
   read or write methods.
 */
 
@@ -1954,7 +1971,8 @@ template <class T> int FIELD<T>::addDriver(driverTypes driverType,
 					   const string & driverName/*="Default Field Name"*/,
 					   MED_EN::med_mode_acces access)
 {
-  const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name,MED_EN::med_mode_acces access) : ";
+  //jfa tmp (as last argument has no default value):const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name\",MED_EN::med_mode_acces access) : ";
+  const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName,const string & driverName,MED_EN::med_mode_acces access) :";//jfa tmp
 
   GENDRIVER * driver;
 
@@ -1977,7 +1995,7 @@ template <class T> int FIELD<T>::addDriver(driverTypes driverType,
 
 
 /*!
-  Duplicate the given driver and return its index reference to path to 
+  Duplicate the given driver and return its index reference to path to
   read or write methods.
 */
 template <class T> inline int FIELD<T>::addDriver (GENDRIVER & driver )
@@ -1994,7 +2012,7 @@ template <class T> inline int FIELD<T>::addDriver (GENDRIVER & driver )
 
   current = _drivers.size()-1;
   SCRUTE(current);
-  driver.setId(current); 
+  driver.setId(current);
 
   MESSAGE(LOC << " je suis la 1");
   END_OF(LOC);
@@ -2213,7 +2231,7 @@ template <class T> inline void FIELD<T>::setValue(MEDARRAY<T> *Value)
 /*!
   \if developper
   Return a reference to  the MEDARRAY<T> in FIELD.
-  \endif  
+  \endif
 */
 template <class T> inline MEDARRAY<T>* FIELD<T>::getvalue() const
 {
@@ -2394,11 +2412,11 @@ template <class T> void FIELD<T>::getBarycenter() const throw (MEDEXCEPTION)
 }
 
 /*!
-  Fill array by using T_Analytic. 
+  Fill array by using T_Analytic.
   WARNING : "this" must have allocated its array by setting this->_support and this->_numberOfComponents properly.
   Typically you should use it on a field built with constructor FIELD<T>::FIELD<T>(SUPPORT *,int nbOfComponents)
  */
-template <class T> 
+template <class T>
 template<void T_Analytic(const double *,T*)>
 void FIELD<T>::fillFromAnalytic()
 {
@@ -2415,7 +2433,7 @@ void FIELD<T>::fillFromAnalytic()
 	{
 	  coord=mesh->getCoordinates(MED_EN::MED_NO_INTERLACE);
 	  for(i=0; i<spaceDim; i++)
-	    xyz[i]=(double *)coord+i*_numberOfValues;  
+	    xyz[i]=(double *)coord+i*_numberOfValues;
 	}
       else
 	{

@@ -29,14 +29,14 @@ protected:
   string         _fieldName;
   int            _fieldNum;
   void search_field() ;
-  
+
 public :
 
-  // all MED cell type ?? Classe de Définition ??
+  // all MED cell type ?? Classe de DÃ©finition ??
   //   static const medGeometryElement all_cell_type[MED_NBR_GEOMETRIE_MAILLE];
-  
+
   //   static const char * const all_cell_type_tab [MED_NBR_GEOMETRIE_MAILLE];
-  
+
   /*!
     Constructor.
   */
@@ -46,10 +46,10 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField, 
+  MED_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField,
 		   MED_EN::med_mode_acces accessMode)
     : GENDRIVER(fileName,accessMode),
-      _ptrField((FIELD<T> *) ptrField), 
+      _ptrField((FIELD<T> *) ptrField),
       _fieldName(fileName),_fieldNum(MED_INVALID)
   {
   }
@@ -69,7 +69,7 @@ public :
     Destructor.
   */
   virtual ~MED_FIELD_DRIVER()
-  { 
+  {
     MESSAGE("MED_FIELD_DRIVER::~MED_FIELD_DRIVER() has been destroyed");
   }
 
@@ -86,7 +86,7 @@ public :
   /*!
     Get the name of the FIELD asked in file.
   */
-  virtual string getFieldName() const { return _fieldName; } 
+  virtual string getFieldName() const { return _fieldName; }
 protected:
   virtual GENDRIVER * copy ( void ) const = 0 ;
   friend class MED_FIELD_RDWR_DRIVER<T>;
@@ -104,29 +104,29 @@ protected:
 
 template <class T> class IMED_FIELD_RDONLY_DRIVER : public virtual MED_FIELD_DRIVER<T>
 {
- 
+
 public :
-  
+
   /*!
     Constructor.
   */
   IMED_FIELD_RDONLY_DRIVER() {}
-  
+
   /*!
     Constructor.
   */
   IMED_FIELD_RDONLY_DRIVER(const string & fileName,  FIELD<T> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY) { 
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY) {
     BEGIN_OF("IMED_FIELD_RDONLY_DRIVER::IMED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
     END_OF("IMED_FIELD_RDONLY_DRIVER::IMED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
   }
-  
+
   /*!
     Copy constructor.
   */
   IMED_FIELD_RDONLY_DRIVER(const IMED_FIELD_RDONLY_DRIVER & fieldDriver):
     MED_FIELD_DRIVER<T>(fieldDriver) {}
-  
+
   /*!
     Destructor.
   */
@@ -151,14 +151,14 @@ public :
 */
 
 template <class T> class IMED_FIELD_WRONLY_DRIVER : public virtual MED_FIELD_DRIVER<T> {
-  
+
 public :
-  
+
   /*!
     Constructor.
   */
   IMED_FIELD_WRONLY_DRIVER() {}
-  
+
   /*!
     Constructor.
   */
@@ -174,7 +174,7 @@ public :
   */
   IMED_FIELD_WRONLY_DRIVER(const IMED_FIELD_WRONLY_DRIVER & fieldDriver):
     MED_FIELD_DRIVER<T>(fieldDriver) {}
-  
+
   /*!
     Destructor.
   */
@@ -197,14 +197,14 @@ public :
 */
 
 template <class T> class IMED_FIELD_RDWR_DRIVER : public virtual IMED_FIELD_RDONLY_DRIVER<T>, public virtual IMED_FIELD_WRONLY_DRIVER<T> {
-  
+
 public :
-  
+
   /*!
     Constructor.
   */
   IMED_FIELD_RDWR_DRIVER() {}
-  
+
   /*!
     Constructor.
   */
@@ -221,7 +221,7 @@ public :
   */
   IMED_FIELD_RDWR_DRIVER(const IMED_FIELD_RDWR_DRIVER & fieldDriver):
     IMED_FIELD_RDONLY_DRIVER<T>(fieldDriver),IMED_FIELD_WRONLY_DRIVER<T>(fieldDriver),MED_FIELD_DRIVER<T>(fieldDriver) {}
-  
+
   /*!
     Destructor.
   */
@@ -236,7 +236,7 @@ namespace MEDMEM {
 
 template <class T> class MED_FIELD_RDONLY_DRIVER : public virtual IMED_FIELD_RDONLY_DRIVER<T>
 {
- 
+
 public :
   MED_FIELD_RDONLY_DRIVER();
   MED_FIELD_RDONLY_DRIVER(const string & fileName,  FIELD<T> * ptrField);
@@ -255,7 +255,7 @@ protected:
   GENDRIVER * _concreteFieldDrv;
 };
 
-template <class T> class MED_FIELD_WRONLY_DRIVER : public virtual IMED_FIELD_WRONLY_DRIVER<T> { 
+template <class T> class MED_FIELD_WRONLY_DRIVER : public virtual IMED_FIELD_WRONLY_DRIVER<T> {
 public :
   MED_FIELD_WRONLY_DRIVER();
   MED_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField);
@@ -306,15 +306,15 @@ protected:
 
 // template <class T> void MED_FIELD_DRIVER<T>::setFieldName(const string & fieldName)
 // {
-//   _fieldName = fieldName; 
+//   _fieldName = fieldName;
 // }
 
 // template <class T> string  MED_FIELD_DRIVER<T>::getFieldName() const
 // {
 //   return _fieldName;
 // }
-  
-#include "MEDMEM_DriverFactory.hxx" 
+
+#include "MEDMEM_DriverFactory.hxx"
 #include "MEDMEM_MedFieldDriver21.hxx"
 #include "MEDMEM_MedFieldDriver22.hxx"
 
@@ -330,11 +330,11 @@ template <class T> void IMED_FIELD_RDONLY_DRIVER<T>::write( void ) const
 
 template <class T>  MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER() {
     MESSAGE("You are using the default constructor of the Field read only Driver and it is 2.1 one");
-    _concreteFieldDrv=new MED_FIELD_RDONLY_DRIVER21<T>(); 
+    _concreteFieldDrv=new MED_FIELD_RDONLY_DRIVER21<T>();
 }
 
 template <class T>  MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER(const string & fileName, FIELD<T> * ptrField)
-  {
+{
     BEGIN_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
 
     _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::MED_LECT);
@@ -387,4 +387,3 @@ template <class T>  MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER(const string
 /*-----------------------------------------------------------------*/
 
 #endif /* MED_FIELD_DRIVER_HXX */
-

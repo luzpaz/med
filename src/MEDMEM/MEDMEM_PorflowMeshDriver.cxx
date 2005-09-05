@@ -203,7 +203,8 @@ inline static medGeometryElement get2DMedGeomType(int nbSommets)
 	case 4:
 	    return MED_QUAD4;
 	    break;
-    } 
+    }
+    return MED_NONE;
 }
 
 // helper function to read a porflow file name (enclosed in single or double quotes) in line

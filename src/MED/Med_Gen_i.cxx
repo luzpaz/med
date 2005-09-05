@@ -1,23 +1,23 @@
 //  MED MED : implemetation of MED idl descriptions
 //
 //  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org
 //
 //
 //
@@ -85,8 +85,8 @@ Med_Gen_i::Med_Gen_i()
 
 Med_Gen_i:: Med_Gen_i(CORBA::ORB_ptr orb,
 				PortableServer::POA_ptr poa,
-				PortableServer::ObjectId * contId, 
-				const char *instanceName, 
+				PortableServer::ObjectId * contId,
+				const char *instanceName,
 				const char *interfaceName) :
   Engines_Component_i(orb, poa, contId, instanceName, interfaceName)
 {
@@ -116,14 +116,14 @@ SALOMEDS::Study_var Med_Gen_i::studyName2Study(const char* studyName)
                                  SALOME::BAD_PARAM);
 
   // Get StudyManager Reference, current study,
-  
+
   CORBA::Object_var obj = _NS->Resolve("/myStudyManager");
   SALOMEDS::StudyManager_var myStudyManager =
     SALOMEDS::StudyManager::_narrow(obj);
   if(CORBA::is_nil(myStudyManager))
     THROW_SALOME_CORBA_EXCEPTION("No StudyManager Found in NameService", \
                                  SALOME::BAD_PARAM);
-  
+
   SALOMEDS::Study_var myStudy =
     myStudyManager->GetStudyByName(myStudyName.c_str());
   if (CORBA::is_nil(myStudy))
@@ -143,7 +143,6 @@ void Med_Gen_i::addInStudy(SALOMEDS::Study_var myStudy)
   throw(SALOME::SALOME_Exception)
 {
   SALOMEDS::StudyBuilder_var  myBuilder = myStudy->NewBuilder();
-  
   // Create SComponent labelled 'Med' if it doesn't already exit
   SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
   if ( CORBA::is_nil(medfather) )
@@ -152,7 +151,7 @@ void Med_Gen_i::addInStudy(SALOMEDS::Study_var myStudy)
       // mpv: component label must be created in spite of "Locked" study flag state
       bool aLocked = myStudy->GetProperties()->IsLocked();
       if (aLocked) myStudy->GetProperties()->SetLocked(false);
-      
+
       MESSAGE("Add Component Med");
       medfather = myBuilder->NewComponent("MED");
       SALOMEDS::GenericAttribute_var anAttr = myBuilder->FindOrCreateAttribute(medfather, "AttributeName");
@@ -164,18 +163,18 @@ void Med_Gen_i::addInStudy(SALOMEDS::Study_var myStudy)
       SALOME_ModuleCatalog::Acomponent_var Comp = Catalogue->GetComponent( "MED" );
       if ( !Comp->_is_nil() ) {
 	aName->SetValue( Comp->componentusername() );
-      }    
-      
+      }
+
       //	    Utilisation de this  deconseillee par Paul ??
       //	    myBuilder->DefineComponentInstance(medfather,POA_Engines::MED_Gen::_this());
       CORBA::Object_var myO = _poa->id_to_reference(*_id); // this ior...
       myBuilder->DefineComponentInstance(medfather,myO);
-      
+
       if (aLocked) myStudy->GetProperties()->SetLocked(true);
       myBuilder->CommitCommand();
-    } 
-  
-   
+    }
+
+
 }
 
 //=============================================================================
@@ -194,13 +193,13 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
 //         if (!_duringLoad) addInStudy(myStudy) ;
 
 	SALOME_MED::MED_ptr myMedIOR ;
-	try 
+	try
 	{
 	  // we create a new MED_i and add in study
 	  MED_i * myMedI = new MED_i();
 	  myMedIOR = myMedI->_this() ;
 // 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR) ;
-// 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ; 	  
+// 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ;
 	  // create ::MED object, read all and add in study !
 	  myMedI->init(myStudy,MED_DRIVER,fileName) ;
 	}
@@ -232,15 +231,14 @@ throw (SALOME::SALOME_Exception)
 
 	SCRUTE(fileName);
   	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
-
 	if (!_duringLoad) addInStudy(myStudy) ;
 
-	try 
+	try
 	{
 	  // we create a new MED_i and add in study
 	  MED_i * myMedI = new MED_i();
 	  SALOME_MED::MED_ptr myMedIOR = myMedI->_this() ;
-	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ;	  
+	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ;
 	  // create ::MED object, read all and add in study !
 	  myMedI->initWithFieldType(myStudy,MED_DRIVER,fileName) ;
 	}
@@ -337,7 +335,7 @@ throw (SALOME::SALOME_Exception)
                                  SALOME::BAD_PARAM);
 
 	// Get StudyManager Reference, current study,
-	
+
 	CORBA::Object_var obj = _NS->Resolve("/myStudyManager");
   	SALOMEDS::StudyManager_var myStudyManager =
     			SALOMEDS::StudyManager::_narrow(obj);
@@ -367,8 +365,8 @@ throw (SALOME::SALOME_Exception)
 		SALOME_ModuleCatalog::Acomponent_var Comp = Catalogue->GetComponent( "MED" );
 		if ( !Comp->_is_nil() ) {
 		  aName->SetValue( Comp->componentusername() );
-		}    
-	
+		}
+
                 CORBA::Object_var myO = _poa->id_to_reference(*_id); // this ior...
                 myBuilder->DefineComponentInstance(medfather,myO);
 
@@ -416,7 +414,7 @@ throw (SALOME::SALOME_Exception)
                 SCRUTE(ex.what());
                 THROW_SALOME_CORBA_EXCEPTION("Unable to find this field in this file",SALOME::BAD_PARAM);
         };
-	                
+
 	SUPPORT * fieldSupport;
         try
 	{
@@ -436,11 +434,11 @@ throw (SALOME::SALOME_Exception)
         };
 
 	med_type_champ type = myField->getValueType() ;
-	switch (type) 
+	switch (type)
 	{
-      	 case MED_EN::MED_INT32: 	
+      	 case MED_EN::MED_INT32:
 	 {
-		try 
+		try
 		{
 			((FIELD<int>*)myField)->read() ;
 			FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
@@ -458,9 +456,9 @@ throw (SALOME::SALOME_Exception)
         	};
 		break;
 	 }
-	 case MED_EN::MED_REEL64: 
+	 case MED_EN::MED_REEL64:
 	 {
-		try 
+		try
 		{
 			((FIELD<double>*)myField)->read() ;
 			FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
@@ -480,7 +478,7 @@ throw (SALOME::SALOME_Exception)
 	 }
 	}
 
-	
+
 }
 
 
@@ -543,7 +541,7 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
   SALOMEDS::SObject_var aMedFieldFather = theComponent->GetStudy()->FindObject("MEDFIELD");
   if (!CORBA::is_nil(aMedFieldFather)) {
     SALOMEDS::ChildIterator_var anIter = theComponent->GetStudy()->NewChildIterator(aMedFieldFather);
-    anIter->InitEx(1);  
+    anIter->InitEx(1);
     for(; anIter->More(); anIter->Next()) {
       SALOMEDS::SObject_var aSO = anIter->Value();
       SALOMEDS::GenericAttribute_var anAttr;
@@ -581,7 +579,7 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
   if (!isMultiFile) SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.ToCString(), aSeq.in(), true);
   // Return the created byte stream
   return aStreamFile._retn();
-  
+
   END_OF(LOC);
 }
 
@@ -590,21 +588,21 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
 					bool isMultiFile) {
   const char* LOC = "Med_Gen_i::SaveASCII";
   BEGIN_OF(LOC);
-  
+
   SALOMEDS::TMPFile_var aStreamFile;
   // Get a temporary directory to store a file
   TCollection_AsciiString aTmpDir = (isMultiFile)?TCollection_AsciiString((char*)theURL):(char*)SALOMEDS_Tool::GetTmpDir().c_str();
   // Create a list to store names of created files
   SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
   TColStd_SequenceOfAsciiString aFileNames;
-  
+
   CORBA::String_var aSaveStudyName("");
   if (isMultiFile) aSaveStudyName = CORBA::string_dup(SALOMEDS_Tool::GetNameFromPath(theComponent->GetStudy()->URL()).c_str());
-  
+
   SALOMEDS::SObject_var aMedMeshFather = theComponent->GetStudy()->FindObject("MEDMESH");
   if (!CORBA::is_nil(aMedMeshFather)) {
     SALOMEDS::ChildIterator_var anIter = theComponent->GetStudy()->NewChildIterator(aMedMeshFather);
-    anIter->InitEx(1); 
+    anIter->InitEx(1);
     for(; anIter->More(); anIter->Next()) {
       SALOMEDS::SObject_var aSO = anIter->Value();
       SALOMEDS::GenericAttribute_var anAttr;
@@ -629,7 +627,7 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
   SALOMEDS::SObject_var aMedFieldFather = theComponent->GetStudy()->FindObject("MEDFIELD");
   if (!CORBA::is_nil(aMedFieldFather)) {
     SALOMEDS::ChildIterator_var anIter = theComponent->GetStudy()->NewChildIterator(aMedFieldFather);
-    anIter->InitEx(1);  
+    anIter->InitEx(1);
     for(; anIter->More(); anIter->Next()) {
       SALOMEDS::SObject_var aSO = anIter->Value();
       SALOMEDS::GenericAttribute_var anAttr;
@@ -701,7 +699,7 @@ CORBA::Boolean Med_Gen_i::LoadASCII(SALOMEDS::SComponent_ptr theComponent,
 
 //=============================================================================
 /*!
- *  CORBA: 
+ *  CORBA:
  */
 //=============================================================================
 
@@ -734,10 +732,10 @@ char* Med_Gen_i::ComponentDataType()
   MESSAGE("Med_Gen_i::ComponentDataType");
   return CORBA::string_dup("MED") ; /* What is this type ? */
 }
-    
+
 //=============================================================================
 /*!
- *  CORBA: give a persistent reference of a transient object (for study save) 
+ *  CORBA: give a persistent reference of a transient object (for study save)
  */
 //=============================================================================
 
@@ -757,24 +755,24 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
 
   // MED
   SALOME_MED::MED_var myMed = SALOME_MED::MED::_narrow(myIOR);
-  if (! CORBA::is_nil(myMed)) 
+  if (! CORBA::is_nil(myMed))
   {
         // nothing to save : Support will be saved inside the mesh
 	string str_MedName="_MED Objet Med + /OBJ_MED/";
-        return CORBA::string_dup(str_MedName.c_str()) ; 
+        return CORBA::string_dup(str_MedName.c_str()) ;
   }
- 
+
   // MESH
   SALOME_MED::MESH_var myMesh = SALOME_MED::MESH::_narrow(myIOR);
-  if (! CORBA::is_nil(myMesh)) 
+  if (! CORBA::is_nil(myMesh))
   {
     CORBA::String_var aName((string("_MEDMESH_")+ myMesh->getName() + ".med").c_str());
     return aName._retn() ;
   }
-    
+
   // SUPPORT
   SALOME_MED::SUPPORT_var mySupport = SALOME_MED::SUPPORT::_narrow(myIOR);
-  if (! CORBA::is_nil(mySupport)) 
+  if (! CORBA::is_nil(mySupport))
   {
         // nothing to save : Support will be saved inside the mesh
 	string str_SupportName;
@@ -792,9 +790,9 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
 	}
     return CORBA::string_dup(("_MED"+str_SupportName).c_str());
   }
-    
+
   SALOME_MED::FIELD_var myField = SALOME_MED::FIELD::_narrow(myIOR);
-  if (! CORBA::is_nil(myField)) 
+  if (! CORBA::is_nil(myField))
   {
     string str_FieldName;
     ostringstream a,b;
@@ -936,7 +934,7 @@ SALOMEDS::SObject_ptr Med_Gen_i::PublishInStudy(SALOMEDS::Study_ptr theStudy,
     SALOME_ModuleCatalog::Acomponent_var Comp = Catalogue->GetComponent( "MED" );
     if ( !Comp->_is_nil() ) {
       aName->SetValue( Comp->componentusername() );
-    }    
+    }
     aBuilder->DefineComponentInstance(aFather, MED_Gen::_this());
   }
 
@@ -945,7 +943,7 @@ SALOMEDS::SObject_ptr Med_Gen_i::PublishInStudy(SALOMEDS::Study_ptr theStudy,
     aMesh->addInStudy(theStudy, aMesh);
     SALOMEDS::SObject_var aResultSO = theStudy->FindObjectIOR(_orb->object_to_string(theObject));
   } else {
-    if (!theSObject->ReferencedObject(aResultSO)) 
+    if (!theSObject->ReferencedObject(aResultSO))
       THROW_SALOME_CORBA_EXCEPTION("Publish in study MED object error",SALOME::BAD_PARAM);
   }
 //    aBuilder->Addreference(theObject, aResultSO);
@@ -1000,17 +998,17 @@ SALOMEDS::TMPFile* Med_Gen_i::CopyFrom(SALOMEDS::SObject_ptr theObject, CORBA::L
   strcpy(aFullName+strlen(aTmpDir), aSeq[0]);
   long driverId = aMesh->addDriver(SALOME_MED::MED_DRIVER,aFullName , aMesh->getName());
   aMesh->write(driverId,"");
-  
+
   //  aStreamFile = SALOMEDS_Tool::PutFilesToStream(aTmpDir.c_str(), aSeq.in(), false);
   char* aFullName1 = new char[strlen(aTmpDir)+1];
   strcpy(aFullName1, aTmpDir);
   aStreamFile = SALOMEDS_Tool::PutFilesToStream(aFullName1, aSeq.in(), false);
   //  SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq.in(), true);
   SALOMEDS_Tool::RemoveTemporaryFiles(aFullName1, aSeq.in(), true);
-  
+
   // Assign an ID = 1 the the type SALOME_MED::MESH
   theObjectID = 1;
- 
+
   return aStreamFile._retn();
 }
 
@@ -1036,7 +1034,7 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
 					   SALOMEDS::SObject_ptr theObject) {
   SALOMEDS::SObject_var aResultSO = SALOMEDS::SObject::_duplicate(theObject);
   if (theStream.length() == 0) return aResultSO._retn();
-  
+
   SALOMEDS::Study_var aStudy = theObject->GetStudy();
 
   CORBA::String_var aTmpDir = CORBA::string_dup(SALOMEDS_Tool::GetTmpDir().c_str());
@@ -1099,8 +1097,8 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
 
 
 //=============================================================================
-/*! 
- * C factory, accessible with dlsym, after dlopen  
+/*!
+ * C factory, accessible with dlsym, after dlopen
  */
 //=============================================================================
 
@@ -1108,14 +1106,14 @@ extern "C"
 {
   PortableServer::ObjectId * MEDEngine_factory(
 			       CORBA::ORB_ptr orb,
-			       PortableServer::POA_ptr poa, 
+			       PortableServer::POA_ptr poa,
 			       PortableServer::ObjectId * contId,
-			       const char *instanceName, 
+			       const char *instanceName,
 		       	       const char *interfaceName)
   {
     MESSAGE("PortableServer::ObjectId * MedEngine_factory()");
     SCRUTE(interfaceName);
-    Med_Gen_i * myMed_Gen 
+    Med_Gen_i * myMed_Gen
       = new Med_Gen_i(orb, poa, contId, instanceName, interfaceName);
     return myMed_Gen->getId() ;
   }

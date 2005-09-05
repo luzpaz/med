@@ -31,11 +31,11 @@ struct LT_DT_IT_
       return  p1.dt < p2.dt ;
   }
 };
-typedef map<DT_IT_, FIELD_*, LT_DT_IT_ > MAP_DT_IT_; 
+typedef map<DT_IT_, FIELD_*, LT_DT_IT_ > MAP_DT_IT_;
 
-// - IN THE FIRST CASE THE USER WANTS TO DISCOVER MESHES & FIELD_S 
+// - IN THE FIRST CASE THE USER WANTS TO DISCOVER MESHES & FIELD_S
 //   CONTAINNED WITHIN A FILE <fileName> OF TYPE GIVEN BY THE  <driverType> PARAMETER
-// - IN THE SECOND CASE THE USER BEGINS HIS WORK WITH A MESH OR A FIELD, 
+// - IN THE SECOND CASE THE USER BEGINS HIS WORK WITH A MESH OR A FIELD,
 //   ?? GET A MED POINTER THEN CAN ADD MESHes OR FIELDs ??
 //
 
@@ -58,13 +58,13 @@ class MED
 
 private:
 
-  map<MESH_NAME_,MESH*>        _meshes;     // We can't have two MESHes with the same meshName.  
+  map<MESH_NAME_,MESH*>        _meshes;     // We can't have two MESHes with the same meshName.
                                             // The string key is a meshName.
 
-  map<FIELD_NAME_,MAP_DT_IT_>  _fields;     // We can't have two FIELD_s with the same fieldName. 
- 
-  map<FIELD_ *, MESH_NAME_>    _meshName;   // Get the meshName associated with a FIELD_ * 
-                                            // in order to get the MESH* from _meshes 
+  map<FIELD_NAME_,MAP_DT_IT_>  _fields;     // We can't have two FIELD_s with the same fieldName.
+
+  map<FIELD_ *, MESH_NAME_>    _meshName;   // Get the meshName associated with a FIELD_ *
+                                            // in order to get the MESH* from _meshes
 
   // POURQUOI MED_FR::med_entite_maillage ? devrait être MED_EN !
   map < MESH_NAME_, map < MED_EN::medEntityMesh, SUPPORT * > > _support ;
@@ -77,10 +77,10 @@ public:
   MED();
   MED (driverTypes driverType, const string & fileName); // Analyse the file <fileName> by calling readFileStruct
   ~MED();
-  
+
   // INUTILE : void addMesh  (const string & meshName  ); // Read the mesh <meshName> found in the file <_fileName>. <_fileName> must be set.
   // INUTILE : void addField (const string & fieldName ); // Pensez au cas ou on ajoute un Field/Mesh avec un driver déjà existant.
-  
+
   void addField ( FIELD_  * const ptrField  ) throw (MED_EXCEPTION) ;
   void addMesh  ( MESH    * const ptrMesh   ) throw (MED_EXCEPTION) ;
   int  addDriver     (driverTypes driverType,
@@ -91,13 +91,13 @@ public:
 
   void readFileStruct(int index=0) throw (MEDEXCEPTION) ;
   void read          (int index=0) throw (MEDEXCEPTION) ;
-  void writeFrom     (int index=0) throw (MEDEXCEPTION) ; 
-  void write         (int index=0) throw (MEDEXCEPTION) ; 
-  
+  void writeFrom     (int index=0) throw (MEDEXCEPTION) ;
+  void write         (int index=0) throw (MEDEXCEPTION) ;
+
   // ------ End Of Drivers Management Part
 
-  int        getNumberOfMeshes ( void ) const;       
-  int        getNumberOfFields ( void ) const;       
+  int        getNumberOfMeshes ( void ) const;
+  int        getNumberOfFields ( void ) const;
   void       getMeshNames      ( string * meshNames ) const throw (MEDEXCEPTION) ;
   deque<string> getMeshNames   () const;
   MESH     * getMesh           ( const string & meshName ) const throw (MEDEXCEPTION) ;
@@ -118,7 +118,7 @@ public:
   void       updateSupport () ;
 
   // GERER LE CAS DE L'APPARITION DES MEMES NOMS DS DES FICHIERS <> !!!!!
- 
+
   //friend ostream & operator<<(ostream &os,const MED & med);
 
 };

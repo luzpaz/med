@@ -32,17 +32,17 @@ using namespace MED_EN;
 
 /*! Add a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. The meshname used in the file
     is  driverName. addDriver returns an integer handler. */
-int MESH::addDriver(driverTypes driverType, 
+int MESH::addDriver(driverTypes driverType,
                     const string & fileName/*="Default File Name.med"*/,
 		    const string & driverName/*="Default Mesh Name"*/,
 		    med_mode_acces access) {
 
   const char * LOC = "MESH::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Mesh Name\",MED_EN::med_mode_acces access) : ";
-  
+
   GENDRIVER * driver;
 
   BEGIN_OF(LOC);
-  
+
   SCRUTE(driverType);
 
   driver = DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,
@@ -51,8 +51,8 @@ int MESH::addDriver(driverTypes driverType,
   _drivers.push_back(driver);
 
   int current = _drivers.size()-1;
-  
-  _drivers[current]->setMeshName(driverName);  
+
+  _drivers[current]->setMeshName(driverName);
 
   END_OF(LOC);
 
@@ -64,7 +64,7 @@ int  MESH::addDriver(GENDRIVER & driver) {
   const char * LOC = "MESH::addDriver(GENDRIVER &) : ";
   BEGIN_OF(LOC);
 
-  // A faire : Vérifier que le driver est de type MESH.
+  // A faire : VÃ©rifier que le driver est de type MESH.
   GENDRIVER * newDriver = driver.copy() ;
 
   _drivers.push_back(newDriver);
@@ -79,20 +79,20 @@ void MESH::rmDriver (int index/*=0*/) {
   BEGIN_OF(LOC);
 
   if ( _drivers[index] ) {
-    //_drivers.erase(&_drivers[index]); 
+    //_drivers.erase(&_drivers[index]);
     // why not ????
     MESSAGE ("detruire");
   }
   else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "The index given is invalid, index must be between  0 and  |" 
-                                     << _drivers.size() 
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
+                                     << "The index given is invalid, index must be between  0 and  |"
+                                     << _drivers.size()
                                      )
-                          );   
-  
+                          );
+
   END_OF(LOC);
 
-}; 
+};
 
 // ------ End of Drivers Management Part
 
@@ -113,7 +113,7 @@ void MESH::init() {
   _numberOfNodes         =          MED_INVALID;
 
   _isAGrid = false;
- 
+
   _arePresentOptionnalNodesNumbers = 0;
 
   END_OF(LOC);
@@ -335,20 +335,20 @@ bool MESH::operator==(const MESH& other) const
   return this==&other;
 }
 
-/*! Create a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. 
+/*! Create a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName.
   The meshname driverName must already exists in the file.*/
 MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION)
 {
   const char * LOC ="MESH::MESH(driverTypes driverType, const string &  fileName="", const string &  driverName="") : ";
   int current;
-  
+
   BEGIN_OF(LOC);
 
   init();
   GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,MED_LECT);
   current = addDriver(*myDriver);
   delete myDriver;
-  _drivers[current]->open();   
+  _drivers[current]->open();
   _drivers[current]->read();
   _drivers[current]->close();
 
@@ -384,9 +384,9 @@ ostream & ::MEDMEM::operator<<(ostream &os, const MESH &myMesh)
   int meshdimension  = myMesh.getMeshDimension();
   int numberofnodes  = myMesh.getNumberOfNodes();
 
-  os << "Space Dimension : " << spacedimension << endl << endl; 
+  os << "Space Dimension : " << spacedimension << endl << endl;
 
-  os << "Mesh Dimension : " << meshdimension << endl << endl; 
+  os << "Mesh Dimension : " << meshdimension << endl << endl;
 
   const double * coordinates = myMesh.getCoordinates(MED_FULL_INTERLACE);
   os << "SHOW NODES COORDINATES : " << endl;
@@ -425,7 +425,7 @@ ostream & ::MEDMEM::operator<<(ostream &os, const MESH &myMesh)
       int numberoffamilies = myMesh.getNumberOfFamilies(entity);
       os << "NumberOfFamilies on "<< entNames[entity] <<" : "<<numberoffamilies<<endl;
       using namespace MED_EN;
-      for (int i=1; i<numberoffamilies+1;i++) 
+      for (int i=1; i<numberoffamilies+1;i++)
 	{
 	  os << * myMesh.getFamily(entity,i) << endl;
 	}
@@ -461,14 +461,14 @@ int MESH::getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entit
 {
   const char* LOC="MESH::getElementNumber " ;
   BEGIN_OF(LOC) ;
-  
+
   int numberOfValue ; // size of connectivity array
   CELLMODEL myType(Type) ;
   if (ConnectivityType==MED_DESCENDING)
     numberOfValue = myType.getNumberOfConstituents(1) ; // faces (3D) or edges (2D)
   else
     numberOfValue = myType.getNumberOfNodes() ; // nodes
-  
+
   const int * myReverseConnectivityValue = getReverseConnectivity(ConnectivityType,Entity) ;
   const int * myReverseConnectivityIndex = getReverseConnectivityIndex(ConnectivityType,Entity) ;
 
@@ -479,12 +479,12 @@ int MESH::getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entit
   // list to put cells numbers
   list<int> cellsList ;
   list<int>::iterator itList ;
-  for (int i=indexBegin; i<indexEnd; i++) 
+  for (int i=indexBegin; i<indexEnd; i++)
     cellsList.push_back(myReverseConnectivityValue[i-1]) ;
-  
+
   // Foreach node or face/edge in cell, we search cells which are in common.
   // At the end, we must have only one !
-  
+
   for (int i=1; i<numberOfValue; i++) {
     int connectivity_i = connectivity[i] ;
     for (itList=cellsList.begin();itList!=cellsList.end();itList++) {
@@ -501,7 +501,7 @@ int MESH::getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entit
       }
     }
   }
-  
+
   if (cellsList.size()>1) // we have more than one cell
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Found more than one element !")) ;
 
@@ -515,10 +515,10 @@ int MESH::getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entit
 
 /*!
   Return a support which reference all elements on the boundary of mesh.
-  
+
   For instance, we could get only face in 3D and edge in 2D.
 */
-SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)  
+SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getBoundaryElements : " ;
@@ -526,7 +526,7 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   // some test :
   // actually we could only get face (in 3D) and edge (in 2D)
   medEntityMesh entityToParse=Entity;
-  if(_spaceDimension == 3) 
+  if(_spaceDimension == 3)
     if (Entity != MED_FACE)
       if(Entity==MED_NODE)
 	entityToParse=MED_FACE;
@@ -538,7 +538,7 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
 	entityToParse=MED_EDGE;
       else
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
-  
+
   const int * myConnectivityValue = getReverseConnectivity(MED_DESCENDING) ;
   const int * myConnectivityIndex = getReverseConnectivityIndex(MED_DESCENDING) ;
   int numberOf = getNumberOfElementsWithPoly(entityToParse,MED_ALL_ELEMENTS) ;
@@ -547,8 +547,8 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   for (int i=0 ; i<numberOf; i++)
     if (myConnectivityValue[myConnectivityIndex[i]] == 0) {
       myElementsList.push_back(i+1);
-
     }
+
   if(Entity==MED_NODE)
     return buildSupportOnNodeFromElementList(myElementsList,entityToParse);
   else
@@ -591,7 +591,7 @@ SUPPORT *MESH::buildSupportOnNodeFromElementList(const list<int>& listOfElt,MED_
 }
 
 /*!
-  Method created to factorize code. This method creates a new support on entity 'entity' (to deallocate) containing all the entities contained in 
+  Method created to factorize code. This method creates a new support on entity 'entity' (to deallocate) containing all the entities contained in
   elements 'listOfElt' of entity 'entity'.
  */
 SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION)
@@ -604,7 +604,7 @@ SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt,
   return mySupport ;
 }
 
-FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTION)
+FIELD<double>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getVolume(SUPPORT*) : ";
   BEGIN_OF(LOC);
@@ -669,7 +669,7 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
 	      const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
 	      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
-	  
+
 	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
 		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
 		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
@@ -812,7 +812,7 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
 		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
 			delete [] pts1[iFaces];
 		    delete [] pts1;
-		    volume->setIJ(index,1,xvolume) ;    
+		    volume->setIJ(index,1,xvolume) ;
 		    index++;
 		  }
 	      }
@@ -823,7 +823,7 @@ FIELD<double>* MESH::getVolume(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	  break;
 	}
 
-      if (!onAll && type!=MED_EN::MED_POLYHEDRA) 
+      if (!onAll && type!=MED_EN::MED_POLYHEDRA)
 	delete [] global_connectivity ;
     }
 
@@ -890,17 +890,17 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
       nb_entity_type = Support->getNumberOfElements(type);
       const int *global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
       if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
-	{ 
+	{
 	  if (onAll)
 	    {
 	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
 	    }
 	  else
-	    {  
+	    {
 	      const int * supp_number = Support->getNumber(type);
 	      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
 	      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
-	  
+
 	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
 		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
 		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[global_connectivityIndex[supp_number[k_type]-1]+j_ent-1];
@@ -938,7 +938,7 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 		int N2 = global_connectivity[quad_index+1]-1;
 		int N3 = global_connectivity[quad_index+2]-1;
 		int N4 = global_connectivity[quad_index+3]-1;
-		
+
 		area[index]=CalculateAreaForQuad(coord+dim_space*N1,
 						   coord+dim_space*N2,
 						   coord+dim_space*N3,
@@ -988,7 +988,7 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 	  break;
 	}
 
-      if (!onAll) 
+      if (!onAll)
 	if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
 	  delete [] global_connectivity ;
     }
@@ -1155,7 +1155,7 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
     {
       medGeometryElement type = types[i] ;
       nb_entity_type = Support->getNumberOfElements(type);
-      
+
       // Make sure we trying to get Normals on
       // TRIA3 or TRIA6 or QUAD4 QUAD8 (2D) cells on a 3D mesh
       // or on SEG2 or SEG3 (1D) cells on a 2D mesh
@@ -1172,18 +1172,18 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
 	    }
 	  else
-	    {  
+	    {
 	      const int * supp_number = Support->getNumber(type);
 	      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
 	      const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
 	      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
-	      
+
 	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
 		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
 		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
 		}
 	      }
-	      
+
 	      global_connectivity = global_connectivity_tmp ;
 	    }
 	}
@@ -1284,7 +1284,7 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Normals on it !"));
 	  break;
 	}
-      if (!onAll && type!=MED_EN::MED_POLYGON) 
+      if (!onAll && type!=MED_EN::MED_POLYGON)
 	delete [] global_connectivity ;
     }
   END_OF(LOC);
@@ -1598,42 +1598,42 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
   return Barycenter;
 }
 
-bool MESH::isEmpty() const 
+bool MESH::isEmpty() const
 {
     bool notempty = _name != "NOT DEFINED"                || _coordinate != NULL           || _connectivity != NULL ||
-	         _spaceDimension !=MED_INVALID || _meshDimension !=MED_INVALID  || 
-		 _numberOfNodes !=MED_INVALID  || _groupNode.size() != 0   || 
-		 _familyNode.size() != 0       || _groupCell.size() != 0   || 
-		 _familyCell.size() != 0       || _groupFace.size() != 0   || 
-		 _familyFace.size() != 0       || _groupEdge.size() != 0   || 
+	         _spaceDimension !=MED_INVALID || _meshDimension !=MED_INVALID  ||
+		 _numberOfNodes !=MED_INVALID  || _groupNode.size() != 0   ||
+		 _familyNode.size() != 0       || _groupCell.size() != 0   ||
+		 _familyCell.size() != 0       || _groupFace.size() != 0   ||
+		 _familyFace.size() != 0       || _groupEdge.size() != 0   ||
 		 _familyEdge.size() != 0       || _isAGrid != 0 ;
     return !notempty;
 }
 
-void MESH::read(int index)  
-{ 
+void MESH::read(int index)
+{
   const char * LOC = "MESH::read(int index=0) : ";
   BEGIN_OF(LOC);
 
   if (_drivers[index]) {
-    _drivers[index]->open();   
-    _drivers[index]->read(); 
-    _drivers[index]->close(); 
+    _drivers[index]->open();
+    _drivers[index]->read();
+    _drivers[index]->close();
   }
   else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "The index given is invalid, index must be between  0 and |" 
-                                     << _drivers.size() 
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
+                                     << "The index given is invalid, index must be between  0 and |"
+                                     << _drivers.size()
                                      )
                           );
   END_OF(LOC);
 }
 //=======================================================================
 //function : getSkin
-//purpose  : 
+//purpose  :
 //=======================================================================
 
-SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION) 
+SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getSkin : " ;
   BEGIN_OF(LOC) ;
@@ -1642,11 +1642,11 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     throw MEDEXCEPTION(STRING(LOC) <<  "no compatibility between *this and SUPPORT::_mesh !");
   if (_meshDimension != 3 || Support3D->getEntity() != MED_CELL)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Defined on 3D cells only"));
-  
+
   // well, all rigth !
   SUPPORT * mySupport = new SUPPORT(this,"Skin",MED_FACE);
   mySupport->setAll(false);
-  
+
   list<int> myElementsList ;
   int i,j, size = 0 ;
 
@@ -1670,7 +1670,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   else
   {
     map<int,int> FaceNbEncounterNb;
-    
+
     int * myConnectivityValue = const_cast <int *>
       (getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING,
 		       MED_CELL, MED_ALL_ELEMENTS));
@@ -1701,7 +1701,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
         myElementsList.push_back( (*FaceNbEncounterNbItr).first) ;
         size++ ;
       }
-  }   
+  }
   // Well, we must know how many geometric type we have found
   int * myListArray = new int[size] ;
   int id = 0 ;
@@ -1784,7 +1784,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 
   END_OF(LOC) ;
   return mySupport ;
- 
+
 }
 
 /*!
@@ -1977,7 +1977,6 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEX
 		strlen((Supports[i]->getDescription()).c_str());
 	    }
 	}
-
       if(returnedSupport != (SUPPORT *) NULL)
 	{
 	  returnedSupportNameChar = new char[lenName];
@@ -2050,7 +2049,7 @@ struct _cell
 };
 
 // Create families from groups
-void MESH::createFamilies() 
+void MESH::createFamilies()
 {
     int idFamNode = 0; // identifier for node families
     int idFamElement = 0; // identifier for cell, face or edge families
@@ -2061,7 +2060,7 @@ void MESH::createFamilies()
 	int numberofgroups = getNumberOfGroups(entity);
 	if(!numberofgroups)
 	    continue; // no groups for this entity
-	
+
 	vector< vector<FAMILY*> > whichFamilyInGroup(numberofgroups); // this container is used to update groups at the end
 
 	// make myFamilies points to the member corresponding to entity
@@ -2081,10 +2080,10 @@ void MESH::createFamilies()
 		myFamilies = & _familyNode;
 		break;
 	}
-	
+
 	vector<GROUP*> myGroups=getGroups(entity); // get a copy of the groups ptr for the entity
 	// get a copy of the (old) family ptrs before clearing
-	vector<FAMILY*> myOldFamilies=getFamilies(entity); 
+	vector<FAMILY*> myOldFamilies=getFamilies(entity);
 	myFamilies->clear();
 
 
@@ -2102,9 +2101,9 @@ void MESH::createFamilies()
 	    for(int n=index[t]-1; n!=index[t+1]-1; ++n)
 		tab_cell[n].geometricType=geometricTypes[t];
 
-	
+
 	// 2 - Scan cells in groups and update in tab_cell the container of groups a cell belong to
-	
+
 	for (unsigned g=0; g!=myGroups.size(); ++g)
 	{
 	    // scan cells that belongs to the group
@@ -2115,9 +2114,9 @@ void MESH::createFamilies()
 	}
 
 
-	// 3 - Scan the cells vector, genarate family name, and create a map associating the family names 
+	// 3 - Scan the cells vector, genarate family name, and create a map associating the family names
 	//     whith the vector of contained cells
-	
+
 	map< string,vector<int> > tab_families;
 	map< string,vector<int> >::iterator fam;
 	for(int n=0; n!=numberOfCells; ++n)
@@ -2126,7 +2125,7 @@ void MESH::createFamilies()
 	    key << "FAM";
 	    if(tab_cell[n].groups.empty()) // this cell don't belong to any group
 		key << "_NONE" << entity;
-	    
+
 	    for(vector<int>::const_iterator it=tab_cell[n].groups.begin(); it!=tab_cell[n].groups.end(); ++it)
 	    {
 		string groupName=myGroups[*it]->getName();
@@ -2135,13 +2134,13 @@ void MESH::createFamilies()
 		else
 		    key << "_" << groupName;
 	    }
-	    
+
 	    tab_families[key.str()].push_back(n+1); // fill the vector of contained cells associated whith the family
 	}
 
 
 	// 4 - Scan the family map, create MED Families, check if it already exist.
-	
+
 	for( fam=tab_families.begin(); fam!=tab_families.end(); ++fam)
 	{
 	    vector<medGeometryElement> tab_types_geometriques;
@@ -2150,9 +2149,9 @@ void MESH::createFamilies()
 	    vector<int> tab_nombres_elements;
 
 	    // scan family cells and fill the tab that are needed by the create a MED FAMILY
-	    for( int i=0; i!=fam->second.size(); ++i) 
+	    for( int i=0; i!=fam->second.size(); ++i)
 	    {
-		int ncell=fam->second[i]-1; 
+		int ncell=fam->second[i]-1;
 		if(tab_cell[ncell].geometricType != geometrictype)
 		{
 		    // new geometric type -> we store it and complete index tabs

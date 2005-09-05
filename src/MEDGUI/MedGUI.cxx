@@ -96,7 +96,7 @@ void MedGUI::createPopupItem( const int id,
 
   QChar lc = QtxPopupMgr::Selection::defEquality();
   QString rule = "(%1)";
-  if( !types.isEmpty() ) 
+  if( !types.isEmpty() )
     rule += " and (%2) and (%3)";
 
   rule = rule.arg( QString( "client in {%1}" ).arg( clients ) );
@@ -134,7 +134,7 @@ void MedGUI::createMedAction( const int id, const QString& po_id, const QString&
 void MedGUI::initialize( CAM_Application* app )
 {
   SalomeApp_Module::initialize( app );
-  
+
   QWidget* parent = application()->desktop();
 
   createMedAction( 931, "MESHSEL" );
@@ -426,24 +426,20 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 //		medgen->readStructFile(file.latin1(),myStudyName);
 		medgen->readStructFileWithFieldType(file.latin1(),myStudyName);
 
-
 		MESSAGE("Ouais on est la !!!!");
 
 		if (myActiveStudy->studyDS()->GetProperties()->IsLocked()) {
 
-
-		MESSAGE("Ouais on est la 1 !!!!");
-
+		  MESSAGE("Ouais on est la 1 !!!!");
 
 		  SUIT_MessageBox::warn1 (application()->desktop(),
-					 QObject::tr("WRN_WARNING"), 
-					 QObject::tr("WRN_STUDY_LOCKED"),
-					 QObject::tr("BUT_OK"));
+                                          QObject::tr("WRN_WARNING"),
+                                          QObject::tr("WRN_STUDY_LOCKED"),
+                                          QObject::tr("BUT_OK"));
 		}
 	      }
 	    catch (const SALOME::SALOME_Exception & S_ex)
 	      {
-
 		MESSAGE("Ouais on est la 2 !!!!");
 
 		SalomeApp_Tools::QtCatchCorbaException(S_ex);
@@ -585,10 +581,13 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 		      }
 		  }
 	      }
-	  } 
+	  }
 	break;
       }
     }
+
+  app->updateActions(); //SRN: To update a Save button in the toolbar
+
   return true;
 }
 
@@ -781,7 +780,7 @@ bool MedGUI::DumpSubMesh( SALOME_MED::FAMILY_var Fam )
 
   SALOME_MED::long_array_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
   for (int l=0;l<tabnoeuds->length();l++)
-    SCRUTE(tabnoeuds[l]); 
+    SCRUTE(tabnoeuds[l]);
 
   return true;
 }

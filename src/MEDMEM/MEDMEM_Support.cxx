@@ -34,7 +34,7 @@ SUPPORT::SUPPORT(): _name(""),	_description("None"), _mesh((MESH*)NULL),
 //--------------------------------------------------------------------------
 {
     MESSAGE("SUPPORT::SUPPORT()");
-}; 
+};
 
 /*!
   Constructor.
@@ -45,7 +45,7 @@ SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL
 		_numberOfGeometricType(0),
 		_geometricType((medGeometryElement*)NULL),
 		_numberOfGaussPoint((int*)NULL),
-		_isOnAllElts(true), 
+		_isOnAllElts(true),
 		_numberOfElements((int*)NULL),
 		_totalNumberOfElements(0),
 		_number((MEDSKYLINEARRAY*)NULL)
@@ -106,7 +106,7 @@ SUPPORT::SUPPORT(const SUPPORT & m)
   Destructor.
 */
 //-----------------
-SUPPORT::~SUPPORT() 
+SUPPORT::~SUPPORT()
 //-----------------
 {
   MESSAGE("Destructeur ~SUPPORT()");
@@ -145,13 +145,13 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
     }
   } else
     os << "Is on all entities !"<< endl;
-  
+
   return os ;
 }
 
 /*!
   Updade the SUPPORT attributs with rigth MESH information.
-  
+
   It has an effect only if SUPPORT is on all elements.
 
   No more need in future release.
@@ -251,7 +251,7 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
 void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
 			 int TotalNumberOfElements,
 			 medGeometryElement *GeometricType,
-			 int *NumberOfElements, int *NumberValue) 
+			 int *NumberOfElements, int *NumberValue)
 //-------------------
 {
   const char * LOC = "SUPPORT::setpartial(string , int , int , medGeometryElement * , int * , int *) : " ;
@@ -284,7 +284,7 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
     _numberOfGaussPoint[i] = 1 ;
     index[i+1] = index[i]+NumberOfElements[i] ;
   }
-  
+
   if (_number!=NULL) delete _number ;
   _number = new MEDSKYLINEARRAY(_numberOfGeometricType,_totalNumberOfElements,index,NumberValue);
 
@@ -314,7 +314,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   if (spaceDimension == 3)
     if (_entity != MED_FACE)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<_entity<<" !"));
-  if (spaceDimension == 2) 
+  if (spaceDimension == 2)
     if (_entity != MED_EDGE)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<_entity<<" !"));
 
@@ -437,7 +437,6 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
 */
 //-------------------
 void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
-//-------------------
 {
   const char * LOC="SUPPORT::intersecting(SUPPORT *) : ";
   BEGIN_OF(LOC);
@@ -867,13 +866,13 @@ SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) cons
   BEGIN_OF(LOC);
   int spaceDimension=_mesh->getSpaceDimension();
   MED_EN::medEntityMesh baseEntity=Entity;
-  if (spaceDimension == 3) 
+  if (spaceDimension == 3)
     if (Entity!=MED_FACE)
       if(Entity==MED_NODE)
 	baseEntity=MED_FACE;
       else
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
-  if (spaceDimension == 2) 
+  if (spaceDimension == 2)
     if (Entity!=MED_EDGE)
       if(Entity==MED_NODE)
 	baseEntity=MED_EDGE;
@@ -946,14 +945,14 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
   setNumberOfElements(numberOfElements);
   setTotalNumberOfElements(numberOfElements[0]);
   setNumber(mySkyLineArray);
-  
+
   delete[] numberOfElements;
   delete[] numberOfGaussPoint;
   delete[] geometricType;
 }
 
 /*
-  Method created to factorize code. This method fills the current SUPPORT on entity 'entity' containing all the entities contained in 
+  Method created to factorize code. This method fills the current SUPPORT on entity 'entity' containing all the entities contained in
   elements 'listOfElt' of entity 'entity'. Warning this method should be called after both the attributes this->_mesh and this->_entity are correctly set.
  */
 void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION)
