@@ -305,7 +305,7 @@ namespace MED{
       TInt aNbComp = aMeshValue.myNbComp;
       INITMSG(MYDEBUG,"aGeom = "<<aGeom<<" - "<<aNbElem<<": ");
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
-	TCValueSliceArr aValueSliceArr = aMeshValue.GetValueSliceArr(iElem);
+	TCValueSliceArr aValueSliceArr = aMeshValue.GetGaussValueSliceArr(iElem);
 	ADDMSG(MYVALUEDEBUG,"{");
 	for(TInt iGauss = 0; iGauss < aNbGauss; iGauss++){
 	  const TCValueSlice& aValueSlice = aValueSliceArr[iGauss];

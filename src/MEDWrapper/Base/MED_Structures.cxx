@@ -352,9 +352,10 @@ TMeshValue
   myValue.resize(theNbElem*myStep);
 }
 
+//---------------------------------------------------------------
 TCValueSliceArr 
 TMeshValue
-::GetValueSliceArr(TInt theElemId) const
+::GetGaussValueSliceArr(TInt theElemId) const
 {
   TCValueSliceArr aValueSliceArr(myNbGauss);
   if(GetModeSwitch() == eFULL_INTERLACE){
@@ -374,10 +375,9 @@ TMeshValue
   return aValueSliceArr;
 }
 
-
 TValueSliceArr 
 TMeshValue
-::GetValueSliceArr(TInt theElemId)
+::GetGaussValueSliceArr(TInt theElemId)
 {
   TValueSliceArr aValueSliceArr(myNbGauss);
   if(GetModeSwitch() == eFULL_INTERLACE){
@@ -386,6 +386,52 @@ TMeshValue
       aValueSliceArr[aGaussId] =
 	TValueSlice(myValue,std::slice(anId,myNbComp,1));
       anId += myNbComp;
+    }
+  }
+  else{
+    for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+      aValueSliceArr[aGaussId] =
+	TValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
+    }
+  }
+  return aValueSliceArr;
+}
+
+//---------------------------------------------------------------
+TCValueSliceArr 
+TMeshValue
+::GetCompValueSliceArr(TInt theElemId) const
+{
+  TCValueSliceArr aValueSliceArr(myNbComp);
+  if(GetModeSwitch() == eFULL_INTERLACE){
+    TInt anId = theElemId*myStep;
+    for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+      aValueSliceArr[aCompId] =
+	TCValueSlice(myValue,std::slice(anId,myNbGauss,myNbComp));
+      anId += 1;
+    }
+  }
+  else{
+    for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+      aValueSliceArr[aCompId] =
+	TCValueSlice(myValue,std::slice(theElemId,myNbGauss,myStep));
+    }
+  }
+  return aValueSliceArr;
+}
+
+
+TValueSliceArr 
+TMeshValue
+::GetCompValueSliceArr(TInt theElemId)
+{
+  TValueSliceArr aValueSliceArr(myNbGauss);
+  if(GetModeSwitch() == eFULL_INTERLACE){
+    TInt anId = theElemId*myStep;
+    for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+      aValueSliceArr[aCompId] =
+	TValueSlice(myValue,std::slice(anId,myNbGauss,myNbComp));
+      anId += 1;
     }
   }
   else{

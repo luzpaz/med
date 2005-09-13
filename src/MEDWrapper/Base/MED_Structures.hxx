@@ -411,11 +411,19 @@ namespace MED
 	 TInt theNbComp,
 	 EModeSwitch theMode = eFULL_INTERLACE);
 
+    // Iteration through Gauss Points by their components
     TCValueSliceArr
-    GetValueSliceArr(TInt theElemId) const;
+    GetGaussValueSliceArr(TInt theElemId) const;
 
     TValueSliceArr 
-    GetValueSliceArr(TInt theElemId);
+    GetGaussValueSliceArr(TInt theElemId);
+
+    // Iteration through components by corresponding Gauss Points
+    TCValueSliceArr
+    GetCompValueSliceArr(TInt theElemId) const;
+
+    TValueSliceArr 
+    GetCompValueSliceArr(TInt theElemId);
   };
 
 
