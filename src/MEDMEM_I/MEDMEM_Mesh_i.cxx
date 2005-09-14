@@ -1534,15 +1534,3 @@ CORBA::Boolean MESH_i::areEquals(SALOME_MED::MESH_ptr other)
     }
   return false;
 }
-
-//=============================================================================
-/*!
- * CORBA : Servant destruction
- */
-//=============================================================================
-void MESH_i::release()
-{
-  PortableServer::ObjectId_var oid=_default_POA()->servant_to_id(this);
-  _default_POA()->deactivate_object(oid);
-  _remove_ref();
-}
