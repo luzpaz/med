@@ -127,7 +127,7 @@ void SUPPORTClient::fillCopy()
 SUPPORTClient::~SUPPORTClient()
 {
   BEGIN_OF("SUPPORTClient::~SUPPORTClient");
-  IOR_Support->release();
+  IOR_Support->Destroy();
   if(_mesh)
     _mesh->removeReference();
   END_OF("SUPPORTClient::~SUPPORTClient");
