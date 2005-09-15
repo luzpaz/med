@@ -25,15 +25,13 @@
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
 
 #include "MEDMEM_Support_i.hxx"
-
 #include "MEDMEM_convert.hxx"
-
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
 
 namespace MEDMEM {
 class FIELD_i: public virtual POA_SALOME_MED::FIELD,
-	       public PortableServer::RefCountServantBase
+	       public SALOME::GenericObj_i
 {
 public :
         static map < int, ::MEDMEM::FIELD_ * > fieldMap ;
@@ -87,7 +85,6 @@ public :
     void        read      (CORBA::Long i) throw (SALOME::SALOME_Exception);
     void        write     (CORBA::Long i, const char* driverFieldName)
                     		          throw (SALOME::SALOME_Exception);
-  void release();
     // Cuisine Interne
     MEDMEM::FIELD_ * constructConstField() const;
 

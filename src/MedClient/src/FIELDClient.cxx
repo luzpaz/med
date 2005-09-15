@@ -59,7 +59,7 @@ void FIELDClient<T>::fillCopy()
 template<class T>
 FIELDClient<T>::~FIELDClient()
 {
-  _fieldPtr->release();
+  _fieldPtr->Destroy();
   CORBA::release(_fieldPtr);
   if(FIELD<T>::_support)
     FIELD<T>::_support->removeReference();
