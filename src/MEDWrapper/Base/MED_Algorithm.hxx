@@ -35,15 +35,12 @@
 
 namespace MED
 {
-
-  struct TWrapper;
-
   //---------------------------------------------------------------
   typedef std::map<EGeometrieElement,PElemInfo> TGeom2ElemInfo;
   typedef std::map<EEntiteMaillage,TGeom2ElemInfo> TEntity2TGeom2ElemInfo;
 
   TEntity2TGeom2ElemInfo
-  GetEntity2TGeom2ElemInfo(TWrapper& theWrapper, 
+  GetEntity2TGeom2ElemInfo(const PWrapper& theWrapper, 
 			   const PMeshInfo& theMeshInfo,
 			   const MED::TEntityInfo& theEntityInfo);
 
@@ -52,7 +49,7 @@ namespace MED
   typedef std::set<PFamilyInfo> TFamilyInfoSet;
 
   TFamilyInfoSet
-  GetFamilyInfoSet(TWrapper& theWrapper, 
+  GetFamilyInfoSet(const PWrapper& theWrapper, 
 		   const PMeshInfo& theMeshInfo);
   
 
@@ -68,7 +65,7 @@ namespace MED
   typedef std::map<EEntiteMaillage,TFamilyTSizeSet> TEntity2FamilySet;
   
   TEntity2FamilySet 
-  GetEntity2FamilySet(TWrapper& theWrapper, 
+  GetEntity2FamilySet(const PWrapper& theWrapper, 
 		      const TEntity2TGeom2ElemInfo& theEntity2TGeom2ElemInfo,
 		      const TFamilyInfoSet& theFamilyInfoSet);
   
@@ -85,7 +82,7 @@ namespace MED
   typedef std::map<PFieldInfo,TTimeStampInfoSet> TFieldInfo2TimeStampInfoSet;
 
   TFieldInfo2TimeStampInfoSet
-  GetFieldInfo2TimeStampInfoSet(TWrapper& theWrapper, 
+  GetFieldInfo2TimeStampInfoSet(const PWrapper& theWrapper, 
 				const PMeshInfo& theMeshInfo,
 				const MED::TEntityInfo& theEntityInfo);
   
@@ -101,14 +98,14 @@ namespace MED
   typedef std::map<TGaussInfo::TKey,PGaussInfo,TGaussInfo::TLess> TKey2Gauss;
 
   TKey2Gauss
-  GetKey2Gauss(TWrapper& theWrapper, 
+  GetKey2Gauss(const PWrapper& theWrapper, 
 	       TErr* theErr = NULL,
 	       EModeSwitch theMode = eFULL_INTERLACE);
 
 
   //---------------------------------------------------------------
   PProfileInfo
-  GetProfileInfo(TWrapper& theWrapper, 
+  GetProfileInfo(const PWrapper& theWrapper, 
 		 const std::string& theProfileName,
 		 TErr* theErr = NULL,
 		 EModeProfil theMode = eCOMPACT);
@@ -118,7 +115,7 @@ namespace MED
   typedef std::map<TProfileInfo::TKey,PProfileInfo> TKey2Profile;
   typedef boost::tuple<EModeProfil,TKey2Profile> TMKey2Profile;
   TMKey2Profile
-  GetMKey2Profile(TWrapper& theWrapper, 
+  GetMKey2Profile(const PWrapper& theWrapper, 
 		  TErr* theErr = NULL,
 		  EModeProfil theMode = eCOMPACT);
 }

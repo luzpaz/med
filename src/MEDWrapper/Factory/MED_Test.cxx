@@ -143,8 +143,8 @@ void CopyMed(const PWrapper& theMed,
 	     const PWrapper& theMed2, 
 	     int theIncr)
 {
-  TKey2Gauss aKey2Gauss = GetKey2Gauss(*theMed);
-  TMKey2Profile aMKey2Profile = GetMKey2Profile(*theMed);
+  TKey2Gauss aKey2Gauss = GetKey2Gauss(theMed);
+  TMKey2Profile aMKey2Profile = GetMKey2Profile(theMed);
 
   TInt aNbMeshes = theMed->GetNbMeshes();
   MSG(MYDEBUG,"aNbMeshes = "<<aNbMeshes);

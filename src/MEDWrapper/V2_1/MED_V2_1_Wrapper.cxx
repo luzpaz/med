@@ -41,8 +41,68 @@ static int MYDEBUG = 0;
 
 
 
-namespace MED{
-  namespace V2_1{
+namespace MED
+{
+
+  template<>
+  TInt
+  GetDESCLength<eV2_1>()
+  {
+    return 200;
+  }
+
+  template<>
+  TInt
+  GetIDENTLength<eV2_1>()
+  {
+    return 8;
+  }
+
+  template<>
+  TInt
+  GetLNOMLength<eV2_1>()
+  {
+    return 80;
+  }
+
+  template<>
+  TInt
+  GetNOMLength<eV2_1>()
+  {
+    return 32;
+  }
+
+  template<>
+  TInt
+  GetPNOMLength<eV2_1>()
+  {
+    return 8;
+  }
+
+  template<>
+  TInt
+  GetNbConn<eV2_1>(EGeometrieElement typmai,
+		   EEntiteMaillage typent,
+		   TInt mdim)
+  {
+    TInt nsup = 0;
+
+    if(typent == eMAILLE){
+      TInt edim = typmai / 100;
+      if(mdim  == 2 || mdim == 3)
+	if(edim == 1)
+	  nsup = 1;
+      
+      if(mdim == 3)
+	if (edim == 2)
+	  nsup = 1;
+    }
+
+    return nsup + typmai%100;
+  }
+
+  namespace V2_1
+  {
 
     //---------------------------------------------------------------
     class TFile{
@@ -711,7 +771,7 @@ namespace MED{
 	return TProfileInfo::TInfo("",-1);
       
       TInt aSize = -1;
-      TVector<char> aName(NOM+1);
+      TVector<char> aName(GetNOMLength<eV2_1>()+1);
 
       TErr aRet;
       aRet = MEDprofilInfo(myFile->Id(),
@@ -861,7 +921,7 @@ namespace MED{
       MED::TMeshInfo& aMeshInfo = *aFieldInfo.myMeshInfo;
       
       MED::TKey2Profile aKey2Profile = boost::get<1>(theMKey2Profile);
-      char aProfileName[NOM+1] = "";
+      TVector<char> aProfileName(GetNOMLength<eV2_1>()+1);
 
       TGeom2Size& aGeom2Size = aTimeStampInfo.myGeom2Size;
       TGeom2Size::iterator anIter = aGeom2Size.begin();
@@ -899,7 +959,7 @@ namespace MED{
 			      (unsigned char*)&anArray[0],
 			      med_mode_switch(theVal.myModeSwitch),
 			      MED_ALL,
-			      aProfileName,
+			      &aProfileName[0],
 			      med_entite_maillage(aTimeStampInfo.myEntity),
 			      med_geometrie_element(aGeom),
 			      aTimeStampInfo.myNumDt,
@@ -917,7 +977,7 @@ namespace MED{
 			      (unsigned char*)&anArray[0],
 			      med_mode_switch(theVal.myModeSwitch),
 			      MED_ALL,
-			      aProfileName,
+			      &aProfileName[0],
 			      med_entite_maillage(aTimeStampInfo.myEntity),
 			      med_geometrie_element(aGeom),
 			      aTimeStampInfo.myNumDt,
@@ -937,8 +997,8 @@ namespace MED{
 	}
 
 	MED::PProfileInfo aProfileInfo;
-	if(strcmp(aProfileName,"") != 0){
-	  MED::TKey2Profile::const_iterator anIter = aKey2Profile.find(aProfileName);
+	if(strcmp(&aProfileName[0],"") != 0){
+	  MED::TKey2Profile::const_iterator anIter = aKey2Profile.find(&aProfileName[0]);
 	  if(anIter != aKey2Profile.end()){
 	    aProfileInfo = anIter->second;
 	    theVal.myGeom2Profile[aGeom] = aProfileInfo;

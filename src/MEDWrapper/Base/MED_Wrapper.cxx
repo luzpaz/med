@@ -17,7 +17,30 @@ static int MYDEBUG = 0;
 static int MYVALUEDEBUG = 0;
 #endif
 
-namespace MED{
+namespace MED
+{
+  TLockProxy
+  ::TLockProxy(TWrapper* theWrapper):
+    myWrapper(theWrapper)
+  {
+    boost::detail::thread::lock_ops<TWrapper::TMutex>::lock(myWrapper->myMutex);
+    INITMSG(MYDEBUG,"TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<endl);
+  }
+  
+  TLockProxy
+  ::~TLockProxy()
+  {
+    INITMSG(MYDEBUG,"~TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<endl);
+    boost::detail::thread::lock_ops<TWrapper::TMutex>::unlock(myWrapper->myMutex);
+  }
+  
+  TWrapper*
+  TLockProxy
+  ::operator-> () const // never throws
+  {
+    return myWrapper;
+  }
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   PMeshInfo
   TWrapper

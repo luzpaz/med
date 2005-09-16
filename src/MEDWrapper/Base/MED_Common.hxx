@@ -95,24 +95,32 @@ namespace MED{
   const TEntity2GeomSet& 
   GetEntity2GeomSet();
 
-  template<int>
+  template<EVersion>
+  TInt
+  GetDESCLength();
+  
+  template<EVersion>
+  TInt
+  GetIDENTLength();
+  
+  template<EVersion>
+  TInt
+  GetNOMLength();
+  
+  template<EVersion>
+  TInt
+  GetLNOMLength();
+  
+  template<EVersion>
+  TInt
+  GetPNOMLength();
+  
+  template<EVersion>
   TInt
   GetNbConn(EGeometrieElement typmai,
 	    EEntiteMaillage typent,
 	    TInt mdim);
   
-  template<>
-  TInt
-  GetNbConn<eV2_1>(EGeometrieElement typmai,
-		   EEntiteMaillage typent,
-		   TInt mdim);
-  
-  template<>
-  TInt
-  GetNbConn<eV2_2>(EGeometrieElement typmai,
-		   EEntiteMaillage typent,
-		   TInt mdim);
-
   TInt 
   GetNbNodes(EGeometrieElement typmai);
 

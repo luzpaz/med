@@ -32,24 +32,50 @@
 #include "MED_Structures.hxx"
 #include "MED_TWrapper.hxx"
 
-namespace MED{
-  namespace V2_2{
+namespace MED
+{
+  template<>
+  TInt
+  GetDESCLength<eV2_2>();
+  
+  template<>
+  TInt
+  GetIDENTLength<eV2_2>();
+  
+  template<>
+  TInt
+  GetNOMLength<eV2_2>();
+  
+  template<>
+  TInt
+  GetLNOMLength<eV2_2>();
+  
+  template<>
+  TInt
+  GetPNOMLength<eV2_2>();
 
-    const TInt PNOM = 16;
+  template<>
+  TInt
+  GetNbConn<eV2_2>(EGeometrieElement typmai,
+		   EEntiteMaillage typent,
+		   TInt mdim);
 
-    typedef MED::TTMeshInfo<PNOM,DESC,IDENT,NOM,LNOM,eV2_2> TVMeshInfo;
+  namespace V2_2
+  {
 
-    typedef MED::TTFamilyInfo<PNOM,DESC,IDENT,NOM,LNOM,eV2_2> TVFamilyInfo;
+    typedef MED::TTMeshInfo<eV2_2> TVMeshInfo;
 
-    typedef MED::TTNodeInfo<PNOM,DESC,IDENT,NOM,LNOM,eV2_2> TVNodeInfo;
+    typedef MED::TTFamilyInfo<eV2_2> TVFamilyInfo;
 
-    typedef MED::TTCellInfo<PNOM,DESC,IDENT,NOM,LNOM,eV2_2> TVCellInfo;
+    typedef MED::TTNodeInfo<eV2_2> TVNodeInfo;
 
-    typedef MED::TTFieldInfo<PNOM,DESC,IDENT,NOM,LNOM,eV2_2> TVFieldInfo;
+    typedef MED::TTCellInfo<eV2_2> TVCellInfo;
 
-    typedef MED::TTTimeStampInfo<PNOM,DESC,IDENT,NOM,LNOM,eV2_2> TVTimeStampInfo;
+    typedef MED::TTFieldInfo<eV2_2> TVFieldInfo;
 
-    typedef MED::TTTimeStampVal<PNOM,DESC,IDENT,NOM,LNOM,eV2_2> TVTimeStampVal;
+    typedef MED::TTTimeStampInfo<eV2_2> TVTimeStampInfo;
+
+    typedef MED::TTTimeStampVal<eV2_2> TVTimeStampVal;
 
     //---------------------------------------------------------------
     class TFile;
@@ -58,7 +84,8 @@ namespace MED{
     typedef enum {eLECTURE, eLECTURE_ECRITURE, eLECTURE_AJOUT, eCREATION} EModeAcces; 
 
     //---------------------------------------------------------------
-    class TVWrapper: public MED::TTWrapper<PNOM,DESC,IDENT,NOM,LNOM,eV2_2>{
+    class TVWrapper: public MED::TTWrapper<eV2_2>
+    {
       TVWrapper();
       TVWrapper(const TVWrapper&);
       TVWrapper& operator=(const TVWrapper&);

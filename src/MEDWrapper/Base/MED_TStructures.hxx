@@ -31,20 +31,15 @@
 
 #include "MED_Structures.hxx"
 
-namespace MED{
-
-  const TInt DESC = 200;
-  const TInt IDENT = 8;
-  const TInt NOM = 32;
-  const TInt LNOM = 80;
-
+namespace MED
+{
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTNameInfo: virtual TNameInfo
   {
     TTNameInfo(const std::string& theValue)
     {
-      myName.resize(nNOM+1);
+      myName.resize(GetNOMLength<eVersion>()+1);
       SetName(theValue);
     }
 
@@ -52,25 +47,25 @@ namespace MED{
     std::string
     GetName() const 
     { 
-      return GetString(0,nNOM,myName);
+      return GetString(0,GetNOMLength<eVersion>(),myName);
     }
 
     virtual
     void
     SetName(const std::string& theValue)
     {
-      SetString(0,nNOM,myName,theValue);
+      SetString(0,GetNOMLength<eVersion>(),myName,theValue);
     }
   };
 
 
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTMeshInfo: 
     virtual TMeshInfo, 
-    virtual TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
+    virtual TTNameInfo<eVersion>
   {
-    typedef TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TNameInfoBase;
+    typedef TTNameInfo<eVersion> TNameInfoBase;
 
     TTMeshInfo(const PMeshInfo& theInfo):
       TNameInfoBase(theInfo->GetName())
@@ -78,7 +73,7 @@ namespace MED{
       myDim = theInfo->GetDim();
       myType = theInfo->GetType();
       
-      myDesc.resize(nDESC+1);
+      myDesc.resize(GetDESCLength<eVersion>()+1);
       SetDesc(theInfo->GetDesc());
     }
 
@@ -91,7 +86,7 @@ namespace MED{
       myDim = theDim;
       myType = theType;
       
-      myDesc.resize(nDESC+1);
+      myDesc.resize(GetDESCLength<eVersion>()+1);
       SetDesc(theDesc);
     }
 
@@ -99,25 +94,25 @@ namespace MED{
     std::string
     GetDesc() const 
     { 
-      return GetString(0,nDESC,myDesc);
+      return GetString(0,GetDESCLength<eVersion>(),myDesc);
     }
 
     virtual
     void
     SetDesc(const std::string& theValue)
     {
-      SetString(0,nDESC,myDesc,theValue);
+      SetString(0,GetDESCLength<eVersion>(),myDesc,theValue);
     }
   };
 
 
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTFamilyInfo: 
     virtual TFamilyInfo, 
-    virtual TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
+    virtual TTNameInfo<eVersion>
   {
-    typedef TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TNameInfoBase;
+    typedef TTNameInfo<eVersion> TNameInfoBase;
 
     TTFamilyInfo(const PMeshInfo& theMeshInfo, const PFamilyInfo& theInfo):
       TNameInfoBase(theInfo->GetName())
@@ -127,7 +122,7 @@ namespace MED{
       myId = theInfo->GetId();
 
       myNbGroup = theInfo->GetNbGroup();
-      myGroupNames.resize(myNbGroup*nLNOM+1);
+      myGroupNames.resize(myNbGroup*GetLNOMLength<eVersion>()+1);
       if(myNbGroup){
 	for(TInt anId = 0; anId < myNbGroup; anId++){
 	  SetGroupName(anId,theInfo->GetGroupName(anId));
@@ -137,7 +132,7 @@ namespace MED{
       myNbAttr = theInfo->GetNbAttr();
       myAttrId.resize(myNbAttr);
       myAttrVal.resize(myNbAttr);
-      myAttrDesc.resize(myNbAttr*nDESC+1);
+      myAttrDesc.resize(myNbAttr*GetDESCLength<eVersion>()+1);
       if(myNbAttr){
 	for(TInt anId = 0; anId < myNbAttr; anId++){
 	  SetAttrDesc(anId,theInfo->GetAttrDesc(anId));
@@ -161,7 +156,7 @@ namespace MED{
       myNbGroup = theNbGroup;
       if(!theNbGroup)
 	theNbGroup = 1;
-      myGroupNames.resize(theNbGroup*nLNOM+1);
+      myGroupNames.resize(theNbGroup*GetLNOMLength<eVersion>()+1);
 
       myNbAttr = theNbAttr;
 
@@ -169,7 +164,7 @@ namespace MED{
 	theNbAttr = 1;
       myAttrId.resize(theNbAttr);
       myAttrVal.resize(theNbAttr);
-      myAttrDesc.resize(theNbAttr*nDESC+1);
+      myAttrDesc.resize(theNbAttr*GetDESCLength<eVersion>()+1);
     }
 
     TTFamilyInfo(const PMeshInfo& theMeshInfo,
@@ -186,7 +181,7 @@ namespace MED{
       myId = theId;
 
       myNbGroup = theGroupNames.size();
-      myGroupNames.resize(myNbGroup*nLNOM+1);
+      myGroupNames.resize(myNbGroup*GetLNOMLength<eVersion>()+1);
       if(myNbGroup){
 	TStringSet::const_iterator anIter = theGroupNames.begin();
 	for(TInt anId = 0; anIter != theGroupNames.end(); anIter++, anId++){
@@ -198,7 +193,7 @@ namespace MED{
       myNbAttr = theAttrDescs.size();
       myAttrId.resize(myNbAttr);
       myAttrVal.resize(myNbAttr);
-      myAttrDesc.resize(myNbAttr*nDESC+1);
+      myAttrDesc.resize(myNbAttr*GetDESCLength<eVersion>()+1);
       if(myNbAttr){
 	for(TInt anId = 0, anEnd = theAttrDescs.size(); anId < anEnd; anId++){
 	  SetAttrDesc(anId,theAttrDescs[anId]);
@@ -212,34 +207,34 @@ namespace MED{
     std::string
     GetGroupName(TInt theId) const 
     { 
-      return GetString(theId,nLNOM,myGroupNames);
+      return GetString(theId,GetLNOMLength<eVersion>(),myGroupNames);
     }
 
     virtual
     void
     SetGroupName(TInt theId, const std::string& theValue)
     {
-      SetString(theId,nLNOM,myGroupNames,theValue);
+      SetString(theId,GetLNOMLength<eVersion>(),myGroupNames,theValue);
     }
 
     virtual
     std::string
     GetAttrDesc(TInt theId) const 
     { 
-      return GetString(theId,nDESC,myAttrDesc);
+      return GetString(theId,GetDESCLength<eVersion>(),myAttrDesc);
     }
 
     virtual
     void
     SetAttrDesc(TInt theId, const std::string& theValue)
     {
-      SetString(theId,nDESC,myAttrDesc,theValue);
+      SetString(theId,GetDESCLength<eVersion>(),myAttrDesc,theValue);
     }
   };
 
 
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTElemInfo: virtual TElemInfo
   {
     TTElemInfo(const PMeshInfo& theMeshInfo, const PElemInfo& theInfo)
@@ -253,7 +248,7 @@ namespace MED{
       myElemNum.resize(myIsElemNum == eFAUX? 0: myNbElem);
 
       myIsElemNames = theInfo->IsElemNames();
-      myElemNames.resize(myNbElem*nPNOM+1);
+      myElemNames.resize(myNbElem*GetPNOMLength<eVersion>()+1);
 
       if(myNbElem){
 	for(TInt anId = 0; anId < myNbElem; anId++){
@@ -288,7 +283,7 @@ namespace MED{
 
       myIsElemNames = theIsElemNames;
       if(theIsElemNames)
-	myElemNames.resize(theNbElem*nPNOM+1);
+	myElemNames.resize(theNbElem*GetPNOMLength<eVersion>()+1);
     }
     
     TTElemInfo(const PMeshInfo& theMeshInfo, 
@@ -307,7 +302,7 @@ namespace MED{
       
       myIsElemNames = theElemNames.size()? eVRAI: eFAUX;
       if(myIsElemNames)
-	myElemNames.resize(theNbElem*nPNOM+1);
+	myElemNames.resize(theNbElem*GetPNOMLength<eVersion>()+1);
       
       if(theNbElem){
 
@@ -331,25 +326,25 @@ namespace MED{
     std::string
     GetElemName(TInt theId) const 
     { 
-      return GetString(theId,nPNOM,myElemNames);
+      return GetString(theId,GetPNOMLength<eVersion>(),myElemNames);
     }
 
     virtual
     void
     SetElemName(TInt theId, const std::string& theValue)
     {
-      SetString(theId,nPNOM,myElemNames,theValue);
+      SetString(theId,GetPNOMLength<eVersion>(),myElemNames,theValue);
     }
   };
 
 
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTNodeInfo: 
     virtual TNodeInfo, 
-    virtual TTElemInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
+    virtual TTElemInfo<eVersion>
   {
-    typedef TTElemInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TElemInfoBase;
+    typedef TTElemInfo<eVersion> TElemInfoBase;
 
     TTNodeInfo(const PMeshInfo& theMeshInfo, const PNodeInfo& theInfo):
       TElemInfoBase(theMeshInfo,theInfo),
@@ -363,11 +358,11 @@ namespace MED{
       
       TInt aDim = theMeshInfo->GetDim();
 
-      myCoordNames.resize(aDim*nPNOM+1);
+      myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+1);
       for(TInt anId = 0; anId < aDim; anId++)
 	SetCoordName(anId,theInfo->GetCoordName(anId));
       
-      myCoordUnits.resize(aDim*nPNOM+1);
+      myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+1);
       for(TInt anId = 0; anId < aDim; anId++)
 	SetCoordUnit(anId,theInfo->GetCoordUnit(anId));
     }
@@ -389,10 +384,10 @@ namespace MED{
       myCoord.resize(theNbElem*theMeshInfo->myDim);
 
       if(theIsElemNum)
-	myCoordUnits.resize(theMeshInfo->myDim*nPNOM+1);
+	myCoordUnits.resize(theMeshInfo->myDim*GetPNOMLength<eVersion>()+1);
 
       if(theIsElemNames)
-	myCoordNames.resize(theMeshInfo->myDim*nPNOM+1);
+	myCoordNames.resize(theMeshInfo->myDim*GetPNOMLength<eVersion>()+1);
     }
 
     
@@ -418,12 +413,12 @@ namespace MED{
       
       TInt aDim = theMeshInfo->GetDim();
 
-      myCoordNames.resize(aDim*nPNOM+1);
+      myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+1);
       if(!theCoordNames.empty())
 	for(TInt anId = 0; anId < aDim; anId++)
 	  SetCoordName(anId,theCoordNames[anId]);
       
-      myCoordUnits.resize(aDim*nPNOM+1);
+      myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+1);
       if(!theCoordUnits.empty())
 	for(TInt anId = 0; anId < aDim; anId++)
 	  SetCoordUnit(anId,theCoordUnits[anId]);
@@ -433,38 +428,38 @@ namespace MED{
     std::string
     GetCoordName(TInt theId) const 
     { 
-      return GetString(theId,nPNOM,myCoordNames);
+      return GetString(theId,GetPNOMLength<eVersion>(),myCoordNames);
     }
 
     virtual
     void
     SetCoordName(TInt theId, const std::string& theValue)
     {
-      SetString(theId,nPNOM,myCoordNames,theValue);
+      SetString(theId,GetPNOMLength<eVersion>(),myCoordNames,theValue);
     }
 
     virtual
     std::string 
     GetCoordUnit(TInt theId) const 
     { 
-      return GetString(theId,nPNOM,myCoordUnits);
+      return GetString(theId,GetPNOMLength<eVersion>(),myCoordUnits);
     }
 
     virtual
     void
     SetCoordUnit(TInt theId, const std::string& theValue)
     {
-      SetString(theId,nPNOM,myCoordUnits,theValue);
+      SetString(theId,GetPNOMLength<eVersion>(),myCoordUnits,theValue);
     }
   };
 
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTPolygoneInfo: 
     virtual TPolygoneInfo, 
-    virtual TTElemInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
+    virtual TTElemInfo<eVersion>
   {
-    typedef TTElemInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TElemInfoBase;
+    typedef TTElemInfo<eVersion> TElemInfoBase;
 
     TTPolygoneInfo(const PMeshInfo& theMeshInfo, const PPolygoneInfo& theInfo):
       TElemInfoBase(theMeshInfo,theInfo)
@@ -526,12 +521,12 @@ namespace MED{
   };
   
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTPolyedreInfo: 
     virtual TPolyedreInfo, 
-    virtual TTElemInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
+    virtual TTElemInfo<eVersion>
   {
-    typedef TTElemInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TElemInfoBase;
+    typedef TTElemInfo<eVersion> TElemInfoBase;
 
     TTPolyedreInfo(const PMeshInfo& theMeshInfo, const PPolyedreInfo& theInfo):
       TElemInfoBase(theMeshInfo,theInfo)
@@ -598,12 +593,12 @@ namespace MED{
   };
 
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTCellInfo: 
     virtual TCellInfo, 
-    virtual TTElemInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
+    virtual TTElemInfo<eVersion>
   {
-    typedef TTElemInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TElemInfoBase;
+    typedef TTElemInfo<eVersion> TElemInfoBase;
 
     TTCellInfo(const PMeshInfo& theMeshInfo, const PCellInfo& theInfo):
       TElemInfoBase(theMeshInfo,theInfo)
@@ -613,7 +608,7 @@ namespace MED{
       myConnMode  = theInfo->GetConnMode();
       
       TInt aConnDim = GetNbNodes(myGeom);
-      myConn.resize(myNbElem*GetNbConn<nV>(myGeom,myEntity,myMeshInfo->myDim));
+      myConn.resize(myNbElem*GetNbConn<eVersion>(myGeom,myEntity,myMeshInfo->myDim));
       for(TInt anElemId = 0; anElemId < myNbElem; anElemId++){
 	TConnSlice aConnSlice = GetConnSlice(anElemId);
 	TCConnSlice aConnSlice2 = theInfo->GetConnSlice(anElemId);
@@ -641,7 +636,7 @@ namespace MED{
       myGeom = theGeom;
 
       myConnMode = theConnMode;
-      myConn.resize(theNbElem*GetNbConn<nV>(theGeom,myEntity,theMeshInfo->myDim));
+      myConn.resize(theNbElem*GetNbConn<eVersion>(theGeom,myEntity,theMeshInfo->myDim));
     }
     
     TTCellInfo(const PMeshInfo& theMeshInfo, 
@@ -665,7 +660,7 @@ namespace MED{
 
       myConnMode = theConnMode;
       TInt aConnDim = GetNbNodes(myGeom);
-      myConn.resize(myNbElem*GetNbConn<nV>(myGeom,myEntity,myMeshInfo->myDim));
+      myConn.resize(myNbElem*GetNbConn<eVersion>(myGeom,myEntity,myMeshInfo->myDim));
       for(TInt anElemId = 0; anElemId < myNbElem; anElemId++){
 	TConnSlice aConnSlice = GetConnSlice(anElemId);
 	for(TInt anConnId = 0; anConnId < aConnDim; anConnId++){
@@ -679,19 +674,19 @@ namespace MED{
     TInt
     GetConnDim() const 
     { 
-      return GetNbConn<nV>(myGeom,myEntity,myMeshInfo->myDim);
+      return GetNbConn<eVersion>(myGeom,myEntity,myMeshInfo->myDim);
     }
 
   };
 
 
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTFieldInfo: 
     virtual TFieldInfo, 
-    virtual TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
+    virtual TTNameInfo<eVersion>
   {
-    typedef TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TNameInfoBase;
+    typedef TTNameInfo<eVersion> TNameInfoBase;
 
     TTFieldInfo(const PMeshInfo& theMeshInfo, const PFieldInfo& theInfo):
       TNameInfoBase(theInfo->GetName())
@@ -699,12 +694,12 @@ namespace MED{
       myMeshInfo = theMeshInfo;
 
       myNbComp = theInfo->GetNbComp();
-      myCompNames.resize(myNbComp*nPNOM+1);
+      myCompNames.resize(myNbComp*GetPNOMLength<eVersion>()+1);
       for(TInt anId = 0; anId < myNbComp; anId++){
 	SetCompName(anId,theInfo->GetCompName(anId));
       }
 
-      myUnitNames.resize(myNbComp*nPNOM+1);
+      myUnitNames.resize(myNbComp*GetPNOMLength<eVersion>()+1);
       for(TInt anId = 0; anId < myNbComp; anId++){
 	SetUnitName(anId,theInfo->GetUnitName(anId));
       }
@@ -726,8 +721,8 @@ namespace MED{
       myMeshInfo = theMeshInfo;
 
       myNbComp = theNbComp;
-      myCompNames.resize(theNbComp*nPNOM+1);
-      myUnitNames.resize(theNbComp*nPNOM+1);
+      myCompNames.resize(theNbComp*GetPNOMLength<eVersion>()+1);
+      myUnitNames.resize(theNbComp*GetPNOMLength<eVersion>()+1);
 
       myType = theType;
 
@@ -739,39 +734,39 @@ namespace MED{
     std::string
     GetCompName(TInt theId) const 
     { 
-      return GetString(theId,nPNOM,myCompNames);
+      return GetString(theId,GetPNOMLength<eVersion>(),myCompNames);
     }
 
     virtual
     void
     SetCompName(TInt theId, const std::string& theValue)
     {
-      SetString(theId,nPNOM,myCompNames,theValue);
+      SetString(theId,GetPNOMLength<eVersion>(),myCompNames,theValue);
     }
 
     virtual
     std::string 
     GetUnitName(TInt theId) const 
     { 
-      return GetString(theId,nPNOM,myUnitNames);
+      return GetString(theId,GetPNOMLength<eVersion>(),myUnitNames);
     }
 
     virtual
     void
     SetUnitName(TInt theId, const std::string& theValue)
     {
-      SetString(theId,nPNOM,myUnitNames,theValue);
+      SetString(theId,GetPNOMLength<eVersion>(),myUnitNames,theValue);
     }
   };
 
 
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTGaussInfo: 
     virtual TGaussInfo,
-    virtual TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
+    virtual TTNameInfo<eVersion>
   {
-    typedef TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TNameInfoBase;
+    typedef TTNameInfo<eVersion> TNameInfoBase;
 
     TTGaussInfo(const TGaussInfo::TInfo& theInfo,
 		EModeSwitch theMode):
@@ -791,7 +786,7 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTTimeStampInfo: virtual TTimeStampInfo
   {
     TTTimeStampInfo(const PFieldInfo& theFieldInfo, const PTimeStampInfo& theInfo)
@@ -806,7 +801,7 @@ namespace MED{
       myNumOrd = theInfo->GetNumOrd();
       myDt = theInfo->GetDt();
 
-      myUnitDt.resize(nPNOM+1);
+      myUnitDt.resize(GetPNOMLength<eVersion>()+1);
       SetUnitDt(theInfo->GetUnitDt());
 
       myGeom2Gauss = theInfo->GetGeom2Gauss();
@@ -832,7 +827,7 @@ namespace MED{
       myNumOrd = theNumDt;
       myDt = theDt;
 
-      myUnitDt.resize(nPNOM+1);
+      myUnitDt.resize(GetPNOMLength<eVersion>()+1);
       SetUnitDt(theUnitDt);
 
       myGeom2Gauss = theGeom2Gauss;
@@ -842,25 +837,25 @@ namespace MED{
     std::string
     GetUnitDt() const
     { 
-      return GetString(0,nPNOM,myUnitDt);
+      return GetString(0,GetPNOMLength<eVersion>(),myUnitDt);
     }
 
     virtual
     void
     SetUnitDt(const std::string& theValue)
     {
-      SetString(0,nPNOM,myUnitDt,theValue);
+      SetString(0,GetPNOMLength<eVersion>(),myUnitDt,theValue);
     }
   };
 
 
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTProfileInfo: 
     virtual TProfileInfo,
-    virtual TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV>
+    virtual TTNameInfo<eVersion>
   {
-    typedef TTNameInfo<nPNOM,nDESC,nIDENT,nNOM,nLNOM,nV> TNameInfoBase;
+    typedef TTNameInfo<eVersion> TNameInfoBase;
 
     TTProfileInfo(const TProfileInfo::TInfo& theInfo,
 		  EModeProfil theMode):
@@ -874,7 +869,7 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  template<TInt nPNOM, TInt nDESC, TInt nIDENT, TInt nNOM, TInt nLNOM, EVersion nV>
+  template<EVersion eVersion>
   struct TTTimeStampVal: virtual TTimeStampVal
   {
     TTTimeStampVal(const PTimeStampInfo& theTimeStampInfo,

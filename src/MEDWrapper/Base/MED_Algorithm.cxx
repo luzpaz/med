@@ -43,7 +43,7 @@ namespace MED
 {
   //---------------------------------------------------------------
   TEntity2TGeom2ElemInfo 
-  GetEntity2TGeom2ElemInfo(TWrapper& theWrapper, 
+  GetEntity2TGeom2ElemInfo(const PWrapper& theWrapper, 
 			   const PMeshInfo& theMeshInfo,
 			   const MED::TEntityInfo& theEntityInfo)
   {
@@ -56,7 +56,7 @@ namespace MED
       TGeom2ElemInfo& aGeom2ElemInfo = anEntity2TGeom2ElemInfo[anEntity];
 
       if(anEntity == eNOEUD){
-	aGeom2ElemInfo[ePOINT1] = theWrapper.GetPNodeInfo(theMeshInfo);
+	aGeom2ElemInfo[ePOINT1] = theWrapper->GetPNodeInfo(theMeshInfo);
 	continue;
       }
 
@@ -65,15 +65,15 @@ namespace MED
 	const EGeometrieElement& aGeom = anIter2->first;
 	switch(aGeom){
 	case ePOLYGONE: {
-	  aGeom2ElemInfo[ePOLYGONE] = theWrapper.GetPPolygoneInfo(theMeshInfo,anEntity,aGeom);
+	  aGeom2ElemInfo[ePOLYGONE] = theWrapper->GetPPolygoneInfo(theMeshInfo,anEntity,aGeom);
 	  break;
 	}
 	case ePOLYEDRE: {
-	  aGeom2ElemInfo[ePOLYEDRE] = theWrapper.GetPPolyedreInfo(theMeshInfo,anEntity,aGeom);
+	  aGeom2ElemInfo[ePOLYEDRE] = theWrapper->GetPPolyedreInfo(theMeshInfo,anEntity,aGeom);
 	  break;
 	}
 	default: {
-	  aGeom2ElemInfo[aGeom] = theWrapper.GetPCellInfo(theMeshInfo,anEntity,aGeom);
+	  aGeom2ElemInfo[aGeom] = theWrapper->GetPCellInfo(theMeshInfo,anEntity,aGeom);
 	}}
 
       }
@@ -85,16 +85,16 @@ namespace MED
   
   //---------------------------------------------------------------
   TFamilyInfoSet
-  GetFamilyInfoSet(TWrapper& theWrapper,
+  GetFamilyInfoSet(const PWrapper& theWrapper,
 		   const PMeshInfo& theMeshInfo)
   {
     MSG(MYDEBUG,"GetFamilies(...)");
     TErr anErr;
     TFamilyInfoSet aFamilyInfoSet;
-    TInt aNbFam = theWrapper.GetNbFamilies(*theMeshInfo);
+    TInt aNbFam = theWrapper->GetNbFamilies(*theMeshInfo);
     INITMSG(MYDEBUG,"GetNbFamilies() = "<<aNbFam<<"\n");
     for(TInt iFam = 1; iFam <= aNbFam; iFam++){
-      PFamilyInfo aFamilyInfo = theWrapper.GetPFamilyInfo(theMeshInfo,iFam,&anErr);
+      PFamilyInfo aFamilyInfo = theWrapper->GetPFamilyInfo(theMeshInfo,iFam,&anErr);
       if(anErr >= 0)
 	aFamilyInfoSet.insert(aFamilyInfo);
     }
@@ -141,25 +141,25 @@ namespace MED
 
   //---------------------------------------------------------------
   TFieldInfo2TimeStampInfoSet 
-  GetFieldInfo2TimeStampInfoSet(TWrapper& theWrapper, 
+  GetFieldInfo2TimeStampInfoSet(const PWrapper& theWrapper, 
 				const PMeshInfo& theMeshInfo,
 				const MED::TEntityInfo& theEntityInfo)
   {
     MSG(MYDEBUG,"GetFieldsByEntity(...)");
     TFieldInfo2TimeStampInfoSet aFieldInfo2TimeStampInfoSet;
-    TInt aNbFields = theWrapper.GetNbFields();
+    TInt aNbFields = theWrapper->GetNbFields();
     INITMSG(MYDEBUG,"GetNbFields() = "<<aNbFields<<"\n");
     for(TInt iField = 1; iField <= aNbFields; iField++){
-      PFieldInfo aFieldInfo = theWrapper.GetPFieldInfo(theMeshInfo,iField);
+      PFieldInfo aFieldInfo = theWrapper->GetPFieldInfo(theMeshInfo,iField);
       INITMSG(MYDEBUG,"aFieldName = '"<<aFieldInfo->GetName()<<
 	      "'; aNbComp = "<<aFieldInfo->GetNbComp()<<"; ");
       TGeom2Size aGeom2Size;
       EEntiteMaillage anEntity = EEntiteMaillage(-1);
-      TInt aNbTimeStamps = theWrapper.GetNbTimeStamps(aFieldInfo,theEntityInfo,anEntity,aGeom2Size);
+      TInt aNbTimeStamps = theWrapper->GetNbTimeStamps(aFieldInfo,theEntityInfo,anEntity,aGeom2Size);
       ADDMSG(MYDEBUG,"anEntity = "<<anEntity<<"; GetNbTimeStamps = "<<aNbTimeStamps<<"\n");
       for(TInt iTimeStamp = 1; iTimeStamp <= aNbTimeStamps; iTimeStamp++){
 	PTimeStampInfo aTimeStamp = 
-	  theWrapper.GetPTimeStampInfo(aFieldInfo,anEntity,aGeom2Size,iTimeStamp);
+	  theWrapper->GetPTimeStampInfo(aFieldInfo,anEntity,aGeom2Size,iTimeStamp);
 	aFieldInfo2TimeStampInfoSet[aFieldInfo].insert(aTimeStamp);
 	INITMSG(MYDEBUG,"aDt = "<<aTimeStamp->GetDt()
 		<<", Unit = \'"<<aTimeStamp->GetUnitDt()
@@ -201,7 +201,7 @@ namespace MED
 
   //---------------------------------------------------------------
   TEntity2FamilySet 
-  GetEntity2FamilySet(TWrapper& theWrapper, 
+  GetEntity2FamilySet(const PWrapper& theWrapper, 
 		      const TEntity2TGeom2ElemInfo& theEntity2TGeom2ElemInfo,
 		      const TFamilyInfoSet& theFamilyInfoSet)
   {
@@ -268,17 +268,17 @@ namespace MED
 
   //---------------------------------------------------------------
   TKey2Gauss
-  GetKey2Gauss(TWrapper& theWrapper, 
+  GetKey2Gauss(const PWrapper& theWrapper, 
 	       TErr* theErr,
 	       EModeSwitch theMode)
   {
     INITMSG(MYDEBUG,"GetKey2Gauss - theMode = "<<theMode<<endl);
     TKey2Gauss aKey2Gauss;
-    TInt aNbGauss = theWrapper.GetNbGauss(theErr);
+    TInt aNbGauss = theWrapper->GetNbGauss(theErr);
     for(TInt anId = 1; anId <= aNbGauss; anId++){
-      TGaussInfo::TInfo aPreInfo = theWrapper.GetGaussPreInfo(anId);
-      PGaussInfo anInfo = theWrapper.CrGaussInfo(aPreInfo,theMode);
-      theWrapper.GetGaussInfo(anId,anInfo,theErr);
+      TGaussInfo::TInfo aPreInfo = theWrapper->GetGaussPreInfo(anId);
+      PGaussInfo anInfo = theWrapper->CrGaussInfo(aPreInfo,theMode);
+      theWrapper->GetGaussInfo(anId,anInfo,theErr);
       TGaussInfo::TKey aKey = boost::get<0>(aPreInfo);
       aKey2Gauss[aKey] = anInfo;
 
@@ -298,18 +298,18 @@ namespace MED
 
   //---------------------------------------------------------------
   PProfileInfo
-  GetProfileInfo(TWrapper& theWrapper, 
+  GetProfileInfo(const PWrapper& theWrapper, 
 		 const std::string& theProfileName,
 		 TErr* theErr,
 		 EModeProfil theMode)
   {
     PProfileInfo anInfo;
-    TInt aNbProfiles = theWrapper.GetNbProfiles(theErr);
+    TInt aNbProfiles = theWrapper->GetNbProfiles(theErr);
     for(TInt anId = 1; anId <= aNbProfiles; anId++){
-      TProfileInfo::TInfo aPreInfo = theWrapper.GetProfilePreInfo(anId);
+      TProfileInfo::TInfo aPreInfo = theWrapper->GetProfilePreInfo(anId);
       const std::string& aName = boost::get<0>(aPreInfo);
       if(aName == theProfileName)
-	return theWrapper.GetPProfileInfo(anId,theMode,theErr);
+	return theWrapper->GetPProfileInfo(anId,theMode,theErr);
     }
     return anInfo;
   }
@@ -317,16 +317,16 @@ namespace MED
 
   //---------------------------------------------------------------
   TMKey2Profile
-  GetMKey2Profile(TWrapper& theWrapper, 
+  GetMKey2Profile(const PWrapper& theWrapper, 
 		  TErr* theErr,
 		  EModeProfil theMode)
   {
     INITMSG(MYDEBUG,"GetMKey2Profile - theMode = "<<theMode<<endl);
     TKey2Profile aKey2Profile;
-    TInt aNbProfiles = theWrapper.GetNbProfiles(theErr);
+    TInt aNbProfiles = theWrapper->GetNbProfiles(theErr);
     for(TInt anId = 1; anId <= aNbProfiles; anId++){
-      TProfileInfo::TInfo aPreInfo = theWrapper.GetProfilePreInfo(anId);
-      PProfileInfo anInfo = theWrapper.GetPProfileInfo(anId,theMode,theErr);
+      TProfileInfo::TInfo aPreInfo = theWrapper->GetProfilePreInfo(anId);
+      PProfileInfo anInfo = theWrapper->GetPProfileInfo(anId,theMode,theErr);
       const std::string& aName = boost::get<0>(aPreInfo);
       aKey2Profile[aName] = anInfo;
       

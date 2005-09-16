@@ -19,37 +19,6 @@ namespace MED
     return typmai%100;
   }
 
-  template<>
-  TInt
-  GetNbConn<eV2_1>(EGeometrieElement typmai,
-		   EEntiteMaillage typent,
-		   TInt mdim)
-  {
-    TInt nsup = 0;
-
-    if(typent == eMAILLE){
-      TInt edim = typmai / 100;
-      if(mdim  == 2 || mdim == 3)
-	if(edim == 1)
-	  nsup = 1;
-      
-      if(mdim == 3)
-	if (edim == 2)
-	  nsup = 1;
-    }
-
-    return nsup + typmai%100;
-  }
-
-  template<>
-  TInt
-  GetNbConn<eV2_2>(EGeometrieElement typmai,
-		   EEntiteMaillage typent,
-		   TInt mdim)
-  {
-    return typmai%100;
-  }
-
   std::string 
   GetString(TInt theId, 
 	    TInt theStep, 

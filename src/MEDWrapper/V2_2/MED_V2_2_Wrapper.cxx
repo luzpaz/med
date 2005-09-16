@@ -30,7 +30,8 @@
 #include "MED_Algorithm.hxx"
 #include "MED_Utilities.hxx"
 
-extern "C"{
+extern "C"
+{
 #include <med.h>
 
 med_err
@@ -46,8 +47,54 @@ static int MYDEBUG = 0;
 
 
 
-namespace MED{
-  namespace V2_2{
+namespace MED
+{
+  template<>
+  TInt
+  GetDESCLength<eV2_2>()
+  {
+    return 200;
+  }
+
+  template<>
+  TInt
+  GetIDENTLength<eV2_2>()
+  {
+    return 8;
+  }
+
+  template<>
+  TInt
+  GetNOMLength<eV2_2>()
+  {
+    return 32;
+  }
+
+  template<>
+  TInt
+  GetLNOMLength<eV2_2>()
+  {
+    return 80;
+  }
+
+  template<>
+  TInt
+  GetPNOMLength<eV2_2>()
+  {
+    return 16;
+  }
+
+  template<>
+  TInt
+  GetNbConn<eV2_2>(EGeometrieElement typmai,
+		   EEntiteMaillage typent,
+		   TInt mdim)
+  {
+    return typmai%100;
+  }
+
+  namespace V2_2
+  {
 
     //---------------------------------------------------------------
     class TFile{
@@ -1205,7 +1252,7 @@ namespace MED{
 	return TGaussInfo::TInfo();
       
       med_int aNbGaussPoints = med_int();
-      TVector<char> aName(NOM+1);
+      TVector<char> aName(GetNOMLength<eV2_2>()+1);
       med_geometrie_element aGeom = MED_NONE;
 
       TErr aRet;
@@ -1275,7 +1322,7 @@ namespace MED{
 	return TProfileInfo::TInfo();
       
       TInt aSize = -1;
-      TVector<char> aName(NOM+1);
+      TVector<char> aName(GetNOMLength<eV2_2>()+1);
 
       TErr aRet;
       aRet = MEDprofilInfo(myFile->Id(),
@@ -1427,12 +1474,12 @@ namespace MED{
       MED::TMeshInfo& aMeshInfo = *aFieldInfo.myMeshInfo;
       
       TGeom2Gauss& aGeom2Gauss = aTimeStampInfo.myGeom2Gauss;
-      char aGaussName[NOM+1] = "";
+      TVector<char> aGaussName(GetNOMLength<eV2_2>()+1);
 
       med_mode_profil aProfileMode = med_mode_profil(boost::get<0>(theMKey2Profile));
       MED::TKey2Profile aKey2Profile = boost::get<1>(theMKey2Profile);
       MED::TGeom2Profile& aGeom2Profile = theVal.myGeom2Profile;
-      char aProfileName[NOM+1] = "";
+      TVector<char> aProfileName(GetNOMLength<eV2_2>()+1);
 
       TGeom2Size& aGeom2Size = aTimeStampInfo.myGeom2Size;
       TGeom2Size::iterator anIter = aGeom2Size.begin();
@@ -1508,8 +1555,8 @@ namespace MED{
 			      (unsigned char*)&anArray[0],
 			      med_mode_switch(theVal.myModeSwitch),
 			      MED_ALL,
-			      aGaussName,
-			      aProfileName,
+			      &aGaussName[0],
+			      &aProfileName[0],
 			      aProfileMode,
 			      med_entite_maillage(aTimeStampInfo.myEntity),
 			      med_geometrie_element(aGeom),
@@ -1528,8 +1575,8 @@ namespace MED{
 			      (unsigned char*)&anArray[0],
 			      med_mode_switch(theVal.myModeSwitch),
 			      MED_ALL,
-			      aGaussName,
-			      aProfileName,
+			      &aGaussName[0],
+			      &aProfileName[0],
 			      aProfileMode,
 			      med_entite_maillage(aTimeStampInfo.myEntity),
 			      med_geometrie_element(aGeom),
@@ -1550,8 +1597,8 @@ namespace MED{
 	}
 
 	MED::PGaussInfo aGaussInfo;
-	TGaussInfo::TKey aKey(aGeom,aGaussName);
-	if(strcmp(aGaussName,"") != 0){
+	TGaussInfo::TKey aKey(aGeom,&aGaussName[0]);
+	if(strcmp(&aGaussName[0],"") != 0){
 	  MED::TKey2Gauss::const_iterator anIter = theKey2Gauss.find(aKey);
 	  if(anIter != theKey2Gauss.end()){
 	    aGaussInfo = anIter->second;
@@ -1560,8 +1607,8 @@ namespace MED{
 	}
 	
 	MED::PProfileInfo aProfileInfo;
-	if(strcmp(aProfileName,"") != 0){
-	  MED::TKey2Profile::const_iterator anIter = aKey2Profile.find(aProfileName);
+	if(strcmp(&aProfileName[0],"") != 0){
+	  MED::TKey2Profile::const_iterator anIter = aKey2Profile.find(&aProfileName[0]);
 	  if(anIter != aKey2Profile.end()){
 	    aProfileInfo = anIter->second;
 	    aGeom2Profile[aGeom] = aProfileInfo;
@@ -1575,7 +1622,7 @@ namespace MED{
 	  }
 	  EXCEPTION(runtime_error,"GetValTimeStamp "<<
 		    "- aNbGauss("<<aNbGauss<<") > 1 && !aGaussInfo"<<
-		    "; aGaussName = '"<<aGaussName<<"'"<<
+		    "; aGaussName = '"<<&aGaussName[0]<<"'"<<
 		    "; aGeom = "<<aGeom<<
 		    "");
 	}
@@ -1660,20 +1707,20 @@ namespace MED{
 	EGeometrieElement aGeom = anIter->first;
 	TMeshValue& aMeshValue = anIter->second;
 
-	char aGaussName[NOM+1] = "";
+	TVector<char> aGaussName(GetNOMLength<eV2_2>()+1);
 	MED::TGeom2Gauss::const_iterator aGaussIter = aGeom2Gauss.find(aGeom);
 	if(aGaussIter != aGeom2Gauss.end()){
 	  MED::PGaussInfo aGaussInfo = aGaussIter->second;
-	  strcpy(aGaussName,&aGaussInfo->myName[0]);
+	  strcpy(&aGaussName[0],&aGaussInfo->myName[0]);
 	}
 
-	char aProfileName[NOM+1] = "";
+	TVector<char> aProfileName(GetNOMLength<eV2_2>()+1);
 	med_mode_profil aProfileMode = med_mode_profil(eNO_PFLMOD);
 	MED::TGeom2Profile::const_iterator aProfileIter = aGeom2Profile.find(aGeom);
 	if(aProfileIter != aGeom2Profile.end()){
 	  MED::PProfileInfo aProfileInfo = aProfileIter->second;
 	  aProfileMode = med_mode_profil(aProfileInfo->myMode);
-	  strcpy(aProfileName,&aProfileInfo->myName[0]);
+	  strcpy(&aProfileName[0],&aProfileInfo->myName[0]);
 	}
 
 	med_int aNbVal = aMeshValue.myNbElem / aFieldInfo.myNbComp;
@@ -1690,9 +1737,9 @@ namespace MED{
 			     (unsigned char*)&anArray[0],
 			     med_mode_switch(theVal.myModeSwitch),
 			     aNbVal,
-			     aGaussName,
+			     &aGaussName[0],
 			     MED_ALL,
-			     aProfileName,
+			     &aProfileName[0],
 			     aProfileMode,
 			     med_entite_maillage(aTimeStampInfo.myEntity),
 			     med_geometrie_element(aGeom),
@@ -1713,9 +1760,9 @@ namespace MED{
 			     (unsigned char*)&anArray[0],
 			     med_mode_switch(theVal.myModeSwitch),
 			     aNbVal,
-			     aGaussName,
+			     &aGaussName[0],
 			     MED_ALL,
-			     aProfileName,
+			     &aProfileName[0],
 			     aProfileMode,
 			     med_entite_maillage(aTimeStampInfo.myEntity),
 			     med_geometrie_element(aGeom),

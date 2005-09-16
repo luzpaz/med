@@ -32,9 +32,17 @@
 #include "MED_Structures.hxx"
 #include "MED_Algorithm.hxx"
 
-namespace MED{
+#include <boost/thread/mutex.hpp>
 
-  struct TWrapper{
+namespace MED
+{
+
+  //----------------------------------------------------------------------------
+  struct TWrapper
+  {
+    typedef boost::mutex TMutex;
+    TMutex myMutex;
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     virtual 
     PMeshInfo 
@@ -609,6 +617,81 @@ namespace MED{
 
   };
 
+
+  //----------------------------------------------------------------------------
+  class TLockProxy
+  {
+    TLockProxy& operator=(const TLockProxy& );
+    TWrapper* myWrapper;
+
+  public:
+    TLockProxy(TWrapper* theWrapper);
+
+    ~TLockProxy();
+
+    TWrapper * operator-> () const;
+  };
+
+
+  //----------------------------------------------------------------------------
+  template<> 
+  class SharedPtr<TWrapper>: public boost::shared_ptr<TWrapper>
+  {
+  public:
+    SharedPtr() {}
+
+    template<class Y>
+    explicit SharedPtr(Y * p): 
+      boost::shared_ptr<TWrapper>(p) 
+    {}
+
+    template<class Y>
+    SharedPtr(SharedPtr<Y> const & r):
+      boost::shared_ptr<TWrapper>(r,boost::detail::dynamic_cast_tag())
+    {}
+
+    template<class Y>
+    SharedPtr& 
+    operator=(SharedPtr<Y> const & r)
+    {
+      boost::shared_ptr<TWrapper>(r,boost::detail::dynamic_cast_tag()).swap(*this);
+      return *this;
+    }
+
+    template<class Y> 
+    SharedPtr& 
+    operator()(Y * p) // Y must be complete
+    {
+      return operator=<Y>(SharedPtr<Y>(p));
+    }
+
+    template<class Y> 
+    SharedPtr& 
+    operator()(SharedPtr<Y> const & r) // Y must be complete
+    {
+      return operator=<Y>(SharedPtr<Y>(r));
+    }
+
+    TLockProxy operator-> () const // never throws
+    {
+      return TLockProxy(this->get());
+    }
+    
+  protected:
+    operator const TWrapper& () const;
+
+    operator TWrapper& ();
+
+    TWrapper& operator* () const;
+
+    TWrapper * get() const // never throws
+    {
+      return boost::shared_ptr<TWrapper>::get();
+    }
+  };
+
+  //----------------------------------------------------------------------------
+  typedef SharedPtr<TWrapper> PWrapper;
 }
 
 #endif
