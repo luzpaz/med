@@ -55,6 +55,10 @@ Mistrat_import22.med \
 pointe_import22.med \
 TimeStamps_import22.med \
 poly3D.med \
+Darcy3_3D_H_10x10x10_2.med \
+elle_3D_HPr_10x10x10_2.med \
+elle_3D_HPr_2x2x2_2.med \
+elle_3D_HPr_4x4x4_2.med \
 Darcy3_3D_H_10x10x10.sauve \
 dx200_dy1_avec_2couches.sauve \
 elle_2D_QT_10x10.sauve \

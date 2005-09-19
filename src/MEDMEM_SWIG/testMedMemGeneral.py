@@ -119,6 +119,18 @@ meshNameFiles.append("Mistrat_Hexa")
 ##files.append("TimeStamps.med")
 ##meshNameFiles.append("dom")
 
+files.append("Darcy3_3D_H_10x10x10_2.med")
+meshNameFiles.append("Darcy3_3D_H_10x10x10")
+
+files.append("elle_3D_HPr_10x10x10_2.med")
+meshNameFiles.append("elle_3D_HPr_10x10x10")
+
+files.append("elle_3D_HPr_2x2x2_2.med")
+meshNameFiles.append("elle_3D_HPr_2x2x2")
+
+files.append("elle_3D_HPr_4x4x4_2.med")
+meshNameFiles.append("elle_3D_HPr_4x4x4")
+
 #
 # Castem or Gibi file list
 #
