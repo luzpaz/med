@@ -1,9 +1,5 @@
 #include "MEDMEM_Grid.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 using namespace MEDMEM;
 using namespace MED_EN;
 
@@ -20,10 +16,6 @@ int main (int argc, char ** argv) {
     /* process the arguments */
     if (argc != 3)
 	usage(argv[0]);
-
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
 
     const int SpaceDimension=atoi(argv[1]);
     const int nbMaille=atoi(argv[2]);

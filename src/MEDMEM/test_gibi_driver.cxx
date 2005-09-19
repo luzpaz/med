@@ -1,10 +1,6 @@
 #include "MEDMEM_GibiMeshDriver.hxx"
 #include "MEDMEM_Mesh.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 using namespace std;
 using namespace MEDMEM;
 int main (int argc, char ** argv)
@@ -17,10 +13,6 @@ int main (int argc, char ** argv)
 	<< "-> lit le fichier gibi filename ,crée 2 fichiers : MED et VTK" << endl;
 	exit(-1);
     }
-
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
 
     string gibifilename  = argv[1];
 

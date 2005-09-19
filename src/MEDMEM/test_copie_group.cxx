@@ -14,10 +14,6 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -69,10 +65,6 @@ void affiche_groupe(const GROUP * myGroup)
 }
 
 int main (int argc, char ** argv) {
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
-
   int read;
 
   if (argc <3) { // after 3, ignored !

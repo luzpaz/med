@@ -4,10 +4,6 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 using namespace std;
 using namespace MEDMEM;
 
@@ -20,10 +16,6 @@ int main (int argc, char ** argv)
 	   << " filename meshname" << endl << endl;
       exit(-1);
     }
-
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
 
   string filename = argv[1];
   string meshname = argv[2];
