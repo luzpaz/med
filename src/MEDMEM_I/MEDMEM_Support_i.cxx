@@ -709,6 +709,9 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   delete [] medsupfatherName;
   delete [] supportEntryPath;
 
+  // register the Corba pointer: increase the referrence count
+  MESSAGE("Registering of the Corba Support pointer");
+  Register();
+
   END_OF(LOC);
 }
-

@@ -1,9 +1,11 @@
 ####################################################################################################
 #
-# Test the Med Component: mounting in Memory a .med file and trying to get information through
-# the CORBA Med API
+# Test the MedClient classes: mounting in Memory a .med file and using this file as a client of
+# the MED component we try
 #
 ####################################################################################################
+from libMEDClient import *
+
 import string
 
 import salome
@@ -87,21 +89,24 @@ def getSupportObjectFromStudy(meshName,supportName):
         return myObj
 
 def getFieldObjectFromStudy(dt,it,fieldName,supportName,meshName):
+    type = -1
     meshNameStudy = changeBlankToUnderScore(meshName)
     objNameInStudy = "/Med/MEDFIELD/"+fieldName+"/("+str(dt)+","+str(it)+")_ON_"+supportName+"_OF_"+meshNameStudy
     mySO = salome.myStudy.FindObjectByPath(objNameInStudy)
     if (mySO == None) :
         print objNameInStudy," cannot be found in the Study"
-        return mySO
+        return -1,-1
     else:
         anAttr = mySO.FindAttribute("AttributeIOR")[1]
         obj = salome.orb.string_to_object(anAttr.Value())
         myObj = obj._narrow(SALOME_MED.FIELDINT)
+        type = 0
         if (myObj == None):
             myObj = obj._narrow(SALOME_MED.FIELDDOUBLE)
+            type = 1
             if (myObj == None) :
                 print objNameInStudy," has been found in the Study but with the wrong type"
-        return myObj
+        return myObj,type
 
 fileName = "cube_hexa8_quad4.med"
 
@@ -130,36 +135,11 @@ print "in this med file there is(are) ",nbOfMeshes," mesh(es):"
 for i in range(nbOfMeshes):
     meshName = meshNames[i]
     print "    - the ",print_ord(i)," mesh is named ",meshName
-    print "      getting the MESH object using the API of the corba object MED"
+    print "      getting the distant MESH object using the API of the corba object MED"
     meshObj = medObj.getMeshByName(meshName)
-    print "      getting mesh information (including corba object) using the API of the corba object MESH"
-    for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,
-                   SALOME_MED.MED_FACE,SALOME_MED.MED_EDGE]:
-        nbFam = meshObj.getNumberOfFamilies(entity)
-        nbGrp = meshObj.getNumberOfGroups(entity)
-        if (entity == SALOME_MED.MED_NODE):
-            print "      this mesh has ",nbFam," Node Family(ies) and ",nbGrp," Node Group(s)"
-        elif (entity == SALOME_MED.MED_CELL):
-            print "                    ",nbFam," Cell Family(ies) and ",nbGrp," Cell Group(s)"
-        elif (entity == SALOME_MED.MED_FACE):
-            print "                    ",nbFam," Face Family(ies) and ",nbGrp," Face Group(s)"
-        elif (entity == SALOME_MED.MED_EDGE):
-            print "                    ",nbFam," Edge Family(ies) and ",nbGrp," Cell Group(s)"
 
-        if nbFam > 0:
-            for j in range(nbFam):
-                familyObj = meshObj.getFamily(entity,j+1)
-                print familyObj
 
-        if nbGrp > 0:
-            for j in range(nbGrp):
-                groupObj = meshObj.getGroup(entity,j+1)
-                print groupObj
 
-    print ""
-    print "      getting the MESH object from the Study"
-    meshObj = getMeshObjectFromStudy(meshName)
-    print meshObj
     print "      getting mesh information using the API of the corba object MESH but corba objects are obtained from the Study"
     for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,
                    SALOME_MED.MED_FACE,SALOME_MED.MED_EDGE]:
@@ -202,6 +182,50 @@ for i in range(nbOfMeshes):
         supportName = "SupportOnAll_"+entitySupport
         supportObj = getSupportObjectFromStudy(meshName,supportName)
 
+
+
+
+
+    meshLocalCopy = MESHClient(meshObj)
+    print "      getting information from the local copy of the distant mesh"
+    name = meshLocalCopy.getName()
+    spaceDimension = meshLocalCopy.getSpaceDimension()
+    meshDimension = meshLocalCopy.getMeshDimension()
+    numberOfNodes = meshLocalCopy.getNumberOfNodes()
+    print "          Name = ", name, " space Dim = ", spaceDimension, " mesh Dim = ", meshDimension, " Nb of Nodes = ", numberOfNodes
+    coordSyst = meshLocalCopy.getCoordinatesSystem()
+    print "          The coordinates system is",coordSyst
+    print "          The Coordinates :"
+    coordNames = []
+    coordUnits = []
+    for isd in range(spaceDimension):
+        coordNames.append(meshLocalCopy.getCoordinateName(isd))
+        coordUnits.append(meshLocalCopy.getCoordinateUnit(isd))
+
+    print "          names:", coordNames
+    print "          units", coordUnits
+    print "          values:"
+    coordinates = meshLocalCopy.getCoordinates(MED_FULL_INTERLACE)
+    for k in range(numberOfNodes):
+        kp1 = k+1
+        print "         ---- ", coordinates[k*spaceDimension:(kp1*spaceDimension)]
+    print ""
+    print "          The Cell Nodal Connectivity of the Cells:"
+    nbTypesCell = meshLocalCopy.getNumberOfTypes(MED_CELL)
+    print ""
+    if (nbTypesCell>0):
+        print "      The Mesh has",nbTypesCell,"Type(s) of Cell"
+        types = meshLocalCopy.getTypes(MED_CELL)
+        for k in range(nbTypesCell):
+            type = types[k]
+            nbElemType = meshLocalCopy.getNumberOfElements(MED_CELL,type)
+            print "     For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
+            connectivity = meshLocalCopy.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,type)
+            nbNodesPerCell = type%100
+            for j in range(nbElemType):
+                print "       Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
+
+
 nbOfFields = medObj.getNumberOfFields()
 print "in the considered .med file there is(are) ",nbOfFields," field(s):"
 fieldNames = medObj.getFieldNames()
@@ -214,22 +238,58 @@ for i in range(nbOfFields):
         dt = dtitfield[0]
         it = dtitfield[1]
         print "     * Iteration:",dt,"Order number:",it
-        for k in range(nbOfMeshes):
-            meshName = meshNames[k]
-            for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,
-                           SALOME_MED.MED_FACE,SALOME_MED.MED_EDGE]:
-                if entity == SALOME_MED.MED_NODE :
-                    entitySupport = "MED_NOEUD"
-                elif entity == SALOME_MED.MED_CELL :
-                    entitySupport = "MED_MAILLE"
-                elif entity == SALOME_MED.MED_FACE :
-                    entitySuppor = "MED_FACE"
-                elif entity == SALOME_MED.MED_EDGE :
-                    entitySupport = "MED_ARETE"
-                supportName = "SupportOnAll_"+entitySupport
-                print "getting a corba object Field from the study iteration ",dt," order number ",it," on the support ",supportName," from the mesh ",meshName
-                fieldObj = getFieldObjectFromStudy(dt,it,fieldName,supportName,meshName)
-                print fieldObj
+        meshName = meshNames[0]
+        for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,
+                       SALOME_MED.MED_FACE,SALOME_MED.MED_EDGE]:
+            if entity == SALOME_MED.MED_NODE :
+                entitySupport = "MED_NOEUD"
+            elif entity == SALOME_MED.MED_CELL :
+                entitySupport = "MED_MAILLE"
+            elif entity == SALOME_MED.MED_FACE :
+                entitySuppor = "MED_FACE"
+            elif entity == SALOME_MED.MED_EDGE :
+                entitySupport = "MED_ARETE"
+            supportName = "SupportOnAll_"+entitySupport
+            print "         getting a corba object Field from the study iteration ",dt," order number ",it," on the support ",supportName," from the mesh ",meshName
+            fieldObj,type = getFieldObjectFromStudy(dt,it,fieldName,supportName,meshName)
+            print fieldObj
+
+            if ((fieldObj != None) and (fieldObj != -1)):
+                if(type == 1):
+                    fieldTyped = FIELDDOUBLEClient(fieldObj)
+                elif (type == 0):
+                    fieldTyped = FIELDINTClient(fieldObj)
+
+                type = fieldTyped.getValueType()
+                print "     * Iteration:",dt,"Order number:",it,"Type:",type
+                name = fieldTyped.getName()
+                desc = fieldTyped.getDescription()
+                nbOfComp = fieldTyped.getNumberOfComponents()
+                print "     Field",name," : ",desc
+                print "     Number Of Components:",nbOfComp
+                iterationNb = fieldTyped.getIterationNumber()
+                orderNb = fieldTyped.getOrderNumber()
+                time = fieldTyped.getTime()
+                print "     Iteration Number",iterationNb
+                print "     Order Number",orderNb
+                print "     Time",time
+                support = fieldTyped.getSupport()
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+                print "     Values:",nbOf
+                for k in range(nbOf):
+                    valueI = fieldTyped.getValueI(MED_FULL_INTERLACE,k+1)
+                    print "     *",valueI[:nbOfComp]
+
+
+
+
+
+
+
+
+
+
+
 
 print ""
 print "END of the Pyhton script ..... Ctrl D to exit"

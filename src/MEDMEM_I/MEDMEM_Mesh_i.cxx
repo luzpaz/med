@@ -1354,6 +1354,10 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
   	_meshId = newObj->GetID();
   	myBuilder->CommitCommand();
 
+	// register the Corba pointer: increase the referrence count
+   	MESSAGE("Registering of the Corba Mesh pointer");
+	Register();
+
 	END_OF("Mesh_i::addInStudy(SALOMEDS::Study_ptr myStudy)");
 }
 //=============================================================================
@@ -1415,6 +1419,10 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
         aComment->SetValue(fileName.c_str());
         _meshId = newObj->GetID();
         myBuilder->CommitCommand();
+
+	// register the Corba pointer: increase the referrence count
+   	MESSAGE("Registering of the Corba Mesh pointer");
+	Register();
 
         END_OF("Mesh_i::addInStudy(SALOMEDS::Study_ptr myStudy)");
 }

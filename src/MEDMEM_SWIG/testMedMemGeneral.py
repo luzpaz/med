@@ -868,7 +868,7 @@ for i in range(nbOfFiles):
                         print "     Norme  2  : ", fieldint.norm2()
                         print "     Norme Max : ", fieldint.normMax()
 
-                        if fielddouble.getSupport().getEntity()!=MED_NODE:
+                        if fieldint.getSupport().getEntity()!=MED_NODE:
                             fieldint_vol=fieldint.getSupport().getMesh().getVolume(fieldint.getSupport())
                             print "     Norme L1  : ", fieldint.normL1()
                             print "     Norme L2  : ", fieldint.normL2()
@@ -883,7 +883,7 @@ for i in range(nbOfFiles):
                             print "          Name:",compName
                             print "          Description:",compDesc
                             print "          Unit:",compUnit
-                            if fielddouble.getSupport().getEntity()!=MED_NODE:
+                            if fieldint.getSupport().getEntity()!=MED_NODE:
                                 print "          Norme L1  : ", fieldint.normL1(kp1)
                                 print "          Norme L2  : ", fieldint.normL2(kp1)
                                 print "          Norme L2(vol) : ", fieldint.normL2(kp1,fieldint_vol)
