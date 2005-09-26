@@ -933,7 +933,7 @@ Internal Corba method.
 
   // MED interface
 
-  interface MED {
+  interface MED : SALOME::GenericObj {
     /*!
       returns the number of meshes in the %MED object.
      */

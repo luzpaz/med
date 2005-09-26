@@ -545,6 +545,10 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 	delete [] supportEntryPath;
 	delete [] fieldEntryName;
 
+	// register the Corba pointer: increase the referrence count
+   	MESSAGE("Registering of the Corba Field pointer");
+	Register();
+
 	MESSAGE("FIELD_i::addInStudy");
 
         //END_OF("FIELD_i::addInStudy");

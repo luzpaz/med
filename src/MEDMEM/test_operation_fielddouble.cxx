@@ -16,10 +16,6 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 double myfunction1(double x)
 {
     return 0.25*(x-1.0);
@@ -194,10 +190,6 @@ int main (int argc, char ** argv)
 	<< "Use optional option -v to select verbose mode" << endl;
 	exit(-1);
     }
-
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
 
     string filename  = argv[verbose+1];
     string meshname  = argv[verbose+2];

@@ -2,7 +2,11 @@ template<class T>
 FIELDClient<T>::FIELDClient(typename MapCppFieldServ<T>::FieldPtrType ptrCorba,MEDMEM::SUPPORT * S):_fieldPtr(MapCppFieldServ<T>::FieldGlobalType::_duplicate(ptrCorba)),_refCounter(1)
 {
   if (!S) 
-    MEDMEM::FIELD<T>::_support=new MEDMEM::SUPPORTClient(_fieldPtr->getSupport());
+    {
+      SCRUTE(_fieldPtr);
+      SCRUTE(_fieldPtr->getSupport());
+      MEDMEM::FIELD<T>::_support=new MEDMEM::SUPPORTClient(_fieldPtr->getSupport());
+    }
   else
     MEDMEM::FIELD<T>::setSupport(S);
   

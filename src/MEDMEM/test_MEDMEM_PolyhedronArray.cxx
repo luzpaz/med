@@ -2,20 +2,12 @@
 
 #include "MEDMEM_PolyhedronArray.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
 int main(void)
 {
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
-
   POLYHEDRONARRAY myPArray(2,11,40);
   med_int polyhedronindex[2] = {1,7};
   med_int facesindex[11] = {1,5,9,13,17,21,25,28,31,34,37};

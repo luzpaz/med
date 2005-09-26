@@ -1,14 +1,11 @@
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Field.hxx"
-#include "LocalTraceCollector.hxx"
 
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
 int main (int argc, char ** argv) {
-  LocalTraceCollector::instance();
-
   double Coordinates[57] = {
     2.0, 3.0, 2.0,
     3.0, 2.0, 2.0,

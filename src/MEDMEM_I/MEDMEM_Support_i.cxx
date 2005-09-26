@@ -433,7 +433,7 @@ throw (SALOME::SALOME_Exception)
         SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
-		MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
+		MESSAGE ("Nombre d'elements  mis de faÃ§on stupide a MED_ALL_ELEMENTS");
                 int nbelements=_support->getNumberOfElements(::MED_ALL_ELEMENTS);
                 myseq->length(nbelements);
                 const int * numbers=_support->getNumberIndex();
@@ -465,7 +465,7 @@ SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumberIndex()
   SALOME::SenderInt_ptr ret;
   try
     {
-      MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
+      MESSAGE ("Nombre d'elements  mis de faÃ§on stupide a MED_ALL_ELEMENTS");
       int nbelements=_support->getNumberOfElements(::MED_ALL_ELEMENTS);
       const int * numbers=_support->getNumberIndex();
       ret=SenderFactory::buildSender(*this,numbers,nbelements);
@@ -709,6 +709,9 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   delete [] medsupfatherName;
   delete [] supportEntryPath;
 
+  // register the Corba pointer: increase the referrence count
+  MESSAGE("Registering of the Corba Support pointer");
+  Register();
+
   END_OF(LOC);
 }
-

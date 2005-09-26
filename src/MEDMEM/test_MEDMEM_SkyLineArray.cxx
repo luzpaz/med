@@ -1,18 +1,10 @@
 #include "utilities.h"
 #include "MEDMEM_SkyLineArray.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 using namespace std;
 using namespace MEDMEM;
 
 int main (int argc, char ** argv) {
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
-
   int NumberOfCell = 3 ; // 1 triangle,1 quadrangle,1 triangle
   int Size = 10 ; // 10 nodes
 

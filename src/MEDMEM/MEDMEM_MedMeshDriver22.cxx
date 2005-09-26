@@ -176,10 +176,13 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
   buildAllGroups(_ptrMesh->_groupNode,_ptrMesh->_familyNode) ;
   // on cell
   buildAllGroups(_ptrMesh->_groupCell,_ptrMesh->_familyCell) ;
-  // on face
-  buildAllGroups(_ptrMesh->_groupFace,_ptrMesh->_familyFace) ;
-  // on edge
-  buildAllGroups(_ptrMesh->_groupEdge,_ptrMesh->_familyEdge) ;
+
+  if (_ptrMesh->_meshDimension == 3)
+    // on face
+    buildAllGroups(_ptrMesh->_groupFace,_ptrMesh->_familyFace) ;
+  else if (_ptrMesh->_meshDimension == 2)
+    // on edge
+    buildAllGroups(_ptrMesh->_groupEdge,_ptrMesh->_familyEdge) ;
 
 //   MESSAGE(LOC<<"Checking of CellModel !!!!!!!");
 

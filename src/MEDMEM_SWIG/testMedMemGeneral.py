@@ -119,6 +119,18 @@ meshNameFiles.append("Mistrat_Hexa")
 ##files.append("TimeStamps.med")
 ##meshNameFiles.append("dom")
 
+files.append("Darcy3_3D_H_10x10x10_2.med")
+meshNameFiles.append("Darcy3_3D_H_10x10x10")
+
+files.append("elle_3D_HPr_10x10x10_2.med")
+meshNameFiles.append("elle_3D_HPr_10x10x10")
+
+files.append("elle_3D_HPr_2x2x2_2.med")
+meshNameFiles.append("elle_3D_HPr_2x2x2")
+
+files.append("elle_3D_HPr_4x4x4_2.med")
+meshNameFiles.append("elle_3D_HPr_4x4x4")
+
 #
 # Castem or Gibi file list
 #
@@ -856,7 +868,7 @@ for i in range(nbOfFiles):
                         print "     Norme  2  : ", fieldint.norm2()
                         print "     Norme Max : ", fieldint.normMax()
 
-                        if fielddouble.getSupport().getEntity()!=MED_NODE:
+                        if fieldint.getSupport().getEntity()!=MED_NODE:
                             fieldint_vol=fieldint.getSupport().getMesh().getVolume(fieldint.getSupport())
                             print "     Norme L1  : ", fieldint.normL1()
                             print "     Norme L2  : ", fieldint.normL2()
@@ -871,7 +883,7 @@ for i in range(nbOfFiles):
                             print "          Name:",compName
                             print "          Description:",compDesc
                             print "          Unit:",compUnit
-                            if fielddouble.getSupport().getEntity()!=MED_NODE:
+                            if fieldint.getSupport().getEntity()!=MED_NODE:
                                 print "          Norme L1  : ", fieldint.normL1(kp1)
                                 print "          Norme L2  : ", fieldint.normL2(kp1)
                                 print "          Norme L2(vol) : ", fieldint.normL2(kp1,fieldint_vol)

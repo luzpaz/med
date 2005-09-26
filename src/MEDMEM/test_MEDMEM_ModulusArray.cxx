@@ -2,18 +2,10 @@
 
 #include "MEDMEM_ModulusArray.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 using namespace std;
 using namespace MEDMEM;
 
 int main (int argc, char ** argv) {
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
-
   using namespace std ;
 
   int array[5]={0,1,2,1,4} ;

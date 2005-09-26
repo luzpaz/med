@@ -16,6 +16,11 @@
 %include "libMedCorba_Swig.i"
 %include "libMEDMEM_Swig.i"
 
+%typecheck(SWIG_TYPECHECK_POINTER) SALOME_MED::FIELDDOUBLE_ptr, SALOME_MED::FIELDINT_ptr
+{
+  $1 = ($input != 0);
+}
+
 class MESHClient : public MESH {
 
  public:
