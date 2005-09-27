@@ -52,7 +52,7 @@ template<class T>
 	      Py_DECREF(function_ret);
 	      throw MEDMEM::MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API list of integer fonct (double, double), especially the size of the returned list)");
 	    }
-	  for(i=0;i<_spaceDim;i++)
+	  for(i=0;i<_nbOfComponent;i++)
 	    {
 	      PyObject * tmp=PyList_GetItem(function_ret,i);
 	      err = Binding<T>::Checker(tmp);
