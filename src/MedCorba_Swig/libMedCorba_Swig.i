@@ -12,8 +12,8 @@
 #include "MEDMEM_Med_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_Support_i.hxx"
-#include "MEDMEM_SWIG_FieldDouble.hxx"
-#include "MEDMEM_SWIG_FieldInt.hxx"
+// #include "MEDMEM_SWIG_FieldDouble.hxx"
+// #include "MEDMEM_SWIG_FieldInt.hxx"
 
   using namespace MEDMEM;
   using namespace MED_EN;

@@ -26,19 +26,27 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_Grid.hxx"
-#include "MEDMEM_SWIG_FieldDouble.hxx"
-#include "MEDMEM_SWIG_FieldInt.hxx"
-#include "MEDMEM_SWIG_MedFieldDoubleDriver.hxx"
-#include "MEDMEM_SWIG_MedFieldIntDriver.hxx"
-#include "MEDMEM_SWIG_AsciiFieldDoubleDriver.hxx"
-#include "MEDMEM_SWIG_AsciiFieldIntDriver.hxx"
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_DriverFactory.hxx"
 #include "MEDMEM_SWIG_Templates.hxx"
 
+#ifdef _DEBUG_
+#include "LocalTraceCollector.hxx"
+#endif /* ifdef _DEBUG_*/
+
   using namespace MEDMEM;
   using namespace MED_EN;
+
+typedef FIELD <double> FIELDDOUBLE;
+typedef FIELD <int> FIELDINT;
+
 %}
+
+// SWIG needs these typedefs to wrap FIELDDOUBLE*, for ex., to something like
+// <C++ FIELD<double> instance at _d0709808_p_FIELDDOUBLE>, not to
+// <SWIG Object at _d0709808_p_FIELDDOUBLE> which has no attributes
+typedef FIELD <double> FIELDDOUBLE;
+typedef FIELD <int> FIELDINT;
 
 %include "typemaps.i"
 %include "my_typemap.i"
@@ -59,6 +67,17 @@
       return NULL;
     }
 }
+
+/*
+  Initialisation block in the case of the debug mode (definition of _DEBUG_
+  compilation switch) and due to the LocalTraceCollector mechanism
+*/
+
+%init %{
+#ifdef _DEBUG_
+  LocalTraceCollector::instance();
+#endif /* ifdef _DEBUG_*/
+%}
 
 /*
   managing the use of operator= of any class by renaming it assign()
@@ -744,7 +763,7 @@ class FAMILY : public SUPPORT
 class FIELD_
 {
 public:
-  FIELD_(const SUPPORT * Support, const int NumberOfComponents);
+  //  FIELD_(const SUPPORT * Support, const int NumberOfComponents);
 
   ~FIELD_();
 
@@ -799,50 +818,50 @@ public:
   }
 };
 
-
-class FIELDDOUBLE : public FIELD_
+template< class T1 >
+class FIELD : public FIELD_
 {
 public:
-  ~FIELDDOUBLE();
+  ~FIELD();
 
-  FIELDDOUBLE(const SUPPORT * Support, const int NumberOfComponents);
+  FIELD(const SUPPORT * Support, const int NumberOfComponents);
 
   /*
     WARNING:
-    other constructor of FIELDDOUBLE (C++ FIELD<double>) object.
+    other constructor of FIELD (C++ FIELD<T1>) object.
     Only one constructor could be wrapped and
     the others commented out when using
     SWIG with a version lesser than 1.3
   */
 
-  FIELDDOUBLE();
+  FIELD();
 
-  FIELDDOUBLE(const FIELDDOUBLE & m);
+  FIELD(const FIELD & m);
 
   void read(int index=0);
 
-  double getValueIJ(int i,int j) const;
+  T1 getValueIJ(int i,int j) const;
 
-  void setValue(medModeSwitch mode, double* value);
+  void setValue(medModeSwitch mode, T1* value);
 
-  void setValueI(medModeSwitch mode, int i, double* value);
+  void setValueI(medModeSwitch mode, int i, T1* value);
 
-  void setValueIJ(int i, int j, double value);
+  void setValueIJ(int i, int j, T1 value);
 
   void allocValue(const int NumberOfComponents);
 
   void deallocValue();
 
-  void applyLin(double a, double n);
+  void applyLin(T1 a, T1 n);
 
-  void applyPow(double scalar);
+  void applyPow(T1 scalar);
 
-  double normMax();
-  double norm2();
-  double normL2(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
-  double normL2(const FIELDDOUBLE * p_field_volume=NULL) const;
-  double normL1(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
-  double normL1(const FIELDDOUBLE * p_field_volume=NULL) const;
+  T1 normMax();
+  T1 norm2();
+  T1 normL2(int component, const FIELD<double> * p_field_volume=NULL) const;
+  T1 normL2(const FIELD<double> * p_field_volume=NULL) const;
+  T1 normL1(int component, const FIELD<double> * p_field_volume=NULL) const;
+  T1 normL1(const FIELD<double> * p_field_volume=NULL) const;
 
 
   %extend {
@@ -850,7 +869,7 @@ public:
     {
 	MESSAGE("Appel de applyPyFunc");
 	if (!PyCallable_Check(func)) {
-	    PyErr_SetString(PyExc_TypeError, "FIELDDOUBLE.applyPyFunc prend en argument une fonction");
+	    PyErr_SetString(PyExc_TypeError, "FIELD.applyPyFunc prend en argument une fonction");
 	    return NULL;
 	}
 
@@ -859,87 +878,85 @@ public:
 	for (int i=1; i!=nVal+1; ++i)
 	    for ( int j=1 ;j!=nComp+1 ;++j )
 	    {
-		self->setValueIJ(i,j,PyFloat_AsDouble (PyObject_CallFunction( func, "f", self->getValueIJ(i,j) ) ) );
-	        //cout << "value(" << i << "," << j << ") = " << self->getValueIJ(i,j) << " -> ";
-		//cout << PyFloat_AsDouble (PyObject_CallFunction( func, "f", self->getValueIJ(i,j) ) ) << endl;
+              self->setValueIJ(i,j, Binding<T1>::Functor( func, self->getValueIJ(i,j) ) );
 	    }
-	 PyObject * result = Py_BuildValue("d", nComp*nVal);
+	 PyObject * result = Binding<double>::Traducer(nComp*nVal);
 	 return result;
     }
 
-    %newobject __add__(const FIELDDOUBLE & );
-    FIELDDOUBLE * __add__(const FIELDDOUBLE & m)
+    %newobject __add__(const FIELD & );
+    FIELD * __add__(const FIELD & m)
       {
-	MESSAGE("operator +  : Creation of the addition of two FIELDDOUBLEs");
+	MESSAGE("operator +  : Creation of the addition of two FIELDs");
 
-	FIELD<double>* result = FIELD<double>::add( *(FIELD<double>*)self , (FIELD<double>&)m );
-	return (FIELDDOUBLE*) result;
+	FIELD<T1>* result = FIELD<T1>::add( *(FIELD<T1>*)self , (FIELD<T1>&)m );
+	return (FIELD<T1>*) result;
       }
 
-    %newobject __sub__(const FIELDDOUBLE & );
-    FIELDDOUBLE * __sub__(const FIELDDOUBLE & m)
+    %newobject __sub__(const FIELD & );
+    FIELD * __sub__(const FIELD & m)
       {
-	MESSAGE("operator -  : Creation of the substraction of two FIELDDOUBLEs");
-	FIELD<double>* result = FIELD<double>::sub( *(FIELD<double>*)self , (FIELD<double>&)m );
-	return (FIELDDOUBLE*) result;
+	MESSAGE("operator -  : Creation of the substraction of two FIELDs");
+	FIELD<T1>* result = FIELD<T1>::sub( *(FIELD<T1>*)self , (FIELD<T1>&)m );
+	return (FIELD<T1>*) result;
       }
 
-    %newobject __mul__(const FIELDDOUBLE & );
-    FIELDDOUBLE * __mul__(const FIELDDOUBLE & m)
+    %newobject __mul__(const FIELD & );
+    FIELD * __mul__(const FIELD & m)
       {
-	MESSAGE("operator *  : Creation of the multiplication of two FIELDDOUBLEs");
-	FIELD<double>* result = FIELD<double>::mul( *(FIELD<double>*)self , (FIELD<double>&)m );
-	return (FIELDDOUBLE*) result;
+	MESSAGE("operator *  : Creation of the multiplication of two FIELDs");
+	FIELD<T1>* result = FIELD<T1>::mul( *(FIELD<T1>*)self , (FIELD<T1>&)m );
+	return (FIELD<T1>*) result;
       }
 
-    %newobject __div__(const FIELDDOUBLE & );
-    FIELDDOUBLE * __div__(const FIELDDOUBLE & m)
+    %newobject __div__(const FIELD & );
+    FIELD * __div__(const FIELD & m)
       {
-	MESSAGE("operator /  : Creation of the division of two FIELDDOUBLEs");
-	FIELD<double>* result = FIELD<double>::div( *(FIELD<double>*)self , (FIELD<double>&)m );
-	return (FIELDDOUBLE*) result;
+	MESSAGE("operator /  : Creation of the division of two FIELDs");
+	FIELD<T1>* result = FIELD<T1>::div( *(FIELD<T1>*)self , (FIELD<T1>&)m );
+	return (FIELD<T1>*) result;
       }
 
     %newobject addDeep(const FIELDINT & );
-    FIELDDOUBLE * addDeep(const FIELDDOUBLE & m)
+    FIELD * addDeep(const FIELD & m)
       {
 	MESSAGE("operator +  : Creation of the addition of two FIELDINTs");
-	FIELD<double>* result = FIELD<double>::addDeep( *(FIELD<double>*)self , (FIELD<double>&)m );
-	return (FIELDDOUBLE*) result;
+	FIELD<T1>* result = FIELD<T1>::addDeep( *(FIELD<T1>*)self , (FIELD<T1>&)m );
+	return (FIELD<T1>*) result;
       }
 
-    %newobject subDeep(const FIELDDOUBLE & );
-    FIELDDOUBLE * subDeep(const FIELDDOUBLE & m)
+    %newobject subDeep(const FIELD & );
+    FIELD * subDeep(const FIELD & m)
       {
-	MESSAGE("operator -  : Creation of the substraction of two FIELDDOUBLEs");
-	FIELD<double>* result = FIELD<double>::subDeep( *(FIELD<double>*)self , (FIELD<double>&)m );
-	return (FIELDDOUBLE*) result;
+	MESSAGE("operator -  : Creation of the substraction of two FIELDs");
+	FIELD<T1>* result = FIELD<T1>::subDeep( *(FIELD<T1>*)self , (FIELD<T1>&)m );
+	return (FIELD<T1>*) result;
       }
 
-    %newobject mulDeep(const FIELDDOUBLE & );
-    FIELDDOUBLE * mulDeep(const FIELDDOUBLE & m)
+    %newobject mulDeep(const FIELD & );
+    FIELD * mulDeep(const FIELD & m)
       {
-	MESSAGE("operator *  : Creation of the multiplication of two FIELDDOUBLEs");
-	FIELD<double>* result = FIELD<double>::mulDeep( *(FIELD<double>*)self , (FIELD<double>&)m );
-	return (FIELDDOUBLE*) result;
+	MESSAGE("operator *  : Creation of the multiplication of two FIELDs");
+	FIELD<T1>* result = FIELD<T1>::mulDeep( *(FIELD<T1>*)self , (FIELD<T1>&)m );
+	return (FIELD<T1>*) result;
       }
 
-    %newobject divDeep(const FIELDDOUBLE & );
-    FIELDDOUBLE * divDeep(const FIELDDOUBLE & m)
+    %newobject divDeep(const FIELD & );
+    FIELD * divDeep(const FIELD & m)
       {
-	MESSAGE("operator /  : Creation of the division of two FIELDDOUBLEs");
-	FIELD<double>* result = FIELD<double>::divDeep( *(FIELD<double>*)self , (FIELD<double>&)m );
-	return (FIELDDOUBLE*) result;
+	MESSAGE("operator /  : Creation of the division of two FIELDs");
+	FIELD<T1>* result = FIELD<T1>::divDeep( *(FIELD<T1>*)self , (FIELD<T1>&)m );
+	return (FIELD<T1>*) result;
       }
 
-    FIELDDOUBLE (const SUPPORT * Support, driverTypes driverType,
+    FIELD (const SUPPORT * Support, driverTypes driverType,
 		 char * fileName, char * fieldName,
 		 const int iterationNumber,
 		 const int orderNumber)
       {
-	return new FIELDDOUBLE(Support, driverType, string(fileName),
-			       string(fieldName),iterationNumber,
-			       orderNumber);
+	return new FIELD<T1>(Support, driverType, string(fileName),
+                             string(fieldName),iterationNumber,
+                             orderNumber);
       }
 
     void write(int index=0, char * driverName="")
@@ -959,16 +976,16 @@ public:
 	int size = (self->getNumberOfComponents())*
 	  ((self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS));
 
-	const double * value = self->getValue(Mode);
+	const T1 * value = self->getValue(Mode);
 
 	py_list = PyList_New(size);
 	for (int i=0; i < size; i++)
 	  {
 	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("d", value[i]));
+				     Binding< T1 >::Traducer(value[i]));
 	    if(err)
 	      {
-		char * message = "Error in FIELDDOUBLE::getValue";
+		char * message = "Error in FIELD::getValue";
 		PyErr_SetString(PyExc_RuntimeError, message);
 		return NULL;
 	      }
@@ -987,16 +1004,16 @@ public:
 
 	if ( Mode == MED_NO_INTERLACE ) size = (self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS);
 
-	const double * value = self->getValueI(Mode,index);
+	const T1 * value = self->getValueI(Mode,index);
 
 	py_list = PyList_New(size);
 	for (int i=0; i < size; i++)
 	  {
 	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("d", value[i]));
+				     Binding< T1 >::Traducer( value[i]) );
 	    if(err)
 	      {
-		char * message = "Error in FIELDDOUBLE::getValueI";
+		char * message = "Error in FIELD::getValueI";
 		PyErr_SetString(PyExc_RuntimeError, message);
 		return NULL;
 	      }
@@ -1012,228 +1029,16 @@ public:
       }
 
     %newobject extract(const SUPPORT *subSupport);
-    FIELDDOUBLE *extract(const SUPPORT *subSupport)
+    FIELD *extract(const SUPPORT *subSupport)
       {
-	FIELD<double>* result=self->extract(subSupport);
-	return (FIELDDOUBLE *)result;
+	FIELD<T1>* result=self->extract(subSupport);
+	return (FIELD<T1> *)result;
       }
   }
 };
+%template (FIELDDOUBLE) FIELD <double>;
+%template (FIELDINT) FIELD <int>;
 
-class FIELDINT : public FIELD_
-{
-public:
-  ~FIELDINT();
-
-  FIELDINT(const SUPPORT * Support, const int NumberOfComponents);
-
-  /*
-    WARNING:
-    other constructor of FIELDINT (C++ FIELD<int>) object.
-    other constructor of MED object.
-    Only one constructor could be wrapped and
-    the others commented out when using
-    SWIG with a version lesser than 1.3
-  */
-
-  FIELDINT();
-
-  FIELDINT(const FIELDINT & m);
-
-  void read(int index=0);
-
-  int getValueIJ(int i,int j) const;
-
-  void setValue(medModeSwitch mode, int* value);
-
-  void setValueI(medModeSwitch mode, int i, int* value);
-
-  void setValueIJ(int i, int j, int value);
-
-  void allocValue(const int NumberOfComponents);
-
-  void deallocValue();
-
-  void applyLin(int a, int n);
-
-  void applyPow(int scalar);
-
-  double normMax();
-  double norm2();
-  double normL2(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
-  double normL2(const FIELDDOUBLE * p_field_volume=NULL) const;
-  double normL1(int component, const FIELDDOUBLE * p_field_volume=NULL) const;
-  double normL1(const FIELDDOUBLE * p_field_volume=NULL) const;
-
-
-  %extend {
-
-    PyObject *  applyPyFunc( PyObject * func )
-    {
-	if (!PyCallable_Check(func)) {
-	    PyErr_SetString(PyExc_TypeError, "FIELDDOUBLE.applyPyFunc prend en argument une fonction");
-	    return NULL;
-	}
-
-    	int nComp=self->getNumberOfComponents();
-    	int nVal=self->getNumberOfValues();
-	for (int i=1; i!=nVal+1; ++i)
-	    for ( int j=1 ;j!=nComp+1 ;++j )
-		self->setValueIJ(i,j,PyInt_AsLong (PyObject_CallFunction( func, "i", self->getValueIJ(i,j) ) ) );
-	 PyObject * result = Py_BuildValue("d", nComp*nVal);
-	 return result;
-    }
-
-    %newobject __add__(const FIELDINT & );
-    FIELDINT * __add__(const FIELDINT & m)
-      {
-	MESSAGE("operator +  : Creation of the addition of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::add( *(FIELD<int>*)self , (FIELD<int>&)m );
-	return (FIELDINT*) result;
-      }
-
-    %newobject __sub__(const FIELDINT & );
-    FIELDINT * __sub__(const FIELDINT & m)
-      {
-	MESSAGE("operator -  : Creation of the substraction of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::sub( *(FIELD<int>*)self , (FIELD<int>&)m );
-	return (FIELDINT*) result;
-      }
-
-    %newobject __mul__(const FIELDINT & );
-    FIELDINT * __mul__(const FIELDINT & m)
-      {
-	MESSAGE("operator *  : Creation of the multiplication of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::mul( *(FIELD<int>*)self , (FIELD<int>&)m );
-	return (FIELDINT*) result;
-      }
-
-    %newobject __div__(const FIELDINT & );
-    FIELDINT * __div__(const FIELDINT & m)
-      {
-	MESSAGE("operator /  : Creation of the division of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::div( *(FIELD<int>*)self , (FIELD<int>&)m );
-	return (FIELDINT*) result;
-      }
-
-    %newobject addDeep(const FIELDINT & );
-    FIELDINT * addDeep(const FIELDINT & m)
-      {
-	MESSAGE("operator +  : Creation of the addition of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::addDeep( *(FIELD<int>*)self , (FIELD<int>&)m );
-	return (FIELDINT*) result;
-      }
-
-    %newobject subDeep(const FIELDINT & );
-    FIELDINT * subDeep(const FIELDINT & m)
-      {
-	MESSAGE("operator -  : Creation of the substraction of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::subDeep( *(FIELD<int>*)self , (FIELD<int>&)m );
-	return (FIELDINT*) result;
-      }
-
-    %newobject mulDeep(const FIELDINT & );
-    FIELDINT * mulDeep(const FIELDINT & m)
-      {
-	MESSAGE("operator *  : Creation of the multiplication of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::mulDeep( *(FIELD<int>*)self , (FIELD<int>&)m );
-	return (FIELDINT*) result;
-      }
-
-    %newobject divDeep(const FIELDINT & );
-    FIELDINT * divDeep(const FIELDINT & m)
-      {
-	MESSAGE("operator /  : Creation of the division of two FIELDINTs");
-	FIELD<int>* result = FIELD<int>::divDeep( *(FIELD<int>*)self , (FIELD<int>&)m );
-	return (FIELDINT*) result;
-      }
-
-    FIELDINT(const SUPPORT * Support, driverTypes driverType,
-             char * fileName, char * fieldName,
-	     const int iterationNumber,
-	     const int orderNumber)
-      {
-	return new FIELDINT(Support, driverType, string(fileName),
-			    string(fieldName), iterationNumber,
-			    orderNumber);
-      }
-
-    void write(int index=0, char * driverName="")
-      {
-	self->write(index, string(driverName));
-      }
-
-    void writeAppend(int index=0, char * driverName="")
-      {
-	self->writeAppend(index, string(driverName));
-      }
-
-    PyObject * getValue(medModeSwitch Mode)
-      {
-	PyObject *py_list;
-
-	int size = (self->getNumberOfComponents())*
-	  ((self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS));
-
-	const int * value = self->getValue(Mode);
-
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("i", value[i]));
-	    if(err)
-	      {
-		char * message = "Error in FIELDINT::getValue";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
-      }
-
-    PyObject * getValueI(medModeSwitch Mode, int index)
-      {
-	PyObject *py_list;
-
-	int size = self->getNumberOfComponents();
-
-	if ( Mode == MED_NO_INTERLACE ) size = (self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS);
-
-	const int * value = self->getValueI(Mode,index);
-
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("i", value[i]));
-	    if(err)
-	      {
-		char * message = "Error in FIELDINT::getValueI";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
-      }
-
-    void allocValue2(int NumberOfComponents, int LengthValue)
-      {
-	self->allocValue(NumberOfComponents, LengthValue);
-      }
-
-    %newobject extract(const SUPPORT *subSupport);
-    FIELDINT *extract(const SUPPORT *subSupport)
-      {
-	FIELD<int>* result=self->extract(subSupport);
-	return (FIELDINT *)result;
-      }
-  }
-};
 
 class GROUP : public SUPPORT
 {
@@ -2488,14 +2293,15 @@ class MED_MESH_RDWR_DRIVER : public virtual MED_MESH_RDONLY_DRIVER,
 };
 
 /*
-  API de MED_FIELDDOUBLE_[RDONLY,WRONLY,RDWR]_DRIVER
+  API de MED_FIELD_[RDONLY,WRONLY,RDWR]_DRIVER
 */
 
-class MED_FIELDDOUBLE_RDONLY_DRIVER
+template< class T1 >
+class MED_FIELD_RDONLY_DRIVER
 {
 public:
 
-  ~MED_FIELDDOUBLE_RDONLY_DRIVER();
+  ~MED_FIELD_RDONLY_DRIVER();
 
   void open();
 
@@ -2506,16 +2312,16 @@ public:
   void read ( void ) ;
 
   %extend {
-    MED_FIELDDOUBLE_RDONLY_DRIVER(char * fileName, FIELDDOUBLE * ptrField)
+    MED_FIELD_RDONLY_DRIVER(char * fileName, FIELD< T1 > * ptrField)
       {
-	return new MED_FIELDDOUBLE_RDONLY_DRIVER(string(fileName), ptrField);
+	return new MED_FIELD_RDONLY_DRIVER< T1 >(string(fileName), ptrField);
       }
 
     %newobject __str__();
     const char* __str__()
       {
 	ostringstream mess;
-	mess << "Python Printing MED_FIELDDOUBLE_RDONLY_DRIVER : " << *self << endl;
+	mess << "Python Printing MED_FIELD_RDONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
 
@@ -2534,12 +2340,16 @@ public:
       }
   }
 };
+%template ( MED_FIELDDOUBLE_RDONLY_DRIVER ) MED_FIELD_RDONLY_DRIVER< double >;
+%template ( MED_FIELDINT_RDONLY_DRIVER ) MED_FIELD_RDONLY_DRIVER< int >;
 
-class MED_FIELDDOUBLE_WRONLY_DRIVER
+
+template < class T1 >
+class MED_FIELD_WRONLY_DRIVER
 {
 public:
 
-  ~MED_FIELDDOUBLE_WRONLY_DRIVER();
+  ~MED_FIELD_WRONLY_DRIVER();
 
   void open();
 
@@ -2550,16 +2360,16 @@ public:
   void read ( void ) ;
 
   %extend {
-    MED_FIELDDOUBLE_WRONLY_DRIVER(char * fileName, FIELDDOUBLE * ptrField)
+    MED_FIELD_WRONLY_DRIVER(char * fileName, FIELD< T1 > * ptrField)
       {
-	return new MED_FIELDDOUBLE_WRONLY_DRIVER(string(fileName), ptrField);
+	return new MED_FIELD_WRONLY_DRIVER< T1 >(string(fileName), ptrField);
       }
 
     %newobject __str__();
     const char* __str__()
       {
 	ostringstream mess;
-	mess << "Python Printing MED_FIELDDOUBLE_WRONLY_DRIVER : " << *self << endl;
+	mess << "Python Printing MED_FIELD_WRONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
 
@@ -2578,12 +2388,16 @@ public:
       }
   }
 };
+%template ( MED_FIELDDOUBLE_WRONLY_DRIVER ) MED_FIELD_WRONLY_DRIVER< double >;
+%template ( MED_FIELDINT_WRONLY_DRIVER ) MED_FIELD_WRONLY_DRIVER< int >;
 
-class MED_FIELDDOUBLE_RDWR_DRIVER : public virtual MED_FIELDDOUBLE_RDONLY_DRIVER, public virtual MED_FIELDDOUBLE_WRONLY_DRIVER
+
+template< class T1 >
+class MED_FIELD_RDWR_DRIVER : public virtual MED_FIELD_RDONLY_DRIVER< T1 >, public virtual MED_FIELD_WRONLY_DRIVER< T1 >
 {
 public:
 
-  ~MED_FIELDDOUBLE_RDWR_DRIVER();
+  ~MED_FIELD_RDWR_DRIVER();
 
   void open();
 
@@ -2594,16 +2408,16 @@ public:
   void read ( void ) ;
 
   %extend {
-    MED_FIELDDOUBLE_RDWR_DRIVER(char * fileName, FIELDDOUBLE * ptrField)
+    MED_FIELD_RDWR_DRIVER(char * fileName, FIELD< T1 > * ptrField)
       {
-	return new MED_FIELDDOUBLE_RDWR_DRIVER(string(fileName), ptrField);
+	return new MED_FIELD_RDWR_DRIVER< T1 >(string(fileName), ptrField);
       }
 
     %newobject __str__();
     const char* __str__()
       {
 	ostringstream mess;
-	mess << "Python Printing MED_FIELDDOUBLE_RDWR_DRIVER : " << *self << endl;
+	mess << "Python Printing MED_FIELD_RDWR_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
 
@@ -2622,146 +2436,14 @@ public:
       }
   }
 };
+%template ( MED_FIELDDOUBLE_RDWR_DRIVER ) MED_FIELD_RDWR_DRIVER< double >;
+%template ( MED_FIELDINT_RDWR_DRIVER ) MED_FIELD_RDWR_DRIVER< int >;
 
-/*
-  API de MED_FIELDINT_[RDONLY,WRONLY,RDWR]_DRIVER
-*/
 
-class MED_FIELDINT_RDONLY_DRIVER
-{
+template< class T1 >
+class ASCII_FIELD_DRIVER {
 public:
-
-  ~MED_FIELDINT_RDONLY_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
-  %extend {
-    MED_FIELDINT_RDONLY_DRIVER(char * fileName, FIELDINT * ptrField)
-      {
-	return new MED_FIELDINT_RDONLY_DRIVER(string(fileName), ptrField);
-      }
-
-    %newobject __str__();
-    const char* __str__()
-      {
-	ostringstream mess;
-	mess << "Python Printing MED_FIELDINT_RDONLY_DRIVER : " << *self << endl;
-	return strdup(mess.str().c_str());
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    %newobject getFieldName();
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
-  }
-};
-
-class MED_FIELDINT_WRONLY_DRIVER
-{
-public:
-
-  ~MED_FIELDINT_WRONLY_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
-  %extend {
-    MED_FIELDINT_WRONLY_DRIVER(char * fileName, FIELDINT * ptrField)
-      {
-	return new MED_FIELDINT_WRONLY_DRIVER(string(fileName), ptrField);
-      }
-
-    %newobject __str__();
-    const char* __str__()
-      {
-	ostringstream mess;
-	mess << "Python Printing MED_FIELDINT_WRONLY_DRIVER : " << *self << endl;
-	return strdup(mess.str().c_str());
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    %newobject getFieldName();
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
-  }
-};
-
-class MED_FIELDINT_RDWR_DRIVER : public virtual MED_FIELDINT_RDONLY_DRIVER, public virtual MED_FIELDINT_WRONLY_DRIVER
-{
-public:
-
-  ~MED_FIELDINT_RDWR_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
-  %extend {
-    MED_FIELDINT_RDWR_DRIVER(char * fileName, FIELDINT * ptrField)
-      {
-	return new MED_FIELDINT_RDWR_DRIVER(string(fileName), ptrField);
-      }
-
-    %newobject __str__();
-    const char* __str__()
-      {
-	ostringstream mess;
-	mess << "Python Printing MED_FIELDINT_RDWR_DRIVER : " << *self << endl;
-	return strdup(mess.str().c_str());
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    %newobject getFieldName();
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
-  }
-};
-
-class ASCII_FIELDDOUBLE_DRIVER {
-public:
-  ~ASCII_FIELDDOUBLE_DRIVER();
+  ~ASCII_FIELD_DRIVER();
 
   void open();
 
@@ -2771,93 +2453,70 @@ public:
 
 
   %extend {
-    ASCII_FIELDDOUBLE_DRIVER(const char *fileName, FIELDDOUBLE * ptrField, med_sort_direc direction, const char *priority)
+    ASCII_FIELD_DRIVER(const char *fileName, FIELD<T1> * ptrField, med_sort_direc direction, const char *priority)
       {
-	return new ASCII_FIELDDOUBLE_DRIVER(string(fileName), ptrField, (MED_EN::med_sort_direc)direction, priority);
+	return new ASCII_FIELD_DRIVER<T1>(string(fileName), ptrField, (MED_EN::med_sort_direc)direction, priority);
       }
   }
 };
-
-class ASCII_FIELDINT_DRIVER {
-public:
-  ~ASCII_FIELDINT_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
+%template (ASCII_FIELDDOUBLE_DRIVER) ASCII_FIELD_DRIVER< double >;
+%template (ASCII_FIELDINT_DRIVER) ASCII_FIELD_DRIVER< int >;
 
 
-  %extend {
-    ASCII_FIELDINT_DRIVER(const char *fileName, FIELDINT * ptrField, med_sort_direc direction, const char *priority)
-      {
-	return new ASCII_FIELDINT_DRIVER(string(fileName), ptrField, (MED_EN::med_sort_direc)direction, priority);
-      }
-  }
-};
-
-%newobject createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
-FIELDDOUBLE * createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
-
-%newobject createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) ;
-FIELDINT * createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) ;
-
-%newobject createFieldDoubleScalarProductDeep(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
-FIELDDOUBLE * createFieldDoubleScalarProductDeep(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
-
-%newobject createFieldIntScalarProductDeep(FIELDINT * field1, FIELDINT * field2) ;
-FIELDINT * createFieldIntScalarProductDeep(FIELDINT * field1, FIELDINT * field2) ;
-
-FIELDDOUBLE * createFieldDoubleFromField(FIELD_ * field) ;
-
-FIELDINT * createFieldIntFromField(FIELD_ * field) ;
-
-%newobject createFieldDoubleFromAnalytic(SUPPORT * , int , PyObject *);
-FIELDDOUBLE * createFieldDoubleFromAnalytic(SUPPORT * Support,
-					    int NumberOfComponents,
-					    PyObject * double_function) ;
-
-%newobject createFieldIntFromAnalytic(SUPPORT * , int , PyObject *);
-FIELDINT * createFieldIntFromAnalytic(SUPPORT * Support,
-				      int NumberOfComponents,
-				      PyObject * integer_function) ;
-
-GRID * createGridFromMesh( MESH * aMesh );
 
 %{
-  FIELDDOUBLE * createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE * field2)
-  {
-     return (FIELDDOUBLE *) FIELD<double>::scalarProduct( (FIELD<double>)*field1, (FIELD<double>)*field2);
-  }
+template <class T> FIELD<T> * createFieldScalarProduct(FIELD<T> * field1, FIELD<T> * field2) {
+  return (FIELD<T> *) FIELD<T>::scalarProduct( (FIELD<T>)*field1, (FIELD<T>)*field2);
+}
+template <class T> FIELD<T> * createFieldScalarProductDeep(FIELD<T> * field1, FIELD<T> * field2) {
+  return (FIELD<T>*) FIELD<T>::scalarProduct( (FIELD<T>)*field1, (FIELD<T>)*field2, true);
+}
+template<class T> FIELD<T> * createFieldFromField(FIELD_ * field) {
+  MESSAGE("createFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
+  MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
+  return (FIELD<T> *) field;
+}
+%}
 
-  FIELDINT * createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2)
-  {
-     return (FIELDINT *) FIELD<int>::scalarProduct( (FIELD<int>)*field1, (FIELD<int>)*field2);
-  }
+template<class T> FIELD<T> * createFieldFromField(FIELD_ * field);
+%template ( createFieldDoubleFromField ) createFieldFromField < double >;
+%template ( createFieldIntFromField ) createFieldFromField < int >;
 
-  FIELDDOUBLE * createFieldDoubleScalarProductDeep(FIELDDOUBLE * field1, FIELDDOUBLE * field2)
-  {
-     return (FIELDDOUBLE *) FIELD<double>::scalarProduct( (FIELD<double>)*field1, (FIELD<double>)*field2, true);
-  }
+template <class T> FIELD<T> * createFieldScalarProduct(FIELD<T> * field1, FIELD<T> * field2);
+%newobject createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
+%newobject createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) ;
+%template ( createFieldDoubleScalarProduct ) createFieldScalarProduct < double >;
+%template ( createFieldIntScalarProduct ) createFieldScalarProduct < int >;
 
-  FIELDINT * createFieldIntScalarProductDeep(FIELDINT * field1, FIELDINT * field2)
-  {
-     return (FIELDINT *) FIELD<int>::scalarProduct( (FIELD<int>)*field1, (FIELD<int>)*field2, true);
-  }
+template <class T> FIELD<T> * createFieldScalarProductDeep(FIELD<T> * field1, FIELD<T> * field2);
+%newobject createFieldDoubleScalarProductDeep(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
+%newobject createFieldIntScalarProductDeep(FIELDINT * field1, FIELDINT * field2) ;
+%template ( createFieldDoubleScalarProductDeep ) createFieldScalarProductDeep < double >;
+%template ( createFieldIntScalarProductDeep ) createFieldScalarProductDeep < int >;
 
-  FIELDDOUBLE * createFieldDoubleFromField(FIELD_ * field)
+%newobject createFieldDoubleFromAnalytic(SUPPORT * , int , PyObject *);
+%newobject createFieldIntFromAnalytic(SUPPORT * , int , PyObject *);
+FIELDDOUBLE * createFieldDoubleFromAnalytic(SUPPORT * Support,
+                                            int NumberOfComponents,
+                                            PyObject * double_function);
+FIELDINT * createFieldIntFromAnalytic(SUPPORT * Support,
+                                      int NumberOfComponents,
+                                      PyObject * integer_function);
+
+
+GRID * createGridFromMesh( MESH * aMesh );
+%{
+  GRID * createGridFromMesh( MESH * aMesh )
     {
-      MESSAGE("createFieldDoubleFromField : Constructor (for Python API) FIELDDOUBLE with parameter FIELD_");
-      MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELDDOUBLE");
-      return (FIELDDOUBLE *) field;
-    }
+      MESSAGE("createGridFromMesh : Constructor (for Python API) GRID with parameter MESH *");
+      MESSAGE("Its returns a proper cast of the input pointer :: MESH --> GRID");
 
-  FIELDINT * createFieldIntFromField(FIELD_ * field)
-    {
-      MESSAGE("createFieldIntFromField : Constructor (for Python API) FIELDINT with parameter FIELD_");
-      MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELDINT");
-      return (FIELDINT *) field;
+      if (aMesh->getIsAGrid())
+        return (GRID *) aMesh;
+
+      char * message = "Error in GRID(mesh): mesh is not a grid";
+      PyErr_SetString(PyExc_RuntimeError, message);
+      return NULL;
     }
 
   FIELDDOUBLE * createFieldDoubleFromAnalytic(SUPPORT * Support,
@@ -2884,18 +2543,5 @@ GRID * createGridFromMesh( MESH * aMesh );
       MyFunction<int>::_spaceDim=Support->getMesh()->getSpaceDimension();
       fieldInt->fillFromAnalytic< MyFunction<int>::EvalPy2Cpp >();
       return fieldInt;
-    }
-
-  GRID * createGridFromMesh( MESH * aMesh )
-    {
-      MESSAGE("createGridFromMesh : Constructor (for Python API) GRID with parameter MESH *");
-      MESSAGE("Its returns a proper cast of the input pointer :: MESH --> GRID");
-
-      if (aMesh->getIsAGrid())
-        return (GRID *) aMesh;
-
-      char * message = "Error in GRID(mesh): mesh is not a grid";
-      PyErr_SetString(PyExc_RuntimeError, message);
-      return NULL;
     }
 %}
