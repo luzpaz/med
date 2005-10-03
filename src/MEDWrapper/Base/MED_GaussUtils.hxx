@@ -92,6 +92,18 @@ namespace MED
 		TGaussCoord& theGaussCoord,
 		const TElemNum& theElemNum = TElemNum(),
 		EModeSwitch theMode = eFULL_INTERLACE);
+  bool
+  GetBaryCenter(const TPolygoneInfo& thePolygoneInfo,
+		const TNodeInfo& theNodeInfo,
+		TGaussCoord& theGaussCoord,
+		const TElemNum& theElemNum = TElemNum(),
+		EModeSwitch theMode = eFULL_INTERLACE);
+  bool
+  GetBaryCenter(const TPolyedreInfo& thePolyedreInfo,
+		const TNodeInfo& theNodeInfo,
+		TGaussCoord& theGaussCoord,
+		const TElemNum& theElemNum = TElemNum(),
+		EModeSwitch theMode = eFULL_INTERLACE);
 }
 
 #endif

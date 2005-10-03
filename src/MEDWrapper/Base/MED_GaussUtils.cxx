@@ -975,4 +975,125 @@ namespace MED
     return true;
   }
 
+
+  //---------------------------------------------------------------
+  bool
+  GetBaryCenter(const TPolygoneInfo& thePolygoneInfo,
+		const TNodeInfo& theNodeInfo,
+		TGaussCoord& theGaussCoord,
+		const TElemNum& theElemNum,
+		EModeSwitch theMode)
+  {
+    INITMSG(MYDEBUG,"GetBaryCenter\n");
+    const PMeshInfo& aMeshInfo = thePolygoneInfo.GetMeshInfo();
+    TInt aDim = aMeshInfo->GetDim();
+    static TInt aNbGauss = 1;
+	
+    bool anIsSubMesh = !theElemNum.empty();
+    TInt aNbElem;
+    if(anIsSubMesh)
+      aNbElem = theElemNum.size();
+    else
+      aNbElem = thePolygoneInfo.GetNbElem();
+	
+    theGaussCoord.Init(aNbElem,aNbGauss,aDim,theMode);
+
+    INITMSGA(MYDEBUG,0,
+	     "- aDim = "<<aDim<<
+	     "; aNbGauss = "<<aNbGauss<<
+	     "; aNbElem = "<<aNbElem<<
+	     "; aNbNodes = "<<theNodeInfo.GetNbElem()<<
+	     endl);
+    
+    for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
+      TInt aCellId = anIsSubMesh? theElemNum[anElemId]-1: anElemId;
+      
+      TCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(anElemId);
+      TCConnSlice aConnSlice = thePolygoneInfo.GetConnSlice(aCellId);
+      TInt aNbConn = thePolygoneInfo.GetNbConn(aCellId);
+      TInt aNbNodes = thePolygoneInfo.GetNbConn(aCellId);
+      
+      for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+	TCoordSlice& aGaussCoordSlice = aCoordSliceArr[aGaussId];
+	
+	for(TInt aConnId = 0; aConnId < aNbConn; aConnId++){
+	  TInt aNodeId = aConnSlice[aConnId] - 1;      
+	  TCCoordSlice aNodeCoordSlice = theNodeInfo.GetCoordSlice(aNodeId);
+	  
+	  for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+	    aGaussCoordSlice[aDimId] += aNodeCoordSlice[aDimId];
+	  }
+	}
+	
+	for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+	  aGaussCoordSlice[aDimId] /= aNbNodes;
+	}
+      }
+    }
+
+    return true;
+  }
+
+
+  //---------------------------------------------------------------
+  bool
+  GetBaryCenter(const TPolyedreInfo& thePolyedreInfo,
+		const TNodeInfo& theNodeInfo,
+		TGaussCoord& theGaussCoord,
+		const TElemNum& theElemNum,
+		EModeSwitch theMode)
+  {
+    INITMSG(MYDEBUG,"GetBaryCenter\n");
+    const PMeshInfo& aMeshInfo = thePolyedreInfo.GetMeshInfo();
+    TInt aDim = aMeshInfo->GetDim();
+    static TInt aNbGauss = 1;
+	
+    bool anIsSubMesh = !theElemNum.empty();
+    TInt aNbElem;
+    if(anIsSubMesh)
+      aNbElem = theElemNum.size();
+    else
+      aNbElem = thePolyedreInfo.GetNbElem();
+	
+    theGaussCoord.Init(aNbElem,aNbGauss,aDim,theMode);
+
+    INITMSGA(MYDEBUG,0,
+	     "- aDim = "<<aDim<<
+	     "; aNbGauss = "<<aNbGauss<<
+	     "; aNbElem = "<<aNbElem<<
+	     "; aNbNodes = "<<theNodeInfo.GetNbElem()<<
+	     endl);
+    
+    for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
+      TInt aCellId = anIsSubMesh? theElemNum[anElemId]-1: anElemId;
+      
+      TCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(anElemId);
+      TCConnSliceArr aConnSliceArr = thePolyedreInfo.GetConnSliceArr(aCellId);
+      TInt aNbFaces = aConnSliceArr.size();
+
+      TInt aNbNodes = thePolyedreInfo.GetNbNodes(aCellId);
+      
+      for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+	TCoordSlice& aGaussCoordSlice = aCoordSliceArr[aGaussId];
+	
+	for(TInt aFaceId = 0; aFaceId < aNbFaces; aFaceId++){
+	  TCConnSlice aConnSlice = aConnSliceArr[aFaceId];
+	  TInt aNbConn = aConnSlice.size();
+	  for(TInt aConnId = 0; aConnId < aNbConn; aConnId++){
+	    TInt aNodeId = aConnSlice[aConnId] - 1;      
+	    TCCoordSlice aNodeCoordSlice = theNodeInfo.GetCoordSlice(aNodeId);
+	    
+	    for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+	      aGaussCoordSlice[aDimId] += aNodeCoordSlice[aDimId];
+	    }
+	  }
+	}
+	for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+	  aGaussCoordSlice[aDimId] /= aNbNodes;
+	}
+      }
+    }
+
+    return true;
+  }
 }
