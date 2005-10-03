@@ -162,14 +162,14 @@ TCConnSlice
 TPolygoneInfo
 ::GetConnSlice(TInt theElemId) const
 {
-  return TCConnSlice(myConn,std::slice(myIndex[theElemId],GetNbConn(theElemId),1));
+  return TCConnSlice(myConn,std::slice(myIndex[theElemId]-1,GetNbConn(theElemId),1));
 }
 
 TConnSlice 
 TPolygoneInfo
 ::GetConnSlice(TInt theElemId)
 {
-  return TConnSlice(myConn,std::slice(myIndex[theElemId],GetNbConn(theElemId),1));
+  return TConnSlice(myConn,std::slice(myIndex[theElemId]-1,GetNbConn(theElemId),1));
 }
 
 
