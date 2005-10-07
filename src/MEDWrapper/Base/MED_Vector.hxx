@@ -103,7 +103,7 @@ namespace MED
 #if defined(__GNUC_2__) || !defined(_DEBUG_)
       return superclass::operator[](__n);
 #else
-      return at(__n);
+      return this->at(__n);
 #endif
     }
 
@@ -113,7 +113,7 @@ namespace MED
 #if defined(__GNUC_2__) || !defined(_DEBUG_)
       return superclass::operator[](__n);
 #else
-      return at(__n);
+      return this->at(__n);
 #endif
     }
   };
