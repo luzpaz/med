@@ -13,6 +13,7 @@
 
 #include <SALOMEconfig.h>
 
+#include "SALOME_GenericObj_i.hh"
 #include CORBA_SERVER_HEADER(MED)
 #include CORBA_SERVER_HEADER(SALOMEDS)
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
@@ -22,7 +23,8 @@
 namespace MEDMEM {
 typedef map<DT_IT_, SALOME_MED::FIELD_ptr, LT_DT_IT_ > MAP_IOR_DT_IT_; 
 
-class MED_i: public POA_SALOME_MED::MED
+class MED_i: public POA_SALOME_MED::MED,
+	     public SALOME::GenericObj_i
 {
 
 private :

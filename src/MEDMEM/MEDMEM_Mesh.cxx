@@ -64,7 +64,7 @@ int  MESH::addDriver(GENDRIVER & driver) {
   const char * LOC = "MESH::addDriver(GENDRIVER &) : ";
   BEGIN_OF(LOC);
 
-  // A faire : Vérifier que le driver est de type MESH.
+  // A faire : VÃ©rifier que le driver est de type MESH.
   GENDRIVER * newDriver = driver.copy() ;
 
   _drivers.push_back(newDriver);

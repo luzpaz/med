@@ -25,10 +25,7 @@ VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(),
 VTK_MED_DRIVER::VTK_MED_DRIVER(const string & fileName,  MED * const ptrMed):
   GENDRIVER(fileName,MED_EN::MED_RDWR), _ptrMed(ptrMed)
 {
-  _ptrMed->addDriver(*this); // OU RECUPERER L'ID.
-  _vtkFile = new ofstream(); 
-  // What about _id in Gendriver ?
-  // _driverType ???
+  _vtkFile = new ofstream();
 }
 
 VTK_MED_DRIVER::VTK_MED_DRIVER(const VTK_MED_DRIVER & driver):
@@ -167,8 +164,8 @@ void VTK_MED_DRIVER::write() const {
       deque<DT_IT_> timeStep = _ptrMed->getFieldIteration(FieldNames[j]) ;
       deque<DT_IT_>::const_iterator currentTimeStep ;
       for ( currentTimeStep=timeStep.begin(); currentTimeStep!=timeStep.end(); currentTimeStep++) {
-	int dt ;
-	int it ;
+	int dt = (*currentTimeStep).dt;
+	int it = (*currentTimeStep).it;
 	FIELD_ * myField = _ptrMed->getField(FieldNames[j],dt,it) ;
 	if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
 	  // rigth in all case : better compare pointeur ?

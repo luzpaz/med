@@ -1177,6 +1177,10 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
         _medId = newObj->GetID();
         myBuilder->CommitCommand();
 
+	// register the Corba pointer: increase the referrence count
+   	MESSAGE("Registering of the Corba Med pointer");
+	Register();
+
         END_OF("Med_i::addInStudy(SALOMEDS::Study_ptr myStudy)");
 }
 
@@ -1260,6 +1264,9 @@ void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
 
 // 	delete [] medObjName1;
 
+	// register the Corba pointer: increase the referrence count
+   	MESSAGE("Registering of the Corba Med pointer");
+	Register();
+
         END_OF("Med_i::addInStudy(myStudy, myIor, medObjName)");
 }
-

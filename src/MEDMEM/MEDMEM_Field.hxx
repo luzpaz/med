@@ -2180,6 +2180,44 @@ template <class T> inline void FIELD<T>::read(const GENDRIVER & genDriver)
 }
 
 /*!
+  Fills in already allocated retValues array the values related to eltIdInSup.
+  If the element does not exist in this->_support false is returned, true otherwise.
+ */
+template <class T> bool FIELD<T>::getValueOnElement(int eltIdInSup,T* retValues) const
+{
+  if(eltIdInSup<1)
+    return false;
+  if(_support->isOnAllElements())
+    {
+      int nbOfEltsThis=_support->getMesh()->getNumberOfElements(_support->getEntity(),MED_EN::MED_ALL_ELEMENTS);
+      if(eltIdInSup>nbOfEltsThis)
+	return false;
+      const T* valsThis=getValue(MED_EN::MED_FULL_INTERLACE);
+      for(int j=0;j<_numberOfComponents;j++)
+	retValues[j]=valsThis[(eltIdInSup-1)*_numberOfComponents+j];
+      return true;
+    }
+  else
+    {
+      int nbOfEltsThis=_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+      const int *eltsThis=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+      int iThis;
+      bool found=false;
+      for(iThis=0;iThis<nbOfEltsThis && !found;)
+	if(eltsThis[iThis]==eltIdInSup)
+	  found=true;
+	else
+	  iThis++;
+      if(!found)
+	return false;
+      const T* valsThis=getValue(MED_EN::MED_FULL_INTERLACE);
+      for(int j=0;j<_numberOfComponents;j++)
+	retValues[j]=valsThis[iThis*_numberOfComponents+j];
+      return true;
+    }
+}
+
+/*!
   \if developper
   Destroy the MEDARRAY<T> in FIELD and put the new one without copy.
   \endif
@@ -2235,44 +2273,6 @@ template <class T> inline const T* FIELD<T>::getValueI(MED_EN::medModeSwitch Mod
 template <class T> inline T FIELD<T>::getValueIJ(int i,int j) const
 {
   return _value->getIJ(i,j) ;
-}
-
-/*!
-  Fills in already allocated retValues array the values related to eltIdInSup.
-  If the element does not exist in this->_support false is returned, true otherwise.
- */
-template <class T> bool FIELD<T>::getValueOnElement(int eltIdInSup,T* retValues) const
-{
-  if(eltIdInSup<1)
-    return false;
-  if(_support->isOnAllElements())
-    {
-      int nbOfEltsThis=_support->getMesh()->getNumberOfElements(_support->getEntity(),MED_EN::MED_ALL_ELEMENTS);
-      if(eltIdInSup>nbOfEltsThis)
-	return false;
-      const T* valsThis=getValue(MED_EN::MED_FULL_INTERLACE);
-      for(int j=0;j<_numberOfComponents;j++)
-	retValues[j]=valsThis[(eltIdInSup-1)*_numberOfComponents+j];
-      return true;
-    }
-  else
-    {
-      int nbOfEltsThis=_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-      const int *eltsThis=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
-      int iThis;
-      bool found=false;
-      for(iThis=0;iThis<nbOfEltsThis && !found;)
-	if(eltsThis[iThis]==eltIdInSup)
-	  found=true;
-	else
-	  iThis++;
-      if(!found)
-	return false;
-      const T* valsThis=getValue(MED_EN::MED_FULL_INTERLACE);
-      for(int j=0;j<_numberOfComponents;j++)
-	retValues[j]=valsThis[iThis*_numberOfComponents+j];
-      return true;
-    }
 }
 
 /*!

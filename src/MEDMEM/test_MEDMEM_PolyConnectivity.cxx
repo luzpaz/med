@@ -2,20 +2,12 @@
 
 #include "MEDMEM_Connectivity.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
 int main(void)
 {
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
-
   CONNECTIVITY myNodalConnectivity;
   CONNECTIVITY myDescendingConnectivity;
 

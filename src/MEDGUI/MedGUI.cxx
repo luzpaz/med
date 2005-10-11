@@ -585,6 +585,9 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 	break;
       }
     }
+
+  app->updateActions(); //SRN: To update a Save button in the toolbar
+
   return true;
 }
 

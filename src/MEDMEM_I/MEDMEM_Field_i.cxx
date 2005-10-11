@@ -545,6 +545,10 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 	delete [] supportEntryPath;
 	delete [] fieldEntryName;
 
+	// register the Corba pointer: increase the referrence count
+   	MESSAGE("Registering of the Corba Field pointer");
+	Register();
+
 	MESSAGE("FIELD_i::addInStudy");
 
         //END_OF("FIELD_i::addInStudy");
@@ -637,17 +641,5 @@ CORBA::Long FIELD_i::addDriver (SALOME_MED::medDriverTypes driverType,
 		MESSAGE("Exception en accedant au champ");
 	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
-}
-
-//=============================================================================
-/*!
- * CORBA: Destructor
-*/
-//=============================================================================
-void FIELD_i::release()
-{
-  PortableServer::ObjectId_var oid=_default_POA()->servant_to_id(this);
-  _default_POA()->deactivate_object(oid);
-  _remove_ref();
 }
 

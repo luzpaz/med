@@ -18,6 +18,7 @@ This file contains the main IDL definitions of the %MED component in %SALOME app
  study and/or give a direct access to those objects.
 */
 
+#include "SALOME_GenericObj.idl"
 #include "SALOME_Exception.idl"
 #include "SALOME_Component.idl"
 #include "SALOMEDS.idl"
@@ -134,7 +135,7 @@ This enumeration contains a set of elements defining the type of connectivity.
   // mesh interface
   // ----------------------
 
-  interface MESH : SALOME::MultiCommClass, SALOME::ServantLifeCycle {
+  interface MESH : SALOME::MultiCommClass, SALOME::GenericObj {
     // Index range begins from 1
 
     // General Informations
@@ -520,7 +521,7 @@ Internal Corba method.
   // Support interface
   // ----------------------
 
-  interface SUPPORT : SALOME::MultiCommClass, SALOME::ServantLifeCycle {
+  interface SUPPORT : SALOME::MultiCommClass, SALOME::GenericObj {
 
     /*!
       Returns the name of the support.
@@ -777,7 +778,7 @@ Internal Corba method.
   // Field interface
   //----------------
 
-  interface FIELD : SALOME::ServantLifeCycle
+  interface FIELD : SALOME::GenericObj
     {
 
       /*!
@@ -932,7 +933,7 @@ Internal Corba method.
 
   // MED interface
 
-  interface MED {
+  interface MED : SALOME::GenericObj {
     /*!
       returns the number of meshes in the %MED object.
      */

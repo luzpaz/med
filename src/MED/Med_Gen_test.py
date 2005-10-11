@@ -40,35 +40,35 @@ def getMedObjectFromStudy(file):
     listOfSO = salome.myStudy.FindObjectByName(objNameInStudy,compNameInStudy)
     listLength = len(listOfSO)
     if (listLength == 0) :
-        print "PROBLEME ",objNameInStudy," cannot be found in the Study under the component ",compNameInStudy
+        print objNameInStudy," cannot be found in the Study under the component ",compNameInStudy
         return None
     elif (listLength > 1) :
-        print "PROBLEME  there are more than one instance of ",objNameInStudy," in the Study under the component ",compNameInStudy
+        print "there are more than one instance of ",objNameInStudy," in the Study under the component ",compNameInStudy
         return None
     mySO = listOfSO[0]
     if (mySO == None) :
-        print "PROBLEM ",objNameInStudy," cannot be found in the Study"
+        print objNameInStudy," cannot be found in the Study"
         return mySO
     else:
         anAttr = mySO.FindAttribute("AttributeIOR")[1]
         obj = salome.orb.string_to_object(anAttr.Value())
         myObj = obj._narrow(SALOME_MED.MED)
         if (myObj == None) :
-            print "PROBLEM ",objNameInStudy," has been found in the Study but with the wrong type"
+            print objNameInStudy," has been found in the Study but with the wrong type"
         return myObj
 
 def getMeshObjectFromStudy(meshName):
     objNameInStudy = "/Med/MEDMESH/"+meshName
     mySO = salome.myStudy.FindObjectByPath(objNameInStudy)
     if (mySO == None) :
-        print "PROBLEM ",objNameInStudy," cannot be found in the Study"
+        print objNameInStudy," cannot be found in the Study"
         return mySO
     else:
         anAttr = mySO.FindAttribute("AttributeIOR")[1]
         obj = salome.orb.string_to_object(anAttr.Value())
         myObj = obj._narrow(SALOME_MED.MESH)
         if (myObj == None) :
-            print "PROBLEM ",objNameInStudy," has been found in the Study but with the wrong type"
+            print objNameInStudy," has been found in the Study but with the wrong type"
         return myObj
 
 def getSupportObjectFromStudy(meshName,supportName):
@@ -76,14 +76,14 @@ def getSupportObjectFromStudy(meshName,supportName):
     objNameInStudy = "/Med/MEDMESH/MEDSUPPORTS_OF_"+meshNameStudy+"/"+supportName
     mySO = salome.myStudy.FindObjectByPath(objNameInStudy)
     if (mySO == None) :
-        print "PROBLEM ",objNameInStudy," cannot be found in the Study"
+        print objNameInStudy," cannot be found in the Study"
         return mySO
     else:
         anAttr = mySO.FindAttribute("AttributeIOR")[1]
         obj = salome.orb.string_to_object(anAttr.Value())
         myObj = obj._narrow(SALOME_MED.SUPPORT)
         if (myObj == None) :
-            print "PROBLEM ",objNameInStudy," has been found in the Study but with the wrong type"
+            print objNameInStudy," has been found in the Study but with the wrong type"
         return myObj
 
 def getFieldObjectFromStudy(dt,it,fieldName,supportName,meshName):
@@ -91,7 +91,7 @@ def getFieldObjectFromStudy(dt,it,fieldName,supportName,meshName):
     objNameInStudy = "/Med/MEDFIELD/"+fieldName+"/("+str(dt)+","+str(it)+")_ON_"+supportName+"_OF_"+meshNameStudy
     mySO = salome.myStudy.FindObjectByPath(objNameInStudy)
     if (mySO == None) :
-        print "PROBLEM ",objNameInStudy," cannot be found in the Study"
+        print objNameInStudy," cannot be found in the Study"
         return mySO
     else:
         anAttr = mySO.FindAttribute("AttributeIOR")[1]
@@ -100,7 +100,7 @@ def getFieldObjectFromStudy(dt,it,fieldName,supportName,meshName):
         if (myObj == None):
             myObj = obj._narrow(SALOME_MED.FIELDDOUBLE)
             if (myObj == None) :
-                print "PROBLEM ",objNameInStudy," has been found in the Study but with the wrong type"
+                print objNameInStudy," has been found in the Study but with the wrong type"
         return myObj
 
 fileName = "cube_hexa8_quad4.med"

@@ -88,7 +88,7 @@ typedef enum {MED_HDF_VERSION, MED_VERSION, MED_FICH_DES} med_fich_info;
 // #define MED_NOPFLi "                                "  /* Variable Interne                      */
 // #define MED_NOPF   0                   /* -> pas de profils pour _MEDdataseNnumEcrire */
 // #define MED_NOPDT -1                   /* rem: pas de pas de temps negatifs           */
-// #define MED_NONOR -1                   /* rem: pas de n°ordre negatif                 */
+// #define MED_NONOR -1                   /* rem: pas de nÂ°ordre negatif                 */
 // #define MED_DIM1   1                   /* PAS */
 //   //#define MED_ALL    0 !!!!! NB: WARNING MED_ALL deja utilise dans l'enum medGeometryElement !!!!!!!!
 // #define MED_ALL    0
@@ -184,11 +184,11 @@ typedef double         med_float;
 //#define MED_NULL     NULL
 
 #define MED_RDONLY MED_LECT
-  //   rem: MED_WRONLY=MED_ECR n'empêche malheureusement pas de lire le fichier
-  //   mais permet de conserver l'existant. Attention à la création d'objet
-  //   ne prenant pas de paramètre de type mode d'accès il faut tester si il
-  //   est déjà présent dans le fichier. Si  MED_WRONLY=MED_REMP le fichier est
-  //   réinitialisé. Cf une évolution de MED.
+  //   rem: MED_WRONLY=MED_ECR n'empÃªche malheureusement pas de lire le fichier
+  //   mais permet de conserver l'existant. Attention Ã  la crÃ©ation d'objet
+  //   ne prenant pas de paramÃ¨tre de type mode d'accÃ¨s il faut tester si il
+  //   est dÃ©jÃ  prÃ©sent dans le fichier. Si  MED_WRONLY=MED_REMP le fichier est
+  //   rÃ©initialisÃ©. Cf une Ã©volution de MED.
 #define MED_WRONLY MED_ECRI
 #define MED_RDWR   MED_ECRI
 // Fin

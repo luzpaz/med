@@ -32,7 +32,7 @@ protected:
 
 public :
 
-  // all MED cell type ?? Classe de Définition ??
+  // all MED cell type ?? Classe de DÃ©finition ??
   //   static const medGeometryElement all_cell_type[MED_NBR_GEOMETRIE_MAILLE];
 
   //   static const char * const all_cell_type_tab [MED_NBR_GEOMETRIE_MAILLE];

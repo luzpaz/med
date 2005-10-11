@@ -1,10 +1,6 @@
 #include "MEDMEM_PorflowMeshDriver.hxx"
 #include "MEDMEM_Mesh.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -19,10 +15,6 @@ int main (int argc, char ** argv)
 	<< "-> lit le fichier Porflowfilename ,crée 2 fichiers : MED et VTK" << endl;
 	exit(-1);
     }
-
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
 
     string porflowfilename  = argv[1];
 

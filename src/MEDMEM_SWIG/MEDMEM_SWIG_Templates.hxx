@@ -14,13 +14,19 @@ template<>
     //const char *TypeBuild="d";
     static int Checker(PyObject *a)  { return PyFloat_Check(a); }
     static double Traducer(PyObject *a) { return PyFloat_AsDouble(a); }
+    static PyObject * Traducer( double value ) { return Py_BuildValue("d", value ); }
+    static double Functor(PyObject *func, double value)
+    { return Traducer( PyObject_CallFunction( func, "f", value )); }
   };
 
 template<>
   struct Binding<int> {
-    //static const char *TypeBuild="i";
+    //const char *TypeBuild="i";
     static int Checker(PyObject *a) { return PyInt_Check(a); }
     static int Traducer(PyObject *a) { return (int) PyInt_AsLong(a); }
+    static PyObject * Traducer( int value ) { return Py_BuildValue("i", value ); }
+    static int Functor(PyObject *func, int value)
+    { return Traducer( PyObject_CallFunction( func, "f", value )); }
   };
 
 template<class T>
@@ -52,7 +58,7 @@ template<class T>
 	      Py_DECREF(function_ret);
 	      throw MEDMEM::MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API list of integer fonct (double, double), especially the size of the returned list)");
 	    }
-	  for(i=0;i<_spaceDim;i++)
+	  for(i=0;i<_nbOfComponent;i++)
 	    {
 	      PyObject * tmp=PyList_GetItem(function_ret,i);
 	      err = Binding<T>::Checker(tmp);

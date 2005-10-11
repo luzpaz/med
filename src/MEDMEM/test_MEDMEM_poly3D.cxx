@@ -7,7 +7,6 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_ModulusArray.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
-#include "LocalTraceCollector.hxx"
 #include <vector>
 
 #define MESHNAME "poly3D"
@@ -83,7 +82,6 @@ bool SupportTester::areEquivalent(const int *nodes1, const int *nodes2, int nbOf
 
 int main (int argc, char ** argv)
 {
-  LocalTraceCollector::instance();
   if (argc<2) // after 2, ignored !
     {
       cerr << "Usage : " << argv[0] << " poly3D.med typically in ../../share/salome/resources" << endl << endl;

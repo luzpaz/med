@@ -61,7 +61,8 @@ else
 SWIG_DEF = libMEDClient.i
 endif
 
-EXPORT_PYSCRIPTS = libMEDClient.py
+EXPORT_PYSCRIPTS = libMEDClient.py \
+		   medClient_test.py
 
 # Libraries targets
 

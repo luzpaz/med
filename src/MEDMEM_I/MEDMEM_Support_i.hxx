@@ -15,15 +15,16 @@
 #include <SALOMEconfig.h>
 
 #include "SALOMEMultiComm.hxx"
+#include "SALOME_GenericObj_i.hh"
 #include CORBA_SERVER_HEADER(MED)
 #include CORBA_SERVER_HEADER(SALOME_Comm)
 
 namespace MEDMEM {
 class SUPPORT;
 
-class SUPPORT_i: public POA_SALOME_MED::SUPPORT,
-                public PortableServer::RefCountServantBase,
-		public SALOMEMultiComm
+  class SUPPORT_i: public POA_SALOME_MED::SUPPORT,
+		   public SALOMEMultiComm,
+		   public SALOME::GenericObj_i
 {
 public :
     static std::map < int,::MEDMEM::SUPPORT *> supportMap;

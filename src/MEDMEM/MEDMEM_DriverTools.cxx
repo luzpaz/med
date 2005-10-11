@@ -10,7 +10,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-#define DUMP_LINES_LIMIT 100
+#define DUMP_LINES_LIMIT 20
 
 // Cet opérateur permet d'ordonner les mailles dans un set suivant l'ordre requis par MED
 bool _maille::operator < (const _maille& ma) const
@@ -53,7 +53,7 @@ _link _maille::link(int i) const
 MED_EN::medEntityMesh _maille::getEntity(const int meshDimension) const throw (MEDEXCEPTION)
 {
   const char * LOC = "_maille::getEntity(const int meshDimension)" ;
-  BEGIN_OF(LOC);
+//   BEGIN_OF(LOC);
 
   int mailleDimension = this->dimension();
   medEntityMesh entity;
@@ -76,7 +76,7 @@ MED_EN::medEntityMesh _maille::getEntity(const int meshDimension) const throw (M
       }
 return entity;
 
-END_OF(LOC);
+//END_OF(LOC);
 };
 
 std::ostream& MEDMEM::operator << (std::ostream& os, const _maille& ma)
@@ -125,14 +125,19 @@ std::ostream& MEDMEM::operator << (std::ostream& os, const _noeud& no)
 
 void MEDMEM::_fieldBase::dump(std::ostream& os) const
 {
-  os << "field " << "<" << name << ">" << endl <<
-    "  nb sub: " << nb_subcomponents << endl <<
-      "  nb comp: " << nb_components << endl <<
-        "  group index: " << group_id << endl <<
-          "  type: " << type << endl;
-  os << "  comp names: ";
-  for ( int i = 0; i < comp_names.size(); ++i )
-    os << " |" << comp_names[ i ] << "|";
+  os << "field " << "<" << _name << ">" << endl <<
+    "  nb sub: " << _sub.size() << endl <<
+    "  group index: " << _group_id << endl <<
+    "  type: " << _type << endl;
+  os << "  subcomponents:" << endl;
+  vector< _sub_data >::const_iterator sub_data = _sub.begin();
+  for ( int i_sub = 1; sub_data != _sub.end(); ++sub_data, i_sub ) {
+    os << "    group index: " << sub_data->_supp_id <<
+      ", " << sub_data->nbComponents() << " comp names: ";
+    for ( int i_comp = 0; i_comp < sub_data->nbComponents(); ++i_comp )
+      os << " |" << sub_data->_comp_names[ i_comp ] << "|";
+    os << endl;
+  }
 }
 
 std::ostream& MEDMEM::operator << (std::ostream& os, const _fieldBase * f)
@@ -228,12 +233,8 @@ void _intermediateMED::treatGroupes()
   std::set<int> groups2convert;
   std::list< _fieldBase* >::const_iterator fIt = fields.begin();
   for ( ; fIt != fields.end(); ++fIt )
-  {
-    groups2convert.insert( (*fIt)->group_id );
-    _groupe& grp = groupes[ (*fIt)->group_id ];
-    for( j = grp.groupes.begin(); j!=grp.groupes.end(); ++j)
-      groups2convert.insert( *j-1 );
-  }
+    (*fIt)->getGroupIds( groups2convert, true );
+
   // keep named groups and their subgroups
   for (unsigned int i=0; i!=this->groupes.size(); ++i)
   {
@@ -251,7 +252,7 @@ void _intermediateMED::treatGroupes()
       _groupe& grp = groupes[i];
       grp.mailles.clear();
       grp.groupes.clear();
-      //INFOS( "Erase " << i << "-th group " << grp.nom );
+      MESSAGE( "Erase " << i << "-th group " << grp.nom );
     }
   }
 
@@ -353,8 +354,7 @@ _intermediateMED::getCoordinate(const string & coordinateSystem)
    * for memory optimisation, clear the intermediate structure (the "maillage" set )
    * \endif
    */
-CONNECTIVITY * 
-_intermediateMED::getConnectivity()
+CONNECTIVITY * _intermediateMED::getConnectivity()
 {
     const char * LOC = "_intermediateMED::getConnectivity() : ";
     BEGIN_OF(LOC);
@@ -365,6 +365,7 @@ _intermediateMED::getConnectivity()
     int * count=NULL;
     int * connectivity=NULL;
     CONNECTIVITY *Connectivity, *Constituent;
+    int dimension_maillage_moin_2=maillage.rbegin()->dimension() - 2;
 
     medGeometryElement type=0; // variables de travail
     int nbtype=0;
@@ -374,10 +375,15 @@ _intermediateMED::getConnectivity()
     std::vector<medGeometryElement> vtype; // tableau de travail : stockage des types geometriques pour UNE entite
     std::vector<int> vcount; // tableau de travail : nombre d'elements pour chaque type geometrique de vtype
 
-    std::set<_maille>::const_iterator i=maillage.begin(); // iterateurs sur les mailles
-    std::set<_maille>::const_iterator j=maillage.begin();
+    std::set<_maille>::const_iterator i, j; // iterateurs sur les mailles
 
-    // renumerote les points de 1 a n (pour le cas ou certains points ne sont pas presents dans le maillage d'origine) 
+    // skip nodes and elements of <dimension_maillage - 2> or less dimension
+    for ( i = maillage.begin(); i != maillage.end(); ++i )
+      //if ( i->geometricType != MED_POINT1 && i->dimension() > dimension_maillage_moin_2 )
+        break;
+    j = i;
+
+    // renumerote les points de 1 a n (pour le cas ou certains points ne sont pas presents dans le maillage d'origine)
     numerotationPoints(); 
 
     do 
@@ -500,10 +506,15 @@ _intermediateMED::getConnectivity()
    * \endif
    */
 void
-_intermediateMED::getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP *> & _groupFace, std::vector<GROUP *> & _groupEdge, std::vector<GROUP *> & _groupNode, MESH * _ptrMesh)
+_intermediateMED::getGroups(vector<GROUP *> & _groupCell,
+                            vector<GROUP *> & _groupFace,
+                            vector<GROUP *> & _groupEdge,
+                            vector<GROUP *> & _groupNode, MESH * _ptrMesh)
 {
   const char * LOC = "_intermediateMED::getGroups() : ";
   BEGIN_OF(LOC);
+
+  medGroupes.resize( groupes.size(), 0 );
   if (maillage.size() == 0) {
     INFOS( "Erreur : il n'y a plus de mailles");
     return;
@@ -513,7 +524,7 @@ _intermediateMED::getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP
   std::set<int> support_groups;
   std::list< _fieldBase* >::const_iterator fIt = fields.begin();
   for ( ; fIt != fields.end(); ++fIt )
-    support_groups.insert( (*fIt)->group_id );
+    (*fIt)->getGroupIds( support_groups, false );
 
   numerotationMaillage(); // Renumerotation des mailles par entite
 
@@ -522,12 +533,17 @@ _intermediateMED::getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP
   for (unsigned int i=0; i!=this->groupes.size(); ++i)
   {
     _groupe& grp = groupes[i];
+    if ( medGroupes[ i ] )
+      continue; // grp already converted into a MED group
+
+    bool isFieldSupport = ( support_groups.find( i ) != support_groups.end() );
     // si le groupe est vide, ou si le groupe n'est pas nommé : on passe au suivant
-    if ( grp.empty() ||
-        ( grp.nom.empty() && support_groups.find( i ) == support_groups.end() )) {
-      if ( !grp.nom.empty() )
-        INFOS("Skip group " << grp.nom );
-      medGroupes.push_back( NULL );
+    if ( grp.empty() || ( grp.nom.empty() && !isFieldSupport )) {
+      if ( !grp.nom.empty() ) {
+        INFOS("Skip group " << i << grp.nom);
+//       } else {
+//         MESSAGE("Skip group " << i << " <" << grp.nom << "> " << ( grp.empty() ? ": empty" : ""));
+      }
       continue;
     }
 
@@ -549,13 +565,34 @@ _intermediateMED::getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP
             mailleSet.insert( *maIt );
         }
       }
-      if ( nb_elem != mailleSet.size() ) {
-        INFOS("Self intersecting group: " << i+1 << " <" << grp.nom << ">"
+      if ( nb_elem != mailleSet.size() ) { // Self intersecting compound group
+        INFOS("Self intersecting group: " << i << " <" << grp.nom << ">"
               << ", mailleSet.size = " << mailleSet.size() << ", sum nb elems = " << nb_elem);
         for( vector<int>::iterator j=grp.groupes.begin(); j!=grp.groupes.end(); ++j)
           INFOS(" in sub-group "<<  *j << " <" << groupes[*j-1].nom << "> "
                 << groupes[*j-1].mailles.size() << " mailles of type "
                 << groupes[*j-1].mailles[0]->geometricType);
+        // if a group serve as a support to a field, then the _field is to be converted
+        // into several MEDMEM::FIELDs, one per sub-group; if we already skipped some sub-groups,
+        // we roll back the loop on groups to create MED groups for skipped ones
+        if ( isFieldSupport ) {
+          if ( grp.nom.empty() ) // clear group existing for the sake of field only
+            grp.groupes.clear();
+          std::set<int> sub_grps;
+          for ( fIt = fields.begin(); fIt != fields.end(); ++fIt ) {
+            _fieldBase * field = (*fIt);
+            if ( field->_group_id == i ) {
+              field->_group_id = -1; // -> a field by support
+              field->getGroupIds( sub_grps, false );
+            }
+          }
+          if ( i > *sub_grps.begin() ) { // roll back
+            support_groups.erase( i );
+            support_groups.insert( sub_grps.begin(), sub_grps.end() ); 
+            i = *sub_grps.begin() - 1;
+            continue;
+          }
+        }
       }
     }
     else {
@@ -563,8 +600,18 @@ _intermediateMED::getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP
       for(; maIt!=grp.mailles.end(); ++maIt)
         mailleSet.insert( *maIt );
       if ( grp.mailles.size() != mailleSet.size() )
-        INFOS( "Self intersecting group: " << i+1 << " <" << grp.nom << ">"
-              << ", mailleSet.size = " << mailleSet.size() << ", nb elems = " << grp.mailles.size());
+        INFOS( "Self intersecting group: " << i << " <" << grp.nom << ">"
+               << ", mailleSet.size = " << mailleSet.size()
+               << ", nb elems = " << grp.mailles.size());
+    }
+    // MEDMEM does not allow constituents of <mesh_dim>-2 and less dimension
+    // but do not skip node group
+    int group_min_dim = (**mailleSet.begin()).dimension();
+    int group_max_dim = (**(--mailleSet.end())).dimension();
+    if ( group_max_dim != 0 && group_min_dim <= dimension_maillage - 2  ) {
+      INFOS("Skip group: " << i << " <" << grp.nom << "> - too small dimension: "
+            << group_min_dim);
+      continue;
     }
 
     // 1. Build a map _maille* -> index in MEDMEM::GROUP.getNumber(MED_ALL_ELEMENTS).
@@ -650,6 +697,7 @@ _intermediateMED::getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP
     }
     //Creation nouveau groupe MED
     GROUP * new_group = new GROUP();
+    medGroupes[ i ] = new_group;
     //Appel methodes set
     new_group->setTotalNumberOfElements(mailleSet.size());
     new_group->setName(grp.nom);
@@ -665,14 +713,12 @@ _intermediateMED::getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP
     new_group->setNumberOfGaussPoint( &nbGaussPnt[0] );
 
     vect_group->push_back(new_group);
-    medGroupes.push_back( new_group );
 
     delete [] tab_types_geometriques;
     delete [] tab_index_types_geometriques;
     delete [] tab_numeros_elements;
     delete [] tab_nombres_elements;
   }
-  SCRUTE( medGroupes.size() );
 
   END_OF(LOC);
 }
@@ -825,23 +871,24 @@ void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
   for ( ; fIt != fields.end(); fIt++ )
   {
     const _fieldBase* fb = *fIt;
-    SUPPORT* sup = getGroup( fb->group_id );
-    if ( !sup )
-      throw MEDEXCEPTION
-        (LOCALIZED(STRING(LOC) <<"_intermediateMED::getFields(), NULL field support: "
-                   << " group index: " << fb->group_id));
-    int nb_elems = sup->getNumberOfElements( MED_ALL_ELEMENTS );
-
-    std::list< FIELD_* > ff = fb->getField(groupes);
-    std::list< FIELD_* >::iterator it = ff.begin();
-    for (int j = 1 ; it != ff.end(); it++, ++j )
+    list<pair< FIELD_*, int> >  ff = fb->getField(groupes);
+    list<pair< FIELD_*, int> >::iterator f_sup = ff.begin();
+    for (int j = 1 ; f_sup != ff.end(); f_sup++, ++j )
     {
-      FIELD_* f = *it;
+      FIELD_* f = f_sup->first;
+      SUPPORT* sup = getGroup( f_sup->second );
+      if ( !sup )
+        throw MEDEXCEPTION
+          (LOCALIZED(STRING(LOC) <<"_intermediateMED::getFields(), NULL field support: "
+                     << " group index: " << fb->_group_id));
+      int nb_elems = sup->getNumberOfElements( MED_ALL_ELEMENTS );
       if ( nb_elems != f->getNumberOfValues() )
         throw MEDEXCEPTION
           (LOCALIZED(STRING("_intermediateMED::getFields(), field support size (")
                      << nb_elems  << ") != NumberOfValues (" << f->getNumberOfValues()));
       theFields.push_back( f );
+      if ( sup->getName().empty() )
+        sup->setName( "GRP_" + f->getName() );
       f->setSupport( sup );
       //f->setIterationNumber( j );
       f->setOrderNumber( j );
@@ -858,5 +905,40 @@ _intermediateMED::~_intermediateMED()
     delete *fIt;
 }
 
+//=======================================================================
+//function : getGroupIds
+//purpose  : return ids of main and/or sub- groups
+//=======================================================================
+
+void _fieldBase::getGroupIds( std::set<int> & ids, bool all ) const
+{
+  if ( hasCommonSupport() )
+    ids.insert( _group_id );
+  if ( all || !hasCommonSupport() ) {
+    vector< _sub_data >::const_iterator sub = _sub.begin();
+    for ( ; sub != _sub.end(); ++sub )
+      ids.insert( sub->_supp_id );
+  }
+}
+
+//=======================================================================
+//function : hasSameComponentsBySupport
+//purpose  : 
+//=======================================================================
+
+bool _fieldBase::hasSameComponentsBySupport() const
+{
+  vector< _sub_data >::const_iterator sub_data = _sub.begin();
+  const _sub_data& first_sub_data = *sub_data;
+  for ( ++sub_data ; sub_data != _sub.end(); ++sub_data )
+  {
+    if ( first_sub_data.nbComponents() != sub_data->nbComponents() )
+      return false;
+    for ( int iComp = 0; iComp < first_sub_data.nbComponents(); ++iComp )
+      if ( first_sub_data._comp_names[ iComp ] != sub_data->_comp_names[ iComp ])
+        return false;
+  }
+  return true;
+}
 
 /////

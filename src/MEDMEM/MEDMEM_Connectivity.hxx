@@ -178,7 +178,7 @@ public:
 				 int NumberOfFaces=0);
 
   inline bool   existConnectivity     (MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh Entity) const;
-
+  
   inline bool existPolygonsConnectivity(MED_EN::medConnectivity connectivityType,
 					MED_EN::medEntityMesh Entity) const;
 
@@ -216,6 +216,7 @@ public:
   virtual int getConnectivityLength        (MED_EN::medConnectivity ConnectivityType,
 					    MED_EN::medEntityMesh Entity,
                                             MED_EN::medGeometryElement Type);
+
   virtual const int *     getConnectivityIndex (MED_EN::medConnectivity ConnectivityType,
 					    MED_EN::medEntityMesh Entity);
 

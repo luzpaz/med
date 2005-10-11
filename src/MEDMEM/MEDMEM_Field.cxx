@@ -301,7 +301,6 @@ void     FIELD_::read          (const GENDRIVER &)                    {};
 void     FIELD_::write         (int , const string & ) {};
 void     FIELD_::writeAppend   (int , const string & ) {};
 void     FIELD_::read          (int )                                  {};
-
 void     FIELD_::copyGlobalInfo(const FIELD_& m)
 {  
   if (m._componentsTypes != NULL)
