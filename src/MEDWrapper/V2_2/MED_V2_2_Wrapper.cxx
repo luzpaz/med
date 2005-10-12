@@ -315,16 +315,21 @@ namespace MED
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
       
+      med_int* anAttrId = theInfo.myNbAttr > 0? (med_int*)&theInfo.myAttrId[0]: NULL;
+      med_int* anAttrVal = theInfo.myNbAttr > 0? (med_int*)&theInfo.myAttrVal[0]: NULL;
+      char* anAttrDesc = theInfo.myNbAttr > 0? &theInfo.myAttrDesc[0]: NULL;
+      char* aGroupNames = theInfo.myNbGroup > 0? &theInfo.myGroupNames[0]: NULL;
+
       TErr aRet = MEDfamInfo(myFile->Id(),
 			     &aMeshInfo.myName[0],
 			     theFamId,
 			     &theInfo.myName[0],
 			     (med_int*)&theInfo.myId,
-			     (med_int*)&theInfo.myAttrId[0],
-			     (med_int*)&theInfo.myAttrVal[0],
-			     &theInfo.myAttrDesc[0],
+			     anAttrId,
+			     anAttrVal,
+			     anAttrDesc,
 			     (med_int*)&theInfo.myNbAttr,
-			     &theInfo.myGroupNames[0],
+			     aGroupNames,
 			     (med_int*)&theInfo.myNbGroup);
       
       if(theErr) 
@@ -352,15 +357,20 @@ namespace MED
       MED::TFamilyInfo& anInfo = const_cast<MED::TFamilyInfo&>(theInfo);
       MED::TMeshInfo& aMeshInfo = *anInfo.myMeshInfo;
       
+      med_int* anAttrId = anInfo.myNbAttr > 0? (med_int*)&anInfo.myAttrId[0]: NULL;
+      med_int* anAttrVal = anInfo.myNbAttr > 0? (med_int*)&anInfo.myAttrVal[0]: NULL;
+      char* anAttrDesc = anInfo.myNbAttr > 0? &anInfo.myAttrDesc[0]: NULL;
+      char* aGroupNames = anInfo.myNbGroup > 0? &anInfo.myGroupNames[0]: NULL;
+
       TErr aRet = MEDfamCr(myFile->Id(),
 			   &aMeshInfo.myName[0],
 			   &anInfo.myName[0],
 			   anInfo.myId,
-			   (med_int*)&anInfo.myAttrId[0],
-			   (med_int*)&anInfo.myAttrVal[0],
-			   &anInfo.myAttrDesc[0],
+			   anAttrId,
+			   anAttrVal,
+			   anAttrDesc,
 			   anInfo.myNbAttr,
-			   &anInfo.myGroupNames[0],
+			   aGroupNames,
 			   anInfo.myNbGroup);
       
       INITMSG(MYDEBUG,"TVWrapper::GetFamilyInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<endl);
@@ -407,7 +417,7 @@ namespace MED
 			     med_entite_maillage(theEntity),
 			     med_geometrie_element(theGeom));
 
-      theInfo.myIsElemNames = (theInfo.myElemNames).empty()? EBooleen(0) : EBooleen(1) ;
+      theInfo.myIsElemNames = (theInfo.myElemNames).empty()? eFAUX : eVRAI ;
 
       if(theErr) 
 	*theErr = aRet;
@@ -440,7 +450,7 @@ namespace MED
 			     anEntity,
 			     aGeom);
 
-      theInfo.myIsElemNum = (theInfo.myElemNum).empty()? EBooleen(0) : EBooleen(1) ;
+      theInfo.myIsElemNum = (theInfo.myElemNum).empty()? eFAUX : eVRAI ;
 
       if(theErr) 
 	*theErr = aRet;
@@ -631,6 +641,9 @@ namespace MED
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
 
+      char* anElemNames = theInfo.myIsElemNames? &theInfo.myElemNames[0]: NULL;
+      med_int* anElemNum = theInfo.myIsElemNum? &theInfo.myElemNum[0]: NULL;
+
       TErr aRet = MEDnoeudsLire(myFile->Id(),
 				&aMeshInfo.myName[0],
 				aMeshInfo.myDim,
@@ -639,9 +652,9 @@ namespace MED
 				(med_repere*)&theInfo.mySystem,
 				&theInfo.myCoordNames[0],
 				&theInfo.myCoordUnits[0],
-				&theInfo.myElemNames[0],
+				anElemNames,
 				(med_booleen*)&theInfo.myIsElemNames,
-				(med_int*)&theInfo.myElemNum[0],
+				anElemNum,
 				(med_booleen*)&theInfo.myIsElemNum,
 				(med_int*)&theInfo.myFamNum[0],
 				theInfo.myNbElem);
@@ -666,6 +679,9 @@ namespace MED
       MED::TNodeInfo& anInfo = const_cast<MED::TNodeInfo&>(theInfo);
       MED::TMeshInfo& aMeshInfo = *anInfo.myMeshInfo;
       
+      char* anElemNames = theInfo.myIsElemNames? &anInfo.myElemNames[0]: NULL;
+      med_int* anElemNum = theInfo.myIsElemNum? &anInfo.myElemNum[0]: NULL;
+
       TErr aRet = MEDnoeudsEcr(myFile->Id(),
 			       &aMeshInfo.myName[0],
 			       aMeshInfo.myDim,
@@ -674,9 +690,9 @@ namespace MED
 			       med_repere(theInfo.mySystem),
 			       &anInfo.myCoordNames[0],
 			       &anInfo.myCoordUnits[0],
-			       &anInfo.myElemNames[0],
+			       anElemNames,
 			       med_booleen(theInfo.myIsElemNames),
-			       (med_int*)&anInfo.myElemNum[0],
+			       anElemNum,
 			       med_booleen(theInfo.myIsElemNum),
 			       (med_int*)&anInfo.myFamNum[0],
 			       anInfo.myNbElem);
@@ -728,13 +744,17 @@ namespace MED
       else if(aRet < 0)
 	EXCEPTION(runtime_error,"GetPolygoneInfo - MEDpolygoneInfo(...)");
 
-      GetNames(theInfo,aNbElem,theInfo.myEntity,ePOLYGONE,&aRet);
-      if(theErr) 
-	*theErr = aRet;
+      if(theInfo.myIsElemNames){
+	GetNames(theInfo,aNbElem,theInfo.myEntity,ePOLYGONE,&aRet);
+	if(theErr) 
+	  *theErr = aRet;
+      }
 
-      GetNumeration(theInfo,aNbElem,theInfo.myEntity,ePOLYGONE,&aRet);
-      if(theErr) 
-	*theErr = aRet;
+      if(theInfo.myIsElemNum){
+	GetNumeration(theInfo,aNbElem,theInfo.myEntity,ePOLYGONE,&aRet);
+	if(theErr) 
+	  *theErr = aRet;
+      }
 
       GetFamilies(theInfo,aNbElem,theInfo.myEntity,ePOLYGONE,&aRet);
       if(theErr) 
@@ -861,13 +881,17 @@ namespace MED
       else if(aRet < 0)
 	EXCEPTION(runtime_error,"GetPolygoneInfo - MEDpolyedreConnLire(...)");
 
-      GetNames(theInfo,aNbElem,theInfo.myEntity,ePOLYEDRE,&aRet);
-      if(theErr) 
-	*theErr = aRet;
+      if(theInfo.myIsElemNames){
+	GetNames(theInfo,aNbElem,theInfo.myEntity,ePOLYEDRE,&aRet);
+	if(theErr)
+	  *theErr = aRet;
+      }
 
-      GetNumeration(theInfo,aNbElem,theInfo.myEntity,ePOLYEDRE,&aRet);
-      if(theErr) 
-	*theErr = aRet;
+      if(theInfo.myIsElemNum){
+	GetNumeration(theInfo,aNbElem,theInfo.myEntity,ePOLYEDRE,&aRet);
+	if(theErr) 
+	  *theErr = aRet;
+      }
 
       GetFamilies(theInfo,aNbElem,theInfo.myEntity,ePOLYEDRE,&aRet);
       if(theErr) 
@@ -1065,15 +1089,18 @@ namespace MED
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
       TInt aNbElem = theInfo.myElemNum.size();
 
+      char* anElemNames = theInfo.myIsElemNames? &theInfo.myElemNames[0]: NULL;
+      med_int* anElemNum = theInfo.myIsElemNum? &theInfo.myElemNum[0]: NULL;
+
       TErr aRet;
       aRet = MEDelementsLire(myFile->Id(),
 			     &aMeshInfo.myName[0],
 			     aMeshInfo.myDim,
 			     (med_int*)&theInfo.myConn[0],
 			     med_mode_switch(theInfo.myModeSwitch),
-			     &theInfo.myElemNames[0],
+			     anElemNames,
 			     (med_booleen*)&theInfo.myIsElemNames,
-			     (med_int*)&theInfo.myElemNum[0],
+			     anElemNum,
 			     (med_booleen*)&theInfo.myIsElemNum,
 			     (med_int*)&theInfo.myFamNum[0],
 			     aNbElem,
@@ -1101,15 +1128,18 @@ namespace MED
       MED::TCellInfo& anInfo = const_cast<MED::TCellInfo&>(theInfo);
       MED::TMeshInfo& aMeshInfo = *anInfo.myMeshInfo;
 
+      char* anElemNames = theInfo.myIsElemNames? &anInfo.myElemNames[0]: NULL;
+      med_int* anElemNum = theInfo.myIsElemNum? &anInfo.myElemNum[0]: NULL;
+
       TErr aRet;
       aRet = MEDelementsEcr(myFile->Id(),
 			    &aMeshInfo.myName[0],
 			    aMeshInfo.myDim,
 			    (med_int*)&anInfo.myConn[0],
 			    med_mode_switch(theInfo.myModeSwitch),
-			    &anInfo.myElemNames[0],
+			    anElemNames,
 			    med_booleen(theInfo.myIsElemNames),
-			    (med_int*)&anInfo.myElemNum[0],
+			    anElemNum,
 			    med_booleen(theInfo.myIsElemNum),
 			    (med_int*)&anInfo.myFamNum[0],
 			    anInfo.myNbElem,

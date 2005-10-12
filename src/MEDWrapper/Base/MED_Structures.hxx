@@ -63,7 +63,8 @@ namespace MED
   //---------------------------------------------------------------
   struct TModeSwitchInfo: virtual TBase
   {
-    TModeSwitchInfo() 
+    TModeSwitchInfo():
+      myModeSwitch(eFULL_INTERLACE)
     {}
 
     TModeSwitchInfo(EModeSwitch theModeSwitch):

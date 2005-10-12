@@ -154,14 +154,9 @@ namespace MED
       myId = theId;
 
       myNbGroup = theNbGroup;
-      if(!theNbGroup)
-	theNbGroup = 1;
       myGroupNames.resize(theNbGroup*GetLNOMLength<eVersion>()+1);
 
       myNbAttr = theNbAttr;
-
-      if(!theNbAttr)
-	theNbAttr = 1;
       myAttrId.resize(theNbAttr);
       myAttrVal.resize(theNbAttr);
       myAttrDesc.resize(theNbAttr*GetDESCLength<eVersion>()+1);
