@@ -428,7 +428,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECT,theErr);
       
-      if(theErr && *theErr < 0 || theInfo.myNbElem<=0)
+      if(theErr && *theErr < 0)
 	return;
       
       TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
