@@ -396,7 +396,7 @@ namespace MED
 	       const TIntVector& theElemNums,
 	       const TStringVector& theElemNames):
       TElemInfoBase(theMeshInfo,
-		    theNodeCoords.size(),
+		    theNodeCoords.size()/theMeshInfo->GetDim(),
 		    theFamilyNums,
 		    theElemNums,
 		    theElemNames),
