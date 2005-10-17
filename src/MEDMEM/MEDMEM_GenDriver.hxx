@@ -4,7 +4,7 @@
 #include <string>
 
 #include "MEDMEM_define.hxx"
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 
 /* Generic Read/Write Driver Class for Meshes & Fields */
 

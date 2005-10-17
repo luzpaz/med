@@ -23,7 +23,7 @@
 //  Module : MED
 
 #include <cstdlib>	// pour l'acces à EXIT_SUCCESS et EXIT_FAILURE
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_Array.hxx"
 
 using namespace std;

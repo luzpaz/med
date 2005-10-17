@@ -61,6 +61,11 @@ else
 SWIG_DEF = libMEDClient.i
 endif
 
+# libMEDClient.i depends on libMEDMEM_Swig.i and libMedCorba_Swig.i:
+# %include "libMedCorba_Swig.i"
+# %include "libMEDMEM_Swig.i"
+SWIG_DEP = libMEDMEM_Swig.i libMedCorba_Swig.i
+
 EXPORT_PYSCRIPTS = libMEDClient.py \
 		   medClient_test.py
 

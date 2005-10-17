@@ -3,7 +3,7 @@
  $Header$
 */
 
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_Exception.hxx"
 
 using namespace std;

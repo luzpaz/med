@@ -1,4 +1,3 @@
-#include "utilities.h"
 #include "MEDMEM_Array.hxx"
 
 using namespace std;

@@ -5,7 +5,7 @@
 //  File   : testUPointerOf.cxx
 //  Module : MED
 
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_PointerOf.hxx"
 #include "MEDMEM_Exception.hxx"
 

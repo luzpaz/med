@@ -6,7 +6,7 @@
 #include "MEDMEM_define.hxx"
 
 #include "MEDMEM_GenDriver.hxx"
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"

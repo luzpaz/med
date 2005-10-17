@@ -63,32 +63,37 @@ void CONNECTIVITYClient::blankCopy()
         THROW_SALOME_CORBA_EXCEPTION(ex.what() ,SALOME::INTERNAL_ERROR);
    }
 
-  //_numberOfNodes = IOR_Mesh->getNumberOfNodes();
   _numberOfNodes = all->numberOfNodes;
   _entityDimension = all->entityDimension;
   medGeometryElement * Types;
 
-  long iT, nT;
-  //convertCorbaArray<SALOME_MED::medGeometryElement>
-  //  (Types, nT, IOR_Mesh->getTypes(Entity));
+  long iT, nTwithPoly, nT=getNumberOfTypes(Entity);
   convertCorbaArray<MED_EN::medGeometryElement,SALOME_MED::medGeometryElement_array *, long>
-    (Types, nT, &all->meshTypes);
+    (Types, nTwithPoly, &all->meshTypes);
 
-  ASSERT(nT == (int) getNumberOfTypes(Entity));
+  //ASSERT(nT == (int) getNumberOfTypes(Entity)); FALSE with POLY
   SCRUTE(nT);
   
   setGeometricTypes(Types, Entity);
-  
+
   _totalNumberOfElements_client = 0L;
-  _numberOfElements_client = new long[nT];
+  _numberOfElements_client = new long[nTwithPoly];
   for (iT=0; iT<nT; iT++) 
    {
-    //_numberOfElements_client[iT] 
-    //  = IOR_Mesh->getNumberOfElements(Entity, Types[iT]);
     _numberOfElements_client[iT] =  all->numberOfElements[iT];
     _totalNumberOfElements_client += _numberOfElements_client[iT];
     SCRUTE(iT);
     SCRUTE(_numberOfElements_client[iT]);
+  }
+
+  if ( nT != nTwithPoly )
+  {
+    _numberOfElements_client[iT] = all->numberOfElements[iT];
+    _polyType_client = Types[iT];
+  }
+  else
+  {
+    _polyType_client = MED_EN::MED_NONE;
   }
 
   _complete = false;
@@ -100,6 +105,16 @@ void CONNECTIVITYClient::blankCopy()
 /*!
  */
 //=============================================================================
+// template< class T>
+// void dumpArray(const T* array, int size, const char* msg)
+// {
+//   if ( msg )
+//     std::cout << msg << " " << std::endl;
+//   std::cout << "Size: " << size << std::endl;
+//   for ( int i = 0; i < size; i++ )
+//     std::cout << " " << array[ i ];
+//   std::cout << endl;
+// }
 
 void CONNECTIVITYClient::fillCopy()
 {
@@ -139,7 +154,46 @@ void CONNECTIVITYClient::fillCopy()
       setNodal(pC, Entity, T[iT]);
       delete [] pC;
     }
-    
+
+    if ( _polyType_client == MED_POLYGON )
+    {
+      const medConnectivity ConType = MED_NODAL;
+      SALOME::SenderInt_var senderForConnectivity=IOR_Mesh->getSenderForPolygonsConnectivity (ConType, Entity);
+      SALOME::SenderInt_var senderForConnectivityIndex=IOR_Mesh->getSenderForPolygonsConnectivityIndex (ConType, Entity);
+
+      pC=ReceiverFactory::getValue(senderForConnectivity,nC);
+      long nP;
+      int * pCI=ReceiverFactory::getValue(senderForConnectivityIndex,nP);
+//       dumpArray( pC, nC, "POLYGON Connectivity: ");
+//       dumpArray( pCI, nP, "POLYGON ConnectivityIndex: ");
+
+      setPolygonsConnectivity(ConType, Entity, pC, pCI, nC, nP-1);
+      delete [] pC;
+      delete [] pCI;
+    }
+
+    if ( _polyType_client == MED_POLYHEDRA )
+    {
+      const medConnectivity ConType = MED_NODAL;
+      SALOME::SenderInt_var senderForConnectivity=IOR_Mesh->getSenderForPolyhedronConnectivity (ConType);
+      SALOME::SenderInt_var senderForPolyhedronIndex=IOR_Mesh->getSenderForPolyhedronIndex (ConType);
+      SALOME::SenderInt_var senderForPolyhedronFacesIndex=IOR_Mesh->getSenderForPolyhedronFacesIndex ();
+
+      pC=ReceiverFactory::getValue(senderForConnectivity,nC);
+      long nP, nF;
+      int * pPI=ReceiverFactory::getValue(senderForPolyhedronIndex,nP);
+      int * pFI=ReceiverFactory::getValue(senderForPolyhedronFacesIndex,nF);
+
+//       dumpArray( pC, nC, "POLYHedron Connectivity: ");
+//       dumpArray( pFI, nF, "POLYHedron Face Index: ");
+//       dumpArray( pPI, nP, "POLYHedron Index: ");
+
+      setPolyhedronConnectivity(ConType, pC, pPI, nC, nP-1, pFI, nF-1);
+      delete [] pC;
+      delete [] pPI;
+      delete [] pFI;
+    }
+
     delete[] Count;
     
     _complete = true;
@@ -153,7 +207,7 @@ void CONNECTIVITYClient::fillCopy()
  */
 //=============================================================================
 int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity, 
-					medGeometryElement Type) const
+                                    medGeometryElement Type) const
 {
   BEGIN_OF("void CONNECTIVITYClient::getNumberOf()");
 
@@ -276,9 +330,11 @@ const int * CONNECTIVITYClient::getGlobalNumberingIndex
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
-  CONNECTIVITY::getGlobalNumberingIndex(Entity);
+  const int * c = CONNECTIVITY::getGlobalNumberingIndex(Entity);
 
   END_OF("void CONNECTIVITYClient::getGlobalNumberingIndex()");
+
+  return c;
 }
 
 //=============================================================================
@@ -395,5 +451,205 @@ const int* CONNECTIVITYClient::getNeighbourhood() const
   END_OF("void CONNECTIVITYClient::getNeighbourhood()");
 
   return c;
+}
+
+//=======================================================================
+//function : existPolygonsConnectivity
+//purpose  : 
+//=======================================================================
+
+bool CONNECTIVITYClient::existPolygonsConnectivity(medConnectivity connectivityType,
+                                                   medEntityMesh   Entity) const
+{
+  BEGIN_OF("void CONNECTIVITYClient::existPolygonsConnectivity()");
+
+  if (!_complete)
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
+
+  bool b = CONNECTIVITY::existPolygonsConnectivity( connectivityType, Entity );
+
+  END_OF("void CONNECTIVITYClient::existPolygonsConnectivity(connectivityType, Entity)");
+
+  return b;
+}
+
+//=======================================================================
+//function : existPolyhedronConnectivity
+//purpose  : 
+//=======================================================================
+
+bool CONNECTIVITYClient::existPolyhedronConnectivity(medConnectivity connectivityType,
+                                                     medEntityMesh   Entity) const
+{
+  BEGIN_OF("void CONNECTIVITYClient::existPolyhedronConnectivity()");
+
+  if (!_complete)
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
+
+  bool b = CONNECTIVITY::existPolyhedronConnectivity( connectivityType, Entity );
+
+  END_OF("void CONNECTIVITYClient::existPolyhedronConnectivity(connectivityType, Entity)");
+
+  return b;
+}
+
+//=======================================================================
+//function : getPolygonsConnectivity
+//purpose  : 
+//=======================================================================
+
+const int* CONNECTIVITYClient::getPolygonsConnectivity(medConnectivity ConnectivityType,
+                                                       medEntityMesh Entity)
+{
+  BEGIN_OF("void CONNECTIVITYClient::getPolygonsConnectivity()");
+
+  if (!_complete)
+    fillCopy();
+
+  const int * c = CONNECTIVITY::getPolygonsConnectivity (ConnectivityType, Entity);
+
+  END_OF("void CONNECTIVITYClient::getPolygonsConnectivity()");
+  return c;
+}
+
+//=======================================================================
+//function : getPolygonsConnectivityIndex
+//purpose  : 
+//=======================================================================
+
+const int* CONNECTIVITYClient::getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
+                                                            medEntityMesh Entity)
+{
+  BEGIN_OF("void CONNECTIVITYClient::getPolygonsConnectivityIndex()");
+
+  if (!_complete)
+    fillCopy();
+
+  const int * c = CONNECTIVITY::getPolygonsConnectivityIndex (ConnectivityType, Entity);
+
+  END_OF("void CONNECTIVITYClient::getPolygonsConnectivityIndex()");
+  return c;
+}
+
+//=======================================================================
+//function : getPolyhedronConnectivity
+//purpose  : 
+//=======================================================================
+
+const int* CONNECTIVITYClient::getPolyhedronConnectivity(medConnectivity ConnectivityType) const
+{
+  BEGIN_OF("void CONNECTIVITYClient::getPolyhedronConnectivity()");
+
+  if (!_complete)
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
+
+  const int * c = CONNECTIVITY::getPolyhedronConnectivity (ConnectivityType);
+
+  END_OF("void CONNECTIVITYClient::getPolyhedronConnectivity()");
+  return c;
+}
+
+//=======================================================================
+//function : getPolyhedronFacesIndex
+//purpose  : 
+//=======================================================================
+
+const int* CONNECTIVITYClient::getPolyhedronFacesIndex() const
+{
+  BEGIN_OF("void CONNECTIVITYClient::getPolyhedronFacesIndex()");
+
+  if (!_complete)
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
+
+  const int * c = CONNECTIVITY::getPolyhedronFacesIndex();
+
+  END_OF("void CONNECTIVITYClient::getPolyhedronFacesIndex()");
+  return c;
+}
+
+//=======================================================================
+//function : getPolyhedronIndex
+//purpose  : 
+//=======================================================================
+
+const int* CONNECTIVITYClient::getPolyhedronIndex(medConnectivity ConnectivityType) const
+{
+  BEGIN_OF("void CONNECTIVITYClient::getPolyhedronIndex()");
+
+  if (!_complete)
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
+
+  const int * c = CONNECTIVITY::getPolyhedronIndex (ConnectivityType);
+
+  END_OF("void CONNECTIVITYClient::getPolyhedronIndex()");
+  return c;
+}
+
+//=======================================================================
+//function : getNumberOfPolygons
+//purpose  : 
+//=======================================================================
+
+int CONNECTIVITYClient::getNumberOfPolygons() const
+{
+  BEGIN_OF("void CONNECTIVITYClient::getNumberOfPolygons()");
+
+  int n = 0;
+
+  if (!_complete) {
+    if ( _polyType_client == MED_POLYGON )
+      n = _numberOfElements_client[ getNumberOfTypes( _entity )];
+  }
+  else
+    n = CONNECTIVITY::getNumberOfPolygons();
+
+  SCRUTE(n);
+
+  END_OF("void CONNECTIVITYClient::getNumberOfPolygons()");
+  return n;
+}
+
+//=======================================================================
+//function : getNumberOfPolyhedronFaces
+//purpose  : 
+//=======================================================================
+
+int CONNECTIVITYClient::getNumberOfPolyhedronFaces() const
+{
+  BEGIN_OF("void CONNECTIVITYClient::getNumberOfPolyhedronFaces()");
+
+  if (!_complete)
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
+
+  int n = CONNECTIVITY::getNumberOfPolyhedronFaces ();
+
+  SCRUTE(n);
+
+  END_OF("void CONNECTIVITYClient::getNumberOfPolyhedronFaces()");
+  return n;
+}
+
+//=======================================================================
+//function : getNumberOfPolyhedron
+//purpose  : 
+//=======================================================================
+
+int CONNECTIVITYClient::getNumberOfPolyhedron() const
+{
+  BEGIN_OF("void CONNECTIVITYClient::getNumberOfPolyhedron()");
+
+  int n = 0;
+
+  if (!_complete) {
+    if ( _polyType_client == MED_POLYHEDRA )
+      n = _numberOfElements_client[ getNumberOfTypes( _entity )];
+  }
+  else
+    n = CONNECTIVITY::getNumberOfPolyhedron();
+
+  SCRUTE(n);
+
+  END_OF("void CONNECTIVITYClient::getNumberOfPolyhedron()");
+  return n;
 }
 

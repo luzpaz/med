@@ -5,18 +5,10 @@
 
 #include "MEDMEM_InterpolationHighLevelObjects.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 #define affiche(NOEUD) cout<<flush;for (int iii=0;iii<DIMENSION;iii++) cout<<NOEUD[iii]<<" "<<flush;
 
 int main (void) 
 {
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
-
 int i;
 
 const int DIMENSION  = 3;

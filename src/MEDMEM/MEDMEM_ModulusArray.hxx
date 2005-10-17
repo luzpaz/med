@@ -1,7 +1,7 @@
 #ifndef __MEDMODULUSARRAY_H__
 #define __MEDMODULUSARRAY_H__
 
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 
 /*
   This class is use to set cyclic (modulus length) array.

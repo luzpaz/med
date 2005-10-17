@@ -24,7 +24,6 @@
 //  File   : MedGUI.cxx
 //  Module : MED
 
-using namespace std;
 #include "MedGUI.h"
 
 // SALOME Includes
@@ -64,6 +63,8 @@ using namespace std;
 #include <qlineedit.h>
 #endif
 //VRV: porting on Qt 3.0.5
+
+using namespace std;
 
 static CORBA::ORB_var   _orb;
 
@@ -118,8 +119,9 @@ void MedGUI::createMedAction( const int id, const QString& po_id, const QString&
   QPixmap pix; QIconSet icon;
   if( !icon_id.isEmpty() )
     pix = mgr->loadPixmap( "MED", tr( icon_id ) );
-  else
-    pix = mgr->loadPixmap( "MED", tr( QString( "ICO_" )+po_id ) );
+//   else
+//     pix = mgr->loadPixmap( "MED", tr( QString( "ICO_" )+po_id ) );
+
   if ( !pix.isNull() )
     icon = QIconSet( pix );
 
@@ -142,9 +144,9 @@ void MedGUI::initialize( CAM_Application* app )
   createMedAction( 933, "EXPLORE" );
   createMedAction( 934, "DUMPMESH" );
   createMedAction( 935, "DUMPSUBMESH" );
-  createMedAction( 8031, "POPUPTEST" );
-  createMedAction( 9002, "ERASE" );
-  createMedAction( 903, "DISPLAY" );
+//   createMedAction( 8031, "POPUPTEST" );
+//   createMedAction( 9002, "ERASE" );
+//   createMedAction( 9003, "DISPLAY" );
   createMedAction( 4031, "MESHSEL", "ICO_TB_MESHSEL" );
   createMedAction( 4032, "FIELDSEL", "ICO_TB_FIELDSEL" );
   createMedAction( 4033, "EXPLORE", "ICO_TB_EXPLORE" );
@@ -162,12 +164,12 @@ void MedGUI::initialize( CAM_Application* app )
   createTool( 4032, medTb );
   createTool( 4033, medTb );
 
-  QString OB = "'ObjectBrowser'",
-          View = QString("'%1'").arg( "VTKViewer" /* SVTK_Viewer::Type()*/ );
+//   QString OB = "'ObjectBrowser'",
+//           View = QString("'%1'").arg( "VTKViewer" /* SVTK_Viewer::Type()*/ );
 
-  createPopupItem( 8031, View, "", "" );
-  createPopupItem( 9002, OB, "", "" );
-  createPopupItem( 903,  OB, "", "" );
+//   createPopupItem( 8031, View, "", "" );
+//   createPopupItem( 9002, OB, "", "" );
+//   createPopupItem( 903,  OB, "", "" );
 }
 
 void MedGUI::contextMenuPopup( const QString& client, QPopupMenu* menu, QString& /*title*/ )
@@ -301,7 +303,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 
 	QString myStudyName = myActiveStudy->studyName();
 	bool ok=FALSE;
-	int myStudyId = myActiveStudy->id();
+// 	int myStudyId = myActiveStudy->id();
 
 	// load MED engine
 	SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
@@ -355,7 +357,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 
 	QString myStudyName = myActiveStudy->studyName();
 	bool ok=FALSE;
-	int myStudyId = myActiveStudy->id();
+// 	int myStudyId = myActiveStudy->id();
 
 	// load MED engine
 	SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
@@ -407,7 +409,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 	MESSAGE("command " << theCommandID << " activated");
 
 	QString myStudyName = myActiveStudy->studyName();
-	int myStudyId = myActiveStudy->id();
+// 	int myStudyId = myActiveStudy->id();
 
 	// load MED engine
 	SALOME_MED::MED_Gen_ptr medgen = InitMedGen();

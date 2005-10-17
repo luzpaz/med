@@ -34,7 +34,9 @@ throw (SALOME::SALOME_Exception)
     case MED_PYRA13  :  return SALOME_MED::MED_PYRA13;
     case MED_PENTA15 :  return SALOME_MED::MED_PENTA15;
     case MED_HEXA20  :  return SALOME_MED::MED_HEXA20;
-    case MED_ALL_ELEMENTS     :  return SALOME_MED::MED_ALL_ELEMENTS;
+    case MED_POLYGON      :  return SALOME_MED::MED_POLYGON;
+    case MED_POLYHEDRA    :  return SALOME_MED::MED_POLYHEDRA;
+    case MED_ALL_ELEMENTS :  return SALOME_MED::MED_ALL_ELEMENTS;
     default :
 	{ MESSAGE("Unknown Geometry Element");
 	  THROW_SALOME_CORBA_EXCEPTION("Unknown Geometry Element",
@@ -67,6 +69,8 @@ throw (SALOME::SALOME_Exception)
     case SALOME_MED::MED_PYRA13   :  return MED_PYRA13;
     case SALOME_MED::MED_PENTA15  :  return MED_PENTA15;
     case SALOME_MED::MED_HEXA20   :  return MED_HEXA20;
+    case SALOME_MED::MED_POLYGON      :  return MED_POLYGON;
+    case SALOME_MED::MED_POLYHEDRA    :  return MED_POLYHEDRA;
     case SALOME_MED::MED_ALL_ELEMENTS :  return MED_ALL_ELEMENTS;
     default :
 	{ MESSAGE("unknown Geometry Element");
@@ -216,6 +220,7 @@ throw (SALOME::SALOME_Exception)
 	   case SALOME_MED::MED_QUAD4	 : coherent=true;
 	   case SALOME_MED::MED_TRIA6	 : coherent=true;
 	   case SALOME_MED::MED_QUAD8	 : coherent=true;
+	   case SALOME_MED::MED_POLYGON	 : coherent=true;
            }
 	 break;
        }
@@ -238,6 +243,8 @@ throw (SALOME::SALOME_Exception)
 	   case SALOME_MED::MED_PENTA15  : coherent=true;
 	   case SALOME_MED::MED_PYRA5	 : coherent=true;
 	   case SALOME_MED::MED_PYRA13	 : coherent=true;
+	   case SALOME_MED::MED_POLYGON	 : coherent=true;
+	   case SALOME_MED::MED_POLYHEDRA: coherent=true;
            }
 	 break;
        }

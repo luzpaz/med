@@ -553,6 +553,7 @@ throw (SALOME::SALOME_Exception)
                 MESSAGE("Unable to access number of Gauss points");
                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
+        return myseq._retn();
 }
 //=============================================================================
 /*!

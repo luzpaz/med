@@ -609,6 +609,158 @@ throw (SALOME::SALOME_Exception)
     THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
   return ret;
 }
+
+//=======================================================================
+//function : getSenderForPolygonsConnectivity
+//purpose  : 
+//=======================================================================
+
+SALOME::SenderInt_ptr MESH_i::getSenderForPolygonsConnectivity(SALOME_MED::medConnectivity mode,
+                                                               SALOME_MED::medEntityMesh entity)
+  throw (SALOME::SALOME_Exception)
+{
+  if (_mesh==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+				 SALOME::INTERNAL_ERROR);
+  if (verifieParam(entity,SALOME_MED::MED_POLYGON)==false)
+    THROW_SALOME_CORBA_EXCEPTION("parameters don't match",\
+				 SALOME::BAD_PARAM);
+  SALOME::SenderInt_ptr ret;
+  try
+    {
+      int nbelements = _mesh->getPolygonsConnectivityLength(convertIdlConnToMedConn(mode),
+                                                            convertIdlEntToMedEnt(entity));
+      const int * numbers=_mesh->getPolygonsConnectivity (convertIdlConnToMedConn(mode),
+                                                          convertIdlEntToMedEnt(entity));
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
+    }
+  catch (MEDEXCEPTION &ex)
+    {
+      MESSAGE("Unable to acces connectivities");
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+    }
+  catch(MultiCommException &ex2)
+    THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
+  return ret;
+}
+
+//=======================================================================
+//function : getSenderForPolygonsConnectivityIndex
+//purpose  : 
+//=======================================================================
+
+SALOME::SenderInt_ptr MESH_i::getSenderForPolygonsConnectivityIndex(SALOME_MED::medConnectivity mode,
+                                                            SALOME_MED::medEntityMesh entity)
+      throw (SALOME::SALOME_Exception)
+{
+  if (_mesh==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+				 SALOME::INTERNAL_ERROR);
+  if (verifieParam(entity,SALOME_MED::MED_POLYGON)==false)
+    THROW_SALOME_CORBA_EXCEPTION("parameters don't match",\
+				 SALOME::BAD_PARAM);
+  SALOME::SenderInt_ptr ret;
+  try
+    {
+      int nbelements = _mesh->getNumberOfPolygons() + 1;
+      const int * numbers=_mesh->getPolygonsConnectivityIndex (convertIdlConnToMedConn(mode),
+                                                               convertIdlEntToMedEnt(entity));
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
+    }
+  catch (MEDEXCEPTION &ex)
+    {
+      MESSAGE("Unable to acces connectivities");
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+    }
+  catch(MultiCommException &ex2)
+    THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
+  return ret;
+}
+
+//=======================================================================
+//function : getSenderForPolyhedronConnectivity
+//purpose  : 
+//=======================================================================
+
+SALOME::SenderInt_ptr MESH_i::getSenderForPolyhedronConnectivity(SALOME_MED::medConnectivity mode)
+    throw (SALOME::SALOME_Exception)
+{
+  if (_mesh==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+				 SALOME::INTERNAL_ERROR);
+  SALOME::SenderInt_ptr ret;
+  try
+    {
+      int nbelements = _mesh->getPolyhedronConnectivityLength(convertIdlConnToMedConn(mode));
+      const int * numbers=_mesh->getPolyhedronConnectivity( convertIdlConnToMedConn(mode) );
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
+    }
+  catch (MEDEXCEPTION &ex)
+    {
+      MESSAGE("Unable to acces connectivities");
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+    }
+  catch(MultiCommException &ex2)
+    THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
+  return ret;
+}
+
+//=======================================================================
+//function : getSenderForPolyhedronIndex
+//purpose  : 
+//=======================================================================
+
+SALOME::SenderInt_ptr MESH_i::getSenderForPolyhedronIndex(SALOME_MED::medConnectivity mode)
+    throw (SALOME::SALOME_Exception)
+{
+  if (_mesh==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+				 SALOME::INTERNAL_ERROR);
+  SALOME::SenderInt_ptr ret;
+  try
+    {
+      int nbelements = _mesh->getNumberOfPolyhedron() + 1;
+      const int * numbers = _mesh->getPolyhedronIndex( convertIdlConnToMedConn( mode ) );
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
+    }
+  catch (MEDEXCEPTION &ex)
+    {
+      MESSAGE("Unable to acces connectivities");
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+    }
+  catch(MultiCommException &ex2)
+    THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
+  return ret;
+}
+
+//=======================================================================
+//function : getSenderForPolyhedronFacesIndex
+//purpose  : 
+//=======================================================================
+
+SALOME::SenderInt_ptr MESH_i::getSenderForPolyhedronFacesIndex()
+    throw (SALOME::SALOME_Exception)
+{
+  if (_mesh==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+				 SALOME::INTERNAL_ERROR);
+  SALOME::SenderInt_ptr ret;
+  try
+    {
+      int nbelements = _mesh->getNumberOfPolyhedronFaces() + 1;
+      const int * numbers=_mesh->getPolyhedronFacesIndex();
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
+    }
+  catch (MEDEXCEPTION &ex)
+    {
+      MESSAGE("Unable to acces connectivities");
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+    }
+  catch(MultiCommException &ex2)
+    THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
+  return ret;
+}
+
 //=============================================================================
 /*!
  * CORBA: Accessor for connectivities
@@ -889,8 +1041,8 @@ throw (SALOME::SALOME_Exception)
         {
                 all->numberOfNodes  = _mesh->getNumberOfNodes();
 
-                int nbTypes=_mesh->getNumberOfTypes(convertIdlEntToMedEnt(entity));
-                const medGeometryElement * elemts  =_mesh->getTypes(
+                int nbTypes=_mesh->getNumberOfTypesWithPoly(convertIdlEntToMedEnt(entity));
+                const medGeometryElement * elemts  =_mesh->getTypesWithPoly(
                                        convertIdlEntToMedEnt(entity));
                 all->meshTypes.length(nbTypes);
                 all->numberOfElements.length(nbTypes);
@@ -898,7 +1050,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0; i<nbTypes; i++)
                 {
                         all->meshTypes[i]=convertMedEltToIdlElt(elemts[i]);
-                        all->numberOfElements[i]=_mesh->getNumberOfElements(
+                        all->numberOfElements[i]=_mesh->getNumberOfElementsWithPoly(
                                        convertIdlEntToMedEnt(entity),elemts[i]);
                 }
         }
@@ -1522,7 +1674,7 @@ throw (SALOME::SALOME_Exception)
 
 //=============================================================================
 /*!
- * CORBA : Test if this and other aggregate the same MESH using the virtual MESH::operator==
+ * CORBA : Test if this and other aggregate the same MESH using the MESH::operator==
  */
 //=============================================================================
 CORBA::Boolean MESH_i::areEquals(SALOME_MED::MESH_ptr other)

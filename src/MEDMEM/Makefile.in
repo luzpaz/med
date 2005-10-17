@@ -81,7 +81,8 @@ MEDMEM_MedMedDriver21.hxx \
 MEDMEM_PolyhedronArray.hxx \
 MEDMEM_MedFieldDriver22.hxx \
 MEDMEM_MedMedDriver22.hxx \
-MEDMEM_MedMeshDriver22.hxx
+MEDMEM_MedMeshDriver22.hxx \
+MEDMEM_Utilities.hxx
 
 # Libraries targets
 
@@ -135,16 +136,23 @@ TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray
 LDFLAGS+= -L$(top_builddir)/lib/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib/salome
 
-CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
+CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES)
 
-CXXFLAGS+=@CXXTMPDPTHFLAGS@ -I${KERNEL_ROOT_DIR}/include/salome
-#LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
+CXXFLAGS+=@CXXTMPDPTHFLAGS@
+#LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace -lMEDWrapper_V2_1 $(STDLIB)
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDWrapper_V2_1 $(STDLIB)
 
-#LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
+#LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace -lMEDWrapper_V2_1 -lMEDWrapperBase
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lMEDWrapper_V2_1 -lMEDWrapperBase
+
+ifeq ($(MED_WITH_KERNEL),yes)
+  CPPFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
+  CXXFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
+  LDFLAGS+= -lSALOMELocalTrace  -L${KERNEL_ROOT_DIR}/lib/salome
+  LDFLAGSFORBIN+= -lSALOMELocalTrace  -L${KERNEL_ROOT_DIR}/lib/salome
+endif
 
 LIBSFORBIN=
 

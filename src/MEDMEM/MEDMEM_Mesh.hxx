@@ -6,7 +6,7 @@
 #include <list>
 #include <map>
 
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
@@ -195,11 +195,14 @@ public :
   virtual inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
 						  MED_EN::medEntityMesh Entity) const;
 
+  inline int getPolygonsConnectivityLength(MED_EN::medConnectivity ConnectivityType,
+                                           MED_EN::medEntityMesh Entity) const;
   inline const int * getPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
 					     MED_EN::medEntityMesh Entity) const;
   inline const int * getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
                                                   MED_EN::medEntityMesh Entity) const;
   inline int getNumberOfPolygons() const;
+  inline int getPolyhedronConnectivityLength(MED_EN::medConnectivity ConnectivityType) const;
   inline const int * getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const;
   inline const int * getPolyhedronFacesIndex() const;
   inline const int * getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const;
@@ -684,6 +687,15 @@ inline const int * MESH::getConnectivityIndex(MED_EN::medConnectivity Connectivi
   return _connectivity->getConnectivityIndex(ConnectivityType, entity);
 }
 /*!
+ Returns the corresponding length of the array returned by MESH::getPolygonsConnectivity.
+ Used particulary for wrapping CORBA and python.
+ */
+inline int MESH::getPolygonsConnectivityLength(MED_EN::medConnectivity ConnectivityType,
+                                               MED_EN::medEntityMesh Entity) const
+{
+  return getPolygonsConnectivityIndex (ConnectivityType,Entity)[ getNumberOfPolygons() ] - 1;
+}
+/*!
   Return the required connectivity of polygons for the given entity.
   You must also get the corresponding index array.
  */
@@ -706,6 +718,17 @@ inline const int * MESH::getPolygonsConnectivityIndex(MED_EN::medConnectivity Co
 inline int MESH::getNumberOfPolygons() const
 {
   return _connectivity->getNumberOfPolygons();
+}
+/*!
+ Returns the corresponding length of the array returned by MESH::getPolyhedronConnectivity with exactly the same arguments.
+ Used particulary for wrapping CORBA and python.
+ */
+inline int MESH::getPolyhedronConnectivityLength(MED_EN::medConnectivity ConnectivityType) const
+{
+  if ( ConnectivityType == MED_EN::MED_DESCENDING )
+    return getPolyhedronIndex (ConnectivityType) [ getNumberOfPolyhedron() ] - 1;
+
+  return getPolyhedronFacesIndex()[ getNumberOfPolyhedronFaces() ] - 1;
 }
 /*!
   Return the required connectivity of polyhedron :

@@ -9,7 +9,7 @@
 using namespace std ;
 
 #include "MEDMEM_define.hxx"
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 
 namespace MED_EN {
 /*!  This Class inherits from  map. \n

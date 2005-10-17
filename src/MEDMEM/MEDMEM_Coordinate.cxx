@@ -2,7 +2,7 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_STRING.hxx"
 
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 
 using namespace std;
 using namespace MEDMEM;

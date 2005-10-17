@@ -1,5 +1,5 @@
 #include "MEDMEM_MedVersion.hxx"
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_Compatibility21_22.hxx"
 
 using namespace MEDMEM;

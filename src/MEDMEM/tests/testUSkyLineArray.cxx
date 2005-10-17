@@ -23,7 +23,7 @@
 //  Module : MED
 
 #include <cstdlib>
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
 
 using namespace std;

@@ -1,4 +1,3 @@
-#include "utilities.h"
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_DriversDef.hxx"
 

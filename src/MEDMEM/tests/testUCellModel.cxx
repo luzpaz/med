@@ -24,7 +24,7 @@
 
 #include <set>
 #include <cstdlib> 
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_define.hxx"

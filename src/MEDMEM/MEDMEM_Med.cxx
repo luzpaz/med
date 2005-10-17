@@ -12,7 +12,7 @@
 # include "MEDMEM_Family.hxx"
 
 # include "MEDMEM_Exception.hxx"
-# include "utilities.h"
+# include "MEDMEM_Utilities.hxx"
 
 using namespace std;
 using namespace MEDMEM;

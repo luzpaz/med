@@ -4,6 +4,9 @@
 # Tool for updating list of .in file for the SALOME project 
 # and regenerating configure script
 #
+# It may be called with --with-kernel[=yes,no] or --without-kernel
+# option, default is --with-kernel=yes
+#
 # Author : Marc Tajchman - CEA
 # Date : 10/10/2002
 # $Header$
@@ -13,19 +16,32 @@ ORIG_DIR=`pwd`
 CONF_DIR=`echo $0 | sed -e "s,[^/]*$,,;s,/$,,;s,^$,.,"`
 
 ########################################################################
-# Test if the KERNEL_ROOT_DIR is set correctly
+# Check --with-kernel option
 
-if test ! -d "${KERNEL_ROOT_DIR}"; then
-    echo "failed : KERNEL_ROOT_DIR variable is not correct !"
-    exit
+MED_WITH_KERNEL=""
+
+for option
+do
+  case $option in
+      -with-kernel | --with-kernel)
+          MED_WITH_KERNEL="yes"
+          break;;
+      -without-kernel | --without-kernel | -with-kernel=no | --with-kernel=no)
+          MED_WITH_KERNEL="no"
+          break;;
+  esac
+done
+
+########################################################################
+# Test if the KERNEL_ROOT_DIR is set correctly if KERNEL required
+
+if test "x${MED_WITH_KERNEL}" != "xno"; then
+    if test ! -d "${KERNEL_ROOT_DIR}"; then
+        echo "failed : KERNEL_ROOT_DIR variable is not correct !"
+        exit
+    fi
 fi
 
-# Test if the KERNEL_SRC is set correctly
-
-#if test ! -d "${KERNEL_SRC}"; then
-#    echo "failed : KERNEL_SRC variable is not correct !"
-#    exit
-#fi
 ########################################################################
 # find_in - utility function
 #
@@ -92,15 +108,14 @@ ABS_CONF_DIR=`pwd`
 #
 # Common part of the configure.in file
 #
-chmod u+w configure.in.base
 if \cp -f configure.in.base configure.in_tmp1
 then
 	echo
+        chmod u+w configure.in_tmp1
 else
 	echo
 	echo "error : can't create files in" ${CONF_DIR}
 	echo "aborting ..."
-        chmod u-w configure.in.base 
 	exit
 fi
 chmod u-w configure.in.base 
@@ -109,12 +124,43 @@ if [ -e "${CONF_DIR}/salome_adm" ] ; then
     \rm -f ${CONF_DIR}/salome_adm
 fi
 
-# make a link allowing AC_OUTPUT to find the salome_adm/.../*.in  files
-echo "" >> configure.in_tmp1
-echo 'ln -fs ${KERNEL_ROOT_DIR}/salome_adm ${ROOT_SRCDIR}/.' >> configure.in_tmp1
+# insert header and AC_INIT(src) which must go before anything else
+cat > configure.in_tmp1 <<EOF
+#
+#  PLEASE DO NOT MODIFY configure.in FILE
+#
+#  ALL CHANGES WILL BE DISCARDED BY THE NEXT
+#  build_configure COMMAND
+#
+#  CHANGES MUST BE MADE IN configure.in.base FILE
+#
+#
+# Author : Marc Tajchman (CEA)
+# Date : 28/06/2001
+# Modified by : Patrick GOLDBRONN (CEA)
+# Modified by : Marc Tajchman (CEA)
+#
+# Created from configure.in.base
+#
 
-echo  "" >> configure.in_tmp1
-echo "AC_OUTPUT([ \\" >> configure.in_tmp1
+AC_INIT(src)
+
+EOF
+
+# initialize MED_WITH_KERNEL
+echo "MED_WITH_KERNEL=${MED_WITH_KERNEL}"                        >> configure.in_tmp1
+
+# insert the configure.in.base
+cat configure.in.base                                            >> configure.in_tmp1
+
+# make a link allowing AC_OUTPUT to find the salome_adm/.../*.in  files
+echo ""                                                          >> configure.in_tmp1
+echo 'if test ${MED_WITH_KERNEL} == yes; then'                   >> configure.in_tmp1
+echo '    ln -fs ${KERNEL_ROOT_DIR}/salome_adm ${ROOT_SRCDIR}/.' >> configure.in_tmp1
+echo 'else'                                                      >> configure.in_tmp1
+echo '    ln -fs ${ROOT_SRCDIR}/adm_local_without_kernel ${ROOT_SRCDIR}/salome_adm' >> configure.in_tmp1
+echo 'fi'                                                        >> configure.in_tmp1
+
 
 #
 # List of .in files in the adm/unix directory
@@ -124,14 +170,25 @@ echo "AC_OUTPUT([ \\" >> configure.in_tmp1
 # Attention, l'ordre d'entrée des fichiers doit être choisi avec
 # précision
 #
+echo ""                                      >> configure.in_tmp1
+echo "AC_OUTPUT([ \\"                        >> configure.in_tmp1
 echo "	./salome_adm/unix/SALOMEconfig.h \\" >> configure.in_tmp1
-echo "	./salome_adm/unix/F77config.h \\" >> configure.in_tmp1
-echo "	./salome_adm/unix/sstream \\" >> configure.in_tmp1
-
-echo "	./salome_adm/unix/depend \\" >> configure.in_tmp1
-echo "	./adm_local/unix/make_omniorb \\" >> configure.in_tmp1
-echo "	./salome_adm/unix/envScript \\" >> configure.in_tmp1
-echo "	./salome_adm/unix/make_module \\" >> configure.in_tmp1
+echo "	./salome_adm/unix/sstream \\"        >> configure.in_tmp1
+echo "	./salome_adm/unix/depend \\"         >> configure.in_tmp1
+echo  " ])"                                  >> configure.in_tmp1
+echo ""                                      >> configure.in_tmp1
+echo 'if test $MED_WITH_KERNEL == yes; then' >> configure.in_tmp1
+echo "{"                                     >> configure.in_tmp1
+echo "AC_OUTPUT([ \\"                        >> configure.in_tmp1
+echo "	./salome_adm/unix/F77config.h \\"    >> configure.in_tmp1
+echo "	./adm_local/unix/make_omniorb \\"    >> configure.in_tmp1
+echo "	./salome_adm/unix/envScript \\"      >> configure.in_tmp1
+echo  " ])"                                  >> configure.in_tmp1
+echo "}"                                     >> configure.in_tmp1
+echo "fi"                                    >> configure.in_tmp1
+echo ""                                      >> configure.in_tmp1
+echo "AC_OUTPUT([ \\"                        >> configure.in_tmp1
+echo "	./salome_adm/unix/make_module \\"    >> configure.in_tmp1
 
 # _CS_gbo Pour assurer ls construction correct de la chaîne de
 # dépendance, il apparaît nécessaire de surcharger le make_conclude
@@ -139,8 +196,8 @@ echo "	./salome_adm/unix/make_module \\" >> configure.in_tmp1
 # salome_adm, par le make_conclude (resp. make_commence) du module,
 # c'est à dire le make_conclude (resp. make_commence) du répertoire
 # adm_local
-echo "	./adm_local/unix/make_commence \\" >> configure.in_tmp1
-echo "	./adm_local/unix/make_conclude \\" >> configure.in_tmp1
+echo "	./adm_local/unix/make_commence \\"   >> configure.in_tmp1
+echo "	./adm_local/unix/make_conclude \\"   >> configure.in_tmp1
 
 \rm -f configure.in_tmp2 configure.in_tmp3
 touch configure.in_tmp2
@@ -152,12 +209,12 @@ find_in . configure.in_tmp2
     sed -e '/^	\.\/salome_adm/d' \
 	-e '/configure.in/d'      \
 	-e '/^	\.\/adm_local/d'  \
-	-e 's/.in / /' configure.in_tmp2 >> configure.in_tmp1
+	-e 's/.in / /' configure.in_tmp2     >> configure.in_tmp1
 
-echo  "])" >> configure.in_tmp1
+echo  " ])"                                  >> configure.in_tmp1
+
 
 # delete the link created for AC_OUTPUT
-echo "" >> configure.in_tmp1
 #echo 'rm -f ${ROOT_SRCDIR}/salome_adm' >> configure.in_tmp1
 \mv configure.in_tmp1 configure.in_new
 \rm  -f configure.in_tmp2 configure.in_tmp3
@@ -216,7 +273,13 @@ else
 	echo -n "Creating 'configure' script ...  "
 fi
 
-aclocal --acdir=adm_local/unix/config_files -I ${KERNEL_ROOT_DIR}/salome_adm/unix/config_files
+if test "x${MED_WITH_KERNEL}" != "xno"; then
+   AUX_CONFIG_DIR=${KERNEL_ROOT_DIR}/salome_adm/unix/config_files
+else
+   AUX_CONFIG_DIR=adm_local_without_kernel/unix/config_files
+fi
+
+aclocal --acdir=adm_local/unix/config_files -I ${AUX_CONFIG_DIR}
 if autoconf
 then
 	echo "done"

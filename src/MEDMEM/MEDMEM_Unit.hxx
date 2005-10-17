@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 

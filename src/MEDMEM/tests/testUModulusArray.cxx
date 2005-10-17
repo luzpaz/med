@@ -24,7 +24,7 @@
 
 #include <cstdlib>
 #include <exception>
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_ModulusArray.hxx"
 using namespace std;
 using namespace MEDMEM;

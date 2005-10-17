@@ -14,11 +14,14 @@ VPATH=.:@srcdir@:@top_srcdir@/bin:@top_srcdir@/resources:./bin:@top_srcdir@/idl:
 
 @COMMENCE@
 
-ifeq (@WITHIHM@,no)
-      SUBDIRS = idl src
+SUBDIRS = src
+
+ifeq ($(MED_WITH_KERNEL),yes)
+      SUBDIRS+= idl
 endif
+
 ifeq (@WITHIHM@,yes)
-      SUBDIRS = idl src doc
+      SUBDIRS+= doc
 endif
 
 RESOURCES_FILES = \
@@ -110,10 +113,10 @@ LDFLAGS= -L$(top_builddir)/lib/salome
 LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
 
 # copy header files in common directory
-ifeq ($(HAVE_SSTREAM),yes)
-  include_list=include/salome/SALOMEconfig.h
-else
-  include_list=include/salome/SALOMEconfig.h include/salome/sstream
+include_list=include/salome/SALOMEconfig.h
+
+ifeq ($(HAVE_SSTREAM),no)
+  include_list+=include/salome/sstream
 endif
 
 inc: idl $(include_list)

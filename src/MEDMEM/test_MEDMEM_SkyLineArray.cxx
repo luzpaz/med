@@ -1,4 +1,3 @@
-#include "utilities.h"
 #include "MEDMEM_SkyLineArray.hxx"
 
 using namespace std;

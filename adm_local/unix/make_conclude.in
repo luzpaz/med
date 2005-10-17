@@ -24,6 +24,8 @@ LIB_DEP= $(LIB_SRC) $(LIB_CLIENT_SRC) $(LIB_SERVER_SRC) $(LIB_SWIG_SRC)
 LIB_CLIENT_OBJ = $(LIB_CLIENT_IDL:%.idl=%$(IDL_CLN_OBJ))
 LIB_SERVER_OBJ = $(LIB_SERVER_IDL:%.idl=%$(IDL_SRV_OBJ))
 
+# declare dependences between SWIG input files
+$(LIB_SWIG_SRC): $(SWIG_DEP:%=$(inc_builddir)/%)
  
 # transform c file in appropriate libtool obj file (.c, .cc and .cxx)
 LIB_OBJ_C   = $(patsubst %.c,   %.lo, $(filter %.c, $(LIB_SRC))) 

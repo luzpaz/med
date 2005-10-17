@@ -1,23 +1,3 @@
-#
-#  PLEASE DO NOT MODIFY configure.in FILE
-#
-#  ALL CHANGES WILL BE DISCARDED BY THE NEXT
-#  build_configure COMMAND
-#
-#  CHANGES MUST BE MADE IN configure.in.base FILE
-#
-#
-# Author : Marc Tajchman (CEA)
-# Date : 28/06/2001
-# Modified by : Patrick GOLDBRONN (CEA)
-# Modified by : Marc Tajchman (CEA)
-#
-# Created from configure.in.base
-#
-
-AC_INIT(src)
-AC_CONFIG_AUX_DIR(${KERNEL_ROOT_DIR}/salome_adm/unix/config_files)
-AC_CANONICAL_HOST
 
 PACKAGE=salome
 AC_SUBST(PACKAGE)
@@ -43,6 +23,62 @@ echo Source root directory : $ROOT_SRCDIR
 echo Build  root directory : $ROOT_BUILDDIR
 echo
 echo
+
+dnl remember MED_WITH_KERNEL set by build configure
+old_with_kernel=${MED_WITH_KERNEL}
+
+dnl
+dnl Check --with-kernel option
+echo
+dnl  ---------------------------------------------
+                 WITH_KERNEL
+dnl  ---------------------------------------------
+dnl
+
+dnl   Update and re-run configure if there was  build_configure --without-kernel
+dnl   but configure --with-kernel=DIR is being called
+
+if test "x${old_with_kernel}" != "x${MED_WITH_KERNEL}"; then
+    if test "x${old_with_kernel}" == "xno" ; then
+         if test ! -d "${KERNEL_ROOT_DIR}"; then
+             echo "failed : KERNEL_ROOT_DIR variable is not correct !"
+             exit
+         fi
+         kernel_check_in_aclocal=`grep KERNEL_ROOT_DIR ${ROOT_SRCDIR}/aclocal.m4`
+         if test "x${kernel_check_in_aclocal}" == "x"; then
+             echo "Configuration changed: without KERNEL -> with KERNEL"
+             echo -n "Updating 'configure' script ...  "
+             cd $ROOT_SRCDIR
+             aclocal --acdir=adm_local/unix/config_files -I ${KERNEL_ROOT_DIR}/salome_adm/unix/config_files
+             if autoconf; then
+             	echo "done"
+             else
+             	echo "failed (check file permissions and/or user quotas ...)"
+                cd $ROOT_BUILDDIR
+                exit
+             fi
+             cd $ROOT_BUILDDIR
+             $0 $*
+             exit
+         fi
+    fi
+fi
+
+
+dnl  AC_CONFIG_AUX_DIR - path to install-sh, config.sub, config.guess,
+dnl  Automake and Libtool scripts etc. 
+dnl  config.sub, config.guess are needed for AC_CANONICAL_HOST
+
+WITHOUT_KERNEL_CONFIG_DIR=${ROOT_SRCDIR}/adm_local_without_kernel/unix/config_files
+AUX_CONFIG_DIR=""
+if test "${MED_WITH_KERNEL}" == "yes"; then
+   AUX_CONFIG_DIR=${KERNEL_ROOT_DIR}/salome_adm/unix/config_files
+else
+   AUX_CONFIG_DIR=${WITHOUT_KERNEL_CONFIG_DIR}
+fi
+AC_CONFIG_AUX_DIR(${AUX_CONFIG_DIR})
+AC_CANONICAL_HOST
+
 
 dnl Modification B. Secher portage sur osf CCRT
 AC_CHECK_PROG(SHELL,sh,,)
@@ -86,7 +122,7 @@ dnl Fix up the INSTALL macro if it s a relative path. We want the
 dnl full-path to the binary instead.
 case "$INSTALL" in
    *install-sh*)
-      INSTALL="\${KERNEL_ROOT_DIR}/salome_adm/unix/config_files/install-sh -c"
+      INSTALL="\${AUX_CONFIG_DIR}/install-sh -c"
       ;;
 esac
 
@@ -137,31 +173,6 @@ dnl
 
 AC_LINKER_OPTIONS
 
-dnl
-dnl ---------------------------------------------
-dnl testing MPICH
-dnl ---------------------------------------------
-dnl
-
-CHECK_MPI
-CHECK_MPICH
-
-dnl
-dnl ---------------------------------------------
-dnl testing WITHIHM
-dnl ---------------------------------------------
-dnl
-
-CHECK_WITHIHM
-
-echo
-echo ---------------------------------------------
-echo BOOST Library
-echo ---------------------------------------------
-echo
-
-CHECK_BOOST
-
 echo
 echo ---------------------------------------------
 echo testing LEX \& YACC
@@ -181,14 +192,6 @@ echo
 
 CHECK_PYTHON
 
-dnl echo
-dnl echo ---------------------------------------------
-dnl echo testing java
-dnl echo ---------------------------------------------
-dnl echo
-
-dnl CHECK_JAVA
-
 echo
 echo ---------------------------------------------
 echo testing swig
@@ -205,6 +208,61 @@ echo
 
 ENABLE_PTHREADS
 
+dnl BOOST is needed for MED Wrapper
+echo
+echo ---------------------------------------------
+echo BOOST Library
+echo ---------------------------------------------
+echo
+
+CHECK_BOOST
+
+echo
+echo ---------------------------------------------
+echo testing HDF5
+echo ---------------------------------------------
+echo
+
+CHECK_HDF5
+
+echo
+echo ---------------------------------------------
+echo testing MED2
+echo ---------------------------------------------
+echo
+
+CHECK_MED2
+
+
+if test "${MED_WITH_KERNEL}" == "yes"; then
+{
+CPPFLAGS="$CPPFLAGS -DMED_WITH_KERNEL"
+
+dnl echo
+dnl echo ---------------------------------------------
+dnl echo testing java
+dnl echo ---------------------------------------------
+dnl echo
+
+dnl CHECK_JAVA
+
+dnl
+dnl ---------------------------------------------
+dnl testing MPICH
+dnl ---------------------------------------------
+dnl
+
+CHECK_MPI
+CHECK_MPICH
+
+dnl
+dnl ---------------------------------------------
+dnl testing WITHIHM
+dnl ---------------------------------------------
+dnl
+
+CHECK_WITHIHM
+
 echo
 echo ---------------------------------------------
 echo testing omniORB
@@ -212,14 +270,6 @@ echo ---------------------------------------------
 echo
 
 CHECK_OMNIORB
-
-dnl echo
-dnl echo ---------------------------------------------
-dnl echo testing mico
-dnl echo ---------------------------------------------
-dnl echo
-
-dnl CHECK_MICO
 
 echo
 echo ---------------------------------------------
@@ -252,35 +302,11 @@ CHECK_QT
 
 echo
 echo ---------------------------------------------
-echo testing MSG2QM
-echo ---------------------------------------------
-echo
-
-CHECK_MSG2QM
-
-echo
-echo ---------------------------------------------
 echo testing VTK
 echo ---------------------------------------------
 echo
 
 CHECK_VTK
-
-echo
-echo ---------------------------------------------
-echo testing HDF5
-echo ---------------------------------------------
-echo
-
-CHECK_HDF5
-
-echo
-echo ---------------------------------------------
-echo testing MED2
-echo ---------------------------------------------
-echo
-
-CHECK_MED2
 
 echo
 echo ---------------------------------------------
@@ -292,19 +318,43 @@ CHECK_CAS
 
 echo
 echo ---------------------------------------------
+echo Testing Kernel
+echo ---------------------------------------------
+echo
+
+CHECK_KERNEL
+
+dnl echo
+dnl echo ---------------------------------------------
+dnl echo testing mico
+dnl echo ---------------------------------------------
+dnl echo
+
+dnl CHECK_MICO
+
+echo
+echo ---------------------------------------------
+echo testing MSG2QM
+echo ---------------------------------------------
+echo
+
+CHECK_MSG2QM
+
+echo
+echo ---------------------------------------------
 echo Testing html generators
 echo ---------------------------------------------
 echo
 
 CHECK_HTML_GENERATORS
 
-echo
-echo ---------------------------------------------
-echo Testing Kernel
-echo ---------------------------------------------
-echo
-
-CHECK_KERNEL
+}
+else
+{
+  WITHIHM=""
+  AC_SUBST(WITHIHM)
+}
+fi # MED_WITH_KERNEL
 
 echo
 echo ---------------------------------------------
@@ -312,9 +362,13 @@ echo Summary
 echo ---------------------------------------------
 echo
 
-echo Configure
-variables="cc_ok boost_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok doxygen_ok graphviz_ok Kernel_ok"
+if test "$MED_WITH_KERNEL" == "no"; then 
+   echo "Configure (without Kernel)"
+else
+   echo Configure
+fi
 
+variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok boost_ok doxygen_ok graphviz_ok OpenGL_ok qt_ok vtk_ok omniORB_ok occ_ok Kernel_ok"
 for var in $variables
 do
    printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
@@ -391,7 +445,9 @@ do
 done
 cd $ROOT_BUILDDIR
 
+if test ${MED_WITH_KERNEL} = "yes"; then
 AC_SUBST_FILE(ENVSCRIPT) ENVSCRIPT=salome_adm/unix/envScript
+fi
 
 dnl copy xml files to the build tree (lib directory)
 dnl pourquoi ????

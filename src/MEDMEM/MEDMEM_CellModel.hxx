@@ -10,7 +10,7 @@
 #include <map>
 #include <string>
 
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_define.hxx"
 
 using namespace std ;

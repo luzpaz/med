@@ -5,19 +5,11 @@
 
 #include "MEDMEM_InterpolationHighLevelObjects.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 using namespace MEDMEM;
 using namespace MED_EN;
 
 int main (void) 
 {
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
-
 int i;
 
 const int DIMENSION = 3;

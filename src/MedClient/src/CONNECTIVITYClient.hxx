@@ -12,6 +12,7 @@ protected:
  
   long *_numberOfElements_client;
   long _totalNumberOfElements_client;
+  medGeometryElement _polyType_client;
 
   mutable bool _complete;
   SALOME_MED::MESH_var IOR_Mesh ;
@@ -57,6 +58,23 @@ public:
  
   const int* getValueIndex        (medConnectivity TypeConnectivity);
   const int* getNeighbourhood() const;
+
+  
+
+  bool       existPolygonsConnectivity(medConnectivity connectivityType,
+                                       medEntityMesh   Entity) const;
+  bool       existPolyhedronConnectivity(medConnectivity connectivityType,
+                                         medEntityMesh   Entity) const;
+  const int* getPolygonsConnectivity(medConnectivity ConnectivityType,
+				     medEntityMesh   Entity);
+  const int* getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
+					  medEntityMesh   Entity);
+  const int* getPolyhedronConnectivity(medConnectivity ConnectivityType) const;
+  const int* getPolyhedronIndex(medConnectivity ConnectivityType) const;
+  const int* getPolyhedronFacesIndex() const;
+  int getNumberOfPolygons() const;
+  int getNumberOfPolyhedronFaces() const;
+  int getNumberOfPolyhedron() const;
 };
 };
 

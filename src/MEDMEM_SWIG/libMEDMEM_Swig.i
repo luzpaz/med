@@ -30,10 +30,6 @@
 #include "MEDMEM_DriverFactory.hxx"
 #include "MEDMEM_SWIG_Templates.hxx"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
   using namespace MEDMEM;
   using namespace MED_EN;
 
@@ -67,17 +63,6 @@ typedef FIELD <int> FIELDINT;
       return NULL;
     }
 }
-
-/*
-  Initialisation block in the case of the debug mode (definition of _DEBUG_
-  compilation switch) and due to the LocalTraceCollector mechanism
-*/
-
-%init %{
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
-%}
 
 /*
   managing the use of operator= of any class by renaming it assign()
@@ -340,6 +325,40 @@ typedef FIELD <int> FIELDINT;
 }
 
 /*
+  MACRO converting C array <arrayvar> of length <size> into a PyList
+  by calling type_converter() for each array element.
+  It reports error in <method> in failure case
+*/
+
+%define TYPEMAP_OUTPUT_ARRAY(arrayvar, size, type_converter, method)
+{
+  PyObject *py_list = PyList_New(size);
+  for (int i=0; i < size; i++)
+  {
+    int err = PyList_SetItem(py_list, i, type_converter( arrayvar[ i ]));
+    if(err)
+    {
+      char * message = "Error in " #method;
+      PyErr_SetString(PyExc_RuntimeError, message);
+      return NULL;
+    }
+  }
+  PyObject * result = Py_BuildValue("O", py_list);
+  Py_DECREF(py_list);
+  return result;
+}
+%enddef
+
+/*
+  Helper function to be used as type_converter in TYPEMAP_OUTPUT_ARRAY
+*/
+
+%{
+  PyObject *PyString_FromStdString(const std::string &str) { return PyString_FromString(str.c_str()); }
+%}
+
+
+/*
   enum of the C++ MED used in the Python API
 */
 
@@ -358,7 +377,7 @@ typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
 	      MED_TRIA3=203, MED_QUAD4=204, MED_TRIA6=206, MED_QUAD8=208,
 	      MED_TETRA4=304, MED_PYRA5=305, MED_PENTA6=306,
 	      MED_HEXA8=308, MED_TETRA10=310, MED_PYRA13=313,
-	      MED_PENTA15=315, MED_HEXA20=320,
+	      MED_PENTA15=315, MED_HEXA20=320, MED_POLYGON = 400, MED_POLYHEDRA = 500,
 	      MED_ALL_ELEMENTS=999} medGeometryElement;
 
 typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ;
@@ -546,73 +565,23 @@ class SUPPORT
 
     PyObject * getTypes()
       {
-	PyObject *py_list;
-
 	const medGeometryElement * types = self->getTypes();
 	int size = self->getNumberOfTypes();
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("i", (int) types[i]));
-	    if(err)
-	      {
-		char * message = "Error in SUPPORT::getTypes";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY( types, size, PyInt_FromLong, SUPPORT::getTypes );
       }
 
     PyObject * getNumber(medGeometryElement GeometricType)
       {
-	PyObject *py_list;
-
 	const int * number = self->getNumber(GeometricType);
 	int size = self->getNumberOfElements(GeometricType);
-
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("i", number[i]));
-	    if(err)
-	      {
-		char * message = "Error in SUPPORT::getNumber";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY( number, size, PyInt_FromLong, SUPPORT::getNumber );
       }
 
     PyObject * getNumberIndex()
       {
-	PyObject *py_list;
-
 	const int * numberindex = self->getNumberIndex();
 	int size = (self->getNumberOfElements(MED_ALL_ELEMENTS))+1;
-
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("i", numberindex[i]));
-	    if(err)
-	      {
-		char * message = "Error in SUPPORT::getNumberIndex";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY( numberindex, size, PyInt_FromLong, SUPPORT::getNumberIndex );
       }
     %newobject getComplement() const;
     SUPPORT *getComplement() const
@@ -709,50 +678,16 @@ class FAMILY : public SUPPORT
 
     PyObject * getAttributesIdentifiers()
       {
-	PyObject *py_list;
-
 	const int * attributesids = self->getAttributesIdentifiers();
 	int size = self->getNumberOfAttributes();
-
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("i",attributesids[i]));
-	    if(err)
-	      {
-		char * message = "Error in FAMILY::getAttributesIdentifiers";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY(attributesids,size,PyInt_FromLong,FAMILY::getAttributesIdentifiers );
       }
 
     PyObject * getAttributesValues()
       {
-	PyObject *py_list;
-
 	const int * attributesvals = self->getAttributesValues();
 	int size = self->getNumberOfAttributes();
-
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("i",attributesvals[i]));
-	    if(err)
-	      {
-		char * message = "Error in FAMILY::getAttributesValues";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY(attributesvals,size,PyInt_FromLong,FAMILY::getAttributesValues );
       }
   }
 };
@@ -971,56 +906,24 @@ public:
 
     PyObject * getValue(medModeSwitch Mode)
       {
-	PyObject *py_list;
-
 	int size = (self->getNumberOfComponents())*
 	  ((self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS));
 
 	const T1 * value = self->getValue(Mode);
 
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Binding< T1 >::Traducer(value[i]));
-	    if(err)
-	      {
-		char * message = "Error in FIELD::getValue";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY( value, size, Binding< T1 >::Traducer, FIELD::getValue );
       }
 
     %newobject getValueI(medModeSwitch , int );
     PyObject * getValueI(medModeSwitch Mode, int index)
       {
-	PyObject *py_list;
-
 	int size = self->getNumberOfComponents();
 
 	if ( Mode == MED_NO_INTERLACE ) size = (self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS);
 
 	const T1 * value = self->getValueI(Mode,index);
 
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Binding< T1 >::Traducer( value[i]) );
-	    if(err)
-	      {
-		char * message = "Error in FIELD::getValueI";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY( value, size, Binding< T1 >::Traducer, FIELD::getValueI );
       }
 
     void allocValue2(int NumberOfComponents, int LengthValue)
@@ -1106,6 +1009,18 @@ public :
 
   int getElementContainingPoint(const double *coord);
 
+  int getNumberOfTypesWithPoly(medEntityMesh Entity);
+  int getNumberOfPolygons();
+  int getNumberOfPolyhedronFaces();
+  int getNumberOfPolyhedron();
+  int getNumberOfElementsWithPoly(medEntityMesh Entity,
+                                  medGeometryElement Type);
+  bool existPolygonsConnectivity(medConnectivity ConnectivityType,
+                                 medEntityMesh Entity);
+  bool existPolyhedronConnectivity(medConnectivity ConnectivityType,
+                                   medEntityMesh Entity);
+  medGeometryElement getElementTypeWithPoly(medEntityMesh Entity,int Number);
+  
   %extend {
     %newobject getBoundaryElements(medEntityMesh );
     SUPPORT * getBoundaryElements(medEntityMesh Entity)
@@ -1218,91 +1133,30 @@ public :
 
     PyObject * getCoordinatesNames()
       {
-	PyObject *py_list;
 	const string * array = self->getCoordinatesNames();
 	int size = self->getSpaceDimension();
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("s", array[i].c_str()));
-	    if(err)
-	      {
-		char * message = "Error in MESH::getCoordinatesNames";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY( array, size, PyString_FromStdString, MESH::getCoordinatesNames );
       }
 
     PyObject * getCoordinatesUnits()
       {
-	PyObject *py_list;
 	const string * array = self->getCoordinatesUnits();
 	int size = self->getSpaceDimension();
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("s", array[i].c_str()));
-	    if(err)
-	      {
-		char * message = "Error in MESH::getCoordinatesUnits";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY( array, size, PyString_FromStdString, MESH::getCoordinatesUnits );
       }
 
     PyObject * getCoordinates(medModeSwitch Mode)
       {
-	PyObject *py_list;
 	const double * array = self->getCoordinates(Mode);
 	int size = (self->getSpaceDimension())*(self->getNumberOfNodes());
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("d", array[i]));
-	    if(err)
-	      {
-		char * message = "Error in MESH::getCoordinates";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY( array, size, PyFloat_FromDouble, MESH::getCoordinates );
       }
 
     PyObject * getTypes(medEntityMesh Entity)
       {
-	PyObject *py_list;
-
 	const medGeometryElement * types = self->getTypes(Entity);
 	int size = self->getNumberOfTypes(Entity);
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("i", (int) types[i]));
-	    if(err)
-	      {
-		char * message = "Error in MESH::getTypes";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY( types, size, PyInt_FromLong, MESH::getTypes );
       }
 
     PyObject * getConnectivity(medModeSwitch Mode,
@@ -1310,127 +1164,88 @@ public :
 			       medEntityMesh Entity,
 			       medGeometryElement Type)
       {
-	PyObject *py_list;
 	const int * connectivity = self->getConnectivity(Mode,ConnectivityType,
 						   Entity,Type);
 	int size = self->getConnectivityLength(Mode,ConnectivityType,Entity,Type);
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("i", connectivity[i]));
-	    if(err)
-	      {
-		char * message = "Error in MESH::getConnectivity";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY( connectivity, size, PyInt_FromLong, MESH::getConnectivity );
       }
 
     PyObject * getConnectivityIndex(medConnectivity ConnectivityType,
 				    medEntityMesh Entity)
       {
-	PyObject *py_list;
 	const int * connectivity_index =
 	  self->getConnectivityIndex(ConnectivityType,Entity);
 	int size = (self->getNumberOfElements(Entity,MED_ALL_ELEMENTS))+1;
-
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("i",
-						   connectivity_index[i]));
-	    if(err)
-	      {
-		char * message = "Error in MESH::getConnectivityIndex";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY(connectivity_index,size,PyInt_FromLong,MESH::getConnectivityIndex);
       }
 
     PyObject * getReverseConnectivity(medConnectivity ConnectivityType,
 				      medEntityMesh Entity=MED_CELL)
       {
-	PyObject *py_list;
 	const int * reverseconnectivity =
 	  self->getReverseConnectivity(ConnectivityType,Entity);
 	int size = self->getReverseConnectivityLength(ConnectivityType,Entity);
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err =
-	      PyList_SetItem(py_list,i,
-			     Py_BuildValue("i",reverseconnectivity[i]));
-	    if(err)
-	      {
-		char * message = "Error in MESH::getReverseConnectivity";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY(reverseconnectivity,size,PyInt_FromLong,MESH::getReverseConnectivity);
       }
 
     PyObject * getReverseConnectivityIndex(medConnectivity ConnectivityType,
 					   medEntityMesh Entity=MED_CELL)
       {
-	PyObject *py_list;
 	const int * reverseconnectivity_index =
 	  self->getReverseConnectivityIndex(ConnectivityType,Entity);
 	int size=self->getReverseConnectivityIndexLength(ConnectivityType,Entity);
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err =
-	      PyList_SetItem(py_list,i,
-			     Py_BuildValue("i",
-					   reverseconnectivity_index[i]));
-	    if(err)
-	      {
-		char * message = "Error in MESH::getReverseConnectivityIndex";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY(reverseconnectivity_index,size,PyInt_FromLong,MESH::getReverseConnectivityIndex);
       }
 
     PyObject * getGlobalNumberingIndex(medEntityMesh Entity)
       {
-	PyObject *py_list;
 	const int * numberingIndex = self->getGlobalNumberingIndex(Entity);
 	int nbOfTypes = self->getNumberOfTypes(Entity);
 	int size = nbOfTypes+1;
-
-	py_list = PyList_New(size);
-	for (int i=0; i < size; i++)
-	  {
-	    int err = PyList_SetItem(py_list, i,
-				     Py_BuildValue("i", numberingIndex[i]));
-	    if(err)
-	      {
-		char * message = "Error in MESH::getGlobalNumberingIndex";
-		PyErr_SetString(PyExc_RuntimeError, message);
-		return NULL;
-	      }
-	  }
-	PyObject * result = Py_BuildValue("O", py_list);
-	Py_DECREF(py_list);
-	return result;
+        TYPEMAP_OUTPUT_ARRAY(numberingIndex,size,PyInt_FromLong,MESH::getGlobalNumberingIndex);
       }
+
+
+    PyObject * getPolygonsConnectivity(medConnectivity ConnectivityType,
+                                       medEntityMesh   Entity)
+      {
+        const int * array = self->getPolygonsConnectivity(ConnectivityType,Entity);
+        int size = self->getPolygonsConnectivityLength(ConnectivityType, Entity);
+        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getPolygonsConnectivity);
+      }
+    PyObject * getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
+                                            medEntityMesh   Entity)
+      {
+        const int * array = self->getPolygonsConnectivityIndex(ConnectivityType,Entity);
+        int size = self->getNumberOfPolygons() + 1;
+        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getPolygonsConnectivity);
+      }
+    PyObject * getPolyhedronConnectivity(medConnectivity ConnectivityType)
+      {
+        const int * array = self->getPolyhedronConnectivity(ConnectivityType);
+        int size = self->getPolyhedronConnectivityLength(ConnectivityType);
+        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getPolygonsConnectivity);
+      }
+    PyObject * getPolyhedronIndex(medConnectivity ConnectivityType)
+      {
+        const int * array = self->getPolyhedronIndex(ConnectivityType);
+        int size = self->getNumberOfPolyhedron() + 1;
+        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getPolyhedronIndex);
+      }
+    PyObject * getPolyhedronFacesIndex()
+      {
+        const int * array = self->getPolyhedronFacesIndex();
+        int size = self->getNumberOfPolyhedronFaces() + 1;
+        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getPolyhedronFacesIndex);
+      }
+    PyObject * getTypesWithPoly(medEntityMesh Entity)
+      {
+        medGeometryElement * array = self->getTypesWithPoly(Entity);
+        int size = self->getNumberOfTypesWithPoly(Entity);
+        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getTypesWithPoly);
+        delete [] array;
+      }
+      
 
     %newobject getVolume(const SUPPORT * );
     FIELDDOUBLE * getVolume(const SUPPORT * Support)

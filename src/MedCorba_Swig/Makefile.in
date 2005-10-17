@@ -51,6 +51,10 @@ else
 SWIG_DEF = libMedCorba_Swig.i
 endif
 
+# libMedCorba_Swig.i depends on libMEDMEM_Swig.i:
+# %include "libMEDMEM_Swig.i"
+SWIG_DEP = libMEDMEM_Swig.i
+
 LIB_SERVER_IDL = MED.idl
 
 LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl SALOME_Comm.idl SALOME_GenericObj.idl

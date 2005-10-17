@@ -1,5 +1,3 @@
-#include "utilities.h"
-
 #include "MEDMEM_ModulusArray.hxx"
 
 using namespace std;

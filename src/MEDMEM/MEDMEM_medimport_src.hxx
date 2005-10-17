@@ -18,7 +18,7 @@
 #ifndef IMPORT_HXX
 #define IMPORT_HXX
 
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
 // #include "MEDMEM_define.hxx"

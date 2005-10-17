@@ -1,6 +1,7 @@
 # common directories to put headerfiles
 inc_builddir=$(top_builddir)/include/salome
 
+MED_WITH_KERNEL=@MED_WITH_KERNEL@
 @SET_MAKE@
 SHELL=@SHELL@
 
@@ -173,12 +174,14 @@ IDL_SRV_H   = @IDL_SRV_H@
 IDL_SRV_CXX = @IDL_SRV_CXX@
 IDL_SRV_OBJ = @IDL_SRV_OBJ@
 
-CPPFLAGS+= $(CORBA_INCLUDES) 
-CXXFLAGS+= $(CORBA_CXXFLAGS)
+ifeq ($(MED_WITH_KERNEL),yes)
+  CPPFLAGS+= $(CORBA_INCLUDES) 
+  CXXFLAGS+= $(CORBA_CXXFLAGS)
 
-# add corba libs when link salome application ! 
-#LDFLAGS+= $(CORBA_LIBS)
-LIBS+=$(CORBA_LIBS)
+  # add corba libs when link salome application ! 
+  #LDFLAGS+= $(CORBA_LIBS)
+  LIBS+=$(CORBA_LIBS)
+endif
 
 DOXYGEN = @DOXYGEN@
 
@@ -254,6 +257,12 @@ $(top_srcdir)/configure.in: $(top_srcdir)/configure.in.base
 	cd $(top_srcdir) && ./build_configure
 
 
+# ACLOCAL_SRC = \
+# ac_cxx_depend_flag.m4 check_hdf5.m4      enable_pthreads.m4	\
+# ac_cxx_namespaces.m4  libtool.m4         python.m4		\
+# check_pthreads.m4     check_swig.m4 
+
+ifeq ($(MED_WITH_KERNEL),yes)
 ACLOCAL_SRC = \
 ac_cxx_bool.m4                    check_corba.m4     check_vtk.m4	\
 ac_cxx_depend_flag.m4             check_hdf5.m4      enable_pthreads.m4	\
@@ -262,6 +271,7 @@ ac_cxx_namespaces.m4              check_omniorb.m4   pyembed.m4		\
 ac_cxx_partial_specialization.m4  check_opengl.m4    python.m4		\
 ac_cxx_typename.m4                check_pthreads.m4  check_cas.m4	\
 ac_cc_warnings.m4                 check_qt.m4        check_swig.m4 
+endif
 
-$(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=@KERNEL_ROOT_DIR@/salome_adm/unix/config_files/%)
-	cd $(top_srcdir) ; aclocal --acdir=adm_local/unix/config_files -I @KERNEL_ROOT_DIR@/salome_adm/unix/config_files
+$(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=$(top_srcdir)/salome_adm/unix/config_files/%)
+	cd $(top_srcdir) ; aclocal --acdir=adm_local/unix/config_files -I $(top_srcdir)/salome_adm/unix/config_files

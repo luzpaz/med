@@ -179,8 +179,8 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
       MESSAGE("    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) : ");
       const int * number = getNumber(types[j]);
       SCRUTE(number);
-      for (int k=0; k<numberOfElements;k++)
-	MESSAGE("________________ " << number[k]);
+      //      for (int k=0; k<numberOfElements;k++)
+        //	MESSAGE("________________ " << number[k]);
     }
   } else
     MESSAGE("Is on all entities !");
@@ -331,7 +331,7 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
       
     for (int i=0; i<NumberOfElements; i++)
       {
-	SCRUTE(ElementsOfThisFamilyNumber[i]);
+        //	SCRUTE(ElementsOfThisFamilyNumber[i]);
 	if (_identifier == ElementsOfThisFamilyNumber[i]) {
 	  tmp_ElementsList[NumberOfElementsInThisFamily]=i+GlobalNumberingIndex[TypeNumber] ;
 	  NumberOfElementsInThisFamily++;

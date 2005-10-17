@@ -525,7 +525,7 @@ const int * MEDMEM::CONNECTIVITY::getConnectivity(medConnectivity ConnectivityTy
 //------------------------------------------------------------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::getConnectivity";
-  BEGIN_OF(LOC);
+  //  BEGIN_OF(LOC);
 
   MEDSKYLINEARRAY * Connectivity;
   if (Entity==_entity) {
@@ -2096,8 +2096,10 @@ const int * CONNECTIVITY::getConnectivityOfAnElementWithPoly(MED_EN::medConnecti
 		{
 		  if(ConnectivityType==MED_NODAL)
 		    throw  MEDEXCEPTION("NODAL Connectivity required for a polyhedron");
-		  newConstituentValue = _polyhedronDescending->getValue();
-		  newConstituentIndex = _polyhedronDescending->getIndex();
+// 		  newConstituentValue = _polyhedronDescending->getValue();
+// 		  newConstituentIndex = _polyhedronDescending->getIndex();
+		  newConstituentValue = getPolyhedronConnectivity( ConnectivityType );
+		  newConstituentIndex = getPolyhedronIndex( ConnectivityType );
 		  lgth=newConstituentIndex[localNumber+1]-newConstituentIndex[localNumber];
 		  return newConstituentValue+newConstituentIndex[localNumber]-1;
 		}

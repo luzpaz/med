@@ -7,18 +7,10 @@
 
 #include "stdio.h"
 
-#ifdef _DEBUG_
-#include "LocalTraceCollector.hxx"
-#endif /* ifdef _DEBUG_*/
-
 using namespace MEDMEM;
 using namespace MED_EN;
 
 main () {
-#ifdef _DEBUG_
-  LocalTraceCollector::instance();
-#endif /* ifdef _DEBUG_*/
-
   const char * fromFileName  = "fromMesh.med";
   const char * toFileName    = "toMesh.med";
   //const char * fieldName     = "fieldcelldoublevector"; 

@@ -63,6 +63,11 @@ else
 SWIG_DEF = libCompo2.i
 endif
 
+# libCompo2.i depends on libMEDClient.i:
+# %include "libMEDClient.i" 
+# which in its turn depends on libMEDMEM_Swig.i and libMedCorba_Swig.i
+SWIG_DEP = libMEDClient.i libMEDMEM_Swig.i libMedCorba_Swig.i
+
 MED.hh MEDSK.cc: MED.idl
 	omniidl -bcxx -Wbtp -I$(top_builddir)/idl -I${KERNEL_ROOT_DIR}/idl/salome $^
 

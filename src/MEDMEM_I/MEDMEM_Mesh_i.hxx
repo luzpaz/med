@@ -116,6 +116,20 @@ public:
   SALOME_MED::long_array*   getGlobalNumberingIndex(SALOME_MED::medEntityMesh entity)
                          throw (SALOME::SALOME_Exception);
 
+  SALOME::SenderInt_ptr getSenderForPolygonsConnectivity(SALOME_MED::medConnectivity mode,
+                                                         SALOME_MED::medEntityMesh entity)
+    throw (SALOME::SALOME_Exception);
+  SALOME::SenderInt_ptr getSenderForPolygonsConnectivityIndex(SALOME_MED::medConnectivity mode,
+                                                              SALOME_MED::medEntityMesh entity)
+    throw (SALOME::SALOME_Exception);
+
+  SALOME::SenderInt_ptr getSenderForPolyhedronConnectivity(SALOME_MED::medConnectivity mode)
+    throw (SALOME::SALOME_Exception);
+  SALOME::SenderInt_ptr getSenderForPolyhedronIndex(SALOME_MED::medConnectivity mode)
+    throw (SALOME::SALOME_Exception);
+  SALOME::SenderInt_ptr getSenderForPolyhedronFacesIndex()
+    throw (SALOME::SALOME_Exception);
+
   CORBA::Long            getElementNumber(SALOME_MED::medConnectivity mode,
 					  SALOME_MED::medEntityMesh entity,
 					  SALOME_MED::medGeometryElement type,

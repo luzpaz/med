@@ -4,7 +4,7 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_PointerOf.hxx"
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 
 /*!
   A template class to generate an array of any particular type (int, long,

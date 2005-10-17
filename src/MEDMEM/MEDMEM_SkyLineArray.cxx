@@ -1,5 +1,5 @@
 #include "MEDMEM_SkyLineArray.hxx"
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 
 using namespace std;
 using namespace MEDMEM;

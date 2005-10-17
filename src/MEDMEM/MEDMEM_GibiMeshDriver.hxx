@@ -12,7 +12,7 @@
 
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
-#include "utilities.h"
+#include "MEDMEM_Utilities.hxx"
 
 /////
 #include <sstream>

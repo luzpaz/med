@@ -1,11 +1,12 @@
-#ifdef _SALOME
+#ifndef __MEDMEM_UTILITIES
+#define __MEDMEM_UTILITIES
+
+#ifdef MED_WITH_KERNEL
+// #ifdef _SALOME
 
 #  include <utilities.h>
 
 #else
-
-#ifndef __MEDMEM_UTILITIES
-#define __MEDMEM_UTILITIES
 
 #  include <cstdlib>
 #  include <iostream>

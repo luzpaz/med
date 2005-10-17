@@ -79,13 +79,23 @@ UseCaseWrapper_Maillage
 
 
 
-CPPFLAGS+=-U_DEBUG_ $(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome -I../
-CXXFLAGS+=-U_DEBUG_ @CXXTMPDPTHFLAGS@ -I${KERNEL_ROOT_DIR}/include/salome 
-#LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
-LDFLAGS+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome -lMEDWrapper_V2_1
+CPPFLAGS+=-U_DEBUG_ $(MED2_INCLUDES) $(HDF5_INCLUDES) -I../
+CXXFLAGS+=-U_DEBUG_ @CXXTMPDPTHFLAGS@
+#LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS)
+LDFLAGS+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lMEDWrapper_V2_1
 
-#LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -L../.libs -lmedmem -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
-LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -L../.libs -lmedmem -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome -lMEDWrapper_V2_1 -lMEDWrapperBase
+#LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -L../.libs -lmedmem
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -L../.libs -lmedmem -lMEDWrapper_V2_1 -lMEDWrapperBase
+
+ifeq ($(MED_WITH_KERNEL),yes)
+  CPPFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
+  CXXFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome 
+  #LDFLAGS+= -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
+  LDFLAGS+= -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome
+
+  #LDFLAGSFORBIN+= -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
+  LDFLAGSFORBIN+= -lSALOMELocalTrace -L${KERNEL_ROOT_DIR}/lib/salome
+endif
 
 LIBSFORBIN=
 
