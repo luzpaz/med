@@ -145,7 +145,7 @@ LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDWrapper_V2_1 $(STDLIB)
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lMEDWrapper_V2_1 -lMEDWrapperBase
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lMEDWrapper_V2_1 -lMEDWrapperBase -lSALOMEBasics
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome

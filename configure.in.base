@@ -236,7 +236,7 @@ CHECK_MED2
 
 if test "${MED_WITH_KERNEL}" == "yes"; then
 {
-CPPFLAGS="$CPPFLAGS -DMED_WITH_KERNEL"
+#CPPFLAGS="$CPPFLAGS -DMED_WITH_KERNEL"
 
 dnl echo
 dnl echo ---------------------------------------------
@@ -353,6 +353,7 @@ else
 {
   WITHIHM=""
   AC_SUBST(WITHIHM)
+  CPPFLAGS="$CPPFLAGS -DMED_WITHOUT_KERNEL"
 }
 fi # MED_WITH_KERNEL
 

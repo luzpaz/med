@@ -1,12 +1,7 @@
 #ifndef __MEDMEM_UTILITIES
 #define __MEDMEM_UTILITIES
 
-#ifdef MED_WITH_KERNEL
-// #ifdef _SALOME
-
-#  include <utilities.h>
-
-#else
+#ifdef MED_WITHOUT_KERNEL
 
 #  include <cstdlib>
 #  include <iostream>
@@ -83,5 +78,9 @@ using namespace std;
 
 #endif
 
+#else
+// #ifdef _SALOME
+
+#  include <utilities.h>
 #endif
 #endif
