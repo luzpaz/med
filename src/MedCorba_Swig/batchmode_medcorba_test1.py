@@ -17,8 +17,8 @@ from random import *
 
 import os
 
-filePath=os.environ["KERNEL_ROOT_DIR"]
-filePath=filePath+"/examples/"
+filePath=os.environ["DATA_DIR"]
+filePath=filePath+"/MedFiles/"
 
 #==============================================================================
 
