@@ -82,10 +82,10 @@ UseCaseWrapper_Maillage
 CPPFLAGS+=-U_DEBUG_ $(MED2_INCLUDES) $(HDF5_INCLUDES) -I../
 CXXFLAGS+=-U_DEBUG_ @CXXTMPDPTHFLAGS@
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS)
-LDFLAGS+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1
+LDFLAGS+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lMEDWrapper_V2_1
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS) -L../.libs -lmedmem
-LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -L../.libs -lmedmem -lmed_V2_1 -lSALOMEBasics
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -L../.libs -lmedmem -lMEDWrapper_V2_1 -lMEDWrapperBase -lSALOMEBasics
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
