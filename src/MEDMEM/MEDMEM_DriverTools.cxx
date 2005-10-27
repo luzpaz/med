@@ -365,7 +365,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
     int * count=NULL;
     int * connectivity=NULL;
     CONNECTIVITY *Connectivity, *Constituent;
-    int dimension_maillage_moin_2=maillage.rbegin()->dimension() - 2;
+    //int dimension_maillage_moin_2=maillage.rbegin()->dimension() - 2;
 
     medGeometryElement type=0; // variables de travail
     int nbtype=0;
@@ -378,6 +378,8 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
     std::set<_maille>::const_iterator i, j; // iterateurs sur les mailles
 
     // skip nodes and elements of <dimension_maillage - 2> or less dimension
+    // Unfortunately, it is impossible because of MESH::createFamilies() that requires
+    // presence of connectivity even for nodes!
     for ( i = maillage.begin(); i != maillage.end(); ++i )
       //if ( i->geometricType != MED_POINT1 && i->dimension() > dimension_maillage_moin_2 )
         break;
@@ -409,6 +411,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 		nbtype=0;
 		type=i->geometricType;
 		vtype.push_back(type); // stocke le nouveau type geometrique rencontre
+                dimension=i->dimension();
 	    }
 
 	    ++nbtype;
