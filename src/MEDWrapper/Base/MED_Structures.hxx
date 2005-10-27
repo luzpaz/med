@@ -31,19 +31,24 @@
 
 #include "MED_Common.hxx"
 
-namespace MED{
+namespace MED
+{
 
   //---------------------------------------------------------------
-  typedef std::vector<char> TString;
+  //! Defines a type for managing sequence of strings
+  typedef TVector<char> TString; 
 
+  //! Extract a substring from the sequence of the strings
   std::string GetString(TInt theId, TInt theStep, 
 			const TString& theString);
 
+  //! Set a substring in the sequence of the strings
   void SetString(TInt theId, TInt theStep, 
 		 TString& theString, 
 		 const std::string& theValue);
 
   //---------------------------------------------------------------
+  //! Define a parent class for all MEDWrapper classes
   struct TBase
   {
     virtual ~TBase() {} 
@@ -51,6 +56,7 @@ namespace MED{
 
 
   //---------------------------------------------------------------
+  //! Define a parent class for all named MED entities
   struct TNameInfo: virtual TBase
   {
     TString myName;
@@ -60,50 +66,77 @@ namespace MED{
 
 
   //---------------------------------------------------------------
+  //! Define a parent class for all MED entities that contains a sequence of numbers
+  struct TModeSwitchInfo: virtual TBase
+  {
+    TModeSwitchInfo():
+      myModeSwitch(eFULL_INTERLACE)
+    {}
+
+    TModeSwitchInfo(EModeSwitch theModeSwitch):
+      myModeSwitch(theModeSwitch)
+    {}
+
+    EModeSwitch myModeSwitch;
+    EModeSwitch GetModeSwitch() const { return myModeSwitch;}
+  };
+
+
+  //---------------------------------------------------------------
+  //! Define a base class which represents MED Mesh entity
   struct TMeshInfo: virtual TNameInfo
   {
-    TInt myDim;
+    TInt myDim; //!< Dimension of the mesh (0, 1, 2 or 3)
     TInt GetDim() const { return myDim;}
 
-    EMaillage myType;
+    EMaillage myType; //!< Type of the mesh
     EMaillage GetType() const { return myType;}
 
-    TString myDesc;
+    TString myDesc; //!< Description of the mesh
     virtual std::string GetDesc() const = 0;
     virtual void SetDesc(const std::string& theValue) = 0;
   };
   
 
   //---------------------------------------------------------------
-  typedef std::vector<TInt> TFamAttr;
+  typedef TVector<TInt> TIntVector;
+  typedef TSlice<TIntVector> TIntVecSlice;
+  typedef TCSlice<TIntVector> TCIntVecSlice;
 
+  typedef TIntVector TFamAttr;
+
+  //! Define a base class which represents MED Family entity
   struct TFamilyInfo: virtual TNameInfo
   {
-    PMeshInfo myMeshInfo;
+    PMeshInfo myMeshInfo; //!< A reference to correspondig MED Mesh
     const PMeshInfo& GetMeshInfo() const { return myMeshInfo;}
 
-    TInt myId;
+    TInt myId; //!< An unique index of the MED Family
     TInt GetId() const { return myId;}
     void SetId(TInt theId) { myId = theId;}
 
-    TInt myNbGroup;
+    TInt myNbGroup; //!< Defines number MED Groups connected to
     TInt GetNbGroup() const { return myNbGroup;}
 
-    TString myGroupNames;
+    //! Contains sequence of the names for the MED Groups connected to
+    TString myGroupNames; 
     virtual std::string GetGroupName(TInt theId) const = 0;
     virtual void SetGroupName(TInt theId, const std::string& theValue) = 0;
 
-    TInt myNbAttr;
+    TInt myNbAttr; //!< Defines number of the MED Family attributes 
     TInt GetNbAttr() const { return myNbAttr;}
 
-    TFamAttr myAttrId;
+    //! Defines sequence of the indexes of the MED Family attributes
+    TFamAttr myAttrId; 
     TInt GetAttrId(TInt theId) const;
     void SetAttrId(TInt theId, TInt theVal);
 
+    //! Defines sequence of the values of the MED Family attributes
     TFamAttr myAttrVal;
     TInt GetAttrVal(TInt theId) const;
     void SetAttrVal(TInt theId, TInt theVal);
 
+    //! Defines sequence of the names of the MED Family attributes
     TString myAttrDesc;
     virtual std::string GetAttrDesc(TInt theId) const = 0;
     virtual void SetAttrDesc(TInt theId, const std::string& theValue) = 0;
@@ -111,30 +144,36 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  typedef std::vector<TInt> TElemNum;
+  typedef TIntVector TElemNum;
   
+  //! Define a parent class for all MED entities that describes mesh entites such as nodes and cells.
   struct TElemInfo: virtual TBase
   {
-    PMeshInfo myMeshInfo;
+    PMeshInfo myMeshInfo; //!< A reference to correspondig MED Mesh
     const PMeshInfo& GetMeshInfo() const { return myMeshInfo;}
 
-    TInt myNbElem;
+    TInt myNbElem; //<! Number of corresponding mesh entities
     TInt GetNbElem() const { return myNbElem;}
     
-    TElemNum myFamNum;
+    //! Defines sequence MED Family indexes for corresponding mesh entites
+    TElemNum myFamNum; 
     TInt GetFamNum(TInt theId) const;
     void SetFamNum(TInt theId, TInt theVal);
 
+    //! Defines if the mesh elements are indexed
     EBooleen myIsElemNum;
     EBooleen IsElemNum() const { return myIsElemNum;}
 
+    //! Contains sequence of the indexes for the mesh elements
     TElemNum myElemNum;
     TInt GetElemNum(TInt theId) const;
     void SetElemNum(TInt theId, TInt theVal);
 
+    //! Defines if the mesh elements are named
     EBooleen myIsElemNames;
     EBooleen IsElemNames() const { return myIsElemNames;}
 
+    //! Contains sequence of the names for the mesh elements
     TString myElemNames;
     virtual std::string GetElemName(TInt theId) const = 0;
     virtual void SetElemName(TInt theId, const std::string& theValue) = 0;
@@ -142,185 +181,339 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  typedef std::vector<TFloat> TNodeCoord;
+  typedef TVector<TFloat> TFloatVector;
+  typedef TSlice<TFloatVector> TFloatVecSlice;
+  typedef TCSlice<TFloatVector> TCFloatVecSlice;
 
-  struct TNodeInfo: virtual TElemInfo
+  typedef TFloatVector TNodeCoord;
+  typedef TFloatVecSlice TCoordSlice;
+  typedef TCFloatVecSlice TCCoordSlice;
+
+  //! Define a base class which represents MED Nodes entity
+  struct TNodeInfo: 
+    virtual TElemInfo,
+    virtual TModeSwitchInfo 
   {
-    TNodeCoord myCoord;
-    TFloat GetNodeCoord(TInt theId, TInt theComp) const;
-    void SetNodeCoord(TInt theId, TInt theComp, TFloat theVal);
+    TNodeCoord myCoord; //!< Contains all nodal coordinates
 
-    ERepere mySystem;
+    //! Gives coordinates for mesh node by its number
+    TCCoordSlice GetCoordSlice(TInt theId) const;
+    //! Gives coordinates for mesh node by its number
+    TCoordSlice GetCoordSlice(TInt theId);
+
+    ERepere mySystem; //!< Defines, which coordinate system is used
     ERepere GetSystem() const { return mySystem;}
     void SetSystem(ERepere theSystem) { mySystem = theSystem;}
 
-    TString myCoordNames;
+    TString myCoordNames; //!< Contains names for the coordinate dimensions
     virtual std::string GetCoordName(TInt theId) const = 0;
     virtual void SetCoordName(TInt theId, const std::string& theValue) = 0;
 
-    TString myCoordUnits;
+    TString myCoordUnits; //!< Contains units for the coordinate dimensions
     virtual std::string GetCoordUnit(TInt theId) const = 0;
     virtual void SetCoordUnit(TInt theId, const std::string& theValue) = 0;
   };
 
 
   //---------------------------------------------------------------
-  typedef SliceArray<TElemNum> TConnSlice;
-  typedef ConstSliceArray<TElemNum> TConstConnSlice;
+  typedef TIntVecSlice TConnSlice;
+  typedef TCIntVecSlice TCConnSlice;
 
-  struct TCellInfo: virtual TElemInfo
+  //! Define a base class which represents MED Cells entity
+  struct TCellInfo: 
+    virtual TElemInfo,
+    virtual TModeSwitchInfo 
   {
-    EEntiteMaillage myTEntity;
-    EEntiteMaillage GetEntity() const { return myTEntity;}
+    EEntiteMaillage myEntity; //!< Defines the MED Entity where the mesh cells belongs to
+    EEntiteMaillage GetEntity() const { return myEntity;}
 
-    EGeometrieElement myTGeom;
-    EGeometrieElement GetGeom() const { return myTGeom;}
+    EGeometrieElement myGeom; //!< Defines the MED Geometric type of the instance
+    EGeometrieElement GetGeom() const { return myGeom;}
 
-    EConnectivite myTConn;
-    EConnectivite GetConn() const { return myTConn;}
+    EConnectivite myConnMode; //!< Defines connectivity mode
+    EConnectivite GetConnMode() const { return myConnMode;}
 
-    virtual TInt GetConnDim() const = 0;
+    virtual TInt GetConnDim() const = 0; //!< Gives step in the connectivity sequence
 
-    TElemNum myConn;
-    TConstConnSlice GetConnSlice(TInt theElemId) const;
+    TElemNum myConn; //!< Defines sequence which describe connectivity for ech of mesh cell
+
+    //! Gives connectivities for mesh cell by its number
+    TCConnSlice GetConnSlice(TInt theElemId) const;
+    //! Gives connectivities for mesh cell by its number
     TConnSlice GetConnSlice(TInt theElemId);
-
-    TInt GetConn(TInt theElemId, TInt theConnId) const;
-    void SetConn(TInt theElemId, TInt theConnId, TInt theVal);
   };
 
   //---------------------------------------------------------------
-  struct TPolygoneInfo: virtual TElemInfo
+  //! Define a base class which represents MED Polygon entity
+  struct TPolygoneInfo: 
+    virtual TElemInfo
   {
-    EEntiteMaillage myTEntity; // MED_FACE|MED_MAILLE
-    EEntiteMaillage GetEntity() const { return myTEntity;}
+    //! Defines the MED Entity where the polygons belongs to
+    EEntiteMaillage myEntity; // MED_FACE|MED_MAILLE
+    EEntiteMaillage GetEntity() const { return myEntity;}
 
-    EGeometrieElement myTGeom; // ePOLYGONE
+    //! Defines the MED Geometric type of the instance
+    EGeometrieElement myGeom; // ePOLYGONE
     EGeometrieElement GetGeom() const { return ePOLYGONE;}
 
-    EConnectivite myTConn; // eNOD|eDESC(eDESC not used)
-    EConnectivite GetConn() const { return myTConn;}
+    //! Defines connectivity mode
+    EConnectivite myConnMode; // eNOD|eDESC(eDESC not used)
+    EConnectivite GetConnMode() const { return myConnMode;}
 
-    TInt myConnDim;
-    TInt GetConnDim() const { return myConnDim;}
+    TElemNum myConn; //!< Table de connectivities
+    TElemNum myIndex; //!< Table de indexes
 
-    TElemNum myConn; // Table de connectivities
-    TElemNum GetConnectivite() const { return myConn;}
-
-    TElemNum myIndex; // Table de indexes
-    TElemNum GetIndex() {return myIndex;}
+    //! Gives number of the connectivities for the defined polygon
     TInt GetNbConn(TInt theElemId) const;
+
+    //! Gives connectivities for polygon by its number
+    TCConnSlice GetConnSlice(TInt theElemId) const;
+    TConnSlice GetConnSlice(TInt theElemId);
   };
 
   //---------------------------------------------------------------
-  struct TPolyedreInfo: virtual TElemInfo
-  {
-    EEntiteMaillage myTEntity; // MED_FACE|MED_MAILLE
-    EEntiteMaillage GetEntity() const { return myTEntity;}
+  typedef TVector<TCConnSlice> TCConnSliceArr;
+  typedef TVector<TConnSlice> TConnSliceArr;
 
-    EGeometrieElement myTGeom; // ePOLYEDRE
+  //! Define a base class which represents MED Polyedre entity
+  struct TPolyedreInfo: 
+    virtual TElemInfo
+  {
+    //! Defines the MED Entity where the polyedres belongs to
+    EEntiteMaillage myEntity; // MED_FACE|MED_MAILLE
+    EEntiteMaillage GetEntity() const { return myEntity;}
+
+    //! Defines the MED Geometric type of the instance
+    EGeometrieElement myGeom; // ePOLYEDRE
     EGeometrieElement GetGeom() const { return ePOLYEDRE;}
 
-    EConnectivite myTConn; // eNOD|eDESC(eDESC not used)
-    EConnectivite GetConn() const { return myTConn;}
+    //! Defines connectivity mode
+    EConnectivite myConnMode; // eNOD|eDESC(eDESC not used)
+    EConnectivite GetConnMode() const { return myConnMode;}
 
-    TInt myNbConn;
-    TInt GetNbConn() const { return myNbConn;}
+    TElemNum myConn; //!< Table de connectivities
+    TElemNum myFaces; //!< Table de faces indexes
+    TElemNum myIndex; //!< Table de indexes
 
-    TElemNum myConn; // Table de connectivities
-    TElemNum GetConnectivite() const { return myConn;}
-    
-    TInt myNbFacesIndex;
-    TInt GetNbFacesIndex() const { return myNbFacesIndex;}
-    
-    TElemNum myFacesIndex; // Table de faces indexes
-    TElemNum GetFacesIndex() {return myFacesIndex;}
-    
-    TElemNum myIndex; // Table de indexes
-    TElemNum GetIndex() {return myIndex;}
-    TInt GetNbConn(TInt theElemId) const;
+    //! Gives number of the faces for the defined polyedre
+    TInt GetNbFaces(TInt theElemId) const;
+    //! Gives number of the nodes for the defined polyedre
+    TInt GetNbNodes(TInt theElemId) const;
+
+    //! Gives sequence of the face connectivities for polyedre by its number
+    TCConnSliceArr GetConnSliceArr(TInt theElemId) const;
+    //! Gives sequence of the face connectivities for polyedre by its number
+    TConnSliceArr GetConnSliceArr(TInt theElemId);
   };
 
   //---------------------------------------------------------------
-  struct TFieldInfo: virtual TNameInfo
+  //! Define a base class which represents MED Field entity
+  struct TFieldInfo: 
+    virtual TNameInfo
   {
-    PMeshInfo myMeshInfo;
+    PMeshInfo myMeshInfo; //!< A reference to correspondig MED Mesh
     const PMeshInfo& GetMeshInfo() const { return myMeshInfo;}
 
-    ETypeChamp myType;
+    ETypeChamp myType; //!< Defines type of the MED Field
     ETypeChamp GetType() const { return myType;}
 
-    TInt myNbComp;
+    TInt myNbComp; //!< Defines number of components stored in the field
     TInt GetNbComp() const { return myNbComp;}
 
-    EBooleen myIsLocal;
+    EBooleen myIsLocal; //!< Defines if the MED Field is local
     EBooleen GetIsLocal() const { return myIsLocal;}
 
-    TInt myNbRef;
+    TInt myNbRef; //!< Defines number of refereces of the field
     TInt GetNbRef() const { return myNbRef;}
 
-    TString myCompNames; 
+    TString myCompNames; //!< Contains names for each of MED Field components
     virtual std::string GetCompName(TInt theId) const = 0;
     virtual void SetCompName(TInt theId, const std::string& theValue) = 0;
 
-    TString myUnitNames; 
+    TString myUnitNames; //!< Contains units for each of MED Field components
     virtual std::string GetUnitName(TInt theId) const = 0;
     virtual void SetUnitName(TInt theId, const std::string& theValue) = 0;
   };
 
 
   //---------------------------------------------------------------
-  struct TTimeStampInfo: virtual TBase
+  //! Get dimension of the Gauss coordinates for the defined type of mesh cell
+  TInt
+  GetDimGaussCoord(EGeometrieElement theGeom);
+
+  //! Get number of referenced nodes for the defined type of mesh cell
+  TInt
+  GetNbRefCoord(EGeometrieElement theGeom);
+
+  typedef TFloatVector TWeight;
+
+  //! The class represents MED Gauss entity
+  struct TGaussInfo: 
+    virtual TNameInfo,
+    virtual TModeSwitchInfo 
   {
-    PFieldInfo myFieldInfo;
+    typedef boost::tuple<EGeometrieElement,std::string> TKey;
+    typedef boost::tuple<TKey,TInt> TInfo;
+    struct TLess
+    {
+      bool
+      operator()(const TKey& theLeft, const TKey& theRight) const;
+    };
+
+    //! Defines, which geometrical type the MED Gauss entity belongs to
+    EGeometrieElement myGeom; 
+    EGeometrieElement GetGeom() const { return myGeom;}
+
+    //! Contains coordinates for the refereced nodes
+    TNodeCoord myRefCoord; 
+
+    //! Gives coordinates for the referenced node by its number
+    TCCoordSlice GetRefCoordSlice(TInt theId) const;
+    //! Gives coordinates for the referenced node by its number
+    TCoordSlice GetRefCoordSlice(TInt theId);
+
+    //! Contains coordinates for the Gauss points
+    TNodeCoord myGaussCoord;
+
+    //! Gives coordinates for the Gauss points by its number
+    TCCoordSlice GetGaussCoordSlice(TInt theId) const;
+    //! Gives coordinates for the Gauss points by its number
+    TCoordSlice GetGaussCoordSlice(TInt theId);
+
+    //! Contains wheights for the Gauss points
+    TWeight myWeight;
+
+    //! Gives number of the referenced nodes
+    TInt GetNbRef() const { return GetNbRefCoord(GetGeom());}
+
+    //! Gives dimension of the referenced nodes
+    TInt GetDim() const { return GetDimGaussCoord(GetGeom());}
+
+    //! Gives number of the Gauss Points
+    TInt GetNbGauss() const { return myGaussCoord.size()/GetDim();}
+  };
+
+
+  //---------------------------------------------------------------
+  typedef std::map<EGeometrieElement,PGaussInfo> TGeom2Gauss;
+
+  //! Define a base class which represents MED TimeStamp
+  struct TTimeStampInfo: 
+    virtual TBase
+  {
+    PFieldInfo myFieldInfo; //!< A reference to correspondig MED Field
     const PFieldInfo& GetFieldInfo() const { return myFieldInfo;}
 
+    //! Defines the MED Entity where the MED TimeStamp belongs to
     EEntiteMaillage myEntity;
     EEntiteMaillage GetEntity() const { return myEntity;}
 
-    TGeom myGeom;
-    const TGeom& GetGeom() const { return myGeom;}
+    //! Keeps map of number of cells per geometric type where the MED TimeStamp belongs to
+    TGeom2Size myGeom2Size;
+    const TGeom2Size& GetGeom2Size() const { return myGeom2Size;}
 
     TInt myNbGauss, myNumDt, myNumOrd;
-    TInt GetNbGauss() const { return myNbGauss;}
-    TInt GetNumDt() const { return myNumDt;}
-    TInt GetNumOrd() const { return myNumOrd;}
+    TInt GetNbGauss() const { return myNbGauss;} //!< Gives number of the Gauss Points for the MED TimeStamp
+    TInt GetNumDt() const { return myNumDt;} //!< Defines number in time for the MED TimeStamp
+    TInt GetNumOrd() const { return myNumOrd;} //!< Defines number for the MED TimeStamp
 
     TFloat myDt;
-    TFloat GetDt() const { return myDt;}
+    TFloat GetDt() const { return myDt;} //!< Defines time for the MED TimeStamp
 
-    TString myGaussName;
-    virtual std::string GetGaussName() const = 0;
-    virtual void SetGaussName(const std::string& theValue) = 0;
+    //! Keeps map of MED Gauss entityes per geometric type
+    TGeom2Gauss myGeom2Gauss;
+    const TGeom2Gauss& GetGeom2Gauss() const { return myGeom2Gauss;}
 
-    TString myUnitDt;
+    TString myUnitDt; //!< Defines unit for the time for the MED TimeStamp
     virtual std::string GetUnitDt() const = 0;
     virtual void SetUnitDt(const std::string& theValue) = 0;
   };
   
 
   //---------------------------------------------------------------
-  typedef std::vector<TFloat> TValue;
-  typedef std::map<EGeometrieElement,TValue> TMeshValue;
-
-  struct TTimeStampVal: virtual TBase
+  //! The class represents MED Profile entity
+  struct TProfileInfo: 
+    virtual TNameInfo
   {
-    PTimeStampInfo myTimeStampInfo;
+    typedef std::string TKey;
+    typedef boost::tuple<TKey,TInt> TInfo;
+
+    EModeProfil myMode; //!< Keeps mode for the MED Profile
+    EModeProfil GetMode() const { return myMode;}
+    void SetMode(EModeProfil theMode) { myMode = theMode;}
+
+    TElemNum myElemNum; //!< Keeps sequence of cell by its number which belong to the profile
+    TInt GetElemNum(TInt theId) const;
+    void SetElemNum(TInt theId, TInt theVal);
+
+    bool IsPresent() const { return GetName() != "";}
+    TInt GetSize() const { return myElemNum.size();}
+  };
+
+
+  //---------------------------------------------------------------
+  typedef TFloatVector TValue;
+  typedef TSlice<TValue> TValueSlice;
+  typedef TCSlice<TValue> TCValueSlice;
+
+  typedef TVector<TCValueSlice> TCValueSliceArr;
+  typedef TVector<TValueSlice> TValueSliceArr;
+
+  //! The class is a helper one. It provide safe and flexible way to get access to values for a MED TimeStamp
+  struct TMeshValue:
+    virtual TModeSwitchInfo 
+  {
+    TValue myValue;
+
+    TInt myNbElem;
+    TInt myNbComp;
+    TInt myNbGauss;
+    TInt myStep;
+
+    //! Initialize the class
+    void
+    Init(TInt theNbElem,
+	 TInt theNbGauss,
+	 TInt theNbComp,
+	 EModeSwitch theMode = eFULL_INTERLACE);
+
+    //! Iteration through Gauss Points by their components
+    TCValueSliceArr
+    GetGaussValueSliceArr(TInt theElemId) const;
+
+    //! Iteration through Gauss Points by their components
+    TValueSliceArr 
+    GetGaussValueSliceArr(TInt theElemId);
+
+    //! Iteration through components by corresponding Gauss Points
+    TCValueSliceArr
+    GetCompValueSliceArr(TInt theElemId) const;
+
+    //! Iteration through components by corresponding Gauss Points
+    TValueSliceArr 
+    GetCompValueSliceArr(TInt theElemId);
+  };
+
+
+  //---------------------------------------------------------------
+  typedef std::map<EGeometrieElement,TMeshValue> TGeom2Value;
+  typedef std::map<EGeometrieElement,PProfileInfo> TGeom2Profile;
+
+  //! The class implements a container for MED TimeStamp values
+  struct TTimeStampVal: 
+    virtual TModeSwitchInfo 
+  {
+    PTimeStampInfo myTimeStampInfo; //!< A reference to correspondig MED TimeStamp
     const PTimeStampInfo& GetTimeStampInfo() const { return myTimeStampInfo;}
 
-    TMeshValue myMeshValue;
-    TFloat GetVal(EGeometrieElement theGeom, TInt theId, 
-		  TInt theComp, TInt theGauss = 0) const;
+    //! Keeps map of MED Profiles per geometric type
+    TGeom2Profile myGeom2Profile;
+    const TGeom2Profile& GetGeom2Profile() const { return myGeom2Profile;}
 
-    void SetVal(EGeometrieElement theGeom, TInt theId, 
-		TInt theComp, TFloat theVal, TInt theGauss = 0);
-    EModeProfil myPflMode;
-    EModeProfil GetPflMode() const { return myPflMode;}
-    void GetPflMode(EModeProfil theVal) { myPflMode = theVal;}
-
-    TString myPflName;
-    virtual std::string GetPflName() const = 0;
-    virtual void SetPflName(const std::string& theValue) = 0;
+    //! Keeps map of MED TimeStamp values per geometric type
+    TGeom2Value myGeom2Value;
+    const TMeshValue& GetMeshValue(EGeometrieElement theGeom) const;
+    TMeshValue& GetMeshValue(EGeometrieElement theGeom);
   };
 
 }

@@ -48,15 +48,16 @@ namespace MED{
   };
 };
 
-//#define _DEBUG_
 #ifdef _DEBUG_
   #define MSG(deb,msg) if(deb) std::cout<<MED::PrefixPrinter::GetPrefix()<<msg<<" ("<<__FILE__<<" ["<<__LINE__<<"])\n"
   #define BEGMSG(deb,msg) if(deb) std::cout<<MED::PrefixPrinter::GetPrefix()<<msg
-  #define INITMSG(deb,msg) MED::PrefixPrinter aPrefixPrinter(deb); BEGMSG(deb,msg)
+  #define INITMSGA(deb,lev,msg) MED::PrefixPrinter aPrefixPrinter_##lev(deb); BEGMSG(deb,msg)
+  #define INITMSG(deb,msg) INITMSGA(deb,,msg)
   #define ADDMSG(deb,msg) if(deb) std::cout<<msg
 #else
   #define MSG(deb,msg)
   #define BEGMSG(deb,msg)
+  #define INITMSGA(deb,lev,msg)
   #define INITMSG(deb,msg)
   #define ADDMSG(deb,msg)
 #endif

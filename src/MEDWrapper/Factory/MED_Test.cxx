@@ -28,6 +28,7 @@
 
 #include "MED_Utilities.hxx"
 #include "MED_Algorithm.hxx"
+#include "MED_GaussUtils.hxx"
 #include "MED_Factory.hxx"
 
 #ifdef _DEBUG_
@@ -36,57 +37,102 @@ static int MYDEBUG = 1;
 static int MYDEBUG = 0;
 #endif
 
-static int MYVALUEDEBUG = 0;
-
 static int MYWRITEDEBUG = 1;
 
 using namespace MED;
 
+#undef _DEBUG_
 
 void CheckMed(const std::string& theFileName)
 {
   MSG(MYDEBUG,"CheckMed - theFileName = '"<<theFileName<<"'");
   {
+    //TErr anErr;
     PWrapper aMed = CrWrapper(theFileName);
+
+    TKey2Gauss aKey2Gauss = GetKey2Gauss(aMed);
+    TMKey2Profile aMKey2Profile = GetMKey2Profile(aMed);
+    INITMSG(MYDEBUG,"aMed->GetNbProfiles() = "<<aMed->GetNbProfiles()<<endl);
+
     TInt aNbMeshes = aMed->GetNbMeshes();
-    INITMSG(MYDEBUG,"GetNbMeshes() = "<<aNbMeshes<<endl);
+    BEGMSG(MYDEBUG,"GetNbMeshes() = "<<aNbMeshes<<endl);
     for(TInt iMesh = 1; iMesh <= aNbMeshes; iMesh++){
       
       PMeshInfo aMeshInfo = aMed->GetPMeshInfo(iMesh);
-      INITMSG(MYDEBUG,"aMeshInfo->GetName() = "<<aMeshInfo->GetName()<<endl);
-
-      //continue;
+      INITMSG(MYDEBUG,"aMeshInfo->GetName() = '"<<aMeshInfo->GetName()<<"'"<<endl);
 
       TEntityInfo aEntityInfo = aMed->GetEntityInfo(aMeshInfo);
       
-      TElemGroup aElemGroup = GetElemsByEntity(aMed,aMeshInfo,aEntityInfo);
-      
-      TFamilyGroup aFamilyGroup = GetFamilies(aMed,aMeshInfo);
-      
-      TFamilyByEntity aFamilyByEntity = GetFamiliesByEntity(aMed,aElemGroup,aFamilyGroup);
-      
-      TGroupInfo aGroupInfo = GetFamiliesByGroup(aFamilyGroup);
-      
-      TTimeStampGroup aTimeStampGroup = GetFieldsByEntity(aMed,aMeshInfo,aEntityInfo);
-      
-      TFieldGroup aFieldGroup = GetFieldsByEntity(aTimeStampGroup);
+      TEntity2TGeom2ElemInfo anEntity2TGeom2ElemInfo = 
+	GetEntity2TGeom2ElemInfo(aMed,aMeshInfo,aEntityInfo);
 
-      TFieldGroup::const_iterator aFieldGroupIter = aFieldGroup.begin();
-      for(; aFieldGroupIter != aFieldGroup.end(); aFieldGroupIter++){
-	const TTimeStampGroup& aTTimeStampGroup = aFieldGroupIter->second;
-	TTimeStampGroup::const_iterator aTTimeStampGroupIter = aTTimeStampGroup.begin();
-	for(; aTTimeStampGroupIter != aTTimeStampGroup.end(); aTTimeStampGroupIter++){
-	  PFieldInfo aFieldInfo = aTTimeStampGroupIter->first;
-	  const TTimeStampSet& aTimeStampSet = aTTimeStampGroupIter->second;
-	  TTimeStampSet::const_iterator aTTimeStampSetIter = aTimeStampSet.begin();
-	  for(; aTTimeStampSetIter != aTimeStampSet.end(); aTTimeStampSetIter++){
-	    PTimeStampInfo aTimeStampInfo = *aTTimeStampSetIter;
-	    TErr anErr;
-	    PTimeStampVal aTimeStampVal = aMed->GetPTimeStampVal(aTimeStampInfo,&anErr);
+      TFieldInfo2TimeStampInfoSet aFieldInfo2TimeStampInfoSet = 
+	GetFieldInfo2TimeStampInfoSet(aMed,aMeshInfo,aEntityInfo);
+      
+      TEntite2TFieldInfo2TimeStampInfoSet anEntite2TFieldInfo2TimeStampInfoSet = 
+	GetEntite2TFieldInfo2TimeStampInfoSet(aFieldInfo2TimeStampInfoSet);
+
+      TEntite2TFieldInfo2TimeStampInfoSet::const_iterator anEntite2TFieldInfo2TimeStampInfoSetIter = 
+	anEntite2TFieldInfo2TimeStampInfoSet.begin();
+      for(; anEntite2TFieldInfo2TimeStampInfoSetIter != anEntite2TFieldInfo2TimeStampInfoSet.end(); anEntite2TFieldInfo2TimeStampInfoSetIter++){
+	const TFieldInfo2TimeStampInfoSet& aFieldInfo2TimeStampInfoSet = anEntite2TFieldInfo2TimeStampInfoSetIter->second;
+	TFieldInfo2TimeStampInfoSet::const_iterator aFieldInfo2TimeStampInfoSetIter = aFieldInfo2TimeStampInfoSet.begin();
+	for(; aFieldInfo2TimeStampInfoSetIter != aFieldInfo2TimeStampInfoSet.end(); aFieldInfo2TimeStampInfoSetIter++){
+	  PFieldInfo aFieldInfo = aFieldInfo2TimeStampInfoSetIter->first;
+	  INITMSG(MYDEBUG,
+		  "GetPFieldInfo "<<
+		  "- aName = '"<<aFieldInfo->GetName()<<"'"<<
+		  "; aType = "<<aFieldInfo->GetType()<<
+		  "; aNbComp = "<<aFieldInfo->GetNbComp()<<
+		  endl);
+	  const TTimeStampInfoSet& aTimeStampInfoSet = aFieldInfo2TimeStampInfoSetIter->second;
+	  TTimeStampInfoSet::const_iterator aTimeStampInfoSettIter = aTimeStampInfoSet.begin();
+	  for(; aTimeStampInfoSettIter != aTimeStampInfoSet.end(); aTimeStampInfoSettIter++){
+	    PTimeStampInfo aTimeStampInfo = *aTimeStampInfoSettIter;
+	    INITMSG(MYDEBUG,
+		    "GetPTimeStampInfo "<<
+		    "- anEntity = "<<aTimeStampInfo->GetEntity()<<
+		    "; aNbGauss = "<<aTimeStampInfo->GetNbGauss()<<
+		    "; aNumDt = "<<aTimeStampInfo->GetNumDt()<<
+		    endl);
+	    PTimeStampVal aTimeStampVal = aMed->GetPTimeStampVal(aTimeStampInfo,
+								 aMKey2Profile,
+								 aKey2Gauss);
 	  }
 	}
       }
 
+      continue;
+
+      TFamilyInfoSet aFamilyInfoSet = GetFamilyInfoSet(aMed,aMeshInfo);
+      
+      TEntity2FamilySet aEntity2FamilySet = 
+	GetEntity2FamilySet(aMed,anEntity2TGeom2ElemInfo,aFamilyInfoSet);
+      
+      TGroupInfo aGroupInfo = GetGroupInfo(aFamilyInfoSet);
+      
+      PNodeInfo aNodeInfo = aMed->GetPNodeInfo(aMeshInfo);
+      TEntity2TGeom2ElemInfo::const_iterator anIter = anEntity2TGeom2ElemInfo.begin();
+      for(; anIter != anEntity2TGeom2ElemInfo.end(); anIter++){
+	const EEntiteMaillage& anEntity = anIter->first;
+	if(anEntity != eNOEUD){
+	  const TGeom2ElemInfo& aGeom2ElemInfo = anIter->second;
+	  TKey2Gauss::const_iterator anIter2 = aKey2Gauss.begin();
+	  for(; anIter2 != aKey2Gauss.end(); anIter2++){
+	    const TGaussInfo::TKey& aKey = anIter2->first;
+	    EGeometrieElement aGeom = boost::get<0>(aKey);
+	    TGeom2ElemInfo::const_iterator anIter3 = aGeom2ElemInfo.find(aGeom);
+	    if(anIter3 != aGeom2ElemInfo.end()){
+	      if(PCellInfo aCellInfo = anIter3->second){
+		PGaussInfo aGaussInfo = anIter2->second;
+		TGaussCoord aGaussCoord;
+		GetGaussCoord3D(aGaussInfo,aCellInfo,aNodeInfo,aGaussCoord);
+	      }
+	    }
+	  }
+	}
+      }
+      
     }
   }
   MSG(MYDEBUG,"OK");
@@ -97,6 +143,9 @@ void CopyMed(const PWrapper& theMed,
 	     const PWrapper& theMed2, 
 	     int theIncr)
 {
+  TKey2Gauss aKey2Gauss = GetKey2Gauss(theMed);
+  TMKey2Profile aMKey2Profile = GetMKey2Profile(theMed);
+
   TInt aNbMeshes = theMed->GetNbMeshes();
   MSG(MYDEBUG,"aNbMeshes = "<<aNbMeshes);
   std::string aName;
@@ -135,14 +184,14 @@ void CopyMed(const PWrapper& theMed,
       }
 
       EEntiteMaillage anEntity;
-      TGeom aTGeom;
+      TGeom2Size aGeom2Size;
       TInt aNbTimeStamps = 
-	theMed->GetNbTimeStamps(aFieldInfo,aEntityInfo,anEntity,aTGeom);
+	theMed->GetNbTimeStamps(aFieldInfo,aEntityInfo,anEntity,aGeom2Size);
       {
 	INITMSG(MYDEBUG,"GetNbTimeStamps = "<<aNbTimeStamps<<endl);
 	for(TInt iTimeStamp = 0; iTimeStamp < aNbTimeStamps; iTimeStamp++){
 	  PTimeStampInfo aTimeStampInfo = 
-	  theMed->GetPTimeStampInfo(aFieldInfo,anEntity,aTGeom,iTimeStamp+1);
+	  theMed->GetPTimeStampInfo(aFieldInfo,anEntity,aGeom2Size,iTimeStamp+1);
 	  TInt aNumDt = aTimeStampInfo->GetNumDt();
 	  TInt aNbGauss = aTimeStampInfo->GetNbGauss();
 	  INITMSG(MYDEBUG,"aNbGauss = "<<aNbGauss<<"; aNumDt = "<<aNumDt<<"\n");
@@ -150,26 +199,14 @@ void CopyMed(const PWrapper& theMed,
 	  PTimeStampInfo aTimeStampInfo2 = 
 	    theMed->CrTimeStampInfo(aFieldInfo2,aTimeStampInfo);
 	  
-	  PTimeStampVal aTimeStampVal = theMed->GetPTimeStampVal(aTimeStampInfo);
+	  PTimeStampVal aTimeStampVal = theMed->GetPTimeStampVal(aTimeStampInfo,
+								 aMKey2Profile,
+								 aKey2Gauss);
 	  
-	  PTimeStampVal aTimeStampVal2 = theMed->CrTimeStampVal(aTimeStampInfo2,aTimeStampVal);
+	  PTimeStampVal aTimeStampVal2 = theMed->CrTimeStampVal(aTimeStampInfo2,
+								aTimeStampVal);
 	  
 	  if(MYWRITEDEBUG) theMed2->SetTimeStamp(aTimeStampVal2);
-	  
-	  TMeshValue& aMeshValue = aTimeStampVal->myMeshValue;
-	  TMeshValue::iterator aMeshValueIter = aMeshValue.begin();
-	  for(; aMeshValueIter != aMeshValue.end(); aMeshValueIter++){
-	    EGeometrieElement aGeom = aMeshValueIter->first;
-	    TValue aValue = aMeshValueIter->second;
-	    INITMSG(MYDEBUG,"aGeom = "<<aGeom<<"; aValue = "<<aValue.size()<<": ");
-	    for(TInt i = 0, iEnd = aValue.size()/aNbComp; i < iEnd; i++){
-	      for(TInt j = 0, ij = i*aNbComp; j < aNbComp; j++, ij++){
-		ADDMSG(MYVALUEDEBUG,aValue[ij]<<",");
-	      }
-	      ADDMSG(MYVALUEDEBUG," ");
-	    }
-	    ADDMSG(MYDEBUG,"\n");
-	  }
 	}
       }
     }
@@ -215,64 +252,25 @@ void CopyMed(const PWrapper& theMed,
 	if(MYWRITEDEBUG) theMed2->SetNodeInfo(aNodeInfo2);
 	continue;
       }
-      TGeom& aTGeom = anEntityInfoIter->second;
-      TGeom::iterator anTGeomIter = aTGeom.begin();
-      for(; anTGeomIter != aTGeom.end(); anTGeomIter++){
-	const EGeometrieElement& aGeom = anTGeomIter->first;
-	const TInt& aNbElem = anTGeomIter->second;
+      TGeom2Size& aGeom2Size = anEntityInfoIter->second;
+      TGeom2Size::iterator aGeomIter = aGeom2Size.begin();
+      for(; aGeomIter != aGeom2Size.end(); aGeomIter++){
+	const EGeometrieElement& aGeom = aGeomIter->first;
+	const TInt& aNbElem = aGeomIter->second;
 	INITMSG(MYDEBUG,"aGeom = "<<aGeom<<"; aNbElem = "<<aNbElem<<": ");
 	switch(aGeom){
-	case ePOLYGONE:
-	  {
-	    PPolygoneInfo aPolygoneInfo = theMed->GetPPolygoneInfo(aMeshInfo,anEntity,aGeom);
-	    TElemNum aConn  = aPolygoneInfo->GetConnectivite();
-	    TElemNum aIndex = aPolygoneInfo->GetIndex();
-	    TInt aNbIndex = aIndex.size();
-	    TInt aIndex0 = aIndex[0];
-	    for(TInt iElem = 1; iElem < aNbIndex; iElem++){
-	      for (TInt i = aIndex0; i < aIndex[iElem];i++)
-		ADDMSG(MYVALUEDEBUG,aConn[i-1]<<",");
-	      ADDMSG(MYDEBUG," ");
-	      aIndex0 = aIndex[iElem];
-	    }
-	    ADDMSG(MYDEBUG,endl);
-	    INITMSG(MYDEBUG,"Indexes :");
-	    for(TInt iElem = 0; iElem < aIndex.size(); iElem++){
-	      ADDMSG(MYVALUEDEBUG,aIndex[iElem]<<",");
-	    }
-	    ADDMSG(MYDEBUG,endl);
-	    PPolygoneInfo aPolygoneInfo2 = theMed->CrPolygoneInfo(aMeshInfo2,aPolygoneInfo);
-	    if(MYWRITEDEBUG) theMed2->SetPolygoneInfo(aPolygoneInfo2);
-	    break;
-	  }
-	case ePOLYEDRE:
-	  {
-	    PPolyedreInfo aPolyedreInfo = theMed->GetPPolyedreInfo(aMeshInfo,anEntity,aGeom);
-	    TElemNum aConn        = aPolyedreInfo->GetConnectivite();
-	    TElemNum aFacesIndex  = aPolyedreInfo->GetFacesIndex();
-	    TElemNum aIndex       = aPolyedreInfo->GetIndex();
-	    
-	    TInt aNbIndex      = aIndex.size();
-	    
-	    for (int aNp = 0; aNp < aNbIndex-1;aNp++){
-	      if (aPolyedreInfo->IsElemNames())
-		ADDMSG(MYDEBUG,aPolyedreInfo->GetElemName(aNp)<<endl);
-	      else 
-		ADDMSG(MYDEBUG,"POLYEDRE "<<aNp+1<<endl);
-
-	      for (int aNf = aIndex[aNp]-1;aNf < aIndex[aNp+1]-1;aNf++){
-		ADDMSG(MYDEBUG,"Face "<<aNf-aIndex[aNp]+2<<": [");
-		for (int aNc = aFacesIndex[aNf]-1; aNc < aFacesIndex[aNf+1]-1;aNc++){
-		  ADDMSG(MYDEBUG," "<<aConn[aNc]);
-		}
-		ADDMSG(MYDEBUG," ]"<<endl;);
-	      }
-	    }
-
-	    PPolyedreInfo aPolyedreInfo2 = theMed->CrPolyedreInfo(aMeshInfo2,aPolyedreInfo);
-	    if(MYWRITEDEBUG) theMed2->SetPolyedreInfo(aPolyedreInfo2);
-	    break;
-	  }
+	case ePOLYGONE: {
+	  PPolygoneInfo aPolygoneInfo = theMed->GetPPolygoneInfo(aMeshInfo,anEntity,aGeom);
+	  PPolygoneInfo aPolygoneInfo2 = theMed->CrPolygoneInfo(aMeshInfo2,aPolygoneInfo);
+	  if(MYWRITEDEBUG) theMed2->SetPolygoneInfo(aPolygoneInfo2);
+	  break;
+	}
+	case ePOLYEDRE: {
+	  PPolyedreInfo aPolyedreInfo = theMed->GetPPolyedreInfo(aMeshInfo,anEntity,aGeom);
+	  PPolyedreInfo aPolyedreInfo2 = theMed->CrPolyedreInfo(aMeshInfo2,aPolyedreInfo);
+	  if(MYWRITEDEBUG) theMed2->SetPolyedreInfo(aPolyedreInfo2);
+	  break;
+	}
 	default:
 	  PCellInfo aCellInfo = theMed->GetPCellInfo(aMeshInfo,anEntity,aGeom);
 	  PCellInfo aCellInfo2 = theMed2->CrCellInfo(aMeshInfo2,aCellInfo);
@@ -317,7 +315,9 @@ void ReadMed(const char* theFileName,
 
 
 int main(int argc, char** argv){ 
+#ifndef _DEBUG_
   try{
+#endif
     if(argc == 2)
       CheckMed(argv[1]);
     if(argc == 3)
@@ -327,10 +327,12 @@ int main(int argc, char** argv){
     if(argc == 5)
       ReadMed(argv[1],argv[2],MED::EVersion(atoi(argv[3])),atoi(argv[4]));
     return 0;
+#ifndef _DEBUG_
   }catch(std::exception& exc){
     MSG(MYDEBUG,"Follow exception was accured :\n"<<exc.what());
   }catch(...){
     MSG(MYDEBUG,"Unknown exception was accured");
   } 
+#endif 
   return 1;
 }

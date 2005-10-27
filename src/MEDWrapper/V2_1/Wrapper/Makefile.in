@@ -27,7 +27,7 @@
 #  $Header$
 
 top_srcdir=@top_srcdir@
-top_builddir=../../..
+top_builddir=../../../..
 srcdir=@srcdir@
 VPATH=.:@srcdir@:@top_srcdir@/idl
 
@@ -36,21 +36,21 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 
 # Libraries targets
 
-LIB = libMEDWrapper.la
+LIB = libMEDWrapper_V2_1.la
 LIB_SRC = \
-	MED_Factory.cxx
+	MED_V2_1_Wrapper.cxx
 
 EXPORT_HEADERS = \
-	MED_Factory.hxx
+	MED_V2_1_Wrapper.hxx
 
 # Executables targets
-BIN = MED_Test
+BIN = 
 BIN_SRC = 
 
-CPPFLAGS+= $(BOOST_CPPFLAGS) $(MED2_INCLUDES)
+CPPFLAGS+= -D@MACHINE@ $(BOOST_CPPFLAGS) $(HDF5_INCLUDES)
 
-LDFLAGS+= -lMEDWrapper_V2_2 -lMEDWrapper_V2_1
+LDFLAGS+= $(HDF5_LIBS) -lMEDWrapperBase -lmed_V2_1
 
-LDFLAGSFORBIN=$(LDFLAGS) -lMEDWrapperBase $(BOOST_LIBS) -lboost_thread-mt -lmed_V2_1
+LDFLAGSFORBIN=$(LDFLAGS)
 
 @CONCLUDE@
