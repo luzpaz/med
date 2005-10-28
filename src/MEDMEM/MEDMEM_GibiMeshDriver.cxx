@@ -37,7 +37,7 @@ using namespace MEDMEM;
 //#define STOP_READING_UNSUP_DATA
 
 // read or not non-named fields
-#define GIBI_READ_ONLY_NAMED_FIELD
+//#define GIBI_READ_ONLY_NAMED_FIELD
 
 // to see full dump of RESULTATS STRUCTURE INTERMEDIAIRES
 #ifdef _DEBUG_
