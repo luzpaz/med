@@ -270,12 +270,27 @@ void _intermediateMED::treatGroupes()
     // check if sub-groups have different dimension
     j = grp.groupes.begin();
     int dim = groupes[*j-1].mailles[0]->dimension();
-    for( j++; !hasMixedCells && j!=grp.groupes.end(); ++j)
-      hasMixedCells = ( dim != groupes[*j-1].mailles[0]->dimension() );
+    for( j++; /*!hasMixedCells &&*/ j!=grp.groupes.end(); ++j) {
+      int dim2 = groupes[*j-1].mailles[0]->dimension();
+      if ( dim != dim2 ) {
+        if ( dim == 0 || dim2 == 0 ) {
+          // cant create a group of nodes plus anything else
+          grp.mailles.clear();
+          grp.groupes.clear();
+          MESSAGE( "Erase mixed dim group with nodes:" << i << "-th group " << grp.nom );
+        }
+        else {
+          hasMixedCells = true;
+          MESSAGE( "Mixed dim group: " << i << "-th " << grp.nom <<
+                   "  dim1 = " << dim << " dim2 = " << dim2 );
+        }
+        break;
+      }
+    }
   }
 
-  if ( hasMixedCells )
-    INFOS( "There will be groups of mixed dimention" );
+//   if ( hasMixedCells )
+//     INFOS( "There will be groups of mixed dimention" );
   END_OF(LOC);
 }
 
@@ -403,7 +418,8 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 	vtype.push_back(type);
 	// Boucle sur i de parcours des mailles d'une entite
 	// Une entite se termine lorsqu'on atteint la fin de maillage ou lorsque la dimension des mailles change
-	for( ; i!=maillage.end() && ( hasMixedCells || dimension==i->dimension()) ; ++i)
+        bool ignoreDimChange = hasMixedCells && dimension > 0;
+	for( ; i!=maillage.end() && ( ignoreDimChange || dimension==i->dimension()) ; ++i)
 	{
 	    if (type != i->geometricType) // si changement de type geometrique
 	    {
@@ -612,8 +628,8 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     int group_min_dim = (**mailleSet.begin()).dimension();
     int group_max_dim = (**(--mailleSet.end())).dimension();
     if ( group_max_dim != 0 && group_min_dim <= dimension_maillage - 2  ) {
-      INFOS("Skip group: " << i << " <" << grp.nom << "> - too small dimension: "
-            << group_min_dim);
+      MESSAGE("Skip group: " << i << " <" << grp.nom << "> - too small dimension: "
+              << group_min_dim);
       continue;
     }
 
@@ -632,7 +648,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     TMailleSet::iterator j=mailleSet.begin(); 
     // initialise groupe_entity a l'entite de la premiere maille du groupe
     medEntityMesh groupe_entity = (**mailleSet.rbegin()).getEntity(dimension_maillage);
-    if ( hasMixedCells )
+    if ( hasMixedCells && group_min_dim > 0 )
       groupe_entity = MED_CELL;
     medGeometryElement geometrictype=(**j).geometricType;
 
