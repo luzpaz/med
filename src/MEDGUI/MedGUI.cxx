@@ -45,9 +45,10 @@
 #include <SalomeApp_Application.h>
 #include <SalomeApp_DataModel.h>
 #include <SalomeApp_Study.h>
-#include <SalomeApp_SelectionMgr.h>
 #include <SALOMEDSClient_Study.hxx>
 #include <SALOMEDSClient_SObject.hxx>
+
+#include <LightApp_SelectionMgr.h>
 
 #include <OB_Browser.h>
 
@@ -460,7 +461,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 
 	SALOME_ListIO list;
 	SalomeApp_Application* app = getApp();
-	SalomeApp_SelectionMgr* mgr = app ? app->selectionMgr() : NULL;
+	LightApp_SelectionMgr* mgr = app ? app->selectionMgr() : NULL;
 	if( mgr )
 	  mgr->selectedObjects( list );
 	//Sel->AddFilter(aMeshFilter) ;
@@ -529,7 +530,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 
 	SALOME_ListIO list;
 	SalomeApp_Application* app = getApp();
-	SalomeApp_SelectionMgr* mgr = app ? app->selectionMgr() : NULL;
+	LightApp_SelectionMgr* mgr = app ? app->selectionMgr() : NULL;
 	if( mgr )
 	  mgr->selectedObjects( list );
 

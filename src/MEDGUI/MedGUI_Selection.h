@@ -29,9 +29,9 @@
 #ifndef MEDGUI_SELECTION_HeaderFile
 #define MEDGUI_SELECTION_HeaderFile
 
-#include "SalomeApp_Selection.h"
+#include "LightApp_Selection.h"
 
-class MedGUI_Selection : public SalomeApp_Selection
+class MedGUI_Selection : public LightApp_Selection
 {
 public:
   MedGUI_Selection();

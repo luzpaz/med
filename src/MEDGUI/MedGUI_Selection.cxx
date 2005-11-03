@@ -6,7 +6,7 @@
 //purpose  : 
 //=======================================================================
 MedGUI_Selection::MedGUI_Selection()
-: SalomeApp_Selection()
+: LightApp_Selection()
 {
 }
 
