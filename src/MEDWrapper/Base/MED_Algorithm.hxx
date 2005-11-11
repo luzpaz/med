@@ -39,6 +39,7 @@ namespace MED
   typedef std::map<EGeometrieElement,PElemInfo> TGeom2ElemInfo;
   typedef std::map<EEntiteMaillage,TGeom2ElemInfo> TEntity2TGeom2ElemInfo;
 
+  //! Get set of TElemInfo by its geometrical type and corresponding MED ENTITY
   TEntity2TGeom2ElemInfo
   GetEntity2TGeom2ElemInfo(const PWrapper& theWrapper, 
 			   const PMeshInfo& theMeshInfo,
@@ -48,6 +49,7 @@ namespace MED
   //---------------------------------------------------------------
   typedef std::set<PFamilyInfo> TFamilyInfoSet;
 
+  //! Read set of MED FAMILIES for defined MED file
   TFamilyInfoSet
   GetFamilyInfoSet(const PWrapper& theWrapper, 
 		   const PMeshInfo& theMeshInfo);
@@ -64,6 +66,7 @@ namespace MED
   //---------------------------------------------------------------
   typedef std::map<EEntiteMaillage,TFamilyTSizeSet> TEntity2FamilySet;
   
+  //! Split set of MED FAMILIES by corresponding MED ENTITY
   TEntity2FamilySet 
   GetEntity2FamilySet(const PWrapper& theWrapper, 
 		      const TEntity2TGeom2ElemInfo& theEntity2TGeom2ElemInfo,
@@ -73,6 +76,7 @@ namespace MED
   //---------------------------------------------------------------
   typedef std::map<std::string,TFamilyInfoSet> TGroupInfo;
   
+  //! Split the input set of MED FAMILIES by corresponding MED GROUPS
   TGroupInfo
   GetGroupInfo(const TFamilyInfoSet& theFamilyInfoSet);
   
@@ -81,6 +85,7 @@ namespace MED
   typedef std::set<PTimeStampInfo> TTimeStampInfoSet;
   typedef std::map<PFieldInfo,TTimeStampInfoSet> TFieldInfo2TimeStampInfoSet;
 
+  //! Read set of MED TIMESTAMPS groupped by corresponding MED FIELDS
   TFieldInfo2TimeStampInfoSet
   GetFieldInfo2TimeStampInfoSet(const PWrapper& theWrapper, 
 				const PMeshInfo& theMeshInfo,
@@ -90,6 +95,7 @@ namespace MED
   //---------------------------------------------------------------
   typedef std::map<EEntiteMaillage,TFieldInfo2TimeStampInfoSet> TEntite2TFieldInfo2TimeStampInfoSet;
 
+  //! Split the input set of MED TIMESTAMPS by corresponding MED FIELDS and MED ENTITIES
   TEntite2TFieldInfo2TimeStampInfoSet
   GetEntite2TFieldInfo2TimeStampInfoSet(const TFieldInfo2TimeStampInfoSet& theFieldInfo2TimeStampInfoSet);
 
@@ -97,6 +103,7 @@ namespace MED
   //---------------------------------------------------------------
   typedef std::map<TGaussInfo::TKey,PGaussInfo,TGaussInfo::TLess> TKey2Gauss;
 
+  //! Read set of MED GAUSS
   TKey2Gauss
   GetKey2Gauss(const PWrapper& theWrapper, 
 	       TErr* theErr = NULL,
@@ -104,6 +111,7 @@ namespace MED
 
 
   //---------------------------------------------------------------
+  //! Get MED PROFILE by its name
   PProfileInfo
   GetProfileInfo(const PWrapper& theWrapper, 
 		 const std::string& theProfileName,
@@ -114,6 +122,8 @@ namespace MED
   //---------------------------------------------------------------
   typedef std::map<TProfileInfo::TKey,PProfileInfo> TKey2Profile;
   typedef boost::tuple<EModeProfil,TKey2Profile> TMKey2Profile;
+
+  //! Read set of MED PROFILES
   TMKey2Profile
   GetMKey2Profile(const PWrapper& theWrapper, 
 		  TErr* theErr = NULL,

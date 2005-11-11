@@ -37,6 +37,7 @@ namespace MED
   typedef TVector<TCCoordSlice> TCCoordSliceArr;
   typedef TVector<TCoordSlice> TCoordSliceArr;
 
+  //! Define a helper class to handle Gauss Points coordinates
   class TGaussCoord:
     virtual TModeSwitchInfo 
   {
@@ -52,12 +53,15 @@ namespace MED
     
     TGaussCoord();
 
+    //! Get slice of the coordinate that corresponds to defined cell (const version)
     TCCoordSliceArr
     GetCoordSliceArr(TInt theElemId) const;
 
+    //! Get slice of the coordinate that corresponds to defined cell
     TCoordSliceArr 
     GetCoordSliceArr(TInt theElemId);
 
+    //! To init the class
     void
     Init(TInt theNbElem,
 	 TInt theNbGauss,
@@ -76,6 +80,7 @@ namespace MED
 
 
   //---------------------------------------------------------------
+  //! To calculate Gauss Points coordinates
   bool
   GetGaussCoord3D(const TGaussInfo& theGaussInfo, 
 		  const TCellInfo& theCellInfo,
@@ -86,18 +91,23 @@ namespace MED
 
 
   //---------------------------------------------------------------
+  //! To calculate Gauss Points coordinates for defined TCellInfo as its bary center
   bool
   GetBaryCenter(const TCellInfo& theCellInfo,
 		const TNodeInfo& theNodeInfo,
 		TGaussCoord& theGaussCoord,
 		const TElemNum& theElemNum = TElemNum(),
 		EModeSwitch theMode = eFULL_INTERLACE);
+
+  //! To calculate Gauss Points coordinates for defined TPolygoneInfo as its bary center
   bool
   GetBaryCenter(const TPolygoneInfo& thePolygoneInfo,
 		const TNodeInfo& theNodeInfo,
 		TGaussCoord& theGaussCoord,
 		const TElemNum& theElemNum = TElemNum(),
 		EModeSwitch theMode = eFULL_INTERLACE);
+
+  //! To calculate Gauss Points coordinates for defined TPolyedreInfo as its bary center
   bool
   GetBaryCenter(const TPolyedreInfo& thePolyedreInfo,
 		const TNodeInfo& theNodeInfo,

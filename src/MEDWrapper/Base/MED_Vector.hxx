@@ -38,6 +38,7 @@
 namespace MED
 {
 
+  //! Main purpose to introduce the class was to customize operator [] 
   template<typename _Tp, typename _Alloc = std::allocator<_Tp> >
   class TVector : public std::vector<_Tp, _Alloc>
   {
