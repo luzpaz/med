@@ -38,7 +38,7 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_Med.hxx"
 #include "MEDMEM_MedMedDriver.hxx"
-#include "MEDMEM_MedMeshDriver21.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_DriversDef.hxx"
@@ -276,7 +276,7 @@ throw (SALOME::SALOME_Exception)
 
 	MESH * myMesh= new MESH() ;
   	myMesh->setName(meshName);
-  	MED_MESH_RDONLY_DRIVER21 myMeshDriver(fileName,myMesh);
+  	MED_MESH_RDONLY_DRIVER myMeshDriver(fileName,myMesh);
 	try
 	{
   		myMeshDriver.setMeshName(meshName);
@@ -845,7 +845,7 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
       sprintf(aFileName, "%shdf_from_ascii.hdf", aResultPath);
       delete(aResultPath);
     } else aFileName = CORBA::string_dup((aTmpDir + aSaveStudyName + (char*)aLocalPersistentID).ToCString());
-    MED_MESH_RDONLY_DRIVER21 myMeshDriver(aFileName,myMesh);
+    MED_MESH_RDONLY_DRIVER myMeshDriver(aFileName,myMesh);
     try
       {
 	myMeshDriver.setMeshName(aMeshName);
@@ -1052,7 +1052,7 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   char* aFullMeshName = new char[strlen(aMeshName)+1];
   strcpy(aFullMeshName,aMeshName);
   myMesh->setName(aFullMeshName);
-  MED_MESH_RDONLY_DRIVER21 myMeshDriver(aFullName, myMesh);
+  MED_MESH_RDONLY_DRIVER myMeshDriver(aFullName, myMesh);
   try {
     myMeshDriver.setMeshName(aFullMeshName);
     myMeshDriver.open();
