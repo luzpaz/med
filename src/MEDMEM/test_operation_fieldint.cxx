@@ -61,7 +61,7 @@ void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
   int NumberOfComponents = myField->getNumberOfComponents() ;
 
   for (int i=1; i<NumberOf+1; i++) {
-    const int * value = myField->getValueI(MED_FULL_INTERLACE,i) ;
+    const int * value = myField->getRow(i) ;
     for (int j=0; j<NumberOfComponents; j++)
       cout << value[j]<< " ";
     cout<<endl;
@@ -87,7 +87,7 @@ void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
 
 void affiche_valeur_field(const char * intitule, const int taille, const FIELD<int>& f)
 {
-    const int * value=f.getValue(f.getvalue()->getMode());
+    const int * value=f.getValue();
     std::cout << endl << intitule;
     for(int i=0;i<taille;i++)
  	std::cout << setw(3) << value[i] << " ";
@@ -101,7 +101,6 @@ int main (int argc, char ** argv)
 	<< " filename meshname fieldname" << endl << endl;
 	exit(-1);
     }
-
     string filename = argv[1] ;
     string meshname = argv[2] ;
     string fieldname = argv[3];
@@ -114,7 +113,6 @@ int main (int argc, char ** argv)
 	/* read MESH, SUPPORT and FIELD */
 	mySupport = new SUPPORT(myMesh,"Support on all Cells",MED_CELL);
 	myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
-	myField1->setValueType(MED_REEL64);
     }
     catch (MEDEXCEPTION &ex)
     {
@@ -123,7 +121,6 @@ int main (int argc, char ** argv)
 	try 
 	{
 	    myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
-	    myField1->setValueType(MED_INT32);
 	    myField1->setValueIJ(10,1,-9); // pour tester les normes max avec une valeur negative
 	}
 	catch (...) 
@@ -237,7 +234,6 @@ int main (int argc, char ** argv)
     std::cout <<  endl << string(60,'-') << endl << " - f1 :" << endl << endl;
     affiche_fieldT(&myFieldNeg, myFieldNeg.getSupport());
 
-    medModeSwitch mode=myFieldPlus.getvalue()->getMode();
     int size=myFieldPlus.getNumberOfValues()*myFieldPlus.getNumberOfComponents();
   
     std::cout <<  endl << string(60,'-') << endl << "Tests opérations :" << endl << endl;

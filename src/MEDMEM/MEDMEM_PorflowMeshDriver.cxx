@@ -61,7 +61,7 @@ inline static medGeometryElement get2DMedGeomType(int nbSommets);
 
 PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER():
   GENDRIVER(),
-  _ptrMesh(( MESH *)MED_NULL),
+  _ptrMesh(( MESH *) NULL),
   // A VOIR _medIdt(MED_INVALID),
   _meshName("")
 {

@@ -16,7 +16,9 @@ FIELD_::FIELD_():
   _componentsDescriptions((string *)NULL),
   _componentsUnits((UNIT*)NULL),
   _MEDComponentsUnits((string *)NULL),
-  _iterationNumber(-1),_time(0.0),_orderNumber(-1)
+  _iterationNumber(-1),_time(0.0),_orderNumber(-1),
+  _valueType(MED_EN::MED_UNDEFINED_TYPE),
+  _interlacingType(MED_EN::MED_UNDEFINED_INTERLACE)
 {
   MESSAGE("Constructeur FIELD_ sans parametre");
 }
@@ -25,7 +27,9 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
   _isRead(false),
   _name(""), _description(""), _support(Support),
   _numberOfComponents(NumberOfComponents),
-  _iterationNumber(-1),_time(0.0),_orderNumber(-1)
+  _iterationNumber(-1),_time(0.0),_orderNumber(-1),
+  _valueType(MED_EN::MED_UNDEFINED_TYPE),
+  _interlacingType(MED_EN::MED_UNDEFINED_INTERLACE)
 {
   MESSAGE("FIELD_(const SUPPORT * Support, const int NumberOfComponents)");
 
@@ -42,6 +46,49 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
     _support->addReference();
 }
 
+FIELD_& FIELD_::operator=(const FIELD_ &m) {
+
+  if ( this == &m) return *this;
+
+  _isRead             = m._isRead ;
+  _name               = m._name;
+  _description        = m._description;
+  _support            = m._support;   //Cf Opérateur de recopie du Support?
+  _numberOfComponents = m._numberOfComponents;
+  _numberOfValues     = m._numberOfValues;
+
+  if (m._componentsTypes != NULL) {
+    _componentsTypes = new int[m._numberOfComponents] ;
+    memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
+  } else 
+    _componentsTypes = (int *) NULL;
+
+  _componentsNames = new string[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    {_componentsNames[i]=m._componentsNames[i];}
+  _componentsDescriptions = new string[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    {_componentsDescriptions[i]=m._componentsDescriptions[i];}
+  _componentsUnits = new UNIT[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    {_componentsUnits[i] = m._componentsUnits[i];}
+  // L'operateur '=' est defini dans la classe UNIT
+  _MEDComponentsUnits = new string[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    {_MEDComponentsUnits[i] = m._MEDComponentsUnits[i];}
+
+  _iterationNumber = m._iterationNumber;
+  _time            = m._time;
+  _orderNumber     = m._orderNumber;
+
+  // _valueType et _interlacingType doivent uniquement être recopiés 
+  // par l'opérateur de recopie de FIELD<T,...>
+
+  //_drivers = m._drivers ; // PG : Well, same driver, what about m destructor !
+
+  return *this;
+}
+
 FIELD_::FIELD_(const FIELD_ &m)
 {
   _isRead = m._isRead ;
@@ -53,7 +100,9 @@ FIELD_::FIELD_(const FIELD_ &m)
   _numberOfComponents = m._numberOfComponents;
   _numberOfValues = m._numberOfValues;
   copyGlobalInfo(m);
-  _valueType = m._valueType;
+  //_valueType = m._valueType;
+  // _valueType et _interlacingType doivent uniquement être recopiés 
+  // par l'opérateur de recopie de FIELD<T,...>
   //_drivers = m._drivers ; // PG : Well, same driver, what about m destructor !
 }
 
@@ -185,6 +234,10 @@ void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n, bool che
     string diagnosis;
 
     // check-up, fill diagnosis if some incompatibility is found.
+
+    // Ne pas vérifier l'entrelacement
+    // Le compilo s'en occupe Rmq from EF
+
     if(m._support != n._support)
       {
 	if(!(*m._support==*n._support))
@@ -192,6 +245,8 @@ void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n, bool che
       }
     else if(m._numberOfComponents != n._numberOfComponents)
       diagnosis+="They don't have the same number of components!";
+    else if (m._valueType != n._valueType)
+      diagnosis+="They don't have the same type!";
     else if(m._numberOfValues != n._numberOfValues)
       diagnosis+="They don't have the same number of values!";
     else
@@ -235,12 +290,18 @@ void FIELD_::_deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n , boo
 {
   string diagnosis;
 
-    // check-up, fill diagnosis if some incompatibility is found.
+  // check-up, fill diagnosis if some incompatibility is found.
+
+  // Ne pas vérifier l'entrelacement
+  // Le compilo s'en occupe Rmq from EF
+
     if(m._support != n._support)
       {
 	if(!(m._support->deepCompare(*n._support)))
 	  diagnosis+="They don't have the same support!";
       }
+    else if (m._valueType != n._valueType)
+      diagnosis+="They don't have the same type!";
     else if(m._numberOfComponents != n._numberOfComponents)
       diagnosis+="They don't have the same number of components!";
     else if(m._numberOfValues != n._numberOfValues)

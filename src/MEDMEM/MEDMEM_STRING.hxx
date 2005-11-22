@@ -4,7 +4,7 @@
 using namespace std;
 
 # include <string>
-# include <strstream>
+# include <sstream>
 
 /*!
  A class to generate string from any type:
@@ -15,57 +15,44 @@ using namespace std;
       throw SALOME_EXCEPTION (LOCALIZED(msgErr)) ;
 								*/
 namespace MEDMEM {
-class STRING : public string
-{
+  class STRING : public string
+  {
 
-private :
-  ostrstream _s ;
+  private :
+    ostringstream _s ;
 
-public :
+  public :
   
-  STRING() :string(), _s() 
-   {
-   }
+    STRING() :string(), _s() 
+    {
+    }
 
-  ~STRING()
-   {
-	_s.freeze(false);
-   }
+    ~STRING()
+    {
+    }
 
-  operator const char * () const 
-   {     
-        return const_cast <const char *> (this->c_str()) ;
-   }
+    operator const char * () const 
+    {
+      // return const_cast <const char *> (this->c_str()) ;
+      return this->c_str();
+    }
 
-   template <class T> STRING( const T &valeur ) : string(), _s() 
-   {
-    	_s.freeze(false);
+    template <class T> STRING( const T &valeur ) : string(), _s() 
+    {
+      _s << valeur ;
 
-    	_s << valeur ;
-        _s << ends;
+      this->string::operator =( _s.str());
+    }
 
-    	this->string::operator =( _s.str());  // freeze is true by now
-   }
+    template <class T> STRING & operator<<( const T &valeur )
+    {
+      _s << valeur ;
 
-   template <class T> STRING & operator<<( const T &valeur )
-   {
-  
-        if ( _s.pcount() )
-        {
-                _s.seekp(-1, ios::cur); // Back up before NULL
-                _s.rdbuf()->freeze(0); // Unfreeze it
-        }
+      this->string::operator = ( _s.str() ) ;  // freeze is true by now
 
-        _s << valeur ;
-        _s << ends;
-
-        this->string::operator = ( _s.str() ) ;  // freeze is true by now
-        _s.freeze( false ) ;
-        return *this ;
-
-
-   }
-} ;
+      return *this ;
+    }
+  } ;
 } ;
 
 # endif

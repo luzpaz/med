@@ -16,6 +16,8 @@
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_DriverTools.hxx"
 
+class MEDMEM::FIELD_;
+
 #include <stdio.h>
 #include <fcntl.h>
 #ifdef WNT
@@ -451,7 +453,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           // (2)       0       1
           // (3) FX   FY   FZ   FZ   FX   FY   FLX 
           // (4)       0       0       0       0       0       0       0
-          // (5)           créé  par  muc pri                                                   
+          // (5)           cré©  par  muc pri                                                   
           // (6)                    
           // (7)       2
 
@@ -754,7 +756,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
 GIBI_MESH_DRIVER::GIBI_MESH_DRIVER():
        GENDRIVER(),
-       _ptrMesh(( MESH *)MED_NULL),
+       _ptrMesh(( MESH *) NULL),
        // A VOIR _medIdt(MED_INVALID),
        _meshName("")
 {
@@ -1013,6 +1015,7 @@ string GIBI_MESH_RDONLY_DRIVER::getName() const
 void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 {
   const char * LOC = "_GIBI_RDONLY_DRIVER::read() : " ;
+  BEGIN_OF(LOC);
 
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The _idt of file " << _fileName << " is : "
@@ -1034,7 +1037,7 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
   {
     INFOS( ex.what() );
   }
-
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -2349,17 +2352,23 @@ GENDRIVER * GIBI_MED_WRONLY_DRIVER::copy ( void ) const
 //purpose  :
 //=======================================================================
 
-template< class T >
-  static void writeDataSection (fstream& file,
-                                FIELD_*  field,
-                                int      id1,
-                                int      id2)
+template< class T, class INTERLACING_TAG>
+static void writeDataSection (fstream& file,
+			      FIELD<T, INTERLACING_TAG> *  field,
+			      int      id1,
+			      int      id2) throw (MEDEXCEPTION)
 {
-  FIELD<T>* f = dynamic_cast<FIELD<T>*>( field );
-  if (!f) return;
-  MEDARRAY<T>* array = f->getvalue();
-  int ld = array->getLeadingValue();
+  const char * LOC="writeDataSection (.....) :";
+  BEGIN_OF(LOC);
+
+  int ld = field->getNumberOfComponents();
+
+//   FIELD<T>* f = dynamic_cast<FIELD<T>*>( field );
+//   if (!f) return;
+//   MEDARRAY<T>* array = f->getvalue();
+//   int ld = array->getLeadingValue();
   //SCRUTE( array->getLengthValue() );
+
   for ( int iComp = 0; iComp < ld; ++iComp )
   {
     file << setw(8) << 1          // nb scalar values by element
@@ -2371,10 +2380,11 @@ template< class T >
     while ( id < id2 )
     {
       for ( int i = 0; id < id2 && i < 3; ++i )
-        file << setw(22) << array->getIJ( id++, iComp + 1);
+        file << setw(22) << field->getValueIJ( id++, iComp + 1);
       file << endl;
     }
   }
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -2410,7 +2420,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
     for ( ; fIt != dtit.end(); fIt++ )
     {
       FIELD_ * f = _med->getField( names[ iField ], fIt->dt, fIt->it );
-      if ( !dynamic_cast< FIELD<double >* >( f ))
+      if ( f->getValueType() != MED_EN::MED_INT32 )
       {
         MESSAGE("GIBI_MED_WRONLY_DRIVER::write( FIELD< int > ) not implemented");
         continue;
@@ -2522,7 +2532,15 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
 
         // Data section
         int id2 = id1 + idsize->second;
-        writeDataSection<double>( gibi, f, id1, id2 );
+
+	if  (f->getGaussPresence() )
+	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " GibiDriver don't support Field with Gauss point" ));
+	
+	if ( f->getInterlacingType() == MED_NO_INTERLACE )
+	  writeDataSection( gibi, dynamic_cast<FIELD<double,NoInterlace>*>(f), id1, id2 );
+	else
+	  writeDataSection( gibi, dynamic_cast< FIELD<double,FullInterlace> * >(f), id1, id2 );
+
         id1 = id2;
       }
     } // loop on fields

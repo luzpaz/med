@@ -772,10 +772,10 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
   const char * LOC = "MED_MESH_RDONLY_DRIVER22::getNodalConnectivity : " ;
   BEGIN_OF(LOC);
 
-  int spaceDimension = _ptrMesh->_spaceDimension;
-
   if (_status==MED_OPENED)
     {
+      int spaceDimension = _ptrMesh->_spaceDimension;
+
       // Get the type of entity to work on (previously set in the Connectivity Object)
       med_2_2::med_entite_maillage Entity = (med_2_2::med_entite_maillage) Connectivity->getEntity();
       

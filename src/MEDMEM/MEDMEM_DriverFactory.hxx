@@ -5,12 +5,13 @@
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_define.hxx"
 
+#include "MEDMEM_FieldForward.hxx"
+
 #include <string>
 
 namespace MEDMEM {
 
   class MESH;
-  template<class T> class FIELD;
   class MED;
   class GENDRIVER;
 
@@ -31,10 +32,11 @@ namespace MEDMEM {
 				   const std::string & fileName,
 				   MESH *mesh,const string &  driverName,
 				   MED_EN::med_mode_acces access);
-    template<class T>
+
+    template<class T, class INTERLACING_TAG>
     GENDRIVER * buildDriverForField(driverTypes driverType,
 				    const std::string & fileName,
-				    FIELD<T> *fielde,
+				    FIELD<T,INTERLACING_TAG> *fielde,
 				    MED_EN::med_mode_acces access);
     GENDRIVER * buildDriverForMed(driverTypes driverType,
 				  const std::string & fileName,
@@ -46,18 +48,18 @@ namespace MEDMEM {
     GENDRIVER * buildMeshDriverFromFile(const string & fileName,
 					MESH * ptrMesh,
 					MED_EN::med_mode_acces access);
-    template<class T>
+    template<class T, class INTERLACING_TAG>
     GENDRIVER * buildFieldDriverFromFile(const string & fileName,
-					 FIELD<T> * ptrField,
+					 FIELD<T,INTERLACING_TAG> * ptrField,
 					 MED_EN::med_mode_acces access);
     GENDRIVER * buildConcreteMedDriverForMesh(const std::string & fileName,
 					      MESH *mesh,
 					      const string & driverName,
 					      MED_EN::med_mode_acces access,
 					      MED_EN::medFileVersion version);
-    template<class T>
+    template<class T, class INTERLACING_TAG>
     GENDRIVER * buildConcreteMedDriverForField(const std::string & fileName,
-					       FIELD<T> *fielde,
+					       FIELD<T,INTERLACING_TAG> *fielde,
 					       MED_EN::med_mode_acces access,
 					       MED_EN::medFileVersion version);
   }
@@ -70,10 +72,10 @@ namespace MEDMEM {
 #include "MEDMEM_AsciiFieldDriver.hxx"
 
 namespace MEDMEM {
-  template<class T>
+  template<class T, class INTERLACING_TAG>
   GENDRIVER * DRIVERFACTORY::buildDriverForField(driverTypes driverType,
 						 const std::string & fileName,
-						 FIELD<T> *field,
+						 FIELD<T,INTERLACING_TAG> *field,
 						 MED_EN::med_mode_acces access)
   {
     GENDRIVER *ret;
@@ -154,9 +156,9 @@ namespace MEDMEM {
     return ret;
   }
 
-  template<class T>
+  template<class T, class INTERLACING_TAG>
   GENDRIVER * DRIVERFACTORY::buildFieldDriverFromFile(const string & fileName,
-						      FIELD<T> * ptrField,
+						      FIELD<T,INTERLACING_TAG> * ptrField,
 						      MED_EN::med_mode_acces access)
   {
     MED_EN::medFileVersion version;
@@ -202,9 +204,9 @@ namespace MEDMEM {
       }
   }
 
-  template<class T>
+  template<class T, class INTERLACING_TAG>
   GENDRIVER * DRIVERFACTORY::buildConcreteMedDriverForField(const std::string & fileName,
-							    FIELD<T> *ptrField,
+							    FIELD<T,INTERLACING_TAG> *ptrField,
 							    MED_EN::med_mode_acces access,
 							    MED_EN::medFileVersion version)
   {

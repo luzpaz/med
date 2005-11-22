@@ -16,6 +16,7 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
+#include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_RCBase.hxx"
 
 /*!
@@ -28,7 +29,6 @@
 */
 
 namespace MEDMEM {
-class MESH ;
 
 class SUPPORT : public RCBASE
 {
@@ -39,6 +39,14 @@ protected:
     \endif
   */
   string                   _name;
+
+ /*!
+    \if developper
+    Name of the associated mesh if the _mesh pointer
+    is NULL.
+    \endif
+  */
+  mutable string                   _meshName;
 
   /*!
     \if developper
@@ -74,7 +82,7 @@ protected:
     Array of all geometric type defined in the support.
     \endif
   */
-  MED_EN::medGeometryElement *     _geometricType;
+  PointerOf<MED_EN::medGeometryElement>     _geometricType;
 
   /*!
     \if developper
@@ -83,17 +91,7 @@ protected:
     (not yet implemented).
     \endif
   */
-  mutable int *                    _numberOfGaussPoint ;
-
-   /*
-    \if developper
-    Array of size _numberOfGeometricType
-    which contains number of geometric
-    entity type in Mesh
-    (to get corresponding CellModel).
-    \endif
-  */
-  //int *                    _geometricTypeNumber;
+  mutable PointerOf<int>                    _numberOfGaussPoint ;
 
   /*!
     \if developper
@@ -108,7 +106,7 @@ protected:
     for each geometric type, the number of elements of this type.
     \endif
   */
-  int *                    _numberOfElements;
+  PointerOf<int>                    _numberOfElements;
 
   /*!
     \if developper
@@ -144,6 +142,7 @@ public:
   inline void setName(string Name);
   inline void setDescription(string Description);
   void setMesh(MESH *Mesh);
+  inline void setMeshName(const string & meshName);
   inline void setAll(bool All);
   inline void setEntity(MED_EN::medEntityMesh Entity);
   inline void setNumberOfGeometricType(int NumberOfGeometricType);
@@ -157,6 +156,7 @@ public:
   inline string getName() const;
   inline string getDescription() const;
   virtual inline MESH * getMesh() const;
+  inline string getMeshName() const;
   inline MED_EN::medEntityMesh getEntity() const;
 
   inline bool   isOnAllElements() const;
@@ -165,9 +165,14 @@ public:
   inline const int *  getNumberOfGaussPoint() const throw (MEDEXCEPTION);
   inline int          getNumberOfGaussPoint(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
   inline int    getNumberOfElements(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+  inline  const int * getNumberOfElements() const throw (MEDEXCEPTION);
+  // rename getnumber -> getGlobalNumberSky()
   virtual inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
+  // rename getNumber -> getGlobalNumberPtr()
   virtual inline const int *  getNumber(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+  // rename in getGlobalNumberInd()
   virtual inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
+  virtual int getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION);
 
   void blending(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
 
@@ -222,6 +227,11 @@ inline int SUPPORT::getNumberOfElements(MED_EN::medGeometryElement GeometricType
       return _numberOfElements[i];
   throw MEDEXCEPTION("Support::getNumberOfElements : Geometric type not found !") ;
 }
+//-----------------------------------------------------------------------------
+inline  const int * SUPPORT::getNumberOfElements() const throw (MEDEXCEPTION) {
+//-----------------------------------------------------------------------------
+  return _numberOfElements;
+}
 
 //---------------------------------------------------------------------
 inline MEDSKYLINEARRAY * SUPPORT::getnumber() const
@@ -249,14 +259,15 @@ inline const int * SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) 
   throw (MEDEXCEPTION)
 //---------------------------------------------------------------------
 {
+  const char * LOC = "Support::getNumber : " ;
   if (_isOnAllElts)
-    throw MEDEXCEPTION("Support::getNumber : Not defined, support is on all entity !") ;
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined, support is on all entity !")) ;
   if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
     return _number->getValue() ;
   for (int i=0;i<_numberOfGeometricType;i++)
     if (_geometricType[i]==GeometricType)
       return _number->getI(i+1) ;
-  throw MEDEXCEPTION("Support::getNumber : GeometricType not found !") ;
+  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"GeometricType not found !")) ;
 }
 
 /*!
@@ -305,7 +316,7 @@ inline int SUPPORT::getNumberOfGaussPoint(MED_EN::medGeometryElement geomElement
 	return _numberOfGaussPoint[i] ;
     throw MEDEXCEPTION("Support::getGlobalNumber : GeometricType not found !") ;
   } else
-    throw MEDEXCEPTION("Support::getNumberOfGaussPoint : Not defined !") ;
+    return 1;
 }
 
 /*! set the attribute _name to Name */
@@ -322,6 +333,20 @@ inline void SUPPORT::setDescription(string Description)
 //--------------------------------------------------
 {
   _description=Description;
+}
+
+
+/*! set the meshName if there is ni reference _mesh to Mesh */
+//--------------------------------------
+inline void SUPPORT::setMeshName(const string & meshName)
+//--------------------------------------
+{
+  const char * LOC = "SUPPORT::setMeshName(const string & meshName) : ";
+
+  if (_mesh)
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Setting meshName is not possible when an associated mesh is set !")) ;
+
+  _meshName=meshName;
 }
 
 /*! set the attribute _isOnAllElts to All */
@@ -345,18 +370,10 @@ inline void SUPPORT::setNumberOfGeometricType(int NumberOfGeometricType)
 //---------------------------------------------------------------------
 {
   _numberOfGeometricType=NumberOfGeometricType;
-  if (_geometricType!=NULL) {
-    delete[] _geometricType ;
-    _geometricType = NULL ;
-  }
-  if (_numberOfElements!=NULL) {
-    delete[] _numberOfElements ;
-    _numberOfElements = NULL ;
-  }
-  if (_numberOfGaussPoint!=NULL) {
-    delete[] _numberOfGaussPoint ;
-    _numberOfGaussPoint = NULL ;
-  }
+
+  _geometricType.set(0);
+  _numberOfElements.set(0);
+  _numberOfGaussPoint.set(0) ;
 }
 
 /*! set the attribute _geometricType to geometricType */
@@ -365,7 +382,7 @@ inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *Geometri
 //---------------------------------------------------------------------
 {
   if (NULL == _geometricType)
-    _geometricType=new MED_EN::medGeometryElement[_numberOfGeometricType];
+    _geometricType.set(_numberOfGeometricType);
   for (int i=0;i<_numberOfGeometricType;i++)
     _geometricType[i] = GeometricType[i];
 }
@@ -390,8 +407,7 @@ inline void SUPPORT::setNumberOfElements(const int *NumberOfElements)
 //----------------------------------------------------------
 {
   if (NULL == _numberOfElements)
-    _numberOfElements=new int[_numberOfGeometricType];
-  memcpy(_numberOfElements,NumberOfElements,sizeof(int)*_numberOfGeometricType);
+    _numberOfElements.set(_numberOfGeometricType,NumberOfElements);
   _totalNumberOfElements = 0 ;
   for (int i=0;i<_numberOfGeometricType;i++)
     _totalNumberOfElements+=_numberOfElements[i];
@@ -446,6 +462,17 @@ inline MESH * SUPPORT::getMesh() const
 //------------------------------------
 {
   return _mesh;
+}
+
+/*! returns the mesh name  */
+//------------------------------------
+inline string SUPPORT::getMeshName() const
+//------------------------------------
+{
+  if (_mesh)
+    return _mesh->getName();
+  else
+    return _meshName;
 }
 
 /*!

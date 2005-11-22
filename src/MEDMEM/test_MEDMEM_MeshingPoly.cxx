@@ -141,7 +141,7 @@ int main (int argc, char ** argv) {
   myPolygonMeshing.setPolygonsConnectivity(REFpolygonIndex, REFpolygonFaces, 2, MED_CELL);
   SUPPORT *sup2 = new SUPPORT(&myPolygonMeshing);
   FIELD<double> *areas = myPolygonMeshing.getArea(sup2);
-  const double *vals2 = areas->getValue(MED_FULL_INTERLACE);
+  const double *vals2 = areas->getValue();
   const double REFAreaOfPolyg[4] ={1.5, 2, 6, 6.5};
   int nbPts=0;
   int i;
@@ -153,7 +153,7 @@ int main (int argc, char ** argv) {
 
   SUPPORT *sup = new SUPPORT(&myMeshing);
   FIELD<double> *vols = myMeshing.getVolume(sup);
-  const double *vals = vols->getValue(MED_FULL_INTERLACE);
+  const double *vals = vols->getValue();
   const double REFVolOfPolyHedron[3] = {2.333333333333333, 11.66666666666666, 13.83224131414673};
   for(i=0;i<3;i++)
     if(fabs(REFVolOfPolyHedron[i]-vals[i])<1e-12)

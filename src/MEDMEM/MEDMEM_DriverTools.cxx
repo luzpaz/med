@@ -3,6 +3,7 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Group.hxx"
+#include "MEDMEM_Field.hxx"
 #include <iomanip>
 #include <algorithm>
 

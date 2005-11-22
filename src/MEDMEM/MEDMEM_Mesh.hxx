@@ -14,6 +14,7 @@
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_RCBase.hxx"
+#include "MEDMEM_FieldForward.hxx"
 
 /*! This class contains all the informations related with a MESH :
   - COORDINATES
@@ -29,8 +30,6 @@
 */
 
 namespace MEDMEM {
-
-template <class T> class FIELD;
 
 class CELLMODEL;
 class FAMILY;

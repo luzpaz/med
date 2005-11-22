@@ -185,7 +185,7 @@ public :
 		{
 		nbr_valeurs=medfield->getNumberOfValues();
 		nbr_composantes=medfield->getNumberOfComponents();
-		valeurs=const_cast<double *>(medfield->getValue(MED_EN::MED_FULL_INTERLACE));
+		valeurs=const_cast<double *>(medfield->getValue());
 		}
 	~Wrapper_MED_Field(){}
 	inline Valeur<double> operator[](int i) 
