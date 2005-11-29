@@ -1412,7 +1412,11 @@ namespace MED
       
       theGeom2Size.clear();
       TInt aNbTimeStamps = 0;
+      TIdt anId = myFile->Id();
+
       MED::TFieldInfo& anInfo = const_cast<MED::TFieldInfo&>(theInfo);
+      MED::TMeshInfo& aMeshInfo = anInfo.myMeshInfo;
+
       TEntityInfo::const_iterator anIter = theEntityInfo.begin();
       for(; anIter != theEntityInfo.end(); anIter++){
 	med_entite_maillage anEntity = med_entite_maillage(anIter->first);
@@ -1420,14 +1424,45 @@ namespace MED
 	TGeom2Size::const_iterator anGeomIter = aGeom2Size.begin();
 	for(; anGeomIter != aGeom2Size.end(); anGeomIter++){
 	  med_geometrie_element aGeom = med_geometrie_element(anGeomIter->first);
-	  TInt aTmp = MEDnPasdetemps(myFile->Id(),&anInfo.myName[0],anEntity,aGeom);
-	  aNbTimeStamps = max(aTmp,aNbTimeStamps);
-	  if (aNbTimeStamps<1)
-	    continue;
-	  INITMSG(MYDEBUG,"GetNbTimeStamps aNbTimeStamps = "<<aTmp<<"; aGeom = "<<aGeom<<"; anEntity = "<<anEntity<<"\n");
-	  if(aTmp){
-	    theEntity = EEntiteMaillage(anEntity);
-	    theGeom2Size[EGeometrieElement(aGeom)] = anGeomIter->second;
+	  TInt aNbStamps = MEDnPasdetemps(anId,
+					  &anInfo.myName[0],
+					  anEntity,
+					  aGeom);
+	  if(aNbStamps > 0){
+	    INITMSG(MYDEBUG,
+		    "GetNbTimeStamps aNbTimeStamps = "<<aNbStamps<<
+			"; aGeom = "<<aGeom<<"; anEntity = "<<anEntity<<"\n");
+	    for(TInt iTimeStamp = 1; iTimeStamp <= aNbStamps; iTimeStamp++){
+	      char aMaillageChamp[GetNOMLength<eV2_2>()+1];
+	      char aDtUnit[GetPNOMLength<eV2_2>()+1];
+	      med_int aNbGauss;
+	      med_int aNumDt;
+	      med_int aNumOrd;
+	      med_float aDt;
+	      med_booleen anIsLocal;
+	      med_int aNbRef;
+	      TErr aRet = MEDpasdetempsInfo(anId,
+					    &anInfo.myName[0],
+					    anEntity,
+					    aGeom,
+					    iTimeStamp, 
+					    &aNbGauss,
+					    &aNumDt,  
+					    &aNumOrd,
+					    aDtUnit, 
+					    &aDt, 
+					    aMaillageChamp,
+					    &anIsLocal,
+					    &aNbRef);
+	      INITMSG(MYDEBUG,
+		      "GetNbTimeStamps aMaillageChamp = '"<<aMaillageChamp<<"'"<<
+		      "; aMeshName = '"<<&aMeshInfo.myName[0]<<"'\n");
+	      if(aRet == 0 && (! strcmp(aMaillageChamp,&aMeshInfo.myName[0]))){
+		theGeom2Size[EGeometrieElement(aGeom)] = anGeomIter->second;
+		theEntity = EEntiteMaillage(anEntity);
+		aNbTimeStamps = aNbStamps;
+	      }
+	    }
 	  }
 	}
 	if(!theGeom2Size.empty()) 

@@ -35,13 +35,20 @@
 namespace MED
 {
   //---------------------------------------------------------------
+  //! This class intends to provide an uniform way to handle multy-dimention data (const version)
+  /*! 
+    It just contains pointer to real sequence and implement proper calcultion of its indexes.
+    This class deal with constant pointer to the sources data and provide const method to
+    read the them (data).
+   */
   template<class TContainer> 
   class TCSlice
   {
     typedef const TContainer* PCContainer;
-    PCContainer myCContainer;
-    std::slice mySlice;
+    PCContainer myCContainer; //!< Reference to source multy-dimension data
+    std::slice mySlice; //!< Defines algorithm of index calculation
   protected:
+    //! Calculate internal index to get proper element from the source multy-dimension data
     size_t
     GetID(size_t theId) const
     {
@@ -62,22 +69,26 @@ namespace MED
   public:
     typedef typename TContainer::value_type value_type;
 
+    //! Construct the class
     TCSlice(const TContainer& theContainer,
 	    const std::slice& theSlice): 
       myCContainer(&theContainer),
       mySlice(theSlice)
     {}
     
+    //! Default constructor (dangerous)
     TCSlice():
       myCContainer(NULL)
     {}
 
+    //! Get element by its number (const version)
     const value_type& 
     operator[](size_t theId) const
     {
       return (*myCContainer)[GetID(theId)];
     }
     
+    //! Get range of the order numbers
     size_t
     size() const
     {
@@ -87,6 +98,7 @@ namespace MED
   
 
   //---------------------------------------------------------------
+  //! This class extend TCSlice functionality for non-constant case
   template<class TContainer> 
   class TSlice: public TCSlice<TContainer>
   {
@@ -97,6 +109,7 @@ namespace MED
     typedef typename TContainer::value_type value_type;
     typedef TCSlice<TContainer> TSupperClass;
 
+    //! Construct the class
     TSlice(TContainer& theContainer,
 	   const std::slice& theSlice): 
       TSupperClass(theContainer,theSlice),
@@ -104,10 +117,12 @@ namespace MED
     {
     }
     
+    //! Default constructor (dangerous)
     TSlice():
       myContainer(NULL)
     {}
 
+    //! Get element by its number
     value_type& 
     operator[](size_t theId)
     {

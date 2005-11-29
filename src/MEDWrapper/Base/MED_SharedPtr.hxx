@@ -34,21 +34,31 @@
 namespace MED
 {
 
+  //! To extend the boost::shared_ptr to support such features automatic dynamic cast
+  /*!
+    All entities of the MEDWrapper package are handled as pointer.
+    This class was introduced to provide correct and flexible memory management 
+    for all of the MEDWrapper objects.
+  */
   template<class T> class SharedPtr: public boost::shared_ptr<T>
   {
   public:
+    //! Default constructor
     SharedPtr() {}
 
+    //! Construct the class by any type of a pointer
     template<class Y>
     explicit SharedPtr(Y * p): 
       boost::shared_ptr<T>(p) 
     {}
 
+    //! Construct the class by any specialisation of the class
     template<class Y>
     SharedPtr(SharedPtr<Y> const & r):
       boost::shared_ptr<T>(r,boost::detail::dynamic_cast_tag())
     {}
 
+    //! Copy-constructor
     template<class Y>
     SharedPtr& 
     operator=(SharedPtr<Y> const & r)
@@ -57,6 +67,7 @@ namespace MED
       return *this;
     }
 
+    //! Introduce a flexible way to reset the wrapped pointer
     template<class Y> 
     SharedPtr& 
     operator()(Y * p) // Y must be complete
@@ -64,6 +75,7 @@ namespace MED
       return operator=<Y>(SharedPtr<Y>(p));
     }
 
+    //! Introduce a flexible way to reset the wrapped pointer
     template<class Y> 
     SharedPtr& 
     operator()(SharedPtr<Y> const & r) // Y must be complete
@@ -71,11 +83,13 @@ namespace MED
       return operator=<Y>(SharedPtr<Y>(r));
     }
 
+    //! To provide a flexible way to use reference to the wrapped pointer (const version)
     operator const T& () const 
     { 
       return *(this->get());
     }
 
+    //! To provide a flexible way to use reference to the wrapped pointer
     operator T& () 
     { 
       return *(this->get());
