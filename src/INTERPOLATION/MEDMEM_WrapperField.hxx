@@ -46,6 +46,26 @@ template <typename Left,typename Op, typename Right> struct X
 		}
 };
 
+template <class TYPE> class Valeur
+{
+protected :
+	TYPE * valeurs;
+	int nbr_valeurs;
+	int a_detruire;
+public :
+	Valeur();
+	Valeur(TYPE * val,int nv);
+	Valeur(int n);
+	template <typename Left,typename Op,typename Right> Valeur(X<Left,Op,Right> expression);
+	template <typename Left,typename Op,typename Right> void operator=(X<Left,Op,Right> expression);
+	void operator=(Valeur v);
+	Valeur(const Valeur &v);
+	~Valeur();
+	TYPE operator[](int i);
+	int SIZE() const;
+	double NormeAbs();
+};
+
 template <typename Right> struct X<double,Multiply,Right>
 {
 	double left;
@@ -102,57 +122,48 @@ return X< double,Multiply,X<Left,Op,Right> >(((double) 1/x),l);
 // Valeur est symboliquement l'argument d'une classe formelle Vecteur<Valeur>
 // elle peut etre un réel ou un pointeur sur réel, simulant un vecteur de vecteur
 
-template <class TYPE> class Valeur
+template <class TYPE> Valeur<TYPE>::Valeur():valeurs(NULL),a_detruire(0){}
+template <class TYPE> Valeur<TYPE>::Valeur(TYPE * val,int nv):valeurs(val),nbr_valeurs(nv),a_detruire(0){} // A VERIFIER
+template <class TYPE> Valeur<TYPE>::Valeur(int n):nbr_valeurs(n),a_detruire(1)
 {
-protected :
-	TYPE * valeurs;
-	int nbr_valeurs;
-	int a_detruire;
-public :
-	Valeur():valeurs(NULL),a_detruire(0){}
-	Valeur(TYPE * val,int nv):valeurs(val),nbr_valeurs(nv),a_detruire(0){} // A VERIFIER
-	Valeur(int n):nbr_valeurs(n),a_detruire(1)
-		{
-		valeurs=new TYPE[nbr_valeurs];
-		}
-	template <typename Left,typename Op,typename Right> Valeur(X<Left,Op,Right> expression)
-		{
-		for (int i=0;i<nbr_valeurs;i++) valeurs[i]=expression[i];
-		}
-	template <typename Left,typename Op,typename Right> void operator=(X<Left,Op,Right> expression)
-		{
-		for (int i=0;i<nbr_valeurs;i++) valeurs[i]=expression[i];
-		}
-	void operator=(Valeur v)
-		{
-		for (int i=0;i<nbr_valeurs;i++) valeurs[i]=v[i];
-		}
-	Valeur(const Valeur &v):nbr_valeurs(v.nbr_valeurs)
-		{
-		if (v.a_detruire) 
-			{
-		      	a_detruire=1;
-		      	valeurs=new TYPE[nbr_valeurs];
-		      	for (int i=0;i<nbr_valeurs;i++) valeurs[i]=v.valeurs[i];
-		      	}
-		else
-		      	{
-		      	a_detruire=0;
-		      	valeurs=v.valeurs;
-		      	}
-		}
-	~Valeur(){if (a_detruire) delete [] valeurs;}
-	TYPE operator[](int i){return valeurs[i];}
-	int SIZE() const {return nbr_valeurs;}
-	double NormeAbs()
-		{
-		int i;
-		double tmp=0;
-		for (i=0;i<nbr_valeurs;i++) tmp+=fabs(valeurs[i]);
-		return tmp;
-		}
-
-};
+  valeurs=new TYPE[nbr_valeurs];
+}
+template <class TYPE> template <typename Left,typename Op,typename Right> Valeur<TYPE>::Valeur(X<Left,Op,Right> expression)
+{
+  for (int i=0;i<nbr_valeurs;i++) valeurs[i]=expression[i];
+}
+template <class TYPE> template <typename Left,typename Op,typename Right> void Valeur<TYPE>::operator=(X<Left,Op,Right> expression)
+{
+  for (int i=0;i<nbr_valeurs;i++) valeurs[i]=expression[i];
+}
+template <class TYPE> void Valeur<TYPE>::operator=(Valeur v)
+{
+  for (int i=0;i<nbr_valeurs;i++) valeurs[i]=v[i];
+}
+template <class TYPE> Valeur<TYPE>::Valeur(const Valeur &v):nbr_valeurs(v.nbr_valeurs)
+{
+  if (v.a_detruire) 
+    {
+      a_detruire=1;
+      valeurs=new TYPE[nbr_valeurs];
+      for (int i=0;i<nbr_valeurs;i++) valeurs[i]=v.valeurs[i];
+    }
+  else
+    {
+      a_detruire=0;
+      valeurs=v.valeurs;
+    }
+}
+template <class TYPE> Valeur<TYPE>::~Valeur(){if (a_detruire) delete [] valeurs;}
+template <class TYPE> TYPE Valeur<TYPE>::operator[](int i){return valeurs[i];}
+template <class TYPE> int Valeur<TYPE>::SIZE() const {return nbr_valeurs;}
+template <class TYPE> double Valeur<TYPE>::NormeAbs()
+{
+  int i;
+  double tmp=0;
+  for (i=0;i<nbr_valeurs;i++) tmp+=fabs(valeurs[i]);
+  return tmp;
+}
 
 template <class TYPE> ostream &operator<<(ostream &os,Valeur<TYPE> v)
 	{	
