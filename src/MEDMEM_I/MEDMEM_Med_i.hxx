@@ -56,6 +56,9 @@ public:
 		  const char * medObjName)
     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
+  void updateSupportIORs(SALOMEDS::Study_ptr myStudy, const char* meshName);
+
+
     // IDL Methods 
     CORBA::Long 	    getNumberOfMeshes() throw (SALOME::SALOME_Exception);
     CORBA::Long 	    getNumberOfFields() throw (SALOME::SALOME_Exception);

@@ -99,6 +99,8 @@ Med_Gen_i:: Med_Gen_i(CORBA::ORB_ptr orb,
   _NS = SINGLETON_<SALOME_NamingService>::Instance() ;
   ASSERT(SINGLETON_<SALOME_NamingService>::IsAlreadyExisting()) ;
   _NS->init_orb( _orb ) ;
+
+  _myMedI = 0;
 }
 //=============================================================================
 /*!
@@ -478,7 +480,7 @@ throw (SALOME::SALOME_Exception)
 	 }
 	}
 
-
+        return SALOME_MED::FIELD::_nil();
 }
 
 
@@ -530,6 +532,13 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
 	  aName += myMesh->getName();
 	  aName += ".med";
 	  MESSAGE("Save mesh with name "<<aName.ToCString());
+          // Remove existing file
+          if (isMultiFile) {
+            aSeq->length(1);
+            aSeq[0]=CORBA::string_dup( aName.ToCString() );
+            SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.ToCString(), aSeq.in(), true);
+            aSeq->length(0);
+          }
 	  long driverId = myMesh->addDriver(SALOME_MED::MED_DRIVER,(aTmpDir+aName).ToCString(),myMesh->getName());
 	  myMesh->write(driverId,"");
 	  aFileNames.Append(aName);
@@ -537,6 +546,10 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
       }
     }
   }
+
+  // temporary: until info that mesh is distant is written
+  MED_EN::medFileVersion curVersion = DRIVERFACTORY::getMedFileVersionForWriting();
+  DRIVERFACTORY::setMedFileVersionForWriting( MED_EN::V21 );
 
   SALOMEDS::SObject_var aMedFieldFather = theComponent->GetStudy()->FindObject("MEDFIELD");
   if (!CORBA::is_nil(aMedFieldFather)) {
@@ -561,7 +574,14 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
 	  aName += "_ITER_";
 	  aName += (char*)(b.str().c_str());
 	  aName += ".med";
-	  MESSAGE("Save mesh with name "<<aName.ToCString());
+          // Remove existing file
+          if (isMultiFile) {
+            aSeq->length(1);
+            aSeq[0]=CORBA::string_dup( aName.ToCString() );
+            SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.ToCString(), aSeq.in(), true);
+            aSeq->length(0);
+          }
+	  MESSAGE("Save field with name "<<aName.ToCString());
 	  long driverId = myField->addDriver(SALOME_MED::MED_DRIVER,(aTmpDir+aName).ToCString(),myField->getName());
 	  myField->write(driverId,"");
 	  aFileNames.Append(aName);
@@ -569,10 +589,12 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
       }
     }
   }
+  DRIVERFACTORY::setMedFileVersionForWriting( curVersion );
 
   int i;
   aSeq->length(aFileNames.Length());
-  for(i = aFileNames.Length(); i > 0; i--) aSeq[i-1] = CORBA::string_dup(aFileNames.Value(i).ToCString());
+  for(i = aFileNames.Length(); i > 0; i--)
+    aSeq[i-1] = CORBA::string_dup(aFileNames.Value(i).ToCString());
   // Conver a file to the byte stream
   aStreamFile = SALOMEDS_Tool::PutFilesToStream(aTmpDir.ToCString(), aSeq.in(), isMultiFile);
   // Remove the created file and tmp directory
@@ -582,7 +604,6 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
 
   END_OF(LOC);
 }
-
 SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
 					const char* theURL,
 					bool isMultiFile) {
@@ -615,6 +636,13 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
 	  aName += myMesh->getName();
 	  aName += ".med";
 	  MESSAGE("Save mesh with name "<<aName.ToCString());
+          // Remove existing file
+          if (isMultiFile) {
+            aSeq->length(1);
+            aSeq[0]=CORBA::string_dup( aName.ToCString() );
+            SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.ToCString(), aSeq.in(), true);
+            aSeq->length(0);
+          }
 	  long driverId = myMesh->addDriver(SALOME_MED::MED_DRIVER,(aTmpDir+aName).ToCString(),myMesh->getName());
 	  myMesh->write(driverId,"");
 	  HDFascii::ConvertFromHDFToASCII((aTmpDir+aName).ToCString(), true);
@@ -623,6 +651,10 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
       }
     }
   }
+
+  // temporary: until info that mesh is distant is written
+  MED_EN::medFileVersion curVersion = DRIVERFACTORY::getMedFileVersionForWriting();
+  DRIVERFACTORY::setMedFileVersionForWriting( MED_EN::V21 );
 
   SALOMEDS::SObject_var aMedFieldFather = theComponent->GetStudy()->FindObject("MEDFIELD");
   if (!CORBA::is_nil(aMedFieldFather)) {
@@ -647,7 +679,14 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
 	  aName += "_ITER_";
 	  aName += (char*)(b.str().c_str());
 	  aName += ".med";
-	  MESSAGE("Save mesh with name "<<aName.ToCString());
+	  MESSAGE("Save field with name "<<aName.ToCString());
+          // Remove existing file
+          if (isMultiFile) {
+            aSeq->length(1);
+            aSeq[0]=CORBA::string_dup( aName.ToCString() );
+            SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.ToCString(), aSeq.in(), true);
+            aSeq->length(0);
+          }
 	  long driverId = myField->addDriver(SALOME_MED::MED_DRIVER,(aTmpDir+aName).ToCString(),myField->getName());
 	  myField->write(driverId,"");
 	  HDFascii::ConvertFromHDFToASCII((aTmpDir+aName).ToCString(), true);
@@ -656,11 +695,13 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
       }
     }
   }
+  DRIVERFACTORY::setMedFileVersionForWriting( curVersion );
 
   int i;
   aSeq->length(aFileNames.Length());
-  for(i = aFileNames.Length(); i > 0; i--) aSeq[i-1] = CORBA::string_dup(aFileNames.Value(i).ToCString());
-  // Conver a file to the byte stream
+  for(i = aFileNames.Length(); i > 0; i--)
+    aSeq[i-1] = CORBA::string_dup(aFileNames.Value(i).ToCString());
+  // Convert a file to the byte stream
   aStreamFile = SALOMEDS_Tool::PutFilesToStream(aTmpDir.ToCString(), aSeq.in(), isMultiFile);
   // Remove the created file and tmp directory
   if (!isMultiFile) SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.ToCString(), aSeq.in(), true);
@@ -809,6 +850,43 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   return CORBA::string_dup("_MED");
 }
 
+//=======================================================================
+//function : getFieldNameAndDtIt
+//purpose  : 
+//=======================================================================
+
+static void getFieldNameAndDtIt( const char*   aLocalPersistentID,
+                                 string &      aFieldName,
+                                 CORBA::Long & aNumOrdre,
+                                 CORBA::Long & anIterNumber)
+{
+  //     aLocalPersistentID(("_MEDFIELD_"+ myField->getName() +
+  //                       "_ORDRE_"+a.str()+
+  //                       "_ITER_"+b.str()+".med"
+  int aLPIdLen = strlen(aLocalPersistentID);
+  const int _MEDFIELD_Len = strlen("_MEDFIELD_");
+  const int _ORDRE_Len    = strlen("_ORDRE_");
+  const int _ITER_Len     = strlen("_ITER_");
+
+  // Get field name: look for _ORDRE_ in aLocalPersistentID
+  int aFieldNameLen = 0, aFieldNameBeg = _MEDFIELD_Len, _ORDRE_Beg;
+  for ( _ORDRE_Beg = aFieldNameBeg; _ORDRE_Beg < aLPIdLen; ++aFieldNameLen,++_ORDRE_Beg )
+    if ( strncmp( &aLocalPersistentID[ _ORDRE_Beg ], "_ORDRE_", _ORDRE_Len ) == 0 )
+      break;
+  aFieldName = string( &(aLocalPersistentID[aFieldNameBeg]), aFieldNameLen);
+
+  // Get orderNumber
+  int anOrderNumberBeg = _ORDRE_Beg + _ORDRE_Len;
+  aNumOrdre = atoi( & aLocalPersistentID[ anOrderNumberBeg ]);
+
+  // Get iterationNumber: look for _ITER_ in aLocalPersistentID
+  int _ITER_Beg = anOrderNumberBeg;
+  for ( ; _ITER_Beg < aLPIdLen; ++_ITER_Beg )
+    if ( strncmp( &aLocalPersistentID[ _ITER_Beg ], "_ITER_", _ITER_Len ) == 0 )
+      break;
+  anIterNumber = atoi( & aLocalPersistentID[ _ITER_Beg + _ITER_Len ]);
+}
+
 //=============================================================================
 /*!
  *  CORBA: give a transient reference (when loading an object, opening study)
@@ -823,72 +901,127 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
 {
   const char * LOC = "Med_Gen_i::LocalPersistentIDToIOR" ;
   BEGIN_OF(LOC) ;
+
+  bool isMesh, isField;
+  isMesh = isField = false;
+  
+  if (strcmp(aLocalPersistentID, "_MED Objet Med + /OBJ_MED/") == 0) { // MED
+    _myMedI = new MED_i();
+    SALOME_MED::MED_ptr myMedIOR = _myMedI->_this();
+    return(CORBA::string_dup(_orb->object_to_string(myMedIOR)));
+  }
+  else if (strncmp(aLocalPersistentID, "_MEDMESH_",9) == 0) // MESH
+    isMesh = true;
+  else if (strncmp(aLocalPersistentID, "_MED/FAS/",9) == 0) // SUPPORT
+    return (CORBA::string_dup( theSObject->GetIOR() )); // is loaded along with MESH
+  else if (strncmp(aLocalPersistentID, "_MEDFIELD_",10) == 0) // FIELD
+    isField = true;
+  else
+    return CORBA::string_dup("");
+    
+  // Get file name
+  char* aFileName;
   TCollection_AsciiString aTmpDir((char*)(_saveFileName.c_str()));
-
   TCollection_AsciiString aSaveStudyName("");
-  if (isMultiFile) aSaveStudyName = (char*)SALOMEDS_Tool::GetNameFromPath(theSObject->GetStudy()->URL()).c_str();
+  if (isMultiFile)
+    aSaveStudyName = (char*)SALOMEDS_Tool::GetNameFromPath(theSObject->GetStudy()->URL()).c_str();
+  if (isASCII)
+  {
+    char* aResultPath = HDFascii::ConvertFromASCIIToHDF((aTmpDir + aSaveStudyName + (char*)aLocalPersistentID).ToCString());
+    aFileName = new char[strlen(aResultPath) + 19];
+    sprintf(aFileName, "%shdf_from_ascii.hdf", aResultPath);
+    delete(aResultPath);
+  }
+  else 
+    aFileName = CORBA::string_dup((aTmpDir + aSaveStudyName + (char*)aLocalPersistentID).ToCString());
 
-  if (strcmp(aLocalPersistentID, "Objet Med + /OBJ_MED/") == 0) return CORBA::string_dup(""); // MED
+  // Read file structure
+  try
+  {
+    ASSERT( _myMedI );
+    CORBA::Long drvId = _myMedI->addDriver( SALOME_MED::MED_DRIVER, aFileName );
+    _myMedI->readFileStruct( drvId );
+  }
+  catch (const std::exception & ex)
+  {
+    MESSAGE("Exception Interceptee : ");
+    SCRUTE(ex.what());
+    THROW_SALOME_CORBA_EXCEPTION("Unable to read a hdf file",SALOME::BAD_PARAM);
+  };
 
-  if (strncmp(aLocalPersistentID, "_MEDMESH_",9) == 0) {// MESH
-    MESH * myMesh= new MESH() ;
+  CORBA::Object_ptr anIOR;
+
+  if ( isMesh ) {// MESH
+    // Get mesh name
     int aMeshNameLen = strlen(aLocalPersistentID) - 12;
-    char* aMeshName = new char[aMeshNameLen];
-    strncpy(aMeshName, &(aLocalPersistentID[9]), aMeshNameLen-1);
+    string aMeshName( &(aLocalPersistentID[9]), aMeshNameLen);
     aMeshName[aMeshNameLen-1] = 0;
-    myMesh->setName(aMeshName);
 
-    char* aFileName;
-    if (isASCII) {
-      char* aResultPath = HDFascii::ConvertFromASCIIToHDF((aTmpDir + aSaveStudyName + (char*)aLocalPersistentID).ToCString());
-      aFileName = new char[strlen(aResultPath) + 19];
-      sprintf(aFileName, "%shdf_from_ascii.hdf", aResultPath);
-      delete(aResultPath);
-    } else aFileName = CORBA::string_dup((aTmpDir + aSaveStudyName + (char*)aLocalPersistentID).ToCString());
-    MED_MESH_RDONLY_DRIVER myMeshDriver(aFileName,myMesh);
+    // Read mesh
+    SALOME_MED::MESH_ptr mesh;
     try
-      {
-	myMeshDriver.setMeshName(aMeshName);
-	myMeshDriver.open();
-      }
-    catch (const std::exception & ex)
-      {
-	MESSAGE("Exception Interceptee : ");
-	SCRUTE(ex.what());
-	THROW_SALOME_CORBA_EXCEPTION("Unable to find this mesh in this file",SALOME::BAD_PARAM);
-      };
-    try
-      {
-	myMeshDriver.read();
-	MESSAGE("apres read");
-	myMeshDriver.close();
-      }
-    catch (const std::exception & ex)
-      {
-	MESSAGE("Exception Interceptee : ");
-	SCRUTE(ex.what());
-	THROW_SALOME_CORBA_EXCEPTION("Unable to read this mesh in this file",SALOME::BAD_PARAM);
-      }
-    MESH_i * meshi = new MESH_i(myMesh);
-    //SALOME_MED::MESH_var mesh = SALOME_MED::MESH::_narrow(meshi->_this());
-    SALOME_MED::MESH_ptr mesh = meshi->_this();
-    SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
-    aSeq->length(1);
-    aSeq[0]=CORBA::string_dup(aLocalPersistentID);
-    if (!isMultiFile) SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.ToCString(), aSeq.in(), true);
-    if (isASCII) {
-      SALOMEDS::ListOfFileNames_var aFilesToRemove = new SALOMEDS::ListOfFileNames;
-      aFilesToRemove->length(1);
-      aFilesToRemove[0] = CORBA::string_dup(&(aFileName[strlen(SALOMEDS_Tool::GetDirFromPath(aFileName).c_str())]));
-      SALOMEDS_Tool::RemoveTemporaryFiles(SALOMEDS_Tool::GetDirFromPath(aFileName).c_str(), aFilesToRemove, true);
+    {
+      mesh = _myMedI->getMeshByName( aMeshName.c_str() );
+      mesh->read( 0 );
+      _myMedI->updateSupportIORs( theSObject->GetStudy(), aMeshName.c_str() );
     }
-    delete(aFileName);
-    return(CORBA::string_dup(_orb->object_to_string(mesh)));
-  } else if (strncmp(aLocalPersistentID, "_MEDFIELD_",14) == 0) { // FIELD
-    return(CORBA::string_dup("")); // not implemented yet
+    catch (const std::exception & ex)
+    {
+      MESSAGE("Exception Interceptee : ");
+      SCRUTE(ex.what());
+      THROW_SALOME_CORBA_EXCEPTION("Unable to read this mesh in this file",
+                                   SALOME::INTERNAL_ERROR);
+    }
+
+    anIOR = mesh;
   }
 
-  return CORBA::string_dup("");
+  if ( isField ) { // FIELD
+
+    // Field Name
+    string aFieldName;
+    CORBA::Long aNumOrdre, anIterNumber;
+    getFieldNameAndDtIt( aLocalPersistentID, aFieldName, aNumOrdre, anIterNumber );
+
+    // Read field
+    SALOME_MED::FIELD_ptr field;
+    try
+    {
+      field = _myMedI->getField( aFieldName.c_str(), anIterNumber, aNumOrdre );
+      field->read( 0 );
+    }
+    catch (const std::exception & ex)
+    {
+      MESSAGE("Exception Interceptee : ");
+      SCRUTE(ex.what());
+      THROW_SALOME_CORBA_EXCEPTION("Unable to read this field in this file",
+                                   SALOME::INTERNAL_ERROR);
+    }
+
+    anIOR = field;
+
+  }
+
+  // Remove tmp files
+  SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
+  aSeq->length(1);
+  aSeq[0]=CORBA::string_dup(aLocalPersistentID);
+  if (!isMultiFile)
+    SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.ToCString(), aSeq.in(), true);
+  if (isASCII)
+  {
+    SALOMEDS::ListOfFileNames_var aFilesToRemove = new SALOMEDS::ListOfFileNames;
+    aFilesToRemove->length(1);
+    aFilesToRemove[0] = CORBA::string_dup(&(aFileName[strlen(SALOMEDS_Tool::GetDirFromPath(aFileName).c_str())]));
+    SALOMEDS_Tool::RemoveTemporaryFiles(SALOMEDS_Tool::GetDirFromPath(aFileName).c_str(), aFilesToRemove, true);
+  }
+
+  delete(aFileName);
+
+  if ( CORBA::is_nil( anIOR ))
+    return CORBA::string_dup("");
+
+  return(CORBA::string_dup(_orb->object_to_string( anIOR )));
 }
 
 //=============================================================================
@@ -898,7 +1031,15 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
 //=============================================================================
 bool Med_Gen_i::CanPublishInStudy(CORBA::Object_ptr theIOR) {
   SALOME_MED::MESH_var aMesh = SALOME_MED::MESH::_narrow(theIOR);
-  return !(aMesh->_is_nil());
+  if ( !aMesh->_is_nil())
+    return true;
+  SALOME_MED::FIELD_var aField = SALOME_MED::FIELD::_narrow(theIOR);
+  if ( !aField->_is_nil())
+    return true;
+//   SALOME_MED::SUPPORT_var aSupport = SALOME_MED::SUPPORT::_narrow(theIOR);
+//   if ( !aSupport->_is_nil())
+//     return true;
+  return false;
 }
 
 //=============================================================================
@@ -940,11 +1081,18 @@ SALOMEDS::SObject_ptr Med_Gen_i::PublishInStudy(SALOMEDS::Study_ptr theStudy,
 
   if (CORBA::is_nil(theSObject)) {
     SALOME_MED::MESH_var aMesh = SALOME_MED::MESH::_narrow(theObject);
-    aMesh->addInStudy(theStudy, aMesh);
-    SALOMEDS::SObject_var aResultSO = theStudy->FindObjectIOR(_orb->object_to_string(theObject));
+    if ( !aMesh->_is_nil() )
+      aMesh->addInStudy(theStudy, aMesh);
+    SALOME_MED::FIELD_var aField = SALOME_MED::FIELD::_narrow(theObject);
+    if ( !aField->_is_nil())
+      aField->addInStudy(theStudy, aField);
+//     SALOME_MED::SUPPORT_var aSupport = SALOME_MED::SUPPORT::_narrow(theObject);
+//     if ( !aSupport->_is_nil())
+//       aSupport->addInStudy(theStudy, aSupport);
+    aResultSO = theStudy->FindObjectIOR(_orb->object_to_string(theObject));
   } else {
-    if (!theSObject->ReferencedObject(aResultSO))
-      THROW_SALOME_CORBA_EXCEPTION("Publish in study MED object error",SALOME::BAD_PARAM);
+//     if (!theSObject->ReferencedObject(aResultSO))
+//       THROW_SALOME_CORBA_EXCEPTION("Publish in study MED object error",SALOME::BAD_PARAM);
   }
 //    aBuilder->Addreference(theObject, aResultSO);
   return aResultSO._retn();
@@ -996,6 +1144,7 @@ SALOMEDS::TMPFile* Med_Gen_i::CopyFrom(SALOMEDS::SObject_ptr theObject, CORBA::L
   char* aFullName = new char[strlen(aTmpDir)+strlen(aSeq[0])+1];
   strcpy(aFullName, aTmpDir);
   strcpy(aFullName+strlen(aTmpDir), aSeq[0]);
+
   long driverId = aMesh->addDriver(SALOME_MED::MED_DRIVER,aFullName , aMesh->getName());
   aMesh->write(driverId,"");
 
@@ -1063,7 +1212,7 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   };
   try {
     myMeshDriver.read();
-    ("apres read");
+    MESSAGE("apres read");
     myMeshDriver.close();
   } catch (const std::exception & ex) {
     MESSAGE("Exception Interceptee : ");

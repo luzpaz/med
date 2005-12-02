@@ -119,14 +119,43 @@ def getFieldIntObjectFromStudy(number,subnumber):
 
 #==============================================================================
 
-def getMedObjectFromStudy():
-    mySO = batchmode_salome.myStudy.FindObject("Objet MED")
-    Builder = batchmode_salome.myStudy.NewBuilder()
-    anAttr = Builder.FindOrCreateAttribute(mySO, "AttributeIOR")
-    obj = batchmode_salome.orb.string_to_object(anAttr.Value())
-    myObj = obj._narrow(SALOME_MED.MED)
+def getMedObjectFromStudy(fileName=None):
+    myObj=None; Builder = batchmode_salome.myStudy.NewBuilder()
+    if fileName is not None:
+        objNameInStudy = "MED_OBJECT_FROM_FILE_"+fileName
+        mySO = batchmode_salome.myStudy.FindObject(objNameInStudy)
+        if mySO is not None:
+            anAttr = Builder.FindOrCreateAttribute(mySO, "AttributeIOR")
+            obj = batchmode_salome.orb.string_to_object(anAttr.Value())
+            if obj is not None:
+                myObj = obj._narrow(SALOME_MED.MED)
+            else:
+                print "ERROR: ",myObj," has been found in the Study, but with the type different of SALOME_MED.MED!!!"
+        else:
+            print "ERROR: ",objNameInStudy," hasn't been found in the Study!!!"
+    else:
+        SObj_root = batchmode_salome.myStudy.FindObjectByPath("/Med/")
+        if SObj_root is not None:
+            iter = batchmode_salome.myStudy.NewChildIterator(SObj_root)
+            try:
+                iter.Init(); 
+                while iter.More():
+                    Obj = iter.Value()
+                    if Obj is not None:
+                        Ok, anAttr = Builder.FindAttribute(Obj, "AttributeIOR")
+                        if Ok:
+                            if len(anAttr.Value()) > 0:
+                                obj = batchmode_salome.orb.string_to_object(anAttr.Value())
+                                if obj is not None:
+                                    myObj = obj._narrow(SALOME_MED.MED)
+                                    if myObj is not None:
+                                        break
+                    iter.Next()
+            except:
+                print "Exception!!!"
+        else: print "Root object Med hasn't been found in the study!!!"
     return myObj
-
+        
 studyCurrent = batchmode_salome.myStudyName
 studyCurrentId = batchmode_salome.myStudyId
 

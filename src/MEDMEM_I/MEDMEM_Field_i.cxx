@@ -509,21 +509,14 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 
 	MESSAGE("Computing path to Support");
 
-	char * supportEntryPath;
-	lenName = 28 + 15 + strlen(meshName.c_str()) + 1 +
-	  strlen(supportName.c_str()) + 1;
-	supportEntryPath = new char[lenName];
-	supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/MEDSUPPORTS_OF_");
-	supportEntryPath = strcat(supportEntryPath,meshNameStudy.c_str());
-	supportEntryPath = strcat(supportEntryPath,"/");
-	supportEntryPath = strcat(supportEntryPath,supportName.c_str());
-
+	string supportEntryPath = SUPPORT_i::getEntryPath( meshNameStudy,
+                                                           _fieldTptr->getSupport() );
 	SCRUTE(supportEntryPath);
 
-	MESSAGE("supportEntryPath in field " << supportEntryPath << " length " << lenName);
+	MESSAGE("supportEntryPath in field " << supportEntryPath /*<< " length " << lenName*/);
 
 // 	SALOMEDS::SObject_var supportObject = myStudy->FindObject(supportName.c_str());
-	SALOMEDS::SObject_var supportObject = myStudy->FindObjectByPath(supportEntryPath);
+	SALOMEDS::SObject_var supportObject = myStudy->FindObjectByPath(supportEntryPath.c_str());
 
 	SCRUTE(supportObject);
 
@@ -542,7 +535,7 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 
         myBuilder->CommitCommand();
 
-	delete [] supportEntryPath;
+	//delete [] supportEntryPath;
 	delete [] fieldEntryName;
 
 	// register the Corba pointer: increase the referrence count

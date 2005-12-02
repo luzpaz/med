@@ -40,6 +40,10 @@
 
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
 
+namespace MEDMEM {
+  class MED_i;
+}
+
 class Med_Gen_i:
   public POA_SALOME_MED::MED_Gen,
   public Engines_Component_i 
@@ -140,7 +144,7 @@ public:
   int myCounter;
   SALOME_NamingService *_NS;
 
-
+  MEDMEM::MED_i* _myMedI; // used while loading a study
 };
 
 #endif
