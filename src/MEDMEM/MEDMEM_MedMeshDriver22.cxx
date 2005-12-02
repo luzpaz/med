@@ -1307,8 +1307,18 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 					Entity,
 					med_2_2::MED_POLYGONE,
 					med_2_2::MED_NOD);
+
+      // Correction to permit the loading of mesh dimensionned at 2 even
+      // if it has only MED_POLYGON elements
+
       if (NumberOfPolygons > 0)
 	{
+	  if (Connectivity->_entityDimension < 2) Connectivity->_entityDimension = 2;
+	}
+
+      if (NumberOfPolygons > 0)
+	{
+	  // By consequence this exception will never occur
 	  if (Connectivity->_entityDimension == 1)
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 2D mesh, polygons need at least one 2D cell of a classic geometric type !"));
 	  med_int ConnectivitySize;
@@ -1361,8 +1371,18 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 					      Entity,
 					      med_2_2::MED_POLYEDRE,
 					      med_2_2::MED_NOD);
+
+      // Correction to permit the loading of mesh dimensionned at 3 even
+      // if it has only MED_POLYEDRE elements
+
       if (NumberOfPolyhedron > 0)
 	{
+	  Connectivity->_entityDimension = 3;
+	}
+
+      if (NumberOfPolyhedron > 0)
+	{
+	  // By consequence this exception will never occur
 	  if (Connectivity->_entityDimension == 2 || Connectivity->_entityDimension == 1)
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 3D mesh, polyhedron need at least one 3D cell of a classic geometric type !"));
 	  med_int FacesIndexSize, NumberOfNodes, NumberOfFaces;
