@@ -334,8 +334,8 @@ MED_FIELD_DRIVER22<T>::createFieldSupport(med_2_2::med_idt id,
 
   map<int, list<MED_EN::medGeometryElement> > CellAndNodeEntities;
   map<int, list<MED_EN::medGeometryElement> >::iterator currentEntity;
-  CellAndNodeEntities[MED_EN::MED_CELL]  = meshEntities[MED_EN::MED_CELL];
-  CellAndNodeEntities[MED_EN::MED_NODE] = meshEntities[MED_EN::MED_NODE];
+  CellAndNodeEntities[MED_EN::MED_CELL]  = MED_EN::meshEntities[MED_EN::MED_CELL];
+  CellAndNodeEntities[MED_EN::MED_NODE] = MED_EN::meshEntities[MED_EN::MED_NODE];
   list< MED_EN::medGeometryElement >::const_iterator currentGeometry;
 
   //med_2_2::med_entite_maillage
@@ -496,8 +496,8 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricType(med_2_2::med_idt id,
   list<MED_EN::medGeometryElement>::const_iterator currentGeometry;
   bool alreadyFoundAnEntity = false;
 
-  for (currentGeometry  = (meshEntities[entity]).begin();
-       currentGeometry != (meshEntities[entity]).end(); currentGeometry++) {
+  for (currentGeometry  = (MED_EN::meshEntities[entity]).begin();
+       currentGeometry != (MED_EN::meshEntities[entity]).end(); currentGeometry++) {
 
 
     if ( (numberOfElements =
@@ -1144,4 +1144,3 @@ template <class T> void MED_FIELD_RDWR_DRIVER22<T>::read (void)
 /*-----------------------------------------------------------------*/
 
 #endif /* MED_FIELD_DRIVER_HXX */
-

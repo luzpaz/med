@@ -727,8 +727,7 @@ public:
     initialised via the constructor FIELD<double>(const SUPPORT * , const int )
     with Support as SUPPORT argument, 1 has the number of components, and Support
     has be a SUPPORT on 3D cells. This initialisation could be done by the empty
-    constructor followed by a setSupport and setNumberOfComponents call but it has
-    be followed by a setValueType(MED_REEL64) call.
+    constructor followed by a setSupport and setNumberOfComponents call.
    */
   void getVolume() const throw (MEDEXCEPTION) ;
   /*!
@@ -737,8 +736,7 @@ public:
     has to be initialised via the constructor FIELD<double>(const SUPPORT * ,
     const int ) with 1 has the number of components, and _support has be a
     SUPPORT on 2D cells or 3D faces. This initialisation could be done by the
-    empty constructor followed by a setSupport and setNumberOfComponents call but
-    it has be followed by a setValueType(MED_REEL64) call.
+    empty constructor followed by a setSupport and setNumberOfComponents call.
    */
   void getArea() const throw (MEDEXCEPTION) ;
   /*!
@@ -747,8 +745,7 @@ public:
     to be initialised via the constructor FIELD<double>(const SUPPORT * ,
     const int ) with 1 has the number of components, and _support has be a
     SUPPORT on 3D edges or 2D faces. This initialisation could be done by the
-    empty constructor followed by a setSupport and setNumberOfComponents call but
-    it has be followed by a setValueType(MED_REEL64) call.
+    empty constructor followed by a setSupport and setNumberOfComponents call.
    */
   void getLength() const throw (MEDEXCEPTION) ;
   /*!
@@ -758,7 +755,7 @@ public:
     const int ) with the space dimension has the number of components, and
     _support has be a SUPPORT on 3D or 2D faces. This initialisation could be done
     by the empty constructor followed by a setSupport and setNumberOfComponents
-    call but it has be followed by a setValueType(MED_REEL64) call.
+    call.
    */
   void getNormal() const throw (MEDEXCEPTION) ;
   /*!
@@ -768,12 +765,12 @@ public:
     FIELD<double>(const SUPPORT * ,const int ) with the space dimension has the
     number of components, and _support has be a SUPPORT on 3D cells or 2D faces.
     This initialisation could be done by the empty constructor followed by a
-    setSupport and setNumberOfComponents call but it has be followed by a
-    setValueType(MED_REEL64) call.
+    setSupport and setNumberOfComponents call.
    */
   void getBarycenter() const throw (MEDEXCEPTION) ;
-  template< void T_Analytic(const double *,T*) >
-  void fillFromAnalytic() throw (MEDEXCEPTION);
+
+  typedef void (*myFuncType)(const double *,T*);
+  void fillFromAnalytic(myFuncType f) throw (MEDEXCEPTION);
 };
 }
 
@@ -921,7 +918,7 @@ const FIELD<T, INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::operator+(const FIELD
     FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
 
     // Creation of the result - memory is allocated by FIELD constructor
-    FIELD<T, INTERLACING_TAG> result(this->getSupport(),this->getNumberOfComponents(),mode);
+    FIELD<T, INTERLACING_TAG> result(this->getSupport(),this->getNumberOfComponents());
     //result._operation(*this,m,mode,"+"); // perform Atribute's initialization & addition
     result._operationInitialize(*this,m,"+"); // perform Atribute's initialization
     result._add_in_place(*this,m); // perform addition
@@ -1442,7 +1439,7 @@ void FIELD<T, INTERLACING_TAG>::_div_in_place(const FIELD& m,const FIELD& n) thr
 {
     // get pointers to the values we are adding
     const T* value1=m.getValue();
-    const T* value2=n.getValue(e);
+    const T* value2=n.getValue();
     // get a non const pointer to the inside array of values and perform operation
     T * value=const_cast<T *> (getValue());
 
@@ -1644,9 +1641,9 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
-
-    const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
-
+    // Il n'est vraiment pas optimal de mixer des champs dans des modes d'entrelacement
+    // different juste pour le calcul
+ 
     const T * value     = NULL;
     ArrayNo * myArray   = NULL;
     if ( getInterlacingType() == MED_NO_INTERLACE )
@@ -1655,6 +1652,8 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
       myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
       value   = myArray->getPtr();
     }
+
+    const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
 
     double integrale=0.0;
     double totVol=0.0;
@@ -1816,7 +1815,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::extract(const SUPPORT *sub
   if(!subSupport->belongsTo(*_support))
     throw MEDEXCEPTION("FIELD<T>::extract : subSupport not included in this->_support !");
   if(_support->isOnAllElements() && subSupport->isOnAllElements())
-    return new FIELD<T>(*this);
+    return new FIELD<T, INTERLACING_TAG>(*this);
 
   FIELD<T, INTERLACING_TAG> *ret = new FIELD<T, INTERLACING_TAG>(subSupport,
 								 _numberOfComponents);
@@ -2274,38 +2273,38 @@ template <class T, class INTERLACING_TAG>
 bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
   const throw (MEDEXCEPTION)
 {
-  retValues =  getRow(eltIdInSup);
+//   retValues =  getRow(eltIdInSup);
 
-//   if(eltIdInSup<1)
-//     return false;
-//   if(_support->isOnAllElements())
-//     {
-//       int nbOfEltsThis=_support->getMesh()->getNumberOfElements(_support->getEntity(),MED_EN::MED_ALL_ELEMENTS);
-//       if(eltIdInSup>nbOfEltsThis)
-// 	return false;
-//       const T* valsThis=getValue(MED_EN::MED_FULL_INTERLACE);
-//       for(int j=0;j<_numberOfComponents;j++)
-// 	retValues[j]=valsThis[(eltIdInSup-1)*_numberOfComponents+j];
-  return true;
-//     }
-//   else
-//     {
-//       int nbOfEltsThis=_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-//       const int *eltsThis=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
-//       int iThis;
-//       bool found=false;
-//       for(iThis=0;iThis<nbOfEltsThis && !found;)
-// 	if(eltsThis[iThis]==eltIdInSup)
-// 	  found=true;
-// 	else
-// 	  iThis++;
-//       if(!found)
-// 	return false;
-//       const T* valsThis=getValue(MED_EN::MED_FULL_INTERLACE);
-//       for(int j=0;j<_numberOfComponents;j++)
-// 	retValues[j]=valsThis[iThis*_numberOfComponents+j];
-//       return true;
-//     }
+  if(eltIdInSup<1)
+    return false;
+  if(_support->isOnAllElements())
+    {
+      int nbOfEltsThis=_support->getMesh()->getNumberOfElements(_support->getEntity(),MED_EN::MED_ALL_ELEMENTS);
+      if(eltIdInSup>nbOfEltsThis)
+	return false;
+      const T* valsThis=getValue();
+      for(int j=0;j<_numberOfComponents;j++)
+	retValues[j]=valsThis[(eltIdInSup-1)*_numberOfComponents+j];
+      return true;
+    }
+  else
+    {
+      int nbOfEltsThis=_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+      const int *eltsThis=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+      int iThis;
+      bool found=false;
+      for(iThis=0;iThis<nbOfEltsThis && !found;)
+	if(eltsThis[iThis]==eltIdInSup)
+	  found=true;
+	else
+	  iThis++;
+      if(!found)
+	return false;
+      const T* valsThis=getValue();
+      for(int j=0;j<_numberOfComponents;j++)
+	retValues[j]=valsThis[iThis*_numberOfComponents+j];
+      return true;
+    }
 }
 
 /*!
@@ -2618,9 +2617,9 @@ void FIELD<T, INTERLACING_TAG>::getBarycenter() const throw (MEDEXCEPTION)
   Typically you should use it on a field built with constructor FIELD<T>::FIELD<T>(SUPPORT *,int nbOfComponents)
  */
 template <class T, class INTERLACING_TAG>
-template<void T_Analytic(const double *,T*)>
-void FIELD<T, INTERLACING_TAG>::fillFromAnalytic() throw (MEDEXCEPTION)
+void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTION)
 {
+  const char * LOC = "void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) : ";
   int i,j;
   if (_support == (SUPPORT *) NULL)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No Support defined."));
@@ -2669,7 +2668,7 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic() throw (MEDEXCEPTION)
   {
     for(j=0;j<spaceDim;j++)
       temp[j]=xyz[j][i];
-    T_Analytic(temp,valsToSet+i*_numberOfComponents);
+    f(temp,valsToSet+i*_numberOfComponents);
   }
   delete [] temp;
   if(barycenterField)

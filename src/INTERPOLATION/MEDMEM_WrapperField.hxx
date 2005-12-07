@@ -181,7 +181,7 @@ public :
 	Wrapper_MED_Field(int nv, int nc, double * v):nbr_valeurs(nv),nbr_composantes(nc),valeurs(v)
 		{
 		}
-	Wrapper_MED_Field(const MEDMEM::FIELD<double> * medfield)
+	Wrapper_MED_Field(const MEDMEM::FIELD<double,MEDMEM::FullInterlace> * medfield)
 		{
 		nbr_valeurs=medfield->getNumberOfValues();
 		nbr_composantes=medfield->getNumberOfComponents();

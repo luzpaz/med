@@ -1028,7 +1028,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
 
 /*! set the reference _mesh to Mesh */
 //--------------------------------------
-void SUPPORT::setMesh(MESH *Mesh)
+void SUPPORT::setMesh(MESH *Mesh) const
 //--------------------------------------
 {
   if(_mesh)

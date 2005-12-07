@@ -212,10 +212,10 @@ int main (int argc, char ** argv)
     if(verbose)  {
       // affichage des nprmes,des champs f1, f2, scalarProduct(f1,f2) et f1+f2
       FIELD<double>* myField1_vol=myField1->getSupport()->getMesh()->getVolume(myField1->getSupport());
-      cout << "Norme L2 calculÃ©e en fournissant le volume : " << myField1->normL2(myField1_vol) << endl;
+      cout << "Norme L2 calculee en fournissant le volume : " << myField1->normL2(myField1_vol) << endl;
       for (int i=1; i<=myField1->getNumberOfComponents(); ++i)
 	cout << "Norme L2 - comp=" << i << " : " << myField1->normL2(i,myField1_vol) << endl;
-      cout << "Norme L1 calculÃ©e en fournissant le volume : " << myField1->normL1(myField1_vol) << endl;
+      cout << "Norme L1 calculee en fournissant le volume : " << myField1->normL1(myField1_vol) << endl;
       for (int i=1; i<=myField1->getNumberOfComponents(); ++i)
 	cout << "Norme L1 - comp=" << i << " : " << myField1->normL1(i,myField1_vol) << endl;
       delete myField1_vol;
