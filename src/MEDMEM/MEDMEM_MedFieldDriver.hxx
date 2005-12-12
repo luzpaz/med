@@ -576,8 +576,6 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 	  for (int k=0 ; k<NumberOf; k++) {
 	    //ValuesT[Count]=myValue[k+offset] ;
 	    Values->setIJ(Count,i+1,myValue[k+offset]);
-	    SCRUTE(Count);
-	    SCRUTE(Values->getIJ(Count,i+1));
 	    Count++;
 	  }
 	}

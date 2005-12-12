@@ -2233,9 +2233,6 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
 	  MEDArrayNodeFamily[Number[j]-1]=FamilyIdentifier ;
       }
     }
-    for(int j=0; j<NumberOfNodes; j++) {
-      SCRUTE(MEDArrayNodeFamily[j]);
-    }
     if ( !_ptrMesh->getIsAGrid() ){
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
       int lgth=NumberOfNodes;
