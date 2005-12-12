@@ -638,16 +638,3 @@ CORBA::Long FIELD_i::addDriver (SALOME_MED::medDriverTypes driverType,
 	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
-
-//=============================================================================
-/*!
- * CORBA: Destructor
-*/
-//=============================================================================
-void FIELD_i::release()
-{
-  PortableServer::ObjectId_var oid=_default_POA()->servant_to_id(this);
-  _default_POA()->deactivate_object(oid);
-  _remove_ref();
-}
-

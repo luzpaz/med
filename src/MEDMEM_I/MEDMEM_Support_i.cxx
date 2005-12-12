@@ -711,15 +711,3 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
 
   END_OF(LOC);
 }
-
-//=============================================================================
-/*!
- * CORBA: release <=> remote delete this
- */
-//=============================================================================
-void SUPPORT_i::release()
-{
-  PortableServer::ObjectId_var oid=_default_POA()->servant_to_id(this);
-  _default_POA()->deactivate_object(oid);
-  _remove_ref();
-}

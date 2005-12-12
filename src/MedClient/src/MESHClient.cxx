@@ -188,7 +188,7 @@ bool MESHClient::operator==(const MESH& other) const
 MESHClient::~MESHClient()
 {
   BEGIN_OF("MESHClient::~MESHClient()");
-  IOR_Mesh->release();
+  IOR_Mesh->Destroy();
   END_OF("MESHClient::~MESHClient()");
 }
 

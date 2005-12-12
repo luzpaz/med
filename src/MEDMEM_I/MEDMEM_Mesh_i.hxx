@@ -14,6 +14,7 @@
 
 #include <SALOMEconfig.h>
 #include "SALOMEMultiComm.hxx"
+#include "SALOME_GenericObj_i.hh"
 #include CORBA_SERVER_HEADER(MED)
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
 #include CORBA_SERVER_HEADER(SALOME_Comm)
@@ -21,8 +22,8 @@
 namespace MEDMEM {
 class MESH;
 class MESH_i: public POA_SALOME_MED::MESH,
-	      public PortableServer::RefCountServantBase,
-	      public SALOMEMultiComm
+	      public SALOMEMultiComm,
+	      public SALOME::GenericObj_i
 {
 public :
     static std::map < int,::MEDMEM::MESH *> meshMap;
@@ -189,8 +190,6 @@ public:
 				  (SALOME_MED::medEntityMesh entity)
                                   throw (SALOME::SALOME_Exception);
     CORBA::Boolean areEquals(SALOME_MED::MESH_ptr other);
-
-  void release();
 };
 }
 
