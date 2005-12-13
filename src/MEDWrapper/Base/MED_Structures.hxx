@@ -409,6 +409,9 @@ namespace MED
     {
       bool
       operator()(const TKey& theLeft, const TKey& theRight) const;
+
+      bool
+      operator()(const TGaussInfo& theLeft, const TGaussInfo& theRight) const;
     };
 
     //! Defines, which geometrical type the MED Gauss entity belongs to

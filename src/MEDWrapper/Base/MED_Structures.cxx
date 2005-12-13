@@ -261,6 +261,19 @@ TGaussInfo::TLess
   return aLStr < aRStr;
 }
 
+bool
+TGaussInfo::TLess
+::operator()(const TGaussInfo& theLeft, const TGaussInfo& theRight) const
+{
+  if(theLeft.myGeom != theRight.myGeom)
+    return theLeft.myGeom < theRight.myGeom;
+
+  if(theLeft.myRefCoord != theRight.myRefCoord)
+    return theLeft.myRefCoord < theRight.myRefCoord;
+
+  return theLeft.myGaussCoord < theRight.myGaussCoord;
+}
+
 TCCoordSlice 
 TGaussInfo
 ::GetRefCoordSlice(TInt theId) const
