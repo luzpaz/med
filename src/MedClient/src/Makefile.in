@@ -82,6 +82,7 @@ LIB_CLIENT_IDL= \
 	SALOMEDS_Attributes.idl \
 	SALOME_Exception.idl \
 	SALOME_Comm.idl \
+	SALOME_GenericObj.idl \
 	MED.idl
 
 # Executables targets

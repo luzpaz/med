@@ -50,9 +50,8 @@ LIB_MOC = MedGUI.h
 
 LIB_CLIENT_IDL = SALOMEDS.idl SALOME_Exception.idl \
                  MED_Gen.idl  MED.idl \
-		 SALOMEDS_Attributes.idl SALOME_Comm.idl
-#		 SMESH_Mesh.idl SMESH_Hypothesis.idl SMESH_BasicHypothesis.idl \
-#		 GEOM_Shape.idl SALOMEDS_Attributes.idl
+		 SALOMEDS_Attributes.idl SALOME_Comm.idl \
+		 SALOME_GenericObj.idl
 
 LIB_SERVER_IDL = 
 

@@ -53,7 +53,8 @@ endif
 
 LIB_SERVER_IDL = MED.idl
 
-LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl SALOME_Comm.idl
+LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl \
+		SALOME_Exception.idl SALOME_Comm.idl SALOME_GenericObj.idl
 
 EXPORT_PYSCRIPTS = libMedCorba_Swig.py medcorba_test.py batchmode_medcorba_test.py batchmode_medcorba_test1.py
 
