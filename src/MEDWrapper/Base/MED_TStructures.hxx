@@ -791,7 +791,6 @@ namespace MED
       myEntity = theInfo->GetEntity();
       myGeom2Size = theInfo->GetGeom2Size();
 
-      myNbGauss = theInfo->GetNbGauss();
       myNumDt = theInfo->GetNumDt();
       myNumOrd = theInfo->GetNumOrd();
       myDt = theInfo->GetDt();
@@ -799,13 +798,14 @@ namespace MED
       myUnitDt.resize(GetPNOMLength<eVersion>()+1);
       SetUnitDt(theInfo->GetUnitDt());
 
+      myGeom2NbGauss = theInfo->myGeom2NbGauss;
       myGeom2Gauss = theInfo->GetGeom2Gauss();
     }
 
     TTTimeStampInfo(const PFieldInfo& theFieldInfo, 
 		    EEntiteMaillage theEntity,
 		    const TGeom2Size& theGeom2Size,
-		    TInt theNbGauss,
+		    const TGeom2NbGauss& theGeom2NbGauss,
 		    TInt theNumDt,
 		    TInt theNumOrd,
 		    TFloat theDt,
@@ -817,7 +817,6 @@ namespace MED
       myEntity = theEntity;
       myGeom2Size = theGeom2Size;
 
-      myNbGauss = theNbGauss;
       myNumDt = theNumDt;
       myNumOrd = theNumDt;
       myDt = theDt;
@@ -825,6 +824,7 @@ namespace MED
       myUnitDt.resize(GetPNOMLength<eVersion>()+1);
       SetUnitDt(theUnitDt);
 
+      myGeom2NbGauss = theGeom2NbGauss;
       myGeom2Gauss = theGeom2Gauss;
     }
 
@@ -887,7 +887,6 @@ namespace MED
       myGeom2Profile = theGeom2Profile;
 
       TInt aNbComp = theTimeStampInfo->myFieldInfo->myNbComp;
-      TInt aNbGauss = theTimeStampInfo->myNbGauss;
 
       const TGeom2Size& aGeom2Size = theTimeStampInfo->myGeom2Size;
       TGeom2Size::const_iterator anIter = aGeom2Size.begin();
@@ -903,6 +902,8 @@ namespace MED
 	if(aProfileInfo && aProfileInfo->IsPresent())
 	  aNbElem = aProfileInfo->GetSize();
 
+	TInt aNbGauss = theTimeStampInfo->GetNbGauss(aGeom);
+	
 	TMeshValue& aMeshValue = GetMeshValue(aGeom);
 	aMeshValue.Init(aNbElem,aNbGauss,aNbComp);
       }

@@ -316,6 +316,19 @@ TGaussInfo
 
 
 //---------------------------------------------------------------
+TInt
+TTimeStampInfo
+::GetNbGauss(EGeometrieElement theGeom) const
+{
+  TGeom2NbGauss::const_iterator anIter = myGeom2NbGauss.find(theGeom);
+  if(anIter == myGeom2NbGauss.end())
+    EXCEPTION(runtime_error,"TTimeStampInfo::GetNbGauss - myGeom2NbGauss.find(theGeom) fails");
+
+  return anIter->second;
+}
+
+
+//---------------------------------------------------------------
 void
 TMeshValue
 ::Init(TInt theNbElem,

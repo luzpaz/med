@@ -908,8 +908,8 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECT,theErr);
       
-      TGeom2Size& aGeom2Size = theInfo.myGeom2Size;
-      
+      const TGeom2Size& aGeom2Size = theInfo.myGeom2Size;     
+
       if(theErr){
 	if(aGeom2Size.empty())
 	  *theErr = -1;
@@ -921,29 +921,38 @@ namespace MED
       MED::TFieldInfo& aFieldInfo = *theInfo.myFieldInfo;
       MED::TMeshInfo& aMeshInfo = *aFieldInfo.myMeshInfo;
       
-      TGeom2Size::iterator anIter = aGeom2Size.begin();
-      
-      TErr aRet;
-      aRet = MEDpasdetempsInfo(myFile->Id(),
-			       &aFieldInfo.myName[0],
-			       med_entite_maillage(theInfo.myEntity),
-			       med_geometrie_element(anIter->first),
-			       theTimeStampId,
-			       &aMeshInfo.myName[0],
-			       (med_int*)&theInfo.myNbGauss,
-			       (med_int*)&theInfo.myNumDt,
-			       &theInfo.myUnitDt[0],
-			       &theInfo.myDt,
-			       (med_int*)&theInfo.myNumOrd);
+      TGeom2NbGauss& aGeom2NbGauss = theInfo.myGeom2NbGauss;
 
-      if(theErr) 
-	*theErr = aRet;
-      else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetTimeStampInfo - MEDpasdetempsInfo(...)");
-      
-      static TInt MAX_NB_GAUSS_POINTS = 32;
-      if(theInfo.myNbGauss <= 0 || theInfo.myNbGauss > MAX_NB_GAUSS_POINTS)
-	theInfo.myNbGauss = 1;
+      TGeom2Size::const_iterator anIter = aGeom2Size.begin();
+      for(; anIter != aGeom2Size.end(); anIter++){
+	const EGeometrieElement& aGeom = anIter->first;
+	med_int aNbGauss = -1;
+
+	TErr aRet;
+	aRet = MEDpasdetempsInfo(myFile->Id(),
+				 &aFieldInfo.myName[0],
+				 med_entite_maillage(theInfo.myEntity),
+				 med_geometrie_element(anIter->first),
+				 theTimeStampId,
+				 &aMeshInfo.myName[0],
+				 &aNbGauss,
+				 (med_int*)&theInfo.myNumDt,
+				 &theInfo.myUnitDt[0],
+				 &theInfo.myDt,
+				 (med_int*)&theInfo.myNumOrd);
+	
+	
+	static TInt MAX_NB_GAUSS_POINTS = 32;
+	if(aNbGauss <= 0 || aNbGauss > MAX_NB_GAUSS_POINTS)
+	  aNbGauss = 1;
+
+	aGeom2NbGauss[aGeom] = aNbGauss;
+	
+	if(theErr) 
+	  *theErr = aRet;
+	else if(aRet < 0)
+	  EXCEPTION(runtime_error,"GetTimeStampInfo - MEDpasdetempsInfo(...)");
+      }
     }
     
 
@@ -983,16 +992,26 @@ namespace MED
 	    *theErr = -1;
 	    return;
 	  }
-	  EXCEPTION(runtime_error,"GetTimeStampInfo - MEDnVal(...) - aNbVal == "<<aNbVal<<" <= 0");
+	  EXCEPTION(runtime_error,"GetTimeStampVal - MEDnVal(...) - aNbVal == "<<aNbVal<<" <= 0");
 	}
 	
 	TMeshValue& aMeshValue = theVal.GetMeshValue(aGeom);
-	TInt aNbElem = aNbVal / aTimeStampInfo.myNbGauss;
+	TInt aNbGauss = aTimeStampInfo.GetNbGauss(aGeom);
+	TInt aNbElem = aNbVal / aNbGauss;
 	aMeshValue.Init(aNbElem,
-			aTimeStampInfo.myNbGauss,
+			aNbGauss,
 			aFieldInfo.myNbComp);
 	TValue& aValue = aMeshValue.myValue;
 	TInt anEnd = aValue.size();
+
+	INITMSG(MYDEBUG,
+		"TVWrapper::GetTimeStampVal - aGeom = "<<aGeom<<
+		"; aNbVal = "<<aNbVal<<
+		"; anEnd = "<<anEnd<<
+		"; aNbElem = "<<aNbElem<<
+		"; aNbGauss = "<<aNbGauss<<
+		"; aFieldInfo.myNbComp = "<<aFieldInfo.myNbComp<<
+		endl);
 
 	TErr aRet;
 	switch(aFieldInfo.myType){
@@ -1038,7 +1057,7 @@ namespace MED
 	    *theErr = aRet;
 	    return;
 	  }
-	  EXCEPTION(runtime_error,"GetValTimeStamp - MEDchampLire(...)");
+	  EXCEPTION(runtime_error,"GetTimeStampVal - MEDchampLire(...)");
 	}
 
 	MED::PProfileInfo aProfileInfo;
@@ -1051,14 +1070,14 @@ namespace MED
 	}
 	  
 	if(aProfileInfo && aProfileInfo->IsPresent()){
-	  TInt aSize = aProfileInfo->GetSize()*aFieldInfo.myNbComp*aTimeStampInfo.myNbGauss;
+	  TInt aSize = aProfileInfo->GetSize()*aFieldInfo.myNbComp*aNbGauss;
 	  if(aSize != aValue.size()){
 	    if(theErr){
 	      *theErr = -1;
 	      return;
 	    }
 	    EXCEPTION(runtime_error,
-		      "GetTimeStampInfo - aSize("<<aSize<<
+		      "GetTimeStampVal - aSize("<<aSize<<
 		      ") != aValue.size()("<<aValue.size()<<
 		      "); aNbVal = "<<aNbVal<<
 		      "; anEntity = "<<aTimeStampInfo.myEntity<<
@@ -1070,7 +1089,7 @@ namespace MED
 		return;
 	      }
 	      EXCEPTION(runtime_error,
-			"GetTimeStampInfo - anEnd("<<anEnd<<
+			"GetTimeStampVal - anEnd("<<anEnd<<
 			") != aValue.size()("<<aValue.size()<<
 			"); aNbVal = "<<aNbVal<<
 			"; anEntity = "<<aTimeStampInfo.myEntity<<
@@ -1112,6 +1131,7 @@ namespace MED
 	med_geometrie_element aMEDGeom = med_geometrie_element(aGeom);
 
 	MED::TProfileInfo& aProfileInfo = aGeom2Profile[aGeom];
+	med_int aNbGauss = aTimeStampInfo.GetNbGauss(aGeom);
 
 	med_int aNbVal = aMeshValue.myNbElem / aFieldInfo.myNbComp;
 	TValue& aValue = aMeshValue.myValue;
@@ -1127,7 +1147,7 @@ namespace MED
 			     (unsigned char*)&anArray[0],
 			     med_mode_switch(theVal.myModeSwitch),
 			     aNbVal,
-			     aTimeStampInfo.myNbGauss,
+			     aNbGauss,
 			     MED_ALL,
 			     &aProfileInfo.myName[0],
 			     MED_ECRI, 
@@ -1150,7 +1170,7 @@ namespace MED
 			     (unsigned char*)&anArray[0],
 			     med_mode_switch(theVal.myModeSwitch),
 			     aNbVal,
-			     aTimeStampInfo.myNbGauss,
+			     aNbGauss,
 			     MED_ALL,
 			     &aProfileInfo.myName[0],
 			     MED_ECRI, 

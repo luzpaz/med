@@ -1480,7 +1480,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      TGeom2Size& aGeom2Size = theInfo.myGeom2Size;
+      const TGeom2Size& aGeom2Size = theInfo.myGeom2Size;
       
       if(theErr){
 	if(aGeom2Size.empty())
@@ -1493,30 +1493,39 @@ namespace MED
       MED::TFieldInfo& aFieldInfo = *theInfo.myFieldInfo;
       MED::TMeshInfo& aMeshInfo = *aFieldInfo.myMeshInfo;
       
-      TGeom2Size::iterator anIter = aGeom2Size.begin();
+      TGeom2NbGauss& aGeom2NbGauss = theInfo.myGeom2NbGauss;
 
-      TErr aRet;
-      aRet = MEDpasdetempsInfo(myFile->Id(),
-			       &aFieldInfo.myName[0],
-			       med_entite_maillage(theInfo.myEntity),
-			       med_geometrie_element(anIter->first),
-			       theTimeStampId,
-			       (med_int*)&theInfo.myNbGauss,
-			       (med_int*)&theInfo.myNumDt,
-			       (med_int*)&theInfo.myNumOrd,
-			       &theInfo.myUnitDt[0],
-			       &theInfo.myDt,
-			       &aMeshInfo.myName[0],
-			       (med_booleen*)&aFieldInfo.myIsLocal,
-			       (med_int*)&aFieldInfo.myNbRef);
-      if(theErr) 
-	*theErr = aRet;
-      else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetTimeStampInfo - MEDpasdetempsInfo(...)");
-      
-      static TInt MAX_NB_GAUSS_POINTS = 32;
-      if(theInfo.myNbGauss <= 0 || theInfo.myNbGauss > MAX_NB_GAUSS_POINTS) 
-	theInfo.myNbGauss = 1;
+      TGeom2Size::const_iterator anIter = aGeom2Size.begin();
+      for(; anIter != aGeom2Size.end(); anIter++){
+	const EGeometrieElement& aGeom = anIter->first;
+	med_int aNbGauss = -1;
+
+	TErr aRet;
+	aRet = MEDpasdetempsInfo(myFile->Id(),
+				 &aFieldInfo.myName[0],
+				 med_entite_maillage(theInfo.myEntity),
+				 med_geometrie_element(anIter->first),
+				 theTimeStampId,
+				 &aNbGauss,
+				 (med_int*)&theInfo.myNumDt,
+				 (med_int*)&theInfo.myNumOrd,
+				 &theInfo.myUnitDt[0],
+				 &theInfo.myDt,
+				 &aMeshInfo.myName[0],
+				 (med_booleen*)&aFieldInfo.myIsLocal,
+				 (med_int*)&aFieldInfo.myNbRef);
+
+	static TInt MAX_NB_GAUSS_POINTS = 32;
+	if(aNbGauss <= 0 || aNbGauss > MAX_NB_GAUSS_POINTS)
+	  aNbGauss = 1;
+
+	aGeom2NbGauss[aGeom] = aNbGauss;
+
+	if(theErr) 
+	  *theErr = aRet;
+	else if(aRet < 0)
+	  EXCEPTION(runtime_error,"GetTimeStampInfo - MEDpasdetempsInfo(...)");
+      }      
     }
     
 
@@ -1563,11 +1572,11 @@ namespace MED
 	    *theErr = MED_FAUX;
 	    return;
 	  }
-	  EXCEPTION(runtime_error,"GetValTimeStamp - MEDnChampRef(...) < 1");
+	  EXCEPTION(runtime_error,"GetTimeStampVal - MEDnChampRef(...) < 1");
 	}
 	
 	TErr aRet;
-	med_int aNbGauss = aTimeStampInfo.myNbGauss;
+	med_int aNbGauss = -1;
 	aRet = MEDchampRefInfo(anId,
 			       &aFieldInfo.myName[0],
 			       med_entite_maillage(aTimeStampInfo.myEntity),
@@ -1584,7 +1593,7 @@ namespace MED
 	    *theErr = MED_FAUX;
 	    return;
 	  }
-	  EXCEPTION(runtime_error,"GetValTimeStamp - MEDchampRefInfo(...)");
+	  EXCEPTION(runtime_error,"GetTimeStampVal - MEDchampRefInfo(...)");
 	}
  
 	TInt aNbVal = MEDnVal(anId,

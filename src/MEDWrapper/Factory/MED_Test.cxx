@@ -92,7 +92,6 @@ void CheckMed(const std::string& theFileName)
 	    INITMSG(MYDEBUG,
 		    "GetPTimeStampInfo "<<
 		    "- anEntity = "<<aTimeStampInfo->GetEntity()<<
-		    "; aNbGauss = "<<aTimeStampInfo->GetNbGauss()<<
 		    "; aNumDt = "<<aTimeStampInfo->GetNumDt()<<
 		    endl);
 	    PTimeStampVal aTimeStampVal = aMed->GetPTimeStampVal(aTimeStampInfo,
@@ -193,8 +192,7 @@ void CopyMed(const PWrapper& theMed,
 	  PTimeStampInfo aTimeStampInfo = 
 	  theMed->GetPTimeStampInfo(aFieldInfo,anEntity,aGeom2Size,iTimeStamp+1);
 	  TInt aNumDt = aTimeStampInfo->GetNumDt();
-	  TInt aNbGauss = aTimeStampInfo->GetNbGauss();
-	  INITMSG(MYDEBUG,"aNbGauss = "<<aNbGauss<<"; aNumDt = "<<aNumDt<<"\n");
+	  INITMSG(MYDEBUG,"aNumDt = "<<aNumDt<<"\n");
 	  
 	  PTimeStampInfo aTimeStampInfo2 = 
 	    theMed->CrTimeStampInfo(aFieldInfo2,aTimeStampInfo);

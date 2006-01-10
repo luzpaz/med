@@ -451,6 +451,7 @@ namespace MED
 
   //---------------------------------------------------------------
   typedef std::map<EGeometrieElement,PGaussInfo> TGeom2Gauss;
+  typedef std::map<EGeometrieElement,TInt> TGeom2NbGauss;
 
   //! Define a base class which represents MED TimeStamp
   struct TTimeStampInfo: 
@@ -470,8 +471,8 @@ namespace MED
     //! Get map of number of cells per geometric type where the MED TimeStamp belongs to
     const TGeom2Size& GetGeom2Size() const { return myGeom2Size;}
 
-    TInt myNbGauss; //!< Keeps number of the Gauss Points for the MED TimeStamp
-    TInt GetNbGauss() const { return myNbGauss;} //!< Gives number of the Gauss Points for the MED TimeStamp
+    TGeom2NbGauss myGeom2NbGauss; //!< Keeps number of the Gauss Points for the MED TimeStamp
+    TInt GetNbGauss(EGeometrieElement theGeom) const; //!< Gives number of the Gauss Points for the MED TimeStamp
 
     TInt myNumDt; //!< Keeps number in time for the MED TimeStamp
     TInt GetNumDt() const { return myNumDt;} //!< Defines number in time for the MED TimeStamp

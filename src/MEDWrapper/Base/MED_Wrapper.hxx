@@ -630,7 +630,7 @@ namespace MED
     CrTimeStampInfo(const PFieldInfo& theFieldInfo, 
 		    EEntiteMaillage theEntity,
 		    const TGeom2Size& theGeom2Size,
-		    TInt theNbGauss = 0,
+		    const TGeom2NbGauss& theGeom2NbGauss = TGeom2NbGauss(),
 		    TInt theNumDt = 0,
 		    TInt theNumOrd = 0,
 		    TFloat theDt = 0,

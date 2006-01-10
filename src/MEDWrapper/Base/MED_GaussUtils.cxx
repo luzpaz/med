@@ -1189,8 +1189,6 @@ namespace MED
 	
     theGaussCoord.Init(aNbElem,aNbGauss,aDim,theMode);
 
-    TInt aConnDim = theCellInfo.GetConnDim();
-    
     INITMSGA(MYDEBUG,0,
 	     "- aDim = "<<aDim<<
 	     "; aNbGauss = "<<aNbGauss<<
@@ -1203,6 +1201,8 @@ namespace MED
       TCConnSlice aConnSlice = theCellInfo.GetConnSlice(aCellId);
       TCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(anElemId);
       
+      TInt aConnDim = aConnSlice.size();
+    
       for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
 	TCoordSlice& aGaussCoordSlice = aCoordSliceArr[aGaussId];
 	

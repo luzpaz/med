@@ -161,9 +161,9 @@ namespace MED
 	PTimeStampInfo aTimeStamp = 
 	  theWrapper->GetPTimeStampInfo(aFieldInfo,anEntity,aGeom2Size,iTimeStamp);
 	aFieldInfo2TimeStampInfoSet[aFieldInfo].insert(aTimeStamp);
-	INITMSG(MYDEBUG,"aDt = "<<aTimeStamp->GetDt()
-		<<", Unit = \'"<<aTimeStamp->GetUnitDt()
-		<<"\', aNbGauss = "<<aTimeStamp->GetNbGauss()<<"\n");
+	INITMSG(MYDEBUG,
+		"aDt = "<<aTimeStamp->GetDt()<<
+		", Unit = \'"<<aTimeStamp->GetUnitDt()<<"\n");
       }
     }
     ADDMSG(MYDEBUG,"\n");

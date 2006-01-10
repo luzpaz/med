@@ -279,10 +279,13 @@ namespace MED
     GetTimeStampInfo(theId,*anInfo,theErr);
 
 #ifdef _DEBUG_
-    INITMSG(MYDEBUG,
-	    "GetPTimeStampInfo - anEntity = "<<anInfo->GetEntity()<<
-	    "; aNbGauss = "<<anInfo->GetNbGauss()<<
-	    "; aNumDt = "<<anInfo->GetNumDt()<<"\n");
+    INITMSG(MYDEBUG,"GetPTimeStampInfo - anEntity = "<<anInfo->GetEntity()<<"\n");
+    TGeom2NbGauss& aGeom2NbGauss = anInfo->myGeom2NbGauss;
+    TGeom2NbGauss::const_iterator anIter = aGeom2NbGauss.begin();
+    for(; anIter != aGeom2NbGauss.end(); anIter++){
+      const EGeometrieElement& aGeom = anIter->first;
+      INITMSG(MYDEBUG,"aGeom = "<<aGeom<<" - "<<aGeom2NbGauss[aGeom]<<";\n");
+    }
 #endif
 
     return anInfo;
