@@ -20,7 +20,6 @@ public:
 template < class ARRAY_ELEMENT_TYPE,
 	   class INTERLACING_POLICY=FullInterlaceNoGaussPolicy,
 	   class CHECKING_POLICY=IndexCheckPolicy >
-	   //NoIndexCheckPolicy>
 class MEDMEM_Array : public INTERLACING_POLICY, public CHECKING_POLICY, public MEDMEM_Array_ {
 
 public :
@@ -41,9 +40,9 @@ public  :
   // Rem : Le constructeur de la policy demandée est appelé
   inline MEDMEM_Array(int dim, int nbelem) : InterlacingPolicy(nbelem,dim)
   {
-    checkMoreThanZero("MEDMEM_Array",nbelem);
-    checkMoreThanZero("MEDMEM_Array",dim);
-    _array.set(_arraySize);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",nbelem);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",dim);
+    _array.set(INTERLACING_POLICY::_arraySize);
   };
 
   // Le mot clé inline permettra d'instancier le constructeur uniquement
@@ -53,8 +52,8 @@ public  :
 		       bool shallowCopy=false,
 		       bool ownershipOfValues=false) : InterlacingPolicy(nbelem,dim)
   {
-    checkMoreThanZero("MEDMEM_Array",nbelem);
-    checkMoreThanZero("MEDMEM_Array",dim);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",nbelem);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",dim);
     if(shallowCopy)
 
       if(ownershipOfValues)
@@ -63,7 +62,7 @@ public  :
 	_array.set((const ElementType*)values);
 
     else // Cas par défaut
-      _array.set(_arraySize,values);
+      _array.set(INTERLACING_POLICY::_arraySize,values);
 
   }
 
@@ -74,10 +73,10 @@ public  :
 		      const int * const  nbelgeoc, const int * const nbgaussgeo)
     : InterlacingPolicy(nbelem, dim, nbtypegeo, nbelgeoc, nbgaussgeo)
   {
-    checkMoreThanZero("MEDMEM_Array",nbelem);
-    checkMoreThanZero("MEDMEM_Array",dim);
-    checkMoreThanZero("MEDMEM_Array",nbtypegeo);
-    _array.set(_arraySize);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",nbelem);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",dim);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",nbtypegeo);
+    _array.set(INTERLACING_POLICY::_arraySize);
   };
 
 
@@ -90,9 +89,9 @@ public  :
 		      bool ownershipOfValues=false)
     : InterlacingPolicy(nbelem, dim, nbtypegeo, nbelgeoc, nbgaussgeo)
   {
-    checkMoreThanZero("MEDMEM_Array",nbelem);
-    checkMoreThanZero("MEDMEM_Array",dim);
-    checkMoreThanZero("MEDMEM_Array",nbtypegeo);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",nbelem);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",dim);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",nbtypegeo);
 
     if(shallowCopy)
 
@@ -102,7 +101,7 @@ public  :
 	_array.set((const ElementType*)values);
 
     else
-      _array.set(_arraySize,values);
+      _array.set(INTERLACING_POLICY::_arraySize,values);
 
   };
 
@@ -114,7 +113,7 @@ public  :
     if (shallowCopy)
       this->_array.set(array._array); // Le propriétaire reste le ARRAY initial
     else
-      this->_array.set(_arraySize,array._array);
+      this->_array.set(INTERLACING_POLICY::_arraySize,array._array);
   }
 
 
@@ -155,75 +154,75 @@ public  :
 	_array.set((const ElementType*)values);
 
     else
-      _array.set(_arraySize,values);
+      _array.set(INTERLACING_POLICY::_arraySize,values);
   }
 
   inline const ElementType * getRow(int i) const {
-    checkInInclusiveRange("MEDMEM_Array",1,_nbelem,i);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_nbelem,i);
     // Empêche l'utilisation de getRow en mode MED_NO_INTERLACE
     // Ne devrait pas dépendre de la politique check
     checkEquality("MEDMEM_Array (Interlace test)",
 		  MED_EN::MED_NO_INTERLACE,
-		  _interlacing );
-    return &(_array[ getIndex(i,1) ]);
+		  INTERLACING_POLICY::_interlacing );
+    return &(_array[ INTERLACING_POLICY::getIndex(i,1) ]);
 
   }
 
   void setRow(int i,const ElementType * const value) {
-    checkInInclusiveRange("MEDMEM_Array",1,_nbelem,i);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_nbelem,i);
     // setRow fonctionne
     // dans les deux modes d'entrelacement.
 
-    for (int j =1; j <= getDim(); j++)
-      for (int k = 1 ; k <= getNbGauss(i); k++)
-	_array[getIndex(i,j,k)] = value[getIndex(1,j,k)];
+    for (int j =1; j <= INTERLACING_POLICY::getDim(); j++)
+      for (int k = 1 ; k <= INTERLACING_POLICY::getNbGauss(i); k++)
+	_array[INTERLACING_POLICY::getIndex(i,j,k)] = value[INTERLACING_POLICY::getIndex(1,j,k)];
   }
 
   inline const ElementType * getColumn(int j) const {
-    checkInInclusiveRange("MEDMEM_Array",1,_dim,j);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_dim,j);
     checkEquality("MEDMEM_Array (Interlace test)",
-		  MED_EN::MED_FULL_INTERLACE, _interlacing );
-    return &(_array[ getIndex(1,j) ]);
+		  MED_EN::MED_FULL_INTERLACE, INTERLACING_POLICY::_interlacing );
+    return &(_array[ INTERLACING_POLICY::getIndex(1,j) ]);
   }
 
   void setColumn(int j, const ElementType * const value) {
-    checkInInclusiveRange("MEDMEM_Array",1,_dim,j);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_dim,j);
     // setColumn fonctionne
     // dans les deux modes d'entrelacement.
 
-    for (int i=1; i <= getNbElem(); i++)
-      for (int k = 1 ; k <= getNbGauss(i); k++)
-	_array[getIndex(i,j,k)] = value[getIndex(i,1,k)];
+    for (int i=1; i <= INTERLACING_POLICY::getNbElem(); i++)
+      for (int k = 1 ; k <= INTERLACING_POLICY::getNbGauss(i); k++)
+	_array[INTERLACING_POLICY::getIndex(i,j,k)] = value[INTERLACING_POLICY::getIndex(i,1,k)];
   }
 
 
   inline const ElementType & getIJ(int i, int j) const  {
-    checkInInclusiveRange("MEDMEM_Array",1,_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,_dim,j);
-    return _array[ getIndex(i,j) ];
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_nbelem,i);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_dim,j);
+    return _array[ INTERLACING_POLICY::getIndex(i,j) ];
   }
 
   inline const ElementType & getIJK(int i, int j, int k ) const {
-    checkInInclusiveRange("MEDMEM_Array",1,_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,_dim,j);
-    checkInInclusiveRange("MEDMEM_Array",1,getNbGauss(i),k);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_nbelem,i);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_dim,j);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::getNbGauss(i),k);
 
-    return _array[ getIndex(i,j,k) ];
+    return _array[ INTERLACING_POLICY::getIndex(i,j,k) ];
   };
 
   inline void setIJ(int i, int j, const ElementType & value) {   //autre signature avec
-    checkInInclusiveRange("MEDMEM_Array",1,_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,_dim,j);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_nbelem,i);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_dim,j);
 
-    _array[ getIndex(i,j) ] = value;                      // retour ElementType & ?
+    _array[ INTERLACING_POLICY::getIndex(i,j) ] = value;                      // retour ElementType & ?
   };
 
   inline void setIJK(int i, int j, int k, const ElementType & value) {   //autre signature avec
-    checkInInclusiveRange("MEDMEM_Array",1,_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,_dim,j);
-    checkInInclusiveRange("MEDMEM_Array",1,getNbGauss(i),k);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_nbelem,i);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::_dim,j);
+    checkInInclusiveRange("MEDMEM_Array",1,INTERLACING_POLICY::getNbGauss(i),k);
 
-    _array[ getIndex(i,j,k) ] = value;                      // retour ElementType & ?
+    _array[ INTERLACING_POLICY::getIndex(i,j,k) ] = value;                      // retour ElementType & ?
   };
 
 

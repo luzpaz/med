@@ -1057,6 +1057,17 @@ void SUPPORT::setMesh(MESH *Mesh) const
     _mesh->addReference();
 }
 
+/*! returns the mesh name  */
+//------------------------------------
+string SUPPORT::getMeshName() const
+//------------------------------------
+{
+  if (_mesh)
+    return _mesh->getName();
+  else
+    return _meshName;
+}
+
 /*!
   addReference : reference counter presently disconnected in C++ -> just connected for client.
 */

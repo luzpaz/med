@@ -391,7 +391,7 @@ MED_FIELD_DRIVER22<T>::createFieldSupport(med_2_2::med_idt id,
 	  alreadyFoundPdtIt = true;
 
 	  if ( nmaa > 1 ) {
-	    MESSAGE(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = ("
+	    MESSAGE(LOC<<" Field |" << fieldName << "| with (ndt,or) = ("
 		    << ndt << "," << od << ") for (entityType,geometricType)=("
 		    << MED_EN::entNames[(*currentEntity).first] << ","
 		    << MED_EN::geoNames[*currentGeometry] << ")"
@@ -631,7 +631,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 				 << MED_FIELD_DRIVER<T>::_fieldName)) ;
   }
 
-  switch ( (med_2_2::med_type_champ) _ptrField->_valueType ) {
+  switch ( (med_2_2::med_type_champ) MED_FIELD_DRIVER<T>::_ptrField->_valueType ) {
   case  med_2_2::MED_INT :
   case  med_2_2::MED_INT32 :
   case  med_2_2::MED_INT64 :
@@ -639,7 +639,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
       delete[] componentName; delete[] unitName;
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field Type in file (" << type
 				   <<") differs from FIELD object type (" <<
-				   _ptrField->_valueType << ")" )) ;
+				   MED_FIELD_DRIVER<T>::_ptrField->_valueType << ")" )) ;
     }
     break;
   default:
@@ -649,7 +649,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
   string meshName="";
   bool   haveSupport = false;
-  if ( _ptrField->getSupport() ) {
+  if ( MED_FIELD_DRIVER<T>::_ptrField->getSupport() ) {
     // Verif sur la taille du meshName
     meshName =  MED_FIELD_DRIVER<T>::_ptrField->getSupport()->getMesh()->getName() ;
     haveSupport = true;

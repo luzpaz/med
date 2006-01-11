@@ -6,7 +6,6 @@
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Mesh.hxx"
-//#include "MEDMEM_FieldForward.hxx"
 #include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_ArrayConvert.hxx"
 
@@ -332,7 +331,12 @@ namespace MEDMEM {
       }
     _file << endl;
   }
+}
 
+#include "MEDMEM_Field.hxx"
+
+namespace MEDMEM
+{
   template <class T>
   template<int SPACEDIMENSION, unsigned int SORTSTRATEGY>
   void ASCII_FIELD_DRIVER<T>::sortAndWrite() const

@@ -50,7 +50,7 @@ public :
   */
   template <class INTERLACING_TAG>
   VTK_FIELD_DRIVER():GENDRIVER(),
-                     _ptrField((FIELD<T> *) MED_NULL), _fieldName(""),
+                     _ptrField((FIELD<T> *) 0), _fieldName(""),
 		     _fieldNum(MED_INVALID)
   {
     const char * LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER() ";

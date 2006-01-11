@@ -16,7 +16,6 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
-#include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_RCBase.hxx"
 
 /*!
@@ -29,6 +28,8 @@
 */
 
 namespace MEDMEM {
+
+  class MESH;
 
 class SUPPORT : public RCBASE
 {
@@ -156,7 +157,7 @@ public:
   inline string getName() const;
   inline string getDescription() const;
   virtual inline MESH * getMesh() const;
-  inline string getMeshName() const;
+  string getMeshName() const;
   inline MED_EN::medEntityMesh getEntity() const;
 
   inline bool   isOnAllElements() const;
@@ -466,17 +467,6 @@ inline MESH * SUPPORT::getMesh() const
 //------------------------------------
 {
   return _mesh;
-}
-
-/*! returns the mesh name  */
-//------------------------------------
-inline string SUPPORT::getMeshName() const
-//------------------------------------
-{
-  if (_mesh)
-    return _mesh->getName();
-  else
-    return _meshName;
 }
 
 /*!

@@ -48,7 +48,7 @@ namespace MEDMEM {
     static const MED_EN::medModeSwitch _interlacingType = MED_EN::MED_NO_INTERLACE; };
 
 class FIELD_    // GENERIC POINTER TO a template <class T, class INTERLACING_TAG> class FIELD
-{  // ùpihjpmoçhmpç_hmù
+{  // �¹pihjpmo�§hmp�§_hm�¹
 protected:
 
   bool            _isRead ;
@@ -1640,7 +1640,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
 
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'impl�©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
@@ -1649,7 +1649,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
  
     const T * value     = NULL;
     ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_NO_INTERLACE )
+    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
       value = getValue();
     else {
       myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
@@ -1668,7 +1668,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() == MED_FULL_INTERLACE ) delete myArray;
+    if ( getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) delete myArray;
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -1685,7 +1685,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
     _checkNormCompatibility(p_field_volume); // may throw exception
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'impl�©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
@@ -1693,7 +1693,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
 
     const T * value     = NULL;
     ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_NO_INTERLACE )
+    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
       value = getValue();
     else {
       myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
@@ -1712,7 +1712,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() == MED_FULL_INTERLACE ) delete myArray;
+    if ( getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) delete myArray;
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -1733,13 +1733,13 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
 
     const FIELD<double,FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'impl�©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
     const T * value     = NULL;
     ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_NO_INTERLACE )
+    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
       value = getColumn(component);
     else {
       myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
@@ -1758,7 +1758,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() == MED_FULL_INTERLACE ) delete myArray;
+    if ( getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) delete myArray;
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -1775,7 +1775,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_
     _checkNormCompatibility(p_field_volume); // may throw exception
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'impl�©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
@@ -1783,7 +1783,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_
 
    const T * value     = NULL;
     ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_NO_INTERLACE )
+    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
       value = getValue();
     else {
       myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
@@ -1802,7 +1802,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() == MED_FULL_INTERLACE ) delete myArray;
+    if ( getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) delete myArray;
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -1930,7 +1930,7 @@ FIELD<T,INTERLACING_TAG>::FIELD(driverTypes driverType,
   _time = 0.0;
   _orderNumber = orderNumber;
 
-  current = addDriver(driverType,fileName,fieldDriverName,MED_LECT);
+  current = addDriver(driverType,fileName,fieldDriverName,MED_EN::MED_LECT);
 
   _drivers[current]->open();
   _drivers[current]->read();
@@ -1978,7 +1978,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
     _numberOfValues = _support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
     MESSAGE(LOC <<" : "<<_numberOfValues <<" et "<< NumberOfComponents);
 
-    //EF : A modifier lors de l'intégration de la classe de localisation des points de gauss-b
+    //EF : A modifier lors de l'int�©gration de la classe de localisation des points de gauss
     _value = new ArrayNoGauss(_numberOfComponents,_numberOfValues);
 
     _isRead = true ;
@@ -2019,7 +2019,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents,
   MESSAGE("FIELD : constructeur : "<<LengthValue <<" et "<< NumberOfComponents);
   _numberOfValues = LengthValue ;
 
-  //EF : A modifier lors de l'intégration de la classe de localisation des points de gauss-b
+  //EF : A modifier lors de l'intÃ©gration de la classe de localisation des points de gauss
   _value = new ArrayNoGauss(_numberOfComponents,_numberOfValues);
 
   _isRead = true ;
