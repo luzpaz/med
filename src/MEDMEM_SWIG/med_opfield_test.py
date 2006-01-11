@@ -87,6 +87,7 @@ if (nbFields>0):
             if type == MED_INT32:
                 fieldint = createFieldIntFromField(field)
                 fieldint.read()
+                fieldint.getSupport().update()
                 name = fieldint.getName()
                 desc = fieldint.getDescription()
                 nbOfComp = fieldint.getNumberOfComponents()
@@ -125,7 +126,7 @@ if (nbFields>0):
                 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
-                    valueI = fieldint.getValueI(MED_FULL_INTERLACE,k+1)
+                    valueI = fieldint.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
                 fieldint2 = FIELDINT(fieldint)
                 print ""
@@ -157,7 +158,7 @@ if (nbFields>0):
                 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
-                    valueI = fieldintadd.getValueI(MED_FULL_INTERLACE,k+1)
+                    valueI = fieldintadd.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
                 print ""
                 fieldintsub = fieldint - fieldint2
@@ -188,7 +189,7 @@ if (nbFields>0):
                 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
-                    valueI = fieldintsub.getValueI(MED_FULL_INTERLACE,k+1)
+                    valueI = fieldintsub.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
                 print ""
                 fieldintmul = fieldint * fieldint2
@@ -219,42 +220,47 @@ if (nbFields>0):
                 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
-                    valueI = fieldintmul.getValueI(MED_FULL_INTERLACE,k+1)
+                    valueI = fieldintmul.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
                 print ""
-                fieldintdiv = fieldint / fieldint2
-                print "Test of the division of two integer fields with creation a new one"
-                print ""
-                name = fieldintdiv.getName()
-                desc = fieldintdiv.getDescription()
-                nbOfComp = fieldintdiv.getNumberOfComponents()
-                print "     Field",name," : ",desc
-                print "     Number Of Components:",nbOfComp
-                iterationNb = fieldintdiv.getIterationNumber()
-                orderNb = fieldintdiv.getOrderNumber()
-                time = fieldintdiv.getTime()
-                print "     Iteration Number",iterationNb
-                print "     Order Number",orderNb
-                print "     Time",time
-                for k in range(nbOfComp):
-                    kp1 = k+1
-                    compName = fieldintdiv.getComponentName(kp1)
-                    compDesc = fieldintdiv.getComponentDescription(kp1)
-                    compUnit = fieldintdiv.getMEDComponentUnit(kp1)
-                    print "      * Component:",kp1
-                    print "          Name:",compName
-                    print "          Description:",compDesc
-                    print "          Unit:",compUnit
+                try:
+                    fieldintdiv = fieldint / fieldint2
+                    print "Test of the division of two integer fields with creation a new one"
+                    print ""
+                    name = fieldintdiv.getName()
+                    desc = fieldintdiv.getDescription()
+                    nbOfComp = fieldintdiv.getNumberOfComponents()
+                    print "     Field",name," : ",desc
+                    print "     Number Of Components:",nbOfComp
+                    iterationNb = fieldintdiv.getIterationNumber()
+                    orderNb = fieldintdiv.getOrderNumber()
+                    time = fieldintdiv.getTime()
+                    print "     Iteration Number",iterationNb
+                    print "     Order Number",orderNb
+                    print "     Time",time
+                    for k in range(nbOfComp):
+                        kp1 = k+1
+                        compName = fieldintdiv.getComponentName(kp1)
+                        compDesc = fieldintdiv.getComponentDescription(kp1)
+                        compUnit = fieldintdiv.getMEDComponentUnit(kp1)
+                        print "      * Component:",kp1
+                        print "          Name:",compName
+                        print "          Description:",compDesc
+                        print "          Unit:",compUnit
 
-                support = fieldintdiv.getSupport()
-                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                print "     Values:",nbOf
-                for k in range(nbOf):
-                    valueI = fieldintdiv.getValueI(MED_FULL_INTERLACE,k+1)
-                    print "     *",valueI[:nbOfComp]
+                    support = fieldintdiv.getSupport()
+                    nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+                    print "     Values:",nbOf
+                    for k in range(nbOf):
+                        valueI = fieldintdiv.getRow(k+1)
+                        print "     *",valueI[:nbOfComp]
+
+                except:
+                    print "fieldintdiv = fieldint / fieldint2 catch/except error"
             elif type == MED_REEL64:
                 fielddouble = createFieldDoubleFromField(field)
                 fielddouble.read()
+                fielddouble.getSupport().update()
                 name = fielddouble.getName()
                 desc = fielddouble.getDescription()
                 nbOfComp = fielddouble.getNumberOfComponents()
@@ -296,7 +302,7 @@ if (nbFields>0):
                 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
-                    valueI = fielddouble.getValueI(MED_FULL_INTERLACE,k+1)
+                    valueI = fielddouble.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
                 fielddouble2 = FIELDDOUBLE(fielddouble)
                 print ""
@@ -328,7 +334,7 @@ if (nbFields>0):
                 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
-                    valueI = fielddoubleadd.getValueI(MED_FULL_INTERLACE,k+1)
+                    valueI = fielddoubleadd.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
                 print ""
                 fielddoublesub = fielddouble - fielddouble2
@@ -359,7 +365,7 @@ if (nbFields>0):
                 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
-                    valueI = fielddoublesub.getValueI(MED_FULL_INTERLACE,k+1)
+                    valueI = fielddoublesub.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
                 print ""
                 fielddoublemul = fielddouble * fielddouble2
@@ -390,39 +396,42 @@ if (nbFields>0):
                 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
-                    valueI = fielddoublemul.getValueI(MED_FULL_INTERLACE,k+1)
+                    valueI = fielddoublemul.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
                 print ""
-                fielddoublediv = fielddouble / fielddouble2
-                print "Test of the division of two double fields with creation a new one"
-                print ""
-                name = fielddoublediv.getName()
-                desc = fielddoublediv.getDescription()
-                nbOfComp = fielddoublediv.getNumberOfComponents()
-                print "     Field",name," : ",desc
-                print "     Number Of Components:",nbOfComp
-                iterationNb = fielddoublediv.getIterationNumber()
-                orderNb = fielddoublediv.getOrderNumber()
-                time = fielddoublediv.getTime()
-                print "     Iteration Number",iterationNb
-                print "     Order Number",orderNb
-                print "     Time",time
-                for k in range(nbOfComp):
-                    kp1 = k+1
-                    compName = fielddoublediv.getComponentName(kp1)
-                    compDesc = fielddoublediv.getComponentDescription(kp1)
-                    compUnit = fielddoublediv.getMEDComponentUnit(kp1)
-                    print "      * Component:",kp1
-                    print "          Name:",compName
-                    print "          Description:",compDesc
-                    print "          Unit:",compUnit
+                try:
+                    fielddoublediv = fielddouble / fielddouble2
+                    print "Test of the division of two double fields with creation a new one"
+                    print ""
+                    name = fielddoublediv.getName()
+                    desc = fielddoublediv.getDescription()
+                    nbOfComp = fielddoublediv.getNumberOfComponents()
+                    print "     Field",name," : ",desc
+                    print "     Number Of Components:",nbOfComp
+                    iterationNb = fielddoublediv.getIterationNumber()
+                    orderNb = fielddoublediv.getOrderNumber()
+                    time = fielddoublediv.getTime()
+                    print "     Iteration Number",iterationNb
+                    print "     Order Number",orderNb
+                    print "     Time",time
+                    for k in range(nbOfComp):
+                        kp1 = k+1
+                        compName = fielddoublediv.getComponentName(kp1)
+                        compDesc = fielddoublediv.getComponentDescription(kp1)
+                        compUnit = fielddoublediv.getMEDComponentUnit(kp1)
+                        print "      * Component:",kp1
+                        print "          Name:",compName
+                        print "          Description:",compDesc
+                        print "          Unit:",compUnit
 
-                support = fielddoublediv.getSupport()
-                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
-                print "     Values:",nbOf
-                for k in range(nbOf):
-                    valueI = fielddoublediv.getValueI(MED_FULL_INTERLACE,k+1)
+                    support = fielddoublediv.getSupport()
+                    nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+                    print "     Values:",nbOf
+                    for k in range(nbOf):
+                        valueI = fielddoublediv.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
+                except:
+                    print "fielddoublediv = fielddouble / fielddouble2 catch/except error"
             else:
                 print "  !!!! Bad type of Field !!!!"
 
@@ -432,33 +441,42 @@ print "TESTS OPERATIONS SUR FIELDDOUBLE : "
 
 fielddoublesub = fielddouble-fielddouble2
 fielddoublemul = fielddouble*fielddouble2
-fielddoublediv = fielddouble/fielddouble2
+
+try:
+    fielddoublediv = fielddouble/fielddouble2
+except:
+    pass
+
 fielddoubleasso = fielddouble+fielddouble2*fielddouble2
 fielddoubleSP=createFieldDoubleScalarProduct(fielddouble, fielddouble2)
 
 
-print " f1     : ",fielddouble.getValue(MED_FULL_INTERLACE)
-print " f2     : ",fielddouble2.getValue(MED_FULL_INTERLACE)
+print " f1     : ",fielddouble.getValue()
+print " f2     : ",fielddouble2.getValue()
 print "--------------------------------------------------------------------------------------------------------------"
-print "  +     : ",fielddoubleadd.getValue(MED_FULL_INTERLACE)
-print "  -     : ",fielddoublesub.getValue(MED_FULL_INTERLACE)
-print "  *     : ",fielddoublemul.getValue(MED_FULL_INTERLACE)
-print "  /     : ",fielddoublediv.getValue(MED_FULL_INTERLACE)
+print "  +     : ",fielddoubleadd.getValue()
+print "  -     : ",fielddoublesub.getValue()
+print "  *     : ",fielddoublemul.getValue()
+
+try:
+    print "  /     : ",fielddoublediv.getValue()
+except:
+    pass
 
 fielddouble+=fielddouble2;
-print "  +=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+print "  +=    : ",fielddouble.getValue()
 fielddouble-=fielddouble2;
-print "  -=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+print "  -=    : ",fielddouble.getValue()
 fielddouble*=fielddouble2;
-print "  *=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+print "  *=    : ",fielddouble.getValue()
 fielddouble/=fielddouble2;
-print "  /=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
-print "f1+f2*f2: ",fielddoubleasso.getValue(MED_FULL_INTERLACE)
+print "  /=    : ",fielddouble.getValue()
+print "f1+f2*f2: ",fielddoubleasso.getValue()
 fielddouble.applyLin(4,1);
-print " 4f1+1  : ",fielddouble.getValue(MED_FULL_INTERLACE)
-print " f1.f2  : ",fielddoubleSP.getValue(MED_FULL_INTERLACE)
+print " 4f1+1  : ",fielddouble.getValue()
+print " f1.f2  : ",fielddoubleSP.getValue()
 fielddouble2.applyPyFunc(add_one)
-print " CB:f2+1: ",fielddouble2.getValue(MED_FULL_INTERLACE)
+print " CB:f2+1: ",fielddouble2.getValue()
 
 print ""
 print "TESTS OPERATIONS SUR FIELDINT : "
@@ -467,31 +485,41 @@ print "TESTS OPERATIONS SUR FIELDINT : "
 fieldintadd = fieldint+fieldint2
 fieldintsub = fieldint-fieldint2
 fieldintmul = fieldint*fieldint2
-fieldintdiv = fieldint/fieldint2
+
+try:
+    fieldintdiv = fieldint/fieldint2
+except:
+    pass
+
 fieldintasso = fieldint+fieldint*fieldint
 fieldintSP=createFieldIntScalarProduct(fieldint, fieldint2)
 
-print " f1     : ",fieldint.getValue(MED_FULL_INTERLACE)
-print " f2     : ",fieldint2.getValue(MED_FULL_INTERLACE)
+print " f1     : ",fieldint.getValue()
+print " f2     : ",fieldint2.getValue()
 print "--------------------------------------------------------------------------------------------------------------"
-print "  +     : ",fieldintadd.getValue(MED_FULL_INTERLACE)
-print "  -     : ",fieldintsub.getValue(MED_FULL_INTERLACE)
-print "  *     : ",fieldintmul.getValue(MED_FULL_INTERLACE)
-print "  /     : ",fieldintdiv.getValue(MED_FULL_INTERLACE)
+print "  +     : ",fieldintadd.getValue()
+print "  -     : ",fieldintsub.getValue()
+print "  *     : ",fieldintmul.getValue()
+
+try:
+    print "  /     : ",fieldintdiv.getValue()
+except:
+    pass
+
 fieldint+=fieldint2;
-print "  +=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+print "  +=    : ",fieldint.getValue()
 fieldint-=fieldint2;
-print "  -=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+print "  -=    : ",fieldint.getValue()
 fieldint*=fieldint2;
-print "  *=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+print "  *=    : ",fieldint.getValue()
 fieldint/=fieldint2;
-print "  /=    : ",fieldint.getValue(MED_FULL_INTERLACE)
-print "f1+f2*f2: ",fieldintasso.getValue(MED_FULL_INTERLACE)
+print "  /=    : ",fieldint.getValue()
+print "f1+f2*f2: ",fieldintasso.getValue()
 fieldint.applyLin(4,1);
-print " 4f1+1  : ",fieldint.getValue(MED_FULL_INTERLACE)
-print " f1.f2  : ",fieldintSP.getValue(MED_FULL_INTERLACE)
+print " 4f1+1  : ",fieldint.getValue()
+print " f1.f2  : ",fieldintSP.getValue()
 fieldint2.applyPyFunc(add_one)
-print " CB:f2+1: ",fieldint2.getValue(MED_FULL_INTERLACE)
+print " CB:f2+1: ",fieldint2.getValue()
 myname="toto"
 fieldint.setName(myname)
 name = fieldint.getName()

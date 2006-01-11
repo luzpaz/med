@@ -2,9 +2,9 @@
 #
 # This Python script is parsing a MED file using MED Memory from SALOME platform:
 # It analyses all meshes in the MED file (coordinates, connectivity of d-cells as
-# well as (d-1)-cells, families), it tests all fields generated ine the MESH class
-# and write them in a new file , it gives only the number of fields stored in the
-# MED file (d is the space dimension).
+# well as (d-1)-cells, families), it tests all fields generated in the MESH class
+# and write them in a 2 new med files (V2.1 and V2.2), it gives only the number of
+# fields stored in the MED file (d is the mesh/space dimension).
 #
 ###################################################################################
 
@@ -25,7 +25,7 @@ def AnalyzeField(field):
     print "iteration number ",itNum," order Number ",ordNum
     print "It has ",nbComp," component(s) with the type ",type
 
-    fieldValue = field.getValue(MED_FULL_INTERLACE)
+    fieldValue = field.getValue()
     fieldSupport = field.getSupport()
     fieldMesh = fieldSupport.getMesh()
     fieldEntity = fieldSupport.getEntity()
@@ -224,6 +224,7 @@ if (nbMeshes>0):
                             print "    * Type",type
                             print "    * Number",number[0:nbOfElmtsOfType]
                         print ""
+                        numberFamily = family.getNumber(MED_ALL_ELEMENTS)
                         print "    * Getting an Integer Field on the family ",familyName
                         fieldFamilyIntg = FIELDINT(family,spaceDim)
                         fieldFamilyIntg.setIterationNumber(0)
@@ -267,16 +268,15 @@ if (nbMeshes>0):
                         nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
                         print "      Values:",nbOf
                         print "      Randomly set and get to check ..!"
-                        mode = MED_FULL_INTERLACE
                         for k in range(nbOf):
                             valueI = []
                             for kcomp in range(nbOfComp):
                                 valueI.append(randint(0,100))
 
 #                            print "     Set Entry *",(k+1)," ",valueI[:nbOfComp]
-                            
-                            fieldFamilyIntg.setValueI(mode,k+1,valueI)
-                            valueIverif = fieldFamilyIntg.getValueI(mode,k+1)
+                            valInd = numberFamily[k]                           
+                            fieldFamilyIntg.setRow(valInd,valueI)
+                            valueIverif = fieldFamilyIntg.getRow(valInd)
                             print "     Set/Get Entry *",(k+1)," ",valueI[:nbOfComp],"  /  ",valueIverif[:nbOfComp]
                         print "    * Getting a Real Field"
                         fieldFamilyDble = FIELDDOUBLE(family,spaceDim)
@@ -328,18 +328,21 @@ if (nbMeshes>0):
                                 valueI.append(random())
 
 #                            print "     Set Entry *",(k+1)," ",valueI[:nbOfComp]
-                            
-                            fieldFamilyDble.setValueI(MED_FULL_INTERLACE,k+1,valueI)
-                            valueIverif = fieldFamilyDble.getValueI(MED_FULL_INTERLACE,k+1)
+                            valInd = numberFamily[k]
+                            fieldFamilyDble.setRow(valInd,valueI)
+                            valueIverif = fieldFamilyDble.getRow(valInd)
                             print "     Set/Get Entry *",(k+1)," ",valueI[:nbOfComp],"  /  ",valueIverif[:nbOfComp]
                     if (entity != MED_NODE):
                         print ""
                         print "Getting barycenter on this family"
                         barycenterfamily = mesh.getBarycenter(family)
+                        if (not familyBool): numberFamily = family.getNumber(MED_ALL_ELEMENTS)
                         nbVal = barycenterfamily.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
                         nbComp = barycenterfamily.getNumberOfComponents()
                         for j in range(nbVal):
-                            barycenterfamilyentity = barycenterfamily.getValueI(MED_FULL_INTERLACE,j+1)
+                            valInd = j+1
+                            if (not familyBool): valInd = numberFamily[j]
+                            barycenterfamilyentity = barycenterfamily.getRow(valInd)
                             print "    * ",barycenterfamilyentity[:nbComp]
                 print ""
 
@@ -350,25 +353,49 @@ if (nbMeshes>0):
         print "Getting barycenter of all Cells of the mesh"
         barycenter = mesh.getBarycenter(supportCell)
         for j in range(nbElemts):
-            barycenterCell = barycenter.getValueI(MED_FULL_INTERLACE,j+1)
+            barycenterCell = barycenter.getRow(j+1)
             print "    * ",barycenterCell[:spaceDim]
 
         print "Writing on file the mesh"
-
-        writeMedFile = medFile[0:(len(medFile)-4)]+"_fields.med"
+        writeMed21File = medFile[0:(len(medFile)-4)]+"_V21_fields.med"
+        writeMed22File = medFile[0:(len(medFile)-4)]+"_V22_fields.med"
         fieldsMesh = barycenter.getSupport().getMesh()
         fieldsMeshName = "Fields Mesh"
         fieldsMesh.setName(fieldsMeshName)
-        indexMesh = fieldsMesh.addDriver(MED_DRIVER,writeMedFile,fieldsMeshName)
-        fieldsMesh.write(indexMesh,"")
+
+        medFileVersion = getMedFileVersionForWriting()
+        if (medFileVersion == V22):
+            setMedFileVersionForWriting(V21)
+
+        index21Mesh = fieldsMesh.addDriver(MED_DRIVER,writeMed21File,fieldsMeshName)
+        fieldsMesh.write(index21Mesh,"")
+
+        medFileVersion = getMedFileVersionForWriting()
+        if (medFileVersion == V21):
+            setMedFileVersionForWriting(V22)
+
+        index22Mesh = fieldsMesh.addDriver(MED_DRIVER,writeMed22File,fieldsMeshName)
+        fieldsMesh.write(index22Mesh,"")
 
         AnalyzeField(barycenter)
 
         print "Writing on file the cells barycenter field"
 
         barycenterName = barycenter.getName()
-        indexFieldBarycenter = barycenter.addDriver(MED_DRIVER,writeMedFile,barycenterName)
-        barycenter.write(indexFieldBarycenter,"")
+
+        medFileVersion = getMedFileVersionForWriting()
+        if (medFileVersion == V22):
+            setMedFileVersionForWriting(V21)
+
+        index21FieldBarycenter = barycenter.addDriver(MED_DRIVER,writeMed21File,barycenterName)
+        barycenter.write(index21FieldBarycenter,"")
+
+        medFileVersion = getMedFileVersionForWriting()
+        if (medFileVersion == V21):
+            setMedFileVersionForWriting(V22)
+
+        index22FieldBarycenter = barycenter.addDriver(MED_DRIVER,writeMed22File,barycenterName)
+        barycenter.write(index22FieldBarycenter,"")
 
         print ""
         if spaceDim == 3 :
@@ -387,8 +414,20 @@ if (nbMeshes>0):
             print "Writing on file the cells volume field"
 
             volumeName = volume.getName()
-            indexFieldVolume = volume.addDriver(MED_DRIVER,writeMedFile,volumeName)
-            volume.write(indexFieldVolume,"")
+
+            medFileVersion = getMedFileVersionForWriting()
+            if (medFileVersion == V22):
+                setMedFileVersionForWriting(V21)
+
+            index21FieldVolume = volume.addDriver(MED_DRIVER,writeMed21File,volumeName)
+            volume.write(index21FieldVolume,"")
+
+            medFileVersion = getMedFileVersionForWriting()
+            if (medFileVersion == V21):
+                setMedFileVersionForWriting(V22)
+
+            index22FieldVolume = volume.addDriver(MED_DRIVER,writeMed22File,volumeName)
+            volume.write(index22FieldVolume,"")
 
             print ""
             print "Building of the support on all Faces of the mesh."
@@ -402,7 +441,7 @@ if (nbMeshes>0):
             print "nbTypeFace:",nbTypeFace,"----",TypeFace[:nbTypeFace]
             normal = mesh.getNormal(supportFace)
             for j in range(nbFace):
-                normalFace = normal.getValueI(MED_FULL_INTERLACE,j+1)
+                normalFace = normal.getRow(j+1)
                 value1 = normalFace[0]
                 value2 = normalFace[1]
                 value3 = normalFace[2]
@@ -415,8 +454,20 @@ if (nbMeshes>0):
             print "Writing on file the face normal field"
 
             normalName = normal.getName()
-            indexFieldNormal = normal.addDriver(MED_DRIVER,writeMedFile,normalName)
-            normal.write(indexFieldNormal,"")
+
+            medFileVersion = getMedFileVersionForWriting()
+            if (medFileVersion == V22):
+                setMedFileVersionForWriting(V21)
+
+            index21FieldNormal = normal.addDriver(MED_DRIVER,writeMed21File,normalName)
+            normal.write(index21FieldNormal,"")
+
+            medFileVersion = getMedFileVersionForWriting()
+            if (medFileVersion == V21):
+                setMedFileVersionForWriting(V22)
+
+            index22FieldNormal = normal.addDriver(MED_DRIVER,writeMed22File,normalName)
+            normal.write(index22FieldNormal,"")
 
         elif spaceDim == 2:
             print "Getting area on all Cells of the mesh:"
@@ -434,8 +485,21 @@ if (nbMeshes>0):
             print "Writing on file the cells area field"
 
             areaName = area.getName()
-            indexFieldArea = area.addDriver(MED_DRIVER,writeMedFile,areaName)
-            area.write(indexFieldArea,"")
+
+            medFileVersion = getMedFileVersionForWriting()
+            if (medFileVersion == V22):
+                setMedFileVersionForWriting(V21)
+
+            index21FieldArea = area.addDriver(MED_DRIVER,writeMed21File,areaName)
+            area.write(index21FieldArea,"")
+
+            medFileVersion = getMedFileVersionForWriting()
+            if (medFileVersion == V21):
+                setMedFileVersionForWriting(V22)
+
+            index22FieldArea = area.addDriver(MED_DRIVER,writeMed22File,areaName)
+            area.write(index22FieldArea,"")
+
             print ""
             print "Building of the support on all Edges of the mesh."
             supportEdge = SUPPORT(mesh,"Support on all edges of the mesh",MED_EDGE)
@@ -448,7 +512,7 @@ if (nbMeshes>0):
             print "nbTypeEdge:",nbTypeEdge,"----",TypeEdge[:nbTypeEdge]
             normal = mesh.getNormal(supportEdge)
             for j in range(nbEdge):
-                normalEdge = normal.getValueI(MED_FULL_INTERLACE,j+1)
+                normalEdge = normal.getRow(j+1)
                 value1 = normalEdge[0]
                 value2 = normalEdge[1]
                 norm = (value1*value1 + value2*value2)**(0.5)
@@ -460,6 +524,20 @@ if (nbMeshes>0):
             print "Writing on file the edge normal field"
 
             normalName = normal.getName()
-            indexFieldNormal = normal.addDriver(MED_DRIVER,writeMedFile,normalName)
-            normal.write(indexFieldNormal,"")
+
+            medFileVersion = getMedFileVersionForWriting()
+            if (medFileVersion == V22):
+                setMedFileVersionForWriting(V21)
+
+            index21FieldNormal = normal.addDriver(MED_DRIVER,writeMed21File,normalName)
+            normal.write(index21FieldNormal,"")
+
+            medFileVersion = getMedFileVersionForWriting()
+            if (medFileVersion == V21):
+                setMedFileVersionForWriting(V22)
+
+            index22FieldNormal = normal.addDriver(MED_DRIVER,writeMed22File,normalName)
+            normal.write(index22FieldNormal,"")
         print ""
+
+print "END of the Pyhton script ..... Ctrl D to exit"

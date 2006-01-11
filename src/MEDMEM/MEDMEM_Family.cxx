@@ -37,15 +37,25 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   MESSAGE("FAMILY(int Identifier, string Name, int NumberOfAttribute,int *AttributeIdentifier,int *AttributeValue,string AttributeDescription,int NumberOfGroup,string GroupName, int ** Number) : "<<Identifier);
 
   _isOnAllElts = false ;
-  _attributeIdentifier.set(_numberOfAttribute,AttributeIdentifier);
-  _attributeValue.set(_numberOfAttribute,AttributeValue);
+  SCRUTE(_numberOfAttribute);
+  if (_numberOfAttribute > 0)
+    {
+      _attributeIdentifier.set(_numberOfAttribute,AttributeIdentifier);
+      _attributeValue.set(_numberOfAttribute,AttributeValue);
 
-  _attributeDescription.set(_numberOfAttribute);
-  for (int i=0;i<NumberOfAttribute;i++) {
-    _attributeDescription[i].assign(AttributeDescription,i*MED_TAILLE_DESC,MED_TAILLE_DESC);
-    _attributeDescription[i].erase(strlen(_attributeDescription[i].c_str()));
-    //SCRUTE(_attributeDescription[i]);
-  }
+      _attributeDescription.set(_numberOfAttribute);
+      for (int i=0;i<NumberOfAttribute;i++) {
+	_attributeDescription[i].assign(AttributeDescription,i*MED_TAILLE_DESC,MED_TAILLE_DESC);
+	_attributeDescription[i].erase(strlen(_attributeDescription[i].c_str()));
+	//SCRUTE(_attributeDescription[i]);
+      }
+    }
+  else
+    {
+      _attributeIdentifier.set(_numberOfAttribute);
+      _attributeValue.set(_numberOfAttribute);
+      _attributeDescription.set(_numberOfAttribute);
+    }
  
   _groupName.set(_numberOfGroup);
   for (int i=0;i<NumberOfGroup;i++) {

@@ -148,11 +148,7 @@ TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray
 	test_operation_fieldint test_gibi_driver test_porflow_driver \
 	test_grid test_MEDMEM_PolyhedronArray test_MEDMEM_PolyConnectivity \
 	test_MEDMEM_PolyDriverMedMeshRead test_MEDMEM_PolyDriverMedMeshWrite \
-	test_MEDMEM_poly3D
-# test_MEDMEM_nArray
-# test_MEDMEM_Meshing_poly
-
-# testUCellModel -> a revoir car l'API a changee (plus de vector)
+	test_MEDMEM_poly3D test_MEDMEM_nArray test_MEDMEM_Meshing_poly
 
 LDFLAGS+= -L$(top_builddir)/lib/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib/salome

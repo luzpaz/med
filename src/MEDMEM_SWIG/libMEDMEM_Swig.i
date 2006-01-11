@@ -24,6 +24,7 @@
 #include "MEDMEM_Med.hxx"
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Field.hxx"
+#include "MEDMEM_FieldConvert.hxx"
 #include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Meshing.hxx"
@@ -33,8 +34,12 @@
   using namespace MEDMEM;
   using namespace MED_EN;
 
-  /*typedef FIELD <double> FIELDDOUBLE;*/
-  /*typedef FIELD <int> FIELDINT;*/
+  /*  typedef FIELD <double, FullInterlace> FIELDDOUBLEFULLINTERLACE;*/
+  /*  typedef FIELD <int, FullInterlace> FIELDINTFULLINTERLACE;*/
+  typedef FIELD <double, FullInterlace> FIELDDOUBLE;
+  typedef FIELD <int, FullInterlace> FIELDINT;
+  typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
+  typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 
 %}
 
@@ -44,21 +49,15 @@
   <SWIG Object at _d0709808_p_FIELDDOUBLE> which has no attributes
 */
 
-/* typedef FIELD <double> FIELDDOUBLE;*/
-/*typedef FIELD <int> FIELDINT;*/
+/*typedef FIELD <double, FullInterlace> FIELDDOUBLEFULLINTERLACE;*/
+/*typedef FIELD <int, FullInterlace> FIELDINTFULLINTERLACE;*/
+typedef FIELD <double, FullInterlace> FIELDDOUBLE;
+typedef FIELD <int, FullInterlace> FIELDINT;
+typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
+typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 
 %include "typemaps.i"
 %include "my_typemap.i"
-
-/*
-%template (FIELDDOUBLE) FIELD <double, FullInterlace>;
-%template (FIELDINT) FIELD <int, FullInterlace>;
-
-%template(FIELDDOUBLEFULLINTERLACE) FIELD<double, FullInterlace>;
-%template(FIELDDOUBLENOINTERLACE) FIELD<double, NoInterlace>;
-%template(FIELDINTFULLINTERLACE) FIELD<int, FullInterlace>;
-%template(FIELDINTNOINTERLACE) FIELD<int, NoInterlace>;
-*/
 
 /*
   mapping between stl string and python string 
@@ -99,14 +98,14 @@
   typemap for vector<FAMILY *> C++ object
 */
 
-%typemap(python,in) vector<FAMILY *>, const vector<FAMILY *>
+%typemap(python,in) vector< FAMILY * >, const vector< FAMILY * >
 {
   /* typemap in for vector<FAMILY *> */
   /* Check if is a list */
 
   if (PyList_Check($input)) {
     int size = PyList_Size($input);
-    $1.resize(size);
+    $1 = vector<FAMILY *>(size);
 
     for (int i=0; i < size; i++)
       {
@@ -134,7 +133,7 @@
     }
 }
 
-%typemap(python,out) vector<FAMILY *>
+%typemap(python,out) vector< FAMILY * >
 {
   /* typemap out for vector<FAMILY *> */
   int size = $1.size();
@@ -154,14 +153,14 @@
   typemap for vector<SUPPORT *> C++ object
 */
 
-%typemap(python,in) vector<SUPPORT *>, const vector<SUPPORT *>
+%typemap(python,in) vector< SUPPORT * >, const vector< SUPPORT * >
 {
   /* typemap in for vector<SUPPORT *> */
   /* Check if is a list */
 
   if (PyList_Check($input)) {
     int size = PyList_Size($input);
-    $1.resize(size);
+    $1 = vector<SUPPORT *>(size);
 
     for (int i=0; i < size; i++)
       {
@@ -189,7 +188,7 @@
     }
 }
 
-%typemap(python,out) vector<SUPPORT *>
+%typemap(python,out) vector< SUPPORT * >
 {
   /* typemap out for vector<SUPPORT *> */
   int size = $1.size();
@@ -206,7 +205,7 @@
 }
 
 
-%typemap(python,in) vector< FIELD<double> * >, const vector< FIELD<double> * >
+%typemap(python,in) vector< FIELD< double > * >, const vector< FIELD< double > * >
 {
     /* typemap in for vector<FIELD<double> *> */
   /* Check if is a list */
@@ -242,7 +241,7 @@
     }
 }
 
-%typemap(python,out) vector<FIELD<double> *>
+%typemap(python,out) vector< FIELD< double > * >
 {
   /* typemap out for vector<FIELD<double> *> */
   int size = $1.size();
@@ -258,7 +257,7 @@
     }
 }
 
-%typemap(python,in) vector<FIELD<int> *>, const vector<FIELD<int> *>
+%typemap(python,in) vector< FIELD< int > * >, const vector< FIELD< int > * >
 {
     /* typemap in for vector<FIELD<int> *> */
   /* Check if is a list */
@@ -294,7 +293,7 @@
     }
 }
 
-%typemap(python,out) vector<FIELD<int> *>
+%typemap(python,out) vector< FIELD< int > * >
 {
   /* typemap out for vector<FIELD<int> *> */
   int size = $1.size();
@@ -429,6 +428,12 @@ void setMedFileVersionForWriting(medFileVersion version);
       return self->it;
     }
 }
+
+%typecheck(SWIG_TYPECHECK_POINTER) vector< SUPPORT * >, const vector< SUPPORT * >
+{
+  $1 = ($input != 0);
+}
+
 /*
   Class et methodes du MED++ que l'on utilise dans l'API Python
 */
@@ -742,6 +747,10 @@ public:
 
   void setValue(T1* value);
 
+  void setRow( int i, T1 * value);
+
+  void setColumn( int i, T1 * value);
+
   void setValueIJ(int i, int j, T1 value);
 
   void allocValue(const int NumberOfComponents);
@@ -940,9 +949,11 @@ public:
   }
 };
 
-%template(FIELDDOUBLEFULLINTERLACE) FIELD<double, FullInterlace>;
+/*%template(FIELDDOUBLEFULLINTERLACE) FIELD<double, FullInterlace>;*/
+%template(FIELDDOUBLE) FIELD<double, FullInterlace>;
 %template(FIELDDOUBLENOINTERLACE) FIELD<double, NoInterlace>;
-%template(FIELDINTFULLINTERLACE) FIELD<int, FullInterlace>;
+/*%template(FIELDINTFULLINTERLACE) FIELD<int, FullInterlace>;*/
+%template(FIELDINT) FIELD<int, FullInterlace>;
 %template(FIELDINTNOINTERLACE) FIELD<int, NoInterlace>;
 
 class GROUP : public SUPPORT
@@ -953,10 +964,10 @@ public:
   ~GROUP();
 
   void setNumberOfFamilies(int numberOfFamilies);
-  void setFamilies(vector<FAMILY*> Family);
+  void setFamilies(vector< FAMILY * > Family);
 
   int getNumberOfFamilies() const ;
-  vector<FAMILY*> getFamilies() const ;
+  vector< FAMILY * > getFamilies() const ;
   FAMILY * getFamily(int i) const ;
 };
 
@@ -1004,16 +1015,25 @@ public :
   int getElementContainingPoint(const double *coord);
 
   int getNumberOfTypesWithPoly(medEntityMesh Entity);
+
   int getNumberOfPolygons();
+
   int getNumberOfPolyhedronFaces();
+
   int getNumberOfPolyhedron();
+
   int getNumberOfElementsWithPoly(medEntityMesh Entity,
                                   medGeometryElement Type);
+
   bool existPolygonsConnectivity(medConnectivity ConnectivityType,
                                  medEntityMesh Entity);
+
   bool existPolyhedronConnectivity(medConnectivity ConnectivityType,
                                    medEntityMesh Entity);
+
   medGeometryElement getElementTypeWithPoly(medEntityMesh Entity,int Number);
+
+  std::string getName() const;
   
   %extend {
     %newobject getBoundaryElements(medEntityMesh );
@@ -1028,14 +1048,14 @@ public :
 	return self->getSkin(Support3D);
       }
 
-    %newobject mergeSupports(const vector<SUPPORT *> );
-    SUPPORT * mergeSupports(const vector<SUPPORT *> Supports)
+    %newobject mergeSupports(const vector< SUPPORT * > );
+    SUPPORT * mergeSupports(const vector< SUPPORT * > Supports)
       {
 	return self->mergeSupports(Supports);
       }
 
-    %newobject intersectSupports(const vector<SUPPORT *> );
-    SUPPORT * intersectSupports(const vector<SUPPORT *> Supports)
+    %newobject intersectSupports(const vector< SUPPORT * > );
+    SUPPORT * intersectSupports(const vector< SUPPORT * > Supports)
       {
 	return self->intersectSupports(Supports);
       }
@@ -1079,15 +1099,6 @@ public :
     void setName(char * name)
       {
 	self->setName(string(name));
-      }
-
-    %newobject getName();
-    const char * getName()
-      {
-	string tmp_str = self->getName();
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
 
     %newobject getCoordinatesSystem();
@@ -1298,6 +1309,8 @@ public :
   ~MESHING();
 
   void setSpaceDimension   (const int SpaceDimension) ;
+
+  void setMeshDimension    (const int MeshDimension) ;
 
   void setNumberOfNodes    (const int NumberOfNodes) ;
 
@@ -2281,8 +2294,6 @@ public:
 %template (ASCII_FIELDDOUBLE_DRIVER) ASCII_FIELD_DRIVER< double >;
 %template (ASCII_FIELDINT_DRIVER) ASCII_FIELD_DRIVER< int >;
 
-
-
 %{
   template <class T, class INTERLACING_TAG>
     FIELD<T, INTERLACING_TAG> * createFieldScalarProduct(FIELD<T, INTERLACING_TAG> * field1,
@@ -2302,33 +2313,41 @@ public:
     }
 
   template<class T, class INTERLACING_TAG>
-    FIELD<T, INTERLACING_TAG> * createFieldFromField(FIELD_ * field)
+    FIELD<T, INTERLACING_TAG> * createTypedFieldFromField(FIELD_ * field)
     {
-      MESSAGE("createFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
+      MESSAGE("createTypedFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
       MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
       return (FIELD<T, INTERLACING_TAG> *) field;
     }
 %}
 
-template<class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldFromField(FIELD_ * field);
-%template ( createFieldDoubleFromField ) createFieldFromField < double, FullInterlace>;
-%template ( createFieldIntFromField ) createFieldFromField < int, FullInterlace >;
+template<class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createTypedFieldFromField(FIELD_ * field);
+%template ( createFieldDoubleFromField ) createTypedFieldFromField < double, FullInterlace>;
+%template ( createFieldIntFromField ) createTypedFieldFromField < int, FullInterlace >;
+%template ( createFieldDoubleNoInterlaceFromField ) createTypedFieldFromField < double, NoInterlace>;
+%template ( createFieldIntNoInterlaceFromField ) createTypedFieldFromField < int, NoInterlace >;
 
 template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldScalarProduct(FIELD<T, INTERLACING_TAG> * field1, FIELD<T, INTERLACING_TAG> * field2);
-%newobject createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
-%newobject createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) ;
+%newobject createFieldDoubleScalarProduct ;
+%newobject createFieldIntScalarProduct ;
+%newobject createFieldDoubleNoInterlaceScalarProduct ;
+%newobject createFieldIntNoInterlaceScalarProduct ;
 %template ( createFieldDoubleScalarProduct ) createFieldScalarProduct < double, FullInterlace >;
 %template ( createFieldIntScalarProduct ) createFieldScalarProduct < int, FullInterlace >;
+%template ( createFieldDoubleNoInterlaceScalarProduct ) createFieldScalarProduct < double, NoInterlace >;
+%template ( createFieldIntNoInterlaceScalarProduct ) createFieldScalarProduct < int, NoInterlace >;
 
-template <class T> FIELD<T> * createFieldScalarProductDeep(FIELD<T> * field1, FIELD<T> * field2);
-%newobject createFieldDoubleScalarProductDeep(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
-%newobject createFieldIntScalarProductDeep(FIELDINT * field1, FIELDINT * field2) ;
-%template ( createFieldDoubleScalarProductDeep ) createFieldScalarProductDeep < double >;
-%template ( createFieldIntScalarProductDeep ) createFieldScalarProductDeep < int >;
+template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldScalarProductDeep(FIELD<T, INTERLACING_TAG> * field1, FIELD<T, INTERLACING_TAG> * field2);
+%newobject createFieldDoubleScalarProductDeep ;
+%newobject createFieldIntScalarProductDeep ;
+%newobject createFieldDoubleNoInterlaceScalarProductDeep ;
+%newobject createFieldIntNoInterlaceScalarProductDeep ;
+%template ( createFieldDoubleScalarProductDeep ) createFieldScalarProductDeep < double, FullInterlace >;
+%template ( createFieldIntScalarProductDeep ) createFieldScalarProductDeep < int, FullInterlace >;
+%template ( createFieldDoubleNoInterlaceScalarProductDeep ) createFieldScalarProductDeep < double, NoInterlace >;
+%template ( createFieldIntNoInterlaceScalarProductDeep ) createFieldScalarProductDeep < int, NoInterlace >;
 
 template<class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldFromAnalytic(SUPPORT * Support, int NumberOfComponents, PyObject * double_function);
-%newobject createFieldDoubleFromAnalytic(SUPPORT * , int , PyObject *);
-%newobject createFieldIntFromAnalytic(SUPPORT * , int , PyObject *);
 
 GRID * createGridFromMesh( MESH * aMesh );
 
@@ -2366,3 +2385,5 @@ GRID * createGridFromMesh( MESH * aMesh );
 
 %template (createFieldDoubleFromAnalytic) createFieldFromAnalytic<double, FullInterlace>;
 %template (createFieldIntFromAnalytic) createFieldFromAnalytic<int, FullInterlace>;
+%template (createFieldDoubleNoInterlaceFromAnalytic) createFieldFromAnalytic<double, NoInterlace>;
+%template (createFieldIntNoInterlaceFromAnalytic) createFieldFromAnalytic<int, NoInterlace>;

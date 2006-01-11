@@ -195,6 +195,7 @@ void SUPPORT::update()
       else
 	{ // we duplicate information from _mesh
 	  _numberOfGeometricType=_mesh->getNumberOfTypesWithPoly(_entity);
+	  SCRUTE(_numberOfGeometricType);
 	  _geometricType.set(_numberOfGeometricType,_mesh->getTypesWithPoly(_entity) );
 	  _numberOfElements.set(_numberOfGeometricType);
 	  _numberOfGaussPoint.set(_numberOfGeometricType);
@@ -206,11 +207,15 @@ void SUPPORT::update()
 	      _numberOfGaussPoint[i]=1 ;
 	    }
 	}
+
+      SCRUTE(_name);
+      SCRUTE(_numberOfGeometricType);
+      SCRUTE(_numberOfGaussPoint);
     }
   END_OF(LOC);
 };
 /*!
-  Get the field value index from the support global number.
+  Get the field value index (in fortran mode) from the support global number.
   Becareful, it doesn't take care of the field number of components
 */
 //-------------------
@@ -230,7 +235,11 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
 
   for(iThis=0;iThis<nbOfEltsThis && !found;)
     if(eltsThis[iThis]==number)
-      return iThis;
+      {
+	found = true;
+	int valInd = iThis+1;
+	return valInd;
+      }
     else
       iThis++;
 
@@ -239,6 +248,7 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
 				 << number << "| in Support |"
 				 << getName() << "|" ));
 
+  // It should never arrive here !!
   return 0;
 
   END_OF(LOC);
@@ -274,11 +284,15 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
   for(int i=0;i<mySupportSize;i++)
     idsSet.insert(idsMySupport[i]);
   int size=idsSet.size();
+
   if(size!=0)
     {
       list<int> idsList;
       for(iter=idsSet.begin();iter!=idsSet.end();iter++)
 	idsList.push_back(*iter);
+
+      MESSAGE(LOC << " size Set " << idsSet.size() << " size List " << idsList.size());
+
       if(_entity==MED_NODE)
 	fillFromNodeList(idsList);
       else
@@ -511,7 +525,11 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
     if(idsSetMySupport.find(*iter)!=idsSetMySupport.end())
       idsList.push_back(*iter);
   int size=idsSet.size();
-  if(size!=0)
+  int sizeList = idsList.size();
+
+  MESSAGE(LOC << " size Set " << idsSet.size() << " size List " << idsList.size());
+
+  if(size!=0 && sizeList != 0)
     {
       if(_entity==MED_NODE)
 	fillFromNodeList(idsList);

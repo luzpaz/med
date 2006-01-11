@@ -2033,6 +2033,11 @@ int MED_MESH_WRONLY_DRIVER22::writeCoordinates() const {
   int meshDimension = med_2_2::MEDdimLire(_medIdt, const_cast <char *>
 					 (_meshName.c_str()) );
 
+  SCRUTE(spaceDimension);
+  SCRUTE(meshDimension);
+  SCRUTE(_ptrMesh->_spaceDimension);
+  SCRUTE(_ptrMesh->_meshDimension);
+
   if ((spaceDimension != MED_VALID) && (meshDimension != MED_VALID))
     {
       err = MEDmaaCr(_medIdt, const_cast <char *> (_meshName.c_str()),

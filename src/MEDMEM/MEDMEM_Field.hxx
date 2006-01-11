@@ -1601,7 +1601,10 @@ FIELD<T, INTERLACING_TAG>::scalarProduct(const FIELD & m, const FIELD & n, bool 
     const int NumberOfComponents=m.getNumberOfComponents(); // strictly positive
 
     // Creation & init of a the result field on the same support, with one component
-    FIELD<T,FullInterlace>* result = new FIELD<T,FullInterlace>(m.getSupport(),1);
+    // You have to be careful about the interlacing mode, because in the computation step,
+    // it seems to assume the the interlacing mode is the FullInterlacing
+
+    FIELD<T, INTERLACING_TAG>* result = new FIELD<T, INTERLACING_TAG>(m.getSupport(),1);
     result->setName( "scalarProduct ( " + m.getName() + " , " + n.getName() + " )" );
     result->setIterationNumber(m.getIterationNumber());
     result->setTime(m.getTime());
@@ -2479,6 +2482,39 @@ template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::s
     return dynamic_cast<ArrayNoGauss *>(_value)->setPtr(value) ;
 }
 
+/*!
+  Update values array in the j^{th} row of FIELD values array with the given ones and
+  according to specified mode.
+*/
+template <class T,class INTERLACING_TAG>
+inline void FIELD<T,INTERLACING_TAG>::setRow( int i, T* value) throw (MEDEXCEPTION) 
+{
+  const char * LOC = "FIELD<T,INTERLACING_TAG>::setRow(int i, T* value) : ";
+  int valIndex=i;
+//   JE (NB) NE SUIS PAS SUR DE CA ????
+  if (_support)
+    valIndex = _support->getValIndFromGlobalNumber(i);
+  else
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not define |" ));
+
+  if ( getGaussPresence() )
+    return dynamic_cast<ArrayGauss *>(_value)->setRow(valIndex, value) ;
+  else
+    return dynamic_cast<ArrayNoGauss *>(_value)->setRow(valIndex, value) ;
+}
+
+/*!
+  Update values array in the j^{th} column of FIELD values array with the given ones and
+  according to specified mode.
+*/
+template <class T,class INTERLACING_TAG>
+inline void FIELD<T,INTERLACING_TAG>::setColumn( int i, T* value) throw (MEDEXCEPTION) 
+{
+  if ( getGaussPresence() )
+    return dynamic_cast<ArrayGauss *>(_value)->setColumn(i, value) ;
+  else
+    return dynamic_cast<ArrayNoGauss *>(_value)->setColumn(i, value) ;
+}
 
 /*!
   Set the value of i^{th} element and j^{th} component with the given one.
@@ -2489,17 +2525,13 @@ template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::s
   int valIndex=-1;
   if (_support)
     valIndex = _support->getValIndFromGlobalNumber(i);
-
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not define |" ));
-
 
   if ( getGaussPresence() )
     return dynamic_cast<ArrayGauss *>(_value)->setIJ(valIndex,j,value) ;
   else
     return dynamic_cast<ArrayNoGauss *>(_value)->setIJ(valIndex,j,value) ;
-
-
 }
 
 /*

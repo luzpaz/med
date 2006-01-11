@@ -292,6 +292,10 @@ inline const int * SUPPORT::getNumberOfGaussPoint() const
   throw (MEDEXCEPTION)
 //-------------------------------------------------
 {
+  SCRUTE(_name);
+  SCRUTE(_numberOfGeometricType);
+  SCRUTE(_numberOfGaussPoint);
+
   if (_numberOfGaussPoint!=NULL)
     return _numberOfGaussPoint ;
   else
@@ -393,7 +397,7 @@ inline void SUPPORT::setNumberOfGaussPoint(const int *NumberOfGaussPoint)
 //-----------------------------------------------------------------
 {
   if (NULL == _numberOfGaussPoint)
-    _numberOfGaussPoint=new int[_numberOfGeometricType];
+    _numberOfGaussPoint.set(_numberOfGeometricType);
   for (int i=0;i<_numberOfGeometricType;i++)
     _numberOfGaussPoint[i] = NumberOfGaussPoint[i];
 }

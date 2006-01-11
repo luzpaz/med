@@ -83,11 +83,11 @@ meshNameFiles.append("CUBE_EN_HEXA8")
 files.append("cube_hexa8_import22.med")
 meshNameFiles.append("CUBE_EN_HEXA8")
 
-files.append("test19.med")
-meshNameFiles.append("CartGrid")
+##files.append("test19.med")
+##meshNameFiles.append("CartGrid")
 
-files.append("test19.med")
-meshNameFiles.append("bodyfitted")
+##files.append("test19.med")
+##meshNameFiles.append("bodyfitted")
 
 ##files.append("test19.med")
 ##meshNameFiles.append("maa1")
@@ -587,12 +587,11 @@ for i in range(nbOfFiles):
 
     print "Building of the support on all Cells of the mesh."
     supportCell = SUPPORT(mesh)
-    supportCell.update()
     print ""
     barycenter = mesh.getBarycenter(supportCell)
     print "Getting barycenter of all Cells of the mesh"
     for j in range(nbElemts):
-        barycenterCell = barycenter.getValueI(MED_FULL_INTERLACE,j+1)
+        barycenterCell = barycenter.getRow(j+1)
         print "    * ",barycenterCell[:spaceDim]
     print ""
 
@@ -665,8 +664,8 @@ for i in range(nbOfFiles):
         normal = mesh.getNormal(supportFace)
         area = mesh.getArea(supportFace)
         for j in range(nbFace):
-            normalFace = normal.getValueI(MED_FULL_INTERLACE,j+1)
-            areaFace = area.getValueI(MED_FULL_INTERLACE,j+1)
+            normalFace = normal.getRow(j+1)
+            areaFace = area.getRow(j+1)
             value1 = normalFace[0]
             value2 = normalFace[1]
             value3 = normalFace[2]
@@ -742,8 +741,8 @@ for i in range(nbOfFiles):
         normal = mesh.getNormal(supportEdge)
         length = mesh.getLength(supportEdge)
         for j in range(nbEdge):
-            normalEdge = normal.getValueI(MED_FULL_INTERLACE,j+1)
-            lengthEdge = length.getValueI(MED_FULL_INTERLACE,j+1)
+            normalEdge = normal.getRow(j+1)
+            lengthEdge = length.getRow(j+1)
             value1 = normalEdge[0]
             value2 = normalEdge[1]
             norm = (value1*value1 + value2*value2)**(0.5)
@@ -778,8 +777,10 @@ for i in range(nbOfFiles):
         nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
         print "Getting normal field on the boundary",nbElmBound
         normalBound = mesh.getNormal(suppBound)
+        numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
         for j in range(nbElmBound):
-            normalBoundJ = normalBound.getValueI(MED_FULL_INTERLACE,j+1)
+            valInd = numberSuppBound[j]
+            normalBoundJ = normalBound.getRow(valInd)
             value1 = normalBoundJ[0]
             value2 = normalBoundJ[1]
             value3 = normalBoundJ[2]
@@ -790,8 +791,10 @@ for i in range(nbOfFiles):
         nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
         print "Getting normal field on the boundary",nbElmBound
         normalBound = mesh.getNormal(suppBound)
+        numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
         for j in range(nbElmBound):
-            normalBoundJ = normalBound.getValueI(MED_FULL_INTERLACE,j+1)
+            valInd = numberSuppBound[j]
+            normalBoundJ = normalBound.getRow(valInd)
             value1 = normalBoundJ[0]
             value2 = normalBoundJ[1]
             norm = (value1*value1 + value2*value2)**(0.5)
@@ -892,7 +895,7 @@ for i in range(nbOfFiles):
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                         print "     Values:",nbOf
                         for k in range(nbOf):
-                            valueI = fieldint.getValueI(MED_FULL_INTERLACE,k+1)
+                            valueI = fieldint.getRow(k+1)
                             print "     *",valueI[:nbOfComp]
                         fieldint2 = FIELDINT(fieldint)
                         print ""
@@ -924,7 +927,7 @@ for i in range(nbOfFiles):
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                         print "     Values:",nbOf
                         for k in range(nbOf):
-                            valueI = fieldintadd.getValueI(MED_FULL_INTERLACE,k+1)
+                            valueI = fieldintadd.getRow(k+1)
                             print "     *",valueI[:nbOfComp]
                         print ""
                         fieldintsub = fieldint - fieldint2
@@ -955,7 +958,7 @@ for i in range(nbOfFiles):
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                         print "     Values:",nbOf
                         for k in range(nbOf):
-                            valueI = fieldintsub.getValueI(MED_FULL_INTERLACE,k+1)
+                            valueI = fieldintsub.getRow(k+1)
                             print "     *",valueI[:nbOfComp]
                         print ""
                         fieldintmul = fieldint * fieldint2
@@ -986,7 +989,7 @@ for i in range(nbOfFiles):
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                         print "     Values:",nbOf
                         for k in range(nbOf):
-                            valueI = fieldintmul.getValueI(MED_FULL_INTERLACE,k+1)
+                            valueI = fieldintmul.getRow(k+1)
                             print "     *",valueI[:nbOfComp]
                         print ""
                         try:
@@ -1018,7 +1021,7 @@ for i in range(nbOfFiles):
                             nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                             print "     Values:",nbOf
                             for k in range(nbOf):
-                                valueI = fieldintdiv.getValueI(MED_FULL_INTERLACE,k+1)
+                                valueI = fieldintdiv.getRow(k+1)
                                 print "     *",valueI[:nbOfComp]
                             print ""
                             print "TESTS OPERATIONS SUR FIELDINT : "
@@ -1035,35 +1038,35 @@ for i in range(nbOfFiles):
                         fieldintasso = fieldint+fieldint*fieldint
                         fieldintSP=createFieldIntScalarProduct(fieldint, fieldint2)
 
-                        print " f1     : ",fieldint.getValue(MED_FULL_INTERLACE)
-                        print " f2     : ",fieldint2.getValue(MED_FULL_INTERLACE)
+                        print " f1     : ",fieldint.getValue()
+                        print " f2     : ",fieldint2.getValue()
                         print "--------------------------------------------------------------------------------------------------------------"
-                        print "  +     : ",fieldintadd.getValue(MED_FULL_INTERLACE)
-                        print "  -     : ",fieldintsub.getValue(MED_FULL_INTERLACE)
-                        print "  *     : ",fieldintmul.getValue(MED_FULL_INTERLACE)
+                        print "  +     : ",fieldintadd.getValue()
+                        print "  -     : ",fieldintsub.getValue()
+                        print "  *     : ",fieldintmul.getValue()
                         if fieldintdiv == None :
                             print "testMedMemGeneral   /     : None"
                         else:
-                            print "  /     : ",fieldintdiv.getValue(MED_FULL_INTERLACE)
+                            print "  /     : ",fieldintdiv.getValue()
                         fieldint+=fieldint2;
-                        print "  +=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        print "  +=    : ",fieldint.getValue()
                         fieldint-=fieldint2;
-                        print "  -=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        print "  -=    : ",fieldint.getValue()
                         fieldint*=fieldint2;
-                        print "  *=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+                        print "  *=    : ",fieldint.getValue()
                         try:
                             fieldint/=fieldint2;
-                            print "  /=    : ",fieldint.getValue(MED_FULL_INTERLACE)
+                            print "  /=    : ",fieldint.getValue()
                         except :
                             fieldint = None
                             print "  /=    : Catch/Except : None"
-                        print "f1+f2*f2: ",fieldintasso.getValue(MED_FULL_INTERLACE)
+                        print "f1+f2*f2: ",fieldintasso.getValue()
                         if fieldint != None :
                             fieldint.applyLin(4,1);
-                            print " 4f1+1  : ",fieldint.getValue(MED_FULL_INTERLACE)
-                        print " f1.f2  : ",fieldintSP.getValue(MED_FULL_INTERLACE)
+                            print " 4f1+1  : ",fieldint.getValue()
+                        print " f1.f2  : ",fieldintSP.getValue()
                         fieldint2.applyPyFunc(add_one)
-                        print " CB:f2+1: ",fieldint2.getValue(MED_FULL_INTERLACE)
+                        print " CB:f2+1: ",fieldint2.getValue()
                     elif type == MED_REEL64:
                         fielddouble = createFieldDoubleFromField(field)
                         fielddouble.read()
@@ -1080,6 +1083,7 @@ for i in range(nbOfFiles):
                         print "     Time",time
                         print "     Norme  2  : ", fielddouble.norm2()
                         print "     Norme Max : ", fielddouble.normMax()
+                        fielddouble.getSupport().update()
                         print "try sobolev",fielddouble.getSupport().getEntity()
                         if fielddouble.getSupport().getEntity()!=MED_NODE:
                             if (spaceDim == 3):
@@ -1108,7 +1112,7 @@ for i in range(nbOfFiles):
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                         print "     Values:",nbOf
                         for k in range(nbOf):
-                            valueI = fielddouble.getValueI(MED_FULL_INTERLACE,k+1)
+                            valueI = fielddouble.getRow(k+1)
                             print "     *",valueI[:nbOfComp]
                         fielddouble2 = FIELDDOUBLE(fielddouble)
                         print ""
@@ -1140,7 +1144,7 @@ for i in range(nbOfFiles):
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                         print "     Values:",nbOf
                         for k in range(nbOf):
-                            valueI = fielddoubleadd.getValueI(MED_FULL_INTERLACE,k+1)
+                            valueI = fielddoubleadd.getRow(k+1)
                             print "     *",valueI[:nbOfComp]
                         print ""
                         fielddoublesub = fielddouble - fielddouble2
@@ -1171,7 +1175,7 @@ for i in range(nbOfFiles):
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                         print "     Values:",nbOf
                         for k in range(nbOf):
-                            valueI = fielddoublesub.getValueI(MED_FULL_INTERLACE,k+1)
+                            valueI = fielddoublesub.getRow(k+1)
                             print "     *",valueI[:nbOfComp]
                         print ""
                         fielddoublemul = fielddouble * fielddouble2
@@ -1202,7 +1206,7 @@ for i in range(nbOfFiles):
                         nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                         print "     Values:",nbOf
                         for k in range(nbOf):
-                            valueI = fielddoublemul.getValueI(MED_FULL_INTERLACE,k+1)
+                            valueI = fielddoublemul.getRow(k+1)
                             print "     *",valueI[:nbOfComp]
                         print ""
                         try:
@@ -1234,7 +1238,7 @@ for i in range(nbOfFiles):
                             nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                             print "     Values:",nbOf
                             for k in range(nbOf):
-                                valueI = fielddoublediv.getValueI(MED_FULL_INTERLACE,k+1)
+                                valueI = fielddoublediv.getRow(k+1)
                                 print "     *",valueI[:nbOfComp]
                         except:
                             print "testMedMemGeneral  fielddoublediv = fielddouble / fielddouble2 catch/except error"
@@ -1250,32 +1254,32 @@ for i in range(nbOfFiles):
                             fielddoublediv = None
                         fielddoubleasso = fielddouble+fielddouble2*fielddouble2
                         fielddoubleSP=createFieldDoubleScalarProduct(fielddouble, fielddouble2)
-                        print " f1     : ",fielddouble.getValue(MED_FULL_INTERLACE)
-                        print " f2     : ",fielddouble2.getValue(MED_FULL_INTERLACE)
+                        print " f1     : ",fielddouble.getValue()
+                        print " f2     : ",fielddouble2.getValue()
                         print "--------------------------------------------------------------------------------------------------------------"
-                        print "  +     : ",fielddoubleadd.getValue(MED_FULL_INTERLACE)
-                        print "  -     : ",fielddoublesub.getValue(MED_FULL_INTERLACE)
-                        print "  *     : ",fielddoublemul.getValue(MED_FULL_INTERLACE)
+                        print "  +     : ",fielddoubleadd.getValue()
+                        print "  -     : ",fielddoublesub.getValue()
+                        print "  *     : ",fielddoublemul.getValue()
                         if fielddoublediv != None:
-                            print "  /     : ",fielddoublediv.getValue(MED_FULL_INTERLACE)
+                            print "  /     : ",fielddoublediv.getValue()
                             pass
                         fielddouble+=fielddouble2;
-                        print "  +=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                        print "  +=    : ",fielddouble.getValue()
                         fielddouble-=fielddouble2;
-                        print "  -=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                        print "  -=    : ",fielddouble.getValue()
                         fielddouble*=fielddouble2;
-                        print "  *=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                        print "  *=    : ",fielddouble.getValue()
                         try:
                             fielddouble/=fielddouble2;
-                            print "  /=    : ",fielddouble.getValue(MED_FULL_INTERLACE)
+                            print "  /=    : ",fielddouble.getValue()
                         except:
                             print "testMedMemGeneral   /=    : "
-                        print "f1+f2*f2: ",fielddoubleasso.getValue(MED_FULL_INTERLACE)
+                        print "f1+f2*f2: ",fielddoubleasso.getValue()
                         fielddouble.applyLin(4,1);
-                        print " 4f1+1  : ",fielddouble.getValue(MED_FULL_INTERLACE)
-                        print " f1.f2  : ",fielddoubleSP.getValue(MED_FULL_INTERLACE)
+                        print " 4f1+1  : ",fielddouble.getValue()
+                        print " f1.f2  : ",fielddoubleSP.getValue()
                         fielddouble2.applyPyFunc(add_one)
-                        print " CB:f2+1: ",fielddouble2.getValue(MED_FULL_INTERLACE)
+                        print " CB:f2+1: ",fielddouble2.getValue()
                     else:
                         print "  !!!! Bad type of Field !!!!"
 

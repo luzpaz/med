@@ -1909,8 +1909,14 @@ int **CONNECTIVITY::getNodesPerFaceOfPolyhedron(int polyhedronId, int& nbOfFaces
 
 int CONNECTIVITY::getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const
 {
+  SCRUTE(_entity);
+  SCRUTE(Entity);
   if (_entity==Entity)
-    return _numberOfTypes+getNumberOfPolyType();
+    {
+      SCRUTE(_numberOfTypes);
+      SCRUTE(getNumberOfPolyType());
+      return _numberOfTypes+getNumberOfPolyType();
+    }
   else if (_constituent!=NULL)
     return _constituent->getNumberOfTypesWithPoly(Entity);
   else

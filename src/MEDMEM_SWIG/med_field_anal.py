@@ -176,7 +176,7 @@ support = fieldDoubleScalOnCell.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldDoubleScalOnCell.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldDoubleScalOnCell.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 print ""
@@ -205,7 +205,7 @@ support = fieldDoubleVectOnCell.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldDoubleVectOnCell.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldDoubleVectOnCell.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 print ""
@@ -234,7 +234,7 @@ support = fieldIntScalOnCell.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldIntScalOnCell.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldIntScalOnCell.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 print ""
@@ -263,7 +263,7 @@ support = fieldIntVectOnCell.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldIntVectOnCell.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldIntVectOnCell.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 ##print ""
@@ -328,7 +328,7 @@ support = fieldDoubleScalOnNode.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldDoubleScalOnNode.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldDoubleScalOnNode.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 print ""
@@ -357,7 +357,7 @@ support = fieldDoubleVectOnNode.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldDoubleVectOnNode.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldDoubleVectOnNode.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 print ""
@@ -386,7 +386,7 @@ support = fieldIntScalOnNode.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldIntScalOnNode.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldIntScalOnNode.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 print ""
@@ -415,7 +415,7 @@ support = fieldIntVectOnNode.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldIntVectOnNode.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldIntVectOnNode.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 ##print ""
@@ -480,7 +480,7 @@ support = fieldDoubleScalOnConst.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldDoubleScalOnConst.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldDoubleScalOnConst.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 print ""
@@ -509,7 +509,7 @@ support = fieldDoubleVectOnConst.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldDoubleVectOnConst.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldDoubleVectOnConst.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 print ""
@@ -538,7 +538,7 @@ support = fieldIntScalOnConst.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldIntScalOnConst.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldIntScalOnConst.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 print ""
@@ -567,7 +567,7 @@ support = fieldIntVectOnConst.getSupport()
 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
-    valueI = fieldIntVectOnConst.getValueI(MED_FULL_INTERLACE,k+1)
+    valueI = fieldIntVectOnConst.getRow(k+1)
     print "     *",valueI[:nbOfComp]
 
 print ""

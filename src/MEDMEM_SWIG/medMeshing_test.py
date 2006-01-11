@@ -9,9 +9,12 @@
 
 from libMEDMEM_Swig import *
 
-# file name to save the generated MESH(ING)
+# files name to save the generated MESH(ING) in different format
+# Med V2.1 Med V2.2 and vtk
 
-medFileName = "toto.med"
+med21FileName = "toto21.med"
+
+med22FileName = "toto22.med"
 
 vtkFileName = "toto.vtk"
 
@@ -305,9 +308,10 @@ connectivityQuad.append(connectivity[3])
 
 myMeshing.setConnectivity(connectivityQuad,entity,types[1])
 
-# edge part
+meshDimension = spaceDimension # because there 3D cells in the mesh
+myMeshing.setMeshDimension(meshDimension)
 
-# saving of the generated mesh in MED and VTK format
+# edge part
 
 # adding GROUPs
 # on Node
@@ -436,8 +440,23 @@ myGroup.setNumber(index,values)
 
 myMeshing.addGroup(myGroup)
 
-idMed = myMeshing.addDriver(MED_DRIVER,medFileName,myMeshing.getName())
-myMeshing.write(idMed)
+# saving of the generated mesh in MED 2.1, 2.2 and VTK format
+
+medFileVersion = getMedFileVersionForWriting()
+print "Med File Version For Writing ",medFileVersion
+
+if (medFileVersion == V22):
+    setMedFileVersionForWriting(V21)
+
+idMedV21 = myMeshing.addDriver(MED_DRIVER,med21FileName,myMeshing.getName())
+myMeshing.write(idMedV21)
+
+medFileVersion = getMedFileVersionForWriting()
+if (medFileVersion == V21):
+    setMedFileVersionForWriting(V22)
+
+idMedV22 = myMeshing.addDriver(MED_DRIVER,med22FileName,myMeshing.getName())
+myMeshing.write(idMedV22)
 
 idVtk = myMeshing.addDriver(VTK_DRIVER,vtkFileName,myMeshing.getName())
 myMeshing.write(idVtk)
@@ -594,29 +613,63 @@ for i in range(numberOfCells):
     fieldIntVectorOnCells.setValueIJ(i+1,2,valueInt2)
     fieldIntVectorOnCells.setValueIJ(i+1,3,valueInt3)
 
-idMed = fieldDoubleScalarOnNodes.addDriver(MED_DRIVER,medFileName,fieldDoubleScalarOnNodes.getName())
-fieldDoubleScalarOnNodes.write(idMed)
+medFileVersion = getMedFileVersionForWriting()
+print "Med File Version For Writing ",medFileVersion
 
-idMed = fieldIntScalarOnNodes.addDriver(MED_DRIVER,medFileName,fieldIntScalarOnNodes.getName())
-fieldIntScalarOnNodes.write(idMed)
+if (medFileVersion == V22):
+    setMedFileVersionForWriting(V21)
 
-idMed = fieldDoubleVectorOnNodes.addDriver(MED_DRIVER,medFileName,fieldDoubleVectorOnNodes.getName())
-fieldDoubleVectorOnNodes.write(idMed)
+idMedV21 = fieldDoubleScalarOnNodes.addDriver(MED_DRIVER,med21FileName,fieldDoubleScalarOnNodes.getName())
+fieldDoubleScalarOnNodes.write(idMedV21)
 
-idMed = fieldIntVectorOnNodes.addDriver(MED_DRIVER,medFileName,fieldIntVectorOnNodes.getName())
-fieldIntVectorOnNodes.write(idMed)
+idMedV21 = fieldIntScalarOnNodes.addDriver(MED_DRIVER,med21FileName,fieldIntScalarOnNodes.getName())
+fieldIntScalarOnNodes.write(idMedV21)
 
-idMed = fieldDoubleScalarOnCells.addDriver(MED_DRIVER,medFileName,fieldDoubleScalarOnCells.getName())
-fieldDoubleScalarOnCells.write(idMed)
+idMedV21 = fieldDoubleVectorOnNodes.addDriver(MED_DRIVER,med21FileName,fieldDoubleVectorOnNodes.getName())
+fieldDoubleVectorOnNodes.write(idMedV21)
 
-idMed = fieldIntScalarOnCells.addDriver(MED_DRIVER,medFileName,fieldIntScalarOnCells.getName())
-fieldIntScalarOnCells.write(idMed)
+idMedV21 = fieldIntVectorOnNodes.addDriver(MED_DRIVER,med21FileName,fieldIntVectorOnNodes.getName())
+fieldIntVectorOnNodes.write(idMedV21)
 
-idMed = fieldDoubleVectorOnCells.addDriver(MED_DRIVER,medFileName,fieldDoubleVectorOnCells.getName())
-fieldDoubleVectorOnCells.write(idMed)
+idMedV21 = fieldDoubleScalarOnCells.addDriver(MED_DRIVER,med21FileName,fieldDoubleScalarOnCells.getName())
+fieldDoubleScalarOnCells.write(idMedV21)
 
-idMed = fieldIntVectorOnCells.addDriver(MED_DRIVER,medFileName,fieldIntVectorOnCells.getName())
-fieldIntVectorOnCells.write(idMed)
+idMedV21 = fieldIntScalarOnCells.addDriver(MED_DRIVER,med21FileName,fieldIntScalarOnCells.getName())
+fieldIntScalarOnCells.write(idMedV21)
+
+idMedV21 = fieldDoubleVectorOnCells.addDriver(MED_DRIVER,med21FileName,fieldDoubleVectorOnCells.getName())
+fieldDoubleVectorOnCells.write(idMedV21)
+
+idMedV21 = fieldIntVectorOnCells.addDriver(MED_DRIVER,med21FileName,fieldIntVectorOnCells.getName())
+fieldIntVectorOnCells.write(idMedV21)
+
+medFileVersion = getMedFileVersionForWriting()
+if (medFileVersion == V21):
+    setMedFileVersionForWriting(V22)
+
+idMedV22 = fieldDoubleScalarOnNodes.addDriver(MED_DRIVER,med22FileName,fieldDoubleScalarOnNodes.getName())
+fieldDoubleScalarOnNodes.write(idMedV22)
+
+idMedV22 = fieldIntScalarOnNodes.addDriver(MED_DRIVER,med22FileName,fieldIntScalarOnNodes.getName())
+fieldIntScalarOnNodes.write(idMedV22)
+
+idMedV22 = fieldDoubleVectorOnNodes.addDriver(MED_DRIVER,med22FileName,fieldDoubleVectorOnNodes.getName())
+fieldDoubleVectorOnNodes.write(idMedV22)
+
+idMedV22 = fieldIntVectorOnNodes.addDriver(MED_DRIVER,med22FileName,fieldIntVectorOnNodes.getName())
+fieldIntVectorOnNodes.write(idMedV22)
+
+idMedV22 = fieldDoubleScalarOnCells.addDriver(MED_DRIVER,med22FileName,fieldDoubleScalarOnCells.getName())
+fieldDoubleScalarOnCells.write(idMedV22)
+
+idMedV22 = fieldIntScalarOnCells.addDriver(MED_DRIVER,med22FileName,fieldIntScalarOnCells.getName())
+fieldIntScalarOnCells.write(idMedV22)
+
+idMedV22 = fieldDoubleVectorOnCells.addDriver(MED_DRIVER,med22FileName,fieldDoubleVectorOnCells.getName())
+fieldDoubleVectorOnCells.write(idMedV22)
+
+idMedV22 = fieldIntVectorOnCells.addDriver(MED_DRIVER,med22FileName,fieldIntVectorOnCells.getName())
+fieldIntVectorOnCells.write(idMedV22)
 
 idVtk = fieldDoubleScalarOnNodes.addDriver(VTK_DRIVER,vtkFileName,fieldDoubleScalarOnNodes.getName())
 fieldDoubleScalarOnNodes.writeAppend(idVtk)
