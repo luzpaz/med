@@ -2072,13 +2072,13 @@ int MED_MESH_WRONLY_DRIVER22::writeCoordinates() const {
   int meshDimension = med_2_2::MEDdimLire(_medIdt, const_cast <char *>
 					 (_meshName.c_str()) );
 
-  if ((spaceDimension != MED_VALID) && (meshDimension != MED_VALID))
+  if ((spaceDimension != MED_VALID) && (meshDimension < MED_VALID))
     {
       err = MEDmaaCr(_medIdt, const_cast <char *> (_meshName.c_str()),
 		     _ptrMesh->_meshDimension, med_2_2::MED_NON_STRUCTURE,
 		     const_cast <char *> (_ptrMesh->_description.c_str()));
 
-      if (err != MED_VALID)
+      if (err < MED_VALID)
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Unable to create Mesh : |" << _meshName << "|"));
       else 
 	MESSAGE(LOC<<"Mesh "<<_meshName<<" created in file "<<_fileName<<" !");
@@ -2769,7 +2769,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
     if (families[i]->getEntity() == MED_NODE)
       dataGroupFam = "/ENS_MAA/"+_meshName+"/FAS/NOEUD/"+families[i]->getName()+"/";  
     else
-      dataGroupFam = "/ENS_MAA/"+_meshName+"/FAS/ELEM/"+families[i]->getName()+"/"; 
+      dataGroupFam = "/ENS_MAA/"+_meshName+"/FAS/ELEME/"+families[i]->getName()+"/"; 
 
     SCRUTE("|"<<dataGroupFam<<"|");
     err = med_2_2::_MEDdatagroupOuvrir(_medIdt,const_cast <char *> (dataGroupFam.c_str()) ) ;
