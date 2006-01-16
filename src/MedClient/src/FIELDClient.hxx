@@ -7,36 +7,20 @@
 #include "SUPPORTClient.hxx"
 #include "ReceiverFactory.hxx"
 #include "SenderFactory.hxx"
+#include "MEDMEM_TraitsForFields.hxx"
+#include "MEDMEM_InterlacingTraits.hxx"
 #include CORBA_CLIENT_HEADER(MED)
-
-template<class T>
-struct MapCppFieldServ {
-  typedef T FieldPtrType;
-  typedef T FieldGlobalType;
-};
-
-template<>
-struct MapCppFieldServ<int> {
-  typedef SALOME_MED::FIELDINT_ptr FieldPtrType;
-  typedef SALOME_MED::FIELDINT FieldGlobalType;
-};
-
-template<>
-struct MapCppFieldServ<double> {
-  typedef SALOME_MED::FIELDDOUBLE_ptr FieldPtrType;
-  typedef SALOME_MED::FIELDDOUBLE FieldGlobalType;
-};
 
 namespace MEDMEM{
 
-template<class T>
-class FIELDClient : public MEDMEM::FIELD<T>
+template<class T, class INTERLACING_TAG>
+class FIELDClient : public MEDMEM::FIELD<T,INTERLACING_TAG>
 {
 private:
-  typename MapCppFieldServ<T>::FieldPtrType _fieldPtr;
+  typename FIELDI_TRAITS<T,INTERLACING_TAG>::SimpleFieldCorbaPtrType _fieldPtr;
   int _refCounter;
 public:
-  FIELDClient(typename MapCppFieldServ<T>::FieldPtrType ptrCorba,MEDMEM::SUPPORT * S = NULL);
+  FIELDClient(typename FIELDI_TRAITS<T,INTERLACING_TAG>::SimpleFieldCorbaPtrType ptrCorba,MEDMEM::SUPPORT * S = NULL);
   ~FIELDClient();
 private:
   void fillCopy();

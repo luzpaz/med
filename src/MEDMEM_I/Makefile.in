@@ -42,8 +42,8 @@ EXPORT_HEADERS = \
   MEDMEM_convert.hxx \
   MEDMEM_Med_i.hxx \
   MEDMEM_Family_i.hxx \
-  MEDMEM_FieldDouble_i.hxx \
-  MEDMEM_FieldInt_i.hxx \
+  MEDMEM_FieldTemplate_i.hxx \
+  MEDMEM_TraitsForFields.hxx \
   MEDMEM_Field_i.hxx \
   MEDMEM_Group_i.hxx \
   MEDMEM_Mesh_i.hxx \
@@ -52,7 +52,7 @@ EXPORT_HEADERS = \
 # Libraries targets
 
 LIB=libMEDMEMImpl.la
-LIB_SRC = MEDMEM_Med_i.cxx  MEDMEM_Family_i.cxx MEDMEM_FieldDouble_i.cxx MEDMEM_FieldInt_i.cxx MEDMEM_Field_i.cxx MEDMEM_Group_i.cxx MEDMEM_Mesh_i.cxx MEDMEM_Support_i.cxx MEDMEM_convert.cxx   
+LIB_SRC = MEDMEM_Med_i.cxx  MEDMEM_Family_i.cxx MEDMEM_Field_i.cxx MEDMEM_Group_i.cxx MEDMEM_Mesh_i.cxx MEDMEM_Support_i.cxx MEDMEM_convert.cxx   
 LIB_SERVER_IDL = MED.idl 
 LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl SALOME_Comm.idl SALOME_GenericObj.idl
 

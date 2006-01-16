@@ -30,8 +30,7 @@
 
 #include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_Med_i.hxx"
-#include "MEDMEM_FieldInt_i.hxx"
-#include "MEDMEM_FieldDouble_i.hxx"
+#include "MEDMEM_FieldTemplate_i.hxx"
 #include "MEDMEM_Support_i.hxx"
 
 #include "MEDMEM_Mesh.hxx"
@@ -441,7 +440,7 @@ throw (SALOME::SALOME_Exception)
 		try
 		{
 			((FIELD<int>*)myField)->read() ;
-			FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
+			FIELDTEMPLATE_I<int,FullInterlace> * myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int,FullInterlace>*)myField);
         		SALOME_MED::FIELD_ptr myFieldIOR = myFieldIntI->_this();
 //         		if (!_duringLoad) myFieldIntI->addInStudy(myStudy,myFieldIOR) ;
 			endService("Med_Gen_i::readFieldInFile");
@@ -461,7 +460,7 @@ throw (SALOME::SALOME_Exception)
 		try
 		{
 			((FIELD<double>*)myField)->read() ;
-			FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
+			FIELDTEMPLATE_I<double,FullInterlace> * myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double,FullInterlace>*)myField);
         		SALOME_MED::FIELD_ptr myFieldIOR = myFieldDoubleI->_this() ;
 //         		if (!_duringLoad) myFieldDoubleI->addInStudy(myStudy,myFieldIOR) ;
 			endService("Med_Gen_i::readFieldInFile");

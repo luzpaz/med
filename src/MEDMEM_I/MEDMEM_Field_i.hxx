@@ -67,6 +67,7 @@ public :
     CORBA::Long             getIterationNumber()   	       
 					     throw (SALOME::SALOME_Exception);
     CORBA::Long             getOrderNumber() throw (SALOME::SALOME_Exception);
+    CORBA::Boolean getGaussPresence();
     CORBA::Double           getTime()        throw (SALOME::SALOME_Exception);
     CORBA::Long             getCorbaIndex()  throw (SALOME::SALOME_Exception);
 

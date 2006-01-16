@@ -18,7 +18,7 @@
 #include "MEDMEM_Support_i.hxx"
 #include "MEDMEM_Family_i.hxx"
 #include "MEDMEM_Group_i.hxx"
-#include "MEDMEM_FieldDouble_i.hxx"
+#include "MEDMEM_FieldTemplate_i.hxx"
 
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Family.hxx"
@@ -1289,7 +1289,7 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getVolume( myCppSupport);
-		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(f);
+		FIELDTEMPLATE_I<double,FullInterlace> *medf = new FIELDTEMPLATE_I<double,FullInterlace>(f);
 		return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
@@ -1341,7 +1341,7 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getArea( myCppSupport);
-		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(f);
+		FIELDTEMPLATE_I<double,FullInterlace> *medf = new FIELDTEMPLATE_I<double,FullInterlace>(f);
 		return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
@@ -1367,7 +1367,7 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getLength( myCppSupport);
-		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(f);
+		FIELDTEMPLATE_I<double,FullInterlace>  *medf = new FIELDTEMPLATE_I<double,FullInterlace>(f);
 	        return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
@@ -1393,7 +1393,7 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getNormal( myCppSupport);
-		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(f);
+		FIELDTEMPLATE_I<double,FullInterlace> *medf = new FIELDTEMPLATE_I<double,FullInterlace>(f);
 	        return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
@@ -1419,7 +1419,7 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getBarycenter( myCppSupport);
-		FIELDDOUBLE_i * medf = new FIELDDOUBLE_i(f);
+		FIELDTEMPLATE_I<double,FullInterlace> *medf = new FIELDTEMPLATE_I<double,FullInterlace>(f);
 	        return medf->_this();
         }
         catch (MEDEXCEPTION &ex)

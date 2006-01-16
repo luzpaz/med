@@ -18,7 +18,6 @@
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_nArray.hxx"
 #include "MEDMEM_GenDriver.hxx"
-//#include "MEDMEM_DriverFactory.hxx"
 #include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_FieldForward.hxx"
 
@@ -824,6 +823,7 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
   FIELD_::_interlacingType=SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType;
 
   try {
+    // becarefull about the numbre of gauss point
     _numberOfValues = Support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   }
   catch (MEDEXCEPTION &ex) {
@@ -1975,6 +1975,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
   }
 
   try {
+    // becarefull about the number of gauss point
     _numberOfValues = _support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
     MESSAGE(LOC <<" : "<<_numberOfValues <<" et "<< NumberOfComponents);
 
@@ -2391,6 +2392,7 @@ template <class T, class INTERLACING_TAG>
 inline int FIELD<T, INTERLACING_TAG>::getValueLength() const
   throw (MEDEXCEPTION)
 {
+  // be carefull about number of gauss point
   return _numberOfComponents*_numberOfValues;
 }
 

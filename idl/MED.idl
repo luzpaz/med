@@ -901,6 +901,11 @@ Internal Corba method.
       */
       long getOrderNumber() raises (SALOME::SALOME_Exception);
 
+      /*!
+	Returns if gauss points are present.
+      */
+      boolean getGaussPresence();
+
       // Read & Write
       // -----------
 
@@ -954,6 +959,12 @@ Internal Corba method.
       raises (SALOME::SALOME_Exception);
   };
 
+  interface FIELDDOUBLENO : FIELDDOUBLE {
+  };
+
+  interface FIELDDOUBLEFULL : FIELDDOUBLE {
+  };
+
   interface FIELDINT : FIELD , SALOME::MultiCommClass {
 
     /*!
@@ -968,6 +979,12 @@ Internal Corba method.
     */
     SALOME::SenderInt getSenderForValue(in medModeSwitch mode)
       raises (SALOME::SALOME_Exception);
+  };
+
+  interface FIELDINTNO : FIELDINT {
+  };
+
+  interface FIELDINTFULL : FIELDINT {
   };
 
   // MED interface

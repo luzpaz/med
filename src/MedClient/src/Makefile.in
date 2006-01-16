@@ -44,8 +44,6 @@ EXPORT_HEADERS = \
 	GROUPClient.hxx \
 	FIELDClient.hxx \
 	FIELDClient.cxx \
-	FIELDDOUBLEClient.hxx \
-	FIELDINTClient.hxx \
 	libMEDClient.i
 
 ifeq (@SWIG_VERSION@, 1.3.21)
@@ -78,9 +76,7 @@ LIB_SRC = \
 	MESHClient.cxx \
 	SUPPORTClient.cxx \
 	FAMILYClient.cxx \
-	GROUPClient.cxx \
-	FIELDDOUBLEClient.cxx \
-	FIELDINTClient.cxx
+	GROUPClient.cxx
 
 LIB_CLIENT_IDL= \
 	SALOME_Component.idl \
@@ -99,7 +95,7 @@ BIN_CLIENT_IDL =
 LDFLAGS= -L$(top_builddir)/lib/salome 
 LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
 
-CPPFLAGS+= $(MED2_INCLUDES) $(HDF5_INCLUDES) $(PYTHON_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
+CPPFLAGS+= $(MED2_INCLUDES) $(HDF5_INCLUDES) $(PYTHON_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome -I$(srcdir)/../../MEDMEM_I
 CXXFLAGS+=-I${KERNEL_ROOT_DIR}/include/salome
 LDFLAGS+=-L${KERNEL_ROOT_DIR}/lib/salome -lOpUtil -lMedCorba_Swigcmodule -lmedmem 
 

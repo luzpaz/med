@@ -113,7 +113,7 @@ throw (SALOME::SALOME_Exception)
 	{
 		int nbAttribute=_family->getNumberOfAttributes();
 		myseq->length(nbAttribute);
-		int * identifiers=_family->getAttributesIdentifiers();
+		const int * identifiers=_family->getAttributesIdentifiers();
 		for (int i=0;i<nbAttribute;i++)
 		{
 			myseq[i]=identifiers[i];
@@ -164,7 +164,7 @@ throw (SALOME::SALOME_Exception)
         {
                 int nbAttribute=_family->getNumberOfAttributes();
                 myseq->length(nbAttribute);
-                int * values=_family->getAttributesValues();
+                const int * values=_family->getAttributesValues();
                 for (int i=0;i<nbAttribute;i++)
                 {
                         myseq[i]=values[i];
@@ -215,7 +215,7 @@ throw (SALOME::SALOME_Exception)
         {
 		int nbAttribute=_family->getNumberOfAttributes();
 		myseq->length(nbAttribute);
-		string * descattribute=_family->getAttributesDescriptions();
+		const string * descattribute=_family->getAttributesDescriptions();
 		for (int i=0;i<nbAttribute;i++)
 		{
 			myseq[i]=CORBA::string_dup(descattribute[i].c_str());
@@ -289,7 +289,7 @@ throw (SALOME::SALOME_Exception)
         {
                 int nbGroups=_family->getNumberOfGroups();
                 myseq->length(nbGroups);
-                string * descGroups=_family->getGroupsNames();
+                const string * descGroups=_family->getGroupsNames();
                 for (int i=0;i<nbGroups;i++)
                 {
                         myseq[i]=CORBA::string_dup(descGroups[i].c_str());

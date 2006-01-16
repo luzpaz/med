@@ -12,8 +12,7 @@
 
 #include "MEDMEM_Med_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
-#include "MEDMEM_FieldDouble_i.hxx"
-#include "MEDMEM_FieldInt_i.hxx"
+#include "MEDMEM_FieldTemplate_i.hxx"
 #include "MEDMEM_Support_i.hxx"
 #include "MEDMEM_Family_i.hxx"
 #include "MEDMEM_Group_i.hxx"
@@ -161,7 +160,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
       		         case MED_EN::MED_INT32 : 
 			 {
 			     ((FIELD<int>*)myField)->read();
-			     FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
+			     FIELDTEMPLATE_I<int,FullInterlace> *myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int>*)myField);
 			     myFieldIOR = myFieldIntI->_this();
 // 	                     myFieldIntI->addInStudy(myStudy,myFieldIOR);
 		             break;
@@ -170,7 +169,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
       			case MED_EN::MED_REEL64: 
                         {
 			     ((FIELD<double>*)myField)->read();
-			     FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
+			     FIELDTEMPLATE_I<double,FullInterlace> *myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double,FullInterlace>*)myField);
 			     myFieldIOR = myFieldDoubleI->_this();
 // 			     myFieldDoubleI->addInStudy(myStudy,myFieldIOR);
 			     break;
@@ -484,7 +483,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		     case MED_EN::MED_INT32: 
 		     {
 			((FIELD<int>*)myField)->read();
-			FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
+			FIELDTEMPLATE_I<int,FullInterlace> *myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int>*)myField);
 			SALOME_MED::FIELDINT_ptr myFieldIntIOR;
 			myFieldIntIOR = myFieldIntI->_this();
 
@@ -498,7 +497,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
       		     case MED_EN::MED_REEL64: 
 		     {
 			((FIELD<double>*)myField)->read();
-			FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
+			FIELDTEMPLATE_I<double,FullInterlace> *myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double>*)myField);
 			SALOME_MED::FIELDDOUBLE_ptr myFieldDoubleIOR;
 			myFieldDoubleIOR = myFieldDoubleI->_this();
 

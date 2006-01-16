@@ -330,7 +330,7 @@ for i in range(nbOfFields):
                 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
-                    valueI = fieldTyped.getValueI(MED_FULL_INTERLACE,k+1)
+                    valueI = fieldTyped.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
 
 

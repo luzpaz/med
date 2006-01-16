@@ -1,22 +1,22 @@
-template<class T>
-FIELDClient<T>::FIELDClient(typename MapCppFieldServ<T>::FieldPtrType ptrCorba,MEDMEM::SUPPORT * S):_fieldPtr(MapCppFieldServ<T>::FieldGlobalType::_duplicate(ptrCorba)),_refCounter(1)
+template<class T, class INTERLACING_TAG>
+FIELDClient<T,INTERLACING_TAG>::FIELDClient(typename FIELDI_TRAITS<T,INTERLACING_TAG>::SimpleFieldCorbaPtrType ptrCorba,MEDMEM::SUPPORT * S):_fieldPtr(FIELDI_TRAITS<T,INTERLACING_TAG>::SimpleFieldGlobalType::_duplicate(ptrCorba)),_refCounter(1)
 {
   if (!S) 
     {
       SCRUTE(_fieldPtr);
       SCRUTE(_fieldPtr->getSupport());
-      MEDMEM::FIELD<T>::_support=new MEDMEM::SUPPORTClient(_fieldPtr->getSupport());
+      MEDMEM::FIELD<T,INTERLACING_TAG>::_support=new MEDMEM::SUPPORTClient(_fieldPtr->getSupport());
     }
   else
-    MEDMEM::FIELD<T>::setSupport(S);
+    MEDMEM::FIELD<T,INTERLACING_TAG>::setSupport(S);
   
   setName(_fieldPtr->getName());
 
-  MEDMEM::FIELD<T>::setDescription(_fieldPtr->getDescription());
+  MEDMEM::FIELD<T,INTERLACING_TAG>::setDescription(_fieldPtr->getDescription());
   int nc = _fieldPtr->getNumberOfComponents();
-  MEDMEM::FIELD<T>::setNumberOfComponents(nc);
+  MEDMEM::FIELD<T,INTERLACING_TAG>::setNumberOfComponents(nc);
 
-  MEDMEM::FIELD<T>::setNumberOfValues( MEDMEM::FIELD<T>::_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
+  MEDMEM::FIELD<T,INTERLACING_TAG>::setNumberOfValues( MEDMEM::FIELD<T,INTERLACING_TAG>::_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
   string * _s = new string[nc];
 
@@ -24,48 +24,48 @@ FIELDClient<T>::FIELDClient(typename MapCppFieldServ<T>::FieldPtrType ptrCorba,M
   s = _fieldPtr->getComponentsNames();
   for (int i=0; i<nc; i++)
     _s[i] = s[i];
-  MEDMEM::FIELD<T>::setComponentsNames(_s);
+  MEDMEM::FIELD<T,INTERLACING_TAG>::setComponentsNames(_s);
 
   s = _fieldPtr->getComponentsDescriptions();
   for (int i=0; i<nc; i++)
     _s[i] = s[i];
-  MEDMEM::FIELD<T>::setComponentsDescriptions(_s);
+  MEDMEM::FIELD<T,INTERLACING_TAG>::setComponentsDescriptions(_s);
 
   s = _fieldPtr->getComponentsUnits();
   for (int i=0; i<nc; i++)
     _s[i] = s[i];
-  MEDMEM::FIELD<T>::setMEDComponentsUnits(_s);
+  MEDMEM::FIELD<T,INTERLACING_TAG>::setMEDComponentsUnits(_s);
 
   delete [] _s;
-
-//  s = _fieldPtr->getComponentsDescriptions();
-//  for (int i=0; i<nc; i++)
-//    _s[i] = s[i];
-//  F->setComponentsDescriptions(_s);
   setIterationNumber(_fieldPtr->getIterationNumber());
   setTime(_fieldPtr->getTime());
   setOrderNumber(_fieldPtr->getOrderNumber());
   fillCopy();
 }
 
-template<class T>
-void FIELDClient<T>::fillCopy()
+template<class T, class INTERLACING_TAG>
+void FIELDClient<T,INTERLACING_TAG>::fillCopy()
 {
-  //setValueType(typeChamps); WARNING TO DO.....
-  //setValueType(_fieldPtr->getValueType());
   long n;
-  typename mapCppSender<T>::SenderVarType sender=_fieldPtr->getSenderForValue(MED_EN::MED_FULL_INTERLACE);
+  typename FIELDI_TRAITS<T,INTERLACING_TAG>::SenderVarType sender=_fieldPtr->getSenderForValue(MEDMEM::FIELD<T,INTERLACING_TAG>::_interlacingType);
   T *v = (T *)ReceiverFactory::getValue(sender,n);
-  MEDMEM::MEDARRAY<T> * M = new MEDMEM::MEDARRAY<T>(v, MEDMEM::FIELD<T>::getNumberOfComponents(),MEDMEM::FIELD<T>::getNumberOfValues(),MED_EN::MED_FULL_INTERLACE,true,true);
-  setValue(M);
+  MEDMEM::MEDMEM_Array_ * array;
+  if(_fieldPtr->getGaussPresence())
+    array=0;
+  //array=new typename MEDMEM::MEDMEM_ArrayInterface<T,INTERLACING_TAG,Gauss>::Array
+  //    (v, MEDMEM::FIELD<T,INTERLACING_TAG>::getNumberOfComponents(),MEDMEM::FIELD<T,INTERLACING_TAG>::getNumberOfValues(),true,true);
+  else
+    array=new typename MEDMEM::MEDMEM_ArrayInterface<T,INTERLACING_TAG,NoGauss>::Array
+      (v, MEDMEM::FIELD<T,INTERLACING_TAG>::getNumberOfComponents(),MEDMEM::FIELD<T,INTERLACING_TAG>::getNumberOfValues(),true,true);
+  MEDMEM::FIELD<T,INTERLACING_TAG>::setArray(array);
 }
 
-template<class T>
-FIELDClient<T>::~FIELDClient()
+template<class T, class INTERLACING_TAG>
+FIELDClient<T,INTERLACING_TAG>::~FIELDClient()
 {
   _fieldPtr->Destroy();
   CORBA::release(_fieldPtr);
-  if(FIELD<T>::_support)
-    FIELD<T>::_support->removeReference();
+  if(FIELD<T,INTERLACING_TAG>::_support)
+    FIELD<T,INTERLACING_TAG>::_support->removeReference();
 }
 

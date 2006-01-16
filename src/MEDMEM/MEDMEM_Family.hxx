@@ -110,13 +110,13 @@ public:
   inline void setNumberOfGroups         (int NumberOfGroups);
   inline void setGroupsNames            (string * GroupName);
 
-  inline int      getIdentifier()              const;
-  inline int      getNumberOfAttributes()      const;
-  inline int *    getAttributesIdentifiers() ;
-  inline int *    getAttributesValues()      ;
-  inline string * getAttributesDescriptions() ;
-  inline int      getNumberOfGroups()          const;
-  inline string * getGroupsNames()  ;
+  inline int      getIdentifier()                    const;
+  inline int      getNumberOfAttributes()            const;
+  inline const int *    getAttributesIdentifiers()   const;
+  inline const int *    getAttributesValues()        const;
+  inline const string * getAttributesDescriptions()  const;
+  inline int      getNumberOfGroups()                const;
+  inline const string * getGroupsNames()             const;
 
   // A FAIRE : VERIFIER LA VALIDITE DES PARAMETRES !
   inline int      getAttributeIdentifier(int i)  const;
@@ -200,7 +200,7 @@ inline int FAMILY::getNumberOfAttributes() const
 /*! Returns a pointer to attributes identifiers .
     (There are _numberOfAttribute attributes) */
 //---------------------------------------------------
-inline int * FAMILY::getAttributesIdentifiers()
+inline const int * FAMILY::getAttributesIdentifiers() const
 //---------------------------------------------------
 { 
     return _attributeIdentifier ; 
@@ -216,7 +216,7 @@ inline int FAMILY::getAttributeIdentifier(int i) const
 /*! Returns a pointer to attributes values.
     (There are _numberOfAttribute attributes)*/
 //----------------------------------------------
-inline int * FAMILY::getAttributesValues()
+inline const int * FAMILY::getAttributesValues() const
 //----------------------------------------------
 { 
     return _attributeValue ; 
@@ -230,7 +230,7 @@ inline int FAMILY::getAttributeValue(int i) const
     return _attributeValue[i-1] ; 
 }
 //-------------------------------------------------------
-inline string * FAMILY::getAttributesDescriptions()
+inline const string * FAMILY::getAttributesDescriptions() const
 //-------------------------------------------------------
 { 
     return _attributeDescription ; 
@@ -252,7 +252,7 @@ inline int FAMILY::getNumberOfGroups() const
 }
 /*! Returns a pointer to the names of the groups the family belongs to */
 //--------------------------------------------
-inline string * FAMILY::getGroupsNames()
+inline const string * FAMILY::getGroupsNames() const
 //--------------------------------------------
 { 
     return _groupName ; 

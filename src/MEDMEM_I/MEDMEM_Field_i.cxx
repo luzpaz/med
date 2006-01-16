@@ -287,6 +287,26 @@ throw (SALOME::SALOME_Exception)
 }
 //=============================================================================
 /*!
+ * CORBA: Accessor for gauss numbers presence.
+ */
+//=============================================================================
+CORBA::Boolean FIELD_i::getGaussPresence()
+{
+       if (_fieldTptr==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
+                                             SALOME::INTERNAL_ERROR);
+        try
+        {
+                return _fieldTptr->getGaussPresence();
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+		MESSAGE("Exception en accedant au champ");
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+}
+//=============================================================================
+/*!
  * CORBA: Accessor  
  */
 //=============================================================================

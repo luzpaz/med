@@ -51,18 +51,10 @@ void SUPPORTClient::blankCopy()
 	setEntity(all->entity);
 // modifs PN 
         setNumberOfGeometricType(all->numberOfGeometricType);
-  	convertCorbaArray(_geometricType, _numberOfGeometricType,
-		           &all->types);
-
-        //_name = IOR_Support->getName();
-        //_description = IOR_Support->getDescription();
-  	//setAll(IOR_Support->isOnAllElements());
-  	//setEntity(IOR_Support->getEntity());
+  	convertCorbaArray2(_geometricType, _numberOfGeometricType, all->types);
 
         SCRUTE(_name);
         SCRUTE(_description);
-  	//convertCorbaArray(_geometricType, _numberOfGeometricType,
-	//	    IOR_Support->getTypes());
 
         int *nE = new int[_numberOfGeometricType];
         int i;
