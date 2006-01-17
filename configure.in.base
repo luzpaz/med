@@ -340,14 +340,6 @@ echo
 
 CHECK_MSG2QM
 
-echo
-echo ---------------------------------------------
-echo Testing html generators
-echo ---------------------------------------------
-echo
-
-CHECK_HTML_GENERATORS
-
 }
 else
 {
@@ -356,6 +348,14 @@ else
   CPPFLAGS="$CPPFLAGS -DMED_WITHOUT_KERNEL"
 }
 fi # MED_WITH_KERNEL
+
+echo
+echo ---------------------------------------------
+echo Testing html generators
+echo ---------------------------------------------
+echo
+
+CHECK_HTML_GENERATORS
 
 echo
 echo ---------------------------------------------
