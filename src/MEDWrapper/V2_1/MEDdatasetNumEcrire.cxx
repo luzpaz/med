@@ -38,6 +38,7 @@
 #include "med.hxx"
 #include "med_outils.hxx"
 #include <stdlib.h>
+#include "hdf5_version2api.hxx"
 
 /*
  * - Nom de la fonction : _MEDdatasetNumEcrire
@@ -70,7 +71,11 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 		     med_size *size,  unsigned char *val, med_mode_acces mode)
 {
   med_idt    dataset, dataspace = 0, memspace = 0;
+#ifdef HDF_NEW_API
+  med_size  start_mem[1],start_data[1],*pflmem,*pfldsk;
+#else
   med_ssize  start_mem[1],start_data[1],*pflmem,*pfldsk;
+#endif
   med_size   stride[1],count[1],pcount[1],pflsize[1];
   med_err    ret;
   int        i,j,index,type_hdf;
@@ -101,7 +106,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
     case MED_INT32 :
 #if defined(PCLINUX)
       type_hdf = H5T_STD_I32BE;
-      if ((H5Tconvert(H5T_NATIVE_INT,H5T_STD_I32BE,(hsize_t)*size,(void *)val,NULL,NULL)) < 0) 
+      if ((H5Tconvert(H5T_NATIVE_INT,H5T_STD_I32BE,(hsize_t)*size,(void *)val,NULL,(hid_t)0)) < 0) 
 	  return -1;
 #else
       type_hdf = H5T_NATIVE_INT;
@@ -188,8 +193,13 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 	
 	pflsize [0] = psize*ngauss*nbdim;
 	pcount  [0] = psize*ngauss*dimutil;
+#ifdef HDF_NEW_API
+	pflmem      = (med_size *) malloc (sizeof(med_size)*pcount[0]);
+	pfldsk      = (med_size *) malloc (sizeof(med_size)*pcount[0]);
+#else
 	pflmem      = (med_ssize *) malloc (sizeof(med_ssize)*pcount[0]);
 	pfldsk      = (med_ssize *) malloc (sizeof(med_ssize)*pcount[0]);
+#endif
 	
 	switch(pflmod)
 	  { /* switch pflmod pout FULL_INTERLACE*/
@@ -209,11 +219,19 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 		}
 	    }
 	     
+#ifdef HDF_NEW_API
+	    if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pflmem ) ) <0) 
+	      return -1; 
+	      
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+	      return -1; 
+#else
 	    if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, pcount[0], (const hssize_t **) pflmem ) ) <0) 
 	      return -1; 
 	      
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hssize_t **) pfldsk ) ) <0) 
 	      return -1; 
+#endif
 	    
 	    break;
 	    
@@ -236,11 +254,19 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 		}
 	    }
 	    
+#ifdef HDF_NEW_API
+	    if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pflmem ) ) <0) 
+	      return -1; 
+	    
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+	      return -1; 
+#else
 	    if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, pcount[0], (const hssize_t **) pflmem ) ) <0) 
 	      return -1; 
 	    
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hssize_t **) pfldsk ) ) <0) 
 	      return -1; 
+#endif
 	     
 	    break;
 	  
@@ -296,7 +322,11 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 	
 	pflsize [0] = psize*ngauss*nbdim;
   	pcount  [0] = psize*ngauss*dimutil; /* nom pas très coherent avec count !!! A revoir */	
+#ifdef HDF_NEW_API
+	pfldsk     = (med_size *) malloc(sizeof(med_size)*pcount[0]);
+#else
 	pfldsk     = (med_ssize *) malloc(sizeof(med_ssize)*pcount[0]);
+#endif
 
 	switch(pflmod)
 	  { /*switch plfmod pour NO_INTERLACE */
@@ -311,8 +341,13 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 		}
 	    }
 	    
+#ifdef HDF_NEW_API
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+	      return -1;
+#else
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hssize_t **) pfldsk ) ) <0) 
 	      return -1;
+#endif
 	    
 	    if ((ret = H5Dwrite(dataset,type_hdf,dataspace,dataspace,H5P_DEFAULT, val)) < 0)
 	      return -1;
@@ -328,7 +363,11 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 	    if ( (memspace = H5Screate_simple (1, pflsize, NULL)) <0)
 	      return -1;
 
+#ifdef HDF_NEW_API
+	    pflmem     = (med_size *) malloc (sizeof(med_size)*pcount[0]);
+#else
 	    pflmem     = (med_ssize *) malloc (sizeof(med_ssize)*pcount[0]);
+#endif
 	    
 	    /* Le profil COMPACT est contigüe, mais il est possible que l'on selectionne uniquemenent une dimension*/
 	    
@@ -342,11 +381,19 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 		}
 	    }
 	     
+#ifdef HDF_NEW_API
+	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET,pcount[0], (const hsize_t **) pflmem ) ) <0) 
+	      return -1; 
+	      
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+	      return -1;
+#else
 	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET,pcount[0], (const hssize_t **) pflmem ) ) <0) 
 	      return -1; 
 	      
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hssize_t **) pfldsk ) ) <0) 
 	      return -1;
+#endif
 	   
 	    if ((ret = H5Dwrite(dataset,type_hdf,memspace,dataspace,H5P_DEFAULT, val)) < 0)
 	      return -1;
@@ -383,7 +430,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 
 #if defined(PCLINUX)
   if (type == MED_INT32)
-      if ((H5Tconvert(H5T_STD_I32BE,H5T_NATIVE_INT,(hsize_t)*size,(void *)val,NULL,NULL)) < 0) 
+      if ((H5Tconvert(H5T_STD_I32BE,H5T_NATIVE_INT,(hsize_t)*size,(void *)val,NULL,(hid_t)0)) < 0) 
 	  return -1;
 #endif 
   
