@@ -157,7 +157,7 @@ throw (SALOME::SALOME_Exception)
                 const int numberOfTypes = _support->getNumberOfTypes();
                 all->numberOfGeometricType = numberOfTypes;
 		all->entity = _support->getEntity();
-
+		all->isOnAllElements    = _support->isOnAllElements();
                 all->types.length(numberOfTypes);
                 all->nbEltTypes.length(numberOfTypes);
                 const medGeometryElement * elemts = _support->getTypes();

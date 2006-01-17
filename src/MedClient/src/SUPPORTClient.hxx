@@ -36,6 +36,8 @@ public :
     const throw (MEDEXCEPTION);
   const int *  getNumberIndex()
     const throw (MEDEXCEPTION);
+  int getValIndFromGlobalNumber(const int number) 
+    const throw (MEDEXCEPTION);
   void addReference() const;
   void removeReference() const;
 };

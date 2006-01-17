@@ -93,7 +93,7 @@ void SUPPORTClient::fillCopy()
   BEGIN_OF("SUPPORTClient::fillCopy");
 
   if (!_complete_support) {
-
+    if(!_isOnAllElts) {
     const int * index, * value;
     long n_index, n_value;
     
@@ -105,7 +105,7 @@ void SUPPORTClient::fillCopy()
     SCRUTE(n_index);
     SCRUTE(n_value);
     setNumber(index, value,true);
-
+    }
     _complete_support = true;
   }
 
@@ -171,6 +171,22 @@ const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION)
   const int * n = SUPPORT::getNumberIndex();
 
   END_OF("SUPPORTClient::getnumberIndex()");
+  return n;
+}
+
+//=============================================================================
+/*!
+ * 
+ */
+//=============================================================================
+int SUPPORTClient::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION)
+{
+  BEGIN_OF("SUPPORTClient::getValIndFromGlobalNumber()");
+  
+  if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
+  const int n = SUPPORT::getValIndFromGlobalNumber(number);
+  
+  END_OF("SUPPORTClient::getValIndFromGlobalNumber()");
   return n;
 }
 
