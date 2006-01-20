@@ -27,84 +27,90 @@
 //  $Header$
 
 #include "MED_Algorithm.hxx"
+#include "MED_Wrapper.hxx"
+
 #include "MED_Utilities.hxx"
  
 #ifdef _DEBUG_
 static int MYDEBUG = 0;
+static int MYVALUEDEBUG = 0;
 #else
 static int MYDEBUG = 0;
+static int MYVALUEDEBUG = 0;
 #endif
 
-namespace MED{
+namespace MED
+{
   //---------------------------------------------------------------
-  TElemGroup 
-  GetElemsByEntity(TWrapper& theWrapper, 
-		   const PMeshInfo& theMeshInfo,
-		   const MED::TEntityInfo& theEntityInfo)
+  TEntity2TGeom2ElemInfo 
+  GetEntity2TGeom2ElemInfo(const PWrapper& theWrapper, 
+			   const PMeshInfo& theMeshInfo,
+			   const MED::TEntityInfo& theEntityInfo)
   {
     MSG(MYDEBUG,"GetElemsByEntity(...)");
-    TElemGroup aGroup;
+    TEntity2TGeom2ElemInfo anEntity2TGeom2ElemInfo;
     MED::TEntityInfo::const_iterator anIter = theEntityInfo.begin();
     for(; anIter != theEntityInfo.end(); anIter++){
       const EEntiteMaillage& anEntity = anIter->first;
-      const MED::TGeom& aGeom = anIter->second;
-      TElemMap& anElemMap = aGroup[anEntity];
+      const TGeom2Size& aGeom2Size = anIter->second;
+      TGeom2ElemInfo& aGeom2ElemInfo = anEntity2TGeom2ElemInfo[anEntity];
 
       if(anEntity == eNOEUD){
-	anElemMap[ePOINT1] = theWrapper.GetPNodeInfo(theMeshInfo);
+	aGeom2ElemInfo[ePOINT1] = theWrapper->GetPNodeInfo(theMeshInfo);
 	continue;
       }
 
-      MED::TGeom::const_iterator anGeomIter = aGeom.begin();
-      for(; anGeomIter != aGeom.end(); anGeomIter++){
-	const EGeometrieElement& aGeo = anGeomIter->first;
-	switch(aGeo){
+      TGeom2Size::const_iterator anIter2 = aGeom2Size.begin();
+      for(; anIter2 != aGeom2Size.end(); anIter2++){
+	const EGeometrieElement& aGeom = anIter2->first;
+	switch(aGeom){
 	case ePOLYGONE: {
-	  anElemMap[ePOLYGONE] = theWrapper.GetPPolygoneInfo(theMeshInfo,anEntity,aGeo);
+	  aGeom2ElemInfo[ePOLYGONE] = theWrapper->GetPPolygoneInfo(theMeshInfo,anEntity,aGeom);
 	  break;
 	}
 	case ePOLYEDRE: {
-	  anElemMap[ePOLYEDRE] = theWrapper.GetPPolyedreInfo(theMeshInfo,anEntity,aGeo);
+	  aGeom2ElemInfo[ePOLYEDRE] = theWrapper->GetPPolyedreInfo(theMeshInfo,anEntity,aGeom);
 	  break;
 	}
 	default: {
-	  anElemMap[aGeo] = theWrapper.GetPCellInfo(theMeshInfo,anEntity,aGeo);
+	  aGeom2ElemInfo[aGeom] = theWrapper->GetPCellInfo(theMeshInfo,anEntity,aGeom);
 	}}
 
       }
     }
     ADDMSG(MYDEBUG,"\n");
-    return aGroup;
+    return anEntity2TGeom2ElemInfo;
   }
   
   
   //---------------------------------------------------------------
-  TFamilyGroup 
-  GetFamilies(TWrapper& theWrapper,
-	      const PMeshInfo& theMeshInfo)
+  TFamilyInfoSet
+  GetFamilyInfoSet(const PWrapper& theWrapper,
+		   const PMeshInfo& theMeshInfo)
   {
     MSG(MYDEBUG,"GetFamilies(...)");
     TErr anErr;
-    TFamilyGroup aGroup;
-    TInt aNbFam = theWrapper.GetNbFamilies(*theMeshInfo);
+    TFamilyInfoSet aFamilyInfoSet;
+    TInt aNbFam = theWrapper->GetNbFamilies(*theMeshInfo);
     INITMSG(MYDEBUG,"GetNbFamilies() = "<<aNbFam<<"\n");
     for(TInt iFam = 1; iFam <= aNbFam; iFam++){
-      PFamilyInfo aFamilyInfo = theWrapper.GetPFamilyInfo(theMeshInfo,iFam,&anErr);
+      PFamilyInfo aFamilyInfo = theWrapper->GetPFamilyInfo(theMeshInfo,iFam,&anErr);
       if(anErr >= 0)
-	aGroup.insert(aFamilyInfo);
+	aFamilyInfoSet.insert(aFamilyInfo);
     }
     ADDMSG(MYDEBUG,"\n");
-    return aGroup;
+    return aFamilyInfoSet;
   }
 
 
-  TGroupInfo 
-  GetFamiliesByGroup(const TFamilyGroup& theGroupInfo)
+  //---------------------------------------------------------------
+  TGroupInfo
+  GetGroupInfo(const TFamilyInfoSet& theFamilyInfoSet)
   {
     MSG(MYDEBUG,"GetFamiliesByGroup(...)");
     TGroupInfo aGroup;
-    TFamilyGroup::const_iterator anIter = theGroupInfo.begin();
-    for(; anIter != theGroupInfo.end(); anIter++){
+    TFamilyInfoSet::const_iterator anIter = theFamilyInfoSet.begin();
+    for(; anIter != theFamilyInfoSet.end(); anIter++){
       const PFamilyInfo& aFamilyInfo = *anIter;
       TInt aNbGroup = aFamilyInfo->GetNbGroup();
       for(TInt iGroup = 0; iGroup < aNbGroup; iGroup++){
@@ -116,11 +122,11 @@ namespace MED{
     if(MYDEBUG){
       TGroupInfo::const_iterator anIter = aGroup.begin();
       for(; anIter != aGroup.end(); anIter++){
-	string aName = anIter->first;
+	const std::string& aName = anIter->first;
 	INITMSG(MYDEBUG,"aGroupName = '"<<aName<<"'\n");
-	const TFamilyGroup& aFamilyGroup = anIter->second;
-	TFamilyGroup::const_iterator anFamIter = aFamilyGroup.begin();
-	for(; anFamIter != aFamilyGroup.end(); anFamIter++){
+	const TFamilyInfoSet& aFamilyInfoSet = anIter->second;
+	TFamilyInfoSet::const_iterator anFamIter = aFamilyInfoSet.begin();
+	for(; anFamIter != aFamilyInfoSet.end(); anFamIter++){
 	  const PFamilyInfo& aFamilyInfo = *anFamIter;
 	  INITMSG(MYDEBUG,"aFamilyName = '"<<aFamilyInfo->GetName()<<"'\n");
 	}
@@ -134,106 +140,119 @@ namespace MED{
 
 
   //---------------------------------------------------------------
-  TTimeStampGroup 
-  GetFieldsByEntity(TWrapper& theWrapper, 
-		    const PMeshInfo& theMeshInfo,
-		    const MED::TEntityInfo& theEntityInfo)
+  TFieldInfo2TimeStampInfoSet 
+  GetFieldInfo2TimeStampInfoSet(const PWrapper& theWrapper, 
+				const PMeshInfo& theMeshInfo,
+				const MED::TEntityInfo& theEntityInfo)
   {
     MSG(MYDEBUG,"GetFieldsByEntity(...)");
-    TTimeStampGroup aGroup;
-    TInt aNbFields = theWrapper.GetNbFields();
+    TFieldInfo2TimeStampInfoSet aFieldInfo2TimeStampInfoSet;
+    TInt aNbFields = theWrapper->GetNbFields();
     INITMSG(MYDEBUG,"GetNbFields() = "<<aNbFields<<"\n");
     for(TInt iField = 1; iField <= aNbFields; iField++){
-      PFieldInfo aFieldInfo = theWrapper.GetPFieldInfo(theMeshInfo,iField);
+      PFieldInfo aFieldInfo = theWrapper->GetPFieldInfo(theMeshInfo,iField);
       INITMSG(MYDEBUG,"aFieldName = '"<<aFieldInfo->GetName()<<
 	      "'; aNbComp = "<<aFieldInfo->GetNbComp()<<"; ");
-      MED::TGeom aGeom;
+      TGeom2Size aGeom2Size;
       EEntiteMaillage anEntity = EEntiteMaillage(-1);
-      TInt aNbTimeStamps = theWrapper.GetNbTimeStamps(aFieldInfo,theEntityInfo,anEntity,aGeom);
+      TInt aNbTimeStamps = theWrapper->GetNbTimeStamps(aFieldInfo,theEntityInfo,anEntity,aGeom2Size);
       ADDMSG(MYDEBUG,"anEntity = "<<anEntity<<"; GetNbTimeStamps = "<<aNbTimeStamps<<"\n");
       for(TInt iTimeStamp = 1; iTimeStamp <= aNbTimeStamps; iTimeStamp++){
 	PTimeStampInfo aTimeStamp = 
-	  theWrapper.GetPTimeStampInfo(aFieldInfo,anEntity,aGeom,iTimeStamp);
-	aGroup[aFieldInfo].insert(aTimeStamp);
-	INITMSG(MYDEBUG,"aDt = "<<aTimeStamp->GetDt()
-		<<", Unit = \'"<<aTimeStamp->GetUnitDt()
-		<<"\', aNbGauss = "<<aTimeStamp->GetNbGauss()<<"\n");
+	  theWrapper->GetPTimeStampInfo(aFieldInfo,anEntity,aGeom2Size,iTimeStamp);
+	aFieldInfo2TimeStampInfoSet[aFieldInfo].insert(aTimeStamp);
+	INITMSG(MYDEBUG,
+		"aDt = "<<aTimeStamp->GetDt()<<
+		", Unit = \'"<<aTimeStamp->GetUnitDt()<<"\n");
       }
     }
     ADDMSG(MYDEBUG,"\n");
-    return aGroup;
+    return aFieldInfo2TimeStampInfoSet;
   }
   
 
-  TFieldGroup 
-  GetFieldsByEntity(const TTimeStampGroup& theTimeStampGroup)
+  //---------------------------------------------------------------
+  TEntite2TFieldInfo2TimeStampInfoSet 
+  GetEntite2TFieldInfo2TimeStampInfoSet(const TFieldInfo2TimeStampInfoSet& theFieldInfo2TimeStampInfoSet)
   {
-    TFieldGroup aGroup;
-    TTimeStampGroup::const_iterator anIter = theTimeStampGroup.begin();
-    for(; anIter != theTimeStampGroup.end(); anIter++){
+    TEntite2TFieldInfo2TimeStampInfoSet anEntite2TFieldInfo2TimeStampInfoSet;
+    TFieldInfo2TimeStampInfoSet::const_iterator anIter = theFieldInfo2TimeStampInfoSet.begin();
+    for(; anIter != theFieldInfo2TimeStampInfoSet.end(); anIter++){
+      const TTimeStampInfoSet& aTimeStampInfoSet = anIter->second;
       //const PFieldInfo& aFieldInfo = anIter->first;
-      const TTimeStampSet& aTimeStampSet = anIter->second;
-      if(aTimeStampSet.empty()) continue;
-      const PTimeStampInfo& aTimeStampInfo = *aTimeStampSet.begin();
-      aGroup[aTimeStampInfo->GetEntity()].insert(*anIter);
+      if(aTimeStampInfoSet.empty()) 
+	continue;
+      const PTimeStampInfo& aTimeStampInfo = *aTimeStampInfoSet.begin();
+      anEntite2TFieldInfo2TimeStampInfoSet[aTimeStampInfo->GetEntity()].insert(*anIter);
     }
-    return aGroup;
+    return anEntite2TFieldInfo2TimeStampInfoSet;
   }
   
 
-  TFamilyByEntity
-  GetFamiliesByEntity(TWrapper& theWrapper, 
-		      const TElemGroup& theElemGroup,
-		      const TFamilyGroup& theFamilyGroup)
+  //---------------------------------------------------------------
+  bool
+  operator<(const TFamilyTSize& theLeft, const TFamilyTSize& theRight)
+  {
+    const MED::PFamilyInfo& aLeftInfo = boost::get<0>(theLeft);
+    const MED::PFamilyInfo& aRightInfo = boost::get<0>(theRight);
+    return aLeftInfo->GetId() < aRightInfo->GetId();
+  }
+
+
+  //---------------------------------------------------------------
+  TEntity2FamilySet 
+  GetEntity2FamilySet(const PWrapper& theWrapper, 
+		      const TEntity2TGeom2ElemInfo& theEntity2TGeom2ElemInfo,
+		      const TFamilyInfoSet& theFamilyInfoSet)
   {
     MSG(MYDEBUG,"GetFamiliesByEntity(...)");
-    TFamilyByEntity aFamilyByEntity;
+    TEntity2FamilySet anEntity2FamilySet;
     
-    typedef map<TInt,PFamilyInfo> TFamilyByIdMap;
-    TFamilyByIdMap aFamilyByIdMap;
-    TFamilyGroup::const_iterator anIter = theFamilyGroup.begin();
-    for(; anIter != theFamilyGroup.end(); anIter++){
+    typedef map<TInt,PFamilyInfo> TId2Family;
+    TId2Family anId2Family;
+    TFamilyInfoSet::const_iterator anIter = theFamilyInfoSet.begin();
+    for(; anIter != theFamilyInfoSet.end(); anIter++){
       const PFamilyInfo& aFamilyInfo = *anIter;
-      aFamilyByIdMap.insert(TFamilyByIdMap::value_type(aFamilyInfo->GetId(),aFamilyInfo));
+      anId2Family.insert(TId2Family::value_type(aFamilyInfo->GetId(),aFamilyInfo));
     }
     
-    if(!aFamilyByIdMap.empty()){
-      typedef set<TInt> TFamilyIdSet;
-      typedef map<EEntiteMaillage,TFamilyIdSet> TFamilyIdByEntity;
-      TFamilyIdByEntity aFamilyIdByEntity;
+    if(!anId2Family.empty()){
+      typedef std::map<TInt,TInt> TFamilyID2Size;
+      typedef map<EEntiteMaillage,TFamilyID2Size> TEntity2FamilyID;
+      TEntity2FamilyID anEntity2FamilyID;
       
-      if(!theElemGroup.empty()){
-	TElemGroup::const_iterator anIter = theElemGroup.begin();
-	for(; anIter != theElemGroup.end(); anIter++){
+      if(!theEntity2TGeom2ElemInfo.empty()){
+	TEntity2TGeom2ElemInfo::const_iterator anIter = theEntity2TGeom2ElemInfo.begin();
+	for(; anIter != theEntity2TGeom2ElemInfo.end(); anIter++){
 	  const EEntiteMaillage& anEntity = anIter->first;
-	  TFamilyIdSet& aFamilyIdSet = aFamilyIdByEntity[anEntity];
-	  const TElemMap& anElemMap = anIter->second;
-	  TElemMap::const_iterator anElemIter = anElemMap.begin();
-	  for(; anElemIter != anElemMap.end(); anElemIter++){
-	    const PElemInfo& aElemInfo = anElemIter->second;
+	  TFamilyID2Size& aFamilyID2Size = anEntity2FamilyID[anEntity];
+	  const TGeom2ElemInfo& aGeom2ElemInfo = anIter->second;
+	  TGeom2ElemInfo::const_iterator aGeom2ElemInfoIter = aGeom2ElemInfo.begin();
+	  for(; aGeom2ElemInfoIter != aGeom2ElemInfo.end(); aGeom2ElemInfoIter++){
+	    const PElemInfo& aElemInfo = aGeom2ElemInfoIter->second;
 	    if(TInt aNbElem = aElemInfo->GetNbElem()){
 	      for(TInt i = 0; i < aNbElem; i++){
-		aFamilyIdSet.insert(aElemInfo->GetFamNum(i));
+		aFamilyID2Size[aElemInfo->GetFamNum(i)] += 1;
 	      }
 	    }
 	  }
 	}
       }
       
-      if(!aFamilyIdByEntity.empty()){
-	TFamilyIdByEntity::const_iterator anIter = aFamilyIdByEntity.begin();
-	for(; anIter != aFamilyIdByEntity.end(); anIter++){
+      if(!anEntity2FamilyID.empty()){
+	TEntity2FamilyID::const_iterator anIter = anEntity2FamilyID.begin();
+	for(; anIter != anEntity2FamilyID.end(); anIter++){
 	  const EEntiteMaillage& anEntity = anIter->first;
 	  INITMSG(MYDEBUG,"anEntity = "<<anEntity<<":\n");
-	  const TFamilyIdSet& aFamilyIdSet = anIter->second;
-	  TFamilyIdSet::const_iterator anFamilyIdIter = aFamilyIdSet.begin();
-	  for(; anFamilyIdIter != aFamilyIdSet.end(); anFamilyIdIter++){
-	    const TInt& aFamilyId = *anFamilyIdIter;
-	    TFamilyByIdMap::const_iterator 
-	      anFamilyByIdMapIter = aFamilyByIdMap.find(aFamilyId);
-	    if(anFamilyByIdMapIter != aFamilyByIdMap.end()){
-	      const PFamilyInfo& aFamilyInfo = anFamilyByIdMapIter->second;
-	      aFamilyByEntity[anEntity].insert(aFamilyInfo);
+	  const TFamilyID2Size& aFamilyID2Size = anIter->second;
+	  TFamilyID2Size::const_iterator anIter2 = aFamilyID2Size.begin();
+	  for(; anIter2 != aFamilyID2Size.end(); anIter2++){
+	    TInt anId = anIter2->first;
+	    TInt aSize = anIter2->second;
+	    TId2Family::const_iterator anIter3 = anId2Family.find(anId);
+	    if(anIter3 != anId2Family.end()){
+	      const PFamilyInfo& aFamilyInfo = anIter3->second;
+	      anEntity2FamilySet[anEntity].insert(TFamilyTSize(aFamilyInfo,aSize));
 	      INITMSG(MYDEBUG,
 		      "aFamilyName = '"<<aFamilyInfo->GetName()<<
 		      "' anId = "<<aFamilyInfo->GetId()<<"\n");
@@ -243,7 +262,88 @@ namespace MED{
       }
     }    
     ADDMSG(MYDEBUG,"\n");
-    return aFamilyByEntity;
+    return anEntity2FamilySet;
   }
   
+
+  //---------------------------------------------------------------
+  TKey2Gauss
+  GetKey2Gauss(const PWrapper& theWrapper, 
+	       TErr* theErr,
+	       EModeSwitch theMode)
+  {
+    INITMSG(MYDEBUG,"GetKey2Gauss - theMode = "<<theMode<<endl);
+    TKey2Gauss aKey2Gauss;
+    TInt aNbGauss = theWrapper->GetNbGauss(theErr);
+    for(TInt anId = 1; anId <= aNbGauss; anId++){
+      TGaussInfo::TInfo aPreInfo = theWrapper->GetGaussPreInfo(anId);
+      PGaussInfo anInfo = theWrapper->CrGaussInfo(aPreInfo,theMode);
+      theWrapper->GetGaussInfo(anId,anInfo,theErr);
+      TGaussInfo::TKey aKey = boost::get<0>(aPreInfo);
+      aKey2Gauss[aKey] = anInfo;
+
+#ifdef _DEBUG_
+      const EGeometrieElement& aGeom = boost::get<0>(aKey);
+      const std::string& aName = boost::get<1>(aKey);
+      INITMSG(MYDEBUG,
+	      "- aGeom = "<<aGeom<<
+	      "; aName = '"<<aName<<"'"<<
+	      endl);
+#endif
+
+    }
+    return aKey2Gauss;
+  }
+
+
+  //---------------------------------------------------------------
+  PProfileInfo
+  GetProfileInfo(const PWrapper& theWrapper, 
+		 const std::string& theProfileName,
+		 TErr* theErr,
+		 EModeProfil theMode)
+  {
+    PProfileInfo anInfo;
+    TInt aNbProfiles = theWrapper->GetNbProfiles(theErr);
+    for(TInt anId = 1; anId <= aNbProfiles; anId++){
+      TProfileInfo::TInfo aPreInfo = theWrapper->GetProfilePreInfo(anId);
+      const std::string& aName = boost::get<0>(aPreInfo);
+      if(aName == theProfileName)
+	return theWrapper->GetPProfileInfo(anId,theMode,theErr);
+    }
+    return anInfo;
+  }
+  
+
+  //---------------------------------------------------------------
+  TMKey2Profile
+  GetMKey2Profile(const PWrapper& theWrapper, 
+		  TErr* theErr,
+		  EModeProfil theMode)
+  {
+    INITMSG(MYDEBUG,"GetMKey2Profile - theMode = "<<theMode<<endl);
+    TKey2Profile aKey2Profile;
+    TInt aNbProfiles = theWrapper->GetNbProfiles(theErr);
+    for(TInt anId = 1; anId <= aNbProfiles; anId++){
+      TProfileInfo::TInfo aPreInfo = theWrapper->GetProfilePreInfo(anId);
+      PProfileInfo anInfo = theWrapper->GetPProfileInfo(anId,theMode,theErr);
+      const std::string& aName = boost::get<0>(aPreInfo);
+      aKey2Profile[aName] = anInfo;
+      
+#ifdef _DEBUG_
+      INITMSG(MYDEBUG,
+	      "- aName = '"<<aName<<"'"<<
+	      " : "<<
+	      endl);
+      TInt aNbElem = anInfo->myElemNum.size();
+      for(TInt iElem = 0; iElem < aNbElem; iElem++){
+	ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
+      }
+      ADDMSG(MYVALUEDEBUG,endl);
+#endif
+      
+    }
+    return TMKey2Profile(theMode,aKey2Profile);
+  }
+
 }

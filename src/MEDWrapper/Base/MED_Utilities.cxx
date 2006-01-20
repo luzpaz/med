@@ -50,14 +50,20 @@ MED::PrefixPrinter::PrefixPrinter(bool theIsActive):
 
 MED::PrefixPrinter::~PrefixPrinter()
 {
-  if(myIsActive)
+  if(myIsActive){
     myCounter--;
+    if(myCounter < 0)
+      EXCEPTION(runtime_error,"PrefixPrinter::~PrefixPrinter() - myCounter("<<myCounter<<") < 0");
+  }
 }
 
 string MED::PrefixPrinter::GetPrefix()
 {
-  if(myCounter)
+  if(myCounter){
+    if(myCounter < 0)
+      EXCEPTION(runtime_error,"PrefixPrinter::~PrefixPrinter() - myCounter("<<myCounter<<") < 0");
     return string(myCounter*2,' ');
+  }
   return "";
 }
 
