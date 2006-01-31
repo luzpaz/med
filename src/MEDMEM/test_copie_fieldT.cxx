@@ -34,6 +34,7 @@
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
+#include "MEDMEM_FieldConvert.hxx"
 #include "MEDMEM_define.hxx"
 
 using namespace std;
@@ -62,7 +63,9 @@ void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
   cout << "- Adresse support : " << mySupport << endl;
 }
 
-void affiche_fieldT(FIELD<double> * myField, const SUPPORT * mySupport)
+template <class INTERLACING_TAG>
+void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
+		    const SUPPORT * mySupport)
 {
   affiche_field_((FIELD_ *) myField, mySupport);
 
@@ -70,11 +73,21 @@ void affiche_fieldT(FIELD<double> * myField, const SUPPORT * mySupport)
   int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
   int NumberOfComponents = myField->getNumberOfComponents() ;
 
-  for (int i=1; i<NumberOf+1; i++) {
-    const double * value = myField->getValueI(MED_FULL_INTERLACE,i) ;
-    for (int j=0; j<NumberOfComponents; j++)
-      cout << value[j]<< " ";
-    cout<<endl;
+  if ( myField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) {
+    for (int i=1; i<NumberOf+1; i++) {
+      const double * value = myField->getRow(i) ;
+      for (int j=0; j<NumberOfComponents; j++)
+	cout << value[j]<< " ";
+      cout<<endl;
+    }
+  }
+  else {
+    for (int j=1; j<NumberOfComponents+1; j++) {
+      const double * value = myField->getColumn(j) ;
+      for (int i=0; i<NumberOf; i++)
+	cout << value[i]<< " ";
+      cout<<endl;
+    }
   }
 }
 
@@ -107,13 +120,11 @@ int main (int argc, char ** argv) {
   SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_cell",MED_CELL);
   try {
     myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
-    myField->setValueType(MED_REEL64);
   } catch (...) {
     delete mySupport ;
     mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
     try {
       myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
-      myField->setValueType(MED_REEL64);
     } catch (...) {
       cout << "Field double " << fieldname << " not found !!!" << endl ;
       exit (-1) ;
@@ -121,10 +132,21 @@ int main (int argc, char ** argv) {
   }
   
   affiche_fieldT(myField, mySupport);
-  FIELD<double> * myField2 = new FIELD<double>(* myField);
-  delete myField;
+  FIELD<double> * myField2 = new FIELD<double>(* myField); // Contructeur par recopie, sauf SUPPORT
+  delete myField; // Ne détruit pas le Support 
   affiche_fieldT(myField2, myField2->getSupport());
+  FIELD<double,NoInterlace>   * myField3  = FieldConvert( *myField2 );
   delete myField2;
+
+  affiche_fieldT(myField3, myField3->getSupport());
+  FIELD<double,FullInterlace> * myField4  = FieldConvert( *myField3 );
+  delete myField3;
+  affiche_fieldT(myField4, myField4->getSupport());
+  delete myField4;
+
+  FIELD<double,NoInterlace> * myField5 = new FIELD<double,NoInterlace>(mySupport,MED_DRIVER,filename,fieldname) ;
+  affiche_fieldT(myField5, myField5->getSupport());
+  delete myField5;
 
   delete mySupport ;
   delete myMesh ;

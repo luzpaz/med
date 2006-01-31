@@ -231,8 +231,8 @@ int main (int argc, char ** argv)
   nbOfPtsForTest=0;
   SUPPORT *supOnCell=new SUPPORT(myMesh);
   FIELD<double>* vol1=myMesh->getVolume(supOnCell);
-  int lgth=vol1->getValueLength(MED_FULL_INTERLACE);
-  const double *vals=vol1->getValue(MED_FULL_INTERLACE);
+  int lgth=vol1->getValueLength();
+  const double *vals=vol1->getValue();
   if(lgth==3)
     nbOfPtsForTest++;
   const double REFVolOfPolyHedron[3]={2.333333333333333,11.66666666666666,13.83224131414673};
@@ -241,8 +241,8 @@ int main (int argc, char ** argv)
       nbOfPtsForTest++;
   delete vol1;
   FIELD<double>* bary=myMesh->getBarycenter(supOnCell);
-  lgth=bary->getValueLength(MED_FULL_INTERLACE);
-  vals=bary->getValue(MED_FULL_INTERLACE);
+  lgth=bary->getValueLength();
+  vals=bary->getValue();
   if(lgth==9)
     nbOfPtsForTest++;
   const double REFBaryOfPolyHedron[9]= {5.5, 1, -1, 2, 1.5, 1.0833333333333333, 5.1, 1.6, 0.9};
@@ -253,8 +253,8 @@ int main (int argc, char ** argv)
   delete supOnCell;
   //area
   vol1=myMesh->getArea(fam1);
-  lgth=vol1->getValueLength(MED_FULL_INTERLACE);
-  vals=vol1->getValue(MED_FULL_INTERLACE);
+  lgth=vol1->getValueLength();
+  vals=vol1->getValue();
   if(lgth==3)
     nbOfPtsForTest++;
   const double REFAreaForPolyg[3]={6,5,6.5};
@@ -263,8 +263,8 @@ int main (int argc, char ** argv)
       nbOfPtsForTest++;
 
   vol1=myMesh->getArea(fam2);
-  lgth=vol1->getValueLength(MED_FULL_INTERLACE);
-  vals=vol1->getValue(MED_FULL_INTERLACE);
+  lgth=vol1->getValueLength();
+  vals=vol1->getValue();
   if(lgth==8)
     nbOfPtsForTest++;
   const double REFAreaForQuad[8]={2.1213203435596424, 2.8284271247461903, 4.4721359549995796, 4.4721359549995796, 
@@ -275,8 +275,8 @@ int main (int argc, char ** argv)
   delete vol1;
 
   vol1=myMesh->getArea(fam3);
-  lgth=vol1->getValueLength(MED_FULL_INTERLACE);
-  vals=vol1->getValue(MED_FULL_INTERLACE);
+  lgth=vol1->getValueLength();
+  vals=vol1->getValue();
   if(lgth==6)
     nbOfPtsForTest++;
   const double REFAreaForTri[6]={2.9580398915498081, 1.4142135623730951, 2.2360679774997898, 

@@ -81,7 +81,7 @@ void Compo2::Calcul3(const FIELD<double> &F)
 {
   BEGIN_OF("void Compo2::Calcul3(const FIELD<double> *)");
 
-  const double *v = F.getValue(MED_FULL_INTERLACE);
+  const double *v = F.getValue();
   long i, n = F.getSupport()->getNumberOfElements(MED_CELL);
   int j, m = F.getNumberOfComponents();
 

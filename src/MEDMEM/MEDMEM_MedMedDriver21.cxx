@@ -567,7 +567,6 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 		  break ;
 		}
 		}
-		ptrField->setValueType((MED_EN::med_type_champ) type) ; // need to write field !
 		
 		MESSAGE("timeStepNumber :"<<timeStepNumber<<",orderNumber :"<<orderNumber);
 		ptrField->setIterationNumber ( timeStepNumber);      // A ajouter dans la classe FIELD

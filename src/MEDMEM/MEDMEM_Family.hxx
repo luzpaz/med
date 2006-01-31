@@ -57,21 +57,21 @@ protected :
     There is one for each attribute.
     \endif
   */ 
-  int *    _attributeIdentifier ;
+  PointerOf<int>    _attributeIdentifier ;
   /*!
     \if developper
     Array of all attributes' values.
     There is one for each attribute.
     \endif
   */
-  int *    _attributeValue ;
+  PointerOf<int>    _attributeValue ;
   /*!
     \if developper
     Array of all attributes' descriptions.
     There is one for each attribute.
     \endif
   */
-  string * _attributeDescription ;
+  PointerOf<string>  _attributeDescription ;
   /*!
     \if developper
     Number of the group the family belongs to.
@@ -83,7 +83,7 @@ protected :
     Name of the group the family belongs to.
     \endif
   */
-  string * _groupName ;
+  PointerOf<string> _groupName ;
 
 public:
 			/*! Constructor. */
@@ -118,6 +118,9 @@ public:
 
   bool build(MED_EN::medEntityMesh Entity,int **FamilyNumber);
 
+  // Il faudrait mettre en cohérence les méthodes set
+  // avec l'opérateur d'affection ! Rmq from EF !!!
+
   inline void setIdentifier             (int Identifier);        
   inline void setNumberOfAttributes     (int NumberOfAttribute);
   inline void setAttributesIdentifiers  (int * AttributeIdentifier);
@@ -126,13 +129,13 @@ public:
   inline void setNumberOfGroups         (int NumberOfGroups);
   inline void setGroupsNames            (string * GroupName);
 
-  inline int      getIdentifier()              const;
-  inline int      getNumberOfAttributes()      const;
-  inline int *    getAttributesIdentifiers()   const;
-  inline int *    getAttributesValues()        const;
-  inline string * getAttributesDescriptions()  const;
-  inline int      getNumberOfGroups()          const;
-  inline string * getGroupsNames()             const;
+  inline int      getIdentifier()                    const;
+  inline int      getNumberOfAttributes()            const;
+  inline const int *    getAttributesIdentifiers()   const;
+  inline const int *    getAttributesValues()        const;
+  inline const string * getAttributesDescriptions()  const;
+  inline int      getNumberOfGroups()                const;
+  inline const string * getGroupsNames()             const;
 
   // A FAIRE : VERIFIER LA VALIDITE DES PARAMETRES !
   inline int      getAttributeIdentifier(int i)  const;
@@ -216,7 +219,7 @@ inline int FAMILY::getNumberOfAttributes() const
 /*! Returns a pointer to attributes identifiers .
     (There are _numberOfAttribute attributes) */
 //---------------------------------------------------
-inline int * FAMILY::getAttributesIdentifiers() const
+inline const int * FAMILY::getAttributesIdentifiers() const
 //---------------------------------------------------
 { 
     return _attributeIdentifier ; 
@@ -232,7 +235,7 @@ inline int FAMILY::getAttributeIdentifier(int i) const
 /*! Returns a pointer to attributes values.
     (There are _numberOfAttribute attributes)*/
 //----------------------------------------------
-inline int * FAMILY::getAttributesValues() const             
+inline const int * FAMILY::getAttributesValues() const
 //----------------------------------------------
 { 
     return _attributeValue ; 
@@ -246,7 +249,7 @@ inline int FAMILY::getAttributeValue(int i) const
     return _attributeValue[i-1] ; 
 }
 //-------------------------------------------------------
-inline string * FAMILY::getAttributesDescriptions() const    
+inline const string * FAMILY::getAttributesDescriptions() const
 //-------------------------------------------------------
 { 
     return _attributeDescription ; 
@@ -268,7 +271,7 @@ inline int FAMILY::getNumberOfGroups() const
 }
 /*! Returns a pointer to the names of the groups the family belongs to */
 //--------------------------------------------
-inline string * FAMILY::getGroupsNames() const               
+inline const string * FAMILY::getGroupsNames() const
 //--------------------------------------------
 { 
     return _groupName ; 

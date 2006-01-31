@@ -18,10 +18,12 @@
 // See http://www.salome-platform.org/
 //
 #include "MEDMEM_Meshing.hxx"
+#include "MEDMEM_DriverFactory.hxx"
 
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
+using namespace DRIVERFACTORY;
 
 int main (int argc, char ** argv)
 {
@@ -29,11 +31,14 @@ int main (int argc, char ** argv)
     if (argc != 2) 
     {
 	cerr << "Usage : " << argv[0] 
-	<< " medfilename" << endl << endl
-	<< "-> cré un maillage et le sauve dans le fichier medfilename." << endl;
+	<< " filenameRoot" << endl << endl
+	<< "-> creer un maillage et le sauve dans le fichier filenameRoot22.med sous le format Med Fichier V2.2 car il contient un polygon." << endl;
 	exit(-1);
     }
-    string medfilename  = argv[1];
+
+    string filenameRoot = argv[1] ;
+
+    string medfilename  = filenameRoot + "22.med";
 
     // Creation maillage
     //***********************************************************************************
@@ -44,7 +49,6 @@ int main (int argc, char ** argv)
       //   define coordinates
 
       int SpaceDimension = 2;
-      int MeshDimension = SpaceDimension ;
       int NumberOfNodes = 11;
       double Coordinates[2*11] = {
 	0.0, 0.0,
@@ -60,8 +64,6 @@ int main (int argc, char ** argv)
 	1.5, 1.0,
       };
 
-      myMeshing.setMeshDimension(MeshDimension) ;
-
       myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,"CARTESIAN",MED_FULL_INTERLACE);
 
       string Names[3] = { "X","Y","Z" };
@@ -70,22 +72,24 @@ int main (int argc, char ** argv)
       string Units[3] = { "cm","cm","cm" };
       myMeshing.setCoordinatesUnits(Units);
 
-      //   define conectivities
+      //   define conectivities of classic types
 
       //      cell part
 
-      const int NumberOfTypes = 3;
-      medGeometryElement Types[NumberOfTypes] = {MED_TRIA3,MED_QUAD4,MED_POLYGON};
-      const int NumberOfElements[NumberOfTypes] = {1,4,1};
+      const int NumberOfTypes = 2;
+      medGeometryElement Types[NumberOfTypes] = {MED_TRIA3,MED_QUAD4};
+      const int NumberOfElements[NumberOfTypes] = {1,4};
 
       myMeshing.setNumberOfTypes(NumberOfTypes,MED_CELL);
       myMeshing.setTypes(Types,MED_CELL);
+      myMeshing.setNumberOfElements(NumberOfElements,MED_CELL);
 
       int ConnectivityTria[1*3]=
 	{
 	  7,4,1
 	};
 
+      myMeshing.setConnectivity(ConnectivityTria,MED_CELL,MED_TRIA3);
 
       int ConnectivityQuad[4*4]=
 	{
@@ -95,6 +99,15 @@ int main (int argc, char ** argv)
 	  8,9,6,5
 	};
   
+      myMeshing.setConnectivity(ConnectivityQuad,MED_CELL,MED_QUAD4);
+
+      int MeshDimension = SpaceDimension ;
+      // because there are 2D cells in the mesh
+
+      myMeshing.setMeshDimension(MeshDimension) ;
+
+      // then define eventuel polygonal cells
+
       int ConnectivityPolygon[1*5]=
 	{
 	  9,11,10,3,6
@@ -104,55 +117,16 @@ int main (int argc, char ** argv)
 	  1,6
 	};
 
-      myMeshing.setNumberOfElements(NumberOfElements,MED_CELL,ConnectivityPolygonIndex,1);
-      myMeshing.setConnectivity(ConnectivityTria,MED_CELL,MED_TRIA3);
-      myMeshing.setConnectivity(ConnectivityQuad,MED_CELL,MED_QUAD4);
-      myMeshing.setConnectivity(ConnectivityPolygon,MED_CELL,MED_POLYGON,ConnectivityPolygonIndex,1);
+      myMeshing.setPolygonsConnectivity(ConnectivityPolygonIndex,ConnectivityPolygon,1,MED_CELL);
 
-      /*
-      //      face part
+      // Ecriture fichier
 
-      const int NumberOfFacesTypes = 2 ;
-      medGeometryElement FacesTypes[NumberOfFacesTypes] = {MED_TRIA3,MED_QUAD4} ;
-      const int NumberOfFacesElements[NumberOfFacesTypes] = {4,4} ;
+      medFileVersion version = getMedFileVersionForWriting();
+      if (version == V21)
+	setMedFileVersionForWriting(V22);
 
-      myMeshing.setNumberOfTypes(NumberOfFacesTypes,MED_FACE);
-      myMeshing.setTypes(FacesTypes,MED_FACE);
-      myMeshing.setNumberOfElements(NumberOfFacesElements,MED_FACE);
-
-      const int sizeTria = 3*4 ;
-      int ConnectivityTria[sizeTria]=
-      {
-      1,4,3,
-      1,5,4,
-      1,6,5,
-      1,3,6
-      };
- 
-      myMeshing.setConnectivity(ConnectivityTria,MED_FACE,MED_TRIA3);
-
-      int ConnectivityQua[4*4]=
-      {
-      7,8,9,10,
-      11,12,13,14,
-      11,7,8,12,
-      12,8,9,13
-      };
-
-      myMeshing.setConnectivity(ConnectivityQua,MED_FACE,MED_QUAD4);
-      */
-
-      /*
-      //      edge part
-
-      // not yet implemented : if set, results are unpredictable.
-      */
-
-
-  // Ecriture fichier
-
-      int idMed = myMeshing.addDriver(MED_DRIVER,medfilename,myMeshing.getName());
-      myMeshing.write(idMed) ;
+      int idMed22 = myMeshing.addDriver(MED_DRIVER,medfilename,myMeshing.getName());
+      myMeshing.write(idMed22) ;
 
       //      int idVtk = myMeshing.addDriver(VTK_DRIVER,"toto.vtk",myMeshing.getName());
       //      myMeshing.write(idVtk) ;

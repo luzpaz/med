@@ -30,7 +30,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-GROUP::GROUP():_numberOfFamilies(0),_family() 
+GROUP::GROUP():SUPPORT(),_numberOfFamilies(0),_family() 
 {
   MESSAGE("GROUP()");
 };
@@ -43,6 +43,8 @@ GROUP::~GROUP()
 GROUP & GROUP::operator=(const GROUP &group) 
 {
   MESSAGE("GROUP::operator=");
+  if ( &group == this ) return *this;
+  SUPPORT::operator=(group);
   _numberOfFamilies = group._numberOfFamilies ;
   _family      	    = group._family ;
   return *this;
@@ -95,10 +97,11 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "building of a GROUP object from several FAMILY, and one of them is on all entities"  )) ;
 
   _numberOfGeometricType = myFamily->getNumberOfTypes() ;
-  _geometricType = new medGeometryElement[_numberOfGeometricType];
-  //_geometricTypeNumber = new int[_numberOfGeometricType] ;
-  _numberOfGaussPoint = new int[_numberOfGeometricType] ;
-  _numberOfElements = new int[_numberOfGeometricType] ;
+
+  _geometricType.set(_numberOfGeometricType);
+  _numberOfGaussPoint.set(_numberOfGeometricType) ;
+  _numberOfElements.set(_numberOfGeometricType) ;
+
   const medGeometryElement * geometricType = myFamily->getTypes() ;
   //int * geometricTypeNumber = myFamily->getGeometricTypeNumber() ;
   const int * numberOfGaussPoint = myFamily->getNumberOfGaussPoint() ;
@@ -164,7 +167,7 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
 GROUP::GROUP(const GROUP & m):SUPPORT(m)
 {
   _numberOfFamilies = m._numberOfFamilies;
-  _family = m._family;
+  _family = m._family; //Copie profonde dans FAMILY Rmq from EF
 };
 
 // void GROUP::init(const list<FAMILY*> & families)

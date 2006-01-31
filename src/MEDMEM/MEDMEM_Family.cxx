@@ -36,9 +36,7 @@ using namespace MED_EN;
 #define MED_TAILLE_DESC 200
 #define MED_TAILLE_LNOM  80
 
-FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), 
-                 _attributeIdentifier((int*)NULL),_attributeValue((int*)NULL), _attributeDescription((string*)NULL),
-		 _numberOfGroup(0), _groupName((string*)NULL) 
+FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), _numberOfGroup(0)
 {
     MESSAGE("FAMILY::FAMILY()");
 };
@@ -58,20 +56,27 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   MESSAGE("FAMILY(int Identifier, string Name, int NumberOfAttribute,int *AttributeIdentifier,int *AttributeValue,string AttributeDescription,int NumberOfGroup,string GroupName, int ** Number) : "<<Identifier);
 
   _isOnAllElts = false ;
-  // replace them by pointerOf ?
-  _attributeIdentifier = new int[_numberOfAttribute] ;
-  memcpy(_attributeIdentifier,AttributeIdentifier,_numberOfAttribute*sizeof(int));
-  _attributeValue = new int[_numberOfAttribute] ;
-  memcpy(_attributeValue,AttributeValue,_numberOfAttribute*sizeof(int));
+  SCRUTE(_numberOfAttribute);
+  if (_numberOfAttribute > 0)
+    {
+      _attributeIdentifier.set(_numberOfAttribute,AttributeIdentifier);
+      _attributeValue.set(_numberOfAttribute,AttributeValue);
 
-  _attributeDescription=new string[_numberOfAttribute];
-  for (int i=0;i<NumberOfAttribute;i++) {
-    _attributeDescription[i].assign(AttributeDescription,i*MED_TAILLE_DESC,MED_TAILLE_DESC);
-    _attributeDescription[i].erase(strlen(_attributeDescription[i].c_str()));
-    //SCRUTE(_attributeDescription[i]);
-  }
+      _attributeDescription.set(_numberOfAttribute);
+      for (int i=0;i<NumberOfAttribute;i++) {
+	_attributeDescription[i].assign(AttributeDescription,i*MED_TAILLE_DESC,MED_TAILLE_DESC);
+	_attributeDescription[i].erase(strlen(_attributeDescription[i].c_str()));
+	//SCRUTE(_attributeDescription[i]);
+      }
+    }
+  else
+    {
+      _attributeIdentifier.set(_numberOfAttribute);
+      _attributeValue.set(_numberOfAttribute);
+      _attributeDescription.set(_numberOfAttribute);
+    }
  
-  _groupName=new string[_numberOfGroup];
+  _groupName.set(_numberOfGroup);
   for (int i=0;i<NumberOfGroup;i++) {
     _groupName[i].assign(GroupName,i*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
     _groupName[i].erase(strlen(_groupName[i].c_str()));
@@ -115,12 +120,14 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
       update();
     } else {
       _numberOfGeometricType = 1 ;
-      if (_geometricType!=NULL) delete[] _geometricType ;
-      _geometricType = new medGeometryElement[1] ;
+
+      _geometricType.set(1) ;
+
       _geometricType[0]=MED_NONE ;
       _isOnAllElts= false ;
-      if (_numberOfElements!=NULL) delete[] _numberOfElements ;
-      _numberOfElements = new int[1] ;
+
+      _numberOfElements.set(1) ;
+
       _numberOfElements[0]=NumberOfNodesInFamily ;
       _totalNumberOfElements=NumberOfNodesInFamily;
       
@@ -213,37 +220,20 @@ FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
   MESSAGE("FAMILY::FAMILY(FAMILY & m)");
   _identifier = m._identifier;
   _numberOfAttribute = m._numberOfAttribute;
-  if (m._attributeIdentifier != NULL)
-    {
-      _attributeIdentifier = new int[m._numberOfAttribute];
-      memcpy(_attributeIdentifier,m._attributeIdentifier,m._numberOfAttribute*sizeof(int));
-    }
-  else
-    _attributeIdentifier = (int *) NULL;
-  if (m._attributeValue != NULL)
-    {
-      _attributeValue = new int[m._numberOfAttribute];
-      memcpy(_attributeValue,m._attributeValue,m._numberOfAttribute*sizeof(int));
-    }
-  else
-    _attributeValue = (int *) NULL;
-  if (m._attributeDescription != NULL)
-    {
-      _attributeDescription = new string[m._numberOfAttribute];
-      for (int i=0;i<m._numberOfAttribute;i++)
-	_attributeDescription[i] = m._attributeDescription[i];
-    }
-  else
-    _attributeDescription = (string *) NULL;
+
+ _attributeIdentifier.set(_numberOfAttribute,m._attributeIdentifier);
+  _attributeValue.set(_numberOfAttribute,m._attributeValue);
+  _attributeDescription.set(_numberOfAttribute);
+
+  for (int i=0;i<m._numberOfAttribute;i++)
+    _attributeDescription[i] = m._attributeDescription[i];
+
   _numberOfGroup = m._numberOfGroup;
-  if (m._groupName != NULL)
-    {
-      _groupName = new string[m._numberOfGroup];
-      for (int i=0;i<m._numberOfGroup;i++)
-	_groupName[i]=m._groupName[i];
-    }
-  else
-    _groupName = (string *) NULL;
+
+  _groupName.set(_numberOfGroup) ;
+
+  for (int i=0;i<m._numberOfGroup;i++)
+    _groupName[i]=m._groupName[i];
 };
 
 FAMILY::FAMILY(const SUPPORT & s):SUPPORT(s)
@@ -252,36 +242,33 @@ FAMILY::FAMILY(const SUPPORT & s):SUPPORT(s)
 
   _identifier = 0;
   _numberOfAttribute = 0;
-  _attributeIdentifier = (int*) NULL;
-  _attributeValue = (int*) NULL;
-  _attributeDescription = (string*) NULL;
+
   _numberOfGroup = 0;
-  _groupName= (string*) NULL;
 };
 
 FAMILY::~FAMILY() 
 {
     MESSAGE("~FAMILY()");
-    if(_attributeIdentifier!=NULL)
-       delete[] _attributeIdentifier;
-    if(_attributeValue!=NULL)
-       delete[] _attributeValue;
-    if(_attributeDescription!=NULL)
-       delete[] _attributeDescription;
-    if(_groupName!=NULL)
-       delete[] _groupName;
 };
   
 FAMILY & FAMILY::operator=(const FAMILY &fam) 
 {
     MESSAGE("FAMILY::operator=");
+    if ( this == &fam ) return *this;
+
+    //Etant donné que l'opérateur d'affectation de la classe SUPPORT effectuait
+    //une recopie profonde j'ai mis en cohérence l'opérateur d'affectation
+    // de la classe FAMILY
+    SUPPORT::operator=(fam);
+ 
+
     _identifier = fam._identifier;
     _numberOfAttribute = fam._numberOfAttribute; 
-    _attributeIdentifier = fam._attributeIdentifier;
-    _attributeValue = fam._attributeValue;
-    _attributeDescription = fam._attributeDescription;
+    _attributeIdentifier.set(_numberOfAttribute, fam._attributeIdentifier) ;
+    _attributeValue.set(_numberOfAttribute, fam._attributeValue) ;
+    _attributeDescription.set(_numberOfAttribute, fam._attributeDescription) ;
     _numberOfGroup = fam._numberOfGroup;
-    _groupName = fam._groupName;
+    _groupName.set(_numberOfGroup, fam._groupName) ;
     return *this;
 };
 
@@ -378,11 +365,11 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
     Find = true ;
     _entity = Entity ;
     _numberOfGeometricType = numberOfElementTypesInFamily ;
-    if (_geometricType!=NULL) delete[] _geometricType ;
-    _geometricType = new medGeometryElement[numberOfElementTypesInFamily] ;
+    _geometricType.set(numberOfElementTypesInFamily) ;
+
     _isOnAllElts = false ;
-    if (_numberOfElements!=NULL) delete[] _numberOfElements ;
-    _numberOfElements = new int[numberOfElementTypesInFamily] ;
+
+    _numberOfElements.set(numberOfElementTypesInFamily) ;
     _totalNumberOfElements=0;
 
     //_numberOfGaussPoint = new int[numberOfElementTypesInFamily] ;

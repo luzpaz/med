@@ -209,11 +209,11 @@ public :
 	Wrapper_MED_Field(int nv, int nc, double * v):nbr_valeurs(nv),nbr_composantes(nc),valeurs(v)
 		{
 		}
-	Wrapper_MED_Field(const MEDMEM::FIELD<double> * medfield)
+	Wrapper_MED_Field(const MEDMEM::FIELD<double,MEDMEM::FullInterlace> * medfield)
 		{
 		nbr_valeurs=medfield->getNumberOfValues();
 		nbr_composantes=medfield->getNumberOfComponents();
-		valeurs=const_cast<double *>(medfield->getValue(MED_EN::MED_FULL_INTERLACE));
+		valeurs=const_cast<double *>(medfield->getValue());
 		}
 	~Wrapper_MED_Field(){}
 	inline Valeur<double> operator[](int i) 

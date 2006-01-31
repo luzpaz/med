@@ -20,11 +20,13 @@
 #ifndef ASCII_FIELD_DRIVER_HXX
 #define ASCII_FIELD_DRIVER_HXX
 
-#include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_Support.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Unit.hxx"
+#include "MEDMEM_Support.hxx"
+#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_ArrayInterface.hxx"
+#include "MEDMEM_ArrayConvert.hxx"
 
 #include <list>
 #include <string>
@@ -40,8 +42,6 @@
 
 namespace MEDMEM {
 
-  template<class T>
-  class FIELD;
 
   template<int N,unsigned int CODE>
   void fill(double *a, const double *b)
@@ -86,20 +86,29 @@ namespace MEDMEM {
   class ASCII_FIELD_DRIVER : public GENDRIVER
   {
   private:
-    MESH          *_mesh;
-    SUPPORT       *_support;
-    mutable FIELD<T> *     _ptrField;
-    std::string         _fileName;
-    mutable ofstream		 _file;
-    unsigned int	 _code;
-    MED_EN::med_sort_direc _direc;
-    int			 _nbComponents;
-    int			 _spaceDimension;
+    MESH                   *_mesh;
+    SUPPORT                *_support;
+    mutable FIELD<T>       *_ptrField;
+    std::string             _fileName;
+    mutable ofstream	    _file;
+    unsigned int	    _code;
+    MED_EN::med_sort_direc  _direc;
+    int			    _nbComponents;
+    int			    _spaceDimension;
     //static int           _nbComponentsForCpyInfo;
+
   public:
-    ASCII_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField, 
+    template <class INTERLACING_TAG>
+    ASCII_FIELD_DRIVER():GENDRIVER(),
+			 _ptrField((FIELD<T>)MED_NULL),
+			 _fileName("") {};
+
+    template <class INTERLACING_TAG>
+    ASCII_FIELD_DRIVER(const string & fileName, FIELD<T,INTERLACING_TAG> * ptrField,
 		       MED_EN::med_sort_direc direction=MED_EN::ASCENDING,
 		       const char *priority="");
+
+
     ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other);
     void open() throw (MEDEXCEPTION);
     void close();
@@ -116,7 +125,6 @@ namespace MEDMEM {
   };
 }
 
-#include "MEDMEM_Field.hxx"
 
 namespace MEDMEM {
 
@@ -162,38 +170,42 @@ namespace MEDMEM {
   }
 
   template <class T>
-  ASCII_FIELD_DRIVER<T>::ASCII_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField,
-					    MED_EN::med_sort_direc direction,const char *priority)
-    :GENDRIVER(fileName,MED_EN::MED_ECRI),_ptrField(ptrField),_fileName(fileName),_direc(direction)
-  {
-    _nbComponents=_ptrField->getNumberOfComponents();
-    if(_nbComponents<=0)
-      throw MEDEXCEPTION("ASCII_FIELD_DRIVER : No components in FIELD<T>");
-    _support=(SUPPORT *)_ptrField->getSupport();
-    _mesh=(MESH *)_support->getMesh();
-    _spaceDimension=_mesh->getSpaceDimension();
-    _code=3;
-    int i;
-    if(priority[0]=='\0')
-      for(i=_spaceDimension-1;i>=0;i--)
-	{
-	  _code<<=2;
-	  _code+=i;
-	}
-    else
-      {
-	if(_spaceDimension!=strlen(priority))
-	  throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Coordinate priority invalid with spaceDim");
+  template <class INTERLACING_TAG>
+  ASCII_FIELD_DRIVER<T>::ASCII_FIELD_DRIVER(const string & fileName,
+					    FIELD<T,INTERLACING_TAG> * ptrField,
+					    MED_EN::med_sort_direc direction,
+					    const char *priority)
+    :GENDRIVER(fileName,MED_EN::MED_ECRI),_ptrField((FIELD<T>*)ptrField),_fileName(fileName),_direc(direction)
+    {
+      _nbComponents=_ptrField->getNumberOfComponents();
+      if(_nbComponents<=0)
+	throw MEDEXCEPTION("ASCII_FIELD_DRIVER : No components in FIELD<T>");
+      _support=(SUPPORT *)_ptrField->getSupport();
+      _mesh=(MESH *)_support->getMesh();
+      _spaceDimension=_mesh->getSpaceDimension();
+      _code=3;
+      int i;
+      if(priority[0]=='\0')
 	for(i=_spaceDimension-1;i>=0;i--)
 	  {
-	    char c=toupper(priority[i]);
-	    if(int(c-'X')>(_spaceDimension-1))
-	      throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid priority definition");
 	    _code<<=2;
-	    _code+=c-'X';
+	    _code+=i;
 	  }
-      }
-  }
+      else
+	{
+	  if(_spaceDimension!=strlen(priority))
+	    throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Coordinate priority invalid with spaceDim");
+	  for(i=_spaceDimension-1;i>=0;i--)
+	    {
+	      char c=toupper(priority[i]);
+	      if(int(c-'X')>(_spaceDimension-1))
+		throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid priority definition");
+	      _code<<=2;
+	      _code+=c-'X';
+	    }
+	}
+    }
+
 
   template <class T>
   ASCII_FIELD_DRIVER<T>::ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other)
@@ -298,6 +310,7 @@ namespace MEDMEM {
   template <class T>
   void ASCII_FIELD_DRIVER<T>::buildIntroduction() const
   {
+
     int i;
     _file  << setiosflags(ios::scientific);
     _file << "#TITLE: table " << _ptrField->getName() << " TIME: " << _ptrField->getTime() << " IT: " << _ptrField->getIterationNumber() << endl;
@@ -337,79 +350,100 @@ namespace MEDMEM {
       }
     _file << endl;
   }
+}
 
+#include "MEDMEM_Field.hxx"
+
+namespace MEDMEM
+{
   template <class T>
   template<int SPACEDIMENSION, unsigned int SORTSTRATEGY>
   void ASCII_FIELD_DRIVER<T>::sortAndWrite() const
   {
+    typedef typename MEDMEM_ArrayInterface<double,NoInterlace,NoGauss>::Array   ArrayDoubleNo;
+    typedef typename MEDMEM_ArrayInterface<double,FullInterlace,NoGauss>::Array ArrayDoubleFull;
+    typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array   ArrayNo;
+    typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array ArrayFull;
+
     int i,j;
     int numberOfValues=_ptrField->getNumberOfValues();
     std::list< SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY > > li;
     const double * coord;
-    FIELD<double> * barycenterField=0;
+    FIELD<double,FullInterlace> * barycenterField=0;
+    ArrayDoubleNo * baryArrayTmp = NULL;
     double * xyz[SPACEDIMENSION];
     bool deallocateXyz=false;
-    if(_support->getEntity()==MED_EN::MED_NODE)
-      {
-	if (_support->isOnAllElements())
-	  {
-	    coord=_mesh->getCoordinates(MED_EN::MED_NO_INTERLACE);
-	    for(i=0; i<SPACEDIMENSION; i++)
-	      xyz[i]=(double *)coord+i*numberOfValues;  
-	  }
-	else
-	  {
-	    coord = _mesh->getCoordinates(MED_EN::MED_FULL_INTERLACE);
-	    const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
-	    for(i=0; i<SPACEDIMENSION; i++)
-	      xyz[i]=new double[numberOfValues];
-	    deallocateXyz=true;
-	    for(i=0;i<numberOfValues;i++)
-	      {
-		for(j=0;j<SPACEDIMENSION;j++)
-		  xyz[j][i]=coord[(nodesNumber[i]-1)*SPACEDIMENSION+j];
-	      }
-	  }
-      }
-    else
-      {
-	barycenterField = _mesh->getBarycenter(_support);
-	coord=barycenterField->getValue(MED_EN::MED_NO_INTERLACE);
+
+    if(_support->getEntity()==MED_EN::MED_NODE) {
+      if (_support->isOnAllElements()) {
+
+	coord=_mesh->getCoordinates(MED_EN::MED_NO_INTERLACE);
 	for(i=0; i<SPACEDIMENSION; i++)
-	  xyz[i]=(double *)(coord+i*numberOfValues);
+	  xyz[i]=(double *)coord+i*numberOfValues;
+
+      } else {
+
+	coord = _mesh->getCoordinates(MED_EN::MED_FULL_INTERLACE);
+	const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+	for(i=0; i<SPACEDIMENSION; i++)
+	  xyz[i]=new double[numberOfValues];
+	    deallocateXyz=true;
+	    for(i=0;i<numberOfValues;i++) {
+	      for(j=0;j<SPACEDIMENSION;j++)
+		xyz[j][i]=coord[(nodesNumber[i]-1)*SPACEDIMENSION+j];
+	    }
       }
-    T* valsToSet=(T*)_ptrField->getValue(MED_EN::MED_FULL_INTERLACE);
+    } else {
+
+      barycenterField = _mesh->getBarycenter(_support);
+      baryArrayTmp = ArrayConvert
+	( *( static_cast<ArrayDoubleFull*>(barycenterField->getArray()) ) );
+      coord = baryArrayTmp->getPtr();
+      for(i=0; i<SPACEDIMENSION; i++)
+	xyz[i]=(double *)(coord+i*numberOfValues);
+    }
+
+    const T * valsToSet;
+    ArrayFull * tmpArray = NULL;
+    if ( _ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
+      valsToSet= _ptrField->getValue();
+    else {
+      tmpArray = ArrayConvert
+	( *( static_cast<ArrayNo*>(_ptrField->getArray()) ) );
+      valsToSet= tmpArray->getPtr();
+    }
     double temp[SPACEDIMENSION];
-    for(i=0;i<numberOfValues;i++)
-      {
-	for(j=0;j<SPACEDIMENSION;j++)
-	  temp[j]=xyz[j][i];
-	li.push_back(SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY>(temp,valsToSet+i*_nbComponents,_nbComponents));
-      }
-    if(barycenterField)
-      delete barycenterField;
+    for(i=0;i<numberOfValues;i++) {
+      for(j=0;j<SPACEDIMENSION;j++)
+	temp[j]=xyz[j][i];
+      li.push_back(SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY>(temp,valsToSet+i*_nbComponents,_nbComponents));
+    }
+
+    if (barycenterField) delete barycenterField;
+    if (baryArrayTmp)    delete baryArrayTmp;
+    if (tmpArray)        delete tmpArray;
+
     if(deallocateXyz)
       for(j=0;j<SPACEDIMENSION;j++)
 	delete [] xyz[j];
+
     li.sort();
     _file << setprecision(PRECISION_IN_ASCII_FILE);
-    if(_direc==MED_EN::ASCENDING)
-      {
-	typename std::list< SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY > >::iterator iter;
-	for(iter=li.begin();iter!=li.end();iter++)
-	  (*iter).writeLine(_file);
-	_file << endl;
-      }
-    else if(_direc==MED_EN::DESCENDING)
-      {
-	typename std::list< SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY > >::reverse_iterator iter;
-	for(iter=li.rbegin();iter!=li.rend();iter++)
-	  (*iter).writeLine(_file);
-	_file << endl;
-      }
-    else
+    if(_direc==MED_EN::ASCENDING) {
+      typename std::list< SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY > >::iterator iter;
+      for(iter=li.begin();iter!=li.end();iter++)
+	(*iter).writeLine(_file);
+      _file << endl;
+    } else if (_direc==MED_EN::DESCENDING) {
+
+      typename std::list< SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY > >::reverse_iterator iter;
+      for(iter=li.rbegin();iter!=li.rend();iter++)
+	(*iter).writeLine(_file);
+      _file << endl;
+    } else
       MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid sort direction");
   }
+
   //{
     //_nbComponentsForCpyInfo=_nbComponents;
     //_ptrField->fillFromAnalytic <TEST<T>::copyInfo3> ();

@@ -24,15 +24,12 @@
 %{
 #include "MEDMEM_convert.hxx"
 #include "MEDMEM_Family_i.hxx"
-#include "MEDMEM_FieldDouble_i.hxx"
 #include "MEDMEM_Field_i.hxx"
-#include "MEDMEM_FieldInt_i.hxx"
+#include "MEDMEM_FieldTemplate_i.hxx"
 #include "MEDMEM_Group_i.hxx"
 #include "MEDMEM_Med_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_Support_i.hxx"
-// #include "MEDMEM_SWIG_FieldDouble.hxx"
-// #include "MEDMEM_SWIG_FieldInt.hxx"
 
   using namespace MEDMEM;
   using namespace MED_EN;
@@ -531,7 +528,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       field->setDescription("Got From A Local One");
 
-      FIELDDOUBLE_i * fieldimpl = new FIELDDOUBLE_i(field, ownCppPtr);
+      FIELDTEMPLATE_I<double,FullInterlace> *fieldimpl = new FIELDTEMPLATE_I<double,FullInterlace>(field, ownCppPtr);
 
       SALOME_MED::FIELDDOUBLE_ptr fieldcorba2 = fieldimpl->_this();
 
@@ -563,7 +560,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       field->setDescription("Got From A Local One");
 
-      FIELDINT_i * fieldimpl = new FIELDINT_i(field, ownCppPtr);
+      FIELDTEMPLATE_I<int,FullInterlace> * fieldimpl = new FIELDTEMPLATE_I<int,FullInterlace>(field, ownCppPtr);
 
       SALOME_MED::FIELDINT_ptr fieldcorba2 = fieldimpl->_this();
 

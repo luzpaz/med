@@ -43,6 +43,7 @@
 #include "MEDMEM_Med.hxx"
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Field.hxx"
+#include "MEDMEM_FieldConvert.hxx"
 #include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Meshing.hxx"
@@ -52,19 +53,37 @@
   using namespace MEDMEM;
   using namespace MED_EN;
 
-typedef FIELD <double> FIELDDOUBLE;
-typedef FIELD <int> FIELDINT;
+  /*  typedef FIELD <double, FullInterlace> FIELDDOUBLEFULLINTERLACE;*/
+  /*  typedef FIELD <int, FullInterlace> FIELDINTFULLINTERLACE;*/
+  typedef FIELD <double, FullInterlace> FIELDDOUBLE;
+  typedef FIELD <int, FullInterlace> FIELDINT;
+  typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
+  typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 
 %}
 
-// SWIG needs these typedefs to wrap FIELDDOUBLE*, for ex., to something like
-// <C++ FIELD<double> instance at _d0709808_p_FIELDDOUBLE>, not to
-// <SWIG Object at _d0709808_p_FIELDDOUBLE> which has no attributes
-typedef FIELD <double> FIELDDOUBLE;
-typedef FIELD <int> FIELDINT;
+/*
+  SWIG needs these typedefs to wrap FIELDDOUBLE*, for ex., to something like
+  <C++ FIELD<double> instance at _d0709808_p_FIELDDOUBLE>, not to
+  <SWIG Object at _d0709808_p_FIELDDOUBLE> which has no attributes
+*/
+
+/*typedef FIELD <double, FullInterlace> FIELDDOUBLEFULLINTERLACE;*/
+/*typedef FIELD <int, FullInterlace> FIELDINTFULLINTERLACE;*/
+typedef FIELD <double, FullInterlace> FIELDDOUBLE;
+typedef FIELD <int, FullInterlace> FIELDINT;
+typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
+typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 
 %include "typemaps.i"
 %include "my_typemap.i"
+
+/*
+  mapping between stl string and python string 
+*/
+
+%include "std_string.i"
+
 
 /*
   managing C++ exception in the Python API
@@ -98,14 +117,14 @@ typedef FIELD <int> FIELDINT;
   typemap for vector<FAMILY *> C++ object
 */
 
-%typemap(python,in) vector<FAMILY *>, const vector<FAMILY *>
+%typemap(python,in) vector< FAMILY * >, const vector< FAMILY * >
 {
   /* typemap in for vector<FAMILY *> */
   /* Check if is a list */
 
   if (PyList_Check($input)) {
     int size = PyList_Size($input);
-    $1.resize(size);
+    $1 = vector<FAMILY *>(size);
 
     for (int i=0; i < size; i++)
       {
@@ -133,7 +152,7 @@ typedef FIELD <int> FIELDINT;
     }
 }
 
-%typemap(python,out) vector<FAMILY *>
+%typemap(python,out) vector< FAMILY * >
 {
   /* typemap out for vector<FAMILY *> */
   int size = $1.size();
@@ -153,14 +172,14 @@ typedef FIELD <int> FIELDINT;
   typemap for vector<SUPPORT *> C++ object
 */
 
-%typemap(python,in) vector<SUPPORT *>, const vector<SUPPORT *>
+%typemap(python,in) vector< SUPPORT * >, const vector< SUPPORT * >
 {
   /* typemap in for vector<SUPPORT *> */
   /* Check if is a list */
 
   if (PyList_Check($input)) {
     int size = PyList_Size($input);
-    $1.resize(size);
+    $1 = vector<SUPPORT *>(size);
 
     for (int i=0; i < size; i++)
       {
@@ -188,7 +207,7 @@ typedef FIELD <int> FIELDINT;
     }
 }
 
-%typemap(python,out) vector<SUPPORT *>
+%typemap(python,out) vector< SUPPORT * >
 {
   /* typemap out for vector<SUPPORT *> */
   int size = $1.size();
@@ -204,7 +223,8 @@ typedef FIELD <int> FIELDINT;
     }
 }
 
-%typemap(python,in) vector< FIELD<double> * >, const vector< FIELD<double> * >
+
+%typemap(python,in) vector< FIELD< double > * >, const vector< FIELD< double > * >
 {
     /* typemap in for vector<FIELD<double> *> */
   /* Check if is a list */
@@ -216,9 +236,9 @@ typedef FIELD <int> FIELDINT;
     for (int i=0; i < size; i++)
       {
 	PyObject * tmp = PyList_GetItem($input,i);
-	FIELDDOUBLE * s;
+	FIELD<double> * s;
 
-	int err = SWIG_ConvertPtr(tmp, (void **) &s, $descriptor(FIELDDOUBLE *),
+	int err = SWIG_ConvertPtr(tmp, (void **) &s, $descriptor(FIELD<double> *),
 				  SWIG_POINTER_EXCEPTION);
 
 	if (err == -1)
@@ -240,7 +260,7 @@ typedef FIELD <int> FIELDINT;
     }
 }
 
-%typemap(python,out) vector<FIELD<double> *>
+%typemap(python,out) vector< FIELD< double > * >
 {
   /* typemap out for vector<FIELD<double> *> */
   int size = $1.size();
@@ -256,7 +276,7 @@ typedef FIELD <int> FIELDINT;
     }
 }
 
-%typemap(python,in) vector<FIELD<int> *>, const vector<FIELD<int> *>
+%typemap(python,in) vector< FIELD< int > * >, const vector< FIELD< int > * >
 {
     /* typemap in for vector<FIELD<int> *> */
   /* Check if is a list */
@@ -292,7 +312,7 @@ typedef FIELD <int> FIELDINT;
     }
 }
 
-%typemap(python,out) vector<FIELD<int> *>
+%typemap(python,out) vector< FIELD< int > * >
 {
   /* typemap out for vector<FIELD<int> *> */
   int size = $1.size();
@@ -308,20 +328,6 @@ typedef FIELD <int> FIELDINT;
     }
 }
 
-%typemap(python,out) char *
-{
-  /* typemap out for char * */
-
-  $result = PyString_FromString($1);
-}
-
-%typemap(python,out) string {
-    $result = PyString_FromString($1.c_str());
-}
-
-%typemap(python,in) string {
-  $1=string(PyString_AsString($input));
-}
 
 /*
   typemap in for PyObject * fonction Python wrapping of a
@@ -353,15 +359,16 @@ typedef FIELD <int> FIELDINT;
 {
   PyObject *py_list = PyList_New(size);
   for (int i=0; i < size; i++)
-  {
-    int err = PyList_SetItem(py_list, i, type_converter( arrayvar[ i ]));
-    if(err)
     {
-      char * message = "Error in " #method;
-      PyErr_SetString(PyExc_RuntimeError, message);
-      return NULL;
+      int err = PyList_SetItem(py_list, i, type_converter( arrayvar[ i ]));
+      if(err)
+	{
+	  char * message = "Error in " #method;
+	  PyErr_SetString(PyExc_RuntimeError, message);
+	  return NULL;
+	}
     }
-  }
+
   PyObject * result = Py_BuildValue("O", py_list);
   Py_DECREF(py_list);
   return result;
@@ -373,7 +380,10 @@ typedef FIELD <int> FIELDINT;
 */
 
 %{
-  PyObject *PyString_FromStdString(const std::string &str) { return PyString_FromString(str.c_str()); }
+  PyObject *PyString_FromStdString(const std::string &str)
+    {
+      return PyString_FromString(str.c_str());
+    }
 %}
 
 
@@ -437,6 +447,12 @@ void setMedFileVersionForWriting(medFileVersion version);
       return self->it;
     }
 }
+
+%typecheck(SWIG_TYPECHECK_POINTER) vector< SUPPORT * >, const vector< SUPPORT * >
+{
+  $1 = ($input != 0);
+}
+
 /*
   Class et methodes du MED++ que l'on utilise dans l'API Python
 */
@@ -466,18 +482,11 @@ class CELLMODEL
 
   int getNumberOfConstituentsType();
 
+  std::string getName() const;
+
   ~CELLMODEL();
 
   %extend {
-    %newobject getName();
-    char * getName()
-      {
-	string tmp_str = self->getName();
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
-
     %newobject __str__();
     const char* __str__()
       {
@@ -501,7 +510,7 @@ class SUPPORT
 
   MESH * getMesh() const;
 
-  void setMesh(MESH * Mesh);
+  void setMesh(MESH * Mesh) const;
 
   medEntityMesh getEntity() const;
 
@@ -529,12 +538,21 @@ class SUPPORT
 
   bool deepCompare(const SUPPORT &support) const;
 
-  %extend {
-    SUPPORT(MESH* Mesh, char * Name="", medEntityMesh Entity=MED_CELL)
-      {
-	return new SUPPORT(Mesh,string(Name),Entity);
-      }
+  SUPPORT(MESH* Mesh, std::string Name="", medEntityMesh Entity=MED_CELL);
 
+  void setpartial(std::string Description, int NumberOfGeometricType,
+		  int TotalNumberOfElements, medGeometryElement *GeometricType,
+		  int *NumberOfElements, int *NumberValue);
+
+  std::string getName() const;
+
+  void setName(std::string Name);
+
+  std::string getDescription();
+
+  void setDescription(std::string Description);
+
+  %extend {
     %newobject __str__();
     const char* __str__()
       {
@@ -545,63 +563,29 @@ class SUPPORT
 	return returned;
       }
 
-    void setpartial(char * Description, int NumberOfGeometricType,
-		    int TotalNumberOfElements, medGeometryElement *GeometricType,
-		    int *NumberOfElements, int *NumberValue)
-      {
-	self->setpartial(string(Description), NumberOfGeometricType,
-			 TotalNumberOfElements, GeometricType,
-			 NumberOfElements, NumberValue);
-      }
-
-    void setName(char * Name)
-      {
-	self->setName(string(Name));
-      }
-
-    %newobject getName();
-    const char * getName()
-      {
-	string tmp_str = self->getName();
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
-
-    void setDescription(char * Description)
-      {
-	self->setDescription(string(Description));
-      }
-
-    %newobject getDescription();
-    const char * getDescription()
-      {
-	string tmp_str = self->getDescription();
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
-
     PyObject * getTypes()
       {
 	const medGeometryElement * types = self->getTypes();
 	int size = self->getNumberOfTypes();
-        TYPEMAP_OUTPUT_ARRAY( types, size, PyInt_FromLong, SUPPORT::getTypes );
+        TYPEMAP_OUTPUT_ARRAY(types, size, PyInt_FromLong, SUPPORT::getTypes);
       }
 
     PyObject * getNumber(medGeometryElement GeometricType)
       {
 	const int * number = self->getNumber(GeometricType);
 	int size = self->getNumberOfElements(GeometricType);
-        TYPEMAP_OUTPUT_ARRAY( number, size, PyInt_FromLong, SUPPORT::getNumber );
+        TYPEMAP_OUTPUT_ARRAY(number, size, PyInt_FromLong,
+			     SUPPORT::getNumber);
       }
 
     PyObject * getNumberIndex()
       {
 	const int * numberindex = self->getNumberIndex();
 	int size = (self->getNumberOfElements(MED_ALL_ELEMENTS))+1;
-        TYPEMAP_OUTPUT_ARRAY( numberindex, size, PyInt_FromLong, SUPPORT::getNumberIndex );
+        TYPEMAP_OUTPUT_ARRAY(numberindex, size, PyInt_FromLong,
+			     SUPPORT::getNumberIndex);
       }
+
     %newobject getComplement() const;
     SUPPORT *getComplement() const
       {
@@ -653,22 +637,18 @@ class FAMILY : public SUPPORT
 
   int getNumberOfGroups() const;
 
-  %extend {
-    FAMILY(MESH* Mesh, int Identifier, char * Name, int NumberOfAttribute,
-	   int *AttributeIdentifier, int *AttributeValue,
-	   char * AttributeDescription, int NumberOfGroup,
-	   char * GroupName, int * MEDArrayNodeFamily,
-	   int ** MEDArrayCellFamily, int ** MEDArrayFaceFamily,
-	   int ** MEDArrayEdgeFamily)
-      {
-	return new FAMILY(Mesh,Identifier,string(Name),NumberOfAttribute,
-			  AttributeIdentifier,AttributeValue,
-			  string(AttributeDescription),NumberOfGroup,
-			  string(GroupName), MEDArrayNodeFamily,
-			  MEDArrayCellFamily, MEDArrayFaceFamily,
-			  MEDArrayEdgeFamily);
-      }
+  FAMILY(MESH* Mesh, int Identifier, std::string Name, int NumberOfAttribute,
+	 int *AttributeIdentifier, int *AttributeValue,
+	 std::string AttributeDescription, int NumberOfGroup,
+	 std::string GroupName, int * MEDArrayNodeFamily,
+	 int ** MEDArrayCellFamily, int ** MEDArrayFaceFamily,
+	 int ** MEDArrayEdgeFamily);
 
+  std::string getAttributeDescription(int i);
+
+  std::string getGroupName(int i);
+
+  %extend {
     %newobject __str__();
     const char* __str__()
       {
@@ -677,47 +657,28 @@ class FAMILY : public SUPPORT
 	return strdup(mess.str().c_str());
       }
 
-    %newobject getAttributeDescription(int );
-    const char * getAttributeDescription(int i)
-      {
-	string tmp_str = self->getAttributeDescription(i);
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
-
-    %newobject getGroupName(int );
-    const char * getGroupName(int i)
-      {
-	string tmp_str = self->getGroupName(i);
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
-
     PyObject * getAttributesIdentifiers()
       {
 	const int * attributesids = self->getAttributesIdentifiers();
 	int size = self->getNumberOfAttributes();
-        TYPEMAP_OUTPUT_ARRAY(attributesids,size,PyInt_FromLong,FAMILY::getAttributesIdentifiers );
+        TYPEMAP_OUTPUT_ARRAY(attributesids,size,PyInt_FromLong,
+			     FAMILY::getAttributesIdentifiers);
       }
 
     PyObject * getAttributesValues()
       {
 	const int * attributesvals = self->getAttributesValues();
 	int size = self->getNumberOfAttributes();
-        TYPEMAP_OUTPUT_ARRAY(attributesvals,size,PyInt_FromLong,FAMILY::getAttributesValues );
+        TYPEMAP_OUTPUT_ARRAY(attributesvals,size,PyInt_FromLong,
+			     FAMILY::getAttributesValues);
       }
   }
 };
 
-
-
-
 class FIELD_
 {
 public:
-  //  FIELD_(const SUPPORT * Support, const int NumberOfComponents);
+  FIELD_(const SUPPORT * Support, const int NumberOfComponents);
 
   ~FIELD_();
 
@@ -732,8 +693,9 @@ public:
   void setOrderNumber (int OrderNumber);
   int getOrderNumber() const;
 
-  void setValueType(med_type_champ ValueType) ;
   med_type_champ getValueType() ;
+
+  medModeSwitch getInterlacingType();
 
   SUPPORT * getSupport();
   void setSupport(SUPPORT * support);
@@ -744,26 +706,32 @@ public:
   void setNumberOfValues(int NumberOfValues);
   int getNumberOfValues() const;
 
-  string   getName() const;
-  string   getDescription() const;
-  string   getComponentName(int i) const;
-  string   getComponentDescription(int i) const;
-  string   getMEDComponentUnit(int i) const;
-  void     setName(string Name);
-  void     setComponentName(int i, string ComponentName);
-  void     setMEDComponentUnit(int i, string MEDComponentUnit);
-  void     setDescription(string Description);
-  void     setComponentDescription(int i, string ComponentDescription);
+  std::string   getName() const;
+
+  std::string   getDescription() const;
+
+  std::string   getComponentName(int i) const;
+
+  std::string   getComponentDescription(int i) const;
+
+  std::string   getMEDComponentUnit(int i) const;
+
+  void     setName(std::string Name);
+
+  void     setComponentName(int i, std::string ComponentName);
+
+  void     setMEDComponentUnit(int i, std::string MEDComponentUnit);
+
+  void     setDescription(std::string Description);
+
+  void     setComponentDescription(int i, std::string ComponentDescription);
+
+  int addDriver(driverTypes driverType,
+		const std::string& fileName="Default File Name.med",
+                const std::string& driverName="Default Field Name",
+		med_mode_acces access=MED_REMP);
 
   %extend {
-    int addDriver(driverTypes driverType,
-		  char * fileName="Default File Name.med",
-		  char * driverName="Default Field Name",
-		  med_mode_acces access=MED_REMP)
-      {
-	return self->addDriver(driverType,string(fileName),
-			       string(driverName),access);
-      }
     %newobject getSupportAndOwner();
     SUPPORT * getSupportAndOwner()
       {
@@ -772,33 +740,35 @@ public:
   }
 };
 
-template< class T1 >
-class FIELD : public FIELD_
+/*
+  Class FIELD has now two template parameters T1 is a double or an int
+  INTERLACING_TAG is FullInterlace or NoInterlace
+*/
+
+template<class T1, class INTERLACING_TAG> class FIELD : public FIELD_
 {
 public:
   ~FIELD();
 
   FIELD(const SUPPORT * Support, const int NumberOfComponents);
 
-  /*
-    WARNING:
-    other constructor of FIELD (C++ FIELD<T1>) object.
-    Only one constructor could be wrapped and
-    the others commented out when using
-    SWIG with a version lesser than 1.3
-  */
-
   FIELD();
 
   FIELD(const FIELD & m);
+
+  FIELD(const SUPPORT * Support, driverTypes driverType,
+	const std::string& fileName, const std::string& fieldName,
+	const int iterationNumber, const int orderNumber);
 
   void read(int index=0);
 
   T1 getValueIJ(int i,int j) const;
 
-  void setValue(medModeSwitch mode, T1* value);
+  void setValue(T1* value);
 
-  void setValueI(medModeSwitch mode, int i, T1* value);
+  void setRow( int i, T1 * value);
+
+  void setColumn( int i, T1 * value);
 
   void setValueIJ(int i, int j, T1 value);
 
@@ -810,140 +780,179 @@ public:
 
   void applyPow(T1 scalar);
 
-  T1 normMax();
-  T1 norm2();
-  T1 normL2(int component, const FIELD<double> * p_field_volume=NULL) const;
-  T1 normL2(const FIELD<double> * p_field_volume=NULL) const;
-  T1 normL1(int component, const FIELD<double> * p_field_volume=NULL) const;
-  T1 normL1(const FIELD<double> * p_field_volume=NULL) const;
+  double normMax();
 
+  double norm2();
+
+  double normL2(int component,const FIELD<double, FullInterlace> *
+		p_field_volume=NULL) const;
+
+  double normL2(const FIELD<double, FullInterlace> *
+		p_field_volume=NULL) const;
+
+  double normL1(int component, const FIELD<double, FullInterlace> *
+		p_field_volume=NULL) const;
+
+  double normL1(const FIELD<double, FullInterlace> *
+		p_field_volume=NULL) const;
+
+  void write(int index=0, const std::string& driverName="");
+
+  void writeAppend(int index=0, const std::string& driverName="");
 
   %extend {
     PyObject *  applyPyFunc( PyObject * func )
-    {
+      {
 	MESSAGE("Appel de applyPyFunc");
 	if (!PyCallable_Check(func)) {
-	    PyErr_SetString(PyExc_TypeError, "FIELD.applyPyFunc prend en argument une fonction");
-	    return NULL;
+	  PyErr_SetString(PyExc_TypeError, "FIELD.applyPyFunc prend en argument une fonction");
+	  return NULL;
 	}
 
     	int nComp=self->getNumberOfComponents();
     	int nVal=self->getNumberOfValues();
 	for (int i=1; i!=nVal+1; ++i)
-	    for ( int j=1 ;j!=nComp+1 ;++j )
+	  for ( int j=1 ;j!=nComp+1 ;++j )
 	    {
               self->setValueIJ(i,j, Binding<T1>::Functor( func, self->getValueIJ(i,j) ) );
 	    }
-	 PyObject * result = Binding<double>::Traducer(nComp*nVal);
-	 return result;
-    }
 
-    %newobject __add__(const FIELD & );
-    FIELD * __add__(const FIELD & m)
+	PyObject * result = Binding<double>::Traducer(nComp*nVal);
+	return result;
+      }
+
+    %newobject __add__(const FIELD<T1, INTERLACING_TAG> & );
+    FIELD<T1, INTERLACING_TAG> * __add__(const FIELD<T1, INTERLACING_TAG> & m)
       {
 	MESSAGE("operator +  : Creation of the addition of two FIELDs");
-
-	FIELD<T1>* result = FIELD<T1>::add( *(FIELD<T1>*)self , (FIELD<T1>&)m );
-	return (FIELD<T1>*) result;
+	
+	FIELD<T1, INTERLACING_TAG>* result =
+	  FIELD<T1, INTERLACING_TAG>::add( *(FIELD<T1, INTERLACING_TAG>*)self ,
+					   (FIELD<T1, INTERLACING_TAG>&)m );
+	return (FIELD<T1, INTERLACING_TAG>*) result;
       }
 
-    %newobject __sub__(const FIELD & );
-    FIELD * __sub__(const FIELD & m)
+    %newobject __sub__(const FIELD<T1, INTERLACING_TAG> & );
+    FIELD<T1, INTERLACING_TAG> * __sub__(const FIELD<T1, INTERLACING_TAG> & m)
       {
 	MESSAGE("operator -  : Creation of the substraction of two FIELDs");
-	FIELD<T1>* result = FIELD<T1>::sub( *(FIELD<T1>*)self , (FIELD<T1>&)m );
-	return (FIELD<T1>*) result;
+	FIELD<T1, INTERLACING_TAG>* result =
+	  FIELD<T1, INTERLACING_TAG>::sub( *(FIELD<T1, INTERLACING_TAG>*)self ,
+					   (FIELD<T1, INTERLACING_TAG>&)m );
+	return (FIELD<T1, INTERLACING_TAG>*) result;
       }
 
-    %newobject __mul__(const FIELD & );
-    FIELD * __mul__(const FIELD & m)
+    %newobject __mul__(const FIELD<T1, INTERLACING_TAG> & );
+    FIELD<T1, INTERLACING_TAG> * __mul__(const FIELD<T1, INTERLACING_TAG> & m)
       {
 	MESSAGE("operator *  : Creation of the multiplication of two FIELDs");
-	FIELD<T1>* result = FIELD<T1>::mul( *(FIELD<T1>*)self , (FIELD<T1>&)m );
-	return (FIELD<T1>*) result;
+	FIELD<T1, INTERLACING_TAG>* result =
+	  FIELD<T1, INTERLACING_TAG>::mul( *(FIELD<T1, INTERLACING_TAG>*)self ,
+					   (FIELD<T1, INTERLACING_TAG>&)m );
+	return (FIELD<T1, INTERLACING_TAG>*) result;
       }
 
-    %newobject __div__(const FIELD & );
-    FIELD * __div__(const FIELD & m)
+    %newobject __div__(const FIELD<T1, INTERLACING_TAG> & );
+    FIELD<T1, INTERLACING_TAG> * __div__(const FIELD<T1, INTERLACING_TAG> & m)
       {
 	MESSAGE("operator /  : Creation of the division of two FIELDs");
-	FIELD<T1>* result = FIELD<T1>::div( *(FIELD<T1>*)self , (FIELD<T1>&)m );
-	return (FIELD<T1>*) result;
+	FIELD<T1, INTERLACING_TAG>* result =
+	  FIELD<T1, INTERLACING_TAG>::div( *(FIELD<T1, INTERLACING_TAG>*)self ,
+					   (FIELD<T1, INTERLACING_TAG>&)m );
+	return (FIELD<T1, INTERLACING_TAG>*) result;
       }
 
-    %newobject addDeep(const FIELDINT & );
-    FIELD * addDeep(const FIELD & m)
+    %newobject addDeep(const FIELD<T1, INTERLACING_TAG> & );
+    FIELD<T1, INTERLACING_TAG> * addDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
 	MESSAGE("operator +  : Creation of the addition of two FIELDINTs");
-	FIELD<T1>* result = FIELD<T1>::addDeep( *(FIELD<T1>*)self , (FIELD<T1>&)m );
-	return (FIELD<T1>*) result;
+	FIELD<T1, INTERLACING_TAG>* result =
+	  FIELD<T1, INTERLACING_TAG>::addDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
+					       (FIELD<T1, INTERLACING_TAG>&)m );
+	return (FIELD<T1, INTERLACING_TAG>*) result;
       }
 
-    %newobject subDeep(const FIELD & );
-    FIELD * subDeep(const FIELD & m)
+    %newobject subDeep(const FIELD<T1, INTERLACING_TAG> & );
+    FIELD<T1, INTERLACING_TAG> * subDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
 	MESSAGE("operator -  : Creation of the substraction of two FIELDs");
-	FIELD<T1>* result = FIELD<T1>::subDeep( *(FIELD<T1>*)self , (FIELD<T1>&)m );
-	return (FIELD<T1>*) result;
+	FIELD<T1, INTERLACING_TAG>* result =
+	  FIELD<T1, INTERLACING_TAG>::subDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
+					       (FIELD<T1, INTERLACING_TAG>&)m );
+	return (FIELD<T1, INTERLACING_TAG>*) result;
       }
 
-    %newobject mulDeep(const FIELD & );
-    FIELD * mulDeep(const FIELD & m)
+    %newobject mulDeep(const FIELD<T1, INTERLACING_TAG> & );
+    FIELD<T1, INTERLACING_TAG> * mulDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
 	MESSAGE("operator *  : Creation of the multiplication of two FIELDs");
-	FIELD<T1>* result = FIELD<T1>::mulDeep( *(FIELD<T1>*)self , (FIELD<T1>&)m );
-	return (FIELD<T1>*) result;
+	FIELD<T1, INTERLACING_TAG>* result =
+	  FIELD<T1, INTERLACING_TAG>::mulDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
+					       (FIELD<T1, INTERLACING_TAG>&)m );
+	return (FIELD<T1, INTERLACING_TAG>*) result;
       }
 
-    %newobject divDeep(const FIELD & );
-    FIELD * divDeep(const FIELD & m)
+    %newobject divDeep(const FIELD<T1, INTERLACING_TAG> & );
+    FIELD<T1, INTERLACING_TAG> * divDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
 	MESSAGE("operator /  : Creation of the division of two FIELDs");
-	FIELD<T1>* result = FIELD<T1>::divDeep( *(FIELD<T1>*)self , (FIELD<T1>&)m );
-	return (FIELD<T1>*) result;
+	FIELD<T1, INTERLACING_TAG>* result =
+	  FIELD<T1, INTERLACING_TAG>::divDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
+					       (FIELD<T1, INTERLACING_TAG>&)m );
+	return (FIELD<T1, INTERLACING_TAG>*) result;
       }
 
-    FIELD (const SUPPORT * Support, driverTypes driverType,
-		 char * fileName, char * fieldName,
-		 const int iterationNumber,
-		 const int orderNumber)
-      {
-	return new FIELD<T1>(Support, driverType, string(fileName),
-                             string(fieldName),iterationNumber,
-                             orderNumber);
-      }
-
-    void write(int index=0, char * driverName="")
-      {
-	self->write(index, string(driverName));
-      }
-
-    void writeAppend(int index=0, char * driverName="")
-      {
-	self->writeAppend(index, string(driverName));
-      }
-
-    PyObject * getValue(medModeSwitch Mode)
+    PyObject * getValue()
       {
 	int size = (self->getNumberOfComponents())*
 	  ((self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS));
 
-	const T1 * value = self->getValue(Mode);
+	const T1 * value = self->getValue();
 
-        TYPEMAP_OUTPUT_ARRAY( value, size, Binding< T1 >::Traducer, FIELD::getValue );
+        TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,
+			     FIELD::getValue);
       }
 
-    %newobject getValueI(medModeSwitch , int );
-    PyObject * getValueI(medModeSwitch Mode, int index)
+    // this method replaces getValueI() in FullInterlace mode
+    /* %newobject getRow(int );*/
+    PyObject * getRow(int index)
       {
 	int size = self->getNumberOfComponents();
 
+	const T1 * value = self->getRow(index);
+
+        TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,
+			     FIELD::getRow);
+      }
+
+    // this method replaces getValueI() in NInterlace mode
+    /*%newobject getColum(int );*/
+    PyObject * getColumn(int index)
+      {
+	int size = (self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS);
+
+	const T1 * value = self->getColumn(index);
+
+        TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,
+			     FIELD::getColumn);
+      }
+
+    /*
+    %newobject getValueI(int );
+    PyObject * getValueI(int index)
+      {
+	int size = self->getNumberOfComponents();
+
+	medModeSwitch  Mode = self->getInterlacingType();
+
 	if ( Mode == MED_NO_INTERLACE ) size = (self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS);
 
-	const T1 * value = self->getValueI(Mode,index);
+	const T1 * value = self->getValueI(index);
 
-        TYPEMAP_OUTPUT_ARRAY( value, size, Binding< T1 >::Traducer, FIELD::getValueI );
+        TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,
+			     FIELD::getValueI);
       }
+    */
 
     void allocValue2(int NumberOfComponents, int LengthValue)
       {
@@ -951,16 +960,20 @@ public:
       }
 
     %newobject extract(const SUPPORT *subSupport);
-    FIELD *extract(const SUPPORT *subSupport)
+    FIELD<T1, INTERLACING_TAG> *extract(const SUPPORT *subSupport)
       {
-	FIELD<T1>* result=self->extract(subSupport);
-	return (FIELD<T1> *)result;
+	FIELD<T1, INTERLACING_TAG>* result=self->extract(subSupport);
+	return (FIELD<T1, INTERLACING_TAG> *)result;
       }
   }
 };
-%template (FIELDDOUBLE) FIELD <double>;
-%template (FIELDINT) FIELD <int>;
 
+/*%template(FIELDDOUBLEFULLINTERLACE) FIELD<double, FullInterlace>;*/
+%template(FIELDDOUBLE) FIELD<double, FullInterlace>;
+%template(FIELDDOUBLENOINTERLACE) FIELD<double, NoInterlace>;
+/*%template(FIELDINTFULLINTERLACE) FIELD<int, FullInterlace>;*/
+%template(FIELDINT) FIELD<int, FullInterlace>;
+%template(FIELDINTNOINTERLACE) FIELD<int, NoInterlace>;
 
 class GROUP : public SUPPORT
 {
@@ -970,24 +983,16 @@ public:
   ~GROUP();
 
   void setNumberOfFamilies(int numberOfFamilies);
-  void setFamilies(vector<FAMILY*> Family);
+  void setFamilies(vector< FAMILY * > Family);
 
   int getNumberOfFamilies() const ;
-  vector<FAMILY*> getFamilies() const ;
+  vector< FAMILY * > getFamilies() const ;
   FAMILY * getFamily(int i) const ;
 };
 
 class MESH
 {
 public :
-  /*
-    WARNING:
-    other constructor of MESH object.
-    Only one constructor could be wrapped and
-    the others commented out when using
-    SWIG with a version lesser than 1.3
-  */
-
   MESH();
 
   ~MESH();
@@ -1029,16 +1034,25 @@ public :
   int getElementContainingPoint(const double *coord);
 
   int getNumberOfTypesWithPoly(medEntityMesh Entity);
+
   int getNumberOfPolygons();
+
   int getNumberOfPolyhedronFaces();
+
   int getNumberOfPolyhedron();
+
   int getNumberOfElementsWithPoly(medEntityMesh Entity,
                                   medGeometryElement Type);
+
   bool existPolygonsConnectivity(medConnectivity ConnectivityType,
                                  medEntityMesh Entity);
+
   bool existPolyhedronConnectivity(medConnectivity ConnectivityType,
                                    medEntityMesh Entity);
+
   medGeometryElement getElementTypeWithPoly(medEntityMesh Entity,int Number);
+
+  std::string getName() const;
   
   %extend {
     %newobject getBoundaryElements(medEntityMesh );
@@ -1053,28 +1067,28 @@ public :
 	return self->getSkin(Support3D);
       }
 
-    %newobject mergeSupports(const vector<SUPPORT *> );
-    SUPPORT * mergeSupports(const vector<SUPPORT *> Supports)
+    %newobject mergeSupports(const vector< SUPPORT * > );
+    SUPPORT * mergeSupports(const vector< SUPPORT * > Supports)
       {
 	return self->mergeSupports(Supports);
       }
 
-    %newobject intersectSupports(const vector<SUPPORT *> );
-    SUPPORT * intersectSupports(const vector<SUPPORT *> Supports)
+    %newobject intersectSupports(const vector< SUPPORT * > );
+    SUPPORT * intersectSupports(const vector< SUPPORT * > Supports)
       {
 	return self->intersectSupports(Supports);
       }
 
     %newobject mergeFieldsDouble(const vector< FIELD<double>* > others);
-    FIELDDOUBLE * mergeFieldsDouble(const vector< FIELD<double>* > others)
+    FIELD<double, FullInterlace> * mergeFieldsDouble(const vector< FIELD<double>* > others)
       {
-	return (FIELDDOUBLE *)self->mergeFields<double>(others);
+	return (FIELD<double, FullInterlace> *)self->mergeFields<double>(others);
       }
 
     %newobject mergeFieldsInt(const vector< FIELD<int>* > others);
-    FIELDINT * mergeFieldsInt(const vector< FIELD<int>* > others)
+    FIELD<int, FullInterlace> * mergeFieldsInt(const vector< FIELD<int>* > others)
       {
-	return (FIELDINT *)self->mergeFields<int>(others);
+	return (FIELD<int, FullInterlace> *)self->mergeFields<int>(others);
       }
 
     CELLMODEL getCellType(medEntityMesh Entity,int i)
@@ -1104,15 +1118,6 @@ public :
     void setName(char * name)
       {
 	self->setName(string(name));
-      }
-
-    %newobject getName();
-    const char * getName()
-      {
-	string tmp_str = self->getName();
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
 
     %newobject getCoordinatesSystem();
@@ -1154,28 +1159,31 @@ public :
       {
 	const string * array = self->getCoordinatesNames();
 	int size = self->getSpaceDimension();
-        TYPEMAP_OUTPUT_ARRAY( array, size, PyString_FromStdString, MESH::getCoordinatesNames );
+        TYPEMAP_OUTPUT_ARRAY(array, size, PyString_FromStdString,
+			     MESH::getCoordinatesNames);
       }
 
     PyObject * getCoordinatesUnits()
       {
 	const string * array = self->getCoordinatesUnits();
 	int size = self->getSpaceDimension();
-        TYPEMAP_OUTPUT_ARRAY( array, size, PyString_FromStdString, MESH::getCoordinatesUnits );
+        TYPEMAP_OUTPUT_ARRAY(array, size, PyString_FromStdString,
+			     MESH::getCoordinatesUnits);
       }
 
     PyObject * getCoordinates(medModeSwitch Mode)
       {
 	const double * array = self->getCoordinates(Mode);
 	int size = (self->getSpaceDimension())*(self->getNumberOfNodes());
-        TYPEMAP_OUTPUT_ARRAY( array, size, PyFloat_FromDouble, MESH::getCoordinates );
+        TYPEMAP_OUTPUT_ARRAY(array, size, PyFloat_FromDouble,
+			     MESH::getCoordinates);
       }
 
     PyObject * getTypes(medEntityMesh Entity)
       {
 	const medGeometryElement * types = self->getTypes(Entity);
 	int size = self->getNumberOfTypes(Entity);
-        TYPEMAP_OUTPUT_ARRAY( types, size, PyInt_FromLong, MESH::getTypes );
+        TYPEMAP_OUTPUT_ARRAY(types, size, PyInt_FromLong, MESH::getTypes);
       }
 
     PyObject * getConnectivity(medModeSwitch Mode,
@@ -1186,7 +1194,8 @@ public :
 	const int * connectivity = self->getConnectivity(Mode,ConnectivityType,
 						   Entity,Type);
 	int size = self->getConnectivityLength(Mode,ConnectivityType,Entity,Type);
-        TYPEMAP_OUTPUT_ARRAY( connectivity, size, PyInt_FromLong, MESH::getConnectivity );
+        TYPEMAP_OUTPUT_ARRAY(connectivity, size, PyInt_FromLong,
+			     MESH::getConnectivity );
       }
 
     PyObject * getConnectivityIndex(medConnectivity ConnectivityType,
@@ -1195,7 +1204,8 @@ public :
 	const int * connectivity_index =
 	  self->getConnectivityIndex(ConnectivityType,Entity);
 	int size = (self->getNumberOfElements(Entity,MED_ALL_ELEMENTS))+1;
-        TYPEMAP_OUTPUT_ARRAY(connectivity_index,size,PyInt_FromLong,MESH::getConnectivityIndex);
+        TYPEMAP_OUTPUT_ARRAY(connectivity_index,size,PyInt_FromLong,
+			     MESH::getConnectivityIndex);
       }
 
     PyObject * getReverseConnectivity(medConnectivity ConnectivityType,
@@ -1204,7 +1214,8 @@ public :
 	const int * reverseconnectivity =
 	  self->getReverseConnectivity(ConnectivityType,Entity);
 	int size = self->getReverseConnectivityLength(ConnectivityType,Entity);
-        TYPEMAP_OUTPUT_ARRAY(reverseconnectivity,size,PyInt_FromLong,MESH::getReverseConnectivity);
+        TYPEMAP_OUTPUT_ARRAY(reverseconnectivity, size, PyInt_FromLong,
+			     MESH::getReverseConnectivity);
       }
 
     PyObject * getReverseConnectivityIndex(medConnectivity ConnectivityType,
@@ -1213,7 +1224,8 @@ public :
 	const int * reverseconnectivity_index =
 	  self->getReverseConnectivityIndex(ConnectivityType,Entity);
 	int size=self->getReverseConnectivityIndexLength(ConnectivityType,Entity);
-        TYPEMAP_OUTPUT_ARRAY(reverseconnectivity_index,size,PyInt_FromLong,MESH::getReverseConnectivityIndex);
+        TYPEMAP_OUTPUT_ARRAY(reverseconnectivity_index,size, PyInt_FromLong,
+			     MESH::getReverseConnectivityIndex);
       }
 
     PyObject * getGlobalNumberingIndex(medEntityMesh Entity)
@@ -1221,79 +1233,90 @@ public :
 	const int * numberingIndex = self->getGlobalNumberingIndex(Entity);
 	int nbOfTypes = self->getNumberOfTypes(Entity);
 	int size = nbOfTypes+1;
-        TYPEMAP_OUTPUT_ARRAY(numberingIndex,size,PyInt_FromLong,MESH::getGlobalNumberingIndex);
+        TYPEMAP_OUTPUT_ARRAY(numberingIndex, size, PyInt_FromLong,
+			     MESH::getGlobalNumberingIndex);
       }
-
 
     PyObject * getPolygonsConnectivity(medConnectivity ConnectivityType,
                                        medEntityMesh   Entity)
       {
         const int * array = self->getPolygonsConnectivity(ConnectivityType,Entity);
         int size = self->getPolygonsConnectivityLength(ConnectivityType, Entity);
-        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getPolygonsConnectivity);
+        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
+			     MESH::getPolygonsConnectivity);
       }
+
     PyObject * getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
                                             medEntityMesh   Entity)
       {
         const int * array = self->getPolygonsConnectivityIndex(ConnectivityType,Entity);
         int size = self->getNumberOfPolygons() + 1;
-        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getPolygonsConnectivity);
+        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
+			     MESH::getPolygonsConnectivity);
       }
+
     PyObject * getPolyhedronConnectivity(medConnectivity ConnectivityType)
       {
         const int * array = self->getPolyhedronConnectivity(ConnectivityType);
         int size = self->getPolyhedronConnectivityLength(ConnectivityType);
-        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getPolygonsConnectivity);
+        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
+			     MESH::getPolygonsConnectivity);
       }
+
     PyObject * getPolyhedronIndex(medConnectivity ConnectivityType)
       {
         const int * array = self->getPolyhedronIndex(ConnectivityType);
         int size = self->getNumberOfPolyhedron() + 1;
-        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getPolyhedronIndex);
+        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
+			     MESH::getPolyhedronIndex);
       }
+
     PyObject * getPolyhedronFacesIndex()
       {
         const int * array = self->getPolyhedronFacesIndex();
         int size = self->getNumberOfPolyhedronFaces() + 1;
-        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getPolyhedronFacesIndex);
+        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
+			     MESH::getPolyhedronFacesIndex);
       }
+
     PyObject * getTypesWithPoly(medEntityMesh Entity)
       {
         medGeometryElement * array = self->getTypesWithPoly(Entity);
         int size = self->getNumberOfTypesWithPoly(Entity);
-        TYPEMAP_OUTPUT_ARRAY(array,size,PyInt_FromLong,MESH::getTypesWithPoly);
+        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
+			     MESH::getTypesWithPoly);
         delete [] array;
       }
       
 
     %newobject getVolume(const SUPPORT * );
-    FIELDDOUBLE * getVolume(const SUPPORT * Support)
+    FIELD<double, FullInterlace> * getVolume(const SUPPORT * Support)
       {
-	return (FIELDDOUBLE *) self->getVolume(Support);
+	return (FIELD<double, FullInterlace> *) self->getVolume(Support);
       }
 
     %newobject getArea(const SUPPORT * );
-    FIELDDOUBLE * getArea(const SUPPORT * Support)
+    FIELD<double, FullInterlace> * getArea(const SUPPORT * Support)
       {
-	return (FIELDDOUBLE *) self->getArea(Support);
+	return (FIELD<double, FullInterlace> *) self->getArea(Support);
       }
 
     %newobject getLength(const SUPPORT * );
-    FIELDDOUBLE * getLength(const SUPPORT * Support)
+    FIELD<double, FullInterlace> * getLength(const SUPPORT * Support)
       {
-	return (FIELDDOUBLE *) self->getLength(Support);
+	return (FIELD<double, FullInterlace> *) self->getLength(Support);
       }
 
     %newobject getNormal(const SUPPORT * );
-    FIELDDOUBLE * getNormal(const SUPPORT * Support)
+    FIELD<double, FullInterlace> * getNormal(const SUPPORT * Support)
       {
-	return (FIELDDOUBLE *) self->getNormal(Support);
+	return (FIELD<double, FullInterlace> *) self->getNormal(Support);
       }
 
     %newobject getBarycenter(const SUPPORT * );
-    FIELDDOUBLE * getBarycenter(const SUPPORT * Support)
+    FIELD<double, FullInterlace> * getBarycenter(const SUPPORT * Support)
       {
-	return (FIELDDOUBLE *) self->getBarycenter(Support);
+	return (FIELD<double, FullInterlace> *) self->getBarycenter(Support);
       }
   }
 } ;
@@ -1305,6 +1328,8 @@ public :
   ~MESHING();
 
   void setSpaceDimension   (const int SpaceDimension) ;
+
+  void setMeshDimension    (const int MeshDimension) ;
 
   void setNumberOfNodes    (const int NumberOfNodes) ;
 
@@ -1467,14 +1492,6 @@ class MED
   void addMesh  ( MESH    * const ptrMesh   );
 
   %extend {
-    /*
-      WARNING:
-      other constructor of MED object.
-      Only one constructor could be wrapped and
-      the others commented out when using
-      SWIG with a version lesser than 1.3
-    */
-
     MED(driverTypes driverType, char * fileName)
       {
 	return new MED(driverType,string(fileName));
@@ -2296,49 +2313,63 @@ public:
 %template (ASCII_FIELDDOUBLE_DRIVER) ASCII_FIELD_DRIVER< double >;
 %template (ASCII_FIELDINT_DRIVER) ASCII_FIELD_DRIVER< int >;
 
-
-
 %{
-template <class T> FIELD<T> * createFieldScalarProduct(FIELD<T> * field1, FIELD<T> * field2) {
-  return (FIELD<T> *) FIELD<T>::scalarProduct( (FIELD<T>)*field1, (FIELD<T>)*field2);
-}
-template <class T> FIELD<T> * createFieldScalarProductDeep(FIELD<T> * field1, FIELD<T> * field2) {
-  return (FIELD<T>*) FIELD<T>::scalarProduct( (FIELD<T>)*field1, (FIELD<T>)*field2, true);
-}
-template<class T> FIELD<T> * createFieldFromField(FIELD_ * field) {
-  MESSAGE("createFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
-  MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
-  return (FIELD<T> *) field;
-}
+  template <class T, class INTERLACING_TAG>
+    FIELD<T, INTERLACING_TAG> * createFieldScalarProduct(FIELD<T, INTERLACING_TAG> * field1,
+							 FIELD<T, INTERLACING_TAG> * field2)
+    {
+      return (FIELD<T, INTERLACING_TAG> *)
+	FIELD<T, INTERLACING_TAG>::scalarProduct((FIELD<T, INTERLACING_TAG>)*field1,
+						 (FIELD<T, INTERLACING_TAG>)*field2);
+    }
+
+  template <class T, class INTERLACING_TAG>
+    FIELD<T, INTERLACING_TAG> * createFieldScalarProductDeep(FIELD<T, INTERLACING_TAG> * field1,
+							     FIELD<T, INTERLACING_TAG> * field2)
+    {
+      return (FIELD<T, INTERLACING_TAG>*) FIELD<T, INTERLACING_TAG>::scalarProduct((FIELD<T, INTERLACING_TAG>)*field1,
+										   (FIELD<T, INTERLACING_TAG>)*field2, true);
+    }
+
+  template<class T, class INTERLACING_TAG>
+    FIELD<T, INTERLACING_TAG> * createTypedFieldFromField(FIELD_ * field)
+    {
+      MESSAGE("createTypedFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
+      MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
+      return (FIELD<T, INTERLACING_TAG> *) field;
+    }
 %}
 
-template<class T> FIELD<T> * createFieldFromField(FIELD_ * field);
-%template ( createFieldDoubleFromField ) createFieldFromField < double >;
-%template ( createFieldIntFromField ) createFieldFromField < int >;
+template<class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createTypedFieldFromField(FIELD_ * field);
+%template ( createFieldDoubleFromField ) createTypedFieldFromField < double, FullInterlace>;
+%template ( createFieldIntFromField ) createTypedFieldFromField < int, FullInterlace >;
+%template ( createFieldDoubleNoInterlaceFromField ) createTypedFieldFromField < double, NoInterlace>;
+%template ( createFieldIntNoInterlaceFromField ) createTypedFieldFromField < int, NoInterlace >;
 
-template <class T> FIELD<T> * createFieldScalarProduct(FIELD<T> * field1, FIELD<T> * field2);
-%newobject createFieldDoubleScalarProduct(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
-%newobject createFieldIntScalarProduct(FIELDINT * field1, FIELDINT * field2) ;
-%template ( createFieldDoubleScalarProduct ) createFieldScalarProduct < double >;
-%template ( createFieldIntScalarProduct ) createFieldScalarProduct < int >;
+template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldScalarProduct(FIELD<T, INTERLACING_TAG> * field1, FIELD<T, INTERLACING_TAG> * field2);
+%newobject createFieldDoubleScalarProduct ;
+%newobject createFieldIntScalarProduct ;
+%newobject createFieldDoubleNoInterlaceScalarProduct ;
+%newobject createFieldIntNoInterlaceScalarProduct ;
+%template ( createFieldDoubleScalarProduct ) createFieldScalarProduct < double, FullInterlace >;
+%template ( createFieldIntScalarProduct ) createFieldScalarProduct < int, FullInterlace >;
+%template ( createFieldDoubleNoInterlaceScalarProduct ) createFieldScalarProduct < double, NoInterlace >;
+%template ( createFieldIntNoInterlaceScalarProduct ) createFieldScalarProduct < int, NoInterlace >;
 
-template <class T> FIELD<T> * createFieldScalarProductDeep(FIELD<T> * field1, FIELD<T> * field2);
-%newobject createFieldDoubleScalarProductDeep(FIELDDOUBLE * field1, FIELDDOUBLE * field2) ;
-%newobject createFieldIntScalarProductDeep(FIELDINT * field1, FIELDINT * field2) ;
-%template ( createFieldDoubleScalarProductDeep ) createFieldScalarProductDeep < double >;
-%template ( createFieldIntScalarProductDeep ) createFieldScalarProductDeep < int >;
+template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldScalarProductDeep(FIELD<T, INTERLACING_TAG> * field1, FIELD<T, INTERLACING_TAG> * field2);
+%newobject createFieldDoubleScalarProductDeep ;
+%newobject createFieldIntScalarProductDeep ;
+%newobject createFieldDoubleNoInterlaceScalarProductDeep ;
+%newobject createFieldIntNoInterlaceScalarProductDeep ;
+%template ( createFieldDoubleScalarProductDeep ) createFieldScalarProductDeep < double, FullInterlace >;
+%template ( createFieldIntScalarProductDeep ) createFieldScalarProductDeep < int, FullInterlace >;
+%template ( createFieldDoubleNoInterlaceScalarProductDeep ) createFieldScalarProductDeep < double, NoInterlace >;
+%template ( createFieldIntNoInterlaceScalarProductDeep ) createFieldScalarProductDeep < int, NoInterlace >;
 
-%newobject createFieldDoubleFromAnalytic(SUPPORT * , int , PyObject *);
-%newobject createFieldIntFromAnalytic(SUPPORT * , int , PyObject *);
-FIELDDOUBLE * createFieldDoubleFromAnalytic(SUPPORT * Support,
-                                            int NumberOfComponents,
-                                            PyObject * double_function);
-FIELDINT * createFieldIntFromAnalytic(SUPPORT * Support,
-                                      int NumberOfComponents,
-                                      PyObject * integer_function);
-
+template<class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldFromAnalytic(SUPPORT * Support, int NumberOfComponents, PyObject * double_function);
 
 GRID * createGridFromMesh( MESH * aMesh );
+
 %{
   GRID * createGridFromMesh( MESH * aMesh )
     {
@@ -2353,29 +2384,25 @@ GRID * createGridFromMesh( MESH * aMesh );
       return NULL;
     }
 
-  FIELDDOUBLE * createFieldDoubleFromAnalytic(SUPPORT * Support,
-					      int NumberOfComponents,
-					      PyObject * double_function)
+  template<class T, class INTERLACING_TAG>
+    FIELD<T, INTERLACING_TAG> * createFieldFromAnalytic(SUPPORT * Support,
+							int NumberOfComponents,
+							PyObject * double_function)
     {
-      MESSAGE("createFieldDoubleFromAnalytic : Constructor (for Python API) FIELDDOUBLE from an analytic fonction");
-      FIELDDOUBLE * fieldDouble  = new FIELDDOUBLE(Support,NumberOfComponents);
-      MyFunction<double>::_pyFunc=double_function;
-      MyFunction<double>::_nbOfComponent=NumberOfComponents;
-      MyFunction<double>::_spaceDim=Support->getMesh()->getSpaceDimension();
-      fieldDouble->fillFromAnalytic< MyFunction<double>::EvalPy2Cpp >();
-      return fieldDouble;
-    }
+      MESSAGE("createFieldFromAnalytic : Constructor (for Python API) FIELD from an analytic fonction");
 
-  FIELDINT * createFieldIntFromAnalytic(SUPPORT * Support,
-					int NumberOfComponents,
-					PyObject * integer_function)
-    {
-      MESSAGE("createFieldIntFromAnalytic : Constructor (for Python API) FIELDINT from an analytic fonction");
-      FIELDINT * fieldInt  = new FIELDINT(Support,NumberOfComponents);
-      MyFunction<int>::_pyFunc=integer_function;
-      MyFunction<int>::_nbOfComponent=NumberOfComponents;
-      MyFunction<int>::_spaceDim=Support->getMesh()->getSpaceDimension();
-      fieldInt->fillFromAnalytic< MyFunction<int>::EvalPy2Cpp >();
-      return fieldInt;
+      FIELD<T, INTERLACING_TAG> * fieldAnalytic =
+	new FIELD<T, INTERLACING_TAG>(Support, NumberOfComponents);
+
+      MyFunction<T>::_pyFunc=double_function;
+      MyFunction<T>::_nbOfComponent=NumberOfComponents;
+      MyFunction<T>::_spaceDim=Support->getMesh()->getSpaceDimension();
+      fieldAnalytic->fillFromAnalytic(MyFunction<T>::EvalPy2Cpp);
+      return fieldAnalytic;
     }
 %}
+
+%template (createFieldDoubleFromAnalytic) createFieldFromAnalytic<double, FullInterlace>;
+%template (createFieldIntFromAnalytic) createFieldFromAnalytic<int, FullInterlace>;
+%template (createFieldDoubleNoInterlaceFromAnalytic) createFieldFromAnalytic<double, NoInterlace>;
+%template (createFieldIntNoInterlaceFromAnalytic) createFieldFromAnalytic<int, NoInterlace>;

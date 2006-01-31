@@ -199,7 +199,8 @@ if (nbMeshes>0):
                             number = family.getNumber(type)
                             print "    * Type",type
                             print "    * Number",number[0:nbOfElmtsOfType]
-                        print ""                        
+                        print ""
+                        numberFamily = family.getNumber(MED_ALL_ELEMENTS)
                         print "    * Getting an Integer Field on the family ",familyName
                         fieldFamilyIntg = FIELDINT(family,spaceDim)
                         fieldFamilyIntg.setIterationNumber(0)
@@ -243,16 +244,15 @@ if (nbMeshes>0):
                         nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
                         print "      Values:",nbOf
                         print "      Randomly set and get to check ..!"
-                        mode = MED_FULL_INTERLACE
                         for k in range(nbOf):
                             valueI = []
                             for kcomp in range(nbOfComp):
                                 valueI.append(randint(0,100))
 
 #                            print "     Set Entry *",(k+1)," ",valueI[:nbOfComp]
-                            
-                            fieldFamilyIntg.setValueI(mode,k+1,valueI)
-                            valueIverif = fieldFamilyIntg.getValueI(mode,k+1)
+                            valInd = numberFamily[k]
+                            fieldFamilyIntg.setRow(valInd,valueI)
+                            valueIverif = fieldFamilyIntg.getRow(valInd)
                             print "     Set/Get Entry *",(k+1)," ",valueI[:nbOfComp],"  /  ",valueIverif[:nbOfComp]
                         print "    * Getting a Real Field"
                         fieldFamilyDble = FIELDDOUBLE(family,spaceDim)
@@ -304,9 +304,9 @@ if (nbMeshes>0):
                                 valueI.append(random())
 
 #                            print "     Set Entry *",(k+1)," ",valueI[:nbOfComp]
-                            
-                            fieldFamilyDble.setValueI(MED_FULL_INTERLACE,k+1,valueI)
-                            valueIverif = fieldFamilyDble.getValueI(MED_FULL_INTERLACE,k+1)
+                            valInd = numberFamily[k]
+                            fieldFamilyDble.setRow(valInd,valueI)
+                            valueIverif = fieldFamilyDble.getRow(valInd)
                             print "     Set/Get Entry *",(k+1)," ",valueI[:nbOfComp],"  /  ",valueIverif[:nbOfComp]
                 print ""
         print ""
@@ -359,7 +359,7 @@ if (nbMeshes>0):
         barycenter = mesh.getBarycenter(supportCell)
         print "Getting barycenter of all Cells of the mesh"
         for j in range(nbElemts):
-            barycenterCell = barycenter.getValueI(MED_FULL_INTERLACE,j+1)
+            barycenterCell = barycenter.getRow(j+1)
             print "    * ",barycenterCell[:spaceDim]
         print ""
         if spaceDim == 3 :
@@ -383,8 +383,8 @@ if (nbMeshes>0):
             normal = mesh.getNormal(supportFace)
             area = mesh.getArea(supportFace)
             for j in range(nbFace):
-                normalFace = normal.getValueI(MED_FULL_INTERLACE,j+1)
-                areaFace = area.getValueI(MED_FULL_INTERLACE,j+1)
+                normalFace = normal.getRow(j+1)
+                areaFace = area.getRow(j+1)
                 value1 = normalFace[0]
                 value2 = normalFace[1]
                 value3 = normalFace[2]
@@ -411,8 +411,8 @@ if (nbMeshes>0):
             normal = mesh.getNormal(supportEdge)
             length = mesh.getLength(supportEdge)
             for j in range(nbEdge):
-                normalEdge = normal.getValueI(MED_FULL_INTERLACE,j+1)
-                lengthEdge = length.getValueI(MED_FULL_INTERLACE,j+1)
+                normalEdge = normal.getRow(j+1)
+                lengthEdge = length.getRow(j+1)
                 value1 = normalEdge[0]
                 value2 = normalEdge[1]
                 norm = (value1*value1 + value2*value2)**(0.5)
@@ -424,8 +424,10 @@ if (nbMeshes>0):
             nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
             normalBound = mesh.getNormal(suppBound)
+            numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
             for j in range(nbElmBound):
-                normalBoundJ = normalBound.getValueI(MED_FULL_INTERLACE,j+1)
+                valInd = numberSuppBound[j]
+                normalBoundJ = normalBound.getRow(valInd)
                 value1 = normalBoundJ[0]
                 value2 = normalBoundJ[1]
                 value3 = normalBoundJ[2]
@@ -436,8 +438,10 @@ if (nbMeshes>0):
             nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
             normalBound = mesh.getNormal(suppBound)
+            numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
             for j in range(nbElmBound):
-                normalBoundJ = normalBound.getValueI(MED_FULL_INTERLACE,j+1)
+                valInd = numberSuppBound[j]
+                normalBoundJ = normalBound.getRow(valInd)
                 value1 = normalBoundJ[0]
                 value2 = normalBoundJ[1]
                 norm = (value1*value1 + value2*value2)**(0.5)
@@ -486,7 +490,7 @@ if (nbFields>0):
                 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
-                    valueI = fieldint.getValueI(MED_FULL_INTERLACE,k+1)
+                    valueI = fieldint.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
             elif type == MED_REEL64:
                 fielddouble = createFieldDoubleFromField(field)
@@ -516,7 +520,7 @@ if (nbFields>0):
                 nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
-                    valueI = fielddouble.getValueI(MED_FULL_INTERLACE,k+1)
+                    valueI = fielddouble.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
             else:
                 print "  !!!! Bad type of Field !!!!"

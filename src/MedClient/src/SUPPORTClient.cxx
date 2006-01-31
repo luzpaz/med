@@ -70,18 +70,10 @@ void SUPPORTClient::blankCopy()
 	setEntity(all->entity);
 // modifs PN 
         setNumberOfGeometricType(all->numberOfGeometricType);
-  	convertCorbaArray(_geometricType, _numberOfGeometricType,
-		           &all->types);
-
-        //_name = IOR_Support->getName();
-        //_description = IOR_Support->getDescription();
-  	//setAll(IOR_Support->isOnAllElements());
-  	//setEntity(IOR_Support->getEntity());
+  	convertCorbaArray2(_geometricType, _numberOfGeometricType, all->types);
 
         SCRUTE(_name);
         SCRUTE(_description);
-  	//convertCorbaArray(_geometricType, _numberOfGeometricType,
-	//	    IOR_Support->getTypes());
 
         int *nE = new int[_numberOfGeometricType];
         int i;
@@ -120,7 +112,7 @@ void SUPPORTClient::fillCopy()
   BEGIN_OF("SUPPORTClient::fillCopy");
 
   if (!_complete_support) {
-
+    if(!_isOnAllElts) {
     const int * index, * value;
     long n_index, n_value;
     
@@ -132,7 +124,7 @@ void SUPPORTClient::fillCopy()
     SCRUTE(n_index);
     SCRUTE(n_value);
     setNumber(index, value,true);
-
+    }
     _complete_support = true;
   }
 
@@ -198,6 +190,22 @@ const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION)
   const int * n = SUPPORT::getNumberIndex();
 
   END_OF("SUPPORTClient::getnumberIndex()");
+  return n;
+}
+
+//=============================================================================
+/*!
+ * 
+ */
+//=============================================================================
+int SUPPORTClient::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION)
+{
+  BEGIN_OF("SUPPORTClient::getValIndFromGlobalNumber()");
+  
+  if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
+  const int n = SUPPORT::getValIndFromGlobalNumber(number);
+  
+  END_OF("SUPPORTClient::getValIndFromGlobalNumber()");
   return n;
 }
 

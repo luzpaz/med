@@ -319,14 +319,14 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolate(i
   _toField->setIterationNumber        ( _fromField->getIterationNumber()        );
   _toField->setTime		      ( _fromField->getTime()		        );
   _toField->setOrderNumber	      ( _fromField->getOrderNumber()		);
-  _toField->setValueType	      ( MED_EN::MED_REEL64			);
+  //  _toField->setValueType	      ( MED_EN::MED_REEL64			);
 
   SUPPORT * mySupport(new SUPPORT(_toMesh,"support",MED_EN::MED_NODE));
   _toField->setSupport(mySupport);  
   
   _toField->allocValue(_toField->getNumberOfComponents(),_toField->getNumberOfValues());
     
-  _toField->setValue( MED_EN::MED_FULL_INTERLACE,resultat.Get_Valeurs());
+  _toField->setValue(resultat.Get_Valeurs());
  
   _toWrapper->Construit_Wrapper_Champ(_toField);
 

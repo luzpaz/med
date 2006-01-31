@@ -33,6 +33,8 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Utilities.hxx"
 
+#include "MEDMEM_FieldForward.hxx"
+
 /////
 #include <sstream>
 #include <iomanip>
@@ -49,7 +51,7 @@
 namespace MEDMEM {
 class MED;
 class MESH;
-class FIELD_;
+  //class FIELD_;
 class FAMILY;
 class GROUP;
 class SUPPORT;

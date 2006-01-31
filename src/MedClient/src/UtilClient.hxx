@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <utilities.h>
+#include "MEDMEM_PointerOf.hxx"
 
 namespace MEDMEM {
 template <typename TLocal, 
@@ -36,6 +37,20 @@ inline void convertCorbaArray (TLocal * & T, Tint &nT, const TCorbaSeq & S)
 
   for (i=0; i<n; i++) {
     T[i] = (*S)[i];
+  }
+}
+
+template <typename TLocal, 
+	  typename TCorbaSeq,
+	  typename Tint>
+inline void convertCorbaArray2 (TLocal& tab, Tint &nT, const TCorbaSeq s)
+{
+  Tint i, n = s.length();
+
+  nT = n;
+  tab.set(n);
+  for (i=0; i<n; i++) {
+    tab[i] = s[i];
   }
 }
 

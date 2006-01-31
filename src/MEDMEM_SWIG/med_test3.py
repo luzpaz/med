@@ -1,3 +1,8 @@
+#
+# This script does not work at the moment !!!
+#
+
+
 ###################################################################################
 #
 # This Python script is parsing a MED file using MED Memory from SALOME platform:
@@ -112,6 +117,7 @@ if (nbMeshes>0):
                             print "    * Type",type
                             print "    * Number",number[0:nbOfElmtsOfType]
                         print ""
+                        numberFamily = family.getNumber(MED_ALL_ELEMENTS)
                         print "    * Getting an Integer Field on the family ",familyName
                         fieldFamilyIntg = FIELDINT(family,spaceDim)
                         fieldFamilyIntg.setIterationNumber(0)
@@ -160,8 +166,8 @@ if (nbMeshes>0):
                             value.append(randint(0,100))
                         print "      the mode is full interlace"
                         mode = MED_FULL_INTERLACE
-                        fieldFamilyIntg.setValue(mode,value)
-                        valueverif = fieldFamilyIntg.getValue(mode)
+                        fieldFamilyIntg.setValue(value)
+                        valueverif = fieldFamilyIntg.getValue()
                         for k in range(nbOf*nbOfComp):
                             print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
                         print ""
@@ -170,8 +176,8 @@ if (nbMeshes>0):
                             value.append(randint(0,100))
                         print "      the mode is no interlace"
                         mode = MED_NO_INTERLACE
-                        fieldFamilyIntg.setValue(mode,value)
-                        valueverif = fieldFamilyIntg.getValue(mode)
+                        fieldFamilyIntg.setValue(value)
+                        valueverif = fieldFamilyIntg.getValue()
                         for k in range(nbOf*nbOfComp):
                             print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
                         print ""
@@ -182,8 +188,8 @@ if (nbMeshes>0):
                         print "      the mode for set is full interlace and no interlace for get"
                         mode_full = MED_FULL_INTERLACE
                         mode_no = MED_NO_INTERLACE
-                        fieldFamilyIntg.setValue(mode_full,value)
-                        valueverif = fieldFamilyIntg.getValue(mode_no)
+                        fieldFamilyIntg.setValue(value)
+                        valueverif = fieldFamilyIntg.getValue()
                         for k in range(nbOf*nbOfComp):
                             print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
                         print ""
@@ -191,8 +197,8 @@ if (nbMeshes>0):
                         for k in range(nbOf*nbOfComp):
                             value.append(randint(0,100))
                         print "      the mode for set is no interlace and full interlace for get"
-                        fieldFamilyIntg.setValue(mode_no,value)
-                        valueverif = fieldFamilyIntg.getValue(mode_full)
+                        fieldFamilyIntg.setValue(value)
+                        valueverif = fieldFamilyIntg.getValue()
                         for k in range(nbOf*nbOfComp):
                             print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
                         print ""
@@ -203,10 +209,10 @@ if (nbMeshes>0):
                         print "      the mode is full interlace"
                         mode = MED_FULL_INTERLACE
                         for k in range(nbOf):
-                            fieldFamilyIntg.setValueI(mode,(k+1),value[k*nbOfComp:(k+1)*nbOfComp])
+                            fieldFamilyIntg.setRow((k+1),value[k*nbOfComp:(k+1)*nbOfComp])
                         valueverif = []
                         for k in range(nbOf):
-                            valueverif.extend(fieldFamilyIntg.getValueI(mode,(k+1)))
+                            valueverif.extend(fieldFamilyIntg.getRow((k+1)))
                         for k in range(nbOf*nbOfComp):
                             print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
                         print ""
@@ -216,10 +222,10 @@ if (nbMeshes>0):
                         print "      the mode is no interlace"
                         mode = MED_NO_INTERLACE
                         for k in range(nbOfComp):
-                            fieldFamilyIntg.setValueI(mode,(k+1),value[k*nbOf:(k+1)*nbOf])
+                            fieldFamilyIntg.setColumn((k+1),value[k*nbOf:(k+1)*nbOf])
                         valueverif = []
                         for k in range(nbOfComp):
-                            valueverif.extend(fieldFamilyIntg.getValueI(mode,(k+1)))
+                            valueverif.extend(fieldFamilyIntg.getColumn((k+1)))
                         for k in range(nbOf*nbOfComp):
                             print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
                         print ""
@@ -231,10 +237,10 @@ if (nbMeshes>0):
                         mode_full = MED_FULL_INTERLACE
                         mode_no = MED_NO_INTERLACE
                         for k in range(nbOf):
-                            fieldFamilyIntg.setValueI(mode_full,(k+1),value[k*nbOfComp:(k+1)*nbOfComp])
+                            fieldFamilyIntg.setRow((k+1),value[k*nbOfComp:(k+1)*nbOfComp])
                         valueverif = []
                         for k in range(nbOfComp):
-                            valueverif.extend(fieldFamilyIntg.getValueI(mode_no,(k+1)))
+                            valueverif.extend(fieldFamilyIntg.getColumn((k+1)))
                         for k in range(nbOf*nbOfComp):
                             print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
                         print ""
@@ -243,10 +249,10 @@ if (nbMeshes>0):
                             value.append(randint(0,100))
                         print "      the mode for set is no interlace and full interlace for get"
                         for k in range(nbOfComp):
-                            fieldFamilyIntg.setValueI(mode_no,(k+1),value[k*nbOf:(k+1)*nbOf])
+                            fieldFamilyIntg.setColumn((k+1),value[k*nbOf:(k+1)*nbOf])
                         valueverif = []
                         for k in range(nbOf):
-                            valueverif.extend(fieldFamilyIntg.getValueI(mode_full,(k+1)))
+                            valueverif.extend(fieldFamilyIntg.getRow((k+1)))
                         for k in range(nbOf*nbOfComp):
                             print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
                         print ""

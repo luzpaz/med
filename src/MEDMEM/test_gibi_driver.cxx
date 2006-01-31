@@ -19,9 +19,13 @@
 //
 #include "MEDMEM_GibiMeshDriver.hxx"
 #include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_DriverFactory.hxx"
 
 using namespace std;
 using namespace MEDMEM;
+using namespace MED_EN;
+using namespace DRIVERFACTORY;
+
 int main (int argc, char ** argv)
 {
     /* process the arguments */
@@ -29,7 +33,7 @@ int main (int argc, char ** argv)
     {
 	cerr << "Usage : " << argv[0] 
 	<< "Gibifilename" << endl << endl
-	<< "-> lit le fichier gibi filename ,crée 2 fichiers : MED et VTK" << endl;
+	<< "-> lit le fichier gibi filename ,crée 3 fichiers : MED 2.1, 2.2 et VTK" << endl;
 	exit(-1);
     }
 
@@ -39,7 +43,8 @@ int main (int argc, char ** argv)
     const string ext=".sauve";
     string::size_type pos=gibifilename.find(ext,0);
     string basename (gibifilename, 0, pos); // nom sans extension
-    string medfile=basename+".med"; // nom fichier med à creer
+    string medfile21=basename+"_V21.med"; // nom fichier med 2.1 à creer
+    string medfile22=basename+"_V22.med"; // nom fichier med 2.2 à creer
     string vtkfile=basename+".vtk"; // nom fichier vtk à creer
     string::size_type pos1=gibifilename.rfind('/');
     string meshName (gibifilename,pos1+1,pos-pos1-1); // get rid of directory & extension
@@ -56,10 +61,22 @@ int main (int argc, char ** argv)
     cout << "Impression de MESH : " << endl;
     cout << *myMesh;
 
-    // creation d'un fichier med
-    cout << "creation d'un fichier med : " << endl;
-    int idMed = myMesh->addDriver(MED_DRIVER, medfile, meshName);
-    myMesh->write(idMed) ;
+    // creation des fichiers med 2.1 et 2.2
+    medFileVersion version = getMedFileVersionForWriting();
+    if (version == V22)
+      setMedFileVersionForWriting(V21);
+
+    cout << "creation du fichier med 21 : " << endl;
+    int idMed21 = myMesh->addDriver(MED_DRIVER, medfile21, meshName);
+    myMesh->write(idMed21) ;
+
+    version = getMedFileVersionForWriting();
+    if (version == V21)
+      setMedFileVersionForWriting(V22);
+
+    cout << "creation du fichier med 22 : " << endl;
+    int idMed22 = myMesh->addDriver(MED_DRIVER, medfile22, meshName);
+    myMesh->write(idMed22) ;
 
     // creation d'un fichier vtk
     cout << "creation d'un fichier vtk : " << endl;
@@ -67,8 +84,8 @@ int main (int argc, char ** argv)
     myMesh->write(idVtk) ;
     delete myMesh;
 
-    // remontée mémoire du fichier med
-    myMesh= new MESH(MED_DRIVER,medfile,meshName);
+    // remontée mémoire du fichier med 21
+    myMesh= new MESH(MED_DRIVER,medfile21,meshName);
     //myMesh= new MESH() ;
     //myMesh->setName(meshName);
     //MED_MESH_RDONLY_DRIVER myMeshDriver(medfile,myMesh) ;
@@ -80,5 +97,8 @@ int main (int argc, char ** argv)
     //cout << *myMesh;
     delete myMesh;
 
+    // remontée mémoire du fichier med 22
+    myMesh= new MESH(MED_DRIVER,medfile22,meshName);
 
+    delete myMesh;
 }

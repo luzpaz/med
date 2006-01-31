@@ -716,10 +716,10 @@ int MED_MESH_RDONLY_DRIVER21::getNodalConnectivity(CONNECTIVITY * Connectivity)
   const char * LOC = "MED_MESH_RDONLY_DRIVER21::getNodalConnectivity : " ;
   BEGIN_OF(LOC);
 
-  int spaceDimension = _ptrMesh->_spaceDimension;
-
   if (_status==MED_OPENED)
     {
+      int spaceDimension = _ptrMesh->_spaceDimension;
+
       // Get the type of entity to work on (previously set in the Connectivity Object)
       med_2_1::med_entite_maillage Entity = (med_2_1::med_entite_maillage) Connectivity->getEntity();
 
@@ -2508,8 +2508,8 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
 			      const_cast <char *> ( _meshName.c_str() ),
 			      const_cast <char *> ( families[i]->getName().c_str() ),
 			      families[i]->getIdentifier(), 
-			      families[i]->getAttributesIdentifiers(),
-			      families[i]->getAttributesValues(),
+			      (med_2_1::med_int*) families[i]->getAttributesIdentifiers(),
+			      (med_2_1::med_int*) families[i]->getAttributesValues(),
 			      const_cast <char *> (attributesDescriptions.c_str()), 
 			      numberOfAttributes,  
 			      const_cast <char *> (groupsNames.c_str()), 

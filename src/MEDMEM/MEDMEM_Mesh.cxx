@@ -623,7 +623,7 @@ SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt,
   return mySupport ;
 }
 
-FIELD<double>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION)
+FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getVolume(SUPPORT*) : ";
   BEGIN_OF(LOC);
@@ -649,7 +649,8 @@ FIELD<double>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION
   length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
   types = Support->getTypes();
   int index;
-  FIELD<double>* Volume = new FIELD<double>(Support,1);
+  FIELD<double, FullInterlace>* Volume =
+    new FIELD<double, FullInterlace>(Support,1);
   //  double *volume = new double [length_values];
   Volume->setName("VOLUME");
   Volume->setDescription("cells volume");
@@ -662,12 +663,14 @@ FIELD<double>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION
 
   Volume->setMEDComponentUnit(1,MEDComponentUnit);
 
-  Volume->setValueType(MED_REEL64);
-
   Volume->setIterationNumber(0);
   Volume->setOrderNumber(0);
   Volume->setTime(0.0);
-  MEDARRAY<double> *volume = Volume->getvalue();
+
+  //const double *volume = Volume->getValue(MED_FULL_INTERLACE);
+  typedef  MEDMEM_ArrayInterface<double,FullInterlace,NoGauss>::Array ArrayNoGauss;
+  ArrayNoGauss  *volume = Volume->getArrayNoGauss();
+
   index = 1;
   const double * coord = getCoordinates(MED_FULL_INTERLACE);
 
@@ -849,7 +852,7 @@ FIELD<double>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION
   return Volume;
 }
 
-FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
+FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getArea(SUPPORT*) : ";
   BEGIN_OF(LOC);
@@ -877,9 +880,9 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
   types = Support->getTypes();
 
   int index;
-  FIELD<double>* Area;
+  FIELD<double, FullInterlace>* Area;
 
-  Area = new FIELD<double>(Support,1);
+  Area = new FIELD<double, FullInterlace>(Support,1);
   Area->setName("AREA");
   Area->setDescription("cells or faces area");
 
@@ -892,13 +895,11 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 
   Area->setMEDComponentUnit(1,MEDComponentUnit);
 
-  Area->setValueType(MED_REEL64);
-
   Area->setIterationNumber(0);
   Area->setOrderNumber(0);
   Area->setTime(0.0);
 
-  double *area = (double *)Area->getValue(MED_FULL_INTERLACE);
+  double *area = (double *)Area->getValue();
 
   const double * coord = getCoordinates(MED_FULL_INTERLACE);
   index = 0;
@@ -1014,7 +1015,7 @@ FIELD<double>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
   return Area;
 }
 
-FIELD<double>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTION)
+FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getLength(SUPPORT*) : ";
   BEGIN_OF(LOC);
@@ -1042,14 +1043,14 @@ FIELD<double>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTIO
   types = Support->getTypes();
 
   int index;
-  FIELD<double>* Length;
+  FIELD<double, FullInterlace>* Length;
 
-  Length = new FIELD<double>(Support,1);
+  Length = new FIELD<double, FullInterlace>(Support,1);
   //  double *length = new double [length_values];
-  Length->setValueType(MED_REEL64);
 
   //const double *length = Length->getValue(MED_FULL_INTERLACE);
-  MEDARRAY<double> * length = Length->getvalue();
+  typedef  MEDMEM_ArrayInterface<double,FullInterlace,NoGauss>::Array ArrayNoGauss;
+  ArrayNoGauss * length = Length->getArrayNoGauss();
 
   const double * coord = getCoordinates(MED_FULL_INTERLACE);
   index = 1;
@@ -1119,7 +1120,7 @@ FIELD<double>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTIO
   return Length;
 }
 
-FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTION)
+FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getNormal(SUPPORT*) : ";
   BEGIN_OF(LOC);
@@ -1151,7 +1152,8 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
 
   int index;
 
-  FIELD<double>* Normal = new FIELD<double>(Support,dim_space);
+  FIELD<double, FullInterlace>* Normal =
+    new FIELD<double, FullInterlace>(Support,dim_space);
   Normal->setName("NORMAL");
   Normal->setDescription("cells or faces normal");
   for (int k=1;k<=dim_space;k++) {
@@ -1160,12 +1162,10 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
     Normal->setMEDComponentUnit(k,"unit");
   }
 
-  Normal->setValueType(MED_REEL64);
-
   Normal->setIterationNumber(MED_NOPDT);
   Normal->setOrderNumber(MED_NONOR);
   Normal->setTime(0.0);
-  double *normal = (double *)Normal->getValue(MED_FULL_INTERLACE);
+  double *normal = (double *)Normal->getValue();
 
   const double * coord = getCoordinates(MED_FULL_INTERLACE);
   index = 0;
@@ -1311,7 +1311,7 @@ FIELD<double>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTIO
   return Normal;
 }
 
-FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCEPTION)
+FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getBarycenter(SUPPORT*) : ";
   MESH* myMesh = Support->getMesh();
@@ -1332,8 +1332,8 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
   length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
   types = Support->getTypes();
 
-  FIELD<double>* Barycenter;
-  Barycenter = new FIELD<double>(Support,dim_space);
+  FIELD<double, FullInterlace>* Barycenter;
+  Barycenter = new FIELD<double, FullInterlace>(Support,dim_space);
   Barycenter->setName("BARYCENTER");
   Barycenter->setDescription("cells or faces barycenter");
 
@@ -1343,11 +1343,10 @@ FIELD<double>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCE
     Barycenter->setComponentDescription(kp1,"desc-comp");
     Barycenter->setMEDComponentUnit(kp1,myMesh->getCoordinatesUnits()[k]);
   }
-  Barycenter->setValueType(MED_REEL64);
   Barycenter->setIterationNumber(0);
   Barycenter->setOrderNumber(0);
   Barycenter->setTime(0.0);
-  double *barycenter=(double *)Barycenter->getValue(MED_FULL_INTERLACE);
+  double *barycenter=(double *)Barycenter->getValue();
   const double * coord = getCoordinates(MED_FULL_INTERLACE);
   int index=0;
   for (int i=0;i<nb_type;i++)

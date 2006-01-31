@@ -33,6 +33,7 @@
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_RCBase.hxx"
+#include "MEDMEM_FieldForward.hxx"
 
 /*! This class contains all the informations related with a MESH :
   - COORDINATES
@@ -48,8 +49,6 @@
 */
 
 namespace MEDMEM {
-
-template <class T> class FIELD;
 
 class CELLMODEL;
 class FAMILY;
@@ -299,8 +298,8 @@ public :
   void fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT *supportToFill) const throw (MEDEXCEPTION);
   SUPPORT *buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
   int getElementContainingPoint(const double *coord);
-  template<class T>
-  static FIELD<T> *mergeFields(const vector< FIELD<T>* >& others,bool meshCompare=false);
+  template<class T> static
+  FIELD<T> * mergeFields(const vector< FIELD<T> * > & others, bool meshCompare=false);
   /*!
    *For ref counter. Only for client
    */
@@ -1024,7 +1023,8 @@ namespace MEDMEM {
 
 //Create a new FIELD that should be deallocated based on a SUPPORT that should be deallocated too.
 template<class T>
-FIELD<T> *MESH::mergeFields(const vector< FIELD<T>* >& others,bool meshCompare)
+FIELD<T, FullInterlace> * MESH::mergeFields(const vector< FIELD<T, FullInterlace> * > & others,
+					    bool meshCompare)
 {
   const char * LOC = "MESH::mergeFields(const vector< FIELD<T>* >& others,bool meshCompare): ";
   BEGIN_OF(LOC);
@@ -1032,17 +1032,22 @@ FIELD<T> *MESH::mergeFields(const vector< FIELD<T>* >& others,bool meshCompare)
   if(others.size()==0)
     return 0;
   vector<SUPPORT *> sup;
-  typename vector< FIELD<T>* >::const_iterator iter;
+  typename vector< FIELD<T, FullInterlace>* >::const_iterator iter;
+  iter = others.begin();
+  MED_EN::med_type_champ valueType = (*iter)->getValueType();
   for(iter=others.begin();iter!=others.end();iter++)
     {
+      MED_EN::med_type_champ valueTypeIter = (*iter)->getValueType();
+      if (valueTypeIter != valueType)
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Fields vector have not the same value type"));
+
       sup.push_back((SUPPORT *)(*iter)->getSupport());
     }
   iter=others.begin();
   SUPPORT *retSup=mergeSupports(sup);
   int retNumberOfComponents=(*iter)->getNumberOfComponents();
-  FIELD<T> *ret=new FIELD<T>(retSup,retNumberOfComponents,MED_EN::MED_FULL_INTERLACE);
-  ret->setValueType((*iter)->getValueType());
-  T* valuesToSet=(T*)ret->getValue(MED_EN::MED_FULL_INTERLACE);
+  FIELD<T, FullInterlace> *ret=new FIELD<T, FullInterlace>(retSup, retNumberOfComponents);
+  T* valuesToSet=(T*)ret->getValue();
   int nbOfEltsRetSup=retSup->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   T* tempValues=new T[retNumberOfComponents];
   if(retSup->isOnAllElements())

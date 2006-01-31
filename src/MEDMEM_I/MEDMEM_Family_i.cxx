@@ -1,22 +1,3 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-//
-// See http://www.salome-platform.org/
-//
 //=============================================================================
 // File      :  MEDMEM_Family_i.cxx
 // Project   :  SALOME
@@ -132,7 +113,7 @@ throw (SALOME::SALOME_Exception)
 	{
 		int nbAttribute=_family->getNumberOfAttributes();
 		myseq->length(nbAttribute);
-		int * identifiers=_family->getAttributesIdentifiers();
+		const int * identifiers=_family->getAttributesIdentifiers();
 		for (int i=0;i<nbAttribute;i++)
 		{
 			myseq[i]=identifiers[i];
@@ -183,7 +164,7 @@ throw (SALOME::SALOME_Exception)
         {
                 int nbAttribute=_family->getNumberOfAttributes();
                 myseq->length(nbAttribute);
-                int * values=_family->getAttributesValues();
+                const int * values=_family->getAttributesValues();
                 for (int i=0;i<nbAttribute;i++)
                 {
                         myseq[i]=values[i];
@@ -234,7 +215,7 @@ throw (SALOME::SALOME_Exception)
         {
 		int nbAttribute=_family->getNumberOfAttributes();
 		myseq->length(nbAttribute);
-		string * descattribute=_family->getAttributesDescriptions();
+		const string * descattribute=_family->getAttributesDescriptions();
 		for (int i=0;i<nbAttribute;i++)
 		{
 			myseq[i]=CORBA::string_dup(descattribute[i].c_str());
@@ -308,7 +289,7 @@ throw (SALOME::SALOME_Exception)
         {
                 int nbGroups=_family->getNumberOfGroups();
                 myseq->length(nbGroups);
-                string * descGroups=_family->getGroupsNames();
+                const string * descGroups=_family->getGroupsNames();
                 for (int i=0;i<nbGroups;i++)
                 {
                         myseq[i]=CORBA::string_dup(descGroups[i].c_str());

@@ -20,10 +20,10 @@
 #ifndef DRIVERTOOLS_HXX
 #define DRIVERTOOLS_HXX
 
-
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Exception.hxx"
-#include "MEDMEM_Field.hxx"
+#include "MEDMEM_FieldForward.hxx"
+#include "MEDMEM_ArrayInterface.hxx"
 #include <string>
 #include <vector>
 #include <set>
@@ -38,6 +38,7 @@ class CONNECTIVITY;
 class COORDINATE;
 class GROUP;
 class FAMILY;
+class FIELD_;
 struct _noeud
 {
     mutable int number;
@@ -202,7 +203,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
     if ( !grp || grp->empty() )
       return res;
   }
-  FIELD< T > * f = 0;
+  FIELD< T, NoInterlace > * f = 0;
   int i_comp_tot = 0, nb_fields = 0;
   std::set<int> supp_id_set;
   // loop on subs of this field
@@ -225,12 +226,12 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
     {
       supp_id_set.clear();
       ++nb_fields;
-      f = new FIELD< T >;
+      f = new FIELD< T, NoInterlace >();
       f->setNumberOfComponents( sub_data->nbComponents() );
       f->setComponentsNames( & sub_data->_comp_names[ 0 ] );
       f->setNumberOfValues ( nb_val );
       f->setName( _name );
-      f->setValueType( _type );
+      //      f->setValueType( _type );
       vector<string> str( sub_data->nbComponents() );
       f->setComponentsDescriptions( &str[0] );
       f->setMEDComponentsUnits( &str[0] );
@@ -238,9 +239,10 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
       MESSAGE(" MAKE " << nb_fields << "-th field <" << _name << "> on group_id " << _group_id );
     }
     // set values
-    MEDARRAY< T > * medarray =
-      new MEDARRAY< T >( sub_data->nbComponents(), nb_val, MED_EN::MED_NO_INTERLACE );
-    f->setValue( medarray );
+    MEDMEM_Array< T, NoInterlaceNoGaussPolicy > * medarray =
+      new MEDMEM_Array < T, NoInterlaceNoGaussPolicy >( sub_data->nbComponents(),
+						       nb_val );
+    f->setArray( medarray );
     // loop on components of a sub
     for ( int i_comp = 0; i_comp < sub_data->nbComponents(); ++i_comp )
     {

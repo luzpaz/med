@@ -1,22 +1,3 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-//
-// See http://www.salome-platform.org/
-//
 //=============================================================================
 // File      : MEDMEM_Med_i.cxx
 // Project   : SALOME
@@ -31,14 +12,11 @@
 
 #include "MEDMEM_Med_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
-#include "MEDMEM_FieldDouble_i.hxx"
-#include "MEDMEM_FieldInt_i.hxx"
+#include "MEDMEM_FieldTemplate_i.hxx"
 #include "MEDMEM_Support_i.hxx"
 #include "MEDMEM_Family_i.hxx"
 #include "MEDMEM_Group_i.hxx"
 #include "MEDMEM_convert.hxx"
-#include "MEDMEM_Family.hxx"
-#include "MEDMEM_Group.hxx"
 
 #include "MEDMEM_DriversDef.hxx"
 #include "utilities.h"
@@ -55,7 +33,6 @@ using namespace MEDMEM;
 MED_i::MED_i():_med((::MED*)NULL)
 {
         BEGIN_OF("Default Constructor MED_i");
-        _med = new ::MED();
         END_OF("Default Constructor MED_i");
 }
 //=============================================================================
@@ -69,9 +46,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 	BEGIN_OF(LOC);
 
   // we create all IOR from _med
-        if ( _med )
-          delete _med;
-        _med = new ::MED(driverType,fileName);
+	_med = new ::MED(driverType,fileName);
 
   // MESHES :
 	deque<string> meshesNames = _med->getMeshNames();
@@ -185,7 +160,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
       		         case MED_EN::MED_INT32 : 
 			 {
 			     ((FIELD<int>*)myField)->read();
-			     FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
+			     FIELDTEMPLATE_I<int,FullInterlace> *myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int>*)myField);
 			     myFieldIOR = myFieldIntI->_this();
 // 	                     myFieldIntI->addInStudy(myStudy,myFieldIOR);
 		             break;
@@ -194,7 +169,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
       			case MED_EN::MED_REEL64: 
                         {
 			     ((FIELD<double>*)myField)->read();
-			     FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
+			     FIELDTEMPLATE_I<double,FullInterlace> *myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double,FullInterlace>*)myField);
 			     myFieldIOR = myFieldDoubleI->_this();
 // 			     myFieldDoubleI->addInStudy(myStudy,myFieldIOR);
 			     break;
@@ -234,9 +209,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 	SCRUTE(driverType);
 	SCRUTE(fileName)
 
-        if ( _med )
-          delete _med;
-        _med = new ::MED(driverType,fileName);
+	_med = new ::MED(driverType,fileName);
 
 	int numberOfMeshes = _med->getNumberOfMeshes();
 	SCRUTE(numberOfMeshes);
@@ -510,7 +483,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		     case MED_EN::MED_INT32: 
 		     {
 			((FIELD<int>*)myField)->read();
-			FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
+			FIELDTEMPLATE_I<int,FullInterlace> *myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int>*)myField);
 			SALOME_MED::FIELDINT_ptr myFieldIntIOR;
 			myFieldIntIOR = myFieldIntI->_this();
 
@@ -524,7 +497,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
       		     case MED_EN::MED_REEL64: 
 		     {
 			((FIELD<double>*)myField)->read();
-			FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
+			FIELDTEMPLATE_I<double,FullInterlace> *myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double>*)myField);
 			SALOME_MED::FIELDDOUBLE_ptr myFieldDoubleIOR;
 			myFieldDoubleIOR = myFieldDoubleI->_this();
 
@@ -691,87 +664,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 //=============================================================================
 MED_i::~MED_i()
 {
-  //delete _med;
 }
-
-//=======================================================================
-//function : updateSupportIORs
-//purpose  : 
-//=======================================================================
-
-void MED_i::updateSupportIORs(SALOMEDS::Study_ptr myStudy, const char* meshName)
-{
-  vector<FAMILY*> familyVector;
-  vector<FAMILY*>::iterator familyVectorIt;
-  vector<GROUP*> groupVector;
-  vector<GROUP*>::iterator groupVectorIt;
-  string supportEntryPath;
-
-  ::MESH * ptrMesh = _med->getMesh(meshName);
-
-  MED_EN::MESH_ENTITIES::const_iterator currentEntity; 
-
-  for (currentEntity = MED_EN::meshEntities.begin();
-       currentEntity != MED_EN::meshEntities.end(); 
-       currentEntity++) 
-  {
-    // family :
-    familyVector = ptrMesh->getFamilies((MED_EN::medEntityMesh)(*currentEntity).first);
-    int nb = familyVector.size();
-    for (familyVectorIt = familyVector.begin();
-         familyVectorIt != familyVector.end();
-         familyVectorIt++) 
-    {
-      supportEntryPath = SUPPORT_i::getEntryPath( meshName, *familyVectorIt );
-      SALOMEDS::SObject_var familyEntry = myStudy->FindObjectByPath(supportEntryPath.c_str());
-      if ( !familyEntry->_is_nil() || CORBA::is_nil( familyEntry->GetObject() ))
-      {
-        FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
-        SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->POA_SALOME_MED::FAMILY::_this();
-        myFamilyI->addInStudy(myStudy,myFamilyIOR);
-      }
-    }
-
-    // group :
-    groupVector = ptrMesh->getGroups((MED_EN::medEntityMesh)(*currentEntity).first);
-    nb = groupVector.size();
-    for (groupVectorIt = groupVector.begin();
-         groupVectorIt != groupVector.end();
-         groupVectorIt++) 
-    {
-      supportEntryPath = SUPPORT_i::getEntryPath( meshName, *groupVectorIt );
-      SALOMEDS::SObject_var groupEntry = myStudy->FindObjectByPath(supportEntryPath.c_str());
-      if ( !groupEntry->_is_nil() || CORBA::is_nil( groupEntry->GetObject() ))
-      {
-        GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
-        SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->POA_SALOME_MED::GROUP::_this();
-        myGroupI->addInStudy(myStudy,myGroupIOR);
-      }
-    }
-  }  
-
-  _med->updateSupport();
-
-  // supports
-  map<MED_EN::medEntityMesh,::SUPPORT*> mySupports = _med->getSupports(meshName);
-  map<MED_EN::medEntityMesh,::SUPPORT*>::const_iterator itSupport;
-  map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> & 
-    mySupportsIOR = _supports[meshName];
-  for (itSupport=mySupports.begin(); itSupport!=mySupports.end(); itSupport++ ) 
-  {
-    supportEntryPath = SUPPORT_i::getEntryPath( meshName, itSupport->second);
-    SALOMEDS::SObject_var supportEntry = myStudy->FindObjectByPath(supportEntryPath.c_str());
-    if ( !supportEntry->_is_nil() || CORBA::is_nil( supportEntry->GetObject() ))
-    {
-      SUPPORT_i * mySupportI = new SUPPORT_i((*itSupport).second);
-      SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this();
-      mySupportsIOR[(*itSupport).first]= mySupportIOR;
-      mySupportI->addInStudy(myStudy,mySupportIOR);
-    }
-  }
-}
-
-
 //=============================================================================
 /*!
  * CORBA: Accessor for Number of meshes
@@ -887,27 +780,18 @@ throw (SALOME::SALOME_Exception)
         if (_med==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::MESH_ptr meshIOR;
         try
         {
-          map<string,SALOME_MED::MESH_ptr>::const_iterator name_meshIOR =
-            _meshes.find( meshName );
-          if ( name_meshIOR == _meshes.end() ) {
                 MESH * mesh=_med->getMesh(meshName);
                 MESH_i * m1 = new MESH_i(mesh);
-		meshIOR = m1->POA_SALOME_MED::MESH::_this();
-                _meshes[ meshName ] = meshIOR;
-          }
-          else {
-            meshIOR = name_meshIOR->second;
-          }
+		return m1->POA_SALOME_MED::MESH::_this();
         }
         catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to get the specified mesh");
 		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
-        return meshIOR;
+
 }
 //=============================================================================
 /*!
@@ -935,7 +819,7 @@ throw (SALOME::SALOME_Exception)
                 ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
 
                 ::FIELD<double> * fdouble = (::FIELD<double> *)FIELD_i::fieldMap[ind];
-                mesh=_med->getMesh(fdouble);
+                MESH * mesh=_med->getMesh(fdouble);
         }
         else
         {
@@ -943,7 +827,7 @@ throw (SALOME::SALOME_Exception)
                 ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
 
                 ::FIELD<int> * fint = (::FIELD<int> *)FIELD_i::fieldMap[ind];
-                mesh=_med->getMesh(fint);
+                MESH * mesh=_med->getMesh(fint);
         }
         MESH_i * meshi = new MESH_i(mesh);
 	return meshi->POA_SALOME_MED::MESH::_this();
@@ -1056,11 +940,6 @@ throw (SALOME::SALOME_Exception)
 {
 	const char * LOC="MED_i::getField(const char*,CORBA::Long,CORBA::Long) ";
 	BEGIN_OF(LOC);
-        if (_med==NULL)
-                THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
-                                             SALOME::INTERNAL_ERROR);
-
-        SALOME_MED::FIELD_ptr myFieldIOR = SALOME_MED::FIELD::_nil();
 
 	DT_IT_ dtIt;
 
@@ -1068,47 +947,19 @@ throw (SALOME::SALOME_Exception)
 	dtIt.it= (int)numOrdre;
 
 	map<string,MAP_IOR_DT_IT_>::const_iterator itFields = _fields.find(fieldName);
-	if ( itFields != _fields.end() )
-        {
-          const MAP_IOR_DT_IT_ & map_dtIt = (*itFields).second;
-          MAP_IOR_DT_IT_::const_iterator itMap_dtIt =  map_dtIt.find(dtIt);
-          if ( itMap_dtIt != map_dtIt.end() )
-            myFieldIOR = (*itMap_dtIt).second;
-        }
 
-	if ( CORBA::is_nil( myFieldIOR ))
-        {
-          try
-          {
-            ::FIELD_* myField = _med->getField( fieldName, pasTemps, numOrdre);
+	if ( itFields == _fields.end() ) 
+    		THROW_SALOME_CORBA_EXCEPTION("Field not found !", SALOME::INTERNAL_ERROR);
+  
+	const MAP_IOR_DT_IT_ & map_dtIt = (*itFields).second;
+	MAP_IOR_DT_IT_::const_iterator itMap_dtIt =  map_dtIt.find(dtIt);
+  
+	if ( itMap_dtIt == map_dtIt.end() )
+		THROW_SALOME_CORBA_EXCEPTION("Iteration not found !", SALOME::INTERNAL_ERROR);
+  
+	END_OF(LOC);
+	return (*itMap_dtIt).second;
 
-            switch ( myField->getValueType() ) {
-            case MED_EN::MED_INT32 : {
-              FIELDINT_i * myFieldIntI = new FIELDINT_i((FIELD<int>*)myField);
-              myFieldIOR = myFieldIntI->_this();
-              break;
-            }
-
-            case MED_EN::MED_REEL64: {
-              FIELDDOUBLE_i * myFieldDoubleI = new FIELDDOUBLE_i((FIELD<double>*)myField);
-              myFieldIOR = myFieldDoubleI->_this();
-              break;
-            }
-            default: 
-              THROW_SALOME_CORBA_EXCEPTION ("Wrong field type", SALOME::INTERNAL_ERROR);
-            }
-          }
-          catch (const std::exception & ex)
-          {
-            MESSAGE("Exception Interceptee : ");
-            SCRUTE(ex.what());
-            THROW_SALOME_CORBA_EXCEPTION("Field not found !", SALOME::INTERNAL_ERROR);
-          }
-          _fields[fieldName][dtIt] = myFieldIOR;
-        }
-
-        END_OF(LOC);
-        return myFieldIOR;
 }
 //=============================================================================
 /*!

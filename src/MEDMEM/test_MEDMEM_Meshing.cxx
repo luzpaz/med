@@ -24,6 +24,7 @@
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
+using namespace DRIVERFACTORY;
 
 int main (int argc, char ** argv) {
 
@@ -31,14 +32,15 @@ int main (int argc, char ** argv) {
     cerr << "Usage : " << argv[0] 
 	 << " filenameRoot" << endl;
     cerr << "        where filenameRoot is a root filename, the program will produce" << endl;
-    cerr << "        2 files filenameRoot.med and filenameRoot.vtk" << endl << endl;
+    cerr << "        3 files filenameRoot21.med filenameRoot22.med and filenameRoot.vtk" << endl << endl;
     exit(-1);
   }
 
   // filename to save the generated MESH
   string filenameRoot = argv[1] ;
 
-  string filenameMed = filenameRoot+".med";
+  string filenameMed21 = filenameRoot+"_V21.med";
+  string filenameMed22 = filenameRoot+"_V22.med";
   string filenameVtk = filenameRoot+".vtk";
 
   MESHING myMeshing ;
@@ -155,6 +157,9 @@ int main (int argc, char ** argv) {
   };
 
   myMeshing.setConnectivity(ConnectivityQua,MED_FACE,MED_QUAD4);
+
+  int meshDimension = SpaceDimension; // because there 3D cells in the mesh
+  myMeshing.setMeshDimension(meshDimension);
 
   // edge part
 
@@ -280,10 +285,21 @@ int main (int argc, char ** argv) {
     myMeshing.addGroup(myGroup);
   }
 
-  // all rigtht, we save it !
+  // all rigtht, we save it in Med 2.1 2.2 and vtk !
 
-  int idMed = myMeshing.addDriver(MED_DRIVER,filenameMed,myMeshing.getName());
-  myMeshing.write(idMed) ;
+  medFileVersion version = getMedFileVersionForWriting();
+  if (version == V22)
+    setMedFileVersionForWriting(V21);
+
+  int idMed21 = myMeshing.addDriver(MED_DRIVER,filenameMed21,myMeshing.getName());
+  myMeshing.write(idMed21) ;
+
+  version = getMedFileVersionForWriting();
+  if (version == V21)
+    setMedFileVersionForWriting(V22);
+
+  int idMed22 = myMeshing.addDriver(MED_DRIVER,filenameMed22,myMeshing.getName());
+  myMeshing.write(idMed22) ;
 
   int idVtk = myMeshing.addDriver(VTK_DRIVER,filenameVtk,myMeshing.getName());
   myMeshing.write(idVtk) ;
@@ -308,8 +324,6 @@ int main (int argc, char ** argv) {
   fieldDoubleScalarOnNodes->setComponentDescription(1,"comp1");
   fieldDoubleScalarOnNodes->setMEDComponentUnit(1,"unit1");
 
-  fieldDoubleScalarOnNodes->setValueType(MED_REEL64);
-
   FIELD<double> * fieldDoubleVectorOnNodes = new FIELD<double>(supportOnNodes,SpaceDimension);
   fieldDoubleVectorOnNodes->setName("fieldVectorDoubleNode");
   fieldDoubleVectorOnNodes->setIterationNumber(-1);
@@ -326,8 +340,6 @@ int main (int argc, char ** argv) {
   fieldDoubleVectorOnNodes->setComponentDescription(3,"comp3");
   fieldDoubleVectorOnNodes->setMEDComponentUnit(3,"unit3");
 
-  fieldDoubleVectorOnNodes->setValueType(MED_REEL64);
-
   FIELD<double> * fieldDoubleScalarOnCells = new FIELD<double>(supportOnCells,1);
   fieldDoubleScalarOnCells->setName("fieldScalarDoubleCell");
   fieldDoubleScalarOnCells->setIterationNumber(-1);
@@ -337,8 +349,6 @@ int main (int argc, char ** argv) {
   fieldDoubleScalarOnCells->setComponentName(1,"Vx");
   fieldDoubleScalarOnCells->setComponentDescription(1,"comp1");
   fieldDoubleScalarOnCells->setMEDComponentUnit(1,"unit1");
-
-  fieldDoubleScalarOnCells->setValueType(MED_REEL64);
 
   FIELD<double> * fieldDoubleVectorOnCells = new FIELD<double>(supportOnCells,SpaceDimension);
   fieldDoubleVectorOnCells->setName("fieldVectorrDoubleCell");
@@ -356,8 +366,6 @@ int main (int argc, char ** argv) {
   fieldDoubleVectorOnCells->setComponentDescription(3,"comp3");
   fieldDoubleVectorOnCells->setMEDComponentUnit(3,"unit3");
 
-  fieldDoubleVectorOnCells->setValueType(MED_REEL64);
-
   FIELD<int> * fieldIntScalarOnNodes = new FIELD<int>(supportOnNodes,1);
   fieldIntScalarOnNodes->setName("fieldScalarIntNode");
   fieldIntScalarOnNodes->setIterationNumber(-1);
@@ -367,8 +375,6 @@ int main (int argc, char ** argv) {
   fieldIntScalarOnNodes->setComponentName(1,"Vx");
   fieldIntScalarOnNodes->setComponentDescription(1,"comp1");
   fieldIntScalarOnNodes->setMEDComponentUnit(1,"unit1");
-
-  fieldIntScalarOnNodes->setValueType(MED_INT32);
 
   FIELD<int> * fieldIntVectorOnNodes = new FIELD<int>(supportOnNodes,SpaceDimension);
   fieldIntVectorOnNodes->setName("fieldVectorIntNode");
@@ -386,8 +392,6 @@ int main (int argc, char ** argv) {
   fieldIntVectorOnNodes->setComponentDescription(3,"comp3");
   fieldIntVectorOnNodes->setMEDComponentUnit(3,"unit3");
 
-  fieldIntVectorOnNodes->setValueType(MED_INT32);
-
   FIELD<int> * fieldIntScalarOnCells = new FIELD<int>(supportOnCells,1);
   fieldIntScalarOnCells->setName("fieldScalarIntCell");
   fieldIntScalarOnCells->setIterationNumber(-1);
@@ -397,8 +401,6 @@ int main (int argc, char ** argv) {
   fieldIntScalarOnCells->setComponentName(1,"Vx");
   fieldIntScalarOnCells->setComponentDescription(1,"comp1");
   fieldIntScalarOnCells->setMEDComponentUnit(1,"unit1");
-
-  fieldIntScalarOnCells->setValueType(MED_INT32);
 
   FIELD<int> * fieldIntVectorOnCells = new FIELD<int>(supportOnCells,SpaceDimension);
   fieldIntVectorOnCells->setName("fieldVectorrIntCell");
@@ -415,8 +417,6 @@ int main (int argc, char ** argv) {
   fieldIntVectorOnCells->setComponentName(3,"Vz");
   fieldIntVectorOnCells->setComponentDescription(3,"comp3");
   fieldIntVectorOnCells->setMEDComponentUnit(3,"unit3");
-
-  fieldIntVectorOnCells->setValueType(MED_INT32);
 
   for (int i = 0; i<numberOfNodes; i++)
     {
@@ -464,29 +464,61 @@ int main (int argc, char ** argv) {
       fieldIntVectorOnCells->setValueIJ(i+1,3,valueInt3);
     }
 
-  idMed = fieldDoubleScalarOnNodes->addDriver(MED_DRIVER,filenameMed,fieldDoubleScalarOnNodes->getName());
-  fieldDoubleScalarOnNodes->write(idMed) ;
+  version = getMedFileVersionForWriting();
+  if (version == V22)
+    setMedFileVersionForWriting(V21);
 
-  idMed = fieldIntScalarOnNodes->addDriver(MED_DRIVER,filenameMed,fieldIntScalarOnNodes->getName());
-  fieldIntScalarOnNodes->write(idMed) ;
+  idMed21 = fieldDoubleScalarOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldDoubleScalarOnNodes->getName());
+  fieldDoubleScalarOnNodes->write(idMed21) ;
 
-  idMed = fieldDoubleVectorOnNodes->addDriver(MED_DRIVER,filenameMed,fieldDoubleVectorOnNodes->getName());
-  fieldDoubleVectorOnNodes->write(idMed) ;
+  idMed21 = fieldIntScalarOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldIntScalarOnNodes->getName());
+  fieldIntScalarOnNodes->write(idMed21) ;
 
-  idMed = fieldIntVectorOnNodes->addDriver(MED_DRIVER,filenameMed,fieldIntVectorOnNodes->getName());
-  fieldIntVectorOnNodes->write(idMed) ;
+  idMed21 = fieldDoubleVectorOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldDoubleVectorOnNodes->getName());
+  fieldDoubleVectorOnNodes->write(idMed21) ;
 
-  idMed = fieldDoubleScalarOnCells->addDriver(MED_DRIVER,filenameMed,fieldDoubleScalarOnCells->getName());
-  fieldDoubleScalarOnCells->write(idMed) ;
+  idMed21 = fieldIntVectorOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldIntVectorOnNodes->getName());
+  fieldIntVectorOnNodes->write(idMed21) ;
 
-  idMed = fieldIntScalarOnCells->addDriver(MED_DRIVER,filenameMed,fieldIntScalarOnCells->getName());
-  fieldIntScalarOnCells->write(idMed) ;
+  idMed21 = fieldDoubleScalarOnCells->addDriver(MED_DRIVER,filenameMed21,fieldDoubleScalarOnCells->getName());
+  fieldDoubleScalarOnCells->write(idMed21) ;
 
-  idMed = fieldDoubleVectorOnCells->addDriver(MED_DRIVER,filenameMed,fieldDoubleVectorOnCells->getName());
-  fieldDoubleVectorOnCells->write(idMed) ;
+  idMed21 = fieldIntScalarOnCells->addDriver(MED_DRIVER,filenameMed21,fieldIntScalarOnCells->getName());
+  fieldIntScalarOnCells->write(idMed21) ;
 
-  idMed = fieldIntVectorOnCells->addDriver(MED_DRIVER,filenameMed,fieldIntVectorOnCells->getName());
-  fieldIntVectorOnCells->write(idMed) ;
+  idMed21 = fieldDoubleVectorOnCells->addDriver(MED_DRIVER,filenameMed21,fieldDoubleVectorOnCells->getName());
+  fieldDoubleVectorOnCells->write(idMed21) ;
+
+  idMed21 = fieldIntVectorOnCells->addDriver(MED_DRIVER,filenameMed21,fieldIntVectorOnCells->getName());
+  fieldIntVectorOnCells->write(idMed21) ;
+
+  version = getMedFileVersionForWriting();
+  if (version == V21)
+    setMedFileVersionForWriting(V22);
+
+  idMed22 = fieldDoubleScalarOnNodes->addDriver(MED_DRIVER,filenameMed22,fieldDoubleScalarOnNodes->getName());
+  fieldDoubleScalarOnNodes->write(idMed22) ;
+
+  idMed22 = fieldIntScalarOnNodes->addDriver(MED_DRIVER,filenameMed22,fieldIntScalarOnNodes->getName());
+  fieldIntScalarOnNodes->write(idMed22) ;
+
+  idMed22 = fieldDoubleVectorOnNodes->addDriver(MED_DRIVER,filenameMed22,fieldDoubleVectorOnNodes->getName());
+  fieldDoubleVectorOnNodes->write(idMed22) ;
+
+  idMed22 = fieldIntVectorOnNodes->addDriver(MED_DRIVER,filenameMed22,fieldIntVectorOnNodes->getName());
+  fieldIntVectorOnNodes->write(idMed22) ;
+
+  idMed22 = fieldDoubleScalarOnCells->addDriver(MED_DRIVER,filenameMed22,fieldDoubleScalarOnCells->getName());
+  fieldDoubleScalarOnCells->write(idMed22) ;
+
+  idMed22 = fieldIntScalarOnCells->addDriver(MED_DRIVER,filenameMed22,fieldIntScalarOnCells->getName());
+  fieldIntScalarOnCells->write(idMed22) ;
+
+  idMed22 = fieldDoubleVectorOnCells->addDriver(MED_DRIVER,filenameMed22,fieldDoubleVectorOnCells->getName());
+  fieldDoubleVectorOnCells->write(idMed22) ;
+
+  idMed22 = fieldIntVectorOnCells->addDriver(MED_DRIVER,filenameMed22,fieldIntVectorOnCells->getName());
+  fieldIntVectorOnCells->write(idMed22) ;
 
   idVtk = fieldDoubleScalarOnNodes->addDriver(VTK_DRIVER,filenameVtk,fieldDoubleScalarOnNodes->getName());
   fieldDoubleScalarOnNodes->writeAppend(idVtk) ;

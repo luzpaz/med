@@ -1,22 +1,3 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-//
-// See http://www.salome-platform.org/
-//
 //=============================================================================
 // File      : MEDMEM_Field_i.cxx
 // Created   : mer fév 20 15:47:57 CET 2002
@@ -306,6 +287,26 @@ throw (SALOME::SALOME_Exception)
 }
 //=============================================================================
 /*!
+ * CORBA: Accessor for gauss numbers presence.
+ */
+//=============================================================================
+CORBA::Boolean FIELD_i::getGaussPresence()
+{
+       if (_fieldTptr==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
+                                             SALOME::INTERNAL_ERROR);
+        try
+        {
+                return _fieldTptr->getGaussPresence();
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+		MESSAGE("Exception en accedant au champ");
+	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+}
+//=============================================================================
+/*!
  * CORBA: Accessor  
  */
 //=============================================================================
@@ -528,14 +529,21 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 
 	MESSAGE("Computing path to Support");
 
-	string supportEntryPath = SUPPORT_i::getEntryPath( meshNameStudy,
-                                                           _fieldTptr->getSupport() );
+	char * supportEntryPath;
+	lenName = 28 + 15 + strlen(meshName.c_str()) + 1 +
+	  strlen(supportName.c_str()) + 1;
+	supportEntryPath = new char[lenName];
+	supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/MEDSUPPORTS_OF_");
+	supportEntryPath = strcat(supportEntryPath,meshNameStudy.c_str());
+	supportEntryPath = strcat(supportEntryPath,"/");
+	supportEntryPath = strcat(supportEntryPath,supportName.c_str());
+
 	SCRUTE(supportEntryPath);
 
-	MESSAGE("supportEntryPath in field " << supportEntryPath /*<< " length " << lenName*/);
+	MESSAGE("supportEntryPath in field " << supportEntryPath << " length " << lenName);
 
 // 	SALOMEDS::SObject_var supportObject = myStudy->FindObject(supportName.c_str());
-	SALOMEDS::SObject_var supportObject = myStudy->FindObjectByPath(supportEntryPath.c_str());
+	SALOMEDS::SObject_var supportObject = myStudy->FindObjectByPath(supportEntryPath);
 
 	SCRUTE(supportObject);
 
@@ -554,7 +562,7 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 
         myBuilder->CommitCommand();
 
-	//delete [] supportEntryPath;
+	delete [] supportEntryPath;
 	delete [] fieldEntryName;
 
 	// register the Corba pointer: increase the referrence count

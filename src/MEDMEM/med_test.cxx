@@ -100,7 +100,6 @@ void affiche_groupe(MESH *myMesh,medEntityMesh Entity)
 }
 
 int main (int argc, char ** argv) {
-  int read;
 
   if ((argc !=3) && (argc != 4)) {
     cerr << "Usage : " << argv[0] 
@@ -454,7 +453,7 @@ int main (int argc, char ** argv) {
   //        cout << value[j]<< " ";
   //      cout<<endl;
   //    }
-  MEDARRAY<double> * myvalue = myField->getvalue();
+  MEDMEM_Array<double> * myvalue = myField->getArrayNoGauss();
   const double * value ;
   for (int i=1; i<NumberOf+1; i++) {
     value = myvalue->getRow(i) ;

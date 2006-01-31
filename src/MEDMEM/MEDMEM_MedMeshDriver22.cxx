@@ -791,10 +791,10 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
   const char * LOC = "MED_MESH_RDONLY_DRIVER22::getNodalConnectivity : " ;
   BEGIN_OF(LOC);
 
-  int spaceDimension = _ptrMesh->_spaceDimension;
-
   if (_status==MED_OPENED)
     {
+      int spaceDimension = _ptrMesh->_spaceDimension;
+
       // Get the type of entity to work on (previously set in the Connectivity Object)
       med_2_2::med_entite_maillage Entity = (med_2_2::med_entite_maillage) Connectivity->getEntity();
       
@@ -2072,13 +2072,18 @@ int MED_MESH_WRONLY_DRIVER22::writeCoordinates() const {
   int meshDimension = med_2_2::MEDdimLire(_medIdt, const_cast <char *>
 					 (_meshName.c_str()) );
 
-  if ((spaceDimension != MED_VALID) && (meshDimension != MED_VALID))
+  SCRUTE(spaceDimension);
+  SCRUTE(meshDimension);
+  SCRUTE(_ptrMesh->_spaceDimension);
+  SCRUTE(_ptrMesh->_meshDimension);
+
+  if ((spaceDimension != MED_VALID) && (meshDimension < MED_VALID))
     {
       err = MEDmaaCr(_medIdt, const_cast <char *> (_meshName.c_str()),
 		     _ptrMesh->_meshDimension, med_2_2::MED_NON_STRUCTURE,
 		     const_cast <char *> (_ptrMesh->_description.c_str()));
 
-      if (err != MED_VALID)
+      if (err < MED_VALID)
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Unable to create Mesh : |" << _meshName << "|"));
       else 
 	MESSAGE(LOC<<"Mesh "<<_meshName<<" created in file "<<_fileName<<" !");
@@ -2769,7 +2774,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
     if (families[i]->getEntity() == MED_NODE)
       dataGroupFam = "/ENS_MAA/"+_meshName+"/FAS/NOEUD/"+families[i]->getName()+"/";  
     else
-      dataGroupFam = "/ENS_MAA/"+_meshName+"/FAS/ELEM/"+families[i]->getName()+"/"; 
+      dataGroupFam = "/ENS_MAA/"+_meshName+"/FAS/ELEME/"+families[i]->getName()+"/"; 
 
     SCRUTE("|"<<dataGroupFam<<"|");
     err = med_2_2::_MEDdatagroupOuvrir(_medIdt,const_cast <char *> (dataGroupFam.c_str()) ) ;
@@ -2812,8 +2817,8 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 			      const_cast <char *> ( _meshName.c_str() ),
 			      const_cast <char *> ( families[i]->getName().c_str() ),
 			      families[i]->getIdentifier(), 
-			      families[i]->getAttributesIdentifiers(),
-			      families[i]->getAttributesValues(),
+			      (med_2_2::med_int*)families[i]->getAttributesIdentifiers(),
+			      (med_2_2::med_int*)families[i]->getAttributesValues(),
 			      const_cast <char *> (attributesDescriptions.c_str()), 
 			      numberOfAttributes,  
 			      const_cast <char *> (groupsNames.c_str()), 

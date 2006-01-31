@@ -35,7 +35,7 @@ VPATH=.:$(srcdir)
 EXPORT_HEADERS = \
 	libMEDMEM_Swig.i \
 	my_typemap.i \
- 	MEDMEM_SWIG_Templates.hxx 
+	MEDMEM_SWIG_Templates.hxx 
 # 	MEDMEM_SWIG_MedFieldDoubleDriver.hxx \
 # 	MEDMEM_SWIG_MedFieldIntDriver.hxx \
 # 	MEDMEM_SWIG_AsciiFieldDoubleDriver.hxx \
@@ -81,6 +81,7 @@ EXPORT_PYSCRIPTS = libMEDMEM_Swig.py \
 		   med_opsupp_test.py \
 		   test_gibi.py \
 		   test_porflow.py \
+		   testDriverAscii.py \
 		   testMedMemGeneral.py
 
 #############################################################################
