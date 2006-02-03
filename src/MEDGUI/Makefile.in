@@ -58,8 +58,7 @@ LIB_SERVER_IDL =
 
 # additionnal information to compil and link file
 
-CPPFLAGS += $(QT_INCLUDES) $(VTK_INCLUDES) $(OCC_INCLUDES) $(PYTHON_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome -I${GUI_ROOT_DIR}/include/salome -I${BOOSTDIR}
-LDFLAGS += -lSalomeApp -lMEDMEMImpl -lmedmem -lMEDEngine -I${KERNEL_ROOT_DIR}/include/salome -I${GUI_ROOT_DIR}/include/salome -I${BOOSTDIR}
+CPPFLAGS += $(QT_INCLUDES) $(VTK_INCLUDES) $(OCC_INCLUDES) $(PYTHON_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome -I${GUI_ROOT_DIR}/include/salome ${BOOST_CPPFLAGS}
 
 LDFLAGS += -lSalomeApp -lMEDMEMImpl -lmedmem -lMEDEngine -L${KERNEL_ROOT_DIR}/lib/salome -L${GUI_ROOT_DIR}/lib/salome
 
