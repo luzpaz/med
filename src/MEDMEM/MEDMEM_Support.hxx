@@ -96,7 +96,8 @@ protected:
 
   /*!
     \if developper
-    If true, we consider all entities of type _entity.
+    If true, we consider all entities of type _entity
+    defined in the associated mesh
     \endif
   */
   bool                     _isOnAllElts;
@@ -127,7 +128,21 @@ protected:
   */
   mutable MEDSKYLINEARRAY * _number;
 
+  /*!
+    \if developper
+    Array of size <_numberOfGeometricType> wich contain the profil name of 
+    entities of each geometric type.\n
+    Defined only if _isOnAllElts is false.
+    If it exist an entities list on a geometric type in _number but there is no profil name associated
+    ( MED_NOPFL ) the MED driver will consider and verify this entities list as being all the
+    entities available on the associated mesh for this geometric type.
+    \endif
+  */
+
+  vector< string > _profilNames;
+
 public:
+
   SUPPORT();
   SUPPORT(MESH* Mesh, string Name="", MED_EN::medEntityMesh Entity=MED_EN::MED_CELL);
   SUPPORT(const SUPPORT & m);
@@ -167,19 +182,26 @@ public:
   inline int          getNumberOfGaussPoint(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
   inline int    getNumberOfElements(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
   inline  const int * getNumberOfElements() const throw (MEDEXCEPTION);
-  // rename getnumber -> getGlobalNumberSky()
   virtual inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
-  // rename getNumber -> getGlobalNumberPtr()
   virtual inline const int *  getNumber(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
-  // rename in getGlobalNumberInd()
   virtual inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
   virtual int getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION);
 
   void blending(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
 
+  // Les numéros d'entités dans les profils doivent être croissant
+  // pour respecter la norme MED
   void setpartial(string Description, int NumberOfGeometricType,
 		  int TotalNumberOfEntity, MED_EN::medGeometryElement *GeometricType,
 		  int *NumberOfEntity, int *NumberValue);
+
+  void setpartial(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
+
+  // Si les noms de profils ne sont pas positionnés, les profils ne seront
+  // pas écrits par MEDFICHIER.
+  void   setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION);
+  //string getProfilName(const MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+  vector<string> getProfilNames() const throw (MEDEXCEPTION);
 
   void getBoundaryElements() throw (MEDEXCEPTION);
   void changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumberingFromOldToNew, int limitNbClassicPoly, const int *renumberingFromOldToNewPoly=0);
@@ -354,7 +376,13 @@ inline void SUPPORT::setMeshName(const string & meshName)
   _meshName=meshName;
 }
 
-/*! set the attribute _isOnAllElts to All */
+/*! set the attribute _isOnAllElts to All
+  Even if _isonAllElts is true, geometric types definning the FIELD's SUPPORT
+  must be read from the SUPPORT not from the associated MESH (the geometric
+  types definning the FIELD's SUPPORT may be a subset of the geometric types
+  defined in the MESH even if for each SUPPORT geometric type all MESH entities
+  are used).
+*/
 //------------------------------------------
 inline void SUPPORT::setAll(bool All)
 //------------------------------------------

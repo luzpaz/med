@@ -5,7 +5,9 @@
 #include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_ArrayConvert.hxx"
 
+
 namespace MEDMEM {
+class FIELD_;
 
 template <class T> FIELD<T,FullInterlace> *
 FieldConvert(const FIELD<T,NoInterlace> & field )

@@ -210,7 +210,7 @@ void SUPPORT::update()
 
       SCRUTE(_name);
       SCRUTE(_numberOfGeometricType);
-      SCRUTE(_numberOfGaussPoint);
+      // SCRUTE(_numberOfGaussPoint); c'est un pointeur
     }
   END_OF(LOC);
 };
@@ -243,11 +243,14 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
     else
       iThis++;
 
+  //if (!_isOnAllElts)
+  cout << "----Contenu du skyline : ---------------------" << *_number << endl;
+
   if(!found)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find the global number |"
 				 << number << "| in Support |"
 				 << getName() << "|" ));
-
+ 
   // It should never arrive here !!
   return 0;
 
@@ -352,6 +355,98 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   delete[] index ;
 
   END_OF(LOC);
+};
+
+
+/*!
+    This function allows the user to set a support not on all entities Entity,
+    it should be used after an initialisation with the constructor
+    SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL) and
+    after calling  setNumberOfGeometricType, setGeometricType
+    It allocates and initialises all the attributs of the class SUPPORT but
+    doesn't set a description.
+ */
+
+//-------------------
+void SUPPORT::setpartial(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDEXCEPTION)
+//-------------------
+{
+  const char * LOC = "SUPPORT::setpartial(MEDSKYLINEARRAY * number) : " ;
+  BEGIN_OF(LOC) ;
+
+
+  if ( _numberOfGeometricType != number->getNumberOf() )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"SUPPORT number of geometric type differs"
+				 << " from MEDSKYLINEARRAY numberOf" )) ;
+
+  if ( ! _geometricType )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"SUPPORT must contains"
+				 << " a geometric type list" )) ;
+
+  // Eventuellement désactiver ce test en fonction des cas d'utilisations du SUPPORT
+  for (int i=0; i< _numberOfGeometricType; i++)
+    if ( _numberOfElements[i] !=  number->getNumberOfI(i+1) )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"SUPPORT number of elements of type |" << MED_EN::geoNames[_geometricType[i]]
+				   << "| : " << _numberOfElements[i] << " differs from MEDSKYLINEARRAY number of : "
+				   << number->getNumberOfI(i+1) )) ;
+
+  if ( _totalNumberOfElements != number->getLength() )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"SUPPORT total number of elements : " 
+				   << _totalNumberOfElements << " differs from MEDSKYLINEARRAY length : "
+				   << number->getLength() )) ;
+
+
+  _isOnAllElts = false ;
+
+  if (_number!=NULL) delete _number ;
+
+  if ( shallowCopy )
+    _number = number;
+  else
+    _number = new MEDSKYLINEARRAY(*number);
+
+  // cout << *_number << endl;
+
+  END_OF(LOC);
+};
+
+void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
+
+  const char * LOC = "SUPPORT::setProfilNames(vector<string> profilNames) : " ;
+  BEGIN_OF(LOC) ;
+
+  if ( _isOnAllElts )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"SUPPORT shouldn't be on all elements"
+				 << " while setting profil name list" )) ;
+
+  if ( ! _geometricType || _numberOfGeometricType==0 )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"SUPPORT must contains"
+				 << " a least one geometric type" )) ;
+
+  if ( ! _number )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"SUPPORT must contains"
+				 << " a profil number list before setting"
+				 << " the associated profil name list" )) ;
+
+  if ( ( profilNames.size() != _number->getNumberOf() ) &&
+       ( profilNames.size() !=_numberOfGeometricType ) ) {
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The profil name list size : "<< profilNames.size()
+				 << " must be equal to the number of geometric type : " 
+				 <<  _numberOfGeometricType << " (_number->getNumberOf() : "
+				 << _number->getNumberOf() << " )"
+				 )) ;
+
+  }
+
+  _profilNames = profilNames;
+
+  END_OF(LOC);
+
+};
+
+vector<string> SUPPORT::getProfilNames() const throw (MEDEXCEPTION)
+{
+  return _profilNames;
 };
 
 
