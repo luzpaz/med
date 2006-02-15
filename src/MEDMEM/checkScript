@@ -1,0 +1,45 @@
+./test_MEDMEM_nArray >   Essai1
+./test_copie_fieldT pointe.med maa1 fieldnodeint >   Essai2
+./med_test pointe.med maa1 fieldnodeint    >   Essai3
+./med_test pointe.med maa1 fieldnodedouble >   Essai4
+./test_copie_fieldT pointe.med maa1 fieldnodeint     >   Essai5
+./test_copie_fieldT pointe.med maa1 fieldnodedouble  >   Essai6
+./test_MEDMEM_Array        >   Essai7
+./test_MEDMEM_CellModel    >   Essai8
+./test_MEDMEM_Meshing   Essai9
+h5dump Essai9.med > Essai9.log && rm Essai9.med
+./test_MEDMEM_ModulusArray  >   Essai10
+./test_MEDMEM_SkyLineArray  >   Essai12
+./test_operation_fielddouble pointe.med maa1 fieldnodedouble     >   Essai13
+./test_operation_fielddouble pointe.med maa1 fieldcelldouble     >   Essai14
+./test_operation_fieldint pointe.med maa1 fieldnodeint     >   Essai15
+./test_operation_fieldint pointe.med maa1 fieldcellint     >   Essai16
+#./test_porflow_driver   Essai17
+./testUArray        >   Essai18
+./testUCellModel    >   Essai19
+./testUCoordinate    >   Essai20
+./testUGeoNameMeshEntities >   Essai21
+./testUMedException        >   Essai22
+./testUModulusArray        >   Essai23
+./test_affect_medarray     >   Essai24
+./test_copie_connectivity pointe.med maa1  >   Essai25
+./test_copie_coordinate pointe.med maa1    >   Essai26
+./test_copie_family pointe.med maa1        >   Essai27
+./test_copie_field_ pointe.med maa1 fieldnodedouble  >   Essai28
+./test_copie_group pointe.med maa1    >   Essai29
+./test_copie_medarray pointe.med maa1 >   Essai30
+./test_copie_mesh pointe.med maa1     >   Essai31
+./test_copie_support pointe.med maa1  >   Essai32
+#./test_gibi_driver pointe.med maa1    >   Essai33
+./duplicateMED pointe.med   Essai34
+rm -f Copy_nomesh_zzzz121b_without_tr6.med Copy_withmesh_zzzz121b_without_tr6.med &&  ./test_profil_MedFieldDriver zzzz121b_without_tr6.med RESUZEROERRE_ELGA_NORE__________ 1 1 > ESSAI35
+# Le fichier suivant ne peut pas passer en mode 2
+# en MODE 1 il faut débrayer la génération du fichier Copy_withmesh_maill.00.med et utiliser
+# celui fourni.
+# MODE 2: Le problème est qu'à la lecture du fichier (qui contient SEG2 TRIA3 et QUAD4)  le driver mesh crée de nouveaux SEG2 or
+# le champ qui a été chargé au préalable a pris le maillage contenu dans le fichier comme référence du coup à la réécriture des numéros
+# de profils il décale d'un nombre d'entités cumulées trop important. 
+#mode 1 avec modif du fichier test
+#cp maill.00_nofield.med.h5 Copy_withmesh_maill.00.med;./test_profil_MedFieldDriver maill.00.med Indicateur_d_erreur_00 2 2
+#mode 3 en activant uniquement le mode 3
+##rm -f Copy_withmesh_maill.00.med Copy_nomesh_maill.00.med && cp maill.00_nofield.med Copy_withmesh_maill.00.med;cp maill.00_nomesh.med Copy_nomesh_maill.00.med;./test_profil_MedFieldDriver maill.00.med Indicateur_d_erreur_00 2 2
