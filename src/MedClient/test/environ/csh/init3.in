@@ -1,2 +1,0 @@
-cd ${KERNEL_ROOT_DIR}/bin
-csh
