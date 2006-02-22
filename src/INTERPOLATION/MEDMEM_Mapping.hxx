@@ -41,11 +41,11 @@ protected :
 	vector<int> point_le_plus_proche;
 	
 public :
-	
 	Mapping():maillage_back(NULL),mailles_back(NULL),noeuds_back(NULL),noeuds_front(NULL),CB(NULL),my_dTree(NULL) {}
 	Mapping(MAILLAGE * mb,NUAGENOEUD * nb,NUAGENOEUD * nf); // le dTree est crée à l'initialisation, par contre, le mapping lui meme doit etre invoqué
 	~Mapping() {if (CB) delete CB;if (my_dTree) delete my_dTree;}
         dTree<NOEUD,NUAGENOEUD,DIMENSION> * Donne_dTree() {return my_dTree;}
+	enum { INTERIEUR = 1, EXTERIEUR_AU_MILIEU = -1, EXTERIEUR_AU_BORD = -2 };
 	int Donne_Directions(int num_maille,const NOEUD &n,int etat_face[NBR_FACES_MAX]);
 	// Méthode interne de localisation
 	int Trouve_Maille_Contenant_Point_Mth_Co(const NOEUD &n,int num_maille,int num_maille_interdit,int max_loop,int &nbr_mailles_examinees,int flag_convexe);
@@ -170,21 +170,21 @@ _TEMPLATE_ int _MAPPING_::Donne_Directions(int num_maille,const NOEUD &n,int eta
 		tf=(ef[i]<0);
 		tv=(maillage_back->DONNE_VOISIN_DE_MAILLE(num_maille,i)==UNDEFINED);
 		tb=(maillage_back->EST_AU_BORD_FACE_DE_MAILLE(num_maille,i));
-		if (tf) 
+		if (tf) // extérieur
 			{
 			etat_int=FAUX;
 			if (tb) etat_ext_bord=VRAI;
 			}
-		if (tv) etat_face[i]=-1;
+		if (tv) etat_face[i]=-1; // ya pas de voisin
 		else
 			{
 			if (tf) etat_face[i]=1;
 			else etat_face[i]=0;
 			}
 		}
-	if (etat_int) return 1;
-	if (etat_ext_bord) return -2;
-	return -1;
+	if (etat_int) return INTERIEUR;
+	if (etat_ext_bord) return EXTERIEUR_AU_BORD;
+	return EXTERIEUR_AU_MILIEU;
 	}
 _TEMPLATE_ int _MAPPING_::Trouve_Maille_Contenant_Point_Mth_Co(const NOEUD &n,int num_maille,int num_maille_interdit,int max_loop,int &nbr_mailles_examinees,int flag_convexe)
 	{
@@ -200,17 +200,27 @@ _TEMPLATE_ int _MAPPING_::Trouve_Maille_Contenant_Point_Mth_Co(const NOEUD &n,in
 	
 	int nbr_faces=maillage_back->DONNE_NBR_FACES_MAILLE(num_maille);
 	
-	for (i=0;i<nbr_faces;i++) indirection[i]=i;
+	if ( test != INTERIEUR ) { // EAP, for PAL11458
+          // check neighbors
+          int etat_face_for_check[NBR_FACES_MAX];
+          for (i=0;i<nbr_faces;i++) {
+            int num_neighbor=maillage_back->DONNE_VOISIN_DE_MAILLE(num_maille,i);
+            if ( num_neighbor != UNDEFINED &&
+                 Donne_Directions(num_neighbor,n,etat_face_for_check) == INTERIEUR )
+              return num_neighbor;
+            indirection[i]=i;
+          }
+	}
 	
 	nbr_mailles_examinees=0;
 	
 	while (nbr_mailles_examinees<max_loop)
 		{
-		if (test==1) 
+		if (test==INTERIEUR) 
 			{
 			return num_maille;
 			}
-		if ((test==-2)&&(flag_convexe)) 
+		if ((test==EXTERIEUR_AU_BORD)&&(flag_convexe)) 
 			{
 			return 2*UNDEFINED;
 			}
