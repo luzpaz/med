@@ -20,9 +20,11 @@
 #ifndef __MEDMEM_RCBASE_HXX__
 #define __MEDMEM_RCBASE_HXX__
 
+#include "MEDMEM.hxx"
+
 namespace MEDMEM {
   
-  class RCBASE {
+  class MEDMEM_EXPORT RCBASE {
   public:
     virtual void addReference() const = 0;
     virtual void removeReference() const = 0;

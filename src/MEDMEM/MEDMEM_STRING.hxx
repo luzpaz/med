@@ -20,6 +20,8 @@
 # ifndef MEDMEM_STRING_HXX
 # define MEDMEM_STRING_HXX
 
+#include "MEDMEM.hxx"
+
 using namespace std;
 
 # include <string>
@@ -34,7 +36,7 @@ using namespace std;
       throw SALOME_EXCEPTION (LOCALIZED(msgErr)) ;
 								*/
 namespace MEDMEM {
-  class STRING : public string
+  class MEDMEM_EXPORT STRING : public string
   {
 
   private :

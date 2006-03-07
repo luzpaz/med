@@ -588,7 +588,7 @@ throw (SALOME::SALOME_Exception)
 	{
 		_fieldTptr->write(i,driverFieldName);
         }
-        catch (MEDEXCEPTION &ex)
+        catch (MEDEXCEPTION &)
         {
 		MESSAGE("Exception en accedant au champ");
                 THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\

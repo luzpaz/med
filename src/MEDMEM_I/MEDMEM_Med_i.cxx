@@ -807,7 +807,7 @@ throw (SALOME::SALOME_Exception)
         int ind=fieldPtr->getCorbaIndex();
         SCRUTE(ind);
 
-	MESH * mesh;
+	MESH * mesh = 0;
 	SALOME_MED::FIELDINT_var fieldint =SALOME_MED::FIELDINT::_narrow(fieldPtr);
         if (CORBA::is_nil(fieldint))
         {

@@ -27,7 +27,7 @@ namespace med_2_1{
 med_err
 MEDprofilEcr(med_idt fid,med_int *pflval,med_int n,char *nom)
 {
-  med_idt root, pid, did;
+  med_idt root, pid;
   med_size dimd[1];
   med_err ret;
   char chemin[MED_TAILLE_PROFILS+1];

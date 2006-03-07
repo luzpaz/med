@@ -51,7 +51,7 @@ template <class T> class MED_FIELD_DRIVER22 : public virtual MED_FIELD_DRIVER<T>
 {
 protected:
   
-  med_2_2::med_idt        _medIdt;
+med_2_2::med_idt        _medIdt;
  
   bool createFieldSupport(med_2_2::med_idt id,
 			  string & fieldName,

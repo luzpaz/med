@@ -20,6 +20,8 @@
 #ifndef __MEDMODULUSARRAY_H__
 #define __MEDMODULUSARRAY_H__
 
+#include "MEDMEM.hxx"
+
 #include "MEDMEM_Utilities.hxx"
 
 /*
@@ -31,7 +33,7 @@
 */
 
 namespace MEDMEM {
-class MEDMODULUSARRAY {
+class MEDMEM_EXPORT MEDMODULUSARRAY {
 private:
   int   _length ;
   const int * _array ;

@@ -115,14 +115,18 @@ std::ostream& MEDMEM::operator << (std::ostream& os, const _groupe& gr)
     os << "--- Groupe " << gr.nom << " --- " << std::endl ;
     os << " -> liste des sous-groupes : ";
     for( std::vector<int>::const_iterator i=gr.groupes.begin(); i!=gr.groupes.end(); ++i)
-	os << *i << " ";
+	    os << *i << " ";
+    
     os << std::endl << " -> liste des "<< gr.mailles.size() << " mailles : " << std::endl;
-    _groupe::mailleIter i=gr.mailles.begin();
+    
+    _groupe::mailleIter i1=gr.mailles.begin();
     int l;
-    for(l = 0; l < DUMP_LINES_LIMIT && i!=gr.mailles.end(); i++, l++)
-	os << setw(3) << l+1 << " " << *(*i) << std::endl;
+    for(l = 0; l < DUMP_LINES_LIMIT && i1!=gr.mailles.end(); i++, l++)
+	    os << setw(3) << l+1 << " " << *(*i1) << std::endl;
+    
     if ( l == DUMP_LINES_LIMIT )
       os << "   ... skip " << gr.mailles.size() - l << " mailles" << endl;
+    
     os << " relocMap, size=" << gr.relocMap.size() << endl;
     map<const _maille*,int>::const_iterator it = gr.relocMap.begin();
     for ( l = 0; l < DUMP_LINES_LIMIT && it != gr.relocMap.end(); ++it, ++l )
@@ -220,7 +224,7 @@ void _intermediateMED::treatGroupes()
     j = grp.groupes.begin();
     while( j!=grp.groupes.end() ) {
       int grpInd = *j-1;
-      if ( grpInd < 0 || grpInd >= groupes.size() ) {
+      if ( grpInd < 0 || grpInd >= (int)groupes.size() ) {
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad subgroup index: " << grpInd <<
                                      ", in " << i << " groupe.nom=" << grp.nom));
       }
@@ -229,7 +233,7 @@ void _intermediateMED::treatGroupes()
         MESSAGE("High hierarchical depth of subgroups in group " << i );
         *j = sub_grp.groupes[0]; // replace j with its 1st subgroup
         // push back the rest subs
-        for ( int k = 1; k < sub_grp.groupes.size(); ++k )
+        for ( int k = 1; k < (int)sub_grp.groupes.size(); ++k )
           grp.groupes.push_back( sub_grp.groupes[ k ]);
         // vector maybe is reallocated: restart iterator
         j = grp.groupes.begin();
@@ -625,7 +629,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
               field->getGroupIds( sub_grps, false );
             }
           }
-          if ( i > *sub_grps.begin() ) { // roll back
+          if ( (int)i > *sub_grps.begin() ) { // roll back
             support_groups.erase( i );
             support_groups.insert( sub_grps.begin(), sub_grps.end() ); 
             i = *sub_grps.begin() - 1;
@@ -890,7 +894,7 @@ void _intermediateMED::getFamilies(std::vector<FAMILY *> & _famCell,
 
 GROUP * _intermediateMED::getGroup( int i )
 {
-  if ( i < medGroupes.size() )
+  if ( i <(int) medGroupes.size() )
     return medGroupes[ i ];
   throw MEDEXCEPTION
     (LOCALIZED(STRING("_intermediateMED::getGroup(): WRONG GROUP INDEX: ")

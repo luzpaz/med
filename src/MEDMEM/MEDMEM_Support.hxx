@@ -25,6 +25,8 @@
 #ifndef SUPPORT_HXX
 #define SUPPORT_HXX
 
+#include <MEDMEM.hxx>
+
 #include <list>
 #include <vector>
 #include <string>
@@ -50,7 +52,7 @@ namespace MEDMEM {
 
   class MESH;
 
-class SUPPORT : public RCBASE
+class MEDMEM_EXPORT SUPPORT : public RCBASE
 {
 protected:
   /*!
@@ -405,7 +407,7 @@ inline void SUPPORT::setNumberOfGeometricType(int NumberOfGeometricType)
 inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *GeometricType)
 //---------------------------------------------------------------------
 {
-  if (NULL == _geometricType)
+  if (!_geometricType)
     _geometricType.set(_numberOfGeometricType);
   for (int i=0;i<_numberOfGeometricType;i++)
     _geometricType[i] = GeometricType[i];
@@ -416,7 +418,7 @@ inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *Geometri
 inline void SUPPORT::setNumberOfGaussPoint(const int *NumberOfGaussPoint)
 //-----------------------------------------------------------------
 {
-  if (NULL == _numberOfGaussPoint)
+  if (!_numberOfGaussPoint)
     _numberOfGaussPoint.set(_numberOfGeometricType);
   for (int i=0;i<_numberOfGeometricType;i++)
     _numberOfGaussPoint[i] = NumberOfGaussPoint[i];
@@ -430,7 +432,7 @@ inline void SUPPORT::setNumberOfGaussPoint(const int *NumberOfGaussPoint)
 inline void SUPPORT::setNumberOfElements(const int *NumberOfElements)
 //----------------------------------------------------------
 {
-  if (NULL == _numberOfElements)
+  if (!_numberOfElements)
     _numberOfElements.set(_numberOfGeometricType,NumberOfElements);
   _totalNumberOfElements = 0 ;
   for (int i=0;i<_numberOfGeometricType;i++)

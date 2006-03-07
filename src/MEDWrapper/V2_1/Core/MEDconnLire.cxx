@@ -42,7 +42,7 @@ MEDconnLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_sw
   int dim,nnoe,ndes;
   int nsup = 0;
   int taille;  
-  int i,j;
+  int i;
   
   /*
    * On inhibe le gestionnaire d'erreur HDF 5
@@ -104,7 +104,7 @@ MEDconnLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_sw
        taille = nsup + ndes;
        if ( psizetmp != MED_NOPF ) {  
 	 psize = psizetmp;
-	 pfltab = (med_ssize *) malloc (sizeof(med_ssize)*psize);
+	 pfltab = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
 	 for (i=0;i<psizetmp;i++)
 	   pfltab[i] = (med_ssize) (pfltabtmp[i]);
        };

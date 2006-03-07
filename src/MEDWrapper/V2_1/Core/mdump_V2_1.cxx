@@ -258,8 +258,8 @@ int main (int argc, char **argv)
   char version_hdf[10];
   char version_med[10];
   med_int nmaa,mdim,nnoe;
-  med_int nmai[MED_NBR_GEOMETRIE_MAILLE],nfac[MED_NBR_GEOMETRIE_FACE];
-  med_int nare[MED_NBR_GEOMETRIE_ARETE];
+  //med_int nmai[MED_NBR_GEOMETRIE_MAILLE],nfac[MED_NBR_GEOMETRIE_FACE];
+  //med_int nare[MED_NBR_GEOMETRIE_ARETE];
   /* nom du maillage */
   char nommaa[MED_TAILLE_NOM+1];
   /* noeuds */
@@ -945,7 +945,7 @@ int main (int argc, char **argv)
 	    /* affichage des resultats */
 	    if (ret == 0)
 	      {
-		fprintf(stdout,"\n- Aretes de type %d : ", nomare[i]);
+		fprintf(stdout,"\n- Aretes de type %s : ", nomare[i]);
 		fprintf(stdout,"\n  - Connectivité : \n");
 		for (j=0;j<naretes[i]*taille;j++)
 		  fprintf(stdout," %d ",*(connectivite+j));

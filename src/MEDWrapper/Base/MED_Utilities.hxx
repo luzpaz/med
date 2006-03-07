@@ -29,15 +29,16 @@
 #ifndef MED_Utilities_HeaderFile
 #define MED_Utilities_HeaderFile
 
+#include "MED_WrapperBase.hxx"
+
 #include <iostream>	
 #include <sstream>	
 #include <string>
 #include <stdexcept>
 
-
 namespace MED{
   using namespace std;
-  class PrefixPrinter{
+  class  MEDWRAPPER_EXPORT PrefixPrinter{
     static int myCounter;
     bool myIsActive;
   public:

@@ -34,7 +34,7 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <string.h>
-#include <fstream.h>
+#include <fstream>
 
 #define PRECISION_IN_ASCII_FILE 10
 #define PRECISION_IN_COMPARE 1e-10

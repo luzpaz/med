@@ -495,7 +495,7 @@ throw (SALOME::SALOME_Exception)
         {
                 (const_cast< ::SUPPORT *>(_support))->getBoundaryElements();
         }
-        catch (MEDEXCEPTION &ex)
+        catch (MEDEXCEPTION &)
         {
                 MESSAGE("Unable to access elements");
                 THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\

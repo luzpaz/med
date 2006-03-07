@@ -135,13 +135,13 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
       /*Initialisation des indices de boucle du traitement de l'entrelacement en fonction de la dimension fixee*/
       if ( fixdim != MED_ALL) 
 	{ 
-	  firstdim = fixdim-1;
-	  lastdim  = fixdim;
+	  firstdim = (int)fixdim-1;
+	  lastdim  = (int)fixdim;
 	  dimutil  = 1;
 	} else	{
 	  firstdim = 0;
-	  lastdim = nbdim;
-	  dimutil  = nbdim; 
+	  lastdim = (int)nbdim;
+	  dimutil  = (int)nbdim; 
 	}
 
       count [0] = (*size)/(nbdim);
@@ -181,8 +181,8 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	pflmem     = (med_size *) malloc (sizeof(med_size)*pcount[0]);
 	pfldsk     = (med_size *) malloc (sizeof(med_size)*pcount[0]);
 #else
-	pflmem     = (med_ssize *) malloc (sizeof(med_ssize)*pcount[0]);
-	pfldsk     = (med_ssize *) malloc (sizeof(med_ssize)*pcount[0]);
+	pflmem     = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)pcount[0]);
+	pfldsk     = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)pcount[0]);
 #endif
 	
 	switch(pflmod)
@@ -197,7 +197,7 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	      
 	      for (i=0; i < psize; i++)              /* i balaye les élements du profil */
 		for (j=0; j < ngauss; j++) {         
-		  index = i*ngauss+j + (dim-firstdim)*(psize*ngauss);
+		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
 		  pflmem[index] = (pfltab[i]-1)*ngauss*nbdim + j*nbdim+dim;
 		  pfldsk[index] = dim*count[0] + (pfltab[i]-1)*ngauss+j;	     
 		}
@@ -210,10 +210,10 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pfldsk ) ) <0) 
 	      return -1; 
 #else
-	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hssize_t **) pflmem ) ) <0) 
+	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pflmem ) ) <0) 
 	      return -1; 
 	    
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hssize_t **) pfldsk ) ) <0) 
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
 	      return -1; 
 #endif
 	    
@@ -232,7 +232,7 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	      
 	      for (i=0; i < psize; i++)              /* i balaye les élements du profil */
 		for (j=0; j < ngauss; j++) {         
-		  index = i*ngauss+j + (dim-firstdim)*(psize*ngauss);
+		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
 		  pflmem[index] = i*ngauss*nbdim + j*nbdim+dim;
 		  pfldsk[index] = dim*count[0] + (pfltab[i]-1)*ngauss+j;	     
 		}	      
@@ -245,10 +245,10 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pfldsk ) ) <0) 
 	      return -1; 
 #else
-	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hssize_t **) pflmem ) ) <0) 
+	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pflmem ) ) <0) 
 	      return -1; 
 	    
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hssize_t **) pfldsk ) ) <0) 
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
 	      return -1; 
 #endif
 	    
@@ -294,13 +294,13 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 
 	if ( fixdim != MED_ALL) 
 	  { 
-	    firstdim = fixdim-1;
-	    lastdim  = fixdim;
+	    firstdim = (int)fixdim-1;
+	    lastdim  = (int)fixdim;
 	    dimutil  = 1;
 	  } else	{
 	    firstdim = 0;
-	    lastdim  = nbdim;
-	    dimutil  = nbdim; 
+	    lastdim  = (int)nbdim;
+	    dimutil  = (int)nbdim; 
 	  }
 
 	pflsize [0] = psize*ngauss*nbdim;	
@@ -308,7 +308,7 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 #ifdef HDF_NEW_API
 	pfldsk      = (med_size *) malloc(sizeof(med_size)*pcount[0]);
 #else
-	pfldsk      = (med_ssize *) malloc(sizeof(med_ssize)*pcount[0]);
+	pfldsk      = (med_ssize *) malloc(sizeof(med_ssize)*(size_t)pcount[0]);
 #endif
 	
 	switch(pflmod)
@@ -319,7 +319,7 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	      
 	      for (i=0; i < psize; i++)              /* i balaye le nbre d'élements du profil                */
 		for (j=0; j < ngauss; j++) { 
-		  index = i*ngauss+j + (dim-firstdim)*(psize*ngauss);
+		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
 		  pfldsk[index] = dim*count[0]+(pfltab[i]-1)*ngauss+j;	    
 		}
 	    }
@@ -328,7 +328,7 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t **) pfldsk ) ) <0) 
 	      return -1;
 #else
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hssize_t **) pfldsk ) ) <0) 
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,(size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
 	      return -1;
 #endif
 	    
@@ -349,7 +349,7 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 #ifdef HDF_NEW_API
 	    pflmem     = (med_size *) malloc (sizeof(med_size)*pcount[0]);
 #else
-	    pflmem     = (med_ssize *) malloc (sizeof(med_ssize)*pcount[0]);
+	    pflmem     = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)pcount[0]);
 #endif
 	    
 	    /* Le profil COMPACT est contigüe, mais il est possible que l'on selectionne uniquemenent une dimension*/
@@ -358,7 +358,7 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	      
 	      for (i=0; i < psize; i++)              /* i balaye le nbre d'élements du profil                */
 		for (j=0; j < ngauss; j++) {
-		  index = i*ngauss+j + (dim-firstdim)*(psize*ngauss);
+		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
 	          pflmem[index] = dim*(psize*ngauss) + (pfltab[i]-1)*ngauss+j;
 		  pfldsk[index] = dim*count[0]  + (pfltab[i]-1)*ngauss+j;	    
 		}
@@ -371,10 +371,10 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t **) pfldsk ) ) <0) 
 	      return -1;	  
 #else
-	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hssize_t **) pflmem ) ) <0) 
+	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pflmem ) ) <0) 
 	      return -1; 
 	    
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hssize_t **) pfldsk ) ) <0) 
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,(size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
 	      return -1;	  
 #endif
 	    

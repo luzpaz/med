@@ -25,6 +25,8 @@
 #ifndef FIELD_HXX
 #define FIELD_HXX
 
+#include <MEDMEM.hxx>
+
 #include <vector>
 #include <algorithm>
 #include <math.h>
@@ -65,7 +67,7 @@ namespace MEDMEM {
   template < > struct SET_INTERLACING_TYPE<NoInterlace> {
     static const MED_EN::medModeSwitch _interlacingType = MED_EN::MED_NO_INTERLACE; };
 
-class FIELD_    // GENERIC POINTER TO a template <class T, class INTERLACING_TAG> class FIELD
+class MEDMEM_EXPORT FIELD_    // GENERIC POINTER TO a template <class T, class INTERLACING_TAG> class FIELD
 {  // ÃÂ¹pihjpmoÃÂ§hmpÃÂ§_hmÃÂ¹
 protected:
 
@@ -845,7 +847,11 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
     // becarefull about the numbre of gauss point
     _numberOfValues = Support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   }
+#ifdef _DEBUG_
   catch (MEDEXCEPTION &ex) {
+#else
+  catch (MEDEXCEPTION ) {
+#endif
     MESSAGE("No value defined ! ("<<ex.what()<<")");
   }
   MESSAGE("FIELD : constructeur : "<< _numberOfValues <<" et "<< NumberOfComponents);

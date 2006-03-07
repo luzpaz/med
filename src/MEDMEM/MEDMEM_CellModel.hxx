@@ -25,6 +25,8 @@
 #ifndef CELLMODEL_HXX
 #define CELLMODEL_HXX
 
+#include <MEDMEM.hxx>
+
 #include <set>
 #include <map>
 #include <string>
@@ -42,8 +44,9 @@ using namespace std ;
   the cell model it describes as cell dimensions, number of nodes...
 */
 
+
 namespace MEDMEM {
-class CELLMODEL 
+class MEDMEM_EXPORT CELLMODEL 
 {
 
 private:

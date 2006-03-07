@@ -17,8 +17,10 @@
 //
 // See http://www.salome-platform.org/
 //
-using namespace std;
 #include "MEDMEM_PolyhedronArray.hxx"
+
+using namespace std;
+
 using namespace MEDMEM;
 using MED_EN::med_int;
 

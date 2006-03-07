@@ -104,8 +104,8 @@ MEDchampLire(med_idt fid,char *maa, char *cha, unsigned char *val,med_mode_switc
       else
 	psize = i;
 
-      pfltabtmp = (med_int *)   malloc (sizeof(med_int)*psize);
-      pfltab = (med_ssize *) malloc (sizeof(med_ssize)*psize);
+      pfltabtmp = (med_int *)   malloc (sizeof(med_int)*(size_t)psize);
+      pfltab = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
       if ((ret = MEDprofilLire(fid,pfltabtmp,profil)) < 0)
 	return -1;
       for (i=0;i<psize;i++)

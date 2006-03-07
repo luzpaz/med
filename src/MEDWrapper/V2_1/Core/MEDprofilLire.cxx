@@ -28,7 +28,7 @@ med_err
 MEDprofilLire(med_idt fid,med_int *pflval, char *nom)
 {
   med_err ret = 0;
-  med_idt pid,did;
+  med_idt pid;
   char chemin[MED_TAILLE_PROFILS+MED_TAILLE_NOM+1]; 
 
   /*

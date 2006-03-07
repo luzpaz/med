@@ -721,7 +721,9 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
   BEGIN_OF(LOC);
 
   int index = 0;
-  for (map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator const_itSupportOnMesh=_support.begin(); const_itSupportOnMesh != _support.end();
+  map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator const_itSupportOnMesh;
+
+  for (const_itSupportOnMesh=_support.begin(); const_itSupportOnMesh != _support.end();
        const_itSupportOnMesh++ )
     {
       map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator const_itSupport ;
@@ -731,7 +733,7 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
 
   MESSAGE(LOC << "In this MED object there is(are) " << index << " support(s):");
 
-  for (map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator const_itSupportOnMesh=_support.begin();const_itSupportOnMesh != _support.end(); const_itSupportOnMesh++ )
+  for (const_itSupportOnMesh=_support.begin();const_itSupportOnMesh != _support.end(); const_itSupportOnMesh++ )
     {
       map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator const_itSupport ;
       for (const_itSupport=(*const_itSupportOnMesh).second.begin();
@@ -741,8 +743,7 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
 	}
   }
 
-
-  map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator const_itSupportOnMesh = _support.find(meshName) ;
+  const_itSupportOnMesh = _support.find(meshName) ;
   
   if ( const_itSupportOnMesh == _support.end() )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -795,7 +796,11 @@ void MED::updateSupport ()
       try {
 	(*itSupport).second->update() ;
       }
+#ifdef _DEBUG_
       catch (MEDEXCEPTION & ex) {
+#else 
+      catch (MEDEXCEPTION & ) {
+#endif
 	// entity not defined in mesh -> we remove support on it !
 	MESSAGE(LOC<<ex.what());
 	delete (*itSupport).second ;

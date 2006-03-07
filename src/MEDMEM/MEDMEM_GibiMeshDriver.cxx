@@ -71,7 +71,7 @@ using namespace MEDMEM;
 // Every memory allocation made in the MedDriver members function are desallocated in the Mesh destructor
 
 /////
-const size_t GIBI_MESH_DRIVER::nb_geometrie_gibi;
+//const size_t GIBI_MESH_DRIVER::nb_geometrie_gibi;
 
 const medGeometryElement GIBI_MESH_DRIVER::geomGIBItoMED[nb_geometrie_gibi] =
      {   /*1 */ MED_POINT1 ,/*2 */ MED_SEG2   ,/*3 */ MED_SEG3   ,/*4 */ MED_TRIA3  ,/*5 */ MED_NONE   ,
@@ -132,7 +132,7 @@ static int getGroupId(const vector<int>& support_ids, _intermediateMED*  medi)
     set<int> sup_set;
     sup_set.insert( sb, se );
 
-    for ( group_id = 0; group_id < medi->groupes.size(); ++group_id )
+    for ( group_id = 0; group_id < (int)medi->groupes.size(); ++group_id )
     {
       if (sup_set.size() == medi->groupes[ group_id ].groupes.size() &&
           std::equal (sup_set.begin(), sup_set.end(),
@@ -318,11 +318,11 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
               std::sort( groupe.groupes.begin(), groupe.groupes.end() );
           }
           // lecture des references (non utilisé pour MED)
-          for ( i = 0; i < nb_reference; i += 10 ) {// FORMAT(10I8)
+          for ( i = 0; i < (int)nb_reference; i += 10 ) {// FORMAT(10I8)
             getNextLine(ligne);
           }
           // lecture des couleurs (non utilisé pour MED)
-          for ( i = 0; i < nb_elements; i += 10 ) {
+          for ( i = 0; i < (int)nb_elements; i += 10 ) {
             getNextLine(ligne);
           }
           // not a composit group
@@ -349,7 +349,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
                 next();
             }
             else {
-              for ( i = 0; i < nb_elements; ++i )
+              for ( i = 0; i < (int)nb_elements; ++i )
               {
                 for (unsigned n = 0; n < nb_noeud; ++n, next() )
                 {
@@ -497,7 +497,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           for ( i_sub = 0; i_sub < nb_sub; ++i_sub )
           {
             support_ids[ i_sub ] = -getInt(); next(); // (a) reference to support
-            if ( support_ids[ i_sub ] < 1 || support_ids[ i_sub ] > medi->groupes.size() ) {
+            if ( support_ids[ i_sub ] < 1 || support_ids[ i_sub ] > (int)medi->groupes.size() ) {
               INFOS("Error of field reading: wrong mesh reference "<< support_ids[ i_sub ]);
               return false;
             }
@@ -628,7 +628,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
             nb_comp    [ i_sub ] =  getInt(); next(); // <nb of components in the sub>
             for ( i = 0; i < 6; ++i )                 // ignore 6 ints, in example 0 0 0 -2 0 3
               next();
-            if ( support_ids[ i_sub ] < 1 || support_ids[ i_sub ] > medi->groupes.size() ) {
+            if ( support_ids[ i_sub ] < 1 || support_ids[ i_sub ] > (int)medi->groupes.size() ) {
               INFOS("Error of field reading: wrong mesh reference "<< support_ids[ i_sub ]);
               return false;
             }
@@ -1268,7 +1268,7 @@ static void orientElements( _intermediateMED& medi )
 //               INFOS( (*si)->second );
           }
           _maille* ma = (_maille*) & (*elemIt);
-          for ( int i = 0; i < swapVec.size(); ++i ) {
+          for ( int i = 0; i < (int)swapVec.size(); ++i ) {
             _maille::iter tmp = ma->sommets[ swapVec[i].first ];
             ma->sommets[ swapVec[i].first ] = ma->sommets[ swapVec[i].second ];
             ma->sommets[ swapVec[i].second ] = tmp;
@@ -1296,7 +1296,7 @@ static void orientElements( _intermediateMED& medi )
         continue;
       for(; maIt!=grp.mailles.end(); ++maIt) {
         if ( faces.insert( &(**maIt )).second ) {
-          for ( int j = 0; j < (*maIt)->sommets.size(); ++j )
+          for ( int j = 0; j < (int)(*maIt)->sommets.size(); ++j )
             linkFacesMap[ (*maIt)->link( j ) ].push_back( &(**maIt) );
           fgm.insert( make_pair( &(**maIt), &grp ));
         }
@@ -1329,7 +1329,7 @@ static void orientElements( _intermediateMED& medi )
         faceQueue.pop();
 
         // loop on links of <face>
-        for ( int i = 0; i < face->sommets.size(); ++i ) {
+        for ( int i = 0; i < (int)face->sommets.size(); ++i ) {
           _link link = face->link( i );
           // find the neighbor faces
           lfIt = linkFacesMap.find( link );
@@ -1346,7 +1346,7 @@ static void orientElements( _intermediateMED& medi )
               {
                 const _maille* badFace = *fIt;
                 // reverse and remove badFace from linkFacesMap
-                for ( int j = 0; j < badFace->sommets.size(); ++j ) {
+                for ( int j = 0; j < (int)badFace->sommets.size(); ++j ) {
                   _link badlink = badFace->link( j );
                   if ( badlink == link ) continue;
                   lfIt2 = linkFacesMap.find( badlink );
@@ -1549,18 +1549,21 @@ void GIBI_MESH_WRONLY_DRIVER::open()
   default:
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access ! " << aMode));
   }
-  if (_gibi &&
+  //change for windows compilation
+  if ( !_gibi ||
 #ifdef WNT
-      _gibi.is_open()
+      !_gibi.is_open()
 #else
-      _gibi.rdbuf()->is_open()
+      !_gibi.rdbuf()->is_open()
 #endif
       )
-    _status = MED_OPENED;
-  else
   {
     _status = MED_CLOSED;
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName));
+  }
+  else
+  {
+    _status = MED_OPENED;
   }
   END_OF(LOC);
 }
@@ -2510,7 +2513,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
           {
             ++cur_nb_sub;
             vals[0] = -idsize->first; // support id
-            for ( int i = 0; i < vals.size(); ++i, fcount++ )
+            for ( int i = 0; i < (int)vals.size(); ++i, fcount++ )
               gibi << setw(8) << vals[ i ];
           }
         }

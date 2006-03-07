@@ -20,6 +20,8 @@
 #ifndef MED_MED_DRIVER_HXX
 #define MED_MED_DRIVER_HXX
 
+#include "MEDMEM.hxx"
+
 #include <string>
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Utilities.hxx"
@@ -41,7 +43,7 @@ class MESH;
 class FIELD_;
 class MED;
 
-class MED_MED_DRIVER : public GENDRIVER
+class MEDMEM_EXPORT MED_MED_DRIVER : public GENDRIVER
 {
 protected:
   
@@ -97,7 +99,7 @@ protected:
 
 */
 
-class IMED_MED_RDONLY_DRIVER : public virtual MED_MED_DRIVER
+class MEDMEM_EXPORT IMED_MED_RDONLY_DRIVER : public virtual MED_MED_DRIVER
 {
 public :
   /*!
@@ -136,7 +138,7 @@ public :
 
 */
 
-class IMED_MED_WRONLY_DRIVER : public virtual MED_MED_DRIVER
+class MEDMEM_EXPORT IMED_MED_WRONLY_DRIVER : public virtual MED_MED_DRIVER
 {
 
 public :
@@ -177,7 +179,7 @@ public :
 
 */
 
-class IMED_MED_RDWR_DRIVER : public virtual IMED_MED_RDONLY_DRIVER,
+class MEDMEM_EXPORT IMED_MED_RDWR_DRIVER : public virtual IMED_MED_RDONLY_DRIVER,
 			     public virtual IMED_MED_WRONLY_DRIVER
 {
 
@@ -202,7 +204,7 @@ public :
 
 };
 
-class MED_MED_RDONLY_DRIVER : public virtual IMED_MED_RDONLY_DRIVER
+class MEDMEM_EXPORT MED_MED_RDONLY_DRIVER : public virtual IMED_MED_RDONLY_DRIVER
 {
 public :
   MED_MED_RDONLY_DRIVER();
@@ -219,7 +221,7 @@ private:
   GENDRIVER * copy ( void ) const;
 };
 
-class MED_MED_WRONLY_DRIVER : public virtual IMED_MED_WRONLY_DRIVER
+class MEDMEM_EXPORT MED_MED_WRONLY_DRIVER : public virtual IMED_MED_WRONLY_DRIVER
 {
 
 public :
@@ -237,7 +239,7 @@ private:
   GENDRIVER * copy ( void ) const;
 };
 
-class MED_MED_RDWR_DRIVER : public IMED_MED_RDWR_DRIVER
+class MEDMEM_EXPORT MED_MED_RDWR_DRIVER : public IMED_MED_RDWR_DRIVER
 {
 
 public :

@@ -29,6 +29,24 @@
 #ifndef MED_V2_1_Wrapper_HeaderFile
 #define MED_V2_1_Wrapper_HeaderFile
 
+#ifdef WNT
+ #if defined MEDWRAPPER_V2_1_EXPORTS
+  #if defined WIN32
+   #define MED_V21_WRAPPER_EXPORT __declspec( dllexport )
+  #else
+   #define MED_V21_WRAPPER_EXPORT
+  #endif
+ #else
+  #if defined WIN32
+   #define MED_V21_WRAPPER_EXPORT __declspec( dllimport )
+  #else
+   #define MED_V21_WRAPPER_EXPORT
+  #endif
+ #endif
+#else
+ #define MED_V21_WRAPPER_EXPORT
+#endif
+
 #include "MED_TWrapper.hxx"
 
 namespace MED
@@ -82,7 +100,7 @@ namespace MED
     typedef enum {eLECT, eECRI, eREMP} EModeAcces; 
 
     //---------------------------------------------------------------
-    class TVWrapper: public MED::TTWrapper<eV2_1>
+    class MED_V21_WRAPPER_EXPORT TVWrapper: public MED::TTWrapper<eV2_1>
     {
       TVWrapper();
       TVWrapper(const TVWrapper&);

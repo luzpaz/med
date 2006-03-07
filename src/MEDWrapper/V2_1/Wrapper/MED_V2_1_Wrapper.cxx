@@ -578,7 +578,7 @@ namespace MED
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
-      TInt aNbElem = theInfo.myElemNum.size();
+      TInt aNbElem = (TInt)theInfo.myElemNum.size();
 
       TErr aRet;
       aRet = MEDelementsLire(myFile->Id(),
@@ -864,8 +864,8 @@ namespace MED
 		    "GetNbTimeStamps aNbTimeStamps = "<<aNbStamps<<
 			"; aGeom = "<<aGeom<<"; anEntity = "<<anEntity<<"\n");
 	    for(TInt iTimeStamp = 1; iTimeStamp <= aNbStamps; iTimeStamp++){
-	      char aMaillageChamp[GetNOMLength<eV2_1>()+1];
-	      char aDtUnit[GetPNOMLength<eV2_1>()+1];
+	      char* aMaillageChamp = new char[GetNOMLength<eV2_1>()+1];
+	      char* aDtUnit = new char[GetPNOMLength<eV2_1>()+1];
 	      med_int aNbGauss;
 	      med_int aNumDt;
 	      med_int aNumOrd;
@@ -1002,7 +1002,7 @@ namespace MED
 			aNbGauss,
 			aFieldInfo.myNbComp);
 	TValue& aValue = aMeshValue.myValue;
-	TInt anEnd = aValue.size();
+	TInt anEnd = (TInt)aValue.size();
 
 	INITMSG(MYDEBUG,
 		"TVWrapper::GetTimeStampVal - aGeom = "<<aGeom<<
@@ -1071,14 +1071,14 @@ namespace MED
 	  
 	if(aProfileInfo && aProfileInfo->IsPresent()){
 	  TInt aSize = aProfileInfo->GetSize()*aFieldInfo.myNbComp*aNbGauss;
-	  if(aSize > aValue.size()){
+	  if(aSize > (TInt)aValue.size()){
 	    if(theErr){
 	      *theErr = -1;
 	      return;
 	    }
 	    EXCEPTION(runtime_error,
 		      "GetTimeStampVal - aSize("<<aSize<<
-		      ") > aValue.size()("<<aValue.size()<<
+		      ") > aValue.size()("<<(unsigned int)aValue.size()<<
 		      "); aNbVal = "<<aNbVal<<
 		      "; anEntity = "<<aTimeStampInfo.myEntity<<
 		      "; aGeom = "<<aGeom);
@@ -1090,7 +1090,7 @@ namespace MED
 	      }
 	      EXCEPTION(runtime_error,
 			"GetTimeStampVal - anEnd("<<anEnd<<
-			") != aValue.size()("<<aValue.size()<<
+			") != aValue.size()("<<(unsigned int)aValue.size()<<
 			"); aNbVal = "<<aNbVal<<
 			"; anEntity = "<<aTimeStampInfo.myEntity<<
 			"; aGeom = "<<aGeom);
@@ -1135,7 +1135,7 @@ namespace MED
 
 	med_int aNbVal = aMeshValue.myNbElem / aFieldInfo.myNbComp;
 	TValue& aValue = aMeshValue.myValue;
-	TInt anEnd = aValue.size();
+	TInt anEnd = (TInt)aValue.size();
 	
 	switch(aFieldInfo.myType){
 	case eFLOAT64: {

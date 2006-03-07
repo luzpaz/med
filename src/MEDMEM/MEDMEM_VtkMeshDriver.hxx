@@ -20,6 +20,8 @@
 #ifndef VTK_MESH_DRIVER_HXX
 #define VTK_MESH_DRIVER_HXX
 
+#include "MEDMEM.hxx"
+
 #include <string>
 #include <vector>
 #include "MEDMEM_define.hxx"
@@ -44,7 +46,7 @@ class MESH;
 class FAMILY;
 class GROUP;
 class CONNECTIVITY;
-class VTK_MESH_DRIVER : public GENDRIVER
+class MEDMEM_EXPORT VTK_MESH_DRIVER : public GENDRIVER
 {
 protected:
 

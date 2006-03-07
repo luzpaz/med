@@ -732,7 +732,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
     int nbelemnts=Families[k]->getNumberOfElements(SALOME_MED::MED_NONE);
     SCRUTE(nbelemnts);
     SALOME_MED::long_array_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MED_NONE);
-    for (int l=0;l<tabnoeuds->length();l++)
+    for (int l=0;l<(int)tabnoeuds->length();l++)
       SCRUTE(tabnoeuds[l]);
   }
 
@@ -782,7 +782,7 @@ bool MedGUI::DumpSubMesh( SALOME_MED::FAMILY_var Fam )
     return false;
 
   SALOME_MED::long_array_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
-  for (int l=0;l<tabnoeuds->length();l++)
+  for (int l=0;l<(int)tabnoeuds->length();l++)
     SCRUTE(tabnoeuds[l]);
 
   return true;

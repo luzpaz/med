@@ -45,12 +45,20 @@
 #undef MED_H
 #undef MED_PROTO_H
 
+/*#ifdef MED_2_2_NAMESPACE
+
+{
+#endif //MED_2_2_NAMESPACE*/
 namespace med_2_2 {
   extern "C" { 
-#include <med.h>
-#include <med_proto.h>
+    #include <med.h>
+    #include <med_proto.h>
   }
 }
+//  }
+//#ifdef MED_2_2_NAMESPACE
+
+//#endif //MED_2_2_NAMESPACE
 
 /*
   Core of the management V2.1 V2.2 of the Med File

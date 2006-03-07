@@ -19,7 +19,9 @@
 #include "med.hxx"
 #include "med_outils.hxx" 
 
-#ifdef PPRO_NT
+//#ifdef PPRO_NT
+#ifdef WIN32
+#include <io.h>
 #define F_OK 0
 #else
 #include <unistd.h>
@@ -43,11 +45,11 @@ MEDouvrir(char *nom, med_mode_acces mode_acces)
   switch(mode_acces)
     {
     case MED_LECT :
-      if (access(nom,F_OK))
-	return -1;
+      if ( access( 0/*nom*/,0/*F_OK*/) )
+	      return -1;
       else 
-	if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
-	  return -1;
+	      if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
+	        return -1;
       break;
 
     case MED_ECRI :

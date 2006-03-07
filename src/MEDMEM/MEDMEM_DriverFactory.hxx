@@ -20,6 +20,8 @@
 #ifndef DRIVERFACTORY_HXX
 #define DRIVERFACTORY_HXX
 
+#include <MEDMEM.hxx>
+
 #include "MEDMEM_MedVersion.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_define.hxx"
@@ -41,13 +43,13 @@ namespace MEDMEM {
       for the writing of Med File set to V22
     */
 
-    extern MED_EN::medFileVersion globalMedFileVersionForWriting;
+    MEDMEM_EXPORT extern MED_EN::medFileVersion globalMedFileVersionForWriting;
 
-    MED_EN::medFileVersion getMedFileVersionForWriting();
+    MEDMEM_EXPORT MED_EN::medFileVersion getMedFileVersionForWriting();
 
-    void setMedFileVersionForWriting(MED_EN::medFileVersion version);
+    MEDMEM_EXPORT void setMedFileVersionForWriting(MED_EN::medFileVersion version);
 
-    GENDRIVER * buildDriverForMesh(driverTypes driverType,
+    MEDMEM_EXPORT GENDRIVER * buildDriverForMesh(driverTypes driverType,
 				   const std::string & fileName,
 				   MESH *mesh,const string &  driverName,
 				   MED_EN::med_mode_acces access);
@@ -186,7 +188,7 @@ namespace MEDMEM {
       {
 	version = getMedFileVersion(fileName);
       }
-    catch (MEDEXCEPTION & ex)
+    catch (MEDEXCEPTION & )
       {
 	version = DRIVERFACTORY::globalMedFileVersionForWriting;
       }

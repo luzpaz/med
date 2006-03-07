@@ -28,20 +28,24 @@
 
 #include "Med_Gen_i.hxx"
 
-#include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_Med_i.hxx"
-#include "MEDMEM_FieldTemplate_i.hxx"
-#include "MEDMEM_Support_i.hxx"
-
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Field.hxx"
+#include "MEDMEM_FieldTemplate_i.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
+#include "MEDMEM_Mesh_i.hxx"
+
+/*#include "MEDMEM_Support_i.hxx"
+
+
+
 #include "MEDMEM_Med.hxx"
 #include "MEDMEM_MedMedDriver.hxx"
-#include "MEDMEM_MedMeshDriver.hxx"
+
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_DriversDef.hxx"
-
+*/
 
 #include "Utils_SINGLETON.hxx"
 #include "OpUtil.hxx"
@@ -204,7 +208,7 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
 	  // create ::MED object, read all and add in study !
 	  myMedI->init(myStudy,MED_DRIVER,fileName) ;
 	}
-        catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
+        catch (const SALOMEDS::StudyBuilder::LockProtection & ) {}
         catch(...)
         {
                 MESSAGE("Erreur a la lecture du fichier");
@@ -243,7 +247,7 @@ throw (SALOME::SALOME_Exception)
 	  // create ::MED object, read all and add in study !
 	  myMedI->initWithFieldType(myStudy,MED_DRIVER,fileName) ;
 	}
-        catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
+        catch (const SALOMEDS::StudyBuilder::LockProtection & ) {}
         catch(...)
         {
                 MESSAGE("Erreur a la lecture du fichier");
@@ -283,7 +287,11 @@ throw (SALOME::SALOME_Exception)
   		myMeshDriver.setMeshName(meshName);
 		myMeshDriver.open();
 	}
+#ifdef _DEBUG_
         catch (const std::exception & ex)
+#else
+        catch (const std::exception &)
+#endif
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -295,7 +303,11 @@ throw (SALOME::SALOME_Exception)
                 MESSAGE("apres read");
 		myMeshDriver.close();
 	}
+#ifdef _DEBUG_
         catch (const std::exception & ex)
+#else
+        catch (const std::exception &)
+#endif
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -310,7 +322,7 @@ throw (SALOME::SALOME_Exception)
 	  // add the mesh object in study
 // 	  if (!_duringLoad) meshi->addInStudy(myStudy,mesh);
 	}
-        catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
+        catch (const SALOMEDS::StudyBuilder::LockProtection & ) {}
 
         endService("Med_Gen_i::readMeshInFile");
         return mesh;
@@ -409,7 +421,11 @@ throw (SALOME::SALOME_Exception)
 */
 		myField = mymed->getField(fieldName,iter,ordre);
 	}
+#ifdef _DEBUG_
         catch (const std::exception & ex)
+#else
+        catch (const std::exception &)
+#endif
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -427,7 +443,11 @@ throw (SALOME::SALOME_Exception)
 		SCRUTE(myMesh->getName());
 		fieldSupport->update();
 	}
+#ifdef _DEBUG_
         catch (const std::exception & ex)
+#else
+        catch (const std::exception &)
+#endif
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -448,8 +468,12 @@ throw (SALOME::SALOME_Exception)
 			endService("Med_Gen_i::readFieldInFile");
         		return myFieldIOR;
 		}
-		catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
+		catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
+#ifdef _DEBUG_            
         	catch (const std::exception & ex)
+#else
+        	catch (const std::exception &)
+#endif
         	{
                		MESSAGE("Exception Interceptee : ");
                 	SCRUTE(ex.what());
@@ -468,8 +492,13 @@ throw (SALOME::SALOME_Exception)
 			endService("Med_Gen_i::readFieldInFile");
         		return myFieldIOR;
 		}
-		catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
+		catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
+
+#ifdef _DEBUG_            
         	catch (const std::exception & ex)
+#else
+        	catch (const std::exception &)
+#endif
         	{
                		MESSAGE("Exception Interceptee : ");
                 	SCRUTE(ex.what());
@@ -941,7 +970,11 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
     CORBA::Long drvId = _myMedI->addDriver( SALOME_MED::MED_DRIVER, aFileName );
     _myMedI->readFileStruct( drvId );
   }
-  catch (const std::exception & ex)
+#ifdef _DEBUG_            
+   catch (const std::exception & ex)
+#else
+   catch (const std::exception &)
+#endif
   {
     MESSAGE("Exception Interceptee : ");
     SCRUTE(ex.what());
@@ -962,9 +995,13 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
     {
       mesh = _myMedI->getMeshByName( aMeshName.c_str() );
       mesh->read( 0 );
-      _myMedI->updateSupportIORs( theSObject->GetStudy(), aMeshName.c_str() );
+      //abd _myMedI->updateSupportIORs( theSObject->GetStudy(), aMeshName.c_str() );
     }
+#ifdef _DEBUG_            
     catch (const std::exception & ex)
+#else
+    catch (const std::exception &)
+#endif
     {
       MESSAGE("Exception Interceptee : ");
       SCRUTE(ex.what());
@@ -989,7 +1026,11 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
       field = _myMedI->getField( aFieldName.c_str(), anIterNumber, aNumOrdre );
       field->read( 0 );
     }
+#ifdef _DEBUG_            
     catch (const std::exception & ex)
+#else
+    catch (const std::exception &)
+#endif
     {
       MESSAGE("Exception Interceptee : ");
       SCRUTE(ex.what());
@@ -1204,7 +1245,12 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   try {
     myMeshDriver.setMeshName(aFullMeshName);
     myMeshDriver.open();
-  } catch (const std::exception & ex) {
+  }
+#ifdef _DEBUG_            
+  catch (const std::exception & ex){
+#else
+  catch (const std::exception &){
+#endif
     MESSAGE("Exception Interceptee : ");
     SCRUTE(ex.what());
     return aResultSO._retn();
@@ -1213,7 +1259,12 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
     myMeshDriver.read();
     MESSAGE("apres read");
     myMeshDriver.close();
-  } catch (const std::exception & ex) {
+  }
+#ifdef _DEBUG_            
+  catch (const std::exception & ex){
+#else
+  catch (const std::exception &){
+#endif
     MESSAGE("Exception Interceptee : ");
     SCRUTE(ex.what());
     return aResultSO._retn();

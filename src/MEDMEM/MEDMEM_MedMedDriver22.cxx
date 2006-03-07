@@ -766,7 +766,7 @@ void MED_MED_WRONLY_DRIVER22::writeFrom( void) const
       (*currentMesh).second->write(*this); 
       // On utilise pour les objects MESH ET FIELD le write(GENDRIVER *) et le == ds GENDRIVER avec eventuellement 1 id 
     }
-    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ex ) {
+    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ) {
       continue;
     }
   }
@@ -775,7 +775,7 @@ void MED_MED_WRONLY_DRIVER22::writeFrom( void) const
     try {
       (*currentField).first->write(*this);
     }
-    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ex ) {
+    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ) {
       continue;
     }
   }

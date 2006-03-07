@@ -20,6 +20,8 @@
 #ifndef FAMILY_HXX
 #define FAMILY_HXX
 
+#include <MEDMEM.hxx>
+
 #include <string>
 #include "MEDMEM_Support.hxx"
 
@@ -34,7 +36,7 @@
 
 */
 namespace MEDMEM {
-class FAMILY : virtual public SUPPORT
+class MEDMEM_EXPORT FAMILY : virtual public SUPPORT
 {
 protected :
   /*!

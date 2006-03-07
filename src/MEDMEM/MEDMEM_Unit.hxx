@@ -25,6 +25,8 @@
 #ifndef UNIT_HXX
 #define UNIT_HXX
 
+#include <MEDMEM.hxx>
+
 #include <string>
 
 #include "MEDMEM_Utilities.hxx"
@@ -32,7 +34,7 @@
 #include "MEDMEM_define.hxx"
 
 namespace MEDMEM {
-class UNIT { 
+class MEDMEM_EXPORT UNIT { 
 protected:
   string _name ;
   string _description ;

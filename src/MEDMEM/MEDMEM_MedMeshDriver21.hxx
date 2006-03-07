@@ -20,6 +20,8 @@
 #ifndef MED_MESH_DRIVER21_HXX
 #define MED_MESH_DRIVER21_HXX
 
+#include "MEDMEM.hxx"
+
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Compatibility21_22.hxx"
@@ -38,7 +40,7 @@ class FAMILY;
 class GROUP;
 class CONNECTIVITY;
 
-class MED_MESH_DRIVER21 : public virtual MED_MESH_DRIVER
+class MEDMEM_EXPORT MED_MESH_DRIVER21 : public virtual MED_MESH_DRIVER
 {
 protected:
 
@@ -83,7 +85,7 @@ public :
 
 */
 
-  class MED_MESH_RDONLY_DRIVER21 : public virtual IMED_MESH_RDONLY_DRIVER , public virtual MED_MESH_DRIVER21
+class MEDMEM_EXPORT MED_MESH_RDONLY_DRIVER21 : public virtual IMED_MESH_RDONLY_DRIVER , public virtual MED_MESH_DRIVER21
 {
  
 public :
@@ -127,7 +129,7 @@ private:
 
 */
 
-class MED_MESH_WRONLY_DRIVER21 : public virtual IMED_MESH_WRONLY_DRIVER, public virtual MED_MESH_DRIVER21 {
+class MEDMEM_EXPORT MED_MESH_WRONLY_DRIVER21 : public virtual IMED_MESH_WRONLY_DRIVER, public virtual MED_MESH_DRIVER21 {
   
 public :
   
@@ -173,7 +175,7 @@ private:
 
 */
 
-class MED_MESH_RDWR_DRIVER21 : public IMED_MESH_RDWR_DRIVER, public MED_MESH_RDONLY_DRIVER21, public MED_MESH_WRONLY_DRIVER21 {
+class MEDMEM_EXPORT MED_MESH_RDWR_DRIVER21 : public IMED_MESH_RDWR_DRIVER, public MED_MESH_RDONLY_DRIVER21, public MED_MESH_WRONLY_DRIVER21 {
 
 public :
 

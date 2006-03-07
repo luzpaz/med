@@ -20,6 +20,8 @@
 #ifndef MESH_HXX
 #define MESH_HXX
 
+#include <MEDMEM.hxx>
+
 #include <string>
 #include <vector>
 #include <list>
@@ -55,7 +57,7 @@ class FAMILY;
 class GROUP;
 class SUPPORT;
 
-class MESH : public RCBASE
+class MEDMEM_EXPORT MESH : public RCBASE
 {
   //-----------------------//
   //   Attributes
@@ -963,7 +965,7 @@ const MEDMEM::FAMILY* MESH::getFamily(MED_EN::medEntityMesh entity, int i) const
   default :
     throw MEDEXCEPTION("MESH::getFamilies : Unknown entity");
   }
-  if (i>Family.size())
+  if (i>(int)Family.size())
     throw MEDEXCEPTION("MESH::getFamily(entity,i) : argument i must be <= _numberOfFamilies");
   return Family[i-1];
 }
@@ -994,7 +996,7 @@ const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
   default :
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Unknown entity"));
   }
-  if (i>Group.size())
+  if (i>(int)Group.size())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i="<<i<<" must be <= _numberOfGroups="<<Group.size()));
   return Group[i-1];
 }

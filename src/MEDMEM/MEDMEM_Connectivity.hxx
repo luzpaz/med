@@ -20,6 +20,8 @@
 #ifndef CONNECTIVITY_HXX
 #define CONNECTIVITY_HXX
 
+#include <MEDMEM.hxx>
+
 #include <vector>
 
 #include "MEDMEM_Utilities.hxx"
@@ -39,7 +41,7 @@ class GROUP;
 */
 
 /* ------------------------------------------- */
-class CONNECTIVITY
+class MEDMEM_EXPORT CONNECTIVITY
 /* ------------------------------------------- */
 {
   /* ---------------------- */
@@ -305,7 +307,7 @@ inline int CONNECTIVITY::getNumberOfTypes(MED_EN::medEntityMesh Entity) const
 	{
 	  (const_cast <CONNECTIVITY *> (this))->calculateDescendingConnectivity();
 	}
-      catch (MEDEXCEPTION & ex)
+      catch (MEDEXCEPTION &)
 	{
 	  return 0 ;
 	}
@@ -318,7 +320,7 @@ inline int CONNECTIVITY::getNumberOfTypes(MED_EN::medEntityMesh Entity) const
 	{
 	  _constituent->calculateConnectivity(MED_EN::MED_NODAL,Entity);
 	}
-      catch (MEDEXCEPTION & ex)
+      catch (MEDEXCEPTION &)
 	{
 	  return 0 ;
 	}

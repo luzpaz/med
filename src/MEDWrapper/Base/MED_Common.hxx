@@ -29,6 +29,8 @@
 #ifndef MED_Common_HeaderFile
 #define MED_Common_HeaderFile
 
+#include "MED_WrapperBase.hxx"
+
 #include <string>
 #include <set>
 #include <map>
@@ -92,7 +94,7 @@ namespace MED{
   typedef std::set<EGeometrieElement> TGeomSet;
   typedef std::map<EEntiteMaillage,TGeomSet> TEntity2GeomSet;
 
-  const TEntity2GeomSet& 
+  MEDWRAPPER_EXPORT const TEntity2GeomSet& 
   GetEntity2GeomSet();
 
   template<EVersion>
@@ -116,12 +118,12 @@ namespace MED{
   GetPNOMLength();
   
   template<EVersion>
-  TInt
+  MEDWRAPPER_EXPORT TInt
   GetNbConn(EGeometrieElement typmai,
 	    EEntiteMaillage typent,
 	    TInt mdim);
   
-  TInt 
+  MEDWRAPPER_EXPORT TInt 
   GetNbNodes(EGeometrieElement typmai);
 
   struct TNameInfo;
@@ -163,7 +165,7 @@ namespace MED{
   struct TTimeStampVal;
   typedef SharedPtr<TTimeStampVal> PTimeStampVal;
 
-  class TWrapper;
+  struct TWrapper;
   typedef SharedPtr<TWrapper> PWrapper;
 };
 

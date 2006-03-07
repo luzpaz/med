@@ -30,12 +30,14 @@
 #ifndef MEDMEM_Grid_HeaderFile
 #define MEDMEM_Grid_HeaderFile
 
+#include <MEDMEM.hxx>
+
 #include "MEDMEM_Mesh.hxx"
 
 // class containing structured mesh data
 
 namespace MEDMEM {
-class GRID: public MESH
+class MEDMEM_EXPORT GRID: public MESH
 {
  protected:
   //-----------------------//

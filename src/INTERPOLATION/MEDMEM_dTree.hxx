@@ -420,7 +420,7 @@ _TEMPLATE_ int _DTREE_::trouve_plus_proche_point_bourrin(NOEUD P) const
 			{
 			num_sol=(*noeud_contenu)[0];
 			min=DistanceL2(P,(*nuage)[num_sol]);
-			for (i=1;i<noeud_contenu->size();i++)
+			for (i=1;i<(int)noeud_contenu->size();i++)
 				{
 				tmp=DistanceL2(P,(*nuage)[(*noeud_contenu)[i]]);
 				if (tmp<min)
@@ -590,7 +590,7 @@ _TEMPLATE_ void _DTREE_::cree_filiation()
 			descendant[i]=new dTree(centre,donne_sommet(i),this);
 			}
 		
-		for (num_loc=0;num_loc<noeud_contenu->size();num_loc++)
+		for (num_loc=0;num_loc<(int)noeud_contenu->size();num_loc++)
 			{
 			int indice=(*noeud_contenu)[num_loc];
 			NOEUD & courant=(*nuage)[indice];

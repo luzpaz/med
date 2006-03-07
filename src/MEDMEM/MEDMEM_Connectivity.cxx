@@ -35,10 +35,10 @@ using namespace MED_EN;
 // Enlarge the vector if necessary to insert the element
 static inline void insert_vector(vector<int> &Vect, int Indice, int Element)
 {
-  if (Indice >= Vect.capacity())
+  if (Indice >=(int) Vect.capacity())
     Vect.reserve(Indice + 1000);
 
-  if (Indice >= Vect.size())
+  if (Indice >=(int) Vect.size())
     Vect.resize(Indice+1);
 
   Vect[Indice] = Element;
@@ -1467,14 +1467,14 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 	  vector<int> myPolygon(vector_begin, vector_begin+vector_size);
 	  myPolygon[myPolygon.size()-1] = myPolygon[0]; // because first and last point make a segment
 
-	  for (int j=0; j<myPolygon.size()-1; j++) // for each segment of polygon
+	  for (int j=0; j<(int)myPolygon.size()-1; j++) // for each segment of polygon
 	    {
 	      MEDMODULUSARRAY segment_poly(2,&myPolygon[j]);
 	      int ret_compare = 0;
 
 	      // we search it in existing segments
 
-	      for (int k=0; k<Constituentnodalindex.size()-1; k++)
+	      for (int k=0; k<(int)Constituentnodalindex.size()-1; k++)
 		{
 		  MEDMODULUSARRAY segment(2,&Constituentnodalvalue[0] + Constituentnodalindex[k]-1);
 		  ret_compare = segment_poly.compare(segment);
@@ -1542,7 +1542,7 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 		{
 		  int Begin = -1; // first TRIA3 or QUAD4
 		  int Number = 0; // number of TRIA3 or QUAD4
-		  for (int k=0; k<Constituentnodalindex.size()-1; k++)
+		  for (int k=0; k<(int)Constituentnodalindex.size()-1; k++)
 		    if (Constituentnodalindex[k+1]-Constituentnodalindex[k] == myFaceNumberOfNodes)
 		      {
 			if (Begin == -1)

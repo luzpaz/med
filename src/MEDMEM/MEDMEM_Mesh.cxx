@@ -163,56 +163,56 @@ MESH::MESH(MESH &m)
   _numberOfNodes = m._numberOfNodes;
 
   _familyNode = m._familyNode;
-  for (int i=0; i<m._familyNode.size(); i++)
+  for (int i=0; i<(int)m._familyNode.size(); i++)
     {
       _familyNode[i] = new FAMILY(* m._familyNode[i]);
       _familyNode[i]->setMesh(this);
     }
 
   _familyCell = m._familyCell;
-  for (int i=0; i<m._familyCell.size(); i++)
+  for (int i=0; i<(int)m._familyCell.size(); i++)
     {
       _familyCell[i] = new FAMILY(* m._familyCell[i]);
       _familyCell[i]->setMesh(this);
     }
 
   _familyFace = m._familyFace;
-  for (int i=0; i<m._familyFace.size(); i++)
+  for (int i=0; i<(int)m._familyFace.size(); i++)
     {
       _familyFace[i] = new FAMILY(* m._familyFace[i]);
       _familyFace[i]->setMesh(this);
     }
 
   _familyEdge = m._familyEdge;
-  for (int i=0; i<m._familyEdge.size(); i++)
+  for (int i=0; i<(int)m._familyEdge.size(); i++)
     {
       _familyEdge[i] = new FAMILY(* m._familyEdge[i]);
       _familyEdge[i]->setMesh(this);
     }
 
   _groupNode = m._groupNode;
-  for (int i=0; i<m._groupNode.size(); i++)
+  for (int i=0; i<(int)m._groupNode.size(); i++)
     {
       _groupNode[i] = new GROUP(* m._groupNode[i]);
       _groupNode[i]->setMesh(this);
     }
 
   _groupCell = m._groupCell;
-  for (int i=0; i<m._groupCell.size(); i++)
+  for (int i=0; i<(int)m._groupCell.size(); i++)
     {
       _groupCell[i] = new GROUP(* m._groupCell[i]);
       _groupCell[i]->setMesh(this);
     }
 
   _groupFace = m._groupFace;
-  for (int i=0; i<m._groupFace.size(); i++)
+  for (int i=0; i<(int)m._groupFace.size(); i++)
     {
       _groupFace[i] = new GROUP(* m._groupFace[i]);
       _groupFace[i]->setMesh(this);
     }
 
   _groupEdge = m._groupEdge;
-  for (int i=0; i<m._groupEdge.size(); i++)
+  for (int i=0; i<(int)m._groupEdge.size(); i++)
     {
       _groupEdge[i] = new GROUP(* m._groupEdge[i]);
       _groupEdge[i]->setMesh(this);
@@ -2246,11 +2246,11 @@ void MESH::createFamilies()
 	}
 
 	// delete old families
-	for (int i=0;i<myOldFamilies.size();i++)
+	for (unsigned int i=0;i<myOldFamilies.size();i++)
 	    delete myOldFamilies[i] ;
 
 	// update references in groups
-	for (int i=0;i<myGroups.size();i++)
+	for (unsigned int i=0;i<myGroups.size();i++)
 	{
 	    myGroups[i]->setNumberOfFamilies(whichFamilyInGroup[i].size());
 	    myGroups[i]->setFamilies(whichFamilyInGroup[i]);

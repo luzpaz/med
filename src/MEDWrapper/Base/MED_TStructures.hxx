@@ -175,7 +175,7 @@ namespace MED
 
       myId = theId;
 
-      myNbGroup = theGroupNames.size();
+      myNbGroup = (TInt)theGroupNames.size();
       myGroupNames.resize(myNbGroup*GetLNOMLength<eVersion>()+1);
       if(myNbGroup){
 	TStringSet::const_iterator anIter = theGroupNames.begin();
@@ -185,12 +185,12 @@ namespace MED
 	}
       }
 
-      myNbAttr = theAttrDescs.size();
+      myNbAttr = (TInt)theAttrDescs.size();
       myAttrId.resize(myNbAttr);
       myAttrVal.resize(myNbAttr);
       myAttrDesc.resize(myNbAttr*GetDESCLength<eVersion>()+1);
       if(myNbAttr){
-	for(TInt anId = 0, anEnd = theAttrDescs.size(); anId < anEnd; anId++){
+	for(TInt anId = 0, anEnd = (TInt)theAttrDescs.size(); anId < anEnd; anId++){
 	  SetAttrDesc(anId,theAttrDescs[anId]);
 	  myAttrVal[anId] = theAttrVals[anId];
 	  myAttrId[anId] = theAttrIds[anId];
@@ -396,7 +396,7 @@ namespace MED
 	       const TIntVector& theElemNums,
 	       const TStringVector& theElemNames):
       TElemInfoBase(theMeshInfo,
-		    theNodeCoords.size()/theMeshInfo->GetDim(),
+		    (TInt)theNodeCoords.size()/theMeshInfo->GetDim(),
 		    theFamilyNums,
 		    theElemNums,
 		    theElemNames),
@@ -500,7 +500,7 @@ namespace MED
 		   const TIntVector& theElemNums,
 		   const TStringVector& theElemNames):
       TElemInfoBase(theMeshInfo,
-		    theIndexes.size() - 1,
+		    (TInt)theIndexes.size() - 1,
 		    theFamilyNums,
 		    theElemNums,
 		    theElemNames)
@@ -571,7 +571,7 @@ namespace MED
 		   const TIntVector& theElemNums,
 		   const TStringVector& theElemNames):
       TElemInfoBase(theMeshInfo,
-		    theIndexes.size()-1,
+		    (TInt)theIndexes.size()-1,
 		    theFamilyNums,
 		    theElemNums,
 		    theElemNames)
@@ -644,7 +644,7 @@ namespace MED
 	       const TStringVector& theElemNames,
 	       EModeSwitch theMode):
       TElemInfoBase(theMeshInfo,
-		    theConnectivities.size()/GetNbNodes(theGeom),
+		    (TInt)theConnectivities.size()/GetNbNodes(theGeom),
 		    theFamilyNums,
 		    theElemNums,
 		    theElemNames),

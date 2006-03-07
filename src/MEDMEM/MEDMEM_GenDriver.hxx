@@ -20,6 +20,8 @@
 #ifndef GENDRIVER_HXX
 #define GENDRIVER_HXX
 
+#include <MEDMEM.hxx>
+
 #include <string>
 
 #include "MEDMEM_define.hxx"
@@ -38,7 +40,7 @@ namespace MEDMEM {
 
 /* Modify the following line to add a new driver type (step 1) */
 typedef enum { MED_DRIVER = 0, GIBI_DRIVER = 1, PORFLOW_DRIVER = 2, VTK_DRIVER = 254, ASCII_DRIVER = 3, NO_DRIVER = 255 } driverTypes;
-class GENDRIVER {
+class MEDMEM_EXPORT GENDRIVER {
 
 protected :
 
