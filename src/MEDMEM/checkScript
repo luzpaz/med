@@ -63,8 +63,8 @@ rm -f Copy_nomesh_zzzz121b_without_tr6.med Copy_withmesh_zzzz121b_without_tr6.me
 #Indicateur_d_erreur_00 3 3 TRIA3, 1 composante, 3 point de Gauss, pas de profil
 #Indicateur_d_erreur_00 3 3 QAUD4, 1 composante, 4 point de Gauss, pas de prrofil
 
-#Indicateur_d_erreur_00 3 3 TRIA3, 1 composante, 3 point de Gauss, taille de profil 4
-#Indicateur_d_erreur_00 3 3 QAUD4, 1 composante, 4 point de Gauss, taille de profil 2
+#Indicateur_d_erreur_00 4 4 TRIA3, 1 composante, 3 point de Gauss, taille de profil 4
+#Indicateur_d_erreur_00 4 4 QAUD4, 1 composante, 4 point de Gauss, taille de profil 2
 
 rm Copy*; ./test_profil_MedFieldDriver maill.00_without_seg2.med Indicateur_d_erreur_00 1 1 > Essai39
 rm Copy*; ./test_profil_MedFieldDriver maill.00_without_seg2.med Indicateur_d_erreur_00 2 2 > Essai40

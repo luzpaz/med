@@ -9,6 +9,7 @@
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_define.hxx"
+#include "MEDMEM_GaussLocalization.hxx"
 
 using namespace std;
 using namespace MEDMEM;
@@ -67,6 +68,7 @@ void affiche_fieldT(FIELD<double,INTERLACING_TAG> * myField)
 	 <<" : "<< nbOfElements[i] << endl;
     cout << "Number Of Gauss Points on type "<< MED_EN::geoNames[typeList[i]]
 	 <<" : "<< myField->getNumberOfGaussPoints(typeList[i]) << endl;
+    cout << "Localization description : " << endl << myField->getGaussLocalization(typeList[i]) << endl;
   }
 
   cout << "- Valeurs :"<<endl;
@@ -116,6 +118,7 @@ void affiche_fieldT(FIELD<double, FullInterlace> * myField)
 	 <<" : "<< nbOfElements[i] << endl;
     cout << "Number Of Gauss Points on type "<< MED_EN::geoNames[typeList[i]]
 	 <<" : "<< nbGaussPoints[i] << endl;
+    cout << "Localization description : " << endl << myField->getGaussLocalization(typeList[i]) << endl;
   }
 
   // On récupère la liste complète
@@ -129,7 +132,7 @@ void affiche_fieldT(FIELD<double, FullInterlace> * myField)
     value = myField->getRow(elNo) ;
     //UP: getRow prend un numéro d'élément qui existe, getRow(1) n'existe pas forcément si il y a un profil
     //qui ne défini pas cet indice
-    cout << endl << " Valeur de getNbGaussI("<<elNo<<") :" << myField->getNbGaussI(elNo) << endl;
+    //cout << endl << " Valeur de getNbGaussI("<<elNo<<") :" << myField->getNbGaussI(elNo) << endl;
     for (int j=0; j<numberOfComponents*myField->getNbGaussI(elNo); j++)
       //UP : Prend en compte le nombre de points de Gauss de l'élément elNo
       cout << "value["<< elNo << "] = " << value[j] << " ";
@@ -178,6 +181,7 @@ void affiche_fieldT(FIELD<double, NoInterlace> * myField)
 	 <<" : "<< nbOfElements[i] << endl;
     cout << "Number Of Gauss Points on type "<< MED_EN::geoNames[typeList[i]]
 	 <<" : "<< nbGaussPoints[i] << endl;
+    cout << "Localization description : " << endl << myField->getGaussLocalization(typeList[i]) << endl;
   }
 
 
@@ -335,7 +339,7 @@ int main (int argc, char ** argv) {
     /////////////////////////////////////////////////////////////////////////////
       // TEST DEUXIEME MODE :
       // Lecture idem 1er mode
-      // A l'écriture, le fichier ciblene contient pas le maillage mais  la
+      // A l'écriture, le fichier cible ne contient pas le maillage mais la
       // relation SUPPORT-MESH est établie, le driver peut donc utiliser les informations
       // dans le maillage pour transcrire les profils.
       // Selon le modèle MED FICHIER, ce mode est interdit : le fichier doit au moins
@@ -410,8 +414,7 @@ int main (int argc, char ** argv) {
 
      MESH * myMesh3 = new MESH(MED_DRIVER,fileName,meshName);
      const SUPPORT * mySupport3= new SUPPORT(myMesh3,"Temporary Support",MED_CELL);
-     FIELD<double,INTERLACING_MODE> * myField3  = new FIELD<double,INTERLACING_MODE>(mySupport3,MED_DRIVER,"Copy_nomesh_"+fileName,fieldName,
-										     iterationNumber, orderNumber);
+     FIELD<double,INTERLACING_MODE> * myField3  = new FIELD<double,INTERLACING_MODE>(mySupport3,MED_DRIVER,"Copy_nomesh_"+fileName,fieldName, iterationNumber, orderNumber);
      delete mySupport3; // Il est déjà possible de libérer ce SUPPORT
 
      //TEST à la réecriture (renommage des profils
