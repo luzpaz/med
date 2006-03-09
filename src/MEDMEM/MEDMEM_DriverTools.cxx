@@ -729,9 +729,6 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     new_group->setEntity(groupe_entity);
     new_group->setAll(mailleSet.size() == maillage.size());
 
-    vector<int> nbGaussPnt( nb_geometric_types, 1 );
-    new_group->setNumberOfGaussPoint( &nbGaussPnt[0] );
-
     vect_group->push_back(new_group);
 
     delete [] tab_types_geometriques;

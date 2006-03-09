@@ -87,15 +87,6 @@ protected:
 
   /*!
     \if developper
-    Array of size _numberOfGeometricType which contains
-    for each type the number of gauss point
-    (not yet implemented).
-    \endif
-  */
-  mutable PointerOf<int>                    _numberOfGaussPoint ;
-
-  /*!
-    \if developper
     If true, we consider all entities of type _entity
     defined in the associated mesh
     \endif
@@ -163,7 +154,6 @@ public:
   inline void setEntity(MED_EN::medEntityMesh Entity);
   inline void setNumberOfGeometricType(int NumberOfGeometricType);
   inline void setGeometricType(const MED_EN::medGeometryElement *GeometricType);
-  inline void setNumberOfGaussPoint(const int *NumberOfGaussPoint);
   inline void setNumberOfElements(const int *NumberOfElements);
   inline void setTotalNumberOfElements(int TotalNumberOfElements);
   inline void setNumber(MEDSKYLINEARRAY * Number);
@@ -178,8 +168,6 @@ public:
   inline bool   isOnAllElements() const;
   inline int    getNumberOfTypes() const;
   inline const MED_EN::medGeometryElement* getTypes() const ;
-  inline const int *  getNumberOfGaussPoint() const throw (MEDEXCEPTION);
-  inline int          getNumberOfGaussPoint(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
   inline int    getNumberOfElements(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
   inline  const int * getNumberOfElements() const throw (MEDEXCEPTION);
   virtual inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
@@ -229,14 +217,14 @@ protected:
   This method returns the number of all elements of the type GeometricType.
 
   If isOnAllElements is false, it returns the number of elements in the
-  support else it returns number of elements in the whole mesh.
+  support else it returns number of elements in the mesh.
 
   Example : number of MED_TRIA3 or MED_ALL_ELEMENTS elements
   in entity of support.
 
   Note : If SUPPORT is defined on MED_NODE, use MED_ALL_ELEMENTS as
          medGeometryElement GeometricType and it will returns the number
-	 of nodes in the support (or in the whole mesh).
+	 of nodes in the support (or in the mesh).
 */
 //-----------------------------------------------------------------------------
 inline int SUPPORT::getNumberOfElements(MED_EN::medGeometryElement GeometricType) const
@@ -309,42 +297,6 @@ inline const int * SUPPORT::getNumberIndex() const
   return _number->getIndex() ;
 }
 
-/*! A DOCUMENTER */
-//-------------------------------------------------
-inline const int * SUPPORT::getNumberOfGaussPoint() const
-  throw (MEDEXCEPTION)
-//-------------------------------------------------
-{
-  SCRUTE(_name);
-  SCRUTE(_numberOfGeometricType);
-  SCRUTE(_numberOfGaussPoint);
-
-  if (_numberOfGaussPoint!=NULL)
-    return _numberOfGaussPoint ;
-  else
-    throw MEDEXCEPTION("Support::getNumberOfGaussPoint : Not defined !") ;
-}
-
-/*!
-  Returns number of Gauss points for this medGeometryElement.
-
-  Note :
-  - Not defined if SUPPORT is on MED_NODE.
-  - Not defined for MED_ALL_ELEMENTS medGeometryElement type.
-*/
-//-----------------------------------------------------------------------------
-inline int SUPPORT::getNumberOfGaussPoint(MED_EN::medGeometryElement geomElement) const
-  throw (MEDEXCEPTION)
-//-----------------------------------------------------------------------------
-{
-  if (_numberOfGaussPoint!=NULL) {
-    for (int i=0;i<_numberOfGeometricType;i++)
-      if (_geometricType[i]==geomElement)
-	return _numberOfGaussPoint[i] ;
-    throw MEDEXCEPTION("Support::getGlobalNumber : GeometricType not found !") ;
-  } else
-    return 1;
-}
 
 /*! set the attribute _name to Name */
 //--------------------------------------
@@ -406,7 +358,6 @@ inline void SUPPORT::setNumberOfGeometricType(int NumberOfGeometricType)
 
   _geometricType.set(0);
   _numberOfElements.set(0);
-  _numberOfGaussPoint.set(0) ;
 }
 
 /*! set the attribute _geometricType to geometricType */
@@ -420,16 +371,6 @@ inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *Geometri
     _geometricType[i] = GeometricType[i];
 }
 
-/*! set the attribute _numberOfGaussPoint to NumberOfGaussPoint */
-//-----------------------------------------------------------------
-inline void SUPPORT::setNumberOfGaussPoint(const int *NumberOfGaussPoint)
-//-----------------------------------------------------------------
-{
-  if (NULL == _numberOfGaussPoint)
-    _numberOfGaussPoint.set(_numberOfGeometricType);
-  for (int i=0;i<_numberOfGeometricType;i++)
-    _numberOfGaussPoint[i] = NumberOfGaussPoint[i];
-}
 
 /*!
   Set the attribute _numberOfElements to NumberOfElements and

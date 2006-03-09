@@ -17,7 +17,12 @@
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Support.hxx"
+#include "MEDMEM_GaussLocalization.hxx"
 
+//includes temporaires
+#include "MEDMEM_MEDMEMgaussEcr.hxx"
+#include "MEDMEM_MEDMEMprofilEcr.hxx"
+#include "MEDMEM_MEDMEMchampLire.hxx"
 
 namespace MEDMEM {
 
@@ -34,13 +39,17 @@ template <class T> class MED_FIELD_DRIVER22 : public virtual MED_FIELD_DRIVER<T>
 protected:
 
   med_2_2::med_idt        _medIdt;
- 
+
   bool createFieldSupportPart1(med_2_2::med_idt id,
-			  string & fieldName,
+			  const string & fieldName,
 			  med_2_2::med_int ndt,
 			  med_2_2::med_int od,
 			  SUPPORT & support,
-			  string & meshName) const throw (MEDEXCEPTION);
+			  string & meshName,
+			  vector<int> & numberOfElementsOfTypeC,
+			  vector<int> & numberOfGaussPoint,
+			  int & totalNumberOfElWg
+			  ) const throw (MEDEXCEPTION);
 
   void getMeshGeometricTypeFromFile(med_2_2::med_idt id,
 			    string & meshName,
@@ -67,7 +76,7 @@ public :
   */
   template <class INTERLACING_TAG>
   MED_FIELD_DRIVER22(const string & fileName,
-		     FIELD<T, INTERLACING_TAG> * ptrField, 
+		     FIELD<T, INTERLACING_TAG> * ptrField,
 		     MED_EN::med_mode_acces accessMode)
     : MED_FIELD_DRIVER<T>(fileName,ptrField,accessMode),_medIdt(MED_INVALID)
   {
@@ -85,7 +94,7 @@ public :
   /*!
     Destructor.
   */
-  virtual ~MED_FIELD_DRIVER22() { 
+  virtual ~MED_FIELD_DRIVER22() {
   }
 
   void open() throw (MEDEXCEPTION)
@@ -95,7 +104,7 @@ public :
 
     // we must set fieldname before open, because we must find field number in file (if it exist !!!)
     if ( MED_FIELD_DRIVER<T>::_fileName == "" )
-      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
 				       << "_fileName is |\"\"|, please set a correct fileName before calling open()"
 				       )
 			    );
@@ -103,13 +112,13 @@ public :
     MESSAGE(LOC<<"_fileName.c_str : "<< MED_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< MED_FIELD_DRIVER<T>::_accessMode);
     MED_FIELD_DRIVER22<T>::_medIdt = med_2_2::MEDouvrir( (const_cast <char *> (MED_FIELD_DRIVER<T>::_fileName.c_str())),(med_2_2::med_mode_acces) MED_FIELD_DRIVER<T>::_accessMode);
     MESSAGE(LOC<<"_medIdt : "<< MED_FIELD_DRIVER22<T>::_medIdt );
-    if (MED_FIELD_DRIVER22<T>::_medIdt > 0) 
+    if (MED_FIELD_DRIVER22<T>::_medIdt > 0)
       MED_FIELD_DRIVER<T>::_status=MED_OPENED;
     else {
       MED_FIELD_DRIVER<T>::_status = MED_INVALID;
       MED_FIELD_DRIVER22<T>::_medIdt = MED_INVALID;
-      throw MED_EXCEPTION (LOCALIZED( STRING(LOC) 
-				      << "Can't open |"  << MED_FIELD_DRIVER<T>::_fileName 
+      throw MED_EXCEPTION (LOCALIZED( STRING(LOC)
+				      << "Can't open |"  << MED_FIELD_DRIVER<T>::_fileName
 				      << "|, _medIdt : " << MED_FIELD_DRIVER22<T>::_medIdt
 				      )
 			   );
@@ -117,7 +126,7 @@ public :
 
     END_OF(LOC);
   }
-  
+
   void close() {
     BEGIN_OF("MED_FIELD_DRIVER22::close()");
     med_2_2::med_int err = 0;
@@ -143,14 +152,14 @@ public :
 
   template <class T> class MED_FIELD_RDONLY_DRIVER22 : public virtual MED_FIELD_DRIVER22<T>, public virtual IMED_FIELD_RDONLY_DRIVER<T>
 {
- 
+
 public :
-  
+
   /*!
     Constructor.
   */
   MED_FIELD_RDONLY_DRIVER22():MED_FIELD_DRIVER<T>() {};
-  
+
   /*!
     Constructor.
   */
@@ -160,11 +169,11 @@ public :
     IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField),
     MED_FIELD_DRIVER22<T>(fileName,ptrField,MED_EN::MED_RDONLY),
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY)
-  { 
+  {
     BEGIN_OF("MED_FIELD_RDONLY_DRIVER22::MED_FIELD_RDONLY_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
     END_OF("MED_FIELD_RDONLY_DRIVER22::MED_FIELD_RDONLY_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
   }
-  
+
   /*!
     Copy constructor.
   */
@@ -173,7 +182,7 @@ public :
     MED_FIELD_DRIVER22<T>(fieldDriver),
     MED_FIELD_DRIVER<T>(fieldDriver)
   {}
-  
+
   /*!
     Destructor.
   */
@@ -204,14 +213,14 @@ private:
 */
 
 template <class T> class MED_FIELD_WRONLY_DRIVER22 : public virtual MED_FIELD_DRIVER22<T>, public virtual IMED_FIELD_WRONLY_DRIVER<T> {
-  
+
 public :
-  
+
   /*!
     Constructor.
   */
   MED_FIELD_WRONLY_DRIVER22():MED_FIELD_DRIVER<T>() {}
-  
+
   /*!
     Constructor.
   */
@@ -234,7 +243,7 @@ public :
     MED_FIELD_DRIVER22<T>(fieldDriver),
     MED_FIELD_DRIVER<T>(fieldDriver)
   {}
-  
+
   /*!
     Destructor.
   */
@@ -264,14 +273,14 @@ private:
 */
 
 template <class T> class MED_FIELD_RDWR_DRIVER22 : public MED_FIELD_RDONLY_DRIVER22<T>, public MED_FIELD_WRONLY_DRIVER22<T>, public IMED_FIELD_RDWR_DRIVER<T> {
-  
+
 public :
-  
+
   /*!
     Constructor.
   */
   MED_FIELD_RDWR_DRIVER22():MED_FIELD_DRIVER22<T>() {}
-  
+
   /*!
     Constructor.
   */
@@ -301,7 +310,7 @@ public :
     IMED_FIELD_WRONLY_DRIVER<T>(fieldDriver),
     MED_FIELD_DRIVER<T>(fieldDriver)
   {};
-  
+
   /*!
     Destructor.
   */
@@ -331,31 +340,40 @@ private:
 
 /*!
 
-  Cette méthode crée le SUPPORT du champ <fieldName> pour le 
-	<n°de pas de temps,n°d'itération>=<ndt,od>. 
-  
+  Cette méthode crée le SUPPORT du champ <fieldName> pour le
+	<n°de pas de temps,n°d'itération>=<ndt,od>.
+
   Le SUPPORT crée à pour nom  <fieldName>Support et contient
   la liste des types géométriques sur le premier type
   d'entité trouvé (en MEDMEM on inderdit aux champs de reposer
   sur plusieurs types d'entité).
-  Il contient également le nombre d'entités trouvées pour chaque 
+  Il contient également le nombre d'entités trouvées pour chaque
   type géométrique.
   Par défaut l'attribut onAll du SUPPORT est positionné à true car
   cette routine ne lit rien de ce qui concerne les entités
   du maillage associé.
   La méthode renvoie true si elle réussit à créer le SUPPORT
-  demandé. 
+  demandé.
   Le nom du maillage associé ( en MEDMEM on ne
   supporte pas encore les maillages multiples ) est renvoyé dans <meshName>.
+  Deux tableaux directements exploitables par MEDMEMnArray sont renvoyés :
+  - numberOfElementsOfTypeC : nombres d'entités cumulés de chaque type géométrique
+       avec numberOfElementsOfTypeC[0]=1 et de taille nombre de types+1
+  - numberOfGaussPoint : nombre de points de Gauss par type géométrique
+       avec numberOfGaussPoint[0]=1 et de taille  nombre de types+1
 */
 
 template <class T> bool
 MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
-					string & fieldName,
-					med_2_2::med_int ndt,
-					med_2_2::med_int od,
-					SUPPORT & support,
-					string & meshName) const throw (MEDEXCEPTION)
+					       const string & fieldName,
+					       med_2_2::med_int ndt,
+					       med_2_2::med_int od,
+					       SUPPORT & support,
+					       string & meshName,
+					       vector<int> & numberOfElementsOfTypeC,
+					       vector<int> & numberOfGaussPoint,
+					       int & totalNumberOfElWg
+					       ) const throw (MEDEXCEPTION)
 {
 
   //EF : Gérer le meshName pour le driver 2.2
@@ -367,15 +385,15 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
   CellAndNodeEntities[MED_EN::MED_NODE] = MED_EN::meshEntities[MED_EN::MED_NODE];
   list< MED_EN::medGeometryElement >::const_iterator currentGeometry;
 
-  //med_2_2::med_entite_maillage
   MED_EN::medEntityMesh entity;
-  bool alreadyFoundAnEntity=false,alreadyFoundPdtIt = false, anyGauss=false;
+  bool alreadyFoundAnEntity=false,alreadyFoundPdtIt = false;
   int  numberOfElements = 0;
   int  numberOfGeometricType = 0;
-  //med_2_2::med_geometrie_element..
   MED_EN::medGeometryElement geometricType[MED_NBR_GEOMETRIE_MAILLE];
   int numberOfElementsOfType[MED_NBR_GEOMETRIE_MAILLE];
-  int numberOfGaussPoint[MED_NBR_GEOMETRIE_MAILLE];
+  numberOfElementsOfTypeC.clear();numberOfGaussPoint.clear();
+  numberOfElementsOfTypeC.resize(MED_NBR_GEOMETRIE_MAILLE+1);
+  numberOfGaussPoint.resize(MED_NBR_GEOMETRIE_MAILLE+1);
 
   med_2_2::med_int nmaa=0, ngauss=0, numdt=-1, numo=-1, nbPdtIt=0;
   char dtunit[MED_TAILLE_PNOM22+1];
@@ -383,6 +401,9 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
   med_2_2::med_float   dt=-1.0;
   med_2_2::med_booleen local;
   med_2_2::med_err     ret=1;
+  numberOfElementsOfTypeC[0] = 1;
+  numberOfGaussPoint[0] = 1;
+  totalNumberOfElWg = 0;
 
   /* Détermine le type d'entité et la liste des types géométriques associés
      au champ <fieldName> */
@@ -415,7 +436,7 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 	ret += med_2_2::MEDpasdetempsInfo(id, const_cast <char*> ( fieldName.c_str() ),
 					 (med_2_2::med_entite_maillage)   (*currentEntity).first,
 					 (med_2_2::med_geometrie_element)  *currentGeometry,
-					 j, &ngauss,  &numdt,  &numo, dtunit, &dt, 
+					 j, &ngauss,  &numdt,  &numo, dtunit, &dt,
 					  maa, &local, &nmaa);
 
 	if ( ndt == numdt && numo == od ) {
@@ -479,12 +500,14 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 				     << MED_EN::entNames[(*currentEntity).first] << ","
 				     << MED_EN::geoNames[*currentGeometry] << ")" )); ;
 
-      //totalNumberOfElements+=numberOfElements;
       numberOfElementsOfType[numberOfGeometricType] = numberOfElements/ngauss;
-      numberOfGaussPoint[numberOfGeometricType] = ngauss;
-      anyGauss = (anyGauss || (ngauss-1) ); // rem : pas de point de Gauss <=> ngauss=1
+      numberOfElementsOfTypeC[numberOfGeometricType+1]=
+	numberOfElementsOfTypeC[numberOfGeometricType]
+	+  numberOfElementsOfType[numberOfGeometricType];
+      numberOfGaussPoint[numberOfGeometricType+1] = ngauss;
       geometricType[numberOfGeometricType]= *currentGeometry;
       numberOfGeometricType++;
+      totalNumberOfElWg+=numberOfElements;
 
     } // End Second For
 
@@ -504,8 +527,8 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
     // Par défaut considère que le champ repose sur tous les type géométriques du maillage
     // Si ce n'est pas le cas les champs geometricType et numberOfElementsOfType du SUPPORT sont corrects
     support.setAll(true);
-    if (anyGauss)
-      support.setNumberOfGaussPoint(numberOfGaussPoint);
+    numberOfElementsOfTypeC.resize(numberOfGeometricType+1);
+    numberOfGaussPoint.resize(numberOfGeometricType+1);
 
     return alreadyFoundAnEntity;
   } else
@@ -527,13 +550,14 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromFile(med_2_2::med_idt id,
 					  MED_EN::medEntityMesh  entity,
 					  vector<MED_EN::medGeometryElement> & geoType,
 					  vector<int> &nbOfElOfType,
-					  vector<int> &nbOfElOfTypeC) const throw(MEDEXCEPTION)
+					  vector<int> &nbOfElOfTypeC
+					 ) const throw(MEDEXCEPTION)
 {
   const char LOC[] = "MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromFile(...)";
 
   int numberOfGeometricType=0;
   MED_EN::medGeometryElement geometricType[MED_NBR_GEOMETRIE_MAILLE];
-  int numberOfElementsOfType[MED_NBR_GEOMETRIE_MAILLE];
+  int numberOfElementsOfType [MED_NBR_GEOMETRIE_MAILLE];
   int numberOfElementsOfTypeC[MED_NBR_GEOMETRIE_MAILLE+1];
   med_2_2::med_int   numberOfElements=0;
   med_2_2::med_table quoi;
@@ -575,8 +599,8 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromFile(med_2_2::med_idt id,
   nbOfElOfType = vector<int> (numberOfElementsOfType,numberOfElementsOfType+numberOfGeometricType);
   nbOfElOfTypeC = vector<int> (numberOfElementsOfTypeC,numberOfElementsOfTypeC+numberOfGeometricType+1);
 
-//    for (int j =0 ; j< numberOfGeometricType;++j)
-//      cout << "nbOfElOfTypeC["<<j<<"]="<<nbOfElOfTypeC[j]<<endl;
+//   for (int j =0 ; j<= numberOfGeometricType;++j)
+//       cout << "nbOfElOfTypeC["<<j<<"]="<<nbOfElOfTypeC[j]<<endl;
 
 }
 
@@ -626,7 +650,9 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   BEGIN_OF(LOC);
 
   typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array   ArrayNo;
+  typedef typename MEDMEM_ArrayInterface<T,NoInterlace,Gauss>::Array     ArrayNoWg;
   typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array ArrayFull;
+  typedef typename MEDMEM_ArrayInterface<T,FullInterlace,Gauss>::Array   ArrayFullWg;
 
   if (MED_FIELD_DRIVER<T>::_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": Method open must be called before method read.")) ;
@@ -645,8 +671,12 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
 				 <<" <fieldName> size in object driver FIELD is > MED_TAILLE_NOM ."));
 
-  MESSAGE("###### "<<LOC<<" fieldNameDRIVER : "<< MED_FIELD_DRIVER<T>::_fieldName << 
-	  " fieldName : "<<MED_FIELD_DRIVER<T>::_fieldName);
+  const string & fieldName = MED_FIELD_DRIVER<T>::_fieldName;
+
+  MED_EN::medModeSwitch interlacingType = MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType();
+  bool isFullInterlace = ( interlacingType == MED_EN::MED_FULL_INTERLACE );
+
+  MESSAGE("###### "<<LOC<<" fieldNameDRIVER : "<< fieldName << " fieldName : "<< MED_FIELD_DRIVER<T>::_ptrField->_name);
 
 // EF :
 //   Si un support a été donnée au champ, pour des raisons de compatibilité avec
@@ -673,13 +703,14 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 //                    Le nom du maillage associé est lu mais le pointeur SUPPORT-MESH non initialisé
 
 
-  char * fieldName = new char[MED_TAILLE_NOM+1] ;
+  char * tmpFieldName = new char[MED_TAILLE_NOM+1] ;
   int err ;
   int    numberOfComponents          = 0;
   char * componentName               = (char *) MED_NULL;
   char * unitName                    = (char *) MED_NULL;
   med_2_2::med_type_champ type ;
   med_2_2::med_idt id = MED_FIELD_DRIVER22<T>::_medIdt;
+  bool needConversionToDouble = false,needConversionToInt64 = false;
 
   // we search for the "field med number" of <fieldName>
   // Having found <fieldName>, variables <numberOfComponents>,
@@ -700,12 +731,12 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 	  componentName = new char[numberOfComponents*MED_TAILLE_PNOM22+1] ;
 	  unitName      = new char[numberOfComponents*MED_TAILLE_PNOM22+1] ;
 
-	  err = med_2_2::MEDchampInfo(id, i, fieldName, &type, componentName,
+	  err = med_2_2::MEDchampInfo(id, i, tmpFieldName, &type, componentName,
 				      unitName, numberOfComponents) ;
 
-	  MESSAGE("Field "<<i<<" : #" << fieldName <<"# et recherche #"<<MED_FIELD_DRIVER<T>::_fieldName.c_str()<<"#");
-	  if ( !strcmp(fieldName,MED_FIELD_DRIVER<T>::_fieldName.c_str()) ) {
-	    MESSAGE("FOUND FIELD "<< fieldName <<" : "<<i);
+	  MESSAGE("Field "<<i<<" : #" << tmpFieldName <<"# et recherche #"<<fieldName.c_str()<<"#");
+	  if ( !strcmp(tmpFieldName,fieldName.c_str()) ) {
+	    MESSAGE("FOUND FIELD "<< tmpFieldName <<" : "<<i);
 	    MED_FIELD_DRIVER<T>::_fieldNum = i ;
 	    break ;
 	  }
@@ -715,12 +746,12 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 	}
     }
 
-  delete[] fieldName ;
+  delete[] tmpFieldName ;
 
   // Si aucun champ ne correspond les variables <componentName> et <unitName> ont été correctement
   // désallouées dans la boucle de recherche
   if (MED_FIELD_DRIVER<T>::_fieldNum==MED_INVALID)
-    throw MEDEXCEPTION(LOCALIZED( STRING(LOC) << ": Field "<<  MED_FIELD_DRIVER<T>::_fieldName
+    throw MEDEXCEPTION(LOCALIZED( STRING(LOC) << ": Field "<<  fieldName
 				   << " not found in file " << MED_FIELD_DRIVER<T>::_fileName) );
 
   MESSAGE ("FieldNum : "<<MED_FIELD_DRIVER<T>::_fieldNum);
@@ -728,10 +759,10 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   if (numberOfComponents < 1) {
     delete[] componentName; delete[] unitName;
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" no component found for field "
-				 << MED_FIELD_DRIVER<T>::_fieldName)) ;
+				 << fieldName)) ;
   }
 
-  // REMARQUE : La lecture d'entier dans un FIELD<double> n'est pas gérée correctement
+  // Verifie que l'on essaye pas de lire un champ double dans un FIELD<int>
   switch ( (med_2_2::med_type_champ) MED_FIELD_DRIVER<T>::_ptrField->_valueType ) {
   case  med_2_2::MED_INT :
   case  med_2_2::MED_INT32 :
@@ -742,11 +773,18 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 				   <<") differs from FIELD object type (" <<
 				   MED_FIELD_DRIVER<T>::_ptrField->_valueType << ")" )) ;
     }
+#if defined(IRIX64) || defined(OSF1) ||defined(VPP5000)
+    if (_ptrField->_valueType==MED_EN::MED_INT32 )
+      needConversionToInt64=true;
+#endif
+    break;
+  case med_2_2::MED_FLOAT64 :
+    if (type != med_2_2::MED_FLOAT64)
+      needConversionToDouble=true;
     break;
   default:
     break;
   }
-
 
   string meshName="";
   MESH * ptrMesh = 0;
@@ -765,25 +803,32 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   // Cherche le type d'entité, le nombre d'entité  par type géométrique sur le type d'entité
   // (MED_MAILLE ou MED_NOEUD uniquement car MEDMEMOIRE ne gère pas la connectivité descendante).
   // et crée le support correspondant.
-  SUPPORT * mySupport = new SUPPORT();
-  bool found = createFieldSupportPart1(id,MED_FIELD_DRIVER<T>::_fieldName,
-				  MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber,
-				  MED_FIELD_DRIVER<T>::_ptrField->_orderNumber,
-				  *mySupport, meshName) ;
+  SUPPORT *   mySupport = new SUPPORT();
+  vector<int> numberOfElementsOfTypeC;
+  vector<int> numberOfGaussPoint;
+  int         totalNumberOfElWg=0;
+
+  bool found = createFieldSupportPart1(id,fieldName,
+				       MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber,
+				       MED_FIELD_DRIVER<T>::_ptrField->_orderNumber,
+				       *mySupport, meshName,
+				       numberOfElementsOfTypeC, numberOfGaussPoint,totalNumberOfElWg);
+
   if ( !found ) {
     delete mySupport; delete[] componentName; delete[] unitName;
     MED_FIELD_DRIVER<T>::_fieldNum = MED_INVALID ;
      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"  Can't find any entity for field |"
-				 << MED_FIELD_DRIVER<T>::_fieldName
+				 << fieldName
 				 << "| with (it,or) = ("
 				  << MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber << ","
 				 << MED_FIELD_DRIVER<T>::_ptrField->_orderNumber << "), on mesh "
 				 << meshName << "|" ));
   }
 
+
   MED_EN::medEntityMesh entityType = mySupport->getEntity();
   //Si un SUPPORT était donné, récupère son nom, sa description et
-  //	 le pointeur du maillage associé 
+  //	 le pointeur du maillage associé
   if (! haveSupport)
     meshName = mySupport->getMeshName();
   else {
@@ -794,7 +839,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 				   << MED_EN::entNames[MED_FIELD_DRIVER<T>::_ptrField->
 						       getSupport()->getEntity()]
 				   << "| for field |"
-				   << MED_FIELD_DRIVER<T>::_fieldName
+				   << fieldName
 				   << "| with (it,or) = ("
 				   << MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber << ","
 				   << MED_FIELD_DRIVER<T>::_ptrField->_orderNumber << "), on mesh "
@@ -860,9 +905,11 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   // Il ne s'agit pas de la gestion des profils
   vector < MED_EN::medGeometryElement > v1(  mySupport->getTypes(),
 					     mySupport->getTypes()+mySupport->getNumberOfTypes() );
-  vector < int > v2(mySupport->getNumberOfElements(),
-		    mySupport->getNumberOfElements()+mySupport->getNumberOfTypes() );
-  if ( ( meshGeoType != v1 )  || meshNbOfElOfTypeC != v2  ) {
+  vector<int> v2(numberOfElementsOfTypeC.size());
+  transform(numberOfElementsOfTypeC.begin(),
+	    numberOfElementsOfTypeC.end(),v2.begin(), bind2nd(plus<int>(),1));
+
+  if ( ( meshGeoType != v1 )  || meshNbOfElOfTypeC != v2 ) {
     // ATTENTION : mySupport->setAll(false);
     // Pb : On a envie de positionner onAll à faux si le champ n'est pas défini sur tous les
     //      types géométriques du maillage associé.
@@ -884,13 +931,13 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
   // If an error occurs while reading the field, these allocated FIELD member will be deleted
 
-  MED_FIELD_DRIVER<T>::_ptrField->_name =  MED_FIELD_DRIVER<T>::_fieldName;
-  MED_FIELD_DRIVER<T>::_ptrField->_numberOfComponents = numberOfComponents ;
-  MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes = new int[numberOfComponents] ;
-  MED_FIELD_DRIVER<T>::_ptrField->_componentsNames = new string[numberOfComponents] ;
-  MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits = new UNIT[numberOfComponents] ;
+  MED_FIELD_DRIVER<T>::_ptrField->_name                   = fieldName;
+  MED_FIELD_DRIVER<T>::_ptrField->_numberOfComponents     = numberOfComponents ;
+  MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes        = new int   [numberOfComponents] ;
+  MED_FIELD_DRIVER<T>::_ptrField->_componentsNames        = new string[numberOfComponents] ;
+  MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits        = new UNIT  [numberOfComponents] ;
   MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions = new string[numberOfComponents] ;
-  MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits = new string[numberOfComponents] ;
+  MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits     = new string[numberOfComponents] ;
   for (int i=0; i<numberOfComponents; i++) {
       MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes[i] = 1 ;
       MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i] = string(componentName,i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
@@ -901,95 +948,89 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   delete[] componentName;
   delete[] unitName;
 
-  int NumberOfTypes = mySupport->getNumberOfTypes() ;
-  const MED_EN::medGeometryElement *Types = mySupport->getTypes() ;
-  T ** myValues = new T*[NumberOfTypes] ;
-  int * NumberOfValues = new int[NumberOfTypes] ;
-  int   TotalNumberOfValues = 0 ;
+  int NumberOfTypes                       = mySupport->getNumberOfTypes() ;
+  const MED_EN::medGeometryElement *types = mySupport->getTypes() ;
+  T * myValues = new T[totalNumberOfElWg*numberOfComponents];
+  const int * nbOfElOfType = mySupport->getNumberOfElements() ;
   bool anyProfil = false;
-  int  pflSize=0;
+  int  pflSize=0,index=0;
   // Le vecteur de profil est dimensionné par rapport aux nombres de types
   // géométriques du champ même si le champ n'a pas de profil MED FICHIER sur
   // tous ses types géométriques car dans MEDMEM si onAllElement 
   // du SUPPORT est false il faut positionner un profil pour tous les types géométriques 
   // du SUPPORT
-  vector < int   > profilSize(NumberOfTypes,0);
   int profilSizeC = 0;
-  vector < vector<int>  > profilList(NumberOfTypes);
-  vector < string > profilNameList(NumberOfTypes);
-  MESSAGE ("NumberOfTypes :"<< NumberOfTypes);
-  MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues=0 ;
-
+  vector < int   >        profilSize    (NumberOfTypes,0);
+  vector < vector<int>  > profilList    (NumberOfTypes);
+  vector < string >       profilNameList(NumberOfTypes);
   char * profilName = new char[MED_TAILLE_NOM+1];
 
-  for (int i=0; i<NumberOfTypes; i++) {
+  MESSAGE ("NumberOfTypes      : "<< NumberOfTypes);
+  MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues=0 ;
 
-    NumberOfValues[i] = mySupport->getNumberOfElements(Types[i])
-      * mySupport->getNumberOfGaussPoint(Types[i]);
-    myValues[i] = new T[ NumberOfValues[i]*numberOfComponents ] ;
-    TotalNumberOfValues+=NumberOfValues[i] ;
-    char * LocalGaussName = new char[MED_TAILLE_NOM+1];
 
-    MESSAGE ("Type["<<i+1<<"] :"<< Types[i]);
-    MESSAGE ("Entity :"<<MED_EN::entNames[entityType]);
-    MESSAGE ("NumberOfValues :"<< NumberOfValues[i]);
-    MESSAGE ("NumberOfComponents :"<< numberOfComponents);
-    MESSAGE ("MESH_NAME :"<< meshName.c_str());
-    MESSAGE ("FIELD_NAME :"<< MED_FIELD_DRIVER<T>::_fieldName.c_str());
-    MESSAGE ("MED_ENTITE :"<< (med_2_2::med_entite_maillage) entityType);
-    MESSAGE("MED_GEOM :"<<MED_EN::geoNames[Types[i]]);
-    MESSAGE("Iteration :"<<MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
-    MESSAGE("Order :"<<MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
+  for (int typeNo=0; typeNo<NumberOfTypes; typeNo++) {
 
-    // Le support prend en compte le nombre de valeurs lié aux profils
-    MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues+=mySupport->getNumberOfElements(Types[i]); // Ne doit pas prendre en compte les points de Gauss
-    med_2_2::med_err ret;
+    int numberOfValuesWc= nbOfElOfType[typeNo]*numberOfGaussPoint[typeNo+1]*numberOfComponents;
+    char * gaussModelName = new char[MED_TAILLE_NOM+1];
 
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
-    int lgth2=NumberOfValues[i]*numberOfComponents;
-    if(_ptrField->getValueType()==MED_EN::MED_INT32)
-      {
-	med_2_2::med_int *temp=new med_2_2::med_int[lgth2];
-	ret=med_2_2::MEDchampLire(id,const_cast <char*> (meshName.c_str()),
-				  const_cast <char*> (MED_FIELD_DRIVER<T>::_fieldName.c_str()),
-				  (unsigned char*) temp,
-				  med_2_2::MED_NO_INTERLACE,
-				  MED_ALL,
-				  profilName,
-				  (med_2_2::med_entite_maillage) entityType,
-				  (med_2_2::med_geometrie_element)Types[i],
-				  MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber(),
-				  MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()
-				  );
-	for(int i2=0;i2<lgth2;i2++)
-	  myValues[i][i2]=(int)(temp[i2]);
-	delete [] temp;
-      }
-    else
-#endif
-      //VERIFIER LE NBRE
-      ret=med_2_2::MEDchampLire(id,const_cast <char*> (meshName.c_str()),
-				const_cast <char*> (MED_FIELD_DRIVER<T>::_fieldName.c_str()),
-				(unsigned char*) myValues[i],
-				med_2_2::MED_NO_INTERLACE,
+    MESSAGE ("FIELD_NAME         : "<< fieldName.c_str());
+    MESSAGE ("MESH_NAME          : "<< meshName.c_str());
+    MESSAGE ("MED_ENTITE         : "<< MED_EN::entNames[entityType]);
+    MESSAGE ("MED_GEOM           : "<< MED_EN::geoNames[types[typeNo]]);
+    MESSAGE ("Iteration          : "<< MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
+    MESSAGE ("Order              : "<< MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
+    MESSAGE ("NumberOfElements   : "<< nbOfElOfType[typeNo]);
+    MESSAGE ("NumberOfComponents : "<< numberOfComponents);
+    MESSAGE ("NumberOfGaussPts   : "<< numberOfGaussPoint[typeNo+1]);
+    MESSAGE ("NumberOfValuesWg   : "<< nbOfElOfType[typeNo]*numberOfGaussPoint[typeNo+1]);
+    MESSAGE ("NumberOfValuesWgWc : "<< numberOfValuesWc);
+    MESSAGE ("Index              : "<< index);
+    med_2_2::med_err ret=-1;
+
+    med_2_2::med_int * myValuesTmp=0;
+    unsigned char* ptrTmp=0;
+    if (needConversionToDouble || needConversionToInt64 ) {
+      myValuesTmp = new med_2_2::med_int[numberOfValuesWc];
+      ptrTmp = (unsigned char*) myValuesTmp;
+    } else
+      ptrTmp = (unsigned char*) &myValues[index];
+
+    //VERIFIER LE NBRE
+    ret=med_2_2::MEDMEMchampLire(id,const_cast <char*> (meshName.c_str() ),
+			         const_cast <char*> (fieldName.c_str()),
+				(unsigned char*) ptrTmp,
+				med_2_2::MED_FULL_INTERLACE,
 				MED_ALL,
-				LocalGaussName,
+				gaussModelName,
 				profilName,
 				med_2_2::MED_COMPACT,
-				(med_2_2::med_entite_maillage)   entityType,
-				(med_2_2::med_geometrie_element) Types[i],
+				(med_2_2::med_entite_maillage) entityType,
+				(med_2_2::med_geometrie_element)types[typeNo],
 				MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber(),
 				MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()
 				);
+
+      if (needConversionToDouble || needConversionToInt64 ) {
+
+      if (needConversionToInt64 )  //utiliser un trait
+	for(int i=0;i<numberOfValuesWc;++i)
+	  myValues[index+i]=(int)(myValuesTmp[i]);
+      else
+	for(int i=0;i<numberOfValuesWc;++i)
+	  myValues[index+i]=myValuesTmp[i];
+      delete[] myValuesTmp;
+    }
+
     if (ret < 0)
       {
 	// The Field can't be read then we must delete all previously allocated members in FIELD
-	for(int j=0; j<=i;j++)
-	  delete[] myValues[j];
+	//for(int j=0; j<=i;j++)
+	//  delete[] myValues[j];
 	delete[] myValues;
-	delete[] NumberOfValues ;
+	//delete[] NumberOfValues ;
 	delete[] profilName;
-	delete[] LocalGaussName;
+	delete[] gaussModelName;
 	delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes ;
 	delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsNames ;
 	delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits ;
@@ -1001,10 +1042,45 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 	MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions = NULL ;
 	MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits = NULL ;
 	MED_FIELD_DRIVER<T>::_fieldNum = MED_INVALID ; // we have not found right field, so reset the field number
-	throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<": ERROR when read value")) ;
+	throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<": ERROR while reading values")) ;
       }
+    index += numberOfValuesWc;
+    // Le support prend en compte le nombre de valeurs lié aux profils
+    MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues+=
+      nbOfElOfType[typeNo];// Ne doit pas prendre en compte les points de Gauss
 
-    delete[] LocalGaussName ;
+    // second et troisième test lié à un bug medfichier
+    if ( strcmp(gaussModelName,MED_NOGAUSS) && strcmp(gaussModelName,string(MED_TAILLE_NOM,' ').c_str() )
+	 && strcmp(gaussModelName,string(16,' ').c_str() )  ) {
+ 
+	int type_geo = (int) types[typeNo];
+	int t1       = (type_geo%100)*(type_geo/100);
+	int ngauss   = numberOfGaussPoint[typeNo+1];
+	int t2       = ngauss*(type_geo/100);
+	med_2_2::med_float * refcoo = new med_2_2::med_float[t1];
+	med_2_2::med_float * gscoo  = new med_2_2::med_float[t2];
+	med_2_2::med_float * wg     = new med_2_2::med_float[ngauss];
+
+	if (MEDgaussLire(id, refcoo, gscoo, wg, (med_2_2::med_mode_switch) interlacingType,
+			 gaussModelName ) < 0)
+	  throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while reading Gauss Model |"
+				      << gaussModelName << "| for FIELD "<< fieldName
+				      << " on geometric type " << MED_EN::geoNames[types[typeNo]]
+				      )
+			   );
+	if (isFullInterlace ) { //serait inutile avec un driver template du type d'entrelacement
+	  GAUSS_LOCALIZATION<FullInterlace> * loc;
+	  loc = new GAUSS_LOCALIZATION<FullInterlace>(gaussModelName,types[typeNo],ngauss, refcoo,gscoo, wg);
+	  MED_FIELD_DRIVER<T>::_ptrField->_gaussModel[types[typeNo]]=loc;
+	} else {
+	  GAUSS_LOCALIZATION<NoInterlace> * loc;
+	  loc = new GAUSS_LOCALIZATION<NoInterlace>(gaussModelName,types[typeNo],ngauss, refcoo,gscoo, wg);
+	  MED_FIELD_DRIVER<T>::_ptrField->_gaussModel[types[typeNo]]=loc;
+	}
+//	cout << *MED_FIELD_DRIVER<T>::_ptrField->_gaussModel[types[typeNo]] << endl;
+	delete [] refcoo;delete [] gscoo; delete [] wg;
+    }
+    delete[] gaussModelName ;
 
     if ( strcmp(profilName,MED_NOPFL) ) {
       anyProfil = true;
@@ -1013,24 +1089,33 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Error while reading the profil size of |"
 				     << profilName << "|" ));
 
-      //profil = new int[pflSize];
-      profilSize[i]=pflSize;
-      profilList[i].resize(pflSize);
-      ret = med_2_2::MEDprofilLire(id,&profilList[i][0],profilName); // cf item 16 Effective STL
-      profilNameList[i]=string(profilName);
+      profilSize[typeNo]=pflSize;
+      profilList[typeNo].resize(pflSize);
+      ret = med_2_2::MEDprofilLire(id,&profilList[typeNo][0],profilName); // cf item 16 Effective STL
+      profilNameList[typeNo]=string(profilName);
     }
   }
+
   delete[] profilName ;
 
+  //MESSAGE ("Index              : "<< index);
+  assert(index == totalNumberOfElWg*numberOfComponents);
+  assert(MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues ==  mySupport->getNumberOfElements(MED_ALL_ELEMENTS));
 
   if (anyProfil) {
 
     for (int typeNo=0; typeNo < NumberOfTypes; typeNo++) {
 
-      // Trouve l'index du type géométriques dans la liste des types géométriques du maillage
+      // Trouve l'index du type géométrique dans la liste des types géométriques du maillage
       // correspondant au type géométrique du champ traité
       vector<MED_EN::medGeometryElement>::iterator meshTypeNoIt =
-	find(meshGeoType.begin(),meshGeoType.end(),Types[typeNo]); //Gérer l'exception
+	find(meshGeoType.begin(),meshGeoType.end(),types[typeNo]); //Gérer l'exception
+      if ( meshTypeNoIt ==  meshGeoType.end() )
+	throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Can't find "<< MED_EN::geoNames[types[typeNo]]
+				      << " on entity " << MED_EN::entNames[entityType]
+				      << " in geometric type list of mesh " << meshName
+				      )
+			   );
       int meshTypeNo = meshTypeNoIt -  meshGeoType.begin();
 
       if (! profilList[typeNo].empty() ) {
@@ -1049,7 +1134,6 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 	// il ne faut pas décaler les numéros du profils qui commencent à 1 dans MEDFICHIER
 	// rem2 : meshNbOfElOfTypeC[NumberOfTypes] ne devrait jamais être utilisé
 	  profilList[typeNo][i]+=meshNbOfElOfTypeC[meshTypeNo];
-//      cout << "profilList1["<<typeNo<<"]["<<i<<"]="<< profilList[typeNo][i] << endl;
 	}
       } else {
 	// Créer le profil <MED_ALL> pour ce type géométrique
@@ -1067,7 +1151,6 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
 	for (int j = 1; j <= pflSize; j++) {
 	  profilList[typeNo][j-1]=meshNbOfElOfTypeC[meshTypeNo] + j ; // index MEDMEM commence à 1
-	  cout << "profilList2["<<typeNo<<"]["<<j-1<<"]="<< profilList[typeNo][j-1] << endl;
 	}
 	profilNameList[typeNo] = MED_NOPFL; //Information a utiliser pour la sauvegarde : PLUTOT MED_ALL
       }
@@ -1086,48 +1169,43 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     mySupport->setAll(false);
     mySupport->setpartial(skyLine,true);
     mySupport->setProfilNames(profilNameList);
-
+//    cout << "Valeurs du skyline du SUPPORT partiel crée : " << *skyLine << endl;
   }
 
-  // allocate _value
-  // probleme avec les points de gauss : voir lorsqu-il y en a (!= 1)
-
   // Créer un driver spécifique pour les modes MED_FULL_INTERLACE et MED_NO_INTERLACE
-  // serait plus efficicace.
-  ArrayNo * Values = new ArrayNo(numberOfComponents,TotalNumberOfValues);
-
-  for (int i=0; i<numberOfComponents; i++)
-    {
-      //T * ValuesT = Values->getRow(i+1) ;
-      int Count = 1 ;
-      for (int j=0; j<NumberOfTypes; j++) {
-	T * myValue = myValues[j] ;
-	int NumberOf = NumberOfValues[j] ;
-	//	  MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues+=NumberOf; // problem with gauss point : _numberOfValues != TotalNumberOfValues !!!!!!!
-	int offset = NumberOf*i ;
-	for (int k=0 ; k<NumberOf; k++)
-	  {
-	    //ValuesT[Count]=myValue[k+offset] ;
-	    Values->setIJ(Count,i+1,myValue[k+offset]); //Eviter de tout recopier
-// 	    SCRUTE(Count);
-// 	    SCRUTE(Values->getIJ(Count,i+1));
-	    Count++;
-	  }
-      }
-    }
-
-  for (int j=0; j<NumberOfTypes; j++)
-    delete[] myValues[j] ;
-  delete[] myValues ;
-  delete[] NumberOfValues ;
-
+  // serait plus efficace.
+  bool anyGauss = (numberOfGaussPoint != vector<int>(numberOfGaussPoint.size(),1));
+  SCRUTE(anyGauss);
+  MEDMEM_Array_ * Values;
+  if (anyGauss) {
+    SCRUTE(mySupport->getNumberOfElements(MED_ALL_ELEMENTS) );
+    SCRUTE(NumberOfTypes);
+    SCRUTE(numberOfElementsOfTypeC[NumberOfTypes]-1);
+    assert(mySupport->getNumberOfElements(MED_ALL_ELEMENTS) == (numberOfElementsOfTypeC[NumberOfTypes]-1) );
+    Values = new ArrayFullWg(myValues,
+			     numberOfComponents,
+			     numberOfElementsOfTypeC[NumberOfTypes]-1,
+			     // Up : Prend en compte les profils et
+			     // Ne prend pas en compte le nbre de composantes et
+			     // le nombre de points de Gauss
+			     NumberOfTypes,
+			     &numberOfElementsOfTypeC[0],
+			     &numberOfGaussPoint[0],
+			     true,true);
+//     cout << "Valeurs du ArrayFullWg crée : " << endl <<
+//       *(static_cast<ArrayFullWg*>(Values))  << endl;
+  } else
+    Values = new ArrayFull(myValues,numberOfComponents,totalNumberOfElWg,
+				       true,true);
   if (MED_FIELD_DRIVER<T>::_ptrField->_value != NULL)
     delete MED_FIELD_DRIVER<T>::_ptrField->_value;
 
-  if ( MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
+  if ( MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE )
     {
-      // dynamic_cast inutile
-      MED_FIELD_DRIVER<T>::_ptrField->_value=dynamic_cast<ArrayFull *>(ArrayConvert(*Values));
+      if (Values->getGaussPresence())
+	MED_FIELD_DRIVER<T>::_ptrField->_value=ArrayConvert(*static_cast<ArrayFullWg*>(Values));
+      else
+	MED_FIELD_DRIVER<T>::_ptrField->_value=ArrayConvert(*static_cast<ArrayNo*    >(Values));
       delete Values;
     }
   else
@@ -1165,9 +1243,15 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 {
   const char * LOC = "MED_FIELD_WRONLY_DRIVER22::write(void) const " ;
   BEGIN_OF(LOC);
-
-  typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array ArrayNo;
+  typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array   ArrayNo;
+  typedef typename MEDMEM_ArrayInterface<T,NoInterlace,Gauss>::Array     ArrayNoWg;
   typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array ArrayFull;
+  typedef typename MEDMEM_ArrayInterface<T,FullInterlace,Gauss>::Array   ArrayFullWg;
+
+  typedef map<MED_EN::medGeometryElement,GAUSS_LOCALIZATION<FullInterlace>*> locMapFull;
+  typedef map<MED_EN::medGeometryElement,GAUSS_LOCALIZATION<NoInterlace>*>   locMapNo;
+  typedef map<MED_EN::medGeometryElement,GAUSS_LOCALIZATION_*>   locMap;
+
   med_2_2::med_idt id = MED_FIELD_DRIVER22<T>::_medIdt;
 
   if (MED_FIELD_DRIVER<T>::_status!=MED_OPENED)
@@ -1199,6 +1283,8 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 				 << fieldName << "."));
 
   bool onAll = mySupport->isOnAllElements();
+  const locMap & gaussModel = MED_FIELD_DRIVER<T>::_ptrField->_gaussModel;
+
 
   string meshName = mySupport->getMeshName();
   SCRUTE(meshName);
@@ -1386,16 +1472,16 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
     }
   }
 
+  const MED_EN::medGeometryElement * types = mySupport->getTypes() ;
+  int numberOfTypes = mySupport->getNumberOfTypes() ;
   int numberOfElForMED = -1;
   const T   * value   = NULL;
-  // on boucle sur tout les types pour ecrire les tableaux de valeur
-  int numberOfTypes = mySupport->getNumberOfTypes() ;
   int index = 1 ;
-  const MED_EN::medGeometryElement * types = mySupport->getTypes() ;
-  // A RETABLIR : const int * NumberOfGaussPoint = mySupport->getNumberOfGaussPoint() ;
+  // on boucle sur tout les types pour ecrire les tableaux de valeur
   for (int typeNo=0;typeNo<numberOfTypes;typeNo++) {
 
     int numberOfElements = mySupport->getNumberOfElements(types[typeNo]) ;
+    //UP : prend en compte les profils, pas les points de Gauss
 
     //value = MED_FIELD_DRIVER<T>::_ptrField->getRow(index) ;
     // rem 1 : le getRow du Array est différent de celui du FIELD si le SUPPORT contient
@@ -1418,9 +1504,16 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
       vector<int> profil(&number[index-1],&(number[index-1])+numberOfElements);
 
       // Trouve l'index du type géométrique dans la liste des types géométriques du maillage
-      // correspondant au type géométrique du champ en cours de traiement
+      // correspondant au type géométrique du champ en cours de traitement
       vector<MED_EN::medGeometryElement>::iterator meshTypeNoIt =
-	find(meshGeoType.begin(),meshGeoType.end(),types[typeNo]); //Gérer l'exception
+	find(meshGeoType.begin(),meshGeoType.end(),types[typeNo]);
+      if ( meshTypeNoIt ==  meshGeoType.end() )
+	throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Can't find "<< MED_EN::geoNames[types[typeNo]]
+				      << " on entity " << MED_EN::entNames[entityType]
+				      << " in geometric type list of mesh " << meshName
+				      )
+			   );
+
       int meshTypeNo = meshTypeNoIt -  meshGeoType.begin();
 
       if ( profilName == MED_NOPFL && profil.size() != meshNbOfElOfType[meshTypeNo] )
@@ -1436,6 +1529,9 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 			    )
 			 );
 
+      //REM : Ce n'est pas évident, mais lorsqu'il y a un profil, le nombre de valeurs
+      //      que l'on indique à MEDchampEcr est le nombre de valeurs sans profil, d'où
+      //      le nombre d'éléments du maillage sur le type géométrique courant.
       numberOfElForMED = meshNbOfElOfType[meshTypeNo];
 
       for (int ind=0;ind < numberOfElements;++ind) {
@@ -1445,7 +1541,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 //  	cout << "profil2["<<ind<<"]="<<profil[ind]<<endl;
       }
 
-      if ( profil[numberOfElements-1] > numberOfElForMED ) //prendre en compte le nombre de points de gauss
+      if ( profil[numberOfElements-1] > numberOfElForMED )
 	throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while creating profil for FIELD "<< fieldName 
 				      << " on entity " << MED_EN::entNames[entityType]
 				      << " and geometric type " << MED_EN::geoNames[types[typeNo]] << " with (it,or) = ("
@@ -1458,7 +1554,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 			    )
 			 );
 
-      if ( med_2_2::MEDprofilEcr(id,
+      if ( med_2_2::MEDMEMprofilEcr(id,
 				 &profil[0],
 				 numberOfElements,
 				 const_cast<char *>(profilName.c_str())) < 0)
@@ -1469,6 +1565,70 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 			 );
     }
 
+
+    string locName=MED_NOGAUSS;
+    if (myField->getGaussPresence()) {
+//       cout << endl << "Nombre de points de Gauss à l'écriture de " << fieldName
+// 	   << " pour le type géométrique : " << MED_EN::geoNames[types[typeNo]]
+// 	   << " : " << myField->getNumberOfGaussPoints(types[typeNo]) << endl;
+//       cout << *mySupport << endl;
+
+      const GAUSS_LOCALIZATION_ * locPtr=0;
+      locMap::const_iterator it;
+      if ( ( it = gaussModel.find(types[typeNo])) != gaussModel.end() )
+	locPtr = (*it).second;
+      else
+	throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while creating Gauss Model for FIELD "<< fieldName 
+				      << " on entity " << MED_EN::entNames[entityType]
+				      << " and geometric type " << MED_EN::geoNames[types[typeNo]] << " with (it,or) = ("
+				      << MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber << ","
+				      << MED_FIELD_DRIVER<T>::_ptrField->_orderNumber << "), with profilName "
+				      << profilName << " on mesh " << meshName
+				      << " : Can't find a Gauss localisation model for this geometric type" 
+			    )
+			 );
+
+      int ngauss = -1;
+      if ( locPtr->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) {
+	const GAUSS_LOCALIZATION<FullInterlace> & loc=*(static_cast<const GAUSS_LOCALIZATION<FullInterlace> * >(locPtr));
+	ngauss = loc.getNbGauss();
+	locName=loc.getName();
+	err=med_2_2::MEDMEMgaussEcr(id,
+			       (med_2_2::med_geometrie_element) loc.getType(),
+			       (med_2_2::med_float *)           loc.getRefCoo().getPtr(),
+			                                        med_2_2::MED_FULL_INTERLACE,
+			       (med_2_2::med_int)               ngauss,
+			       (med_2_2::med_float *)           loc.getGsCoo().getPtr(),
+			       (med_2_2::med_float *)           (&loc.getWeight()[0]),
+			       const_cast<char *>               (locName.c_str())
+			       );
+      } else {
+	const GAUSS_LOCALIZATION<NoInterlace> & loc=*(static_cast<const GAUSS_LOCALIZATION<NoInterlace> * >(locPtr));
+	ngauss = loc.getNbGauss();
+	locName=loc.getName();
+	err=med_2_2::MEDMEMgaussEcr(id,
+			       (med_2_2::med_geometrie_element) loc.getType(),
+			       (med_2_2::med_float *)           loc.getRefCoo().getPtr(),
+				                                med_2_2::MED_NO_INTERLACE,
+			       (med_2_2::med_int)               ngauss,
+			       (med_2_2::med_float *)           loc.getGsCoo().getPtr(),
+			       (med_2_2::med_float *)           (&loc.getWeight()[0]),
+			       const_cast<char *>               (locName.c_str())
+			       );
+
+      };
+
+      if ( err != 0 )
+	throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while writing Gauss Model for FIELD "<< fieldName
+				      << " on entity " << MED_EN::entNames[entityType]
+				      << " and geometric type " << MED_EN::geoNames[types[typeNo]] 
+			    )
+			 );
+
+	//numberOfElForMED *= mySupport->getNumberOfGaussPoints(types[typeNo]); //Deplacer la méthode dans FIELD
+	numberOfElForMED *= ngauss;
+    }
+
     MESSAGE("MED_FIELD_DRIVER22<T>::_medIdt                       : "<<id);
     MESSAGE("meshName.c_str()                : "<<meshName.c_str());
     MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getName()            : "<<MED_FIELD_DRIVER<T>::_ptrField->getName());
@@ -1476,13 +1636,12 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
     MESSAGE("value                           : "<<value);
     MESSAGE("numberOfElements                : "<<numberOfElements);
     MESSAGE("numberOfElForMED                : "<<numberOfElForMED);
-    //    MESSAGE("NumberOfGaussPoint[i]     : "<<NumberOfGaussPoint[typeNo]);
     MESSAGE("entityType                      : "<<MED_EN::entNames[entityType]);
     MESSAGE("types[i]                        : "<<MED_EN::geoNames[types[typeNo]]);
+    MESSAGE("NumberOfGaussPoint[i]           : "<<myField->getNumberOfGaussPoints(types[typeNo]));
     MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber() : "<<MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
     MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getTime()            : "<<MED_FIELD_DRIVER<T>::_ptrField->getTime());
     MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()     : "<<MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
-
 
     // Rem 1 : le nombre d'éléments passé à MEDchampEcr ne doit pas tenir compte de la taille
     //         des profils : c'est la taille du champ sans profil.
@@ -1490,8 +1649,11 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 			     const_cast <char*> ( meshName.c_str()) ,
 			     const_cast <char*> ( fieldName.c_str()),
 			     (unsigned char*)value, med_2_2::MED_FULL_INTERLACE,
-			     numberOfElForMED, //numberOfElements,//*NumberOfGaussPoint[typeNo],
-			     MED_NOGAUSS, MED_ALL,
+			     numberOfElForMED,
+			     //UP : prend en compte le nombre de points de Gauss mais 
+			     //     pas le nombre de composantes
+			     const_cast <char*> ( locName.c_str()),
+			     MED_ALL,
 			     const_cast <char *> (profilName.c_str()), med_2_2::MED_COMPACT,
 			     (med_2_2::med_entite_maillage)entityType,
 			     (med_2_2::med_geometrie_element)types[typeNo],
@@ -1514,7 +1676,8 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 			 );
     }
 
-    index += numberOfElements ;
+    index += numberOfElements ; //Ne doit pas prendre en compte le nombre de points de GAUSS
+                                //ni les composantes.
 
   }
   if ( MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE ) delete myField;

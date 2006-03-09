@@ -27,7 +27,7 @@
 #undef MED_PROTO_H
 
 namespace med_2_2 {
-  extern "C" { 
+  extern "C" {
 #include <med.h>
 #include <med_proto.h>
   }

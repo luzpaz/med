@@ -147,7 +147,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
       Find = build(MED_FACE,MEDArrayFaceFamily) ;
     }
   }
-  
+
   // on edge ?
   if (!Find) {
     if ((_mesh->existConnectivity(MED_NODAL,MED_EDGE))|(_mesh->existConnectivity(MED_DESCENDING,MED_EDGE))) {
@@ -161,14 +161,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
     _numberOfGeometricType = 0 ;
     _isOnAllElts = false ;
     MESSAGE ("FAMILY() : No entity found !") ;
-  } 
-  // already done by support !!!!
-//    else { // set gauss point number to be equal one !
-//      _numberOfGaussPoint = new int[_numberOfGeometricType] ;
-//      for (int i=0; i<_numberOfGeometricType; i++)
-//        _numberOfGaussPoint[i]=1 ;
-//    }
-
+  }
 
   MESSAGE("Well now ??? :::");
 
@@ -191,7 +184,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
     }
   } else
     MESSAGE("Is on all entities !");
-  
+
 
 
 };

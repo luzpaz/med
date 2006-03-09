@@ -32,14 +32,43 @@ h5dump Essai9.med > Essai9.log && rm Essai9.med
 ./test_copie_support pointe.med maa1  >   Essai32
 #./test_gibi_driver pointe.med maa1    >   Essai33
 ./duplicateMED pointe.med   Essai34
-rm -f Copy_nomesh_zzzz121b_without_tr6.med Copy_withmesh_zzzz121b_without_tr6.med &&  ./test_profil_MedFieldDriver zzzz121b_without_tr6.med RESUZEROERRE_ELGA_NORE__________ 1 1 > ESSAI35
-# Le fichier suivant ne peut pas passer en mode 2
-# en MODE 1 il faut débrayer la génération du fichier Copy_withmesh_maill.00.med et utiliser
-# celui fourni.
-# MODE 2: Le problème est qu'à la lecture du fichier (qui contient SEG2 TRIA3 et QUAD4)  le driver mesh crée de nouveaux SEG2 or
+
+#RESUZERODEPL____________________ 1 1 sur NOEUDS, 3 composantes, 1 points de Gauss,  taille de profil 18 
+#RESUZEROERRE_ELGA_NORE__________ 1 1 sur TETRA10, 6 composantes, 1 points de Gauss,  taille de profil 3 
+#RESUZEROSIEF_ELGA_DEPL__________ 1 1 sur TETRA10, 6 composantes, 5 points de Gauss,  taille de profil 3 
+#RESUZEROSIGM_ELNO_DEPL__________ 1 1 sur TETRA10, 6 composantes, 10 points de Gauss, taille de profil 3  
+
+rm -f Copy_nomesh_zzzz121b_without_tr6.med Copy_withmesh_zzzz121b_without_tr6.med &&  ./test_profil_MedFieldDriver zzzz121b_without_tr6.med RESUZERODEPL____________________ 1 1 > Essai35
+rm -f Copy_nomesh_zzzz121b_without_tr6.med Copy_withmesh_zzzz121b_without_tr6.med &&  ./test_profil_MedFieldDriver zzzz121b_without_tr6.med RESUZEROERRE_ELGA_NORE__________ 1 1 > Essai36
+rm -f Copy_nomesh_zzzz121b_without_tr6.med Copy_withmesh_zzzz121b_without_tr6.med &&  ./test_profil_gauss_MedFieldDriver zzzz121b_without_tr6.med RESUZEROSIEF_ELGA_DEPL__________ 1 1 > Essai37
+rm -f Copy_nomesh_zzzz121b_without_tr6.med Copy_withmesh_zzzz121b_without_tr6.med &&  ./test_profil_gauss_MedFieldDriver zzzz121b_without_tr6.med RESUZEROSIGM_ELNO_DEPL__________ 1 1 > Essai38
+
+# Le fichier maill.00.med ne peut pas passer en mode 2
+# - En MODE 1 il faut débrayer la génération du fichier Copy_withmesh_maill.00.med et utiliser celui fourni.
+# - En MODE 2, le problème est qu'à la lecture du fichier (qui contient SEG2 TRIA3 et QUAD4) le driver mesh crée de nouveaux SEG2 or
 # le champ qui a été chargé au préalable a pris le maillage contenu dans le fichier comme référence du coup à la réécriture des numéros
 # de profils il décale d'un nombre d'entités cumulées trop important. 
-#mode 1 avec modif du fichier test
-#cp maill.00_nofield.med.h5 Copy_withmesh_maill.00.med;./test_profil_MedFieldDriver maill.00.med Indicateur_d_erreur_00 2 2
-#mode 3 en activant uniquement le mode 3
+
+# MODE 1 avec modif du fichier test
+#cp maill.00_nofield.med Copy_withmesh_maill.00.med;./test_profil_MedFieldDriver maill.00.med Indicateur_d_erreur_00 2 2
+# MODE 3 en activant uniquement le mode 3
 ##rm -f Copy_withmesh_maill.00.med Copy_nomesh_maill.00.med && cp maill.00_nofield.med Copy_withmesh_maill.00.med;cp maill.00_nomesh.med Copy_nomesh_maill.00.med;./test_profil_MedFieldDriver maill.00.med Indicateur_d_erreur_00 2 2
+
+#Indicateur_d_erreur_00 1 1 TRIA3, 1 composante, 1 point de Gauss, pas de profil
+#Indicateur_d_erreur_00 1 1 QUAD4, 1 composante, 1 point de Gauss, pas de profil
+
+#Indicateur_d_erreur_00 2 2 TRIA3, 1 composante, 1 point de Gauss, taille de profil 4
+#Indicateur_d_erreur_00 2 2 QAUD4, 1 composante, 1 point de Gauss, taille de profil 2
+
+#Indicateur_d_erreur_00 3 3 TRIA3, 1 composante, 3 point de Gauss, pas de profil
+#Indicateur_d_erreur_00 3 3 QAUD4, 1 composante, 4 point de Gauss, pas de prrofil
+
+#Indicateur_d_erreur_00 3 3 TRIA3, 1 composante, 3 point de Gauss, taille de profil 4
+#Indicateur_d_erreur_00 3 3 QAUD4, 1 composante, 4 point de Gauss, taille de profil 2
+
+rm Copy*; ./test_profil_MedFieldDriver maill.00_without_seg2.med Indicateur_d_erreur_00 1 1 > Essai39
+rm Copy*; ./test_profil_MedFieldDriver maill.00_without_seg2.med Indicateur_d_erreur_00 2 2 > Essai40
+rm Copy*; ./test_profil_gauss_MedFieldDriver maill.00_without_seg2.med Indicateur_d_erreur_00 3 3 > Essai41
+rm Copy*; ./test_profil_gauss_MedFieldDriver maill.00_without_seg2.med Indicateur_d_erreur_00 4 4 > Essai42
+
+

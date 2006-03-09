@@ -74,7 +74,7 @@ public :
   FullInterlaceNoGaussPolicy(const FullInterlaceNoGaussPolicy & policy,
 				bool shallowcopie=true)
     : InterlacingPolicy(policy) {};
- 
+
   inline int getIndex(int i,int j) const {
     return (i-1)*_dim + j-1;
   }
