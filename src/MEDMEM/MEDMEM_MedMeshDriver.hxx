@@ -45,9 +45,9 @@ class CONNECTIVITY;
 class MED_MESH_DRIVER : public GENDRIVER
 {
 protected:
-  
-  MESH *   _ptrMesh;
-  string         _meshName;    // const ?
+
+  MESH *         _ptrMesh;
+  mutable string _meshName;
   int            _meshNum;     // INUTILE ?
 
 
@@ -60,8 +60,8 @@ public :
   /*!
     Constructor.
   */
-  MED_MESH_DRIVER(const string & fileName,  
-		  MESH * ptrMesh, 
+  MED_MESH_DRIVER(const string & fileName,
+		  MESH * ptrMesh,
 		  MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.

@@ -678,19 +678,6 @@ Internal Corba method.
     SALOME::SenderInt getSenderForNumberIndex()
       raises (SALOME::SALOME_Exception);
 
-    /*!
-      Returns the number of Gauss points for this %medGeometryElement.
-
-      \note
-      - Not defined if %SUPPORT is on MED_NODE.
-      - Not defined for MED_ALL_ELEMENTS %medGeometryElement type.
-     */
-    long getNumberOfGaussPoint(in medGeometryElement geomElement)
-      				raises (SALOME::SALOME_Exception);
-
-    SALOME_MED::long_array getNumbersOfGaussPoint()
-      				raises (SALOME::SALOME_Exception);
-
     void getBoundaryElements()
       					raises (SALOME::SALOME_Exception);
 /*!

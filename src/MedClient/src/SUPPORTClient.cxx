@@ -87,10 +87,6 @@ void SUPPORTClient::blankCopy()
 
   	SCRUTE(_totalNumberOfElements);
   	_complete_support = false;
-	//Gauss points settings
-	_numberOfGaussPoint = new int[_numberOfGeometricType];
-	for (int i=0;i<_numberOfGeometricType;i++)
-	  _numberOfGaussPoint[i] = 1 ;
   }
   catch( const CORBA::Exception &ex )
   {

@@ -138,7 +138,7 @@ MED_MESH_RDONLY_DRIVER22::~MED_MESH_RDONLY_DRIVER22()
 {
   //MESSAGE("MED_MESH_RDONLY_DRIVER22::~MED_MESH_RDONLY_DRIVER() has been destroyed");
 }
-  
+
 GENDRIVER * MED_MESH_RDONLY_DRIVER22::copy(void) const
 {
   return new MED_MESH_RDONLY_DRIVER22(*this);
@@ -150,6 +150,19 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
   BEGIN_OF(LOC);
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The _idt of file " << _fileName << " is : " << _medIdt <<  " (the file is not opened)." )) ;
+
+  if ( ( _meshName.empty() ) && ( _ptrMesh->_name.empty() )    )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
+				 <<" neither <meshName> is set in driver nor in object MESH.")) ;
+
+  // If _meshName is not set in driver, try to use _ptrMesh->_name
+  if ( ( _meshName.empty() ) && ( !_ptrMesh->_name.empty() )    )
+    _meshName=_ptrMesh->_name;
+
+  if ( _meshName.size() > MED_TAILLE_NOM )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
+				 <<" <meshName> size in object driver MESH is > MED_TAILLE_NOM ."));
+
 
   _ptrMesh->_name =  _meshName;
 
@@ -1786,6 +1799,20 @@ void MED_MESH_WRONLY_DRIVER22::write(void) const
 
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "File "<<_fileName<<" is not open. Open it before write !"));
+
+  string fieldName;
+  if ( ( _meshName.empty() ) && ( _ptrMesh->_name.empty() )    )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
+				 <<" neither <meshName> is set in driver nor in object MESH.")) ;
+
+  // If _meshName is not set in driver, try to use _ptrmesh->_meshName
+  if ( ( _meshName.empty() ) && ( !_ptrMesh->_name.empty() )    )
+    _meshName=_ptrMesh->_name;
+
+  if ( _meshName.size() > MED_TAILLE_NOM )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
+				 <<" <meshName> size in object driver MESH is > MED_TAILLE_NOM ."));
+
 
   if (_ptrMesh->getIsAGrid())
   {

@@ -45,9 +45,9 @@ template <class T> class MED_FIELD_DRIVER : public GENDRIVER
 {
 protected:
   // Developement plus propre :
-  // - Il faudrait soit utiliser le type FIELD_ et ajouter Ã  cette classe
-  //   les accesseurs de FIELD<> utilisÃ©s dans les drivers
-  // - Ou bien avoir des drivers Ã  deux paramÃ¨tres template (le top)
+  // - Il faudrait soit utiliser le type FIELD_ et ajouter à cette classe
+  //   les accesseurs de FIELD<> utilisées dans les drivers
+  // - Ou bien avoir des drivers à deux paramètres template (le top)
   // - Remarquez l'affreux cast dans le second constructeur :
   //      _ptrField( (FIELD<T> *) ptrField )
   //   Cela cast toujours le ptrField en FullInterlace
@@ -57,11 +57,6 @@ protected:
   int            _fieldNum;
 
 public :
-
-  // all MED cell type ?? Classe de DÃ©finition ??
-  //   static const medGeometryElement all_cell_type[MED_NBR_GEOMETRIE_MAILLE];
-
-  //   static const char * const all_cell_type_tab [MED_NBR_GEOMETRIE_MAILLE];
 
   /*!
     Constructor.
@@ -77,7 +72,7 @@ public :
 		   MED_EN::med_mode_acces accessMode)
     : GENDRIVER(fileName,accessMode),
       _ptrField((FIELD<T> *) ptrField),
-      _fieldName(fileName),_fieldNum(MED_INVALID)
+      _fieldName(""),_fieldNum(MED_INVALID)
   {
   }
 

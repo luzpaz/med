@@ -173,6 +173,46 @@ void MESHClient::fillCopy()
   _coord->fillCopy();
   _connect->fillCopy();
 
+  int size = _familyNode.size();
+
+  for (int i = 0; i < size; i++)
+    {
+      FAMILYClient * _fam = dynamic_cast<FAMILYClient *> (_familyNode[i]);
+      ASSERT(_fam);
+
+      _fam->fillCopy();
+    }
+
+  size = _familyCell.size();
+
+  for (int i = 0; i < size; i++)
+    {
+      FAMILYClient * _fam = dynamic_cast<FAMILYClient *> (_familyCell[i]);
+      ASSERT(_fam);
+
+      _fam->fillCopy();
+    }
+
+  size = _familyFace.size();
+
+  for (int i = 0; i < size; i++)
+    {
+      FAMILYClient * _fam = dynamic_cast<FAMILYClient *> (_familyFace[i]);
+      ASSERT(_fam);
+
+      _fam->fillCopy();
+    }
+
+  size = _familyEdge.size();
+
+  for (int i = 0; i < size; i++)
+    {
+      FAMILYClient * _fam = dynamic_cast<FAMILYClient *> (_familyEdge[i]);
+      ASSERT(_fam);
+
+      _fam->fillCopy();
+    }
+
   _complete = true;
 
   END_OF("MESHClient::fillCopy()");

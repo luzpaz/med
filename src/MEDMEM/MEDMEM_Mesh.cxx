@@ -1731,7 +1731,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 
   int numberOfGeometricType ;
   medGeometryElement* geometricType ;
-  int * numberOfGaussPoint ;
   int * geometricTypeNumber ;
   int * numberOfEntities ;
   //  MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY() ;
@@ -1743,8 +1742,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     geometricType = new medGeometryElement[1] ;
     const medGeometryElement *  allType = getTypes(MED_FACE);
     geometricType[0] = allType[0] ;
-    numberOfGaussPoint = new int[1] ;
-    numberOfGaussPoint[0] = 1 ;
     geometricTypeNumber = new int[1] ; // not use, but initialized to nothing
     geometricTypeNumber[0] = 0 ;
     numberOfEntities = new int[1] ;
@@ -1765,7 +1762,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
     //const medGeometryElement *  allType = getTypes(MED_FACE); !! UNUSED VARIABLE !!
-    numberOfGaussPoint = new int[numberOfGeometricType] ;
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfEntities = new int[numberOfGeometricType] ;
     mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
@@ -1774,7 +1770,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     map<medGeometryElement,int>::iterator theTypeIt ;
     for (theTypeIt=theType.begin();theTypeIt!=theType.end();theTypeIt++) {
       geometricType[index] = (*theTypeIt).first ;
-      numberOfGaussPoint[index] = 1 ;
       geometricTypeNumber[index] = 0 ;
       numberOfEntities[index] = (*theTypeIt).second ;
       mySkyLineArrayIndex[index+1]=mySkyLineArrayIndex[index]+numberOfEntities[index] ;
@@ -1786,7 +1781,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 
   mySupport->setNumberOfGeometricType(numberOfGeometricType) ;
   mySupport->setGeometricType(geometricType) ;
-  mySupport->setNumberOfGaussPoint(numberOfGaussPoint) ;
   //  mySupport->setGeometricTypeNumber(geometricTypeNumber) ;
   mySupport->setNumberOfElements(numberOfEntities) ;
   mySupport->setTotalNumberOfElements(size) ;
@@ -1794,7 +1788,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 
   delete[] numberOfEntities;
   delete[] geometricTypeNumber;
-  delete[] numberOfGaussPoint;
   delete[] geometricType;
   delete[] mySkyLineArrayIndex;
   delete[] myListArray;

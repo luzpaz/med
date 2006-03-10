@@ -71,6 +71,16 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(const int count, const int length,
 	  }
 }
 
+ostream& MEDMEM::operator<<(ostream &os, const MEDSKYLINEARRAY &sky) {
+  os << "_count : " << sky._count << " ,_length : " << sky._length;
+  for (int i = 0; i < sky._count ; i++) {
+    os << endl << "Values of type n°" << i+1 << " (index["<<i<<"]="<< sky._index[i]<<") :" << endl;
+    for (int j=sky._index[i]-1;j < sky._index[i+1]-1;j++)
+      os << sky._value[j] << " " ;
+  }
+  return os;
+}
+
 //  void MEDSKYLINEARRAY::setMEDSKYLINEARRAY( const int count , const int length, int* index , int* value )
 //  {
 //    MESSAGE("void MEDSKYLINEARRAY::setMEDSKYLINEARRAY(count, length, index, value)");

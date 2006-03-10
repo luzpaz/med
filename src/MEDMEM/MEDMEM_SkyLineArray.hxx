@@ -32,17 +32,33 @@ private :
   int   _count ;
   int   _length ;
   PointerOf <int> _index ; // array of size _count+1 : _index[0]=1 and
-		               // _index[_count]=length+1
+                           // _index[_count]=length+1
   PointerOf <int> _value ; // array of size _length
 
 public :
+  // Attention, avec ce constructeur, il n'est possible de remplir le MEDSKYLINEARRAY 
   MEDSKYLINEARRAY();
-  ~MEDSKYLINEARRAY();
+
+  // Constructeur par recopie
   MEDSKYLINEARRAY( const MEDSKYLINEARRAY &myArray );
+
+  // Avec ce constructeur la mémoire pour le tableau  de valeur et le
+  // tableau d'index est réservée. Il suffit d'effectuer les séquences
+  // d'appels suivantes pour initialiser le MEDSKYLINEARRAY
+  // 1) setIndex(index) puis <count> fois setI(i,&listValeurN°I) avec i dans 1..count
+  //    rem :   listValeurN°I est dupliquée
+  // 2) appeler <length> fois setIJ(i,j,valeur) avec i dans 1..count et avec j dans 1..count
   MEDSKYLINEARRAY( const int count, const int length );
+
+  // Avec ce constructeur le MEDSKYLINEARRAY est complètement initialisé
+  // Si shallowCopy=false (par défaut) les tableaux d'index et de valeurs
+  // sont dupliqués
+  // Sinon le MEDSKYLINEARRAY prend directement les pointeurs et en devient 
+  // propriétaire
   MEDSKYLINEARRAY( const int count, const int length,
 		   const int* index, const int* value, bool shallowCopy=false );
 
+  ~MEDSKYLINEARRAY();
   //void setMEDSKYLINEARRAY( const int count, const int length, int* index , int* value ) ;
 
   inline int  getNumberOf()       const;
@@ -59,6 +75,7 @@ public :
   inline void setIJ(int i, int j, int value) throw (MEDEXCEPTION) ;
   inline void setIndexValue(int i, int value) throw (MEDEXCEPTION) ;
 
+  friend ostream& operator<<(ostream &os, const MEDSKYLINEARRAY &sky);
 };
 
 // ---------------------------------------

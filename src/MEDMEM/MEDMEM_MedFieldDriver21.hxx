@@ -360,7 +360,7 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
   //med_2_1::med_geometrie_element..
   MED_EN::medGeometryElement geometricType[MED_NBR_GEOMETRIE_MAILLE];
   int numberOfElementsOfType[MED_NBR_GEOMETRIE_MAILLE];
-  int numberOfGaussPoint[MED_NBR_GEOMETRIE_MAILLE];
+  int numberOfGaussPoints[MED_NBR_GEOMETRIE_MAILLE];
 
   med_2_1::med_int ngauss=0, numdt=-1, numo=-1, nbPdtIt=0; //nmaa=0
   char dtunit[MED_TAILLE_PNOM21+1], maa[MED_TAILLE_NOM+1];
@@ -448,7 +448,7 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
 
       //totalNumberOfElements+=numberOfElements;
       numberOfElementsOfType[numberOfGeometricType] = numberOfElements/ngauss;
-      numberOfGaussPoint[numberOfGeometricType] = ngauss;
+      numberOfGaussPoints[numberOfGeometricType] = ngauss;
       anyGauss = (anyGauss || (ngauss-1) );
       geometricType[numberOfGeometricType]= *currentGeometry;
       numberOfGeometricType++;
@@ -468,8 +468,6 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
     support.setGeometricType(geometricType); // Utile uniquement si setAll == false
     support.setNumberOfElements(numberOfElementsOfType);    //setNumberOfElements effectue une copie
     support.setAll(true);
-    if (anyGauss)
-      support.setNumberOfGaussPoint(numberOfGaussPoint);
 
     return alreadyFoundAnEntity;
   } else
@@ -770,7 +768,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
 // 	      MED_FIELD_DRIVER<T>::_ptrField->_orderNumber) ;
 
     NumberOfValues[i] = mySupport->getNumberOfElements(Types[i])
-      * mySupport->getNumberOfGaussPoint(Types[i]);
+      * MED_FIELD_DRIVER<T>::_ptrField->getNumberOfGaussPoints(Types[i]);
 
     myValues[i] = new T[ NumberOfValues[i]*numberOfComponents ] ;
     TotalNumberOfValues+=NumberOfValues[i] ;
@@ -1013,7 +1011,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
       const SUPPORT * mySupport = MED_FIELD_DRIVER<T>::_ptrField->getSupport() ;
 
       if (! mySupport->isOnAllElements())
-	throw MEDEXCEPTION( LOCALIZED (STRING(LOC) 
+	throw MEDEXCEPTION( LOCALIZED (STRING(LOC)
 				       <<": Field must be on all entity"
 				       )
 			    );
@@ -1025,7 +1023,6 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
       int NumberOfType = mySupport->getNumberOfTypes() ;
       int Index = 1 ;
       const MED_EN::medGeometryElement * Types = mySupport->getTypes() ;
-      const int * NumberOfGaussPoint = mySupport->getNumberOfGaussPoint() ;
 
       const T * value     = NULL;
       ArrayFull * myArray = NULL;
@@ -1042,7 +1039,8 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 
       for (int i=0;i<NumberOfType;i++) {
 	int NumberOfElements = mySupport->getNumberOfElements(Types[i]) ;
-	
+	int NumberOfGaussPoints = MED_FIELD_DRIVER<T>::_ptrField->getNumberOfGaussPoints(Types[i]) ;
+
 // 	const T * value = MED_FIELD_DRIVER<T>::_ptrField->getValueI(MED_EN::MED_FULL_INTERLACE,Index) ;
 
 	value = myArray->getRow(Index) ;
@@ -1052,7 +1050,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 	MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getName()            : "<<MED_FIELD_DRIVER<T>::_ptrField->getName());
 	MESSAGE("value                           : "<<value);
 	MESSAGE("NumberOfElements                : "<<NumberOfElements);
-	MESSAGE("NumberOfGaussPoint[i]           : "<<NumberOfGaussPoint[i]);
+	MESSAGE("NumberOfGaussPoints             : "<<NumberOfGaussPoints);
 	MESSAGE("mySupport->getEntity()          : "<<mySupport->getEntity());
 	MESSAGE("Types[i]                        : "<<Types[i]);
 	MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber() : "<<MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
@@ -1091,7 +1089,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 				    (unsigned char*)temp, 
 				    med_2_1::MED_FULL_INTERLACE,
 				    NumberOfElements,
-				    NumberOfGaussPoint[i],
+				    NumberOfGaussPoints,
 				    MED_ALL,
 				    MED_NOPFL,
 				    med_2_1::MED_REMP,  // PROFIL NON GERE, mode de remplacement non géré
@@ -1112,7 +1110,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 				(unsigned char*)value, 
 				med_2_1::MED_FULL_INTERLACE,
 				NumberOfElements,
-				NumberOfGaussPoint[i],
+				NumberOfGaussPoints,
 				MED_ALL,
 				MED_NOPFL,
 				med_2_1::MED_REMP,  // PROFIL NON GERE, mode de remplacement non géré
