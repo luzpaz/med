@@ -830,7 +830,7 @@ FIELD<T, INTERLACING_TAG>::FIELD():FIELD_()
 template <class T, class INTERLACING_TAG>
 FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
 				    const int NumberOfComponents) throw (MEDEXCEPTION) :
-  FIELD_(Support, NumberOfComponents),_value()
+  FIELD_(Support, NumberOfComponents),_value(NULL)
 {
   BEGIN_OF("FIELD<T>::FIELD(const SUPPORT * Support, const int NumberOfComponents)");
   SCRUTE(this);
@@ -1905,7 +1905,12 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
   //A.G. Addings for RC
   if(_support)
     _support->addReference();
-  _value = (MEDMEM_Array<T, INTERLACING_TAG> *) NULL;
+  // OCC 10/03/2006 -- According to the rules defined with help of 
+  // MEDMEM_IntrelacingTraits class, it is not allowed to instantiate
+  // MEDMEM_Array<> template using INTERLACING_TAG parameter of 
+  // FIELD template - MSVC++ 2003 compiler generated an error here.
+  // _value = (MEDMEM_Array<T, INTERLACING_TAG> *) NULL;
+  _value = NULL;
 
   _iterationNumber = iterationNumber;
   _time = 0.0;
@@ -1949,7 +1954,12 @@ FIELD<T,INTERLACING_TAG>::FIELD(driverTypes driverType,
   FIELD_::_interlacingType=SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType;
 
   _support = (SUPPORT *) NULL;
-  _value = (MEDMEM_Array<T,INTERLACING_TAG> *)NULL;
+  // OCC 10/03/2006 -- According to the rules defined with help of 
+  // MEDMEM_IntrelacingTraits class, it is not allowed to instantiate
+  // MEDMEM_Array<> template using INTERLACING_TAG parameter of 
+  // FIELD template - MSVC++ 2003 compiler generated an error here.
+  // _value = (MEDMEM_Array<T, INTERLACING_TAG> *) NULL;
+  _value = NULL;
 
   _iterationNumber = iterationNumber;
   _time = 0.0;
@@ -2011,7 +2021,12 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
   }
   catch (MEDEXCEPTION &ex) {
     MESSAGE("No value defined, problem with NumberOfComponents (and may be _support) size of MEDARRAY<T>::_value !");
-    _value = (MEDMEM_Array<T, INTERLACING_TAG> *)NULL ;
+    // OCC 10/03/2006 -- According to the rules defined with help of 
+    // MEDMEM_IntrelacingTraits class, it is not allowed to instantiate
+    // MEDMEM_Array<> template using INTERLACING_TAG parameter of 
+    // FIELD template - MSVC++ 2003 compiler generated an error here.
+    // _value = (MEDMEM_Array<T, INTERLACING_TAG> *) NULL;
+    _value = NULL;
   }
 
   SCRUTE(_value);
