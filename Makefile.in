@@ -24,6 +24,8 @@ ifeq (@WITHIHM@,yes)
       SUBDIRS+= doc
 endif
 
+SUBDIRS+= adm_local
+
 RESOURCES_FILES = \
 MEDCatalog.xml \
 MED_en.xml \

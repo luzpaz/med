@@ -33,9 +33,11 @@
 
 namespace MED{
 
-  EVersion GetVersionId(const std::string& theFileName);
+  EVersion GetVersionId(const std::string& theFileName,
+			bool theDoPreCheckInSeparateProcess = false);
 
-  PWrapper CrWrapper(const std::string& theFileName);
+  PWrapper CrWrapper(const std::string& theFileName,
+		     bool theDoPreCheckInSeparateProcess = false);
 
   PWrapper CrWrapper(const std::string& theFileName, EVersion theId);
 

@@ -1410,6 +1410,13 @@ namespace MED
       }else if(theEntityInfo.empty()) 
 	EXCEPTION(runtime_error,"GetNbTimeStamps - There is no any Entity on the Mesh");
       
+      bool anIsPerformAdditionalCheck = GetNbMeshes() > 1;
+#ifdef _DEBUG_
+      static bool anIsCheckOnlyFirstTimeStamp = false;
+#else
+      static bool anIsCheckOnlyFirstTimeStamp = true;
+#endif
+
       theGeom2Size.clear();
       TInt aNbTimeStamps = 0;
       TIdt anId = myFile->Id();
@@ -1428,41 +1435,50 @@ namespace MED
 					  &anInfo.myName[0],
 					  anEntity,
 					  aGeom);
-	  if(aNbStamps > 0){
+	  bool anIsSatisfied = aNbStamps > 0;
+	  if(anIsSatisfied){
 	    INITMSG(MYDEBUG,
 		    "GetNbTimeStamps aNbTimeStamps = "<<aNbStamps<<
-			"; aGeom = "<<aGeom<<"; anEntity = "<<anEntity<<"\n");
-	    for(TInt iTimeStamp = 1; iTimeStamp <= aNbStamps; iTimeStamp++){
-	      char aMaillageChamp[GetNOMLength<eV2_2>()+1];
-	      char aDtUnit[GetPNOMLength<eV2_2>()+1];
-	      med_int aNbGauss;
-	      med_int aNumDt;
-	      med_int aNumOrd;
-	      med_float aDt;
-	      med_booleen anIsLocal;
-	      med_int aNbRef;
-	      TErr aRet = MEDpasdetempsInfo(anId,
-					    &anInfo.myName[0],
-					    anEntity,
-					    aGeom,
-					    iTimeStamp, 
-					    &aNbGauss,
-					    &aNumDt,  
-					    &aNumOrd,
-					    aDtUnit, 
-					    &aDt, 
-					    aMaillageChamp,
-					    &anIsLocal,
-					    &aNbRef);
-	      INITMSG(MYDEBUG,
-		      "GetNbTimeStamps aMaillageChamp = '"<<aMaillageChamp<<"'"<<
-		      "; aMeshName = '"<<&aMeshInfo.myName[0]<<"'\n");
-	      if(aRet == 0 && (! strcmp(aMaillageChamp,&aMeshInfo.myName[0]))){
-		theGeom2Size[EGeometrieElement(aGeom)] = anGeomIter->second;
-		theEntity = EEntiteMaillage(anEntity);
-		aNbTimeStamps = aNbStamps;
+		    "; aGeom = "<<aGeom<<"; anEntity = "<<anEntity<<"\n");
+	    if(anIsPerformAdditionalCheck){
+	      TInt iTimeStampEnd = anIsCheckOnlyFirstTimeStamp? 1: aNbStamps;
+	      for(TInt iTimeStamp = 1; iTimeStamp <= iTimeStampEnd; iTimeStamp++){
+		TVector<char> aMeshName(GetNOMLength<eV2_2>()+1);
+		TVector<char> aDtUnit(GetPNOMLength<eV2_2>()+1);
+		med_int aNbGauss;
+		med_int aNumDt;
+		med_int aNumOrd;
+		med_float aDt;
+		med_booleen anIsLocal;
+		med_int aNbRef;
+		TErr aRet = MEDpasdetempsInfo(anId,
+					      &anInfo.myName[0],
+					      anEntity,
+					      aGeom,
+					      iTimeStamp, 
+					      &aNbGauss,
+					      &aNumDt,  
+					      &aNumOrd,
+					      &aDtUnit[0],
+					      &aDt, 
+					      &aMeshName[0],
+					      &anIsLocal,
+					      &aNbRef);
+
+		anIsSatisfied = (aRet == 0 && (!strcmp(&aMeshName[0],&aMeshInfo.myName[0])));
+		if(!anIsSatisfied){
+		  INITMSG(MYDEBUG,
+			  "GetNbTimeStamps aMeshName = '"<<&aMeshName[0]<<"' != "<<
+			  "; aMeshInfo.myName = '"<<&aMeshInfo.myName[0]<<"'\n");
+		  break;
+		}
 	      }
 	    }
+	  }
+	  if(anIsSatisfied){
+	    theGeom2Size[EGeometrieElement(aGeom)] = anGeomIter->second;
+	    theEntity = EEntiteMaillage(anEntity);
+	    aNbTimeStamps = aNbStamps;
 	  }
 	}
 	if(!theGeom2Size.empty()) 
@@ -1504,7 +1520,7 @@ namespace MED
 	aRet = MEDpasdetempsInfo(myFile->Id(),
 				 &aFieldInfo.myName[0],
 				 med_entite_maillage(theInfo.myEntity),
-				 med_geometrie_element(anIter->first),
+				 med_geometrie_element(aGeom),
 				 theTimeStampId,
 				 &aNbGauss,
 				 (med_int*)&theInfo.myNumDt,

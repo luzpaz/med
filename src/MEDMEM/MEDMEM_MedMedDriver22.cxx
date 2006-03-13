@@ -451,7 +451,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 
 		MESSAGE("Field information 2 : NumberOfTimeStep :"<<
 			numberOfTimeSteps);
-
+/*
 	  if ( numberOfTimeSteps > MED_VALID ) 
 		  break ;
 		// There are value for some med_geometrie_element of this
@@ -462,10 +462,10 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 	      for (currentGeometry = (*currentEntity).second.begin();
 		   currentGeometry != (*currentEntity).second.end();
 		   currentGeometry++)
-		{
-	    MESSAGE("Field information 3 : Geom : "<<(*currentGeometry));
+		{*/
+                MESSAGE("Field information 3 : Geom : "<<(*currentGeometry));
 	      
-		  for (j=1;j <= numberOfTimeSteps; j++)
+                for (j=1;j <= numberOfTimeSteps; j++)
 		    {
 		      MESSAGE("Field information 4 : time step j = "<<j);
 		

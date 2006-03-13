@@ -1427,8 +1427,12 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 	_constituent->_count[2]=NumberOfConstituent+1;
 	// we correct _descending to adjust face number
 	for(int j=0;j<DescendingSize;j++)
-	  if (descend_connectivity[j]>tmp_NumberOfConstituentsForeachType[0])
-	    descend_connectivity[j]-=offset;
+	  if (abs(descend_connectivity[j])>tmp_NumberOfConstituentsForeachType[0]) {
+            if ( descend_connectivity[j] > 0 )
+              descend_connectivity[j]-=offset;
+            else 
+              descend_connectivity[j]+=offset;
+          }
       }
 
       delete [] ConstituentNodalConnectivityIndex;

@@ -30,10 +30,11 @@
 #define MED_Vector_HeaderFile
 
 #include <vector>
+#include <stdexcept>
 
-#if !defined(__GNUC_2__) && defined(__GNUC__) && (__GNUC__ == 2)
-  #define __GNUC_2__
-#endif
+//#if defined(_DEBUG_)
+#  define MED_TVECTOR_CHECK_RANGE
+//#endif
 
 namespace MED
 {
@@ -51,6 +52,26 @@ namespace MED
     typedef _Tp	value_type;
     typedef value_type& reference;
     typedef const value_type& const_reference;
+
+  protected:
+    void
+    check_range(size_type __n) const
+    {
+      if (__n >= this->size())
+	throw std::out_of_range("TVector [] access out of range");
+    }
+
+    const_reference
+    get_value(size_type __n) const
+    {
+      return superclass::operator[](__n);
+    }
+
+    reference
+    get_value(size_type __n)
+    {
+      return superclass::operator[](__n);
+    }
 
   public:
     explicit
@@ -101,25 +122,38 @@ namespace MED
     reference
     operator[](size_type __n)
     {
-#if defined(__GNUC_2__)
-      return superclass::operator[](__n);
-#else
-      return this->at(__n);
+#if defined(MED_TVECTOR_CHECK_RANGE)
+      check_range(__n);
 #endif
+      return get_value(__n);
     }
 
     const_reference
     operator[](size_type __n) const
     {
-#if defined(__GNUC_2__)
-      return superclass::operator[](__n);
-#else
-      return this->at(__n);
+#if defined(MED_TVECTOR_CHECK_RANGE)
+      check_range(__n);
 #endif
+      return get_value(__n);
+    }
+
+    reference
+    at(size_type __n)
+    {
+      check_range(__n);
+      return get_value(__n);
+    }
+
+    const_reference
+    at(size_type __n) const
+    {
+      check_range(__n);
+      return get_value(__n);
     }
   };
 
 }
 
+#undef MED_TVECTOR_CHECK_RANGE
 
 #endif

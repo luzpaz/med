@@ -35,6 +35,7 @@
 *
 *************************************************************************/
 #include "MEDMEM_medimport_src.hxx"
+#include "hdf5_version2api.hxx"
 
 using namespace med_2_2;
 using namespace MEDMEM;
@@ -110,7 +111,13 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 				       unsigned char *val,hid_t hdf_file)
 {
   med_idt    dataset, dataspace = 0, memspace = 0;
+
+#ifdef HDF_NEW_API
+  med_size  start_mem[1],start_data[1],*pflmem=0,*pfldsk=0;
+#else 
   med_ssize  start_mem[1],start_data[1],*pflmem=0,*pfldsk=0;
+#endif
+
   med_size   stride[1],count[1],pcount[1],size[1],pflsize[1];
   med_err    ret;
   int        i,j,index,type_hdf;
@@ -223,9 +230,15 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 
 	pflsize [0] = psize*ngauss*nbdim;
 	pcount  [0] = psize*ngauss*dimutil;
+
+#ifdef HDF_NEW_API
+        pflmem     = (med_size *) malloc (sizeof(med_size)*pcount[0]);
+	pfldsk     = (med_size *) malloc (sizeof(med_size)*pcount[0]);
+#else
 	pflmem     = (med_ssize *) malloc (sizeof(med_ssize)*pcount[0]);
 	pfldsk     = (med_ssize *) malloc (sizeof(med_ssize)*pcount[0]);
-	
+#endif
+
 	switch(pflmod)
 	  { /* switch pflmod pour FULL_INTERLACE*/
 	  case MED_GLOBAL :
@@ -244,12 +257,19 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 		}
 	    }
 	    
+#ifdef HDF_NEW_API
+	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hsize_t **) pflmem ) ) <0) 
+	      return -1; 
+	    
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+	      return -1; 
+#else
 	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hssize_t **) pflmem ) ) <0) 
 	      return -1; 
 	    
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hssize_t **) pfldsk ) ) <0) 
-	      return -1; 
-	    
+	      return -1;
+#endif
 	    break;
 	
 	  case MED_COMPACT :
@@ -270,12 +290,20 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 		  pfldsk[index] = dim*count[0] + (pfltab[i]-1)*ngauss+j;	     
 		}	      
 	    }
+
+#ifdef HDF_NEW_API	    
+	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hsize_t **) pflmem ) ) <0) 
+	      return -1; 
 	    
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+	      return -1; 
+#else
 	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hssize_t **) pflmem ) ) <0) 
 	      return -1; 
 	    
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hssize_t **) pfldsk ) ) <0) 
-	      return -1; 
+	      return -1;
+#endif
 	    
 	    break;
 
@@ -330,7 +358,11 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 
 	pflsize [0] = psize*ngauss*nbdim;	
   	pcount  [0] = psize*ngauss*dimutil; /* nom pas très coherent avec count !!! A revoir */	
+#ifdef HDF_NEW_API
+	pfldsk      = (med_size *) malloc(sizeof(med_size)*pcount[0]);
+#else
 	pfldsk      = (med_ssize *) malloc(sizeof(med_ssize)*pcount[0]);
+#endif
 	
 	switch(pflmod)
 	  { /*switch plfmod pour NO_INTERLACE */
@@ -345,8 +377,13 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 		}
 	    }
 	    
+#ifdef HDF_NEW_API
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+	      return -1;
+#else
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hssize_t **) pfldsk ) ) <0) 
 	      return -1;
+#endif
 	    
 	    if ((ret = H5Dread(dataset,type_hdf,dataspace,dataspace,H5P_DEFAULT, val)) < 0)
 	      return -1;
@@ -362,7 +399,11 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 	    if ( (memspace = H5Screate_simple (1, pflsize, NULL)) <0)
 	      return -1;
 
+#ifdef HDF_NEW_API
+	    pflmem     = (med_size *) malloc (sizeof(med_size)*pcount[0]);
+#else
 	    pflmem     = (med_ssize *) malloc (sizeof(med_ssize)*pcount[0]);
+#endif
 	    
 	    /* Le profil COMPACT est contigüe, mais il est possible que l'on selectionne uniquemenent une dimension*/
 
@@ -376,11 +417,19 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 		}
 	    }
 	    
+#ifdef HDF_NEW_API
+	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hsize_t **) pflmem ) ) <0) 
+	      return -1; 
+	    
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+	      return -1;	  
+#else
 	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hssize_t **) pflmem ) ) <0) 
 	      return -1; 
 	    
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hssize_t **) pfldsk ) ) <0) 
-	      return -1;	  
+	      return -1;
+#endif
 	    
 	    if ((ret = H5Dread(dataset,type_hdf,memspace,dataspace,H5P_DEFAULT, val)) < 0)
 	      return -1;

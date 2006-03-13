@@ -44,13 +44,13 @@ EXPORT_HEADERS = \
 	MED_Factory.hxx
 
 # Executables targets
-BIN = MED_Test
+BIN = MED_Test mprint_version
 BIN_SRC = 
 
 CPPFLAGS+= $(BOOST_CPPFLAGS) $(MED2_INCLUDES)
 
 LDFLAGS+= -lMEDWrapper_V2_2 -lMEDWrapper_V2_1
 
-LDFLAGSFORBIN=$(LDFLAGS) -lMEDWrapperBase $(BOOST_LIBS) -lboost_thread-mt -lmed_V2_1
+LDFLAGSFORBIN=$(LDFLAGS) -lMEDWrapperBase $(BOOST_LIBS) -lboost_thread${BOOST_LIBSUFFIX} -lmed_V2_1
 
 @CONCLUDE@
