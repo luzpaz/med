@@ -114,9 +114,9 @@ public:
 			/*! Destructor. */
   virtual ~FAMILY();
   FAMILY & operator=(const FAMILY &fam);
-  friend ostream & operator<<(ostream &os, FAMILY &my) ;
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, FAMILY &my) ;
 
-  friend ostream & operator<<(ostream &os, const FAMILY &my) ;
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, const FAMILY &my) ;
 
   bool build(MED_EN::medEntityMesh Entity,int **FamilyNumber);
 

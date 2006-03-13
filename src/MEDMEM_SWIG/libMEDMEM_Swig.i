@@ -117,14 +117,16 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
   typemap for vector<FAMILY *> C++ object
 */
 
-%typemap(python,in) vector< FAMILY * >, const vector< FAMILY * >
+%typemap(python,in) vector<FAMILY *>, const vector<FAMILY *>
 {
   /* typemap in for vector<FAMILY *> */
   /* Check if is a list */
 
   if (PyList_Check($input)) {
     int size = PyList_Size($input);
-    $1 = vector<FAMILY *>(size);
+    vector<FAMILY *> tmpVec( size );
+//     $1 = vector<FAMILY*>();
+//     $1.resize(size);
 
     for (int i=0; i < size; i++)
       {
@@ -142,8 +144,10 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 	  }
 	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
 	// $1[i] = f;
-	$1.at(i) = f;
+	//$1.at(i) = f;
+        tmpVec[i] = f;
       }
+    $1 = tmpVec;
   }
   else
     {
@@ -172,14 +176,16 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
   typemap for vector<SUPPORT *> C++ object
 */
 
-%typemap(python,in) vector< SUPPORT * >, const vector< SUPPORT * >
+%typemap(python,in) vector<SUPPORT *>, const vector<SUPPORT *>
 {
   /* typemap in for vector<SUPPORT *> */
   /* Check if is a list */
 
   if (PyList_Check($input)) {
     int size = PyList_Size($input);
-    $1 = vector<SUPPORT *>(size);
+    vector<SUPPORT*> tmpVec ( size );
+//     $1 = vector<SUPPORT*>();
+//     $1.resize(size);
 
     for (int i=0; i < size; i++)
       {
@@ -197,8 +203,10 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 	  }
 	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
 	//$1[i] = s;
-	$1.at(i) = s;
+	//$1.at(i) = s;
+        tmpVec[i] = s;
       }
+    $1 = tmpVec;
   }
   else
     {

@@ -153,7 +153,7 @@ public:
   SUPPORT(MESH* Mesh, string Name="", MED_EN::medEntityMesh Entity=MED_EN::MED_CELL);
   SUPPORT(const SUPPORT & m);
   virtual ~SUPPORT();
-  friend ostream & operator<<(ostream &os,const SUPPORT &my);
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const SUPPORT &my);
 
   SUPPORT& operator=(const SUPPORT &support);
   bool operator == (const SUPPORT &support) const;

@@ -149,7 +149,7 @@ public :
   MESH( driverTypes driverType, const string & fileName="",
 	const string & meshName="") throw (MEDEXCEPTION);
   virtual ~MESH();
-  friend ostream & operator<<(ostream &os, const MESH &my);
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, const MESH &my);
 
   int  addDriver(driverTypes driverType,
 		 const string & fileName  ="Default File Name.med",

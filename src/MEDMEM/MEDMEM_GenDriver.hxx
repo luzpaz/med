@@ -80,7 +80,7 @@ public:
   /*!
     Operator << : put GENDRIVER object information to the given stream
   */
-  friend ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
 
   bool operator ==(const GENDRIVER &genDriver) const;
   /*!

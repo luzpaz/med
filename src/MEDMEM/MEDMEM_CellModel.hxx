@@ -102,7 +102,7 @@ public :
   inline CELLMODEL & operator=(const CELLMODEL &m);
 
   			/*! Operator << : print CELLMODEL to the given stream. */
-  friend ostream & operator<<(ostream &os,const CELLMODEL &my);
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const CELLMODEL &my);
 
   			/*! returns _name attribute (ie: MED_PENTA15).\n
 		    	    see med.h (in med/include) */

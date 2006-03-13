@@ -46,7 +46,8 @@ EXPORT_HEADERS = \
 	MED_Algorithm.hxx \
 	MED_GaussUtils.hxx \
 	MED_CoordUtils.hxx \
-	MED_Utilities.hxx
+	MED_Utilities.hxx \
+	MED_WrapperBase.hxx
 
 # Libraries targets
 
