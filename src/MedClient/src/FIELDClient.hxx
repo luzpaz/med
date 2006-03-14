@@ -32,7 +32,7 @@
 
 namespace MEDMEM{
 
-template<class T, class INTERLACING_TAG>
+template<class T, class INTERLACING_TAG=FullInterlace>
 class FIELDClient : public MEDMEM::FIELD<T,INTERLACING_TAG>
 {
 private:

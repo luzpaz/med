@@ -12,7 +12,7 @@
 
 namespace MEDMEM
 {
-  template < class T, class INTERLACING_TAG >
+  template < class T, class INTERLACING_TAG=FullInterlace >
   class FIELDTEMPLATE_I : public FIELDI_TRAITS<T,INTERLACING_TAG>::InterfaceForServant,
                           public FIELD_i,
                           public SALOMEMultiComm
