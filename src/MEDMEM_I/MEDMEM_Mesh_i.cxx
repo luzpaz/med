@@ -1289,7 +1289,7 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getVolume( myCppSupport);
-		FIELDTEMPLATE_I<double,FullInterlace> *medf = new FIELDTEMPLATE_I<double,FullInterlace>(f);
+		FIELDTEMPLATE_I<double> *medf = new FIELDTEMPLATE_I<double>(f);
 		return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
@@ -1341,7 +1341,7 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getArea( myCppSupport);
-		FIELDTEMPLATE_I<double,FullInterlace> *medf = new FIELDTEMPLATE_I<double,FullInterlace>(f);
+		FIELDTEMPLATE_I<double> *medf = new FIELDTEMPLATE_I<double>(f);
 		return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
@@ -1367,7 +1367,7 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getLength( myCppSupport);
-		FIELDTEMPLATE_I<double,FullInterlace>  *medf = new FIELDTEMPLATE_I<double,FullInterlace>(f);
+		FIELDTEMPLATE_I<double>  *medf = new FIELDTEMPLATE_I<double>(f);
 	        return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
@@ -1393,7 +1393,7 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getNormal( myCppSupport);
-		FIELDTEMPLATE_I<double,FullInterlace> *medf = new FIELDTEMPLATE_I<double,FullInterlace>(f);
+		FIELDTEMPLATE_I<double> *medf = new FIELDTEMPLATE_I<double>(f);
 	        return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
@@ -1419,7 +1419,7 @@ throw (SALOME::SALOME_Exception)
 		ASSERT(SUPPORT_i::supportMap.find(sup)!=SUPPORT_i::supportMap.end());
 		const SUPPORT * myCppSupport=SUPPORT_i::supportMap[sup];
                 ::FIELD<double>*f=_mesh->getBarycenter( myCppSupport);
-		FIELDTEMPLATE_I<double,FullInterlace> *medf = new FIELDTEMPLATE_I<double,FullInterlace>(f);
+		FIELDTEMPLATE_I<double> *medf = new FIELDTEMPLATE_I<double>(f);
 	        return medf->_this();
         }
         catch (MEDEXCEPTION &ex)
