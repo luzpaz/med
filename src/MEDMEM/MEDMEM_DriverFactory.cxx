@@ -39,12 +39,12 @@ using namespace MEDMEM;
 using namespace MED_EN;
 
 template<>
-void fill<-1,0x3>(double *a, const double *b)
+void MEDMEM::fill<-1,0x3>(double *a, const double *b)
 {
 }
 
 template<>
-bool compare<-1>(const double *a, const double *b)
+bool MEDMEM::compare<-1>(const double *a, const double *b)
 {
   return false;
 }

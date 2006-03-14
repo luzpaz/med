@@ -223,7 +223,8 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
     int          numberOfMeshes;
     char         meshName[MED_TAILLE_NOM+1]="";
     char         meshDescription[MED_TAILLE_DESC+1]="";
-    int          meshDim;
+//CCRT    int          meshDim;
+    med_2_2::med_int          meshDim;
     med_2_2::med_maillage meshType;
 
     MESH *       ptrMesh;
@@ -393,8 +394,10 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
     //    char                          timeStepUnit[MED_TAILLE_PNOM]= "";
     char                          timeStepUnit[MED_TAILLE_PNOM22+1] ;
     double                        timeStep                     = 0.0;
-    int                           orderNumber                  =  -1;                           //???init?????
-    int                           numberOfRefMesh = 0;
+//CCRT    int                           orderNumber                  =  -1;                           //???init?????
+    med_2_2::med_int                           orderNumber                  =  -1;                           //???init?????
+//CCRT    int                           numberOfRefMesh = 0;
+    med_2_2::med_int                           numberOfRefMesh = 0;
     med_2_2::med_booleen           meshLink;
     map<MESH_NAME_,MESH*>      & _meshes   =  _ptrMed->_meshes; 
     map<FIELD_NAME_,MAP_DT_IT_> & _fields   =  _ptrMed->_fields; 

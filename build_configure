@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #
 # Tool for updating list of .in file for the SALOME project 
@@ -155,7 +155,7 @@ cat configure.in.base                                            >> configure.in
 
 # make a link allowing AC_OUTPUT to find the salome_adm/.../*.in  files
 echo ""                                                          >> configure.in_tmp1
-echo 'if test ${MED_WITH_KERNEL} == yes; then'                   >> configure.in_tmp1
+echo 'if test ${MED_WITH_KERNEL} = yes; then'                   >> configure.in_tmp1
 echo '    ln -fs ${KERNEL_ROOT_DIR}/salome_adm ${ROOT_SRCDIR}/.' >> configure.in_tmp1
 echo 'else'                                                      >> configure.in_tmp1
 echo '    ln -fs ${ROOT_SRCDIR}/adm_local_without_kernel ${ROOT_SRCDIR}/salome_adm' >> configure.in_tmp1
@@ -177,7 +177,7 @@ echo "	./salome_adm/unix/sstream \\"        >> configure.in_tmp1
 echo "	./salome_adm/unix/depend \\"         >> configure.in_tmp1
 echo  " ])"                                  >> configure.in_tmp1
 echo ""                                      >> configure.in_tmp1
-echo 'if test $MED_WITH_KERNEL == yes; then' >> configure.in_tmp1
+echo 'if test $MED_WITH_KERNEL = yes; then' >> configure.in_tmp1
 echo "{"                                     >> configure.in_tmp1
 echo "AC_OUTPUT([ \\"                        >> configure.in_tmp1
 echo "	./salome_adm/unix/F77config.h \\"    >> configure.in_tmp1

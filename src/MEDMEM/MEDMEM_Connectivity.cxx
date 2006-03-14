@@ -379,9 +379,28 @@ void CONNECTIVITY::setPolyhedronConnectivity(medConnectivity ConnectivityType, c
 	  if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL)
 	    delete _polyhedronNodal;
 	  _polyhedronNodal = new POLYHEDRONARRAY(NumberOfPolyhedron,NumberOfFaces,ConnectivitySize);
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+          int i ;
+          MED_EN::med_int * tmp_PolyhedronIndex = new med_int[NumberOfPolyhedron+1] ;
+          for ( i = 0 ; i < NumberOfPolyhedron+1 ; i++ )
+             tmp_PolyhedronIndex[i] = PolyhedronIndex[i] ;
+	  _polyhedronNodal->setPolyhedronIndex(tmp_PolyhedronIndex);
+          delete [] tmp_PolyhedronIndex ;
+          MED_EN::med_int * tmp_PolyhedronFacesIndex = new med_int[NumberOfFaces+1] ;
+          for ( i = 0 ; i < NumberOfFaces+1 ; i++ )
+             tmp_PolyhedronFacesIndex[i] = PolyhedronFacesIndex[i] ;
+	  _polyhedronNodal->setFacesIndex(tmp_PolyhedronFacesIndex);
+          delete [] tmp_PolyhedronFacesIndex ;
+          MED_EN::med_int * tmp_PolyhedronConnectivity = new med_int[ConnectivitySize] ;
+          for ( i = 0 ; i < ConnectivitySize ; i++ )
+             tmp_PolyhedronConnectivity[i] = PolyhedronConnectivity[i] ;
+	  _polyhedronNodal->setNodes(tmp_PolyhedronConnectivity);
+          delete [] tmp_PolyhedronConnectivity ;
+#else
 	  _polyhedronNodal->setPolyhedronIndex(PolyhedronIndex);
 	  _polyhedronNodal->setFacesIndex(PolyhedronFacesIndex);
 	  _polyhedronNodal->setNodes(PolyhedronConnectivity);
+#endif
 	}
       else
 	{
@@ -746,16 +765,29 @@ const int* CONNECTIVITY::getPolyhedronConnectivity(medConnectivity ConnectivityT
       if (ConnectivityType == MED_NODAL)
 	{
 	  ((CONNECTIVITY *)(this))->calculateNodalConnectivity();
-	  if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL)
+	  if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL) {
+//CCRT
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+            int i ;
+            const MED_EN::med_int * tmp_PolyhedronConnectivity = _polyhedronNodal->getNodes();
+            int * PolyhedronConnectivity = new int[_polyhedronNodal->getNumberOfNodes()] ;
+            for ( i = 0 ; i < _polyhedronNodal->getNumberOfNodes() ; i++ )
+               PolyhedronConnectivity[i] = tmp_PolyhedronConnectivity[i] ;
+//CCRT : return of a copy of PolyhedronConnectivity
+            return PolyhedronConnectivity ;
+#else
 	    return _polyhedronNodal->getNodes();
+#endif
+          }
 	  else
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polyhedron Nodal Connectivity not defined !"));
 	}
       else
 	{
 	  ((CONNECTIVITY *)(this))->calculateDescendingConnectivity();
-	  if (_polyhedronDescending != (MEDSKYLINEARRAY*) NULL)
+	  if (_polyhedronDescending != (MEDSKYLINEARRAY*) NULL) {
 	    return _polyhedronDescending->getValue();
+          }
 	  else
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polyhedron Descending Connectivity not defined !"));
 	}
@@ -774,8 +806,20 @@ const int* CONNECTIVITY::getPolyhedronFacesIndex() const
   if (_entity == MED_CELL) //polyhedron can only be MED_CELL
     {
       //      calculateNodalConnectivity();
-      if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL)
+      if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL) {
+//CCRT
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+            int i ;
+            const MED_EN::med_int * tmp_PolyhedronFacesIndex = _polyhedronNodal->getFacesIndex();
+            int * PolyhedronFacesIndex = new int[_polyhedronNodal->getNumberOfFaces()+1] ;
+            for ( i = 0 ; i < _polyhedronNodal->getNumberOfFaces()+1 ; i++ )
+               PolyhedronFacesIndex[i] = tmp_PolyhedronFacesIndex[i] ;
+//CCRT : return of a copy of PolyhedronFacesIndex
+            return PolyhedronFacesIndex ;
+#else
 	return _polyhedronNodal->getFacesIndex();
+#endif
+      }
       else
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : No Polyhedron in that Connectivity !"));
     }
@@ -795,8 +839,20 @@ const int* CONNECTIVITY::getPolyhedronIndex(medConnectivity ConnectivityType) co
       if (ConnectivityType == MED_NODAL)
 	{
 	  //	  calculateNodalConnectivity();
-	  if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL)
+	  if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL) {
+//CCRT
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+            int i ;
+            const MED_EN::med_int * tmp_PolyhedronIndex = _polyhedronNodal->getPolyhedronIndex();
+            int * PolyhedronIndex = new int[_polyhedronNodal->getNumberOfPolyhedron()+1] ;
+            for ( i = 0 ; i < _polyhedronNodal->getNumberOfPolyhedron()+1 ; i++ )
+               PolyhedronIndex[i] = tmp_PolyhedronIndex[i] ;
+//CCRT : return of a copy of PolyhedronIndex
+            return PolyhedronIndex ;
+#else
 	    return _polyhedronNodal->getPolyhedronIndex();
+#endif
+          }
 	  else
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polyhedron Nodal Connectivity not defined !"));
 	}
@@ -1229,9 +1285,10 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 	_constituent->_numberOfTypes = 2;
       _constituent->_geometricTypes = new medGeometryElement[_constituent->_numberOfTypes];
       _constituent->_type = new CELLMODEL[_constituent->_numberOfTypes];
-      _constituent->_count = new med_int[_constituent->_numberOfTypes+1];
+//CCRT      _constituent->_count = new med_int[_constituent->_numberOfTypes+1];
+      _constituent->_count = new int[_constituent->_numberOfTypes+1];
       _constituent->_count[0]=1;
-      int* tmp_NumberOfConstituentsForeachType = new med_int[_constituent->_numberOfTypes+1];
+      med_int* tmp_NumberOfConstituentsForeachType = new med_int[_constituent->_numberOfTypes+1];
       tmp_NumberOfConstituentsForeachType[0]=0; // to count constituent of each type
       for (int i=0; i<_constituent->_numberOfTypes;i++) {
 	_constituent->_geometricTypes[i]=ConstituentsTypes[i];
@@ -1527,7 +1584,8 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 	  int myNumberOfFaces = _polyhedronNodal->getPolyhedronIndex()[i+1]-_polyhedronNodal->getPolyhedronIndex()[i];
 	  int myNumberOfNodes = _polyhedronNodal->getFacesIndex()[_polyhedronNodal->getPolyhedronIndex()[i+1]-1]-_polyhedronNodal->getFacesIndex()[_polyhedronNodal->getPolyhedronIndex()[i]-1];
 	  POLYHEDRONARRAY myPolyhedra(1,myNumberOfFaces,myNumberOfNodes);
-	  vector<int> myFacesIndex(_polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1, _polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1 + myNumberOfFaces+1);
+//CCRT	  vector<int> myFacesIndex(_polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1, _polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1 + myNumberOfFaces+1);
+	  vector<med_int> myFacesIndex(_polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1, _polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1 + myNumberOfFaces+1);
 	  for (int j=myNumberOfFaces; j>=0; j--)
 	    myFacesIndex[j] -= myFacesIndex[0]-1;
 	  myPolyhedra.setFacesIndex(&myFacesIndex[0]);
@@ -1536,7 +1594,24 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 	  for (int j=0; j<myPolyhedra.getNumberOfFaces(); j++) // for each face of polyhedra
 	    {
 	      int myFaceNumberOfNodes = myPolyhedra.getFacesIndex()[j+1]-myPolyhedra.getFacesIndex()[j];
+//CCRT
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+              int ii ;
+              const med_int * Nodes = myPolyhedra.getNodes() ;
+              int * tmp_Nodes = new int[myPolyhedra.getNumberOfNodes()] ;
+              for ( ii = 0 ; ii < myPolyhedra.getNumberOfNodes() ; ii++ )
+                 tmp_Nodes[ii] = Nodes[ii] ;
+              const med_int * FacesIndex = myPolyhedra.getFacesIndex() ;
+              int * tmp_FacesIndex = new int[myPolyhedra.getNumberOfFaces()+1] ;
+              for ( ii = 0 ; ii < myPolyhedra.getNumberOfNodes() ; ii++ )
+                 tmp_FacesIndex[ii] = FacesIndex[ii] ;
+//CCRT : copy of Nodes
+	      MEDMODULUSARRAY face_poly(myFaceNumberOfNodes,tmp_Nodes + tmp_FacesIndex[j]-1);
+//CCRT              delete [] tmp_Nodes ;
+              delete [] tmp_FacesIndex ;
+#else
 	      MEDMODULUSARRAY face_poly(myFaceNumberOfNodes,myPolyhedra.getNodes() + myPolyhedra.getFacesIndex()[j]-1);
+#endif
 	      int ret_compare = 0;
 
 	      // we search it in existing faces
@@ -1603,7 +1678,17 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 
       if (getNumberOfPolyhedron() > 0)
 	{
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+          int * tmp_PolyhedronIndex = new int[getNumberOfPolyhedron()+1] ;
+          const MED_EN::med_int * PolyhedronIndex = _polyhedronNodal->getPolyhedronIndex() ;
+          int ii ;
+          for ( ii = 0 ; ii < getNumberOfPolyhedron()+1 ; ii++ )
+             tmp_PolyhedronIndex[ii] = PolyhedronIndex[ii] ;
+//CCRT : copy of PolyhedronIndex
+	  _polyhedronDescending = new MEDSKYLINEARRAY(getNumberOfPolyhedron(),_polyhedronNodal->getNumberOfFaces(),tmp_PolyhedronIndex,&PolyDescending[0]); // polyhedron index are the same for nodal and descending connectivities
+#else
 	  _polyhedronDescending = new MEDSKYLINEARRAY(getNumberOfPolyhedron(),_polyhedronNodal->getNumberOfFaces(),_polyhedronNodal->getPolyhedronIndex(),&PolyDescending[0]); // polyhedron index are the same for nodal and descending connectivities
+#endif
 
 	  if (_constituent->_polygonsNodal != NULL)
 	    delete [] _constituent->_polygonsNodal;

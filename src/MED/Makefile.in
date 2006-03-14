@@ -40,7 +40,7 @@ EXPORT_PYSCRIPTS =  MED_test1.py MED_test2.py Med_Gen_test.py
 LIB = libMEDEngine.la
 
 LIB_SRC = Med_Gen_i.cxx
-LIB_SERVER_IDL = MED_Gen.idl SALOME_Component.idl \
+LIB_SERVER_IDL = MED_Gen.idl SALOME_Component.idl SALOME_ContainerManager.idl \
 	         SALOME_Exception.idl MED.idl
 
 LIB_CLIENT_IDL = SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_ModuleCatalog.idl SALOME_Comm.idl SALOME_GenericObj.idl

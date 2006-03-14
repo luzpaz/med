@@ -177,8 +177,8 @@ LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
   CXXFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
-  LDFLAGS+= -lSALOMELocalTrace  -L${KERNEL_ROOT_DIR}/lib/salome
-  LDFLAGSFORBIN+= -lSALOMELocalTrace -lSALOMEBasics -L${KERNEL_ROOT_DIR}/lib/salome
+  LDFLAGS+= -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace 
+  LDFLAGSFORBIN+= -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace -lSALOMEBasics
 endif
 
 LIBSFORBIN=

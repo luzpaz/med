@@ -162,9 +162,10 @@ _TEMPLATE_SPE_ vector<double> _COORDBARY_2D_::Calcule_Coord_Baryc(int num_maille
 	{
 	int i,j;
         // for PAL11458
+        double zero = 0. ;
 	//vector<double> coord_baryc_M(3,0);
 	int nbr_faces=coord_baryc[num_maille].size();
-	vector<double> coord_baryc_M(nbr_faces,0);
+	vector<double> coord_baryc_M(nbr_faces,zero);
 	for (i=0;i</*3*/nbr_faces;i++) 
 		{
 		for (j=0;j<2;j++) coord_baryc_M[i]+=coord_baryc[num_maille][i][j]*M[j];

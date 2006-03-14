@@ -584,7 +584,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         // (2)                                                         CARACTERISTIQUES
         // (3)      -15  317773       4       0       0       0      -2       0       3
         // (4)             317581
-        // (5)          
+        // (5)  0
         // (6)   317767  317761  317755  317815
         // (7)  YOUN     NU       H        SIGY    
         // (8)  REAL*8            REAL*8            REAL*8            REAL*8           
