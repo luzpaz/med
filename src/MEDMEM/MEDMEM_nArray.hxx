@@ -229,7 +229,7 @@ public  :
     if ( this == &array ) return true;
 
     int size = array.getArraySize();
-    if ( size != getArraySize() ) return false;
+    if ( size != this->getArraySize() ) return false;
 
     ARRAY_ELEMENT_TYPE * arrayPtr =
       const_cast<MEDMEM_Array &>(array).getPtr();

@@ -875,8 +875,8 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   vector< int >  MESHnbOfElOfType;
   vector< int >  MESHnbOfElOfTypeC;
   if ( haveMesh )
-    getMeshGeometricTypeFromMESH(ptrMesh,entityType,MESHgeoType,
-				 MESHnbOfElOfType,MESHnbOfElOfTypeC);
+    this->getMeshGeometricTypeFromMESH(ptrMesh,entityType,MESHgeoType,
+                                       MESHnbOfElOfType,MESHnbOfElOfTypeC);
 
   int fileHasMesh = ( med_2_2::MEDdimLire(id, const_cast<char *>(meshName.c_str())) > 0);
   vector< MED_EN::medGeometryElement >  meshGeoType;
@@ -884,8 +884,8 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   vector< int >  meshNbOfElOfTypeC;
   // Si le maillage n'est pas trouvé les tableaux renvoyés sont vides
   if (fileHasMesh)
-    getMeshGeometricTypeFromFile(id,meshName,entityType,meshGeoType,
-				 meshNbOfElOfType,meshNbOfElOfTypeC);
+    this->getMeshGeometricTypeFromFile(id,meshName,entityType,meshGeoType,
+                                       meshNbOfElOfType,meshNbOfElOfTypeC);
 
 
   if (fileHasMesh && haveSupport )
@@ -1448,15 +1448,14 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
     MESH * meshPtr = mySupport->getMesh();
 
     if (fileHasMesh)
-      getMeshGeometricTypeFromFile(id, meshName,
-				   entityType,
-				   fileMeshGeoType,fileMeshNbOfElOfType,fileMeshNbOfElOfTypeC);
+      this->getMeshGeometricTypeFromFile(id, meshName,
+                                         entityType,
+                                         fileMeshGeoType,fileMeshNbOfElOfType,fileMeshNbOfElOfTypeC);
 
     if (meshPtr) {
-
-      getMeshGeometricTypeFromMESH( meshPtr, entityType,meshGeoType,
-				    meshNbOfElOfType,
-				    meshNbOfElOfTypeC);
+      this->getMeshGeometricTypeFromMESH( meshPtr, entityType,meshGeoType,
+                                          meshNbOfElOfType,
+                                          meshNbOfElOfTypeC);
 
       if (fileHasMesh)
 	if ( ( fileMeshGeoType != meshGeoType ) || (fileMeshNbOfElOfTypeC != meshNbOfElOfTypeC) )
