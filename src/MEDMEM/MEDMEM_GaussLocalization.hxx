@@ -162,7 +162,7 @@ namespace MEDMEM {
   }
 
 
-  template <class INTERLACING_TAG> ostream & MEDMEM::operator<<(ostream &os,
+  template <class INTERLACING_TAG> ostream & operator<<(ostream &os,
 								const  GAUSS_LOCALIZATION<INTERLACING_TAG> &loc) {
     os << "Localization Name     : " << loc._locName << endl;
     os << "Geometric Type        : " << MED_EN::geoNames[loc._typeGeo]<< endl;
