@@ -91,6 +91,10 @@ void CONNECTIVITYClient::blankCopy()
     SCRUTE(_numberOfElements_client[iT]);
   }
 
+  // create constituents (PAL10556)
+  if ( ++Entity < MED_NODE && IOR_Mesh->getNumberOfTypes( Entity ))
+    _constituent = new CONNECTIVITYClient( IOR_Mesh, Entity );
+
   _complete = false;
 
   END_OF("CONNECTIVITYClient::blankCopy()");
@@ -276,9 +280,11 @@ const int * CONNECTIVITYClient::getGlobalNumberingIndex
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
-  CONNECTIVITY::getGlobalNumberingIndex(Entity);
+  const int * index = CONNECTIVITY::getGlobalNumberingIndex(Entity);
 
   END_OF("void CONNECTIVITYClient::getGlobalNumberingIndex()");
+
+  return index;
 }
 
 //=============================================================================
