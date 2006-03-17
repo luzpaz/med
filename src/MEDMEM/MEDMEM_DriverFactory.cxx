@@ -151,7 +151,7 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
 	  break ;
 	}
 	case MED_REMP : {
-	  ret=new MED_MED_RDONLY_DRIVER(fileName,med);
+	  ret=new MED_MED_RDWR_DRIVER(fileName,med);
 	  break ;
 	}
 	default:
