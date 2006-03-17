@@ -154,6 +154,7 @@ throw (SALOME::SALOME_Exception)
         {
                 all->name               = CORBA::string_dup(_support->getName().c_str());
                 all->description        = CORBA::string_dup(_support->getDescription().c_str());
+                all->isOnAllElements    = _support->isOnAllElements();
                 const int numberOfTypes = _support->getNumberOfTypes();
                 all->numberOfGeometricType = numberOfTypes;
 		all->entity = _support->getEntity();
@@ -553,6 +554,7 @@ throw (SALOME::SALOME_Exception)
                 MESSAGE("Unable to access number of Gauss points");
                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
+        return myseq._retn();
 }
 //=============================================================================
 /*!
