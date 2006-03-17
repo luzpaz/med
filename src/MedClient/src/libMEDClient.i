@@ -31,6 +31,14 @@ class MESHClient : public MESH {
   }
 };
 
+MESH * getMeshPointer(MESHClient * input);
+%{
+  MESH * getMeshPointer(MESHClient * input)
+  {
+    return (MESH *) input;
+  }
+%}
+
 class SUPPORTClient : public SUPPORT {
 
  public:
