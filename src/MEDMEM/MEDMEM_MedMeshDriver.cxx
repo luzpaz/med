@@ -735,7 +735,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
   const char * LOC = "MED_MESH_RDONLY_DRIVER::getNodalConnectivity : " ;
   BEGIN_OF(LOC);
 
-  int spaceDimension = _ptrMesh->_spaceDimension;
+  //int spaceDimension = _ptrMesh->_spaceDimension;
 
   if (_status==MED_OPENED)
     {
@@ -2594,6 +2594,13 @@ int MED_MESH_WRONLY_DRIVER::writeFamilies(vector<FAMILY*> & families ) const {
     err =_MEDdatagroupOuvrir(_medIdt,const_cast <char *> (dataGroupFam.c_str()) ) ;
     if ( err < MED_VALID ) {
       SCRUTE(err);
+      if ( families[i]->getName().size() > MED_TAILLE_NOM )
+	throw MEDEXCEPTION
+          ( LOCALIZED(STRING(LOC) << "The size of the name of the family |" << i+1
+                      << "| |" << families[i]->getName()
+                      << "| with identifier |" << families[i]->getIdentifier()  << "| is |" 
+                      <<  families[i]->getName().size()  <<"| and is more than |"
+                      << MED_TAILLE_NOM << "|")) ;
 
       MESSAGE(LOC<<"families[i]->getName().c_str() : "<<families[i]->getName().c_str());
       MESSAGE(LOC<<"_meshName.c_str() : "<<_meshName.c_str());
