@@ -2593,8 +2593,10 @@ void MESH::createFamilies()
               else { // try to make a unique name by cutting off char by char from the tail
                 famName.substr(0, MED_TAILLE_NOM);
                 map< string,vector<int> >::iterator foundName = tab_families.find( famName );
-                while ( foundName != tab_families.end() && !famName.empty() )
+                while ( foundName != tab_families.end() && !famName.empty() ) {
                   famName = famName.substr( 0, famName.size() - 1 );
+                  foundName = tab_families.find( famName );
+                }
               }
             }
 

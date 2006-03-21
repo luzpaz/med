@@ -91,9 +91,8 @@ SUPPORT::SUPPORT(const SUPPORT & m)
   else
     _numberOfElements = (int *) NULL;
   _totalNumberOfElements = m._totalNumberOfElements;
-  if (m._isOnAllElts == false)
-    if ( m._number ) // m may be not filled SUPPORTClient
-      _number = new MEDSKYLINEARRAY(* m._number);
+  if (m._isOnAllElts == false && m._number ) // m may be not filled SUPPORTClient
+    _number = new MEDSKYLINEARRAY(* m._number);
   else
     _number = (MEDSKYLINEARRAY *) NULL;
 
