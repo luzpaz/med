@@ -2338,6 +2338,18 @@ public:
       MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
       return (FIELD<T, INTERLACING_TAG> *) field;
     }
+
+  template <class T> FIELD<T,FullInterlace> *
+    createTypedFieldConvertFullInterlace(const FIELD<T,NoInterlace> & field )
+    {
+      return FieldConvert(field);
+    }
+
+  template <class T> FIELD<T,NoInterlace> *
+    createTypedFieldConvertNoInterlace(const FIELD<T,FullInterlace> & field )
+    {
+      return FieldConvert(field);
+    }
 %}
 
 template<class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createTypedFieldFromField(FIELD_ * field);
@@ -2367,6 +2379,24 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFiel
 %template ( createFieldIntNoInterlaceScalarProductDeep ) createFieldScalarProductDeep < int, NoInterlace >;
 
 template<class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldFromAnalytic(SUPPORT * Support, int NumberOfComponents, PyObject * double_function);
+
+template <class T> FIELD<T,FullInterlace> * createTypedFieldConvertFullInterlace(const FIELD<T,NoInterlace> & field );
+
+%template (createFieldDoubleConvertFullInterlace) createTypedFieldConvertFullInterlace<double>;
+
+%template (createFieldIntConvertFullInterlace) createTypedFieldConvertFullInterlace<int>;
+
+template <class T> FIELD<T,NoInterlace> * createTypedFieldConvertNoInterlace(const FIELD<T,FullInterlace> & field );
+
+%template (createFieldDoubleConvertNoInterlace) createTypedFieldConvertNoInterlace<double>;
+
+%template (createFieldIntConvertNoInterlace) createTypedFieldConvertNoInterlace<int>;
+
+%newobject createFieldDoubleConvertFullInterlace ;
+%newobject createFieldIntConvertFullInterlace ;
+
+%newobject createFieldDoubleConvertNoInterlace ;
+%newobject createFieldIntConvertNoInterlace ;
 
 GRID * createGridFromMesh( MESH * aMesh );
 
