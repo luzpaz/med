@@ -1096,9 +1096,40 @@ static void getReverseVector (const medGeometryElement type,
     swapVec[4] = make_pair( 12, 15 );
     swapVec[5] = make_pair( 13, 14 );
     swapVec[6] = make_pair( 17, 19 );
+    break;
+  case MED_TRIA6:
+    swapVec.resize(2);
+    swapVec[0] = make_pair( 1, 2 );
+    swapVec[1] = make_pair( 3, 5 );
+    break;
+  case MED_QUAD8:
+    swapVec.resize(3);
+    swapVec[0] = make_pair( 1, 3 );
+    swapVec[1] = make_pair( 4, 7 );
+    swapVec[2] = make_pair( 5, 6 );
+    break;
   default:;
   }
   END_OF("void getReverseVector()");
+}
+
+//=======================================================================
+//function : reverse
+//purpose  : inverse element orientation using vector of indices to swap
+//=======================================================================
+
+static void reverse(const _maille & aMaille, const vector<pair<int,int> > & swapVec )
+{
+  _maille* ma = (_maille*) & aMaille;
+  for ( int i = 0; i < swapVec.size(); ++i ) {
+    _maille::iter tmp = ma->sommets[ swapVec[i].first ];
+    ma->sommets[ swapVec[i].first ] = ma->sommets[ swapVec[i].second ];
+    ma->sommets[ swapVec[i].second ] = tmp;
+  }
+  if ( swapVec.empty() )
+    ma->reverse = true;
+  else
+    ma->reverse = false;
 }
 
 //=======================================================================
@@ -1137,10 +1168,6 @@ static inline void fixConnectivity(const _maille & aMaille )
   if ( const int * conn = getGibi2MedConnectivity( aMaille.geometricType )) {
     _maille* ma = (_maille*) & aMaille;
     //cout << "###### BEFORE fixConnectivity() " << *ma << endl;
-    if ( ma->reverse ) {
-      std::reverse( ma->sommets.begin(), ma->sommets.end() );
-      ma->reverse = false;
-    }
     vector< _maille::iter > newSommets( ma->sommets.size() );
     for ( int i = 0; i < newSommets.size(); ++i )
       newSommets[ i ] = ma->sommets[ conn[ i ]];
@@ -1159,6 +1186,9 @@ static void orientElements( _intermediateMED& medi )
   MESSAGE("orientElements()");
   set<_maille>::iterator elemIt = medi.maillage.begin();
 
+  int type = -100;
+  vector< pair<int,int> > swapVec;
+
   if ( elemIt->sommets[0]->second.coord.size() == 2 ) { // space dimension
 
     // --------------------------
@@ -1168,8 +1198,13 @@ static void orientElements( _intermediateMED& medi )
     for ( ; elemIt != medi.maillage.end(); elemIt++ )
       if ( elemIt->dimension() == 2 )
       {
+        // fix connectivity of quadratic faces
+        fixConnectivity( *elemIt );
+
         // look for index of the most left node
         int iLeft = 0, iNode, nbNodes = elemIt->sommets.size();
+        if ( nbNodes > 4 ) // quadratic face
+          nbNodes /= 2;
         double minX = elemIt->sommets[0]->second.coord[0];
         for ( iNode = 1; iNode < nbNodes; ++iNode )
         {
@@ -1199,10 +1234,14 @@ static void orientElements( _intermediateMED& medi )
           yLN /= modLN;
           // summury direction of neighboring links must be positive
           bool clockwise = ( yPL + yLN > 0 );
-          elemIt->reverse = ( !clockwise );
+          if ( !clockwise ) { 
+            if ( elemIt->geometricType != type ) {
+              type = elemIt->geometricType;
+              getReverseVector( type, swapVec );
+            }
+            reverse( *elemIt, swapVec );
+          }
         }
-        // specific reverse for quadratic faces
-        fixConnectivity( *elemIt );
       }
   }
   else {
@@ -1334,14 +1373,21 @@ static void orientElements( _intermediateMED& medi )
     // fix connectivity of quadratic elements
     // ---------------------------------------------------
 
-
-    int type = -100;
-    vector< pair<int,int> > swapVec;
     for ( ; elemIt != medi.maillage.end(); elemIt++ ) {
 
       // GIBI connectivity -> MED one
       fixConnectivity( *elemIt );
 
+      // reverse quadratic faces
+      if ( elemIt->reverse ) {
+        if ( elemIt->geometricType != type ) {
+          type = elemIt->geometricType;
+          getReverseVector( type, swapVec );
+        }
+        reverse ( *elemIt, swapVec );
+      }
+
+      // treate volumes
       if ( elemIt->dimension() == 3 )
       {
         int nbBottomNodes = 0;
@@ -1409,26 +1455,12 @@ static void orientElements( _intermediateMED& medi )
         tbDir[2] = n[0]->coord[2] - n[3]->coord[2];
         // compare 2 directions: normal and top-bottom
         double dot = normal[0]*tbDir[0] + normal[1]*tbDir[1] + normal[2]*tbDir[2];
-        bool reverse = ( dot < 0. );
-        if ( reverse ) {
+        if ( dot < 0. ) { // need reverse
           if ( elemIt->geometricType != type ) {
             type = elemIt->geometricType;
             getReverseVector( type, swapVec );
-//             INFOS("vec01: " <<vec01[0] << " " <<vec01[1] << " " << vec01[2]);
-//             INFOS("vec02: " <<vec02[0] << " " <<vec02[1] << " " << vec02[2]);
-//             INFOS("normal: " <<normal[0] << " " <<normal[1] << " " << normal[2]);
-//             INFOS("tb: " << tbDir[0] << " " <<tbDir[1] << " " << tbDir[2]);
-//             INFOS( *elemIt );
-//             for ( vector< _maille::iter >::const_iterator si = elemIt->sommets.begin();
-//                  si != elemIt->sommets.end(); si++ )
-//               INFOS( (*si)->second );
           }
-          _maille* ma = (_maille*) & (*elemIt);
-          for ( int i = 0; i < swapVec.size(); ++i ) {
-            _maille::iter tmp = ma->sommets[ swapVec[i].first ];
-            ma->sommets[ swapVec[i].first ] = ma->sommets[ swapVec[i].second ];
-            ma->sommets[ swapVec[i].second ] = tmp;
-          }
+          reverse( *elemIt, swapVec );
         }
       } // dimension() == 3
     } // loop on maillage
