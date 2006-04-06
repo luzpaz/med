@@ -131,17 +131,17 @@ typedef double         med_float;
 #endif
 
 
-//#if defined(PPRO_NT) 
+#if defined(PPRO_NT) 
 /* correspondance des types avec HDF 5 */
-//typedef hsize_t        med_size;
-//typedef hssize_t       med_ssize;
-//typedef hid_t          med_idt;
-//typedef herr_t         med_err;
+typedef hsize_t        med_size;
+typedef hssize_t       med_ssize;
+typedef hid_t          med_idt;
+typedef herr_t         med_err;
 
 /* types elementaires */
-//typedef int	       med_int;
-//typedef double         med_float;
-//#endif
+typedef int	       med_int;
+typedef double         med_float;
+#endif
 
 
 #if defined(NOMF_PRE_UNDERSCORE) && defined(NOMF_POST_UNDERSCORE)
