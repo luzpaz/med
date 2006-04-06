@@ -73,8 +73,11 @@ namespace MEDMEM {
     inline MED_EN::medModeSwitch  getInterlacingType() const { return _interlacingType;}
 
   };
-  template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION() throw (MEDEXCEPTION) : _typeGeo(MED_EN::MED_NONE), _nGauss(-1),
-														    _interlacingType(_interlacingType( SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType))  {};
+  template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION() throw (MEDEXCEPTION) :
+    _typeGeo(MED_EN::MED_NONE), _nGauss(-1),
+    _interlacingType( SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType) 
+  {};
+
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION(const string & locName,
 											   const MED_EN::medGeometryElement typeGeo,
 											   const int  nGauss,

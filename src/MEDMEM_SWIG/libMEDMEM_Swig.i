@@ -48,6 +48,8 @@
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_DriverFactory.hxx"
+#include "MEDMEM_GaussLocalization.hxx"
+#include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_SWIG_Templates.hxx"
 
   using namespace MEDMEM;
@@ -77,6 +79,14 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 
 %include "typemaps.i"
 %include "my_typemap.i"
+
+%typecheck(SWIG_TYPECHECK_POINTER) double *, const double *,
+ const double * const, int *, const int *, const int * const, string *,
+ const string *, const string * const, medGeometryElement *,
+ const medGeometryElement *, const medGeometryElement * const
+{
+  $1 = ($input != 0);
+}
 
 /*
   mapping between stl string and python string 
@@ -2310,8 +2320,89 @@ public:
       }
   }
 };
+
 %template (ASCII_FIELDDOUBLE_DRIVER) ASCII_FIELD_DRIVER< double >;
 %template (ASCII_FIELDINT_DRIVER) ASCII_FIELD_DRIVER< int >;
+
+/*
+*/
+
+
+template <class INTERLACING_TAG> class GAUSS_LOCALIZATION
+{
+ public:
+
+  GAUSS_LOCALIZATION();
+
+  ~GAUSS_LOCALIZATION();
+
+  std::string getName() const ;
+
+  medGeometryElement getType() const ;
+
+  int getNbGauss() const ;
+
+  medModeSwitch  getInterlacingType() const;
+
+  %extend {
+    GAUSS_LOCALIZATION<INTERLACING_TAG>(char * locName,
+					const medGeometryElement
+					typeGeo,
+					const int  nGauss,
+					const double * cooRef,
+					const double * cooGauss,
+					const double * wg)
+      {
+	return new GAUSS_LOCALIZATION<INTERLACING_TAG>(string(locName),
+						       typeGeo, nGauss, cooRef,
+						       cooGauss, wg);
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing GAUSS_LOCALIZATION : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
+    PyObject * getRefCoo () const
+      {
+	typedef  MEDMEM_ArrayInterface<double,INTERLACING_TAG,NoGauss>::Array ArrayNoGauss;
+
+	ArrayNoGauss cooRef = self->getRefCoo();
+	int size = cooRef.getArraySize();
+	double * cooRefPtr = cooRef.getPtr();
+        TYPEMAP_OUTPUT_ARRAY(cooRefPtr, size, PyFloat_FromDouble,
+			     GAUSS_LOCALIZATION::getRefCoo);
+      }
+
+    PyObject * getGsCoo () const
+      {
+	typedef  MEDMEM_ArrayInterface<double,INTERLACING_TAG,NoGauss>::Array ArrayNoGauss;
+	ArrayNoGauss cooGauss = self->getGsCoo();
+	int size = cooGauss.getArraySize();
+	double * cooGaussPtr = cooGauss.getPtr();
+        TYPEMAP_OUTPUT_ARRAY(cooGaussPtr, size, PyFloat_FromDouble,
+			     GAUSS_LOCALIZATION::getGsCoo);
+      }
+
+    PyObject * getWeight () const
+      {
+	vector<double> wg = self->getWeight();
+	int size = wg.size();
+	double * wgPtr = new double [size];
+	for (int index = 0; index<size; index++)
+	  wgPtr[index] = wg[index];
+        TYPEMAP_OUTPUT_ARRAY(wgPtr, size, PyFloat_FromDouble,
+			     GAUSS_LOCALIZATION::getWeight);
+	delete wgPtr;
+      }
+  }
+};
+
+%template (GAUSS_LOCALIZATION_FULL) GAUSS_LOCALIZATION<FullInterlace> ;
+%template (GAUSS_LOCALIZATION_NO) GAUSS_LOCALIZATION<NoInterlace> ;
 
 %{
   template <class T, class INTERLACING_TAG>
