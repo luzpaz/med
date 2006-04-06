@@ -29,6 +29,8 @@
 #ifndef MED_CoordUtils_HeaderFile
 #define MED_CoordUtils_HeaderFile
 
+#include "MED_WrapperBase.hxx"
+
 #include "MED_Structures.hxx"
 
 namespace MED
@@ -37,7 +39,7 @@ namespace MED
 
 
   //---------------------------------------------------------------
-  class TCoordHelper
+  class MEDWRAPPER_EXPORT TCoordHelper
   {
     TGetCoord* myGetCoord;
     

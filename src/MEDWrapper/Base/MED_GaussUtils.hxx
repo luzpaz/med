@@ -29,6 +29,8 @@
 #ifndef MED_GaussUtils_HeaderFile
 #define MED_GaussUtils_HeaderFile
 
+#include "MED_WrapperBase.hxx"
+
 #include "MED_Structures.hxx"
 
 namespace MED
@@ -38,7 +40,7 @@ namespace MED
   typedef TVector<TCoordSlice> TCoordSliceArr;
 
   //! Define a helper class to handle Gauss Points coordinates
-  class TGaussCoord:
+  class MEDWRAPPER_EXPORT TGaussCoord:
     virtual TModeSwitchInfo 
   {
     TInt myNbElem;
