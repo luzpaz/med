@@ -520,6 +520,8 @@ class SUPPORT
 
   MESH * getMesh() const;
 
+  std::string getMeshName() const;
+
   void setMesh(MESH * Mesh) const;
 
   medEntityMesh getEntity() const;
@@ -770,6 +772,10 @@ public:
 	const std::string& fileName, const std::string& fieldName,
 	const int iterationNumber, const int orderNumber);
 
+  FIELD(driverTypes driverType,	const std::string& fileName,
+	const std::string& fieldName, const int iterationNumber,
+	const int orderNumber);
+
   void read(int index=0);
 
   T1 getValueIJ(int i,int j) const;
@@ -809,6 +815,10 @@ public:
   void write(int index=0, const std::string& driverName="");
 
   void writeAppend(int index=0, const std::string& driverName="");
+
+  bool getGaussPresence();
+
+  GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement);
 
   %extend {
     PyObject *  applyPyFunc( PyObject * func )
