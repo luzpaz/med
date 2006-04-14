@@ -61,6 +61,24 @@ void DRIVERFACTORY::setMedFileVersionForWriting(medFileVersion version)
   DRIVERFACTORY::globalMedFileVersionForWriting = version;
 }
 
+driverTypes DRIVERFACTORY::deduceDriverTypeFromFileName(const std::string & fileName)
+{
+  string extension(fileName);
+  unsigned int pos=extension.rfind('.');
+  if(pos==string::npos)
+    return NO_DRIVER;
+  extension.erase(0,pos+1);
+  if(extension=="med")
+    return MED_DRIVER;
+  if(extension=="sauve" || extension=="sauv")
+    return GIBI_DRIVER;
+  if(extension=="cnc" || extension=="inp" || extension=="xyz")
+    return PORFLOW_DRIVER;
+  if(extension=="vtk")
+    return VTK_DRIVER;
+  return NO_DRIVER;
+}
+
 GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
 					     const std::string & fileName,
 					     MESH *mesh,
@@ -180,7 +198,7 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
 	  break ;
 	}
 	case MED_REMP : {
-	  ret=new MED_MED_RDONLY_DRIVER(fileName,med);
+	  ret=new MED_MED_RDWR_DRIVER(fileName,med);
 	  break ;
 	}
 	default:

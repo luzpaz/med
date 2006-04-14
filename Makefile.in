@@ -70,6 +70,8 @@ maill.00_nofield.med \
 maill.00_nomesh.med \
 maill.00_without_seg2.med \
 zzzz121b_without_tr6.med \
+geomMesh21.med \
+geomMesh22.med \
 Darcy3_3D_H_10x10x10.sauve \
 dx200_dy1_avec_2couches.sauve \
 elle_2D_QT_10x10.sauve \

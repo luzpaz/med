@@ -204,10 +204,11 @@ void SUPPORT::update()
 	  _totalNumberOfElements=_numberOfElements[0];
 	}
       else
-	{ // we duplicate information from _mesh
+	{ // we duplicate information from _mesh
 	  _numberOfGeometricType=_mesh->getNumberOfTypesWithPoly(_entity);
 	  SCRUTE(_numberOfGeometricType);
-	  _geometricType.set(_numberOfGeometricType,_mesh->getTypesWithPoly(_entity) );
+	  medGeometryElement *  allType = _mesh->getTypesWithPoly(_entity);
+	  _geometricType.set(_numberOfGeometricType,allType );
 	  _numberOfElements.set(_numberOfGeometricType);
 	  _totalNumberOfElements=0;
 	  for (int i=0;i<_numberOfGeometricType;i++)
@@ -215,6 +216,7 @@ void SUPPORT::update()
 	      _numberOfElements[i]=_mesh->getNumberOfElementsWithPoly(_entity,_geometricType[i]) ;
 	      _totalNumberOfElements+=_numberOfElements[i];
 	    }
+	  delete [] allType;
 	}
 
       SCRUTE(_name);

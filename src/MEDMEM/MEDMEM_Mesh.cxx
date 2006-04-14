@@ -2258,26 +2258,50 @@ int MESH::getElementContainingPoint(const double *coord)
 {
   if(_spaceDimension==3)
     {
-      Meta_Wrapper<3> *fromWrapper=new Meta_Wrapper<3> (getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
+      Meta_Wrapper<3> fromWrapper(getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
 							const_cast<CONNECTIVITY *>(getConnectivityptr()));
-      Meta_Wrapper<3> *toWrapper=new Meta_Wrapper<3> (1,const_cast<double *>(coord));
-      Meta_Mapping<3> *mapping=new Meta_Mapping<3> (fromWrapper,toWrapper);
-      mapping->Cree_Mapping(1);
-      vector<int> vectormapping=mapping->Get_Mapping();
-      return vectormapping[0]+1;
+      Meta_Wrapper<3> toWrapper(1,const_cast<double *>(coord));
+      Meta_Mapping<3> mapping(&fromWrapper,&toWrapper);
+      mapping.Cree_Mapping(1);
+      return mapping.Get_Mapping()[0]+1;
     }
   else if(_spaceDimension==2)
     {
-      Meta_Wrapper<2> *fromWrapper=new Meta_Wrapper<2> (getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
+      Meta_Wrapper<2> fromWrapper(getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
 							const_cast<CONNECTIVITY *>(getConnectivityptr()));
-      Meta_Wrapper<2> *toWrapper=new Meta_Wrapper<2> (1,const_cast<double *>(coord));
-      Meta_Mapping<2> *mapping=new Meta_Mapping<2> (fromWrapper,toWrapper);
-      mapping->Cree_Mapping(1);
-      vector<int> vectormapping=mapping->Get_Mapping();
-      return vectormapping[0]+1;
+      Meta_Wrapper<2> toWrapper(1,const_cast<double *>(coord));
+      Meta_Mapping<2> mapping(&fromWrapper,&toWrapper);
+      mapping.Cree_Mapping(1);
+      return mapping.Get_Mapping()[0]+1;
       }
   else
     throw MEDEXCEPTION("MESH::getElementContainingPoint : invalid _spaceDimension must be equal to 2 or 3 !!!");
+}
+
+vector< vector<double> > MESH::getBoundingBox() const
+{
+  const double *myCoords=_coordinate->getCoordinates(MED_EN::MED_FULL_INTERLACE);
+  vector< vector<double> > ret(2);
+  int i,j;
+  ret[0].resize(_spaceDimension);
+  ret[1].resize(_spaceDimension);
+  for(i=0;i<_spaceDimension;i++)
+    {
+      ret[0][i]=1.e300;
+      ret[1][i]=-1.e300;
+    }
+  for(i=0;i<_coordinate->getNumberOfNodes();i++)
+    {
+      for(j=0;j<_spaceDimension;j++)
+	{
+	  double tmp=myCoords[i*_spaceDimension+j];
+	  if(tmp<ret[0][j])
+	    ret[0][j]=tmp;
+	  if(tmp>ret[1][j])
+	    ret[1][j]=tmp;
+	}
+    }
+  return ret;
 }
 
 //Presently disconnected in C++

@@ -17,11 +17,15 @@ int main(int argc, char *argv[])
   if (argc !=2)
     {
       cerr << "Usage : " << argv[0] 
-	   << " filename  where filename should be a med file" << endl << endl;
+	   << " fileName.med where fileName.med should be a med file" << endl;
+      cerr << "        It will then generate two med files fileNameAnal_V21.med (med V2.1 format)" << endl;
+      cerr << "and fileNameAnal_V21.med (med V2.2 format)" << endl << endl;
       exit(-1);
     }
 
   int i;
+  // This test program is more or less designed to work with file TimeStamps.med
+  // If you want to use it for other Med files, you have to alter the mounting in memory of the fields f1 and f2
   //string fileIn="/export/home/geay32/SALOME225/KERNEL_SRC/examples/TimeStamps.med";
 
   string fileIn = argv[1] ;

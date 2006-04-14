@@ -84,6 +84,7 @@ EXPORT_PYSCRIPTS = libMEDMEM_Swig.py \
 		   testDriverAscii.py \
 		   gaussLocalization.py \
 		   test_profil_MedFieldDriver.py \
+		   testWriteAndFam.py \
 		   testMedMemGeneral.py
 
 #############################################################################

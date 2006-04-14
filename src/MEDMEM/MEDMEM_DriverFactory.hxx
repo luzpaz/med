@@ -47,6 +47,8 @@ namespace MEDMEM {
 
     void setMedFileVersionForWriting(MED_EN::medFileVersion version);
 
+    driverTypes deduceDriverTypeFromFileName(const std::string & fileName);
+
     GENDRIVER * buildDriverForMesh(driverTypes driverType,
 				   const std::string & fileName,
 				   MESH *mesh,const string &  driverName,
