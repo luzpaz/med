@@ -37,7 +37,7 @@ MEDconnLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_sw
   char nom_ent[MED_TAILLE_NOM_ENTITE+1];
   char nom_geo[MED_TAILLE_NOM_ENTITE+1];
   char nom_dataset[MED_TAILLE_NOM_ENTITE+1];
-  med_ssize * pfltab;
+  med_ssize * pfltab = NULL;
   med_size    psize;
   int dim,nnoe,ndes;
   int nsup = 0;

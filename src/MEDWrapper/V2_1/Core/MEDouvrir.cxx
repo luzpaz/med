@@ -45,7 +45,7 @@ MEDouvrir(char *nom, med_mode_acces mode_acces)
   switch(mode_acces)
     {
     case MED_LECT :
-      if ( access( 0/*nom*/,0/*F_OK*/) )
+      if (access(nom,F_OK))
 	      return -1;
       else 
 	      if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)

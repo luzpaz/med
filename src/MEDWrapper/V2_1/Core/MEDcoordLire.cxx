@@ -36,7 +36,7 @@ MEDcoordLire(med_idt fid, char *maa, med_int mdim, med_float *coo,
   char      chemin[MED_TAILLE_MAA+MED_TAILLE_NOM+1];
   int       i;
   med_int   type_rep_int;
-  med_ssize * pfltab;
+  med_ssize * pfltab = NULL;
 
   /*
    * On inhibe le gestionnaire d'erreur
