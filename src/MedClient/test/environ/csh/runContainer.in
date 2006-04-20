@@ -9,9 +9,9 @@ set PYTHON_VERSION=python@PYTHON_VERSION@
 setenv KERNEL_ROOT_DIR @prefix@
 
 if ( ${?KERNEL_ROOT_DIR} ) then
-  setenv PATH ${KERNEL_ROOT_DIR}/bin:${KERNEL_ROOT_DIR}/Tests:${PATH}
-  setenv LD_LIBRARY_PATH ${KERNEL_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
-  setenv PYTHONPATH ${KERNEL_ROOT_DIR}/lib:${KERNEL_ROOT_DIR}/lib/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
+  setenv PATH ${KERNEL_ROOT_DIR}/bin/salome:${KERNEL_ROOT_DIR}/Tests:${PATH}
+  setenv LD_LIBRARY_PATH ${KERNEL_ROOT_DIR}/lib@LIB_LOCATION_SUFFIX@/salome:${LD_LIBRARY_PATH}
+  setenv PYTHONPATH ${KERNEL_ROOT_DIR}/lib@LIB_LOCATION_SUFFIX@/salome:${KERNEL_ROOT_DIR}/lib@LIB_LOCATION_SUFFIX@/${PYTHON_VERSION}/site-packages/salome:${PYTHONPATH}
 endif
 
 if ( ${?MED_ROOT_DIR} ) then

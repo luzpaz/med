@@ -49,7 +49,7 @@ if test "x${old_with_kernel}" != "x${MED_WITH_KERNEL}"; then
              echo "Configuration changed: without KERNEL -> with KERNEL"
              echo -n "Updating 'configure' script ...  "
              cd $ROOT_SRCDIR
-             aclocal --acdir=adm_local/unix/config_files -I ${KERNEL_ROOT_DIR}/salome_adm/unix/config_files
+             aclocal -I adm_local/unix/config_files -I ${KERNEL_ROOT_DIR}/salome_adm/unix/config_files
              if autoconf; then
              	echo "done"
              else
@@ -508,7 +508,7 @@ else
 fi
 
 # make other build directories
-for rep in salome_adm adm_local doc bin/salome include/salome lib/salome share/salome/resources idl
+for rep in salome_adm adm_local doc bin/salome include/salome lib${LIB_LOCATION_SUFFIX}/salome share/salome/resources idl
 do
 #   if test ! -d $rep ; then
 #      eval mkdir $rep

@@ -92,7 +92,7 @@ SUPPORT::SUPPORT(const SUPPORT & m)
 
   _totalNumberOfElements = m._totalNumberOfElements;
 
-  if (m._isOnAllElts == false)
+  if (m._isOnAllElts == false && m._number ) // m may be not filled SUPPORTClient
     _number = new MEDSKYLINEARRAY(* m._number);
   else
     _number = (MEDSKYLINEARRAY *) NULL;
@@ -124,7 +124,10 @@ SUPPORT & SUPPORT::operator=(const SUPPORT & m)
   _totalNumberOfElements = m._totalNumberOfElements;
   if (m._isOnAllElts == false) {
     if (_number) delete _number;
-    _number = new MEDSKYLINEARRAY(* m._number);
+    if  ( m._number ) // m may be not filled SUPPORTClient
+      _number = new MEDSKYLINEARRAY(* m._number);
+    else
+      _number = (MEDSKYLINEARRAY *) NULL;
   } else
     _number = (MEDSKYLINEARRAY *) NULL;
 
@@ -165,7 +168,8 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
     os << "Is on all entities."<< endl;
   else {
     os << "Is not on all entities. "<< endl;
-    os << *my.getNumber(MED_ALL_ELEMENTS);
+    if ( my._number )  // m may be not filled SUPPORTClient
+      os << *my.getNumber(MED_ALL_ELEMENTS);
   }
   int numberoftypes = my._numberOfGeometricType ;
   os << "NumberOfTypes : "<<numberoftypes<<endl;

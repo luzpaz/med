@@ -1567,6 +1567,8 @@ class MED
 
   void write (int index=0);
 
+  void read (int index=0);
+
   void addField ( FIELD_  * const ptrField  );
 
   void addMesh  ( MESH    * const ptrMesh   );

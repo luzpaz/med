@@ -3116,6 +3116,13 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
     err = med_2_2::_MEDdatagroupOuvrir(_medIdt,const_cast <char *> (dataGroupFam.c_str()) ) ;
     if ( err < MED_VALID ) {
       SCRUTE(err);
+      if ( families[i]->getName().size() > MED_TAILLE_NOM )
+	throw MEDEXCEPTION
+          ( LOCALIZED(STRING(LOC) << "The size of the name of the family |" << i+1
+                      << "| |" << families[i]->getName()
+                      << "| with identifier |" << families[i]->getIdentifier()  << "| is |" 
+                      <<  families[i]->getName().size()  <<"| and is more than |"
+                      << MED_TAILLE_NOM << "|")) ;
 
       MESSAGE(LOC<<"families[i]->getName().c_str() : "<<families[i]->getName().c_str());
       MESSAGE(LOC<<"_meshName.c_str() : "<<_meshName.c_str());

@@ -12,8 +12,8 @@ HAVE_SSTREAM=@HAVE_SSTREAM@
 
 LIBS=@LIBS@
 LIBSFORBIN=@LIBS@
-LDFLAGS=@LDFLAGS@ -L$(top_builddir)/lib/salome
-LDFLAGSFORBIN=@LDFLAGS@ -L$(top_builddir)/lib/salome
+LDFLAGS=@LDFLAGS@ -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
+LDFLAGSFORBIN=@LDFLAGS@ -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 # add libstdc++ to link c++ library with libtool !
 LDFLAGS+= @STDLIB@
 LDFLAGSFORBIN+= @STDLIB@
@@ -60,8 +60,8 @@ PYTHON_VERSION = @PYTHON_VERSION@
 # Changes from the SalomePro V1.2c
 #PYTHON_SITE = @PYTHON_SITE@
 #PYTHON_SITE_INSTALL = @PYTHON_SITE_INSTALL@
-PYTHON_SITE = $(prefix)/lib/python$(PYTHON_VERSION)/site-packages
-PYTHON_SITE_INSTALL = $(prefix)/lib/python$(PYTHON_VERSION)/site-packages/salome
+PYTHON_SITE = $(prefix)/lib@LIB_LOCATION_SUFFIX@/python$(PYTHON_VERSION)/site-packages
+PYTHON_SITE_INSTALL = $(prefix)/lib@LIB_LOCATION_SUFFIX@/python$(PYTHON_VERSION)/site-packages/salome
 
 # QT
 
@@ -186,6 +186,8 @@ ifeq ($(MED_WITH_KERNEL),yes)
 endif
 
 DOXYGEN = @DOXYGEN@
+DOXYGEN_WITH_PYTHON = @DOXYGEN_WITH_PYTHON@
+DOXYGEN_WITH_STL = @DOXYGEN_WITH_STL@
 
 ## Shared libraries
 LT_STATIC_EXEC=@LT_STATIC_EXEC@
@@ -207,16 +209,26 @@ INSTALL_DATA=@INSTALL_DATA@
 # create a symbolic link (or a copie ?)
 LN_S=@LN_S@
 
+KERNEL_ROOT_DIR=@KERNEL_ROOT_DIR@
+KERNEL_SITE_DIR=@KERNEL_SITE_DIR@
+
+KERNEL_LDFLAGS=@KERNEL_LDFLAGS@
+KERNEL_CXXFLAGS=@KERNEL_CXXFLAGS@
+
+GUI_ROOT_DIR=@GUI_ROOT_DIR@
+GUI_LDFLAGS=@GUI_LDFLAGS@
+GUI_CXXFLAGS=@GUI_CXXFLAGS@
+
 ## Installation points
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-bindir=@bindir@/salome
-libdir=@libdir@/salome
+bindir=@exec_prefix@/bin/salome
+libdir=@exec_prefix@/lib@LIB_LOCATION_SUFFIX@/salome
 # warning : if user give this path in configure we could have salome/salome :-(
 includedir=@includedir@/salome
 datadir=@datadir@/salome
-idldir=$(prefix)/idl/salome
-sharedpydir=@libdir@/python$(PYTHON_VERSION)/site-packages/salome/shared_modules
+idldir=${prefix}/idl/salome
+sharedpydir=@exec_prefix@/lib@LIB_LOCATION_SUFFIX@/python$(PYTHON_VERSION)/site-packages/salome/shared_modules
 incmakedir=${prefix}/salome_adm/unix
 
 docdir=${prefix}/doc/salome
@@ -281,6 +293,6 @@ check_GUI.m4	                  check_corba_in_GUI.m4
 
 $(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=@KERNEL_ROOT_DIR@/salome_adm/unix/config_files/%) \
                           $(ACLOCAL_GUI:%=@GUI_ROOT_DIR@/adm_local/unix/config_files/%)
-	cd $(top_srcdir) ; aclocal --acdir=adm_local/unix/config_files -I @KERNEL_ROOT_DIR@/salome_adm/unix/config_files \
+	cd $(top_srcdir) ; aclocal -I adm_local/unix/config_files -I @KERNEL_ROOT_DIR@/salome_adm/unix/config_files \
 	                                                               -I @GUI_ROOT_DIR@/adm_local/unix/config_files
 

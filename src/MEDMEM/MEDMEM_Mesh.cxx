@@ -2158,6 +2158,8 @@ void MESH::createFamilies()
 	    medGeometryElement geometrictype=MED_NONE;
 	    vector<int> tab_index_types_geometriques;
 	    vector<int> tab_nombres_elements;
+            if ( fam->second.empty() )
+              continue; // it is just a truncated long family name
 
 	    // scan family cells and fill the tab that are needed by the create a MED FAMILY
 	    for( int i=0; i!=fam->second.size(); ++i)
@@ -2176,9 +2178,28 @@ void MESH::createFamilies()
 	    tab_nombres_elements.push_back(fam->second.size()+1-tab_index_types_geometriques.back());
 	    tab_index_types_geometriques.push_back(fam->second.size()+1);
 
-	    // create a empty MED FAMILY and fill it with the tabs we constructed
+            // family name sould not be longer than MED_TAILLE_NOM
+            string famName = fam->first;
+            if ( famName.size() > MED_TAILLE_NOM ) {
+              // try to cut off "FAM_" from the head
+              if ( famName.size() - 4 <= MED_TAILLE_NOM ) {
+                famName = famName.substr(4);
+              }
+              else { // try to make a unique name by cutting off char by char from the tail
+                famName.substr(0, MED_TAILLE_NOM);
+                map< string,vector<int> >::iterator foundName = tab_families.find( famName );
+                while ( foundName != tab_families.end() && !famName.empty() ) {
+                  famName = famName.substr( 0, famName.size() - 1 );
+                  foundName = tab_families.find( famName );
+                }
+              }
+              tab_families[ famName ]; // add a new name in the table to assure uniqueness
+            }
+
+	    // create an empty MED FAMILY and fill it with the tabs we constructed
 	    FAMILY* newFam = new FAMILY();
 	    newFam->setTotalNumberOfElements(fam->second.size());
+	    newFam->setName(famName);
 	    newFam->setName(fam->first);
 	    newFam->setMesh(this);
 	    newFam->setNumberOfGeometricType(tab_types_geometriques.size());

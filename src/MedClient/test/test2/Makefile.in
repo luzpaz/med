@@ -42,11 +42,11 @@ LIB = libCompo2cmodule.la
 LIB_SRC = Compo2.cxx
 LIB_CLIENT_IDL= SALOME_Component.idl SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Exception.idl SALOME_Comm.idl MED.idl SALOME_GenericObj.idl
 
-LDFLAGS= -L$(top_builddir)/lib/salome 
-LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
+LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
+LDFLAGSFORBIN= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
-CPPFLAGS += ${MED2_INCLUDES} ${HDF5_INCLUDES} ${PYTHON_INCLUDES} -I${KERNEL_ROOT_DIR}/include/salome
-LIBS = -L${KERNEL_ROOT_DIR}/lib/salome -lMEDClientcmodule -lMEDMEM_Swigcmodule -lmedmem -lMEDMEMImpl  ${MED2_LIBS} ${HDF5_LIBS}
+CPPFLAGS += ${MED2_INCLUDES} ${HDF5_INCLUDES} ${PYTHON_INCLUDES} ${KERNEL_CXXFLAGS}
+LIBS = ${KERNEL_LDFLAGS} -lMEDClientcmodule -lMEDMEM_Swigcmodule -lmedmem -lMEDMEMImpl  ${MED2_LIBS} ${HDF5_LIBS}
 
 # Executables targets
 

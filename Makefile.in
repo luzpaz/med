@@ -119,8 +119,8 @@ titi.xyz
 BIN_SCRIPT= \
 VERSION
 
-LDFLAGS= -L$(top_builddir)/lib/salome 
-LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
+LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
+LDFLAGSFORBIN= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
 # copy header files in common directory
 include_list=include/salome/SALOMEconfig.h
