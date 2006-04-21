@@ -208,6 +208,14 @@ namespace MED
 		TErr* theErr = NULL)
     {}
 
+    //! Read a MEDWrapper MED Element representation from defined MED file
+    PElemInfo
+    GetPElemInfo(const PMeshInfo& theMeshInfo,
+		 EEntiteMaillage theEntity = eNOEUD, 
+		 EGeometrieElement theGeom = ePOINT1, 
+		 EConnectivite theConnMode = eNOD,
+		 TErr* theErr = NULL);
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //! Read number of nodes in defined MED Mesh
     virtual
@@ -215,6 +223,15 @@ namespace MED
     GetNbNodes(const TMeshInfo& theMeshInfo,
 	       TErr* theErr = NULL) = 0;
     
+    virtual
+    TInt
+    GetNbNodes(const TMeshInfo& theMeshInfo,
+	       ETable theTable,
+	       TErr* theErr = NULL)
+    {
+      return 0;
+    }
+
     //! Read a MEDWrapper MED Nodes representation from defined MED file
     virtual
     void
@@ -229,6 +246,29 @@ namespace MED
     
     //! Creates a MEDWrapper MED Nodes representation
     virtual 
+    PElemInfo
+    CrElemInfo(const PMeshInfo& theMeshInfo, 
+	       TInt theNbElem,
+	       EBooleen theIsElemNum = eVRAI,
+	       EBooleen theIsElemNames = eVRAI)
+    {
+      return PElemInfo();
+    }
+
+    //! Creates a MEDWrapper MED Nodes representation
+    virtual 
+    PElemInfo
+    CrElemInfo(const PMeshInfo& theMeshInfo, 
+	       TInt theNbElem,
+	       const TIntVector& theFamNum,
+	       const TIntVector& aElemNum,
+	       const TStringVector& aElemNames)
+    {
+      return PElemInfo();
+    }
+
+    //! Creates a MEDWrapper MED Nodes representation
+    virtual
     PNodeInfo
     CrNodeInfo(const PMeshInfo& theMeshInfo, 
 	       TInt theNbElem,
@@ -719,6 +759,88 @@ namespace MED
 		     const TKey2Gauss& theKey2Gauss,
 		     TErr* theErr = NULL);
 
+    //! Read a MEDWrapper MED Grille representation from defined MED file
+    /*! This feature is support only for version of 2.2 and higher */
+    PGrilleInfo
+    GetPGrilleInfo(const PMeshInfo& theMeshInfo);
+
+    //! Read a MEDWrapper MED Grille representation from defined MED file
+    /*! This feature is support only for version of 2.2 and higher */
+    PGrilleInfo
+    GetPGrilleInfo(const PMeshInfo& theMeshInfo,
+		   const PGrilleInfo& theInfo);
+
+    //! Read a MEDWrapper MED Grille representation from defined MED file
+    /*! This feature is support only for version of 2.2 and higher */
+    virtual
+    void
+    GetGrilleInfo(TGrilleInfo& theInfo,
+		  TErr* theErr = NULL)
+    {}
+
+    //! Write the MEDWrapper MED Grille representation into defined MED file
+    /*! This feature is support only for version of 2.2 and higher */
+    virtual 
+    void
+    SetGrilleInfo(const TGrilleInfo& theInfo,
+		  TErr* theErr = NULL)
+    {}
+
+    /*! This feature is support only for version of 2.2 and higher */
+    virtual
+    PGrilleInfo
+    CrGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const PGrilleInfo& theGrilleInfo)
+    {
+      return PGrilleInfo();
+    }
+
+    /*! This feature is support only for version of 2.2 and higher */
+    virtual
+    PGrilleInfo
+    CrGrilleInfo(const PMeshInfo& theMeshInfo)
+    {
+      return PGrilleInfo();
+    }
+    
+    /*! This feature is support only for version of 2.2 and higher */
+    virtual
+    PGrilleInfo
+    CrGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const EGrilleType& type)
+    {
+      return PGrilleInfo();
+    }
+    
+    /*! This feature is support only for version of 2.2 and higher */
+    virtual
+    PGrilleInfo
+    CrGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const EGrilleType& type,
+		 const TInt& nbNodes)
+    {
+      return PGrilleInfo();
+    }
+
+    /*! This feature is support only for version of 2.2 and higher */
+    virtual
+    PGrilleInfo
+    CrGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const EGrilleType& type,
+		 const MED::TIntVector& nbNodeVec)
+    {
+      return PGrilleInfo();
+    }
+
+    /*! This feature is support only for version of 2.2 and higher */
+    virtual
+    void
+    GetGrilleType(const TMeshInfo& theMeshInfo,
+		  EGrilleType& type,
+		  TErr* theErr = NULL)
+    {
+    }
+    
   };
 
 

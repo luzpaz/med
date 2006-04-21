@@ -318,6 +318,15 @@ echo
 
 CHECK_MED2
 
+dnl
+dnl ---------------------------------------------
+dnl testing MPI
+dnl ---------------------------------------------
+dnl
+
+CHECK_MPI
+CHECK_MPICH
+
 echo "MED_WITH_KERNEL ${MED_WITH_KERNEL}"
 
 if test "${MED_WITH_KERNEL}" = "yes"; then
@@ -330,15 +339,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	dnl echo
 
 	dnl CHECK_JAVA
-
-	dnl
-	dnl ---------------------------------------------
-	dnl testing MPI
-	dnl ---------------------------------------------
-	dnl
-
-	CHECK_MPI
-	CHECK_MPICH
 
 	echo
 	echo ---------------------------------------------
@@ -395,6 +395,14 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	echo
 
 	CHECK_CAS
+
+	echo
+	echo ----------------------------------------------
+	echo testing CPPUNIT only required for unit testing
+	echo ----------------------------------------------
+	echo
+
+	CHECK_CPPUNIT
 
 	echo
 	echo ---------------------------------------------

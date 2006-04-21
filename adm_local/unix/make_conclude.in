@@ -118,11 +118,65 @@ sharedpyscripts: $(PYTHON_SHARED_SITE) $(DEST_SHAREDPYSCRIPTS)
 $(DEST_SHAREDPYSCRIPTS): $(PYTHON_SHARED_SITE)/%: %
 	cp -f $< $@
 
-check: test
+#check: test !!!!   version before AG changes
 
-tests: test
+#tests: test      !!!!   version before AG changes
 
-test: $(LIB) $(TEST_PROGS:%=$(top_builddir)/bin/salome/%) 
+#test: $(LIB) $(TEST_PROGS:%=$(top_builddir)/bin/salome/%)  !!!!   version before AG changes
+
+check: tests
+
+
+
+
+
+runtest_%:
+	@( LD_LIBRARY_PATH=$(top_builddir)/src/MEDMEM/.libs:$(top_builddir)/src/MEDWrapper/V2_1/Core/.libs:$${LD_LIBRARY_PATH} ; \
+	SALOME_trace=local ; \
+	export SALOME_trace ; \
+	x=$@ ; \
+	x=$${x#runtest_*} ; \
+	echo -n "Passing test : "$$x ; \
+	./$$x > /dev/null ; \
+	if test $$? != "0"; then  \
+	  echo $$'\033'[1\;31m [ FAILED ] $$'\033'[0m ; \
+	  exit 2;                                       \
+	else  \
+	  echo  $$'\033'[1\;32m [ OK ] $$'\033'[0m \ ; \
+	fi; )
+
+runpytest_%:
+	@( LD_LIBRARY_PATH=$(top_builddir)/src/MEDMEM/.libs:$(top_builddir)/src/MEDWrapper/V2_1/Core/.libs:$${LD_LIBRARY_PATH} ; \
+	PYTHONPATH=$(top_builddir)/src/MEDMEM_SWIG:$${PYTHONPATH} ; \
+	SALOME_trace=local ; \
+	export SALOME_trace ; \
+	x=$@ ; \
+	x=$${x#runpytest_*} ; \
+	echo -n "Passing python test : "$$x ; \
+	python $(srcdir)/$$x > /dev/null ; \
+	if test $$? != "0"; then  \
+	  echo $$'\033'[1\;31m [ FAILED ] $$'\033'[0m ; \
+	  exit 2;                                       \
+	else  \
+	  echo  $$'\033'[1\;32m [ OK ] $$'\033'[0m \ ; \
+	fi; )
+
+ALL_CHECK_TARGETS = $(patsubst %, runtest_%, $(TEST_PROGS)) 
+
+tests: $(LIB) $(TEST_PROGS) $(ALL_CHECK_TARGETS)
+	@ln -fs $(top_builddir)/src/MEDMEM_SWIG/.libs/libMEDMEM_Swigcmodule.so $(top_builddir)/src/MEDMEM_SWIG/_libMEDMEM_Swig.so ; \
+	for f in $(TEST_PYSCRIPTS); do            \
+	  if [ x"$${f#*test}" != x"$${f}" ]; then    \
+	     $(MAKE) runpytest_$$f ; \
+	     if test $$? != "0"; then  \
+	        rm -f $(top_builddir)/src/MEDMEM_SWIG/_libMEDMEM_Swig.so ; \
+	        exit 2; \
+	     fi; \
+	  fi;  \
+	done ; \
+	rm -f $(top_builddir)/src/MEDMEM_SWIG/_libMEDMEM_Swig.so ;
+
+
 
 
 # copy header file in $(inc_builddir)
@@ -140,7 +194,8 @@ $(libdir) $(includedir) $(bindir) $(datadir) $(idldir) $(sharedpydir):
 	$(INSTALL) -d $@ && chmod 755 $@
 
 # Install the library, the public header files, and programs.
-install: $(LIB) $(BIN) $(TEST_PROGS) $(libdir) $(includedir) $(bindir) $(datadir) $(idldir) install-python install-sharedpyqt install-qm
+#install: $(LIB) $(BIN) $(TEST_PROGS) $(libdir) $(includedir) $(bindir) $(datadir) $(idldir) install-python install-sharedpyqt install-qm
+install: $(LIB) $(BIN) $(libdir) $(includedir) $(bindir) $(datadir) $(idldir) install-python install-sharedpyqt install-qm
 	@for f in X $(LIB); do						      \
 	   if test $$f != X; then					      \
 	      ($(LT_INSTALL_LIB) $$f $(libdir)/. || exit 1);		      \
