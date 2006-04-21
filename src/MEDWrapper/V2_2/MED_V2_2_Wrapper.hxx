@@ -77,6 +77,8 @@ namespace MED
 
     typedef MED::TTTimeStampVal<eV2_2> TVTimeStampVal;
 
+    typedef MED::TTGrilleInfo<eV2_2> TVGrilleInfo;
+
     //---------------------------------------------------------------
     class TFile;
     typedef boost::shared_ptr<TFile> PFile;
@@ -217,6 +219,14 @@ namespace MED
       virtual
       TInt
       GetNbNodes(const MED::TMeshInfo& theMeshInfo,
+		 TErr* theErr = NULL)
+      {
+	return GetNbNodes(theMeshInfo,eCOOR,theErr);
+      }
+
+      TInt
+      GetNbNodes(const MED::TMeshInfo& theMeshInfo,
+		 ETable theTable,
 		 TErr* theErr = NULL);
       
       virtual 
@@ -420,6 +430,32 @@ namespace MED
 		   EModeAcces theMode,
 		   TErr* theErr = NULL);
       
+      virtual
+      void
+      GetGrilleInfo(TGrilleInfo& theGrilleInfo,
+		    TErr* theErr = NULL);
+      
+      virtual
+      void
+      SetGrilleInfo(const MED::TGrilleInfo& theGrilleInfo,
+		    TErr* theErr = NULL);
+
+      void
+      SetGrilleInfo(const MED::TGrilleInfo& theGrilleInfo,
+		    EModeAcces theMode,
+		    TErr* theErr = NULL);
+
+      virtual
+      void
+      GetGrilleType(const MED::TMeshInfo& theMeshInfo,
+		    EGrilleType& type,
+		    TErr* theErr = NULL);
+
+      void
+      GetGrilleStruct(const MED::TMeshInfo& theMeshInfo,
+		      TIntVector& theStruct,
+		      TErr* theErr = NULL);
+
     protected:
       PFile myFile;
     };
