@@ -194,8 +194,8 @@ $(libdir) $(includedir) $(bindir) $(datadir) $(idldir) $(sharedpydir):
 	$(INSTALL) -d $@ && chmod 755 $@
 
 # Install the library, the public header files, and programs.
-#install: $(LIB) $(BIN) $(TEST_PROGS) $(libdir) $(includedir) $(bindir) $(datadir) $(idldir) install-python install-sharedpyqt install-qm
-install: $(LIB) $(BIN) $(libdir) $(includedir) $(bindir) $(datadir) $(idldir) install-python install-sharedpyqt install-qm
+install: $(LIB) $(BIN) $(TEST_PROGS) $(libdir) $(includedir) $(bindir) $(datadir) $(idldir) install-python install-sharedpyqt install-qm
+#install: $(LIB) $(BIN) $(libdir) $(includedir) $(bindir) $(datadir) $(idldir) install-python install-sharedpyqt install-qm
 	@for f in X $(LIB); do						      \
 	   if test $$f != X; then					      \
 	      ($(LT_INSTALL_LIB) $$f $(libdir)/. || exit 1);		      \
