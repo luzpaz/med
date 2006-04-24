@@ -96,7 +96,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
          the file read under SGI is incorrect
 	       2) Compaq OSF/1 is LE, since we force SGI64,SUN4SOL2,HP to write double in LE even if they are BE, mips OSF/1 must be BE
 	       REM  : Be careful of compatibility between MED files when changing this (med2.2)
-         3) PPRO_NT is added for med2.1.6 support under WNT */
+         3) PPRO_NT is added for med2.1.6 support under Win32 */
 #if defined(PCLINUX) || defined(OSF1) || defined(PPRO_NT)
       type_hdf = H5T_IEEE_F64BE;
 #else     
