@@ -30,6 +30,7 @@ RESOURCES_FILES = \
 MEDCatalog.xml \
 MED_en.xml \
 MED.config \
+SalomeApp.xml \
 Data.png \
 Infos.png \
 Structure.png \

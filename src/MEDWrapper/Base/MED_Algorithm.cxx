@@ -50,32 +50,22 @@ namespace MED
     MSG(MYDEBUG,"GetElemsByEntity(...)");
     TEntity2TGeom2ElemInfo anEntity2TGeom2ElemInfo;
     MED::TEntityInfo::const_iterator anIter = theEntityInfo.begin();
+    PElemInfo anElemInfo;
+    TErr anErr;
     for(; anIter != theEntityInfo.end(); anIter++){
       const EEntiteMaillage& anEntity = anIter->first;
       const TGeom2Size& aGeom2Size = anIter->second;
       TGeom2ElemInfo& aGeom2ElemInfo = anEntity2TGeom2ElemInfo[anEntity];
 
       if(anEntity == eNOEUD){
-	aGeom2ElemInfo[ePOINT1] = theWrapper->GetPNodeInfo(theMeshInfo);
+	aGeom2ElemInfo[ePOINT1] = theWrapper->GetPElemInfo(theMeshInfo);
 	continue;
       }
 
       TGeom2Size::const_iterator anIter2 = aGeom2Size.begin();
       for(; anIter2 != aGeom2Size.end(); anIter2++){
 	const EGeometrieElement& aGeom = anIter2->first;
-	switch(aGeom){
-	case ePOLYGONE: {
-	  aGeom2ElemInfo[ePOLYGONE] = theWrapper->GetPPolygoneInfo(theMeshInfo,anEntity,aGeom);
-	  break;
-	}
-	case ePOLYEDRE: {
-	  aGeom2ElemInfo[ePOLYEDRE] = theWrapper->GetPPolyedreInfo(theMeshInfo,anEntity,aGeom);
-	  break;
-	}
-	default: {
-	  aGeom2ElemInfo[aGeom] = theWrapper->GetPCellInfo(theMeshInfo,anEntity,aGeom);
-	}}
-
+	aGeom2ElemInfo[aGeom] = theWrapper->GetPElemInfo(theMeshInfo,anEntity,aGeom,MED::eNOD,&anErr);
       }
     }
     ADDMSG(MYDEBUG,"\n");

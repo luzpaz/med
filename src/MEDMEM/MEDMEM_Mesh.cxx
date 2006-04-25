@@ -2200,7 +2200,6 @@ void MESH::createFamilies()
 	    FAMILY* newFam = new FAMILY();
 	    newFam->setTotalNumberOfElements(fam->second.size());
 	    newFam->setName(famName);
-	    newFam->setName(fam->first);
 	    newFam->setMesh(this);
 	    newFam->setNumberOfGeometricType(tab_types_geometriques.size());
 	    newFam->setGeometricType(&tab_types_geometriques[0]); // we know the tab is not empy
