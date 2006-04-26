@@ -586,13 +586,16 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           if ( ignoreField )
             INFOS("Skip non-named field " << objet+1 << DUMP_LINE_NB);
 #endif
-          initIntReading( 1 );
+          initIntReading( 4 );
           int i_sub, nb_sub = getInt(); // (1) <nb_sub> 2 6 <title length>
           if ( nb_sub < 1 ) {
             INFOS("Error of field reading: wrong nb of subcomponents " << nb_sub);
             return false;
           }
-          getNextLine( ligne ); // (2) title
+          next(); next(); next(); // skip (1) <nb_sub> 2 6 
+          int title_length = getInt(); // <title length>
+          if ( title_length )
+            getNextLine( ligne ); // (2) title
           // look for a line starting with '-' : <reference to support>
           do {
             initIntReading( nb_sub * 9 );
