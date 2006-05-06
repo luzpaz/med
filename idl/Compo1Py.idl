@@ -20,10 +20,10 @@
 #include "SALOME_Component.idl"
 #include "MED.idl"
 
-module Engines
+module Compo1Py_ORB
 {
  
-  interface Compo1Py : Component
+  interface Compo1Py : Engines::Component
   {
     void Initialise(in string medFile);
     SALOME_MED::MESH Calcul1();

@@ -160,7 +160,8 @@ bool MEDMEM::GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
   MESSAGE(LOC);
 
   return ( _id == genDriver._id )  &&
-    ( _driverType == genDriver._driverType );
+    ( _driverType == genDriver._driverType ) &&
+    (_accessMode == genDriver._accessMode);
   
 };
 

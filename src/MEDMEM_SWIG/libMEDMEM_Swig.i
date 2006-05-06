@@ -48,6 +48,8 @@
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_DriverFactory.hxx"
+#include "MEDMEM_GaussLocalization.hxx"
+#include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_SWIG_Templates.hxx"
 
   using namespace MEDMEM;
@@ -77,6 +79,14 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 
 %include "typemaps.i"
 %include "my_typemap.i"
+
+%typecheck(SWIG_TYPECHECK_POINTER) double *, const double *,
+ const double * const, int *, const int *, const int * const, string *,
+ const string *, const string * const, medGeometryElement *,
+ const medGeometryElement *, const medGeometryElement * const
+{
+  $1 = ($input != 0);
+}
 
 /*
   mapping between stl string and python string 
@@ -350,6 +360,66 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 }
 
 /*
+  MACRO converting C++ MEDMEM::FIELD_ pointer into a PyObject pointer rightly
+  casted following its value type (int or double) and its interlacing mode
+  (FullInterlace or NoInterlace) by calling the function SWIG_NewPointer with
+  the appropriate $descriptor(...)
+*/
+
+%define TYPEMAP_OUTPUT_FIELDT(myField)
+{
+  FIELD_ *arg1=myField;
+  PyObject *myResult=NULL;
+  if(arg1)
+    {
+      FIELD<double> *try1=dynamic_cast<FIELD<double> *>(arg1);
+      if(try1)
+        myResult = SWIG_NewPointerObj((void *) try1, $descriptor(FIELD<double, FullInterlace> *), 0);
+      else
+        {
+          FIELD<int> *try2=dynamic_cast<FIELD<int> *>(arg1);
+          if(try2)
+            myResult = SWIG_NewPointerObj((void *) try2, $descriptor(FIELD<int, FullInterlace> *), 0);
+          else
+            {
+              FIELD<double, NoInterlace> *try3=dynamic_cast<FIELD<double, NoInterlace> *>(arg1);
+              if(try3)
+                myResult = SWIG_NewPointerObj((void *) try3, $descriptor(FIELD<double, NoInterlace> *), 0);
+              else
+                {
+                   FIELD<int, NoInterlace> *try4=dynamic_cast<FIELD<int, NoInterlace> *>(arg1);
+                   if(try4)
+                     myResult = SWIG_NewPointerObj((void *) try4, $descriptor(FIELD<int, NoInterlace> *), 0);
+                   else
+                     {
+                       myResult = SWIG_NewPointerObj((void *) arg1, $descriptor(FIELD_ *), 0);
+                     }
+                }
+            }
+        }
+     }
+  return myResult;
+}
+%enddef
+
+/*
+  MACRO to transforme a C++ deque<string> object into a proper Python List
+*/
+
+%define TYPEMAP_OUTPUT_DEQUE_STRING(myDeque)
+{
+   PyObject *py_list = PyList_New(myDeque.size());
+   deque<string>::iterator iter4;
+   int i4=0;
+   for(iter4=myDeque.begin();iter4!=myDeque.end();iter4++,i4++)
+     {
+         PyList_SetItem(py_list, i4, PyString_FromString((*iter4).c_str()));
+     }
+   return py_list;
+}
+%enddef
+
+/*
   MACRO converting C array <arrayvar> of length <size> into a PyList
   by calling type_converter() for each array element.
   It reports error in <method> in failure case
@@ -509,6 +579,8 @@ class SUPPORT
   void update ( void );
 
   MESH * getMesh() const;
+
+  std::string getMeshName() const;
 
   void setMesh(MESH * Mesh) const;
 
@@ -760,6 +832,10 @@ public:
 	const std::string& fileName, const std::string& fieldName,
 	const int iterationNumber, const int orderNumber);
 
+  FIELD(driverTypes driverType,	const std::string& fileName,
+	const std::string& fieldName, const int iterationNumber,
+	const int orderNumber);
+
   void read(int index=0);
 
   T1 getValueIJ(int i,int j) const;
@@ -799,6 +875,10 @@ public:
   void write(int index=0, const std::string& driverName="");
 
   void writeAppend(int index=0, const std::string& driverName="");
+
+  bool getGaussPresence();
+
+  GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement);
 
   %extend {
     PyObject *  applyPyFunc( PyObject * func )
@@ -925,7 +1005,7 @@ public:
 			     FIELD::getRow);
       }
 
-    // this method replaces getValueI() in NInterlace mode
+    // this method replaces getValueI() in NoInterlace mode
     /*%newobject getColum(int );*/
     PyObject * getColumn(int index)
       {
@@ -1487,6 +1567,8 @@ class MED
 
   void write (int index=0);
 
+  void read (int index=0);
+
   void addField ( FIELD_  * const ptrField  );
 
   void addMesh  ( MESH    * const ptrMesh   );
@@ -1504,6 +1586,12 @@ class MED
 	return self->addDriver(driverType,string(fileName),access);
       }
 
+    PyObject *getMeshNames()
+      {
+        deque<string> list_string = self->getMeshNames();
+	TYPEMAP_OUTPUT_DEQUE_STRING(list_string);
+      }
+
     %newobject getMeshName(int );
     const char * getMeshName(int i)
       {
@@ -1511,6 +1599,12 @@ class MED
 	char * tmp = new char[strlen(list_string[i].c_str())+1];
 	strcpy(tmp,list_string[i].c_str());
 	return tmp;
+      }
+
+    PyObject *getFieldNames()
+      {
+        deque<string> list_string = self->getFieldNames();
+        TYPEMAP_OUTPUT_DEQUE_STRING(list_string);
       }
 
     %newobject getFieldName(int );
@@ -1545,6 +1639,12 @@ class MED
     FIELD_ * getField(char * fieldName, int dt, int it)
       {
 	return self->getField(string(fieldName),dt,it);
+      }
+
+    PyObject *getFieldT(char * fieldName, int dt, int it)
+      {
+        FIELD_ *ret=self->getField(string(fieldName),dt,it);
+	TYPEMAP_OUTPUT_FIELDT(ret);
       }
 
     FIELD_ * getField2(char * fieldName,double time, int it=0)
@@ -2163,7 +2263,7 @@ public:
   void read ( void ) ;
 
   %extend {
-    MED_FIELD_RDONLY_DRIVER(char * fileName, FIELD< T1 > * ptrField)
+    MED_FIELD_RDONLY_DRIVER(char * fileName, FIELD<T1, FullInterlace > * ptrField)
       {
 	return new MED_FIELD_RDONLY_DRIVER< T1 >(string(fileName), ptrField);
       }
@@ -2211,7 +2311,7 @@ public:
   void read ( void ) ;
 
   %extend {
-    MED_FIELD_WRONLY_DRIVER(char * fileName, FIELD< T1 > * ptrField)
+    MED_FIELD_WRONLY_DRIVER(char * fileName, FIELD<T1, FullInterlace> * ptrField)
       {
 	return new MED_FIELD_WRONLY_DRIVER< T1 >(string(fileName), ptrField);
       }
@@ -2259,7 +2359,7 @@ public:
   void read ( void ) ;
 
   %extend {
-    MED_FIELD_RDWR_DRIVER(char * fileName, FIELD< T1 > * ptrField)
+    MED_FIELD_RDWR_DRIVER(char * fileName, FIELD<T1, FullInterlace> * ptrField)
       {
 	return new MED_FIELD_RDWR_DRIVER< T1 >(string(fileName), ptrField);
       }
@@ -2304,14 +2404,95 @@ public:
 
 
   %extend {
-    ASCII_FIELD_DRIVER(const char *fileName, FIELD<T1> * ptrField, med_sort_direc direction, const char *priority)
+    ASCII_FIELD_DRIVER(const char *fileName, FIELD<T1, FullInterlace> * ptrField, med_sort_direc direction, const char *priority)
       {
 	return new ASCII_FIELD_DRIVER<T1>(string(fileName), ptrField, (MED_EN::med_sort_direc)direction, priority);
       }
   }
 };
+
 %template (ASCII_FIELDDOUBLE_DRIVER) ASCII_FIELD_DRIVER< double >;
 %template (ASCII_FIELDINT_DRIVER) ASCII_FIELD_DRIVER< int >;
+
+/*
+*/
+
+
+template <class INTERLACING_TAG> class GAUSS_LOCALIZATION
+{
+ public:
+
+  GAUSS_LOCALIZATION();
+
+  ~GAUSS_LOCALIZATION();
+
+  std::string getName() const ;
+
+  medGeometryElement getType() const ;
+
+  int getNbGauss() const ;
+
+  medModeSwitch  getInterlacingType() const;
+
+  %extend {
+    GAUSS_LOCALIZATION<INTERLACING_TAG>(char * locName,
+					const medGeometryElement
+					typeGeo,
+					const int  nGauss,
+					const double * cooRef,
+					const double * cooGauss,
+					const double * wg)
+      {
+	return new GAUSS_LOCALIZATION<INTERLACING_TAG>(string(locName),
+						       typeGeo, nGauss, cooRef,
+						       cooGauss, wg);
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing GAUSS_LOCALIZATION : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
+    PyObject * getRefCoo () const
+      {
+	typedef  MEDMEM_ArrayInterface<double,INTERLACING_TAG,NoGauss>::Array ArrayNoGauss;
+
+	ArrayNoGauss cooRef = self->getRefCoo();
+	int size = cooRef.getArraySize();
+	double * cooRefPtr = cooRef.getPtr();
+        TYPEMAP_OUTPUT_ARRAY(cooRefPtr, size, PyFloat_FromDouble,
+			     GAUSS_LOCALIZATION::getRefCoo);
+      }
+
+    PyObject * getGsCoo () const
+      {
+	typedef  MEDMEM_ArrayInterface<double,INTERLACING_TAG,NoGauss>::Array ArrayNoGauss;
+	ArrayNoGauss cooGauss = self->getGsCoo();
+	int size = cooGauss.getArraySize();
+	double * cooGaussPtr = cooGauss.getPtr();
+        TYPEMAP_OUTPUT_ARRAY(cooGaussPtr, size, PyFloat_FromDouble,
+			     GAUSS_LOCALIZATION::getGsCoo);
+      }
+
+    PyObject * getWeight () const
+      {
+	vector<double> wg = self->getWeight();
+	int size = wg.size();
+	double * wgPtr = new double [size];
+	for (int index = 0; index<size; index++)
+	  wgPtr[index] = wg[index];
+        TYPEMAP_OUTPUT_ARRAY(wgPtr, size, PyFloat_FromDouble,
+			     GAUSS_LOCALIZATION::getWeight);
+	delete wgPtr;
+      }
+  }
+};
+
+%template (GAUSS_LOCALIZATION_FULL) GAUSS_LOCALIZATION<FullInterlace> ;
+%template (GAUSS_LOCALIZATION_NO) GAUSS_LOCALIZATION<NoInterlace> ;
 
 %{
   template <class T, class INTERLACING_TAG>
@@ -2337,6 +2518,18 @@ public:
       MESSAGE("createTypedFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
       MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
       return (FIELD<T, INTERLACING_TAG> *) field;
+    }
+
+  template <class T> FIELD<T, FullInterlace> *
+    createTypedFieldConvertFullInterlace(const FIELD<T, NoInterlace> & field )
+    {
+      return FieldConvert(field);
+    }
+
+  template <class T> FIELD<T, NoInterlace> *
+    createTypedFieldConvertNoInterlace(const FIELD<T, FullInterlace> & field )
+    {
+      return FieldConvert(field);
     }
 %}
 
@@ -2367,6 +2560,24 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFiel
 %template ( createFieldIntNoInterlaceScalarProductDeep ) createFieldScalarProductDeep < int, NoInterlace >;
 
 template<class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldFromAnalytic(SUPPORT * Support, int NumberOfComponents, PyObject * double_function);
+
+template <class T> FIELD<T, FullInterlace> * createTypedFieldConvertFullInterlace(const FIELD<T, NoInterlace> & field );
+
+%template (createFieldDoubleConvertFullInterlace) createTypedFieldConvertFullInterlace<double>;
+
+%template (createFieldIntConvertFullInterlace) createTypedFieldConvertFullInterlace<int>;
+
+template <class T> FIELD<T, NoInterlace> * createTypedFieldConvertNoInterlace(const FIELD<T, FullInterlace> & field );
+
+%template (createFieldDoubleConvertNoInterlace) createTypedFieldConvertNoInterlace<double>;
+
+%template (createFieldIntConvertNoInterlace) createTypedFieldConvertNoInterlace<int>;
+
+%newobject createFieldDoubleConvertFullInterlace ;
+%newobject createFieldIntConvertFullInterlace ;
+
+%newobject createFieldDoubleConvertNoInterlace ;
+%newobject createFieldIntConvertNoInterlace ;
 
 GRID * createGridFromMesh( MESH * aMesh );
 

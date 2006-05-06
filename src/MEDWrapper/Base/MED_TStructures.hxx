@@ -910,6 +910,118 @@ namespace MED
     }
   };
 
+  //---------------------------------------------------------------
+  template<EVersion eVersion>
+  struct TTGrilleInfo:
+    virtual TGrilleInfo
+  {
+    TTGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const PGrilleInfo& theInfo)
+    {
+      myMeshInfo        = theMeshInfo;
+
+      myCoord           = theInfo->GetNodeCoord();
+      
+      myGrilleType      = theInfo->GetGrilleType();
+
+      myCoordNames      = theInfo->myCoordNames;
+
+      myCoordUnits      = theInfo->myCoordUnits;
+
+      myIndixes         = theInfo->GetMapOfIndexes();
+
+      myGrilleStructure = theInfo->GetGrilleStructure();
+
+      myGrilleType      = theInfo->GetGrilleType();
+
+    }
+
+    TTGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const EGrilleType& type,
+		 const TInt nnoeuds)
+    {
+      myMeshInfo        = theMeshInfo;
+      TInt aDim = theMeshInfo->GetDim();
+      if(type == eGRILLE_STANDARD){
+	myCoord.resize(aDim*nnoeuds);
+	myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+1);
+	myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+1);
+      } else { //if(type == eGRILLE_CARTESIENNE){
+	myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+aDim);
+	myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+aDim);
+      }
+      
+      myGrilleStructure.resize(theMeshInfo->myDim);
+      
+    }
+
+    TTGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const EGrilleType& type)
+    {
+      myMeshInfo        = theMeshInfo;
+      TInt aDim = theMeshInfo->GetDim();
+      if(type == eGRILLE_STANDARD){
+	myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+1);
+	myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+1);
+      } else {// if(type == eGRILLE_CARTESIENNE){
+	myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+aDim);
+	myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+aDim);
+      }
+      TTGrilleInfo(theMeshInfo,type,0);
+    }
+
+    TTGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const EGrilleType& type,
+		 const MED::TIntVector& nbNodeVec)
+    {
+      myMeshInfo        = theMeshInfo;
+
+      TInt aDim = theMeshInfo->GetDim();
+      if(type == eGRILLE_STANDARD){
+	myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+1);
+	myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+1);
+      } else {// if(type == eGRILLE_CARTESIENNE){
+	myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+aDim);
+	myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+aDim);
+      }
+
+      if(type != eGRILLE_STANDARD)
+	for(int aAxe=0;aAxe<nbNodeVec.size();aAxe++){
+	  myIndixes[aAxe].resize(nbNodeVec[aAxe]);
+	}
+      
+      TTGrilleInfo(theMeshInfo,type,0);
+    }
+
+    virtual
+    std::string
+    GetCoordName(TInt theId) const 
+    { 
+      return GetString(theId,GetPNOMLength<eVersion>(),myCoordNames);
+    }
+
+    virtual
+    void
+    SetCoordName(TInt theId, const std::string& theValue)
+    {
+      SetString(theId,GetPNOMLength<eVersion>(),myCoordNames,theValue);
+    }
+
+    virtual
+    std::string 
+    GetCoordUnit(TInt theId) const 
+    { 
+      return GetString(theId,GetPNOMLength<eVersion>(),myCoordUnits);
+    }
+
+    virtual
+    void
+    SetCoordUnit(TInt theId, const std::string& theValue)
+    {
+      SetString(theId,GetPNOMLength<eVersion>(),myCoordUnits,theValue);
+    }
+
+  };
 }
 
 #endif

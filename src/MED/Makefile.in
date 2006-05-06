@@ -49,15 +49,15 @@ LIB_CLIENT_IDL = SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_ModuleCatalog.idl S
 BIN =
 BIN_SRC =
 
-LDFLAGS= -L$(top_builddir)/lib/salome
-LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
+LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
+LDFLAGSFORBIN= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
 # additionnal information to compil and link file
 
-CPPFLAGS += $(OCC_INCLUDES) $(MED2_INCLUDES)  $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
-CXXFLAGS += $(OCC_CXXFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
+CPPFLAGS += $(OCC_INCLUDES) $(MED2_INCLUDES)  $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS}
+CXXFLAGS += $(OCC_CXXFLAGS) ${KERNEL_CXXFLAGS}
 
-LDFLAGS+=  $(OCC_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome \
+LDFLAGS+=  $(OCC_LIBS) $(HDF5_LIBS) ${KERNEL_LDFLAGS} \
 	-lSalomeContainer -lSalomeHDFPersist -lSalomeDS -lSalomeNS -lRegistry -lOpUtil -lMEDMEMImpl
 
 MED.hh MEDSK.cc: MED.idl

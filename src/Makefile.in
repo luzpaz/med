@@ -43,7 +43,7 @@ ifeq (@WITHIHM@,yes)
   SUBDIRS+= MEDGUI
 endif
 
-LDFLAGS= -L$(top_builddir)/lib/salome
-LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
+LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
+LDFLAGSFORBIN= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
 @MODULE@

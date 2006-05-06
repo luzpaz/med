@@ -115,6 +115,12 @@ void CONNECTIVITYClient::blankCopy()
     _polyType_client = MED_EN::MED_NONE;
   }
 
+  // create a constituent (PAL10556)
+  if ( Entity == MED_CELL ) {
+    Entity = ( IOR_Mesh->getMeshDimension() == 3 ? MED_FACE : MED_EDGE );
+    _constituent = new CONNECTIVITYClient( IOR_Mesh, Entity );
+  }
+
   _complete = false;
 
   END_OF("CONNECTIVITYClient::blankCopy()");
@@ -349,11 +355,11 @@ const int * CONNECTIVITYClient::getGlobalNumberingIndex
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
-  const int * c = CONNECTIVITY::getGlobalNumberingIndex(Entity);
+  const int * index = CONNECTIVITY::getGlobalNumberingIndex(Entity);
 
   END_OF("void CONNECTIVITYClient::getGlobalNumberingIndex()");
 
-  return c;
+  return index;
 }
 
 //=============================================================================

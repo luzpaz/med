@@ -125,6 +125,8 @@ namespace MED
       bool anIsDimPresent[3] = {false, false, false};
       for(int iDim = 0; iDim < aMeshDimension; iDim++){
 	std::string aName = theNodeInfo->GetCoordName(iDim);
+        if ( aName.size() > 1 ) // PAL12148, aName has size 8 or 16
+          aName = aName.substr(0,1);
 	if(aName == "x" || aName == "X")
 	  anIsDimPresent[eX] = true;
 	else if(aName == "y" || aName == "Y")

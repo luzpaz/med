@@ -2158,6 +2158,8 @@ void MESH::createFamilies()
 	    medGeometryElement geometrictype=MED_NONE;
 	    vector<int> tab_index_types_geometriques;
 	    vector<int> tab_nombres_elements;
+            if ( fam->second.empty() )
+              continue; // it is just a truncated long family name
 
 	    // scan family cells and fill the tab that are needed by the create a MED FAMILY
 	    for( int i=0; i!=fam->second.size(); ++i)
@@ -2176,10 +2178,28 @@ void MESH::createFamilies()
 	    tab_nombres_elements.push_back(fam->second.size()+1-tab_index_types_geometriques.back());
 	    tab_index_types_geometriques.push_back(fam->second.size()+1);
 
-	    // create a empty MED FAMILY and fill it with the tabs we constructed
+            // family name sould not be longer than MED_TAILLE_NOM
+            string famName = fam->first;
+            if ( famName.size() > MED_TAILLE_NOM ) {
+              // try to cut off "FAM_" from the head
+              if ( famName.size() - 4 <= MED_TAILLE_NOM ) {
+                famName = famName.substr(4);
+              }
+              else { // try to make a unique name by cutting off char by char from the tail
+                famName.substr(0, MED_TAILLE_NOM);
+                map< string,vector<int> >::iterator foundName = tab_families.find( famName );
+                while ( foundName != tab_families.end() && !famName.empty() ) {
+                  famName = famName.substr( 0, famName.size() - 1 );
+                  foundName = tab_families.find( famName );
+                }
+              }
+              tab_families[ famName ]; // add a new name in the table to assure uniqueness
+            }
+
+	    // create an empty MED FAMILY and fill it with the tabs we constructed
 	    FAMILY* newFam = new FAMILY();
 	    newFam->setTotalNumberOfElements(fam->second.size());
-	    newFam->setName(fam->first);
+	    newFam->setName(famName);
 	    newFam->setMesh(this);
 	    newFam->setNumberOfGeometricType(tab_types_geometriques.size());
 	    newFam->setGeometricType(&tab_types_geometriques[0]); // we know the tab is not empy
@@ -2258,26 +2278,50 @@ int MESH::getElementContainingPoint(const double *coord)
 {
   if(_spaceDimension==3)
     {
-      Meta_Wrapper<3> *fromWrapper=new Meta_Wrapper<3> (getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
+      Meta_Wrapper<3> fromWrapper(getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
 							const_cast<CONNECTIVITY *>(getConnectivityptr()));
-      Meta_Wrapper<3> *toWrapper=new Meta_Wrapper<3> (1,const_cast<double *>(coord));
-      Meta_Mapping<3> *mapping=new Meta_Mapping<3> (fromWrapper,toWrapper);
-      mapping->Cree_Mapping(1);
-      vector<int> vectormapping=mapping->Get_Mapping();
-      return vectormapping[0]+1;
+      Meta_Wrapper<3> toWrapper(1,const_cast<double *>(coord));
+      Meta_Mapping<3> mapping(&fromWrapper,&toWrapper);
+      mapping.Cree_Mapping(1);
+      return mapping.Get_Mapping()[0]+1;
     }
   else if(_spaceDimension==2)
     {
-      Meta_Wrapper<2> *fromWrapper=new Meta_Wrapper<2> (getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
+      Meta_Wrapper<2> fromWrapper(getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
 							const_cast<CONNECTIVITY *>(getConnectivityptr()));
-      Meta_Wrapper<2> *toWrapper=new Meta_Wrapper<2> (1,const_cast<double *>(coord));
-      Meta_Mapping<2> *mapping=new Meta_Mapping<2> (fromWrapper,toWrapper);
-      mapping->Cree_Mapping(1);
-      vector<int> vectormapping=mapping->Get_Mapping();
-      return vectormapping[0]+1;
+      Meta_Wrapper<2> toWrapper(1,const_cast<double *>(coord));
+      Meta_Mapping<2> mapping(&fromWrapper,&toWrapper);
+      mapping.Cree_Mapping(1);
+      return mapping.Get_Mapping()[0]+1;
       }
   else
     throw MEDEXCEPTION("MESH::getElementContainingPoint : invalid _spaceDimension must be equal to 2 or 3 !!!");
+}
+
+vector< vector<double> > MESH::getBoundingBox() const
+{
+  const double *myCoords=_coordinate->getCoordinates(MED_EN::MED_FULL_INTERLACE);
+  vector< vector<double> > ret(2);
+  int i,j;
+  ret[0].resize(_spaceDimension);
+  ret[1].resize(_spaceDimension);
+  for(i=0;i<_spaceDimension;i++)
+    {
+      ret[0][i]=1.e300;
+      ret[1][i]=-1.e300;
+    }
+  for(i=0;i<_coordinate->getNumberOfNodes();i++)
+    {
+      for(j=0;j<_spaceDimension;j++)
+	{
+	  double tmp=myCoords[i*_spaceDimension+j];
+	  if(tmp<ret[0][j])
+	    ret[0][j]=tmp;
+	  if(tmp>ret[1][j])
+	    ret[1][j]=tmp;
+	}
+    }
+  return ret;
 }
 
 //Presently disconnected in C++

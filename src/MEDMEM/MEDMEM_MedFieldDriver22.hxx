@@ -887,18 +887,50 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     this->getMeshGeometricTypeFromFile(id,meshName,entityType,meshGeoType,
                                        meshNbOfElOfType,meshNbOfElOfTypeC);
 
+  SCRUTE(meshGeoType.size());
+  SCRUTE(MESHgeoType.size());
+  SCRUTE(meshNbOfElOfTypeC.size());
+  SCRUTE(MESHnbOfElOfTypeC.size());
+
+  if (meshGeoType.size() != MESHgeoType.size())
+    {
+      for (int i = 0; i<meshGeoType.size();i++)
+	MESSAGE("debug meshGeotype " << meshGeoType[i]);
+
+      for (int i = 0; i<MESHgeoType.size();i++)
+	MESSAGE("debug MESHgeoType. " << MESHgeoType[i]);
+    }
+
+  if (meshNbOfElOfTypeC.size() == MESHnbOfElOfTypeC.size())
+    {
+      for (int i = 0; i<meshNbOfElOfTypeC.size();i++)
+	MESSAGE("debug meshNbOfElOfTypeC " << meshNbOfElOfTypeC[i]);
+
+      for (int i = 0; i<MESHnbOfElOfTypeC.size();i++)
+	MESSAGE("debug MESHnbOfElOfTypeC " << MESHnbOfElOfTypeC[i]);
+    }
 
   if (fileHasMesh && haveSupport )
     if ( ( meshGeoType != MESHgeoType ) || (meshNbOfElOfTypeC != MESHnbOfElOfTypeC) )
-      throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while getting mesh information from file for FIELD "<< fieldName
-				    << " on entity " << MED_EN::entNames[entityType]
-				    << " with (it,or) = ("
-				    << MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber << ","
-				    << MED_FIELD_DRIVER<T>::_ptrField->_orderNumber << ")"
-				    << " on mesh " << meshName
-				    << " : geometric types or number of elements by type differs from MESH object !"
-				    )
-			 );
+      {
+	MESSAGE("Warning MedField driver 21 while getting mesh information from file for FIELD "<< fieldName
+		<< " on entity " << MED_EN::entNames[entityType]
+		<< " with (it,or) = ("
+		<< MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber << ","
+		<< MED_FIELD_DRIVER<T>::_ptrField->_orderNumber << ")"
+		<< " on mesh " << meshName
+		<< " : geometric types or number of elements by type differs from MESH object !");
+
+// 	throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while getting mesh information from file for FIELD "<< fieldName
+// 				      << " on entity " << MED_EN::entNames[entityType]
+// 				      << " with (it,or) = ("
+// 				      << MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber << ","
+// 				      << MED_FIELD_DRIVER<T>::_ptrField->_orderNumber << ")"
+// 				      << " on mesh " << meshName
+// 				      << " : geometric types or number of elements by type differs from MESH object !"
+// 				      )
+// 			   );
+      }
 
   if ( !fileHasMesh && !haveSupport )
     throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while getting mesh information for FIELD "<< fieldName

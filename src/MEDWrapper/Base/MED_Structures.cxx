@@ -454,3 +454,323 @@ TTimeStampVal
 {
   return myGeom2Value[theGeom];
 }
+
+//---------------------------------------------------------------
+// TGrilleInfo structure methods
+//---------------------------------------------------------------
+const EGrilleType&
+TGrilleInfo
+::GetGrilleType() const
+{
+  return myGrilleType;
+}
+
+EGrilleType
+TGrilleInfo
+::GetGrilleType()
+{
+  return myGrilleType;
+}
+
+void
+TGrilleInfo
+::SetGrilleType(EGrilleType theGrilleType)
+{
+  myGrilleType = theGrilleType;
+}
+
+const
+TIndexes&
+TGrilleInfo
+::GetMapOfIndexes() const
+{
+  return myIndixes;
+}
+
+TIndexes
+TGrilleInfo
+::GetMapOfIndexes()
+{
+  return myIndixes;
+}
+
+const
+TFloatVector&
+TGrilleInfo
+::GetIndexes(TInt theAxisNumber) const
+{
+  TIndexes::const_iterator aIter=myIndixes.find(theAxisNumber);
+  if(aIter==myIndixes.end())
+    EXCEPTION(runtime_error,"const TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber); fails");
+  return aIter->second;
+}
+
+TFloatVector
+TGrilleInfo
+::GetIndexes(TInt theAxisNumber)
+{
+  TIndexes::iterator aIter=myIndixes.find(theAxisNumber);
+  if(aIter==myIndixes.end())
+    EXCEPTION(runtime_error,"TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber); fails");
+  return aIter->second;
+}
+
+TInt
+TGrilleInfo
+::GetNbIndexes(TInt theAxisNumber)
+{
+  const TFloatVector& aVector=GetIndexes(theAxisNumber);
+  return aVector.size();
+}
+
+TInt
+TGrilleInfo
+::GetNbNodes()
+{
+  TInt nbNodes=0;
+  TInt aDim = myMeshInfo->GetDim();
+  if(myGrilleType == eGRILLE_STANDARD)
+    for(int i=0;i<aDim;i++)
+      if(nbNodes == 0)
+	nbNodes = myGrilleStructure[i];
+      else
+	nbNodes = nbNodes*myGrilleStructure[i];
+  else
+    for(int i=0;i<aDim;i++)
+      if(nbNodes == 0)
+	nbNodes = GetNbIndexes(i);
+      else
+	nbNodes = nbNodes*GetNbIndexes(i);
+  
+  return nbNodes;
+}
+
+TInt
+TGrilleInfo
+::GetNbCells()
+{
+  TInt nbCells=0;
+  TInt aDim = myMeshInfo->GetDim();
+  if(myGrilleType == eGRILLE_STANDARD)
+    for(int i=0;i<aDim;i++)
+      if(nbCells == 0)
+	nbCells = myGrilleStructure[i]-1;
+      else
+	nbCells = nbCells*(myGrilleStructure[i]-1);
+  else
+    for(int i=0;i<aDim;i++)
+      if(nbCells == 0)
+	nbCells = GetNbIndexes(i)-1;
+      else
+	nbCells = nbCells*(GetNbIndexes(i)-1);
+  return nbCells;
+}
+
+EGeometrieElement
+TGrilleInfo
+::GetGeom()
+{
+  TInt aDim = myMeshInfo->GetDim();
+  switch(aDim){
+  case 1:
+    return eSEG2;
+  case 2:
+    return eQUAD4;
+  case 3:
+    return eHEXA8;
+  default:
+    return eNONE;
+  }
+}
+
+EEntiteMaillage
+TGrilleInfo
+::GetEntity()
+{
+  return eMAILLE;
+}
+
+const
+TIntVector&
+TGrilleInfo
+::GetGrilleStructure() const
+{
+  return myGrilleStructure;
+}
+
+TIntVector
+TGrilleInfo
+::GetGrilleStructure()
+{
+  return myGrilleStructure;
+}
+
+void
+TGrilleInfo
+::SetGrilleStructure(TInt theAxis,TInt theNb)
+{
+  if(theAxis >= 0 && theAxis <=2 && theNb >= 0)
+  myGrilleStructure[theAxis]=theNb;
+}
+
+const
+TNodeCoord&
+TGrilleInfo
+::GetNodeCoord() const
+{
+  return myCoord;
+}
+
+TNodeCoord
+TGrilleInfo
+::GetNodeCoord()
+{
+  return myCoord;
+}
+
+TNodeCoord
+TGrilleInfo
+::GetCoord(TInt theId)
+{
+  TNodeCoord aCoord;
+  TInt aDim       = myMeshInfo->GetDim();
+  TInt aNbNodes   = this->GetNbNodes();
+  aCoord.resize(aDim);
+  
+  if(theId >= aNbNodes)
+    EXCEPTION(runtime_error,"TGrilleInfo::GetCoord - theId out of range");
+
+  if(myGrilleType == eGRILLE_STANDARD){
+    switch(aDim){
+    case 3:
+      aCoord[2] = myCoord[aDim*theId+2];
+    case 2:
+      aCoord[1] = myCoord[aDim*theId+1];
+    case 1:{
+      aCoord[0] = myCoord[aDim*theId];
+      break;
+    }
+    }
+  } else {
+
+    TFloatVector aVecX  = this->GetIndexes(0);
+    TInt nbIndxX        = this->GetNbIndexes(0);
+    
+    switch(aDim){
+    case 1:{
+      aCoord[0] = aVecX[theId];
+      break;
+    }
+    case 2:{
+      TFloatVector aVecY = this->GetIndexes(1);
+      TInt i,j,k;
+      i = j = k = 0;
+      i = theId % nbIndxX;
+      j = theId / nbIndxX;
+      if(myGrilleType == eGRILLE_CARTESIENNE){
+	aCoord[0] = aVecX[i];
+	aCoord[1] = aVecY[j];
+      } else { // eGRILLE_POLAIRE (cylindrical)
+	aCoord[0] = aVecX[i] * cos(aVecY[j]);
+	aCoord[1] = aVecX[i] * sin(aVecY[j]);
+      }
+      break;
+    }
+    case 3:{
+      TFloatVector aVecY = this->GetIndexes(1);
+      TInt nbIndxY       = this->GetNbIndexes(1);
+      TFloatVector aVecZ = this->GetIndexes(2);
+      TInt i,j,k;
+      i = j = k = 0;
+      
+      i = theId % nbIndxX;
+      j = (theId / nbIndxX) % nbIndxY;
+      k = theId / (nbIndxX*nbIndxY);
+
+      if(myGrilleType == eGRILLE_CARTESIENNE){
+	aCoord[0] = aVecX[i];
+	aCoord[1] = aVecY[j];
+	aCoord[2] = aVecZ[k];
+      } else { // eGRILLE_POLAIRE (cylindrical)
+	aCoord[0] = aVecX[i] * cos(aVecY[j]);
+	aCoord[1] = aVecX[i] * sin(aVecY[j]);
+	aCoord[2] = aVecZ[k];
+      }
+      
+      break;
+    }
+    }
+  }
+    
+  return aCoord;
+}
+
+TIntVector
+TGrilleInfo
+::GetConn(TInt theId)
+{
+  TIntVector anIndexes;
+  TInt aDim       = myMeshInfo->GetDim();
+  TInt aArrSize   = 2;
+  for(int i=1;i<aDim;i++) aArrSize = aArrSize*2;
+  
+  TInt idx;
+  TInt iMin, iMax, jMin, jMax, kMin, kMax;
+  TInt loc[3];
+
+  loc[0] = loc[1] = loc[2] = 0;
+  iMin = iMax = jMin = jMax = kMin = kMax = 0;
+ 
+  TInt nbX,nbY;
+  if (myGrilleType == eGRILLE_STANDARD)
+    {
+      nbX = this->GetGrilleStructure()[0];
+      nbY = this->GetGrilleStructure()[1];
+    }
+  else
+    {
+      nbX = this->GetNbIndexes(0);
+      nbY = this->GetNbIndexes(1);
+    }
+
+  TInt d01 = nbX*nbY;
+  
+  switch(aDim){
+  case 3:{
+    iMin = theId % (nbX - 1);
+    iMax = iMin + 1;
+    jMin = (theId / (nbX - 1)) % (nbY - 1);
+    jMax = jMin + 1;
+    kMin = theId / ((nbX - 1) * (nbY - 1));
+    kMax = kMin + 1;
+    break;
+  }
+  case 2:{
+    iMin = theId % (nbX-1);
+    iMax = iMin + 1;
+    jMin = theId / (nbX-1);
+    jMax = jMin + 1;
+    break;
+  }
+  case 1:{
+    iMin = theId;
+    iMax = theId + 1;
+    break;
+  }
+  }
+  
+  
+  for (loc[2]=kMin; loc[2]<=kMax; loc[2]++)
+    {
+      for (loc[1]=jMin; loc[1]<=jMax; loc[1]++)
+	{
+	  for (loc[0]=iMin; loc[0]<=iMax; loc[0]++)
+	    {
+	      idx = loc[0] + loc[1]*nbX + loc[2]*d01;
+	      anIndexes.push_back(idx);
+	    }
+	}
+    }
+  
+  return anIndexes;
+}

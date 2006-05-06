@@ -417,12 +417,7 @@ namespace MED
 			     med_entite_maillage(theEntity),
 			     med_geometrie_element(theGeom));
 
-      theInfo.myIsElemNames = (theInfo.myElemNames).empty()? eFAUX : eVRAI ;
-
-      if(theErr) 
-	*theErr = aRet;
-      else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetNames - MEDnomLire(...)");
+      theInfo.myIsElemNames = aRet != 0? eFAUX : eVRAI ;
     }
 
     void
@@ -450,12 +445,7 @@ namespace MED
 			     anEntity,
 			     aGeom);
 
-      theInfo.myIsElemNum = (theInfo.myElemNum).empty()? eFAUX : eVRAI ;
-
-      if(theErr) 
-	*theErr = aRet;
-      else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetNumeration - MEDnumLire(...)");
+      theInfo.myIsElemNum = aRet != 0? eFAUX : eVRAI;
     }
 
     void
@@ -611,6 +601,7 @@ namespace MED
     TInt
     TVWrapper
     ::GetNbNodes(const MED::TMeshInfo& theMeshInfo,
+		 ETable theTable,
 		 TErr* theErr)
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
@@ -622,7 +613,7 @@ namespace MED
       
       return MEDnEntMaa(myFile->Id(),
 			&aMeshInfo.myName[0],
-			MED_COOR,
+			(med_table)theTable,
 			MED_NOEUD,
 			med_geometrie_element(0),
 			med_connectivite(0));
@@ -1027,7 +1018,9 @@ namespace MED
       
       if(theErr && *theErr < 0)
 	return anInfo;
-      
+
+      if(theMeshInfo.GetType() == eNON_STRUCTURE) {
+
       TInt aNbElem = GetNbNodes(theMeshInfo);
       if(aNbElem > 0){
 	anInfo[eNOEUD][ePOINT1] = aNbElem;
@@ -1045,6 +1038,61 @@ namespace MED
 	    if(aNbElem > 0)
 	      anInfo[anEntity][aGeom] = aNbElem;
 	  }
+	}
+      }
+      } else { // eSTRUCTURE
+	EGrilleType aGrilleType;
+	TInt aNbNodes = 1;
+	TInt aNbElem  = 1;
+	TInt aDim = theMeshInfo.GetDim();
+	EGeometrieElement aGeom;
+	EEntiteMaillage anEntity = eMAILLE;
+	switch(aDim){
+	case 1:
+	  aGeom = eSEG2;
+	  break;
+	case 2:
+	  aGeom = eQUAD4;
+	  break;
+	case 3:
+	  aGeom = eHEXA8;
+	  break;
+	}
+
+	GetGrilleType(theMeshInfo,aGrilleType);
+
+	if (aGrilleType == eGRILLE_STANDARD){
+	  TIntVector theStruct;
+	  theStruct.resize(aDim);
+	  GetGrilleStruct(theMeshInfo,theStruct,theErr);
+	  for(med_int i=0;i<aDim;i++){
+	    aNbNodes = aNbNodes * theStruct[i];
+	    aNbElem =  aNbElem * (theStruct[i]-1);
+	  }
+	  anInfo[eNOEUD][ePOINT1] = aNbNodes;
+	  anInfo[anEntity][aGeom] = aNbElem;
+	  
+	} else { // eGRILLE_CARTESIENNE and eGRILLE_POLAIRE
+	  med_table quoi;
+	  for(int aAxe=1;aAxe<=aDim;aAxe++)
+	  {
+	    switch(aAxe) {
+	    case 1 :
+	      quoi = MED_COOR_IND1;
+	      break;
+	    case 2 :
+	      quoi = MED_COOR_IND2;
+	      break;
+	    case 3 :
+	      quoi = MED_COOR_IND3;
+	      break;
+	    }
+	    TInt nbn = GetNbNodes(theMeshInfo,(ETable)quoi);
+	    aNbNodes = aNbNodes * nbn;
+	    aNbElem =  aNbElem * (nbn-1);
+	  }
+	  anInfo[eNOEUD][ePOINT1] = aNbNodes;
+	  anInfo[anEntity][aGeom] = aNbElem;
 	}
       }
       return anInfo;
@@ -1889,5 +1937,230 @@ namespace MED
 	SetTimeStamp(theVal,eLECTURE_AJOUT,theErr);
     }
     
+    void 
+    TVWrapper
+    ::SetGrilleInfo(const MED::TGrilleInfo& theInfo,
+		    TErr* theErr)
+    {
+      SetGrilleInfo(theInfo,eLECTURE_ECRITURE,theErr);
+    }
+
+    void 
+    TVWrapper
+    ::SetGrilleInfo(const MED::TGrilleInfo& theInfo,
+		    EModeAcces theMode,
+		    TErr* theErr)
+    {
+      if(theInfo.myMeshInfo->myType != eSTRUCTURE)
+	return;
+      TFileWrapper aFileWrapper(myFile,theMode,theErr);
+      
+      if(theErr)
+	if(!*theErr)
+	  return;
+
+      MED::TGrilleInfo& anInfo = const_cast<MED::TGrilleInfo&>(theInfo);
+      MED::TMeshInfo& aMeshInfo = *anInfo.myMeshInfo;
+
+      TErr aRet = 0;
+      aRet = MEDnatureGrilleEcr(myFile->Id(),
+				&aMeshInfo.myName[0],
+				(med_type_grille)anInfo.myGrilleType);
+      if(theErr) 
+	*theErr = aRet;
+      else if(aRet < 0)
+	EXCEPTION(runtime_error,"SetGrilleInfo - MEDnatureGrilleEcr(...)");
+      
+      if(anInfo.myGrilleType == eGRILLE_STANDARD){
+	med_int nnoeuds = (med_int)(anInfo.myCoord.size()/aMeshInfo.myDim);
+	aRet = MEDcoordEcr(myFile->Id(),
+			   &aMeshInfo.myName[0],
+			   aMeshInfo.myDim,
+			   &anInfo.myCoord[0],
+			   med_mode_switch(anInfo.myModeSwitch),
+			   nnoeuds,
+			   (med_repere)theInfo.myGrilleType,
+			   &anInfo.myCoordNames[0],
+			   &anInfo.myCoordUnits[0]);
+
+	if(aRet < 0)
+	  EXCEPTION(runtime_error,"SetGrilleInfo - MEDcoordEcr(...)");
+
+	aRet = MEDstructureCoordEcr(myFile->Id(),
+				    &aMeshInfo.myName[0],
+				    aMeshInfo.myDim,
+				    &anInfo.myGrilleStructure[0]);
+	if(aRet < 0)
+	  EXCEPTION(runtime_error,"SetGrilleInfo - MEDstructureCoordEcr(...)");
+	
+      } else {
+	for(int aAxe=0;aAxe<aMeshInfo.myDim;aAxe++){
+	  aRet = MEDindicesCoordEcr(myFile->Id(),
+				    &aMeshInfo.myName[0],
+				    aMeshInfo.myDim,
+				    &anInfo.GetIndexes(aAxe)[0],
+				    anInfo.GetIndexes(aAxe).size(),
+				    aAxe+1,
+				    &anInfo.GetCoordName(aAxe)[0],
+				    &anInfo.GetCoordUnit(aAxe)[0]);
+	  if(aRet < 0)
+	    EXCEPTION(runtime_error,"SetGrilleInfo - MEDindicesCoordEcr(...)");
+	}
+	
+      }
+
+      return;
+    }
+
+    void
+    TVWrapper
+    ::GetGrilleInfo(TGrilleInfo& theInfo,
+		    TErr* theErr)
+    {
+      TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
+
+      if(theErr)
+	if(!*theErr)
+	  return;
+      
+      MED::TMeshInfo& aMeshInfo      = *theInfo.myMeshInfo;
+      
+      EMaillage type_maillage   = aMeshInfo.myType;
+      
+      GetGrilleType(aMeshInfo,theInfo.myGrilleType,theErr);
+      EGrilleType       type = theInfo.myGrilleType;
+
+      TErr aRet;
+      if(type_maillage == eSTRUCTURE && type == eGRILLE_STANDARD){
+	
+	GetGrilleStruct(aMeshInfo,theInfo.myGrilleStructure,theErr);
+	
+	aRet = MEDcoordLire(myFile->Id(),
+			    &aMeshInfo.myName[0],
+			    aMeshInfo.myDim,
+			    &theInfo.myCoord[0],
+			    med_mode_switch(theInfo.myModeSwitch),
+			    MED_ALL, // all coordinates must be return
+			    NULL,
+			    0,
+			    (med_repere*)&theInfo.myGrilleType,
+			    &theInfo.myCoordNames[0],
+			    &theInfo.myCoordUnits[0]);
+
+	if(theErr) 
+	  *theErr = aRet;
+	else if(aRet < 0)
+	  EXCEPTION(runtime_error,"GetGrilleInfo - MEDcoordLire(...)");
+	//============================
+      }
+
+      if(type_maillage == eSTRUCTURE && type != eGRILLE_STANDARD){
+	med_table quoi;
+	for(int aAxe=1;aAxe<=aMeshInfo.myDim;aAxe++)
+	  {
+	    switch(aAxe) {
+	    case 1 :
+	      quoi = MED_COOR_IND1;
+	      break;
+	    case 2 :
+	      quoi = MED_COOR_IND2;
+	      break;
+	    case 3 :
+	      quoi = MED_COOR_IND3;
+	      break;
+
+	    default :
+	      aRet = -1;
+	    }
+	    
+	    if(theErr) 
+	      *theErr = aRet;
+	    else if(aRet < 0)
+	      EXCEPTION(runtime_error,"GetGrilleInfo - Axe number out of range(...)");
+
+	    TInt nind = GetNbNodes(aMeshInfo,(ETable)quoi);
+	    if(nind < 0)
+	      EXCEPTION(runtime_error,"GetGrilleInfo - Erreur a la lecture de la taille de l'indice");
+	    
+	    med_float* indices = (med_float*)&theInfo.myIndixes[aAxe-1][0];
+	    
+	    char comp[MED_TAILLE_PNOM+1];
+	    char unit[MED_TAILLE_PNOM+1];
+	    
+	    aRet = MEDindicesCoordLire(myFile->Id(),
+				       &aMeshInfo.myName[0],
+				       aMeshInfo.myDim,
+				       indices,
+				       (med_int)nind,
+				       (med_int)aAxe,
+				       comp,
+				       unit);
+	    theInfo.SetCoordName(aAxe-1,comp);
+	    theInfo.SetCoordUnit(aAxe-1,unit);
+	    if(theErr) 
+	      *theErr = aRet;
+	    else if(aRet < 0)
+	      EXCEPTION(runtime_error,"GetGrilleInfo - MEDindicesCoordLire(...)");
+	  }
+      }
+    }
+
+    void
+    TVWrapper
+    ::GetGrilleType(const MED::TMeshInfo& theMeshInfo,
+		    EGrilleType& type,
+		    TErr* theErr)
+    {
+      TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
+
+      if(theErr)
+	if(!*theErr)
+ 	EXCEPTION(runtime_error," GetGrilleType - aFileWrapper (...)");
+
+      MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
+      
+      EMaillage type_maillage   = aMeshInfo.myType;
+      
+      TErr aRet;
+      if(type_maillage == eSTRUCTURE){
+	med_type_grille Mtype;
+	aRet = MEDnatureGrilleLire(myFile->Id(),
+				   &aMeshInfo.myName[0],
+				   &Mtype);
+	if(aRet < 0)
+	  EXCEPTION(runtime_error,"GetGrilleInfo - MEDnatureGrilleLire(...)");
+
+	type = (EGrilleType)Mtype;
+
+      }
+    }    
+    
+    void
+    TVWrapper
+    ::GetGrilleStruct(const MED::TMeshInfo& theMeshInfo,
+		      TIntVector& theStruct,
+		      TErr* theErr)
+    {
+      TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
+      
+      if(theErr) 
+	if(!*theErr)
+	  return;
+      
+      TErr aRet;
+      MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
+
+      med_int* anGrilleStruct = aMeshInfo.myDim > 0? (med_int*)&theStruct[0]: NULL;
+	
+      aRet = MEDstructureCoordLire(myFile->Id(),
+				   &aMeshInfo.myName[0],
+				   aMeshInfo.myDim,
+				   anGrilleStruct);
+      if(theErr) 
+	*theErr = aRet;
+      else if(aRet < 0)
+	EXCEPTION(runtime_error,"GetGrilleInfo - MEDstructureCoordLire(...)");
+    }
+
   }
 }

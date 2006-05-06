@@ -65,15 +65,15 @@ EXPORT_HEADERS = libMedCorba_Swig.i
 
 #############################################################################
 
-LDFLAGS= -L$(top_builddir)/lib/salome 
-LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
+LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
+LDFLAGSFORBIN= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
-CPPFLAGS+= $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
-CXXFLAGS+=-ftemplate-depth-42 -I${KERNEL_ROOT_DIR}/include/salome
+CPPFLAGS+= $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS}
+CXXFLAGS+=-ftemplate-depth-42 ${KERNEL_CXXFLAGS}
 LIBS= $(PYTHON_LIBS) 
-#LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDMEMImpl -lmedmem -lMEDMEM_Swigcmodule -L${KERNEL_ROOT_DIR}/lib/salome -lSalomeLoggerServer -L${KERNEL_ROOT_DIR}/lib/salome
+#LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDMEMImpl -lmedmem -lMEDMEM_Swigcmodule ${KERNEL_LDFLAGS} -lSalomeLoggerServer ${KERNEL_LDFLAGS}
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDMEMImpl -lmedmem -lMEDMEM_Swigcmodule -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDMEMImpl -lmedmem -lMEDMEM_Swigcmodule ${KERNEL_LDFLAGS} -lSALOMELocalTrace
 
 #############################################################################
 

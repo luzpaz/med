@@ -407,7 +407,7 @@ throw (SALOME::SALOME_Exception)
 			SCRUTE(myIteration.size());
 		}
 */
-		myField = mymed->getField(fieldName,iter,ordre);
+		myField = mymed->getField(fieldName,ordre,iter);
 	}
         catch (const std::exception & ex)
         {

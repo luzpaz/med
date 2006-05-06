@@ -739,6 +739,7 @@ public:
 
   const int   getNumberOfGeometricTypes() const throw (MEDEXCEPTION);
   const GAUSS_LOCALIZATION<INTERLACING_TAG> & getGaussLocalization(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
+  const GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
   const int * getNumberOfGaussPoints() const throw (MEDEXCEPTION);
   const int   getNumberOfGaussPoints( MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
   const int   getNbGaussI(int i)          const throw (MEDEXCEPTION);
@@ -2586,6 +2587,22 @@ FIELD<T,INTERLACING_TAG>::getGaussLocalization(MED_EN::medGeometryElement geomEl
   if ( ( it = _gaussModel.find(geomElement)) != _gaussModel.end() ) {
 	locPtr = (*it).second;
 	return  *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> *>(locPtr);
+  }
+  else
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find any GaussLocalization on this geometric type" ));
+
+};
+
+template <class T,class INTERLACING_TAG> const GAUSS_LOCALIZATION<INTERLACING_TAG> *
+FIELD<T,INTERLACING_TAG>::getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION)
+{
+  const char * LOC ="getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement) : ";
+  const GAUSS_LOCALIZATION_ * locPtr=0;
+
+  locMap::const_iterator it;
+  if ( ( it = _gaussModel.find(geomElement)) != _gaussModel.end() ) {
+	locPtr = (*it).second;
+	return  static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> *>(locPtr);
   }
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find any GaussLocalization on this geometric type" ));

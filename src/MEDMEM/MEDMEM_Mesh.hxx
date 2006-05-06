@@ -298,6 +298,7 @@ public :
   void fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT *supportToFill) const throw (MEDEXCEPTION);
   SUPPORT *buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
   int getElementContainingPoint(const double *coord);
+  vector< vector<double> > MESH::getBoundingBox() const;
   template<class T> static
   FIELD<T> * mergeFields(const vector< FIELD<T> * > & others, bool meshCompare=false);
   /*!

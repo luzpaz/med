@@ -1,13 +1,13 @@
 import sys
 from omniORB import CORBA, PortableServer
 import CosNaming
-import Engines, Engines__POA
+import Compo1Py_ORB, Compo1Py_ORB__POA
 from SALOME_ComponentPy import *
 from libMedCorba_Swig import *
 
 import Compo1
 
-class Compo1Py( Engines__POA.Compo1Py, SALOME_ComponentPy_i):
+class Compo1Py( Compo1Py_ORB__POA.Compo1Py, SALOME_ComponentPy_i):
 
         def __init__(self, orb, poa, contID, \
                      containerName, instanceName, interfaceName):

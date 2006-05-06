@@ -727,7 +727,7 @@ void MED_MED_WRONLY_DRIVER21::write(void ) const
     current = (*currentMesh).second->addDriver(MED_DRIVER,_fileName,(*currentMesh).second->getName());
     // put right _id in Mesh driver (same as this._id)
     (*currentMesh).second->_drivers[current]->setId( getId() );
-    //(*currentMesh).second->write(current) ;
+    (*currentMesh).second->write(current) ;
   }
 
   for ( currentField=_meshName.begin();currentField != _meshName.end(); currentField++ ) {
@@ -735,11 +735,11 @@ void MED_MED_WRONLY_DRIVER21::write(void ) const
     current = (*currentField).first->addDriver(MED_DRIVER,_fileName,(*currentField).first->getName());
     // put right _id in Field driver (same as this._id)
     (*currentField).first->_drivers[current]->setId( getId() );
-    //(*currentField).first->write(current) ;
+    (*currentField).first->write(current) ;
   }
 
   // that's work, but it is more efficenty to write directly when we had driver, no ?
-  writeFrom();
+  //  writeFrom();
   
   END_OF(LOC);
 

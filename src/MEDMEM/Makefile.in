@@ -82,6 +82,7 @@ MEDMEM_PolyhedronArray.hxx \
 MEDMEM_MedFieldDriver22.hxx \
 MEDMEM_MedMedDriver22.hxx \
 MEDMEM_MedMeshDriver22.hxx \
+MEDMEM_TopLevel.hxx \
 MEDMEM_Utilities.hxx \
 MEDMEM_ArrayInterface.hxx \
 MEDMEM_IndexCheckingPolicy.hxx \
@@ -135,6 +136,7 @@ MEDMEM_medimport_src.cxx \
 MEDMEM_PolyhedronArray.cxx \
 MEDMEM_MedMedDriver22.cxx \
 MEDMEM_MedMeshDriver22.cxx \
+MEDMEM_TopLevel.cxx \
 MEDMEM_MEDMEMgaussEcr.cxx \
 MEDMEM_MEDMEMprofilEcr.cxx \
 MEDMEM_MEDMEMchampLire.cxx
@@ -158,10 +160,10 @@ TEST_PROGS = test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray
 	test_grid test_MEDMEM_PolyhedronArray test_MEDMEM_PolyConnectivity \
 	test_MEDMEM_PolyDriverMedMeshRead test_MEDMEM_PolyDriverMedMeshWrite \
 	test_MEDMEM_poly3D test_MEDMEM_nArray test_MEDMEM_Meshing_poly test_profil_MedFieldDriver \
-	test_profil_gauss_MedFieldDriver test_GaussLocalization
+	test_profil_gauss_MedFieldDriver test_GaussLocalization testAnalFile
 
-LDFLAGS+= -L$(top_builddir)/lib/salome 
-LDFLAGSFORBIN+= -L$(top_builddir)/lib/salome
+LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
+LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
 CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES)
 
@@ -175,10 +177,10 @@ LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB)
 LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1
 
 ifeq ($(MED_WITH_KERNEL),yes)
-  CPPFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
-  CXXFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
-  LDFLAGS+= -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace 
-  LDFLAGSFORBIN+= -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace -lSALOMEBasics
+  CPPFLAGS+= ${KERNEL_CXXFLAGS}
+  CXXFLAGS+= ${KERNEL_CXXFLAGS}
+  LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
+  LDFLAGSFORBIN+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics
 endif
 
 LIBSFORBIN=

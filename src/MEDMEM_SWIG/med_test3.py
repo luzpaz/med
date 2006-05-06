@@ -1,12 +1,7 @@
-#
-# This script does not work at the moment !!!
-#
-
-
 ###################################################################################
 #
 # This Python script is parsing a MED file using MED Memory from SALOME platform:
-# It tests the setValue(I) function on MED fields
+# It tests the setValue, setRow and setColum functions on MED fields
 #
 ###################################################################################
 
@@ -202,57 +197,37 @@ if (nbMeshes>0):
                         for k in range(nbOf*nbOfComp):
                             print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
                         print ""
-                        print "      Randomly set (via setValueI) and get (via getValueI) to check with the same mode ..!"
+                        print "      Randomly set (via setRow/setColumn) and get (via getRow/getColumn) to check with the same mode ..!"
                         value = []
                         for k in range(nbOf*nbOfComp):
                             value.append(randint(0,100))
-                        print "      the mode is full interlace"
                         mode = MED_FULL_INTERLACE
+                        print "      the mode is full interlace ", mode
+                        print "      the field interlacing mode ",fieldFamilyIntg.getInterlacingType()
                         for k in range(nbOf):
-                            fieldFamilyIntg.setRow((k+1),value[k*nbOfComp:(k+1)*nbOfComp])
+                            valInd = numberFamily[k]
+                            fieldFamilyIntg.setRow(valInd,value[k*nbOfComp:(k+1)*nbOfComp])
                         valueverif = []
                         for k in range(nbOf):
-                            valueverif.extend(fieldFamilyIntg.getRow((k+1)))
+                            valInd = numberFamily[k]
+                            valueverif.extend(fieldFamilyIntg.getRow(valInd))
                         for k in range(nbOf*nbOfComp):
                             print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
                         print ""
                         value = []
                         for k in range(nbOf*nbOfComp):
                             value.append(randint(0,100))
-                        print "      the mode is no interlace"
                         mode = MED_NO_INTERLACE
-                        for k in range(nbOfComp):
-                            fieldFamilyIntg.setColumn((k+1),value[k*nbOf:(k+1)*nbOf])
-                        valueverif = []
-                        for k in range(nbOfComp):
-                            valueverif.extend(fieldFamilyIntg.getColumn((k+1)))
-                        for k in range(nbOf*nbOfComp):
-                            print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
-                        print ""
-                        print "      Randomly set (via setValueI) and get (via getValueI) to check with different mode ..!"
-                        value = []
-                        for k in range(nbOf*nbOfComp):
-                            value.append(randint(0,100))
-                        print "      the mode for set is full interlace and no interlace for get"
-                        mode_full = MED_FULL_INTERLACE
-                        mode_no = MED_NO_INTERLACE
+                        print "      the mode is no interlace ", mode
+                        print "      the field interlacing mode ",fieldFamilyIntg.getInterlacingType()
                         for k in range(nbOf):
-                            fieldFamilyIntg.setRow((k+1),value[k*nbOfComp:(k+1)*nbOfComp])
+                            valInd = numberFamily[k]
+                            fieldFamilyIntg.setRow(valInd,value[k*nbOfComp:(k+1)*nbOfComp])
+                        fieldFamilyIntgOtherMode = createFieldIntConvertNoInterlace(fieldFamilyIntg)
                         valueverif = []
                         for k in range(nbOfComp):
-                            valueverif.extend(fieldFamilyIntg.getColumn((k+1)))
+                            valueverif.extend(fieldFamilyIntgOtherMode.getColumn(k+1))
                         for k in range(nbOf*nbOfComp):
                             print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
                         print ""
-                        value = []
-                        for k in range(nbOf*nbOfComp):
-                            value.append(randint(0,100))
-                        print "      the mode for set is no interlace and full interlace for get"
-                        for k in range(nbOfComp):
-                            fieldFamilyIntg.setColumn((k+1),value[k*nbOf:(k+1)*nbOf])
-                        valueverif = []
-                        for k in range(nbOf):
-                            valueverif.extend(fieldFamilyIntg.getRow((k+1)))
-                        for k in range(nbOf*nbOfComp):
-                            print "      Set/Get Entry * ",value[k]," / ",valueverif[k]
-                        print ""
+print "END of the Pyhton script ..... Ctrl D to exit"

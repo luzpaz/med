@@ -2432,6 +2432,7 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
 	      err = MEDconnEcr(_medIdt, const_cast <char *> ( _meshName.c_str()),
 			       _ptrMesh->_spaceDimension, connectivityArray,
 			       med_2_2::MED_FULL_INTERLACE , numberOfElements,
+// 			       (med_2_2::med_entite_maillage  ) entity, because Med Memory works only in Nodal connectivity
 			       (med_2_2::med_entite_maillage  ) MED_CELL, 
 			       (med_2_2::med_geometrie_element) types[i],
 			       med_2_2::MED_NOD);
@@ -2465,7 +2466,8 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
 			       tmp_PolygonsConnectivityIndex,
 			       _ptrMesh->getNumberOfPolygons()+1,
 			       tmp_PolygonsConnectivity,
-			       (med_2_2::med_entite_maillage) entity,
+// 			       (med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
+			       (med_2_2::med_entite_maillage) MED_CELL,
 			       med_2_2::MED_NOD);
       delete [] tmp_PolygonsConnectivityIndex ;
       delete [] tmp_PolygonsConnectivity ;
@@ -2475,7 +2477,8 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
 			       const_cast <med_int*> (_ptrMesh->getPolygonsConnectivityIndex(MED_NODAL,entity)),
 			       _ptrMesh->getNumberOfPolygons()+1,
 			       const_cast <med_int*> (_ptrMesh->getPolygonsConnectivity(MED_NODAL,entity)),
-			       (med_2_2::med_entite_maillage) entity,
+// 			       (med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
+			       (med_2_2::med_entite_maillage) MED_CELL,
 			       med_2_2::MED_NOD);
 #endif
 
@@ -2563,25 +2566,27 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
           for ( ii = 0 ; ii < numberOfElements ; ii++ )
           tmp_Connectivity[ii] = connectivity[ii] ;
 	  err = med_2_2::MEDconnEcr(_medIdt,
-				const_cast <char *> ( _meshName.c_str()),
-				_ptrMesh->_spaceDimension,
-				tmp_Connectivity,
-				med_2_2::MED_FULL_INTERLACE,
-				numberOfElements,
-				(med_2_2::med_entite_maillage  ) entity, 
-				(med_2_2::med_geometrie_element) types[i],
-				med_2_2::MED_DESC );
+				    const_cast <char *> ( _meshName.c_str()),
+				    _ptrMesh->_spaceDimension,
+				    tmp_Connectivity,
+				    med_2_2::MED_FULL_INTERLACE,
+				    numberOfElements,
+// 				    (med_2_2::med_entite_maillage  ) entity, because Med Memory works only in Nodal connectivity
+				    (med_2_2::med_entite_maillage) MED_CELL,
+				    (med_2_2::med_geometrie_element) types[i],
+				    med_2_2::MED_DESC );
           delete [] tmp_Connectivity ;
 #else
 	  err = med_2_2::MEDconnEcr(_medIdt,
-				const_cast <char *> ( _meshName.c_str()),
-				_ptrMesh->_spaceDimension,
-				const_cast <int *> (connectivity),
-				med_2_2::MED_FULL_INTERLACE,
-				numberOfElements,
-				(med_2_2::med_entite_maillage  ) entity, 
-				(med_2_2::med_geometrie_element) types[i],
-				med_2_2::MED_DESC );
+				    const_cast <char *> ( _meshName.c_str()),
+				    _ptrMesh->_spaceDimension,
+				    const_cast <int *> (connectivity),
+				    med_2_2::MED_FULL_INTERLACE,
+				    numberOfElements,
+// 				    (med_2_2::med_entite_maillage  ) entity, because Med Memory works only in Nodal connectivity
+				    (med_2_2::med_entite_maillage  ) MED_CELL, 
+				    (med_2_2::med_geometrie_element) types[i],
+				    med_2_2::MED_DESC );
 #endif
 	
 	  if (err<0) // ETENDRE LES EXPLICATIONS
@@ -2604,14 +2609,15 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
           tmp_PolygonsConnectivityIndex[ii] = PolygonsConnectivityIndex[ii] ;
       med_2_2::med_int * tmp_PolygonsConnectivity = new med_2_2::med_int[_ptrMesh->getNumberOfPolygons()+1] ;
       const int * PolygonsConnectivity = _ptrMesh->getPolygonsConnectivity(MED_DESCENDING,entity) ;
-       for ( ii = 0 ; ii < _ptrMesh->getNumberOfPolygons()+1 ; ii++ )
-          tmp_PolygonsConnectivity[ii] = PolygonsConnectivity[ii] ;
+      for ( ii = 0 ; ii < _ptrMesh->getNumberOfPolygons()+1 ; ii++ )
+	tmp_PolygonsConnectivity[ii] = PolygonsConnectivity[ii] ;
       err = MEDpolygoneConnEcr(_medIdt,
 			       const_cast <char *> (_meshName.c_str()),
 			       tmp_PolygonsConnectivityIndex,
 			       _ptrMesh->getNumberOfPolygons()+1,
 			       tmp_PolygonsConnectivity,
-			       (med_2_2::med_entite_maillage) entity,
+// 			       (med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
+			       (med_2_2::med_entite_maillage  ) MED_CELL, 
 			       med_2_2::MED_DESC);
       delete [] tmp_PolygonsConnectivityIndex ;
       delete [] tmp_PolygonsConnectivity ;
@@ -2621,7 +2627,8 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
 			       const_cast <med_int*> (_ptrMesh->getPolygonsConnectivityIndex(MED_DESCENDING,entity)),
 			       _ptrMesh->getNumberOfPolygons()+1,
 			       const_cast <med_int*> (_ptrMesh->getPolygonsConnectivity(MED_DESCENDING,entity)),
-			       (med_2_2::med_entite_maillage) entity,
+// 			       (med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
+			       (med_2_2::med_entite_maillage  ) MED_CELL, 
 			       med_2_2::MED_DESC);
 #endif
 
@@ -2803,6 +2810,13 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 	}
       }
 
+
+
+      for (int i=0; i<NumberOfElements; i++)
+	SCRUTE(MEDArrayFamily[i]);
+
+
+
       const int * typeCount = _ptrMesh->getGlobalNumberingIndex(entity) ;
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
 	int lgth=NumberOfElements;
@@ -2813,18 +2827,19 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       for (int i=0; i<numberOfTypes; i++) {
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
 	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-			temp+typeCount[i]-1,typeCount[i+1]-typeCount[i],
-//CCRT			med_2_2::MED_REMP ,
-			(med_2_2::med_entite_maillage) entity,
-			(med_2_2::med_geometrie_element) types[i]
-);
+			(temp+(typeCount[i]-1)),(typeCount[i+1]-typeCount[i]),
+			//CCRT			med_2_2::MED_REMP ,
+// 			(med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
+			(med_2_2::med_entite_maillage) MED_CELL,
+			(med_2_2::med_geometrie_element) types[i]);
 #else
 	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-			(MEDArrayFamily+typeCount[i]-1),
+			(MEDArrayFamily+(typeCount[i]-1)),
 			(typeCount[i+1]-typeCount[i]),
-			(med_2_2::med_entite_maillage) entity,
+// 			(med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
+			(med_2_2::med_entite_maillage) MED_CELL,
 			(med_2_2::med_geometrie_element) types[i]); 
-
+#endif
 	MESSAGE("OK "<<i);
 	if ( err != MED_VALID) 
 	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write family for the |"<< _ptrMesh->getNumberOfElements(entity, types[i])
@@ -2889,20 +2904,37 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 	}
       }
 
+      for (int i=0;i<numberOfElements;i++)
+	SCRUTE(familyArray[i]);
+
       const int * typeCount = _ptrMesh->getGlobalNumberingIndex(entity) ;
 //CCRT Clutter
-//CCRT#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
-//CCRT	int lgth=numberOfElements;
-//CCRT	med_2_2::med_int *temp=new med_2_2::med_int[lgth];
-//CCRT	for(int i2=0;i2<lgth;i2++)
-//CCRT	  temp[i2]=(med_2_2::med_int) (familyArray[i2]);
-//CCRT#endif
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+      int lgth=numberOfElements;
+      med_2_2::med_int *temp=new med_2_2::med_int[lgth];
+      for(int i2=0;i2<lgth;i2++)
+	temp[i2]=(med_2_2::med_int) (familyArray[i2]);
+#endif
+      SCRUTE(numberOfTypes);
+
       for (int i=0; i<numberOfTypes; i++) {
 	int typeNumberOfElements = typeCount[i+1] - typeCount[i] ;
+	SCRUTE(typeNumberOfElements);
+	SCRUTE(typeCount[i+1]);
+	SCRUTE(typeCount[i]);
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
+			(temp+(typeCount[i]-1)), typeNumberOfElements,
+// 			(med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
+			(med_2_2::med_entite_maillage) MED_CELL,
+			(med_2_2::med_geometrie_element) types[i]); 
+#else
+	MESSAGE("On est bien la !!! entity = " << entity << " type " << types[i]);
 
 	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-			familyArray+typeCount[i]-1, typeNumberOfElements,
-			(med_2_2::med_entite_maillage) entity,
+			(familyArray+(typeCount[i]-1)), typeNumberOfElements,
+// 			(med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
+			(med_2_2::med_entite_maillage) MED_CELL,
 			(med_2_2::med_geometrie_element) types[i]); 
 #endif
 	if ( err != MED_VALID) 
@@ -2910,13 +2942,12 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 				       << "| faces of geometric type |" << geoNames[types[i]] <<"|in mesh |"      
 				       << _ptrMesh->_name.c_str() << "|" ));   
       }
-//CCRT there was "temp" for OSF and "familyArray" for Linux ...
+//CCRT there was "temp" and "familyArray" for OSF, but only "familyArray" for Linux ...
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
       delete [] temp;
 //CCRT#endif
-#else
-      delete[] familyArray ;
 #endif
+      delete[] familyArray ;
       //if (true == ToDestroy) {
       //  int NumberOfFamilies = myFamilies->size();
       //    for (int i=0; i<NumberOfFamilies; i++)
@@ -2935,8 +2966,8 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       const medGeometryElement  * types = _ptrMesh->getTypes         (entity) ;
       
       int numberOfElements = _ptrMesh->getNumberOfElements(entity, MED_ALL_ELEMENTS) ;
-//CCRT      int * familyArray = new int[numberOfElements] ;
-      med_2_2::med_int * familyArray = new med_2_2::med_int[numberOfElements] ;
+      int * familyArray = new int[numberOfElements] ;
+      //      med_2_2::med_int * familyArray = new int[numberOfElements] ;
       for (int i=0;i<numberOfElements;i++)
 	familyArray[i]=0;
 
@@ -2971,31 +3002,48 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 	}
       }
 
+
+      for (int i=0;i<numberOfElements;i++)
+	SCRUTE(familyArray[i]);
+
+
       const int * typeCount = _ptrMesh->getGlobalNumberingIndex(entity) ;
 //CCRT : clutter :
-//CCRT#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
-//CCRT	int lgth=numberOfElements;
-//CCRT	med_2_2::med_int *temp=new med_2_2::med_int[lgth];
-//CCRT	for(int i2=0;i2<lgth;i2++)
-//CCRT	  temp[i2]=(med_2_2::med_int) (familyArray[i2]);
-//CCRT#endif
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+      int lgth=numberOfElements;
+      med_2_2::med_int *temp=new med_2_2::med_int[lgth];
+      for(int i2=0;i2<lgth;i2++)
+	temp[i2]=(med_2_2::med_int) (familyArray[i2]);
+#endif
+      SCRUTE(numberOfTypes);
+
       for (int i=0; i<numberOfTypes; i++) {
 	int typeNumberOfElements = typeCount[i+1] - typeCount[i] ;
-
+	SCRUTE(typeNumberOfElements);
+	SCRUTE(typeCount[i+1]);
+	SCRUTE(typeCount[i]);
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
 	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-			familyArray+typeCount[i]-1, typeNumberOfElements,
-			(med_2_2::med_entite_maillage) entity,
+			(temp+(typeCount[i]-1)), typeNumberOfElements,
+// 			(med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
+			(med_2_2::med_entite_maillage) MED_CELL,
 			(med_2_2::med_geometrie_element) types[i]); 
-
+#else
+	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
+			(familyArray+(typeCount[i]-1)), typeNumberOfElements,
+// 			(med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
+			(med_2_2::med_entite_maillage) MED_CELL,
+			(med_2_2::med_geometrie_element) types[i]); 
+#endif
 	if ( err != MED_VALID) 
 	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write family for the |"<< _ptrMesh->getNumberOfElements(entity, types[i])
 				       << "| edges of geometric type |" << geoNames[types[i]] <<"|in mesh |"      
 				       << _ptrMesh->_name.c_str() << "|" ));   
       }
-//CCRT : clutter :
-//CCRT#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
-//CCRT      delete [] temp;
-//CCRT#endif
+
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+      delete [] temp;
+#endif
       delete[] familyArray ;
       //if (true == ToDestroy) {
       //  int NumberOfFamilies = myFamilies->size();
@@ -3068,6 +3116,13 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
     err = med_2_2::_MEDdatagroupOuvrir(_medIdt,const_cast <char *> (dataGroupFam.c_str()) ) ;
     if ( err < MED_VALID ) {
       SCRUTE(err);
+      if ( families[i]->getName().size() > MED_TAILLE_NOM )
+	throw MEDEXCEPTION
+          ( LOCALIZED(STRING(LOC) << "The size of the name of the family |" << i+1
+                      << "| |" << families[i]->getName()
+                      << "| with identifier |" << families[i]->getIdentifier()  << "| is |" 
+                      <<  families[i]->getName().size()  <<"| and is more than |"
+                      << MED_TAILLE_NOM << "|")) ;
 
       MESSAGE(LOC<<"families[i]->getName().c_str() : "<<families[i]->getName().c_str());
       MESSAGE(LOC<<"_meshName.c_str() : "<<_meshName.c_str());

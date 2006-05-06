@@ -331,6 +331,8 @@ void MED::read  (int index/*=0*/)
   const char * LOC = "MED::read (int index=0): ";
   BEGIN_OF(LOC);
   
+  SCRUTE(index);
+
   if (_drivers[index]) {
     // open and close are made by all objects !
     SCRUTE(index);

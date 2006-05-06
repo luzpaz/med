@@ -30,6 +30,7 @@ RESOURCES_FILES = \
 MEDCatalog.xml \
 MED_en.xml \
 MED.config \
+SalomeApp.xml \
 Data.png \
 Infos.png \
 Structure.png \
@@ -65,6 +66,13 @@ elle_3D_HPr_10x10x10_2.med \
 elle_3D_HPr_2x2x2_2.med \
 elle_3D_HPr_4x4x4_2.med \
 test_2D.med \
+maill.00.med \
+maill.00_nofield.med \
+maill.00_nomesh.med \
+maill.00_without_seg2.med \
+zzzz121b_without_tr6.med \
+geomMesh21.med \
+geomMesh22.med \
 Darcy3_3D_H_10x10x10.sauve \
 dx200_dy1_avec_2couches.sauve \
 elle_2D_QT_10x10.sauve \
@@ -112,8 +120,8 @@ titi.xyz
 BIN_SCRIPT= \
 VERSION
 
-LDFLAGS= -L$(top_builddir)/lib/salome 
-LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
+LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
+LDFLAGSFORBIN= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
 # copy header files in common directory
 include_list=include/salome/SALOMEconfig.h
