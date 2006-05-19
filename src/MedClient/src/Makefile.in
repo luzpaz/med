@@ -65,7 +65,8 @@ endif
 SWIG_DEP = libMEDMEM_Swig.i libMedCorba_Swig.i
 
 EXPORT_PYSCRIPTS = libMEDClient.py \
-		   medClient_test.py
+		   medClient_test.py \
+		   testMeshAlliances.py
 
 # Libraries targets
 

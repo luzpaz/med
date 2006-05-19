@@ -131,6 +131,80 @@ meshNameFiles.append("elle_3D_HPr_2x2x2")
 files.append("elle_3D_HPr_4x4x4_2.med")
 meshNameFiles.append("elle_3D_HPr_4x4x4")
 
+
+
+files.append("ChampsDarcy.med")
+meshNameFiles.append("2D_I129")
+
+files.append("darcy_1.1_res.med")
+meshNameFiles.append("mail_test1-1-tri")
+
+files.append("darcy_1.3_resCASTEM.med")
+meshNameFiles.append("mail_ktest1-3-tetra")
+
+files.append("darcy_1.3_resPORFLOW.med")
+meshNameFiles.append("mail_ktest1-3-hexa")
+
+files.append("darcy_1.3_resTRACES.med")
+meshNameFiles.append("mail_ktest1-3-tetra")
+
+files.append("darcy2_Castem_EFMH.med")
+meshNameFiles.append("mail_test1-2-tri")
+
+files.append("darcy2_Castem_qua_EFMH.med")
+meshNameFiles.append("mail_test1-2-qua")
+
+files.append("darcy2_Castem_qua_VF.med")
+meshNameFiles.append("mail_test1-2-qua")
+
+files.append("Deff_fdt_5.8_castem_efmh_diff_conc_dom.med")
+meshNameFiles.append("maillage_deffec_fdt")
+
+files.append("Deff_fdt_5.8_castem_vf_diff_conc_dom.med")
+meshNameFiles.append("maillage_deffec_fdt")
+
+files.append("extendedtransport53_triangles.med")
+meshNameFiles.append("TestA3_2094_0.1_rsurf_tri")
+
+files.append("H_CastCast_EFMH_I129_COUPLEX1.med")
+meshNameFiles.append("COUPLEX1")
+
+files.append("H_CastCast_VF_I129_COUPLEX1.med")
+meshNameFiles.append("COUPLEX1")
+
+files.append("H_CastCast_VF_Se79_COUPLEX1.med")
+meshNameFiles.append("COUPLEX1")
+
+files.append("H_CastPorf_I129_COUPLEX1.med")
+meshNameFiles.append("COUPLEX1")
+
+files.append("H_CastPorf_Se79_COUPLEX1.med")
+meshNameFiles.append("COUPLEX1")
+
+files.append("H_PorfCast_EFMH_I129_COUPLEX1.med")
+meshNameFiles.append("COUPLEX1")
+
+files.append("H_PorfCast_EFMH_Se79_COUPLEX1.med")
+meshNameFiles.append("COUPLEX1")
+
+files.append("H_PorfPorf_I129_COUPLEX1.med")
+meshNameFiles.append("COUPLEX1")
+
+files.append("H_Traces_I129_COUPLEX1.med")
+meshNameFiles.append("COUPLEX1")
+
+files.append("H_Traces_Se79_COUPLEX1.med")
+meshNameFiles.append("COUPLEX1")
+
+files.append("maillage_5_5_5.med")
+meshNameFiles.append("maillage_5_5_5")
+
+files.append("maillage_chemvalIV_cas1_40elts.med")
+meshNameFiles.append("maillage_chemvalIV_cas1_40elts")
+
+
+
+
 #
 # Castem or Gibi file list
 #
@@ -250,6 +324,9 @@ for i in range(nbOfFiles):
 # Loop on all files
 #
 ###################################################################################
+
+print " This test is running on ",nbOfFiles," files"
+print ""
 
 for i in range(nbOfFiles):
     file = files[i]

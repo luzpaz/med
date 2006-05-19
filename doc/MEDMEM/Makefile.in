@@ -104,11 +104,8 @@ MedMemory_devel_2on1.pdf:
 
 # User Guide
 
-MEDMEM_UsersGuide.ps: MEDMEM_UsersGuide.dvi
-	dvips -o MEDMEM_UsersGuide.ps MEDMEM_UsersGuide.dvi
-
-MEDMEM_UsersGuide.pdf: MEDMEM_UsersGuide.ps
-	ps2pdf MEDMEM_UsersGuide.ps MEDMEM_UsersGuide.pdf
+MEDMEM_UsersGuide.ps: MEDMEM_UsersGuide.pdf
+	pdf2ps MEDMEM_UsersGuide.pdf MEDMEM_UsersGuide.ps 
 
 MEDMEM_UsersGuide_2on1.ps: MEDMEM_UsersGuide.ps
 	psnup -2 MEDMEM_UsersGuide.ps >MEDMEM_UsersGuide_2on1.ps
@@ -116,17 +113,13 @@ MEDMEM_UsersGuide_2on1.ps: MEDMEM_UsersGuide.ps
 MEDMEM_UsersGuide_2on1.pdf: MEDMEM_UsersGuide_2on1.ps
 	ps2pdf MEDMEM_UsersGuide_2on1.ps MEDMEM_UsersGuide_2on1.pdf
 
-
-MEDMEM_UML.eps:MEDMEM_UML.dia
-	dia -e $@ $<
-
-MEDMEM_UsersGuide.dvi: MEDMEM_UsersGuide.tex MEDMEM_UML.eps
-	echo "Running latex..."
-	latex $<
+MEDMEM_UsersGuide.pdf: MEDMEM_UsersGuide.tex MEDMEM_Content.tex MEDMEM_UML_light.png MEDMEM_UML.png
+	echo "Running pdflatex..."
+	pdflatex $<
 	#echo "Running makeindex..."
 	#makeindex MEDMEM_UsersGuide.idx
 	echo "Rerunning latex...."
-	latex $<
+	pdflatex $<
 	latex_count=5
 	while egrep -s 'Rerun (LaTeX|to get cross-references right)' MEDMEM_UsersGuide.log && [ $latex_count -gt 0 ] ;\
 	    do \
@@ -137,6 +130,15 @@ MEDMEM_UsersGuide.dvi: MEDMEM_UsersGuide.tex MEDMEM_UML.eps
 
 MEDMEM_UsersGuide.tex:MEDMEM_UsersGuide.tex.in
 	cd $(top_builddir) && CONFIG_FILES=./doc/MEDMEM/MEDMEM_UsersGuide.tex ./config.status
+
+MEDMEM_Content.tex:MEDMEM_Content.tex.in
+	cd $(top_builddir) && CONFIG_FILES=./doc/MEDMEM/MEDMEM_Content.tex ./config.status 
+
+MEDMEM_UML_light.png:MEDMEM_UML_light.png.in
+	cd $(top_builddir) && CONFIG_FILES=./doc/MEDMEM/MEDMEM_UML_light.png ./config.status 
+
+MEDMEM_UML.png:MEDMEM_UML.png.in
+	cd $(top_builddir) && CONFIG_FILES=./doc/MEDMEM/MEDMEM_UML.png ./config.status 
 
 # install procedure
 
