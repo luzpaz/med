@@ -1161,12 +1161,18 @@ for i in range(nbOfFiles):
                         print "     Norme  2  : ", fielddouble.norm2()
                         print "     Norme Max : ", fielddouble.normMax()
                         fielddouble.getSupport().update()
-                        print "try sobolev",fielddouble.getSupport().getEntity()
-                        if fielddouble.getSupport().getEntity()!=MED_NODE:
-                            if (spaceDim == 3):
-                                fielddouble_vol=fielddouble.getSupport().getMesh().getVolume(fielddouble.getSupport())
-                            elif (spaceDim == 2):
+                        fieldEntity = fielddouble.getSupport().getEntity()
+                        print "try sobolev",fieldEntity
+                        if fieldEntity !=MED_NODE:
+                            if (fieldEntity == MED_CELL):
+                                if (spaceDim == 3):
+                                    fielddouble_vol=fielddouble.getSupport().getMesh().getVolume(fielddouble.getSupport())
+                                elif (spaceDim == 2):
+                                    fielddouble_vol=fielddouble.getSupport().getMesh().getArea(fielddouble.getSupport())
+                            elif (fieldEntity == MED_FACE):
                                 fielddouble_vol=fielddouble.getSupport().getMesh().getArea(fielddouble.getSupport())
+                            elif (fieldEntity == MED_EDGE):
+                                fielddouble_vol=fielddouble.getSupport().getMesh().getLength(fielddouble.getSupport())
                             print "Norme L1  : ", fielddouble.normL1()
                             print "Norme L2  : ", fielddouble.normL2()
                             print "Norme L2(vol) : ", fielddouble.normL2(fielddouble_vol)
