@@ -214,15 +214,18 @@ INSTALL_DATA=@INSTALL_DATA@
 # create a symbolic link (or a copie ?)
 LN_S=@LN_S@
 
-KERNEL_ROOT_DIR=@KERNEL_ROOT_DIR@
-KERNEL_SITE_DIR=@KERNEL_SITE_DIR@
+ifeq ($(MED_WITH_KERNEL),yes)
 
-KERNEL_LDFLAGS=@KERNEL_LDFLAGS@
-KERNEL_CXXFLAGS=@KERNEL_CXXFLAGS@
+    KERNEL_ROOT_DIR=@KERNEL_ROOT_DIR@
+    KERNEL_SITE_DIR=@KERNEL_SITE_DIR@
 
-GUI_ROOT_DIR=@GUI_ROOT_DIR@
-GUI_LDFLAGS=@GUI_LDFLAGS@
-GUI_CXXFLAGS=@GUI_CXXFLAGS@
+    KERNEL_LDFLAGS=@KERNEL_LDFLAGS@
+    KERNEL_CXXFLAGS=@KERNEL_CXXFLAGS@
+
+    GUI_ROOT_DIR=@GUI_ROOT_DIR@
+    GUI_LDFLAGS=@GUI_LDFLAGS@
+    GUI_CXXFLAGS=@GUI_CXXFLAGS@
+endif
 
 ## Installation points
 prefix=@prefix@
@@ -265,17 +268,22 @@ LOCAL_MAKE = make_commence make_conclude
 
 ifeq ($(MED_WITH_KERNEL),yes)
      LOCAL_MAKE += make_omniorb
-endif
 
-KERNEL_MAKE = make_module depend SALOMEconfig.h sstream
-
-ifeq ($(MED_WITH_KERNEL),yes)
+     KERNEL_MAKE = make_module depend SALOMEconfig.h sstream
      KERNEL_MAKE += F77config.h envScript
+
+     NOKERNEL_MAKE = 
+else
+     KERNEL_MAKE = 
+
+     NOKERNEL_MAKE = make_module depend SALOMEconfig.h sstream
+
 endif
 
 $(top_builddir)/config.status: $(top_srcdir)/configure \
 			       $(LOCAL_MAKE:%=$(top_srcdir)/adm_local/unix/%.in) \
-			       $(KERNEL_MAKE:%=$(KERNEL_ROOT_DIR)/salome_adm/unix/%.in)
+			       $(KERNEL_MAKE:%=$(KERNEL_ROOT_DIR)/salome_adm/unix/%.in) \
+			       $(NOKERNEL_MAKE:%=$(top_srcdir)/adm_local_without_kernel/unix/%.in)
 	cd $(top_builddir) ; ./config.status --recheck
 
 # VPATH contain $(srcdir), so make configure is good in top_srcdir and we must add target configure otherwise :-)
@@ -290,12 +298,8 @@ $(top_srcdir)/configure.in: $(top_srcdir)/configure.in.base
 	cd $(top_srcdir) && ./build_configure
 
 
-# ACLOCAL_SRC = \
-# ac_cxx_depend_flag.m4 check_hdf5.m4      enable_pthreads.m4	\
-# ac_cxx_namespaces.m4  libtool.m4         python.m4		\
-# check_pthreads.m4     check_swig.m4 
-
 ifeq ($(MED_WITH_KERNEL),yes)
+
 ACLOCAL_SRC = \
 ac_cxx_bool.m4                    check_corba.m4                        \
 ac_cxx_depend_flag.m4             check_hdf5.m4      enable_pthreads.m4	\
@@ -304,7 +308,6 @@ ac_cxx_namespaces.m4              check_omniorb.m4   pyembed.m4		\
 ac_cxx_partial_specialization.m4  python.m4                             \
 ac_cxx_typename.m4                check_pthreads.m4  check_cas.m4	\
 ac_cc_warnings.m4                 check_swig.m4 
-endif
 
 ACLOCAL_GUI = \
 check_vtk.m4	                  check_opengl.m4    check_qt.m4        \
@@ -315,3 +318,4 @@ $(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=@KERNEL_ROOT_DIR@/salome_adm/unix/conf
 	cd $(top_srcdir) ; aclocal -I adm_local/unix/config_files -I @KERNEL_ROOT_DIR@/salome_adm/unix/config_files \
 	                                                               -I @GUI_ROOT_DIR@/adm_local/unix/config_files
 
+endif

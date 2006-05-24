@@ -34,6 +34,11 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 
 @COMMENCE@
 
-SUBDIRS = Base V2_1 V2_2 Factory
+# if without KERNEL, build only med 2.1 library
+ifeq ($(MED_WITH_KERNEL),yes)
+  SUBDIRS = Base V2_1 V2_2 Factory
+else
+  SUBDIRS = V2_1
+endif
 
 @MODULE@

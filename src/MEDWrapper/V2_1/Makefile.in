@@ -34,6 +34,11 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 
 @COMMENCE@
 
-SUBDIRS = Core Wrapper
+# if without KERNEL, build only med 2.1 library
+ifeq ($(MED_WITH_KERNEL),yes)
+  SUBDIRS = Core Wrapper
+else
+  SUBDIRS = Core
+endif
 
 @MODULE@
