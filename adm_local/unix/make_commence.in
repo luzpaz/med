@@ -266,6 +266,9 @@ Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in
 
 LOCAL_MAKE = make_commence make_conclude
 
+KERNEL_MAKE = 
+NOKERNEL_MAKE = 
+
 ifeq ($(MED_WITH_KERNEL),yes)
      LOCAL_MAKE += make_omniorb
 
