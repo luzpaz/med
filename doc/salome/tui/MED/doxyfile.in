@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = "SALOME - MED - v.version"
+PROJECT_NAME           = "SALOME - MED - v.@VERSION@"
 PROJECT_NUMBER         = 
 OUTPUT_DIRECTORY       = ../
 CREATE_SUBDIRS         = NO

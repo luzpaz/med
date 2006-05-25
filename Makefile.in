@@ -9,7 +9,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=.
 srcdir=@srcdir@
-VPATH=.:@srcdir@:@top_srcdir@/bin:@top_srcdir@/resources:./bin:@top_srcdir@/idl:${KERNEL_ROOT_DIR}/idl/salome
+VPATH=.:@srcdir@:@top_srcdir@/bin:./resources:@top_srcdir@/resources:./bin:@top_srcdir@/idl:${KERNEL_ROOT_DIR}/idl/salome
 
 
 @COMMENCE@
@@ -147,7 +147,8 @@ LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 LDFLAGSFORBIN= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
 # copy header files in common directory
-include_list=include/salome/SALOMEconfig.h
+include_list = include/salome/SALOMEconfig.h \
+               include/salome/MED_version.h
 
 ifeq ($(HAVE_SSTREAM),no)
   include_list+=include/salome/sstream
@@ -171,6 +172,9 @@ salome_adm/unix/SALOMEconfig.ref: salome_adm/unix/SALOMEconfig.h
 include/salome/sstream: salome_adm/unix/sstream
 	-$(RM) $@
 	$(LN_S) ../../$< $@
+
+include/salome/MED_version.h: MED_version.h
+	cp $< $@
 
 depend: depend_idl
 
