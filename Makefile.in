@@ -9,7 +9,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=.
 srcdir=@srcdir@
-VPATH=.:@srcdir@:@top_srcdir@/bin:./resources:@top_srcdir@/resources:./bin:@top_srcdir@/idl:${KERNEL_ROOT_DIR}/idl/salome
+VPATH=.:@srcdir@:@top_srcdir@/bin:./bin/salome:./resources:@top_srcdir@/resources:./bin:@top_srcdir@/idl:${KERNEL_ROOT_DIR}/idl/salome
 
 
 @COMMENCE@
@@ -156,6 +156,12 @@ endif
 
 inc: idl $(include_list)
 
+bin: bin/salome/VERSION
+
+bin/salome/VERSION : bin/VERSION
+	-$(RM) $@
+	$(LN_S) ../../$< $@
+
 include/salome/SALOMEconfig.h: salome_adm/unix/SALOMEconfig.ref
 	-$(RM) $@
 	$(LN_S) ../../$< $@
@@ -174,7 +180,8 @@ include/salome/sstream: salome_adm/unix/sstream
 	$(LN_S) ../../$< $@
 
 include/salome/MED_version.h: MED_version.h
-	cp $< $@
+	-$(RM) $@
+	$(LN_S) ../../$< $@
 
 depend: depend_idl
 
@@ -191,10 +198,10 @@ install-end:
 
 install-include: $(include_list)
 	$(INSTALL) -d  $(includedir)
-#	@for f in X $(include_list); do				\
-#	   if test $$f != X; then				\
-#	     (cp -p $$f $(includedir) || exit 1);		\
-#	   fi;							\
+	@for f in X $(include_list); do				\
+	   if test $$f != X; then				\
+	     (cp -p $$f $(includedir) || exit 1);		\
+	   fi;							\
 	done
 
 # install script in $(bindir) :
