@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 template<class T, class INTERLACING_TAG>
 FIELDClient<T,INTERLACING_TAG>::FIELDClient(typename FIELDI_TRAITS<T,INTERLACING_TAG>::SimpleFieldCorbaPtrType ptrCorba,MEDMEM::SUPPORT * S):_fieldPtr(FIELDI_TRAITS<T,INTERLACING_TAG>::SimpleFieldGlobalType::_duplicate(ptrCorba)),_refCounter(1)

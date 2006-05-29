@@ -1,3 +1,6 @@
+// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
 using namespace std;
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Field.hxx"
