@@ -15,26 +15,35 @@ SUBDIRS= tui
 
 @COMMENCE@
 
-docs:
+dev_docs:
 	@@SETX@; for d in $(SUBDIRS); do 	\
 	   (cd $$d && $(MAKE) $@) || exit 1; 	\
 	done; \
 
 clean:
 	@@SETX@; for d in $(SUBDIRS); do 	\
-	   (cd $$d && $(MAKE) $@) || exit 1; 	\
+	   if test -d $$d/MED; then		\
+	      (cd $$d && $(MAKE) $@) || exit 1;	\
+	   fi;                                  \
 	done
 
 distclean: clean
 	@@SETX@; for d in $(SUBDIRS); do 	\
-	   (cd $$d && $(MAKE) $@) || exit 1; 	\
+	   if test -d $$d/MED; then		\
+	      (cd $$d && $(MAKE) $@) || exit 1; \
+	   fi;                                  \
 	done
 
 install:
-	$(MAKE) docs
-	(cd tui && $(MAKE) install);
+	@@SETX@; for d in $(SUBDIRS); do 	\
+	   if test -d $$d/MED; then		\
+	      (cd $$d && $(MAKE) $@); 	        \
+	   fi;                                  \
+	done
 
 uninstall:
 	@@SETX@; for d in $(SUBDIRS); do 	\
-	   (cd $$d && $(MAKE) $@) || exit 1; 	\
+	   if test -d $$d/MED; then		\
+	      (cd $$d && $(MAKE) $@) || exit 1; \
+	   fi;                                  \
 	done; \
