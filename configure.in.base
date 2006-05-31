@@ -226,6 +226,26 @@ echo ---------------------------------------------
 echo "MED_WITH_KERNEL: ${MED_WITH_KERNEL}"
 echo ---------------------------------------------
 
+openpbs_ok=no
+echo
+echo ---------------------------------------------
+echo testing OpenPBS
+echo ---------------------------------------------
+echo
+
+CHECK_OPENPBS
+dnl openpbs_ok is set to yes by CHECK_OPENPBS
+
+echo
+echo ---------------------------------------------
+echo testing LSF
+echo ---------------------------------------------
+echo
+
+lsf_ok=no
+CHECK_LSF
+dnl lsf_ok is set to yes by CHECK_LSF
+
 if test "${MED_WITH_KERNEL}" = "yes"; then
 {
 	echo
@@ -251,38 +271,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	dnl
 
 	CHECK_SOCKETS
-
-	dnl
-	dnl ---------------------------------------------
-	dnl testing OpenPBS
-	dnl ---------------------------------------------
-	dnl
-
-	echo
-	echo ---------------------------------------------
-	echo testing OpenPBS
-	echo ---------------------------------------------
-	echo
-
-	openpbs_ok=no
-	CHECK_OPENPBS
-	dnl openpbs_ok is set to yes by CHECK_OPENPBS
-
-	dnl
-	dnl ---------------------------------------------
-	dnl testing LSF
-	dnl ---------------------------------------------
-	dnl
-
-	echo
-	echo ---------------------------------------------
-	echo testing LSF
-	echo ---------------------------------------------
-	echo
-
-	lsf_ok=no
-	CHECK_LSF
-	dnl lsf_ok is set to yes by CHECK_LSF
 
 	dnl
 	dnl ---------------------------------------------
