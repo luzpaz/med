@@ -2,7 +2,6 @@
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 // 
 #include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_CellModel.hxx"
 
 using namespace MEDMEM ;
 using namespace MED_EN ;
@@ -22,16 +21,15 @@ int main (int argc, char ** argv) {
 
   // we get all type for cell entity :
   int NumberOfTypes = myMesh.getNumberOfTypes(MED_CELL) ;
-  const CELLMODEL * Types = myMesh.getCellsTypes(MED_CELL) ;
-
   cout << "Show Connectivity (Nodal) :" << endl ;
-  // this example use access with a specified medGeometryElement through
-  // CELLMODEL class
+  // this example use access with a specified medGeometryElement array
+  const medGeometryElement * Types = myMesh.getTypes(MED_CELL);
+  string * cellTypeNames =  myMesh.getCellTypeNames(MED_CELL);
   for (int i=0; i<NumberOfTypes; i++) {
-    cout << "For type " << Types[i].getName() << " : " << endl ;
-    medGeometryElement myType = Types[i].getType() ;
+    cout << "For type " << cellTypeNames[i] << " : " << endl ;
+    medGeometryElement myType = Types[i] ;
     int NumberOfElements = myMesh.getNumberOfElements(MED_CELL,myType);
-    int NomberOfNodesPerCell = Types[i].getNumberOfNodes() ;
+    int NomberOfNodesPerCell = Types[i]%100 ;
     const int * Connectivity = 
       myMesh.getConnectivity(MED_FULL_INTERLACE,
 			     MED_NODAL,

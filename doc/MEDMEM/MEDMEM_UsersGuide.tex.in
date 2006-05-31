@@ -72,7 +72,7 @@
 % |___________________________________________________________________________|
 %
 \title{User's Guide Of Med Memory V 3.2}
-\author{Patrick Goldbronn \and Eric Fayolle \and Nadir Bouhamou \and Jerome Roy \and Nicolas Crouzet}
+\author{Patrick Goldbronn \and Eric Fayolle \and Nadir Bouhamou \and Jerome Roy \and Nicolas Crouzet \and Vincent Bergeaud}
 
 %  ___________________________________________________________________________
 % |                                                                           |
@@ -120,6 +120,10 @@
 
 \bibitem{RefManualMedFile}
 \newblock {Reference Manual for Med File~:} \\
+{\sc V. Lefebvre \and E. Fayolle} \\
+\newblock {Projet PAL: Définition du modèle d'échange de données MED V2.2}
+\newblock {\it Note technique EDF/SINETICS}
+\newblock {HI-26-03-012/A} \\
 \newblock {\verb+http://www-drn2.cea.fr/MED/MEDMEM/DOC/html/index.html+}
 
 \bibitem{RefManualMedMemory}

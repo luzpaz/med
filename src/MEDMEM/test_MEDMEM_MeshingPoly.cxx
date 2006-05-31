@@ -183,12 +183,14 @@ int main (int argc, char ** argv) {
   if(nbPts==7)
     {
       cout << "ALL TESTS OK !!!" << endl;
-      return 0;
     }
   else
     {
       cout << "TEST FAILS !!!" << endl;
       return -1;
     }
+  cout << "Writing test " << endl;
+  int idMed22 = myMeshing.addDriver(MED_DRIVER,"totoPoly_V22.med",myMeshing.getName());
+  myMeshing.write(idMed22);
 
 }

@@ -52,13 +52,12 @@ of very few classes:
 
 All these are detailed in the following sections. The C++ 
 formalism will be used for the description in these sections.
- Python syntax is very similar and is given in
- appendix \ref{app:python}.
+ Python syntax is very similar and is given in appendix \ref{sec:python}.
 
 \section{Naming conventions}
-The naming conventions are rather straightforward, but 
-the reader used to the MED-file semantics will find that
-there are a few noticeable differences.
+The naming conventions are rather straightforward, but the user used to the
+Med-File semantics may find that there are a few noticeable differences (see
+the following section).
 \begin{description}
 \item[cell] entity of dimension equal to the mesh dimension ($1$, $2$ or $3$).
 \item[component] in a field, represents a value that is available for each
@@ -101,14 +100,33 @@ default value).
 hexahedron, etc...).
 \end{description}
 
+\section{Limitations and advantages regarding Med-File}
+The Med Memory may only read meshes defined by their nodale connectivities.
+Following this assumption, in Med File framework all elements defined
+in the mesh should be stored as a {\bf MED\_MAILLE}.
+
+The Med Memory is able to read meshes defined by their nodale connectivities,
+and where somme geometric faces are stored as a {\bf MED\_FACE} or a
+{\bf MED\_ARETE} Med files. Which is not really Med File compliant.
+
+{\bf MED\_MAILLE}, {\bf MED\_FACE} and {\bf MED\_ARETE} should be taken in the
+Med File sense. In future version, meshes defined by their descending
+connectivities could be treated.
+
+The field notion in Med File and Med Memory is quite different. In Med memory
+a field is of course its name, but as well its iteration number, its order
+number and finally its corresponding sot of values. But in Med File a field is
+only flagged by its name.
+
 \chapter{Med Memory API}\label{sec:objects}
 
 \section{Conventions}
 
 \begin{itemize}
-\item
-In this document, one refers to the main user documentation \cite{RefManualMedMemory}
-where the variable \verb+$MED_ROOT_DIR+ is the Med Memory directory installation.
+\item In this document, one refers to the main user documentation
+\cite{RefManualMedMemory} where the variable \verb+$MED_ROOT_DIR+ (resp.
+\verb+$MED_SRC_DIR+) is the Med Memory directory installation (resp. sources
+directory).
 
 \item All numberings start at one (take care of array index !).
 
@@ -138,46 +156,47 @@ programer.
 
 \section{Classes}
 At a basic usage level, the API consists in few classes which are located in
-the \verb+MEDMEM+ C++ namespace :
+the \verb+MEDMEM+ C++ namespace (consult figure \ref{fig:uml_light} which gives
+an UML diagram view of the main Med Memory classes~:
 \begin{description}
 \item[MED] the global container;
 \item[MESH] the class containing 2D or 3D mesh objects;
-\item[SUPPORT] the class containing descriptions of list of elements;
+\item[SUPPORT] the class containing mainly a list of mesh elements;
 \item[FIELD] the class template containing list of values lying on a
 particular support.
 \end{description}
-
-Figure \ref{fig:uml_light} gives a view of the UML diagram of the classes that
-are sufficient for most integrations in the Salome platform, couplings using
-the Med Memory libraries. With these classes, it is possible to :
-\begin{itemize}
-\item read/write meshes from MED-files;
-\item create fields containing scalar or vectorial values on list of elements
-of the mesh;
-\item communicate these fields between different components;
-\item read/write such fields.
-\end{itemize}
-
-Note on this figure that the MED container controls the life cycle of all the
-objects it contains : its destruction will destroy all the objects it
-aggregates. On the other hand, the life cycle of mesh, support and field
-objects are independent. Destroying a support will have no effect on the fields
-which refer to it.
-
 \begin{center}
 \begin{figure}
 \includegraphics[width=15cm]{MEDMEM_UML_light.png}
 \caption{UML diagram of basic Med Memory API classes.}\label{fig:uml_light}
 \end{figure}
 \end{center}
+The API of those classes is quite sufficient for most of the component
+integrations in the Salome platform. The use of the Med Memory libraries may
+make easier the code coupling in the Salome framework. With these classes, it
+is possible to~:
+\begin{itemize}
+\item read/write meshes and fields from MED-files;
+\item create fields containing scalar or vectorial values on list of elements
+of the mesh;
+\item communicate these fields between different components;
+\item read/write such fields.
+\end{itemize}
+Note that on the figure \ref{fig:uml_light} as well as \ref{fig:uml} that the
+MED container controls the life cycle of all the objects it contains~: its
+destructor will destroy all the objects it aggregates. On the other hand, the
+life cycle of mesh, support and field objects are independent. Destroying a
+support (resp. a mesh) will have no effect on the fields (resp. on the support)
+which refer to it. But the user has to maintain the link~: a mesh agregates a
+support which agregates a field. If the user has to delete Med Memory objects,
+the field has to be deleted first, then the support and finally the mesh.
 
 A more advanced usage of the Med Memory is possible through other classes.
 Figure \ref{fig:uml} gives a complete view of the Med Memory API. It includes :
 \begin{description}
 \item[GROUP] a class inherited from the SUPPORT class used to create supports
-linked to mesh groups (restricted list of elements used for setting boundary
-conditions, initial values or transferring data from one component to the
-other);
+linked to mesh groups. It stores restricted list of elements used to set
+boundary conditions, initial values.
 \item[FAMILY] which is used to manipulate a certain kind of support and does
 not intersect each other;
 \item[MESHING] which builds meshes from scratch, it can be used to transform
@@ -187,20 +206,19 @@ mesh);
 \item[Driver classes] which enable the user to get a fine control of the I/O
 operations.
 \end{description}
-
 \begin{center}
 \begin{figure}
 \includegraphics[width=15cm]{MEDMEM_UML.png}
 \caption{UML diagram of Med Memory API classes.}\label{fig:uml}
 \end{figure}
 \end{center}
-
 \section{Enums}
 A few enums are defined in the \verb+MED_EN+ namespace :
 \begin{itemize}
 \item The \verb+medGeometryElement+ enum which defines geometry types. The
-available types are	 linear and quadratic elements (c.f. [DR??]). The
-entries of the enum are quite self-explanatory :
+available types are linear and quadratic elements (consult
+\cite{RefManualMedMemory}). The entries of the enum are quite
+self-explanatory~:
 \begin{itemize}
 \item \verb+MED_NONE+
 \item \verb+MED_POINT1+
@@ -277,6 +295,14 @@ should never delete it.
 One can add as well some MESH or FIELD object via the {\method{addMesh}} and
 the {\method{addField}} respectively.
 
+To write a complete MED object in an available writing format, on may use
+{\method{addDriver}} and then {\method{write}}.
+
+For an example using these methods, one may see the Python scripts in the
+directory \verb+$MED_ROOT_DIR/bin/salome/+,\verb+testMedObj.py+, or C++
+example program in the directory \verb+$MED_SRC_DIR/src/MEDMEM+,
+\verb+duplicateMED.cxx+.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{How to use MESH object}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -292,9 +318,11 @@ We could get some general information about a MESH object such as~:
 \item the space dimension (\method{getSpaceDimension}) 
 \item the mesh dimension (\method{getMeshDimension}) 
 \end{itemize}
-\fileCxx{MESHgeneral.cxx}
 
-\filePython{MESHgeneral.py}
+Here is a small C++ example program which the Python version may be found in
+\ref{MESHgeneral.py}.
+
+\fileCxx{MESHgeneral.cxx}
 
 \section{Information about nodes}
 
@@ -321,9 +349,11 @@ an array where values are ordered like (\verb+X1,Y1,Z1, X2,Y2,Z2, ...+).
 \item I want to get one particular value of coordinate~: use \method{getCoordinate}
 which returns the value of \( i^{th} \) node and \( j^{th} \) axis.
 \end{enumerate}
-\fileCxx{MESHcoordinates.cxx}
 
-\filePython{MESHcoordinates.py}
+Here is a small C++ example program which the Python version may be found in
+\ref{MESHcoordinates.py}.
+
+\fileCxx{MESHcoordinates.cxx}
 
 \section{Information about cells}
 
@@ -429,102 +459,25 @@ To get nodal connectivity of polyhedral elements, it is necessary use together
 and \method{getPolyhedronIndex} (see example \myref{MESHconnectivities.cxx}).
 
 \end{enumerate}
+
+Here is a small C++ example program which the Python version may be found in
+\ref{MESHconnectivities.py}.
+
 \fileCxx{MESHconnectivities.cxx}
 
-\filePython{MESHconnectivities.py}
+\section{Information about FAMILY and GROUP}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{How to use MESHING object}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-This class is a derivated class of MESH class to build a MESH object from 
-scratch (use of set methods).
-
-All verifications are under user responsability : If arrays values or arrays 
-dimensions are wrongs, results are impredicable.
-
-All arrays in arguments in set methods are duplicated in MESHING object.
-
-\section{Build a MESHING}
-
-\label{BuildMeshing}
-
-\subsection{Coordinates}
-
-First we must defined points coordinates of the mesh. We use 
-\method{setCoordinates}.
-
-\textbf{C++ Example~:}
-\begin{verbatim}
-MESHING myMeshing ;
-const int SpaceDimension=2;
-const int NumberOfNodes=6;
-int * Coordinates = new int[SpaceDimension*NumberOfNodes] ;
-string System="CARTESIAN";
-medModeSwitch MED_FULL_INTERLACE ;
-myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,System,Mode);
-\end{verbatim}
-
-Then you could set the coordinates names and units (with 
-\method{setCoordinatesNames} and \method{setCoordinatesUnits}).
-
-\subsection{Connectivities}
-
-When coordinates are defined, we could defined connectivities.
-
-First we must defined connectivity of MED\_CELL elements. 
-After, we could defined constituent connectivity if necesary 
-(MED\_FACE and/or MED\_EDGE).
-
-For each connectivities, you could use some methods in the following order :
-\begin{itemize}
-\item \method{setNumberOfTypes} to set the number of differents geometrics 
-types (3 for example). This method allocates all arrays which size is this 
-number ;
-\item \method{setTypes} to set the differents geometrics types 
-({MED\_TETRA4,MED\_PYRA5,MED\_HEXA8} for example). Types should be given 
-in increasing order of number of nodes for this type ;
-\item \method{setNumberOfElements} to set the number of elements for 
-each geometric type. This method allocates connectivities array ;
-\item \method{setConnectivity} to set the connectivity in MED\_FULL\_INTERLACE
-mode for each geometric type (use \method{setPolygonsConnectivity} and
-\method{setPolyhedraConnectivity} for poly elements);
-\end{itemize}
-
-\textbf{C++ Example~:}
-\begin{verbatim}
-MESHING myMeshing ;
-myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,System,Mode);
-
-myMeshing.setNumberOfTypes(2,MED_CELL);
-myMeshing.setTypes({MED_TRIA3,MED_QUAD4},MED_CELL);
-myMeshing.setNumberOfElements({3,2},MED_CELL); // 3 MED_TRIA3 and 2 MED_QUAD4
-myMeshing.setConnectivity({1,2,3,6,8,9,4,5,6},MED_CELL,MED_TRIA3);
-myMeshing.setConnectivity({1,3,4,5,4,5,7,8},MED_CELL,MED_QUAD4);
-\end{verbatim}
+If one wants to get from a MESH object
 
 
-\section{Defined a GROUP object}
 
-To add a group in a MESHING object, use \method{addGroup}.
 
-This method duplicate the GROUP object in the MESH object.
+To write a complete MESH object in an available writing format, on may use
+{\method{addDriver}} and then {\method{write}}.
 
-To build this GROUP object, use SUPPORT methods \ref{CreateSupport} to set all attributes.
-
-\subsection{WARNING}
-
-For instance, translation from GROUP objects to FAMILY objects are not completed !
-
-You MUST set GROUP objects as if they are FAMILY objects.
-
-This feature will be fully implemented in next release of med memory. 
-
-\section{Example}
-
-\fileCxx{MESHINGexample.cxx}
-
-%\filePython{MESHINGexample.py}
+For an example using these methods, one may see the Python scripts in the
+directory \verb+$MED_ROOT_DIR/bin/salome/+,\verb+med_test1.py+, or C++ example
+program in the directory \verb+$MED_SRC_DIR/src/MEDMEM+, \verb+med_test.cxx+.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{How to use SUPPORT object}
@@ -665,9 +618,10 @@ interlace).
 \item Third return the $j^{th}$ component of $i^{th}$ element.
 \end{itemize}
 
-\fileCxx{FIELDgeneral.cxx}
+Here is a small C++ example program which the Python version may be found in
+\ref{FIELDgeneral.py}.
 
-\filePython{FIELDgeneral.py}
+\fileCxx{FIELDgeneral.cxx}
 
 \section{Create a Field}
 
@@ -687,9 +641,102 @@ You \textbf{SHOULD} also set unit of your components with \method{setMEDComponen
 
 To set value, use \method{setValueIJ} to put new value of field.
 
+Here is a small C++ example program which the Python version may be found in
+\ref{FIELDcreate.py}.
+
 \fileCxx{FIELDcreate.cxx}
 
-\filePython{FIELDcreate.py}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{How to use MESHING object}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This class is a derivated class of MESH class to build a MESH object from 
+scratch (use of set methods).
+
+All verifications are under user responsability : If arrays values or arrays 
+dimensions are wrongs, results are impredicable.
+
+All arrays in arguments in set methods are duplicated in MESHING object.
+
+\section{Build a MESHING}
+
+\label{BuildMeshing}
+
+\subsection{Coordinates}
+
+First we must defined points coordinates of the mesh. We use 
+\method{setCoordinates}.
+
+\textbf{C++ Example~:}
+\begin{verbatim}
+MESHING myMeshing ;
+const int SpaceDimension=2;
+const int NumberOfNodes=6;
+int * Coordinates = new int[SpaceDimension*NumberOfNodes] ;
+string System="CARTESIAN";
+medModeSwitch MED_FULL_INTERLACE ;
+myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,System,Mode);
+\end{verbatim}
+
+Then you could set the coordinates names and units (with 
+\method{setCoordinatesNames} and \method{setCoordinatesUnits}).
+
+\subsection{Connectivities}
+
+When coordinates are defined, we could defined connectivities.
+
+First we must defined connectivity of MED\_CELL elements. 
+After, we could defined constituent connectivity if necesary 
+(MED\_FACE and/or MED\_EDGE).
+
+For each connectivities, you could use some methods in the following order :
+\begin{itemize}
+\item \method{setNumberOfTypes} to set the number of differents geometrics 
+types (3 for example). This method allocates all arrays which size is this 
+number ;
+\item \method{setTypes} to set the differents geometrics types 
+({MED\_TETRA4,MED\_PYRA5,MED\_HEXA8} for example). Types should be given 
+in increasing order of number of nodes for this type ;
+\item \method{setNumberOfElements} to set the number of elements for 
+each geometric type. This method allocates connectivities array ;
+\item \method{setConnectivity} to set the connectivity in MED\_FULL\_INTERLACE
+mode for each geometric type (use \method{setPolygonsConnectivity} and
+\method{setPolyhedraConnectivity} for poly elements);
+\end{itemize}
+
+\textbf{C++ Example~:}
+\begin{verbatim}
+MESHING myMeshing ;
+myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,System,Mode);
+
+myMeshing.setNumberOfTypes(2,MED_CELL);
+myMeshing.setTypes({MED_TRIA3,MED_QUAD4},MED_CELL);
+myMeshing.setNumberOfElements({3,2},MED_CELL); // 3 MED_TRIA3 and 2 MED_QUAD4
+myMeshing.setConnectivity({1,2,3,6,8,9,4,5,6},MED_CELL,MED_TRIA3);
+myMeshing.setConnectivity({1,3,4,5,4,5,7,8},MED_CELL,MED_QUAD4);
+\end{verbatim}
+
+
+\section{Defined a GROUP object}
+
+To add a group in a MESHING object, use \method{addGroup}.
+
+This method duplicate the GROUP object in the MESH object.
+
+To build this GROUP object, use SUPPORT methods \ref{CreateSupport} to set all attributes.
+
+\subsection{WARNING}
+
+For instance, translation from GROUP objects to FAMILY objects are not completed !
+
+You MUST set GROUP objects as if they are FAMILY objects.
+
+This feature will be fully implemented in next release of med memory. 
+
+Here is a small C++ example program which the Python version may be found in
+\ref{MESHINGexample.py}.
+
+\fileCxx{MESHINGexample.cxx}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Using drivers}
@@ -731,9 +778,10 @@ rem 2 : Since the driver has read the object, the associated file
 is closed. You can reread the object with the default driver by calling
 the read() method : myObject.read().
 
-\fileCxx{MEDMEM_InvokingDriverAtObjectCreationTime.cxx}
+Here is a small C++ example program which the Python version may be found in
+\ref{MEDMEM_InvokingDriverAtObjectCreationTime.py}.
 
-\filePython{MEDMEM_InvokingDriverAtObjectCreationTime.py}
+\fileCxx{MEDMEM_InvokingDriverAtObjectCreationTime.cxx}
 
 \subsection{Invoking a driver from the standard driver method of an object\label{sec:invoking_a_driver_from_the_std_drv_method}}
 
@@ -755,9 +803,10 @@ write() methods.
 rem 2 : If you use more than a driver you need to keep the driver
 handlers (myDriverI ).
 
-\fileCxx{MEDMEM_InvokingDriverFromStandardObjectMethod.cxx}
+Here is a small C++ example program which the Python version may be found in
+\ref{MEDMEM_InvokingDriverFromStandardObjectMethod.py}.
 
-\filePython{MEDMEM_InvokingDriverFromStandardObjectMethod.py}
+\fileCxx{MEDMEM_InvokingDriverFromStandardObjectMethod.cxx}
 
 \subsection{Invoking a driver and attaching it to an existing object}
 
@@ -776,9 +825,10 @@ Don't forget to close the file with myRdOnlyDriver->close().
 ToDo : By now when you create such specific drivers, the object doesn't
 know anything about it. 
 
-\fileCxx{MEDMEM_InvokingDriverByAttachingItToAnObject.cxx}
+Here is a small C++ example program which the Python version may be found in
+\ref{MEDMEM_InvokingDriverByAttachingItToAnObject.py}.
 
-\filePython{MEDMEM_InvokingDriverByAttachingItToAnObject.py}
+\fileCxx{MEDMEM_InvokingDriverByAttachingItToAnObject.cxx}
 
 \section{Using the MED driver}
 
@@ -867,3 +917,43 @@ myGibiMeshDriver.open() ;
 myGibiMeshDriver.read() ;
 myGibiMeshDriver.close() ;
 \end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Appendix: Python example scripts.}\label{sec:python}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Full Python example for \ref{MESHgeneral.cxx}~:}
+\label{MESHgeneral.py}
+\verbatiminput{@srcdir@/MESHgeneral.py}
+
+\section{Full Python example for \ref{MESHcoordinates.cxx}~:}
+\label{MESHcoordinates.py}
+\verbatiminput{@srcdir@/MESHcoordinates.py}
+
+\section{Full Python example for \ref{MESHconnectivities.cxx}~:}
+\label{MESHconnectivities.py}
+\verbatiminput{@srcdir@/MESHconnectivities.py}
+
+\section{Full Python example for \ref{FIELDgeneral.cxx}~:}
+\label{FIELDgeneral.py}
+\verbatiminput{@srcdir@/FIELDgeneral.py}
+
+\section{Full Python example for \ref{FIELDcreate.cxx}~:}
+\label{FIELDcreate.py}
+\verbatiminput{@srcdir@/FIELDcreate.py}
+
+\section{Full Python example for \ref{MESHINGexample.cxx}~:}
+\label{MESHINGexample.py}
+\verbatiminput{@srcdir@/MESHINGexample.py}
+
+\section{Full Python example for \ref{MEDMEM_InvokingDriverAtObjectCreationTime.cxx}~:}
+\label{MEDMEM_InvokingDriverAtObjectCreationTime.py}
+\verbatiminput{@srcdir@/MEDMEM_InvokingDriverAtObjectCreationTime.py}
+
+\section{Full Python example for \ref{MEDMEM_InvokingDriverFromStandardObjectMethod.cxx}~:}
+\label{MEDMEM_InvokingDriverFromStandardObjectMethod.py}
+\verbatiminput{@srcdir@/MEDMEM_InvokingDriverFromStandardObjectMethod.py}
+
+\section{Full Python example for \ref{MEDMEM_InvokingDriverByAttachingItToAnObject.cxx}~:}
+\label{MEDMEM_InvokingDriverByAttachingItToAnObject.py}
+\verbatiminput{@srcdir@/MEDMEM_InvokingDriverByAttachingItToAnObject.py}

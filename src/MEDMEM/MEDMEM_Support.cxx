@@ -242,6 +242,10 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
   if (_isOnAllElts) return number;
 
   int nbOfEltsThis    = getNumberOfElements(MED_ALL_ELEMENTS);
+  int nbOfEltsThisVerif    = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
+
+  if (nbOfEltsThis == nbOfEltsThisVerif) return number;
+
   const int *eltsThis = _number->getValue();
 
   int iThis;

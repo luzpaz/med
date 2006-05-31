@@ -1115,7 +1115,7 @@ public :
 
   int getNumberOfTypesWithPoly(medEntityMesh Entity);
 
-  int getNumberOfPolygons();
+  int getNumberOfPolygons(medEntityMesh Entity=MED_ALL_ENTITIES);
 
   int getNumberOfPolyhedronFaces();
 

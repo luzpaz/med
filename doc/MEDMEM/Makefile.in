@@ -131,7 +131,7 @@ MEDMEM_UsersGuide_2on1.ps: MEDMEM_UsersGuide.ps
 MEDMEM_UsersGuide_2on1.pdf: MEDMEM_UsersGuide_2on1.ps
 	ps2pdf MEDMEM_UsersGuide_2on1.ps MEDMEM_UsersGuide_2on1.pdf
 
-MEDMEM_UsersGuide.pdf: MEDMEM_UsersGuide.tex MEDMEM_Content.tex MEDMEM_UML_light.png MEDMEM_UML.png
+MEDMEM_UsersGuide.pdf: MEDMEM_UsersGuide.tex MEDMEM_Content.tex MEDMEM_UML_light.png MEDMEM_UML.png FIELDcreate.cxx FIELDgeneral.cxx MEDMEM_InvokingDriverAtObjectCreationTime.cxx MEDMEM_InvokingDriverByAttachingItToAnObject.cxx MEDMEM_InvokingDriverFromStandardObjectMethod.cxx MEDMEM_MedAddingAnExistingObject.cxx MESHconnectivities.cxx MESHcoordinates.cxx MESHgeneral.cxx MESHINGexample.cxx FIELDcreate.py FIELDgeneral.py MEDMEM_InvokingDriverAtObjectCreationTime.py MEDMEM_InvokingDriverByAttachingItToAnObject.py MEDMEM_InvokingDriverFromStandardObjectMethod.py MESHconnectivities.py MESHcoordinates.py MESHgeneral.py MESHINGexample.py
 	echo "Running pdflatex..."
 	pdflatex $<
 	#echo "Running makeindex..."

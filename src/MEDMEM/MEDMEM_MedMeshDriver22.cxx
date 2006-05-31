@@ -2464,7 +2464,7 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
       err = MEDpolygoneConnEcr(_medIdt,
 			       const_cast <char *> (_meshName.c_str()),
 			       tmp_PolygonsConnectivityIndex,
-			       _ptrMesh->getNumberOfPolygons()+1,
+			       _ptrMesh->getNumberOfPolygons(entity)+1,
 			       tmp_PolygonsConnectivity,
 // 			       (med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
 			       (med_2_2::med_entite_maillage) MED_CELL,
@@ -2475,7 +2475,7 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
       err = MEDpolygoneConnEcr(_medIdt,
 			       const_cast <char *> (_meshName.c_str()),
 			       const_cast <med_int*> (_ptrMesh->getPolygonsConnectivityIndex(MED_NODAL,entity)),
-			       _ptrMesh->getNumberOfPolygons()+1,
+			       _ptrMesh->getNumberOfPolygons(entity)+1,
 			       const_cast <med_int*> (_ptrMesh->getPolygonsConnectivity(MED_NODAL,entity)),
 // 			       (med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
 			       (med_2_2::med_entite_maillage) MED_CELL,
@@ -2864,11 +2864,11 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
     // SOLUTION TEMPORAIRE CAR _ptrMesh->_MEDArray____Family DOIT ETRE ENLEVER DE LA CLASSE MESH
     if  ( ( _ptrMesh->existConnectivity(MED_NODAL,entity) )|( _ptrMesh->existConnectivity(MED_DESCENDING,entity) ) ) { 
 
-      int numberOfTypes           = _ptrMesh->getNumberOfTypes (entity) ;
-      const medGeometryElement  * types = _ptrMesh->getTypes         (entity) ;
+      int numberOfTypes           = _ptrMesh->getNumberOfTypesWithPoly(entity) ;
+      medGeometryElement  * types = _ptrMesh->getTypesWithPoly(entity) ;
       SCRUTE(numberOfTypes);
       
-      int numberOfElements = _ptrMesh->getNumberOfElements(entity, MED_ALL_ELEMENTS) ;
+      int numberOfElements = _ptrMesh->getNumberOfElementsWithPoly(entity, MED_ALL_ELEMENTS) ;
       int * familyArray = new int[numberOfElements] ;
       for (int i=0;i<numberOfElements;i++)
 	familyArray[i]=0;
@@ -2907,7 +2907,6 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       for (int i=0;i<numberOfElements;i++)
 	SCRUTE(familyArray[i]);
 
-      const int * typeCount = _ptrMesh->getGlobalNumberingIndex(entity) ;
 //CCRT Clutter
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
       int lgth=numberOfElements;
@@ -2916,15 +2915,14 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 	temp[i2]=(med_2_2::med_int) (familyArray[i2]);
 #endif
       SCRUTE(numberOfTypes);
-
+      int offset=0;
       for (int i=0; i<numberOfTypes; i++) {
-	int typeNumberOfElements = typeCount[i+1] - typeCount[i] ;
+	int typeNumberOfElements = _ptrMesh->getNumberOfElementsWithPoly(entity,types[i]) ;
 	SCRUTE(typeNumberOfElements);
-	SCRUTE(typeCount[i+1]);
-	SCRUTE(typeCount[i]);
+	SCRUTE(offset);
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
 	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-			(temp+(typeCount[i]-1)), typeNumberOfElements,
+			(temp+offset), typeNumberOfElements,
 // 			(med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
 			(med_2_2::med_entite_maillage) MED_CELL,
 			(med_2_2::med_geometrie_element) types[i]); 
@@ -2932,15 +2930,16 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 	MESSAGE("On est bien la !!! entity = " << entity << " type " << types[i]);
 
 	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-			(familyArray+(typeCount[i]-1)), typeNumberOfElements,
+			(familyArray+offset), typeNumberOfElements,
 // 			(med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
 			(med_2_2::med_entite_maillage) MED_CELL,
 			(med_2_2::med_geometrie_element) types[i]); 
 #endif
 	if ( err != MED_VALID) 
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write family for the |"<< _ptrMesh->getNumberOfElements(entity, types[i])
+	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write family for the |"<< _ptrMesh->getNumberOfElementsWithPoly(entity, types[i])
 				       << "| faces of geometric type |" << geoNames[types[i]] <<"|in mesh |"      
-				       << _ptrMesh->_name.c_str() << "|" ));   
+				       << _ptrMesh->_name.c_str() << "|" )); 
+	offset+=typeNumberOfElements;  
       }
 //CCRT there was "temp" and "familyArray" for OSF, but only "familyArray" for Linux ...
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
@@ -2948,6 +2947,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 //CCRT#endif
 #endif
       delete[] familyArray ;
+      delete[] types;
       //if (true == ToDestroy) {
       //  int NumberOfFamilies = myFamilies->size();
       //    for (int i=0; i<NumberOfFamilies; i++)
