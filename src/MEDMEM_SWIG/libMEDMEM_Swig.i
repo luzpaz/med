@@ -124,222 +124,6 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 %rename(assign) *::operator=;
 
 /*
-  typemap for vector<FAMILY *> C++ object
-*/
-
-%typemap(python,in) vector< FAMILY * >, const vector< FAMILY * >
-{
-  /* typemap in for vector<FAMILY *> */
-  /* Check if is a list */
-
-  if (PyList_Check($input)) {
-    int size = PyList_Size($input);
-    $1 = vector<FAMILY *>(size);
-
-    for (int i=0; i < size; i++)
-      {
-	PyObject * tmp = PyList_GetItem($input,i);
-	FAMILY * f;
-
-	int err = SWIG_ConvertPtr(tmp, (void **) &f, $descriptor(FAMILY *),
-				  SWIG_POINTER_EXCEPTION);
-
-	if (err == -1)
-	  {
-	    char * message = "Error in typemap(python,in) for vector<FAMILY *> each component should be a FAMILY pointer";
-	    PyErr_SetString(PyExc_RuntimeError, message);
-	    return NULL;
-	  }
-	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-	// $1[i] = f;
-	$1.at(i) = f;
-      }
-  }
-  else
-    {
-      PyErr_SetString(PyExc_TypeError,"not a list");
-      return NULL;
-    }
-}
-
-%typemap(python,out) vector< FAMILY * >
-{
-  /* typemap out for vector<FAMILY *> */
-  int size = $1.size();
-  $result = PyList_New(size);
-
-  for (int i=0;i<size;i++)
-    {
-      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FAMILY *),0);
-      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(FAMILY *),0);
-
-      PyList_SetItem($result,i,tmp);
-    }
-}
-
-/*
-  typemap for vector<SUPPORT *> C++ object
-*/
-
-%typemap(python,in) vector< SUPPORT * >, const vector< SUPPORT * >
-{
-  /* typemap in for vector<SUPPORT *> */
-  /* Check if is a list */
-
-  if (PyList_Check($input)) {
-    int size = PyList_Size($input);
-    $1 = vector<SUPPORT *>(size);
-
-    for (int i=0; i < size; i++)
-      {
-	PyObject * tmp = PyList_GetItem($input,i);
-	SUPPORT * s;
-
-	int err = SWIG_ConvertPtr(tmp, (void **) &s, $descriptor(SUPPORT *),
-				  SWIG_POINTER_EXCEPTION);
-
-	if (err == -1)
-	  {
-	    char * message = "Error in typemap(python,in) for vector<SUPPORT *> each component should be a SUPPORT pointer";
-	    PyErr_SetString(PyExc_RuntimeError, message);
-	    return NULL;
-	  }
-	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-	//$1[i] = s;
-	$1.at(i) = s;
-      }
-  }
-  else
-    {
-      PyErr_SetString(PyExc_TypeError,"not a list");
-      return NULL;
-    }
-}
-
-%typemap(python,out) vector< SUPPORT * >
-{
-  /* typemap out for vector<SUPPORT *> */
-  int size = $1.size();
-  $result = PyList_New(size);
-
-  for (int i=0;i<size;i++)
-    {
-      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(SUPPORT *),0);
-      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(SUPPORT *),0);
-
-      PyList_SetItem($result,i,tmp);
-    }
-}
-
-
-%typemap(python,in) vector< FIELD< double > * >, const vector< FIELD< double > * >
-{
-    /* typemap in for vector<FIELD<double> *> */
-  /* Check if is a list */
-
-  if (PyList_Check($input)) {
-    int size = PyList_Size($input);
-    $1.resize(size);
-
-    for (int i=0; i < size; i++)
-      {
-	PyObject * tmp = PyList_GetItem($input,i);
-	FIELD<double> * s;
-
-	int err = SWIG_ConvertPtr(tmp, (void **) &s, $descriptor(FIELD<double> *),
-				  SWIG_POINTER_EXCEPTION);
-
-	if (err == -1)
-	  {
-	    char * message = "Error in typemap(python,in) for vector<FIELD<double> *> each component should be a SUPPORT pointer";
-	    PyErr_SetString(PyExc_RuntimeError, message);
-	    return NULL;
-	  }
-
-	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-	//$1[i] = s;
-	$1.at(i) = s;
-      }
-  }
-  else
-    {
-      PyErr_SetString(PyExc_TypeError,"not a list");
-      return NULL;
-    }
-}
-
-%typemap(python,out) vector< FIELD< double > * >
-{
-  /* typemap out for vector<FIELD<double> *> */
-  int size = $1.size();
-  $result = PyList_New(size);
-
-  for (int i=0;i<size;i++)
-    {
-      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FIELD<double> *),0);
-      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(FIELD<double> *),0);
-
-      PyList_SetItem($result,i,tmp);
-    }
-}
-
-%typemap(python,in) vector< FIELD< int > * >, const vector< FIELD< int > * >
-{
-    /* typemap in for vector<FIELD<int> *> */
-  /* Check if is a list */
-
-  if (PyList_Check($input)) {
-    int size = PyList_Size($input);
-    $1.resize(size);
-
-    for (int i=0; i < size; i++)
-      {
-	PyObject * tmp = PyList_GetItem($input,i);
-	FIELD<int> * s;
-
-	int err = SWIG_ConvertPtr(tmp, (void **) &s, $descriptor(FIELD<int> *),
-				  SWIG_POINTER_EXCEPTION);
-
-	if (err == -1)
-	  {
-	    char * message = "Error in typemap(python,in) for vector<FIELD<int> *> each component should be a SUPPORT pointer";
-	    PyErr_SetString(PyExc_RuntimeError, message);
-	    return NULL;
-	  }
-
-	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-	//$1[i] = s;
-	$1.at(i) = s;
-      }
-  }
-  else
-    {
-      PyErr_SetString(PyExc_TypeError,"not a list");
-      return NULL;
-    }
-}
-
-%typemap(python,out) vector< FIELD< int > * >
-{
-  /* typemap out for vector<FIELD<int> *> */
-  int size = $1.size();
-  $result = PyList_New(size);
-
-  for (int i=0;i<size;i++)
-    {
-      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FIELD<int> *),0);
-      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(FIELD<int> *),0);
-
-      PyList_SetItem($result,i,tmp);
-    }
-}
-
-
-/*
   typemap in for PyObject * fonction Python wrapping of a
   double or int fonction pointeur
 */
@@ -455,6 +239,103 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
       return PyString_FromString(str.c_str());
     }
 %}
+
+/**************************************************
+  IN typemaps for some std::vector's
+**************************************************/
+
+/*  MACRO: IN typemap for std::vector<TYPE> C++ object */
+%define TYPEMAP_INPUT_VECTOR_BY_VALUE( TYPE )
+{
+  /* typemap in for vector<TYPE> */
+  /* Check if is a list */
+  if (PyList_Check($input))
+  {
+    int size = PyList_Size($input);
+    vector< TYPE > tmpVec(size);
+
+    for (int i=0; i < size; i++)
+    {
+      PyObject * tmp = PyList_GetItem($input,i);
+      TYPE elem;
+
+      int err = SWIG_ConvertPtr(tmp, (void **) &elem, $descriptor(TYPE),
+                                SWIG_POINTER_EXCEPTION);
+      if (err == -1)
+      {
+        char * message = "Error in typemap(python,in) for vector<TYPE>"
+          "each component should be a TYPE";
+        PyErr_SetString(PyExc_RuntimeError, message);
+        return NULL;
+      }
+      tmpVec[i] = elem;
+    }
+    $1 = tmpVec;
+  }
+  else
+  {
+    PyErr_SetString(PyExc_TypeError,"not a list");
+    return NULL;
+  }
+}
+%enddef
+
+%typemap(python,in) vector< FAMILY* >, const vector< FAMILY* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( FAMILY * ) }
+
+%typemap(python,in) vector< SUPPORT* >, const vector< SUPPORT* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( SUPPORT * ) }
+
+%typemap(python,in) vector< FIELDDOUBLE* >, const vector< FIELDDOUBLE* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDDOUBLE * ) }
+
+%typemap(python,in) vector< FIELDINT* >, const vector< FIELDINT* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDINT * ) }
+
+%typemap(python,in) vector< FIELDDOUBLENOINTERLACE* >, const vector< FIELDDOUBLENOINTERLACE* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDDOUBLENOINTERLACE * ) }
+
+%typemap(python,in) vector< FIELDINTNOINTERLACE* >, const vector< FIELDINTNOINTERLACE* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDINTNOINTERLACE * ) }
+
+
+/**************************************************
+  OUT typemaps for some std::vector's
+**************************************************/
+
+/*  MACRO: OUT typemap for std::vector<TYPE> C++ object */
+%define TYPEMAP_OUTPUT_VECTOR_BY_VALUE( TYPE )
+{
+  /* typemap out for vector<TYPE> */
+  int size = $1.size();
+  $result = PyList_New(size);
+
+  for (int i=0;i<size;i++)
+  {
+    PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(TYPE),0);
+
+    PyList_SetItem($result,i,tmp);
+  }
+}
+%enddef
+
+%typemap(python,out) vector< FAMILY* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FAMILY * ) }
+
+%typemap(python,out) vector< SUPPORT* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( SUPPORT * ) }
+
+%typemap(python,out) vector< FIELDDOUBLE* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDDOUBLE * ) }
+
+%typemap(python,out) vector< FIELDINT* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDINT * )  }
+
+%typemap(python,out) vector< FIELDDOUBLENOINTERLACE* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDDOUBLENOINTERLACE * ) }
+
+%typemap(python,out) vector< FIELDINTNOINTERLACE* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDINTNOINTERLACE * ) }
 
 
 /*
@@ -1159,14 +1040,14 @@ public :
 	return self->intersectSupports(Supports);
       }
 
-    %newobject mergeFieldsDouble(const vector< FIELD<double>* > others);
-    FIELD<double, FullInterlace> * mergeFieldsDouble(const vector< FIELD<double>* > others)
+    %newobject mergeFieldsDouble(const vector< FIELDDOUBLE* > others);
+    FIELD<double, FullInterlace> * mergeFieldsDouble(const vector< FIELDDOUBLE* > others)
       {
 	return (FIELD<double, FullInterlace> *)self->mergeFields<double>(others);
       }
 
-    %newobject mergeFieldsInt(const vector< FIELD<int>* > others);
-    FIELD<int, FullInterlace> * mergeFieldsInt(const vector< FIELD<int>* > others)
+    %newobject mergeFieldsInt(const vector< FIELDINT* > others);
+    FIELD<int, FullInterlace> * mergeFieldsInt(const vector< FIELDINT* > others)
       {
 	return (FIELD<int, FullInterlace> *)self->mergeFields<int>(others);
       }
