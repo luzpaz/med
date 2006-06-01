@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef CONNECTIVITY_HXX
 #define CONNECTIVITY_HXX
@@ -26,11 +26,11 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_PolyhedronArray.hxx"
+#include "MEDMEM_CellModel.hxx"
 
 namespace MEDMEM {
 class MEDSKYLINEARRAY;
-class CELLMODEL;
-class FAMILY;
+ class FAMILY;
 class GROUP;
 
 /*!
@@ -243,7 +243,7 @@ public:
                                              MED_EN::medEntityMesh Entity);
   virtual const int* getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
                                                   MED_EN::medEntityMesh Entity);
-  virtual int getNumberOfPolygons() const;
+  virtual int getNumberOfPolygons(MED_EN::medEntityMesh Entity=MED_EN::MED_ALL_ENTITIES) const;
   virtual const int* getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const;
   virtual const int* getPolyhedronFacesIndex() const;
   virtual const int* getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const;
@@ -254,6 +254,8 @@ public:
   const CELLMODEL &   getType              (MED_EN::medGeometryElement Type) const;
   const CELLMODEL *   getCellsTypes        (MED_EN::medEntityMesh Entity)    const
                                     	    throw (MEDEXCEPTION);
+  string * getCellTypeNames (MED_EN::medEntityMesh Entity) const
+    throw (MEDEXCEPTION);
 
   int       getNumberOfNodesInType     (MED_EN::medGeometryElement Type) const;
   int       getNumberOfSubCellInType   (MED_EN::medGeometryElement Type) const;
@@ -449,6 +451,43 @@ inline const CELLMODEL * CONNECTIVITY::getCellsTypes(MED_EN::medEntityMesh Entit
     else
       throw MEDEXCEPTION("CONNECTIVITY::getCellsTypes(medEntityMesh) : Not found Entity !");
 }
+/*!
+Returns an array (it should deleted after use) containing the whole list of
+CELLMODEL Name foreach element type present in connectivity for given
+medEntityMesh (similar as getGeometricTypes).\n
+Throw an execption if the given entity is not defined or if the array is not
+defined.
+
+*/
+//-----------------------------------------------------------------------------//
+inline string * CONNECTIVITY::getCellTypeNames(MED_EN::medEntityMesh Entity) const
+						throw (MEDEXCEPTION)
+//-----------------------------------------------------------------------------//
+{
+  if (Entity == _entity)
+    if (_type!=NULL)
+      {
+	string * stringArray = new string[_numberOfTypes];
+
+	for (int i=0;i<_numberOfTypes;i++)
+	  stringArray[i] = _type[i].getName();
+
+	return stringArray;
+      }
+    else
+      throw MEDEXCEPTION("CONNECTIVITY::getCellTypeNames(medEntityMesh) :"
+			 " CELLMODEL array is not defined !");
+  else
+    if (_constituent != NULL)
+      return _constituent->getCellTypeNames(Entity);
+    else
+      throw MEDEXCEPTION("CONNECTIVITY::getCellTypeNames(medEntityMesh) : Not found Entity !");
+}
+
+
+
+
+
 
 /*! A DOCUMENTER */
 //------------------------------------------------------------------------------------------//

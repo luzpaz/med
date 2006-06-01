@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
  File Support.cxx
@@ -242,6 +242,10 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
   if (_isOnAllElts) return number;
 
   int nbOfEltsThis    = getNumberOfElements(MED_ALL_ELEMENTS);
+  int nbOfEltsThisVerif    = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
+
+  if (nbOfEltsThis == nbOfEltsThisVerif) return number;
+
   const int *eltsThis = _number->getValue();
 
   int iThis;

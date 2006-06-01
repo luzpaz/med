@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_Family.hxx"
@@ -651,7 +651,6 @@ const int * CONNECTIVITY::getConnectivityIndex(medConnectivity ConnectivityType,
 //-----------------------------------------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::getConnectivityIndex";
-  BEGIN_OF(LOC);
 
   MEDSKYLINEARRAY * Connectivity;
   if (Entity==_entity) {
@@ -741,15 +740,24 @@ const int* CONNECTIVITY::getPolygonsConnectivityIndex(medConnectivity Connectivi
 /*! We suppose in this method that nodal and descending connectivities
   are coherent.*/
 //-------------------------------------------------------------//
-int CONNECTIVITY::getNumberOfPolygons() const
+int CONNECTIVITY::getNumberOfPolygons(MED_EN::medEntityMesh Entity) const
 //-------------------------------------------------------------//
 {
-  if (_polygonsNodal != (MEDSKYLINEARRAY*) NULL)
-    return _polygonsNodal->getNumberOf();
-  else if (_polygonsDescending != (MEDSKYLINEARRAY*) NULL)
-    return _polygonsDescending->getNumberOf();
+  if(Entity==MED_ALL_ENTITIES || Entity==_entity )
+    {
+      if (_polygonsNodal != (MEDSKYLINEARRAY*) NULL)
+	return _polygonsNodal->getNumberOf();
+      else if (_polygonsDescending != (MEDSKYLINEARRAY*) NULL)
+	return _polygonsDescending->getNumberOf();
+      else
+	return 0;
+    }
   else
-    return 0;
+    {
+      if (_constituent == (CONNECTIVITY*) NULL)
+	throw MEDEXCEPTION("getNumberOfPolygons : Entity not found !");
+      return _constituent->getNumberOfPolygons(Entity);
+    }
 }
 
 

@@ -1,10 +1,10 @@
 //  Copyright (C) 2003  CEA/DEN, EDF R&D
 //
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//
-//  File   : VISU_DatConvertor.cxx
+//  File   : MED_Wrapper.cxx
 //  Author : Alexey PETROV
-//  Module : VISU
+//  Module : MED
 
 #include "MED_Wrapper.hxx"
 #include "MED_Utilities.hxx"

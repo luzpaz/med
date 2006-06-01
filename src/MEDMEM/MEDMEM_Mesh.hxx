@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef MESH_HXX
 #define MESH_HXX
@@ -183,6 +183,7 @@ public :
   virtual inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
   virtual MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
   virtual inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
+  virtual inline string * getCellTypeNames(MED_EN::medEntityMesh Entity) const;
   virtual const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
   virtual inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
 					 MED_EN::medGeometryElement Type) const;
@@ -219,7 +220,7 @@ public :
 					     MED_EN::medEntityMesh Entity) const;
   inline const int * getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
                                                   MED_EN::medEntityMesh Entity) const;
-  inline int getNumberOfPolygons() const;
+  inline int getNumberOfPolygons(MED_EN::medEntityMesh Entity=MED_EN::MED_ALL_ENTITIES) const;
   inline int getPolyhedronConnectivityLength(MED_EN::medConnectivity ConnectivityType) const;
   inline const int * getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const;
   inline const int * getPolyhedronFacesIndex() const;
@@ -543,6 +544,20 @@ inline const CELLMODEL * MESH::getCellsTypes(MED_EN::medEntityMesh Entity) const
   throw MEDEXCEPTION(LOCALIZED("MESH::getCellsTypes( medEntityMesh ) : Connectivity not defined !"));
 }
 
+/*!
+  Get an array (it should deleted after use) of the whole list of CELLMODEL
+  Name of a given type (medEntityMesh).
+
+  REMARK : Don't use MED_NODE as medEntityMesh
+*/
+inline string * MESH::getCellTypeNames(MED_EN::medEntityMesh Entity) const
+{
+  //  checkGridFillConnectivity();
+  if (_connectivity != NULL)
+    return _connectivity->getCellTypeNames(Entity);
+  throw MEDEXCEPTION(LOCALIZED("MESH::getCellTypesName( medEntityMesh ) : Connectivity not defined !"));
+}
+
 /*! Returns an array of size NumbreOfTypes+1 which contains, for each
     geometric type of the given entity, the first global element number
     of this type.
@@ -734,9 +749,9 @@ inline const int * MESH::getPolygonsConnectivityIndex(MED_EN::medConnectivity Co
 /*!
   Return the number of polygons.
  */
-inline int MESH::getNumberOfPolygons() const
+inline int MESH::getNumberOfPolygons(MED_EN::medEntityMesh Entity) const
 {
-  return _connectivity->getNumberOfPolygons();
+  return _connectivity->getNumberOfPolygons(Entity);
 }
 /*!
  Returns the corresponding length of the array returned by MESH::getPolyhedronConnectivity with exactly the same arguments.

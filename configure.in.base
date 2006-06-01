@@ -2,8 +2,10 @@
 PACKAGE=salome
 AC_SUBST(PACKAGE)
 
-VERSION=0.0.1
+VERSION=3.2.0
+XVERSION=0x030200
 AC_SUBST(VERSION)
+AC_SUBST(XVERSION)
 
 dnl
 dnl Initialize source and build root directories
@@ -92,26 +94,6 @@ AC_SUBST(AR)
 dnl Export the AR macro so that it will be placed in the libtool file
 dnl correctly.
 export AR
-
-echo
-echo ---------------------------------------------
-echo Testing GUI
-echo ---------------------------------------------
-echo
-
-CHECK_SALOME_GUI
-
-echo
-echo ---------------------------------------------
-echo Testing full GUI
-echo ---------------------------------------------
-echo
-
-CHECK_CORBA_IN_GUI
-if test "x${CORBA_IN_GUI}" != "xyes"; then
-  echo "failed : For configure MED module necessary full GUI !"
-  exit
-fi
 
 echo
 echo ---------------------------------------------
@@ -207,85 +189,6 @@ echo
 
 ENABLE_PTHREADS
 
-dnl
-dnl ---------------------------------------------
-dnl testing WITHIHM
-dnl ---------------------------------------------
-dnl
-
-CHECK_WITHIHM
-
-echo
-echo ---------------------------------------------
-echo BOOST Library
-echo ---------------------------------------------
-echo
-
-CHECK_BOOST
-
-dnl
-dnl ---------------------------------------------
-dnl testing sockets
-dnl ---------------------------------------------
-dnl
-
-CHECK_SOCKETS
-
-dnl
-dnl ---------------------------------------------
-dnl testing OpenPBS
-dnl ---------------------------------------------
-dnl
-
-echo
-echo ---------------------------------------------
-echo testing OpenPBS
-echo ---------------------------------------------
-echo
-
-openpbs_ok=no
-CHECK_OPENPBS
-dnl openpbs_ok is set to yes by CHECK_OPENPBS
-
-dnl
-dnl ---------------------------------------------
-dnl testing LSF
-dnl ---------------------------------------------
-dnl
-
-echo
-echo ---------------------------------------------
-echo testing LSF
-echo ---------------------------------------------
-echo
-
-lsf_ok=no
-CHECK_LSF
-dnl lsf_ok is set to yes by CHECK_LSF
-
-dnl
-dnl ---------------------------------------------
-dnl testing Batch
-dnl ---------------------------------------------
-dnl
-
-WITH_BATCH=no
-test x$openpbs_ok = xyes || test x$lsf_ok = xyes && WITH_BATCH=yes
-AC_SUBST(WITH_BATCH)
-
-if test "X$WITHIHM" = "Xyes"; then
-	echo
-	echo ---------------------------------------------
-	echo testing LEX \& YACC
-	echo ---------------------------------------------
-	echo
-
-	lex_yacc_ok=no
-	AC_PROG_YACC
-	AC_PROG_LEX
-	lex_yacc_ok=yes
-fi
-
 echo
 echo ---------------------------------------------
 echo testing python
@@ -318,27 +221,88 @@ echo
 
 CHECK_MED2
 
-dnl
-dnl ---------------------------------------------
-dnl testing MPI
-dnl ---------------------------------------------
-dnl
-
-CHECK_MPI
-CHECK_MPICH
-
 echo
-echo ----------------------------------------------
-echo testing CPPUNIT only required for unit testing
-echo ----------------------------------------------
+echo ---------------------------------------------
+echo "MED_WITH_KERNEL: ${MED_WITH_KERNEL}"
+echo ---------------------------------------------
+
+openpbs_ok=no
+echo
+echo ---------------------------------------------
+echo testing OpenPBS
+echo ---------------------------------------------
 echo
 
-CHECK_CPPUNIT
+CHECK_OPENPBS
+dnl openpbs_ok is set to yes by CHECK_OPENPBS
 
-echo "MED_WITH_KERNEL ${MED_WITH_KERNEL}"
+echo
+echo ---------------------------------------------
+echo testing LSF
+echo ---------------------------------------------
+echo
+
+lsf_ok=no
+CHECK_LSF
+dnl lsf_ok is set to yes by CHECK_LSF
 
 if test "${MED_WITH_KERNEL}" = "yes"; then
 {
+	echo
+	echo ---------------------------------------------
+	echo BOOST Library
+	echo ---------------------------------------------
+	echo
+
+	CHECK_BOOST
+
+	dnl
+	dnl ---------------------------------------------
+	dnl testing WITHIHM
+	dnl ---------------------------------------------
+	dnl
+
+	CHECK_WITHIHM
+
+	dnl
+	dnl ---------------------------------------------
+	dnl testing sockets
+	dnl ---------------------------------------------
+	dnl
+
+	CHECK_SOCKETS
+
+	dnl
+	dnl ---------------------------------------------
+	dnl testing Batch
+	dnl ---------------------------------------------
+	dnl
+
+	WITH_BATCH=no
+	test x$openpbs_ok = xyes || test x$lsf_ok = xyes && WITH_BATCH=yes
+	AC_SUBST(WITH_BATCH)
+
+	if test "X$WITHIHM" = "Xyes"; then
+		echo
+		echo ---------------------------------------------
+		echo testing LEX \& YACC
+		echo ---------------------------------------------
+		echo
+
+		lex_yacc_ok=no
+		AC_PROG_YACC
+		AC_PROG_LEX
+		lex_yacc_ok=yes
+	fi
+
+	dnl
+	dnl ---------------------------------------------
+	dnl testing MPI
+	dnl ---------------------------------------------
+	dnl
+
+	CHECK_MPI
+	CHECK_MPICH
 
 	dnl echo
 	dnl echo ---------------------------------------------
@@ -368,7 +332,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	AC_SUBST_FILE(CORBA)
 	corba=make_$ORB
 	CORBA=adm_local/unix/$corba
-
 
 	echo
 	echo ---------------------------------------------
@@ -436,22 +399,45 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 
 	CHECK_HTML_GENERATORS
 
+	echo
+	echo ---------------------------------------------
+	echo Testing GUI
+	echo ---------------------------------------------
+	echo
+
+	CHECK_SALOME_GUI
+
+	echo
+	echo ---------------------------------------------
+	echo Testing full GUI
+	echo ---------------------------------------------
+	echo
+
+	CHECK_CORBA_IN_GUI
+	if test "x${CORBA_IN_GUI}" != "xyes"; then
+	  echo "failed : For configure MED module necessary full GUI !"
+	  exit
+	fi
+
+	echo
+	echo ----------------------------------------------
+	echo testing CPPUNIT only required for unit testing
+	echo ----------------------------------------------
+	echo
+
+	CHECK_CPPUNIT
+
 }
 else
 {
-	WITHIHM=""
+	WITHIHM="no"
+	WITHOPENPBS="no"
+	
 	AC_SUBST(WITHIHM)
+	AC_SUBST(WITHOPENPBS)
 	CPPFLAGS="$CPPFLAGS -DMED_WITHOUT_KERNEL"
 }
 fi # MED_WITH_KERNEL
-
-echo
-echo ---------------------------------------------
-echo Testing html generators
-echo ---------------------------------------------
-echo
-
-CHECK_HTML_GENERATORS
 
 echo
 echo ---------------------------------------------
@@ -482,17 +468,22 @@ do
      eval echo \$$var
    fi
 done
-echo "---Optional:"
-variables="cppunit_ok openpbs_ok lsf_ok doxygen_ok graphviz_ok"
+
+if test "${MED_WITH_KERNEL}" = "yes"; then
+{
+        echo "---Optional:"
+        variables="cppunit_ok openpbs_ok lsf_ok doxygen_ok graphviz_ok"
  
-for var in $variables
-do
-   eval toto=\$$var
-   if test x$toto != "x"; then
-     printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
-     eval echo \$$var
-   fi
-done
+        for var in $variables
+        do
+           eval toto=\$$var
+           if test x$toto != "x"; then
+                printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
+                eval echo \$$var
+           fi
+        done
+}
+fi
 
 echo
 echo "Default ORB   : $DEFAULT_ORB"

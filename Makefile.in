@@ -1,3 +1,21 @@
+# Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
+#           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either 
+# version 2.1 of the License.
+# 
+# This library is distributed in the hope that it will be useful 
+# but WITHOUT ANY WARRANTY; without even the implied warranty of 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+# Lesser General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public  
+# License along with this library; if not, write to the Free Software 
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# 
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# 
 # -* Makefile *- 
 #
 # Author : Patrick GOLDBRONN (CEA)
@@ -9,7 +27,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=.
 srcdir=@srcdir@
-VPATH=.:@srcdir@:@top_srcdir@/bin:@top_srcdir@/resources:./bin:@top_srcdir@/idl:${KERNEL_ROOT_DIR}/idl/salome
+VPATH=.:@srcdir@:@top_srcdir@/bin:./bin/salome:./resources:@top_srcdir@/resources:./bin:@top_srcdir@/idl:${KERNEL_ROOT_DIR}/idl/salome
 
 
 @COMMENCE@
@@ -73,6 +91,29 @@ maill.00_without_seg2.med \
 zzzz121b_without_tr6.med \
 geomMesh21.med \
 geomMesh22.med \
+ChampsDarcy.med \
+darcy_1.1_res.med \
+darcy_1.3_resCASTEM.med \
+darcy_1.3_resPORFLOW.med \
+darcy_1.3_resTRACES.med \
+darcy2_Castem_EFMH.med \
+darcy2_Castem_qua_EFMH.med \
+darcy2_Castem_qua_VF.med \
+Deff_fdt_5.8_castem_efmh_diff_conc_dom.med \
+Deff_fdt_5.8_castem_vf_diff_conc_dom.med \
+extendedtransport53_triangles.med \
+H_CastCast_EFMH_I129_COUPLEX1.med \
+H_CastCast_VF_I129_COUPLEX1.med \
+H_CastCast_VF_Se79_COUPLEX1.med \
+H_CastPorf_I129_COUPLEX1.med \
+H_CastPorf_Se79_COUPLEX1.med \
+H_PorfCast_EFMH_I129_COUPLEX1.med \
+H_PorfCast_EFMH_Se79_COUPLEX1.med \
+H_PorfPorf_I129_COUPLEX1.med \
+H_Traces_I129_COUPLEX1.med \
+H_Traces_Se79_COUPLEX1.med \
+maillage_5_5_5.med \
+maillage_chemvalIV_cas1_40elts.med \
 Darcy3_3D_H_10x10x10.sauve \
 dx200_dy1_avec_2couches.sauve \
 elle_2D_QT_10x10.sauve \
@@ -124,13 +165,20 @@ LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 LDFLAGSFORBIN= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
 # copy header files in common directory
-include_list=include/salome/SALOMEconfig.h
+include_list = include/salome/SALOMEconfig.h \
+               include/salome/MED_version.h
 
 ifeq ($(HAVE_SSTREAM),no)
   include_list+=include/salome/sstream
 endif
 
 inc: idl $(include_list)
+
+bin: bin/salome/VERSION
+
+bin/salome/VERSION : bin/VERSION
+	-$(RM) $@
+	$(LN_S) ../../$< $@
 
 include/salome/SALOMEconfig.h: salome_adm/unix/SALOMEconfig.ref
 	-$(RM) $@
@@ -149,6 +197,10 @@ include/salome/sstream: salome_adm/unix/sstream
 	-$(RM) $@
 	$(LN_S) ../../$< $@
 
+include/salome/MED_version.h: MED_version.h
+	-$(RM) $@
+	$(LN_S) ../../$< $@
+
 depend: depend_idl
 
 depend_idl:
@@ -164,10 +216,10 @@ install-end:
 
 install-include: $(include_list)
 	$(INSTALL) -d  $(includedir)
-#	@for f in X $(include_list); do				\
-#	   if test $$f != X; then				\
-#	     (cp -p $$f $(includedir) || exit 1);		\
-#	   fi;							\
+	@for f in X $(include_list); do				\
+	   if test $$f != X; then				\
+	     (cp -p $$f $(includedir) || exit 1);		\
+	   fi;							\
 	done
 
 # install script in $(bindir) :

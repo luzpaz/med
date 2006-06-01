@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef MED_FIELD_DRIVER22_HXX
 #define MED_FIELD_DRIVER22_HXX
@@ -398,11 +398,16 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
   //EF : Gérer le meshName pour le driver 2.2
   const char * LOC="MED_FIELD_DRIVER<T>::createFieldSupportPart1(...)";
 
+  BEGIN_OF(LOC);
+
   map<int, list<MED_EN::medGeometryElement> > CellAndNodeEntities;
   map<int, list<MED_EN::medGeometryElement> >::iterator currentEntity;
   CellAndNodeEntities[MED_EN::MED_CELL]  = MED_EN::meshEntities[MED_EN::MED_CELL];
   CellAndNodeEntities[MED_EN::MED_NODE] = MED_EN::meshEntities[MED_EN::MED_NODE];
   list< MED_EN::medGeometryElement >::const_iterator currentGeometry;
+
+  MED_EN::medEntityMesh entityCurrent;
+  MED_EN::medGeometryElement geometryCurrent;
 
   MED_EN::medEntityMesh entity;
   bool alreadyFoundAnEntity=false,alreadyFoundPdtIt = false;
@@ -414,7 +419,7 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
   numberOfElementsOfTypeC.resize(MED_NBR_GEOMETRIE_MAILLE+1);
   numberOfGaussPoint.resize(MED_NBR_GEOMETRIE_MAILLE+1);
 
-  med_2_2::med_int nmaa=0, ngauss=0, numdt=-1, numo=-1, nbPdtIt=0;
+  med_2_2::med_int nmaa=0, ngauss=0, numdt=-1, numo=-1, nbPdtIt=0, nbPdtIt1=0, nbPdtIt2=0;
   char dtunit[MED_TAILLE_PNOM22+1];
   char maa[MED_TAILLE_NOM+1];
   med_2_2::med_float   dt=-1.0;
@@ -431,31 +436,65 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
     for (currentGeometry  = (*currentEntity).second.begin();
 	 currentGeometry != (*currentEntity).second.end(); currentGeometry++) {
 
+      entityCurrent = (*currentEntity).first ;
+      geometryCurrent = (*currentGeometry) ;
 
-      if ( (nbPdtIt = med_2_2::MEDnPasdetemps(id, const_cast <char*> ( fieldName.c_str() ),
-					      (med_2_2::med_entite_maillage)   (*currentEntity).first,
-					      (med_2_2::med_geometrie_element)  *currentGeometry ))  <=  0 )
+      // That is a difference between Med File and Med Memory (NB)
+      if (geometryCurrent == MED_EN::MED_SEG2 || geometryCurrent == MED_EN::MED_SEG3)
+	entityCurrent = MED_EN::MED_EDGE;
+
+      if (geometryCurrent == MED_EN::MED_TRIA3 || geometryCurrent == MED_EN::MED_QUAD4 ||
+	  geometryCurrent == MED_EN::MED_TRIA6 || geometryCurrent == MED_EN::MED_QUAD8)
+	entityCurrent = MED_EN::MED_FACE;
+
+      nbPdtIt1 = med_2_2::MEDnPasdetemps(id, const_cast <char*> ( fieldName.c_str() ),
+					 (med_2_2::med_entite_maillage)   (*currentEntity).first,
+					 (med_2_2::med_geometrie_element)  *currentGeometry );
+
+      nbPdtIt2 = med_2_2::MEDnPasdetemps(id, const_cast <char*> ( fieldName.c_str() ),
+					 (med_2_2::med_entite_maillage)   entityCurrent,
+					 (med_2_2::med_geometrie_element)  geometryCurrent );
+
+      if (nbPdtIt2 < nbPdtIt1) entityCurrent = (*currentEntity).first ;
+
+      nbPdtIt = (nbPdtIt1>nbPdtIt2)?nbPdtIt1:nbPdtIt2;
+
+      if ( nbPdtIt <=  0 )
 	continue;
 
       /* Verifie que le champ n'est pas défini sur un autre type d'entité */
-      if ( alreadyFoundAnEntity ) {
-	if (entity != (*currentEntity).first )
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |"  << fieldName
-				       << "| with (ndt,or) = (" << ndt << ","
-				       << od << ") must not be defined on nodes and cells" ));
+      if ( alreadyFoundAnEntity )
+	{
+	  //if (entity != (*currentEntity).first )  (NB)
+	  if ( entity != entityCurrent )
+	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |"  << fieldName
+					 << "| with (ndt,or) = (" << ndt << ","
+					 << od << ") must not be defined on nodes and cells" ));
 
-      } else { entity=(*currentEntity).first; alreadyFoundAnEntity = true; };
+	}
+      else
+	{ 
+	  //entity=(*currentEntity).first; (NB)
+	  entity=entityCurrent;
+	  alreadyFoundAnEntity = true;
+	};
 
 
       /* Cherche le champ pour le <ndt>,<ot> demandé et détermine le nombre de points de Gauss*/
       ret = 0; alreadyFoundPdtIt = false; ngauss =0;
       for ( med_2_2::med_int j=1; j <= nbPdtIt; j++ ) {
 
-	// Search how many <ngauss> (<fieldName>,<ndt>,<ot>) has
+	// Search how many <ngauss> (<fieldName>,<ndt>,<ot>) has   (NB)
+	//ret += med_2_2::MEDpasdetempsInfo(id, const_cast <char*> ( fieldName.c_str() ),
+	//				 (med_2_2::med_entite_maillage)   (*currentEntity).first,
+	//				 (med_2_2::med_geometrie_element)  *currentGeometry,
+	//				 j, &ngauss,  &numdt,  &numo, dtunit, &dt,
+	//				  maa, &local, &nmaa);
+
 	ret += med_2_2::MEDpasdetempsInfo(id, const_cast <char*> ( fieldName.c_str() ),
-					 (med_2_2::med_entite_maillage)   (*currentEntity).first,
-					 (med_2_2::med_geometrie_element)  *currentGeometry,
-					 j, &ngauss,  &numdt,  &numo, dtunit, &dt,
+					  (med_2_2::med_entite_maillage)   entityCurrent,
+					  (med_2_2::med_geometrie_element)  *currentGeometry,
+					  j, &ngauss,  &numdt,  &numo, dtunit, &dt,
 					  maa, &local, &nmaa);
 
 	if ( ndt == numdt && numo == od ) {
@@ -464,7 +503,7 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 	  if ( nmaa > 1 ) {
 	    MESSAGE(LOC<<" Field |" << fieldName << "| with (ndt,or) = ("
 		    << ndt << "," << od << ") for (entityType,geometricType)=("
-		    << MED_EN::entNames[(*currentEntity).first] << ","
+		    << MED_EN::entNames[entityCurrent] << ","
 		    << MED_EN::geoNames[*currentGeometry] << ")"
 		    << "is defined on multiple meshes, using dafault mesh  |" << maa << "|" );
 	  }
@@ -472,7 +511,7 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 	  if ( !local) {
 	    MESSAGE(" Field |" << fieldName << "| with (ndt,or) = ("
 		    << ndt << "," << od << ") for (entityType,geometricType)=("
-		    << MED_EN::entNames[(*currentEntity).first] << ","
+		    << MED_EN::entNames[entityCurrent] << ","
 		    << MED_EN::geoNames[*currentGeometry] << ")"
 		    << "is using a mesh on a distant file (ignored)" );
 
@@ -487,7 +526,7 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 	    if ( meshName != maa ) {
 	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = ("
 					   << ndt << "," << od << ") for (entityType,geometricType)=("
-					   << MED_EN::entNames[(*currentEntity).first] << ","
+					   << MED_EN::entNames[entityCurrent] << ","
 					   << MED_EN::geoNames[*currentGeometry] << ")"
 					   << "is defined on mesh |" << maa << "| not on mesh |" << meshName ));
 	    }
@@ -496,27 +535,29 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 
       }
 
+      MESSAGE(LOC << " a (dt,it) is found ?? " << alreadyFoundPdtIt);
+
       if ( !alreadyFoundPdtIt )
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = ("
 				     << ndt << "," << od << ") should be defined for (entityType,geometricType)=("
-				     << MED_EN::entNames[(*currentEntity).first] << ","
+				     << MED_EN::entNames[entityCurrent] << ","
 				     << MED_EN::geoNames[*currentGeometry] << ")" ));
 
       if ( (ret != 0)  || (ngauss < 1 ) )
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Error in MEDpasdetempsInfo for  Field |" << fieldName 
 				     << "| with (ndt,or) = ("
 				     << ndt << "," << od << ") for (entityType,geometricType)=("
-				     << MED_EN::entNames[(*currentEntity).first] << ","
+				     << MED_EN::entNames[entityCurrent] << ","
 				     << MED_EN::geoNames[*currentGeometry] << ")" )); ;
 
       if ( (numberOfElements =  med_2_2::MEDnVal(id, const_cast <char*> ( fieldName.c_str() ),
-						(med_2_2::med_entite_maillage)   (*currentEntity).first,
+						(med_2_2::med_entite_maillage)   entityCurrent,
 						(med_2_2::med_geometrie_element) *currentGeometry,
 						 numdt, numo, maa, med_2_2::MED_COMPACT))  <=  0 )
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Error in MEDnVal for  Field |" << fieldName
 				     << "| with (ndt,or) = ("
 				     << ndt << "," << od << ") for (entityType,geometricType)=("
-				     << MED_EN::entNames[(*currentEntity).first] << ","
+				     << MED_EN::entNames[entityCurrent] << ","
 				     << MED_EN::geoNames[*currentGeometry] << ")" )); ;
 
       numberOfElementsOfType[numberOfGeometricType] = numberOfElements/ngauss;
@@ -687,8 +728,15 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     MED_FIELD_DRIVER<T>::_fieldName=MED_FIELD_DRIVER<T>::_ptrField->_name;
 
   if ( MED_FIELD_DRIVER<T>::_fieldName.size() > MED_TAILLE_NOM )
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
-				 <<" <fieldName> size in object driver FIELD is > MED_TAILLE_NOM ."));
+    {
+      SCRUTE(MED_FIELD_DRIVER<T>::_fieldName.size());
+      SCRUTE(MED_TAILLE_NOM);
+
+//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
+// 				   <<" <fieldName> size in object driver FIELD is > MED_TAILLE_NOM ."));
+
+      MESSAGE(LOC << "Warning <fieldName> size in object driver FIELD is > MED_TAILLE_NOM .");
+    }
 
   const string & fieldName = MED_FIELD_DRIVER<T>::_fieldName;
 
@@ -722,7 +770,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 //                    Le nom du maillage associé est lu mais le pointeur SUPPORT-MESH non initialisé
 
 
-  char * tmpFieldName = new char[MED_TAILLE_NOM+1] ;
+  char tmpFieldName[MED_TAILLE_NOM+1] ;
   int err ;
   int    numberOfComponents          = 0;
   char * componentName               = (char *) MED_NULL;
@@ -765,7 +813,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 	}
     }
 
-  delete[] tmpFieldName ;
+  //delete[] tmpFieldName ;
 
   // Si aucun champ ne correspond les variables <componentName> et <unitName> ont été correctement
   // désallouées dans la boucle de recherche
@@ -884,8 +932,13 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   vector< int >  meshNbOfElOfTypeC;
   // Si le maillage n'est pas trouvé les tableaux renvoyés sont vides
   if (fileHasMesh)
-    this->getMeshGeometricTypeFromFile(id,meshName,entityType,meshGeoType,
-                                       meshNbOfElOfType,meshNbOfElOfTypeC);
+    {
+      MED_EN::medEntityMesh entityTypeLoc = entityType;
+      if (entityType == MED_EN::MED_FACE || entityType == MED_EN::MED_EDGE) entityTypeLoc = MED_EN::MED_CELL;
+
+      this->getMeshGeometricTypeFromFile(id,meshName,entityTypeLoc,meshGeoType,
+					 meshNbOfElOfType,meshNbOfElOfTypeC);
+    }
 
   SCRUTE(meshGeoType.size());
   SCRUTE(MESHgeoType.size());

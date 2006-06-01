@@ -17,7 +17,7 @@
 #  License along with this library; if not, write to the Free Software 
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
 # 
-#  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 #
 #
@@ -34,6 +34,11 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 
 @COMMENCE@
 
-SUBDIRS = Core Wrapper
+# if without KERNEL, build only med 2.1 library
+ifeq ($(MED_WITH_KERNEL),yes)
+  SUBDIRS = Core Wrapper
+else
+  SUBDIRS = Core
+endif
 
 @MODULE@

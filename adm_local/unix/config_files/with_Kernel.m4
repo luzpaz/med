@@ -10,9 +10,9 @@ AC_DEFUN([WITH_KERNEL],[
 
 AC_ARG_WITH(kernel,
 	    [  --with-kernel default=yes ],
-	    with_kernel="$withval",with_kernel="${MED_WITH_KERNEL}")
+	    withkernel="$withval",withkernel="${MED_WITH_KERNEL}")
 
-case $with_kernel in
+case $withkernel in
   no)
 #         AC_MSG_RESULT(************************************************)
 #         AC_MSG_RESULT(*******   WITHOUT KERNEL configuration   *******)
