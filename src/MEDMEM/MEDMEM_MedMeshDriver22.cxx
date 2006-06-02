@@ -1860,7 +1860,7 @@ int  MED_MESH_RDONLY_DRIVER22::getCellsFamiliesNumber(int **MEDArrayFamily,
 			   med_2_2::MED_MAILLE,
 			   (med_2_2::med_geometrie_element)types[i]);
 	    if (err != MED_VALID)
-	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<Connectivity->_geometricTypes[i]));
+	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<types[i]));
 	  }
         int ii ;
         for ( ii = 0 ; ii < NumberOfCell ; ii++ )
@@ -1879,7 +1879,7 @@ int  MED_MESH_RDONLY_DRIVER22::getCellsFamiliesNumber(int **MEDArrayFamily,
 			   med_2_2::MED_MAILLE,
 			   (med_2_2::med_geometrie_element)types[i]);
 	    if (err != MED_VALID)
-	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<Connectivity->_geometricTypes[i]));
+	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<types[i]));
 	  }
 #endif
       }
@@ -2770,8 +2770,8 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
     // SOLUTION TEMPORAIRE CAR _ptrMesh->_MEDArray____Family DOIT ETRE ENLEVER DE LA CLASSE MESH
     if  ( ( _ptrMesh->existConnectivity(MED_NODAL,entity) )|( _ptrMesh->existConnectivity(MED_DESCENDING,entity) ) ) { 
 
-      int numberOfTypes           = _ptrMesh->getNumberOfTypes (entity) ;
-      const medGeometryElement  * types = _ptrMesh->getTypes         (entity) ;
+      int numberOfTypes           = _ptrMesh->getNumberOfTypesWithPoly(entity) ;
+      medGeometryElement  * types = _ptrMesh->getTypesWithPoly(entity) ;
 
       // We build the array from the families list objects :
       int NumberOfElements = _ptrMesh->getNumberOfElements(entity, MED_ALL_ELEMENTS);
@@ -2816,8 +2816,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 	SCRUTE(MEDArrayFamily[i]);
 
 
-
-      const int * typeCount = _ptrMesh->getGlobalNumberingIndex(entity) ;
+      int offset=0;
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
 	int lgth=NumberOfElements;
 	med_2_2::med_int *temp=new med_2_2::med_int[lgth];
@@ -2825,17 +2824,18 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 	  temp[i2]=(med_2_2::med_int) (MEDArrayFamily[i2]);
 #endif
       for (int i=0; i<numberOfTypes; i++) {
+	  int typeNumberOfElements=_ptrMesh->getNumberOfElementsWithPoly(entity,types[i]);
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
 	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-			(temp+(typeCount[i]-1)),(typeCount[i+1]-typeCount[i]),
+			(temp+offset),(typeCount[i+1]-typeCount[i]),
 			//CCRT			med_2_2::MED_REMP ,
 // 			(med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
 			(med_2_2::med_entite_maillage) MED_CELL,
 			(med_2_2::med_geometrie_element) types[i]);
 #else
 	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-			(MEDArrayFamily+(typeCount[i]-1)),
-			(typeCount[i+1]-typeCount[i]),
+			(MEDArrayFamily+offset),
+			typeNumberOfElements,
 // 			(med_2_2::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
 			(med_2_2::med_entite_maillage) MED_CELL,
 			(med_2_2::med_geometrie_element) types[i]); 
@@ -2851,6 +2851,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 //CCRT      delete [] temp;
 //CCRT#endif
       delete[] MEDArrayFamily ;
+      delete[] types;
       //if (true == ToDestroy) {
       //  int NumberOfFamilies = myFamilies->size();
       //  for (int i=0; i<NumberOfFamilies; i++)

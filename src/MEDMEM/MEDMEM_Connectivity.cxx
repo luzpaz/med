@@ -2133,25 +2133,30 @@ void CONNECTIVITY::invertConnectivityForAFace(int faceId, const int *nodalConnFo
     _reverseDescendingConnectivity->setIJ(faceId,1,cell2);
     _reverseDescendingConnectivity->setIJ(faceId,2,cell1);
     // Updating _constituent->_nodal because of reversity
-    MEDSKYLINEARRAY *currentNodal=(!polygonFace)?_constituent->_nodal:_constituent->_polygonsNodal;
-    MEDSKYLINEARRAY *currentDescending=(!polygonFace)?_descending:_polygonsDescending;
     const int *descendingNodalIndex=(!polygonFace)?_constituent->_nodal->getIndex():_constituent->_polygonsNodal->getIndex();
-    const int *newDescendingIndex=(!polygonFace)?_descending->getIndex():_polygonsDescending->getIndex();
-    for(int iarray=1;iarray<=(descendingNodalIndex[faceId]-descendingNodalIndex[faceId-1]);iarray++)
-      currentNodal->setIJ(faceId,iarray,nodalConnForFace[iarray-1]);
+    MEDSKYLINEARRAY *currentNodal=(!polygonFace)?_constituent->_nodal:_constituent->_polygonsNodal;
+    int faceIdRelative=(!polygonFace)?faceId:faceId-getNumberOf(MED_FACE,MED_ALL_ELEMENTS);
+    for(int iarray=1;iarray<=(descendingNodalIndex[faceIdRelative]-descendingNodalIndex[faceIdRelative-1]);iarray++)
+      currentNodal->setIJ(faceIdRelative,iarray,nodalConnForFace[iarray-1]);
 
     // Updating _descending for cell1 and cell2
-    for(int iface=newDescendingIndex[cell1-1];iface<=newDescendingIndex[cell1];iface++)
-      if (currentDescending->getIndexValue(iface)==faceId)
-	currentDescending->setIndexValue(iface,-faceId);
-      else if (currentDescending->getIndexValue(iface)==-faceId)
-	currentDescending->setIndexValue(iface,faceId);
-
-    for(int iface=newDescendingIndex[cell2-1];iface<newDescendingIndex[cell2];iface++)
-      if (currentDescending->getIndexValue(iface)==faceId)
-	currentDescending->setIndexValue(iface,-faceId);
-      else if (_descending->getIndexValue(iface)==-faceId)
-	currentDescending->setIndexValue(iface,faceId);
+    const int NB_OF_CELLS_SHARING_A_FACE=2;
+    int cellsToUpdate[NB_OF_CELLS_SHARING_A_FACE]; cellsToUpdate[0]=cell1; cellsToUpdate[1]=cell2;
+    for(int curCell=0;curCell<NB_OF_CELLS_SHARING_A_FACE;curCell++)
+      {
+	int cell=cellsToUpdate[curCell];
+	bool polyhCell=(getElementTypeWithPoly(MED_CELL,cell)==MED_POLYHEDRA);
+	if(polyhCell)
+	  cell-=getNumberOf(MED_CELL,MED_ALL_ELEMENTS);
+	const int *newDescendingIndex=(!polyhCell)?_descending->getIndex():_polyhedronDescending->getIndex();
+	MEDSKYLINEARRAY *currentDescending=(!polyhCell)?_descending:_polyhedronDescending;
+	for(int iface=newDescendingIndex[cell-1];iface<newDescendingIndex[cell];iface++)
+	  {
+	    int curValue=currentDescending->getIndexValue(iface);
+	    if (abs(curValue)==faceId)
+	      currentDescending->setIndexValue(iface,-curValue);
+	  }
+      }
   }
 }
 

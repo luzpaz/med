@@ -320,7 +320,7 @@ TTimeStampInfo
 {
   TGeom2NbGauss::const_iterator anIter = myGeom2NbGauss.find(theGeom);
   if(anIter == myGeom2NbGauss.end())
-    EXCEPTION(runtime_error,"TTimeStampInfo::GetNbGauss - myGeom2NbGauss.find(theGeom) fails");
+    return 1;//EXCEPTION(runtime_error,"TTimeStampInfo::GetNbGauss - myGeom2NbGauss.find(theGeom) fails");
 
   return anIter->second;
 }
@@ -418,22 +418,24 @@ TValueSliceArr
 TMeshValue
 ::GetCompValueSliceArr(TInt theElemId)
 {
-  TValueSliceArr aValueSliceArr(myNbGauss);
   if(GetModeSwitch() == eFULL_INTERLACE){
+    TValueSliceArr aValueSliceArr(myNbComp);
     TInt anId = theElemId*myStep;
     for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
       aValueSliceArr[aCompId] =
 	TValueSlice(myValue,std::slice(anId,myNbGauss,myNbComp));
       anId += 1;
     }
+    return aValueSliceArr;
   }
   else{
+    TValueSliceArr aValueSliceArr(myNbGauss);
     for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
       aValueSliceArr[aGaussId] =
 	TValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
     }
+    return aValueSliceArr;
   }
-  return aValueSliceArr;
 }
 
 
