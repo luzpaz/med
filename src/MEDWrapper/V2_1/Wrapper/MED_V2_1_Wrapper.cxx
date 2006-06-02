@@ -1148,7 +1148,7 @@ namespace MED
 	MED::TProfileInfo& aProfileInfo = aGeom2Profile[aGeom];
 	med_int aNbGauss = aTimeStampInfo.GetNbGauss(aGeom);
 
-	med_int aNbVal = aMeshValue.myNbElem / aFieldInfo.myNbComp;
+	med_int aNbVal = aMeshValue.myNbElem * aMeshValue.myNbGauss;
 	TValue& aValue = aMeshValue.myValue;
 	TInt anEnd = aValue.size();
 	

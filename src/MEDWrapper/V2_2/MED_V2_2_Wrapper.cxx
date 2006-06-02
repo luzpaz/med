@@ -1861,7 +1861,7 @@ namespace MED
 	  strcpy(&aProfileName[0],&aProfileInfo->myName[0]);
 	}
 
-	med_int aNbVal = aMeshValue.myNbElem / aFieldInfo.myNbComp;
+	med_int aNbVal = aMeshValue.myNbElem * aMeshValue.myNbGauss;
 	TValue& aValue = aMeshValue.myValue;
 	TInt anEnd = aValue.size();
 	
