@@ -2845,6 +2845,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write family for the |"<< _ptrMesh->getNumberOfElements(entity, types[i])
 				       << "| cells of geometric type |" << geoNames[types[i]] <<"|in mesh |"      
 				       << _ptrMesh->_name.c_str() << "|" ));   
+	offset+=typeNumberOfElements;  
       }
 //CCRT Clutter
 //CCRT#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
