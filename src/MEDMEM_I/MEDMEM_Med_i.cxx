@@ -1,8 +1,25 @@
+// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
+//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either 
+// version 2.1 of the License.
+// 
+// This library is distributed in the hope that it will be useful 
+// but WITHOUT ANY WARRANTY; without even the implied warranty of 
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public  
+// License along with this library; if not, write to the Free Software 
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// 
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// 
 //=============================================================================
 // File      : MEDMEM_Med_i.cxx
 // Project   : SALOME
 // Author    : EDF
-// Copyright : EDF 2002
 // $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_i.cxx
 //=============================================================================
 
@@ -160,7 +177,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
       		         case MED_EN::MED_INT32 : 
 			 {
 			     ((FIELD<int>*)myField)->read();
-			     FIELDTEMPLATE_I<int,FullInterlace> *myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int>*)myField);
+			     FIELDTEMPLATE_I<int> *myFieldIntI = new FIELDTEMPLATE_I<int>((FIELD<int>*)myField);
 			     myFieldIOR = myFieldIntI->_this();
 // 	                     myFieldIntI->addInStudy(myStudy,myFieldIOR);
 		             break;
@@ -169,7 +186,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
       			case MED_EN::MED_REEL64: 
                         {
 			     ((FIELD<double>*)myField)->read();
-			     FIELDTEMPLATE_I<double,FullInterlace> *myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double,FullInterlace>*)myField);
+			     FIELDTEMPLATE_I<double> *myFieldDoubleI = new FIELDTEMPLATE_I<double>((FIELD<double>*)myField);
 			     myFieldIOR = myFieldDoubleI->_this();
 // 			     myFieldDoubleI->addInStudy(myStudy,myFieldIOR);
 			     break;
@@ -483,7 +500,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		     case MED_EN::MED_INT32: 
 		     {
 			((FIELD<int>*)myField)->read();
-			FIELDTEMPLATE_I<int,FullInterlace> *myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int>*)myField);
+			FIELDTEMPLATE_I<int> *myFieldIntI = new FIELDTEMPLATE_I<int>((FIELD<int>*)myField);
 			SALOME_MED::FIELDINT_ptr myFieldIntIOR;
 			myFieldIntIOR = myFieldIntI->_this();
 
@@ -497,7 +514,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
       		     case MED_EN::MED_REEL64: 
 		     {
 			((FIELD<double>*)myField)->read();
-			FIELDTEMPLATE_I<double,FullInterlace> *myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double>*)myField);
+			FIELDTEMPLATE_I<double> *myFieldDoubleI = new FIELDTEMPLATE_I<double>((FIELD<double>*)myField);
 			SALOME_MED::FIELDDOUBLE_ptr myFieldDoubleIOR;
 			myFieldDoubleIOR = myFieldDoubleI->_this();
 

@@ -17,7 +17,7 @@
 //  License along with this library; if not, write to the Free Software 
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
 // 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //
 //
@@ -82,6 +82,10 @@ namespace MED{
   typedef enum {eMAILLE, eFACE, eARETE, eNOEUD} EEntiteMaillage; 
 
   typedef enum {eNO_PFLMOD, eGLOBAL, eCOMPACT}  EModeProfil; 
+
+  typedef enum {eGRILLE_CARTESIENNE,eGRILLE_POLAIRE,eGRILLE_STANDARD} EGrilleType;
+
+  typedef enum {eCOOR, eCONN, eNOM, eNUM, eFAM,eCOOR_IND1,eCOOR_IND2,eCOOR_IND3} ETable;
 
   typedef TVector<TFloat> TFloatVector;
   typedef TVector<std::string> TStringVector;
@@ -162,6 +166,9 @@ namespace MED{
   struct TGaussInfo;
   typedef SharedPtr<TGaussInfo> PGaussInfo;
   
+  class TGrilleInfo;
+  typedef SharedPtr<TGrilleInfo> PGrilleInfo;
+
   struct TTimeStampVal;
   typedef SharedPtr<TTimeStampVal> PTimeStampVal;
 

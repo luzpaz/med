@@ -17,7 +17,7 @@
 //  License along with this library; if not, write to the Free Software 
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
 // 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //
 //
@@ -94,6 +94,8 @@ namespace MED
     typedef MED::TTTimeStampInfo<eV2_2> TVTimeStampInfo;
 
     typedef MED::TTTimeStampVal<eV2_2> TVTimeStampVal;
+
+    typedef MED::TTGrilleInfo<eV2_2> TVGrilleInfo;
 
     //---------------------------------------------------------------
     class TFile;
@@ -235,6 +237,14 @@ namespace MED
       virtual
       TInt
       GetNbNodes(const MED::TMeshInfo& theMeshInfo,
+		 TErr* theErr = NULL)
+      {
+	return GetNbNodes(theMeshInfo,eCOOR,theErr);
+      }
+
+      TInt
+      GetNbNodes(const MED::TMeshInfo& theMeshInfo,
+		 ETable theTable,
 		 TErr* theErr = NULL);
       
       virtual 
@@ -438,6 +448,32 @@ namespace MED
 		   EModeAcces theMode,
 		   TErr* theErr = NULL);
       
+      virtual
+      void
+      GetGrilleInfo(TGrilleInfo& theGrilleInfo,
+		    TErr* theErr = NULL);
+      
+      virtual
+      void
+      SetGrilleInfo(const MED::TGrilleInfo& theGrilleInfo,
+		    TErr* theErr = NULL);
+
+      void
+      SetGrilleInfo(const MED::TGrilleInfo& theGrilleInfo,
+		    EModeAcces theMode,
+		    TErr* theErr = NULL);
+
+      virtual
+      void
+      GetGrilleType(const MED::TMeshInfo& theMeshInfo,
+		    EGrilleType& type,
+		    TErr* theErr = NULL);
+
+      void
+      GetGrilleStruct(const MED::TMeshInfo& theMeshInfo,
+		      TIntVector& theStruct,
+		      TErr* theErr = NULL);
+
     protected:
       PFile myFile;
     };

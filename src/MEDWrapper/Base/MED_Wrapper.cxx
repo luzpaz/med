@@ -1,10 +1,10 @@
 //  Copyright (C) 2003  CEA/DEN, EDF R&D
 //
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//
-//  File   : VISU_DatConvertor.cxx
+//  File   : MED_Wrapper.cxx
 //  Author : Alexey PETROV
-//  Module : VISU
+//  Module : MED
 
 #include "MED_Wrapper.hxx"
 #include "MED_Utilities.hxx"
@@ -60,6 +60,10 @@ namespace MED
 		   TInt theId,
 		   TErr* theErr)
   {
+    // must be reimplemented in connection with mesh type eSTRUCTURE
+    //     if(theMeshInfo->GetType() != eNON_STRUCTURE)
+    //       return PFamilyInfo();
+    
     TInt aNbAttr = GetNbFamAttr(theId,*theMeshInfo);
     TInt aNbGroup = GetNbFamGroup(theId,*theMeshInfo);
     PFamilyInfo anInfo = CrFamilyInfo(theMeshInfo,aNbGroup,aNbAttr);
@@ -88,6 +92,10 @@ namespace MED
 		 TErr* theErr)
   {
     TInt aNbElems = GetNbNodes(*theMeshInfo);
+    if(aNbElems == 0){
+      return PNodeInfo();
+    }
+
     PNodeInfo anInfo = CrNodeInfo(theMeshInfo,aNbElems);
     GetNodeInfo(*anInfo,theErr);
 
@@ -134,6 +142,9 @@ namespace MED
 		     EGeometrieElement theGeom, 
 		     EConnectivite theConnMode)
   {
+    if(theMeshInfo->GetType() != eNON_STRUCTURE)
+      return PPolygoneInfo();
+
     TInt aNbElem = GetNbPolygones(theMeshInfo,theEntity,theGeom,theConnMode);
     TInt aConnSize = GetPolygoneConnSize(theMeshInfo,theEntity,theGeom,theConnMode);
     PPolygoneInfo anInfo = CrPolygoneInfo(theMeshInfo,theEntity,theGeom,aNbElem,aConnSize,theConnMode);
@@ -165,6 +176,8 @@ namespace MED
 		     EGeometrieElement theGeom, 
 		     EConnectivite theConnMode)
   {
+    if(theMeshInfo->GetType() != eNON_STRUCTURE)
+      return PPolyedreInfo();
     TInt aNbElem  = GetNbPolyedres(theMeshInfo,theEntity,theGeom,theConnMode);
     TInt aNbFaces, aConnSize;
     GetPolyedreConnSize(theMeshInfo,aNbFaces,aConnSize,theConnMode);
@@ -196,6 +209,94 @@ namespace MED
     return anInfo;
   }
   
+  PElemInfo 
+  TWrapper
+  ::GetPElemInfo(const PMeshInfo& theMeshInfo,
+		 EEntiteMaillage theEntity, 
+		 EGeometrieElement theGeom, 
+		 EConnectivite theConnMode,
+		 TErr* theErr)
+  {
+    EMaillage aType = theMeshInfo->GetType();
+    if(aType == eNON_STRUCTURE){
+      switch(theGeom){
+      case ePOINT1:
+	return GetPNodeInfo(theMeshInfo,theErr);
+	break;
+      case ePOLYGONE:
+	return GetPPolygoneInfo(theMeshInfo,theEntity,theGeom,theConnMode);
+	break;
+      case ePOLYEDRE:
+	return GetPPolyedreInfo(theMeshInfo,theEntity,theGeom,theConnMode);
+	break;
+      default:
+	return GetPCellInfo(theMeshInfo,theEntity,theGeom,theConnMode,theErr);
+      }
+    } else {
+      PGrilleInfo aGrille = GetPGrilleInfo(theMeshInfo);
+
+      TInt nbElems;
+      EBooleen theIsElemNum = eFAUX;
+      // nodes
+      switch(theGeom){
+      case ePOINT1:
+	nbElems = aGrille->GetNbNodes();
+	theIsElemNum = eVRAI;
+	break;
+      case eSEG2:
+      case eQUAD4:
+      case eHEXA8:
+	nbElems = aGrille->GetNbCells();
+	break;
+      default:
+	nbElems = 0;
+      }
+      
+      TIntVector aFamNum;
+      TIntVector aElemNum;
+      TStringVector aElemNames;
+      
+      PElemInfo aElemInfo;
+
+      if(theGeom == ePOINT1){
+	aElemInfo = CrElemInfo(theMeshInfo,
+			       nbElems,
+			       theIsElemNum);
+	MED::TElemInfo &aTElemInfo = *aElemInfo;
+
+	// must be reimplemente in connection with mesh type eSTRUCTURE
+// 	GetNumeration(aTElemInfo,
+// 		      nbElems,
+// 		      theEntity,
+// 		      theGeom,
+// 		      theErr);
+	
+	GetFamilies(aTElemInfo,
+		    nbElems,
+		    theEntity,
+		    theGeom,
+		    theErr);
+	
+	// must be reimplemente in connection with mesh type eSTRUCTURE
+// 	GetNames(aTElemInfo,
+// 		 nbElems,
+// 		 theEntity,
+// 		 theGeom,
+// 		 theErr);
+      } else {
+	aElemInfo = CrElemInfo(theMeshInfo,
+			       nbElems,
+			       aFamNum,
+			       aElemNum,
+			       aElemNames);
+      }
+      
+      return aElemInfo;
+    }
+    return PElemInfo();
+  }
+
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   PCellInfo 
   TWrapper
@@ -205,6 +306,8 @@ namespace MED
 		 EConnectivite theConnMode,
 		 TErr* theErr)
   {
+    if(theMeshInfo->GetType() != eNON_STRUCTURE)
+      return PCellInfo();
     TInt aNbElem = GetNbCells(theMeshInfo,theEntity,theGeom,theConnMode);
     PCellInfo anInfo = CrCellInfo(theMeshInfo,theEntity,theGeom,aNbElem,theConnMode);
     GetCellInfo(anInfo,theErr);
@@ -346,6 +449,55 @@ namespace MED
     }
 #endif
 
+    return anInfo;
+  }
+
+  PGrilleInfo
+  TWrapper
+  ::GetPGrilleInfo(const PMeshInfo& theMeshInfo)
+  {
+    if(theMeshInfo->GetType() != eSTRUCTURE)
+      return PGrilleInfo();
+
+    EGrilleType type;
+    GetGrilleType(*theMeshInfo,type);
+    PGrilleInfo anInfo;
+    if(type == eGRILLE_STANDARD){
+      const TInt nnoeuds = GetNbNodes(*theMeshInfo);
+      anInfo = CrGrilleInfo(theMeshInfo,type,nnoeuds);
+    }
+    else {
+      TIntVector aVec;
+      aVec.resize(theMeshInfo->GetDim());
+      for(int aAxe=0;aAxe<theMeshInfo->GetDim();aAxe++){
+	ETable aATable;
+	switch(aAxe){
+	case 0:
+	  aATable = eCOOR_IND1;
+	  break;
+	case 1:
+	  aATable = eCOOR_IND2;
+	  break;
+	case 2:
+	  aATable = eCOOR_IND3;
+	  break;
+	}
+	aVec[aAxe] = GetNbNodes(*theMeshInfo,aATable);
+      }
+      anInfo = CrGrilleInfo(theMeshInfo,type,aVec);
+    }
+
+    GetGrilleInfo(anInfo);
+    anInfo->SetGrilleType(type);
+    return anInfo;
+  }
+  
+  PGrilleInfo
+  TWrapper
+  ::GetPGrilleInfo(const PMeshInfo& theMeshInfo,
+		   const PGrilleInfo& theInfo)
+  {
+    PGrilleInfo anInfo = CrGrilleInfo(theMeshInfo,theInfo);
     return anInfo;
   }
 }

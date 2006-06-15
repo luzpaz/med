@@ -12,8 +12,8 @@ HAVE_SSTREAM=@HAVE_SSTREAM@
 
 LIBS=@LIBS@
 LIBSFORBIN=@LIBS@
-LDFLAGS=@LDFLAGS@ -L$(top_builddir)/lib/salome
-LDFLAGSFORBIN=@LDFLAGS@ -L$(top_builddir)/lib/salome
+LDFLAGS=@LDFLAGS@ -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
+LDFLAGSFORBIN=@LDFLAGS@ -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 # add libstdc++ to link c++ library with libtool !
 LDFLAGS+= @STDLIB@
 LDFLAGSFORBIN+= @STDLIB@
@@ -41,6 +41,7 @@ CXX_DEPEND_FLAG = @CXX_DEPEND_FLAG@
 # BOOST Library
 
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
+BOOST_LIBSUFFIX = @BOOST_LIBSUFFIX@
 BOOST_LIBS = @BOOST_LIBS@
 
 # JAVA
@@ -59,8 +60,8 @@ PYTHON_VERSION = @PYTHON_VERSION@
 # Changes from the SalomePro V1.2c
 #PYTHON_SITE = @PYTHON_SITE@
 #PYTHON_SITE_INSTALL = @PYTHON_SITE_INSTALL@
-PYTHON_SITE = $(prefix)/lib/python$(PYTHON_VERSION)/site-packages
-PYTHON_SITE_INSTALL = $(prefix)/lib/python$(PYTHON_VERSION)/site-packages/salome
+PYTHON_SITE = $(prefix)/lib@LIB_LOCATION_SUFFIX@/python$(PYTHON_VERSION)/site-packages
+PYTHON_SITE_INSTALL = $(prefix)/lib@LIB_LOCATION_SUFFIX@/python$(PYTHON_VERSION)/site-packages/salome
 
 # QT
 
@@ -126,6 +127,11 @@ CAS_MODELER=@CAS_MODELER@
 CAS_DATAEXCHANGE=@CAS_DATAEXCHANGE@
 CAS_LDPATH=@CAS_LDPATH@
 
+# CPPUNIT
+
+CPPUNIT_INCLUDES = @CPPUNIT_INCLUDES@
+CPPUNIT_LIBS = @CPPUNIT_LIBS@
+
 # MPICH
 
 MPICH_INCLUDES=@MPICH_INCLUDES@
@@ -185,6 +191,8 @@ ifeq ($(MED_WITH_KERNEL),yes)
 endif
 
 DOXYGEN = @DOXYGEN@
+DOXYGEN_WITH_PYTHON = @DOXYGEN_WITH_PYTHON@
+DOXYGEN_WITH_STL = @DOXYGEN_WITH_STL@
 
 ## Shared libraries
 LT_STATIC_EXEC=@LT_STATIC_EXEC@
@@ -206,16 +214,29 @@ INSTALL_DATA=@INSTALL_DATA@
 # create a symbolic link (or a copie ?)
 LN_S=@LN_S@
 
+ifeq ($(MED_WITH_KERNEL),yes)
+
+    KERNEL_ROOT_DIR=@KERNEL_ROOT_DIR@
+    KERNEL_SITE_DIR=@KERNEL_SITE_DIR@
+
+    KERNEL_LDFLAGS=@KERNEL_LDFLAGS@
+    KERNEL_CXXFLAGS=@KERNEL_CXXFLAGS@
+
+    GUI_ROOT_DIR=@GUI_ROOT_DIR@
+    GUI_LDFLAGS=@GUI_LDFLAGS@
+    GUI_CXXFLAGS=@GUI_CXXFLAGS@
+endif
+
 ## Installation points
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-bindir=@bindir@/salome
-libdir=@libdir@/salome
+bindir=@exec_prefix@/bin/salome
+libdir=@exec_prefix@/lib@LIB_LOCATION_SUFFIX@/salome
 # warning : if user give this path in configure we could have salome/salome :-(
 includedir=@includedir@/salome
 datadir=@datadir@/salome
-idldir=$(prefix)/idl/salome
-sharedpydir=@libdir@/python$(PYTHON_VERSION)/site-packages/salome/shared_modules
+idldir=${prefix}/idl/salome
+sharedpydir=@exec_prefix@/lib@LIB_LOCATION_SUFFIX@/python$(PYTHON_VERSION)/site-packages/salome/shared_modules
 incmakedir=${prefix}/salome_adm/unix
 
 docdir=${prefix}/doc/salome
@@ -243,7 +264,29 @@ all:
 Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in
 	cd $(top_builddir) ; ./config.status
 
-$(top_builddir)/config.status: $(top_srcdir)/configure
+LOCAL_MAKE = make_commence make_conclude
+
+KERNEL_MAKE = 
+NOKERNEL_MAKE = 
+
+ifeq ($(MED_WITH_KERNEL),yes)
+     LOCAL_MAKE += make_omniorb
+
+     KERNEL_MAKE = make_module depend SALOMEconfig.h sstream
+     KERNEL_MAKE += F77config.h envScript
+
+     NOKERNEL_MAKE = 
+else
+     KERNEL_MAKE = 
+
+     NOKERNEL_MAKE = make_module depend SALOMEconfig.h sstream
+
+endif
+
+$(top_builddir)/config.status: $(top_srcdir)/configure \
+			       $(LOCAL_MAKE:%=$(top_srcdir)/adm_local/unix/%.in) \
+			       $(KERNEL_MAKE:%=$(KERNEL_ROOT_DIR)/salome_adm/unix/%.in) \
+			       $(NOKERNEL_MAKE:%=$(top_srcdir)/adm_local_without_kernel/unix/%.in)
 	cd $(top_builddir) ; ./config.status --recheck
 
 # VPATH contain $(srcdir), so make configure is good in top_srcdir and we must add target configure otherwise :-)
@@ -258,21 +301,24 @@ $(top_srcdir)/configure.in: $(top_srcdir)/configure.in.base
 	cd $(top_srcdir) && ./build_configure
 
 
-# ACLOCAL_SRC = \
-# ac_cxx_depend_flag.m4 check_hdf5.m4      enable_pthreads.m4	\
-# ac_cxx_namespaces.m4  libtool.m4         python.m4		\
-# check_pthreads.m4     check_swig.m4 
-
 ifeq ($(MED_WITH_KERNEL),yes)
+
 ACLOCAL_SRC = \
-ac_cxx_bool.m4                    check_corba.m4     check_vtk.m4	\
+ac_cxx_bool.m4                    check_corba.m4                        \
 ac_cxx_depend_flag.m4             check_hdf5.m4      enable_pthreads.m4	\
 ac_cxx_mutable.m4                 check_mico.m4      libtool.m4		\
 ac_cxx_namespaces.m4              check_omniorb.m4   pyembed.m4		\
-ac_cxx_partial_specialization.m4  check_opengl.m4    python.m4		\
+ac_cxx_partial_specialization.m4  python.m4                             \
 ac_cxx_typename.m4                check_pthreads.m4  check_cas.m4	\
-ac_cc_warnings.m4                 check_qt.m4        check_swig.m4 
-endif
+ac_cc_warnings.m4                 check_swig.m4 
 
-$(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=@KERNEL_ROOT_DIR@/salome_adm/unix/config_files/%)
-	cd $(top_srcdir) ; aclocal --acdir=adm_local/unix/config_files -I @KERNEL_ROOT_DIR@/salome_adm/unix/config_files
+ACLOCAL_GUI = \
+check_vtk.m4	                  check_opengl.m4    check_qt.m4        \
+check_GUI.m4	                  check_corba_in_GUI.m4
+
+$(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=@KERNEL_ROOT_DIR@/salome_adm/unix/config_files/%) \
+                          $(ACLOCAL_GUI:%=@GUI_ROOT_DIR@/adm_local/unix/config_files/%)
+	cd $(top_srcdir) ; aclocal -I adm_local/unix/config_files -I @KERNEL_ROOT_DIR@/salome_adm/unix/config_files \
+	                                                               -I @GUI_ROOT_DIR@/adm_local/unix/config_files
+
+endif

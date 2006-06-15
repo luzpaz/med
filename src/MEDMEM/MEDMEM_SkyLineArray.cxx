@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_SkyLineArray.hxx"
 #include "MEDMEM_Utilities.hxx"
@@ -69,6 +69,16 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(const int count, const int length,
 	    _index.set(_count+1,index);
 	    _value.set(_length,value);
 	  }
+}
+
+ostream& MEDMEM::operator<<(ostream &os, const MEDSKYLINEARRAY &sky) {
+  os << "_count : " << sky._count << " ,_length : " << sky._length;
+  for (int i = 0; i < sky._count ; i++) {
+    os << endl << "Values of type n°" << i+1 << " (index["<<i<<"]="<< sky._index[i]<<") :" << endl;
+    for (int j=sky._index[i]-1;j < sky._index[i+1]-1;j++)
+      os << sky._value[j] << " " ;
+  }
+  return os;
 }
 
 //  void MEDSKYLINEARRAY::setMEDSKYLINEARRAY( const int count , const int length, int* index , int* value )

@@ -17,7 +17,7 @@
 //  License along with this library; if not, write to the Free Software 
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
 // 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //
 //
@@ -840,7 +840,14 @@ namespace MED
 	  return -1;
       }else if(theEntityInfo.empty()) 
 	EXCEPTION(runtime_error,"GetNbTimeStamps - There is no any Entity on the Mesh");
-      
+
+      bool anIsPerformAdditionalCheck = GetNbMeshes() > 1;
+#ifdef _DEBUG_
+      static bool anIsCheckOnlyFirstTimeStamp = false;
+#else
+      static bool anIsCheckOnlyFirstTimeStamp = true;
+#endif
+
       theGeom2Size.clear();
       TInt aNbTimeStamps = 0;
       TIdt anId = myFile->Id();
@@ -859,38 +866,46 @@ namespace MED
 					  &anInfo.myName[0],
 					  anEntity,
 					  aGeom);
-	  if(aNbStamps > 0){
+	  bool anIsSatisfied = aNbStamps > 0;
+	  if(anIsSatisfied){
 	    INITMSG(MYDEBUG,
 		    "GetNbTimeStamps aNbTimeStamps = "<<aNbStamps<<
-			"; aGeom = "<<aGeom<<"; anEntity = "<<anEntity<<"\n");
-	    for(TInt iTimeStamp = 1; iTimeStamp <= aNbStamps; iTimeStamp++){
-	      char* aMaillageChamp = new char[GetNOMLength<eV2_1>()+1];
-	      char* aDtUnit = new char[GetPNOMLength<eV2_1>()+1];
-	      med_int aNbGauss;
-	      med_int aNumDt;
-	      med_int aNumOrd;
-	      med_float aDt;
-	      TErr aRet = MEDpasdetempsInfo(anId,
-					    &anInfo.myName[0],
-					    anEntity,
-					    aGeom,
-					    iTimeStamp, 
-					    aMaillageChamp,
-					    &aNbGauss,
-					    &aNumDt,  
-					    aDtUnit, 
-					    &aDt, 
-					    &aNumOrd);
-
-	      INITMSG(MYDEBUG,
-		      "GetNbTimeStamps aMaillageChamp = '"<<aMaillageChamp<<"'"<<
-		      "; aMeshName = '"<<&aMeshInfo.myName[0]<<"'\n");
-	      if(aRet == 0 && (! strcmp(aMaillageChamp,&aMeshInfo.myName[0]))){
-		theGeom2Size[EGeometrieElement(aGeom)] = anGeomIter->second;
-		theEntity = EEntiteMaillage(anEntity);
-		aNbTimeStamps = aNbStamps;
+		    "; aGeom = "<<aGeom<<"; anEntity = "<<anEntity<<"\n");
+	    if(anIsPerformAdditionalCheck){
+	      TInt iTimeStampEnd = anIsCheckOnlyFirstTimeStamp? 1: aNbStamps;
+	      for(TInt iTimeStamp = 1; iTimeStamp <= iTimeStampEnd; iTimeStamp++){
+		TVector<char> aMeshName(GetNOMLength<eV2_1>()+1);
+		TVector<char> aDtUnit(GetPNOMLength<eV2_1>()+1);
+		med_int aNbGauss;
+		med_int aNumDt;
+		med_int aNumOrd;
+		med_float aDt;
+		TErr aRet = MEDpasdetempsInfo(anId,
+					      &anInfo.myName[0],
+					      anEntity,
+					      aGeom,
+					      iTimeStamp, 
+					      &aMeshName[0],
+					      &aNbGauss,
+					      &aNumDt,  
+					      &aDtUnit[0],
+					      &aDt, 
+					      &aNumOrd);
+		
+		anIsSatisfied = (aRet == 0 && (!strcmp(&aMeshName[0],&aMeshInfo.myName[0])));
+		if(!anIsSatisfied){
+		  INITMSG(MYDEBUG,
+			  "GetNbTimeStamps aMeshName = '"<<&aMeshName[0]<<"' != "<<
+			  "; aMeshInfo.myName = '"<<&aMeshInfo.myName[0]<<"'\n");
+		  break;
+		}
 	      }
 	    }
+	  }
+	  if(anIsSatisfied){
+	    theGeom2Size[EGeometrieElement(aGeom)] = anGeomIter->second;
+	    theEntity = EEntiteMaillage(anEntity);
+	    aNbTimeStamps = aNbStamps;
 	  }
 	}
 	if(!theGeom2Size.empty()) 
@@ -932,7 +947,7 @@ namespace MED
 	aRet = MEDpasdetempsInfo(myFile->Id(),
 				 &aFieldInfo.myName[0],
 				 med_entite_maillage(theInfo.myEntity),
-				 med_geometrie_element(anIter->first),
+				 med_geometrie_element(aGeom),
 				 theTimeStampId,
 				 &aMeshInfo.myName[0],
 				 &aNbGauss,
@@ -1133,7 +1148,7 @@ namespace MED
 	MED::TProfileInfo& aProfileInfo = aGeom2Profile[aGeom];
 	med_int aNbGauss = aTimeStampInfo.GetNbGauss(aGeom);
 
-	med_int aNbVal = aMeshValue.myNbElem / aFieldInfo.myNbComp;
+	med_int aNbVal = aMeshValue.myNbElem * aMeshValue.myNbGauss;
 	TValue& aValue = aMeshValue.myValue;
 	TInt anEnd = (TInt)aValue.size();
 	

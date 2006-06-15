@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef COORDONNEES_BARYCENTRIQUES_HPP
 #define COORDONNEES_BARYCENTRIQUES_HPP
@@ -161,8 +161,12 @@ _TEMPLATE_SPE_ vector<double> _COORDBARY_2D_::Calcule_Base_Coord_Baryc(const vec
 _TEMPLATE_SPE_ vector<double> _COORDBARY_2D_::Calcule_Coord_Baryc(int num_maille, const NOEUD & M)
 	{
 	int i,j;
-	vector<double> coord_baryc_M(3,0);
-	for (i=0;i<3;i++) 
+        // for PAL11458
+        double zero = 0. ;
+	//vector<double> coord_baryc_M(3,0);
+	int nbr_faces=coord_baryc[num_maille].size();
+	vector<double> coord_baryc_M(nbr_faces,zero);
+	for (i=0;i</*3*/nbr_faces;i++) 
 		{
 		for (j=0;j<2;j++) coord_baryc_M[i]+=coord_baryc[num_maille][i][j]*M[j];
 		coord_baryc_M[i]+=coord_baryc[num_maille][i][2];

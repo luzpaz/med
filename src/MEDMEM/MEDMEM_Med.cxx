@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 # include <string> 
 # include <math.h>
@@ -331,6 +331,8 @@ void MED::read  (int index/*=0*/)
   const char * LOC = "MED::read (int index=0): ";
   BEGIN_OF(LOC);
   
+  SCRUTE(index);
+
   if (_drivers[index]) {
     // open and close are made by all objects !
     SCRUTE(index);

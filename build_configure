@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #
 # Tool for updating list of .in file for the SALOME project 
@@ -18,7 +18,7 @@ CONF_DIR=`echo $0 | sed -e "s,[^/]*$,,;s,/$,,;s,^$,.,"`
 ########################################################################
 # Check --with-kernel option
 
-MED_WITH_KERNEL=""
+MED_WITH_KERNEL="yes"
 
 for option
 do
@@ -32,12 +32,13 @@ do
   esac
 done
 
-########################################################################
-# Test if the KERNEL_ROOT_DIR is set correctly if KERNEL required
 
-if test "x${MED_WITH_KERNEL}" != "xno"; then
-    if test ! -d "${KERNEL_ROOT_DIR}"; then
-        echo "failed : KERNEL_ROOT_DIR variable is not correct !"
+########################################################################
+# Test if the GUI_ROOT_DIR is set correctly if GUI required
+
+if test "$MED_WITH_KERNEL" = "yes"; then
+    if test ! -d "${GUI_ROOT_DIR}"; then
+        echo "failed : GUI_ROOT_DIR variable is not correct !"
         exit
     fi
 fi
@@ -71,6 +72,7 @@ find_in()
 
   case $1 in
     */CVS) return ;;
+    */adm_local/*) return ;;
     *) ;;
   esac
 
@@ -155,7 +157,7 @@ cat configure.in.base                                            >> configure.in
 
 # make a link allowing AC_OUTPUT to find the salome_adm/.../*.in  files
 echo ""                                                          >> configure.in_tmp1
-echo 'if test ${MED_WITH_KERNEL} == yes; then'                   >> configure.in_tmp1
+echo 'if test ${MED_WITH_KERNEL} = yes; then'                   >> configure.in_tmp1
 echo '    ln -fs ${KERNEL_ROOT_DIR}/salome_adm ${ROOT_SRCDIR}/.' >> configure.in_tmp1
 echo 'else'                                                      >> configure.in_tmp1
 echo '    ln -fs ${ROOT_SRCDIR}/adm_local_without_kernel ${ROOT_SRCDIR}/salome_adm' >> configure.in_tmp1
@@ -177,11 +179,11 @@ echo "	./salome_adm/unix/sstream \\"        >> configure.in_tmp1
 echo "	./salome_adm/unix/depend \\"         >> configure.in_tmp1
 echo  " ])"                                  >> configure.in_tmp1
 echo ""                                      >> configure.in_tmp1
-echo 'if test $MED_WITH_KERNEL == yes; then' >> configure.in_tmp1
+echo 'if test $MED_WITH_KERNEL = yes; then' >> configure.in_tmp1
 echo "{"                                     >> configure.in_tmp1
 echo "AC_OUTPUT([ \\"                        >> configure.in_tmp1
 echo "	./salome_adm/unix/F77config.h \\"    >> configure.in_tmp1
-echo "	./adm_local/unix/make_omniorb \\"    >> configure.in_tmp1
+echo "	./adm_local/unix/make_omniorb:${ABS_CONF_DIR}/adm_local/unix/make_omniorb.in \\"    >> configure.in_tmp1
 echo "	./salome_adm/unix/envScript \\"      >> configure.in_tmp1
 echo  " ])"                                  >> configure.in_tmp1
 echo "}"                                     >> configure.in_tmp1
@@ -196,8 +198,8 @@ echo "	./salome_adm/unix/make_module \\"    >> configure.in_tmp1
 # salome_adm, par le make_conclude (resp. make_commence) du module,
 # c'est à dire le make_conclude (resp. make_commence) du répertoire
 # adm_local
-echo "	./adm_local/unix/make_commence \\"   >> configure.in_tmp1
-echo "	./adm_local/unix/make_conclude \\"   >> configure.in_tmp1
+echo "	./adm_local/unix/make_commence:${ABS_CONF_DIR}/adm_local/unix/make_commence.in \\"   >> configure.in_tmp1
+echo "	./adm_local/unix/make_conclude:${ABS_CONF_DIR}/adm_local/unix/make_conclude.in \\"   >> configure.in_tmp1
 
 \rm -f configure.in_tmp2 configure.in_tmp3
 touch configure.in_tmp2
@@ -206,9 +208,8 @@ find_in . configure.in_tmp2
 
 # _CS_gbo_100204 Mise à jour du filtre pour prise en compte des
 # restrictions imposées par les versions récente de autoconf.
-    sed -e '/^	\.\/salome_adm/d' \
+    sed -e '/^...salome_adm/d' \
 	-e '/configure.in/d'      \
-	-e '/^	\.\/adm_local/d'  \
 	-e 's/.in / /' configure.in_tmp2     >> configure.in_tmp1
 
 echo  " ])"                                  >> configure.in_tmp1
@@ -274,12 +275,12 @@ else
 fi
 
 if test "x${MED_WITH_KERNEL}" != "xno"; then
-   AUX_CONFIG_DIR=${KERNEL_ROOT_DIR}/salome_adm/unix/config_files
+   AUX_CONFIG_INC="-I ${KERNEL_ROOT_DIR}/salome_adm/unix/config_files -I ${GUI_ROOT_DIR}/adm_local/unix/config_files"
 else
-   AUX_CONFIG_DIR=adm_local_without_kernel/unix/config_files
+   AUX_CONFIG_INC="-I adm_local_without_kernel/unix/config_files"
 fi
 
-aclocal --acdir=adm_local/unix/config_files -I ${AUX_CONFIG_DIR}
+aclocal -I adm_local/unix/config_files ${AUX_CONFIG_INC}
 if autoconf
 then
 	echo "done"

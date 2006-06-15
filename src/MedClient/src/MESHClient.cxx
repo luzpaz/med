@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MESHClient.hxx"
 #include "MEDMEM_convert.hxx"
@@ -172,6 +172,46 @@ void MESHClient::fillCopy()
 
   _coord->fillCopy();
   _connect->fillCopy();
+
+  int size = _familyNode.size();
+
+  for (int i = 0; i < size; i++)
+    {
+      FAMILYClient * _fam = dynamic_cast<FAMILYClient *> (_familyNode[i]);
+      ASSERT(_fam);
+
+      _fam->fillCopy();
+    }
+
+  size = _familyCell.size();
+
+  for (int i = 0; i < size; i++)
+    {
+      FAMILYClient * _fam = dynamic_cast<FAMILYClient *> (_familyCell[i]);
+      ASSERT(_fam);
+
+      _fam->fillCopy();
+    }
+
+  size = _familyFace.size();
+
+  for (int i = 0; i < size; i++)
+    {
+      FAMILYClient * _fam = dynamic_cast<FAMILYClient *> (_familyFace[i]);
+      ASSERT(_fam);
+
+      _fam->fillCopy();
+    }
+
+  size = _familyEdge.size();
+
+  for (int i = 0; i < size; i++)
+    {
+      FAMILYClient * _fam = dynamic_cast<FAMILYClient *> (_familyEdge[i]);
+      ASSERT(_fam);
+
+      _fam->fillCopy();
+    }
 
   _complete = true;
 

@@ -17,7 +17,7 @@
 //  License along with this library; if not, write to the Free Software 
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
 // 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //
 //
@@ -593,6 +593,93 @@ namespace MED
     //! Keeps map of MED TimeStamp values per geometric type
     TMeshValue& GetMeshValue(EGeometrieElement theGeom);
   };
+
+
+  typedef std::map<TInt,TFloatVector> TIndexes;
+  typedef std::map<TInt,TString> TNames;
+  
+  //! Define a base class which represents MED Grille 
+  struct MEDWRAPPER_EXPORT TGrilleInfo:
+    virtual TModeSwitchInfo
+  {
+
+    PMeshInfo myMeshInfo;
+    const PMeshInfo& GetMeshInfo() const { return myMeshInfo;} 
+
+    TNodeCoord myCoord; //!< Contains all nodal coordinates, now used only for eGRILLE_STANDARD
+    //! Gives coordinates for mesh nodes (const version)
+    const TNodeCoord& GetNodeCoord() const;
+    TNodeCoord GetNodeCoord();
+    //! Gives coordinates for mesh node by its number, array index from 0
+    TNodeCoord GetCoord(TInt theId);
+    //! Gives ids of nodes for mesh cell by its number, array index from 0
+    TIntVector GetConn(TInt theId);
+
+    EGrilleType myGrilleType; //!< Defines grille type (eGRILLE_CARTESIENNE,eGRILLE_POLAIRE,eGRILLE_STANDARD)
+    //!Gets grille type (const version)
+    const EGrilleType& GetGrilleType() const;
+    //!Gets grille type
+    EGrilleType GetGrilleType();
+    //!Sets grille type
+    void SetGrilleType(EGrilleType theGrilleType);
+
+
+    
+    TString myCoordNames; //!< Contains names for the coordinate dimensions
+    //! Get name of the coordinate dimension by its order number
+    virtual std::string GetCoordName(TInt theId) const = 0 ;
+    //! Set name of the coordinate dimension by its order number
+    virtual void SetCoordName(TInt theId, const std::string& theValue) = 0;
+
+    TString myCoordUnits; //!< Contains units for the coordinate dimensions
+    //! Get name of unit for the coordinate dimension by its order number
+    virtual std::string GetCoordUnit(TInt theId) const = 0;
+    //! Set name of unit for the coordinate dimension by its order number
+    virtual void SetCoordUnit(TInt theId, const std::string& theValue) = 0;
+
+
+    //! Map of index of axes and Table of indexes for certain axe, now used for eGRILLE_CARTESIENNE and eGRILLE_POLAIRE
+    TIndexes myIndixes;
+    //!Gets a map of Tables (const version)
+    const TIndexes& GetMapOfIndexes() const ;
+    //!Gets a map of Tables
+    TIndexes GetMapOfIndexes();
+    //!Gets a Table of indexes for certain axe(const version)
+    const TFloatVector& GetIndexes(TInt theAxisNumber) const;
+    //!Gets a Table of indexes for certain axe
+    TFloatVector GetIndexes(TInt theAxisNumber);
+    //!Gets a number of indices per axe
+    TInt GetNbIndexes(TInt theAxisNumber);
+    
+    TInt GetNbNodes();//! Return count of all points
+    TInt GetNbCells();//! Return count of all cells
+    EGeometrieElement GetGeom();//! Return geometry of cells (calculated from mesh dimension)
+    EEntiteMaillage   GetEntity();//! Return entity (eMAILLE)
+
+    /*!
+     *Vector of grille structure (Example: {3,4,5}, 3 nodes in X axe, 4 nodes in Y axe, ...)
+     *Used only for eGRILLE_STANDARD
+     */
+    TIntVector myGrilleStructure;
+    //!Gets grille structure(const version)
+    const TIntVector& GetGrilleStructure() const;
+    //!Gets grille structure
+    TIntVector GetGrilleStructure();
+    //!Sets the grille structure of theAxis axe to theNb.
+    void SetGrilleStructure(TInt theAxis,TInt theNb);
+    
+    /*!
+     *Defines sequence MED Family indexes for corresponding mesh entites
+     *Not used now. 
+     */
+    TElemNum myFamNum; 
+    //! Get number of a MED FAMILY by order number of the mesh element
+    TInt GetFamNum(TInt theId) const;
+    //! Set number of a MED FAMILY for the mesh element with the  order number
+    void SetFamNum(TInt theId, TInt theVal);
+
+  };
+
 
 }
 

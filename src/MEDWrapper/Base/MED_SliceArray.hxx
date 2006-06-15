@@ -17,7 +17,7 @@
 //  License along with this library; if not, write to the Free Software 
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
 // 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //
 //
@@ -31,6 +31,10 @@
 
 #include <valarray>
 #include <stdexcept>
+
+//#if defined(_DEBUG_)
+#  define MED_TCSLICE_CHECK_RANGE
+//#endif
 
 namespace MED
 {
@@ -48,24 +52,41 @@ namespace MED
     PCContainer myCContainer; //!< Reference to source multy-dimension data
     std::slice mySlice; //!< Defines algorithm of index calculation
   protected:
-    //! Calculate internal index to get proper element from the source multy-dimension data
-    size_t
-    GetID(size_t theId) const
+    void
+    check_id(size_t theId) const
     {
-#ifdef _DEBUG_
-      size_t anId = -1;
+      long int anId = -1;
       if(theId < mySlice.size()){
 	anId = mySlice.start() + theId*mySlice.stride();
 	if(anId < myCContainer->size())
-	  return anId;
+	  return;
       }
-      throw std::out_of_range(std::string("TCSlice::GetID"));
-      return anId;
-#else
+      throw std::out_of_range("TCSlice::check_id");
+    }
+
+    //! Calculate internal index to get proper element from the source multy-dimension data
+    size_t
+    calculate_id(size_t theId) const
+    {
       return mySlice.start() + theId*mySlice.stride();
-#endif
     }
     
+    size_t
+    get_id(size_t theId) const
+    {
+#ifdef MED_TCSLICE_CHECK_RANGE
+      check_id(theId);
+#endif
+      return calculate_id(theId);
+    }
+    
+    size_t
+    get_id_at(size_t theId) const
+    {
+      check_id(theId);
+      return calculate_id(theId);
+    }
+
   public:
     typedef typename TContainer::value_type value_type;
 
@@ -85,7 +106,13 @@ namespace MED
     const value_type& 
     operator[](size_t theId) const
     {
-      return (*myCContainer)[GetID(theId)];
+      return (*myCContainer)[get_id(theId)];
+    }
+    
+    const value_type& 
+    at(size_t theId) const
+    {
+      return (*myCContainer)[get_id_at(theId)];
     }
     
     //! Get range of the order numbers
@@ -126,11 +153,18 @@ namespace MED
     value_type& 
     operator[](size_t theId)
     {
-      return (*myContainer)[this->GetID(theId)];
+      return (*myContainer)[this->get_id(theId)];
+    }
+
+    value_type& 
+    at(size_t theId)
+    {
+      return (*myContainer)[this->get_id_at(theId)];
     }
   };
 
 }
 
+#undef MED_TCSLICE_CHECK_RANGE
 
 #endif

@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 %module libMEDMEM_Swig
 
@@ -48,6 +48,8 @@
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_DriverFactory.hxx"
+#include "MEDMEM_GaussLocalization.hxx"
+#include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_SWIG_Templates.hxx"
 
   using namespace MEDMEM;
@@ -77,6 +79,14 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 
 %include "typemaps.i"
 %include "my_typemap.i"
+
+%typecheck(SWIG_TYPECHECK_POINTER) double *, const double *,
+ const double * const, int *, const int *, const int * const, string *,
+ const string *, const string * const, medGeometryElement *,
+ const medGeometryElement *, const medGeometryElement * const
+{
+  $1 = ($input != 0);
+}
 
 /*
   mapping between stl string and python string 
@@ -114,230 +124,6 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 %rename(assign) *::operator=;
 
 /*
-  typemap for vector<FAMILY *> C++ object
-*/
-
-%typemap(python,in) vector<FAMILY *>, const vector<FAMILY *>
-{
-  /* typemap in for vector<FAMILY *> */
-  /* Check if is a list */
-
-  if (PyList_Check($input)) {
-    int size = PyList_Size($input);
-    vector<FAMILY *> tmpVec( size );
-//     $1 = vector<FAMILY*>();
-//     $1.resize(size);
-
-    for (int i=0; i < size; i++)
-      {
-	PyObject * tmp = PyList_GetItem($input,i);
-	FAMILY * f;
-
-	int err = SWIG_ConvertPtr(tmp, (void **) &f, $descriptor(FAMILY *),
-				  SWIG_POINTER_EXCEPTION);
-
-	if (err == -1)
-	  {
-	    char * message = "Error in typemap(python,in) for vector<FAMILY *> each component should be a FAMILY pointer";
-	    PyErr_SetString(PyExc_RuntimeError, message);
-	    return NULL;
-	  }
-	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-	// $1[i] = f;
-	//$1.at(i) = f;
-        tmpVec[i] = f;
-      }
-    $1 = tmpVec;
-  }
-  else
-    {
-      PyErr_SetString(PyExc_TypeError,"not a list");
-      return NULL;
-    }
-}
-
-%typemap(python,out) vector< FAMILY * >
-{
-  /* typemap out for vector<FAMILY *> */
-  int size = $1.size();
-  $result = PyList_New(size);
-
-  for (int i=0;i<size;i++)
-    {
-      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FAMILY *),0);
-      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(FAMILY *),0);
-
-      PyList_SetItem($result,i,tmp);
-    }
-}
-
-/*
-  typemap for vector<SUPPORT *> C++ object
-*/
-
-%typemap(python,in) vector<SUPPORT *>, const vector<SUPPORT *>
-{
-  /* typemap in for vector<SUPPORT *> */
-  /* Check if is a list */
-
-  if (PyList_Check($input)) {
-    int size = PyList_Size($input);
-    vector<SUPPORT*> tmpVec ( size );
-//     $1 = vector<SUPPORT*>();
-//     $1.resize(size);
-
-    for (int i=0; i < size; i++)
-      {
-	PyObject * tmp = PyList_GetItem($input,i);
-	SUPPORT * s;
-
-	int err = SWIG_ConvertPtr(tmp, (void **) &s, $descriptor(SUPPORT *),
-				  SWIG_POINTER_EXCEPTION);
-
-	if (err == -1)
-	  {
-	    char * message = "Error in typemap(python,in) for vector<SUPPORT *> each component should be a SUPPORT pointer";
-	    PyErr_SetString(PyExc_RuntimeError, message);
-	    return NULL;
-	  }
-	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-	//$1[i] = s;
-	//$1.at(i) = s;
-        tmpVec[i] = s;
-      }
-    $1 = tmpVec;
-  }
-  else
-    {
-      PyErr_SetString(PyExc_TypeError,"not a list");
-      return NULL;
-    }
-}
-
-%typemap(python,out) vector< SUPPORT * >
-{
-  /* typemap out for vector<SUPPORT *> */
-  int size = $1.size();
-  $result = PyList_New(size);
-
-  for (int i=0;i<size;i++)
-    {
-      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(SUPPORT *),0);
-      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(SUPPORT *),0);
-
-      PyList_SetItem($result,i,tmp);
-    }
-}
-
-
-%typemap(python,in) vector< FIELD< double > * >, const vector< FIELD< double > * >
-{
-    /* typemap in for vector<FIELD<double> *> */
-  /* Check if is a list */
-
-  if (PyList_Check($input)) {
-    int size = PyList_Size($input);
-    $1.resize(size);
-
-    for (int i=0; i < size; i++)
-      {
-	PyObject * tmp = PyList_GetItem($input,i);
-	FIELD<double> * s;
-
-	int err = SWIG_ConvertPtr(tmp, (void **) &s, $descriptor(FIELD<double> *),
-				  SWIG_POINTER_EXCEPTION);
-
-	if (err == -1)
-	  {
-	    char * message = "Error in typemap(python,in) for vector<FIELD<double> *> each component should be a SUPPORT pointer";
-	    PyErr_SetString(PyExc_RuntimeError, message);
-	    return NULL;
-	  }
-
-	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-	//$1[i] = s;
-	$1.at(i) = s;
-      }
-  }
-  else
-    {
-      PyErr_SetString(PyExc_TypeError,"not a list");
-      return NULL;
-    }
-}
-
-%typemap(python,out) vector< FIELD< double > * >
-{
-  /* typemap out for vector<FIELD<double> *> */
-  int size = $1.size();
-  $result = PyList_New(size);
-
-  for (int i=0;i<size;i++)
-    {
-      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FIELD<double> *),0);
-      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(FIELD<double> *),0);
-
-      PyList_SetItem($result,i,tmp);
-    }
-}
-
-%typemap(python,in) vector< FIELD< int > * >, const vector< FIELD< int > * >
-{
-    /* typemap in for vector<FIELD<int> *> */
-  /* Check if is a list */
-
-  if (PyList_Check($input)) {
-    int size = PyList_Size($input);
-    $1.resize(size);
-
-    for (int i=0; i < size; i++)
-      {
-	PyObject * tmp = PyList_GetItem($input,i);
-	FIELD<int> * s;
-
-	int err = SWIG_ConvertPtr(tmp, (void **) &s, $descriptor(FIELD<int> *),
-				  SWIG_POINTER_EXCEPTION);
-
-	if (err == -1)
-	  {
-	    char * message = "Error in typemap(python,in) for vector<FIELD<int> *> each component should be a SUPPORT pointer";
-	    PyErr_SetString(PyExc_RuntimeError, message);
-	    return NULL;
-	  }
-
-	// mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-	//$1[i] = s;
-	$1.at(i) = s;
-      }
-  }
-  else
-    {
-      PyErr_SetString(PyExc_TypeError,"not a list");
-      return NULL;
-    }
-}
-
-%typemap(python,out) vector< FIELD< int > * >
-{
-  /* typemap out for vector<FIELD<int> *> */
-  int size = $1.size();
-  $result = PyList_New(size);
-
-  for (int i=0;i<size;i++)
-    {
-      // mpv: for compatibility with SWIG 1.3.24 SwigValueWrapper
-      //PyObject * tmp = SWIG_NewPointerObj($1[i],$descriptor(FIELD<int> *),0);
-      PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(FIELD<int> *),0);
-
-      PyList_SetItem($result,i,tmp);
-    }
-}
-
-
-/*
   typemap in for PyObject * fonction Python wrapping of a
   double or int fonction pointeur
 */
@@ -356,6 +142,66 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 
   $1 = $input;
 }
+
+/*
+  MACRO converting C++ MEDMEM::FIELD_ pointer into a PyObject pointer rightly
+  casted following its value type (int or double) and its interlacing mode
+  (FullInterlace or NoInterlace) by calling the function SWIG_NewPointer with
+  the appropriate $descriptor(...)
+*/
+
+%define TYPEMAP_OUTPUT_FIELDT(myField)
+{
+  FIELD_ *arg1=myField;
+  PyObject *myResult=NULL;
+  if(arg1)
+    {
+      FIELD<double> *try1=dynamic_cast<FIELD<double> *>(arg1);
+      if(try1)
+        myResult = SWIG_NewPointerObj((void *) try1, $descriptor(FIELD<double, FullInterlace> *), 0);
+      else
+        {
+          FIELD<int> *try2=dynamic_cast<FIELD<int> *>(arg1);
+          if(try2)
+            myResult = SWIG_NewPointerObj((void *) try2, $descriptor(FIELD<int, FullInterlace> *), 0);
+          else
+            {
+              FIELD<double, NoInterlace> *try3=dynamic_cast<FIELD<double, NoInterlace> *>(arg1);
+              if(try3)
+                myResult = SWIG_NewPointerObj((void *) try3, $descriptor(FIELD<double, NoInterlace> *), 0);
+              else
+                {
+                   FIELD<int, NoInterlace> *try4=dynamic_cast<FIELD<int, NoInterlace> *>(arg1);
+                   if(try4)
+                     myResult = SWIG_NewPointerObj((void *) try4, $descriptor(FIELD<int, NoInterlace> *), 0);
+                   else
+                     {
+                       myResult = SWIG_NewPointerObj((void *) arg1, $descriptor(FIELD_ *), 0);
+                     }
+                }
+            }
+        }
+     }
+  return myResult;
+}
+%enddef
+
+/*
+  MACRO to transforme a C++ deque<string> object into a proper Python List
+*/
+
+%define TYPEMAP_OUTPUT_DEQUE_STRING(myDeque)
+{
+   PyObject *py_list = PyList_New(myDeque.size());
+   deque<string>::iterator iter4;
+   int i4=0;
+   for(iter4=myDeque.begin();iter4!=myDeque.end();iter4++,i4++)
+     {
+         PyList_SetItem(py_list, i4, PyString_FromString((*iter4).c_str()));
+     }
+   return py_list;
+}
+%enddef
 
 /*
   MACRO converting C array <arrayvar> of length <size> into a PyList
@@ -393,6 +239,103 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
       return PyString_FromString(str.c_str());
     }
 %}
+
+/**************************************************
+  IN typemaps for some std::vector's
+**************************************************/
+
+/*  MACRO: IN typemap for std::vector<TYPE> C++ object */
+%define TYPEMAP_INPUT_VECTOR_BY_VALUE( TYPE )
+{
+  /* typemap in for vector<TYPE> */
+  /* Check if is a list */
+  if (PyList_Check($input))
+  {
+    int size = PyList_Size($input);
+    vector< TYPE > tmpVec(size);
+
+    for (int i=0; i < size; i++)
+    {
+      PyObject * tmp = PyList_GetItem($input,i);
+      TYPE elem;
+
+      int err = SWIG_ConvertPtr(tmp, (void **) &elem, $descriptor(TYPE),
+                                SWIG_POINTER_EXCEPTION);
+      if (err == -1)
+      {
+        char * message = "Error in typemap(python,in) for vector<TYPE>"
+          "each component should be a TYPE";
+        PyErr_SetString(PyExc_RuntimeError, message);
+        return NULL;
+      }
+      tmpVec[i] = elem;
+    }
+    $1 = tmpVec;
+  }
+  else
+  {
+    PyErr_SetString(PyExc_TypeError,"not a list");
+    return NULL;
+  }
+}
+%enddef
+
+%typemap(python,in) vector< FAMILY* >, const vector< FAMILY* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( FAMILY * ) }
+
+%typemap(python,in) vector< SUPPORT* >, const vector< SUPPORT* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( SUPPORT * ) }
+
+%typemap(python,in) vector< FIELDDOUBLE* >, const vector< FIELDDOUBLE* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDDOUBLE * ) }
+
+%typemap(python,in) vector< FIELDINT* >, const vector< FIELDINT* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDINT * ) }
+
+%typemap(python,in) vector< FIELDDOUBLENOINTERLACE* >, const vector< FIELDDOUBLENOINTERLACE* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDDOUBLENOINTERLACE * ) }
+
+%typemap(python,in) vector< FIELDINTNOINTERLACE* >, const vector< FIELDINTNOINTERLACE* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDINTNOINTERLACE * ) }
+
+
+/**************************************************
+  OUT typemaps for some std::vector's
+**************************************************/
+
+/*  MACRO: OUT typemap for std::vector<TYPE> C++ object */
+%define TYPEMAP_OUTPUT_VECTOR_BY_VALUE( TYPE )
+{
+  /* typemap out for vector<TYPE> */
+  int size = $1.size();
+  $result = PyList_New(size);
+
+  for (int i=0;i<size;i++)
+  {
+    PyObject * tmp = SWIG_NewPointerObj($1.at(i),$descriptor(TYPE),0);
+
+    PyList_SetItem($result,i,tmp);
+  }
+}
+%enddef
+
+%typemap(python,out) vector< FAMILY* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FAMILY * ) }
+
+%typemap(python,out) vector< SUPPORT* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( SUPPORT * ) }
+
+%typemap(python,out) vector< FIELDDOUBLE* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDDOUBLE * ) }
+
+%typemap(python,out) vector< FIELDINT* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDINT * )  }
+
+%typemap(python,out) vector< FIELDDOUBLENOINTERLACE* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDDOUBLENOINTERLACE * ) }
+
+%typemap(python,out) vector< FIELDINTNOINTERLACE* >
+{ TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDINTNOINTERLACE * ) }
 
 
 /*
@@ -517,6 +460,8 @@ class SUPPORT
   void update ( void );
 
   MESH * getMesh() const;
+
+  std::string getMeshName() const;
 
   void setMesh(MESH * Mesh) const;
 
@@ -768,6 +713,10 @@ public:
 	const std::string& fileName, const std::string& fieldName,
 	const int iterationNumber, const int orderNumber);
 
+  FIELD(driverTypes driverType,	const std::string& fileName,
+	const std::string& fieldName, const int iterationNumber,
+	const int orderNumber);
+
   void read(int index=0);
 
   T1 getValueIJ(int i,int j) const;
@@ -807,6 +756,10 @@ public:
   void write(int index=0, const std::string& driverName="");
 
   void writeAppend(int index=0, const std::string& driverName="");
+
+  bool getGaussPresence();
+
+  GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement);
 
   %extend {
     PyObject *  applyPyFunc( PyObject * func )
@@ -933,7 +886,7 @@ public:
 			     FIELD::getRow);
       }
 
-    // this method replaces getValueI() in NInterlace mode
+    // this method replaces getValueI() in NoInterlace mode
     /*%newobject getColum(int );*/
     PyObject * getColumn(int index)
       {
@@ -1043,7 +996,7 @@ public :
 
   int getNumberOfTypesWithPoly(medEntityMesh Entity);
 
-  int getNumberOfPolygons();
+  int getNumberOfPolygons(medEntityMesh Entity=MED_ALL_ENTITIES);
 
   int getNumberOfPolyhedronFaces();
 
@@ -1087,14 +1040,14 @@ public :
 	return self->intersectSupports(Supports);
       }
 
-    %newobject mergeFieldsDouble(const vector< FIELD<double>* > others);
-    FIELD<double, FullInterlace> * mergeFieldsDouble(const vector< FIELD<double>* > others)
+    %newobject mergeFieldsDouble(const vector< FIELDDOUBLE* > others);
+    FIELD<double, FullInterlace> * mergeFieldsDouble(const vector< FIELDDOUBLE* > others)
       {
 	return (FIELD<double, FullInterlace> *)self->mergeFields<double>(others);
       }
 
-    %newobject mergeFieldsInt(const vector< FIELD<int>* > others);
-    FIELD<int, FullInterlace> * mergeFieldsInt(const vector< FIELD<int>* > others)
+    %newobject mergeFieldsInt(const vector< FIELDINT* > others);
+    FIELD<int, FullInterlace> * mergeFieldsInt(const vector< FIELDINT* > others)
       {
 	return (FIELD<int, FullInterlace> *)self->mergeFields<int>(others);
       }
@@ -1495,6 +1448,8 @@ class MED
 
   void write (int index=0);
 
+  void read (int index=0);
+
   void addField ( FIELD_  * const ptrField  );
 
   void addMesh  ( MESH    * const ptrMesh   );
@@ -1512,6 +1467,12 @@ class MED
 	return self->addDriver(driverType,string(fileName),access);
       }
 
+    PyObject *getMeshNames()
+      {
+        deque<string> list_string = self->getMeshNames();
+	TYPEMAP_OUTPUT_DEQUE_STRING(list_string);
+      }
+
     %newobject getMeshName(int );
     const char * getMeshName(int i)
       {
@@ -1519,6 +1480,12 @@ class MED
 	char * tmp = new char[strlen(list_string[i].c_str())+1];
 	strcpy(tmp,list_string[i].c_str());
 	return tmp;
+      }
+
+    PyObject *getFieldNames()
+      {
+        deque<string> list_string = self->getFieldNames();
+        TYPEMAP_OUTPUT_DEQUE_STRING(list_string);
       }
 
     %newobject getFieldName(int );
@@ -1553,6 +1520,12 @@ class MED
     FIELD_ * getField(char * fieldName, int dt, int it)
       {
 	return self->getField(string(fieldName),dt,it);
+      }
+
+    PyObject *getFieldT(char * fieldName, int dt, int it)
+      {
+        FIELD_ *ret=self->getField(string(fieldName),dt,it);
+	TYPEMAP_OUTPUT_FIELDT(ret);
       }
 
     FIELD_ * getField2(char * fieldName,double time, int it=0)
@@ -2171,7 +2144,7 @@ public:
   void read ( void ) ;
 
   %extend {
-    MED_FIELD_RDONLY_DRIVER(char * fileName, FIELD< T1 > * ptrField)
+    MED_FIELD_RDONLY_DRIVER(char * fileName, FIELD<T1, FullInterlace > * ptrField)
       {
 	return new MED_FIELD_RDONLY_DRIVER< T1 >(string(fileName), ptrField);
       }
@@ -2219,7 +2192,7 @@ public:
   void read ( void ) ;
 
   %extend {
-    MED_FIELD_WRONLY_DRIVER(char * fileName, FIELD< T1 > * ptrField)
+    MED_FIELD_WRONLY_DRIVER(char * fileName, FIELD<T1, FullInterlace> * ptrField)
       {
 	return new MED_FIELD_WRONLY_DRIVER< T1 >(string(fileName), ptrField);
       }
@@ -2267,7 +2240,7 @@ public:
   void read ( void ) ;
 
   %extend {
-    MED_FIELD_RDWR_DRIVER(char * fileName, FIELD< T1 > * ptrField)
+    MED_FIELD_RDWR_DRIVER(char * fileName, FIELD<T1, FullInterlace> * ptrField)
       {
 	return new MED_FIELD_RDWR_DRIVER< T1 >(string(fileName), ptrField);
       }
@@ -2312,14 +2285,95 @@ public:
 
 
   %extend {
-    ASCII_FIELD_DRIVER(const char *fileName, FIELD<T1> * ptrField, med_sort_direc direction, const char *priority)
+    ASCII_FIELD_DRIVER(const char *fileName, FIELD<T1, FullInterlace> * ptrField, med_sort_direc direction, const char *priority)
       {
 	return new ASCII_FIELD_DRIVER<T1>(string(fileName), ptrField, (MED_EN::med_sort_direc)direction, priority);
       }
   }
 };
+
 %template (ASCII_FIELDDOUBLE_DRIVER) ASCII_FIELD_DRIVER< double >;
 %template (ASCII_FIELDINT_DRIVER) ASCII_FIELD_DRIVER< int >;
+
+/*
+*/
+
+
+template <class INTERLACING_TAG> class GAUSS_LOCALIZATION
+{
+ public:
+
+  GAUSS_LOCALIZATION();
+
+  ~GAUSS_LOCALIZATION();
+
+  std::string getName() const ;
+
+  medGeometryElement getType() const ;
+
+  int getNbGauss() const ;
+
+  medModeSwitch  getInterlacingType() const;
+
+  %extend {
+    GAUSS_LOCALIZATION<INTERLACING_TAG>(char * locName,
+					const medGeometryElement
+					typeGeo,
+					const int  nGauss,
+					const double * cooRef,
+					const double * cooGauss,
+					const double * wg)
+      {
+	return new GAUSS_LOCALIZATION<INTERLACING_TAG>(string(locName),
+						       typeGeo, nGauss, cooRef,
+						       cooGauss, wg);
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing GAUSS_LOCALIZATION : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
+    PyObject * getRefCoo () const
+      {
+	typedef  MEDMEM_ArrayInterface<double,INTERLACING_TAG,NoGauss>::Array ArrayNoGauss;
+
+	ArrayNoGauss cooRef = self->getRefCoo();
+	int size = cooRef.getArraySize();
+	double * cooRefPtr = cooRef.getPtr();
+        TYPEMAP_OUTPUT_ARRAY(cooRefPtr, size, PyFloat_FromDouble,
+			     GAUSS_LOCALIZATION::getRefCoo);
+      }
+
+    PyObject * getGsCoo () const
+      {
+	typedef  MEDMEM_ArrayInterface<double,INTERLACING_TAG,NoGauss>::Array ArrayNoGauss;
+	ArrayNoGauss cooGauss = self->getGsCoo();
+	int size = cooGauss.getArraySize();
+	double * cooGaussPtr = cooGauss.getPtr();
+        TYPEMAP_OUTPUT_ARRAY(cooGaussPtr, size, PyFloat_FromDouble,
+			     GAUSS_LOCALIZATION::getGsCoo);
+      }
+
+    PyObject * getWeight () const
+      {
+	vector<double> wg = self->getWeight();
+	int size = wg.size();
+	double * wgPtr = new double [size];
+	for (int index = 0; index<size; index++)
+	  wgPtr[index] = wg[index];
+        TYPEMAP_OUTPUT_ARRAY(wgPtr, size, PyFloat_FromDouble,
+			     GAUSS_LOCALIZATION::getWeight);
+	delete wgPtr;
+      }
+  }
+};
+
+%template (GAUSS_LOCALIZATION_FULL) GAUSS_LOCALIZATION<FullInterlace> ;
+%template (GAUSS_LOCALIZATION_NO) GAUSS_LOCALIZATION<NoInterlace> ;
 
 %{
   template <class T, class INTERLACING_TAG>
@@ -2345,6 +2399,18 @@ public:
       MESSAGE("createTypedFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
       MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
       return (FIELD<T, INTERLACING_TAG> *) field;
+    }
+
+  template <class T> FIELD<T, FullInterlace> *
+    createTypedFieldConvertFullInterlace(const FIELD<T, NoInterlace> & field )
+    {
+      return FieldConvert(field);
+    }
+
+  template <class T> FIELD<T, NoInterlace> *
+    createTypedFieldConvertNoInterlace(const FIELD<T, FullInterlace> & field )
+    {
+      return FieldConvert(field);
     }
 %}
 
@@ -2375,6 +2441,24 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFiel
 %template ( createFieldIntNoInterlaceScalarProductDeep ) createFieldScalarProductDeep < int, NoInterlace >;
 
 template<class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldFromAnalytic(SUPPORT * Support, int NumberOfComponents, PyObject * double_function);
+
+template <class T> FIELD<T, FullInterlace> * createTypedFieldConvertFullInterlace(const FIELD<T, NoInterlace> & field );
+
+%template (createFieldDoubleConvertFullInterlace) createTypedFieldConvertFullInterlace<double>;
+
+%template (createFieldIntConvertFullInterlace) createTypedFieldConvertFullInterlace<int>;
+
+template <class T> FIELD<T, NoInterlace> * createTypedFieldConvertNoInterlace(const FIELD<T, FullInterlace> & field );
+
+%template (createFieldDoubleConvertNoInterlace) createTypedFieldConvertNoInterlace<double>;
+
+%template (createFieldIntConvertNoInterlace) createTypedFieldConvertNoInterlace<int>;
+
+%newobject createFieldDoubleConvertFullInterlace ;
+%newobject createFieldIntConvertFullInterlace ;
+
+%newobject createFieldDoubleConvertNoInterlace ;
+%newobject createFieldIntConvertNoInterlace ;
 
 GRID * createGridFromMesh( MESH * aMesh );
 

@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_Mesh.hxx"
@@ -126,7 +126,7 @@ FIELD_::FIELD_(const FIELD_ &m)
 }
 
 FIELD_::~FIELD_()
-{   
+{
   MESSAGE("~FIELD_()");
   if ( _componentsTypes !=NULL)
     delete[] _componentsTypes ;
@@ -216,14 +216,11 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume) const 
 	throw MEDEXCEPTION(diagnosis.c_str());
     }
 
-    const int* nbGauss=getSupport()->getNumberOfGaussPoint();
-    for (int i=0; i<getSupport()->getNumberOfTypes(); ++i)
-	if(nbGauss[i]!=1)
-	{
-	    diagnosis="Cannot compute Lnorm of "+getName()+
-	    " : Gauss numbers greater than one are not yet implemented!";
-	    throw MEDEXCEPTION(diagnosis.c_str());
-	}
+    if (getGaussPresence() ) {
+      diagnosis="Cannot compute Lnorm of "+getName()+
+	" : Gauss numbers greater than one are not yet implemented!";
+      throw MEDEXCEPTION(diagnosis.c_str());
+    }
 
     if(support_volume) // if the user has supplied the volume
     {

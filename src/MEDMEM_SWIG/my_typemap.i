@@ -15,14 +15,14 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 %{
 #include <stdio.h>
 %}
 
-%typemap(python,in) string * {
-  /* typemap in for string * */
+%typemap(python,in) string * , const string * , const string * const {
+  /* typemap in for string * , const string * , const string * const */
   /* Check if is a list */
   if (PyList_Check($input)) {
     int size = PyList_Size($input);
@@ -46,9 +46,9 @@
     }
 }
 
-%typemap(python,in) double *
+%typemap(python,in) double * , const double * , const double * const
 {
-  /* typemap in for double * */
+  /* typemap in for double * , const double * , const double * const */
   /* Check if is a list */
   if (PyList_Check($input)) { 
     int size = PyList_Size($input);
@@ -72,9 +72,9 @@
     }
 } 
 
-%typemap(python,in) int *
+%typemap(python,in) int * , const int * , const int * const
 {
-  /* typemap in for int * */
+  /* typemap in for int * , const int * , const int * const */
   /* Check if is a list */
   if (PyList_Check($input)) { 
     int size = PyList_Size($input);
@@ -99,9 +99,9 @@
 } 
 
 
-%typemap(python,in) medGeometryElement *
+%typemap(python,in) medGeometryElement * , const  medGeometryElement * , const  medGeometryElement * const 
 {
-  /* typemap in for medGeometryElement * */
+  /* typemap in for medGeometryElement * , const  medGeometryElement * , const  medGeometryElement * const */
   /* Check if is a list */
   if (PyList_Check($input)) { 
     int size = PyList_Size($input);
@@ -134,18 +134,17 @@
     PyList_SetItem($result,i,PyString_FromString((*iL).c_str())); 
 }
 
-%typemap(freearg) int * {
-  /* free the memory allocated in the typemap in for int * */
+%typemap(freearg) int * , const int * , const int * const {
+  /* free the memory allocated in the typemap in for int * , const int * , const int * const */
   free($1);
 }
 
-%typemap(freearg) double * {
-  /* free the memory allocated in the typemap in for double * */
+%typemap(freearg) double * , const double * , const double * const {
+  /* free the memory allocated in the typemap in for double * , const double * , const double * const */
   free($1);
 }
 
-%typemap(freearg) medGeometryElement * {
-  /* free the memory allocated in the typemap in for medGeometryElement * */
+%typemap(freearg) medGeometryElement * , const medGeometryElement * , const medGeometryElement * const {
+  /* free the memory allocated in the typemap in for medGeometryElement * , const medGeometryElement * , const medGeometryElement * const */
   free($1);
 }
-

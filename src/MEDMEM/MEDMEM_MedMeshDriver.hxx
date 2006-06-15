@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef MED_MESH_DRIVER_HXX
 #define MED_MESH_DRIVER_HXX
@@ -47,9 +47,9 @@ class CONNECTIVITY;
 class MEDMEM_EXPORT MED_MESH_DRIVER : public GENDRIVER
 {
 protected:
-  
-  MESH *   _ptrMesh;
-  string         _meshName;    // const ?
+
+  MESH *         _ptrMesh;
+  mutable string _meshName;
   int            _meshNum;     // INUTILE ?
 
 
@@ -62,8 +62,8 @@ public :
   /*!
     Constructor.
   */
-  MED_MESH_DRIVER(const string & fileName,  
-		  MESH * ptrMesh, 
+  MED_MESH_DRIVER(const string & fileName,
+		  MESH * ptrMesh,
 		  MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.

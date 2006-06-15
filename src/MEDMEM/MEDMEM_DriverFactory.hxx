@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef DRIVERFACTORY_HXX
 #define DRIVERFACTORY_HXX
@@ -48,6 +48,8 @@ namespace MEDMEM {
     MEDMEM_EXPORT MED_EN::medFileVersion getMedFileVersionForWriting();
 
     MEDMEM_EXPORT void setMedFileVersionForWriting(MED_EN::medFileVersion version);
+
+    MEDMEM_EXPORT driverTypes deduceDriverTypeFromFileName(const std::string & fileName);
 
     MEDMEM_EXPORT GENDRIVER * buildDriverForMesh(driverTypes driverType,
 				   const std::string & fileName,

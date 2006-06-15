@@ -1,4 +1,4 @@
-cd ${KERNEL_ROOT_DIR}/bin
+cd ${KERNEL_ROOT_DIR}/bin/salome
 pwd
 ./allkill || true
 ./killall python || true

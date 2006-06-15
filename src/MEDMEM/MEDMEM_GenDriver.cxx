@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_STRING.hxx"
@@ -160,7 +160,8 @@ bool MEDMEM::GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
   MESSAGE(LOC);
 
   return ( _id == genDriver._id )  &&
-    ( _driverType == genDriver._driverType );
+    ( _driverType == genDriver._driverType ) &&
+    (_accessMode == genDriver._accessMode);
   
 };
 

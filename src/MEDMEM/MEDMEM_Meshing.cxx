@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
   File MEDMEM_Meshing.cxx
@@ -191,6 +191,7 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
       }
     // all rigth, we could create connectivity !
     CONNECTIVITY * myConnectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;
+    myConnectivity->setEntityDimension(_connectivity->getEntityDimension()-1);
     _connectivity->setConstituent(myConnectivity);
   }
 }
@@ -274,12 +275,8 @@ void MESHING::setPolygonsConnectivity     (const int * ConnectivityIndex,
 {
   if (_connectivity == (CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("No connectivity defined !");
-  if(_connectivity->getPolyTypeRelativeTo()==MED_EN::MED_POLYGON)
-    {
-      _connectivity->setPolygonsConnectivity(MED_NODAL, Entity, ConnectivityValue, ConnectivityIndex,ConnectivityIndex[nbOfPolygons]-1,nbOfPolygons) ;
-    }
-  else
-    throw MEDEXCEPTION("Invalid connectivity for polygons !!!");
+  
+  _connectivity->setPolygonsConnectivity(MED_NODAL, Entity, ConnectivityValue, ConnectivityIndex,ConnectivityIndex[nbOfPolygons]-1,nbOfPolygons) ;
 }
 
 void MESHING::setPolyhedraConnectivity     (const int * PolyhedronIndex,

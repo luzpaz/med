@@ -1,8 +1,25 @@
+// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
+//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either 
+// version 2.1 of the License.
+// 
+// This library is distributed in the hope that it will be useful 
+// but WITHOUT ANY WARRANTY; without even the implied warranty of 
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public  
+// License along with this library; if not, write to the Free Software 
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// 
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// 
 //=============================================================================
 // File      : MEDMEM_Support_i.cxx
 // Project   : SALOME
 // Author    : EDF
-// Copyright : EDF 2002
 // $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Support_i.cxx
 //=============================================================================
 
@@ -503,58 +520,6 @@ throw (SALOME::SALOME_Exception)
         }
 }
 
-
-//=============================================================================
-/*!
- * CORBA: Array containing indexes for elements included in the support  
- */
-//=============================================================================
-
-CORBA::Long SUPPORT_i::getNumberOfGaussPoint(SALOME_MED::medGeometryElement geomElement)
-throw (SALOME::SALOME_Exception)
-{
-	if (_support==NULL)
-		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
-        try
-        {
-		return _support->getNumberOfGaussPoint(convertIdlEltToMedElt(geomElement));
-	}
-	catch (MEDEXCEPTION &ex)
-        {
-      		MESSAGE("Unable to access number of Gauss points");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-	}
-}
-//=============================================================================
-/*!
- * CORBA: Global Nodes Index (optionnaly designed by the user)
- */
-//=============================================================================
-SALOME_MED::long_array *  SUPPORT_i::getNumbersOfGaussPoint()
-throw (SALOME::SALOME_Exception)
-{
-        if (_support==NULL)
-                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-                                             SALOME::INTERNAL_ERROR);
-        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
-        try
-        {
-                int mySeqLength=_support->getNumberOfTypes();
-                myseq->length(mySeqLength);
-                const medGeometryElement * elemts = _support->getTypes();
-                for (int i=0;i<mySeqLength;i++)
-                {
-                        myseq[i]= _support->getNumberOfGaussPoint(elemts[i]);
-                }
-        }
-        catch (MEDEXCEPTION &ex)
-        {
-                MESSAGE("Unable to access number of Gauss points");
-                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-        }
-        return myseq._retn();
-}
 //=============================================================================
 /*!
  * CORBA: add the Support in the StudyManager 

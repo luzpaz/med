@@ -17,7 +17,7 @@
 //  License along with this library; if not, write to the Free Software 
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
 // 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //
 //
@@ -32,8 +32,10 @@
 #include "MED_V2_1_Wrapper.hxx"
 
 #include <stdio.h>
+#include <strstream>
 
-extern "C"{
+extern "C"
+{
 #include <med.h>
 }
 
@@ -43,13 +45,38 @@ static int MYDEBUG = 0;
 static int MYDEBUG = 0;
 #endif
 
-namespace MED{
+namespace MED
+{
   
-  EVersion GetVersionId(const std::string& theFileName)
+  EVersion GetVersionId(const std::string& theFileName,
+			bool theDoPreCheckInSeparateProcess)
   {
-    EVersion aVersion = eVUnknown;
+    INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'"<<std::endl);
+    EVersion aVersion = eVUnknown;    
+
+    if(theDoPreCheckInSeparateProcess){
+      // First check, is it possible to deal with the file
+      std::ostringstream aStr;
+#ifdef WIN32
+      aStr<< getenv("MED_ROOT_DIR") << "/bin/salome/mprint_version " << theFileName;
+#else
+      aStr<<"bash -c \""<<getenv("MED_ROOT_DIR")<<"/bin/salome/mprint_version "<<theFileName<<"\"";
+      if(!MYDEBUG)
+        aStr<<" 2>&1 > /dev/null";
+#endif
+      
+      std::string aCommand = aStr.str();
+      int aStatus = system(aCommand.c_str());
+      
+      BEGMSG(MYDEBUG,"aCommand = '"<<aCommand<<"'; aStatus = "<<aStatus<<std::endl);
+      if(aStatus != 0)
+	return aVersion;
+    }
+
+    // Next, try to open the file trough the MED API
     char* aFileName = const_cast<char*>(theFileName.c_str());
     med_idt aFid = MEDouvrir(aFileName,MED_LECTURE);
+
     MSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aFid = "<<aFid<<endl);
     if(aFid >= 0){
       med_int aMajor, aMinor, aRelease;
@@ -62,21 +89,26 @@ namespace MED{
 	  aVersion = eV2_1;
       }
     }
-    INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aVersion = "<<aVersion<<endl);
+    MEDfermer(aFid);
+
+    BEGMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aVersion = "<<aVersion<<std::endl);
     return aVersion;
   }
 
-  PWrapper CrWrapper(const std::string& theFileName)
+  PWrapper CrWrapper(const std::string& theFileName,
+		     bool theDoPreCheckInSeparateProcess)
   {
     PWrapper aWrapper;
-    EVersion aVersion = GetVersionId(theFileName);
+    EVersion aVersion = GetVersionId(theFileName,theDoPreCheckInSeparateProcess);
     switch(aVersion){
     case eV2_2:
       aWrapper.reset(new MED::V2_2::TVWrapper(theFileName));
       break;
     case eV2_1:
-    default:
       aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
+      break;
+    default:
+      EXCEPTION(runtime_error,"MED::CrWrapper - theFileName = '"<<theFileName<<"'");
     }
     return aWrapper;
   }

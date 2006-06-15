@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_DriverTools.hxx"
 #include "MEDMEM_STRING.hxx"
@@ -751,9 +751,6 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     new_group->setNumber(tab_index_types_geometriques,tab_numeros_elements);
     new_group->setEntity(groupe_entity);
     new_group->setAll(mailleSet.size() == maillage.size());
-
-    vector<int> nbGaussPnt( nb_geometric_types, 1 );
-    new_group->setNumberOfGaussPoint( &nbGaussPnt[0] );
 
     vect_group->push_back(new_group);
 

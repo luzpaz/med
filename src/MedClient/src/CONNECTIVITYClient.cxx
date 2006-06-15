@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_convert.hxx"
 #include "Utils_CorbaException.hxx"
@@ -113,6 +113,12 @@ void CONNECTIVITYClient::blankCopy()
   else
   {
     _polyType_client = MED_EN::MED_NONE;
+  }
+
+  // create a constituent (PAL10556)
+  if ( Entity == MED_CELL ) {
+    Entity = ( IOR_Mesh->getMeshDimension() == 3 ? MED_FACE : MED_EDGE );
+    _constituent = new CONNECTIVITYClient( IOR_Mesh, Entity );
   }
 
   _complete = false;
@@ -349,11 +355,11 @@ const int * CONNECTIVITYClient::getGlobalNumberingIndex
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
-  const int * c = CONNECTIVITY::getGlobalNumberingIndex(Entity);
+  const int * index = CONNECTIVITY::getGlobalNumberingIndex(Entity);
 
   END_OF("void CONNECTIVITYClient::getGlobalNumberingIndex()");
 
-  return c;
+  return index;
 }
 
 //=============================================================================

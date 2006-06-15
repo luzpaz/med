@@ -17,7 +17,7 @@
 #  License along with this library; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 #
 #
@@ -33,14 +33,14 @@ VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl
 
 @COMMENCE@
 
-EXPORT_PYSCRIPTS =  MED_test1.py MED_test2.py Med_Gen_test.py
+EXPORT_PYSCRIPTS =  MED_test1.py MED_test2.py Med_Gen_test.py testMedAlliances.py testMedAlliances1.py
 
 # Libraries targets
 
 LIB = libMEDEngine.la
 
 LIB_SRC = Med_Gen_i.cxx
-LIB_SERVER_IDL = MED_Gen.idl SALOME_Component.idl \
+LIB_SERVER_IDL = MED_Gen.idl SALOME_Component.idl SALOME_ContainerManager.idl \
 	         SALOME_Exception.idl MED.idl
 
 LIB_CLIENT_IDL = SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_ModuleCatalog.idl SALOME_Comm.idl SALOME_GenericObj.idl
@@ -49,15 +49,15 @@ LIB_CLIENT_IDL = SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_ModuleCatalog.idl S
 BIN =
 BIN_SRC =
 
-LDFLAGS= -L$(top_builddir)/lib/salome
-LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
+LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
+LDFLAGSFORBIN= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
 # additionnal information to compil and link file
 
-CPPFLAGS += $(OCC_INCLUDES) $(MED2_INCLUDES)  $(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
-CXXFLAGS += $(OCC_CXXFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
+CPPFLAGS += $(OCC_INCLUDES) $(MED2_INCLUDES)  $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS}
+CXXFLAGS += $(OCC_CXXFLAGS) ${KERNEL_CXXFLAGS}
 
-LDFLAGS+=  $(OCC_LIBS) $(HDF5_LIBS) -L${KERNEL_ROOT_DIR}/lib/salome \
+LDFLAGS+=  $(OCC_LIBS) $(HDF5_LIBS) ${KERNEL_LDFLAGS} \
 	-lSalomeContainer -lSalomeHDFPersist -lSalomeDS -lSalomeNS -lRegistry -lOpUtil -lMEDMEMImpl
 
 MED.hh MEDSK.cc: MED.idl

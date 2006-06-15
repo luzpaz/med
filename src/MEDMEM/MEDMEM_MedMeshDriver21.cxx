@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_MedMeshDriver21.hxx"
 
@@ -2471,6 +2471,13 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
     err =med_2_1::_MEDdatagroupOuvrir(_medIdt,const_cast <char *> (dataGroupFam.c_str()) ) ;
     if ( err < MED_VALID ) {
       SCRUTE(err);
+      if ( families[i]->getName().size() > MED_TAILLE_NOM )
+	throw MEDEXCEPTION
+          ( LOCALIZED(STRING(LOC) << "The size of the name of the family |" << i+1
+                      << "| |" << families[i]->getName()
+                      << "| with identifier |" << families[i]->getIdentifier()  << "| is |" 
+                      <<  families[i]->getName().size()  <<"| and is more than |"
+                      << MED_TAILLE_NOM << "|")) ;
 
       MESSAGE(LOC<<"families[i]->getName().c_str() : "<<families[i]->getName().c_str());
       MESSAGE(LOC<<"_meshName.c_str() : "<<_meshName.c_str());

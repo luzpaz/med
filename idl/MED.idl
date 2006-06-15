@@ -15,11 +15,10 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File: MED.idl
 // Project: SALOME
-// Copyright : CEA/DEN/DMSS/LGLS
 // $Header$
 
 /*!
@@ -677,19 +676,6 @@ Internal Corba method.
      */
     SALOME::SenderInt getSenderForNumberIndex()
       raises (SALOME::SALOME_Exception);
-
-    /*!
-      Returns the number of Gauss points for this %medGeometryElement.
-
-      \note
-      - Not defined if %SUPPORT is on MED_NODE.
-      - Not defined for MED_ALL_ELEMENTS %medGeometryElement type.
-     */
-    long getNumberOfGaussPoint(in medGeometryElement geomElement)
-      				raises (SALOME::SALOME_Exception);
-
-    SALOME_MED::long_array getNumbersOfGaussPoint()
-      				raises (SALOME::SALOME_Exception);
 
     void getBoundaryElements()
       					raises (SALOME::SALOME_Exception);

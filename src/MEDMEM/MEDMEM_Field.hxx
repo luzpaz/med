@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
  File Field.hxx
@@ -28,6 +28,7 @@
 #include <MEDMEM.hxx>
 
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <math.h>
 #include <cmath>
@@ -40,7 +41,9 @@
 #include "MEDMEM_nArray.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_ArrayInterface.hxx"
+#include "MEDMEM_SetInterlacingType.hxx"
 #include "MEDMEM_FieldForward.hxx"
+#include "MEDMEM_GaussLocalization.hxx"
 
 /*!
 
@@ -68,7 +71,7 @@ namespace MEDMEM {
     static const MED_EN::medModeSwitch _interlacingType = MED_EN::MED_NO_INTERLACE; };
 
 class MEDMEM_EXPORT FIELD_    // GENERIC POINTER TO a template <class T, class INTERLACING_TAG> class FIELD
-{  // ÃÂ¹pihjpmoÃÂ§hmpÃÂ§_hmÃÂ¹
+{
 protected:
 
   bool            _isRead ;
@@ -101,6 +104,8 @@ protected:
   /*!
     \if developper
     Number of field's values.
+    doesn't take care of _numberOfComponents
+    and number of Gauss points.
     \endif
   */
   int             _numberOfValues ;
@@ -198,7 +203,6 @@ public:
   friend class MED_MED_RDONLY_DRIVER22;
   friend class MED_MED_WRONLY_DRIVER22;
   friend class MED_MED_RDWR_DRIVER22;
-
   friend class VTK_MED_DRIVER;
 
   /*!
@@ -230,7 +234,7 @@ public:
   virtual  int      addDriver( GENDRIVER & driver);
   virtual  void     read (const GENDRIVER &);
   virtual  void     read(int index=0);
-  virtual void openAppend( void );
+  virtual  void     openAppend( void );
   virtual  void     write(const GENDRIVER &);
   virtual  void     write(int index=0, const string & driverName="");
 
@@ -632,10 +636,15 @@ protected:
   typedef typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,Gauss>::Array   ArrayGauss;
   typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array     ArrayNo;
   typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array   ArrayFull;
-  typedef  MEDMEM_Array_ Array;
+  typedef MEDMEM_Array_ Array;
+  typedef T ElementType;
+  typedef INTERLACING_TAG InterlacingTag;
+  typedef map<MED_EN::medGeometryElement,GAUSS_LOCALIZATION_*> locMap;
 
   // array of value of type T
   Array *_value ;
+
+  map<MED_EN::medGeometryElement,GAUSS_LOCALIZATION_*> _gaussModel; //A changer quand les drivers seront template de l'entrelacement
 
   static T _scalarForPow;
   static T pow(T x);
@@ -733,8 +742,20 @@ public:
   inline const T*     getRow(int i)    const throw (MEDEXCEPTION);
   inline const T*     getColumn(int j) const throw (MEDEXCEPTION);
   inline T            getValueIJ(int i,int j) const throw (MEDEXCEPTION);
+  inline T            getValueIJK(int i,int j,int k) const throw (MEDEXCEPTION);
+
   bool                getValueOnElement(int eltIdInSup,T* retValues) const throw (MEDEXCEPTION);
 
+  const int   getNumberOfGeometricTypes() const throw (MEDEXCEPTION);
+  const GAUSS_LOCALIZATION<INTERLACING_TAG> & getGaussLocalization(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
+  const GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
+  const int * getNumberOfGaussPoints() const throw (MEDEXCEPTION);
+  const int   getNumberOfGaussPoints( MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
+  const int   getNbGaussI(int i)          const throw (MEDEXCEPTION);
+  const int * getNumberOfElements()       const throw (MEDEXCEPTION);
+  const MED_EN::medGeometryElement  * getGeometricTypes()  const throw (MEDEXCEPTION);
+  bool        isOnAllElements()           const throw (MEDEXCEPTION);
+ 
   inline void setArray(MEDMEM_Array_ *value) throw (MEDEXCEPTION);
   inline void setValue( T* value) throw (MEDEXCEPTION);
   inline void setRow( int i, T* value) throw (MEDEXCEPTION);
@@ -879,7 +900,7 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::FIELD(const
 {
   MESSAGE("Constructeur FIELD de recopie");
 
-  // RECOPIE PROFOND Rmq from EF
+  // RECOPIE PROFONDE <> de l'operateur= Rmq from EF
   if (m._value != NULL)
     {
       if ( m.getGaussPresence() )
@@ -889,6 +910,12 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::FIELD(const
     }
   else
     _value = (ArrayNoGauss *) NULL;
+  locMap::const_iterator it;
+  for ( it = m._gaussModel.begin();it != m._gaussModel.end(); it++ )
+    _gaussModel[dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
+      new GAUSS_LOCALIZATION<INTERLACING_TAG>(
+					      *dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
+					      );
 
   _valueType       = m._valueType;
   _interlacingType = m._interlacingType;
@@ -911,9 +938,18 @@ FIELD<T, INTERLACING_TAG> & FIELD<T, INTERLACING_TAG>::operator=(const FIELD &m)
 
   _value           = m._value; //PROBLEME RECOPIE DES POINTEURS PAS COHERENT AVEC LE
                                //CONSTRUCTEUR PAR RECOPIE
-                               //CF :Commentaire dans MEDMEM_Array 
+                               //CF :Commentaire dans MEDMEM_Array
+  locMap::const_iterator it;
+  for ( it = m._gaussModel.begin();it != m._gaussModel.end(); it++ )
+    _gaussModel[dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
+      new GAUSS_LOCALIZATION<INTERLACING_TAG>(
+					      *dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
+					      );
+
   _valueType       = m._valueType;
   _interlacingType = m._interlacingType;
+
+  return *this;
 }
 
 /*!
@@ -1665,13 +1701,13 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
 
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÂ©mentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
     // Il n'est vraiment pas optimal de mixer des champs dans des modes d'entrelacement
     // different juste pour le calcul
- 
+
     const T * value     = NULL;
     ArrayNo * myArray   = NULL;
     if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
@@ -1931,7 +1967,7 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
   provides the meshName related mesh but doesn't not set a mesh in the created
   support.
 */
-template <class T, class INTERLACING_TAG>  
+template <class T, class INTERLACING_TAG>
 FIELD<T,INTERLACING_TAG>::FIELD(driverTypes driverType,
 				const string & fileName,
 				const string & fieldDriverName,
@@ -1982,6 +2018,10 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::~FIELD()
   BEGIN_OF(" Destructeur FIELD<T, INTERLACING_TAG>::~FIELD()");
   SCRUTE(this);
   if (_value) delete _value;
+  locMap::const_iterator it;
+  for ( it = _gaussModel.begin();it != _gaussModel.end(); it++ )
+    delete (*it).second;
+
   END_OF(" Destructeur FIELD<T,INTERLACING_TAG>::~FIELD()");
 }
 
@@ -2014,7 +2054,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
     _numberOfValues = _support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
     MESSAGE(LOC <<" : "<<_numberOfValues <<" et "<< NumberOfComponents);
 
-    //EF : A modifier lors de l'intÃÂ©gration de la classe de localisation des points de gauss
+    //EF : A modifier lors de l'intégration de la classe de localisation des points de gauss
     _value = new ArrayNoGauss(_numberOfComponents,_numberOfValues);
 
     _isRead = true ;
@@ -2060,7 +2100,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents,
   MESSAGE("FIELD : constructeur : "<<LengthValue <<" et "<< NumberOfComponents);
   _numberOfValues = LengthValue ;
 
-  //EF : A modifier lors de l'intÃƒÂ©gration de la classe de localisation des points de gauss
+  //EF : A modifier lors de l'intégration de la classe de localisation des points de gauss
   _value = new ArrayNoGauss(_numberOfComponents,_numberOfValues);
 
   _isRead = true ;
@@ -2317,7 +2357,6 @@ template <class T, class INTERLACING_TAG>
 bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
   const throw (MEDEXCEPTION)
 {
-//   retValues =  getRow(eltIdInSup);
 
   if(eltIdInSup<1)
     return false;
@@ -2377,7 +2416,7 @@ inline MEDMEM_Array_ * FIELD<T, INTERLACING_TAG>::getArray() const throw (MEDEXC
   END_OF(LOC);
   return _value ;
 }
-template <class T,class INTERLACING_TAG>  inline 
+template <class T,class INTERLACING_TAG>  inline
 typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,Gauss>::Array *
 FIELD<T, INTERLACING_TAG>::getArrayGauss() const throw (MEDEXCEPTION)
 {
@@ -2394,7 +2433,7 @@ FIELD<T, INTERLACING_TAG>::getArrayGauss() const throw (MEDEXCEPTION)
 
 }
 
-template <class T,class INTERLACING_TAG>  inline 
+template <class T,class INTERLACING_TAG>  inline
 typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,NoGauss>::Array *
 FIELD<T, INTERLACING_TAG>::getArrayNoGauss() const throw (MEDEXCEPTION)
 {
@@ -2415,25 +2454,28 @@ template <class T,class INTERLACING_TAG> inline bool
 FIELD<T, INTERLACING_TAG>::getGaussPresence() const throw (MEDEXCEPTION)
 {
   const char * LOC = "FIELD<T, INTERLACING_TAG>::getGaussPresence() const :";
-  BEGIN_OF(LOC);
+  //BEGIN_OF(LOC);
 
   if (_value != NULL)
     return _value->getGaussPresence();
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't call getGaussPresence on a null _value"));
 
-  END_OF(LOC);
+  //END_OF(LOC);
 }
 
 /*!
   Return the actual length of the reference to values array returned by getValue.
+  Take care of number of components and number of Gauss points by geometric type
 */
 template <class T, class INTERLACING_TAG>
 inline int FIELD<T, INTERLACING_TAG>::getValueLength() const
   throw (MEDEXCEPTION)
 {
-  // be carefull about number of gauss point
-  return _numberOfComponents*_numberOfValues;
+  if ( getGaussPresence() )
+    return dynamic_cast<ArrayGauss *>(_value)->getArraySize() ;
+  else
+    return dynamic_cast<ArrayNoGauss *>(_value)->getArraySize() ;
 }
 
 /*!
@@ -2454,15 +2496,15 @@ inline const T* FIELD<T, INTERLACIN_TAG>::getValue() const throw (MEDEXCEPTION)
   of FIELD values array.
   If a faster accessor is intended you may use getArray() once,
   then MEDMEM_Array accessors.
-  Be careful if field support is not on all elements you might
-  have to use support->getValIndFromGlobalNumber(i).
+  Be careful if field support is not on all elements getRow
+  use support->getValIndFromGlobalNumber(i).
 */
 template <class T,class INTERLACING_TAG> inline
 const T*
 FIELD<T,INTERLACING_TAG>::getRow(int i) const throw (MEDEXCEPTION)
 {
   const char * LOC = "FIELD<T,INTERLACING_TAG>::getRow(int i) : ";
-  BEGIN_OF(LOC);
+  //BEGIN_OF(LOC);
 
   int valIndex=-1;
   if (_support)
@@ -2470,11 +2512,12 @@ FIELD<T,INTERLACING_TAG>::getRow(int i) const throw (MEDEXCEPTION)
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not define |" ));
 
+  //cout << endl << "getRow Valindex : " << valIndex << endl;
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->getRow(valIndex) ;
+    return static_cast<ArrayGauss *>(_value)->getRow(valIndex) ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->getRow(valIndex) ;
-  END_OF(LOC);
+    return static_cast<ArrayNoGauss *>(_value)->getRow(valIndex) ;
+  //END_OF(LOC);
 }
 
 /*!
@@ -2485,11 +2528,11 @@ template <class T,class INTERLACING_TAG> inline const T*
 FIELD<T,INTERLACING_TAG>::getColumn(int j) const throw (MEDEXCEPTION)
 {
   const char * LOC ="FIELD<T,INTERLACING_TAG>::getColumn(int j) : ";
-  BEGIN_OF(LOC);
+  //BEGIN_OF(LOC);
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->getColumn(j) ;
+    return static_cast<ArrayGauss *>(_value)->getColumn(j) ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->getColumn(j) ;
+    return static_cast<ArrayNoGauss *>(_value)->getColumn(j) ;
 }
 
 /*!
@@ -2498,18 +2541,196 @@ FIELD<T,INTERLACING_TAG>::getColumn(int j) const throw (MEDEXCEPTION)
 template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getValueIJ(int i,int j) const throw (MEDEXCEPTION)
 {
   const char * LOC = "getValueIJ(..)";
-  BEGIN_OF(LOC);
+  //BEGIN_OF(LOC);
   int valIndex=-1;
   if (_support)
     valIndex = _support->getValIndFromGlobalNumber(i);
   else
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not define |" ));
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
 
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->getIJ(valIndex,j) ;
+    return static_cast<ArrayGauss *>(_value)->getIJ(valIndex,j) ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->getIJ(valIndex,j) ;
+    return static_cast<ArrayNoGauss *>(_value)->getIJ(valIndex,j) ;
 }
+
+/*!
+  Return the j^{th} component of k^{th} gauss points of i^{th} value.
+*/
+template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getValueIJK(int i,int j,int k) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "getValueIJK(..)";
+  //BEGIN_OF(LOC);
+  int valIndex=-1;
+  if (_support)
+    valIndex = _support->getValIndFromGlobalNumber(i);
+  else
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
+
+  if ( getGaussPresence() )
+    return static_cast<ArrayGauss *>(_value)->getIJK(valIndex,j,k) ;
+  else
+    return static_cast<ArrayNoGauss *>(_value)->getIJK(valIndex,j,k) ;
+}
+
+
+template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::getNumberOfGeometricTypes() const throw (MEDEXCEPTION)
+{
+  const char * LOC = "getNumberOfGeometricTypes(..)";
+  BEGIN_OF(LOC);
+  if (_support)
+    return _support->getNumberOfTypes();
+  else
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
+  END_OF(LOC);
+};
+
+
+template <class T,class INTERLACING_TAG> const GAUSS_LOCALIZATION<INTERLACING_TAG> &
+FIELD<T,INTERLACING_TAG>::getGaussLocalization(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION)
+{
+  const char * LOC ="getGaussLocalization(MED_EN::medGeometryElement geomElement) : ";
+  const GAUSS_LOCALIZATION_ * locPtr=0;
+
+  locMap::const_iterator it;
+  if ( ( it = _gaussModel.find(geomElement)) != _gaussModel.end() ) {
+	locPtr = (*it).second;
+	return  *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> *>(locPtr);
+  }
+  else
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find any GaussLocalization on this geometric type" ));
+
+};
+
+template <class T,class INTERLACING_TAG> const GAUSS_LOCALIZATION<INTERLACING_TAG> *
+FIELD<T,INTERLACING_TAG>::getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION)
+{
+  const char * LOC ="getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement) : ";
+  const GAUSS_LOCALIZATION_ * locPtr=0;
+
+  locMap::const_iterator it;
+  if ( ( it = _gaussModel.find(geomElement)) != _gaussModel.end() ) {
+	locPtr = (*it).second;
+	return  static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> *>(locPtr);
+  }
+  else
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find any GaussLocalization on this geometric type" ));
+
+};
+
+/*!
+  Returns number of Gauss points for this medGeometryElement.
+
+  Note :
+  if there is no GAUSS_LOCALIZATION having this medGeometryElement but
+  the medGeometryElement exist in the SUPPORT, getNumberOfGaussPoints
+  return 1
+*/
+template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::getNumberOfGaussPoints(MED_EN::medGeometryElement geomElement) const
+  throw (MEDEXCEPTION)
+{
+  const char * LOC ="getNumberOfGaussPoints(MED_EN::medGeometryElement geomElement) : ";
+  const GAUSS_LOCALIZATION_ * locPtr=0;
+
+  locMap::const_iterator it;
+  if ( ( it = _gaussModel.find(geomElement)) != _gaussModel.end() ) {
+	locPtr = (*it).second;
+	return  static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> *>(locPtr)->getNbGauss();
+  }
+  else
+    if (_support)
+      try {
+	if ( _support->getNumberOfElements(geomElement) ) return 1;
+      } catch ( MEDEXCEPTION & ex) {
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "GeometricType not found !" )) ;
+      }
+    else
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
+
+  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Should never execute this!" ));
+
+}
+
+/*!
+  Returns number of Gauss points for each geometric type.
+
+  Note :
+  if there is no gauss points whatever the geometric type is
+  it returns an exception. (renvoyer un tableau de 1 ?)
+*/
+template <class T,class INTERLACING_TAG> const int * FIELD<T,INTERLACING_TAG>::getNumberOfGaussPoints() const
+  throw (MEDEXCEPTION)
+{
+  const char * LOC ="const int * getNumberOfGaussPoints(MED_EN::medGeometryElement geomElement) : ";
+
+  if (_value)
+    if ( getGaussPresence() ) {
+      return dynamic_cast<ArrayGauss *>(_value)->getNbGaussGeo()+1;
+    } else
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"value hasn't Gauss points " ));
+
+    else
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Value not defined" ));
+}
+
+/*!
+  Returns number of Gauss points for element n°i.
+  The i index is a global index (take care of previous element
+  on different geometric type).
+*/
+template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::getNbGaussI(int i) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "getNbGaussI(..)";
+//   BEGIN_OF(LOC);
+
+  int valIndex=-1;
+  if (_support)
+    valIndex = _support->getValIndFromGlobalNumber(i);
+  else
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
+
+  if (_value)
+   if ( getGaussPresence() )
+     return static_cast<ArrayGauss *>(_value)->getNbGauss(valIndex) ;
+   else
+     return static_cast<ArrayNoGauss *>(_value)->getNbGauss(valIndex) ;
+ else
+   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_value not defined" ));
+//   END_OF(LOC);
+};
+
+template <class T,class INTERLACING_TAG> const int * FIELD<T,INTERLACING_TAG>::getNumberOfElements() const throw (MEDEXCEPTION)
+{
+  const char * LOC = "getNumberOfElements(..)";
+  BEGIN_OF(LOC);
+  if (_support)
+    return _support->getNumberOfElements();
+  else
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
+   END_OF(LOC);
+};
+
+template <class T,class INTERLACING_TAG> const MED_EN::medGeometryElement  * FIELD<T,INTERLACING_TAG>::getGeometricTypes()  const throw (MEDEXCEPTION)
+{
+  const char * LOC = "getGeometricTypes(..)";
+  BEGIN_OF(LOC);
+  if (_support)
+    return _support->getTypes();
+  else
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
+   END_OF(LOC);
+};
+template <class T,class INTERLACING_TAG> bool  FIELD<T,INTERLACING_TAG>::isOnAllElements() const throw (MEDEXCEPTION)
+{
+  const char * LOC = "isOnAllElements(..)";
+  BEGIN_OF(LOC);
+  if (_support)
+    return _support->isOnAllElements();
+  else
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
+  END_OF(LOC);
+};
+
 
 /*!
   Copy new values array in FIELD according to the given mode.
@@ -2529,20 +2750,19 @@ template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::s
   according to specified mode.
 */
 template <class T,class INTERLACING_TAG>
-inline void FIELD<T,INTERLACING_TAG>::setRow( int i, T* value) throw (MEDEXCEPTION) 
+inline void FIELD<T,INTERLACING_TAG>::setRow( int i, T* value) throw (MEDEXCEPTION)
 {
   const char * LOC = "FIELD<T,INTERLACING_TAG>::setRow(int i, T* value) : ";
   int valIndex=i;
-//   JE (NB) NE SUIS PAS SUR DE CA ????
   if (_support)
     valIndex = _support->getValIndFromGlobalNumber(i);
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not define |" ));
 
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->setRow(valIndex, value) ;
+    return static_cast<ArrayGauss *>(_value)->setRow(valIndex, value) ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->setRow(valIndex, value) ;
+    return static_cast<ArrayNoGauss *>(_value)->setRow(valIndex, value) ;
 }
 
 /*!
@@ -2550,12 +2770,12 @@ inline void FIELD<T,INTERLACING_TAG>::setRow( int i, T* value) throw (MEDEXCEPTI
   according to specified mode.
 */
 template <class T,class INTERLACING_TAG>
-inline void FIELD<T,INTERLACING_TAG>::setColumn( int i, T* value) throw (MEDEXCEPTION) 
+inline void FIELD<T,INTERLACING_TAG>::setColumn( int j, T* value) throw (MEDEXCEPTION)
 {
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->setColumn(i, value) ;
+    return static_cast<ArrayGauss *>(_value)->setColumn(j, value) ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->setColumn(i, value) ;
+    return static_cast<ArrayNoGauss *>(_value)->setColumn(j, value) ;
 }
 
 /*!
@@ -2571,9 +2791,9 @@ template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::s
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not define |" ));
 
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->setIJ(valIndex,j,value) ;
+    return static_cast<ArrayGauss *>(_value)->setIJ(valIndex,j,value) ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->setIJ(valIndex,j,value) ;
+    return static_cast<ArrayNoGauss *>(_value)->setIJ(valIndex,j,value) ;
 }
 
 /*

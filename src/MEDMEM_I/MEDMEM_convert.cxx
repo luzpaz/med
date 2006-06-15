@@ -15,14 +15,13 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //=============================================================================
 // File      : MEDMEM_convert.cxx
 // Created   : mer fév 20 15:47:57 CET 2002
 // Author    : EDF
 // Project   : SALOME
-// Copyright : EDF 2002
 // $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_convert.cxx
 //=============================================================================
 

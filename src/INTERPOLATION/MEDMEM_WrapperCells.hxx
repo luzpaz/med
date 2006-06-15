@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef WRAPPERS_CELLS_HXX
 #define WRAPPERS_CELLS_HXX
@@ -553,7 +553,7 @@ public :
 		type=5;
 		
 		int pn[4] = {0,1,2,3};
-		int sb[12] = {2,0,1,3,1,2,0,2,3,1,0,2};
+		int sb[12] = {2,0,1,3,1,2,0,2,3,1,3,0};
 		int fa[8] = {0,1,1,2,2,3,3,0};
 		int po[5] = {0,2,4,6,8};
 		nbr_noeuds = 4;
@@ -590,7 +590,7 @@ public :
 		type=6;
 		
 		int pn[4] = {0,1,2,3};
-		int sb[12] = {2,0,1,3,1,2,0,2,3,1,0,2};
+		int sb[12] = {2,0,1,3,1,2,0,2,3,1,3,0};
 		int fa[8] = {0,1,1,2,2,3,3,0};
 		int po[5] = {0,2,4,6,8};
 		nbr_noeuds = 8;

@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "FAMILYClient.hxx"
 #include "MESHClient.hxx"
@@ -53,33 +53,33 @@ void FAMILYClient::blankCopy(bool blankSupport)
   if (blankSupport)
     SUPPORTClient::blankCopy();
 
-//   setIdentifier(IOR_Family->getIdentifier());
+  setIdentifier(IOR_Family->getIdentifier());
 
-//   int nAttr, nGr, n;
-//   int *i;
-//   std::string *s;
+  int nAttr, nGr, n;
+  int *i;
+  std::string *s;
 
-//   nAttr = IOR_Family->getNumberOfAttributes();
-//   setNumberOfAttributes(nAttr);
+  nAttr = IOR_Family->getNumberOfAttributes();
+  setNumberOfAttributes(nAttr);
 
-//   convertCorbaArray(i, n, IOR_Family->getAttributesIdentifiers());
-//   ASSERT(n == nAttr);
-//   setAttributesIdentifiers(i);
+  convertCorbaArray(i, n, IOR_Family->getAttributesIdentifiers());
+  ASSERT(n == nAttr);
+  setAttributesIdentifiers(i);
 
-//   convertCorbaArray(i, n, IOR_Family->getAttributesValues());
-//   ASSERT(n == _numberOfAttribute);
-//   setAttributesValues(i);
+  convertCorbaArray(i, n, IOR_Family->getAttributesValues());
+  ASSERT(n == _numberOfAttribute);
+  setAttributesValues(i);
 
-//   convertCorbaArray(s, n, IOR_Family->getAttributesDescriptions());
-//   ASSERT(n == _numberOfAttribute);
-//   setAttributesDescriptions(s);
+  convertCorbaArray(s, n, IOR_Family->getAttributesDescriptions());
+  ASSERT(n == _numberOfAttribute);
+  setAttributesDescriptions(s);
 
-//   nGr = IOR_Family->getNumberOfGroups();
-//   setNumberOfGroups(nGr);
+  nGr = IOR_Family->getNumberOfGroups();
+  setNumberOfGroups(nGr);
 
-//   convertCorbaArray(s, n, IOR_Family->getGroupsNames());
-//   ASSERT(n == _numberOfAttribute);
-//   setGroupsNames(s);
+  convertCorbaArray(s, n, IOR_Family->getGroupsNames());
+  ASSERT(n == _numberOfGroup);
+  setGroupsNames(s);
 
   _complete = false;
 
@@ -99,7 +99,9 @@ void FAMILYClient::fillCopy(bool fillSupport)
 
     if (fillSupport)
       SUPPORTClient::fillCopy();
-    
+
+    // Get other FAMILY attributes
+
     _complete = true;
   }
 

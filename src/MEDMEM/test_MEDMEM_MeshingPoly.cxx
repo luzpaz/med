@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Field.hxx"
@@ -183,12 +183,14 @@ int main (int argc, char ** argv) {
   if(nbPts==7)
     {
       cout << "ALL TESTS OK !!!" << endl;
-      return 0;
     }
   else
     {
       cout << "TEST FAILS !!!" << endl;
       return -1;
     }
+  cout << "Writing test " << endl;
+  int idMed22 = myMeshing.addDriver(MED_DRIVER,"totoPoly_V22.med",myMeshing.getName());
+  myMeshing.write(idMed22);
 
 }

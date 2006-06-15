@@ -15,8 +15,13 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+#include <stdlib.h>
+#include <string.h>
+#include <cassert>
+
+#include "MEDMEM_Utilities.hxx"
 #  ifdef MED_WITH_KERNEL
 //#include "LocalTraceCollector.hxx"
 #  endif /* ifdef MED_WITH_KERNEL*/
@@ -37,4 +42,14 @@ MEDMEM::INIT::INIT()
 #ifdef MED_WITH_KERNEL
 //  LocalTraceCollector::instance();
 #endif /* ifdef MED_WITH_KERNEL*/
+  char* traceKind = getenv("SALOME_trace");
+
+  if (traceKind == NULL)
+    {
+      setenv("SALOME_trace","local",1);
+      traceKind = getenv("SALOME_trace");
+      assert(traceKind);
+    }
+
+  MESSAGE("Med Memory Initialization with $SALOME_trace = " << traceKind);
 }

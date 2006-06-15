@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
  File Group.cxx
@@ -99,19 +99,16 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   _numberOfGeometricType = myFamily->getNumberOfTypes() ;
 
   _geometricType.set(_numberOfGeometricType);
-  _numberOfGaussPoint.set(_numberOfGeometricType) ;
   _numberOfElements.set(_numberOfGeometricType) ;
 
   const medGeometryElement * geometricType = myFamily->getTypes() ;
   //int * geometricTypeNumber = myFamily->getGeometricTypeNumber() ;
-  const int * numberOfGaussPoint = myFamily->getNumberOfGaussPoint() ;
 
   SCRUTE(_numberOfGeometricType);
 
   for (int i=0 ; i<_numberOfGeometricType; i++) {
     _geometricType[i]= geometricType[i] ;
     // _geometricTypeNumber[i] = geometricTypeNumber[i] ;
-    _numberOfGaussPoint[i] = numberOfGaussPoint[i] ;
     _numberOfElements[i]=myFamily->getNumberOfElements(geometricType[i]);
     MESSAGE(LOC << " Type : " << _geometricType[i] << " number of element(s) " << _numberOfElements[i]);
   }
@@ -192,15 +189,15 @@ GROUP::GROUP(const GROUP & m):SUPPORT(m)
 //   _numberOfGeometricType = myFamily->getNumberOfTypes() ;
 //   _geometricType = new medGeometryElement[_numberOfGeometricType];
 //   //_geometricTypeNumber = new int[_numberOfGeometricType] ;
-//   _numberOfGaussPoint = new int[_numberOfGeometricType] ;
+//   _numberOfGaussPoints = new int[_numberOfGeometricType] ;
 //   _numberOfElements = new int[_numberOfGeometricType] ;
 //   medGeometryElement * geometricType = myFamily->getTypes() ;
 //   //int * geometricTypeNumber = myFamily->getGeometricTypeNumber() ;
-//   int * numberOfGaussPoint = myFamily->getNumberOfGaussPoint() ;
+//   int * numberOfGaussPoints = myFamily->getNumberOfGaussPoints() ;
 //   for (int i=0 ; i<_numberOfGeometricType; i++) {
 //     _geometricType[i]= geometricType[i] ;
 //     // _geometricTypeNumber[i] = geometricTypeNumber[i] ;
-//     _numberOfGaussPoint[i] = numberOfGaussPoint[i] ;
+//     _numberOfGaussPoints[i] = numberOfGaussPoints[i] ;
 //     _numberOfElements[i]=myFamily->getNumberOfElements(geometricType[i]);
 //   }
 //   _isOnAllElts = false ;

@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 # ifndef MED_HXX
 # define MED_HXX
@@ -32,7 +32,7 @@
 # include "MEDMEM_define.hxx"
 # include "MEDMEM_Exception.hxx"
 # include "MEDMEM_GenDriver.hxx"
-
+# include "MEDMEM_Field.hxx"
 
 namespace MEDMEM {
 class MESH;
@@ -129,6 +129,10 @@ public:
   deque<DT_IT_> getFieldIteration (const string & fieldName) const throw (MEDEXCEPTION) ;
   FIELD_   * getField          ( const string & fieldName,
                                  const int dt,  const int it) const throw (MEDEXCEPTION) ;
+  template<class T>
+  FIELD<T> * getFieldT         ( const string & fieldName,
+                                 const int dt,  const int it) const throw (MEDEXCEPTION) ;
+
   FIELD_   * getField2          ( const string & fieldName,
 				 double time, int it=0) const throw (MEDEXCEPTION) ;
 
@@ -143,7 +147,19 @@ public:
   //friend ostream & operator<<(ostream &os,const MED & med);
 
 };
-};
+
+template<class T>
+FIELD<T> * MED::getFieldT( const string & fieldName, const int dt,  const int it) const throw (MEDEXCEPTION)
+{
+  const char *LOC="Unexpected type of field";
+  FIELD_ retUp=getField(fieldName,dt,it);
+  FIELD<T> *ret=dynamic_cast< FIELD<T> * >(retUp);
+  if(!ret)
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) ) );
+  return ret;
+}
+
+}
 
 #endif
 

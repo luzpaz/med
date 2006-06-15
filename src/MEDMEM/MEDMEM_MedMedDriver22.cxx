@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_Compatibility21_22.hxx"
 # include "MEDMEM_MedMedDriver22.hxx"
@@ -223,7 +223,8 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
     int          numberOfMeshes;
     char         meshName[MED_TAILLE_NOM+1]="";
     char         meshDescription[MED_TAILLE_DESC+1]="";
-    int          meshDim;
+//CCRT    int          meshDim;
+    med_2_2::med_int          meshDim;
     med_2_2::med_maillage meshType;
 
     MESH *       ptrMesh;
@@ -393,8 +394,10 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
     //    char                          timeStepUnit[MED_TAILLE_PNOM]= "";
     char                          timeStepUnit[MED_TAILLE_PNOM22+1] ;
     double                        timeStep                     = 0.0;
-    int                           orderNumber                  =  -1;                           //???init?????
-    int                           numberOfRefMesh = 0;
+//CCRT    int                           orderNumber                  =  -1;                           //???init?????
+    med_2_2::med_int                           orderNumber                  =  -1;                           //???init?????
+//CCRT    int                           numberOfRefMesh = 0;
+    med_2_2::med_int                           numberOfRefMesh = 0;
     med_2_2::med_booleen           meshLink;
     map<MESH_NAME_,MESH*>      & _meshes   =  _ptrMed->_meshes; 
     map<FIELD_NAME_,MAP_DT_IT_> & _fields   =  _ptrMed->_fields; 
@@ -451,7 +454,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 
 		MESSAGE("Field information 2 : NumberOfTimeStep :"<<
 			numberOfTimeSteps);
-
+/*
 	  if ( numberOfTimeSteps > MED_VALID ) 
 		  break ;
 		// There are value for some med_geometrie_element of this
@@ -462,10 +465,10 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 	      for (currentGeometry = (*currentEntity).second.begin();
 		   currentGeometry != (*currentEntity).second.end();
 		   currentGeometry++)
-		{
-	    MESSAGE("Field information 3 : Geom : "<<(*currentGeometry));
+		{*/
+                MESSAGE("Field information 3 : Geom : "<<(*currentGeometry));
 	      
-		  for (j=1;j <= numberOfTimeSteps; j++)
+                for (j=1;j <= numberOfTimeSteps; j++)
 		    {
 		      MESSAGE("Field information 4 : time step j = "<<j);
 		
@@ -805,7 +808,7 @@ void MED_MED_WRONLY_DRIVER22::write(void ) const
     current = (*currentMesh).second->addDriver(MED_DRIVER,_fileName,(*currentMesh).second->getName());
     // put right _id in Mesh driver (same as this._id)
     (*currentMesh).second->_drivers[current]->setId( getId() );
-    //(*currentMesh).second->write(current) ;
+    (*currentMesh).second->write(current) ;
   }
 
   for ( currentField=_meshName.begin();currentField != _meshName.end(); currentField++ ) {
@@ -813,11 +816,11 @@ void MED_MED_WRONLY_DRIVER22::write(void ) const
     current = (*currentField).first->addDriver(MED_DRIVER,_fileName,(*currentField).first->getName());
     // put right _id in Field driver (same as this._id)
     (*currentField).first->_drivers[current]->setId( getId() );
-    //(*currentField).first->write(current) ;
+    (*currentField).first->write(current) ;
   }
 
   // that's work, but it is more efficenty to write directly when we had driver, no ?
-  writeFrom();
+  //writeFrom();
   
   END_OF(LOC);
 

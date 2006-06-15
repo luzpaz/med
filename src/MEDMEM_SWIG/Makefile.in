@@ -17,7 +17,7 @@
 #  License along with this library; if not, write to the Free Software 
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
 # 
-#  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 #
 #
@@ -82,12 +82,16 @@ EXPORT_PYSCRIPTS = libMEDMEM_Swig.py \
 		   test_gibi.py \
 		   test_porflow.py \
 		   testDriverAscii.py \
+		   testGaussLocalization.py \
+		   testMedObj.py \
+		   test_profil_MedFieldDriver.py \
+		   testWriteAndFam.py \
 		   testMedMemGeneral.py
 
 #############################################################################
 
-LDFLAGS= -L$(top_builddir)/lib/salome 
-LDFLAGSFORBIN= -L$(top_builddir)/lib/salome
+LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@//salome 
+LDFLAGSFORBIN= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
 CPPFLAGS+= $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES)
 CXXFLAGS+= @CXXTMPDPTHFLAGS@
@@ -95,9 +99,9 @@ LIBS= $(PYTHON_LIBS)
 LDFLAGS+= -lmedmem $(MED2_LIBS) $(HDF5_LIBS)
 
 ifeq ($(MED_WITH_KERNEL),yes)
-  CPPFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
-  CXXFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
-  LDFLAGS+= -L${KERNEL_ROOT_DIR}/lib/salome -lSALOMELocalTrace
+  CPPFLAGS+= ${KERNEL_CXXFLAGS}
+  CXXFLAGS+= ${KERNEL_CXXFLAGS}
+  LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace
 endif
 #############################################################################
 

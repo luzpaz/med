@@ -17,7 +17,7 @@
 //  License along with this library; if not, write to the Free Software 
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
 // 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //
 //
@@ -109,6 +109,36 @@ namespace MED
 			  theInfo));
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    virtual
+    PElemInfo
+    CrElemInfo(const PMeshInfo& theMeshInfo, 
+	       TInt theNbElem,
+	       EBooleen theIsElemNum = eVRAI,
+	       EBooleen theIsElemNames = eVRAI)
+    {
+      return PElemInfo(new TTElemInfo<eVersion>
+		       (theMeshInfo,
+			theNbElem,
+			theIsElemNum,
+			theIsElemNames));
+    }
+
+    virtual
+    PElemInfo
+    CrElemInfo(const PMeshInfo& theMeshInfo, 
+	       TInt theNbElem,
+	       const TIntVector& theFamNum,
+	       const TIntVector& aElemNum,
+	       const TStringVector& aElemNames)
+    {
+      return PElemInfo(new TTElemInfo<eVersion>
+		       (theMeshInfo,
+			theNbElem,
+			theFamNum,
+			aElemNum,
+			aElemNames));
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     virtual
@@ -452,6 +482,50 @@ namespace MED
 			    theInfo));
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    virtual
+    PGrilleInfo
+    CrGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const PGrilleInfo& theInfo)
+    {
+      return PGrilleInfo(new TTGrilleInfo<eVersion>
+			    (theMeshInfo,
+			     theInfo));
+    }
+    virtual
+    PGrilleInfo
+    CrGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const EGrilleType& type)
+    {
+      return PGrilleInfo(new TTGrilleInfo<eVersion>
+			    (theMeshInfo,
+			     type));
+    }
+
+    virtual
+    PGrilleInfo
+    CrGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const EGrilleType& type,
+		 const TInt& nbNodes)
+    {
+      return PGrilleInfo(new TTGrilleInfo<eVersion>
+			    (theMeshInfo,
+			     type,
+			     nbNodes));
+    }
+
+    virtual
+    PGrilleInfo
+    CrGrilleInfo(const PMeshInfo& theMeshInfo,
+		 const EGrilleType& type,
+		 const MED::TIntVector& nbNodeVec)
+    {
+      return PGrilleInfo(new TTGrilleInfo<eVersion>
+			    (theMeshInfo,
+			     type,
+			     nbNodeVec));
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   };
 
 }
