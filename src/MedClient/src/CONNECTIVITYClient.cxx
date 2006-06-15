@@ -116,10 +116,14 @@ void CONNECTIVITYClient::blankCopy()
   }
 
   // create a constituent (PAL10556)
-  if ( Entity == MED_CELL ) {
-    Entity = ( IOR_Mesh->getMeshDimension() == 3 ? MED_FACE : MED_EDGE );
-    _constituent = new CONNECTIVITYClient( IOR_Mesh, Entity );
-  }
+// The consequence is that, if the remote server
+// has not calculated nodal connectivity of dimension d-1, heavy method
+// (CPU and memory) calculateDecsendingConnectivity is called on this
+// server for a potentially useless information for client side . (by Anthony GEAY)
+//   if ( Entity == MED_CELL ) {
+//     Entity = ( IOR_Mesh->getMeshDimension() == 3 ? MED_FACE : MED_EDGE );
+//     _constituent = new CONNECTIVITYClient( IOR_Mesh, Entity );
+//   }
 
   _complete = false;
 
