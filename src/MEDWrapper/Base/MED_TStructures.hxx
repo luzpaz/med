@@ -934,6 +934,9 @@ namespace MED
 
       myGrilleType      = theInfo->GetGrilleType();
 
+      myFamNumNode.resize(theInfo->GetNbNodes());
+      myFamNumNode      = theInfo->myFamNumNode;
+
     }
 
     TTGrilleInfo(const PMeshInfo& theMeshInfo,
@@ -952,7 +955,7 @@ namespace MED
       }
       
       myGrilleStructure.resize(theMeshInfo->myDim);
-      
+      myFamNumNode.resize(nnoeuds);
     }
 
     TTGrilleInfo(const PMeshInfo& theMeshInfo,

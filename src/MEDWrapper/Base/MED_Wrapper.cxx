@@ -489,6 +489,30 @@ namespace MED
 
     GetGrilleInfo(anInfo);
     anInfo->SetGrilleType(type);
+
+#ifdef _DEBUG_
+    INITMSG(MYDEBUG,"GetPGrilleInfo: ");
+    {
+      TInt aNbElem = anInfo->GetNbNodes();
+      BEGMSG(MYVALUEDEBUG,"GetFamNum: ");
+      for(TInt iElem = 0; iElem < aNbElem; iElem++){
+	ADDMSG(MYVALUEDEBUG,anInfo->GetFamNumNode(iElem)<<", ");
+      }
+      ADDMSG(MYVALUEDEBUG,endl);
+      BEGMSG(MYVALUEDEBUG,"GetCoordName: ");
+      for(TInt iElem = 0; iElem < theMeshInfo->GetDim(); iElem++){
+	ADDMSG(MYVALUEDEBUG,anInfo->GetCoordName(iElem)<<", ");
+      }
+      ADDMSG(MYVALUEDEBUG,endl);
+      BEGMSG(MYVALUEDEBUG,"GetCoordUnit: ");
+      for(TInt iElem = 0; iElem < theMeshInfo->GetDim(); iElem++){
+	ADDMSG(MYVALUEDEBUG,anInfo->GetCoordUnit(iElem)<<", ");
+      }
+      ADDMSG(MYVALUEDEBUG,endl);
+      
+    }
+#endif
+    
     return anInfo;
   }
   

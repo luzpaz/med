@@ -776,3 +776,17 @@ TGrilleInfo
   
   return anIndexes;
 }
+
+TInt
+TGrilleInfo
+::GetFamNumNode(TInt theId) const 
+{
+  return myFamNumNode[theId];
+}
+
+void
+TGrilleInfo
+::SetFamNumNode(TInt theId,TInt theVal) 
+{
+  myFamNumNode[theId] = theVal;
+}

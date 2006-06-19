@@ -2051,6 +2051,20 @@ namespace MED
 	  *theErr = aRet;
 	else if(aRet < 0)
 	  EXCEPTION(runtime_error,"GetGrilleInfo - MEDcoordLire(...)");
+
+	TInt theNb = GetNbFamilies(aMeshInfo);
+	
+	aRet = MEDfamLire(myFile->Id(),
+			  &aMeshInfo.myName[0],
+			  (med_int*)&theInfo.myFamNumNode[0],
+			  theNb,
+			  med_entite_maillage(eNOEUD),
+			  med_geometrie_element(ePOINT1));
+	
+	if(theErr) 
+	  *theErr = aRet;
+	else if(aRet < 0)
+	  EXCEPTION(runtime_error,"GetGrilleInfo - MEDfamLire(...)");
 	//============================
       }
 

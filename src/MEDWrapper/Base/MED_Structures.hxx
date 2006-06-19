@@ -677,6 +677,15 @@ namespace MED
     TInt GetFamNum(TInt theId) const;
     //! Set number of a MED FAMILY for the mesh element with the  order number
     void SetFamNum(TInt theId, TInt theVal);
+    
+    /*!
+     *Defines sequence MED Family indexes for corresponding mesh nodes
+     */
+    TElemNum myFamNumNode;
+    //! Get number of a MED FAMILY by order number of the mesh node
+    TInt GetFamNumNode(TInt theId) const;
+    //! Set number of a MED FAMILY for the mesh node with the  order number
+    void SetFamNumNode(TInt theId, TInt theVal);
 
   };
 
