@@ -34,6 +34,7 @@
 
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Support.hxx"
+#include "MEDMEM_Mesh.hxx"
 
 #include "MEDMEM_Support_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
@@ -519,7 +520,6 @@ throw (SALOME::SALOME_Exception)
                                                 ,SALOME::INTERNAL_ERROR);
         }
 }
-
 //=============================================================================
 /*!
  * CORBA: add the Support in the StudyManager 
@@ -569,7 +569,7 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   }
   MESSAGE(LOC << " Find SObject MESH (represent mesh in support)");
 
-  string meshName = getMesh()->getName() ;
+  string meshName = _support->getMesh()->getName() ;
   string meshNameStudy = meshName;
 
   for (string::size_type pos=0; pos<meshNameStudy.size();++pos)
@@ -583,7 +583,7 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
     THROW_SALOME_CORBA_EXCEPTION("SObject Mesh in Support not Found",SALOME::INTERNAL_ERROR);
   // perhaps add MESH automatically ?
   
-  MESSAGE("Add a support Object under /MED/MESH/MESHNAME");
+  MESSAGE("Add a support Object under /Med/MESH/MESHNAME");
 
   char * medsupfatherName;
   int lenName = 15 + strlen(meshName.c_str()) + 1;
@@ -606,28 +606,11 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
 
   //myBuilder->NewCommand();
 
-  string supportName = _support->getName();
+  string supportEntryPath = getEntryPath( _support );
 
-  SCRUTE(supportName);
+  SALOMEDS::SObject_var supportEntry = myStudy->FindObjectByPath(supportEntryPath.c_str());
 
-  SCRUTE(meshNameStudy);
 
-  char * supportEntryPath;
-  lenName = 13 + 15 + strlen(meshName.c_str()) + 1 + strlen(supportName.c_str())+1;
-  supportEntryPath = new char[lenName];
-  supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/");
-  supportEntryPath = strcat(supportEntryPath,"MEDSUPPORTS_OF_");
-  supportEntryPath = strcat(supportEntryPath,meshNameStudy.c_str());
-  supportEntryPath = strcat(supportEntryPath,"/");
-  supportEntryPath = strcat(supportEntryPath,supportName.c_str());
-
-  //SCRUTE(supportEntryPath);
-
-  MESSAGE("supportEntryPath in support " << supportEntryPath << " length " << lenName);
-
-//   SALOMEDS::SObject_var supportEntry = myStudy->FindObject(_support->getName().c_str());
-			 // c'est pas bon, car il faut rechercher uniquement sous le bon MESH !!!
-  SALOMEDS::SObject_var supportEntry = myStudy->FindObjectByPath(supportEntryPath);
 
   if ( CORBA::is_nil(supportEntry) ) 
   {
@@ -659,7 +642,7 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   }
   myBuilder->CommitCommand();
 
-  SALOMEDS::SObject_var supportEntryBis = myStudy->FindObjectByPath(supportEntryPath);
+  SALOMEDS::SObject_var supportEntryBis = myStudy->FindObjectByPath(supportEntryPath.c_str());
 
   MESSAGE("Just for checking, reuse of the corba pointer");
 
@@ -673,11 +656,31 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
     }
 
   delete [] medsupfatherName;
-  delete [] supportEntryPath;
+
 
   // register the Corba pointer: increase the referrence count
   MESSAGE("Registering of the Corba Support pointer");
   Register();
 
   END_OF(LOC);
+}
+
+//=======================================================================
+//function : getEntryPath
+//purpose  : 
+//=======================================================================
+  
+string SUPPORT_i::getEntryPath(const ::MEDMEM::SUPPORT * aSupport)
+{
+  string meshNameStudy( aSupport->getMeshName() );
+  for (string::size_type pos=0; pos<meshNameStudy.size();++pos)
+    if (isspace(meshNameStudy[pos])) meshNameStudy[pos] = '_';
+
+  string supportName = aSupport->getName();
+  string supportNameStudy( supportName.c_str(), strlen( supportName.c_str() ));
+  string supportEntryPath =
+    "/Med/MEDMESH/MEDSUPPORTS_OF_" + meshNameStudy + "/" + supportNameStudy;
+  SCRUTE( supportEntryPath );
+
+  return supportEntryPath;
 }

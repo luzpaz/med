@@ -99,8 +99,7 @@ public:
 			  SALOME_MED::SUPPORT_ptr myIor)
     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
-  static std::string getEntryPath (const std::string&        aMeshName,
-                                   const ::MEDMEM::SUPPORT * aSupport);
+  static std::string getEntryPath (const MEDMEM::SUPPORT * aSupport);
 
   void release();
   //					Cuisine interne
