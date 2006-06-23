@@ -143,8 +143,6 @@ public:
   
   int myCounter;
   SALOME_NamingService *_NS;
-
-  MEDMEM::MED_i* _myMedI; // used while loading a study
 };
 
 #endif
