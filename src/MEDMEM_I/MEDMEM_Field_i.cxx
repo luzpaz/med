@@ -457,13 +457,17 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
         SALOMEDS::AttributeName_var    aName;
         SALOMEDS::AttributeIOR_var     aIOR;
 
+        string fieldEntryPath = "/";
+
         // Create SComponent labelled 'Med'
         SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
+        fieldEntryPath += "Med/";
         if ( CORBA::is_nil(medfather) )
-	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'MED' not Found",SALOME::INTERNAL_ERROR);
+	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
 
  	// Create SObject labelled 'MEDFIELD' if it doesn't already exit
 	SALOMEDS::SObject_var medfieldfather = myStudy->FindObject("MEDFIELD");
+        fieldEntryPath += "MEDFIELD/";
   	if ( CORBA::is_nil(medfieldfather) ) 
 	{
 	  MESSAGE("Add Object 'MEDFIELD'");
@@ -478,6 +482,7 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 
  	// Create SObject labelled 'FIELDNAME' if it doesn't already exit
 	SALOMEDS::SObject_var medfieldnamefather = myStudy->FindObject(fieldName.c_str());
+        fieldEntryPath += fieldName + "/";
   	if ( CORBA::is_nil(medfieldnamefather) ) 
 	{
 	  MESSAGE("Add Object "<<fieldName);
@@ -487,16 +492,6 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 	  aName->SetValue(fieldName.c_str());
 
   	} ;
-
-        // Create object labelled according to Field's Name
-
-        MESSAGE("Add a Field Object under "<<fieldName);
-        myBuilder->NewCommand();
-        SALOMEDS::SObject_var newObj = myBuilder->NewObject(medfieldnamefather);
-
-        ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
-        ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
-        CORBA::ORB_var &orb = init(0,0);
 
 	int iterationNumber = _fieldTptr->getIterationNumber();
 	SCRUTE(iterationNumber);
@@ -530,57 +525,61 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 	SCRUTE(meshNameStudy);
 
 	fieldEntryName = strcat(fieldEntryName,meshNameStudy.c_str());
+        fieldEntryPath += fieldEntryName;
 
 	SCRUTE(fieldEntryName);
 
-        anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
+        // Create object labelled according to Field's Name
+
+        SALOMEDS::SObject_var fieldSO = myStudy->FindObjectByPath(fieldEntryPath.c_str());
+        bool alreadyPublished = ! CORBA::is_nil(fieldSO);
+        myBuilder->NewCommand();
+        if ( !alreadyPublished )
+        {
+          MESSAGE("Add a Field Object under "<<fieldName);
+          fieldSO = myBuilder->NewObject(medfieldnamefather);
+        }
+        anAttr = myBuilder->FindOrCreateAttribute(fieldSO, "AttributeName");
         aName = SALOMEDS::AttributeName::_narrow(anAttr);
-//         aName->SetValue(iterationName.str().c_str());
         aName->SetValue(fieldEntryName);
 
+        ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
+        ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
+        CORBA::ORB_var &orb = init(0,0);
 	string iorStr = orb->object_to_string(myIor);
-        anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
+        anAttr = myBuilder->FindOrCreateAttribute(fieldSO, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
         aIOR->SetValue(iorStr.c_str());
-        myBuilder->CommitCommand();
-        _FieldId = newObj->GetID();
+        _FieldId = fieldSO->GetID();
 
-	MESSAGE("Computing path to Support");
-
-	char * supportEntryPath;
-	lenName = 28 + 15 + strlen(meshName.c_str()) + 1 +
-	  strlen(supportName.c_str()) + 1;
-	supportEntryPath = new char[lenName];
-	supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/MEDSUPPORTS_OF_");
-	supportEntryPath = strcat(supportEntryPath,meshNameStudy.c_str());
-	supportEntryPath = strcat(supportEntryPath,"/");
-	supportEntryPath = strcat(supportEntryPath,supportName.c_str());
-
-	SCRUTE(supportEntryPath);
-
-	MESSAGE("supportEntryPath in field " << supportEntryPath << " length " << lenName);
-
-// 	SALOMEDS::SObject_var supportObject = myStudy->FindObject(supportName.c_str());
-	SALOMEDS::SObject_var supportObject = myStudy->FindObjectByPath(supportEntryPath);
-
-	SCRUTE(supportObject);
-
-  	if ( CORBA::is_nil(supportObject) ) 
+        if ( !alreadyPublished )
         {
-	  MESSAGE("supportObject is a nil corba object");
-	  MESSAGE("FIELD_i::addInStudy : SUPPORT not found") ;
-	} 
-        else 
-        {
-	  MESSAGE("supportObject is OK and is now going to be referenced !");
-	  SALOMEDS::SObject_var newObjSupport = myBuilder->NewObject(newObj);
-	  myBuilder->Addreference(newObjSupport,supportObject);
-	  MESSAGE(" OUF !!!");
-	}
+          MESSAGE("Computing path to Support");
+
+          string supportEntryPath = SUPPORT_i::getEntryPath( _fieldTptr->getSupport() );
+          SCRUTE(supportEntryPath);
+
+          SALOMEDS::SObject_var supportObject =
+            myStudy->FindObjectByPath(supportEntryPath.c_str());
+
+          SCRUTE(supportObject);
+
+          if ( CORBA::is_nil(supportObject) ) 
+          {
+            MESSAGE("supportObject is a nil corba object");
+            MESSAGE("FIELD_i::addInStudy : SUPPORT not found") ;
+          } 
+          else 
+          {
+            MESSAGE("supportObject is OK and is now going to be referenced !");
+            SALOMEDS::SObject_var newObjSupport = myBuilder->NewObject(fieldSO);
+            myBuilder->Addreference(newObjSupport,supportObject);
+            MESSAGE(" OUF !!!");
+          }
+        }
 
         myBuilder->CommitCommand();
 
-	delete [] supportEntryPath;
 	delete [] fieldEntryName;
 
 	// register the Corba pointer: increase the referrence count

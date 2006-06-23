@@ -1498,29 +1498,36 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 
 //   	} ;
 
-	SALOMEDS::SObject_var medmeshfather = myStudy->FindObjectByPath("/Med/MEDMESH");
+        string aPath = "/Med/MEDMESH";
+	SALOMEDS::SObject_var medmeshfather = myStudy->FindObjectByPath( aPath.c_str() );
   	if ( CORBA::is_nil(medmeshfather) ) 
 	  {
 	    MESSAGE("Add Object MEDMESH");
 
-	    myBuilder->AddDirectory("/Med/MEDMESH");
-            medmeshfather = myStudy->FindObjectByPath("/Med/MEDMESH");
+	    myBuilder->AddDirectory( aPath.c_str() );
+            medmeshfather = myStudy->FindObjectByPath( aPath.c_str() );
 	  } ;
 
-   	MESSAGE("Add a mesh Object under MED/MEDMESH");
-  	SALOMEDS::SObject_var newObj = myBuilder->NewObject(medmeshfather);
+        aPath += "/" + _mesh->getName();
+        SALOMEDS::SObject_var meshSO = myStudy->FindObjectByPath( aPath.c_str());
+        bool alreadyPublished = ! CORBA::is_nil( meshSO );
+        if ( !alreadyPublished ) {
+          MESSAGE("Add a mesh Object under MED/MEDMESH");
+          meshSO = myBuilder->NewObject(medmeshfather);
+
+          anAttr = myBuilder->FindOrCreateAttribute(meshSO, "AttributeName");
+          aName = SALOMEDS::AttributeName::_narrow(anAttr);
+          aName->SetValue(_mesh->getName().c_str());
+        }
 
 	ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
         ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
         CORBA::ORB_var &orb = init(0,0);
 	string iorStr = orb->object_to_string(myIor);
-        anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
+        anAttr = myBuilder->FindOrCreateAttribute(meshSO, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
         aIOR->SetValue(iorStr.c_str());
-        anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
-        aName = SALOMEDS::AttributeName::_narrow(anAttr);
-        aName->SetValue(_mesh->getName().c_str());
-  	_meshId = newObj->GetID();
+  	_meshId = meshSO->GetID();
   	myBuilder->CommitCommand();
 
 	// register the Corba pointer: increase the referrence count
