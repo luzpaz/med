@@ -68,13 +68,11 @@ public:
 
   void init(SALOMEDS::Study_ptr myStudy, driverTypes driverType, const string & fileName); // Analyse the file <fileName> by calling readFileStruct
 
-  void initWithFieldType(SALOMEDS::Study_ptr myStudy, driverTypes driverType, const string & fileName); // Same method as above but with storage of fields with their type
+  void initWithFieldType(SALOMEDS::Study_ptr myStudy, driverTypes driverType, const string & fileName, bool persistence=false); // Same method as above but with storage of fields with their type
 
   void addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
 		  const char * medObjName)
     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
-
-  void updateSupportIORs(SALOMEDS::Study_ptr myStudy, const char* meshName);
 
 
     // IDL Methods 

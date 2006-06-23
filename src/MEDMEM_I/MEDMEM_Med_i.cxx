@@ -26,7 +26,6 @@
 #include <deque>
 
 //#include "MEDMEM_Field.hxx"
-
 #include "MEDMEM_Med_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_FieldTemplate_i.hxx"
@@ -34,6 +33,9 @@
 #include "MEDMEM_Family_i.hxx"
 #include "MEDMEM_Group_i.hxx"
 #include "MEDMEM_convert.hxx"
+
+#include "MEDMEM_Family.hxx"
+#include "MEDMEM_Group.hxx"
 
 #include "MEDMEM_DriversDef.hxx"
 #include "utilities.h"
@@ -52,6 +54,7 @@ MED_i::MED_i():_med((::MED*)NULL)
         BEGIN_OF("Default Constructor MED_i");
         END_OF("Default Constructor MED_i");
 }
+
 //=============================================================================
 /*!
  * methods
@@ -171,13 +174,16 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 					 << meshName << "|"));
                  SALOME_MED::SUPPORT_ptr mySupportIOR = (*itSupport).second;
       		 med_type_champ type = myField->getValueType();
+                 //medModeSwitch  mode = myField->getInterlacingType();
       		 SALOME_MED::FIELD_ptr myFieldIOR;
       		 switch (type) 
 		 {
       		         case MED_EN::MED_INT32 : 
 			 {
-			     ((FIELD<int>*)myField)->read();
-			     FIELDTEMPLATE_I<int> *myFieldIntI = new FIELDTEMPLATE_I<int>((FIELD<int>*)myField);
+			     myField->read();
+                             //if ( mode == FullInterlace )
+			     FIELDTEMPLATE_I<int> *myFieldIntI =
+                               new FIELDTEMPLATE_I<int>((FIELD<int>*)myField);
 			     myFieldIOR = myFieldIntI->_this();
 // 	                     myFieldIntI->addInStudy(myStudy,myFieldIOR);
 		             break;
@@ -185,7 +191,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 
       			case MED_EN::MED_REEL64: 
                         {
-			     ((FIELD<double>*)myField)->read();
+			     myField->read();
 			     FIELDTEMPLATE_I<double> *myFieldDoubleI = new FIELDTEMPLATE_I<double>((FIELD<double>*)myField);
 			     myFieldIOR = myFieldDoubleI->_this();
 // 			     myFieldDoubleI->addInStudy(myStudy,myFieldIOR);
@@ -210,14 +216,33 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
   
   END_OF(LOC);
 }
+//=============================================================================
+/*!
+ * service
+ * purpose: return true if a support is published in a study
+ */
+//=============================================================================
+
+namespace {
+  bool isPublishedSupport(const MEDMEM::SUPPORT * support,
+                          SALOMEDS::Study_ptr     study)
+  {
+    string entryPath = SUPPORT_i::getEntryPath( support );
+    return ! CORBA::is_nil( study->FindObjectByPath( entryPath.c_str() ));
+  }
+}
 
 //=============================================================================
 /*!
  * methods
  */
 //=============================================================================
-void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const string & fileName)
+void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const string & fileName, bool persistence)
 {
+  // if (persistence):
+  //    all meshes and fields contained in the file should be published,
+  //    only some supports maybe not
+
 	const char * LOC = "MED_i::initWithFieldType(driverTypes, const string &)";
 	BEGIN_OF(LOC);
 
@@ -285,7 +310,9 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		     {
 			  FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
 			  SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->POA_SALOME_MED::FAMILY::_this();
-			   myFamilyI->addInStudy(myStudy,myFamilyIOR);
+                          if ( !persistence ||
+                               isPublishedSupport( (const MEDMEM::SUPPORT *)*familyVectorIt, myStudy ))
+                            myFamilyI->addInStudy(myStudy,myFamilyIOR);
       		     }
 
 	       // group :
@@ -298,7 +325,9 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		    {
 			 GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
 			 SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->POA_SALOME_MED::GROUP::_this();
-			 myGroupI->addInStudy(myStudy,myGroupIOR);
+                         if ( !persistence ||
+                              isPublishedSupport( (const MEDMEM::SUPPORT *)*groupVectorIt, myStudy ))
+                           myGroupI->addInStudy(myStudy,myGroupIOR);
       		    }
                 }      
 	}
@@ -314,7 +343,9 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		 SUPPORT_i * mySupportI = new SUPPORT_i((*itSupport).second);
 	         SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this();
 	         mySupportsIOR[(*itSupport).first]= mySupportIOR;
-	         mySupportI->addInStudy(myStudy,mySupportIOR);
+                 if ( !persistence ||
+                      isPublishedSupport( itSupport->second, myStudy ))
+                   mySupportI->addInStudy(myStudy,mySupportIOR);
 	    }
 	}
 
@@ -488,8 +519,9 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 					 << "There is no support on entity "
 					 << entity << " in mesh named |" 
 					 << meshName << "|"));
-		  SALOME_MED::SUPPORT_ptr mySupportIOR = (*itSupport).second;
+		  //SALOME_MED::SUPPORT_ptr mySupportIOR = (*itSupport).second;
 		  med_type_champ type = myField->getValueType();
+                  medModeSwitch  mode = myField->getInterlacingType();
 
 		  DT_IT_ dtIt;
 		  dtIt.dt  = dt;
@@ -497,28 +529,46 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
 		  switch (type) 
 		  {
-		     case MED_EN::MED_INT32: 
-		     {
-			((FIELD<int>*)myField)->read();
-			FIELDTEMPLATE_I<int> *myFieldIntI = new FIELDTEMPLATE_I<int>((FIELD<int>*)myField);
-			SALOME_MED::FIELDINT_ptr myFieldIntIOR;
-			myFieldIntIOR = myFieldIntI->_this();
+                  case MED_EN::MED_INT32: 
+                    {
+                      myField->read();
+                      SALOME_MED::FIELD_ptr myFieldIntIOR;
+                      FIELD_i* myFieldIntI;
+                      if ( mode == MED_FULL_INTERLACE )
+                      {
+                        myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int,FullInterlace>*)myField);
+                        myFieldIntIOR = myFieldIntI->_this();
+                      }
+                      else
+                      {
+                        myFieldIntI = new FIELDTEMPLATE_I<int,NoInterlace>((FIELD<int,NoInterlace>*)myField);
+                        myFieldIntIOR = myFieldIntI->_this();
+                      }
+                      MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str()
+                              << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
-			MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str() << " dt = " << dtIt.dt << " it = " << dtIt.it);
-
-			myFieldIntI->addInStudy(myStudy,myFieldIntIOR);
-			_fields[fieldsNames[i]][dtIt] = myFieldIntIOR;
-			break;
-  		     }
+                      myFieldIntI->addInStudy(myStudy,myFieldIntIOR);
+                      _fields[fieldsNames[i]][dtIt] = myFieldIntIOR;
+                      break;
+                    }
 
       		     case MED_EN::MED_REEL64: 
 		     {
-			((FIELD<double>*)myField)->read();
-			FIELDTEMPLATE_I<double> *myFieldDoubleI = new FIELDTEMPLATE_I<double>((FIELD<double>*)myField);
-			SALOME_MED::FIELDDOUBLE_ptr myFieldDoubleIOR;
-			myFieldDoubleIOR = myFieldDoubleI->_this();
-
-			MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str() << " dt = " << dtIt.dt << " it = " << dtIt.it);
+                       myField->read();
+                       SALOME_MED::FIELD_ptr myFieldDoubleIOR;
+                       FIELD_i* myFieldDoubleI;
+                       if ( mode == MED_FULL_INTERLACE )
+                       {
+                         myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double,FullInterlace>*)myField);
+                         myFieldDoubleIOR = myFieldDoubleI->_this();
+                       }
+                       else
+                       {
+                         myFieldDoubleI = new FIELDTEMPLATE_I<double,NoInterlace>((FIELD<double,NoInterlace>*)myField);
+                         myFieldDoubleIOR = myFieldDoubleI->_this();
+                       }
+			MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str()
+                                << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
 			myFieldDoubleI->addInStudy(myStudy,myFieldDoubleIOR);
 			_fields[fieldsNames[i]][dtIt] = myFieldDoubleIOR;
@@ -836,7 +886,7 @@ throw (SALOME::SALOME_Exception)
                 ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
 
                 ::FIELD<double> * fdouble = (::FIELD<double> *)FIELD_i::fieldMap[ind];
-                MESH * mesh=_med->getMesh(fdouble);
+                mesh=_med->getMesh(fdouble);
         }
         else
         {
@@ -844,7 +894,7 @@ throw (SALOME::SALOME_Exception)
                 ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
 
                 ::FIELD<int> * fint = (::FIELD<int> *)FIELD_i::fieldMap[ind];
-                MESH * mesh=_med->getMesh(fint);
+                mesh=_med->getMesh(fint);
         }
         MESH_i * meshi = new MESH_i(mesh);
 	return meshi->POA_SALOME_MED::MESH::_this();
@@ -978,6 +1028,7 @@ throw (SALOME::SALOME_Exception)
 	return (*itMap_dtIt).second;
 
 }
+
 //=============================================================================
 /*!
  * CORBA: Accessor for a specific field
