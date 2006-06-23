@@ -112,9 +112,10 @@ void MED_MED_DRIVER22::open()
                                      )
                           );
 
-  MESSAGE(LOC<<"_fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
+  int accessMode = getMedAccessMode( _accessMode, MED_EN::V22 );
+  MESSAGE(LOC<<"_fileName.c_str : "<< _fileName.c_str()<<",mode : "<< accessMode);
 
-  _medIdt = med_2_2::MEDouvrir( (const_cast <char *> (_fileName.c_str())), (med_2_2::med_mode_acces) _accessMode);
+  _medIdt = med_2_2::MEDouvrir( (const_cast <char *> (_fileName.c_str())), (med_2_2::med_mode_acces) accessMode);
   MESSAGE(LOC<<" _medIdt = "<<_medIdt);
   
   if (_medIdt > 0) 

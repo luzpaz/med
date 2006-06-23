@@ -28,6 +28,7 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_Grid.hxx"
+#include "MEDMEM_MedVersion.hxx"
 
 
 using namespace std;
@@ -67,8 +68,9 @@ void MED_MESH_DRIVER21::open()
 {
   const char * LOC = "MED_MESH_DRIVER21::open()" ;
   BEGIN_OF(LOC);
-  MESSAGE(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
-  _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (_fileName.c_str())),(med_2_1::med_mode_acces) _accessMode);
+  int accessMode = getMedAccessMode( _accessMode, MED_EN::V21 );
+  MESSAGE(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< accessMode);
+  _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (_fileName.c_str())),(med_2_1::med_mode_acces) accessMode);
   MESSAGE(LOC<<" _medIdt : "<< _medIdt );
   if (_medIdt > 0) 
     _status = MED_OPENED; 

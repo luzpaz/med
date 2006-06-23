@@ -107,9 +107,9 @@ void MED_MED_DRIVER21::open()
                                      << "_fileName is |\"\"|, please set a correct fileName before calling open()"
                                      )
                           );
-  
-  MESSAGE(LOC<<"_fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
-  _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (_fileName.c_str())), (med_2_1::med_mode_acces) _accessMode);
+  int accessMode = getMedAccessMode( _accessMode, MED_EN::V21 );
+  MESSAGE(LOC<<"_fileName.c_str : "<< _fileName.c_str()<<",mode : "<< accessMode);
+  _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (_fileName.c_str())), (med_2_1::med_mode_acces) accessMode);
   MESSAGE(LOC<<" _medIdt = "<<_medIdt);
   
   if (_medIdt > 0) 

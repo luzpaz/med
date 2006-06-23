@@ -121,3 +121,75 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
 
   return version;
 }
+
+//================================================================================
+/*!
+ * \brief return file mode access corresponding to MED_EN::med_mode_acces in given med version
+  * \param mode - either MED_LECT, MED_ECRI or MED_REMP
+  * \param medVersion - V21 or V22 or ??
+  * \retval int - file mode access
+  *
+  * To be used in MEDouvrir() call
+ */
+//================================================================================
+
+int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
+                             MED_EN::medFileVersion medVersion)
+  throw (MEDEXCEPTION)
+{
+  switch ( medVersion ) {
+  case V21:
+/*
+  from MEDouvrir.c:
+     switch(mode_acces)
+    {
+    case MED_LECT :
+      if (access(nom,F_OK))
+	return -1;
+      else 
+	if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
+	  return -1;
+      break;
+
+    case MED_ECRI :
+      if (access(nom,F_OK))
+	{
+	  if ((fid = _MEDfichierCreer(nom)) < 0)
+	    return -1;
+	}
+      else
+	if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
+	  return -1;
+      break;
+
+    case MED_REMP :
+      if ((fid = _MEDfichierCreer(nom)) < 0)
+	return -1;
+      break;
+*/
+    switch ( mode ) {
+    case MED_EN::MED_LECT: return med_2_1::MED_LECT;
+    case MED_EN::MED_ECRI: return med_2_1::MED_ECRI;
+    case MED_EN::MED_REMP: return med_2_1::MED_ECRI;
+    default:
+      throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
+    }
+  case V22:
+/*
+  from med.h:
+   MED_LECTURE          : Ouverture en lecture seule
+   MED_LECTURE_ECRITURE : Ouverture en lecture/ecriture, si un élément existe il est écrasé
+   MED_LECTURE_AJOUT    : Ouverture en lecture/ecriture, si un élément existe une erreur est générée
+   MED_CREATION         : Créer le fichier s'il n'existe pas, l'écrase sinon
+*/
+    switch ( mode ) {
+    case MED_EN::MED_LECT: return med_2_2::MED_LECTURE;
+    case MED_EN::MED_ECRI: return med_2_2::MED_LECTURE_ECRITURE;
+    case MED_EN::MED_REMP: return med_2_2::MED_LECTURE_ECRITURE;
+    default:
+      throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
+    }
+  default:;
+  }
+  throw MEDEXCEPTION("getMedAccessMode(): Unknown med version");
+}
