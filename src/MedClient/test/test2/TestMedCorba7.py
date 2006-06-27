@@ -18,7 +18,7 @@
 # 
 import os
 
-BASE = os.environ["MED_ROOT_DIR"] + '/share/salome/resources/'
+BASE = os.environ["MED_ROOT_DIR"] + '/share/salome/resources/med/'
 
 fileName = BASE + 'pointe.med'
 fileName = BASE + 'test_hydro_darcy1a_out.med'

@@ -21,7 +21,7 @@ import os
 ## ne fonctionne pas ?
 ## import salome
 
-BASE = os.environ["MED_ROOT_DIR"] + '/share/salome/resources/'
+BASE = os.environ["MED_ROOT_DIR"] + '/share/salome/resources/med/'
 
 fileName = BASE + 'pointe.med'
 fileName = BASE + 'carre_en_quad4_seg2.med'

@@ -38,7 +38,7 @@ from random import *
 import os
 
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/"
+filePath=filePath+"/share/salome/resources/med/"
 
 #==============================================================================
 

@@ -32,7 +32,7 @@ from random import *
 import sys,os,string
 
 filesPath=os.environ["MED_ROOT_DIR"]
-filesPath=filesPath+"/share/salome/resources/"
+filesPath=filesPath+"/share/salome/resources/med/"
 
 os.system("rm -rf "+filesPath+"*_test.*")
 

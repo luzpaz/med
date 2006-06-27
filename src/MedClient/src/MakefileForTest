@@ -30,7 +30,7 @@ pyTESTMEDCLIENT : TESTMEDCLIENT_Gen.idl
 TESTMEDCLIENTCatalog.xml : TESTMEDCLIENT_Gen.idl
 	omniidl -bIDLparser $(INCIDL) -Wbcatalog=$@,name='TESTMEDCLIENT',username='TESTMEDCLIENT' $^
 	sed -e 's/TESTMEDCLIENT_Gen/TESTMEDCLIENT/g' $@ > toto
-	mv toto ./share/salome/resources/$@
+	mv toto ./share/salome/resources/med/$@
 	rm *.xml
 
 TESTMEDCLIENT_GenSK.o : $(INC_IDL) TESTMEDCLIENT_GenSK.cc
