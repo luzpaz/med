@@ -263,6 +263,12 @@ bool
 TGaussInfo::TLess
 ::operator()(const TGaussInfo& theLeft, const TGaussInfo& theRight) const
 {
+  if(!&theLeft)
+    return true;
+
+  if(!&theRight)
+    return false;
+
   if(theLeft.myGeom != theRight.myGeom)
     return theLeft.myGeom < theRight.myGeom;
 
