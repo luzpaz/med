@@ -46,7 +46,7 @@ _MEDattrNumLire(med_idt pere,med_type_champ type,char *nom,unsigned char *val)
   switch(type) 
     {
     case MED_REEL64 :
-#if defined(PCLINUX) || defined(OSF1)
+#if defined(PCLINUX) || defined(OSF1) || defined(PPRO_NT)
       type_hdf = H5T_IEEE_F64BE;
 #else 
       type_hdf = H5T_IEEE_F64LE;
