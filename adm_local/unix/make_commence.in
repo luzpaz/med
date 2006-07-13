@@ -4,6 +4,7 @@ inc_builddir=$(top_builddir)/include/salome
 MODULE_NAME=@MODULE_NAME@
 
 MED_WITH_KERNEL=@MED_WITH_KERNEL@
+MED_WITH_GUI=@MED_WITH_GUI@
 @SET_MAKE@
 SHELL=@SHELL@
 
@@ -312,15 +313,21 @@ ac_cxx_mutable.m4                 check_mico.m4      libtool.m4		\
 ac_cxx_namespaces.m4              check_omniorb.m4   pyembed.m4		\
 ac_cxx_partial_specialization.m4  python.m4                             \
 ac_cxx_typename.m4                check_pthreads.m4  check_cas.m4	\
-ac_cc_warnings.m4                 check_swig.m4 
+ac_cc_warnings.m4                 check_swig.m4      check_qt.m4 
+endif
 
+ifeq ($(MED_WITH_GUI),yes)
 ACLOCAL_GUI = \
-check_vtk.m4	                  check_opengl.m4    check_qt.m4        \
+check_vtk.m4	                  check_opengl.m4       \
 check_GUI.m4	                  check_corba_in_GUI.m4
 
 $(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=@KERNEL_ROOT_DIR@/salome_adm/unix/config_files/%) \
                           $(ACLOCAL_GUI:%=@GUI_ROOT_DIR@/adm_local/unix/config_files/%)
 	cd $(top_srcdir) ; aclocal -I adm_local/unix/config_files -I @KERNEL_ROOT_DIR@/salome_adm/unix/config_files \
-	                                                               -I @GUI_ROOT_DIR@/adm_local/unix/config_files
+                                                                  -I @GUI_ROOT_DIR@/adm_local/unix/config_files
+endif
 
+ifeq ($(MED_WITH_GUI),no)
+$(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=@KERNEL_ROOT_DIR@/salome_adm/unix/config_files/%)
+	cd $(top_srcdir) ; aclocal -I adm_local/unix/config_files -I @KERNEL_ROOT_DIR@/salome_adm/unix/config_files
 endif
