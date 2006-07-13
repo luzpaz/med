@@ -128,6 +128,19 @@ namespace MED
   GetMKey2Profile(const PWrapper& theWrapper, 
 		  TErr* theErr = NULL,
 		  EModeProfil theMode = eCOMPACT);
+
+  //---------------------------------------------------------------
+  //! Get Entity for Grille by family id.
+  EEntiteMaillage
+  GetEntityByFamilyId(PGrilleInfo& theInfo,
+		      TInt theId);
+
+  typedef std::map<TInt,TInt> TFamilyID2NbCells;
+  
+  //! Get Number of cells for theId family, for Grille
+  TFamilyID2NbCells
+  GetFamilyID2NbCells(PGrilleInfo& theInfo);
+  
 }
 
 #endif

@@ -336,4 +336,30 @@ namespace MED
     return TMKey2Profile(theMode,aKey2Profile);
   }
 
+  //---------------------------------------------------------------
+  EEntiteMaillage
+  GetEntityByFamilyId(PGrilleInfo& theInfo,TInt theId){
+    TElemNum::iterator aNodeFamIter = (theInfo->myFamNumNode).begin();
+    for(;aNodeFamIter != (theInfo->myFamNumNode).end(); aNodeFamIter++){
+      if(theId == *aNodeFamIter)
+	return eNOEUD;
+    }
+    TElemNum::iterator aCellFamIter = (theInfo->myFamNum).begin();
+    for(;aCellFamIter != (theInfo->myFamNum).end(); aCellFamIter++){
+      if(theId == *aCellFamIter)
+	return eMAILLE;
+    }
+  }
+
+  TFamilyID2NbCells
+  GetFamilyID2NbCells(PGrilleInfo& theInfo){
+    TFamilyID2NbCells aFamily2NbCells;
+    TInt aNbNodes = theInfo->myFamNumNode.size();
+    TInt aNbCells = theInfo->myFamNum.size();
+    for(TInt i=0; i<aNbNodes; i++) aFamily2NbCells[theInfo->GetFamNumNode(i)] = 0;
+    for(TInt i=0; i<aNbCells; i++) aFamily2NbCells[theInfo->GetFamNum(i)] = 0;
+    for(TInt i=0; i<aNbNodes; i++) aFamily2NbCells[theInfo->GetFamNumNode(i)] += 1;
+    for(TInt i=0; i<aNbCells; i++) aFamily2NbCells[theInfo->GetFamNum(i)] += 1;
+    return aFamily2NbCells;
+  }
 }

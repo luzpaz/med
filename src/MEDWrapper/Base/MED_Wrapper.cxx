@@ -494,9 +494,14 @@ namespace MED
     INITMSG(MYDEBUG,"GetPGrilleInfo: ");
     {
       TInt aNbElem = anInfo->GetNbNodes();
-      BEGMSG(MYVALUEDEBUG,"GetFamNum: ");
+      BEGMSG(MYVALUEDEBUG,"GetFamNumNode: ");
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
 	ADDMSG(MYVALUEDEBUG,anInfo->GetFamNumNode(iElem)<<", ");
+      }
+      TInt aNbCells = anInfo->GetNbCells();
+      BEGMSG(MYVALUEDEBUG,"GetFamNum: ");
+      for(TInt iElem = 0; iElem < aNbCells; iElem++){
+	ADDMSG(MYVALUEDEBUG,anInfo->GetFamNum(iElem)<<", ");
       }
       ADDMSG(MYVALUEDEBUG,endl);
       BEGMSG(MYVALUEDEBUG,"GetCoordName: ");

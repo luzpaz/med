@@ -937,6 +937,7 @@ namespace MED
       myFamNumNode.resize(theInfo->GetNbNodes());
       myFamNumNode      = theInfo->myFamNumNode;
 
+      myFamNum      = theInfo->myFamNum;
     }
 
     TTGrilleInfo(const PMeshInfo& theMeshInfo,

@@ -670,7 +670,6 @@ namespace MED
     
     /*!
      *Defines sequence MED Family indexes for corresponding mesh entites
-     *Not used now. 
      */
     TElemNum myFamNum; 
     //! Get number of a MED FAMILY by order number of the mesh element

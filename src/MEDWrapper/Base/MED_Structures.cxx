@@ -519,7 +519,7 @@ TGrilleInfo
 {
   TIndexes::iterator aIter=myIndixes.find(theAxisNumber);
   if(aIter==myIndixes.end())
-    EXCEPTION(runtime_error,"TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber); fails");
+    EXCEPTION(runtime_error,"TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber="<<theAxisNumber<<"); fails");
   return aIter->second;
 }
 
@@ -540,9 +540,9 @@ TGrilleInfo
   if(myGrilleType == eGRILLE_STANDARD)
     for(int i=0;i<aDim;i++)
       if(nbNodes == 0)
-	nbNodes = myGrilleStructure[i];
+	nbNodes = this->GetGrilleStructure()[i];
       else
-	nbNodes = nbNodes*myGrilleStructure[i];
+	nbNodes = nbNodes*this->GetGrilleStructure()[i];
   else
     for(int i=0;i<aDim;i++)
       if(nbNodes == 0)
@@ -559,12 +559,12 @@ TGrilleInfo
 {
   TInt nbCells=0;
   TInt aDim = myMeshInfo->GetDim();
-  if(myGrilleType == eGRILLE_STANDARD)
+  if(this->GetGrilleType() == eGRILLE_STANDARD)
     for(int i=0;i<aDim;i++)
       if(nbCells == 0)
-	nbCells = myGrilleStructure[i]-1;
+	nbCells = this->GetGrilleStructure()[i]-1;
       else
-	nbCells = nbCells*(myGrilleStructure[i]-1);
+	nbCells = nbCells*(this->GetGrilleStructure()[i]-1);
   else
     for(int i=0;i<aDim;i++)
       if(nbCells == 0)
@@ -795,4 +795,18 @@ TGrilleInfo
 ::SetFamNumNode(TInt theId,TInt theVal) 
 {
   myFamNumNode[theId] = theVal;
+}
+
+TInt
+TGrilleInfo
+::GetFamNum(TInt theId) const 
+{
+  return myFamNum[theId];
+}
+
+void
+TGrilleInfo
+::SetFamNum(TInt theId,TInt theVal) 
+{
+  myFamNum[theId] = theVal;
 }
