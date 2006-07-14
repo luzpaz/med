@@ -538,10 +538,10 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 //         aName->SetValue(iterationName.str().c_str());
         aName->SetValue(fieldEntryName);
 
-	string iorStr = orb->object_to_string(myIor);
+        CORBA::String_var iorStr = orb->object_to_string(myIor);
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
-        aIOR->SetValue(iorStr.c_str());
+        aIOR->SetValue(iorStr.in());
         myBuilder->CommitCommand();
         _FieldId = newObj->GetID();
 

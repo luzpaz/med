@@ -186,10 +186,14 @@ void MedGUI::contextMenuPopup( const QString& client, QPopupMenu* menu, QString&
 
 QString MedGUI::engineIOR() const
 {
+  QString anIOR( "" );
   SALOME_MED::MED_Gen_ptr aMedGen = InitMedGen();
   if ( !CORBA::is_nil( aMedGen) )
-    return QString( getApp()->orb()->object_to_string( aMedGen ));
-  return QString( "" );
+  {
+    CORBA::String_var objStr = getApp()->orb()->object_to_string( aMedGen );
+    anIOR = QString( objStr.in() );
+  }
+  return anIOR;
 }
 
 void MedGUI::windows( QMap<int, int>& mappa ) const

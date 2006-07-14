@@ -1183,10 +1183,10 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
         ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance();
         ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting());
         CORBA::ORB_var &orb = init(0,0);
-        string iorStr = orb->object_to_string(myIor);
+        CORBA::String_var iorStr = orb->object_to_string(myIor);
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
-        aIOR->SetValue(iorStr.c_str());
+        aIOR->SetValue(iorStr.in());
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
         aName = SALOMEDS::AttributeName::_narrow(anAttr);
         aName->SetValue("Objet MED");
@@ -1250,10 +1250,10 @@ void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
         ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance();
         ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting());
         CORBA::ORB_var &orb = init(0,0);
-        string iorStr = orb->object_to_string(myIor);
+        CORBA::String_var iorStr = orb->object_to_string(myIor);
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
-        aIOR->SetValue(iorStr.c_str());
+        aIOR->SetValue(iorStr.in());
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
         aName = SALOMEDS::AttributeName::_narrow(anAttr);
         aName->SetValue(medObjName);

@@ -1129,7 +1129,8 @@ SALOMEDS::SObject_ptr Med_Gen_i::PublishInStudy(SALOMEDS::Study_ptr theStudy,
 //     SALOME_MED::SUPPORT_var aSupport = SALOME_MED::SUPPORT::_narrow(theObject);
 //     if ( !aSupport->_is_nil())
 //       aSupport->addInStudy(theStudy, aSupport);
-    aResultSO = theStudy->FindObjectIOR(_orb->object_to_string(theObject));
+    CORBA::String_var objStr = _orb->object_to_string(theObject);
+    aResultSO = theStudy->FindObjectIOR(objStr.in());
   } else {
 //     if (!theSObject->ReferencedObject(aResultSO))
 //       THROW_SALOME_CORBA_EXCEPTION("Publish in study MED object error",SALOME::BAD_PARAM);
@@ -1281,7 +1282,7 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   meshi->addInStudy(aStudy,mesh);
   // get the IOR attribute of just added mesh
   CORBA::String_var anIORString = _orb->object_to_string(mesh);
-  aResultSO = aStudy->FindObjectIOR(anIORString);
+  aResultSO = aStudy->FindObjectIOR(anIORString.in());
 
   char * aFullName1 = new char[strlen(aTmpDir)+1];
   strcpy(aFullName1,aTmpDir);

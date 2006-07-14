@@ -637,10 +637,10 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
     ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
     CORBA::ORB_var &orb = init(0,0);
-    string iorStr = orb->object_to_string(myIor);
+    CORBA::String_var iorStr = orb->object_to_string(myIor);
     anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
     aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
-    aIOR->SetValue(iorStr.c_str());
+    aIOR->SetValue(iorStr.in());
     anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
     aName = SALOMEDS::AttributeName::_narrow(anAttr);
     aName->SetValue(_support->getName().c_str());
@@ -652,10 +652,10 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
     ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
     CORBA::ORB_var &orb = init(0,0);
-    string iorStr = orb->object_to_string(myIor);
+    CORBA::String_var iorStr = orb->object_to_string(myIor);
     anAttr = myBuilder->FindOrCreateAttribute(supportEntry, "AttributeIOR");
     aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
-    aIOR->SetValue(iorStr.c_str());
+    aIOR->SetValue(iorStr.in());
   }
   myBuilder->CommitCommand();
 
