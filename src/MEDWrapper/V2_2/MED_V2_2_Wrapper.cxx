@@ -462,7 +462,6 @@ namespace MED
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
-      
       TErr aRet = MEDfamLire(myFile->Id(),
 			     &aMeshInfo.myName[0],
 			     (med_int*)&theInfo.myFamNum[0],
@@ -2028,13 +2027,12 @@ namespace MED
       EMaillage type_maillage   = aMeshInfo.myType;
       
       GetGrilleType(aMeshInfo,theInfo.myGrilleType,theErr);
-      EGrilleType       type = theInfo.myGrilleType;
+      EGrilleType       aGrtype = theInfo.myGrilleType;
 
       TErr aRet;
-      if(type_maillage == eSTRUCTURE && type == eGRILLE_STANDARD){
-	
+      if(type_maillage == eSTRUCTURE && aGrtype == eGRILLE_STANDARD){
 	GetGrilleStruct(aMeshInfo,theInfo.myGrilleStructure,theErr);
-	
+	med_repere aRep;
 	aRet = MEDcoordLire(myFile->Id(),
 			    &aMeshInfo.myName[0],
 			    aMeshInfo.myDim,
@@ -2043,7 +2041,7 @@ namespace MED
 			    MED_ALL, // all coordinates must be return
 			    NULL,
 			    0,
-			    (med_repere*)&theInfo.myGrilleType,
+			    &aRep,//(med_repere*)&theInfo.myGrilleType,
 			    &theInfo.myCoordNames[0],
 			    &theInfo.myCoordUnits[0]);
 
@@ -2052,23 +2050,24 @@ namespace MED
 	else if(aRet < 0)
 	  EXCEPTION(runtime_error,"GetGrilleInfo - MEDcoordLire(...)");
 
-	TInt theNb = GetNbFamilies(aMeshInfo);
+	TInt theNbNodes = theInfo.GetNbNodes();//GetNbFamilies(aMeshInfo);
 	
 	aRet = MEDfamLire(myFile->Id(),
 			  &aMeshInfo.myName[0],
 			  (med_int*)&theInfo.myFamNumNode[0],
-			  theNb,
+			  theNbNodes,
 			  med_entite_maillage(eNOEUD),
 			  med_geometrie_element(ePOINT1));
-	
+
 	if(theErr) 
 	  *theErr = aRet;
 	else if(aRet < 0)
-	  EXCEPTION(runtime_error,"GetGrilleInfo - MEDfamLire(...)");
+	  EXCEPTION(runtime_error,"GetGrilleInfo - MEDfamLire(...) of NODES");
+
 	//============================
       }
 
-      if(type_maillage == eSTRUCTURE && type != eGRILLE_STANDARD){
+      if(type_maillage == eSTRUCTURE && aGrtype != eGRILLE_STANDARD){
 	med_table quoi;
 	for(int aAxe=1;aAxe<=aMeshInfo.myDim;aAxe++)
 	  {
@@ -2117,6 +2116,28 @@ namespace MED
 	      EXCEPTION(runtime_error,"GetGrilleInfo - MEDindicesCoordLire(...)");
 	  }
       }
+
+      EGeometrieElement aGeom   = theInfo.GetGeom();
+      EEntiteMaillage   aEntity = theInfo.GetEntity();
+      TInt theNbCells           = theInfo.GetNbCells();
+      
+      theInfo.myFamNum.resize(theNbCells);
+      
+      aRet = MEDfamLire(myFile->Id(),
+			&aMeshInfo.myName[0],
+			(med_int*)&theInfo.myFamNum[0],
+			theNbCells,
+			med_entite_maillage(aEntity),
+			med_geometrie_element(aGeom));
+      
+      if(theErr) 
+	*theErr = aRet;
+      else if(aRet < 0){
+	//EXCEPTION(runtime_error,"GetGrilleInfo - MEDfamLire(...) of CELLS");
+	aRet = 0;
+	theInfo.myFamNum.resize(0);
+      }
+      
     }
 
     void
