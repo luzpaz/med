@@ -57,7 +57,8 @@ namespace MED
     if(theDoPreCheckInSeparateProcess){
       // First check, is it possible to deal with the file
       std::ostringstream aStr;
-      aStr<<"bash -c \""<<getenv("MED_ROOT_DIR")<<"/bin/salome/mprint_version "<<theFileName<<"\"";
+      // File name is in quotes for the case of space(s) inside it (PAL13009)
+      aStr<<"bash -c \""<<getenv("MED_ROOT_DIR")<<"/bin/salome/mprint_version \'"<<theFileName<<"\'\"";
       if(!MYDEBUG)
 	aStr<<" 2>&1 > /dev/null";
       
