@@ -955,6 +955,7 @@ class MESH
 {
 public :
   MESH();
+  MESH(MESH &m);
 
   ~MESH();
 
