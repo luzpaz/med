@@ -121,7 +121,7 @@ std::ostream& MEDMEM::operator << (std::ostream& os, const _groupe& gr)
     
     _groupe::mailleIter i1=gr.mailles.begin();
     int l;
-    for(l = 0; l < DUMP_LINES_LIMIT && i1!=gr.mailles.end(); i++, l++)
+    for(l = 0; l < DUMP_LINES_LIMIT && i1!=gr.mailles.end(); i1++, l++)
 	    os << setw(3) << l+1 << " " << *(*i1) << std::endl;
     
     if ( l == DUMP_LINES_LIMIT )
