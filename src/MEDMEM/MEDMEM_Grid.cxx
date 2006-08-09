@@ -53,6 +53,8 @@ GRID::GRID() {
 GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name, 
 	   const std::vector<std::string>& coord_unit, const med_grid_type type) : _gridType(type)
 {
+    init(); // PAL 12136
+
     _spaceDimension = xyz_array.size();
 
     // compute & set _numberOfNodes
