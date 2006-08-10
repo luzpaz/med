@@ -1458,11 +1458,6 @@ namespace MED
 	EXCEPTION(runtime_error,"GetNbTimeStamps - There is no any Entity on the Mesh");
       
       bool anIsPerformAdditionalCheck = GetNbMeshes() > 1;
-#ifdef _DEBUG_
-      static bool anIsCheckOnlyFirstTimeStamp = false;
-#else
-      static bool anIsCheckOnlyFirstTimeStamp = true;
-#endif
 
       theGeom2Size.clear();
       TInt aNbTimeStamps = 0;
@@ -1488,7 +1483,7 @@ namespace MED
 		    "GetNbTimeStamps aNbTimeStamps = "<<aNbStamps<<
 		    "; aGeom = "<<aGeom<<"; anEntity = "<<anEntity<<"\n");
 	    if(anIsPerformAdditionalCheck){
-	      TInt iTimeStampEnd = anIsCheckOnlyFirstTimeStamp? 1: aNbStamps;
+	      TInt iTimeStampEnd = aNbStamps;
 	      for(TInt iTimeStamp = 1; iTimeStamp <= iTimeStampEnd; iTimeStamp++){
 		TVector<char> aMeshName(GetNOMLength<eV2_2>()+1);
 		TVector<char> aDtUnit(GetPNOMLength<eV2_2>()+1);
