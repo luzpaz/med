@@ -533,6 +533,31 @@
   SCRUTE($1);
 }
 
+
+/*
+  managing C++ exception in the Python API
+*/
+%exception
+{
+  class PyAllowThreadsGuard {
+   public:
+    PyAllowThreadsGuard() { _save = PyEval_SaveThread(); }
+    ~PyAllowThreadsGuard() { PyEval_RestoreThread(_save); }
+   private:
+    PyThreadState *_save;
+  };
+
+  PyAllowThreadsGuard guard;
+
+  try {
+    $action
+  }
+  catch(MEDEXCEPTION& exception) {
+    PyErr_SetString(PyExc_RuntimeError,exception.what());
+    return NULL;
+  }
+}
+
 SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr,
 						   FIELDDOUBLE *,
 						   bool ownCppPtr=false);
