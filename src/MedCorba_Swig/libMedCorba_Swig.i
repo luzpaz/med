@@ -549,13 +549,7 @@
 
   PyAllowThreadsGuard guard;
 
-  try {
-    $action
-  }
-  catch(MEDEXCEPTION& exception) {
-    PyErr_SetString(PyExc_RuntimeError,exception.what());
-    return NULL;
-  }
+  $action
 }
 
 SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr,

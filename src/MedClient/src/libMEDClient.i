@@ -53,13 +53,7 @@
 
   PyAllowThreadsGuard guard;
 
-  try {
-    $action
-  }
-  catch(MEDEXCEPTION& exception) {
-    PyErr_SetString(PyExc_RuntimeError,exception.what());
-    return NULL;
-  }
+  $action
 }
 
 class MESHClient : public MESH {
