@@ -109,10 +109,9 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
     PyThreadState *_save;
   };
 
-  PyAllowThreadsGuard guard;
-
   try
     {
+      PyAllowThreadsGuard guard;
       $action
     }
   catch(MEDEXCEPTION& exception)
