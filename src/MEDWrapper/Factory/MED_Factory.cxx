@@ -54,24 +54,23 @@ namespace MED
     INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'"<<std::endl);
     EVersion aVersion = eVUnknown;    
 
+#ifndef WIN32
     if(theDoPreCheckInSeparateProcess){
       // First check, is it possible to deal with the file
       std::ostringstream aStr;
-#ifdef WIN32
-      aStr<< getenv("MED_ROOT_DIR") << "/bin/salome/mprint_version " << theFileName;
-#else
+      //aStr<< getenv("MED_ROOT_DIR") << "/bin/salome/mprint_version " << theFileName;
       aStr<<"bash -c \""<<getenv("MED_ROOT_DIR")<<"/bin/salome/mprint_version "<<theFileName<<"\"";
       if(!MYDEBUG)
         aStr<<" 2>&1 > /dev/null";
-#endif
       
       std::string aCommand = aStr.str();
       int aStatus = system(aCommand.c_str());
       
       BEGMSG(MYDEBUG,"aCommand = '"<<aCommand<<"'; aStatus = "<<aStatus<<std::endl);
       if(aStatus != 0)
-	return aVersion;
+        return aVersion;
     }
+#endif
 
     // Next, try to open the file trough the MED API
     char* aFileName = const_cast<char*>(theFileName.c_str());
