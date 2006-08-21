@@ -537,7 +537,7 @@
 /*
   managing C++ exception in the Python API
 */
-%exception
+/*%exception
 {
   class PyAllowThreadsGuard {
    public:
@@ -550,7 +550,7 @@
   PyAllowThreadsGuard guard;
 
   $action
-}
+}*/
 
 SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr,
 						   FIELDDOUBLE *,

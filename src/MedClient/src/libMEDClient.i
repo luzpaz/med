@@ -41,7 +41,7 @@
 /*
   managing C++ exception in the Python API
 */
-%exception
+/*%exception
 {
   class PyAllowThreadsGuard {
    public:
@@ -54,7 +54,7 @@
   PyAllowThreadsGuard guard;
 
   $action
-}
+}*/
 
 class MESHClient : public MESH {
 

@@ -101,17 +101,17 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 
 %exception
 {
-  class PyAllowThreadsGuard {
-   public:
-    PyAllowThreadsGuard() { _save = PyEval_SaveThread(); }
-    ~PyAllowThreadsGuard() { PyEval_RestoreThread(_save); }
-   private:
-    PyThreadState *_save;
-  };
+  //class PyAllowThreadsGuard {
+  // public:
+  //  PyAllowThreadsGuard() { _save = PyEval_SaveThread(); }
+  //  ~PyAllowThreadsGuard() { PyEval_RestoreThread(_save); }
+  // private:
+  //  PyThreadState *_save;
+  //};
 
   try
     {
-      PyAllowThreadsGuard guard;
+      //PyAllowThreadsGuard guard;
       $action
     }
   catch(MEDEXCEPTION& exception)
