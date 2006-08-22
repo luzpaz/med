@@ -479,7 +479,9 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
 				     << "| with (ndt,or) = ("
 				     << ndt << "," << od << ") for (entityType,geometricType)=("
 				     << MED_EN::entNames[entityCurrent] << ","
-				     << MED_EN::geoNames[*currentGeometry] << ")" )); ;
+				     << MED_EN::geoNames[*currentGeometry] << ")" ));
+      if ( entityCurrent == MED_EN::MED_NODE || ngauss > 1000 ) // some gabage
+        ngauss = 1;
 
       //totalNumberOfElements+=numberOfElements;
       numberOfElementsOfType[numberOfGeometricType] = numberOfElements/ngauss;
