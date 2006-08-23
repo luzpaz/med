@@ -480,8 +480,13 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
 				     << ndt << "," << od << ") for (entityType,geometricType)=("
 				     << MED_EN::entNames[entityCurrent] << ","
 				     << MED_EN::geoNames[*currentGeometry] << ")" ));
-      if ( entityCurrent == MED_EN::MED_NODE || ngauss > 1000 ) // some gabage
+      if ( ngauss > 1000 ) { // some gabage
+        INFOS( "Set to 1 invalid nb of Gauss points " << ngauss << " for  Field |" << fieldName
+               << "| with (ndt,or) = (" << ndt << "," << od << ") for (entityType,geometricType)=("
+               << MED_EN::entNames[entityCurrent] << ","
+               << MED_EN::geoNames[*currentGeometry] << ")" );
         ngauss = 1;
+      }
 
       //totalNumberOfElements+=numberOfElements;
       numberOfElementsOfType[numberOfGeometricType] = numberOfElements/ngauss;
@@ -968,7 +973,8 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
   typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array ArrayNo;
   typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array ArrayFull;
 
-  if (MED_FIELD_DRIVER<T>::_status==MED_OPENED)
+  if (MED_FIELD_DRIVER<T>::_status==MED_OPENED &&
+      MED_FIELD_DRIVER<T>::_ptrField->_isRead )
     {
       int err ;
 
