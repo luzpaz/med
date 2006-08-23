@@ -1359,7 +1359,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
   med_2_2::med_idt id = MED_FIELD_DRIVER22<T>::_medIdt;
 
   if (MED_FIELD_DRIVER<T>::_status!=MED_OPENED)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": Method open must be called before method read.")) ;
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": Method open must be called before method write.")) ;
 
   string fieldName;
   if ( ( MED_FIELD_DRIVER<T>::_fieldName.empty()       ) &&
@@ -1373,6 +1373,10 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
     fieldName=MED_FIELD_DRIVER<T>::_ptrField->_name;
   else
     fieldName = MED_FIELD_DRIVER<T>::_fieldName;
+
+  if ( ! MED_FIELD_DRIVER<T>::_ptrField->_isRead )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
+				 <<" FIELD |"<<fieldName<<"| was not read but is being written"));
 
   SCRUTE(fieldName);
   if ( fieldName.size() > MED_TAILLE_NOM ) {
