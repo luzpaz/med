@@ -727,7 +727,7 @@ inline const int * MESH::getConnectivityIndex(MED_EN::medConnectivity Connectivi
 inline int MESH::getPolygonsConnectivityLength(MED_EN::medConnectivity ConnectivityType,
                                                MED_EN::medEntityMesh Entity) const
 {
-  return getPolygonsConnectivityIndex (ConnectivityType,Entity)[ getNumberOfPolygons() ] - 1;
+  return getPolygonsConnectivityIndex (ConnectivityType,Entity)[ getNumberOfPolygons(Entity) ] - 1;
 }
 /*!
   Return the required connectivity of polygons for the given entity.
