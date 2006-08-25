@@ -1044,9 +1044,9 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits     = new string[numberOfComponents] ;
   for (int i=0; i<numberOfComponents; i++) {
       MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes[i] = 1 ;
-      MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i] = string(componentName,i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
+      MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i] = string(componentName+i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
       SCRUTE(MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i]);
-      MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits[i] = string(unitName,i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
+      MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits[i] = string(unitName+i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
       SCRUTE(MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits[i]);
   }
   delete[] componentName;
