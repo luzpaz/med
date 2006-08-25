@@ -1221,7 +1221,7 @@ public :
                                             medEntityMesh   Entity)
       {
         const int * array = self->getPolygonsConnectivityIndex(ConnectivityType,Entity);
-        int size = self->getNumberOfPolygons() + 1;
+        int size = self->getNumberOfPolygons(Entity) + 1;
         TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
 			     MESH::getPolygonsConnectivity);
       }
