@@ -787,28 +787,37 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
 */
 void MED::updateSupport ()
 {
- 
   const char * LOC = "MED::updateSupport () : ";
   BEGIN_OF(LOC);
 
   map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::iterator itSupportOnMesh ;
   for ( itSupportOnMesh=_support.begin();itSupportOnMesh != _support.end(); itSupportOnMesh++ ) {
+    map<MED_EN::medEntityMesh,SUPPORT *>& anEntity2Support = (*itSupportOnMesh).second;
+    map<MED_EN::medEntityMesh,SUPPORT *> anEntity2SupportTmp;
     map<MED_EN::medEntityMesh,SUPPORT *>::iterator itSupport ;
-    for ( itSupport=(*itSupportOnMesh).second.begin();itSupport!=(*itSupportOnMesh).second.end();itSupport++)
+    for ( itSupport=anEntity2Support.begin();itSupport!=anEntity2Support.end();itSupport++)
+    {
+      MED_EN::medEntityMesh aKey = (*itSupport).first;
+      SUPPORT* aData = (*itSupport).second;
       try {
-	(*itSupport).second->update() ;
+        aData->update() ;
+        anEntity2SupportTmp[aKey] = aData;
       }
-#ifdef _DEBUG_
       catch (MEDEXCEPTION & ex) {
-#else 
-      catch (MEDEXCEPTION & ) {
-#endif
-	// entity not defined in mesh -> we remove support on it !
-	MESSAGE(LOC<<ex.what());
-	delete (*itSupport).second ;
-	(*itSupportOnMesh).second.erase(itSupport) ; // that's rigth ????
-	itSupport-- ;
+        MESSAGE(LOC<<ex.what());
       }
+    }
+
+    // some entities has not defined in mesh -> we should remove their supports!
+    anEntity2Support.swap( anEntity2SupportTmp );
+
+    for ( itSupport=anEntity2SupportTmp.begin();itSupport!=anEntity2SupportTmp.end();itSupport++)
+    {
+      MED_EN::medEntityMesh aKey = (*itSupport).first;
+      SUPPORT* aData = (*itSupport).second;
+      if( anEntity2Support.find( aKey ) == anEntity2Support.end() )
+        delete aData;
+    }
   }
 
   END_OF(LOC);
