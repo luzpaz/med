@@ -354,13 +354,17 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	    
 	    /* Le profil COMPACT est contigüe, mais il est possible que l'on selectionne uniquemenent une dimension*/
 
+	    index = 0;
 	    for (dim=firstdim; dim < lastdim; dim++) {
 	      
 	      for (i=0; i < psize; i++)              /* i balaye le nbre d'élements du profil                */
 		for (j=0; j < ngauss; j++) {
-		  index = i*ngauss+j + (dim-firstdim)*(psize*ngauss);
-	          pflmem[index] = dim*(psize*ngauss) + (pfltab[i]-1)*ngauss+j;
-		  pfldsk[index] = dim*count[0]  + (pfltab[i]-1)*ngauss+j;	    
+// 		  index = i*ngauss+j + (dim-firstdim)*(psize*ngauss);
+// 	          pflmem[index] = dim*(psize*ngauss) + (pfltab[i]-1)*ngauss+j;
+// 		  pfldsk[index] = dim*count[0]  + (pfltab[i]-1)*ngauss+j;	    
+		  pflmem[index] = ( (dim*psize) + i )*ngauss + j;
+		  pfldsk[index] = dim*count[0]  + (pfltab[i]-1)*ngauss+j;
+		  index++;	    
 		}
 	    }
 	    
