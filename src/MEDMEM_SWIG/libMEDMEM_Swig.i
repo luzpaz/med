@@ -768,7 +768,7 @@ public:
 
   bool getGaussPresence();
 
-  GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement);
+  GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr(medGeometryElement geomElement);
 
   %extend {
     PyObject *  applyPyFunc( PyObject * func )
@@ -874,8 +874,7 @@ public:
 
     PyObject * getValue()
       {
-	int size = (self->getNumberOfComponents())*
-	  ((self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS));
+	int size = self->getValueLength();
 
 	const T1 * value = self->getValue();
 
@@ -887,7 +886,7 @@ public:
     /* %newobject getRow(int );*/
     PyObject * getRow(int index)
       {
-	int size = self->getNumberOfComponents();
+	int size = self->getNumberOfComponents() * self->getNbGaussI( index );
 
 	const T1 * value = self->getRow(index);
 
@@ -1333,7 +1332,7 @@ public :
 				     const int * FacesIndex,
 				     const int * Nodes,
 				     int nbOfPolyhedra,
-				     const MED_EN::medEntityMesh Entity);
+				     const medEntityMesh Entity);
 
   %extend {
     void setCoordinates(const int SpaceDimension, const int NumberOfNodes,
