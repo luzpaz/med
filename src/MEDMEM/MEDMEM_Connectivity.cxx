@@ -504,6 +504,8 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
       const int * oldConstituentValueLoop=oldConstituentValueTab[loop];
       const int * oldConstituentIndexLoop= oldConstituentIndexTab[loop];
       int * renumberingFromOldToNewLoop=renumberingFromOldToNewTab[loop];
+      CELLMODEL * aCELLMODEL = 0;
+      if ( loop == 0 ) aCELLMODEL = & oldConstituent->_type[0];
       for(int iOldFace=0;iOldFace<oldNumberOfFaceLoop;iOldFace++)
 	{
 	  const int *nodesOfCurrentFaceOld=oldConstituentValueLoop+oldConstituentIndexLoop[iOldFace]-1;
@@ -539,8 +541,21 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
 	  int nbOfNodesOfCurrentFaceNew;
 	  const int *nodesOfCurrentFaceNew=_constituent->getConnectivityOfAnElementWithPoly(MED_NODAL,_constituent->getEntity(),
 											    renumberingFromOldToNewLoop[iOldFace],nbOfNodesOfCurrentFaceNew);
-	  MEDMODULUSARRAY modulusArrayOld(nbOfNodesOfCurrentFaceOld,nodesOfCurrentFaceOld);
-	  MEDMODULUSARRAY modulusArrayNew(nbOfNodesOfCurrentFaceNew,nodesOfCurrentFaceNew);
+          // compare nodes of a new face and those of an old one;
+          // for the second order elements, only vertex nodes are compared
+          int nbOfVertices = nbOfNodesOfCurrentFaceOld;
+          if ( aCELLMODEL ) {
+            if ( aCELLMODEL->getNumberOfNodes() != nbOfNodesOfCurrentFaceOld ) {
+              // type changed, find a corresponding CELLMODEL
+              int iType = 2; // 1-st type is already used at loop beginning
+              while ( iOldFace + 1 >= oldConstituent->_count[ 1 + iType ]) // check next type
+                ++iType;
+              aCELLMODEL = & oldConstituent->_type[ iType - 1 ];
+            }
+            nbOfVertices = aCELLMODEL->getNumberOfVertexes();
+          }
+	  MEDMODULUSARRAY modulusArrayOld(nbOfVertices,nbOfNodesOfCurrentFaceOld,nodesOfCurrentFaceOld);
+	  MEDMODULUSARRAY modulusArrayNew(nbOfVertices,nbOfNodesOfCurrentFaceNew,nodesOfCurrentFaceNew);
 	  int retCompareNewOld=modulusArrayNew.compare(modulusArrayOld);
 	  if(retCompareNewOld==0)
 	    throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"Uncompatible given user face with calculated existing faces"));
