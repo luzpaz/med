@@ -473,8 +473,8 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 		  ptrMesh = _meshes[meshName];
 		
 		ptrSupport     =  support[meshName][(MED_EN::medEntityMesh) (*currentEntity).first];
-		if (NbOfGaussPts != 1)
-		  throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<"Number of Gauss Point must be equal to 1 for instance")) ;
+// 		if (NbOfGaussPts != 1)
+// 		  throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<"Number of Gauss Point must be equal to 1 for instance")) ;
 		
 		// init to null to prevent some error if not correctly allocated !
 		ptrField = (FIELD_*)NULL ;
