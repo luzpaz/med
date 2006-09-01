@@ -45,6 +45,8 @@ LIB_SERVER_IDL = MED_Gen.idl SALOME_Component.idl SALOME_ContainerManager.idl \
 
 LIB_CLIENT_IDL = SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_ModuleCatalog.idl SALOME_Comm.idl SALOME_GenericObj.idl
 
+EXPORT_HEADERS = Med_Gen_i.hxx
+
 # Executables targets
 BIN =
 BIN_SRC =
