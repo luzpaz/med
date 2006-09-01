@@ -30,6 +30,7 @@
 #include "MEDMEM_Med_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_Support_i.hxx"
+#include "Med_Gen_i.hxx"
 
   using namespace MEDMEM;
   using namespace MED_EN;
@@ -598,7 +599,20 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       delete [] name;
 
-     return fieldcorba2;
+      // try to set support to field
+      ::MEDMEM::SUPPORT * sup = 0;
+      if ( SUPPORT_i * sup_i = Med_Gen_i::DownCast< SUPPORT_i * >( mySupportIOR ))
+      {
+        std::map < int,::MEDMEM::SUPPORT *>::iterator index_supp = 
+          SUPPORT_i::supportMap.find( sup_i->getCorbaIndex() );
+        if ( index_supp != SUPPORT_i::supportMap.end() )
+          sup = index_supp->second;
+      }
+      SCRUTE( sup );
+      if ( sup )
+        field->setSupport( sup );
+
+      return fieldcorba2;
     }
 
   SALOME_MED::FIELDINT_ptr createCorbaFieldInt(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDINT * field, bool ownCppPtr=false)
@@ -628,6 +642,19 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
       SCRUTE(name);
 
       delete [] name;
+
+      // try to set support to field
+      ::MEDMEM::SUPPORT * sup = 0;
+      if ( SUPPORT_i * sup_i = Med_Gen_i::DownCast< SUPPORT_i * >( mySupportIOR ))
+      {
+        std::map < int,::MEDMEM::SUPPORT *>::iterator index_supp = 
+          SUPPORT_i::supportMap.find( sup_i->getCorbaIndex() );
+        if ( index_supp != SUPPORT_i::supportMap.end() )
+          sup = index_supp->second;
+      }
+      SCRUTE( sup );
+      if ( sup )
+        field->setSupport( sup );
 
       return fieldcorba2;
     }
