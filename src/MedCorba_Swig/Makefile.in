@@ -73,7 +73,7 @@ CXXFLAGS+=-ftemplate-depth-42 ${KERNEL_CXXFLAGS}
 LIBS= $(PYTHON_LIBS) 
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDMEMImpl -lmedmem -lMEDMEM_Swigcmodule ${KERNEL_LDFLAGS} -lSalomeLoggerServer ${KERNEL_LDFLAGS}
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDMEMImpl -lmedmem -lMEDMEM_Swigcmodule ${KERNEL_LDFLAGS} -lSALOMELocalTrace
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lMEDMEMImpl -lmedmem -lMEDMEM_Swigcmodule ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lMEDEngine
 
 #############################################################################
 
