@@ -64,6 +64,7 @@ using namespace MEDMEM;
  map <string, string> Med_Gen_i::_MedCorbaObj;
  string Med_Gen_i::_myFileName="";
  string Med_Gen_i::_saveFileName="";
+ Med_Gen_i* Med_Gen_i::_MEDGen = NULL;
 
 //=============================================================================
 /*!
@@ -100,7 +101,31 @@ Med_Gen_i:: Med_Gen_i(CORBA::ORB_ptr orb,
   _NS->init_orb( _orb ) ;
 
   //_myMedI = 0;
+  _MEDGen = this;
 }
+
+//=============================================================================
+/*!
+ *  GetServant [ static ]
+ *
+ *  Get servant of the CORBA object
+ */
+//=============================================================================
+
+PortableServer::ServantBase_var Med_Gen_i::GetServant( CORBA::Object_ptr theObject )
+{
+  if( CORBA::is_nil( theObject ) || !_MEDGen || CORBA::is_nil( _MEDGen->_poa ) )
+    return NULL;
+  try {
+    PortableServer::Servant aServant = _MEDGen->_poa->reference_to_servant( theObject );
+    return aServant;
+  } 
+  catch (...) {
+    INFOS( "GetServant - Unknown exception was caught!!!" ); 
+    return NULL;
+  }
+}
+
 //=============================================================================
 /*!
  *  private method : change a study name in SALOMEDS::Study_var

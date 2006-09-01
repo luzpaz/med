@@ -131,10 +131,23 @@ public:
 				  CORBA::Long theObjectID,
 				  SALOMEDS::SObject_ptr theObject);
   
-  private :
+  // Get last created instance of the class
+  static Med_Gen_i* GetMEDGen() { return _MEDGen; }
+
+  // Get object of the CORBA reference
+  static PortableServer::ServantBase_var GetServant( CORBA::Object_ptr theObject );
+
+  template<class T>
+  static T DownCast(CORBA::Object_ptr theArg)
+  {
+    return dynamic_cast<T>(GetServant(theArg).in());
+  }
+
+private :
   static std::map <std::string, std::string>_MedCorbaObj;
   static std::string _myFileName;
   static std::string _saveFileName;
+  static Med_Gen_i*  _MEDGen;    // Point to last created instance of the class
 
   private:
   bool   _duringLoad;
