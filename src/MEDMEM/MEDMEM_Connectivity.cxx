@@ -548,14 +548,17 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
             if ( aCELLMODEL->getNumberOfNodes() != nbOfNodesOfCurrentFaceOld ) {
               // type changed, find a corresponding CELLMODEL
               int iType = 2; // 1-st type is already used at loop beginning
-              while ( iOldFace + 1 >= oldConstituent->_count[ 1 + iType ]) // check next type
+              //while ( iOldFace + 1 >= oldConstituent->_count[ 1 + iType ]) // check next type
+              while ( iOldFace + 1 >= oldConstituent->_count[ iType ]) // check next type
                 ++iType;
               aCELLMODEL = & oldConstituent->_type[ iType - 1 ];
             }
             nbOfVertices = aCELLMODEL->getNumberOfVertexes();
           }
 	  MEDMODULUSARRAY modulusArrayOld(nbOfVertices,nbOfNodesOfCurrentFaceOld,nodesOfCurrentFaceOld);
-	  MEDMODULUSARRAY modulusArrayNew(nbOfVertices,nbOfNodesOfCurrentFaceNew,nodesOfCurrentFaceNew);
+          int nbOfVerticesNew = nbOfVertices;
+          if (nbOfVerticesNew > nbOfNodesOfCurrentFaceNew) nbOfVerticesNew = nbOfNodesOfCurrentFaceNew;
+	  MEDMODULUSARRAY modulusArrayNew(nbOfVerticesNew,nbOfNodesOfCurrentFaceNew,nodesOfCurrentFaceNew);
 	  int retCompareNewOld=modulusArrayNew.compare(modulusArrayOld);
 	  if(retCompareNewOld==0)
 	    throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"Uncompatible given user face with calculated existing faces"));
