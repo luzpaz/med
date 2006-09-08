@@ -1091,8 +1091,9 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
   typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array ArrayNo;
   typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array ArrayFull;
 
-  if (MED_FIELD_DRIVER<T>::_status==MED_OPENED &&
-      MED_FIELD_DRIVER<T>::_ptrField->_isRead )
+  //if (MED_FIELD_DRIVER<T>::_status==MED_OPENED &&
+  //    MED_FIELD_DRIVER<T>::_ptrField->_isRead )
+  if (MED_FIELD_DRIVER<T>::_status==MED_OPENED)
     {
       int err ;
 

@@ -1374,9 +1374,9 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
   else
     fieldName = MED_FIELD_DRIVER<T>::_fieldName;
 
-  if ( ! MED_FIELD_DRIVER<T>::_ptrField->_isRead )
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
-				 <<" FIELD |"<<fieldName<<"| was not read but is being written"));
+  //if ( ! MED_FIELD_DRIVER<T>::_ptrField->_isRead )
+  //  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
+  //			 <<" FIELD |"<<fieldName<<"| was not read but is being written"));
 
   SCRUTE(fieldName);
   if ( fieldName.size() > MED_TAILLE_NOM ) {
