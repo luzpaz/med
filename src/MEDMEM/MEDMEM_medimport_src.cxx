@@ -2083,7 +2083,11 @@ char * MEDMEM::med2_1_To_med2_2(char * fileNameIn) throw (MEDEXCEPTION)
   /* Creation et ouverture du fichier que l'on va convertire au format MED V2.2 */
 /*   commande = (char *) malloc(sizeof(char)*(strlen("cp ")+2*strlen(argv[1])+strlen(" ")+strlen("2.2")+1)); */
 
+#ifndef WNT
   commande = (char *) malloc(sizeof(char)*(strlen("cp -f ") +
+#else
+  commande = (char *) malloc(sizeof(char)*(strlen("copy /Y ") +
+#endif
 					   strlen(fileNameIn) + strlen(" ") +
 					   strlen(InternalFileNameOut) + 
 					   strlen(" ; chmod ug+rw ") +
@@ -2109,7 +2113,11 @@ char * MEDMEM::med2_1_To_med2_2(char * fileNameIn) throw (MEDEXCEPTION)
 
 //   strcat(fileNameOut,"2.2");
 
+#ifndef WNT
   strcpy(commande,"cp -f ");
+#else
+  strcpy(commande,"copy /Y ");
+#endif
 /*   strcat(commande,argv[1]); */
 
   strcat(commande,fileNameIn);
