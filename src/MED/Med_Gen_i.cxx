@@ -409,7 +409,18 @@ throw (SALOME::SALOME_Exception)
 // Creation du champ
 
 	FIELD_ * myField;
-        MED * mymed = new MED(MED_DRIVER,fileName) ;
+	MED * mymed;
+	try
+	{
+	  mymed = new MED(MED_DRIVER,fileName) ;
+	} 
+	catch (const std::exception & ex)
+	{
+	  MESSAGE("Exception Interceptee : ");
+	  SCRUTE(ex.what());
+	  THROW_SALOME_CORBA_EXCEPTION("Unable to find this file ",SALOME::BAD_PARAM);
+	}
+	
 	try
 	{
 		deque<string> fieldsNames = mymed->getFieldNames() ;
