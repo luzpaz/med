@@ -92,8 +92,8 @@ COORDINATE::COORDINATE(const COORDINATE & m):
   setCoordinatesNames((const string*)m._coordinateName) ;
   setCoordinatesUnits((const string*)m._coordinateUnit) ;
 
-  if ( (const int * const) m._nodeNumber != NULL)
-    _nodeNumber.set(numberOfNodes,(const int*)m._nodeNumber);
+  if ( (const MED_EN::med_int * /* int * */ const) m._nodeNumber != NULL)
+    _nodeNumber.set(numberOfNodes,(const MED_EN::med_int* /* int* */)m._nodeNumber);
   // PG : it's default no ?
 //    else
 //      {
@@ -208,7 +208,7 @@ void COORDINATE::setCoordinatesSystem(const string CoordinateSystem)
 
 /*! sets the attribute _nodeNumber with NodeNumber */
 //------------------------------------------------//
-void COORDINATE::setNodesNumbers(const int * NodeNumber) 
+void COORDINATE::setNodesNumbers(const MED_EN::med_int * /* int * */ NodeNumber) 
 //------------------------------------------------//
 { 	
   int NumberOfNodes = getNumberOfNodes() ;
@@ -229,10 +229,10 @@ int COORDINATE::getNumberOfNodes() const
 /*! returns a pointer to the optional array storing 
     eventual nodes numbers */
 //-------------------------------------------------//
-const int * COORDINATE::getNodesNumbers() const
+const MED_EN::med_int * /* int * */ COORDINATE::getNodesNumbers() const
 //-------------------------------------------------//
 {
-	return  (const int *)_nodeNumber;
+  return  (const MED_EN::med_int * /* int * */)_nodeNumber;
 }
 
 /*! returns a Pointer to Coordinates Array in specified mode representation */

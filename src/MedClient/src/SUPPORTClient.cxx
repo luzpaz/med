@@ -109,13 +109,13 @@ void SUPPORTClient::fillCopy()
 
   if (!_complete_support) {
     if(!_isOnAllElts) {
-    const int * index, * value;
+    const MED_EN::med_int * /* int * */ index, * value;
     long n_index, n_value;
     
     SALOME::SenderInt_var senderForValue=IOR_Support->getSenderForNumber(MED_ALL_ELEMENTS);
-    value=(const int *)ReceiverFactory::getValue(senderForValue,n_value);
+    value=(const MED_EN::med_int * /* int * */)ReceiverFactory::getValue(senderForValue,n_value);
     SALOME::SenderInt_var senderForIndex=IOR_Support->getSenderForNumberIndex();
-    index=(const int *)ReceiverFactory::getValue(senderForIndex,n_index);
+    index=(const MED_EN::med_int * /* int * */)ReceiverFactory::getValue(senderForIndex,n_index);
     
     SCRUTE(n_index);
     SCRUTE(n_value);
@@ -161,13 +161,13 @@ MEDSKYLINEARRAY *  SUPPORTClient::getnumber() const throw (MEDEXCEPTION)
  * 
  */
 //=============================================================================
-const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType) 
+const MED_EN::med_int * /* int * */  SUPPORTClient::getNumber(medGeometryElement GeometricType) 
     const throw (MEDEXCEPTION)
 {
   BEGIN_OF("SUPPORTClient::getnumber(medGeometryElement)");
 
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
-  const int *n = SUPPORT::getNumber(GeometricType);
+  const MED_EN::med_int * /* int * */n = SUPPORT::getNumber(GeometricType);
 
   END_OF("SUPPORTClient::getnumber(medGeometryElement)");
   return n;
@@ -178,12 +178,12 @@ const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType)
  * 
  */
 //=============================================================================
-const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION) 
+const MED_EN::med_int * /* int * */  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION) 
 {
   BEGIN_OF("SUPPORTClient::getnumberIndex()");
 
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
-  const int * n = SUPPORT::getNumberIndex();
+  const MED_EN::med_int * /* int * */ n = SUPPORT::getNumberIndex();
 
   END_OF("SUPPORTClient::getnumberIndex()");
   return n;

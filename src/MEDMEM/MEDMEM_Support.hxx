@@ -176,7 +176,9 @@ public:
   inline void setNumberOfElements(const int *NumberOfElements);
   inline void setTotalNumberOfElements(int TotalNumberOfElements);
   inline void setNumber(MEDSKYLINEARRAY * Number);
-  inline void setNumber(const int * index, const int* value, bool shallowCopy=false);
+  inline void setNumber(const MED_EN::med_int* /* const int * */ index, 
+			const MED_EN::med_int* /* const int* */ value, 
+			bool shallowCopy=false);
 
   inline string getName() const;
   inline string getDescription() const;
@@ -190,8 +192,8 @@ public:
   inline int    getNumberOfElements(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
   inline  const int * getNumberOfElements() const throw (MEDEXCEPTION);
   virtual inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
-  virtual inline const int *  getNumber(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
-  virtual inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
+  virtual inline const MED_EN::med_int* /* const int * */  getNumber(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+  virtual inline const MED_EN::med_int* /* const int * */  getNumberIndex() const throw (MEDEXCEPTION);
   virtual int getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION);
 
   void blending(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
@@ -200,7 +202,8 @@ public:
   // pour respecter la norme MED
   void setpartial(string Description, int NumberOfGeometricType,
 		  int TotalNumberOfEntity, MED_EN::medGeometryElement *GeometricType,
-		  int *NumberOfEntity, int *NumberValue);
+		  int *NumberOfEntity, 
+		  MED_EN::med_int* /* int * */NumberValue);
 
   void setpartial(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
 
@@ -224,8 +227,8 @@ public:
   virtual void addReference() const;
   virtual void removeReference() const;
 protected:
-  static list<int> *sub(int start,int end,const int *idsToSuppress,int lgthIdsToSuppress);
-  static list<int> *sub(const int *ids,int lgthIds,const int *idsToSuppress,int lgthIdsToSuppress);
+  static list<int> *sub(int start,int end,const MED_EN::med_int* /* const int * */idsToSuppress,int lgthIdsToSuppress);
+  static list<int> *sub(const MED_EN::med_int* /* const int * */ids,int lgthIds,const MED_EN::med_int* /* const int * */idsToSuppress,int lgthIdsToSuppress);
 };
 
 // _____________________
@@ -285,7 +288,7 @@ inline MEDSKYLINEARRAY * SUPPORT::getnumber() const
   medGeometryElement type.
 */
 //---------------------------------------------------------------------
-inline const int * SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) const
+inline const MED_EN::med_int* /* const int * */ SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) const
   throw (MEDEXCEPTION)
 //---------------------------------------------------------------------
 {
@@ -307,7 +310,7 @@ inline const int * SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) 
   Note : See getConnectivityIndex for details.
 */
 //-------------------------------------------
-inline const int * SUPPORT::getNumberIndex() const
+inline const MED_EN::med_int* /* const int * */ SUPPORT::getNumberIndex() const
 //-------------------------------------------
   throw (MEDEXCEPTION)
 {
@@ -428,7 +431,7 @@ inline void SUPPORT::setNumber(MEDSKYLINEARRAY * Number)
 
 /*! set the attribute _number with index and value arrays */
 //---------------------------------------------------
-inline void SUPPORT::setNumber(const int * index, const int* value, bool shallowCopy)
+inline void SUPPORT::setNumber(const MED_EN::med_int* /* const int * */ index, const MED_EN::med_int* /* const int* */  value, bool shallowCopy)
 //---------------------------------------------------
 {
   if (_number != NULL) delete _number ;

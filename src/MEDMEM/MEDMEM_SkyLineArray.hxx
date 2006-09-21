@@ -31,9 +31,9 @@ class MEDSKYLINEARRAY
 private :
   int   _count ;
   int   _length ;
-  PointerOf <int> _index ; // array of size _count+1 : _index[0]=1 and
+  PointerOf <MED_EN::med_int/*int*/> _index ; // array of size _count+1 : _index[0]=1 and
                            // _index[_count]=length+1
-  PointerOf <int> _value ; // array of size _length
+  PointerOf <MED_EN::med_int/*int*/> _value ; // array of size _length
 
 public :
   // Attention, avec ce constructeur, il n'est possible de remplir le MEDSKYLINEARRAY 
@@ -56,24 +56,26 @@ public :
   // Sinon le MEDSKYLINEARRAY prend directement les pointeurs et en devient 
   // propriétaire
   MEDSKYLINEARRAY( const int count, const int length,
-		   const int* index, const int* value, bool shallowCopy=false );
+		   const MED_EN::med_int* /* const int* */ index, 
+		   const MED_EN::med_int* /* const int* */ value, 
+		   bool shallowCopy=false );
 
   ~MEDSKYLINEARRAY();
   //void setMEDSKYLINEARRAY( const int count, const int length, int* index , int* value ) ;
 
   inline int  getNumberOf()       const;
   inline int  getLength()         const;
-  inline const int*  getIndex()   const;
-  inline const int*  getValue()   const;
-  inline int  getNumberOfI(int i) const throw (MEDEXCEPTION) ;
-  inline const int*  getI(int i)  const throw (MEDEXCEPTION) ;
-  inline int  getIJ(int i, int j) const throw (MEDEXCEPTION) ;
-  inline int  getIndexValue(int i) const throw (MEDEXCEPTION) ;
+  inline const MED_EN::med_int* /* const int* */  getIndex()   const;
+  inline const MED_EN::med_int* /* const int* */  getValue()   const;
+  inline MED_EN::med_int /*int*/  getNumberOfI(int i) const throw (MEDEXCEPTION) ;
+  inline const MED_EN::med_int* /* const int* */  getI(int i)  const throw (MEDEXCEPTION) ;
+  inline MED_EN::med_int /*int*/  getIJ(int i, int j) const throw (MEDEXCEPTION) ;
+  inline MED_EN::med_int /*int*/  getIndexValue(int i) const throw (MEDEXCEPTION) ;
 
-  inline void setIndex(const int* index) ;
-  inline void setI(const int i, const int* values) throw (MEDEXCEPTION) ;
-  inline void setIJ(int i, int j, int value) throw (MEDEXCEPTION) ;
-  inline void setIndexValue(int i, int value) throw (MEDEXCEPTION) ;
+  inline void setIndex(const MED_EN::med_int* /* const int* */ index) ;
+  inline void setI(const int i, const MED_EN::med_int* /* const int* */ values) throw (MEDEXCEPTION) ;
+  inline void setIJ(int i, int j, MED_EN::med_int /*int*/ value) throw (MEDEXCEPTION) ;
+  inline void setIndexValue(int i, MED_EN::med_int /*int*/ value) throw (MEDEXCEPTION) ;
 
   friend ostream& operator<<(ostream &os, const MEDSKYLINEARRAY &sky);
 };
@@ -89,15 +91,15 @@ inline int MEDSKYLINEARRAY::getLength() const
 {
   return _length ;
 };
-inline const int*  MEDSKYLINEARRAY::getIndex() const
+inline const MED_EN::med_int* /* const int* */  MEDSKYLINEARRAY::getIndex() const
 {
-  return (const int*)_index ;
+  return (const MED_EN::med_int* /* const int* */)_index ;
 } ;
-inline const int*  MEDSKYLINEARRAY::getValue() const
+inline const MED_EN::med_int* /* const int* */  MEDSKYLINEARRAY::getValue() const
 {
-  return (const int*)_value ;
+  return (const MED_EN::med_int* /* const int* */)_value ;
 } ;
-inline int MEDSKYLINEARRAY::getNumberOfI(int i) const throw (MEDEXCEPTION)
+inline MED_EN::med_int /*int*/ MEDSKYLINEARRAY::getNumberOfI(int i) const throw (MEDEXCEPTION)
 {
   if (i<1)
     throw MEDEXCEPTION("MEDSKYLINEARRAY::getNumberOfI : argument must be >= 1");
@@ -105,7 +107,7 @@ inline int MEDSKYLINEARRAY::getNumberOfI(int i) const throw (MEDEXCEPTION)
     throw MEDEXCEPTION("MEDSKYLINEARRAY::getNumberOfI : argument is out of range");
   return _index[i]-_index[i-1] ;
 } ;
-inline const int* MEDSKYLINEARRAY::getI(int i) const throw (MEDEXCEPTION)
+inline const MED_EN::med_int* /* const int* */ MEDSKYLINEARRAY::getI(int i) const throw (MEDEXCEPTION)
 {
     if (i<1)
       throw MEDEXCEPTION("MEDSKYLINEARRAY::getI : argument must be >= 1");
@@ -113,7 +115,7 @@ inline const int* MEDSKYLINEARRAY::getI(int i) const throw (MEDEXCEPTION)
       throw MEDEXCEPTION("MEDSKYLINEARRAY::getI : argument is out of range");
     return _value+_index[i-1]-1 ;
 }
-inline int MEDSKYLINEARRAY::getIJ(int i, int j) const throw (MEDEXCEPTION)
+inline MED_EN::med_int /*int*/ MEDSKYLINEARRAY::getIJ(int i, int j) const throw (MEDEXCEPTION)
 {
     if (i<1)
       throw MEDEXCEPTION("MEDSKYLINEARRAY::getIJ : first argument must be >= 1");
@@ -126,7 +128,7 @@ inline int MEDSKYLINEARRAY::getIJ(int i, int j) const throw (MEDEXCEPTION)
     return _value[_index[i-1]+j-2] ;
 }
 
-inline int  MEDSKYLINEARRAY::getIndexValue(int i) const throw (MEDEXCEPTION)
+inline MED_EN::med_int /*int*/  MEDSKYLINEARRAY::getIndexValue(int i) const throw (MEDEXCEPTION)
 {
   if (i<1)
     throw MEDEXCEPTION("MEDSKYLINEARRAY::getIndexValue : argument must be >= 1");
@@ -135,13 +137,13 @@ inline int  MEDSKYLINEARRAY::getIndexValue(int i) const throw (MEDEXCEPTION)
   return _value[i-1] ;
 }
 
-inline void MEDSKYLINEARRAY::setIndex(const int* index)
+inline void MEDSKYLINEARRAY::setIndex(const MED_EN::med_int* /* const int* */ index)
 {
-  memcpy((int*)_index,index,(_count+1)*sizeof(int));
+  memcpy((MED_EN::med_int* /*int**/)_index,index,(_count+1)*sizeof(MED_EN::med_int/*int*/));
 }
 
 
-inline void MEDSKYLINEARRAY::setIJ(int i, int j, int value) throw (MEDEXCEPTION)
+inline void MEDSKYLINEARRAY::setIJ(int i, int j, MED_EN::med_int /*int*/ value) throw (MEDEXCEPTION)
 {
   if (i<1)
     throw MEDEXCEPTION("MEDSKYLINEARRAY::setIJ : first argument must be >= 1");
@@ -156,7 +158,7 @@ inline void MEDSKYLINEARRAY::setIJ(int i, int j, int value) throw (MEDEXCEPTION)
 
 }
 
-inline void MEDSKYLINEARRAY::setI(const int i, const int * values) throw (MEDEXCEPTION)
+inline void MEDSKYLINEARRAY::setI(const int i, const MED_EN::med_int* /* const int * */ values) throw (MEDEXCEPTION)
 {
   if (i<1)
     throw MEDEXCEPTION("MEDSKYLINEARRAY::setI : index must be >= 1");
@@ -164,10 +166,10 @@ inline void MEDSKYLINEARRAY::setI(const int i, const int * values) throw (MEDEXC
   if (i>_count)
     throw MEDEXCEPTION("MEDSKYLINEARRAY::setI : index is out of range") ;
 
-  memcpy(_value+_index[i-1]-1,values,(_index[i]-_index[i-1])*sizeof(int)) ;
+  memcpy(_value+_index[i-1]-1,values,(_index[i]-_index[i-1])*sizeof(MED_EN::med_int/*int*/)) ;
 }
 
-inline void MEDSKYLINEARRAY::setIndexValue(int i, int value) throw (MEDEXCEPTION)
+inline void MEDSKYLINEARRAY::setIndexValue(int i, MED_EN::med_int /*int*/ value) throw (MEDEXCEPTION)
 {
   if (i<1)
     throw MEDEXCEPTION("MEDSKYLINEARRAY::setIndexValue : argument must be >= 1");

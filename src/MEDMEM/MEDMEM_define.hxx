@@ -113,7 +113,7 @@ typedef enum {MED_HDF_VERSION, MED_VERSION, MED_FICH_DES} med_fich_info;
 //   //#define MED_ALL    0 !!!!! NB: WARNING MED_ALL deja utilise dans l'enum medGeometryElement !!!!!!!!
 // #define MED_ALL    0
 
-#if defined(SUN4SOL2) || defined(PCLINUX) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000)
+#if defined(SUN4SOL2) || defined(PCLINUX) || defined(PCLINUX64_32) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000)
 /* interface C/FORTRAN */
 /* this true only with g77 and gcc : we must change it to use directly NOMF_... and INT32 or INT64 - it will be more simple to understand and to use ! */
 // #define NOMF_POST_UNDERSCORE
@@ -141,7 +141,7 @@ typedef int            med_int;
 typedef double         med_float;
 #endif
 
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64) 
 // #define NOMF_POST_UNDERSCORE
 
 /* correspondance des types avec HDF 5 */

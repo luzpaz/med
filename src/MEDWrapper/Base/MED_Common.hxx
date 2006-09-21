@@ -52,10 +52,10 @@ namespace MED{
   
   typedef enum {eFAUX, eVRAI} EBooleen ; 
   typedef double TFloat;
-#if defined(SUN4SOL2) || defined(PCLINUX) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000) || defined(HP9000)
+#if defined(SUN4SOL2) || defined(PCLINUX) || defined(PCLINUX64_32) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000) || defined(HP9000)
   typedef int TInt;
 #endif
-#if defined(IRIX64) || defined(OSF1)
+#if defined(IRIX64) || defined(OSF1) || defined(PCLINUX64)
   typedef long TInt;
 #endif
   typedef hid_t TIdt;

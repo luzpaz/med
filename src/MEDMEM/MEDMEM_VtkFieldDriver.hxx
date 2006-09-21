@@ -361,7 +361,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   //  int connectivity_sum = 0 ;
 
   //const int * connectivity = meshField->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS) ; !! UNUSED VARIABLE !!
-  const int * connectivityIndex = meshField->getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL) ;
+  const MED_EN::med_int* /* const int * */ connectivityIndex = meshField->getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL) ;
 
   int connectivity_sum =  connectivityIndex[cells_sum]-1 ;
 
@@ -465,7 +465,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getName() ) ) ;
     int nodes_cell = cells_type[i].getNumberOfNodes();
     int numberOfCell = meshField->getNumberOfElements(MED_EN::MED_CELL,cells_type[i].getType()) ;
-    const int * connectivityArray = meshField->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,MED_EN::MED_CELL,cells_type[i].getType());
+    const MED_EN::med_int* /* const int * */ connectivityArray = meshField->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,MED_EN::MED_CELL,cells_type[i].getType());
     for (int j=0;j<numberOfCell;j++) {
       (*_vtkFile) << nodes_cell << " " ;
       for (int k=0;k<nodes_cell;k++)

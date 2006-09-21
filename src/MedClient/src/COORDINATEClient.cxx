@@ -170,7 +170,7 @@ const double *  COORDINATEClient::getCoordinateAxis(int Axis)
  * Retourne le nombre de noeuds
  */
 //=============================================================================
-const int*      COORDINATEClient::getNodesNumbers() const
+const MED_EN::med_int* /* int* */      COORDINATEClient::getNodesNumbers() const
 {
   BEGIN_OF("void COORDINATEClient::getNodesNumbers()");
 

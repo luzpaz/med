@@ -51,9 +51,9 @@ public :
 
   MEDSKYLINEARRAY *  getnumber()
     const throw (MEDEXCEPTION);
-  const int *  getNumber(MED_EN::medGeometryElement GeometricType) 
+  const MED_EN::med_int * /* int * */  getNumber(MED_EN::medGeometryElement GeometricType) 
     const throw (MEDEXCEPTION);
-  const int *  getNumberIndex()
+  const MED_EN::med_int * /* int * */  getNumberIndex()
     const throw (MEDEXCEPTION);
   int getValIndFromGlobalNumber(const int number) 
     const throw (MEDEXCEPTION);

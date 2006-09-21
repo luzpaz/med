@@ -1881,7 +1881,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::extract(const SUPPORT *sub
   T* valuesToSet=(T*)ret->getValue();
 
   int nbOfEltsSub=subSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-  const int *eltsSub=subSupport->getNumber(MED_EN::MED_ALL_ELEMENTS);
+  const MED_EN::med_int * /* int * */eltsSub=subSupport->getNumber(MED_EN::MED_ALL_ELEMENTS);
   T* tempVals=new T[_numberOfComponents];
   for(int i=0;i<nbOfEltsSub;i++)
     {
@@ -2364,7 +2364,7 @@ bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
   else
     {
       int nbOfEltsThis=_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-      const int *eltsThis=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+      const MED_EN::med_int * /* int * */eltsThis=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
       int iThis;
       bool found=false;
       for(iThis=0;iThis<nbOfEltsThis && !found;)
@@ -2929,7 +2929,7 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTI
       else
 	{
 	  coord = mesh->getCoordinates(MED_EN::MED_FULL_INTERLACE);
-	  const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+	  const MED_EN::med_int * /* int * */ nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
 	  for(i=0; i<spaceDim; i++)
 	    xyz[i]=new double[_numberOfValues];
 	  deallocateXyz=true;

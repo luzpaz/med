@@ -69,7 +69,7 @@ protected:
   PointerOf<string>          _coordinateUnit;
 
 				     /*! PointerOf to an array of size NumberOfNodes : optional nodes numbers */
-  PointerOf<int>             _nodeNumber;
+  PointerOf<MED_EN::med_int/*int*/>             _nodeNumber;
 
 
 public :
@@ -95,12 +95,12 @@ public :
   void setCoordinatesUnits(const string * CoordinateUnit);
   void setCoordinateUnit(const string CoordinateUnit, const int i);
   void setCoordinatesSystem(const string CoordinateSystem);
-  void setNodesNumbers(const int * NodeNumber);
+  void setNodesNumbers(const MED_EN::med_int * /* int * */ NodeNumber);
 
   int             getSpaceDimension() const;
   int             getNumberOfNodes() const;
 
-  virtual const int*      getNodesNumbers() const;
+  virtual const MED_EN::med_int* /* int* */      getNodesNumbers() const;
   //const int*            getNodesNumbers() ;
   string          getCoordinatesSystem() const;
 

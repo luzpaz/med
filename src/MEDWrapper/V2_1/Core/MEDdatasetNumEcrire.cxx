@@ -96,7 +96,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 	 the file read under SGI is incorrect
 	 2) Compaq OSF/1 is LE, since we force SGI64,SUN4SOL2,HP to write double in LE even if they are BE, mips OSF/1 must be BE
 	 REM  : Be careful of compatibility between MED files when changing this (med2.2)                    */
-#if defined(PCLINUX) || defined(OSF1)
+#if defined(PCLINUX) || defined(PCLINUX64) || defined(PCLINUX64_32) || defined(OSF1)
       type_hdf = H5T_IEEE_F64BE;
 #else     
       type_hdf = H5T_IEEE_F64LE;
@@ -104,7 +104,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
       break;
 
     case MED_INT32 :
-#if defined(PCLINUX)
+#if defined(PCLINUX) || defined(PCLINUX64) || defined(PCLINUX64_32)
       type_hdf = H5T_STD_I32BE;
       if ((H5Tconvert(H5T_NATIVE_INT,H5T_STD_I32BE,(hsize_t)*size,(void *)val,NULL,(hid_t)0)) < 0) 
 	  return -1;
@@ -428,7 +428,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
   if ((ret = H5Dclose(dataset)) < 0)
     return -1;      
 
-#if defined(PCLINUX)
+#if defined(PCLINUX) || defined(PCLINUX64) || defined(PCLINUX64_32)
   if (type == MED_INT32)
       if ((H5Tconvert(H5T_STD_I32BE,H5T_NATIVE_INT,(hsize_t)*size,(void *)val,NULL,(hid_t)0)) < 0) 
 	  return -1;

@@ -270,10 +270,10 @@ public :
   struct typeData
   {
     int         _nbElems;
-    const int * _ptrElemIDs; // elem ids or 
+    const MED_EN::med_int* /* const int * */ _ptrElemIDs; // elem ids or 
     int         _elemID1;    // first elem id if isOnAllElements()
     typeData(): _nbElems(0),  _ptrElemIDs(NULL), _elemID1(0) {}
-    typeData( int nbElems, const int * ptrElemIDs, int elemID1 )
+    typeData( int nbElems, const MED_EN::med_int* /* const int * */ ptrElemIDs, int elemID1 )
       : _nbElems(nbElems),  _ptrElemIDs(ptrElemIDs), _elemID1(elemID1) {}
   };
   struct supportData
@@ -287,14 +287,14 @@ public :
     int getNumberObjects() const
     { return _types.size() < 2 ? _types.size() : _types.size() + !_cleanName.empty(); }
     void addTypeData(MED_EN::medGeometryElement type, int nbElems,
-                     const int * ptrElemIDs,  int elemID1 )
+                     const MED_EN::med_int* /* const int * */ ptrElemIDs,  int elemID1 )
     { _types[type].push_back( typeData( nbElems, ptrElemIDs, elemID1 )); }
   };
 
   void writeElements (MED_EN::medGeometryElement geomType,
                       list< typeData >&  typeDataList,
-                      const int *        nodalConnect,
-                      const int *        nodalConnectIndex);
+                      const MED_EN::med_int* /* const int * */        nodalConnect,
+                      const MED_EN::med_int* /* const int * */        nodalConnectIndex);
 
   map<const SUPPORT*, supportData> _supports;
 

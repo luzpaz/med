@@ -38,13 +38,13 @@ private:
   // total nb nodes; not vertex nodes exists in 2-nd order elements,
   // only presence of not vertex nodes is checked by compare()
   int   _length2;
-  const int * _array ;
+  const MED_EN::med_int* /* const int * */ _array ;
 
   bool compareNotVertexNodes(const MEDMODULUSARRAY &modulusArray) const;
 
 public:
-  MEDMODULUSARRAY(int length, const int * array) ;
-  MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array);
+  MEDMODULUSARRAY(int length, const MED_EN::med_int* /* const int * */ array) ;
+  MEDMODULUSARRAY(int vertexLength, int totalLength, const MED_EN::med_int* /* const int * */ array);
   ~MEDMODULUSARRAY() ;
 
   const int & operator[](const int &i) const ;
@@ -53,8 +53,9 @@ public:
 
 };
 
-MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) : 
-  _length(length), _length2(length), _array(array)
+
+MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const MED_EN::med_int* /* const int * */ array) : 
+  _length(length), _array(array)
 {
 //    SCRUTE(_length);
 //    for (int i=0;i<_length;i++){
@@ -62,7 +63,7 @@ MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) :
 //    }
 };
 
-MEDMODULUSARRAY::MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array):
+  MEDMODULUSARRAY::MEDMODULUSARRAY(int vertexLength, int totalLength, const MED_EN::med_int* /* const int * */ array):
   _length(vertexLength), _length2( totalLength ), _array(array)
 {
 }

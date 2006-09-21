@@ -19,7 +19,7 @@
 //
 #include "MemorySpy.hxx"
 
-#ifdef PCLINUX
+#if defined(PCLINUX)  || defined(PCLINUX64) || defined(PCLINUX64_32)
 #include <unistd.h>
 #include <string.h>
 

@@ -341,7 +341,7 @@ CONNECTIVITY * GRID::makeConnectivity (medEntityMesh           Entity,
 				       int                NbEntities,
 				       int                NbNodes,
 				       int                nbMeshNodes,
-				       const int *                    NodeNumbers)
+				       const MED_EN::med_int* /* const int * */                    NodeNumbers)
   const
 {
   CONNECTIVITY * Connectivity     = new CONNECTIVITY(Entity) ;
@@ -351,7 +351,7 @@ CONNECTIVITY * GRID::makeConnectivity (medEntityMesh           Entity,
   int numberOfGeometricType    = 1;
   Connectivity->_numberOfTypes = numberOfGeometricType;
 
-  Connectivity->_count    = new int [numberOfGeometricType + 1] ;
+  Connectivity->_count    = new MED_EN::med_int/*int*/ [numberOfGeometricType + 1] ;
   Connectivity->_count[0] = 1;
   Connectivity->_count[1] = 1 + NbEntities;
 
@@ -362,7 +362,7 @@ CONNECTIVITY * GRID::makeConnectivity (medEntityMesh           Entity,
   Connectivity->_geometricTypes[0] = Geometry;
 
   //  Connectivity->_nodal = new MEDSKYLINEARRAY() ;
-  int * skyLineArrayIndex = new int [NbEntities + 1];
+  MED_EN::med_int* /* int * */ skyLineArrayIndex = new MED_EN::med_int/*int*/ [NbEntities + 1];
   int i, j, nbEntityNodes = Connectivity->_type[0].getNumberOfNodes();
   for (i=0, j=1; i <= NbEntities; ++i, j += nbEntityNodes)
     skyLineArrayIndex [ i ] = j;
@@ -410,9 +410,10 @@ void GRID::fillConnectivity() const
   int nbCells, nbFaces, nbEdges;
   int nbCNodes, nbFNodes, nbENodes, nbMeshNodes;
   int indexC, indexF, indexE;
-  int * nodeCNumbers, * nodeFNumbers, * nodeENumbers;
+  MED_EN::med_int /* int */ * nodeCNumbers, * nodeFNumbers, * nodeENumbers;
   // about descending connectivity
-  int nbSub, nbRevSub, indexSub, indexRevSub, * subNumbers, * subRevNumbers;
+  int nbSub, nbRevSub, indexSub, indexRevSub/* , * subNumbers, * subRevNumbers */;
+  MED_EN::med_int * subNumbers, * subRevNumbers;
 
   bool hasFaces = _kArrayLength, hasEdges = _jArrayLength;
   
@@ -426,7 +427,7 @@ void GRID::fillConnectivity() const
   nbCells = iLenMin1 * jLenMin1 * kLenMin1;
   nbMeshNodes = _iArrayLength * (_jArrayLength ? _jArrayLength : 1) * (_kArrayLength ? _kArrayLength : 1);
   nbCNodes = nbCells * 2 * (hasEdges ? 2 : 1) * (hasFaces ? 2 : 1);
-  nodeCNumbers = new int [ nbCNodes ];
+  nodeCNumbers = new MED_EN::med_int /*int*/ [ nbCNodes ];
 
   // nb of faces and of their connectivity nodes
 
@@ -435,7 +436,7 @@ void GRID::fillConnectivity() const
     nbFaces += _jArrayLength * kLenMin1 * iLenMin1;
     nbFaces += _kArrayLength * iLenMin1 * jLenMin1;
     nbFNodes = nbFaces * 4;
-    nodeFNumbers = new int [ nbFNodes ];
+    nodeFNumbers = new MED_EN::med_int/*int*/ [ nbFNodes ];
   } else
     nbFaces = nbFNodes = 0;
 
@@ -452,7 +453,7 @@ void GRID::fillConnectivity() const
       nbEdges += jLenMin1 * _iArrayLength;
     }
     nbENodes = nbEdges * 2;
-    nodeENumbers = new int [ nbENodes ];
+    nodeENumbers = new MED_EN::med_int/*int*/ [ nbENodes ];
   } else
     nbEdges = nbENodes = 0;
 
@@ -468,8 +469,8 @@ void GRID::fillConnectivity() const
     nbSub = nbCells * 4;
     nbRevSub = nbEdges * 2;
   }
-  subNumbers = new int [ nbSub ];
-  subRevNumbers = new int [ nbRevSub ];
+  subNumbers = new  MED_EN::med_int/*int*/ [ nbSub ];
+  subRevNumbers = new MED_EN::med_int/*int*/ [ nbRevSub ];
   for (int r=0; r<nbRevSub; ++r)
     subRevNumbers[ r ] = 0;
 
@@ -691,7 +692,7 @@ void GRID::fillConnectivity() const
   // descending
   {
     //    CellCNCT->_descending = new MEDSKYLINEARRAY() ;
-    int * skyLineArrayIndex = new int [nbCells + 1];
+    MED_EN::med_int* /* int * */ skyLineArrayIndex = new MED_EN::med_int/*int*/ [nbCells + 1];
     int nbEntitySub = CellCNCT->_type[0].getNumberOfConstituents(1);
     for (i=0, j=1; i <= nbCells; ++i, j += nbEntitySub)
       skyLineArrayIndex [ i ] = j;
@@ -708,7 +709,7 @@ void GRID::fillConnectivity() const
   {
     //    CellCNCT->_reverseDescendingConnectivity = new MEDSKYLINEARRAY() ;
     nbSub = nbRevSub/2;
-    int * skyLineArrayIndex = new int [nbSub + 1];
+    MED_EN::med_int * /* int * */ skyLineArrayIndex = new MED_EN::med_int/*int*/ [nbSub + 1];
     for (i=0, j=1; i <= nbSub; ++i, j += 2)
       skyLineArrayIndex [ i ] = j;
     //    CellCNCT->_reverseDescendingConnectivity->setMEDSKYLINEARRAY

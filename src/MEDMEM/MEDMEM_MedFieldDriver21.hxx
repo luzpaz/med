@@ -855,7 +855,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues+=mySupport->getNumberOfElements(Types[i]); // Ne doit pas prendre en compte les points de Gauss
 
     med_2_1::med_err ret;
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64) || defined(PCLINUX64_32)
     int lgth2=NumberOfValues[i]*numberOfComponents;
     if(MED_FIELD_DRIVER<T>::_ptrField->getValueType()==MED_EN::MED_INT32)
       {
@@ -1060,7 +1060,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     }
   }
       
-  END_OF(LOC);
+  //  END_OF(LOC);
 }
 
 template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::write( void ) const

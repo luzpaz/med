@@ -95,7 +95,7 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	 the file read under SGI is incorrect
 	 2) Compaq OSF/1 is LE, since we force SGI64,SUN4SOL2,HP to write double in LE even if they are BE, mips OSF/1 must be BE
 	 REM  : Be careful of compatibility between MED files when changing this (med2.2)                    */
-#if defined(PCLINUX) || defined(OSF1)
+#if defined(PCLINUX) || defined(OSF1) || defined(PCLINUX64) || defined(PCLINUX64_32)
       type_hdf = H5T_IEEE_F64BE;
 #else 
       type_hdf = H5T_IEEE_F64LE;
@@ -264,7 +264,7 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	free(pflmem);
 	free(pfldsk);
       }
-      
+     
       break;
       
     case MED_NO_INTERLACE :
@@ -393,7 +393,7 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 	  }
 	
 	free(pfldsk);
-	
+		
       };
       
       break;

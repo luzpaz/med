@@ -243,7 +243,7 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
 
   int nbOfEltsThis    = getNumberOfElements(MED_ALL_ELEMENTS);
 
-  const int *eltsThis = _number->getValue();
+  const MED_EN::med_int* /* const int * */eltsThis = _number->getValue();
 
   int iThis;
   bool found=false;
@@ -294,9 +294,9 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
     }
   if(mySupport->_totalNumberOfElements==0)
     return;
-  const int *ids=getNumber(MED_ALL_ELEMENTS);
+  const MED_EN::med_int* /* const int * */ids=getNumber(MED_ALL_ELEMENTS);
   set<int> idsSet(ids,ids+getNumberOfElements(MED_ALL_ELEMENTS));
-  const int *idsMySupport=mySupport->getNumber(MED_ALL_ELEMENTS);
+  const MED_EN::med_int* /* const int * */idsMySupport=mySupport->getNumber(MED_ALL_ELEMENTS);
   int mySupportSize=mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
   set<int>::iterator iter;
   for(int i=0;i<mySupportSize;i++)
@@ -333,7 +333,7 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
 void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
 			 int TotalNumberOfElements,
 			 medGeometryElement *GeometricType,
-			 int *NumberOfElements, int *NumberValue)
+			 int *NumberOfElements, MED_EN::med_int* /* int * */NumberValue)
 //-------------------
 {
   const char * LOC = "SUPPORT::setpartial(string , int , int , medGeometryElement * , int * , int *) : " ;
@@ -348,7 +348,7 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   _numberOfElements.set(NumberOfGeometricType);
   _totalNumberOfElements = TotalNumberOfElements;
 
-  int * index = new int[_numberOfGeometricType+1];
+  MED_EN::med_int* /* int * */ index = new MED_EN::med_int/*int*/[_numberOfGeometricType+1];
   index[0]=1;
   int elemDim = -1;
   for (int i=0;i<_numberOfGeometricType;i++) {
@@ -480,8 +480,8 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
 
   setAll(false);
 
-  const int * myConnectivityValue = _mesh->getReverseConnectivity(MED_DESCENDING) ;
-  const int * myConnectivityIndex = _mesh->getReverseConnectivityIndex(MED_DESCENDING) ;
+  const MED_EN::med_int* /* const int * */ myConnectivityValue = _mesh->getReverseConnectivity(MED_DESCENDING) ;
+  const MED_EN::med_int* /* const int * */ myConnectivityIndex = _mesh->getReverseConnectivityIndex(MED_DESCENDING) ;
   int numberOf = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS) ;
   list<int> myElementsList ;
   int size = 0 ;
@@ -494,7 +494,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
     }
   SCRUTE(size) ;
   // Well, we must know how many geometric type we have found
-  int * myListArray = new int[size] ;
+  MED_EN::med_int* /* int * */ myListArray = new MED_EN::med_int/*int*/[size] ;
   int id = 0 ;
   list<int>::iterator myElementsListIt ;
   for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
@@ -509,7 +509,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   int * geometricTypeNumber ;
   int * numberOfElements ;
   //MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY() ;
-  int * mySkyLineArrayIndex ;
+  MED_EN::med_int* /* int * */ mySkyLineArrayIndex ;
 
   int numberOfType = _mesh->getNumberOfTypes(_entity) ;
   if (numberOfType == 1) { // wonderfull : it's easy !
@@ -521,7 +521,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
     geometricTypeNumber[0] = 0 ;
     numberOfElements = new int[1] ;
     numberOfElements[0] = size ;
-    mySkyLineArrayIndex = new int[2] ;
+    mySkyLineArrayIndex = new MED_EN::med_int/*int*/[2] ;
     mySkyLineArrayIndex[0]=1 ;
     mySkyLineArrayIndex[1]=1+size ;
   }
@@ -539,7 +539,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
     //const medGeometryElement *  allType = _mesh->getTypes(_entity); !! UNUSED VARIABLE !!
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfElements = new int[numberOfGeometricType] ;
-    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
+    mySkyLineArrayIndex = new MED_EN::med_int/*int*/[numberOfGeometricType+1] ;
     int index = 0 ;
     mySkyLineArrayIndex[0]=1 ;
     map<medGeometryElement,int>::iterator theTypeIt ;
@@ -605,9 +605,9 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
     }
   if(_totalNumberOfElements==0)
     return;
-  const int *ids=getNumber(MED_ALL_ELEMENTS);
+  const MED_EN::med_int* /* const int * */ids=getNumber(MED_ALL_ELEMENTS);
   set<int> idsSet(ids,ids+getNumberOfElements(MED_ALL_ELEMENTS));
-  const int *idsMySupport=mySupport->getNumber(MED_ALL_ELEMENTS);
+  const MED_EN::med_int* /* const int * */idsMySupport=mySupport->getNumber(MED_ALL_ELEMENTS);
   int mySupportSize=mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
   set<int> idsSetMySupport(idsMySupport,idsMySupport+mySupportSize);
   set<int>::iterator iter;
@@ -704,7 +704,7 @@ void SUPPORT::changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumbe
   list<int> newNbs;
   if(!_isOnAllElts)
     {
-      const int *oldNbs=_number->getValue();
+      const MED_EN::med_int* /* const int * */oldNbs=_number->getValue();
       for(int i=0;i<_totalNumberOfElements;i++)
 	{
 	  int globNb=oldNbs[i];
@@ -789,8 +789,8 @@ bool MEDMEM::SUPPORT::belongsTo(const SUPPORT& other, bool deepCompare) const
 	return false;
       if(_numberOfElements[i]>other._numberOfElements[iOther])
 	return false;
-      const int *numbers1=_number->getI(i+1);
-      const int *numbers2=other._number->getI(iOther+1);
+      const MED_EN::med_int* /* const int * */numbers1=_number->getI(i+1);
+      const MED_EN::med_int* /* const int * */numbers2=other._number->getI(iOther+1);
       for (int k=0; k<_numberOfElements[i]; k++)
 	{
 	  bool found=false;
@@ -825,7 +825,7 @@ int compareId(const void *x, const void *y)
   in array defined by (idsToSuppress,lgthIdsToSuppress) from array [start ... end]
   Example sub(0,7,{1,2,5},3) => {0,3,4,6,7} - WARNING returned list should be deallocated !
  */
-list<int> *MEDMEM::SUPPORT::sub(int start,int end,const int *idsToSuppress,int lgthIdsToSuppress)
+list<int> *MEDMEM::SUPPORT::sub(int start,int end,const MED_EN::med_int* /* const int * */idsToSuppress,int lgthIdsToSuppress)
 {
   int size=end-start+1;
   int sizeRet=size-lgthIdsToSuppress;
@@ -862,7 +862,7 @@ list<int> *MEDMEM::SUPPORT::sub(int start,int end,const int *idsToSuppress,int l
   in array defined by (idsToSuppress,lgthIdsToSuppress) from array [start ... end]
   Example sub({1,3,4,5,6,7,9},7,{1,2,5},3) => {3,4,6,7,9}  - WARNING returned list should be deallocated !
  */
-list<int> *MEDMEM::SUPPORT::sub(const int *ids,int lgthIds,const int *idsToSuppress,int lgthIdsToSuppress)
+list<int> *MEDMEM::SUPPORT::sub(const MED_EN::med_int* /* const int * */ids,int lgthIds,const MED_EN::med_int* /* const int * */idsToSuppress,int lgthIdsToSuppress)
 {
   list<int> *ret;
   int i,j=0;
@@ -912,7 +912,7 @@ SUPPORT *MEDMEM::SUPPORT::getComplement() const
       ret->setName(name);
       return ret;
     }
-  const int *nbs=_number->getValue();
+  const MED_EN::med_int* /* const int * */nbs=_number->getValue();
   list<int> *ids=sub(1,nbOfElt,nbs,nbOfEltInSupp);
   if(_entity==MED_EN::MED_NODE)
     ret=_mesh->buildSupportOnNodeFromElementList(*ids,_entity);
@@ -944,9 +944,9 @@ SUPPORT *MEDMEM::SUPPORT::substract(const SUPPORT& other) const throw (MEDEXCEPT
   if(_isOnAllElts)
     return other.getComplement();
   int nbOfEltInThis=getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-  const int *nbsThis=_number->getValue();
+  const MED_EN::med_int* /* const int * */nbsThis=_number->getValue();
   int nbOfEltInOther=other.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-  const int *nbsOther=other._number->getValue();
+  const MED_EN::med_int* /* const int * */nbsOther=other._number->getValue();
   list<int> *ids=sub(nbsThis,nbOfEltInThis,nbsOther,nbOfEltInOther);
   if(_entity==MED_EN::MED_NODE)
     ret=_mesh->buildSupportOnNodeFromElementList(*ids,_entity);
@@ -982,10 +982,10 @@ SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) cons
   if(_isOnAllElts)
     return _mesh->getBoundaryElements(Entity);
 
-  const int * myConnectivityValue=_mesh->getReverseConnectivity(MED_DESCENDING);
-  const int * myConnectivityIndex=_mesh->getReverseConnectivityIndex(MED_DESCENDING);
+  const MED_EN::med_int* /* const int * */ myConnectivityValue=_mesh->getReverseConnectivity(MED_DESCENDING);
+  const MED_EN::med_int* /* const int * */ myConnectivityIndex=_mesh->getReverseConnectivityIndex(MED_DESCENDING);
   int numberOf=_mesh->getNumberOfElements(baseEntity,MED_ALL_ELEMENTS);
-  const int *ids=_number->getValue();
+  const MED_EN::med_int* /* const int * */ids=_number->getValue();
   set<int> idsSet(ids,ids+_totalNumberOfElements);
   list<int> myElementsList;
   for (int i=0;i<numberOf;i++)
@@ -1030,10 +1030,10 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
   geometricType[0]=MED_NONE;
   int *numberOfElements=new int[1];
   numberOfElements[0]=size;
-  int *mySkyLineArrayIndex=new int[2];
+  MED_EN::med_int* /* int * */mySkyLineArrayIndex=new MED_EN::med_int/*int*/[2];
   mySkyLineArrayIndex[0]=1;
   mySkyLineArrayIndex[1]=1+numberOfElements[0];
-  int *tab=new int[numberOfElements[0]];
+  MED_EN::med_int* /* int * */tab=new MED_EN::med_int/*int*/[numberOfElements[0]];
   int i=0;
   for(list<int>::const_iterator iter2=listOfNode.begin();iter2!=listOfNode.end();iter2++)
     tab[i++]=*iter2;
@@ -1065,7 +1065,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
   else
   _isOnAllElts=false;
   // Well, we must know how many geometric type we have found
-  int * myListArray = new int[size] ;
+  MED_EN::med_int* /* int * */ myListArray = new MED_EN::med_int/*int*/[size] ;
   int id = 0 ;
   list<int>::const_iterator myElementsListIt ;
   for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++)
@@ -1073,7 +1073,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
   int numberOfGeometricType ;
   medGeometryElement* geometricType ;
   int * numberOfElements ;
-  int * mySkyLineArrayIndex ;
+  MED_EN::med_int* /* int * */ mySkyLineArrayIndex ;
 
   int numberOfType = _mesh->getNumberOfTypesWithPoly(_entity) ;
   if (numberOfType == 1) {
@@ -1083,7 +1083,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
     geometricType[0] = allType[0] ;
     numberOfElements = new int[1] ;
     numberOfElements[0] = size ;
-    mySkyLineArrayIndex = new int[2] ;
+    mySkyLineArrayIndex = new MED_EN::med_int/*int*/[2] ;
     mySkyLineArrayIndex[0]=1 ;
     mySkyLineArrayIndex[1]=1+size ;
     delete [] allType;
@@ -1100,7 +1100,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
     numberOfElements = new int[numberOfGeometricType] ;
-    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
+    mySkyLineArrayIndex = new MED_EN::med_int/*int*/[numberOfGeometricType+1] ;
     int index = 0 ;
     mySkyLineArrayIndex[0]=1 ;
     map<medGeometryElement,int>::iterator theTypeIt ;

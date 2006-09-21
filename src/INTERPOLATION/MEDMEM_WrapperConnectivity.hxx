@@ -51,9 +51,9 @@ public :
 	Wrapper_Med_Connectivity():mailles(NULL) {}
 	Wrapper_Med_Connectivity(MEDMEM::CONNECTIVITY * maillesmed)
 		{
-		const int * tab_sommets_mailles=maillesmed->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
-		const int * med_connectivite=maillesmed->getConnectivityIndex(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_CELL);
-		const int * med_index=maillesmed->getValueIndex(MED_EN::MED_FULL_INTERLACE);
+		const MED_EN::med_int* /* const int * */ tab_sommets_mailles=maillesmed->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
+		const MED_EN::med_int* /* const int * */ med_connectivite=maillesmed->getConnectivityIndex(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_CELL);
+		const MED_EN::med_int* /* const int * */ med_index=maillesmed->getValueIndex(MED_EN::MED_FULL_INTERLACE);
 		nbr_mailles=maillesmed->getNumberOf(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 		int size=med_index[nbr_mailles]-med_index[0];
 		types.resize(nbr_mailles);

@@ -29,7 +29,7 @@ public:
   MemorySpy();
   ~MemorySpy();
   long getCurrentMemoryUsage();
-#ifdef PCLINUX 
+#if defined(PCLINUX)  || defined(PCLINUX64) || defined(PCLINUX64_32)
   //SOLARIS
 private:
   long parseString(char* line);

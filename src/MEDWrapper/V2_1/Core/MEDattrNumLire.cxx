@@ -54,7 +54,7 @@ _MEDattrNumLire(med_idt pere,med_type_champ type,char *nom,unsigned char *val)
       break;
       
     case MED_INT :
-#if defined(IRIX64) || defined(OSF1)
+#if defined(IRIX64) || defined(OSF1) || defined(PCLINUX64)
       type_hdf = H5T_NATIVE_LONG; 
 #else
       type_hdf = H5T_NATIVE_INT;
@@ -67,6 +67,12 @@ _MEDattrNumLire(med_idt pere,med_type_champ type,char *nom,unsigned char *val)
 
   if ((ret = H5Aread(attid,type_hdf,val)) < 0)
     return -1;
+
+  if (strcmp(nom, MED_NOM_NGA) == 0 ) {
+    med_int* ngauss = (med_int*)val;
+    if( *ngauss <= 0 || *ngauss > 128) 
+      *ngauss =1;
+  }
 
   if ((ret = H5Aclose(attid)) < 0)
     return -1;

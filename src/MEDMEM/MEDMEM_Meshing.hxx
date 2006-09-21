@@ -62,20 +62,20 @@ public :
   void setNumberOfElements (const int * NumberOfElements,
 			    const MED_EN::medEntityMesh Entity)
     throw (MEDEXCEPTION) ;
-  void setConnectivity     (const int * Connectivity,
+  void setConnectivity     (const MED_EN::med_int* /* const int * */ Connectivity,
 			    const MED_EN::medEntityMesh Entity,
 			    const MED_EN::medGeometryElement Type)
     throw (MEDEXCEPTION) ;
   
-  void setPolygonsConnectivity     (const int * ConnectivityIndex,
-				    const int * ConnectivityValue,
+  void setPolygonsConnectivity     (const MED_EN::med_int* /* const int * */ ConnectivityIndex,
+				    const MED_EN::med_int* /* const int * */ ConnectivityValue,
 				    int nbOfPolygons,
 				    const MED_EN::medEntityMesh Entity)
     throw (MEDEXCEPTION) ;
 
-  void setPolyhedraConnectivity     (const int * PolyhedronIndex,
-				     const int * FacesIndex,
-				     const int * Nodes,
+  void setPolyhedraConnectivity     (const MED_EN::med_int* /* const int * */ PolyhedronIndex,
+				     const MED_EN::med_int* /* const int * */ FacesIndex,
+				     const MED_EN::med_int* /* const int * */ Nodes,
 				     int nbOfPolyhedra,
 				     const MED_EN::medEntityMesh Entity)
     throw (MEDEXCEPTION) ;

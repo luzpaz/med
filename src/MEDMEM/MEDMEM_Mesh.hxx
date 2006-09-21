@@ -184,7 +184,7 @@ public :
   virtual MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
   virtual inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
   virtual inline string * getCellTypeNames(MED_EN::medEntityMesh Entity) const;
-  virtual const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
+  virtual const MED_EN::med_int * /* int * */ getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
   virtual inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
 					 MED_EN::medGeometryElement Type) const;
   virtual int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity,
@@ -207,24 +207,24 @@ public :
 					     MED_EN::medConnectivity ConnectivityType,
 					     MED_EN::medEntityMesh Entity,
 					     MED_EN::medGeometryElement Type) const;
-  virtual inline const int * getConnectivity(MED_EN::medModeSwitch Mode,
-					     MED_EN::medConnectivity ConnectivityType,
-					     MED_EN::medEntityMesh Entity,
-					     MED_EN::medGeometryElement Type) const;
-  virtual inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
-						  MED_EN::medEntityMesh Entity) const;
-
+  virtual inline const MED_EN::med_int* /* const int * */ getConnectivity(MED_EN::medModeSwitch Mode,
+									  MED_EN::medConnectivity ConnectivityType,
+									  MED_EN::medEntityMesh Entity,
+									  MED_EN::medGeometryElement Type) const;
+  virtual inline const MED_EN::med_int* /* const int * */ getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+									       MED_EN::medEntityMesh Entity) const;
+  
   inline int getPolygonsConnectivityLength(MED_EN::medConnectivity ConnectivityType,
                                            MED_EN::medEntityMesh Entity) const;
-  inline const int * getPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
-					     MED_EN::medEntityMesh Entity) const;
-  inline const int * getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
-                                                  MED_EN::medEntityMesh Entity) const;
+  inline const MED_EN::med_int* /* const int * */ getPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
+									  MED_EN::medEntityMesh Entity) const;
+  inline const MED_EN::med_int* /* const int * */ getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+									       MED_EN::medEntityMesh Entity) const;
   inline int getNumberOfPolygons(MED_EN::medEntityMesh Entity=MED_EN::MED_ALL_ENTITIES) const;
   inline int getPolyhedronConnectivityLength(MED_EN::medConnectivity ConnectivityType) const;
-  inline const int * getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const;
-  inline const int * getPolyhedronFacesIndex() const;
-  inline const int * getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const;
+  inline const MED_EN::med_int* /* const int * */ getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const;
+  inline const MED_EN::med_int* /* const int * */ getPolyhedronFacesIndex() const;
+  inline const MED_EN::med_int* /* const int * */ getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const;
   inline int getNumberOfPolyhedronFaces() const;
   inline int getNumberOfPolyhedron() const;
 
@@ -234,12 +234,12 @@ public :
                                                int * connectivity) const;
   virtual inline int getReverseConnectivityLength(MED_EN::medConnectivity ConnectivityType,
 						  MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
-  virtual inline const int * getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,
-						    MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+  virtual inline const MED_EN::med_int* /* const int * */getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,
+										MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
   virtual inline int getReverseConnectivityIndexLength(MED_EN::medConnectivity ConnectivityType,
 							 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
-  virtual inline const int * getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
-							 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+  virtual inline const MED_EN::med_int* /* const int * */ getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+										      MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
 
   virtual int                          getNumberOfFamilies(MED_EN::medEntityMesh Entity) const;
   virtual inline const vector<FAMILY*> getFamilies(MED_EN::medEntityMesh Entity) const;
@@ -568,7 +568,7 @@ inline string * MESH::getCellTypeNames(MED_EN::medEntityMesh Entity) const
     - GlobalNumberingIndex[1]=6 (the second type)
     - GlobalNumberingIndex[2]=10
 */
-inline const int * MESH::getGlobalNumberingIndex(MED_EN::medEntityMesh entity) const
+inline const MED_EN::med_int * /* int * */ MESH::getGlobalNumberingIndex(MED_EN::medEntityMesh entity) const
 {
   //  checkGridFillConnectivity();
   if (_connectivity != NULL)
@@ -697,7 +697,7 @@ inline int MESH::getConnectivityLength(MED_EN::medModeSwitch Mode,MED_EN::medCon
   and Type=MED_ALL_ELEMENTS.
   You must also get the corresponding index array.
  */
-inline const int * MESH::getConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
+inline const MED_EN::med_int* /* const int * */ MESH::getConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
 {
   //  checkGridFillConnectivity();
   if (Mode==MED_EN::MED_FULL_INTERLACE)
@@ -715,7 +715,7 @@ inline const int * MESH::getConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medC
   in Connectivity array (Connectivity[ConnectivityIndex[i-1]-1] is the
   first value)
  */
-inline const int * MESH::getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity) const
+inline const MED_EN::med_int* /* const int * */ MESH::getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity) const
 {
   //  checkGridFillConnectivity();
   return _connectivity->getConnectivityIndex(ConnectivityType, entity);
@@ -733,16 +733,16 @@ inline int MESH::getPolygonsConnectivityLength(MED_EN::medConnectivity Connectiv
   Return the required connectivity of polygons for the given entity.
   You must also get the corresponding index array.
  */
-inline const int * MESH::getPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
-						 MED_EN::medEntityMesh Entity) const
+inline const MED_EN::med_int* /* const int * */ MESH::getPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
+									      MED_EN::medEntityMesh Entity) const
 {
   return _connectivity->getPolygonsConnectivity(ConnectivityType,Entity);
 }
 /*!
   Return the required index array for polygons connectivity.
  */
-inline const int * MESH::getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
-						      MED_EN::medEntityMesh Entity) const
+inline const MED_EN::med_int* /* const int * */ MESH::getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+										   MED_EN::medEntityMesh Entity) const
 {
   return _connectivity->getPolygonsConnectivityIndex(ConnectivityType,Entity);
 }
@@ -772,7 +772,7 @@ inline int MESH::getPolyhedronConnectivityLength(MED_EN::medConnectivity Connect
   - faces index and polyhedron index arrays in nodal mode.
   - polyhedron index array in descending mode.
  */
-inline const int * MESH::getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const
+inline const MED_EN::med_int* /* const int * */ MESH::getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const
 {
   return _connectivity->getPolyhedronConnectivity(ConnectivityType);
 }
@@ -780,14 +780,14 @@ inline const int * MESH::getPolyhedronConnectivity(MED_EN::medConnectivity Conne
   Return the index array of polyhedron faces in nodal mode.
   You must also get the polyhedron index array.
  */
-inline const int * MESH::getPolyhedronFacesIndex() const
+inline const MED_EN::med_int* /* const int * */ MESH::getPolyhedronFacesIndex() const
 {
   return _connectivity->getPolyhedronFacesIndex();
 }
 /*!
   Return the required polyhedron index array.
  */
-inline const int * MESH::getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const
+inline const MED_EN::med_int* /* const int * */ MESH::getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const
 {
   return _connectivity->getPolyhedronIndex(ConnectivityType);
 }
@@ -839,7 +839,7 @@ inline int MESH::getReverseConnectivityLength(MED_EN::medConnectivity Connectivi
   You must get ReverseConnectivityIndex array to use it.
  */
 
-inline const int * MESH::getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
+inline const MED_EN::med_int* /* const int * */ MESH::getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
 {
   //  checkGridFillConnectivity();
   if (NULL==_connectivity)
@@ -882,7 +882,7 @@ inline int MESH::getReverseConnectivityIndexLength(MED_EN::medConnectivity Conne
   ReverseConnectivity[ReverseConnectivityIndex[i-1]-1]
   is the first value)
  */
-inline const int * MESH::getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
+inline const MED_EN::med_int* /* const int * */ MESH::getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
 {
   //  checkGridFillConnectivity();
   if (NULL==_connectivity)
@@ -1082,7 +1082,7 @@ FIELD<T, FullInterlace> * MESH::mergeFields(const vector< FIELD<T, FullInterlace
     }
   else
     {
-      const int *eltsRetSup=retSup->getNumber(MED_EN::MED_ALL_ELEMENTS);
+      const MED_EN::med_int * /* int * */eltsRetSup=retSup->getNumber(MED_EN::MED_ALL_ELEMENTS);
       for(i=0;i<nbOfEltsRetSup;i++)
 	{
 	  bool found=false;

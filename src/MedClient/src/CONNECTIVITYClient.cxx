@@ -152,7 +152,7 @@ void CONNECTIVITYClient::fillCopy()
 
   if (!_complete) {
 
-    int *pC;
+    int * pC;
     long nC;
     
     medEntityMesh Entity = getEntity();
@@ -180,7 +180,7 @@ void CONNECTIVITYClient::fillCopy()
       SCRUTE(nC);
       ASSERT(nC == (T[iT]%100) * kT);
       
-      setNodal(pC, Entity, T[iT]);
+      setNodal((MED_EN::med_int *)pC, Entity, T[iT]);
       delete [] pC;
     }
 
@@ -196,7 +196,7 @@ void CONNECTIVITYClient::fillCopy()
 //       dumpArray( pC, nC, "POLYGON Connectivity: ");
 //       dumpArray( pCI, nP, "POLYGON ConnectivityIndex: ");
 
-      setPolygonsConnectivity(ConType, Entity, pC, pCI, nC, nP-1);
+      setPolygonsConnectivity(ConType, Entity, (MED_EN::med_int *)pC, (MED_EN::med_int *)pCI, nC, nP-1);
       delete [] pC;
       delete [] pCI;
     }
@@ -217,7 +217,7 @@ void CONNECTIVITYClient::fillCopy()
 //       dumpArray( pFI, nF, "POLYHedron Face Index: ");
 //       dumpArray( pPI, nP, "POLYHedron Index: ");
 
-      setPolyhedronConnectivity(ConType, pC, pPI, nC, nP-1, pFI, nF-1);
+      setPolyhedronConnectivity(ConType, (MED_EN::med_int *)pC, (MED_EN::med_int *)pPI, nC, nP-1, (MED_EN::med_int *)pFI, nF-1);
       delete [] pC;
       delete [] pPI;
       delete [] pFI;
@@ -276,7 +276,7 @@ int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity,
 /*!
  */
 //=============================================================================
-const int * CONNECTIVITYClient::getConnectivity
+const MED_EN::med_int * /* int * */ CONNECTIVITYClient::getConnectivity
                       (medConnectivity ConnectivityType, 
 		       medEntityMesh Entity,
 		       medGeometryElement Type)
@@ -286,7 +286,7 @@ const int * CONNECTIVITYClient::getConnectivity
   if (!_complete)
     fillCopy();
 
-  const int * c = CONNECTIVITY::getConnectivity
+  const MED_EN::med_int * /* int * */ c = CONNECTIVITY::getConnectivity
     (ConnectivityType, Entity, Type);
 
   END_OF("void CONNECTIVITYClient::getConnectivity()");
@@ -297,7 +297,7 @@ const int * CONNECTIVITYClient::getConnectivity
 /*!
  */
 //=============================================================================
-const int * CONNECTIVITYClient::getConnectivityIndex
+const MED_EN::med_int * /* int * */ CONNECTIVITYClient::getConnectivityIndex
                       (medConnectivity ConnectivityType,
 		       medEntityMesh Entity)
 {
@@ -306,7 +306,7 @@ const int * CONNECTIVITYClient::getConnectivityIndex
   if (!_complete)
     fillCopy();
 
-  const int *c = CONNECTIVITY::getConnectivityIndex
+  const MED_EN::med_int * /* int * */c = CONNECTIVITY::getConnectivityIndex
     (ConnectivityType, Entity);
 
   END_OF("void CONNECTIVITYClient::getConnectivityIndex()");
@@ -351,7 +351,7 @@ void  CONNECTIVITYClient::updateFamily (vector<FAMILY*> myFamilies)
 /*!
  */
 //=============================================================================
-const int * CONNECTIVITYClient::getGlobalNumberingIndex 
+const MED_EN::med_int * /* int * */ CONNECTIVITYClient::getGlobalNumberingIndex 
                       (medEntityMesh Entity) const throw (MEDEXCEPTION)
 {
   BEGIN_OF("void CONNECTIVITYClient::getGlobalNumberingIndex()");
@@ -359,7 +359,7 @@ const int * CONNECTIVITYClient::getGlobalNumberingIndex
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
-  const int * index = CONNECTIVITY::getGlobalNumberingIndex(Entity);
+  const MED_EN::med_int * /* int * */ index = CONNECTIVITY::getGlobalNumberingIndex(Entity);
 
   END_OF("void CONNECTIVITYClient::getGlobalNumberingIndex()");
 
@@ -389,7 +389,7 @@ bool CONNECTIVITYClient::existConnectivity(medConnectivity ConnectivityType,
 /*!
  */
 //=============================================================================
-const int * CONNECTIVITYClient::getReverseConnectivity
+const MED_EN::med_int * /* int * */ CONNECTIVITYClient::getReverseConnectivity
                       (medConnectivity ConnectivityType, 
 		       medEntityMesh Entity) throw (MEDEXCEPTION)
 {
@@ -398,7 +398,7 @@ const int * CONNECTIVITYClient::getReverseConnectivity
   if (!_complete)
     fillCopy();
 
-  const int *c = CONNECTIVITY::getReverseConnectivity
+  const MED_EN::med_int * /* int * */c = CONNECTIVITY::getReverseConnectivity
     (ConnectivityType, Entity);
 
   END_OF("void CONNECTIVITYClient::getReverseConnectivity()");
@@ -410,7 +410,7 @@ const int * CONNECTIVITYClient::getReverseConnectivity
 /*!
  */
 //=============================================================================
-const int * CONNECTIVITYClient::getReverseConnectivityIndex
+const MED_EN::med_int * /* int * */ CONNECTIVITYClient::getReverseConnectivityIndex
                       (medConnectivity ConnectivityType,
 		       medEntityMesh Entity) throw (MEDEXCEPTION)
 {
@@ -419,7 +419,7 @@ const int * CONNECTIVITYClient::getReverseConnectivityIndex
   if (!_complete)
     fillCopy();
 
-  const int *c =  CONNECTIVITY::getReverseConnectivityIndex
+  const MED_EN::med_int * /* int * */c =  CONNECTIVITY::getReverseConnectivityIndex
     (ConnectivityType, Entity);
 
   END_OF("void CONNECTIVITYClient::getReverseConnectivityIndex()");
@@ -431,7 +431,7 @@ const int * CONNECTIVITYClient::getReverseConnectivityIndex
 /*!
  */
 //=============================================================================
-const int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity, 
+const MED_EN::med_int * /* int* */ CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity, 
 			medGeometryElement Type)
 {
   BEGIN_OF("void CONNECTIVITYClient::getValue()");
@@ -439,7 +439,7 @@ const int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity,
   if (!_complete)
     fillCopy();
 
-  const int * c =  CONNECTIVITY::getValue(TypeConnectivity, Type);
+  const MED_EN::med_int * /* int * */ c =  CONNECTIVITY::getValue(TypeConnectivity, Type);
 
   END_OF("void CONNECTIVITYClient::()");
 
@@ -450,14 +450,14 @@ const int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity,
 /*!
  */
 //=============================================================================
-const int* CONNECTIVITYClient::getValueIndex(medConnectivity TypeConnectivity)
+const MED_EN::med_int * /* int* */ CONNECTIVITYClient::getValueIndex(medConnectivity TypeConnectivity)
 {
   BEGIN_OF("void CONNECTIVITYClient::getValueIndex()");
 
   if (!_complete)
     fillCopy();
 
-  const int * c =  CONNECTIVITY::getValueIndex(TypeConnectivity);
+  const MED_EN::med_int * /* int * */ c =  CONNECTIVITY::getValueIndex(TypeConnectivity);
 
   END_OF("void CONNECTIVITYClient::getValueIndex()");
 
@@ -527,15 +527,15 @@ bool CONNECTIVITYClient::existPolyhedronConnectivity(medConnectivity connectivit
 //purpose  : 
 //=======================================================================
 
-const int* CONNECTIVITYClient::getPolygonsConnectivity(medConnectivity ConnectivityType,
-                                                       medEntityMesh Entity)
+const MED_EN::med_int * /* int* */ CONNECTIVITYClient::getPolygonsConnectivity(medConnectivity ConnectivityType,
+									       medEntityMesh Entity)
 {
   BEGIN_OF("void CONNECTIVITYClient::getPolygonsConnectivity()");
 
   if (!_complete)
     fillCopy();
 
-  const int * c = CONNECTIVITY::getPolygonsConnectivity (ConnectivityType, Entity);
+  const MED_EN::med_int * /* int * */ c = CONNECTIVITY::getPolygonsConnectivity (ConnectivityType, Entity);
 
   END_OF("void CONNECTIVITYClient::getPolygonsConnectivity()");
   return c;
@@ -546,15 +546,15 @@ const int* CONNECTIVITYClient::getPolygonsConnectivity(medConnectivity Connectiv
 //purpose  : 
 //=======================================================================
 
-const int* CONNECTIVITYClient::getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
-                                                            medEntityMesh Entity)
+const MED_EN::med_int * /* int* */ CONNECTIVITYClient::getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
+										    medEntityMesh Entity)
 {
   BEGIN_OF("void CONNECTIVITYClient::getPolygonsConnectivityIndex()");
 
   if (!_complete)
     fillCopy();
 
-  const int * c = CONNECTIVITY::getPolygonsConnectivityIndex (ConnectivityType, Entity);
+  const MED_EN::med_int * /* int * */ c = CONNECTIVITY::getPolygonsConnectivityIndex (ConnectivityType, Entity);
 
   END_OF("void CONNECTIVITYClient::getPolygonsConnectivityIndex()");
   return c;
@@ -565,14 +565,14 @@ const int* CONNECTIVITYClient::getPolygonsConnectivityIndex(medConnectivity Conn
 //purpose  : 
 //=======================================================================
 
-const int* CONNECTIVITYClient::getPolyhedronConnectivity(medConnectivity ConnectivityType) const
+const MED_EN::med_int * /* int* */ CONNECTIVITYClient::getPolyhedronConnectivity(medConnectivity ConnectivityType) const
 {
   BEGIN_OF("void CONNECTIVITYClient::getPolyhedronConnectivity()");
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
-  const int * c = CONNECTIVITY::getPolyhedronConnectivity (ConnectivityType);
+  const MED_EN::med_int * /* int * */ c = CONNECTIVITY::getPolyhedronConnectivity (ConnectivityType);
 
   END_OF("void CONNECTIVITYClient::getPolyhedronConnectivity()");
   return c;
@@ -583,14 +583,14 @@ const int* CONNECTIVITYClient::getPolyhedronConnectivity(medConnectivity Connect
 //purpose  : 
 //=======================================================================
 
-const int* CONNECTIVITYClient::getPolyhedronFacesIndex() const
+const MED_EN::med_int * /* int* */ CONNECTIVITYClient::getPolyhedronFacesIndex() const
 {
   BEGIN_OF("void CONNECTIVITYClient::getPolyhedronFacesIndex()");
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
-  const int * c = CONNECTIVITY::getPolyhedronFacesIndex();
+  const MED_EN::med_int * /* int * */ c = CONNECTIVITY::getPolyhedronFacesIndex();
 
   END_OF("void CONNECTIVITYClient::getPolyhedronFacesIndex()");
   return c;
@@ -601,14 +601,14 @@ const int* CONNECTIVITYClient::getPolyhedronFacesIndex() const
 //purpose  : 
 //=======================================================================
 
-const int* CONNECTIVITYClient::getPolyhedronIndex(medConnectivity ConnectivityType) const
+const MED_EN::med_int * /* int* */ CONNECTIVITYClient::getPolyhedronIndex(medConnectivity ConnectivityType) const
 {
   BEGIN_OF("void CONNECTIVITYClient::getPolyhedronIndex()");
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
-  const int * c = CONNECTIVITY::getPolyhedronIndex (ConnectivityType);
+  const MED_EN::med_int * /* int * */ c = CONNECTIVITY::getPolyhedronIndex (ConnectivityType);
 
   END_OF("void CONNECTIVITYClient::getPolyhedronIndex()");
   return c;

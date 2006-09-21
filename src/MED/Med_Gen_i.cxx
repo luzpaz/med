@@ -268,13 +268,13 @@ throw (SALOME::SALOME_Exception)
 	  // create ::MED object, read all and add in study !
 	  myMedI->initWithFieldType(myStudy,MED_DRIVER,fileName) ;
 	}
-        catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
-        catch(...)
-        {
-                MESSAGE("Erreur a la lecture du fichier");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to open File "\
-                                                ,SALOME::BAD_PARAM);
-        }
+	catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
+	catch(...)
+	  {
+	    MESSAGE("Erreur a la lecture du fichier");
+	    THROW_SALOME_CORBA_EXCEPTION("Unable to open File "\
+					 ,SALOME::BAD_PARAM);
+	  }
 
         endService("Med_Gen_i::readStructFileWithFieldType");
 	END_OF("Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)");
