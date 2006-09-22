@@ -496,7 +496,9 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 					  (med_2_2::med_geometrie_element)  *currentGeometry,
 					  j, &ngauss,  &numdt,  &numo, dtunit, &dt,
 					  maa, &local, &nmaa);
-
+		
+	MED_FIELD_DRIVER<T>::_ptrField->setTime(dt); // PAL12664
+	
 	if ( ndt == numdt && numo == od ) {
 	  alreadyFoundPdtIt = true;
 

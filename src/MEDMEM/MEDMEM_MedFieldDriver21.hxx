@@ -441,6 +441,8 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
 					 (med_2_1::med_entite_maillage) entityCurrent,
 					 (med_2_1::med_geometrie_element)  *currentGeometry,
 					 j,maa,&ngauss,&numdt,dtunit,&dt,&numo);
+	
+	MED_FIELD_DRIVER<T>::_ptrField->setTime(dt); // PAL12664
 
 	// 	    ret = med_2_2::MEDpasdetempsInfo(id, const_cast <char*> ( fieldName.c_str() ),
 	// 				    (med_2_1::med_entite_maillage)   (*currentEntity).first,
