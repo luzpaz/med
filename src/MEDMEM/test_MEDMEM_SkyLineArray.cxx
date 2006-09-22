@@ -26,12 +26,12 @@ int main (int argc, char ** argv) {
   int NumberOfCell = 3 ; // 1 triangle,1 quadrangle,1 triangle
   int Size = 10 ; // 10 nodes
 
-  int * index = new int[NumberOfCell+1] ;
+  MED_EN::med_int * /* int * */ index = new MED_EN::med_int/*int*/[NumberOfCell+1] ;
   index[0]=1;
   index[1]=4;
   index[2]=8;
   index[3]=11;
-  int * value = new int[Size] ;
+  MED_EN::med_int * /*int * */ value = new MED_EN::med_int/*int*/[Size] ;
   value[0]=1; // first
   value[1]=2;
   value[2]=5;
@@ -48,7 +48,7 @@ int main (int argc, char ** argv) {
 
   cout << "Show all 1 :" << endl ;
   for (int i=1; i<NumberOfCell+1 ; i++) {
-    const int * cell = myArray->getI(i) ;
+    const MED_EN::med_int * /* const int * */ cell = myArray->getI(i) ;
     int numberof = myArray->getNumberOfI(i) ;
     cout << " - " ;
     for (int j=0;j<numberof;j++)
@@ -68,7 +68,7 @@ int main (int argc, char ** argv) {
   delete myArray ;
   
   cout << "Show all 3 :" << endl ;
-  const int * index2 = myArray2->getIndex() ;
+  const MED_EN::med_int * /* const int * */ index2 = myArray2->getIndex() ;
   for (int i=1; i<=NumberOfCell ; i++) {
     cout << " - " ;
     for (int j=index2[i-1];j<index2[i];j++)

@@ -49,7 +49,7 @@ double coords[108]=
    0.3485, 0.3485, 0.3485, 
    0.3485};
 
-int connNodalCellClassical[48]=
+MED_EN::med_int /*int*/ connNodalCellClassical[48]=
   { 1, 2, 3, 4, 10, 11, 12, 13, 
     4, 3, 7, 8, 13, 12, 16, 17, 
     10, 11, 12, 13, 19, 20, 21, 22, 
@@ -57,8 +57,8 @@ int connNodalCellClassical[48]=
     19, 20, 21, 22, 28, 29, 30, 31,
     22, 21, 25, 26, 31, 30, 34, 35 };
 
-int polyHedraInd[7]={1, 7, 13, 19, 25, 31, 37};
-int polyHedraFacesInd[37]={ 
+MED_EN::med_int /*int*/ polyHedraInd[7]={1, 7, 13, 19, 25, 31, 37};
+MED_EN::med_int /*int*/ polyHedraFacesInd[37]={ 
   1, 5, 9, 13, 17, 21, 
   25, 29, 33, 37, 41, 45, 
   49, 53, 57, 61, 65, 69, 
@@ -67,7 +67,7 @@ int polyHedraFacesInd[37]={
   121, 125, 129, 133, 137, 141, 
   145 };
 
-int polyHedraConn[144]={ 
+MED_EN::med_int /*int*/ polyHedraConn[144]={ 
   2, 3, 6, 5, 11, 14, 15, 12, 2, 5, 14, 11, 5, 6, 15, 14, 6, 3, 12, 15, 3, 2, 11, 12, 
   3, 7, 9, 6, 12, 15, 18, 16, 3, 6, 15, 12, 6, 9, 18, 15, 9, 7, 16, 18, 7, 3, 12, 16, 
   11, 12, 15, 14, 20, 23, 24, 21, 11, 14, 23, 20, 14, 15, 24, 23, 15, 12, 21, 24, 12, 11, 20, 21, 
@@ -75,7 +75,7 @@ int polyHedraConn[144]={
   20, 21, 24, 23, 29, 32, 33, 30, 20, 23, 32, 29, 23, 24, 33, 32, 24, 21, 30, 33, 21, 20, 29, 30, 
   21, 25, 27, 24, 30, 33, 36, 34, 21, 24, 33, 30, 24, 27, 36, 33, 27, 25, 34, 36, 25, 21, 30, 34 };
 
-int connNodalFaceClassical[116]=
+MED_EN::med_int /*int*/ connNodalFaceClassical[116]=
   { 1, 2, 3, 4, 
     10, 13, 12, 11, 
     1, 2, 11, 10, 
@@ -106,11 +106,11 @@ int connNodalFaceClassical[116]=
     25, 26, 35, 34, 
     26, 22, 31, 35};
 
-int cpolygonsIndex[24]=
+MED_EN::med_int /*int*/ cpolygonsIndex[24]=
   { 1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57, 61, 65, 69, 
     73, 77, 81, 85, 89, 93};
 
-int cpolygonsValue[92]=
+MED_EN::med_int /*int*/ cpolygonsValue[92]=
   {2, 5, 6, 3, 
    11, 12, 15, 14, 
    2, 5, 14, 11, 
@@ -135,15 +135,15 @@ int cpolygonsValue[92]=
    24, 27, 36, 33, 
    27, 25, 34, 36};
 
-int bottom[4]={1,7,30,35}; MED_EN::medGeometryElement bottomTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON }; int bottomIndex[3]={1,3,5}; int bottomNbOfElts[2]={2,2};
-int top[4]={21,26,46,50}; MED_EN::medGeometryElement topTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON }; int topIndex[3]={1,3,5}; int topNbOfElts[2]={2,2};
-int side[24]={ 3, 6, 10, 11, 13, 16, 19, 20, 22, 25, 28, 29, 32, 33, 37, 38, 40, 41, 44, 45, 
-	       47, 48, 51, 52}; MED_EN::medGeometryElement sideTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON }; int sideIndex[3]={1,13,25}; int sideNbOfElts[2]={12,12};
+MED_EN::med_int /*int*/ bottom[4]={1,7,30,35}; MED_EN::medGeometryElement bottomTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON }; MED_EN::med_int /*int*/ bottomIndex[3]={1,3,5}; int bottomNbOfElts[2]={2,2};
+MED_EN::med_int /*int*/ top[4]={21,26,46,50}; MED_EN::medGeometryElement topTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON }; MED_EN::med_int /*int*/ topIndex[3]={1,3,5}; int topNbOfElts[2]={2,2};
+MED_EN::med_int /*int*/ side[24]={ 3, 6, 10, 11, 13, 16, 19, 20, 22, 25, 28, 29, 32, 33, 37, 38, 40, 41, 44, 45, 
+				   47, 48, 51, 52}; MED_EN::medGeometryElement sideTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON }; MED_EN::med_int /*int*/ sideIndex[3]={1,13,25}; int sideNbOfElts[2]={12,12};
 
 using namespace MEDMEM;
 
-void addMedFacesGroup( MESHING& meshing, int nFaces, const int *groupValue,
-		       string groupName, const MED_EN::medGeometryElement *mytypes,  const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
+void addMedFacesGroup( MESHING& meshing, int nFaces, const MED_EN::med_int * /* const int * */groupValue,
+		       string groupName, const MED_EN::medGeometryElement *mytypes,  const MED_EN::med_int * /* const int * */index, const int *myNumberOfElements, int nbOfGeomTypes)
   {
     GROUP faces ;
     faces.setName(groupName) ;

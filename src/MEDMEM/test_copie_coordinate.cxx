@@ -107,7 +107,7 @@ int main (int argc, char ** argv) {
   if (spaceDimension >= 3) myCoordinatesUnits[2] = "m";
 
   //construction des indices des noeuds
-  int * myNodeNumber = new int[numberofNodes];
+  MED_EN::med_int * /* int * */ myNodeNumber = new MED_EN::med_int/*int*/[numberofNodes];
   for (int i=0; i<numberofNodes; i++)
     myNodeNumber[i]=numberofNodes-i-1;
 

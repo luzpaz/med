@@ -46,7 +46,7 @@ int main (int argc, char ** argv) {
     6.0, 0.0, -1.0,
     5.0, 1.0, -3.0};
 
-  const int REFnodalConnOfFaces[74] = {
+  const MED_EN::med_int /* const int */ REFnodalConnOfFaces[74] = {
     1, 2, 3, 4, 5, 6, // Polyhedron 1
     1, 7, 8, 2, 
     2, 8, 9, 3, 
@@ -68,11 +68,11 @@ int main (int argc, char ** argv) {
     8, 9, 17, 16, 
     9, 18, 17};
 
-  const int REFfacesIndex[20] = {
+  const MED_EN::med_int /* const int */ REFfacesIndex[20] = {
     1, 7, 11, 15, 19, 23, 27, 31, 34, 
     39, 44, 48, 52, 55, 58, 61, 64, 68, 72, 75};
 
-  const int REFpolyIndex[3] = {1, 10, 20};
+  const MED_EN::med_int /* const int */ REFpolyIndex[3] = {1, 10, 20};
 
   double PolygonCoordinates[27] = {
     2.0, 3.0, 12.0,
@@ -85,11 +85,11 @@ int main (int argc, char ** argv) {
     7.0, 2.0, 12.0,
     6.0, 0.0, 12.0};
 
-  const int REFpolygonFaces[11] = {
+  const MED_EN::med_int /* const int */ REFpolygonFaces[11] = {
     1, 2, 3, 4, 5, 6, // Polygon 1   
     7, 8, 9, 3, 2}; // Polygon 2
 
-  const int REFpolygonIndex[3] = {1, 7, 12};
+  const MED_EN::med_int /* const int */ REFpolygonIndex[3] = {1, 7, 12};
 
   MESHING myMeshing;
   myMeshing.setName("meshing");
@@ -118,7 +118,7 @@ int main (int argc, char ** argv) {
   myMeshing.setCoordinatesUnits(Units);
 
   const int sizeTetra = 4*1 ;
-  int ConnectivityTetra[sizeTetra]=
+  MED_EN::med_int /*int*/ ConnectivityTetra[sizeTetra]=
   {
     17, 9, 18, 19
   };
@@ -151,7 +151,7 @@ int main (int argc, char ** argv) {
   myPolygonMeshing.setCoordinatesUnits(Units);
 
   const int sizeTri = 3*2 ;
-  int ConnectivityTri[sizeTri]=
+  MED_EN::med_int /*int*/ ConnectivityTri[sizeTri]=
   {
     1, 7, 2, 3, 9, 4
   };

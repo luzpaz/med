@@ -195,7 +195,7 @@ public:
 				 const MED_EN::med_int* /* const int* */  PolyhedronConnectivity,
 				 const MED_EN::med_int* /* const int* */  PolyhedronIndex, int ConnectivitySize,
 				 int NumberOfPolyhedron,
-				 const MED_EN::med_int* /* const int* */ PolyhedronFacesIndex= (int*) NULL,
+				 const MED_EN::med_int* /* const int* */ PolyhedronFacesIndex= (MED_EN::med_int*/* int* */) NULL,
 				 int NumberOfFaces=0);
 
   inline bool   existConnectivity     (MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh Entity) const;

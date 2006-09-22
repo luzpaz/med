@@ -34,8 +34,8 @@ using namespace MEDMEM;
 using namespace MED_EN;
 
 #define INTERLACING_MODE FullInterlace
-int fct2(int i,const int * number) { return i;};
-int fct1(int i,const int * number) { return number[i]; };
+int fct2(int i,const MED_EN::med_int * /* const int * */ number) { return i;};
+int fct1(int i,const MED_EN::med_int * /* const int * */ number) { return number[i]; };
 
 void affiche_field_(FIELD_ * myField)
 {
@@ -105,7 +105,7 @@ template <>
 void affiche_fieldT(FIELD<double, FullInterlace> * myField)
 {
   const double * value = 0;
-  const int    * number = 0;
+  const MED_EN::med_int * /* const int    * */ number = 0;
 
   affiche_field_((FIELD_ *) myField);
   const SUPPORT * mySupport=myField->getSupport();
@@ -167,7 +167,7 @@ template <>
 void affiche_fieldT(FIELD<double, NoInterlace> * myField)
 {
   const double * value = 0;
-  const int    * number = 0;
+  const MED_EN::med_int * /* const int    * */ number = 0;
 
   affiche_field_((FIELD_ *) myField);
   const SUPPORT * mySupport=myField->getSupport();
@@ -203,7 +203,7 @@ void affiche_fieldT(FIELD<double, NoInterlace> * myField)
   }
 
 
-  int (* fct)(int,const int *);
+  int (* fct)(int,const MED_EN::med_int * /* const int * */);
 
   if (!onAll) {
     number = mySupport->getNumber(MED_ALL_ELEMENTS);
@@ -234,7 +234,7 @@ void affiche_fieldT2(FIELD< T,  INTERLACING_TAG> * myField)
 template <>
 void affiche_fieldT2(FIELD<double, FullInterlace> * myField)
 {
-  const int    * number = 0;
+  const MED_EN::med_int * /* const int    * */ number = 0;
 
   affiche_field_((FIELD_ *) myField);
   const SUPPORT * mySupport=myField->getSupport();
@@ -269,7 +269,7 @@ void affiche_fieldT2(FIELD<double, FullInterlace> * myField)
   }
 
 
-  int (* fct)(int,const int *);
+  int (* fct)(int,const MED_EN::med_int * /* const int * */);
 
   if (!onAll) {
     number = mySupport->getNumber(MED_ALL_ELEMENTS);

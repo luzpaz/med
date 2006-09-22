@@ -21,6 +21,8 @@
 #define __MEDMODULUSARRAY_H__
 
 #include "MEDMEM_Utilities.hxx"
+#include "MEDMEM_define.hxx"
+
 
 /*
   This class is use to set cyclic (modulus length) array.

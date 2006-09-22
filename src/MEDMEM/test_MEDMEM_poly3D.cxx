@@ -39,19 +39,19 @@ using namespace MED_EN;
 
 class SupportTester {
 private:
-  const int *_tabOfNodes;
-  vector<int> _eltsActiveYet;
+  const MED_EN::med_int * /* const int * */_tabOfNodes;
+  vector<MED_EN::med_int/*int*/> _eltsActiveYet;
   vector<int> _lgthOfEltsActiveYet;
 public:
-  SupportTester(const int *tabOfNodes, int nbOfElts, int nbOfNodesPerElt);
-  SupportTester(const int *tabOfNodes, int nbOfElts, const int *nbOfNodesPerElt);
-  bool isIncludedAndNotAlreadyConsumed(const int *tabOfNodesOfTheElementToTest);
+  SupportTester(const MED_EN::med_int * /* const int * */tabOfNodes, int nbOfElts, int nbOfNodesPerElt);
+  SupportTester(const MED_EN::med_int * /* const int * */tabOfNodes, int nbOfElts, const int *nbOfNodesPerElt);
+  bool isIncludedAndNotAlreadyConsumed(const MED_EN::med_int * /* const int * */tabOfNodesOfTheElementToTest);
   bool areAllEltsConsumed();
 private:
-  static bool areEquivalent(const int *nodes1, const int *nodes2, int nbOfNodes);
+  static bool areEquivalent(const MED_EN::med_int * /* const int * */nodes1, const MED_EN::med_int * /* const int * */nodes2, int nbOfNodes);
 };
 
-SupportTester::SupportTester(const int *tabOfNodes, int nbOfElts, int nbOfNodesPerElt):_tabOfNodes(tabOfNodes)
+SupportTester::SupportTester(const MED_EN::med_int * /* const int * */tabOfNodes, int nbOfElts, int nbOfNodesPerElt):_tabOfNodes(tabOfNodes)
 {
   for(int i=0;i<nbOfElts;i++)
     {
@@ -60,7 +60,7 @@ SupportTester::SupportTester(const int *tabOfNodes, int nbOfElts, int nbOfNodesP
     }
 }
 
-SupportTester::SupportTester(const int *tabOfNodes, int nbOfElts, const int *nbOfNodesPerElt):_tabOfNodes(tabOfNodes)
+SupportTester::SupportTester(const MED_EN::med_int * /* const int * */tabOfNodes, int nbOfElts, const int *nbOfNodesPerElt):_tabOfNodes(tabOfNodes)
 {
   int offset=0;
   for(int i=0;i<nbOfElts;i++)
@@ -70,10 +70,10 @@ SupportTester::SupportTester(const int *tabOfNodes, int nbOfElts, const int *nbO
     }
 }
 
-bool SupportTester::isIncludedAndNotAlreadyConsumed(const int *tabOfNodesOfTheElementToTest)
+bool SupportTester::isIncludedAndNotAlreadyConsumed(const MED_EN::med_int * /* const int * */tabOfNodesOfTheElementToTest)
 {
   vector<int>::iterator iter2=_lgthOfEltsActiveYet.begin();
-  for(vector<int>::iterator iter=_eltsActiveYet.begin();iter!=_eltsActiveYet.end();iter++)
+  for(vector<MED_EN::med_int/*int*/>::iterator iter=_eltsActiveYet.begin();iter!=_eltsActiveYet.end();iter++)
     if(areEquivalent(_tabOfNodes+(*iter),tabOfNodesOfTheElementToTest,*iter2))
       {
 	_eltsActiveYet.erase(iter);
@@ -92,7 +92,7 @@ bool SupportTester::areAllEltsConsumed()
   return _eltsActiveYet.size()==0;
 }
 
-bool SupportTester::areEquivalent(const int *nodes1, const int *nodes2, int nbOfNodes)
+bool SupportTester::areEquivalent(const MED_EN::med_int * /* const int * */nodes1, const MED_EN::med_int * /* const int * */nodes2, int nbOfNodes)
 {
   MEDMODULUSARRAY arr1(nbOfNodes,nodes1);
   MEDMODULUSARRAY arr2(nbOfNodes,nodes2);
@@ -122,15 +122,15 @@ int main (int argc, char ** argv)
   if(myMesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,MED_EN::MED_TETRA4)==1 && myMesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA)==2)
     nbOfPtsForTest++;
   const int REFnodalConnForTetra[4]={17, 9, 18, 19};
-  const int *connForTetraToTest=myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_TETRA4);
-  const int *connIndForTetraToTest=myMesh->getConnectivityIndex(MED_NODAL,MED_CELL);
+  const MED_EN::med_int * /* const int * */connForTetraToTest=myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_TETRA4);
+  const MED_EN::med_int * /* const int * */connIndForTetraToTest=myMesh->getConnectivityIndex(MED_NODAL,MED_CELL);
   for(i=connIndForTetraToTest[0]-1;i<connIndForTetraToTest[1]-1;i++)
     if(connForTetraToTest[i]==REFnodalConnForTetra[i])
       nbOfPtsForTest++;
   //6
-  const int *globIndex=myMesh->getPolyhedronIndex(MED_NODAL);
-  const int *nodalConnOfFaces=myMesh->getPolyhedronConnectivity(MED_NODAL);
-  const int *facesIndex=myMesh->getPolyhedronFacesIndex();
+  const MED_EN::med_int * /* const int * */globIndex=myMesh->getPolyhedronIndex(MED_NODAL);
+  const MED_EN::med_int * /* const int * */nodalConnOfFaces=myMesh->getPolyhedronConnectivity(MED_NODAL);
+  const MED_EN::med_int * /* const int * */facesIndex=myMesh->getPolyhedronFacesIndex();
   if(globIndex[1]-globIndex[0]==9 && globIndex[2]-globIndex[1]==10)// resp 9 faces and 10 faces are in polyh 1 and 2.
     nbOfPtsForTest++;
   //7
@@ -175,18 +175,18 @@ int main (int argc, char ** argv)
   FAMILY *fam1=*(iter++);
   FAMILY *fam2=*(iter++);
   FAMILY *fam3=*(iter);
-  const int *nbs;
+  const MED_EN::med_int * /* const int * */nbs;
   // family 1
   if(fam1->getNumberOfTypes()==1 && fam1->getTypes()[0]==MED_POLYGON && fam1->getNumberOfElements(MED_ALL_ELEMENTS)==3)
     nbOfPtsForTest++;
   nbs=fam1->getNumber(MED_ALL_ELEMENTS);
-  const int REFTabForPolyg[16]={1, 2, 3, 4, 5, 6, 10, 9, 8, 12, 11, 13, 14, 15, 3, 2};
+  const MED_EN::med_int /* const int */ REFTabForPolyg[16]={1, 2, 3, 4, 5, 6, 10, 9, 8, 12, 11, 13, 14, 15, 3, 2};
   const int REFTabForPolygLgth[3]={6,5,5};
   SupportTester test1(REFTabForPolyg,3,REFTabForPolygLgth);
   for(i=0;i<3;i++)
     {
       int lgth;
-      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
+      const MED_EN::med_int * /* const int * */conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test1.isIncludedAndNotAlreadyConsumed(conn))
 	nbOfPtsForTest++;
     }
@@ -196,12 +196,12 @@ int main (int argc, char ** argv)
   if(fam2->getNumberOfElements(MED_ALL_ELEMENTS)==8)
     nbOfPtsForTest++;
   nbs=fam2->getNumber(MED_ALL_ELEMENTS);
-  const int REFTabForQuad[32]={1, 7, 8, 2, 2, 8, 9, 3, 4, 3, 9, 10, 5, 4, 10, 11, 6, 5, 11, 12, 1, 6, 12, 7, 14, 13, 16, 17, 8, 9, 17, 16};
+  const MED_EN::med_int /* const int */ REFTabForQuad[32]={1, 7, 8, 2, 2, 8, 9, 3, 4, 3, 9, 10, 5, 4, 10, 11, 6, 5, 11, 12, 1, 6, 12, 7, 14, 13, 16, 17, 8, 9, 17, 16};
   SupportTester test2(REFTabForQuad,8,4);
   for(i=0;i<8;i++)
     {
       int lgth;
-      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
+      const MED_EN::med_int * /* const int * */conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test2.isIncludedAndNotAlreadyConsumed(conn))
 	nbOfPtsForTest++;
     }
@@ -211,12 +211,12 @@ int main (int argc, char ** argv)
   if(fam3->getNumberOfElements(MED_ALL_ELEMENTS)==6)
     nbOfPtsForTest++;
   nbs=fam3->getNumber(MED_ALL_ELEMENTS);
-  const int REFTabForTria[18]={7, 12, 8, 15, 14, 17, 15, 17, 18, 15, 18, 9, 3, 15, 9, 18, 17, 9};
+  const MED_EN::med_int /* const int */ REFTabForTria[18]={7, 12, 8, 15, 14, 17, 15, 17, 18, 15, 18, 9, 3, 15, 9, 18, 17, 9};
   SupportTester test3(REFTabForTria,6,3);
   for(i=0;i<6;i++)
     {
       int lgth;
-      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
+      const MED_EN::med_int * /* const int * */conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test3.isIncludedAndNotAlreadyConsumed(conn))
 	nbOfPtsForTest++;
     }

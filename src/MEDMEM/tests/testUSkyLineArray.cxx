@@ -35,13 +35,13 @@ int main (int argc, char ** argv)
   int NumberOfCell = 3 ; // 1 triangle,1 quadrangle,1 triangle
   int Size = 10 ;	 // 10 nodes
 
-  int * index = new int[NumberOfCell+1];
+  MED_EN::med_int * /* int * */ index = new MED_EN::med_int/*int*/[NumberOfCell+1];
   index[0]=1;
   index[1]=4;
   index[2]=8;
   index[3]=11;
 
-  int * value = new int[Size];
+  MED_EN::med_int * /* int * */ value = new MED_EN::med_int/*int*/[Size];
   value[0]=1; // first
   value[1]=2;
   value[2]=5;
@@ -55,7 +55,7 @@ int main (int argc, char ** argv)
 
   MEDSKYLINEARRAY * myArray = new MEDSKYLINEARRAY(NumberOfCell,Size,index,value) ;
 
-  const int * ArrayIndex ;
+  const MED_EN::med_int * /* const int * */ ArrayIndex ;
   try
   {
   	ArrayIndex = myArray->getIndex() ;
@@ -76,7 +76,7 @@ int main (int argc, char ** argv)
         return EXIT_FAILURE ;
   }
 
-  const int * ArrayValue ;
+  const MED_EN::med_int * /* const int * */ ArrayValue ;
   try
   {
         ArrayValue  = myArray->getValue() ;
@@ -143,7 +143,7 @@ int main (int argc, char ** argv)
   cout << "Show all :" << endl ;
   for (int i=1; i< NumberOfCell+1 ; i++) 
   {
-    const int * cell;
+    const MED_EN::med_int * /* const int * */ cell;
     try
     {
 	cell = myArray->getI(i) ;

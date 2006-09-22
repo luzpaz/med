@@ -93,7 +93,7 @@ int main (int argc, char ** argv) {
   myMeshing.setNumberOfElements(NumberOfElements,MED_CELL);
 
   const int sizeTetra = 12*4 ;
-  int ConnectivityTetra[sizeTetra]=
+  MED_EN::med_int /*int*/ ConnectivityTetra[sizeTetra]=
   {
     1,2,3,6,
     1,2,4,3,
@@ -111,7 +111,7 @@ int main (int argc, char ** argv) {
   
   myMeshing.setConnectivity(ConnectivityTetra,MED_CELL,MED_TETRA4);
 
-  int ConnectivityPyra[2*5]=
+  MED_EN::med_int /*int*/ ConnectivityPyra[2*5]=
   {
     7,8,9,10,2,
     15,18,17,16,19
@@ -119,7 +119,7 @@ int main (int argc, char ** argv) {
 
   myMeshing.setConnectivity(ConnectivityPyra,MED_CELL,MED_PYRA5);
 
-  int ConnectivityHexa[2*8]=
+  MED_EN::med_int /*int*/ ConnectivityHexa[2*8]=
   {
     11,12,13,14,7,8,9,10,
     15,16,17,18,11,12,13,14
@@ -138,7 +138,7 @@ int main (int argc, char ** argv) {
   myMeshing.setNumberOfElements(NumberOfFacesElements,MED_FACE);
 
   const int sizeTria = 3*4 ;
-  int ConnectivityTria[sizeTria]=
+  MED_EN::med_int /*int*/ ConnectivityTria[sizeTria]=
   {
     1,4,3,
     1,5,4,
@@ -148,7 +148,7 @@ int main (int argc, char ** argv) {
   
   myMeshing.setConnectivity(ConnectivityTria,MED_FACE,MED_TRIA3);
 
-  int ConnectivityQua[4*4]=
+  MED_EN::med_int /*int*/ ConnectivityQua[4*4]=
   {
     7,8,9,10,
     11,12,13,14,
@@ -178,8 +178,8 @@ int main (int argc, char ** argv) {
     myGroup.setGeometricType(myTypes);
     const int myNumberOfElements[1] = {4} ;
     myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[1+1] = {1,5} ;
-    const int value[4]= { 1,4,5,7} ;
+    const MED_EN::med_int /* const int */ index[1+1] = {1,5} ;
+    const MED_EN::med_int /* const int */ value[4]= { 1,4,5,7} ;
     myGroup.setNumber(index,value);
     
     myMeshing.addGroup(myGroup);
@@ -194,8 +194,8 @@ int main (int argc, char ** argv) {
     myGroup.setGeometricType(myTypes);
     const int myNumberOfElements[1] = {3} ;
     myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[1+1] = {1,4} ;
-    const int value[3]= { 2,3,6} ;
+    const MED_EN::med_int /* const int */ index[1+1] = {1,4} ;
+    const MED_EN::med_int /* const int */ value[3]= { 2,3,6} ;
     myGroup.setNumber(index,value);
     
     myMeshing.addGroup(myGroup);
@@ -212,8 +212,8 @@ int main (int argc, char ** argv) {
     myGroup.setGeometricType(myTypes);
     const int myNumberOfElements[3] = {4,1,2} ;
     myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[3+1] = {1,5,6,8} ;
-    const int value[4+1+2]=
+    const MED_EN::med_int /* const int */ index[3+1] = {1,5,6,8} ;
+    const MED_EN::med_int /* const int */ value[4+1+2]=
     {
       2,7,8,12,
       13,
@@ -233,8 +233,8 @@ int main (int argc, char ** argv) {
     myGroup.setGeometricType(myTypes);
     const int myNumberOfElements[] = {4,1} ;
     myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[2+1] = {1,5,6} ;
-    const int value[4+1]=
+    const MED_EN::med_int /* const int */ index[2+1] = {1,5,6} ;
+    const MED_EN::med_int /* const int */ value[4+1]=
     {
       3,4,5,9,
       14
@@ -255,8 +255,8 @@ int main (int argc, char ** argv) {
     myGroup.setGeometricType(myTypes);
     const int myNumberOfElements[2] = {2,3} ;
     myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[2+1] = {1,3,6} ;
-    const int value[2+3]=
+    const MED_EN::med_int /* const int */ index[2+1] = {1,3,6} ;
+    const MED_EN::med_int /* const int */ value[2+3]=
     {
       2,4,
       5,6,8
@@ -275,8 +275,8 @@ int main (int argc, char ** argv) {
     myGroup.setGeometricType(myTypes);
     const int myNumberOfElements[1] = {2} ;
     myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[1+1] = {1,3} ;
-    const int value[2]=
+    const MED_EN::med_int /* const int */ index[1+1] = {1,3} ;
+    const MED_EN::med_int /* const int */ value[2]=
     {
       1,3
     } ;
