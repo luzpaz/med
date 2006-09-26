@@ -775,7 +775,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   // Pour tester les profils aussi ?
   vector< MED_EN::medGeometryElement >  meshGeoType;
   vector< int >  meshNbOfElOfType;
-  getMeshGeometricType(id,meshName,mySupport->getEntity(),meshGeoType,meshNbOfElOfType);
+  MED_FIELD_DRIVER21<T>::getMeshGeometricType(id,meshName,mySupport->getEntity(),meshGeoType,meshNbOfElOfType);
   vector<MED_EN::medGeometryElement> supGeoType(mySupport->getTypes(),
                                                 mySupport->getTypes()+mySupport->getNumberOfTypes());
   vector < int > supNbOfElOfType(mySupport->getNumberOfElements(),
