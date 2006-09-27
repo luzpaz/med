@@ -47,7 +47,7 @@ MEDprofilLire(med_idt fid,med_int *pflval, char *nom)
   /*
    * Lecture du profil
    */
-#if defined(IRIX64)||defined(OSF1)
+#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
   if ((ret =  _MEDdatasetNumLire(pid,MED_NOM_PFL,MED_INT64,
 				 MED_NO_INTERLACE,1,MED_ALL,
 				 MED_NOPF,0,MED_NOPG,
