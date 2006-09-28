@@ -57,7 +57,7 @@ public:
 
 
 MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const MED_EN::med_int* /* const int * */ array) : 
-  _length(length), _array(array)
+  _length(length), _array(array), _length2(0)
 {
 //    SCRUTE(_length);
 //    for (int i=0;i<_length;i++){
