@@ -19,7 +19,7 @@
 #include "med_outils.hxx"
 #include "med.hxx"
 
-#if defined(IRIX64)
+#if defined(IRIX64)||defined(PCLINUX64)
 #define MED_INTEGER MED_INT64
 #else
 #define MED_INTEGER MED_INT32

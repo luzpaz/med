@@ -945,7 +945,7 @@ int main (int argc, char **argv)
 	    /* affichage des resultats */
 	    if (ret == 0)
 	      {
-		fprintf(stdout,"\n- Aretes de type %d : ", nomare[i]);
+		fprintf(stdout,"\n- Aretes de type %s : ", nomare[i]);
 		fprintf(stdout,"\n  - Connectivité : \n");
 		for (j=0;j<naretes[i]*taille;j++)
 		  fprintf(stdout," %d ",*(connectivite+j));

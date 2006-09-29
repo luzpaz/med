@@ -56,9 +56,9 @@ _MEDattrNumEcrire(med_idt pere,med_type_champ type,char *nom,unsigned char *val,
       break;
       
     case MED_INT :
-#if defined(IRIX64) || defined(OSF1)
+#if defined(IRIX64) || defined(OSF1) || defined(PCLINUX64)
       type_hdf = H5T_NATIVE_LONG; 
-#elif defined(PCLINUX) || defined(PCLINUX64) || defined(PCLINUX64_32)
+#elif defined(PCLINUX) || defined(PCLINUX64_32)
       /* This explicit convertion avoid a core dump between in HDF&ASTER when reading on SGI
 	 a file written under a PCLINUX system (in founction H5Tconvert),
 	 we don't know yet if it is an HDF bug or an ASTER one */
@@ -93,7 +93,7 @@ _MEDattrNumEcrire(med_idt pere,med_type_champ type,char *nom,unsigned char *val,
   if ((ret = H5Aclose(attr)) < 0)
     return -1;
 
-#if defined(PCLINUX) || defined(PCLINUX64) || defined(PCLINUX64_32)
+#if defined(PCLINUX) || defined(PCLINUX64_32)
   /* This explicit convertion cancel the previous on which avoid a mysterious bug between HDF&ASTER when reading
      a file written under a PCLINUX system, we don't know yet if it is an HDF bug or an ASTER one */  
   if (type == MED_INT) 
