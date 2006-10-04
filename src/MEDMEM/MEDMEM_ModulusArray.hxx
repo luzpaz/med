@@ -49,7 +49,7 @@ public:
   MEDMODULUSARRAY(int vertexLength, int totalLength, const MED_EN::med_int* /* const int * */ array);
   ~MEDMODULUSARRAY() ;
 
-  const int & operator[](const int &i) const ;
+  const int operator[](const int &i) const ;
 
   int compare(const MEDMODULUSARRAY &modulusArray) const;
 
@@ -77,7 +77,7 @@ MEDMODULUSARRAY::~MEDMODULUSARRAY()
 };
 
 
-const int & MEDMODULUSARRAY::operator[](const int &i) const
+const int MEDMODULUSARRAY::operator[](const int &i) const
 {
   //int position = i%_length ;
   int position = i%_length2 ;
