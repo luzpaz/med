@@ -637,7 +637,7 @@ int  MED_MESH_RDONLY_DRIVER22::getCOORDINATE()
 	for(med_2_2::med_int i2=0;i2<NumberOfNodes;i2++)
 	  _ptrMesh->_coordinate->_nodeNumber[i2]=(int)(tmp_node_number[i2]);
 #else
-	memcpy((MED_EN::med_int*/* int* */)_ptrMesh->_coordinate->_nodeNumber,tmp_node_number,sizeof(int)*NumberOfNodes) ;
+	memcpy((MED_EN::med_int*/* int* */)_ptrMesh->_coordinate->_nodeNumber,tmp_node_number,sizeof(MED_EN::med_int/*int*/)*NumberOfNodes) ;
 #endif
 	
 	//////////////////////////////////////////////////////////////////////////////////////

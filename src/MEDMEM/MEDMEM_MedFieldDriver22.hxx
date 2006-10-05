@@ -842,8 +842,8 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 				   <<") differs from FIELD object type (" <<
 				   MED_FIELD_DRIVER<T>::_ptrField->_valueType << ")" )) ;
     }
-#if defined(IRIX64) || defined(OSF1) ||defined(VPP5000)
-    if (_ptrField->_valueType==MED_EN::MED_INT32 )
+#if defined(IRIX64) || defined(OSF1) ||defined(VPP5000) || defined(PCLINUX64) || defined(PCLINUX64_32)
+    if (MED_FIELD_DRIVER<T>::_ptrField->_valueType==MED_EN::MED_INT32 )
       needConversionToInt64=true;
 #endif
     break;

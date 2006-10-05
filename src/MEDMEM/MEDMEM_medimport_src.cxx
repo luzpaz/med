@@ -866,7 +866,7 @@ void med_2_2::MAJ_elements_maillage(med_idt mid, med_int dimension)
       if(old_conn == NULL)
 	throw MEDEXCEPTION("Problem in the med File convertor 2.1 to 2.2, you should check the med File you wanted to mount in memory");
 
-#if defined(IRIX64)||defined(OSF1)
+#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
       ret = OLD_MEDdatasetNumLire(gid,MED_NOM_NOD,MED_INT64,
 				  MED_NO_INTERLACE,(med_size)taille,MED_ALL,
 				  0,NULL,MED_NOPG,
@@ -889,7 +889,7 @@ void med_2_2::MAJ_elements_maillage(med_idt mid, med_int dimension)
       for (j=0;j<n*taille;j++)
 	*(conn+j) = *(old_conn+j);
       dimd[0] = n*taille;
-#if defined(IRIX64)||defined(OSF1)
+#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
       ret = _MEDdatasetNumEcrire(gid,"TMP",MED_INT64,MED_NO_INTERLACE,
 				 taille,MED_ALL,MED_NOPF,MED_NO_PFLMOD,0,MED_NOPG,dimd,
 				 (unsigned char*) conn);
