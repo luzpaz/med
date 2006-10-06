@@ -79,11 +79,11 @@ MEDMODULUSARRAY::~MEDMODULUSARRAY()
 
 const int MEDMODULUSARRAY::operator[](const int &i) const
 {
-  //int position = i%_length ;
-  int position = i%_length2 ;
+  int position = i%_length ;
+  //int position = i%_length2 ;
   if (position < 0)
-    //position+=_length ;
-    position += _length2 ;
+    position+=_length ;
+  //position += _length2 ;
   return _array[position] ;
 };
 
