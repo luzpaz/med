@@ -561,9 +561,9 @@ SCRUTE(elt2);
 		else
 		{
 MESSAGE("MED_NODAL");
-                         const MED_EN::med_int * /* int * */ tab=_mesh->getConnectivityIndex(
-											     convertIdlConnToMedConn(mode),
-											     convertIdlEntToMedEnt(entity));
+			const int * tab=_mesh->getConnectivityIndex(
+				convertIdlConnToMedConn(mode),
+				convertIdlEntToMedEnt(entity));
 			nbelements = elt1*(convertIdlEltToMedElt(geomElement)%100);
 			//			nbelements = tab[elt1 ] - 1 ;
 		}
@@ -571,10 +571,10 @@ SCRUTE(entity);
 SCRUTE(geomElement);
 SCRUTE(nbelements);
                 myseq->length(nbelements);
-                const MED_EN::med_int * /* int * */ numbers=_mesh->getConnectivity(convertIdlModeToMedMode(typeSwitch),
-										   convertIdlConnToMedConn(mode),
-										   convertIdlEntToMedEnt(entity),
-										   convertIdlEltToMedElt(geomElement));
+                const int * numbers=_mesh->getConnectivity(convertIdlModeToMedMode(typeSwitch),
+						     convertIdlConnToMedConn(mode),
+						     convertIdlEntToMedEnt(entity),
+						     convertIdlEltToMedElt(geomElement));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -611,11 +611,11 @@ throw (SALOME::SALOME_Exception)
 						 convertIdlConnToMedConn(mode),
 						 convertIdlEntToMedEnt(entity),
 						 convertIdlEltToMedElt(geomElement));
-      const MED_EN::med_int * /* int * */ numbers=_mesh->getConnectivity(convertIdlModeToMedMode(typeSwitch),
-									 convertIdlConnToMedConn(mode),
-									 convertIdlEntToMedEnt(entity),
-									 convertIdlEltToMedElt(geomElement));
-      ret=SenderFactory::buildSender(*this,(int*)numbers,nbelements);
+      const int * numbers=_mesh->getConnectivity(convertIdlModeToMedMode(typeSwitch),
+						 convertIdlConnToMedConn(mode),
+						 convertIdlEntToMedEnt(entity),
+						 convertIdlEltToMedElt(geomElement));
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
     }
   catch (MEDEXCEPTION &ex)
     {
@@ -647,9 +647,9 @@ SALOME::SenderInt_ptr MESH_i::getSenderForPolygonsConnectivity(SALOME_MED::medCo
     {
       int nbelements = _mesh->getPolygonsConnectivityLength(convertIdlConnToMedConn(mode),
                                                             convertIdlEntToMedEnt(entity));
-      const MED_EN::med_int * /* int * */ numbers=_mesh->getPolygonsConnectivity (convertIdlConnToMedConn(mode),
-										  convertIdlEntToMedEnt(entity));
-      ret=SenderFactory::buildSender(*this,(int*)numbers,nbelements);
+      const int * numbers=_mesh->getPolygonsConnectivity (convertIdlConnToMedConn(mode),
+                                                          convertIdlEntToMedEnt(entity));
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
     }
   catch (MEDEXCEPTION &ex)
     {
@@ -680,9 +680,9 @@ SALOME::SenderInt_ptr MESH_i::getSenderForPolygonsConnectivityIndex(SALOME_MED::
   try
     {
       int nbelements = _mesh->getNumberOfPolygons() + 1;
-      const MED_EN::med_int * /* int * */ numbers=_mesh->getPolygonsConnectivityIndex (convertIdlConnToMedConn(mode),
-										       convertIdlEntToMedEnt(entity));
-      ret=SenderFactory::buildSender(*this,(int*)numbers,nbelements);
+      const int * numbers=_mesh->getPolygonsConnectivityIndex (convertIdlConnToMedConn(mode),
+                                                               convertIdlEntToMedEnt(entity));
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
     }
   catch (MEDEXCEPTION &ex)
     {
@@ -709,8 +709,8 @@ SALOME::SenderInt_ptr MESH_i::getSenderForPolyhedronConnectivity(SALOME_MED::med
   try
     {
       int nbelements = _mesh->getPolyhedronConnectivityLength(convertIdlConnToMedConn(mode));
-      const MED_EN::med_int * /* int * */ numbers=_mesh->getPolyhedronConnectivity( convertIdlConnToMedConn(mode) );
-      ret=SenderFactory::buildSender(*this,(int*)numbers,nbelements);
+      const int * numbers=_mesh->getPolyhedronConnectivity( convertIdlConnToMedConn(mode) );
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
     }
   catch (MEDEXCEPTION &ex)
     {
@@ -737,8 +737,8 @@ SALOME::SenderInt_ptr MESH_i::getSenderForPolyhedronIndex(SALOME_MED::medConnect
   try
     {
       int nbelements = _mesh->getNumberOfPolyhedron() + 1;
-      const MED_EN::med_int * /* int * */ numbers = _mesh->getPolyhedronIndex( convertIdlConnToMedConn( mode ) );
-      ret=SenderFactory::buildSender(*this,(int*)numbers,nbelements);
+      const int * numbers = _mesh->getPolyhedronIndex( convertIdlConnToMedConn( mode ) );
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
     }
   catch (MEDEXCEPTION &ex)
     {
@@ -765,8 +765,8 @@ SALOME::SenderInt_ptr MESH_i::getSenderForPolyhedronFacesIndex()
   try
     {
       int nbelements = _mesh->getNumberOfPolyhedronFaces() + 1;
-      const MED_EN::med_int * /* int * */ numbers=_mesh->getPolyhedronFacesIndex();
-      ret=SenderFactory::buildSender(*this,(int*)numbers,nbelements);
+      const int * numbers=_mesh->getPolyhedronFacesIndex();
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
     }
   catch (MEDEXCEPTION &ex)
     {
@@ -797,8 +797,8 @@ throw (SALOME::SALOME_Exception)
 					convertIdlEntToMedEnt(entity),
 					MED_ALL_ELEMENTS);
                 myseq->length(nbelements);
-                const MED_EN::med_int * /* int * */ numbers=_mesh->getConnectivityIndex(convertIdlConnToMedConn(mode),
-											convertIdlEntToMedEnt(entity));
+                const int * numbers=_mesh->getConnectivityIndex(convertIdlConnToMedConn(mode),
+						          convertIdlEntToMedEnt(entity));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -827,7 +827,7 @@ throw (SALOME::SALOME_Exception)
         {
                 int nbelements = _mesh->getNumberOfTypes( convertIdlEntToMedEnt(entity)) + 1;
                 myseq->length(nbelements);
-                const MED_EN::med_int * /* int * */ numbers=_mesh->getGlobalNumberingIndex( convertIdlEntToMedEnt(entity));
+                const int * numbers=_mesh->getGlobalNumberingIndex( convertIdlEntToMedEnt(entity));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -891,7 +891,7 @@ throw (SALOME::SALOME_Exception)
                 int nbelements=_mesh->getReverseConnectivityLength(convertIdlConnToMedConn(mode));
 		SCRUTE(nbelements);
                 myseq->length(nbelements);
-                const MED_EN::med_int * /* int * */ numbers=_mesh->getReverseConnectivity(convertIdlConnToMedConn(mode));
+                const int * numbers=_mesh->getReverseConnectivity(convertIdlConnToMedConn(mode));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -920,7 +920,7 @@ throw (SALOME::SALOME_Exception)
         {
                 int nbelements=_mesh->getReverseConnectivityIndexLength(convertIdlConnToMedConn(mode));
                 myseq->length(nbelements);
-                const MED_EN::med_int * /* int * */ numbers=_mesh->getReverseConnectivityIndex(convertIdlConnToMedConn(mode));
+                const int * numbers=_mesh->getReverseConnectivityIndex(convertIdlConnToMedConn(mode));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];

@@ -72,7 +72,7 @@ public:
   virtual const double *  getCoordinates(MED_EN::medModeSwitch Mode);
   virtual double          getCoordinate(int Number,int Axis);
   virtual const double *  getCoordinateAxis(int Axis);
-  virtual const MED_EN::med_int* /* int* */      getNodesNumbers() const;
+  virtual const int*      getNodesNumbers() const;
 
 };
 };

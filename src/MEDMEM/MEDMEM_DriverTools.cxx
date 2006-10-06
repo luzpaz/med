@@ -398,7 +398,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
     medEntityMesh entity;
     medGeometryElement * types=NULL; // pointeurs pour allouer les structures MED
     int * count=NULL;
-    MED_EN::med_int* /* int * */ connectivity=NULL;
+    int * connectivity=NULL;
     CONNECTIVITY *Connectivity, *Constituent;
     //int dimension_maillage_moin_2=maillage.rbegin()->dimension() - 2;
 
@@ -495,7 +495,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 	    // pour chaque type géometrique k, copie des sommets dans connectivity et set dans Connectivity
 	    int nbSommetsParMaille = j->sommets.size();
 	    int n, nbSommets = vcount[k] * j->sommets.size();
-	    connectivity = new MED_EN::med_int/*int*/[ nbSommets ];
+	    connectivity = new int[ nbSommets ];
 	    for (int l=0; l!=vcount[k]; ++l)
 	    {
                 if ( entity==MED_NODE )
@@ -684,8 +684,8 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     }
 
     MED_EN::medGeometryElement * tab_types_geometriques = new MED_EN::medGeometryElement[nb_geometric_types];
-    MED_EN::med_int* /* int * */ tab_index_types_geometriques = new MED_EN::med_int/*int*/[nb_geometric_types+1];
-    MED_EN::med_int* /* int * */ tab_numeros_elements = new MED_EN::med_int/*int*/[mailleSet.size()];
+    int * tab_index_types_geometriques = new int[nb_geometric_types+1];
+    int * tab_numeros_elements = new int[mailleSet.size()];
     int * tab_nombres_elements = new int[nb_geometric_types];
 
     //Remplit tableaux entree des methodes set
@@ -790,9 +790,9 @@ void _intermediateMED::getFamilies(std::vector<FAMILY *> & _famCell,
     medEntityMesh    entity = i->getEntity( dimension_maillage );
 
     std::vector<medGeometryElement> tab_types_geometriques;
-    std::vector<MED_EN::med_int/*int*/> tab_index_types_geometriques;
+    std::vector<int> tab_index_types_geometriques;
     std::vector<int> tab_nombres_elements;
-    std::vector<MED_EN::med_int/*int*/> tab_numeros_elements;
+    std::vector<int> tab_numeros_elements;
 
     int iMa = 1, nbtype = 0;
     tab_types_geometriques.push_back( type );

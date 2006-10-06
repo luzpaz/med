@@ -84,14 +84,14 @@ int main (int argc, char ** argv)
       myMeshing.setTypes(Types,MED_CELL);
       myMeshing.setNumberOfElements(NumberOfElements,MED_CELL);
 
-      MED_EN::med_int /*int*/ ConnectivityTria[1*3]=
+      int ConnectivityTria[1*3]=
 	{
 	  7,4,1
 	};
 
       myMeshing.setConnectivity(ConnectivityTria,MED_CELL,MED_TRIA3);
 
-      MED_EN::med_int /*int*/ ConnectivityQuad[4*4]=
+      int ConnectivityQuad[4*4]=
 	{
 	  4,5,2,1,
 	  5,6,3,2,
@@ -108,11 +108,11 @@ int main (int argc, char ** argv)
 
       // then define eventuel polygonal cells
 
-      MED_EN::med_int /*int*/ ConnectivityPolygon[1*5]=
+      int ConnectivityPolygon[1*5]=
 	{
 	  9,11,10,3,6
 	};
-      MED_EN::med_int /*int*/ ConnectivityPolygonIndex[2]=
+      int ConnectivityPolygonIndex[2]=
 	{
 	  1,6
 	};

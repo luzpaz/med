@@ -56,7 +56,7 @@ void FAMILYClient::blankCopy(bool blankSupport)
   setIdentifier(IOR_Family->getIdentifier());
 
   int nAttr, nGr, n;
-  MED_EN::med_int * /* int * */i;
+  int *i;
   std::string *s;
 
   nAttr = IOR_Family->getNumberOfAttributes();

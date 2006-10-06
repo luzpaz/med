@@ -214,7 +214,7 @@ void VTK_MESH_DRIVER::write(void) const
   //  int connectivity_sum = 0 ;
 
   //const int * connectivity = _ptrMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS) ; !! UNUSED VARIABLE !!
-  const MED_EN::med_int* /* const int * */ connectivityIndex = _ptrMesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
+  const int * connectivityIndex = _ptrMesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
 
   int connectivity_sum =  connectivityIndex[cells_sum]-1 ;
 
@@ -318,7 +318,7 @@ void VTK_MESH_DRIVER::write(void) const
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getName() ) ) ;
     int nodes_cell = cells_type[i].getNumberOfNodes();
     int numberOfCell = _ptrMesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
-    const MED_EN::med_int* /* const int * */ connectivityArray = _ptrMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
+    const int * connectivityArray = _ptrMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
     for (int j=0;j<numberOfCell;j++) {
       (*_vtkFile) << nodes_cell << " " ;
       for (int k=0;k<nodes_cell;k++)

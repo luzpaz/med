@@ -63,7 +63,7 @@ int main (int argc, char ** argv)
   units[1]=" m ";
   units[2]=" m ";
 
-  MED_EN::med_int * /* int * */ numbers=new MED_EN::med_int/*int*/[5];
+  int * numbers=new int[5];
   for (int i=0; i< 5; i++) numbers[i] =10+i;
 
   MED_EN::medModeSwitch ModeFull=MED_EN::MED_FULL_INTERLACE;

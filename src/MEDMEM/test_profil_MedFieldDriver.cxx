@@ -58,7 +58,7 @@ void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
 		    const SUPPORT * mySupport)
 {
   const double * value = 0;
-  const MED_EN::med_int * /* const int    * */ number = 0;
+  const int    * number = 0;
 
   affiche_field_((FIELD_ *) myField, mySupport);
 

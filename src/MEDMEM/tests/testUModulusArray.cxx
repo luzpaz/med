@@ -34,7 +34,7 @@ int main (int argc, char ** argv)
 
   using namespace std ;
 
-  MED_EN::med_int /*int*/ array[5]={0,1,2,1,4} ;
+  int array[5]={0,1,2,1,4} ;
   MEDMODULUSARRAY modulusArray(5,array);
 
   cout << " ModulusArray : " << endl;
@@ -50,7 +50,7 @@ int main (int argc, char ** argv)
   // ------------
 
   int ret ;
-  MED_EN::med_int /*int*/ array2[5]={1,4,0,1,2} ;
+  int array2[5]={1,4,0,1,2} ;
   MEDMODULUSARRAY modulusArray2(5,array2) ;
 
   cout << " Test compare : mêmes tableaux mêmes ordres ..." << endl; 
@@ -89,7 +89,7 @@ int main (int argc, char ** argv)
     cout << endl;
   }
 
-  MED_EN::med_int /*int*/ array3[5]={1,2,1,0,4} ;
+  int array3[5]={1,2,1,0,4} ;
   MEDMODULUSARRAY modulusArray3(5,array3) ;
 
   cout << " Test compare : mêmes tableaux ordres inverses ..." << endl; 
@@ -128,7 +128,7 @@ int main (int argc, char ** argv)
     cout << endl;
   }
 
-  MED_EN::med_int /*int*/ array4[6]={1,2,1,0} ;
+  int array4[6]={1,2,1,0} ;
   MEDMODULUSARRAY modulusArray4(4,array4) ;
 
   cout << " Test compare : Tableaux de differentes tailles ... " << endl;
@@ -166,7 +166,7 @@ int main (int argc, char ** argv)
     cout << endl;
   }
   
-  MED_EN::med_int /*int*/ array5[5]={1,2,1,0,1} ;
+  int array5[5]={1,2,1,0,1} ;
   MEDMODULUSARRAY modulusArray5(5,array5) ;
   cout << " Test compare : tableaux differents de même taille ..." << endl;
   try
@@ -205,7 +205,7 @@ int main (int argc, char ** argv)
 
   //  test small array :
   //  taille 1
-  MED_EN::med_int /*int*/ array6[1]={1} ;
+  int array6[1]={1} ;
   MEDMODULUSARRAY modulusArray6(1,array6);
 
   cout << " ModulusArray  1 : " << endl;
@@ -217,7 +217,7 @@ int main (int argc, char ** argv)
   }
   cout << endl;
 
-  MED_EN::med_int /*int*/ array7[1]={1} ;
+  int array7[1]={1} ;
   MEDMODULUSARRAY modulusArray7(1,array7);
 
   cout << " Test compare : mêmes tableaux mêmes ordres ..." << endl;
@@ -255,7 +255,7 @@ int main (int argc, char ** argv)
     cout << endl;
   }
 
-  MED_EN::med_int /*int*/ array8[1]={2} ;
+  int array8[1]={2} ;
   MEDMODULUSARRAY modulusArray8(1,array8);
 
    cout << " Test compare : tableaux differents "<< endl;
@@ -295,7 +295,7 @@ int main (int argc, char ** argv)
 
   
   // 2
-  MED_EN::med_int /*int*/ array60[2]={1,2} ;
+  int array60[2]={1,2} ;
   MEDMODULUSARRAY modulusArray60(2,array60);
 
 
@@ -308,7 +308,7 @@ int main (int argc, char ** argv)
   }
   cout << endl;
 
-  MED_EN::med_int /*int*/ array70[2]={1,2} ;
+  int array70[2]={1,2} ;
   MEDMODULUSARRAY modulusArray70(2,array70);
   cout << " Test compare : mêmes tableaux mêmes ordres ..." << endl;
 
@@ -346,7 +346,7 @@ int main (int argc, char ** argv)
     cout << endl;
   }
 
-  MED_EN::med_int /*int*/ array80[2]={2,2} ;
+  int array80[2]={2,2} ;
   MEDMODULUSARRAY modulusArray80(2,array80);
 
   cout << " Test compare : tableaux differents  ..." << endl;
@@ -385,7 +385,7 @@ int main (int argc, char ** argv)
     cout << endl;
   }
 
-  MED_EN::med_int /*int*/ array90[2]={2,1} ;
+  int array90[2]={2,1} ;
   MEDMODULUSARRAY modulusArray90(2,array90);
   cout << " Test compare : tableaux differents ordres inverses ..." << endl;
   try

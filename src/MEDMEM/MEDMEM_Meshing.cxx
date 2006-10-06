@@ -251,7 +251,7 @@ void MESHING::setNumberOfElements(const int * NumberOfElements,
   Example : setConnectivity({1,2,3,1,4,2},MED_FACE,MED_TRIA3)
   Define 2 triangles face defined with nodes 1,2,3 and 1,4,2.
 */
-void MESHING::setConnectivity(const MED_EN::med_int* /* const int * */ Connectivity,
+void MESHING::setConnectivity(const int * Connectivity,
 			      const medEntityMesh Entity,
 			      const medGeometryElement Type)
   throw (MEDEXCEPTION)
@@ -267,8 +267,8 @@ void MESHING::setConnectivity(const MED_EN::med_int* /* const int * */ Connectiv
   _connectivity->setNodal(Connectivity,Entity,Type) ;
 }
 
-void MESHING::setPolygonsConnectivity     (const MED_EN::med_int* /* const int * */ ConnectivityIndex,
-					   const MED_EN::med_int* /* const int * */ ConnectivityValue,
+void MESHING::setPolygonsConnectivity     (const int * ConnectivityIndex,
+					   const int * ConnectivityValue,
 					   int nbOfPolygons,
 					   const MED_EN::medEntityMesh Entity)
   throw (MEDEXCEPTION)
@@ -279,9 +279,9 @@ void MESHING::setPolygonsConnectivity     (const MED_EN::med_int* /* const int *
   _connectivity->setPolygonsConnectivity(MED_NODAL, Entity, ConnectivityValue, ConnectivityIndex,ConnectivityIndex[nbOfPolygons]-1,nbOfPolygons) ;
 }
 
-void MESHING::setPolyhedraConnectivity     (const MED_EN::med_int* /* const int * */ PolyhedronIndex,
-					    const MED_EN::med_int* /* const int * */ FacesIndex,
-					    const MED_EN::med_int* /* const int * */ Nodes,
+void MESHING::setPolyhedraConnectivity     (const int * PolyhedronIndex,
+					    const int * FacesIndex,
+					    const int * Nodes,
 					    int nbOfPolyhedra,
 					    const MED_EN::medEntityMesh Entity)
   throw (MEDEXCEPTION)

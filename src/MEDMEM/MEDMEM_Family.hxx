@@ -57,14 +57,14 @@ protected :
     There is one for each attribute.
     \endif
   */ 
-  PointerOf<MED_EN::med_int/*int*/>    _attributeIdentifier ;
+  PointerOf<int>    _attributeIdentifier ;
   /*!
     \if developper
     Array of all attributes' values.
     There is one for each attribute.
     \endif
   */
-  PointerOf<MED_EN::med_int/*int*/>    _attributeValue ;
+  PointerOf<int>    _attributeValue ;
   /*!
     \if developper
     Array of all attributes' descriptions.
@@ -94,13 +94,13 @@ public:
     \endif
   */
   FAMILY( MESH* Mesh, int Identifier, string Name, 
-	  int NumberOfAttribute, MED_EN::med_int * /* int * */AttributeIdentifier,
-          MED_EN::med_int * /* int * */AttributeValue, string AttributeDescription,
+	  int NumberOfAttribute, int *AttributeIdentifier,
+          int *AttributeValue, string AttributeDescription,
           int NumberOfGroup,   string GroupName,
-	  MED_EN::med_int * /* int * */ MEDArrayNodeFamily,
-	  MED_EN::med_int ** /* int ** */ MEDArrayCellFamily,
-	  MED_EN::med_int ** /* int ** */ MEDArrayFaceFamily,
-	  MED_EN::med_int ** /* int ** */ MEDArrayEdgeFamily
+	  int * MEDArrayNodeFamily,
+	  int ** MEDArrayCellFamily,
+	  int ** MEDArrayFaceFamily,
+	  int ** MEDArrayEdgeFamily
 	  ) ;
 
 			/*! Copy Constructor. */
@@ -116,23 +116,23 @@ public:
 
   friend ostream & operator<<(ostream &os, const FAMILY &my) ;
 
-  bool build(MED_EN::medEntityMesh Entity,MED_EN::med_int ** /* int ** */FamilyNumber);
+  bool build(MED_EN::medEntityMesh Entity,int **FamilyNumber);
 
   // Il faudrait mettre en cohérence les méthodes set
   // avec l'opérateur d'affection ! Rmq from EF !!!
 
   inline void setIdentifier             (int Identifier);        
   inline void setNumberOfAttributes     (int NumberOfAttribute);
-  inline void setAttributesIdentifiers  (MED_EN::med_int * /* int * */ AttributeIdentifier);
-  inline void setAttributesValues       (MED_EN::med_int * /* int * */ AttributeValue);
+  inline void setAttributesIdentifiers  (int * AttributeIdentifier);
+  inline void setAttributesValues       (int * AttributeValue);
   inline void setAttributesDescriptions (string * AttributeDescription); 
   inline void setNumberOfGroups         (int NumberOfGroups);
   inline void setGroupsNames            (string * GroupName);
 
   inline int      getIdentifier()                    const;
   inline int      getNumberOfAttributes()            const;
-  inline const MED_EN::med_int * /* int * */    getAttributesIdentifiers()   const;
-  inline const MED_EN::med_int * /* int * */    getAttributesValues()        const;
+  inline const int *    getAttributesIdentifiers()   const;
+  inline const int *    getAttributesValues()        const;
   inline const string * getAttributesDescriptions()  const;
   inline int      getNumberOfGroups()                const;
   inline const string * getGroupsNames()             const;
@@ -163,7 +163,7 @@ inline void FAMILY::setNumberOfAttributes(int NumberOfAttribute)
 
 /*! Sets the attribute _attributeIdentifier to AttributeIdentifier. */
 //---------------------------------------------------------------------
-inline void FAMILY::setAttributesIdentifiers(MED_EN::med_int * /* int * */ AttributeIdentifier) 
+inline void FAMILY::setAttributesIdentifiers(int * AttributeIdentifier) 
 //---------------------------------------------------------------------
 { 
     _attributeIdentifier = AttributeIdentifier ; 
@@ -171,7 +171,7 @@ inline void FAMILY::setAttributesIdentifiers(MED_EN::med_int * /* int * */ Attri
 
 /*! Sets the attribute _attributeValue to AttributeValue. */
 //-----------------------------------------------------------
-inline void FAMILY::setAttributesValues(MED_EN::med_int * /* int * */ AttributeValue) 
+inline void FAMILY::setAttributesValues(int * AttributeValue) 
 //-----------------------------------------------------------
 { 
     _attributeValue = AttributeValue ; 
@@ -219,7 +219,7 @@ inline int FAMILY::getNumberOfAttributes() const
 /*! Returns a pointer to attributes identifiers .
     (There are _numberOfAttribute attributes) */
 //---------------------------------------------------
-inline const MED_EN::med_int * /* int * */ FAMILY::getAttributesIdentifiers() const
+inline const int * FAMILY::getAttributesIdentifiers() const
 //---------------------------------------------------
 { 
     return _attributeIdentifier ; 
@@ -235,7 +235,7 @@ inline int FAMILY::getAttributeIdentifier(int i) const
 /*! Returns a pointer to attributes values.
     (There are _numberOfAttribute attributes)*/
 //----------------------------------------------
-inline const MED_EN::med_int * /* int * */ FAMILY::getAttributesValues() const
+inline const int * FAMILY::getAttributesValues() const
 //----------------------------------------------
 { 
     return _attributeValue ; 

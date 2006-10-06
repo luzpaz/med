@@ -111,8 +111,8 @@ private:
   int getCONNECTIVITY();
   int getFAMILY();
   int getNodalConnectivity(CONNECTIVITY * Connectivity) ;
-  int getNodesFamiliesNumber(MED_EN::med_int * /* int * */ MEDArrayNodeFamily) ;
-  int getCellsFamiliesNumber(MED_EN::med_int ** /* int** */ Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity) ;
+  int getNodesFamiliesNumber(int * MEDArrayNodeFamily) ;
+  int getCellsFamiliesNumber(int** Arrays, CONNECTIVITY* Connectivity, MED_EN::medEntityMesh entity) ;
   void getGRID ();
 
   GENDRIVER * copy ( void ) const ;

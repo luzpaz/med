@@ -50,7 +50,7 @@ void affiche_support(const SUPPORT * mySupport)
     for (int j=0;j<NumberOfTypes;j++) {
       cout<<"    * Type "<<Types[j]<<" : ";
       int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
-      const MED_EN::med_int * /* const int * */ Number = mySupport->getNumber(Types[j]) ;
+      const int * Number = mySupport->getNumber(Types[j]) ;
       for (int k=0; k<NumberOfElements;k++)
 	cout << Number[k] << " ";
       cout << endl ;

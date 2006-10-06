@@ -67,7 +67,7 @@ class GRID: public MESH
 
   CONNECTIVITY * makeConnectivity (const MED_EN::medEntityMesh Entity, const MED_EN::medGeometryElement Geometry,
 				   const int NbEntities, int NbNodes, int nbMeshNodes,
-				   const MED_EN::med_int* /* const int * */ NodeNumbers) const ;
+				   const int * NodeNumbers) const ;
   // creates nodal connectivity
 
   
@@ -234,7 +234,7 @@ class GRID: public MESH
 
   inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
 
-  const MED_EN::med_int * /* int * */ getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
+  const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
 
   inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
 				 MED_EN::medGeometryElement Type) const;
@@ -257,19 +257,19 @@ class GRID: public MESH
 
   inline const CONNECTIVITY* getConnectivityptr() const;
 
-  inline const MED_EN::med_int* /* const int * */ getConnectivity(MED_EN::medModeSwitch Mode,
-								  MED_EN::medConnectivity ConnectivityType,
-								  MED_EN::medEntityMesh Entity, 
-								  MED_EN::medGeometryElement Type) const;
+  inline const int * getConnectivity(MED_EN::medModeSwitch Mode,
+				     MED_EN::medConnectivity ConnectivityType,
+				     MED_EN::medEntityMesh Entity, 
+				     MED_EN::medGeometryElement Type) const;
 
-  inline const MED_EN::med_int* /* const int * */ getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
-								       MED_EN::medEntityMesh Entity) const;
+  inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+					  MED_EN::medEntityMesh Entity) const;
 
-  inline const MED_EN::med_int* /* const int * */ getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,
-									 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+  inline const int * getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,
+					    MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
 
-  inline const MED_EN::med_int* /* const int * */ getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
-									      MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+  inline const int * getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
+						 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
 
   //  Setting fields
 
@@ -400,7 +400,7 @@ inline const CELLMODEL * GRID::getCellsTypes(MED_EN::medEntityMesh Entity) const
     - GlobalNumberingIndex[1]=6 (the second type)
     - GlobalNumberingIndex[2]=10
 */
-inline const MED_EN::med_int * /* int * */ GRID::getGlobalNumberingIndex(MED_EN::medEntityMesh entity) const
+inline const int * GRID::getGlobalNumberingIndex(MED_EN::medEntityMesh entity) const
 {
   fillConnectivity();
 
@@ -509,7 +509,7 @@ inline const CONNECTIVITY* GRID::getConnectivityptr() const
   and Type=MED_ALL_ELEMENTS.
   You must also get the corresponding index array.
  */
-inline const MED_EN::med_int* /* const int * */ GRID::getConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
+inline const int * GRID::getConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
 {
   fillConnectivity();
 
@@ -529,7 +529,7 @@ inline const MED_EN::med_int* /* const int * */ GRID::getConnectivity(MED_EN::me
   in Connectivity array (Connectivity[ConnectivityIndex[i-1]-1] is the
   first value)
  */
-inline const MED_EN::med_int* /* const int * */ GRID::getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity) const
+inline const int * GRID::getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity) const
 {
   fillConnectivity();
 
@@ -543,7 +543,7 @@ inline const MED_EN::med_int* /* const int * */ GRID::getConnectivityIndex(MED_E
 
   You must get ReverseConnectivityIndex array to use it.
  */
-inline const MED_EN::med_int* /* const int * */ GRID::getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
+inline const int * GRID::getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
 {
   fillConnectivity();
 
@@ -565,7 +565,7 @@ inline const MED_EN::med_int* /* const int * */ GRID::getReverseConnectivity(MED
   ReverseConnectivity[ReverseConnectivityIndex[i-1]-1]
   is the first value)
  */
-inline const MED_EN::med_int* /* const int * */ GRID::getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
+inline const int * GRID::getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh Entity/*=MED_CELL*/) const
 {
   fillConnectivity();
 

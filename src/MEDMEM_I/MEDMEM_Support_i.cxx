@@ -389,7 +389,7 @@ throw (SALOME::SALOME_Exception)
 SCRUTE(_support->getName());
 SCRUTE(nbelements);
 SCRUTE(convertIdlEltToMedElt(geomElement));
-                const MED_EN::med_int * /* int * */ numbers=_support->getNumber(convertIdlEltToMedElt(geomElement));
+                const int * numbers=_support->getNumber(convertIdlEltToMedElt(geomElement));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -423,8 +423,8 @@ SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumber(SALOME_MED::medGeometryEleme
   try
     {
       int nbelements=_support->getNumberOfElements(convertIdlEltToMedElt(geomElement));
-      const MED_EN::med_int * /* int * */ numbers=_support->getNumber(convertIdlEltToMedElt(geomElement));
-      ret=SenderFactory::buildSender(*this,(int*)numbers,nbelements);
+      const int * numbers=_support->getNumber(convertIdlEltToMedElt(geomElement));
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
     }
   catch (MEDEXCEPTION &ex)
     {
@@ -454,7 +454,7 @@ throw (SALOME::SALOME_Exception)
 		MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
                 int nbelements=_support->getNumberOfElements(::MED_ALL_ELEMENTS);
                 myseq->length(nbelements);
-                const MED_EN::med_int * /* int * */ numbers=_support->getNumberIndex();
+                const int * numbers=_support->getNumberIndex();
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -485,8 +485,8 @@ SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumberIndex()
     {
       MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
       int nbelements=_support->getNumberOfElements(::MED_ALL_ELEMENTS);
-      const MED_EN::med_int * /* int * */ numbers=_support->getNumberIndex();
-      ret=SenderFactory::buildSender(*this,(int*)numbers,nbelements);
+      const int * numbers=_support->getNumberIndex();
+      ret=SenderFactory::buildSender(*this,numbers,nbelements);
     }
   catch (MEDEXCEPTION &ex)
     {

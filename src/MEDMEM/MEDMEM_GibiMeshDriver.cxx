@@ -1563,10 +1563,10 @@ void GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi)
       for ( i = 1; i <= nb; ++i ) {
         FAMILY* f = const_cast<FAMILY*>( _ptrMesh->getFamily( entity, i ));
         f->setNumberOfAttributes( 1 );
-        MED_EN::med_int * /* int* */ attIDs = new MED_EN::med_int/*int*/[1];
+        int* attIDs = new int[1];
         attIDs[0] = 1;
         f->setAttributesIdentifiers( attIDs );
-        MED_EN::med_int * /* int* */ attVals = new MED_EN::med_int/*int*/[1];
+        int* attVals = new int[1];
         attVals[0] = 1;
         f->setAttributesValues( attVals );
         string* attDescr = new string[1];
@@ -1806,7 +1806,7 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
     for ( int iType = 0; iType < nbTypes; ++iType )
     {
       medGeometryElement geomType = types ? types[ iType ] : MED_ALL_ELEMENTS;
-      const MED_EN::med_int* /* const int * */ ptrElemIDs = 0;
+      const int * ptrElemIDs = 0;
       int elemID1 = 0, nbElems = 0;
       if ( onAll ) {
         nbElems = _ptrMesh->getNumberOfElements( entity, geomType );
@@ -1891,8 +1891,8 @@ class TFieldCounter
 
 void GIBI_MESH_WRONLY_DRIVER::writeElements (medGeometryElement geomType,
                                              list< typeData >&  typeDataList,
-                                             const MED_EN::med_int* /* const int * */        nodalConnect,
-                                             const MED_EN::med_int* /* const int * */        nodalConnectIndex)
+                                             const int *        nodalConnect,
+                                             const int *        nodalConnectIndex)
 {
   // ITYPEL : type de l'鬩ment 1=point, 2=segment ?eux noeuds...
   // NBSOUS : nombre de sous parties dans cet objet,
@@ -2198,7 +2198,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh()
 
     // write components
     entity = supIt->first->getEntity();
-    const MED_EN::med_int* /* const int * */ nodalConnect = 0, * nodalConnectIndex = 0;
+    const int * nodalConnect = 0, * nodalConnectIndex = 0;
     if ( entity != MED_NODE ) {
       nodalConnect = _ptrMesh->getConnectivity (MED_FULL_INTERLACE,
                                                 MED_NODAL,
@@ -2226,8 +2226,8 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh()
     if ( nbTypes == 0 || !_ptrMesh->existConnectivity( MED_NODAL, entity ))
       continue;
     const medGeometryElement* types = _ptrMesh->getTypes( entity );
-    const MED_EN::med_int * /* int * */ nbIndex = _ptrMesh->getGlobalNumberingIndex (entity);
-    const MED_EN::med_int* /* const int * */ nodalConnect = 0, * nodalConnectIndex = 0;
+    const int * nbIndex = _ptrMesh->getGlobalNumberingIndex (entity);
+    const int * nodalConnect = 0, * nodalConnectIndex = 0;
     nodalConnect = _ptrMesh->getConnectivity (MED_FULL_INTERLACE,
                                               MED_NODAL,
                                               entity,

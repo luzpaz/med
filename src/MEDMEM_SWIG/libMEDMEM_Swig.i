@@ -496,8 +496,7 @@ class SUPPORT
 
   void getBoundaryElements();
 
-  void setNumber(const MED_EN::med_int * /* int * */ index, const
-  MED_EN::med_int * /* int* */ value);
+  void setNumber(const int * index, const int* value);
 
   bool deepCompare(const SUPPORT &support) const;
 
@@ -505,7 +504,7 @@ class SUPPORT
 
   void setpartial(std::string Description, int NumberOfGeometricType,
 		  int TotalNumberOfElements, medGeometryElement *GeometricType,
-		  int *NumberOfElements, MED_EN::med_int * /* int * */NumberValue);
+		  int *NumberOfElements, int *NumberValue);
 
   std::string getName() const;
 
@@ -535,7 +534,7 @@ class SUPPORT
 
     PyObject * getNumber(medGeometryElement GeometricType)
       {
-	const MED_EN::med_int * /* int * */ number = self->getNumber(GeometricType);
+	const int * number = self->getNumber(GeometricType);
 	int size = self->getNumberOfElements(GeometricType);
         TYPEMAP_OUTPUT_ARRAY(number, size, PyInt_FromLong,
 			     SUPPORT::getNumber);
@@ -543,7 +542,7 @@ class SUPPORT
 
     PyObject * getNumberIndex()
       {
-	const MED_EN::med_int * /* int * */ numberindex = self->getNumberIndex();
+	const int * numberindex = self->getNumberIndex();
 	int size = (self->getNumberOfElements(MED_ALL_ELEMENTS))+1;
         TYPEMAP_OUTPUT_ARRAY(numberindex, size, PyInt_FromLong,
 			     SUPPORT::getNumberIndex);
@@ -584,9 +583,9 @@ class FAMILY : public SUPPORT
 
   void setNumberOfAttributes(int NumberOfAttribute);
 
-  void setAttributesIdentifiers(MED_EN::med_int * /* int * */ AttributeIdentifier);
+  void setAttributesIdentifiers(int * AttributeIdentifier);
 
-  void setAttributesValues(MED_EN::med_int * /* int * */ AttributeValue);
+  void setAttributesValues(int * AttributeValue);
 
   void setAttributesDescriptions(string * AttributeDescription);
 
@@ -601,13 +600,11 @@ class FAMILY : public SUPPORT
   int getNumberOfGroups() const;
 
   FAMILY(MESH* Mesh, int Identifier, std::string Name, int NumberOfAttribute,
-	 MED_EN::med_int * /* int * */AttributeIdentifier,
-	 MED_EN::med_int * /* int * */AttributeValue,
+	 int *AttributeIdentifier, int *AttributeValue,
 	 std::string AttributeDescription, int NumberOfGroup,
-	 std::string GroupName, MED_EN::med_int * /* int * */ MEDArrayNodeFamily,
-	 MED_EN::med_int ** /* int ** */ MEDArrayCellFamily,
-	 MED_EN::med_int ** /* int ** */ MEDArrayFaceFamily,
-	 MED_EN::med_int ** /* int ** */ MEDArrayEdgeFamily);
+	 std::string GroupName, int * MEDArrayNodeFamily,
+	 int ** MEDArrayCellFamily, int ** MEDArrayFaceFamily,
+	 int ** MEDArrayEdgeFamily);
 
   std::string getAttributeDescription(int i);
 
@@ -624,7 +621,7 @@ class FAMILY : public SUPPORT
 
     PyObject * getAttributesIdentifiers()
       {
-	const MED_EN::med_int * /* int * */ attributesids = self->getAttributesIdentifiers();
+	const int * attributesids = self->getAttributesIdentifiers();
 	int size = self->getNumberOfAttributes();
         TYPEMAP_OUTPUT_ARRAY(attributesids,size,PyInt_FromLong,
 			     FAMILY::getAttributesIdentifiers);
@@ -632,7 +629,7 @@ class FAMILY : public SUPPORT
 
     PyObject * getAttributesValues()
       {
-	const MED_EN::med_int * /* int * */ attributesvals = self->getAttributesValues();
+	const int * attributesvals = self->getAttributesValues();
 	int size = self->getNumberOfAttributes();
         TYPEMAP_OUTPUT_ARRAY(attributesvals,size,PyInt_FromLong,
 			     FAMILY::getAttributesValues);
@@ -1164,7 +1161,7 @@ public :
 			       medEntityMesh Entity,
 			       medGeometryElement Type)
       {
-	const MED_EN::med_int * /* int */ connectivity = self->getConnectivity(Mode,ConnectivityType,
+	const int * connectivity = self->getConnectivity(Mode,ConnectivityType,
 						   Entity,Type);
 	int size = self->getConnectivityLength(Mode,ConnectivityType,Entity,Type);
         TYPEMAP_OUTPUT_ARRAY(connectivity, size, PyInt_FromLong,
@@ -1174,7 +1171,7 @@ public :
     PyObject * getConnectivityIndex(medConnectivity ConnectivityType,
 				    medEntityMesh Entity)
       {
-	const MED_EN::med_int * /* int * */ connectivity_index =
+	const int * connectivity_index =
 	  self->getConnectivityIndex(ConnectivityType,Entity);
 	int size = (self->getNumberOfElements(Entity,MED_ALL_ELEMENTS))+1;
         TYPEMAP_OUTPUT_ARRAY(connectivity_index,size,PyInt_FromLong,
@@ -1184,7 +1181,7 @@ public :
     PyObject * getReverseConnectivity(medConnectivity ConnectivityType,
 				      medEntityMesh Entity=MED_CELL)
       {
-	const MED_EN::med_int * /* int * */ reverseconnectivity =
+	const int * reverseconnectivity =
 	  self->getReverseConnectivity(ConnectivityType,Entity);
 	int size = self->getReverseConnectivityLength(ConnectivityType,Entity);
         TYPEMAP_OUTPUT_ARRAY(reverseconnectivity, size, PyInt_FromLong,
@@ -1194,7 +1191,7 @@ public :
     PyObject * getReverseConnectivityIndex(medConnectivity ConnectivityType,
 					   medEntityMesh Entity=MED_CELL)
       {
-	const MED_EN::med_int * /* int * */ reverseconnectivity_index =
+	const int * reverseconnectivity_index =
 	  self->getReverseConnectivityIndex(ConnectivityType,Entity);
 	int size=self->getReverseConnectivityIndexLength(ConnectivityType,Entity);
         TYPEMAP_OUTPUT_ARRAY(reverseconnectivity_index,size, PyInt_FromLong,
@@ -1203,7 +1200,7 @@ public :
 
     PyObject * getGlobalNumberingIndex(medEntityMesh Entity)
       {
-	const MED_EN::med_int * /* int * */ numberingIndex = self->getGlobalNumberingIndex(Entity);
+	const int * numberingIndex = self->getGlobalNumberingIndex(Entity);
 	int nbOfTypes = self->getNumberOfTypes(Entity);
 	int size = nbOfTypes+1;
         TYPEMAP_OUTPUT_ARRAY(numberingIndex, size, PyInt_FromLong,
@@ -1213,7 +1210,7 @@ public :
     PyObject * getPolygonsConnectivity(medConnectivity ConnectivityType,
                                        medEntityMesh   Entity)
       {
-        const MED_EN::med_int * /* int * */ array = self->getPolygonsConnectivity(ConnectivityType,Entity);
+        const int * array = self->getPolygonsConnectivity(ConnectivityType,Entity);
         int size = self->getPolygonsConnectivityLength(ConnectivityType, Entity);
         TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
 			     MESH::getPolygonsConnectivity);
@@ -1222,7 +1219,7 @@ public :
     PyObject * getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
                                             medEntityMesh   Entity)
       {
-        const MED_EN::med_int * /* int * */ array = self->getPolygonsConnectivityIndex(ConnectivityType,Entity);
+        const int * array = self->getPolygonsConnectivityIndex(ConnectivityType,Entity);
         int size = self->getNumberOfPolygons(Entity) + 1;
         TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
 			     MESH::getPolygonsConnectivity);
@@ -1230,7 +1227,7 @@ public :
 
     PyObject * getPolyhedronConnectivity(medConnectivity ConnectivityType)
       {
-        const MED_EN::med_int * /* int * */ array = self->getPolyhedronConnectivity(ConnectivityType);
+        const int * array = self->getPolyhedronConnectivity(ConnectivityType);
         int size = self->getPolyhedronConnectivityLength(ConnectivityType);
         TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
 			     MESH::getPolygonsConnectivity);
@@ -1238,7 +1235,7 @@ public :
 
     PyObject * getPolyhedronIndex(medConnectivity ConnectivityType)
       {
-        const MED_EN::med_int * /* int * */ array = self->getPolyhedronIndex(ConnectivityType);
+        const int * array = self->getPolyhedronIndex(ConnectivityType);
         int size = self->getNumberOfPolyhedron() + 1;
         TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
 			     MESH::getPolyhedronIndex);
@@ -1246,7 +1243,7 @@ public :
 
     PyObject * getPolyhedronFacesIndex()
       {
-        const MED_EN::med_int * /* int * */ array = self->getPolyhedronFacesIndex();
+        const int * array = self->getPolyhedronFacesIndex();
         int size = self->getNumberOfPolyhedronFaces() + 1;
         TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
 			     MESH::getPolyhedronFacesIndex);
@@ -1315,7 +1312,7 @@ public :
   void setNumberOfElements (const int * NumberOfElements,
 			    const medEntityMesh Entity) ;
 
-  void setConnectivity     (const MED_EN::med_int * /* int * */ Connectivity,
+  void setConnectivity     (const int * Connectivity,
 			    const medEntityMesh Entity,
 			    const medGeometryElement Type) ;
 
@@ -1326,14 +1323,14 @@ public :
 
   void addGroup            (const GROUP & Group) ;
 
-  void setPolygonsConnectivity     (const MED_EN::med_int * /* int * */ ConnectivityIndex,
-				    const MED_EN::med_int * /* int * */ ConnectivityValue,
+  void setPolygonsConnectivity     (const int * ConnectivityIndex,
+				    const int * ConnectivityValue,
 				    int nbOfPolygons,
 				    const medEntityMesh Entity);
 
-  void setPolyhedraConnectivity     (const MED_EN::med_int * /* int * */ PolyhedronIndex,
-				     const MED_EN::med_int * /* int * */ FacesIndex,
-				     const MED_EN::med_int * /* int * */ Nodes,
+  void setPolyhedraConnectivity     (const int * PolyhedronIndex,
+				     const int * FacesIndex,
+				     const int * Nodes,
 				     int nbOfPolyhedra,
 				     const medEntityMesh Entity);
 

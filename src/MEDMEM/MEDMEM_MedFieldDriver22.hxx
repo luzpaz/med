@@ -1067,7 +1067,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   // du SUPPORT
   int profilSizeC = 0;
   vector < int   >        profilSize    (NumberOfTypes,0);
-  vector < vector<MED_EN::med_int/*int*/>  > profilList    (NumberOfTypes);
+  vector < vector<int>  > profilList    (NumberOfTypes);
   vector < string >       profilNameList(NumberOfTypes);
   char * profilName = new char[MED_TAILLE_NOM+1];
 
@@ -1197,7 +1197,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
       profilSize[typeNo]=pflSize;
       profilList[typeNo].resize(pflSize);
-      ret = med_2_2::MEDprofilLire(id,&profilList[typeNo][0],profilName); // cf item 16 Effective STL
+      ret = med_2_2::MEDprofilLire(id,(MED_EN::med_int*)(&profilList[typeNo][0]),profilName); // cf item 16 Effective STL
       profilNameList[typeNo]=string(profilName);
     }
   }
@@ -1264,7 +1264,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     }
 
     MEDSKYLINEARRAY * skyLine = new MEDSKYLINEARRAY(profilList.size(), profilSizeC );
-    vector<MED_EN::med_int/*int*/> index(NumberOfTypes+1,0);
+    vector<int> index(NumberOfTypes+1,0);
     index[0]=1;
     for( int typeNo=0; typeNo < NumberOfTypes; typeNo++ )
       index[typeNo+1]=index[typeNo]+profilSize[typeNo];
@@ -1518,7 +1518,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
   // pour vérifier la cohérence des informations.
   // Si la relation SUPPRT-MESH n'esiste pas  on constitue le tableau uniquement à partir du fichier qui
   // doit alors obligatoirement contenir le maillage.
-  const MED_EN::med_int* /* const int * */ number, *numberIndex = 0;
+  const int * number, *numberIndex = 0;
   string         profilName;
   vector<string> profilNameList;
   vector<MED_EN::medGeometryElement> meshGeoType;

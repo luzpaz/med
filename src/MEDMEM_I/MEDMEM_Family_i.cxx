@@ -130,7 +130,7 @@ throw (SALOME::SALOME_Exception)
 	{
 		int nbAttribute=_family->getNumberOfAttributes();
 		myseq->length(nbAttribute);
-		const MED_EN::med_int * /* int * */ identifiers=_family->getAttributesIdentifiers();
+		const int * identifiers=_family->getAttributesIdentifiers();
 		for (int i=0;i<nbAttribute;i++)
 		{
 			myseq[i]=identifiers[i];
@@ -181,7 +181,7 @@ throw (SALOME::SALOME_Exception)
         {
                 int nbAttribute=_family->getNumberOfAttributes();
                 myseq->length(nbAttribute);
-                const MED_EN::med_int * /* int * */ values=_family->getAttributesValues();
+                const int * values=_family->getAttributesValues();
                 for (int i=0;i<nbAttribute;i++)
                 {
                         myseq[i]=values[i];

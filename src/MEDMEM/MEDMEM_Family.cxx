@@ -42,12 +42,12 @@ FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), _numberOfGroup(0)
 };
 
 FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
-               MED_EN::med_int * /* int * */AttributeIdentifier, MED_EN::med_int * /* int * */AttributeValue, string AttributeDescription,
+               int *AttributeIdentifier, int *AttributeValue, string AttributeDescription,
                int NumberOfGroup, string GroupName,
-	       MED_EN::med_int * /* int * */ MEDArrayNodeFamily,
-	       MED_EN::med_int ** /* int ** */ MEDArrayCellFamily,
-	       MED_EN::med_int ** /* int ** */ MEDArrayFaceFamily,
-	       MED_EN::med_int ** /* int ** */ MEDArrayEdgeFamily
+	       int * MEDArrayNodeFamily,
+	       int ** MEDArrayCellFamily,
+	       int ** MEDArrayFaceFamily,
+	       int ** MEDArrayEdgeFamily
 	       ): SUPPORT(Mesh,Name),
 		  _identifier(Identifier), 
 		  _numberOfAttribute(NumberOfAttribute), 
@@ -134,8 +134,8 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
 //        _number=new MEDSKYLINEARRAY(1,NumberOfNodesInFamily) ;
 //        int * NumberIndex = _number->getIndex();
 //        int * NumberValue = _number->getValue();
-      MED_EN::med_int* /* int * */ NumberIndex = new MED_EN::med_int/*int*/[2];
-      MED_EN::med_int* /* int * */ NumberValue = new MED_EN::med_int/*int*/[NumberOfNodesInFamily];
+      int * NumberIndex = new int[2];
+      int * NumberValue = new int[NumberOfNodesInFamily];
 
       NumberIndex[0]=1;                          //set the MEDSKYLINEARRAY Index table
       NumberIndex[1]=1+NumberOfNodesInFamily;    //set the MEDSKYLINEARRAY Index table
@@ -196,13 +196,14 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
     for (int j=0;j<numberoftypes;j++) {
       int numberOfElements = getNumberOfElements(types[j]);
       MESSAGE("    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) : ");
-      const MED_EN::med_int* /* const int * */ number = getNumber(types[j]);
+      const int * number = getNumber(types[j]);
       SCRUTE(number);
       //      for (int k=0; k<numberOfElements;k++)
         //	MESSAGE("________________ " << number[k]);
     }
   } else
     MESSAGE("Is on all entities !");
+
 
 
 };
@@ -302,7 +303,7 @@ ostream & MEDMEM::operator<<(ostream &os, const FAMILY &myFamily)
   return os;
 };
 
-bool FAMILY::build(medEntityMesh Entity,MED_EN::med_int ** /* int ** */FamilyNumber /* from MED file */)
+bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
 {
   MESSAGE("FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)");
   bool Find = false ;
@@ -316,7 +317,7 @@ bool FAMILY::build(medEntityMesh Entity,MED_EN::med_int ** /* int ** */FamilyNum
   medGeometryElement * tmp_Types  = new medGeometryElement[numberOfTypes];
   int ** tmp_ElementsLists                = new int*[numberOfTypes] ;
   //  int *  GeometricTypeNumber           = new int[numberOfTypes] ;
-  const MED_EN::med_int * /* int * */  GlobalNumberingIndex          = _mesh->getGlobalNumberingIndex(Entity);
+  const int *  GlobalNumberingIndex          = _mesh->getGlobalNumberingIndex(Entity);
   
 
   SCRUTE(numberOfTypes);
@@ -326,7 +327,7 @@ bool FAMILY::build(medEntityMesh Entity,MED_EN::med_int ** /* int ** */FamilyNum
     
     int NumberOfElements             = _mesh->getNumberOfElementsWithPoly(Entity,types[TypeNumber]) ;
     int NumberOfElementsInThisFamily = 0 ;
-    MED_EN::med_int * /* int * */ ElementsOfThisFamilyNumber = FamilyNumber[TypeNumber];
+    int * ElementsOfThisFamilyNumber = FamilyNumber[TypeNumber];
     int * tmp_ElementsList           = new int[NumberOfElements];
       
     for (int i=0; i<NumberOfElements; i++)
@@ -388,8 +389,8 @@ bool FAMILY::build(medEntityMesh Entity,MED_EN::med_int ** /* int ** */FamilyNum
       for (int i=0; i<_numberOfGeometricType; i++)
 	delete[] tmp_ElementsLists[i];
     } else {
-      MED_EN::med_int * /* int * */NumberValue = new MED_EN::med_int/*int*/[_totalNumberOfElements];
-      MED_EN::med_int * /* int * */NumberIndex = new MED_EN::med_int/*int*/[_numberOfGeometricType+1];
+      int *NumberValue = new int[_totalNumberOfElements];
+      int *NumberIndex = new int[_numberOfGeometricType+1];
       NumberIndex[0]=1;
       for (int i=0; i<_numberOfGeometricType; i++) {
 	NumberIndex[i+1]=NumberIndex[i]+_numberOfElements[i];

@@ -118,9 +118,9 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
 
   MEDSKYLINEARRAY * famNumber = myFamily->getnumber();
 
-  const MED_EN::med_int* /* const int * */ famNumberValue = myFamily->getNumber(MED_ALL_ELEMENTS);
+  const int * famNumberValue = myFamily->getNumber(MED_ALL_ELEMENTS);
 
-  const MED_EN::med_int* /* const int * */ famNumberIndex = myFamily->getNumberIndex();
+  const int * famNumberIndex = myFamily->getNumberIndex();
 
   int famNumberCount = famNumber->getNumberOf();
   int famNumberLength = famNumber->getLength();

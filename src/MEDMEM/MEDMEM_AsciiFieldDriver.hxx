@@ -384,7 +384,7 @@ namespace MEDMEM
       } else {
 
 	coord = _mesh->getCoordinates(MED_EN::MED_FULL_INTERLACE);
-	const MED_EN::med_int* /* const int * */ nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+	const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
 	for(i=0; i<SPACEDIMENSION; i++)
 	  xyz[i]=new double[numberOfValues];
 	    deallocateXyz=true;

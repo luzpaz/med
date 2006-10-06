@@ -722,7 +722,6 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
 
 	END_OF(LOC);
-
 }
 
 //=============================================================================
