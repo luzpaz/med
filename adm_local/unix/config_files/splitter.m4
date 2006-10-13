@@ -27,7 +27,7 @@ dnl
  
 # AC_ENABLE_SPLITTER
 AC_DEFUN([AC_ENABLE_SPLITTER], [dnl
-define([AC_ENABLE_SPLITTER_DEFAULT], ifelse($1, no, no, yes))dnl
+define([AC_ENABLE_SPLITTER_DEFAULT], ifelse($1, yes, yes, no))dnl
 AC_ARG_ENABLE(splitter,
 changequote(<<, >>)dnl
 <<  --enable-splitter[=PKGS]  build with splitter tool [default=>>AC_ENABLE_SPLITTER_DEFAULT],

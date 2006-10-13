@@ -266,8 +266,7 @@ echo ---------------------------------------------
 echo checking SPLITTER
 echo ---------------------------------------------
 echo
-ENABLE_SPLITTER=no
-AC_ENABLE_SPLITTER
+AC_ENABLE_SPLITTER(no)
 
 if test "x$ENABLE_SPLITTER" = "xyes"; then
 
