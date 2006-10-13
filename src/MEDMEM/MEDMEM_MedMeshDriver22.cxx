@@ -2689,6 +2689,163 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
   return MED_VALID;
 }
 
+/*!creates a vector of families from a vector of groups
+ * 
+ * \param myGroups input : vector of groups
+ * \param myFamilies output vector of families
+ * 
+ * Routine is meant to be called to reconstruct families from existing groups
+ * typically for writing meshes created by MEDMEM::MESHING containing overlapping groups 
+ * 
+ * if the groups do not overlap, the vector of families will have the same size
+ * as the vector of groups
+ * otherwise, the size of the family vector will be larger
+*/	
+
+void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGroups, vector <FAMILY*>& myFamilies ) const 
+{
+
+  if (myGroups.empty()) return;
+	
+//	if (!myFamilies.empty())
+//      throw MEDEXCEPTION(LOCALIZED("Family vector must be empty on call "
+//      << "to groupFamilyConverter"));
+// 
+ //mapping elements to all the groups containing it
+ 	std::multimap <int,int> elem2groups;
+ 	for (int igroup=0; igroup< myGroups.size(); igroup++)
+ 	{
+ 		// if the support is on all Mesh elements
+ 		//all the items from 1 to nb are in the group
+ 		if (myGroups[igroup]->isOnAllElements())
+ 		{
+ 			for (int ielem = 0; ielem< myGroups[igroup]->getNumberOfElements(MED_ALL_ELEMENTS); ielem++)
+ 			{
+ 				elem2groups.insert(make_pair(ielem+1, igroup));
+ 			}
+ 		}
+ 		//otherwise getNumber() gives the appropriate number of items
+ 		else
+ 		{
+ 			const int*Number = myGroups[igroup]->getNumber(MED_ALL_ELEMENTS) ;
+ 			for (int ielem = 0; ielem< myGroups[igroup]->getNumberOfElements(MED_ALL_ELEMENTS); ielem++)
+ 			{
+ 				elem2groups.insert(make_pair(Number[ielem], igroup));
+ 			}
+ 		}
+ 	}
+ 	
+ 	//creating a set of signatures for the groups intersections
+ 	std::multimap<basic_string<int>,int> signatures;
+ 	
+ 	typedef multimap<int,int>::iterator MI;
+ 	MI iter=elem2groups.begin();
+ 	
+ 	while (iter!=elem2groups.end())
+ 	{
+ 		basic_string<int> sign (1, iter -> second );
+ 		int key = iter -> first;
+ 		iter ++;
+ 		while (iter!=elem2groups.end()&&iter-> first == key)
+ 		{
+ 			sign+=iter -> second;	
+ 			iter++;
+ 		}
+ 		signatures.insert(make_pair(sign,key));
+ 	}
+ 	
+ 	elem2groups.clear();
+ 	
+ 	//creating the families from the signatures mapping
+ 	//each signature will correspond to a new family
+ 	std::multimap<basic_string<int>,int>::const_iterator iter_signatures = signatures.begin();
+ 	
+ 	//retrieving the entity type (all the groups have the same)
+ 	// node families are numbered above 0
+ 	// cell families are numbered from  -1 to -MAX_NB_GROUPS
+ 	// face falimies are numbered from -MAX_NB_GROUPS-1 to -2*MAX_NB_GROUPS
+ 	// edge families are numbered from -2*MAX_NB_GROUPS to -3*MAX_NB_GROUPS
+ 	// MAX_NB_GROUPS is defined in MEDMEM_define.hxx
+ 	
+ 	medEntityMesh entity = myGroups[0]->getEntity();
+ 	MESH* mesh=myGroups[0]->getMesh();
+ 	
+ 	int ifamily;
+ 	switch (entity)
+ 	{
+ 		case MED_NODE:
+ 			ifamily=1;
+ 			break;
+ 		case MED_CELL:
+ 			ifamily=-MAX_NB_GROUP;
+ 			break;
+ 		case MED_FACE:
+ 			ifamily=-2*MAX_NB_GROUP;
+ 			break;
+ 		case MED_EDGE:
+ 			 ifamily=-3*MAX_NB_GROUP;
+ 			break;
+ 	}
+
+	//browsing signatures to build all the families
+	//each signature corresponds to a new family
+
+ 	while (iter_signatures!= signatures.end())
+ 	{
+ 		basic_string<int> key= iter_signatures->first;
+ 		int size=signatures.count(key);
+ 		
+ 		list<int> numbers;
+
+ 		for (int i=0; i< size; i++)
+ 		{
+ 			numbers.push_back(iter_signatures->second);
+ 			iter_signatures++;
+ 		}
+ 		
+ 		//TODO : see if build SupportOnElementFromElementList could not be built from another container
+
+		// for nodes, the family is built directly from the node list
+		// for elements, it is built from the buildSupportOnElementsFromElementList
+		//               which allocates a support
+		FAMILY* myFamily;
+ 		if (entity!=MED_NODE)
+		  {	
+		    SUPPORT* support;
+		    support=mesh->buildSupportOnElementsFromElementList(numbers, entity);
+		    myFamily=new FAMILY(*support);
+		  }
+	 	else
+		  {
+		    myFamily= new FAMILY();
+		    myFamily->setMesh(mesh);
+		    myFamily->fillFromNodeList(numbers);
+		  }
+ 
+		// the identifier and the groups are set
+ 		myFamily->setIdentifier(ifamily);
+ 		myFamily->setNumberOfGroups(key.size());
+		char family_name[MED_TAILLE_LNOM];
+		sprintf(family_name,"family%d",ifamily);
+		myFamily->setName(family_name);
+
+ 		string* groupnames=new string[key.size()];
+ 		//myFamily->getGroupsNames();
+ 		//groupnames.set(key.size());
+
+ 		for (int igroup=0; igroup<key.size(); igroup++)
+ 		{
+		  groupnames[igroup]=myGroups[key[igroup]]->getName();
+ 		}	
+ 		
+		myFamily->setGroupsNames(groupnames,true);
+	  
+ 		myFamilies.push_back(myFamily);
+ 		ifamily++;
+ 	}
+ 		
+}
+
 int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
   
   const char * LOC="int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const : ";
@@ -2714,14 +2871,9 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
     if (0 == NumberOfNodesFamilies) {
       //ToDestroy = true ;
       vector<GROUP*> myGroups = _ptrMesh->getGroups(MED_NODE);
-      int NumberOfGroups = myGroups.size() ;
-      // build families from groups
-      for (int i=0; i<NumberOfGroups; i++) {
-	SUPPORT * mySupport = myGroups[i] ;
-	FAMILY* myFamily = new FAMILY(*mySupport);
-	myFamily->setIdentifier(i+1);
-	myFamilies->push_back(myFamily);
-      }
+      
+      groupFamilyConverter(myGroups,*myFamilies);
+		
       NumberOfNodesFamilies=myFamilies->size() ;
     }
     for (int i=0 ; i<NumberOfNodesFamilies; i++) {
@@ -2788,15 +2940,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       if (0 == NumberOfFamilies) {
 	//ToDestroy = true ;
 	vector<GROUP*> myGroups = _ptrMesh->getGroups(entity);
-	int NumberOfGroups = myGroups.size() ;
-	// build families from groups
-	for (int i=0; i<NumberOfGroups; i++) {
-	  SCRUTE( myGroups[i]->getName() );
-	  SUPPORT * mySupport = myGroups[i] ;
-	  FAMILY* myFamily = new FAMILY(*mySupport);
-	  myFamily->setIdentifier(-i-1);
-	  myFamilies->push_back(myFamily);
-	}
+	groupFamilyConverter(myGroups,*myFamilies);
 	NumberOfFamilies=myFamilies->size() ;
       }
       for (int i=0 ; i<NumberOfFamilies; i++) {
@@ -2884,15 +3028,9 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       if (0 == numberOfFamilies) {
 	//ToDestroy = true ;
 	vector<GROUP*> myGroups = _ptrMesh->getGroups(entity);
-	int NumberOfGroups = myGroups.size() ;
-	// build families from groups
-	for (int i=0; i<NumberOfGroups; i++) {
-	  SCRUTE( myGroups[i]->getName() );
-	  SUPPORT * mySupport = myGroups[i] ;
-	  FAMILY* myFamily = new FAMILY(*mySupport);
-	  myFamily->setIdentifier(-i-1000);
-	  myFamilies->push_back(myFamily);
-	}
+
+	groupFamilyConverter(myGroups,*myFamilies);
+	
 	numberOfFamilies=myFamilies->size() ;
       }
       for (int i=0;i<numberOfFamilies;i++) {
@@ -2982,17 +3120,13 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       if (0 == numberOfFamilies) {
 	//ToDestroy = true ;
 	vector<GROUP*> myGroups = _ptrMesh->getGroups(entity);
-	int NumberOfGroups = myGroups.size() ;
-	// build families from groups
-	for (int i=0; i<NumberOfGroups; i++) {
-	  SCRUTE( myGroups[i]->getName() );
-	  SUPPORT * mySupport = myGroups[i] ;
-	  FAMILY* myFamily = new FAMILY(*mySupport);
-	  myFamily->setIdentifier(-i-2000);
-	  myFamilies->push_back(myFamily);
-	}
+
+	groupFamilyConverter(myGroups,*myFamilies);
+	
 	numberOfFamilies=myFamilies->size() ;
+
       }
+
       for (int i=0;i<numberOfFamilies;i++) {
 	int familyNumber = (*myFamilies)[i]->getIdentifier() ;
 	int numberOfFamilyElements = (*myFamilies)[i]->getNumberOfElements(MED_ALL_ELEMENTS) ;

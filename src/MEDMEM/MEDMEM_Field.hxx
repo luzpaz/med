@@ -1,4 +1,3 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 // 
 // This library is free software; you can redistribute it and/or
@@ -740,6 +739,7 @@ public:
   const int   getNumberOfGeometricTypes() const throw (MEDEXCEPTION);
   const GAUSS_LOCALIZATION<INTERLACING_TAG> & getGaussLocalization(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
   const GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
+  void setGaussLocalization(MED_EN::medGeometryElement geomElement, const GAUSS_LOCALIZATION<INTERLACING_TAG> & gaussloc);
   const int * getNumberOfGaussPoints() const throw (MEDEXCEPTION);
   const int   getNumberOfGaussPoints( MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
   const int   getNbGaussI(int i)          const throw (MEDEXCEPTION);
@@ -2609,6 +2609,11 @@ FIELD<T,INTERLACING_TAG>::getGaussLocalizationPtr(MED_EN::medGeometryElement geo
 
 };
 
+template <class T,class INTERLACING_TAG> void
+FIELD<T,INTERLACING_TAG>::setGaussLocalization(MED_EN::medGeometryElement geomElement, const GAUSS_LOCALIZATION<INTERLACING_TAG>& gaussloc)
+{
+  _gaussModel[geomElement]=new GAUSS_LOCALIZATION<INTERLACING_TAG> (gaussloc);
+};
 /*!
   Returns number of Gauss points for this medGeometryElement.
 

@@ -217,6 +217,16 @@ echo
 
 CHECK_HDF5
 
+
+echo
+echo ---------------------------------------------
+echo BOOST Library
+echo ---------------------------------------------
+echo
+
+CHECK_BOOST
+
+
 echo
 echo ---------------------------------------------
 echo testing MED2
@@ -251,15 +261,38 @@ lsf_ok=no
 CHECK_LSF
 dnl lsf_ok is set to yes by CHECK_LSF
 
+echo
+echo ---------------------------------------------
+echo checking SPLITTER
+echo ---------------------------------------------
+echo
+ENABLE_SPLITTER=no
+AC_ENABLE_SPLITTER
+
+if test "x$ENABLE_SPLITTER" = "xyes"; then
+
+    echo  
+    echo --------------------------------------------- 
+    echo testing METIS 
+    echo ---------------------------------------------
+    echo 
+    metis_ok=no 
+    CHECK_METIS dnl metis_ok is set to yes by CHECK_METIS
+
+    echo  
+    echo --------------------------------------------- 
+    echo testing SCOTCH 
+    echo ---------------------------------------------
+    echo scotch_ok=no 
+    CHECK_SCOTCH 
+    dnl scotch_ok is set to yes by CHECK_SCOTCH	 
+
+fi
+	
+
 if test "${MED_WITH_KERNEL}" = "yes"; then
 {
-	echo
-	echo ---------------------------------------------
-	echo BOOST Library
-	echo ---------------------------------------------
-	echo
 
-	CHECK_BOOST
 
 	dnl
 	dnl ---------------------------------------------
@@ -478,9 +511,21 @@ do
    fi
 done
 
+dnl optional variables 
+
+echo "---Optional:"
+variables="metis_ok scotch_ok"
+for var in $variables
+     do
+         eval toto=\$$var
+         if test x$toto != "x"; then
+                printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
+                eval echo \$$var
+         fi
+     done
+
 if test "${MED_WITH_KERNEL}" = "yes"; then
 {
-        echo "---Optional:"
         variables="cppunit_ok openpbs_ok lsf_ok doxygen_ok graphviz_ok"
  
         for var in $variables

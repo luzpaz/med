@@ -243,6 +243,8 @@ typedef double         med_float;
 #define OK 0
 #define KO 1
 
+//maximum number of groups handled by the Family Group converter
+#define MAX_NB_GROUP 100000
   /*
     enum definition for the used Med File version V2.1 or V2.2
     because of incompatibility between them.

@@ -127,7 +127,7 @@ public:
   inline void setAttributesValues       (int * AttributeValue);
   inline void setAttributesDescriptions (string * AttributeDescription); 
   inline void setNumberOfGroups         (int NumberOfGroups);
-  inline void setGroupsNames            (string * GroupName);
+  inline void setGroupsNames            (string * GroupName, bool giveOwnership=false);
 
   inline int      getIdentifier()                    const;
   inline int      getNumberOfAttributes()            const;
@@ -195,10 +195,13 @@ inline void FAMILY::setNumberOfGroups(int NumberOfGroups)
 
 /*! Sets the attribute _groupName to GroupName. */
 //----------------------------------------------------
-inline void FAMILY::setGroupsNames(string * GroupName) 
+  inline void FAMILY::setGroupsNames(string * GroupName, bool giveOwnership) 
 //----------------------------------------------------
 { 
-    _groupName = GroupName ; 
+	if (giveOwnership)
+		_groupName.setShallowAndOwnership(GroupName);
+	else	
+    	_groupName = GroupName ; 
 }
 /*! Returns the attribute _identifier.\n
    Note that there is one identifier precisely for each family. */

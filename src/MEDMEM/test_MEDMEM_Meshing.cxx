@@ -17,6 +17,9 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+#define protected public
+#define private public
+
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Field.hxx"
@@ -25,6 +28,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 using namespace DRIVERFACTORY;
+
 
 int main (int argc, char ** argv) {
 
@@ -184,6 +188,8 @@ int main (int argc, char ** argv) {
     
     myMeshing.addGroup(myGroup);
   }
+ 
+
   {
     GROUP myGroup ;
     myGroup.setName("OtherNodes");
@@ -273,33 +279,35 @@ int main (int argc, char ** argv) {
     myGroup.setNumberOfGeometricType(1);
     medGeometryElement myTypes[1] = {MED_TRIA3};
     myGroup.setGeometricType(myTypes);
-    const int myNumberOfElements[1] = {2} ;
+    const int myNumberOfElements[1] = {3} ;
     myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[1+1] = {1,3} ;
-    const int value[2]=
+    const int index[1+1] = {1,4} ;
+    const int value[3]=
     {
-      1,3
+      1,3,4
     } ;
     myGroup.setNumber(index,value);
     
     myMeshing.addGroup(myGroup);
   }
 
+
+
   // all rigtht, we save it in Med 2.1 2.2 and vtk !
 
   medFileVersion version = getMedFileVersionForWriting();
-  if (version == V22)
-    setMedFileVersionForWriting(V21);
-
-  int idMed21 = myMeshing.addDriver(MED_DRIVER,filenameMed21,myMeshing.getName());
-  myMeshing.write(idMed21) ;
-
-  version = getMedFileVersionForWriting();
   if (version == V21)
     setMedFileVersionForWriting(V22);
 
   int idMed22 = myMeshing.addDriver(MED_DRIVER,filenameMed22,myMeshing.getName());
   myMeshing.write(idMed22) ;
+
+  version = getMedFileVersionForWriting();
+  if (version == V22)
+    setMedFileVersionForWriting(V21);
+
+  int idMed21 = myMeshing.addDriver(MED_DRIVER,filenameMed21,myMeshing.getName());
+  myMeshing.write(idMed21) ;
 
   int idVtk = myMeshing.addDriver(VTK_DRIVER,filenameVtk,myMeshing.getName());
   myMeshing.write(idVtk) ;

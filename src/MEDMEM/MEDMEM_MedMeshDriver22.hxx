@@ -162,6 +162,7 @@ public :
 private:
   int writeCoordinates    ()                           const;
   int writeConnectivities (MED_EN::medEntityMesh entity)       const;
+  void groupFamilyConverter(const vector<GROUP*>& groups,vector<FAMILY*>& families) const;
   int writeFamilyNumbers  ()                           const;
   int writeFamilies       (vector<FAMILY*> & families) const;
   int writeGRID() const;
