@@ -1,0 +1,103 @@
+#  MED MEDMEM : MED files in memory
+#
+#  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+# 
+#  This library is free software; you can redistribute it and/or 
+#  modify it under the terms of the GNU Lesser General Public 
+#  License as published by the Free Software Foundation; either 
+#  version 2.1 of the License. 
+# 
+#  This library is distributed in the hope that it will be useful, 
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+#  Lesser General Public License for more details. 
+# 
+#  You should have received a copy of the GNU Lesser General Public 
+#  License along with this library; if not, write to the Free Software 
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+# 
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
+#
+#
+#  File   : Makefile.in
+#  Author : Vincent BERGEAUD (CEA/DEN/DANS/DM2S/SFME/LGLS)
+#  Module : MED
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:$(srcdir):$(srcdir)/tests
+
+MACHINE=PCLINUX
+
+@COMMENCE@
+
+
+EXPORT_PYSCRIPTS = \
+
+
+EXPORT_HEADERS = \
+MEDSPLITTER_Topology.hxx \
+MEDSPLITTER_MESHCollection.hxx \
+MEDSPLITTER_MESHCollectionDriver.hxx \
+MEDSPLITTER_ParallelTopology.hxx \
+MEDSPLITTER_Graph.hxx\
+MEDSPLITTER_METISGraph.hxx\
+MEDSPLITTER_SCOTCHGraph.hxx\
+MEDSPLITTER_UserGraph.hxx\
+MEDSPLITTER_API.hxx
+
+# Libraries targets
+
+LIB=libmedsplitter.la
+
+LIB_SRC = \
+MEDSPLITTER_MESHCollection.cxx \
+MEDSPLITTER_MESHCollectionDriver.cxx \
+MEDSPLITTER_ParallelTopology.cxx \
+MEDSPLITTER_Graph.cxx\
+MEDSPLITTER_METISGraph.cxx\
+MEDSPLITTER_SCOTCHGraph.cxx\
+MEDSPLITTER_UserGraph.cxx\
+MEDSPLITTER_API.cxx
+
+# Executables targets
+BIN = medsplitter
+BIN_SRC = 
+BIN_SERVER_IDL = 
+BIN_CLIENT_IDL = 
+
+TEST_PROGS = test_SPLITTER_square test_SPLITTER_indivisible test_HighLevelAPI test_SPLITTER_user_partition
+
+LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
+LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
+
+CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) $(METIS_CPPFLAGS) $(SCOTCH_CPPFLAGS)
+
+CXXFLAGS+=@CXXTMPDPTHFLAGS@
+CPPFLAGS+=$(BOOST_CPPFLAGS)
+#LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
+# change motivated by the bug KERNEL4778.
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS) 
+
+#LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
+# change motivated by the bug KERNEL4778.
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS)  $(BOOST_LIBS) -lboost_program_options-gcc-mt
+
+ifeq ($(MED_WITH_KERNEL),yes)
+  CPPFLAGS+= ${KERNEL_CXXFLAGS}
+  CXXFLAGS+= ${KERNEL_CXXFLAGS}
+  LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
+  LDFLAGSFORBIN+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics
+endif
+
+LIBSFORBIN=$(BOOSTLIBS)
+
+LIBS=
+
+# build create_mesh :
+bin: 
+
+@CONCLUDE@
