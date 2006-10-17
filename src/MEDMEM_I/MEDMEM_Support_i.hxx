@@ -77,6 +77,10 @@ public:
                                            throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumber(SALOME_MED::medGeometryElement geomElement) 
 					   throw (SALOME::SALOME_Exception);
+
+    SALOME_MED::long_array* getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
+                                           throw (SALOME::SALOME_Exception);
+
     SALOME::SenderInt_ptr getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumberIndex() 

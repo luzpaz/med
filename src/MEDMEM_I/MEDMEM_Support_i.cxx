@@ -407,6 +407,45 @@ SCRUTE(numbers[i]);
 
 //=============================================================================
 /*!
+ * CORBA: get Nodes from file
+ */
+//=============================================================================
+SALOME_MED::long_array *  SUPPORT_i::getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
+throw (SALOME::SALOME_Exception)
+{
+  SCRUTE(_support);
+  SCRUTE(geomElement);
+  SCRUTE(convertIdlEltToMedElt(geomElement));
+
+	if (_support==NULL)
+		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+				             SALOME::INTERNAL_ERROR);
+        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        try
+        {
+                int nbelements=_support->getNumberOfElements(convertIdlEltToMedElt(geomElement));
+                myseq->length(nbelements);
+SCRUTE(_support->getName());
+SCRUTE(nbelements);
+SCRUTE(convertIdlEltToMedElt(geomElement));
+                const int * numbers=_support->getNumberFromFile(convertIdlEltToMedElt(geomElement));
+                for (int i=0;i<nbelements;i++)
+                {
+                        myseq[i]=numbers[i];
+SCRUTE(numbers[i]);
+                }
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+      		MESSAGE("Unable to access the support optionnal index");
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+        return myseq._retn();
+	
+}
+
+//=============================================================================
+/*!
  * CORBA: 2nd get Nodes 
  */
 //=============================================================================
