@@ -1413,6 +1413,9 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 
   const string * listcomponent_name=MED_FIELD_DRIVER<T>::_ptrField->getComponentsNames() ;
   const string * listcomponent_unit=MED_FIELD_DRIVER<T>::_ptrField->getMEDComponentsUnits() ;
+  if ( ! listcomponent_name || ! listcomponent_unit )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<" Udefined components of FIELD : "
+				 << fieldName << "."));
   int length ;
   for (int i=0; i < component_count ; i++) {
     length = min(MED_TAILLE_PNOM22,(int)listcomponent_name[i].size());
