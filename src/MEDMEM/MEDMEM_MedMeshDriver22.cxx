@@ -2563,9 +2563,10 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
 	  // 				MED_FR::MED_DESC );
 
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-          med_2_2::med_int * tmp_Connectivity = new med_2_2::med_int[numberOfElements] ;
+          int lgth = _ptrMesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE, MED_DESCENDING, entity, types[i]);
+          med_2_2::med_int * tmp_Connectivity = new med_2_2::med_int[lgth] ;
           int ii ;
-          for ( ii = 0 ; ii < numberOfElements ; ii++ )
+          for ( ii = 0 ; ii < lgth ; ii++ )
           tmp_Connectivity[ii] = connectivity[ii] ;
 	  err = med_2_2::MEDconnEcr(_medIdt,
 				    const_cast <char *> ( _meshName.c_str()),
