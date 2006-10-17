@@ -1629,7 +1629,7 @@ void CONNECTIVITY::calculateDescendingConnectivity()
                  tmp_Nodes[ii] = Nodes[ii] ;
               const med_int * FacesIndex = myPolyhedra.getFacesIndex() ;
               int * tmp_FacesIndex = new int[myPolyhedra.getNumberOfFaces()+1] ;
-              for ( ii = 0 ; ii < myPolyhedra.getNumberOfNodes() ; ii++ )
+              for ( ii = 0 ; ii < myPolyhedra.getNumberOfFaces() ; ii++ )
                  tmp_FacesIndex[ii] = FacesIndex[ii] ;
 //CCRT : copy of Nodes
 	      MEDMODULUSARRAY face_poly(myFaceNumberOfNodes,tmp_Nodes + tmp_FacesIndex[j]-1);
