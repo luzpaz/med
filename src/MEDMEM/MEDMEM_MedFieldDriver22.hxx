@@ -1068,6 +1068,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   int profilSizeC = 0;
   vector < int   >        profilSize    (NumberOfTypes,0);
   vector < vector<int>  > profilList    (NumberOfTypes);
+  vector < vector<int>  > profilListFromFile (NumberOfTypes);
   vector < string >       profilNameList(NumberOfTypes);
   char * profilName = new char[MED_TAILLE_NOM+1];
 
@@ -1197,7 +1198,9 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
       profilSize[typeNo]=pflSize;
       profilList[typeNo].resize(pflSize);
+      profilListFromFile[typeNo].resize(pflSize);
       ret = med_2_2::MEDprofilLire(id,(MED_EN::med_int*)(&profilList[typeNo][0]),profilName); // cf item 16 Effective STL
+      profilListFromFile[typeNo] = profilList[typeNo];
       profilNameList[typeNo]=string(profilName);
     }
   }
@@ -1272,8 +1275,14 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     for (int i=1; i <= profilList.size() ; i++)
       skyLine->setI(i,&profilList[i-1][0]);
 
+    MEDSKYLINEARRAY * skyLineFromFile = new MEDSKYLINEARRAY(profilListFromFile.size(), profilSizeC );
+    skyLineFromFile->setIndex(&index[0]);
+    for (int i=1; i <= profilListFromFile.size() ; i++)
+      skyLineFromFile->setI(i,&profilListFromFile[i-1][0]);
+
     mySupport->setAll(false);
     mySupport->setpartial(skyLine,true);
+    mySupport->setpartial_fromfile(skyLineFromFile,true);
     mySupport->setProfilNames(profilNameList);
 //    cout << "Valeurs du skyline du SUPPORT partiel crée : " << *skyLine << endl;
   }
