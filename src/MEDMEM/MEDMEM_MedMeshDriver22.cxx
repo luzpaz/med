@@ -2736,19 +2736,19 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
  	}
  	
  	//creating a set of signatures for the groups intersections
- 	std::multimap<basic_string<int>,int> signatures;
+ 	std::multimap<vector<int>,int> signatures;
  	
  	typedef multimap<int,int>::iterator MI;
  	MI iter=elem2groups.begin();
  	
  	while (iter!=elem2groups.end())
  	{
- 		basic_string<int> sign (1, iter -> second );
+ 		vector<int> sign (1, iter -> second );
  		int key = iter -> first;
  		iter ++;
  		while (iter!=elem2groups.end()&&iter-> first == key)
  		{
- 			sign+=iter -> second;	
+ 			sign.push_back(iter -> second);
  			iter++;
  		}
  		signatures.insert(make_pair(sign,key));
@@ -2758,7 +2758,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
  	
  	//creating the families from the signatures mapping
  	//each signature will correspond to a new family
- 	std::multimap<basic_string<int>,int>::const_iterator iter_signatures = signatures.begin();
+ 	std::multimap<vector<int>,int>::const_iterator iter_signatures = signatures.begin();
  	
  	//retrieving the entity type (all the groups have the same)
  	// node families are numbered above 0
@@ -2792,8 +2792,8 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 
  	while (iter_signatures!= signatures.end())
  	{
- 		basic_string<int> key= iter_signatures->first;
- 		int size=signatures.count(key);
+ 		const vector<int>& key= iter_signatures->first;
+ 		int size = signatures.count(key);
  		
  		list<int> numbers;
 
