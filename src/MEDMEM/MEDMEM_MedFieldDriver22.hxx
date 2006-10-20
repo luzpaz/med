@@ -842,7 +842,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 				   <<") differs from FIELD object type (" <<
 				   MED_FIELD_DRIVER<T>::_ptrField->_valueType << ")" )) ;
     }
-#if defined(IRIX64) || defined(OSF1) ||defined(VPP5000) || defined(PCLINUX64) || defined(PCLINUX64_32)
+#if defined(IRIX64) || defined(OSF1) ||defined(VPP5000) || defined(PCLINUX64)
     if (MED_FIELD_DRIVER<T>::_ptrField->_valueType==MED_EN::MED_INT32 )
       needConversionToInt64=true;
 #endif
@@ -893,7 +893,6 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 				 << MED_FIELD_DRIVER<T>::_ptrField->_orderNumber << "), on mesh "
 				 << meshName << "|" ));
   }
-
 
   MED_EN::medEntityMesh entityType = mySupport->getEntity();
   //Si un SUPPORT était donné, récupère son nom, sa description et
@@ -1005,7 +1004,6 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     meshNbOfElOfType  = MESHnbOfElOfType;
   }
 
-
   // Test si le Support du Champ repose ou non sur toutes les entités géométriques
   // du maillage associé et positionne ou non l'attribut onAll du SUPPORT.
   // Il ne s'agit pas de la gestion des profils
@@ -1067,14 +1065,13 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   // du SUPPORT
   int profilSizeC = 0;
   vector < int   >        profilSize    (NumberOfTypes,0);
-  vector < vector<int>  > profilList    (NumberOfTypes);
-  vector < vector<int>  > profilListFromFile (NumberOfTypes);
+  vector < vector<MED_EN::med_int>  > profilList    (NumberOfTypes);      // IPAL13481
+  vector < vector<MED_EN::med_int>  > profilListFromFile (NumberOfTypes); // IPAL13481
   vector < string >       profilNameList(NumberOfTypes);
   char * profilName = new char[MED_TAILLE_NOM+1];
 
   MESSAGE ("NumberOfTypes      : "<< NumberOfTypes);
   MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues=0 ;
-
 
   for (int typeNo=0; typeNo<NumberOfTypes; typeNo++) {
 
@@ -1151,6 +1148,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 	MED_FIELD_DRIVER<T>::_fieldNum = MED_INVALID ; // we have not found right field, so reset the field number
 	throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<": ERROR while reading values")) ;
       }
+
     index += numberOfValuesWc;
     // Le support prend en compte le nombre de valeurs lié aux profils
     MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues+=
@@ -1186,6 +1184,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 	}
 //	cout << *MED_FIELD_DRIVER<T>::_ptrField->_gaussModel[types[typeNo]] << endl;
 	delete [] refcoo;delete [] gscoo; delete [] wg;
+
     }
     delete[] gaussModelName ;
 
@@ -1199,7 +1198,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
       profilSize[typeNo]=pflSize;
       profilList[typeNo].resize(pflSize);
       profilListFromFile[typeNo].resize(pflSize);
-      ret = med_2_2::MEDprofilLire(id,(MED_EN::med_int*)(&profilList[typeNo][0]),profilName); // cf item 16 Effective STL
+      ret = med_2_2::MEDprofilLire(id,&profilList[typeNo][0],profilName); // cf item 16 Effective STL // IPAL13481
       profilListFromFile[typeNo] = profilList[typeNo];
       profilNameList[typeNo]=string(profilName);
     }
@@ -1272,13 +1271,23 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     for( int typeNo=0; typeNo < NumberOfTypes; typeNo++ )
       index[typeNo+1]=index[typeNo]+profilSize[typeNo];
     skyLine->setIndex(&index[0]);
-    for (int i=1; i <= profilList.size() ; i++)
-      skyLine->setI(i,&profilList[i-1][0]);
+    for (int i=1; i <= profilList.size() ; i++) {
+      vector<int> aTmp(profilList[i-1].size()); // IPAL13481
+      for (int j=0; j < profilList[i-1].size(); j++)
+	aTmp[j] = (int) profilList[i-1][j];
+      skyLine->setI(i,&aTmp[0]);
+      //skyLine->setI(i,&profilList[i-1][0]);
+    }
 
     MEDSKYLINEARRAY * skyLineFromFile = new MEDSKYLINEARRAY(profilListFromFile.size(), profilSizeC );
     skyLineFromFile->setIndex(&index[0]);
-    for (int i=1; i <= profilListFromFile.size() ; i++)
-      skyLineFromFile->setI(i,&profilListFromFile[i-1][0]);
+    for (int i=1; i <= profilListFromFile.size() ; i++) {
+      vector<int> aTmp(profilListFromFile[i-1].size()); // IPAL13481
+      for (int j=0; j < profilListFromFile[i-1].size(); j++)
+	aTmp[j] = (int) profilListFromFile[i-1][j];
+      skyLineFromFile->setI(i,&aTmp[0]);
+      //skyLineFromFile->setI(i,&profilListFromFile[i-1][0]);
+    }
 
     mySupport->setAll(false);
     mySupport->setpartial(skyLine,true);
@@ -1329,7 +1338,6 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   MED_FIELD_DRIVER<T>::_ptrField->_isRead = true ;
 
   MED_FIELD_DRIVER<T>::_ptrField->_support=mySupport; //Prévenir l'utilisateur ?
-
 
   END_OF(LOC);
 }
