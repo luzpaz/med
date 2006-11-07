@@ -58,7 +58,7 @@ int main(int argc, char** argv)
   	("output-file",po::value<string>(),"name of the resulting file")
   	("meshname",po::value<string>(),"name of the input mesh")
   	("split-method",po::value<string>(&library)->default_value("metis"),"name of the splitting library (metis,scotch)")
-  	("ndomain",po::value<int>(&ndomains)->default_value(1),"number of subdomains in the output file")
+  	("ndomains",po::value<int>(&ndomains)->default_value(1),"number of subdomains in the output file")
   	;
   	
   po::variables_map vm;
