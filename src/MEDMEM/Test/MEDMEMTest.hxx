@@ -1,0 +1,171 @@
+// Copyright (C) 2006  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
+//
+// This library is distributed in the hope that it will be useful
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+
+#ifndef _MEDMEMTEST_HXX_
+#define _MEDMEMTEST_HXX_
+
+#include <cppunit/extensions/HelperMacros.h>
+
+class MEDMEMTest : public CppUnit::TestFixture
+{
+  CPPUNIT_TEST_SUITE( MEDMEMTest );
+  //0
+  CPPUNIT_TEST( testArray );
+  CPPUNIT_TEST( testArrayConvert );
+  CPPUNIT_TEST( testArrayInterface /* not in spec */ );
+  CPPUNIT_TEST( testAsciiFieldDriver );
+  CPPUNIT_TEST( testCellModel /* not in spec */ );
+  CPPUNIT_TEST( testCompatibility21_22 /* not in spec */ );
+  CPPUNIT_TEST( testConnectivity );
+  CPPUNIT_TEST( testCoordinate );
+  CPPUNIT_TEST( testDriverFactory );
+  CPPUNIT_TEST( testDriversDef /* not in spec */ );
+  //10
+  CPPUNIT_TEST( testDriverTools /* not in spec */ );
+  CPPUNIT_TEST( testException /* not in spec */ );
+  CPPUNIT_TEST( testFamily );
+  CPPUNIT_TEST( testField );
+  CPPUNIT_TEST( testFieldConvert );
+  CPPUNIT_TEST( testFieldForward /* not in spec */ );
+  CPPUNIT_TEST( testFormulae );
+  CPPUNIT_TEST( testGaussLocalization );
+  CPPUNIT_TEST( testGenDriver /* not in spec */ );
+  CPPUNIT_TEST( testGibiMeshDriver );
+  //20
+  CPPUNIT_TEST( testGrid );
+  CPPUNIT_TEST( testGroup );
+  CPPUNIT_TEST( testIndexCheckingPolicy );
+  CPPUNIT_TEST( testInit /* cxx */ );
+  CPPUNIT_TEST( testInterlacingPolicy /* not in spec */ );
+  CPPUNIT_TEST( testInterlacingTraits /* not in spec */ );
+  CPPUNIT_TEST( testMedFieldDriver21 );
+  CPPUNIT_TEST( testMedFieldDriver22 );
+  CPPUNIT_TEST( testMedFieldDriver /* not in spec */ );
+  CPPUNIT_TEST( testMed );
+  //30
+  CPPUNIT_TEST( testMedMedDriver21 );
+  CPPUNIT_TEST( testMedMedDriver22 );
+  CPPUNIT_TEST( testMedMedDriver /* not in spec */ );
+  CPPUNIT_TEST( testMEDMEMchampLire /* not in spec */ );
+  CPPUNIT_TEST( testMEDMEMgaussEcr /* not in spec */ );
+  CPPUNIT_TEST( testMEDMEMprofilEcr /* not in spec */ );
+  CPPUNIT_TEST( testMedMeshDriver21 );
+  CPPUNIT_TEST( testMedMeshDriver22 );
+  CPPUNIT_TEST( testMedMeshDriver /* not in spec */ );
+  CPPUNIT_TEST( testMedVersion /* not in spec */ );
+  //40
+  CPPUNIT_TEST( testMesh );
+  CPPUNIT_TEST( testMeshing );
+  CPPUNIT_TEST( testModulusArray );
+  CPPUNIT_TEST( testnArray );
+  CPPUNIT_TEST( testPointerOf );
+  CPPUNIT_TEST( testPolyhedronArray );
+  CPPUNIT_TEST( testPorflowMeshDriver );
+  CPPUNIT_TEST( testRCBase /* not in spec */ );
+  CPPUNIT_TEST( testSetInterlacingType /* not in spec */ );
+  CPPUNIT_TEST( testSkyLineArray );
+  //50
+  CPPUNIT_TEST( testSTRING );
+  CPPUNIT_TEST( testSupport );
+  CPPUNIT_TEST( testTags /* not in spec */ );
+  CPPUNIT_TEST( testTopLevel );
+  CPPUNIT_TEST( testTypeMeshDriver );
+  CPPUNIT_TEST( testUnit );
+  CPPUNIT_TEST( testVtkFieldDriver );
+  CPPUNIT_TEST( testVtkMedDriver );
+  CPPUNIT_TEST( testVtkMeshDriver );
+  CPPUNIT_TEST( testmedimport_src /* not in spec */ );
+  //60
+  CPPUNIT_TEST_SUITE_END();
+
+public:
+
+  void setUp();
+  void tearDown();
+
+  void testArray();
+  void testArrayConvert();
+  void testArrayInterface() /* not in spec */;
+  void testAsciiFieldDriver();
+  void testCellModel() /* not in spec */;
+  void testCompatibility21_22() /* not in spec */;
+  void testConnectivity();
+  void testCoordinate();
+  void testDriverFactory();
+  void testDriversDef() /* not in spec */;
+  //10
+  void testDriverTools() /* not in spec */;
+  void testException() /* not in spec */;
+  void testFamily();
+  void testField();
+  void testFieldConvert();
+  void testFieldForward() /* not in spec */;
+  void testFormulae();
+  void testGaussLocalization();
+  void testGenDriver() /* not in spec */;
+  void testGibiMeshDriver();
+  //20
+  void testGrid();
+  void testGroup();
+  void testIndexCheckingPolicy();
+  void testInit() /* cxx */;
+  void testInterlacingPolicy() /* not in spec */;
+  void testInterlacingTraits() /* not in spec */;
+  void testMedFieldDriver21();
+  void testMedFieldDriver22();
+  void testMedFieldDriver /* not in spec */();
+  void testMed();
+  //30
+  void testMedMedDriver21();
+  void testMedMedDriver22();
+  void testMedMedDriver() /* not in spec */;
+  void testMEDMEMchampLire() /* not in spec */;
+  void testMEDMEMgaussEcr() /* not in spec */;
+  void testMEDMEMprofilEcr() /* not in spec */;
+  void testMedMeshDriver21();
+  void testMedMeshDriver22();
+  void testMedMeshDriver() /* not in spec */;
+  void testMedVersion() /* not in spec */;
+  //40
+  void testMesh();
+  void testMeshing();
+  void testModulusArray();
+  void testnArray();
+  void testPointerOf();
+  void testPolyhedronArray();
+  void testPorflowMeshDriver();
+  void testRCBase() /* not in spec */;
+  void testSetInterlacingType /* not in spec */();
+  void testSkyLineArray();
+  //50
+  void testSTRING();
+  void testSupport();
+  void testTags() /* not in spec */;
+  void testTopLevel();
+  void testTypeMeshDriver();
+  void testUnit();
+  void testVtkFieldDriver();
+  void testVtkMedDriver();
+  void testVtkMeshDriver();
+  void testmedimport_src() /* not in spec */;
+  //60
+};
+
+#endif
