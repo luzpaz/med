@@ -37,9 +37,9 @@ using namespace MEDMEM;
  *   (+)     UNIT(string Name, string Description);
  *   (+)     ~UNIT();
  *   (+)     UNIT & operator=(const UNIT &unit);
- *   (+)     inline void setName(string Name); 
+ *   (+)     inline void setName(string Name);
  *   (+)     inline void setDescription(string Description);
- *   (+)     inline void setMasse(int Masse); 
+ *   (+)     inline void setMasse(int Masse);
  *   (+)     inline void setLength(int Length);
  *   (+)     inline void setTime(int Time);
  *   (+)     inline void setTemperature(int Temperature);
@@ -90,10 +90,10 @@ void MEDMEMTest::testUnit()
   // - setTime                                                          //
   // - setTemperature                                                   //
   // - setMatterQuantity                                                //
-  // - setCurrentStrength                                               //    
+  // - setCurrentStrength                                               //
   // - setLightIntensity                                                //
   //--------------------------------------------------------------------//
-  
+
   try
   {
     myUNIT.setName(myName);
@@ -106,7 +106,7 @@ void MEDMEMTest::testUnit()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   try
   {
     myUNIT.setDescription(myDescription);
@@ -132,7 +132,7 @@ void MEDMEMTest::testUnit()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   try
   {
     myUNIT.setLength(myLength);
@@ -158,7 +158,7 @@ void MEDMEMTest::testUnit()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   try
   {
     myUNIT.setTemperature(myTemperature);
@@ -171,7 +171,7 @@ void MEDMEMTest::testUnit()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   try
   {
     myUNIT.setMatterQuantity(myMatterQuantity);
@@ -184,7 +184,7 @@ void MEDMEMTest::testUnit()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
- 
+
   try
   {
     myUNIT.setCurrentStrength(myCurrentStrength);
@@ -197,9 +197,9 @@ void MEDMEMTest::testUnit()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   try
-  {                            
+  {
     myUNIT.setLightIntensity(myLightIntensity);
   }
   catch(const std::exception &e)
@@ -223,8 +223,8 @@ void MEDMEMTest::testUnit()
   // - getMatterQuantity                                                //
   // - getCurrentStrength                                               //
   // - getLightIntensity                                                //
-  //--------------------------------------------------------------------// 
-  
+  //--------------------------------------------------------------------//
+
   try
   {
     CPPUNIT_ASSERT( myUNIT.getName() == myName );
@@ -263,7 +263,7 @@ void MEDMEMTest::testUnit()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   try
   {
     CPPUNIT_ASSERT( myUNIT.getLength() == myLength );
@@ -289,7 +289,7 @@ void MEDMEMTest::testUnit()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-   
+
   try
   {
     CPPUNIT_ASSERT( myUNIT.getTemperature() == myTemperature );
@@ -302,7 +302,7 @@ void MEDMEMTest::testUnit()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   try
   {
     CPPUNIT_ASSERT( myUNIT.getMatterQuantity() == myMatterQuantity );
@@ -341,14 +341,13 @@ void MEDMEMTest::testUnit()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   //--------------------------------------------------------------------//
   //                        Tests des method                            //
   // - operator=                                                        //
   //--------------------------------------------------------------------//
-  
-  UNIT myUNITCpy = myUNIT;
-  CPPUNIT_ASSERT_EQUAL( myUNITCpy.getTemperature(), myUNITCpy.getTemperature());
-  
-}
 
+  UNIT myUNITCpy;
+  myUNITCpy = myUNIT;
+  CPPUNIT_ASSERT_EQUAL( myUNITCpy.getTemperature(), myUNITCpy.getTemperature());
+}

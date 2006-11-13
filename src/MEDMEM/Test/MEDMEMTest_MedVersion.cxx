@@ -18,13 +18,13 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 
 #include "MEDMEMTest.hxx"
-#include <cppunit/Message.h>
 #include <cppunit/TestAssert.h>
 
 #include <cstdlib>
 #include <exception>
 
 #include <MEDMEM_MedVersion.hxx>
+#include "MEDMEM_Compatibility21_22.hxx"
 
 using namespace std;
 using namespace MEDMEM;
@@ -37,8 +37,6 @@ using namespace MED_EN;
  *                               MED_EN::medFileVersion medVersion) throw (MEDEXCEPTION);
  */
 
-
-
 void MEDMEMTest::testMedVersion()
 {
   string filename = getenv("DATA_DIR");
@@ -46,7 +44,7 @@ void MEDMEMTest::testMedVersion()
   string notExistFileName = "anyfile";
   medFileVersion myFileVersion;
   medFileVersion myEmptyFileVersion;
-                     
+
   // Test - getMedFileVersion
   CPPUNIT_ASSERT_THROW(getMedFileVersion(notExistFileName),MEDEXCEPTION);
 
@@ -63,13 +61,14 @@ void MEDMEMTest::testMedVersion()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   //Test - getMedAccessMode
   CPPUNIT_ASSERT_THROW(getMedAccessMode(MED_REMP,myEmptyFileVersion),MEDEXCEPTION);
 
    try
   {
-    CPPUNIT_ASSERT(getMedAccessMode(MED_REMP,myFileVersion) == MED_ECRI);
+    CPPUNIT_ASSERT_EQUAL(med_2_1::MED_ECRI,
+                         (med_2_1::med_mode_acces)getMedAccessMode(MED_REMP,myFileVersion));
   }
   catch(MEDEXCEPTION &e)
   {
