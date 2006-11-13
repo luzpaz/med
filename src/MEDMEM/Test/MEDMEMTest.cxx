@@ -1053,48 +1053,8 @@ void MEDMEMTest::testMedMeshDriver21()
   CPPUNIT_FAIL("Case Not Implemented");
 }
 
-// #38: MEDMEM_MedMeshDriver22.hxx  }  MEDMEMTest.cxx
+// #38: MEDMEM_MedMeshDriver22.hxx  }  MEDMEMTest_MedMeshDriver22.cxx
 
-/*!
- *  Check methods (13), defined in MEDMEM_MedMeshDriver22.hxx:
- *  class MED_MESH_DRIVER22 : public virtual MED_MESH_DRIVER {
- *   (yetno) MED_MESH_DRIVER22();
- *   (yetno) MED_MESH_DRIVER22(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces accessMode);
- *   (yetno) MED_MESH_DRIVER22(const MED_MESH_DRIVER22 & driver);
- *   (yetno) virtual ~MED_MESH_DRIVER22();
- *   (yetno) void open();
- *   (yetno) void close();
- *  }
- *  class MED_MESH_RDONLY_DRIVER22 : public virtual IMED_MESH_RDONLY_DRIVER,
- *                                   public virtual MED_MESH_DRIVER22 {
- *   (yetno) MED_MESH_RDONLY_DRIVER22();
- *   (yetno) MED_MESH_RDONLY_DRIVER22(const string & fileName, MESH * ptrMesh);
- *   (yetno) MED_MESH_RDONLY_DRIVER22(const MED_MESH_RDONLY_DRIVER22 & driver);
- *   (yetno) virtual ~MED_MESH_RDONLY_DRIVER22();
- *   (yetno) void read (void);
- *  }
- *  class MED_MESH_WRONLY_DRIVER22 : public virtual IMED_MESH_WRONLY_DRIVER,
- *                                   public virtual MED_MESH_DRIVER22 {
- *   (yetno) MED_MESH_WRONLY_DRIVER22();
- *   (yetno) MED_MESH_WRONLY_DRIVER22(const string & fileName, MESH * ptrMesh);
- *   (yetno) MED_MESH_WRONLY_DRIVER22(const MED_MESH_WRONLY_DRIVER22 & driver);
- *   (yetno) virtual ~MED_MESH_WRONLY_DRIVER22();
- *   (yetno) void write(void) const;
- *  }
- *  class MED_MESH_RDWR_DRIVER22 : public IMED_MESH_RDWR_DRIVER,
- *                                 public MED_MESH_RDONLY_DRIVER22, public MED_MESH_WRONLY_DRIVER22 {
- *   (yetno) MED_MESH_RDWR_DRIVER22();
- *   (yetno) MED_MESH_RDWR_DRIVER22(const string & fileName, MESH * ptrMesh);
- *   (yetno) MED_MESH_RDWR_DRIVER22(const MED_MESH_RDWR_DRIVER22 & driver);
- *   (yetno) ~MED_MESH_RDWR_DRIVER22();
- *   (yetno) void write(void) const;
- *   (yetno) void read (void);
- *  }
- */
-void MEDMEMTest::testMedMeshDriver22()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
 
 // #39: MEDMEM_MedMeshDriver.hxx  }  MEDMEMTest.cxx
 
@@ -1109,18 +1069,8 @@ void MEDMEMTest::testMedMeshDriver()
   CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 }
 
-// #40: MEDMEM_MedVersion.hxx  }  MEDMEMTest.cxx
+// #40: MEDMEM_MedVersion.hxx  }  MEDMEMTest_MedVersion.cxx
 
-/*!
- *  Check methods (not in spec), defined in MEDMEM_MedVersion.hxx:
- *  (yetno) MED_EN::medFileVersion getMedFileVersion(const string & fileName) throw (MEDEXCEPTION);
- *  (yetno) int getMedAccessMode(MED_EN::med_mode_acces mode,
- *                               MED_EN::medFileVersion medVersion) throw (MEDEXCEPTION);
- */
-void MEDMEMTest::testMedVersion()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
 
 // #41: MEDMEM_Mesh.hxx  }  MEDMEMTest.cxx
 
@@ -1688,39 +1638,6 @@ void MEDMEMTest::testTypeMeshDriver()
 
 // #56: MEDMEM_Unit.hxx  }  MEDMEMTest_Unit.cxx
 
-/*!
- *  Check methods (18), defined in MEDMEM_Unit.hxx:
- *  class UNIT {
- *   (yetno) UNIT();
- *   (yetno) UNIT(string Name, string Description);
- *   (yetno) ~UNIT();
- *   (yetno) UNIT & operator=(const UNIT &unit);
- *   (yetno) inline void setName(string Name);
- *   (yetno) inline void setDescription(string Description);
- *   (yetno) inline void setMasse(int Masse);
- *   (yetno) inline void setLength(int Length);
- *   (yetno) inline void setTime(int Time);
- *   (yetno) inline void setTemperature(int Temperature);
- *   (yetno) inline void setMatterQuantity(int MatterQuantity);
- *   (yetno) inline void setCurrentStrength(int CurrentStrength);
- *   (yetno) inline void setLightIntensity(int LightIntensity);
- *   (yetno) inline string getName() const;
- *   (yetno) inline string getDescription() const;
- *   (yetno) inline int    getMasse() const;
- *   (yetno) inline int    getLength() const;
- *   (yetno) inline int    getTime() const;
- *   (yetno) inline int    getTemperature() const;
- *   (yetno) inline int    getMatterQuantity() const;
- *   (yetno) inline int    getCurrentStrength() const;
- *   (yetno) inline int    getLightIntensity() const;
- *  }
- *
- *  Use code of MEDMEM/tests/testUUnit.cxx
- */
-void MEDMEMTest::testUnit()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
 
 // #57: MEDMEM_VtkFieldDriver.hxx  }  MEDMEMTest.cxx
 

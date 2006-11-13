@@ -49,7 +49,11 @@ LIB_SRC = MEDMEMTest.cxx \
 	  MEDMEMTest_Coordinate.cxx \
 	  MEDMEMTest_DriverFactory.cxx \
 	  MEDMEMTest_Family.cxx \
-	  MEDMEMTest_Field.cxx
+	  MEDMEMTest_Field.cxx \
+	  MEDMEMTest_Unit.cxx \
+	  MEDMEMTest_MedVersion.cxx \
+	  MEDMEMTest_MedMeshDriver22.cxx
+
 LIB_CLIENT_IDL =
 
 # Executables targets
