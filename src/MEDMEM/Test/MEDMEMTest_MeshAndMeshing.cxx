@@ -696,7 +696,7 @@ void MEDMEMTest::testMesh()
       cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
       }*/
 
-  delete TypeNames;
+  delete [] TypeNames;
   delete myMesh2;
 }
 

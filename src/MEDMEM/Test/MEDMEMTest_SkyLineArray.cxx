@@ -188,7 +188,7 @@ void MEDMEMTest::testSkyLineArray()
   }
   
   for (int i=1; i<=NumberOfCell ; i++) {
-    for (int j=index2[i-1];j<index2[i];j++)
+    for (int j=index[i-1];j<index[i];j++)
       CPPUNIT_ASSERT_NO_THROW(myArray3.setIndexValue(j,value[j-1]));
   }
 
