@@ -232,23 +232,23 @@ void MEDMEMTest::testMeshAndMeshing()
   int SpaceDimension = 3 ;
   int NumberOfNodes = 19 ;
   double Coordinates[57] = {
-    0.0, 0.0, 0.0, 
-    0.0, 0.0, 1.0, 
-    2.0, 0.0, 1.0, 
-    0.0, 2.0, 1.0, 
-    -2.0, 0.0, 1.0, 
-    0.0, -2.0, 1.0, 
-    1.0, 1.0, 2.0, 
-    -1.0, 1.0, 2.0, 
-    -1.0, -1.0, 2.0, 
-    1.0, -1.0, 2.0, 
-    1.0, 1.0, 3.0, 
-    -1.0, 1.0, 3.0, 
-    -1.0, -1.0, 3.0, 
-    1.0, -1.0, 3.0, 
-    1.0, 1.0, 4.0, 
-    -1.0, 1.0, 4.0, 
-    -1.0, -1.0, 4.0, 
+    0.0, 0.0, 0.0,
+    0.0, 0.0, 1.0,
+    2.0, 0.0, 1.0,
+    0.0, 2.0, 1.0,
+    -2.0, 0.0, 1.0,
+    0.0, -2.0, 1.0,
+    1.0, 1.0, 2.0,
+    -1.0, 1.0, 2.0,
+    -1.0, -1.0, 2.0,
+    1.0, -1.0, 2.0,
+    1.0, 1.0, 3.0,
+    -1.0, 1.0, 3.0,
+    -1.0, -1.0, 3.0,
+    1.0, -1.0, 3.0,
+    1.0, 1.0, 4.0,
+    -1.0, 1.0, 4.0,
+    -1.0, -1.0, 4.0,
     1.0, -1.0, 4.0,
     0.0, 0.0, 5.0
   };
@@ -296,7 +296,7 @@ void MEDMEMTest::testMeshAndMeshing()
   // define conectivities
 
   // cell part
-  
+
   const int NumberOfTypes = 3 ;
   medGeometryElement Types[NumberOfTypes] = {MED_TETRA4,MED_PYRA5,MED_HEXA8} ;
   const int NumberOfElements[NumberOfTypes] = {12,2,2} ;
@@ -323,7 +323,7 @@ void MEDMEMTest::testMeshAndMeshing()
     2,9,5,8,
     2,10,6,9
   };
-  
+
   CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityTetra,MED_CELL,MED_TETRA4));
 
   int ConnectivityPyra[2*5]=
@@ -359,7 +359,7 @@ void MEDMEMTest::testMeshAndMeshing()
     1,6,5,
     1,3,6
   };
-  
+
   CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityTria,MED_FACE,MED_TRIA3));
   const int nbQua = 4;
   int ConnectivityQua[nbQua*4]=
@@ -769,30 +769,30 @@ void MEDMEMTest::testMeshAndMeshing()
 
   const int REFnodalConnOfFaces[74] = {
     1, 2, 3, 4, 5, 6, // Polyhedron 1
-    1, 7, 8, 2, 
-    2, 8, 9, 3, 
-    4, 3, 9, 10, 
-    5, 4, 10, 11, 
-    6, 5, 11, 12, 
-    1, 6, 12, 7, 
-    7, 12, 8, 
+    1, 7, 8, 2,
+    2, 8, 9, 3,
+    4, 3, 9, 10,
+    5, 4, 10, 11,
+    6, 5, 11, 12,
+    1, 6, 12, 7,
+    7, 12, 8,
     10, 9, 8, 12, 11,
-                   
+
     13, 14, 15, 3, 2, // Polyhedron 2
-    13, 2, 8, 16, 
-    14, 13, 16, 17, 
-    15, 14, 17, 
-    15, 17, 18, 
-    15, 18, 9, 
-    3, 15, 9, 
-    2, 3, 9, 8, 
-    8, 9, 17, 16, 
+    13, 2, 8, 16,
+    14, 13, 16, 17,
+    15, 14, 17,
+    15, 17, 18,
+    15, 18, 9,
+    3, 15, 9,
+    2, 3, 9, 8,
+    8, 9, 17, 16,
     9, 18, 17};
   const int NumberOfFaces = 19;
   const int NumberOfPolyhedron = 2;
   const int nbOfPolygons = 2;
   const int REFfacesIndex[NumberOfFaces+1] = {
-    1, 7, 11, 15, 19, 23, 27, 31, 34, 
+    1, 7, 11, 15, 19, 23, 27, 31, 34,
     39, 44, 48, 52, 55, 58, 61, 64, 68, 72, 75};
 
   const int REFpolyIndex[NumberOfPolyhedron+1] = {1, 10, 20};
@@ -809,7 +809,7 @@ void MEDMEMTest::testMeshAndMeshing()
     6.0, 0.0, 12.0};
 
   const int REFpolygonFaces[11] = {
-    1, 2, 3, 4, 5, 6, // Polygon 1   
+    1, 2, 3, 4, 5, 6, // Polygon 1
     7, 8, 9, 3, 2}; // Polygon 2
 
   const int REFpolygonIndex[nbOfPolygons+1] = {1, 7, 12};
@@ -901,10 +901,10 @@ void MEDMEMTest::testMeshAndMeshing()
   {
     17, 9, 18, 19
   };
-  
+
   CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.setConnectivity(ConnectivityTetraPoly, MED_CELL, MED_TETRA4));
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.setPolyhedraConnectivity(REFpolyIndex, REFfacesIndex, 
+  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.setPolyhedraConnectivity(REFpolyIndex, REFfacesIndex,
                                  REFnodalConnOfFaces, NumberOfPolyhedron, MED_CELL));
 
   bool PolyConn = false;
@@ -1001,7 +1001,7 @@ void MEDMEMTest::testMeshAndMeshing()
   {
     1, 7, 2, 3, 9, 4
   };
- 
+
   CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.setConnectivity(ConnectivityTri, MED_CELL, MED_TRIA3));
   CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.setPolygonsConnectivity(REFpolygonIndex, REFpolygonFaces, nbOfPolygons, MED_CELL));
 
@@ -1025,7 +1025,7 @@ void MEDMEMTest::testMeshAndMeshing()
     medGeometryElement geomPolyElem;
     CPPUNIT_ASSERT_NO_THROW(geomPolyElem = myPolygonMeshing.getElementTypeWithPoly(MED_CELL, 1));
     CPPUNIT_ASSERT_EQUAL(geomPolyElem, MED_TRIA3);
- 
+
     CPPUNIT_ASSERT_EQUAL(myPolygonMeshing.getNumberOfPolygons(),nbOfPolygons);
     CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.getPolygonsConnectivityLength(MED_NODAL,MED_CELL));
     const int * PolygonConn;
@@ -1058,7 +1058,7 @@ void MEDMEMTest::testMeshAndMeshing()
   MED_MESH_RDONLY_DRIVER myMeshDriver (filename, myMesh3);
   myMeshDriver.setMeshName(meshname);
   myMeshDriver.open();
-  myMeshDriver.read(); 
+  myMeshDriver.read();
   myMeshDriver.close();
 
   int MeshDim  = myMesh3->getMeshDimension();
@@ -1080,7 +1080,7 @@ void MEDMEMTest::testMeshAndMeshing()
   int SpaceDim = myMesh3->getSpaceDimension() ;
   SUPPORT *sup = new SUPPORT(myMesh3);
 
-  // test of normal, area, volume, barycenter 
+  // test of normal, area, volume, barycenter
   if (SpaceDim == 2)
   {
     FIELD<double>* normal;
@@ -1091,7 +1091,7 @@ void MEDMEMTest::testMeshAndMeshing()
     double tmp_value ;
     for (int i = 1; i<=NumberOfElem; i++) {
       normal_square = 0. ;
-      cout << "Normal " << i << " " ; 
+      cout << "Normal " << i << " " ;
       for (int j=1; j<=SpaceDim; j++) {
 	tmp_value = normal->getValueIJ(i,j) ;
 	normal_square += tmp_value*tmp_value ;
@@ -1181,11 +1181,10 @@ void MEDMEMTest::testMeshAndMeshing()
 
     cout << "Max Area " << maxarea << " Min Area " << minarea << endl;
     cout << "Support Area " << areatot << endl;
-    
-    delete area ;
+
+    delete area;
   }
 
   delete sup;
   delete myMesh3;
 }
-

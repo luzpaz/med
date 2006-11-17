@@ -30,6 +30,12 @@
 #include <sstream>
 #include <cmath>
 
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
+
 using namespace std;
 using namespace MEDMEM;
 
@@ -272,8 +278,11 @@ void MEDMEMTest::testFamily()
   }
 
   // checked invalid indices
+#ifdef ENABLE_FORCED_FAILURES
+  // (BUG) Index is not checked to be in valid range
   CPPUNIT_ASSERT_THROW(aFamily3->getAttributeIdentifier(newNumberOfAttribute + 1), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aFamily3->getAttributeDescription(0), MEDEXCEPTION);
+#endif
 
   // groups
   CPPUNIT_ASSERT_EQUAL(newNumberOfGroups, aFamily3->getNumberOfGroups());
@@ -291,8 +300,12 @@ void MEDMEMTest::testFamily()
 
   // check default constructor and operator=
   FAMILY aFamily4;
-  //aFamily4 = (const FAMILY &)*aFamily3;
-
+#ifdef ENABLE_FAULTS
+  aFamily4 = (const FAMILY &)*aFamily3;
+#endif
+#ifdef ENABLE_FORCED_FAILURES
+  // (BUG) Wrong implementation or usage of PointerOf<string>.
+  //       Do not use memcpy() with array of std::string!
   CPPUNIT_FAIL("Impossible to use FAMILY::operator= because of"
                " wrong implementation or usage of PointerOf<string>");
   /*{
@@ -329,6 +342,7 @@ void MEDMEMTest::testFamily()
     delete [] str;
   }
   */
+#endif
 
   ////////////
   // TEST 3 //

@@ -154,17 +154,7 @@ void MEDMEMTest::testnArray()
   for (int i =0; i < mdim*nbelem1; i++)
     CPPUNIT_ASSERT( myArray1Ptr[i] == array1Ref[i] );
 
-  //ERROR
-  /* try {
-     myArray1qua.getColumn(1);
-   }
-  catch (MEDMEM::MEDEXCEPTION &m) {
-    CPPUNIT_FAIL(m.what());
-  }
-  catch (...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }*/
+  CPPUNIT_ASSERT_THROW(myArray1qua.getColumn(1), MEDEXCEPTION);
 
   MEDMEM_Array<double,NoInterlaceNoGaussPolicy> * myArray1cin = ArrayConvert(myArray1);
   myArray1Ptr = myArray1cin->getPtr();
@@ -232,16 +222,7 @@ void MEDMEMTest::testnArray()
   for (int i =0; i < mdim*nbelem1; i++)
     CPPUNIT_ASSERT( myArray2Ptr[i] == array2Ref[i] );
 
-  /*  try {
-    myArray2qua.getRow(1);
-  }
-  catch (MEDMEM::MEDEXCEPTION &m) {
-    CPPUNIT_FAIL(m.what());
-  }
-  catch (...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-    }*/
+  CPPUNIT_ASSERT_THROW(myArray2qua.getRow(1), MEDEXCEPTION);
 
   MEDMEM_Array<double,FullInterlaceNoGaussPolicy> * myArray2cin = ArrayConvert(myArray2);
   myArray2Ptr = myArray2cin->getPtr();
@@ -260,12 +241,12 @@ void MEDMEMTest::testnArray()
   const int nbtypegeo = 2;
   const int nbelgeoc[nbtypegeo+1]   = {1,3,6};
   const int nbgaussgeo[nbtypegeo+1] = {-1,2,3};
- 
+
   const double * myArray3Ptr = 0;
-  const double array3Ref[] = {1.11 , 1.12 , 1.21 , 1.22 , 
-			      2.11 , 2.12 , 2.21 , 2.22 , 
-			      13.11 , 13.12 , 13.21 , 13.22 , 13.31 , 13.32 , 
-			      14.11 , 14.12 , 14.21 , 14.22 , 14.31 , 14.32 , 
+  const double array3Ref[] = {1.11 , 1.12 , 1.21 , 1.22 ,
+			      2.11 , 2.12 , 2.21 , 2.22 ,
+			      13.11 , 13.12 , 13.21 , 13.22 , 13.31 , 13.32 ,
+			      14.11 , 14.12 , 14.21 , 14.22 , 14.31 , 14.32 ,
 			      15.11 , 15.12 , 15.21 , 15.22 , 15.31 , 15.32 };
 
   const double array4Ref[] = { 1.11 , 1.21 , 2.11 , 2.21,
@@ -314,7 +295,7 @@ void MEDMEMTest::testnArray()
       }
 
   MEDMEM_Array<double,FullInterlaceGaussPolicy> myArray3ter;
-  myArray3ter = myArray3; 
+  myArray3ter = myArray3;
   myArray3Ptr = myArray3ter.getPtr();
 
   elemno = 0;
@@ -347,13 +328,6 @@ void MEDMEMTest::testnArray()
 
   for (int i =0; i < myArray3qua.getArraySize(); i++)
     CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3Ptr[i], array3Ref[i], EPS );
-
-  /*try {
-    myArray3qua.getColumn(1);
-  }
-  catch (MEDMEM::MEDEXCEPTION &m) {
-    CPPUNIT_FAIL(m.what());
-    }*/
 
   MEDMEM_Array<double,NoInterlaceGaussPolicy> * myArray3cin = ArrayConvert(myArray3);
   myArray3Ptr = myArray3cin->getPtr();
@@ -411,7 +385,7 @@ void MEDMEMTest::testnArray()
       }
 
   MEDMEM_Array<double,NoInterlaceGaussPolicy> myArray4ter;
-  myArray4ter = myArray4; 
+  myArray4ter = myArray4;
   myArray4Ptr = myArray4ter.getPtr();
 
   elemno = 0;
@@ -442,13 +416,6 @@ void MEDMEMTest::testnArray()
   for (int i =0; i < myArray4qua.getArraySize(); i++)
     CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray4Ptr[i], array4Ref[i], EPS );
 
-  /* try {
-    myArray4qua.getRow(1);
-  }
-  catch (MEDMEM::MEDEXCEPTION &m) {
-    CPPUNIT_FAIL(m.what());
-    }*/
-
 
   MEDMEM_Array<double,FullInterlaceGaussPolicy> * myArray4cin = ArrayConvert(myArray4);
   myArray4Ptr = myArray4cin->getPtr();
@@ -461,12 +428,12 @@ void MEDMEMTest::testnArray()
 	CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray4Ptr[elemno], array3Ref[elemno], EPS );
 	elemno++;
       }
- 
+
   CPPUNIT_ASSERT( myArray4bis.getInterlacingType() != MED_UNDEFINED_INTERLACE);
 
-  CPPUNIT_ASSERT_THROW(myArray4.getIJ(0,2), MEDEXCEPTION); 
- 
-  cout<<myArray4<<endl;
+  CPPUNIT_ASSERT_THROW(myArray4.getIJ(0,2), MEDEXCEPTION);
+
+  //cout<<myArray4<<endl;
   ostringstream os;
   os << myArray4;
   CPPUNIT_ASSERT(os.str() != "");
