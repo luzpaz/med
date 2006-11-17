@@ -1094,79 +1094,11 @@ void MEDMEMTest::testModulusArray()
   CPPUNIT_FAIL("Case Not Implemented");
 }
 
-// #44: MEDMEM_nArray.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (21), defined in MEDMEM_nArray.hxx:
- *  class MEDMEM_Array_ {
- *   (yetno) virtual bool getGaussPresence() const { return false; }
- *   (yetno) virtual MED_EN::medModeSwitch getInterlacingType() const {return MED_EN::MED_UNDEFINED_INTERLACE;}
- *   (yetno) ~MEDMEM_Array_() {};
- *  }
- *  template<class ARRAY_ELEMENT_TYPE,
- *           class INTERLACING_POLICY=FullInterlaceNoGaussPolicy,
- *           class CHECKING_POLICY=IndexCheckPolicy>
- *  class MEDMEM_Array : public INTERLACING_POLICY, public CHECKING_POLICY, public MEDMEM_Array_ {
- *   (yetno) MEDMEM_Array();
- *   (yetno) ~MEDMEM_Array();
- *   (yetno) inline MEDMEM_Array(int dim, int nbelem);
- *   (yetno) inline MEDMEM_Array(ElementType * values, int dim, int nbelem,
- *                                bool shallowCopy=false, bool ownershipOfValues=false);
- *   (yetno) inline MEDMEM_Array(int dim, int nbelem, int nbtypegeo,
- *                               const int * const  nbelgeoc, const int * const nbgaussgeo);
- *   (yetno) inline MEDMEM_Array(ElementType * values, int dim, int nbelem, int nbtypegeo,
- *                               const int * const  nbelgeoc, const int * const  nbgaussgeo,
- *                               bool shallowCopy=false, bool ownershipOfValues=false);
- *   (yetno) inline MEDMEM_Array(const MEDMEM_Array & array, bool shallowCopy=false);
- *   (yetno) inline MEDMEM_Array<ElementType,InterlacingPolicy,CheckingPolicy> &
- *                  operator=(const MEDMEM_Array & array);
- *   (yetno) MED_EN::medModeSwitch getInterlacingType() const;
- *   (yetno) bool getGaussPresence() const;
- *   (yetno) ElementType * getPtr();
- *   (yetno) void setPtr(ElementType * values, bool shallowCopy=false, bool ownershipOfValues=false);
- *   (yetno) inline const ElementType * getRow(int i) const;
- *   (yetno) void setRow(int i,const ElementType * const value);
- *   (yetno) inline const ElementType * getColumn(int j) const;
- *   (yetno) void setColumn(int j, const ElementType * const value);
- *   (yetno) inline const ElementType & getIJ(int i, int j) const;
- *   (yetno) inline const ElementType & getIJK(int i, int j, int k) const;
- *   (yetno) inline void setIJ(int i, int j, const ElementType & value);
- *   (yetno) inline void setIJK(int i, int j, int k, const ElementType & value);
- *   (yetno) bool operator == (const MEDMEM_Array & array) const;
- *   (yetno) friend ostream & operator<<(ostream & os, const MEDMEM_Array & array);
- *  }
- */
-void MEDMEMTest::testnArray()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #44: MEDMEM_nArray.hxx  }  MEDMEMTest_nArray.cxx
 
 // #45: MEDMEM_PointerOf.hxx  }  MEDMEMTest_PointerOf.cxx
 
-// #46: MEDMEM_PolyhedronArray.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (12), defined in MEDMEM_PolyhedronArray.hxx:
- *  class POLYHEDRONARRAY {
- *   (yetno) POLYHEDRONARRAY();
- *   (yetno) POLYHEDRONARRAY(MED_EN::med_int numberofpolyhedron,
- *                           MED_EN::med_int numberoffaces, MED_EN::med_int numberofnodes);
- *   (yetno) POLYHEDRONARRAY(const POLYHEDRONARRAY& m);
- *   (yetno) inline MED_EN::med_int getNumberOfPolyhedron() const;
- *   (yetno) inline MED_EN::med_int getNumberOfFaces() const;
- *   (yetno) inline MED_EN::med_int getNumberOfNodes() const;
- *   (yetno) inline const MED_EN::med_int* getPolyhedronIndex() const;
- *   (yetno) inline const MED_EN::med_int* getFacesIndex() const;
- *   (yetno) inline const MED_EN::med_int* getNodes() const;
- *   (yetno) inline void setPolyhedronIndex(const MED_EN::med_int* polyhedronindex);
- *   (yetno) inline void setFacesIndex(const MED_EN::med_int* facesindex);
- *   (yetno) inline void setNodes(const MED_EN::med_int* nodes);
- *  }
- */
-void MEDMEMTest::testPolyhedronArray()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #46: MEDMEM_PolyhedronArray.hxx  }  MEDMEMTest_PolyhedronArray.cxx
 
 // #47: MEDMEM_PorflowMeshDriver.hxx  }  MEDMEMTest.cxx
 

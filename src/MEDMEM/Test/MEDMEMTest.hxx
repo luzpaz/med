@@ -71,8 +71,8 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testMedMeshDriver /* not in spec */ );
   CPPUNIT_TEST( testMedVersion /* not in spec */ );
   //40
-  CPPUNIT_TEST( testMesh );
-  CPPUNIT_TEST( testMeshing );
+  CPPUNIT_TEST( testMeshAndMeshing );
+//  CPPUNIT_TEST( testMeshing );
   CPPUNIT_TEST( testModulusArray );
   CPPUNIT_TEST( testnArray );
   CPPUNIT_TEST( testPointerOf );
@@ -144,8 +144,8 @@ public:
   void testMedMeshDriver() /* not in spec */;
   void testMedVersion() /* not in spec */;
   //40
-  void testMesh();
-  void testMeshing();
+  void testMeshAndMeshing();
+//  void testMeshing();
   void testModulusArray();
   void testnArray();
   void testPointerOf();

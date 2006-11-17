@@ -24,6 +24,8 @@
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_define.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
+#include "MEDMEM_Field.hxx"
 
 #include <sstream>
 #include <cmath>
@@ -32,19 +34,61 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
+double dmax(double x, double y) { return (x>y)?x:y;}
+
+double dmin(double x, double y) { return (x>y)?y:x;}
+
+/*!
+ *  Check methods (18), defined in MEDMEM_Meshing.hxx:
+ *  class MESHING: public MESH {
+ *   (+) MESHING();
+ *   (yetno) ~MESHING();
+ *   (+) void setSpaceDimension (const int SpaceDimension);
+ *   (+) void setMeshDimension (const int MeshDimension);
+ *   (+) void setNumberOfNodes (const int NumberOfNodes);
+ *   (+) void setCoordinates (const int SpaceDimension, const int NumberOfNodes,
+ *                                const double * Coordinates,
+ *                                const string System, const MED_EN::medModeSwitch Mode);
+ *   (+) void setCoordinatesSystem(const string System) throw (MEDEXCEPTION);
+ *   (+) void setCoordinatesNames (const string * names);
+ *   (+) void setCoordinateName (const string name, const int i);
+ *   (+) void setCoordinatesUnits (const string * units);
+ *   (+) void setCoordinateUnit (const string unit, const int i);
+ *   (+) void setNumberOfTypes (const int NumberOfTypes,
+ *                                  const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
+ *   (+) void setTypes (const MED_EN::medGeometryElement * Types,
+ *                          const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
+ *   (+) void setNumberOfElements (const int * NumberOfElements,
+ *                                 const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
+ *   (+) void setConnectivity (const int * Connectivity, const MED_EN::medEntityMesh Entity,
+ *                             const MED_EN::medGeometryElement Type) throw (MEDEXCEPTION);
+ *   (+) void setPolygonsConnectivity (const int * ConnectivityIndex, const int * ConnectivityValue,
+ *                                     int nbOfPolygons,
+ *                                     const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
+ *   (+) void setPolyhedraConnectivity (const int * PolyhedronIndex, const int * FacesIndex,
+ *                                      const int * Nodes, int nbOfPolyhedra,
+ *                                      const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
+ *   (NOT YET IMPLEMENTED!!!) void setConnectivities (const int * ConnectivityIndex,
+ *                                   const int * ConnectivityValue,
+ *                                   const MED_EN::medConnectivity ConnectivityType,
+ *                                   const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
+ *   (+) void addGroup (const GROUP & Group) throw (MEDEXCEPTION);
+ *  }
+ */
+
 /*!
  *  Check methods (87), defined in MEDMEM_Mesh.hxx:
  *  class MESH : public RCBASE {
  *   (yetno) void init();
- *   (yetno) MESH();
- *   (yetno) MESH(MESH &m);
+ *   (+) MESH();
+ *   (+) MESH(MESH &m);
  *   (yetno) MESH & operator=(const MESH &m);
  *   (yetno) virtual bool operator==(const MESH& other) const;
- *   (yetno) virtual bool deepCompare(const MESH& other) const;
+ *   (+) virtual bool deepCompare(const MESH& other) const;
  *   (yetno) MESH(driverTypes driverType, const string & fileName="",
  *                const string & meshName="") throw (MEDEXCEPTION);
- *   (yetno) virtual ~MESH();
- *   (yetno) friend ostream & operator<<(ostream &os, const MESH &my);
+ *   (+) virtual ~MESH();
+ *   (+) friend ostream & operator<<(ostream &os, const MESH &my);
  *   (yetno) int  addDriver(driverTypes driverType,
  *                          const string & fileName="Default File Name.med",
  *                          const string & driverName="Default Mesh Name",
@@ -55,40 +99,40 @@ using namespace MED_EN;
  *   (yetno) inline void read(const GENDRIVER & genDriver);
  *   (yetno) inline void write(int index=0, const string & driverName = "");
  *   (yetno) inline void write(const GENDRIVER & genDriver);
- *   (yetno) inline void setName(string name);
- *   (yetno) inline void setDescription(string description);
- *   (yetno) inline string getName() const;
- *   (yetno) inline string getDescription() const;
- *   (yetno) inline int getSpaceDimension() const;
- *   (yetno) inline int getMeshDimension() const;
+ *   (+) inline void setName(string name);
+ *   (+) inline void setDescription(string description);
+ *   (+) inline string getName() const;
+ *   (+) inline string getDescription() const;
+ *   (+) inline int getSpaceDimension() const;
+ *   (+) inline int getMeshDimension() const;
  *   (yetno) inline bool getIsAGrid();
- *   (yetno) inline int getNumberOfNodes() const;
- *   (yetno) virtual inline const COORDINATE * getCoordinateptr() const;
- *   (yetno) inline string                     getCoordinatesSystem() const;
- *   (yetno) virtual inline const double *     getCoordinates(MED_EN::medModeSwitch Mode) const;
- *   (yetno) virtual inline const double       getCoordinate(int Number,int Axis) const;
- *   (yetno) inline const string *             getCoordinatesNames() const;
- *   (yetno) inline const string *             getCoordinatesUnits() const;
- *   (yetno) virtual inline int getNumberOfTypes(MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual int getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual inline string * getCellTypeNames(MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
+ *   (+) inline int getNumberOfNodes() const;
+ *   (+) virtual inline const COORDINATE * getCoordinateptr() const;
+ *   (+) inline string                     getCoordinatesSystem() const;
+ *   (+) virtual inline const double *     getCoordinates(MED_EN::medModeSwitch Mode) const;
+ *   (+) virtual inline const double       getCoordinate(int Number,int Axis) const;
+ *   (+) inline const string *             getCoordinatesNames() const;
+ *   (+) inline const string *             getCoordinatesUnits() const;
+ *   (+) virtual inline int getNumberOfTypes(MED_EN::medEntityMesh Entity) const;
+ *   (+) virtual int getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
+ *   (+) virtual inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
+ *   (+) virtual MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
+ *   (+) virtual inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
+ *   (+) virtual inline string * getCellTypeNames(MED_EN::medEntityMesh Entity) const;
+ *   (+) virtual const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
+ *   (+) virtual inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
  *                                        MED_EN::medGeometryElement Type) const;
- *   (yetno) virtual int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity,
+ *   (+) virtual int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity,
  *                                        MED_EN::medGeometryElement Type) const;
- *   (yetno) virtual inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
+ *   (+) virtual inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
  *                                       MED_EN::medEntityMesh Entity) const;
- *   (yetno) inline bool existPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
+ *   (+) inline bool existPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
  *                                       MED_EN::medEntityMesh Entity) const;
- *   (yetno) inline bool existPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,
+ *   (+) inline bool existPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,
  *                                         MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual inline MED_EN::medGeometryElement getElementType
+ *   (+) virtual inline MED_EN::medGeometryElement getElementType
  *           (MED_EN::medEntityMesh Entity, int Number) const;
- *   (yetno) virtual inline MED_EN::medGeometryElement getElementTypeWithPoly
+ *   (+) virtual inline MED_EN::medGeometryElement getElementTypeWithPoly
  *           (MED_EN::medEntityMesh Entity, int Number) const;
  *   (yetno) virtual inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
  *                                            MED_EN::medConnectivity ConnectivityType,
@@ -97,25 +141,25 @@ using namespace MED_EN;
  *                                             MED_EN::medConnectivity ConnectivityType,
  *                                             MED_EN::medEntityMesh Entity,
  *                                             MED_EN::medGeometryElement Type) const;
- *   (yetno) virtual inline const int * getConnectivity(MED_EN::medModeSwitch Mode,
+ *   (+) virtual inline const int * getConnectivity(MED_EN::medModeSwitch Mode,
  *                                             MED_EN::medConnectivity ConnectivityType,
  *                                             MED_EN::medEntityMesh Entity,
  *                                             MED_EN::medGeometryElement Type) const;
- *   (yetno) virtual inline const int * getConnectivityIndex
+ *   (+) virtual inline const int * getConnectivityIndex
  *           (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity) const;
- *   (yetno) inline int getPolygonsConnectivityLength
+ *   (+) inline int getPolygonsConnectivityLength
  *           (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity) const;
- *   (yetno) inline const int * getPolygonsConnectivity
+ *   (+) inline const int * getPolygonsConnectivity
  *           (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity) const;
- *   (yetno) inline const int * getPolygonsConnectivityIndex
+ *   (+) inline const int * getPolygonsConnectivityIndex
  *           (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity) const;
- *   (yetno) inline int getNumberOfPolygons(MED_EN::medEntityMesh Entity=MED_EN::MED_ALL_ENTITIES) const;
- *   (yetno) inline int getPolyhedronConnectivityLength(MED_EN::medConnectivity ConnectivityType) const;
- *   (yetno) inline const int * getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const;
- *   (yetno) inline const int * getPolyhedronFacesIndex() const;
- *   (yetno) inline const int * getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const;
- *   (yetno) inline int getNumberOfPolyhedronFaces() const;
- *   (yetno) inline int getNumberOfPolyhedron() const;
+ *   (+) inline int getNumberOfPolygons(MED_EN::medEntityMesh Entity=MED_EN::MED_ALL_ENTITIES) const;
+ *   (+) inline int getPolyhedronConnectivityLength(MED_EN::medConnectivity ConnectivityType) const;
+ *   (+) inline const int * getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const;
+ *   (+) inline const int * getPolyhedronFacesIndex() const;
+ *   (+) inline const int * getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const;
+ *   (+) inline int getNumberOfPolyhedronFaces() const;
+ *   (+) inline int getNumberOfPolyhedron() const;
  *   (yetno) virtual int getElementNumber(MED_EN::medConnectivity ConnectivityType,
  *                                        MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type,
  *                                        int * connectivity) const;
@@ -127,20 +171,20 @@ using namespace MED_EN;
  *           (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
  *   (yetno) virtual inline const int * getReverseConnectivityIndex
  *           (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
- *   (yetno) virtual int getNumberOfFamilies(MED_EN::medEntityMesh Entity) const;
+ *   (+) virtual int getNumberOfFamilies(MED_EN::medEntityMesh Entity) const;
  *   (yetno) virtual inline const vector<FAMILY*> getFamilies(MED_EN::medEntityMesh Entity) const;
  *   (yetno) virtual inline const FAMILY* getFamily(MED_EN::medEntityMesh Entity,int i) const;
- *   (yetno) virtual int getNumberOfGroups(MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual inline const vector<GROUP*> getGroups(MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual inline const GROUP* getGroup(MED_EN::medEntityMesh Entity,int i) const;
- *   (yetno) virtual inline const CONNECTIVITY* getConnectivityptr() const;
+ *   (+) virtual int getNumberOfGroups(MED_EN::medEntityMesh Entity) const;
+ *   (+) virtual inline const vector<GROUP*> getGroups(MED_EN::medEntityMesh Entity) const;
+ *   (+) virtual inline const GROUP* getGroup(MED_EN::medEntityMesh Entity,int i) const;
+ *   (+) virtual inline const CONNECTIVITY* getConnectivityptr() const;
  *   (yetno) virtual SUPPORT * getBoundaryElements(MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
  *   (yetno) SUPPORT * getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION);
- *   (yetno) virtual FIELD<double>* getVolume (const SUPPORT * Support) const throw (MEDEXCEPTION);
- *   (yetno) virtual FIELD<double>* getArea (const SUPPORT * Support) const throw (MEDEXCEPTION);
- *   (yetno) virtual FIELD<double>* getLength (const SUPPORT * Support) const throw (MEDEXCEPTION);
- *   (yetno) virtual FIELD<double>* getNormal (const SUPPORT * Support) const throw (MEDEXCEPTION);
- *   (yetno) virtual FIELD<double>* getBarycenter (const SUPPORT * Support) const throw (MEDEXCEPTION);
+ *   (+) virtual FIELD<double>* getVolume (const SUPPORT * Support) const throw (MEDEXCEPTION);
+ *   (+) virtual FIELD<double>* getArea (const SUPPORT * Support) const throw (MEDEXCEPTION);
+ *   (+) virtual FIELD<double>* getLength (const SUPPORT * Support) const throw (MEDEXCEPTION);
+ *   (+) virtual FIELD<double>* getNormal (const SUPPORT * Support) const throw (MEDEXCEPTION);
+ *   (+) virtual FIELD<double>* getBarycenter (const SUPPORT * Support) const throw (MEDEXCEPTION);
  *   (yetno) static SUPPORT * mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION);
  *   (yetno) static SUPPORT * intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION);
  *   (yetno) void createFamilies();
@@ -158,7 +202,7 @@ using namespace MED_EN;
  *   (yetno) virtual void removeReference() const;
  *  }
  */
-void MEDMEMTest::testMesh()
+void MEDMEMTest::testMeshAndMeshing()
 {
   MESH * myMesh= new MESH() ;
   myMesh->setName("FIRST_MESH");
@@ -644,6 +688,7 @@ void MEDMEMTest::testMesh()
   }
 
   // Show Reverse Nodal Connectivity
+  //CPPUNIT_FAIL("ERROR in CONNECTIVITY::calculateReverseNodalConnectivity():_numberOfNodes - null->reverse_connectivity.size == 1");
   /*const int * ReverseNodalConnectivity;
   CPPUNIT_ASSERT_NO_THROW(ReverseNodalConnectivity= myMesh2->getReverseConnectivity(MED_NODAL, entity));
   const int ReverseLength = myMesh2->getReverseConnectivityLength(MED_NODAL, entity);
@@ -658,7 +703,7 @@ void MEDMEMTest::testMesh()
     }*/
 
   // Show Descending Connectivity
-  /*  int NumberOfElements1;
+  /*int NumberOfElements1;
   const int * connectivity;
   const int * connectivity_index;
   myMesh2->calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, entity);
@@ -678,358 +723,28 @@ void MEDMEMTest::testMesh()
     cout << endl;
     }*/
 
-  //test family
-  /*  vector<FAMILY*> families=myMesh->getFamilies(MED_CELL);
-  vector<FAMILY *>::iterator iter=families.begin();
+  //test family and group
+  int NumberOfGroups;
+  CPPUNIT_ASSERT_THROW(myMesh2->getNumberOfGroups(MED_ALL_ENTITIES), MEDEXCEPTION);
+  CPPUNIT_ASSERT_NO_THROW(NumberOfGroups = myMesh2->getNumberOfGroups(MED_CELL));
+  CPPUNIT_ASSERT_EQUAL(NumberOfGroups, 2);
+  vector<GROUP*> groups;
+  CPPUNIT_ASSERT_NO_THROW(groups = myMesh2->getGroups(MED_CELL));
+  CPPUNIT_ASSERT(groups.size() != 0);
+  for(int nb = 1; nb <= NumberOfGroups; nb++ )
+  {
+    const GROUP* group;
+    CPPUNIT_ASSERT_NO_THROW(group = myMesh2->getGroup(MED_CELL, nb));
+    CPPUNIT_ASSERT_EQUAL(group->getName(), groups[nb-1]->getName());
+  }
+
   int NumberOfFamilies;
   CPPUNIT_ASSERT_NO_THROW(NumberOfFamilies = myMesh2->getNumberOfFamilies(MED_CELL));
-  for (int i=1; i<NumberOfFamilies+1;i++) {
-    const FAMILY* myFamily = myMesh2->getFamily(MED_CELL,i);
-    cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
-    int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
-    cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
-    for (int j=1;j<NumberOfAttributes+1;j++)
-      cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
-    int NumberOfGroups = myFamily->getNumberOfGroups() ;
-    cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
-    for (int j=1;j<NumberOfGroups+1;j++)
-      cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
-      }*/
+  CPPUNIT_ASSERT_MESSAGE("Current mesh hasn't Families", NumberOfFamilies == 0);
 
-  delete [] TypeNames;
-  delete myMesh2;
-}
-
-/*!
- *  Check methods (18), defined in MEDMEM_Meshing.hxx:
- *  class MESHING: public MESH {
- *   (+) MESHING();
- *   (yetno) ~MESHING();
- *   (+) void setSpaceDimension (const int SpaceDimension);
- *   (+) void setMeshDimension (const int MeshDimension);
- *   (+) void setNumberOfNodes (const int NumberOfNodes);
- *   (+) void setCoordinates (const int SpaceDimension, const int NumberOfNodes,
- *                                const double * Coordinates,
- *                                const string System, const MED_EN::medModeSwitch Mode);
- *   (+) void setCoordinatesSystem(const string System) throw (MEDEXCEPTION);
- *   (+) void setCoordinatesNames (const string * names);
- *   (+) void setCoordinateName (const string name, const int i);
- *   (+) void setCoordinatesUnits (const string * units);
- *   (+) void setCoordinateUnit (const string unit, const int i);
- *   (+) void setNumberOfTypes (const int NumberOfTypes,
- *                                  const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
- *   (+) void setTypes (const MED_EN::medGeometryElement * Types,
- *                          const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
- *   (+) void setNumberOfElements (const int * NumberOfElements,
- *                                 const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
- *   (+) void setConnectivity (const int * Connectivity, const MED_EN::medEntityMesh Entity,
- *                             const MED_EN::medGeometryElement Type) throw (MEDEXCEPTION);
- *   (+) void setPolygonsConnectivity (const int * ConnectivityIndex, const int * ConnectivityValue,
- *                                     int nbOfPolygons,
- *                                     const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
- *   (+) void setPolyhedraConnectivity (const int * PolyhedronIndex, const int * FacesIndex,
- *                                      const int * Nodes, int nbOfPolyhedra,
- *                                      const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
- *   (NOT YET IMPLEMENTED!!!) void setConnectivities (const int * ConnectivityIndex,
- *                                   const int * ConnectivityValue,
- *                                   const MED_EN::medConnectivity ConnectivityType,
- *                                   const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
- *   (+) void addGroup (const GROUP & Group) throw (MEDEXCEPTION);
- *  }
- */
-void MEDMEMTest::testMeshing()
-{
-  ////////////
-  // TEST 1 //
-  ////////////
-
-  MESHING myMeshing ;
-  myMeshing.setName("meshing") ;
-
-  // define coordinates
-
-  int SpaceDimension = 3 ;
-  int NumberOfNodes = 19 ;
-  double Coordinates[57] = {
-    0.0, 0.0, 0.0, 
-    0.0, 0.0, 1.0, 
-    2.0, 0.0, 1.0, 
-    0.0, 2.0, 1.0, 
-    -2.0, 0.0, 1.0, 
-    0.0, -2.0, 1.0, 
-    1.0, 1.0, 2.0, 
-    -1.0, 1.0, 2.0, 
-    -1.0, -1.0, 2.0, 
-    1.0, -1.0, 2.0, 
-    1.0, 1.0, 3.0, 
-    -1.0, 1.0, 3.0, 
-    -1.0, -1.0, 3.0, 
-    1.0, -1.0, 3.0, 
-    1.0, 1.0, 4.0, 
-    -1.0, 1.0, 4.0, 
-    -1.0, -1.0, 4.0, 
-    1.0, -1.0, 4.0,
-    0.0, 0.0, 5.0
-  };
-  try
-  {
-    myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,"CARTESIAN",MED_FULL_INTERLACE);
-  }
-  catch (const std::exception &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch (...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
-
-  string Names[3] = { "X","Y","Z" } ;
-  try
-  {
-    myMeshing.setCoordinatesNames(Names);
-  }
-  catch (const std::exception &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch (...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
-
-  string Units[3] = { "cm","cm","cm" } ;
-  try
-  {
-    myMeshing.setCoordinatesUnits(Units) ;
-  }
-  catch (const std::exception &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch (...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
-
-  // define conectivities
-
-  // cell part
-  
-  const int NumberOfTypes = 3 ;
-  medGeometryElement Types[NumberOfTypes] = {MED_TETRA4,MED_PYRA5,MED_HEXA8} ;
-  const int NumberOfElements[NumberOfTypes] = {12,2,2} ;
-
-  CPPUNIT_ASSERT_THROW(myMeshing.setNumberOfTypes(NumberOfTypes,MED_NODE),MEDEXCEPTION);
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setNumberOfTypes(NumberOfTypes,MED_CELL));
-
-  CPPUNIT_ASSERT_THROW(myMeshing.setTypes(Types,MED_NODE), MEDEXCEPTION);
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setTypes(Types,MED_CELL));
-
-  CPPUNIT_ASSERT_THROW(myMeshing.setNumberOfElements(NumberOfElements,MED_NODE), MEDEXCEPTION);
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setNumberOfElements(NumberOfElements,MED_CELL));
-
-  const int sizeTetra = 12*4 ;
-  int ConnectivityTetra[sizeTetra]=
-  {
-    1,2,3,6,
-    1,2,4,3,
-    1,2,5,4,
-    1,2,6,5,
-    2,7,4,3,
-    2,8,5,4,
-    2,9,6,5,
-    2,10,3,6,
-    2,7,3,10,
-    2,8,4,7,
-    2,9,5,8,
-    2,10,6,9
-  };
-  
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityTetra,MED_CELL,MED_TETRA4));
-
-  int ConnectivityPyra[2*5]=
-  {
-    7,8,9,10,2,
-    15,18,17,16,19
-  };
-
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityPyra,MED_CELL,MED_PYRA5));
-
-  int ConnectivityHexa[2*8]=
-  {
-    11,12,13,14,7,8,9,10,
-    15,16,17,18,11,12,13,14
-  };
-
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityHexa,MED_CELL,MED_HEXA8));
-
-  // face part
-
-  const int NumberOfFacesTypes = 2 ;
-  medGeometryElement FacesTypes[NumberOfFacesTypes] = {MED_TRIA3,MED_QUAD4} ;
-  const int NumberOfFacesElements[NumberOfFacesTypes] = {4,4} ;
-
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setNumberOfTypes(NumberOfFacesTypes,MED_FACE));
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setTypes(FacesTypes,MED_FACE));
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setNumberOfElements(NumberOfFacesElements,MED_FACE));
-
-  const int sizeTria = 3*4 ;
-  int ConnectivityTria[sizeTria]=
-  {
-    1,4,3,
-    1,5,4,
-    1,6,5,
-    1,3,6
-  };
-  
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityTria,MED_FACE,MED_TRIA3));
-
-  int ConnectivityQua[4*4]=
-  {
-    7,8,9,10,
-    11,12,13,14,
-    11,7,8,12,
-    12,8,9,13
-  };
-
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityQua,MED_FACE,MED_QUAD4));
-
-  int meshDimension = SpaceDimension; // because there 3D cells in the mesh
-  try
-  {
-    myMeshing.setMeshDimension(meshDimension);
-  }
-  catch (const std::exception &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch (...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
-
-  // edge part
-
-  // not yet implemented : if set, results are unpredictable.
-
-  // Some groups :
-
-  // Node :
-  {
-    GROUP myGroup ;
-    myGroup.setName("SomeNodes");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_NODE);
-    myGroup.setNumberOfGeometricType(1);
-    medGeometryElement myTypes[1] = {MED_NONE};
-    myGroup.setGeometricType(myTypes);
-    const int myNumberOfElements[1] = {4} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[1+1] = {1,5} ;
-    const int value[4]= { 1,4,5,7} ;
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
-  }
-  {
-    GROUP myGroup ;
-    myGroup.setName("OtherNodes");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_NODE);
-    myGroup.setNumberOfGeometricType(1);
-    medGeometryElement myTypes[1] = {MED_NONE};
-    myGroup.setGeometricType(myTypes);
-    const int myNumberOfElements[1] = {3} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[1+1] = {1,4} ;
-    const int value[3]= { 2,3,6} ;
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
-  }
-
-  // Cell :
-  {
-    GROUP myGroup ;
-    myGroup.setName("SomeCells");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_CELL);
-    myGroup.setNumberOfGeometricType(3);
-    medGeometryElement myTypes[3] = {MED_TETRA4,MED_PYRA5,MED_HEXA8};
-    myGroup.setGeometricType(myTypes);
-    const int myNumberOfElements[3] = {4,1,2} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[3+1] = {1,5,6,8} ;
-    const int value[4+1+2]=
-    {
-      2,7,8,12,
-      13,
-      15,16
-    };
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
-  }
-  {
-    GROUP myGroup ;
-    myGroup.setName("OtherCells");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_CELL);
-    myGroup.setNumberOfGeometricType(2);
-    medGeometryElement myTypes[] = {MED_TETRA4,MED_PYRA5};
-    myGroup.setGeometricType(myTypes);
-    const int myNumberOfElements[] = {4,1} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[2+1] = {1,5,6} ;
-    const int value[4+1]=
-    {
-      3,4,5,9,
-      14
-    };
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
-  }
-
-  // Face :
-  {
-    GROUP myGroup ;
-    myGroup.setName("SomeFaces");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_FACE);
-    myGroup.setNumberOfGeometricType(2);
-    medGeometryElement myTypes[2] = {MED_TRIA3,MED_QUAD4};
-    myGroup.setGeometricType(myTypes);
-    const int myNumberOfElements[2] = {2,3} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[2+1] = {1,3,6} ;
-    const int value[2+3]=
-    {
-      2,4,
-      5,6,8
-    } ;
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
-  }
-  {
-    GROUP myGroup ;
-    myGroup.setName("OtherFaces");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_FACE);
-    myGroup.setNumberOfGeometricType(1);
-    medGeometryElement myTypes[1] = {MED_TRIA3};
-    myGroup.setGeometricType(myTypes);
-    const int myNumberOfElements[1] = {2} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[1+1] = {1,3} ;
-    const int value[2]=
-    {
-      1,3
-    } ;
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
-  }
-
-  ////////////
-  // TEST 2//
-  ////////////
+  //////////////////////////////////////////////////////////////
+  // TEST 2: Polygon and Polyhedron(only NODAL connectivity)  //
+  /////////////////////////////////////////////////////////////
 
   double CoordinatesPoly[57] = {
     2.0, 3.0, 2.0,
@@ -1073,12 +788,14 @@ void MEDMEMTest::testMeshing()
     2, 3, 9, 8, 
     8, 9, 17, 16, 
     9, 18, 17};
-
-  const int REFfacesIndex[20] = {
+  const int NumberOfFaces = 19;
+  const int NumberOfPolyhedron = 2;
+  const int nbOfPolygons = 2;
+  const int REFfacesIndex[NumberOfFaces+1] = {
     1, 7, 11, 15, 19, 23, 27, 31, 34, 
     39, 44, 48, 52, 55, 58, 61, 64, 68, 72, 75};
 
-  const int REFpolyIndex[3] = {1, 10, 20};
+  const int REFpolyIndex[NumberOfPolyhedron+1] = {1, 10, 20};
 
   double PolygonCoordinates[27] = {
     2.0, 3.0, 12.0,
@@ -1095,7 +812,7 @@ void MEDMEMTest::testMeshing()
     1, 2, 3, 4, 5, 6, // Polygon 1   
     7, 8, 9, 3, 2}; // Polygon 2
 
-  const int REFpolygonIndex[3] = {1, 7, 12};
+  const int REFpolygonIndex[nbOfPolygons+1] = {1, 7, 12};
 
   MESHING myMeshingPoly;
   myMeshingPoly.setName("meshingpoly");
@@ -1188,8 +905,34 @@ void MEDMEMTest::testMeshing()
   CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.setConnectivity(ConnectivityTetraPoly, MED_CELL, MED_TETRA4));
 
   CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.setPolyhedraConnectivity(REFpolyIndex, REFfacesIndex, 
-                                 REFnodalConnOfFaces, 2, MED_CELL));
+                                 REFnodalConnOfFaces, NumberOfPolyhedron, MED_CELL));
 
+  bool PolyConn = false;
+  CPPUNIT_ASSERT_NO_THROW(PolyConn = myMeshingPoly.existPolyhedronConnectivity(MED_NODAL, MED_CELL));
+  if(PolyConn)
+  {
+    CPPUNIT_ASSERT_EQUAL(myMeshingPoly.getNumberOfPolyhedron(),NumberOfPolyhedron);
+    CPPUNIT_ASSERT_EQUAL(myMeshingPoly.getNumberOfPolyhedronFaces(),NumberOfFaces);
+    CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.getPolyhedronConnectivityLength(MED_NODAL));
+    const int * PolyConn;
+    const int * PolyFaceIdx;
+    const int * PolyIdx;
+    CPPUNIT_ASSERT_NO_THROW(PolyConn = myMeshingPoly.getPolyhedronConnectivity(MED_NODAL));
+    CPPUNIT_ASSERT_NO_THROW(PolyFaceIdx = myMeshingPoly.getPolyhedronFacesIndex());
+    CPPUNIT_ASSERT_NO_THROW(PolyIdx = myMeshingPoly.getPolyhedronIndex(MED_NODAL));
+    for(int i = 0; i<NumberOfPolyhedron; i++)
+    {
+      int FaceIdxBegin = PolyIdx[i];
+      int FaceIdxEnd = PolyIdx[i+1];
+      for(int k = FaceIdxBegin; k < FaceIdxEnd; k++)
+      {
+	int IdxBegin = PolyFaceIdx[k-1];
+	int IdxEnd = PolyFaceIdx[k];
+	for(int j = IdxBegin; j < IdxEnd; j++ )
+	  CPPUNIT_ASSERT_EQUAL(PolyConn[j-1],REFnodalConnOfFaces[j-1]);
+      }
+    }
+  }
 
   MESHING myPolygonMeshing;
   myPolygonMeshing.setName("PolygonMeshing");
@@ -1258,9 +1001,191 @@ void MEDMEMTest::testMeshing()
   {
     1, 7, 2, 3, 9, 4
   };
-
+ 
   CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.setConnectivity(ConnectivityTri, MED_CELL, MED_TRIA3));
-  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.setPolygonsConnectivity(REFpolygonIndex, REFpolygonFaces, 2, MED_CELL));
-}
+  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.setPolygonsConnectivity(REFpolygonIndex, REFpolygonFaces, nbOfPolygons, MED_CELL));
 
+  bool PolygonConn = false;
+  CPPUNIT_ASSERT_NO_THROW(PolygonConn = myPolygonMeshing.existPolygonsConnectivity(MED_NODAL, MED_CELL));
+  if(PolygonConn)
+  {
+    int Polytypes;
+    CPPUNIT_ASSERT_NO_THROW(Polytypes = myPolygonMeshing.getNumberOfTypesWithPoly(MED_CELL));
+    CPPUNIT_ASSERT(NbOfTypes != Polytypes);
+
+    const MED_EN::medGeometryElement * PolyTypes;
+    CPPUNIT_ASSERT_NO_THROW(PolyTypes = myPolygonMeshing.getTypesWithPoly(MED_CELL));
+    CPPUNIT_ASSERT_EQUAL(PolyTypes[NbOfTypes],MED_POLYGON);
+
+    for(int t = 0; t < Polytypes; t++)
+    {
+      CPPUNIT_ASSERT_NO_THROW( myPolygonMeshing.getNumberOfElementsWithPoly(MED_CELL, PolyTypes[t]));
+    }
+
+    medGeometryElement geomPolyElem;
+    CPPUNIT_ASSERT_NO_THROW(geomPolyElem = myPolygonMeshing.getElementTypeWithPoly(MED_CELL, 1));
+    CPPUNIT_ASSERT_EQUAL(geomPolyElem, MED_TRIA3);
+ 
+    CPPUNIT_ASSERT_EQUAL(myPolygonMeshing.getNumberOfPolygons(),nbOfPolygons);
+    CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.getPolygonsConnectivityLength(MED_NODAL,MED_CELL));
+    const int * PolygonConn;
+    const int * PolygonIdx;
+    //!!!!!!!!Error
+    CPPUNIT_ASSERT_THROW(PolygonConn = myMeshingPoly.getPolygonsConnectivity(MED_NODAL,MED_CELL),MEDEXCEPTION);//Error for Med_Nodal connectivity - not implemented
+    CPPUNIT_ASSERT_THROW(PolygonIdx = myMeshingPoly.getPolygonsConnectivityIndex(MED_NODAL,MED_CELL),MEDEXCEPTION);
+    /*for(int i = 0; i<nbOfPolygons; i++)
+    {
+      int IdxBegin = PolygonIdx[i];
+      int IdxEnd = PolygonIdx[i+1];
+      for(int k = IdxBegin; k < IdxEnd; k++)
+      {
+	CPPUNIT_ASSERT_EQUAL(PolygonConn[k-1],REFpolygonFaces[k-1]);
+      }
+    }*/
+  }
+  delete[] TypeNames;
+  delete myMesh2;
+
+  /////////////////////////////////////////
+  // TEST 3: test MESH on real .med file //
+  /////////////////////////////////////////
+  string datadir  = getenv("DATA_DIR");
+  string filename = datadir + "/MedFiles/pointe.med";
+  string meshname = "maa1";
+
+  MESH * myMesh3 = new MESH();
+  myMesh3->setName(meshname);
+  MED_MESH_RDONLY_DRIVER myMeshDriver (filename, myMesh3);
+  myMeshDriver.setMeshName(meshname);
+  myMeshDriver.open();
+  myMeshDriver.read(); 
+  myMeshDriver.close();
+
+  int MeshDim  = myMesh3->getMeshDimension();
+  medEntityMesh constituentEntity ;
+  if (MeshDim==3) {
+    //constituent = "Face" ;
+    constituentEntity = MED_FACE ;
+  }
+
+  if (MeshDim==2) {
+    //constituent = "Edge" ;
+    constituentEntity = MED_EDGE ;
+  }
+  if (MeshDim==1) {
+    CPPUNIT_FAIL("ERROR: MeshDimension == 1");
+  }
+
+  int NumberOfElem = myMesh3->getNumberOfElements (constituentEntity,MED_ALL_ELEMENTS);
+  int SpaceDim = myMesh3->getSpaceDimension() ;
+  SUPPORT *sup = new SUPPORT(myMesh3);
+
+  // test of normal, area, volume, barycenter 
+  if (SpaceDim == 2)
+  {
+    FIELD<double>* normal;
+    CPPUNIT_ASSERT_NO_THROW(normal = myMesh3->getNormal(sup));
+    double normal_square, norm ;
+    double maxnorm=0.;
+    double minnorm=0.;
+    double tmp_value ;
+    for (int i = 1; i<=NumberOfElem; i++) {
+      normal_square = 0. ;
+      cout << "Normal " << i << " " ; 
+      for (int j=1; j<=SpaceDim; j++) {
+	tmp_value = normal->getValueIJ(i,j) ;
+	normal_square += tmp_value*tmp_value ;
+	cout << tmp_value << " " ;
+      }
+      norm = sqrt(normal_square);
+      maxnorm = dmax(maxnorm,norm);
+      minnorm = dmin(minnorm,norm);
+      cout << ", Norm = " << norm << endl;
+    }
+    cout << "Max Norm " << maxnorm << " Min Norm " << minnorm << endl;
+    delete normal ;
+  }
+
+  if (SpaceDim == 2)
+  {
+    FIELD<double>* length;
+    CPPUNIT_ASSERT_NO_THROW(length = myMesh3->getLength(sup));
+    double length_value,maxlength,minlength;
+    maxlength = 0;
+    minlength = 0;
+    for (int i = 1; i<=NumberOfElem;i++)
+    {
+      length_value = length->getValueIJ(i,1) ;
+      cout << "Length " << i << " " << length_value << endl;
+      maxlength = dmax(maxlength,length_value);
+      minlength = dmin(minlength,length_value);
+    }
+    cout << "Max Length " << maxlength << " Min Length " << minlength << endl;
+
+    delete length ;
+  }
+
+  FIELD<double>* barycenter;
+  CPPUNIT_ASSERT_NO_THROW(barycenter = myMesh3->getBarycenter(sup));
+  CPPUNIT_ASSERT_NO_THROW(NumberOfElem = myMesh3->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS));
+
+  for (int i = 1; i<=NumberOfElem;i++)
+  {
+    if (SpaceDim == 3)
+      cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << " " << barycenter->getValueIJ(i,3) << endl;
+
+    if (SpaceDim == 2)
+      cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << endl;
+  }
+
+  delete barycenter ;
+
+  if (SpaceDim == 3)
+  {
+    FIELD<double>* volume;
+    CPPUNIT_ASSERT_NO_THROW(volume= myMesh3->getVolume(sup));
+
+    double maxvol,minvol,voltot;
+    maxvol = 0.;
+    minvol = 0.;
+    voltot = 0.0;
+    for (int i = 1; i<=NumberOfElem;i++)
+    {
+      cout << "Volume " << i << " " << volume->getValueIJ(i,1) << endl;
+      maxvol = dmax(maxvol,volume->getValueIJ(i,1));
+      minvol = dmin(minvol,volume->getValueIJ(i,1));
+      voltot = voltot + volume->getValueIJ(i,1);
+    }
+
+    cout << "Max Volume " << maxvol << " Min Volume " << minvol << endl;
+    cout << "Support Volume " << voltot << endl;
+
+    delete volume ;
+  }
+  else if (SpaceDim == 2)
+  {
+    FIELD<double>* area;
+    CPPUNIT_ASSERT_NO_THROW(area = myMesh->getArea(sup));
+
+    double maxarea,minarea,areatot;
+    maxarea = 0.;
+    minarea = 0.;
+    areatot = 0.0;
+    for (int i = 1; i<=NumberOfElem;i++)
+    {
+      cout << "Area " << i << " " << area->getValueIJ(i,1) << endl;
+      maxarea = dmax(maxarea,area->getValueIJ(i,1));
+      minarea = dmin(minarea,area->getValueIJ(i,1));
+      areatot = areatot + area->getValueIJ(i,1);
+    }
+
+    cout << "Max Area " << maxarea << " Min Area " << minarea << endl;
+    cout << "Support Area " << areatot << endl;
+    
+    delete area ;
+  }
+
+  delete sup;
+  delete myMesh3;
+}
 
