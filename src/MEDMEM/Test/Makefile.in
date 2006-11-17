@@ -56,8 +56,8 @@ LIB_SRC = MEDMEMTest.cxx \
           MEDMEMTest_PointerOf.cxx \
           MEDMEMTest_SkyLineArray.cxx \
           MEDMEMTest_MeshAndMeshing.cxx \
-	  MEDMEMTest_nArray.cxx 
-#	  MEDMEMTest_PolyhedronArray.cxx
+	  MEDMEMTest_nArray.cxx \
+	  MEDMEMTest_PolyhedronArray.cxx
 
 LIB_CLIENT_IDL =
 
