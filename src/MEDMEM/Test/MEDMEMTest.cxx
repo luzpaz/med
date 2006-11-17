@@ -37,14 +37,13 @@
 #include "MEDMEM_Exception.hxx"
 //#include "MEDMEM_Family.hxx"
 //#include "MEDMEM_FieldConvert.hxx"
-//#include "MEDMEM_FieldForward.hxx"
 //#include "MEDMEM_Field.hxx"
 //#include "MEDMEM_Formulae.hxx"
 //#include "MEDMEM_GaussLocalization.hxx"
 //#include "MEDMEM_GenDriver.hxx"
 //#include "MEDMEM_GibiMeshDriver.hxx"
 //#include "MEDMEM_Grid.hxx"
-//#include "MEDMEM_Group.hxx"
+#include "MEDMEM_Group.hxx"
 //#include "MEDMEM_IndexCheckingPolicy.hxx"
 //#include "MEDMEM_InterlacingPolicy.hxx"
 //#include "MEDMEM_InterlacingTraits.hxx"
@@ -63,8 +62,8 @@
 //#include "MEDMEM_MedMeshDriver22.hxx"
 //#include "MEDMEM_MedMeshDriver.hxx"
 //#include "MEDMEM_MedVersion.hxx"
-//#include "MEDMEM_Mesh.hxx"
-//#include "MEDMEM_Meshing.hxx"
+#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Meshing.hxx"
 //#include "MEDMEM_ModulusArray.hxx"
 //#include "MEDMEM_PointerOf.hxx"
 //#include "MEDMEM_PolyhedronArray.hxx"
@@ -87,7 +86,7 @@
 #include <cmath>
 
 using namespace std;
-using namespace MEDMEM;
+//using namespace MEDMEM;
 
 // ============================================================================
 /*!
@@ -258,194 +257,13 @@ void MEDMEMTest::testDriverTools()
   CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 }
 
-// #12: MEDMEM_Exception.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_Exception.hxx:
- *   (+)     #define LOCALIZED(message) static_cast<const char *> (message) , __FILE__ , __LINE__
- *  class MEDEXCEPTION : public std::exception {
- *   (+)     MEDEXCEPTION(const char *text, const char *fileName=0, const unsigned int lineNumber=0);
- *   (+)     MEDEXCEPTION(const MEDEXCEPTION &ex);
- *   (yetno) ~MEDEXCEPTION() throw ();
- *   (+)     friend ostream & operator<< (ostream &os, const MEDEXCEPTION &ex);
- *   (+)     virtual const char *what(void) const throw ();
- *  }
- *  class MED_DRIVER_NOT_FOUND_EXCEPTION : public MEDEXCEPTION {
- *   (+)     MED_DRIVER_NOT_FOUND_EXCEPTION(const char *text, const char *fileName=0,
- *                                const unsigned int lineNumber=0);
- *   (yetno) MED_DRIVER_NOT_FOUND_EXCEPTION(const MED_DRIVER_NOT_FOUND_EXCEPTION &ex);
- *   (yetno) ~MED_DRIVER_NOT_FOUND_EXCEPTION() throw();
- *  }
- *
- *  Use code of MEDMEM/tests/testUMedException.cxx
- */
-void MEDMEMTest::testException()
-{
-  // test simple constructor
-  MEDEXCEPTION a = MEDEXCEPTION("test med exception");
-  //cout << a << endl;
-  //cout << a.what() << endl;
-  CPPUNIT_ASSERT(a.what());
-  CPPUNIT_ASSERT(strcmp(a.what(), "MED Exception : test med exception") == 0);
-
-  // test copy constructor
-  MEDEXCEPTION b (a);
-  CPPUNIT_ASSERT(b.what());
-  CPPUNIT_ASSERT(strcmp(b.what(), "MED Exception : test med exception") == 0);
-
-  // test dumping of exception in stream
-  ostringstream ostr;
-  ostr << b;
-  //cout << "ostr: " << ostr.str() << endl;
-  CPPUNIT_ASSERT(ostr.str() == "MED Exception : test med exception");
-
-  // test constructor from three arguments
-  MEDEXCEPTION c ("test med exception", "<file_name>.cxx", 14);
-  CPPUNIT_ASSERT(c.what());
-  CPPUNIT_ASSERT(strcmp(c.what(), "MED Exception in <file_name>.cxx [14] : test med exception") == 0);
-
-  // Test macro LOCALIZED
-  STRING msgErr;
-  msgErr << "ESSAI::ESSAI()!  "<< 4 << "ieme essai ";
-  //cout << MEDEXCEPTION(LOCALIZED(msgErr)).what() << endl;
-
-  const char* prefix = "MED Exception";
-  const char* exctxt = static_cast<const char *>(msgErr);
-  char* filen = __FILE__;
-  unsigned int linen = __LINE__ + 5;
-  const size_t len = strlen(prefix) + strlen(exctxt) + strlen(filen) +
-                     (1 + int(log10(float(linen)))) + 10 + 1;
-  char* excmsg = new char [len];
-  sprintf(excmsg, "%s in %s [%u] : %s", prefix, filen, linen, exctxt);
-  CPPUNIT_ASSERT(strcmp(MEDEXCEPTION(LOCALIZED(msgErr)).what(), excmsg) == 0);
-
-  delete [] excmsg;
-
-  // Test function STRING<<
-  const char * LOC = "toto";
-  CPPUNIT_ASSERT(MEDEXCEPTION(LOCALIZED(STRING(LOC) << " et titi")).what());
-
-  // Test throw
-  MEDEXCEPTION d (LOCALIZED(STRING(LOC) << " et titi"));
-  const char* dtxt = d.what();
-  try {
-    throw d;
-  }
-  catch (MEDEXCEPTION dc) {
-    CPPUNIT_ASSERT(strcmp(dc.what(), dtxt) == 0);
-  }
-  catch (...) {
-    CPPUNIT_FAIL("Unknown exception");
-  }
-
-  // Test MED_DRIVER_NOT_FOUND_EXCEPTION
-  MED_DRIVER_NOT_FOUND_EXCEPTION g ("mdnfe");
-  try {
-    throw g;
-  }
-  catch (MED_DRIVER_NOT_FOUND_EXCEPTION mdnfe) {
-    CPPUNIT_ASSERT(strcmp(mdnfe.what(), g.what()) == 0);
-  }
-  catch (MEDEXCEPTION me) {
-    CPPUNIT_FAIL(me.what());
-  }
-  catch (...) {
-    CPPUNIT_FAIL("Unknown exception");
-  }
-
-  CPPUNIT_FAIL("Case Not Complete (not in spec)");
-}
-
-// #13: MEDMEM_Family.hxx         }  MEDMEMTest.cxx
-// #14: MEDMEM_Field.hxx         \
-// #15: MEDMEM_FieldConvert.hxx   }  MEDMEMTest_Field.cxx
-// #16: MEDMEM_FieldForward.hxx  /
-
-// #17: MEDMEM_Formulae.hxx       }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (13), defined in MEDMEM_Formulae.hxx:
- *  (yetno) inline void CalculateBarycenterDyn(const double **pts, int nbPts, int dim, double *bary);
- *  (yetno) inline double CalculateAreaForPolyg(const double **coords, int nbOfPtsInPolygs, int spaceDim);
- *  (yetno) inline double CalculateAreaForTria(const double *p1, const double *p2,
- *                                             const double *p3, int spaceDim);
- *  (yetno) inline double CalculateAreaForQuad(const double *p1, const double *p2,
- *                                             const double *p3, const double *p4, int spaceDim);
- *  (yetno) inline void CalculateNormalForTria(const double *p1, const double *p2,
- *                                             const double *p3, double *normal);
- *  (yetno) inline void CalculateNormalForQuad(const double *p1, const double *p2,
- *                                             const double *p3, const double *p4, double *normal);
- *  (yetno) inline void CalculateNormalForPolyg(const double **coords, int nbOfPtsInPolygs, double *normal);
- *  (yetno) inline double CalculateVolumeForTetra(const double *p1, const double *p2,
- *                                                const double *p3, const double *p4);
- *  (yetno) inline double CalculateVolumeForPyra(const double *p1, const double *p2,
- *                                               const double *p3, const double *p4, const double *p5);
- *  (yetno) inline double CalculateVolumeForPenta(const double *p1, const double *p2, const double *p3,
- *                                                const double *p4, const double *p5, const double *p6);
- *  (yetno) inline double CalculateVolumeForHexa(const double *pt1, const double *pt2, const double *pt3,
- *                                               const double *pt4, const double *pt5, const double *pt6,
- *                                               const double *pt7, const double *pt8);
- *  (yetno) inline double CalculateVolumeForPolyh(const double ***pts, const int *nbOfNodesPerFaces,
- *                                                int nbOfFaces, const double *bary);
- *  (yetno) template<int N> inline double addComponentsOfVec(const double **pts, int rk);
- *  (yetno) template<> inline double addComponentsOfVec<1>(const double **pts, int rk);
- *  (yetno) template<int N, int DIM> inline void CalculateBarycenter(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<2,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<3,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<4,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<5,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<6,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<7,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<8,0>(const double **pts, double *bary);
- */
-void MEDMEMTest::testFormulae()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
-
-// #18: MEDMEM_GaussLocalization.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (13), defined in MEDMEM_GaussLocalization.hxx:
- *  class GAUSS_LOCALIZATION_ {
- *   (yetno) virtual MED_EN::medModeSwitch getInterlacingType() const;
- *   (yetno) virtual ~GAUSS_LOCALIZATION_();
- *  }
- *  (yetno) template <class INTERLACING_TAG=FullInterlace> class GAUSS_LOCALIZATION;
- *  (yetno) template <class INTERLACING_TAG> ostream & operator<<
- *                (ostream &os, const GAUSS_LOCALIZATION<INTERLACING_TAG> &loc);
- *  template <class INTERLACING_TAG> class GAUSS_LOCALIZATION : public GAUSS_LOCALIZATION_ {
- *   (yetno) friend ostream & operator<< <INTERLACING_TAG>
- *                     (ostream &os, const GAUSS_LOCALIZATION<INTERLACING_TAG> &loc);
- *   (yetno) GAUSS_LOCALIZATION() throw (MEDEXCEPTION);
- *   (yetno) GAUSS_LOCALIZATION(const string & locName,
- *                       const MED_EN::medGeometryElement typeGeo,
- *                       const int  nGauss,
- *                       const ArrayNoGauss & cooRef,
- *                       const ArrayNoGauss & cooGauss,
- *                       const vector<double>  & wg) throw (MEDEXCEPTION);
- *   (yetno) GAUSS_LOCALIZATION(const string & locName,
- *                       const MED_EN::medGeometryElement  typeGeo,
- *                       const int  nGauss,
- *                       const double  * const cooRef,
- *                       const double  * const cooGauss,
- *                       const double  * const wg) throw (MEDEXCEPTION);
- *   (yetno) virtual ~GAUSS_LOCALIZATION();
- *   (yetno) GAUSS_LOCALIZATION & operator=(const GAUSS_LOCALIZATION & gaussLoc);
- *   (yetno) bool operator == (const GAUSS_LOCALIZATION &loc) const;
- *   (yetno) string          getName()    const;
- *   (yetno) MED_EN::medGeometryElement getType() const;
- *   (yetno) int             getNbGauss() const;
- *   (yetno) ArrayNoGauss    getRefCoo () const;
- *   (yetno) ArrayNoGauss    getGsCoo  () const;
- *   (yetno) vector <double> getWeight () const;
- *   (yetno) inline MED_EN::medModeSwitch  getInterlacingType() const;
- *  }
- */
-void MEDMEMTest::testGaussLocalization()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #12: MEDMEM_Exception.hxx          }  MEDMEMTest_Exception.cxx
+// #13: MEDMEM_Family.hxx             }  MEDMEMTest.cxx
+// #14: MEDMEM_Field.hxx              \
+// #15: MEDMEM_FieldConvert.hxx       /  MEDMEMTest_Field.cxx
+// #16: MEDMEM_FieldForward.hxx       }  no methods to test
+// #17: MEDMEM_Formulae.hxx           }  MEDMEMTest_Formulae.cxx
+// #18: MEDMEM_GaussLocalization.hxx  }  MEDMEMTest_GaussLocalization.cxx
 
 // #19: MEDMEM_GenDriver.hxx  }  MEDMEMTest.cxx
 
@@ -1295,3 +1113,276 @@ void MEDMEMTest::testmedimport_src()
 
 //60
 //21 not in spec
+
+//////////////////////////////////////
+// HELP METHODS, used in many tests //
+//////////////////////////////////////
+
+/*!
+ *  Create a mesh with certain filling
+ *                 .n4
+ *                 |
+ *                 |
+ *  n16,n12,n8.---------.n7,n11,n15
+ *            |    |    |
+ *            |    |    |
+ *     n5.----|----.----|----.n3
+ *            |    |    |
+ *            |    |    |
+ *  n17,n13,n9.---------.n10,n14,n18
+ *                 |
+ *                 |
+ *                 .n6
+ *
+ *                 .n19 (0,0,5)
+ *                 |
+ *                 |
+ *                 |
+ *                 |
+ *           n16.--|-.----.n15
+ *             /   |/    /
+ *            .    .    .
+ *           /    /|   /
+ *       n17.----.----.n18
+ *                 |
+ *                 |
+ *           n12.--|-.----.n11
+ *             /   |/    /
+ *            .    .    .
+ *           /    /|   /
+ *       n13.----.----.n14
+ *                 |
+ *                 |
+ *            n8.--|-.----.n7
+ *             /   |/    /
+ *            .    .    .
+ *           /    /|   /
+ *        n9.----.----.n10
+ *                 |   .n4 (0,2,1)
+ *                 |  /
+ *                 | .
+ *                 |/
+ *     n5.----.----.----.----.n3 (2,0,1)
+ *   (-2,0,1)     /n2 (0,0,1)
+ *               . |
+ *              /  |
+ *             .n6 |
+ *                 |
+ *                 |
+ *                 .n1 (0,0,0)
+ */
+MEDMEM::MESH * MEDMEMTest::createTestMesh ()
+{
+  // MESH DATA
+  int SpaceDimension = 3;
+  int meshDimension = SpaceDimension; // because there 3D cells in the mesh
+
+  // coordinates
+  int NumberOfNodes = 19;
+
+  string Names[3] = { "X","Y","Z" };
+  string Units[3] = { "cm","cm","cm" };
+
+  double Coordinates[57] = {
+     0.0,  0.0, 0.0, // n1
+     0.0,  0.0, 1.0, // n2
+     2.0,  0.0, 1.0, // n3
+     0.0,  2.0, 1.0, // n4
+    -2.0,  0.0, 1.0, // n5
+     0.0, -2.0, 1.0, // n6
+     1.0,  1.0, 2.0, // n7
+    -1.0,  1.0, 2.0, // n8
+    -1.0, -1.0, 2.0, // n9
+     1.0, -1.0, 2.0, // n10
+     1.0,  1.0, 3.0, // n11
+    -1.0,  1.0, 3.0, // n12
+    -1.0, -1.0, 3.0, // n13
+     1.0, -1.0, 3.0, // n14
+     1.0,  1.0, 4.0, // n15
+    -1.0,  1.0, 4.0, // n16
+    -1.0, -1.0, 4.0, // n17
+     1.0, -1.0, 4.0, // n18
+     0.0,  0.0, 5.0  // n19
+  };
+
+  // cells connectivities
+  const int NumberOfCellTypes = 3;
+  MED_EN::medGeometryElement CellTypes[NumberOfCellTypes] =
+    {MED_EN::MED_TETRA4, MED_EN::MED_PYRA5, MED_EN::MED_HEXA8};
+  const int NumberOfCells[NumberOfCellTypes] = {12, 2, 2};
+
+  int ConnectivityTetra[12 * 4] = {
+    1,2,3,6,
+    1,2,4,3,
+    1,2,5,4,
+    1,2,6,5,
+    2,7,4,3,
+    2,8,5,4,
+    2,9,6,5,
+    2,10,3,6,
+    2,7,3,10,
+    2,8,4,7,
+    2,9,5,8,
+    2,10,6,9
+  };
+
+  int ConnectivityPyra[2 * 5] = {
+    7,8,9,10,2,
+    15,18,17,16,19
+  };
+
+  int ConnectivityHexa[2 * 8] = {
+    11,12,13,14,7,8,9,10,
+    15,16,17,18,11,12,13,14
+  };
+
+  // faces connectivities
+  const int NumberOfFaceTypes = 2;
+  MED_EN::medGeometryElement FaceTypes[NumberOfFaceTypes] = {MED_EN::MED_TRIA3, MED_EN::MED_QUAD4};
+  const int NumberOfFaces[NumberOfFaceTypes] = {4, 4};
+
+  int ConnectivityTria[4 * 3] = {
+    1,4,3,
+    1,5,4,
+    1,6,5,
+    1,3,6
+  };
+
+  int ConnectivityQua[4 * 4] = {
+    7,8,9,10,
+    11,12,13,14,
+    11,7,8,12,
+    12,8,9,13
+  };
+
+
+  // CREATE THE MESH
+  MEDMEM::MESHING* myMeshing = new MEDMEM::MESHING;
+
+  myMeshing->setName("meshing");
+
+  myMeshing->setCoordinates(SpaceDimension, NumberOfNodes, Coordinates,
+                           "CARTESIAN", MED_EN::MED_FULL_INTERLACE);
+  myMeshing->setCoordinatesNames(Names);
+  myMeshing->setCoordinatesUnits(Units);
+
+  // define connectivities
+  myMeshing->setNumberOfTypes(NumberOfCellTypes, MED_EN::MED_CELL);
+  myMeshing->setTypes(CellTypes, MED_EN::MED_CELL);
+  myMeshing->setNumberOfElements(NumberOfCells, MED_EN::MED_CELL);
+  
+  myMeshing->setConnectivity(ConnectivityTetra, MED_EN::MED_CELL, MED_EN::MED_TETRA4);
+  myMeshing->setConnectivity(ConnectivityPyra, MED_EN::MED_CELL, MED_EN::MED_PYRA5);
+  myMeshing->setConnectivity(ConnectivityHexa, MED_EN::MED_CELL, MED_EN::MED_HEXA8);
+
+  myMeshing->setNumberOfTypes(NumberOfFaceTypes, MED_EN::MED_FACE);
+  myMeshing->setTypes(FaceTypes, MED_EN::MED_FACE);
+  myMeshing->setNumberOfElements(NumberOfFaces, MED_EN::MED_FACE);
+  
+  myMeshing->setConnectivity(ConnectivityTria, MED_EN::MED_FACE, MED_EN::MED_TRIA3);
+  myMeshing->setConnectivity(ConnectivityQua, MED_EN::MED_FACE, MED_EN::MED_QUAD4);
+
+  // mesh dimension
+  myMeshing->setMeshDimension(meshDimension);
+
+  // edges connectivities
+  // not yet implemented : if set, results are unpredictable.
+
+  // groups of nodes
+  {
+    MEDMEM::GROUP myGroup;
+    myGroup.setName("SomeNodes");
+    myGroup.setMesh(myMeshing);
+    myGroup.setEntity(MED_EN::MED_NODE);
+    myGroup.setNumberOfGeometricType(1);
+    MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_NONE};
+    myGroup.setGeometricType(myTypes);
+    const int myNumberOfElements[1] = {4};
+    myGroup.setNumberOfElements(myNumberOfElements);
+    const int index[1+1] = {1,5};
+    const int value[4] = {1,4,5,7};
+    myGroup.setNumber(index,value);
+    myMeshing->addGroup(myGroup);
+  }
+  {
+    MEDMEM::GROUP myGroup;
+    myGroup.setName("OtherNodes");
+    myGroup.setMesh(myMeshing);
+    myGroup.setEntity(MED_EN::MED_NODE);
+    myGroup.setNumberOfGeometricType(1);
+    MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_NONE};
+    myGroup.setGeometricType(myTypes);
+    const int myNumberOfElements[1] = {3};
+    myGroup.setNumberOfElements(myNumberOfElements);
+    const int index[1+1] = {1,4};
+    const int value[3] = {2,3,6};
+    myGroup.setNumber(index,value);
+    myMeshing->addGroup(myGroup);
+  }
+
+  // groups of cells
+  {
+    MEDMEM::GROUP myGroup;
+    myGroup.setName("SomeCells");
+    myGroup.setMesh(myMeshing);
+    myGroup.setEntity(MED_EN::MED_CELL);
+    myGroup.setNumberOfGeometricType(3);
+    MED_EN::medGeometryElement myTypes[3] = {MED_EN::MED_TETRA4,MED_EN::MED_PYRA5,MED_EN::MED_HEXA8};
+    myGroup.setGeometricType(myTypes);
+    const int myNumberOfElements[3] = {4,1,2};
+    myGroup.setNumberOfElements(myNumberOfElements);
+    const int index[3+1] = {1,5,6,8};
+    const int value[4+1+2] = {2,7,8,12,  13,  15,16};
+    myGroup.setNumber(index,value);
+    myMeshing->addGroup(myGroup);
+  }
+  {
+    MEDMEM::GROUP myGroup;
+    myGroup.setName("OtherCells");
+    myGroup.setMesh(myMeshing);
+    myGroup.setEntity(MED_EN::MED_CELL);
+    myGroup.setNumberOfGeometricType(2);
+    MED_EN::medGeometryElement myTypes[] = {MED_EN::MED_TETRA4,MED_EN::MED_PYRA5};
+    myGroup.setGeometricType(myTypes);
+    const int myNumberOfElements[] = {4,1};
+    myGroup.setNumberOfElements(myNumberOfElements);
+    const int index[2+1] = {1,5,6};
+    const int value[4+1] = {3,4,5,9,  14};
+    myGroup.setNumber(index,value);
+    myMeshing->addGroup(myGroup);
+  }
+
+  // groups of faces
+  {
+    MEDMEM::GROUP myGroup;
+    myGroup.setName("SomeFaces");
+    myGroup.setMesh(myMeshing);
+    myGroup.setEntity(MED_EN::MED_FACE);
+    myGroup.setNumberOfGeometricType(2);
+    MED_EN::medGeometryElement myTypes[2] = {MED_EN::MED_TRIA3,MED_EN::MED_QUAD4};
+    myGroup.setGeometricType(myTypes);
+    const int myNumberOfElements[2] = {2,3};
+    myGroup.setNumberOfElements(myNumberOfElements);
+    const int index[2+1] = {1,3,6};
+    const int value[2+3] = {2,4,  5,6,8};
+    myGroup.setNumber(index,value);
+    myMeshing->addGroup(myGroup);
+  }
+  {
+    MEDMEM::GROUP myGroup;
+    myGroup.setName("OtherFaces");
+    myGroup.setMesh(myMeshing);
+    myGroup.setEntity(MED_EN::MED_FACE);
+    myGroup.setNumberOfGeometricType(1);
+    MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_TRIA3};
+    myGroup.setGeometricType(myTypes);
+    const int myNumberOfElements[1] = {2};
+    myGroup.setNumberOfElements(myNumberOfElements);
+    const int index[1+1] = {1,3};
+    const int value[2] = {1,3};
+    myGroup.setNumber(index,value);
+    myMeshing->addGroup(myGroup);
+  }
+
+  return myMeshing;
+}

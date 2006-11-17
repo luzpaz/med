@@ -23,6 +23,10 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
+namespace MEDMEM {
+  class MESH;
+};
+
 class MEDMEMTest : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( MEDMEMTest );
@@ -43,7 +47,6 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testFamily );
   CPPUNIT_TEST( testField );
   CPPUNIT_TEST( testFieldConvert );
-  CPPUNIT_TEST( testFieldForward /* not in spec */ );
   CPPUNIT_TEST( testFormulae );
   CPPUNIT_TEST( testGaussLocalization );
   CPPUNIT_TEST( testGenDriver /* not in spec */ );
@@ -116,7 +119,6 @@ public:
   void testFamily();
   void testField();
   void testFieldConvert();
-  void testFieldForward() /* not in spec */;
   void testFormulae();
   void testGaussLocalization();
   void testGenDriver() /* not in spec */;
@@ -166,6 +168,8 @@ public:
   void testVtkMeshDriver();
   void testmedimport_src() /* not in spec */;
   //60
+
+  MEDMEM::MESH * createTestMesh ();
 };
 
 #endif

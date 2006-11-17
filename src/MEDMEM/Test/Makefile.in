@@ -48,8 +48,11 @@ LIB_SRC = MEDMEMTest.cxx \
 	  MEDMEMTest_Connectivity.cxx \
 	  MEDMEMTest_Coordinate.cxx \
 	  MEDMEMTest_DriverFactory.cxx \
+	  MEDMEMTest_Exception.cxx \
 	  MEDMEMTest_Family.cxx \
 	  MEDMEMTest_Field.cxx \
+	  MEDMEMTest_Formulae.cxx \
+	  MEDMEMTest_GaussLocalization.cxx \
 	  MEDMEMTest_Unit.cxx \
 	  MEDMEMTest_MedVersion.cxx \
           MEDMEMTest_PointerOf.cxx \
