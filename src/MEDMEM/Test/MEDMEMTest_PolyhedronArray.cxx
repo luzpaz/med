@@ -35,19 +35,19 @@ using namespace MED_EN;
 /*!
  *  Check methods (12), defined in MEDMEM_PolyhedronArray.hxx:
  *  class POLYHEDRONARRAY {
- *   (yetno) POLYHEDRONARRAY();
- *   (yetno) POLYHEDRONARRAY(MED_EN::med_int numberofpolyhedron,
+ *   (+) POLYHEDRONARRAY();
+ *   (+) POLYHEDRONARRAY(MED_EN::med_int numberofpolyhedron,
  *                           MED_EN::med_int numberoffaces, MED_EN::med_int numberofnodes);
- *   (yetno) POLYHEDRONARRAY(const POLYHEDRONARRAY& m);
- *   (yetno) inline MED_EN::med_int getNumberOfPolyhedron() const;
- *   (yetno) inline MED_EN::med_int getNumberOfFaces() const;
- *   (yetno) inline MED_EN::med_int getNumberOfNodes() const;
- *   (yetno) inline const MED_EN::med_int* getPolyhedronIndex() const;
- *   (yetno) inline const MED_EN::med_int* getFacesIndex() const;
- *   (yetno) inline const MED_EN::med_int* getNodes() const;
- *   (yetno) inline void setPolyhedronIndex(const MED_EN::med_int* polyhedronindex);
- *   (yetno) inline void setFacesIndex(const MED_EN::med_int* facesindex);
- *   (yetno) inline void setNodes(const MED_EN::med_int* nodes);
+ *   (+) POLYHEDRONARRAY(const POLYHEDRONARRAY& m);
+ *   (+) inline MED_EN::med_int getNumberOfPolyhedron() const;
+ *   (+) inline MED_EN::med_int getNumberOfFaces() const;
+ *   (+) inline MED_EN::med_int getNumberOfNodes() const;
+ *   (+) inline const MED_EN::med_int* getPolyhedronIndex() const;
+ *   (+) inline const MED_EN::med_int* getFacesIndex() const;
+ *   (+) inline const MED_EN::med_int* getNodes() const;
+ *   (+) inline void setPolyhedronIndex(const MED_EN::med_int* polyhedronindex);
+ *   (+) inline void setFacesIndex(const MED_EN::med_int* facesindex);
+ *   (+) inline void setNodes(const MED_EN::med_int* nodes);
  *  }
  */
 void MEDMEMTest::testPolyhedronArray()
@@ -66,18 +66,28 @@ void MEDMEMTest::testPolyhedronArray()
 
   POLYHEDRONARRAY myPArray2(myPArray);
 
-  const med_int* __polyhedronindex;
-  __polyhedronindex = myPArray2.getPolyhedronIndex();
+  const med_int* __polyhedronindex = myPArray2.getPolyhedronIndex();
   const med_int* __facesindex = myPArray2.getFacesIndex();
   const med_int* __nodes = myPArray2.getNodes();
 
-  cout << "__polyhedronindex =" << endl;
-  for (int i=0; i<2; i++)
-    cout << __polyhedronindex[i] << endl;
-  cout << "__facesindex =" << endl;
-  for (int i=0; i<11; i++)
-    cout << __facesindex[i] << endl;
-  cout << "__nodes =" << endl;
-  for (int i=0; i<40; i++)
-    cout << __nodes[i] << endl;
+  CPPUNIT_ASSERT_EQUAL(myPArray2.getNumberOfPolyhedron(), nbPolyhedrons);
+  CPPUNIT_ASSERT_EQUAL(myPArray2.getNumberOfFaces(), nbFaces);
+  CPPUNIT_ASSERT_EQUAL(myPArray2.getNumberOfNodes(), nbNodes);
+
+  for (int i=0; i<nbPolyhedrons; i++)
+    CPPUNIT_ASSERT_EQUAL( __polyhedronindex[i], polyhedronindex[i]);
+
+  for (int i=0; i<nbFaces; i++)
+   CPPUNIT_ASSERT_EQUAL( __facesindex[i], facesindex[i]);
+
+  for (int i=0; i<nbNodes; i++)
+    CPPUNIT_ASSERT_EQUAL(__nodes[i], nodes[i]);
+
+  POLYHEDRONARRAY myPArray3;
+  //ERROR: myPArray3.getNumberOfPolyhedron() == 0 -> set only __polyhedronindex3[0]==1
+  CPPUNIT_ASSERT_NO_THROW(myPArray3.setPolyhedronIndex(polyhedronindex));
+  /*CPPUNIT_ASSERT_EQUAL(myPArray3.getNumberOfPolyhedron(), nbPolyhedrons);
+  const med_int* __polyhedronindex3 = myPArray3.getPolyhedronIndex();
+  for(int i=0; i<nbPolyhedrons; i++)
+  CPPUNIT_ASSERT_EQUAL( __polyhedronindex3[i], polyhedronindex[i]);*/
 }
