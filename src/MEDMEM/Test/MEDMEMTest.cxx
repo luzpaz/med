@@ -460,71 +460,7 @@ void MEDMEMTest::testGenDriver()
   CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 }
 
-// #20: MEDMEM_GibiMeshDriver.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (31), defined in MEDMEM_GibiMeshDriver.hxx:
- *  class GIBI_MESH_DRIVER : public GENDRIVER {
- *   (yetno) GIBI_MESH_DRIVER();
- *   (yetno) GIBI_MESH_DRIVER(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces accessMode);
- *   (yetno) GIBI_MESH_DRIVER(const GIBI_MESH_DRIVER & driver);
- *   (yetno) virtual ~GIBI_MESH_DRIVER();
- *   (yetno) virtual void write(void) const = 0;
- *   (yetno) virtual void read (void) = 0;
- *   (yetno) void   setMeshName(const string & meshName);
- *   (yetno) string getMeshName() const;
- *   (yetno) static MED_EN::medGeometryElement gibi2medGeom(size_t gibiTypeNb);
- *   (yetno) static int med2gibiGeom(MED_EN::medGeometryElement medGeomType);
- *  }
- *  class GIBI_MESH_RDONLY_DRIVER : public virtual GIBI_MESH_DRIVER {
- *   (yetno) GIBI_MESH_RDONLY_DRIVER();
- *   (yetno) GIBI_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh);
- *   (yetno) GIBI_MESH_RDONLY_DRIVER(const GIBI_MESH_RDONLY_DRIVER & driver);
- *   (yetno) virtual ~GIBI_MESH_RDONLY_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *   (yetno) void read (void) throw (MEDEXCEPTION);
- *   (yetno) void open();
- *   (yetno) void close();
- *  }
- *  class GIBI_MESH_WRONLY_DRIVER : public virtual GIBI_MESH_DRIVER {
- *   (yetno) GIBI_MESH_WRONLY_DRIVER();
- *   (yetno) GIBI_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh);
- *   (yetno) GIBI_MESH_WRONLY_DRIVER(const GIBI_MESH_WRONLY_DRIVER & driver);
- *   (yetno) virtual ~GIBI_MESH_WRONLY_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *   (yetno) void read (void) throw (MEDEXCEPTION);
- *   (yetno) void open();
- *   (yetno) void close();
- *  }
- *  class GIBI_MESH_RDWR_DRIVER : public GIBI_MESH_RDONLY_DRIVER, public GIBI_MESH_WRONLY_DRIVER {
- *   (yetno) GIBI_MESH_RDWR_DRIVER();
- *   (yetno) GIBI_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh);
- *   (yetno) GIBI_MESH_RDWR_DRIVER(const GIBI_MESH_RDWR_DRIVER & driver);
- *   (yetno) ~GIBI_MESH_RDWR_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *   (yetno) void read (void) throw (MEDEXCEPTION);
- *   (yetno) void open();
- *   (yetno) void close();
- *  }
- *  class GIBI_MED_RDONLY_DRIVER : public GIBI_MESH_RDONLY_DRIVER {
- *   (yetno) GIBI_MED_RDONLY_DRIVER();
- *   (yetno) GIBI_MED_RDONLY_DRIVER(const string & fileName, MED * ptrMed);
- *   (yetno) GIBI_MED_RDONLY_DRIVER(const GIBI_MED_RDONLY_DRIVER & driver);
- *   (yetno) virtual ~GIBI_MED_RDONLY_DRIVER();
- *   (yetno) void read (void) throw (MEDEXCEPTION);
- *  }
- *  class GIBI_MED_WRONLY_DRIVER : public GIBI_MESH_WRONLY_DRIVER {
- *   (yetno) GIBI_MED_WRONLY_DRIVER();
- *   (yetno) GIBI_MED_WRONLY_DRIVER(const string & fileName, MED * ptrMed, MESH * ptrMesh);
- *   (yetno) GIBI_MED_WRONLY_DRIVER(const GIBI_MED_WRONLY_DRIVER & driver);
- *   (yetno) virtual ~GIBI_MED_WRONLY_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *  }
- */
-void MEDMEMTest::testGibiMeshDriver()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #20: MEDMEM_GibiMeshDriver.hxx  }  MEDMEMTest_GibiMeshDriver.cxx
 
 // #21: MEDMEM_Grid.cxx  }  MEDMEMTest.cxx
 
@@ -1100,51 +1036,7 @@ void MEDMEMTest::testModulusArray()
 
 // #46: MEDMEM_PolyhedronArray.hxx  }  MEDMEMTest_PolyhedronArray.cxx
 
-// #47: MEDMEM_PorflowMeshDriver.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (18), defined in MEDMEM_PorflowMeshDriver.hxx:
- *  class PORFLOW_MESH_DRIVER : public GENDRIVER {
- *   (yetno) PORFLOW_MESH_DRIVER();
- *   (yetno) PORFLOW_MESH_DRIVER(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces accessMode);
- *   (yetno) PORFLOW_MESH_DRIVER(const PORFLOW_MESH_DRIVER & driver);
- *   (yetno) virtual ~PORFLOW_MESH_DRIVER();
- *   (yetno) void open() throw (MEDEXCEPTION);
- *   (yetno) void close() throw (MEDEXCEPTION);
- *   (yetno) virtual void write(void) const = 0;
- *   (yetno) virtual void read (void) = 0;
- *   (yetno) void   setMeshName(const string & meshName);
- *   (yetno) string getMeshName() const;
- *  }
- *  class PORFLOW_MESH_RDONLY_DRIVER : public virtual PORFLOW_MESH_DRIVER {
- *   (yetno) PORFLOW_MESH_RDONLY_DRIVER();
- *   (yetno) PORFLOW_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh);
- *   (yetno) PORFLOW_MESH_RDONLY_DRIVER(const PORFLOW_MESH_RDONLY_DRIVER & driver);
- *   (yetno) virtual ~PORFLOW_MESH_RDONLY_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *   (yetno) void read (void) throw (MEDEXCEPTION);
- *  }
- *  class PORFLOW_MESH_WRONLY_DRIVER : public virtual PORFLOW_MESH_DRIVER {
- *   (yetno) PORFLOW_MESH_WRONLY_DRIVER();
- *   (yetno) PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh);
- *   (yetno) PORFLOW_MESH_WRONLY_DRIVER(const PORFLOW_MESH_WRONLY_DRIVER & driver);
- *   (yetno) virtual ~PORFLOW_MESH_WRONLY_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *   (yetno) void read (void) throw (MEDEXCEPTION);
- *  }
- *  class PORFLOW_MESH_RDWR_DRIVER : public PORFLOW_MESH_RDONLY_DRIVER, public PORFLOW_MESH_WRONLY_DRIVER {
- *   (yetno) PORFLOW_MESH_RDWR_DRIVER();
- *   (yetno) PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh);
- *   (yetno) PORFLOW_MESH_RDWR_DRIVER(const PORFLOW_MESH_RDWR_DRIVER & driver);
- *   (yetno) ~PORFLOW_MESH_RDWR_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *   (yetno) void read (void) throw (MEDEXCEPTION);
- *  }
- */
-void MEDMEMTest::testPorflowMeshDriver()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #47: MEDMEM_PorflowMeshDriver.hxx  }  MEDMEMTest_PorflowMeshDriver.cxx
 
 // #48: MEDMEM_RCBase.hxx  }  MEDMEMTest.cxx
 
@@ -1386,29 +1278,7 @@ void MEDMEMTest::testVtkMedDriver()
   CPPUNIT_FAIL("Case Not Implemented");
 }
 
-// #59: MEDMEM_VtkMeshDriver.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (11), defined in MEDMEM_VtkMeshDriver.hxx:
- *  class VTK_MESH_DRIVER : public GENDRIVER {
- *   (yetno) VTK_MESH_DRIVER();
- *   (yetno) VTK_MESH_DRIVER(const string & fileName,  MESH * ptrMesh);
- *   (yetno) VTK_MESH_DRIVER(const VTK_MESH_DRIVER & driver);
- *   (yetno) ~VTK_MESH_DRIVER();
- *   (yetno) void open();
- *   (yetno) void close();
- *   (yetno) void openConst() const throw (MEDEXCEPTION);
- *   (yetno) void closeConst() const throw (MEDEXCEPTION);
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *   (yetno) void read (void) throw (MEDEXCEPTION);
- *   (yetno) void   setMeshName(const string & meshName);
- *   (yetno) string getMeshName() const;
- *  }
- */
-void MEDMEMTest::testVtkMeshDriver()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #59: MEDMEM_VtkMeshDriver.hxx  }  MEDMEMTest_VtkMeshDriver.cxx
 
 // #60: MEDMEM_medimport_src.hxx  }  MEDMEMTest.cxx
 

@@ -52,12 +52,15 @@ LIB_SRC = MEDMEMTest.cxx \
 	  MEDMEMTest_Field.cxx \
 	  MEDMEMTest_Unit.cxx \
 	  MEDMEMTest_MedVersion.cxx \
-	  MEDMEMTest_MedMeshDriver22.cxx \
           MEDMEMTest_PointerOf.cxx \
           MEDMEMTest_SkyLineArray.cxx \
           MEDMEMTest_MeshAndMeshing.cxx \
 	  MEDMEMTest_nArray.cxx \
-	  MEDMEMTest_PolyhedronArray.cxx
+	  MEDMEMTest_PolyhedronArray.cxx \
+	  MEDMEMTest_MedMeshDriver22.cxx \
+          MEDMEMTest_GibiMeshDriver.cxx \
+          MEDMEMTest_VtkMeshDriver.cxx \
+	  MEDMEMTest_PorflowMeshDriver.cxx
 
 LIB_CLIENT_IDL =
 
