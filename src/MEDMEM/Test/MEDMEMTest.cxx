@@ -357,28 +357,7 @@ void MEDMEMTest::testGrid()
   CPPUNIT_FAIL("Case Not Implemented");
 }
 
-// #22: MEDMEM_Group.cxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (10), defined in MEDMEM_Group.hxx:
- *  class GROUP : virtual public SUPPORT {
- *   (yetno) GROUP();
- *   (yetno) GROUP(const string & name, const list<FAMILY*> & family) throw (MEDEXCEPTION);
- *   (yetno) GROUP(const GROUP & m);
- *   (yetno) virtual ~GROUP();
- *   (yetno) GROUP & operator=(const GROUP &group);
- *   (yetno) friend ostream & operator<<(ostream &os, GROUP &my);
- *   (yetno) inline void setNumberOfFamilies(int numberOfFamilies);
- *   (yetno) inline void setFamilies(vector<FAMILY*> Family);
- *   (yetno) inline int                  getNumberOfFamilies() const;
- *   (yetno) inline vector<FAMILY*> getFamilies() const;
- *   (yetno) inline FAMILY *          getFamily(int i) const;
- *  }
- */
-void MEDMEMTest::testGroup()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #22: MEDMEM_Group.cxx  }  MEDMEMTest_Group.cxx
 
 // #23: MEDMEM_IndexCheckingPolicy.cxx  }  MEDMEMTest.cxx
 
@@ -829,24 +808,7 @@ void MEDMEMTest::testMedMeshDriver()
 // #41: MEDMEM_Mesh.hxx     \ 
 // #42: MEDMEM_Meshing.hxx  /  MEDMEMTest_MeshAndMeshing.cxx
 
-// #43: MEDMEM_ModulusArray.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (4), defined in MEDMEM_ModulusArray.hxx:
- *  class MEDMODULUSARRAY {
- *   (yetno) MEDMODULUSARRAY(int length, const int * array);
- *   (yetno) MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array);
- *   (yetno) ~MEDMODULUSARRAY();
- *   (yetno) const int operator[](const int &i) const;
- *   (yetno) int compare(const MEDMODULUSARRAY &modulusArray) const;
- *  }
- *
- *  Use code of MEDMEM/tests/testUModulusArray.cxx
- */
-void MEDMEMTest::testModulusArray()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #43: MEDMEM_ModulusArray.hxx  }  MEDMEMTest_ModulusArray.cxx
 
 // #44: MEDMEM_nArray.hxx  }  MEDMEMTest_nArray.cxx
 
