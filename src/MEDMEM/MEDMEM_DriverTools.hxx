@@ -164,7 +164,10 @@ struct _intermediateMED
     void treatGroupes(); // detect groupes of mixed dimention
     void numerotationMaillage(); 
     void numerotationPoints();
+  bool myGroupsTreated;
+  bool myPointsNumerated;
 
+  _intermediateMED() { myGroupsTreated = myPointsNumerated = false; }
     ~_intermediateMED();
 };
 

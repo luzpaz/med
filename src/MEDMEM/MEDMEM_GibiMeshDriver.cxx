@@ -287,6 +287,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       {
         map<int,int> strangeGroupType;
         medi->groupes.reserve(nb_objets*2); // fields may add some groups
+        map< int , int > nbElemsByGeomType;
+
         for (int objet=0; objet!=nb_objets; ++objet) // pour chaque groupe
         {
           initIntReading( 5 );
@@ -330,9 +332,17 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           if (type_geom_castem>0 && nb_sous_maillage==0)
           {
             medGeometryElement medType = gibi2medGeom(type_geom_castem);
-            bool goodType = ( medType!=MED_NONE );
-            if ( !goodType )
+
+            initIntReading( nb_elements * nb_noeud );
+            if ( medType == MED_NONE ) { // look for group end
+              while ( more() )
+                next();
               strangeGroupType.insert( make_pair( objet, type_geom_castem ));
+              continue;
+            }
+            if ( nbElemsByGeomType.find( medType ) == nbElemsByGeomType.end())
+              nbElemsByGeomType[ medType ] = 0;
+            int & order = nbElemsByGeomType[ medType ];
 
             pair<set<_maille>::iterator,bool> p;
             pair<map<int,_noeud>::iterator,bool> p_no;
@@ -340,31 +350,24 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
             no.coord.resize(space_dimension);
             _maille ma( medType, nb_noeud );
             ma.sommets.resize(nb_noeud);
-            if ( goodType )
-              groupe.mailles.resize( nb_elements );
+            groupe.mailles.resize( nb_elements );
 
             // lecture pour chaque maille des sommets et insertions
-            initIntReading( nb_elements * nb_noeud );
-            if ( !goodType ) {
-              while ( more() )
-                next();
-            }
-            else {
-              for ( i = 0; i < nb_elements; ++i )
+            for ( i = 0; i < nb_elements; ++i )
+            {
+              for (unsigned n = 0; n < nb_noeud; ++n, next() )
               {
-                for (unsigned n = 0; n < nb_noeud; ++n, next() )
-                {
-                  if ( !more() ) {
-                    INFOS( " Error while reading elem nodes ");
-                    return false;
-                  }
-                  no.number = getInt();
-                  p_no=medi->points.insert(make_pair(no.number, no));
-                  ma.sommets[n]=p_no.first;
+                if ( !more() ) {
+                  INFOS( " Error while reading elem nodes ");
+                  return false;
                 }
-                p=medi->maillage.insert(ma);
-                groupe.mailles[i] = p.first; // on stocke dans le groupe un iterateur sur la maille
+                no.number = getInt();
+                p_no=medi->points.insert(make_pair(no.number, no));
+                ma.sommets[n]=p_no.first;
               }
+              ma.ordre = ++order;
+              p=medi->maillage.insert(ma);
+              groupe.mailles[i] = p.first; // on stocke dans le groupe un iterateur sur la maille
             }
           }
         } // loop on groups
@@ -1816,7 +1819,7 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
         nbElems = (*sIt)->getNumberOfElements( geomType );
         ptrElemIDs = (*sIt)->getNumber( geomType );
       }
-      if ( geomType == 0 )
+      if ( geomType == 0 || ( entity == MED_NODE ))
         geomType = MED_POINT1;
 
       data.addTypeData( geomType, nbElems, ptrElemIDs, elemID1 );
@@ -2507,6 +2510,10 @@ static void writeDataSection (fstream& file,
 //   MEDARRAY<T>* array = f->getvalue();
 //   int ld = array->getLeadingValue();
   //SCRUTE( array->getLengthValue() );
+  const int * numbers = 0;
+  const SUPPORT* support = field->getSupport();
+  if ( !support->isOnAllElements() )
+    numbers = support->getNumber( MED_EN::MED_ALL_ELEMENTS );
 
   for ( int iComp = 0; iComp < ld; ++iComp )
   {
@@ -2518,8 +2525,12 @@ static void writeDataSection (fstream& file,
     int id = id1;
     while ( id < id2 )
     {
-      for ( int i = 0; id < id2 && i < 3; ++i )
-        file << setw(22) << field->getValueIJ( id++, iComp + 1);
+      for ( int i = 0; id < id2 && i < 3; ++i, ++id ) {
+        if ( numbers )
+          file << setw(22) << field->getValueIJ( numbers[ id-1 ], iComp + 1);
+        else
+          file << setw(22) << field->getValueIJ( id, iComp + 1);
+      }
       file << endl;
     }
   }
@@ -2559,7 +2570,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
     for ( ; fIt != dtit.end(); fIt++ )
     {
       FIELD_ * f = _med->getField( names[ iField ], fIt->dt, fIt->it );
-      if ( f->getValueType() != MED_EN::MED_INT32 )
+      if ( f->getValueType() != MED_EN::MED_REEL64 )
       {
         MESSAGE("GIBI_MED_WRONLY_DRIVER::write( FIELD< int > ) not implemented");
         continue;

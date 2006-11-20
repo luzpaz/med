@@ -206,6 +206,10 @@ void _intermediateMED::treatGroupes()
 {
   const char * LOC = "_intermediateMED::treatGroupes() : ";
   BEGIN_OF(LOC);
+
+  if ( myGroupsTreated )
+    return;
+  myGroupsTreated = true;
   
   // --------------------
   // erase useless group
@@ -330,24 +334,91 @@ void _intermediateMED::numerotationMaillage()
       i++;
     }
   }
+
+  // check if numeration is needed
+  if ( i->ordre  > 0 && maillage.rbegin()->ordre > 0 )
+  {
+    // already numerated, check numeration
+    bool ok = true;
+    const int maxNbTypes = 20;
+    pair< unsigned, unsigned > minMaxOrder[ maxNbTypes ];
+    int nbElems[ maxNbTypes ];
+    std::set<_maille>::iterator j=i;
+
+    do { // loop on elements of one entity
+      int iType = 0;
+      minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
+      int i_maille = 0, dimension = j->dimension(), type = j->geometricType;
+
+      std::set<_maille>::iterator k=j;
+      for ( ; j!=maillage.end() && (hasMixedCells || dimension==j->dimension()); ++j)
+      {
+        if (type != j->geometricType) // si changement de type geometrique
+        {
+          nbElems[ iType ] = i_maille;
+          i_maille=0;
+          type = j->geometricType;
+          iType++;
+          minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
+        }
+        ++i_maille;
+        if ( j->ordre < minMaxOrder[ iType ].first )
+          minMaxOrder[ iType ].first = j->ordre;
+        if ( j->ordre > minMaxOrder[ iType ].second )
+          minMaxOrder[ iType ].second = j->ordre;
+      }
+      nbElems[ iType ] = i_maille;
+
+      bool renumEntity = false; 
+      for ( int t = 0; t <= iType; ++t ) {
+        int orderRange = minMaxOrder[ t ].second - minMaxOrder[ t ].first;
+        if ( nbElems[ t ] != orderRange + 1 )
+          ok = false;
+        if ( t > 0 ) {
+          if ( minMaxOrder[ t ].first == 1 )
+            renumEntity = true;
+          else if ( minMaxOrder[ t-1 ].second+1 != minMaxOrder[ t ].first )
+            ok = false;
+        }
+      }
+      if ( ok && renumEntity ) { // each type of entity is numerated separately
+        int iType = 0, i_shift = 0;
+        type = k->geometricType;
+        for ( ; k != j; ++k ) {
+          if (type != k->geometricType) { // si changement de type geometrique
+            i_shift = minMaxOrder[ iType++ ].second;
+            type = k->geometricType;
+          }
+          k->ordre += i_shift;
+        }
+      }
+
+    } while ( ok && j != maillage.end() );
+
+    if ( ok ) return; // renumeration not needed
+  }
+
   // numerotation des mailles par entité
-    int i_maille=0;
-    int dimension=i->dimension();
-    for( ; i!=maillage.end(); ++i)
+  int i_maille=0;
+  int dimension=i->dimension();
+  for( ; i!=maillage.end(); ++i)
+  {
+    if ( !hasMixedCells && dimension != i->dimension() ) // on change d'entite
     {
-	if ( !hasMixedCells && dimension!=i->dimension() ) // on change d'entite
-	{
-          MESSAGE( "NB dim " << dimension << " entities: " << i_maille);
-	    dimension=i->dimension();
-	    i_maille=0;
-	}
-	(*i).ordre=++i_maille;
+      MESSAGE( "NB dim " << dimension << " entities: " << i_maille);
+      dimension=i->dimension();
+      i_maille=0;
     }
+    i->ordre=++i_maille;
+  }
   END_OF(LOC);
 }
 
 void _intermediateMED::numerotationPoints()
 {
+//   if ( myPointsNumerated )
+//     return;
+//   myPointsNumerated = true;
     // Fonction de renumerotation des noeuds (necessaire quand il y a des trous dans la numerotation.
     int i_noeud=0;
     for( std::map<int,_noeud>::const_iterator i=points.begin(); i!=points.end(); ++i)
@@ -412,6 +483,10 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 
     std::set<_maille>::const_iterator i, j; // iterateurs sur les mailles
 
+    // min and max element nb for each geom type
+    const int maxNbTypes = 20;
+    vector< pair< unsigned, unsigned > > minMaxOrder( maxNbTypes );
+
     // skip nodes and elements of <dimension_maillage - 2> or less dimension
     // Unfortunately, it is impossible because of MESH::createFamilies() that requires
     // presence of connectivity even for nodes!
@@ -431,13 +506,19 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 	//   - on alloue la connectivite
 	//   - on parcourt une deuxieme fois avec j pour lire les noeuds.
 
-
 	type=i->geometricType; // init boucle for
 	dimension=i->dimension();
 	nbtype=0;
 	vtype.push_back(type);
 	// Boucle sur i de parcours des mailles d'une entite
 	// Une entite se termine lorsqu'on atteint la fin de maillage ou lorsque la dimension des mailles change
+
+        int iType=0;
+        minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
+
+        // if hasMixedCells, store POINT1 elems as MED_NODE and
+        // elems of all the rest types as MED_CELL, i.e. do not break the loop
+        // when dimension changes
         bool ignoreDimChange = hasMixedCells && dimension > 0;
 	for( ; i!=maillage.end() && ( ignoreDimChange || dimension==i->dimension()) ; ++i)
 	{
@@ -448,8 +529,13 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 		type=i->geometricType;
 		vtype.push_back(type); // stocke le nouveau type geometrique rencontre
                 dimension=i->dimension();
+                iType++;
+                minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
 	    }
-
+            if ( i->ordre < minMaxOrder[ iType ].first )
+              minMaxOrder[ iType ].first = i->ordre;
+            if ( i->ordre > minMaxOrder[ iType ].second )
+              minMaxOrder[ iType ].second = i->ordre;
 	    ++nbtype;
 	}
 	vcount.push_back(dimension ? nbtype : numberOfNodes); // n'a pas été stocké dans la boucle
@@ -492,18 +578,23 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 
 	for (int k=0; k!=numberOfTypes; ++k )
 	  {
+            int orderShift = 1;
+            if ( minMaxOrder[ k ].first > 1 ) // min elem number != 1
+              orderShift += minMaxOrder[ k-1 ].second; // max elem number in previous type
 	    // pour chaque type géometrique k, copie des sommets dans connectivity et set dans Connectivity
 	    int nbSommetsParMaille = j->sommets.size();
-	    int n, nbSommets = vcount[k] * j->sommets.size();
+	    int n, nbSommets = vcount[k] * nbSommetsParMaille;
 	    connectivity = new int[ nbSommets ];
-	    for (int l=0; l!=vcount[k]; ++l)
+	    for (int l=0; l!=vcount[k]; ++l) // loop on elements of geom type
 	    {
                 if ( entity==MED_NODE )
                   connectivity[l] = l+1;
                 else
                 {
+                  int index0 = nbSommetsParMaille * ( j->ordre - orderShift );
                   for ( n=0; n != nbSommetsParMaille; ++n) {
-		    connectivity[nbSommetsParMaille*l+n] =
+		    //connectivity[nbSommetsParMaille*l+n] =
+                    connectivity[ index0 + n ] =
                       j->sommets[ j->reverse ? nbSommetsParMaille-n-1 : n ]->second.number;
                   }
                 // DO NOT ERASE, maillage will be used while fields construction
