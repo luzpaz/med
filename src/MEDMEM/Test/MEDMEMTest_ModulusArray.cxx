@@ -24,8 +24,6 @@
 
 #include "MEDMEM_ModulusArray.hxx"
 #include "MEDMEM_define.hxx"
-//#include "MEDMEM_Mesh.hxx"
-//#include "MEDMEM_MedMeshDriver.hxx"
 
 #include <sstream>
 #include <cmath>
@@ -75,7 +73,7 @@ void MEDMEMTest::testModulusArray()
 
   cout<<"!!!!!!ret"<<ret<<endl;
   CPPUNIT_ASSERT_MESSAGE("Two identical arrays - KO", ret == 1);
-  
+
   int array3[5]={1,2,1,0,4} ;
   MEDMODULUSARRAY modulusArray3(5,array3) ;
   try{
@@ -90,7 +88,7 @@ void MEDMEMTest::testModulusArray()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  CPPUNIT_ASSERT_MESSAGE("Two arrays are in reverse order - KO",ret == -1); 
+  CPPUNIT_ASSERT_MESSAGE("Two arrays are in reverse order - KO",ret == -1);
 
   int array4[6]={1,2,1,0} ;
   MEDMODULUSARRAY modulusArray4(4,array4) ;
@@ -106,11 +104,11 @@ void MEDMEMTest::testModulusArray()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  CPPUNIT_ASSERT_MESSAGE("Two arrays are have different size - KO",ret == 0); 
-  
+  CPPUNIT_ASSERT_MESSAGE("Two arrays are have different size - KO",ret == 0);
+
   int array5[5]={1,2,1,0,1} ;
   MEDMODULUSARRAY modulusArray5(5,array5) ;
-  
+
   try{
     ret=modulusArray5.compare(modulusArray);
   }
@@ -123,8 +121,8 @@ void MEDMEMTest::testModulusArray()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  CPPUNIT_ASSERT_MESSAGE("Two different arrays, same size - KO",ret == 0); 
-   
+  CPPUNIT_ASSERT_MESSAGE("Two different arrays, same size - KO",ret == 0);
+
   // test small array :
 
   // 1
@@ -166,8 +164,8 @@ void MEDMEMTest::testModulusArray()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  CPPUNIT_ASSERT_MESSAGE("Two different arrays - KO",ret == 0); 
-  
+  CPPUNIT_ASSERT_MESSAGE("Two different arrays - KO",ret == 0);
+
   // 2
   int array60[2]={1,2} ;
   MEDMODULUSARRAY modulusArray60(2,array60);
@@ -179,7 +177,7 @@ void MEDMEMTest::testModulusArray()
 
   int array70[2]={1,2} ;
   MEDMODULUSARRAY modulusArray70(2,array70);
-  
+
   try{
     ret=modulusArray60.compare(modulusArray70);
   }
@@ -192,7 +190,7 @@ void MEDMEMTest::testModulusArray()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  CPPUNIT_ASSERT_MESSAGE("Same arrays, same order - KO",ret == 1); 
+  CPPUNIT_ASSERT_MESSAGE("Same arrays, same order - KO",ret == 1);
 
   int array80[2]={2,2} ;
   MEDMODULUSARRAY modulusArray80(2,array80);
@@ -208,7 +206,7 @@ void MEDMEMTest::testModulusArray()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  CPPUNIT_ASSERT_MESSAGE("Different arrays - KO",ret == 0); 
+  CPPUNIT_ASSERT_MESSAGE("Different arrays - KO",ret == 0);
 
   int array90[2]={2,1} ;
   MEDMODULUSARRAY modulusArray90(2,array90);
@@ -225,14 +223,14 @@ void MEDMEMTest::testModulusArray()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  CPPUNIT_ASSERT_MESSAGE("Two arrays are in reverse order - KO",ret == -1); 
-  
+  CPPUNIT_ASSERT_MESSAGE("Two arrays are in reverse order - KO",ret == -1);
+
   //test not vertex nodes
   int array100[2]={1,2} ;
-  MEDMODULUSARRAY modulusArray100(2,2,array100);
+  MEDMODULUSARRAY modulusArray100(2,2,array100); // == MEDMODULUSARRAY(2,array100);
 
   try{
-    ret=modulusArray60.compare(modulusArray100);
+    ret = modulusArray60.compare(modulusArray100);
   }
   catch (const std::exception &e)
   {
@@ -243,25 +241,48 @@ void MEDMEMTest::testModulusArray()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  CPPUNIT_ASSERT_MESSAGE("Different arrays -KO",ret != 1); 
+  CPPUNIT_ASSERT_MESSAGE("Same arrays, same order - KO", ret == 1);
 
-  int array110[4]={1,2,4,3};
+  // check comparison of equal arrays, containing non-vertex nodes
+
+  int array110[4] = {1,2,4,3};
   MEDMODULUSARRAY modulusArray110(2,4,array110);
 
-  int array120[4]={1,2,4,3};
+  int array120[4] = {1,2,4,3};
   MEDMODULUSARRAY modulusArray120(2,4,array120);
 
-  try{
-    ret=modulusArray120.compare(modulusArray110);
-  }
-  catch (const std::exception &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch (...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+  int array130[4] = {1,2,3,4};
+  MEDMODULUSARRAY modulusArray130(2,4,array130);
 
-  CPPUNIT_ASSERT_MESSAGE("Same arrays, same order - KO",ret == 1); 
+  // same order of non-vertex nodes
+  CPPUNIT_ASSERT_NO_THROW(ret = modulusArray120.compare(modulusArray110));
+  CPPUNIT_ASSERT_MESSAGE("Same arrays, same order - KO", ret == 1);
+
+  // different order of non-vertex nodes
+  CPPUNIT_ASSERT_NO_THROW(ret = modulusArray130.compare(modulusArray110));
+  CPPUNIT_ASSERT_MESSAGE("Same arrays, same order - KO", ret == 1);
+
+  // check comparison of different arrays, containing non-vertex nodes
+
+  // difference is in vertex nodes
+  int array140[4] = {1,5,4,3};
+  MEDMODULUSARRAY modulusArray140 (2,4,array140);
+
+  CPPUNIT_ASSERT_NO_THROW(ret = modulusArray120.compare(modulusArray140));
+  CPPUNIT_ASSERT_MESSAGE("Different arrays - KO", ret == 0);
+
+  // difference is in non-vertex nodes
+  int array150[4] = {1,2,4,5};
+  MEDMODULUSARRAY modulusArray150 (2,4,array150);
+
+  CPPUNIT_ASSERT_NO_THROW(ret = modulusArray120.compare(modulusArray150));
+  CPPUNIT_ASSERT_MESSAGE("Different arrays - KO", ret == 0);
+
+  // check that operator[] returns only vertex nodes
+  CPPUNIT_ASSERT_EQUAL(1, modulusArray120[0]);
+  CPPUNIT_ASSERT_EQUAL(2, modulusArray120[1]);
+  CPPUNIT_ASSERT_EQUAL(1, modulusArray120[2]);
+  CPPUNIT_ASSERT_EQUAL(2, modulusArray120[3]);
+  CPPUNIT_ASSERT_EQUAL(1, modulusArray120[4]);
+  CPPUNIT_ASSERT_EQUAL(2, modulusArray120[5]);
 }
