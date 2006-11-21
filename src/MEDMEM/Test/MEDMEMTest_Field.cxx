@@ -93,9 +93,9 @@ using namespace MEDMEM;
  *   (+)     inline void     setComponentDescription(int i, const string ComponentDescription);
  *   (+)     inline const string * getComponentsDescriptions() const;
  *   (+)     inline string   getComponentDescription(int i) const;
- *   (yetno) inline void     setComponentsUnits(const UNIT * ComponentsUnits);
- *   (yetno) inline const UNIT *   getComponentsUnits() const;
- *   (yetno) inline const UNIT *   getComponentUnit(int i) const;
+ *   (+)     inline void     setComponentsUnits(const UNIT * ComponentsUnits);
+ *   (+)     inline const UNIT *   getComponentsUnits() const;
+ *   (+)     inline const UNIT *   getComponentUnit(int i) const;
  *   (+)     inline void     setMEDComponentsUnits(const string * MEDComponentsUnits);
  *   (+)     inline void     setMEDComponentUnit(int i, const string MEDComponentUnit);
  *   (+)     inline const string * getMEDComponentsUnits() const;
@@ -196,14 +196,16 @@ using namespace MEDMEM;
  *
  *   (+)     const int getNumberOfGeometricTypes() const throw (MEDEXCEPTION);
  *
- *   (yetno) const GAUSS_LOCALIZATION<INTERLACING_TAG> & getGaussLocalization
+ *   (+)     const GAUSS_LOCALIZATION<INTERLACING_TAG> & getGaussLocalization
  *                          (MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
- *   (yetno) const GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr
+ *   (+)     const GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr
  *                          (MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
- *   (yetno) const int * getNumberOfGaussPoints() const throw (MEDEXCEPTION);
- *   (yetno) const int   getNumberOfGaussPoints
+ *   (+)     void setGaussLocalization(MED_EN::medGeometryElement geomElement,
+ *                                     const GAUSS_LOCALIZATION<INTERLACING_TAG> & gaussloc);
+ *   (+)     const int * getNumberOfGaussPoints() const throw (MEDEXCEPTION);
+ *   (+)     const int   getNumberOfGaussPoints
  *                          (MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
- *   (yetno) const int   getNbGaussI(int i) const throw (MEDEXCEPTION);
+ *   (+)     const int   getNbGaussI(int i) const throw (MEDEXCEPTION);
  *
  *   (+)     const int * getNumberOfElements() const throw (MEDEXCEPTION);
  *   (+)     const MED_EN::medGeometryElement * getGeometricTypes() const throw (MEDEXCEPTION);
@@ -760,9 +762,51 @@ void MEDMEMTest::testField()
   // info about support (Group1)
   CPPUNIT_ASSERT(!aFieldOnGroup1->isOnAllElements()); // because we build Group1 so
   int nbTypes = aFieldOnGroup1->getNumberOfGeometricTypes();
-  CPPUNIT_ASSERT(nbTypes);
+  //CPPUNIT_ASSERT(nbTypes);
+  CPPUNIT_ASSERT_EQUAL(2, nbTypes);
   const int * nbElemsInEachType = aFieldOnGroup1->getNumberOfElements();
   const MED_EN::medGeometryElement * aGeomTypes = aFieldOnGroup1->getGeometricTypes();
+
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_TRIA3, aGeomTypes[0]);
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_QUAD4, aGeomTypes[1]);
+
+  // GAUSS
+
+  // now we have no gauss localization in aFieldOnGroup1
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA3));
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_QUAD4));
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA6), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(), MEDEXCEPTION);
+
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MED_TRIA3), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_TRIA3), MEDEXCEPTION);
+
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNbGaussI(anElems[0]));
+
+  // set a gauss localization into aFieldOnGroup1
+  double cooRef[6] = {1.,1., 2.,4., 3.,9.}; // xy xy xy
+  double cooGauss[10] = {7.,7., 6.,6., 5.,5., 4.,3., 2.,1.}; // x1,y1  x2,y2  x3,y3  x4,y4  x5,y5
+  double wg[5] = {1., 2., 3., 4., 5.};
+  GAUSS_LOCALIZATION<> gl1 ("GL1", MED_EN::MED_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
+
+  aFieldOnGroup1->setGaussLocalization(MED_EN::MED_TRIA3, gl1);
+
+  // now we have a gauss localization for MED_TRIA3 type
+  CPPUNIT_ASSERT_EQUAL(5, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA3));
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_QUAD4));
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA6), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(), MEDEXCEPTION);
+
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MED_QUAD4), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_QUAD4), MEDEXCEPTION);
+
+  GAUSS_LOCALIZATION<> gl1Back = aFieldOnGroup1->getGaussLocalization(MED_EN::MED_TRIA3);
+  const GAUSS_LOCALIZATION<> * gl1BackPtr = aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_TRIA3);
+
+  CPPUNIT_ASSERT(gl1 == gl1Back);
+  CPPUNIT_ASSERT(gl1 == *gl1BackPtr);
+
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNbGaussI(anElems[0]));
 
   // sub-support of Group1 on one (first) geometric type
   SUPPORT * aSubSupport1 = new SUPPORT(aMesh, "Sub-Support 1 of Group1", MED_EN::MED_FACE);
@@ -836,23 +880,23 @@ void MEDMEMTest::testField()
   CPPUNIT_ASSERT_DOUBLES_EQUAL(225., aSubField1->getValueIJ(anElems1[1], 1), 0.000001); // 15*15
   CPPUNIT_ASSERT_DOUBLES_EQUAL(121., aSubField1->getValueIJ(anElems1[1], 2), 0.000001); // 11*11
 
-  // setXXX
-
-  //MEDMEM_Array<double,FullInterlaceNoGaussPolicy,IndexCheckPolicy>
+  // setArray (NoGauss)
   MEDMEM_ArrayInterface<double,FullInterlace,NoGauss>::Array * aNewArrayNoGauss =
-    new MEDMEM_ArrayInterface<double,FullInterlace,NoGauss>::Array(2, 2);
+    new MEDMEM_ArrayInterface<double,FullInterlace,NoGauss>::Array(/*dim*/2, /*nbelem*/2);
   aNewArrayNoGauss->setIJ(1, 1, 4.);
   aNewArrayNoGauss->setIJ(1, 2, 2.);
   aNewArrayNoGauss->setIJ(2, 1, 5.);
   aNewArrayNoGauss->setIJ(2, 2, 1.);
   aSubField1->setArray(aNewArrayNoGauss);
-  // no need to delete aNewArrayNoGauss, because it will be deleted in destructor of aSubField1
+  // no need to delete aNewArrayNoGauss, because it will be deleted
+  // in destructor or in deallocValue() method of aSubField1
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(4., aSubField1->getValueIJ(anElems1[0], 1), 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(2., aSubField1->getValueIJ(anElems1[0], 2), 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(5., aSubField1->getValueIJ(anElems1[1], 1), 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1., aSubField1->getValueIJ(anElems1[1], 2), 0.000001);
 
+  // setRow
   double row[2] = {-1., -3.};
   aSubField1->setRow(anElems1[0], row);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(-1., aSubField1->getValueIJ(anElems1[0], 1), 0.000001);
@@ -862,6 +906,7 @@ void MEDMEMTest::testField()
   // out of range
   CPPUNIT_ASSERT_THROW(aSubField1->setRow(3, row), MEDEXCEPTION);
 
+  // setColumn
   double col[2] = {-7., -9.};
   aSubField1->setColumn(1, col);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(-7., aSubField1->getValueIJ(anElems1[0], 1), 0.000001);
@@ -874,25 +919,53 @@ void MEDMEMTest::testField()
   // out of range
   CPPUNIT_ASSERT_THROW(aSubField1->setColumn(3, col), MEDEXCEPTION);
 
-  // Gauss Array
-#ifdef CHECK_GAUSS_ARRAY
-  int nbelgeoc[2] = {1, 1};
-  int nbgaussgeo[2] = {1, 1};
-  MEDMEM_ArrayInterface<double,FullInterlace,Gauss>::Array * aNewArrayGauss =
-    new MEDMEM_ArrayInterface<double,FullInterlace,Gauss>::Array
-    (2, 2, /*nbtypegeo*/1, /*nbelgeoc*/nbelgeoc, /*nbgaussgeo*/nbgaussgeo);
-  aNewArrayGauss->setIJ(1, 1, -4.);
-  aNewArrayGauss->setIJ(1, 2, -2.);
-  aNewArrayGauss->setIJ(2, 1, -5.);
-  aNewArrayGauss->setIJ(2, 2, -1.);
-  aSubField1->setArray(aNewArrayGauss);
-  // no need to delete aNewArrayGauss, because it will be deleted in destructor of aSubField1
+  // setArray (Gauss)
+  {
+    int nbelgeoc[2] = {1, 3}; // 3 - 1 = two elements for the first (and the only) type
+    int nbgaussgeo[2] = {-1, 1}; // one gauss point per each element
+    MEDMEM_ArrayInterface<double,FullInterlace,Gauss>::Array * aNewArrayGauss =
+      new MEDMEM_ArrayInterface<double,FullInterlace,Gauss>::Array
+      (/*dim*/2, /*nbelem*/2, /*nbtypegeo*/1, /*nbelgeoc*/nbelgeoc, /*nbgaussgeo*/nbgaussgeo);
 
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(-4., aSubField1->getValueIJ(anElems1[0], 1), 0.000001);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(-2., aSubField1->getValueIJ(anElems1[0], 2), 0.000001);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(-5., aSubField1->getValueIJ(anElems1[1], 1), 0.000001);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(-1., aSubField1->getValueIJ(anElems1[1], 2), 0.000001);
+#ifdef ENABLE_FAULTS
+    aNewArrayGauss->setIJ(1, 1, -4.);
+    aNewArrayGauss->setIJ(1, 2, -2.);
+    aNewArrayGauss->setIJ(2, 1, -5.);
+    aNewArrayGauss->setIJ(2, 2, -1.);
 #endif
+#ifdef ENABLE_FORCED_FAILURES
+    // ? (BUG) in FullInterlaceGaussPolicy::getIndex(int i,int j)
+    // FullInterlaceGaussPolicy::getIndex(2,2) returns 4!!!
+    CPPUNIT_FAIL("? Bug in FullInterlaceGaussPolicy::getIndex(int i,int j) ?");
+#endif
+
+    aNewArrayGauss->setIJK(1, 1, 1, -4.);
+    aNewArrayGauss->setIJK(1, 2, 1, -2.);
+    aNewArrayGauss->setIJK(2, 1, 1, -5.);
+    aNewArrayGauss->setIJK(2, 2, 1, -1.);
+
+    aSubField1->setArray(aNewArrayGauss);
+    // no need to delete aNewArrayGauss, because it will be deleted
+    // in destructor or in deallocValue() method of aSubField1
+
+#ifdef ENABLE_FAULTS
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-4., aSubField1->getValueIJ(anElems1[0], 1), 0.000001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-2., aSubField1->getValueIJ(anElems1[0], 2), 0.000001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-5., aSubField1->getValueIJ(anElems1[1], 1), 0.000001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-1., aSubField1->getValueIJ(anElems1[1], 2), 0.000001);
+#endif
+#ifdef ENABLE_FORCED_FAILURES
+    // ? (BUG) in FullInterlaceGaussPolicy::getIndex(int i,int j)
+    // Must be   : return _G[i-1]-1 + (j-1);
+    // Instead of: return _G[i-1]-1 + (j-1)*_dim;
+    CPPUNIT_FAIL("? Bug in FullInterlaceGaussPolicy::getIndex(int i,int j) ?");
+#endif
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-4., aSubField1->getValueIJK(anElems1[0], 1, 1), 0.000001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-2., aSubField1->getValueIJK(anElems1[0], 2, 1), 0.000001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-5., aSubField1->getValueIJK(anElems1[1], 1, 1), 0.000001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-1., aSubField1->getValueIJK(anElems1[1], 2, 1), 0.000001);
+  }
 
   // alloc/dealloc; compatibility of new size with support
   try {
@@ -1173,35 +1246,6 @@ void MEDMEMTest::testField()
   CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 *= *aFieldOnGroup3, MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 /= *aFieldOnGroup3, MEDEXCEPTION);
 
-  // check case of different operands: valueType
-  //FIELD<int> * aFieldOnGroup4 =
-  //  createFieldOnGroup<int>(aMeshOneMore, aGroupOneMore, "Test_Diff_Mesh", "test");
-  //
-  //CPPUNIT_ASSERT_THROW(FIELD<double>::add(*aFieldOnGroup4, *aFieldOnGroup3), MEDEXCEPTION);
-  //CPPUNIT_ASSERT_THROW(*aFieldOnGroup4 - *aFieldOnGroup3, MEDEXCEPTION);
-  //CPPUNIT_ASSERT_THROW(*aFieldOnGroup4 *= *aFieldOnGroup3, MEDEXCEPTION);
-
-  /*
-  // check case of different operands: numberOfComponents
-  aFieldOnGroup1->deallocValue();
-  aFieldOnGroup1->allocValue(5);
-
-  CPPUNIT_ASSERT_THROW(FIELD<double>::sub(*aFieldOnGroup1, *aFieldOnGroup2), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 * *aFieldOnGroup2, MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 /= *aFieldOnGroup2, MEDEXCEPTION);
-
-  // check case of different operands: numberOfValues
-  aFieldOnGroup1->deallocValue();
-  aFieldOnGroup1->allocValue(2, nbVals + 1);
-
-  CPPUNIT_ASSERT_THROW(FIELD<double>::mul(*aFieldOnGroup1, *aFieldOnGroup2), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 / *aFieldOnGroup2, MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 += *aFieldOnGroup2, MEDEXCEPTION);
-
-  aFieldOnGroup1->deallocValue();
-  aFieldOnGroup1->allocValue(2, nbVals);
-  */
-
   // check case of different operands: MEDComponentsUnits
   aFieldOnGroup1->setMEDComponentUnit(1, "unit3");
 
@@ -1238,6 +1282,49 @@ void MEDMEMTest::testField()
     CPPUNIT_FAIL("Unknown exception");
   }
 
+  // restore MED units
+  aFieldOnGroup1->setMEDComponentUnit(1, "unit1");
+
+  // check case of different operands: valueType
+  //FIELD<int> * aFieldOnGroup4 =
+  //  createFieldOnGroup<int>(aMeshOneMore, aGroupOneMore, "Test_Diff_Mesh", "test");
+  //
+  //CPPUNIT_ASSERT_THROW(FIELD<double>::add(*aFieldOnGroup4, *aFieldOnGroup3), MEDEXCEPTION);
+  //CPPUNIT_ASSERT_THROW(*aFieldOnGroup4 - *aFieldOnGroup3, MEDEXCEPTION);
+  //CPPUNIT_ASSERT_THROW(*aFieldOnGroup4 *= *aFieldOnGroup3, MEDEXCEPTION);
+  //delete aFieldOnGroup4;
+
+  // check case of different operands: numberOfComponents
+#ifdef ENABLE_FAULTS
+  // (BUG) Cannot allocate value of higher dimension because of _componentsTypes reinitialization
+  aFieldOnGroup1->deallocValue();
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->allocValue(/*dim*/5), MEDEXCEPTION);
+#endif
+#ifdef ENABLE_FORCED_FAILURES
+  CPPUNIT_FAIL("Segmentation fault on attempt to allocate value of higher dimension."
+               " Must be MEDEXCEPTION instead. And on attempt to change nb.components"
+               " must be the same behaviour.");
+#endif
+  aFieldOnGroup1->setNumberOfComponents(5);
+
+  CPPUNIT_ASSERT_THROW(FIELD<double>::sub(*aFieldOnGroup1, *aFieldOnGroup2), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 * *aFieldOnGroup2, MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 /= *aFieldOnGroup2, MEDEXCEPTION);
+
+  // check case of different operands: numberOfValues
+  aFieldOnGroup1->deallocValue();
+  aFieldOnGroup1->allocValue(2, nbVals + 1);
+  // be carefull: aFieldOnGroup1 reallocated and contains random values
+
+  CPPUNIT_ASSERT_THROW(FIELD<double>::mul(*aFieldOnGroup1, *aFieldOnGroup2), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 / *aFieldOnGroup2, MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 += *aFieldOnGroup2, MEDEXCEPTION);
+
+  // restore aFieldOnGroup1
+  aFieldOnGroup1->deallocValue();
+  aFieldOnGroup1->allocValue(2, nbVals);
+  // be carefull: aFieldOnGroup1 reallocated and contains random values
+
   delete aSubSupport1;
   delete [] anElems1;
 
@@ -1248,22 +1335,159 @@ void MEDMEMTest::testField()
   delete aFieldOnGroup1;
   delete aFieldOnGroup2;
   delete aFieldOnGroup3;
-  //delete aFieldOnGroup4;
 
   delete aMesh;
   delete aMeshOneMore;
 
-  CPPUNIT_FAIL("Case Not Complete");
+  CPPUNIT_FAIL("Case Not Complete. TO DO: test reading/writing from/to a file.");
 }
 
 // #15: MEDMEM_FieldConvert.hxx  }  MEDMEMTest_Field.cxx
 
 /*!
  *  Check methods (2), defined in MEDMEM_FieldConvert.hxx:
- *  (yetno) template <class T> FIELD<T,FullInterlace> * FieldConvert(const FIELD<T,NoInterlace> & field);
- *  (yetno) template <class T> FIELD<T,NoInterlace> * FieldConvert(const FIELD<T,FullInterlace> & field);
+ *  (+) template <class T> FIELD<T,FullInterlace> * FieldConvert(const FIELD<T,NoInterlace> & field);
+ *  (+) template <class T> FIELD<T,NoInterlace> * FieldConvert(const FIELD<T,FullInterlace> & field);
  */
 void MEDMEMTest::testFieldConvert()
 {
-  CPPUNIT_FAIL("Case Not Implemented");
+  // create an empty integer field 2x10
+  FIELD<int, FullInterlace> * aField_FING = new FIELD<int, FullInterlace> ();
+
+  aField_FING->setName("Field_FING");
+  aField_FING->setDescription("Field full interlace no gauss");
+
+  aField_FING->setNumberOfComponents(2);
+  aField_FING->setNumberOfValues(10);
+
+  string aCompsNames[2] = {"Pos", "Neg"};
+  string aCompsDescs[2] = {"+", "-"};
+  string aMEDCompsUnits[2] = {"unit1", "unit2"};
+  UNIT   aCompsUnits[2];
+
+  aCompsUnits[0] = UNIT("u1", "descr1");
+  aCompsUnits[1] = UNIT("u2", "descr2");
+
+  aField_FING->setComponentsNames(aCompsNames);
+  aField_FING->setComponentsDescriptions(aCompsDescs);
+  aField_FING->setMEDComponentsUnits(aMEDCompsUnits);
+  aField_FING->setComponentsUnits(aCompsUnits);
+
+  // check UNITs (for testField())
+  const UNIT * aCompsUnitsBack = aField_FING->getComponentsUnits();
+  CPPUNIT_ASSERT(aCompsUnits[0].getName() == aCompsUnitsBack[0].getName());
+  CPPUNIT_ASSERT(aCompsUnits[1].getName() == aCompsUnitsBack[1].getName());
+
+  const UNIT * aCompUnitBack1 = aField_FING->getComponentUnit(1);
+  const UNIT * aCompUnitBack2 = aField_FING->getComponentUnit(2);
+  CPPUNIT_ASSERT(aCompsUnits[0].getName() == aCompUnitBack1->getName());
+  CPPUNIT_ASSERT(aCompsUnits[1].getName() == aCompUnitBack2->getName());
+
+  // create one more field by copy
+  FIELD<int, FullInterlace> * aField_FIGG = new FIELD<int, FullInterlace> (*aField_FING);
+
+  // values
+  int values_FING[20] = { 7,- 7, 14,-14, 21,-21, 28,-28, 35,-35,
+                          42,-42, 49,-49, 56,-56, 63,-63, 70,-70};
+
+  /////////////////////
+  // TEST 1: NoGauss //
+  /////////////////////
+
+  MEDMEM_ArrayInterface<int,FullInterlace,NoGauss>::Array * anArray_FING =
+    new MEDMEM_ArrayInterface<int,FullInterlace,NoGauss>::Array
+    (values_FING, /*dim*/2, /*nbelem*/10, /*shallowCopy*/false, /*ownershipOfValues*/false);
+  aField_FING->setArray(anArray_FING);
+  // no need to delete anArray_FING, because it will be deleted in destructor of aField_FING
+
+  // 1. FullInterlace -> NoInterlace
+  FIELD<int, NoInterlace> * aField_NING = FieldConvert(*aField_FING);
+  const int * values_NING = aField_NING->getValue();
+
+  for (int i = 0; i < 10; i++) {
+    for (int j = 0; j < 2; j++) {
+      CPPUNIT_ASSERT_EQUAL(values_FING[2*i + j], values_NING[10*j + i]);
+    }
+  }
+
+  // 2. NoInterlace -> FullInterlace
+  FIELD<int, FullInterlace> * aField_FING_conv = FieldConvert(*aField_NING);
+  const int * values_FING_conv = aField_FING_conv->getValue();
+
+  for (int i = 0; i < 10; i++) {
+    for (int j = 0; j < 2; j++) {
+      CPPUNIT_ASSERT_EQUAL(values_FING_conv[2*i + j], values_FING[2*i + j]);
+      CPPUNIT_ASSERT_EQUAL(values_FING_conv[2*i + j], values_NING[10*j + i]);
+    }
+  }
+
+  delete aField_FING;
+  delete aField_NING;
+  delete aField_FING_conv;
+
+  ///////////////////
+  // TEST 2: Gauss //
+  ///////////////////
+  int nbelgeoc[2] = {1, 11};
+  int nbgaussgeo[2] = {-1, 1};
+  MEDMEM_ArrayInterface<int,FullInterlace,Gauss>::Array * anArray_FIGG =
+    new MEDMEM_ArrayInterface<int,FullInterlace,Gauss>::Array
+    (values_FING, /*dim*/2, /*nbelem*/10, /*nbtypegeo*/1, /*nbelgeoc*/nbelgeoc,
+     /*nbgaussgeo*/nbgaussgeo, /*shallowCopy*/false, /*ownershipOfValues*/false);
+  aField_FIGG->setArray(anArray_FIGG);
+  // no need to delete anArray_FIGG, because it will be deleted in destructor of aField_FIGG
+
+  // 1. FullInterlace -> NoInterlace
+  FIELD<int, NoInterlace> * aField_NIGG = FieldConvert(*aField_FIGG);
+  const int * values_NIGG = aField_NIGG->getValue();
+
+  for (int i = 0; i < 10; i++) {
+    for (int j = 0; j < 2; j++) {
+      CPPUNIT_ASSERT_EQUAL(values_FING[2*i + j], values_NIGG[10*j + i]);
+    }
+  }
+
+  // 2. NoInterlace -> FullInterlace
+  FIELD<int, FullInterlace> * aField_FIGG_conv = FieldConvert(*aField_NIGG);
+  const int * values_FIGG_conv = aField_FIGG_conv->getValue();
+
+  for (int i = 0; i < 10; i++) {
+    for (int j = 0; j < 2; j++) {
+      CPPUNIT_ASSERT_EQUAL(values_FIGG_conv[2*i + j], values_FING[2*i + j]);
+      CPPUNIT_ASSERT_EQUAL(values_FIGG_conv[2*i + j], values_NIGG[10*j + i]);
+    }
+  }
+
+  delete aField_FIGG;
+  delete aField_NIGG;
+  delete aField_FIGG_conv;
+
+#ifdef ENABLE_FAULTS
+  // (BUG) in FieldConvert(), concerning FIELD_::operator=
+  {
+    // create an empty integer field 2x10
+    FIELD<int, FullInterlace> * aField = new FIELD<int, FullInterlace> ();
+
+    aField->setName("aField");
+    aField->setDescription("Field full interlace no gauss");
+
+    aField->setNumberOfComponents(2);
+    aField->setNumberOfValues(10);
+
+    aField->setComponentsNames(aCompsNames);
+    aField->setComponentsDescriptions(aCompsDescs);
+    aField->setMEDComponentsUnits(aMEDCompsUnits);
+
+    MEDMEM_ArrayInterface<int,FullInterlace,NoGauss>::Array * anArray =
+      new MEDMEM_ArrayInterface<int,FullInterlace,NoGauss>::Array
+      (values_FING, /*dim*/2, /*nbelem*/10, /*shallowCopy*/false, /*ownershipOfValues*/false);
+    aField->setArray(anArray);
+    // no need to delete anArray, because it will be deleted in destructor of aField
+
+    FIELD<int, NoInterlace> * aField_conv = FieldConvert(*aField);
+  }
+#endif
+#ifdef ENABLE_FORCED_FAILURES
+  CPPUNIT_FAIL("FieldConvert() fails if _componentsUnits is not set, because it calls FIELD_::operator=");
+#endif
 }

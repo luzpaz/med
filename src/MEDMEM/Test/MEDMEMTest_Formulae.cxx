@@ -21,89 +21,40 @@
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
-////#include "MEDMEM_nArray.hxx"
-////#include "MEDMEM_ArrayConvert.hxx"
-////#include "MEDMEM_Array.hxx"
-//#include "MEDMEM_ArrayInterface.hxx"
-//#include "MEDMEM_AsciiFieldDriver.hxx"
-//#include "MEDMEM_CellModel.hxx"
-//#include "MEDMEM_Compatibility21_22.hxx"
-//#include "MEDMEM_Connectivity.hxx"
-////#include "MEDMEM_Coordinate.hxx"
-//#include "MEDMEM_define.hxx"
-//#include "MEDMEM_DriverFactory.hxx"
-//#include "MEDMEM_DriversDef.hxx"
-//#include "MEDMEM_DriverTools.hxx"
-//#include "MEDMEM_Exception.hxx"
-//#include "MEDMEM_Family.hxx"
-//#include "MEDMEM_FieldConvert.hxx"
-//#include "MEDMEM_FieldForward.hxx"
-//#include "MEDMEM_Field.hxx"
-//#include "MEDMEM_Formulae.hxx"
-//#include "MEDMEM_GaussLocalization.hxx"
-//#include "MEDMEM_GenDriver.hxx"
-//#include "MEDMEM_GibiMeshDriver.hxx"
-//#include "MEDMEM_Grid.hxx"
-//#include "MEDMEM_Group.hxx"
-//#include "MEDMEM_IndexCheckingPolicy.hxx"
-//#include "MEDMEM_InterlacingPolicy.hxx"
-//#include "MEDMEM_InterlacingTraits.hxx"
-//#include "MEDMEM_MedFieldDriver21.hxx"
-//#include "MEDMEM_MedFieldDriver22.hxx"
-//#include "MEDMEM_MedFieldDriver.hxx"
-//#include "MEDMEM_Med.hxx"
-//#include "MEDMEM_medimport_src.hxx"
-//#include "MEDMEM_MedMedDriver21.hxx"
-//#include "MEDMEM_MedMedDriver22.hxx"
-//#include "MEDMEM_MedMedDriver.hxx"
-//#include "MEDMEM_MEDMEMchampLire.hxx"
-//#include "MEDMEM_MEDMEMgaussEcr.hxx"
-//#include "MEDMEM_MEDMEMprofilEcr.hxx"
-//#include "MEDMEM_MedMeshDriver21.hxx"
-//#include "MEDMEM_MedMeshDriver22.hxx"
-//#include "MEDMEM_MedMeshDriver.hxx"
-//#include "MEDMEM_MedVersion.hxx"
-//#include "MEDMEM_Mesh.hxx"
-//#include "MEDMEM_Meshing.hxx"
-//#include "MEDMEM_ModulusArray.hxx"
-//#include "MEDMEM_PointerOf.hxx"
-//#include "MEDMEM_PolyhedronArray.hxx"
-//#include "MEDMEM_PorflowMeshDriver.hxx"
-//#include "MEDMEM_RCBase.hxx"
-//#include "MEDMEM_SetInterlacingType.hxx"
-//#include "MEDMEM_SkyLineArray.hxx"
+#include "MEDMEM_Formulae.hxx"
 #include "MEDMEM_STRING.hxx"
-//#include "MEDMEM_Support.hxx"
-//#include "MEDMEM_Tags.hxx"
-//#include "MEDMEM_TopLevel.hxx"
-//#include "MEDMEM_TypeMeshDriver.hxx"
-//#include "MEDMEM_Unit.hxx"
-//#include "MEDMEM_Utilities.hxx"
-//#include "MEDMEM_VtkFieldDriver.hxx"
-//#include "MEDMEM_VtkMedDriver.hxx"
-//#include "MEDMEM_VtkMeshDriver.hxx"
 
 #include <sstream>
 #include <cmath>
 
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
+
 using namespace std;
 using namespace MEDMEM;
 
-// #17: MEDMEM_Formulae.hxx       }  MEDMEMTest_Formulae.cxx
+// #17: MEDMEM_Formulae.hxx  }  MEDMEMTest_Formulae.cxx
 
 /*!
  *  Check methods (13), defined in MEDMEM_Formulae.hxx:
+ *
  *  (yetno) inline void CalculateBarycenterDyn(const double **pts, int nbPts, int dim, double *bary);
- *  (yetno) inline double CalculateAreaForPolyg(const double **coords, int nbOfPtsInPolygs, int spaceDim);
- *  (yetno) inline double CalculateAreaForTria(const double *p1, const double *p2,
+ *
+ *  (+)     inline double CalculateAreaForPolyg(const double **coords, int nbOfPtsInPolygs, int spaceDim);
+ *  (+)     inline double CalculateAreaForTria(const double *p1, const double *p2,
  *                                             const double *p3, int spaceDim);
- *  (yetno) inline double CalculateAreaForQuad(const double *p1, const double *p2,
+ *  (+)     inline double CalculateAreaForQuad(const double *p1, const double *p2,
  *                                             const double *p3, const double *p4, int spaceDim);
+ *
  *  (yetno) inline void CalculateNormalForTria(const double *p1, const double *p2,
  *                                             const double *p3, double *normal);
  *  (yetno) inline void CalculateNormalForQuad(const double *p1, const double *p2,
  *                                             const double *p3, const double *p4, double *normal);
  *  (yetno) inline void CalculateNormalForPolyg(const double **coords, int nbOfPtsInPolygs, double *normal);
+ *
  *  (yetno) inline double CalculateVolumeForTetra(const double *p1, const double *p2,
  *                                                const double *p3, const double *p4);
  *  (yetno) inline double CalculateVolumeForPyra(const double *p1, const double *p2,
@@ -115,8 +66,10 @@ using namespace MEDMEM;
  *                                               const double *pt7, const double *pt8);
  *  (yetno) inline double CalculateVolumeForPolyh(const double ***pts, const int *nbOfNodesPerFaces,
  *                                                int nbOfFaces, const double *bary);
+ *
  *  (yetno) template<int N> inline double addComponentsOfVec(const double **pts, int rk);
  *  (yetno) template<> inline double addComponentsOfVec<1>(const double **pts, int rk);
+ *
  *  (yetno) template<int N, int DIM> inline void CalculateBarycenter(const double **pts, double *bary);
  *  (yetno) template<> inline void CalculateBarycenter<2,0>(const double **pts, double *bary);
  *  (yetno) template<> inline void CalculateBarycenter<3,0>(const double **pts, double *bary);
@@ -128,5 +81,135 @@ using namespace MEDMEM;
  */
 void MEDMEMTest::testFormulae()
 {
-  CPPUNIT_FAIL("Case Not Implemented");
+  double val;
+
+  //      ^y
+  //      |
+  //      *3
+  //  4   |
+  //  .*. . . . . . *6
+  //      |
+  //  . . . . . . . .
+  //      |  5
+  //  . . . .*. *2. .
+  //     1|
+  // -.-.-*-.-.-.-.-.-->x
+  //      |
+
+  // S_12634 = (3 + (3+4.8)*2 + 4.8 + 1.5*4)/2 = 1.5 + 7.8 + 2.4 + 3 = 14.7
+  // S_143652 = S_14362 - S_625 = 14.7 - 2 * 1.5 / 2 = 13.2
+
+  double xy1[2]  = { 0.0, 0.0};
+  double xy2[2]  = { 3.0, 1.0};
+  double xy3[2]  = { 0.0, 4.0};
+  double xy4[2]  = {-1.5, 3.0};
+  double xy5[2]  = { 1.5, 1.0};
+  double xy6[2]  = { 4.8, 3.0};
+
+  double xyz1[3] = { 0.0, 0.0,  0.0};
+  double xyz2[3] = { 3.0, 1.0,  4.0}; // cos(alpha) = 3/5
+  double xyz3[3] = { 0.0, 4.0,  0.0};
+  double xyz4[3] = {-1.5, 3.0, -2.0}; // z4 = z2 * x4 / x2 = - 4 * 1.5 / 3
+  double xyz5[3] = { 1.5, 1.0,  2.0}; // z5 = z2 * x5 / x2 = 4 * 1.5 / 3
+  double xyz6[3] = { 4.8, 3.0,  6.4}; // z6 = z2 * x6 / x2 = 4 * 4.8 / 3
+
+  // S_3d = S_2d * 5.0 / 3.0
+
+  ///////////////////////////
+  // CalculateAreaForPolyg //
+  ///////////////////////////
+
+  // 2D: Convex polygon
+  const double * poly_2d_cc[5] = {xy1, xy2, xy6, xy3, xy4};
+  const double * poly_2d_cw[5] = {xy1, xy4, xy3, xy6, xy2};
+
+  // counter-clockwise
+  val = CalculateAreaForPolyg(poly_2d_cc, /*nbOfPtsInPolygs*/5, /*dim*/2);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(-14.7, val, 0.000001);
+
+  // clockwise
+  val = CalculateAreaForPolyg(poly_2d_cw, /*nbOfPtsInPolygs*/5, /*dim*/2);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(14.7, val, 0.000001);
+
+  // 2D: Non-convex polygon
+  const double * poly_2d_nc[6] = {xy1, xy4, xy3, xy6, xy5, xy2};
+  val = CalculateAreaForPolyg(poly_2d_nc, /*nbOfPtsInPolygs*/6, /*dim*/2);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(13.2, val, 0.000001);
+
+  // 3D: Convex polygon
+  const double * poly_3d_cc[5] = {xyz1, xyz2, xyz6, xyz3, xyz4};
+
+  val = CalculateAreaForPolyg(poly_3d_cc, /*nbOfPtsInPolygs*/5, /*dim*/3);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(24.5, val, 0.000001);
+
+  // 3D: Non-convex polygon
+  const double * poly_3d_nc[6] = {xyz1, xyz4, xyz3, xyz6, xyz5, xyz2};
+  val = CalculateAreaForPolyg(poly_3d_nc, /*nbOfPtsInPolygs*/6, /*dim*/3);
+#ifdef ENABLE_FORCED_FAILURES
+  // (BUG) Wrong area calculation for non-convex polygons in 3D space,
+  //       because area of triangle is always positive
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(22.0, val, 0.000001);
+#endif
+
+  //////////////////////////
+  // CalculateAreaForTria //
+  //////////////////////////
+
+  // 2D: counter-clockwise
+  val = CalculateAreaForTria(xy1, xy2, xy3, /*dim*/2);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(-6.0, val, 0.000001);
+
+  // 2D: clockwise
+  val = CalculateAreaForTria(xy2, xy1, xy3, /*dim*/2);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(6.0, val, 0.000001);
+
+  // 3D
+  val = CalculateAreaForTria(xyz1, xyz2, xyz3, /*dim*/3);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(10.0, val, 0.000001);
+
+  //////////////////////////
+  // CalculateAreaForQuad //
+  //////////////////////////
+
+  // 2D: Convex quadrangle
+
+  // counter-clockwise
+  val = CalculateAreaForQuad(xy1, xy2, xy3, xy4, /*dim*/2);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(-9.0, val, 0.000001);
+
+  // clockwise
+  val = CalculateAreaForQuad(xy2, xy1, xy4, xy3, /*dim*/2);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(9.0, val, 0.000001);
+
+  // wrong order
+  CPPUNIT_ASSERT_NO_THROW(CalculateAreaForQuad(xy2, xy1, xy3, xy4, /*dim*/2));
+
+  // 2D: Non-convex quadrangle
+
+  // counter-clockwise
+  val = CalculateAreaForQuad(xy1, xy2, xy3, xy5, /*dim*/2);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(-3.0, val, 0.000001);
+
+  // clockwise
+  val = CalculateAreaForQuad(xy1, xy5, xy3, xy2, /*dim*/2);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, val, 0.000001);
+
+  // 3D: Convex quadrangle
+
+  // good order
+  val = CalculateAreaForQuad(xyz1, xyz2, xyz3, xyz4, /*dim*/3);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(15.0, val, 0.000001);
+
+  // wrong order
+  CPPUNIT_ASSERT_NO_THROW(CalculateAreaForQuad(xyz1, xyz4, xyz2, xyz3, /*dim*/3));
+
+  // 3D: Non-convex quadrangle
+  val = CalculateAreaForQuad(xyz1, xyz2, xyz3, xyz5, /*dim*/3);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(5.0, val, 0.000001);
+
+  // 3D: Non-planar quadrangle
+  double xyz7[3] = {-1.5, 3.0,  2.0};
+  CPPUNIT_ASSERT_NO_THROW(CalculateAreaForQuad(xyz1, xyz2, xyz3, xyz7, /*dim*/3));
+
+  CPPUNIT_FAIL("Case Not Complete: only area calculation tested.");
 }
