@@ -575,121 +575,9 @@ void MEDMEMTest::testMed()
   CPPUNIT_FAIL("Case Not Implemented");
 }
 
-// #31: MEDMEM_MedMedDriver21.hxx  }  MEDMEMTest.cxx
+// #31: MEDMEM_MedMedDriver21.hxx  }  MEDMEMTest_MedMedDriver21.cxx
 
-/*!
- *  Check methods (21), defined in MEDMEM_MedMedDriver21.hxx:
- *  class MED_MED_DRIVER21 : public virtual MED_MED_DRIVER {
- *   (yetno) MED_MED_DRIVER21();
- *   (yetno) MED_MED_DRIVER21(const string & fileName,  MED * const ptrMed);
- *   (yetno) MED_MED_DRIVER21(const string & fileName,  MED * const ptrMed,
- *                            MED_EN::med_mode_acces accessMode);
- *   (yetno) MED_MED_DRIVER21(const MED_MED_DRIVER21 & driver);
- *   (yetno) virtual ~MED_MED_DRIVER21();
- *   (yetno) void open() throw (MEDEXCEPTION);
- *   (yetno) void close();
- *   (yetno) virtual void write          (void) const;
- *   (yetno) virtual void writeFrom      (void) const;
- *   (yetno) virtual void read           (void);
- *   (yetno) virtual void readFileStruct (void);
- *  }
- *  class MED_MED_RDONLY_DRIVER21 : public virtual IMED_MED_RDONLY_DRIVER,
- *                                  public virtual MED_MED_DRIVER21 {
- *   (yetno) MED_MED_RDONLY_DRIVER21();
- *   (yetno) MED_MED_RDONLY_DRIVER21(const string & fileName,  MED * const ptrMed);
- *   (yetno) MED_MED_RDONLY_DRIVER21(const MED_MED_RDONLY_DRIVER21 & driver);
- *   (yetno) virtual ~MED_MED_RDONLY_DRIVER21();
- *   (yetno) void write          (void) const throw (MEDEXCEPTION);
- *   (yetno) void writeFrom      (void) const throw (MEDEXCEPTION);
- *   (yetno) void read           (void) throw (MEDEXCEPTION);
- *   (yetno) void readFileStruct (void) throw (MEDEXCEPTION);
- *  }
- *  class MED_MED_WRONLY_DRIVER21 : public virtual IMED_MED_WRONLY_DRIVER,
- *                                  public virtual MED_MED_DRIVER21 {
- *   (yetno) MED_MED_WRONLY_DRIVER21();
- *   (yetno) MED_MED_WRONLY_DRIVER21(const string & fileName,  MED * const ptrMed);
- *   (yetno) MED_MED_WRONLY_DRIVER21(const MED_MED_WRONLY_DRIVER21 & driver);
- *   (yetno) virtual ~MED_MED_WRONLY_DRIVER21();
- *   (yetno) void write          (void) const throw (MEDEXCEPTION);
- *   (yetno) void writeFrom      (void) const throw (MEDEXCEPTION);
- *   (yetno) void read           (void) throw (MEDEXCEPTION);
- *   (yetno) void readFileStruct (void) throw (MEDEXCEPTION);
- *  }
- *  class MED_MED_RDWR_DRIVER21 : public MED_MED_RDONLY_DRIVER21,
- *                              public MED_MED_WRONLY_DRIVER21,
- *                              public IMED_MED_RDWR_DRIVER {
- *   (yetno) MED_MED_RDWR_DRIVER21();
- *   (yetno) MED_MED_RDWR_DRIVER21(const string & fileName,  MED * const ptrMed);
- *   (yetno) MED_MED_RDWR_DRIVER21(const MED_MED_RDWR_DRIVER21 & driver);
- *   (yetno) ~MED_MED_RDWR_DRIVER21();
- *   (yetno) void write          (void) const throw (MEDEXCEPTION);
- *   (yetno) void writeFrom      (void) const throw (MEDEXCEPTION);
- *   (yetno) void read           (void) throw (MEDEXCEPTION);
- *   (yetno) void readFileStruct (void) throw (MEDEXCEPTION);
- *  }
- */
-void MEDMEMTest::testMedMedDriver21()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
-
-// #32: MEDMEM_MedMedDriver22.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (21), defined in MEDMEM_MedMedDriver22.hxx:
- *  class MED_MED_DRIVER22 : public virtual MED_MED_DRIVER {
- *   (yetno) MED_MED_DRIVER22();
- *   (yetno) MED_MED_DRIVER22(const string & fileName,  MED * const ptrMed);
- *   (yetno) MED_MED_DRIVER22(const string & fileName,  MED * const ptrMed,
- *                            MED_EN::med_mode_acces accessMode);
- *   (yetno) MED_MED_DRIVER22(const MED_MED_DRIVER22 & driver);
- *   (yetno) virtual ~MED_MED_DRIVER22();
- *   (yetno) void open() throw (MEDEXCEPTION);
- *   (yetno) void close();
- *   (yetno) virtual void write          (void) const;
- *   (yetno) virtual void writeFrom      (void) const;
- *   (yetno) virtual void read           (void);
- *   (yetno) virtual void readFileStruct (void);
- *  }
- *  class MED_MED_RDONLY_DRIVER22 : public virtual IMED_MED_RDONLY_DRIVER,
- *                                  public virtual MED_MED_DRIVER22 {
- *   (yetno) MED_MED_RDONLY_DRIVER22();
- *   (yetno) MED_MED_RDONLY_DRIVER22(const string & fileName,  MED * const ptrMed);
- *   (yetno) MED_MED_RDONLY_DRIVER22(const MED_MED_RDONLY_DRIVER22 & driver);
- *   (yetno) virtual ~MED_MED_RDONLY_DRIVER22();
- *   (yetno) void write          (void) const throw (MEDEXCEPTION);
- *   (yetno) void writeFrom      (void) const throw (MEDEXCEPTION);
- *   (yetno) void read           (void) throw (MEDEXCEPTION);
- *   (yetno) void readFileStruct (void) throw (MEDEXCEPTION);
- *  }
- *  class MED_MED_WRONLY_DRIVER22 : public virtual IMED_MED_WRONLY_DRIVER,
- *                                  public virtual MED_MED_DRIVER22 {
- *   (yetno) MED_MED_WRONLY_DRIVER22();
- *   (yetno) MED_MED_WRONLY_DRIVER22(const string & fileName,  MED * const ptrMed);
- *   (yetno) MED_MED_WRONLY_DRIVER22(const MED_MED_WRONLY_DRIVER22 & driver);
- *   (yetno) virtual ~MED_MED_WRONLY_DRIVER22();
- *   (yetno) void write          (void) const throw (MEDEXCEPTION);
- *   (yetno) void writeFrom      (void) const throw (MEDEXCEPTION);
- *   (yetno) void read           (void) throw (MEDEXCEPTION);
- *   (yetno) void readFileStruct (void) throw (MEDEXCEPTION);
- *  }
- *  class MED_MED_RDWR_DRIVER22 : public virtual MED_MED_RDONLY_DRIVER22,
- *                                public virtual MED_MED_WRONLY_DRIVER22,
- *                                public virtual IMED_MED_RDWR_DRIVER {
- *   (yetno) MED_MED_RDWR_DRIVER22();
- *   (yetno) MED_MED_RDWR_DRIVER22(const string & fileName,  MED * const ptrMed);
- *   (yetno) MED_MED_RDWR_DRIVER22(const MED_MED_RDWR_DRIVER22 & driver);
- *   (yetno) ~MED_MED_RDWR_DRIVER22();
- *   (yetno) void write          (void) const throw (MEDEXCEPTION);
- *   (yetno) void writeFrom      (void) const throw (MEDEXCEPTION);
- *   (yetno) void read           (void) throw (MEDEXCEPTION);
- *   (yetno) void readFileStruct (void) throw (MEDEXCEPTION);
- *  }
- */
-void MEDMEMTest::testMedMedDriver22()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #32: MEDMEM_MedMedDriver22.hxx  }  MEDMEMTest_MedMedDriver22.cxx
 
 // #33: MEDMEM_MedMedDriver.hxx  }  MEDMEMTest.cxx
 
@@ -743,48 +631,7 @@ void MEDMEMTest::testMEDMEMprofilEcr()
   CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 }
 
-// #37: MEDMEM_MedMeshDriver21.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (13), defined in MEDMEM_MedMeshDriver21.hxx:
- *  class MED_MESH_DRIVER21 : public virtual MED_MESH_DRIVER {
- *   (yetno) MED_MESH_DRIVER21();
- *   (yetno) MED_MESH_DRIVER21(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces accessMode);
- *   (yetno) MED_MESH_DRIVER21(const MED_MESH_DRIVER21 & driver);
- *   (yetno) virtual ~MED_MESH_DRIVER21();
- *   (yetno) void open();
- *   (yetno) void close();
- *  }
- *  class MED_MESH_RDONLY_DRIVER21 : public virtual IMED_MESH_RDONLY_DRIVER,
- *                                   public virtual MED_MESH_DRIVER21 {
- *   (yetno) MED_MESH_RDONLY_DRIVER21();
- *   (yetno) MED_MESH_RDONLY_DRIVER21(const string & fileName, MESH * ptrMesh);
- *   (yetno) MED_MESH_RDONLY_DRIVER21(const MED_MESH_RDONLY_DRIVER21 & driver);
- *   (yetno) virtual ~MED_MESH_RDONLY_DRIVER21();
- *   (yetno) void read(void);
- *  }
- *  class MED_MESH_WRONLY_DRIVER21 : public virtual IMED_MESH_WRONLY_DRIVER,
- *                                   public virtual MED_MESH_DRIVER21 {
- *   (yetno) MED_MESH_WRONLY_DRIVER21();
- *   (yetno) MED_MESH_WRONLY_DRIVER21(const string & fileName, MESH * ptrMesh);
- *   (yetno) MED_MESH_WRONLY_DRIVER21(const MED_MESH_WRONLY_DRIVER21 & driver);
- *   (yetno) virtual ~MED_MESH_WRONLY_DRIVER21();
- *   (yetno) void write(void) const;
- *  }
- *  class MED_MESH_RDWR_DRIVER21 : public IMED_MESH_RDWR_DRIVER,
- *                                 public MED_MESH_RDONLY_DRIVER21, public MED_MESH_WRONLY_DRIVER21 {
- *   (yetno) MED_MESH_RDWR_DRIVER21();
- *   (yetno) MED_MESH_RDWR_DRIVER21(const string & fileName, MESH * ptrMesh);
- *   (yetno) MED_MESH_RDWR_DRIVER21(const MED_MESH_RDWR_DRIVER21 & driver);
- *   (yetno) ~MED_MESH_RDWR_DRIVER21();
- *   (yetno) void write(void) const;
- *   (yetno) void read (void);
- *  }
- */
-void MEDMEMTest::testMedMeshDriver21()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #37: MEDMEM_MedMeshDriver21.hxx  }  MEDMEMTest_MedMeshDriver21.cxx
 
 // #38: MEDMEM_MedMeshDriver22.hxx  }  MEDMEMTest_MedMeshDriver22.cxx
 
@@ -1040,23 +887,7 @@ void MEDMEMTest::testVtkFieldDriver()
   CPPUNIT_FAIL("Case Not Implemented");
 }
 
-// #58: MEDMEM_VtkMedDriver.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (5), defined in MEDMEM_VtkMedDriver.hxx:
- *  class VTK_MED_DRIVER : public GENDRIVER {
- *   (yetno) VTK_MED_DRIVER(const string & fileName,  MED * const ptrMed);
- *   (yetno) VTK_MED_DRIVER(const VTK_MED_DRIVER & driver);
- *   (yetno) ~VTK_MED_DRIVER();
- *   (yetno) void write (void) const;
- *   (yetno) virtual void read (void)  {};
- *   (yetno) GENDRIVER * copy (void) const;
- *  }
- */
-void MEDMEMTest::testVtkMedDriver()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #58: MEDMEM_VtkMedDriver.hxx  }  MEDMEMTest_VtkMedDriver.cxx
 
 // #59: MEDMEM_VtkMeshDriver.hxx  }  MEDMEMTest_VtkMeshDriver.cxx
 

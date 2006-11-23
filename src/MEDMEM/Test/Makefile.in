@@ -65,7 +65,12 @@ LIB_SRC = MEDMEMTest.cxx \
           MEDMEMTest_GibiMeshDriver.cxx \
           MEDMEMTest_VtkMeshDriver.cxx \
 	  MEDMEMTest_PorflowMeshDriver.cxx \
-	  MEDMEMTest_ModulusArray.cxx
+	  MEDMEMTest_ModulusArray.cxx \
+	  MEDMEMTest_MedMeshDriver21.cxx \
+	  MEDMEMTest_MedMedDriver21.cxx \
+	  MEDMEMTest_MedMedDriver22.cxx \
+          MEDMEMTest_VtkMedDriver.cxx
+
 
 LIB_CLIENT_IDL =
 
