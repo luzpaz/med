@@ -130,6 +130,18 @@ void MEDMEMTest::testGaussLocalization()
 #ifdef ENABLE_FORCED_FAILURES
   // (BUG) Badly copyed arrays as a result of operator= usage
   CPPUNIT_ASSERT_EQUAL(gl1, gl1_c);
+  // Invalid read of size 8
+  //    at 0x342B157A: MEDMEM::MEDMEM_Array<double, MEDMEM::FullInterlaceNoGaussPolicy, MEDMEM::IndexCheckPolicy>::operator==(MEDMEM::MEDMEM_Array<double, MEDMEM::FullInterlaceNoGaussPolicy, MEDMEM::IndexCheckPolicy> const&) const (MEDMEM_nArray.hxx:255)
+  //    by 0x342A1CDA: MEDMEM::GAUSS_LOCALIZATION<MEDMEM::FullInterlace>::operator==(MEDMEM::GAUSS_LOCALIZATION<MEDMEM::FullInterlace> const&) const (MEDMEM_GaussLocalization.hxx:175)
+  //    by 0x34315F98: CppUnit::assertion_traits<MEDMEM::GAUSS_LOCALIZATION<MEDMEM::FullInterlace> >::equal(MEDMEM::GAUSS_LOCALIZATION<MEDMEM::FullInterlace> const&, MEDMEM::GAUSS_LOCALIZATION<MEDMEM::FullInterlace> const&) (TestAssert.h:40)
+  //    by 0x34314D35: void CppUnit::assertEquals<MEDMEM::GAUSS_LOCALIZATION<MEDMEM::FullInterlace> >(MEDMEM::GAUSS_LOCALIZATION<MEDMEM::FullInterlace> const&, MEDMEM::GAUSS_LOCALIZATION<MEDMEM::FullInterlace> const&, CppUnit::SourceLine, std::string const&) (TestAssert.h:62)
+  //    by 0x34311D6F: MEDMEMTest::testGaussLocalization() (MEDMEMTest_GaussLocalization.cxx:132)
+  //  Address 0x35B5FC98 is 0 bytes inside a block of size 48 free'd
+  //    at 0x3414CD61: operator delete[](void*) (vg_replace_malloc.c:161)
+  //    by 0x341D88CA: MEDMEM::PointerOf<double>::~PointerOf() (MEDMEM_PointerOf.hxx:141)
+  //    by 0x341D56C7: MEDMEM::MEDMEM_Array<double, MEDMEM::FullInterlaceNoGaussPolicy, MEDMEM::IndexCheckPolicy>::~MEDMEM_Array() (MEDMEM_nArray.hxx:52)
+  //    by 0x34314F58: MEDMEM::GAUSS_LOCALIZATION<MEDMEM::FullInterlace>::operator=(MEDMEM::GAUSS_LOCALIZATION<MEDMEM::FullInterlace> const&) (MEDMEM_GaussLocalization.hxx:166)
+  //    by 0x34311CCC: MEDMEMTest::testGaussLocalization() (MEDMEMTest_GaussLocalization.cxx:128)
 #endif
 
   // same name, type and nb.gauss, but different coords or weights

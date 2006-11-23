@@ -36,7 +36,6 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testArrayInterface /* not in spec */ );
   CPPUNIT_TEST( testAsciiFieldDriver );
   CPPUNIT_TEST( testCellModel /* not in spec */ );
-  CPPUNIT_TEST( testCompatibility21_22 /* not in spec */ );
   CPPUNIT_TEST( testConnectivity );
   CPPUNIT_TEST( testCoordinate );
   CPPUNIT_TEST( testDriverFactory );
@@ -108,7 +107,6 @@ public:
   void testArrayInterface() /* not in spec */;
   void testAsciiFieldDriver();
   void testCellModel() /* not in spec */;
-  void testCompatibility21_22() /* not in spec */;
   void testConnectivity();
   void testCoordinate();
   void testDriverFactory();

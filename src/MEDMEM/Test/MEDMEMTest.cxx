@@ -44,7 +44,7 @@
 //#include "MEDMEM_GibiMeshDriver.hxx"
 //#include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Group.hxx"
-//#include "MEDMEM_IndexCheckingPolicy.hxx"
+#include "MEDMEM_IndexCheckingPolicy.hxx"
 //#include "MEDMEM_InterlacingPolicy.hxx"
 //#include "MEDMEM_InterlacingTraits.hxx"
 //#include "MEDMEM_MedFieldDriver21.hxx"
@@ -86,7 +86,6 @@
 #include <cmath>
 
 using namespace std;
-//using namespace MEDMEM;
 
 // ============================================================================
 /*!
@@ -106,12 +105,12 @@ void MEDMEMTest::tearDown()
 {
 }
 
-// #1: MEDMEM_Array.hxx           \
-// #2: MEDMEM_ArrayConvert.hxx     }  MEDMEMTest_Array.cxx
-// #3: MEDMEM_ArrayInterface.hxx  /
-// #4:MEDMEM_AsciiFieldDriver.hxx  }  MEDMEMTest_AsciiFieldDriver.cxx
+// #1: MEDMEM_Array.hxx            \
+// #2: MEDMEM_ArrayConvert.hxx      }  MEDMEMTest_Array.cxx
+// #3: MEDMEM_ArrayInterface.hxx   /
+// #4: MEDMEM_AsciiFieldDriver.hxx  }  MEDMEMTest_AsciiFieldDriver.cxx
 
-// #5:
+// #5: MEDMEM_CellModel.hxx  }  MEDMEMTest.cxx
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_CellModel.hxx:
@@ -126,112 +125,12 @@ void MEDMEMTest::testCellModel()
   CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 }
 
-// #6:
+// #6: MEDMEM_Compatibility21_22.hxx  }  nothing to test
+// #7: MEDMEM_Connectivity.hxx        }  MEDMEMTest_Connectivity.cxx
+// #8: MEDMEM_Coordinate.hxx          }  MEDMEMTest_Coordinate.cxx
+// #9: MEDMEM_DriverFactory.hxx       }  MEDMEMTest_DriverFactory.cxx
 
-/*!
- *  Check methods (not in spec), defined in MEDMEM_Compatibility21_22.hxx:
- *   {
- *   (yetno) friend ostream & operator<<(ostream &os, CONNECTIVITY &connectivity);
- *   (yetno) CONNECTIVITY (MED_EN::medEntityMesh Entity=MED_EN::MED_CELL);
- *   (yetno) CONNECTIVITY (int numberOfTypes, MED_EN::medEntityMesh Entity=MED_EN::MED_CELL);
- *   (yetno) CONNECTIVITY (const CONNECTIVITY & m);
- *   (yetno) virtual ~CONNECTIVITY ();
- *   (yetno) void setConstituent (CONNECTIVITY * Constituent) throw (MEDEXCEPTION);
- *   (yetno) void setGeometricTypes (const MED_EN::medGeometryElement * Types,
- *                           const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
- *   (yetno) void setCount (const int * Count, const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
- *   (yetno) void setNodal (const int * Connectivity, const MED_EN::medEntityMesh Entity,
- *                 const MED_EN::medGeometryElement Type) throw (MEDEXCEPTION);
- *   (yetno) inline void setNumberOfNodes(int NumberOfNodes);
- *   (yetno) inline int getEntityDimension() const;
- *   (yetno) inline void setEntityDimension(int EntityDimension);
- *   (yetno) void setPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
- *                               MED_EN::medEntityMesh Entity,
- *                               const int* PolygonsConnectivity,
- *                               const int* PolygonsConnectivityIndex,
- *                               int ConnectivitySize, int NumberOfPolygons);
- *   (yetno) void setPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,
- *                                 const int* PolyhedronConnectivity,
- *                                 const int* PolyhedronIndex, int ConnectivitySize,
- *                                 int NumberOfPolyhedron,
- *                                 const int* PolyhedronFacesIndex= (int*) NULL,
- *                                 int NumberOfFaces=0);
- *   (yetno) inline bool existConnectivity (MED_EN::medConnectivity connectivityType,
- *                                          MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual bool existPolygonsConnectivity(MED_EN::medConnectivity connectivityType,
- *                                        MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual bool existPolyhedronConnectivity(MED_EN::medConnectivity connectivityType,
- *                                          MED_EN::medEntityMesh Entity) const;
- *   (yetno) virtual void calculateConnectivity (MED_EN::medConnectivity connectivityType,
- *                                               MED_EN::medEntityMesh Entity);
- *   (yetno) virtual void updateFamily (const vector<FAMILY*>& myFamilies);
- *   (yetno) inline MED_EN::medEntityMesh getEntity () const;
- *   (yetno) inline int getNumberOfTypes (MED_EN::medEntityMesh Entity) const;
- *   (yetno) int getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
- *   (yetno) const int * getConnectivityOfAnElementWithPoly(MED_EN::medConnectivity ConnectivityType,
- *                                                 MED_EN::medEntityMesh Entity, int Number, int &lgth);
- *   (yetno) int getNumberOfPolyType()  const;
- *   (yetno) int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity,
- *                                           MED_EN::medGeometryElement Type) const;
- *   (yetno) int getNumberOfElementOfPolyType(MED_EN::medEntityMesh Entity)  const;
- *   (yetno) inline const MED_EN::medGeometryElement * getGeometricTypes
- *                    (MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION);
- *   (yetno) MED_EN::medGeometryElement * getGeometricTypesWithPoly
- *                    (MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION);
- *   (yetno) MED_EN::medGeometryElement getElementType (MED_EN::medEntityMesh Entity, int Number) const;
- *   (yetno) MED_EN::medGeometryElement getElementTypeWithPoly
- *                    (MED_EN::medEntityMesh Entity, int Number) const;
- *   (yetno) inline MED_EN::medGeometryElement getPolyTypeRelativeTo() const;
- *   (yetno) virtual inline const int * getGlobalNumberingIndex
- *                 (MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION);
- *   (yetno) virtual const int * getConnectivity (MED_EN::medConnectivity ConnectivityType,
- *                       MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type);
- *   (yetno) virtual int getConnectivityLength (MED_EN::medConnectivity ConnectivityType,
- *                        MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type);
- *   (yetno) virtual const int * getConnectivityIndex (MED_EN::medConnectivity ConnectivityType,
- *                       MED_EN::medEntityMesh Entity);
- *   (yetno) virtual const int* getPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
- *                       MED_EN::medEntityMesh Entity);
- *   (yetno) virtual const int* getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
- *                       MED_EN::medEntityMesh Entity);
- *   (yetno) virtual int getNumberOfPolygons(MED_EN::medEntityMesh Entity=MED_EN::MED_ALL_ENTITIES) const;
- *   (yetno) virtual const int* getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const;
- *   (yetno) virtual const int* getPolyhedronFacesIndex() const;
- *   (yetno) virtual const int* getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const;
- *   (yetno) virtual int getNumberOfPolyhedronFaces() const;
- *   (yetno) virtual int getNumberOfPolyhedron() const;
- *   (yetno) int *getNodesOfPolyhedron(int polyhedronId, int& lgthOfTab) const;
- *   (yetno) int **getNodesPerFaceOfPolyhedron(int polyhedronId, int& nbOfFaces,
- *                                             int* & nbOfNodesPerFaces) const;
- *   (yetno) const CELLMODEL & getType (MED_EN::medGeometryElement Type) const;
- *   (yetno) const CELLMODEL * getCellsTypes (MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION);
- *   (yetno) string * getCellTypeNames (MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION);
- *   (yetno) int getNumberOfNodesInType (MED_EN::medGeometryElement Type) const;
- *   (yetno) int getNumberOfSubCellInType (MED_EN::medGeometryElement Type) const;
- *   (yetno) virtual int getNumberOf (MED_EN::medEntityMesh Entity,
- *                                      MED_EN::medGeometryElement Type) const;
- *   (yetno) virtual const int* getValue (MED_EN::medConnectivity TypeConnectivity,
- *                                           MED_EN::medGeometryElement Type);
- *   (yetno) virtual const int* getValueIndex (MED_EN::medConnectivity TypeConnectivity);
- *   (yetno) virtual inline const int* getReverseConnectivity (MED_EN::medConnectivity ConnectivityType,
- *                     MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) throw (MEDEXCEPTION);
- *   (yetno) virtual inline const int* getReverseConnectivityIndex (MED_EN::medConnectivity ConnectivityType,
- *                      MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) throw (MEDEXCEPTION);
- *   (yetno) const int* getNeighbourhood() const;
- *   (yetno) void invertConnectivityForAFace(int faceId, const int *nodalConnForFace, bool polygonFace=false);
- *   (yetno) bool deepCompare(const CONNECTIVITY& other) const;
- *  }
- */
-void MEDMEMTest::testCompatibility21_22()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #7: MEDMEM_Connectivity.hxx  }  MEDMEMTest_Connectivity.cxx
-// #8: MEDMEM_Coordinate.hxx    }  MEDMEMTest_Coordinate.cxx
-// #9: MEDMEM_DriverFactory.hxx }  MEDMEMTest_DriverFactory.cxx
-
-// #10: MEDMEM_DriversDef.hxx   }  MEDMEMTest.cxx
+// #10: MEDMEM_DriversDef.hxx         }  MEDMEMTest.cxx
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_DriversDef.hxx:
@@ -364,34 +263,69 @@ void MEDMEMTest::testGrid()
 /*!
  *  Check methods (4), defined in MEDMEM_IndexCheckingPolicy.hxx:
  *  class IndexCheckPolicy {
- *   (yetno) void checkMoreThanZero(const std::string & classname, int index) const;
- *   (yetno) void checkLessOrEqualThan(const std::string & classname, int max, int index) const;
- *   (yetno) void checkInInclusiveRange(const std::string & classname, int min, int max, int index) const;
- *   (yetno) void checkEquality(const std::string & classname, int a, int b) const;
+ *   (+)     void checkMoreThanZero(const std::string & classname, int index) const;
+ *   (+)     void checkLessOrEqualThan(const std::string & classname, int max, int index) const;
+ *   (+)     void checkInInclusiveRange(const std::string & classname, int min, int max, int index) const;
+ *   (+)     void checkEquality(const std::string & classname, int a, int b) const;
  *  }
  *  class NoIndexCheckPolicy {
- *   (yetno) void checkMoreThanZero(const string &classname, int index) const;
- *   (yetno) void checkLessOrEqualThan(const std::string & classname, int max, int index) const;
- *   (yetno) void checkInInclusiveRange(const std::string & classname, int min, int max, int index) const;
- *   (yetno) void checkEquality(const std::string & classname, int a, int b) const;
+ *   (+)     void checkMoreThanZero(const string &classname, int index) const;
+ *   (+)     void checkLessOrEqualThan(const std::string & classname, int max, int index) const;
+ *   (+)     void checkInInclusiveRange(const std::string & classname, int min, int max, int index) const;
+ *   (+)     void checkEquality(const std::string & classname, int a, int b) const;
  *  }
  */
 void MEDMEMTest::testIndexCheckingPolicy()
 {
-  CPPUNIT_FAIL("Case Not Implemented");
+  MEDMEM::IndexCheckPolicy do_check;
+  MEDMEM::NoIndexCheckPolicy no_check;
+
+  int min = 3;
+  int max = 10;
+
+  string aClassName ("MEDMEMTest::testIndexCheckingPolicy");
+
+  // IndexCheckPolicy: throw, if index does not satisfy criteria
+  CPPUNIT_ASSERT_THROW(do_check.checkMoreThanZero(aClassName, -1), MEDMEM::MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(do_check.checkLessOrEqualThan(aClassName, max, 13), MEDMEM::MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(do_check.checkInInclusiveRange(aClassName, min, max, 1), MEDMEM::MEDEXCEPTION);
+  // checkEquality() check that values are not equal
+  CPPUNIT_ASSERT_THROW(do_check.checkEquality(aClassName, 21, 21), MEDMEM::MEDEXCEPTION);
+
+  // NoIndexCheckPolicy: do not throw, if index does not satisfy criteria
+  CPPUNIT_ASSERT_NO_THROW(no_check.checkMoreThanZero(aClassName, -1));
+  CPPUNIT_ASSERT_NO_THROW(no_check.checkLessOrEqualThan(aClassName, max, 13));
+  CPPUNIT_ASSERT_NO_THROW(no_check.checkInInclusiveRange(aClassName, min, max, 1));
+  CPPUNIT_ASSERT_NO_THROW(no_check.checkEquality(aClassName, 21, 21));
+
+  // IndexCheckPolicy: do not throw, if index satisfy criteria
+  CPPUNIT_ASSERT_NO_THROW(do_check.checkMoreThanZero(aClassName, 5));
+  CPPUNIT_ASSERT_NO_THROW(do_check.checkLessOrEqualThan(aClassName, max, 7));
+  CPPUNIT_ASSERT_NO_THROW(do_check.checkInInclusiveRange(aClassName, min, max, 6));
+  CPPUNIT_ASSERT_NO_THROW(do_check.checkEquality(aClassName, 21, 28));
+
+  // NoIndexCheckPolicy: do not throw, if index satisfy criteria
+  CPPUNIT_ASSERT_NO_THROW(no_check.checkMoreThanZero(aClassName, 5));
+  CPPUNIT_ASSERT_NO_THROW(no_check.checkLessOrEqualThan(aClassName, max, 7));
+  CPPUNIT_ASSERT_NO_THROW(no_check.checkInInclusiveRange(aClassName, min, max, 6));
+  CPPUNIT_ASSERT_NO_THROW(no_check.checkEquality(aClassName, 21, 28));
 }
 
 // #24: MEDMEM_Init.cxx  }  MEDMEMTest.cxx
 
 /*!
- *  Check methods (1), implemented in MEDMEM_Init.cxx:
- *   {
- *   (yetno)
- *  }
+ *  Check initialization, done in MEDMEM_Init.cxx:
+ *  (-) MEDMEM::INIT init;
  */
 void MEDMEMTest::testInit()
 {
-  CPPUNIT_FAIL("Case Not Implemented");
+  // We cannot check here effect of initialization, done in MEDMEM_Init.cxx,
+  // because environment variable, set there, is visible only in libmedmem.la
+  // and its child processes (if any).
+
+  // Check effect of MEDMEM_Init.cxx
+  //char* traceKind = getenv("SALOME_trace");
+  //CPPUNIT_ASSERT(traceKind);
 }
 
 // #25: MEDMEM_InterlacingPolicy.hxx  }  MEDMEMTest.cxx
@@ -531,52 +465,8 @@ void MEDMEMTest::testMedFieldDriver()
   CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 }
 
-// #30: MEDMEM_Med.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (26), defined in MEDMEM_Med.hxx:
- *  class MED {
- *   (yetno) MED();
- *   (yetno) MED (driverTypes driverType, const string & fileName);
- *   (yetno) ~MED();
- *   (yetno) void addField (FIELD_ * const ptrField) throw (MED_EXCEPTION);
- *   (yetno) void addMesh  (MESH   * const ptrMesh) throw (MED_EXCEPTION);
- *   (yetno) int addDriver (driverTypes driverType, const string & fileName,
- *                          MED_EN::med_mode_acces access=MED_EN::MED_REMP);
- *   (yetno) int addDriver (GENDRIVER & driver);
- *   (yetno) void rmDriver (int index=0) throw (MEDEXCEPTION);
- *   (yetno) void readFileStruct(int index=0) throw (MEDEXCEPTION);
- *   (yetno) void read (int index=0) throw (MEDEXCEPTION);
- *   (yetno) void writeFrom (int index=0) throw (MEDEXCEPTION);
- *   (yetno) void write (int index=0) throw (MEDEXCEPTION);
- *   (yetno) int  getNumberOfMeshes (void) const;
- *   (yetno) int  getNumberOfFields (void) const;
- *   (yetno) void getMeshNames (string * meshNames) const throw (MEDEXCEPTION);
- *   (yetno) deque<string> getMeshNames   () const;
- *   (yetno) MESH * getMesh (const string & meshName) const throw (MEDEXCEPTION);
- *   (yetno) MESH * getMesh (const  FIELD_ * const field) const throw (MEDEXCEPTION);
- *   (yetno) void getFieldNames (string * fieldNames) const throw (MEDEXCEPTION);
- *   (yetno) deque<string> getFieldNames () const;
- *   (yetno) deque<DT_IT_> getFieldIteration (const string & fieldName) const throw (MEDEXCEPTION);
- *   (yetno) FIELD_ * getField (const string & fieldName, const int dt,
- *                              const int it) const throw (MEDEXCEPTION);
- *   (yetno) template<class T> FIELD<T> * getFieldT
- *           (const string & fieldName, const int dt,  const int it) const throw (MEDEXCEPTION);
- *   (yetno) FIELD_ * getField2 (const string & fieldName, double time, int it=0) const throw (MEDEXCEPTION);
- *   (yetno) const map<MED_EN::medEntityMesh,SUPPORT *> & getSupports
- *           (const string & meshName) const throw (MEDEXCEPTION);
- *   (yetno) SUPPORT *  getSupport (const string & meshName,
- *                                  MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
- *   (yetno) void updateSupport ();
- *  }
- */
-void MEDMEMTest::testMed()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
-
+// #30: MEDMEM_Med.hxx             }  MEDMEMTest_Med.cxx
 // #31: MEDMEM_MedMedDriver21.hxx  }  MEDMEMTest_MedMedDriver21.cxx
-
 // #32: MEDMEM_MedMedDriver22.hxx  }  MEDMEMTest_MedMedDriver22.cxx
 
 // #33: MEDMEM_MedMedDriver.hxx  }  MEDMEMTest.cxx
@@ -632,9 +522,7 @@ void MEDMEMTest::testMEDMEMprofilEcr()
 }
 
 // #37: MEDMEM_MedMeshDriver21.hxx  }  MEDMEMTest_MedMeshDriver21.cxx
-
 // #38: MEDMEM_MedMeshDriver22.hxx  }  MEDMEMTest_MedMeshDriver22.cxx
-
 
 // #39: MEDMEM_MedMeshDriver.hxx  }  MEDMEMTest.cxx
 
@@ -649,20 +537,13 @@ void MEDMEMTest::testMedMeshDriver()
   CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 }
 
-// #40: MEDMEM_MedVersion.hxx  }  MEDMEMTest_MedVersion.cxx
-
-
-// #41: MEDMEM_Mesh.hxx     \ 
-// #42: MEDMEM_Meshing.hxx  /  MEDMEMTest_MeshAndMeshing.cxx
-
-// #43: MEDMEM_ModulusArray.hxx  }  MEDMEMTest_ModulusArray.cxx
-
-// #44: MEDMEM_nArray.hxx  }  MEDMEMTest_nArray.cxx
-
-// #45: MEDMEM_PointerOf.hxx  }  MEDMEMTest_PointerOf.cxx
-
-// #46: MEDMEM_PolyhedronArray.hxx  }  MEDMEMTest_PolyhedronArray.cxx
-
+// #40: MEDMEM_MedVersion.hxx         }  MEDMEMTest_MedVersion.cxx
+// #41: MEDMEM_Mesh.hxx               \
+// #42: MEDMEM_Meshing.hxx            /  MEDMEMTest_MeshAndMeshing.cxx
+// #43: MEDMEM_ModulusArray.hxx       }  MEDMEMTest_ModulusArray.cxx
+// #44: MEDMEM_nArray.hxx             }  MEDMEMTest_nArray.cxx
+// #45: MEDMEM_PointerOf.hxx          }  MEDMEMTest_PointerOf.cxx
+// #46: MEDMEM_PolyhedronArray.hxx    }  MEDMEMTest_PolyhedronArray.cxx
 // #47: MEDMEM_PorflowMeshDriver.hxx  }  MEDMEMTest_PorflowMeshDriver.cxx
 
 // #48: MEDMEM_RCBase.hxx  }  MEDMEMTest.cxx
@@ -670,13 +551,13 @@ void MEDMEMTest::testMedMeshDriver()
 /*!
  *  Check methods (not in spec), defined in MEDMEM_RCBase.hxx:
  *  class RCBASE {
- *   (yetno) virtual void addReference() const = 0;
- *   (yetno) virtual void removeReference() const = 0;
+ *   (reference counter presently disconnected in C++) virtual void addReference() const = 0;
+ *   (reference counter presently disconnected in C++) virtual void removeReference() const = 0;
  *  }
  */
 void MEDMEMTest::testRCBase()
 {
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+  // nothing to test
 }
 
 // #49: MEDMEM_SetInterlacingType.hxx  }  MEDMEMTest.cxx
@@ -712,73 +593,6 @@ void MEDMEMTest::testSTRING()
 }
 
 // #52: MEDMEM_Support.hxx  }  MEDMEMTest_Support.cxx
-
-/*!
- *  Check methods (48), defined in MEDMEM_Support.hxx:
- *  class SUPPORT : public RCBASE {
- *   (yetno) SUPPORT();
- *   (yetno) SUPPORT(MESH* Mesh, string Name="", MED_EN::medEntityMesh Entity=MED_EN::MED_CELL);
- *   (yetno) SUPPORT(const SUPPORT & m);
- *   (yetno) virtual ~SUPPORT();
- *   (yetno) friend ostream & operator<<(ostream &os,const SUPPORT &my);
- *   (yetno) SUPPORT& operator=(const SUPPORT &support);
- *   (yetno) bool operator == (const SUPPORT &support) const;
- *   (yetno) bool deepCompare(const SUPPORT &support) const;
- *   (yetno) void update();
- *   (yetno) inline void setName(string Name);
- *   (yetno) inline void setDescription(string Description);
- *   (yetno) void setMesh(MESH *Mesh) const;
- *   (yetno) inline void setMeshName(const string & meshName);
- *   (yetno) inline void setAll(bool All);
- *   (yetno) inline void setEntity(MED_EN::medEntityMesh Entity);
- *   (yetno) inline void setNumberOfGeometricType(int NumberOfGeometricType);
- *   (yetno) inline void setGeometricType(const MED_EN::medGeometryElement *GeometricType);
- *   (yetno) inline void setNumberOfElements(const int *NumberOfElements);
- *   (yetno) inline void setTotalNumberOfElements(int TotalNumberOfElements);
- *   (yetno) inline void setNumber(MEDSKYLINEARRAY * Number);
- *   (yetno) inline void setNumber(const int * index, const int* value, bool shallowCopy=false);
- *   (yetno) inline string getName() const;
- *   (yetno) inline string getDescription() const;
- *   (yetno) virtual inline MESH * getMesh() const;
- *   (yetno) string getMeshName() const;
- *   (yetno) inline MED_EN::medEntityMesh getEntity() const;
- *   (yetno) inline bool   isOnAllElements() const;
- *   (yetno) inline int    getNumberOfTypes() const;
- *   (yetno) inline const MED_EN::medGeometryElement* getTypes() const;
- *   (yetno) inline int    getNumberOfElements(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
- *   (yetno) inline  const int * getNumberOfElements() const throw (MEDEXCEPTION);
- *   (yetno) virtual inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
- *   (yetno) virtual inline MEDSKYLINEARRAY *  getnumberFromFile() const throw (MEDEXCEPTION);
- *   (yetno) virtual inline const int *  getNumber(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
- *   (yetno) virtual inline const int *  getNumberFromFile(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
- *   (yetno) virtual inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
- *   (yetno) virtual int getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION);
- *   (yetno) void blending(SUPPORT * mySupport) throw (MEDEXCEPTION);
- *   (yetno) void setpartial(string Description, int NumberOfGeometricType,
- *                           int TotalNumberOfEntity, MED_EN::medGeometryElement *GeometricType,
- *                           int *NumberOfEntity, int *NumberValue);
- *   (yetno) void setpartial(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
- *   (yetno) void setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
- *   (yetno) void   setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION);
- *   (yetno) vector<string> getProfilNames() const throw (MEDEXCEPTION);
- *   (yetno) void getBoundaryElements() throw (MEDEXCEPTION);
- *   (yetno) void changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumberingFromOldToNew, int limitNbClassicPoly, const int *renumberingFromOldToNewPoly=0);
- *   (yetno) void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION);
- *   (yetno) bool belongsTo(const SUPPORT& other, bool deepCompare=false) const;
- *   (yetno) SUPPORT *getComplement() const;
- *   (yetno) SUPPORT *substract(const SUPPORT& other) const throw (MEDEXCEPTION);
- *   (yetno) SUPPORT *getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION);
- *   (yetno) void fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION);
- *   (yetno) void fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION);
- *   (yetno) void clearDataOnNumbers();
- *   (yetno) virtual void addReference() const;
- *   (yetno) virtual void removeReference() const;
- *  }
- */
-void MEDMEMTest::testSupport()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
 
 // #53: MEDMEM_Tags.hxx  }  MEDMEMTest.cxx
 
@@ -887,8 +701,7 @@ void MEDMEMTest::testVtkFieldDriver()
   CPPUNIT_FAIL("Case Not Implemented");
 }
 
-// #58: MEDMEM_VtkMedDriver.hxx  }  MEDMEMTest_VtkMedDriver.cxx
-
+// #58: MEDMEM_VtkMedDriver.hxx   }  MEDMEMTest_VtkMedDriver.cxx
 // #59: MEDMEM_VtkMeshDriver.hxx  }  MEDMEMTest_VtkMeshDriver.cxx
 
 // #60: MEDMEM_medimport_src.hxx  }  MEDMEMTest.cxx
@@ -1063,7 +876,7 @@ MEDMEM::MESH * MEDMEMTest::createTestMesh ()
   myMeshing->setNumberOfTypes(NumberOfCellTypes, MED_EN::MED_CELL);
   myMeshing->setTypes(CellTypes, MED_EN::MED_CELL);
   myMeshing->setNumberOfElements(NumberOfCells, MED_EN::MED_CELL);
-  
+
   myMeshing->setConnectivity(ConnectivityTetra, MED_EN::MED_CELL, MED_EN::MED_TETRA4);
   myMeshing->setConnectivity(ConnectivityPyra, MED_EN::MED_CELL, MED_EN::MED_PYRA5);
   myMeshing->setConnectivity(ConnectivityHexa, MED_EN::MED_CELL, MED_EN::MED_HEXA8);
@@ -1071,7 +884,7 @@ MEDMEM::MESH * MEDMEMTest::createTestMesh ()
   myMeshing->setNumberOfTypes(NumberOfFaceTypes, MED_EN::MED_FACE);
   myMeshing->setTypes(FaceTypes, MED_EN::MED_FACE);
   myMeshing->setNumberOfElements(NumberOfFaces, MED_EN::MED_FACE);
-  
+
   myMeshing->setConnectivity(ConnectivityTria, MED_EN::MED_FACE, MED_EN::MED_TRIA3);
   myMeshing->setConnectivity(ConnectivityQua, MED_EN::MED_FACE, MED_EN::MED_QUAD4);
 
