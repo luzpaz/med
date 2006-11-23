@@ -22,6 +22,9 @@
 
 #include <MEDMEM_GibiMeshDriver.hxx>
 #include <MEDMEM_Mesh.hxx>
+//#include <MEDMEM_Compatibility21_22.hxx>
+//#include <MEDMEM_MedMedDriver22.hxx>
+#include <MEDMEM_Med.hxx>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 //#define ENABLE_FAULTS
@@ -85,30 +88,35 @@ using namespace MED_EN;
  *   (yetno) void close();
  *  }
  *  class GIBI_MED_RDONLY_DRIVER : public GIBI_MESH_RDONLY_DRIVER {
- *   (yetno) GIBI_MED_RDONLY_DRIVER();
- *   (yetno) GIBI_MED_RDONLY_DRIVER(const string & fileName, MED * ptrMed);
- *   (yetno) GIBI_MED_RDONLY_DRIVER(const GIBI_MED_RDONLY_DRIVER & driver);
- *   (yetno) virtual ~GIBI_MED_RDONLY_DRIVER();
- *   (yetno) void read (void) throw (MEDEXCEPTION);
+ *   (+) GIBI_MED_RDONLY_DRIVER();
+ *   (+) GIBI_MED_RDONLY_DRIVER(const string & fileName, MED * ptrMed);
+ *   (+) GIBI_MED_RDONLY_DRIVER(const GIBI_MED_RDONLY_DRIVER & driver);
+ *   (+) virtual ~GIBI_MED_RDONLY_DRIVER();
+ *   (+) void read (void) throw (MEDEXCEPTION);
  *  }
  *  class GIBI_MED_WRONLY_DRIVER : public GIBI_MESH_WRONLY_DRIVER {
- *   (yetno) GIBI_MED_WRONLY_DRIVER();
- *   (yetno) GIBI_MED_WRONLY_DRIVER(const string & fileName, MED * ptrMed, MESH * ptrMesh);
- *   (yetno) GIBI_MED_WRONLY_DRIVER(const GIBI_MED_WRONLY_DRIVER & driver);
- *   (yetno) virtual ~GIBI_MED_WRONLY_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
+ *   (+) GIBI_MED_WRONLY_DRIVER();
+ *   (+) GIBI_MED_WRONLY_DRIVER(const string & fileName, MED * ptrMed, MESH * ptrMesh);
+ *   (+) GIBI_MED_WRONLY_DRIVER(const GIBI_MED_WRONLY_DRIVER & driver);
+ *   (+) virtual ~GIBI_MED_WRONLY_DRIVER();
+ *   (+) void write(void) const throw (MEDEXCEPTION);
  *  }
  */
 
 void MEDMEMTest::testGibiMeshDriver()
 {
   MESH *aMesh                      = new MESH();
-  MESH *aMesh_1                    = new MESH();
+  MESH *aMesh_1                    = NULL;
+  MED  *aMed                       = new MED();
+  MED  *aMed_1                     = NULL;
   string data_dir                  = getenv("DATA_DIR");
   string tmp_dir                   = getenv("TMP");
   string filename_rd               = data_dir + "/Sauv/Darcy3_3D_H_10x10x10.sauve";
+  string filenamemed_rd            = data_dir + "/Sauv/elle_3D_HPr_10x10x10.sauve";
   string filename_wr               = tmp_dir  + "/myWr_Darcy3_3D_H_10x10x10.sauve";
   string tmpfile                   = tmp_dir  + "/tmp.sauve";
+  string filenamemed_wr            = tmp_dir  + "/myWrMed_elle_3D_HPr_10x10x10.sauve";
+  string tmpfilemed                = tmp_dir  + "/tmpmed.sauve";
   string meshname                  = "Darcy3_3D_H_10x10x10";
   string newmeshname               = "new" + meshname;
   string fileNotExistsName_rd      = "notExists.sauve";
@@ -329,9 +337,9 @@ void MEDMEMTest::testGibiMeshDriver()
   //Compilation error after using this operator
   //aGibiWrDriverCpy_1 = *aGibiWrDriver;
   //CPPUNIT_ASSERT_EQUAL(aGibiWrDriverCpy_1, *aGibiWrDriver);
-//#ifdef ENABLE_FORCED_FAILURES
-  //   CPPUNIT_FAIL("GIBI_MESH_WRONLY_DRIVER::operator=: Error during compilation");
-//#endif
+#ifdef ENABLE_FORCED_FAILURES
+  CPPUNIT_FAIL("GIBI_MESH_WRONLY_DRIVER::operator=: Error during compilation");
+#endif
 
   //Test copy constructor
   GIBI_MESH_WRONLY_DRIVER aGibiWrDriverCpy_2 = GIBI_MESH_WRONLY_DRIVER(*aGibiWrDriver);
@@ -459,18 +467,216 @@ void MEDMEMTest::testGibiMeshDriver()
   CPPUNIT_ASSERT(rwostr1.str() != "");
   CPPUNIT_ASSERT(rwostr1.str() == rwostr2.str());
   */
+  
+  //--------------------------------Test GIBI_MED_RDONLY_DRIVER-----------------------------------------
+  GIBI_MED_RDONLY_DRIVER *aInvalidMedGibiRdDriver = new GIBI_MED_RDONLY_DRIVER(fileNotExistsName_rd, aMed);
+    
+  //Trying open not exising file
+  CPPUNIT_ASSERT_THROW(aInvalidMedGibiRdDriver->open(), MEDEXCEPTION);
+  
+  //Creation a correct Gibi read only driver (normal constructor)
+  GIBI_MED_RDONLY_DRIVER *aGibiMedRdDriver = new GIBI_MED_RDONLY_DRIVER(filenamemed_rd, aMed);
 
+  //Check driver
+  CPPUNIT_ASSERT(aGibiMedRdDriver);
+
+  //Trying read mesh from file, if file is not open
+  CPPUNIT_ASSERT_THROW(aGibiMedRdDriver->read(), MEDEXCEPTION);
+
+  //Test open() method
+  try
+  {
+    aGibiMedRdDriver->open();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+#ifdef ENABLE_FORCED_FAILURES
+  //Trying open file secondary.
+  CPPUNIT_ASSERT_THROW(aGibiMedRdDriver->open(), MEDEXCEPTION);
+  //This case is not work, seems it BUG
+#endif
+  
+  //Test read() method
+  try
+  {
+    aGibiMedRdDriver->read();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  //Test write() method for GIBI MED READ ONLY driver
+  CPPUNIT_ASSERT_THROW(aGibiMedRdDriver->write(), MEDEXCEPTION);
+
+  //Check Med
+  CPPUNIT_ASSERT(aMed);
+  
+  //Test close method
+  try
+  {
+    aGibiMedRdDriver->close();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  //Default constructor
+  GIBI_MED_RDONLY_DRIVER aGibiMedRdDriverCpy_1;
+
+  //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
+  aGibiMedRdDriverCpy_1 = *aGibiMedRdDriver;
+  CPPUNIT_ASSERT_EQUAL(aGibiMedRdDriverCpy_1, *aGibiMedRdDriver);
+
+  //Test (bool operator ==) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
+  CPPUNIT_ASSERT(aGibiMedRdDriverCpy_1 == *aGibiMedRdDriver);
+
+  //Test copy constructor
+  GIBI_MED_RDONLY_DRIVER aGibiMedRdDriverCpy_2 = GIBI_MED_RDONLY_DRIVER(*aGibiMedRdDriver);
+#ifdef ENABLE_FORCED_FAILURES  
+  CPPUNIT_ASSERT_EQUAL_MESSAGE("Copy constructor work incorrect...",aGibiMedRdDriverCpy_2, *aGibiMedRdDriver);
+#endif
+
+  //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
+  ostringstream medrostr1, medrostr2;
+  medrostr1<<*aGibiMedRdDriver;
+  medrostr2<<aGibiMedRdDriverCpy_1;
+  CPPUNIT_ASSERT(medrostr1.str() != "");
+  CPPUNIT_ASSERT(medrostr1.str() == medrostr2.str());
+
+
+  //----------------------------------Test GIBI MED WRITE ONLY part------------------------------------------//
+  //Creation a incorrect gibi med write only driver
+  GIBI_MED_WRONLY_DRIVER *aInvalidGibiMedWrDriver = new GIBI_MED_WRONLY_DRIVER(fileNotExistsName_wr, aMed ,aMesh);
+  
+  //Trying open non existing file
+  CPPUNIT_ASSERT_THROW(aInvalidGibiMedWrDriver->open(), MEDEXCEPTION);
+
+   //Trying create gibi med write only driver with null MED and MESH
+  CPPUNIT_ASSERT_THROW(GIBI_MED_WRONLY_DRIVER *aTmpGibiMedWrDriver = new GIBI_MED_WRONLY_DRIVER(tmpfilemed, aMed_1 ,aMesh_1), MEDEXCEPTION);
+
+ //Creation a correct gibi med write only drivers
+  GIBI_MED_WRONLY_DRIVER *aGibiMedWrDriver = new GIBI_MED_WRONLY_DRIVER(filenamemed_wr, aMed, aMesh);
+
+  //Check driver
+  CPPUNIT_ASSERT(aGibiMedWrDriver);
+
+  //Trying write mesh to file, if file is not open
+  CPPUNIT_ASSERT_THROW(aGibiMedWrDriver->write(), MEDEXCEPTION);
+
+  //Test open() method
+  try
+  {
+    aGibiMedWrDriver->open();
+  }
+  catch(MEDEXCEPTION &e)
+    {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+#ifdef ENABLE_FORCED_FAILURES
+  //Trying open file secondary.
+  CPPUNIT_ASSERT_THROW(aGibiMedWrDriver->open(), MEDEXCEPTION);
+  //Exception is generated, but second call open() function break driver
+#endif
+
+  //Test write() method
+  try
+  {
+    aGibiMedWrDriver->write();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  //Test read() method for GIBI MED WRITE ONLY driver
+  CPPUNIT_ASSERT_THROW(aGibiMedWrDriver->read(), MEDEXCEPTION);
+
+  //Test close method
+  try
+  {
+    aGibiMedWrDriver->close();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  //Default constructor
+  GIBI_MED_WRONLY_DRIVER aGibiMedWrDriverCpy_1;
+  //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
+  //Compilation error after using this operator
+  //aGibiMedWrDriverCpy_1 = *aGibiMedWrDriver;
+  //CPPUNIT_ASSERT_EQUAL(aGibiMedWrDriverCpy_1, *aGibiMedWrDriver);
+#ifdef ENABLE_FORCED_FAILURES
+  CPPUNIT_FAIL("GIBI_MED_WRONLY_DRIVER::operator=: Error during compilation");
+#endif
+
+
+#ifdef ENABLE_FAULTS
+  //Test copy constructor
+  GIBI_MED_WRONLY_DRIVER aGibiMedWrDriverCpy_2 = GIBI_MED_WRONLY_DRIVER(*aGibiMedWrDriver);
+  //Segmentation fault after delete copied object
+#ifdef ENABLE_FORCED_FAILURES  
+  CPPUNIT_ASSERT_EQUAL_MESSAGE("Copy constructor work incorrect...",*aGibiMedWrDriverCpy_2, *aGibiMedWrDriver);
+#endif
+
+  //Test (bool operator ==) defined GENDRIVER class in MEDMEM_GenDriver.hxx
+  CPPUNIT_ASSERT(aGibiMedWrDriverCpy_2 == *aGibiMedWrDriver);
+  //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
+  ostringstream medwostr1, medwostr2;
+  medwostr1<<*aGibiMedWrDriver;
+  medwostr2<<aGibiMedWrDriverCpy_2;
+  CPPUNIT_ASSERT(medwostr1.str() != "");
+  CPPUNIT_ASSERT(medwostr1.str() == medwostr2.str());
+#endif  
 
   //Delete all objects
   delete aMesh;
-  delete aMesh_1;
   delete aInvalidGibiRdDriver;
   delete aGibiRdDriver;
 
   delete aInvalidGibiWrDriver;
+  delete aTmpGibiWrDriver;
   delete aGibiWrDriver;
+
+  delete aInvalidMedGibiRdDriver;
+  delete aGibiMedRdDriver;
+
+  delete aInvalidGibiMedWrDriver;
+  delete aGibiMedWrDriver;
 
   //Remove tmp files
   remove(filename_wr.data());
   remove(tmpfile.data());
+  remove(tmpfilemed.data());
+  remove(filenamemed_wr.data());
 }

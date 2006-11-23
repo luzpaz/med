@@ -229,7 +229,10 @@ void MEDMEMTest::testVtkMeshDriver()
    //CPPUNIT_ASSERT_EQUAL(ostr1.str(), ostr2.str());
 
   //Delete objects
-  //delete aInvalidVtkDriver;
+#ifdef ENABLE_FORCED_FAILURES
+  delete aInvalidVtkDriver;
+  //Exception after trying close not existing file
+#endif
   delete aEmptyVtkDriver;
   delete aVtkDriver;
   delete aMedMeshRdDriver21;
