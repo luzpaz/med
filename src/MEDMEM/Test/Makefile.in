@@ -67,6 +67,7 @@ LIB_SRC = MEDMEMTest.cxx \
           MEDMEMTest_PointerOf.cxx \
 	  MEDMEMTest_PolyhedronArray.cxx \
 	  MEDMEMTest_PorflowMeshDriver.cxx \
+	  MEDMEMTest_Grid.cxx \
           MEDMEMTest_SkyLineArray.cxx \
           MEDMEMTest_Support.cxx \
 	  MEDMEMTest_Unit.cxx \
