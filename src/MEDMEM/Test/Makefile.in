@@ -71,7 +71,9 @@ LIB_SRC = MEDMEMTest.cxx \
           MEDMEMTest_Support.cxx \
 	  MEDMEMTest_Unit.cxx \
           MEDMEMTest_VtkMedDriver.cxx \
-          MEDMEMTest_VtkMeshDriver.cxx
+          MEDMEMTest_VtkMeshDriver.cxx \
+	  MEDMEMTest_MedFieldDriver21.cxx \
+	  MEDMEMTest_MedFieldDriver22.cxx 
 
 LIB_CLIENT_IDL =
 
