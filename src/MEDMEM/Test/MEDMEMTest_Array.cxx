@@ -25,66 +25,16 @@
 #include "MEDMEM_ArrayConvert.hxx"
 #include "MEDMEM_Array.hxx"
 //#include "MEDMEM_ArrayInterface.hxx"
-//#include "MEDMEM_AsciiFieldDriver.hxx"
-//#include "MEDMEM_CellModel.hxx"
-//#include "MEDMEM_Compatibility21_22.hxx"
-//#include "MEDMEM_Connectivity.hxx"
-//#include "MEDMEM_Coordinate.hxx"
-//#include "MEDMEM_define.hxx"
-//#include "MEDMEM_DriverFactory.hxx"
-//#include "MEDMEM_DriversDef.hxx"
-//#include "MEDMEM_DriverTools.hxx"
-////#include "MEDMEM_Exception.hxx"
-//#include "MEDMEM_Family.hxx"
-//#include "MEDMEM_FieldConvert.hxx"
-//#include "MEDMEM_FieldForward.hxx"
-//#include "MEDMEM_Field.hxx"
-//#include "MEDMEM_Formulae.hxx"
-//#include "MEDMEM_GaussLocalization.hxx"
-//#include "MEDMEM_GenDriver.hxx"
-//#include "MEDMEM_GibiMeshDriver.hxx"
-//#include "MEDMEM_Grid.hxx"
-//#include "MEDMEM_Group.hxx"
-//#include "MEDMEM_IndexCheckingPolicy.hxx"
-//#include "MEDMEM_InterlacingPolicy.hxx"
-//#include "MEDMEM_InterlacingTraits.hxx"
-//#include "MEDMEM_MedFieldDriver21.hxx"
-//#include "MEDMEM_MedFieldDriver22.hxx"
-//#include "MEDMEM_MedFieldDriver.hxx"
-//#include "MEDMEM_Med.hxx"
-//#include "MEDMEM_medimport_src.hxx"
-//#include "MEDMEM_MedMedDriver21.hxx"
-//#include "MEDMEM_MedMedDriver22.hxx"
-//#include "MEDMEM_MedMedDriver.hxx"
-//#include "MEDMEM_MEDMEMchampLire.hxx"
-//#include "MEDMEM_MEDMEMgaussEcr.hxx"
-//#include "MEDMEM_MEDMEMprofilEcr.hxx"
-//#include "MEDMEM_MedMeshDriver21.hxx"
-//#include "MEDMEM_MedMeshDriver22.hxx"
-//#include "MEDMEM_MedMeshDriver.hxx"
-//#include "MEDMEM_MedVersion.hxx"
-//#include "MEDMEM_Mesh.hxx"
-//#include "MEDMEM_Meshing.hxx"
-//#include "MEDMEM_ModulusArray.hxx"
-//#include "MEDMEM_PointerOf.hxx"
-//#include "MEDMEM_PolyhedronArray.hxx"
-//#include "MEDMEM_PorflowMeshDriver.hxx"
-//#include "MEDMEM_RCBase.hxx"
-//#include "MEDMEM_SetInterlacingType.hxx"
-//#include "MEDMEM_SkyLineArray.hxx"
 #include "MEDMEM_STRING.hxx"
-//#include "MEDMEM_Support.hxx"
-//#include "MEDMEM_Tags.hxx"
-//#include "MEDMEM_TopLevel.hxx"
-//#include "MEDMEM_TypeMeshDriver.hxx"
-//#include "MEDMEM_Unit.hxx"
-//#include "MEDMEM_Utilities.hxx"
-//#include "MEDMEM_VtkFieldDriver.hxx"
-//#include "MEDMEM_VtkMedDriver.hxx"
-//#include "MEDMEM_VtkMeshDriver.hxx"
 
 #include <sstream>
 #include <cmath>
+
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -436,17 +386,47 @@ void MEDMEMTest::testArray()
   // Check operator= and method shallowCopy()
   double c7n3 = aSpiral->getIJ(3, 7);
   MEDARRAY<double> shc, cpy;
-  //tmp//shc.shallowCopy(*aSpiral);
+
+#ifdef ENABLE_FAULTS
+  // (BUG) MEDARRAY<T>::shallowCopy() usage leads to memory leaks,
+  // because on attemp to free both arrays we have Segmentation Fault
+  shc.shallowCopy(*aSpiral);
+
+  // hangs up
+  //MEDARRAY<double> arr (10, 10);
+  //MEDARRAY<double> shc;
+  //shc.shallowCopy(arr);
+
+  // Segmentation fault
+  //MEDARRAY<double>* arr = new MEDARRAY<double> (10, 10);
+  //MEDARRAY<double>* shc = new MEDARRAY<double> (10, 10);
+  //shc->shallowCopy(*arr);
+  //delete arr;
+  //delete shc;
+#endif
+#ifdef ENABLE_FORCED_FAILURES
+  CPPUNIT_FAIL("MEDARRAY<T>::shallowCopy(): wrong memory management");
+#endif
+
   cpy = *aSpiral;
+
   aSpiral->setIJ(3, 7, c7n3 * 2.0);
 
-  //tmp//CPPUNIT_ASSERT_DOUBLES_EQUAL(c7n3 * 2.0, shc.getIJ(3, 7), delta);
+#ifdef ENABLE_FAULTS
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(c7n3 * 2.0, shc.getIJ(3, 7), delta);
+#endif
 
-  // Comments to operator= do not correspond to actual implementation
+#ifdef ENABLE_FORCED_FAILURES
+  // (BUG) Comments to MEDARRAY<T>::operator= do not correspond to actual implementation
+  CPPUNIT_FAIL("Comments to MEDARRAY<T>::operator= do not correspond to actual implementation");
+#endif
   //CPPUNIT_ASSERT_DOUBLES_EQUAL(c7n3 * 2.0, cpy.getIJ(3, 7), delta);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(c7n3, cpy.getIJ(3, 7), delta);
 
+#ifdef ENABLE_FORCED_FAILURES
   // Comments to deep copy constructor do not correspond to actual implementation
+  CPPUNIT_FAIL("Comments to MEDARRAY<T> deep copy constructor do not correspond to actual implementation");
+#endif
   aSpiral->clearOtherMode();
   //CPPUNIT_ASSERT_THROW(MEDARRAY<double> co (*aSpiral, true), MEDEXCEPTION);
   CPPUNIT_ASSERT_NO_THROW(MEDARRAY<double> co (*aSpiral, true));
@@ -498,34 +478,23 @@ void MEDMEMTest::testArray()
 
   delete [] aValues;
 
-  // hangs up
-  //MEDARRAY<double> arr (10, 10);
-  //MEDARRAY<double> shc;
-  //shc.shallowCopy(arr);
-
-  // Segmentation fault
-  //MEDARRAY<double>* arr = new MEDARRAY<double> (10, 10);
-  //MEDARRAY<double>* shc = new MEDARRAY<double> (10, 10);
-  //shc->shallowCopy(*arr);
-  //delete arr;
-  //delete shc;
-
-  // hangs up
-  //int ld = 7, nb = 4;
-  //double * val = new double [ld * nb];
-  //for (int nn = 0; nn < nb; nn++) {
-  //  for (int cc = 0; cc < ld; cc++) {
-  //    val[nn*ld + cc] = nn;
-  //  }
-  //}
-  //MEDARRAY<double> * arr =
-  //  new MEDARRAY<double> (val, ld, nb, MED_EN::MED_FULL_INTERLACE,
-  //                        ///*shallowCopy=*/false, /*ownershipOfValues=*/false);
-  //                        /*shallowCopy=*/true, /*ownershipOfValues=*/true);
-  //delete arr;
-  //delete [] val;
-
-  CPPUNIT_FAIL("TO DO: uncomment some lines //tmp//, clear with other commented lines.");
+  // construction with taking ownership of values
+  int ld1 = 7, nb1 = 4;
+  double * val1 = new double [ld * nb];
+  for (int nn = 0; nn < nb1; nn++) {
+    for (int cc = 0; cc < ld1; cc++) {
+      val1[nn*ld1 + cc] = nn;
+    }
+  }
+  MEDARRAY<double> * arr1 =
+    new MEDARRAY<double> (val1, ld1, nb1, MED_EN::MED_FULL_INTERLACE,
+                          /*shallowCopy=*/true, /*ownershipOfValues=*/true);
+  for (int nn = 1; nn <= nb1; nn++) {
+    for (int cc = 1; cc <= ld1; cc++) {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(nn - 1, arr1->getIJ(nn, cc), delta);
+    }
+  }
+  delete arr1;
 }
 
 // #2: MEDMEM_ArrayConvert.hxx  }  MEDMEMTest_Array.cxx
@@ -582,40 +551,6 @@ void MEDMEMTest::testArrayConvert()
   for (int i = 0; i < mdim*nbelem1; i++)
     CPPUNIT_ASSERT(myArray1Ptr[i] == array1Ref[i]);
 
-  /*
-  // copy constructor
-  MEDMEM_Array<double> myArray1bis (myArray1, false);
-  myArray1Ptr = myArray1bis.getPtr();
-  for (int i =0; i < mdim*nbelem1; i++)
-    CPPUNIT_ASSERT(myArray1Ptr[i] == array1Ref[i]);
-
-  // operator =
-  MEDMEM_Array<double> myArray1ter;
-  myArray1ter = myArray1;
-  myArray1Ptr = myArray1ter.getPtr();
-  for (int i =0; i < mdim*nbelem1; i++)
-    CPPUNIT_ASSERT(myArray1Ptr[i] == array1Ref[i]);
-
-  // check that getColumn() is invalid for myArray1qua
-  MEDMEM_Array<double> myArray1qua (mdim, nbelem1);
-  myArray1Ptr = myArray1qua.getPtr();
-
-  for (int i = 1; i <= nbelem1; i++)
-    myArray1qua.setRow(i, &array1Ref[(i-1)*mdim]);
-
-  for (int i = 0; i < mdim*nbelem1; i++)
-    CPPUNIT_ASSERT(myArray1Ptr[i] == array1Ref[i]);
-
-  bool isExc = false;
-  try {
-    myArray1qua.getColumn(1);
-  }
-  catch (MEDMEM::MEDEXCEPTION &m) {
-    isExc = true;
-  }
-  CPPUNIT_ASSERT(isExc);
-  */
-
   MEDMEM_Array<double, NoInterlaceNoGaussPolicy> * myArray1cin = ArrayConvert(myArray1);
   myArray1Ptr = myArray1cin->getPtr();
   int elemno = 0;
@@ -638,37 +573,6 @@ void MEDMEMTest::testArrayConvert()
   const double * myArray2Ptr = myArray2.getPtr();
   for (int i = 0; i < mdim*nbelem1; i++)
     CPPUNIT_ASSERT(myArray2Ptr[i] == array2Ref[i]);
-
-  /*
-  MEDMEM_Array<double, NoInterlaceNoGaussPolicy> myArray2bis (myArray2, false);
-  myArray2Ptr = myArray2bis.getPtr();
-  for (int i = 0; i < mdim*nbelem1; i++)
-    CPPUNIT_ASSERT(myArray2Ptr[i] == array2Ref[i]);
-
-  MEDMEM_Array<double,NoInterlaceNoGaussPolicy> myArray2ter;
-  myArray2ter = myArray2;
-  myArray2Ptr = myArray2ter.getPtr();
-  for (int i = 0; i < mdim*nbelem1; i++)
-    CPPUNIT_ASSERT(myArray2Ptr[i] == array2Ref[i]);
-
-  MEDMEM_Array<double, NoInterlaceNoGaussPolicy> myArray2qua (mdim,nbelem1);
-  myArray2Ptr = myArray2qua.getPtr();
-
-  for (int j = 1; j <= mdim; j++)
-    myArray2qua.setColumn(j, &array2Ref[nbelem1*(j-1)]);
-
-  for (int i = 0; i < mdim*nbelem1; i++)
-    CPPUNIT_ASSERT(myArray2Ptr[i] == array2Ref[i]);
-
-  isExc = false;
-  try {
-    myArray2qua.getRow(1);
-  }
-  catch (MEDMEM::MEDEXCEPTION &m) {
-    isExc = true;
-  }
-  CPPUNIT_ASSERT(isExc);
-  */
 
   MEDMEM_Array<double, FullInterlaceNoGaussPolicy> * myArray2cin = ArrayConvert(myArray2);
   myArray2Ptr = myArray2cin->getPtr();
@@ -720,56 +624,6 @@ void MEDMEMTest::testArrayConvert()
   for (int i = 0; i < myArray3.getArraySize(); i++)
     CPPUNIT_ASSERT(myArray3Ptr[i] == array3Ref[i]);
 
-  /*
-  MEDMEM_Array<double, FullInterlaceGaussPolicy> myArray3bis (myArray3, false);
-  myArray3Ptr = myArray3bis.getPtr();
-
-  elemno = 0;
-  for (int i = 1; i < nbelgeoc[nbtypegeo]; i++)
-    for (int k = 1; k <= myArray3bis.getNbGauss(i); k++)
-      for (int j = 1; j <= mdim; j++) {
-        CPPUNIT_ASSERT(myArray3bis.getIJK(i,j,k) == array3Ref[elemno]);
-        CPPUNIT_ASSERT(myArray3Ptr[elemno]       == array3Ref[elemno]);
-        elemno++;
-      }
-
-  MEDMEM_Array<double, FullInterlaceGaussPolicy> myArray3ter;
-  myArray3ter = myArray3;
-  myArray3Ptr = myArray3ter.getPtr();
-
-  elemno = 0;
-  for (int i = 1; i < nbelgeoc[nbtypegeo]; i++)
-    for (int k = 1; k <= myArray3ter.getNbGauss(i); k++)
-      for (int j = 1; j <= mdim; j++) {
-        CPPUNIT_ASSERT(myArray3ter.getIJK(i,j,k) == array3Ref[elemno]);
-        CPPUNIT_ASSERT(myArray3Ptr[elemno]       == array3Ref[elemno]);
-        elemno++;
-      }
-
-  MEDMEM_Array<double, FullInterlaceGaussPolicy> myArray3qua
-    (mdim, nbelem2, nbtypegeo, nbelgeoc, nbgaussgeo);
-  myArray3Ptr = myArray3qua.getPtr();
-
-  int cumul = 0;
-  for (int i = 1; i <= nbelem2; i++) {
-    myArray3qua.setRow(i, &array3Ref[cumul]);
-    cumul += myArray3qua.getNbGauss(i) * mdim;
-  };
-
-  for (int i = 0; i < myArray3qua.getArraySize(); i++)
-    CPPUNIT_ASSERT(myArray3Ptr[i] == array3Ref[i]);
-
-  isExc = false;
-  try {
-    myArray3qua.getColumn(1);
-  }
-  catch (MEDMEM::MEDEXCEPTION &m) {
-    isExc = true;
-    std::cout << m.what() << endl;
-  }
-  CPPUNIT_ASSERT(isExc);
-  */
-
   MEDMEM_Array<double, NoInterlaceGaussPolicy> * myArray3cin = ArrayConvert(myArray3);
   myArray3Ptr = myArray3cin->getPtr();
   elemno = 0;
@@ -804,52 +658,6 @@ void MEDMEMTest::testArrayConvert()
   for (int i = 0; i < myArray4.getArraySize(); i++)
     CPPUNIT_ASSERT(myArray4Ptr[i] == array4Ref[i]);
 
-  /*
-  MEDMEM_Array<double, NoInterlaceGaussPolicy> myArray4bis (myArray4, false);
-  myArray4Ptr = myArray4bis.getPtr();
-
-  elemno = 0;
-  for (int j = 1; j <= mdim; j++)
-    for (int i = 1; i < nbelgeoc[nbtypegeo]; i++)
-      for (int k = 1; k <= myArray4bis.getNbGauss(i); k++) {
-        CPPUNIT_ASSERT(myArray4bis.getIJK(i,j,k) == array4Ref[elemno]);
-        CPPUNIT_ASSERT(myArray4Ptr[elemno]       == array4Ref[elemno]);
-        elemno++;
-      }
-
-  MEDMEM_Array<double, NoInterlaceGaussPolicy> myArray4ter;
-  myArray4ter = myArray4;
-  myArray4Ptr = myArray4ter.getPtr();
-
-  elemno = 0;
-  for (int j = 1; j <= mdim; j++)
-    for (int i = 1; i < nbelgeoc[nbtypegeo]; i++)
-      for (int k = 1; k <= myArray4ter.getNbGauss(i); k++) {
-        CPPUNIT_ASSERT(myArray4ter.getIJK(i,j,k) == array4Ref[elemno]);
-        CPPUNIT_ASSERT(myArray4Ptr[elemno]       == array4Ref[elemno]);
-        elemno++;
-      }
-
-  MEDMEM_Array<double, NoInterlaceGaussPolicy> myArray4qua
-    (mdim, nbelem2, nbtypegeo, nbelgeoc, nbgaussgeo);
-  myArray4Ptr = myArray4qua.getPtr();
-
-  for (int j = 1; j <= mdim; j++)
-    myArray4qua.setColumn(j, &array4Ref[(myArray4qua.getArraySize()/mdim)*(j-1)]);
-
-  for (int i = 0; i < myArray4qua.getArraySize(); i++)
-    CPPUNIT_ASSERT(myArray4Ptr[i] == array4Ref[i]);
-
-  isExc = false;
-  try {
-    myArray4qua.getRow(1);
-  }
-  catch (MEDMEM::MEDEXCEPTION &m) {
-    isExc = true;
-  }
-  CPPUNIT_ASSERT(isExc);
-  */
-
   MEDMEM_Array<double, FullInterlaceGaussPolicy> * myArray4cin = ArrayConvert(myArray4);
   myArray4Ptr = myArray4cin->getPtr();
   elemno = 0;
@@ -861,24 +669,6 @@ void MEDMEMTest::testArrayConvert()
         CPPUNIT_ASSERT(myArray4Ptr[elemno]        == array3Ref[elemno]);
         elemno++;
       }
-
-  /*
-  //TEST DES METHODES D'INTERROGATION en NoInterlace et Gauss :
-  //  MEDMEM_ArrayInterface<double,NoInterlace,Gauss>::Array & myArray4bis = myField4bis.getArray();
-  std::cout << std::endl;
-  std::cout << "Test de la méthode getDim : " << myArray4bis.getDim() << std::endl;
-  std::cout << "Test de la méthode getNbelem : " << myArray4bis.getNbElem() << std::endl;
-  std::cout << "Test de la méthode getArraySize : " << myArray4bis.getArraySize() << std::endl;
-  std::cout << "Test de la méthode getInterlacingType : " << myArray4bis.getInterlacingType() << std::endl;
-
-  // Test de levée d'exception si MED_ARRAY compilée avec une politique de checking
-  try {
-    myArray4.getIJ(0,2); //L'exception génère des blocks perdus (A voir)
-  }
-  catch (MEDMEM::MEDEXCEPTION &m) {
-    std::cout << m.what() << endl;
-  }
-  */
 }
 
 // #3: MEDMEM_ArrayInterface.hxx  }  MEDMEMTest_Array.cxx
@@ -891,6 +681,5 @@ void MEDMEMTest::testArrayConvert()
  */
 void MEDMEMTest::testArrayInterface()
 {
-  //CPPUNIT_FAIL("Case Not Complete");
   CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 }
