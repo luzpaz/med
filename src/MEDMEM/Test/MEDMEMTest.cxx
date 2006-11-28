@@ -21,66 +21,13 @@
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
-////#include "MEDMEM_nArray.hxx"
-////#include "MEDMEM_ArrayConvert.hxx"
-////#include "MEDMEM_Array.hxx"
-//#include "MEDMEM_ArrayInterface.hxx"
-//#include "MEDMEM_AsciiFieldDriver.hxx"
-//#include "MEDMEM_CellModel.hxx"
-//#include "MEDMEM_Compatibility21_22.hxx"
-//#include "MEDMEM_Connectivity.hxx"
-////#include "MEDMEM_Coordinate.hxx"
-//#include "MEDMEM_define.hxx"
-//#include "MEDMEM_DriverFactory.hxx"
-//#include "MEDMEM_DriversDef.hxx"
-//#include "MEDMEM_DriverTools.hxx"
 #include "MEDMEM_Exception.hxx"
-//#include "MEDMEM_Family.hxx"
-//#include "MEDMEM_FieldConvert.hxx"
-//#include "MEDMEM_Field.hxx"
-//#include "MEDMEM_Formulae.hxx"
-//#include "MEDMEM_GaussLocalization.hxx"
-//#include "MEDMEM_GenDriver.hxx"
-//#include "MEDMEM_GibiMeshDriver.hxx"
-//#include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_IndexCheckingPolicy.hxx"
-//#include "MEDMEM_InterlacingPolicy.hxx"
-//#include "MEDMEM_InterlacingTraits.hxx"
-//#include "MEDMEM_MedFieldDriver21.hxx"
-//#include "MEDMEM_MedFieldDriver22.hxx"
-//#include "MEDMEM_MedFieldDriver.hxx"
-//#include "MEDMEM_Med.hxx"
-//#include "MEDMEM_medimport_src.hxx"
-//#include "MEDMEM_MedMedDriver21.hxx"
-//#include "MEDMEM_MedMedDriver22.hxx"
-//#include "MEDMEM_MedMedDriver.hxx"
-//#include "MEDMEM_MEDMEMchampLire.hxx"
-//#include "MEDMEM_MEDMEMgaussEcr.hxx"
-//#include "MEDMEM_MEDMEMprofilEcr.hxx"
-//#include "MEDMEM_MedMeshDriver21.hxx"
-//#include "MEDMEM_MedMeshDriver22.hxx"
-//#include "MEDMEM_MedMeshDriver.hxx"
-//#include "MEDMEM_MedVersion.hxx"
+#include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Meshing.hxx"
-//#include "MEDMEM_ModulusArray.hxx"
-//#include "MEDMEM_PointerOf.hxx"
-//#include "MEDMEM_PolyhedronArray.hxx"
-//#include "MEDMEM_PorflowMeshDriver.hxx"
-//#include "MEDMEM_RCBase.hxx"
-//#include "MEDMEM_SetInterlacingType.hxx"
-//#include "MEDMEM_SkyLineArray.hxx"
 #include "MEDMEM_STRING.hxx"
-//#include "MEDMEM_Support.hxx"
-//#include "MEDMEM_Tags.hxx"
-//#include "MEDMEM_TopLevel.hxx"
-//#include "MEDMEM_TypeMeshDriver.hxx"
-//#include "MEDMEM_Unit.hxx"
-//#include "MEDMEM_Utilities.hxx"
-//#include "MEDMEM_VtkFieldDriver.hxx"
-//#include "MEDMEM_VtkMedDriver.hxx"
-//#include "MEDMEM_VtkMeshDriver.hxx"
 
 #include <sstream>
 #include <cmath>
@@ -163,26 +110,10 @@ void MEDMEMTest::testDriverTools()
 // #16: MEDMEM_FieldForward.hxx       }  no methods to test
 // #17: MEDMEM_Formulae.hxx           }  MEDMEMTest_Formulae.cxx
 // #18: MEDMEM_GaussLocalization.hxx  }  MEDMEMTest_GaussLocalization.cxx
-
-// #19: MEDMEM_GenDriver.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_GenDriver.hxx:
- *   {
- *   (yetno)
- *  }
- */
-void MEDMEMTest::testGenDriver()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #20: MEDMEM_GibiMeshDriver.hxx  }  MEDMEMTest_GibiMeshDriver.cxx
-
-// #21: MEDMEM_Grid.cxx  }  MEDMEMTest_Grid.cxx
-
-// #22: MEDMEM_Group.cxx  }  MEDMEMTest_Group.cxx
-
+// #19: MEDMEM_GenDriver.hxx  }  abstract class; implemented methods are tested during its successors testing
+// #20: MEDMEM_GibiMeshDriver.hxx     }  MEDMEMTest_GibiMeshDriver.cxx
+// #21: MEDMEM_Grid.cxx               }  MEDMEMTest_Grid.cxx
+// #22: MEDMEM_Group.cxx              }  MEDMEMTest_Group.cxx
 // #23: MEDMEM_IndexCheckingPolicy.cxx  }  MEDMEMTest.cxx
 
 /*!
@@ -280,7 +211,6 @@ void MEDMEMTest::testInterlacingTraits()
 }
 
 // #27: MEDMEM_MedFieldDriver21.hxx  }  MEDMEMTest_MedFieldDriver21.cxx
-
 // #28: MEDMEM_MedFieldDriver22.hxx  }  MEDMEMTest_MedFieldDriver22.cxx
 
 // #29: MEDMEM_MedFieldDriver.hxx  }  MEDMEMTest.cxx
@@ -822,4 +752,24 @@ MEDMEM::MESH * MEDMEMTest::createTestMesh ()
   }
 
   return myMeshing;
+}
+
+/*!
+ *  Tool to remove temporary files.
+ *  Allows automatique removal of temporary files in case of test failure.
+ */
+MEDMEMTest_TmpFilesRemover::~MEDMEMTest_TmpFilesRemover()
+{
+  set<string>::iterator it = myTmpFiles.begin();
+  for (; it != myTmpFiles.end(); it++) {
+    if (access((*it).data(), F_OK) == 0)
+      remove((*it).data());
+  }
+  myTmpFiles.clear();
+  //cout << "~MEDMEMTest_TmpFilesRemover()" << endl;
+}
+
+bool MEDMEMTest_TmpFilesRemover::Register(const string theTmpFile)
+{
+  return (myTmpFiles.insert(theTmpFile)).second;
 }

@@ -17,26 +17,18 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 
-// use this define to enable lines, execution of which leads to Segmentation Fault
-//#define ENABLE_FAULTS
- 
-// use this define to enable CPPUNIT asserts and fails, showing bugs
-#define ENABLE_FORCED_FAILURES
-
-#ifdef ENABLE_FAULTS
-  // (BUG)
-#endif
-
-#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("");
-#endif
-
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
 #include <MEDMEM_VtkMeshDriver.hxx>
 #include <MEDMEM_MedMeshDriver21.hxx>
 #include <MEDMEM_Mesh.hxx>
+
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -69,17 +61,20 @@ void MEDMEMTest::testVtkMeshDriver()
   string meshname                  = "MyMesh";
   string fileNotExistsName         = "/path_not_exists/file_not_exists.vtk";
   string filename                  =  tmp_dir  + "/my_pointe.vtk";
-  
+
+  MEDMEMTest_TmpFilesRemover aRemover;
+  aRemover.Register(filename);
+
   //Creation a invalid Vtk driver
   VTK_MESH_DRIVER *aInvalidVtkDriver = new VTK_MESH_DRIVER(fileNotExistsName,aMesh);
-  
+
   //Trying open not existing file
   CPPUNIT_ASSERT_THROW(aInvalidVtkDriver->open(), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aInvalidVtkDriver->openConst(), MEDEXCEPTION);
-  
+
   //Create Vtk driver with empty file name
   VTK_MESH_DRIVER *aEmptyVtkDriver = new VTK_MESH_DRIVER(emptyfilename, aMesh);
-  
+
   //Test open() and openConst() methods with empty file name
   CPPUNIT_ASSERT_THROW(aEmptyVtkDriver->open(), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aEmptyVtkDriver->openConst(), MEDEXCEPTION);
@@ -87,14 +82,14 @@ void MEDMEMTest::testVtkMeshDriver()
   //Creation corect driver
   VTK_MESH_DRIVER *aVtkDriver = new VTK_MESH_DRIVER(filename, aMesh);
 
-  //Create a Mesh 
+  //Create a Mesh
   MED_MESH_RDONLY_DRIVER21 *aMedMeshRdDriver21 = new MED_MESH_RDONLY_DRIVER21(filename_rd, aMesh);
   aMedMeshRdDriver21->open();
   aMedMeshRdDriver21->setMeshName(meshname_rd);
-    
+
   //Check Driver
   CPPUNIT_ASSERT(aVtkDriver);
-  
+
   //Test openConst() and closeConst() methods
   try
   {
@@ -121,7 +116,7 @@ void MEDMEMTest::testVtkMeshDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   //Test open() method
   try
   {
@@ -134,14 +129,14 @@ void MEDMEMTest::testVtkMeshDriver()
   catch( ... )
   {
     CPPUNIT_FAIL("Unknown exception");
-  }  
-  
+  }
+
 #ifdef ENABLE_FORCED_FAILURES
   //Trying open file secondary
   CPPUNIT_ASSERT_THROW(aVtkDriver->open(), MEDEXCEPTION);
   //No exception in this case
 #endif
-  
+
   //Test read method
   CPPUNIT_ASSERT_THROW(aVtkDriver->read(), MEDEXCEPTION);
 
@@ -153,7 +148,7 @@ void MEDMEMTest::testVtkMeshDriver()
 
   //Read mesh from Med file
   aMedMeshRdDriver21->read();
-  
+
   //Check mesh
   CPPUNIT_ASSERT(aMesh);
 
@@ -170,9 +165,9 @@ void MEDMEMTest::testVtkMeshDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-                        
+
   CPPUNIT_ASSERT_EQUAL(meshname, aVtkDriver->getMeshName());
-  
+
   //Test write method
    try
   {
@@ -186,7 +181,7 @@ void MEDMEMTest::testVtkMeshDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-   
+
   //Test close method
   try
   {
@@ -200,24 +195,24 @@ void MEDMEMTest::testVtkMeshDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
-   
-   //Test Default constructor 
+
+
+   //Test Default constructor
    VTK_MESH_DRIVER aVtkDriverCpy_1;
-#ifdef ENABLE_FAULTS   
+#ifdef ENABLE_FAULTS
    //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
    aVtkDriverCpy_1 = *aVtkDriver;
    CPPUNIT_ASSERT_EQUAL(aVtkDriverCpy_1, *aVtkDriver);
    //=>Segmentation fault
 #endif
-   
-#ifdef ENABLE_FAULTS   
+
+#ifdef ENABLE_FAULTS
    //Test copy constructor
    VTK_MESH_DRIVER aVtkDriverCpy_2 = VTK_MESH_DRIVER(*aVtkDriver);
    CPPUNIT_ASSERT_EQUAL(aVtkDriverCpy_2, *aVtkDriver);
    //=>Segmentation fault
 #endif
-   
+
    //Test (bool operator ==) defined GENDRIVER class in MEDMEM_GenDriver.hxx
    //CPPUNIT_ASSERT(aVtkDriverCpy_2 == aVtkDriverCpy_1);
 
@@ -236,7 +231,4 @@ void MEDMEMTest::testVtkMeshDriver()
   delete aEmptyVtkDriver;
   delete aVtkDriver;
   delete aMedMeshRdDriver21;
-  
-  //Remove tmp files
-  remove(filename.data());
 }

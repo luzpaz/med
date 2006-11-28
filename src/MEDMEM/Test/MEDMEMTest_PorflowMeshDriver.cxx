@@ -17,27 +17,17 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 
-// use this define to enable lines, execution of which leads to Segmentation Fault
-//#define ENABLE_FAULTS
-
-// use this define to enable CPPUNIT asserts and fails, showing bugs
-#define ENABLE_FORCED_FAILURES
-
-#ifdef ENABLE_FAULTS
-  // (BUG)
-#endif
-
-#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("");
-#endif
-
-
-
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
 #include <MEDMEM_PorflowMeshDriver.hxx>
 #include <MEDMEM_Mesh.hxx>
+
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -51,7 +41,7 @@ using namespace MEDMEM;
  *   (+) virtual ~PORFLOW_MESH_DRIVER();
  *   (+) void open() throw (MEDEXCEPTION);
  *   (+) void close() throw (MEDEXCEPTION);
- *   (yetno) virtual void write(void) const = 0;
+ *   (-) virtual void write(void) const = 0;
  *   (+) virtual void read (void) = 0;
  *   (+) void   setMeshName(const string & meshName);
  *   (+) string getMeshName() const;
@@ -69,7 +59,7 @@ using namespace MEDMEM;
  *   (+) PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh);
  *   (+) PORFLOW_MESH_WRONLY_DRIVER(const PORFLOW_MESH_WRONLY_DRIVER & driver);
  *   (+) virtual ~PORFLOW_MESH_WRONLY_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
+ *   (NOT IMPLEMENTED!!!) void write(void) const throw (MEDEXCEPTION);
  *   (+) void read (void) throw (MEDEXCEPTION);
  *  }
  *  class PORFLOW_MESH_RDWR_DRIVER : public PORFLOW_MESH_RDONLY_DRIVER, public PORFLOW_MESH_WRONLY_DRIVER {
@@ -77,11 +67,10 @@ using namespace MEDMEM;
  *   (+) PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh);
  *   (+) PORFLOW_MESH_RDWR_DRIVER(const PORFLOW_MESH_RDWR_DRIVER & driver);
  *   (+) ~PORFLOW_MESH_RDWR_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
+ *   (CALLS PORFLOW_MESH_WRONLY_DRIVER::write()) void write(void) const throw (MEDEXCEPTION);
  *   (+) void read (void) throw (MEDEXCEPTION);
  *  }
  */
-
 void MEDMEMTest::testPorflowMeshDriver()
 {
   MESH *aMesh                      = new MESH();
@@ -98,48 +87,41 @@ void MEDMEMTest::testPorflowMeshDriver()
   string fcopy                     = "cp " + filename_rd  + " " + filename_rdwr;
   string fcopy1                    = "cp " + data_dir + "/inp_xyz/Case1.xyz" + " " + tmp_dir + "/Case1.xyz";
   string fcopy2                    = "cp " + data_dir + "/inp_xyz/Case1.cnc" + " " + tmp_dir + "/Case1.cnc";
-  
+
   //Copy files in the TMP dir for testing READ/WRITE case
   system(fcopy.data());
   system(fcopy1.data());
   system(fcopy2.data());
-  FILE *tmpFile = fopen(filename_wr.data(),"w");
-  fclose(tmpFile);
-  
+
+  MEDMEMTest_TmpFilesRemover aRemover;
+  aRemover.Register(filename_wr);
+  aRemover.Register(filename_rdwr);
+  aRemover.Register(tmp_dir + "/Case1.xyz");
+  aRemover.Register(tmp_dir + "/Case1.cnc");
+
   //----------------------------------Test READ ONLY part---------------------------------------------------//
   //Creation a incorrectPorflow read only driver
   PORFLOW_MESH_RDONLY_DRIVER *aInvalidPorflowRdDriver = new PORFLOW_MESH_RDONLY_DRIVER(fileNotExistsName_rd, aMesh);
-  
+
   //Trying open not existing file
   CPPUNIT_ASSERT_THROW(aInvalidPorflowRdDriver->open(), MEDEXCEPTION);
- 
+
   //Creation a correct Porflow read only driver (normal constructor)
   PORFLOW_MESH_RDONLY_DRIVER *aPorflowRdDriver = new PORFLOW_MESH_RDONLY_DRIVER(filename_rd, aMesh);
 
   //Check driver
   CPPUNIT_ASSERT(aPorflowRdDriver);
-  
+
   //Trying read mesh from file, if file is not open
   CPPUNIT_ASSERT_THROW(aPorflowRdDriver->read(), MEDEXCEPTION);
-  
+
   //Test open() method
-  try
-  {
-    aPorflowRdDriver->open();
-  }
-  catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+  CPPUNIT_ASSERT_NO_THROW(aPorflowRdDriver->open());
+
 #ifdef ENABLE_FORCED_FAILURES
   //Trying open file secondary
   CPPUNIT_ASSERT_THROW(aPorflowRdDriver->open(), MEDEXCEPTION);
   //This case  work, but it corrypt driver
-
 #endif
 
   //Test read() method
@@ -164,7 +146,7 @@ void MEDMEMTest::testPorflowMeshDriver()
   //Test write() method for Porflow RDONLY Driver
   CPPUNIT_ASSERT_THROW(aPorflowRdDriver->write(), MEDEXCEPTION);
 
-  //Test setMeshName() and getMeshName() 
+  //Test setMeshName() and getMeshName()
   try
   {
     aPorflowRdDriver->setMeshName(meshname);
@@ -194,24 +176,17 @@ void MEDMEMTest::testPorflowMeshDriver()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  //Default constructor 
+  //Default constructor
   PORFLOW_MESH_RDONLY_DRIVER aPorflowRdDriverCpy_1;
-  
-  //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  //aPorflowRdDriverCpy_1 = *aPorflowRdDriver;
-  // Compilation error using operator =
-#ifdef ENABLE_FORCED_FAILURES
-  CPPUNIT_FAIL("PORFLOW_MESH_RDONLY_DRIVER::operator= :error dyring compilation");
-#endif  
-  
+  // TO DO
+
   //Test copy constructor
   PORFLOW_MESH_RDONLY_DRIVER aPorflowRdDriverCpy_2 = PORFLOW_MESH_RDONLY_DRIVER(*aPorflowRdDriver);
   CPPUNIT_ASSERT_EQUAL(aPorflowRdDriverCpy_2, *aPorflowRdDriver);
 
   //Test (bool operator ==) defined GENDRIVER class in MEDMEM_GenDriver.hxx
-  CPPUNIT_ASSERT(aPorflowRdDriverCpy_2 ==  *aPorflowRdDriver);
+  CPPUNIT_ASSERT(aPorflowRdDriverCpy_2.GENDRIVER::operator==(*aPorflowRdDriver));
 
-  
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
   ostringstream rostr1, rostr2;
   rostr1<<*aPorflowRdDriver;
@@ -219,7 +194,7 @@ void MEDMEMTest::testPorflowMeshDriver()
   CPPUNIT_ASSERT(rostr1.str() != "");
   CPPUNIT_ASSERT_EQUAL(rostr1.str() , rostr2.str());
 
-  
+
   //----------------------------------Test WRITE ONLY part------------------------------------------//
   //Creation a incorrect Porflow write only driver
   PORFLOW_MESH_WRONLY_DRIVER *aInvalidPorflowWrDriver = new PORFLOW_MESH_WRONLY_DRIVER(fileNotExistsName_wr, aMesh);
@@ -232,26 +207,20 @@ void MEDMEMTest::testPorflowMeshDriver()
 
   //Check driver
   CPPUNIT_ASSERT(aPorflowWrDriver);
-  
+
   //Test case: trying write mesh to file, if file is not open
   CPPUNIT_ASSERT_THROW(aPorflowWrDriver->write(), MEDEXCEPTION);
-  
+
   //Test open() method
-  try
-  {
-    aPorflowWrDriver->open();
-  }
-  catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+#ifndef ENABLE_FORCED_FAILURES
+  FILE *tmpFile = fopen(filename_wr.data(),"w");
+  fclose(tmpFile);
+#endif
+  CPPUNIT_ASSERT_NO_THROW(aPorflowWrDriver->open());
+
   //Test case: trying open file secondary.
   CPPUNIT_ASSERT_THROW(aPorflowWrDriver->open(), MEDEXCEPTION);
-  
+
   ////Test write() method
   //try
   //{
@@ -269,11 +238,11 @@ void MEDMEMTest::testPorflowMeshDriver()
 #ifdef ENABLE_FORCED_FAILURES
   CPPUNIT_FAIL("PORFLOW_MESH_RDONLY_DRIVER::write() method not implemented");
 #endif
-  
+
   //Test read() method for WRITE ONLY driver
   CPPUNIT_ASSERT_THROW(aPorflowWrDriver->read(), MEDEXCEPTION);
-  
-  //Test setMeshName() and getMeshName() 
+
+  //Test setMeshName() and getMeshName()
   try
   {
     aPorflowWrDriver->setMeshName(newmeshname);
@@ -288,7 +257,7 @@ void MEDMEMTest::testPorflowMeshDriver()
   }
 
   CPPUNIT_ASSERT_EQUAL(newmeshname, aPorflowWrDriver->getMeshName());
-  
+
   try
   {
     aPorflowWrDriver->close();
@@ -301,16 +270,16 @@ void MEDMEMTest::testPorflowMeshDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
-  //Default constructor 
+
+  //Default constructor
    PORFLOW_MESH_WRONLY_DRIVER aPorflowWrDriverCpy_1;
-  
+
   //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
   //aPorflowWrDriverCpy_1 = *aPorflowWrDriver;
   //Error dyring compilation
 #ifdef ENABLE_FORCED_FAILURES
    CPPUNIT_FAIL("PORFLOW_MESH_WRONLY_DRIVER::operator= :error dyring compilation");
-#endif  
+#endif
 
   //Test copy constructor
   PORFLOW_MESH_WRONLY_DRIVER aPorflowWrDriverCpy_2 = PORFLOW_MESH_WRONLY_DRIVER(*aPorflowWrDriver);
@@ -365,7 +334,7 @@ void MEDMEMTest::testPorflowMeshDriver()
   CPPUNIT_ASSERT_THROW(aPorflowRdWrDriver->open(), MEDEXCEPTION);
   //This case work, but corrupt driver
 #endif
-    
+
   //Test read() method
   try
   {
@@ -399,10 +368,10 @@ void MEDMEMTest::testPorflowMeshDriver()
 #ifdef ENABLE_FORCED_FAILURES
   CPPUNIT_FAIL("PORFLOW_MESH_RDWR_DRIVER::write() method not implemented");
 #endif
-     
+
   //Check Mesh
   CPPUNIT_ASSERT(aMesh);
-  
+
   try
   {
     aPorflowRdWrDriver->close();
@@ -417,16 +386,10 @@ void MEDMEMTest::testPorflowMeshDriver()
   }
 
 
-  //Default constructor 
+  //Default constructor
   PORFLOW_MESH_RDWR_DRIVER aPorflowRdWrDriverCpy_1;
-  
-  //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  //aPorflowRdWrDriverCpy_1 = *aPorflowRdWrDriver;
-    //Error dyring compilation
-#ifdef ENABLE_FORCED_FAILURES
-  CPPUNIT_FAIL("PORFLOW_MESH_RDWR_DRIVER::operator= :error dyring compilation");
-#endif
-  
+  // TO DO
+
   //Test copy constructor
   PORFLOW_MESH_RDWR_DRIVER aPorflowRdWrDriverCpy_2 = PORFLOW_MESH_RDWR_DRIVER(*aPorflowRdWrDriver);
   CPPUNIT_ASSERT_EQUAL(aPorflowRdWrDriverCpy_2, *aPorflowRdWrDriver);
@@ -434,7 +397,7 @@ void MEDMEMTest::testPorflowMeshDriver()
   //Test (bool operator ==) defined GENDRIVER class in MEDMEM_GenDriver.hxx
   CPPUNIT_ASSERT(aPorflowRdWrDriverCpy_2 ==  *aPorflowRdWrDriver);
 
- 
+
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
   ostringstream rwostr1, rwostr2;
   rwostr1<<*aPorflowRdWrDriver;
@@ -452,10 +415,9 @@ void MEDMEMTest::testPorflowMeshDriver()
   delete aInvalidPorflowRdWrDriver;
   delete aPorflowRdWrDriver;
 
-  //Delete files 
-  remove(filename_wr.data());
-  remove(filename_rdwr.data());
-  remove((tmp_dir + "/Case1.xyz").data());
-  remove((tmp_dir + "/Case1.cnc").data());
-
+  //Delete files
+  //remove(filename_wr.data());
+  //remove(filename_rdwr.data());
+  //remove((tmp_dir + "/Case1.xyz").data());
+  //remove((tmp_dir + "/Case1.cnc").data());
 }

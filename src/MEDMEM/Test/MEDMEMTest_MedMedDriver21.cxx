@@ -17,20 +17,6 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 
-// use this define to enable lines, execution of which leads to Segmentation Fault
-//#define ENABLE_FAULTS
-
-// use this define to enable CPPUNIT asserts and fails, showing bugs
-#define ENABLE_FORCED_FAILURES
-
-#ifdef ENABLE_FAULTS
-  // (BUG)
-#endif
-
-#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("");
-#endif
-
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
@@ -38,6 +24,11 @@
 #include <MEDMEM_MedMedDriver21.hxx>
 #include <MEDMEM_Med.hxx>
 
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -98,9 +89,9 @@ void MEDMEMTest::testMedMedDriver21() {
   MED *aMed                        = new MED();
   string data_dir                  = getenv("DATA_DIR");
   string tmp_dir                   = getenv("TMP");
-  if(tmp_dir == "") 
+  if(tmp_dir == "")
     tmp_dir = "/tmp";
-  
+
   string filename_rd               = data_dir + "/MedFiles/pointe.med";
   string emptyfilename             = "";
   string filename_wr               = tmp_dir  + "/myMedWr_pointe21.med";
@@ -108,23 +99,28 @@ void MEDMEMTest::testMedMedDriver21() {
   string fileNotExistsName_wr      = "/path_not_exists/file_not_exists.med";
   string filename_rdwr             = tmp_dir + "/myMedRdWr_pointe21.med";
   string fcopy                     = "cp " + filename_rd + " " + filename_rdwr;
-  
+
+  // To remove tmp files from disk
+  MEDMEMTest_TmpFilesRemover aRemover;
+  aRemover.Register(filename_wr);
+  aRemover.Register(filename_rdwr);
+
   //Copy file in the TMP dir for testing READ/WRITE case
   system(fcopy.data());
 
   //-------------------------------Test READ_ONLY part-------------------------------------------------------
   //Creation incorrect Med_Med read only driver (file is not exist)
   MED_MED_RDONLY_DRIVER21 *aInvalidMedMedRdDriver21 = new MED_MED_RDONLY_DRIVER21(fileNotExistsName_rd, aMed);
-  
+
   //Trying open not existing file
   CPPUNIT_ASSERT_THROW(aInvalidMedMedRdDriver21->open(),MEDEXCEPTION);
 
   //Creation incorrect Med_Med read only driver (with empty file name)
   MED_MED_RDONLY_DRIVER21 *aInvalidMedMedRdDriver21_1 = new MED_MED_RDONLY_DRIVER21(emptyfilename, aMed);
-  
+
   //Trying open file with empty name
   CPPUNIT_ASSERT_THROW(aInvalidMedMedRdDriver21_1->open(),MEDEXCEPTION);
-  
+
 
   //Creation a correct Med_Med read only driver (normal constructor)
   MED_MED_RDONLY_DRIVER21 *aMedMedRdDriver21 = new MED_MED_RDONLY_DRIVER21(filename_rd, aMed);
@@ -137,7 +133,7 @@ void MEDMEMTest::testMedMedDriver21() {
   CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->read(), MEDEXCEPTION);
   // (BUG) No exception in this case.
 #endif
-  
+
   CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->readFileStruct(),MEDEXCEPTION);
 
   //Test open() method
@@ -153,9 +149,9 @@ void MEDMEMTest::testMedMedDriver21() {
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   //Trying open() file twice
-#ifdef  ENABLE_FORCED_FAILURES  
+#ifdef  ENABLE_FORCED_FAILURES
   CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->open(),MEDEXCEPTION);
   //(BUG) No exception in this case.
 #endif
@@ -187,10 +183,10 @@ void MEDMEMTest::testMedMedDriver21() {
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   //Test write() and WriteFrom() methods for READ_ONLY part
   CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->write(), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->writeFrom(), MEDEXCEPTION);  
+  CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->writeFrom(), MEDEXCEPTION);
 
   //Check MED
   CPPUNIT_ASSERT(aMed);
@@ -209,27 +205,29 @@ void MEDMEMTest::testMedMedDriver21() {
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  //Default constructor 
+  //Default constructor
   MED_MED_RDONLY_DRIVER21 aMedMedRdDriver21Cpy_1;
-  
-#ifdef ENABLE_FORCED_FAILURES  
-  //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  //aMedMedRdDriver21Cpy_1 = *aMedMedRdDriver21;
-  CPPUNIT_FAIL("MED_MED_RDONLY_DRIVER21::operator= Compilation error");
-#endif
 
+  //Test (void operator =) defined in GENDRIVER class
+  //aMedMedRdDriver21Cpy_1 = *aMedMedRdDriver21;
 
   //Test copy constructor
 #ifdef ENABLE_FAULTS
-  MED_MED_RDONLY_DRIVER21 aMedMedRdDriver21Cpy_2 = MED_MED_RDONLY_DRIVER21(*aMedMedRdDriver21);
-  // (BUG) => Segmentation fault
+  MED_MED_RDONLY_DRIVER21 aMedMedRdDriver21Cpy_2 (*aMedMedRdDriver21);
+  // (BUG) => Segmentation fault, because _concreteMedDrv is NULL
+  // Process terminating with default action of signal 11 (SIGSEGV)
+  //  Access not within mapped region at address 0x0
+  //    at 0x34881A7A: MEDMEM::MED_MED_DRIVER::MED_MED_DRIVER(MEDMEM::MED_MED_DRIVER const&) (MEDMEM_MedMedDriver.cxx:56)
+  //    by 0x34A07786: MEDMEM::MED_MED_RDONLY_DRIVER21::MED_MED_RDONLY_DRIVER21(MEDMEM::MED_MED_RDONLY_DRIVER21 const&) (MEDMEM_MedMedDriver21.cxx:179)
+  //    by 0x343A02AD: MEDMEMTest::testMedMedDriver21() (MEDMEMTest_MedMedDriver21.cxx:219)
 #endif
+
   //CPPUNIT_ASSERT_EQUAL(aMedMedRdDriver21Cpy_2, *aMedMedRdDriver21);
 
   //Test (bool operator ==) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  //CPPUNIT_ASSERT(aMedMedRdDriver21Cpy_2 ==  *aMedMedRdDriver21);
-  
-  //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
+  //CPPUNIT_ASSERT(aMedMedRdDriver21Cpy_2.GENDRIVER::operator==(*aMedMedRdDriver21));
+
+  //Test (friend ostream & operator <<) defined GENDRIVER class
   //ostringstream rwostr1, rwostr2;
   //rwostr1<<aMedMedRdDriver21Cpy_1;
   //rwostr2<<aMedMedRdDriver21Cpy_2;
@@ -239,16 +237,16 @@ void MEDMEMTest::testMedMedDriver21() {
   //-------------------------------Test WRITE_ONLY part-------------------------------------------------------
   //Creation incorrect Med_Med write only driver (file is not exist)
   MED_MED_WRONLY_DRIVER21 *aInvalidMedMedWrDriver21 = new MED_MED_WRONLY_DRIVER21(fileNotExistsName_wr, aMed);
-  
+
   //Trying open not existing file
   CPPUNIT_ASSERT_THROW(aInvalidMedMedWrDriver21->open(),MEDEXCEPTION);
 
   //Creation incorrect Med_Med write only driver (with empty file name)
   MED_MED_WRONLY_DRIVER21 *aInvalidMedMedWrDriver21_1 = new MED_MED_WRONLY_DRIVER21(emptyfilename, aMed);
-  
+
   //Trying open file with empty name
   CPPUNIT_ASSERT_THROW(aInvalidMedMedWrDriver21_1->open(),MEDEXCEPTION);
-  
+
 
   //Creation a correct Med_Med write only driver (normal constructor)
   MED_MED_WRONLY_DRIVER21 *aMedMedWrDriver21 = new MED_MED_WRONLY_DRIVER21(filename_wr, aMed);
@@ -281,9 +279,9 @@ void MEDMEMTest::testMedMedDriver21() {
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   //Trying open() file twice
-#ifdef  ENABLE_FORCED_FAILURES  
+#ifdef  ENABLE_FORCED_FAILURES
   CPPUNIT_ASSERT_THROW(aMedMedWrDriver21->open(),MEDEXCEPTION);
   //(BUG) No exception in this case.
 #endif
@@ -300,7 +298,7 @@ void MEDMEMTest::testMedMedDriver21() {
   catch( ... )
   {
     CPPUNIT_FAIL("Unknown exception");
-  } 
+  }
 
 #ifdef ENABLE_FAULTS
   //Test write() method
@@ -315,7 +313,7 @@ void MEDMEMTest::testMedMedDriver21() {
   catch( ... )
   {
    CPPUNIT_FAIL("Unknown exception");
-  } 
+  }
   // (BUG) => terminate called after throwing an instance of 'std::length_error'
   // what():  basic_string::_S_create
 #endif
@@ -333,63 +331,59 @@ void MEDMEMTest::testMedMedDriver21() {
   {
    CPPUNIT_FAIL("Unknown exception");
   }
-  
-  //Default constructor 
-  MED_MED_WRONLY_DRIVER21 aMedMedWrDriver21Cpy_1;
-  
-#ifdef ENABLE_FORCED_FAILURES  
-  //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  //aMedMedWrDriver21Cpy_1 = *aMedMedWrDriver21;
-  CPPUNIT_FAIL("MED_MED_RDONLY_DRIVER21::operator= Compilation error");
-#endif
 
+  //Default constructor
+  MED_MED_WRONLY_DRIVER21 aMedMedWrDriver21Cpy_1;
+
+  //Test (void operator =) defined in GENDRIVER class
+  //aMedMedWrDriver21Cpy_1 = *aMedMedWrDriver21;
 
   //Test copy constructor
 #ifdef ENABLE_FAULTS
-  MED_MED_WRONLY_DRIVER21 aMedMedWrDriver21Cpy_2 = MED_MED_WRONLY_DRIVER21(*aMedMedWrDriver21);
+  MED_MED_WRONLY_DRIVER21 aMedMedWrDriver21Cpy_2 (*aMedMedWrDriver21);
   // (BUG) => Segmentation fault
 #endif
   //CPPUNIT_ASSERT_EQUAL(aMedMedWrDriver21Cpy_2, *aMedMedWrDriver21);
 
-  //Test (bool operator ==) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  //CPPUNIT_ASSERT(aMedMedWrDriver21Cpy_2 ==  *aMedMedWrDriver21);
-  
-  //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
+  //Test (bool operator ==) defined in GENDRIVER class
+  //CPPUNIT_ASSERT(aMedMedWrDriver21Cpy_2.GENDRIVER::operator==(*aMedMedWrDriver21));
+
+  //Test (friend ostream & operator <<) defined GENDRIVER class
   //ostringstream rwostr1, rwostr2;
   //rwostr1<<aMedMedWrDriver21Cpy_1;
   //rwostr2<<aMedMedWrDriver21Cpy_2;
   //CPPUNIT_ASSERT(rwostr1.str() != "");
   //CPPUNIT_ASSERT(rwostr1.str() == rwostr2.str());
-  
-  
+
+
 //-------------------------------Test READ/WRITE part-------------------------------------------------------
   //Creation incorrect Med_Med read/write driver (file is not exist)
   MED_MED_RDWR_DRIVER21 *aInvalidMedMedRdWrDriver21 = new MED_MED_RDWR_DRIVER21(fileNotExistsName_wr, aMed);
-  
+
   //Trying open not existing file
   CPPUNIT_ASSERT_THROW(aInvalidMedMedRdWrDriver21->open(),MEDEXCEPTION);
 
   //Creation incorrect Med_Med read/write driver (with empty file name)
   MED_MED_RDWR_DRIVER21 *aInvalidMedMedRdWrDriver21_1 = new MED_MED_RDWR_DRIVER21(emptyfilename, aMed);
-  
+
   //Trying open file with empty name
   CPPUNIT_ASSERT_THROW(aInvalidMedMedRdWrDriver21_1->open(),MEDEXCEPTION);
-  
+
 
   //Creation a correct Med_Med read/write driver (normal constructor)
   MED_MED_RDWR_DRIVER21 *aMedMedRdWrDriver21 = new MED_MED_RDWR_DRIVER21(filename_rdwr, aMed);
 
   //Check driver
   CPPUNIT_ASSERT(aMedMedRdWrDriver21);
-  
+
   //Trying read MED from file if it is not open
 #ifdef  ENABLE_FORCED_FAILURES
   CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->read(), MEDEXCEPTION);
   // (BUG) No exception in this case.
 #endif
-  
+
   CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->readFileStruct(),MEDEXCEPTION);
-  
+
   //Trying write mesh to file, if file is not open
 #ifdef ENABLE_FORCED_FAILURES
   CPPUNIT_ASSERT_THROW(aMedMedRdWrDriver21->writeFrom(),MEDEXCEPTION);
@@ -400,7 +394,7 @@ void MEDMEMTest::testMedMedDriver21() {
   CPPUNIT_ASSERT_THROW(aMedMedRdWrDriver21->write(), MEDEXCEPTION);
   //(BUG) => Crash
 #endif
-  
+
   //Test open() method
   try
   {
@@ -414,9 +408,9 @@ void MEDMEMTest::testMedMedDriver21() {
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   //Trying open() file twice
-#ifdef  ENABLE_FORCED_FAILURES  
+#ifdef  ENABLE_FORCED_FAILURES
   CPPUNIT_ASSERT_THROW(aMedMedRdWrDriver21->open(),MEDEXCEPTION);
   //(BUG) No exception in this case.
 #endif
@@ -434,7 +428,7 @@ void MEDMEMTest::testMedMedDriver21() {
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-    
+
   //Test read() method
   try
   {
@@ -448,7 +442,7 @@ void MEDMEMTest::testMedMedDriver21() {
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   //Test writeFrom() method
   try
   {
@@ -462,7 +456,7 @@ void MEDMEMTest::testMedMedDriver21() {
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
 #ifdef ENABLE_FAULTS
   //Test write() method
   try
@@ -478,7 +472,7 @@ void MEDMEMTest::testMedMedDriver21() {
     CPPUNIT_FAIL("Unknown exception");
   }
 #endif
-  
+
   //Test close() method
   try
   {
@@ -492,27 +486,20 @@ void MEDMEMTest::testMedMedDriver21() {
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
-  //Default constructor 
-  MED_MED_RDWR_DRIVER21 aMedMedRdWrDriver21Cpy_1;
-  
-#ifdef ENABLE_FORCED_FAILURES  
-  //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  //aMedMedRdWrDriver21Cpy_1 = *aMedMedRdWrDriver21;
-  CPPUNIT_FAIL("MED_MED_RDWR_DRIVER21::operator=  Compilation error");
-#endif
 
+  //Default constructor
+  MED_MED_RDWR_DRIVER21 aMedMedRdWrDriver21Cpy_1;
 
   //Test copy constructor
 #ifdef ENABLE_FAULTS
-  MED_MED_RDWR_DRIVER21 aMedMedRdWrDriver21Cpy_2 = MED_MED_RDWR_DRIVER21(*aMedMedRdWrDriver21);
+  MED_MED_RDWR_DRIVER21 aMedMedRdWrDriver21Cpy_2 (*aMedMedRdWrDriver21);
   // (BUG) => Segmentation fault
 #endif
   //CPPUNIT_ASSERT_EQUAL(aMedMedRdWrDriver21Cpy_2, *aMedMedRdWrDriver21);
 
-  //Test (bool operator ==) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  //CPPUNIT_ASSERT(aMedMedRdWrDriver21Cpy_2 ==  *aMedMedRdWrDriver21);
-  
+  //Test (bool operator ==) defined in GENDRIVER class
+  //CPPUNIT_ASSERT(aMedMedRdWrDriver21Cpy_2.GENDRIVER::operator==(*aMedMedRdWrDriver21));
+
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
   //ostringstream rwostr1, rwostr2;
   //rwostr1<<aMedMedRdWrDriver21Cpy_1;
@@ -525,16 +512,12 @@ void MEDMEMTest::testMedMedDriver21() {
   delete aInvalidMedMedRdDriver21;
   delete aInvalidMedMedRdDriver21_1;
   delete aMedMedRdDriver21;
-  
+
   delete aInvalidMedMedWrDriver21;
   delete aInvalidMedMedWrDriver21_1;
   delete aMedMedWrDriver21;
-  
+
   delete aInvalidMedMedRdWrDriver21;
   delete aInvalidMedMedRdWrDriver21_1;
   delete aMedMedRdWrDriver21;
-  
-  //Remove tmp files from disk
-  remove(filename_wr.c_str());
-  remove(filename_rdwr.c_str());
 }

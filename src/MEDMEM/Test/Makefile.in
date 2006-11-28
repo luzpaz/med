@@ -54,8 +54,11 @@ LIB_SRC = MEDMEMTest.cxx \
 	  MEDMEMTest_Formulae.cxx \
 	  MEDMEMTest_GaussLocalization.cxx \
           MEDMEMTest_GibiMeshDriver.cxx \
+	  MEDMEMTest_Grid.cxx \
 	  MEDMEMTest_Group.cxx \
           MEDMEMTest_Med.cxx \
+	  MEDMEMTest_MedFieldDriver21.cxx \
+	  MEDMEMTest_MedFieldDriver22.cxx \
 	  MEDMEMTest_MedMedDriver21.cxx \
 	  MEDMEMTest_MedMedDriver22.cxx \
 	  MEDMEMTest_MedMeshDriver21.cxx \
@@ -67,14 +70,11 @@ LIB_SRC = MEDMEMTest.cxx \
           MEDMEMTest_PointerOf.cxx \
 	  MEDMEMTest_PolyhedronArray.cxx \
 	  MEDMEMTest_PorflowMeshDriver.cxx \
-	  MEDMEMTest_Grid.cxx \
           MEDMEMTest_SkyLineArray.cxx \
           MEDMEMTest_Support.cxx \
 	  MEDMEMTest_Unit.cxx \
           MEDMEMTest_VtkMedDriver.cxx \
-          MEDMEMTest_VtkMeshDriver.cxx \
-	  MEDMEMTest_MedFieldDriver21.cxx \
-	  MEDMEMTest_MedFieldDriver22.cxx 
+          MEDMEMTest_VtkMeshDriver.cxx
 
 LIB_CLIENT_IDL =
 

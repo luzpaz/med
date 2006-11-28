@@ -22,6 +22,8 @@
 #define _MEDMEMTEST_HXX_
 
 #include <cppunit/extensions/HelperMacros.h>
+#include <set>
+#include <string>
 
 namespace MEDMEM {
   class MESH;
@@ -48,7 +50,6 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testFieldConvert );
   CPPUNIT_TEST( testFormulae );
   CPPUNIT_TEST( testGaussLocalization );
-  CPPUNIT_TEST( testGenDriver /* not in spec */ );
   CPPUNIT_TEST( testGibiMeshDriver );
   //20
   CPPUNIT_TEST( testGrid );
@@ -119,7 +120,6 @@ public:
   void testFieldConvert();
   void testFormulae();
   void testGaussLocalization();
-  void testGenDriver() /* not in spec */;
   void testGibiMeshDriver();
   //20
   void testGrid();
@@ -168,6 +168,17 @@ public:
   //60
 
   MEDMEM::MESH * createTestMesh ();
+};
+
+class MEDMEMTest_TmpFilesRemover
+{
+public:
+  MEDMEMTest_TmpFilesRemover() {}
+  ~MEDMEMTest_TmpFilesRemover();
+  bool Register(const std::string theTmpFile);
+
+private:
+  std::set<std::string> myTmpFiles;
 };
 
 #endif

@@ -17,25 +17,17 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 
-// use this define to enable lines, execution of which leads to Segmentation Fault
-//#define ENABLE_FAULTS
-
-// use this define to enable CPPUNIT asserts and fails, showing bugs
-#define ENABLE_FORCED_FAILURES
-
-#ifdef ENABLE_FAULTS
-  // (BUG)
-#endif
-
-#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("");
-#endif
-
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
 #include <MEDMEM_MedMeshDriver21.hxx>
 #include <MEDMEM_Mesh.hxx>
+
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -76,17 +68,15 @@ using namespace MEDMEM;
  *   (+) void read (void);
  *  }
  */
-
-
 void MEDMEMTest::testMedMeshDriver21()
 {
-  
   MESH *aMesh                      = new MESH();
   MESH *aMesh_1                    = new MESH();
+
   string data_dir                  = getenv("DATA_DIR");
   string tmp_dir                   = getenv("TMP");
-  if(tmp_dir == "")
-    tmp_dir = "/tmp";
+  if (tmp_dir == "") tmp_dir = "/tmp";
+
   string filename_rd               = data_dir + "/MedFiles/pointe.med";
   string filename_wr               = tmp_dir  + "/myWr_pointe21.med";
   string tmpfile                   = tmp_dir  + "/tmp.med";
@@ -97,17 +87,23 @@ void MEDMEMTest::testMedMeshDriver21()
   string filename_rdwr             =  tmp_dir  + "/myRdWr_pointe22.med";
   char* longmeshname               = new char[MED_TAILLE_NOM+2];
   string fcopy                     = "cp " + filename_rd + " " + filename_rdwr;
-  for (int i = 0; i<MED_TAILLE_NOM+2; ++i) 
+  for (int i = 0; i<MED_TAILLE_NOM+2; ++i)
     longmeshname[i] = 'a';
-  
+
   //Copy file in the TMP dir for testing READ/WRITE case
   system(fcopy.data());
- 
+
+  // To remove tmp files from disk
+  MEDMEMTest_TmpFilesRemover aRemover;
+  aRemover.Register(filename_wr);
+  aRemover.Register(filename_rdwr);
+  aRemover.Register(tmpfile);
 
   //----------------------------------Test READ ONLY part---------------------------------------------------//
+
   //Creation a incorrect read only driver
   MED_MESH_RDONLY_DRIVER21 *aInvalidRdDriver21 = new MED_MESH_RDONLY_DRIVER21(fileNotExistsName_rd, aMesh);
-  
+
   //Trying open not existing file
   CPPUNIT_ASSERT_THROW(aInvalidRdDriver21->open(), MEDEXCEPTION);
 
@@ -116,7 +112,7 @@ void MEDMEMTest::testMedMeshDriver21()
 
   //Check driver
   CPPUNIT_ASSERT(aRdDriver21);
-  
+
   //Trying read mesh from file, if file is not open
   CPPUNIT_ASSERT_THROW(aRdDriver21->read(), MEDEXCEPTION);
 
@@ -133,15 +129,15 @@ void MEDMEMTest::testMedMeshDriver21()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-#ifdef ENABLE_FORCED_FAILURES  
+#ifdef ENABLE_FORCED_FAILURES
   //Trying open file secondary.
   CPPUNIT_ASSERT_THROW(aRdDriver21->open(), MEDEXCEPTION);
   //This case is not work, seems it BUG
-  
+
   //Trying read mesh from file, if mesh name is not set, i.e. empty
   CPPUNIT_ASSERT_THROW(aRdDriver21->read(), MEDEXCEPTION);
   //No correct exception in this case
-  
+
   //Trying read mesh from file with very long name
   //aRdDriver21->setMeshName(longmeshname);
   CPPUNIT_ASSERT_THROW(aRdDriver21->read(), MEDEXCEPTION);
@@ -185,18 +181,18 @@ void MEDMEMTest::testMedMeshDriver21()
 
   //Check Mesh
   CPPUNIT_ASSERT(aMesh);
-  
-  //Default constructor 
+
+  //Default constructor
   MED_MESH_RDONLY_DRIVER21 aRdDriver21Cpy_1;
-  
+
   //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  aRdDriver21Cpy_1 = *aRdDriver21;
-  
+  //aRdDriver21Cpy_1 = *aRdDriver21;
+
   //Test (bool operator ==) defined GENDRIVER class in MEDMEM_GenDriver.hxx
-  CPPUNIT_ASSERT(aRdDriver21Cpy_1 ==  *aRdDriver21);
-  
+  CPPUNIT_ASSERT(aRdDriver21Cpy_1.GENDRIVER::operator==(*aRdDriver21));
+
   //Test copy constructor
-  MED_MESH_RDONLY_DRIVER21 aRdDriver21Cpy_2 = MED_MESH_RDONLY_DRIVER21(aRdDriver21Cpy_1);
+  MED_MESH_RDONLY_DRIVER21 aRdDriver21Cpy_2 (aRdDriver21Cpy_1);
   CPPUNIT_ASSERT_EQUAL(aRdDriver21Cpy_2, *aRdDriver21);
 
   //Test close() method
@@ -211,12 +207,12 @@ void MEDMEMTest::testMedMeshDriver21()
   catch( ... )
   {
     CPPUNIT_FAIL("Unknown exception");
-  }  
-  
+  }
+
   //Trying read mesh from copy closed driver
   CPPUNIT_ASSERT_THROW(aRdDriver21Cpy_1.read(), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aRdDriver21Cpy_2.read(), MEDEXCEPTION);
-  
+
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
   ostringstream rostr1, rostr2;
   rostr1<<aRdDriver21Cpy_1;
@@ -224,8 +220,9 @@ void MEDMEMTest::testMedMeshDriver21()
   CPPUNIT_ASSERT(rostr1.str() != "");
   CPPUNIT_ASSERT(rostr1.str() == rostr2.str());
 
-    
-//----------------------------------Test WRITE ONLY part------------------------------------------//
+
+  //----------------------------------Test WRITE ONLY part------------------------------------------//
+
   //Creation a incorrect write only driver
   MED_MESH_WRONLY_DRIVER21 *aInvalidWrDriver21 = new MED_MESH_WRONLY_DRIVER21(fileNotExistsName_wr, aMesh);
 
@@ -251,7 +248,7 @@ void MEDMEMTest::testMedMeshDriver21()
 
   //Trying write mesh to file, if file is not open
   CPPUNIT_ASSERT_THROW(aWrDriver21->write(), MEDEXCEPTION);
-  
+
   //Test open() method
   try
   {
@@ -270,7 +267,9 @@ void MEDMEMTest::testMedMeshDriver21()
   //Trying open file secondary.
   CPPUNIT_ASSERT_THROW(aWrDriver21->open(), MEDEXCEPTION);
   //This case is not work, seems it BUG
-  
+#endif
+
+#ifdef ENABLE_FORCED_FAILURES
   //Test case: trying write mesh to file, if mesh name is not set, i.e empty
   aMesh->setName("");
   aWrDriver21->setMeshName("");
@@ -283,7 +282,7 @@ void MEDMEMTest::testMedMeshDriver21()
   //No exception in this case
 #endif
 
-  //Set initialy mesh name 
+  //Set initialy mesh name
   aMesh->setName(meshname);
   //Test setMeshName() and getMeshName() methods
   try
@@ -314,21 +313,21 @@ void MEDMEMTest::testMedMeshDriver21()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   //Test read() method for WRITE ONLY driver
   CPPUNIT_ASSERT_THROW(aWrDriver21->read(), MEDEXCEPTION);
-  
-  //Default constructor 
+
+  //Default constructor
    MED_MESH_WRONLY_DRIVER21 aWrDriver21Cpy_1;
-  
-  //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  aWrDriver21Cpy_1 = *aWrDriver21;
-  
-  //Test (bool operator ==) defined GENDRIVER class in MEDMEM_GenDriver.hxx
-  CPPUNIT_ASSERT(aWrDriver21Cpy_1 == *aWrDriver21);
-  
+
+  //Test (void operator =) defined in GENDRIVER class
+  //aWrDriver21Cpy_1 = *aWrDriver21;
+
+  //Test (bool operator ==) defined GENDRIVER class
+  CPPUNIT_ASSERT(aWrDriver21Cpy_1.GENDRIVER::operator==(*aWrDriver21));
+
   //Test copy constructor
-  MED_MESH_WRONLY_DRIVER21 aWrDriver21Cpy_2 = MED_MESH_WRONLY_DRIVER21(aWrDriver21Cpy_1);
+  MED_MESH_WRONLY_DRIVER21 aWrDriver21Cpy_2 (aWrDriver21Cpy_1);
   CPPUNIT_ASSERT_EQUAL(aWrDriver21Cpy_2 , *aWrDriver21);
 
   try
@@ -347,7 +346,7 @@ void MEDMEMTest::testMedMeshDriver21()
   //Test case: Trying write mesh using copy closed driver
   CPPUNIT_ASSERT_THROW(aWrDriver21Cpy_1.write(), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aWrDriver21Cpy_2.write(), MEDEXCEPTION);
-  
+
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
   ostringstream wostr1, wostr2;
   wostr1<<aWrDriver21Cpy_1;
@@ -356,7 +355,8 @@ void MEDMEMTest::testMedMeshDriver21()
   CPPUNIT_ASSERT(wostr1.str() == wostr2.str());
 
 
-//----------------------------------Test READ / WRITE part------------------------------------------//
+  //----------------------------------Test READ / WRITE part------------------------------------------//
+
   //Creation a incorrect read/write driver
   MED_MESH_RDWR_DRIVER21 *aInvalidRdWrDriver21 = new  MED_MESH_RDWR_DRIVER21(fileNotExistsName_wr, aMesh_1);
 
@@ -393,7 +393,9 @@ void MEDMEMTest::testMedMeshDriver21()
   //Test case: trying open file secondary.
   CPPUNIT_ASSERT_THROW(aRdWrDriver21->open(), MEDEXCEPTION);
   //This case is not work, seems it BUG
+#endif
 
+#ifdef ENABLE_FORCED_FAILURES
   //Set mesh name
   aMesh_1->setName("EmptyMesh");
   aRdWrDriver21->setMeshName("EmptyMesh");
@@ -403,7 +405,7 @@ void MEDMEMTest::testMedMeshDriver21()
   //No exception in this case, seems it BUG
 #endif
 
-  //Set initialy mesh name 
+  //Set initialy mesh name
   aMesh_1->setName(meshname);
   //Test setMeshName() and getMeshName() methods
   try
@@ -418,9 +420,9 @@ void MEDMEMTest::testMedMeshDriver21()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   CPPUNIT_ASSERT_EQUAL(meshname, aRdWrDriver21->getMeshName());
-  
+
   //Test read() method
   try
   {
@@ -434,17 +436,18 @@ void MEDMEMTest::testMedMeshDriver21()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-#ifdef ENABLE_FORCED_FAILURES
+
   //Trying read mesh from file, if mesh name is not set, i.e. empty
+#ifdef ENABLE_FORCED_FAILURES
   aRdWrDriver21->setMeshName("");
   aMesh_1->setName("");
   CPPUNIT_ASSERT_THROW(aRdWrDriver21->read(), MEDEXCEPTION);
   //No correct exception in this case
-  
+
   //Trying write mesh to file, if mesh name is not set, i.e empty
   CPPUNIT_ASSERT_THROW(aRdWrDriver21->write(), MEDEXCEPTION);
   //No correct exception in this case
-  
+
   //Trying read mesh from file with very long name
   aRdWrDriver21->setMeshName(longmeshname);
   aMesh_1->setName(longmeshname);
@@ -471,21 +474,21 @@ void MEDMEMTest::testMedMeshDriver21()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   //Check Mesh
   CPPUNIT_ASSERT(aMesh_1);
 
-  //Default constructor 
+  //Default constructor
   MED_MESH_RDWR_DRIVER21 aRdWrDriver21Cpy_1;
-  
-  //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  aRdWrDriver21Cpy_1 = *aRdWrDriver21;
-  
-  //Test (bool operator ==) defined GENDRIVER class in MEDMEM_GenDriver.hxx
-  CPPUNIT_ASSERT(aRdWrDriver21Cpy_1 ==  *aRdWrDriver21);
+
+  //Test (void operator =) defined in GENDRIVER class
+  //aRdWrDriver21Cpy_1 = *aRdWrDriver21;
+
+  //Test (bool operator ==) defined GENDRIVER class
+  CPPUNIT_ASSERT(aRdWrDriver21Cpy_1.GENDRIVER::operator==(*aRdWrDriver21));
 
   //Test copy constructor
-  MED_MESH_RDWR_DRIVER21 aRdWrDriver21Cpy_2 = MED_MESH_RDWR_DRIVER21(aRdWrDriver21Cpy_1);
+  MED_MESH_RDWR_DRIVER21 aRdWrDriver21Cpy_2 (aRdWrDriver21Cpy_1);
   CPPUNIT_ASSERT_EQUAL(aRdWrDriver21Cpy_2, *aRdWrDriver21);
 
   try
@@ -506,7 +509,7 @@ void MEDMEMTest::testMedMeshDriver21()
   CPPUNIT_ASSERT_THROW(aRdWrDriver21Cpy_2.read(), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aRdWrDriver21Cpy_1.write(), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aRdWrDriver21Cpy_2.write(), MEDEXCEPTION);
-  
+
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
   ostringstream rwostr1, rwostr2;
   rwostr1<<aRdWrDriver21Cpy_1;
@@ -519,20 +522,14 @@ void MEDMEMTest::testMedMeshDriver21()
 
   delete aInvalidRdDriver21;
   delete aRdDriver21;
-  
+
   delete aInvalidWrDriver21;
   delete aWrDriver21;
   delete aTmpWrDriver21;
 
-
   delete aInvalidRdWrDriver21;
   delete aRdWrDriver21;
-  
+
   delete aMesh;
   delete aMesh_1;
-
-  //Remove tmp files
-  remove(filename_wr.data());
-  remove(filename_rdwr.data());
-  remove(tmpfile.data());
 }

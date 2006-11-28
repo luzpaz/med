@@ -17,20 +17,6 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 
-// use this define to enable lines, execution of which leads to Segmentation Fault
-//#define ENABLE_FAULTS
-
-// use this define to enable CPPUNIT asserts and fails, showing bugs
-#define ENABLE_FORCED_FAILURES
-
-#ifdef ENABLE_FAULTS
-  // (BUG)
-#endif
-
-#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("");
-#endif
-
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
@@ -39,6 +25,11 @@
 #include <MEDMEM_MedMedDriver21.hxx>
 #include <MEDMEM_Med.hxx>
 
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -57,15 +48,18 @@ using namespace MED_EN;
  */
 void MEDMEMTest::testVtkMedDriver()
 {
-  MED *aMed                        = new MED();
-  string data_dir                  = getenv("DATA_DIR");
-  string tmp_dir                   = getenv("TMP");
-  if(tmp_dir == "")
-    tmp_dir ="/tmp";
-  string filename_rd               = data_dir + "/MedFiles/pointe.med";
-  string emptyfilename             = "";
-  string fileNotExistsName         = "/path_not_exists/file_not_exists.vtk";
-  string filename_wr                  =  tmp_dir  + "/myMED_pointe.vtk";
+  MED *aMed                = new MED();
+  string data_dir          = getenv("DATA_DIR");
+  string tmp_dir           = getenv("TMP");
+  if (tmp_dir == "")
+    tmp_dir = "/tmp";
+  string filename_rd       = data_dir + "/MedFiles/pointe.med";
+  string emptyfilename     = "";
+  string fileNotExistsName = "/path_not_exists/file_not_exists.vtk";
+  string filename_wr       =  tmp_dir  + "/myMED_pointe.vtk";
+
+  MEDMEMTest_TmpFilesRemover aRemover;
+  aRemover.Register(filename_wr);
 
   //Read MED structure from file
   MED_MED_RDONLY_DRIVER21 *aMedMedRdDriver21 = new MED_MED_RDONLY_DRIVER21(filename_rd, aMed);
@@ -74,21 +68,21 @@ void MEDMEMTest::testVtkMedDriver()
   aMedMedRdDriver21->close();
   //Check Med
   CPPUNIT_ASSERT(aMed);
- 
+
   //Creation incorrect Vtk Med Driver (file is not exists)
   VTK_MED_DRIVER *aInvalidVtkMedDriver = new VTK_MED_DRIVER(fileNotExistsName,aMed);
-  
+
   //Trying write data in the not existing file
   CPPUNIT_ASSERT_THROW(aInvalidVtkMedDriver->write(),MEDEXCEPTION);
- 
-  //Creation correct Vtk Med Driver 
+
+  //Creation correct Vtk Med Driver
   VTK_MED_DRIVER *aVtkMedDriver = new VTK_MED_DRIVER(filename_wr ,aMed);
-  
+
   //Check driver
   CPPUNIT_ASSERT(aVtkMedDriver);
-  
-  //Test write() method 
-  
+
+  //Test write() method
+
   try
   {
     aVtkMedDriver->write();
@@ -101,7 +95,7 @@ void MEDMEMTest::testVtkMedDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
- 
+
   //Test copy constructor
   VTK_MED_DRIVER *aVtkMedDriverCpy = new VTK_MED_DRIVER(*aVtkMedDriver);
 #ifdef ENABLE_FORCED_FAILURES
@@ -111,21 +105,21 @@ void MEDMEMTest::testVtkMedDriver()
   //Test (operator ==) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
 #ifdef ENABLE_FORCED_FAILURES
   CPPUNIT_ASSERT(*aVtkMedDriverCpy == *aVtkMedDriver);
-#endif 
-  
+#endif
+
   //Test copy() function
   VTK_MED_DRIVER *aVtkMedDriverCpy_1 = (VTK_MED_DRIVER*)aVtkMedDriver->copy();
 #ifdef ENABLE_FORCED_FAILURES
   CPPUNIT_ASSERT_EQUAL(*aVtkMedDriverCpy_1, *aVtkMedDriver);
 #endif
-  
+
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
   ostringstream ostr1, ostr2;
   ostr1<<*aVtkMedDriverCpy;
   ostr2<<*aVtkMedDriverCpy_1;
   CPPUNIT_ASSERT(ostr1.str() != "");
   CPPUNIT_ASSERT(ostr1.str() == ostr2.str());
-  
+
 
   //Delete objects
   delete aMedMedRdDriver21;
@@ -134,10 +128,6 @@ void MEDMEMTest::testVtkMedDriver()
   delete aVtkMedDriver;
   delete aVtkMedDriverCpy;
   delete aVtkMedDriverCpy_1;
-  //MEDEXCEPTION in the destructor (after trying close file) 
+  //MEDEXCEPTION in the destructor (after trying close file)
 #endif
-
- 
-  //Remove tmp files from disk
-  remove(filename_wr.c_str());
 }
