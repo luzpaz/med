@@ -26,6 +26,12 @@
 #include <sstream>
 #include <cmath>
 
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
+
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -46,7 +52,7 @@ using namespace MED_EN;
  *   (+) void rmDriver (int index=0) throw (MEDEXCEPTION);
  *   (+) void readFileStruct(int index=0) throw (MEDEXCEPTION);
  *   (+) void read (int index=0) throw (MEDEXCEPTION);
- *   (yetno) void writeFrom (int index=0) throw (MEDEXCEPTION);
+ *   (+) void writeFrom (int index=0) throw (MEDEXCEPTION);
  *   (+) void write (int index=0) throw (MEDEXCEPTION);
  *   (+) int  getNumberOfMeshes (void) const;
  *   (+) int  getNumberOfFields (void) const;
@@ -59,14 +65,14 @@ using namespace MED_EN;
  *   (+) deque<DT_IT_> getFieldIteration (const string & fieldName) const throw (MEDEXCEPTION);
  *   (+) FIELD_ * getField (const string & fieldName, const int dt,
  *                              const int it) const throw (MEDEXCEPTION);
- *   (-) template<class T> FIELD<T> * getFieldT
+ *   (NOT COMPILABLE!!!) template<class T> FIELD<T> * getFieldT
  *           (const string & fieldName, const int dt,  const int it) const throw (MEDEXCEPTION);
  *   (+) FIELD_ * getField2 (const string & fieldName, double time, int it=0) const throw (MEDEXCEPTION);
  *   (+) const map<MED_EN::medEntityMesh,SUPPORT *> & getSupports
  *           (const string & meshName) const throw (MEDEXCEPTION);
  *   (+) SUPPORT *  getSupport (const string & meshName,
  *                                  MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
- *   (yetno) void updateSupport ();
+ *   (-, as it is temporary and called from driver after Med object reading from file) void updateSupport ();
  *  }
  */
 void MEDMEMTest::testMed()
@@ -74,15 +80,34 @@ void MEDMEMTest::testMed()
   string datadir  = getenv("DATA_DIR");
   string filename = datadir + "/MedFiles/pointe.med";
 
-  string tmp_dir       = getenv("TMP");
-  if(tmp_dir == "") 
+  string tmp_dir  = getenv("TMP");
+  if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filenameout21   = tmp_dir  + "/myMedWrite_pointe21.med";
 
+  string filenameout21      = tmp_dir  + "/myMedWrite_pointe21.med";
+  string filenameout21_from = tmp_dir  + "/myMedWrite_pointe21_from.med";
 
-  MED* myMed= new MED(MED_DRIVER, filename) ;
+  // To remove tmp files from disk
+  MEDMEMTest_TmpFilesRemover aRemover;
+  aRemover.Register(filenameout21);
+  aRemover.Register(filenameout21_from);
+
+  MED* myMed = new MED(MED_DRIVER, filename);
   //read all objects in the file
   CPPUNIT_ASSERT_NO_THROW(myMed->read());
+#ifdef ENABLE_FORCED_FAILURES
+  // (BUG) Memory problem in MED::updateSupport()!
+  // Invalid read of size 4
+  //    at 0x34548AD6: std::_Rb_tree_decrement(std::_Rb_tree_node_base*) (in /usr/lib/libstdc++.so.6.0.1)
+  //    by 0x34876722: std::_Rb_tree_iterator<std::pair<long const, MEDMEM::SUPPORT*> >::operator--(int) (stl_tree.h:203)
+  //    by 0x348733BE: MEDMEM::MED::updateSupport() (MEDMEM_Med.cxx:805)
+  //  Address 0x35C67598 is 0 bytes inside a block of size 24 free'd
+  //    at 0x3414CBD5: operator delete(void*) (vg_replace_malloc.c:155)
+  //    ...
+  //    by 0x348766EB: std::map<long, MEDMEM::SUPPORT*, std::less<long>, std::allocator<std::pair<long const, MEDMEM::SUPPORT*> > >::erase(std::_Rb_tree_iterator<std::pair<long const, MEDMEM::SUPPORT*> >) (stl_map.h:410)
+  //    by 0x348733A3: MEDMEM::MED::updateSupport() (MEDMEM_Med.cxx:804)
+  CPPUNIT_FAIL("Memory problem in MED::updateSupport(): removing map item while iterating on this map.");
+#endif
 
   //getNumberOfMeshes
   int nbMeshes, nbFields;
@@ -142,20 +167,6 @@ void MEDMEMTest::testMed()
   }
   CPPUNIT_ASSERT(field_names.size() != 0);
 
-  CPPUNIT_FAIL("Error: if size of array string is not equal to amount of fields or meshes -> error");
-  /*  string field_names_error[nbFields-1];
-  try{
-    myMed->getFieldNames(field_names_error);
-  }
-  catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-    }*/
-
   string field_names_1[nbFields];
   string mesh_names_1[nbMeshes];
   //get field and mesh names
@@ -212,24 +223,29 @@ void MEDMEMTest::testMed()
       CPPUNIT_ASSERT(myField->getValueType() == myField2->getValueType());
       CPPUNIT_ASSERT(myField->getDescription() == myField2->getDescription());
 
-      CPPUNIT_FAIL("We are not able to call function getFieldT(const string & fieldName, const int dt,  const int it)");
-      //ERROR:MEDMEM_Med.hxx str.153
-      /* med_type_champ type = myField->getValueType() ;
+      med_type_champ type = myField->getValueType();
       switch (type)
       {
-        case MED_INT32 :
+      case MED_INT32:
         {
-	  FIELD<int> *myFieldT;
-	  CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<int>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
-	  break;
+#ifdef ENABLE_FORCED_FAILURES
+          // (BUG) ERROR in MEDMEM_Med.hxx line 153: FIELD_ retUp=getField(fieldName,dt,it);
+          //       But getField returns FIELD_*
+          CPPUNIT_FAIL("Error in MED::getFieldT(const string & fieldName, const int dt,  const int it)");
+#endif
+          // not compilable
+	  //FIELD<int> *myFieldT;
+	  //CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<int>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
 	}
-        case MED_REEL64 :
+        break;
+      case MED_REEL64:
 	{
-	  FIELD<double> *myFieldT;
-	  CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<double>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
-	  break;
+          // not compilable
+	  //FIELD<double> *myFieldT;
+	  //CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<double>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
 	}
-	}*/
+        break;
+      }
     }
   }
 
@@ -264,13 +280,33 @@ void MEDMEMTest::testMed()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  // write this driver to file
+  // write to file
   CPPUNIT_ASSERT_NO_THROW(myMed->write(idMedV21));
+  // check, that the file is created on disk
+  CPPUNIT_ASSERT(access(filenameout21.data(), F_OK) == 0);
+
+  // writeFrom
+  CPPUNIT_ASSERT_THROW(myMed->writeFrom(idMedV21 + 1000), MEDEXCEPTION); // invalid driver index
+  int idMedV21_from = myMed->addDriver(MED_DRIVER, filenameout21_from);
+#ifdef ENABLE_FORCED_FAILURES
+  // (BUG) MED::writeFrom(int) always throws MEDEXCEPTION.
+  //       ? missed 'else' clause before throw ?
+  CPPUNIT_ASSERT_NO_THROW(myMed->writeFrom(idMedV21_from));
+#endif
+  // check, that the file is created on disk
+#ifdef ENABLE_FORCED_FAILURES
+  // ? (BUG) The file is not created.
+  CPPUNIT_ASSERT(access(filenameout21_from.data(), F_OK) == 0);
+#endif
+
   // remove driver from med
   CPPUNIT_ASSERT_NO_THROW(myMed->rmDriver(idMedV21));
+#ifdef ENABLE_FORCED_FAILURES
   //ERROR: driver with index idMedV21 has not been removed
+  // Why driver removal is commented out?
   // ensure exception is raised on second attempt to remove driver
   CPPUNIT_ASSERT_THROW(myMed->rmDriver(idMedV21),MEDEXCEPTION);
+#endif
 
   //create empty MED object
   MED* myEmptyMed = new MED();
@@ -376,14 +412,14 @@ void MEDMEMTest::testMed()
   CPPUNIT_ASSERT_NO_THROW(myEmptyMed->addMesh(aMesh));
 
   //compare two meshes
-  CPPUNIT_ASSERT(aMesh->deepCompare(*(myEmptyMed->getMesh("meshing"))));   
+  CPPUNIT_ASSERT(aMesh->deepCompare(*(myEmptyMed->getMesh("meshing"))));
 
   // add null field, exception should be raised
   CPPUNIT_ASSERT_THROW(myEmptyMed->addField(NULL), MEDEXCEPTION);
   //
   FIELD_* myEmptyField = new FIELD_();
   // add empty field, ensure exception is raised
-  CPPUNIT_ASSERT_THROW(myEmptyMed->addField(myEmptyField), MEDEXCEPTION); 
+  CPPUNIT_ASSERT_THROW(myEmptyMed->addField(myEmptyField), MEDEXCEPTION);
   //set field name
   myEmptyField->setName("myField");
 
@@ -391,12 +427,11 @@ void MEDMEMTest::testMed()
   SUPPORT* aSupport = new SUPPORT(myEmptyMed->getMesh("meshing"), "Support On Cells");
   myEmptyField->setSupport(aSupport);
 
-  CPPUNIT_ASSERT_NO_THROW(myEmptyMed->addField(myEmptyField)); 
+  CPPUNIT_ASSERT_NO_THROW(myEmptyMed->addField(myEmptyField));
 
   CPPUNIT_ASSERT(aSupport->deepCompare(*(myEmptyMed->getSupport("meshing",MED_CELL))));
-  CPPUNIT_ASSERT(aMesh->deepCompare(*(myEmptyMed->getMesh("meshing"))));   
+  CPPUNIT_ASSERT(aMesh->deepCompare(*(myEmptyMed->getMesh("meshing"))));
 
   delete myMed;
   delete myEmptyMed;
 }
-
