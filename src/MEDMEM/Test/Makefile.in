@@ -72,7 +72,9 @@ LIB_SRC = MEDMEMTest.cxx \
 	  MEDMEMTest_PorflowMeshDriver.cxx \
           MEDMEMTest_SkyLineArray.cxx \
           MEDMEMTest_Support.cxx \
+          MEDMEMTest_TopLevel.cxx \
 	  MEDMEMTest_Unit.cxx \
+	  MEDMEMTest_VtkFieldDriver.cxx \
           MEDMEMTest_VtkMedDriver.cxx \
           MEDMEMTest_VtkMeshDriver.cxx
 

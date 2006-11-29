@@ -368,100 +368,56 @@ void MEDMEMTest::testTags()
   CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 }
 
-// #54: MEDMEM_TopLevel.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (6), defined in MEDMEM_TopLevel.hxx:
- *  (yetno) MED *readMedInFile(const std::string& fileName) throw(MEDEXCEPTION);
- *  (yetno) MESH *readMeshInFile(const std::string& fileName, const std::string& meshName);
- *  (yetno) template<class T> FIELD<T> *readFieldInFile
- *                            (const std::string& fileName, const std::string& fieldName);
- *  (yetno) void writeMedToFile(const MED *medObj, const std::string& fileName);
- *  (yetno) void writeMeshToFile(const MESH *meshObj, const std::string& fileName);
- *  (yetno) template<class T> void writeFieldToFile(const FIELD<T> *fieldObj, const std::string& fileName);
- */
-void MEDMEMTest::testTopLevel()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
+// #54: MEDMEM_TopLevel.hxx  }  MEDMEMTest_TopLevel.cxx
 
 // #55: MEDMEM_TypeMeshDriver.hxx  }  MEDMEMTest.cxx
 
 /*!
  *  Check methods (15), defined in MEDMEM_TypeMeshDriver.hxx:
  *  class TYPE_MESH_DRIVER : public GENDRIVER {
- *   (yetno) TYPE_MESH_DRIVER();
- *   (yetno) TYPE_MESH_DRIVER(const string & fileName, MESH * ptrMesh, med_mode_acces accessMode);
- *   (yetno) TYPE_MESH_DRIVER(const TYPE_MESH_DRIVER & driver);
- *   (yetno) virtual ~TYPE_MESH_DRIVER();
- *   (yetno) void open() throw (MEDEXCEPTION);
- *   (yetno) void close() throw (MEDEXCEPTION);
- *   (yetno) virtual void write(void) const = 0;
- *   (yetno) virtual void read (void) = 0;
- *   (yetno) void   setMeshName(const string & meshName);
- *   (yetno) string getMeshName() const;
+ *   (-) TYPE_MESH_DRIVER();
+ *   (-) TYPE_MESH_DRIVER(const string & fileName, MESH * ptrMesh, med_mode_acces accessMode);
+ *   (-) TYPE_MESH_DRIVER(const TYPE_MESH_DRIVER & driver);
+ *   (-) virtual ~TYPE_MESH_DRIVER();
+ *   (-) void open() throw (MEDEXCEPTION);
+ *   (-) void close() throw (MEDEXCEPTION);
+ *   (-) virtual void write(void) const = 0;
+ *   (-) virtual void read (void) = 0;
+ *   (-) void   setMeshName(const string & meshName);
+ *   (-) string getMeshName() const;
  *  }
  *  class TYPE_MESH_RDONLY_DRIVER : public virtual TYPE_MESH_DRIVER {
- *   (yetno) TYPE_MESH_RDONLY_DRIVER();
- *   (yetno) TYPE_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh);
- *   (yetno) TYPE_MESH_RDONLY_DRIVER(const TYPE_MESH_RDONLY_DRIVER & driver);
- *   (yetno) virtual ~TYPE_MESH_RDONLY_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *   (yetno) void read (void) throw (MEDEXCEPTION);
+ *   (-) TYPE_MESH_RDONLY_DRIVER();
+ *   (-) TYPE_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh);
+ *   (-) TYPE_MESH_RDONLY_DRIVER(const TYPE_MESH_RDONLY_DRIVER & driver);
+ *   (-) virtual ~TYPE_MESH_RDONLY_DRIVER();
+ *   (-) void write(void) const throw (MEDEXCEPTION);
+ *   (-) void read (void) throw (MEDEXCEPTION);
  *  }
  *  class TYPE_MESH_WRONLY_DRIVER : public virtual TYPE_MESH_DRIVER {
- *   (yetno) TYPE_MESH_WRONLY_DRIVER();
- *   (yetno) TYPE_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh);
- *   (yetno) TYPE_MESH_WRONLY_DRIVER(const TYPE_MESH_WRONLY_DRIVER & driver);
- *   (yetno) virtual ~TYPE_MESH_WRONLY_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *   (yetno) void read (void) throw (MEDEXCEPTION);
+ *   (-) TYPE_MESH_WRONLY_DRIVER();
+ *   (-) TYPE_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh);
+ *   (-) TYPE_MESH_WRONLY_DRIVER(const TYPE_MESH_WRONLY_DRIVER & driver);
+ *   (-) virtual ~TYPE_MESH_WRONLY_DRIVER();
+ *   (-) void write(void) const throw (MEDEXCEPTION);
+ *   (-) void read (void) throw (MEDEXCEPTION);
  *  }
  *  class TYPE_MESH_RDWR_DRIVER : public TYPE_MESH_RDONLY_DRIVER, public TYPE_MESH_WRONLY_DRIVER {
- *   (yetno) TYPE_MESH_RDWR_DRIVER();
- *   (yetno) TYPE_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh);
- *   (yetno) TYPE_MESH_RDWR_DRIVER(const TYPE_MESH_RDWR_DRIVER & driver);
- *   (yetno) ~TYPE_MESH_RDWR_DRIVER();
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *   (yetno) void read (void) throw (MEDEXCEPTION);
+ *   (-) TYPE_MESH_RDWR_DRIVER();
+ *   (-) TYPE_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh);
+ *   (-) TYPE_MESH_RDWR_DRIVER(const TYPE_MESH_RDWR_DRIVER & driver);
+ *   (-) ~TYPE_MESH_RDWR_DRIVER();
+ *   (-) void write(void) const throw (MEDEXCEPTION);
+ *   (-) void read (void) throw (MEDEXCEPTION);
  *  }
  */
 void MEDMEMTest::testTypeMeshDriver()
 {
-  CPPUNIT_FAIL("Case Not Implemented");
+  CPPUNIT_FAIL("TYPE_MESH_DRIVER: not implemented");
 }
 
 // #56: MEDMEM_Unit.hxx  }  MEDMEMTest_Unit.cxx
-
-
-// #57: MEDMEM_VtkFieldDriver.hxx  }  MEDMEMTest.cxx
-
-/*!
- *  Check methods (14), defined in MEDMEM_VtkFieldDriver.hxx:
- *  template <class T> class VTK_FIELD_DRIVER : public GENDRIVER {
- *   (yetno) template <class INTERLACING_TAG> VTK_FIELD_DRIVER();
- *   (yetno) template <class INTERLACING_TAG> VTK_FIELD_DRIVER
- *               (const string & fileName, FIELD<T, INTERLACING_TAG> * ptrField)
- *   (yetno) VTK_FIELD_DRIVER(const VTK_FIELD_DRIVER & fieldDriver)
- *   (yetno) ~VTK_FIELD_DRIVER()
- *   (yetno) void openConst() const throw (MEDEXCEPTION)
- *   (yetno) void openConstAppend() const throw (MEDEXCEPTION)
- *   (yetno) void open() throw (MEDEXCEPTION)
- *   (yetno) void openAppend() throw (MEDEXCEPTION)
- *   (yetno) void closeConst() const throw (MEDEXCEPTION)
- *   (yetno) void close()
- *   (yetno) void setFieldName(const string & fieldName);
- *   (yetno) string getFieldName() const;
- *   (yetno) void read (void) throw (MEDEXCEPTION);
- *   (yetno) void write(void) const throw (MEDEXCEPTION);
- *   (yetno) void writeAppend(void) const throw (MEDEXCEPTION);
- *  }
- */
-void MEDMEMTest::testVtkFieldDriver()
-{
-  CPPUNIT_FAIL("Case Not Implemented");
-}
-
+// #57: MEDMEM_VtkFieldDriver.hxx }  MEDMEMTest_VtkFieldDriver.cxx
 // #58: MEDMEM_VtkMedDriver.hxx   }  MEDMEMTest_VtkMedDriver.cxx
 // #59: MEDMEM_VtkMeshDriver.hxx  }  MEDMEMTest_VtkMeshDriver.cxx
 
