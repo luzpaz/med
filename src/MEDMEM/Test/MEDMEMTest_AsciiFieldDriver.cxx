@@ -28,13 +28,14 @@
 #include <stdio.h>
 
 #include <sstream>
+#include <fstream.h>
 #include <cmath>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 //#define ENABLE_FAULTS
 
 // use this define to enable CPPUNIT asserts and fails, showing bugs
-//#define ENABLE_FORCED_FAILURES
+#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -51,11 +52,11 @@ using namespace MEDMEM;
  *
  *  template <class T, int SPACEDIMENSION, unsigned int SORTSTRATEGY>
  *  class SDForSorting {
- *   (yetno) SDForSorting(const double *coords, const T* comp, int nbComponents);
- *   (yetno) SDForSorting(const SDForSorting& other);
- *   (yetno) ~SDForSorting();
- *   (yetno) bool operator< (const SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY>& other) const;
- *   (yetno) void writeLine(ofstream& file) const;
+ *   (+) SDForSorting(const double *coords, const T* comp, int nbComponents);
+ *   (+) SDForSorting(const SDForSorting& other);
+ *   (+) ~SDForSorting();
+ *   (+) bool operator< (const SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY>& other) const;
+ *   (+) void writeLine(ofstream& file) const;
  *  }
  *
  *  template <class T>
@@ -64,12 +65,12 @@ using namespace MEDMEM;
  *   (+)     template <class INTERLACING_TAG>
  *           ASCII_FIELD_DRIVER(const string & fileName, FIELD<T,INTERLACING_TAG> * ptrField,
  *                              MED_EN::med_sort_direc direction=MED_EN::ASCENDING, const char *priority="");
- *   (yetno) ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other);
+ *   (+) ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other);
  *   (+)     void open() throw (MEDEXCEPTION);
  *   (+)     void close();
  *   (+)     void read (void) throw (MEDEXCEPTION);
  *   (+)     void write(void) const throw (MEDEXCEPTION);
- *   (yetno) GENDRIVER* copy() const;
+ *   (+) GENDRIVER* copy() const;
  *  }
  */
 void MEDMEMTest::testAsciiFieldDriver()
@@ -84,7 +85,29 @@ void MEDMEMTest::testAsciiFieldDriver()
   if (tmp_dir == "")
     tmp_dir = "/tmp";
   string anyfile1  = tmp_dir + "/anyfile1";
-
+  string SDFfilename = tmp_dir + "/myfile";
+  ofstream aFile(SDFfilename.c_str());
+  
+  // To remove tmp files from disk
+  MEDMEMTest_TmpFilesRemover aRemover;
+  aRemover.Register(anyfile1);
+  aRemover.Register(SDFfilename);
+  
+  //Test SDForSorting class
+   double coord_1[10] = { 1.0, 2.0, 
+			 -1.0, 2.0, 
+			 3.6, -8.7, 
+			 10.0, -10.0,
+			 12.3, 9.3};
+  
+  int comp_1[5] = {1, 3, 5, 7, 9};
+  SDForSorting<int, 2, 48> aSDF_1(coord_1, comp_1, 5);
+  
+  SDForSorting<int, 2, 48> aSDFCpy_1 = SDForSorting<int, 2, 48>(aSDF_1);
+  CPPUNIT_ASSERT_EQUAL(aSDFCpy_1 < aSDF_1, false);
+  CPPUNIT_ASSERT_NO_THROW(aSDF_1.writeLine(aFile));
+  
+  
   FIELD<double> * aField1 = new FIELD<double> (MED_DRIVER, filename, fieldname);
   const SUPPORT * aSupport = aField1->getSupport();
   MESH * aMesh = new MESH (MED_DRIVER, filename, aSupport->getMeshName());
@@ -99,7 +122,7 @@ void MEDMEMTest::testAsciiFieldDriver()
   CPPUNIT_ASSERT(aDriver1->getAccessMode() == MED_EN::MED_ECRI);
 
   // and write the field on disk
-
+  
   // must throw because the file is not opened
 #ifdef ENABLE_FORCED_FAILURES
   // (BUG) Invalid opened/closed state management
@@ -171,14 +194,23 @@ void MEDMEMTest::testAsciiFieldDriver()
                  " contains mesh of wrong dimension: must be 2 or 3");
   }
 
+  //Copy constructor
+  ASCII_FIELD_DRIVER<double> aDriver1_Cpy1 = ASCII_FIELD_DRIVER<double> (*aDriver1);
+  
+  //Test copy() function
+  ASCII_FIELD_DRIVER<double> *aDriver1_Cpy2 = (ASCII_FIELD_DRIVER<double>*)aDriver1->copy();
+  
+  //Compare objects
+#ifdef ENABLE_FORCED_FAILURES  
+  CPPUNIT_ASSERT_EQUAL(aDriver1_Cpy1, *aDriver1);
+  CPPUNIT_ASSERT_EQUAL(*aDriver1_Cpy2, *aDriver1);
+#endif
+  
+
+  
+  
   // free memory
   delete aDriver1;
-
   delete aField1;
   delete aMesh;
-
-  // remove temporary files from disk
-  remove(anyfile1.c_str());
-
-  CPPUNIT_FAIL("Case Not Complete.");
 }
