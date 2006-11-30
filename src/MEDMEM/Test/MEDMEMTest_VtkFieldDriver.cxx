@@ -17,20 +17,6 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 
-// use this define to enable lines, execution of which leads to Segmentation Fault
-//#define ENABLE_FAULTS
-
-// use this define to enable CPPUNIT asserts and fails, showing bugs
-//#define ENABLE_FORCED_FAILURES
-
-#ifdef ENABLE_FAULTS
-  // (BUG)
-#endif
-
-#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("");
-#endif
-
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
@@ -38,6 +24,11 @@
 #include <MEDMEM_Med.hxx>
 #include <MEDMEM_Field.hxx>
 
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -46,7 +37,9 @@ using namespace MED_EN;
 /*!
  *  Check methods (14), defined in MEDMEM_VtkFieldDriver.hxx:
  *  template <class T> class VTK_FIELD_DRIVER : public GENDRIVER {
- *   (yetno) template <class INTERLACING_TAG> VTK_FIELD_DRIVER();
+ *       //MUST BE PRIVATE, because it is impossible to set _ptrField after this constructor.
+ *       //AND cannot compile, so maybe it is specially implemented to prevent usage of it.
+ *   (!) template <class INTERLACING_TAG> VTK_FIELD_DRIVER();
  *   (+) template <class INTERLACING_TAG> VTK_FIELD_DRIVER
  *               (const string & fileName, FIELD<T, INTERLACING_TAG> * ptrField)
  *   (+) VTK_FIELD_DRIVER(const VTK_FIELD_DRIVER & fieldDriver)
@@ -68,14 +61,17 @@ void MEDMEMTest::testVtkFieldDriver()
 {
   FIELD<int> *aField                = new FIELD<int> ();
   FIELD<double> *aField_1           = new FIELD<double> ();
+
   string data_dir                   = getenv("DATA_DIR");
   string tmp_dir                    = getenv("TMP");
-  if(tmp_dir == "")
-    tmp_dir ="/tmp";
+  if (tmp_dir == "")
+    tmp_dir = "/tmp";
+
   string filename_rd                = data_dir + "/MedFiles/pointe.med";
   string emptyfilename              = "";
   string fileNotExistsName          = "/path_not_exists/file_not_exists.vtk";
-  string filename_wr                =  tmp_dir  + "/myField_pointe.vtk";
+  string filename_wr                = tmp_dir  + "/myField_pointe.vtk";
+
   string fieldname_rd_int           = "fieldnodeint";
   string fieldname_wr_int           = "myintfield";
   string fieldname_rd_double        = "fieldnodedouble";
@@ -84,7 +80,7 @@ void MEDMEMTest::testVtkFieldDriver()
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);
-  
+
   /////////////////////////////////////
   //  TEST1: Open not existing file  //
   /////////////////////////////////////
@@ -115,7 +111,7 @@ void MEDMEMTest::testVtkFieldDriver()
   aMedRdFieldDriver21_int->setFieldName(fieldname_rd_int);
   aMedRdFieldDriver21_int->read();
   aMedRdFieldDriver21_int->close();
-  
+
   MED_FIELD_RDONLY_DRIVER21<double> *aMedRdFieldDriver21_double = new MED_FIELD_RDONLY_DRIVER21<double>(filename_rd, aField_1);
   aMedRdFieldDriver21_double->open();
   aMedRdFieldDriver21_double->setFieldName(fieldname_rd_double);
@@ -123,13 +119,13 @@ void MEDMEMTest::testVtkFieldDriver()
   aMedRdFieldDriver21_double->close();
   //Check fields
   CPPUNIT_ASSERT(aField);
-  
-  //Creation correct VtkFieldDriver 
+
+  //Creation correct VtkFieldDriver
   VTK_FIELD_DRIVER<int> *aVtkFieldDriver_int = new VTK_FIELD_DRIVER<int>(filename_wr, aField);
-  
+
   //Check driver
   CPPUNIT_ASSERT(aVtkFieldDriver_int);
-  
+
   //Test setFieldName() and getFieldName() methods
   try
   {
@@ -144,10 +140,10 @@ void MEDMEMTest::testVtkFieldDriver()
     CPPUNIT_FAIL("Unknown exception");
   }
   CPPUNIT_ASSERT_EQUAL(fieldname_wr_int, aVtkFieldDriver_int->getFieldName());
-  
-  //Test open() method 
-  try 
-  { 
+
+  //Test open() method
+  try
+  {
     aVtkFieldDriver_int->open();
   }
   catch(MEDEXCEPTION &e)
@@ -159,8 +155,8 @@ void MEDMEMTest::testVtkFieldDriver()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-#ifdef ENABLE_FAULTS  
-  //Test write() method 
+#ifdef ENABLE_FAULTS
+  //Test write() method
   try
   {
     aVtkFieldDriver_int->write();
@@ -173,12 +169,12 @@ void MEDMEMTest::testVtkFieldDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-    // => Segmentation fault 
+    // => Segmentation fault
 #endif
-  
-  //Test read() method for Vtk Field Driver 
+
+  //Test read() method for Vtk Field Driver
   CPPUNIT_ASSERT_THROW(aVtkFieldDriver_int->read(),MEDEXCEPTION);
-  
+
   //Test close() method
   try
   {
@@ -193,7 +189,7 @@ void MEDMEMTest::testVtkFieldDriver()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  //Test openAppend() method 
+  //Test openAppend() method
   try
   {
     aVtkFieldDriver_int->close();
@@ -207,20 +203,20 @@ void MEDMEMTest::testVtkFieldDriver()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  
+
   /////////////////////////////////////////////////////////
   //  TEST? Test openAppend() and writeAppend() methods  //
   /////////////////////////////////////////////////////////
 
-  //Creation correct VtkFieldDriver 
+  //Creation correct VtkFieldDriver
   VTK_FIELD_DRIVER<double> *aVtkFieldDriver_double = new VTK_FIELD_DRIVER<double>(filename_wr, aField_1);
-  
+
   //Check driver
   CPPUNIT_ASSERT(aVtkFieldDriver_double);
-  
-  //Test openAppend() method 
-  try 
-  { 
+
+  //Test openAppend() method
+  try
+  {
     aVtkFieldDriver_double->openAppend();
   }
   catch(MEDEXCEPTION &e)
@@ -231,13 +227,13 @@ void MEDMEMTest::testVtkFieldDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
+
   aVtkFieldDriver_double->setFieldName(fieldname_wr_double);
 
 #ifdef ENABLE_FAULTS
-  //Test writeAppend() method 
-  try 
-  { 
+  //Test writeAppend() method
+  try
+  {
     aVtkFieldDriver_double->writeAppend();
   }
   catch(MEDEXCEPTION &e)
@@ -250,9 +246,9 @@ void MEDMEMTest::testVtkFieldDriver()
   }
   // => Segmentation fault
 #endif
-  
-  try 
-  { 
+
+  try
+  {
     aVtkFieldDriver_double->close();
   }
   catch(MEDEXCEPTION &e)
@@ -263,25 +259,22 @@ void MEDMEMTest::testVtkFieldDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  
-#ifdef ENABLE_FORCED_FAILURES
-  //VTK_FIELD_DRIVER<int> aVtkFieldDriver_intCpy_1;
-  //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  //aVtkFieldDriver_intCpy_1 = *aVtkFieldDriver_int;
-  CPPUNIT_FAIL("Compilation error: no matching function for call to 'MEDMEM::VTK_FIELD_DRIVER<int>::VTK_FIELD_DRIVER()");
-#endif
 
+  //#ifdef ENABLE_FORCED_FAILURES
+  //VTK_FIELD_DRIVER<int> aVtkFieldDriver_intCpy_1;
+  //VTK_FIELD_DRIVER<int>.template VTK_FIELD_DRIVER<FullInterlace> aVtkFieldDriver_intCpy_1;
+  //CPPUNIT_FAIL("Compilation error: no matching function for call to 'MEDMEM::VTK_FIELD_DRIVER<int>::VTK_FIELD_DRIVER()");
+  //#endif
 
 #ifdef ENABLE_FAULTS
   //Test copy constructor
-  VTK_FIELD_DRIVER<int> aVtkFieldDriver_intCpy_2 = VTK_FIELD_DRIVER<int> (*aVtkFieldDriver_int);
+  VTK_FIELD_DRIVER<int> aVtkFieldDriver_intCpy_2 (*aVtkFieldDriver_int);
   // => Segmentation fault after call Copy Constructor
-  
 
   CPPUNIT_ASSERT_EQUAL(aVtkFieldDriver_intCpy_2, *aVtkFieldDriver_int);
   //Test (bool operator ==) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
   CPPUNIT_ASSERT(aVtkFieldDriver_intCpy_2.GENDRIVER::operator== (*aVtkFieldDriver_int));
-  
+
   //Test (friend ostream & operator <<) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
   ostringstream ostr1, ostr2;
   ostr1<<*aVtkFieldDriver_int;
@@ -290,12 +283,13 @@ void MEDMEMTest::testVtkFieldDriver()
   CPPUNIT_ASSERT(ostr1.str() != "");
   CPPUNIT_ASSERT(ostr1.str() == ostr2.str());
 #endif
+
   //Delete all objects
   delete aField;
   delete aField_1;
-#ifdef ENABLE_FORCED_FAILURES  
+#ifdef ENABLE_FORCED_FAILURES
+  // (BUG) Exception in the destructor after trying close not existing file.
   delete aInvalidVtkFieldDriver_1;
-  // (Bug) Exception in the destructor after trying close not existing file.
 #endif
   delete aInvalidVtkFieldDriver_2;
   delete aMedRdFieldDriver21_int;
