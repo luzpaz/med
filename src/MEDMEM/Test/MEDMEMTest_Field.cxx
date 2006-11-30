@@ -26,6 +26,9 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Support.hxx"
+#include <MEDMEM_VtkMeshDriver.hxx>
+#include <MEDMEM_MedMeshDriver22.hxx>
+
 
 #include <sstream>
 #include <cmath>
@@ -117,7 +120,7 @@ using namespace MEDMEM;
  *   (+)     FIELD();
  *   (+)     FIELD(const FIELD &m);
  *   (+)     FIELD(const SUPPORT * Support, const int NumberOfComponents) throw (MEDEXCEPTION);
- *   (yetno) FIELD(driverTypes driverType,
+ *   (+) FIELD(driverTypes driverType,
  *                 const string & fileName, const string & fieldDriverName,
  *                 const int iterationNumber=-1, const int orderNumber=-1) throw (MEDEXCEPTION);
  *   (yetno) FIELD(const SUPPORT * Support, driverTypes driverType,
@@ -163,22 +166,22 @@ using namespace MEDMEM;
  *
  *   (EMPTY COMMENT, EMPTY IMPLEMENTATION!!!) void init ();
  *
- *   (yetno) void rmDriver(int index=0);
- *   (yetno) int  addDriver(driverTypes driverType,
+ *   (+) void rmDriver(int index=0);
+ *   (+) int  addDriver(driverTypes driverType,
  *                          const string & fileName="Default File Name.med",
  *                          const string & driverFieldName="Default Field Name",
  *                          MED_EN::med_mode_acces access=MED_EN::MED_REMP);
- *   (yetno) int  addDriver(GENDRIVER & driver);
+ *   (+) int  addDriver(GENDRIVER & driver);
  *
  *   (+)     void allocValue(const int NumberOfComponents);
  *   (+)     void allocValue(const int NumberOfComponents, const int LengthValue);
  *   (+)     void deallocValue();
  *
- *   (yetno) inline void read(int index=0);
- *   (yetno) inline void read(const GENDRIVER & genDriver);
- *   (yetno) inline void write(int index=0, const string & driverName = "");
- *   (yetno) inline void write(const GENDRIVER &);
- *   (yetno) inline void writeAppend(int index=0, const string & driverName = "");
+ *   (+) inline void read(int index=0);
+ *   (+) inline void read(const GENDRIVER & genDriver);
+ *   (+) inline void write(int index=0, const string & driverName = "");
+ *   (+) inline void write(const GENDRIVER &);
+ *   (+) inline void writeAppend(int index=0, const string & driverName = "");
  *   (yetno) inline void writeAppend(const GENDRIVER &);
  *
  *   (+)     inline MEDMEM_Array_  * getArray()        const throw (MEDEXCEPTION);
@@ -556,10 +559,219 @@ void proj2d (const double * temp, double* output)
   output[1] = temp[2] - dx;
 }
 
+void testDrivers()
+{
+  string data_dir                     = getenv("DATA_DIR");
+  string tmp_dir                      = getenv("TMP");
+  if (tmp_dir == "")
+    tmp_dir = "/tmp";
+  string filename_rd                  = data_dir + "/MedFiles/pointe.med";
+  string filename_wr                  = tmp_dir  + "/myMedFieldfile.med";
+  string filename22_rd                = data_dir + "/MedFiles/pointe_import22.med";
+  string filenamevtk_wr                = tmp_dir  + "/myMedFieldfile22.vtk";
+  string cp_file                      = "cp " + filename_rd + " " + filename_wr;
+  string fieldname_celldouble_rd      = "fieldcelldouble";
+  string fieldname_celldouble_wr      = fieldname_celldouble_rd + "_cpy";
+  string fieldname_nodeint_rd         = "fieldnodeint";
+  string fieldname_nodeint_wr         = fieldname_nodeint_rd + "_cpy";
+  string fieldname_nodeint_wr1        = fieldname_nodeint_rd + "_cpy1";
+  
+  // To remove tmp files from disk
+  MEDMEMTest_TmpFilesRemover aRemover;
+  aRemover.Register(filename_wr);
+  aRemover.Register(filenamevtk_wr);
+
+  //Copy file 
+  system(cp_file.c_str());
+  
+  FIELD<int> aInvalidField; 
+  //must throw becase only VTK_DRIVER or MED_DRIVER may specified as driverType for FIELD
+  CPPUNIT_ASSERT_THROW( aInvalidField = FIELD<int>(NO_DRIVER, filename_rd, fieldname_nodeint_rd), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW( aInvalidField = FIELD<int>(GIBI_DRIVER, filename_rd, fieldname_nodeint_rd), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW( aInvalidField = FIELD<int>(PORFLOW_DRIVER, filename_rd, fieldname_nodeint_rd), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW( aInvalidField = FIELD<int>(ASCII_DRIVER, filename_rd, fieldname_nodeint_rd), MEDEXCEPTION);
+  
+  //////////////////
+  //TestRead Part//
+  //////////////////
+  FIELD<double> *aField_1 = NULL;
+  CPPUNIT_ASSERT_NO_THROW(aField_1 = new FIELD<double>(MED_DRIVER, filename_rd, fieldname_celldouble_rd));
+  int IdDriver_rd = aField_1->addDriver(MED_DRIVER,filename_rd,fieldname_celldouble_rd);
+#ifdef ENABLE_FORCED_FAILURES
+  //Test read(int index) method
+  try
+  {
+  aField_1->read(IdDriver_rd);
+  // (BUG) Can not open file, but file exist
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    e.what();
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+#endif
+  //Test read(GENDRIVER & genDriver) method
+  //Creation a Driver
+  MED_FIELD_RDONLY_DRIVER21<int> *aMedRdFieldDriver21_1 =
+    new MED_FIELD_RDONLY_DRIVER21<int>();
+  //Creation a Field
+  FIELD<int> *aField_2 = new FIELD<int>();
+  aField_2->setName(fieldname_nodeint_rd);  
+  aField_2->addDriver(*aMedRdFieldDriver21_1);
+  aField_2->read(*aMedRdFieldDriver21_1);
+  
+  ///////////////////
+  //Test Write Part//
+  ///////////////////
+  //Create fileds
+  FIELD<double> * aField_3 = new FIELD<double>();
+  MED_FIELD_RDONLY_DRIVER21<double> *aMedRdFieldDriver21_2 =
+    new MED_FIELD_RDONLY_DRIVER21<double>(filename_rd, aField_3);
+  aMedRdFieldDriver21_2->open();
+  aMedRdFieldDriver21_2->setFieldName(fieldname_celldouble_rd);
+  aMedRdFieldDriver21_2->read();
+  aMedRdFieldDriver21_2->close();
+ 
+  //Test write(int index) method
+  //Add drivers to FIELDs
+  int IdDriver1 = -1;
+  try
+  {
+    IdDriver1 = aField_3->addDriver(MED_DRIVER,filename_wr,fieldname_celldouble_wr);
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    e.what();
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+  //Trying call write(int index) method with incorrect index
+#ifdef ENABLE_FAULTS  
+  CPPUNIT_ASSERT_THROW(aField_3->write(IdDriver1+1, fieldname_celldouble_wr),MEDEXCEPTION);
+  // => Segmentation fault
+#endif
+
+  //Write field to file
+#ifdef ENABLE_FAULTS
+  try
+  {
+    aField_3->write(IdDriver1, fieldname_celldouble_wr);
+    // => Segmentation fault
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    e.what();
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+#endif
+  
+  CPPUNIT_ASSERT_NO_THROW(aField_3->rmDriver(IdDriver1));
+
+  //Test write(const GENDRIVER &);
+  //Create a driver
+  MED_FIELD_WRONLY_DRIVER21<int> *aMedWrFieldDriver21 =
+    new MED_FIELD_WRONLY_DRIVER21<int>();
+  aMedWrFieldDriver21->setFileName(filename_wr);
+  aField_2->setName(fieldname_nodeint_wr1);
+  //Add driver to a field
+  aField_2->addDriver(*aMedWrFieldDriver21);
+
+  try
+  {
+  aField_2->write(*aMedWrFieldDriver21);
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    e.what();
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  //Test writeAppend(int index) method
+  //Create a vtk file
+  MESH * aMesh = new MESH();
+  MED_MESH_RDONLY_DRIVER22 *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER22(filename22_rd, aMesh);
+  aMedMeshRdDriver22->open();
+  aMedMeshRdDriver22->setMeshName("maa1");
+  aMedMeshRdDriver22->read();
+  aMedMeshRdDriver22->close();
+  VTK_MESH_DRIVER *aVtkDriver = new VTK_MESH_DRIVER(filenamevtk_wr, aMesh);
+  aVtkDriver->open();
+  aVtkDriver->write();
+  aVtkDriver->close();
+
+  //Create a field
+  FIELD<int> * aField_4 = new FIELD<int>();
+  MED_FIELD_RDONLY_DRIVER22<int> *aMedRdFieldDriver22 =
+    new MED_FIELD_RDONLY_DRIVER22<int>(filename22_rd, aField_2);
+  aMedRdFieldDriver22->open();
+  aMedRdFieldDriver22->setFieldName(fieldname_nodeint_rd);
+  aMedRdFieldDriver22->read();
+  aMedRdFieldDriver22->close();
+
+  //Add Driver to a field
+  int IdDriver2;
+  try
+  {
+    IdDriver2 = aField_4->addDriver(VTK_DRIVER, filenamevtk_wr ,fieldname_nodeint_wr);
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    e.what();
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+#ifdef ENABLE_FAULTS
+  //Trying call writeAppend() method with incorrect index 
+  CPPUNIT_ASSERT_THROW(aField_4->writeAppend(IdDriver2+1,fieldname_nodeint_wr),MEDEXCEPTION);
+  // => Segmentation fault
+#endif
+  
+#ifdef ENABLE_FAULTS  
+  try
+  {
+    aField_4->writeAppend(IdDriver2, fieldname_nodeint_wr);
+    // => Segmentation fault
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    e.what();
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+#endif
+
+  //Delete objects
+  delete aField_1;
+  delete aMedRdFieldDriver21_1;
+  delete aField_2;
+  delete aField_3;
+  delete aMedRdFieldDriver21_2;
+  delete aField_4;
+  delete aMedMeshRdDriver22;
+  delete aMedWrFieldDriver21;
+  delete aVtkDriver;
+  delete aMesh;
+  delete aMedRdFieldDriver22;
+}
+
 void MEDMEMTest::testField()
 {
   SUPPORT anEmptySupport;
-
   ////////////////////
   // TEST 1: FIELD_ //
   ////////////////////
@@ -1325,6 +1537,8 @@ void MEDMEMTest::testField()
   aFieldOnGroup1->allocValue(2, nbVals);
   // be carefull: aFieldOnGroup1 reallocated and contains random values
 
+  testDrivers();
+
   delete aSubSupport1;
   delete [] anElems1;
 
@@ -1339,7 +1553,7 @@ void MEDMEMTest::testField()
   delete aMesh;
   delete aMeshOneMore;
 
-  CPPUNIT_FAIL("Case Not Complete. TO DO: test reading/writing from/to a file.");
+  CPPUNIT_FAIL("Case Not Complete. ");
 }
 
 // #15: MEDMEM_FieldConvert.hxx  }  MEDMEMTest_Field.cxx
