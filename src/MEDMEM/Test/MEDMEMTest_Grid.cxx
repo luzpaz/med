@@ -26,30 +26,39 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Med.hxx"
 #include "MEDMEM_MedMedDriver.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
 
 #include <sstream>
 #include <cmath>
+
+using namespace std;
+using namespace MEDMEM;
+using namespace MED_EN;
+
 
 /*!
  *  Check methods (44), defined in MEDMEM_Grid.hxx:
  *  class GRID: public MESH {
  *   (+) GRID();
- *   (yetno) GRID(const MED_EN::med_grid_type type);
- *   (yetno) GRID(const GRID &m);
- *   (yetno) GRID(driverTypes driverType, const string & fileName="",const string & meshName="");
- *   (yetno) GRID(const std::vector<std::vector<double> >& xyz_array,
+ *   (+) GRID(const MED_EN::med_grid_type type);
+ *   (BUG:operator=() not implemented but init() not called) GRID(const GRID &m);
+ *   (+) GRID(driverTypes driverType, const string & fileName="",const string & meshName="");
+ *   (+) GRID(const std::vector<std::vector<double> >& xyz_array,
  *                const std::vector<std::string>& coord_name,
  *                const std::vector<std::string>& coord_unit,
  *                const MED_EN::med_grid_type type=MED_EN::MED_CARTESIAN);
- *   (yetno) GRID & operator=(const GRID &m);
- *   (yetno) virtual ~GRID();
- *   (yetno) virtual void init();
- *   (yetno) void fillCoordinates() const;
- *   (yetno) void fillConnectivity() const;
- *   (yetno) inline void makeUnstructured();
- *   (yetno) void fillMeshAfterRead();
- *   (yetno) void writeUnstructured(int index=0, const string & driverName = "");
- *   (yetno) void read(int index=0);
+ *   (NOT IPLEMENTED) GRID & operator=(const GRID &m);
+ *   (+) virtual ~GRID();
+ *   (+) virtual void init();
+ *   (tested together with getCoordinateptr() as it is called 
+ *    internally from there first of all. 
+ *    Moreover, fillCoordinates should be made private to avoid 
+ *    ambiguity druing in GRID class usage.) void fillCoordinates() const;
+ *   (tested together with getConnectivityptr()) void fillConnectivity() const;
+ *   (+) inline void makeUnstructured();//fill coordinates and connectivity of MESH 
+ *   (+) void fillMeshAfterRead();
+ *   (+) void writeUnstructured(int index=0, const string & driverName = "");
+ *   (+) void read(int index=0);
  *   (+) inline int getNodeNumber(const int i, const int j=0, const int k=0) const;
  *   (+) inline int getCellNumber(const int i, const int j=0, const int k=0) const;
  *   (+) int getEdgeNumber
@@ -64,30 +73,30 @@
  *           (const int Number, int& Axis, int& i, int& j, int& k) const throw (MEDEXCEPTION);
  *   (+) inline MED_EN::med_grid_type getGridType() const;
  *   (+) int getArrayLength(const int Axis) const throw (MEDEXCEPTION);
- *   (yetno) const double getArrayValue (const int Axis, const int i) const throw (MEDEXCEPTION);
- *   (yetno) inline const COORDINATE * getCoordinateptr() const;
+ *   (+) const double getArrayValue (const int Axis, const int i) const throw (MEDEXCEPTION);
+ *   (+) inline const COORDINATE * getCoordinateptr() const;
  *   (+) inline const double * getCoordinates(MED_EN::medModeSwitch Mode) const;
  *   (+) inline const double getCoordinate(int Number,int Axis) const;
  *   (+) inline int getNumberOfTypes(MED_EN::medEntityMesh Entity) const;
- *   (yetno) inline int getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
+ *   (+) inline int getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
  *   (+) inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
- *   (yetno) MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
- *   (yetno) inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
+ *   (+) MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
+ *   (+) inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
  *   (+) const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
  *   (+) inline int getNumberOfElements
  *                (MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const;
- *   (yetno) inline int getNumberOfElementsWithPoly
+ *   (+) inline int getNumberOfElementsWithPoly
  *                (MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const;
  *   (+) inline bool existConnectivity
  *                (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity) const;
  *   (+) inline MED_EN::medGeometryElement getElementType
  *                (MED_EN::medEntityMesh Entity, int Number) const;
- *   (yetno) inline MED_EN::medGeometryElement getElementTypeWithPoly
+ *   (+) inline MED_EN::medGeometryElement getElementTypeWithPoly
  *                (MED_EN::medEntityMesh Entity, int Number) const;
  *   (+) inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
  *                                             MED_EN::medConnectivity ConnectivityType,
  *                                               MED_EN::medEntityMesh Entity) const;
- *   (yetno) inline const CONNECTIVITY* getConnectivityptr() const;
+ *   (+) inline const CONNECTIVITY* getConnectivityptr() const;
  *   (+) inline const int * getConnectivity
  *             (MED_EN::medModeSwitch Mode, MED_EN::medConnectivity ConnectivityType,
  *                MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const;
@@ -97,7 +106,7 @@
  *                                            MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
  *   (+) inline const int * getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
  *                                                 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
- *   (yetno) inline void setGridType(MED_EN::med_grid_type gridType);
+  *   (+) inline void setGridType(MED_EN::med_grid_type gridType);
  *  }
  */
 void MEDMEMTest::testGrid()
@@ -164,25 +173,6 @@ void MEDMEMTest::testGrid()
         {
 	  CPPUNIT_FAIL("Unknown exception");
 	}
-      }
-    }
-    catch (const std::exception &e)
-    {
-      CPPUNIT_FAIL(e.what());
-    }
-    catch (...)
-    {
-      CPPUNIT_FAIL("Unknown exception");
-    }
-  }
-
-  for (int axe = 0; axe < SpaceDimension; axe++) {
-    try
-    {
-      for (int num = 0; num < myGrid->getArrayLength(axe+1); num++) {
-	const double arrayValue = myGrid->getArrayValue(axe + 1, num);
-	//cout<<"arrayValue = "<<arrayValue<<"coordinates[(num+axe) * SpaceDimension] = "<<coordinates[(num+axe) * SpaceDimension]<<endl;
-	//CPPUNIT_ASSERT(fabs(coordinates[(num+axe) * SpaceDimension)] - arrayValue) < 0.001);//!!!!!!!
       }
     }
     catch (const std::exception &e)
@@ -342,9 +332,11 @@ void MEDMEMTest::testGrid()
       CPPUNIT_ASSERT_THROW(myGrid->getElementType(MED_CELL, myGlobalNbIdx[i]), MEDEXCEPTION);
       break;
     }
-    medGeometryElement aElem;
+    medGeometryElement aElem, geomPolyElem;
     CPPUNIT_ASSERT_NO_THROW(aElem = myGrid->getElementType(MED_CELL, myGlobalNbIdx[i]));
+    CPPUNIT_ASSERT_NO_THROW(geomPolyElem = myGrid->getElementTypeWithPoly(MED_CELL, myGlobalNbIdx[i]));
     CPPUNIT_ASSERT(types[0] == aElem);
+    CPPUNIT_ASSERT(geomPolyElem == aElem);
   }
 
   CPPUNIT_ASSERT_NO_THROW(existConnect = myGrid->existConnectivity(MED_DESCENDING, MED_CELL));
@@ -374,6 +366,28 @@ void MEDMEMTest::testGrid()
     for (int j = ReverseConnectivityIndexDes[i]; j < ReverseConnectivityIndexDes[i+1]; j++)
       cout << ReverseDesConnectivity[j-1] << " ";
     cout << endl;
+  }
+
+  //TEST POLY
+  {
+    int nbPolytypes;
+    //test getNumberOfTypesWithPoly() - a grid has one type
+    CPPUNIT_ASSERT_NO_THROW(nbPolytypes = myGrid->getNumberOfTypesWithPoly(MED_CELL));
+    CPPUNIT_ASSERT(nbPolytypes == 1 );
+
+    const MED_EN::medGeometryElement * PolyTypes, *Types;
+    CPPUNIT_ASSERT_NO_THROW(PolyTypes = myGrid->getTypesWithPoly(MED_CELL));
+    CPPUNIT_ASSERT_NO_THROW(Types = myGrid->getTypes(MED_CELL));
+    CPPUNIT_ASSERT_EQUAL(PolyTypes[nbPolytypes-1],Types[nbPolytypes-1]);
+
+    for(int t = 0; t < nbPolytypes; t++)
+    {
+      int nbElPoly, nbEl;
+      CPPUNIT_ASSERT_NO_THROW(nbElPoly = myGrid->getNumberOfElementsWithPoly(MED_CELL, PolyTypes[t]));
+      CPPUNIT_ASSERT_NO_THROW(nbEl = myGrid->getNumberOfElements(MED_CELL, PolyTypes[t]));
+      CPPUNIT_ASSERT(nbElPoly == nbEl);
+    }
+
   }
 
   //////////////////////////////
@@ -447,10 +461,303 @@ void MEDMEMTest::testGrid()
   CPPUNIT_ASSERT(myMesh2 != NULL);
   CPPUNIT_ASSERT(!(myMesh2->getIsAGrid()));
 
-  delete myMed;
-
   ////////////////////////////
   // test4 create new GRID  //
   ////////////////////////////
 
+  // Default constructor and destructor,
+   GRID* myGrid2 = new GRID();
+  CPPUNIT_ASSERT(myGrid2->getIsAGrid());
+  CPPUNIT_ASSERT(myGrid2->getGridType() == MED_CARTESIAN);
+  CPPUNIT_ASSERT(!myGrid2->getArrayLength(1));
+  CPPUNIT_ASSERT(!myGrid2->getArrayLength(2));
+  CPPUNIT_ASSERT(!myGrid2->getArrayLength(3));
+  delete myGrid2;
+
+  // Constructor with grid type, setGridType()
+  myGrid2 = new GRID(MED_POLAR); 
+  CPPUNIT_ASSERT(myGrid2->getGridType() == MED_POLAR);
+  myGrid2->setGridType(MED_CARTESIAN);
+  CPPUNIT_ASSERT(myGrid2->getGridType() == MED_CARTESIAN);
+  delete myGrid2;
+
+  // Constructor with coordinate values, getArrayValue(), init()
+  {
+    vector<vector<double> > xyz;
+    const int nbCoords = 3;
+    xyz.resize(nbCoords);
+    for ( int i = 0; i < nbCoords; i++ )
+    {
+      xyz[i].resize(i + 2);
+      for ( int j = 0; j < i + 2; j++ )
+	xyz[i][j] = j;
+    }
+    vector<string> Coord_Names;
+    Coord_Names.resize(nbCoords);
+    Coord_Names[0] = "X";
+    Coord_Names[1] = "Y";
+    Coord_Names[2] = "Z";
+
+    vector<string> Coord_Units;
+    Coord_Units.resize(nbCoords);
+    for(int i = 0; i < 3; i++)
+      Coord_Units[i] = "cm";
+
+    try{
+      myGrid2 = new GRID(xyz, Coord_Names, Coord_Units, MED_CARTESIAN);
+    }
+    catch (const std::exception &e)
+    {
+      CPPUNIT_FAIL(e.what());
+    }
+    catch (...)
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
+
+    // testing getCoordinateptr() and fillCoordinates()
+    // We fill a map of all possible coordinate triples.
+    // After iteration through all coordinates, this map should contain only "true" as data.
+    // "true" in some map element during iteration means duplicated node position.
+    // "false" in some map element after iteration means empty node position.
+    map<int, bool> found;
+    for ( int i1 = 0; i1 < xyz[0].size(); i1++ )
+      for ( int i2 = 0; i2 < xyz[1].size(); i2++ )
+	for ( int i3 = 0; i3 < xyz[2].size(); i3++ )
+	  found[int(xyz[0][i1] * 100 + xyz[1][i2] * 10 + xyz[2][i3])] = false;
+
+    COORDINATE* coords = (COORDINATE*)myGrid2->getCoordinateptr();
+    CPPUNIT_ASSERT(coords);
+    for (int num = 0; num < myGrid2->getNumberOfNodes(); num++) {
+      int x = int(coords->getCoordinate(num + 1, 1));
+      int y = int(coords->getCoordinate(num + 1, 2));
+      int z = int(coords->getCoordinate(num + 1, 3));
+      CPPUNIT_ASSERT(!found[x * 100 + y * 10 + z]);
+      found[x * 100 + y * 10 + z] = true;
+    }
+
+    for ( map<int, bool>::iterator it = found.begin(); it != found.end(); it++ )
+      CPPUNIT_ASSERT((*it).second);
+
+    // Testing fillConnectivity() and getConnectivityptr()
+    // Basic testing: presence of connectivity arrays, element types and number of elements
+    CONNECTIVITY* conn = (CONNECTIVITY*)myGrid2->getConnectivityptr();
+    CPPUNIT_ASSERT(conn);
+    bool hasFaces = myGrid2->getArrayLength(3), hasEdges = myGrid2->getArrayLength(2);
+    medGeometryElement aCellGeometry;
+    if (hasFaces)      aCellGeometry = MED_HEXA8;
+    else if (hasEdges) aCellGeometry = MED_QUAD4;
+    else               aCellGeometry = MED_SEG2;
+    CPPUNIT_ASSERT(conn->getElementType(MED_CELL, 1) == aCellGeometry);
+    CPPUNIT_ASSERT(conn->existConnectivity(MED_NODAL,      MED_CELL));
+    CPPUNIT_ASSERT(conn->existConnectivity(MED_DESCENDING, MED_CELL));
+    //test getCellsTypes
+    CELLMODEL* cellmodel = (CELLMODEL*)myGrid2->getCellsTypes(MED_CELL);
+    CPPUNIT_ASSERT(cellmodel);
+
+    int nbCells, nbFaces, nbEdges;
+
+    int iLen     = myGrid2->getArrayLength(1),   jLen     = myGrid2->getArrayLength(2),   kLen     = myGrid2->getArrayLength(3);
+    int iLenMin1 = myGrid2->getArrayLength(1)-1, jLenMin1 = myGrid2->getArrayLength(2)-1, kLenMin1 = myGrid2->getArrayLength(3)-1;
+    const int* aCellCount = conn->getGlobalNumberingIndex(MED_CELL);
+    nbCells = iLenMin1 * jLenMin1 * kLenMin1;
+    CPPUNIT_ASSERT(aCellCount[1] - 1 == nbCells);
+
+    if (hasFaces){
+      CPPUNIT_ASSERT(conn->getElementType(MED_FACE, 1) == MED_QUAD4);
+      nbFaces  = iLen * jLenMin1 * kLenMin1;
+      nbFaces += jLen * kLenMin1 * iLenMin1;
+      nbFaces += kLen * iLenMin1 * jLenMin1;
+      const int* aFaceCount = conn->getGlobalNumberingIndex(MED_FACE);
+      CPPUNIT_ASSERT(aFaceCount[1] - 1 == nbFaces);
+      CPPUNIT_ASSERT(conn->existConnectivity(MED_NODAL, MED_FACE));
+      //test getCellsTypes
+      CELLMODEL* cellmodelF = (CELLMODEL*)myGrid2->getCellsTypes(MED_FACE);
+      CPPUNIT_ASSERT(cellmodelF);
+    }
+    if (hasEdges){
+      CPPUNIT_ASSERT(conn->getElementType(MED_EDGE, 1) == MED_SEG2);
+      if (kLen) { // 3d grid
+        nbEdges  = iLenMin1 * jLen * kLen;
+        nbEdges += jLenMin1 * kLen * iLen;
+        nbEdges += kLenMin1 * iLen * jLen;
+      }
+      else if (jLen) { // 2d
+        nbEdges  = iLenMin1 * jLen;
+        nbEdges += jLenMin1 * iLen;
+      }
+      const int* anEdgeCount = conn->getGlobalNumberingIndex(MED_EDGE);
+      CPPUNIT_ASSERT(anEdgeCount[1] - 1 == nbEdges);
+      CPPUNIT_ASSERT(conn->existConnectivity(MED_NODAL, MED_EDGE));
+      //test getCellsTypes
+      CELLMODEL* cellmodelE = (CELLMODEL*)myGrid2->getCellsTypes(MED_EDGE);
+      CPPUNIT_ASSERT(cellmodelE);
+
+    }
+
+    // Testing getArrayValue()
+    for ( int ii = 1; ii <= nbCoords; ii++ )
+      for ( int jj = 0; jj < ii + 1; jj++ )
+	CPPUNIT_ASSERT(myGrid2->getArrayValue(ii, jj) == xyz[ii - 1][jj]);
+
+    CPPUNIT_ASSERT_THROW(myGrid2->getArrayValue(nbCoords + 1, 0), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(myGrid2->getArrayValue(1, myGrid2->getArrayLength(1) + 1), MEDEXCEPTION);
+    myGrid2->setGridType(MED_POLAR);
+
+    //testing read/write functions
+    string tmp_dir       = getenv("TMP");
+    if(tmp_dir == "") 
+      tmp_dir = "/tmp";
+    string filenameout21   = tmp_dir  + "/myGridWrite_grid21.med";
+    
+    // add new driver
+    int idGridV21;
+    
+    try
+    {
+      idGridV21 = myGrid2->addDriver(MED_DRIVER,filenameout21);
+    }
+    catch(MEDEXCEPTION &e)
+    {
+      CPPUNIT_FAIL(e.what());
+    }
+    catch( ... )
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
+
+    // write this driver to file as an unstructured mesh
+    CPPUNIT_ASSERT_NO_THROW(myGrid2->writeUnstructured(idGridV21));
+
+    GRID* myGrid3 = new GRID();
+    // add new driver for myGrid3
+    int driver;
+    
+    try
+    {
+      driver = myGrid3->addDriver(MED_DRIVER,filenameout21);
+    }
+    catch(MEDEXCEPTION &e)
+    {
+      CPPUNIT_FAIL(e.what());
+    }
+    catch( ... )
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
+
+    //ERROR???
+    CPPUNIT_FAIL("ERROR:can not read myGridWrite_grid21.med");
+    /*try
+    {
+      myGrid3->read(driver);
+    }
+    catch(MEDEXCEPTION &e)
+    {
+      CPPUNIT_FAIL(e.what());
+    }
+    catch( ... )
+    {
+      CPPUNIT_FAIL("Unknown exception");
+      }*/
+
+    // Testing getArrayValue()
+    /*for ( int ii = 1; ii <= nbCoords; ii++ )
+      for ( int jj = 0; jj < ii + 1; jj++ )
+	CPPUNIT_ASSERT(myGrid3->getArrayValue(ii, jj) == xyz[ii - 1][jj]);
+
+	CPPUNIT_ASSERT(myGrid3->getGridType() == MED_POLAR);*/
+
+    delete myGrid3;
+
+    //test init()
+    try{
+      myGrid2->init();
+    }
+    catch (const std::exception &e)
+    {
+      CPPUNIT_FAIL(e.what());
+    }
+    catch (...)
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
+    CPPUNIT_ASSERT(myGrid2->getGridType() == MED_CARTESIAN);
+    CPPUNIT_ASSERT(myGrid2->getArrayLength(1) == 0);
+    CPPUNIT_ASSERT(myGrid2->getArrayLength(2) == 0);
+    CPPUNIT_ASSERT(myGrid2->getArrayLength(3) == 0);
+    CPPUNIT_FAIL("ERROR:makeUnstructured() - there is no check if grid is empty or not");
+    //myGrid2->makeUnstructured();
+
+    delete myGrid2;
+  }
+
+  CPPUNIT_FAIL("ERROR: - Nothing grid-specific is read - only unstructured mesh data, init() not called");
+  //CPPUNIT_ASSERT_NO_THROW(myGrid2 = new GRID(MED_DRIVER, filename, mesh_names[1]));
+
+  // Check if something has been read - full mesh data testing is above
+    /*  CPPUNIT_ASSERT(myGrid2->getSpaceDimension());
+  CPPUNIT_ASSERT(myGrid2->getNumberOfNodes());
+  CPPUNIT_ASSERT(myGrid2->getNumberOfTypes(MED_CELL) == 1);
+  const medGeometryElement* types2;
+  CPPUNIT_ASSERT_NO_THROW( types2 = myGrid2->getTypes(MED_CELL) );
+  try{
+    int nbElem = myGrid2->getNumberOfElements(MED_CELL,types2[0]);
+    CPPUNIT_ASSERT(nbElem);
+  }
+  catch (const std::exception &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch (...)
+  {
+    CPPUNIT_FAIL("Unknown exception");
+    }*/
+  {
+    GRID* myGrid4 = new GRID();
+    filename = datadir + "/MedFiles/pointe.med";  
+    myGrid4->setName("maa1");
+    MED_MESH_RDONLY_DRIVER myMeshDriver(filename, myGrid4);
+    myMeshDriver.setMeshName("maa1");
+
+    // add new driver for myGrid4
+    int driver;
+    try
+    {
+      driver = myGrid4->addDriver(myMeshDriver);
+    }
+    catch(MEDEXCEPTION &e)
+    {
+      CPPUNIT_FAIL(e.what());
+    }
+    catch( ... )
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
+
+    CPPUNIT_FAIL("ERROR:can not read() grid");
+    CPPUNIT_FAIL("ERROR:myGrid4->fillMeshAfterRead()- this method is incomplete: currently it only resets _is_coordinates_filled and _is_connectivity_filled flags that leads to grid reconstruction");
+    /*try
+    {
+      myGrid4->read(driver);
+    }
+    catch(MEDEXCEPTION &e)
+    {
+      CPPUNIT_FAIL(e.what());
+    }
+    catch( ... )
+    { 
+      CPPUNIT_FAIL("Unknown exception");
+    }
+    CPPUNIT_ASSERT(myGrid4->getArrayLength(1) == 0);
+    CPPUNIT_ASSERT(myGrid4->getArrayLength(2) == 0);
+    CPPUNIT_ASSERT(myGrid4->getArrayLength(3) == 0);
+    myGrid4->fillMeshAfterRead();
+    CPPUNIT_ASSERT(myGrid4->getArrayLength(1) != 0);
+    CPPUNIT_ASSERT(myGrid4->getArrayLength(2) != 0);
+    CPPUNIT_ASSERT(myGrid4->getArrayLength(3) != 0);*/
+
+    delete myGrid4;
+  }
+  delete myMed;
 }
