@@ -28,6 +28,12 @@
 #include <sstream>
 #include <cmath>
 
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
+
 using namespace std;
 using namespace MEDMEM;
 
@@ -89,9 +95,6 @@ void MEDMEMTest::testCoordinate()
   int * numbers = new int[5];
   for (int i = 0; i < 5; i++) numbers[i] = 10 + i;
 
-  MED_EN::medModeSwitch ModeFull = MED_EN::MED_FULL_INTERLACE;
-  //MED_EN::medModeSwitch ModeNo = MED_EN::MED_NO_INTERLACE;
-
   double coor[15] = {0,0,0,0,0,1,0,1,0,1,0,0,0.5,0.5,0.5};
   CPPUNIT_ASSERT(SpaceDim * NbOfNodes == 15);
 
@@ -99,7 +102,8 @@ void MEDMEMTest::testCoordinate()
   for (int k = 0; k < SpaceDim*NbOfNodes; k++)
     coor1[k] = coor[k];
 
-  MEDARRAY<double>* CoordinateArray = new MEDARRAY<double>(coor1, SpaceDim, NbOfNodes, ModeFull);
+  MEDARRAY<double>* CoordinateArray =
+    new MEDARRAY<double>(coor1, SpaceDim, NbOfNodes, MED_EN::MED_FULL_INTERLACE);
   COORDINATE mycoo;
   try
   {
@@ -259,7 +263,7 @@ void MEDMEMTest::testCoordinate()
 
   try
   {
-    const double * coor2 = mycoo.getCoordinates(ModeFull);
+    const double * coor2 = mycoo.getCoordinates(MED_EN::MED_FULL_INTERLACE);
 
     for (int axe = 0; axe < SpaceDim; axe++) {
       try
@@ -395,17 +399,24 @@ void MEDMEMTest::testCoordinate()
   // 2. void setCoordinates(const MED_EN::medModeSwitch Mode, const double *Coordinate);
   // in this case we can override Mode
 
-  // Incoherence between setCoordinateName() and getCoordinateName()
-  //anEmptyC.setCoordinateName("alpha", 1);
-  //anEmptyC.setCoordinateName("betta", 2);
+#ifdef ENABLE_FAULTS
+  // (BUG) Incoherence between setCoordinateName() and getCoordinateName()
+  anEmptyC.setCoordinateName("alpha", 1);
+  anEmptyC.setCoordinateName("betta", 2);
+  // (BUG) Incoherence between setCoordinateUnit() and getCoordinateUnit()
+  anEmptyC.setCoordinateUnit("ttt", 1);
+  anEmptyC.setCoordinateUnit("sss", 2);
+#else
   anEmptyC.setCoordinateName("alpha", 0);
   anEmptyC.setCoordinateName("betta", 1);
 
-  // Incoherence between setCoordinateUnit() and getCoordinateUnit()
-  //anEmptyC.setCoordinateUnit("ttt", 1);
-  //anEmptyC.setCoordinateUnit("sss", 2);
   anEmptyC.setCoordinateUnit("ttt", 0);
   anEmptyC.setCoordinateUnit("sss", 1);
+#endif
+#ifdef ENABLE_FORCED_FAILURES
+  CPPUNIT_FAIL("Incoherence between COORDINATE::setCoordinateName() and COORDINATE::getCoordinateName()");
+  CPPUNIT_FAIL("Incoherence between COORDINATE::setCoordinateUnit() and COORDINATE::getCoordinateUnit()");
+#endif
 
   int len = 10 * 2;
   double * cc = new double[len];
@@ -444,10 +455,15 @@ void MEDMEMTest::testCoordinate()
 
   delete [] cc;
 
-  // Segmentation Fault or Hang up, because array will be owned
-  // by two pointers (in mcc and in anEmptyC) after this call
-  //anEmptyC.setCoordinates(mcc, true);
-
+#ifdef ENABLE_FAULTS
+  // (BUG) Segmentation Fault or Hang up after anEmptyC and mcc destruction,
+  // because array will be owned by two pointers (in mcc and in anEmptyC) after this call
+  anEmptyC.setCoordinates(&mcc, true);
+  // In other case (if we dynamically allocate mcc and do not free it) we will have memory leak.
+#endif
+#ifdef ENABLE_FORCED_FAILURES
+  CPPUNIT_FAIL("Bug in COORDINATE::setCoordinates() in shallow copy mode");
+#endif
 
   ////////////
   // TEST 4 //
@@ -484,7 +500,7 @@ void MEDMEMTest::testCoordinate()
   CPPUNIT_ASSERT_THROW(anEmptyA.getCoordinate(-1, 0), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(anEmptyA.getCoordinate(10, 10), MEDEXCEPTION);
 
-  // No COORDINATE::operator=, but it is compilable
+  // No COORDINATE::operator=, but this is compilable
   // good
   //COORDINATE anEmptyB;
   //COORDINATE anEmptyD (3, cnames, cunits);
@@ -493,79 +509,8 @@ void MEDMEMTest::testCoordinate()
 
   // bad (assert fails)
   //COORDINATE anEmptyB;
+  // Object, created in this line, is destructed right after it.
   //anEmptyB = COORDINATE(3, cnames, cunits);
+  // Now a pointer _coordinateName inside anEmptyB points to a desallocated memory zone
   //CPPUNIT_ASSERT(anEmptyB.getCoordinateName(1) == "al");
-
-  // good
-  //COORDINATE anEmptyB = COORDINATE(3, cnames, cunits);
-  //CPPUNIT_ASSERT(anEmptyB.getCoordinateName(1) == "al");
-
-  /*
-  class AAAJFA {
-  public:
-    AAAJFA ()
-      : myIntField(0),
-        myNames1(NULL),
-        myNames2() {};
-
-    AAAJFA (int theIntValue)
-      : myIntField(theIntValue),
-        myNames1(NULL),
-        myNames2(theIntValue)
-    {
-      myNames1 = new string [myIntField];
-      for (int ii = 0; ii < myIntField; ii++) {
-        myNames1[ii] = "aa";
-        myNames2[ii] = "aa";
-      }
-    };
-
-    ~AAAJFA ()
-    {
-      delete [] myNames1;
-    };
-
-    int getIntValue() { return myIntField; };
-
-    string getName1(int theIndex)
-    {
-      if (0 <= theIndex && theIndex < myIntField)
-        return myNames1[theIndex];
-      return string("bb");
-    };
-
-    string getName2(int theIndex)
-    {
-      if (0 <= theIndex && theIndex < myIntField)
-        return myNames2[theIndex];
-      return string("bb");
-    };
-
-  private:
-    int myIntField;
-    string * myNames1;
-    PointerOf<string> myNames2;
-  };
-
-  AAAJFA bbb;
-  CPPUNIT_ASSERT(bbb.getIntValue() == 0);
-  CPPUNIT_ASSERT(bbb.getName1(0) == "bb");
-  CPPUNIT_ASSERT(bbb.getName2(0) == "bb");
-
-  // 1. Ok with PointerOf<>, but bad with simple array
-  // (Segmentation fault after objects destruction at the end of this function,
-  // because both aaa and bbb tries to desallocate myNames1)
-  //AAAJFA aaa (13);
-  //CPPUNIT_ASSERT(aaa.getIntValue() == 13);
-  //CPPUNIT_ASSERT(aaa.getName1(0) == "aa");
-  //CPPUNIT_ASSERT(aaa.getName2(0) == "aa");
-  bbb = aaa;
-
-  // 2. Bad in both cases. Objects, created in this line, is destructed right after it.
-  bbb = AAAJFA(13);
-  // Now a pointer myNames2 inside bbb points to a desallocated memory zone
-  CPPUNIT_ASSERT(bbb.getIntValue() == 13);
-  CPPUNIT_ASSERT(bbb.getName1(0) == "aa");
-  CPPUNIT_ASSERT(bbb.getName2(0) == "aa");
-  //*/
 }
