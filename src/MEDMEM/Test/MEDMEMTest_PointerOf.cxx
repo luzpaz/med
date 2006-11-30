@@ -19,12 +19,19 @@
 //
 
 #include "MEDMEMTest.hxx"
-#include <cppunit/TestAssert.h>
 #include "MEDMEM_PointerOf.hxx"
 #include "MEDMEM_define.hxx"
 
+#include <cppunit/TestAssert.h>
+
 #include <sstream>
 #include <cmath>
+
+// use this define to enable lines, execution of which leads to Segmentation Fault
+//#define ENABLE_FAULTS
+
+// use this define to enable CPPUNIT asserts and fails, showing bugs
+#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -38,7 +45,7 @@ using namespace MEDMEM;
  *   (+) PointerOf(const T *pointer);
  *   (+) PointerOf(const int &size, const T *pointer);
  *   (+) PointerOf(const PointerOf<T> & pointerOf);
- *   (yetno) PointerOf(const int &size, const PointerOf<T> & pointerOf);
+ *   (NOT COMPILABLE!!!) PointerOf(const int &size, const PointerOf<T> & pointerOf);
  *   (+) operator T*();
  *   (+) operator const T*() const;
  *   (+) void set(const int &size);
@@ -102,7 +109,7 @@ void MEDMEMTest::testPointerOf()
   {
     p[i]=i*10;
   }
-  
+
   P2.set(p);
   PointerOf<int> P3(p);
 
@@ -121,7 +128,16 @@ void MEDMEMTest::testPointerOf()
   CPPUNIT_ASSERT((const int*)P5 != NULL);
 
   const PointerOf<int> P7(10, p);
-  CPPUNIT_FAIL("Can not create: PointerOf(const int &size, const PointerOf<T> & pointerOf)");
+
+  {
+#ifdef ENABLE_COMPILATION_ERRORS
+    PointerOf<int> PP1 (10, p);
+    PointerOf<int> PP2 (10, PP1);
+#endif
+#ifdef ENABLE_FORCED_FAILURES
+    CPPUNIT_FAIL("Can not create: PointerOf(const int &size, const PointerOf<T> & pointerOf)");
+#endif
+  }
 
   CPPUNIT_ASSERT_THROW(P3.set(0, p),MEDEXCEPTION);
 
@@ -133,5 +149,3 @@ void MEDMEMTest::testPointerOf()
 
   //delete [] p; not needed - P already owns p and will delete it when the scope is over
 }
-
-
