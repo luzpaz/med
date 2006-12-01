@@ -114,7 +114,7 @@ using namespace MEDMEM;
  *   (+)     FIELD(driverTypes driverType,
  *                 const string & fileName, const string & fieldDriverName,
  *                 const int iterationNumber=-1, const int orderNumber=-1) throw (MEDEXCEPTION);
- *   (yetno) FIELD(const SUPPORT * Support, driverTypes driverType,
+ *   (+) FIELD(const SUPPORT * Support, driverTypes driverType,
  *                 const string & fileName="", const string & fieldName="",
  *                 const int iterationNumber = -1, const int orderNumber = -1) throw (MEDEXCEPTION);
  *   (+)     ~FIELD();
@@ -173,7 +173,7 @@ using namespace MEDMEM;
  *   (+)     inline void write(int index=0, const string & driverName = "");
  *   (+)     inline void write(const GENDRIVER &);
  *   (+)     inline void writeAppend(int index=0, const string & driverName = "");
- *   (yetno) inline void writeAppend(const GENDRIVER &);
+ *   (+) inline void writeAppend(const GENDRIVER &);
  *
  *   (+)     inline MEDMEM_Array_  * getArray()        const throw (MEDEXCEPTION);
  *   (+)     inline ArrayGauss     * getArrayGauss()   const throw (MEDEXCEPTION);
@@ -559,6 +559,7 @@ void testDrivers()
 
   string filename_rd                  = data_dir + "/MedFiles/pointe.med";
   string filename_wr                  = tmp_dir  + "/myMedFieldfile.med";
+  string filename_support_wr          = tmp_dir  + "/myMedSupportFiledfile.med";
   string filename22_rd                = data_dir + "/MedFiles/pointe_import22.med";
   string filenamevtk_wr                = tmp_dir  + "/myMedFieldfile22.vtk";
   string cp_file                      = "cp " + filename_rd + " " + filename_wr;
@@ -568,11 +569,13 @@ void testDrivers()
   string fieldname_nodeint_rd         = "fieldnodeint";
   string fieldname_nodeint_wr         = fieldname_nodeint_rd + "_cpy";
   string fieldname_nodeint_wr1        = fieldname_nodeint_rd + "_cpy1";
+  string meshname                     = "maa1";
 
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);
   aRemover.Register(filenamevtk_wr);
+  aRemover.Register(filename_support_wr);
 
   //Copy file
   system(cp_file.c_str());
@@ -614,6 +617,23 @@ void testDrivers()
   ///////////////////
   //Test Write Part//
   ///////////////////
+  int IdDriver;
+  MESH *aMesh = new MESH(MED_DRIVER,filename_rd,meshname);
+  SUPPORT *aSupport = new SUPPORT(aMesh, "aSupport",MED_CELL);
+  FIELD<int> *aFieldSupport;
+#ifdef ENABLE_FORCED_FAILURES  
+  CPPUNIT_ASSERT_NO_THROW(aFieldSupport = 
+			  new FIELD<int>(aSupport, MED_DRIVER,filename_support_wr,fieldname_nodeint_rd));
+  //(BUG) Can not open file
+  MED_FIELD_WRONLY_DRIVER21<int> * aFieldWrDriver21 = 
+    new MED_FIELD_WRONLY_DRIVER21<int>(filename_support_wr,aFieldSupport);
+  aFieldWrDriver21->setFieldName(aFieldSupport->getName() + "_copy");
+  CPPUNIT_ASSERT_NO_THROW(IdDriver= aFieldSupport->addDriver(*aFieldWrDriver21));
+  CPPUNIT_ASSERT_NO_THROW(aFieldSupport->write(IdDriver));
+  delete aFieldSupport;
+  delete aFieldWrDriver21;
+#endif    
+
   //Create fileds
   FIELD<double> * aField_3 = new FIELD<double>();
   MED_FIELD_RDONLY_DRIVER21<double> *aMedRdFieldDriver21_2 =
@@ -687,13 +707,13 @@ void testDrivers()
 
   //Test writeAppend(int index) method
   //Create a vtk file
-  MESH * aMesh = new MESH();
-  MED_MESH_RDONLY_DRIVER22 *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER22(filename22_rd, aMesh);
+  MESH * aMesh_1 = new MESH();
+  MED_MESH_RDONLY_DRIVER22 *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER22(filename22_rd, aMesh_1);
   aMedMeshRdDriver22->open();
-  aMedMeshRdDriver22->setMeshName("maa1");
+  aMedMeshRdDriver22->setMeshName(meshname);
   aMedMeshRdDriver22->read();
   aMedMeshRdDriver22->close();
-  VTK_MESH_DRIVER *aVtkDriver = new VTK_MESH_DRIVER(filenamevtk_wr, aMesh);
+  VTK_MESH_DRIVER *aVtkDriver = new VTK_MESH_DRIVER(filenamevtk_wr, aMesh_1);
   aVtkDriver->open();
   aVtkDriver->write();
   aVtkDriver->close();
@@ -731,6 +751,19 @@ void testDrivers()
   // (BUG) => Segmentation fault
   CPPUNIT_ASSERT_NO_THROW(aField_4->writeAppend(IdDriver2, fieldname_nodeint_wr));
 #endif
+  
+  //Test writeAppend(const GENDRIVER &) method
+  aField_4->setName(fieldname_nodeint_wr1);
+ 
+  //Add driver to a field
+#ifdef ENABLE_FAULTS
+  //Create a driver
+  VTK_FIELD_DRIVER<int> *aVtkFieldDriver = new VTK_FIELD_DRIVER<int>(filenamevtk_wr, aField_4);
+  CPPUNIT_ASSERT_NO_THROW(aField_4->addDriver(*aVtkFieldDriver));
+  //(BUG) => Segmentation fault after addDriver(const GENDRIVER &)
+  CPPUNIT_ASSERT_NO_THROW(aField_4->writeAppend(*aVtkFieldDriver));
+#endif
+
 
   //Delete objects
   delete aField_1;
@@ -743,7 +776,9 @@ void testDrivers()
   delete aMedWrFieldDriver21;
   delete aVtkDriver;
   delete aMesh;
+  delete aMesh_1;
   delete aMedRdFieldDriver22;
+  delete aSupport;
 }
 
 void MEDMEMTest::testField()
