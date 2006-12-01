@@ -52,69 +52,91 @@ void MEDMEMTest::tearDown()
 {
 }
 
-// #1: MEDMEM_Array.hxx            \
-// #2: MEDMEM_ArrayConvert.hxx      }  MEDMEMTest_Array.cxx
-// #3: MEDMEM_ArrayInterface.hxx   /
-// #4: MEDMEM_AsciiFieldDriver.hxx  }  MEDMEMTest_AsciiFieldDriver.cxx
+// #1: MEDMEM_Array.hxx                \
+// #2: MEDMEM_ArrayConvert.hxx          }  MEDMEMTest_Array.cxx
+// #3: MEDMEM_ArrayInterface.hxx (-)   /
+// #4: MEDMEM_AsciiFieldDriver.hxx      }  MEDMEMTest_AsciiFieldDriver.cxx
+// #5: MEDMEM_CellModel.hxx             }  MEDMEMTest.cxx (-)
+// #6: MEDMEM_Compatibility21_22.hxx    }  nothing to test
+// #7: MEDMEM_Connectivity.hxx          }  MEDMEMTest_Connectivity.cxx
+// #8: MEDMEM_Coordinate.hxx            }  MEDMEMTest_Coordinate.cxx
+// #9: MEDMEM_DriverFactory.hxx         }  MEDMEMTest_DriverFactory.cxx
+// #10: MEDMEM_DriversDef.hxx           }  MEDMEMTest.cxx (-)
+// #11: MEDMEM_DriverTools.hxx          }  MEDMEMTest.cxx (-)
+// #12: MEDMEM_Exception.hxx            }  MEDMEMTest_Exception.cxx
+// #13: MEDMEM_Family.hxx               }  MEDMEMTest.cxx
+// #14: MEDMEM_Field.hxx                \
+// #15: MEDMEM_FieldConvert.hxx         /  MEDMEMTest_Field.cxx
+// #16: MEDMEM_FieldForward.hxx         }  no methods to test
+// #17: MEDMEM_Formulae.hxx             }  MEDMEMTest_Formulae.cxx
+// #18: MEDMEM_GaussLocalization.hxx    }  MEDMEMTest_GaussLocalization.cxx
+// #19: MEDMEM_GenDriver.hxx  }  abstract class; implemented methods are tested during its successors testing
+// #20: MEDMEM_GibiMeshDriver.hxx       }  MEDMEMTest_GibiMeshDriver.cxx
+// #21: MEDMEM_Grid.cxx                 }  MEDMEMTest_Grid.cxx
+// #22: MEDMEM_Group.cxx                }  MEDMEMTest_Group.cxx
+// #23: MEDMEM_IndexCheckingPolicy.cxx  }  MEDMEMTest.cxx
+// #24: MEDMEM_Init.cxx                 }  MEDMEMTest.cxx
+// #25: MEDMEM_InterlacingPolicy.hxx    }  MEDMEMTest.cxx (-)
+// #26: MEDMEM_InterlacingTraits.hxx    }  MEDMEMTest.cxx (-)
+// #27: MEDMEM_MedFieldDriver21.hxx     }  MEDMEMTest_MedFieldDriver21.cxx
+// #28: MEDMEM_MedFieldDriver22.hxx     }  MEDMEMTest_MedFieldDriver22.cxx
+// #29: MEDMEM_MedFieldDriver.hxx       }  MEDMEMTest.cxx (-)
+// #30: MEDMEM_Med.hxx                  }  MEDMEMTest_Med.cxx
+// #31: MEDMEM_MedMedDriver21.hxx       }  MEDMEMTest_MedMedDriver21.cxx
+// #32: MEDMEM_MedMedDriver22.hxx       }  MEDMEMTest_MedMedDriver22.cxx
+// #33: MEDMEM_MedMedDriver.hxx         }  MEDMEMTest.cxx (-)
+// #34: MEDMEM_MEDMEMchampLire.hxx      }  MEDMEMTest.cxx (-)
+// #35: MEDMEM_MEDMEMgaussEcr.hxx       }  MEDMEMTest.cxx (-)
+// #36: MEDMEM_MEDMEMprofilEcr.hxx      }  MEDMEMTest.cxx (-)
+// #37: MEDMEM_MedMeshDriver21.hxx      }  MEDMEMTest_MedMeshDriver21.cxx
+// #38: MEDMEM_MedMeshDriver22.hxx      }  MEDMEMTest_MedMeshDriver22.cxx
+// #39: MEDMEM_MedMeshDriver.hxx        }  MEDMEMTest.cxx (-)
+// #40: MEDMEM_MedVersion.hxx           }  MEDMEMTest_MedVersion.cxx
+// #41: MEDMEM_Mesh.hxx                 \
+// #42: MEDMEM_Meshing.hxx              /  MEDMEMTest_MeshAndMeshing.cxx
+// #43: MEDMEM_ModulusArray.hxx         }  MEDMEMTest_ModulusArray.cxx
+// #44: MEDMEM_nArray.hxx               }  MEDMEMTest_nArray.cxx
+// #45: MEDMEM_PointerOf.hxx            }  MEDMEMTest_PointerOf.cxx
+// #46: MEDMEM_PolyhedronArray.hxx      }  MEDMEMTest_PolyhedronArray.cxx
+// #47: MEDMEM_PorflowMeshDriver.hxx    }  MEDMEMTest_PorflowMeshDriver.cxx
+// #48: MEDMEM_RCBase.hxx               }  MEDMEMTest.cxx (-)
+// #49: MEDMEM_SetInterlacingType.hxx   }  MEDMEMTest.cxx (-)
+// #50: MEDMEM_SkyLineArray.hxx         }  MEDMEMTest_SkyLineArray.cxx
+// #51: MEDMEM_STRING.hxx               }  MEDMEMTest.cxx
+// #52: MEDMEM_Support.hxx              }  MEDMEMTest_Support.cxx
+// #53: MEDMEM_Tags.hxx                 }  MEDMEMTest.cxx (-)
+// #54: MEDMEM_TopLevel.hxx             }  MEDMEMTest_TopLevel.cxx
+// #55: MEDMEM_TypeMeshDriver.hxx       }  MEDMEMTest.cxx
+// #56: MEDMEM_Unit.hxx                 }  MEDMEMTest_Unit.cxx
+// #57: MEDMEM_VtkFieldDriver.hxx       }  MEDMEMTest_VtkFieldDriver.cxx
+// #58: MEDMEM_VtkMedDriver.hxx         }  MEDMEMTest_VtkMedDriver.cxx
+// #59: MEDMEM_VtkMeshDriver.hxx        }  MEDMEMTest_VtkMeshDriver.cxx
+// #60: MEDMEM_medimport_src.hxx        }  MEDMEMTest.cxx (-)
 
-// #5: MEDMEM_CellModel.hxx  }  MEDMEMTest.cxx
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_CellModel.hxx:
- *   {
- *   (yetno)
- *  }
- *
- *  Use code of MEDMEM/tests/testUCellModel.cxx
  */
-void MEDMEMTest::testCellModel()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #6: MEDMEM_Compatibility21_22.hxx  }  nothing to test
-// #7: MEDMEM_Connectivity.hxx        }  MEDMEMTest_Connectivity.cxx
-// #8: MEDMEM_Coordinate.hxx          }  MEDMEMTest_Coordinate.cxx
-// #9: MEDMEM_DriverFactory.hxx       }  MEDMEMTest_DriverFactory.cxx
-
-// #10: MEDMEM_DriversDef.hxx         }  MEDMEMTest.cxx
+//void MEDMEMTest::testCellModel()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_DriversDef.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testDriversDef()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #11: MEDMEM_DriverTools.hxx   }  MEDMEMTest.cxx
+//void MEDMEMTest::testDriversDef()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_DriverTools.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testDriverTools()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #12: MEDMEM_Exception.hxx          }  MEDMEMTest_Exception.cxx
-// #13: MEDMEM_Family.hxx             }  MEDMEMTest.cxx
-// #14: MEDMEM_Field.hxx              \
-// #15: MEDMEM_FieldConvert.hxx       /  MEDMEMTest_Field.cxx
-// #16: MEDMEM_FieldForward.hxx       }  no methods to test
-// #17: MEDMEM_Formulae.hxx           }  MEDMEMTest_Formulae.cxx
-// #18: MEDMEM_GaussLocalization.hxx  }  MEDMEMTest_GaussLocalization.cxx
-// #19: MEDMEM_GenDriver.hxx  }  abstract class; implemented methods are tested during its successors testing
-// #20: MEDMEM_GibiMeshDriver.hxx     }  MEDMEMTest_GibiMeshDriver.cxx
-// #21: MEDMEM_Grid.cxx               }  MEDMEMTest_Grid.cxx
-// #22: MEDMEM_Group.cxx              }  MEDMEMTest_Group.cxx
-// #23: MEDMEM_IndexCheckingPolicy.cxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testDriverTools()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (4), defined in MEDMEM_IndexCheckingPolicy.hxx:
@@ -167,8 +189,6 @@ void MEDMEMTest::testIndexCheckingPolicy()
   CPPUNIT_ASSERT_NO_THROW(no_check.checkEquality(aClassName, 21, 28));
 }
 
-// #24: MEDMEM_Init.cxx  }  MEDMEMTest.cxx
-
 /*!
  *  Check initialization, done in MEDMEM_Init.cxx:
  *  (-) MEDMEM::INIT init;
@@ -184,130 +204,69 @@ void MEDMEMTest::testInit()
   //CPPUNIT_ASSERT(traceKind);
 }
 
-// #25: MEDMEM_InterlacingPolicy.hxx  }  MEDMEMTest.cxx
-
 /*!
  *  Check methods (not in spec), defined in MEDMEM_InterlacingPolicy.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testInterlacingPolicy()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #26: MEDMEM_InterlacingTraits.hxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testInterlacingPolicy()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_InterlacingTraits.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testInterlacingTraits()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #27: MEDMEM_MedFieldDriver21.hxx  }  MEDMEMTest_MedFieldDriver21.cxx
-// #28: MEDMEM_MedFieldDriver22.hxx  }  MEDMEMTest_MedFieldDriver22.cxx
-
-// #29: MEDMEM_MedFieldDriver.hxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testInterlacingTraits()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_MedFieldDriver.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testMedFieldDriver()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #30: MEDMEM_Med.hxx             }  MEDMEMTest_Med.cxx
-// #31: MEDMEM_MedMedDriver21.hxx  }  MEDMEMTest_MedMedDriver21.cxx
-// #32: MEDMEM_MedMedDriver22.hxx  }  MEDMEMTest_MedMedDriver22.cxx
-
-// #33: MEDMEM_MedMedDriver.hxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testMedFieldDriver()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_MedMedDriver.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testMedMedDriver()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #34: MEDMEM_MEDMEMchampLire.hxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testMedMedDriver()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_MEDMEMchampLire.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testMEDMEMchampLire()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #35: MEDMEM_MEDMEMgaussEcr.hxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testMEDMEMchampLire()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_MEDMEMgaussEcr.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testMEDMEMgaussEcr()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #36: MEDMEM_MEDMEMprofilEcr.hxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testMEDMEMgaussEcr()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_MEDMEMprofilEcr.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testMEDMEMprofilEcr()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #37: MEDMEM_MedMeshDriver21.hxx  }  MEDMEMTest_MedMeshDriver21.cxx
-// #38: MEDMEM_MedMeshDriver22.hxx  }  MEDMEMTest_MedMeshDriver22.cxx
-
-// #39: MEDMEM_MedMeshDriver.hxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testMEDMEMprofilEcr()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_MedMeshDriver.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testMedMeshDriver()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #40: MEDMEM_MedVersion.hxx         }  MEDMEMTest_MedVersion.cxx
-// #41: MEDMEM_Mesh.hxx               \
-// #42: MEDMEM_Meshing.hxx            /  MEDMEMTest_MeshAndMeshing.cxx
-// #43: MEDMEM_ModulusArray.hxx       }  MEDMEMTest_ModulusArray.cxx
-// #44: MEDMEM_nArray.hxx             }  MEDMEMTest_nArray.cxx
-// #45: MEDMEM_PointerOf.hxx          }  MEDMEMTest_PointerOf.cxx
-// #46: MEDMEM_PolyhedronArray.hxx    }  MEDMEMTest_PolyhedronArray.cxx
-// #47: MEDMEM_PorflowMeshDriver.hxx  }  MEDMEMTest_PorflowMeshDriver.cxx
-
-// #48: MEDMEM_RCBase.hxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testMedMeshDriver()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_RCBase.hxx:
@@ -316,61 +275,82 @@ void MEDMEMTest::testMedMeshDriver()
  *   (reference counter presently disconnected in C++) virtual void removeReference() const = 0;
  *  }
  */
-void MEDMEMTest::testRCBase()
-{
-  // nothing to test
-}
-
-// #49: MEDMEM_SetInterlacingType.hxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testRCBase()
+//{
+//  // nothing to test
+//}
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_SetInterlacingType.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testSetInterlacingType()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #50: MEDMEM_SkyLineArray.hxx  }  MEDMEMTest_SkyLineArray.cxx
-
-// #51: MEDMEM_STRING.hxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testSetInterlacingType()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (2), defined in MEDMEM_STRING.hxx:
  *  class STRING : public string {
- *   (yetno) STRING()
- *   (yetno) ~STRING()
- *   (yetno) operator const char * () const
- *   (yetno) template <class T> STRING(const T &valeur)
- *   (yetno) template <class T> STRING & operator<<(const T &valeur)
+ *   (+)     STRING()
+ *   (+)     ~STRING()
+ *   (+)     operator const char * () const
+ *   (+)     template <class T> STRING(const T &valeur)
+ *   (+)     template <class T> STRING & operator<<(const T &valeur)
  *  }
  */
 void MEDMEMTest::testSTRING()
 {
-  CPPUNIT_FAIL("Case Not Implemented");
+  {
+    // empty constructor
+    MEDMEM::STRING medstr;
+    CPPUNIT_ASSERT(strcmp(medstr.c_str(), "") == 0);
+
+    // template <class T> STRING & operator<<(const T &valeur) with T == char*
+    //medstr << <char*>"filling 1";
+    medstr << "filling " << 1 << " !!!";
+    CPPUNIT_ASSERT(strcmp(medstr.c_str(), "filling 1 !!!") == 0);
+
+    // operator const char * ()
+    CPPUNIT_ASSERT(strcmp((const char *)medstr, "filling 1 !!!") == 0);
+    CPPUNIT_ASSERT(strcmp(              medstr, "filling 1 !!!") == 0);
+  }
+
+  MEDMEM::MESH * aMesh1 = createTestMesh();
+  ostringstream ostr;
+  ostr << *aMesh1;
+
+  {
+    // template <class T> STRING & operator<<(const T &valeur) with T == MEDMEM::MESH
+    MEDMEM::STRING medstr;
+    //medstr << <char*>"filling 1";
+    medstr << *aMesh1;
+    CPPUNIT_ASSERT(strcmp(medstr, ostr.str().c_str()) == 0);
+  }
+
+  {
+    // Constructor STRING(const T &valeur) with T == char*
+    //MEDMEM::STRING medstr<char*>("filling 2");
+    MEDMEM::STRING medstr ("filling 2");
+    CPPUNIT_ASSERT(strcmp(medstr.c_str(), "filling 2") == 0);
+    CPPUNIT_ASSERT(strcmp(medstr, "filling 2") == 0);
+  }
+
+  {
+    // Constructor STRING(const T &valeur) with T == MEDMEM::MESH
+    MEDMEM::STRING medstr (*aMesh1);
+    CPPUNIT_ASSERT(strcmp(medstr, ostr.str().c_str()) == 0);
+  }
+
+  delete aMesh1;
 }
-
-// #52: MEDMEM_Support.hxx  }  MEDMEMTest_Support.cxx
-
-// #53: MEDMEM_Tags.hxx  }  MEDMEMTest.cxx
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_Tags.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testTags()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
-
-// #54: MEDMEM_TopLevel.hxx  }  MEDMEMTest_TopLevel.cxx
-
-// #55: MEDMEM_TypeMeshDriver.hxx  }  MEDMEMTest.cxx
+//void MEDMEMTest::testTags()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 /*!
  *  Check methods (15), defined in MEDMEM_TypeMeshDriver.hxx:
@@ -416,23 +396,13 @@ void MEDMEMTest::testTypeMeshDriver()
   CPPUNIT_FAIL("TYPE_MESH_DRIVER: not implemented");
 }
 
-// #56: MEDMEM_Unit.hxx  }  MEDMEMTest_Unit.cxx
-// #57: MEDMEM_VtkFieldDriver.hxx }  MEDMEMTest_VtkFieldDriver.cxx
-// #58: MEDMEM_VtkMedDriver.hxx   }  MEDMEMTest_VtkMedDriver.cxx
-// #59: MEDMEM_VtkMeshDriver.hxx  }  MEDMEMTest_VtkMeshDriver.cxx
-
-// #60: MEDMEM_medimport_src.hxx  }  MEDMEMTest.cxx
-
 /*!
  *  Check methods (not in spec), defined in MEDMEM_medimport_src.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testmedimport_src()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
+//void MEDMEMTest::testmedimport_src()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
 
 //60
 //21 not in spec
@@ -728,4 +698,20 @@ MEDMEMTest_TmpFilesRemover::~MEDMEMTest_TmpFilesRemover()
 bool MEDMEMTest_TmpFilesRemover::Register(const string theTmpFile)
 {
   return (myTmpFiles.insert(theTmpFile)).second;
+}
+
+/*!
+ *  Tool to print array to stream.
+ */
+template<class T>
+void MEDMEMTest_DumpArray (ostream & stream, const T* array, const int length, const string text)
+{
+  stream << text << ": {";
+  if (length > 0) {
+    stream << array[0];
+    for (int i = 1; i < length; i++) {
+      stream << ", " << array[i];
+    }
+  }
+  stream << "}" << endl;
 }

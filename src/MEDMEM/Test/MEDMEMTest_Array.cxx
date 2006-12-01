@@ -42,8 +42,6 @@ using namespace MEDMEM;
 // #1,2,3: MEDMEMTest_Array.cxx
 // Check methods from MEDMEM_Array.hxx, MEDMEM_ArrayConvert.hxx, MEDMEM_ArrayInterface.hxx
 
-// #1: MEDMEM_Array.hxx  }  MEDMEMTest_Array.cxx
-
 /*!
  *  Check methods (20), defined in MEDMEM_Array.hxx:
  *  template <class T> class MEDARRAY {
@@ -497,8 +495,6 @@ void MEDMEMTest::testArray()
   delete arr1;
 }
 
-// #2: MEDMEM_ArrayConvert.hxx  }  MEDMEMTest_Array.cxx
-
 /*!
  *  Check methods (4), defined in MEDMEM_ArrayConvert.hxx:
  *
@@ -671,15 +667,10 @@ void MEDMEMTest::testArrayConvert()
       }
 }
 
-// #3: MEDMEM_ArrayInterface.hxx  }  MEDMEMTest_Array.cxx
-
 /*!
  *  Check methods (not in spec), defined in MEDMEM_ArrayInterface.hxx:
- *   {
- *   (yetno)
- *  }
  */
-void MEDMEMTest::testArrayInterface()
-{
-  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-}
+//void MEDMEMTest::testArrayInterface()
+//{
+//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
+//}
