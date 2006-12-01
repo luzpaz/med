@@ -39,20 +39,11 @@
 // use this define to enable CPPUNIT asserts and fails, showing bugs
 #define ENABLE_FORCED_FAILURES
 
-#ifdef ENABLE_FAULTS
-  // (BUG)
-#endif
-#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("");
-#endif
-
 using namespace std;
 using namespace MEDMEM;
 
 // #14,15: MEDMEMTest_Field.cxx
 // Check methods from MEDMEM_Field.hxx, MEDMEM_FieldConvert.hxx
-
-// #14: MEDMEM_Field.hxx  }  MEDMEMTest_Field.cxx
 
 /*!
  *  Check methods (48), defined in MEDMEM_Field.hxx:
@@ -120,7 +111,7 @@ using namespace MEDMEM;
  *   (+)     FIELD();
  *   (+)     FIELD(const FIELD &m);
  *   (+)     FIELD(const SUPPORT * Support, const int NumberOfComponents) throw (MEDEXCEPTION);
- *   (+) FIELD(driverTypes driverType,
+ *   (+)     FIELD(driverTypes driverType,
  *                 const string & fileName, const string & fieldDriverName,
  *                 const int iterationNumber=-1, const int orderNumber=-1) throw (MEDEXCEPTION);
  *   (yetno) FIELD(const SUPPORT * Support, driverTypes driverType,
@@ -166,22 +157,22 @@ using namespace MEDMEM;
  *
  *   (EMPTY COMMENT, EMPTY IMPLEMENTATION!!!) void init ();
  *
- *   (+) void rmDriver(int index=0);
- *   (+) int  addDriver(driverTypes driverType,
+ *   (+)     void rmDriver(int index=0);
+ *   (+)     int  addDriver(driverTypes driverType,
  *                          const string & fileName="Default File Name.med",
  *                          const string & driverFieldName="Default Field Name",
  *                          MED_EN::med_mode_acces access=MED_EN::MED_REMP);
- *   (+) int  addDriver(GENDRIVER & driver);
+ *   (+)     int  addDriver(GENDRIVER & driver);
  *
  *   (+)     void allocValue(const int NumberOfComponents);
  *   (+)     void allocValue(const int NumberOfComponents, const int LengthValue);
  *   (+)     void deallocValue();
  *
- *   (+) inline void read(int index=0);
- *   (+) inline void read(const GENDRIVER & genDriver);
- *   (+) inline void write(int index=0, const string & driverName = "");
- *   (+) inline void write(const GENDRIVER &);
- *   (+) inline void writeAppend(int index=0, const string & driverName = "");
+ *   (+)     inline void read(int index=0);
+ *   (+)     inline void read(const GENDRIVER & genDriver);
+ *   (+)     inline void write(int index=0, const string & driverName = "");
+ *   (+)     inline void write(const GENDRIVER &);
+ *   (+)     inline void writeAppend(int index=0, const string & driverName = "");
  *   (yetno) inline void writeAppend(const GENDRIVER &);
  *
  *   (+)     inline MEDMEM_Array_  * getArray()        const throw (MEDEXCEPTION);
@@ -565,64 +556,61 @@ void testDrivers()
   string tmp_dir                      = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
+
   string filename_rd                  = data_dir + "/MedFiles/pointe.med";
   string filename_wr                  = tmp_dir  + "/myMedFieldfile.med";
   string filename22_rd                = data_dir + "/MedFiles/pointe_import22.med";
   string filenamevtk_wr                = tmp_dir  + "/myMedFieldfile22.vtk";
   string cp_file                      = "cp " + filename_rd + " " + filename_wr;
+
   string fieldname_celldouble_rd      = "fieldcelldouble";
   string fieldname_celldouble_wr      = fieldname_celldouble_rd + "_cpy";
   string fieldname_nodeint_rd         = "fieldnodeint";
   string fieldname_nodeint_wr         = fieldname_nodeint_rd + "_cpy";
   string fieldname_nodeint_wr1        = fieldname_nodeint_rd + "_cpy1";
-  
+
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);
   aRemover.Register(filenamevtk_wr);
 
-  //Copy file 
+  //Copy file
   system(cp_file.c_str());
-  
-  FIELD<int> aInvalidField; 
-  //must throw becase only VTK_DRIVER or MED_DRIVER may specified as driverType for FIELD
-  CPPUNIT_ASSERT_THROW( aInvalidField = FIELD<int>(NO_DRIVER, filename_rd, fieldname_nodeint_rd), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW( aInvalidField = FIELD<int>(GIBI_DRIVER, filename_rd, fieldname_nodeint_rd), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW( aInvalidField = FIELD<int>(PORFLOW_DRIVER, filename_rd, fieldname_nodeint_rd), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW( aInvalidField = FIELD<int>(ASCII_DRIVER, filename_rd, fieldname_nodeint_rd), MEDEXCEPTION);
-  
+
+  FIELD<int> aInvalidField;
+  //must throw becase only VTK_DRIVER or MED_DRIVER may be specified as driverType for FIELD
+  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(NO_DRIVER, filename_rd, fieldname_nodeint_rd),
+                       MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(GIBI_DRIVER, filename_rd, fieldname_nodeint_rd),
+                       MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(PORFLOW_DRIVER, filename_rd, fieldname_nodeint_rd),
+                       MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(ASCII_DRIVER, filename_rd, fieldname_nodeint_rd),
+                       MEDEXCEPTION);
+
   //////////////////
   //TestRead Part//
   //////////////////
   FIELD<double> *aField_1 = NULL;
   CPPUNIT_ASSERT_NO_THROW(aField_1 = new FIELD<double>(MED_DRIVER, filename_rd, fieldname_celldouble_rd));
+
+  //Test read(int index) method
   int IdDriver_rd = aField_1->addDriver(MED_DRIVER,filename_rd,fieldname_celldouble_rd);
 #ifdef ENABLE_FORCED_FAILURES
-  //Test read(int index) method
-  try
-  {
-  aField_1->read(IdDriver_rd);
-  // (BUG) Can not open file, but file exist
-  }
-  catch(MEDEXCEPTION &e)
-  {
-    e.what();
-  }
-  catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+  // (BUG) Cannot open file, but file exist
+  CPPUNIT_ASSERT_NO_THROW(aField_1->read(IdDriver_rd));
 #endif
+
   //Test read(GENDRIVER & genDriver) method
   //Creation a Driver
   MED_FIELD_RDONLY_DRIVER21<int> *aMedRdFieldDriver21_1 =
     new MED_FIELD_RDONLY_DRIVER21<int>();
   //Creation a Field
   FIELD<int> *aField_2 = new FIELD<int>();
-  aField_2->setName(fieldname_nodeint_rd);  
+  aField_2->setName(fieldname_nodeint_rd);
   aField_2->addDriver(*aMedRdFieldDriver21_1);
   aField_2->read(*aMedRdFieldDriver21_1);
-  
+
   ///////////////////
   //Test Write Part//
   ///////////////////
@@ -634,7 +622,7 @@ void testDrivers()
   aMedRdFieldDriver21_2->setFieldName(fieldname_celldouble_rd);
   aMedRdFieldDriver21_2->read();
   aMedRdFieldDriver21_2->close();
- 
+
   //Test write(int index) method
   //Add drivers to FIELDs
   int IdDriver1 = -1;
@@ -651,7 +639,7 @@ void testDrivers()
     CPPUNIT_FAIL("Unknown exception");
   }
   //Trying call write(int index) method with incorrect index
-#ifdef ENABLE_FAULTS  
+#ifdef ENABLE_FAULTS
   CPPUNIT_ASSERT_THROW(aField_3->write(IdDriver1+1, fieldname_celldouble_wr),MEDEXCEPTION);
   // => Segmentation fault
 #endif
@@ -672,7 +660,7 @@ void testDrivers()
     CPPUNIT_FAIL("Unknown exception");
   }
 #endif
-  
+
   CPPUNIT_ASSERT_NO_THROW(aField_3->rmDriver(IdDriver1));
 
   //Test write(const GENDRIVER &);
@@ -734,25 +722,14 @@ void testDrivers()
     CPPUNIT_FAIL("Unknown exception");
   }
 #ifdef ENABLE_FAULTS
-  //Trying call writeAppend() method with incorrect index 
+  //Trying call writeAppend() method with incorrect index
   CPPUNIT_ASSERT_THROW(aField_4->writeAppend(IdDriver2+1,fieldname_nodeint_wr),MEDEXCEPTION);
   // => Segmentation fault
 #endif
-  
-#ifdef ENABLE_FAULTS  
-  try
-  {
-    aField_4->writeAppend(IdDriver2, fieldname_nodeint_wr);
-    // => Segmentation fault
-  }
-  catch(MEDEXCEPTION &e)
-  {
-    e.what();
-  }
-  catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+
+#ifdef ENABLE_FAULTS
+  // (BUG) => Segmentation fault
+  CPPUNIT_ASSERT_NO_THROW(aField_4->writeAppend(IdDriver2, fieldname_nodeint_wr));
 #endif
 
   //Delete objects
@@ -1537,8 +1514,6 @@ void MEDMEMTest::testField()
   aFieldOnGroup1->allocValue(2, nbVals);
   // be carefull: aFieldOnGroup1 reallocated and contains random values
 
-  testDrivers();
-
   delete aSubSupport1;
   delete [] anElems1;
 
@@ -1553,10 +1528,11 @@ void MEDMEMTest::testField()
   delete aMesh;
   delete aMeshOneMore;
 
-  CPPUNIT_FAIL("Case Not Complete. ");
+  /////////////////////
+  // TEST 5: Drivers //
+  /////////////////////
+  testDrivers();
 }
-
-// #15: MEDMEM_FieldConvert.hxx  }  MEDMEMTest_Field.cxx
 
 /*!
  *  Check methods (2), defined in MEDMEM_FieldConvert.hxx:
