@@ -47,7 +47,7 @@ using namespace MEDMEM;
  *   (+)     FAMILY();
  *
  *           // Constructor to use with med driver.
- *   (yetno) FAMILY(MESH* Mesh, int Identifier, string Name,
+ *   (!)     FAMILY(MESH* Mesh, int Identifier, string Name,
  *                  int NumberOfAttribute, int *AttributeIdentifier,
  *                  int *AttributeValue, string AttributeDescription,
  *                  int NumberOfGroup,   string GroupName,
@@ -55,16 +55,16 @@ using namespace MEDMEM;
  *                  int ** MEDArrayFaceFamily, int ** MEDArrayEdgeFamily);
  *   (+)     FAMILY(const FAMILY & m);
  *   (+)     FAMILY(const SUPPORT & s);
- *   (+) virtual ~FAMILY();
+ *   (+)     virtual ~FAMILY();
  *
  *           // Does not work (Segmentation Fault of Hang up)
- *   (yetno) FAMILY & operator=(const FAMILY &fam);
+ *   (!)     FAMILY & operator=(const FAMILY &fam);
  *
  *   (+)     friend ostream & operator<<(ostream &os, FAMILY &my);
  *   (+)     friend ostream & operator<<(ostream &os, const FAMILY &my);
  *
  *           // Is used only in constructor. Why it is public?
- *   (yetno) bool build(MED_EN::medEntityMesh Entity,int **FamilyNumber);
+ *   (!)     bool build(MED_EN::medEntityMesh Entity,int **FamilyNumber);
  *
  *   (+)     inline void setIdentifier             (int Identifier);
  *   (+)     inline void setNumberOfAttributes     (int NumberOfAttribute);
