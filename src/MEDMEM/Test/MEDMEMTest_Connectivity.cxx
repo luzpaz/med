@@ -1630,10 +1630,6 @@ void MEDMEMTest::testConnectivity()
   createOrCheck(c2, "Check copy constructor", /*create*/false);
 
   // invertConnectivityForAFace
-#ifdef ENABLE_FORCED_FAILURES
-  // ? (BUG) ? This case fails on third face (not inverted).
-  // And the first face at that moment looks like before this test.
-  // I suppose, it is recalculated somethere.
   int nbFacesC2 = c2->getNumberOf(MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS);
   for (int faceId = 1; faceId <= nbFacesC2; faceId++) {
     //cout << "^^^^^ not inverted ^^^^^" << endl;
@@ -1690,38 +1686,14 @@ void MEDMEMTest::testConnectivity()
     //cout <<  *c2  << endl;
     //cout << "^^^^^ inverted ^^^^^" << endl;
 
-    // this face nodal connectivity after inversion:
-    const int * newConn = c2->getConnectivityOfAnElementWithPoly(MED_EN::MED_NODAL,
-                                                                 MED_EN::MED_FACE, faceId, newLen);
-    CPPUNIT_ASSERT_EQUAL(oldLen, newLen);
-    for (int i = 0; i < newLen; i++) {
-      CPPUNIT_ASSERT_EQUAL(newNodesForFace[i], newConn[i]);
-    }
-    delete [] newNodesForFace;
-
-    // descending connectivity after inversion:
-    int after_NumberOfElements = c2->getNumberOf(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
-    const int * after_connectivity =
-      c2->getConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
-    const int * after_connectivity_index =
-      c2->getConnectivityIndex(MED_EN::MED_DESCENDING, MED_EN::MED_CELL);
-
-    CPPUNIT_ASSERT_EQUAL(before_NumberOfElements, after_NumberOfElements);
-
-    for (int j = 0; j < before_NumberOfElements; j++) {
-      for (int k = after_connectivity_index[j]; k < after_connectivity_index[j+1]; k++) {
-        if (labs(before_connectivity[k-1]) == faceId)
-          CPPUNIT_ASSERT_EQUAL(before_connectivity[k-1], - after_connectivity[k-1]);
-        else
-          CPPUNIT_ASSERT_EQUAL(before_connectivity[k-1], after_connectivity[k-1]);
-      }
-    }
-
     // reverse descending connectivity after inversion:
     const int * after_ReverseDescendingConnectivity =
       c2->getReverseConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL);
     const int * after_ReverseDescendingConnectivityIndex =
       c2->getReverseConnectivityIndex(MED_EN::MED_DESCENDING, MED_EN::MED_CELL);
+
+    // Faces, which are on bound (have one neighbouring), are not inverted.
+    bool isOnBound = false;
 
     //cout << "faceId = " << faceId << endl;
     //cout << "oldLen = " << oldLen << endl;
@@ -1729,7 +1701,11 @@ void MEDMEMTest::testConnectivity()
       //cout << "i = " << i << endl;
       int plus = after_ReverseDescendingConnectivityIndex[i] - 1;
       // always two neighbourings
-      if ((i + 1) == faceId && oldLen == 4) {
+      if ((i + 1) == faceId) {
+        // no second neighbouring
+        isOnBound = (before_ReverseDescendingConnectivity[plus + 1] == 0);
+      }
+      if ((i + 1) == faceId && oldLen == 4 && !isOnBound) {
         CPPUNIT_ASSERT_EQUAL(before_ReverseDescendingConnectivity[plus + 0],
                              after_ReverseDescendingConnectivity[plus + 1]);
         CPPUNIT_ASSERT_EQUAL(before_ReverseDescendingConnectivity[plus + 1],
@@ -1743,11 +1719,46 @@ void MEDMEMTest::testConnectivity()
       }
     }
 
+    // descending connectivity after inversion:
+    int after_NumberOfElements = c2->getNumberOf(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
+    const int * after_connectivity =
+      c2->getConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
+    const int * after_connectivity_index =
+      c2->getConnectivityIndex(MED_EN::MED_DESCENDING, MED_EN::MED_CELL);
+
+    CPPUNIT_ASSERT_EQUAL(before_NumberOfElements, after_NumberOfElements);
+
+    for (int j = 0; j < before_NumberOfElements; j++) {
+      for (int k = after_connectivity_index[j]; k < after_connectivity_index[j+1]; k++) {
+        if (labs(before_connectivity[k-1]) == faceId && !isOnBound) {
+          CPPUNIT_ASSERT_EQUAL(before_connectivity[k-1], - after_connectivity[k-1]);
+        }
+        else {
+          CPPUNIT_ASSERT_EQUAL(before_connectivity[k-1], after_connectivity[k-1]);
+        }
+      }
+    }
+
+    // this face nodal connectivity after inversion:
+    if (!isOnBound) {
+      const int * newConn = c2->getConnectivityOfAnElementWithPoly(MED_EN::MED_NODAL,
+                                                                   MED_EN::MED_FACE, faceId, newLen);
+      CPPUNIT_ASSERT_EQUAL(oldLen, newLen);
+      for (int i = 0; i < newLen; i++) {
+        CPPUNIT_ASSERT_EQUAL(newNodesForFace[i], newConn[i]);
+      }
+    }
+    delete [] newNodesForFace;
+
     delete [] before_connectivity;
     delete [] before_ReverseDescendingConnectivity;
 
     // ATTENTION: invertConnectivityForAFace() is not tested on polygons!!!
   }
+#ifdef ENABLE_FORCED_FAILURES
+  // ? (BUG) ? After several loops the first face looks like before this test.
+  //           I suppose, it is recalculated somethere.
+  //CPPUNIT_FAIL("Results of invertConnectivityForAFace() are overwritten.");
 #endif
 
   delete c1;
