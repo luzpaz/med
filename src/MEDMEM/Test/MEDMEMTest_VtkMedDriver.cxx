@@ -39,11 +39,11 @@ using namespace MED_EN;
  *  Check methods (5), defined in MEDMEM_VtkMedDriver.hxx:
  *  class VTK_MED_DRIVER : public GENDRIVER {
  *   (+) VTK_MED_DRIVER(const string & fileName,  MED * const ptrMed);
- *   (yetno) VTK_MED_DRIVER(const VTK_MED_DRIVER & driver);
+ *   (+) VTK_MED_DRIVER(const VTK_MED_DRIVER & driver);
  *   (+) ~VTK_MED_DRIVER();
  *   (+) void write (void) const;
- *   (yetno) virtual void read (void)  {};
- *   (yetno) GENDRIVER * copy (void) const;
+ *   (-) virtual void read (void)  {};
+ *   (+) GENDRIVER * copy (void) const;
  *  }
  */
 void MEDMEMTest::testVtkMedDriver()

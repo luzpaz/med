@@ -36,9 +36,9 @@ using namespace MEDMEM;
 /*!
  *  Check methods (11), defined in MEDMEM_VtkMeshDriver.hxx:
  *  class VTK_MESH_DRIVER : public GENDRIVER {
- *   (yetno) VTK_MESH_DRIVER();
+ *   (+) VTK_MESH_DRIVER();
  *   (+) VTK_MESH_DRIVER(const string & fileName,  MESH * ptrMesh);
- *   (yetno) VTK_MESH_DRIVER(const VTK_MESH_DRIVER & driver);
+ *   (+) VTK_MESH_DRIVER(const VTK_MESH_DRIVER & driver);
  *   (+) ~VTK_MESH_DRIVER();
  *   (+) void open();
  *   (+) void close();

@@ -41,7 +41,7 @@ using namespace MED_EN;
  *   (+) MED_MED_DRIVER21(const string & fileName,  MED * const ptrMed);
  *   (+) MED_MED_DRIVER21(const string & fileName,  MED * const ptrMed,
  *                            MED_EN::med_mode_acces accessMode);
- *   (yetno) MED_MED_DRIVER21(const MED_MED_DRIVER21 & driver);
+ *   (+) MED_MED_DRIVER21(const MED_MED_DRIVER21 & driver);
  *   (+) virtual ~MED_MED_DRIVER21();
  *   (+) void open() throw (MEDEXCEPTION);
  *   (+) void close();
@@ -54,7 +54,7 @@ using namespace MED_EN;
  *                                  public virtual MED_MED_DRIVER21 {
  *   (+) MED_MED_RDONLY_DRIVER21();
  *   (+) MED_MED_RDONLY_DRIVER21(const string & fileName,  MED * const ptrMed);
- *   (yetno) MED_MED_RDONLY_DRIVER21(const MED_MED_RDONLY_DRIVER21 & driver);
+ *   (+) MED_MED_RDONLY_DRIVER21(const MED_MED_RDONLY_DRIVER21 & driver);
  *   (+) virtual ~MED_MED_RDONLY_DRIVER21();
  *   (+) void write          (void) const throw (MEDEXCEPTION);
  *   (+) void writeFrom      (void) const throw (MEDEXCEPTION);
@@ -65,7 +65,7 @@ using namespace MED_EN;
  *                                  public virtual MED_MED_DRIVER21 {
  *   (+) MED_MED_WRONLY_DRIVER21();
  *   (+) MED_MED_WRONLY_DRIVER21(const string & fileName,  MED * const ptrMed);
- *   (yetno) MED_MED_WRONLY_DRIVER21(const MED_MED_WRONLY_DRIVER21 & driver);
+ *   (+) MED_MED_WRONLY_DRIVER21(const MED_MED_WRONLY_DRIVER21 & driver);
  *   (+) virtual ~MED_MED_WRONLY_DRIVER21();
  *   (+) void write          (void) const throw (MEDEXCEPTION);
  *   (+) void writeFrom      (void) const throw (MEDEXCEPTION);
@@ -77,7 +77,7 @@ using namespace MED_EN;
  *                              public IMED_MED_RDWR_DRIVER {
  *   (+) MED_MED_RDWR_DRIVER21();
  *   (+) MED_MED_RDWR_DRIVER21(const string & fileName,  MED * const ptrMed);
- *   (yetno) MED_MED_RDWR_DRIVER21(const MED_MED_RDWR_DRIVER21 & driver);
+ *   (+) MED_MED_RDWR_DRIVER21(const MED_MED_RDWR_DRIVER21 & driver);
  *   (+) ~MED_MED_RDWR_DRIVER21();
  *   (+) void write          (void) const throw (MEDEXCEPTION);
  *   (+) void writeFrom      (void) const throw (MEDEXCEPTION);
