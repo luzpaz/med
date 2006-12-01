@@ -158,7 +158,8 @@ public :
 
   virtual void read(int index=0);
   inline void read(const GENDRIVER & genDriver);
-  inline void write(int index=0, const string & driverName = "");
+  //inline void write(int index=0, const string & driverName = "");
+  virtual void write(int index=0, const string & driverName = "");
   inline void write(const GENDRIVER & genDriver);
 
   inline void 	      setName(string name);
@@ -320,45 +321,6 @@ inline const CONNECTIVITY* MESH::getConnectivityptr() const
   return _connectivity;
 }
 
-// inline void MESH::read(int index/*=0*/)
-// {
-//   const char * LOC = "MESH::read(int index=0) : ";
-//   BEGIN_OF(LOC);
-
-//   if (_drivers[index]) {
-//     _drivers[index]->open();
-//     _drivers[index]->read();
-//     _drivers[index]->close();
-//   }
-//   else
-//     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
-//                                      << "The index given is invalid, index must be between  0 and |"
-//                                      << _drivers.size()
-//                                      )
-//                           );
-//   END_OF(LOC);
-// }
-
-/*! Write all the content of the MESH using driver referenced by the integer handler index.*/
-inline void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
-{
-  const char * LOC = "MESH::write(int index=0, const string & driverName = \"\") : ";
-  BEGIN_OF(LOC);
-
-  if ( _drivers[index] ) {
-    _drivers[index]->open();
-    if (driverName != "") _drivers[index]->setMeshName(driverName);
-    _drivers[index]->write();
-    _drivers[index]->close();
-  }
-  else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
-                                     << "The index given is invalid, index must be between  0 and |"
-                                     << _drivers.size()
-                                     )
-                          );
-  END_OF(LOC);
-}
 
 // This method is MED specific : don't use it
 // must be private.

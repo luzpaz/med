@@ -1646,6 +1646,28 @@ void MESH::read(int index)
                           );
   END_OF(LOC);
 }
+
+/*! Write all the content of the MESH using driver referenced by the integer handler index.*/
+void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
+{
+  const char * LOC = "MESH::write(int index=0, const string & driverName = \"\") : ";
+  BEGIN_OF(LOC);
+
+  if ( _drivers[index] ) {
+    _drivers[index]->open();
+    if (driverName != "") _drivers[index]->setMeshName(driverName);
+    _drivers[index]->write();
+    _drivers[index]->close();
+  }
+  else
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
+                                     << "The index given is invalid, index must be between  0 and |"
+                                     << _drivers.size()
+                                     )
+                          );
+  END_OF(LOC);
+}
+
 //=======================================================================
 //function : getSkin
 //purpose  :
