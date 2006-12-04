@@ -116,51 +116,43 @@ void MEDMEMTest::testnArray()
 
   //test getPtr
   myArray1Ptr = myArray1.getPtr();
-
   for (int i = 0; i < mdim*nbelem1; i++)
     CPPUNIT_ASSERT( myArray1Ptr[i] == array1Ref[i] );
 
   {
     //test MEDMEM_Array(ElementType * values, int dim, int nbelem, bool shallowCopy=false, bool ownershipOfValues=false)
-    MEDMEM_Array<double>  myArray1val((double*)array1Ref,mdim,nbelem1);
+    MEDMEM_Array<double> myArray1val ((double*)array1Ref, mdim, nbelem1);
     myArray1Ptr = myArray1val.getPtr();
     for (int i = 0; i < mdim*nbelem1; i++)
       CPPUNIT_ASSERT( myArray1Ptr[i] == array1Ref[i] );
+
     //test MEDMEM_Array(ElementType * values, int dim, int nbelem, bool shallowCopy=true, bool ownershipOfValues=false);
-    MEDMEM_Array<double>  myArray1valsh((double*)array1Ref,mdim,nbelem1, true);
+    MEDMEM_Array<double> myArray1valsh ((double*)array1Ref, mdim, nbelem1, true);
     myArray1Ptr = myArray1valsh.getPtr();
     for (int i = 0; i < mdim*nbelem1; i++)
       CPPUNIT_ASSERT( myArray1Ptr[i] == array1Ref[i] );
 
-#ifdef ENABLE_FAULTS
-    //test MEDMEM_Array(ElementType * values, int dim, int nbelem, bool shallowCopy=true, bool ownershipOfValues=true);
-    MEDMEM_Array<double> myArray1valow ((double*)array1Ref,mdim,nbelem1,true,true);
-#endif
-#ifdef ENABLE_FORCED_FAILURES
-    CPPUNIT_FAIL("(BUG):MEDMEM_Array<double> myArray1valow((double*)array1Ref,mdim,nbelem1,true,true)->abort");
-#endif
-
-    double myPtr[]= {-1, -2, -3, -4, -5, -6, -7, -8, -9, 0};
-    try{
-      //size the array stays the same, only first 10 element are being overwritten
-      //test setPtr
-      myArray1valsh.setPtr(myPtr);
-    }
-    catch ( const std::exception &e )
-    {
-      CPPUNIT_FAIL(e.what());
-    }
-    catch (...)
-    {
-      CPPUNIT_FAIL("Unknown exception");
-    }
+    //test setPtr
+    double myPtr[] = {-1, -2, -3, -4, -5, -6, -7, -8, -9, 0};
+    CPPUNIT_ASSERT_NO_THROW(myArray1valsh.setPtr(myPtr));
+    //size the array stays the same, only first 10 element are being overwritten
     myArray1Ptr = myArray1valsh.getPtr();
-    for (int i =0; i < 11; i++)
+    for (int i = 0; i < 11; i++)
       CPPUNIT_ASSERT_EQUAL(myArray1Ptr[i], myPtr[i]);
   }
 
+  //test MEDMEM_Array(ElementType * values, int dim, int nbelem, bool shallowCopy=true, bool ownershipOfValues=true);
+  {
+    double * array1Ref_do_not_delete = new double[40];
+    for (int i = 0; i < 40; i = i + 2) {
+      array1Ref_do_not_delete[i  ] = 10.0 * (i+1) + 1;
+      array1Ref_do_not_delete[i+1] = 10.0 * (i+1) + 2;
+    }
+    MEDMEM_Array<double> myArray1valow (array1Ref_do_not_delete, mdim, nbelem1, true, true);
+  }
+
   //test MEDMEM_Array(const MEDMEM_Array & array, bool shallowCopy=false)
-  MEDMEM_Array<double> myArray1bis(myArray1, false);
+  MEDMEM_Array<double> myArray1bis (myArray1, false);
   CPPUNIT_ASSERT(myArray1 == myArray1bis);
 
   myArray1Ptr = myArray1bis.getPtr();

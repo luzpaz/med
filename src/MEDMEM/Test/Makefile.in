@@ -83,6 +83,21 @@ LIB_CLIENT_IDL =
 # Executables targets
 
 BIN = TestMEDMEM
+# Faulting tests
+BIN +=  MEDMEMTest_Array_fault \
+	MEDMEMTest_Connectivity_fault \
+	MEDMEMTest_Coordinate_fault \
+	MEDMEMTest_Family_fault \
+	MEDMEMTest_Field_fault \
+	MEDMEMTest_Grid_fault \
+	MEDMEMTest_MedFieldDriver21_fault \
+	MEDMEMTest_MedMedDriver21_fault \
+	MEDMEMTest_MedMedDriver22_fault \
+	MEDMEMTest_MeshAndMeshing_fault \
+	MEDMEMTest_Support_fault \
+	MEDMEMTest_VtkFieldDriver_fault \
+	MEDMEMTest_VtkMeshDriver_fault
+
 BIN_SRC =
 BIN_CLIENT_IDL =
 

@@ -42,6 +42,48 @@ import sys, os,signal,string,commands
 command = ['TestMEDMEM']
 ret = os.spawnvp(os.P_WAIT, command[0], command)
 
+print "MEDMEM General testing done."
+print "Run cases, which leads to Segmentation Fault ..."
+
+command = ['MEDMEMTest_Array_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_Connectivity_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_Coordinate_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_Family_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_Field_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_Grid_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_MedFieldDriver21_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_MedMedDriver21_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_MedMedDriver22_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_MeshAndMeshing_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_Support_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_VtkFieldDriver_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
+command = ['MEDMEMTest_VtkMeshDriver_fault']
+ret = os.spawnvp(os.P_WAIT, command[0], command)
+
 # kill Test process
 
 ###TestKiller.killProcess(runSalome.process_id)

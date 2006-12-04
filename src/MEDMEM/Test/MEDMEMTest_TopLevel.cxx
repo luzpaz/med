@@ -140,7 +140,7 @@ void MEDMEMTest::testTopLevel()
 #endif
 
     //Create a MESH
-    MESH * aMesh = createTestMesh();
+    MESH * aMesh = MEDMEMTest_createTestMesh();
     CPPUNIT_ASSERT_THROW(writeMeshToFile(aMesh, fileNotExist_wr), MEDEXCEPTION);
 
 #ifdef ENABLE_FORCED_FAILURES

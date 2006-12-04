@@ -407,7 +407,7 @@ void MEDMEMTest::testMed()
   CPPUNIT_ASSERT_THROW(myEmptyMed->addMesh(NULL), MEDEXCEPTION);
 
   //create a mesh
-  MESH * aMesh = createTestMesh();
+  MESH * aMesh = MEDMEMTest_createTestMesh();
   // and add it
   CPPUNIT_ASSERT_NO_THROW(myEmptyMed->addMesh(aMesh));
 

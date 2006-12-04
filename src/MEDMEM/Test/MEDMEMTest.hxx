@@ -167,10 +167,12 @@ public:
   void testVtkMeshDriver();
   //void testmedimport_src() /* not in spec */;
   //60
-
-  MEDMEM::MESH * createTestMesh ();
 };
 
+// to create a mesh with certain filling
+MEDMEM::MESH * MEDMEMTest_createTestMesh();
+
+// to automatically remove temporary files from disk
 class MEDMEMTest_TmpFilesRemover
 {
 public:

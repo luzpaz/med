@@ -34,10 +34,10 @@
 #include <cmath>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
-//#define ENABLE_FAULTS
+#define ENABLE_FAULTS
 
 // use this define to enable CPPUNIT asserts and fails, showing bugs
-#define ENABLE_FORCED_FAILURES
+//#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -781,7 +781,7 @@ void testDrivers()
   delete aSupport;
 }
 
-void MEDMEMTest::testField()
+void MEDMEMTest_testField()
 {
   SUPPORT anEmptySupport;
   ////////////////////
@@ -1509,45 +1509,13 @@ void MEDMEMTest::testField()
   // restore MED units
   aFieldOnGroup1->setMEDComponentUnit(1, "unit1");
 
-  // check case of different operands: valueType
-  //FIELD<int> * aFieldOnGroup4 =
-  //  createFieldOnGroup<int>(aMeshOneMore, aGroupOneMore, "Test_Diff_Mesh", "test");
-  //
-  //CPPUNIT_ASSERT_THROW(FIELD<double>::add(*aFieldOnGroup4, *aFieldOnGroup3), MEDEXCEPTION);
-  //CPPUNIT_ASSERT_THROW(*aFieldOnGroup4 - *aFieldOnGroup3, MEDEXCEPTION);
-  //CPPUNIT_ASSERT_THROW(*aFieldOnGroup4 *= *aFieldOnGroup3, MEDEXCEPTION);
-  //delete aFieldOnGroup4;
-
   // check case of different operands: numberOfComponents
 #ifdef ENABLE_FAULTS
   // (BUG) Cannot allocate value of higher dimension because of _componentsTypes reinitialization
+  // Must be MEDEXCEPTION instead. And on attempt to change nb.components must be the same behaviour.
   aFieldOnGroup1->deallocValue();
   CPPUNIT_ASSERT_THROW(aFieldOnGroup1->allocValue(/*dim*/5), MEDEXCEPTION);
 #endif
-#ifdef ENABLE_FORCED_FAILURES
-  CPPUNIT_FAIL("Segmentation fault on attempt to allocate value of higher dimension."
-               " Must be MEDEXCEPTION instead. And on attempt to change nb.components"
-               " must be the same behaviour.");
-#endif
-  aFieldOnGroup1->setNumberOfComponents(5);
-
-  CPPUNIT_ASSERT_THROW(FIELD<double>::sub(*aFieldOnGroup1, *aFieldOnGroup2), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 * *aFieldOnGroup2, MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 /= *aFieldOnGroup2, MEDEXCEPTION);
-
-  // check case of different operands: numberOfValues
-  aFieldOnGroup1->deallocValue();
-  aFieldOnGroup1->allocValue(2, nbVals + 1);
-  // be carefull: aFieldOnGroup1 reallocated and contains random values
-
-  CPPUNIT_ASSERT_THROW(FIELD<double>::mul(*aFieldOnGroup1, *aFieldOnGroup2), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 / *aFieldOnGroup2, MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 += *aFieldOnGroup2, MEDEXCEPTION);
-
-  // restore aFieldOnGroup1
-  aFieldOnGroup1->deallocValue();
-  aFieldOnGroup1->allocValue(2, nbVals);
-  // be carefull: aFieldOnGroup1 reallocated and contains random values
 
   delete aSubSupport1;
   delete [] anElems1;
@@ -1569,150 +1537,7 @@ void MEDMEMTest::testField()
   testDrivers();
 }
 
-/*!
- *  Check methods (2), defined in MEDMEM_FieldConvert.hxx:
- *  (+) template <class T> FIELD<T,FullInterlace> * FieldConvert(const FIELD<T,NoInterlace> & field);
- *  (+) template <class T> FIELD<T,NoInterlace> * FieldConvert(const FIELD<T,FullInterlace> & field);
- */
-void MEDMEMTest::testFieldConvert()
+int main (int argc, char** argv)
 {
-  // create an empty integer field 2x10
-  FIELD<int, FullInterlace> * aField_FING = new FIELD<int, FullInterlace> ();
-
-  aField_FING->setName("Field_FING");
-  aField_FING->setDescription("Field full interlace no gauss");
-
-  aField_FING->setNumberOfComponents(2);
-  aField_FING->setNumberOfValues(10);
-
-  string aCompsNames[2] = {"Pos", "Neg"};
-  string aCompsDescs[2] = {"+", "-"};
-  string aMEDCompsUnits[2] = {"unit1", "unit2"};
-  UNIT   aCompsUnits[2];
-
-  aCompsUnits[0] = UNIT("u1", "descr1");
-  aCompsUnits[1] = UNIT("u2", "descr2");
-
-  aField_FING->setComponentsNames(aCompsNames);
-  aField_FING->setComponentsDescriptions(aCompsDescs);
-  aField_FING->setMEDComponentsUnits(aMEDCompsUnits);
-  aField_FING->setComponentsUnits(aCompsUnits);
-
-  // check UNITs (for testField())
-  const UNIT * aCompsUnitsBack = aField_FING->getComponentsUnits();
-  CPPUNIT_ASSERT(aCompsUnits[0].getName() == aCompsUnitsBack[0].getName());
-  CPPUNIT_ASSERT(aCompsUnits[1].getName() == aCompsUnitsBack[1].getName());
-
-  const UNIT * aCompUnitBack1 = aField_FING->getComponentUnit(1);
-  const UNIT * aCompUnitBack2 = aField_FING->getComponentUnit(2);
-  CPPUNIT_ASSERT(aCompsUnits[0].getName() == aCompUnitBack1->getName());
-  CPPUNIT_ASSERT(aCompsUnits[1].getName() == aCompUnitBack2->getName());
-
-  // create one more field by copy
-  FIELD<int, FullInterlace> * aField_FIGG = new FIELD<int, FullInterlace> (*aField_FING);
-
-  // values
-  int values_FING[20] = { 7,- 7, 14,-14, 21,-21, 28,-28, 35,-35,
-                          42,-42, 49,-49, 56,-56, 63,-63, 70,-70};
-
-  /////////////////////
-  // TEST 1: NoGauss //
-  /////////////////////
-
-  MEDMEM_ArrayInterface<int,FullInterlace,NoGauss>::Array * anArray_FING =
-    new MEDMEM_ArrayInterface<int,FullInterlace,NoGauss>::Array
-    (values_FING, /*dim*/2, /*nbelem*/10, /*shallowCopy*/false, /*ownershipOfValues*/false);
-  aField_FING->setArray(anArray_FING);
-  // no need to delete anArray_FING, because it will be deleted in destructor of aField_FING
-
-  // 1. FullInterlace -> NoInterlace
-  FIELD<int, NoInterlace> * aField_NING = FieldConvert(*aField_FING);
-  const int * values_NING = aField_NING->getValue();
-
-  for (int i = 0; i < 10; i++) {
-    for (int j = 0; j < 2; j++) {
-      CPPUNIT_ASSERT_EQUAL(values_FING[2*i + j], values_NING[10*j + i]);
-    }
-  }
-
-  // 2. NoInterlace -> FullInterlace
-  FIELD<int, FullInterlace> * aField_FING_conv = FieldConvert(*aField_NING);
-  const int * values_FING_conv = aField_FING_conv->getValue();
-
-  for (int i = 0; i < 10; i++) {
-    for (int j = 0; j < 2; j++) {
-      CPPUNIT_ASSERT_EQUAL(values_FING_conv[2*i + j], values_FING[2*i + j]);
-      CPPUNIT_ASSERT_EQUAL(values_FING_conv[2*i + j], values_NING[10*j + i]);
-    }
-  }
-
-  delete aField_FING;
-  delete aField_NING;
-  delete aField_FING_conv;
-
-  ///////////////////
-  // TEST 2: Gauss //
-  ///////////////////
-  int nbelgeoc[2] = {1, 11};
-  int nbgaussgeo[2] = {-1, 1};
-  MEDMEM_ArrayInterface<int,FullInterlace,Gauss>::Array * anArray_FIGG =
-    new MEDMEM_ArrayInterface<int,FullInterlace,Gauss>::Array
-    (values_FING, /*dim*/2, /*nbelem*/10, /*nbtypegeo*/1, /*nbelgeoc*/nbelgeoc,
-     /*nbgaussgeo*/nbgaussgeo, /*shallowCopy*/false, /*ownershipOfValues*/false);
-  aField_FIGG->setArray(anArray_FIGG);
-  // no need to delete anArray_FIGG, because it will be deleted in destructor of aField_FIGG
-
-  // 1. FullInterlace -> NoInterlace
-  FIELD<int, NoInterlace> * aField_NIGG = FieldConvert(*aField_FIGG);
-  const int * values_NIGG = aField_NIGG->getValue();
-
-  for (int i = 0; i < 10; i++) {
-    for (int j = 0; j < 2; j++) {
-      CPPUNIT_ASSERT_EQUAL(values_FING[2*i + j], values_NIGG[10*j + i]);
-    }
-  }
-
-  // 2. NoInterlace -> FullInterlace
-  FIELD<int, FullInterlace> * aField_FIGG_conv = FieldConvert(*aField_NIGG);
-  const int * values_FIGG_conv = aField_FIGG_conv->getValue();
-
-  for (int i = 0; i < 10; i++) {
-    for (int j = 0; j < 2; j++) {
-      CPPUNIT_ASSERT_EQUAL(values_FIGG_conv[2*i + j], values_FING[2*i + j]);
-      CPPUNIT_ASSERT_EQUAL(values_FIGG_conv[2*i + j], values_NIGG[10*j + i]);
-    }
-  }
-
-  delete aField_FIGG;
-  delete aField_NIGG;
-  delete aField_FIGG_conv;
-
-#ifdef ENABLE_FAULTS
-  // (BUG) in FieldConvert(), concerning FIELD_::operator=
-  {
-    // create an empty integer field 2x10
-    FIELD<int, FullInterlace> * aField = new FIELD<int, FullInterlace> ();
-
-    aField->setName("aField");
-    aField->setDescription("Field full interlace no gauss");
-
-    aField->setNumberOfComponents(2);
-    aField->setNumberOfValues(10);
-
-    aField->setComponentsNames(aCompsNames);
-    aField->setComponentsDescriptions(aCompsDescs);
-    aField->setMEDComponentsUnits(aMEDCompsUnits);
-
-    MEDMEM_ArrayInterface<int,FullInterlace,NoGauss>::Array * anArray =
-      new MEDMEM_ArrayInterface<int,FullInterlace,NoGauss>::Array
-      (values_FING, /*dim*/2, /*nbelem*/10, /*shallowCopy*/false, /*ownershipOfValues*/false);
-    aField->setArray(anArray);
-    // no need to delete anArray, because it will be deleted in destructor of aField
-
-    FIELD<int, NoInterlace> * aField_conv = FieldConvert(*aField);
-  }
-#endif
-#ifdef ENABLE_FORCED_FAILURES
-  CPPUNIT_FAIL("FieldConvert() fails if _componentsUnits is not set, because it calls FIELD_::operator=");
-#endif
+  MEDMEMTest_testField();
 }

@@ -32,10 +32,10 @@
 #include <cmath>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
-//#define ENABLE_FAULTS
+#define ENABLE_FAULTS
 
 // use this define to enable CPPUNIT asserts and fails, showing bugs
-#define ENABLE_FORCED_FAILURES
+//#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -209,7 +209,7 @@ double dmin(double x, double y) { return (x>y)?y:x;}
  *   (Presently disconnected in C++) virtual void removeReference() const;
  *  }
  */
-void MEDMEMTest::testMeshAndMeshing()
+void MEDMEMTest_testMeshAndMeshing()
 {
   string datadir  = getenv("DATA_DIR");
   string filename = datadir + "/MedFiles/pointe.med";
@@ -1686,4 +1686,9 @@ void MEDMEMTest::testMeshAndMeshing()
     CPPUNIT_FAIL("Unknown exception");
   }
   CPPUNIT_ASSERT(idxNoElem == -1);
+}
+
+int main (int argc, char** argv)
+{
+  MEDMEMTest_testMeshAndMeshing();
 }

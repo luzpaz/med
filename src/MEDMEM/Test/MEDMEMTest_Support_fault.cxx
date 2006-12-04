@@ -29,10 +29,10 @@
 #include <cmath>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
-//#define ENABLE_FAULTS
+#define ENABLE_FAULTS
 
 // use this define to enable CPPUNIT asserts and fails, showing bugs
-#define ENABLE_FORCED_FAILURES
+//#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
@@ -121,7 +121,7 @@ using namespace MEDMEM;
  *   (reference counter presently disconnected in C++) virtual void removeReference() const;
  *  }
  */
-void MEDMEMTest::testSupport()
+void MEDMEMTest_testSupport()
 {
   // cells connectivities
   //const int NumberOfCellTypes = 3;
@@ -683,4 +683,9 @@ void MEDMEMTest::testSupport()
 
   delete aMesh;
   delete aMeshOneMore;
+}
+
+int main (int argc, char** argv)
+{
+  MEDMEMTest_testSupport();
 }

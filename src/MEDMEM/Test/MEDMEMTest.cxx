@@ -315,7 +315,7 @@ void MEDMEMTest::testSTRING()
     CPPUNIT_ASSERT(strcmp(              medstr, "filling 1 !!!") == 0);
   }
 
-  MEDMEM::MESH * aMesh1 = createTestMesh();
+  MEDMEM::MESH * aMesh1 = MEDMEMTest_createTestMesh();
   ostringstream ostr;
   ostr << *aMesh1;
 
@@ -464,7 +464,7 @@ void MEDMEMTest::testTypeMeshDriver()
  *                 |
  *                 .n1 (0,0,0)
  */
-MEDMEM::MESH * MEDMEMTest::createTestMesh ()
+MEDMEM::MESH * MEDMEMTest_createTestMesh ()
 {
   // MESH DATA
   int SpaceDimension = 3;
