@@ -699,19 +699,3 @@ bool MEDMEMTest_TmpFilesRemover::Register(const string theTmpFile)
 {
   return (myTmpFiles.insert(theTmpFile)).second;
 }
-
-/*!
- *  Tool to print array to stream.
- */
-template<class T>
-void MEDMEMTest_DumpArray (ostream & stream, const T* array, const int length, const string text)
-{
-  stream << text << ": {";
-  if (length > 0) {
-    stream << array[0];
-    for (int i = 1; i < length; i++) {
-      stream << ", " << array[i];
-    }
-  }
-  stream << "}" << endl;
-}

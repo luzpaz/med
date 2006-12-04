@@ -25,7 +25,8 @@
 
 #include <set>
 #include <string>
-#include <ostream>
+//#include <ostream>
+#include <iostream>
 
 namespace MEDMEM {
   class MESH;
@@ -181,7 +182,20 @@ private:
   std::set<std::string> myTmpFiles;
 };
 
+/*!
+ *  Tool to print array to stream.
+ */
 template<class T>
-void MEDMEMTest_DumpArray (std::ostream & stream, const T* array, const int length, const std::string text);
+void MEDMEMTest_DumpArray (std::ostream & stream, const T* array, const int length, const std::string text)
+{
+  stream << text << ": {";
+  if (length > 0) {
+    stream << array[0];
+    for (int i = 1; i < length; i++) {
+      stream << ", " << array[i];
+    }
+  }
+  stream << "}" << std::endl;
+};
 
 #endif
