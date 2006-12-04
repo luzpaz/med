@@ -102,32 +102,38 @@ void MEDMEMTest::testnArray()
 			       , 112 , 122 , 132 , 142 , 152 , 162 , 172 , 182
 			       , 192 , 202 };
 
+  //test MEDMEM_Array(int dim, int nbelem)
   MEDMEM_Array<double>  myArray1(mdim,nbelem1);
+  //test getGaussPresence
   CPPUNIT_ASSERT( !myArray1.getGaussPresence());
 
+  //test setIJ. Fill array
   for (int i =1; i <= nbelem1; i++)
     for (int j =1; j <= mdim; j++)
     {
       CPPUNIT_ASSERT_NO_THROW(myArray1.setIJ(i,j,i*10+j));
     }
 
+  //test getPtr
   myArray1Ptr = myArray1.getPtr();
 
   for (int i = 0; i < mdim*nbelem1; i++)
     CPPUNIT_ASSERT( myArray1Ptr[i] == array1Ref[i] );
 
   {
+    //test MEDMEM_Array(ElementType * values, int dim, int nbelem, bool shallowCopy=false, bool ownershipOfValues=false)
     MEDMEM_Array<double>  myArray1val((double*)array1Ref,mdim,nbelem1);
     myArray1Ptr = myArray1val.getPtr();
     for (int i = 0; i < mdim*nbelem1; i++)
       CPPUNIT_ASSERT( myArray1Ptr[i] == array1Ref[i] );
-
+    //test MEDMEM_Array(ElementType * values, int dim, int nbelem, bool shallowCopy=true, bool ownershipOfValues=false);
     MEDMEM_Array<double>  myArray1valsh((double*)array1Ref,mdim,nbelem1, true);
     myArray1Ptr = myArray1valsh.getPtr();
     for (int i = 0; i < mdim*nbelem1; i++)
       CPPUNIT_ASSERT( myArray1Ptr[i] == array1Ref[i] );
 
 #ifdef ENABLE_FAULTS
+    //test MEDMEM_Array(ElementType * values, int dim, int nbelem, bool shallowCopy=true, bool ownershipOfValues=true);
     MEDMEM_Array<double> myArray1valow ((double*)array1Ref,mdim,nbelem1,true,true);
 #endif
 #ifdef ENABLE_FORCED_FAILURES
@@ -137,6 +143,7 @@ void MEDMEMTest::testnArray()
     double myPtr[]= {-1, -2, -3, -4, -5, -6, -7, -8, -9, 0};
     try{
       //size the array stays the same, only first 10 element are being overwritten
+      //test setPtr
       myArray1valsh.setPtr(myPtr);
     }
     catch ( const std::exception &e )
@@ -152,6 +159,7 @@ void MEDMEMTest::testnArray()
       CPPUNIT_ASSERT_EQUAL(myArray1Ptr[i], myPtr[i]);
   }
 
+  //test MEDMEM_Array(const MEDMEM_Array & array, bool shallowCopy=false)
   MEDMEM_Array<double> myArray1bis(myArray1, false);
   CPPUNIT_ASSERT(myArray1 == myArray1bis);
 
@@ -159,6 +167,7 @@ void MEDMEMTest::testnArray()
   for (int i =0; i < mdim*nbelem1; i++)
     CPPUNIT_ASSERT( myArray1Ptr[i] == array1Ref[i] );
 
+  //test MEDMEM_Array()
   MEDMEM_Array<double> myArray1ter;
   try
   {
@@ -183,6 +192,7 @@ void MEDMEMTest::testnArray()
   for (int i =1; i <= nbelem1; i++)
   {
     try {
+      //test setRow(int i,const ElementType * const value)
       myArray1qua.setRow(i,&array1Ref[(i-1)*mdim]);
     }
     catch (MEDMEM::MEDEXCEPTION &m) {
@@ -197,6 +207,7 @@ void MEDMEMTest::testnArray()
   for (int i =0; i < mdim*nbelem1; i++)
     CPPUNIT_ASSERT( myArray1Ptr[i] == array1Ref[i] );
 
+  //test getColumn(int j)
   CPPUNIT_ASSERT_THROW(myArray1qua.getColumn(1), MEDEXCEPTION);
 
   MEDMEM_Array<double,NoInterlaceNoGaussPolicy> * myArray1cin = ArrayConvert(myArray1);
@@ -214,26 +225,32 @@ void MEDMEMTest::testnArray()
   /////////////////////////////////////
   {
     const double * myArray2Ptr = 0;
-
+    //MEDMEM_Array(int dim, int nbelem)
     MEDMEM_Array<double,NoInterlaceNoGaussPolicy> myArray2(mdim,nbelem1);
 
     for (int i =1; i <= nbelem1; i++) {
       for (int j =1; j <= mdim; j++) {
+	//test setIJ(int i, int j, const ElementType & value)
         CPPUNIT_ASSERT_NO_THROW(myArray2.setIJ(i,j,i*10+j));
       }
     }
 
+    //test getPtr()
     myArray2Ptr = myArray2.getPtr();
     for (int i =0; i < mdim*nbelem1; i++)
       CPPUNIT_ASSERT( myArray2Ptr[i] == array2Ref[i] );
 
+    //test MEDMEM_Array(const MEDMEM_Array & array, bool shallowCopy=false)
     MEDMEM_Array<double,NoInterlaceNoGaussPolicy> myArray2bis(myArray2, false);
     myArray2Ptr = myArray2bis.getPtr();
     for (int i =0; i < mdim*nbelem1; i++)
       CPPUNIT_ASSERT( myArray2Ptr[i] == array2Ref[i] );
 
+    //test MEDMEM_Array()
     MEDMEM_Array<double,NoInterlaceNoGaussPolicy> myArray2ter;
+    //test operator=(const MEDMEM_Array & array)
     myArray2ter = myArray2;
+    //test getPtr
     myArray2Ptr = myArray2ter.getPtr();
     for (int i =0; i < mdim*nbelem1; i++)
       CPPUNIT_ASSERT( myArray2Ptr[i] == array2Ref[i] );
@@ -242,12 +259,14 @@ void MEDMEMTest::testnArray()
     myArray2Ptr = myArray2qua.getPtr();
 
     for (int j = 1; j <= mdim; j++) {
+      //test setColumn(int j, const ElementType * const value)
       CPPUNIT_ASSERT_NO_THROW(myArray2qua.setColumn(j,&array2Ref[nbelem1*(j-1)]));
     }
 
     for (int i =0; i < mdim*nbelem1; i++)
       CPPUNIT_ASSERT( myArray2Ptr[i] == array2Ref[i] );
 
+    //test getRow(int i)
     CPPUNIT_ASSERT_THROW(myArray2qua.getRow(1), MEDEXCEPTION);
 
     MEDMEM_Array<double,FullInterlaceNoGaussPolicy> * myArray2cin = ArrayConvert(myArray2);
@@ -291,6 +310,7 @@ void MEDMEMTest::testnArray()
 			       13 , 13 , 13 , 14 , 14 , 14 ,
 			       15 , 15 , 15 };
 
+  //test MEDMEM_Array(int dim, int nbelem, int nbtypegeo, const int * const  nbelgeoc, const int * const nbgaussgeo)
   MEDMEM_Array<double,FullInterlaceGaussPolicy> myArray3(mdim,nbelem2,nbtypegeo,nbelgeoc,nbgaussgeo);
 
   elemno = 1;
@@ -299,6 +319,7 @@ void MEDMEMTest::testnArray()
       for (int k=1; k <= nbgaussgeo[ntyp]; k++)
 	for (int j=1; j <= mdim; j++) {
 	  try{
+	    //test setIJK(int i, int j, int k, const ElementType & value)
 	    myArray3.setIJK(elemno,j,k,elemno+(ntyp-1)*10+0.1*k+0.01*j);
 	  }
 	  catch (MEDMEM::MEDEXCEPTION &m) {
@@ -329,7 +350,9 @@ void MEDMEMTest::testnArray()
 	elemno++;
       }
 
+  //test MEDMEM_Array()
   MEDMEM_Array<double,FullInterlaceGaussPolicy> myArray3ter;
+  //test operator=(const MEDMEM_Array & array)
   myArray3ter = myArray3;
   myArray3Ptr = myArray3ter.getPtr();
 
@@ -379,7 +402,7 @@ void MEDMEMTest::testnArray()
   // TEST 4   NoInterlace et Gauss  //
   ////////////////////////////////////
   const double * myArray4Ptr = 0;
-
+  //test MEDMEM_Array(int dim, int nbelem, int nbtypegeo, const int * const  nbelgeoc, const int * const nbgaussgeo)
   MEDMEM_Array<double,NoInterlaceGaussPolicy> myArray4(mdim,nbelem2,nbtypegeo,nbelgeoc,nbgaussgeo);
 
   elemno = 1;
@@ -388,6 +411,7 @@ void MEDMEMTest::testnArray()
       for (int k=1; k <= nbgaussgeo[ntyp]; k++)
 	for (int j=1; j <= mdim; j++) {
 	  try{
+	    //test setIJK(int i, int j, int k, const ElementType & value)
 	    myArray4.setIJK(elemno,j,k,elemno+(ntyp-1)*10+0.1*k+0.01*j);
 	  }
 	  catch (MEDMEM::MEDEXCEPTION &m) {
@@ -402,11 +426,13 @@ void MEDMEMTest::testnArray()
     }
   }
 
+   //test getPtr()
   myArray4Ptr = myArray4.getPtr();
   for (int i =0; i < myArray4.getArraySize(); i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray4Ptr[i], array4Ref[i], EPS );
   }
 
+  //test MEDMEM_Array(const MEDMEM_Array & array, bool shallowCopy=false)
   MEDMEM_Array<double,NoInterlaceGaussPolicy> myArray4bis(myArray4, false);
   myArray4Ptr = myArray4bis.getPtr();
 
@@ -419,7 +445,9 @@ void MEDMEMTest::testnArray()
 	elemno++;
       }
 
+  //test MEDMEM_Array()
   MEDMEM_Array<double,NoInterlaceGaussPolicy> myArray4ter;
+  //test operator=(const MEDMEM_Array & array)
   myArray4ter = myArray4;
   myArray4Ptr = myArray4ter.getPtr();
 
@@ -465,13 +493,17 @@ void MEDMEMTest::testnArray()
   CPPUNIT_ASSERT_THROW(myArray4.getIJ(0,2), MEDEXCEPTION);
 
   ostringstream os;
+  //test operator<<(ostream & os, const MEDMEM_Array & array)
   os << myArray4;
   CPPUNIT_ASSERT(os.str() != "");
 
   const int * myArray5Ptr = 0;
-
+  //test MEDMEM_Array(ElementType * values, int dim, int nbelem, int nbtypegeo,
+  //                  const int * const  nbelgeoc, const int * const  nbgaussgeo,
+  //                  bool shallowCopy=false, bool ownershipOfValues=false)
   MEDMEM_Array<int, NoInterlaceGaussPolicy> myArray5 ((int*)array5Ref, mdim, nbelem2,
                                                       nbtypegeo, nbelgeoc, nbgaussgeo);
+  //test getGaussPresence
   CPPUNIT_ASSERT( myArray5.getGaussPresence());
 
   myArray5Ptr = myArray5.getPtr();
@@ -479,6 +511,7 @@ void MEDMEMTest::testnArray()
     CPPUNIT_ASSERT_EQUAL( myArray5Ptr[i], array5Ref[i]);
   }
 
+  //test MEDMEM_Array(const MEDMEM_Array & array, bool shallowCopy=false)
   MEDMEM_Array<int,NoInterlaceGaussPolicy> myArray5bis(myArray5, false);
   myArray5Ptr = myArray5bis.getPtr();
 
@@ -491,9 +524,12 @@ void MEDMEMTest::testnArray()
 	elemno++;
       }
 
+  //MEDMEM_Array()
   MEDMEM_Array<int,NoInterlaceGaussPolicy> myArray5ter;
+  //test setPtr(ElementType * values, bool shallowCopy=false, bool ownershipOfValues=false)
   CPPUNIT_ASSERT_NO_THROW(myArray5.setPtr((int*)array5Ref));
 
+  //test getPtr()
   myArray5Ptr = myArray5ter.getPtr();
   for (int i =0; i < myArray5ter.getArraySize(); i++) {
     CPPUNIT_ASSERT_EQUAL( myArray5Ptr[i], array5Ref[i]);
