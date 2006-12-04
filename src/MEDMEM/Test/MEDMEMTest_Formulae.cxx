@@ -43,7 +43,7 @@ using namespace MEDMEM;
 /*!
  *  Check methods (13), defined in MEDMEM_Formulae.hxx:
  *
- *  (yetno) inline void CalculateBarycenterDyn(const double **pts, int nbPts, int dim, double *bary);
+ *  (+)     inline void CalculateBarycenterDyn(const double **pts, int nbPts, int dim, double *bary);
  *
  *  (+)     inline double CalculateAreaForPolyg(const double **coords, int nbOfPtsInPolygs, int spaceDim);
  *  (+)     inline double CalculateAreaForTria(const double *p1, const double *p2,
@@ -57,29 +57,29 @@ using namespace MEDMEM;
  *                                             const double *p3, const double *p4, double *normal);
  *  (+)     inline void CalculateNormalForPolyg(const double **coords, int nbOfPtsInPolygs, double *normal);
  *
- *  (yetno) inline double CalculateVolumeForTetra(const double *p1, const double *p2,
+ *  (+)     inline double CalculateVolumeForTetra(const double *p1, const double *p2,
  *                                                const double *p3, const double *p4);
- *  (yetno) inline double CalculateVolumeForPyra(const double *p1, const double *p2,
+ *  (+)     inline double CalculateVolumeForPyra(const double *p1, const double *p2,
  *                                               const double *p3, const double *p4, const double *p5);
- *  (yetno) inline double CalculateVolumeForPenta(const double *p1, const double *p2, const double *p3,
+ *  (+)     inline double CalculateVolumeForPenta(const double *p1, const double *p2, const double *p3,
  *                                                const double *p4, const double *p5, const double *p6);
- *  (yetno) inline double CalculateVolumeForHexa(const double *pt1, const double *pt2, const double *pt3,
+ *  (+)     inline double CalculateVolumeForHexa(const double *pt1, const double *pt2, const double *pt3,
  *                                               const double *pt4, const double *pt5, const double *pt6,
  *                                               const double *pt7, const double *pt8);
- *  (yetno) inline double CalculateVolumeForPolyh(const double ***pts, const int *nbOfNodesPerFaces,
+ *  (+)     inline double CalculateVolumeForPolyh(const double ***pts, const int *nbOfNodesPerFaces,
  *                                                int nbOfFaces, const double *bary);
  *
- *  (yetno) template<int N> inline double addComponentsOfVec(const double **pts, int rk);
- *  (yetno) template<> inline double addComponentsOfVec<1>(const double **pts, int rk);
+ *  (+)     template<int N> inline double addComponentsOfVec(const double **pts, int rk);
+ *  (+)     template<> inline double addComponentsOfVec<1>(const double **pts, int rk);
  *
- *  (yetno) template<int N, int DIM> inline void CalculateBarycenter(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<2,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<3,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<4,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<5,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<6,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<7,0>(const double **pts, double *bary);
- *  (yetno) template<> inline void CalculateBarycenter<8,0>(const double **pts, double *bary);
+ *  (+)     template<int N, int DIM> inline void CalculateBarycenter(const double **pts, double *bary);
+ *  (-)     template<> inline void CalculateBarycenter<2,0>(const double **pts, double *bary);
+ *  (-)     template<> inline void CalculateBarycenter<3,0>(const double **pts, double *bary);
+ *  (-)     template<> inline void CalculateBarycenter<4,0>(const double **pts, double *bary);
+ *  (-)     template<> inline void CalculateBarycenter<5,0>(const double **pts, double *bary);
+ *  (-)     template<> inline void CalculateBarycenter<6,0>(const double **pts, double *bary);
+ *  (-)     template<> inline void CalculateBarycenter<7,0>(const double **pts, double *bary);
+ *  (-)     template<> inline void CalculateBarycenter<8,0>(const double **pts, double *bary);
  */
 void MEDMEMTest::testFormulae()
 {
