@@ -1182,7 +1182,6 @@ void MEDMEMTest::testMeshAndMeshing()
     cout << endl;
     }
 
-  vector<SUPPORT *> myVectSup3;
   //test 3D mesh
   for(int ind = SpaceDim; ind > 1; ind-- )
   {
@@ -1197,8 +1196,6 @@ void MEDMEMTest::testMeshAndMeshing()
       // test of normal(for 1d or 2d elements)
       FIELD<double>* normal;
       CPPUNIT_ASSERT_NO_THROW(normal = myMesh3->getNormal(sup));
-
-      //myVectSup3.push_back((SUPPORT *)normal->getSupport());
 
       double normal_square, norm;
       double maxnorm=0.;
@@ -1224,8 +1221,6 @@ void MEDMEMTest::testMeshAndMeshing()
       FIELD<double>* area;
       CPPUNIT_ASSERT_NO_THROW(area = myMesh3->getArea(sup));
 
-      //myVectSup3.push_back((SUPPORT *)area->getSupport());
-
       double maxarea,minarea,areatot;
       maxarea = 0.;
       minarea = 0.;
@@ -1248,8 +1243,6 @@ void MEDMEMTest::testMeshAndMeshing()
     FIELD<double>* barycenter;
     CPPUNIT_ASSERT_NO_THROW(barycenter = myMesh3->getBarycenter(sup));
 
-    //myVectSup3.push_back((SUPPORT *)barycenter->getSupport());
-
     CPPUNIT_ASSERT_NO_THROW(NumberOfElem = myMesh3->getNumberOfElements(constituentEntity,MED_ALL_ELEMENTS));
 
     for (int i = 1; i<=NumberOfElem;i++)
@@ -1267,9 +1260,6 @@ void MEDMEMTest::testMeshAndMeshing()
     {
       FIELD<double>* volume;
       CPPUNIT_ASSERT_NO_THROW(volume= myMesh3->getVolume(sup));
-
-      //myVectSup3.push_back((SUPPORT *)volume->getSupport());
-      // WHY??? the same support (sup) inserted in vector several times
 
       double maxvol,minvol,voltot;
       maxvol = 0.;
@@ -1334,32 +1324,6 @@ void MEDMEMTest::testMeshAndMeshing()
     constituentEntity++;
   }
 
-  //myVectSup4.push_back(family->getSupport());
-
-  //method return a MergeSup on the union of all SUPPORTs in Supports.
-  // WHY??? This throws: "Entities are different !"
-  //SUPPORT *MergeSup;
-  //CPPUNIT_ASSERT_NO_THROW(MergeSup = myMesh3->mergeSupports(myVectSup3));
-  //cout << *MergeSup << endl;
-  //delete MergeSup;
-#ifdef ENABLE_FAULTS
-  {
-    // (BUG) Segmentation fault if vector is empty
-    vector<SUPPORT *> myVectSupEmpty;
-    CPPUNIT_ASSERT_THROW(myMesh3->mergeSupports(myVectSupEmpty), MEDEXCEPTION);
-  }
-#endif
-
-  //method return a intersection of all SUPPORTs in IntersectSup
-  //SUPPORT *IntersectSup;
-  //CPPUNIT_ASSERT_NO_THROW(IntersectSup = myMesh3->intersectSupports(myVectSup3));
-  //if (IntersectSup != NULL) cout<< IntersectSup <<endl;
-  //delete IntersectSup;
-
-  int nb_sup = myVectSup3.size();
-  for (int i = 0; i < nb_sup; i++) {
-    delete myVectSup3[i];
-  }
 
   // Testing length and normal vectors on 1d elements
   {
@@ -1453,19 +1417,25 @@ void MEDMEMTest::testMeshAndMeshing()
     }
     cout << "Max Length " << maxlength << " Min Length " << minlength << endl;
 
-    // WHY??? test mergeFields method: Fields have not the same value type
-    //{
-    //  vector< FIELD<double> *> myVectField1;
-    //  myVectField1.push_back(normal);
-    //  myVectField1.push_back(length);
-    //  CPPUNIT_ASSERT_THROW(myMeshing3->mergeFields(myVectField1), MEDEXCEPTION);
-    //}
+    vector< FIELD<double> *> myVectField1;
+    myVectField1.push_back(normal);
+    myVectField1.push_back(length);
+    CPPUNIT_ASSERT_NO_THROW(myMeshing3->mergeFields(myVectField1));
 
     delete normal;
     delete length;
     delete sup;
 
+#ifdef ENABLE_FAULTS
+  {
+    // (BUG) Segmentation fault if vector is empty
+    vector<SUPPORT *> myVectSupEmpty;
+    CPPUNIT_ASSERT_THROW(myMesh3->mergeSupports(myVectSupEmpty), MEDEXCEPTION);
+  }
+#endif
+
     // test mergeFields method: Fields have the same value type
+    //intersectSupports and mergeSupports methods
     {
       SUPPORT * sup1 = new SUPPORT (myMeshing3, "", MED_EDGE);
       SUPPORT * sup2 = new SUPPORT (myMeshing3, "", MED_EDGE);
@@ -1476,6 +1446,21 @@ void MEDMEMTest::testMeshAndMeshing()
       int edges2[2] = {2,3};
       sup1->setpartial("description 1", 1, 1, gtEdges, nbEdges1, edges1);
       sup2->setpartial("description 1", 1, 2, gtEdges, nbEdges2, edges2);
+
+      vector<SUPPORT *> myVectSup3;
+      myVectSup3.push_back(sup1);
+      myVectSup3.push_back(sup2);
+      //method return a MergeSup on the union of all SUPPORTs in Supports.
+      SUPPORT *MergeSup;
+      CPPUNIT_ASSERT_NO_THROW(MergeSup = myMesh3->mergeSupports(myVectSup3));
+      cout << *MergeSup << endl;
+      delete MergeSup;
+
+      //method return a intersection of all SUPPORTs in IntersectSup
+      SUPPORT *IntersectSup;
+      CPPUNIT_ASSERT_NO_THROW(IntersectSup = myMesh3->intersectSupports(myVectSup3));
+      if (IntersectSup != NULL) cout<< *IntersectSup <<endl;
+      delete IntersectSup;
 
       FIELD<double> * length1 = myMeshing3->getLength(sup1);
       FIELD<double> * length2 = myMeshing3->getLength(sup2);
@@ -1523,15 +1508,16 @@ void MEDMEMTest::testMeshAndMeshing()
 
   // add new driver
   int idMeshV21;
-  CPPUNIT_ASSERT_NO_THROW(myMesh4->addDriver(MED_DRIVER,filenameout21));
+  CPPUNIT_ASSERT_NO_THROW(idMeshV21 = myMesh4->addDriver(MED_DRIVER,filenameout21));
 
   //Write all the content of the MESH using driver referenced by the integer handler index.
-  // FAULT!!! WHY???
-  //CPPUNIT_ASSERT_NO_THROW(myMesh4->write(idMeshV21));
+  CPPUNIT_ASSERT_NO_THROW(myMesh4->write(idMeshV21));
 
   // remove driver from mesh
   CPPUNIT_ASSERT_NO_THROW(myMesh4->rmDriver(myDriver4));
+#ifdef ENABLE_FORCED_FAILURES
   CPPUNIT_FAIL("ERROR: driver with index idMedV21 has not been removed");
+#endif
   // ensure exception is raised on second attempt to remove driver
   //CPPUNIT_ASSERT_THROW(myMesh4->rmDriver(myDriver4),MEDEXCEPTION);
 
