@@ -46,6 +46,12 @@ namespace MED
     TMutex myMutex; 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //! Gets version of the MED library used for the MED file
+    virtual 
+    EVersion
+    GetVersion() = 0;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //! Creates a MEDWrapper MED Mesh representation
     virtual 
     PMeshInfo 

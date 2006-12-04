@@ -40,6 +40,15 @@ namespace MED
   {
   public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //! Gets version of the MED library used for the MED file
+    virtual 
+    EVersion
+    GetVersion()
+    {
+      return eVersion;
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     virtual 
     PMeshInfo
     CrMeshInfo(TInt theDim = 0,
