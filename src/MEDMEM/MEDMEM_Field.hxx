@@ -1707,7 +1707,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
       myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
       value   = myArray->getPtr();
     }
-
+    value = value + (component-1) * getNumberOfValues();
     const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
 
     double integrale=0.0;
