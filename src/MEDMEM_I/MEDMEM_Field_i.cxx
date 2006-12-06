@@ -26,6 +26,12 @@
 //=============================================================================
 #include "MEDMEM_Field_i.hxx"
 
+#include "SALOME_NamingService.hxx"
+#include "SALOME_LifeCycleCORBA.hxx"
+
+#include CORBA_SERVER_HEADER(SALOME_ModuleCatalog)
+#include CORBA_CLIENT_HEADER(MED_Gen)
+
 using namespace MEDMEM;
 using namespace MED_EN;
 
@@ -460,7 +466,7 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
         string fieldEntryPath = "/";
 
         // Create SComponent labelled 'Med'
-        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
+        SALOMEDS::SComponent_var medfather = PublishMedComponent(myStudy);
         fieldEntryPath += "Med/";
         if ( CORBA::is_nil(medfather) )
 	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
@@ -679,4 +685,54 @@ CORBA::Long FIELD_i::addDriver (SALOME_MED::medDriverTypes driverType,
 	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
+//=============================================================================
+/*!
+ * CORBA: publish MED component
+ */
+//=============================================================================
+SALOMEDS::SComponent_ptr FIELD_i::PublishMedComponent(SALOMEDS::Study_ptr theStudy)
+{
+  if ( CORBA::is_nil(theStudy) )
+    return SALOMEDS::SComponent::_nil();
 
+  SALOMEDS::SComponent_var medfather = theStudy->FindComponent("MED");
+  if ( !CORBA::is_nil(medfather) )
+    return medfather._retn();
+
+  ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
+  ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
+  CORBA::ORB_var &orb = init(0,0);
+
+  SALOME_NamingService* ns = SINGLETON_<SALOME_NamingService>::Instance();
+  ASSERT(SINGLETON_<SALOME_NamingService>::IsAlreadyExisting());
+  ns->init_orb( orb );
+
+  SALOME_LifeCycleCORBA* lcc = new SALOME_LifeCycleCORBA( ns );
+
+  SALOME_ModuleCatalog::ModuleCatalog_var aCatalog  = 
+    SALOME_ModuleCatalog::ModuleCatalog::_narrow(ns->Resolve("/Kernel/ModulCatalog"));
+  if ( CORBA::is_nil( aCatalog ) )
+    return medfather._retn();
+  SALOME_ModuleCatalog::Acomponent_var aComp = aCatalog->GetComponent( "MED" );
+  if ( CORBA::is_nil( aComp ) )
+    return medfather._retn();
+  
+  SALOMEDS::StudyBuilder_var aBuilder = theStudy->NewBuilder();
+  aBuilder->NewCommand();
+  bool aLocked = theStudy->GetProperties()->IsLocked();
+  if (aLocked) theStudy->GetProperties()->SetLocked(false);
+  
+  medfather = aBuilder->NewComponent("MED");
+  SALOMEDS::GenericAttribute_var anAttr = aBuilder->FindOrCreateAttribute(medfather, "AttributeName");
+  SALOMEDS::AttributeName_var aName = SALOMEDS::AttributeName::_narrow(anAttr);
+  aName->SetValue( aComp->componentusername() );
+  
+  Engines::Component_var aMedComponent = lcc->FindOrLoad_Component("FactoryServer", "MED");
+  SALOME_MED::MED_Gen_var aMedEngine = SALOME_MED::MED_Gen::_narrow( aMedComponent );
+  aBuilder->DefineComponentInstance(medfather, aMedEngine);
+  
+  if (aLocked) theStudy->GetProperties()->SetLocked(true);
+  aBuilder->CommitCommand();
+  
+  return medfather._retn();
+}

@@ -106,6 +106,9 @@ public :
     // Cuisine Interne
     MEDMEM::FIELD_ * constructConstField() const;
 
+    // Publish MED Component
+    SALOMEDS::SComponent_ptr PublishMedComponent(SALOMEDS::Study_ptr theStudy);
+
  };
 }
 
