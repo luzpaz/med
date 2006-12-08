@@ -405,13 +405,13 @@ namespace MED
       
       virtual
       void
-      SetTimeStamp(const PTimeStampValueBase& theTimeStampValue,
-		   TErr* theErr = NULL);
+      SetTimeStampValue(const PTimeStampValueBase& theTimeStampValue,
+			TErr* theErr = NULL);
       
       void 
-      SetTimeStamp(const PTimeStampValueBase& theTimeStampValue,
-		   EModeAcces theMode,
-		   TErr* theErr = NULL);
+      SetTimeStampValue(const PTimeStampValueBase& theTimeStampValue,
+			EModeAcces theMode,
+			TErr* theErr = NULL);
       
 
       //----------------------------------------------------------------------------

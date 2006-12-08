@@ -41,7 +41,7 @@ namespace MED
     return myWrapper;
   }
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PMeshInfo
   TWrapper
   ::GetPMeshInfo(TInt theId,
@@ -53,7 +53,7 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PFamilyInfo 
   TWrapper
   ::GetPFamilyInfo(const PMeshInfo& theMeshInfo, 
@@ -85,7 +85,7 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PNodeInfo
   TWrapper
   ::GetPNodeInfo(const PMeshInfo& theMeshInfo,
@@ -134,7 +134,7 @@ namespace MED
     return anInfo;
   }
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PPolygoneInfo
   TWrapper
   ::GetPPolygoneInfo(const PMeshInfo& theMeshInfo,
@@ -168,7 +168,7 @@ namespace MED
     return anInfo;
   }
   
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PPolyedreInfo
   TWrapper
   ::GetPPolyedreInfo(const PMeshInfo& theMeshInfo,
@@ -209,6 +209,7 @@ namespace MED
     return anInfo;
   }
   
+  //----------------------------------------------------------------------------
   PElemInfo 
   TWrapper
   ::GetPElemInfo(const PMeshInfo& theMeshInfo,
@@ -297,7 +298,7 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PCellInfo 
   TWrapper
   ::GetPCellInfo(const PMeshInfo& theMeshInfo,
@@ -345,7 +346,7 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PFieldInfo
   TWrapper
   ::GetPFieldInfo(const PMeshInfo& theMeshInfo, 
@@ -369,7 +370,7 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PTimeStampInfo
   TWrapper
   ::GetPTimeStampInfo(const PFieldInfo& theFieldInfo,
@@ -395,7 +396,7 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PProfileInfo
   TWrapper
   ::GetPProfileInfo(TInt theId,
@@ -410,28 +411,52 @@ namespace MED
   }
 
 
-  //---------------------------------------------------------------
+  //----------------------------------------------------------------------------
+  PTimeStampValueBase
+  TWrapper
+  ::CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const TGeom2Profile& theGeom2Profile,
+		     EModeSwitch theMode)
+  {
+    PFieldInfo aFieldInfo = theTimeStampInfo->GetFieldInfo();
+    return CrTimeStampValue(theTimeStampInfo,
+			    aFieldInfo->GetType(),
+			    theGeom2Profile,
+			    theMode);
+  }
+
+  //----------------------------------------------------------------------------
+  PTimeStampValueBase
+  TWrapper
+  ::CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const PTimeStampValueBase& theInfo)
+  {
+    PFieldInfo aFieldInfo = theTimeStampInfo->GetFieldInfo();
+    return CrTimeStampValue(theTimeStampInfo,
+			    theInfo,
+			    aFieldInfo->GetType());
+  }
+
+  //----------------------------------------------------------------------------
   template<class TimeStampValueType>
   void
   Print(SharedPtr<TimeStampValueType> theTimeStampValue)
   {
     INITMSG(MYDEBUG,"Print - TimeStampValue\n");
-    typename TimeStampValueType::TGeom2Value& aGeom2Value = theTimeStampValue->myGeom2Value;
-    typename TimeStampValueType::TGeom2Value::const_iterator anIter = aGeom2Value.begin();
+    typename TimeStampValueType::TTGeom2Value& aGeom2Value = theTimeStampValue->myGeom2Value;
+    typename TimeStampValueType::TTGeom2Value::const_iterator anIter = aGeom2Value.begin();
     for(; anIter != aGeom2Value.end(); anIter++){
       const EGeometrieElement& aGeom = anIter->first;
-      const typename TimeStampValueType::TMeshValue& aMeshValue = anIter->second;
+      const typename TimeStampValueType::TTMeshValue& aMeshValue = anIter->second;
       TInt aNbElem = aMeshValue.myNbElem;
       TInt aNbGauss = aMeshValue.myNbGauss;
       TInt aNbComp = aMeshValue.myNbComp;
       INITMSG(MYDEBUG,"aGeom = "<<aGeom<<" - "<<aNbElem<<": ");
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
-	typename TimeStampValueType::TMeshValue::TCValueSliceArr aValueSliceArr = 
-	  aMeshValue.GetGaussValueSliceArr(iElem);
+	typename TimeStampValueType::TTMeshValue::TCValueSliceArr aValueSliceArr = aMeshValue.GetGaussValueSliceArr(iElem);
 	ADDMSG(MYVALUEDEBUG,"{");
 	for(TInt iGauss = 0; iGauss < aNbGauss; iGauss++){
-	  const typename TimeStampValueType::TMeshValue::TCValueSlice& aValueSlice = 
-	    aValueSliceArr[iGauss];
+	  const typename TimeStampValueType::TTMeshValue::TCValueSlice& aValueSlice = aValueSliceArr[iGauss];
 	  for(TInt iComp = 0; iComp < aNbComp; iComp++){
 	    ADDMSG(MYVALUEDEBUG,aValueSlice[iComp]<<" ");
 	  }
@@ -443,7 +468,7 @@ namespace MED
     }
   }
 
-  //---------------------------------------------------------------
+  //----------------------------------------------------------------------------
   PTimeStampValueBase 
   TWrapper
   ::GetPTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
@@ -451,10 +476,14 @@ namespace MED
 		       const TKey2Gauss& theKey2Gauss,
 		       TErr* theErr)
   {
-    PTimeStampValueBase anInfo = CrTimeStampValue(theTimeStampInfo);
-    GetTimeStampValue(anInfo,theMKey2Profile,theKey2Gauss,theErr);
-#ifdef _DEBUG_
     PFieldInfo aFieldInfo = theTimeStampInfo->GetFieldInfo();
+    PTimeStampValueBase anInfo = CrTimeStampValue(theTimeStampInfo,
+						  aFieldInfo->GetType());
+    GetTimeStampValue(anInfo, 
+		      theMKey2Profile, 
+		      theKey2Gauss,
+		      theErr);
+#ifdef _DEBUG_
     if(aFieldInfo->GetType() == eFLOAT64)
       Print<TFloatTimeStampValue>(anInfo);
     else
@@ -463,6 +492,94 @@ namespace MED
     return anInfo;
   }
 
+  //----------------------------------------------------------------------------
+  void 
+  TWrapper
+  ::GetTimeStampVal(const PTimeStampVal& theVal,
+		    const TMKey2Profile& theMKey2Profile,
+		    const TKey2Gauss& theKey2Gauss,
+		    TErr* theErr)
+  {
+    PTimeStampInfo aTimeStampInfo = theVal->GetTimeStampInfo();
+    PFieldInfo aFieldInfo = aTimeStampInfo->GetFieldInfo();
+    if(aFieldInfo->GetType() == eFLOAT64)
+      GetTimeStampValue(theVal,
+			theMKey2Profile,
+			theKey2Gauss,
+			theErr);
+    else{
+      PTimeStampValueBase aVal = CrTimeStampValue(aTimeStampInfo,
+						  theVal,
+						  eINT);
+      GetTimeStampValue(aVal,
+			theMKey2Profile,
+			theKey2Gauss,
+			theErr);
+      CopyTimeStampValueBase(aVal, theVal);
+    }
+  }
+
+  //----------------------------------------------------------------------------
+  void
+  TWrapper
+  ::SetTimeStamp(const PTimeStampVal& theVal,
+		 TErr* theErr)
+  {
+    PTimeStampInfo aTimeStampInfo = theVal->GetTimeStampInfo();
+    PFieldInfo aFieldInfo = aTimeStampInfo->GetFieldInfo();
+    if(aFieldInfo->GetType() == eFLOAT64)
+      SetTimeStampValue(theVal, theErr);
+    else{
+      PTimeStampValueBase aVal = CrTimeStampValue(aTimeStampInfo,
+						  eINT,
+						  theVal->GetGeom2Profile(),
+						  theVal->GetModeSwitch());
+      CopyTimeStampValueBase(theVal, aVal);
+      SetTimeStampValue(aVal, theErr);
+    }
+  }
+
+  //----------------------------------------------------------------------------
+  PTimeStampVal
+  TWrapper
+  ::CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
+		   const TGeom2Profile& theGeom2Profile,
+		   EModeSwitch theMode)
+  {
+    return CrTimeStampValue(theTimeStampInfo,
+			    eFLOAT64,
+			    theGeom2Profile,
+			    theMode);
+  }
+
+  //----------------------------------------------------------------------------
+  PTimeStampVal
+  TWrapper
+  ::CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
+		   const PTimeStampVal& theInfo)
+  {
+    return CrTimeStampValue(theTimeStampInfo,
+			    theInfo,
+			    eFLOAT64);
+  }
+
+  //----------------------------------------------------------------------------
+  PTimeStampVal 
+  TWrapper
+  ::GetPTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
+		     const TMKey2Profile& theMKey2Profile,
+		     const TKey2Gauss& theKey2Gauss,
+		     TErr* theErr)
+  {
+    PTimeStampVal anInfo = CrTimeStampVal(theTimeStampInfo);
+    GetTimeStampVal(anInfo, 
+		    theMKey2Profile, 
+		    theKey2Gauss,
+		    theErr);
+    return anInfo;
+  }
+
+  //----------------------------------------------------------------------------
   PGrilleInfo
   TWrapper
   ::GetPGrilleInfo(const PMeshInfo& theMeshInfo)
@@ -532,6 +649,7 @@ namespace MED
     return anInfo;
   }
   
+  //----------------------------------------------------------------------------
   PGrilleInfo
   TWrapper
   ::GetPGrilleInfo(const PMeshInfo& theMeshInfo,

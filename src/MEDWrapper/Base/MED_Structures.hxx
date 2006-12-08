@@ -528,7 +528,7 @@ namespace MED
   //---------------------------------------------------------------
   //! The class is a helper one. It provide safe and flexible way to get access to values for a MED TimeStamp
   template<class TValueType>
-  struct TMeshValue:
+  struct TTMeshValue:
     virtual TModeSwitchInfo 
   {
     typedef TValueType TValue;
@@ -538,6 +538,8 @@ namespace MED
     typedef TVector<TCValueSlice> TCValueSliceArr;
     typedef TVector<TValueSlice> TValueSliceArr;
     
+    typedef typename TValueType::value_type TElement;
+
     TValue myValue;
 
     TInt myNbElem;
@@ -547,10 +549,10 @@ namespace MED
 
     //! Initialize the class
     void
-    Init(TInt theNbElem,
-	 TInt theNbGauss,
-	 TInt theNbComp,
-	 EModeSwitch theMode = eFULL_INTERLACE)
+    Allocate(TInt theNbElem,
+	     TInt theNbGauss,
+	     TInt theNbComp,
+	     EModeSwitch theMode = eFULL_INTERLACE)
     {
       myModeSwitch = theMode;
       
@@ -563,29 +565,34 @@ namespace MED
       myValue.resize(theNbElem*myStep);
     }
 
+    //! Returns size of the value container
     size_t
     GetSize() const
     {
       return myValue.size();
     }
     
+    //! Returns MED interpetation of the value size
     size_t
     GetNbVal() const
     {
       return myNbElem * myNbGauss;
     }
     
+    //! Returns number of Gauss Points bounded with the value
     size_t
     GetNbGauss() const
     {
       return myNbGauss;
     }
     
+    //! Returns bare pointer on the internal value representation
     unsigned char*
     GetValuePtr()
     {
       return (unsigned char*)&myValue[0];
     }
+
     //! Iteration through Gauss Points by their components
     TCValueSliceArr
     GetGaussValueSliceArr(TInt theElemId) const
@@ -677,8 +684,20 @@ namespace MED
     }
   };
 
-  typedef TMeshValue<TFloatVector> TFloatMeshValue;
-  typedef TMeshValue<TIntVector> TIntMeshValue;
+  typedef TTMeshValue<TFloatVector> TFloatMeshValue;
+  typedef TTMeshValue<TIntVector> TIntMeshValue;
+
+  //---------------------------------------------------------------
+  // Backward compatibility  declarations
+  typedef TFloatVector TValue;
+  typedef TSlice<TValue> TValueSlice;
+  typedef TCSlice<TValue> TCValueSlice;
+  
+  typedef TVector<TCValueSlice> TCValueSliceArr;
+  typedef TVector<TValueSlice> TValueSliceArr;
+    
+  typedef TFloatMeshValue TMeshValue;
+  typedef std::map<EGeometrieElement,TMeshValue> TGeom2Value;
 
   //---------------------------------------------------------------
   typedef std::map<EGeometrieElement,PProfileInfo> TGeom2Profile;
@@ -702,13 +721,19 @@ namespace MED
     //! Gets a map of MED Profiles per geometric type
     const TGeom2Profile& GetGeom2Profile() const { return myGeom2Profile;}
 
+    //! Gets type of the champ
+    virtual 
+    ETypeChamp
+    GetTypeChamp() const = 0;
+
+    //! Allocates values for the given geometry
     virtual 
     void
-    InitValue(EGeometrieElement theGeom,
-	      TInt theNbElem,
-	      TInt theNbGauss,
-	      TInt theNbComp,
-	      EModeSwitch theMode = eFULL_INTERLACE) = 0;
+    AllocateValue(EGeometrieElement theGeom,
+		  TInt theNbElem,
+		  TInt theNbGauss,
+		  TInt theNbComp,
+		  EModeSwitch theMode = eFULL_INTERLACE) = 0;
     
     virtual 
     size_t
@@ -727,30 +752,47 @@ namespace MED
     GetValuePtr(EGeometrieElement theGeom) = 0;
   };
 
+
   //---------------------------------------------------------------
   //! The class implements a container for MED TimeStamp values
   template<class TMeshValueType>
   struct TTimeStampValue: 
     virtual TTimeStampValueBase 
   {
-    typedef TMeshValueType TMeshValue;
-    typedef std::map<EGeometrieElement,TMeshValue> TGeom2Value;
+    typedef TMeshValueType TTMeshValue;
+    typedef std::map<EGeometrieElement, TTMeshValue> TTGeom2Value;
+
+    ETypeChamp myTypeChamp; //<! Keeps type of the champ
+
+    //! Gets type of the champ
+    virtual 
+    ETypeChamp
+    GetTypeChamp() const
+    {
+      return myTypeChamp;
+    }
 
     //! Keeps map of MED TimeStamp values per geometric type (const version)
-    TGeom2Value myGeom2Value;
+    TTGeom2Value myGeom2Value;
+
+    const TTGeom2Value& 
+    GetGeom2Value() const
+    {
+      return myGeom2Value;
+    }
 
     //! Gets MED TimeStamp values for the given geometric type (const version)
-    const TMeshValue& 
+    const TTMeshValue& 
     GetMeshValue(EGeometrieElement theGeom) const
     {
-      typename TGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
+      typename TTGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
       if(anIter == myGeom2Value.end())
 	EXCEPTION(runtime_error,"TTimeStampValue::GetMeshValue - myGeom2Value.find(theGeom) fails");
       return anIter->second;
     }
 
     //! Gets MED TimeStamp values for the given geometric type
-    TMeshValue& 
+    TTMeshValue& 
     GetMeshValue(EGeometrieElement theGeom)
     {
       myGeomSet.insert(theGeom);
@@ -758,13 +800,74 @@ namespace MED
     }
   };
 
+
+  //---------------------------------------------------------------
   typedef TTimeStampValue<TFloatMeshValue> TFloatTimeStampValue;
   typedef SharedPtr<TFloatTimeStampValue> PFloatTimeStampValue;
 
   typedef TTimeStampValue<TIntMeshValue> TIntTimeStampValue;
   typedef SharedPtr<TIntTimeStampValue> PIntTimeStampValue;
   
-  
+
+  //---------------------------------------------------------------
+  template<class TMeshValueTypeFrom, class TMeshValueTypeTo>
+  void
+  CopyTimeStampValue(SharedPtr<TTimeStampValue<TMeshValueTypeFrom> > theTimeStampValueFrom,
+		     SharedPtr<TTimeStampValue<TMeshValueTypeTo> > theTimeStampValueTo)
+  {
+    typedef TTimeStampValue<TMeshValueTypeFrom> TimeStampValueTypeFrom;
+    typedef TTimeStampValue<TMeshValueTypeTo> TimeStampValueTypeTo;
+    typedef typename TMeshValueTypeTo::TElement TElementTo;
+
+    typename TimeStampValueTypeFrom::TTGeom2Value& aGeom2Value = theTimeStampValueFrom->myGeom2Value;
+    typename TimeStampValueTypeFrom::TTGeom2Value::const_iterator anIter = aGeom2Value.begin();
+    for(; anIter != aGeom2Value.end(); anIter++){
+      const EGeometrieElement& aGeom = anIter->first;
+      const typename TimeStampValueTypeFrom::TTMeshValue& aMeshValue = anIter->second;
+      TInt aNbElem = aMeshValue.myNbElem;
+      TInt aNbGauss = aMeshValue.myNbGauss;
+      TInt aNbComp = aMeshValue.myNbComp;
+      theTimeStampValueTo->AllocateValue(aGeom, aNbElem, aNbGauss, aNbComp);
+      typename TimeStampValueTypeTo::TTMeshValue& aMeshValue2 = theTimeStampValueTo->GetMeshValue(aGeom);
+      for(TInt iElem = 0; iElem < aNbElem; iElem++){
+	typename TimeStampValueTypeFrom::TTMeshValue::TCValueSliceArr aValueSliceArr = aMeshValue.GetGaussValueSliceArr(iElem);
+	typename TimeStampValueTypeTo::TTMeshValue::TValueSliceArr aValueSliceArr2 = aMeshValue2.GetGaussValueSliceArr(iElem);
+	for(TInt iGauss = 0; iGauss < aNbGauss; iGauss++){
+	  const typename TimeStampValueTypeFrom::TTMeshValue::TCValueSlice& aValueSlice = aValueSliceArr[iGauss];
+	  typename TimeStampValueTypeTo::TTMeshValue::TValueSlice& aValueSlice2 = aValueSliceArr2[iGauss];
+	  for(TInt iComp = 0; iComp < aNbComp; iComp++)
+	    aValueSlice2[iComp] = TElementTo(aValueSlice[iComp]);
+	}
+      }
+    }
+  }
+
+
+  //---------------------------------------------------------------
+  inline
+  void
+  CopyTimeStampValueBase(const PTimeStampValueBase& theValueFrom, 
+			 const PTimeStampValueBase& theValueTo)
+  {
+    if(theValueFrom->GetTypeChamp() == theValueTo->GetTypeChamp()){
+      if(theValueFrom->GetTypeChamp() == eFLOAT64)
+	CopyTimeStampValue<TFloatMeshValue, TFloatMeshValue>(theValueFrom, theValueTo);
+      else if(theValueFrom->GetTypeChamp() == eINT)
+	CopyTimeStampValue<TIntMeshValue, TIntMeshValue>(theValueFrom, theValueTo);
+    }else{
+      if(theValueFrom->GetTypeChamp() == eFLOAT64 && theValueTo->GetTypeChamp() == eINT)
+	CopyTimeStampValue<TFloatMeshValue, TIntMeshValue>(theValueFrom, theValueTo);
+      else if(theValueFrom->GetTypeChamp() == eINT && theValueTo->GetTypeChamp() == eFLOAT64)
+	CopyTimeStampValue<TIntMeshValue, TFloatMeshValue>(theValueFrom, theValueTo);
+    }
+  }
+
+
+  //---------------------------------------------------------------
+  // Backward compatibility  declarations
+  typedef TFloatTimeStampValue TTimeStampVal;
+  typedef PFloatTimeStampValue PTimeStampVal;
+
   //---------------------------------------------------------------
   typedef std::map<TInt,TFloatVector> TIndexes;
   typedef std::map<TInt,TString> TNames;

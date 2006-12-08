@@ -928,11 +928,13 @@ namespace MED
   struct TTTimeStampValue: virtual TTimeStampValue<TMeshValueType>
   {
     TTTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
-		     const PTimeStampValueBase& theInfo)
+		     const PTimeStampValueBase& theInfo,
+		     ETypeChamp theTypeChamp)
     {
       typedef TTimeStampValue<TMeshValueType> TCompatible;
       if(TCompatible* aCompatible = dynamic_cast<TCompatible*>(theInfo.get())){
 	myTimeStampInfo = theTimeStampInfo;
+	myTypeChamp = theTypeChamp;
 	myGeom2Profile = aCompatible->GetGeom2Profile();
 	myGeom2Value = aCompatible->myGeom2Value;
 	myGeomSet = aCompatible->GetGeomSet();
@@ -941,17 +943,20 @@ namespace MED
     }
 
     TTTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     ETypeChamp theTypeChamp,
 		     const TGeom2Profile& theGeom2Profile,
 		     EModeSwitch theMode):
       TModeSwitchInfo(theMode)
     {
       myTimeStampInfo = theTimeStampInfo;
 
+      myTypeChamp = theTypeChamp;
+
       myGeom2Profile = theGeom2Profile;
 
       TInt aNbComp = theTimeStampInfo->myFieldInfo->myNbComp;
 
-      const TGeom2Size& aGeom2Size = theTimeStampInfo->myGeom2Size;
+      const TGeom2Size& aGeom2Size = theTimeStampInfo->GetGeom2Size();
       TGeom2Size::const_iterator anIter = aGeom2Size.begin();
       for(; anIter != aGeom2Size.end(); anIter++){
 	const EGeometrieElement& aGeom = anIter->first;
@@ -967,7 +972,7 @@ namespace MED
 
 	TInt aNbGauss = theTimeStampInfo->GetNbGauss(aGeom);
 	
-	GetMeshValue(aGeom).Init(aNbElem,aNbGauss,aNbComp);
+	GetMeshValue(aGeom).Allocate(aNbElem,aNbGauss,aNbComp);
       }
     }
 
@@ -994,13 +999,13 @@ namespace MED
 
     virtual 
     void
-    InitValue(EGeometrieElement theGeom,
-	      TInt theNbElem,
-	      TInt theNbGauss,
-	      TInt theNbComp,
-	      EModeSwitch theMode = eFULL_INTERLACE)
+    AllocateValue(EGeometrieElement theGeom,
+		  TInt theNbElem,
+		  TInt theNbGauss,
+		  TInt theNbComp,
+		  EModeSwitch theMode = eFULL_INTERLACE)
     {
-      GetMeshValue(theGeom).Init(theNbElem,theNbGauss,theNbComp,theMode);
+      GetMeshValue(theGeom).Allocate(theNbElem,theNbGauss,theNbComp,theMode);
     }
     
     virtual 

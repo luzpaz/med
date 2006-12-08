@@ -1115,10 +1115,10 @@ namespace MED
 	TInt aNbGauss = aTimeStampInfo->GetNbGauss(aGeom);
 	TInt aNbComp = aFieldInfo->myNbComp;
 	TInt aNbValue = aNbVal / aNbGauss;
-	theTimeStampValue->InitValue(aGeom,
-				     aNbValue,
-				     aNbGauss,
-				     aNbComp);
+	theTimeStampValue->AllocateValue(aGeom,
+					 aNbValue,
+					 aNbGauss,
+					 aNbComp);
 	TInt aValueSize = theTimeStampValue->GetValueSize(aGeom);
 
 	INITMSG(MYDEBUG,
@@ -1201,9 +1201,9 @@ namespace MED
     
     void
     TVWrapper
-    ::SetTimeStamp(const MED::PTimeStampValueBase& theTimeStampValue,
-		   EModeAcces theMode,
-		   TErr* theErr)
+    ::SetTimeStampValue(const MED::PTimeStampValueBase& theTimeStampValue,
+			EModeAcces theMode,
+			TErr* theErr)
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
@@ -1265,7 +1265,7 @@ namespace MED
 	    *theErr = aRet;
 	    break;
 	  }
-	  EXCEPTION(runtime_error,"SetTimeStamp - MEDchampEcr(...)");
+	  EXCEPTION(runtime_error,"SetTimeStampValue - MEDchampEcr(...)");
 	}
 	
       }
@@ -1276,14 +1276,14 @@ namespace MED
     
     void
     TVWrapper
-    ::SetTimeStamp(const PTimeStampValueBase& theTimeStampValue,
-		   TErr* theErr)
+    ::SetTimeStampValue(const PTimeStampValueBase& theTimeStampValue,
+			TErr* theErr)
     {
       TErr aRet;
-      SetTimeStamp(theTimeStampValue,eECRI,&aRet);
+      SetTimeStampValue(theTimeStampValue,eECRI,&aRet);
       
       if(aRet < 0)
-	SetTimeStamp(theTimeStampValue,eREMP,theErr);
+	SetTimeStampValue(theTimeStampValue,eREMP,theErr);
     }
     
   }
