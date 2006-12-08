@@ -349,6 +349,8 @@ namespace MED
       if(theId == *aCellFamIter)
 	return eMAILLE;
     }
+    EXCEPTION(runtime_error,"GetEntityByFamilyId - fails");
+    return EEntiteMaillage(-1);
   }
 
   TFamilyID2NbCells

@@ -410,34 +410,28 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  PTimeStampVal 
-  TWrapper
-  ::GetPTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		     const TMKey2Profile& theMKey2Profile,
-		     const TKey2Gauss& theKey2Gauss,
-		     TErr* theErr)
+  //---------------------------------------------------------------
+  template<class TimeStampValueType>
+  void
+  Print(SharedPtr<TimeStampValueType> theTimeStampValue)
   {
-    PTimeStampVal anInfo = CrTimeStampVal(theTimeStampInfo);
-    GetTimeStampVal(*anInfo,theMKey2Profile,theKey2Gauss,theErr);
-
-#ifdef _DEBUG_
-    PFieldInfo aFieldInfo = theTimeStampInfo->GetFieldInfo();
-    INITMSG(MYDEBUG,"GetPTimeStampVal\n");
-    TGeom2Value& aGeom2Value = anInfo->myGeom2Value;
-    TGeom2Value::const_iterator anIter = aGeom2Value.begin();
+    INITMSG(MYDEBUG,"Print - TimeStampValue\n");
+    typename TimeStampValueType::TGeom2Value& aGeom2Value = theTimeStampValue->myGeom2Value;
+    typename TimeStampValueType::TGeom2Value::const_iterator anIter = aGeom2Value.begin();
     for(; anIter != aGeom2Value.end(); anIter++){
       const EGeometrieElement& aGeom = anIter->first;
-      const TMeshValue& aMeshValue = anIter->second;
+      const typename TimeStampValueType::TMeshValue& aMeshValue = anIter->second;
       TInt aNbElem = aMeshValue.myNbElem;
       TInt aNbGauss = aMeshValue.myNbGauss;
       TInt aNbComp = aMeshValue.myNbComp;
       INITMSG(MYDEBUG,"aGeom = "<<aGeom<<" - "<<aNbElem<<": ");
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
-	TCValueSliceArr aValueSliceArr = aMeshValue.GetGaussValueSliceArr(iElem);
+	typename TimeStampValueType::TMeshValue::TCValueSliceArr aValueSliceArr = 
+	  aMeshValue.GetGaussValueSliceArr(iElem);
 	ADDMSG(MYVALUEDEBUG,"{");
 	for(TInt iGauss = 0; iGauss < aNbGauss; iGauss++){
-	  const TCValueSlice& aValueSlice = aValueSliceArr[iGauss];
+	  const typename TimeStampValueType::TMeshValue::TCValueSlice& aValueSlice = 
+	    aValueSliceArr[iGauss];
 	  for(TInt iComp = 0; iComp < aNbComp; iComp++){
 	    ADDMSG(MYVALUEDEBUG,aValueSlice[iComp]<<" ");
 	  }
@@ -447,8 +441,25 @@ namespace MED
       }
       ADDMSG(MYDEBUG,"\n");
     }
-#endif
+  }
 
+  //---------------------------------------------------------------
+  PTimeStampValueBase 
+  TWrapper
+  ::GetPTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		       const TMKey2Profile& theMKey2Profile,
+		       const TKey2Gauss& theKey2Gauss,
+		       TErr* theErr)
+  {
+    PTimeStampValueBase anInfo = CrTimeStampValue(theTimeStampInfo);
+    GetTimeStampValue(anInfo,theMKey2Profile,theKey2Gauss,theErr);
+#ifdef _DEBUG_
+    PFieldInfo aFieldInfo = theTimeStampInfo->GetFieldInfo();
+    if(aFieldInfo->GetType() == eFLOAT64)
+      Print<TFloatTimeStampValue>(anInfo);
+    else
+      Print<TIntTimeStampValue>(anInfo);
+#endif
     return anInfo;
   }
 

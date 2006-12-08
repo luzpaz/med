@@ -30,6 +30,7 @@
 #define MED_Structures_HeaderFile
 
 #include "MED_Common.hxx"
+#include "MED_Utilities.hxx"
 
 namespace MED
 {
@@ -525,17 +526,18 @@ namespace MED
 
 
   //---------------------------------------------------------------
-  typedef TFloatVector TValue;
-  typedef TSlice<TValue> TValueSlice;
-  typedef TCSlice<TValue> TCValueSlice;
-
-  typedef TVector<TCValueSlice> TCValueSliceArr;
-  typedef TVector<TValueSlice> TValueSliceArr;
-
   //! The class is a helper one. It provide safe and flexible way to get access to values for a MED TimeStamp
+  template<class TValueType>
   struct TMeshValue:
     virtual TModeSwitchInfo 
   {
+    typedef TValueType TValue;
+    typedef TSlice<TValue> TValueSlice;
+    typedef TCSlice<TValue> TCValueSlice;
+    
+    typedef TVector<TCValueSlice> TCValueSliceArr;
+    typedef TVector<TValueSlice> TValueSliceArr;
+    
     TValue myValue;
 
     TInt myNbElem;
@@ -548,53 +550,222 @@ namespace MED
     Init(TInt theNbElem,
 	 TInt theNbGauss,
 	 TInt theNbComp,
-	 EModeSwitch theMode = eFULL_INTERLACE);
+	 EModeSwitch theMode = eFULL_INTERLACE)
+    {
+      myModeSwitch = theMode;
+      
+      myNbElem = theNbElem;
+      myNbGauss = theNbGauss;
+      myNbComp = theNbComp;
+      
+      myStep = theNbComp*theNbGauss;
+      
+      myValue.resize(theNbElem*myStep);
+    }
 
+    size_t
+    GetSize() const
+    {
+      return myValue.size();
+    }
+    
+    size_t
+    GetNbVal() const
+    {
+      return myNbElem * myNbGauss;
+    }
+    
+    size_t
+    GetNbGauss() const
+    {
+      return myNbGauss;
+    }
+    
+    unsigned char*
+    GetValuePtr()
+    {
+      return (unsigned char*)&myValue[0];
+    }
     //! Iteration through Gauss Points by their components
     TCValueSliceArr
-    GetGaussValueSliceArr(TInt theElemId) const;
+    GetGaussValueSliceArr(TInt theElemId) const
+    {
+      TCValueSliceArr aValueSliceArr(myNbGauss);
+      if(GetModeSwitch() == eFULL_INTERLACE){
+	TInt anId = theElemId*myStep;
+	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+	  aValueSliceArr[aGaussId] =
+	    TCValueSlice(myValue,std::slice(anId,myNbComp,1));
+	  anId += myNbComp;
+	}
+      }
+      else{
+	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+	  aValueSliceArr[aGaussId] =
+	    TCValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
+	}
+      }
+      return aValueSliceArr;
+    }
 
     //! Iteration through Gauss Points by their components
     TValueSliceArr 
-    GetGaussValueSliceArr(TInt theElemId);
+    GetGaussValueSliceArr(TInt theElemId)
+    {
+      TValueSliceArr aValueSliceArr(myNbGauss);
+      if(GetModeSwitch() == eFULL_INTERLACE){
+	TInt anId = theElemId*myStep;
+	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+	  aValueSliceArr[aGaussId] =
+	    TValueSlice(myValue,std::slice(anId,myNbComp,1));
+	  anId += myNbComp;
+	}
+      }
+      else{
+	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+	  aValueSliceArr[aGaussId] =
+	    TValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
+	}
+      }
+      return aValueSliceArr;
+    }
 
     //! Iteration through components by corresponding Gauss Points
     TCValueSliceArr
-    GetCompValueSliceArr(TInt theElemId) const;
+    GetCompValueSliceArr(TInt theElemId) const
+    {
+      TCValueSliceArr aValueSliceArr(myNbComp);
+      if(GetModeSwitch() == eFULL_INTERLACE){
+	TInt anId = theElemId*myStep;
+	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+	  aValueSliceArr[aCompId] =
+	    TCValueSlice(myValue,std::slice(anId,myNbGauss,myNbComp));
+	  anId += 1;
+	}
+      }
+      else{
+	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+	  aValueSliceArr[aCompId] =
+	    TCValueSlice(myValue,std::slice(theElemId,myNbGauss,myStep));
+	}
+      }
+      return aValueSliceArr;
+    }
 
     //! Iteration through components by corresponding Gauss Points
     TValueSliceArr 
-    GetCompValueSliceArr(TInt theElemId);
+    GetCompValueSliceArr(TInt theElemId)
+    {
+      if(GetModeSwitch() == eFULL_INTERLACE){
+	TValueSliceArr aValueSliceArr(myNbComp);
+	TInt anId = theElemId*myStep;
+	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+	  aValueSliceArr[aCompId] =
+	    TValueSlice(myValue,std::slice(anId,myNbGauss,myNbComp));
+	  anId += 1;
+	}
+	return aValueSliceArr;
+      }
+      else{
+	TValueSliceArr aValueSliceArr(myNbGauss);
+	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+	  aValueSliceArr[aGaussId] =
+	    TValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
+	}
+	return aValueSliceArr;
+      }
+    }
   };
 
+  typedef TMeshValue<TFloatVector> TFloatMeshValue;
+  typedef TMeshValue<TIntVector> TIntMeshValue;
 
   //---------------------------------------------------------------
-  typedef std::map<EGeometrieElement,TMeshValue> TGeom2Value;
   typedef std::map<EGeometrieElement,PProfileInfo> TGeom2Profile;
+  typedef std::set<EGeometrieElement> TGeom;
 
-  //! The class implements a container for MED TimeStamp values
-  struct TTimeStampVal: 
+  //! The class is a base class for MED TimeStamp values holder
+  struct TTimeStampValueBase: 
     virtual TModeSwitchInfo 
   {
-    PTimeStampInfo myTimeStampInfo; //!< A reference to correspondig MED TimeStamp
+    //! A reference to correspondig MED TimeStamp
+    PTimeStampInfo myTimeStampInfo;
     //!< Get a reference to correspondig MED TimeStamp
     const PTimeStampInfo& GetTimeStampInfo() const { return myTimeStampInfo;}
+
+    //! Keeps set of MED EGeometrieElement which contains values for the timestamp
+    TGeomSet myGeomSet;
+    const TGeomSet& GetGeomSet() const { return myGeomSet;}
 
     //! Keeps map of MED Profiles per geometric type
     TGeom2Profile myGeom2Profile;
     //! Gets a map of MED Profiles per geometric type
     const TGeom2Profile& GetGeom2Profile() const { return myGeom2Profile;}
 
-    TGeom2Value myGeom2Value;
+    virtual 
+    void
+    InitValue(EGeometrieElement theGeom,
+	      TInt theNbElem,
+	      TInt theNbGauss,
+	      TInt theNbComp,
+	      EModeSwitch theMode = eFULL_INTERLACE) = 0;
+    
+    virtual 
+    size_t
+    GetValueSize(EGeometrieElement theGeom) const = 0;
+    
+    virtual 
+    size_t
+    GetNbVal(EGeometrieElement theGeom) const = 0;
+    
+    virtual 
+    size_t
+    GetNbGauss(EGeometrieElement theGeom) const = 0;
 
-    //! Keeps map of MED TimeStamp values per geometric type (const version)
-    const TMeshValue& GetMeshValue(EGeometrieElement theGeom) const;
-
-    //! Keeps map of MED TimeStamp values per geometric type
-    TMeshValue& GetMeshValue(EGeometrieElement theGeom);
+    virtual 
+    unsigned char*
+    GetValuePtr(EGeometrieElement theGeom) = 0;
   };
 
+  //---------------------------------------------------------------
+  //! The class implements a container for MED TimeStamp values
+  template<class TMeshValueType>
+  struct TTimeStampValue: 
+    virtual TTimeStampValueBase 
+  {
+    typedef TMeshValueType TMeshValue;
+    typedef std::map<EGeometrieElement,TMeshValue> TGeom2Value;
 
+    //! Keeps map of MED TimeStamp values per geometric type (const version)
+    TGeom2Value myGeom2Value;
+
+    //! Gets MED TimeStamp values for the given geometric type (const version)
+    const TMeshValue& 
+    GetMeshValue(EGeometrieElement theGeom) const
+    {
+      typename TGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
+      if(anIter == myGeom2Value.end())
+	EXCEPTION(runtime_error,"TTimeStampValue::GetMeshValue - myGeom2Value.find(theGeom) fails");
+      return anIter->second;
+    }
+
+    //! Gets MED TimeStamp values for the given geometric type
+    TMeshValue& 
+    GetMeshValue(EGeometrieElement theGeom)
+    {
+      myGeomSet.insert(theGeom);
+      return myGeom2Value[theGeom];
+    }
+  };
+
+  typedef TTimeStampValue<TFloatMeshValue> TFloatTimeStampValue;
+  typedef SharedPtr<TFloatTimeStampValue> PFloatTimeStampValue;
+
+  typedef TTimeStampValue<TIntMeshValue> TIntTimeStampValue;
+  typedef SharedPtr<TIntTimeStampValue> PIntTimeStampValue;
+  
+  
+  //---------------------------------------------------------------
   typedef std::map<TInt,TFloatVector> TIndexes;
   typedef std::map<TInt,TString> TNames;
   
@@ -609,7 +780,7 @@ namespace MED
     TNodeCoord myCoord; //!< Contains all nodal coordinates, now used only for eGRILLE_STANDARD
     //! Gives coordinates for mesh nodes (const version)
     const TNodeCoord& GetNodeCoord() const;
-    TNodeCoord GetNodeCoord();
+    TNodeCoord& GetNodeCoord();
     //! Gives coordinates for mesh node by its number, array index from 0
     TNodeCoord GetCoord(TInt theId);
     //! Gives ids of nodes for mesh cell by its number, array index from 0
@@ -643,11 +814,11 @@ namespace MED
     //!Gets a map of Tables (const version)
     const TIndexes& GetMapOfIndexes() const ;
     //!Gets a map of Tables
-    TIndexes GetMapOfIndexes();
+    TIndexes& GetMapOfIndexes();
     //!Gets a Table of indexes for certain axe(const version)
     const TFloatVector& GetIndexes(TInt theAxisNumber) const;
     //!Gets a Table of indexes for certain axe
-    TFloatVector GetIndexes(TInt theAxisNumber);
+    TFloatVector& GetIndexes(TInt theAxisNumber);
     //!Gets a number of indices per axe
     TInt GetNbIndexes(TInt theAxisNumber);
     

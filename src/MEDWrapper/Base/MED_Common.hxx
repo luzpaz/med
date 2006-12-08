@@ -81,9 +81,9 @@ namespace MED{
 
   typedef enum {eNO_PFLMOD, eGLOBAL, eCOMPACT}  EModeProfil; 
 
-  typedef enum {eGRILLE_CARTESIENNE,eGRILLE_POLAIRE,eGRILLE_STANDARD} EGrilleType;
+  typedef enum {eGRILLE_CARTESIENNE, eGRILLE_POLAIRE, eGRILLE_STANDARD} EGrilleType;
 
-  typedef enum {eCOOR, eCONN, eNOM, eNUM, eFAM,eCOOR_IND1,eCOOR_IND2,eCOOR_IND3} ETable;
+  typedef enum {eCOOR, eCONN, eNOM, eNUM, eFAM, eCOOR_IND1, eCOOR_IND2, eCOOR_IND3} ETable;
 
   typedef TVector<TFloat> TFloatVector;
   typedef TVector<std::string> TStringVector;
@@ -167,8 +167,8 @@ namespace MED{
   class TGrilleInfo;
   typedef SharedPtr<TGrilleInfo> PGrilleInfo;
 
-  struct TTimeStampVal;
-  typedef SharedPtr<TTimeStampVal> PTimeStampVal;
+  struct TTimeStampValueBase;
+  typedef SharedPtr<TTimeStampValueBase> PTimeStampValueBase;
 
   class TWrapper;
   typedef SharedPtr<TWrapper> PWrapper;

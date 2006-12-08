@@ -34,6 +34,66 @@
 namespace MED
 {
   //---------------------------------------------------------------
+  //! To provide a common way to handle values of MEDWrapper types as native MED types
+  template<class TValue, class TRepresentation>
+  struct TValueHolder
+  {
+    TValue& myValue;
+    TRepresentation myRepresentation;
+
+    TValueHolder(TValue& theValue):
+      myValue(theValue),
+      myRepresentation(TRepresentation(theValue))
+    {}
+
+    ~TValueHolder()
+    {
+      myValue = TValue(myRepresentation);
+    }
+
+    TRepresentation*
+    operator& ()
+    {
+      return &myRepresentation;
+    }
+
+    operator TRepresentation () const
+    {
+      return myRepresentation;
+    }  
+
+    const TValue&
+    operator() () const
+    {
+      return myValue;
+    }  
+  };
+  
+  //! To customize TValueHolder common template definition for TVector
+  template<class TVal, class TRepresentation>
+  struct TValueHolder<TVector<TVal>, TRepresentation>
+  {
+    typedef TVector<TVal> TValue;
+    TValue& myValue;
+    TRepresentation* myRepresentation;
+
+    TValueHolder(TValue& theValue):
+      myValue(theValue)
+    {
+      if(theValue.empty())
+	myRepresentation = (TRepresentation*)NULL;
+      else
+	myRepresentation = (TRepresentation*)&theValue[0];
+    }
+
+    TRepresentation*
+    operator& ()
+    {
+      return myRepresentation;
+    }
+  };
+  
+  //---------------------------------------------------------------
   template<EVersion eVersion>
   struct TTNameInfo: virtual TNameInfo
   {
@@ -864,22 +924,25 @@ namespace MED
 
 
   //---------------------------------------------------------------
-  template<EVersion eVersion>
-  struct TTTimeStampVal: virtual TTimeStampVal
+  template<EVersion eVersion, class TMeshValueType>
+  struct TTTimeStampValue: virtual TTimeStampValue<TMeshValueType>
   {
-    TTTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const PTimeStampVal& theInfo)
+    TTTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const PTimeStampValueBase& theInfo)
     {
-      myTimeStampInfo = theTimeStampInfo;
-
-      myGeom2Profile = theInfo->GetGeom2Profile();
-
-      myGeom2Value = theInfo->myGeom2Value;
+      typedef TTimeStampValue<TMeshValueType> TCompatible;
+      if(TCompatible* aCompatible = dynamic_cast<TCompatible*>(theInfo.get())){
+	myTimeStampInfo = theTimeStampInfo;
+	myGeom2Profile = aCompatible->GetGeom2Profile();
+	myGeom2Value = aCompatible->myGeom2Value;
+	myGeomSet = aCompatible->GetGeomSet();
+      }else
+	EXCEPTION(runtime_error,"TTTimeStampValue::TTTimeStampValue - use incompatible arguments!");
     }
 
-    TTTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const TGeom2Profile& theGeom2Profile,
-		   EModeSwitch theMode):
+    TTTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const TGeom2Profile& theGeom2Profile,
+		     EModeSwitch theMode):
       TModeSwitchInfo(theMode)
     {
       myTimeStampInfo = theTimeStampInfo;
@@ -904,9 +967,47 @@ namespace MED
 
 	TInt aNbGauss = theTimeStampInfo->GetNbGauss(aGeom);
 	
-	TMeshValue& aMeshValue = GetMeshValue(aGeom);
-	aMeshValue.Init(aNbElem,aNbGauss,aNbComp);
+	GetMeshValue(aGeom).Init(aNbElem,aNbGauss,aNbComp);
       }
+    }
+
+    virtual 
+    size_t
+    GetValueSize(EGeometrieElement theGeom) const
+    {
+      return GetMeshValue(theGeom).GetSize();
+    }
+
+    virtual 
+    size_t
+    GetNbVal(EGeometrieElement theGeom) const
+    {
+      return GetMeshValue(theGeom).GetNbVal();
+    }
+
+    virtual 
+    size_t
+    GetNbGauss(EGeometrieElement theGeom) const
+    {
+      return GetMeshValue(theGeom).GetNbGauss();
+    }
+
+    virtual 
+    void
+    InitValue(EGeometrieElement theGeom,
+	      TInt theNbElem,
+	      TInt theNbGauss,
+	      TInt theNbComp,
+	      EModeSwitch theMode = eFULL_INTERLACE)
+    {
+      GetMeshValue(theGeom).Init(theNbElem,theNbGauss,theNbComp,theMode);
+    }
+    
+    virtual 
+    unsigned char*
+    GetValuePtr(EGeometrieElement theGeom)
+    {
+      return GetMeshValue(theGeom).GetValuePtr();
     }
   };
 

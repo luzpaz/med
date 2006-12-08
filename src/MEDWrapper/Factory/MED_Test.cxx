@@ -94,9 +94,10 @@ void CheckMed(const std::string& theFileName)
 		    "- anEntity = "<<aTimeStampInfo->GetEntity()<<
 		    "; aNumDt = "<<aTimeStampInfo->GetNumDt()<<
 		    endl);
-	    PTimeStampVal aTimeStampVal = aMed->GetPTimeStampVal(aTimeStampInfo,
-								 aMKey2Profile,
-								 aKey2Gauss);
+	    PTimeStampValueBase aTimeStampValue = 
+	      aMed->GetPTimeStampValue(aTimeStampInfo,
+				       aMKey2Profile,
+				       aKey2Gauss);
 	  }
 	}
       }
@@ -197,14 +198,16 @@ void CopyMed(const PWrapper& theMed,
 	  PTimeStampInfo aTimeStampInfo2 = 
 	    theMed->CrTimeStampInfo(aFieldInfo2,aTimeStampInfo);
 	  
-	  PTimeStampVal aTimeStampVal = theMed->GetPTimeStampVal(aTimeStampInfo,
-								 aMKey2Profile,
-								 aKey2Gauss);
+	  PTimeStampValueBase aTimeStampValue = 
+	    theMed->GetPTimeStampValue(aTimeStampInfo,
+				       aMKey2Profile,
+				       aKey2Gauss);
 	  
-	  PTimeStampVal aTimeStampVal2 = theMed->CrTimeStampVal(aTimeStampInfo2,
-								aTimeStampVal);
+	  PTimeStampValueBase aTimeStampValue2 = 
+	    theMed->CrTimeStampValue(aTimeStampInfo2,
+				     aTimeStampValue);
 	  
-	  if(MYWRITEDEBUG) theMed2->SetTimeStamp(aTimeStampVal2);
+	  if(MYWRITEDEBUG) theMed2->SetTimeStamp(aTimeStampValue2);
 	}
       }
     }

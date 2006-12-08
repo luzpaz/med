@@ -470,25 +470,36 @@ namespace MED
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     virtual
-    PTimeStampVal
-    CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const TGeom2Profile& theGeom2Profile = TGeom2Profile(),
-		   EModeSwitch theMode = eFULL_INTERLACE)
+    PTimeStampValueBase
+    CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const TGeom2Profile& theGeom2Profile = TGeom2Profile(),
+		     EModeSwitch theMode = eFULL_INTERLACE)
     {
-      return PTimeStampVal(new TTTimeStampVal<eVersion>
-			   (theTimeStampInfo,
-			    theGeom2Profile,
-			    theMode));
+      PFieldInfo aFieldInfo = theTimeStampInfo->GetFieldInfo();
+      if(aFieldInfo->GetType() == eFLOAT64)
+	return PTimeStampValueBase(new TTTimeStampValue<eVersion, TFloatMeshValue>
+				   (theTimeStampInfo,
+				    theGeom2Profile,
+				    theMode));
+      return PTimeStampValueBase(new TTTimeStampValue<eVersion, TIntMeshValue>
+				 (theTimeStampInfo,
+				  theGeom2Profile,
+				  theMode));
     }
 
     virtual
-    PTimeStampVal
-    CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const PTimeStampVal& theInfo)
+    PTimeStampValueBase
+    CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const PTimeStampValueBase& theInfo)
     {
-      return PTimeStampVal(new TTTimeStampVal<eVersion>
-			   (theTimeStampInfo,
-			    theInfo));
+      PFieldInfo aFieldInfo = theTimeStampInfo->GetFieldInfo();
+      if(aFieldInfo->GetType() == eFLOAT64)
+	return PTimeStampValueBase(new TTTimeStampValue<eVersion, TFloatMeshValue>
+				   (theTimeStampInfo,
+				    theInfo));
+      return PTimeStampValueBase(new TTTimeStampValue<eVersion, TIntMeshValue>
+				 (theTimeStampInfo,
+				  theInfo));
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
