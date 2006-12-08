@@ -1556,6 +1556,9 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	MEDArrayCellFamily[i] = new
 	  int[_ptrMesh->getNumberOfElementsWithPoly(MED_CELL,myTypes[i])] ;
 
+      // assure connectivety exists in case of GRID
+      _ptrMesh->getConnectivityptr(); //PAL14113
+
       err = getCellsFamiliesNumber(MEDArrayCellFamily,
 				   _ptrMesh->_connectivity,MED_CELL) ;
       delete [] myTypes;
@@ -1880,7 +1883,7 @@ int  MED_MESH_RDONLY_DRIVER22::getCellsFamiliesNumber(int **MEDArrayFamily,
 			   MEDArrayFamily[i],NumberOfCell,
 			   med_2_2::MED_MAILLE,
 			   (med_2_2::med_geometrie_element)types[i]);
-	    if (err != MED_VALID)
+	    if (err != MED_VALID && !((GRID *)_ptrMesh)) //PAL14113
 	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<types[i]));
 	  }
 #endif
