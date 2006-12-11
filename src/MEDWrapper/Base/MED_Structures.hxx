@@ -824,24 +824,26 @@ namespace MED
     for(; anIter != aGeom2Value.end(); anIter++){
       const EGeometrieElement& aGeom = anIter->first;
       const typename TimeStampValueTypeFrom::TTMeshValue& aMeshValue = anIter->second;
-      TInt aNbElem = aMeshValue.myNbElem;
-      TInt aNbGauss = aMeshValue.myNbGauss;
-      TInt aNbComp = aMeshValue.myNbComp;
-      theTimeStampValueTo->AllocateValue(aGeom, aNbElem, aNbGauss, aNbComp);
       typename TimeStampValueTypeTo::TTMeshValue& aMeshValue2 = theTimeStampValueTo->GetMeshValue(aGeom);
-      for(TInt iElem = 0; iElem < aNbElem; iElem++){
-	typename TimeStampValueTypeFrom::TTMeshValue::TCValueSliceArr aValueSliceArr = aMeshValue.GetGaussValueSliceArr(iElem);
-	typename TimeStampValueTypeTo::TTMeshValue::TValueSliceArr aValueSliceArr2 = aMeshValue2.GetGaussValueSliceArr(iElem);
-	for(TInt iGauss = 0; iGauss < aNbGauss; iGauss++){
-	  const typename TimeStampValueTypeFrom::TTMeshValue::TCValueSlice& aValueSlice = aValueSliceArr[iGauss];
-	  typename TimeStampValueTypeTo::TTMeshValue::TValueSlice& aValueSlice2 = aValueSliceArr2[iGauss];
-	  for(TInt iComp = 0; iComp < aNbComp; iComp++)
-	    aValueSlice2[iComp] = TElementTo(aValueSlice[iComp]);
-	}
-      }
+      aMeshValue2.Allocate(aMeshValue.myNbElem, 
+			   aMeshValue.myNbGauss, 
+			   aMeshValue.myNbComp,
+			   aMeshValue.myModeSwitch);
+      const typename TimeStampValueTypeFrom::TTMeshValue::TValue& aValue = aMeshValue.myValue;
+      typename TimeStampValueTypeTo::TTMeshValue::TValue& aValue2 = aMeshValue2.myValue;
+      TInt aSize = aValue.size();
+      for(TInt anId = 0; anId < aSize; anId++)
+	aValue2[anId] = TElementTo(aValue[anId]);
     }
   }
 
+  template<class TMeshValueType>
+  void
+  CopyTimeStampValue(SharedPtr<TTimeStampValue<TMeshValueType> > theTimeStampValueFrom,
+		     SharedPtr<TTimeStampValue<TMeshValueType> > theTimeStampValueTo)
+  {
+    theTimeStampValueTo->myGeom2Value = theTimeStampValueFrom->myGeom2Value;
+  }
 
   //---------------------------------------------------------------
   inline
@@ -851,9 +853,9 @@ namespace MED
   {
     if(theValueFrom->GetTypeChamp() == theValueTo->GetTypeChamp()){
       if(theValueFrom->GetTypeChamp() == eFLOAT64)
-	CopyTimeStampValue<TFloatMeshValue, TFloatMeshValue>(theValueFrom, theValueTo);
+	CopyTimeStampValue<TFloatMeshValue>(theValueFrom, theValueTo);
       else if(theValueFrom->GetTypeChamp() == eINT)
-	CopyTimeStampValue<TIntMeshValue, TIntMeshValue>(theValueFrom, theValueTo);
+	CopyTimeStampValue<TIntMeshValue>(theValueFrom, theValueTo);
     }else{
       if(theValueFrom->GetTypeChamp() == eFLOAT64 && theValueTo->GetTypeChamp() == eINT)
 	CopyTimeStampValue<TFloatMeshValue, TIntMeshValue>(theValueFrom, theValueTo);
