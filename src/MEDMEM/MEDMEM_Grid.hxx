@@ -61,6 +61,9 @@ class GRID: public MESH
   bool              _is_coordinates_filled;
   bool              _is_connectivity_filled;
 
+  // 4. is _gridType a true value or just a default one
+  bool              _is_default_gridType;
+
   //-----------------------//
   //   Protected Methods
   //-----------------------//
