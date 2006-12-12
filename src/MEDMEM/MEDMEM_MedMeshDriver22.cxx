@@ -171,28 +171,37 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
   SCRUTE(_ptrMesh->getIsAGrid());
 
   if (_ptrMesh->getIsAGrid())
+  {
+    getGRID( );
     {
-      getGRID( );
-
-      // always call getFAMILY : families are requiered !!!!
-
-//        int nbFam = MEDnFam(_medIdt,
-//  			  const_cast <char *> (_meshName.c_str()),
-//  			  0,
-//  			  MED_FR::MED_FAMILLE);
-//        if (nbFam > 0)
-	{
-// 	  getFAMILY();
-    
-	  if (getFAMILY()!=MED_VALID)
-	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY when the mesh is a grid")) ;
-
-	  buildAllGroups(_ptrMesh->_groupNode,_ptrMesh->_familyNode) ;
-	}
-
-      END_OF(LOC);
-      return;
+      if (getFAMILY()!=MED_VALID)
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY when the mesh is a grid")) ;
+      buildAllGroups(_ptrMesh->_groupNode,_ptrMesh->_familyNode) ;
     }
+    END_OF(LOC);
+    return;
+  }
+  else // check that the mesh is really unstructured (PAL14113)
+  {
+    char                  meshName[MED_TAILLE_NOM+1]="";
+    char                  meshDescription[MED_TAILLE_DESC+1]="";
+    med_2_2::med_int      meshDim;
+    med_2_2::med_maillage meshType;
+    int numberOfMeshes = med_2_2::MEDnMaa(_medIdt);
+    for (int i=1;i<=numberOfMeshes;i++)
+    {
+      MEDmaaInfo(_medIdt, i ,meshName, &meshDim, &meshType, meshDescription);
+      if (_meshName == string(meshName)) {
+        if ( meshType == med_2_2::MED_STRUCTURE ) {
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
+                                       "class GRID must be used for a structured mesh"));
+        }
+        else {
+          break;
+        }
+      }
+    }
+  }
 
   if (getCOORDINATE()!=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getCOORDINATE"  )) ;
@@ -274,6 +283,18 @@ void MED_MESH_RDONLY_DRIVER22::getGRID()
     }
 
   MED_EN::med_grid_type gridType = ptrGrid->getGridType();
+  if ( ptrGrid->_is_default_gridType )
+  {
+    med_2_2::med_type_grille type;
+    err = med_2_2::MEDnatureGrilleLire(_medIdt,
+                                       const_cast <char *>(_meshName.c_str()),
+                                       &type);
+    if (err != MED_VALID)
+      throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << ": can't get the nature of the grid which is the mesh n°" << i << " of the file |" << _fileName << "| !"));
+
+    gridType = ptrGrid->_gridType = (MED_EN::med_grid_type) type;
+    ptrGrid->_is_default_gridType = false;
+  }
 
   MESSAGE(LOC<<": Mesh processed is nammed "<< _ptrMesh->_name << " with the description " << _ptrMesh->_description << " is structured with the type " << gridType);
 
@@ -1883,7 +1904,8 @@ int  MED_MESH_RDONLY_DRIVER22::getCellsFamiliesNumber(int **MEDArrayFamily,
 			   MEDArrayFamily[i],NumberOfCell,
 			   med_2_2::MED_MAILLE,
 			   (med_2_2::med_geometrie_element)types[i]);
-	    if (err != MED_VALID && !((GRID *)_ptrMesh)) //PAL14113
+	    if (err != MED_VALID
+                && !_ptrMesh->getIsAGrid() ) // it's normal for a grid (PAL14113)
 	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<types[i]));
 	  }
 #endif
