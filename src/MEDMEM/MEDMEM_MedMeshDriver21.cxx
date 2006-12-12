@@ -159,17 +159,7 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
   if (_ptrMesh->getIsAGrid())
     {
       getGRID( );
-
-      // always call getFAMILY : families are requiered !!!!
-
-//        int nbFam = MEDnFam(_medIdt,
-//  			  const_cast <char *> (_meshName.c_str()),
-//  			  0,
-//  			  med_2_1::MED_FAMILLE);
-//        if (nbFam > 0)
 	{
-// 	  getFAMILY();
-    
 	  if (getFAMILY()!=MED_VALID)
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY when the mesh is a grid")) ;
 
@@ -179,6 +169,27 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
       END_OF(LOC);
       return;
     }
+  else // check that the mesh is really unstructured (PAL14113)
+  {
+    char                  meshName[MED_TAILLE_NOM+1]="";
+    char                  meshDescription[MED_TAILLE_DESC+1]="";
+    med_2_2::med_int      meshDim;
+    med_2_2::med_maillage meshType;
+    int numberOfMeshes = med_2_2::MEDnMaa(_medIdt);
+    for (int i=1;i<=numberOfMeshes;i++)
+    {
+      MEDmaaInfo(_medIdt, i ,meshName, &meshDim, &meshType, meshDescription);
+      if (_meshName == string(meshName)) {
+        if ( meshType == med_2_2::MED_STRUCTURE ) {
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
+                                       "class GRID must be used for a structured mesh"));
+        }
+        else {
+          break;
+        }
+      }
+    }
+  }
 
   if (getCOORDINATE()!=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getCOORDINATE"  )) ;
