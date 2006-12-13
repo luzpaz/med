@@ -53,9 +53,6 @@ int MESHCollectionDriver::read(char* filename)
   vector<int*> cellglobal;
   vector<int*> nodeglobal;
   vector<int*> faceglobal;
-  string meshstring;
-  char file[256];
-  char meshname[MED_TAILLE_NOM];
   
   // reading ascii master file
   try{
@@ -84,9 +81,17 @@ int MESHCollectionDriver::read(char* filename)
 		string mesh;
 		int idomain;
 		string host;
-      
+      	string meshstring;
+  		char file[256];
+  		char meshname[MED_TAILLE_NOM];
+  
 		asciiinput >> mesh >> idomain >> meshstring >> host >> m_filename[i];
-	
+		
+		//Setting the name of the global mesh (which is the same
+		//for all the subdomains)
+		if (i==0)
+			m_collection->setName(mesh);
+		
 		if (idomain!=i+1)
 		  {
 		    cerr<<"Error : domain must be written from 1 to N in asciifile descriptor"<<endl;
@@ -221,28 +226,30 @@ int MESHCollectionDriver::read(char* filename)
 int MESHCollectionDriver::readSeq(char* filename, char* meshname)
 {
 	
-  	BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::readSeq()")
- 
-	m_filename.resize(1);
-	m_filename[0]=string(filename);
-	//puts the only mesh in the mesh vector
-	(m_collection->getMesh()).push_back(new MEDMEM::MESH(MEDMEM::MED_DRIVER,filename, meshname));
- 
-    (m_collection->getCZ()).clear();
-    vector<int*> cellglobal,nodeglobal,faceglobal;
-    cellglobal.resize(1);
-    nodeglobal.resize(1);
-    faceglobal.resize(1);
-    cellglobal[0]=0;
-    nodeglobal[0]=0;
-    faceglobal[0]=0;
-	//creation of topology from mesh 
-	//connectzone argument is 0
-  	m_collection->setTopology(
-  	new ParallelTopology((m_collection->getMesh()),(m_collection->getCZ()),cellglobal,nodeglobal,faceglobal)
-    );
-    END_OF("MEDSPLITTER::MESHCollectionDriver::readSeq()")
-    return 0;
+   BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::readSeq()")
+     
+   m_filename.resize(1);
+   m_filename[0]=string(filename);
+   //puts the only mesh in the mesh vector
+   MEDMEM::MESH* new_mesh = new MEDMEM::MESH(MEDMEM::MED_DRIVER,filename, meshname);
+   (m_collection->getMesh()).push_back(new_mesh);
+   
+   m_collection->setName(meshname);
+   (m_collection->getCZ()).clear();
+   vector<int*> cellglobal,nodeglobal,faceglobal;
+   cellglobal.resize(1);
+   nodeglobal.resize(1);
+   faceglobal.resize(1);
+   cellglobal[0]=0;
+   nodeglobal[0]=0;
+   faceglobal[0]=0;
+   //creation of topology from mesh 
+   //connectzone argument is 0
+   m_collection->setTopology(
+			     new ParallelTopology((m_collection->getMesh()),(m_collection->getCZ()),cellglobal,nodeglobal,faceglobal)
+			     );
+   END_OF("MEDSPLITTER::MESHCollectionDriver::readSeq()")
+   return 0;
 }
 
 /*! writes the collection of meshes in a 
@@ -283,7 +290,7 @@ void MESHCollectionDriver::write(char* filename)
 		(m_collection->getMesh())[i]->write(id);
 		
 		//updating the ascii description file
-		file << (m_collection->getMesh())[i]->getName() <<" "<< i+1 << " "<< (m_collection->getMesh())[i]->getName() << " localhost " << distfilename << " "<<endl;
+		file << m_collection->getName() <<" "<< i+1 << " "<< (m_collection->getMesh())[i]->getName() << " localhost " << distfilename << " "<<endl;
 	
 	//build connect zones
 		if (nbdomains>1)
@@ -321,6 +328,7 @@ void MESHCollectionDriver::write(char* filename)
 				med_2_2::MEDjointEcr(fid, mesh_name, joint_name, node_corresp, nbnodes,
 	   			    med_2_2::MED_NOEUD, med_2_2::MED_POINT1,med_2_2::MED_NOEUD, med_2_2::MED_POINT1);
 	   			if (err2==1) cout << "erreur creation de joint "<<endl;
+	   			index_joint++;
 			}
 		}
 		// Writing cell global numbering

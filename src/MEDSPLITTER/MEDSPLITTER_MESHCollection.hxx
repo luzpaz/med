@@ -95,6 +95,11 @@ Topology* getTopology() const ;
 //settig a new topology
 void setTopology(Topology* topology);
 
+//getting/setting the name of the global mesh (as opposed 
+//to the name of a subdomain \a nn, which is name_nn) 
+string getName() const {return m_name;}
+void setName(const string& name) {m_name=name;}
+	
 //!transfers families from an old MESHCollection to new mesh
 void castFamilies(const MESHCollection& old_collection);
 
@@ -140,7 +145,8 @@ std::vector<MEDMEM::CONNECTZONE*> m_connect_zones;
 //!list of groups that are not to be splitted
 std::vector<std::string> m_indivisible_regions;
 
-
+//!name of global mesh
+string m_name;
 };
 
 }//of namespace

@@ -57,16 +57,18 @@ MESHCollection::MESHCollection():m_topology(0),m_driver(0){}
 */
 
 MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topology* topology)
-:m_topology(topology),m_cell_graph(topology->getGraph()),m_driver(0)
+:m_name(initial_collection.m_name),m_topology(topology),m_cell_graph(topology->getGraph()),m_driver(0)
 {
-	string mesh_name = initial_collection.getMeshName();
+	string mesh_name = initial_collection.getName();
 	m_mesh.resize(m_topology->nbDomain());
 	for (int idomain=0; idomain < m_topology->nbDomain(); idomain++)
 	{
 		//creating the new mesh
 		MEDMEM::MESHING* mesh_builder=new MEDMEM::MESHING;
 		m_mesh[idomain]= static_cast<MEDMEM::MESH*> (mesh_builder);
-		mesh_builder->setName(mesh_name);
+		ostringstream osname;
+		osname << mesh_name<<"_"<<idomain+1;
+		mesh_builder->setName(osname.str());
 		
 		createNodalConnectivity(initial_collection,idomain, MED_EN::MED_CELL);
 		mesh_builder->setMeshDimension(initial_collection.getMeshDimension());
@@ -108,7 +110,7 @@ MESHCollection::MESHCollection(const string& filename):m_topology(0),m_driver(0)
  * \param filename MED file
  * \param meshname name of the mesh that is to be read
  */
-MESHCollection::MESHCollection(const string& filename, const string& meshname):m_topology(0),m_driver(0)
+MESHCollection::MESHCollection(const string& filename, const string& meshname):m_name(meshname),m_topology(0),m_driver(0)
 {
 	char filenamechar[256];
 	char meshnamechar[256];
@@ -120,11 +122,11 @@ MESHCollection::MESHCollection(const string& filename, const string& meshname):m
 MESHCollection::~MESHCollection()
 {
 	for (int i=0; i<m_mesh.size();i++)
-		if (m_mesh[i]!=0) delete m_mesh[i];
+	  if (m_mesh[i]!=0) {delete m_mesh[i]; m_mesh[i]=0;}
 	for (int i=0; i<m_connect_zones.size();i++)
-		if (m_connect_zones[i]!=0) delete m_connect_zones[i];
-	if (m_driver !=0) delete m_driver;
-	if (m_topology!=0) delete m_topology;
+	  if (m_connect_zones[i]!=0) {delete m_connect_zones[i]; m_connect_zones[i]=0;}
+	if (m_driver !=0) {delete m_driver; m_driver=0;}
+	if (m_topology!=0) {delete m_topology; m_topology=0;}
 	
 }
 
