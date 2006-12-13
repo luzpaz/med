@@ -84,7 +84,7 @@ LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem $(METIS_LIBS) $
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS)  $(BOOST_LIBS) -lboost_program_options-gcc-mt
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS)  $(BOOST_LIBS) -lboost_program_options
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}
