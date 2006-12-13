@@ -13,7 +13,7 @@ int main()
 {
 	string testname="MEDSPLITTER - test #1 -";
 	
-	char filename[100] = "../../../share/salome/resources/carre_en_quad4_import22.med";
+	char filename[100] = "../../../share/salome/resources/med/carre_en_quad4_import22.med";
 	char meshname[20]  = "carre_en_quad4";
 	
 	MESHCollection collection(filename,meshname);

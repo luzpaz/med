@@ -30,13 +30,14 @@ int main()
 {
 	string testname="MEDSPLITTER - test #2 -";
 	
-	char filename[100] = "../../share/salome/resources/maill.00.med";
+	char filename[100] = "../../share/salome/resources/med/maill.00.med";
 	char meshname[20]  = "MAILTRQU";
 	char family[30]="QUAD";
 	MESHCollection collection(filename,meshname);
 	collection.setIndivisibleGroup(family);
-	MESHCollection new_collection(collection, collection.createPartition(4,Graph::SCOTCH));
-	
+	Topology* topo =  collection.createPartition(4,Graph::SCOTCH);
+	MESHCollection new_collection(collection, topo);
+
 	//collection.write("/export/home/test_splitter");
 	new_collection.write("./tests/carre_indivisible");
 	
@@ -44,11 +45,16 @@ int main()
 	char filename2[100]= "./tests/carre_indivisible2.med";
 	char filename3[100]= "./tests/carre_indivisible3.med";
 	char filename4[100]= "./tests/carre_indivisible4.med";
+
+	char meshname1[20]="MAILTRQU_1";
+	char meshname2[20]="MAILTRQU_2";
+	char meshname3[20]="MAILTRQU_3";
+	char meshname4[20]="MAILTRQU_4";
 	
-	MEDMEM::MESH mesh1(MEDMEM::MED_DRIVER, filename1, meshname);
-	MEDMEM::MESH mesh2(MEDMEM::MED_DRIVER, filename2, meshname);
-	MEDMEM::MESH mesh3(MEDMEM::MED_DRIVER, filename3, meshname);
-	MEDMEM::MESH mesh4(MEDMEM::MED_DRIVER, filename4, meshname);
+	MEDMEM::MESH mesh1(MEDMEM::MED_DRIVER, filename1, meshname1);
+	MEDMEM::MESH mesh2(MEDMEM::MED_DRIVER, filename2, meshname2);
+	MEDMEM::MESH mesh3(MEDMEM::MED_DRIVER, filename3, meshname3);
+	MEDMEM::MESH mesh4(MEDMEM::MED_DRIVER, filename4, meshname4);
 		
 	// testing number of quads for each partition
 	int nbquad1=	mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4);
