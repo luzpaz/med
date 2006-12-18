@@ -933,11 +933,11 @@ namespace MED
     {
       typedef TTimeStampValue<TMeshValueType> TCompatible;
       if(TCompatible* aCompatible = dynamic_cast<TCompatible*>(theInfo.get())){
-	myTimeStampInfo = theTimeStampInfo;
-	myTypeChamp = theTypeChamp;
-	myGeom2Profile = aCompatible->GetGeom2Profile();
-	myGeom2Value = aCompatible->myGeom2Value;
-	myGeomSet = aCompatible->GetGeomSet();
+	this->myTimeStampInfo = theTimeStampInfo;
+	this->myTypeChamp = theTypeChamp;
+	this->myGeom2Profile = aCompatible->GetGeom2Profile();
+	this->myGeom2Value = aCompatible->myGeom2Value;
+	this->myGeomSet = aCompatible->GetGeomSet();
       }else
 	EXCEPTION(runtime_error,"TTTimeStampValue::TTTimeStampValue - use incompatible arguments!");
     }
@@ -948,11 +948,11 @@ namespace MED
 		     EModeSwitch theMode):
       TModeSwitchInfo(theMode)
     {
-      myTimeStampInfo = theTimeStampInfo;
+      this->myTimeStampInfo = theTimeStampInfo;
 
-      myTypeChamp = theTypeChamp;
+      this->myTypeChamp = theTypeChamp;
 
-      myGeom2Profile = theGeom2Profile;
+      this->myGeom2Profile = theGeom2Profile;
 
       TInt aNbComp = theTimeStampInfo->myFieldInfo->myNbComp;
 
@@ -972,7 +972,7 @@ namespace MED
 
 	TInt aNbGauss = theTimeStampInfo->GetNbGauss(aGeom);
 	
-	GetMeshValue(aGeom).Allocate(aNbElem,aNbGauss,aNbComp);
+	this->GetMeshValue(aGeom).Allocate(aNbElem,aNbGauss,aNbComp);
       }
     }
 
@@ -980,21 +980,21 @@ namespace MED
     size_t
     GetValueSize(EGeometrieElement theGeom) const
     {
-      return GetMeshValue(theGeom).GetSize();
+      return this->GetMeshValue(theGeom).GetSize();
     }
 
     virtual 
     size_t
     GetNbVal(EGeometrieElement theGeom) const
     {
-      return GetMeshValue(theGeom).GetNbVal();
+      return this->GetMeshValue(theGeom).GetNbVal();
     }
 
     virtual 
     size_t
     GetNbGauss(EGeometrieElement theGeom) const
     {
-      return GetMeshValue(theGeom).GetNbGauss();
+      return this->GetMeshValue(theGeom).GetNbGauss();
     }
 
     virtual 
@@ -1005,14 +1005,14 @@ namespace MED
 		  TInt theNbComp,
 		  EModeSwitch theMode = eFULL_INTERLACE)
     {
-      GetMeshValue(theGeom).Allocate(theNbElem,theNbGauss,theNbComp,theMode);
+      this->GetMeshValue(theGeom).Allocate(theNbElem,theNbGauss,theNbComp,theMode);
     }
     
     virtual 
     unsigned char*
     GetValuePtr(EGeometrieElement theGeom)
     {
-      return GetMeshValue(theGeom).GetValuePtr();
+      return this->GetMeshValue(theGeom).GetValuePtr();
     }
   };
 
