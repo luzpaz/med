@@ -91,7 +91,8 @@ namespace MED
     typedef typename TContainer::value_type value_type;
 
     //! Construct the class
-    TCSlice(const TContainer& theContainer,
+    template<class TTContainer>
+    TCSlice(const TTContainer& theContainer,
 	    const std::slice& theSlice): 
       myCContainer(&theContainer),
       mySlice(theSlice)
@@ -137,12 +138,12 @@ namespace MED
     typedef TCSlice<TContainer> TSupperClass;
 
     //! Construct the class
-    TSlice(TContainer& theContainer,
+    template<class TTContainer>
+    TSlice(TTContainer& theContainer,
 	   const std::slice& theSlice): 
-      TSupperClass(theContainer,theSlice),
+      TSupperClass(theContainer, theSlice),
       myContainer(&theContainer)
-    {
-    }
+    {}
     
     //! Default constructor (dangerous)
     TSlice():
