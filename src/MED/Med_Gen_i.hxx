@@ -130,9 +130,12 @@ public:
   SALOMEDS::SObject_ptr PasteInto(const SALOMEDS::TMPFile& theStream,
 				  CORBA::Long theObjectID,
 				  SALOMEDS::SObject_ptr theObject);
-  
+
   // Get last created instance of the class
   static Med_Gen_i* GetMEDGen() { return _MEDGen; }
+
+  // Get Med of the study (for persistance)
+  static SALOME_MED::MED_ptr GetMED(SALOMEDS::SComponent_ptr theStudy);
 
   // Get object of the CORBA reference
   static PortableServer::ServantBase_var GetServant( CORBA::Object_ptr theObject );
@@ -143,8 +146,9 @@ public:
     return dynamic_cast<T>(GetServant(theArg).in());
   }
 
+
 private :
-  static std::map <std::string, std::string>_MedCorbaObj;
+  static std::map <std::string, MEDMEM::MED_i*>_MedCorbaObj;
   static std::string _myFileName;
   static std::string _saveFileName;
   static Med_Gen_i*  _MEDGen;    // Point to last created instance of the class
