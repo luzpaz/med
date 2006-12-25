@@ -74,6 +74,10 @@ public:
 		  const char * medObjName)
     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
+  SALOME_MED::SUPPORT_ptr getSupport(string                meshName,
+                                     MED_EN::medEntityMesh entity)
+    throw (SALOME::SALOME_Exception);
+
 
     // IDL Methods 
     CORBA::Long 	    getNumberOfMeshes() throw (SALOME::SALOME_Exception);
