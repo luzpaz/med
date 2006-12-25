@@ -544,6 +544,10 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
         {
           MESSAGE("Add a Field Object under "<<fieldName);
           fieldSO = myBuilder->NewObject(medfieldnamefather);
+          // check that this method and getEntryPath() build the same path
+          MESSAGE("fieldEntryPath: "<< fieldEntryPath);
+          MESSAGE("getEntryPath(): "<< getEntryPath());
+          ASSERT( getEntryPath() == fieldEntryPath );
         }
         anAttr = myBuilder->FindOrCreateAttribute(fieldSO, "AttributeName");
         aName = SALOMEDS::AttributeName::_narrow(anAttr);
@@ -596,6 +600,7 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 
         //END_OF("FIELD_i::addInStudy");
 }
+
 //=============================================================================
 /*!
  * CORBA: write
@@ -685,11 +690,13 @@ CORBA::Long FIELD_i::addDriver (SALOME_MED::medDriverTypes driverType,
 	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
+
 //=============================================================================
 /*!
- * CORBA: publish MED component
+ * internal method: publish MED component
  */
 //=============================================================================
+
 SALOMEDS::SComponent_ptr FIELD_i::PublishMedComponent(SALOMEDS::Study_ptr theStudy)
 {
   if ( CORBA::is_nil(theStudy) )
@@ -736,3 +743,36 @@ SALOMEDS::SComponent_ptr FIELD_i::PublishMedComponent(SALOMEDS::Study_ptr theStu
   
   return medfather._retn();
 }
+
+//================================================================================
+/*!
+ * \brief Return a default path to publish this field
+  * \retval string - the path
+ */
+//================================================================================
+
+string FIELD_i::getEntryPath ()
+{
+  string path;
+  if ( _fieldTptr &&
+       _fieldTptr->getSupport() &&
+       _fieldTptr->getSupport()->getMesh() )
+  {
+    string meshName = _fieldTptr->getSupport()->getMesh()->getName();
+    for (string::size_type pos=0; pos<meshName.size();++pos)
+    {
+      if (isspace(meshName[pos])) meshName[pos] = '_';
+    }
+    ostringstream os ;
+
+    os << "/Med/MEDFIELD/" << _fieldTptr->getName() << "/" 
+       << "(" << _fieldTptr->getIterationNumber()
+       << "," << _fieldTptr->getOrderNumber()
+       << ")_ON_" << _fieldTptr->getSupport()->getName()
+       << "_OF_" << meshName;
+
+    path = os.str();
+  }
+  return path;
+}
+

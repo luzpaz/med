@@ -109,6 +109,9 @@ public :
     // Publish MED Component
     SALOMEDS::SComponent_ptr PublishMedComponent(SALOMEDS::Study_ptr theStudy);
 
+    // Return a default path to publish this field
+    std::string getEntryPath ();
+
  };
 }
 
