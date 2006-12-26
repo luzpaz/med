@@ -325,7 +325,7 @@ namespace MED
 	      "- aName = '"<<aName<<"'"<<
 	      " : "<<
 	      endl);
-      TInt aNbElem = anInfo->myElemNum.size();
+      TInt aNbElem = anInfo->GetSize();
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
 	ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
       }

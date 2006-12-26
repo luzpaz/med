@@ -623,7 +623,7 @@ namespace MED
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
-      TInt aNbElem = theInfo.myElemNum.size();
+      TInt aNbElem = theInfo.myElemNum->size();
 
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);

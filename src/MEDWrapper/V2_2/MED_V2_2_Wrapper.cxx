@@ -566,7 +566,7 @@ namespace MED
 	aRet  = MEDnomEcr(myFile->Id(),
 			  &aMeshName,
 			  &anElemNames,
-			  anInfo.myElemNames.size(),
+			  anInfo.myElemNames->size(),
 			  anEntity,
 			  aGeom);
 	if(theErr) 
@@ -616,7 +616,7 @@ namespace MED
 	aRet  = MEDnumEcr(myFile->Id(),
 			  &aMeshName,
 			  &anElemNum,
-			  anInfo.myElemNum.size(),
+			  anInfo.myElemNum->size(),
 			  anEntity,
 			  aGeom);
 	if(theErr) 
@@ -662,7 +662,7 @@ namespace MED
       TErr aRet = MEDfamEcr(myFile->Id(),
 			    &aMeshName,
 			    &aFamNum,
-			    anInfo.myFamNum.size(),
+			    anInfo.myFamNum->size(),
 			    anEntity,
 			    aGeom);
       
@@ -825,7 +825,7 @@ namespace MED
 
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TElemNum, med_int> anIndex(theInfo.myIndex);
-      TInt aNbElem = theInfo.myElemNum.size();
+      TInt aNbElem = theInfo.myElemNum->size();
       TValueHolder<TElemNum, med_int> aConn(theInfo.myConn);
       TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(theInfo.myEntity);
       TValueHolder<EConnectivite, med_connectivite> aConnMode(theInfo.myConnMode);
@@ -977,7 +977,7 @@ namespace MED
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
 
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TInt aNbElem = theInfo.myElemNum.size();
+      TInt aNbElem = theInfo.myElemNum->size();
       TValueHolder<TElemNum, med_int> anIndex(theInfo.myIndex);
       TValueHolder<TElemNum, med_int> aFaces(theInfo.myFaces);
       TValueHolder<TElemNum, med_int> aConn(theInfo.myConn);
@@ -989,7 +989,7 @@ namespace MED
 				 &anIndex,
 				 aNbElem + 1,
 				 &aFaces,
-				 theInfo.myFaces.size(),
+				 theInfo.myFaces->size(),
 				 &aConn,
 				 aConnMode);
 
@@ -1051,7 +1051,7 @@ namespace MED
 				&anIndex,
 				anInfo.myNbElem + 1,
 				&aFaces,
-				anInfo.myFaces.size(),
+				anInfo.myFaces->size(),
 				&aConn,
 				aConnMode);
       
@@ -1067,7 +1067,7 @@ namespace MED
 	aRet  = MEDnomEcr(myFile->Id(),
 			  &aMeshName,
 			  &anElemNames,
-			  anInfo.myElemNames.size(),
+			  anInfo.myElemNames->size(),
 			  anEntity,
 			  MED_POLYEDRE);
 	if(theErr) 
@@ -1081,7 +1081,7 @@ namespace MED
 	aRet  = MEDnumEcr(myFile->Id(),
 			  &aMeshName,
 			  &anElemNum,
-			  anInfo.myElemNum.size(),
+			  anInfo.myElemNum->size(),
 			  anEntity,
 			  MED_POLYEDRE);
 	if(theErr) 
@@ -1095,7 +1095,7 @@ namespace MED
       aRet = MEDfamEcr(myFile->Id(),
 		       &aMeshName,
 		       &aFamNum,
-		       anInfo.myFamNum.size(),
+		       anInfo.myFamNum->size(),
 		       anEntity,
 		       MED_POLYEDRE);
       
@@ -1277,7 +1277,7 @@ namespace MED
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
-      TInt aNbElem = theInfo.myElemNum.size();
+      TInt aNbElem = theInfo.myElemNum->size();
 
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);

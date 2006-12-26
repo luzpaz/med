@@ -38,6 +38,7 @@ namespace MED
   //---------------------------------------------------------------
   //! Defines a type for managing sequence of strings
   typedef TVector<char> TString; 
+  typedef SharedPtr<TString> PString;
 
   //! Extract a substring from the sequence of the strings
   std::string GetString(TInt theId, TInt theStep, 
@@ -163,6 +164,7 @@ namespace MED
 
   //---------------------------------------------------------------
   typedef TIntVector TElemNum;
+  typedef SharedPtr<TElemNum> PElemNum;
   
   //! Define a parent class for all MED entities that describes mesh entites such as nodes and cells.
   struct TElemInfo: virtual TBase
@@ -175,7 +177,7 @@ namespace MED
     TInt GetNbElem() const { return myNbElem;} //! Get number of mesh elements
     
     //! Defines sequence MED Family indexes for corresponding mesh entites
-    TElemNum myFamNum; 
+    PElemNum myFamNum; 
     //! Get number of a MED FAMILY by order number of the mesh element
     TInt GetFamNum(TInt theId) const;
     //! Set number of a MED FAMILY for the mesh element with the  order number
@@ -187,7 +189,7 @@ namespace MED
     EBooleen IsElemNum() const { return myIsElemNum;}
 
     //! Contains sequence of the indexes for the mesh elements
-    TElemNum myElemNum;
+    PElemNum myElemNum;
     //! Get a reference number of the mesh element by its order number
     TInt GetElemNum(TInt theId) const;
     //! Set a reference number for the mesh element by its order number
@@ -199,7 +201,7 @@ namespace MED
     EBooleen IsElemNames() const { return myIsElemNames;}
 
     //! Contains sequence of the names for the mesh elements
-    TString myElemNames;
+    PString myElemNames;
     //! Get name of the mesh element by its order number
     virtual std::string GetElemName(TInt theId) const = 0;
     //! Set name of the mesh element by its order number
@@ -213,6 +215,8 @@ namespace MED
   typedef TCSlice<TFloatVector> TCFloatVecSlice;
 
   typedef TFloatVector TNodeCoord;
+  typedef SharedPtr<TNodeCoord> PNodeCoord;
+
   typedef TFloatVecSlice TCoordSlice;
   typedef TCFloatVecSlice TCCoordSlice;
 
@@ -221,7 +225,7 @@ namespace MED
     virtual TElemInfo,
     virtual TModeSwitchInfo 
   {
-    TNodeCoord myCoord; //!< Contains all nodal coordinates
+    PNodeCoord myCoord; //!< Contains all nodal coordinates
 
     //! Gives coordinates for mesh node by its number (const version)
     TCCoordSlice GetCoordSlice(TInt theId) const;
@@ -271,7 +275,7 @@ namespace MED
 
     virtual TInt GetConnDim() const = 0; //!< Gives step in the connectivity sequence
 
-    TElemNum myConn; //!< Defines sequence which describe connectivity for ech of mesh cell
+    PElemNum myConn; //!< Defines sequence which describe connectivity for ech of mesh cell
 
     //! Gives connectivities for mesh cell by its number (const version)
     TCConnSlice GetConnSlice(TInt theElemId) const;
@@ -299,8 +303,8 @@ namespace MED
     //! Let known in what connectivity the cells are writen
     EConnectivite GetConnMode() const { return myConnMode;}
 
-    TElemNum myConn; //!< Table de connectivities
-    TElemNum myIndex; //!< Table de indexes
+    PElemNum myConn; //!< Table de connectivities
+    PElemNum myIndex; //!< Table de indexes
 
     //! Gives number of the connectivities for the defined polygon
     TInt GetNbConn(TInt theElemId) const;
@@ -334,9 +338,9 @@ namespace MED
     //! Let known in what connectivity the cells are writen
     EConnectivite GetConnMode() const { return myConnMode;}
 
-    TElemNum myConn; //!< Table de connectivities
-    TElemNum myFaces; //!< Table de faces indexes
-    TElemNum myIndex; //!< Table de indexes
+    PElemNum myConn; //!< Table de connectivities
+    PElemNum myFaces; //!< Table de faces indexes
+    PElemNum myIndex; //!< Table de indexes
 
     //! Gives number of the faces for the defined polyedre (const version)
     TInt GetNbFaces(TInt theElemId) const;
@@ -511,7 +515,7 @@ namespace MED
     //! Set mode for the MED Profile
     void SetMode(EModeProfil theMode) { myMode = theMode;}
 
-    TElemNum myElemNum; //!< Keeps sequence of cell by its number which belong to the profile
+    PElemNum myElemNum; //!< Keeps sequence of cell by its number which belong to the profile
     //! Get number of mesh elelemts by its order number
     TInt GetElemNum(TInt theId) const;
     //! Set number of mesh elelemts by its order number
@@ -521,7 +525,7 @@ namespace MED
     bool IsPresent() const { return GetName() != "";}
 
     //! Let known size of the MED Profile
-    TInt GetSize() const { return myElemNum.size();}
+    TInt GetSize() const { return myElemNum->size();}
   };
 
 
@@ -760,7 +764,8 @@ namespace MED
     virtual TTimeStampValueBase 
   {
     typedef TMeshValueType TTMeshValue;
-    typedef std::map<EGeometrieElement, TTMeshValue> TTGeom2Value;
+    typedef SharedPtr<TMeshValueType> PTMeshValue;
+    typedef std::map<EGeometrieElement, PTMeshValue> TTGeom2Value;
 
     ETypeChamp myTypeChamp; //<! Keeps type of the champ
 
@@ -788,15 +793,22 @@ namespace MED
       typename TTGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
       if(anIter == myGeom2Value.end())
 	EXCEPTION(runtime_error,"TTimeStampValue::GetMeshValue - myGeom2Value.find(theGeom) fails");
-      return anIter->second;
+      return *anIter->second;
     }
 
     //! Gets MED TimeStamp values for the given geometric type
     TTMeshValue& 
     GetMeshValue(EGeometrieElement theGeom)
     {
+      PTMeshValue aMeshValue;
       myGeomSet.insert(theGeom);
-      return myGeom2Value[theGeom];
+      typename TTGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
+      if(anIter == myGeom2Value.end()){
+	PTMeshValue aMeshValue(new TTMeshValue());
+	myGeom2Value[theGeom] = aMeshValue;
+	return *aMeshValue;
+      }
+      return *anIter->second;
     }
   };
 
@@ -823,7 +835,7 @@ namespace MED
     typename TimeStampValueTypeFrom::TTGeom2Value::const_iterator anIter = aGeom2Value.begin();
     for(; anIter != aGeom2Value.end(); anIter++){
       const EGeometrieElement& aGeom = anIter->first;
-      const typename TimeStampValueTypeFrom::TTMeshValue& aMeshValue = anIter->second;
+      const typename TimeStampValueTypeFrom::TTMeshValue& aMeshValue = *anIter->second;
       typename TimeStampValueTypeTo::TTMeshValue& aMeshValue2 = theTimeStampValueTo->GetMeshValue(aGeom);
       aMeshValue2.Allocate(aMeshValue.myNbElem, 
 			   aMeshValue.myNbGauss, 
@@ -842,7 +854,15 @@ namespace MED
   CopyTimeStampValue(SharedPtr<TTimeStampValue<TMeshValueType> > theTimeStampValueFrom,
 		     SharedPtr<TTimeStampValue<TMeshValueType> > theTimeStampValueTo)
   {
-    theTimeStampValueTo->myGeom2Value = theTimeStampValueFrom->myGeom2Value;
+    typedef TTimeStampValue<TMeshValueType> TimeStampValueType;
+    typename TimeStampValueType::TTGeom2Value& aGeom2Value = theTimeStampValueFrom->myGeom2Value;
+    typename TimeStampValueType::TTGeom2Value::const_iterator anIter = aGeom2Value.begin();
+    for(; anIter != aGeom2Value.end(); anIter++){
+      const EGeometrieElement& aGeom = anIter->first;
+      const typename TimeStampValueType::TTMeshValue& aMeshValue = *anIter->second;
+      typename TimeStampValueType::TTMeshValue& aMeshValue2 = theTimeStampValueTo->GetMeshValue(aGeom);
+      aMeshValue2 = aMeshValue;
+    }
   }
 
   //---------------------------------------------------------------
@@ -930,7 +950,7 @@ namespace MED
     TInt GetNbNodes();//! Return count of all points
     TInt GetNbCells();//! Return count of all cells
     EGeometrieElement GetGeom();//! Return geometry of cells (calculated from mesh dimension)
-    EEntiteMaillage   GetEntity();//! Return entity (eMAILLE)
+    EEntiteMaillage GetEntity();//! Return entity (eMAILLE)
 
     /*!
      *Vector of grille structure (Example: {3,4,5}, 3 nodes in X axe, 4 nodes in Y axe, ...)

@@ -88,21 +88,28 @@ TInt
 TElemInfo
 ::GetFamNum(TInt theId) const 
 {
-  return myFamNum[theId];
+  return (*myFamNum)[theId];
+}
+
+void
+TElemInfo
+::SetFamNum(TInt theId, TInt theVal) 
+{
+  (*myFamNum)[theId] = theVal;
 }
 
 TInt
 TElemInfo
 ::GetElemNum(TInt theId) const 
 {
-  return myElemNum[theId];
+  return (*myElemNum)[theId];
 }
 
 void
 TElemInfo
-::SetFamNum(TInt theId,TInt theVal) 
+::SetElemNum(TInt theId, TInt theVal) 
 {
-  myFamNum[theId] = theVal;
+  (*myElemNum)[theId] = theVal;
 }
 
 //---------------------------------------------------------------
@@ -112,9 +119,9 @@ TNodeInfo
 {
   TInt aDim = myMeshInfo->GetDim();
   if(GetModeSwitch() == eFULL_INTERLACE)
-    return TCCoordSlice(myCoord,std::slice(theId*aDim,aDim,1));
+    return TCCoordSlice(*myCoord, std::slice(theId*aDim,aDim,1));
   else
-    return TCCoordSlice(myCoord,std::slice(theId,aDim,aDim));
+    return TCCoordSlice(*myCoord, std::slice(theId,aDim,aDim));
 }
 
 TCoordSlice 
@@ -123,9 +130,9 @@ TNodeInfo
 {
   TInt aDim = myMeshInfo->GetDim();
   if(GetModeSwitch() == eFULL_INTERLACE)
-    return TCoordSlice(myCoord,std::slice(theId*aDim,aDim,1));
+    return TCoordSlice(*myCoord, std::slice(theId*aDim,aDim,1));
   else
-    return TCoordSlice(myCoord,std::slice(theId,aDim,aDim));
+    return TCoordSlice(*myCoord, std::slice(theId,aDim,aDim));
 }
 
 //---------------------------------------------------------------
@@ -134,9 +141,9 @@ TCellInfo
 ::GetConnSlice(TInt theElemId) const
 {
   if(GetModeSwitch() == eFULL_INTERLACE)
-    return TCConnSlice(myConn,std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
+    return TCConnSlice(*myConn, std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
   else
-    return TCConnSlice(myConn,std::slice(theElemId,GetNbNodes(myGeom),GetConnDim()));
+    return TCConnSlice(*myConn, std::slice(theElemId,GetNbNodes(myGeom),GetConnDim()));
 }
 
 TConnSlice 
@@ -144,9 +151,9 @@ TCellInfo
 ::GetConnSlice(TInt theElemId)
 {
   if(GetModeSwitch() == eFULL_INTERLACE)
-    return TConnSlice(myConn,std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
+    return TConnSlice(*myConn, std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
   else
-    return TConnSlice(myConn,std::slice(theElemId,GetNbNodes(myGeom),GetConnDim()));
+    return TConnSlice(*myConn, std::slice(theElemId,GetNbNodes(myGeom),GetConnDim()));
 }
 
 
@@ -155,21 +162,21 @@ TInt
 TPolygoneInfo
 ::GetNbConn(TInt theElemId) const 
 {
-  return myIndex[theElemId + 1] - myIndex[theElemId];
+  return (*myIndex)[theElemId + 1] - (*myIndex)[theElemId];
 }
 
 TCConnSlice 
 TPolygoneInfo
 ::GetConnSlice(TInt theElemId) const
 {
-  return TCConnSlice(myConn,std::slice(myIndex[theElemId]-1,GetNbConn(theElemId),1));
+  return TCConnSlice(*myConn, std::slice((*myIndex)[theElemId] - 1, GetNbConn(theElemId), 1));
 }
 
 TConnSlice 
 TPolygoneInfo
 ::GetConnSlice(TInt theElemId)
 {
-  return TConnSlice(myConn,std::slice(myIndex[theElemId]-1,GetNbConn(theElemId),1));
+  return TConnSlice(*myConn, std::slice((*myIndex)[theElemId] - 1, GetNbConn(theElemId), 1));
 }
 
 
@@ -178,7 +185,7 @@ TInt
 TPolyedreInfo
 ::GetNbFaces(TInt theElemId) const 
 {
-  return myIndex[theElemId+1] - myIndex[theElemId];
+  return (*myIndex)[theElemId+1] - (*myIndex)[theElemId];
 }
 
 TInt 
@@ -187,10 +194,10 @@ TPolyedreInfo
 {
   TInt aNbNodes = 0;
   TInt aNbFaces = GetNbFaces(theElemId);
-  TInt aStartFaceId = myIndex[theElemId] - 1;
+  TInt aStartFaceId = (*myIndex)[theElemId] - 1;
   for(TInt aFaceId = 0; aFaceId < aNbFaces; aFaceId++, aStartFaceId++){
-    TInt aCurrentId = myFaces[aStartFaceId];
-    TInt aDiff = myFaces[aStartFaceId + 1] - aCurrentId;
+    TInt aCurrentId = (*myFaces)[aStartFaceId];
+    TInt aDiff = (*myFaces)[aStartFaceId + 1] - aCurrentId;
     aNbNodes += aDiff;
   }
   return aNbNodes;
@@ -202,12 +209,12 @@ TPolyedreInfo
 {
   TInt aNbFaces = GetNbFaces(theElemId);
   TCConnSliceArr aConnSliceArr(aNbFaces);
-  TInt aStartFaceId = myIndex[theElemId] - 1;
+  TInt aStartFaceId = (*myIndex)[theElemId] - 1;
   for(TInt aFaceId = 0; aFaceId < aNbFaces; aFaceId++, aStartFaceId++){
-    TInt aCurrentId = myFaces[aStartFaceId];
-    TInt aDiff = myFaces[aStartFaceId + 1] - aCurrentId;
+    TInt aCurrentId = (*myFaces)[aStartFaceId];
+    TInt aDiff = (*myFaces)[aStartFaceId + 1] - aCurrentId;
     aConnSliceArr[aFaceId] =
-      TCConnSlice(myConn,std::slice(aCurrentId - 1,aDiff,1));
+      TCConnSlice(*myConn, std::slice(aCurrentId - 1, aDiff, 1));
   }
   return aConnSliceArr;
 }
@@ -218,12 +225,12 @@ TPolyedreInfo
 {
   TInt aNbFaces = GetNbFaces(theElemId);
   TConnSliceArr aConnSliceArr(aNbFaces);
-  TInt aStartFaceId = myIndex[theElemId] - 1;
+  TInt aStartFaceId = (*myIndex)[theElemId] - 1;
   for(TInt aFaceId = 0; aFaceId < aNbFaces; aFaceId++, aStartFaceId++){
-    TInt aCurrentId = myFaces[aStartFaceId];
-    TInt aDiff = myFaces[aStartFaceId + 1] - aCurrentId;
+    TInt aCurrentId = (*myFaces)[aStartFaceId];
+    TInt aDiff = (*myFaces)[aStartFaceId + 1] - aCurrentId;
     aConnSliceArr[aFaceId] =
-      TConnSlice(myConn,std::slice(aCurrentId - 1,aDiff,1));
+      TConnSlice(*myConn, std::slice(aCurrentId - 1, aDiff, 1));
   }
   return aConnSliceArr;
 }
@@ -234,14 +241,14 @@ TInt
 TProfileInfo
 ::GetElemNum(TInt theId) const 
 {
-  return myElemNum[theId];
+  return (*myElemNum)[theId];
 }
 
 void
 TProfileInfo
 ::SetElemNum(TInt theId,TInt theVal) 
 {
-  myElemNum[theId] = theVal;
+  (*myElemNum)[theId] = theVal;
 }
 
 //---------------------------------------------------------------
