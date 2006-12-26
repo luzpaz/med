@@ -210,7 +210,13 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 {
   const char * LOC = "MED_MED_DRIVER22::readFileStruct() : ";
   int          err,i,j;
-      
+
+  // PAL12192
+  if ( IMED_MED_RDONLY_DRIVER::_fileStructIsRead )
+    return;
+  else
+    IMED_MED_RDONLY_DRIVER::_fileStructIsRead = true;
+
   BEGIN_OF(LOC);
 
   if ( _medIdt == MED_INVALID ) 
@@ -693,6 +699,11 @@ void MED_MED_RDONLY_DRIVER22::read( void )
   const char * LOC = "MED_MED_DRIVER22::read() : ";
  
   BEGIN_OF(LOC);
+
+  // For PAL12192: assure that file structure is already read
+  this->open();
+  this->readFileStruct();
+  this->close();
 
   const map<MESH_NAME_, MESH*> & _meshes = const_cast<const map<MESH_NAME_, MESH*>& > (_ptrMed->_meshes); 
   map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
