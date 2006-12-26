@@ -64,18 +64,18 @@ MED_MED_DRIVER::~MED_MED_DRIVER()
 
 // ------------- Read Only Part --------------
 
-IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER():MED_MED_DRIVER()
+IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER():MED_MED_DRIVER(),_fileStructIsRead(false)
 {
 }
 
 IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed):
-  MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_RDONLY)
+  MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_RDONLY),_fileStructIsRead(false)
 {
   MESSAGE("MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed) Constructeur read only");
 }
 
 IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER(const IMED_MED_RDONLY_DRIVER & driver):
-  MED_MED_DRIVER(driver)
+  MED_MED_DRIVER(driver),_fileStructIsRead(false)
 {
 }
 

@@ -126,6 +126,10 @@ public :
     Return a MEDEXCEPTION : it is the read-only driver.
   */
   void writeFrom      ( void ) const throw (MEDEXCEPTION) ;
+
+protected:
+  // PAL14192: to allow painless repeated readFileStruct() calls
+  bool _fileStructIsRead;
 };
 
 /*!
