@@ -41,6 +41,7 @@
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_DriversDef.hxx"
+#include "MEDMEM_Grid.hxx"
 
 
 #include "Utils_SINGLETON.hxx"
@@ -327,7 +328,17 @@ throw (SALOME::SALOME_Exception)
 
 // Creation du maillage
 
-	MESH * myMesh= new MESH() ;
+	MESH * myMesh;
+
+	// skl for IPAL14240
+	// check mesh or grid:
+	MED med(MED_DRIVER,fileName);
+	MESH* tmpMesh = med.getMesh(meshName);
+	if(tmpMesh->getIsAGrid())
+	  myMesh = new GRID();
+	else
+	  myMesh = new MESH() ;
+
   	myMesh->setName(meshName);
   	MED_MESH_RDONLY_DRIVER myMeshDriver(fileName,myMesh);
 	try
