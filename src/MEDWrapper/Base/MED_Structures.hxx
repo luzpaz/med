@@ -108,8 +108,8 @@ namespace MED
 
   //---------------------------------------------------------------
   typedef TVector<TInt> TIntVector;
-  typedef TSlice<TIntVector> TIntVecSlice;
-  typedef TCSlice<TIntVector> TCIntVecSlice;
+  typedef TSlice<TInt> TIntVecSlice;
+  typedef TCSlice<TInt> TCIntVecSlice;
 
   typedef TIntVector TFamAttr;
 
@@ -211,8 +211,8 @@ namespace MED
 
   //---------------------------------------------------------------
   typedef TVector<TFloat> TFloatVector;
-  typedef TSlice<TFloatVector> TFloatVecSlice;
-  typedef TCSlice<TFloatVector> TCFloatVecSlice;
+  typedef TSlice<TFloat> TFloatVecSlice;
+  typedef TCSlice<TFloat> TCFloatVecSlice;
 
   typedef TFloatVector TNodeCoord;
   typedef SharedPtr<TNodeCoord> PNodeCoord;
@@ -531,25 +531,61 @@ namespace MED
 
   //---------------------------------------------------------------
   //! The class is a helper one. It provide safe and flexible way to get access to values for a MED TimeStamp
-  template<class TValueType>
-  struct TTMeshValue:
+  struct TMeshValueBase:
     virtual TModeSwitchInfo 
   {
-    typedef TValueType TValue;
-    typedef TSlice<TValue> TValueSlice;
-    typedef TCSlice<TValue> TCValueSlice;
-    
-    typedef TVector<TCValueSlice> TCValueSliceArr;
-    typedef TVector<TValueSlice> TValueSliceArr;
-    
-    typedef typename TValueType::value_type TElement;
-
-    TValue myValue;
-
     TInt myNbElem;
     TInt myNbComp;
     TInt myNbGauss;
     TInt myStep;
+
+    TMeshValueBase();
+
+    //! Initialize the class
+    void
+    Allocate(TInt theNbElem,
+	     TInt theNbGauss,
+	     TInt theNbComp,
+	     EModeSwitch theMode = eFULL_INTERLACE);
+
+    //! Returns size of the value container
+    size_t
+    GetSize() const;
+    
+    //! Returns MED interpetation of the value size
+    size_t
+    GetNbVal() const;
+    
+    //! Returns number of Gauss Points bounded with the value
+    size_t
+    GetNbGauss() const;
+    
+    //! Returns step inside of the data array
+    size_t
+    GetStep() const;
+    
+    //! Returns bare pointer on the internal value representation
+    virtual
+    unsigned char*
+    GetValuePtr() = 0;
+  };
+
+  //---------------------------------------------------------------
+  //! The class is a helper one. It provide safe and flexible way to get access to values for a MED TimeStamp
+  template<class TValueType>
+  struct TTMeshValue:
+    virtual TMeshValueBase 
+  {
+    typedef TValueType TValue;
+    typedef typename TValueType::value_type TElement;
+
+    typedef TSlice<TElement> TValueSlice;
+    typedef TCSlice<TElement> TCValueSlice;
+    
+    typedef TVector<TCValueSlice> TCValueSliceArr;
+    typedef TVector<TValueSlice> TValueSliceArr;
+    
+    TValue myValue;
 
     //! Initialize the class
     void
@@ -558,39 +594,12 @@ namespace MED
 	     TInt theNbComp,
 	     EModeSwitch theMode = eFULL_INTERLACE)
     {
-      myModeSwitch = theMode;
-      
-      myNbElem = theNbElem;
-      myNbGauss = theNbGauss;
-      myNbComp = theNbComp;
-      
-      myStep = theNbComp*theNbGauss;
-      
-      myValue.resize(theNbElem*myStep);
+      TMeshValueBase::Allocate(theNbElem, theNbGauss, theNbComp, theMode);
+      myValue.resize(theNbElem * this->GetStep());
     }
 
-    //! Returns size of the value container
-    size_t
-    GetSize() const
-    {
-      return myValue.size();
-    }
-    
-    //! Returns MED interpetation of the value size
-    size_t
-    GetNbVal() const
-    {
-      return myNbElem * myNbGauss;
-    }
-    
-    //! Returns number of Gauss Points bounded with the value
-    size_t
-    GetNbGauss() const
-    {
-      return myNbGauss;
-    }
-    
     //! Returns bare pointer on the internal value representation
+    virtual
     unsigned char*
     GetValuePtr()
     {
@@ -603,17 +612,17 @@ namespace MED
     {
       TCValueSliceArr aValueSliceArr(myNbGauss);
       if(GetModeSwitch() == eFULL_INTERLACE){
-	TInt anId = theElemId*myStep;
+	TInt anId = theElemId * myStep;
 	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
 	  aValueSliceArr[aGaussId] =
-	    TCValueSlice(myValue,std::slice(anId,myNbComp,1));
+	    TCValueSlice(myValue, std::slice(anId, myNbComp, 1));
 	  anId += myNbComp;
 	}
       }
       else{
 	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
 	  aValueSliceArr[aGaussId] =
-	    TCValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
+	    TCValueSlice(myValue, std::slice(theElemId, myNbComp, myStep));
 	}
       }
       return aValueSliceArr;
@@ -628,14 +637,14 @@ namespace MED
 	TInt anId = theElemId*myStep;
 	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
 	  aValueSliceArr[aGaussId] =
-	    TValueSlice(myValue,std::slice(anId,myNbComp,1));
+	    TValueSlice(myValue, std::slice(anId, myNbComp, 1));
 	  anId += myNbComp;
 	}
       }
       else{
 	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
 	  aValueSliceArr[aGaussId] =
-	    TValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
+	    TValueSlice(myValue, std::slice(theElemId, myNbComp, myStep));
 	}
       }
       return aValueSliceArr;
@@ -650,14 +659,14 @@ namespace MED
 	TInt anId = theElemId*myStep;
 	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
 	  aValueSliceArr[aCompId] =
-	    TCValueSlice(myValue,std::slice(anId,myNbGauss,myNbComp));
+	    TCValueSlice(myValue, std::slice(anId, myNbGauss, myNbComp));
 	  anId += 1;
 	}
       }
       else{
 	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
 	  aValueSliceArr[aCompId] =
-	    TCValueSlice(myValue,std::slice(theElemId,myNbGauss,myStep));
+	    TCValueSlice(myValue, std::slice(theElemId, myNbGauss, myStep));
 	}
       }
       return aValueSliceArr;
@@ -672,7 +681,7 @@ namespace MED
 	TInt anId = theElemId*myStep;
 	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
 	  aValueSliceArr[aCompId] =
-	    TValueSlice(myValue,std::slice(anId,myNbGauss,myNbComp));
+	    TValueSlice(myValue, std::slice(anId, myNbGauss, myNbComp));
 	  anId += 1;
 	}
 	return aValueSliceArr;
@@ -681,7 +690,7 @@ namespace MED
 	TValueSliceArr aValueSliceArr(myNbGauss);
 	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
 	  aValueSliceArr[aGaussId] =
-	    TValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
+	    TValueSlice(myValue,std::slice(theElemId, myNbComp, myStep));
 	}
 	return aValueSliceArr;
       }
@@ -694,8 +703,8 @@ namespace MED
   //---------------------------------------------------------------
   // Backward compatibility  declarations
   typedef TFloatVector TValue;
-  typedef TSlice<TValue> TValueSlice;
-  typedef TCSlice<TValue> TCValueSlice;
+  typedef TSlice<TFloat> TValueSlice;
+  typedef TCSlice<TFloat> TCValueSlice;
   
   typedef TVector<TCValueSlice> TCValueSliceArr;
   typedef TVector<TValueSlice> TValueSliceArr;
