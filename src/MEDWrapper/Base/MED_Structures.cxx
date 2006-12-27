@@ -119,9 +119,9 @@ TNodeInfo
 {
   TInt aDim = myMeshInfo->GetDim();
   if(GetModeSwitch() == eFULL_INTERLACE)
-    return TCCoordSlice(*myCoord, std::slice(theId*aDim,aDim,1));
+    return TCCoordSlice(*myCoord, std::slice(theId*aDim, aDim, 1));
   else
-    return TCCoordSlice(*myCoord, std::slice(theId,aDim,aDim));
+    return TCCoordSlice(*myCoord, std::slice(theId, aDim, aDim));
 }
 
 TCoordSlice 
@@ -141,9 +141,9 @@ TCellInfo
 ::GetConnSlice(TInt theElemId) const
 {
   if(GetModeSwitch() == eFULL_INTERLACE)
-    return TCConnSlice(*myConn, std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
+    return TCConnSlice(*myConn, std::slice(GetConnDim()*theElemId, GetNbNodes(myGeom), 1));
   else
-    return TCConnSlice(*myConn, std::slice(theElemId,GetNbNodes(myGeom),GetConnDim()));
+    return TCConnSlice(*myConn, std::slice(theElemId, GetNbNodes(myGeom), GetConnDim()));
 }
 
 TConnSlice 
@@ -151,9 +151,9 @@ TCellInfo
 ::GetConnSlice(TInt theElemId)
 {
   if(GetModeSwitch() == eFULL_INTERLACE)
-    return TConnSlice(*myConn, std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
+    return TConnSlice(*myConn, std::slice(GetConnDim()*theElemId, GetNbNodes(myGeom), 1));
   else
-    return TConnSlice(*myConn, std::slice(theElemId,GetNbNodes(myGeom),GetConnDim()));
+    return TConnSlice(*myConn, std::slice(theElemId, GetNbNodes(myGeom), GetConnDim()));
 }
 
 
@@ -233,6 +233,60 @@ TPolyedreInfo
       TConnSlice(*myConn, std::slice(aCurrentId - 1, aDiff, 1));
   }
   return aConnSliceArr;
+}
+
+
+//---------------------------------------------------------------
+TMeshValueBase
+::TMeshValueBase():
+  myNbElem(0),
+  myNbComp(0),
+  myNbGauss(0),
+  myStep(0)
+{}
+
+void
+TMeshValueBase
+::Allocate(TInt theNbElem,
+	   TInt theNbGauss,
+	   TInt theNbComp,
+	   EModeSwitch theMode)
+{
+  myModeSwitch = theMode;
+  
+  myNbElem = theNbElem;
+  myNbGauss = theNbGauss;
+  myNbComp = theNbComp;
+  
+  myStep = theNbComp*theNbGauss;
+}
+
+size_t
+TMeshValueBase
+::GetSize() const
+{
+  return myNbElem * myStep;
+}
+    
+size_t
+TMeshValueBase
+::GetNbVal() const
+{
+  return myNbElem * myNbGauss;
+}
+
+size_t
+TMeshValueBase
+::GetNbGauss() const
+{
+  return myNbGauss;
+}
+
+size_t
+TMeshValueBase
+::GetStep() const
+{
+  return myStep;
 }
 
 
