@@ -71,6 +71,35 @@ namespace MED
   }
 
 
+  TInt
+  TGaussCoord
+  ::GetNbElem() const
+  { 
+    return myNbElem; 
+  }
+  
+  TInt
+  TGaussCoord
+  ::GetNbGauss() const
+  { 
+    return myNbGauss; 
+  }
+  
+  TInt
+  TGaussCoord
+  ::GetDim() const
+  { 
+    return myDim; 
+  }
+  
+  unsigned char*
+  TGaussCoord
+  ::GetValuePtr()
+  {
+    return (unsigned char*)&(myGaussCoord[0]);
+  }
+
+
   TCCoordSliceArr 
   TGaussCoord
   ::GetCoordSliceArr(TInt theElemId) const
@@ -80,14 +109,14 @@ namespace MED
       TInt anId = theElemId*myGaussStep;
       for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
 	aCoordSliceArr[anGaussId] =
-	  TCCoordSlice(myGaussCoord,std::slice(anId,myDim,1));
+	  TCCoordSlice(myGaussCoord, std::slice(anId, myDim, 1));
 	anId += myDim;
       }
     }
     else{
       for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
 	aCoordSliceArr[anGaussId] =
-	  TCCoordSlice(myGaussCoord,std::slice(theElemId,myDim,myGaussStep));
+	  TCCoordSlice(myGaussCoord, std::slice(theElemId, myDim, myGaussStep));
       }
     }
     return aCoordSliceArr;
@@ -103,14 +132,14 @@ namespace MED
       TInt anId = theElemId*myGaussStep;
       for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
 	aCoordSliceArr[anGaussId] =
-	  TCoordSlice(myGaussCoord,std::slice(anId,myDim,1));
+	  TCoordSlice(myGaussCoord, std::slice(anId, myDim, 1));
 	anId += myDim;
       }
     }
     else{
       for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
 	aCoordSliceArr[anGaussId] =
-	  TCoordSlice(myGaussCoord,std::slice(theElemId,myDim,myGaussStep));
+	  TCoordSlice(myGaussCoord, std::slice(theElemId, myDim, myGaussStep));
       }
     }
     return aCoordSliceArr;

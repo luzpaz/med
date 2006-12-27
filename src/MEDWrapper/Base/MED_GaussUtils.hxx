@@ -53,14 +53,6 @@ namespace MED
     
     TGaussCoord();
 
-    //! Get slice of the coordinate that corresponds to defined cell (const version)
-    TCCoordSliceArr
-    GetCoordSliceArr(TInt theElemId) const;
-
-    //! Get slice of the coordinate that corresponds to defined cell
-    TCoordSliceArr 
-    GetCoordSliceArr(TInt theElemId);
-
     //! To init the class
     void
     Init(TInt theNbElem,
@@ -69,14 +61,26 @@ namespace MED
 	 EModeSwitch theMode = eFULL_INTERLACE);
 
     TInt
-    GetNbElem() const { return myNbElem; }
+    GetNbElem() const;
 
     TInt
-    GetNbGauss() const { return myNbGauss; }
+    GetNbGauss() const;
 
     TInt
-    GetDim() const { return myDim; }
+    GetDim() const;
+
+    unsigned char*
+    GetValuePtr();
+
+    //! Get slice of the coordinate that corresponds to defined cell (const version)
+    TCCoordSliceArr
+    GetCoordSliceArr(TInt theElemId) const;
+
+    //! Get slice of the coordinate that corresponds to defined cell
+    TCoordSliceArr 
+    GetCoordSliceArr(TInt theElemId);
   };
+  typedef SharedPtr<TGaussCoord> PGaussCoord;
 
 
   //---------------------------------------------------------------
