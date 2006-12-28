@@ -332,12 +332,21 @@ throw (SALOME::SALOME_Exception)
 
 	// skl for IPAL14240
 	// check mesh or grid:
-	MED med(MED_DRIVER,fileName);
-	MESH* tmpMesh = med.getMesh(meshName);
-	if(tmpMesh->getIsAGrid())
-	  myMesh = new GRID();
-	else
+	try {
+	  MED med(MED_DRIVER,fileName);
+	  MESH* tmpMesh = med.getMesh(meshName);
+	  if(tmpMesh) {
+	    if(tmpMesh->getIsAGrid())
+	      myMesh = new GRID();
+	    else
+	      myMesh = new MESH() ;
+	  }
+	}
+        catch (const std::exception & ex) {
+	  MESSAGE("Exception Interceptee : ");
+	  SCRUTE(ex.what());
 	  myMesh = new MESH() ;
+        };
 
   	myMesh->setName(meshName);
   	MED_MESH_RDONLY_DRIVER myMeshDriver(fileName,myMesh);
