@@ -1406,7 +1406,7 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   // set new mesh name, becouse now there are no possibility to operate meshes with the same names
 //    srand((unsigned int)time(NULL));
   int aRND = rand(); //Get a random number to present a name of a copied mesh
-  char aCopiedMeshName[20];
+  char aCopiedMeshName[127];
   sprintf(aCopiedMeshName,"MESH_COPY_%d",aRND);
   myMesh->setName(aCopiedMeshName);
   MESH_i * meshi = new MESH_i(myMesh);
