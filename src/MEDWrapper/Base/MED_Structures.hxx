@@ -606,6 +606,22 @@ namespace MED
       return (unsigned char*)&myValue[0];
     }
 
+    //! Returns bare pointer on the internal value representation
+    virtual
+    TElement*
+    GetPointer()
+    {
+      return &myValue[0];
+    }
+
+    //! Returns bare pointer on the internal value representation
+    virtual
+    const TElement*
+    GetPointer() const
+    {
+      return &myValue[0];
+    }
+
     //! Iteration through Gauss Points by their components
     TCValueSliceArr
     GetGaussValueSliceArr(TInt theElemId) const
@@ -774,6 +790,7 @@ namespace MED
   {
     typedef TMeshValueType TTMeshValue;
     typedef SharedPtr<TMeshValueType> PTMeshValue;
+    typedef typename TMeshValueType::TElement TElement;
     typedef std::map<EGeometrieElement, PTMeshValue> TTGeom2Value;
 
     ETypeChamp myTypeChamp; //<! Keeps type of the champ
@@ -796,28 +813,39 @@ namespace MED
     }
 
     //! Gets MED TimeStamp values for the given geometric type (const version)
-    const TTMeshValue& 
-    GetMeshValue(EGeometrieElement theGeom) const
+    const PTMeshValue& 
+    GetMeshValuePtr(EGeometrieElement theGeom) const
     {
       typename TTGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
       if(anIter == myGeom2Value.end())
-	EXCEPTION(runtime_error,"TTimeStampValue::GetMeshValue - myGeom2Value.find(theGeom) fails");
-      return *anIter->second;
+	EXCEPTION(runtime_error,"TTimeStampValue::GetMeshValuePtr - myGeom2Value.find(theGeom) fails");
+      return anIter->second;
+    }
+
+    //! Gets MED TimeStamp values for the given geometric type
+    PTMeshValue& 
+    GetMeshValuePtr(EGeometrieElement theGeom)
+    {
+      myGeomSet.insert(theGeom);
+      if(myGeom2Value.find(theGeom) == myGeom2Value.end()){
+	myGeom2Value[theGeom] = PTMeshValue(new TTMeshValue());
+	return myGeom2Value[theGeom];
+      }
+      return myGeom2Value[theGeom];
+    }
+
+    //! Gets MED TimeStamp values for the given geometric type (const version)
+    const TTMeshValue& 
+    GetMeshValue(EGeometrieElement theGeom) const
+    {
+      return *(this->GetMeshValuePtr(theGeom));
     }
 
     //! Gets MED TimeStamp values for the given geometric type
     TTMeshValue& 
     GetMeshValue(EGeometrieElement theGeom)
     {
-      PTMeshValue aMeshValue;
-      myGeomSet.insert(theGeom);
-      typename TTGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
-      if(anIter == myGeom2Value.end()){
-	PTMeshValue aMeshValue(new TTMeshValue());
-	myGeom2Value[theGeom] = aMeshValue;
-	return *aMeshValue;
-      }
-      return *anIter->second;
+      return *(this->GetMeshValuePtr(theGeom));
     }
   };
 
