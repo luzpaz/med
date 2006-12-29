@@ -170,13 +170,13 @@ namespace MED
     value_type& 
     operator[](size_t theId)
     {
-      return *(myValuePtr + get_id(theId));
+      return *(myValuePtr + this->get_id(theId));
     }
 
     value_type& 
     at(size_t theId)
     {
-      return *(myValuePtr + get_id_at(theId));
+      return *(myValuePtr + this->get_id_at(theId));
     }
   };
 
