@@ -947,7 +947,8 @@ Topology* MESHCollection::createPartition(int nbdomain,
 					  int* user_vertices_weights)
 {
 
-	MEDMEM::MEDSKYLINEARRAY* array=0;
+	if (nbdomain <1) throw MEDEXCEPTION("Number of subdomains must be >0");
+    MEDMEM::MEDSKYLINEARRAY* array=0;
 	int* edgeweights=0;
 	
 	MESSAGE("Building cell graph");

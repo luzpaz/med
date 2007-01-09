@@ -271,6 +271,8 @@ ParallelTopology::~ParallelTopology()
  * */
 void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, int* local, int* ip)
 	{
+        if (m_node_glob_to_loc.empty()) 
+            throw MEDMEM::MEDEXCEPTION("convertGlobalNodeList - Node mapping has not yet been built");
 		for (int i=0; i< nbnode; i++)
 		{
 			pair<int,int> local_node = m_node_glob_to_loc.find(node_list[i])->second;
@@ -287,19 +289,22 @@ void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, i
  * 
  * */
 void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, int* local, int ip)
-	{
-		for (int i=0; i< nbnode; i++)
-		{
-			typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
-			pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(node_list[i]);
-			for (mmiter it=range.first; it !=range.second; it++)
-			{	
-				int ipfound=(it->second).first;
-				if (ipfound==ip)
-					local[i]=(it->second).second;
-			}
-		}
-	}	
+{
+  if (m_node_glob_to_loc.empty()) 
+    throw MEDMEM::MEDEXCEPTION("convertGlobalNodeList - Node mapping has not yet been built");
+    
+  for (int i=0; i< nbnode; i++)
+  {
+	typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+	pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(node_list[i]);
+	for (mmiter it=range.first; it !=range.second; it++)
+	{	
+	  int ipfound=(it->second).first;
+	  if (ipfound==ip)
+		local[i]=(it->second).second;
+	}
+  }
+}	
 	
 /*!Converts a list of global node numbers
  * to a distributed array with local cell numbers.
@@ -308,33 +313,36 @@ void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, i
  * all the values are put in the array
  * */
 void ParallelTopology::convertGlobalNodeListWithTwins(const int* node_list, int nbnode, int*& local, int*& ip,int*& full_array, int& size)
-	{
-		size=0;
-		for (int i=0; i< nbnode; i++)
-		{
-			int count= m_node_glob_to_loc.count(node_list[i]);
+{
+  if (m_node_glob_to_loc.empty()) 
+    throw MEDMEM::MEDEXCEPTION("convertGlobalNodeList - Node mapping has not yet been built");
+ 
+  size=0;
+  for (int i=0; i< nbnode; i++)
+  {
+	int count= m_node_glob_to_loc.count(node_list[i]);
 //			if (count > 1) 
 //				cout << "noeud " << node_list[i]<< " doublon d'ordre " << count<<endl;
-			size+=count;
-		}
-		int index=0;
-		ip=new int[size];
-		local=new int[size];
-		full_array=new int[size];
-		for (int i=0; i< nbnode; i++)
-		{
-			typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
-			pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(node_list[i]);
-			for (mmiter it=range.first; it !=range.second; it++)
-			{	
-				ip[index]=(it->second).first;
-				local[index]=(it->second).second;
-				full_array [index]=node_list[i];
-				index++;
-			}
+	size+=count;
+  }
+  int index=0;
+  ip=new int[size];
+  local=new int[size];
+  full_array=new int[size];
+  for (int i=0; i< nbnode; i++)
+  {
+	 typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+	 pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(node_list[i]);
+	 for (mmiter it=range.first; it !=range.second; it++)
+	 {	
+		ip[index]=(it->second).first;
+		local[index]=(it->second).second;
+		full_array [index]=node_list[i];
+		index++;
+	 }
 			
-		}
-	}
+   }
+}
 
 /*!Converts a list of global face numbers
  * to a distributed array with local face numbers.
