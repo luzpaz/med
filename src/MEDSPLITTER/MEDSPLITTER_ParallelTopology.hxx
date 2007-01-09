@@ -6,6 +6,17 @@
 
 #include "MEDSPLITTER_Topology.hxx"
 
+ namespace __gnu_cxx
+    {
+        template<> struct hash< pair<int,int> >
+        {
+                size_t operator()( const pair<int,int>& x ) const
+                {
+                        return hash< int >()( x.first*1000000+x.second );
+                }
+        };
+}
+
 namespace MEDSPLITTER {
 
 class Graph;
@@ -113,7 +124,7 @@ inline  void convertFaceToGlobal(int ip, const int* local, int n, int* global)co
       {
 	if (m_face_loc_to_glob.find(make_pair(ip,local[i]))==m_face_loc_to_glob.end())
 	  {
-	    cout << "probleme : la face n "<< local[i] << " du processeur "<< ip<< " n'a pas ete trouvee dans le mapping loc2glob"<<endl;	
+	    cout << "problem : face # "<< local[i] << " of processor "<< ip<< " was not found in mapping loc2glob"<<endl;	
 	    global[i]=-1;
 	  }
 	else
@@ -215,20 +226,31 @@ private:
 	//!mapping global -> local
   __gnu_cxx::hash_map<int,pair<int,int> > m_glob_to_loc;
 
+  //  bool is_equal_pair (pair<int,int> a, pair<int,int> b){
+  //      return  (a.first==b.first && a.second==b.second);
+   // }
 	//!mapping local -> global
-	map<pair<int,int>,int> m_loc_to_glob;
-
+	//map<pair<int,int>,int> m_loc_to_glob;
+   
+    //
+   __gnu_cxx::hash_map<pair<int,int>,int, __gnu_cxx::hash<pair<int,int> > > m_loc_to_glob;
+    
 	//!mapping global -> local
 	__gnu_cxx::hash_multimap<int,pair<int,int> > m_node_glob_to_loc;
 	
 	//!mapping local -> global
-	map<pair<int,int>,int> m_node_loc_to_glob;
+//	map<pair<int,int>,int> m_node_loc_to_glob;
+    __gnu_cxx::hash_map<pair<int,int>,int, __gnu_cxx::hash<pair<int,int> > > m_node_loc_to_glob;
+   
+    
 	
 	//!mapping global -> local
 	__gnu_cxx::hash_multimap<int,pair<int,int> > m_face_glob_to_loc;
 	
 	//!mapping local -> global
-	map<pair<int,int>,int> m_face_loc_to_glob;
+    __gnu_cxx::hash_map<pair<int,int>,int, __gnu_cxx::hash<pair<int,int> > > m_face_loc_to_glob;
+   
+	//map<pair<int,int>,int> m_face_loc_to_glob;
 	
 	vector<int> m_nb_cells;
 	
