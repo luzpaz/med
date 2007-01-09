@@ -58,6 +58,10 @@ int MESHCollectionDriver::read(char* filename)
   try{
   	MESSAGE("Start reading");
     ifstream asciiinput(filename);
+    
+    if (!asciiinput)     
+        throw MEDEXCEPTION("MEDSPLITTER read - Master File does not exist");
+    
     char charbuffer[512];
     asciiinput.getline(charbuffer,512);
     
@@ -111,7 +115,7 @@ int MESHCollectionDriver::read(char* filename)
 		    char name[MED_TAILLE_NOM];
 		    char name_distant[MED_TAILLE_NOM];
 		    
-		    int ncorr = med_2_2::MEDjointInfo(fid,file, idomain, name, 
+		    int ncorr = med_2_2::MEDjointInfo(fid,meshname, ijoint+1, name, 
 		    	joint_description,
 			       &distant, name_distant);
 	
@@ -124,7 +128,7 @@ int MESHCollectionDriver::read(char* filename)
 		  
 		   
 		      int ncouples;
-		      ncouples = med_2_2::MEDjointTypeCorres(fid, meshname, name, ic,
+		      ncouples = med_2_2::MEDjointTypeCorres(fid, meshname, name, ic+1,
 						    &cor_typent_local,  &cor_typgeo_local,
 						    &cor_typent_dist, &cor_typgeo_dist
 						    );
