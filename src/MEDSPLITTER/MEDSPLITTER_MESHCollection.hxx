@@ -4,10 +4,13 @@
 //#include "MESHCollectionDriver.hxx"
 #include "MEDSPLITTER_Graph.hxx"
 #include "boost/shared_ptr.hpp"
+#include <vector>
 
 namespace MEDMEM{
 class MESH;
 class CONNECTZONE;
+class MEDSKYLINEARAY;
+class SUPPORT;
 }
 
 namespace MEDSPLITTER{
