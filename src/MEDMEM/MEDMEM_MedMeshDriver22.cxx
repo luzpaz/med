@@ -1889,9 +1889,11 @@ int  MED_MESH_RDONLY_DRIVER22::getCellsFamiliesNumber(int **MEDArrayFamily,
                 && !_ptrMesh->getIsAGrid() ) // (skl for IPAL14260)
 	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<types[i]));
 	  }
-        int ii ;
-        for ( ii = 0 ; ii < NumberOfCell ; ii++ )
-           MEDArrayFamily[i][ii] = tmp_MEDArrayFamily[ii] ;
+	if (err == MED_VALID) {
+	  int ii ;
+	  for ( ii = 0 ; ii < NumberOfCell ; ii++ )
+	    MEDArrayFamily[i][ii] = tmp_MEDArrayFamily[ii] ;
+	}
         delete [] tmp_MEDArrayFamily ;
 #else
 	err=MEDfamLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
