@@ -569,6 +569,14 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
   // Updating the Family
   for(vector<FAMILY*>::const_iterator iter=myFamilies.begin();iter!=myFamilies.end();iter++)
     (*iter)->changeElementsNbs(_constituent->getEntity(),renumberingFromOldToNew,oldNumberOfFace,renumberingFromOldToNewPoly);
+
+  // FIX PAL13414:
+  if ( _constituent && !_constituent->_constituent ) {
+    _constituent->_constituent = oldConstituent->_constituent;
+    oldConstituent->_constituent = NULL;
+  }
+  // END FIX PAL13414:
+
   delete oldConstituent ;
   delete [] renumberingFromOldToNew;
   if(oldNumberOfFacePoly>0)
