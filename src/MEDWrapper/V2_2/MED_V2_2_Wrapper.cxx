@@ -118,7 +118,7 @@ namespace MED
 	  myFid = MEDouvrir(aFileName,med_mode_acces(theMode));
 	}
 	if(theErr)
-	  *theErr = TErr(myFid > 0);
+	  *theErr = TErr(myFid);
 	else if(myFid < 0)
 	  EXCEPTION(runtime_error,"TFile - MEDouvrir('"<<myFileName<<"',"<<theMode<<")");
       }
@@ -171,7 +171,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return -1;
       
       return MEDnMaa(myFile->Id());
@@ -186,7 +186,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       TErr aRet = MEDmaaInfo(myFile->Id(),
@@ -210,7 +210,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       MED::TMeshInfo& anInfo = const_cast<MED::TMeshInfo&>(theInfo);
@@ -246,7 +246,10 @@ namespace MED
 	SetMeshInfo(theInfo,eLECTURE_AJOUT,&aRet);
 
       if(aRet < 0)
-	SetMeshInfo(theInfo,eCREATION,theErr);
+	SetMeshInfo(theInfo,eCREATION,&aRet);
+
+      if(theErr)
+        *theErr = aRet;
     }
     
     
@@ -257,7 +260,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return -1;
       
       MED::TMeshInfo& anInfo = const_cast<MED::TMeshInfo&>(theInfo);
@@ -274,7 +277,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return -1;
       
       MED::TMeshInfo& anInfo = const_cast<MED::TMeshInfo&>(theInfo);
@@ -292,7 +295,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return -1;
       
       MED::TMeshInfo& anInfo = const_cast<MED::TMeshInfo&>(theInfo);
@@ -310,7 +313,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
@@ -351,7 +354,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       MED::TFamilyInfo& anInfo = const_cast<MED::TFamilyInfo&>(theInfo);
@@ -391,7 +394,10 @@ namespace MED
       SetFamilyInfo(theInfo,eLECTURE_ECRITURE,&aRet);
       
       if(aRet < 0)
-	SetFamilyInfo(theInfo,eLECTURE_AJOUT,theErr);
+	SetFamilyInfo(theInfo,eLECTURE_AJOUT,&aRet);
+
+      if(theErr)
+        *theErr = aRet;
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -405,7 +411,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
@@ -418,6 +424,9 @@ namespace MED
 			     med_geometrie_element(theGeom));
 
       theInfo.myIsElemNames = aRet != 0? eFAUX : eVRAI ;
+
+      if(theErr)
+        *theErr = aRet;
     }
 
     void
@@ -430,7 +439,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
@@ -446,6 +455,9 @@ namespace MED
 			     aGeom);
 
       theInfo.myIsElemNum = aRet != 0? eFAUX : eVRAI;
+
+      if(theErr)
+        *theErr = aRet;
     }
 
     void
@@ -458,7 +470,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
@@ -495,7 +507,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
 
       MED::TElemInfo& anInfo = const_cast<MED::TElemInfo&>(theInfo);
@@ -536,7 +548,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
 
       MED::TElemInfo& anInfo = const_cast<MED::TElemInfo&>(theInfo);
@@ -577,7 +589,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
 
       MED::TElemInfo& anInfo = const_cast<MED::TElemInfo&>(theInfo);
@@ -605,7 +617,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return -1;
       
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
@@ -626,7 +638,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
@@ -663,7 +675,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       MED::TNodeInfo& anInfo = const_cast<MED::TNodeInfo&>(theInfo);
@@ -702,7 +714,10 @@ namespace MED
       SetNodeInfo(theInfo,eLECTURE_ECRITURE,&aRet);
       
       if(aRet < 0)
-	SetNodeInfo(theInfo,eLECTURE_AJOUT,theErr);
+	SetNodeInfo(theInfo,eLECTURE_AJOUT,&aRet);
+
+      if(theErr) 
+	*theErr = aRet;
     }
     
 
@@ -714,7 +729,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
 
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
 
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
@@ -767,7 +782,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
 
       MED::TPolygoneInfo& anInfo = const_cast<MED::TPolygoneInfo&>(theInfo);
@@ -820,7 +835,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
 
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return 0;
 
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
@@ -850,7 +865,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
 
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
 
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
@@ -904,7 +919,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
 
       MED::TPolyedreInfo& anInfo = const_cast<MED::TPolyedreInfo&>(theInfo);
@@ -986,7 +1001,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
 
-      if(theErr && !*theErr) 
+      if(theErr && *theErr < 0) 
 	EXCEPTION(runtime_error,"GetPolyedreInfo - (...)");
 
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
@@ -1109,7 +1124,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return -1;
       
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
@@ -1130,7 +1145,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
 
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
@@ -1169,7 +1184,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
 
       MED::TCellInfo& anInfo = const_cast<MED::TCellInfo&>(theInfo);
@@ -1217,7 +1232,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return -1;
       
       return MEDnChamp(myFile->Id(),0);
@@ -1231,7 +1246,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return -1;
       
       return MEDnChamp(myFile->Id(),theFieldId);
@@ -1246,7 +1261,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       TErr aRet;
@@ -1272,7 +1287,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       MED::TFieldInfo& anInfo = const_cast<MED::TFieldInfo&>(theInfo);
@@ -1300,7 +1315,10 @@ namespace MED
       SetFieldInfo(theInfo,eLECTURE_ECRITURE,&aRet);
       
       if(aRet < 0)
-	SetFieldInfo(theInfo,eLECTURE_AJOUT,theErr);
+	SetFieldInfo(theInfo,eLECTURE_AJOUT,&aRet);
+
+      if(theErr) 
+	*theErr = aRet;
     }
     
     
@@ -1596,7 +1614,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       TIdt anId = myFile->Id();
@@ -1818,7 +1836,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr && !*theErr)
+      if(theErr && *theErr < 0)
 	return;
       
       TErr aRet;
@@ -1928,7 +1946,10 @@ namespace MED
       SetTimeStamp(theVal,eLECTURE_ECRITURE,&aRet);
       
       if(aRet < 0)
-	SetTimeStamp(theVal,eLECTURE_AJOUT,theErr);
+	SetTimeStamp(theVal,eLECTURE_AJOUT,&aRet);
+
+      if(theErr) 
+	*theErr = aRet;
     }
     
     void 
@@ -1949,8 +1970,7 @@ namespace MED
 	return;
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
-      if(theErr)
-	if(!*theErr)
+      if(theErr && *theErr < 0)
 	  return;
 
       MED::TGrilleInfo& anInfo = const_cast<MED::TGrilleInfo&>(theInfo);
@@ -2013,11 +2033,10 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
 
-      if(theErr)
-	if(!*theErr)
+      if(theErr && *theErr < 0)
 	  return;
       
-      MED::TMeshInfo& aMeshInfo      = *theInfo.myMeshInfo;
+      MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
       
       EMaillage type_maillage   = aMeshInfo.myType;
       
@@ -2143,8 +2162,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
 
-      if(theErr)
-	if(!*theErr)
+      if(theErr && *theErr < 0)
  	EXCEPTION(runtime_error," GetGrilleType - aFileWrapper (...)");
 
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
@@ -2173,8 +2191,7 @@ namespace MED
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
-      if(theErr) 
-	if(!*theErr)
+      if(theErr && *theErr < 0)
 	  return;
       
       TErr aRet;
