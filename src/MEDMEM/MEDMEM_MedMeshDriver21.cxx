@@ -211,7 +211,8 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
   if (_ptrMesh->_meshDimension == 3)
     // on face
     buildAllGroups(_ptrMesh->_groupFace,_ptrMesh->_familyFace) ;
-  else if (_ptrMesh->_meshDimension == 2)
+//   else if (_ptrMesh->_meshDimension == 2) -- PAL13414
+  if (_ptrMesh->_meshDimension > 1)
     // on edge
     buildAllGroups(_ptrMesh->_groupEdge,_ptrMesh->_familyEdge) ;
 
