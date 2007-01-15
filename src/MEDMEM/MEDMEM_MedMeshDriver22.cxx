@@ -2202,7 +2202,7 @@ int MED_MESH_WRONLY_DRIVER22::writeGRID() const
 				    MED_TAILLE_PNOM22);
 
 	  err = med_2_2::MEDindicesCoordEcr(_medIdt, const_cast <char *>
-					   (_ptrMesh->_name.c_str()),
+					   (_meshName.c_str()),
 					   _ptrMesh->_meshDimension,
 					   Array[idim], ArrayLen[idim],
 					   (idim+1), const_cast <char *>
