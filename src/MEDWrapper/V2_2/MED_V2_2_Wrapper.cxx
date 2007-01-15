@@ -120,12 +120,12 @@ namespace MED
 	if(theErr)
 	  *theErr = TErr(myFid > 0);
 	else if(myFid < 0)
-	  EXCEPTION(runtime_error,"TFile - MEDouvrir('"<<myFileName<<"',"<<theMode<<")");
+	  EXCEPTION(std::runtime_error,"TFile - MEDouvrir('"<<myFileName<<"',"<<theMode<<")");
       }
 
       const TIdt& Id() const { 
 	if(myFid < 0)
-	  EXCEPTION(runtime_error,"TFile - GetFid() < 0");
+	  EXCEPTION(std::runtime_error,"TFile - GetFid() < 0");
 	return myFid;
       }
 
@@ -204,7 +204,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetMeshInfo - MEDmaaInfo(...)");
+	EXCEPTION(std::runtime_error,"GetMeshInfo - MEDmaaInfo(...)");
     }
     
     
@@ -237,12 +237,12 @@ namespace MED
 			&aMeshName);
       }
       
-      INITMSG(MYDEBUG,"TVWrapper::SetMeshInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<endl);
+      INITMSG(MYDEBUG,"TVWrapper::SetMeshInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
       
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"SetMeshInfo - MEDmaaCr(...)");
+	EXCEPTION(std::runtime_error,"SetMeshInfo - MEDmaaCr(...)");
     }
     
     
@@ -364,7 +364,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetFamilyInfo - MEDfamInfo(...) - "<<
+	EXCEPTION(std::runtime_error,"GetFamilyInfo - MEDfamInfo(...) - "<<
 		  " aMeshInfo.myName = '"<<&aMeshName<<
 		  "'; theFamId = "<<theFamId<<
 		  "; theInfo.myNbGroup = "<<aNbGroup()<<
@@ -408,12 +408,12 @@ namespace MED
 			   &aGroupNames,
 			   aNbGroup);
       
-      INITMSG(MYDEBUG,"TVWrapper::GetFamilyInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<endl);
+      INITMSG(MYDEBUG,"TVWrapper::GetFamilyInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
       
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"SetFamilyInfo - MEDfamCr(...)");
+	EXCEPTION(std::runtime_error,"SetFamilyInfo - MEDfamCr(...)");
     }
     
     
@@ -523,7 +523,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetFamilies - MEDfamLire(...)");
+	EXCEPTION(std::runtime_error,"GetFamilies - MEDfamLire(...)");
     }
 
 
@@ -572,7 +572,7 @@ namespace MED
 	if(theErr) 
 	  *theErr = aRet;
 	else if(aRet < 0)
-	  EXCEPTION(runtime_error,"SetNames - MEDnomEcr(...)");
+	  EXCEPTION(std::runtime_error,"SetNames - MEDnomEcr(...)");
       }
     }
 
@@ -622,7 +622,7 @@ namespace MED
 	if(theErr) 
 	  *theErr = aRet;
 	else if(aRet < 0)
-	  EXCEPTION(runtime_error,"SetNumeration - MEDnumEcr(...)");
+	  EXCEPTION(std::runtime_error,"SetNumeration - MEDnumEcr(...)");
       }
     }
 
@@ -669,7 +669,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"SetFamilies - MEDfamEcr(...)");
+	EXCEPTION(std::runtime_error,"SetFamilies - MEDfamEcr(...)");
     }
     
     //----------------------------------------------------------------------------
@@ -742,7 +742,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetNodeInfo - MEDnoeudsLire(...)");
+	EXCEPTION(std::runtime_error,"GetNodeInfo - MEDnoeudsLire(...)");
     }
     
     
@@ -792,7 +792,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"SetNodeInfo - MEDnoeudsEcr(...)");
+	EXCEPTION(std::runtime_error,"SetNodeInfo - MEDnoeudsEcr(...)");
     }
     
     
@@ -842,7 +842,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetPolygoneInfo - MEDpolygoneInfo(...)");
+	EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDpolygoneInfo(...)");
 
       if(theInfo.myIsElemNames){
 	GetNames(theInfo,aNbElem,theInfo.myEntity,ePOLYGONE,&aRet);
@@ -902,7 +902,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"SetPolygoneInfo - MEDpolygoneConnEcr(...)");
+	EXCEPTION(std::runtime_error,"SetPolygoneInfo - MEDpolygoneConnEcr(...)");
       
       SetNames(anInfo,theInfo.myEntity,ePOLYGONE,&aRet);
       if(theErr) 
@@ -958,7 +958,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetPolygoneInfo - MEDpolygoneInfo(...)");
+	EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDpolygoneInfo(...)");
 
       return TInt(aTaille);
     }
@@ -996,7 +996,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetPolygoneInfo - MEDpolyedreConnLire(...)");
+	EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDpolyedreConnLire(...)");
 
       if(theInfo.myIsElemNames){
 	GetNames(theInfo,aNbElem,theInfo.myEntity,ePOLYEDRE,&aRet);
@@ -1058,7 +1058,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"SetPolyedreInfo - MEDpolyedreConnEcr(...)");
+	EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDpolyedreConnEcr(...)");
       
       TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(anInfo.myEntity);
 
@@ -1073,7 +1073,7 @@ namespace MED
 	if(theErr) 
 	  *theErr = aRet;
 	else if(aRet < 0)
-	  EXCEPTION(runtime_error,"SetPolyedreInfo - MEDnomEcr(...)");
+	  EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDnomEcr(...)");
       }
       
       if(theInfo.myIsElemNum){
@@ -1087,7 +1087,7 @@ namespace MED
 	if(theErr) 
 	  *theErr = aRet;
 	else if(aRet < 0)
-	  EXCEPTION(runtime_error,"SetPolyedreInfo - MEDnumEcr(...)");
+	  EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDnumEcr(...)");
       }
       
       
@@ -1102,7 +1102,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"SetPolyedreInfo - MEDfamEcr(...)");
+	EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDfamEcr(...)");
     }
 
     //----------------------------------------------------------------------------
@@ -1129,7 +1129,7 @@ namespace MED
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
 
       if(theErr && !*theErr) 
-	EXCEPTION(runtime_error,"GetPolyedreInfo - (...)");
+	EXCEPTION(std::runtime_error,"GetPolyedreInfo - (...)");
 
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
       
@@ -1147,7 +1147,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetPolygoneInfo - MEDpolyedreInfo(...)");
+	EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDpolyedreInfo(...)");
 
     }
     
@@ -1310,7 +1310,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetCellInfo - MEDelementsLire(...)");
+	EXCEPTION(std::runtime_error,"GetCellInfo - MEDelementsLire(...)");
     }
     
     
@@ -1361,7 +1361,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"SetCellInfo - MEDelementsLire(...)");
+	EXCEPTION(std::runtime_error,"SetCellInfo - MEDelementsLire(...)");
     }
     
 
@@ -1432,7 +1432,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetFieldInfo - MEDchampInfo(...)");
+	EXCEPTION(std::runtime_error,"GetFieldInfo - MEDchampInfo(...)");
     }
     
     
@@ -1465,7 +1465,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"SetFieldInfo - MEDchampEcr(...)");
+	EXCEPTION(std::runtime_error,"SetFieldInfo - MEDchampEcr(...)");
     }
     
     
@@ -1521,7 +1521,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetGaussPreInfo - MEDgaussInfo(...)");
+	EXCEPTION(std::runtime_error,"GetGaussPreInfo - MEDgaussInfo(...)");
       
       return TGaussInfo::TInfo(TGaussInfo::TKey(EGeometrieElement(aGeom),&aName[0]),
 			       TInt(aNbGaussPoints));
@@ -1557,7 +1557,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetGaussInfo - MEDgaussLire(...)");
+	EXCEPTION(std::runtime_error,"GetGaussInfo - MEDgaussLire(...)");
     }
 
 
@@ -1597,7 +1597,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetProfilePreInfo - MEDprofilInfo(...)");
+	EXCEPTION(std::runtime_error,"GetProfilePreInfo - MEDprofilInfo(...)");
       
       return TProfileInfo::TInfo(&aName[0],aSize);
     }
@@ -1625,7 +1625,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetProfileInfo - MEDprofilLire(...)");
+	EXCEPTION(std::runtime_error,"GetProfileInfo - MEDprofilLire(...)");
     }
 
 
@@ -1647,7 +1647,7 @@ namespace MED
 	if(*theErr < 0)
 	  return -1;
       }else if(theEntityInfo.empty()) 
-	EXCEPTION(runtime_error,"GetNbTimeStamps - There is no any Entity on the Mesh");
+	EXCEPTION(std::runtime_error,"GetNbTimeStamps - There is no any Entity on the Mesh");
       
       bool anIsPerformAdditionalCheck = GetNbMeshes() > 1;
 
@@ -1740,7 +1740,7 @@ namespace MED
 	if(*theErr < 0)
 	  return;
       }else if(aGeom2Size.empty())
-	EXCEPTION(runtime_error,"GetTimeStampInfo - There is no any cell");
+	EXCEPTION(std::runtime_error,"GetTimeStampInfo - There is no any cell");
       
       MED::TFieldInfo& aFieldInfo = *theInfo.myFieldInfo;
       MED::TMeshInfo& aMeshInfo = *aFieldInfo.myMeshInfo;
@@ -1786,7 +1786,7 @@ namespace MED
 	if(theErr) 
 	  *theErr = aRet;
 	else if(aRet < 0)
-	  EXCEPTION(runtime_error,"GetTimeStampInfo - MEDpasdetempsInfo(...)");
+	  EXCEPTION(std::runtime_error,"GetTimeStampInfo - MEDpasdetempsInfo(...)");
       }      
     }
     
@@ -1845,7 +1845,7 @@ namespace MED
 	    *theErr = MED_FAUX;
 	    return;
 	  }
-	  EXCEPTION(runtime_error,"GetTimeStampValue - MEDnChampRef(...) < 1");
+	  EXCEPTION(std::runtime_error,"GetTimeStampValue - MEDnChampRef(...) < 1");
 	}
 	
 	TErr aRet;
@@ -1866,7 +1866,7 @@ namespace MED
 	    *theErr = MED_FAUX;
 	    return;
 	  }
-	  EXCEPTION(runtime_error,"GetTimeStampValue - MEDchampRefInfo(...)");
+	  EXCEPTION(std::runtime_error,"GetTimeStampValue - MEDchampRefInfo(...)");
 	}
  
 	TInt aNbVal = MEDnVal(anId,
@@ -1882,7 +1882,7 @@ namespace MED
 	    *theErr = -1;
 	    return;
 	  }
-	  EXCEPTION(runtime_error,"GetTimeStampValue - MEDnVal(...) - aNbVal == "<<aNbVal<<" <= 0");
+	  EXCEPTION(std::runtime_error,"GetTimeStampValue - MEDnVal(...) - aNbVal == "<<aNbVal<<" <= 0");
 	}
 	
 	TInt aNbComp = aFieldInfo->myNbComp;
@@ -1899,7 +1899,7 @@ namespace MED
 		"; aNbValue = "<<aNbValue<<
 		"; aNbGauss = "<<aNbGauss<<
 		"; aNbComp = "<<aNbComp<<
-		endl);
+		std::endl);
 	
 	aRet = MEDchampLire(anId,
 			    &aMeshName,
@@ -1919,7 +1919,7 @@ namespace MED
 	    *theErr = MED_FAUX;
 	    return;
 	  }
-	  EXCEPTION(runtime_error,"GetTimeStampValue - MEDchampLire(...)");
+	  EXCEPTION(std::runtime_error,"GetTimeStampValue - MEDchampLire(...)");
 	}
 
 	MED::PGaussInfo aGaussInfo;
@@ -1946,7 +1946,7 @@ namespace MED
 	    *theErr = MED_FAUX;
 	    return;
 	  }
-	  EXCEPTION(runtime_error,"GetTimeStampValue "<<
+	  EXCEPTION(std::runtime_error,"GetTimeStampValue "<<
 		    "- aNbGauss("<<aNbGauss<<") > 1 && !aGaussInfo"<<
 		    "; aGaussName = '"<<&aGaussName[0]<<"'"<<
 		    "; aGeom = "<<aGeom<<
@@ -1958,7 +1958,7 @@ namespace MED
 	    *theErr = MED_FAUX;
 	    return;
 	  }
-	  EXCEPTION(runtime_error,"GetTimeStampValue - aNbGauss != aGaussInfo->GetNbGauss()");
+	  EXCEPTION(std::runtime_error,"GetTimeStampValue - aNbGauss != aGaussInfo->GetNbGauss()");
 	}
 	
 	if(aProfileInfo && aProfileInfo->IsPresent()){
@@ -1969,7 +1969,7 @@ namespace MED
 	      *theErr = -1;
 	      return;
 	    }
-	    EXCEPTION(runtime_error,
+	    EXCEPTION(std::runtime_error,
 		      "GetTimeStampValue - aProfileSize("<<aProfileSize<<
 		      ") != aValueSize("<<aValueSize<<
 		      "); aNbVal = "<<aNbVal<<
@@ -1987,7 +1987,7 @@ namespace MED
 	      *theErr = -1;
 	      return;
 	    }
-	    EXCEPTION(runtime_error,
+	    EXCEPTION(std::runtime_error,
 		      "GetTimeStampValue - aNbElem("<<aNbElem<<
 		      ") != aNbValue("<<aNbValue<<
 		      "); aNbVal = "<<aNbVal<<
@@ -2079,12 +2079,12 @@ namespace MED
 	    *theErr = MED_FAUX;
 	    break;
 	  }
-	  EXCEPTION(runtime_error,"SetTimeStampValue - MEDchampEcr(...)");
+	  EXCEPTION(std::runtime_error,"SetTimeStampValue - MEDchampEcr(...)");
 	}
 	
       }
       
-      INITMSG(MYDEBUG,"TVWrapper::SetMeshInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<endl);
+      INITMSG(MYDEBUG,"TVWrapper::SetMeshInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
     }
 
     
@@ -2140,7 +2140,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"SetGrilleInfo - MEDnatureGrilleEcr(...)");
+	EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDnatureGrilleEcr(...)");
       
       if(anInfo.myGrilleType == eGRILLE_STANDARD){
 	TValueHolder<TNodeCoord, med_float> aCoord(anInfo.myCoord);
@@ -2161,7 +2161,7 @@ namespace MED
 			   &aCoordUnits);
 
 	if(aRet < 0)
-	  EXCEPTION(runtime_error,"SetGrilleInfo - MEDcoordEcr(...)");
+	  EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDcoordEcr(...)");
 
 	TValueHolder<TIntVector, med_int> aGrilleStructure(anInfo.myGrilleStructure);
 	aRet = MEDstructureCoordEcr(myFile->Id(),
@@ -2169,7 +2169,7 @@ namespace MED
 				    aDim,
 				    &aGrilleStructure);
 	if(aRet < 0)
-	  EXCEPTION(runtime_error,"SetGrilleInfo - MEDstructureCoordEcr(...)");
+	  EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDstructureCoordEcr(...)");
 	
       } else {
 	for(med_int aAxis = 0; aAxis < aMeshInfo.myDim; aAxis++){
@@ -2182,7 +2182,7 @@ namespace MED
 				    &anInfo.GetCoordName(aAxis)[0],
 				    &anInfo.GetCoordUnit(aAxis)[0]);
 	  if(aRet < 0)
-	    EXCEPTION(runtime_error,"SetGrilleInfo - MEDindicesCoordEcr(...)");
+	    EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDindicesCoordEcr(...)");
 	}
 	
       }
@@ -2235,7 +2235,7 @@ namespace MED
 	if(theErr) 
 	  *theErr = aRet;
 	else if(aRet < 0)
-	  EXCEPTION(runtime_error,"GetGrilleInfo - MEDcoordLire(...)");
+	  EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDcoordLire(...)");
 
 	TInt aNbNodes = theInfo.GetNbNodes();//GetNbFamilies(aMeshInfo);
 	TValueHolder<TElemNum, med_int> aFamNumNode(theInfo.myFamNumNode);
@@ -2250,7 +2250,7 @@ namespace MED
 	if(theErr) 
 	  *theErr = aRet;
 	else if(aRet < 0)
-	  EXCEPTION(runtime_error,"GetGrilleInfo - MEDfamLire(...) of NODES");
+	  EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDfamLire(...) of NODES");
 
 	//============================
       }
@@ -2275,11 +2275,11 @@ namespace MED
 	  if(theErr) 
 	    *theErr = aRet;
 	  else if(aRet < 0)
-	    EXCEPTION(runtime_error,"GetGrilleInfo - anAxis number out of range(...)");
+	    EXCEPTION(std::runtime_error,"GetGrilleInfo - anAxis number out of range(...)");
 	  
 	  TInt aNbIndexes = GetNbNodes(aMeshInfo,aTable);
 	  if(aNbIndexes < 0)
-	    EXCEPTION(runtime_error,"GetGrilleInfo - Erreur a la lecture de la taille de l'indice");
+	    EXCEPTION(std::runtime_error,"GetGrilleInfo - Erreur a la lecture de la taille de l'indice");
 	    
 	  TValueHolder<TFloatVector, med_float> anIndexes(theInfo.GetIndexes(anAxis-1));
 	  char aCompNames[MED_TAILLE_PNOM+1];
@@ -2300,7 +2300,7 @@ namespace MED
 	  if(theErr) 
 	    *theErr = aRet;
 	  else if(aRet < 0)
-	    EXCEPTION(runtime_error,"GetGrilleInfo - MEDindicesCoordLire(...)");
+	    EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDindicesCoordLire(...)");
 	}
       }
 
@@ -2321,7 +2321,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0){
-	//EXCEPTION(runtime_error,"GetGrilleInfo - MEDfamLire(...) of CELLS");
+	//EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDfamLire(...) of CELLS");
 	aRet = 0;
 	theInfo.myFamNum.resize(0);
       }
@@ -2338,7 +2338,7 @@ namespace MED
 
       if(theErr)
 	if(!*theErr)
- 	EXCEPTION(runtime_error," GetGrilleType - aFileWrapper (...)");
+ 	EXCEPTION(std::runtime_error," GetGrilleType - aFileWrapper (...)");
 
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
       
@@ -2350,7 +2350,7 @@ namespace MED
 					&aMeshName,
 					&aGrilleType);
 	if(aRet < 0)
-	  EXCEPTION(runtime_error,"GetGrilleInfo - MEDnatureGrilleLire(...)");
+	  EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDnatureGrilleLire(...)");
       }
     }    
     
@@ -2380,7 +2380,7 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"GetGrilleInfo - MEDstructureCoordLire(...)");
+	EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDstructureCoordLire(...)");
     }
 
   }

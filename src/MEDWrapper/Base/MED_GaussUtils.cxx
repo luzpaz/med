@@ -288,7 +288,7 @@ namespace MED
 	 TGaussCoord& theGaussCoord,
 	 EModeSwitch theMode)
     {
-      INITMSG(MYDEBUG,"TShapeFun::Eval"<<endl);
+      INITMSG(MYDEBUG,"TShapeFun::Eval"<<std::endl);
 
       if(IsSatisfy(theRef)){
 	const PMeshInfo& aMeshInfo = theCellInfo.GetMeshInfo();
@@ -312,7 +312,7 @@ namespace MED
 		"; aNbGauss = "<<aNbGauss<<
 		"; aNbElem = "<<aNbElem<<
 		"; aNbNodes = "<<theNodeInfo.GetNbElem()<<
-		endl);
+		std::endl);
 
 	for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
 	  TInt aCellId = anIsSubMesh? theElemNum[anElemId]-1: anElemId;
@@ -345,7 +345,7 @@ namespace MED
 	    }
 	    ADDMSG(MYVALUEDEBUG,"} ");
 	  }
-	  ADDMSG(MYVALUEDEBUG,endl);
+	  ADDMSG(MYVALUEDEBUG, std::endl);
 	}
 	for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
 	  TCCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(anElemId);
@@ -358,7 +358,7 @@ namespace MED
 	    }
 	    ADDMSG(MYVALUEDEBUG,"} ");
 	  }
-	  ADDMSG(MYVALUEDEBUG,endl);
+	  ADDMSG(MYVALUEDEBUG, std::endl);
 	}
 #endif
 	return true;
@@ -1795,7 +1795,7 @@ namespace MED
 
       switch(aGeom){
       case eSEG2: {
-	INITMSG(MYDEBUG,"eSEG2"<<endl);
+	INITMSG(MYDEBUG,"eSEG2"<<std::endl);
 
 	if(TSeg2a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1803,7 +1803,7 @@ namespace MED
 	break;
       }
       case eSEG3: {
-	INITMSG(MYDEBUG,"eSEG3"<<endl);
+	INITMSG(MYDEBUG,"eSEG3"<<std::endl);
 
 	if(TSeg3a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1811,7 +1811,7 @@ namespace MED
 	break;
       }
       case eTRIA3: {
-	INITMSG(MYDEBUG,"eTRIA3"<<endl);
+	INITMSG(MYDEBUG,"eTRIA3"<<std::endl);
 
 	if(TTria3a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1822,7 +1822,7 @@ namespace MED
 	break;
       }
       case eTRIA6: {
-	INITMSG(MYDEBUG,"eTRIA6"<<endl);
+	INITMSG(MYDEBUG,"eTRIA6"<<std::endl);
 
 	if(TTria6a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1833,7 +1833,7 @@ namespace MED
 	break;
       }
       case eQUAD4: {
-	INITMSG(MYDEBUG,"eQUAD4"<<endl);
+	INITMSG(MYDEBUG,"eQUAD4"<<std::endl);
 
 	if(TQuad4a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1844,7 +1844,7 @@ namespace MED
 	break;
       }
       case eQUAD8: {
-	INITMSG(MYDEBUG,"eQUAD8"<<endl);
+	INITMSG(MYDEBUG,"eQUAD8"<<std::endl);
 
 	if(TQuad8a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1855,7 +1855,7 @@ namespace MED
 	break;
       }
       case eTETRA4: {
-	INITMSG(MYDEBUG,"eTETRA4"<<endl);
+	INITMSG(MYDEBUG,"eTETRA4"<<std::endl);
 
 	if(TTetra4a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1866,7 +1866,7 @@ namespace MED
 	break;
       }
       case ePYRA5: {
-	INITMSG(MYDEBUG,"ePYRA5"<<endl);
+	INITMSG(MYDEBUG,"ePYRA5"<<std::endl);
 
 	if(TPyra5a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1877,7 +1877,7 @@ namespace MED
 	break;
       }
       case ePENTA6: {
-	INITMSG(MYDEBUG,"ePENTA6"<<endl);
+	INITMSG(MYDEBUG,"ePENTA6"<<std::endl);
 
 	if(TPenta6a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1888,7 +1888,7 @@ namespace MED
 	break;
       }
       case eHEXA8: {
-	INITMSG(MYDEBUG,"eHEXA8"<<endl);
+	INITMSG(MYDEBUG,"eHEXA8"<<std::endl);
 
 	if(THexa8a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1899,7 +1899,7 @@ namespace MED
 	break;
       }
       case eTETRA10: {
-	INITMSG(MYDEBUG,"eTETRA10"<<endl);
+	INITMSG(MYDEBUG,"eTETRA10"<<std::endl);
 
 	if(TTetra10a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1910,7 +1910,7 @@ namespace MED
 	break;
       }
       case ePYRA13: {
-	INITMSG(MYDEBUG,"ePYRA13"<<endl);
+	INITMSG(MYDEBUG,"ePYRA13"<<std::endl);
 
 	if(TPyra13a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1921,7 +1921,7 @@ namespace MED
 	break;
       }
       case ePENTA15: {
-	INITMSG(MYDEBUG,"ePENTA15"<<endl);
+	INITMSG(MYDEBUG,"ePENTA15"<<std::endl);
 
 	if(TPenta15a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1932,7 +1932,7 @@ namespace MED
 	break;
       }
       case eHEXA20: {
-	INITMSG(MYDEBUG,"eHEXA20"<<endl);
+	INITMSG(MYDEBUG,"eHEXA20"<<std::endl);
 
 	if(THexa20a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
 	  return true;
@@ -1943,7 +1943,7 @@ namespace MED
 	break;
       }
       default: 
-	INITMSG(MYDEBUG,"eNONE"<<endl);
+	INITMSG(MYDEBUG,"eNONE"<<std::endl);
 	return false;
       }
     }
@@ -1980,7 +1980,7 @@ namespace MED
 	     "; aNbGauss = "<<aNbGauss<<
 	     "; aNbElem = "<<aNbElem<<
 	     "; aNbNodes = "<<theNodeInfo.GetNbElem()<<
-	     endl);
+	     std::endl);
     
     for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
       TInt aCellId = anIsSubMesh? theElemNum[anElemId]-1: anElemId;
@@ -2017,7 +2017,7 @@ namespace MED
 	}
 	ADDMSG(MYVALUEDEBUG,"} ");
       }
-      ADDMSG(MYVALUEDEBUG,endl);
+      ADDMSG(MYVALUEDEBUG, std::endl);
     }
 #endif
 
@@ -2052,7 +2052,7 @@ namespace MED
 	     "; aNbGauss = "<<aNbGauss<<
 	     "; aNbElem = "<<aNbElem<<
 	     "; aNbNodes = "<<theNodeInfo.GetNbElem()<<
-	     endl);
+	     std::endl);
     
     for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
       TInt aCellId = anIsSubMesh? theElemNum[anElemId]-1: anElemId;
@@ -2111,7 +2111,7 @@ namespace MED
 	     "; aNbGauss = "<<aNbGauss<<
 	     "; aNbElem = "<<aNbElem<<
 	     "; aNbNodes = "<<theNodeInfo.GetNbElem()<<
-	     endl);
+	     std::endl);
     
     for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
       TInt aCellId = anIsSubMesh? theElemNum[anElemId]-1: anElemId;

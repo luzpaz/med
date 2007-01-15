@@ -198,7 +198,7 @@ namespace MED
     MSG(MYDEBUG,"GetFamiliesByEntity(...)");
     TEntity2FamilySet anEntity2FamilySet;
     
-    typedef map<TInt,PFamilyInfo> TId2Family;
+    typedef std::map<TInt,PFamilyInfo> TId2Family;
     TId2Family anId2Family;
     TFamilyInfoSet::const_iterator anIter = theFamilyInfoSet.begin();
     for(; anIter != theFamilyInfoSet.end(); anIter++){
@@ -208,7 +208,7 @@ namespace MED
     
     if(!anId2Family.empty()){
       typedef std::map<TInt,TInt> TFamilyID2Size;
-      typedef map<EEntiteMaillage,TFamilyID2Size> TEntity2FamilyID;
+      typedef std::map<EEntiteMaillage,TFamilyID2Size> TEntity2FamilyID;
       TEntity2FamilyID anEntity2FamilyID;
       
       if(!theEntity2TGeom2ElemInfo.empty()){
@@ -262,7 +262,7 @@ namespace MED
 	       TErr* theErr,
 	       EModeSwitch theMode)
   {
-    INITMSG(MYDEBUG,"GetKey2Gauss - theMode = "<<theMode<<endl);
+    INITMSG(MYDEBUG,"GetKey2Gauss - theMode = "<<theMode<<std::endl);
     TKey2Gauss aKey2Gauss;
     TInt aNbGauss = theWrapper->GetNbGauss(theErr);
     for(TInt anId = 1; anId <= aNbGauss; anId++){
@@ -278,7 +278,7 @@ namespace MED
       INITMSG(MYDEBUG,
 	      "- aGeom = "<<aGeom<<
 	      "; aName = '"<<aName<<"'"<<
-	      endl);
+	      std::endl);
 #endif
 
     }
@@ -311,7 +311,7 @@ namespace MED
 		  TErr* theErr,
 		  EModeProfil theMode)
   {
-    INITMSG(MYDEBUG,"GetMKey2Profile - theMode = "<<theMode<<endl);
+    INITMSG(MYDEBUG,"GetMKey2Profile - theMode = "<<theMode<<std::endl);
     TKey2Profile aKey2Profile;
     TInt aNbProfiles = theWrapper->GetNbProfiles(theErr);
     for(TInt anId = 1; anId <= aNbProfiles; anId++){
@@ -324,12 +324,12 @@ namespace MED
       INITMSG(MYDEBUG,
 	      "- aName = '"<<aName<<"'"<<
 	      " : "<<
-	      endl);
+	      std::endl);
       TInt aNbElem = anInfo->GetSize();
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
 	ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
       }
-      ADDMSG(MYVALUEDEBUG,endl);
+      ADDMSG(MYVALUEDEBUG, std::endl);
 #endif
       
     }
@@ -349,7 +349,7 @@ namespace MED
       if(theId == *aCellFamIter)
 	return eMAILLE;
     }
-    EXCEPTION(runtime_error,"GetEntityByFamilyId - fails");
+    EXCEPTION(std::runtime_error, "GetEntityByFamilyId - fails");
     return EEntiteMaillage(-1);
   }
 

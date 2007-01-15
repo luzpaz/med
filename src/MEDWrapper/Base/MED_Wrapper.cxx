@@ -24,13 +24,13 @@ namespace MED
     myWrapper(theWrapper)
   {
     boost::detail::thread::lock_ops<TWrapper::TMutex>::lock(myWrapper->myMutex);
-    INITMSG(MYDEBUG,"TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<endl);
+    INITMSG(MYDEBUG,"TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<std::endl);
   }
   
   TLockProxy
   ::~TLockProxy()
   {
-    INITMSG(MYDEBUG,"~TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<endl);
+    INITMSG(MYDEBUG,"~TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<std::endl);
     boost::detail::thread::lock_ops<TWrapper::TMutex>::unlock(myWrapper->myMutex);
   }
   
@@ -70,7 +70,7 @@ namespace MED
     GetFamilyInfo(theId,*anInfo,theErr);
 
 #ifdef _DEBUG_
-    string aName = anInfo->GetName();
+    std::string aName = anInfo->GetName();
     INITMSG(MYDEBUG,"GetPFamilyInfo - aFamilyName = '"<<aName<<
 	    "'; andId = "<<anInfo->GetId()<<
 	    "; aNbAttr = "<<aNbAttr<<
@@ -112,23 +112,23 @@ namespace MED
 	}
 	ADDMSG(MYVALUEDEBUG," ");
       }
-      ADDMSG(MYDEBUG,endl);
+      ADDMSG(MYDEBUG, std::endl);
       
-      BEGMSG(MYVALUEDEBUG,"GetFamNum: ");
+      BEGMSG(MYVALUEDEBUG, "GetFamNum: ");
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
 	ADDMSG(MYVALUEDEBUG,anInfo->GetFamNum(iElem)<<", ");
       }
-      ADDMSG(MYVALUEDEBUG,endl);
+      ADDMSG(MYVALUEDEBUG, std::endl);
       
       if(anInfo->IsElemNum()){
 	BEGMSG(MYVALUEDEBUG,"GetElemNum: ");
 	for(TInt iElem = 0; iElem < aNbElem; iElem++){
 	  ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
 	}
-	ADDMSG(MYVALUEDEBUG,endl);
+	ADDMSG(MYVALUEDEBUG, std::endl);
       }
     }
-    ADDMSG(MYDEBUG,endl);
+    ADDMSG(MYDEBUG, std::endl);
 #endif
     
     return anInfo;
@@ -162,7 +162,7 @@ namespace MED
       }
       ADDMSG(MYDEBUG," ");
     }
-    ADDMSG(MYDEBUG,endl);
+    ADDMSG(MYDEBUG, std::endl);
 #endif
 
     return anInfo;
@@ -203,7 +203,7 @@ namespace MED
       }
       ADDMSG(MYDEBUG,"} ");
     }
-    ADDMSG(MYDEBUG,endl);
+    ADDMSG(MYDEBUG, std::endl);
 #endif
 
     return anInfo;
@@ -324,22 +324,22 @@ namespace MED
       }
       ADDMSG(MYVALUEDEBUG," ");
     }
-    ADDMSG(MYDEBUG,endl);
+    ADDMSG(MYDEBUG, std::endl);
 
     BEGMSG(MYVALUEDEBUG,"GetPCellInfo - GetFamNum: ");
     for(TInt iElem = 0; iElem < aNbElem; iElem++){
       ADDMSG(MYVALUEDEBUG,anInfo->GetFamNum(iElem)<<", ");
     }
-    ADDMSG(MYVALUEDEBUG,endl);
+    ADDMSG(MYVALUEDEBUG, std::endl);
 
     if(anInfo->IsElemNum()){
       BEGMSG(MYVALUEDEBUG,"GetPCellInfo - GetElemNum: ");
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
 	ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
       }
-      ADDMSG(MYVALUEDEBUG,endl);
+      ADDMSG(MYVALUEDEBUG, std::endl);
     }
-    ADDMSG(MYDEBUG,endl);
+    ADDMSG(MYDEBUG, std::endl);
 #endif
     
     return anInfo;
@@ -363,7 +363,7 @@ namespace MED
 	    "- aName = '"<<anInfo->GetName()<<"'"<<
 	    "; aType = "<<anInfo->GetType()<<
 	    "; aNbComp = "<<aNbComp<<
-	    endl);
+	    std::endl);
 #endif
     
     return anInfo;
@@ -631,17 +631,17 @@ namespace MED
       for(TInt iElem = 0; iElem < aNbCells; iElem++){
 	ADDMSG(MYVALUEDEBUG,anInfo->GetFamNum(iElem)<<", ");
       }
-      ADDMSG(MYVALUEDEBUG,endl);
+      ADDMSG(MYVALUEDEBUG, std::endl);
       BEGMSG(MYVALUEDEBUG,"GetCoordName: ");
       for(TInt iElem = 0; iElem < theMeshInfo->GetDim(); iElem++){
 	ADDMSG(MYVALUEDEBUG,anInfo->GetCoordName(iElem)<<", ");
       }
-      ADDMSG(MYVALUEDEBUG,endl);
+      ADDMSG(MYVALUEDEBUG, std::endl);
       BEGMSG(MYVALUEDEBUG,"GetCoordUnit: ");
       for(TInt iElem = 0; iElem < theMeshInfo->GetDim(); iElem++){
 	ADDMSG(MYVALUEDEBUG,anInfo->GetCoordUnit(iElem)<<", ");
       }
-      ADDMSG(MYVALUEDEBUG,endl);
+      ADDMSG(MYVALUEDEBUG, std::endl);
       
     }
 #endif

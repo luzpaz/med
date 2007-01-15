@@ -439,7 +439,7 @@ TGrilleInfo
 {
   TIndexes::const_iterator aIter=myIndixes.find(theAxisNumber);
   if(aIter==myIndixes.end())
-    EXCEPTION(runtime_error,"const TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber); fails");
+    EXCEPTION(std::runtime_error, "const TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber); fails");
   return aIter->second;
 }
 
@@ -449,7 +449,7 @@ TGrilleInfo
 {
   TIndexes::iterator aIter=myIndixes.find(theAxisNumber);
   if(aIter==myIndixes.end())
-    EXCEPTION(runtime_error,"TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber="<<theAxisNumber<<"); fails");
+    EXCEPTION(std::runtime_error, "TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber="<<theAxisNumber<<"); fails");
   return aIter->second;
 }
 
@@ -576,7 +576,7 @@ TGrilleInfo
   aCoord.resize(aDim);
   
   if(theId >= aNbNodes)
-    EXCEPTION(runtime_error,"TGrilleInfo::GetCoord - theId out of range");
+    EXCEPTION(std::runtime_error, "TGrilleInfo::GetCoord - theId out of range");
 
   if(myGrilleType == eGRILLE_STANDARD){
     switch(aDim){

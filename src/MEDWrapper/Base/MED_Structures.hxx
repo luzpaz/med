@@ -818,7 +818,7 @@ namespace MED
     {
       typename TTGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
       if(anIter == myGeom2Value.end())
-	EXCEPTION(runtime_error,"TTimeStampValue::GetMeshValuePtr - myGeom2Value.find(theGeom) fails");
+	EXCEPTION(std::runtime_error,"TTimeStampValue::GetMeshValuePtr - myGeom2Value.find(theGeom) fails");
       return anIter->second;
     }
 

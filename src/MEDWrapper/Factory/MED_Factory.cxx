@@ -74,11 +74,11 @@ namespace MED
     char* aFileName = const_cast<char*>(theFileName.c_str());
     med_idt aFid = MEDouvrir(aFileName,MED_LECTURE);
 
-    MSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aFid = "<<aFid<<endl);
+    MSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aFid = "<<aFid<<std::endl);
     if(aFid >= 0){
       med_int aMajor, aMinor, aRelease;
       med_err aRet = MEDversionLire(aFid,&aMajor,&aMinor,&aRelease);
-      INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aRet = "<<aRet<<endl);
+      INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aRet = "<<aRet<<std::endl);
       if(aRet >= 0){
 	if(aMajor >= 2 && aMinor >= 2)
 	  aVersion = eV2_2;
@@ -105,7 +105,7 @@ namespace MED
       aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
       break;
     default:
-      EXCEPTION(runtime_error,"MED::CrWrapper - theFileName = '"<<theFileName<<"'");
+      EXCEPTION(std::runtime_error,"MED::CrWrapper - theFileName = '"<<theFileName<<"'");
     }
     return aWrapper;
   }

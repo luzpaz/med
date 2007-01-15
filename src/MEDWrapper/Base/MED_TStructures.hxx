@@ -955,7 +955,7 @@ namespace MED
 	this->myGeom2Value = aCompatible->myGeom2Value;
 	this->myGeomSet = aCompatible->GetGeomSet();
       }else
-	EXCEPTION(runtime_error,"TTTimeStampValue::TTTimeStampValue - use incompatible arguments!");
+	EXCEPTION(std::runtime_error,"TTTimeStampValue::TTTimeStampValue - use incompatible arguments!");
     }
 
     TTTimeStampValue(const PTimeStampInfo& theTimeStampInfo,

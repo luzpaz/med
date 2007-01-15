@@ -35,16 +35,17 @@
 #include <stdexcept>
 
 
-namespace MED{
-  using namespace std;
-  class PrefixPrinter{
+namespace MED
+{
+  class PrefixPrinter
+  {
     static int myCounter;
     bool myIsActive;
   public:
     PrefixPrinter(bool theIsActive = true);
     ~PrefixPrinter();
 
-    static string GetPrefix();
+    static std::string GetPrefix();
   };
 };
 
@@ -68,7 +69,7 @@ namespace MED{
 #define EXCEPTION(TYPE, MSG) {\
   std::ostringstream aStream;\
   aStream<<__FILE__<<"["<<__LINE__<<"]::"<<MSG;\
-  throw TYPE(aStream.str());\
+  throw TYPE(aStream.str().c_str());\
 }
 
 #endif
