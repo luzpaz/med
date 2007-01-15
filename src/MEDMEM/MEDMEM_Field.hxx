@@ -895,17 +895,17 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::FIELD(const
   if (m._value != NULL)
     {
       if ( m.getGaussPresence() )
-	_value = new ArrayGauss( *(dynamic_cast< ArrayGauss * > (m._value) ) ,false);
+	_value = new ArrayGauss( *(static_cast< ArrayGauss * > (m._value) ) ,false);
       else
-	_value = new ArrayNoGauss( *(dynamic_cast< ArrayNoGauss * > (m._value)) ,false);
+	_value = new ArrayNoGauss( *(static_cast< ArrayNoGauss * > (m._value)) ,false);
     }
   else
     _value = (ArrayNoGauss *) NULL;
   locMap::const_iterator it;
   for ( it = m._gaussModel.begin();it != m._gaussModel.end(); it++ )
-    _gaussModel[dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
+    _gaussModel[static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
       new GAUSS_LOCALIZATION<INTERLACING_TAG>(
-					      *dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
+					      *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
 					      );
 
   _valueType       = m._valueType;
@@ -932,9 +932,9 @@ FIELD<T, INTERLACING_TAG> & FIELD<T, INTERLACING_TAG>::operator=(const FIELD &m)
                                //CF :Commentaire dans MEDMEM_Array
   locMap::const_iterator it;
   for ( it = m._gaussModel.begin();it != m._gaussModel.end(); it++ )
-    _gaussModel[dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
+    _gaussModel[static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
       new GAUSS_LOCALIZATION<INTERLACING_TAG>(
-					      *dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
+					      *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
 					      );
 
   _valueType       = m._valueType;
@@ -2415,7 +2415,7 @@ FIELD<T, INTERLACING_TAG>::getArrayGauss() const throw (MEDEXCEPTION)
   BEGIN_OF(LOC);
 
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *> (_value);
+    return static_cast<ArrayGauss *> (_value);
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<
 				 "The field has no Gauss Point"));
@@ -2432,7 +2432,7 @@ FIELD<T, INTERLACING_TAG>::getArrayNoGauss() const throw (MEDEXCEPTION)
   BEGIN_OF(LOC);
 
   if ( ! getGaussPresence() )
-    return dynamic_cast < ArrayNoGauss * > (_value);
+    return static_cast < ArrayNoGauss * > (_value);
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<
 				 "The field has Gauss Point"));
@@ -2464,9 +2464,9 @@ inline int FIELD<T, INTERLACING_TAG>::getValueLength() const
   throw (MEDEXCEPTION)
 {
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->getArraySize() ;
+    return static_cast<ArrayGauss *>(_value)->getArraySize() ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->getArraySize() ;
+    return static_cast<ArrayNoGauss *>(_value)->getArraySize() ;
 }
 
 /*!
@@ -2478,9 +2478,9 @@ inline const T* FIELD<T, INTERLACIN_TAG>::getValue() const throw (MEDEXCEPTION)
   const char * LOC ="FIELD<T, INTERLACING_TAG>::getValue() : ";
   BEGIN_OF(LOC);
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->getPtr() ;
+    return static_cast<ArrayGauss *>(_value)->getPtr() ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->getPtr() ;
+    return static_cast<ArrayNoGauss *>(_value)->getPtr() ;
 }
 /*!
   Return a reference to i^{th} row
@@ -2656,7 +2656,7 @@ template <class T,class INTERLACING_TAG> const int * FIELD<T,INTERLACING_TAG>::g
 
   if (_value)
     if ( getGaussPresence() ) {
-      return dynamic_cast<ArrayGauss *>(_value)->getNbGaussGeo()+1;
+      return static_cast<ArrayGauss *>(_value)->getNbGaussGeo()+1;
     } else
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"value hasn't Gauss points " ));
 
@@ -2731,9 +2731,9 @@ template <class T,class INTERLACING_TAG> bool  FIELD<T,INTERLACING_TAG>::isOnAll
 template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::setValue( T* value) throw (MEDEXCEPTION) 
 {
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->setPtr(value) ;
+    return static_cast<ArrayGauss *>(_value)->setPtr(value) ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->setPtr(value) ;
+    return static_cast<ArrayNoGauss *>(_value)->setPtr(value) ;
 }
 
 /*!
