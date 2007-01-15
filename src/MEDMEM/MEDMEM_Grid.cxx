@@ -51,13 +51,16 @@ GRID::GRID() {
 ////function : GRID
 ////purpose  : array constructor
 ////=======================================================================
-GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name, 
-	   const std::vector<std::string>& coord_unit, const med_grid_type type) : _gridType(type)
+GRID::GRID(const std::vector<std::vector<double> >& xyz_array,
+           const std::vector<std::string>&          coord_name, 
+	   const std::vector<std::string>&          coord_unit,
+           const med_grid_type                      type) : _gridType(type)
 {
     init(); // PAL 12136
     _is_default_gridType = false;
 
     _spaceDimension = xyz_array.size();
+    _meshDimension  = _spaceDimension; // PAL14482
 
     // compute & set _numberOfNodes
     int NumberOfNodes=1 ;
