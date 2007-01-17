@@ -708,13 +708,15 @@ namespace MED
 	return;
       
       TErr aRet;
+      TString aName(256); // PAL13122, protect from memory pb with too long names
       aRet = MEDchampInfo(myFile->Id(),
 			  theFieldId,
-			  &theInfo.myName[0],
+			  &aName[0],// PAL13122 &theInfo.myName[0],
 			  (med_type_champ*)&theInfo.myType,
 			  &theInfo.myCompNames[0],
 			  &theInfo.myUnitNames[0],
 			  theInfo.myNbComp);
+      theInfo.SetName(aName); // PAL13122
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
