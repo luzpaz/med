@@ -564,7 +564,12 @@ MESSAGE("MED_NODAL");
 			const int * tab=_mesh->getConnectivityIndex(
 				convertIdlConnToMedConn(mode),
 				convertIdlEntToMedEnt(entity));
-			nbelements = elt1*(convertIdlEltToMedElt(geomElement)%100);
+                        nbelements = _mesh->getConnectivityLength
+                          (convertIdlModeToMedMode(typeSwitch),
+                           convertIdlConnToMedConn(mode),
+                           convertIdlEntToMedEnt(entity),
+                           convertIdlEltToMedElt(geomElement));
+			//nbelements = elt1*(convertIdlEltToMedElt(geomElement)%100);
 			//			nbelements = tab[elt1 ] - 1 ;
 		}
 SCRUTE(entity);
@@ -795,7 +800,7 @@ throw (SALOME::SALOME_Exception)
         {
 		int nbelements = _mesh->getNumberOfElements(
 					convertIdlEntToMedEnt(entity),
-					MED_ALL_ELEMENTS);
+					MED_ALL_ELEMENTS) + 1;
                 myseq->length(nbelements);
                 const int * numbers=_mesh->getConnectivityIndex(convertIdlConnToMedConn(mode),
 						          convertIdlEntToMedEnt(entity));
