@@ -11,6 +11,7 @@ class MESHCollectionDriver
 public:
   
   MESHCollectionDriver(MESHCollection*);
+  virtual ~MESHCollectionDriver(){}
   
   int read(char*);
   

@@ -41,6 +41,7 @@ class MEDSPLITTERTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testMESHCollection_indivisible);
   CPPUNIT_TEST( testMESHCollection_user_partition);
   CPPUNIT_TEST( testParallelTopology_graph_constructor);
+  CPPUNIT_TEST( testMESHCollection_complete_sequence);
   
   CPPUNIT_TEST_SUITE_END();
 
@@ -55,6 +56,7 @@ public:
   void testMESHCollection_square();
   void testMESHCollection_indivisible();
   void testMESHCollection_user_partition();
+  void testMESHCollection_complete_sequence();
   void testParallelTopology_graph_constructor();
   };
 

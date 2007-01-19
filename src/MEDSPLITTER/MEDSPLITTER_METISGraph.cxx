@@ -23,10 +23,10 @@ METISGraph::~METISGraph()
 
 void METISGraph::partGraph(int ndomain, const string& options_string)
 {
-	// number of graph vertices
-	int n = m_graph->getNumberOf();
+  // number of graph vertices
+  int n = m_graph->getNumberOf();
 	
-	//graph
+  //graph
 	int * xadj=const_cast<int*>(m_graph->getIndex());
 	int * adjncy = const_cast<int*>(m_graph->getValue());
 	//constraints
@@ -51,10 +51,10 @@ void METISGraph::partGraph(int ndomain, const string& options_string)
 	  {
 	    if (options_string != "k")
 	      METIS_PartGraphRecursive(&n, xadj, adjncy, vwgt, adjwgt, &wgtflag,
-				       &base, &nparts, options, &edgecut, partition);
+																 &base, &nparts, options, &edgecut, partition);
 	    else
 	      METIS_PartGraphKway(&n, xadj, adjncy, vwgt, adjwgt, &wgtflag,
-				  &base, &nparts, options, &edgecut, partition);
+														&base, &nparts, options, &edgecut, partition);
 	  }
 	else
 	  {
@@ -65,10 +65,10 @@ void METISGraph::partGraph(int ndomain, const string& options_string)
 	int* index=new int [n+1];
 	index[0]=1;
 	for (int i=0; i<n; i++)
-	{
-		index[i+1]=index[i]+1;
-		partition[i]--;
-	}
+		{
+			index[i+1]=index[i]+1;
+			partition[i]--;
+		}
 	
 	//creating a skylinearray with no copy of the index and partition array
 	// the fifth argument true specifies that only the pointers are passed 

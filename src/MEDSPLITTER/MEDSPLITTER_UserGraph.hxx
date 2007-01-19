@@ -4,13 +4,13 @@
 namespace MEDSPLITTER
 {
 
-class UserGraph:public Graph
-{
-public:
-	UserGraph(MEDMEM::MEDSKYLINEARRAY*, const int*, int);
-	virtual ~UserGraph();
-  void partGraph(int, const string& options="");
-};
+	class UserGraph:public Graph
+	{
+	public:
+		UserGraph(MEDMEM::MEDSKYLINEARRAY*, const int*, int);
+		virtual ~UserGraph();
+		void partGraph(int, const string& options="");
+	};
 
 }
 

@@ -30,10 +30,10 @@ top_builddir=../..
 srcdir=@srcdir@
 VPATH=.:$(srcdir):$(srcdir)/tests
 
+
 MACHINE=PCLINUX
 
 @COMMENCE@
-
 
 EXPORT_PYSCRIPTS = \
 
@@ -69,7 +69,7 @@ BIN_SRC =
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-TEST_PROGS = test_SPLITTER_square test_SPLITTER_indivisible test_HighLevelAPI test_SPLITTER_user_partition
+TEST_PROGS =  
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome

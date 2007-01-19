@@ -49,55 +49,55 @@
 #define ENABLE_FORCED_FAILURES
 
 
- using namespace std;
- using namespace MEDSPLITTER;
- using namespace MEDMEM;
+using namespace std;
+using namespace MEDSPLITTER;
+using namespace MEDMEM;
  
- /*
-  * Check methods defined in ParallelTopology.hxx
-  * 
-  ParallelTopology();
-  ParallelTopology(vector<MEDMEM::MESH*>, vector<MEDMEM::CONNECTZONE*>,vector<int*>&, vector<int*>&, vector<int*>&);
-  (+) ParallelTopology(boost::shared_ptr<Graph> graph, int nbdomain, int mesh_dimension);
-  ~ParallelTopology();
-  (+) void convertGlobalNodeList(const int*, int,int*,int*);
-  (+) void convertGlobalNodeList(const int*, int,int*,int);
-  (+) void convertGlobalNodeListWithTwins(const int* face_list, int nbnode, int*& local, int*& ip, int*& full_array, int& size);
-  (+) void convertGlobalCellList(const int*, int , int*, int *);
-  void convertGlobalFaceList(const int*, int , int*, int *);    
-  void convertGlobalFaceList(const int*, int , int*, int);  
-  void convertGlobalFaceListWithTwins(const int* face_list, int nbface, int*& local, int*& ip, int*& full_array,int& size);
-  void createNodeMapping(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
-             std::map<MED_EN::medGeometryElement,int>& present_type_numbers,
-             int idomain);
-  void createFaceMapping(const MESHCollection &);
-  void createFaceMapping2ndversion(const MESHCollection &);
-  void convertToLocal(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
-              std::map<MED_EN::medGeometryElement,int>& present_type_numbers,
-              int idomain,
-              MED_EN::medEntityMesh entity);
-  void computeNodeNodeCorrespondencies(int nbdomain,vector<MEDMEM::MEDSKYLINEARRAY*>& ) const;
-  void computeCellCellCorrespondencies(int nbdomain,vector<MEDMEM::MEDSKYLINEARRAY*>&, const Graph* ) const;
-  inline  int convertNodeToGlobal(int ip,int icell) const
-  inline  int convertFaceToGlobal(int ip,int icell) const
-  inline  int convertCellToGlobal(int ip,int icell) const
-  inline  void convertNodeToGlobal(int ip, const int* local, int n, int* global)const
-  (+)inline  void convertCellToGlobal(int ip, const int* local, int n, int* global)const
-  inline  void convertFaceToGlobal(int ip, const int* local, int n, int* global)const
-  (+) inline  int nbDomain() const
-  int nbCells() const
-  (+) inline  int nbCells( int idomain) const
-  (+) inline  int getNodeNumber(int idomain) const
-  inline  int getNodeNumber() const
-  inline  void getNodeList(int idomain, int* list) const
-  (+) inline  int getCellNumber(int idomain) const
-  inline  int getCellDomainNumber(int global) const
-  inline  void getCellList(int idomain, int* list) const
-  inline int getFaceNumber(int idomain) const
-  inline  int getFaceNumber() const
-  inline  void getFaceList(int idomain, int* list) const
-  boost::shared_ptr<Graph> getGraph() const
-   */
+/*
+ * Check methods defined in ParallelTopology.hxx
+ * 
+ ParallelTopology();
+ ParallelTopology(vector<MEDMEM::MESH*>, vector<MEDMEM::CONNECTZONE*>,vector<int*>&, vector<int*>&, vector<int*>&);
+ (+) ParallelTopology(boost::shared_ptr<Graph> graph, int nbdomain, int mesh_dimension);
+ ~ParallelTopology();
+ (+) void convertGlobalNodeList(const int*, int,int*,int*);
+ (+) void convertGlobalNodeList(const int*, int,int*,int);
+ (+) void convertGlobalNodeListWithTwins(const int* face_list, int nbnode, int*& local, int*& ip, int*& full_array, int& size);
+ (+) void convertGlobalCellList(const int*, int , int*, int *);
+ void convertGlobalFaceList(const int*, int , int*, int *);    
+ void convertGlobalFaceList(const int*, int , int*, int);  
+ void convertGlobalFaceListWithTwins(const int* face_list, int nbface, int*& local, int*& ip, int*& full_array,int& size);
+ void createNodeMapping(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
+ std::map<MED_EN::medGeometryElement,int>& present_type_numbers,
+ int idomain);
+ void createFaceMapping(const MESHCollection &);
+ void createFaceMapping2ndversion(const MESHCollection &);
+ void convertToLocal(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
+ std::map<MED_EN::medGeometryElement,int>& present_type_numbers,
+ int idomain,
+ MED_EN::medEntityMesh entity);
+ void computeNodeNodeCorrespondencies(int nbdomain,vector<MEDMEM::MEDSKYLINEARRAY*>& ) const;
+ void computeCellCellCorrespondencies(int nbdomain,vector<MEDMEM::MEDSKYLINEARRAY*>&, const Graph* ) const;
+ inline  int convertNodeToGlobal(int ip,int icell) const
+ inline  int convertFaceToGlobal(int ip,int icell) const
+ inline  int convertCellToGlobal(int ip,int icell) const
+ inline  void convertNodeToGlobal(int ip, const int* local, int n, int* global)const
+ (+)inline  void convertCellToGlobal(int ip, const int* local, int n, int* global)const
+ inline  void convertFaceToGlobal(int ip, const int* local, int n, int* global)const
+ (+) inline  int nbDomain() const
+ int nbCells() const
+ (+) inline  int nbCells( int idomain) const
+ (+) inline  int getNodeNumber(int idomain) const
+ inline  int getNodeNumber() const
+ inline  void getNodeList(int idomain, int* list) const
+ (+) inline  int getCellNumber(int idomain) const
+ inline  int getCellDomainNumber(int global) const
+ inline  void getCellList(int idomain, int* list) const
+ inline int getFaceNumber(int idomain) const
+ inline  int getFaceNumber() const
+ inline  void getFaceList(int idomain, int* list) const
+ boost::shared_ptr<Graph> getGraph() const
+*/
  
 void MEDSPLITTERTest::testParallelTopology_graph_constructor()
 {
@@ -126,43 +126,43 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   Topology* topology = new ParallelTopology (cell_graph, 2, collection.getMeshDimension());
   
   
-/*
- * test_SPLITTER_square
- * 
- * computes a partitioning for the following geometry
- * 
- * 
- * 
- * 7------------8------------9
- * |            |            |
- * |            |            |
- * |     3      |     4      |
- * |            |            |
- * |            |            |
- * 4------------5------------6
- * |            |            |
- * |            |            |
- * |     1      |     2      |
- * |            |            |
- * |            |            |
- * 1------------2------------3 
- *
- * Result of the 2 domain split :
- *  
- * 5------------6 5------------6
- * |            | |            |
- * |            | |            |
- * |     2      | |     2      |
- * |            | |            |
- * |            | |            |
- * 1------------2 1------------2
- * |            | |            |
- * |            | |            |
- * |     1      | |     1      |
- * |            | |            |
- * |            | |            |
- * 4------------3 4------------3 
- */
+	/*
+	 * test_SPLITTER_square
+	 * 
+	 * computes a partitioning for the following geometry
+	 * 
+	 * 
+	 * 
+	 * 7------------8------------9
+	 * |            |            |
+	 * |            |            |
+	 * |     3      |     4      |
+	 * |            |            |
+	 * |            |            |
+	 * 4------------5------------6
+	 * |            |            |
+	 * |            |            |
+	 * |     1      |     2      |
+	 * |            |            |
+	 * |            |            |
+	 * 1------------2------------3 
+	 *
+	 * Result of the 2 domain split :
+	 *  
+	 * 5------------6 5------------6
+	 * |            | |            |
+	 * |            | |            |
+	 * |     2      | |     2      |
+	 * |            | |            |
+	 * |            | |            |
+	 * 1------------2 1------------2
+	 * |            | |            |
+	 * |            | |            |
+	 * |     1      | |     1      |
+	 * |            | |            |
+	 * |            | |            |
+	 * 4------------3 4------------3 
+	 */
  
   int iglobal[3]={1,2,3};
   int* iloc=new int[3];
@@ -171,17 +171,17 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   int iproc_answer[3]={0,1,0};
   topology->convertGlobalCellList(iglobal,3,iloc,iproc);
   for(int i=0; i<3; i++)
-  { 
-    CPPUNIT_ASSERT_EQUAL(iloc_answer[i], iloc[i]);
-    CPPUNIT_ASSERT_EQUAL(iproc_answer[i],iproc[i]);
-  }
+		{ 
+			CPPUNIT_ASSERT_EQUAL(iloc_answer[i], iloc[i]);
+			CPPUNIT_ASSERT_EQUAL(iproc_answer[i],iproc[i]);
+		}
   int* global_2 = new int[3];
   topology->convertCellToGlobal(0,iloc,3,global_2);
   int global_answer[3]={1,1,3};
   for (int i=0; i<3; i++)
-  {
-    CPPUNIT_ASSERT_EQUAL(global_answer[i],global_2[i]);
-  }
+		{
+			CPPUNIT_ASSERT_EQUAL(global_answer[i],global_2[i]);
+		}
   
   CPPUNIT_ASSERT_EQUAL(topology->getCellNumber(0),2);  
   CPPUNIT_ASSERT_EQUAL(topology->getCellNumber(1),2);
@@ -205,10 +205,10 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   int iloc_node_answer[3]={4,3,3};
   int iproc_node_answer[3]={0,0,1};
   for(int i=0; i<3; i++)
-  { 
-    CPPUNIT_ASSERT_EQUAL(iloc_node_answer[i], iloc[i]);
-    CPPUNIT_ASSERT_EQUAL(iproc_node_answer[i],iproc[i]);
-  }
+		{ 
+			CPPUNIT_ASSERT_EQUAL(iloc_node_answer[i], iloc[i]);
+			CPPUNIT_ASSERT_EQUAL(iproc_node_answer[i],iproc[i]);
+		}
   int* local_nodes;
   int* ip_nodes;
   int* full_array;
@@ -218,8 +218,15 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   int iloc_node_wt_answer[4]={4,3,4,3};
   int iproc_node_wt_answer[4]={0,0,1,1};
   for(int i=0; i<4; i++)
-  { 
-    CPPUNIT_ASSERT_EQUAL(iloc_node_wt_answer[i], local_nodes[i]);
-    CPPUNIT_ASSERT_EQUAL(iproc_node_wt_answer[i],ip_nodes[i]);
-  }
+		{ 
+			CPPUNIT_ASSERT_EQUAL(iloc_node_wt_answer[i], local_nodes[i]);
+			CPPUNIT_ASSERT_EQUAL(iproc_node_wt_answer[i],ip_nodes[i]);
+		}
+  delete topology;
+  delete[] iloc;
+  delete[]iproc;
+  delete[] global_2;
+  delete[] local_nodes;
+  delete[] ip_nodes;
+  delete[] full_array;
 }

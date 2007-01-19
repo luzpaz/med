@@ -133,6 +133,9 @@ void castFields(const MESHCollection& old_collection, const string& fieldname, i
 //!link to mesh_collection topology
 Topology* m_topology;
 
+//!control over topology
+bool m_owns_topology;
+
 //!link to graph
 boost::shared_ptr<Graph> m_cell_graph;
 
@@ -150,6 +153,7 @@ std::vector<std::string> m_indivisible_regions;
 
 //!name of global mesh
 string m_name;
+
 };
 
 }//of namespace

@@ -30,12 +30,12 @@ using namespace std;
  */
  
 int medsplitter(const char* inputfilename, 
-			    const char* mesh,
-			    const char* outputfilename,  
-			    int is_distributed,
-			    int nprocs,
-			    int method,
-			    int meshonly)
+		const char* mesh,
+		const char* outputfilename,  
+		int is_distributed,
+		int nprocs,
+		int method,
+		int meshonly)
 {			 
 
   //Pointer to the initial collection
@@ -50,25 +50,25 @@ int medsplitter(const char* inputfilename,
       collection=new MEDSPLITTER::MESHCollection(input,meshname);
     }
   else
-  	  collection = new MEDSPLITTER::MESHCollection(input);
+    collection = new MEDSPLITTER::MESHCollection(input);
   	  
   // Creating the graph and partitioning it	  
   MEDSPLITTER::Topology* new_topo;
   if (method==0)
-  	new_topo = collection->createPartition(nprocs,MEDSPLITTER::Graph::METIS);
+    new_topo = collection->createPartition(nprocs,MEDSPLITTER::Graph::METIS);
   else
-  	new_topo = collection->createPartition(nprocs,MEDSPLITTER::Graph::SCOTCH);
+    new_topo = collection->createPartition(nprocs,MEDSPLITTER::Graph::SCOTCH);
   
   // Creating a new mesh collection from the partitioning 
   MEDSPLITTER::MESHCollection new_collection(*collection, new_topo);
  
- //Writing the output files (master + MED files)
- string output(outputfilename);
+  //Writing the output files (master + MED files)
+  string output(outputfilename);
   new_collection.write(output);
   
   // Casting the fields on the new collection
   if (meshonly!=0)
-  new_collection.castAllFields(*collection);
+    new_collection.castAllFields(*collection);
   delete collection;
  
   return 0;

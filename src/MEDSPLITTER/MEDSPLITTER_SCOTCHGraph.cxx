@@ -18,7 +18,8 @@ SCOTCHGraph::SCOTCHGraph(const MEDMEM::MEDSKYLINEARRAY* graph, int* edgeweight):
 
 SCOTCHGraph::~SCOTCHGraph()
 {
-	if (m_partition!=0) delete m_partition;
+	if (m_partition!=0) {delete m_partition; m_partition=0;}
+	if (m_graph!=0) {delete m_graph; m_graph=0;}
 }
 
 void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
@@ -42,15 +43,15 @@ void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
 	
 	
 	SCOTCH_graphBuild(&scotch_graph,
-			  1, //premier indice 1
-			  n, // nb of graph nodes
-			  xadj,
-			  0,
-			  m_cellweight, //graph vertices loads
-			  0,
-			  xadj[n], // number of edges
-			  adjncy,
-			  m_edgeweight);
+										1, //premier indice 1
+										n, // nb of graph nodes
+										xadj,
+										0,
+										m_cellweight, //graph vertices loads
+										0,
+										xadj[n], // number of edges
+										adjncy,
+										m_edgeweight);
 
 	SCOTCH_Strat scotch_strategy;					  
 	SCOTCH_stratInit(&scotch_strategy);
@@ -73,9 +74,9 @@ void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
 	int* index=new int [n+1];
 	index[0]=1;
 	for (int i=0; i<n; i++)
-	{
-		index[i+1]=index[i]+1;
-	}
+		{
+			index[i+1]=index[i]+1;
+		}
 	
 	//creating a skylinearray with no copy of the index and partition array
 	// the fifth argument true specifies that only the pointers are passed 
