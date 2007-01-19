@@ -37,6 +37,9 @@ SUBDIRS = MEDWrapper INTERPOLATION MEDMEM MEDMEM_SWIG
 
 ifeq (@ENABLE_SPLITTER@,yes)
   SUBDIRS+= MEDSPLITTER
+  ifeq (@cppunit_ok@,yes)
+    SUBDIRS+= MEDSPLITTER/Test
+  endif  
 endif
 
 ifeq ($(MED_WITH_KERNEL),yes)

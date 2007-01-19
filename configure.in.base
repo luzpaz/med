@@ -261,6 +261,14 @@ lsf_ok=no
 CHECK_LSF
 dnl lsf_ok is set to yes by CHECK_LSF
 
+
+echo
+echo ----------------------------------------------
+echo testing CPPUNIT only required for unit testing
+echo ----------------------------------------------
+echo
+CHECK_CPPUNIT
+
 echo
 echo ---------------------------------------------
 echo checking SPLITTER
@@ -436,13 +444,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 
 	CHECK_HTML_GENERATORS
 
-	echo
-	echo ----------------------------------------------
-	echo testing CPPUNIT only required for unit testing
-	echo ----------------------------------------------
-	echo
-
-	CHECK_CPPUNIT
 
 }
 else
