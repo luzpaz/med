@@ -24,8 +24,11 @@
 # see salome_shared_modules.py
 # (avoids incomplete import at run time)
 
-print "============== import MED_idl ======================="
-print "============== import MED_Gen_idl ======================="
+from launchConfigureParser import verbose
+
+if verbose():
+    print "============== import MED_idl ======================="
+    print "============== import MED_Gen_idl ======================="
 
 import MED_idl
 import MED_Gen_idl
