@@ -44,11 +44,17 @@ MESHCollectionDriver::MESHCollectionDriver(MESHCollection* collection):m_collect
  *\param filename ascii file containing the list of MED v2.3 files
  * */
  
+<<<<<<< MEDSPLITTER_MESHCollectionDriver.cxx
+int MESHCollectionDriver::read(char* filename)
+{
+	
+=======
 int MESHCollectionDriver::read(char* filename)
 {
 
   BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::read()")
   
+>>>>>>> 1.1.4.1
   //ditributed meshes
   vector<int*> cellglobal;
   vector<int*> nodeglobal;
@@ -170,7 +176,11 @@ int MESHCollectionDriver::read(char* filename)
 		}
 		cellglobal[i]=array;
 		
+<<<<<<< MEDSPLITTER_MESHCollectionDriver.cxx
+		cout << "Reading node global numbering" <<endl;
+=======
 		MESSAGE("Reading node global numbering");
+>>>>>>> 1.1.4.1
 		int nnode= (m_collection->getMesh())[i]->getNumberOfNodes();
 		array=new int[nnode];
 		med_2_2::MEDglobalNumLire(fid,meshname, array, nnode,

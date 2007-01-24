@@ -36,10 +36,15 @@ class Graph
 	const 	MEDMEM::MEDSKYLINEARRAY* m_graph;
 	
 	MEDMEM::MEDSKYLINEARRAY* m_partition;
+<<<<<<< MEDSPLITTER_Graph.hxx
+
+	int* m_edgeweight;	
+=======
 
 	int* m_edgeweight;	
 
   int* m_cellweight;
+>>>>>>> 1.1.4.1
 };
 
 }

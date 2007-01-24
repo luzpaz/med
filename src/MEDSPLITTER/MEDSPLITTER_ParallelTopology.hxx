@@ -6,6 +6,13 @@
 
 #include "MEDSPLITTER_Topology.hxx"
 
+<<<<<<< MEDSPLITTER_ParallelTopology.hxx
+#include "boost/shared_ptr.hpp"
+
+#include "MEDSPLITTER_Topology.hxx"
+
+=======
+>>>>>>> 1.1.4.1
 namespace MEDSPLITTER {
 
 class Graph;

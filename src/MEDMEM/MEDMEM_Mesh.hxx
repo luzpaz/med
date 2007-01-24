@@ -403,13 +403,22 @@ inline void MESH::setName(string name)
   _name=name; //NOM interne à la classe
 }
 
-/*! Get the MESH name */
+/*! \if MEDMEM_ug
+\addtogroup MESH_general
+@{
+\endif
+*/
+
+/*!
+Get the MESH name */
 inline string MESH::getName() const
 {
   return _name;
 }
 
-/*! Set the MESH description */
+/*! \ifnot MEDMEM_ug
+Set the MESH description 
+\endif */
 inline void MESH::setDescription(string description)
 {
   _description=description; //NOM interne à la classe
@@ -432,14 +441,25 @@ inline int MESH::getMeshDimension() const
 {
   return _meshDimension;
 }
-
+/*! \if MEDMEM_ug
+@}
+\endif
+*/
+/*! \if MEDMEM_ug
+\addtogroup MESH_nodes
+@{
+\endif
+*/
 /*! Get the number of nodes used in the MESH */
 inline int MESH::getNumberOfNodes() const
 {
   return _numberOfNodes;
 }
 
-/*! Get the COORDINATES object. Use it only if you need COORDINATES informations not provided by the MESH class.*/
+/*! \ifnot MEDMEM_ug 
+ Get the COORDINATES object. Use it only if you need COORDINATES informations not provided by the MESH class.
+\endif
+*/
 inline const COORDINATE * MESH::getCoordinateptr() const
 {
 //   checkGridFillCoords();
@@ -484,10 +504,21 @@ inline const string * MESH::getCoordinatesUnits() const
 {
   return _coordinate->getCoordinatesUnits();
 }
+/*!\if MEDMEM_ug
+@}
+\endif
+*/
+
 //  int * MESH::getNodesNumbers() const
 //  {
 //    return nodesNumbers;
 //  }
+
+/*!\if MEDMEM_ug
+\addtogroup MESH_connectivity
+@{
+\endif
+*/
 
 /*! Get the number of different geometric types for a given entity type.
 
@@ -605,6 +636,10 @@ inline int MESH::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
       //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"connectivity not defined !"));
     }
 }
+/*! \if MEDMEM_ug
+@}
+\endif
+*/
 /*!
   Returns true if the wanted connectivity exist, else returns false
   (to use before a getSomething method).

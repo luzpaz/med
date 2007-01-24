@@ -552,6 +552,10 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
 				{
 					if(domain_counts[inew]==nbnodes)
 					{
+<<<<<<< MEDSPLITTER_ParallelTopology.cxx
+					//	cout << "face partagee sur domaine "<<inew<<endl;
+=======
+>>>>>>> 1.1.4.1
 						new_counts[inew]++;
 						m_face_glob_to_loc.insert(make_pair(global_face_number,make_pair(inew,new_counts[inew])));
 						m_face_loc_to_glob.insert(make_pair(make_pair(inew,new_counts[inew]),global_face_number));

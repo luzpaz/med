@@ -29,6 +29,12 @@ void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
 	//graph
 	int * xadj=const_cast<int*>(m_graph->getIndex());
 	int * adjncy = const_cast<int*>(m_graph->getValue());
+<<<<<<< MEDSPLITTER_SCOTCHGraph.cxx
+	
+	//base 0 or 1
+	int base=1;
+=======
+>>>>>>> 1.1.4.1
 	
 	//ndomain
 	int nparts = ndomain;
@@ -42,6 +48,17 @@ void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
 	
 	
 	SCOTCH_graphBuild(&scotch_graph,
+<<<<<<< MEDSPLITTER_SCOTCHGraph.cxx
+					  1, //premier indice 1
+					  n, // nb of graph nodes
+					  xadj,
+					  0,
+					  0,
+					  0,
+					  xadj[n], // number of edges
+					  adjncy,
+					  m_edgeweight);
+=======
 			  1, //premier indice 1
 			  n, // nb of graph nodes
 			  xadj,
@@ -51,13 +68,19 @@ void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
 			  xadj[n], // number of edges
 			  adjncy,
 			  m_edgeweight);
+>>>>>>> 1.1.4.1
 
 	SCOTCH_Strat scotch_strategy;					  
 	SCOTCH_stratInit(&scotch_strategy);
+<<<<<<< MEDSPLITTER_SCOTCHGraph.cxx
+    SCOTCH_stratGraphMap(&scotch_strategy,
+    						"b{strat=f{bal=0.0001}}");
+=======
 
 	//!user-defined options for the strategy
 	if (options_string!="")
 	  SCOTCH_stratGraphMap(&scotch_strategy,options_string.c_str());
+>>>>>>> 1.1.4.1
     						  
 
 	if (nparts>1)					  

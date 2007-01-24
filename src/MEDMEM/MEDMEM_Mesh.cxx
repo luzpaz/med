@@ -47,6 +47,36 @@ using namespace MED_EN;
 #define MED_NOPDT -1
 #define MED_NONOR -1
 
+// Block defining groups for the MEDMEM_ug documentation
+/*!\if MEDMEM_ug
+\defgroup MESH_constructors Constructors
+
+The MESH class provides only two constructors : a copy constructor and
+a constructor enabling creation from file reading. The creation of 
+a user-defined mesh implies the use of the MESHING class.
+
+\defgroup MESH_advanced Advanced features
+These functions provide access to high-level manipulation of the meshes, giving 
+information about the cells or extracting supports from the mesh.
+
+\defgroup MESH_connectivity Connectivity information
+These methods are related to the extraction of connectivity information
+from the mesh.
+
+\defgroup MESH_nodes Nodes information
+These methods are related to the extraction of information about the mesh nodes.
+
+\defgroup MESH_general General information
+
+These methods are related to the retrieval of general information about the mesh.
+
+\defgroup MESH_poly Polygons and Polyhedra information
+
+These methods are specific methods used for retrieving connectivity
+information for MED_POLYGON and MED_POLYHEDRON elements.
+\endif
+*/
+
 // ------- Drivers Management Part
 
 /*! Add a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. The meshname used in the file
@@ -143,6 +173,13 @@ MESH::MESH():_coordinate(NULL),_connectivity(NULL), _isAGrid(false) {
   init();
 };
 
+/*! \if MEDMEM_ug
+  \addtogroup MESH_constructors
+@{
+*/
+/*!
+Copy constructor
+*/
 MESH::MESH(MESH &m)
 {
   _name=m._name;
@@ -221,6 +258,11 @@ MESH::MESH(MESH &m)
   //_drivers = m._drivers;  //Recopie des drivers?
 }
 
+/*! 
+@}
+\endif
+*/
+
 MESH::~MESH() {
 
   MESSAGE("MESH::~MESH() : Destroying the Mesh");
@@ -262,7 +304,13 @@ MESH::~MESH() {
 
 }
 
-/*
+
+/*! \if MEDMEM_ug
+\addtogroup MESH_poly
+@{
+\endif
+*/
+/*!
   Method equivalent to getNumberOfTypes except that it includes not only classical Types but polygons/polyhedra also.
  */
 int MESH::getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const
@@ -271,6 +319,7 @@ int MESH::getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const
     return _connectivity->getNumberOfTypesWithPoly(Entity);
   throw MEDEXCEPTION(LOCALIZED("MESH::getNumberOfTypesWithPoly( medEntityMesh ) : Connectivity not defined !"));
 }
+
 
 /*
   Method equivalent to getTypesWithPoly except that it includes not only classical Types but polygons/polyhedra also.
@@ -305,6 +354,9 @@ int MESH::getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_EN::medG
     return getNumberOfElements(Entity,Type);
 }
 
+/*! \if MEDMEM_ug
+@}
+\endif*/
 MESH & MESH::operator=(const MESH &m)
 {
   const char * LOC = "MESH & MESH::operator=(const MESH &m) : ";
@@ -354,7 +406,13 @@ bool MESH::operator==(const MESH& other) const
   return this==&other;
 }
 
-/*! Create a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName.
+/*!\if MEDMEM_ug
+\addtogroup MESH_constructors
+@{
+\endif
+*/
+/*!
+ Create a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName.
   The meshname driverName must already exists in the file.*/
 MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION)
 {
@@ -373,7 +431,10 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
 
   END_OF(LOC);
 };
-
+/*!\if MEDMEM_ug 
+  @}
+\endif
+*/
 /*
   for a deep comparison of 2 meshes.
 */
@@ -532,9 +593,12 @@ int MESH::getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entit
   return cellsList.front() ;
 }
 
-/*!
-  Return a support which reference all elements on the boundary of mesh.
+/*!\if MEDMEM_ug
+\addtogroup MESH_advanced
+@{
+\endif
 
+  Returns a support which reference all elements on the boundary of mesh.
   For instance, we could get only face in 3D and edge in 2D.
 */
 SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
@@ -573,6 +637,7 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
   else
     return buildSupportOnElementsFromElementList(myElementsList,entityToParse);
 }
+/*!\if MEDMEM_ug @} \endif*/
 
 /*!
   Method that do the same thing as buildSupportOnNodeFromElementList except that a SUPPORT is not created.
@@ -623,6 +688,14 @@ SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt,
   return mySupport ;
 }
 
+/*!\if MEDMEM_ug
+\addtogroup MESH_advanced
+@{
+\endif
+*/
+/*! Retrieves the volume of all the elements contained in \a Support. This method returns 
+a FIELD structure based on this support. It only works on MED_CELL for 3D meshes.
+*/
 FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getVolume(SUPPORT*) : ";
@@ -851,6 +924,10 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 
   return Volume;
 }
+/*! Retrieves the area of all the elements contained in \a Support. This method returns 
+a FIELD structure based on this support. It only works on MED_CELL for 2D meshes or MED_FACE
+for 3D meshes.
+*/
 
 FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
@@ -1014,7 +1091,9 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
     }
   return Area;
 }
-
+/*! Retrieves the length of all the elements contained in \a Support. This method returns 
+a FIELD structure based on this support. It only works on MED_EDGE supports.
+*/
 FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getLength(SUPPORT*) : ";
@@ -1120,6 +1199,13 @@ FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const thr
   return Length;
 }
 
+/*! Retrieves the normal for all elements contained in SUPPORT \a Support.
+The method is only functional for 2D supports for 3D meshes and 1D supports
+for 2D meshes. It returns 
+a FIELD for which the number of components is equal to the dimension of the 
+mesh and which represents coordinates of the vector normal to the element.
+The direction of the vector is undetermined.
+*/
 FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getNormal(SUPPORT*) : ";
@@ -1310,7 +1396,9 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 
   return Normal;
 }
-
+/*!Returns the barycenter for each element in the support. The barycenter positions are returned
+as a field with a number of components equal to the mesh dimension.
+*/
 FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getBarycenter(SUPPORT*) : ";
@@ -1615,6 +1703,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
   END_OF(LOC);
   return Barycenter;
 }
+/*! \if MEDMEM_ug @} \endif*/
 
 bool MESH::isEmpty() const
 {

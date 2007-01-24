@@ -2,6 +2,9 @@
 #include <string>
 #include <ext/hash_map>
 #include <set>
+#include <ext/hash_map>
+
+
 
 
 #include <iostream>
@@ -18,10 +21,15 @@
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_Group.hxx"
 
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
+#include "MEDSPLITTER_utils.hxx"
+
+=======
 #include "MEDMEM_Exception.hxx"
 
 #include "MEDSPLITTER_utils.hxx"
 
+>>>>>>> 1.1.4.1
 #include "MEDSPLITTER_Graph.hxx"
 
 #include "MEDSPLITTER_Topology.hxx"
@@ -103,7 +111,8 @@ MESHCollection::MESHCollection(const string& filename):m_topology(0),m_driver(0)
 	retrieveDriver()->read (filenamechar);
 }
 
-/*! constructing the MESH collection from a sequential MED-file
+/*! constructing the MESH collectiQUAD
+ * on from a sequential MED-file
  * 
  * \param filename MED file
  * \param meshname name of the mesh that is to be read
@@ -424,11 +433,55 @@ void MESHCollection::setTopology(Topology* topo)
 	m_topology= topo;
 }
 
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
 void MESHCollection::setIndivisibleGroup(const string& name)
 {
 	m_indivisible_regions.push_back(name);
 	
 }
+
+/*! Browses the domains and the regions that have 
+ * been marked as indivisible in order to create a vector 
+ * the dimlension of which is the total number of cells, and
+ * that contains 0 if the cell belongs to no indivisible group
+ * and that contains an integer corresponding to the group otherwise.
+ * 
+ * \param   indivisible_tag on input is an int* allocated as int[nbcells]
+ *		    on output contains the tags 
+ */
+
+
+void MESHCollection::treatIndivisibleRegions(int* indivisible_tag)
+{
+	for (int i=0; i<m_topology->nbCells(); i++)
+		indivisible_tag[i]=0;
+
+	//treating cell groups		
+	for (int idomain=0; idomain<m_topology->nbDomain();idomain++)
+			for (int igroup=0; igroup<m_mesh[idomain]->getNumberOfGroups(MED_EN::MED_CELL); igroup++)
+				for (int i=0; i<m_indivisible_regions.size(); i++)
+				{
+					const MEDMEM::GROUP* group = m_mesh[idomain]->getGroup(MED_EN::MED_CELL,igroup+1);
+					string groupname = group->getName();
+					if (trim(groupname)==trim(m_indivisible_regions[i]))
+					{
+						int nbcells=group->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+						const int* numbers=group->getNumber(MED_EN::MED_ALL_ELEMENTS);
+						int* global=new int[nbcells];
+						m_topology->convertCellToGlobal(idomain,numbers,nbcells,global);
+						for (int icell=0; icell<nbcells; icell++)
+							indivisible_tag[global[icell]-1]=i+1;
+							
+					} 
+				}
+}	
+=======
+void MESHCollection::setIndivisibleGroup(const string& name)
+{
+	m_indivisible_regions.push_back(name);
+	
+}
+>>>>>>> 1.1.4.1
 
 /*! Browses the domains and the regions that have 
  * been marked as indivisible in order to create a vector 
@@ -596,6 +649,10 @@ void MESHCollection::buildCellGraph(MEDMEM::MEDSKYLINEARRAY* & array,int *& edge
       
     }
 	
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
+	//list of cells for a given node
+	hash_multimap <int,int> node2cell;
+=======
 	//creating the MEDMEMSKYLINEARRAY containing the graph
   
   int* size = new int[m_topology->nbCells()];
@@ -676,7 +733,13 @@ void MESHCollection::buildCellGraph(MEDMEM::MEDSKYLINEARRAY* & array,int *& edge
 		array->setI(i+1,temp[i]);
 		delete[]temp[i];
 	}
+>>>>>>> 1.1.4.1
 	
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
+	//list of nodes for a given cell
+	hash_multimap <int,int> cell2node;
+=======
+>>>>>>> 1.1.4.1
 	
 	if (has_indivisible_regions)
 	{
@@ -718,6 +781,20 @@ void MESHCollection::buildCellGraph2ndversion(MEDMEM::MEDSKYLINEARRAY* & array,i
 		
 	map<MED_EN::medGeometryElement,int*> type_cell_list;
 	
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
+	//tagging for the indivisible regions
+	int* indivisible_tag;
+	bool has_indivisible_regions=false;
+	if (!m_indivisible_regions.empty())
+	{
+		has_indivisible_regions=true;
+		indivisible_tag=new int[m_topology->nbCells()];
+		treatIndivisibleRegions(indivisible_tag);
+	}
+	
+	
+	//browsing through all domains to create cell->node and node->cell connectivities
+=======
 	//tagging for the indivisible regions
 	int* indivisible_tag;
 	bool has_indivisible_regions=false;
@@ -730,6 +807,7 @@ void MESHCollection::buildCellGraph2ndversion(MEDMEM::MEDSKYLINEARRAY* & array,i
 	
 	
 	//browsing through all domains to create cell->face and face->cell connectivities
+>>>>>>> 1.1.4.1
 	for (int idomain=0; idomain<m_topology->nbDomain(); idomain++)
 	{
 	//	MED_EN::medGeometryElement* type_array;
@@ -848,9 +926,15 @@ void MESHCollection::buildCellGraph2ndversion(MEDMEM::MEDSKYLINEARRAY* & array,i
 	//going across all cells
 	for (int i=0; i< m_topology->nbCells(); i++)
 	{
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
+		map<int,int> cells_neighbours;
+		typedef hash_multimap<int,int>::iterator mmap_iter;
+		pair <mmap_iter,mmap_iter>  noderange = cell2node.equal_range(i+1);
+=======
 		set<int> cells_neighbours;
 		typedef multimap<int,int>::const_iterator mmap_iter;
 		pair <mmap_iter,mmap_iter>  facerange = cell2face.equal_range(i+1);
+>>>>>>> 1.1.4.1
 		
 		for (mmap_iter iterface = facerange.first; iterface != facerange.second; iterface++)
 		{
@@ -858,13 +942,28 @@ void MESHCollection::buildCellGraph2ndversion(MEDMEM::MEDSKYLINEARRAY* & array,i
 			int faceid=iterface->second;
 			pair <mmap_iter,mmap_iter>  cellrange = face2cell.equal_range(faceid);			
 			for (mmap_iter itercell = cellrange.first; itercell != cellrange.second; itercell++)
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
+			{				
+				map<int,int>::iterator iter_map = cells_neighbours.find(itercell->second);
+				if (iter_map == cells_neighbours.end())
+					cells_neighbours.insert(make_pair(itercell->second,1));
+				else
+					(iter_map->second)++;
+=======
 			{		
 			  cells_neighbours.insert(itercell->second);
+>>>>>>> 1.1.4.1
 			}
 		}
 		size[i]=0;
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
+		int dimension = getMeshDimension();
+		dimension=1;
+		for (map<int,int>::iterator iter=cells_neighbours.begin(); iter != cells_neighbours.end(); iter++)	
+=======
 		
 		for (set<int>::iterator iter=cells_neighbours.begin(); iter != cells_neighbours.end(); iter++)	
+>>>>>>> 1.1.4.1
 		{
 			if (*iter != i+1) size[i]++;
 		}
@@ -876,6 +975,22 @@ void MESHCollection::buildCellGraph2ndversion(MEDMEM::MEDSKYLINEARRAY* & array,i
 		int itemp=0;
 		for (set<int>::iterator iter=cells_neighbours.begin(); iter != cells_neighbours.end(); iter++)	
 		{
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
+			if (iter->second >=dimension && iter->first != i+1) 
+			{
+				temp[i][itemp]=iter->first;
+				if (has_indivisible_regions)
+				{
+					int tag1 = indivisible_tag[(i+1)-1];
+					int tag2 = indivisible_tag[iter->first-1];
+					if (tag1==tag2 && tag1!=0)
+						temp_edgeweight[i][itemp]=m_topology->nbCells()*100000;
+					else
+						temp_edgeweight[i][itemp]=1;
+				}	
+				itemp++;
+			}
+=======
 			if (*iter != i+1) 
 			{
 				temp[i][itemp]=*iter;
@@ -890,15 +1005,22 @@ void MESHCollection::buildCellGraph2ndversion(MEDMEM::MEDSKYLINEARRAY* & array,i
 				}	
 				itemp++;
 			}
+>>>>>>> 1.1.4.1
 		}
 	}
 	int* index=new int[m_topology->nbCells()+1];
 	index[0]=1;
 	for (int i=0; i<m_topology->nbCells(); i++)
 		index[i+1]=index[i]+size[i];
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
+		
+	node2cell.clear();
+	cell2node.clear();
+=======
 		
 	face2cell.clear();
 	cell2face.clear();
+>>>>>>> 1.1.4.1
 			
 	//SKYLINEARRAY structure holding the cell graph
 	array= new MEDMEM::MEDSKYLINEARRAY(m_topology->nbCells(),index[m_topology->nbCells()]);
@@ -910,6 +1032,28 @@ void MESHCollection::buildCellGraph2ndversion(MEDMEM::MEDSKYLINEARRAY* & array,i
 		array->setI(i+1,temp[i]);
 		delete[]temp[i];
 	}
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
+	
+	int* edgeweights=0;
+	
+	if (has_indivisible_regions)
+	{
+		edgeweights=new int[array->getLength()];
+		for (int i=0; i<m_topology->nbCells(); i++)
+		{
+			for (int j=index[i]; j<index[i+1];j++)
+				edgeweights[j-1]=temp_edgeweight[i][j-index[i]];
+			delete[] temp_edgeweight[i];	
+		}
+		delete[]temp_edgeweight;
+		for (int i=0; i<array->getLength(); i++)
+			cout<<edgeweights[i]<<endl;
+	}
+	delete[] index;
+	delete[] temp;
+	delete[] size;
+	
+=======
 	
 	
 	if (has_indivisible_regions)
@@ -950,6 +1094,7 @@ Topology* MESHCollection::createPartition(int nbdomain,
 	
 	MESSAGE("Building cell graph");
 	buildCellGraph(array,edgeweights);
+>>>>>>> 1.1.4.1
 	
 	switch (split)
 	{
@@ -975,6 +1120,10 @@ Topology* MESHCollection::createPartition(int nbdomain,
 	//m_cell_graph is a shared pointer 
 	Topology* topology = new ParallelTopology (m_cell_graph, nbdomain, getMeshDimension());
 	
+<<<<<<< MEDSPLITTER_MESHCollection.cxx
+	//cleaning
+	if (has_indivisible_regions) delete[] edgeweights;
+=======
 	//cleaning
 	if (edgeweights!=0) delete[] edgeweights;
 	MESSAGE("End of partition creation");
@@ -1005,6 +1154,7 @@ Topology* MESHCollection::createPartition(const int* partition)
 	
 	//m_cell_graph is a shared pointer 
 	Topology* topology = new ParallelTopology (m_cell_graph, nbdomain, getMeshDimension());
+>>>>>>> 1.1.4.1
 	
 	return topology;
 }

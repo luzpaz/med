@@ -30,9 +30,15 @@ void METISGraph::partGraph(int ndomain, const string& options_string)
 	int * xadj=const_cast<int*>(m_graph->getIndex());
 	int * adjncy = const_cast<int*>(m_graph->getValue());
 	//constraints
+<<<<<<< MEDSPLITTER_METISGraph.cxx
+	int * vwgt=0;
+	int * adjwgt=m_edgeweight;
+	int wgtflag=(m_edgeweight!=0)?1:0;
+=======
 	int * vwgt=m_cellweight;
 	int * adjwgt=m_edgeweight;
 	int wgtflag=(m_edgeweight!=0)?1:0+(m_cellweight!=0)?2:0;
+>>>>>>> 1.1.4.1
 	
 	//base 0 or 1
 	int base=1;

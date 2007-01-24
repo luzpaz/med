@@ -39,57 +39,65 @@ EXPORT_PYSCRIPTS = \
 
 
 EXPORT_HEADERS = \
-MEDSPLITTER_Topology.hxx \
-MEDSPLITTER_MESHCollection.hxx \
-MEDSPLITTER_MESHCollectionDriver.hxx \
-MEDSPLITTER_ParallelTopology.hxx \
-MEDSPLITTER_Graph.hxx\
-MEDSPLITTER_METISGraph.hxx\
-MEDSPLITTER_SCOTCHGraph.hxx\
-MEDSPLITTER_UserGraph.hxx\
-MEDSPLITTER_API.hxx
+CommInterface.hxx\
+MPIProcessorGroup.hxx\
+ProcessorGroup.hxx\
+BlockTopology.hxx\
+Topology.hxx\
+ParaGRID.hxx\
+ParaMESH.hxx\
+ParaSUPPORT.hxx\
+StructuredParaSUPPORT.hxx\
+ComponentTopology.hxx\
+ExplicitTopology.hxx\
+ParaFIELD.hxx\
+DEC.hxx\
+StructuredCoincidentDEC.hxx\
+ExplicitCoincidentDEC.hxx
 
 # Libraries targets
 
-LIB=libmedsplitter.la
+LIB=libparamed.la
 
 LIB_SRC = \
-MEDSPLITTER_MESHCollection.cxx \
-MEDSPLITTER_MESHCollectionDriver.cxx \
-MEDSPLITTER_ParallelTopology.cxx \
-MEDSPLITTER_Graph.cxx\
-MEDSPLITTER_METISGraph.cxx\
-MEDSPLITTER_SCOTCHGraph.cxx\
-MEDSPLITTER_UserGraph.cxx\
-MEDSPLITTER_API.cxx
+MPIProcessorGroup.cxx\
+BlockTopology.cxx\
+ParaGRID.cxx\
+ParaMESH.cxx\
+ParaSUPPORT.cxx\
+StructuredParaSUPPORT.cxx\
+ComponentTopology.cxx\
+ParaFIELD.cxx\
+DEC.cxx\
+StructuredCoincidentDEC.cxx\
+ExplicitCoincidentDEC.cxx\
+ExplicitTopology.cxx
+
+
 
 # Executables targets
-BIN = medsplitter
+BIN =
 BIN_SRC = 
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-<<<<<<< Makefile.in
-TEST_PROGS = test_SPLITTER_square test_SPLITTER_indivisible 
-TESTS=toto.sh
-=======
-TEST_PROGS = test_SPLITTER_square test_SPLITTER_indivisible test_HighLevelAPI test_SPLITTER_user_partition
->>>>>>> 1.1.4.1
+TEST_PROGS = test_ProcessorGroup test_BlockTopology test_ParaStructuredSupport \
+test_ParaField test_DEC test_UnstructuredDEC
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
-CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) $(METIS_CPPFLAGS) $(SCOTCH_CPPFLAGS)
+CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) $(MPI_INCLUDES)
 
-CXXFLAGS+=@CXXTMPDPTHFLAGS@
+CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MPI_INCLUDES)
 CPPFLAGS+=$(BOOST_CPPFLAGS)
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS) 
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem $(MPI_LIBS)
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS)  $(BOOST_LIBS) -lboost_program_options-gcc-mt
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(MPI_LIBS)  $(BOOST_LIBS)
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}
@@ -98,7 +106,7 @@ ifeq ($(MED_WITH_KERNEL),yes)
   LDFLAGSFORBIN+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics
 endif
 
-LIBSFORBIN=$(BOOSTLIBS)
+LIBSFORBIN=$(BOOSTLIBS) $(MPI_LIBS) 
 
 LIBS=
 
@@ -106,4 +114,3 @@ LIBS=
 bin: 
 
 @CONCLUDE@
-

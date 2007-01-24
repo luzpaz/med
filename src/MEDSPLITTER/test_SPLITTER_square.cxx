@@ -241,5 +241,9 @@ int main()
 }
 
 
+<<<<<<< test_SPLITTER_square.cxx
+
+	=======
 
 	
+>>>>>>> 1.1.4.1

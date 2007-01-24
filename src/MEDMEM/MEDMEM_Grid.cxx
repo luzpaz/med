@@ -36,6 +36,14 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
+
+// Block defining the comments for the MEDMEM_ug documentation
+/*! \if MEDMEM_ug
+\defgroup GRID_axes Information about axes
+\defgroup GRID_connectivity Utility methods for defining element positions in the grid
+\endif
+*/
+
 //=======================================================================
 //function : GRID
 //purpose  : empty constructor
@@ -752,7 +760,13 @@ void GRID::fillConnectivity() const
 //function : getArrayLength
 //purpose  : return array length. Axis = [1,2,3] meaning [i,j,k],
 //=======================================================================
-
+/*!\if MEDMEM_ug
+\addtogroup GRID_axes
+@{
+\endif
+*/
+/*! Returns the number of nodes on axis number \a Axis (axis numbering starts at 1).
+*/
 int GRID::getArrayLength( const int Axis ) const throw (MEDEXCEPTION)
 {
   switch (Axis) {
@@ -771,7 +785,9 @@ int GRID::getArrayLength( const int Axis ) const throw (MEDEXCEPTION)
 //           exception if Axis out of [1-3] range
 //           exception if i is out of range 0 <= i < getArrayLength(Axis);
 //=======================================================================
-
+/*!
+Returns the value of node coordinate \a i on axis \a Axis.
+ */
 const double GRID::getArrayValue (const int Axis, const int i) const throw (MEDEXCEPTION)
 {
   if (i < 0 || i >= getArrayLength(Axis))
@@ -786,11 +802,22 @@ const double GRID::getArrayValue (const int Axis, const int i) const throw (MEDE
   return 0.0;
 }
 
+/*!
+\if MEDMEM_ug
+@}
+\endif
+ */
+
 //=======================================================================
 //function : getEdgeNumber
 //purpose  : 
 //=======================================================================
 
+/*!
+\if MEDMEM_ug
+@{
+\endif
+*/
 int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
   const throw (MEDEXCEPTION)
 {
@@ -826,15 +853,14 @@ int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
   return Nb;
 }
 
-//=======================================================================
-//function : getFaceNumber
-//purpose  : return a NODE, EDGE, FACE, CELL number by its position in the grid.
-//           Axis [1,2,3] means one of directions: along i, j or k
-//           For Cell contituents (FACE or EDGE), Axis selects one of those having same (i,j,k):
-//           * a FACE which is normal to direction along given Axis;
-//           * an EDGE going along given Axis.
-//           Exception for Axis out of range
-//=======================================================================
+/*!
+Returns a NODE, EDGE, FACE, CELL number by its position in the grid.
+Axis [1,2,3] means one of directions: along i, j or k
+For Cell contituents (FACE or EDGE), Axis selects one of those having same (i,j,k):
+- a FACE which is normal to direction along given Axis;
+- an EDGE going along given Axis.
+Exception for Axis out of range
+*/
 
 int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
   const throw (MEDEXCEPTION)
@@ -1055,7 +1081,11 @@ void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
   
   throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "Number is out of range: " << Number));
 }
-
+/*!
+\if MEDMEM_ug
+@}
+\endif
+*/
 //=======================================================================
 //function : writeUnstructured
 //purpose  : write a Grid as an Unstructured mesh
