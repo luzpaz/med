@@ -2275,6 +2275,16 @@ int MED_MESH_WRONLY_DRIVER22::writeCoordinates() const {
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Unable to create Mesh : |" << _meshName << "|"));
       else 
 	MESSAGE(LOC<<"Mesh "<<_meshName<<" created in file "<<_fileName<<" !");
+
+      // PAL14544. Write _spaceDimension if _spaceDimension != _meshDimension
+      if ( _ptrMesh->_spaceDimension != _ptrMesh->_meshDimension )
+      {
+        err = med_2_2::MEDdimEspaceCr(_medIdt, const_cast <char *> (_meshName.c_str()),
+                                      _ptrMesh->_spaceDimension);
+        if (err < MED_VALID)
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write spaceDimension of Mesh : |"
+                                       << _meshName << "|"));
+      }
     }
   else if ((spaceDimension != _ptrMesh->_spaceDimension)  &&
 	   (meshDimension != _ptrMesh->_meshDimension))
