@@ -516,8 +516,13 @@ throw (SALOME::SALOME_Exception)
 	
 	try
         {
-		return _mesh->getNumberOfElements(convertIdlEntToMedEnt(entity),
-						  convertIdlEltToMedElt(geomElement));
+//           if ( geomElement == SALOME_MED::MED_POLYGON ||
+//                geomElement == SALOME_MED::MED_POLYHEDRA )
+//             return _mesh->getNumberOfElementsWithPoly(convertIdlEntToMedEnt(entity),
+//                                                       convertIdlEltToMedElt(geomElement));
+//           else
+            return _mesh->getNumberOfElements(convertIdlEntToMedEnt(entity),
+                                              convertIdlEltToMedElt(geomElement));
 	}
 	catch (MEDEXCEPTION &ex)
         {
@@ -561,9 +566,9 @@ SCRUTE(elt2);
 		else
 		{
 MESSAGE("MED_NODAL");
-			const int * tab=_mesh->getConnectivityIndex(
-				convertIdlConnToMedConn(mode),
-				convertIdlEntToMedEnt(entity));
+// 			const int * tab=_mesh->getConnectivityIndex(
+// 				convertIdlConnToMedConn(mode),
+// 				convertIdlEntToMedEnt(entity));
                         nbelements = _mesh->getConnectivityLength
                           (convertIdlModeToMedMode(typeSwitch),
                            convertIdlConnToMedConn(mode),
@@ -684,7 +689,7 @@ SALOME::SenderInt_ptr MESH_i::getSenderForPolygonsConnectivityIndex(SALOME_MED::
   SALOME::SenderInt_ptr ret;
   try
     {
-      int nbelements = _mesh->getNumberOfPolygons() + 1;
+      int nbelements = _mesh->getNumberOfPolygons(entity) + 1;
       const int * numbers=_mesh->getPolygonsConnectivityIndex (convertIdlConnToMedConn(mode),
                                                                convertIdlEntToMedEnt(entity));
       ret=SenderFactory::buildSender(*this,numbers,nbelements);
@@ -1462,6 +1467,7 @@ throw (SALOME::SALOME_Exception)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                               SALOME::INTERNAL_ERROR);
 	MESSAGE("Not Implemented");
+        return SALOME_MED::FIELD::_nil();
 }
 //=============================================================================
 /*!
