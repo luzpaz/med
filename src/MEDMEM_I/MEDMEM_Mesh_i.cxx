@@ -1056,37 +1056,51 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Returns connectivity global informations
  */
 //=============================================================================
-SALOME_MED::MESH::connectivityInfos * MESH_i::getConnectGlobal
-                        (SALOME_MED::medEntityMesh entity)
-throw (SALOME::SALOME_Exception)
+SALOME_MED::MESH::connectivityInfos * MESH_i::getConnectGlobal (SALOME_MED::medEntityMesh entity)
+  throw (SALOME::SALOME_Exception)
 {
-        if (_mesh==NULL)
-                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
-                                             SALOME::INTERNAL_ERROR);
-        SALOME_MED::MESH::connectivityInfos_var all=new SALOME_MED::MESH::connectivityInfos;
-        try
-        {
-                all->numberOfNodes  = _mesh->getNumberOfNodes();
+  if (_mesh==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                 SALOME::INTERNAL_ERROR);
+  SALOME_MED::MESH::connectivityInfos_var all=new SALOME_MED::MESH::connectivityInfos;
+  try
+  {
+    MED_EN::medEntityMesh anEntity = convertIdlEntToMedEnt(entity);
+    all->numberOfNodes  = _mesh->getNumberOfNodes();
 
-                int nbTypes=_mesh->getNumberOfTypesWithPoly(convertIdlEntToMedEnt(entity));
-                const medGeometryElement * elemts  =_mesh->getTypesWithPoly(
-                                       convertIdlEntToMedEnt(entity));
-                all->meshTypes.length(nbTypes);
-                all->numberOfElements.length(nbTypes);
-		all->entityDimension=_mesh->getConnectivityptr()->getEntityDimension();
-                for (int i=0; i<nbTypes; i++)
-                {
-                        all->meshTypes[i]=convertMedEltToIdlElt(elemts[i]);
-                        all->numberOfElements[i]=_mesh->getNumberOfElementsWithPoly(
-                                       convertIdlEntToMedEnt(entity),elemts[i]);
-                }
-        }
-        catch (MEDEXCEPTION &ex)
-        {
-                MESSAGE("Unable to acces connectivities informations");
-                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-        }
-        return all._retn();
+    int nbTypes=_mesh->getNumberOfTypesWithPoly(anEntity);
+    medGeometryElement * types =_mesh->getTypesWithPoly(anEntity);
+    all->meshTypes.length(nbTypes);
+    all->numberOfElements.length(nbTypes);
+    all->nodalConnectivityLength.length(nbTypes);
+    all->entityDimension=_mesh->getConnectivityptr()->getEntityDimension();
+    for (int i=0; i<nbTypes; i++)
+    {
+      all->meshTypes[i]=convertMedEltToIdlElt(types[i]);
+      all->numberOfElements[i]=_mesh->getNumberOfElementsWithPoly(anEntity,types[i]);
+      switch ( types[i] )
+      {
+      case MED_EN::MED_POLYGON:
+        all->nodalConnectivityLength[i]=
+          _mesh->getPolygonsConnectivityLength(MED_EN::MED_NODAL,anEntity);
+        break;
+      case MED_EN::MED_POLYHEDRA:
+        all->nodalConnectivityLength[i]=
+          _mesh->getPolyhedronConnectivityLength(MED_EN::MED_NODAL);
+        break;
+      default:
+        all->nodalConnectivityLength[i]=
+          _mesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,
+                                       anEntity,types[i]);
+      }
+    }
+  }
+  catch (MEDEXCEPTION &ex)
+  {
+    MESSAGE("Unable to acces connectivities informations");
+    THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+  }
+  return all._retn();
 }
 
 //=============================================================================

@@ -425,8 +425,9 @@ This enumeration contains a set of elements defining the type of connectivity.
     {
     	long                     numberOfNodes;
         medGeometryElement_array meshTypes;
-    	SALOME_MED::long_array      numberOfElements;
-        long                       entityDimension;
+    	SALOME_MED::long_array   numberOfElements;
+    	SALOME_MED::long_array   nodalConnectivityLength;
+        long                     entityDimension;
     };
     connectivityInfos getConnectGlobal(in medEntityMesh entity)
     raises (SALOME::SALOME_Exception);
@@ -705,7 +706,8 @@ Internal Corba method.
     	   medEntityMesh entity;
            long          numberOfGeometricType;
            medGeometryElement_array types;
-           SALOME_MED::long_array nbEltTypes;
+           SALOME_MED::long_array   nbEltTypes;
+           SALOME_MED::long_array   nodalConnectivityLength;
     };
     supportInfos getSupportGlobal()		raises (SALOME::SALOME_Exception);
 
