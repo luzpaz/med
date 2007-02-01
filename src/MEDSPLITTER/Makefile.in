@@ -64,7 +64,7 @@ MEDSPLITTER_UserGraph.cxx\
 MEDSPLITTER_API.cxx
 
 # Executables targets
-BIN = medsplitter
+BIN = medsplitter 
 BIN_SRC = 
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 

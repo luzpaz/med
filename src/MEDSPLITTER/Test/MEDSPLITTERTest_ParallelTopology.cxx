@@ -20,7 +20,7 @@
 #include "MEDSPLITTERTest.hxx"
 #include <cppunit/TestAssert.h>
 
-#include "MEDMEM_ConnectZone.hxx"
+#include "MEDMEM_ConnectZone.hxx" 
 #include "MEDMEM_DriversDef.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Meshing.hxx"

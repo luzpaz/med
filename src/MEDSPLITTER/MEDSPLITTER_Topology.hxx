@@ -73,8 +73,8 @@ namespace MEDSPLITTER {
 
 		//retrieving number of nodes
 		virtual int getNodeNumber(int idomain) const =0;
-		virtual int getNodeNumber() const =0;
-		//retrieving list of nodes
+	  virtual int getNodeNumber() const=0;
+  	//retrieving list of nodes
 		virtual void getNodeList(int idomain, int* list) const =0;
 	
 		//retrieving number of nodes
@@ -85,7 +85,8 @@ namespace MEDSPLITTER {
 	
 		//retrieving number of faces
 		virtual int getFaceNumber(int idomain) const =0;
-		virtual int getFaceNumber() const =0;
+    virtual int getFaceNumber()const =0;
+
 		//retrieving list of nodes
 		virtual void getFaceList(int idomain, int* list) const =0;
 	

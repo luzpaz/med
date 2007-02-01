@@ -17,7 +17,7 @@
 
 #include "MEDMEM_Exception.hxx"
 
-#include "MEDSPLITTER_utils.hxx"
+#include "MEDSPLITTER_utils.hxx" 
 
 #include "MEDSPLITTER_Graph.hxx"
 
@@ -87,8 +87,8 @@ MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topolog
 					cerr<<"MEDSPLITTER : Mesh dimension must be 2 or 3"<<endl;
 				}
 		}
-	MESSAGE (" Number of nodes for new topology " << m_topology->getNodeNumber()<<endl);
-	castFamilies(initial_collection);
+	
+  castFamilies(initial_collection);
 }
 
 /*! constructing the MESH collection from a distributed file

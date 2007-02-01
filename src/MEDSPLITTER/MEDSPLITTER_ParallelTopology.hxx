@@ -1,6 +1,7 @@
 #ifndef PARALLELTOPOLOGY_HXX_
 #define PARALLELTOPOLOGY_HXX_
 
+#include <set>
 #include <ext/hash_map>
 #include "boost/shared_ptr.hpp"
 
@@ -160,7 +161,13 @@ namespace MEDSPLITTER {
 		inline  int getNodeNumber() const
 		{
 			if (m_node_glob_to_loc.empty()) return 0;
-			//		return m_node_glob_to_loc.rbegin()->first;
+      set <int> keys;
+      for (__gnu_cxx::hash_multimap<int, pair<int,int> >::const_iterator iter= m_node_glob_to_loc.begin();
+           iter!=m_node_glob_to_loc.end();
+           iter++) {
+          keys.insert(iter->first);
+        }
+      return keys.size();
 		}
 
 		//!retrieving list of nodes in global numbers
@@ -199,12 +206,19 @@ namespace MEDSPLITTER {
 		{
 			return m_nb_faces[idomain];
 		}
-
-		inline  int getFaceNumber() const
-		{
-			if (m_face_glob_to_loc.empty()) return 0;
-			//		return m_face_glob_to_loc.rbegin()->first;
-		}
+    
+    inline  int getFaceNumber() const
+    {
+      if (m_face_glob_to_loc.empty()) return 0;
+      set <int> keys;
+      for (__gnu_cxx::hash_multimap<int, pair<int,int> >::const_iterator iter= m_face_glob_to_loc.begin();
+           iter!=m_face_glob_to_loc.end();
+           iter++) {
+          keys.insert(iter->first);
+        }
+      return keys.size();
+    }
+    
 
 		//!retrieving list of faces in global numbers
 		inline  void getFaceList(int idomain, int* list) const

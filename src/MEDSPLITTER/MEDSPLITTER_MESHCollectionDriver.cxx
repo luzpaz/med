@@ -46,7 +46,7 @@ MESHCollectionDriver::MESHCollectionDriver(MESHCollection* collection):m_collect
  
 int MESHCollectionDriver::read(char* filename)
 {
-
+  
   BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::read()")
   
 		//ditributed meshes
@@ -283,7 +283,7 @@ void MESHCollectionDriver::write(char* filename)
 	
 	BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::write()")
  
-		ofstream file(filename);
+	ofstream file(filename);
 
 	file <<"#MED Fichier V 2.3"<<" "<<endl;
 	file <<"#"<<" "<<endl;
@@ -291,6 +291,7 @@ void MESHCollectionDriver::write(char* filename)
 	 
 	int nbdomains= m_collection->getMesh().size();
 	m_filename.resize(nbdomains);
+
 	//loop on the domains
 	for (int i=0; i<nbdomains;i++)
 		{
@@ -349,6 +350,8 @@ void MESHCollectionDriver::write(char* filename)
 								med_2_2::MEDjointEcr(fid, mesh_name, joint_name, node_corresp, nbnodes,
 																		 med_2_2::MED_NOEUD, med_2_2::MED_POINT1,med_2_2::MED_NOEUD, med_2_2::MED_POINT1);
 							if (err2==1) cout << "erreur creation de joint "<<endl;
+              
+              
 							index_joint++;
 						}
 				}
@@ -454,7 +457,7 @@ void MESHCollectionDriver::readFileStruct(vector <string>&  field_names,vector<i
 				}
 		}
 	END_OF("MEDSPLITTER::MESHCollectionDriver::readFileStruct()")
-		}
+	}
 
 //!retrieves the type of a field for a given fieldname
 int MESHCollectionDriver::getFieldType(const string& fieldname)
@@ -464,7 +467,6 @@ int MESHCollectionDriver::getFieldType(const string& fieldname)
 
 	deque<MEDMEM::DT_IT_> dtit=med_struct.getFieldIteration(fieldname);
 	deque<MEDMEM::DT_IT_>::const_iterator iter =dtit.begin();
-	
 	
 	// testing whether the field is of double or int type		
 	MEDMEM::FIELD_* field = med_struct.getField(fieldname,iter->dt,iter->it);
@@ -476,4 +478,4 @@ int MESHCollectionDriver::getFieldType(const string& fieldname)
 	   	
 	END_OF("MEDSPLITTER::MESHCollectionDriver::getFieldType()")
 
-		}
+	}

@@ -437,7 +437,7 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
   
   
   char meshname[20]  = "MAILTRQU";
-  char family[30]="QUAD";
+  char family[MED_TAILLE_NOM]="QUAD";
   MESHCollection collection(filename_rd,meshname);
   collection.setIndivisibleGroup(family);
   Topology* topo =  collection.createPartition(4,Graph::SCOTCH);
