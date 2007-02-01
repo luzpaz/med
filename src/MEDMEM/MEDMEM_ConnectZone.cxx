@@ -27,6 +27,7 @@ using namespace MEDMEM;
   for (map < pair <MED_EN::medEntityMesh, MED_EN::medEntityMesh>,MEDMEM::MEDSKYLINEARRAY * >::iterator 
    iter = _entityCorresp.begin(); iter != _entityCorresp.end(); iter++)
    {
+        cout << "delete correspondency"<<endl;
    		delete iter->second;
    }
   }
