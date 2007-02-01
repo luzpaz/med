@@ -2815,7 +2815,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 		    SUPPORT* support;
 		    support=mesh->buildSupportOnElementsFromElementList(numbers, entity);
 		    myFamily=new FAMILY(*support);
-                    delete support;
+        delete support;
 		  }
 	 	else
 		  {
@@ -2828,7 +2828,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 		// the identifier and the groups are set
  		myFamily->setIdentifier(ifamily);
  		myFamily->setNumberOfGroups(key.size());
-		char family_name[MED_TAILLE_LNOM];
+		char family_name[MED_TAILLE_NOM];
 		sprintf(family_name,"family%d",ifamily);
 		myFamily->setName(family_name);
 
