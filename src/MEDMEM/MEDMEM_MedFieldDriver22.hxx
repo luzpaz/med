@@ -491,6 +491,8 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 					  (med_2_2::med_geometrie_element)  *currentGeometry,
 					  j, &ngauss,  &numdt,  &numo, dtunit, &dt,
 					  maa, &local, &nmaa);
+            
+  MED_FIELD_DRIVER<T>::_ptrField->setTime(dt);
 
 	if ( ndt == numdt && numo == od ) {
 	  alreadyFoundPdtIt = true;
@@ -1079,6 +1081,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     MESSAGE ("MED_GEOM           : "<< MED_EN::geoNames[types[typeNo]]);
     MESSAGE ("Iteration          : "<< MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
     MESSAGE ("Order              : "<< MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
+    MESSAGE ("Time               : "<< MED_FIELD_DRIVER<T>::_ptrField->getTime());
     MESSAGE ("NumberOfElements   : "<< nbOfElOfType[typeNo]);
     MESSAGE ("NumberOfComponents : "<< numberOfComponents);
     MESSAGE ("NumberOfGaussPts   : "<< numberOfGaussPoint[typeNo+1]);
