@@ -31,9 +31,9 @@ public:
 private:
 	const BlockTopology* const  _block_topology;
 	const ParaGRID* const _grid;
-	const ParaMESH* const _mesh;
+  //	const ParaMESH* const _mesh;
 	const MED_EN::medEntityMesh _entity;
-	const MEDMEM::SUPPORT* _support;
+  //	const MEDMEM::SUPPORT* _support;
 	
 };
 

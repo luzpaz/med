@@ -190,16 +190,16 @@ void ExplicitCoincidentDEC::broadcastTopology(const ExplicitTopology& toposend, 
 	else
 	{
 		vector <int> size (group->size());
-		
+		int myrank=toporecv.getProcGroup()->myRank();
 		for (int iproc=0; iproc<group->size();iproc++)
 		{
 			int isource = iproc;
 			if (!toporecv.getProcGroup()->contains(isource))
 			{
 				int nbelem;
-				_comm_interface->recv(&nbelem, 1, MPI_INTEGER, isource, tag+isource, *(group->getComm()), &status);
+				_comm_interface->recv(&nbelem, 1, MPI_INTEGER, isource, tag+myrank, *(group->getComm()), &status);
 				int* buffer = new int[nbelem];
-				_comm_interface->recv(buffer, nbelem, MPI_INTEGER, isource,tag+isource, *(group->getComm()), &status);				
+				_comm_interface->recv(buffer, nbelem, MPI_INTEGER, isource,tag+myrank, *(group->getComm()), &status);				
 			
 				ExplicitTopology* topotemp=new ExplicitTopology();
 				topotemp->unserialize(buffer, *_comm_interface);

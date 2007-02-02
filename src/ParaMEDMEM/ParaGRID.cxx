@@ -19,7 +19,7 @@ _name(global_grid->getName())
 	if (!_block_topology->getProcGroup()->containsMyRank()) return;
 	
 	int dimension=_block_topology->getDimension() ;
-	if (dimension != global_grid->getMeshDimension())
+	if (dimension != global_grid->getSpaceDimension())
 		throw MEDEXCEPTION(LOCALIZED("ParaGrid::ParaGrid incompatible topology"));
 	
 	vector<vector<double> > xyz_array(dimension);

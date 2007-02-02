@@ -18,7 +18,7 @@ namespace ParaMEDMEM
     virtual const Topology* getTopology() const {};
     virtual const MEDMEM::SUPPORT* getSupport() const {return _support;}
     virtual const ParaMESH* getMesh() const {return _mesh;}
-  private :
+  protected :
     const MEDMEM::SUPPORT* _support;
     const ParaMESH* _mesh;
   };

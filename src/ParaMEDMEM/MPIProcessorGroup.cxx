@@ -38,7 +38,9 @@ ProcessorGroup(interface, proc_ids)
    
   // copying proc_ids in ranks
   copy<set<int>::const_iterator,int*> (proc_ids.begin(), proc_ids.end(), ranks);
-  
+  for (int i=0; i<proc_ids.size();i++)
+    cout << "proc id " << ranks[i]<<endl;
+
   _comm_interface.groupIncl(group_world, proc_ids.size(), ranks, &_group);
   
   _comm_interface.commCreate(MPI_COMM_WORLD, _group, &_comm);
