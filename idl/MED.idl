@@ -651,6 +651,20 @@ Internal Corba method.
       raises (SALOME::SALOME_Exception);
 
     /*!
+      If the method %isOnAllElements() returns False, this method returns an array which
+     contains all numbers of given %medGeometryElement.
+
+      Numbering is from file, ie numbers are bounded by 1 and
+      MESH::getNumberOfElement(entity,MED_ALL_ELEMENTS) and not by 1 and
+      MESH::getNumberOfElement(entity,geomElement).
+
+      \note
+      If %SUPPORT is defined on MED_NODE, use MED_NONE %medGeometryElement type.
+    */
+    SALOME_MED::long_array getNumberFromFile(in medGeometryElement geomElement)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
       Idem SALOME::Sender getNumber(in medGeometryElement geomElement) but returning Sender.\n
       It could be used in a Client code using the MED Client classes.
      */
