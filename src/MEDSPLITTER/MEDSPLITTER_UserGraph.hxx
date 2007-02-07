@@ -1,10 +1,12 @@
 #ifndef MEDSPLITTER_USERGRAPH_HXX_
 #define MEDSPLITTER_USERGRAPH_HXX_
 
+#include "MEDSPLITTER.hxx"
+
 namespace MEDSPLITTER
 {
 
-class UserGraph:public Graph
+class MEDSPLITTER_EXPORT UserGraph:public Graph
 {
 public:
 	UserGraph(MEDMEM::MEDSKYLINEARRAY*, const int*, int);

@@ -29,12 +29,14 @@
 #ifndef MEDMEM_Grid_HeaderFile
 #define MEDMEM_Grid_HeaderFile
 
+#include <MEDMEM.hxx>
+
 #include "MEDMEM_Mesh.hxx"
 
 // class containing structured mesh data
 
 namespace MEDMEM {
-class GRID: public MESH
+class MEDMEM_EXPORT GRID: public MESH
 {
  protected:
   //-----------------------//
@@ -60,6 +62,9 @@ class GRID: public MESH
   // 3. flags to know that _coordinates and _connectivity of MESH are filled
   bool              _is_coordinates_filled;
   bool              _is_connectivity_filled;
+
+  // 4. is _gridType a true value or just a default one
+  bool              _is_default_gridType;
 
   //-----------------------//
   //   Protected Methods

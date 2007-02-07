@@ -47,11 +47,13 @@ MEDgridInfo(med_idt fid, int indice, med_int *isAGrid, med_grid_type *typ)
     maaid = _MEDdatagroupOuvrir(fid, chemin);
     if (maaid < 0) return(-1);
 
-    if (_MEDattrEntierLire(maaid, MED_NOM_GRD, typ) < 0) {
+    med_int aTmpType; // MPV bug IPAL 13621: for 64bits platform read 64 bits (not 32 - as for type)
+    if (_MEDattrEntierLire(maaid, MED_NOM_GRD, &aTmpType) < 0) {
         *isAGrid = 0;
     } else {
         *isAGrid = 1;
     };
+    *typ = (med_grid_type)aTmpType;// MPV bug IPAL 13621: now use this 64bits value to set enumeration
 
     if (_MEDdatagroupFermer(maaid) < 0) return(-1);
     return(0);

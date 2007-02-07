@@ -1,6 +1,8 @@
 #ifndef TOPOLOGY_HXX_
 #define TOPOLOGY_HXX_
 
+#include "MEDSPLITTER.hxx"
+
 #include "boost/shared_ptr.hpp"
 
 namespace MEDMEM
@@ -13,7 +15,7 @@ namespace MEDSPLITTER {
 class Graph;
 class MESHCollection;
 
-class Topology
+class MEDSPLITTER_EXPORT Topology
 {
 public:
 	Topology(){}

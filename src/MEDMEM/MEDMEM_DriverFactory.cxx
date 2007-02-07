@@ -257,7 +257,7 @@ GENDRIVER * DRIVERFACTORY::buildMedDriverFromFile(const string & fileName,
     {
       version = getMedFileVersion(fileName);
     }
-  catch (MEDEXCEPTION & ex)
+  catch (MEDEXCEPTION &)
     {
       version = DRIVERFACTORY::globalMedFileVersionForWriting;
     }
@@ -304,7 +304,7 @@ GENDRIVER * DRIVERFACTORY::buildMeshDriverFromFile(const string & fileName,
     {
       version = getMedFileVersion(fileName);
     }
-  catch (MEDEXCEPTION & ex)
+  catch (MEDEXCEPTION & )
     {
       version = DRIVERFACTORY::globalMedFileVersionForWriting;
     }

@@ -205,6 +205,12 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
   const char * LOC = "MED_MED_DRIVER21::readFileStruct() : ";
   int          err,i,j;
       
+  // PAL12192
+  if ( IMED_MED_RDONLY_DRIVER::_fileStructIsRead )
+    return;
+  else
+    IMED_MED_RDONLY_DRIVER::_fileStructIsRead = true;
+
   BEGIN_OF(LOC);
 
   if ( _medIdt == MED_INVALID ) 
@@ -614,6 +620,11 @@ void MED_MED_RDONLY_DRIVER21::read( void )
  
   BEGIN_OF(LOC);
 
+  // For PAL12192: assure that file structure is already read
+  this->open();
+  this->readFileStruct();
+  this->close();
+
   const map<MESH_NAME_, MESH*> & _meshes = const_cast<const map<MESH_NAME_, MESH*>& > (_ptrMed->_meshes); 
   map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
 
@@ -688,7 +699,7 @@ void MED_MED_WRONLY_DRIVER21::writeFrom( void) const
       (*currentMesh).second->write(*this); 
       // On utilise pour les objects MESH ET FIELD le write(GENDRIVER *) et le == ds GENDRIVER avec eventuellement 1 id 
     }
-    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ex ) {
+    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ) {
       continue;
     }
   }
@@ -697,7 +708,7 @@ void MED_MED_WRONLY_DRIVER21::writeFrom( void) const
     try {
       (*currentField).first->write(*this);
     }
-    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ex ) {
+    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ) {
       continue;
     }
   }

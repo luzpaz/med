@@ -20,6 +20,8 @@
 # ifndef MED_HXX
 # define MED_HXX
 
+#include <MEDMEM.hxx>
+
 // STL
 # include <string>
 # include <map>
@@ -40,7 +42,7 @@ class SUPPORT ;
 typedef string MESH_NAME_;
 typedef string FIELD_NAME_;
 typedef struct { int dt; int it; } DT_IT_;
-struct LT_DT_IT_
+struct MEDMEM_EXPORT LT_DT_IT_
 {
   bool operator() (const DT_IT_ &p1, const DT_IT_ &p2) const
   {
@@ -65,7 +67,7 @@ typedef map<DT_IT_, FIELD_*, LT_DT_IT_ > MAP_DT_IT_;
 
 */
 
-class MED
+class MEDMEM_EXPORT MED
 {
   // Add your personnal driver line (step 2)
   friend class MED_MED_RDONLY_DRIVER21;

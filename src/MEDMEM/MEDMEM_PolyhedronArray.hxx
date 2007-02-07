@@ -20,12 +20,14 @@
 # ifndef __POLYHEDRONARRAY_H__
 # define __POLYHEDRONARRAY_H__
 
+#include "MEDMEM.hxx"
+
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_PointerOf.hxx"
 #include "MEDMEM_define.hxx"
 
 namespace MEDMEM {
-class POLYHEDRONARRAY
+class MEDMEM_EXPORT POLYHEDRONARRAY
 {
 private :
   MED_EN::med_int   _numberOfPolyhedron;

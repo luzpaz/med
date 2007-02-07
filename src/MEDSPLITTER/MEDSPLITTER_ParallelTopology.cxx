@@ -1,7 +1,12 @@
 #include <set>
 #include <map>
 #include <vector>
-#include <ext/hash_map>
+#ifndef WNT
+# include <ext/hash_map>
+#else
+# include <hash_map>
+#endif
+
 #include "MEDMEM_SkyLineArray.hxx"
 #include "MEDMEM_ConnectZone.hxx"
 #include "MEDMEM_CellModel.hxx"
@@ -15,7 +20,11 @@
 #include "MEDSPLITTER_Graph.hxx"
 #include "MEDSPLITTER_ParallelTopology.hxx"
 
+#ifndef WNT
 using namespace __gnu_cxx;
+#else
+using namespace std;
+#endif
 
 using namespace MEDSPLITTER;
 

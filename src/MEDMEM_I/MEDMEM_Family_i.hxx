@@ -26,12 +26,13 @@
 #ifndef MED_FAMILY_I_HXX_
 #define MED_FAMILY_I_HXX_
 
+#include "MEDMEM_I.hxx"
 
 #include "MEDMEM_Support_i.hxx"
 
 namespace MEDMEM {
 class FAMILY;
-class FAMILY_i:
+class MEDMEM_I_EXPORT FAMILY_i:
 		public POA_SALOME_MED::FAMILY,
 		public SUPPORT_i
 {

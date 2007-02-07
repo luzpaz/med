@@ -20,6 +20,8 @@
 #ifndef MED_MESH_DRIVER_HXX
 #define MED_MESH_DRIVER_HXX
 
+#include <MEDMEM.hxx>
+
 #include <string>
 #include <vector>
 #include "MEDMEM_define.hxx"
@@ -42,7 +44,7 @@ class MESH;
 class FAMILY;
 class GROUP;
 class CONNECTIVITY;
-class MED_MESH_DRIVER : public GENDRIVER
+class MEDMEM_EXPORT MED_MESH_DRIVER : public GENDRIVER
 {
 protected:
 
@@ -103,7 +105,7 @@ public:
 
 */
 
-  class IMED_MESH_RDONLY_DRIVER : public virtual MED_MESH_DRIVER
+class MEDMEM_EXPORT IMED_MESH_RDONLY_DRIVER : public virtual MED_MESH_DRIVER
 {
  
 public :
@@ -151,7 +153,7 @@ protected:
 
 */
 
-class IMED_MESH_WRONLY_DRIVER : public virtual MED_MESH_DRIVER {
+class MEDMEM_EXPORT IMED_MESH_WRONLY_DRIVER : public virtual MED_MESH_DRIVER {
   
 public :
   
@@ -197,7 +199,7 @@ public :
 
 */
 
-class IMED_MESH_RDWR_DRIVER : public virtual IMED_MESH_RDONLY_DRIVER, public virtual IMED_MESH_WRONLY_DRIVER {
+class MEDMEM_EXPORT IMED_MESH_RDWR_DRIVER : public virtual IMED_MESH_RDONLY_DRIVER, public virtual IMED_MESH_WRONLY_DRIVER {
 
 public :
 
@@ -223,7 +225,7 @@ public :
 
 };
 
-class MED_MESH_RDONLY_DRIVER : public virtual IMED_MESH_RDONLY_DRIVER
+class MEDMEM_EXPORT MED_MESH_RDONLY_DRIVER : public virtual IMED_MESH_RDONLY_DRIVER
 {
 public:
   MED_MESH_RDONLY_DRIVER();
@@ -249,7 +251,7 @@ protected:
   GENDRIVER * copy ( void ) const;
 };
 
-class MED_MESH_WRONLY_DRIVER : public virtual IMED_MESH_WRONLY_DRIVER {
+class MEDMEM_EXPORT MED_MESH_WRONLY_DRIVER : public virtual IMED_MESH_WRONLY_DRIVER {
 public :
   MED_MESH_WRONLY_DRIVER();
   MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh);
@@ -271,7 +273,7 @@ protected:
   GENDRIVER * copy ( void ) const;
 };
 
-class MED_MESH_RDWR_DRIVER : public IMED_MESH_RDWR_DRIVER {
+class MEDMEM_EXPORT MED_MESH_RDWR_DRIVER : public IMED_MESH_RDWR_DRIVER {
 public :
   MED_MESH_RDWR_DRIVER();
   MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh);

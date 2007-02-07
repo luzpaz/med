@@ -180,7 +180,6 @@ template <typename T> PointerOf<T>::operator const T*() const
 	return _pointer ;
 }
 
-
 /*! If necessary, released memory holded by PointerOf\n.
     Else allocates memory and sets desallocation boolean to true.\n
     Can be used in order to "nullify" an existing PointerOf\n

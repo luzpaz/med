@@ -490,8 +490,9 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 	  (*_vtkFile) << value[j*NumberOfValue+i] << " " ;
 	(*_vtkFile) << endl ;
       }
-      if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
-	delete[] myArray;
+      // mkr : PAL13994 (commented the code below)
+      //if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
+      //delete[] myArray;
       break ;
     }
     case MED_REEL64 : {
@@ -523,8 +524,9 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 	  (*_vtkFile) << value[j*NumberOfValue+i] << " " ;
 	(*_vtkFile) << endl ;
       }
-      if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
-	delete[] myArray;
+      // mkr : PAL13994 (commented the code below)
+      //if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
+      //delete[] myArray;
       break ;
     }
     default : { 

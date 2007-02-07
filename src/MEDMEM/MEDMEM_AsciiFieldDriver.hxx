@@ -20,6 +20,7 @@
 #ifndef ASCII_FIELD_DRIVER_HXX
 #define ASCII_FIELD_DRIVER_HXX
 
+#include "MEDMEM.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Unit.hxx"
@@ -34,7 +35,7 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <string.h>
-#include <fstream.h>
+#include <fstream>
 
 #define PRECISION_IN_ASCII_FILE 10
 #define PRECISION_IN_COMPARE 1e-10
@@ -61,10 +62,10 @@ namespace MEDMEM {
     return compare<N-1>(a,b);
   }
 
-  template<>
+  template<> MEDMEM_EXPORT
   void fill<-1,0x3>(double *a, const double *b);
 
-  template<>
+  template<> MEDMEM_EXPORT 
   bool compare<-1>(const double *a, const double *b);
 
   template <class T, int SPACEDIMENSION, unsigned int SORTSTRATEGY> 

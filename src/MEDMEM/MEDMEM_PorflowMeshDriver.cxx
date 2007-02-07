@@ -39,12 +39,12 @@ using namespace MED_EN;
 using namespace MEDMEM;
 
 // geometric types conversion from PORFLOW -> MED
-const size_t PORFLOW_MESH_DRIVER::nb_geometrie_porflow;
+//const size_t PORFLOW_MESH_DRIVER::nb_geometrie_porflow;
 const medGeometryElement PORFLOW_MESH_DRIVER::geomPORFLOWtoMED[nb_geometrie_porflow] =
   {   /*  1  */ MED_TRIA3   ,/*  2  */ MED_QUAD4  ,/*  3  */ MED_TETRA4  ,/*  4  */ MED_PYRA5  ,
       /*  5  */ MED_PENTA6  ,/*  6  */ MED_HEXA8   };
 // indirection table from PORFLOW order to MED one for nodes numerotation in all PORFLOW geometries
-const size_t PORFLOW_MESH_DRIVER::nb_nodes_max;
+//const size_t PORFLOW_MESH_DRIVER::nb_nodes_max;
 
 // conversion from porflow connectivity to MED connectivity
 const int PORFLOW_MESH_DRIVER::numPORFLOWtoMED[nb_geometrie_porflow] [nb_nodes_max] = {
@@ -56,8 +56,8 @@ const int PORFLOW_MESH_DRIVER::numPORFLOWtoMED[nb_geometrie_porflow] [nb_nodes_m
       /*  HEXA8  */ { /*1*/ 1, /*2*/ 4, /*3*/ 3, /*4*/ 2, /*5*/ 5, /*6*/ 8, /*7*/ 7, /*8*/ 6 } };
 
 // Porflox nodal connectivity of faces - documented in Porflow user's manual
-const size_t PORFLOW_MESH_DRIVER::nb_faces_max;
-const size_t PORFLOW_MESH_DRIVER::nb_nodes2_max;
+//const size_t PORFLOW_MESH_DRIVER::nb_faces_max;
+//const size_t PORFLOW_MESH_DRIVER::nb_nodes2_max;
 const int PORFLOW_MESH_DRIVER::connectivityPORFLOW[nb_geometrie_porflow][nb_faces_max][nb_nodes2_max]={
   //{/* TRI3   */ {3,1,0,0}, {1,2,0,0}, {2,3,0,0}, {0,0,0,0}, {0,0,0,0}, {0,0,0,0} },
   //{/* QUA4   */ {1,4,0,0}, {2,3,0,0}, {1,2,0,0}, {3,4,0,0}, {0,0,0,0}, {0,0,0,0} },

@@ -27,6 +27,8 @@
 #ifndef _MED_SUPPORT_I_HXX_
 #define _MED_SUPPORT_I_HXX_
 
+#include "MEDMEM_I.hxx"
+
 #include <map>
 #include <string>
 
@@ -40,7 +42,7 @@
 namespace MEDMEM {
 class SUPPORT;
 
-  class SUPPORT_i: public POA_SALOME_MED::SUPPORT,
+class MEDMEM_I_EXPORT SUPPORT_i: public POA_SALOME_MED::SUPPORT,
 		   public SALOMEMultiComm,
 		   public SALOME::GenericObj_i
 {
@@ -77,6 +79,10 @@ public:
                                            throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumber(SALOME_MED::medGeometryElement geomElement) 
 					   throw (SALOME::SALOME_Exception);
+
+    SALOME_MED::long_array* getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
+                                           throw (SALOME::SALOME_Exception);
+
     SALOME::SenderInt_ptr getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumberIndex() 

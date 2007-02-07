@@ -3,7 +3,7 @@ extern "C" {
 #define restrict
 #include "bin/scotch.h"
 }
-#include"MEDSPLITTER_Graph.hxx"
+#include "MEDSPLITTER_Graph.hxx"
 #include "MEDSPLITTER_SCOTCHGraph.hxx"
 
 using namespace MEDSPLITTER;

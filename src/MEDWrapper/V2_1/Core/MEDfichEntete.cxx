@@ -26,7 +26,7 @@ namespace med_2_1{
 med_err 
 MEDfichEntete(med_idt fid, med_fich_info quoi, char str[])
 {
-  med_idt atid, root;
+  med_idt root;
   med_err ret;
   char locale[MED_TAILLE_DESC+1];
   char chemin[MED_TAILLE_MAA+1];
@@ -65,7 +65,7 @@ MEDfichEntete(med_idt fid, med_fich_info quoi, char str[])
 	return -1;
       strcpy(str,locale);
       
-      if ((ret == _MEDdatagroupFermer(root)) < 0)
+      if ((ret = _MEDdatagroupFermer(root)) < 0)
 	return -1;
 
       break;

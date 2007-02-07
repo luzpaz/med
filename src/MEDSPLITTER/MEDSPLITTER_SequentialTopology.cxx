@@ -21,13 +21,22 @@ void SequentialTopology::convertGlobalNodeList(const int*, int,int*,int*){}
 void SequentialTopology::convertGlobalCellList(const int*, int , int*, int *){}
 	
 //number of doamins
-int SequentialTopology::nbDomain() const{}
+int SequentialTopology::nbDomain() const
+{
+  return 0;
+}
 
 //number of cells
-int SequentialTopology::nbCells() const{}
+int SequentialTopology::nbCells() const
+{
+  return 0;
+}
 	
 //number of cells on a specific domain
-int SequentialTopology::nbCells(int idomain) const{}
+int SequentialTopology::nbCells(int idomain) const
+{
+  return 0;
+}
 
 //!creating node mapping 
 void SequentialTopology::createNodeMapping(vector<int*> type_connectivity,int* present_type_numbers, int idomain){}
@@ -36,13 +45,19 @@ void SequentialTopology::createNodeMapping(vector<int*> type_connectivity,int* p
 void SequentialTopology::convertToLocal(vector<int*> type_connectivity,int* present_type_numbers){}
 
 //!retrieving number of nodes
-int SequentialTopology::getNodeNumber(int idomain) const {}
+int SequentialTopology::getNodeNumber(int idomain) const
+{
+  return 0;
+}
 
 //!retrieving list of nodes
 void SequentialTopology::getNodeList(int idomain, int* list) const{}
 
 //!retrieving number of cells
-int SequentialTopology::getCellNumber(int idomain) const {}
+int SequentialTopology::getCellNumber(int idomain) const
+{
+  return 0;
+}
 
 //!retrieving list of cells
 void SequentialTopology::getCellList(int idomain, int* list) const{}

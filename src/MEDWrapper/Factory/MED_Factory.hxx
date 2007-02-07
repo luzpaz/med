@@ -29,17 +29,18 @@
 #ifndef MED_Factory_HeaderFile
 #define MED_Factory_HeaderFile
 
+#include "MED_WrapperFactory.hxx"
 #include "MED_Wrapper.hxx"
 
 namespace MED{
 
-  EVersion GetVersionId(const std::string& theFileName,
-			bool theDoPreCheckInSeparateProcess = false);
+  EVersion MEDWRAPPER_FACTORY_EXPORT GetVersionId(const std::string& theFileName,
+			                          bool theDoPreCheckInSeparateProcess = false);
 
-  PWrapper CrWrapper(const std::string& theFileName,
-		     bool theDoPreCheckInSeparateProcess = false);
+  PWrapper MEDWRAPPER_FACTORY_EXPORT CrWrapper(const std::string& theFileName,
+		                               bool theDoPreCheckInSeparateProcess = false);
 
-  PWrapper CrWrapper(const std::string& theFileName, EVersion theId);
+  PWrapper MEDWRAPPER_FACTORY_EXPORT CrWrapper(const std::string& theFileName, EVersion theId);
 
 }
 

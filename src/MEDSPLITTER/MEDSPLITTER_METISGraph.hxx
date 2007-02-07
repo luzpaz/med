@@ -1,8 +1,10 @@
 #ifndef METISGRAPH_HXX_
 #define METISGRAPH_HXX_
 
+#include "MEDSPLITTER.hxx"
+
 namespace MEDSPLITTER {
-class METISGraph:public Graph
+class MEDSPLITTER_EXPORT METISGraph:public Graph
 {
 public:
 	METISGraph();

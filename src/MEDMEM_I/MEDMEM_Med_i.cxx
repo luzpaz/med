@@ -157,22 +157,8 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 	         ::FIELD_ * myField = _med->getField(fieldsNames[i], myIteration[j].dt, myIteration[j].it);
 	         string meshName = myField->getSupport()->getMesh()->getName();
 	         medEntityMesh myEntity = myField->getSupport()->getEntity();
-	         map<string, map<MED_EN::medEntityMesh, SALOME_MED::SUPPORT_ptr> >::const_iterator 
-							     itSupportOnMesh = _supports.find(meshName);
-	         if ( itSupportOnMesh == _supports.end() )
-		      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-					 << "There is no support on mesh named |" 
-					 << meshName << "|" ));
-      		 const map<MED_EN::medEntityMesh, SALOME_MED::SUPPORT_ptr> & SupportOnMesh 
-					= (*itSupportOnMesh).second;
-                 map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr>::const_iterator itSupport 
-					= SupportOnMesh.find(myEntity);
-                 if (itSupport == SupportOnMesh.end())
-		      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-					 << "There is no support on entity "
-					 << entity << " in mesh named |" 
-					 << meshName << "|"));
-                 SALOME_MED::SUPPORT_ptr mySupportIOR = (*itSupport).second;
+                 SALOME_MED::SUPPORT_var mySupportIOR = getSupport( meshName, myEntity );
+
       		 med_type_champ type = myField->getValueType();
                  //medModeSwitch  mode = myField->getInterlacingType();
       		 SALOME_MED::FIELD_ptr myFieldIOR;
@@ -224,11 +210,24 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 //=============================================================================
 
 namespace {
-  bool isPublishedSupport(const MEDMEM::SUPPORT * support,
-                          SALOMEDS::Study_ptr     study)
+  bool isPublishedObject(SALOMEDS::Study_ptr study,
+                         string              entryPath)
   {
-    string entryPath = SUPPORT_i::getEntryPath( support );
-    return ! CORBA::is_nil( study->FindObjectByPath( entryPath.c_str() ));
+    SALOMEDS::SObject_var so = study->FindObjectByPath( entryPath.c_str() );
+    if ( !so->_is_nil() ) {
+      CORBA::String_var ior = so->GetIOR();
+      // for persistance: "published" means SObject exists but without IOR
+      bool published = ( strlen( ior ) == 0 );
+      return published;
+    }
+    return false;
+  }
+  bool isPublishedMesh(SALOMEDS::Study_ptr study,
+                       CORBA::String_var   meshName)
+  {
+    string entryPath("/Med/MEDMESH/");
+    entryPath += meshName;
+    return isPublishedObject( study, entryPath );
   }
 }
 
@@ -240,8 +239,7 @@ namespace {
 void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const string & fileName, bool persistence)
 {
   // if (persistence):
-  //    all meshes and fields contained in the file should be published,
-  //    only some supports maybe not
+  //    some objects can be not published
 
 	const char * LOC = "MED_i::initWithFieldType(driverTypes, const string &)";
 	BEGIN_OF(LOC);
@@ -271,7 +269,8 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 	    MESH_i * myMeshI = new MESH_i(myMesh);
 	    SALOME_MED::MESH_ptr myMeshIOR = myMeshI->_this();
 	    _meshes[meshesNames[i]]=myMeshIOR;
-	    myMeshI->addInStudy(myStudy,myMeshIOR);
+            if ( !persistence || isPublishedMesh(myStudy,myMeshI->getName() ))
+              myMeshI->addInStudy(myStudy,myMeshIOR);
 	}
 
   // SUPPORTS :
@@ -311,7 +310,8 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 			  FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
 			  SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->POA_SALOME_MED::FAMILY::_this();
                           if ( !persistence ||
-                               isPublishedSupport( (const MEDMEM::SUPPORT *)*familyVectorIt, myStudy ))
+                               isPublishedObject( myStudy, SUPPORT_i::getEntryPath
+                                                  ((const SUPPORT *)*familyVectorIt)))
                             myFamilyI->addInStudy(myStudy,myFamilyIOR);
       		     }
 
@@ -326,7 +326,8 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 			 GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
 			 SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->POA_SALOME_MED::GROUP::_this();
                          if ( !persistence ||
-                              isPublishedSupport( (const MEDMEM::SUPPORT *)*groupVectorIt, myStudy ))
+                              isPublishedObject( myStudy, SUPPORT_i::getEntryPath
+                                                 ((const SUPPORT *)*groupVectorIt)))
                            myGroupI->addInStudy(myStudy,myGroupIOR);
       		    }
                 }      
@@ -344,7 +345,8 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 	         SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this();
 	         mySupportsIOR[(*itSupport).first]= mySupportIOR;
                  if ( !persistence ||
-                      isPublishedSupport( itSupport->second, myStudy ))
+                      isPublishedObject( myStudy,
+                                         SUPPORT_i::getEntryPath (itSupport->second)))
                    mySupportI->addInStudy(myStudy,mySupportIOR);
 	    }
 	}
@@ -502,24 +504,11 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
 		  ::FIELD_ * myField = _med->getField(fieldsNames[i],dt,it);
 
+                  // check if corresponding support exists
 		  string meshName = myField->getSupport()->getMesh()->getName();
 		  medEntityMesh myEntity = myField->getSupport()->getEntity();
-		  map<string, map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> >::const_iterator 
-			itSupportOnMesh = _supports.find(meshName);
-		  if (itSupportOnMesh == _supports.end() )
-		  	throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-					 << "There is no support on mesh named |" 
-					 << meshName << "|"));
-		  const map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> & SupportOnMesh 
-				= (*itSupportOnMesh).second;
-		  map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr>::const_iterator itSupport
-				= SupportOnMesh.find(myEntity);
-		  if (itSupport == SupportOnMesh.end() )
-			throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-					 << "There is no support on entity "
-					 << entity << " in mesh named |" 
-					 << meshName << "|"));
-		  //SALOME_MED::SUPPORT_ptr mySupportIOR = (*itSupport).second;
+                  SALOME_MED::SUPPORT_var support = getSupport( meshName, myEntity );
+
 		  med_type_champ type = myField->getValueType();
                   medModeSwitch  mode = myField->getInterlacingType();
 
@@ -547,7 +536,9 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
                       MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str()
                               << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
-                      myFieldIntI->addInStudy(myStudy,myFieldIntIOR);
+                      if ( !persistence ||
+                           isPublishedObject( myStudy, myFieldIntI->getEntryPath() ))
+                        myFieldIntI->addInStudy(myStudy,myFieldIntIOR);
                       _fields[fieldsNames[i]][dtIt] = myFieldIntIOR;
                       break;
                     }
@@ -570,6 +561,8 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 			MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str()
                                 << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
+                      if ( !persistence ||
+                           isPublishedObject( myStudy, myFieldDoubleI->getEntryPath() ))
 			myFieldDoubleI->addInStudy(myStudy,myFieldDoubleIOR);
 			_fields[fieldsNames[i]][dtIt] = myFieldDoubleIOR;
 			break;
@@ -588,140 +581,40 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
 	     MESSAGE("Here we are i="<< i);
 	}
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// 	for (int i=0; i<numberOfMeshes; i++) 
-// 	  {
-// 	    string meshName = meshesNames[i];
-// 	    char * supportEntryPath;
-// 	    int lenName;
-// 	    string supportName;
-// 	    SALOMEDS::SObject_var supportEntry;
-
-// 	    supportName = "SupportOnAll_MED_MAILLE";
-// 	    lenName = 13 + 15 + strlen(meshName.c_str()) + 1 + strlen(supportName.c_str());
-// 	    supportEntryPath = new char[lenName];
-// 	    supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/");
-// 	    supportEntryPath = strcat(supportEntryPath,"MEDSUPPORTS_OF_");
-// 	    supportEntryPath = strcat(supportEntryPath,meshName.c_str());
-// 	    supportEntryPath = strcat(supportEntryPath,"/");
-// 	    supportEntryPath = strcat(supportEntryPath,supportName.c_str());
-
-// 	    SCRUTE(supportEntryPath);
-
-// 	    cout << "supportEntryPath in Med " << supportEntryPath << " length " << lenName << endl;
-
-// 	    supportEntry = myStudy->FindObjectByPath(supportEntryPath);
-
-// 	    if ( CORBA::is_nil(supportEntry) ) 
-// 	      cout << "The reuse in Med is OK " << endl;
-// 	    else 
-// 	      cout << "the reuse in Med is not OK and there was a problem in the storage in the study" << endl;
-// 	    delete [] supportEntryPath;
-
-
-
-// 	    supportName = "SupportOnAll_MED_FACE";
-// 	    lenName = 13 + 15 + strlen(meshName.c_str()) + 1 + strlen(supportName.c_str());
-// 	    supportEntryPath = new char[lenName];
-// 	    supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/");
-// 	    supportEntryPath = strcat(supportEntryPath,"MEDSUPPORTS_OF_");
-// 	    supportEntryPath = strcat(supportEntryPath,meshName.c_str());
-// 	    supportEntryPath = strcat(supportEntryPath,"/");
-// 	    supportEntryPath = strcat(supportEntryPath,supportName.c_str());
-
-// 	    SCRUTE(supportEntryPath);
-
-// 	    cout << "supportEntryPath in Med " << supportEntryPath << " length " << lenName << endl;
-
-// 	    supportEntry = myStudy->FindObjectByPath(supportEntryPath);
-
-// 	    if ( CORBA::is_nil(supportEntry) ) 
-// 	      cout << "The reuse in Med is OK " << endl;
-// 	    else 
-// 	      cout << "the reuse in Med is not OK and there was a problem in the storage in the study" << endl;
-// 	    delete [] supportEntryPath;
-
-
-
-// 	    supportName = "SupportOnAll_MED_ARETE";
-// 	    lenName = 13 + 15 + strlen(meshName.c_str()) + 1 + strlen(supportName.c_str());
-// 	    supportEntryPath = new char[lenName];
-// 	    supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/");
-// 	    supportEntryPath = strcat(supportEntryPath,"MEDSUPPORTS_OF_");
-// 	    supportEntryPath = strcat(supportEntryPath,meshName.c_str());
-// 	    supportEntryPath = strcat(supportEntryPath,"/");
-// 	    supportEntryPath = strcat(supportEntryPath,supportName.c_str());
-
-// 	    SCRUTE(supportEntryPath);
-
-// 	    cout << "supportEntryPath in Med " << supportEntryPath << " length " << lenName << endl;
-
-// 	    supportEntry = myStudy->FindObjectByPath(supportEntryPath);
-
-// 	    if ( CORBA::is_nil(supportEntry) ) 
-// 	      cout << "The reuse in Med is OK " << endl;
-// 	    else 
-// 	      cout << "the reuse in Med is not OK and there was a problem in the storage in the study" << endl;
-// 	    delete [] supportEntryPath;
-
-
-
-
-// 	    supportName = "SupportOnAll_MED_NOEUD";
-// 	    lenName = 13 + 15 + strlen(meshName.c_str()) + 1 + strlen(supportName.c_str());
-// 	    supportEntryPath = new char[lenName];
-// 	    supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/");
-// 	    supportEntryPath = strcat(supportEntryPath,"MEDSUPPORTS_OF_");
-// 	    supportEntryPath = strcat(supportEntryPath,meshName.c_str());
-// 	    supportEntryPath = strcat(supportEntryPath,"/");
-// 	    supportEntryPath = strcat(supportEntryPath,supportName.c_str());
-
-// 	    SCRUTE(supportEntryPath);
-
-// 	    cout << "supportEntryPath in Med " << supportEntryPath << " length " << lenName << endl;
-
-// 	    supportEntry = myStudy->FindObjectByPath(supportEntryPath);
-
-// 	    if ( CORBA::is_nil(supportEntry) ) 
-// 	      cout << "The reuse in Med is OK " << endl;
-// 	    else 
-// 	      cout << "the reuse in Med is not OK and there was a problem in the storage in the study" << endl;
-// 	    delete [] supportEntryPath;
-
-
-
-
-// 	  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	END_OF(LOC);
+}
+
+//================================================================================
+/*!
+ * \brief Return support
+  * \param meshName - name of the mesh the suppotr belongs to
+  * \param entity - support entity
+  * \retval SALOME_MED::SUPPORT_ptr - found support
+ * 
+ * Raises if support not found
+ */
+//================================================================================
+
+SALOME_MED::SUPPORT_ptr MED_i::getSupport(string                meshName,
+                                          MED_EN::medEntityMesh entity)
+  throw (SALOME::SALOME_Exception)
+{
+  map<string, map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> >::const_iterator 
+    itSupportOnMesh = _supports.find(meshName);
+  if (itSupportOnMesh == _supports.end() )
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+                                     << "There is no support on mesh named |" 
+                                     << meshName << "|"));
+  const map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> & SupportOnMesh 
+    = (*itSupportOnMesh).second;
+  map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr>::const_iterator itSupport
+    = SupportOnMesh.find(entity);
+  if (itSupport == SupportOnMesh.end() )
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+                                     << "There is no support on entity "
+                                     << entity << " in mesh named |" 
+                                     << meshName << "|"));
+  return SALOME_MED::SUPPORT::_duplicate( itSupport->second );
 }
 
 //=============================================================================
@@ -732,6 +625,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 MED_i::~MED_i()
 {
 }
+
 //=============================================================================
 /*!
  * CORBA: Accessor for Number of meshes
@@ -874,7 +768,7 @@ throw (SALOME::SALOME_Exception)
         int ind=fieldPtr->getCorbaIndex();
         SCRUTE(ind);
 
-	MESH * mesh;
+	MESH * mesh = 0;
 	SALOME_MED::FIELDINT_var fieldint =SALOME_MED::FIELDINT::_narrow(fieldPtr);
         if (CORBA::is_nil(fieldint))
         {
@@ -1234,10 +1128,10 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
         ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance();
         ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting());
         CORBA::ORB_var &orb = init(0,0);
-        string iorStr = orb->object_to_string(myIor);
+        CORBA::String_var iorStr = orb->object_to_string(myIor);
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
-        aIOR->SetValue(iorStr.c_str());
+        aIOR->SetValue(iorStr.in());
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
         aName = SALOMEDS::AttributeName::_narrow(anAttr);
         aName->SetValue("Objet MED");
@@ -1254,6 +1148,9 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 //=============================================================================
 /*!
  * CORBA: Add Med object in Study with a name medObjName
+ *
+ * FOR PERSISTANCE: if fileName is NULL string, looks for a SObject with a
+ * suitable name and bad IOR and update the IOR
  */
 //=============================================================================
 void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
@@ -1282,36 +1179,69 @@ void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
 				       SALOME::BAD_PARAM);
         };
 
-        MESSAGE("Add a MED Object under Med");
+        SALOMEDS::SObject_var medObj;
+        if ( ! fileName )
+        {
+          //  FOR PERSISTANCE: if fileName is a NULL string,
+          //  looks for a SObject with a suitable name and
+          //  bad IOR and update the IOR
+          SALOMEDS::ChildIterator_var anIter = myStudy->NewChildIterator( medfather );
+          for ( ; anIter->More(); anIter->Next()) {
+            SALOMEDS::SObject_var obj = anIter->Value();
+            // check name
+            CORBA::String_var name = obj->GetName();
+            const char* suitableName1 = "MED_OBJECT_FROM_FILE_";
+            const char* suitableName2 = "Objet MED";
+            if ( strncmp( name, suitableName1, strlen(suitableName1)) == 0 || 
+                 strcmp( name, suitableName2 ) == 0 ) {
+              // check IOR
+              CORBA::String_var ior = obj->GetIOR();
+              if ( strlen( ior ) == 0 ) {
+                medObj = obj;
+                break;
+              }
+            }
+          }
+          if ( medObj->_is_nil() )
+            return; // nothing looking like MED found in the study
+        }
+        else
+        {
+          MESSAGE("Add a MED Object under Med");
 
-	char * medObjName;
-	string::size_type pos1=string(fileName).rfind('/');
-	string::size_type lenFileName = strlen(fileName);
-	string fileNameShort = string(fileName,pos1+1,lenFileName-pos1-1);
+          char * medObjName;
+          string::size_type pos1=string(fileName).rfind('/');
+          string::size_type lenFileName = strlen(fileName);
+          string fileNameShort = string(fileName,pos1+1,lenFileName-pos1-1);
 
-	SCRUTE(fileNameShort);
+          SCRUTE(fileNameShort);
 
-	int lenName = 21 + strlen(fileNameShort.c_str()) + 1;
-	medObjName = new char[lenName];
-	medObjName = strcpy(medObjName,"MED_OBJECT_FROM_FILE_");
-	medObjName = strcat(medObjName,fileNameShort.c_str());
+          int lenName = 21 + strlen(fileNameShort.c_str()) + 1;
+          medObjName = new char[lenName];
+          medObjName = strcpy(medObjName,"MED_OBJECT_FROM_FILE_");
+          medObjName = strcat(medObjName,fileNameShort.c_str());
 
-        SALOMEDS::SObject_var newObj = myBuilder->NewObject(medfather);
+          string path = string("/Med/") + medObjName;
+          medObj = myStudy->FindObjectByPath(path.c_str());
+          if ( medObj->_is_nil() )
+            medObj = myBuilder->NewObject(medfather);
 
+          anAttr = myBuilder->FindOrCreateAttribute(medObj, "AttributeName");
+          aName = SALOMEDS::AttributeName::_narrow(anAttr);
+          aName->SetValue(medObjName);
+
+          delete [] medObjName;
+        }
         ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance();
         ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting());
         CORBA::ORB_var &orb = init(0,0);
         string iorStr = orb->object_to_string(myIor);
-        anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
+        anAttr = myBuilder->FindOrCreateAttribute(medObj, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
         aIOR->SetValue(iorStr.c_str());
-        anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
-        aName = SALOMEDS::AttributeName::_narrow(anAttr);
-        aName->SetValue(medObjName);
-        _medId = newObj->GetID();
-        myBuilder->CommitCommand();
 
-	delete [] medObjName;
+        _medId = medObj->GetID();
+        myBuilder->CommitCommand();
 
 // 	char * medObjName1;
 // 	lenName = 26 + strlen(fileNameShort.c_str());

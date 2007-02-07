@@ -20,13 +20,15 @@
 # ifndef __MEDSKYLINEARRAY_H__
 # define __MEDSKYLINEARRAY_H__
 
+#include "MEDMEM.hxx"
+
 #include "MEDMEM_Exception.hxx"
 
 #include "MEDMEM_PointerOf.hxx"
 #include "MEDMEM_define.hxx"
 
 namespace MEDMEM {
-class MEDSKYLINEARRAY
+class MEDMEM_EXPORT MEDSKYLINEARRAY
 {
 private :
   int   _count ;

@@ -19,6 +19,8 @@
 #ifndef MEDMEM_ARRAY_HXX
 #define MEDMEM_ARRAY_HXX
 
+#include "MEDMEM.hxx"
+
 #include "MEDMEM_InterlacingPolicy.hxx"
 #include "MEDMEM_IndexCheckingPolicy.hxx"
 
@@ -27,7 +29,7 @@
 
 namespace MEDMEM {
 
-class MEDMEM_Array_ {
+class MEDMEM_EXPORT MEDMEM_Array_ {
 public:
   //virtual void dummy() {};
   virtual bool getGaussPresence() const { return false; }

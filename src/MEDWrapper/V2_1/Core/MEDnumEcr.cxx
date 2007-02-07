@@ -86,7 +86,7 @@ MEDnumEcr(med_idt fid,char *maa, med_int *num, med_int n, med_mode_acces mode,
    else
      root = geoid;
    dimd[0] = n;
-#if defined(IRIX64)||defined(OSF1)
+#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
    if ((ret = _MEDdatasetNumEcrire(root,MED_NOM_NUM,MED_INT64,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
 				(unsigned char*) num,mode)) < 0)
      return -1;

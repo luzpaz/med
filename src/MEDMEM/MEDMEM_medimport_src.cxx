@@ -40,6 +40,7 @@
 using namespace med_2_2;
 using namespace MEDMEM;
 
+namespace med_2_2 {
 extern "C" {
   extern med_err MEDgaussInfo(med_idt fid, int indice, char * locname,
 			      med_geometrie_element * type_geo,
@@ -49,6 +50,7 @@ extern "C" {
 
   extern med_err _MEDnomGeometrie(char *nom_geo,
 				  med_geometrie_element type_geo);
+}
 }
 
 med_err med_2_2::OLD_MEDattrNumLire(med_idt pere, med_type_champ type,
@@ -65,7 +67,7 @@ med_err med_2_2::OLD_MEDattrNumLire(med_idt pere, med_type_champ type,
   switch(type) 
     {
     case MED_FLOAT64 :
-#if defined(PCLINUX) || defined(OSF1)
+#if defined(PCLINUX) || defined(PCLINUX64) || defined(PCLINUX64_32) || defined(OSF1)
 /*       type_hdf = H5T_IEEE_F64BE; */
       if (H5Tequal(hdf_file,H5T_IEEE_F64BE))
 	type_hdf = H5T_IEEE_F64LE;
@@ -81,7 +83,7 @@ med_err med_2_2::OLD_MEDattrNumLire(med_idt pere, med_type_champ type,
       break;
       
     case MED_INT :
-#if defined(IRIX64) || defined(OSF1)
+#if defined(IRIX64) || defined(OSF1) || defined(PCLINUX64)
       type_hdf = H5T_NATIVE_LONG; 
 #else
       type_hdf = H5T_NATIVE_INT;
@@ -140,7 +142,7 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 	 the file read under SGI is incorrect
 	 2) Compaq OSF/1 is LE, since we force SGI64,SUN4SOL2,HP to write double in LE even if they are BE, mips OSF/1 must be BE
 	 REM  : Be careful of compatibility between MED files when changing this (med2.2)                    */
-#if defined(PCLINUX) || defined(OSF1)
+#if defined(PCLINUX) || defined(PCLINUX64) || defined(PCLINUX64_32) || defined(OSF1)
 /*       type_hdf = H5T_IEEE_F64BE; */
       if (H5Tequal(hdf_file,H5T_IEEE_F64BE))
 	type_hdf = H5T_IEEE_F64LE;
@@ -188,13 +190,13 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
       /*Initialisation des indices de boucle du traitement de l'entrelacement en fonction de la dimension fixee*/
       if ( fixdim != MED_ALL) 
 	{ 
-	  firstdim = fixdim-1;
-	  lastdim  = fixdim;
+	  firstdim = (int)fixdim-1;
+	  lastdim  = (int)fixdim;
 	  dimutil  = 1;
 	} else	{
 	  firstdim = 0;
-	  lastdim = nbdim;
-	  dimutil  = nbdim; 
+	  lastdim = (int)nbdim;
+	  dimutil  = (int)nbdim; 
 	}
 
       count [0] = (*size)/(nbdim);
@@ -251,7 +253,7 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 	      
 	      for (i=0; i < psize; i++)              /* i balaye les élements du profil */
 		for (j=0; j < ngauss; j++) {         
-		  index = i*ngauss+j + (dim-firstdim)*(psize*ngauss);
+		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
 		  pflmem[index] = (pfltab[i]-1)*ngauss*nbdim + j*nbdim+dim;
 		  pfldsk[index] = dim*count[0] + (pfltab[i]-1)*ngauss+j;	     
 		}
@@ -285,7 +287,7 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 	      
 	      for (i=0; i < psize; i++)              /* i balaye les élements du profil */
 		for (j=0; j < ngauss; j++) {         
-		  index = i*ngauss+j + (dim-firstdim)*(psize*ngauss);
+		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
 		  pflmem[index] = i*ngauss*nbdim + j*nbdim+dim;
 		  pfldsk[index] = dim*count[0] + (pfltab[i]-1)*ngauss+j;	     
 		}	      
@@ -347,13 +349,13 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 
 	if ( fixdim != MED_ALL) 
 	  { 
-	    firstdim = fixdim-1;
-	    lastdim  = fixdim;
+	    firstdim = (int)fixdim-1;
+	    lastdim  = (int)fixdim;
 	    dimutil  = 1;
 	  } else	{
 	    firstdim = 0;
-	    lastdim  = nbdim;
-	    dimutil  = nbdim; 
+	    lastdim  = (int)nbdim;
+	    dimutil  = (int)nbdim; 
 	  }
 
 	pflsize [0] = psize*ngauss*nbdim;	
@@ -372,7 +374,7 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 	      
 	      for (i=0; i < psize; i++)              /* i balaye le nbre d'élements du profil                */
 		for (j=0; j < ngauss; j++) { 
-		  index = i*ngauss+j + (dim-firstdim)*(psize*ngauss);
+		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
 		  pfldsk[index] = dim*count[0]+(pfltab[i]-1)*ngauss+j;	    
 		}
 	    }
@@ -411,7 +413,7 @@ med_err med_2_2::OLD_MEDdatasetNumLire(med_idt pere, char *nom,
 	      
 	      for (i=0; i < psize; i++)              /* i balaye le nbre d'élements du profil                */
 		for (j=0; j < ngauss; j++) {
-		  index = i*ngauss+j + (dim-firstdim)*(psize*ngauss);
+		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
 	          pflmem[index] = dim*(psize*ngauss) + (pfltab[i]-1)*ngauss+j;
 		  pfldsk[index] = dim*count[0]  + (pfltab[i]-1)*ngauss+j;	    
 		}
@@ -551,12 +553,10 @@ void med_2_2::MAJ_noeuds_maillage(med_idt mid, med_int dimension)
   med_idt nid, gid, tid;
   med_float *coo;
   char *nom, *unit;
-  char tmp[MED_TAILLE_PNOM+1];
   char *nouvelle_chaine;
   med_int n;
   med_size dimd[1];
   med_err ret;
-  int i;
   hid_t hdf_type;
   med_repere repere;
 
@@ -609,7 +609,7 @@ void med_2_2::MAJ_noeuds_maillage(med_idt mid, med_int dimension)
   /*   printf("EGALITE des types : %d \n",H5Tequal(hdf_type,H5T_NATIVE_DOUBLE)); */
   /*   printf("Avant conversion : [%f] [%f] [%f] \n",*(coo),*(coo+1),*(coo+2)); */
   if (! H5Tequal(hdf_type,H5T_NATIVE_DOUBLE)) {
-    ret = H5Tconvert(hdf_type,H5T_NATIVE_DOUBLE,(hsize_t)*dimd,(void *)coo,NULL,0);
+    ret = H5Tconvert(hdf_type,H5T_NATIVE_DOUBLE,(size_t)*dimd,(void *)coo,NULL,0);
     /*   printf("Après conversion éventuelle : [%f] [%f] [%f] \n",*(coo),*(coo+1),*(coo+2)); */
 
 //     EXIT_IF(ret < 0,"Conversion des coordonnées des noeuds",NULL);
@@ -866,7 +866,7 @@ void med_2_2::MAJ_elements_maillage(med_idt mid, med_int dimension)
       if(old_conn == NULL)
 	throw MEDEXCEPTION("Problem in the med File convertor 2.1 to 2.2, you should check the med File you wanted to mount in memory");
 
-#if defined(IRIX64)||defined(OSF1)
+#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
       ret = OLD_MEDdatasetNumLire(gid,MED_NOM_NOD,MED_INT64,
 				  MED_NO_INTERLACE,(med_size)taille,MED_ALL,
 				  0,NULL,MED_NOPG,
@@ -889,7 +889,7 @@ void med_2_2::MAJ_elements_maillage(med_idt mid, med_int dimension)
       for (j=0;j<n*taille;j++)
 	*(conn+j) = *(old_conn+j);
       dimd[0] = n*taille;
-#if defined(IRIX64)||defined(OSF1)
+#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
       ret = _MEDdatasetNumEcrire(gid,"TMP",MED_INT64,MED_NO_INTERLACE,
 				 taille,MED_ALL,MED_NOPF,MED_NO_PFLMOD,0,MED_NOPG,dimd,
 				 (unsigned char*) conn);
@@ -1001,12 +1001,9 @@ void med_2_2::MAJ_elements_maillage(med_idt mid, med_int dimension)
 void med_2_2::MAJ_familles_maillage(med_idt mid) throw (MEDEXCEPTION)
 {
   med_idt fid, gid;
-  char *nouvelle_chaine;
   int n;
-  med_size dimd[1];
   med_err ret;
   int i;
-  char chemin[MED_TAILLE_FAS+2*MED_TAILLE_NOM+1];
   char nom[MED_TAILLE_NOM+1];
   char *noeuds, *elements;
   int nnoeuds = 0;
@@ -1018,7 +1015,6 @@ void med_2_2::MAJ_familles_maillage(med_idt mid) throw (MEDEXCEPTION)
   char famille0[MED_TAILLE_NOM+1];
   int *index_noeuds, *index_elements;
   char stockage[MED_TAILLE_DESC];
-  med_float *valr;
 
   /* Combien de famille ? */
   fid = _MEDdatagroupOuvrir(mid,"FAS");
@@ -1635,7 +1631,7 @@ void med_2_2::MAJ_champs(med_idt fid) throw (MEDEXCEPTION)
 	/* 	printf("EGALITE des types : %d \n",H5Tequal(hdf_type,H5T_NATIVE_DOUBLE)); */
 	/* 	printf("Avant conversion : [%f]\n",pdt); */
 	if (! H5Tequal(hdf_type,H5T_NATIVE_DOUBLE)) {
-	  ret = H5Tconvert(hdf_type,H5T_NATIVE_DOUBLE,(hsize_t)*dimd,(void *)(&pdt),NULL,0);
+	  ret = H5Tconvert(hdf_type,H5T_NATIVE_DOUBLE,(size_t)*dimd,(void *)(&pdt),NULL,0);
 	  /* 	printf("Après conversion éventuelle : [%f] \n",pdt); */
 
 // 	  EXIT_IF(ret < 0,"Conversion du pas de temps",NULL);
@@ -1837,7 +1833,7 @@ void med_2_2::MAJ_champs(med_idt fid) throw (MEDEXCEPTION)
 
 	  H5Gunlink(pid,MED_NOM_CO);
 	  dimd[0] = ncomp*nval;
-	  ret = H5Tconvert(hdf_type,H5T_NATIVE_DOUBLE,(hsize_t)*dimd,(void *)valr,NULL,0);
+	  ret = H5Tconvert(hdf_type,H5T_NATIVE_DOUBLE,(size_t)*dimd,(void *)valr,NULL,0);
 
 // 	  EXIT_IF(ret < 0,"Conversion des valeurs",NULL);
 
@@ -2087,7 +2083,11 @@ char * MEDMEM::med2_1_To_med2_2(char * fileNameIn) throw (MEDEXCEPTION)
   /* Creation et ouverture du fichier que l'on va convertire au format MED V2.2 */
 /*   commande = (char *) malloc(sizeof(char)*(strlen("cp ")+2*strlen(argv[1])+strlen(" ")+strlen("2.2")+1)); */
 
+#ifndef WNT
   commande = (char *) malloc(sizeof(char)*(strlen("cp -f ") +
+#else
+  commande = (char *) malloc(sizeof(char)*(strlen("copy /Y ") +
+#endif
 					   strlen(fileNameIn) + strlen(" ") +
 					   strlen(InternalFileNameOut) + 
 					   strlen(" ; chmod ug+rw ") +
@@ -2113,7 +2113,11 @@ char * MEDMEM::med2_1_To_med2_2(char * fileNameIn) throw (MEDEXCEPTION)
 
 //   strcat(fileNameOut,"2.2");
 
+#ifndef WNT
   strcpy(commande,"cp -f ");
+#else
+  strcpy(commande,"copy /Y ");
+#endif
 /*   strcat(commande,argv[1]); */
 
   strcat(commande,fileNameIn);
@@ -2158,7 +2162,7 @@ char * MEDMEM::med2_1_To_med2_2(char * fileNameIn) throw (MEDEXCEPTION)
   MESSAGE("med File convertor 2.1 to 2.2 :: Running the convertor fromV 2.1 to V2.2");
 
   /* On inhibe le gestionnaire d'erreur HDF5 */
-  _MEDmodeErreurVerrouiller();  
+  ::_MEDmodeErreurVerrouiller();  
 
   /* Mise a jour du numero de version */
 

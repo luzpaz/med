@@ -47,7 +47,8 @@ MEDSPLITTER_Graph.hxx\
 MEDSPLITTER_METISGraph.hxx\
 MEDSPLITTER_SCOTCHGraph.hxx\
 MEDSPLITTER_UserGraph.hxx\
-MEDSPLITTER_API.hxx
+MEDSPLITTER_API.hxx \
+MEDSPLITTER.hxx
 
 # Libraries targets
 

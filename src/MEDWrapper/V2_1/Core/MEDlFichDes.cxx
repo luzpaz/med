@@ -68,12 +68,12 @@ MEDlFichDes(med_idt fid)
     return -1;
   }
   
-  longueur = strlen(des);
+  longueur = (med_int)strlen(des);
 
   /*
    * fermetures 
    */
-  if ((ret == _MEDdatagroupFermer(root)) < 0)
+  if ((ret = _MEDdatagroupFermer(root)) < 0)
     return -1;
 
   return longueur;

@@ -159,17 +159,7 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
   if (_ptrMesh->getIsAGrid())
     {
       getGRID( );
-
-      // always call getFAMILY : families are requiered !!!!
-
-//        int nbFam = MEDnFam(_medIdt,
-//  			  const_cast <char *> (_meshName.c_str()),
-//  			  0,
-//  			  med_2_1::MED_FAMILLE);
-//        if (nbFam > 0)
 	{
-// 	  getFAMILY();
-    
 	  if (getFAMILY()!=MED_VALID)
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY when the mesh is a grid")) ;
 
@@ -179,6 +169,27 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
       END_OF(LOC);
       return;
     }
+  else // check that the mesh is really unstructured (PAL14113)
+  {
+    char                  meshName[MED_TAILLE_NOM+1]="";
+    char                  meshDescription[MED_TAILLE_DESC+1]="";
+    med_2_2::med_int      meshDim;
+    med_2_2::med_maillage meshType;
+    int numberOfMeshes = med_2_2::MEDnMaa(_medIdt);
+    for (int i=1;i<=numberOfMeshes;i++)
+    {
+      MEDmaaInfo(_medIdt, i ,meshName, &meshDim, &meshType, meshDescription);
+      if (_meshName == string(meshName)) {
+        if ( meshType == med_2_2::MED_STRUCTURE ) {
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
+                                       "class GRID must be used for a structured mesh"));
+        }
+        else {
+          break;
+        }
+      }
+    }
+  }
 
   if (getCOORDINATE()!=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getCOORDINATE"  )) ;
@@ -519,7 +530,7 @@ int  MED_MESH_RDONLY_DRIVER21::getCOORDINATE()
         // INFOS(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
 	MESSAGE(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : Nodes have numbers, we DO TAKE care of them !");
 	_ptrMesh->_coordinate->_nodeNumber.set(NumberOfNodes) ; 
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	for(med_2_1::med_int i2=0;i2<NumberOfNodes;i2++)
 	  _ptrMesh->_coordinate->_nodeNumber[i2]=(int)(tmp_node_number[i2]);
 #else
@@ -1290,7 +1301,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 	// node 
 	int NumberOfNodes =  _ptrMesh->getNumberOfNodes() ;
 	MEDArrayNodeFamily = new int[ NumberOfNodes ];
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	med_2_1::med_int* MEDArrayNodeFamily2 = new med_2_1::med_int[ NumberOfNodes ];
 	err = med_2_1::MEDfamGridLire (_medIdt,
 				      const_cast <char *> (_ptrMesh->_name.c_str()),
@@ -1329,11 +1340,11 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 
     for (int i=0;i<NumberOfFamilies;i++) {
       
-      med_2_1::med_int NumberOfAttributes = MEDnFam(_medIdt,const_cast <char *> (_meshName.c_str()),i+1,med_2_1::MED_ATTR) ;
+      med_2_1::med_int NumberOfAttributes = med_2_1::MEDnFam(_medIdt,const_cast <char *> (_meshName.c_str()),i+1,med_2_1::MED_ATTR) ;
       if (NumberOfAttributes < 0) 
 	throw MEDEXCEPTION("MED_MESH_RDONLY_DRIVER21::getFAMILY() : NumberOfAttributes" );
     
-      med_2_1::med_int NumberOfGroups = MEDnFam(_medIdt,const_cast <char *> (_meshName.c_str()),i+1,med_2_1::MED_GROUPE) ;
+      med_2_1::med_int NumberOfGroups = med_2_1::MEDnFam(_medIdt,const_cast <char *> (_meshName.c_str()),i+1,med_2_1::MED_GROUPE) ;
       if (NumberOfGroups < 0)
 	throw MEDEXCEPTION("MED_MESH_RDONLY_DRIVER21::getFAMILY() : NumberOfGroups" );
       
@@ -1343,7 +1354,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
       int *  AttributesValues     = new int[NumberOfAttributes] ;
       string AttributesDescription(MED_TAILLE_DESC*NumberOfAttributes,' ') ;
       string GroupsNames(MED_TAILLE_LNOM*NumberOfGroups+1,'\0') ;
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       med_2_1::med_int tmp_NumberOfAttributes=NumberOfAttributes;
       med_2_1::med_int *  AttributesIdentifier2 = new med_2_1::med_int[NumberOfAttributes] ;
       med_2_1::med_int *  AttributesValues2     = new med_2_1::med_int[NumberOfAttributes] ;
@@ -1460,7 +1471,7 @@ int  MED_MESH_RDONLY_DRIVER21::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
   BEGIN_OF(LOC);
   if (_status==MED_OPENED) {
     int err = 0 ;
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
     int lgth=_ptrMesh->getNumberOfNodes();
     med_2_1::med_int *temp=new med_2_1::med_int[lgth];
     err = MEDfamLire(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())), 
@@ -1498,7 +1509,7 @@ int  MED_MESH_RDONLY_DRIVER21::getCellsFamiliesNumber(int **MEDArrayFamily,
     int i, err = 0 ;
     for (i=0;i<Connectivity->_numberOfTypes;i++)	{
       int NumberOfCell = Connectivity->_count[i+1]-Connectivity->_count[i] ;
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       const medGeometryElement * myTypes = _ptrMesh->getTypes(entity);
       int lgthI=_ptrMesh->getNumberOfElements(entity,myTypes[i]);
       med_2_1::med_int *temp=new med_2_1::med_int[lgthI];
@@ -1519,7 +1530,7 @@ int  MED_MESH_RDONLY_DRIVER21::getCellsFamiliesNumber(int **MEDArrayFamily,
       // provisoire : si les faces ou les aretes sont des mailles !!!
       if (err != MED_VALID) {
 	MESSAGE(LOC<<"search face/edge family on cell !!!");
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	int lgthI=_ptrMesh->getNumberOfElements(entity,myTypes[i]);
 	med_2_1::med_int *temp=new med_2_1::med_int[lgthI];
 	err=MEDfamLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
@@ -1883,7 +1894,7 @@ int MED_MESH_WRONLY_DRIVER21::writeCoordinates() const {
 
 
       if (_ptrMesh->_arePresentOptionnalNodesNumbers==1) {
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	int lgth=_ptrMesh->_coordinate->getNumberOfNodes();
 	med_2_1::med_int *temp=new med_2_1::med_int[lgth];
 	for(int i2=0;i2<lgth;i2++)
@@ -1984,7 +1995,7 @@ int MED_MESH_WRONLY_DRIVER21::writeConnectivities(medEntityMesh entity) const {
 // 		}
 
       //////////////////////////////////////////////////////////////////////////////////////
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       int lgth=numberOfElements*(numberOfNodes+multi);
       med_2_1::med_int *temp=new med_2_1::med_int[lgth];
       for(int i2=0;i2<lgth;i2++)
@@ -2021,7 +2032,7 @@ int MED_MESH_WRONLY_DRIVER21::writeConnectivities(medEntityMesh entity) const {
       const int * connectivity = _ptrMesh->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_DESCENDING, entity, types[i]); 
       
       // Pour l'instant la class utilise le multi.....
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       int lgth=_ptrMesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE, MED_DESCENDING, entity, types[i]);
       med_2_1::med_int *temp=new med_2_1::med_int[lgth];
       for(int i2=0;i2<lgth;i2++)
@@ -2113,7 +2124,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
       SCRUTE(MEDArrayNodeFamily[j]);
     }
     if ( !_ptrMesh->getIsAGrid() ){
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       int lgth=NumberOfNodes;
       med_2_1::med_int *temp=new med_2_1::med_int[lgth];
       for(int i2=0;i2<lgth;i2++)
@@ -2131,7 +2142,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
 #endif
     }
     else{
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       int lgth=NumberOfNodes;
       med_2_1::med_int *temp=new med_2_1::med_int[lgth];
       for(int i2=0;i2<lgth;i2++)
@@ -2207,14 +2218,14 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
       }
 
       const int * typeCount = _ptrMesh->getGlobalNumberingIndex(entity) ;
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	int lgth=NumberOfElements;
 	med_2_1::med_int *temp=new med_2_1::med_int[lgth];
 	for(int i2=0;i2<lgth;i2++)
 	  temp[i2]=(med_2_1::med_int) (MEDArrayFamily[i2]);
 #endif
       for (int i=0; i<numberOfTypes; i++) {
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
 			temp+typeCount[i]-1,typeCount[i+1]-typeCount[i],
 			med_2_1::MED_REMP ,
@@ -2235,7 +2246,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
 				       << "| cells of geometric type |" << geoNames[ types[i]] <<"|in mesh |"      
 				       << _ptrMesh->_name.c_str() << "|" ));   
       }
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       delete [] temp;
 #endif
       delete[] MEDArrayFamily ;
@@ -2293,7 +2304,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
       }
 
       const int * typeCount = _ptrMesh->getGlobalNumberingIndex(entity) ;
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	int lgth=numberOfElements;
 	med_2_1::med_int *temp=new med_2_1::med_int[lgth];
 	for(int i2=0;i2<lgth;i2++)
@@ -2302,7 +2313,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
       for (int i=0; i<numberOfTypes; i++) {
 
 	int typeNumberOfElements = typeCount[i+1] - typeCount[i] ;
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
 			temp+typeCount[i]-1, typeNumberOfElements,
 			med_2_1::MED_REMP ,
@@ -2320,7 +2331,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
 				       << "| faces of geometric type |" << geoNames[types[i]] <<"|in mesh |"      
 				       << _ptrMesh->_name.c_str() << "|" ));   
       }
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       delete [] temp;
 #endif
       delete[] familyArray ;
@@ -2378,7 +2389,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
       }
 
       const int * typeCount = _ptrMesh->getGlobalNumberingIndex(entity) ;
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	int lgth=numberOfElements;
 	med_2_1::med_int *temp=new med_2_1::med_int[lgth];
 	for(int i2=0;i2<lgth;i2++)
@@ -2387,7 +2398,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
       for (int i=0; i<numberOfTypes; i++) {
 
 	int typeNumberOfElements = typeCount[i+1] - typeCount[i] ;
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
 			temp+typeCount[i]-1, typeNumberOfElements,
 			med_2_1::MED_REMP ,
@@ -2405,7 +2416,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
 				       << "| edges of geometric type |" << geoNames[types[i]] <<"|in mesh |"      
 				       << _ptrMesh->_name.c_str() << "|" ));   
       }
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       delete [] temp;
 #endif
       delete[] familyArray ;
@@ -2491,7 +2502,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
       MESSAGE(LOC<<"attributesDescriptions.c_str() : "<<attributesDescriptions.c_str());
       MESSAGE(LOC<<"numberOfGroups : "<<numberOfGroups);
       MESSAGE(LOC<<"groupsNames.c_str() : "<<groupsNames.c_str());
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       int lgth=families[i]->getNumberOfAttributes();
       med_2_1::med_int *  AttributesIdentifier2 = new med_2_1::med_int[lgth] ;
       med_2_1::med_int *  AttributesValues2     = new med_2_1::med_int[lgth] ;

@@ -1,6 +1,10 @@
 #include <vector>
 #include <string>
-#include <ext/hash_map>
+#ifndef WNT
+# include <ext/hash_map>
+#else
+# include <hash_map>
+#endif
 #include <set>
 
 
@@ -36,7 +40,13 @@
 #include "MEDSPLITTER_MESHCollectionDriver.hxx"
 
 using namespace MEDSPLITTER;
+
+#ifndef WNT
 using namespace __gnu_cxx;
+#else
+using namespace std;
+#endif
+
 //template inclusion
 #include "MEDSPLITTER_MESHCollection.H"
 #include "MEDSPLITTER_MESHCollectionDriver.H"

@@ -39,17 +39,17 @@ namespace MED
   typedef TVector<char> TString; 
 
   //! Extract a substring from the sequence of the strings
-  std::string GetString(TInt theId, TInt theStep, 
+  MEDWRAPPER_EXPORT std::string GetString(TInt theId, TInt theStep, 
 			const TString& theString);
 
   //! Set a substring in the sequence of the strings
-  void SetString(TInt theId, TInt theStep, 
+  MEDWRAPPER_EXPORT void SetString(TInt theId, TInt theStep, 
 		 TString& theString, 
 		 const std::string& theValue);
 
   //---------------------------------------------------------------
   //! Define a parent class for all MEDWrapper classes
-  struct TBase
+  struct MEDWRAPPER_EXPORT TBase
   {
     virtual ~TBase() {} 
   };
@@ -57,7 +57,7 @@ namespace MED
 
   //---------------------------------------------------------------
   //! Define a parent class for all named MED entities
-  struct TNameInfo: virtual TBase
+  struct MEDWRAPPER_EXPORT TNameInfo: virtual TBase
   {
     TString myName; //!< Keeps its name
     virtual std::string GetName() const = 0; //!< Gets its name
@@ -71,7 +71,7 @@ namespace MED
     It defines through corresponding enumeration (EModeSwitch) how the sequence 
     should be interpreted in C or Fortran mode (eFULL_INTERLACE or eNON_INTERLACE).
   */
-  struct TModeSwitchInfo: virtual TBase
+  struct MEDWRAPPER_EXPORT TModeSwitchInfo: virtual TBase
   {
     //! To construct instance of the class by default
     TModeSwitchInfo():
@@ -90,7 +90,7 @@ namespace MED
 
   //---------------------------------------------------------------
   //! Define a base class which represents MED Mesh entity
-  struct TMeshInfo: virtual TNameInfo
+  struct MEDWRAPPER_EXPORT TMeshInfo: virtual TNameInfo
   {
     TInt myDim; //!< Dimension of the mesh (0, 1, 2 or 3)
     TInt GetDim() const { return myDim;} //!< Gets dimension of the mesh
@@ -112,7 +112,7 @@ namespace MED
   typedef TIntVector TFamAttr;
 
   //! Define a base class which represents MED Family entity
-  struct TFamilyInfo: virtual TNameInfo
+  struct MEDWRAPPER_EXPORT TFamilyInfo: virtual TNameInfo
   {
     PMeshInfo myMeshInfo; //!< A reference to correspondig MED Mesh
     //! Get a reference to corresponding MED Mesh
@@ -164,7 +164,7 @@ namespace MED
   typedef TIntVector TElemNum;
   
   //! Define a parent class for all MED entities that describes mesh entites such as nodes and cells.
-  struct TElemInfo: virtual TBase
+  struct MEDWRAPPER_EXPORT TElemInfo: virtual TBase
   {
     PMeshInfo myMeshInfo; //!< A reference to correspondig MED Mesh
     //! Get a reference to corresponding MED Mesh
@@ -216,7 +216,7 @@ namespace MED
   typedef TCFloatVecSlice TCCoordSlice;
 
   //! Define a base class which represents MED Nodes entity
-  struct TNodeInfo: 
+  struct MEDWRAPPER_EXPORT TNodeInfo: 
     virtual TElemInfo,
     virtual TModeSwitchInfo 
   {
@@ -252,7 +252,7 @@ namespace MED
   typedef TCIntVecSlice TCConnSlice;
 
   //! Define a base class which represents MED Cells entity
-  struct TCellInfo: 
+  struct MEDWRAPPER_EXPORT TCellInfo: 
     virtual TElemInfo,
     virtual TModeSwitchInfo 
   {
@@ -280,7 +280,7 @@ namespace MED
 
   //---------------------------------------------------------------
   //! Define a base class which represents MED Polygon entity
-  struct TPolygoneInfo: 
+  struct MEDWRAPPER_EXPORT TPolygoneInfo: 
     virtual TElemInfo
   {
     //! Defines the MED Entity where the polygons belongs to
@@ -315,7 +315,7 @@ namespace MED
   typedef TVector<TConnSlice> TConnSliceArr;
 
   //! Define a base class which represents MED Polyedre entity
-  struct TPolyedreInfo: 
+  struct MEDWRAPPER_EXPORT TPolyedreInfo: 
     virtual TElemInfo
   {
     //! Defines the MED Entity where the polyedres belongs to
@@ -350,7 +350,7 @@ namespace MED
 
   //---------------------------------------------------------------
   //! Define a base class which represents MED Field entity
-  struct TFieldInfo: 
+  struct MEDWRAPPER_EXPORT TFieldInfo: 
     virtual TNameInfo
   {
     PMeshInfo myMeshInfo; //!< A reference to correspondig MED Mesh
@@ -389,23 +389,23 @@ namespace MED
 
   //---------------------------------------------------------------
   //! Get dimension of the Gauss coordinates for the defined type of mesh cell
-  TInt
+  MEDWRAPPER_EXPORT TInt
   GetDimGaussCoord(EGeometrieElement theGeom);
 
   //! Get number of referenced nodes for the defined type of mesh cell
-  TInt
+  MEDWRAPPER_EXPORT TInt
   GetNbRefCoord(EGeometrieElement theGeom);
 
   typedef TFloatVector TWeight;
 
   //! The class represents MED Gauss entity
-  struct TGaussInfo: 
+  struct MEDWRAPPER_EXPORT TGaussInfo: 
     virtual TNameInfo,
     virtual TModeSwitchInfo 
   {
     typedef boost::tuple<EGeometrieElement,std::string> TKey;
     typedef boost::tuple<TKey,TInt> TInfo;
-    struct TLess
+    struct MEDWRAPPER_EXPORT TLess
     {
       bool
       operator()(const TKey& theLeft, const TKey& theRight) const;
@@ -445,7 +445,7 @@ namespace MED
     TInt GetDim() const { return GetDimGaussCoord(GetGeom());}
 
     //! Gives number of the Gauss Points
-    TInt GetNbGauss() const { return myGaussCoord.size()/GetDim();}
+    TInt GetNbGauss() const { return (TInt)(myGaussCoord.size()/GetDim());}
   };
 
 
@@ -454,7 +454,7 @@ namespace MED
   typedef std::map<EGeometrieElement,TInt> TGeom2NbGauss;
 
   //! Define a base class which represents MED TimeStamp
-  struct TTimeStampInfo: 
+  struct MEDWRAPPER_EXPORT TTimeStampInfo: 
     virtual TBase
   {
     PFieldInfo myFieldInfo; //!< A reference to correspondig MED Field
@@ -498,7 +498,7 @@ namespace MED
 
   //---------------------------------------------------------------
   //! The class represents MED Profile entity
-  struct TProfileInfo: 
+  struct MEDWRAPPER_EXPORT TProfileInfo: 
     virtual TNameInfo
   {
     typedef std::string TKey;
@@ -520,7 +520,7 @@ namespace MED
     bool IsPresent() const { return GetName() != "";}
 
     //! Let known size of the MED Profile
-    TInt GetSize() const { return myElemNum.size();}
+    TInt GetSize() const { return (TInt)myElemNum.size();}
   };
 
 
@@ -533,7 +533,7 @@ namespace MED
   typedef TVector<TValueSlice> TValueSliceArr;
 
   //! The class is a helper one. It provide safe and flexible way to get access to values for a MED TimeStamp
-  struct TMeshValue:
+  struct MEDWRAPPER_EXPORT TMeshValue:
     virtual TModeSwitchInfo 
   {
     TValue myValue;
@@ -573,7 +573,7 @@ namespace MED
   typedef std::map<EGeometrieElement,PProfileInfo> TGeom2Profile;
 
   //! The class implements a container for MED TimeStamp values
-  struct TTimeStampVal: 
+  struct MEDWRAPPER_EXPORT TTimeStampVal: 
     virtual TModeSwitchInfo 
   {
     PTimeStampInfo myTimeStampInfo; //!< A reference to correspondig MED TimeStamp
@@ -599,7 +599,7 @@ namespace MED
   typedef std::map<TInt,TString> TNames;
   
   //! Define a base class which represents MED Grille 
-  struct TGrilleInfo:
+  struct MEDWRAPPER_EXPORT TGrilleInfo:
     virtual TModeSwitchInfo
   {
 

@@ -1,7 +1,17 @@
 #ifndef PARALLELTOPOLOGY_HXX_
 #define PARALLELTOPOLOGY_HXX_
 
-#include <ext/hash_map>
+#include "MEDSPLITTER.hxx"
+
+#ifndef WNT
+# include <ext/hash_map>
+# define HASH_MAP __gnu_cxx::hash_map
+# define HASH_MULTIMAP __gnu_cxx::hash_multimap
+#else
+# include <hash_map>
+# define HASH_MAP std::hash_map
+# define HASH_MULTIMAP std::hash_multimap
+#endif
 #include "boost/shared_ptr.hpp"
 
 #include "MEDSPLITTER_Topology.hxx"
@@ -12,7 +22,7 @@ class Graph;
 class MESHCollection;
 
 
-class ParallelTopology:public Topology
+class MEDSPLITTER_EXPORT ParallelTopology:public Topology
 {
 	
 public:
@@ -213,19 +223,19 @@ inline  void getFaceList(int idomain, int* list) const
 
 private:
 	//!mapping global -> local
-  __gnu_cxx::hash_map<int,pair<int,int> > m_glob_to_loc;
+  HASH_MAP<int,pair<int,int> > m_glob_to_loc;
 
 	//!mapping local -> global
 	map<pair<int,int>,int> m_loc_to_glob;
 
 	//!mapping global -> local
-	__gnu_cxx::hash_multimap<int,pair<int,int> > m_node_glob_to_loc;
+	HASH_MULTIMAP<int,pair<int,int> > m_node_glob_to_loc;
 	
 	//!mapping local -> global
 	map<pair<int,int>,int> m_node_loc_to_glob;
 	
 	//!mapping global -> local
-	__gnu_cxx::hash_multimap<int,pair<int,int> > m_face_glob_to_loc;
+	HASH_MULTIMAP<int,pair<int,int> > m_face_glob_to_loc;
 	
 	//!mapping local -> global
 	map<pair<int,int>,int> m_face_loc_to_glob;

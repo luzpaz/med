@@ -20,7 +20,11 @@
 #ifndef __MEDMODULUSARRAY_H__
 #define __MEDMODULUSARRAY_H__
 
+#include "MEDMEM.hxx"
+
 #include "MEDMEM_Utilities.hxx"
+#include "MEDMEM_define.hxx"
+
 
 /*
   This class is use to set cyclic (modulus length) array.
@@ -31,7 +35,7 @@
 */
 
 namespace MEDMEM {
-  class MEDMODULUSARRAY {
+class MEDMEM_EXPORT MEDMODULUSARRAY {
 private:
   // nb vertex nodes; only vertex nodes are in cycle
   int   _length ;
@@ -47,14 +51,15 @@ public:
   MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array);
   ~MEDMODULUSARRAY() ;
 
-  const int & operator[](const int &i) const ;
+  const int operator[](const int &i) const ;
 
   int compare(const MEDMODULUSARRAY &modulusArray) const;
 
 };
 
+
 MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) : 
-  _length(length), _length2(length), _array(array)
+  _length(length), _array(array), _length2(0)
 {
 //    SCRUTE(_length);
 //    for (int i=0;i<_length;i++){
@@ -62,7 +67,7 @@ MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) :
 //    }
 };
 
-MEDMODULUSARRAY::MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array):
+  MEDMODULUSARRAY::MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array):
   _length(vertexLength), _length2( totalLength ), _array(array)
 {
 }
@@ -74,13 +79,13 @@ MEDMODULUSARRAY::~MEDMODULUSARRAY()
 };
 
 
-const int & MEDMODULUSARRAY::operator[](const int &i) const
+const int MEDMODULUSARRAY::operator[](const int &i) const
 {
-  //int position = i%_length ;
-  int position = i%_length2 ;
+  int position = i%_length ;
+  //int position = i%_length2 ;
   if (position < 0)
-    //position+=_length ;
-    position += _length2 ;
+    position+=_length ;
+  //position += _length2 ;
   return _array[position] ;
 };
 

@@ -275,3 +275,16 @@ void MESHClient::removeReference() const
       delete this;
     }
 }
+
+//=============================================================================
+/*!
+ * Write all the content of the MESH using driver referenced by the integer handler index
+ */
+//=============================================================================
+
+void MESHClient::write(int index/*=0*/, const string & driverName/* = ""*/)
+{
+  this->fillCopy();
+  MESH::write(index,driverName);
+}
+

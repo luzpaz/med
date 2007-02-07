@@ -25,7 +25,6 @@ med_int
 MEDnProfil(med_idt fid)
 {
   int n;
-  med_err ret;
 
   _MEDmodeErreurVerrouiller();
 

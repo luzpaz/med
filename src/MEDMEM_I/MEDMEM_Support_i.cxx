@@ -407,6 +407,45 @@ SCRUTE(numbers[i]);
 
 //=============================================================================
 /*!
+ * CORBA: get Nodes from file
+ */
+//=============================================================================
+SALOME_MED::long_array *  SUPPORT_i::getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
+throw (SALOME::SALOME_Exception)
+{
+  SCRUTE(_support);
+  SCRUTE(geomElement);
+  SCRUTE(convertIdlEltToMedElt(geomElement));
+
+	if (_support==NULL)
+		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+				             SALOME::INTERNAL_ERROR);
+        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        try
+        {
+                int nbelements=_support->getNumberOfElements(convertIdlEltToMedElt(geomElement));
+                myseq->length(nbelements);
+SCRUTE(_support->getName());
+SCRUTE(nbelements);
+SCRUTE(convertIdlEltToMedElt(geomElement));
+                const int * numbers=_support->getNumberFromFile(convertIdlEltToMedElt(geomElement));
+                for (int i=0;i<nbelements;i++)
+                {
+                        myseq[i]=numbers[i];
+SCRUTE(numbers[i]);
+                }
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+      		MESSAGE("Unable to access the support optionnal index");
+		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+        return myseq._retn();
+	
+}
+
+//=============================================================================
+/*!
  * CORBA: 2nd get Nodes 
  */
 //=============================================================================
@@ -513,7 +552,7 @@ throw (SALOME::SALOME_Exception)
         {
                 (const_cast< ::SUPPORT *>(_support))->getBoundaryElements();
         }
-        catch (MEDEXCEPTION &ex)
+        catch (MEDEXCEPTION &)
         {
                 MESSAGE("Unable to access elements");
                 THROW_SALOME_CORBA_EXCEPTION("Unable to acces Support C++ Object"\
@@ -620,10 +659,10 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
     ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
     CORBA::ORB_var &orb = init(0,0);
-    string iorStr = orb->object_to_string(myIor);
+    CORBA::String_var iorStr = orb->object_to_string(myIor);
     anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
     aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
-    aIOR->SetValue(iorStr.c_str());
+    aIOR->SetValue(iorStr.in());
     anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
     aName = SALOMEDS::AttributeName::_narrow(anAttr);
     aName->SetValue(_support->getName().c_str());
@@ -635,10 +674,10 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
     ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
     CORBA::ORB_var &orb = init(0,0);
-    string iorStr = orb->object_to_string(myIor);
+    CORBA::String_var iorStr = orb->object_to_string(myIor);
     anAttr = myBuilder->FindOrCreateAttribute(supportEntry, "AttributeIOR");
     aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
-    aIOR->SetValue(iorStr.c_str());
+    aIOR->SetValue(iorStr.in());
   }
   myBuilder->CommitCommand();
 

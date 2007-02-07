@@ -578,7 +578,7 @@ namespace MED
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
-      TInt aNbElem = theInfo.myElemNum.size();
+      TInt aNbElem = (TInt)theInfo.myElemNum.size();
 
       TErr aRet;
       aRet = MEDelementsLire(myFile->Id(),
@@ -1017,7 +1017,7 @@ namespace MED
 			aNbGauss,
 			aFieldInfo.myNbComp);
 	TValue& aValue = aMeshValue.myValue;
-	TInt anEnd = aValue.size();
+	TInt anEnd = (TInt)aValue.size();
 
 	INITMSG(MYDEBUG,
 		"TVWrapper::GetTimeStampVal - aGeom = "<<aGeom<<
@@ -1086,14 +1086,14 @@ namespace MED
 	  
 	if(aProfileInfo && aProfileInfo->IsPresent()){
 	  TInt aSize = aProfileInfo->GetSize()*aFieldInfo.myNbComp*aNbGauss;
-	  if(aSize > aValue.size()){
+	  if(aSize > (TInt)aValue.size()){
 	    if(theErr){
 	      *theErr = -1;
 	      return;
 	    }
 	    EXCEPTION(runtime_error,
 		      "GetTimeStampVal - aSize("<<aSize<<
-		      ") > aValue.size()("<<aValue.size()<<
+		      ") > aValue.size()("<<(unsigned int)aValue.size()<<
 		      "); aNbVal = "<<aNbVal<<
 		      "; anEntity = "<<aTimeStampInfo.myEntity<<
 		      "; aGeom = "<<aGeom);
@@ -1105,7 +1105,7 @@ namespace MED
 	      }
 	      EXCEPTION(runtime_error,
 			"GetTimeStampVal - anEnd("<<anEnd<<
-			") != aValue.size()("<<aValue.size()<<
+			") != aValue.size()("<<(unsigned int)aValue.size()<<
 			"); aNbVal = "<<aNbVal<<
 			"; anEntity = "<<aTimeStampInfo.myEntity<<
 			"; aGeom = "<<aGeom);
@@ -1150,7 +1150,7 @@ namespace MED
 
 	med_int aNbVal = aMeshValue.myNbElem * aMeshValue.myNbGauss;
 	TValue& aValue = aMeshValue.myValue;
-	TInt anEnd = aValue.size();
+	TInt anEnd = (TInt)aValue.size();
 	
 	switch(aFieldInfo.myType){
 	case eFLOAT64: {

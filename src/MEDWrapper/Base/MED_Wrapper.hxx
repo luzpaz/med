@@ -29,6 +29,8 @@
 #ifndef MED_Wrapper_HeaderFile
 #define MED_Wrapper_HeaderFile
 
+#include "MED_WrapperBase.hxx"
+
 #include "MED_Structures.hxx"
 #include "MED_Algorithm.hxx"
 
@@ -39,7 +41,7 @@ namespace MED
 
   //----------------------------------------------------------------------------
   //! Define a base class that wraps the MED API
-  struct TWrapper
+  struct MEDWRAPPER_EXPORT TWrapper
   {
     typedef boost::mutex TMutex;
     //! This is a syncronization primitive which allow to support thread safety for the MED access
@@ -622,7 +624,7 @@ namespace MED
     GetGaussPreInfo(TInt theId, 
 		    TErr* theErr = NULL)
     {
-      return TGaussInfo::TInfo();
+      return TGaussInfo::TInfo( TGaussInfo::TKey(ePOINT1,""),0 );
     }
     
     //! Read a MEDWrapper MED GAUSS representation by its order number from defined MED file
@@ -846,7 +848,7 @@ namespace MED
 
   //----------------------------------------------------------------------------
   //! This class provide thread-safety for MEDWrapper interaction
-  class TLockProxy
+  class MEDWRAPPER_EXPORT TLockProxy
   {
     TLockProxy& operator=(const TLockProxy& );
     TWrapper* myWrapper;

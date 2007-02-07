@@ -27,6 +27,8 @@
 #ifndef MED_FIELD_I_HXX_
 #define MED_FIELD_I_HXX_
 
+#include <MEDMEM_I.hxx>
+
 #include <map>
 #include <string>
 #include <sstream>
@@ -47,7 +49,7 @@
 #include "MEDMEM_Field.hxx"
 
 namespace MEDMEM {
-class FIELD_i: public virtual POA_SALOME_MED::FIELD,
+class MEDMEM_I_EXPORT FIELD_i: public virtual POA_SALOME_MED::FIELD,
 	       public SALOME::GenericObj_i
 {
 public :
@@ -105,6 +107,12 @@ public :
                     		          throw (SALOME::SALOME_Exception);
     // Cuisine Interne
     MEDMEM::FIELD_ * constructConstField() const;
+
+    // Publish MED Component
+    SALOMEDS::SComponent_ptr PublishMedComponent(SALOMEDS::Study_ptr theStudy);
+
+    // Return a default path to publish this field
+    std::string getEntryPath ();
 
  };
 }

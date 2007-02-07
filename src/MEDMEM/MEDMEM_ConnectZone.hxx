@@ -2,6 +2,8 @@
 # ifndef __CONNECTZONE_HXX__
 # define __CONNECTZONE_HXX__
 
+#include "MEDMEM.hxx"
+
 // few STL include files
 #include <map>
 
@@ -12,7 +14,7 @@
 #include "MEDMEM_SkyLineArray.hxx"
 
 namespace MEDMEM {
-class CONNECTZONE
+class MEDMEM_EXPORT CONNECTZONE
 {
 private :
   string _name;

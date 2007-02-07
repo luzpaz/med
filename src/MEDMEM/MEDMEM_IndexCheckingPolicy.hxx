@@ -19,12 +19,14 @@
 #ifndef MEDMEM_INDEX_CHECKING_POLICY_HXX
 #define MEDMEM_INDEX_CHECKING_POLICY_HXX 
 
+#include <MEDMEM.hxx>
+
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_STRING.hxx"
 
 namespace MEDMEM {
 
-class IndexCheckPolicy {
+class MEDMEM_EXPORT IndexCheckPolicy {
 public :
   inline void checkMoreThanZero(const std::string & classname, int index) const {
     if (index <= 0)
@@ -48,7 +50,7 @@ public :
 
 };
 
-class NoIndexCheckPolicy {
+class MEDMEM_EXPORT NoIndexCheckPolicy {
 public :
   inline void checkMoreThanZero(const string &classname, int index) const {}
   inline void checkLessOrEqualThan(const std::string & classname, int max, int index) const {}

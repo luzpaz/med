@@ -20,6 +20,8 @@
 # ifndef DRIVERS_DEF_HXX
 # define DRIVERS_DEF_HXX
 
+#include <MEDMEM.hxx>
+
 // STL
 # include <string>
 # include <list>
@@ -39,7 +41,7 @@ namespace MED_EN {
      the name of the geometry of an element : MED_FR:GEO_NAME 
      A simple test/use case can be found in test/testUGeoNameMeshEntities.cxx  */
 //----------------------------------------
-class GEO_NAME : public map<int,string>
+class MEDMEM_EXPORT GEO_NAME : public map<int,string>
 //----------------------------------------
 {
   
@@ -63,7 +65,7 @@ static const GEO_NAME geoNames ;
     A simple test/use case can be found in test/testUGeoNameMeshEntities.cxx  */
 
 //----------------------------------------
-class ENT_NAME : public map<int,string>
+class MEDMEM_EXPORT ENT_NAME : public map<int,string>
 //----------------------------------------
 {
   
@@ -88,7 +90,7 @@ static const ENT_NAME entNames ;
 
 
 //--------------------------------------------------------------------------------
-class MESH_ENTITIES : public map<int, const list<MED_EN::medGeometryElement> >
+class MEDMEM_EXPORT MESH_ENTITIES : public map<int, const list<MED_EN::medGeometryElement> >
 //--------------------------------------------------------------------------------
 {
 

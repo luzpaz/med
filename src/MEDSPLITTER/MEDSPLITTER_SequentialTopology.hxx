@@ -1,8 +1,10 @@
 #ifndef SequentialTOPOLOGY_HXX_
 #define SequentialTOPOLOGY_HXX_
 
+#include "MEDSPLITTER.hxx"
+
 namespace MEDSPLITTER {
-class SequentialTopology:public Topology
+class MEDSPLITTER_EXPORT SequentialTopology:public Topology
 {
 	
 public:

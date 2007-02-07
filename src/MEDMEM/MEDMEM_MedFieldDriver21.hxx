@@ -441,6 +441,8 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
 					 (med_2_1::med_entite_maillage) entityCurrent,
 					 (med_2_1::med_geometrie_element)  *currentGeometry,
 					 j,maa,&ngauss,&numdt,dtunit,&dt,&numo);
+	
+	MED_FIELD_DRIVER<T>::_ptrField->setTime(dt); // PAL12664
 
 	// 	    ret = med_2_2::MEDpasdetempsInfo(id, const_cast <char*> ( fieldName.c_str() ),
 	// 				    (med_2_1::med_entite_maillage)   (*currentEntity).first,
@@ -773,7 +775,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   // Pour tester les profils aussi ?
   vector< MED_EN::medGeometryElement >  meshGeoType;
   vector< int >  meshNbOfElOfType;
-  getMeshGeometricType(id,meshName,mySupport->getEntity(),meshGeoType,meshNbOfElOfType);
+  MED_FIELD_DRIVER21<T>::getMeshGeometricType(id,meshName,mySupport->getEntity(),meshGeoType,meshNbOfElOfType);
   vector<MED_EN::medGeometryElement> supGeoType(mySupport->getTypes(),
                                                 mySupport->getTypes()+mySupport->getNumberOfTypes());
   vector < int > supNbOfElOfType(mySupport->getNumberOfElements(),
@@ -855,7 +857,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues+=mySupport->getNumberOfElements(Types[i]); // Ne doit pas prendre en compte les points de Gauss
 
     med_2_1::med_err ret;
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64) || defined(PCLINUX64_32)
     int lgth2=NumberOfValues[i]*numberOfComponents;
     if(MED_FIELD_DRIVER<T>::_ptrField->getValueType()==MED_EN::MED_INT32)
       {
@@ -1060,7 +1062,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     }
   }
       
-  END_OF(LOC);
+  //  END_OF(LOC);
 }
 
 template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::write( void ) const
@@ -1102,7 +1104,11 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
       string   component_unit(component_count*MED_TAILLE_PNOM21,' ') ;
 
       const string * listcomponent_name=MED_FIELD_DRIVER<T>::_ptrField->getComponentsNames() ;
-      const string * listcomponent_unit=MED_FIELD_DRIVER<T>::_ptrField->getMEDComponentsUnits() ;
+      const string * listcomponent_unit=MED_FIELD_DRIVER<T>::_ptrField->getMEDComponentsUnits();
+      if ( ! listcomponent_name || ! listcomponent_unit )
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<" Udefined components of FIELD : "
+                                     << MED_FIELD_DRIVER<T>::_ptrField->getName() << "."));
+
       int length ;
       for (int i=0; i < component_count ; i++) {
 	length = min(MED_TAILLE_PNOM21,(int)listcomponent_name[i].size());
@@ -1250,10 +1256,10 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 	cout<<"==================> nom unit lu       = "<<chaunit<<endl;
 	cout<<"==================> valeur de med_2_1::MED_REEL64 = "<<med_2_1::MED_REEL64<<endl;
 */	
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
-	if(_ptrField->getValueType()==MED_EN::MED_INT32)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64) || defined(PCLINUX64_32)
+	if(MED_FIELD_DRIVER<T>::_ptrField->getValueType()==MED_EN::MED_INT32)
 	  {
-	    int lgth2=_ptrField->getNumberOfValues();
+	    int lgth2=MED_FIELD_DRIVER<T>::_ptrField->getNumberOfValues();
 	    med_2_1::med_int *temp=new med_2_1::med_int[lgth2];
 	    for(int i2=0;i2<lgth2;i2++)
 	      temp[i2]=(int)(value[i2]);

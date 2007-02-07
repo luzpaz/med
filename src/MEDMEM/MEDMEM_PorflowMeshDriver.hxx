@@ -20,6 +20,8 @@
 #ifndef PORFLOW_MESH_DRIVER_HXX
 #define PORFLOW_MESH_DRIVER_HXX
 
+#include "MEDMEM.hxx"
+
 #include <string>
 #include <fstream>
 
@@ -48,9 +50,9 @@ class MESH;
 class FAMILY;
 class GROUP;
 class CONNECTIVITY;
-class _intermediateMED;
-class _maille;
-class PORFLOW_MESH_DRIVER : public GENDRIVER
+struct _intermediateMED;
+struct _maille;
+class MEDMEM_EXPORT PORFLOW_MESH_DRIVER : public GENDRIVER
 {
 protected:
   
@@ -59,13 +61,23 @@ protected:
   string          _meshName;    
   ifstream        _porflow;
 
+  // This enumeration is used to substitude static const
+  // memers data causing link errors on VC7 compiler.
+  enum
+  {
+    nb_geometrie_porflow = 6,
+    nb_nodes_max         = 8, // maximal number of nodes for a porflow geometrie
+    nb_nodes2_max        = 4, // maximal number of nodes for a 2D porflow geometrie
+    nb_faces_max         = 6  // maximal number of faces for a porflow geometrie
+  };
+
   // tableau de correspondance des types géométriques de PORFLOW -> MED
-  static const size_t nb_geometrie_porflow = 6;
+  //static const size_t nb_geometrie_porflow = 6;
   static const MED_EN::medGeometryElement geomPORFLOWtoMED[nb_geometrie_porflow];
   // indirection table from PORFLOW order to MED one for nodes numerotation in all PORFLOW geometries
-  static const size_t nb_nodes_max = 8;  // maximal number of nodes for a porflow geometrie
-  static const size_t nb_nodes2_max = 4; // maximal number of nodes for a 2D porflow geometrie
-  static const size_t nb_faces_max = 6;  // maximal number of faces for a porflow geometrie
+  //static const size_t nb_nodes_max = 8;  // maximal number of nodes for a porflow geometrie
+  //static const size_t nb_nodes2_max = 4; // maximal number of nodes for a 2D porflow geometrie
+  //static const size_t nb_faces_max = 6;  // maximal number of faces for a porflow geometrie
   static const int numPORFLOWtoMED[nb_geometrie_porflow] [nb_nodes_max];
   static const int connectivityPORFLOW[nb_geometrie_porflow][nb_faces_max][nb_nodes2_max];
   inline static int geomMEDtoPorflow(MED_EN::medGeometryElement medGeo);
@@ -116,7 +128,7 @@ private:
 };
 
 
-class PORFLOW_MESH_RDONLY_DRIVER : public virtual PORFLOW_MESH_DRIVER
+class MEDMEM_EXPORT PORFLOW_MESH_RDONLY_DRIVER : public virtual PORFLOW_MESH_DRIVER
 {
  
 public :
@@ -165,7 +177,7 @@ private:
 
 */
 
-class PORFLOW_MESH_WRONLY_DRIVER : public virtual PORFLOW_MESH_DRIVER {
+class MEDMEM_EXPORT PORFLOW_MESH_WRONLY_DRIVER : public virtual PORFLOW_MESH_DRIVER {
   
 public :
   
@@ -210,7 +222,7 @@ private:
 
 */
 
-class PORFLOW_MESH_RDWR_DRIVER : public PORFLOW_MESH_RDONLY_DRIVER, public PORFLOW_MESH_WRONLY_DRIVER {
+class MEDMEM_EXPORT PORFLOW_MESH_RDWR_DRIVER : public PORFLOW_MESH_RDONLY_DRIVER, public PORFLOW_MESH_WRONLY_DRIVER {
 
 public :
 

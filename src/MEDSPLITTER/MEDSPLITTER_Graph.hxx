@@ -1,11 +1,13 @@
 #ifndef GRAPH_HXX_
 #define GRAPH_HXX_
 
+#include "MEDSPLITTER.hxx"
+
 #include "MEDMEM_SkyLineArray.hxx"
 
 namespace MEDSPLITTER {
 	
-class Graph
+class MEDSPLITTER_EXPORT Graph
 {
 	
 	public:

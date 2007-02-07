@@ -29,6 +29,8 @@
 #ifndef MED_Common_HeaderFile
 #define MED_Common_HeaderFile
 
+#include "MED_WrapperBase.hxx"
+
 #include <string>
 #include <set>
 #include <map>
@@ -52,10 +54,10 @@ namespace MED{
   
   typedef enum {eFAUX, eVRAI} EBooleen ; 
   typedef double TFloat;
-#if defined(SUN4SOL2) || defined(PCLINUX) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000) || defined(HP9000)
+#if defined(SUN4SOL2) || defined(PCLINUX) || defined(PPRO_NT) || defined(PCLINUX64_32) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000) || defined(HP9000)
   typedef int TInt;
 #endif
-#if defined(IRIX64) || defined(OSF1)
+#if defined(IRIX64) || defined(OSF1) || defined(PCLINUX64)
   typedef long TInt;
 #endif
   typedef hid_t TIdt;
@@ -96,7 +98,7 @@ namespace MED{
   typedef std::set<EGeometrieElement> TGeomSet;
   typedef std::map<EEntiteMaillage,TGeomSet> TEntity2GeomSet;
 
-  const TEntity2GeomSet& 
+  MEDWRAPPER_EXPORT const TEntity2GeomSet& 
   GetEntity2GeomSet();
 
   template<EVersion>
@@ -120,12 +122,12 @@ namespace MED{
   GetPNOMLength();
   
   template<EVersion>
-  TInt
+  MEDWRAPPER_EXPORT TInt
   GetNbConn(EGeometrieElement typmai,
 	    EEntiteMaillage typent,
 	    TInt mdim);
   
-  TInt 
+  MEDWRAPPER_EXPORT TInt 
   GetNbNodes(EGeometrieElement typmai);
 
   struct TNameInfo;
@@ -170,7 +172,7 @@ namespace MED{
   struct TTimeStampVal;
   typedef SharedPtr<TTimeStampVal> PTimeStampVal;
 
-  class TWrapper;
+  struct TWrapper;
   typedef SharedPtr<TWrapper> PWrapper;
 };
 

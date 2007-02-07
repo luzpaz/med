@@ -927,7 +927,7 @@ inline Connectivite_Generale::Connectivite_Generale():AllConn(NBR_MODELES_MAILLE
 	}
 inline Connectivite_Generale::~Connectivite_Generale() 
 	{
-	for (int i=0;i<AllConn.size();i++) delete AllConn[i];
+	for (int i=0;i<(int)AllConn.size();i++) delete AllConn[i];
 	}
 
 

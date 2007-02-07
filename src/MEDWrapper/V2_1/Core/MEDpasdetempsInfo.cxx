@@ -31,7 +31,6 @@ MEDpasdetempsInfo(med_idt fid,char *champ
 {
 
   med_err ret=0;
-  med_int gauss_size;
   med_idt gid;
   char chemin[(MED_TAILLE_CHA+MED_TAILLE_NOM+1)+(2*MED_TAILLE_NOM_ENTITE+2)+2*MED_MAX_PARA+1];
   int num;

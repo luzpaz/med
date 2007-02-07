@@ -1,8 +1,10 @@
 #ifndef SCOTCHGRAPH_HXX_
 #define SCOTCHGRAPH_HXX_
 
+#include "MEDSPLITTER.hxx"
+
 namespace MEDSPLITTER {
-class SCOTCHGraph:public Graph
+class MEDSPLITTER_EXPORT SCOTCHGraph:public Graph
 {
 public:
 	SCOTCHGraph();

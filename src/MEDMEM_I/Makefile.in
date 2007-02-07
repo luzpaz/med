@@ -47,7 +47,8 @@ EXPORT_HEADERS = \
   MEDMEM_Field_i.hxx \
   MEDMEM_Group_i.hxx \
   MEDMEM_Mesh_i.hxx \
-  MEDMEM_Support_i.hxx 
+  MEDMEM_Support_i.hxx \
+  MEDMEM_I.hxx
 
 # Libraries targets
 

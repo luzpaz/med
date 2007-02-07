@@ -104,8 +104,8 @@ MEDchampLire(med_idt fid,char *maa, char *cha, unsigned char *val,med_mode_switc
       else
 	psize = i;
 
-      pfltabtmp = (med_int *)   malloc (sizeof(med_int)*psize);
-      pfltab = (med_ssize *) malloc (sizeof(med_ssize)*psize);
+      pfltabtmp = (med_int *)   malloc (sizeof(med_int)*(size_t)psize);
+      pfltab = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
       if ((ret = MEDprofilLire(fid,pfltabtmp,profil)) < 0)
 	return -1;
       for (i=0;i<psize;i++)
@@ -146,9 +146,9 @@ MEDchampLire(med_idt fid,char *maa, char *cha, unsigned char *val,med_mode_switc
 				     psize,pfltab,ngauss,val))< 0)
 	return -1;
       break;
-
+      
     case MED_INT32 :
-#if defined(IRIX64)||defined(OSF1) 
+#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64) 
      if ((ret =  _MEDdatasetNumLire(datagroup2,MED_NOM_CO,MED_INT64,
 				     interlace,ncomp,numco,
 				     psize,pfltab,ngauss,val))< 0)
@@ -162,7 +162,7 @@ MEDchampLire(med_idt fid,char *maa, char *cha, unsigned char *val,med_mode_switc
      break;
 
     case MED_INT64 :
-#if defined(IRIX64)||defined(OSF1) 
+#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64) 
      if ((ret =  _MEDdatasetNumLire(datagroup2,MED_NOM_CO,MED_INT64,
 				     interlace,ncomp,numco,
 				     psize,pfltab,ngauss,val))< 0)

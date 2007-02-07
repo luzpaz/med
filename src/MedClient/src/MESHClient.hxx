@@ -45,6 +45,7 @@ public :
   void fillCopy();
   virtual void addReference() const;
   virtual void removeReference() const;
+  virtual void write(int index=0, const string & driverName = "");
 
 private:
   virtual ~MESHClient();

@@ -32,7 +32,7 @@ _MEDfstring(char *chaine, med_int longueur_fixee)
 
   if (longueur_fixee == 0 ) return 0;
 
-  longueur_reelle = strlen(chaine);
+  longueur_reelle = (int)strlen(chaine);
   if (longueur_fixee < longueur_reelle)
     return -1;
 

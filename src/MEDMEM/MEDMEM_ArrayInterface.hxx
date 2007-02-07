@@ -38,7 +38,7 @@ template < class ARRAY_ELEMENT_TYPE,
 	   class GAUSS_TAG,
 	   class CHECKING_POLICY=IndexCheckPolicy>
 	   //NoIndexCheckPolicy>
-class MEDMEM_ArrayInterface  {
+class MEDMEM_EXPORT MEDMEM_ArrayInterface  {
 
 public:
 

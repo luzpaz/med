@@ -27,6 +27,8 @@
 #ifndef _MED_MED_I_HXX_
 #define _MED_MED_I_HXX_
 
+#include <MEDMEM_I.hxx>
+
 #include <string>
 
 #include <SALOMEconfig.h>
@@ -41,7 +43,7 @@
 namespace MEDMEM {
 typedef map<DT_IT_, SALOME_MED::FIELD_ptr, LT_DT_IT_ > MAP_IOR_DT_IT_; 
 
-class MED_i: public POA_SALOME_MED::MED,
+class MEDMEM_I_EXPORT MED_i: public POA_SALOME_MED::MED,
 	     public SALOME::GenericObj_i
 {
 
@@ -73,6 +75,10 @@ public:
   void addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
 		  const char * medObjName)
     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
+
+  SALOME_MED::SUPPORT_ptr getSupport(string                meshName,
+                                     MED_EN::medEntityMesh entity)
+    throw (SALOME::SALOME_Exception);
 
 
     // IDL Methods 

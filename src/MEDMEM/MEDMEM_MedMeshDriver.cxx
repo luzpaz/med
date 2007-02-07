@@ -362,12 +362,12 @@ GENDRIVER * MED_MESH_WRONLY_DRIVER::copy ( void ) const
   return new MED_MESH_WRONLY_DRIVER(*this);
 }
 
-void MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::read ( void )
+void MED_MESH_WRONLY_DRIVER::read ()
 {
   _concreteMeshDrv->read();
 }
 
-void MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::write( void ) const
+void MED_MESH_WRONLY_DRIVER::write( void ) const
 {
   _concreteMeshDrv->write();
 }

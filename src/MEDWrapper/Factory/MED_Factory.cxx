@@ -54,6 +54,7 @@ namespace MED
     INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'"<<std::endl);
     EVersion aVersion = eVUnknown;    
 
+#ifndef WIN32
     if(theDoPreCheckInSeparateProcess){
       // First check, is it possible to deal with the file
       std::ostringstream aStr;
@@ -69,6 +70,7 @@ namespace MED
       if(aStatus != 0)
 	return aVersion;
     }
+#endif
 
     // Next, try to open the file trough the MED API
     char* aFileName = const_cast<char*>(theFileName.c_str());

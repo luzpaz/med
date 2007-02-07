@@ -103,7 +103,7 @@ MEDfamInfo(med_idt fid,char *maa,int indice, char *famille,
       /*
        * Le Data Set "IDE"
        */
-#if defined(IRIX64)||defined(OSF1)
+#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
       if ((ret = _MEDdatasetNumLire(datagroup,MED_NOM_IDE,MED_INT64,
 				    MED_NO_INTERLACE,1,MED_ALL,
 				    MED_NOPF,0,MED_NOPG,
@@ -120,7 +120,7 @@ MEDfamInfo(med_idt fid,char *maa,int indice, char *famille,
       /*
        * Le Data Set "VAL"
        */
-#if defined(IRIX64)||defined(OSF1)
+#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
       if ((ret = _MEDdatasetNumLire(datagroup,MED_NOM_VAL,MED_INT64,
 				    MED_NO_INTERLACE,1,MED_ALL,
 				    MED_NOPF,0,MED_NOPG,

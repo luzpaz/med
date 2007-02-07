@@ -25,6 +25,8 @@
 #ifndef MEDEXCEPTION_HXX
 #define MEDEXCEPTION_HXX
 
+#include <MEDMEM.hxx>
+
 #include <exception>
 #include <iostream>
 
@@ -42,7 +44,7 @@ using namespace std;
 */
 namespace MEDMEM {
 //--------------------------------------//
-  class MEDEXCEPTION : public std::exception
+  class MEDMEM_EXPORT MEDEXCEPTION : public std::exception
 //--------------------------------------//
 {
 private :

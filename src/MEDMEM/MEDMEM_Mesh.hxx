@@ -20,6 +20,8 @@
 #ifndef MESH_HXX
 #define MESH_HXX
 
+#include <MEDMEM.hxx>
+
 #include <string>
 #include <vector>
 #include <list>
@@ -55,7 +57,7 @@ class FAMILY;
 class GROUP;
 class SUPPORT;
 
-class MESH : public RCBASE
+class MEDMEM_EXPORT MESH : public RCBASE
 {
   //-----------------------//
   //   Attributes
@@ -147,7 +149,7 @@ public :
   MESH( driverTypes driverType, const string & fileName="",
 	const string & meshName="") throw (MEDEXCEPTION);
   virtual ~MESH();
-  friend ostream & operator<<(ostream &os, const MESH &my);
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, const MESH &my);
 
   int  addDriver(driverTypes driverType,
 		 const string & fileName  ="Default File Name.med",
@@ -158,7 +160,8 @@ public :
 
   virtual void read(int index=0);
   inline void read(const GENDRIVER & genDriver);
-  inline void write(int index=0, const string & driverName = "");
+  //inline void write(int index=0, const string & driverName = "");
+  virtual void write(int index=0, const string & driverName = "");
   inline void write(const GENDRIVER & genDriver);
 
   inline void 	      setName(string name);
@@ -299,7 +302,8 @@ public :
   void fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT *supportToFill) const throw (MEDEXCEPTION);
   SUPPORT *buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
   int getElementContainingPoint(const double *coord);
-  vector< vector<double> > MESH::getBoundingBox() const;
+//  vector< vector<double> > MESH::getBoundingBox() const;
+  vector< vector<double> > getBoundingBox() const;
   template<class T> static
   FIELD<T> * mergeFields(const vector< FIELD<T> * > & others, bool meshCompare=false);
   /*!
@@ -319,45 +323,6 @@ inline const CONNECTIVITY* MESH::getConnectivityptr() const
   return _connectivity;
 }
 
-// inline void MESH::read(int index/*=0*/)
-// {
-//   const char * LOC = "MESH::read(int index=0) : ";
-//   BEGIN_OF(LOC);
-
-//   if (_drivers[index]) {
-//     _drivers[index]->open();
-//     _drivers[index]->read();
-//     _drivers[index]->close();
-//   }
-//   else
-//     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
-//                                      << "The index given is invalid, index must be between  0 and |"
-//                                      << _drivers.size()
-//                                      )
-//                           );
-//   END_OF(LOC);
-// }
-
-/*! Write all the content of the MESH using driver referenced by the integer handler index.*/
-inline void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
-{
-  const char * LOC = "MESH::write(int index=0, const string & driverName = \"\") : ";
-  BEGIN_OF(LOC);
-
-  if ( _drivers[index] ) {
-    _drivers[index]->open();
-    if (driverName != "") _drivers[index]->setMeshName(driverName);
-    _drivers[index]->write();
-    _drivers[index]->close();
-  }
-  else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
-                                     << "The index given is invalid, index must be between  0 and |"
-                                     << _drivers.size()
-                                     )
-                          );
-  END_OF(LOC);
-}
 
 // This method is MED specific : don't use it
 // must be private.
@@ -979,7 +944,7 @@ const MEDMEM::FAMILY* MESH::getFamily(MED_EN::medEntityMesh entity, int i) const
   default :
     throw MEDEXCEPTION("MESH::getFamilies : Unknown entity");
   }
-  if (i>Family.size())
+  if (i>(int)Family.size())
     throw MEDEXCEPTION("MESH::getFamily(entity,i) : argument i must be <= _numberOfFamilies");
   return Family[i-1];
 }
@@ -1010,7 +975,7 @@ const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
   default :
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Unknown entity"));
   }
-  if (i>Group.size())
+  if (i>(int)Group.size())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i="<<i<<" must be <= _numberOfGroups="<<Group.size()));
   return Group[i-1];
 }

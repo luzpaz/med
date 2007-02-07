@@ -28,19 +28,21 @@
 
 #include "Med_Gen_i.hxx"
 
-#include "MEDMEM_Mesh_i.hxx"
+#include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Med_i.hxx"
 #include "MEDMEM_FieldTemplate_i.hxx"
 #include "MEDMEM_Support_i.hxx"
 
-#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_Field.hxx"
+
 #include "MEDMEM_Med.hxx"
 #include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_DriversDef.hxx"
+#include "MEDMEM_Grid.hxx"
 
 
 #include "Utils_SINGLETON.hxx"
@@ -61,7 +63,7 @@ using namespace std;
 using namespace MEDMEM;
 
 // Initialisation des variables statiques
- map <string, string> Med_Gen_i::_MedCorbaObj;
+ map <string, MEDMEM::MED_i*> Med_Gen_i::_MedCorbaObj;
  string Med_Gen_i::_myFileName="";
  string Med_Gen_i::_saveFileName="";
  Med_Gen_i* Med_Gen_i::_MEDGen = NULL;
@@ -102,6 +104,33 @@ Med_Gen_i:: Med_Gen_i(CORBA::ORB_ptr orb,
 
   //_myMedI = 0;
   _MEDGen = this;
+}
+
+//=============================================================================
+/*!
+ *  GetMED [ static ]
+ *
+ *  Get Med of the study (for persistance)
+ */
+//=============================================================================
+
+SALOME_MED::MED_ptr Med_Gen_i::GetMED(SALOMEDS::SComponent_ptr theComponent)
+{
+  // we have a separate MED_i for each component in a study
+  SALOMEDS::Study_var study = theComponent->GetStudy();
+  ostringstream os;
+  os << study->StudyId() << "_" << theComponent->Tag();
+  string mapKey = os.str();
+  
+  MED_i* med_i;
+  map <string, MEDMEM::MED_i*>::iterator id_med;
+  id_med = _MedCorbaObj.find( mapKey );
+  if ( id_med == _MedCorbaObj.end() )
+    _MedCorbaObj[ mapKey ] = med_i = new MED_i();
+  else
+    med_i = id_med->second;
+  SALOME_MED::MED_var med = med_i->_this();
+  return med._retn();
 }
 
 //=============================================================================
@@ -229,7 +258,7 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
 	  // create ::MED object, read all and add in study !
 	  myMedI->init(myStudy,MED_DRIVER,fileName) ;
 	}
-        catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
+        catch (const SALOMEDS::StudyBuilder::LockProtection & ) {}
         catch(...)
         {
                 MESSAGE("Erreur a la lecture du fichier");
@@ -268,7 +297,7 @@ throw (SALOME::SALOME_Exception)
 	  // create ::MED object, read all and add in study !
 	  myMedI->initWithFieldType(myStudy,MED_DRIVER,fileName) ;
 	}
-        catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
+        catch (const SALOMEDS::StudyBuilder::LockProtection & ) {}
         catch(...)
         {
                 MESSAGE("Erreur a la lecture du fichier");
@@ -300,7 +329,26 @@ throw (SALOME::SALOME_Exception)
 
 // Creation du maillage
 
-	MESH * myMesh= new MESH() ;
+	MESH * myMesh;
+
+	// skl for IPAL14240
+	// check mesh or grid:
+	try {
+	  MED med(MED_DRIVER,fileName);
+	  MESH* tmpMesh = med.getMesh(meshName);
+	  if(tmpMesh) {
+	    if(tmpMesh->getIsAGrid())
+	      myMesh = new GRID();
+	    else
+	      myMesh = new MESH() ;
+	  }
+	}
+        catch (const std::exception & ex) {
+	  MESSAGE("Exception Interceptee : ");
+	  SCRUTE(ex.what());
+	  myMesh = new MESH() ;
+        };
+
   	myMesh->setName(meshName);
   	MED_MESH_RDONLY_DRIVER myMeshDriver(fileName,myMesh);
 	try
@@ -308,7 +356,11 @@ throw (SALOME::SALOME_Exception)
   		myMeshDriver.setMeshName(meshName);
 		myMeshDriver.open();
 	}
+#ifdef _DEBUG_
         catch (const std::exception & ex)
+#else
+        catch (const std::exception &)
+#endif
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -320,7 +372,11 @@ throw (SALOME::SALOME_Exception)
                 MESSAGE("apres read");
 		myMeshDriver.close();
 	}
+#ifdef _DEBUG_
         catch (const std::exception & ex)
+#else
+        catch (const std::exception &)
+#endif
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -335,7 +391,7 @@ throw (SALOME::SALOME_Exception)
 	  // add the mesh object in study
 // 	  if (!_duringLoad) meshi->addInStudy(myStudy,mesh);
 	}
-        catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
+        catch (const SALOMEDS::StudyBuilder::LockProtection & ) {}
 
         endService("Med_Gen_i::readMeshInFile");
         return mesh;
@@ -409,7 +465,18 @@ throw (SALOME::SALOME_Exception)
 // Creation du champ
 
 	FIELD_ * myField;
-        MED * mymed = new MED(MED_DRIVER,fileName) ;
+	MED * mymed;
+	try
+	{
+	  mymed = new MED(MED_DRIVER,fileName) ;
+	} 
+	catch (const std::exception & ex)
+	{
+	  MESSAGE("Exception Interceptee : ");
+	  SCRUTE(ex.what());
+	  THROW_SALOME_CORBA_EXCEPTION("Unable to find this file ",SALOME::BAD_PARAM);
+	}
+	
 	try
 	{
 		deque<string> fieldsNames = mymed->getFieldNames() ;
@@ -434,7 +501,11 @@ throw (SALOME::SALOME_Exception)
 */
 		myField = mymed->getField(fieldName,ordre,iter);
 	}
+#ifdef _DEBUG_
         catch (const std::exception & ex)
+#else
+        catch (const std::exception &)
+#endif
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -452,7 +523,11 @@ throw (SALOME::SALOME_Exception)
 		SCRUTE(myMesh->getName());
 		fieldSupport->update();
 	}
+#ifdef _DEBUG_
         catch (const std::exception & ex)
+#else
+        catch (const std::exception &)
+#endif
         {
                 MESSAGE("Exception Interceptee : ");
                 SCRUTE(ex.what());
@@ -473,8 +548,12 @@ throw (SALOME::SALOME_Exception)
 			endService("Med_Gen_i::readFieldInFile");
         		return myFieldIOR;
 		}
-		catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
+		catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
+#ifdef _DEBUG_            
         	catch (const std::exception & ex)
+#else
+        	catch (const std::exception &)
+#endif
         	{
                		MESSAGE("Exception Interceptee : ");
                 	SCRUTE(ex.what());
@@ -493,8 +572,13 @@ throw (SALOME::SALOME_Exception)
 			endService("Med_Gen_i::readFieldInFile");
         		return myFieldIOR;
 		}
-		catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
+		catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
+
+#ifdef _DEBUG_            
         	catch (const std::exception & ex)
+#else
+        	catch (const std::exception &)
+#endif
         	{
                		MESSAGE("Exception Interceptee : ");
                 	SCRUTE(ex.what());
@@ -540,21 +624,28 @@ namespace {
    */
   //================================================================================
 
-  pair<string,string> getPersistanceDirAndFileName(SALOMEDS::Study_ptr theStudy,
-                                                   const char*         theURL,
-                                                   const bool          isMultiFile,
-                                                   const bool          isSave)
+  pair<string,string> getPersistanceDirAndFileName(SALOMEDS::SComponent_ptr theComponent,
+                                                   const char*              theURL,
+                                                   const bool               isMultiFile,
+                                                   const bool               isSave)
   {
-    if ( isMultiFile )
+    string path, file;
+    CORBA::String_var compName = theComponent->ComponentDataType();
+    if ( isMultiFile ) {
       // file constantly holding data
-      return make_pair
-        ( theURL,
-          SALOMEDS_Tool::GetNameFromPath(theStudy->URL()) + "_MED.med" );
-    else
+      path = theURL;
+      SALOMEDS::Study_var study = theComponent->GetStudy();
+      file = SALOMEDS_Tool::GetNameFromPath( study->URL() );
+      file += string( "_" ) + string( compName ) + ".med";
+    }
+    else {
       // temporary file
-      return make_pair
-        ( isSave ? SALOMEDS_Tool::GetTmpDir() : theURL,
-          "tmp.med" );
+      path = SALOMEDS_Tool::GetTmpDir();
+      if ( strcmp( "MED", compName ) != 0 )
+        file = string( compName ) + "_"; // not MED
+      file += "tmp.med";
+    }
+    return make_pair ( path, file );
   }
 
   //================================================================================
@@ -568,17 +659,17 @@ namespace {
    */
   //================================================================================
 
-  SALOMEDS::TMPFile* saveStudy(SALOMEDS::Study_ptr theStudy,
-                               const char*         theURL,
-                               bool                isMultiFile,
-                               bool                isAscii)
+  SALOMEDS::TMPFile* saveStudy(SALOMEDS::SComponent_ptr theComponent,
+                               const char*              theURL,
+                               bool                     isMultiFile,
+                               bool                     isAscii)
   {
     const char* LOC = "Med_Gen_i::Save";
     BEGIN_OF(LOC);
 
     // Write all MEDMEM objects in one med file because of problems with
     // reference to external mesh when writting field in a separate file.
-    // Actually, writting is OK, but when reading a field, its support
+    // Actually, writting is OK, but when reading a field, it's support
     // is updated using mesh data missing in the file being read
 
     // If arises a problem of meshes or other objects having equal names,
@@ -586,7 +677,10 @@ namespace {
     // and renaming back during restoration, real names will be stored in
     // LocalPersistentID's for example
 
-    pair<string,string> aDir_aFileName = getPersistanceDirAndFileName(theStudy, theURL, isMultiFile, SAVE );
+    SALOMEDS::Study_var study = theComponent->GetStudy();
+
+    pair<string,string> aDir_aFileName =
+      getPersistanceDirAndFileName(theComponent, theURL, isMultiFile, SAVE );
     string& aPath     = aDir_aFileName.first;
     string& aBaseName = aDir_aFileName.second;
     string aFile      = aPath + aBaseName;
@@ -600,25 +694,12 @@ namespace {
       SALOMEDS_Tool::RemoveTemporaryFiles(aPath.c_str(), aSeq.in(), true);
     }
 
-    SALOMEDS::SObject_var aMedMeshFather = theStudy->FindObject("MEDMESH");
-    if (!CORBA::is_nil(aMedMeshFather)) {
-      SALOMEDS::ChildIterator_var anIter = theStudy->NewChildIterator(aMedMeshFather);
-      anIter->InitEx(1);
-      for(; anIter->More(); anIter->Next()) {
-        SALOMEDS::SObject_var aSO = anIter->Value();
-        SALOME_MED::MESH_var myMesh = SALOME_MED::MESH::_narrow( aSO->GetObject() );
-        if (! CORBA::is_nil(myMesh)) {
-          long driverId = myMesh->addDriver(SALOME_MED::MED_DRIVER,
-                                            aFile.c_str(),
-                                            myMesh->getName());
-          myMesh->write(driverId,"");
-        }
-      }
-    }
+    // First save fields and their meshes and then not saved meshes
 
-    SALOMEDS::SObject_var aMedFieldFather = theStudy->FindObject("MEDFIELD");
+    set< CORBA::Long > savedMeshIDs;
+    SALOMEDS::SObject_var aMedFieldFather = study->FindComponent("MED");
     if (!CORBA::is_nil(aMedFieldFather)) {
-      SALOMEDS::ChildIterator_var anIter = theStudy->NewChildIterator(aMedFieldFather);
+      SALOMEDS::ChildIterator_var anIter = study->NewChildIterator(aMedFieldFather);
       anIter->InitEx(1);
       for(; anIter->More(); anIter->Next()) {
         SALOMEDS::SObject_var aSO = anIter->Value();
@@ -628,13 +709,49 @@ namespace {
                                              aFile.c_str(),
                                              myField->getName());
           myField->write(driverId,"");
+          // save mesh
+          SALOME_MED::SUPPORT_var sup = myField->getSupport();
+          if ( !sup->_is_nil() ) {
+            SALOME_MED::MESH_var mesh = sup->getMesh();
+            if ( !mesh->_is_nil() ) {
+              CORBA::Long corbaID = mesh->getCorbaIndex();
+              if ( savedMeshIDs.find( corbaID ) == savedMeshIDs.end() ) {
+                long driverId = mesh->addDriver(SALOME_MED::MED_DRIVER,
+                                                aFile.c_str(),
+                                                mesh->getName());
+                mesh->write(driverId,"");
+                savedMeshIDs.insert( corbaID );
+              }
+            }
+          }
         }
       }
     }
+
+    SALOMEDS::SObject_var aMedMeshFather = study->FindComponent("MED");
+    if (!CORBA::is_nil(aMedMeshFather)) {
+      SALOMEDS::ChildIterator_var anIter = study->NewChildIterator(aMedMeshFather);
+      anIter->InitEx(1);
+      for(; anIter->More(); anIter->Next()) {
+        SALOMEDS::SObject_var aSO = anIter->Value();
+        SALOME_MED::MESH_var myMesh = SALOME_MED::MESH::_narrow( aSO->GetObject() );
+        if (! CORBA::is_nil(myMesh)) {
+          CORBA::Long corbaID = myMesh->getCorbaIndex();
+          if ( savedMeshIDs.find( corbaID ) == savedMeshIDs.end() ) {
+            long driverId = myMesh->addDriver(SALOME_MED::MED_DRIVER,
+                                              aFile.c_str(),
+                                              myMesh->getName());
+            myMesh->write(driverId,"");
+            savedMeshIDs.insert( corbaID );
+          }
+        }
+      }
+    }
+
     if ( isAscii )
       HDFascii::ConvertFromHDFToASCII( aFile.c_str(), true);
 
-    // Conver a file to the byte stream
+    // Convert a file to the byte stream
     SALOMEDS::TMPFile_var aStreamFile;
     aStreamFile = SALOMEDS_Tool::PutFilesToStream(aPath.c_str(), aSeq.in(), isMultiFile);
 
@@ -646,9 +763,172 @@ namespace {
     // Return the created byte stream
     END_OF(LOC);
     return aStreamFile._retn();
-  }
 
+  } // end of saveStudy()
+
+  //================================================================================
+  /*!
+   * \brief Load study contents
+    * \param theComponent - component holding med data
+    * \param theURL - 
+    * \param isMultiFile - 
+    * \param isASCII - 
+    * \retval char* - 
+   */
+  //================================================================================
+
+  void loadStudy(SALOMEDS::SComponent_ptr theComponent,
+                 const SALOMEDS::TMPFile& theStream,
+                 const char*         theURL,
+                 CORBA::Boolean      isMultiFile,
+                 CORBA::Boolean      isASCII)
+  {
+    SALOMEDS::Study_var study = theComponent->GetStudy();
+
+    // Get file name
+    pair<string,string> aDir_aFileName = getPersistanceDirAndFileName
+      (theComponent, theURL, isMultiFile, RESTORE);
+    string& aPath     = aDir_aFileName.first;
+    string& aBaseName = aDir_aFileName.second;
+    string aFile      = aPath + aBaseName;
+
+    SALOMEDS::ListOfFileNames_var aSeq =
+      SALOMEDS_Tool::PutStreamToFiles(theStream, aPath.c_str(), isMultiFile);
+
+    string aASCIIPath, aASCIIFile;
+    if (isASCII)
+    {
+      aASCIIPath = HDFascii::ConvertFromASCIIToHDF(aFile.c_str());
+      aASCIIFile = "hdf_from_ascii.hdf";
+      aFile = aASCIIPath + aASCIIFile;
+    }
+    SALOME_MED::MED_var med = Med_Gen_i::GetMED( theComponent );
+    MED_i* myMedI = Med_Gen_i::DownCast< MED_i* >( med );
+
+    // Read all meshes with supports and all fields
+    try
+    {
+//      cout << "-----------------Filename " << aFile << endl;
+      myMedI->initWithFieldType( study, MED_DRIVER, aFile, true );
+
+      // publishing must be done by initWithFieldType according to <persistence> flag
+      SALOME_MED::MED_ptr myMedIOR = myMedI->_this() ;
+      myMedI->addInStudy(study,myMedIOR, 0);
+    }
+    catch (const std::exception & ex)
+    {
+      MESSAGE("Exception Interceptee : ");
+      SCRUTE(ex.what());
+      THROW_SALOME_CORBA_EXCEPTION("Unable to read a hdf file",SALOME::BAD_PARAM);
+    };
+
+    // Remove tmp files
+    bool keepTmpFiles = getenv( "MEDPERSIST_KEEP_TMP_FILES" ); // DEBUG
+    if ( keepTmpFiles )
+      cout << "TMP FILE: " << aFile << endl;
+    if ( !isMultiFile && !keepTmpFiles ) {
+      aSeq->length(1);
+      aSeq[0]=CORBA::string_dup(aBaseName.c_str());
+      SALOMEDS_Tool::RemoveTemporaryFiles(aPath.c_str(), aSeq.in(), true);
+    }
+    if (isASCII)
+    {
+      aSeq->length(1);
+      aSeq[0] = CORBA::string_dup(aASCIIFile.c_str());
+//      cout << "-----------------Remove " << aASCIIPath<< ", "<<aASCIIFile << endl;
+      SALOMEDS_Tool::RemoveTemporaryFiles(aASCIIPath.c_str(), aSeq, true);
+    }
+
+  } // end loadStudy()
+
+
+  //================================================================================
+  /*!
+   * \brief retrieve filed features from LocalPersistentID
+    * \param aLocalPersistentID - ID
+    * \param aFieldName - out filed name
+    * \param aNumOrdre - out NumOrdre
+    * \param anIterNumber - out IterNumber
+   */
+  //================================================================================
+
+  void getFieldNameAndDtIt( const char*   aLocalPersistentID,
+                            string &      aFieldName,
+                            CORBA::Long & aNumOrdre,
+                            CORBA::Long & anIterNumber)
+  {
+    //     aLocalPersistentID(("_MEDFIELD_"+ myField->getName() +
+    //                       "_ORDRE_"+a.str()+
+    //                       "_ITER_"+b.str()+".med"
+    int aLPIdLen = strlen(aLocalPersistentID);
+    const int _MEDFIELD_Len = strlen("_MEDFIELD_");
+    const int _ORDRE_Len    = strlen("_ORDRE_");
+    const int _ITER_Len     = strlen("_ITER_");
+
+    // Get field name: look for _ORDRE_ in aLocalPersistentID
+    int aFieldNameLen = 0, aFieldNameBeg = _MEDFIELD_Len, _ORDRE_Beg;
+    for ( _ORDRE_Beg = aFieldNameBeg; _ORDRE_Beg < aLPIdLen; ++aFieldNameLen,++_ORDRE_Beg )
+      if ( strncmp( &aLocalPersistentID[ _ORDRE_Beg ], "_ORDRE_", _ORDRE_Len ) == 0 )
+        break;
+    aFieldName = string( &(aLocalPersistentID[aFieldNameBeg]), aFieldNameLen);
+
+    // Get orderNumber
+    int anOrderNumberBeg = _ORDRE_Beg + _ORDRE_Len;
+    aNumOrdre = atoi( & aLocalPersistentID[ anOrderNumberBeg ]);
+
+    // Get iterationNumber: look for _ITER_ in aLocalPersistentID
+    int _ITER_Beg = anOrderNumberBeg;
+    for ( ; _ITER_Beg < aLPIdLen; ++_ITER_Beg )
+      if ( strncmp( &aLocalPersistentID[ _ITER_Beg ], "_ITER_", _ITER_Len ) == 0 )
+        break;
+    anIterNumber = atoi( & aLocalPersistentID[ _ITER_Beg + _ITER_Len ]);
+  }
+  //================================================================================
+  /*!
+   * \brief Retrieve from aLocalPersistentID data to get support from med
+    * \param aLocalPersistentID - persistent ID
+    * \param type - string "FAMILY", "GROUP" or "SUPPORT
+    * \param name - support name
+    * \param mesh - mesh name
+    * \param entity - support entity
+    * \retval bool - true if all data found in aLocalPersistentID
+   */
+  //================================================================================
+
+  bool getSupportData( string aLocalPersistentID,
+                       string & type,
+                       string & name,
+                       string & mesh,
+                       string & entity)
+  {
+    // aLocalPersistentID contains:
+    // _MED_[FAMILY|GROUP|SUPPORT]/support_name/ENS_MAA/mesh_name/ENTITY/entity
+    string::size_type slash1Pos = aLocalPersistentID.find("/");
+    if ( slash1Pos == aLocalPersistentID.npos ) return false;
+    string::size_type ens_maaPos = aLocalPersistentID.find("/ENS_MAA/", slash1Pos);
+    if ( ens_maaPos == aLocalPersistentID.npos ) return false;
+    string::size_type entityPos = aLocalPersistentID.find("/ENTITY/", ens_maaPos);
+    if ( entityPos == aLocalPersistentID.npos ) return false;
+
+    string::size_type medSize = strlen("_MED_");
+    string::size_type ens_maaSize = strlen("/ENS_MAA/");
+    string::size_type entitySize = strlen("/ENTITY/");
+
+    type = aLocalPersistentID.substr( medSize, slash1Pos - medSize );
+    name = aLocalPersistentID.substr( slash1Pos + 1, ens_maaPos - slash1Pos - 1);
+    mesh = aLocalPersistentID.substr( ens_maaPos + ens_maaSize,
+                                      entityPos - ens_maaPos - ens_maaSize);
+    entity = aLocalPersistentID.substr( entityPos + entitySize );
+//     cout << aLocalPersistentID << endl
+//          << " type: " << type
+//          << " name: " << name
+//          << " mesh: " << mesh
+//          << " entity: " << entity << endl;
+    return true;
+  }
+  
 } // no name namespace
+
 
 //================================================================================
 /*!
@@ -664,7 +944,7 @@ SALOMEDS::TMPFile* Med_Gen_i::Save(SALOMEDS::SComponent_ptr theComponent,
                                    const char* theURL,
                                    bool isMultiFile)
 {
-  return saveStudy ( theComponent->GetStudy(), theURL, isMultiFile, NON_ASCII );
+  return saveStudy ( theComponent, theURL, isMultiFile, NON_ASCII );
 }
 
 //================================================================================
@@ -681,7 +961,7 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
                                         const char* theURL,
                                         bool isMultiFile)
 {
-  return saveStudy ( theComponent->GetStudy(), theURL, isMultiFile, ASCII );
+  return saveStudy ( theComponent, theURL, isMultiFile, ASCII );
 }
 
 //=============================================================================
@@ -693,24 +973,23 @@ SALOMEDS::TMPFile* Med_Gen_i::SaveASCII(SALOMEDS::SComponent_ptr theComponent,
 CORBA::Boolean Med_Gen_i::Load(SALOMEDS::SComponent_ptr theComponent,
 			       const SALOMEDS::TMPFile& theStream,
 			       const char* theURL,
-			       bool isMultiFile) {
+			       bool isMultiFile)
+{
   const char* LOC = "Med_Gen_i::Load";
   BEGIN_OF(LOC);
 
-  // Get a temporary directory for a file
-  TCollection_AsciiString aTmpDir =
-    (isMultiFile)?TCollection_AsciiString((char*)theURL):(char*)SALOMEDS_Tool::GetTmpDir().c_str();
-  _saveFileName = CORBA::string_dup(aTmpDir.ToCString());
-  SALOMEDS::ListOfFileNames_var aSeq =
-    SALOMEDS_Tool::PutStreamToFiles(theStream, aTmpDir.ToCString(), isMultiFile);
+  loadStudy ( theComponent, theStream, theURL, isMultiFile, NON_ASCII );
+
   return true;
 }
 
 CORBA::Boolean Med_Gen_i::LoadASCII(SALOMEDS::SComponent_ptr theComponent,
 				    const SALOMEDS::TMPFile& theStream,
 				    const char* theURL,
-				    bool isMultiFile) {
-  return Load(theComponent, theStream, theURL, isMultiFile);
+				    bool isMultiFile)
+{
+  loadStudy ( theComponent, theStream, theURL, isMultiFile, ASCII );
+  return true;
 }
 
 //=============================================================================
@@ -773,9 +1052,8 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   SALOME_MED::MED_var myMed = SALOME_MED::MED::_narrow(myIOR);
   if (! CORBA::is_nil(myMed))
   {
-        // nothing to save : Support will be saved inside the mesh
-	string str_MedName="_MED Objet Med + /OBJ_MED/";
-        return CORBA::string_dup(str_MedName.c_str()) ;
+    string str_MedName="_MED Objet Med + /OBJ_MED/";
+    return CORBA::string_dup(str_MedName.c_str()) ;
   }
 
   // MESH
@@ -790,21 +1068,30 @@ char* Med_Gen_i::IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
   SALOME_MED::SUPPORT_var mySupport = SALOME_MED::SUPPORT::_narrow(myIOR);
   if (! CORBA::is_nil(mySupport))
   {
-        // nothing to save : Support will be saved inside the mesh
-	string str_SupportName;
-	try
-	{
-    		str_SupportName=string("/FAS/")+string(mySupport->getName());
-		str_SupportName+=string("/ENS_MAA/")+string(mySupport->getMesh()->getName());
-   		SCRUTE(str_SupportName);
-	}
-	catch(...)
-	{
-		MESSAGE("Unable to save the support");
-                THROW_SALOME_CORBA_EXCEPTION("Unable to save Field in Med"\
-                                              ,SALOME::INTERNAL_ERROR);
-	}
-    return CORBA::string_dup(("_MED"+str_SupportName).c_str());
+    string type, str_SupportName;
+    SALOME_MED::FAMILY_var family = SALOME_MED::FAMILY::_narrow(myIOR);
+    if ( !family->_is_nil() )
+      type = "_MED_FAMILY";
+    else {
+      SALOME_MED::GROUP_var grp = SALOME_MED::GROUP::_narrow(myIOR);
+      if ( !grp->_is_nil() )
+        type = "_MED_GROUP";
+      else
+        type = "_MED_SUPPORT";
+    }
+    try  {
+      ostringstream os;
+      os << type << "/" << mySupport->getName();
+      os << "/ENS_MAA/" << mySupport->getMesh()->getName();
+      os << "/ENTITY/" << mySupport->getEntity();
+      str_SupportName = os.str();
+    }
+    catch(...) {
+      MESSAGE("Unable to save the support");
+      THROW_SALOME_CORBA_EXCEPTION("Unable to save Field in Med"\
+                                   ,SALOME::INTERNAL_ERROR);
+    }
+    return CORBA::string_dup(str_SupportName.c_str());
   }
 
   SALOME_MED::FIELD_var myField = SALOME_MED::FIELD::_narrow(myIOR);
@@ -840,61 +1127,111 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
   const char * LOC = "Med_Gen_i::LocalPersistentIDToIOR" ;
   BEGIN_OF(LOC) ;
 
-  bool isMesh, isField;
-  isMesh = isField = false;
+  // all object are restored in Load() if their name in study coincides
+  // with a default one generated by object.addInStudy(...)
+  CORBA::String_var ior = theSObject->GetIOR();
+  bool restoredByLoad = ( ior.in() && strlen( ior ) > 0 );
 
-  if (strcmp(aLocalPersistentID, "_MED Objet Med + /OBJ_MED/") == 0) // MED
+  if ( !restoredByLoad )
   {
-    // Get file name
-    pair<string,string> aDir_aFileName = getPersistanceDirAndFileName
-      (theSObject->GetStudy(), _saveFileName.c_str(), isMultiFile, RESTORE);
-    string& aPath     = aDir_aFileName.first;
-    string& aBaseName = aDir_aFileName.second;
-    string aFile      = aPath + aBaseName;
+    CORBA::Object_var object;
+    SALOMEDS::SComponent_var component = theSObject->GetFatherComponent();
+    SALOME_MED::MED_var med = GetMED( component );
 
-    string aASCIIPath, aASCIIFile;
-    if (isASCII)
+    // MED
+    if (strcmp(aLocalPersistentID, "_MED Objet Med + /OBJ_MED/") == 0)
     {
-      aASCIIPath = HDFascii::ConvertFromASCIIToHDF(aFile.c_str());
-      aASCIIFile = "hdf_from_ascii.hdf";
-      aFile = aASCIIPath + aASCIIFile;
+      object = med;
     }
-    MED_i* myMedI = new MED_i();
-
-    // Read all meshes with supports and all fields
-    try
+    // MESH
+    else if (strncmp(aLocalPersistentID, "_MEDMESH_",9) == 0)
     {
-//      cout << "-----------------Filename " << aFile << endl;
-      myMedI->initWithFieldType( theSObject->GetStudy(), MED_DRIVER, aFile, true );
+      int aMeshNameLen = strlen(aLocalPersistentID) - 12;
+      string aMeshName( &(aLocalPersistentID[9]), aMeshNameLen);
+      aMeshName[aMeshNameLen-1] = 0;
+      try {
+        object = med->getMeshByName( aMeshName.c_str() );
+      }
+      catch (const std::exception & ex) {
+        SCRUTE(ex.what());
+        THROW_SALOME_CORBA_EXCEPTION("Unable to find a mesh by name in this file",
+                                     SALOME::INTERNAL_ERROR);
+      }
     }
-    catch (const std::exception & ex)
+    // FIELD
+    else if (strncmp(aLocalPersistentID, "_MEDFIELD_",10) == 0)
     {
-      MESSAGE("Exception Interceptee : ");
-      SCRUTE(ex.what());
-      THROW_SALOME_CORBA_EXCEPTION("Unable to read a hdf file",SALOME::BAD_PARAM);
-    };
-
-    // Remove tmp files
-    SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
-    if (!isMultiFile) {
-      aSeq->length(1);
-      aSeq[0]=CORBA::string_dup(aBaseName.c_str());
-//      cout << "-----------------Remove " << aPath<< ", "<<aBaseName << endl;
-      SALOMEDS_Tool::RemoveTemporaryFiles(aPath.c_str(), aSeq.in(), true);
+      // Field Name
+      string aFieldName;
+      CORBA::Long aNumOrdre, anIterNumber;
+      getFieldNameAndDtIt( aLocalPersistentID, aFieldName, aNumOrdre, anIterNumber );
+      // Get a field that is already read
+      try {
+        object = med->getField( aFieldName.c_str(), anIterNumber, aNumOrdre );
+      }
+      catch (const std::exception & ex) {
+        SCRUTE(ex.what());
+        THROW_SALOME_CORBA_EXCEPTION("Unable to find a field by name in this file",
+                                     SALOME::INTERNAL_ERROR);
+      }
     }
-    if (isASCII)
-    {
-      aSeq->length(1);
-      aSeq[0] = CORBA::string_dup(aASCIIFile.c_str());
-//      cout << "-----------------Remove " << aASCIIPath<< ", "<<aASCIIFile << endl;
-      SALOMEDS_Tool::RemoveTemporaryFiles(aASCIIPath.c_str(), aSeq, true);
+    // SUPPORT?
+    else {
+      string type, name, meshName, entity;
+      MED_EN::medEntityMesh medEntity( atoi( entity.c_str() ));
+      if ( getSupportData( aLocalPersistentID, type, name, meshName, entity ))
+      {
+        if ( type == "SUPPORT" ) {
+          MED_i* med_i = DownCast< MED_i* >( med );
+          try {
+            object = med_i->getSupport( meshName, medEntity ); 
+          }
+          catch (const std::exception & ex) {
+            SCRUTE(ex.what());
+            THROW_SALOME_CORBA_EXCEPTION("Unable to find support in this file",
+                                         SALOME::INTERNAL_ERROR);
+          }
+        }
+        else {
+          SALOME_MED::MESH_var mesh;
+          try {
+            mesh = med->getMeshByName( meshName.c_str() );
+          }
+          catch (const std::exception & ex) {
+            SCRUTE(ex.what());
+            THROW_SALOME_CORBA_EXCEPTION("Unable to find mesh in this file",
+                                         SALOME::INTERNAL_ERROR);
+          }
+          if ( !mesh->_is_nil() ) {
+            try {
+              if ( type == "FAMILY" ) {
+                SALOME_MED::Family_array_var families = mesh->getFamilies( medEntity );
+                for ( int i = 0; CORBA::is_nil(object) && i <= families->length(); ++i )
+                  if ( families[ i ]->getName() == name )
+                    object = SALOME_MED::FAMILY::_duplicate( families[ i ]);
+              }
+              else {
+                SALOME_MED::Group_array_var groups = mesh->getGroups( medEntity );
+                for ( int i = 0; CORBA::is_nil(object) && i <= groups->length(); ++i )
+                  if ( groups[ i ]->getName() == name )
+                    object = SALOME_MED::GROUP::_duplicate( groups[ i ]);
+              }
+            }
+            catch (const std::exception & ex) {
+              SCRUTE(ex.what());
+              THROW_SALOME_CORBA_EXCEPTION("Unable to find support in this file",
+                                           SALOME::INTERNAL_ERROR);
+            }
+          }
+        }
+      }
     }
+    if ( !CORBA::is_nil(object) )
+      ior = _orb->object_to_string( object );
 
-    SALOME_MED::MED_ptr myMedIOR = myMedI->_this();
-    return(CORBA::string_dup(_orb->object_to_string(myMedIOR)));
-  }
+  } // !restoredByLoad
 
-  return (CORBA::string_dup( theSObject->GetIOR() )); // is loaded along with MED
+  return ior._retn();
 }
 
 //=============================================================================
@@ -962,7 +1299,8 @@ SALOMEDS::SObject_ptr Med_Gen_i::PublishInStudy(SALOMEDS::Study_ptr theStudy,
 //     SALOME_MED::SUPPORT_var aSupport = SALOME_MED::SUPPORT::_narrow(theObject);
 //     if ( !aSupport->_is_nil())
 //       aSupport->addInStudy(theStudy, aSupport);
-    aResultSO = theStudy->FindObjectIOR(_orb->object_to_string(theObject));
+    CORBA::String_var objStr = _orb->object_to_string(theObject);
+    aResultSO = theStudy->FindObjectIOR(objStr.in());
   } else {
 //     if (!theSObject->ReferencedObject(aResultSO))
 //       THROW_SALOME_CORBA_EXCEPTION("Publish in study MED object error",SALOME::BAD_PARAM);
@@ -1078,7 +1416,12 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   try {
     myMeshDriver.setMeshName(aFullMeshName);
     myMeshDriver.open();
-  } catch (const std::exception & ex) {
+  }
+#ifdef _DEBUG_            
+  catch (const std::exception & ex){
+#else
+  catch (const std::exception &){
+#endif
     MESSAGE("Exception Interceptee : ");
     SCRUTE(ex.what());
     return aResultSO._retn();
@@ -1087,7 +1430,12 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
     myMeshDriver.read();
     MESSAGE("apres read");
     myMeshDriver.close();
-  } catch (const std::exception & ex) {
+  }
+#ifdef _DEBUG_            
+  catch (const std::exception & ex){
+#else
+  catch (const std::exception &){
+#endif
     MESSAGE("Exception Interceptee : ");
     SCRUTE(ex.what());
     return aResultSO._retn();
@@ -1104,7 +1452,7 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
   meshi->addInStudy(aStudy,mesh);
   // get the IOR attribute of just added mesh
   CORBA::String_var anIORString = _orb->object_to_string(mesh);
-  aResultSO = aStudy->FindObjectIOR(anIORString);
+  aResultSO = aStudy->FindObjectIOR(anIORString.in());
 
   char * aFullName1 = new char[strlen(aTmpDir)+1];
   strcpy(aFullName1,aTmpDir);
@@ -1124,19 +1472,17 @@ SALOMEDS::SObject_ptr Med_Gen_i::PasteInto(const SALOMEDS::TMPFile& theStream,
  */
 //=============================================================================
 
-extern "C"
-{
+extern "C" MED_EXPORT 
   PortableServer::ObjectId * MEDEngine_factory(
 			       CORBA::ORB_ptr orb,
 			       PortableServer::POA_ptr poa,
 			       PortableServer::ObjectId * contId,
 			       const char *instanceName,
 		       	       const char *interfaceName)
-  {
-    MESSAGE("PortableServer::ObjectId * MedEngine_factory()");
-    SCRUTE(interfaceName);
-    Med_Gen_i * myMed_Gen
-      = new Med_Gen_i(orb, poa, contId, instanceName, interfaceName);
-    return myMed_Gen->getId() ;
-  }
+{
+  MESSAGE("PortableServer::ObjectId * MedEngine_factory()");
+  SCRUTE(interfaceName);
+  Med_Gen_i * myMed_Gen
+    = new Med_Gen_i(orb, poa, contId, instanceName, interfaceName);
+  return myMed_Gen->getId() ;
 }

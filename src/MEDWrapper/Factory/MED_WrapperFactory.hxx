@@ -1,5 +1,3 @@
-//  
-//
 //  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
 // 
@@ -17,46 +15,33 @@
 //  License along with this library; if not, write to the Free Software 
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
 // 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
 //
 //
 //
-//  File   : 
-//  Author : 
-//  Module : 
-//  $Header$
+//  File   : MED_WrapperFactory.hxx
+//  Author : Alexander A. BORODIN
+//  Module : MED
 
-#ifndef MED_CoordUtils_HeaderFile
-#define MED_CoordUtils_HeaderFile
+#ifndef _MED_WrapperFactory_HXX_
+#define _MED_WrapperFactory_HXX_
 
-#include "MED_WrapperBase.hxx"
-
-#include "MED_Structures.hxx"
-
-namespace MED
-{
-  typedef TFloat (*TGetCoord)(const TCCoordSlice& theCoordSlice);
-
-
-  //---------------------------------------------------------------
-  class MEDWRAPPER_EXPORT TCoordHelper
-  {
-    TGetCoord* myGetCoord;
-    
-  public:
-    TCoordHelper(TGetCoord* theGetCoord);
-
-    TFloat 
-    GetCoord(TCCoordSlice& theCoordSlice, 
-	     TInt theCoordId);
-  };
-  typedef SharedPtr<TCoordHelper> PCoordHelper;
-
-
-  //---------------------------------------------------------------
-  MEDWRAPPER_EXPORT PCoordHelper
-  GetCoordHelper(PNodeInfo theNodeInfo);
-
-}
+#ifdef WNT
+ #if defined MEDWRAPPER_FACTORY_EXPORTS
+  #if defined WIN32
+   #define MEDWRAPPER_FACTORY_EXPORT __declspec( dllexport )
+  #else
+   #define MEDWRAPPER_FACTORY_EXPORT
+  #endif
+ #else
+  #if defined WIN32
+   #define MEDWRAPPER_FACTORY_EXPORT __declspec( dllimport )
+  #else
+   #define MEDWRAPPER_FACTORY_EXPORT
+  #endif
+ #endif
+#else
+ #define MEDWRAPPER_FACTORY_EXPORT
+#endif
 
 #endif

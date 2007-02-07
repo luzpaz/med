@@ -1,6 +1,8 @@
 #ifndef MESHCOLLECTION_
 #define MESHCOLLECTION_
 
+#include "MEDSPLITTER.hxx"
+
 //#include "MESHCollectionDriver.hxx"
 #include "MEDSPLITTER_Graph.hxx"
 #include "boost/shared_ptr.hpp"
@@ -15,7 +17,7 @@ namespace MEDSPLITTER{
 class Topology;
 class MESHCollectionDriver;
 
-class MESHCollection
+class MEDSPLITTER_EXPORT MESHCollection
 {
 	
 public:

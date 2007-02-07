@@ -19,6 +19,8 @@
 #ifndef MEDMEM_INTERLACING_HXX
 #define MEDMEM_INTERLACING_HXX
 
+#include <MEDMEM.hxx>
+
 #include <iostream>
 #include "MEDMEM_Utilities.hxx"
 
@@ -27,7 +29,7 @@
 
 namespace MEDMEM {
 
-class InterlacingPolicy {
+class MEDMEM_EXPORT InterlacingPolicy {
 protected:
   ~InterlacingPolicy() {} //pour éviter qu'un utilisateur cast la class array en politique
 public :
@@ -79,7 +81,7 @@ public :
 };
 
 
-class FullInterlaceNoGaussPolicy : public  InterlacingPolicy {
+class MEDMEM_EXPORT FullInterlaceNoGaussPolicy : public  InterlacingPolicy {
 
 protected:
   ~FullInterlaceNoGaussPolicy() {} //pour éviter qu'un utilisateur cast la class array en politique
@@ -105,7 +107,7 @@ public :
 
 };
 
-class NoInterlaceNoGaussPolicy : public InterlacingPolicy {
+class MEDMEM_EXPORT NoInterlaceNoGaussPolicy : public InterlacingPolicy {
 
 protected:
   ~NoInterlaceNoGaussPolicy() {} //pour éviter qu'un utilisateur cast la class array en politique
@@ -132,7 +134,7 @@ public :
 
 };
 
-class FullInterlaceGaussPolicy : public InterlacingPolicy {
+class MEDMEM_EXPORT FullInterlaceGaussPolicy : public InterlacingPolicy {
 protected:
   ~FullInterlaceGaussPolicy() {} //pour éviter qu'un utilisateur cast la class array en politique
 public :
@@ -238,7 +240,7 @@ public :
 
 };
 
-class NoInterlaceGaussPolicy : public InterlacingPolicy {
+class MEDMEM_EXPORT NoInterlaceGaussPolicy : public InterlacingPolicy {
 
 protected:
   ~NoInterlaceGaussPolicy() {} //pour éviter qu'un utilisateur cast la class array en politique

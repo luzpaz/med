@@ -41,7 +41,8 @@ LIB_SRC = \
 	MED_Factory.cxx
 
 EXPORT_HEADERS = \
-	MED_Factory.hxx
+	MED_Factory.hxx \
+	MED_WrapperFactory.hxx
 
 # Executables targets
 BIN = MED_Test mprint_version

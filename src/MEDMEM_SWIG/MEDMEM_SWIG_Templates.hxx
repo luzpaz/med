@@ -45,7 +45,7 @@ template<>
     static int Traducer(PyObject *a) { return (int) PyInt_AsLong(a); }
     static PyObject * Traducer( int value ) { return Py_BuildValue("i", value ); }
     static int Functor(PyObject *func, int value)
-    { return Traducer( PyObject_CallFunction( func, "f", value )); }
+    { return Traducer( PyObject_CallFunction( func, "i", value )); }
   };
 
 template<class T>

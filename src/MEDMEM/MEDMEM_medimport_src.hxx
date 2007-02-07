@@ -37,6 +37,8 @@
 #ifndef IMPORT_HXX
 #define IMPORT_HXX
 
+#include <MEDMEM.hxx>
+
 #include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
@@ -258,35 +260,35 @@ namespace med_2_2 {
 
 namespace med_2_2 {
 
-med_err OLD_MEDattrNumLire(med_idt pere, med_type_champ type, char *nom,
+MEDMEM_EXPORT med_err OLD_MEDattrNumLire(med_idt pere, med_type_champ type, char *nom,
 			   unsigned char *val, hid_t hdf_file);
 
-med_err OLD_MEDdatasetNumLire(med_idt pere, char *nom, med_type_champ type,
+MEDMEM_EXPORT med_err OLD_MEDdatasetNumLire(med_idt pere, char *nom, med_type_champ type,
 			      med_mode_switch interlace, med_size nbdim,
 			      med_size fixdim, med_size psize,
 			      med_ssize * pfltab, med_int ngauss,
 			      unsigned char *val,hid_t hdf_file);
 
-void conversion_chaine(char *ancienne_chaine, char *nouvelle_chaine,
+MEDMEM_EXPORT void conversion_chaine(char *ancienne_chaine, char *nouvelle_chaine,
 		       med_int n);
 
-void MAJ_version(med_idt fid) throw (MEDMEM::MEDEXCEPTION) ;
+MEDMEM_EXPORT void MAJ_version(med_idt fid) throw (MEDMEM::MEDEXCEPTION) ;
 
-void MAJ_noeuds_maillage(med_idt mid, med_int dimension) throw (MEDMEM::MEDEXCEPTION) ;
+MEDMEM_EXPORT void MAJ_noeuds_maillage(med_idt mid, med_int dimension) throw (MEDMEM::MEDEXCEPTION) ;
 
-void MAJ_elements_maillage(med_idt mid, med_int dimension)
+MEDMEM_EXPORT void MAJ_elements_maillage(med_idt mid, med_int dimension)
   throw (MEDMEM::MEDEXCEPTION);
 
-void MAJ_familles_maillage(med_idt mid) throw (MEDMEM::MEDEXCEPTION) ;
+MEDMEM_EXPORT void MAJ_familles_maillage(med_idt mid) throw (MEDMEM::MEDEXCEPTION) ;
 
-void MAJ_maillages(med_idt fid) throw (MEDMEM::MEDEXCEPTION) ;
+MEDMEM_EXPORT void MAJ_maillages(med_idt fid) throw (MEDMEM::MEDEXCEPTION) ;
 
-void MAJ_localisation_Gauss(med_idt fid,char *nom_modele,med_int ngauss)
+MEDMEM_EXPORT void MAJ_localisation_Gauss(med_idt fid,char *nom_modele,med_int ngauss)
   throw (MEDMEM::MEDEXCEPTION) ;
 
-void MAJ_champs(med_idt fid) throw (MEDMEM::MEDEXCEPTION) ;
+MEDMEM_EXPORT void MAJ_champs(med_idt fid) throw (MEDMEM::MEDEXCEPTION) ;
 
-void MAJ_profils(med_idt fid,med_int nprofil) throw (MEDMEM::MEDEXCEPTION) ;
+MEDMEM_EXPORT void MAJ_profils(med_idt fid,med_int nprofil) throw (MEDMEM::MEDEXCEPTION) ;
 }
 
 namespace MEDMEM {
@@ -298,7 +300,7 @@ namespace MEDMEM {
   command in the directory $HOME/TMP_Med2_2Files/
 */
 
-char * med2_1_To_med2_2(char * fileNameIn) throw (MEDMEM::MEDEXCEPTION) ;
+MEDMEM_EXPORT char * med2_1_To_med2_2(char * fileNameIn) throw (MEDMEM::MEDEXCEPTION) ;
 }
 
 #endif /* IMPORT_HXX */

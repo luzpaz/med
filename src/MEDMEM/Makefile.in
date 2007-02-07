@@ -98,7 +98,8 @@ MEDMEM_MEDMEMgaussEcr.hxx \
 MEDMEM_MEDMEMprofilEcr.hxx \
 MEDMEM_MEDMEMchampLire.hxx \
 MEDMEM_SetInterlacingType.hxx\
-MEDMEM_ConnectZone.hxx
+MEDMEM_ConnectZone.hxx \
+MEDMEM.hxx
 
 # Libraries targets
 

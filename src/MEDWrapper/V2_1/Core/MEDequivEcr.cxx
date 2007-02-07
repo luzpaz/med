@@ -87,7 +87,7 @@ MEDequivEcr(med_idt fid, char *maa, char *eq, med_int *corr, med_int n,
 
   dimd[0] = 2*n;
 
-#if defined(IRIX64)||defined(OSF1)
+#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
   if ((ret =  _MEDdatasetNumEcrire(datagroup,MED_NOM_COR,MED_INT64,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
 				(unsigned char*) corr,mode)) < 0)
     return -1;

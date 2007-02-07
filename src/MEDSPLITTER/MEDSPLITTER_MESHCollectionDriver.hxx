@@ -1,12 +1,13 @@
 #ifndef MESHCOLLECTIONDRIVER_HXX_
 #define MESHCOLLECTIONDRIVER_HXX_
 
+#include "MEDSPLITTER.hxx"
 
 namespace MEDSPLITTER{
 	
 class MESHCollection;
 
-class MESHCollectionDriver
+class MEDSPLITTER_EXPORT MESHCollectionDriver
 {
 public:
   

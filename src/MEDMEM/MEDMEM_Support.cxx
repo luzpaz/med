@@ -414,6 +414,20 @@ void SUPPORT::setpartial(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDE
   END_OF(LOC);
 };
 
+void SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDEXCEPTION)
+//-------------------
+{
+  const char * LOC = "SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number) : " ;
+  BEGIN_OF(LOC) ;
+
+  if ( shallowCopy )
+    _number_fromfile = number;
+  else
+    _number_fromfile = new MEDSKYLINEARRAY(*number);
+
+  END_OF(LOC);
+};
+
 void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
 
   const char * LOC = "SUPPORT::setProfilNames(vector<string> profilNames) : " ;

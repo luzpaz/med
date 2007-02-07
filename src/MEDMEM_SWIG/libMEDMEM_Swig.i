@@ -1459,6 +1459,8 @@ class MED
 
   void read (int index=0);
 
+  void readFileStruct (int index=0);
+
   void addField ( FIELD_  * const ptrField  );
 
   void addMesh  ( MESH    * const ptrMesh   );

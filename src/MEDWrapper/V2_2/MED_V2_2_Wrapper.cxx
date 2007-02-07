@@ -30,6 +30,11 @@
 #include "MED_Algorithm.hxx"
 #include "MED_Utilities.hxx"
 
+
+
+//#include <med.h>
+//using namespace med_2_2;
+
 extern "C"
 {
 #include <med.h>
@@ -37,6 +42,8 @@ extern "C"
 med_err
 MEDgaussInfo(med_idt fid, int indice, char * locname, med_geometrie_element * type_geo,
 	     med_int * ngauss );
+med_int
+MEDnMaa(med_idt fid);
 }
 
 #ifdef _DEBUG_
@@ -506,7 +513,7 @@ namespace MED
 	aRet  = MEDnomEcr(myFile->Id(),
 			  &aMeshInfo.myName[0],
 			  &anInfo.myElemNames[0],
-			  anInfo.myElemNames.size(),
+			  (TInt)anInfo.myElemNames.size(),
 			  med_entite_maillage(theEntity),
 			  med_geometrie_element(theGeom));
 	if(theErr) 
@@ -547,7 +554,7 @@ namespace MED
 	aRet  = MEDnumEcr(myFile->Id(),
 			  &aMeshInfo.myName[0],
 			  (med_int*)&anInfo.myElemNum[0],
-			  anInfo.myElemNum.size(),
+			  (TInt)anInfo.myElemNum.size(),
 			  med_entite_maillage(theEntity),
 			  med_geometrie_element(theGeom));
 	if(theErr) 
@@ -586,7 +593,7 @@ namespace MED
       TErr aRet = MEDfamEcr(myFile->Id(),
 			    &aMeshInfo.myName[0],
 			    (med_int*)&anInfo.myFamNum[0],
-			    anInfo.myFamNum.size(),
+			    (TInt)anInfo.myFamNum.size(),
 			    med_entite_maillage(theEntity),
 			    med_geometrie_element(theGeom));
       
@@ -718,7 +725,7 @@ namespace MED
 	return;
 
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
-      TInt aNbElem = theInfo.myElemNum.size();
+      TInt aNbElem = (TInt)theInfo.myElemNum.size();
 
       TErr aRet;
       aRet = MEDpolygoneConnLire(myFile->Id(), 
@@ -854,7 +861,7 @@ namespace MED
 	return;
 
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
-      TInt aNbElem = theInfo.myElemNum.size();
+      TInt aNbElem = (TInt)theInfo.myElemNum.size();
 
       TErr aRet;
       aRet = MEDpolyedreConnLire(myFile->Id(), 
@@ -862,7 +869,7 @@ namespace MED
 				 (med_int*)&theInfo.myIndex[0],
 				 aNbElem + 1,
 				 (med_int*)&theInfo.myFaces[0],
-				 theInfo.myFaces.size(),
+				 (TInt)theInfo.myFaces.size(),
 				 (med_int*)&theInfo.myConn[0],
 				 med_connectivite(theInfo.myConnMode));
 
@@ -916,7 +923,7 @@ namespace MED
 				(med_int*)&anInfo.myIndex[0],
 				anInfo.myNbElem+1,
 				(med_int*)&anInfo.myFaces[0],
-				anInfo.myFaces.size(),
+				(TInt)anInfo.myFaces.size(),
 				(med_int*)&anInfo.myConn[0],
 				med_connectivite(theInfo.myConnMode));
       
@@ -929,7 +936,7 @@ namespace MED
 	aRet  = MEDnomEcr(myFile->Id(),
 			  &aMeshInfo.myName[0],
 			  &anInfo.myElemNames[0],
-			  anInfo.myElemNames.size(),
+			  (TInt)anInfo.myElemNames.size(),
 			  med_entite_maillage(theInfo.myEntity),
 			  MED_POLYEDRE);
 	if(theErr) 
@@ -942,7 +949,7 @@ namespace MED
 	aRet  = MEDnumEcr(myFile->Id(),
 			  &aMeshInfo.myName[0],
 			  (med_int*)&anInfo.myElemNum[0],
-			  anInfo.myElemNum.size(),
+			  (TInt)anInfo.myElemNum.size(),
 			  med_entite_maillage(theInfo.myEntity),
 			  MED_POLYEDRE);
 	if(theErr) 
@@ -955,7 +962,7 @@ namespace MED
       aRet = MEDfamEcr(myFile->Id(),
 		       &aMeshInfo.myName[0],
 		       (med_int*)&anInfo.myFamNum[0],
-		       anInfo.myFamNum.size(),
+		       (TInt)anInfo.myFamNum.size(),
 		       med_entite_maillage(theInfo.myEntity),
 		       MED_POLYEDRE);
       
@@ -1134,7 +1141,7 @@ namespace MED
 	return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
-      TInt aNbElem = theInfo.myElemNum.size();
+      TInt aNbElem = (TInt)theInfo.myElemNum.size();
 
       char* anElemNames = theInfo.myIsElemNames? &theInfo.myElemNames[0]: NULL;
       med_int* anElemNum = theInfo.myIsElemNum? &theInfo.myElemNum[0]: NULL;
@@ -1326,7 +1333,7 @@ namespace MED
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
 
       if(theErr && *theErr < 0)
-	return TGaussInfo::TInfo();
+	      return TGaussInfo::TInfo( TGaussInfo::TKey(ePOINT1,""),0 );
       
       med_int aNbGaussPoints = med_int();
       TVector<char> aName(GetNOMLength<eV2_2>()+1);
@@ -1676,7 +1683,7 @@ namespace MED
 			aNbGauss,
 			aFieldInfo.myNbComp);
 	TValue& aValue = aMeshValue.myValue;
-	TInt anEnd = aValue.size();
+	TInt anEnd = (TInt)aValue.size();
 
 	switch(aFieldInfo.myType){
 	case eFLOAT64: {
@@ -1857,7 +1864,7 @@ namespace MED
 
 	med_int aNbVal = aMeshValue.myNbElem * aMeshValue.myNbGauss;
 	TValue& aValue = aMeshValue.myValue;
-	TInt anEnd = aValue.size();
+	TInt anEnd = (TInt)aValue.size();
 	
 	switch(aFieldInfo.myType){
 	case eFLOAT64: {
