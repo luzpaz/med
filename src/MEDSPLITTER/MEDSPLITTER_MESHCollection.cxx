@@ -241,7 +241,7 @@ void MESHCollection::getNodeConnectivity(const int* cell_list,int nb_cells,MED_E
 			else
 				conn_ip[i]=0;											
 		}
-	ParallelTopology* topo=static_cast<ParallelTopology*>(m_topology);
+	
 	for (int icell=0; icell<nb_cells; icell++)
 		{
 			int number_of_types = number_of_types_array[ip[icell]];
@@ -256,7 +256,7 @@ void MESHCollection::getNodeConnectivity(const int* cell_list,int nb_cells,MED_E
 			for (int inode=0; inode<nbnode_per_type; inode++)
 				{
 					type_connectivity[icell*nbnode_per_type+inode]=
-						topo->convertNodeToGlobal(ip[icell],conn[(local[icell]-type_offset-1)*nbnode_per_type+inode]);												
+						m_topology->convertNodeToGlobal(ip[icell],conn[(local[icell]-type_offset-1)*nbnode_per_type+inode]);												
 				}
 		}
 	
@@ -1278,13 +1278,11 @@ void MESHCollection::castField(const MESHCollection& old_collection, const strin
   int type=old_collection.getDriver()->getFieldType(fieldname);
   char field_char[80];
   strcpy(field_char,fieldname.c_str());
-  double double_type_of_field=1.0;
-  int int_type_of_field=1;
-
+  
   if (type ==0)
-    castFields(old_collection, field_char, itnumber, ordernumber, int_type_of_field);
+    castFields<int>(old_collection, field_char, itnumber, ordernumber);
   else
-    castFields(old_collection, field_char, itnumber, ordernumber, double_type_of_field);
+    castFields<double>(old_collection, field_char, itnumber, ordernumber);
 }
 
 void MESHCollection::castAllFields(const MESHCollection& initial_collection)
@@ -1301,12 +1299,10 @@ void MESHCollection::castAllFields(const MESHCollection& initial_collection)
 			strcpy(field_char,field_names[i].c_str());
 		
 			// choosing whether the field is of int or double type
-			double double_type_of_field=1.0;
-			int int_type_of_field=1;
 			if (types[i] ==0)
-				castFields(initial_collection, field_char, iternumber[i], ordernumber[i], int_type_of_field);
+        castFields<int>(initial_collection, field_char, iternumber[i], ordernumber[i]);
 			else
-				castFields(initial_collection, field_char, iternumber[i], ordernumber[i], double_type_of_field);
+			  castFields<double>(initial_collection, field_char, iternumber[i], ordernumber[i]);
 		}
 }
 
