@@ -134,6 +134,32 @@ const int * CONNECTZONE::getEntityCorrespValue(MED_EN::medEntityMesh localEntity
 	return 0;	        	
 }
 
+int CONNECTZONE::getEntityCorrespNumber(MED_EN::medEntityMesh localEntity,
+                  MED_EN::medEntityMesh distantEntity) const
+{
+  typedef map<pair<MED_EN::medEntityMesh,MED_EN::medEntityMesh>, MEDMEM::MEDSKYLINEARRAY*>::const_iterator map_iter;
+  
+  for (map_iter iter=_entityCorresp.begin(); iter != _entityCorresp.end(); iter++)
+  {
+    if ((iter->first).first==localEntity && (iter->first).second==distantEntity)
+      return iter->second->getNumberOf();
+  }
+  return 0;           
+}
+
+
+int CONNECTZONE::getEntityCorrespLength(MED_EN::medEntityMesh localEntity,
+                  MED_EN::medEntityMesh distantEntity) const
+{
+  typedef map<pair<MED_EN::medEntityMesh,MED_EN::medEntityMesh>, MEDMEM::MEDSKYLINEARRAY*>::const_iterator map_iter;
+  
+  for (map_iter iter=_entityCorresp.begin(); iter != _entityCorresp.end(); iter++)
+  {
+    if ((iter->first).first==localEntity && (iter->first).second==distantEntity)
+      return iter->second->getLength();
+  }
+  return 0;           
+}
 
   void CONNECTZONE::setName(string name) 
   {
