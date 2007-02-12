@@ -293,30 +293,30 @@ void MESHCollectionDriver::write(char* filename)
 	m_filename.resize(nbdomains);
 
 	//loop on the domains
-	for (int i=0; i<nbdomains;i++)
+	for (int idomain=0; idomain<nbdomains;idomain++)
 		{
 			char distfilename[256];
 	
 			ostringstream suffix;
-			suffix << filename<< i+1 <<".med";
+			suffix << filename<< idomain+1 <<".med";
 		
 			strcpy(distfilename,suffix.str().c_str());
 
-			m_filename[i]=string(distfilename);
+			m_filename[idomain]=string(distfilename);
 		
 			MESSAGE("File name "<<string(distfilename));
 		
-			int id=(m_collection->getMesh())[i]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[i]->getName());
+			int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName());
 		
 			MESSAGE("Start writing");
-			(m_collection->getMesh())[i]->write(id);
+			(m_collection->getMesh())[idomain]->write(id);
 		
 			//updating the ascii description file
-			file << m_collection->getName() <<" "<< i+1 << " "<< (m_collection->getMesh())[i]->getName() << " localhost " << distfilename << " "<<endl;
+			file << m_collection->getName() <<" "<< idomain+1 << " "<< (m_collection->getMesh())[idomain]->getName() << " localhost " << distfilename << " "<<endl;
 	
 			//build connect zones
 			if (nbdomains>1)
-				m_collection->buildConnectZones(i);
+				m_collection->buildConnectZones(idomain);
 		
 			MESSAGE(" Number of connect zones "<<(m_collection->getCZ()).size());
 				
@@ -327,9 +327,10 @@ void MESHCollectionDriver::write(char* filename)
 			int index_joint=0;
 			for (int icz=0; icz<(m_collection->getCZ()).size(); icz++)
 				{
-					if ((m_collection->getCZ())[icz]->getLocalDomainNumber()==i)
+					if ((m_collection->getCZ())[icz]->getLocalDomainNumber()==idomain)
 						{
-				
+              med_2_2::med_err error;
+				      int idistant=(m_collection->getCZ())[icz]->getDistantDomainNumber();
 							char joint_name[MED_TAILLE_NOM];
 							sprintf(joint_name,"joint%i",index_joint+1);
 							char desc[MED_TAILLE_DESC];
@@ -339,39 +340,116 @@ void MESHCollectionDriver::write(char* filename)
 							sprintf(distant_name,"domain_%i",(m_collection->getCZ())[icz]->getDistantDomainNumber());
 							char mesh_name[MED_TAILLE_NOM];
 
-							strcpy (mesh_name, (m_collection->getMesh())[i]->getName().c_str());
-							med_2_2::med_err err1 = med_2_2::MEDjointCr(fid,mesh_name, joint_name, desc, 
-																													(m_collection->getCZ())[icz]->getDistantDomainNumber(), distant_name);
-							if (err1==1) cout << "erreur creation de joint "<<endl;
+              
+							strcpy (mesh_name, (m_collection->getMesh())[idomain]->getName().c_str());
+							error = med_2_2::MEDjointCr(fid,mesh_name, joint_name, desc, 
+																													idistant, distant_name);
+							if (error==-1) cout << "erreur creation de joint "<<endl;
+              
+              /////////////////////////////////////////
+               //writing node/node correspondency
+               /////////////////////////////////////////
 							int nbnodes=(m_collection->getCZ())[icz]->getNodeNumber();
 							int* node_corresp=const_cast<int*>((m_collection->getCZ())[icz]->getNodeCorrespValue());
 				
-							med_err err2=
+							error=
 								med_2_2::MEDjointEcr(fid, mesh_name, joint_name, node_corresp, nbnodes,
 																		 med_2_2::MED_NOEUD, med_2_2::MED_POINT1,med_2_2::MED_NOEUD, med_2_2::MED_POINT1);
-							if (err2==1) cout << "erreur creation de joint "<<endl;
+							if (error==-1) cout << "erreur creation de joint "<<endl;
               
+              //////////////////////////////////////////
+              //writing cell/cell correspondency
+              //////////////////////////////////////////
+              int nbcells=(m_collection->getCZ())[icz]->getEntityCorrespNumber(MED_EN::MED_CELL,MED_EN::MED_CELL);
+              const int* index = (m_collection->getCZ())[icz]->getEntityCorrespIndex(MED_EN::MED_CELL,MED_EN::MED_CELL);
+              const int* value = (m_collection->getCZ())[icz]->getEntityCorrespValue(MED_EN::MED_CELL,MED_EN::MED_CELL);
               
+              map <pair <MED_EN::medGeometryElement, MED_EN::medGeometryElement> , vector<int> > cellmap;
+              map <MED_EN::medGeometryElement, int> local_offset;
+              map <MED_EN::medGeometryElement, int> distant_offset;
+             
+              //definition of the local offsets for the types present on local
+              //and distant domains
+              // for a mesh containing 2 triangles and 3 quads
+              //local_offset[TRIA3]=0
+              //local_offset[QUAD4]=2
+             
+              int nb_types_local=(m_collection->getMesh())[idomain]-> getNumberOfTypes(MED_EN::MED_CELL);
+              const MED_EN::medGeometryElement* local_types = (m_collection->getMesh())[idomain]->getTypes(MED_EN::MED_CELL);
+              const int* local_gni = (m_collection->getMesh())[idomain]-> getGlobalNumberingIndex(MED_EN::MED_CELL);
+              for (int i=0; i< nb_types_local; i++)
+                {
+                  local_offset[local_types[i]]=local_gni[i]-1;
+                }                                      
+              
+              int nb_types_distant=(m_collection->getMesh())[idistant]-> getNumberOfTypes(MED_EN::MED_CELL);
+              const MED_EN::medGeometryElement* distant_types = (m_collection->getMesh())[idistant]->getTypes(MED_EN::MED_CELL);
+              const int* distant_gni = (m_collection->getMesh())[idistant]-> getGlobalNumberingIndex(MED_EN::MED_CELL);
+              for (int i=0; i< nb_types_distant; i++)
+                {
+                  distant_offset[distant_types[i]]=distant_gni[i]-1;
+                } 
+              
+              //classifying all thje cell/cell relationships into geomtype/geomtype relationships
+              //there exists a vector for each geomtype/geomtype pair
+              // the vectors are stored in cellmap, a std::map with a pair<geomtype,geomtype> key 
+              
+              for (int i=0; i<nbcells; i++)
+                for (int icol = index[i]-1; icol<index[i+1]-1; icol++)
+                  {
+                      MED_EN::medGeometryElement local_type =  (m_collection->getMesh())[idomain]->getElementType(MED_EN::MED_CELL,i+1);
+                      MED_EN::medGeometryElement distant_type = (m_collection->getMesh())[idistant]->getElementType(MED_EN::MED_CELL,value[icol]);
+                      
+                      cellmap[make_pair(local_type, distant_type)].push_back(i+1-local_offset[local_type]);
+                      cellmap[make_pair(local_type, distant_type)].push_back(value[icol]-distant_offset[distant_type]);
+                  }
+               map <pair <MED_EN::medGeometryElement, MED_EN::medGeometryElement> , vector<int> >::const_iterator iter;
+             
+              //going through all the (geom,geom) pairs and writing the joints
+              for (iter= cellmap.begin(); iter != cellmap.end(); iter++)
+                {
+                  int size= iter->second.size();
+                  int *corresp = new int[size];
+                  for (int ind=0; ind < size; ind++)
+                    corresp[ind]=(iter->second)[ind];
+                  med_2_2::med_geometrie_element local_geo_elem=(med_2_2::med_geometrie_element)iter->first.first;
+                  med_2_2::med_geometrie_element distant_geo_elem=(med_2_2::med_geometrie_element)iter->first.second;
+                  int size_joint=size/2;
+                  error=
+                  med_2_2::MEDjointEcr(fid, mesh_name, joint_name, corresp, size_joint, med_2_2::MED_MAILLE
+                                     , local_geo_elem,med_2_2::MED_MAILLE, distant_geo_elem);
+                  // MED v 2.3.1 returns an error code when
+                  // writing a joint that is already present in the file.
+                  // Also, it returns an error code if a joint 
+                  // concerns 3D elements.
+                  // Until these two items are not 
+                  // changed, the following line must be commented out
+                   
+                  //if (error==-1) throw MEDEXCEPTION("Error filling joint");
+                  
+                  delete[]corresp;              
+                }            
+                            
 							index_joint++;
 						}
 				}
 			// Writing cell global numbering
 			// 
-			int ncell=m_collection->getTopology()->getCellNumber(i);
+			int ncell=m_collection->getTopology()->getCellNumber(idomain);
 			int * array=new int[ncell];
-			m_collection->getTopology()->getCellList(i,array);
+			m_collection->getTopology()->getCellList(idomain,array);
 			int offset=0;
 		
 			MED_EN::MESH_ENTITIES::const_iterator currentEntity;
 			list<MED_EN::medGeometryElement>::const_iterator iter;
 			currentEntity  = MED_EN::meshEntities.find(MED_EN::MED_CELL);
 			char meshchar[MED_TAILLE_NOM];
-			strcpy(meshchar,(m_collection->getMesh())[i]->getName().c_str());
+			strcpy(meshchar,(m_collection->getMesh())[idomain]->getName().c_str());
 			for (iter = (*currentEntity).second.begin();iter != (*currentEntity).second.end(); iter++)
 				{
 					MED_EN::medGeometryElement type=*iter;
 					if (type/100 != m_collection->getMeshDimension()) continue;
-					int ntype = (m_collection->getMesh())[i]->getNumberOfElements(MED_EN::MED_CELL,type);
+					int ntype = (m_collection->getMesh())[idomain]->getNumberOfElements(MED_EN::MED_CELL,type);
 					if (ntype==0) continue;
 					med_2_2::MEDglobalNumEcr(fid,meshchar, array+offset, ntype,
 																	 med_2_2::MED_MAILLE, (med_2_2::med_geometrie_element)type);
@@ -383,16 +461,16 @@ void MESHCollectionDriver::write(char* filename)
 			//writing face global numbering
 		
 			offset=0;
-			int nface= m_collection->getTopology()->getFaceNumber(i);
+			int nface= m_collection->getTopology()->getFaceNumber(idomain);
 			array=new int[nface];
-			m_collection->getTopology()->getFaceList(i,array);
+			m_collection->getTopology()->getFaceList(idomain,array);
 			currentEntity  = MED_EN::meshEntities.find(MED_EN::MED_FACE);
-			strcpy(meshchar,(m_collection->getMesh())[i]->getName().c_str());
+			strcpy(meshchar,(m_collection->getMesh())[idomain]->getName().c_str());
 			for (iter = (*currentEntity).second.begin();iter != (*currentEntity).second.end(); iter++)
 				{
 					MED_EN::medGeometryElement type=*iter;
 					if (type/100 != m_collection->getMeshDimension()-1) continue;
-					int ntype = (m_collection->getMesh())[i]->getNumberOfElements(MED_EN::MED_FACE,type);
+					int ntype = (m_collection->getMesh())[idomain]->getNumberOfElements(MED_EN::MED_FACE,type);
 					if (ntype==0) continue;
 					med_2_2::MEDglobalNumEcr(fid,meshchar, array+offset, ntype,
 																	 med_2_2::MED_FACE, (med_2_2::med_geometrie_element)type);
@@ -402,9 +480,9 @@ void MESHCollectionDriver::write(char* filename)
 		
 			//writing node global numbering
 		
-			int nnode= m_collection->getTopology()->getNodeNumber(i);
+			int nnode= m_collection->getTopology()->getNodeNumber(idomain);
 			array=new int[nnode];
-			m_collection->getTopology()->getNodeList(i,array);
+			m_collection->getTopology()->getNodeList(idomain,array);
 			med_2_2::MEDglobalNumEcr(fid,meshchar, array, nnode,
 															 med_2_2::MED_NOEUD, med_2_2::MED_POINT1);
 		
@@ -471,11 +549,11 @@ int MESHCollectionDriver::getFieldType(const string& fieldname)
 	// testing whether the field is of double or int type		
 	MEDMEM::FIELD_* field = med_struct.getField(fieldname,iter->dt,iter->it);
 
+  END_OF("MEDSPLITTER::MESHCollectionDriver::getFieldType()")
+  
 	if (dynamic_cast<MEDMEM::FIELD<double>*>(field))
 	  return 1;
 	else
 	  return 0;			
-	   	
-	END_OF("MEDSPLITTER::MESHCollectionDriver::getFieldType()")
 
 	}

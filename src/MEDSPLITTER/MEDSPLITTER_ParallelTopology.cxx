@@ -787,24 +787,26 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
 	const int* index=skylinegraph->getIndex();
 	const int* value=skylinegraph->getValue();
 	
-	for (int inode=0; inode<m_nb_cells[idomain]; inode++)
+	for (int icell=0; icell<m_nb_cells[idomain]; icell++)
 		{
-			for (int ii=index[inode]-1; ii<index[inode+1]-1; ii++)
+      int global =   m_loc_to_glob.find(make_pair(idomain,icell+1))->second;
+			for (int ii=index[global-1]-1; ii<index[global]-1; ii++)
 				{
-					int global=value[ii];
-			
+					int distant_global=value[ii];
+          
 					//	Integrity check commented out for performance
 
 					//			if ( m_glob_to_loc.find(global) == m_glob_to_loc.end())
 					//			{
 					//				throw MED_EXCEPTION(" Erreur dans le mapping glob -> loc");		
 					//			}
-					pair<int,int> local = m_glob_to_loc.find(global)->second;
-			
+					pair<int,int> local = m_glob_to_loc.find(distant_global)->second;
+			   
 					if (local.first != idomain)
 						{
-							cell_corresp[local.first].insert(make_pair(inode+1,local.second));
-							number_of_connections[local.first][inode]++;
+							cell_corresp[local.first].insert(make_pair(icell+1,local.second));
+							number_of_connections[local.first][icell]++;
+               
 						}
 				}
 		}
