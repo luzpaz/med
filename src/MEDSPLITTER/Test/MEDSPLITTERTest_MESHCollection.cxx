@@ -360,6 +360,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
   typ_geo_dist= med_2_2::MED_QUAD4;
   //joint1
   n1=med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  CPPUNIT_ASSERT_EQUAL(n1,2);
   tab=new int[2*n1];
   med_2_2::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
     
@@ -368,6 +369,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
             
   n2=med_2_2::MEDjointnCorres(fid2,meshname2,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  CPPUNIT_ASSERT_EQUAL(n2,2);
   delete[] tab;
   //joint2
   tab=new int[2*n2];
