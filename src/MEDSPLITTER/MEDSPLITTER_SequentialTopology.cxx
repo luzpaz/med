@@ -2,15 +2,16 @@
 #include "MEDMEM_ConnectZone.hxx"
 #include "MEDMEM_DriversDef.hxx"
 #include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Exception.hxx"
 
 #include "MEDSPLITTER_Topology.hxx"
 #include "MEDSPLITTER_SequentialTopology.hxx"
 
 using namespace MEDSPLITTER;
 	
-SequentialTopology::SequentialTopology(){}
+SequentialTopology::SequentialTopology(){throw MEDEXCEPTION("SequentialTopology - not implemented yet");}
 
-SequentialTopology::SequentialTopology(std::vector<MEDMEM::MESH*>, std::vector<MEDMEM::CONNECTZONE*>){}
+SequentialTopology::SequentialTopology(std::vector<MEDMEM::MESH*>, std::vector<MEDMEM::CONNECTZONE*>){throw MEDEXCEPTION("SequentialTopology - not implemented yet");}
 
 //!converts a list of global cell numbers
 //!to a distributed array with local cell numbers
