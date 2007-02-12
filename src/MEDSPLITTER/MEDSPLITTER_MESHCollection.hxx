@@ -127,8 +127,10 @@ void createNodalConnectivity(const MESHCollection & initial_collection, int idom
 //!creates the tags for indivisible groups
 void treatIndivisibleRegions(int* tag);
 
+//!projects a field from an old collection to the present one
+//!field is identified by (name, dt, it)
 template <class T>
-void castFields(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber, T type_of_template);
+void castFields(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber);
 
 //!link to mesh_collection topology
 Topology* m_topology;

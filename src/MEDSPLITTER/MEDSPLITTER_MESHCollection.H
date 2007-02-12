@@ -11,7 +11,7 @@
  */
  
 template <class T>
-void MESHCollection::castFields(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber, T type_of_template)
+void MESHCollection::castFields(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber)
 {
 	
 	char fieldchar[80];
@@ -21,7 +21,7 @@ void MESHCollection::castFields(const MESHCollection& old_collection, const stri
 	int nb_new_domains=m_topology->nbDomain();
 	
 	vector <list<int> > element_array  (m_topology->nbDomain());
-	//vector <MEDMEM::FIELD<T> *> old_fields (nb_old_domains);
+
 	vector <MEDMEM::FIELD<T> *> old_fields ;
 	
 	cout << "MEDSPLITTER -  reading fields rom old collection"<<endl;
