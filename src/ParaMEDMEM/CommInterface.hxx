@@ -32,12 +32,19 @@ public:
 	{return MPI_Alltoallv(sendbuf, sendcounts, senddispls, sendtype,
 						  recvbuf, recvcounts, recvdispls, recvtype,
 						  comm);}
+  int allToAll(void* sendbuf, int sendcount, MPI_Datatype sendtype,
+	       void* recvbuf, int recvcount, MPI_Datatype recvtype,
+	       MPI_Comm comm) const
+  {
+    return MPI_Alltoall(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm);
+  }
 	int allGather(void* sendbuf, int sendcount, MPI_Datatype sendtype,
 				  void* recvbuf, int recvcount, MPI_Datatype recvtype,
 				  	MPI_Comm comm) const
 	{return MPI_Allgather(sendbuf,sendcount, sendtype, recvbuf, recvcount, recvtype, comm);  
 	}
-	
+
+  int worldSize() const {int size; MPI_Comm_size(MPI_COMM_WORLD, &size); return size;}
 };
 
 }

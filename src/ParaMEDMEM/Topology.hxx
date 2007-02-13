@@ -6,6 +6,7 @@
 using namespace std;
 namespace ParaMEDMEM
 {
+  class ProcessorGroup;
 
 class Topology
 {
@@ -16,6 +17,7 @@ public:
 //	virtual int localToGlobal (const std::pair<int,int>) const =0;
 	virtual int getNbElements() const=0;
 	virtual int getNbLocalElements() const =0;
+	virtual const ProcessorGroup* getProcGroup()const =0;
 };
 
 }

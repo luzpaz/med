@@ -64,6 +64,7 @@ throw (MEDMEM::MEDEXCEPTION){
 		strcpy(meshname,meshstring.c_str());
 		strcpy(file,_medfilename.c_str());
       }
+    _name=meshstring;
 	///////////////////////////////////////////
 	// treatment of the domain that corresponds
 	// to the local id
@@ -214,8 +215,7 @@ throw (MEDMEM::MEDEXCEPTION){
 	
 	int nbdomains= _block_topology->getProcGroup()->size();	
 	vector<string> filename(nbdomains);
-		
-		
+				
 	//loop on the domains
 	for (int i=0; i<nbdomains;i++)
 	{
@@ -242,7 +242,7 @@ throw (MEDMEM::MEDEXCEPTION){
 		for (int i=0; i<nbdomains;i++)
 		{
 			//updating the ascii description file
-			file << _name <<" "<< i+1 << " "<< _name << " localhost " << filename[i] << " "<<endl;
+		  file << _name <<" "<< i+1 << " "<< _name <<"_"<<i+1<< " localhost " << filename[i] << " "<<endl;
 		}
 		
 	}

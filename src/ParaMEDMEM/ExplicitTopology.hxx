@@ -18,11 +18,13 @@ namespace ParaMEDMEM
 {
 class Topology;
 class ComponentTopology;
+  class ParaSUPPORT;
 
 class ExplicitTopology: public Topology
 {
 public:
 	ExplicitTopology(){};
+  ExplicitTopology( const ExplicitTopology& topo, int nbcomponents);
 	ExplicitTopology(const ParaSUPPORT&);
 	virtual ~ExplicitTopology();
 	
@@ -38,15 +40,18 @@ public:
 	inline int globalToLocal(int) const;
 	void serialize(int* & serializer, int& size) const ;
 	void unserialize(const int* serializer, const CommInterface& comm_interface);
+  int getNbComponents () const {return _nb_components;}
 private:
-	//Processor group
-	const ProcessorGroup* _proc_group;
-	//nb of elements
-	int _nb_elems;
-	//mapping local to global
-	int* _loc2glob;
-	//mapping global to local
-	hash_map<int,int> _glob2loc;
+  //Processor group
+  const ProcessorGroup* _proc_group;
+  //nb of elements
+  int _nb_elems;
+  //nb of components
+  int _nb_components;
+  //mapping local to global
+  int* _loc2glob;
+  //mapping global to local
+  hash_map<int,int> _glob2loc;
 };
 
 //!converts a pair <subdomainid,local> to a global number 

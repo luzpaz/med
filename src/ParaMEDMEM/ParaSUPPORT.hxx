@@ -13,6 +13,8 @@ namespace ParaMEDMEM
   {
   public:
     ParaSUPPORT();
+    ParaSUPPORT(const ParaMESH* mesh, const MEDMEM::SUPPORT* support):
+      _support(support), _mesh(mesh){};
     ParaSUPPORT(const MEDMEM::SUPPORT&);
     virtual ~ParaSUPPORT();
     virtual const Topology* getTopology() const {};

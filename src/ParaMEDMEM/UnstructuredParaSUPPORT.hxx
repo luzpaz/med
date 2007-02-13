@@ -3,6 +3,7 @@
 
 #include "ParaSUPPORT.hxx"
 #include "MEDMEM_define.hxx"
+#include "ExplicitTopology.hxx"
 
 using namespace MED_EN;
 namespace MEDMEM
@@ -12,23 +13,25 @@ namespace MEDMEM
 
 namespace ParaMEDMEM
 {
-class BlockTopology;
-class ParaMESH;
+  class Topology;
+  class ExplicitTopology;
+  class ParaMESH;
+  
 
-class UnstructuredParaSUPPORT:public ParaSUPPORT
-{
-public:
+  class UnstructuredParaSUPPORT:public ParaSUPPORT
+  {
+  public:
+    
+    UnstructuredParaSUPPORT(const ParaMESH* const mesh, const MEDMEM::SUPPORT* support );
+    UnstructuredParaSUPPORT(const ParaMESH* const mesh, const MED_EN::medEntityMesh entity);
+    virtual ~UnstructuredParaSUPPORT();
+    const Topology* getTopology() const {return _explicit_topology;}
+    
+  private:
+    const ExplicitTopology* const  _explicit_topology;
+    const MED_EN::medEntityMesh _entity;
 	
-	UnstructuredParaSUPPORT(const ParaMESH* const mesh, SUPPORT* support );
-	virtual ~UnstructuredParaSUPPORT();
-	const Topology* getTopology() const {return _block_topology;}
-   
-private:
-	const BlockTopology* const  _block_topology;
-	const MED_EN::medEntityMesh _entity;
-	
-	
-};
-
+  };
+  
 }
 #endif /*STRUCTUREDPARASUPPORT_HXX_*/

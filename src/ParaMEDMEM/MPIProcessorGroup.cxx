@@ -5,7 +5,7 @@
 #include <iostream>
 #include <set>
 #include <algorithm>
-#include "/export/home/vb144235/mpich2_install/include/mpi.h"
+#include "mpi.h"
 
 using namespace std;
 
@@ -71,5 +71,26 @@ int MPIProcessorGroup::translateRank(const ProcessorGroup* group, int rank) cons
 }
 
 
+ProcessorGroup* MPIProcessorGroup::createComplementProcGroup() const
+{
+  set <int> procs;
+  int world_size=_comm_interface.worldSize();
+  for (int i=0; i<world_size; i++)
+    procs.insert(i);
+  for (set<int>::const_iterator iter=_proc_ids.begin(); iter!= _proc_ids.end(); iter++)
+    procs.erase(*iter);
+  
+  return new MPIProcessorGroup(_comm_interface, procs);
+
+}
+ProcessorGroup* MPIProcessorGroup::createProcGroup() const
+{
+  set <int> procs;
+  for (set<int>::const_iterator iter=_proc_ids.begin(); iter!= _proc_ids.end(); iter++)
+    procs.insert(*iter);
+  
+  return new MPIProcessorGroup(_comm_interface, procs);
+
+}
 	
 }

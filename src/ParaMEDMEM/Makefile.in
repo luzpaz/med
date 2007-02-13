@@ -53,7 +53,9 @@ ExplicitTopology.hxx\
 ParaFIELD.hxx\
 DEC.hxx\
 StructuredCoincidentDEC.hxx\
-ExplicitCoincidentDEC.hxx
+UnstructuredParaSUPPORT.hxx\
+ExplicitCoincidentDEC.hxx\
+ExplicitMapping.hxx
 
 # Libraries targets
 
@@ -71,6 +73,7 @@ ParaFIELD.cxx\
 DEC.cxx\
 StructuredCoincidentDEC.cxx\
 ExplicitCoincidentDEC.cxx\
+UnstructuredParaSUPPORT.cxx\
 ExplicitTopology.cxx
 
 
@@ -82,22 +85,22 @@ BIN_SERVER_IDL =
 BIN_CLIENT_IDL = 
 
 TEST_PROGS = test_ProcessorGroup test_BlockTopology test_ParaStructuredSupport \
-test_ParaField test_DEC test_UnstructuredDEC
+test_ParaField test_DEC test_UnstructuredDEC test_ExplicitDEC
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
-CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) $(MPI_INCLUDES)
+CPPFLAGS+=$(MED2_INCLUDES) $(MPI_INCLUDES) $(LAM_INCLUDES) -I/data/tmpawa/vb144235/lam_install/include
 
-CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MPI_INCLUDES)
+CXXFLAGS+=@CXXTMPDPTHFLAGS@ 
 CPPFLAGS+=$(BOOST_CPPFLAGS)
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem $(MPI_LIBS)
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem  $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(MPI_LIBS)  $(BOOST_LIBS)
+LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}

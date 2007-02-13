@@ -23,6 +23,9 @@ public:
 	bool containsMyRank() const { int rank; MPI_Group_rank(_group, &rank); return (rank!=MPI_UNDEFINED);}
 	int translateRank(const ProcessorGroup* group, int rank) const;
 	const MPI_Comm* getComm() const {return &_comm;}
+  ProcessorGroup* createComplementProcGroup() const;
+  ProcessorGroup* createProcGroup() const;
+ 
 private:
 	MPI_Group _group;
 	MPI_Comm _comm;

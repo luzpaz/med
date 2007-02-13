@@ -13,7 +13,7 @@
 #include "MPIProcessorGroup.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "ParaMESH.hxx"
-#include "StructuredParaSUPPORT.hxx"
+#include "UnstructuredParaSUPPORT.hxx"
 #include "ComponentTopology.hxx"
 #include "ParaFIELD.hxx"
 
@@ -58,17 +58,17 @@ int main(int argc, char** argv)
 	Topology* topo_target;
 	if (source_group->containsMyRank())
 	{
-		source_mesh=new ParaMESH(MED_DRIVER,"../../share/salome/resources/pointe_nosplit",*self_group);
+		source_mesh=new ParaMESH(MED_DRIVER,"../../share/salome/resources/med/pointe_nosplit",*source_group);
 		topo_source=source_mesh->getBlockTopology();
 	}
 	if (target_group->containsMyRank())
 	{
-		target_mesh=new ParaMESH(MED_DRIVER,"../../share/salome/resources/pointe_split",*target_group);
+		target_mesh=new ParaMESH(MED_DRIVER,"../../share/salome/resources/med/pointe_split",*target_group);
 		topo_target=target_mesh->getBlockTopology();
 	}
 		
-	StructuredParaSUPPORT* target_support;
-	StructuredParaSUPPORT* source_support;
+	UnstructuredParaSUPPORT* target_support;
+	UnstructuredParaSUPPORT* source_support;
 	ComponentTopology* target_comp;
 	ComponentTopology* source_comp;
 	ParaFIELD* target_field=0;
@@ -76,9 +76,9 @@ int main(int argc, char** argv)
 	
 	if (source_group->containsMyRank())
 	{
-		source_support=new StructuredParaSUPPORT(source_mesh,MED_EN::MED_CELL);
-		source_comp=new ComponentTopology (6, source_group);
-		source_field = new ParaFIELD(source_support, *source_comp);
+		source_support=new UnstructuredParaSUPPORT(source_mesh,MED_EN::MED_CELL);
+		source_comp=new ComponentTopology (1);
+		source_field = new ParaFIELD(source_support,*source_comp);
 		int nb_local = source_field->getTopology()->getNbLocalElements();
 		cout << "Source field nb elems on rank : "<<rank<<" : "<<nb_local<<endl;
 		double * value= new double[nb_local];
@@ -88,18 +88,18 @@ int main(int argc, char** argv)
 		source_field->synchronizeSource(target_field);
 		if (source_group->myRank()==0)
 		{
-			source_mesh->write(MED_DRIVER,"/home/vb144235/tmp/source");
-			source_field->write(MED_DRIVER,"/home/vb144235/tmp/source","maa1");
+			source_mesh->write(MED_DRIVER,"/home/vb144235/tmp/sourceexp");
+			source_field->write(MED_DRIVER,"/home/vb144235/tmp/sourceexp","maa1");
 		}
 	}
 	if (target_group->containsMyRank())
 	{
-		target_support=new StructuredParaSUPPORT(target_mesh,MED_EN::MED_CELL);	
-		target_comp= new ComponentTopology (6);
-		target_field = new ParaFIELD(target_support, *target_comp);
+		target_support=new UnstructuredParaSUPPORT(target_mesh,MED_EN::MED_CELL);	
+		target_comp=new ComponentTopology(1);
+		target_field = new ParaFIELD(target_support,*target_comp);
 		target_field->synchronizeTarget(source_field);
-		target_mesh->write(MED_DRIVER, "/home/vb144235/tmp/target");
-		target_field->write(MED_DRIVER, "/home/vb144235/tmp/target", "maa1");
+		target_mesh->write(MED_DRIVER, "/home/vb144235/tmp/targetexp");
+		target_field->write(MED_DRIVER, "/home/vb144235/tmp/targetexp", "maa1_1");
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
 	MPI_Finalize();

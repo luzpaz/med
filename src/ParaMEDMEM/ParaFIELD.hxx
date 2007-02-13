@@ -18,7 +18,9 @@ class ParaSUPPORT;
 class ParaFIELD
 {
 public:
-	ParaFIELD(ParaSUPPORT* support, const ComponentTopology& component_topology); 
+
+	ParaFIELD(const ParaSUPPORT* support, const ComponentTopology& component_topology); 
+
 	ParaFIELD(MEDMEM::driverTypes driver_type, const string& file_name, 
 		const string& driver_name, const ComponentTopology& component_topology) 
 		throw (MEDMEM::MEDEXCEPTION);
@@ -33,7 +35,7 @@ private:
 	const ComponentTopology& _component_topology;
 	Topology* _topology; 
 	MEDMEM::FIELD<double>* _field;
-	ParaSUPPORT* _support;
+	const ParaSUPPORT* _support;
 };
 
 }

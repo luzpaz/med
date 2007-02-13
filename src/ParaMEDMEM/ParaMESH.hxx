@@ -31,7 +31,7 @@ private:
 	//mesh object underlying the ParaMESH object
 	MEDMEM::MESH* _mesh;
 	//name of the mesh
-	const string _name;
+	string _name;
 	//connect zone
 	std::vector<MEDMEM::CONNECTZONE*> _connect_zone;
 	//id of the local grid

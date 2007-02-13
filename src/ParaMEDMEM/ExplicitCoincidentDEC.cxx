@@ -6,6 +6,8 @@
 #include "ParaFIELD.hxx"
 #include "MPIProcessorGroup.hxx"
 #include "ExplicitCoincidentDEC.hxx"
+#include "ExplicitMapping.hxx"
+
 
 namespace ParaMEDMEM
 {
@@ -22,16 +24,28 @@ ExplicitCoincidentDEC::~ExplicitCoincidentDEC()
  */
 void ExplicitCoincidentDEC::synchronize()
 {
-	if (_source_field!=0)
-		_toposource = dynamic_cast<ExplicitTopology*>(_source_field->getTopology());
-	if (_target_field!=0)
-		_topotarget = dynamic_cast<ExplicitTopology*>(_target_field->getTopology());
-	
-	// Transmitting source topology to target code 
-	broadcastTopology(*_toposource,*_topotarget,1000);
-	// Transmitting target topology to source code
-	//broadcastTopology(_topotarget,2000);
-	//checkCompatibility(_toposource,_topotarget);
+  if (_source_field!=0)
+    {
+      _toposource = dynamic_cast<ExplicitTopology*>(_source_field->getTopology());
+      _sourcegroup= _toposource->getProcGroup()->createProcGroup();
+      _targetgroup=_toposource->getProcGroup()->createComplementProcGroup();
+    }
+  if (_target_field!=0)
+    {
+      _topotarget = dynamic_cast<ExplicitTopology*>(_target_field->getTopology());
+      _sourcegroup= _topotarget->getProcGroup()->createComplementProcGroup();
+      _targetgroup=_topotarget->getProcGroup()->createProcGroup();
+    }
+  
+  // Exchanging
+  
+  // Transmitting source topology to target code 
+  broadcastTopology(_toposource,_topotarget,1000);
+  
+  transferMappingToSource();
+  // Transmitting target topology to source code
+  //       	broadcastTopology(_topotarget,_toposource,2000);
+  //checkCompatibility(_toposource,_topotarget);
 }
 
 /*! Creates the arrays necessary for the data transfer
@@ -40,76 +54,73 @@ void ExplicitCoincidentDEC::synchronize()
  *  */
 void ExplicitCoincidentDEC::prepareSourceDE()
 {
-	////////////////////////////////////
-	//Step 1 : buffer array creation 
-	
-	if (!_toposource->getProcGroup()->containsMyRank())
-		return;
-	MPIProcessorGroup* group=new MPIProcessorGroup(_toposource->getProcGroup()->getCommInterface());
-	
-	int myranksource = _toposource->getProcGroup()->myRank();
-	
-	vector <int>* target_arrays=new vector<int>[_topotarget->getProcGroup()->size()];
-	
-	//cout<<" topotarget size"<<	_topotarget->getProcGroup()->size()<<endl;
-	
-	int nb_local = _toposource-> getNbLocalElements();
-	for (int ielem=0; ielem< nb_local ; ielem++)
-	{
-		pair<int,int> target_local =_distant_elems[ielem];
-		target_arrays[target_local.first].push_back(target_local.second); 
-	}	
-	
-	int union_size=group->size();
-	
-	_sendcounts=new int[union_size];
-   	_senddispls=new int[union_size];
-   	_recvcounts=new int[union_size];
-   	_recvdispls=new int[union_size];
-   	
-	for (int i=0; i< union_size; i++)
-	{
-		_sendcounts[i]=0;
-		_recvcounts[i]=0;
-		_recvdispls[i]=0;
-	}
-	_senddispls[0]=0;
-	
-	for (int iproc=0; iproc < _topotarget->getProcGroup()->size(); iproc++)
-	{
-		//converts the rank in target to the rank in union communicator
-		int unionrank=group->translateRank(_topotarget->getProcGroup(),iproc);
-		_sendcounts[unionrank]=target_arrays[iproc].size();
-	}
-	
-	for (int iproc=1; iproc<group->size();iproc++)
-		_senddispls[iproc]=_senddispls[iproc-1]+_sendcounts[iproc-1];
-	
-	_sendbuffer = new double [nb_local ];
+  ////////////////////////////////////
+  //Step 1 : buffer array creation 
+  
+  if (!_toposource->getProcGroup()->containsMyRank())
+    return;
+  MPIProcessorGroup* group=new MPIProcessorGroup(_sourcegroup->getCommInterface());
+  
+  int myranksource = _sourcegroup->myRank();
+  
+  // Warning : the size of the target side is implicitly deduced
+  //from the size of MPI_COMM_WORLD
+  int target_size = _toposource->getProcGroup()->getCommInterface().worldSize()- _toposource->getProcGroup()->size()  ;
+  //	vector <int>* target_arrays=new vector<int>[_topotarget->getProcGroup()->size()];
+  
+  vector <int>* target_arrays=new vector<int>[target_size];
+  //cout<<" topotarget size"<<	_topotarget->getProcGroup()->size()<<endl;
+  
+  int nb_local = _toposource-> getNbLocalElements();
 
-	/////////////////////////////////////////////////////////////
-	//Step 2 : filling the buffers with the source field values 
-
-	int* counter=new int [_topotarget->getProcGroup()->size()];
-	counter[0]=0;	
-	for (int i=1; i<_topotarget->getProcGroup()->size(); i++)
-		counter[i]=counter[i-1]+target_arrays[i-1].size();
-		
-			
-	const double* value = _source_field->getField()->getValue();
-	//cout << "Nb local " << nb_local<<endl;
-	for (int ielem=0; ielem<nb_local ; ielem++)
+  int union_size=group->size();
+  
+  _sendcounts=new int[union_size];
+  _senddispls=new int[union_size];
+  _recvcounts=new int[union_size];
+  _recvdispls=new int[union_size];
+  
+  for (int i=0; i< union_size; i++)
+    {
+      _sendcounts[i]=0;
+      _recvcounts[i]=0;
+      _recvdispls[i]=0;
+    }
+  _senddispls[0]=0;
+ 
+  int* counts=_explicit_mapping.getCounts();
+  for (int i=0; i<group->size(); i++)
+    _sendcounts[i]=counts[i];
+  
+  for (int iproc=1; iproc<group->size();iproc++)
+    _senddispls[iproc]=_senddispls[iproc-1]+_sendcounts[iproc-1];
+  
+  _sendbuffer = new double [nb_local * _toposource->getNbComponents()];
+  
+  /////////////////////////////////////////////////////////////
+  //Step 2 : filling the buffers with the source field values 
+  
+  int* counter=new int [target_size];
+  counter[0]=0;	
+  for (int i=1; i<target_size; i++)
+    counter[i]=counter[i-1]+target_arrays[i-1].size();
+  
+  
+  const double* value = _source_field->getField()->getValue();
+  
+  int* bufferindex= _explicit_mapping.getBufferIndex();
+  
+  for (int ielem=0; ielem<nb_local; ielem++)
+    {
+      int ncomp = _toposource->getNbComponents();
+      for (int icomp=0; icomp<ncomp; icomp++)
 	{
-	  int global = _toposource->localToGlobal(make_pair(myranksource, ielem));
-	  //int global=_toposource->localToGlobal(ielem);
-		int target_local =_topotarget->globalToLocal(global);
-		//cout <<"global : "<< global<<" local :"<<target_local.first<<" "<<target_local.second;
-		//cout <<"counter[]"<<counter[target_local.first]<<endl;
-		_sendbuffer[counter[target_local]++]=value[ielem];
-		
+ 	  _sendbuffer[ielem*ncomp+icomp]=value[bufferindex[ielem]*ncomp+icomp];
 	}
-	delete[] target_arrays;
-	delete[] counter;
+     
+    }
+  delete[] target_arrays;
+  delete[] counter;
 }
 
 /*!
@@ -119,15 +130,16 @@ void ExplicitCoincidentDEC::prepareTargetDE()
 {
 	if (!_topotarget->getProcGroup()->containsMyRank())
 		return;
-	MPIProcessorGroup* group=new MPIProcessorGroup(_toposource->getProcGroup()->getCommInterface());
+	MPIProcessorGroup* group=new MPIProcessorGroup(_topotarget->getProcGroup()->getCommInterface());
 	
 	//int myranktarget = _topotarget->getProcGroup()->myRank();
 	
-	vector < vector <int> > source_arrays(_toposource->getProcGroup()->size());
+	vector < vector <int> > source_arrays(_sourcegroup->size());
 	int nb_local = _topotarget-> getNbLocalElements();
 	for (int ielem=0; ielem< nb_local ; ielem++)
 	{
-		pair<int,int> source_local =_distant_elems[ielem];
+	  //pair<int,int> source_local =_distant_elems[ielem];
+	  pair <int,int> source_local=_explicit_mapping.getDistantNumbering(ielem);
 		source_arrays[source_local.first].push_back(source_local.second); 
 	}	
 	int union_size=group->size();
@@ -142,15 +154,15 @@ void ExplicitCoincidentDEC::prepareTargetDE()
 			_recvcounts[i]=0;
 			_recvdispls[i]=0;
 		}
-	for (int iproc=0; iproc < _toposource->getProcGroup()->size(); iproc++)
+	for (int iproc=0; iproc < _sourcegroup->size(); iproc++)
 	{
 		//converts the rank in target to the rank in union communicator
-		int unionrank=group->translateRank(_toposource->getProcGroup(),iproc);
-		_recvcounts[unionrank]=source_arrays[iproc].size();
+		int unionrank=group->translateRank(_sourcegroup,iproc);
+		_recvcounts[unionrank]=source_arrays[iproc].size()*_topotarget->getNbComponents();
 	}
 	for (int i=1; i<union_size; i++)
 		_recvdispls[i]=_recvdispls[i-1]+_recvcounts[i-1];
-	_recvbuffer=new double[nb_local];
+	_recvbuffer=new double[nb_local*_topotarget->getNbComponents()];
 		
 }
 
@@ -162,7 +174,7 @@ void ExplicitCoincidentDEC::prepareTargetDE()
  * \param topo Topology that is transmitted. It is read on processes where it already exists, and it is created and filled on others.
  * \param tag Communication tag associated with this operation.
  */
-void ExplicitCoincidentDEC::broadcastTopology(const ExplicitTopology& toposend, ExplicitTopology& toporecv, int tag)
+void ExplicitCoincidentDEC::broadcastTopology(const ExplicitTopology* toposend, ExplicitTopology* toporecv, int tag)
 {
 	MPI_Status status;
 	
@@ -173,46 +185,50 @@ void ExplicitCoincidentDEC::broadcastTopology(const ExplicitTopology& toposend, 
 	
 	// The send processors serialize the send topology
 	// and send the buffers to the recv procs
-	if (toposend.getProcGroup()->containsMyRank())
+	if (toposend !=0 && toposend->getProcGroup()->containsMyRank())
 	{
-		toposend.serialize(serializer, size);
+		toposend->serialize(serializer, size);
 		for (int iproc=0; iproc< group->size(); iproc++)
 		{
-			int itarget=(iproc+toposend.getProcGroup()->myRank())%group->size();
-			if (!toposend.getProcGroup()->contains(itarget))
+		  //			int itarget=(iproc+toposend->getProcGroup()->myRank())%group->size();
+		  int itarget=iproc;
+			if (!toposend->getProcGroup()->contains(itarget))
 			{
-				int nbelem = toposend.getNbLocalElements();
-				_comm_interface->send(&nbelem,1,MPI_INTEGER, itarget,tag+itarget,*(group->getComm()));
-				_comm_interface->send(&serializer, size, MPI_INTEGER, itarget, tag+itarget,*(group->getComm()));					
+			  //				int nbelem = toposend->getNbLocalElements();
+				_comm_interface->send(&size,1,MPI_INTEGER, itarget,tag+itarget,*(group->getComm()));
+				_comm_interface->send(serializer, size, MPI_INTEGER, itarget, tag+itarget,*(group->getComm()));					
 			}
 		}
 	}
 	else
 	{
 		vector <int> size (group->size());
-		int myrank=toporecv.getProcGroup()->myRank();
+		int myrank=toporecv->getProcGroup()->myRank();
+		int myworldrank=group->myRank();
 		for (int iproc=0; iproc<group->size();iproc++)
 		{
 			int isource = iproc;
-			if (!toporecv.getProcGroup()->contains(isource))
+			if (!toporecv->getProcGroup()->contains(isource))
 			{
 				int nbelem;
-				_comm_interface->recv(&nbelem, 1, MPI_INTEGER, isource, tag+myrank, *(group->getComm()), &status);
+				_comm_interface->recv(&nbelem, 1, MPI_INTEGER, isource, tag+myworldrank, *(group->getComm()), &status);
 				int* buffer = new int[nbelem];
-				_comm_interface->recv(buffer, nbelem, MPI_INTEGER, isource,tag+myrank, *(group->getComm()), &status);				
+				_comm_interface->recv(buffer, nbelem, MPI_INTEGER, isource,tag+myworldrank, *(group->getComm()), &status);				
 			
 				ExplicitTopology* topotemp=new ExplicitTopology();
 				topotemp->unserialize(buffer, *_comm_interface);
 				delete[] buffer;
 				
-				for (int ielem=0; ielem<toporecv.getNbLocalElements(); ielem++)
+				for (int ielem=0; ielem<toporecv->getNbLocalElements(); ielem++)
 				{
-					int global=toporecv.localToGlobal(make_pair(iproc,ielem));
+				  int global = toporecv->localToGlobal(ielem);
+				  //int global=toporecv->localToGlobal(make_pair(iproc,ielem));
 					int sendlocal=topotemp->globalToLocal(global);
 					if (sendlocal!=-1)
 					{
 						size[iproc]++;
-						_distant_elems.insert(make_pair(ielem, make_pair(iproc,sendlocal)));
+						_explicit_mapping.pushBackElem(make_pair(iproc,sendlocal));
+						//_distant_elems.insert(make_pair(ielem, make_pair(iproc,sendlocal)));
 					}
 				}
 				delete topotemp;
@@ -222,42 +238,129 @@ void ExplicitCoincidentDEC::broadcastTopology(const ExplicitTopology& toposend, 
 	MESSAGE (" rank "<<group->myRank()<< " broadcastTopology is over");
 }
 
+void ExplicitCoincidentDEC::transferMappingToSource()
+{
+
+  MPIProcessorGroup* group=new MPIProcessorGroup(*_comm_interface);
+  
+  // sending source->target mapping which is stored by target
+  //in _distant_elems from target to source
+  if (_topotarget!=0 && _topotarget->getProcGroup()->containsMyRank())
+    {
+      int world_size = _topotarget->getProcGroup()->getCommInterface().worldSize()  ;
+      int* nb_transfer_union=new int[world_size];
+      int* dummy_recv=new int[world_size];
+      for (int i=0; i<world_size; i++)
+	nb_transfer_union[i]=0;
+      //converts the rank in target to the rank in union communicator
+    
+      for (int i=0; i<  _explicit_mapping.nbDistantDomains(); i++)
+	{
+	  //	  ProcessorGroup* sourcegroup = _topotarget->getProcGroup()->createComplementProcGroup();
+	  int unionrank=group->translateRank(_sourcegroup,_explicit_mapping.getDistantDomain(i));
+	  nb_transfer_union[unionrank]=_explicit_mapping.getNbDistantElems(i);
+	  //	  delete sourcegroup;
+	}
+      _comm_interface->allToAll(nb_transfer_union, 1, MPI_INTEGER, dummy_recv, 1, MPI_INTEGER, MPI_COMM_WORLD);
+      
+      int* sendbuffer= _explicit_mapping.serialize(_topotarget->getProcGroup()->myRank());
+      
+      int* sendcounts= new int [world_size];
+      int* senddispls = new int [world_size];
+      for (int i=0; i< world_size; i++)
+	{
+	  sendcounts[i]=2*nb_transfer_union[i];
+	  if (i==0)
+	    senddispls[i]=0;
+	  else
+	    senddispls[i]=senddispls[i-1]+sendcounts[i-1];
+	}
+      int* recvcounts=new int[world_size];
+      int* recvdispls=new int[world_size];
+      int *dummyrecv;
+      for (int i=0; i <world_size; i++)
+	{
+	  recvcounts[i]=0;
+	  recvdispls[i]=0;
+	}
+      _comm_interface->allToAllV(sendbuffer, sendcounts, senddispls, MPI_INTEGER, dummyrecv, recvcounts, senddispls, MPI_INTEGER, MPI_COMM_WORLD);
+      
+    }
+  //receiving in the source subdomains the mapping sent by targets
+  else
+    {
+       int world_size = _toposource->getProcGroup()->getCommInterface().worldSize()  ;
+      int* nb_transfer_union=new int[world_size];
+      int* dummy_send=new int[world_size];
+      for (int i=0; i<world_size; i++)
+	dummy_send[i]=0;
+      _comm_interface->allToAll(dummy_send, 1, MPI_INTEGER, nb_transfer_union, 1, MPI_INTEGER, MPI_COMM_WORLD);
+      
+      int total_size=0;
+      for (int i=0; i< world_size; i++)
+	total_size+=nb_transfer_union[i];
+      int nbtarget = _targetgroup->size();
+      int* targetranks = new int[ nbtarget];
+      for (int i=0; i<nbtarget; i++)
+	targetranks[i]=group->translateRank(_targetgroup,i);
+      int* mappingbuffer= new int [total_size*2];
+      int* sendcounts= new int [world_size];
+      int* senddispls = new int [world_size];
+      int* recvcounts=new int[world_size];
+      int* recvdispls=new int[world_size];
+      for (int i=0; i< world_size; i++)
+	{
+	  recvcounts[i]=2*nb_transfer_union[i];
+	  if (i==0)
+	    recvdispls[i]=0;
+	  else
+	    recvdispls[i]=recvdispls[i-1]+recvcounts[i-1];
+	}
+
+      int *dummysend;
+      for (int i=0; i <world_size; i++)
+	{
+	  sendcounts[i]=0;
+	  senddispls[i]=0;
+	}
+      _comm_interface->allToAllV(dummysend, sendcounts, senddispls, MPI_INTEGER, mappingbuffer, recvcounts, recvdispls, MPI_INTEGER, MPI_COMM_WORLD);
+      
+      _explicit_mapping.unserialize(world_size,nb_transfer_union,nbtarget, targetranks, mappingbuffer);
+    }
+}
+
 void ExplicitCoincidentDEC::recvData()
 {
 	//MPI_COMM_WORLD is used instead of group because there is no
 	//mechanism for creating the union group yet
 	MESSAGE("recvData");
-	for (int i=0; i< 4; i++)
-		cout << _recvcounts[i]<<" ";
-	cout <<endl;
-	for (int i=0; i< 4; i++)
-		cout << _recvdispls[i]<<" ";
-	cout <<endl;
+
 	
 	cout<<"start AllToAll"<<endl;
 	_comm_interface->allToAllV(_sendbuffer, _sendcounts, _senddispls, MPI_DOUBLE, 
 			_recvbuffer, _recvcounts, _recvdispls, MPI_DOUBLE,MPI_COMM_WORLD);
 	cout<<"end AllToAll"<<endl;
 	int nb_local = _topotarget->getNbLocalElements();
-	double* value=new double[nb_local];
+	double* value=new double[nb_local*_topotarget->getNbComponents()];
 	int myranktarget=_topotarget->getProcGroup()->myRank();
-	vector<int> counters(_toposource->getProcGroup()->size());
+	vector<int> counters(_sourcegroup->size());
 	counters[0]=0;
-	for (int i=0; i<_toposource->getProcGroup()->size()-1; i++)
+	for (int i=0; i<_sourcegroup->size()-1; i++)
 		{
 			MPIProcessorGroup* group=new MPIProcessorGroup(*_comm_interface);
-			int worldrank=group->translateRank(_toposource->getProcGroup(),i);
+			int worldrank=group->translateRank(_sourcegroup,i);
 			counters[i+1]=counters[i]+_recvcounts[worldrank];
 		}
 	
 	for (int ielem=0; ielem<nb_local ; ielem++)
 	{
-		int global = _topotarget->localToGlobal(make_pair(myranktarget, ielem));
-		int source_local =_toposource->globalToLocal(global);
-		value[ielem]=_recvbuffer[counters[source_local]++];
-	}
-	
-	
+	  pair<int,int> distant_numbering=_explicit_mapping.getDistantNumbering(ielem);
+	  int iproc=distant_numbering.first; 
+	  int ncomp =  _topotarget->getNbComponents();
+	  for (int icomp=0; icomp< ncomp; icomp++)
+	    value[ielem*ncomp+icomp]=_recvbuffer[counters[iproc]*ncomp+icomp];
+	  counters[iproc]++;
+	}	
 	_target_field->getField()->setValue(value);
 }
 

@@ -23,6 +23,7 @@ using namespace ParaMEDMEM;
 using namespace MEDMEM;
 int main(int argc, char** argv)
 {
+
   string testname="ParaMEDMEM - test #1 -";
   MPI_Init(&argc, &argv); 
   int size;
@@ -74,6 +75,7 @@ int main(int argc, char** argv)
     }	
   MPI_Finalize();
   return 0;
+
 }
 
 

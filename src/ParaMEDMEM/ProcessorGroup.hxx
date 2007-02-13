@@ -26,7 +26,8 @@ public:
 	const CommInterface& getCommInterface()const {return _comm_interface;};
 	virtual int myRank() const =0;
 	virtual int translateRank(const ProcessorGroup*, int) const =0;
-	
+  virtual ProcessorGroup* createComplementProcGroup() const =0;
+  virtual ProcessorGroup* createProcGroup() const=0;
 protected:
 	const CommInterface& _comm_interface;
 	std::set<int> _proc_ids;

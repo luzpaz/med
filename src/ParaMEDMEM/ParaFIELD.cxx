@@ -4,7 +4,7 @@
 #include "ComponentTopology.hxx"
 #include "ParaSUPPORT.hxx"
 #include "StructuredParaSUPPORT.hxx"
-#include "ExplicitCoincidentDEC.hxx";
+#include "ExplicitCoincidentDEC.hxx"
 #include "StructuredCoincidentDEC.hxx"
 #include "ParaFIELD.hxx"
 #include "ParaMESH.hxx"
@@ -14,19 +14,27 @@ using namespace MEDMEM;
 namespace ParaMEDMEM
 {
 
-ParaFIELD::ParaFIELD(ParaSUPPORT* para_support, const ComponentTopology& component_topology)
+ParaFIELD::ParaFIELD(const ParaSUPPORT* para_support, const ComponentTopology& component_topology)
 :_support(para_support),
 _component_topology(component_topology) 
 {
-	if (dynamic_cast<StructuredParaSUPPORT*>(para_support)!=0)
+	if (dynamic_cast<const StructuredParaSUPPORT*>(para_support)!=0)
 	{const BlockTopology* source_topo = dynamic_cast<const BlockTopology*>(para_support->getTopology());
 		_topology=new BlockTopology(*source_topo,component_topology);
 	}
 	else
-		throw MEDEXCEPTION(LOCALIZED(
+	{
+	  if (component_topology.nbBlocks()!=1)
+	    throw MEDEXCEPTION(LOCALIZED(
 		"ParaFIELD constructor : Unstructured Support not taken into account with component topology yet"));
-		
-	
+	  else 
+	    {
+	      const ExplicitTopology* source_topo=
+		dynamic_cast<const ExplicitTopology*> (para_support->getTopology());
+	      _topology=new ExplicitTopology(*source_topo,component_topology.nbLocalComponents());
+					     
+	    }
+	}
 //	int nb_components=0;
 //	if (component_topology.getProcGroup()!=0)
 	int nb_components = component_topology.nbLocalComponents();
@@ -61,8 +69,8 @@ ParaFIELD::ParaFIELD(MEDMEM::driverTypes driver_type, const string& file_name,
 ParaFIELD::~ParaFIELD(){}
 
 void ParaFIELD::write(MEDMEM::driverTypes driverType, const string& fileName, const string& meshName){
-	BlockTopology* topo = dynamic_cast<BlockTopology*> (_topology);
-	int myrank = topo->getProcGroup()->myRank();
+  //	Topology* topo = dynamic_cast<BlockTopology*> (_topology);
+	int myrank = _topology->getProcGroup()->myRank();
 	ostringstream name;
 	name <<fileName<<myrank+1<<".med";
 	cout << name <<endl;
@@ -83,7 +91,7 @@ void ParaFIELD::synchronizeTarget(ParaFIELD* source_field){
 	data_channel->attachTargetField(this);
 	data_channel->synchronize();
 	data_channel->prepareTargetDE();
-	data_channel->sendData();
+	data_channel->recvData();
 	
 	delete data_channel;
 }
