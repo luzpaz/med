@@ -1,0 +1,119 @@
+#  SALOMELocalTrace : log on local machine
+#
+#  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
+#
+#
+#  File   : Makefile.in
+#  Author : Sergey RUIN
+#  Module : MED
+
+top_srcdir=@top_srcdir@
+top_builddir=../../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@top_srcdir@/idl
+
+
+@COMMENCE@
+
+# header files
+EXPORT_HEADERS = MEDMEMTest.hxx
+
+EXPORT_PYSCRIPTS = testMEDMEM.py
+TEST_PYSCRIPTS = testMEDMEM.py
+
+# Libraries targets
+
+LIB = libMEDMEMTest.la
+LIB_SRC = MEDMEMTest.cxx \
+	  MEDMEMTest_Array.cxx \
+	  MEDMEMTest_AsciiFieldDriver.cxx \
+	  MEDMEMTest_Connectivity.cxx \
+	  MEDMEMTest_Coordinate.cxx \
+	  MEDMEMTest_DriverFactory.cxx \
+	  MEDMEMTest_Exception.cxx \
+	  MEDMEMTest_Family.cxx \
+	  MEDMEMTest_Field.cxx \
+	  MEDMEMTest_Formulae.cxx \
+	  MEDMEMTest_GaussLocalization.cxx \
+          MEDMEMTest_GibiMeshDriver.cxx \
+	  MEDMEMTest_Grid.cxx \
+	  MEDMEMTest_Group.cxx \
+          MEDMEMTest_Med.cxx \
+	  MEDMEMTest_MedFieldDriver21.cxx \
+	  MEDMEMTest_MedFieldDriver22.cxx \
+	  MEDMEMTest_MedMedDriver21.cxx \
+	  MEDMEMTest_MedMedDriver22.cxx \
+	  MEDMEMTest_MedMeshDriver21.cxx \
+	  MEDMEMTest_MedMeshDriver22.cxx \
+	  MEDMEMTest_MedVersion.cxx \
+          MEDMEMTest_MeshAndMeshing.cxx \
+	  MEDMEMTest_ModulusArray.cxx \
+	  MEDMEMTest_nArray.cxx \
+          MEDMEMTest_PointerOf.cxx \
+	  MEDMEMTest_PolyhedronArray.cxx \
+	  MEDMEMTest_PorflowMeshDriver.cxx \
+          MEDMEMTest_SkyLineArray.cxx \
+          MEDMEMTest_Support.cxx \
+          MEDMEMTest_TopLevel.cxx \
+	  MEDMEMTest_Unit.cxx \
+	  MEDMEMTest_VtkFieldDriver.cxx \
+          MEDMEMTest_VtkMedDriver.cxx \
+          MEDMEMTest_VtkMeshDriver.cxx
+
+LIB_CLIENT_IDL =
+
+# Executables targets
+
+BIN = TestMEDMEM
+# Faulting tests
+BIN +=  MEDMEMTest_Array_fault \
+	MEDMEMTest_Connectivity_fault \
+	MEDMEMTest_Coordinate_fault \
+	MEDMEMTest_Family_fault \
+	MEDMEMTest_Field_fault \
+	MEDMEMTest_Grid_fault \
+	MEDMEMTest_MedFieldDriver21_fault \
+	MEDMEMTest_MedMedDriver21_fault \
+	MEDMEMTest_MedMedDriver22_fault \
+	MEDMEMTest_MeshAndMeshing_fault \
+	MEDMEMTest_Support_fault \
+	MEDMEMTest_VtkFieldDriver_fault \
+	MEDMEMTest_VtkMeshDriver_fault
+
+BIN_SRC =
+BIN_CLIENT_IDL =
+
+
+CXXFLAGS += $ @CPPUNIT_INCLUDES@ $(KERNEL_CXXFLAGS) @CXXTMPDPTHFLAGS@ -I$(top_srcdir)/src/MEDMEM
+CPPFLAGS += $ @CPPUNIT_INCLUDES@ $(KERNEL_CXXFLAGS) $(MED2_INCLUDES) $(HDF5_INCLUDES) -I$(top_srcdir)/src/MEDMEM
+
+LIBS = @LIBS@ @CPPUNIT_LIBS@
+
+LDFLAGS +=
+
+LDFLAGSFORBIN += $(LDFLAGS) -lm $(MED2_LIBS) $(HDF5_LIBS) \
+                 -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome -lmed_V2_1 -lmedmem \
+                 ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics \
+                 -lMEDMEMTest
+
+UNIT_TEST_PROG = TestMEDMEM
+
+@CONCLUDE@

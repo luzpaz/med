@@ -33,7 +33,7 @@ VPATH=.:@srcdir@
 
 #SUBDIRS = MEDWrapper INTERPOLATION MEDMEM MEDMEM_SWIG MEDMEM_I MED MEDGUI MedCorba_Swig MED_SWIG MedClient
 
-SUBDIRS = MEDWrapper INTERPOLATION MEDMEM MEDMEM_SWIG 
+SUBDIRS = MEDWrapper INTERPOLATION MEDMEM MEDMEM_SWIG
 
 ifeq (@ENABLE_SPLITTER@,yes)
   SUBDIRS+= MEDSPLITTER
@@ -45,6 +45,10 @@ endif
 
 ifeq (@WITHIHM@,yes)
   SUBDIRS+= MEDGUI
+endif
+
+ifeq (@cppunit_ok@,yes)
+ SUBDIRS += MEDMEM/Test 
 endif
 
 LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
