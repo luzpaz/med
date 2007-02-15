@@ -30,10 +30,10 @@ top_builddir=../..
 srcdir=@srcdir@
 VPATH=.:$(srcdir):$(srcdir)/tests
 
+
 MACHINE=PCLINUX
 
 @COMMENCE@
-
 
 EXPORT_PYSCRIPTS = \
 
@@ -65,12 +65,12 @@ MEDSPLITTER_UserGraph.cxx\
 MEDSPLITTER_API.cxx
 
 # Executables targets
-BIN = medsplitter
+BIN = medsplitter 
 BIN_SRC = 
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-TEST_PROGS = test_SPLITTER_square test_SPLITTER_indivisible test_HighLevelAPI test_SPLITTER_user_partition
+TEST_PROGS =  
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
@@ -85,7 +85,7 @@ LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem $(METIS_LIBS) $
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS)  $(BOOST_LIBS) -lboost_program_options-gcc-mt
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS)  $(BOOST_LIBS) -lboost_program_options
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}

@@ -6,10 +6,13 @@
 //#include "MESHCollectionDriver.hxx"
 #include "MEDSPLITTER_Graph.hxx"
 #include "boost/shared_ptr.hpp"
+#include <vector>
 
 namespace MEDMEM{
 class MESH;
 class CONNECTZONE;
+class MEDSKYLINEARAY;
+class SUPPORT;
 }
 
 namespace MEDSPLITTER{
@@ -97,6 +100,11 @@ Topology* getTopology() const ;
 //settig a new topology
 void setTopology(Topology* topology);
 
+//getting/setting the name of the global mesh (as opposed 
+//to the name of a subdomain \a nn, which is name_nn) 
+string getName() const {return m_name;}
+void setName(const string& name) {m_name=name;}
+	
 //!transfers families from an old MESHCollection to new mesh
 void castFamilies(const MESHCollection& old_collection);
 
@@ -121,11 +129,16 @@ void createNodalConnectivity(const MESHCollection & initial_collection, int idom
 //!creates the tags for indivisible groups
 void treatIndivisibleRegions(int* tag);
 
+//!projects a field from an old collection to the present one
+//!field is identified by (name, dt, it)
 template <class T>
-void castFields(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber, T type_of_template);
+void castFields(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber);
 
 //!link to mesh_collection topology
 Topology* m_topology;
+
+//!control over topology
+bool m_owns_topology;
 
 //!link to graph
 boost::shared_ptr<Graph> m_cell_graph;
@@ -142,6 +155,8 @@ std::vector<MEDMEM::CONNECTZONE*> m_connect_zones;
 //!list of groups that are not to be splitted
 std::vector<std::string> m_indivisible_regions;
 
+//!name of global mesh
+string m_name;
 
 };
 

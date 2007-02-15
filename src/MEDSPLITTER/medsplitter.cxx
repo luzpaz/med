@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 	int ndomains;
 	string library;
 	po::options_description desc("Available options");
-  	desc.add_options()
+	desc.add_options()
   	("help","produces this help message")
   	("mesh-only","prevents the splitter from creating the fields contained in the original file(s)")
   	("distributed","specifies that the input file is distributed")
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 	  is_sequential=false;
   bool mesh_only=false;
   if (vm.count("mesh-only"))
-      mesh_only=true;
+		mesh_only=true;
   
   MEDSPLITTER::MESHCollection* collection;
   
@@ -94,16 +94,16 @@ int main(int argc, char** argv)
   // Beginning of the computation
   
   // Loading the mesh collection
- cout << "MEDSPLITTER - reading input files "<<endl;
+	cout << "MEDSPLITTER - reading input files "<<endl;
   if (is_sequential)
     {
       string meshname = vm["meshname"].as<string>();
       collection=new MEDSPLITTER::MESHCollection(input,meshname);
     }
   else
-  	  collection = new MEDSPLITTER::MESHCollection(input);
+		collection = new MEDSPLITTER::MESHCollection(input);
   	  
- cout << "MEDSPLITTER - computing partition "<<endl;
+	cout << "MEDSPLITTER - computing partition "<<endl;
 
   // Creating the graph and partitioning it	  
   MEDSPLITTER::Topology* new_topo;
@@ -112,19 +112,22 @@ int main(int argc, char** argv)
   else
   	new_topo = collection->createPartition(ndomains,MEDSPLITTER::Graph::SCOTCH);
   
- cout << "MEDSPLITTER - creating new meshes"<<endl;
+	cout << "MEDSPLITTER - creating new meshes"<<endl;
 
   // Creating a new mesh collection from the partitioning
   MEDSPLITTER::MESHCollection new_collection(*collection, new_topo);
- cout << "MEDSPLITTER - writing output files "<<endl;
+	cout << "MEDSPLITTER - writing output files "<<endl;
   new_collection.write(output);
 
 
  
   // Casting the fields on the new collection
   if (!mesh_only)
-  new_collection.castAllFields(*collection);
+		new_collection.castAllFields(*collection);
+
+	// Cleaning memory
   delete collection;
- 
+  delete new_topo;
+
   return 0;
 }

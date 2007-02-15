@@ -38,11 +38,6 @@
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_GaussLocalization.hxx"
 
-//includes temporaires (attente release med fichier 2.3.1)
-#include "MEDMEM_MEDMEMgaussEcr.hxx"
-#include "MEDMEM_MEDMEMprofilEcr.hxx"
-#include "MEDMEM_MEDMEMchampLire.hxx"
-
 namespace MEDMEM {
 
 /*!
@@ -496,9 +491,9 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 					  (med_2_2::med_geometrie_element)  *currentGeometry,
 					  j, &ngauss,  &numdt,  &numo, dtunit, &dt,
 					  maa, &local, &nmaa);
-		
+
 	MED_FIELD_DRIVER<T>::_ptrField->setTime(dt); // PAL12664
-	
+
 	if ( ndt == numdt && numo == od ) {
 	  alreadyFoundPdtIt = true;
 
@@ -1084,6 +1079,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     MESSAGE ("MED_GEOM           : "<< MED_EN::geoNames[types[typeNo]]);
     MESSAGE ("Iteration          : "<< MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
     MESSAGE ("Order              : "<< MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
+    MESSAGE ("Time               : "<< MED_FIELD_DRIVER<T>::_ptrField->getTime());
     MESSAGE ("NumberOfElements   : "<< nbOfElOfType[typeNo]);
     MESSAGE ("NumberOfComponents : "<< numberOfComponents);
     MESSAGE ("NumberOfGaussPts   : "<< numberOfGaussPoint[typeNo+1]);
@@ -1101,7 +1097,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
       ptrTmp = (unsigned char*) &myValues[index];
 
     //VERIFIER LE NBRE
-    ret=med_2_2::MEDMEMchampLire(id,const_cast <char*> (meshName.c_str() ),
+    ret=med_2_2::MEDchampLire(id,const_cast <char*> (meshName.c_str() ),
 			         const_cast <char*> (fieldName.c_str()),
 				(unsigned char*) ptrTmp,
 				med_2_2::MED_FULL_INTERLACE,
@@ -1679,7 +1675,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 			    )
 			 );
 
-      if ( med_2_2::MEDMEMprofilEcr(id,
+      if ( med_2_2::MEDprofilEcr(id,
 				 &profil[0],
 				 numberOfElements,
 				 const_cast<char *>(profilName.c_str())) < 0)
@@ -1718,7 +1714,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 	const GAUSS_LOCALIZATION<FullInterlace> & loc=*(static_cast<const GAUSS_LOCALIZATION<FullInterlace> * >(locPtr));
 	ngauss = loc.getNbGauss();
 	locName=loc.getName();
-	err=med_2_2::MEDMEMgaussEcr(id,
+	err=med_2_2::MEDgaussEcr(id,
 			       (med_2_2::med_geometrie_element) loc.getType(),
 			       (med_2_2::med_float *)           loc.getRefCoo().getPtr(),
 			                                        med_2_2::MED_FULL_INTERLACE,
@@ -1731,7 +1727,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 	const GAUSS_LOCALIZATION<NoInterlace> & loc=*(static_cast<const GAUSS_LOCALIZATION<NoInterlace> * >(locPtr));
 	ngauss = loc.getNbGauss();
 	locName=loc.getName();
-	err=med_2_2::MEDMEMgaussEcr(id,
+	err=med_2_2::MEDgaussEcr(id,
 			       (med_2_2::med_geometrie_element) loc.getType(),
 			       (med_2_2::med_float *)           loc.getRefCoo().getPtr(),
 				                                med_2_2::MED_NO_INTERLACE,

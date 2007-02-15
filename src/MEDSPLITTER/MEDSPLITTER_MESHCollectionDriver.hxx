@@ -12,6 +12,7 @@ class MEDSPLITTER_EXPORT MESHCollectionDriver
 public:
   
   MESHCollectionDriver(MESHCollection*);
+  virtual ~MESHCollectionDriver(){}
   
   int read(char*);
   

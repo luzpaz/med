@@ -12,13 +12,13 @@ template <class T>
 void MESHCollectionDriver::readFields(vector<MEDMEM::FIELD<T>* >& fields,char* fieldname, int itnumber, int ordernumber)
 {
 	for (int i=0; i<m_collection->getMesh().size(); i++)
-	{
-		char filename[256];
-		strcpy(filename,m_filename[i].c_str());
-		cout << "maillage : " << filename << " champ : " << fieldname << endl;
-		MEDMEM::FIELD<T>* field = new MEDMEM::FIELD<T>(MEDMEM::MED_DRIVER,filename,fieldname,itnumber,ordernumber);
-		fields[i]=field;
-	}
+		{
+			char filename[256];
+			strcpy(filename,m_filename[i].c_str());
+			cout << "maillage : " << filename << " champ : " << fieldname << endl;
+			//		MEDMEM::FIELD<T>* field = new MEDMEM::FIELD<T>(MEDMEM::MED_DRIVER,filename,fieldname,itnumber,ordernumber);
+			fields.push_back (new MEDMEM::FIELD<T>(MEDMEM::MED_DRIVER,filename,fieldname,itnumber,ordernumber));
+		}
 }
 
 
@@ -31,12 +31,12 @@ template <class T>
 void MESHCollectionDriver::writeFields(vector<MEDMEM::FIELD<T>* >& fields,char* fieldname)
 {
 	for (int i=0; i<m_collection->getMesh().size(); i++)
-	{
-		char filename[256];
-		strcpy(filename,m_filename[i].c_str());
-		int driverid = fields[i]->addDriver(MEDMEM::MED_DRIVER, filename, fieldname);
-		fields[i]->write(driverid);
-	}
+		{
+			char filename[256];
+			strcpy(filename,m_filename[i].c_str());
+			int driverid = fields[i]->addDriver(MEDMEM::MED_DRIVER, filename, fieldname);
+			fields[i]->write(driverid);
+		}
 }
 
 #endif

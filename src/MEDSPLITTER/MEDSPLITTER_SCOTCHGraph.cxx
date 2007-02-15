@@ -18,7 +18,8 @@ SCOTCHGraph::SCOTCHGraph(const MEDMEM::MEDSKYLINEARRAY* graph, int* edgeweight):
 
 SCOTCHGraph::~SCOTCHGraph()
 {
-	if (m_partition!=0) delete m_partition;
+	if (m_partition!=0) {delete m_partition; m_partition=0;}
+	if (m_graph!=0) {delete m_graph; m_graph=0;}
 }
 
 void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
@@ -82,4 +83,3 @@ void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
 	//to the object
 	m_partition = new MEDMEM::MEDSKYLINEARRAY(n,n, index, partition, true);
 }
-

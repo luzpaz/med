@@ -1937,6 +1937,7 @@ MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22(const MED_MESH_WRONLY_DRIVER2
 MED_MESH_WRONLY_DRIVER22::~MED_MESH_WRONLY_DRIVER22()
 {
   //MESSAGE("MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22(const string & fileName, MESH * ptrMesh) has been destroyed");
+ 
 }
 
 GENDRIVER * MED_MESH_WRONLY_DRIVER22::copy(void) const
@@ -2035,7 +2036,7 @@ void MED_MESH_WRONLY_DRIVER22::write(void) const
   MESSAGE(LOC<<"writeFamilies(_ptrMesh->_familyEdge)");
   if (writeFamilies(_ptrMesh->_familyEdge) !=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERROR in writeFamilies(_ptrMesh->_familyEdge)"  )) ;
-
+       
   END_OF(LOC);
 } 
 
@@ -2840,6 +2841,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 		    SUPPORT* support;
 		    support=mesh->buildSupportOnElementsFromElementList(numbers, entity);
 		    myFamily=new FAMILY(*support);
+        delete support;
 		  }
 	 	else
 		  {
@@ -2847,11 +2849,12 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 		    myFamily->setMesh(mesh);
 		    myFamily->fillFromNodeList(numbers);
 		  }
- 
+        
+        
 		// the identifier and the groups are set
  		myFamily->setIdentifier(ifamily);
  		myFamily->setNumberOfGroups(key.size());
-		char family_name[MED_TAILLE_LNOM];
+		char family_name[MED_TAILLE_NOM];
 		sprintf(family_name,"family%d",ifamily);
 		myFamily->setName(family_name);
 
@@ -2893,9 +2896,9 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
     //vector<FAMILY*> myFamilies = _ptrMesh->getFamilies(MED_NODE);
     vector<FAMILY*> * myFamilies = &_ptrMesh->_familyNode;
     int NumberOfNodesFamilies = myFamilies->size() ;
-    //bool ToDestroy = false;
+   // bool ToDestroy = false;
     if (0 == NumberOfNodesFamilies) {
-      //ToDestroy = true ;
+   //   ToDestroy = true ;
       vector<GROUP*> myGroups = _ptrMesh->getGroups(MED_NODE);
       
       groupFamilyConverter(myGroups,*myFamilies);
@@ -2940,9 +2943,9 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 				   << "| nodes in mesh |" 
 				   << _ptrMesh->_name.c_str() << "|" ));
     delete[] MEDArrayNodeFamily;
-    //if (true == ToDestroy)
-    //  for (int i=0; i<NumberOfNodesFamilies; i++)
-    //	  delete myFamilies[i];
+//if (true == ToDestroy)
+//  for (int i=0; i<NumberOfNodesFamilies; i++)
+//	  delete (*myFamilies)[i];
   }
     
   { // CELLS RELATED BLOCK
@@ -2962,9 +2965,9 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       //vector<FAMILY*> myFamilies = _ptrMesh->getFamilies(entity);
       vector<FAMILY*> * myFamilies = &_ptrMesh->_familyCell ;
       int NumberOfFamilies = myFamilies->size() ;
-      //bool ToDestroy = false;
+     // bool ToDestroy = false;
       if (0 == NumberOfFamilies) {
-	//ToDestroy = true ;
+//	ToDestroy = true ;
 	vector<GROUP*> myGroups = _ptrMesh->getGroups(entity);
 	groupFamilyConverter(myGroups,*myFamilies);
 	NumberOfFamilies=myFamilies->size() ;
@@ -3026,11 +3029,11 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 //CCRT#endif
       delete[] MEDArrayFamily ;
       delete[] types;
-      //if (true == ToDestroy) {
-      //  int NumberOfFamilies = myFamilies->size();
-      //  for (int i=0; i<NumberOfFamilies; i++)
-      //    delete myFamilies[i];
-      //}
+//      if (true == ToDestroy) {
+//        int NumberOfFamilies = myFamilies->size();
+//        for (int i=0; i<NumberOfFamilies; i++)
+//          delete (*myFamilies)[i];
+//      }
     }
   }
 
@@ -3051,7 +3054,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       int numberOfFamilies = _ptrMesh->getNumberOfFamilies(entity) ;
       //vector<FAMILY*> myFamilies = _ptrMesh->getFamilies(entity) ;
       vector<FAMILY*> * myFamilies = &_ptrMesh->_familyFace ;
-      //bool ToDestroy = false;
+     // bool ToDestroy = false;
       if (0 == numberOfFamilies) {
 	//ToDestroy = true ;
 	vector<GROUP*> myGroups = _ptrMesh->getGroups(entity);
@@ -3117,11 +3120,11 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 #endif
       delete[] familyArray ;
       delete[] types;
-      //if (true == ToDestroy) {
-      //  int NumberOfFamilies = myFamilies->size();
-      //    for (int i=0; i<NumberOfFamilies; i++)
-      //      delete myFamilies[i];
-      //}
+//      if (true == ToDestroy) {
+//        int NumberOfFamilies = myFamilies->size();
+//          for (int i=0; i<NumberOfFamilies; i++)
+//            delete (*myFamilies)[i];
+//      }
     }
   }
 
@@ -3210,11 +3213,11 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       delete [] temp;
 #endif
       delete[] familyArray ;
-      //if (true == ToDestroy) {
-      //  int NumberOfFamilies = myFamilies->size();
-      //  for (int i=0; i<NumberOfFamilies; i++)
-      //    delete myFamilies[i];
-      //}
+//      if (true == ToDestroy) {
+//        int NumberOfFamilies = myFamilies->size();
+//        for (int i=0; i<NumberOfFamilies; i++)
+//          delete (*myFamilies)[i];
+//      }
     }
   }
     

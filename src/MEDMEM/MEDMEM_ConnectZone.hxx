@@ -56,7 +56,10 @@ public :
 			            MED_EN::medEntityMesh distantEntity) const;
   const int * getEntityCorrespValue(MED_EN::medEntityMesh localEntity,
 			            MED_EN::medEntityMesh distantEntity) const;
-
+  int getEntityCorrespNumber(MED_EN::medEntityMesh localEntity,
+                  MED_EN::medEntityMesh distantEntity) const;
+  int getEntityCorrespLength(MED_EN::medEntityMesh localEntity,
+                  MED_EN::medEntityMesh distantEntity) const;
   void setName(string name) ;
   void setDescription(string description) ;
   void setDistantDomainNumber(int distantDomainNumber) ;
