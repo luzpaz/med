@@ -1672,6 +1672,8 @@ template <class T, class INTERLACIN_TAG> double FIELD<T, INTERLACIN_TAG>::norm2(
 
 }
 
+/*!  Return vectorial gradient field
+ */
 template <class T, class INTERLACIN_TAG> 
 FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const throw (MEDEXCEPTION)
 {
@@ -1723,12 +1725,14 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
 
   switch(typ){
   case MED_CELL:
+  case MED_FACE:
+  case MED_EDGE:
     // read connectivity array to have the list of nodes contained by an element
-    C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
-    iC = getSupport()->getMesh()->getConnectivityIndex(MED_NODAL,MED_CELL);
+    C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,typ,MED_ALL_ELEMENTS);
+    iC = getSupport()->getMesh()->getConnectivityIndex(MED_NODAL,typ);
     // calculate reverse connectivity to have the list of elements which contains node i
-    revC = getSupport()->getMesh()->getReverseConnectivity(MED_NODAL,MED_CELL);
-    indC = getSupport()->getMesh()->getReverseConnectivityIndex(MED_NODAL,MED_CELL);
+    revC = getSupport()->getMesh()->getReverseConnectivity(MED_NODAL,typ);
+    indC = getSupport()->getMesh()->getReverseConnectivityIndex(MED_NODAL,typ);
     // coordinates of each node
     coord = getSupport()->getMesh()->getCoordinates(MED_FULL_INTERLACE);
     // number of elements
@@ -1779,16 +1783,6 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
       }
     }
     delete barycenter;
-    break;
-  case MED_FACE:
-    delete [] x;
-    delete Gradient;
-    throw MEDEXCEPTION("gradient calculation not yet implemented on face");
-    break;
-  case MED_EDGE:
-    delete [] x;
-    delete Gradient;
-    throw MEDEXCEPTION("gradient calculation not yet implemented on edge");
     break;
   case MED_NODE:
     // read connectivity array to have the list of nodes contained by an element
@@ -1846,10 +1840,13 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
   }
 
   delete [] x;
-  return Gradient;
 
+  END_OF(LOC);
+  return Gradient;
 }
 
+/*!  Return scalar norm2 field
+ */
 template <class T, class INTERLACIN_TAG> 
 FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildNorm2Field() const throw (MEDEXCEPTION)
 {
@@ -1886,9 +1883,9 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildNorm2Field() const 
     Norm2Field->setValueIJ(i,1,sqrt(norm2));
   }
 
+  END_OF(LOC);
   return Norm2Field;
 
-  END_OF(LOC);
 }
 
 /*!  Apply to each (scalar) field component the template parameter T_function,
