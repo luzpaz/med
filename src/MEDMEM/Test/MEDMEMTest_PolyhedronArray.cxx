@@ -93,9 +93,9 @@ void MEDMEMTest::testPolyhedronArray()
   // default constructor (has no sense, must be private)
   POLYHEDRONARRAY myPArray3;
 
-  CPPUNIT_ASSERT_EQUAL(0, myPArray3.getNumberOfPolyhedron());
-  CPPUNIT_ASSERT_EQUAL(0, myPArray3.getNumberOfFaces());
-  CPPUNIT_ASSERT_EQUAL(0, myPArray3.getNumberOfNodes());
+  CPPUNIT_ASSERT_EQUAL(0, int(myPArray3.getNumberOfPolyhedron()));
+  CPPUNIT_ASSERT_EQUAL(0, int(myPArray3.getNumberOfFaces()));
+  CPPUNIT_ASSERT_EQUAL(0, int(myPArray3.getNumberOfNodes()));
 
   CPPUNIT_ASSERT(myPArray3.getPolyhedronIndex() == NULL);
   CPPUNIT_ASSERT(myPArray3.getFacesIndex() == NULL);
