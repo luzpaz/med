@@ -1680,6 +1680,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
 
   // space dimension of input mesh
   int spaceDim = getSupport()->getMesh()->getSpaceDimension();
+  double *x = new double[spaceDim];
 
   FIELD<double, FullInterlace>* Gradient =
     new FIELD<double, FullInterlace>(getSupport(),spaceDim);
@@ -1691,8 +1692,11 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
   descr += getDescription();
   Gradient->setDescription(descr);
 
-  if( _numberOfComponents > 1 )
+  if( _numberOfComponents > 1 ){
+    delete Gradient;
+    delete [] x;
     throw MEDEXCEPTION("gradient calculation only on scalar field");
+  }
 
   for(int i=1;i<=spaceDim;i++){
     string nameC("gradient of ");
@@ -1710,27 +1714,94 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
   // typ of entity on what is field
   MED_EN::medEntityMesh typ = getSupport()->getEntity();
 
+  const int *C;
+  const int *iC;  
+  const int *revC;
+  const int *indC;
+  const double *coord;
+  int NumberOf;
+
   switch(typ){
   case MED_CELL:
-    throw MEDEXCEPTION("gradient calculation not yet implemented on cell");
+    // read connectivity array to have the list of nodes contained by an element
+    C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+    iC = getSupport()->getMesh()->getConnectivityIndex(MED_NODAL,MED_CELL);
+    // calculate reverse connectivity to have the list of elements which contains node i
+    revC = getSupport()->getMesh()->getReverseConnectivity(MED_NODAL,MED_CELL);
+    indC = getSupport()->getMesh()->getReverseConnectivityIndex(MED_NODAL,MED_CELL);
+    // coordinates of each node
+    coord = getSupport()->getMesh()->getCoordinates(MED_FULL_INTERLACE);
+    // number of elements
+    NumberOf = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
+    // barycenter field of elements
+    FIELD<double, FullInterlace>* barycenter = getSupport()->getMesh()->getBarycenter(getSupport());
+
+    // calculate gradient vector for each element i
+    for (int i=1; i<NumberOf+1; i++){
+
+      // listElements contains elements which contains a node of element i
+      set <int> listElements;
+      set <int>::iterator elemIt ;
+      listElements.clear();
+
+      // for each node j of element i
+      for(int ij=iC[i-1];ij<iC[i];ij++){
+	int j = C[ij-1];
+	for(int k=indC[j-1];k<indC[j];k++){
+	  // c element contains node j
+	  int c=revC[k-1];
+	  // we put the elements in set
+	  if(c != i)
+	    listElements.insert(c);
+	}
+      }
+      // coordinates of barycentre of element i in space of dimension spaceDim
+      for(int j=0;j<spaceDim;j++)
+	x[j] = barycenter->getValueIJ(i,j+1);
+      
+      for(int j=0;j<spaceDim;j++){
+	// value of field of element i
+	double val = getValueIJ(i,1);
+	double grad = 0.;
+	// calculate gradient for each neighbor element
+	for(elemIt=listElements.begin();elemIt!=listElements.end();elemIt++){
+	  int elem = *elemIt;
+	  double d2 = 0.;
+	  for(int l=0;l<spaceDim;l++){
+	    // coordinate of barycenter of element elem
+	    double xx = barycenter->getValueIJ(elem,l+1);
+	    d2 += (x[l]-xx) * (x[l]-xx);
+	  }
+	  grad += (barycenter->getValueIJ(elem,j+1)-x[j])*(getValueIJ(elem,1)-val)/sqrt(d2);
+	}
+	if(listElements.size() != 0) grad /= listElements.size();
+	Gradient->setValueIJ(i,j+1,grad);
+      }
+    }
+    delete barycenter;
     break;
   case MED_FACE:
+    delete [] x;
+    delete Gradient;
     throw MEDEXCEPTION("gradient calculation not yet implemented on face");
     break;
   case MED_EDGE:
+    delete [] x;
+    delete Gradient;
     throw MEDEXCEPTION("gradient calculation not yet implemented on edge");
     break;
   case MED_NODE:
     // read connectivity array to have the list of nodes contained by an element
-    const int *C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
-    const int *iC = getSupport()->getMesh()->getConnectivityIndex(MED_NODAL,MED_CELL);
+    C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+    iC = getSupport()->getMesh()->getConnectivityIndex(MED_NODAL,MED_CELL);
     // calculate reverse connectivity to have the list of elements which contains node i
-    const int *revC=getSupport()->getMesh()->getReverseConnectivity(MED_NODAL,MED_CELL);
-    const int *indC=getSupport()->getMesh()->getReverseConnectivityIndex(MED_NODAL,MED_CELL);
+    revC=getSupport()->getMesh()->getReverseConnectivity(MED_NODAL,MED_CELL);
+    indC=getSupport()->getMesh()->getReverseConnectivityIndex(MED_NODAL,MED_CELL);
     // coordinates of each node
-    const double *coord = getSupport()->getMesh()->getCoordinates(MED_FULL_INTERLACE);
-   // calculate gradient for each node
-    int NumberOf = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
+    coord = getSupport()->getMesh()->getCoordinates(MED_FULL_INTERLACE);
+
+    // calculate gradient for each node
+    NumberOf = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
     for (int i=1; i<NumberOf+1; i++){
       // listNodes contains nodes neigbor of node i 
       set <int> listNodes;
@@ -1745,33 +1816,38 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
 	    listNodes.insert(C[k-1]);
       }
       // coordinates of node i in space of dimension spaceDim
-      double *x = new double[spaceDim];
-      for(int j=0;j<spaceDim;j++){
+      for(int j=0;j<spaceDim;j++)
 	x[j] = coord[(i-1)*spaceDim+j];
       
+      for(int j=0;j<spaceDim;j++){
 	// value of field
 	double val = getValueIJ(i,1);
 	double grad = 0.;
 	// calculate gradient for each neighbor node
 	for(nodeIt=listNodes.begin();nodeIt!=listNodes.end();nodeIt++){
 	  int node = *nodeIt;
-	  double v2 = 0.;
-	  for(int l=0;l<spaceDim;l++)
-	    v2 += (x[l]-coord[(node-1)*spaceDim+l])*(x[l]-coord[(node-1)*spaceDim+l]);
-	  grad += (coord[(node-1)*spaceDim+j]-x[j])*(getValueIJ(node,1)-val)/sqrt(v2);
+	  double d2 = 0.;
+	  for(int l=0;l<spaceDim;l++){
+	    double xx = coord[(node-1)*spaceDim+l];
+	    d2 += (x[l]-xx) * (x[l]-xx);
+	  }
+	  grad += (coord[(node-1)*spaceDim+j]-x[j])*(getValueIJ(node,1)-val)/sqrt(d2);
 	}
+	if(listNodes.size() != 0) grad /= listNodes.size();
 	Gradient->setValueIJ(i,j+1,grad);
       }
     }
     break;
   case MED_ALL_ENTITIES:
+    delete [] x;
+    delete Gradient;
     throw MEDEXCEPTION("gradient calculation not yet implemented on all elements");
     break;
   }
 
+  delete [] x;
   return Gradient;
 
-  END_OF(LOC);
 }
 
 template <class T, class INTERLACIN_TAG> 
@@ -1779,9 +1855,6 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildNorm2Field() const 
 {
   const char * LOC = "FIELD<T, INTERLACIN_TAG>::buildNorm2Field() : ";
   BEGIN_OF(LOC);
-
-  // space dimension of input mesh
-  int spaceDim = getSupport()->getMesh()->getSpaceDimension();
 
   FIELD<double, FullInterlace>* Norm2Field =
     new FIELD<double, FullInterlace>(getSupport(),1);
