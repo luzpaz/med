@@ -29,6 +29,7 @@ using namespace MED_EN;
 // ---------------------------------
 FIELD_::FIELD_(): 
   _isRead(false),
+  _isMinMax(false),
   _name(""), _description(""), _support((SUPPORT *)NULL),
   _numberOfComponents(0), _numberOfValues(0),_componentsTypes((int *)NULL),
   _componentsNames((string *)NULL), 
@@ -44,6 +45,7 @@ FIELD_::FIELD_():
 
 FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
   _isRead(false),
+  _isMinMax(false),
   _name(""), _description(""), _support(Support),
   _numberOfComponents(NumberOfComponents),
   _iterationNumber(-1),_time(0.0),_orderNumber(-1),
@@ -70,6 +72,7 @@ FIELD_& FIELD_::operator=(const FIELD_ &m) {
   if ( this == &m) return *this;
 
   _isRead             = m._isRead ;
+  _isMinMax           = m._isMinMax ;
   _name               = m._name;
   _description        = m._description;
   _support            = m._support;   //Cf Opérateur de recopie du Support?
@@ -111,6 +114,7 @@ FIELD_& FIELD_::operator=(const FIELD_ &m) {
 FIELD_::FIELD_(const FIELD_ &m)
 {
   _isRead = m._isRead ;
+  _isMinMax = m._isMinMax ;
   _name = m._name;
   _description = m._description;
   _support = m._support;

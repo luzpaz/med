@@ -166,6 +166,7 @@ public :
 
   inline void 	      setName(string name);
   inline void 	      setDescription(string description);
+  inline void 	      setMeshDimension(int dim);
   inline string       getName() const;
   inline string       getDescription() const;
   inline int 	      getSpaceDimension() const;
@@ -372,6 +373,11 @@ inline void MESH::setName(string name)
 inline string MESH::getName() const
 {
   return _name;
+}
+
+inline void MESH::setMeshDimension(int dim)
+{
+  _meshDimension=dim;
 }
 
 /*! Set the MESH description */

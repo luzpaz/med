@@ -25,6 +25,8 @@
 #include "MEDMEM_PorflowMeshDriver.hxx"
 #include "MEDMEM_VtkMeshDriver.hxx"
 #include "MEDMEM_VtkMedDriver.hxx"
+#include "MEDMEM_EnsightMeshDriver.hxx"
+#include "MEDMEM_EnsightMedDriver.hxx"
 
 #include "MEDMEM_Exception.hxx"
 
@@ -150,6 +152,26 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
       break;
     }
 
+    case ENSIGHT_DRIVER : {
+      switch(access)
+	{
+	case MED_LECT : {
+	  throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the ENSIGHT_DRIVER type which is not allowed because ENSIGHT_DRIVER is only a write access driver");
+	}
+	case MED_ECRI : {
+	  ret=new ENSIGHT_MESH_DRIVER(fileName,mesh);
+	  return ret;
+	}
+	case MED_REMP : {
+	  ret=new ENSIGHT_MESH_DRIVER(fileName,mesh);
+	  return ret;
+	}
+	default:
+	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	}
+      break;
+    }
+
     case VTK_DRIVER : {
       switch(access)
 	{
@@ -219,6 +241,26 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
 	}
 	case MED_REMP : {
 	  ret=new VTK_MED_DRIVER(fileName,med);
+	  break ;
+	}
+	default:
+	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	}
+      break;
+    }
+
+    case ENSIGHT_DRIVER : {
+      switch(access)
+	{
+	case MED_LECT : {
+	  throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the ENSIGHT_DRIVER type which is not allowed because ENSIGHT_DRIVER is only a write access driver");
+	}
+	case MED_ECRI : {
+	  ret=new ENSIGHT_MED_DRIVER(fileName,med);
+	  break ;
+	}
+	case MED_REMP : {
+	  ret=new ENSIGHT_MED_DRIVER(fileName,med);
 	  break ;
 	}
 	default:

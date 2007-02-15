@@ -99,7 +99,10 @@ MEDMEM_MEDMEMprofilEcr.hxx \
 MEDMEM_MEDMEMchampLire.hxx \
 MEDMEM_SetInterlacingType.hxx\
 MEDMEM_ConnectZone.hxx \
-MEDMEM.hxx
+MEDMEM.hxx \
+MEDMEM_EnsightMedDriver.hxx \
+MEDMEM_EnsightMeshDriver.hxx \
+MEDMEM_EnsightFieldDriver.hxx
 
 # Libraries targets
 
@@ -142,11 +145,13 @@ MEDMEM_TopLevel.cxx \
 MEDMEM_MEDMEMgaussEcr.cxx \
 MEDMEM_MEDMEMprofilEcr.cxx \
 MEDMEM_MEDMEMchampLire.cxx \
-MEDMEM_ConnectZone.cxx
+MEDMEM_ConnectZone.cxx \
+MEDMEM_EnsightMedDriver.cxx \
+MEDMEM_EnsightMeshDriver.cxx
 
 
 # Executables targets
-BIN = med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH 
+BIN = med2_1_To_med2_2 med2vtk med2ensight duplicateMED med_test duplicateMEDMESH 
 BIN_SRC = 
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 

@@ -297,6 +297,9 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 
       ptrMesh->setName(meshName);
 
+      // add by B. Secher for filter module
+      ptrMesh->setMeshDimension(meshDim);
+
       SCRUTE(ptrMesh);
 
       MESSAGE(LOC<<"is" << (isAGrid ? "" : " NOT") << " a GRID and its name is "<<ptrMesh->getName());
