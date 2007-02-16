@@ -29,6 +29,7 @@ AC_LANG_C
 METIS_CPPFLAGS=""
 METIS_LIBSUFFIX=""
 METIS_LIBS=""
+ENABLE_METIS="no"
 
 AC_CHECKING(for METIS location)
 AC_ARG_WITH(metis,
@@ -42,7 +43,7 @@ CPPFLAGS_old="${CPPFLAGS}"
 LIBS_old=$LIBS
 
 if test "x${METISDIR}" != "x" ; then
-  METIS_CPPFLAGS="-I${METISDIR}/Lib"
+  METIS_CPPFLAGS="-DENABLE_METIS -I${METISDIR}/Lib"
   METIS_LIBS="-L${METISDIR} -lmetis"
 fi
 
@@ -122,6 +123,7 @@ LIBS="${LIBS_old}"
 if test "x${metis_headers_ok}" = "xyes" ; then
   if test "x${metis_binaries_ok}" = "xyes" ; then
     metis_ok=yes
+    ENABLE_METIS="yes"
   fi
 fi
 
@@ -130,9 +132,8 @@ AC_MSG_RESULT(for metis: $metis_ok)
 AC_SUBST(METIS_CPPFLAGS)
 AC_SUBST(METIS_LIBSUFFIX)
 AC_SUBST(METIS_LIBS)
+AC_SUBST(ENABLE_METIS)
 
 AC_LANG_RESTORE
 
 ])dnl
-
-

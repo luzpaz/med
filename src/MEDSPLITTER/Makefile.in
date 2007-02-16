@@ -44,11 +44,16 @@ MEDSPLITTER_MESHCollection.hxx \
 MEDSPLITTER_MESHCollectionDriver.hxx \
 MEDSPLITTER_ParallelTopology.hxx \
 MEDSPLITTER_Graph.hxx\
-MEDSPLITTER_METISGraph.hxx\
-MEDSPLITTER_SCOTCHGraph.hxx\
 MEDSPLITTER_UserGraph.hxx\
 MEDSPLITTER_API.hxx \
 MEDSPLITTER.hxx
+
+ifeq ($(ENABLE_METIS),yes)
+  EXPORT_HEADERS += MEDSPLITTER_METISGraph.hxx
+endif
+ifeq ($(ENABLE_SCOTCH),yes)
+  EXPORT_HEADERS += MEDSPLITTER_SCOTCHGraph.hxx
+endif
 
 # Libraries targets
 
@@ -59,10 +64,15 @@ MEDSPLITTER_MESHCollection.cxx \
 MEDSPLITTER_MESHCollectionDriver.cxx \
 MEDSPLITTER_ParallelTopology.cxx \
 MEDSPLITTER_Graph.cxx\
-MEDSPLITTER_METISGraph.cxx\
-MEDSPLITTER_SCOTCHGraph.cxx\
 MEDSPLITTER_UserGraph.cxx\
 MEDSPLITTER_API.cxx
+
+ifeq ($(ENABLE_METIS),yes)
+  LIB_SRC += MEDSPLITTER_METISGraph.cxx
+endif
+ifeq ($(ENABLE_SCOTCH),yes)
+  LIB_SRC += MEDSPLITTER_SCOTCHGraph.cxx
+endif
 
 # Executables targets
 BIN = medsplitter 
@@ -75,17 +85,31 @@ TEST_PROGS =
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
-CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) $(METIS_CPPFLAGS) $(SCOTCH_CPPFLAGS)
+CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES)
 
 CXXFLAGS+=@CXXTMPDPTHFLAGS@
 CPPFLAGS+=$(BOOST_CPPFLAGS)
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS) 
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS)  $(BOOST_LIBS) -lboost_program_options
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(BOOST_LIBS)
+ifeq ($(BOOST_PROGRAM_OPTIONS_LIB),yes)
+  LDFLAGSFORBIN+= -lboost_program_options
+endif
+
+ifeq ($(ENABLE_METIS),yes)
+  CPPFLAGS+= $(METIS_CPPFLAGS)
+  LDFLAGS+= $(METIS_LIBS)
+  LDFLAGSFORBIN+= $(METIS_LIBS)
+endif
+ifeq ($(ENABLE_SCOTCH),yes)
+  CPPFLAGS+= $(SCOTCH_CPPFLAGS)
+  LDFLAGS+= $(SCOTCH_LIBS)
+  LDFLAGSFORBIN+= $(SCOTCH_LIBS)
+endif
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}

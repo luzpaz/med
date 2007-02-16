@@ -36,8 +36,8 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 # header files
 EXPORT_HEADERS = MEDSPLITTERTest.hxx
 
-#EXPORT_PYSCRIPTS = testMEDSPLITTER.py
-#TEST_PYSCRIPTS = testMEDSPLITTER.py
+EXPORT_PYSCRIPTS = testMEDSPLITTER.py
+TEST_PYSCRIPTS = testMEDSPLITTER.py
 
 # Libraries targets
 
@@ -69,6 +69,17 @@ LDFLAGSFORBIN += $(LDFLAGS) -lm $(MED2_LIBS) $(HDF5_LIBS) \
                  -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome -lmed_V2_1 -lmedsplitter -lmedmem \
                  ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics \
                  -lMEDSPLITTERTest
+
+ifeq ($(ENABLE_METIS),yes)
+  CPPFLAGS+= $(METIS_CPPFLAGS)
+  LDFLAGS+= $(METIS_LIBS)
+  LDFLAGSFORBIN+= $(METIS_LIBS)
+endif
+ifeq ($(ENABLE_SCOTCH),yes)
+  CPPFLAGS+= $(SCOTCH_CPPFLAGS)
+  LDFLAGS+= $(SCOTCH_LIBS)
+  LDFLAGSFORBIN+= $(SCOTCH_LIBS)
+endif
 
 UNIT_TEST_PROG = TestMEDSPLITTER
 

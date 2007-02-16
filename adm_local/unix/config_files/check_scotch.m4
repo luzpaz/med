@@ -29,6 +29,7 @@ AC_LANG_C
 SCOTCH_CPPFLAGS=""
 SCOTCH_LIBSUFFIX=""
 SCOTCH_LIBS=""
+ENABLE_SCOTCH="no"
 
 AC_CHECKING(for SCOTCH location)
 AC_ARG_WITH(scotch,
@@ -42,7 +43,7 @@ CPPFLAGS_old="${CPPFLAGS}"
 LIBS_old=$LIBS
 
 if test "x${SCOTCHDIR}" != "x" ; then
-  SCOTCH_CPPFLAGS="-I${SCOTCHDIR}"
+  SCOTCH_CPPFLAGS="-DENABLE_SCOTCH -I${SCOTCHDIR}"
   SCOTCH_LIBS="-L${SCOTCHDIR}/bin -lscotch -lscotcherr"
 fi
 
@@ -128,6 +129,7 @@ LIBS="${LIBS_old}"
 if test "x${scotch_headers_ok}" = "xyes" ; then
   if test "x${scotch_binaries_ok}" = "xyes" ; then
     scotch_ok=yes
+    ENABLE_SCOTCH="yes"
   fi
 fi
 
@@ -136,6 +138,7 @@ AC_MSG_RESULT(for scotch: $scotch_ok)
 AC_SUBST(SCOTCH_CPPFLAGS)
 AC_SUBST(SCOTCH_LIBSUFFIX)
 AC_SUBST(SCOTCH_LIBS)
+AC_SUBST(ENABLE_SCOTCH)
 
 AC_LANG_RESTORE
 

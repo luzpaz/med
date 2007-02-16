@@ -33,8 +33,8 @@
 #include "MEDSPLITTER_Topology.hxx"
 #include "MEDSPLITTER_ParallelTopology.hxx"
 #include "MEDSPLITTER_SequentialTopology.hxx"
-#include "MEDSPLITTER_METISGraph.hxx"
-#include "MEDSPLITTER_SCOTCHGraph.hxx"
+//#include "MEDSPLITTER_METISGraph.hxx"
+//#include "MEDSPLITTER_SCOTCHGraph.hxx"
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_MESHCollectionDriver.hxx"
 
@@ -192,7 +192,12 @@ void MEDSPLITTERTest::testMESHCollection_read_para()
   Topology* topo=0;
   CPPUNIT_ASSERT_THROW(topo=collection.createPartition(0,Graph::METIS),MEDEXCEPTION);
   if (topo!=0) delete topo;
-  topo=collection.createPartition(2,Graph::METIS);
+#ifdef ENABLE_METIS
+  CPPUNIT_ASSERT_NO_THROW(topo=collection.createPartition(2,Graph::METIS));
+#else
+  CPPUNIT_ASSERT_THROW(topo=collection.createPartition(2,Graph::METIS), MEDEXCEPTION);
+  CPPUNIT_FAIL("METIS is not available, further test execution is not possible.");
+#endif
   MESHCollection new_collection(collection, topo);
   new_collection.write(filename_para_wr);
     
@@ -270,7 +275,13 @@ void MEDSPLITTERTest::testMESHCollection_square()
   
   
   MESHCollection collection(filename_rd,meshname);
-  MEDSPLITTER::Topology* topo= collection.createPartition(2,Graph::METIS);
+  MEDSPLITTER::Topology* topo;
+#ifdef ENABLE_METIS
+  CPPUNIT_ASSERT_NO_THROW(topo = collection.createPartition(2,Graph::METIS));
+#else
+  CPPUNIT_ASSERT_THROW(topo = collection.createPartition(2,Graph::METIS), MEDEXCEPTION);
+  CPPUNIT_FAIL("METIS is not available, further test execution is not possible.");
+#endif
   MESHCollection new_collection(collection, topo);
     
   //collection.write("/export/home/test_splitter");
@@ -442,7 +453,13 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
   char family[MED_TAILLE_NOM]="QUAD";
   MESHCollection collection(filename_rd,meshname);
   collection.setIndivisibleGroup(family);
-  Topology* topo =  collection.createPartition(4,Graph::SCOTCH);
+  Topology* topo;
+#ifdef ENABLE_SCOTCH
+  CPPUNIT_ASSERT_NO_THROW(topo = collection.createPartition(4,Graph::SCOTCH));
+#else
+  CPPUNIT_ASSERT_THROW(topo = collection.createPartition(4,Graph::SCOTCH), MEDEXCEPTION);
+  CPPUNIT_FAIL("SCOTCH is not available, further test execution is not possible.");
+#endif
   MESHCollection new_collection(collection, topo);
   new_collection.write(filename_wr);
    
@@ -705,26 +722,47 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   
   string meshname="maa1";
   MESHCollection collection(filename_rd,meshname);
-  Topology* topo2=collection.createPartition(2,Graph::METIS);
+  Topology* topo2;
+#ifdef ENABLE_METIS
+  CPPUNIT_ASSERT_NO_THROW(topo2 = collection.createPartition(2,Graph::METIS));
+#else
+  CPPUNIT_ASSERT_THROW(topo2 = collection.createPartition(2,Graph::METIS), MEDEXCEPTION);
+  CPPUNIT_FAIL("METIS is not available, further test execution is not possible.");
+#endif
   MESHCollection new_collection(collection, topo2);
   new_collection.write(filename_para_wr);
     
   MESHCollection new_collection2(filename_para_wr);
   CPPUNIT_ASSERT_EQUAL(collection.getName(),new_collection2.getName());
-  Topology* topo3=new_collection2.createPartition(3,Graph::SCOTCH);
+  Topology* topo3;
+#ifdef ENABLE_SCOTCH
+  CPPUNIT_ASSERT_NO_THROW(topo3 = new_collection2.createPartition(3,Graph::SCOTCH));
+#else
+  CPPUNIT_ASSERT_THROW(topo3 = new_collection2.createPartition(3,Graph::SCOTCH), MEDEXCEPTION);
+  CPPUNIT_FAIL("SCOTCH is not available, further test execution is not possible.");
+#endif
   MESHCollection new_collection3(new_collection2,topo3);
   CPPUNIT_ASSERT_EQUAL(topo3->nbCells(),topo2->nbCells());
   new_collection3.write(filename_para2_wr);
   
   MESHCollection new_collection4(filename_para2_wr);
-  Topology* topo1=new_collection4.createPartition(1,Graph::METIS);
+  Topology* topo1;
+#ifdef ENABLE_METIS
+  CPPUNIT_ASSERT_NO_THROW(topo1 = new_collection4.createPartition(1,Graph::METIS));
+#else
+  CPPUNIT_ASSERT_THROW(topo1 = new_collection4.createPartition(1,Graph::METIS), MEDEXCEPTION);
+  CPPUNIT_FAIL("METIS is not available, further test execution is not possible.");
+#endif
   MESHCollection new_collection_seq(new_collection4,topo1);
   new_collection_seq.write(filename_seq_wr);
   MEDMEM::MESH* mesh_after = new_collection_seq.getMesh(0);
   MEDMEM::MESH* mesh_before = collection.getMesh(0);
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS),
+                       mesh_after->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS),
+                       mesh_after->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS),
+                       mesh_after->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfNodes(), mesh_after->getNumberOfNodes());
   delete topo2;
   delete topo3;

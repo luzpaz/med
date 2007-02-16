@@ -33,10 +33,13 @@
 #include "MEDSPLITTER_Topology.hxx"
 #include "MEDSPLITTER_ParallelTopology.hxx"
 #include "MEDSPLITTER_SequentialTopology.hxx"
-#include "MEDSPLITTER_METISGraph.hxx"
-#include "MEDSPLITTER_SCOTCHGraph.hxx"
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_MESHCollectionDriver.hxx"
+
+#ifdef ENABLE_METIS
+#include "MEDSPLITTER_METISGraph.hxx"
+#endif
+//#include "MEDSPLITTER_SCOTCHGraph.hxx"
 
 #include "MEDMEM_Exception.hxx"
 
@@ -101,6 +104,9 @@ using namespace MEDMEM;
  
 void MEDSPLITTERTest::testParallelTopology_graph_constructor()
 {
+#ifndef ENABLE_METIS
+  CPPUNIT_FAIL("METIS is not available. Please, check your compilation.");
+#else
   string data_dir                   = getenv("DATA_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
@@ -229,4 +235,5 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   delete[] local_nodes;
   delete[] ip_nodes;
   delete[] full_array;
+#endif // ENABLE_METIS
 }

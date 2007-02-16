@@ -29,12 +29,17 @@
 #include "MEDSPLITTER_ParallelTopology.hxx"
 #include "MEDSPLITTER_SequentialTopology.hxx"
 
-#include "MEDSPLITTER_METISGraph.hxx"
-#include "MEDSPLITTER_SCOTCHGraph.hxx"
-#include "MEDSPLITTER_UserGraph.hxx"
-
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_MESHCollectionDriver.hxx"
+
+#include "MEDSPLITTER_UserGraph.hxx"
+
+#ifdef ENABLE_METIS
+#include "MEDSPLITTER_METISGraph.hxx"
+#endif
+#ifdef ENABLE_SCOTCH
+#include "MEDSPLITTER_SCOTCHGraph.hxx"
+#endif
 
 using namespace MEDSPLITTER;
 
@@ -950,26 +955,33 @@ void MESHCollection::buildCellGraph2ndversion(MEDMEM::MEDSKYLINEARRAY* & array,i
  * returns a topology based on the new graph
  */
 Topology* MESHCollection::createPartition(int nbdomain, 
-																					Graph::splitter_type split, 
-																					const string& options_string,
-																					int* user_edge_weights,
-																					int* user_vertices_weights)
+					  Graph::splitter_type split, 
+					  const string& options_string,
+					  int* user_edge_weights,
+					  int* user_vertices_weights)
 {
-
 	if (nbdomain <1) throw MEDEXCEPTION("Number of subdomains must be >0");
 	MEDMEM::MEDSKYLINEARRAY* array=0;
 	int* edgeweights=0;
-	
+
 	MESSAGE("Building cell graph");
 	buildCellGraph(array,edgeweights);
-	
+
 	switch (split)
 		{
 		case Graph::METIS:
+#ifdef ENABLE_METIS
 			m_cell_graph=boost::shared_ptr<Graph>(new METISGraph(array,edgeweights));
+#else
+			throw MEDEXCEPTION("METIS Graph is not available. Check your products, please.");
+#endif
 			break;
 		case Graph::SCOTCH:
+#ifdef ENABLE_SCOTCH
 			m_cell_graph=boost::shared_ptr<Graph>(new SCOTCHGraph(array,edgeweights));
+#else
+			throw MEDEXCEPTION("SCOTCH Graph is not available. Check your products, please.");
+#endif
 			break;
 		}
 
@@ -979,14 +991,13 @@ Topology* MESHCollection::createPartition(int nbdomain,
 	if (user_vertices_weights!=0)
 	  m_cell_graph->setVerticesWeights(user_vertices_weights);
 
-  
 	MESSAGE("Partitioning graph");
 	m_cell_graph->partGraph(nbdomain,options_string);
-	
+
 	MESSAGE("Building new topology");
 	//m_cell_graph is a shared pointer 
 	Topology* topology = new ParallelTopology (m_cell_graph, nbdomain, getMeshDimension());
-	
+
 	//cleaning
 	if (edgeweights!=0) delete[] edgeweights;
 	//if (array!=0) delete array;
