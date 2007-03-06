@@ -193,8 +193,8 @@ void ENSIGHT_MESH_DRIVER::write(void) const
 
   (*_ensightFile) << "# Ensight6 case DataFile Version" << endl 
 		  << "maillage from MedMemory" << endl ;
-  (*_ensightFile) << "node id given" << endl ;
-  (*_ensightFile) << "element id given" << endl ;
+  (*_ensightFile) << "node id assign" << endl ;
+  (*_ensightFile) << "element id assign" << endl ;
 
 
   (*_ensightFile) << "coordinates" << endl ;
@@ -204,7 +204,7 @@ void ENSIGHT_MESH_DRIVER::write(void) const
   (*_ensightFile) << NumberOfNodes << endl ;
   const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) ;
   for (int i=0;i<NumberOfNodes;i++) {
-    (*_ensightFile) << setw(8) << i+1  << " " ;
+//     (*_ensightFile) << setw(8) << i+1  << " " ;
     for (int j=0;j<SpaceDimension;j++)
       (*_ensightFile) << setw(8) << coordinate[i*SpaceDimension+j] << " " ;
     if (SpaceDimension==1) 

@@ -93,7 +93,7 @@ int main (int argc, char ** argv) {
     //////////////////////////////////////////
     // we write all in ENSIGHT file filenameOUT //
     /////////////////////////////////////////
-    int id = myMed.addDriver(ENSIGHT_DRIVER,filenameOUT) ;
+    int id = myMed.addDriver(ENSIGHT_DRIVER,filenameOUT,MED_EN::MED_ECRI) ;
     myMed.write(id) ;
 
   } 

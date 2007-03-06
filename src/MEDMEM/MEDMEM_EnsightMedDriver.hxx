@@ -42,39 +42,67 @@ class ENSIGHT_MED_DRIVER : public GENDRIVER
 {
 protected:
   
-  MED * const       _ptrMed ;     // Store 'ENSIGHT_DRIVER (0..n)----(1) ENSIGHT' associations
-  ofstream *        _ensightFile ;         // The main _ensightFile used to link geom and data _filename
+  MED * const       _ptrMed ;              // Store 'ENSIGHT_DRIVER (0..n)----(1) ENSIGHT' associations
  
-private:
-  ENSIGHT_MED_DRIVER();
-
-  //writeField(FIELD * myField) ;
-  //writeMesh(MESH * myMesh) ;
-
-  void open()   ;
-  void close()  ;
-  void openConst()  const ;
-  void closeConst() const ;
+  virtual void openConst()  const =0;
+  virtual void closeConst() const =0;
 
 public :
+  ENSIGHT_MED_DRIVER();
   ENSIGHT_MED_DRIVER(const string & fileName, MED * const ptrMed);
+  ENSIGHT_MED_DRIVER(const string & fileName,  MED * const ptrMed,
+		 MED_EN::med_mode_acces accessMode);
   ENSIGHT_MED_DRIVER(const ENSIGHT_MED_DRIVER & driver);
-  ~ENSIGHT_MED_DRIVER();
+  virtual ~ENSIGHT_MED_DRIVER();
   // OPERATEUR DE RECOPIE AVEC _ensightFile ??
 
-  //virtual void write          ( void )  ;
-  void write                 ( void ) const ;
-  virtual void read          ( void )  {} ;
-  //  virtual void writeFrom      ( void ) const ;
-  //  virtual void read           ( void ) ;
-  GENDRIVER * copy (void ) const ;
+  void open();
+  void close();
+  virtual void write( void ) const = 0 ;
+  virtual void read( void ) = 0 ;
+  virtual GENDRIVER * copy (void ) const = 0;
 
-private :
+};
+
+class ENSIGHT_MED_RDONLY_DRIVER : public virtual ENSIGHT_MED_DRIVER
+{
+public :
+  ENSIGHT_MED_RDONLY_DRIVER();
+  ENSIGHT_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed);
+  ENSIGHT_MED_RDONLY_DRIVER(const ENSIGHT_MED_RDONLY_DRIVER & driver);
+  virtual ~ENSIGHT_MED_RDONLY_DRIVER();
+  void openConst()  const;
+  void closeConst() const;
+  void write          ( void ) const throw (MEDEXCEPTION) ;
+  virtual void read           ( void ) ;
+//   virtual void readFileStruct ( void ) ;
+private:
+  ifstream *        _ensightFile;         // The main _ensightFile used to read geom and data _filename
+  GENDRIVER * copy ( void ) const;
+};
+
+class ENSIGHT_MED_WRONLY_DRIVER : public virtual ENSIGHT_MED_DRIVER
+{
+
+public :
+  ENSIGHT_MED_WRONLY_DRIVER();
+  ENSIGHT_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed);
+  ENSIGHT_MED_WRONLY_DRIVER(const ENSIGHT_MED_WRONLY_DRIVER & driver);
+  virtual ~ENSIGHT_MED_WRONLY_DRIVER();
+  void openConst()  const;
+  void closeConst() const;
+  void write          ( void ) const throw (MEDEXCEPTION) ;
+//   void writeFrom      ( void ) const throw (MEDEXCEPTION) ;
+  virtual void read           ( void ) throw (MEDEXCEPTION) ;
+//   virtual void readFileStruct ( void ) throw (MEDEXCEPTION) ;
+private:
+  ofstream *        _ensightFile;         // The main _ensightFile used to write geom and data _filename
+  GENDRIVER * copy ( void ) const;
   void writeMesh(MESH * myMesh) const ;
   void writeSupport(SUPPORT * mySupport) const ;
   void writeField(FIELD_ * myField,string name) const ;
-
 };
+
 };
 
 

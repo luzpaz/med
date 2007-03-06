@@ -151,7 +151,7 @@ MEDMEM_EnsightMeshDriver.cxx
 
 
 # Executables targets
-BIN = med2_1_To_med2_2 med2vtk med2ensight duplicateMED med_test duplicateMEDMESH 
+BIN = med2_1_To_med2_2 med2vtk med2ensight ensight2med duplicateMED med_test duplicateMEDMESH 
 BIN_SRC = 
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 

@@ -82,10 +82,11 @@ public :
 		   FIELD<T, INTERLACING_TAG> * ptrField):
     GENDRIVER(fileName,MED_EN::MED_WRONLY),
     _ptrField((FIELD<T> *) ptrField),
-    _fieldName(fileName),_fieldNum(MED_INVALID) 
+    _fieldNum(MED_INVALID) 
   {
     const char * LOC = "ENSIGHT_FIELD_DRIVER::ENSIGHT_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
     BEGIN_OF(LOC);
+    _fieldName = ptrField->getName();
     _ensightFile = new ofstream();
 
     END_OF(LOC);

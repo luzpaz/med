@@ -78,6 +78,8 @@ driverTypes DRIVERFACTORY::deduceDriverTypeFromFileName(const std::string & file
     return PORFLOW_DRIVER;
   if(extension=="vtk")
     return VTK_DRIVER;
+  if(extension=="case")
+    return ENSIGHT_DRIVER;
   return NO_DRIVER;
 }
 
@@ -156,7 +158,8 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
       switch(access)
 	{
 	case MED_LECT : {
-	  throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the ENSIGHT_DRIVER type which is not allowed because ENSIGHT_DRIVER is only a write access driver");
+	  ret=new ENSIGHT_MESH_DRIVER(fileName,mesh);
+	  return ret;
 	}
 	case MED_ECRI : {
 	  ret=new ENSIGHT_MESH_DRIVER(fileName,mesh);
@@ -193,7 +196,7 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
     }
 
     case NO_DRIVER : {
-      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method which is not allowed");
+      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method 1 which is not allowed");
     }
     default:
       throw MED_EXCEPTION ("other driver than MED_DRIVER GIBI_DRIVER PORFLOW_DRIVER and VT_DRIVER has been specified to the method which is not allowed");
@@ -253,14 +256,15 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
       switch(access)
 	{
 	case MED_LECT : {
-	  throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the ENSIGHT_DRIVER type which is not allowed because ENSIGHT_DRIVER is only a write access driver");
+	  ret=new ENSIGHT_MED_RDONLY_DRIVER(fileName,med);
+	  break ;
 	}
 	case MED_ECRI : {
-	  ret=new ENSIGHT_MED_DRIVER(fileName,med);
+	  ret=new ENSIGHT_MED_WRONLY_DRIVER(fileName,med);
 	  break ;
 	}
 	case MED_REMP : {
-	  ret=new ENSIGHT_MED_DRIVER(fileName,med);
+	  throw MED_EXCEPTION ("not yet implemented");
 	  break ;
 	}
 	default:
@@ -280,11 +284,11 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
     }
 
     case NO_DRIVER : {
-      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method which is not allowed");
+      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method 2 which is not allowed");
       break;
     }
     default:
-      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method which is not allowed");
+      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method 3 which is not allowed");
     }
   return ret;
 }
@@ -299,7 +303,7 @@ GENDRIVER * DRIVERFACTORY::buildMedDriverFromFile(const string & fileName,
     {
       version = getMedFileVersion(fileName);
     }
-  catch (MEDEXCEPTION &)
+  catch (MEDEXCEPTION & ex)
     {
       version = DRIVERFACTORY::globalMedFileVersionForWriting;
     }
@@ -346,7 +350,7 @@ GENDRIVER * DRIVERFACTORY::buildMeshDriverFromFile(const string & fileName,
     {
       version = getMedFileVersion(fileName);
     }
-  catch (MEDEXCEPTION & )
+  catch (MEDEXCEPTION & ex)
     {
       version = DRIVERFACTORY::globalMedFileVersionForWriting;
     }
