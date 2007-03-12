@@ -41,8 +41,6 @@ ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(): GENDRIVER(),
 				    _ptrMesh((MESH * const)MED_NULL)
 {
   _ensightFile = new ofstream();
-  // What about _id in Gendriver ?
-  // _driverType ???
 }
 
 ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(const string & fileName,
@@ -52,7 +50,6 @@ ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(const string & fileName,
 {
   const char * LOC = "ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(const string & fileName, MESH * ptrMesh) : " ;
 
-  //  _ptrMesh->addDriver(*this); // OU RECUPERER L'ID.
   MESSAGE(LOC << "WARNING this driver is only used to write in Ensight format So the object can not be instantied using a file!");
 
   _ensightFile = new ofstream(); 
@@ -98,10 +95,6 @@ void ENSIGHT_MESH_DRIVER::openConst() const throw (MEDEXCEPTION)
 
   if (!(*_ensightFile).is_open())
     (*_ensightFile).open(_fileName.c_str()) ; 
-//    if (*_ensightFile)
-//      _status = MED_OPENED ;
-//    else
-
 
   SCRUTE((*_ensightFile).is_open());
   SCRUTE(_ensightFile);
@@ -131,10 +124,6 @@ void ENSIGHT_MESH_DRIVER::closeConst() const throw (MEDEXCEPTION)
   if ((*_ensightFile).is_open())
     (*_ensightFile).close();
   
-//    if (*_ensightFile)
-//      _status = MED_CLOSED ;
-//    else
-
   SCRUTE(_ensightFile);
   SCRUTE(*_ensightFile);
 
@@ -203,10 +192,11 @@ void ENSIGHT_MESH_DRIVER::write(void) const
   int NumberOfNodes = _ptrMesh->getNumberOfNodes() ;
   (*_ensightFile) << NumberOfNodes << endl ;
   const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) ;
+//   ensightGeomFile.setf(ios::scientific);	
+//   ensightGeomFile.precision(5);	
   for (int i=0;i<NumberOfNodes;i++) {
-//     (*_ensightFile) << setw(8) << i+1  << " " ;
     for (int j=0;j<SpaceDimension;j++)
-      (*_ensightFile) << setw(8) << coordinate[i*SpaceDimension+j] << " " ;
+      (*_ensightFile) << setw(8) << coordinate[i*SpaceDimension+j];
     if (SpaceDimension==1) 
       (*_ensightFile) << "0 0" ;
     if (SpaceDimension==2) 
@@ -219,8 +209,6 @@ void ENSIGHT_MESH_DRIVER::write(void) const
   int cells_types_count = _ptrMesh->getNumberOfTypes(MED_CELL) ;
   int cells_sum = _ptrMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) ;
   const CELLMODEL * cells_type = _ptrMesh->getCellsTypes(MED_CELL) ;
-
-//   const int * connectivityIndex = _ptrMesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
 
   (*_ensightFile) << "part 1" << endl;
   (*_ensightFile) << "connectivities description" << endl;
@@ -386,7 +374,7 @@ void ENSIGHT_MESH_DRIVER::write(void) const
     const int * connectivityArray = _ptrMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
     for (int j=0;j<numberOfCell;j++) {
       for (int k=0;k<nodes_cell;k++)
-	(*_ensightFile) << setw(8) << connectivityArray[j*nodes_cell+filter[k]]  << " " ;
+	(*_ensightFile) << setw(8) << connectivityArray[j*nodes_cell+filter[k]];
       (*_ensightFile) << endl ;
     }
     if (filter != NULL)
@@ -399,8 +387,6 @@ void ENSIGHT_MESH_DRIVER::write(void) const
     int cells_types_count = _support[i]->getNumberOfTypes() ;
     int cells_sum = _support[i]->getNumberOfElements(MED_ALL_ELEMENTS) ;
     const medGeometryElement * geo_type = _support[i]->getTypes() ;
-
-//     const int * connectivityIndex = _ptrMesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
 
     (*_ensightFile) << "part " << i+2 << endl;
     (*_ensightFile) << "connectivities description" << endl;
@@ -583,7 +569,7 @@ void ENSIGHT_MESH_DRIVER::write(void) const
       const int * connectivityArray = _ptrMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_FACE,geo_type[i]);
       for (int j=0;j<numberOfCell;j++) {
 	for (int k=0;k<nodes_cell;k++)
-	  (*_ensightFile) << setw(8) << connectivityArray[j*nodes_cell+filter[k]]  << " " ;
+	  (*_ensightFile) << setw(8) << connectivityArray[j*nodes_cell+filter[k]];
 	(*_ensightFile) << endl ;
       }
       if (filter != NULL)

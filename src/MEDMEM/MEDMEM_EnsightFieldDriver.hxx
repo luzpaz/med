@@ -146,6 +146,8 @@ public :
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				       << _fileName)
 			    );
+//     _ensightFile.setf(ios::scientific);	
+//     _ensightFile.precision(5);	
     END_OF(LOC);
   }
 
@@ -185,6 +187,8 @@ public :
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				       << _fileName)
 			    );
+//     _ensightFile.setf(ios::scientific);	
+//     _ensightFile.precision(5);	
     END_OF(LOC);
   }
 
@@ -329,7 +333,7 @@ template <class T> void ENSIGHT_FIELD_DRIVER<T>::write(void) const
   const double *coordinate = meshField->getCoordinates(MED_EN::MED_FULL_INTERLACE) ;
   for (int i=0;i<NumberOfNodes;i++) {
     for (int j=0;j<SpaceDimension;j++)
-      (*_ensightFile) << coordinate[i*SpaceDimension+j] << " " ;
+      (*_ensightFile) << coordinate[i*SpaceDimension+j];
     if (SpaceDimension==1) 
       (*_ensightFile) << "0 0" ;
     if (SpaceDimension==2) 
@@ -482,7 +486,7 @@ template <class T> void ENSIGHT_FIELD_DRIVER<T>::write(void) const
     for (int j=0;j<numberOfCell;j++) {
       (*_ensightFile) << nodes_cell << " " ;
       for (int k=0;k<nodes_cell;k++)
-	(*_ensightFile) << connectivityArray[j*nodes_cell+filter[k]] - 1 << " " ;
+	(*_ensightFile) << connectivityArray[j*nodes_cell+filter[k]] - 1;
       (*_ensightFile) << endl ;
     }
     if (filter != NULL)
@@ -643,7 +647,7 @@ template <class T> void ENSIGHT_FIELD_DRIVER<T>::write(void) const
   for (int i=0; i<NomberOfValue; i++)
     {
       for(int j=0; j<NomberOfComponents; j++)
-	(*_ensightFile) << value[j*NomberOfValue+i] << " " ;
+	(*_ensightFile) << value[j*NomberOfValue+i];
       (*_ensightFile) << endl ;
     }
   

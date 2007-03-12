@@ -280,10 +280,12 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh) const {
   // (ensightGeomFile) << "how many points =  " << NumberOfNodes << " float" << endl ;
   ensightGeomFile << NumberOfNodes << endl ;
   const double *coordinate = myMesh->getCoordinates(MED_FULL_INTERLACE) ;
+  ensightGeomFile.setf(ios::scientific);	
+  ensightGeomFile.precision(5);	
   for (int i=0;i<NumberOfNodes;i++) {
 //     ensightGeomFile << setw(12) << i+1 ;
     for (int j=0;j<SpaceDimension;j++)
-      ensightGeomFile << setw(12) << coordinate[i*SpaceDimension+j] << " " ;
+      ensightGeomFile << setw(12) << coordinate[i*SpaceDimension+j];
     if (SpaceDimension==1) 
       ensightGeomFile << "0       0" ;
     if (SpaceDimension==2) 
@@ -461,7 +463,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh) const {
     const int * connectivityArray = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
     for (int j=0;j<numberOfCell;j++) {
       for (int k=0;k<nodes_cell;k++)
-	ensightGeomFile << setw(8) << connectivityArray[j*nodes_cell+filter[k]]  << " " ;
+	ensightGeomFile << setw(8) << connectivityArray[j*nodes_cell+filter[k]];
       ensightGeomFile << endl ;
     }
     if (filter != NULL)
@@ -531,7 +533,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
 
       for (int i=0; i<NumberOfValue; i++) {
 	for(int j=0; j<NumberOfComponents; j++)
-	  ensightDataFile << setw(12) << value[j*NumberOfValue+i] << " " ;
+	  ensightDataFile << setw(12) << value[j*NumberOfValue+i];
      }
       if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
 	delete[] myArray;
@@ -565,7 +567,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       int mypoint=0;
       for (int i=0; i<NumberOfValue; i++) {
 	for(int j=0; j<NumberOfComponents; j++) {
-	  ensightDataFile << setw(12) << value[j*NumberOfValue+i] << " " ;
+	  ensightDataFile << setw(12) << value[j*NumberOfValue+i];
 	  mypoint+=1;
 	  if (mypoint == 6) {
 	    ensightDataFile << endl ;
