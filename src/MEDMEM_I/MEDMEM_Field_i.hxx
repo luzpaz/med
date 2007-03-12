@@ -20,7 +20,7 @@
 // File      : MEDMEM_Field_i.hxx
 // Project   : SALOME
 // Author    : EDF
-// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Field_i.hxx
+// $Header   : $
 //=============================================================================
 
 
@@ -71,6 +71,9 @@ public :
     ~FIELD_i();
 
     char *   		    getName() 	     throw (SALOME::SALOME_Exception);
+    void                    setName(const char* theName)
+					     throw (SALOME::SALOME_Exception);
+
     char *   		    getDescription() throw (SALOME::SALOME_Exception);
     SALOME_MED::SUPPORT_ptr getSupport()     throw (SALOME::SALOME_Exception);
     CORBA::Long             getNumberOfComponents()   	   
@@ -91,10 +94,16 @@ public :
     SALOME_MED::string_array * getComponentsNames()  throw (SALOME::SALOME_Exception);
     SALOME_MED::string_array * getComponentsUnits()  throw (SALOME::SALOME_Exception);
     SALOME_MED::string_array * getComponentsDescriptions()  throw (SALOME::SALOME_Exception);
-    void addInStudy(SALOMEDS::Study_ptr myStudy, 
-		    SALOME_MED::FIELD_ptr myIor)  
-		    throw (SALOME::SALOME_Exception, 
+
+    void addInStudy(SALOMEDS::Study_ptr myStudy,
+                    SALOME_MED::FIELD_ptr myIor)
+                    throw (SALOME::SALOME_Exception,
                            SALOMEDS::StudyBuilder::LockProtection);
+
+    void addInStudyToComponent(SALOMEDS::SComponent_ptr myComponent,
+                               SALOME_MED::FIELD_ptr    myIor)
+                               throw (SALOME::SALOME_Exception,
+                                      SALOMEDS::StudyBuilder::LockProtection);
 
     CORBA::Long addDriver (SALOME_MED::medDriverTypes driverType, 
 			   const char* fileName, const char* fieldName)

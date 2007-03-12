@@ -33,7 +33,11 @@
 
 module SALOME_MED
 {
-  interface MED_Gen : Engines::Component, SALOMEDS::Driver
+  interface MED_Gen_Driver : SALOMEDS::Driver
+  {
+  };
+
+  interface MED_Gen : Engines::Component, MED_Gen_Driver
   {
     /*!
       it returns a Corba pointer %MESH on the mesh stored in the .med file
@@ -72,7 +76,6 @@ module SALOME_MED
 				     in string studyName)
       raises (SALOME::SALOME_Exception);
   };
-
 };
 
 #endif
