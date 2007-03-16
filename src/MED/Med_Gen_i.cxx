@@ -1141,7 +1141,8 @@ char* Med_Gen_i::LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
     // MED
     if (strcmp(aLocalPersistentID, "_MED Objet Med + /OBJ_MED/") == 0)
     {
-      object = med;
+      //SALOME_MED::MED_var v1(med);
+      object = SALOME_MED::MED::_duplicate( med );
     }
     // MESH
     else if (strncmp(aLocalPersistentID, "_MEDMESH_",9) == 0)
