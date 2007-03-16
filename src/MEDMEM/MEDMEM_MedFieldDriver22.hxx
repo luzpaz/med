@@ -444,7 +444,8 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 	entityCurrent = MED_EN::MED_EDGE;
 
       if (geometryCurrent == MED_EN::MED_TRIA3 || geometryCurrent == MED_EN::MED_QUAD4 ||
-	  geometryCurrent == MED_EN::MED_TRIA6 || geometryCurrent == MED_EN::MED_QUAD8)
+	  geometryCurrent == MED_EN::MED_TRIA6 || geometryCurrent == MED_EN::MED_QUAD8 || 
+	  geometryCurrent == MED_EN::MED_POLYGON)
 	entityCurrent = MED_EN::MED_FACE;
 
       nbPdtIt1 = med_2_2::MEDnPasdetemps(id, const_cast <char*> ( fieldName.c_str() ),
