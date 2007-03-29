@@ -209,6 +209,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
  */
 //=============================================================================
 
+/*
 namespace {
   bool isPublishedObject(SALOMEDS::Study_ptr study,
                          string              entryPath)
@@ -230,6 +231,7 @@ namespace {
     return isPublishedObject( study, entryPath );
   }
 }
+*/
 
 //=============================================================================
 /*!
@@ -269,7 +271,8 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 	    MESH_i * myMeshI = new MESH_i(myMesh);
 	    SALOME_MED::MESH_ptr myMeshIOR = myMeshI->_this();
 	    _meshes[meshesNames[i]]=myMeshIOR;
-            if ( !persistence || isPublishedMesh(myStudy,myMeshI->getName() ))
+            //if ( !persistence || isPublishedMesh(myStudy,myMeshI->getName() ))
+            if ( !persistence )
               myMeshI->addInStudy(myStudy,myMeshIOR);
 	}
 
@@ -309,9 +312,10 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		     {
 			  FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
 			  SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->POA_SALOME_MED::FAMILY::_this();
-                          if ( !persistence ||
-                               isPublishedObject( myStudy, SUPPORT_i::getEntryPath
-                                                  ((const SUPPORT *)*familyVectorIt)))
+                          //if ( !persistence ||
+                          //     isPublishedObject( myStudy, SUPPORT_i::getEntryPath
+                          //                        ((const SUPPORT *)*familyVectorIt)))
+                          if ( !persistence )
                             myFamilyI->addInStudy(myStudy,myFamilyIOR);
       		     }
 
@@ -325,9 +329,10 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		    {
 			 GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
 			 SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->POA_SALOME_MED::GROUP::_this();
-                         if ( !persistence ||
-                              isPublishedObject( myStudy, SUPPORT_i::getEntryPath
-                                                 ((const SUPPORT *)*groupVectorIt)))
+                         //if ( !persistence ||
+                         //     isPublishedObject( myStudy, SUPPORT_i::getEntryPath
+                         //                        ((const SUPPORT *)*groupVectorIt)))
+                         if ( !persistence )
                            myGroupI->addInStudy(myStudy,myGroupIOR);
       		    }
                 }      
@@ -344,9 +349,10 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		 SUPPORT_i * mySupportI = new SUPPORT_i((*itSupport).second);
 	         SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this();
 	         mySupportsIOR[(*itSupport).first]= mySupportIOR;
-                 if ( !persistence ||
-                      isPublishedObject( myStudy,
-                                         SUPPORT_i::getEntryPath (itSupport->second)))
+                 //if ( !persistence ||
+                 //     isPublishedObject( myStudy,
+                 //                        SUPPORT_i::getEntryPath (itSupport->second)))
+                 if ( !persistence )
                    mySupportI->addInStudy(myStudy,mySupportIOR);
 	    }
 	}
@@ -536,8 +542,9 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
                       MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str()
                               << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
-                      if ( !persistence ||
-                           isPublishedObject( myStudy, myFieldIntI->getEntryPath() ))
+                      //if ( !persistence ||
+                      //     isPublishedObject( myStudy, myFieldIntI->getEntryPath() ))
+                      if ( !persistence )
                         myFieldIntI->addInStudy(myStudy,myFieldIntIOR);
                       _fields[fieldsNames[i]][dtIt] = myFieldIntIOR;
                       break;
@@ -561,11 +568,12 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 			MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str()
                                 << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
-                      if ( !persistence ||
-                           isPublishedObject( myStudy, myFieldDoubleI->getEntryPath() ))
-			myFieldDoubleI->addInStudy(myStudy,myFieldDoubleIOR);
-			_fields[fieldsNames[i]][dtIt] = myFieldDoubleIOR;
-			break;
+                        //if ( !persistence ||
+                        //     isPublishedObject( myStudy, myFieldDoubleI->getEntryPath() ))
+                        if ( !persistence )
+                          myFieldDoubleI->addInStudy(myStudy,myFieldDoubleIOR);
+                        _fields[fieldsNames[i]][dtIt] = myFieldDoubleIOR;
+                        break;
   		     }
 
       		    default: 
@@ -1153,16 +1161,16 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
  * suitable name and bad IOR and update the IOR
  */
 //=============================================================================
-void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
-		       const char * fileName) 
+void MED_i::addInStudy (SALOMEDS::Study_ptr myStudy,
+                        SALOME_MED::MED_ptr myIor,
+                        SALOMEDS::SComponent_ptr medfather,
+                        const char * fileName)
   throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
 	BEGIN_OF("MED_i::addInStudy(myStudy, myIor, fileName)");
-        if ( _medId != "" )
-        {
-                MESSAGE("Med already in Study");
-                    THROW_SALOME_CORBA_EXCEPTION("Med already in Study", \
-                                 SALOME::BAD_PARAM);
+        if ( _medId != "" ) {
+          MESSAGE("Med already in Study");
+          THROW_SALOME_CORBA_EXCEPTION("Med already in Study", SALOME::BAD_PARAM);
         };
 
         SALOMEDS::StudyBuilder_var     myBuilder = myStudy->NewBuilder();
@@ -1172,7 +1180,7 @@ void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
         SALOMEDS::AttributeIOR_var     aIOR;
 
         // Create SComponent labelled 'MED' if it doesn't already exit
-        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
+        //SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
         if ( CORBA::is_nil(medfather) )
         {
 	  THROW_SALOME_CORBA_EXCEPTION("Component Med not found",
@@ -1207,7 +1215,7 @@ void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
         }
         else
         {
-          MESSAGE("Add a MED Object under Med");
+          MESSAGE("Add a MED Object under the medfather");
 
           char * medObjName;
           string::size_type pos1=string(fileName).rfind('/');
@@ -1221,7 +1229,11 @@ void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
           medObjName = strcpy(medObjName,"MED_OBJECT_FROM_FILE_");
           medObjName = strcat(medObjName,fileNameShort.c_str());
 
-          string path = string("/Med/") + medObjName;
+          string path ("/");
+          path += string(medfather->GetName());
+          path += string("/");
+          path += medObjName;
+          //string path = string("/Med/") + medObjName;
           medObj = myStudy->FindObjectByPath(path.c_str());
           if ( medObj->_is_nil() )
             medObj = myBuilder->NewObject(medfather);
@@ -1265,5 +1277,5 @@ void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
    	MESSAGE("Registering of the Corba Med pointer");
 	Register();
 
-        END_OF("Med_i::addInStudy(myStudy, myIor, medObjName)");
+        END_OF("Med_i::addInStudy(myStudy, myIor, medfather, medObjName)");
 }

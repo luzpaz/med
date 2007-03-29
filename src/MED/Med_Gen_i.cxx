@@ -214,20 +214,25 @@ void Med_Gen_i::addInStudy(SALOMEDS::Study_var myStudy)
  */
 //=============================================================================
 SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
-                                const char* studyName)
+                                               const char* studyName)
   throw(SALOME::SALOME_Exception)
 {
         beginService("Med_Gen_i::readStructFile");
 
 	SCRUTE(fileName);
   	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
-//         if (!_duringLoad) addInStudy(myStudy) ;
+        //if (!_duringLoad) addInStudy(myStudy) ;
 
 	SALOME_MED::MED_ptr myMedIOR ;
 	try
 	{
 	  // we create a new MED_i and add in study
-	  MED_i * myMedI = new MED_i();
+          SALOMEDS::SComponent_var theComponent = myStudy->FindComponent("MED");
+          MED_i * myMedI = 0;
+          if (CORBA::is_nil(theComponent))
+            myMedI = new MED_i();
+          else
+            myMedI = Med_Gen_Driver_i::GetMED(theComponent);
 	  myMedIOR = myMedI->_this() ;
 // 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR) ;
 // 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ;
@@ -254,7 +259,7 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
 //=============================================================================
 void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
 					     const char* studyName)
-throw (SALOME::SALOME_Exception)
+  throw (SALOME::SALOME_Exception)
 {
         beginService("Med_Gen_i::readStructFileWithFieldType");
 
@@ -267,11 +272,16 @@ throw (SALOME::SALOME_Exception)
 	try
 	{
 	  // we create a new MED_i and add in study
-	  MED_i * myMedI = new MED_i();
-	  SALOME_MED::MED_ptr myMedIOR = myMedI->_this() ;
-	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ;
+          SALOMEDS::SComponent_var theComponent = myStudy->FindComponent("MED");
+          MED_i * myMedI = 0;
+          if (CORBA::is_nil(theComponent))
+            myMedI = new MED_i();
+          else
+            myMedI = Med_Gen_Driver_i::GetMED(theComponent);
+	  SALOME_MED::MED_ptr myMedIOR = myMedI->_this();
+	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,theComponent,fileName);
 	  // create ::MED object, read all and add in study !
-	  myMedI->initWithFieldType(myStudy,MED_DRIVER,fileName) ;
+	  myMedI->initWithFieldType(myStudy,MED_DRIVER,fileName);
 	}
         catch (const SALOMEDS::StudyBuilder::LockProtection & lp) {}
         catch(...)

@@ -333,7 +333,7 @@ namespace {
       med_i->initWithFieldType(study, MED_DRIVER, aFile, true);
 
       // publishing must be done by initWithFieldType according to <persistence> flag
-      med_i->addInStudy(study, med, 0);
+      med_i->addInStudy(study, med, theComponent, 0);
     }
     catch (const std::exception & ex)
     {
@@ -678,9 +678,10 @@ char* Med_Gen_Driver_i::LocalPersistentIDToIOR (SALOMEDS::SObject_ptr theSObject
     // SUPPORT?
     else {
       string type, name, meshName, entity;
-      MED_EN::medEntityMesh medEntity( atoi( entity.c_str() ));
       if ( getSupportData( aLocalPersistentID, type, name, meshName, entity ))
       {
+        MED_EN::medEntityMesh medEntity( atoi( entity.c_str() ));
+
         if ( type == "SUPPORT" ) {
           try {
             object = med_i->getSupport( meshName, medEntity );
@@ -727,6 +728,9 @@ char* Med_Gen_Driver_i::LocalPersistentIDToIOR (SALOMEDS::SObject_ptr theSObject
     }
     if ( !CORBA::is_nil(object) )
       ior = _driver_orb->object_to_string( object );
+    else
+      THROW_SALOME_CORBA_EXCEPTION("Unable to find the object in this file",
+                                   SALOME::INTERNAL_ERROR);
 
   } // !restoredByLoad
 
