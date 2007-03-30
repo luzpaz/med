@@ -32,54 +32,44 @@
 
 using namespace std;
 using namespace MEDMEM;
+
 void usage(char * name)
 {
-  cout << "  " << name << " <input med file> <output ensight file> " <<endl ;
-  cout << "    " << "(the two file name are mandatory )" << endl ;
+  cout << " ERROR ABOUT SYNTAX " << endl ;
+  cout << "  " << name << " <input med file> <output ensight file> " << endl ;
   exit(-1);
 }
 
 int main (int argc, char ** argv) {
-  if (argc != 3) usage(argv[0]);
-  
-  string filenameIN = argv[1] ;
-  string filenameOUT = argv[2] ;
-  
-  try {
-    /////////////////////////////////////////////////
-    // we read all meshes and fields in filenameIN //
-    /////////////////////////////////////////////////
-    MED myMed(MED_DRIVER,filenameIN) ;
-    cout << "resultat de MED " << endl ;
-    
-    // read all meshes
-    ////////////////////
 
-    cout << "Read all meshes "  ;
+  string filenameIN ;
+  string filenameOUT;
+  
+  if ( argc == 3 ) {
+    filenameIN  = argv[1] ;
+    filenameOUT = argv[2] ;
+    cout << "-> reading all into the Med file " << filenameIN << " and writing all into the Ensight file " << filenameOUT <<  endl ;
+
+    MED myMed(MED_DRIVER,filenameIN) ;
+
+    cout << "-> Read all meshes "  ;
     int NumberOfMeshes = myMed.getNumberOfMeshes() ;
     cout << "( "<<NumberOfMeshes << " ) :" << endl ;
     deque<string> MeshName = myMed.getMeshNames() ;
     for (int i=0; i<NumberOfMeshes; i++) {
       myMed.getMesh(MeshName[i])->read() ;
-      cout << "  - Mesh "<<i+1<<", named "<<MeshName[i]<<" is read !" << endl;
+      cout << "-> Mesh "<<i+1<<", named "<<MeshName[i]<<" is read !" << endl;
     }
 
-    // PROVISOIRE
-    ///////////////
-
-    // set support : support must be calculated with mesh information !!!
     myMed.updateSupport() ;
     
-    // read all fields
-    ////////////////////
-
-    cout << "Read all fields " ;
+    cout << "-> Read all fields " ;
     int NumberOfFields = myMed.getNumberOfFields() ;
     cout << "( "<<NumberOfFields << " ) :" << endl;
     deque<string> FieldName = myMed.getFieldNames() ;
     for (int i=0; i<NumberOfFields; i++) {
       deque<DT_IT_> FieldIteration = myMed.getFieldIteration(FieldName[i]) ;
-      cout << "  - Field "<<i+1<<", named "<<FieldName[i] << " :" << endl ;
+      cout << "-> Field "<<i+1<<", named "<<FieldName[i] << " :" << endl ;
       int NumberOfIteration = FieldIteration.size() ;
       cout << "    Number of iteration pair : "<< NumberOfIteration << endl;
       for (int j=0; j<NumberOfIteration; j++) {
@@ -89,16 +79,8 @@ int main (int argc, char ** argv) {
 	cout << "    * Iteration "<<FieldIteration[j].dt<<" and  order number "<<FieldIteration[j].it<<" ) is read !" << endl;
       }
     }
-
-    //////////////////////////////////////////
-    // we write all in ENSIGHT file filenameOUT //
-    /////////////////////////////////////////
     int id = myMed.addDriver(ENSIGHT_DRIVER,filenameOUT,MED_EN::MED_ECRI) ;
     myMed.write(id) ;
-
-  } 
-  catch (MEDEXCEPTION& ex){
-    cout << ex.what() << endl ;
   }
-
+  else usage(argv[0]);
 }

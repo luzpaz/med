@@ -98,7 +98,7 @@ public :
 private:
   ofstream *        _ensightFile;         // The main _ensightFile used to write geom and data _filename
   GENDRIVER * copy ( void ) const;
-  void writeMesh(MESH * myMesh) const ;
+  void writeMesh(MESH * myMesh,int imesh) const ;
   void writeSupport(SUPPORT * mySupport) const ;
   void writeField(FIELD_ * myField,string name) const ;
 };

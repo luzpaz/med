@@ -34,8 +34,8 @@ using namespace std;
 using namespace MEDMEM;
 void usage(char * name)
 {
-  cout << "  " << name << " <input Ensight file> <output Med file> " <<endl ;
-  cout << "    " << "(the two file name are mandatory )" << endl ;
+  cout << " ERROR ABOUT SYNTAX " << endl ;
+  cout << "  " << name << " <input ensight file> <output med file> " << endl ;
   exit(-1);
 }
 
@@ -43,21 +43,22 @@ void usage(char * name)
 
 int main (int argc, char ** argv) {
 
-  if (argc != 3) usage(argv[0]);
-
-  string filenameIN = argv[1];
-  string filenameOUT= argv[2];
+  string filenameIN ;
+  string filenameOUT;
  
-  cout << " encountering translation from Ensight" << filenameIN << " to Med " << filenameOUT <<  endl ;
+  if ( argc == 3 ) {
+    filenameIN  = argv[1] ;
+    filenameOUT = argv[2] ;
+    cout << " reading all into the Ensight file " << filenameIN << " and writing all into the Med file " << filenameOUT <<  endl ;
 
-  MED myMed(ENSIGHT_DRIVER,filenameIN) ;
-  cout << " driver ensight start : call to read part " << endl ;
-  //--------------
-  myMed.read() ;
-  //--------------
-  cout << " driver ensight OK : call to med part " << endl ;
-  int id = myMed.addDriver(MED_DRIVER,filenameOUT);
-  myMed.write(id);
-  cout << " med part OK " << endl ;
+    MED myMed(ENSIGHT_DRIVER,filenameIN) ;
+    myMed.read() ;
+
+    int id = myMed.addDriver(MED_DRIVER,filenameOUT);
+    myMed.write(id);
+  }
+  else usage(argv[0]);
 
 }
+
+

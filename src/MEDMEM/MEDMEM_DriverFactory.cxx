@@ -25,6 +25,7 @@
 #include "MEDMEM_PorflowMeshDriver.hxx"
 #include "MEDMEM_VtkMeshDriver.hxx"
 #include "MEDMEM_VtkMedDriver.hxx"
+#include "MEDMEM_EnsightFieldDriver.hxx"
 #include "MEDMEM_EnsightMeshDriver.hxx"
 #include "MEDMEM_EnsightMedDriver.hxx"
 
@@ -158,15 +159,15 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
       switch(access)
 	{
 	case MED_LECT : {
-	  ret=new ENSIGHT_MESH_DRIVER(fileName,mesh);
+	  ret=new ENSIGHT_MESH_RDONLY_DRIVER(fileName,mesh);
 	  return ret;
 	}
 	case MED_ECRI : {
-	  ret=new ENSIGHT_MESH_DRIVER(fileName,mesh);
+	  ret=new ENSIGHT_MESH_WRONLY_DRIVER(fileName,mesh);
 	  return ret;
 	}
 	case MED_REMP : {
-	  ret=new ENSIGHT_MESH_DRIVER(fileName,mesh);
+	  throw MED_EXCEPTION ("not yet implemented");
 	  return ret;
 	}
 	default:
@@ -303,7 +304,7 @@ GENDRIVER * DRIVERFACTORY::buildMedDriverFromFile(const string & fileName,
     {
       version = getMedFileVersion(fileName);
     }
-  catch (MEDEXCEPTION & ex)
+    catch (MEDEXCEPTION & ex)
     {
       version = DRIVERFACTORY::globalMedFileVersionForWriting;
     }

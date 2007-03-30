@@ -140,6 +140,8 @@ public :
 
   friend class VTK_MESH_DRIVER;
 
+  friend class ENSIGHT_MESH_RDONLY_DRIVER;
+
   void init();
   MESH();
   MESH(MESH &m);

@@ -28,7 +28,11 @@
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_CellModel.hxx"
+
+#include "MEDMEM_MedMeshDriver.hxx"
+#include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_Meshing.hxx"
+#include "MEDMEM_Group.hxx"
 
 using namespace std;
 using namespace MEDMEM;
@@ -86,7 +90,6 @@ ENSIGHT_MED_WRONLY_DRIVER::ENSIGHT_MED_WRONLY_DRIVER(const ENSIGHT_MED_WRONLY_DR
 
 ENSIGHT_MED_WRONLY_DRIVER::~ENSIGHT_MED_WRONLY_DRIVER()
 {
-  close();
   delete _ensightFile ;
 }
 
@@ -147,9 +150,6 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
   // Ensight case organization requires a main file (filename.case) which defines organization
   // We also need a geom file (filemane.geo) to store the meshs
   // We also need a data file (filemane.data) to store the fields
-
-  // main Ensight file  
-  // ofstream ensightCaseFile("test.case", ios::out);
    
   int NumberOfMeshes = _ptrMed->getNumberOfMeshes() ;
   deque<string> MeshNames = _ptrMed->getMeshNames() ;
@@ -158,38 +158,26 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 
   int NumberOfFields = _ptrMed->getNumberOfFields() ;
   deque<string> FieldNames = _ptrMed->getFieldNames() ;
-
-  string ensight_case(ENSIGHT_MED_DRIVER::ENSIGHT_MED_DRIVER::_fileName) ;
-
-  //------------------------------------------------------------------------
-  (*_ensightFile) << "Driver Ensight for " << ensight_case << " case" << endl << endl ;
-  (*_ensightFile) << "Result files are : " << endl ;
-  (*_ensightFile) << "-------------------" << endl ;
-  (*_ensightFile) << "Main file     = " << ensight_case << ".case" << endl ;
-  //------------------------------------------------------------------------
-
-  string ensight_casef  = ensight_case ;
-  ensight_casef  = ensight_casef +=".case" ;
-  // ------------ create the main Ensight file 
-  ofstream ensightCaseFile(ensight_casef.c_str(),ios::out);
-  cout << "-> creating the Ensight case file " << ensight_casef <<  endl ;
-  ensightCaseFile << "FORMAT" << endl ;
-  ensightCaseFile << "type:   ensight" << endl ;
-  ensightCaseFile << endl ;
+	       
+  cout << "-> creating the Ensight case file " << _fileName <<  endl ;
+  (*_ensightFile) << "FORMAT" << endl ;
+  (*_ensightFile) << "type:   ensight" << endl ;
+  (*_ensightFile) << endl ;
   if (NumberOfMeshes){
-    ensightCaseFile << "GEOMETRY" << endl ;
+    (*_ensightFile) << "GEOMETRY" << endl ;
     for (int i=0; i<NumberOfMeshes; i++) {
-      ensightCaseFile << "# Mesh " << i+1 << " detected with name = " << MeshNames[i] << endl ;
-      ensightCaseFile << "model: " << i+1 << " " << ensight_case << "-" << i+1 << ".geom"  << endl ;
-      (*_ensightFile) << "Mesh     file = " << ensight_case << "-" << i+1 << ".geom" << endl ;
+      int len       = _fileName.size() ;
+      string prefix = _fileName.substr(0,len-5); // extraction de .case
+      (*_ensightFile) << "# Mesh " << i+1 << " detected with name = " << MeshNames[i] << endl ;
+      (*_ensightFile) << "model: " << i+1 << " " << prefix << "-" << i+1 << ".geom"  << endl ;
     }
   }
-  ensightCaseFile << endl ;
-  if (NumberOfFields) ensightCaseFile << "VARIABLE" << endl ;
+  (*_ensightFile) << endl ;
+  if (NumberOfFields) (*_ensightFile) << "VARIABLE" << endl ;
 
   for (int i=0; i<NumberOfMeshes; i++) {
     MESH * myMesh = _ptrMed->getMesh(MeshNames[i]) ;
-    writeMesh(myMesh) ;
+    writeMesh(myMesh, i) ;
     // get all field which values are on this mesh => revoir api de Med !!!
     // first : field on node
     // fields is on all node !
@@ -202,7 +190,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 	FIELD_ * myField = _ptrMed->getField(FieldNames[j],dt,it) ;
 	ostringstream name ; 
 	name << myField->getName() << "_" << dt << "_" << it ;
-	ensightCaseFile << "# -Field "<< j+1 << " detected with name = " << name.str() << endl ;
+	(*_ensightFile) << "# -Field "<< j+1 << " detected with name = " << name.str() << endl ;
 	if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
 	  // rigth in all case : better compare pointeur ?
 	  if (MED_NODE == myField->getSupport()->getEntity())
@@ -210,9 +198,8 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 	      int NumberOfComponents =  myField->getNumberOfComponents() ;
 	      ostringstream name ; 
 	      name << myField->getName() << "_" << dt << "_" << it ;
-	      if (NumberOfComponents==3) ensightCaseFile << "vector per node: " << name.str() << " " << name.str() << ".data" << endl ;
-	      else if (NumberOfComponents<=4) ensightCaseFile << "scalar per node: " << name.str() << " " << name.str() << ".data" << endl ;
-	      (*_ensightFile) << "Field    file = " << name.str() << ".data" << endl ;
+	      if (NumberOfComponents==3)      (*_ensightFile) << "vector per node: " << name.str() << " " << name.str() << ".sol" << endl ;
+	      else if (NumberOfComponents<=4) (*_ensightFile) << "scalar per node: " << name.str() << " " << name.str() << ".sol" << endl ;
 	      writeField(myField,name.str()) ;
 	    } else
 	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
@@ -229,7 +216,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 	FIELD_ * myField = _ptrMed->getField(FieldNames[j],dt,it) ;
 	ostringstream name ; 
 	name << myField->getName() << "_" << dt << "_" << it ;
-	ensightCaseFile << "# --Field "<< j+1 << " detected for " << name.str() << endl ;
+	(*_ensightFile) << "# --Field "<< j+1 << " detected for " << name.str() << endl ;
 	if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
 	  // rigth in all case : better compare pointeur ?
 	  if (MED_CELL == myField->getSupport()->getEntity())
@@ -237,9 +224,8 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 	      int NumberOfComponents =  myField->getNumberOfComponents() ;
 	      ostringstream name ; 
 	      name << myField->getName() << "_" << dt << "_" << it ;
-	      if (NumberOfComponents==3) ensightCaseFile << "vector per node: " << name.str() << " " << name.str() << ".data" << endl ;
-	      else if (NumberOfComponents<=4) ensightCaseFile << "scalar per node: " << name.str() << " " << name.str() << ".data" << endl ;
-	      (*_ensightFile) << "Field    file = " << name.str() << ".data" << endl ;
+	      if (NumberOfComponents==3)      (*_ensightFile) << "vector per element: " << name.str() << " " << name.str() << ".sol" << endl ;
+	      else if (NumberOfComponents<=4) (*_ensightFile) << "scalar per element: " << name.str() << " " << name.str() << ".sol" << endl ;
 	      writeField(myField,name.str()) ;
 	    } else
 	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all cells !");
@@ -256,14 +242,16 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
   END_OF(LOC);
 }
 
-void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh) const {
+void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh , int imesh) const {
 
   const char * LOC = "ENSIGHT_MED_DRIVER::writeMesh() : ";
   BEGIN_OF(LOC);
 
-  string ensight_geomf(ENSIGHT_MED_WRONLY_DRIVER::ENSIGHT_MED_WRONLY_DRIVER::_fileName) ;
-  ensight_geomf  += "-1"  ;
-  ensight_geomf  += ".geom"  ;
+  int len       = _fileName.size() ;
+  string prefix = _fileName.substr(0,len-5); // extraction de .case
+  strstream w_mesh ;
+  w_mesh << prefix << "-" << imesh+1 << ".geom" << ends ;
+  string ensight_geomf = w_mesh.str()  ;
 
   ofstream ensightGeomFile(ensight_geomf.c_str(),ios::out); 
   cout << "-> creating the Ensight geometry file " << ensight_geomf << endl ;
@@ -271,21 +259,22 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh) const {
   // ------------ create the Ensight file associated to this meshe
   ensightGeomFile << "Ensight Geometry File : " <<  endl 
 		  << "Meshing from MedMemory"  << endl ;
+//   ensightGeomFile << "node id given " << endl ;
+//   ensightGeomFile << "element id given " << endl ;
   ensightGeomFile << "node id assign " << endl ;
   ensightGeomFile << "element id assign " << endl ;
   ensightGeomFile << "coordinates" << endl ;
   // put points (all point are in 3D, so if we are in 1D or 2D, we complete by zero !
   int SpaceDimension = myMesh->getSpaceDimension() ;
   int NumberOfNodes = myMesh->getNumberOfNodes() ;
-  // (ensightGeomFile) << "how many points =  " << NumberOfNodes << " float" << endl ;
   ensightGeomFile << NumberOfNodes << endl ;
   const double *coordinate = myMesh->getCoordinates(MED_FULL_INTERLACE) ;
   ensightGeomFile.setf(ios::scientific);	
   ensightGeomFile.precision(5);	
   for (int i=0;i<NumberOfNodes;i++) {
-//     ensightGeomFile << setw(12) << i+1 ;
+//     ensightGeomFile << setw(8) << i+1 ;
     for (int j=0;j<SpaceDimension;j++)
-      ensightGeomFile << setw(12) << coordinate[i*SpaceDimension+j];
+      ensightGeomFile << setw(12) << coordinate[i*SpaceDimension+j] ;
     if (SpaceDimension==1) 
       ensightGeomFile << "0       0" ;
     if (SpaceDimension==2) 
@@ -296,6 +285,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh) const {
   // we put connectivity
   // how many cells and how many value in connectivity :
   int cells_types_count = myMesh->getNumberOfTypes(MED_CELL) ;
+//   int cells_sum = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) ;
   const CELLMODEL * cells_type = myMesh->getCellsTypes(MED_CELL) ;
   ensightGeomFile << "part 1 " << endl ;
   ensightGeomFile << "elements are following " << endl ;
@@ -322,8 +312,6 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh) const {
         break ;
       }
       case MED_SEG3    : {  
-        ensightGeomFile << "bar3" << endl ;
-        ensightGeomFile << setw(8) << numberOfCell << endl ;
         filter = new int[3] ;
 	filter[0] = 0 ;
         filter[1] = 2 ;
@@ -381,8 +369,8 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh) const {
         filter = new int[4] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
-        filter[2] = 3 ;  // 3td element in med are 4th in ensight (array begin at 0 !)
-        filter[3] = 2 ;  // 4th element in med are 3rd in ensight (array begin at 0 !)
+        filter[2] = 3 ;  // 3td element in med are 4th in vtk (array begin at 0 !)
+        filter[3] = 2 ;  // 4th element in med are 3rd in vtk (array begin at 0 !)
         break ;
       }
       case MED_PYRA5   : {
@@ -390,9 +378,9 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh) const {
         ensightGeomFile << setw(8) << numberOfCell << endl ;
         filter = new int[5] ;
         filter[0] = 0 ;
-        filter[1] = 3 ;  // 2nd element in med are 4th in ensight (array begin at 0 !)
+        filter[1] = 3 ;  // 2nd element in med are 4th in vtk (array begin at 0 !)
         filter[2] = 2 ;
-        filter[3] = 1 ;  // 4th element in med are 2nd in ensight (array begin at 0 !)
+        filter[3] = 1 ;  // 4th element in med are 2nd in vtk (array begin at 0 !)
   	filter[4] = 4 ;
         break ;
       }
@@ -404,8 +392,8 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh) const {
         filter[1] = 2 ;
         filter[2] = 1 ;
         filter[3] = 3 ;
-        filter[4] = 5 ;
-  	filter[5] = 4 ;
+        filter[4] = 4 ;
+  	filter[5] = 5 ;
 	break ;
       }
       case MED_HEXA8   : {
@@ -463,7 +451,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh) const {
     const int * connectivityArray = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
     for (int j=0;j<numberOfCell;j++) {
       for (int k=0;k<nodes_cell;k++)
-	ensightGeomFile << setw(8) << connectivityArray[j*nodes_cell+filter[k]];
+	ensightGeomFile << setw(8) << connectivityArray[j*nodes_cell+filter[k]] ;
       ensightGeomFile << endl ;
     }
     if (filter != NULL)
@@ -490,7 +478,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
   int is_node    = 0 ;
   int is_element = 0 ;
 	
-  string dataname = name += ".data" ;
+  string dataname = name += ".sol" ;
   ofstream ensightDataFile(name.c_str(),ios::out) ;  
   cout << "-> creating the Ensight data file " << name << endl ;
   ensightDataFile.setf(ios::scientific);	
@@ -533,7 +521,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
 
       for (int i=0; i<NumberOfValue; i++) {
 	for(int j=0; j<NumberOfComponents; j++)
-	  ensightDataFile << setw(12) << value[j*NumberOfValue+i];
+	  ensightDataFile << setw(12) << value[j*NumberOfValue+i] ;
      }
       if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
 	delete[] myArray;
@@ -565,9 +553,10 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       }
 
       int mypoint=0;
+      //cout << "-> number of values " << NumberOfValue << " number of components " << NumberOfComponents << endl ;
       for (int i=0; i<NumberOfValue; i++) {
 	for(int j=0; j<NumberOfComponents; j++) {
-	  ensightDataFile << setw(12) << value[j*NumberOfValue+i];
+	  ensightDataFile << setw(12) << value[j*NumberOfValue+i] ;
 	  mypoint+=1;
 	  if (mypoint == 6) {
 	    ensightDataFile << endl ;
@@ -576,6 +565,11 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
 	}
       }
       ensightDataFile << endl ;
+
+// genere un core  !?!?
+//       if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
+// 	delete[] myArray;
+
       break ;
     }
     default : { 
@@ -667,24 +661,6 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
 
   openConst() ;
 
-  //-------------------------  data d'amorcage pour les tests--------------------------------------------------
-
-//   string med_filename ;     
-//   string ensight_filename ;
-
-//   ensight_filename = "testfra1.case" ;
-//   med_filename = "testfra1.med" ;     
-
-//   ensight_filename = "mymesh.case" ;
-//   ensight_filename = "b4.case" ;
-//   ensight_filename = "c1000.aa.case" ;
-
-//   med_filename     = "tatave.med" ; 
-//   med_filename     = "b4.med" ; 
-//   med_filename     = "c1000.med" ; 
-
-  //--------------------------  EOF data d'amorcage -----------------------------------------------------------
-
   string type_Ensight[15] = {
     "point" , "bar2", "bar3" , "tria3" , "tria6" , "quad4" , "quad8" , "tetra4" , "tetra10" , "pyramid5" ,
     "pyramid13" , "hexa8" , "hexa20" , "penta6" , "penta15" };
@@ -718,6 +694,8 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
   int is_node=0;
   int is_element=0;
   int my_field=0 ;
+  int is_doublon=0 ;
+  int type_doublon=0 ;
 //   strstream w_field ;
 
   MESHING* MyMeshing = new MESHING();
@@ -736,14 +714,9 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
 
   cout << "****************** READ **************** starting " << endl ;
 
-//   string med_filename   = "resu.med" ;     
   ifstream ensightCaseFile(_fileName.c_str(),ios::in);
-
-//   cout << "=> _fileName " << _fileName << endl ;
-//   ifstream ensightCaseFile(ensight_filename.c_str(),ios::in);
-//   cout << "Ensight case file name to read " << ensight_filename << endl ;
-
   cout << "Ensight case file name to read " << _fileName << endl ;
+  string diren = dirname((char*)_fileName.c_str());
 
   if (ensightCaseFile.is_open() )
     { 
@@ -753,8 +726,8 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
 	    cout << "geometry detected" << endl ;
 	    while ( ensightCaseFile >> mot_lu ){
 	      if ( mot_lu == "model:" ) {
-		ensightCaseFile >> number_of_geom ;
-		cout << "number of geometries " << number_of_geom << endl ;
+// 		ensightCaseFile >> number_of_geom ;
+// 		cout << "number of geometries " << number_of_geom << endl ;
 		ensightCaseFile >> mot_lu ;
 		geom_namefile = mot_lu;
 		cout << "name of geometrie : " << geom_namefile << endl ;
@@ -803,8 +776,14 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
   // chargement des noeuds et connectivites necessaires depuis le fichier ensight geom
   // ---------------------------------------------------------------------------------
 
-  cout << "-> Entering into the geometry file " << geom_namefile << endl  ;
-  ifstream ensightGeomFile(geom_namefile.c_str(),ios::in);
+  string cgeom_namefile;
+  if( diren.length() > 0 )
+    cgeom_namefile = diren + '/' + geom_namefile;
+  else
+    cgeom_namefile = geom_namefile;
+  cout << "-> Entering into the geometry file " << cgeom_namefile << endl;
+
+  ifstream ensightGeomFile(cgeom_namefile.c_str(),ios::in);
   if (ensightGeomFile.is_open() )
     {
       while ( ensightGeomFile >> mot_lu ){
@@ -816,41 +795,73 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
 	  int NumberOfCoordinates = NumberOfNodes*SpaceDimension ;
 	  double Coordinates[NumberOfCoordinates];
 	  int iCoord = 0 ;
-	  //cout << "-> geom given " << geom_given << endl ;
+	  cout << "-> geom given " << geom_given << endl ;
 	  for ( int i=0 ; i < NumberOfNodes ; i++) {
 	    if( geom_given) ensightGeomFile >> setw(8) >> num_coordinate ;
 	    ensightGeomFile >> setw(12) >> Coordinates[iCoord]   ;
 	    ensightGeomFile >> setw(12) >> Coordinates[iCoord+1] ; 
 	    ensightGeomFile >> setw(12) >> Coordinates[iCoord+2] ;
+// 	    cout << "coordinate " << i+1 << " read : x = " << Coordinates[iCoord] << " y = " << Coordinates[iCoord+1] << " z = " << Coordinates[iCoord+2] << endl ;
 // 	    cout << "coordinate read " << num_coordinate << " : x = " << Coordinates[iCoord] << " y = " << Coordinates[iCoord+1] << " z = " << Coordinates[iCoord+2] << endl ;
 	    iCoord+=3 ;
 	  }
+
 	  MyMeshing->setSpaceDimension(SpaceDimension);
 	  MyMeshing->setNumberOfNodes(NumberOfNodes);
 	  MyMeshing->setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,"CARTESIAN",MED_EN::MED_FULL_INTERLACE);
+	  string coordname[3] = { "x", "y", "z" } ;
+	  MyMeshing->setCoordinatesNames(coordname) ;
 	}
 	else if  ( mot_lu == "part" ) {
 //---------------- Connectivities part --------------------------------------------
+
 	  while ( ensightGeomFile >> mot_lu ){
 	    for ( int j = 0 ; j < 15 ; j++){
 	      if( mot_lu == type_Ensight[j] ) {
-		NumberOfTypes+=1;
-		iType=NumberOfTypes-1 ;
-		total_conn.resize(NumberOfTypes) ;
-		type_read.push_back(mot_lu) ;
-		ensightGeomFile >> number_of_cell ;
-		nbcell_read.push_back(number_of_cell) ;
-		total_conn[iType].resize(nb_edge[j]*number_of_cell);
-		cout << "-> loading " << number_of_cell << " cells connectivities of type " << type_Ensight[j] << " (" << nb_edge[j]*number_of_cell << ") values " << endl ;
-		for ( int k=0 ; k < nb_edge[j]*number_of_cell ; k++ ) {
-		  ensightGeomFile >> setw(8) >> conn ;
-		  total_conn[iType][k]=conn ;
-		  // cout << " connectivitie " << k << " read = " << total_conn[iType][k] << endl ; 
+		is_doublon=0 ;
+		for ( int ltype = 0 ; ltype < NumberOfTypes ; ltype++ ){
+		  if ( mot_lu == type_read[ltype] ) {
+		    is_doublon=1 ;
+		    type_doublon=ltype ;
+		  }
 		}
-	      }    
-	    }
+		if ( is_doublon ) {
+		  // type_read already stored
+		  ensightGeomFile >> number_of_cell ;
+		  int last_number_of_cell = nbcell_read[type_doublon] ;
+		  int total_number_of_cell = number_of_cell + last_number_of_cell ;
+		  nbcell_read[type_doublon] = total_number_of_cell ;
+		  total_conn[type_doublon].resize(nb_edge[j]*total_number_of_cell);
+		  cout << "-> loading again by adding " << number_of_cell << " to " << last_number_of_cell << " cells connectivities of type " << type_Ensight[j] << " existing" << endl << "-> new results for " << type_Ensight[j] << " are : number of cells connectivities = " << total_number_of_cell << " and total number of values = " << nb_edge[j]*total_number_of_cell << endl ;
+		  for ( int k=0 ; k < nb_edge[j]*number_of_cell ; k++ ) {
+		    ensightGeomFile >> setw(8) >> conn ;
+		    int last_dim = last_number_of_cell*nb_edge[j] ;
+		    total_conn[type_doublon][last_dim+k]=conn ;
+// 		    cout << " connectivitie " << last_number_of_cell+k+1 << " read = " << total_conn[type_doublon][last_dim+k] << endl ; 
+		  }
+		}
+		else {
+		  NumberOfTypes+=1;
+		  iType=NumberOfTypes-1 ;
+		  total_conn.resize(NumberOfTypes) ;
+		  type_read.push_back(mot_lu) ;
+		  ensightGeomFile >> number_of_cell ;
+		  nbcell_read.push_back(number_of_cell) ;
+		  total_conn[iType].resize(nb_edge[j]*number_of_cell);
+		  cout << "-> loading " << number_of_cell << " cell connectivities of type " << type_Ensight[j] << " (total number of values = " << nb_edge[j]*number_of_cell << ") " << endl ;
+		  for ( int k=0 ; k < nb_edge[j]*number_of_cell ; k++ ) {
+		    ensightGeomFile >> setw(8) >> conn ;
+		    total_conn[iType][k]=conn ;
+// 		    cout << " connectivitie " << k+1 << " read = " << total_conn[iType][k] << endl ; 
+		  }
+		}
+	      }
+	    }	  
 	  }
-	}	  
+
+
+
+	}
       }
     }
 
@@ -889,17 +900,19 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
     int MeshDimension ;
     MeshDimension = 2 ;
     for (int k=0 ; k<NumberOfTypes ; k++){
-      for (int j=0 ; j<15 ; j++)
-	if(type_read[k] == type_Ensight[j] && j>6 ) MeshDimension = 3 ; 
+      for (int j=0 ; j<15 ; j++) 
+	if(type_read[k] == type_Ensight[j] && j>6 ) MeshDimension = 3 ;
     }
     MyMeshing->setMeshDimension(MeshDimension);
 
     for (int k = 0 ; k < NumberOfTypes ; k++) {
       int nb_connectivities = total_conn[k].size();
+      cout << "-> type = " << k+1 << " has for total number of values of connectivities : " <<  nb_connectivities << endl ;
       int *connectivities = new int[nb_connectivities];
       for (int itab=0 ; itab < nb_connectivities ; itab++) connectivities[itab]=total_conn[k][itab] ;
       for (int j=0 ; j<15 ; j++) {
 	if( type_read[k] == type_Ensight[j] ) {
+	  cout << "-> type read = " << type_read[k] << endl ;
 	  switch ( j+1 )
 	    {
 	    case 1  : {MyMeshing->setConnectivity(connectivities,MED_EN::MED_CELL,MED_EN::MED_POINT1)  ; break ;}
@@ -923,6 +936,7 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
       }
       delete [] connectivities;
     }
+    cout << "-> connectivities OK " << endl ;
 
 //   cout << "-> Writing the mesh into med file" << endl ;
 //   int id = MyMeshing->addDriver(MED_DRIVER,med_filename,MyMeshing->getName());
@@ -936,9 +950,14 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
   //  ! faire le cas des champs multiples
 
 //   for (int ifield=0 ; ifield < my_field ; ifield++) {
-//     cout << "-> Entering into the field file " << field_namefile << endl  ;
+  string cfield_namefile;
+  if( diren.length() > 0 )
+    cfield_namefile = diren + '/' + field_namefile;
+  else
+    cfield_namefile = field_namefile;
+  cout << "-> Entering into the field file " << cfield_namefile << endl  ;
 
-    ifstream ensightFieldFile(field_namefile.c_str(),ios::in);
+    ifstream ensightFieldFile(cfield_namefile.c_str(),ios::in);
     if (ensightFieldFile.is_open() )
       {
 	ensightFieldFile.getline(ligne, 80, '\n') ; // read the first line of comment
@@ -985,11 +1004,10 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
 	const int NumberOfValues = MySupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) ;
 	MyField->setNumberOfValues(NumberOfValues) ;
 
-	for ( int i = 1 ; i <= NumberOfValues ; i++) {
+	int NumberOf = NumberOfValues / NumberOfComponents;
+	for ( int i = 1 ; i <= NumberOf ; i++) {
 	  for ( int j = 1 ; j <= NumberOfComponents ; j++) {
-	    double MyValue = var[i-1] ;
-	    //  	  cout << " value " << i << " = " << MyValue << " from " << var[i-1] << endl ;
-	    MyField->setValueIJ(i,j,MyValue) ;
+	    MyField->setValueIJ(i,j,var[NumberOfComponents*(i-1)+j-1]) ;
 	  }
 	}
 	cout << "-> Writing the field into the med object" << endl ;

@@ -132,15 +132,15 @@ namespace MEDMEM {
 	switch(access)
 	  {
 	  case MED_EN::MED_LECT : {
-	    throw MED_EXCEPTION ("access mode other than MED_ECRI and MED_REMP has been specified with the ENSIGHT_DRIVER type which is not allowed because ENSIGHT_DRIVER is only a write access driver");
+	    ret = new ENSIGHT_FIELD_RDONLY_DRIVER<T>(fileName,field);
 	    break;
 	  }
 	  case MED_EN::MED_ECRI : {
-	    ret=new ENSIGHT_FIELD_DRIVER<T>(fileName,field);
+	    ret=new ENSIGHT_FIELD_WRONLY_DRIVER<T>(fileName,field);
 	    break;
 	  }
 	  case MED_EN::MED_REMP : {
-	    ret=new ENSIGHT_FIELD_DRIVER<T>(fileName,field);
+	    throw MED_EXCEPTION ("not yet implemented");
 	    break ;
 	  }
 	  default:
