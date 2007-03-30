@@ -227,12 +227,13 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
 	try
 	{
 	  // we create a new MED_i and add in study
-          SALOMEDS::SComponent_var theComponent = myStudy->FindComponent("MED");
-          MED_i * myMedI = 0;
-          if (CORBA::is_nil(theComponent))
-            myMedI = new MED_i();
-          else
-            myMedI = Med_Gen_Driver_i::GetMED(theComponent);
+          //SALOMEDS::SComponent_var theComponent = myStudy->FindComponent("MED");
+          //MED_i * myMedI = 0;
+          //if (CORBA::is_nil(theComponent))
+          //  myMedI = new MED_i();
+          //else
+          //  myMedI = Med_Gen_Driver_i::GetMED(theComponent);
+          MED_i * myMedI = new MED_i();
 	  myMedIOR = myMedI->_this() ;
 // 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR) ;
 // 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ;
@@ -273,11 +274,12 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
 	{
 	  // we create a new MED_i and add in study
           SALOMEDS::SComponent_var theComponent = myStudy->FindComponent("MED");
-          MED_i * myMedI = 0;
-          if (CORBA::is_nil(theComponent))
-            myMedI = new MED_i();
-          else
-            myMedI = Med_Gen_Driver_i::GetMED(theComponent);
+          //MED_i * myMedI = 0;
+          //if (CORBA::is_nil(theComponent))
+          //  myMedI = new MED_i();
+          //else
+          //  myMedI = Med_Gen_Driver_i::GetMED(theComponent);
+          MED_i * myMedI = new MED_i();
 	  SALOME_MED::MED_ptr myMedIOR = myMedI->_this();
 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,theComponent,fileName);
 	  // create ::MED object, read all and add in study !
