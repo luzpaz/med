@@ -22,6 +22,7 @@
 #include <sstream>
 #include <strstream>
 #include <iomanip>
+#include <libgen.h>
 
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Family.hxx"
@@ -175,7 +176,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
   int len       = _fileName.size() ;
   string prefix = _fileName.substr(0,len-5); // extraction de .case
   string ensight_geomf = prefix + ".geom" ;
-  string basen = basename(ensight_geomf.c_str());
+  string basen = basename((char*)ensight_geomf.c_str());
   (*_ensightFile) << "# Mesh detected with name = " << MeshName << endl ;
   (*_ensightFile) << "model: 1 " << basen << endl ;
   (*_ensightFile) << endl ;
@@ -714,6 +715,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() {
 
   ifstream ensightCaseFile(_fileName.c_str(),ios::in);
   cout << "Ensight case file name to read " << _fileName << endl ;
+  string diren = dirname((char*)_fileName.c_str());
 
   if (ensightCaseFile.is_open() )
     { 
@@ -723,8 +725,8 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() {
 	    cout << "geometry detected" << endl ;
 	    while ( ensightCaseFile >> mot_lu ){
 	      if ( mot_lu == "model:" ) {
-		ensightCaseFile >> number_of_geom ;
-		cout << "number of geometries " << number_of_geom << endl ;
+// 		ensightCaseFile >> number_of_geom ;
+// 		cout << "number of geometries " << number_of_geom << endl ;
 		ensightCaseFile >> mot_lu ;
 		geom_namefile = mot_lu;
 		cout << "name of geometry file : " << geom_namefile << endl ;
@@ -745,8 +747,13 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() {
 
   _ptrMesh->_name = mesh_read_name ;
 
+  string cgeom_namefile;
+  if( diren.length() > 0 )
+    cgeom_namefile = diren + '/' + geom_namefile;
+  else
+    cgeom_namefile = geom_namefile;
   cout << "-> Entering into the geometry file " << geom_namefile << endl  ;
-  ifstream ensightGeomFile(geom_namefile.c_str(),ios::in);
+  ifstream ensightGeomFile(cgeom_namefile.c_str(),ios::in);
   if (ensightGeomFile.is_open() )
     {
       while ( ensightGeomFile >> mot_lu ){
