@@ -2917,9 +2917,9 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       }
     }
 
-    for(int j=0; j<NumberOfNodes; j++) {
-      SCRUTE(MEDArrayNodeFamily[j]);
-    }
+//     for(int j=0; j<NumberOfNodes; j++) {
+//       SCRUTE(MEDArrayNodeFamily[j]);
+//     }
 
 //     if ( !_ptrMesh->getIsAGrid() )
 
@@ -2984,8 +2984,8 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 
 
 
-      for (int i=0; i<NumberOfElements; i++)
-	SCRUTE(MEDArrayFamily[i]);
+//       for (int i=0; i<NumberOfElements; i++)
+// 	SCRUTE(MEDArrayFamily[i]);
 
 
       const int * typeCount = _ptrMesh->getGlobalNumberingIndex(entity) ;
