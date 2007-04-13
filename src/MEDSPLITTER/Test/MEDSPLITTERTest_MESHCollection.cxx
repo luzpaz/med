@@ -323,47 +323,47 @@ void MEDSPLITTERTest::testMESHCollection_square()
   med_2_2::med_entite_maillage typ_ent_dist=med_2_2::MED_NOEUD;
   med_2_2::med_geometrie_element typ_geo_loc= med_2_2::MED_POINT1;
   med_2_2::med_geometrie_element typ_geo_dist= med_2_2::MED_POINT1;
-    
-  int n1 =med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  int* tab=new int[2*n1];
+
+  int n1 = med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_2::med_int* tab = new med_2_2::med_int[2*n1];
    
   med_2_2::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
     
-  int tabreference1[6]={2,1,3,4,6,5};
+  med_2_2::med_int tabreference1[6] = {2,1,3,4,6,5};
   for (int i=0; i<2*n1; i++)
 		CPPUNIT_ASSERT_EQUAL(tab[i],tabreference1[i]);
-    
+
   delete[] tab;
 
   int n2 =med_2_2::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  tab=new int[2*n2];
-    
+  tab = new med_2_2::med_int[2*n2];
+
   med_2_2::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-    
-  int tabreference2[]={1,2,4,3,5,6};
+
+  med_2_2::med_int tabreference2[] = {1,2,4,3,5,6};
   for (int i=0; i<2*n1; i++)
 		CPPUNIT_ASSERT_EQUAL(tab[i],tabreference2[i]);
   delete[] tab;
 
   //testing nodes global numbering
-  int* num=new int[6];
+  med_2_2::med_int* num = new med_2_2::med_int[6];
   cout <<"Reading global "<<
 		MEDglobalNumLire(fid1, meshname1, num, 6, typ_ent_loc, typ_geo_loc)<<endl;
   
-  int globnoderef1[]={4,5,2,1,7,8};
-    
+  med_2_2::med_int globnoderef1[] = {4,5,2,1,7,8};
+
   for (int i=0; i<6; i++)
 		CPPUNIT_ASSERT_EQUAL(num[i],globnoderef1[i]);
   delete[] num;
-    
+
   //testing nodes global numbering
-  num=new int[6];
+  num = new med_2_2::med_int[6];
   MEDglobalNumLire(fid2, meshname2, num, 6, typ_ent_loc, typ_geo_loc);
-  int globnoderef2[]={5,6,3,2,8,9};
+  med_2_2::med_int globnoderef2[] = {5,6,3,2,8,9};
   for (int i=0; i<6; i++)
     CPPUNIT_ASSERT_EQUAL(num[i],globnoderef2[i]);
   delete[] num;
-  
+
   //testing cell-cell correspondency
   typ_ent_loc=med_2_2::MED_MAILLE;
   typ_ent_dist=med_2_2::MED_MAILLE;
@@ -372,48 +372,47 @@ void MEDSPLITTERTest::testMESHCollection_square()
   //joint1
   n1=med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
   CPPUNIT_ASSERT_EQUAL(n1,2);
-  tab=new int[2*n1];
+  tab = new med_2_2::med_int[2*n1];
   med_2_2::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-    
-  int tabreferencecell1[4]={1,1,2,2};
+
+  med_2_2::med_int tabreferencecell1[4] = {1,1,2,2};
   for (int i=0; i<2*n1; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
-            
+
   n2=med_2_2::MEDjointnCorres(fid2,meshname2,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
   CPPUNIT_ASSERT_EQUAL(n2,2);
   delete[] tab;
   //joint2
-  tab=new int[2*n2];
+  tab = new med_2_2::med_int[2*n2];
   med_2_2::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-    
-  int tabreferencecell2[4]={1,1,2,2};
+
+  med_2_2::med_int tabreferencecell2[4] = {1,1,2,2};
   for (int i=0; i<n2; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell2[i]);
-            
+
   delete[]tab;
-        
+
   //testing cells global numbering
-  num=new int[2];
+  num = new med_2_2::med_int[2];
   MEDglobalNumLire(fid1, meshname1, num, 2, typ_ent_loc, typ_geo_loc);
-  int* globcellref = new int[2];
+  med_2_2::med_int* globcellref = new med_2_2::med_int[2];
   globcellref[0]=1;
   globcellref[1]=3;
-  
+
   for (int i=0; i<2; i++)
     CPPUNIT_ASSERT_EQUAL(num[i],globcellref[i]);
   delete[] num;
-    
+
   //testing cells global numbering
-  num=new int[2];
+  num = new med_2_2::med_int[2];
   MEDglobalNumLire(fid2, meshname2, num, 2, typ_ent_loc, typ_geo_loc);
   globcellref[0]=2;
   globcellref[1]=4;
   for (int i=0; i<2; i++)
     CPPUNIT_ASSERT_EQUAL(num[i],globcellref[i]);
   delete[] num;
-  delete[]globcellref;
-  delete topo;   
-      
+  delete[] globcellref;
+  delete topo;
 }
 
 /*
@@ -594,94 +593,95 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
   med_2_2::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
-  
+
   // testing node-node correspondency
   med_2_2::med_entite_maillage typ_ent_loc=med_2_2::MED_NOEUD;
   med_2_2::med_entite_maillage typ_ent_dist=med_2_2::MED_NOEUD;
   med_2_2::med_geometrie_element typ_geo_loc= med_2_2::MED_POINT1;
   med_2_2::med_geometrie_element typ_geo_dist= med_2_2::MED_POINT1;
-  
-  int n1 =med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  int* tab=new int[2*n1];
-  
+
+  int n1 = med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_2::med_int* tab = new med_2_2::med_int[2*n1];
+
   med_2_2::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  
-  int tabreference1[10]={1,7,2,1,3,4,5,6,7,2};
+
+  med_2_2::med_int tabreference1[10] = {1,7,2,1,3,4,5,6,7,2};
   for (int i=0; i<2*n1; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreference1[i]);
   delete[] tab;
 
-  int n2 =med_2_2::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  tab=new int[2*n2];
-   
+  int n2 = med_2_2::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  tab = new med_2_2::med_int[2*n2];
+
   med_2_2::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-    
-  int tabreference2[10]={1,2,2,7,4,3,6,5,7,1};
+
+  med_2_2::med_int tabreference2[10] = {1,2,2,7,4,3,6,5,7,1};
   for (int i=0; i<2*n2; i++)
 		CPPUNIT_ASSERT_EQUAL(tab[i],tabreference2[i]);
   delete[] tab;
-	//testing nodes global numbering
-  int* num=new int[7];
+
+  //testing nodes global numbering
+  med_2_2::med_int* num = new med_2_2::med_int[7];
   cout <<"Reading global "<<
 		MEDglobalNumLire(fid1, meshname1, num, 7, typ_ent_loc, typ_geo_loc)<<endl;
-  int globnoderef1[7]={4,5,2,1,8,9,6};
-    
+  med_2_2::med_int globnoderef1[7] = {4,5,2,1,8,9,6};
+
   for (int i=0; i<7; i++)
 		CPPUNIT_ASSERT_EQUAL(num[i],globnoderef1[i]);
-  
+
   delete[] num;
-    
+
   //testing nodes global numbering
-  num=new int[7];
+  num = new med_2_2::med_int[7];
   MEDglobalNumLire(fid2, meshname2, num, 7, typ_ent_loc, typ_geo_loc);
-  int globnoderef2[7]={5,6,3,2,7,8,4};
+  med_2_2::med_int globnoderef2[7] = {5,6,3,2,7,8,4};
   for (int i=0; i<7; i++)
 		CPPUNIT_ASSERT_EQUAL(num[i],globnoderef2[i]);
-  delete[]num;
-   
+  delete[] num;
+
   //testing cell-cell correspondency
   typ_ent_loc=med_2_2::MED_MAILLE;
   typ_ent_dist=med_2_2::MED_MAILLE;
   typ_geo_loc= med_2_2::MED_QUAD4;
   typ_geo_dist= med_2_2::MED_QUAD4;
   //joint1
-  n1 =med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  tab=new int[2*n1];
+  n1 = med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  tab = new med_2_2::med_int[2*n1];
   med_2_2::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-    
-  int tabreferencecell1[8]={1,1,1,2,2,1,2,2};
+
+  med_2_2::med_int tabreferencecell1[8] = {1,1,1,2,2,1,2,2};
   for (int i=0; i<2*n1; i++)
 		CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
-          
-  n2 =med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+
+  n2 = med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
   delete[] tab;
   //joint2
-  tab=new int[2*n2];
+  tab = new med_2_2::med_int[2*n2];
   med_2_2::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  
-  int tabreferencecell2[8]={1,1,1,2,2,1,2,2};
+
+  med_2_2::med_int tabreferencecell2[8] = {1,1,1,2,2,1,2,2};
   for (int i=0; i<n2; i++)
 		CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell2[i]);   
-  delete[]tab;
-      
+  delete[] tab;
+
   //testing cells global numbering
-  num=new int[2];
+  num = new med_2_2::med_int[2];
   MEDglobalNumLire(fid1, meshname1, num, 2, typ_ent_loc, typ_geo_loc);
-  int globcellref1[2]={1,4};
+  med_2_2::med_int globcellref1[2] = {1,4};
   for (int i=0; i<2; i++)
     CPPUNIT_ASSERT_EQUAL(num[i],globcellref1[i]);   
   delete[] num;
-  
+
   //testing cells global numbering
-  num=new int[2];
+  num = new med_2_2::med_int[2];
   MEDglobalNumLire(fid2, meshname2, num, 2, typ_ent_loc, typ_geo_loc);
-  int globcellref2[2]={2,3};
+  med_2_2::med_int globcellref2[2] = {2,3};
   for (int i=0; i<2; i++)
 		CPPUNIT_ASSERT_EQUAL(num[i],globcellref2[i]);   
- 
+
   delete[] num;   
   delete topo;
-  delete[]partition;
+  delete[] partition;
 }
 
 
