@@ -23,12 +23,14 @@ namespace ParaMEDMEM
   public:
     
     UnstructuredParaSUPPORT(const ParaMESH* const mesh, const MEDMEM::SUPPORT* support );
-    UnstructuredParaSUPPORT(const ParaMESH* const mesh, const MED_EN::medEntityMesh entity);
-    virtual ~UnstructuredParaSUPPORT();
-    const Topology* getTopology() const {return _explicit_topology;}
+    UnstructuredParaSUPPORT(const MEDMEM::SUPPORT* support , const ProcessorGroup& group);
     
+    UnstructuredParaSUPPORT(const ParaMESH* const mesh, const MED_EN::medEntityMesh entity);
+    virtual ~UnstructuredParaSUPPORT(); 
+    const Topology* UnstructuredParaSUPPORT::getTopology() const
+      {return _explicit_topology;}
   private:
-    const ExplicitTopology* const  _explicit_topology;
+    const ExplicitTopology*  _explicit_topology;
     const MED_EN::medEntityMesh _entity;
 	
   };

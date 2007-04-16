@@ -48,13 +48,14 @@ throw (MEDMEM::MEDEXCEPTION){
     string mesh;
 	int idomain;
 	string host;
-	
+	string medfilename;
+  
     for (int i=0; i<=domain_id;i++)
       {
 	//reading information about the domain
 		
       
-		asciiinput >> mesh >> idomain >> meshstring >> host >> _medfilename;
+		asciiinput >> mesh >> idomain >> meshstring >> host >> medfilename;
 		
 		if (idomain!=i+1)
 		  {
@@ -62,7 +63,7 @@ throw (MEDMEM::MEDEXCEPTION){
 		 	throw (MEDEXCEPTION("Error : domain must be written from 1 to N in asciifile descriptor"));
 		  }
 		strcpy(meshname,meshstring.c_str());
-		strcpy(file,_medfilename.c_str());
+		strcpy(file,medfilename.c_str());
       }
     _name=meshstring;
 	///////////////////////////////////////////
@@ -80,7 +81,7 @@ throw (MEDMEM::MEDEXCEPTION){
 		char joint_description[MED_TAILLE_DESC];
 	    char name[MED_TAILLE_NOM];
 	    char name_distant[MED_TAILLE_NOM];
-	    cout << "arguments"<< fid<<" "<<file<<" "<<ijoint<<" "<<name<<" "<<joint_description<<" "<<distant<<" "<<name_distant<<endl;
+	    // cout << "arguments"<< fid<<" "<<file<<" "<<ijoint<<" "<<name<<" "<<joint_description<<" "<<distant<<" "<<name_distant<<endl;
 	    int ncorr = med_2_2::MEDjointInfo(fid,meshname, ijoint, name, 
 	    	joint_description,
 		       &distant, name_distant);
@@ -193,9 +194,27 @@ throw (MEDMEM::MEDEXCEPTION){
     END_OF("MEDSPLITTER::MESHCollectionDriver::read()")
 };
 
+/*! Constructor for creating a ParaMESH from a local mesh and
+ * a processor group. Constructor must be called by all the processors
+ * in the group. */
+
+ParaMESH::ParaMESH(MEDMEM::MESH& subdomain_mesh, const ProcessorGroup& proc_group, const string& name):
+_mesh(&subdomain_mesh),
+_name (name),
+_my_domain_id(proc_group.myRank()),
+_block_topology (new BlockTopology(proc_group, subdomain_mesh.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS)))
+{
+  _cellglobal = new int[subdomain_mesh.getNumberOfElements(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS)];
+  int offset = _block_topology->localToGlobal(make_pair(_my_domain_id,0));
+  for (int i=0; i<subdomain_mesh.getNumberOfElements(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); i++)
+    {
+      _cellglobal[i]=offset+i;
+    }
+}
+
+
 
 ParaMESH::~ParaMESH(){if (_mesh !=0) delete _mesh;};
-
 
 /*! method for writing a distributed MESH
  * 
@@ -267,6 +286,8 @@ const int* ParaMESH::getGlobalNumbering(const MED_EN::medEntityMesh entity)const
 			return _edgeglobal;
 		case MED_NODE:
 			return _nodeglobal;
+    default :
+      return 0;
 	}
 }	
 	

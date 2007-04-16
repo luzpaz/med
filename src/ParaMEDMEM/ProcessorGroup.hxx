@@ -18,7 +18,7 @@ public:
 	ProcessorGroup (const ProcessorGroup& proc_group, std::set<int> proc_ids):
 		_comm_interface(proc_group.getCommInterface()){}
 	virtual ~ProcessorGroup(){}
-	virtual void fuse (ProcessorGroup&)=0;
+	virtual ProcessorGroup* fuse (const ProcessorGroup&) const=0;
 	virtual void intersect (ProcessorGroup&)=0;
 	bool contains(int rank) const {return _proc_ids.find(rank)!=_proc_ids.end();};
 	virtual bool containsMyRank() const=0;
@@ -28,6 +28,7 @@ public:
 	virtual int translateRank(const ProcessorGroup*, int) const =0;
   virtual ProcessorGroup* createComplementProcGroup() const =0;
   virtual ProcessorGroup* createProcGroup() const=0;
+  virtual const std::set<int>& getProcIDs()const  {return _proc_ids;} 
 protected:
 	const CommInterface& _comm_interface;
 	std::set<int> _proc_ids;

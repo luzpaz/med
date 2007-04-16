@@ -1,5 +1,6 @@
 #include "Topology.hxx"
 #include "ExplicitTopology.hxx"
+#include "BlockTopology.hxx"
 #include "ParaMESH.hxx"
 #include "UnstructuredParaSUPPORT.hxx"
 #include "MEDMEM_Support.hxx"
@@ -7,13 +8,25 @@
 namespace ParaMEDMEM 
 {
 	
-/*! Constructor on all elements from a MESH */
+/*! Constructor on from a ParaMESH and a local support*/
 UnstructuredParaSUPPORT::UnstructuredParaSUPPORT(const ParaMESH* const mesh, const MEDMEM::SUPPORT* support):
-_entity(support->getEntity()),
-_explicit_topology(new ExplicitTopology(*support))
+ParaSUPPORT(mesh,support),
+_entity(support->getEntity())
 {
   _mesh=mesh;
   _support=support;
+  _explicit_topology=new ExplicitTopology(*(ParaSUPPORT*)this);
+}
+
+/*! Constructor on from a ProcessorGroup and a local support*/
+UnstructuredParaSUPPORT::UnstructuredParaSUPPORT(const MEDMEM::SUPPORT* support, const ProcessorGroup& proc_group):
+_entity(support->getEntity())
+{
+  ostringstream name ("mesh associated with support ");
+  name << support->getName();
+  _mesh=new ParaMESH(*support->getMesh(), proc_group, name.str() );
+  _support=support;
+  _explicit_topology=new ExplicitTopology(*(ParaSUPPORT*)this);
 }
 
 UnstructuredParaSUPPORT::UnstructuredParaSUPPORT(const ParaMESH* const mesh, const MED_EN::medEntityMesh entity):
@@ -21,14 +34,14 @@ UnstructuredParaSUPPORT::UnstructuredParaSUPPORT(const ParaMESH* const mesh, con
   _entity(entity),
   _explicit_topology(new ExplicitTopology(*this))
 {
-  //_mesh=mesh;
-  //  _support=new SUPPORT(_mesh->getMesh(), "support on all entities", entity);
-  //_explicit_topology(new ExplicitTopology(*support));
 }
 
 UnstructuredParaSUPPORT::~UnstructuredParaSUPPORT()
 {
 	delete _support;
+	delete _explicit_topology;
 }
+
+ 
 
 }//end of namespace ParaMEDMEM

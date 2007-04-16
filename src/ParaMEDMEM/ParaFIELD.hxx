@@ -7,6 +7,7 @@
 
 namespace MEDMEM{
 	class MEDEXCEPTION;
+  template <class T> class FIELD<T>;
 }
 
 
@@ -14,6 +15,7 @@ namespace ParaMEDMEM
 {
 class ComponentTopology;
 class ParaSUPPORT;
+class ProcessorGroup;
 
 class ParaFIELD
 {
@@ -24,11 +26,14 @@ public:
 	ParaFIELD(MEDMEM::driverTypes driver_type, const string& file_name, 
 		const string& driver_name, const ComponentTopology& component_topology) 
 		throw (MEDMEM::MEDEXCEPTION);
+  ParaFIELD(MEDMEM::FIELD<double>* field, const ProcessorGroup& group);
+  
 	virtual ~ParaFIELD();
 	void write(MEDMEM::driverTypes driverType, const string& fileName="", const string& meshName="");
 	void synchronizeTarget(ParaFIELD* source_field);
 	void synchronizeSource(ParaFIELD* target_field);
 	MEDMEM::FIELD<double>* getField() const {return _field;}
+  const ParaSUPPORT* getSupport() const {return _support;}
 	Topology* getTopology() const {return _topology;}
 	int nbComponents() const {return _component_topology.nbComponents();}
 private:

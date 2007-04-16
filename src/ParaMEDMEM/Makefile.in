@@ -52,9 +52,14 @@ ComponentTopology.hxx\
 ExplicitTopology.hxx\
 ParaFIELD.hxx\
 DEC.hxx\
+MxN_Mapping.hxx\
+INTERPOLATION_2D.hxx\
 StructuredCoincidentDEC.hxx\
+InterpolationMatrix.hxx\
+IntersectionDEC.hxx\
 UnstructuredParaSUPPORT.hxx\
 ExplicitCoincidentDEC.hxx\
+ElementLocator.hxx\
 ExplicitMapping.hxx
 
 # Libraries targets
@@ -71,9 +76,14 @@ StructuredParaSUPPORT.cxx\
 ComponentTopology.cxx\
 ParaFIELD.cxx\
 DEC.cxx\
+INTERPOLATION_2D.cxx\
+MxN_Mapping.cxx\
+InterpolationMatrix.cxx\
 StructuredCoincidentDEC.cxx\
 ExplicitCoincidentDEC.cxx\
+IntersectionDEC.cxx\
 UnstructuredParaSUPPORT.cxx\
+ElementLocator.cxx\
 ExplicitTopology.cxx
 
 
@@ -85,12 +95,12 @@ BIN_SERVER_IDL =
 BIN_CLIENT_IDL = 
 
 TEST_PROGS = test_ProcessorGroup test_BlockTopology test_ParaStructuredSupport \
-test_ParaField test_DEC test_UnstructuredDEC test_ExplicitDEC
+test_ParaField test_DEC test_UnstructuredDEC test_ExplicitDEC test_IntersectionDEC
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
-CPPFLAGS+=$(MED2_INCLUDES) $(MPI_INCLUDES) $(LAM_INCLUDES) -I/data/tmpawa/vb144235/lam_install/include
+CPPFLAGS+=$(MED2_INCLUDES) $(MPI_INCLUDES) $(LAM_INCLUDES) -I/data/tmpawa/vb144235/lam_install/include -I/data/tmpawa/vb144235/fvm/src -DFVM_HAVE_MPI
 
 CXXFLAGS+=@CXXTMPDPTHFLAGS@ 
 CPPFLAGS+=$(BOOST_CPPFLAGS)

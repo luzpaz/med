@@ -4,8 +4,10 @@
 #include "ComponentTopology.hxx"
 #include "ParaSUPPORT.hxx"
 #include "StructuredParaSUPPORT.hxx"
+#include "UnstructuredParaSUPPORT.hxx"
 #include "ExplicitCoincidentDEC.hxx"
 #include "StructuredCoincidentDEC.hxx"
+
 #include "ParaFIELD.hxx"
 #include "ParaMESH.hxx"
 
@@ -16,7 +18,8 @@ namespace ParaMEDMEM
 
 ParaFIELD::ParaFIELD(const ParaSUPPORT* para_support, const ComponentTopology& component_topology)
 :_support(para_support),
-_component_topology(component_topology) 
+ _component_topology(component_topology),
+ _field(0)
 {
 	if (dynamic_cast<const StructuredParaSUPPORT*>(para_support)!=0)
 	{const BlockTopology* source_topo = dynamic_cast<const BlockTopology*>(para_support->getTopology());
@@ -61,12 +64,34 @@ _component_topology(component_topology)
 	_field->setIterationNumber(0);
 	_field->setOrderNumber(0);
 	_field->setTime(0.0);
+	delete[] compnames;
+	delete[] compdesc;
 } 
+
+/*! Constructor creating the ParaFIELD
+ * from a given FIELD
+ */
+ParaFIELD::ParaFIELD(MEDMEM::FIELD<double>* subdomain_field, const ProcessorGroup& proc_group):
+_field(subdomain_field),
+_support(new UnstructuredParaSUPPORT(subdomain_field->getSupport(), proc_group)),
+_component_topology(ComponentTopology(_field->getNumberOfComponents()))
+{
+  const ExplicitTopology* source_topo=
+    dynamic_cast<const ExplicitTopology*> (_support->getTopology());
+    _topology=new ExplicitTopology(*source_topo,_component_topology.nbLocalComponents());
+}
 
 ParaFIELD::ParaFIELD(MEDMEM::driverTypes driver_type, const string& file_name, 
 	const string& driver_name, const ComponentTopology& component_topology) 
-	throw (MEDEXCEPTION):_component_topology(component_topology){}
-ParaFIELD::~ParaFIELD(){}
+	throw (MEDEXCEPTION):_component_topology(component_topology),_field(0){}
+
+ParaFIELD::~ParaFIELD()
+{
+  if (_field!=0)
+    delete _field;
+  if (_topology!=0)
+    delete _topology;
+}
 
 void ParaFIELD::write(MEDMEM::driverTypes driverType, const string& fileName, const string& meshName){
   //	Topology* topo = dynamic_cast<BlockTopology*> (_topology);

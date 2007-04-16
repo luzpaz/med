@@ -52,8 +52,8 @@ ExplicitTopology::ExplicitTopology(const ExplicitTopology& topo, int nb_componen
   _proc_group = topo._proc_group;
   _nb_elems = topo._nb_elems;
   _nb_components = nb_components;
-  _loc2glob=new int[2*_nb_elems];
-  for (int i=0; i<2*_nb_elems; i++)
+  _loc2glob=new int[_nb_elems];
+  for (int i=0; i<_nb_elems; i++)
     {
       _loc2glob[i]=topo._loc2glob[i];
     }
@@ -63,6 +63,7 @@ ExplicitTopology::ExplicitTopology(const ExplicitTopology& topo, int nb_componen
 
 ExplicitTopology::~ExplicitTopology()
 {
+  if (_loc2glob != 0) delete[] _loc2glob;
 }
 
 

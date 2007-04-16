@@ -20,12 +20,13 @@ public:
 	ParaMESH(MEDMEM::driverTypes driver_type, const std::string& file_name, 
 		const ProcessorGroup& group)
 	throw (MEDMEM::MEDEXCEPTION);
+  ParaMESH(MEDMEM::MESH& subdomain_mesh, const ProcessorGroup& proc_group, const string& name);
 	void write(MEDMEM::driverTypes driverType, const std::string& fileName="")
 	throw (MEDMEM::MEDEXCEPTION);
 	virtual ~ParaMESH();
 	MEDMEM::MESH* getMesh() const {return _mesh;}
 	ParaMEDMEM::BlockTopology* getBlockTopology()const {return _block_topology;}
-	const string& getFilename() const {return _medfilename;}
+//	const string& getFilename() const {return _medfilename;}
 	const int* getGlobalNumbering(MED_EN::medEntityMesh)const; 
 private:
 	//mesh object underlying the ParaMESH object
@@ -38,8 +39,6 @@ private:
 	int _my_domain_id;
 	//global topology of the cells
 	ParaMEDMEM::BlockTopology* _block_topology;
-	//name of the local filename (!= masterfilename)
-	string _medfilename;
 	// pointers to global numberings
 	int* _nodeglobal;
 	int* _edgeglobal;

@@ -38,8 +38,6 @@ ProcessorGroup(interface, proc_ids)
    
   // copying proc_ids in ranks
   copy<set<int>::const_iterator,int*> (proc_ids.begin(), proc_ids.end(), ranks);
-  for (int i=0; i<proc_ids.size();i++)
-    cout << "proc id " << ranks[i]<<endl;
 
   _comm_interface.groupIncl(group_world, proc_ids.size(), ranks, &_group);
   
@@ -92,5 +90,16 @@ ProcessorGroup* MPIProcessorGroup::createProcGroup() const
   return new MPIProcessorGroup(_comm_interface, procs);
 
 }
+ProcessorGroup*  MPIProcessorGroup::fuse (const ProcessorGroup& group) const
+{
+  set <int> procs = _proc_ids;
+  const set<int>& distant_proc_ids = group.getProcIDs();
+  for (set<int>::const_iterator iter=distant_proc_ids.begin(); iter!=distant_proc_ids.end(); iter++)
+  {
+    procs.insert(*iter);
+  }
+  return new MPIProcessorGroup(_comm_interface,procs);
+}
+
 	
 }

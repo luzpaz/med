@@ -139,7 +139,7 @@ BlockTopology::BlockTopology(const ProcessorGroup& group, int nb_elem):_proc_gro
 		}
 	_cycle_type.resize(1);
 	_cycle_type[0]=ParaMEDMEM::Block;
-		
+	delete[] nbelems_per_proc;
 }
 
 BlockTopology::~BlockTopology()

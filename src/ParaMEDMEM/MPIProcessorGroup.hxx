@@ -17,7 +17,7 @@ public:
 	MPIProcessorGroup(const CommInterface& interface, set<int> proc_ids);
 	MPIProcessorGroup (const ProcessorGroup& proc_group, set<int> proc_ids);
 	virtual ~MPIProcessorGroup();
-	void fuse (ProcessorGroup&){};
+	virtual ProcessorGroup* fuse (const ProcessorGroup&) const;
 	void intersect (ProcessorGroup&){};
 	int myRank() const {int rank; MPI_Comm_rank(_comm,&rank); return rank;}
 	bool containsMyRank() const { int rank; MPI_Group_rank(_group, &rank); return (rank!=MPI_UNDEFINED);}

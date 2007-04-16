@@ -43,7 +43,15 @@ public:
 				  	MPI_Comm comm) const
 	{return MPI_Allgather(sendbuf,sendcount, sendtype, recvbuf, recvcount, recvtype, comm);  
 	}
-
+  int sendRecv(void* sendbuf, int sendcount, MPI_Datatype sendtype,
+               int dest, int sendtag, void* recvbuf, int recvcount, 
+               MPI_Datatype recvtype, int source, int recvtag, MPI_Comm comm,
+               MPI_Status* status)
+               {
+                return 
+                MPI_Sendrecv(sendbuf, sendcount, sendtype, dest, sendtag, recvbuf,
+                recvcount, recvtype, source, recvtag, comm,status);
+               }
   int worldSize() const {int size; MPI_Comm_size(MPI_COMM_WORLD, &size); return size;}
 };
 
