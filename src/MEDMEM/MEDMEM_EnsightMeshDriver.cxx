@@ -763,7 +763,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() {
 	  ensightGeomFile >> NumberOfNodes ;
 	  cout << "-> loading " << NumberOfNodes << " coordinates " << endl ;
 	  int NumberOfCoordinates = NumberOfNodes*SpaceDimension ;
-	  double Coordinates[NumberOfCoordinates];
+	  double* Coordinates = new double[NumberOfCoordinates];
 	  int iCoord = 0 ;
 	  //cout << "-> geom given " << geom_given << endl ;
 	  for ( int i=0 ; i < NumberOfNodes ; i++) {
@@ -779,6 +779,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() {
 	  _ptrMesh->_coordinate =  new COORDINATE(SpaceDimension,NumberOfNodes,MED_EN::MED_FULL_INTERLACE);
 	  _ptrMesh->_coordinate->setCoordinates(MED_EN::MED_FULL_INTERLACE,Coordinates);
 	  _ptrMesh->_coordinate->setCoordinatesSystem("CARTESIAN");
+	  delete [] Coordinates;
 	}
 	else if  ( mot_lu == "part" ) {
 //---------------- Connectivities part --------------------------------------------
