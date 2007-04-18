@@ -44,7 +44,9 @@ GEO_NAME::GEO_NAME() : map<int,string>()
   table[(int)MED_PENTA15] = "MED_PENTA15";
   table[(int)MED_PYRA5  ] = "MED_PYRA5"  ;
   table[(int)MED_PYRA13 ] = "MED_PYRA13" ;
-  assert( table.find( (int)MED_PYRA13 ) != table.end() ) ;
+  table[(int)MED_POLYGON] = "MED_POLYGON";
+  table[(int)MED_POLYHEDRA] = "MED_POLYHEDRA";
+  assert( table.find( (int)MED_POLYHEDRA ) != table.end() ) ;
 }
  
 GEO_NAME::~GEO_NAME()
@@ -110,7 +112,9 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
       MED_TETRA10,
       MED_PYRA13,
       MED_PENTA15,
-      MED_HEXA20};
+      MED_HEXA20,
+      MED_POLYGON,
+      MED_POLYHEDRA};
 
     static const list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_CELL] = geomList;
@@ -121,7 +125,8 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
       MED_TRIA3,
       MED_QUAD4,
       MED_TRIA6,
-      MED_QUAD8};
+      MED_QUAD8,
+      MED_POLYGON};
 
     static const list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_FACE] = geomList; 

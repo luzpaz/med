@@ -730,7 +730,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 		int N5 = global_connectivity[pyra_index+4]-1;
 		xvolume=CalculateVolumeForPyra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5);
 		volume->setIJ(index,1,xvolume) ;
-		index = index++;
+		index++;
 	      }
 	    break;
 	  }

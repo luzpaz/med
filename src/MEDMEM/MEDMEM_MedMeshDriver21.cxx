@@ -211,7 +211,8 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
   if (_ptrMesh->_meshDimension == 3)
     // on face
     buildAllGroups(_ptrMesh->_groupFace,_ptrMesh->_familyFace) ;
-  else if (_ptrMesh->_meshDimension == 2)
+//   else if (_ptrMesh->_meshDimension == 2) -- PAL13414
+  if (_ptrMesh->_meshDimension > 1)
     // on edge
     buildAllGroups(_ptrMesh->_groupEdge,_ptrMesh->_familyEdge) ;
 
@@ -1750,7 +1751,7 @@ int MED_MESH_WRONLY_DRIVER21::writeGRID() const
     med_2_1::med_int * MEDArrayNodeFamily = new med_2_1::med_int[_ptrMesh->_numberOfNodes] ;
 
     err = MEDbodyFittedEcr (_medIdt,
-                            const_cast <char *> (_ptrMesh->_name.c_str()),
+                            const_cast <char *> (_meshName.c_str()),
                             _ptrMesh->_spaceDimension,
                             coo,
                             ArrayLen,
@@ -1778,7 +1779,7 @@ int MED_MESH_WRONLY_DRIVER21::writeGRID() const
     for (idim = 0; idim < _ptrMesh->_spaceDimension; ++idim)
     {
       err = med_2_1::MEDgridEcr (_medIdt,
-                        const_cast <char *> (_ptrMesh->_name.c_str()),
+                        const_cast <char *> (_meshName.c_str()),
                         _ptrMesh->_spaceDimension,
                         Array [idim],
                         ArrayLen [idim],
@@ -1794,7 +1795,7 @@ int MED_MESH_WRONLY_DRIVER21::writeGRID() const
     }
 
 //      err = MEDfamGridEcr(_medIdt,
-//                          const_cast <char *> (_ptrMesh->_name.c_str()),
+//                          const_cast <char *> (_meshName.c_str()),
 //                          _ptrMesh->_MEDArrayNodeFamily,
 //                          _ptrMesh->_numberOfNodes,
 //                          med_2_1::MED_REMP,
@@ -2154,7 +2155,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
       delete [] temp;
 #else
       err = MEDfamGridEcr(_medIdt,
-			  const_cast <char *> (_ptrMesh->_name.c_str()),
+			  const_cast <char *> (_meshName.c_str()),
 			  MEDArrayNodeFamily,
 			  NumberOfNodes,
 			  med_2_1::MED_REMP,

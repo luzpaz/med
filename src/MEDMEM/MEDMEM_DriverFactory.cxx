@@ -25,6 +25,9 @@
 #include "MEDMEM_PorflowMeshDriver.hxx"
 #include "MEDMEM_VtkMeshDriver.hxx"
 #include "MEDMEM_VtkMedDriver.hxx"
+#include "MEDMEM_EnsightFieldDriver.hxx"
+#include "MEDMEM_EnsightMeshDriver.hxx"
+#include "MEDMEM_EnsightMedDriver.hxx"
 
 #include "MEDMEM_Exception.hxx"
 
@@ -76,6 +79,8 @@ driverTypes DRIVERFACTORY::deduceDriverTypeFromFileName(const std::string & file
     return PORFLOW_DRIVER;
   if(extension=="vtk")
     return VTK_DRIVER;
+  if(extension=="case")
+    return ENSIGHT_DRIVER;
   return NO_DRIVER;
 }
 
@@ -150,6 +155,27 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
       break;
     }
 
+    case ENSIGHT_DRIVER : {
+      switch(access)
+	{
+	case MED_LECT : {
+	  ret=new ENSIGHT_MESH_RDONLY_DRIVER(fileName,mesh);
+	  return ret;
+	}
+	case MED_ECRI : {
+	  ret=new ENSIGHT_MESH_WRONLY_DRIVER(fileName,mesh);
+	  return ret;
+	}
+	case MED_REMP : {
+	  throw MED_EXCEPTION ("not yet implemented");
+	  return ret;
+	}
+	default:
+	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	}
+      break;
+    }
+
     case VTK_DRIVER : {
       switch(access)
 	{
@@ -171,7 +197,7 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
     }
 
     case NO_DRIVER : {
-      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method which is not allowed");
+      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method 1 which is not allowed");
     }
     default:
       throw MED_EXCEPTION ("other driver than MED_DRIVER GIBI_DRIVER PORFLOW_DRIVER and VT_DRIVER has been specified to the method which is not allowed");
@@ -227,6 +253,27 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
       break;
     }
 
+    case ENSIGHT_DRIVER : {
+      switch(access)
+	{
+	case MED_LECT : {
+	  ret=new ENSIGHT_MED_RDONLY_DRIVER(fileName,med);
+	  break ;
+	}
+	case MED_ECRI : {
+	  ret=new ENSIGHT_MED_WRONLY_DRIVER(fileName,med);
+	  break ;
+	}
+	case MED_REMP : {
+	  throw MED_EXCEPTION ("not yet implemented");
+	  break ;
+	}
+	default:
+	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	}
+      break;
+    }
+
     case GIBI_DRIVER : {
       throw MED_EXCEPTION ("GIBI_DRIVER has been specified to the method which is not allowed because there is no GIBI driver for the MED object");
       break;
@@ -238,11 +285,11 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
     }
 
     case NO_DRIVER : {
-      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method which is not allowed");
+      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method 2 which is not allowed");
       break;
     }
     default:
-      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method which is not allowed");
+      throw MED_EXCEPTION ("NO_DRIVER has been specified to the method 3 which is not allowed");
     }
   return ret;
 }
@@ -257,7 +304,7 @@ GENDRIVER * DRIVERFACTORY::buildMedDriverFromFile(const string & fileName,
     {
       version = getMedFileVersion(fileName);
     }
-  catch (MEDEXCEPTION &)
+    catch (MEDEXCEPTION & ex)
     {
       version = DRIVERFACTORY::globalMedFileVersionForWriting;
     }
@@ -304,7 +351,7 @@ GENDRIVER * DRIVERFACTORY::buildMeshDriverFromFile(const string & fileName,
     {
       version = getMedFileVersion(fileName);
     }
-  catch (MEDEXCEPTION & )
+  catch (MEDEXCEPTION & ex)
     {
       version = DRIVERFACTORY::globalMedFileVersionForWriting;
     }

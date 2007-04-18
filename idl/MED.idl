@@ -425,8 +425,9 @@ This enumeration contains a set of elements defining the type of connectivity.
     {
     	long                     numberOfNodes;
         medGeometryElement_array meshTypes;
-    	SALOME_MED::long_array      numberOfElements;
-        long                       entityDimension;
+    	SALOME_MED::long_array   numberOfElements;
+    	SALOME_MED::long_array   nodalConnectivityLength;
+        long                     entityDimension;
     };
     connectivityInfos getConnectGlobal(in medEntityMesh entity)
     raises (SALOME::SALOME_Exception);
@@ -705,7 +706,8 @@ Internal Corba method.
     	   medEntityMesh entity;
            long          numberOfGeometricType;
            medGeometryElement_array types;
-           SALOME_MED::long_array nbEltTypes;
+           SALOME_MED::long_array   nbEltTypes;
+           SALOME_MED::long_array   nodalConnectivityLength;
     };
     supportInfos getSupportGlobal()		raises (SALOME::SALOME_Exception);
 
@@ -840,9 +842,16 @@ Internal Corba method.
     {
 
       /*!
-	Returns the field name.
-      */
+       *  Returns the field name.
+       */
       string getName() raises (SALOME::SALOME_Exception);
+
+      /*!
+       *  Changes the field name.
+       *
+       *  \param theName The new name for this field.
+       */
+      void setName (in string theName) raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns the field description.
@@ -882,11 +891,10 @@ Internal Corba method.
 	raises (SALOME::SALOME_Exception);
 
       /*!
-	Returns the unit of i-th component.
-
-	\note
-      i is bounded by 1 and NumberOfComponents.
-      */
+       *  Returns the unit of i-th component.
+       *
+       *  \note i is bounded by 1 and NumberOfComponents.
+       */
       string getComponentUnit(in long i) raises (SALOME::SALOME_Exception);
 
       /*!
@@ -950,7 +958,9 @@ Internal Corba method.
       /*!
 	Adds the Field in the StudyManager.
       */
-      void addInStudy(in SALOMEDS::Study myStudy, in FIELD myIor )
+      void addInStudy(in SALOMEDS::Study myStudy, in FIELD myIor)
+	raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
+      void addInStudyToComponent(in SALOMEDS::SComponent myComponent, in FIELD myIor)
 	raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
 /*!

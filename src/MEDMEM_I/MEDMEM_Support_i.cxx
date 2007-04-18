@@ -162,35 +162,84 @@ throw (SALOME::SALOME_Exception)
 //=============================================================================
 
 SALOME_MED::SUPPORT::supportInfos * SUPPORT_i::getSupportGlobal()
-throw (SALOME::SALOME_Exception)
+  throw (SALOME::SALOME_Exception)
 {
-        if (_support==NULL)
-                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-                                             SALOME::INTERNAL_ERROR);
-        SALOME_MED::SUPPORT::supportInfos_var all = new SALOME_MED::SUPPORT::supportInfos;
-        try
-        {
-                all->name               = CORBA::string_dup(_support->getName().c_str());
-                all->description        = CORBA::string_dup(_support->getDescription().c_str());
-                const int numberOfTypes = _support->getNumberOfTypes();
-                all->numberOfGeometricType = numberOfTypes;
-		all->entity = _support->getEntity();
-		all->isOnAllElements    = _support->isOnAllElements();
-                all->types.length(numberOfTypes);
-                all->nbEltTypes.length(numberOfTypes);
-                const medGeometryElement * elemts = _support->getTypes();
-                for (int i=0;i<numberOfTypes;i++)
-                {
-                        all->types[i]      = convertMedEltToIdlElt(elemts[i]);
-                        all->nbEltTypes[i] = _support->getNumberOfElements(elemts[i]);
-                }
+  if (_support==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                 SALOME::INTERNAL_ERROR);
+  SALOME_MED::SUPPORT::supportInfos_var all = new SALOME_MED::SUPPORT::supportInfos;
+  try
+  {
+    all->name               = CORBA::string_dup(_support->getName().c_str());
+    all->description        = CORBA::string_dup(_support->getDescription().c_str());
+    const int numberOfTypes = _support->getNumberOfTypes();
+    all->numberOfGeometricType = numberOfTypes;
+    all->entity = _support->getEntity();
+    all->isOnAllElements    = _support->isOnAllElements();
+    all->types.length(numberOfTypes);
+    all->nbEltTypes.length(numberOfTypes);
+    all->nodalConnectivityLength.length(numberOfTypes);
+    const medGeometryElement * types = _support->getTypes();
+    for (int i=0;i<numberOfTypes;i++)
+    {
+      int nbelements = _support->getNumberOfElements(types[i]);
+      int connLength = 0;
+      MESH* mesh = _support->getMesh();
+      switch ( types[i] )
+      {
+      case MED_EN::MED_POLYGON: {
+        if (_support->isOnAllElements() ) {
+          connLength = mesh->getPolygonsConnectivityLength(MED_EN::MED_NODAL,
+                                                           _support->getEntity());
         }
-        catch (MEDEXCEPTION &ex)
-        {
-                MESSAGE("Unable to access the description of the support ");
-                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        else {
+          const int * index = mesh->getPolygonsConnectivityIndex(MED_EN::MED_NODAL,
+                                                                 _support->getEntity());
+          const int * numbers=_support->getNumber(types[i]);
+          int canonicNb = mesh->getNumberOfElements(_support->getEntity(),
+                                                    MED_EN::MED_ALL_ELEMENTS);
+          for (int j=0;j<nbelements;j++)
+          {
+            int elem = numbers[j]-canonicNb-1;
+            connLength += index[ elem+1 ] - index[ elem ];
+          }
         }
-        return all._retn();
+        break;
+      }
+      case MED_EN::MED_POLYHEDRA: {
+        if (_support->isOnAllElements() ) {
+          connLength = mesh->getPolyhedronConnectivityLength(MED_EN::MED_NODAL);
+        }
+        else {
+          const int * index = mesh->getPolyhedronIndex(MED_EN::MED_NODAL);
+          const int * faceIndex = mesh->getPolyhedronFacesIndex();
+          const int * numbers=_support->getNumber(types[i]);
+          int canonicNb = mesh->getNumberOfElements(_support->getEntity(),
+                                                    MED_EN::MED_ALL_ELEMENTS);
+          for (int j=0;j<nbelements;j++)
+          {
+            int elem = numbers[j]-canonicNb-1 ;
+            int f1 = index[ elem ]-1,   f2 = index[ elem+1 ]-2;
+            int i1 = faceIndex[ f1 ]-1, i2 = faceIndex[ f2+1 ]-1;
+            connLength += i2 - i1;
+          }
+        }
+        break;
+      }
+      default:
+        connLength = nbelements * ( types[i] % 100 );
+      }
+      all->types[i]                   = convertMedEltToIdlElt(types[i]);
+      all->nbEltTypes[i]              = nbelements;
+      all->nodalConnectivityLength[i] = connLength;
+    }
+  }
+  catch (MEDEXCEPTION &ex)
+  {
+    MESSAGE("Unable to access the description of the support ");
+    THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+  }
+  return all._retn();
 
 }
 

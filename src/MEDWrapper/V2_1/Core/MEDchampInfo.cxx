@@ -28,7 +28,8 @@ MEDchampInfo(med_idt fid,int indice,char *champ,
 {
   med_err ret=0;
   med_idt gid;
-  char chemin[MED_TAILLE_CHA+MED_TAILLE_NOM+1];
+  char chemin[MED_TAILLE_CHA+MED_TAILLE_LNOM+1]; //SRN: Changed to MED_TAILLE_LNOM to avoid a crash 
+                                                 //     in case if a field name longer than MED_TAILLE_NOM
   int num;
 
   /*
@@ -43,6 +44,8 @@ MEDchampInfo(med_idt fid,int indice,char *champ,
   strcpy(chemin,MED_CHA);
   if ((ret = _MEDobjetIdentifier(fid,chemin,num,champ)) < 0)
     return -1;
+
+  if(strlen(champ) > MED_TAILLE_NOM) return -1;
 
   /* 
    * Si le Data Group cha n'existe pas => erreur

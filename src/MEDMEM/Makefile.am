@@ -89,6 +89,9 @@ MEDMEM_FieldForward.hxx \
 MEDMEM_GaussLocalization.hxx \
 MEDMEM_SetInterlacingType.hxx\
 MEDMEM_ConnectZone.hxx \
+MEDMEM_EnsightMedDriver.hxx \
+MEDMEM_EnsightMeshDriver.hxx \
+MEDMEM_EnsightFieldDriver.hxx \
 MEDMEM.hxx
 
 # not exported headers
@@ -131,7 +134,9 @@ MEDMEM_PolyhedronArray.cxx \
 MEDMEM_MedMedDriver22.cxx \
 MEDMEM_MedMeshDriver22.cxx \
 MEDMEM_TopLevel.cxx \
-MEDMEM_ConnectZone.cxx
+MEDMEM_ConnectZone.cxx \
+MEDMEM_EnsightMedDriver.cxx \
+MEDMEM_EnsightMeshDriver.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
@@ -145,6 +150,7 @@ if MED_ENABLE_KERNEL
 endif
 
 bin_PROGRAMS= \
+	ensight2med med2ensight \
 	med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH \
 	test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray \
 	test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit \
@@ -164,6 +170,8 @@ bin_PROGRAMS= \
 AM_CPPFLAGS= $(libmedmem_la_CPPFLAGS)
 LDADD= $(libmedmem_la_LDFLAGS) -lm -lSALOMEBasics libmedmem.la
 
+dist_ensight2med_SOURCES= ensight2med.cxx
+dist_med2ensight_SOURCES= med2ensight.cxx
 dist_med2_1_To_med2_2_SOURCES= med2_1_To_med2_2.cxx
 dist_med2vtk_SOURCES= med2vtk.cxx
 dist_duplicateMED_SOURCES= duplicateMED.cxx

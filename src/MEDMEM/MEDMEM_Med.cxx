@@ -390,17 +390,7 @@ void MED::getMeshNames      ( string * meshNames ) const
 {
   const char * LOC = "MED::getMeshNames ( string * ) const : ";
   BEGIN_OF(LOC);
-  unsigned int meshNamesSize;
-  
-  if (  ( meshNamesSize = sizeof(meshNames) / sizeof(string *) )
-       != _meshes.size() )
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "Size of parameter meshNames is |" 
-                                     << meshNamesSize    << "| and should be |" 
-                                     << _meshes.size() << "| and should be |" 
-                                     )
-                          );   
-  
+
   // REM : ALLOCATION D'UN TABLEAU DE POINTEURS SUR STRING FAITE PAR LE CLIENT
   map<MESH_NAME_,MESH*>::const_iterator  currentMesh; // ??ITERATEUR CONST SUR UN OBJET NON CONST ??
 

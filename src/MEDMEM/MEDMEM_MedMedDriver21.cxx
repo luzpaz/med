@@ -297,6 +297,9 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 
       ptrMesh->setName(meshName);
 
+      // add by B. Secher for filter module
+      ptrMesh->setMeshDimension(meshDim);
+
       SCRUTE(ptrMesh);
 
       MESSAGE(LOC<<"is" << (isAGrid ? "" : " NOT") << " a GRID and its name is "<<ptrMesh->getName());
@@ -358,7 +361,8 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
   {
     int                           numberOfFields              = 0;      //MED_INVALID
     //    char                          fieldName[MED_TAILLE_NOM+1] = "";
-    char                          fieldName[MED_TAILLE_NOM+1] ;
+    //    char                          fieldName[MED_TAILLE_NOM+1] ;
+    char                          fieldName[MED_TAILLE_LNOM+1] ; //SRN: to avoid a crash if the field name is longer than MED_TAILLE_NOM
     int                           numberOfComponents           = 0;
     char                          * componentName              = (char *) MED_NULL;
     char                          * unitName                   =  (char *) MED_NULL;
@@ -394,9 +398,9 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
       numberOfComponents = med_2_1::MEDnChamp(_medIdt,i) ;
       if ( numberOfComponents <= 0 ) 
         if (err != MED_VALID) 
-          throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) <<  "Be careful there is no compound for field n°" 
+	  throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) <<  "Be careful there is no compound for field n°" 
                                            << i << "in file |"<<_fileName<<"| !"));
-      
+	
       componentName = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;
       unitName      = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;   
       

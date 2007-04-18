@@ -44,6 +44,9 @@
 #include "MEDMEM_FieldForward.hxx"
 #include "MEDMEM_GaussLocalization.hxx"
 
+#define DBL_MAX 1.0E+308
+#define DBL_MIN -1.0E+308
+
 /*!
 
   This class contains all the informations related with a template class FIELD :
@@ -54,6 +57,22 @@
 */
 
 namespace MEDMEM {
+
+  template<class T>
+  struct MinMax {
+  };
+
+  template<>
+  struct MinMax<double> {
+    static double getMin() { return DBL_MIN; }
+    static double getMax() { return DBL_MAX; }
+  };
+
+  template<>
+  struct MinMax<int> {
+    static int getMin() { return INT_MIN; }
+    static int getMax() { return INT_MAX; }
+  };  
 
   template < typename T > struct SET_VALUE_TYPE {
     static const MED_EN::med_type_champ _valueType = MED_EN::MED_UNDEFINED_TYPE;};
@@ -67,6 +86,7 @@ class MEDMEM_EXPORT FIELD_    // GENERIC POINTER TO a template <class T, class I
 protected:
 
   bool            _isRead ;
+  bool            _isMinMax;
 
   /*!
     \if developper
@@ -636,6 +656,10 @@ protected:
   // array of value of type T
   Array *_value ;
 
+  // extrema values
+  T _vmin;
+  T _vmax;
+
   map<MED_EN::medGeometryElement,GAUSS_LOCALIZATION_*> _gaussModel; //A changer quand les drivers seront template de l'entrelacement
 
   static T _scalarForPow;
@@ -684,6 +708,16 @@ public:
   static FIELD* div(const FIELD& m, const FIELD& n);
   static FIELD* divDeep(const FIELD& m, const FIELD& n);
   double normMax() const throw (MEDEXCEPTION);
+
+  //------- TDG and BS addings
+
+  void getMinMax(T &vmin, T &vmax) throw (MEDEXCEPTION);
+  vector<int> getHistogram(int &nbint) throw (MEDEXCEPTION);
+  FIELD<double>* buildGradient() const throw (MEDEXCEPTION);
+  FIELD<double>* buildNorm2Field() const throw (MEDEXCEPTION);
+
+  //-------------------
+
   double norm2() const throw (MEDEXCEPTION);
   void   applyLin(T a, T b);
   template <T T_function(T)> void applyFunc();
@@ -897,17 +931,17 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::FIELD(const
   if (m._value != NULL)
     {
       if ( m.getGaussPresence() )
-	_value = new ArrayGauss( *(dynamic_cast< ArrayGauss * > (m._value) ) ,false);
+	_value = new ArrayGauss( *(static_cast< ArrayGauss * > (m._value) ) ,false);
       else
-	_value = new ArrayNoGauss( *(dynamic_cast< ArrayNoGauss * > (m._value)) ,false);
+	_value = new ArrayNoGauss( *(static_cast< ArrayNoGauss * > (m._value)) ,false);
     }
   else
     _value = (ArrayNoGauss *) NULL;
   locMap::const_iterator it;
   for ( it = m._gaussModel.begin();it != m._gaussModel.end(); it++ )
-    _gaussModel[dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
+    _gaussModel[static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
       new GAUSS_LOCALIZATION<INTERLACING_TAG>(
-					      *dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
+					      *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
 					      );
 
   _valueType       = m._valueType;
@@ -934,9 +968,9 @@ FIELD<T, INTERLACING_TAG> & FIELD<T, INTERLACING_TAG>::operator=(const FIELD &m)
                                //CF :Commentaire dans MEDMEM_Array
   locMap::const_iterator it;
   for ( it = m._gaussModel.begin();it != m._gaussModel.end(); it++ )
-    _gaussModel[dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
+    _gaussModel[static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
       new GAUSS_LOCALIZATION<INTERLACING_TAG>(
-					      *dynamic_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
+					      *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
 					      );
 
   _valueType       = m._valueType;
@@ -1564,6 +1598,295 @@ template <class T, class INTERLACIN_TAG> double FIELD<T, INTERLACIN_TAG>::norm2(
     return std::sqrt(static_cast<double> (result));
 }
 
+
+//------------- TDG and BS addings 
+
+/*!  Return Extremums of field
+ */
+ template <class T, class INTERLACIN_TAG> void FIELD<T, INTERLACIN_TAG>::getMinMax(T &vmin, T &vmax) throw (MEDEXCEPTION)
+{
+  const T* value=getValue(); // get pointer to the values
+  const int size=getNumberOfValues()*getNumberOfComponents();
+  const T* lastvalue=value+size; // point just after last value
+    
+  if (size <= 0){ // Size of array has to be strictly positive
+      
+    string diagnosis;
+    diagnosis="FIELD<T,INTERLACIN_TAG>::getMinMax() : cannot compute the extremums of "+getName()+
+      " : its size is non positive!";
+    throw MEDEXCEPTION(diagnosis.c_str());
+  }
+    
+  if (!_isMinMax){
+    vmax=MinMax<T>::getMin(); // init a max value
+    vmin=MinMax<T>::getMax(); // init a min value
+      
+    for( ; value!=lastvalue ; ++value){
+      if ( vmin > *value )
+	vmin=*value;
+      if ( vmax < *value )
+	vmax=*value;
+    }
+    _isMinMax=true;
+    _vmin=vmin;
+    _vmax=vmax;
+  }
+  else{
+    vmin = _vmin;
+    vmax = _vmax;
+  }
+
+}
+
+/*!  Return Histogram of field
+ */
+ template <class T, class INTERLACIN_TAG> vector<int> FIELD<T, INTERLACIN_TAG>::getHistogram(int &nbint) throw (MEDEXCEPTION)
+{
+  const T* value=getValue(); // get pointer to the values
+  const int size=getNumberOfValues()*getNumberOfComponents();
+  const T* lastvalue=value+size; // point just after last value
+
+  if (size <= 0){ // Size of array has to be strictly positive
+
+    string diagnosis;
+    diagnosis="FIELD<T,INTERLACIN_TAG>::getHistogram() : cannot compute the histogram of "+getName()+
+      " : it size is non positive!";
+    throw MEDEXCEPTION(diagnosis.c_str());
+  }
+  //    return static_cast<ArrayGauss *>(_value)->getIJ(valIndex,j) ;
+
+  vector<int> Histogram(nbint) ;
+  T vmin,vmax;
+  int j;
+
+  for( j=0 ; j!=nbint ; j++) Histogram[j]=0 ;
+    
+  getMinMax(vmin,vmax);
+  for( ; value!=lastvalue ; ++value){
+    if(*value==vmax) j = nbint-1;
+    else j = (int)(((double)nbint * (*value-vmin))/(vmax-vmin));
+    Histogram[j]+=1 ;
+  }
+
+  return Histogram ;
+
+}
+
+/*!  Return vectorial gradient field
+ */
+template <class T, class INTERLACIN_TAG> 
+FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const throw (MEDEXCEPTION)
+{
+  const char * LOC = "FIELD<T, INTERLACIN_TAG>::buildGradient() : ";
+  BEGIN_OF(LOC);
+
+  // space dimension of input mesh
+  int spaceDim = getSupport()->getMesh()->getSpaceDimension();
+  double *x = new double[spaceDim];
+
+  FIELD<double, FullInterlace>* Gradient =
+    new FIELD<double, FullInterlace>(getSupport(),spaceDim);
+
+  string name("gradient of ");
+  name += getName();
+  Gradient->setName(name);
+  string descr("gradient of ");
+  descr += getDescription();
+  Gradient->setDescription(descr);
+
+  if( _numberOfComponents > 1 ){
+    delete Gradient;
+    delete [] x;
+    throw MEDEXCEPTION("gradient calculation only on scalar field");
+  }
+
+  for(int i=1;i<=spaceDim;i++){
+    string nameC("gradient of ");
+    nameC += getName();
+    Gradient->setComponentName(i,nameC);
+    Gradient->setComponentDescription(i,"gradient");
+    string MEDComponentUnit = getMEDComponentUnit(1)+getSupport()->getMesh()->getCoordinatesUnits()[i-1];
+    Gradient->setMEDComponentUnit(i,MEDComponentUnit);
+  }
+
+  Gradient->setIterationNumber(getIterationNumber());
+  Gradient->setOrderNumber(getOrderNumber());
+  Gradient->setTime(getTime());
+
+  // typ of entity on what is field
+  MED_EN::medEntityMesh typ = getSupport()->getEntity();
+
+  const int *C;
+  const int *iC;  
+  const int *revC;
+  const int *indC;
+  const double *coord;
+  int NumberOf;
+
+  switch(typ){
+  case MED_CELL:
+  case MED_FACE:
+  case MED_EDGE:
+    // read connectivity array to have the list of nodes contained by an element
+    C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,typ,MED_ALL_ELEMENTS);
+    iC = getSupport()->getMesh()->getConnectivityIndex(MED_NODAL,typ);
+    // calculate reverse connectivity to have the list of elements which contains node i
+    revC = getSupport()->getMesh()->getReverseConnectivity(MED_NODAL,typ);
+    indC = getSupport()->getMesh()->getReverseConnectivityIndex(MED_NODAL,typ);
+    // coordinates of each node
+    coord = getSupport()->getMesh()->getCoordinates(MED_FULL_INTERLACE);
+    // number of elements
+    NumberOf = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
+    // barycenter field of elements
+    FIELD<double, FullInterlace>* barycenter = getSupport()->getMesh()->getBarycenter(getSupport());
+
+    // calculate gradient vector for each element i
+    for (int i=1; i<NumberOf+1; i++){
+
+      // listElements contains elements which contains a node of element i
+      set <int> listElements;
+      set <int>::iterator elemIt ;
+      listElements.clear();
+
+      // for each node j of element i
+      for(int ij=iC[i-1];ij<iC[i];ij++){
+	int j = C[ij-1];
+	for(int k=indC[j-1];k<indC[j];k++){
+	  // c element contains node j
+	  int c=revC[k-1];
+	  // we put the elements in set
+	  if(c != i)
+	    listElements.insert(c);
+	}
+      }
+      // coordinates of barycentre of element i in space of dimension spaceDim
+      for(int j=0;j<spaceDim;j++)
+	x[j] = barycenter->getValueIJ(i,j+1);
+      
+      for(int j=0;j<spaceDim;j++){
+	// value of field of element i
+	double val = getValueIJ(i,1);
+	double grad = 0.;
+	// calculate gradient for each neighbor element
+	for(elemIt=listElements.begin();elemIt!=listElements.end();elemIt++){
+	  int elem = *elemIt;
+	  double d2 = 0.;
+	  for(int l=0;l<spaceDim;l++){
+	    // coordinate of barycenter of element elem
+	    double xx = barycenter->getValueIJ(elem,l+1);
+	    d2 += (x[l]-xx) * (x[l]-xx);
+	  }
+	  grad += (barycenter->getValueIJ(elem,j+1)-x[j])*(getValueIJ(elem,1)-val)/sqrt(d2);
+	}
+	if(listElements.size() != 0) grad /= listElements.size();
+	Gradient->setValueIJ(i,j+1,grad);
+      }
+    }
+    delete barycenter;
+    break;
+  case MED_NODE:
+    // read connectivity array to have the list of nodes contained by an element
+    C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+    iC = getSupport()->getMesh()->getConnectivityIndex(MED_NODAL,MED_CELL);
+    // calculate reverse connectivity to have the list of elements which contains node i
+    revC=getSupport()->getMesh()->getReverseConnectivity(MED_NODAL,MED_CELL);
+    indC=getSupport()->getMesh()->getReverseConnectivityIndex(MED_NODAL,MED_CELL);
+    // coordinates of each node
+    coord = getSupport()->getMesh()->getCoordinates(MED_FULL_INTERLACE);
+
+    // calculate gradient for each node
+    NumberOf = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
+    for (int i=1; i<NumberOf+1; i++){
+      // listNodes contains nodes neigbor of node i 
+      set <int> listNodes;
+      set <int>::iterator nodeIt ;
+      listNodes.clear();
+      for(int j=indC[i-1];j<indC[i];j++){
+	// c element contains node i
+	int c=revC[j-1];
+	// we put the nodes of c element in set
+	for(int k=iC[c-1];k<iC[c];k++)
+	  if(C[k-1] != i)
+	    listNodes.insert(C[k-1]);
+      }
+      // coordinates of node i in space of dimension spaceDim
+      for(int j=0;j<spaceDim;j++)
+	x[j] = coord[(i-1)*spaceDim+j];
+      
+      for(int j=0;j<spaceDim;j++){
+	// value of field
+	double val = getValueIJ(i,1);
+	double grad = 0.;
+	// calculate gradient for each neighbor node
+	for(nodeIt=listNodes.begin();nodeIt!=listNodes.end();nodeIt++){
+	  int node = *nodeIt;
+	  double d2 = 0.;
+	  for(int l=0;l<spaceDim;l++){
+	    double xx = coord[(node-1)*spaceDim+l];
+	    d2 += (x[l]-xx) * (x[l]-xx);
+	  }
+	  grad += (coord[(node-1)*spaceDim+j]-x[j])*(getValueIJ(node,1)-val)/sqrt(d2);
+	}
+	if(listNodes.size() != 0) grad /= listNodes.size();
+	Gradient->setValueIJ(i,j+1,grad);
+      }
+    }
+    break;
+  case MED_ALL_ENTITIES:
+    delete [] x;
+    delete Gradient;
+    throw MEDEXCEPTION("gradient calculation not yet implemented on all elements");
+    break;
+  }
+
+  delete [] x;
+
+  END_OF(LOC);
+  return Gradient;
+}
+
+/*!  Return scalar norm2 field
+ */
+template <class T, class INTERLACIN_TAG> 
+FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildNorm2Field() const throw (MEDEXCEPTION)
+{
+  const char * LOC = "FIELD<T, INTERLACIN_TAG>::buildNorm2Field() : ";
+  BEGIN_OF(LOC);
+
+  FIELD<double, FullInterlace>* Norm2Field =
+    new FIELD<double, FullInterlace>(getSupport(),1);
+
+  string name("norm2 of ");
+  name += getName();
+  Norm2Field->setName(name);
+  string descr("norm2 of ");
+  descr += getDescription();
+  Norm2Field->setDescription(descr);
+
+  string nameC("norm2 of ");
+  nameC += getName();
+  Norm2Field->setComponentName(1,nameC);
+  Norm2Field->setComponentDescription(1,"norm2");
+  string MEDComponentUnit = getMEDComponentUnit(1);
+  Norm2Field->setMEDComponentUnit(1,MEDComponentUnit);
+
+  Norm2Field->setIterationNumber(getIterationNumber());
+  Norm2Field->setOrderNumber(getOrderNumber());
+  Norm2Field->setTime(getTime());
+
+  // calculate nom2 for each element
+  int NumberOf = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
+  for (int i=1; i<NumberOf+1; i++){
+    double norm2 = 0.;
+    for(int j=1;j<=getNumberOfComponents();j++)
+      norm2 += getValueIJ(i,j)*getValueIJ(i,j);
+    Norm2Field->setValueIJ(i,1,sqrt(norm2));
+  }
+
+  END_OF(LOC);
+  return Norm2Field;
+
+}
 
 /*!  Apply to each (scalar) field component the template parameter T_function,
  *   which is a pointer to function.
@@ -2417,7 +2740,7 @@ FIELD<T, INTERLACING_TAG>::getArrayGauss() const throw (MEDEXCEPTION)
   BEGIN_OF(LOC);
 
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *> (_value);
+    return static_cast<ArrayGauss *> (_value);
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<
 				 "The field has no Gauss Point"));
@@ -2434,7 +2757,7 @@ FIELD<T, INTERLACING_TAG>::getArrayNoGauss() const throw (MEDEXCEPTION)
   BEGIN_OF(LOC);
 
   if ( ! getGaussPresence() )
-    return dynamic_cast < ArrayNoGauss * > (_value);
+    return static_cast < ArrayNoGauss * > (_value);
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<
 				 "The field has Gauss Point"));
@@ -2466,9 +2789,9 @@ inline int FIELD<T, INTERLACING_TAG>::getValueLength() const
   throw (MEDEXCEPTION)
 {
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->getArraySize() ;
+    return static_cast<ArrayGauss *>(_value)->getArraySize() ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->getArraySize() ;
+    return static_cast<ArrayNoGauss *>(_value)->getArraySize() ;
 }
 
 /*!
@@ -2480,9 +2803,9 @@ inline const T* FIELD<T, INTERLACIN_TAG>::getValue() const throw (MEDEXCEPTION)
   const char * LOC ="FIELD<T, INTERLACING_TAG>::getValue() : ";
   BEGIN_OF(LOC);
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->getPtr() ;
+    return static_cast<ArrayGauss *>(_value)->getPtr() ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->getPtr() ;
+    return static_cast<ArrayNoGauss *>(_value)->getPtr() ;
 }
 /*!
   Return a reference to i^{th} row
@@ -2663,7 +2986,7 @@ template <class T,class INTERLACING_TAG> const int * FIELD<T,INTERLACING_TAG>::g
 
   if (_value)
     if ( getGaussPresence() ) {
-      return dynamic_cast<ArrayGauss *>(_value)->getNbGaussGeo()+1;
+      return static_cast<ArrayGauss *>(_value)->getNbGaussGeo()+1;
     } else
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"value hasn't Gauss points " ));
 
@@ -2738,9 +3061,9 @@ template <class T,class INTERLACING_TAG> bool  FIELD<T,INTERLACING_TAG>::isOnAll
 template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::setValue( T* value) throw (MEDEXCEPTION) 
 {
   if ( getGaussPresence() )
-    return dynamic_cast<ArrayGauss *>(_value)->setPtr(value) ;
+    return static_cast<ArrayGauss *>(_value)->setPtr(value) ;
   else
-    return dynamic_cast<ArrayNoGauss *>(_value)->setPtr(value) ;
+    return static_cast<ArrayNoGauss *>(_value)->setPtr(value) ;
 }
 
 /*!

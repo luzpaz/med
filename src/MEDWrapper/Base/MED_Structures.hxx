@@ -47,6 +47,11 @@ namespace MED
 		 TString& theString, 
 		 const std::string& theValue);
 
+  //! Set a substring in the sequence of the strings
+  void SetString(TInt theId, TInt theStep, 
+		 TString& theString, 
+		 const TString& theValue);
+
   //---------------------------------------------------------------
   //! Define a parent class for all MEDWrapper classes
   struct MEDWRAPPER_EXPORT TBase
@@ -62,6 +67,7 @@ namespace MED
     TString myName; //!< Keeps its name
     virtual std::string GetName() const = 0; //!< Gets its name
     virtual void SetName(const std::string& theValue) = 0; //!< Set a new name
+    virtual void SetName(const TString& theValue) = 0; //!< Set a new name
   };
 
 

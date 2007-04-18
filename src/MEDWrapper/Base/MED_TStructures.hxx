@@ -56,6 +56,13 @@ namespace MED
     {
       SetString(0,GetNOMLength<eVersion>(),myName,theValue);
     }
+
+    virtual
+    void
+    SetName(const TString& theValue)
+    {
+      SetString(0,GetNOMLength<eVersion>(),myName,theValue);
+    }
   };
 
 

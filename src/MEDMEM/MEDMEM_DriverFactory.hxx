@@ -90,6 +90,7 @@ namespace MEDMEM {
   }
 }
 
+#include "MEDMEM_EnsightFieldDriver.hxx"
 #include "MEDMEM_VtkFieldDriver.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_MedFieldDriver21.hxx"
@@ -120,6 +121,27 @@ namespace MEDMEM {
 	  case MED_EN::MED_REMP : {
 	    ret = new MED_FIELD_RDWR_DRIVER<T>(fileName,field);
 	    break;
+	  }
+	  default:
+	    throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	  }
+	break;
+      }
+
+      case ENSIGHT_DRIVER : {
+	switch(access)
+	  {
+	  case MED_EN::MED_LECT : {
+	    ret = new ENSIGHT_FIELD_RDONLY_DRIVER<T>(fileName,field);
+	    break;
+	  }
+	  case MED_EN::MED_ECRI : {
+	    ret=new ENSIGHT_FIELD_WRONLY_DRIVER<T>(fileName,field);
+	    break;
+	  }
+	  case MED_EN::MED_REMP : {
+	    throw MED_EXCEPTION ("not yet implemented");
+	    break ;
 	  }
 	  default:
 	    throw MED_EXCEPTION ("access type has not been properly specified to the method");

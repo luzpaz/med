@@ -40,6 +40,18 @@ namespace MED
     strncpy(aPos,theValue.c_str(),aSize);
   }
 
+  void 
+  SetString(TInt theId, 
+	    TInt theStep, 
+	    TString& theString, 
+	    const TString& theValue)
+  {
+    TInt aSize = std::min(TInt(theValue.size()+1),theStep);
+    char* aPos = &theString[theId*theStep];
+    const char* aValue = &theValue[0];
+    strncpy(aPos,aValue,aSize);
+  }
+
   TInt
   GetDimGaussCoord(EGeometrieElement theGeom)
   {

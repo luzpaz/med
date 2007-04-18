@@ -242,7 +242,10 @@ namespace MED
       SetMeshInfo(theInfo,eECRI,&aRet);
       
       if(aRet < 0)
-	SetMeshInfo(theInfo,eREMP,theErr);
+	SetMeshInfo(theInfo,eREMP,&aRet);
+
+      if(theErr) 
+	*theErr = aRet;
     }
     
     
@@ -394,7 +397,10 @@ namespace MED
       SetFamilyInfo(theInfo,eECRI,&aRet);
       
       if(aRet < 0)
-	SetFamilyInfo(theInfo,eREMP,theErr);
+	SetFamilyInfo(theInfo,eREMP,&aRet);
+
+      if(theErr) 
+	*theErr = aRet;
     }
     
     
@@ -503,7 +509,10 @@ namespace MED
       SetNodeInfo(theInfo,eECRI,&aRet);
       
       if(aRet < 0)
-	SetNodeInfo(theInfo,eREMP,theErr);
+	SetNodeInfo(theInfo,eREMP,&aRet);
+
+      if(theErr) 
+	*theErr = aRet;
     }
     
     
@@ -653,7 +662,10 @@ namespace MED
       SetCellInfo(theInfo,eECRI,&aRet);
       
       if(aRet < 0)
-	SetCellInfo(theInfo,eREMP,theErr);
+	SetCellInfo(theInfo,eREMP,&aRet);
+
+      if(theErr) 
+	*theErr = aRet;
     }
     
 
@@ -696,13 +708,15 @@ namespace MED
 	return;
       
       TErr aRet;
+      TString aName(256); // PAL13122, protect from memory pb with too long names
       aRet = MEDchampInfo(myFile->Id(),
 			  theFieldId,
-			  &theInfo.myName[0],
+			  &aName[0],// PAL13122 &theInfo.myName[0],
 			  (med_type_champ*)&theInfo.myType,
 			  &theInfo.myCompNames[0],
 			  &theInfo.myUnitNames[0],
 			  theInfo.myNbComp);
+      theInfo.SetName(aName); // PAL13122
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
@@ -749,7 +763,10 @@ namespace MED
 	SetFieldInfo(theInfo,eECRI,&aRet);
       
 	if(aRet < 0)
-	  SetFieldInfo(theInfo,eREMP,theErr);
+	  SetFieldInfo(theInfo,eREMP,&aRet);
+
+        if(theErr) 
+          *theErr = aRet;
 
       }catch(const std::exception& theExc){
 	EXCEPTION(runtime_error,"SetFieldInfo(...)"<<endl<<
@@ -1219,7 +1236,10 @@ namespace MED
       SetTimeStamp(theVal,eECRI,&aRet);
       
       if(aRet < 0)
-	SetTimeStamp(theVal,eREMP,theErr);
+	SetTimeStamp(theVal,eREMP,&aRet);
+
+      if(theErr) 
+	*theErr = aRet;
     }
     
   }
