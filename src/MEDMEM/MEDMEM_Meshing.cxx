@@ -264,6 +264,7 @@ void MESHING::setConnectivity(const int * Connectivity,
   if (_connectivity == (CONNECTIVITY*)NULL)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity defined !"));
 
+  _connectivity->setNumberOfNodes(_numberOfNodes);
   _connectivity->setNodal(Connectivity,Entity,Type) ;
 }
 
