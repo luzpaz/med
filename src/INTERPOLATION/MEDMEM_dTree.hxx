@@ -434,6 +434,7 @@ _TEMPLATE_ int _DTREE_::trouve_plus_proche_point_bourrin(NOEUD P) const
 		else return DTREE_FANTOME;
 		}
 	}
+
 // Fonction de pilotage de la recursion, lance les tests preliminaires et invoque la recursion
 _TEMPLATE_ int _DTREE_::trouve_plus_proche_point(NOEUD P) const
 	{
@@ -452,7 +453,7 @@ _TEMPLATE_ int _DTREE_::trouve_plus_proche_point(NOEUD P) const
 
 		if (ref->pere!=NULL)	
 			{
-			delta=DistanceInf((ref->pere->coord_max),(ref->pere->coord_min));
+			delta=DistanceInf((ref->pere->coord_max),(ref->pere->coord_min))*2.0;
 			}	
 		else 
 			{

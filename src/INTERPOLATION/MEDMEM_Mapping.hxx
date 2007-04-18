@@ -114,6 +114,10 @@ _TEMPLATE_ void _MAPPING_::Cree_Mapping(int flag_convexe)
 		
 		for (i=0;i<nbr_noeuds;i++)
 			{
+			  if (i==6367)
+			    {
+			      cout <<"toto"<<endl;
+			    }
 			point_le_plus_proche[i]=my_dTree->trouve_plus_proche_point((*noeuds_front)[i]);
 			num_maille_depart=maillage_back->DONNE_PREMIERE_MAILLE_CONTENANT(point_le_plus_proche[i]);
 			resultat_mapping[i]=Trouve_Maille_Contenant_Point_Mth_Co((*noeuds_front)[i],num_maille_depart,num_maille_depart,NBR_MAX_MAILLES_EXAMINEES,nma,flag_convexe);
