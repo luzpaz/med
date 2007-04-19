@@ -50,7 +50,7 @@ libMEDMEMSwig.py: libMEDMEM_Swig_wrap.cxx
 libMEDMEM_Swig_wrap.cxx: $(SWIG_DEF)
 	$(SWIG) $(SWIG_FLAGS) -o $@  $<
 
-libMEDMEM_Swigcmodule_la_CPPFLAGS=$(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+libMEDMEM_Swigcmodule_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
 libMEDMEM_Swigcmodule_la_LDFLAGS= $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
 	../MEDMEM/libmedmem.la
