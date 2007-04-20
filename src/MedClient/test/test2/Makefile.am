@@ -37,7 +37,8 @@ nodist_libCompo2cmodule_la_SOURCES= libCompo2_wrap.cxx
 
 EXTRA_DIST+= Compo2.hxx
 
-libCompo2cmodule_la_CPPFLAGS= ${MED2_INCLUDES} ${HDF5_INCLUDES} ${PYTHON_INCLUDES} ${KERNEL_CXXFLAGS} \
+libCompo2cmodule_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
+	${MED2_INCLUDES} ${HDF5_INCLUDES} ${PYTHON_INCLUDES} ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../../../MEDMEM_I -I$(srcdir)/../../../MEDMEM -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl \
 	-I$(srcdir)/../../../MEDWrapper/V2_1/Core -I$(srcdir)/../../../MEDMEM_SWIG -I$(srcdir)/../../../MED -I$(srcdir)/../../src
 libCompo2cmodule_la_LDFLAGS= ${KERNEL_LDFLAGS}  ${MED2_LIBS} ${HDF5_LIBS} \
