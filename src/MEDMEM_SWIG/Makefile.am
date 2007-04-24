@@ -87,4 +87,4 @@ dist_salomescript_DATA= \
 install-exec-hook: $(libdir)/_libMEDMEM_Swig.so
 
 $(libdir)/_libMEDMEM_Swig.so:
-	ln -sf $(libdir)/libMEDMEM_Swigcmodule.la $@
+	ln -sf $(libdir)/libMEDMEM_Swigcmodule.so $@
