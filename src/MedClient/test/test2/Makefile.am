@@ -71,4 +71,4 @@ CLEANFILES= libCompo2_wrap.cxx libCompo2.py
 install-exec-hook: $(libdir)/_libCompo2.so
 
 $(libdir)/_libCompo2.so:
-	( cd $(libdir); ln -sf libSalome_Swigcmodule.so _libCompo2.so; )
+	( cd $(libdir); ln -sf libCompo2cmodule.so _libCompo2.so; )
