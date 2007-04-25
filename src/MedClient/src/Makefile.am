@@ -82,4 +82,4 @@ CLEANFILES= libMEDClient.py libMEDClient_wrap.cxx
 install-exec-hook: $(libdir)/_libMEDClient.so
 
 $(libdir)/_libMEDClient.so:
-	ln -sf $(libdir)/libMEDClientcmodule.la $@
+	ln -sf $(libdir)/libMEDClientcmodule.so $@

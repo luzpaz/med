@@ -65,4 +65,4 @@ CLEANFILES= libMedCorba_Swig.py libMedCorba_Swig_wrap.cxx
 install-exec-hook: $(libdir)/_libMedCorba_Swig.so
 
 $(libdir)/_libMedCorba_Swig.so:
-	ln -sf $(libdir)/libMedCorba_Swigcmodule.la $@
+	ln -sf $(libdir)/libMedCorba_Swigcmodule.so $@
