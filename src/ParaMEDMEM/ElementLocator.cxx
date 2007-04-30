@@ -19,7 +19,8 @@ const double HUGE = 1e300;
 ElementLocator::ElementLocator(const ParaMESH& mesh, const ProcessorGroup& distant_group) 
 :_local_mesh(mesh.getMesh()),
 _local_group(*mesh.getBlockTopology()->getProcGroup()),
-_distant_group(distant_group)
+ _distant_group(distant_group),
+ _adjustment_eps(0.1)
 { 
   _union_group = _local_group.fuse(distant_group);
   _computeBoundingBoxes();
@@ -162,9 +163,22 @@ bool ElementLocator::_intersectsBoundingBox(int irank)
 
 bool ElementLocator::_intersectsBoundingBox(double* bb1, double* bb2, int dim)
 {
+	double bbtemp[2*dim];
+	double deltamax=0.0;
+	for (int i=0; i< dim; i++)
+		{
+			double delta = bb1[2*i+1]-bb1[2*i];
+			deltamax = (delta>deltamax)?delta:deltamax;
+		}
+	for (int i=0; i<dim; i++)
+		{
+			bbtemp[i*2]=bb1[i*2]-deltamax*_adjustment_eps;
+			bbtemp[i*2+1]=bb1[i*2+1]+deltamax*_adjustment_eps;
+		}
+	
   for (int idim=0; idim < dim; idim++)
   {
-    bool intersects = bb1[idim*2]<bb2[idim*2+1] && bb2[idim*2]<bb1[idim*2+1];
+    bool intersects = bbtemp[idim*2]<bb2[idim*2+1] && bb2[idim*2]<bbtemp[idim*2+1];
     if (!intersects) return false; 
   }
   return true;
@@ -255,6 +269,7 @@ void ElementLocator::_exchangeMesh(MEDMEM::MESH* local_mesh, MEDMEM::MESH*& dist
     MEDMEM::MESHING* meshing = new MEDMEM::MESHING ();
     int* recv_buffer_ptr = recv_buffer;
     meshing->setCoordinates(distant_space_dim, distant_nnodes, recv_coords, "CARTESIAN", MED_EN::MED_FULL_INTERLACE);
+		
     meshing->setNumberOfTypes(distant_nb_types,MED_EN::MED_CELL);
 
     // converting the types from int to medGeometryElement
@@ -281,7 +296,8 @@ void ElementLocator::_exchangeMesh(MEDMEM::MESH* local_mesh, MEDMEM::MESH*& dist
     {
       distant_ids_recv[i]=*recv_buffer_ptr++;
     }
-    
+    meshing->setMeshDimension(distant_mesh_dim);
+
     distant_mesh=meshing;  
     delete[] recv_buffer;
     delete[] nbtypes;
@@ -358,13 +374,16 @@ MEDMEM::MESH* ElementLocator::_meshFromElems(set<int>& elems)
   meshing->setNumberOfTypes(nbelems_per_type.size(),MED_EN::MED_CELL);
   meshing->setTypes(new_types,MED_EN::MED_CELL);
   meshing->setNumberOfElements(nbtypes,MED_EN::MED_CELL);
- 
+
+	int dimmax=0;
  int* conn_ptr= conn;
   for (int i=0; i<nbelems_per_type.size(); i++)
   {
     meshing->setConnectivity(conn_ptr, MED_EN::MED_CELL,new_types[i]);
     conn_ptr+=nbtypes[i]*(new_types[i]%100);
+		if (new_types[i]/100>dimmax) dimmax=new_types[i]/100;
   }
+	meshing->setMeshDimension(dimmax);
   delete [] small2big;
   delete [] nbtypes;
   delete [] conn;

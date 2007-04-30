@@ -16,7 +16,7 @@ public:
 	MxN_Mapping();
   MxN_Mapping(const ProcessorGroup& local_group, const ProcessorGroup& distant_group);
 	virtual ~MxN_Mapping();
-  void addElementFromSource(int local_elem, int distant_proc, int distant_elem);
+  void addElementFromSource(int distant_proc, int distant_elem);
   void prepareSendRecv();
   void sendRecv(MEDMEM::FIELD<double>& field);
   void sendRecv(double* field, MEDMEM::FIELD<double>& field) const ;

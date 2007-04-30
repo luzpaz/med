@@ -200,10 +200,13 @@ throw (MEDMEM::MEDEXCEPTION){
 
 ParaMESH::ParaMESH(MEDMEM::MESH& subdomain_mesh, const ProcessorGroup& proc_group, const string& name):
 _mesh(&subdomain_mesh),
-_name (name),
 _my_domain_id(proc_group.myRank()),
 _block_topology (new BlockTopology(proc_group, subdomain_mesh.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS)))
 {
+	ostringstream stream;
+	stream<<name<<"_"<<_my_domain_id+1;
+	_name=stream.str();
+
   _cellglobal = new int[subdomain_mesh.getNumberOfElements(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS)];
   int offset = _block_topology->localToGlobal(make_pair(_my_domain_id,0));
   for (int i=0; i<subdomain_mesh.getNumberOfElements(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); i++)

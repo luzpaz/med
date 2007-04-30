@@ -52,15 +52,24 @@ ParaFIELD::ParaFIELD(const ParaSUPPORT* para_support, const ComponentTopology& c
 	_field->setNumberOfValues(para_support->getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 	string* compnames=new string[nb_components];
 	string* compdesc=new string[nb_components];
+		string* compunit=new string[nb_components];
 	for (int i=0; i<nb_components; i++)
 	{
 		ostringstream stream(compnames[i]);
 		ostringstream stream2(compdesc[i]);
+		ostringstream stream3(compunit[i]);
 		stream<<"component "<<i;
 		stream2<<"component description "<<i;
+				stream3<<"component unit "<<i;
+
+		compnames[i]=stream.str();
+		compdesc[i]=stream2.str();
+				compunit[i]=stream3.str();
+
 	}
 	_field->setComponentsNames(compnames);
 	_field->setComponentsDescriptions(compdesc);
+	_field->setMEDComponentsUnits(compunit);
 	_field->setIterationNumber(0);
 	_field->setOrderNumber(0);
 	_field->setTime(0.0);

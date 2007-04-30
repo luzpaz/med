@@ -19,10 +19,15 @@ MxN_Mapping::~MxN_Mapping()
   delete _union_group;
 }
 
-void MxN_Mapping::addElementFromSource(int local_element, int distant_proc, int distant_element)
+
+/*!
+Method registering a new element for correspondence with a distant element
+\param distant_proc proc rank of the distant processor (in terms of the union group)
+\param distant_element id of the element on the distant processor
+ */
+void MxN_Mapping::addElementFromSource(int distant_proc, int distant_element)
 {
   _sending_ids.push_back(make_pair(distant_proc,distant_element));
- // _local_ids.push_back(local_element);
   for (int i=distant_proc; i<_union_group->size(); i++)
     _send_proc_offsets[i+1]++;
 }

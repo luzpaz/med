@@ -32,6 +32,7 @@ private:
   const ProcessorGroup& _local_group;
   ProcessorGroup* _union_group;
   std::vector<int> _distant_proc_ids;
+	double _adjustment_eps;
   //InterpolationMatrix _matrix;
   //MxN_Mapping _mapping; 
   

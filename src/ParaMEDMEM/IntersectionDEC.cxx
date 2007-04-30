@@ -49,8 +49,8 @@ void IntersectionDEC::synchronize()
       int* distant_ids=0;
       for (int i=0; i<_target_group->size(); i++)
       {
-	int idistant_proc = (i+_source_group->myRank())%_target_group->size();
-	//	idistant_proc=i;
+	//	int idistant_proc = (i+_source_group->myRank())%_target_group->size();
+	int	idistant_proc=i;
 
         //gathers pieces of the target meshes that can intersect the local mesh
         locator.exchangeMesh(idistant_proc,distant_mesh,distant_ids);
@@ -81,8 +81,8 @@ void IntersectionDEC::synchronize()
       int* distant_ids=0;
       for (int i=0; i<_source_group->size(); i++)
       {
-	int idistant_proc = (i+_target_group->myRank())%_source_group->size();
-       
+	//	int idistant_proc = (i+_target_group->myRank())%_source_group->size();
+	int  idistant_proc=i;
         //gathers pieces of the target meshes that can intersect the local mesh
         locator.exchangeMesh(idistant_proc,distant_mesh,distant_ids);
 	cout << " Data sent from "<<_union_group->myRank()<<" to source proc "<< idistant_proc<<endl;

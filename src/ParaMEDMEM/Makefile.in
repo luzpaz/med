@@ -54,13 +54,18 @@ ParaFIELD.hxx\
 DEC.hxx\
 MxN_Mapping.hxx\
 INTERPOLATION_2D.hxx\
+INTERPOLATION_3D_surf.hxx\
+INTERPOLATION.hxx\
+INTERPOLATION_Utils.hxx\
 StructuredCoincidentDEC.hxx\
 InterpolationMatrix.hxx\
 IntersectionDEC.hxx\
 UnstructuredParaSUPPORT.hxx\
 ExplicitCoincidentDEC.hxx\
 ElementLocator.hxx\
-ExplicitMapping.hxx
+ExplicitMapping.hxx\
+TranslationRotationMatrix.hxx\
+BBTree.H
 
 # Libraries targets
 
@@ -77,6 +82,7 @@ ComponentTopology.cxx\
 ParaFIELD.cxx\
 DEC.cxx\
 INTERPOLATION_2D.cxx\
+INTERPOLATION_3D_surf.cxx\
 MxN_Mapping.cxx\
 InterpolationMatrix.cxx\
 StructuredCoincidentDEC.cxx\
@@ -95,7 +101,7 @@ BIN_SERVER_IDL =
 BIN_CLIENT_IDL = 
 
 TEST_PROGS = test_ProcessorGroup test_BlockTopology test_ParaStructuredSupport \
-test_ParaField test_DEC test_UnstructuredDEC test_ExplicitDEC test_IntersectionDEC
+test_ParaField test_DEC test_UnstructuredDEC test_ExplicitDEC test_IntersectionDEC test_SeqIntersectionDEC test_Seq3DsurfIntersection test_MEDMEMConstructor make_cylinder make_plane test_INTERPOL_2D
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome

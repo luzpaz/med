@@ -3,6 +3,7 @@
 #include "MxN_Mapping.hxx"
 #include "InterpolationMatrix.hxx"
 #include "INTERPOLATION_2D.hxx"
+#include "INTERPOLATION_3D_surf.hxx"
 
 /*! \class InterpolationMatrix
 This class enables the storage of an interpolation matrix Wij mapping 
@@ -51,10 +52,19 @@ adds the contribution of a distant subdomain to the interpolation matrix
  */
 void InterpolationMatrix::addContribution(MEDMEM::MESH& distant_support, int iproc_distant, int* distant_elems)
 {
-  INTERPOLATION_2D interpolator;
-  int nbelems=  _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
-  //_row_offsets.resize(nbelems);
-  vector<map<int,double> > surfaces = interpolator.interpol_maillages(distant_support,_source_support);
+
+	// computing the intersections between distant and local elements
+  INTERPOLATION* interpolator;
+	if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==3)
+		interpolator=new INTERPOLATION_3D_surf();
+	else if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==2)
+		interpolator=new INTERPOLATION_2D();
+
+  int nbelems=  _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);  
+  vector<map<int,double> > surfaces = interpolator->interpol_maillages(distant_support,_source_support);
+	delete interpolator;
+
+
   if (surfaces.size() != nbelems)
     throw MEDEXCEPTION("uncoherent number of rows in interpolation matrix");
 
@@ -69,23 +79,31 @@ void InterpolationMatrix::addContribution(MEDMEM::MESH& distant_support, int ipr
          iter!=surfaces[ielem].end();
          iter++)
          {
+	   //surface of the source triangle
 	   double surf = triangle_surf->getValueIJ(iter->first,1);
+	   //oriented surfaces are not considered
 	   surf = (surf>0)?surf:-surf;
+	   //locating the (iproc, itriangle) pair in the list of columns
            vector<pair<int,int> >::iterator iter2 = find (_col_offsets.begin(), _col_offsets.end(),make_pair(iproc_distant,iter->first));
            int col_id;
+	   
+	   //(iproc, itriangle) is not registered in the list
+	   //of distant elements
            if (iter2==_col_offsets.end())
            {
              _col_offsets.push_back(make_pair(iproc_distant,iter->first));
              col_id =_col_offsets.size();
-	     _mapping.addElementFromSource(col_id,iproc_distant,distant_elems[iter->first-1]);
+	     _mapping.addElementFromSource(iproc_distant,distant_elems[iter->first-1]);
            } 
-           else
+           else 
            {
             col_id=iter2-_col_offsets.begin()+1;
            }
+	   //the column indirection number is registered
+	   //with the interpolation coefficient
+	   //actual column number is obtained with _col_offsets[col_id]
            _col_numbers.push_back(col_id);
            _coeffs.push_back(iter->second/surf);
-         
          }
   }
   delete triangle_surf;
@@ -154,7 +172,6 @@ void InterpolationMatrix::multiply(MEDMEM::FIELD<double>& field) const
     {
       target_value[i]=0.0;
     }
-  // int nbrows = _source_indices.size();
   int nbrows=  _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
   for (int irow=0; irow<nbrows; irow++)
   {
