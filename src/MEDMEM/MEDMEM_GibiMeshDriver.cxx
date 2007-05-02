@@ -1133,6 +1133,10 @@ static void getReverseVector (const medGeometryElement type,
     swapVec[5] = make_pair( 13, 14 );
     swapVec[6] = make_pair( 17, 19 );
     break;
+//   case MED_SEG3: no need to reverse edges
+//     swapVec.resize(1);
+//     swapVec[0] = make_pair( 1, 2 );
+//     break;
   case MED_TRIA6:
     swapVec.resize(2);
     swapVec[0] = make_pair( 1, 2 );
@@ -1158,9 +1162,8 @@ static void reverse(const _maille & aMaille, const vector<pair<int,int> > & swap
 {
   _maille* ma = (_maille*) & aMaille;
   for ( int i = 0; i < swapVec.size(); ++i ) {
-    _maille::iter tmp = ma->sommets[ swapVec[i].first ];
-    ma->sommets[ swapVec[i].first ] = ma->sommets[ swapVec[i].second ];
-    ma->sommets[ swapVec[i].second ] = tmp;
+    std::swap( ma->sommets[ swapVec[i].first ],
+               ma->sommets[ swapVec[i].second ]);
   }
   if ( swapVec.empty() )
     ma->reverse = true;
@@ -1182,12 +1185,14 @@ static const int * getGibi2MedConnectivity( const medGeometryElement type )
   static int tetra10[] = {0,2,4, 9, 1,3,5, 6,7,8};
   static int quad8  [] = {0,2,4,6, 1,3,5,7};
   static int tria6  [] = {0,2,4, 1,3,5};
+  static int seg3   [] = {0,2,1};
   if ( conn.empty() ) {
     conn.resize( MED_HEXA20 + 1, 0 );
     conn[ MED_HEXA20 ] = hexa20;
     conn[ MED_PENTA15] = penta15;
     conn[ MED_PYRA13 ] = pyra13; 
     conn[ MED_TETRA10] = tetra10;
+    conn[ MED_SEG3   ] = seg3;
     conn[ MED_TRIA6  ] = tria6;  
     conn[ MED_QUAD8  ] = quad8;
   }
@@ -1224,6 +1229,7 @@ static void orientElements( _intermediateMED& medi )
 
   int type = -100;
   vector< pair<int,int> > swapVec;
+  bool isQuadratic = ( getGibi2MedConnectivity( medi.maillage.rbegin()->geometricType ));
 
   if ( elemIt->sommets[0]->second.coord.size() == 2 ) { // space dimension
 
@@ -1235,7 +1241,8 @@ static void orientElements( _intermediateMED& medi )
       if ( elemIt->dimension() == 2 )
       {
         // fix connectivity of quadratic faces
-        fixConnectivity( *elemIt );
+        if ( isQuadratic )
+          fixConnectivity( *elemIt );
 
         // look for index of the most left node
         int iLeft = 0, iNode, nbNodes = elemIt->sommets.size();
@@ -1279,13 +1286,20 @@ static void orientElements( _intermediateMED& medi )
           }
         }
       }
+      else
+      {
+        // fix connectivity of quadratic edges
+        if ( isQuadratic )
+          fixConnectivity( *elemIt );
+      }
   }
   else {
 
     // --------------------------------------
     // orient equally all connected 3D faces
     // --------------------------------------
-    // quadratic faces will be reversed in the following fixConnectivity();
+    // connectivity of quadratic faces will be fixed by fixConnectivity()
+    // in the next loop on elements
 
     // fill map of links and their faces
     set<const _maille*> faces;
@@ -1412,7 +1426,8 @@ static void orientElements( _intermediateMED& medi )
     for ( ; elemIt != medi.maillage.end(); elemIt++ ) {
 
       // GIBI connectivity -> MED one
-      fixConnectivity( *elemIt );
+      if ( isQuadratic )
+        fixConnectivity( *elemIt );
 
       // reverse quadratic faces
       if ( elemIt->reverse ) {
