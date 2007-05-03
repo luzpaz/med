@@ -1723,66 +1723,68 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
   const double *coord;
   int NumberOf;
 
-  switch(typ){
+  switch (typ) {
   case MED_CELL:
   case MED_FACE:
   case MED_EDGE:
-    // read connectivity array to have the list of nodes contained by an element
-    C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,typ,MED_ALL_ELEMENTS);
-    iC = getSupport()->getMesh()->getConnectivityIndex(MED_NODAL,typ);
-    // calculate reverse connectivity to have the list of elements which contains node i
-    revC = getSupport()->getMesh()->getReverseConnectivity(MED_NODAL,typ);
-    indC = getSupport()->getMesh()->getReverseConnectivityIndex(MED_NODAL,typ);
-    // coordinates of each node
-    coord = getSupport()->getMesh()->getCoordinates(MED_FULL_INTERLACE);
-    // number of elements
-    NumberOf = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
-    // barycenter field of elements
-    FIELD<double, FullInterlace>* barycenter = getSupport()->getMesh()->getBarycenter(getSupport());
+    {
+      // read connectivity array to have the list of nodes contained by an element
+      C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,typ,MED_ALL_ELEMENTS);
+      iC = getSupport()->getMesh()->getConnectivityIndex(MED_NODAL,typ);
+      // calculate reverse connectivity to have the list of elements which contains node i
+      revC = getSupport()->getMesh()->getReverseConnectivity(MED_NODAL,typ);
+      indC = getSupport()->getMesh()->getReverseConnectivityIndex(MED_NODAL,typ);
+      // coordinates of each node
+      coord = getSupport()->getMesh()->getCoordinates(MED_FULL_INTERLACE);
+      // number of elements
+      NumberOf = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
+      // barycenter field of elements
+      FIELD<double, FullInterlace>* barycenter = getSupport()->getMesh()->getBarycenter(getSupport());
 
-    // calculate gradient vector for each element i
-    for (int i=1; i<NumberOf+1; i++){
+      // calculate gradient vector for each element i
+      for (int i = 1; i < NumberOf + 1; i++) {
 
-      // listElements contains elements which contains a node of element i
-      set <int> listElements;
-      set <int>::iterator elemIt ;
-      listElements.clear();
+        // listElements contains elements which contains a node of element i
+        set <int> listElements;
+        set <int>::iterator elemIt;
+        listElements.clear();
 
-      // for each node j of element i
-      for(int ij=iC[i-1];ij<iC[i];ij++){
-	int j = C[ij-1];
-	for(int k=indC[j-1];k<indC[j];k++){
-	  // c element contains node j
-	  int c=revC[k-1];
-	  // we put the elements in set
-	  if(c != i)
-	    listElements.insert(c);
-	}
+        // for each node j of element i
+        for (int ij = iC[i-1]; ij < iC[i]; ij++) {
+          int j = C[ij-1];
+          for (int k = indC[j-1]; k < indC[j]; k++) {
+            // c element contains node j
+            int c = revC[k-1];
+            // we put the elements in set
+            if (c != i)
+              listElements.insert(c);
+          }
+        }
+        // coordinates of barycentre of element i in space of dimension spaceDim
+        for (int j = 0; j < spaceDim; j++)
+          x[j] = barycenter->getValueIJ(i,j+1);
+
+        for (int j = 0; j < spaceDim; j++) {
+          // value of field of element i
+          double val = getValueIJ(i,1);
+          double grad = 0.;
+          // calculate gradient for each neighbor element
+          for (elemIt = listElements.begin(); elemIt != listElements.end(); elemIt++) {
+            int elem = *elemIt;
+            double d2 = 0.;
+            for (int l = 0; l < spaceDim; l++) {
+              // coordinate of barycenter of element elem
+              double xx = barycenter->getValueIJ(elem, l+1);
+              d2 += (x[l]-xx) * (x[l]-xx);
+            }
+            grad += (barycenter->getValueIJ(elem,j+1)-x[j])*(getValueIJ(elem,1)-val)/sqrt(d2);
+          }
+          if (listElements.size() != 0) grad /= listElements.size();
+          Gradient->setValueIJ(i,j+1,grad);
+        }
       }
-      // coordinates of barycentre of element i in space of dimension spaceDim
-      for(int j=0;j<spaceDim;j++)
-	x[j] = barycenter->getValueIJ(i,j+1);
-      
-      for(int j=0;j<spaceDim;j++){
-	// value of field of element i
-	double val = getValueIJ(i,1);
-	double grad = 0.;
-	// calculate gradient for each neighbor element
-	for(elemIt=listElements.begin();elemIt!=listElements.end();elemIt++){
-	  int elem = *elemIt;
-	  double d2 = 0.;
-	  for(int l=0;l<spaceDim;l++){
-	    // coordinate of barycenter of element elem
-	    double xx = barycenter->getValueIJ(elem,l+1);
-	    d2 += (x[l]-xx) * (x[l]-xx);
-	  }
-	  grad += (barycenter->getValueIJ(elem,j+1)-x[j])*(getValueIJ(elem,1)-val)/sqrt(d2);
-	}
-	if(listElements.size() != 0) grad /= listElements.size();
-	Gradient->setValueIJ(i,j+1,grad);
-      }
+      delete barycenter;
     }
-    delete barycenter;
     break;
   case MED_NODE:
     // read connectivity array to have the list of nodes contained by an element
