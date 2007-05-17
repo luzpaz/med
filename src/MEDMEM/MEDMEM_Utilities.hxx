@@ -20,6 +20,46 @@
 #ifndef __MEDMEM_UTILITIES
 #define __MEDMEM_UTILITIES
 
+// standart Linux/Unix functions 
+#include <string>
+
+#ifndef WNT
+  #include <libgen.h>
+#endif
+static std::string getBaseName( std::string dataname ) {
+  std::string aBaseName = "";
+#ifndef WNT
+  aBaseName = basename((char*)dataname.c_str());
+#else
+  for ( int i = dataname.size()-1; i >= 0; i-- ) {
+    char aSymb = dataname[i];
+    if ( dataname[i] == '\\' || dataname[i] == '/' )
+      break;
+    aBaseName = dataname[i] + aBaseName;
+  }
+#endif
+  return aBaseName;
+}
+
+static std::string getDirName( std::string dataname ) {
+  std::string aDirName = "";
+#ifndef WNT
+  aDirName = dirname((char*)dataname.c_str());
+#else
+  bool aFindLine = false;
+  for ( int i = dataname.size()-1; i >= 0; i-- ) {
+    char aSymb = dataname[i];
+    if ( !aFindLine )
+      aFindLine = dataname[i] == '\\' || dataname[i] == '/';
+    else
+      aDirName = dataname[i] + aDirName;
+  }
+  if ( !aFindLine )
+    aDirName = '.';
+#endif
+  return aDirName;
+}
+
 #ifdef MED_WITHOUT_KERNEL
 
 #  include <cstdlib>

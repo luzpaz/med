@@ -22,7 +22,6 @@
 #include <sstream>
 #include <strstream>
 #include <iomanip>
-#include <libgen.h>
 
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Family.hxx"
@@ -176,7 +175,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
   int len       = _fileName.size() ;
   string prefix = _fileName.substr(0,len-5); // extraction de .case
   string ensight_geomf = prefix + ".geom" ;
-  string basen = basename((char*)ensight_geomf.c_str());
+  string basen = getBaseName((char*)ensight_geomf.c_str());
   (*_ensightFile) << "# Mesh detected with name = " << MeshName << endl ;
   (*_ensightFile) << "model: 1 " << basen << endl ;
   (*_ensightFile) << endl ;
@@ -385,7 +384,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
       delete[] filter ;
   }
 
-  for(int i=0;i<_support.size();i++){
+  for(int i=0;i<(int)_support.size();i++){
     // we put connectivity
     // how many cells and how many value in connectivity :
     int nbTypes = _support[i]->getNumberOfTypes() ;
@@ -715,7 +714,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() {
 
   ifstream ensightCaseFile(_fileName.c_str(),ios::in);
   cout << "Ensight case file name to read " << _fileName << endl ;
-  string diren = dirname((char*)_fileName.c_str());
+  string diren = getDirName((char*)_fileName.c_str());
 
   if (ensightCaseFile.is_open() )
     { 
@@ -805,10 +804,14 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() {
 	}	  
       }
     }
-
+    // for compilation on WNT
+#ifndef WNT
     medGeometryElement classicalTypesCell[NumberOfTypes];
     int nbOfClassicalTypesCell[NumberOfTypes];
-
+#else // massive with zero size can't exist on Win32
+    medGeometryElement* classicalTypesCell = new medGeometryElement(NumberOfTypes);
+    int* nbOfClassicalTypesCell = new int(NumberOfTypes);
+#endif
     int ind=0 ;
     for (int k=0 ; k<NumberOfTypes ; k++){
       for (int j=0 ; j<15 ; j++)

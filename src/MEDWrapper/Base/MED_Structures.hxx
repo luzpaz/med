@@ -48,7 +48,7 @@ namespace MED
 		 const std::string& theValue);
 
   //! Set a substring in the sequence of the strings
-  void SetString(TInt theId, TInt theStep, 
+  void MEDWRAPPER_EXPORT SetString(TInt theId, TInt theStep, 
 		 TString& theString, 
 		 const TString& theValue);
 

@@ -43,7 +43,7 @@ namespace MEDMEM {
   class MED_i;
 }
 
-class Med_Gen_Driver_i : public POA_SALOME_MED::MED_Gen_Driver
+class Med_Gen_Driver_i : public virtual POA_SALOME_MED::MED_Gen_Driver
 {
 private:
   Med_Gen_Driver_i();

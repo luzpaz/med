@@ -477,8 +477,12 @@ throw (SALOME::SALOME_Exception)
 SCRUTE(_support->getName());
 SCRUTE(nbelements);
 SCRUTE(convertIdlEltToMedElt(geomElement));
+#ifndef WNT
                 const int * numbers=_support->getNumberFromFile(convertIdlEltToMedElt(geomElement));
-                for (int i=0;i<nbelements;i++)
+#else
+                const int * numbers=(const int *)getNumberFromFile(geomElement);
+#endif
+				for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
 SCRUTE(numbers[i]);

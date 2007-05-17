@@ -24,7 +24,6 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#include <libgen.h>
 
 #include "MEDMEM_define.hxx"
 
@@ -770,13 +769,14 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
   string prefix = ENSIGHT_FIELD_DRIVER<T>::_fileName.substr(0,len-5); // extraction de .case
   string dataname = prefix + ".sol" ;
 
-  NensightCaseFile << "# --Field  detected for " << basename((char*)dataname.c_str()) << endl ;
+  std::string aBaseName = getBaseName( (char*)dataname.c_str() );
+  NensightCaseFile << "# --Field  detected for " << aBaseName << endl ;
   if ( NumberOfComponents > 1 ) {
-    if (is_node)    NensightCaseFile << "vector per node: " << nameField << " " << basename((char*)dataname.c_str()) << endl ;
-    if (is_element) NensightCaseFile << "vector per element: " << nameField << " " << basename((char*)dataname.c_str()) << endl ;
+    if (is_node)    NensightCaseFile << "vector per node: " << nameField << " " << aBaseName << endl ;
+    if (is_element) NensightCaseFile << "vector per element: " << nameField << " " << aBaseName << endl ;
   } else {
-    if (is_node)    NensightCaseFile << "scalar per node: " << nameField << " " << basename((char*)dataname.c_str()) << endl ;
-    if (is_element) NensightCaseFile << "scalar per element: " << nameField << " " << basename((char*)dataname.c_str()) << endl ;
+    if (is_node)    NensightCaseFile << "scalar per node: " << nameField << " " << aBaseName << endl ;
+    if (is_element) NensightCaseFile << "scalar per element: " << nameField << " " << aBaseName << endl ;
   }
   NensightCaseFile.close();
 

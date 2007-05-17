@@ -716,7 +716,7 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
 
   ifstream ensightCaseFile(_fileName.c_str(),ios::in);
   cout << "Ensight case file name to read " << _fileName << endl ;
-  string diren = dirname((char*)_fileName.c_str());
+  string diren = getDirName((char*)_fileName.c_str());
 
   if (ensightCaseFile.is_open() )
     { 
@@ -865,9 +865,14 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
 	}
       }
     }
-
+    // for compilation on WNT
+#ifndef WNT
     medGeometryElement classicalTypesCell[NumberOfTypes];
     int nbOfClassicalTypesCell[NumberOfTypes];
+#else // massive with zero size can't exist on Win32
+    medGeometryElement* classicalTypesCell = new medGeometryElement(NumberOfTypes);
+    int* nbOfClassicalTypesCell = new int(NumberOfTypes);
+#endif
 
     int ind=0 ;
     for (int k=0 ; k<NumberOfTypes ; k++){
