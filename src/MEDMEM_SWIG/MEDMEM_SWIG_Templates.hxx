@@ -48,34 +48,38 @@ template<>
     { return Traducer( PyObject_CallFunction( func, "i", value )); }
   };
 
-template<class T>
+template<class T, class U>
   class MyFunction {
   public:
     static PyObject *_pyFunc;
     static int _nbOfComponent;
     static int _spaceDim;
-    static void EvalPy2Cpp(const double *coord, T* outputValues)
+    static void EvalPy2Cpp(const U *coord, T* outputValues)
       {
 	int i=0,err;
 	PyObject * tuple=PyTuple_New(_spaceDim);
 	  for(i=0;i<_spaceDim;i++)
 	    {
-	      err=PyTuple_SetItem(tuple,i,Py_BuildValue("d",coord[i]));
+	      err=PyTuple_SetItem(tuple,i,Binding<U>::Traducer(coord[i]));
 	      if (err != 0)
 		throw MEDMEM::MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic");
 	    }
 	  PyObject * function_ret = PyObject_CallObject(_pyFunc,tuple);
+          if ( !function_ret )
+          {
+            throw MEDMEM::MEDEXCEPTION(MEDMEM::STRING("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (possibly wrong nb of arguments that must be equal to space dimension = ")<< _spaceDim << ")");
+          }
 	  err = PyList_Check(function_ret);
 	  if (!err)
 	      {
 		Py_DECREF(function_ret);
-		throw MEDMEM::MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API list of integer fonct (double, double))");
+		throw MEDMEM::MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (its return value must be a list");
 	      }
 	  int size=PyList_Size(function_ret);
 	  if (size!=_nbOfComponent)
 	    {
 	      Py_DECREF(function_ret);
-	      throw MEDMEM::MEDEXCEPTION("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (check its API list of integer fonct (double, double), especially the size of the returned list)");
+	      throw MEDMEM::MEDEXCEPTION(MEDMEM::STRING("Internal Error in createFieldIntFromAnalytic : the call to the user callable fonction has failed (its return value must be a list of size equal to _nbOfComponent = ") << _nbOfComponent << ")");
 	    }
 	  for(i=0;i<_nbOfComponent;i++)
 	    {
@@ -84,20 +88,20 @@ template<class T>
 	      if (!err)
 		  {
 		    Py_DECREF(function_ret);
-		    throw MEDMEM::MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic : the call to the user callable fonction has failed (check its API list of double fonct (double, double), especially the type of the returned list)");
+		    throw MEDMEM::MEDEXCEPTION("Internal Error in createFieldDoubleFromAnalytic : the call to the user callable fonction has failed (check its return value type)");
 		  }
 	      outputValues[i]=Binding<T>::Traducer(tmp);
 	    }
       }
   };
 
-template<class T>
-PyObject *MyFunction<T>::_pyFunc=0;
+template<class T, class U>
+PyObject *MyFunction<T,U>::_pyFunc=0;
 
-template<class T>
-int MyFunction<T>::_nbOfComponent=0;
+template<class T, class U>
+int MyFunction<T,U>::_nbOfComponent=0;
 
-template<class T>
-int MyFunction<T>::_spaceDim=0;
+template<class T, class U>
+int MyFunction<T,U>::_spaceDim=0;
 
 #endif
