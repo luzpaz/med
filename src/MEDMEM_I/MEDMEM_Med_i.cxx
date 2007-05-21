@@ -111,7 +111,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 			  familyVectorIt++) 
 		     {
 			  FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
-			  SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->POA_SALOME_MED::FAMILY::_this();
+			  SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->_this();
 // 			   myFamilyI->addInStudy(myStudy,myFamilyIOR);
       		     }
 
@@ -124,7 +124,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 			 groupVectorIt++) 
 		    {
 			 GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
-			 SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->POA_SALOME_MED::GROUP::_this();
+			 SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->_this();
 // 			 myGroupI->addInStudy(myStudy,myGroupIOR);
       		    }
                 }      
@@ -311,7 +311,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 			  familyVectorIt++) 
 		     {
 			  FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
-			  SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->POA_SALOME_MED::FAMILY::_this();
+			  SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->_this();
                           //if ( !persistence ||
                           //     isPublishedObject( myStudy, SUPPORT_i::getEntryPath
                           //                        ((const SUPPORT *)*familyVectorIt)))
@@ -328,7 +328,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 			 groupVectorIt++) 
 		    {
 			 GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
-			 SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->POA_SALOME_MED::GROUP::_this();
+			 SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->_this();
                          //if ( !persistence ||
                          //     isPublishedObject( myStudy, SUPPORT_i::getEntryPath
                          //                        ((const SUPPORT *)*groupVectorIt)))
@@ -753,7 +753,7 @@ throw (SALOME::SALOME_Exception)
         {
                 MESH * mesh=_med->getMesh(meshName);
                 MESH_i * m1 = new MESH_i(mesh);
-		return m1->POA_SALOME_MED::MESH::_this();
+		return m1->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -799,7 +799,7 @@ throw (SALOME::SALOME_Exception)
                 mesh=_med->getMesh(fint);
         }
         MESH_i * meshi = new MESH_i(mesh);
-	return meshi->POA_SALOME_MED::MESH::_this();
+	return meshi->_this();
 
 }
 //=============================================================================

@@ -29,6 +29,8 @@ if test "x${MED_DIR}" == "x" ; then
 
 fi
 
+MED_ENABLE_MULTIPR=no
+
 if test -f ${MED_DIR}/idl/salome/MED.idl ; then
    AC_MSG_RESULT(Using Med module distribution in ${MED_DIR})
    Med_ok=yes
@@ -44,11 +46,25 @@ if test -f ${MED_DIR}/idl/salome/MED.idl ; then
 
    AC_SUBST(MED_LDFLAGS)
    AC_SUBST(MED_CXXFLAGS)
+
+   # MULTIPR
+   AC_CHECK_FILE(${MED_DIR}/include/salome/MULTIPR_Obj.hxx,
+                 ENABLE_MULTIPR=yes,
+                 ENABLE_MULTIPR=no)
+   AC_SUBST(ENABLE_MULTIPR)
+   MULTIPR_CPPFLAGS=""
+   MULTIPR_LIBS=""
+   if test "x${ENABLE_MULTIPR}" = "xyes" ; then
+      MULTIPR_CPPFLAGS="-DENABLE_MULTIPR"
+      MULTIPR_LIBS="-lMULTIPR_API"
+   fi
+   AC_SUBST(MULTIPR_CPPFLAGS)
+   AC_SUBST(MULTIPR_LIBS)
 else
    AC_MSG_WARN("Cannot find Med module sources")
 fi
-  
+
 AC_MSG_RESULT(for Med: $Med_ok)
- 
+AC_MSG_RESULT(for MULTIPR Med package: $ENABLE_MULTIPR)
+
 ])dnl
- 

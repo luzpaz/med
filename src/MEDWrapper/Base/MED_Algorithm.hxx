@@ -41,7 +41,8 @@ namespace MED
   typedef std::map<EEntiteMaillage,TGeom2ElemInfo> TEntity2TGeom2ElemInfo;
 
   //! Get set of TElemInfo by its geometrical type and corresponding MED ENTITY
-  MEDWRAPPER_EXPORT TEntity2TGeom2ElemInfo
+  MEDWRAPPER_EXPORT
+  TEntity2TGeom2ElemInfo
   GetEntity2TGeom2ElemInfo(const PWrapper& theWrapper, 
 			   const PMeshInfo& theMeshInfo,
 			   const MED::TEntityInfo& theEntityInfo);
@@ -51,7 +52,8 @@ namespace MED
   typedef std::set<PFamilyInfo> TFamilyInfoSet;
 
   //! Read set of MED FAMILIES for defined MED file
-  MEDWRAPPER_EXPORT TFamilyInfoSet
+  MEDWRAPPER_EXPORT
+  TFamilyInfoSet
   GetFamilyInfoSet(const PWrapper& theWrapper, 
 		   const PMeshInfo& theMeshInfo);
   
@@ -68,7 +70,8 @@ namespace MED
   typedef std::map<EEntiteMaillage,TFamilyTSizeSet> TEntity2FamilySet;
   
   //! Split set of MED FAMILIES by corresponding MED ENTITY
-  MEDWRAPPER_EXPORT TEntity2FamilySet
+  MEDWRAPPER_EXPORT
+  TEntity2FamilySet
   GetEntity2FamilySet(const PWrapper& theWrapper, 
 		      const TEntity2TGeom2ElemInfo& theEntity2TGeom2ElemInfo,
 		      const TFamilyInfoSet& theFamilyInfoSet);
@@ -78,7 +81,8 @@ namespace MED
   typedef std::map<std::string,TFamilyInfoSet> TGroupInfo;
   
   //! Split the input set of MED FAMILIES by corresponding MED GROUPS
-  MEDWRAPPER_EXPORT TGroupInfo
+  MEDWRAPPER_EXPORT
+  TGroupInfo
   GetGroupInfo(const TFamilyInfoSet& theFamilyInfoSet);
   
   
@@ -87,7 +91,8 @@ namespace MED
   typedef std::map<PFieldInfo,TTimeStampInfoSet> TFieldInfo2TimeStampInfoSet;
 
   //! Read set of MED TIMESTAMPS groupped by corresponding MED FIELDS
-  MEDWRAPPER_EXPORT TFieldInfo2TimeStampInfoSet
+  MEDWRAPPER_EXPORT
+  TFieldInfo2TimeStampInfoSet
   GetFieldInfo2TimeStampInfoSet(const PWrapper& theWrapper, 
 				const PMeshInfo& theMeshInfo,
 				const MED::TEntityInfo& theEntityInfo);
@@ -97,7 +102,8 @@ namespace MED
   typedef std::map<EEntiteMaillage,TFieldInfo2TimeStampInfoSet> TEntite2TFieldInfo2TimeStampInfoSet;
 
   //! Split the input set of MED TIMESTAMPS by corresponding MED FIELDS and MED ENTITIES
-  MEDWRAPPER_EXPORT TEntite2TFieldInfo2TimeStampInfoSet
+  MEDWRAPPER_EXPORT
+  TEntite2TFieldInfo2TimeStampInfoSet
   GetEntite2TFieldInfo2TimeStampInfoSet(const TFieldInfo2TimeStampInfoSet& theFieldInfo2TimeStampInfoSet);
 
 
@@ -105,7 +111,8 @@ namespace MED
   typedef std::map<TGaussInfo::TKey,PGaussInfo,TGaussInfo::TLess> TKey2Gauss;
 
   //! Read set of MED GAUSS
-  MEDWRAPPER_EXPORT TKey2Gauss
+  MEDWRAPPER_EXPORT
+  TKey2Gauss
   GetKey2Gauss(const PWrapper& theWrapper, 
 	       TErr* theErr = NULL,
 	       EModeSwitch theMode = eFULL_INTERLACE);
@@ -113,7 +120,8 @@ namespace MED
 
   //---------------------------------------------------------------
   //! Get MED PROFILE by its name
-  MEDWRAPPER_EXPORT PProfileInfo
+  MEDWRAPPER_EXPORT
+  PProfileInfo
   GetProfileInfo(const PWrapper& theWrapper, 
 		 const std::string& theProfileName,
 		 TErr* theErr = NULL,
@@ -125,21 +133,24 @@ namespace MED
   typedef boost::tuple<EModeProfil,TKey2Profile> TMKey2Profile;
 
   //! Read set of MED PROFILES
-  MEDWRAPPER_EXPORT TMKey2Profile
+  MEDWRAPPER_EXPORT
+  TMKey2Profile
   GetMKey2Profile(const PWrapper& theWrapper, 
 		  TErr* theErr = NULL,
 		  EModeProfil theMode = eCOMPACT);
 
   //---------------------------------------------------------------
   //! Get Entity for Grille by family id.
-  MEDWRAPPER_EXPORT EEntiteMaillage
+  MEDWRAPPER_EXPORT
+  EEntiteMaillage
   GetEntityByFamilyId(PGrilleInfo& theInfo,
 		      TInt theId);
 
   typedef std::map<TInt,TInt> TFamilyID2NbCells;
   
   //! Get Number of cells for theId family, for Grille
-  MEDWRAPPER_EXPORT TFamilyID2NbCells
+  MEDWRAPPER_EXPORT
+  TFamilyID2NbCells
   GetFamilyID2NbCells(PGrilleInfo& theInfo);
   
 }

@@ -54,7 +54,8 @@ namespace MED
 
 
   //---------------------------------------------------------------
-  MEDWRAPPER_EXPORT PCoordHelper
+  MEDWRAPPER_EXPORT 
+  PCoordHelper
   GetCoordHelper(PNodeInfo theNodeInfo);
 
 }

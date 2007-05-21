@@ -595,6 +595,7 @@ AC_OUTPUT([ \
 	./src/MEDMEM_SWIG/Makefile \
 	./src/MEDSPLITTER/Makefile \
 	./src/MEDSPLITTER/Test/Makefile \
+	./src/MULTIPR/Makefile \
 	./src/MEDMEM_I/Makefile \
 	./src/MED/Makefile \
 	./src/MedCorba_Swig/Makefile \

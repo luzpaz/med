@@ -121,7 +121,7 @@ throw (SALOME::SALOME_Exception)
 		for (int i=0;i<nbfam;i++)
                 {
 			FAMILY_i * f1=new FAMILY_i(fam[i]);
-			myseq[i] = f1->POA_SALOME_MED::FAMILY::_this();
+			myseq[i] = f1->_this();
 		}
 	}
 	catch (MEDEXCEPTION &ex)
@@ -147,7 +147,7 @@ throw (SALOME::SALOME_Exception)
         {
 		FAMILY * fam=_group->getFamily(i);
 		FAMILY_i * f1=new FAMILY_i(fam);
-		return f1->POA_SALOME_MED::FAMILY::_this();
+		return f1->_this();
 	}
 	catch (MEDEXCEPTION &ex)
 	{

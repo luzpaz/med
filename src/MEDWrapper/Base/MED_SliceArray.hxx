@@ -45,12 +45,13 @@ namespace MED
     This class deal with constant pointer to the sources data and provide const method to
     read the them (data).
    */
-  template<class TContainer> 
+  template<class TValueType> 
   class TCSlice
   {
-    typedef const TContainer* PCContainer;
-    PCContainer myCContainer; //!< Reference to source multy-dimension data
+    const TValueType* myCValuePtr; //!< Reference to source multy-dimension data
+    size_t mySourceSize; //!< Size of the source multy-dimension data
     std::slice mySlice; //!< Defines algorithm of index calculation
+
   protected:
     void
     check_id(size_t theId) const
@@ -58,7 +59,7 @@ namespace MED
       long int anId = -1;
       if(theId < mySlice.size()){
 	anId = mySlice.start() + theId*mySlice.stride();
-	if(anId < myCContainer->size())
+	if(anId < mySourceSize)
 	  return;
       }
       throw std::out_of_range("TCSlice::check_id");
@@ -88,31 +89,41 @@ namespace MED
     }
 
   public:
-    typedef typename TContainer::value_type value_type;
+    typedef TValueType value_type;
 
-    //! Construct the class
-    TCSlice(const TContainer& theContainer,
+    //! Construct the class from bare pointer
+    TCSlice(const value_type* theValuePtr,
+	    size_t theSourceSize,
 	    const std::slice& theSlice): 
-      myCContainer(&theContainer),
+      myCValuePtr(theValuePtr),
+      mySourceSize(theSourceSize),
+      mySlice(theSlice)
+    {}
+    
+    //! Construct the class from corresponding container
+    TCSlice(const TVector<value_type>& theContainer,
+	    const std::slice& theSlice): 
+      myCValuePtr(&theContainer[0]),
+      mySourceSize(theContainer.size()),
       mySlice(theSlice)
     {}
     
     //! Default constructor (dangerous)
     TCSlice():
-      myCContainer(NULL)
+      myCValuePtr(NULL)
     {}
 
     //! Get element by its number (const version)
     const value_type& 
     operator[](size_t theId) const
     {
-      return (*myCContainer)[get_id(theId)];
+      return *(myCValuePtr + get_id(theId));
     }
     
     const value_type& 
     at(size_t theId) const
     {
-      return (*myCContainer)[get_id_at(theId)];
+      return *(myCValuePtr + get_id_at(theId));
     }
     
     //! Get range of the order numbers
@@ -126,40 +137,46 @@ namespace MED
 
   //---------------------------------------------------------------
   //! This class extend TCSlice functionality for non-constant case
-  template<class TContainer> 
-  class TSlice: public TCSlice<TContainer>
+  template<class TValueType> 
+  class TSlice: public TCSlice<TValueType>
   {
-    typedef TContainer* PContainer;
-    PContainer myContainer;
+    TValueType* myValuePtr;
     
   public:
-    typedef typename TContainer::value_type value_type;
-    typedef TCSlice<TContainer> TSupperClass;
+    typedef TValueType value_type;
+    typedef TCSlice<TValueType> TSupperClass;
 
-    //! Construct the class
-    TSlice(TContainer& theContainer,
+    //! Construct the class from bare pointer
+    TSlice(value_type* theValuePtr,
+	   size_t theSourceSize,
 	   const std::slice& theSlice): 
-      TSupperClass(theContainer,theSlice),
-      myContainer(&theContainer)
-    {
-    }
+      TSupperClass(theValuePtr, theSourceSize, theSlice),
+      myValuePtr(theValuePtr)
+    {}
+    
+    //! Construct the class from corresponding container
+    TSlice(TVector<value_type>& theContainer,
+	   const std::slice& theSlice): 
+      TSupperClass(theContainer, theSlice),
+      myValuePtr(&theContainer[0])
+    {}
     
     //! Default constructor (dangerous)
     TSlice():
-      myContainer(NULL)
+      myValuePtr(NULL)
     {}
 
     //! Get element by its number
     value_type& 
     operator[](size_t theId)
     {
-      return (*myContainer)[this->get_id(theId)];
+      return *(myValuePtr + this->get_id(theId));
     }
 
     value_type& 
     at(size_t theId)
     {
-      return (*myContainer)[this->get_id_at(theId)];
+      return *(myValuePtr + this->get_id_at(theId));
     }
   };
 

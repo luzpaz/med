@@ -83,9 +83,9 @@ namespace MED{
 
   typedef enum {eNO_PFLMOD, eGLOBAL, eCOMPACT}  EModeProfil; 
 
-  typedef enum {eGRILLE_CARTESIENNE,eGRILLE_POLAIRE,eGRILLE_STANDARD} EGrilleType;
+  typedef enum {eGRILLE_CARTESIENNE, eGRILLE_POLAIRE, eGRILLE_STANDARD} EGrilleType;
 
-  typedef enum {eCOOR, eCONN, eNOM, eNUM, eFAM,eCOOR_IND1,eCOOR_IND2,eCOOR_IND3} ETable;
+  typedef enum {eCOOR, eCONN, eNOM, eNUM, eFAM, eCOOR_IND1, eCOOR_IND2, eCOOR_IND3} ETable;
 
   typedef TVector<TFloat> TFloatVector;
   typedef TVector<std::string> TStringVector;
@@ -98,7 +98,8 @@ namespace MED{
   typedef std::set<EGeometrieElement> TGeomSet;
   typedef std::map<EEntiteMaillage,TGeomSet> TEntity2GeomSet;
 
-  MEDWRAPPER_EXPORT const TEntity2GeomSet& 
+  MEDWRAPPER_EXPORT 
+  const TEntity2GeomSet& 
   GetEntity2GeomSet();
 
   template<EVersion>
@@ -122,12 +123,14 @@ namespace MED{
   GetPNOMLength();
   
   template<EVersion>
-  MEDWRAPPER_EXPORT TInt
+  MEDWRAPPER_EXPORT
+  TInt
   GetNbConn(EGeometrieElement typmai,
 	    EEntiteMaillage typent,
 	    TInt mdim);
   
-  MEDWRAPPER_EXPORT TInt 
+  MEDWRAPPER_EXPORT
+  TInt 
   GetNbNodes(EGeometrieElement typmai);
 
   struct TNameInfo;
@@ -169,8 +172,8 @@ namespace MED{
   class TGrilleInfo;
   typedef SharedPtr<TGrilleInfo> PGrilleInfo;
 
-  struct TTimeStampVal;
-  typedef SharedPtr<TTimeStampVal> PTimeStampVal;
+  struct TTimeStampValueBase;
+  typedef SharedPtr<TTimeStampValueBase> PTimeStampValueBase;
 
   struct TWrapper;
   typedef SharedPtr<TWrapper> PWrapper;

@@ -42,9 +42,9 @@
 namespace MEDMEM {
 class SUPPORT;
 
-class MEDMEM_I_EXPORT SUPPORT_i: public POA_SALOME_MED::SUPPORT,
-		   public SALOMEMultiComm,
-		   public SALOME::GenericObj_i
+class MEDMEM_I_EXPORT SUPPORT_i: virtual public POA_SALOME_MED::SUPPORT,
+		   virtual public SALOMEMultiComm,
+		   virtual public SALOME::GenericObj_i
 {
 public :
     static std::map < int,::MEDMEM::SUPPORT *> supportMap;

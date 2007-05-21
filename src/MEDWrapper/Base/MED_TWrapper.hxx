@@ -39,7 +39,16 @@ namespace MED
   class TTWrapper: public TWrapper
   {
   public:
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
+    //! Gets version of the MED library used for the MED file
+    virtual 
+    EVersion
+    GetVersion()
+    {
+      return eVersion;
+    }
+    
+    //----------------------------------------------------------------------------
     virtual 
     PMeshInfo
     CrMeshInfo(TInt theDim = 0,
@@ -62,7 +71,7 @@ namespace MED
     }
     
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
     PFamilyInfo
     CrFamilyInfo(const PMeshInfo& theMeshInfo,
@@ -109,7 +118,7 @@ namespace MED
 			  theInfo));
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
     PElemInfo
     CrElemInfo(const PMeshInfo& theMeshInfo, 
@@ -140,7 +149,7 @@ namespace MED
 			aElemNames));
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
     PNodeInfo
     CrNodeInfo(const PMeshInfo& theMeshInfo, 
@@ -193,7 +202,7 @@ namespace MED
 			theInfo));
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
     PPolygoneInfo
     CrPolygoneInfo(const PMeshInfo& theMeshInfo, 
@@ -250,7 +259,7 @@ namespace MED
 			    theInfo));
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
     PPolyedreInfo
     CrPolyedreInfo(const PMeshInfo& theMeshInfo, 
@@ -311,7 +320,7 @@ namespace MED
 			    theInfo));
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
     PCellInfo
     CrCellInfo(const PMeshInfo& theMeshInfo, 
@@ -369,7 +378,7 @@ namespace MED
     }
     
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
     PFieldInfo
     CrFieldInfo(const PMeshInfo& theMeshInfo, 
@@ -399,7 +408,7 @@ namespace MED
     }
     
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
     PTimeStampInfo
     CrTimeStampInfo(const PFieldInfo& theFieldInfo, 
@@ -435,7 +444,7 @@ namespace MED
     }
 
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
     PGaussInfo
     CrGaussInfo(const TGaussInfo::TInfo& theInfo,
@@ -447,7 +456,7 @@ namespace MED
     }
     
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
     PProfileInfo
     CrProfileInfo(const TProfileInfo::TInfo& theInfo,
@@ -459,30 +468,45 @@ namespace MED
     }
     
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
-    PTimeStampVal
-    CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const TGeom2Profile& theGeom2Profile = TGeom2Profile(),
-		   EModeSwitch theMode = eFULL_INTERLACE)
+    PTimeStampValueBase
+    CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     ETypeChamp theTypeChamp,
+		     const TGeom2Profile& theGeom2Profile = TGeom2Profile(),
+		     EModeSwitch theMode = eFULL_INTERLACE)
     {
-      return PTimeStampVal(new TTTimeStampVal<eVersion>
-			   (theTimeStampInfo,
-			    theGeom2Profile,
-			    theMode));
+      if(theTypeChamp == eFLOAT64)
+	return PTimeStampValueBase(new TTTimeStampValue<eVersion, TFloatMeshValue>
+				   (theTimeStampInfo,
+				    theTypeChamp,
+				    theGeom2Profile,
+				    theMode));
+      return PTimeStampValueBase(new TTTimeStampValue<eVersion, TIntMeshValue>
+				 (theTimeStampInfo,
+				  theTypeChamp,
+				  theGeom2Profile,
+				  theMode));
     }
 
     virtual
-    PTimeStampVal
-    CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const PTimeStampVal& theInfo)
+    PTimeStampValueBase
+    CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const PTimeStampValueBase& theInfo,
+		     ETypeChamp theTypeChamp)
     {
-      return PTimeStampVal(new TTTimeStampVal<eVersion>
-			   (theTimeStampInfo,
-			    theInfo));
+      if(theTypeChamp == eFLOAT64)
+	return PTimeStampValueBase(new TTTimeStampValue<eVersion, TFloatMeshValue>
+				   (theTimeStampInfo,
+				    theInfo,
+				    theTypeChamp));
+      return PTimeStampValueBase(new TTTimeStampValue<eVersion, TIntMeshValue>
+				 (theTimeStampInfo,
+				  theInfo,
+				  theTypeChamp));
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     virtual
     PGrilleInfo
     CrGrilleInfo(const PMeshInfo& theMeshInfo,
@@ -525,7 +549,7 @@ namespace MED
 			     type,
 			     nbNodeVec));
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
   };
 
 }

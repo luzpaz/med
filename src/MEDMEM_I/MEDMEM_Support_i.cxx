@@ -265,7 +265,7 @@ throw (SALOME::SALOME_Exception)
 		SCRUTE(mesh) ;
 
 		MESH_i * m1 = new MESH_i(mesh);
-		SALOME_MED::MESH_ptr m2 = m1->POA_SALOME_MED::MESH::_this();
+		SALOME_MED::MESH_ptr m2 = m1->_this();
 		MESSAGE("SALOME_MED::MESH_ptr SUPPORT_i::getMesh() checking des pointeurs CORBA");
 
 		SCRUTE(m1);
@@ -477,12 +477,8 @@ throw (SALOME::SALOME_Exception)
 SCRUTE(_support->getName());
 SCRUTE(nbelements);
 SCRUTE(convertIdlEltToMedElt(geomElement));
-#ifndef WNT
                 const int * numbers=_support->getNumberFromFile(convertIdlEltToMedElt(geomElement));
-#else
-                const int * numbers=(const int *)getNumberFromFile(geomElement);
-#endif
-				for (int i=0;i<nbelements;i++)
+                for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
 SCRUTE(numbers[i]);

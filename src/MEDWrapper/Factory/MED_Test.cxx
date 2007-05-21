@@ -52,14 +52,14 @@ void CheckMed(const std::string& theFileName)
 
     TKey2Gauss aKey2Gauss = GetKey2Gauss(aMed);
     TMKey2Profile aMKey2Profile = GetMKey2Profile(aMed);
-    INITMSG(MYDEBUG,"aMed->GetNbProfiles() = "<<aMed->GetNbProfiles()<<endl);
+    INITMSG(MYDEBUG,"aMed->GetNbProfiles() = "<<aMed->GetNbProfiles()<<std::endl);
 
     TInt aNbMeshes = aMed->GetNbMeshes();
-    BEGMSG(MYDEBUG,"GetNbMeshes() = "<<aNbMeshes<<endl);
+    BEGMSG(MYDEBUG,"GetNbMeshes() = "<<aNbMeshes<<std::endl);
     for(TInt iMesh = 1; iMesh <= aNbMeshes; iMesh++){
       
       PMeshInfo aMeshInfo = aMed->GetPMeshInfo(iMesh);
-      INITMSG(MYDEBUG,"aMeshInfo->GetName() = '"<<aMeshInfo->GetName()<<"'"<<endl);
+      INITMSG(MYDEBUG,"aMeshInfo->GetName() = '"<<aMeshInfo->GetName()<<"'"<<std::endl);
 
       TEntityInfo aEntityInfo = aMed->GetEntityInfo(aMeshInfo);
       
@@ -84,7 +84,7 @@ void CheckMed(const std::string& theFileName)
 		  "- aName = '"<<aFieldInfo->GetName()<<"'"<<
 		  "; aType = "<<aFieldInfo->GetType()<<
 		  "; aNbComp = "<<aFieldInfo->GetNbComp()<<
-		  endl);
+		  std::endl);
 	  const TTimeStampInfoSet& aTimeStampInfoSet = aFieldInfo2TimeStampInfoSetIter->second;
 	  TTimeStampInfoSet::const_iterator aTimeStampInfoSettIter = aTimeStampInfoSet.begin();
 	  for(; aTimeStampInfoSettIter != aTimeStampInfoSet.end(); aTimeStampInfoSettIter++){
@@ -93,10 +93,11 @@ void CheckMed(const std::string& theFileName)
 		    "GetPTimeStampInfo "<<
 		    "- anEntity = "<<aTimeStampInfo->GetEntity()<<
 		    "; aNumDt = "<<aTimeStampInfo->GetNumDt()<<
-		    endl);
-	    PTimeStampVal aTimeStampVal = aMed->GetPTimeStampVal(aTimeStampInfo,
-								 aMKey2Profile,
-								 aKey2Gauss);
+		    std::endl);
+	    PTimeStampValueBase aTimeStampValue = 
+	      aMed->GetPTimeStampValue(aTimeStampInfo,
+				       aMKey2Profile,
+				       aKey2Gauss);
 	  }
 	}
       }
@@ -187,7 +188,7 @@ void CopyMed(const PWrapper& theMed,
       TInt aNbTimeStamps = 
 	theMed->GetNbTimeStamps(aFieldInfo,aEntityInfo,anEntity,aGeom2Size);
       {
-	INITMSG(MYDEBUG,"GetNbTimeStamps = "<<aNbTimeStamps<<endl);
+	INITMSG(MYDEBUG,"GetNbTimeStamps = "<<aNbTimeStamps<<std::endl);
 	for(TInt iTimeStamp = 0; iTimeStamp < aNbTimeStamps; iTimeStamp++){
 	  PTimeStampInfo aTimeStampInfo = 
 	  theMed->GetPTimeStampInfo(aFieldInfo,anEntity,aGeom2Size,iTimeStamp+1);
@@ -197,14 +198,16 @@ void CopyMed(const PWrapper& theMed,
 	  PTimeStampInfo aTimeStampInfo2 = 
 	    theMed->CrTimeStampInfo(aFieldInfo2,aTimeStampInfo);
 	  
-	  PTimeStampVal aTimeStampVal = theMed->GetPTimeStampVal(aTimeStampInfo,
-								 aMKey2Profile,
-								 aKey2Gauss);
+	  PTimeStampValueBase aTimeStampValue = 
+	    theMed->GetPTimeStampValue(aTimeStampInfo,
+				       aMKey2Profile,
+				       aKey2Gauss);
 	  
-	  PTimeStampVal aTimeStampVal2 = theMed->CrTimeStampVal(aTimeStampInfo2,
-								aTimeStampVal);
+	  PTimeStampValueBase aTimeStampValue2 = 
+	    theMed->CrTimeStampValue(aTimeStampInfo2,
+				     aTimeStampValue);
 	  
-	  if(MYWRITEDEBUG) theMed2->SetTimeStamp(aTimeStampVal2);
+	  if(MYWRITEDEBUG) theMed2->SetTimeStamp(aTimeStampValue2);
 	}
       }
     }
@@ -235,7 +238,7 @@ void CopyMed(const PWrapper& theMed,
 	aName[0] += theIncr;
 	aFamilyInfo2->SetName(aName);
 	theMed2->SetFamilyInfo(aFamilyInfo2);
-	INITMSG(MYDEBUG,"GetNbFamilies = "<<theMed2->GetNbFamilies(aMeshInfo2)<<endl);
+	INITMSG(MYDEBUG,"GetNbFamilies = "<<theMed2->GetNbFamilies(aMeshInfo2)<<std::endl);
       }
     }
 

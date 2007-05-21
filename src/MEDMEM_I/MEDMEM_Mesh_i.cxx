@@ -1006,7 +1006,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbfam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(fam[i]);
-                        myseq[i] = f1->POA_SALOME_MED::FAMILY::_this();
+                        myseq[i] = f1->_this();
                 }
         }
         catch (MEDEXCEPTION &ex)
@@ -1119,7 +1119,7 @@ throw (SALOME::SALOME_Exception)
         {
                 const FAMILY * fam = _mesh->getFamily(convertIdlEntToMedEnt(entity),i);
                 FAMILY_i * f1=new FAMILY_i(fam);
-	        return f1->POA_SALOME_MED::FAMILY::_this();
+	        return f1->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1155,7 +1155,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vNode[i]);
-                        all->famNode[i] = f1->POA_SALOME_MED::FAMILY::_this();
+                        all->famNode[i] = f1->_this();
                 }
 
                 nbFam = _mesh->getNumberOfFamilies(MED_EDGE);
@@ -1166,7 +1166,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vEdge[i]);
-                        all->famEdge[i] = f1->POA_SALOME_MED::FAMILY::_this();
+                        all->famEdge[i] = f1->_this();
                 }
 
                 nbFam = _mesh->getNumberOfFamilies(MED_FACE);
@@ -1176,7 +1176,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vFace[i]);
-                        all->famFace[i] = f1->POA_SALOME_MED::FAMILY::_this();
+                        all->famFace[i] = f1->_this();
                 }
 
                 nbFam = _mesh->getNumberOfFamilies(MED_CELL);
@@ -1186,7 +1186,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vCell[i]);
-                        all->famCell[i] = f1->POA_SALOME_MED::FAMILY::_this();
+                        all->famCell[i] = f1->_this();
                 }
 
                 int nbGroup = _mesh->getNumberOfGroups(MED_NODE);
@@ -1196,7 +1196,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gNode[i]);
-                        all->groupNode[i] = f1->POA_SALOME_MED::GROUP::_this();
+                        all->groupNode[i] = f1->_this();
                 }
 
                 nbGroup = _mesh->getNumberOfGroups(MED_EDGE);
@@ -1206,7 +1206,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gEdge[i]);
-                        all->groupEdge[i] = f1->POA_SALOME_MED::GROUP::_this();
+                        all->groupEdge[i] = f1->_this();
                 }
                 nbGroup = _mesh->getNumberOfGroups(MED_FACE);
                 all->groupFace.length(nbGroup);
@@ -1215,7 +1215,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gFace[i]);
-                        all->groupFace[i] = f1->POA_SALOME_MED::GROUP::_this();
+                        all->groupFace[i] = f1->_this();
                 }
 
                 nbGroup = _mesh->getNumberOfGroups(MED_CELL);
@@ -1225,7 +1225,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gCell[i]);
-                        all->groupCell[i] = f1->POA_SALOME_MED::GROUP::_this();
+                        all->groupCell[i] = f1->_this();
                 }
 
         }
@@ -1257,7 +1257,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbgroups;i++)
                 {
                 	GROUP_i * f1=new GROUP_i(groups[i]);
-                        myseq[i] = f1->POA_SALOME_MED::GROUP::_this();
+                        myseq[i] = f1->_this();
                 }
         }
         catch (MEDEXCEPTION &ex)
@@ -1283,7 +1283,7 @@ throw (SALOME::SALOME_Exception)
         {
                 const GROUP * grou = _mesh->getGroup(convertIdlEntToMedEnt(entity),i);
                 GROUP_i * f1=new GROUP_i(grou);
-	        return f1->POA_SALOME_MED::GROUP::_this();
+	        return f1->_this();
         }
         catch (MEDEXCEPTION &ex)
         {

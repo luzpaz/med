@@ -100,21 +100,28 @@ TInt
 TElemInfo
 ::GetFamNum(TInt theId) const 
 {
-  return myFamNum[theId];
+  return (*myFamNum)[theId];
+}
+
+void
+TElemInfo
+::SetFamNum(TInt theId, TInt theVal) 
+{
+  (*myFamNum)[theId] = theVal;
 }
 
 TInt
 TElemInfo
 ::GetElemNum(TInt theId) const 
 {
-  return myElemNum[theId];
+  return (*myElemNum)[theId];
 }
 
 void
 TElemInfo
-::SetFamNum(TInt theId,TInt theVal) 
+::SetElemNum(TInt theId, TInt theVal) 
 {
-  myFamNum[theId] = theVal;
+  (*myElemNum)[theId] = theVal;
 }
 
 //---------------------------------------------------------------
@@ -124,9 +131,9 @@ TNodeInfo
 {
   TInt aDim = myMeshInfo->GetDim();
   if(GetModeSwitch() == eFULL_INTERLACE)
-    return TCCoordSlice(myCoord,std::slice(theId*aDim,aDim,1));
+    return TCCoordSlice(*myCoord, std::slice(theId*aDim, aDim, 1));
   else
-    return TCCoordSlice(myCoord,std::slice(theId,aDim,aDim));
+    return TCCoordSlice(*myCoord, std::slice(theId, aDim, aDim));
 }
 
 TCoordSlice 
@@ -135,9 +142,9 @@ TNodeInfo
 {
   TInt aDim = myMeshInfo->GetDim();
   if(GetModeSwitch() == eFULL_INTERLACE)
-    return TCoordSlice(myCoord,std::slice(theId*aDim,aDim,1));
+    return TCoordSlice(*myCoord, std::slice(theId*aDim,aDim,1));
   else
-    return TCoordSlice(myCoord,std::slice(theId,aDim,aDim));
+    return TCoordSlice(*myCoord, std::slice(theId,aDim,aDim));
 }
 
 //---------------------------------------------------------------
@@ -146,9 +153,9 @@ TCellInfo
 ::GetConnSlice(TInt theElemId) const
 {
   if(GetModeSwitch() == eFULL_INTERLACE)
-    return TCConnSlice(myConn,std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
+    return TCConnSlice(*myConn, std::slice(GetConnDim()*theElemId, GetNbNodes(myGeom), 1));
   else
-    return TCConnSlice(myConn,std::slice(theElemId,GetNbNodes(myGeom),GetConnDim()));
+    return TCConnSlice(*myConn, std::slice(theElemId, GetNbNodes(myGeom), GetConnDim()));
 }
 
 TConnSlice 
@@ -156,9 +163,9 @@ TCellInfo
 ::GetConnSlice(TInt theElemId)
 {
   if(GetModeSwitch() == eFULL_INTERLACE)
-    return TConnSlice(myConn,std::slice(GetConnDim()*theElemId,GetNbNodes(myGeom),1));
+    return TConnSlice(*myConn, std::slice(GetConnDim()*theElemId, GetNbNodes(myGeom), 1));
   else
-    return TConnSlice(myConn,std::slice(theElemId,GetNbNodes(myGeom),GetConnDim()));
+    return TConnSlice(*myConn, std::slice(theElemId, GetNbNodes(myGeom), GetConnDim()));
 }
 
 
@@ -167,21 +174,21 @@ TInt
 TPolygoneInfo
 ::GetNbConn(TInt theElemId) const 
 {
-  return myIndex[theElemId + 1] - myIndex[theElemId];
+  return (*myIndex)[theElemId + 1] - (*myIndex)[theElemId];
 }
 
 TCConnSlice 
 TPolygoneInfo
 ::GetConnSlice(TInt theElemId) const
 {
-  return TCConnSlice(myConn,std::slice(myIndex[theElemId]-1,GetNbConn(theElemId),1));
+  return TCConnSlice(*myConn, std::slice((*myIndex)[theElemId] - 1, GetNbConn(theElemId), 1));
 }
 
 TConnSlice 
 TPolygoneInfo
 ::GetConnSlice(TInt theElemId)
 {
-  return TConnSlice(myConn,std::slice(myIndex[theElemId]-1,GetNbConn(theElemId),1));
+  return TConnSlice(*myConn, std::slice((*myIndex)[theElemId] - 1, GetNbConn(theElemId), 1));
 }
 
 
@@ -190,7 +197,7 @@ TInt
 TPolyedreInfo
 ::GetNbFaces(TInt theElemId) const 
 {
-  return myIndex[theElemId+1] - myIndex[theElemId];
+  return (*myIndex)[theElemId+1] - (*myIndex)[theElemId];
 }
 
 TInt 
@@ -199,10 +206,10 @@ TPolyedreInfo
 {
   TInt aNbNodes = 0;
   TInt aNbFaces = GetNbFaces(theElemId);
-  TInt aStartFaceId = myIndex[theElemId] - 1;
+  TInt aStartFaceId = (*myIndex)[theElemId] - 1;
   for(TInt aFaceId = 0; aFaceId < aNbFaces; aFaceId++, aStartFaceId++){
-    TInt aCurrentId = myFaces[aStartFaceId];
-    TInt aDiff = myFaces[aStartFaceId + 1] - aCurrentId;
+    TInt aCurrentId = (*myFaces)[aStartFaceId];
+    TInt aDiff = (*myFaces)[aStartFaceId + 1] - aCurrentId;
     aNbNodes += aDiff;
   }
   return aNbNodes;
@@ -214,12 +221,12 @@ TPolyedreInfo
 {
   TInt aNbFaces = GetNbFaces(theElemId);
   TCConnSliceArr aConnSliceArr(aNbFaces);
-  TInt aStartFaceId = myIndex[theElemId] - 1;
+  TInt aStartFaceId = (*myIndex)[theElemId] - 1;
   for(TInt aFaceId = 0; aFaceId < aNbFaces; aFaceId++, aStartFaceId++){
-    TInt aCurrentId = myFaces[aStartFaceId];
-    TInt aDiff = myFaces[aStartFaceId + 1] - aCurrentId;
+    TInt aCurrentId = (*myFaces)[aStartFaceId];
+    TInt aDiff = (*myFaces)[aStartFaceId + 1] - aCurrentId;
     aConnSliceArr[aFaceId] =
-      TCConnSlice(myConn,std::slice(aCurrentId - 1,aDiff,1));
+      TCConnSlice(*myConn, std::slice(aCurrentId - 1, aDiff, 1));
   }
   return aConnSliceArr;
 }
@@ -230,14 +237,68 @@ TPolyedreInfo
 {
   TInt aNbFaces = GetNbFaces(theElemId);
   TConnSliceArr aConnSliceArr(aNbFaces);
-  TInt aStartFaceId = myIndex[theElemId] - 1;
+  TInt aStartFaceId = (*myIndex)[theElemId] - 1;
   for(TInt aFaceId = 0; aFaceId < aNbFaces; aFaceId++, aStartFaceId++){
-    TInt aCurrentId = myFaces[aStartFaceId];
-    TInt aDiff = myFaces[aStartFaceId + 1] - aCurrentId;
+    TInt aCurrentId = (*myFaces)[aStartFaceId];
+    TInt aDiff = (*myFaces)[aStartFaceId + 1] - aCurrentId;
     aConnSliceArr[aFaceId] =
-      TConnSlice(myConn,std::slice(aCurrentId - 1,aDiff,1));
+      TConnSlice(*myConn, std::slice(aCurrentId - 1, aDiff, 1));
   }
   return aConnSliceArr;
+}
+
+
+//---------------------------------------------------------------
+TMeshValueBase
+::TMeshValueBase():
+  myNbElem(0),
+  myNbComp(0),
+  myNbGauss(0),
+  myStep(0)
+{}
+
+void
+TMeshValueBase
+::Allocate(TInt theNbElem,
+	   TInt theNbGauss,
+	   TInt theNbComp,
+	   EModeSwitch theMode)
+{
+  myModeSwitch = theMode;
+  
+  myNbElem = theNbElem;
+  myNbGauss = theNbGauss;
+  myNbComp = theNbComp;
+  
+  myStep = theNbComp*theNbGauss;
+}
+
+size_t
+TMeshValueBase
+::GetSize() const
+{
+  return myNbElem * myStep;
+}
+    
+size_t
+TMeshValueBase
+::GetNbVal() const
+{
+  return myNbElem * myNbGauss;
+}
+
+size_t
+TMeshValueBase
+::GetNbGauss() const
+{
+  return myNbGauss;
+}
+
+size_t
+TMeshValueBase
+::GetStep() const
+{
+  return myStep;
 }
 
 
@@ -246,14 +307,14 @@ TInt
 TProfileInfo
 ::GetElemNum(TInt theId) const 
 {
-  return myElemNum[theId];
+  return (*myElemNum)[theId];
 }
 
 void
 TProfileInfo
 ::SetElemNum(TInt theId,TInt theVal) 
 {
-  myElemNum[theId] = theVal;
+  (*myElemNum)[theId] = theVal;
 }
 
 //---------------------------------------------------------------
@@ -345,137 +406,6 @@ TTimeStampInfo
 
 
 //---------------------------------------------------------------
-void
-TMeshValue
-::Init(TInt theNbElem,
-       TInt theNbGauss,
-       TInt theNbComp,
-       EModeSwitch theMode)
-{
-  myModeSwitch = theMode;
-  
-  myNbElem = theNbElem;
-  myNbGauss = theNbGauss;
-  myNbComp = theNbComp;
-  
-  myStep = theNbComp*theNbGauss;
-  
-  myValue.resize(theNbElem*myStep);
-}
-
-//---------------------------------------------------------------
-TCValueSliceArr 
-TMeshValue
-::GetGaussValueSliceArr(TInt theElemId) const
-{
-  TCValueSliceArr aValueSliceArr(myNbGauss);
-  if(GetModeSwitch() == eFULL_INTERLACE){
-    TInt anId = theElemId*myStep;
-    for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-      aValueSliceArr[aGaussId] =
-	TCValueSlice(myValue,std::slice(anId,myNbComp,1));
-      anId += myNbComp;
-    }
-  }
-  else{
-    for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-      aValueSliceArr[aGaussId] =
-	TCValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
-    }
-  }
-  return aValueSliceArr;
-}
-
-TValueSliceArr 
-TMeshValue
-::GetGaussValueSliceArr(TInt theElemId)
-{
-  TValueSliceArr aValueSliceArr(myNbGauss);
-  if(GetModeSwitch() == eFULL_INTERLACE){
-    TInt anId = theElemId*myStep;
-    for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-      aValueSliceArr[aGaussId] =
-	TValueSlice(myValue,std::slice(anId,myNbComp,1));
-      anId += myNbComp;
-    }
-  }
-  else{
-    for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-      aValueSliceArr[aGaussId] =
-	TValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
-    }
-  }
-  return aValueSliceArr;
-}
-
-//---------------------------------------------------------------
-TCValueSliceArr 
-TMeshValue
-::GetCompValueSliceArr(TInt theElemId) const
-{
-  TCValueSliceArr aValueSliceArr(myNbComp);
-  if(GetModeSwitch() == eFULL_INTERLACE){
-    TInt anId = theElemId*myStep;
-    for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
-      aValueSliceArr[aCompId] =
-	TCValueSlice(myValue,std::slice(anId,myNbGauss,myNbComp));
-      anId += 1;
-    }
-  }
-  else{
-    for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
-      aValueSliceArr[aCompId] =
-	TCValueSlice(myValue,std::slice(theElemId,myNbGauss,myStep));
-    }
-  }
-  return aValueSliceArr;
-}
-
-
-TValueSliceArr 
-TMeshValue
-::GetCompValueSliceArr(TInt theElemId)
-{
-  if(GetModeSwitch() == eFULL_INTERLACE){
-    TValueSliceArr aValueSliceArr(myNbComp);
-    TInt anId = theElemId*myStep;
-    for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
-      aValueSliceArr[aCompId] =
-	TValueSlice(myValue,std::slice(anId,myNbGauss,myNbComp));
-      anId += 1;
-    }
-    return aValueSliceArr;
-  }
-  else{
-    TValueSliceArr aValueSliceArr(myNbGauss);
-    for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-      aValueSliceArr[aGaussId] =
-	TValueSlice(myValue,std::slice(theElemId,myNbComp,myStep));
-    }
-    return aValueSliceArr;
-  }
-}
-
-
-//---------------------------------------------------------------
-const TMeshValue& 
-TTimeStampVal
-::GetMeshValue(EGeometrieElement theGeom) const
-{
-  TGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
-  if(anIter == myGeom2Value.end())
-    EXCEPTION(runtime_error,"TTimeStampVal::GetMeshValue - myGeom2Value.find(theGeom) fails");
-  return anIter->second;
-}
-
-TMeshValue& 
-TTimeStampVal
-::GetMeshValue(EGeometrieElement theGeom)
-{
-  return myGeom2Value[theGeom];
-}
-
-//---------------------------------------------------------------
 // TGrilleInfo structure methods
 //---------------------------------------------------------------
 const EGrilleType&
@@ -507,7 +437,7 @@ TGrilleInfo
   return myIndixes;
 }
 
-TIndexes
+TIndexes&
 TGrilleInfo
 ::GetMapOfIndexes()
 {
@@ -521,17 +451,17 @@ TGrilleInfo
 {
   TIndexes::const_iterator aIter=myIndixes.find(theAxisNumber);
   if(aIter==myIndixes.end())
-    EXCEPTION(runtime_error,"const TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber); fails");
+    EXCEPTION(std::runtime_error, "const TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber); fails");
   return aIter->second;
 }
 
-TFloatVector
+TFloatVector&
 TGrilleInfo
 ::GetIndexes(TInt theAxisNumber)
 {
   TIndexes::iterator aIter=myIndixes.find(theAxisNumber);
   if(aIter==myIndixes.end())
-    EXCEPTION(runtime_error,"TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber="<<theAxisNumber<<"); fails");
+    EXCEPTION(std::runtime_error, "TGrilleInfo::GetIndexes - myIndixes.find(theAxisNumber="<<theAxisNumber<<"); fails");
   return aIter->second;
 }
 
@@ -641,7 +571,7 @@ TGrilleInfo
   return myCoord;
 }
 
-TNodeCoord
+TNodeCoord&
 TGrilleInfo
 ::GetNodeCoord()
 {
@@ -658,7 +588,7 @@ TGrilleInfo
   aCoord.resize(aDim);
   
   if(theId >= aNbNodes)
-    EXCEPTION(runtime_error,"TGrilleInfo::GetCoord - theId out of range");
+    EXCEPTION(std::runtime_error, "TGrilleInfo::GetCoord - theId out of range");
 
   if(myGrilleType == eGRILLE_STANDARD){
     switch(aDim){
