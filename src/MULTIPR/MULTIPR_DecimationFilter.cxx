@@ -115,7 +115,7 @@ Mesh* DecimationFilterGradAvg::apply(Mesh* pMesh, const char* pArgv, const char*
     //---------------------------------------------------------------------
     // Collects elements of the mesh to be kept
     //---------------------------------------------------------------------
-    set<int> elementsToKeep;
+    set<med_int> elementsToKeep;
     
     int numElements = pMesh->getNumberOfElements();
     int numGaussPointsByElt = points.size() / numElements; // for a TETRA10, should be 5 for a field of elements and 10 for a field of nodes
@@ -159,7 +159,7 @@ Mesh* DecimationFilterGradAvg::apply(Mesh* pMesh, const char* pArgv, const char*
         if (keepElement)
         {
             // add index of the element to keep (index must start at 1)
-            elementsToKeep.insert(itElt + 1);
+            elementsToKeep.insert(med_int(itElt + 1));
         }
     }
 
