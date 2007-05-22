@@ -78,10 +78,11 @@ MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topolog
 			//creating the new mesh
 			MEDMEM::MESHING* mesh_builder=new MEDMEM::MESHING;
 			m_mesh[idomain]= static_cast<MEDMEM::MESH*> (mesh_builder);
-			ostringstream osname;
-			osname << mesh_name<<"_"<<idomain+1;
-			mesh_builder->setName(osname.str());
-		
+			//ostringstream osname;
+			//osname << mesh_name<<"_"<<idomain+1;
+			//mesh_builder->setName(osname.str());
+			mesh_builder->setName(mesh_name);
+
 			createNodalConnectivity(initial_collection,idomain, MED_EN::MED_CELL);
 			mesh_builder->setMeshDimension(initial_collection.getMeshDimension());
 			mesh_builder->setSpaceDimension(initial_collection.getSpaceDimension());
