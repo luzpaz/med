@@ -188,7 +188,7 @@ vector<string> multipr::getListMeshes(const char* pMEDfilename)
     {
         char meshName[MED_TAILLE_NOM + 1];
         
-        int meshDim;
+        med_int meshDim;
         med_maillage meshType;
         char meshDesc[MED_TAILLE_DESC + 1]; 
         
