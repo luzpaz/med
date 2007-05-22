@@ -56,7 +56,7 @@ MULTIPR_DecimationAccel.cxx \
 MULTIPR_Utils.cxx \
 MULTIPR_Obj.cxx
 
-libMULTIPR_API_la_CPPFLAGS= $(MED2_INCLUDES) @CXXTMPDPTHFLAGS@ -Wall -pthread \
+libMULTIPR_API_la_CPPFLAGS= $(MED2_INCLUDES) @CXXTMPDPTHFLAGS@ -Wall -pthread $(BOOST_CPPFLAGS) \
 	-I$(srcdir)/../MEDWrapper/Factory \
 	-I$(srcdir)/../MEDWrapper/Base \
 	-I$(srcdir)/../MEDMEM \
@@ -80,7 +80,7 @@ bin_PROGRAMS= multipr
 dist_multipr_SOURCES= multipr.cxx
 
 multipr_CPPFLAGS= $(libMULTIPR_API_la_CPPFLAGS)
-multipr_LDADD= $(libMULTIPR_API_la_LDFLAGS) \
+multipr_LDADD= $(libMULTIPR_API_la_LDFLAGS) $(BOOST_LIBS) \
 	../MEDWrapper/V2_1/Core/libmed_V2_1.la \
 	../MEDWrapper/V2_1/Wrapper/libMEDWrapper_V2_1.la \
 	../MEDWrapper/V2_2/libMEDWrapper_V2_2.la \
