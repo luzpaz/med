@@ -148,6 +148,7 @@ public :
 	const string & meshName="") throw (MEDEXCEPTION);
   virtual ~MESH();
   friend ostream & operator<<(ostream &os, const MESH &my);
+  virtual void printMySelf(ostream &os) const;
 
   int  addDriver(driverTypes driverType,
 		 const string & fileName  ="Default File Name.med",

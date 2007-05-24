@@ -397,8 +397,17 @@ bool MESH::deepCompare(const MESH& other) const
   return ret;
 }
 
+/*!
+ * \brief print my contents
+ */
 ostream & ::MEDMEM::operator<<(ostream &os, const MESH &myMesh)
 {
+  myMesh.printMySelf(os);
+  return os;
+}
+void MESH::printMySelf(ostream &os) const
+{
+  const MESH &myMesh = *this;
   int spacedimension = myMesh.getSpaceDimension();
   int meshdimension  = myMesh.getMeshDimension();
   int numberofnodes  = myMesh.getNumberOfNodes();
@@ -465,8 +474,6 @@ ostream & ::MEDMEM::operator<<(ostream &os, const MESH &myMesh)
 	  os << * myMesh.getGroup(entity,i) << endl;
 	}
     }
-
-  return os;
 }
 
 /*!
