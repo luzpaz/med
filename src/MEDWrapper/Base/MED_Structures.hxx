@@ -868,9 +868,15 @@ namespace MED
   typedef TTimeStampValue<TFloatMeshValue> TFloatTimeStampValue;
   typedef SharedPtr<TFloatTimeStampValue> PFloatTimeStampValue;
 
+  PFloatTimeStampValue
+  CastToFloatTimeStampValue(const PTimeStampValueBase& theTimeStampValue);
+
   typedef TTimeStampValue<TIntMeshValue> TIntTimeStampValue;
   typedef SharedPtr<TIntTimeStampValue> PIntTimeStampValue;
   
+  PIntTimeStampValue
+  CastToIntTimeStampValue(const PTimeStampValueBase& theTimeStampValue);
+
 
   //---------------------------------------------------------------
   template<class TMeshValueTypeFrom, class TMeshValueTypeTo>

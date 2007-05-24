@@ -64,6 +64,18 @@ namespace MED
     return (theGeom%100);
   }
 
+  //---------------------------------------------------------------
+  PFloatTimeStampValue
+  CastToFloatTimeStampValue(const PTimeStampValueBase& theTimeStampValue)
+  {
+    return theTimeStampValue;
+  }
+
+  PIntTimeStampValue
+  CastToIntTimeStampValue(const PTimeStampValueBase& theTimeStampValue)
+  {
+    return theTimeStampValue;
+  }
 }
 
 //---------------------------------------------------------------
