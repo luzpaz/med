@@ -485,9 +485,8 @@ MESH   * MED::getMesh           (const FIELD_ * const field ) const
                                      )
                           );   
   
-  return (*itMeshes).second;
-  
   END_OF(LOC);
+  return (*itMeshes).second;
 };
 
 
