@@ -26,7 +26,7 @@
 #ifndef WNT
   #include <libgen.h>
 #endif
-static std::string getBaseName( std::string dataname ) {
+inline std::string getBaseName( std::string dataname ) {
   std::string aBaseName = "";
 #ifndef WNT
   aBaseName = basename((char*)dataname.c_str());
@@ -41,7 +41,7 @@ static std::string getBaseName( std::string dataname ) {
   return aBaseName;
 }
 
-static std::string getDirName( std::string dataname ) {
+inline std::string getDirName( std::string dataname ) {
   std::string aDirName = "";
 #ifndef WNT
   aDirName = dirname((char*)dataname.c_str());

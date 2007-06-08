@@ -672,7 +672,7 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
   vector<double> var ;
 
   char ligne[80]; 
-  int number_of_geom ;
+  //int number_of_geom ;
   string geom_namefile ;
 //   vector<string> field_namefile ;
   string field_namefile ;

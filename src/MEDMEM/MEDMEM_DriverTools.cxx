@@ -155,7 +155,7 @@ void MEDMEM::_fieldBase::dump(std::ostream& os) const
     "  type: " << _type << endl;
   os << "  subcomponents:" << endl;
   vector< _sub_data >::const_iterator sub_data = _sub.begin();
-  for ( int i_sub = 1; sub_data != _sub.end(); ++sub_data, i_sub ) {
+  for ( ; sub_data != _sub.end(); ++sub_data ) {
     os << "    group index: " << sub_data->_supp_id <<
       ", " << sub_data->nbComponents() << " comp names: ";
     for ( int i_comp = 0; i_comp < sub_data->nbComponents(); ++i_comp )

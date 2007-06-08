@@ -685,7 +685,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() {
   vector< vector <int> > total_conn ;
   vector<double> var ;
 
-  int number_of_geom ;
+  //int number_of_geom ;
   string geom_namefile ;
   string field_namefile ;
   string mot_lu ;
