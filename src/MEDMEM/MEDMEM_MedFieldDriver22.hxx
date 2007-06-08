@@ -1061,8 +1061,8 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   // du SUPPORT
   int profilSizeC = 0;
   vector < int   >        profilSize    (NumberOfTypes,0);
-  vector < vector<MED_EN::med_int>  > profilList    (NumberOfTypes);      // IPAL13481
-  vector < vector<MED_EN::med_int>  > profilListFromFile (NumberOfTypes); // IPAL13481
+  vector < vector<med_2_2::med_int>  > profilList    (NumberOfTypes);      // IPAL13481
+  vector < vector<med_2_2::med_int>  > profilListFromFile (NumberOfTypes); // IPAL13481
   vector < string >       profilNameList(NumberOfTypes);
   char * profilName = new char[MED_TAILLE_NOM+1];
 
@@ -1623,7 +1623,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
       // différents et est défini sur tous les éléments d'un type géométrique
       // mais pas de l'autre, il existe tout de même des profils sur les deux types géométriques.
       // Ce n'est pas le cas en MEDFICHIER.
-      vector<MED_EN::med_int/*int*/> profil(&number[index-1],&(number[index-1])+numberOfElements);
+      vector<med_2_2::med_int> profil(&number[index-1],&(number[index-1])+numberOfElements);
 
       // Trouve l'index du type géométrique dans la liste des types géométriques du maillage
       // correspondant au type géométrique du champ en cours de traitement

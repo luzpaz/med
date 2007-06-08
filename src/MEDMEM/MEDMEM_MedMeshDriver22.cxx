@@ -340,7 +340,7 @@ void MED_MESH_RDONLY_DRIVER22::getGRID()
   if (gridType == MED_EN::MED_BODY_FITTED)
     {
 //CCRT      int * structure = new int[MeshDimension];
-      med_int * structure = new med_int[MeshDimension];
+      med_2_2::med_int * structure = new med_2_2::med_int[MeshDimension];
 
       err = med_2_2::MEDstructureCoordLire(_medIdt,
 					  const_cast <char *>
@@ -865,7 +865,7 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	{
 	  // if MED version < 2.2.x, we read only entity with dimention = Connectivity->_entityDimension. Lesser dimension are face or edge !
 
-      med_int major, minor, release;
+      med_2_2::med_int major, minor, release;
 
       if ( med_2_2::MEDversionLire(_medIdt, &major, &minor, &release) != 0 )
 	    {
@@ -1387,28 +1387,28 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	  // By consequence this exception will never occur
 	  if (Connectivity->_entityDimension == 1)
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 2D mesh, polygons need at least one 2D cell of a classic geometric type !"));
-	  med_int ConnectivitySize;
-	  med_err err1 = MEDpolygoneInfo(_medIdt,
-					 const_cast <char *> (_ptrMesh->_name.c_str()),
-					 Entity,
-					 med_2_2::MED_NOD,
-					 &ConnectivitySize);
+	  med_2_2::med_int ConnectivitySize;
+	  med_2_2::med_int err1 = MEDpolygoneInfo(_medIdt,
+						  const_cast <char *> (_ptrMesh->_name.c_str()),
+						  Entity,
+						  med_2_2::MED_NOD,
+						  &ConnectivitySize);
 	  if (err1 != MED_VALID)
 	    {
 	      MESSAGE(LOC<<": MEDpolygoneInfo returns "<<err1);
 	      return MED_ERROR;
 	    }
       
-	  med_int* PolygonsConnectivity = new med_int[ConnectivitySize];
-	  med_int* PolygonsConnectivityIndex = new med_int[NumberOfPolygons+1];
+	  med_2_2::med_int* PolygonsConnectivity = new med_2_2::med_int[ConnectivitySize];
+	  med_2_2::med_int* PolygonsConnectivityIndex = new med_2_2::med_int[NumberOfPolygons+1];
       
-	  med_err err2 = MEDpolygoneConnLire(_medIdt,
-					     const_cast <char *> (_ptrMesh->_name.c_str()),
-					     PolygonsConnectivityIndex,
-					     NumberOfPolygons+1,
-					     PolygonsConnectivity,
-					     Entity,
-					     med_2_2::MED_NOD);
+	  med_2_2::med_err err2 = MEDpolygoneConnLire(_medIdt,
+						      const_cast <char *> (_ptrMesh->_name.c_str()),
+						      PolygonsConnectivityIndex,
+						      NumberOfPolygons+1,
+						      PolygonsConnectivity,
+						      Entity,
+						      med_2_2::MED_NOD);
 	  if (err2 != MED_VALID)
 	    {
 	      MESSAGE(LOC<<": MEDpolygoneConnLire returns "<<err2);
@@ -1479,12 +1479,12 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	  // By consequence this exception will never occur
 	  if (Connectivity->_entityDimension == 2 || Connectivity->_entityDimension == 1)
 	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 3D mesh, polyhedron need at least one 3D cell of a classic geometric type !"));
-	  med_int FacesIndexSize, NumberOfNodes, NumberOfFaces;
-	  med_err err3 = MEDpolyedreInfo(_medIdt,
-					 const_cast <char *> (_ptrMesh->_name.c_str()),
-					 med_2_2::MED_NOD,
-					 &FacesIndexSize,
-					 &NumberOfNodes);
+	  med_2_2::med_int FacesIndexSize, NumberOfNodes, NumberOfFaces;
+	  med_2_2::med_err err3 = MEDpolyedreInfo(_medIdt,
+						  const_cast <char *> (_ptrMesh->_name.c_str()),
+						  med_2_2::MED_NOD,
+						  &FacesIndexSize,
+						  &NumberOfNodes);
 	  NumberOfFaces = FacesIndexSize-1;
 	  if (err3 != MED_VALID)
 	    {
@@ -1492,18 +1492,18 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	      return MED_ERROR;
 	    }
       
-	  med_int* Nodes = new med_int[NumberOfNodes];
-	  med_int* FacesIndex = new med_int[NumberOfFaces+1];
-	  med_int* PolyhedronIndex = new med_int[NumberOfPolyhedron+1];
+	  med_2_2::med_int* Nodes = new med_2_2::med_int[NumberOfNodes];
+	  med_2_2::med_int* FacesIndex = new med_2_2::med_int[NumberOfFaces+1];
+	  med_2_2::med_int* PolyhedronIndex = new med_2_2::med_int[NumberOfPolyhedron+1];
 	  
-	  med_err err4 = MEDpolyedreConnLire(_medIdt,
-					     const_cast <char *> (_ptrMesh->_name.c_str()),
-					     PolyhedronIndex,
-					     NumberOfPolyhedron+1,
-					     FacesIndex,
-					     NumberOfFaces+1,
-					     Nodes,
-					     med_2_2::MED_NOD);
+	  med_2_2::med_err err4 = MEDpolyedreConnLire(_medIdt,
+						      const_cast <char *> (_ptrMesh->_name.c_str()),
+						      PolyhedronIndex,
+						      NumberOfPolyhedron+1,
+						      FacesIndex,
+						      NumberOfFaces+1,
+						      Nodes,
+						      med_2_2::MED_NOD);
 	  if (err4 != MED_VALID)
 	    {
 	      MESSAGE(LOC<<": MEDpolyedreConnLire returns "<<err4);
@@ -1665,11 +1665,10 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
     for (int i=0;i<NumberOfFamilies;i++)
       {
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-	med_int tmp_NumberOfAttributes = med_2_2::MEDnAttribut(_medIdt,
-						      const_cast <char *>
-						      (_meshName.c_str()),
-						      (i+1));
-        int NumberOfAttributes = tmp_NumberOfAttributes ;
+	med_2_2::med_int tmp_NumberOfAttributes = med_2_2::MEDnAttribut(_medIdt,
+									const_cast <char *>(_meshName.c_str()),
+									(i+1));
+        med_2_2::med_int NumberOfAttributes = tmp_NumberOfAttributes ;
 #else
 	int NumberOfAttributes = med_2_2::MEDnAttribut(_medIdt,
 						      const_cast <char *>
@@ -1681,12 +1680,14 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	throw MEDEXCEPTION("MED_MESH_RDONLY_DRIVER22::getFAMILY() : NumberOfAttributes" );
 
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-	med_int tmp_NumberOfGroups = med_2_2::MEDnGroupe(_medIdt, const_cast <char *>
-						(_meshName.c_str()),(i+1)) ;
-	int NumberOfGroups = tmp_NumberOfGroups ;
+      med_2_2::med_int tmp_NumberOfGroups = med_2_2::MEDnGroupe(_medIdt, 
+								 const_cast <char *>(_meshName.c_str()),
+								(i+1)) ;
+      int NumberOfGroups = tmp_NumberOfGroups ;
 #else
-	int NumberOfGroups = med_2_2::MEDnGroupe(_medIdt, const_cast <char *>
-						(_meshName.c_str()),(i+1)) ;
+      int NumberOfGroups = med_2_2::MEDnGroupe(_medIdt, 
+					       const_cast <char *>(_meshName.c_str()),
+					       (i+1)) ;
 #endif
 
 	if (NumberOfGroups < 0)
@@ -1699,18 +1700,20 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	string AttributesDescription(MED_TAILLE_DESC*NumberOfAttributes,' ') ;
 	string GroupsNames(MED_TAILLE_LNOM*NumberOfGroups+1,'\0') ;
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-	med_int tmp_FamilyIdentifier ;
-	med_int *  tmp_AttributesIdentifier = new med_int[NumberOfAttributes] ;
-	med_int *  tmp_AttributesValues     = new med_int[NumberOfAttributes] ;
-	err = med_2_2::MEDfamInfo(_medIdt,const_cast <char *>
-				 (_meshName.c_str()),
-				 (i+1),const_cast <char *>
-				 (FamilyName.c_str()), &tmp_FamilyIdentifier,
-				 tmp_AttributesIdentifier,tmp_AttributesValues,
-				 const_cast <char *>
-				 (AttributesDescription.c_str()),
-				 &tmp_NumberOfAttributes, const_cast <char *>
-				 (GroupsNames.c_str()),&tmp_NumberOfGroups);
+	med_2_2::med_int tmp_FamilyIdentifier ;
+	med_2_2::med_int *  tmp_AttributesIdentifier = new med_2_2::med_int[NumberOfAttributes] ;
+	med_2_2::med_int *  tmp_AttributesValues     = new med_2_2::med_int[NumberOfAttributes] ;
+	err = med_2_2::MEDfamInfo(_medIdt,
+				  const_cast <char *>(_meshName.c_str()),
+				  (i+1),
+				  const_cast <char *>(FamilyName.c_str()), 
+				  &tmp_FamilyIdentifier,
+				  tmp_AttributesIdentifier,
+				  tmp_AttributesValues,
+				  const_cast <char *>(AttributesDescription.c_str()),
+				  &tmp_NumberOfAttributes, 
+				  const_cast <char *>(GroupsNames.c_str()),
+				  &tmp_NumberOfGroups);
         FamilyIdentifier = tmp_FamilyIdentifier ;
         int ii ;
         for ( ii = 0 ; ii < NumberOfAttributes ; ii++ ) {
@@ -1833,7 +1836,7 @@ int  MED_MESH_RDONLY_DRIVER22::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
     int err = 0 ;
 
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-      med_int * tmp_MEDArrayNodeFamily = new med_int[_ptrMesh->getNumberOfNodes()] ;
+      med_2_2::med_int * tmp_MEDArrayNodeFamily = new med_2_2::med_int[_ptrMesh->getNumberOfNodes()] ;
       err = MEDfamLire(_medIdt, const_cast <char *>
 		       (_ptrMesh->_name.c_str()), tmp_MEDArrayNodeFamily,
 		       _ptrMesh->getNumberOfNodes(), med_2_2::MED_NOEUD,
@@ -2351,7 +2354,7 @@ int MED_MESH_WRONLY_DRIVER22::writeCoordinates() const {
         
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
         const int * NodesNumbers = _ptrMesh->_coordinate->getNodesNumbers() ;
-        med_2_2::med_int * tmp_NodesNumbers = new med_int[_ptrMesh->_numberOfNodes] ;
+        med_2_2::med_int * tmp_NodesNumbers = new med_2_2::med_int[_ptrMesh->_numberOfNodes] ;
         int ii ;
         for ( ii = 0 ; ii < _ptrMesh->_numberOfNodes ; ii++ )
            tmp_NodesNumbers[ii] = NodesNumbers[ii] ;
@@ -2715,11 +2718,11 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
   // Polyhedron writing
   if (_ptrMesh->existPolyhedronConnectivity(MED_DESCENDING, entity))
     {
-      med_int nbPolyhedron = _ptrMesh->getNumberOfPolyhedron();
-      med_int NumberOfFaces = _ptrMesh->getNumberOfPolyhedronFaces();
+      med_2_2::med_int nbPolyhedron = _ptrMesh->getNumberOfPolyhedron();
+      med_2_2::med_int NumberOfFaces = _ptrMesh->getNumberOfPolyhedronFaces();
       // ??? //_ptrMesh->getPolyhedronIndex(MED_DESCENDING)[nbPolyhedron] - 1;
       // by default all polyhedron faces are polygons
-      vector<med_int> FacesGeometricTypes (NumberOfFaces, MED_POLYGON);
+      vector<med_2_2::med_int> FacesGeometricTypes (NumberOfFaces, MED_POLYGON);
       const int * PolyhedronIndex = _ptrMesh->getPolyhedronIndex(MED_DESCENDING);
       const int * PolyhedronConnectivity = _ptrMesh->getPolyhedronConnectivity(MED_DESCENDING);
 
