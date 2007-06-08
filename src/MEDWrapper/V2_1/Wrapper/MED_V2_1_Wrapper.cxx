@@ -885,7 +885,7 @@ namespace MED
       if(theErr && *theErr < 0)
 	return TProfileInfo::TInfo("",-1);
       
-      TInt aSize = -1;
+      med_int aSize = -1;
       TVector<char> aName(GetNOMLength<eV2_1>()+1);
 
       TErr aRet;
