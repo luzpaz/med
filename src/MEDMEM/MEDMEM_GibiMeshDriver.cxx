@@ -461,6 +461,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
       else if ( numero_pile == PILE_NODES_FIELD && readFields )
       {
+        cout << "############# FOUND PILE NODES FIELD " << endl;
         vector< _fieldBase* > fields( nb_objets );
         for (int objet=0; objet!=nb_objets; ++objet) // pour chaque field
         {
@@ -573,7 +574,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         // set field names
         for ( i = 0; i < nb_objets_nommes; ++i ) {
           int fieldIndex = indices_objets_nommes[ i ];
-          if ( fields[ fieldIndex - 1 ] )
+          if ( fields[ fieldIndex - 1 ] ) 
             fields[ fieldIndex - 1 ]->_name = objets_nommes[ i ];
         }
 
@@ -758,7 +759,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         // set field names
         for ( i = 0; i < nb_objets_nommes; ++i ) {
           int fieldIndex = indices_objets_nommes[ i ] - 1;
-          if ( fields[ fieldIndex ])
+          if ( fields[ fieldIndex ]) 
             fields[ fieldIndex ]->_name = objets_nommes[ i ];
         }
 
@@ -2460,6 +2461,17 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
 
     list< FIELD_* >::iterator it = fields.begin();
     for ( ; it != fields.end(); it++ ) {
+      int nbComponents = (*it)->getNumberOfComponents();
+      if(nbComponents>0) { 
+	UNIT* compoUnits = new UNIT[nbComponents];
+	string* MEDcompoUnits = new string[nbComponents];
+	for(int l = 0; l<nbComponents; l++) {
+	  compoUnits[i] = UNIT("", "");
+	  MEDcompoUnits[i] = "";
+	}
+	(*it)->setComponentsUnits(compoUnits);
+	(*it)->setMEDComponentsUnits(MEDcompoUnits);
+      }
       _med->addField( *it );
     }
   }
