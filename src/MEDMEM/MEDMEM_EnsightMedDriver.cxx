@@ -169,7 +169,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
       int len       = _fileName.size() ;
       string prefix = _fileName.substr(0,len-5); // extraction de .case
       (*_ensightFile) << "# Mesh " << i+1 << " detected with name = " << MeshNames[i] << endl ;
-      (*_ensightFile) << "model: " << i+1 << " " << prefix << "-" << i+1 << ".geom"  << endl ;
+      (*_ensightFile) << "model: " << prefix << "-" << i+1 << ".geom"  << endl ;
     }
   }
   (*_ensightFile) << endl ;

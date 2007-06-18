@@ -177,7 +177,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
   string ensight_geomf = prefix + ".geom" ;
   string basen = getBaseName((char*)ensight_geomf.c_str());
   (*_ensightFile) << "# Mesh detected with name = " << MeshName << endl ;
-  (*_ensightFile) << "model: 1 " << basen << endl ;
+  (*_ensightFile) << "model: " << basen << endl ;
   (*_ensightFile) << endl ;
 
   ofstream ensightGeomFile(ensight_geomf.c_str(),ios::out); 
