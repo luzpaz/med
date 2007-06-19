@@ -461,7 +461,6 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
       else if ( numero_pile == PILE_NODES_FIELD && readFields )
       {
-        cout << "############# FOUND PILE NODES FIELD " << endl;
         vector< _fieldBase* > fields( nb_objets );
         for (int objet=0; objet!=nb_objets; ++objet) // pour chaque field
         {
