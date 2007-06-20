@@ -1254,7 +1254,7 @@ namespace MED
       TValueHolder<TString, char> aMeshName(aMeshInfo->myName);
       
       const TGeomSet& aGeomSet = theTimeStampValue->myGeomSet;
-      TGeomSet::iterator anIter = aGeomSet.begin();
+      TGeomSet::const_iterator anIter = aGeomSet.begin();
       for(; anIter != aGeomSet.end(); anIter++){
 	EGeometrieElement aGeom = *anIter;
 

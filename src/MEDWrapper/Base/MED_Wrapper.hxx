@@ -923,7 +923,7 @@ namespace MED
   //----------------------------------------------------------------------------
   //! To specialize the SharedPtr for TWrapper
   template<> 
-  class SharedPtr<TWrapper>: public boost::shared_ptr<TWrapper>
+  class MEDWRAPPER_EXPORT SharedPtr<TWrapper>: public boost::shared_ptr<TWrapper>
   {
   public:
     SharedPtr() {}

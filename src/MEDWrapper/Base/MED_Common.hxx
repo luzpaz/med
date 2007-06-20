@@ -119,7 +119,7 @@ namespace MED{
   GetLNOMLength();
   
   template<EVersion>
-  TInt
+  TInt MEDWRAPPER_EXPORT
   GetPNOMLength();
   
   template<EVersion>

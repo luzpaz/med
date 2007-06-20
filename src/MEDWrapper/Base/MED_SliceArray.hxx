@@ -29,6 +29,11 @@
 #ifndef MED_SliceArray_HeaderFile
 #define MED_SliceArray_HeaderFile
 
+#ifdef WNT // for correctly compiling "valarray" in modules, which are includes this file
+  #undef max
+  #undef min
+#endif
+
 #include <valarray>
 #include <stdexcept>
 
