@@ -895,7 +895,7 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
     // becarefull about the numbre of gauss point
     _numberOfValues = Support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   }
-#ifdef _DEBUG_
+#if defined(_DEBUG_) || defined(_DEBUG)
   catch (MEDEXCEPTION &ex) {
 #else
   catch (MEDEXCEPTION ) {

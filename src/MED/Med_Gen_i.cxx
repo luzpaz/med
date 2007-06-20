@@ -343,7 +343,7 @@ throw (SALOME::SALOME_Exception)
   		myMeshDriver.setMeshName(meshName);
 		myMeshDriver.open();
 	}
-#ifdef _DEBUG_
+#if defined(_DEBUG_) || defined(_DEBUG)
         catch (const std::exception & ex)
 #else
         catch (const std::exception &)
@@ -359,7 +359,7 @@ throw (SALOME::SALOME_Exception)
                 MESSAGE("apres read");
 		myMeshDriver.close();
 	}
-#ifdef _DEBUG_
+#if defined(_DEBUG_) || defined(_DEBUG)
         catch (const std::exception & ex)
 #else
         catch (const std::exception &)
@@ -489,7 +489,7 @@ throw (SALOME::SALOME_Exception)
 */
 		myField = mymed->getField(fieldName,ordre,iter);
 	}
-#ifdef _DEBUG_
+#if defined(_DEBUG_) || defined(_DEBUG)
         catch (const std::exception & ex)
 #else
         catch (const std::exception &)
@@ -511,7 +511,7 @@ throw (SALOME::SALOME_Exception)
 		SCRUTE(myMesh->getName());
 		fieldSupport->update();
 	}
-#ifdef _DEBUG_
+#if defined(_DEBUG_) || defined(_DEBUG)
         catch (const std::exception & ex)
 #else
         catch (const std::exception &)
@@ -537,7 +537,7 @@ throw (SALOME::SALOME_Exception)
         		return myFieldIOR;
 		}
 		catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
-#ifdef _DEBUG_            
+#if defined(_DEBUG_) || defined(_DEBUG)
         	catch (const std::exception & ex)
 #else
         	catch (const std::exception &)
@@ -562,7 +562,7 @@ throw (SALOME::SALOME_Exception)
 		}
 		catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
 
-#ifdef _DEBUG_            
+#if defined(_DEBUG_) || defined(_DEBUG)
         	catch (const std::exception & ex)
 #else
         	catch (const std::exception &)
