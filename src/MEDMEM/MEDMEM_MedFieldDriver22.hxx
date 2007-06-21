@@ -1624,7 +1624,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
       numberOfElForMED = numberOfElements;
     } else {
       value = myField->getRow(number[index-1]);
-      profilName = profilNameList[typeNo].substr(0,MED_TAILLE_NOM);
+      profilName = (profilNameList.size()>typeNo) ? profilNameList[typeNo].substr(0,MED_TAILLE_NOM) : MED_NOPFL;
       // Rem : Si le SUPPORT n'est pas onAll mais que pour un type géométrique donné le nom
       // du profil associé est MED_NOPFL alors le profil n'est pas écrit dans le fichier MED.
       // Car en MEDMEMOIRE si le champ repose sur des éléments de deux types géométriques
