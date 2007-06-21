@@ -202,7 +202,7 @@ void SUPPORT::update()
 	{
 	  _numberOfGeometricType=1 ;
 	  _geometricType.set(1);
-	  _geometricType[0]=MED_NONE;
+	  _geometricType[0]=MED_POINT1;
 	  _numberOfElements.set(1);
 	  _numberOfElements[0]=_mesh->getNumberOfNodes(); // Vérifier le pointeur !
 	  _totalNumberOfElements=_numberOfElements[0];
