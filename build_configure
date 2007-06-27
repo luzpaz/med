@@ -76,16 +76,16 @@ fi
 
 rm -rf salome_adm
 mkdir -p salome_adm/unix/config_files
-cp -f ${CONFIGURE_SOURCE_DIR}/unix/config_files/* salome_adm/unix/config_files
+#cp -f ${CONFIGURE_SOURCE_DIR}/unix/config_files/* salome_adm/unix/config_files
 cp -f ${CONFIGURE_SOURCE_DIR}/unix/SALOMEconfig.h.in salome_adm/unix
-if test ${MED_WITH_KERNEL} = yes; then
-  cp -f ${CONFIGURE_SOURCE_DIR}/unix/pythonbe.py salome_adm/unix
-fi
+#if test ${MED_WITH_KERNEL} = yes; then
+#  cp -f ${CONFIGURE_SOURCE_DIR}/unix/pythonbe.py salome_adm/unix
+#fi
 
 # if with GUI, cofy configure files from it
-if test ${MED_WITH_GUI} = yes; then
-  cp -f ${GUI_ROOT_DIR}/adm_local/unix/config_files/* salome_adm/unix/config_files
-fi
+#if test ${MED_WITH_GUI} = yes; then
+#  cp -f ${GUI_ROOT_DIR}/adm_local/unix/config_files/* salome_adm/unix/config_files
+#fi
 
 # remove KERNEL deprecated configure files
 #for deprecated in ac_cc_warnings.m4 ac_cxx_partial_specialization.m4 \
@@ -104,7 +104,14 @@ fi
 #   autom4te.cache (directory)
 echo "====================================================== aclocal"
 
-aclocal -I adm_local/unix/config_files -I salome_adm/unix/config_files  || exit 1
+if test ${MED_WITH_GUI} = yes; then
+  aclocal -I adm_local/unix/config_files \
+          -I ${CONFIGURE_SOURCE_DIR}/unix/config_files \
+	  -I ${GUI_ROOT_DIR}/adm_local/unix/config_files || exit 1
+else
+  aclocal -I adm_local/unix/config_files \
+          -I ${CONFIGURE_SOURCE_DIR}/unix/config_files || exit 1
+fi
 
 # ____________________________________________________________________
 # libtoolize creates some configuration files (ltmain.sh,
