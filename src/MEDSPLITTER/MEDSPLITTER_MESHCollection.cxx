@@ -72,19 +72,23 @@ MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topolog
 	:m_name(initial_collection.m_name),m_topology(topology),m_owns_topology(false),m_cell_graph(topology->getGraph()),m_driver(0)
 {
 	string mesh_name = initial_collection.getName();
+        cout << endl << endl << "initial_collection.getName() = " << initial_collection.getName() << endl << endl;
+        cout << endl << endl << "initial_collection.getMeshName() = " << initial_collection.getMeshName() << endl << endl;
 	m_mesh.resize(m_topology->nbDomain());
 	for (int idomain=0; idomain < m_topology->nbDomain(); idomain++)
 		{
 			//creating the new mesh
 			MEDMEM::MESHING* mesh_builder=new MEDMEM::MESHING;
 			m_mesh[idomain]= static_cast<MEDMEM::MESH*> (mesh_builder);
-			ostringstream osname;
-			osname << mesh_name<<"_"<<idomain+1;
-			mesh_builder->setName(osname.str());
+			//ostringstream osname;
+			//osname << mesh_name<<"_"<<idomain+1;
+			//mesh_builder->setName(osname.str());
+			mesh_builder->setName(mesh_name);
 
 			createNodalConnectivity(initial_collection,idomain, MED_EN::MED_CELL);
 			mesh_builder->setMeshDimension(initial_collection.getMeshDimension());
 			mesh_builder->setSpaceDimension(initial_collection.getSpaceDimension());
+                        cout << "MESHCollection: " << this << ", m_mesh[idomain]->getName(): " << m_mesh[idomain]->getName() << endl;
 		}
 	
 	m_topology->createFaceMapping(initial_collection);	
