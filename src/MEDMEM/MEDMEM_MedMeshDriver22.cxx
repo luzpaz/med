@@ -1771,14 +1771,14 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 
     if (MEDArrayCellFamily != NULL)
       {
-	for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_CELL);i++)
+	for (int i=0;i<_ptrMesh->getNumberOfTypesWithPoly(MED_CELL);i++)
 	  delete[] MEDArrayCellFamily[i] ;
 	delete[] MEDArrayCellFamily ;
       }
 
     if (MEDArrayFaceFamily != NULL)
       {
-	for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_FACE);i++)
+	for (int i=0;i<_ptrMesh->getNumberOfTypesWithPoly(MED_FACE);i++)
 	  delete[] MEDArrayFaceFamily[i] ;
 	delete[] MEDArrayFaceFamily ;
       }
@@ -2439,7 +2439,7 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
 			       (med_2_2::med_entite_maillage  ) MED_CELL, 
 			       (med_2_2::med_geometrie_element) types[i],
 			       med_2_2::MED_NOD);
-
+        err = med_2_2::MEDdimEspaceCr(_medIdt, const_cast <char *> ( _meshName.c_str()),_ptrMesh->_spaceDimension);
 	      delete[] connectivityArray ;
 
 	      if (err<0) // ETENDRE LES EXPLICATIONS
@@ -2931,7 +2931,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       medGeometryElement  * types = _ptrMesh->getTypesWithPoly(entity) ;
 
       // We build the array from the families list objects :
-      int NumberOfElements = _ptrMesh->getNumberOfElements(entity, MED_ALL_ELEMENTS);
+      int NumberOfElements = _ptrMesh->getNumberOfElementsWithPoly(entity, MED_ALL_ELEMENTS);
       int * MEDArrayFamily = new int[NumberOfElements] ;
       // family 0 by default
       for (int i=0; i<NumberOfElements; i++)
@@ -3211,8 +3211,8 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
   for (unsigned int i=0; i< families.size(); i++) {
 
     int      numberOfAttributes         = families[i]->getNumberOfAttributes ();
-    string   attributesDescriptions     = "";
-
+    char*   attributesDescriptions     = new char[numberOfAttributes*MED_TAILLE_DESC+1];
+    
     // Recompose the attributes descriptions arg for MED
     for (int j=0; j < numberOfAttributes; j++) {
         
@@ -3222,10 +3222,10 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 	throw MEDEXCEPTION( LOCALIZED(STRING(LOC) << "The size of the attribute description n° |" << j+1 << "| of the family |" << families[i]->getName()
 				      << "| with identifier |" << families[i]->getIdentifier()  << "| is |" 
 				      <<  attributeDescription.size()  <<"| and is more than |" <<  MED_TAILLE_DESC << "|")) ;
-        
-      attributesDescriptions += attributeDescription;
+      strncpy(attributesDescriptions+j*MED_TAILLE_DESC, attributeDescription.c_str(),MED_TAILLE_DESC);   
+//      attributesDescriptions += attributeDescription;
     }
-      
+    attributesDescriptions[MED_TAILLE_DESC*numberOfAttributes]='\0';    
 
     int      numberOfGroups  = families[i]->getNumberOfGroups();
     string   groupsNames(numberOfGroups*MED_TAILLE_LNOM,'\0') ;
@@ -3272,7 +3272,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 	
       //MESSAGE(LOC<<"families[i]->getAttributesIdentifiers() : "<<families[i]->getAttributesIdentifiers()[0]);
       //MESSAGE(LOC<<"families[i]->getAttributesValues() : "<<families[i]->getAttributesValues()[0]);
-      MESSAGE(LOC<<"attributesDescriptions.c_str() : "<<attributesDescriptions.c_str());
+      MESSAGE(LOC<<"attributesDescriptions : "<<attributesDescriptions);
       MESSAGE(LOC<<"numberOfGroups : "<<numberOfGroups);
       MESSAGE(LOC<<"groupsNames.c_str() : "<<groupsNames.c_str());
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
@@ -3290,7 +3290,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 			      families[i]->getIdentifier(), 
 			      AttributesIdentifier2,
 			      AttributesValues2,
-			      const_cast <char *> (attributesDescriptions.c_str()), 
+			      const_cast <char *> (attributesDescriptions), 
 			      numberOfAttributes,  
 			      const_cast <char *> (groupsNames.c_str()), 
 			      numberOfGroups);
@@ -3303,12 +3303,13 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 			      families[i]->getIdentifier(), 
 			      (med_2_2::med_int*)families[i]->getAttributesIdentifiers(),
 			      (med_2_2::med_int*)families[i]->getAttributesValues(),
-			      const_cast <char *> (attributesDescriptions.c_str()), 
+			      const_cast <char *> (attributesDescriptions), 
 			      numberOfAttributes,  
 			      const_cast <char *> (groupsNames.c_str()), 
 			      numberOfGroups);
 #endif
       SCRUTE(err);
+      delete[] attributesDescriptions;
       if ( err != MED_VALID) 
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't create family |" << families[i]->getName()
 				     << "| with identifier |" << families[i]->getIdentifier()  << "| groups names |" 
