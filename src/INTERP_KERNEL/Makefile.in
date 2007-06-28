@@ -1,0 +1,94 @@
+#  MED MEDMEM : MED files in memory
+#
+#  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+# 
+#  This library is free software; you can redistribute it and/or 
+#  modify it under the terms of the GNU Lesser General Public 
+#  License as published by the Free Software Foundation; either 
+#  version 2.1 of the License. 
+# 
+#  This library is distributed in the hope that it will be useful, 
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+#  Lesser General Public License for more details. 
+# 
+#  You should have received a copy of the GNU Lesser General Public 
+#  License along with this library; if not, write to the Free Software 
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+# 
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
+#
+#
+#  File   : Makefile.in
+#  Author : Vincent BERGEAUD (CEA/DEN/DANS/DM2S/SFME/LGLS)
+#  Module : MED
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:$(srcdir):$(srcdir)/tests
+
+MACHINE=PCLINUX
+
+@COMMENCE@
+
+
+EXPORT_PYSCRIPTS = \
+
+
+EXPORT_HEADERS = \
+Interpolation2D.hxx\
+Interpolation3DSurf.hxx\
+Interpolation.hxx\
+InterpolationUtils.hxx\
+TranslationRotationMatrix.hxx\
+BBTree.H
+
+# Libraries targets
+
+LIB=libinterpkernel.la
+
+LIB_SRC = \
+Interpolation2D.cxx\
+Interpolation3DSurf.cxx
+
+
+
+# Executables targets
+BIN =
+BIN_SRC = 
+BIN_SERVER_IDL = 
+BIN_CLIENT_IDL = 
+
+TEST_PROGS = make_plane test_INTERPOL_2D
+
+LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
+LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
+
+CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MED2_INCLUDES)
+CPPFLAGS+=$(BOOST_CPPFLAGS)
+#LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
+# change motivated by the bug KERNEL4778.
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem   -lutil
+
+#LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
+# change motivated by the bug KERNEL4778.
+LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) -lutil
+
+ifeq ($(MED_WITH_KERNEL),yes)
+  CPPFLAGS+= ${KERNEL_CXXFLAGS}
+  CXXFLAGS+= ${KERNEL_CXXFLAGS}
+  LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
+  LDFLAGSFORBIN+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics
+endif
+
+LIBSFORBIN=$(BOOSTLIBS) $(MPI_LIBS) 
+
+LIBS=
+
+# build create_mesh :
+bin: 
+
+@CONCLUDE@
