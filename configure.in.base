@@ -293,7 +293,16 @@ if test "x$ENABLE_SPLITTER" = "xyes"; then
     echo scotch_ok=no 
     CHECK_SCOTCH 
     dnl scotch_ok is set to yes by CHECK_SCOTCH	 
-
+    
+    echo 
+    echo	 
+    echo --------------------------------------------- 
+    echo testing LIBXML2
+    echo ---------------------------------------------
+    echo libxml_ok=no 
+    CHECK_LIBXML 
+    dnl libxml_ok is set to yes by CHECK_LIBXML	 
+   
 fi
 	
 
@@ -514,7 +523,7 @@ done
 dnl optional variables 
 
 echo "---Optional:"
-variables="metis_ok scotch_ok"
+variables="metis_ok scotch_ok libxml_ok"
 for var in $variables
      do
          eval toto=\$$var
