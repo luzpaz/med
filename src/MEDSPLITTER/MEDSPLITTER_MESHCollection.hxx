@@ -3,8 +3,10 @@
 
 //#include "MESHCollectionDriver.hxx"
 #include "MEDSPLITTER_Graph.hxx"
+#include "MEDSPLITTER_FaceModel.hxx"
 #include "boost/shared_ptr.hpp"
 #include <vector>
+
 
 namespace MEDMEM{
 class MESH;
@@ -17,6 +19,8 @@ namespace MEDSPLITTER{
 
 class Topology;
 class MESHCollectionDriver;
+
+	typedef enum{MedAscii, MedXML, Undefined} DriverType;
 
 class MESHCollection
 {
@@ -43,12 +47,10 @@ void write(const std::string& filename);
 //getting the driver
 MESHCollectionDriver* retrieveDriver();
 MESHCollectionDriver* getDriver() const;
+	void setDriverType(MEDSPLITTER::DriverType type) {m_driver_type=type;}
 
 //creation of the cell graph
 void buildCellGraph(MEDMEM::MEDSKYLINEARRAY* & array,int *& edgeweights );
-
-void buildCellGraph2ndversion(MEDMEM::MEDSKYLINEARRAY* & array,int *& edgeweights );
-
 
 //creation and partition of the associated graph
   Topology* createPartition(int nbdomain, Graph::splitter_type type = Graph::METIS,
@@ -66,6 +68,11 @@ void getCoordinates(int* node_list,int nb_nodes, double* coordinates) const ;
 
 //getting connectivities
 void getNodeConnectivity( const int*  cell_list,int nb_cells,MED_EN::medEntityMesh,MED_EN::medGeometryElement type, int* type_connectivity) const ;
+void getPolygonNodeConnectivity(const int* cell_list,int nb_cells,MED_EN::medEntityMesh entity,
+                                vector<int>& type_connectivity, vector<int>& connectivity_index) const;
+void getPolyhedraNodeConnectivity(const int* cell_list,int nb_cells,MED_EN::medEntityMesh entity,
+                                  vector<int>& type_connectivity, vector<int>& connectivity_index, vector<int>& face_connectivity_index) const;
+
 void getFaceConnectivity( const int*  cell_list,int nb_cells,MED_EN::medEntityMesh,MED_EN::medGeometryElement type, int* type_connectivity) const ;
 
   //void getFaceConnectivity( const int*  cell_list,int nb_cells,MED_EN::medGeometryElement type, int* type_connectivity) const ;
@@ -102,6 +109,10 @@ void setTopology(Topology* topology);
 //to the name of a subdomain \a nn, which is name_nn) 
 string getName() const {return m_name;}
 void setName(const string& name) {m_name=name;}
+
+//getting/setting the description of the global mesh
+string getDescription() const {return m_description;}
+void setDescription(const string& name) { m_description=name;}
 	
 //!transfers families from an old MESHCollection to new mesh
 void castFamilies(const MESHCollection& old_collection);
@@ -119,6 +130,14 @@ void setIndivisibleGroup(const string& a);
 
 //!constructing connect zones
 void buildConnectZones(int idomain);
+void buildConnectZones();
+
+bool isDimensionOK(MED_EN::medGeometryElement type, int dim)
+{
+  return ((type/100 == dim) || (dim==2 && type == MED_EN::MED_POLYGON) || (dim==3 && type == MED_EN::MED_POLYHEDRA));
+}
+void setSubdomainBoundaryCreates(bool flag) {  m_subdomain_boundary_creates=flag;}
+bool getSubdomainBoundaryCreates(){return m_subdomain_boundary_creates;}
 
 private:
 //!creates connectivities for a domain and an entity (face or cell)
@@ -131,6 +150,11 @@ void treatIndivisibleRegions(int* tag);
 //!field is identified by (name, dt, it)
 template <class T>
 void castFields(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber);
+
+void getFaces(int idomain, std::map<MED_EN::medGeometryElement, vector<MEDSPLITTER_FaceModel*> >&);
+
+MEDSPLITTER_FaceModel* getCommonFace(int ip1,int ilocal1,int ip2,int ilocal2,int face_index);
+
 
 //!link to mesh_collection topology
 Topology* m_topology;
@@ -155,6 +179,16 @@ std::vector<std::string> m_indivisible_regions;
 
 //!name of global mesh
 string m_name;
+
+//!description of global mesh
+string m_description;
+
+//! specifies the driver associated to the collection
+DriverType m_driver_type;
+
+/*! flag specifying that the splitter should create boundary constituent entity
+so that they are written in joints*/
+bool m_subdomain_boundary_creates;
 
 };
 

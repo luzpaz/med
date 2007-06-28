@@ -31,6 +31,8 @@
 namespace po=boost::program_options;
 
 #include <string>
+#include <fstream>
+
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Family.hxx"
@@ -59,6 +61,8 @@ int main(int argc, char** argv)
   	("meshname",po::value<string>(),"name of the input mesh")
   	("split-method",po::value<string>(&library)->default_value("metis"),"name of the splitting library (metis,scotch)")
   	("ndomains",po::value<int>(&ndomains)->default_value(1),"number of subdomains in the output file")
+		("plain-master","creates a plain masterfile instead of an XML file")
+    ("creates-boundary-faces","creates the necessary faces so that faces joints are created in the output files");
   	;
   	
   po::variables_map vm;
@@ -69,6 +73,12 @@ int main(int argc, char** argv)
   	cout<<desc<<"\n";
   	return 1;
   }
+  if (!vm.count("ndomains"))
+  {
+    cout << "ndomains must be specified !"<<endl;
+    return 1;
+  }
+    
   
   ndomains = vm["ndomains"].as<int>();
   if (!vm.count("input-file") || !vm.count("output-file"))
@@ -76,17 +86,43 @@ int main(int argc, char** argv)
   		cout << "input-file and output-file names must be specified"<<endl;
   		return 1;
   	}
+  
+  if (!vm.count("distributed") && !vm.count("meshname") )
+  {
+    cout << "MEDSPLITTER : for a serial MED file, mesh name must be selected with --meshname=..."<<endl;
+    return 1;
+  }
   string input = vm["input-file"].as<string>();
   string output = vm["output-file"].as<string>();
  
-  
+ 
+ //testing whether it is possible to write a file at the specified location
+  string outputtest = output + ".testioms.";
+  ofstream testfile(outputtest.c_str());
+  if (testfile.fail())
+  { 
+    cout << "MEDSPLITTER : output-file directory does not exist or is in read-only access" << endl;
+    return 1;
+  };
+  //deletes test file
+  remove(outputtest.c_str());
+    
   bool is_sequential = true;
  
   if (vm.count("distributed"))
 	  is_sequential=false;
+
   bool mesh_only=false;
   if (vm.count("mesh-only"))
 		mesh_only=true;
+
+	bool xml_output_master=true;
+	if (vm.count("plain-master"))
+		xml_output_master=false;
+    
+  bool creates_boundary_faces=false;  
+  if (vm.count("creates-boundary-faces"))
+    creates_boundary_faces=true;
   
   MEDSPLITTER::MESHCollection* collection;
   
@@ -116,11 +152,14 @@ int main(int argc, char** argv)
 
   // Creating a new mesh collection from the partitioning
   MEDSPLITTER::MESHCollection new_collection(*collection, new_topo);
+	if (!xml_output_master)
+		new_collection.setDriverType(MEDSPLITTER::MedAscii);
+  
+  new_collection.setSubdomainBoundaryCreates(creates_boundary_faces);
+  
 	cout << "MEDSPLITTER - writing output files "<<endl;
   new_collection.write(output);
 
-
- 
   // Casting the fields on the new collection
   if (!mesh_only)
 		new_collection.castAllFields(*collection);

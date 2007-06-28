@@ -12,30 +12,45 @@ public:
   
   MESHCollectionDriver(MESHCollection*);
   virtual ~MESHCollectionDriver(){}
-  
-  int read(char*);
-  
+
+  virtual int read(char*)=0;
   int readSeq(char*,char*);
   
-  void write(char*);
-  
-  template <class T>
-  void readFields(vector <MEDMEM::FIELD<T> *>& filenames, char* fieldname,
-		  int itnumber, int ordernumber);
-  
-  template <class T>
-  void writeFields(vector <MEDMEM::FIELD<T> *>& filenames, char* fieldname);
-  
+  virtual void write(char*)=0;
+	virtual void readFields (vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname,
+															int itnumber, int ordernumber) =0;
+	virtual void readFields (vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname,
+															int itnumber, int ordernumber) =0;
+	virtual void writeFields(vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname)=0;
+	virtual void writeFields(vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname)=0;
+
   void readFileStruct(vector <string>&  field_names,vector<int>& iternumber,vector <int>&  ordernumber,vector <int> & types);
   
   int getFieldType(const std::string& fieldname);
   //	void exportFamily(vector<int*>,MED_EN::medEntityMesh, const string& name);
-    
-private :
-  
+
+protected:
+
+ void readSubdomain(const string& meshname, vector<int*>& cellglobal,
+vector<int*>& faceglobal,
+vector<int*>& nodeglobal, int idomain);
+ void writeSubdomain(int idomain,int nbdomain, char*filename);
+ 
+void writeElementJoint(medEntityMesh entity ,
+                       int icz, 
+                       int idomain, 
+                       int idistant, 
+                       char* mesh_name, 
+                       char* joint_name,  
+                       med_2_2::med_idt fid );
+void jointSort(int* elems, int nbelems, bool is_first);
+
+
+
   MESHCollection* m_collection;
   
   std::vector <std::string> m_filename;
+
 };
 
 }

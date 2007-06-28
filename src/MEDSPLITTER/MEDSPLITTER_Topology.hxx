@@ -12,7 +12,8 @@ namespace MEDSPLITTER {
 	
 	class Graph;
 	class MESHCollection;
-
+  class MEDSPLITTER_FaceModel;
+  
 	class Topology
 	{
 	public:
@@ -49,7 +50,13 @@ namespace MEDSPLITTER {
 	
 		////creating node mapping 
 		virtual void createNodeMapping(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
-																	 std::map<MED_EN::medGeometryElement,int>& present_type_numbers,int domain)=0;
+																	 std::map<MED_EN::medGeometryElement,int>& present_type_numbers,
+                                   std::vector<int>& polygon_conn,
+                                   std::vector<int>& polygon_conn_index,
+                                   std::vector<int>& polyhedron_conn,
+                                   std::vector<int>& polyhedron_conn_index,
+                                   std::vector<int>& polyhedron_face_index,
+                                   int domain)=0;
 		
 		////creating face mapping 
 		//	virtual void createFaceMapping(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
@@ -62,7 +69,9 @@ namespace MEDSPLITTER {
 																std::map<MED_EN::medGeometryElement,int>& present_type_numbers,
 																int idomain,
 																MED_EN::medEntityMesh entity)=0;
-										
+			//converting node global numberings to local numberings
+    virtual void convertToLocal2ndVersion(int*,int,int)=0;
+    							
 		virtual int convertNodeToGlobal(int ip,int icell)const=0;
 		virtual int convertFaceToGlobal(int ip,int icell)const=0;
 		virtual int convertCellToGlobal(int ip,int icell)const=0;
@@ -89,7 +98,16 @@ namespace MEDSPLITTER {
 
 		//retrieving list of nodes
 		virtual void getFaceList(int idomain, int* list) const =0;
-	
+	 
+    //adding a face to the mapping
+    virtual void appendFace(int idomain, int ilocal, int iglobal)=0;
+  
+    //converting a global face number to a local representation
+    virtual int convertGlobalFace(int iglobal, int idomain)=0;
+    
+    //converting a global node number to a local representation
+    virtual int convertGlobalNode(int iglobal, int idomain)=0;
+    
 		//! computing arrays with node/node correspondencies
 		virtual void computeNodeNodeCorrespondencies(int nbdomain, vector<MEDMEM::MEDSKYLINEARRAY*>&) const =0;
 	
@@ -98,6 +116,9 @@ namespace MEDSPLITTER {
 	
 		//! retrieving graph
 		virtual boost::shared_ptr<Graph> getGraph() const=0;
+    
+    //!recreating a face mapping from scratch
+    virtual void recreateFaceMapping(std::vector<std::map<MED_EN::medGeometryElement, std::vector<MEDSPLITTER_FaceModel*> > >) =0;
 	};
 }
 #endif /*TOPOLOGY_HXX_*/

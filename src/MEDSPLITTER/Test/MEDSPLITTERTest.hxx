@@ -38,11 +38,13 @@ class MEDSPLITTERTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testMESHCollection_read_seq);
   CPPUNIT_TEST( testMESHCollection_read_para);
   CPPUNIT_TEST( testMESHCollection_square);
+  CPPUNIT_TEST( testMESHCollection_square_with_faces);
   CPPUNIT_TEST( testMESHCollection_indivisible);
   CPPUNIT_TEST( testMESHCollection_user_partition);
   CPPUNIT_TEST( testParallelTopology_graph_constructor);
   CPPUNIT_TEST( testMESHCollection_complete_sequence);
-  
+  CPPUNIT_TEST( testMESHCollection_complete_sequence_with_polygon);
+//  CPPUNIT_TEST( testMESHCollection_complete_sequence_with_polyhedra);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -54,10 +56,14 @@ public:
   void testMESHCollection_read_seq();
   void testMESHCollection_read_para();
   void testMESHCollection_square();
+  void testMESHCollection_square_with_faces();
   void testMESHCollection_indivisible();
   void testMESHCollection_user_partition();
   void testMESHCollection_complete_sequence();
+  void testMESHCollection_complete_sequence_with_polygon();
+  void testMESHCollection_complete_sequence_with_polyhedra();
   void testParallelTopology_graph_constructor();
+    
   };
 
 // to automatically remove temporary files from disk

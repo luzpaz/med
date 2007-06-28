@@ -42,6 +42,8 @@ EXPORT_HEADERS = \
 MEDSPLITTER_Topology.hxx \
 MEDSPLITTER_MESHCollection.hxx \
 MEDSPLITTER_MESHCollectionDriver.hxx \
+MEDSPLITTER_MESHCollectionMedXMLDriver.hxx \
+MEDSPLITTER_MESHCollectionMedAsciiDriver.hxx \
 MEDSPLITTER_ParallelTopology.hxx \
 MEDSPLITTER_Graph.hxx\
 MEDSPLITTER_METISGraph.hxx\
@@ -56,6 +58,8 @@ LIB=libmedsplitter.la
 LIB_SRC = \
 MEDSPLITTER_MESHCollection.cxx \
 MEDSPLITTER_MESHCollectionDriver.cxx \
+MEDSPLITTER_MESHCollectionMedAsciiDriver.cxx \
+MEDSPLITTER_MESHCollectionMedXMLDriver.cxx \
 MEDSPLITTER_ParallelTopology.cxx \
 MEDSPLITTER_Graph.cxx\
 MEDSPLITTER_METISGraph.cxx\
@@ -74,17 +78,17 @@ TEST_PROGS =
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
-CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) $(METIS_CPPFLAGS) $(SCOTCH_CPPFLAGS)
+CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES) $(METIS_CPPFLAGS) $(SCOTCH_CPPFLAGS) $(LIBXML_CPPFLAGS)
 
 CXXFLAGS+=@CXXTMPDPTHFLAGS@
 CPPFLAGS+=$(BOOST_CPPFLAGS)
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS) 
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS) $(LIBXML_LIBS) 
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS)  $(BOOST_LIBS) -lboost_program_options
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem $(METIS_LIBS) $(SCOTCH_LIBS)  $(BOOST_LIBS) -lboost_program_options 
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}
