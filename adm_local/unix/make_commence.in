@@ -125,6 +125,10 @@ METIS_LIBS=@METIS_LIBS@
 SCOTCH_CPPFLAGS=@SCOTCH_CPPFLAGS@
 SCOTCH_LIBS=@SCOTCH_LIBS@
 
+#LIBXML
+LIBXML_CPPFLAGS=@LIBXML_CPPFLAGS@
+LIBXML_LIBS=@LIBXML_LIBS@
+
 # OpenCasCade
 
 OCC_INCLUDES=@CAS_CPPFLAGS@
@@ -320,7 +324,7 @@ $(top_srcdir)/configure.in: $(top_srcdir)/configure.in.base
 ifeq ($(MED_WITH_KERNEL),yes)
 
 ACLOCAL_SRC += \
-ac_cxx_bool.m4                    check_corba.m4                        \
+ac_cxx_bool.m4                    check_corba.m4     check_cppunit.m4  \
 ac_cxx_depend_flag.m4             check_hdf5.m4      enable_pthreads.m4	\
 ac_cxx_mutable.m4                 check_mico.m4      libtool.m4		\
 ac_cxx_namespaces.m4              check_omniorb.m4   pyembed.m4		\
@@ -335,7 +339,7 @@ check_vtk.m4	                  check_opengl.m4       \
 check_GUI.m4	                  check_corba_in_GUI.m4
 
 ACLOCAL_MED = \
-check_metis.m4 check_scotch.m4
+check_metis.m4 check_scotch.m4 check_libxml.m4
 
 $(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=@KERNEL_ROOT_DIR@/salome_adm/unix/config_files/%) \
                           $(ACLOCAL_GUI:%=@GUI_ROOT_DIR@/adm_local/unix/config_files/%) \
