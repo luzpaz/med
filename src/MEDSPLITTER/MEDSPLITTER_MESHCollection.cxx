@@ -1158,7 +1158,7 @@ void MESHCollection::buildConnectZones()
             for (int icelldistant = index[ilocal]; icelldistant < index[ilocal+1]; icelldistant++)
             {
               int distant_id = value[icelldistant-1];
-               medGeometryElement distant_type = m_mesh[idomain]->getElementType(MED_EN::MED_CELL,distant_id);
+               medGeometryElement distant_type = m_mesh[idistant]->getElementType(MED_EN::MED_CELL,distant_id);
                MEDMEM::CELLMODEL distant_model (distant_type);
                MEDSPLITTER_FaceModel* face = getCommonFace(idomain,ilocal+1,idistant,distant_id,global_face_id);
                face_map[idomain][face->getType()].push_back(face);
@@ -1905,9 +1905,10 @@ void MESHCollection::getFaces(int idomain,
 MEDSPLITTER_FaceModel* MESHCollection::getCommonFace(int ip1,int ilocal1,int ip2,int ilocal2,int face_index)
 {
   MEDSPLITTER_FaceModel* face_model = new MEDSPLITTER_FaceModel();
-
+  SCRUTE(ilocal1);
   MED_EN::medGeometryElement type1 = m_mesh[ip1]->getElementType(MED_EN::MED_CELL,ilocal1);
   MEDMEM::CELLMODEL celltype1 (type1);
+  
   const int* conn_index1 =  m_mesh[ip1]->getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
   const int* conn1 = m_mesh[ip1]->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
   
@@ -1930,7 +1931,7 @@ MEDSPLITTER_FaceModel* MESHCollection::getCommonFace(int ip1,int ilocal1,int ip2
  
  while (iface<nbfaces)
  {
-  SCRUTE (iface);
+  //SCRUTE (iface);
   int nbnodes= types[iface]%100;
   const int* nodes = celltype1.getNodesConstituent(1,iface+1);
   int common_nodes=0;

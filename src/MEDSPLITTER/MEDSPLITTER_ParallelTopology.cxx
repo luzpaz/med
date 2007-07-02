@@ -1028,7 +1028,7 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
        for (int i=0; i< (iter->second).size(); i++)
        {
         MEDSPLITTER_FaceModel* face = (iter->second)[i];
-        cout << "global :"<<face->getGlobal()<<" - "<<ilocal<<endl;
+        //cout << "global :"<<face->getGlobal()<<" - "<<ilocal<<endl;
         m_face_glob_to_loc.insert(make_pair(face->getGlobal(),make_pair(idomain,ilocal)));
         m_face_loc_to_glob[idomain].push_back(face->getGlobal());
         ilocal++;
