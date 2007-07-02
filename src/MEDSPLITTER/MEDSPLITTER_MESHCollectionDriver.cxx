@@ -305,7 +305,7 @@ vector<int*>& nodeglobal, int idomain
         char mesh_name[MED_TAILLE_NOM];
               
         strcpy (mesh_name, m_collection->getMesh(idomain)->getName().c_str());
-        cout <<m_collection->getMesh(idomain)->getName();
+        SCRUTE(m_collection->getMesh(idomain)->getName());
         error = med_2_2::MEDjointCr(fid,mesh_name, joint_name, desc, 
             idistant, distant_name);
         if (error==-1) cout << "erreur creation de joint "<<endl;
@@ -468,8 +468,6 @@ void MESHCollectionDriver::writeElementJoint(medEntityMesh entity ,
   for (int i=0; i<nbcells; i++)
     for (int icol = index[i]-1; icol<index[i+1]-1; icol++)
       {
-        cout << "i+1"<<i+1<<endl;
-        cout << "icol"<<icol<<endl;
         MED_EN::medGeometryElement local_type =  (m_collection->getMesh())[idomain]->getElementType(entity,i+1);
         MED_EN::medGeometryElement distant_type = (m_collection->getMesh())[idistant]->getElementType(entity,value[icol]);
                       
