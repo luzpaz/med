@@ -1905,7 +1905,7 @@ void MESHCollection::getFaces(int idomain,
 MEDSPLITTER_FaceModel* MESHCollection::getCommonFace(int ip1,int ilocal1,int ip2,int ilocal2,int face_index)
 {
   MEDSPLITTER_FaceModel* face_model = new MEDSPLITTER_FaceModel();
-  SCRUTE(ilocal1);
+  
   MED_EN::medGeometryElement type1 = m_mesh[ip1]->getElementType(MED_EN::MED_CELL,ilocal1);
   MEDMEM::CELLMODEL celltype1 (type1);
   
