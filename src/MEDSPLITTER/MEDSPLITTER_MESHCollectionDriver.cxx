@@ -294,7 +294,7 @@ vector<int*>& nodeglobal, int idomain
               med_2_2::med_err error;
         int idistant=(m_collection->getCZ())[icz]->getDistantDomainNumber();
         char joint_name[MED_TAILLE_NOM];
-        sprintf(joint_name,"joint_%i",idistant);
+        sprintf(joint_name,"joint_%i",idistant+1);
         char desc[MED_TAILLE_DESC];
         sprintf(desc,"connect_zone_%d",icz+1);
         
