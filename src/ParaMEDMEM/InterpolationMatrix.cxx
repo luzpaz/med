@@ -2,8 +2,8 @@
 #include "ProcessorGroup.hxx"
 #include "MxN_Mapping.hxx"
 #include "InterpolationMatrix.hxx"
-#include "INTERPOLATION_2D.hxx"
-#include "INTERPOLATION_3D_surf.hxx"
+#include "Interpolation2D.hxx"
+#include "Interpolation3DSurf.hxx"
 
 /*! \class InterpolationMatrix
 This class enables the storage of an interpolation matrix Wij mapping 
@@ -54,11 +54,11 @@ void InterpolationMatrix::addContribution(MEDMEM::MESH& distant_support, int ipr
 {
 
 	// computing the intersections between distant and local elements
-  INTERPOLATION* interpolator;
+  MEDMEM::Interpolation* interpolator;
 	if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==3)
-		interpolator=new INTERPOLATION_3D_surf();
+		interpolator=new MEDMEM::Interpolation3DSurf();
 	else if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==2)
-		interpolator=new INTERPOLATION_2D();
+		interpolator=new MEDMEM::Interpolation2D();
 
   int nbelems=  _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);  
   vector<map<int,double> > surfaces = interpolator->interpol_maillages(distant_support,_source_support);
