@@ -790,8 +790,9 @@ void MED::updateSupport ()
 	// entity not defined in mesh -> we remove support on it !
 	MESSAGE(LOC<<ex.what());
 	delete (*itSupport).second ;
-	(*itSupportOnMesh).second.erase(itSupport) ; // that's rigth ????
-	itSupport-- ;
+	//(*itSupportOnMesh).second.erase(itSupport) ; // that's rigth ????
+	//itSupport-- ;
+	(*itSupportOnMesh).second.erase(itSupport--); // dercement before erase()
       }
   }
 
