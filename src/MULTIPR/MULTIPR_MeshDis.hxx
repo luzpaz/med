@@ -418,7 +418,15 @@ public:
      * \throw  IOException if any i/o error occurs.
      */
     void readDistributedMED(const char* pMEDfilename);
-    
+
+    /**
+     * Works like \a readDistributedMED(), but assumes that the distributed MED file was
+     * moved from the original location and its ASCII master file needs to be updated.
+     *
+     * \note This method is mentioned to be used only in persistence.
+     */
+    void readPersistentDistributedMED(const char* pMEDfilename);
+
     /**
      * Writes this distributed MED file (including master file and sub MED files if necessary).
      * \param  pMEDfilenamePrefix

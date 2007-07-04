@@ -102,13 +102,19 @@ public:
      * \return the name of the associated sequential MED file.
      */
     std::string getSequentialMEDFilename() const;
-    
+
     /**
      * Defines the mesh to be processed.
      * \param  pMeshName name of the mesh to be partitionned.
      */
     void setMesh(const char* pMeshName);
-     
+
+    /**
+     * Returns the name of mesh, defined via setMesh().
+     * \return the name of mesh, defined via setMesh().
+     */
+    std::string getMeshName() const { return mMeshName; }
+
     /**
      * Returns the list of meshes contained in the sequential MED file.
      * Assumes this object encapsulates a sequential MED file.
@@ -240,6 +246,25 @@ public:
      * \throw  IOException if any i/o error occurs.
      */
     void save(const char* pPath);
+
+    /**
+     * Saves the associated MED file to the given location.
+     * Calling this method does not influence the object state.
+     *
+     * \note This method is mentioned to be used only in persistence.
+     *
+     * \param  pPath path where to save the file.
+     * \throw  IOException if any i/o error occurs.
+     */
+    void savePersistent(const char* pPath);
+
+    /**
+     * Works like \a create(), but assumes that the distributed MED file was moved
+     * from the original location and its ASCII master file needs to be updated.
+     *
+     * \note This method is mentioned to be used only in persistence.
+     */
+    void restorePersistent(const char* pMEDfilename);
 
     /**
      * Dumps any Obj to the given output stream.

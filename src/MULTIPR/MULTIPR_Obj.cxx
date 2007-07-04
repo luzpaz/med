@@ -276,9 +276,9 @@ vector<string> Obj::partitionneDomaine()
         mMeshDis = NULL;
         throw e;
     }
-    
+
     mState = MULTIPR_OBJ_STATE_DIS_MEM;
-    
+
     return getListParts();
 }
 
@@ -460,6 +460,68 @@ void Obj::save(const char* pPath)
         
         mState = MULTIPR_OBJ_STATE_DIS;
     }
+}
+
+
+void Obj::savePersistent (const char* pPath)
+{
+  if (pPath == NULL)
+    throw multipr::NullArgumentException("path must not be NULL", __FILE__, __LINE__);
+
+  //-------------------------------------------------------------
+  // Write distributed mesh
+  //-------------------------------------------------------------
+  string filename = string(pPath) + string("/") + multipr::getFilenameWithoutPath(mMEDfilename.c_str());
+  string strPrefix = multipr::removeExtension(filename.c_str(), ".med");
+  mMeshDis->writeDistributedMED(strPrefix.c_str());
+}
+
+void Obj::restorePersistent (const char* pMEDfilename)
+{
+  if (pMEDfilename == NULL)
+    throw multipr::NullArgumentException("file name must not be NULL", __FILE__, __LINE__);
+
+  // reset everything before associating a new MED file to this object
+  reset();
+
+  mMEDfilename = pMEDfilename;
+  mState = MULTIPR_OBJ_STATE_ERROR;
+
+  // check if file exists
+  FILE* f = fopen(pMEDfilename, "rb");
+  if (f == 0) 
+  {
+    // file does not exist
+    mState = MULTIPR_OBJ_STATE_ERROR;
+    throw FileNotFoundException("file not found", __FILE__, __LINE__);
+  }
+  fclose(f);
+
+  // test whether it is a sequential MED file or a distributed MED file
+  MED::EVersion aVersion = MED::GetVersionId(pMEDfilename, true);
+  if (aVersion != MED::eVUnknown)
+  {
+    mState = MULTIPR_OBJ_STATE_SEQ_INIT;
+    cout << "Sequential MED file " << pMEDfilename << " has been successfuly opened" << endl;
+  }
+  else
+  {
+    // CASE 2: distributed MED file?
+    try
+    {
+      mMeshDis = new multipr::MeshDis();
+      mMeshDis->readPersistentDistributedMED(pMEDfilename);
+
+      mState = MULTIPR_OBJ_STATE_DIS;
+      cout << "Distributed MED file " << pMEDfilename << " has been successfuly opened" << endl;
+    }
+    catch (...)
+    {
+      // neither a sequential MED file, nor a distributed MED file => error
+      mState = MULTIPR_OBJ_STATE_ERROR;
+      throw IOException("file is neither a sequential, nor a distributed MED file", __FILE__, __LINE__);
+    }
+  }
 }
 
 

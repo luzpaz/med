@@ -848,6 +848,115 @@ void MeshDis::readDistributedMED(const char* pMEDfilename)
 }
 
 
+void MeshDis::readPersistentDistributedMED(const char* pMEDfilename)
+{
+  if (pMEDfilename == NULL) throw NullArgumentException("filename should not be NULL", __FILE__, __LINE__);
+
+  const int MAX_SIZEOF_LINE = 1024;
+
+  reset();
+  strcpy(mDistributedMEDFilename, pMEDfilename);
+
+  //---------------------------------------------------------------------
+  // Open master file (ASCII file)
+  //---------------------------------------------------------------------
+  ifstream fileMaster(mDistributedMEDFilename);
+  if (fileMaster.fail()) throw IOException("i/o error while opening MED master file", __FILE__, __LINE__);
+
+  //---------------------------------------------------------------------
+  // Read header
+  //---------------------------------------------------------------------
+  char charbuffer[MAX_SIZEOF_LINE];
+  fileMaster.getline(charbuffer, MAX_SIZEOF_LINE);
+  if (fileMaster.fail()) throw IOException("i/o error while reading MED master file", __FILE__, __LINE__);
+
+  // check format
+  if ((charbuffer[0] != '#') ||
+      (charbuffer[1] != ' ') ||
+      (charbuffer[2] != 'M') ||
+      (charbuffer[3] != 'E') ||
+      (charbuffer[4] != 'D'))
+    throw IOException("not a valid distributed MED file", __FILE__, __LINE__);
+
+  while ((charbuffer[0] == '#') || (strlen(charbuffer) == 0))
+  {
+    char* strTag = NULL;
+    if ((charbuffer[0] == '#') && ((strTag = strstr(charbuffer, "[SOURCE]=")) != NULL))
+    {
+      char strSequentialMEDFilename[256];
+      int ret = sscanf(strTag, "[SOURCE]=%s", strSequentialMEDFilename);
+      if (ret == 1)
+      {
+        setSequentialMEDFilename(strSequentialMEDFilename);
+      }
+    }
+    fileMaster.getline(charbuffer, MAX_SIZEOF_LINE);
+    if (fileMaster.fail()) throw IOException("i/o error while reading MED master file", __FILE__, __LINE__);
+  }
+
+  // read number of parts
+  int nbParts = atoi(charbuffer);
+
+  //---------------------------------------------------------------------
+  // Read infos about sub-parts
+  //---------------------------------------------------------------------
+  char   lMeshName[MED_TAILLE_NOM + 1];
+  int    lId;
+  char   lPartName[MED_TAILLE_NOM + 1];
+  char   lPath[256];
+  char   lMEDFileName[256];    
+
+  for (int i = 0 ; i < nbParts ; i++)
+  {
+    fileMaster.getline(charbuffer, MAX_SIZEOF_LINE);
+    if (fileMaster.fail()) throw IOException("i/o error while reading MED master file", __FILE__, __LINE__);
+
+    while ((charbuffer[0] == '#') || (strlen(charbuffer) == 0))
+    {
+      fileMaster.getline(charbuffer, MAX_SIZEOF_LINE);
+      if (fileMaster.fail()) throw IOException("i/o error while reading MED master file", __FILE__, __LINE__);
+    }
+
+    lMeshName[0]    = '\0';
+    lId             = 0;
+    lPartName[0]    = '\0';
+    lPath[0]        = '\0';
+    lMEDFileName[0] = '\0';
+
+    int ret = sscanf(charbuffer, "%s %d %s %s %s", 
+                     lMeshName,
+                     &lId,
+                     lPartName,
+                     lPath,
+                     lMEDFileName);
+
+    if (ret != 5)
+      throw IOException("i/o error while reading MED master file; bad format", __FILE__, __LINE__);
+
+    // For Persistent (most probably moved) set of files:
+    // - replace path to the part in <lMEDFileName> by path to the master file.
+    string masterFilePath = multipr::getPath(pMEDfilename);
+    string partFileName   = multipr::getFilenameWithoutPath(lMEDFileName);
+    string newMEDFileName = masterFilePath + partFileName;
+
+    //cout << "DBG: read: " << lMeshName << " " << lId << " " << lPartName << endl;
+    addMesh(MeshDisPart::MULTIPR_KEEP_AS_IT,
+            lMeshName,
+            lId,
+            lPartName,
+            lPath,
+            newMEDFileName.c_str(), // lMEDFileName
+            NULL);
+  }
+
+  //---------------------------------------------------------------------
+  // Close master file
+  //---------------------------------------------------------------------
+  fileMaster.close();
+  if (fileMaster.fail()) throw IOException("i/o error while closing MED master file", __FILE__, __LINE__);
+}
+
+
 /**
  * Retrieves the output of MEDSPLITTER and convert it for MULTIPR.
  */
