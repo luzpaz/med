@@ -5,8 +5,6 @@
 #include "MEDMEM_Field.hxx"
 
 
-
-
 #include <cmath>
 #include <map>
 #include <sstream>

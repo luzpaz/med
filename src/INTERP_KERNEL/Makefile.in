@@ -51,31 +51,37 @@ BBTree.H
 LIB=libinterpkernel.la
 
 LIB_SRC = \
+TransformedTriangle.cxx\
+TransformedTriangle_intersect.cxx\
+TransformedTriangle_math.cxx\
+Interpolation3DSurf.cxx\
 Interpolation2D.cxx\
-Interpolation3DSurf.cxx
-
-
 
 # Executables targets
-BIN =
+BIN = 
 BIN_SRC = 
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-TEST_PROGS = make_plane test_INTERPOL_2D
+TEST_PROGS = make_plane test_INTERPOL_2D 
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
 CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MED2_INCLUDES)
-CPPFLAGS+=$(BOOST_CPPFLAGS)
+CPPFLAGS+=$(BOOST_CPPFLAGS) 
+
+# enable testing
+CXXFLAGS+= -DTESTING_INTERP_KERNEL
+CPPFLAGS+= -DTESTING_INTERP_KERNEL
+
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
 LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem   -lutil
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) -lutil
+LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) -lutil 
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}
