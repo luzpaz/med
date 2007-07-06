@@ -579,63 +579,69 @@ void MeshDis::decimatePart(
     char argv[256];
     char newPartName[MED_TAILLE_NOM + 1];
     char newMEDFileName[256];
-    
+
     // *** create a new mesh = MEDIUM resolution ***
     sprintf(argv, "%s %d %lf %lf %d", pFieldName, pFieldIt, pTMed, pRadius, pBoxing);
     sprintf(newPartName, "%s_MED", pPartName);
     sprintf(newMEDFileName, "%s_gradmoy-med-%s-%s.med", 
-        strPrefix.c_str(), 
-        realToString(pTMed).c_str(), 
-        realToString(pRadius).c_str());
-    
+            strPrefix.c_str(), 
+            realToString(pTMed).c_str(), 
+            realToString(pRadius).c_str());
+
     {
-        Mesh* meshMedium = meshFull->decimate(pFilterName, argv, part->getMeshName());
-        cout << (*meshMedium) << endl;
-        
-        insertMesh(
-            MeshDisPart::MULTIPR_WRITE_MESH,
-            part->getMeshName(),
-            part->mId + 1,
-            newPartName,
-            "localhost",
-            newMEDFileName,
-            meshMedium,
-            part->mId + 0);
-            
-            if ((meshMedium->getNumberOfElements() == 0) && (gEmptyMeshCallback != NULL))
-            {
-                gEmptyMeshCallback->reportEmptyMesh(newPartName);
-            }
+      Mesh* meshMedium = meshFull->decimate(pFilterName, argv, part->getMeshName());
+      cout << (*meshMedium) << endl;
+
+      if ((meshMedium->getNumberOfElements() == 0) && (gEmptyMeshCallback != NULL))
+      {
+        gEmptyMeshCallback->reportEmptyMesh(newPartName);
+      }
+
+      // insert only non-empty meshes
+      if (meshMedium->getNumberOfElements() > 0)
+      {
+        insertMesh(MeshDisPart::MULTIPR_WRITE_MESH,
+                   part->getMeshName(),
+                   part->mId + 1,
+                   newPartName,
+                   "localhost",
+                   newMEDFileName,
+                   meshMedium,
+                   part->mId + 0);
+      }
     }
-    
+
     // *** create a new mesh = LOW resolution ***
     sprintf(argv, "%s %d %lf %lf %d", pFieldName, pFieldIt, pTLow, pRadius, pBoxing);
     sprintf(newPartName, "%s_LOW", pPartName);
     sprintf(newMEDFileName, "%s_gradmoy-low-%s-%s.med", 
-        strPrefix.c_str(), 
-        realToString(pTLow).c_str(), 
-        realToString(pRadius).c_str());
-    
+            strPrefix.c_str(), 
+            realToString(pTLow).c_str(), 
+            realToString(pRadius).c_str());
+
     {
-        Mesh* meshLow = meshFull->decimate(pFilterName, argv, part->getMeshName());
-        cout << (*meshLow) << endl;
-        
-        insertMesh(
-            MeshDisPart::MULTIPR_WRITE_MESH,
-            part->getMeshName(),
-            part->mId + 2,
-            newPartName,
-            "localhost",
-            newMEDFileName,
-            meshLow,
-            part->mId + 1);
-            
-            if ((meshLow->getNumberOfElements() == 0) && (gEmptyMeshCallback != NULL))
-            {
-                gEmptyMeshCallback->reportEmptyMesh(newPartName);
-            }
+      Mesh* meshLow = meshFull->decimate(pFilterName, argv, part->getMeshName());
+      cout << (*meshLow) << endl;
+
+      if ((meshLow->getNumberOfElements() == 0) && (gEmptyMeshCallback != NULL))
+      {
+        gEmptyMeshCallback->reportEmptyMesh(newPartName);
+      }
+
+      // insert only non-empty meshes
+      if (meshLow->getNumberOfElements() > 0)
+      {
+        insertMesh(MeshDisPart::MULTIPR_WRITE_MESH,
+                   part->getMeshName(),
+                   part->mId + 2,
+                   newPartName,
+                   "localhost",
+                   newMEDFileName,
+                   meshLow,
+                   part->mId + 1);
+      }
     }
-    
+
     // debug
     //cout << (*this) << endl;
 }
