@@ -3284,49 +3284,53 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 
 int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 {
-  
+
   const char * LOC="int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> families) const : ";
   BEGIN_OF(LOC);
 
   med_2_2::med_err err;
-  
+
   MESSAGE(LOC<<" families.size() :"<<families.size());
 
   for (unsigned int i=0; i< families.size(); i++) {
 
-    int      numberOfAttributes         = families[i]->getNumberOfAttributes ();
-    string   attributesDescriptions     = "";
+    int      numberOfAttributes = families[i]->getNumberOfAttributes ();
+    string   attributesDescriptions (numberOfAttributes*MED_TAILLE_DESC,'\0');
 
     // Recompose the attributes descriptions arg for MED
-    for (int j=0; j < numberOfAttributes; j++) {
-        
+    for (int j=0; j < numberOfAttributes; j++)
+    {
       string attributeDescription = families[i]->getAttributeDescription(j+1);
-        
+
       if ( attributeDescription.size() > MED_TAILLE_DESC )
-	throw MEDEXCEPTION( LOCALIZED(STRING(LOC) << "The size of the attribute description n° |" << j+1 << "| of the family |" << families[i]->getName()
-				      << "| with identifier |" << families[i]->getIdentifier()  << "| is |" 
-				      <<  attributeDescription.size()  <<"| and is more than |" <<  MED_TAILLE_DESC << "|")) ;
-        
-      attributesDescriptions += attributeDescription;
+	throw MEDEXCEPTION( LOCALIZED(STRING(LOC) << "The size of the attribute description n° |"
+                                      << j+1 << "| of the family |" << families[i]->getName()
+				      << "| with identifier |" << families[i]->getIdentifier()
+                                      << "| is |" << attributeDescription.size()
+                                      <<"| and is more than |" <<  MED_TAILLE_DESC << "|"));
+
+      int length = min(MED_TAILLE_LNOM,(int)attributeDescription.size());
+      attributesDescriptions.replace(j*MED_TAILLE_DESC,length, attributeDescription,0,length);
     }
-      
+
 
     int      numberOfGroups  = families[i]->getNumberOfGroups();
-    string   groupsNames(numberOfGroups*MED_TAILLE_LNOM,'\0') ;
-    // Recompose the groups names arg for MED
-    for (int j=0; j < numberOfGroups; j++) {
+    string   groupsNames(numberOfGroups*MED_TAILLE_LNOM,'\0');
 
+    // Recompose the groups names arg for MED
+    for (int j=0; j < numberOfGroups; j++)
+    {
       string groupName = families[i]->getGroupName(j+1);
-       
+
       if ( groupName.size() > MED_TAILLE_LNOM )
-	throw MEDEXCEPTION( LOCALIZED(STRING(LOC) << "The size of the group name  n° |" << j+1 << "| of the family |" << families[i]->getName()
-				      << "| with identifier |" << families[i]->getIdentifier()  << "| is |" 
-				      <<  groupName.size()  <<"| and is more than |" << MED_TAILLE_LNOM << "|")) ;
-        
+	throw MEDEXCEPTION( LOCALIZED(STRING(LOC) << "The size of the group name  n° |"
+                                      << j+1 << "| of the family |" << families[i]->getName()
+				      << "| with identifier |" << families[i]->getIdentifier()
+                                      << "| is |" << groupName.size()
+                                      <<"| and is more than |" << MED_TAILLE_LNOM << "|"));
 
       int length = min(MED_TAILLE_LNOM,(int)groupName.size());
       groupsNames.replace(j*MED_TAILLE_LNOM,length, groupName,0,length);
-      
     }
 
     // test if the family already exists (HDF trick waiting a MED evolution to be replaced)
@@ -3393,19 +3397,19 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 			      numberOfGroups);
 #endif
       SCRUTE(err);
-      if ( err != MED_VALID) 
+      if (err != MED_VALID) 
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't create family |" << families[i]->getName()
-				     << "| with identifier |" << families[i]->getIdentifier()  << "| groups names |" 
-				     << groupsNames  <<"| and  attributes descriptions |" << attributesDescriptions << "|")) ;
+				     << "| with identifier |" << families[i]->getIdentifier()
+                                     << "| groups names |" << groupsNames
+                                     << "| and  attributes descriptions |" << attributesDescriptions << "|"));
     }
     else
       med_2_2::_MEDdatagroupFermer(_medIdt);
 
-
   }
 
   END_OF(LOC);
-    
+
   return MED_VALID;
 }
 
