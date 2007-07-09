@@ -5,6 +5,7 @@
 
 #ifdef TESTING_INTERP_KERNEL
 class TransformedTriangleTest;
+class TransformedTriangleIntersectTest;
 #endif
 
 namespace INTERP_UTILS
@@ -21,14 +22,14 @@ namespace INTERP_UTILS
    */
   class TransformedTriangle
   {
-    //#ifdef TESTING_INTERP_KERNEL
-    
-    //#endif
-    
+
   public:
+
 #ifdef TESTING_INTERP_KERNEL
     friend class ::TransformedTriangleTest;
+    friend class ::TransformedTriangleIntersectTest;
 #endif
+
     /**
      * Enumerations representing the different geometric elements of the unit tetrahedron
      * and the triangle.
@@ -118,7 +119,9 @@ namespace INTERP_UTILS
 
     bool testSegmentIntersectsFacet(const TriSegment seg, const TetraFacet facet) const;
 
-    bool testSurfaceAboveCorner(const TetraCorner corner);
+    bool testSurfaceAboveCorner(const TetraCorner corner) const;
+    
+    bool testTriangleSurroundsRay(const TetraCorner corner) const;
 
     ////////////////////////////////////////////////////////////////////////////////////
     /// Double and triple product calculations                           ///////////////

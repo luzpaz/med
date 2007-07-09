@@ -74,9 +74,9 @@ namespace INTERP_UTILS
 	const double term2 = _doubleProducts[8*seg + TT::C_ZX] * _doubleProducts[8*seg + TT::C_YH];
 	const double term3 = _doubleProducts[8*seg + TT::C_XY] * _doubleProducts[8*seg + TT::C_ZH];
 
-	std::cout << std::endl;
-	std::cout << "for seg " << seg << " consistency " << term1 + term2 + term3 << std::endl;
-	std::cout << "term1 :" << term1 << " term2 :" << term2 << " term3: " << term3 << std::endl;
+	//	std::cout << std::endl;
+	//std::cout << "for seg " << seg << " consistency " << term1 + term2 + term3 << std::endl;
+	//std::cout << "term1 :" << term1 << " term2 :" << term2 << " term3: " << term3 << std::endl;
 
 	//	if(term1 + term2 + term3 != 0.0)
 	const int num_zero = (term1 == 0.0 ? 1 : 0) + (term2 == 0.0 ? 1 : 0) + (term3 == 0.0 ? 1 : 0);
@@ -85,7 +85,7 @@ namespace INTERP_UTILS
 	
 	if(num_zero == 2 || (num_zero !=3 && num_neg == 0) || (num_zero !=3 && num_neg == 3))
 	  {
-	    std::cout << "inconsistent! "<< std::endl;
+	    //std::cout << "inconsistent! "<< std::endl;
 
 	    // find TetraCorner nearest to segment
 	    double min_dist;
@@ -96,7 +96,7 @@ namespace INTERP_UTILS
 		// calculate distance corner - segment axis
 		// NB uses fact that TriSegment <=> TriCorner that is first point of segment (PQ <=> P)
 		const TriCorner ptP_idx = TriCorner(seg);
-		const TriCorner ptQ_idx = TriCorner(seg + 1 % 3);
+		const TriCorner ptQ_idx = TriCorner( (seg + 1) % 3);
 
 		const double ptP[3] = { _coords[5*ptP_idx], _coords[5*ptP_idx + 1], _coords[5*ptP_idx + 2]  };
 		const double ptQ[3] = { _coords[5*ptQ_idx], _coords[5*ptQ_idx + 1], _coords[5*ptQ_idx + 2]  };
@@ -182,7 +182,7 @@ namespace INTERP_UTILS
 	  
 	    if(absDoubleProduct < THRESHOLD_F*delta)
 	      {
-		std::cout << "Double product " << 8*seg+dp << " = " << absDoubleProduct << " is imprecise, reset to 0.0" << std::endl;
+		//std::cout << "Double product " << 8*seg+dp << " = " << absDoubleProduct << " is imprecise, reset to 0.0" << std::endl;
 		_doubleProducts[8*seg + dp] = 0.0;
 	      }
 	  }

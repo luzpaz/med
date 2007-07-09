@@ -229,9 +229,7 @@ namespace INTERP_UTILS
    */
   bool TransformedTriangle::testSurfaceRayIntersection(const TetraCorner corner) const
   { 
-    // not implemented
-    //return testTriangleSurroundsEdge(H_10,etc) && testSurfaceAboveCorner(corner); 
-    return false;
+    return testTriangleSurroundsRay( corner ) && testSurfaceAboveCorner( corner ); 
   }
 
   /**
@@ -244,8 +242,41 @@ namespace INTERP_UTILS
    */
   bool TransformedTriangle::testSegmentHalfstripIntersection(const TriSegment seg, const TetraEdge edg)
   {
-    // not implemented
-    return false;
+    // get right index here to avoid "filling out" array
+    const int edgeIndex = static_cast<int>(edg) - 3;
+    
+    // double products used in test
+    // products 1 and 2 for each edge -> first condition in Grandy [30]
+    // products 3 and 4 for each edge -> third condition
+    // NB : some uncertainty whether these last are correct
+    static const DoubleProduct DP_FOR_HALFSTRIP_INTERSECTION[12] =
+      {
+	C_10, C_01, C_ZH, C_YZ, // XY
+	C_01, C_XY, C_XH, C_ZX, // YZ
+	C_XY, C_10, C_YH, C_XY  // ZX
+      };
+
+    // facets to use in second condition (S_m)
+    static TetraFacet FACET_FOR_HALFSTRIP_INTERSECTION[3] = 
+      {
+	XYZ, // XY
+	OYZ, // YZ
+	OZX  // ZX
+      };
+
+    const double cVals[4] = 
+      {
+	calcStableC(seg, DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIndex]),
+	calcStableC(seg, DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIndex + 1]),
+	calcStableC(seg, DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIndex + 2]),
+	calcStableC(seg, DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIndex + 3])
+      };
+    
+    const TetraFacet facet =  FACET_FOR_HALFSTRIP_INTERSECTION[edgeIndex];
+
+    //    std::cout << "Halfstrip tests : " << (cVals[0]*cVals[1] < 0.0) << ", " << testSegmentIntersectsFacet(seg, facet) << ", " << (cVals[2]*cVals[3] > 0.0) << std::endl;
+      
+    return (cVals[0]*cVals[1] < 0.0) && testSegmentIntersectsFacet(seg, facet) && (cVals[2]*cVals[3] > 0.0);
   }
 
   /**
@@ -273,7 +304,64 @@ namespace INTERP_UTILS
    */
   bool TransformedTriangle::testSegmentRayIntersection(const TriSegment seg, const TetraCorner corner) const
   {
-    // not implemented
+    assert(corner == X || corner == Y || corner == Z);
+
+    // readjust index since O is not used
+    const int cornerIdx = static_cast<int>(corner) - 1;
+
+    // double products to use in test
+    // dp 1   -> cond 1
+    // dp 2-7 -> cond 3
+    //? NB : last two rows are not completely understood and may contain errors
+    static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21] = 
+      {
+	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
+	C_01, C_XH, C_ZH, C_XY, C_10, C_XH, C_ZX, // Y
+	C_XY, C_YH, C_XH, C_10, C_01, C_ZH, C_YZ  // Z
+      };
+
+    // facets to use
+    //? not sure this is correct
+    static const TetraFacet FACET_SEGMENT_RAY_INTERSECTION[3] = 
+      {
+	OZX, // X
+	OXY, // Y
+	OYZ, // Z
+      };
+    
+
+    const DoubleProduct dp0 = DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx];
+    
+    //? epsilon-equality here?
+    if(dp0 == 0.0) // cond. 1
+      {
+	
+	if(testSegmentIntersectsFacet(seg, FACET_SEGMENT_RAY_INTERSECTION[cornerIdx])) // cond. 2.1
+	  { 
+	  const double H1 = _coords[5*seg + 4];
+	  const double H2 = _coords[5*( (seg + 1) % 3) + 4];
+
+	  // S_H -> cond. 2.2
+	  //	  std::cout << "H1 = " << H1 << ", H2= " << H2 << std::endl; 
+	  if(H1*H2 <= 0.0 && H1 != H2) // should equality be in "epsilon-sense" ?
+	    {
+    
+	      const double cVals[6] = 
+		{
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 1]),
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 2]),
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 3]),
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 4]),
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 5]),
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 6]),
+		};
+
+	      // cond. 3
+	      return ( (cVals[0] + cVals[1])*(cVals[2] - cVals[3]) - cVals[4]*cVals[5] ) < 0.0;
+	    }
+	  }
+      }
+    
     return false;
   }
 
@@ -392,7 +480,7 @@ namespace INTERP_UTILS
     const double t1 = calcStableT(TRIPLE_PRODUCTS[2*edge]);
     const double t2 = calcStableT(TRIPLE_PRODUCTS[2*edge + 1]);
 
-    // should equality with zero use epsilon?
+    //? should equality with zero use epsilon?
     return (t1*t2 <= 0.0) && (t1 - t2 != 0.0);
   }
 
@@ -432,11 +520,12 @@ namespace INTERP_UTILS
   bool TransformedTriangle::testSegmentIntersectsFacet(const TriSegment seg, const TetraFacet facet) const
   {
     // use correspondance facet a = 0 <=> offset for coordinate a in _coords
-    // and also coorespondance segment AB => corner A
+    // and also correspondance segment AB => corner A
     const double coord1 = _coords[5*seg + facet];
-    const double coord2 = _coords[5*(seg + 1 % 3) + facet];
+    const double coord2 = _coords[5*( (seg + 1) % 3) + facet];
 
-    // should we use epsilon-equality here in second test?
+    //? should we use epsilon-equality here in second test?
+    //    std::cout << "coord1 : " << coord1 << " coord2 : " << coord2 << std::endl;
     return (coord1*coord2 <= 0.0) && (coord1 != coord2);
   }
 
@@ -448,10 +537,43 @@ namespace INTERP_UTILS
    * @param corner corner of the tetrahedron
    * @returns true if the triangle lies above the corner in the z-direction
    */
-  bool TransformedTriangle::testSurfaceAboveCorner(const TetraCorner corner)
+  bool TransformedTriangle::testSurfaceAboveCorner(const TetraCorner corner) const
   {
-    // not implemented
-    return false;
+    //? is it always YZ here ?
+    const double normal = calcStableC(PQ, C_YZ) + calcStableC(QR, C_YZ) + calcStableC(RP, C_YZ);
+    return ( calcStableT(corner) * normal ) >= 0.0;
+  }
+
+  /**
+   * Tests if the triangle PQR surrounds the ray pointing upwards in the z-direction
+   * from the given corner.
+   *
+   * @param corner corner on face XYZ of tetrahedron
+   * @returns      true if PQR surrounds ray, false if not (see Grandy, eq. [18])
+   */
+  bool TransformedTriangle::testTriangleSurroundsRay(const TetraCorner corner) const
+  {
+    assert(corner == X || corner == Y || corner == Z);
+
+    // double products to use for the possible corners
+    static const DoubleProduct DP_FOR_RAY_INTERSECTION[4] = 
+      {
+	DoubleProduct(0),        // O - only here to fill out and make indices match
+	C_10,     // X
+	C_01,     // Y
+	C_XY      // Z
+      };
+
+    const DoubleProduct dp = DP_FOR_RAY_INTERSECTION[corner];
+
+    const double cPQ = calcStableC(PQ, dp);
+    const double cQR = calcStableC(QR, dp);
+    const double cRP = calcStableC(RP, dp);
+
+    //? NB here we have no correction for precision - is this good?
+    // Our authority Grandy says nothing
+    return ( cPQ*cQR > 0.0 ) && ( cPQ*cRP > 0.0 );
+
   }
 
 }; // NAMESPACE
