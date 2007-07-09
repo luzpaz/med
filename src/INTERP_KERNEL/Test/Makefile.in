@@ -35,7 +35,8 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 
 # header files
 EXPORT_HEADERS = CppUnitTest.hxx \
-		 TransformedTriangleTest.hxx
+		 TransformedTriangleTest.hxx \
+		 TransformedTriangleIntersectTest.hxx	
 
 
 # Libraries targets
@@ -49,7 +50,7 @@ LIB_CLIENT_IDL =
 
 BIN = TestInterpKernel
 
-BIN_SRC = CppUnitTest.cxx TransformedTriangleTest.cxx
+BIN_SRC = CppUnitTest.cxx TransformedTriangleTest.cxx TransformedTriangleIntersectTest.cxx
 BIN_CLIENT_IDL =
 
 

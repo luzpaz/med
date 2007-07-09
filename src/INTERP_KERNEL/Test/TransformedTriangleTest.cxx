@@ -20,7 +20,7 @@ void TransformedTriangleTest::setUp()
   Hq1 = 1 - q1[0] - q1[1];
   Hr1 = 1 - r1[0] - r1[1];
 
-  std::cout <<std::endl<< "constructing tri1..." << std::endl;
+  //  std::cout <<std::endl<< "constructing tri1..." << std::endl;
   tri1 = new TransformedTriangle(p1, q1, r1);
  
 
@@ -43,7 +43,7 @@ void TransformedTriangleTest::setUp()
   Hp2 = 1 - p2[0] - p2[1];
   Hq2 = 1 - q2[0] - q2[1];
   Hr2 = 1 - r2[0] - r2[1];
-  std::cout <<std::endl<< "constructing tri2..." << std::endl;
+  //  std::cout <<std::endl<< "constructing tri2..." << std::endl;
   tri2 = new TransformedTriangle(p2, q2, r2);
   
   
@@ -171,8 +171,8 @@ void TransformedTriangleTest::test_calcUnstableT()
       for(int row = 1 ; row < 4 ; ++row)
 	{
 	  const double t = tri1->calcTByDevelopingRow(corner, row, false);
-	  std::cout << std::endl  << " Corner = " << corner  << " Row = " << row << " got: " << t << 
-	    " expected: " << correct_t_vals[corner]<< std::endl;
+	  //	  std::cout << std::endl  << " Corner = " << corner  << " Row = " << row << " got: " << t << 
+	  //  " expected: " << correct_t_vals[corner]<< std::endl;
 	  CPPUNIT_ASSERT_DOUBLES_EQUAL(correct_t_vals[corner], t, ERR_TOL);	  
 	}
     }
@@ -248,7 +248,7 @@ void TransformedTriangleTest::test_calcStableC_Consistency()
 	      // formula : ( (Q-P) x (P - corner) )^2 / norm(Q-P)^2
 	    
 	      const double ptP[3] = { tri2->_coords[5*seg], tri2->_coords[5*seg + 1], tri2->_coords[5*seg + 2] };
-	      const double ptQ[3] = { tri2->_coords[5*(seg+1 % 3)], tri2->_coords[5*(seg+1 % 3) + 1], tri2->_coords[5*(seg+1 % 3) + 2] };
+	      const double ptQ[3] = { tri2->_coords[5*( (seg+1) % 3)], tri2->_coords[5*( (seg+1) % 3) + 1], tri2->_coords[5*( (seg+1) % 3) + 2] };
 	      const double ptCorner[3] = { 
 		corner == TransformedTriangle::X ? 1.0 : 0.0,
 		corner == TransformedTriangle::Y ? 1.0 : 0.0,
@@ -287,7 +287,7 @@ void TransformedTriangleTest::test_calcStableC_Consistency()
 	  for(int i = 0; i < 3 ; ++i) 
 	    {
 	      DoubleProduct dp = DOUBLE_PRODUCTS[3*min_corner + i];
-	      std::cout << std::endl << "in test inconsistent (seg,dp) :(" << seg <<", " << dp << ")" << std::endl;
+	      //	      std::cout << std::endl << "in test inconsistent (seg,dp) :(" << seg <<", " << dp << ")" << std::endl;
 	      CPPUNIT_ASSERT_EQUAL(0.0, tri2->calcStableC(seg, dp));
 	      correct_c_vals[8*seg + dp] = 0.0;
 	    }
