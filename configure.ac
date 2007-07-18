@@ -429,13 +429,13 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 
 	dnl CHECK_MICO
 
-	echo
-	echo ---------------------------------------------
-	echo testing MSG2QM
-	echo ---------------------------------------------
-	echo
+	dnl echo
+	dnl echo ---------------------------------------------
+	dnl echo testing MSG2QM
+	dnl echo ---------------------------------------------
+	dnl echo
 
-	CHECK_MSG2QM
+	dnl CHECK_MSG2QM
 
 	echo
 	echo ---------------------------------------------

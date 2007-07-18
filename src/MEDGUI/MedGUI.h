@@ -25,18 +25,18 @@ class MedGUI: public SalomeApp_Module
 public:
   MedGUI();
 
-  virtual void initialize        ( CAM_Application* );
-  virtual QString                engineIOR() const;
-  virtual void windows( QMap<int, int>& mappa ) const;
-  virtual bool OnGUIEvent        (int theCommandID);
-  virtual bool OnKeyPress        (QKeyEvent* pe, SUIT_ViewWindow* );
-  virtual bool OnMousePress      (QMouseEvent* pe, SUIT_ViewWindow* );
-  virtual bool OnMouseMove       (QMouseEvent* pe, SUIT_ViewWindow* );
+  virtual void                        initialize( CAM_Application* );
+  virtual QString                     engineIOR() const;
+  virtual void                        windows( QMap<int, int>& mappa ) const;
+  
+  virtual bool                        OnGUIEvent(int theCommandID);
+  virtual bool                        OnKeyPress(QKeyEvent* pe, SUIT_ViewWindow* );
+  virtual bool                        OnMousePress(QMouseEvent* pe, SUIT_ViewWindow* );
+  virtual bool                        OnMouseMove(QMouseEvent* pe, SUIT_ViewWindow* );
 
   void createMedAction( const int, const QString&, const QString& = "" );
-  void createPopupItem( const int, const QString&, const QString&, const QString& = "", const int = -1 );
 
-  virtual void contextMenuPopup( const QString&, QPopupMenu*, QString& );
+  virtual void                        contextMenuPopup( const QString&, QMenu*, QString& );
 
   //virtual bool SetSettings       ();
   //virtual bool CustomPopup       ( QAD_Desktop* parent, QPopupMenu* popup, const QString & theContext,
@@ -47,7 +47,6 @@ public:
   /*static*/ SALOME_MED::MED_Gen_ptr InitMedGen() const;
 
   static bool DumpMesh( SALOME_MED::MESH_var aMesh );
-  //  static bool DumpSubMesh( SMESH::SMESH_subMesh_ptr aSubMesh ) ;
   static bool DumpSubMesh( SALOME_MED::FAMILY_var Fam ) ;
 
   static void setOrb();

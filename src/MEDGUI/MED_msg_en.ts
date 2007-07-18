@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="1.1">
+    <context>
+        <name>@default</name>
+        <message>
+            <source>MED_BUT_OK</source>
+            <translation>OK</translation>
+        </message>
+        <message>
+            <source>MED_INF_FIELDNAME</source>
+            <translation>Please enter the name of the field you want to read</translation>
+        </message>
+        <message>
+            <source>MED_INF_MESHNAME</source>
+            <translation>Please enter the name of the mesh you want to read</translation>
+        </message>
+        <message>
+            <source>MED_INF_NOIOR</source>
+            <translation>Object has no IOR</translation>
+        </message>
+        <message>
+            <source>MED_INF_NOTIMPL</source>
+            <translation>Not Implemented for this Object</translation>
+        </message>
+        <message>
+            <source>MED_WRN_WARNING</source>
+            <translation>Warning</translation>
+        </message>
+        <message>
+            <source>MEN_DISPLAY</source>
+            <translation>Display</translation>
+        </message>
+        <message>
+            <source>MEN_DUMPMESH</source>
+            <translation>Dump Mesh</translation>
+        </message>
+        <message>
+            <source>MEN_DUMPSUBMESH</source>
+            <translation>Dump SubMesh</translation>
+        </message>
+        <message>
+            <source>MEN_ERASE</source>
+            <translation>Erase</translation>
+        </message>
+        <message>
+            <source>MEN_EXPLORE</source>
+            <translation>Explore Med File</translation>
+        </message>
+        <message>
+            <source>MEN_FIELDSEL</source>
+            <translation>Field selection</translation>
+        </message>
+        <message>
+            <source>MEN_MESHSEL</source>
+            <translation>Mesh selection</translation>
+        </message>
+        <message>
+            <source>MEN_POPUPTEST</source>
+            <translation>Popup test</translation>
+        </message>
+        <message>
+            <source>STB_DISPLAY</source>
+            <translation>Display</translation>
+        </message>
+        <message>
+            <source>STB_DUMPMESH</source>
+            <translation>dump Mesh</translation>
+        </message>
+        <message>
+            <source>STB_DUMPSUBMESH</source>
+            <translation>dump Mesh</translation>
+        </message>
+        <message>
+            <source>STB_ERASE</source>
+            <translation>Erase</translation>
+        </message>
+        <message>
+            <source>STB_EXPLORE</source>
+            <translation>Explore Med File</translation>
+        </message>
+        <message>
+            <source>STB_FIELDSEL</source>
+            <translation>Read a field</translation>
+        </message>
+        <message>
+            <source>STB_MESHSEL</source>
+            <translation>Read a mesh</translation>
+        </message>
+        <message>
+            <source>STB_POPUPTEST</source>
+            <translation>Popup test</translation>
+        </message>
+        <message>
+            <source>TB_MED</source>
+            <translation>Med Toolbar</translation>
+        </message>
+        <message>
+            <source>TOP_DISPLAY</source>
+            <translation>Display</translation>
+        </message>
+        <message>
+            <source>TOP_DUMPMESH</source>
+            <translation>Dump Mesh</translation>
+        </message>
+        <message>
+            <source>TOP_DUMPSUBMESH</source>
+            <translation>Dump SubMesh</translation>
+        </message>
+        <message>
+            <source>TOP_ERASE</source>
+            <translation>Erase</translation>
+        </message>
+        <message>
+            <source>TOP_EXPLORE</source>
+            <translation>Explore Med File</translation>
+        </message>
+        <message>
+            <source>TOP_FIELDSEL</source>
+            <translation>Field selection</translation>
+        </message>
+        <message>
+            <source>TOP_MESHSEL</source>
+            <translation>Mesh selection</translation>
+        </message>
+        <message>
+            <source>TOP_POPUPTEST</source>
+            <translation>Popup test</translation>
+        </message>
+    </context>
+    <context>
+        <name>MedGUI</name>
+        <message>
+            <source>MED_MEN_ALL_FILES</source>
+            <translation>All Files ( * )</translation>
+        </message>
+        <message>
+            <source>MED_MEN_IMPORT</source>
+            <translation>Import</translation>
+        </message>
+        <message>
+            <source>MED_MEN_IMPORT_MED</source>
+            <translation>MED Files ( *.med )</translation>
+        </message>
+    </context>
+</TS>

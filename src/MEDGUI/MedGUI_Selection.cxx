@@ -24,8 +24,9 @@
 //function : MedGUI_Selection
 //purpose  : 
 //=======================================================================
-MedGUI_Selection::MedGUI_Selection()
-: LightApp_Selection()
+MedGUI_Selection::MedGUI_Selection( const QString&         client,
+                                    LightApp_SelectionMgr* mgr )
+: LightApp_Selection( client, mgr)
 {
 }
 

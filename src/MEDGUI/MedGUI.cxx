@@ -50,19 +50,21 @@
 
 #include <LightApp_SelectionMgr.h>
 
-#include <OB_Browser.h>
+#include <QAction>
+#include <QIcon>
+#include <QInputDialog>
+#include <QLineEdit>
 
-//#include "SMESH_TypeFilter.hxx"
 
 #include <MedGUI_Selection.h>
 
 // QT Includes
-#include <qinputdialog.h>
+//#include <qinputdialog.h>
 
 //VRV: porting on Qt 3.0.5
-#if QT_VERSION >= 0x030005
-#include <qlineedit.h>
-#endif
+//#if QT_VERSION >= 0x030005
+//#include <qlineedit.h>
+//#endif
 //VRV: porting on Qt 3.0.5
 
 using namespace std;
@@ -76,13 +78,15 @@ static CORBA::ORB_var   _orb;
 //=============================================================================
 MedGUI::MedGUI() :
   SalomeApp_Module( "MED" )
-{}
+{
+}
 
 //=============================================================================
 /*!
  *
  */
 //=============================================================================
+/* 
 void MedGUI::createPopupItem( const int id,
                               const QString& clients,
                               const QString& types,
@@ -111,22 +115,33 @@ void MedGUI::createPopupItem( const int id,
   rule += theRule;
   popupMgr()->setRule( action( id ), rule, true );
 }
+*/
 
 void MedGUI::createMedAction( const int id, const QString& po_id, const QString& icon_id )
 {
   QWidget* parent = application()->desktop();
   SUIT_ResourceMgr* mgr = application()->resourceMgr();
 
-  QPixmap pix; QIconSet icon;
+  QPixmap pix;
+  QIcon icon;
   if( !icon_id.isEmpty() )
-    pix = mgr->loadPixmap( "MED", tr( icon_id ) );
+    pix = mgr->loadPixmap( "MED", tr( (const char*)icon_id.toLatin1() ) );
 //   else
 //     pix = mgr->loadPixmap( "MED", tr( QString( "ICO_" )+po_id ) );
 
   if ( !pix.isNull() )
-    icon = QIconSet( pix );
+    icon = QIcon( pix );
 
-  createAction( id, tr( "TOP_" + po_id ), icon, tr( "MEN_" + po_id ), tr( "STB_" + po_id ), 0, parent, false, this, SLOT( onGUIEvent() ) );
+  createAction( id, 
+		tr( (const char*)("TOP_" + po_id).toLatin1() ),
+		icon,
+		tr( (const char*)("MEN_" + po_id).toLatin1() ),
+		tr( (const char*)("STB_" + po_id).toLatin1() ),
+		0,
+		parent,
+		false,
+		this,
+		SLOT( onGUIEvent() ) );
 }
 
 //=============================================================================
@@ -138,7 +153,7 @@ void MedGUI::initialize( CAM_Application* app )
 {
   SalomeApp_Module::initialize( app );
 
-  QWidget* parent = application()->desktop();
+  //QWidget* parent = application()->desktop();
 
   createMedAction( 931, "MESHSEL" );
   createMedAction( 932, "FIELDSEL" );
@@ -173,14 +188,15 @@ void MedGUI::initialize( CAM_Application* app )
 //   createPopupItem( 903,  OB, "", "" );
 }
 
-void MedGUI::contextMenuPopup( const QString& client, QPopupMenu* menu, QString& /*title*/ )
-{
-  MedGUI_Selection sel;
+void MedGUI::contextMenuPopup( const QString& client, QMenu* menu, QString& /*title*/ )
+{  
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( application() );
   if( app )
   {
-    sel.init( client, app->selectionMgr() );
-    popupMgr()->updatePopup( menu, &sel );
+    MedGUI_Selection sel( client, app->selectionMgr() );
+    popupMgr()->setMenu( menu );
+    popupMgr()->setSelection( &sel );
+    popupMgr()->updateMenu();
   }
 }
 
@@ -198,8 +214,8 @@ QString MedGUI::engineIOR() const
 
 void MedGUI::windows( QMap<int, int>& mappa ) const
 {
-  mappa.insert( SalomeApp_Application::WT_ObjectBrowser, Qt::DockLeft );
-  mappa.insert( SalomeApp_Application::WT_PyConsole, Qt::DockBottom );
+  mappa.insert( SalomeApp_Application::WT_ObjectBrowser, Qt::LeftDockWidgetArea );
+  mappa.insert( SalomeApp_Application::WT_PyConsole, Qt::BottomDockWidgetArea );
 }
 
 
@@ -210,10 +226,10 @@ void MedGUI::windows( QMap<int, int>& mappa ) const
 //=============================================================================
 void MedGUI::onGUIEvent()
 {
-  const QObject* obj = sender();
-  if ( !obj || !obj->inherits( "QAction" ) )
+  const QAction* obj = qobject_cast<QAction *>(sender());
+  if ( !obj );
     return;
-  int id = actionId((QAction*)obj);
+  int id = actionId( obj );
   if ( id != -1 )
     OnGUIEvent( id );
 }
@@ -323,26 +339,26 @@ bool MedGUI::OnGUIEvent (int theCommandID)
         // Selection du Maillage
 	if (!file.isEmpty() )
 	  {
-	    SCRUTE(file);
+	    SCRUTE((const char*)file.toLatin1());
 	    QString meshName;
-	    meshName = QInputDialog::getText( QString( tr("MED_INF_MESHNAME") ),
+	    meshName = QInputDialog::getText( application()->desktop(),
+					      tr("MED_INF_MESHNAME"),
 					      QString::null,
-					      //VRV: porting on Qt 3.0.5
-#if QT_VERSION >= 0x030005
 					      QLineEdit::Normal,
-#endif
-					      //VRV: porting on Qt 3.0.5
-					      QString::null, &ok);
-	    if ( ! meshName.isEmpty())
+					      QString::null,
+					      &ok );
+	    if ( ok && !meshName.isEmpty() )
 	      {
 		  try
 		    {
-		      medgen->readMeshInFile(file.latin1(),myStudyName,meshName);
+		      medgen->readMeshInFile( (const char*)file.toLatin1(),
+					      (const char*)myStudyName.toLatin1(),
+					      (const char*)meshName.toLatin1() );
 		      if (myActiveStudy->studyDS()->GetProperties()->IsLocked()) {
-			SUIT_MessageBox::warn1 (application()->desktop(),
-					       QObject::tr("WRN_WARNING"),
-					       QObject::tr("WRN_STUDY_LOCKED"),
-					       QObject::tr("BUT_OK"));
+			SUIT_MessageBox::warning ( application()->desktop(),
+					           tr("WRN_WARNING"),
+					           tr("WRN_STUDY_LOCKED") );
+			//QObject::tr("BUT_OK")); by default
 		      }
 		    }
 		  catch (const SALOME::SALOME_Exception & S_ex)
@@ -377,26 +393,28 @@ bool MedGUI::OnGUIEvent (int theCommandID)
         // Selection du Maillage
 	if (!file.isEmpty() )
 	  {
-	    SCRUTE(file);
+	    SCRUTE((const char*)file.toLatin1());
 	    QString fieldName;
-	    fieldName = QInputDialog::getText(
-					      QString( tr("MED_INF_FIELDNAME") ), QString::null,
-					      //VRV: porting on Qt 3.0.5
-#if QT_VERSION >= 0x030005
-					      QLineEdit::Normal,
-#endif
-					      //VRV: porting on Qt 3.0.5
-					      QString::null, &ok);
-	    if ( ! fieldName.isEmpty())
+	    fieldName = QInputDialog::getText( application()->desktop(),
+					       tr("MED_INF_FIELDNAME"),
+					       QString::null,
+					       QLineEdit::Normal,
+					       QString::null,
+					       &ok );
+	    if ( ok && !fieldName.isEmpty())
 	      {
 		try
 		  {
-		    medgen->readFieldInFile(file.latin1(),myStudyName,fieldName,-1,-1);
+		    medgen->readFieldInFile( (const char*)file.toLatin1(),
+					     (const char*)myStudyName.toLatin1(),
+					     (const char*)fieldName.toLatin1(),
+					     -1,
+					     -1 );
 		    if (myActiveStudy->studyDS()->GetProperties()->IsLocked()) {
-		      SUIT_MessageBox::warn1 (application()->desktop(),
-					     QObject::tr("WRN_WARNING"),
-					     QObject::tr("WRN_STUDY_LOCKED"),
-					     QObject::tr("BUT_OK"));
+		      SUIT_MessageBox::warning ( application()->desktop(),
+					         tr("WRN_WARNING"),
+					         tr("WRN_STUDY_LOCKED") );
+		      //tr("BUT_OK")); by default
 		    }
 		  }
 		catch (const SALOME::SALOME_Exception & S_ex)
@@ -427,11 +445,12 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 					true);
 	if (!file.isEmpty() )
 	  {
-	    SCRUTE(file);
+	    SCRUTE((const char*)file.toLatin1());
 	    try
 	      {
 //		medgen->readStructFile(file.latin1(),myStudyName);
-		medgen->readStructFileWithFieldType(file.latin1(),myStudyName);
+		medgen->readStructFileWithFieldType((const char*)file.toLatin1(),
+                                                    (const char*)myStudyName.toLatin1());
 
 		MESSAGE("Ouais on est la !!!!");
 
@@ -439,10 +458,10 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 
 		  MESSAGE("Ouais on est la 1 !!!!");
 
-		  SUIT_MessageBox::warn1 (application()->desktop(),
-                                          QObject::tr("WRN_WARNING"),
-                                          QObject::tr("WRN_STUDY_LOCKED"),
-                                          QObject::tr("BUT_OK"));
+		  SUIT_MessageBox::warning (application()->desktop(),
+                                            tr("WRN_WARNING"),
+                                            tr("WRN_STUDY_LOCKED") );
+		  //QObject::tr("BUT_OK")); by default
 		}
 	      }
 	    catch (const SALOME::SALOME_Exception & S_ex)
@@ -502,11 +521,11 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 			    //  			    aMesh = aM->GetMEDMesh();
 			    if ( aMesh->_is_nil() )
 			      {
-				SUIT_MessageBox::warn1
+				SUIT_MessageBox::warning
 				  ( application()->desktop(),
 				    tr ("MED_WRN_WARNING"),
-				    tr ("MED_INF_NOTIMPL"),
-				    tr ("MED_BUT_OK") );
+				    tr ("MED_INF_NOTIMPL") );
+				//tr ("MED_BUT_OK") ); by default
 				break;
 			      }
   			  }
@@ -515,11 +534,11 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 		      }
 		    else
 		      {
-			SUIT_MessageBox::warn1
+			SUIT_MessageBox::warning
 			  ( application()->desktop(),
 			    tr ("MED_WRN_WARNING"),
-			    tr ("MED_INF_NOIOR"),
-			    tr ("MED_BUT_OK") );
+			    tr ("MED_INF_NOIOR") );
+			//tr ("MED_BUT_OK") ); by default
 			break;
 		      }
 		  }
@@ -579,11 +598,11 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 		      }
 		    else
 		      {
-			SUIT_MessageBox::warn1
+			SUIT_MessageBox::warning
 			  ( application()->desktop(),
 			    tr ("MED_WRN_WARNING"),
-			    tr ("MED_INFNOIOR"),
-			    tr ("MED_BUT_OK") );
+			    tr ("MED_INFNOIOR") );
+			//  tr ("MED_BUT_OK") ); by default
 			break;
 		      }
 		  }

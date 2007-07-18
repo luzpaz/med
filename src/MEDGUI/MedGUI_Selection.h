@@ -34,7 +34,7 @@
 class MedGUI_Selection : public LightApp_Selection
 {
 public:
-  MedGUI_Selection();
+  MedGUI_Selection( const QString&, LightApp_SelectionMgr* );
   virtual ~MedGUI_Selection();
 };
 
