@@ -45,7 +45,10 @@ namespace MED
   {
     typedef boost::mutex TMutex;
     //! This is a syncronization primitive which allow to support thread safety for the MED access
-    TMutex myMutex; 
+    TMutex myMutex;
+
+    virtual
+    ~TWrapper();
 
     //----------------------------------------------------------------------------
     //! Gets version of the MED library used for the MED file
