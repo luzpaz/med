@@ -24,6 +24,9 @@
 #include <string>
 #include <vector>
 
+//#include "MULTIPR_MeshDis.hxx"
+#include <boost/thread/recursive_mutex.hpp>
+
 
 namespace multipr
 {
@@ -248,6 +251,18 @@ public:
     void save(const char* pPath);
 
     /**
+     * Reset save progress to zero.
+     * \param pPercents current save progress in percents.
+     */
+    void resetProgress();
+
+    /**
+     * Obtain save progress.
+     * \return current save progress in percents.
+     */
+    int getProgress();
+
+    /**
      * Saves the associated MED file to the given location.
      * Calling this method does not influence the object state.
      *
@@ -284,15 +299,16 @@ private:
     std::vector<std::string> getListParts() const;
 
 private:
-    
-    std::string  mMEDfilename;     /**< Name of the MED file: sequential or distributed. */
-    std::string  mMeshName;        /**< Mesh to be partitionned. */
-    ObjState     mState;           /**< State of this object. */
-    MeshDis*     mMeshDis;         /**< Distributed mesh. */
-    
-    
+
+    std::string        mMEDfilename;     /**< Name of the MED file: sequential or distributed. */
+    std::string        mMeshName;        /**< Mesh to be partitionned. */
+    ObjState           mState;           /**< State of this object. */
+    //SharedPtr<MeshDis> mMeshDis;         /**< Distributed mesh. */
+    MeshDis*           mMeshDis;         /**< Distributed mesh. */
+    boost::recursive_mutex mWriteMutex;  /**< Write progress thread safe access. */
+
 private:
-    
+
     // do not allow copy constructor
     Obj(const Obj&);
     

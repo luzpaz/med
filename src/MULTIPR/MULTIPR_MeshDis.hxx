@@ -35,6 +35,9 @@ extern "C"
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_Topology.hxx"
 
+#include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace multipr
 {
@@ -434,6 +437,18 @@ public:
      * \throw  IOException if any i/o error occurs.
      */
     void writeDistributedMED(const char* pMEDfilenamePrefix);
+
+    /**
+     * Update save progress.
+     * \param pPercents current save progress in percents.
+     */
+    void setProgress (int pPercents);
+
+    /**
+     * Obtain save progress.
+     * \return current save progress in percents.
+     */
+    int getProgress();
     
     /**
      * Dumps any MeshDis to the given output stream.
@@ -457,8 +472,10 @@ private:
     char                      mSequentialMEDFilename[256];  /**< Name of the original MED file used to build distribyuted MED. */
     char                      mDistributedMEDFilename[256]; /**< Name of this distributed MED file (= name of the master file). */
     std::vector<MeshDisPart*> mParts;                       /**< Table of sub-parts; a distributed mesh is composed of N sub-part, where N = mParts.size(). */
-    //MULTIPR_ProgressCallback*   mProgressCallback;
-    
+
+    int                       mWriteProgress;
+    boost::recursive_mutex    mWriteMutex;
+
 private:
 
     // do not allow copy constructor
@@ -472,6 +489,101 @@ private:
     
 }; // class MeshDis
 
+/*
+//----------------------------------------------------------------------------
+//! This class provide thread-safety for MEDWrapper interaction
+class TLockProxy
+{
+  TLockProxy& operator=(const TLockProxy& );
+  MeshDis* myMeshDis;
+  boost::shared_ptr<boost::mutex> myMutex;
+
+public:
+  TLockProxy(MeshDis* theMeshDis, boost::shared_ptr<boost::mutex> theMutex);
+
+  ~TLockProxy();
+
+  MeshDis * operator-> () const;
+};
+
+
+//----------------------------------------------------------------------------
+//! To specialize the SharedPtr for MeshDis
+template<class T> 
+class SharedPtr: public boost::shared_ptr<T>
+{
+public:
+  SharedPtr()
+    : myMutex(new boost::mutex())
+  {}
+
+  template<class Y>
+  explicit SharedPtr(Y * p)
+    : boost::shared_ptr<T>(p),
+      myMutex(new boost::mutex())
+  {}
+
+  template<class Y>
+  SharedPtr(SharedPtr<Y> const & r)
+    : boost::shared_ptr<T>(r,boost::detail::dynamic_cast_tag()),
+      myMutex(r->myMutex)
+  {}
+
+  template<class Y>
+  SharedPtr& 
+  operator=(SharedPtr<Y> const & r)
+  {
+    boost::shared_ptr<T>(r,boost::detail::dynamic_cast_tag()).swap(*this);
+    myMutex = r->myMutex;
+    return *this;
+  }
+
+  template<class Y> 
+  SharedPtr& 
+  operator()(Y * p) // Y must be complete
+  {
+    return operator=<Y>(SharedPtr<Y>(p));
+  }
+
+  template<class Y> 
+  SharedPtr& 
+  operator()(SharedPtr<Y> const & r) // Y must be complete
+  {
+    return operator=<Y>(SharedPtr<Y>(r));
+  }
+
+  TLockProxy operator-> () const // never throws
+  {
+    return TLockProxy(this->get(), myMutex);
+  }
+
+  template<class Y> 
+  void reset (Y * p) // Y must be complete
+  {
+    //boost::detail::thread::lock_ops<typename T::TMutex>::lock(p->myMutex);
+    boost::detail::thread::lock_ops<boost::mutex>::lock(*myMutex);
+    if (boost::shared_ptr<T>::get() != NULL) delete (boost::shared_ptr<T>::get());
+    boost::shared_ptr<T>(p).swap(*this);
+    //boost::detail::thread::lock_ops<typename T::TMutex>::unlock(p->myMutex);
+    boost::detail::thread::lock_ops<boost::mutex>::unlock(*myMutex);
+  }
+
+protected:
+  operator const T& () const;
+
+  operator T& ();
+
+  T& operator* () const;
+
+  T * get() const // never throws
+  {
+    return boost::shared_ptr<T>::get();
+  }
+
+private:
+  boost::shared_ptr<boost::mutex> myMutex;
+};
+*/
 
 } // namespace MULTIPR
 

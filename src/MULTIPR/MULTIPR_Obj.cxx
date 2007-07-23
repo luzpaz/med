@@ -36,11 +36,11 @@ namespace multipr
 // Class Obj implementation
 //*****************************************************************************
 
-Obj::Obj() 
+Obj::Obj()
+  : mMeshDis()
 {
-    mMeshDis = NULL;
-    
-    reset(); 
+  //mMeshDis = SharedPtr<MeshDis>(NULL);
+  reset(); 
 }
 
 
@@ -56,7 +56,11 @@ void Obj::reset()
     mMeshName        = "";
     mState           = MULTIPR_OBJ_STATE_RESET;
     
-    if (mMeshDis != NULL) { delete mMeshDis; mMeshDis = NULL; }
+    //if (mMeshDis != NULL) mMeshDis.reset<MeshDis>(NULL);
+    if (mMeshDis != NULL) {
+      delete mMeshDis;
+      mMeshDis = NULL;
+    }
 }
 
 
@@ -93,6 +97,7 @@ void Obj::create(const char* pMEDfilename)
         try
         {
             mMeshDis = new multipr::MeshDis();
+            //mMeshDis.reset(new multipr::MeshDis());
             mMeshDis->readDistributedMED(pMEDfilename);
         
             mState = MULTIPR_OBJ_STATE_DIS;
@@ -268,13 +273,15 @@ vector<string> Obj::partitionneDomaine()
     cout << "Build distributed mesh: please wait... " << endl;
     try
     {
-        mMeshDis = mesh.splitGroupsOfElements();
+      mMeshDis = mesh.splitGroupsOfElements();
+      //mMeshDis.reset(mesh.splitGroupsOfElements());
     }
     catch (RuntimeException& e)
     {
-        delete mMeshDis;
-        mMeshDis = NULL;
-        throw e;
+      delete mMeshDis;
+      mMeshDis = NULL;
+      //mMeshDis.reset<MeshDis>(0);
+      throw e;
     }
 
     mState = MULTIPR_OBJ_STATE_DIS_MEM;
@@ -309,16 +316,19 @@ vector<string> Obj::partitionneGrain(
         mMeshDis->writeDistributedMED(strPrefix.c_str());
         
         mMEDfilename = mMeshDis->getDistributedMEDFilename();
-        
+
         delete mMeshDis;
-        
+        //mMeshDis.reset<MeshDis>(0);
+
         //---------------------------------------------------------------------
         // Read the distributed mesh
         //---------------------------------------------------------------------    
         int ret = MEDformatConforme(mMEDfilename.c_str());
-        if (ret == 0) throw IOException("waiting for a distributed MED file (not a sequential one)", __FILE__, __LINE__);
-    
+        if (ret == 0)
+          throw IOException("waiting for a distributed MED file (not a sequential one)", __FILE__, __LINE__);
+
         mMeshDis = new MeshDis();
+        //mMeshDis.reset(new MeshDis());
         mMeshDis->readDistributedMED(mMEDfilename.c_str());
         
         mState = MULTIPR_OBJ_STATE_DIS;
@@ -341,6 +351,7 @@ vector<string> Obj::partitionneGrain(
     //---------------------------------------------------------------------
     delete mMeshDis;
     mMeshDis = new MeshDis();
+    //mMeshDis.reset(new MeshDis());
     //cout << "read dis MED file: filename=" << mMEDfilename << endl;
     mMeshDis->readDistributedMED(mMEDfilename.c_str());
     
@@ -454,14 +465,34 @@ void Obj::save(const char* pPath)
         //-------------------------------------------------------------
         // Read the distributed mesh
         //-------------------------------------------------------------
-        delete mMeshDis;
-        mMeshDis = new MeshDis();
+        {
+          boost::recursive_mutex::scoped_lock aLock (mWriteMutex);
+          delete mMeshDis;
+          mMeshDis = new MeshDis();
+        }
+        //mMeshDis.reset(new MeshDis());
         mMeshDis->readDistributedMED(mMEDfilename.c_str());
-        
+
         mState = MULTIPR_OBJ_STATE_DIS;
+    }
+    else
+    {
+      boost::recursive_mutex::scoped_lock aLock (mWriteMutex);
+      mMeshDis->setProgress(100);
     }
 }
 
+void Obj::resetProgress()
+{
+  boost::recursive_mutex::scoped_lock aLock (mWriteMutex);
+  mMeshDis->setProgress(0);
+}
+
+int Obj::getProgress()
+{
+  boost::recursive_mutex::scoped_lock aLock (mWriteMutex);
+  return mMeshDis->getProgress();
+}
 
 void Obj::savePersistent (const char* pPath)
 {
@@ -510,6 +541,7 @@ void Obj::restorePersistent (const char* pMEDfilename)
     try
     {
       mMeshDis = new multipr::MeshDis();
+      //mMeshDis.reset(new MeshDis());
       mMeshDis->readPersistentDistributedMED(pMEDfilename);
 
       mState = MULTIPR_OBJ_STATE_DIS;

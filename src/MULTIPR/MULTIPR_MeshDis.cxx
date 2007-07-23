@@ -178,7 +178,29 @@ ostream& operator<<(ostream& pOs, MeshDisPart& pM)
     return pOs;
 }
 
+//*****************************************************************************
+// Class TLockProxy implementation
+//*****************************************************************************
+/*
+TLockProxy::TLockProxy (MeshDis* theMeshDis, boost::shared_ptr<boost::mutex> theMutex)
+  : myMeshDis(theMeshDis),
+    myMutex(theMutex)
+{
+  //boost::detail::thread::lock_ops<MeshDis::TMutex>::lock(myMeshDis->myMutex);
+  boost::detail::thread::lock_ops<boost::mutex>::lock(*myMutex);
+}
 
+TLockProxy::~TLockProxy()
+{
+  //boost::detail::thread::lock_ops<MeshDis::TMutex>::unlock(myMeshDis->myMutex);
+  boost::detail::thread::lock_ops<boost::mutex>::unlock(*myMutex);
+}
+
+MeshDis* TLockProxy::operator-> () const // never throws
+{
+  return myMeshDis;
+}
+*/
 //*****************************************************************************
 // Class MeshDis implementation
 //*****************************************************************************
@@ -207,7 +229,8 @@ void MeshDis::reset()
     }
     mParts.clear();
     
-    //mProgressCallback = NULL;
+    boost::recursive_mutex::scoped_lock aLock (mWriteMutex);
+    mWriteProgress = 100;
 }
 
 
@@ -1083,15 +1106,15 @@ void MeshDis::writeDistributedMED(const char* pMEDfilenamePrefix)
     // Create a new MED file (v2.3)
     //---------------------------------------------------------------------
     int id = 1;
-    
+
     if (gProgressCallback != NULL) gProgressCallback->start("Save mesh", mParts.size());
-    
+    setProgress(0);
+
     try
     {
-    
-    // for each sub-meshes
-    for (unsigned itPart = 0 ; itPart < mParts.size() ; itPart++)
-    {
+      // for each sub-meshes
+      for (unsigned itPart = 0 ; itPart < mParts.size() ; itPart++)
+      {
         switch (mParts[itPart]->mToDoOnNextWrite)
         {
             case MeshDisPart::MULTIPR_KEEP_AS_IT: 
@@ -1104,7 +1127,8 @@ void MeshDis::writeDistributedMED(const char* pMEDfilenamePrefix)
                 if (strSrcPath != strDestPath)
                 {
                     cout << "Write: KEEP_AS_IT: copy file" << endl;
-                    string strDestFilename = strDestPath + multipr::getFilenameWithoutPath(mParts[itPart]->getMEDFileName());
+                    string strDestFilename = strDestPath +
+                      multipr::getFilenameWithoutPath(mParts[itPart]->getMEDFileName());
                     multipr::copyFile(mParts[itPart]->getMEDFileName(), strDestPath.c_str());
                     strcpy(mParts[itPart]->mMEDFileName, strDestFilename.c_str());
                 }
@@ -1116,10 +1140,13 @@ void MeshDis::writeDistributedMED(const char* pMEDfilenamePrefix)
             
             case MeshDisPart::MULTIPR_WRITE_MESH:
             {
-                if (strlen(mParts[itPart]->getMEDFileName()) == 0) throw IOException("MED filename is empty", __FILE__, __LINE__);
-                if (mParts[itPart]->mMesh == NULL) throw IllegalStateException("invalid mesh (shoult not be NULL)", __FILE__, __LINE__);
+                if (strlen(mParts[itPart]->getMEDFileName()) == 0)
+                  throw IOException("MED filename is empty", __FILE__, __LINE__);
+                if (mParts[itPart]->mMesh == NULL)
+                  throw IllegalStateException("invalid mesh (shoult not be NULL)", __FILE__, __LINE__);
                 
-                string strDestFilename = strDestPath + multipr::getFilenameWithoutPath(mParts[itPart]->getMEDFileName());
+                string strDestFilename = strDestPath +
+                  multipr::getFilenameWithoutPath(mParts[itPart]->getMEDFileName());
                 strcpy(mParts[itPart]->mMEDFileName, strDestFilename.c_str());
                 
                 mParts[itPart]->mMesh->writeMED(mParts[itPart]->getMEDFileName());
@@ -1133,13 +1160,15 @@ void MeshDis::writeDistributedMED(const char* pMEDfilenamePrefix)
             case MeshDisPart::MULTIPR_WRITE_PARTS:
             {
                 // split this part using medsplitter
-                if (mParts[itPart]->mOldCollection == NULL) throw IllegalStateException("", __FILE__, __LINE__);
+                if (mParts[itPart]->mOldCollection == NULL)
+                  throw IllegalStateException("", __FILE__, __LINE__);
                 string strPrefix = removeExtension(mParts[itPart]->getMEDFileName(), ".med"); 
                 char tmpFilename[256];
                 sprintf(tmpFilename, "%s_part", strPrefix.c_str());
                 mParts[itPart]->mCollection->write(tmpFilename);
                 mParts[itPart]->mCollection->castAllFields(*(mParts[itPart]->mOldCollection));
-                int ret = convertMedsplitterToMultipr(fileMaster, tmpFilename, id, mParts[itPart], strDestPath);
+                int ret = convertMedsplitterToMultipr(fileMaster, tmpFilename, id,
+                                                      mParts[itPart], strDestPath);
                 id += ret;
                 remove(mParts[itPart]->getMEDFileName());
                 break;
@@ -1147,19 +1176,21 @@ void MeshDis::writeDistributedMED(const char* pMEDfilenamePrefix)
         
             default: throw IllegalStateException("should not be there", __FILE__, __LINE__);
         }
-        
+
         if (gProgressCallback != NULL) gProgressCallback->moveOn();
-    }
-    
+        setProgress((itPart + 1) * 100 / mParts.size());
+      }
     }
     catch (RuntimeException& e)
     {
         if (gProgressCallback != NULL) gProgressCallback->done();
+        setProgress(100);
         throw e;
     }
-    
+
     if (gProgressCallback != NULL) gProgressCallback->done();
-    
+    setProgress(100);
+
     //---------------------------------------------------------------------
     // Close master file
     //---------------------------------------------------------------------
@@ -1167,6 +1198,18 @@ void MeshDis::writeDistributedMED(const char* pMEDfilenamePrefix)
     if (fileMaster.fail()) throw IOException("i/o error while closing MED master file", __FILE__, __LINE__);
 }
 
+void MeshDis::setProgress (int pPercents)
+{
+  boost::recursive_mutex::scoped_lock aLock (mWriteMutex);
+  mWriteProgress = pPercents;
+}
+
+int MeshDis::getProgress()
+{
+  boost::recursive_mutex::scoped_lock aLock (mWriteMutex);
+  int ret = mWriteProgress;
+  return ret;
+}
 
 ostream& operator<<(ostream& pOs, MeshDis& pM)
 {
