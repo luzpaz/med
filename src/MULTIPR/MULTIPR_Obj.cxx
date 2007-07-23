@@ -369,18 +369,41 @@ vector<string> Obj::decimePartition(
     double      pRadius,
     int         pBoxing)
 {
-    
+  std::list<std::string> pEmptyMeshes;
+  return decimePartition(pPartName,
+                         pFieldName,
+                         pFieldIt,
+                         pFilterName,
+                         pTmed,
+                         pTlow,
+                         pRadius,
+                         pBoxing,
+                         pEmptyMeshes);
+}
+
+
+vector<string> Obj::decimePartition (const char* pPartName,
+                                     const char* pFieldName,
+                                     int         pFieldIt,
+                                     const char* pFilterName,
+                                     double      pTmed,
+                                     double      pTlow,
+                                     double      pRadius,
+                                     int         pBoxing,
+                                     std::list<std::string>& pEmptyMeshes)
+{
     // decimePartition() is only available for distributed MED file (not sequential MED file)
     if ((mState != MULTIPR_OBJ_STATE_DIS_MEM) &&
-        (mState != MULTIPR_OBJ_STATE_DIS)) throw IllegalStateException("unexpected operation", __FILE__, __LINE__);
-        
+        (mState != MULTIPR_OBJ_STATE_DIS))
+      throw IllegalStateException("unexpected operation", __FILE__, __LINE__);
+
     if (mMeshDis == NULL) throw IllegalStateException("expected a distributed MED file", __FILE__, __LINE__);
-    
+
     //---------------------------------------------------------------------
     // Decimate
     //---------------------------------------------------------------------
-    mMeshDis->decimatePart(
-        pPartName, 
+    std::list<std::string> emptyMeshes = mMeshDis->decimatePart(
+        pPartName,
         pFieldName,
         pFieldIt,
         pFilterName,
@@ -388,9 +411,15 @@ vector<string> Obj::decimePartition(
         pTlow,
         pRadius,
         pBoxing);
-        
+
+    std::list<std::string>::iterator it = emptyMeshes.begin(), end = emptyMeshes.end();
+    for (; it != end; it++)
+    {
+      pEmptyMeshes.push_back(*it);
+    }
+
     mState = MULTIPR_OBJ_STATE_DIS_MEM;
-    
+
     return getListParts();
 }
 

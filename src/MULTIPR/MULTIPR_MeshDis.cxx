@@ -548,36 +548,44 @@ void MeshDis::splitPart(const char* pPartName, int pNbParts, int pPartitionner)
 }
 
 
-void MeshDis::decimatePart(
-    const char* pPartName, 
-    const char* pFieldName,
-    med_int     pFieldIt,
-    const char* pFilterName,
-    med_float   pTMed, 
-    med_float   pTLow,
-    med_float   pRadius,
-    int         pBoxing)
+std::list<std::string> MeshDis::decimatePart (const char* pPartName,
+                                              const char* pFieldName,
+                                              med_int     pFieldIt,
+                                              const char* pFilterName,
+                                              med_float   pTMed,
+                                              med_float   pTLow,
+                                              med_float   pRadius,
+                                              int         pBoxing)
 {
     //---------------------------------------------------------------------
     // Check arguments
     //---------------------------------------------------------------------
-    if (pPartName == NULL) throw NullArgumentException("partname should not be NULL", __FILE__, __LINE__);
-    if (pFieldName == NULL) throw NullArgumentException("fieldname should not be NULL", __FILE__, __LINE__);
-    if (pFieldIt < med_int(1)) throw IllegalArgumentException("invalid field iteration; should be >= 1", __FILE__, __LINE__);
-    if (pTMed < 0.0) throw IllegalArgumentException("med res.: threshold must be > 0", __FILE__, __LINE__);
-    if (pTMed >= pTLow) throw IllegalArgumentException("threshold for med res. must be < threshold for low res.", __FILE__, __LINE__);    
-    if (pRadius <= med_float(0.0)) throw IllegalArgumentException("radius should be > 0", __FILE__, __LINE__);
-    if ((pBoxing < 1) || (pBoxing > 200)) throw IllegalArgumentException("boxing should be in [1..200]", __FILE__, __LINE__);
-    
+    if (pPartName == NULL)
+      throw NullArgumentException("partname should not be NULL", __FILE__, __LINE__);
+    if (pFieldName == NULL)
+      throw NullArgumentException("fieldname should not be NULL", __FILE__, __LINE__);
+    if (pFieldIt < med_int(1))
+      throw IllegalArgumentException("invalid field iteration; should be >= 1", __FILE__, __LINE__);
+    if (pTMed < 0.0)
+      throw IllegalArgumentException("med res.: threshold must be > 0", __FILE__, __LINE__);
+    if (pTMed >= pTLow)
+      throw IllegalArgumentException("threshold for med res. must be < threshold for low res.",
+                                     __FILE__, __LINE__);
+    if (pRadius <= med_float(0.0))
+      throw IllegalArgumentException("radius should be > 0", __FILE__, __LINE__);
+    if ((pBoxing < 1) || (pBoxing > 200))
+      throw IllegalArgumentException("boxing should be in [1..200]", __FILE__, __LINE__);
+
     //---------------------------------------------------------------------
     // Find the MED file corresponding to the given part
     //---------------------------------------------------------------------
     MeshDisPart* part = findPart(pPartName);
     if (part == NULL)
     {
-        throw IllegalArgumentException("part not found in the given distributed MED file", __FILE__, __LINE__);
+        throw IllegalArgumentException("part not found in the given distributed MED file",
+                                       __FILE__, __LINE__);
     }
-    
+
     //---------------------------------------------------------------------
     // Load the associated sequential MED file
     //---------------------------------------------------------------------
@@ -585,16 +593,18 @@ void MeshDis::decimatePart(
     {
         part->readMED();
     }
-    
+
     Mesh* meshFull = part->mMesh;
     cout << (*meshFull) << endl;
-    
+
+    std::list<std::string> ret;
+
     const char* originalFilename = part->getMEDFileName();
     string strPrefix = removeExtension(originalFilename, ".med");
-    
+
     // debug
     //cout << (*this) << endl;
-    
+
     //---------------------------------------------------------------------
     // Decimates the given mesh
     //---------------------------------------------------------------------
@@ -606,19 +616,14 @@ void MeshDis::decimatePart(
     // *** create a new mesh = MEDIUM resolution ***
     sprintf(argv, "%s %d %lf %lf %d", pFieldName, pFieldIt, pTMed, pRadius, pBoxing);
     sprintf(newPartName, "%s_MED", pPartName);
-    sprintf(newMEDFileName, "%s_gradmoy-med-%s-%s.med", 
-            strPrefix.c_str(), 
-            realToString(pTMed).c_str(), 
+    sprintf(newMEDFileName, "%s_gradmoy-med-%s-%s.med",
+            strPrefix.c_str(),
+            realToString(pTMed).c_str(),
             realToString(pRadius).c_str());
 
     {
       Mesh* meshMedium = meshFull->decimate(pFilterName, argv, part->getMeshName());
       cout << (*meshMedium) << endl;
-
-      if ((meshMedium->getNumberOfElements() == 0) && (gEmptyMeshCallback != NULL))
-      {
-        gEmptyMeshCallback->reportEmptyMesh(newPartName);
-      }
 
       // insert only non-empty meshes
       if (meshMedium->getNumberOfElements() > 0)
@@ -631,6 +636,14 @@ void MeshDis::decimatePart(
                    newMEDFileName,
                    meshMedium,
                    part->mId + 0);
+      }
+      else
+      {
+        if (gEmptyMeshCallback != NULL)
+        {
+          gEmptyMeshCallback->reportEmptyMesh(newPartName);
+        }
+        ret.push_back(newPartName);
       }
     }
 
@@ -646,11 +659,6 @@ void MeshDis::decimatePart(
       Mesh* meshLow = meshFull->decimate(pFilterName, argv, part->getMeshName());
       cout << (*meshLow) << endl;
 
-      if ((meshLow->getNumberOfElements() == 0) && (gEmptyMeshCallback != NULL))
-      {
-        gEmptyMeshCallback->reportEmptyMesh(newPartName);
-      }
-
       // insert only non-empty meshes
       if (meshLow->getNumberOfElements() > 0)
       {
@@ -663,10 +671,20 @@ void MeshDis::decimatePart(
                    meshLow,
                    part->mId + 1);
       }
+      else
+      {
+        if (gEmptyMeshCallback != NULL)
+        {
+          gEmptyMeshCallback->reportEmptyMesh(newPartName);
+        }
+        ret.push_back(newPartName);
+      }
     }
 
     // debug
     //cout << (*this) << endl;
+
+    return ret;
 }
 
 

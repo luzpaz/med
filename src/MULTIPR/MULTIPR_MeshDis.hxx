@@ -381,9 +381,10 @@ public:
      * \param  pTLow        threshold used to generate LOW resolution (must be >= pTMed).
      * \param  pRadius
      * \param  pBoxing number of cells along each axis; e.g. if 100 then grid will have 100*100*100 = 10**6 cells; 100 by default.
+     * \return a list of strings, containing names of empty resulting parts, empty list if all resolutions are non-empty.
      * \throw  RuntimeException if any error occurs.
      */
-    void decimatePart(
+    std::list<std::string> decimatePart(
         const char* pPartName, 
         const char* pFieldName,
         med_int     pFieldIt,

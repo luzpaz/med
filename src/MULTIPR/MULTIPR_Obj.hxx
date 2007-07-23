@@ -23,6 +23,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <list>
 
 //#include "MULTIPR_MeshDis.hxx"
 #include <boost/thread/recursive_mutex.hpp>
@@ -195,7 +196,7 @@ public:
         const char* pPartName, 
         int         pNbParts, 
         int         pPartitionner=0);
-    
+
     /**
      * Creates 3 resolutions of the given part of a distributed MED file (V2.3).
      *         Assumes:
@@ -221,7 +222,23 @@ public:
         double      pTlow,
         double      pRadius,
         int         pBoxing);
-    
+
+    /**
+     * Works exactly like the above method and has the same parameters
+     * and returning value meaning, except the last additional parameter.
+     * \param  pEmptyMeshes list of names of empty meshes, corresponding to medium and/or lower resolution.
+     */
+    std::vector<std::string> decimePartition(
+        const char* pPartName,
+        const char* pFieldName,
+        int         pFieldIt,
+        const char* pFilterName,
+        double      pTmed,
+        double      pTlow,
+        double      pRadius,
+        int         pBoxing,
+        std::list<std::string>& pEmptyMeshes);
+
     /**
      * Returns useful information to configure decimation parameters.
      * Depends on part, field and filter: generic operation.
