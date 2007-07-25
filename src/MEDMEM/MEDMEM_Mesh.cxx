@@ -305,6 +305,14 @@ int MESH::getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_EN::medG
     return getNumberOfElements(Entity,Type);
 }
 
+bool MESH::existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
+                                     MED_EN::medEntityMesh Entity) const
+{
+  if (_connectivity==(CONNECTIVITY*)NULL)
+    throw MEDEXCEPTION("MESH::existConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
+  return _connectivity->existConnectivityWithPoly(ConnectivityType,Entity);
+}
+
 MESH & MESH::operator=(const MESH &m)
 {
   const char * LOC = "MESH & MESH::operator=(const MESH &m) : ";

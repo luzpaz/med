@@ -193,6 +193,8 @@ public :
 					 MED_EN::medGeometryElement Type) const;
   virtual inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
 					MED_EN::medEntityMesh Entity) const;
+  virtual bool existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
+                                         MED_EN::medEntityMesh Entity) const;
   inline bool existPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
 					MED_EN::medEntityMesh Entity) const;
   inline bool existPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,

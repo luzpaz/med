@@ -143,7 +143,7 @@ MEDMEM_MEDMEMchampLire.cxx
 
 
 # Executables targets
-BIN = med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH 
+BIN = med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH test_write_groups_poly
 BIN_SRC = 
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 

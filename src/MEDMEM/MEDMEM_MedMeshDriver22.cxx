@@ -2848,8 +2848,9 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
   { // CELLS RELATED BLOCK
     medEntityMesh entity=MED_EN::MED_CELL;
     // SOLUTION TEMPORAIRE CAR _ptrMesh->_MEDArray____Family DOIT ETRE ENLEVER DE LA CLASSE MESH
-    if  ( ( _ptrMesh->existConnectivity(MED_NODAL,entity) )|( _ptrMesh->existConnectivity(MED_DESCENDING,entity) ) ) { 
-
+    if ((_ptrMesh->existConnectivityWithPoly(MED_NODAL,entity)) |
+        (_ptrMesh->existConnectivityWithPoly(MED_DESCENDING,entity)))
+    {
       int numberOfTypes           = _ptrMesh->getNumberOfTypesWithPoly(entity) ;
       medGeometryElement  * types = _ptrMesh->getTypesWithPoly(entity) ;
 
@@ -2947,8 +2948,9 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
   { // FACE RELATED BLOCK
     medEntityMesh entity=MED_EN::MED_FACE;
     // SOLUTION TEMPORAIRE CAR _ptrMesh->_MEDArray____Family DOIT ETRE ENLEVER DE LA CLASSE MESH
-    if  ( ( _ptrMesh->existConnectivity(MED_NODAL,entity) )|( _ptrMesh->existConnectivity(MED_DESCENDING,entity) ) ) { 
-
+    if ((_ptrMesh->existConnectivityWithPoly(MED_NODAL,entity)) ||
+        (_ptrMesh->existConnectivityWithPoly(MED_DESCENDING,entity)))
+    {
       int numberOfTypes           = _ptrMesh->getNumberOfTypesWithPoly(entity) ;
       medGeometryElement  * types = _ptrMesh->getTypesWithPoly(entity) ;
       SCRUTE(numberOfTypes);

@@ -415,6 +415,19 @@ void CONNECTIVITY::setPolyhedronConnectivity(medConnectivity ConnectivityType, c
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : _entity must be MED_CELL to set polyhedron !"));
 }
 
+bool CONNECTIVITY::existConnectivityWithPoly (MED_EN::medConnectivity connectivityType,
+                                              MED_EN::medEntityMesh Entity) const
+{
+   if (_entity == Entity) {
+    if ((connectivityType == MED_EN::MED_NODAL) &&
+        (_nodal != (MEDSKYLINEARRAY*)NULL || _polygonsNodal || _polyhedronNodal))
+      return true;
+    if ((connectivityType == MED_EN::MED_DESCENDING) && (_descending != (MEDSKYLINEARRAY*)NULL))
+      return true;
+   } else if (_constituent != NULL)
+     return _constituent->existConnectivityWithPoly(connectivityType, Entity);
+   return false;
+}
 
 /*! A DOCUMENTER */
 //------------------------------------------------------------------------------------------//

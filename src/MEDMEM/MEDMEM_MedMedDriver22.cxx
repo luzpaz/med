@@ -430,6 +430,9 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 	err = MEDchampInfo(_medIdt, i, fieldName, &type, componentName, 
 			   unitName, numberOfComponents) ;
 
+	cout << "Field n°" << i << " nammed " << fieldName << endl;
+	cout << "Name real length = " << strlen(fieldName) << ", while reserved " << MED_TAILLE_NOM << endl;
+
 	if (err != MED_VALID)
 	  throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << ": can't get information about the field n°" << i <<" of the file |" << _fileName << "| !")); 
 
