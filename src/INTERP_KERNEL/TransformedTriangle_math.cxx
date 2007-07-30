@@ -29,9 +29,9 @@ namespace INTERP_UTILS
       C_YH, C_XH, C_XY  // Z
     };
   
-  const double TransformedTriangle::MACH_EPS = 1.0e-15;
-  const double TransformedTriangle::MULT_PREC_F = 4.0*TransformedTriangle::MACH_EPS;
-  const double TransformedTriangle::THRESHOLD_F = 20.0;
+  const long double TransformedTriangle::MACH_EPS = 1.0e-15;
+  const long double TransformedTriangle::MULT_PREC_F = 4.0*TransformedTriangle::MACH_EPS;
+  const long double TransformedTriangle::THRESHOLD_F = 20.0;
 
   const double TransformedTriangle::TRIPLE_PRODUCT_ANGLE_THRESHOLD = 0.1;
 

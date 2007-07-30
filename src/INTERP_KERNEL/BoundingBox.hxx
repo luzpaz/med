@@ -11,14 +11,14 @@ namespace INTERP_UTILS
   class BoundingBox 
   {
   public:
-    enum BoxCoord { XMIN = 0, XMAX = 1, YMIN = 2, YMAX = 3, ZMIN = 4, ZMAX = 5 };
+    enum BoxCoord { XMIN = 0, YMIN = 1, ZMIN = 2, XMAX = 3, YMAX = 4, ZMAX = 5 };
     
     
     /**
      * Default constructor
      * 
      */
-    BoundingBox() : coords({0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {}
+    //BoundingBox() : coords({0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {}
     
     /**
      * Constructor creating box from an array of the points corresponding
@@ -68,6 +68,8 @@ namespace INTERP_UTILS
      *
      */
     double getCoordinate(const BoxCoord coord) const;
+
+    void updateWithPoint(const double* pt);
 
   private:
     double[6] _coords;

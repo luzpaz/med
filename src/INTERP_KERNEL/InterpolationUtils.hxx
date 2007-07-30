@@ -457,7 +457,7 @@ namespace INTERP_UTILS
 
 
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */  
-*  /* fonction pour reconstituer un polygone convexe à partir  */
+  /* fonction pour reconstituer un polygone convexe à partir  */
   /*              d'un nuage de point.                        */
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */  
 
