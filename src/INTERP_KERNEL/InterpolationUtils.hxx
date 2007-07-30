@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <vector>
 
-
 namespace INTERP_UTILS
 {
   //	const double HUGE=1e300;
@@ -458,7 +457,7 @@ namespace INTERP_UTILS
 
 
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */  
-  /* fonction pour reconstituer un polygone convexe à partir  */
+*  /* fonction pour reconstituer un polygone convexe à partir  */
   /*              d'un nuage de point.                        */
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */  
 
@@ -548,6 +547,9 @@ namespace INTERP_UTILS
       }
 		
   }
+
+
+ 
 
 };
 #endif

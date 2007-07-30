@@ -15,7 +15,7 @@ private:
   double x;
 };
   
-// This test has no use
+
 class TestBogusClass : public CppUnit::TestFixture
 {
 

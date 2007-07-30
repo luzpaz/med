@@ -3,7 +3,7 @@
 
 // MEDMEM includes
 #include "Interpolation.hxx"
-
+#include "MEDMEM_Mesh.hxx"
 
 // standard includes
 #include <vector>
@@ -14,6 +14,17 @@
 // typedefs
 typedef std::vector< std::map< int, double > > IntersectionMatrix;
 
+
+#ifdef TESTING_INTERP_KERNEL
+class Interpolation3DTest;
+#endif
+
+namespace INTERP_UTILS
+{
+  class MeshElement;
+  class MeshRegion;
+};
+
 namespace MEDMEM 
 {
   /**
@@ -22,6 +33,10 @@ namespace MEDMEM
    */
   class Interpolation3D : public Interpolation
   {
+
+#ifdef TESTING_INTERP_KERNEL
+    friend class ::Interpolation3DTest;
+#endif
 
   public :
 
@@ -90,7 +105,7 @@ namespace MEDMEM
      * @returns    volume of intersection between srcElement and targetElement
      *
      */
-    double calculateIntersectionVolume(const Element srcElement&, const Element targetElement);
+    double calculateIntersectionVolume(const INTERP_UTILS::MeshElement& srcElement, const INTERP_UTILS::MeshElement& targetElement);
 
   };
 

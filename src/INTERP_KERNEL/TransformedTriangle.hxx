@@ -6,6 +6,7 @@
 #ifdef TESTING_INTERP_KERNEL
 class TransformedTriangleTest;
 class TransformedTriangleIntersectTest;
+class TransformedTriangleCalcVolumeTest;
 #endif
 
 namespace INTERP_UTILS
@@ -28,6 +29,7 @@ namespace INTERP_UTILS
 #ifdef TESTING_INTERP_KERNEL
     friend class ::TransformedTriangleTest;
     friend class ::TransformedTriangleIntersectTest;
+    friend class ::TransformedTriangleCalcVolumeTest;
 #endif
 
     /**
@@ -35,31 +37,35 @@ namespace INTERP_UTILS
      * and the triangle.
      */
     /// Corners of tetrahedron
-    enum TetraCorner { O = 0, X, Y, Z };
+    enum TetraCorner { O = 0, X, Y, Z, NO_TET_CORNER };
 
     /// Edges of tetrahedron
-    enum TetraEdge { OX = 0, OY, OZ, XY, YZ, ZX, H01, H10 };
+    enum TetraEdge { OX = 0, OY, OZ, XY, YZ, ZX, H01, H10, NO_TET_EDGE };
 
     /// Facets (faces) of tetrahedron
-    enum TetraFacet { OYZ = 0, OZX, OXY, XYZ };
+    enum TetraFacet { OYZ = 0, OZX, OXY, XYZ, NO_TET_FACET };
 
     /// Corners of triangle
-    enum TriCorner { P = 0, Q, R };
+    enum TriCorner { P = 0, Q, R, NO_TRI_CORNER };
     
     /// Segments (edges) of triangle
-    enum TriSegment { PQ = 0, QR, RP };
+    enum TriSegment { PQ = 0, QR, RP, NO_TRI_SEGMENT };
     
     /// Polygons
-    enum IntersectionPolygon{ A = 0, B };
+    enum IntersectionPolygon{ A = 0, B, NO_INTERSECTION_POLYGONS };
 
     /// Double products
     /// NB : order corresponds to TetraEdges (Grandy, table III)
-    enum DoubleProduct { C_YZ = 0, C_ZX, C_XY, C_ZH, C_XH, C_YH, C_01, C_10 };
+    enum DoubleProduct { C_YZ = 0, C_ZX, C_XY, C_ZH, C_XH, C_YH, C_01, C_10, NO_DP };
 
     TransformedTriangle(double* p, double* q, double* r); 
     ~TransformedTriangle();
 
     double calculateIntersectionVolume(); 
+
+    // temporary debug method
+    void dumpCoords();
+
     
   private:
     
@@ -75,6 +81,13 @@ namespace INTERP_UTILS
 
     double calculateVolumeUnderPolygon(IntersectionPolygon poly, const double* barycenter); 
 
+    ////////////////////////////////////////////////////////////////////////////////////
+    /// Detection of (very) degenerate cases                                ////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    bool isTriangleInPlaneOfFacet(const TetraFacet facet);
+
+    bool isTriangleBelowTetraeder();
 
     ////////////////////////////////////////////////////////////////////////////////////
     /// Intersection test methods and intersection point calculations           ////////
@@ -105,7 +118,7 @@ namespace INTERP_UTILS
     bool testCornerInTetrahedron(const TriCorner corner) const;
 
     bool testCornerOnXYZFacet(const TriCorner corner) const;
-    
+      
 
     ////////////////////////////////////////////////////////////////////////////////////
     /// Utility methods used in intersection tests                       ///////////////
@@ -118,6 +131,8 @@ namespace INTERP_UTILS
     bool testFacetSurroundsSegment(const TriSegment seg, const TetraFacet facet) const;
 
     bool testSegmentIntersectsFacet(const TriSegment seg, const TetraFacet facet) const;
+
+    bool testSegmentIntersectsH(const TriSegment seg);
 
     bool testSurfaceAboveCorner(const TetraCorner corner) const;
     
@@ -154,6 +169,10 @@ namespace INTERP_UTILS
     std::vector<double*> _polygonA, _polygonB;
     double _barycenterA[3], _barycenterB[3];
 
+    // used for debugging
+    bool _validTP[4];
+
+
     ////////////////////////////////////////////////////////////////////////////////////
     /// Constants                                                      /////////////////
     ////////////////////////////////////////////////////////////////////////////////////
@@ -176,9 +195,9 @@ namespace INTERP_UTILS
     
     // values used to decide how imprecise the double products 
     // should be to set them to 0.0
-    static const double MACH_EPS;    // machine epsilon
-    static const double MULT_PREC_F; // precision of multiplications (Grandy : f)
-    static const double THRESHOLD_F; // threshold for zeroing (Grandy : F/f)
+    static const long double MACH_EPS;    // machine epsilon
+    static const long double MULT_PREC_F; // precision of multiplications (Grandy : f)
+    static const long double THRESHOLD_F; // threshold for zeroing (Grandy : F/f)
 
     static const double TRIPLE_PRODUCT_ANGLE_THRESHOLD;
 
@@ -189,6 +208,8 @@ namespace INTERP_UTILS
     // signs associated with entries in DP_FOR_SEGMENT_FACET_INTERSECTION
     static const double SIGN_FOR_SEG_FACET_INTERSECTION[12];
     
+    // coordinates of corners of tetrahedron
+    static const double COORDS_TET_CORNER[12];
 
   };
 
