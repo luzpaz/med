@@ -53,10 +53,6 @@ ExplicitTopology.hxx\
 ParaFIELD.hxx\
 DEC.hxx\
 MxN_Mapping.hxx\
-INTERPOLATION_2D.hxx\
-INTERPOLATION_3D_surf.hxx\
-INTERPOLATION.hxx\
-INTERPOLATION_Utils.hxx\
 StructuredCoincidentDEC.hxx\
 InterpolationMatrix.hxx\
 IntersectionDEC.hxx\
@@ -81,8 +77,6 @@ StructuredParaSUPPORT.cxx\
 ComponentTopology.cxx\
 ParaFIELD.cxx\
 DEC.cxx\
-INTERPOLATION_2D.cxx\
-INTERPOLATION_3D_surf.cxx\
 MxN_Mapping.cxx\
 InterpolationMatrix.cxx\
 StructuredCoincidentDEC.cxx\
@@ -112,11 +106,11 @@ CXXFLAGS+=@CXXTMPDPTHFLAGS@
 CPPFLAGS+=$(BOOST_CPPFLAGS)
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem  $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem  $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil
+LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}
