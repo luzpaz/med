@@ -35,7 +35,7 @@ namespace INTERP_UTILS
      * Constructor creating box from union of two boxes
      *
      */
-    BoundingBox(const BoundingBox& box1, const BoundingBox& box1) {}
+    BoundingBox(const BoundingBox& box1, const BoundingBox& box2);
 
     /**
      * Destructor
@@ -72,7 +72,7 @@ namespace INTERP_UTILS
     void updateWithPoint(const double* pt);
 
   private:
-    double[6] _coords;
+    double _coords[6];
 
   };
 

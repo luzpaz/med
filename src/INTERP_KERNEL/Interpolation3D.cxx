@@ -166,7 +166,7 @@ namespace MEDMEM
 	    } 
 	  else // recursion 
 	    {
-	      typedef MeshElement::ZoneBBoxComparison Cmp;
+
 	      // std::cout << " - Recursion" << std::endl;
 
 	      RegionNode* leftNode = new RegionNode();
@@ -174,14 +174,14 @@ namespace MEDMEM
 	      
 	      // split current source region
 	      //} decide on axis
-	      static Cmp::BoxAxis axis = Cmp::X;
+	      static BoundingBox::BoxCoord axis = BoundingBox::XMAX;
 	      
 	      currNode->getSrcRegion().split(leftNode->getSrcRegion(), rightNode->getSrcRegion(), axis);
 
 	      // ugly hack to avoid problem with enum which does not start at 0
 	      // I guess I ought to implement ++ for it instead ...
 	      // Anyway, it basically chooses the next axis, circually
-	      axis = (axis != Cmp::Z) ? static_cast<Cmp::BoxAxis>(axis + 1) : Cmp::X;
+	      axis = (axis != BoundingBox::ZMAX) ? static_cast<BoundingBox::BoxCoord>(axis + 1) : BoundingBox::XMAX;
 
 	      // add target elements of curr node that overlap the two new nodes
 	      //	      std::cout << " -- Adding target elements" << std::endl;

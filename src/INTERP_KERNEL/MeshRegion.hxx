@@ -3,8 +3,12 @@
 
 #include <vector>
 
+#include "BoundingBox.hxx"
+
 namespace INTERP_UTILS
 {
+  class MeshElement;
+
   /**
    * Class representing a set of elements in a mesh together with their bounding box.
    * It permits to split itself in two, which is used in the depth-first search filtering process.
@@ -44,13 +48,21 @@ namespace INTERP_UTILS
      * @param axis    axis along which to split the region
      *
      */
-    void split(Region& region1, Region& region2, int axis) const;
+    void split(MeshRegion& region1, MeshRegion& region2, BoundingBox::BoxCoord coord);
+
+    bool isDisjointWithElementBoundingBox(const MeshElement& elem) const;
+
+    std::vector<MeshElement*>::const_iterator getBeginElements() const;
+
+    std::vector<MeshElement*>::const_iterator getEndElements() const;
+
+    int getNumberOfElements() const;
 
   private:
     // Vector of pointers to elements. NB : these pointers are not owned by the region object, and are thus
     // neither allocated or liberated in this class. The elements must therefore be allocated and liberated outside this class
     std::vector<MeshElement*> _elements;
-    BoundingBox _box;
+    BoundingBox* _box;
 
   };
 

@@ -1,5 +1,8 @@
 #include "MeshElement.hxx"
 
+#include "TetraAffineTransform.hxx"
+#include "TransformedTriangle.hxx"
+
 namespace INTERP_UTILS
 {
 
@@ -10,7 +13,7 @@ namespace INTERP_UTILS
    * @param type    geometric type of the element
    * @param index   global number of element in the mesh
    */
-  MeshElement::MeshElement(const int index, const MEDEN::medGeometryElement type, const MEDMEM::Mesh& mesh)
+  MeshElement::MeshElement(const int index, const MED_EN::medGeometryElement type, const MEDMEM::MESH& mesh)
     : _index(index - 1), _mesh(&mesh), _type(type), _box(0)
   {
     // get coordinates of vertices
@@ -96,7 +99,7 @@ namespace INTERP_UTILS
   const double* MeshElement::getCoordsOfNode(int node) const
   {
     const int nodeOffset = node - 1;
-    const int elemIdx = mesh->getConnectivityIndex(MED_NODAL, MED_CELL)[_index];
+    const int elemIdx = _mesh->getConnectivityIndex(MED_NODAL, MED_CELL)[_index];
     return &(_mesh->getCoordinates(MED_FULL_INTERLACE)[elemIdx + nodeOffset]);
   }
   
@@ -108,7 +111,64 @@ namespace INTERP_UTILS
    */
   void MeshElement::triangulate(std::vector<TransformedTriangle>& triangles, const TetraAffineTransform& T) const
   {
-    // not implemented
+    switch(_type)
+      {
+      case MED_TETRA4 :
+	// triangles == faces
+	const int beginFaceIdx = _mesh->getConnectivityIndex(MED_DESCENDING, MED_CELL)[_index];
+	const int endFaceIdx = _mesh->getConnectivityIndex(MED_DESCENDING, MED_CELL)[_index + 1];
+	
+	for(int i = beginFaceIdx ; i < endFaceIdx ; ++i) // loop over faces of element
+	  {
+	    const int faceIdx = _mesh->getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL, MED_ALL_ELEMENTS)[i - 1];
+	    const int beginNodeIdx = _mesh->getConnectivityIndex(MED_NODAL, MED_FACE)[faceIdx - 1];
+	    const int endNodeIdx = _mesh->getConnectivityIndex(MED_NODAL, MED_FACE)[faceIdx];
+	    
+	    double transformedPts[9];
+	    
+	    assert(endNodeIdx - beginNodeIdx == 3);
+	    
+	    for(int j = 0 ; j < 3 ; ++j) // loop over nodes of face
+	      {
+		// { optimise here using getCoordinatesForNode ?
+		// could maybe use the connNodeIdx directly and only transform each node once
+		// instead of once per face
+		const int connNodeIdx = 
+		  _mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL, MED_FACE, MED_ALL_ELEMENTS)[beginNodeIdx + j - 1];
+		const double* pt = &(_mesh->getCoordinates(MED_FULL_INTERLACE)[connNodeIdx - 1]);
+
+		// transform
+		T.apply(&transformedPts[3*j], pt);
+	      }
+	    
+	    triangles.push_back(TransformedTriangle(&transformedPts[0], &transformedPts[3], &transformedPts[6]));
+	  }
+
+	break;
+      default:
+	break;
+      }
   }
 
+  int MeshElement::getIndex() const
+  {
+    return _index + 1;
+  }
+  
+
+  /// ElementBBoxOrder
+  bool ElementBBoxOrder::operator()( MeshElement* elem1, MeshElement* elem2)
+  {
+    assert(elem1 != 0);
+    assert(elem2 != 0);
+    assert(elem1->_box != 0);
+    assert(elem2->_box != 0);
+    
+    const double coord1 = elem1->_box->getCoordinate(_coord);
+    const double coord2 = elem2->_box->getCoordinate(_coord);
+    
+    return coord1 < coord2;
+  }
+
+  
 };

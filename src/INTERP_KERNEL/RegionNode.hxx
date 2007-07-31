@@ -1,8 +1,11 @@
 #ifndef __REGION_NODE_HXX__
 #define __REGION_NODE_HXX__
 
+#include "MeshRegion.hxx"
+
 namespace INTERP_UTILS
 {
+
   /**
    * Class containing a tuplet of a source region and a target region. 
    * This is used as the object to put on the stack in the depth-first search
@@ -26,14 +29,18 @@ namespace INTERP_UTILS
     ~RegionNode();
 
     /**
+     *  Accessor to source region
      *
+     * @return   reference to source region
      */
-    MeshRegion& getSrcRegion() const;
+    MeshRegion& getSrcRegion();
     
     /**
+     *  Accessor to target region
      *
+     * @return   reference to target region
      */
-    MeshRegion& getTargetRegion() const;
+    MeshRegion& getTargetRegion();
 
 
   private:
