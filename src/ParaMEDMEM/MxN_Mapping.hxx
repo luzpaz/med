@@ -20,6 +20,7 @@ public:
   void prepareSendRecv();
   void sendRecv(MEDMEM::FIELD<double>& field);
   void sendRecv(double* field, MEDMEM::FIELD<double>& field) const ;
+	void reverseSendRecv(double* field, MEDMEM::FIELD<double>& field) const ;
   
 private :
 //  ProcessorGroup& _local_group;

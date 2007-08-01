@@ -1,7 +1,6 @@
 #ifndef INTERSECTIONDEC_HXX_
 #define INTERSECTIONDEC_HXX_
 
-
 namespace ParaMEDMEM
 {
   class DEC;
@@ -39,6 +38,7 @@ namespace ParaMEDMEM
    string _method;
    
    InterpolationMatrix* _interpolation_matrix;
+
   };
 }
 

@@ -6,10 +6,12 @@
 #include "Interpolation3DSurf.hxx"
 
 /*! \class InterpolationMatrix
+
 This class enables the storage of an interpolation matrix Wij mapping 
-source field Sj to target field Ti via Ti=Wij.Sj.
+source field Sj to target field Ti via Ti=Vi^(-1).Wij.Sj.
 The matrix is built and stored on the processors belonging to the source
 group. 
+
 */
 
 namespace ParaMEDMEM
@@ -22,22 +24,26 @@ namespace ParaMEDMEM
     \param local_group processor group containing the local processors
     \param distant_group processor group containing the distant processors
     \param method interpolation method
-   */
+	*/
 InterpolationMatrix::InterpolationMatrix(
 const ParaMEDMEM::ParaMESH& source_support, 
-const ProcessorGroup& local_group,
-const ProcessorGroup& distant_group, 
+const ProcessorGroup& source_group,
+const ProcessorGroup& target_group, 
 const string& method):
-_source_support(*source_support.getMesh()),
-_local_group(local_group),
-_distant_group(distant_group),
-_mapping(local_group, distant_group),
-_method(method)
+	_source_support(*source_support.getMesh()),
+	_mapping(source_group, target_group),
+	_method(method),
+	_source_group(source_group),
+	_target_group(target_group),
+	_source_volume(0)
+	
 {
   int nbelems=  _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
-  _row_offsets.resize(nbelems+1,0);
+  _row_offsets.resize(nbelems+1);
+	for (int i=0; i<nbelems+1; i++)
+		_row_offsets[i]=0;
   
-  
+	_coeffs.resize(nbelems);
 }
 
 InterpolationMatrix::~InterpolationMatrix()
@@ -45,115 +51,98 @@ InterpolationMatrix::~InterpolationMatrix()
 }
 
 /*!
-adds the contribution of a distant subdomain to the interpolation matrix
+\brief Adds the contribution of a distant subdomain to the interpolation matrix.
+
+The method adds contribution to the interpolation matrix.
+For each row of the matrix, elements are addded as
+a (column, coeff) pair in the _coeffs array. This column number refers
+to an element on the target side via the _col_offsets array. It is made of a series 
+of (iproc, ielem) pairs. 
+The number of elements per row is stored in the row_offsets array.
+
 \param distant_support local representation of the distant subdomain
 \param iproc_distant id of the distant subdomain (in the distant group)
 \param distant_elems mapping between the local representation of the subdomain and the actual elem ids on the distant subdomain
  */
 void InterpolationMatrix::addContribution(MEDMEM::MESH& distant_support, int iproc_distant, int* distant_elems)
 {
-
-	// computing the intersections between distant and local elements
+	//creating the interpolator structure
   MEDMEM::Interpolation* interpolator;
-	if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==3)
-		interpolator=new MEDMEM::Interpolation3DSurf();
-	else if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==2)
-		interpolator=new MEDMEM::Interpolation2D();
-
-  int nbelems=  _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);  
+  if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==3)
+    interpolator=new MEDMEM::Interpolation3DSurf();
+  else if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==2)
+    interpolator=new MEDMEM::Interpolation2D();
+  
+	//computation of the intersection volumes between source and target elements
+  int source_size=  _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);  
   vector<map<int,double> > surfaces = interpolator->interpol_maillages(distant_support,_source_support);
-	delete interpolator;
-
-
-  if (surfaces.size() != nbelems)
+  delete interpolator;  
+  if (surfaces.size() != source_size)
     throw MEDEXCEPTION("uncoherent number of rows in interpolation matrix");
+  
+	//computing the vectors containing the source and target element volumes
+  MEDMEM::SUPPORT target_support(&distant_support,"all cells", MED_EN::MED_CELL);
+  MEDMEM::FIELD<double>* target_triangle_surf = distant_support.getArea(&target_support);
+	MEDMEM::SUPPORT source_support (const_cast<MEDMEM::MESH*>(&_source_support),"all cells", MED_EN::MED_CELL);
+	MEDMEM::FIELD<double>* source_triangle_surf = _source_support.getArea(&source_support);
 
-  MEDMEM::SUPPORT support(&distant_support,"all cells", MED_EN::MED_CELL);
-  MEDMEM::FIELD<double>* triangle_surf = distant_support.getArea(&support);
-
+	//storing the source volumes
+	_source_volume.resize(source_size);
+	for (int i=0; i<source_size;i++)
+		_source_volume[i]=source_triangle_surf->getValueIJ(i+1,1);
+	
+	//loop over the elements to build the interpolation
+	//matrix structures
   for (int ielem=0; ielem < surfaces.size(); ielem++) 
-  {
-    _row_offsets[ielem+1]+=surfaces[ielem].size();
-    //    _source_indices.push_back(make_pair(iproc_distant, ielem));
-    for (map<int,double>::const_iterator iter=surfaces[ielem].begin();
-         iter!=surfaces[ielem].end();
-         iter++)
-         {
-	   //surface of the source triangle
-	   double surf = triangle_surf->getValueIJ(iter->first,1);
-	   //oriented surfaces are not considered
-	   surf = (surf>0)?surf:-surf;
-	   //locating the (iproc, itriangle) pair in the list of columns
-           vector<pair<int,int> >::iterator iter2 = find (_col_offsets.begin(), _col_offsets.end(),make_pair(iproc_distant,iter->first));
-           int col_id;
-	   
-	   //(iproc, itriangle) is not registered in the list
-	   //of distant elements
-           if (iter2==_col_offsets.end())
-           {
-             _col_offsets.push_back(make_pair(iproc_distant,iter->first));
-             col_id =_col_offsets.size();
-	     _mapping.addElementFromSource(iproc_distant,distant_elems[iter->first-1]);
-           } 
-           else 
-           {
-            col_id=iter2-_col_offsets.begin()+1;
-           }
-	   //the column indirection number is registered
-	   //with the interpolation coefficient
-	   //actual column number is obtained with _col_offsets[col_id]
-           _col_numbers.push_back(col_id);
-           _coeffs.push_back(iter->second/surf);
-         }
-  }
-  delete triangle_surf;
+    {
+      _row_offsets[ielem+1]+=surfaces[ielem].size();
+      //    _source_indices.push_back(make_pair(iproc_distant, ielem));
+      for (map<int,double>::const_iterator iter=surfaces[ielem].begin();
+					 iter!=surfaces[ielem].end();
+					 iter++)
+				{
+					//surface of the target triangle
+					double surf = target_triangle_surf->getValueIJ(iter->first,1);
+
+					//locating the (iproc, itriangle) pair in the list of columns
+					vector<pair<int,int> >::iterator iter2 = find (_col_offsets.begin(), _col_offsets.end(),make_pair(iproc_distant,iter->first));
+					int col_id;
+					
+					
+					if (iter2==_col_offsets.end())
+						{
+							//(iproc, itriangle) is not registered in the list
+							//of distant elements
+
+							_col_offsets.push_back(make_pair(iproc_distant,iter->first));
+							col_id =_col_offsets.size();
+							_mapping.addElementFromSource(iproc_distant,distant_elems[iter->first-1]);
+							_target_volume.push_back(surf);
+						} 
+					else 
+						{
+							col_id=iter2-_col_offsets.begin()+1;
+						}
+
+					//the non zero coefficient is stored 
+					//ielem is the row,
+					//col_id is the number of the column
+					//iter->second is the value of the coefficient
+
+					_coeffs[ielem].push_back(make_pair(col_id,iter->second));
+
+				}
+    }
+  delete source_triangle_surf;
+	delete target_triangle_surf;
 }
-    
-//  intersect (_local_support,_distant_support);
-//  const int* conn_source_index = _local_support->getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_ALL_ELEMENTS);
-//  const int* conn_source = distant_support->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_ALL_ELEMENTS);
-//  const double* coords_source = _local_support->getCoords(MED_EN::MED_FULL_INTERLACE);
-//  for (int ielem=0; ielem< _local_support->getNumberOfElements(MED_EN::MED_CELL); ielem++)
-//    {
-//      MED_EN::medGeometryElementType type = distant_support->getElementType(ielem);
-//      switch (type)
-//      {
-//
-//        case MED_EN::TRIA3 :
-//          double* coords=new int[3*dim];
-//          for (ielem_distant=0; ielem_distant<distant_support->getNumberOfElements(MED_EN::MED_CELL);ielem_distant++)
-//          {
-//            int ielem_target=*iter;
-//                    
-//            for (int i=0; i<3; i++)
-//              {
-//                int node = conn[conn_source_index[ielem]+i];
-//                for  (int idim=0; i<dim; idim++)
-//                   coords[idim+dim*i]=coords_source[node*dim+idim];
-//              }
-//            double* moments = new double[dim+1];
-//            intersection (target_support, ielem_target, dim, coords,intersection_moments); 
-//          }
-//          
-//          //intersection_moments :
-//          // 0 -> int(1.dV)
-//          // 1 -> int(x.dV)
-//          // 2 -> int(y.dV)
-//          // 3 -> int(z.dV)
-//          if (intersection_moments[0]>0)
-//          {
-//           _source_indices.push_back(make_pair(iproc_distant, ielem);
-//           _col_numbers.push_back(ielem_target);
-//           _row_offsets[irow]++;
-//           _coeffs.push_back(intersection_moments[0]);
-//           for (int i=0; i<dim; i++)
-//              _coeffs.push_back(intersection_moments[i+1]);
-//           _mapping.addElementFromSource(ielem,iproc_distant,ielem_target);
-//           }        
-//      }
-//      irow++;
-//    }  
-//}
+
+/*! The call to this method updates the arrays on the target side
+so that they know which amount of data from which processor they 
+should expect. 
+That call makes actual interpolations via multiply method 
+available.
+*/
 
 void InterpolationMatrix::prepare()
 {
@@ -165,30 +154,107 @@ void InterpolationMatrix::prepare()
   _mapping.prepareSendRecv();
 }
 
+/*!
+  \brief performs t=Ws, where t is the target field, s is the source field
+
+	The call to this method must be called both on the working side 
+and on the idle side. On the working side, the vector  T=VT^(-1).(W.S)
+is computed and sent. On the idle side, no computation is done, but the 
+result from the working side is received and the field is updated.
+
+  \param field source field on processors involved on the source side, target field on processors on the target side
+ */
 void InterpolationMatrix::multiply(MEDMEM::FIELD<double>& field) const
 {
-  double* target_value = new double[_col_offsets.size()* field.getNumberOfComponents()];
-  for (int i=0; i< _col_offsets.size()* field.getNumberOfComponents();i++)
-    {
-      target_value[i]=0.0;
-    }
-  int nbrows=  _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
-  for (int irow=0; irow<nbrows; irow++)
-  {
-    for (int icol=_row_offsets[irow]; icol< _row_offsets[irow+1];icol++)
-    {
-      for (int icomp=0; icomp<field.getNumberOfComponents(); icomp++)
-	{
-	  double coeff_row = field.getValueIJ(irow+1,icomp+1);
-	  target_value[_col_numbers[icol]-1]+=_coeffs[icol]*coeff_row;
-	}
-    } 
-  }
-  _mapping.sendRecv(target_value,field);
+  vector<double> target_value(_col_offsets.size()* field.getNumberOfComponents(),0.0);
+
+	//computing the matrix multiply on source side
+	if (_source_group.containsMyRank())
+		{
+			int nbcomp = field.getNumberOfComponents();
+			int nbrows=  _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+			
+			// performing W.S
+			// W is the intersection matrix
+			// S is the source vector
+
+			for (int irow=0; irow<nbrows; irow++)
+				for (int icomp=0; icomp< nbcomp; icomp++)
+					{
+						double coeff_row = field.getValueIJ(irow+1,icomp+1);
+						for (int icol=_row_offsets[irow]; icol< _row_offsets[irow+1];icol++)
+							{
+								int colid= _coeffs[irow][icol-_row_offsets[irow]].first;
+								double value = _coeffs[irow][icol-_row_offsets[irow]].second;
+								target_value[(colid-1)*nbcomp+icomp]+=value*coeff_row;
+							}
+					}
+
+			// performing VT^(-1).(W.S)
+			// where VT^(-1) is the inverse of the diagonal matrix  containing 
+			// the volumes of target cells
+
+			for (int i=0; i<_col_offsets.size();i++)
+				for (int icomp=0; icomp<nbcomp; icomp++)
+					target_value[i*nbcomp+icomp] /= _target_volume[i];
+		}
+
+	//on source side : sending  T=VT^(-1).(W.S)
+	//on target side :: receiving T and storing it in field
+  _mapping.sendRecv(&target_value[0],field);
   
-  if (_col_offsets.size()>0)
-       delete[] target_value;
 }
-  
+/*!
+  \brief performs s=WTt, where t is the target field, s is the source field, WT is the transpose matrix from W
+
+	The call to this method must be called both on the working side 
+and on the idle side. On the working side, the target vector T is received and the
+ vector  S=VS^(-1).(WT.T) is computed to update the field. 
+On the idle side, no computation is done, but the field is sent.
+
+  \param field source field on processors involved on the source side, target field on processors on the target side
+ */ 
+void InterpolationMatrix::transposeMultiply(MEDMEM::FIELD<double>& field) const
+{
+  vector<double> source_value(_col_offsets.size()* field.getNumberOfComponents(),0.0);
+  _mapping.reverseSendRecv(&source_value[0],field);
+
+	//treatment of the transpose matrix multiply on the source side
+	if (_source_group.containsMyRank())
+		{
+			int nbcomp = field.getNumberOfComponents();
+			int nbrows = _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+			
+			vector<double> target_value(nbrows,0.0);
+
+			//performing WT.T
+			//WT is W transpose
+			//T is the target vector
+			for (int irow=0; irow<nbrows; irow++)
+				for (int icol=_row_offsets[irow]; icol< _row_offsets[irow+1];icol++)
+					for (int icomp=0; icomp<nbcomp; icomp++)
+						{
+							int colid= _coeffs[irow][icol-_row_offsets[irow]].first;
+							double value = _coeffs[irow][icol-_row_offsets[irow]].second;
+
+							double coeff_row = source_value[colid-1];
+							target_value[irow*nbcomp+icomp]+=value*coeff_row;
+						}
+				
+			//performing VS^(-1).(WT.T)
+			//VS^(-1) is the inverse of the diagonal matrix storing
+			//volumes of the source cells
+			for (int i=0; i<nbrows; i++)
+				for (int icomp;  icomp<nbcomp; icomp++)
+					target_value[i*nbcomp+icomp]/=_source_volume[i];
+				
+			//storing S= VS^(-1).(WT.T)
+			for (int irow=0; irow<nbrows; irow++)
+				for (int icomp=0; icomp<nbcomp; icomp++)
+					field.setValueIJ(irow+1,icomp+1,target_value[irow*nbcomp+icomp]);
+		}
+
+}
+
 
 }
