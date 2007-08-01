@@ -24,15 +24,15 @@ ExplicitCoincidentDEC::~ExplicitCoincidentDEC()
  */
 void ExplicitCoincidentDEC::synchronize()
 {
-  if (_source_field!=0)
+  if (_source_group->containsMyRank())
     {
-      _toposource = dynamic_cast<ExplicitTopology*>(_source_field->getTopology());
+      _toposource = dynamic_cast<ExplicitTopology*>(_local_field->getTopology());
       _sourcegroup= _toposource->getProcGroup()->createProcGroup();
       _targetgroup=_toposource->getProcGroup()->createComplementProcGroup();
     }
-  if (_target_field!=0)
+  if (_target_group->containsMyRank())
     {
-      _topotarget = dynamic_cast<ExplicitTopology*>(_target_field->getTopology());
+      _topotarget = dynamic_cast<ExplicitTopology*>(_local_field->getTopology());
       _sourcegroup= _topotarget->getProcGroup()->createComplementProcGroup();
       _targetgroup=_topotarget->getProcGroup()->createProcGroup();
     }
@@ -106,7 +106,7 @@ void ExplicitCoincidentDEC::prepareSourceDE()
     counter[i]=counter[i-1]+target_arrays[i-1].size();
   
   
-  const double* value = _source_field->getField()->getValue();
+  const double* value = _local_field->getField()->getValue();
   
   int* bufferindex= _explicit_mapping.getBufferIndex();
   
@@ -361,7 +361,7 @@ void ExplicitCoincidentDEC::recvData()
 	    value[ielem*ncomp+icomp]=_recvbuffer[counters[iproc]*ncomp+icomp];
 	  counters[iproc]++;
 	}	
-	_target_field->getField()->setValue(value);
+	_local_field->getField()->setValue(value);
 }
 
 void ExplicitCoincidentDEC::sendData()

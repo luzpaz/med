@@ -122,7 +122,7 @@ void ParaFIELD::synchronizeTarget(ParaFIELD* source_field){
 	{
 		data_channel=new ExplicitCoincidentDEC();
 	}
-	data_channel->attachTargetField(this);
+	data_channel->attachLocalField(this);
 	data_channel->synchronize();
 	data_channel->prepareTargetDE();
 	data_channel->recvData();
@@ -140,7 +140,7 @@ void ParaFIELD::synchronizeSource(ParaFIELD* target_field){
 	{
 		data_channel=new ExplicitCoincidentDEC();
 	}
-	data_channel->attachSourceField(this);
+	data_channel->attachLocalField(this);
 	data_channel->synchronize();
 	data_channel->prepareSourceDE();
 	data_channel->sendData();

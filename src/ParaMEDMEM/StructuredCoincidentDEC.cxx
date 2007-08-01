@@ -24,10 +24,10 @@ StructuredCoincidentDEC::~StructuredCoincidentDEC()
  */
 void StructuredCoincidentDEC::synchronize()
 {
-	if (_source_field!=0)
-		_toposource = dynamic_cast<BlockTopology*>(_source_field->getTopology());
-	if (_target_field!=0)
-		_topotarget = dynamic_cast<BlockTopology*>(_target_field->getTopology());
+	if (_source_group->containsMyRank())
+		_toposource = dynamic_cast<BlockTopology*>(_local_field->getTopology());
+	if (_target_group->containsMyRank())
+		_topotarget = dynamic_cast<BlockTopology*>(_local_field->getTopology());
 	
 	// Transmitting source topology to target code 
 	broadcastTopology(_toposource,1000);
@@ -102,7 +102,7 @@ void StructuredCoincidentDEC::prepareSourceDE()
 		counter[i]=counter[i-1]+target_arrays[i-1].size();
 		
 			
-	const double* value = _source_field->getField()->getValue();
+	const double* value = _local_field->getField()->getValue();
 	//cout << "Nb local " << nb_local<<endl;
 	for (int ielem=0; ielem<nb_local ; ielem++)
 	{
@@ -268,7 +268,7 @@ void StructuredCoincidentDEC::recvData()
 	}
 	
 	
-	_target_field->getField()->setValue(value);
+	_local_field->getField()->setValue(value);
 }
 
 void StructuredCoincidentDEC::sendData()
