@@ -78,6 +78,8 @@ namespace MEDMEM
       const int numSrcElems = srcMesh.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
       const int numTargetElems = targetMesh.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
 
+      std::cout << "Source mesh has " << numSrcElems << " elements and target mesh has " << numTargetElems << " elements " << std::endl;
+
       // create empty maps for all source elements
       matrix.resize(numSrcElems);
 
@@ -136,11 +138,11 @@ namespace MEDMEM
 	{
 	  RegionNode* currNode = nodes.top();
 	  nodes.pop();
-	  // std::cout << "Popping node " <<   std::endl;
+	  std::cout << "Popping node " <<   std::endl;
 
 	  if(currNode->getSrcRegion().getNumberOfElements() == 1)
 	    {
-	      // std::cout << " - One element" << std::endl;
+	      std::cout << " - One element" << std::endl;
 
 	      // volume calculation
 	      MeshElement* srcElement = *(currNode->getSrcRegion().getBeginElements());
@@ -155,7 +157,7 @@ namespace MEDMEM
 		  iter != currNode->getTargetRegion().getEndElements() ; ++iter)
 		{
 		  const double vol = calculateIntersectionVolume(*srcElement, **iter);
-		  if(vol != 0.0)
+		  //		  if(vol != 0.0)
 		    {
 		      const int targetIdx = (*iter)->getIndex();
 		  
@@ -167,7 +169,7 @@ namespace MEDMEM
 	  else // recursion 
 	    {
 
-	      // std::cout << " - Recursion" << std::endl;
+	      std::cout << " - Recursion" << std::endl;
 
 	      RegionNode* leftNode = new RegionNode();
 	      RegionNode* rightNode = new RegionNode();
@@ -178,19 +180,22 @@ namespace MEDMEM
 	      
 	      currNode->getSrcRegion().split(leftNode->getSrcRegion(), rightNode->getSrcRegion(), axis);
 
+	      std::cout << "After split, left src region has " << leftNode->getSrcRegion().getNumberOfElements() <<
+		" elements and right src region has " << rightNode->getSrcRegion().getNumberOfElements() << " elements" << std::endl;
+
 	      // ugly hack to avoid problem with enum which does not start at 0
 	      // I guess I ought to implement ++ for it instead ...
 	      // Anyway, it basically chooses the next axis, circually
 	      axis = (axis != BoundingBox::ZMAX) ? static_cast<BoundingBox::BoxCoord>(axis + 1) : BoundingBox::XMAX;
 
 	      // add target elements of curr node that overlap the two new nodes
-	      //	      std::cout << " -- Adding target elements" << std::endl;
+	      std::cout << " -- Adding target elements" << std::endl;
 	      int numLeftElements = 0;
 	      int numRightElements = 0;
 	      for(vector<MeshElement*>::const_iterator iter = currNode->getTargetRegion().getBeginElements() ; 
 		  iter != currNode->getTargetRegion().getEndElements() ; ++iter)
 		{
-		  //		  std::cout << " --- New target node" << std::endl;
+		  //std::cout << " --- New target node" << std::endl;
 		  
 		  if(!leftNode->getSrcRegion().isDisjointWithElementBoundingBox(**iter))
 		    {
@@ -204,7 +209,10 @@ namespace MEDMEM
 		      ++numRightElements;
 		    }
 		  
+		  
 		}
+
+	      std::cout << "Left target region has " << numLeftElements << " elements and right target region has " << numRightElements << " elements" << std::endl;
 
 	      if(numLeftElements != 0)
 		{
@@ -228,7 +236,7 @@ namespace MEDMEM
 	    }
 	      
 	  delete currNode;
-	  // std::cout << "Next iteration. Nodes left : " << nodes.size() << std::endl;
+	  std::cout << "Next iteration. Nodes left : " << nodes.size() << std::endl;
 	}
 
       
@@ -286,7 +294,9 @@ namespace MEDMEM
 
 	// create AffineTransform
 	TetraAffineTransform T( tetraCorners );
-	// T.dump();
+	std::cout << "Transform : " << std::endl;
+	T.dump();
+	std::cout << std::endl;
 
 	// triangulate source element faces (assumed tetraeder for the time being)
 	// do nothing
@@ -296,10 +306,10 @@ namespace MEDMEM
 	double volume = 0.0;
 
 	// std::cout << "num triangles = " << triangles.size() << std::endl;
-
+	int i = 0;
 	for(vector<TransformedTriangle>::iterator iter = triangles.begin() ; iter != triangles.end(); ++iter)
 	  {
-	    // std::cout << std::endl << "= > Triangle " << ++i << std::endl;  
+	    std::cout << std::endl << "= > Triangle " << ++i << std::endl;  
 	    iter->dumpCoords();
 	    volume += iter->calculateIntersectionVolume();
 	  }

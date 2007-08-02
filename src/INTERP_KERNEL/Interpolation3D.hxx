@@ -14,16 +14,13 @@
 // typedefs
 typedef std::vector< std::map< int, double > > IntersectionMatrix;
 
-
-#ifdef TESTING_INTERP_KERNEL
-class Interpolation3DTest;
-#endif
-
 namespace INTERP_UTILS
 {
   class MeshElement;
   class MeshRegion;
 };
+
+class Interpolation3DTest;
 
 namespace MEDMEM 
 {
@@ -34,9 +31,8 @@ namespace MEDMEM
   class Interpolation3D : public Interpolation
   {
 
-#ifdef TESTING_INTERP_KERNEL
     friend class ::Interpolation3DTest;
-#endif
+
 
   public :
 

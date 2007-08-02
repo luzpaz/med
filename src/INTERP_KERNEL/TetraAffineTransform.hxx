@@ -4,22 +4,22 @@
 #include <math.h>
 #include <iostream>
 
-#ifdef TESTING_INTERP_KERNEL
-class TetraAffineTransformTest;
-#endif
+#include "VectorUtils.hxx"
 
 namespace INTERP_UTILS
 {
 
   class TetraAffineTransform
   {
-#ifdef TESTING_INTERP_KERNEL
-    friend class ::TetraAffineTransformTest;
-#endif
+
 
   public:
     TetraAffineTransform(const double** pts)
     {
+
+      std::cout << "Creating transform from tetraeder : " << std::endl;
+      std::cout << vToStr(pts[0]) << ", " << vToStr(pts[1]) << ", " << vToStr(pts[2]) << ", " << vToStr(pts[3]) << ", " << std::endl;
+
 #if 0
       do {
 #endif
@@ -61,6 +61,20 @@ namespace INTERP_UTILS
 
       // precalculate determinant (again after inversion of transform)
       calculateDeterminant();
+      
+      std::cout << "*Self-check : Applying transformation to original points ... ";
+      for(int i = 0; i < 4 ; ++i)
+	{
+	  double v[3];
+	  apply(v, pts[i]);
+	  //	  std::cout << vToStr(v) << std::endl;
+	  for(int j = 0; j < 3; ++j)
+	    {
+	      assert(epsilonEqual(v[j], (3*i+j == 3 || 3*i+j == 7 || 3*i+j == 11 ) ? 1.0 : 0.0));
+	    }
+	}
+      
+      std::cout << " ok" << std::endl;
     }
 
     void apply(double* destPt, const double* srcPt) const
@@ -111,13 +125,14 @@ namespace INTERP_UTILS
       std::cout << "A = " << std::endl << "[";
       for(int i = 0; i < 3; ++i)
 	{
-	  cout << _linearTransform[3*i] << ", " << _linearTransform[3*i + 1] << ", " << _linearTransform[3*i + 1];
-	  if(i !=2 ) cout << endl;
+	  cout << _linearTransform[3*i] << ", " << _linearTransform[3*i + 1] << ", " << _linearTransform[3*i + 2];
+	  if(i != 2 ) cout << endl;
 	}
       cout << "]" << endl;
       
       cout << "b = " << "[" << _translation[0] << ", " << _translation[1] << ", " << _translation[2] << "]" << endl;
     }
+
   private:
 
     void invertLinearTransform()

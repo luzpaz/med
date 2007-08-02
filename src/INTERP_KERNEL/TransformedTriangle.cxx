@@ -155,6 +155,7 @@ namespace INTERP_UTILS
 
     if(isTriangleBelowTetraeder())
       {
+	std::cout << std::endl << "Triangle is below tetraeder - V = 0.0" << std::endl << std::endl ;
 	return 0.0;
       }
 
@@ -171,6 +172,7 @@ namespace INTERP_UTILS
     
     if(sign == 0.0)
       {
+	std::cout << std::endl << "Triangle is perpendicular to z-plane - V = 0.0" << std::endl << std::endl;
 	return 0.0;
       }
 
@@ -369,10 +371,23 @@ namespace INTERP_UTILS
 	  {
 	    double* ptB = new double[3];
 	    copyVector3(&_coords[5*corner], ptB);
-	    _polygonA.push_back(ptB);
+	    _polygonB.push_back(ptB);
 	    std::cout << "Inclusion XYZ-plane : " << vToStr(ptB) << " added to B" << std::endl;
 	  }
+
+	// projection on XYZ - facet
+	if(testCornerAboveXYZFacet(corner))
+	  {
+	    double* ptB = new double[3];
+	    copyVector3(&_coords[5*corner], ptB);
+	    ptB[2] = 1 - ptB[0] - ptB[1];
+	    assert(epsilonEqual(ptB[0]+ptB[1]+ptB[2] - 1, 0.0));
+	    _polygonB.push_back(ptB);
+	    std::cout << "Projection XYZ-plane : " << vToStr(ptB) << " added to B" << std::endl;
+	  }
+
       }
+
   }
 
   /**

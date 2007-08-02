@@ -51,6 +51,14 @@ namespace INTERP_UTILS
 	    
 	_box = new BoundingBox(pts, numNodes);
 	    
+      } else {
+	const int numNodes = element->getNumberNodes();
+
+	for(int i = 1 ; i <= numNodes ; ++i)
+	  {
+	    const double* pt = element->getCoordsOfNode(i);
+	    _box->updateWithPoint(pt);
+	  }
       }
   }
 

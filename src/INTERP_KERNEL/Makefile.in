@@ -39,11 +39,17 @@ EXPORT_PYSCRIPTS = \
 
 
 EXPORT_HEADERS = \
+Interpolation.hxx\
+Interpolation3D.hxx\
+RegionNode.hxx\
+MeshRegion.hxx\
+MeshElement.hxx\
+BoundingBox.hxx\
+TetraAffineTransform.hxx\
+TranslationRotationMatrix.hxx\
 Interpolation2D.hxx\
 Interpolation3DSurf.hxx\
-Interpolation.hxx\
 InterpolationUtils.hxx\
-TranslationRotationMatrix.hxx\
 BBTree.H
 
 # Libraries targets
@@ -54,8 +60,14 @@ LIB_SRC = \
 TransformedTriangle.cxx\
 TransformedTriangle_intersect.cxx\
 TransformedTriangle_math.cxx\
-Interpolation3DSurf.cxx\
-Interpolation2D.cxx\
+MeshElement.cxx\
+MeshRegion.cxx\
+RegionNode.cxx\
+BoundingBox.cxx\
+TetraAffineTransform.cxx\
+Interpolation3D.cxx
+#Interpolation3DSurf.cxx\
+#Interpolation2D.cxx\
 
 # Executables targets
 BIN = 
@@ -63,7 +75,7 @@ BIN_SRC =
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-TEST_PROGS = make_plane test_INTERPOL_2D 
+TEST_PROGS = #make_plane test_INTERPOL_2D 
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
@@ -71,17 +83,17 @@ LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MED2_INCLUDES)
 CPPFLAGS+=$(BOOST_CPPFLAGS) 
 
-# enable testing
-CXXFLAGS+= -DTESTING_INTERP_KERNEL
-CPPFLAGS+= -DTESTING_INTERP_KERNEL
+
 
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
 LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem   -lutil
+#LDFLAGS+= $(HDF5_LIBS) $(STDLIB) -lutil
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
 LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) -lutil 
+#LDFLAGSFORBIN+= -lm $(HDF5_LIBS) -lmedmem $(BOOST_LIBS) -lutil 
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}

@@ -3,11 +3,11 @@
 
 #include <vector>
 
-#ifdef TESTING_INTERP_KERNEL
+
 class TransformedTriangleTest;
 class TransformedTriangleIntersectTest;
 class TransformedTriangleCalcVolumeTest;
-#endif
+
 
 namespace INTERP_UTILS
 {
@@ -26,11 +26,11 @@ namespace INTERP_UTILS
 
   public:
 
-#ifdef TESTING_INTERP_KERNEL
+
     friend class ::TransformedTriangleTest;
     friend class ::TransformedTriangleIntersectTest;
     friend class ::TransformedTriangleCalcVolumeTest;
-#endif
+
 
     /**
      * Enumerations representing the different geometric elements of the unit tetrahedron
@@ -118,7 +118,8 @@ namespace INTERP_UTILS
     bool testCornerInTetrahedron(const TriCorner corner) const;
 
     bool testCornerOnXYZFacet(const TriCorner corner) const;
-      
+
+    bool testCornerAboveXYZFacet(const TriCorner corner) const;
 
     ////////////////////////////////////////////////////////////////////////////////////
     /// Utility methods used in intersection tests                       ///////////////
@@ -132,7 +133,7 @@ namespace INTERP_UTILS
 
     bool testSegmentIntersectsFacet(const TriSegment seg, const TetraFacet facet) const;
 
-    bool testSegmentIntersectsH(const TriSegment seg);
+    bool testSegmentIntersectsHPlane(const TriSegment seg) const;
 
     bool testSurfaceAboveCorner(const TetraCorner corner) const;
     
@@ -210,6 +211,14 @@ namespace INTERP_UTILS
     
     // coordinates of corners of tetrahedron
     static const double COORDS_TET_CORNER[12];
+    
+    // indices to use in tables DP_FOR_SEG_FACET_INTERSECTION and SIGN_FOR_SEG_FACET_INTERSECTION
+    // for the calculation of the coordinates (x,y,z) of the intersection points
+    // for Segment-Facet and Segment-Edge intersections
+    static const int TransformedTriangle::DP_INDEX[12];
+
+    // correspondance edge - corners
+    static const TetraCorner CORNERS_FOR_EDGE[12];
 
   };
 

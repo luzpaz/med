@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cassert>
 #include <cmath>
+#include <limits>
 
 namespace INTERP_UTILS
 {
@@ -29,12 +30,22 @@ namespace INTERP_UTILS
       C_YH, C_XH, C_XY  // Z
     };
   
-  const long double TransformedTriangle::MACH_EPS = 1.0e-15;
-  const long double TransformedTriangle::MULT_PREC_F = 4.0*TransformedTriangle::MACH_EPS;
+  //const double TransformedTriangle::MACH_EPS = 1.0e-15;
+  const long double TransformedTriangle::MACH_EPS = std::numeric_limits<double>::epsilon();
+  const long double TransformedTriangle::MULT_PREC_F = 4.0 * TransformedTriangle::MACH_EPS;
   const long double TransformedTriangle::THRESHOLD_F = 20.0;
 
   const double TransformedTriangle::TRIPLE_PRODUCT_ANGLE_THRESHOLD = 0.1;
 
+  // coordinates of corner ptTetCorner
+  /*  const double TransformedTriangle::COORDS_TET_CORNER[12] = 
+    {
+      0.0, 0.0, 0.0, // O
+      1.0, 0.0, 0.0, // X
+      0.0, 1.0, 0.0, // Y
+      0.0, 0.0, 1.0  // Z
+    };
+  */
   ////////////////////////////////////////////////////////////////////////////////////
   /// Double and triple product calculations                           ///////////////
   ////////////////////////////////////////////////////////////////////////////////////
@@ -104,9 +115,9 @@ namespace INTERP_UTILS
 		// coordinates of corner
 		const double ptTetCorner[3] = 
 		  { 
-		    corner == TT::X ? 1.0 : 0.0,
-		    corner == TT::Y ? 1.0 : 0.0,
-		    corner == TT::Z ? 1.0 : 0.0
+		    COORDS_TET_CORNER[3*corner    ],
+		    COORDS_TET_CORNER[3*corner + 1],
+		    COORDS_TET_CORNER[3*corner + 2]
 		  };
 
 		// dist^2 = ( PQ x CP )^2 / |PQ|^2 where C is the corner point
@@ -114,7 +125,9 @@ namespace INTERP_UTILS
 		// difference vectors
 		const double diffPQ[3] = { ptQ[0] - ptP[0], ptQ[1] - ptP[1], ptQ[2] - ptP[2] };
 		const double diffCornerP[3] = { ptP[0] - ptTetCorner[0], ptP[1] - ptTetCorner[1], ptP[2] - ptTetCorner[2] };
-	      
+
+		//{ use functions in VectorUtils for this
+
 		// cross product of difference vectors
 		const double cross[3] = 
 		  { 
@@ -148,8 +161,7 @@ namespace INTERP_UTILS
 	    for(int i = 0 ; i < 3 ; ++i) {
 	      DoubleProduct dp = DOUBLE_PRODUCTS[3*min_corner + i];
 	      
-	      //	      std::cout << std::endl << "in code inconsistent dp :" << dp << std::endl;
-	      
+	      // std::cout << std::endl << "inconsistent dp :" << dp << std::endl;	      
 	      _doubleProducts[8*seg + dp] = 0.0;
 	    }
 
@@ -172,18 +184,19 @@ namespace INTERP_UTILS
 	    const int off1 = DP_OFFSET_1[dp];
 	    const int off2 = DP_OFFSET_2[dp];
 
-	    const double term1 = _coords[5*pt1 + off1] * _coords[5*pt2 + off2]; 
-	    const double term2 = _coords[5*pt1 + off2] * _coords[5*pt2 + off1];
-	    const double absTerm1 = (term1 > 0.0 ? term1 : -term1);
-	    const double absTerm2 = (term2 > 0.0 ? term2 : -term2);
+	    const long double term1 = static_cast<long double>(_coords[5*pt1 + off1]) * static_cast<long double>(_coords[5*pt2 + off2]); 
+	    const long double term2 = static_cast<long double>(_coords[5*pt1 + off2]) * static_cast<long double>(_coords[5*pt2 + off1]);
 
-	    const double delta = MULT_PREC_F*(absTerm1 + absTerm2);
-	    const double absDoubleProduct = _doubleProducts[8*seg + dp] > 0.0 ? _doubleProducts[8*seg + dp] : -_doubleProducts[8*seg + dp];
+	    const long double delta = MULT_PREC_F * ( std::abs(term1) + std::abs(term2) );
 	  
-	    if(absDoubleProduct < THRESHOLD_F*delta)
+	    if( std::abs(static_cast<long double>(_doubleProducts[8*seg + dp])) < THRESHOLD_F*delta )
 	      {
-		//std::cout << "Double product " << 8*seg+dp << " = " << absDoubleProduct << " is imprecise, reset to 0.0" << std::endl;
+		if(_doubleProducts[8*seg + dp] != 0.0)
+		  {
+		    std::cout << "Double product for (seg,dp) = (" << seg << ", " << dp << ") = " << std::abs(_doubleProducts[8*seg + dp]) << " is imprecise, reset to 0.0" << std::endl;
+		  }
 		_doubleProducts[8*seg + dp] = 0.0;
+		  
 	      }
 	  }
       }
@@ -202,8 +215,10 @@ namespace INTERP_UTILS
     if(_isTripleProductsCalculated)
       return;
 
+    std::cout << "Precalculating triple products" << std::endl;
     for(TetraCorner corner = O ; corner <= Z ; corner = TetraCorner(corner + 1))
       {
+	std::cout << "- Triple product for corner " << corner << std::endl;
 	bool isGoodRowFound = false;
 
 	// find edge / row to use
@@ -227,7 +242,7 @@ namespace INTERP_UTILS
 		// find normal to PQR - cross PQ and PR
 		const double pq[3] = 
 		  { 
-		    _coords[5*Q] - _coords[5*P], 
+		    _coords[5*Q]     - _coords[5*P], 
 		    _coords[5*Q + 1] - _coords[5*P + 1],
 		    _coords[5*Q + 2] - _coords[5*P + 2]
 		  };
@@ -288,12 +303,16 @@ namespace INTERP_UTILS
 	      {
 		_tripleProducts[corner] = calcTByDevelopingRow(corner, minRow, false);
 	      }
+	    _validTP[corner] = true;
 	  }
 	else
 	  {
 	    // this value will not be used
 	    // we set it to whatever
+	    // std::cout << "Triple product not calculated for corner " << corner << std::endl;
 	    _tripleProducts[corner] = -3.14159265;
+	    _validTP[corner] = false;
+
 	  }
 
       }
@@ -332,6 +351,7 @@ namespace INTERP_UTILS
   double TransformedTriangle::calcStableT(const TetraCorner corner) const
   {
     assert(_isTripleProductsCalculated);
+    //    assert(_validTP[corner]);
     return _tripleProducts[corner];
   }
 
