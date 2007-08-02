@@ -45,6 +45,7 @@ bool Interpolation3DTest::isIntersectionConsistent(IntersectionMatrix m)
 void Interpolation3DTest::dumpIntersectionMatrix(IntersectionMatrix m)
 {
   int i = 0;
+  cout << "Intersection matrix is " << endl;
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
@@ -71,11 +72,12 @@ void Interpolation3DTest::reflexiveTetra()
 {
   std::cout << std::endl << std::endl << "=============================" << std::endl;
   std::cout << " Reflexive tetra " << endl;
-  MESH unitMesh(MED_DRIVER, "meshes/tetra1.med", "Mesh_1");
+  MESH unitMesh(MED_DRIVER, "meshes/UnitTetra.med", "UnitTetra");
 
   std::cout << std::endl << "*** unit tetra" << std::endl;
   IntersectionMatrix matrix1 = interpolator->interpol_maillages(unitMesh, unitMesh);
-  
+
+#if 0  
   std::cout << std::endl << "*** non-unit large tetra" << std::endl;
   MESH largeMesh(MED_DRIVER, "meshes/tetra2.med", "Mesh_1");
   IntersectionMatrix matrix2 = interpolator->interpol_maillages(largeMesh, largeMesh);
@@ -83,32 +85,50 @@ void Interpolation3DTest::reflexiveTetra()
   std::cout << std::endl << "*** non-unit small tetra" << std::endl;
   MESH smallMesh(MED_DRIVER, "meshes/tetra2_scaled.med", "Mesh_2");
   IntersectionMatrix matrix3 = interpolator->interpol_maillages(smallMesh, smallMesh);
-
+#endif
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0 / 6.0, sumVolume(matrix1), ERR_TOL);
+#if 0
   CPPUNIT_ASSERT_DOUBLES_EQUAL(48.0, sumVolume(matrix2), ERR_TOL);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.75, sumVolume(matrix3), ERR_TOL);
-  
+#endif
 }
 
-void Interpolation3DTest::tetraTetraTransl()
+void Interpolation3DTest::calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m)
+{
+  std::cout << std::endl << "=== -> intersecting src = " << mesh1 << ", target = " << mesh2 << std::endl;
+
+  std::cout << "Loading " << mesh1 << " from " << mesh1path << endl;
+  MESH sMesh(MED_DRIVER, mesh1path, mesh1);
+
+  std::cout << "Loading " << mesh2 << " from " << mesh2path << endl;
+  MESH tMesh(MED_DRIVER, mesh2path, mesh2);
+
+  m = interpolator->interpol_maillages(sMesh, tMesh);
+
+  dumpIntersectionMatrix(m);
+
+  std::cout << "Intersection calculation done. " << std::endl << std::endl;
+}
+
+void Interpolation3DTest::intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol)
 {
   std::cout << std::endl << std::endl << "=============================" << std::endl;
-  std::cout << " Translated tetra  " << endl;
-  MESH srcMesh(MED_DRIVER, "meshes/tetra1.med", "Mesh_1");
 
-  MESH targetMesh(MED_DRIVER, "meshes/tetra1_transl_delta.med", "Mesh_3");
+  IntersectionMatrix matrix1;
+  calcIntersectionMatrix(mesh1path, mesh1, mesh2path, mesh2, matrix1);
 
-  std::cout << std::endl << "*** src - target" << std::endl;
-  IntersectionMatrix matrix1 = interpolator->interpol_maillages(srcMesh, targetMesh);
-  std::cout << std::endl << std::endl << "*** target - src" << std::endl;
-  IntersectionMatrix matrix2 = interpolator->interpol_maillages(targetMesh, srcMesh);
-  std::cout << std::endl << std::endl << "*** target - target" << std::endl;
-  IntersectionMatrix matrix3 = interpolator->interpol_maillages(targetMesh, targetMesh);
+  dumpIntersectionMatrix(matrix1);
 
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.152112, sumVolume(matrix1), 1.0e-6);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.152112, sumVolume(matrix2), 1.0e-6);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0 / 6.0, sumVolume(matrix3), ERR_TOL);
+  IntersectionMatrix matrix2;
+  calcIntersectionMatrix(mesh2path, mesh2, mesh1path, mesh1, matrix2);
+
+  dumpIntersectionMatrix(matrix2);
+
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, sumVolume(matrix1), 1.0e-6);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, sumVolume(matrix2), 1.0e-6);
 }
+
+
 
 void Interpolation3DTest::tetraTetraScale()
 {

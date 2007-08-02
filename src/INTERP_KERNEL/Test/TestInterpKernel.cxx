@@ -21,13 +21,16 @@
 #include "CppUnitTest.hxx"
 #include "TransformedTriangleTest.hxx"
 #include "TransformedTriangleIntersectTest.hxx"
+#include "Interpolation3DTest.hxx"
 
 // --- Registers the fixture into the 'registry'
 
+CPPUNIT_TEST_SUITE_REGISTRATION( Interpolation3DTest );
+#if 0
 CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleIntersectTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( TestBogusClass );
-
+#endif
 // --- generic Main program from KERNEL_SRC/src/Basics/Test
 
 #include "BasicMainTest.hxx"
