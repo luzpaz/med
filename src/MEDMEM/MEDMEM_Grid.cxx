@@ -64,7 +64,7 @@ GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<
     init(); // PAL 12136
 
     _spaceDimension = xyz_array.size();
-
+    _meshDimension=_spaceDimension;
     // compute & set _numberOfNodes
     int NumberOfNodes=1 ;
     for(int i=0;i!=xyz_array.size();++i)
