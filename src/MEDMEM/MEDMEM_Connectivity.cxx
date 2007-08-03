@@ -1764,7 +1764,7 @@ medGeometryElement CONNECTIVITY::getElementType(medEntityMesh Entity,int globalN
 //--------------------------------------------------------------------//
 {
   const char * LOC = "medGeometryElement CONNECTIVITY::getElementType(medEntityMesh Entity, int globalNumber) const : ";
-  BEGIN_OF(LOC);
+	//  BEGIN_OF(LOC);
   int globalNumberMin = 1;
   int globalNumberMax ;
 

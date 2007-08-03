@@ -684,6 +684,7 @@ public:
   double normMax() const throw (MEDEXCEPTION);
   double norm2() const throw (MEDEXCEPTION);
   void   applyLin(T a, T b);
+	void applyLin(T a, T b, int icomp);
   template <T T_function(T)> void applyFunc();
   void applyPow(T scalar);
   static FIELD* scalarProduct(const FIELD& m, const FIELD& n, bool deepCheck=false);
@@ -1621,6 +1622,27 @@ template <class T, class INTERLACIN_TAG> void FIELD<T, INTERLACIN_TAG>::applyLin
 	    *value = a*(*value)+b;
     }
 }
+
+/*!  Apply to a given field component the linear function x -> ax+b.
+ *   calculation is done "in place".
+ */
+template <class T, class INTERLACIN_TAG> void FIELD<T, INTERLACIN_TAG>::applyLin(T a, T b, int icomp)
+{
+    // get a non const pointer to the inside array of values and perform operation in place
+    T * value=const_cast<T *> (getValue());
+	 
+    const int size=getNumberOfValues()*getNumberOfComponents(); // size of array
+
+    if (size>0) // for a negative size, there is nothing to do
+    {
+			value+=icomp-1;
+			const T* lastvalue=value+size; // pointer to the end of value
+ 
+			for(;value!=lastvalue; value+=getNumberOfComponents()) // apply linear transformation
+				*value = a*(*value)+b;
+    }
+}
+
 
 
 /*!
