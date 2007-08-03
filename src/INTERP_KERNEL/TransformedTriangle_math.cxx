@@ -215,10 +215,10 @@ namespace INTERP_UTILS
     if(_isTripleProductsCalculated)
       return;
 
-    std::cout << "Precalculating triple products" << std::endl;
+    // std::cout << "Precalculating triple products" << std::endl;
     for(TetraCorner corner = O ; corner <= Z ; corner = TetraCorner(corner + 1))
       {
-	std::cout << "- Triple product for corner " << corner << std::endl;
+	// std::cout << "- Triple product for corner " << corner << std::endl;
 	bool isGoodRowFound = false;
 
 	// find edge / row to use
@@ -309,7 +309,7 @@ namespace INTERP_UTILS
 	  {
 	    // this value will not be used
 	    // we set it to whatever
-	    // std::cout << "Triple product not calculated for corner " << corner << std::endl;
+	    std::cout << "Triple product not calculated for corner " << corner << std::endl;
 	    _tripleProducts[corner] = -3.14159265;
 	    _validTP[corner] = false;
 

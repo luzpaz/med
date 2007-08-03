@@ -32,8 +32,21 @@ namespace INTERP_UTILS
 		_linearTransform[3*j + i] = (pts[i+1])[j] - (pts[0])[j];
 	      }
 	  }
-#if 0
+
 	calculateDeterminant();
+
+	std::cout << "determinant before inverse = " << _determinant << std::endl;
+	
+	// check that tetra is non-planar -> determinant is not zero
+	// otherwise set _determinant to zero to signal caller that transformation did not work
+	if(epsilonEqual(_determinant, 0.0))
+	  {
+	    _determinant = 0.0;
+	    return;
+	  }
+	
+#if 0
+
 	//assert(_determinant != 0.0);
 	
 	if(_determinant < 0.0) 
@@ -62,12 +75,14 @@ namespace INTERP_UTILS
       // precalculate determinant (again after inversion of transform)
       calculateDeterminant();
       
+      // self-check
+      std::cout << "transform determinant is " << _determinant << std::endl;
       std::cout << "*Self-check : Applying transformation to original points ... ";
       for(int i = 0; i < 4 ; ++i)
 	{
 	  double v[3];
 	  apply(v, pts[i]);
-	  //	  std::cout << vToStr(v) << std::endl;
+	  std::cout << vToStr(v) << std::endl;
 	  for(int j = 0; j < 3; ++j)
 	    {
 	      assert(epsilonEqual(v[j], (3*i+j == 3 || 3*i+j == 7 || 3*i+j == 11 ) ? 1.0 : 0.0));

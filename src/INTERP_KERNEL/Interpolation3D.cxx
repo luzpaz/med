@@ -298,6 +298,13 @@ namespace MEDMEM
 	T.dump();
 	std::cout << std::endl;
 
+	if(T.determinant() == 0.0)
+	  {
+	    // tetra is planar
+	    std::cout << "Planar tetra -- volume 0" << std::endl;
+	    return 0.0;
+	  }
+
 	// triangulate source element faces (assumed tetraeder for the time being)
 	// do nothing
 	vector<TransformedTriangle> triangles;

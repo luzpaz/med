@@ -2,6 +2,7 @@
 
 #include "TetraAffineTransform.hxx"
 #include "TransformedTriangle.hxx"
+#include "MEDMEM_CellModel.hxx"
 
 namespace INTERP_UTILS
 {
@@ -111,6 +112,66 @@ namespace INTERP_UTILS
    */
   void MeshElement::triangulate(std::vector<TransformedTriangle>& triangles, const TetraAffineTransform& T) const
   {
+    // get cell model for the element
+    CELLMODEL cellModel(_type);
+
+    assert(cellModel.getDimension() == 3);
+
+    // start index in connectivity array for cell
+    //    const int cellIdx = _mesh->getConnectivityIndex(MED_NODAL, MED_CELL)[_index] - 1;
+
+    //    assert(cellIdx >= 0);
+    //assert(cellIdx < _mesh->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
+
+    // loop over faces
+    for(int i = 1 ; i <= cellModel.getNumberOfConstituents(1) ; ++i)
+      {
+	medGeometryElement faceType = cellModel.getConstituentType(1, i);
+	CELLMODEL faceModel(faceType);
+
+	assert(faceModel.getDimension() == 2);
+
+	double transformedNodes[3 * faceModel.getNumberOfNodes()];
+	const double* coords = _mesh->getCoordinates(MED_FULL_INTERLACE);
+
+	// loop over nodes of face
+	for(int j = 1; j <= faceModel.getNumberOfNodes(); ++j)
+	  {
+	    // offset of node from cellIdx
+	    int localNodeNumber = cellModel.getNodeConstituent(1, i, j);
+
+	    assert(localNodeNumber >= 1);
+	    assert(localNodeNumber <= cellModel.getNumberOfNodes());
+
+	    const double* node = getCoordsOfNode(localNodeNumber);
+	    
+	    // transform 
+	    //{ not totally efficient since we transform each node once per face
+	    T.apply(&transformedNodes[3*(j-1)], node);
+
+	  }
+
+	assert(faceType == MED_TRIA3);
+
+	// create triangles from face
+	switch(faceType)
+	  {
+	  case MED_TRIA3:
+	    triangles.push_back(TransformedTriangle(&transformedNodes[0], &transformedNodes[3], &transformedNodes[6]));
+	    break;
+	    
+	  default:
+	    std::cout << "Only elements with triangular faces are supported at the moment." << std::endl;
+	  }
+      }
+    
+
+  }
+  
+
+#if 0
+  void MeshElement::triangulate(std::vector<TransformedTriangle>& triangles, const TetraAffineTransform& T) const
+  {
     std::cout << "Triangulating element " << getIndex() << std::endl;
     switch(_type)
       {
@@ -156,7 +217,7 @@ namespace INTERP_UTILS
 	break;
       }
   }
-
+#endif
   int MeshElement::getIndex() const
   {
     return _index + 1;

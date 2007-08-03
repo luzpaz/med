@@ -109,12 +109,12 @@ namespace INTERP_UTILS
     // calculate point
     for(int i = 0; i < 3; ++i)
       {
-	// std::cout << "alpha= " << alpha << std::endl;
+	std::cout << "tA = " << tA << " tB = " << tB << " alpha= " << alpha << std::endl;
 	pt[i] = (1 - alpha) * COORDS_TET_CORNER[3*corners[0] + i] + 
 	  alpha * COORDS_TET_CORNER[3*corners[1] + i];
-	// std::cout << pt[i] << std::endl;
-	assert(pt[i] >= 0.0);
-	assert(pt[i] <= 1.0);
+	 std::cout << pt[i] << std::endl;
+	 //assert(pt[i] >= 0.0);
+	 //assert(pt[i] <= 1.0);
       }
   }
 
@@ -657,7 +657,7 @@ namespace INTERP_UTILS
     const double cQR = calcStableC(QR, DoubleProduct(edge));
     const double cRP = calcStableC(RP, DoubleProduct(edge));
 
-    // std::cout << "TriangleSurroundsEdge : edge = " << edge << " c = [" << cPQ << ", " << cQR << ", " << cRP << "]" << std::endl;
+    std::cout << "TriangleSurroundsEdge : edge = " << edge << " c = [" << cPQ << ", " << cQR << ", " << cRP << "]" << std::endl;
 
     // if two or more c-values are zero we disallow x-edge intersection
     // Grandy, p.446
@@ -690,9 +690,9 @@ namespace INTERP_UTILS
 	X, O, // OX
 	Y, O, // OY
 	Z, O, // OZ 
+	X, Y,  // XY
 	Y, Z, // YZ
 	Z, X, // ZX
-	X, Y  // XY
       };
 
     // Grandy, [16]
@@ -700,6 +700,7 @@ namespace INTERP_UTILS
     const double t2 = calcStableT(TRIPLE_PRODUCTS[2*edge + 1]);
 
     //? should equality with zero use epsilon?
+    std::cout << "testEdgeIntersectsTriangle : t1 = " << t1 << " t2 = " << t2 << std::endl;
     return (t1*t2 <= 0.0) && (t1 - t2 != 0.0);
   }
 
@@ -771,11 +772,11 @@ namespace INTERP_UTILS
     //? is it always YZ here ?
     //? changed to XY !
     const double normal = calcStableC(PQ, C_XY) + calcStableC(QR, C_XY) + calcStableC(RP, C_XY);
-    std::cout << "surface above corner " << corner << " : " << "n = " << normal << ", t = [" <<  calcTByDevelopingRow(corner, 1, false) << ", "  << calcTByDevelopingRow(corner, 2, false) << ", " << calcTByDevelopingRow(corner, 3, false) << "] - stable : " << calcStableT(corner)  << std::endl;
+    // std::cout << "surface above corner " << corner << " : " << "n = " << normal << ", t = [" <<  calcTByDevelopingRow(corner, 1, false) << ", "  << calcTByDevelopingRow(corner, 2, false) << ", " << calcTByDevelopingRow(corner, 3, false) << "] - stable : " << calcStableT(corner)  << std::endl;
     //? we don't care here if the triple product is "invalid", that is, the triangle does not surround one of the
     // edges going out from the corner (Grandy [53])
-        return ( calcTByDevelopingRow(corner, 2, false) * normal ) >= 0.0;
-    //   return ( calcStableT(corner) * normal ) >= 0.0;
+    //   return ( calcTByDevelopingRow(corner, 2, false) * normal ) >= 0.0;
+       return ( calcStableT(corner) * normal ) >= 0.0;
   }
 
   /**
