@@ -1,0 +1,88 @@
+#  MED MEDMEM : MED files in memory
+#
+#  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
+# 
+#  This library is free software; you can redistribute it and/or 
+#  modify it under the terms of the GNU Lesser General Public 
+#  License as published by the Free Software Foundation; either 
+#  version 2.1 of the License. 
+# 
+#  This library is distributed in the hope that it will be useful, 
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+#  Lesser General Public License for more details. 
+# 
+#  You should have received a copy of the GNU Lesser General Public 
+#  License along with this library; if not, write to the Free Software 
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+# 
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
+#
+#
+#  File   : Makefile.in
+#  Author : Vincent BERGEAUD (CEA/DEN/DANS/DM2S/SFME/LGLS)
+#  Module : MED
+
+top_srcdir=@top_srcdir@
+top_builddir=../../..
+srcdir=@srcdir@
+VPATH=.:$(srcdir):$(srcdir)/tests
+
+MACHINE=PCLINUX
+
+@COMMENCE@
+
+
+EXPORT_PYSCRIPTS = \
+
+
+EXPORT_HEADERS = \
+ICoCoField.hxx\
+ICoCoMEDField.hxx
+
+# Libraries targets
+
+LIB=libICoCo.la
+
+LIB_SRC = ICoCoMEDField.cxx
+
+
+# Executables targets
+BIN =
+BIN_SRC = 
+BIN_SERVER_IDL = 
+BIN_CLIENT_IDL = 
+
+TEST_PROGS = 
+LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
+LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
+
+CPPFLAGS+=$(MED2_INCLUDES) $(MPI_INCLUDES) $(LAM_INCLUDES) -I/data/tmpawa/vb144235/lam_install/include -I/data/tmpawa/vb144235/fvm/src -DFVM_HAVE_MPI -I$(top_srcdir)/src/ParaMEDMEM  -I$(top_srcdir)/src/MEDMEM
+
+CXXFLAGS+=@CXXTMPDPTHFLAGS@ 
+CPPFLAGS+=$(BOOST_CPPFLAGS)
+#LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
+# change motivated by the bug KERNEL4778.
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem  $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel -lparamed
+
+#LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
+# change motivated by the bug KERNEL4778.
+LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel  -lparamed
+
+ifeq ($(MED_WITH_KERNEL),yes)
+  CPPFLAGS+= ${KERNEL_CXXFLAGS}
+  CXXFLAGS+= ${KERNEL_CXXFLAGS}
+  LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
+  LDFLAGSFORBIN+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics
+endif
+
+LIBSFORBIN=$(BOOSTLIBS) $(MPI_LIBS) 
+
+LIBS=
+
+# build create_mesh :
+bin: 
+
+@CONCLUDE@
