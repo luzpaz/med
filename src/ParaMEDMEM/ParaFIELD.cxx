@@ -7,7 +7,9 @@
 #include "UnstructuredParaSUPPORT.hxx"
 #include "ExplicitCoincidentDEC.hxx"
 #include "StructuredCoincidentDEC.hxx"
-
+#include "CommInterface.hxx"
+#include "ProcessorGroup.hxx"
+#include "MPIProcessorGroup.hxx"
 #include "ParaFIELD.hxx"
 #include "ParaMESH.hxx"
 
@@ -38,8 +40,7 @@ ParaFIELD::ParaFIELD(const ParaSUPPORT* para_support, const ComponentTopology& c
 					     
 	    }
 	}
-//	int nb_components=0;
-//	if (component_topology.getProcGroup()!=0)
+
 	int nb_components = component_topology.nbLocalComponents();
 	if (nb_components!=0)
 		{
@@ -47,8 +48,8 @@ ParaFIELD::ParaFIELD(const ParaSUPPORT* para_support, const ComponentTopology& c
 		}
 	else return;
 	
-	_field->setName("toto");
-	_field->setDescription("titi");
+	_field->setName("Default ParaFIELD name");
+	_field->setDescription("Default ParaFIELD description");
 	_field->setNumberOfValues(para_support->getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 	string* compnames=new string[nb_components];
 	string* compdesc=new string[nb_components];
@@ -148,4 +149,41 @@ void ParaFIELD::synchronizeSource(ParaFIELD* target_field){
 	delete data_channel;
 }
 
+double ParaFIELD::getVolumeIntegral(int icomp) const
+{
+	CommInterface comm_interface = _topology->getProcGroup()->getCommInterface();
+	const MEDMEM::SUPPORT* support = _field->getSupport();
+	FIELD<double>* volume= getSupportVolumes(*support);
+	double integral=0;
+	for (int i=0; i<support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS); i++)
+		integral+=_field->getValueIJ(i+1,icomp)*volume->getValueIJ(i+1,1);
+	
+	double total=0.0;
+	comm_interface.allReduce(&integral, &total, 1, MPI_DOUBLE, MPI_SUM, * dynamic_cast<const MPIProcessorGroup*>(_topology->getProcGroup())->getComm());
+	return total;
+}
+
+/*!
+\brief returns the volumes of the cells underlying the field \a field
+
+For 2D geometries, the returned field contains the areas.
+For 3D geometries, the returned field contains the volumes.
+
+\param field field on which cells the volumes are required
+\return field containing the volumes
+*/
+ MEDMEM::FIELD<double>* ParaFIELD::getSupportVolumes(const MEDMEM::SUPPORT& support) const
+	 {
+		 const MEDMEM::MESH* mesh=support.getMesh();
+		 int dim = mesh->getMeshDimension();
+		 switch (dim)
+			 {
+			 case 2:
+				 return mesh->getArea(&support);
+			 case 3:
+				 return mesh->getVolume(&support);
+			 default:
+				 throw MEDMEM::MEDEXCEPTION("interpolation is not available for this dimension");
+			 }
+	 }
 }

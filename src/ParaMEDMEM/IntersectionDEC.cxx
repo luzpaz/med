@@ -94,7 +94,6 @@ void IntersectionDEC::synchronize()
 				}      
 		}
   _interpolation_matrix->prepare();
-	//	_volume_vector=para_mesh->getVolume();
 	
 }
 
@@ -104,13 +103,39 @@ void IntersectionDEC::recvData()
 	if (_source_group->containsMyRank())
 		_interpolation_matrix->transposeMultiply(*_local_field->getField());
 	else if (_target_group->containsMyRank())
-		_interpolation_matrix->multiply(*_local_field->getField());
+		{
+			_interpolation_matrix->multiply(*_local_field->getField());
+			if (_forced_renormalization_flag)
+				for (int icomp=0; icomp<_local_field->getField()->getNumberOfComponents(); icomp++)
+					{
+						double total_norm = _local_field->getVolumeIntegral(icomp+1);
+						double source_norm=total_norm;
+						_comm_interface->broadcast(&source_norm, 1, MPI_DOUBLE, 0,* dynamic_cast<MPIProcessorGroup*>(_union_group)->getComm());
+						
+						if (_target_group->containsMyRank() && abs(total_norm)>1e-100)
+							_local_field->getField()->applyLin(source_norm/total_norm,0.0,icomp+1);
+					}
+		}
+	
+	
 }
 
 void IntersectionDEC::sendData()
 {
 	if (_source_group->containsMyRank())
-    _interpolation_matrix->multiply(*_local_field->getField());
+		{
+			_interpolation_matrix->multiply(*_local_field->getField());
+			if (_forced_renormalization_flag)
+				for (int icomp=0; icomp<_local_field->getField()->getNumberOfComponents(); icomp++)
+					{
+						double total_norm = _local_field->getVolumeIntegral(icomp+1);
+						double source_norm = total_norm;
+						_comm_interface->broadcast(&source_norm, 1, MPI_DOUBLE, 0,* dynamic_cast<MPIProcessorGroup*>(_union_group)->getComm());
+						
+						if (_target_group->containsMyRank() && abs(total_norm)>1e-100)
+							_local_field->getField()->applyLin(source_norm/total_norm,0.0,icomp+1);
+					}
+		}
 	else if (_target_group->containsMyRank())
 		_interpolation_matrix->transposeMultiply(*_local_field->getField());
 }

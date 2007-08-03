@@ -136,7 +136,7 @@ int main(int argc, char** argv)
       source_field.getField()->setValue(value);
       cout <<"creating intersectionDEC"<<endl;
       IntersectionDEC dec(*source_group,*target_group);
-      dec.attachSourceField(&source_field);
+      dec.attachLocalField(&source_field);
       dec.synchronize();
       cout<<"DEC usage"<<endl;
       dec.sendData();
@@ -160,7 +160,7 @@ int main(int argc, char** argv)
 				value[ielem]=0.0;
       target_field.getField()->setValue(value);
       IntersectionDEC dec(*source_group,*target_group);
-      dec.attachTargetField(&target_field);
+      dec.attachLocalField(&target_field);
       dec.synchronize();
       dec.recvData();
 			target_mesh_bis->write(MED_DRIVER, "/home/vb144235/tmp/targetcylinder");

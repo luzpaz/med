@@ -28,12 +28,14 @@
 top_srcdir=@top_srcdir@
 top_builddir=../..
 srcdir=@srcdir@
+
 VPATH=.:$(srcdir):$(srcdir)/tests
 
 MACHINE=PCLINUX
 
 @COMMENCE@
 
+SUBDIRS= ICoCo
 
 EXPORT_PYSCRIPTS = \
 

@@ -67,7 +67,9 @@ int main(int argc, char** argv)
   //loading the geometry for the source group
   if (source_group->containsMyRank())
     {
-      string master = "/home/vb144235/resources/square128000_split";
+			//      string master = "/home/vb144235/resources/square128000_split";
+			string master = "/home/vb144235/resources/square1_split";
+      
       cout <<"loading source"<<endl;
       source_mesh=new ParaMESH(MED_DRIVER,master,*source_group);
       cout <<"end of load"<<endl;
@@ -76,7 +78,7 @@ int main(int argc, char** argv)
             strstream <<master<<rank+1<<".med";
       //strstream<<"/home/vb144235/resources/square128000.med";
       ostringstream meshname ;
-            meshname<< "Mesh_1_"<< rank+1;
+            meshname<< "Mesh_2_"<< rank+1;
       //      meshname<<"Mesh_1";
       MEDMEM::MESH* mesh_bis = new MESH(MED_DRIVER,strstream.str(),meshname.str());
       source_mesh_bis = new ParaMESH(*mesh_bis,*source_group,"mesh_from_mem");
@@ -94,14 +96,15 @@ int main(int argc, char** argv)
   //loading the geometry for the target group
   if (target_group->containsMyRank())
     {
-      string master = "/home/vb144235/resources/square30000_split";
+			//      string master = "/home/vb144235/resources/square30000_split";
+			string master= "/home/vb144235/resources/square2_split";
       target_mesh=new ParaMESH(MED_DRIVER,master,*target_group);
       topo_target=target_mesh->getBlockTopology();
       ostringstream strstream;
             strstream << master<<(rank-nproc_source+1)<<".med";
 	    //strstream<<"/home/vb144235/resources/square30000.med";
       ostringstream meshname ;
-            meshname<< "Mesh_1_"<<rank-nproc_source+1;
+            meshname<< "Mesh_3_"<<rank-nproc_source+1;
 	    //meshname<<"Mesh_1";
     
       MEDMEM::MESH* mesh_bis = new MESH(MED_DRIVER,strstream.str(),meshname.str());
@@ -136,10 +139,16 @@ int main(int argc, char** argv)
       source_field.getField()->setValue(value);
       cout <<"creating intersectionDEC"<<endl;
       IntersectionDEC dec(*source_group,*target_group);
-      dec.attachSourceField(&source_field);
+      dec.attachLocalField(&source_field);
       dec.synchronize();
       cout<<"DEC usage"<<endl;
+			dec.setForcedRenormalizationFlag(true);
+
       dec.sendData();
+			source_mesh->write(MED_DRIVER,"/home/vb144235/tmp/sourcesquareb");
+      source_field.write(MED_DRIVER,"/home/vb144235/tmp/sourcesquareb","boundary");  
+   
+			dec.recvData();
       cout <<"writing"<<endl;
       source_mesh->write(MED_DRIVER,"/home/vb144235/tmp/sourcesquare");
       source_field.write(MED_DRIVER,"/home/vb144235/tmp/sourcesquare","boundary");  
@@ -160,9 +169,14 @@ int main(int argc, char** argv)
 	value[ielem]=0.0;
       target_field.getField()->setValue(value);
       IntersectionDEC dec(*source_group,*target_group);
-      dec.attachTargetField(&target_field);
+      dec.attachLocalField(&target_field);
       dec.synchronize();
+			dec.setForcedRenormalizationFlag(true);
+
       dec.recvData();
+			target_mesh->write(MED_DRIVER, "/home/vb144235/tmp/targetsquareb");
+			target_field.write(MED_DRIVER, "/home/vb144235/tmp/targetsquareb", "boundary");
+	 		dec.sendData();
       target_mesh->write(MED_DRIVER, "/home/vb144235/tmp/targetsquare");
       target_field.write(MED_DRIVER, "/home/vb144235/tmp/targetsquare", "boundary");
       delete[] value;

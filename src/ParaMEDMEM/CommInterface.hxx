@@ -53,6 +53,12 @@ public:
                 recvcount, recvtype, source, recvtag, comm,status);
                }
   int worldSize() const {int size; MPI_Comm_size(MPI_COMM_WORLD, &size); return size;}
+	int reduce(void* sendbuf, void* recvbuf, int count, MPI_Datatype datatype, MPI_Op op, 
+						 int root, MPI_Comm comm) const
+	{return MPI_Reduce(sendbuf, recvbuf, count, datatype, op, root, comm);}
+	int allReduce(void* sendbuf, void* recvbuf, int count, MPI_Datatype datatype, MPI_Op op, 
+						 MPI_Comm comm) const
+	{return MPI_Allreduce(sendbuf, recvbuf, count, datatype, op, comm);}
 };
 
 }

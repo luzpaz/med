@@ -9,12 +9,14 @@ namespace ParaMEDMEM
   {
   }
   
-  ParaSUPPORT::ParaSUPPORT(const MEDMEM::SUPPORT& support, const ProcessorGroup& proc_group):_support(&support) {
+  ParaSUPPORT::ParaSUPPORT(const MEDMEM::SUPPORT& support, const ProcessorGroup& proc_group):_support(&support), _owns_support(false) {
   _mesh = new ParaMESH(*(support.getMesh()),  proc_group, "mesh from support");
   }
   
   ParaSUPPORT::~ParaSUPPORT()
   {
+		if (_owns_support)
+			delete _support;
   }
   
 }

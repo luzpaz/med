@@ -66,12 +66,19 @@ The number of elements per row is stored in the row_offsets array.
  */
 void InterpolationMatrix::addContribution(MEDMEM::MESH& distant_support, int iproc_distant, int* distant_elems)
 {
+
+	if (distant_support.getMeshDimension() != _source_support.getMeshDimension() ||
+			distant_support.getMeshDimension() != _source_support.getMeshDimension() )
+		throw MEDMEM::MEDEXCEPTION("local and distant meshes do not have the same space and mesh dimensions");
+	
 	//creating the interpolator structure
-  MEDMEM::Interpolation* interpolator;
+	MEDMEM::Interpolation* interpolator;
   if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==3)
     interpolator=new MEDMEM::Interpolation3DSurf();
   else if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==2)
     interpolator=new MEDMEM::Interpolation2D();
+	else
+		throw MEDMEM::MEDEXCEPTION("no interpolator exists for these mesh and space dimensions ");
   
 	//computation of the intersection volumes between source and target elements
   int source_size=  _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);  
@@ -81,10 +88,10 @@ void InterpolationMatrix::addContribution(MEDMEM::MESH& distant_support, int ipr
     throw MEDEXCEPTION("uncoherent number of rows in interpolation matrix");
   
 	//computing the vectors containing the source and target element volumes
-  MEDMEM::SUPPORT target_support(&distant_support,"all cells", MED_EN::MED_CELL);
-  MEDMEM::FIELD<double>* target_triangle_surf = distant_support.getArea(&target_support);
+	MEDMEM::SUPPORT target_support(&distant_support,"all cells", MED_EN::MED_CELL);
+	MEDMEM::FIELD<double>* target_triangle_surf = getSupportVolumes(target_support);
 	MEDMEM::SUPPORT source_support (const_cast<MEDMEM::MESH*>(&_source_support),"all cells", MED_EN::MED_CELL);
-	MEDMEM::FIELD<double>* source_triangle_surf = _source_support.getArea(&source_support);
+	MEDMEM::FIELD<double>* source_triangle_surf = getSupportVolumes(source_support);
 
 	//storing the source volumes
 	_source_volume.resize(source_size);
@@ -245,7 +252,7 @@ void InterpolationMatrix::transposeMultiply(MEDMEM::FIELD<double>& field) const
 			//VS^(-1) is the inverse of the diagonal matrix storing
 			//volumes of the source cells
 			for (int i=0; i<nbrows; i++)
-				for (int icomp;  icomp<nbcomp; icomp++)
+				for (int icomp=0;  icomp<nbcomp; icomp++)
 					target_value[i*nbcomp+icomp]/=_source_volume[i];
 				
 			//storing S= VS^(-1).(WT.T)
@@ -256,5 +263,27 @@ void InterpolationMatrix::transposeMultiply(MEDMEM::FIELD<double>& field) const
 
 }
 
+/*!
+\brief returns the volumes of the cells underlying the field \a field
 
+For 2D geometries, the returned field contains the areas.
+For 3D geometries, the returned field contains the volumes.
+
+\param field field on which cells the volumes are required
+\return field containing the volumes
+*/
+ MEDMEM::FIELD<double>* InterpolationMatrix::getSupportVolumes(const MEDMEM::SUPPORT& support)
+	 {
+		 const MEDMEM::MESH* mesh=support.getMesh();
+		 int dim = mesh->getMeshDimension();
+		 switch (dim)
+			 {
+			 case 2:
+				 return mesh->getArea(&support);
+			 case 3:
+				 return mesh->getVolume(&support);
+			 default:
+				 throw MEDMEM::MEDEXCEPTION("interpolation is not available for this dimension");
+			 }
+	 }
 }

@@ -36,7 +36,10 @@ public:
   const ParaSUPPORT* getSupport() const {return _support;}
 	Topology* getTopology() const {return _topology;}
 	int nbComponents() const {return _component_topology.nbComponents();}
+	double getVolumeIntegral(int icomp) const;
+	double getL2norm()const{return -1;}
 private:
+	MEDMEM::FIELD<double>* getSupportVolumes(const MEDMEM::SUPPORT& support) const;
 	const ComponentTopology& _component_topology;
 	Topology* _topology; 
 	MEDMEM::FIELD<double>* _field;
