@@ -12,7 +12,7 @@ class Interpolation3DTest : public CppUnit::TestFixture
 {
 
   CPPUNIT_TEST_SUITE( Interpolation3DTest );
-#if 0
+
   CPPUNIT_TEST( tetraReflexiveUnit );
   CPPUNIT_TEST( tetraReflexiveGeneral );
   CPPUNIT_TEST( tetraNudgedSimpler );
@@ -21,7 +21,7 @@ class Interpolation3DTest : public CppUnit::TestFixture
   CPPUNIT_TEST( tetraHalfstripOnly );
   CPPUNIT_TEST( tetraHalfstripOnly2 );
   CPPUNIT_TEST( tetraSimpleHalfstripOnly );
-#endif
+
   CPPUNIT_TEST( tetraBoxes );
   //CPPUNIT_TEST( tetraTetraScale );
   //  CPPUNIT_TEST( box1 );
