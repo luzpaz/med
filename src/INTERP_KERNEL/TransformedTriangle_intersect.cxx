@@ -3,482 +3,811 @@
 #include <fstream>
 #include <cassert>
 #include <cmath>
-#include <limits>
 
 namespace INTERP_UTILS
 {
-  
+
   ////////////////////////////////////////////////////////////////////////////////////
   /// Constants                                                      /////////////////
   ////////////////////////////////////////////////////////////////////////////////////
-  const int TransformedTriangle::DP_OFFSET_1[8] = {1, 2, 0, 2, 0, 1, 4, 1};
-  const int TransformedTriangle::DP_OFFSET_2[8] = {2, 0, 1, 3, 3, 3, 0, 4};
 
-  const int TransformedTriangle::COORDINATE_FOR_DETERMINANT_EXPANSION[12] =
+  // correspondance facet - double product
+  // Grandy, table IV
+  const TransformedTriangle::DoubleProduct TransformedTriangle::DP_FOR_SEG_FACET_INTERSECTION[12] = 
     {
-      0, 1, 2, // O
-      3, 1, 2, // X
-      0, 3, 2, // Y
-      0, 1, 3  // Z
+      C_XH, C_XY, C_ZX, // OYZ
+      C_YH, C_YZ, C_XY, // OZX
+      C_ZH, C_ZX, C_YZ, // OXY
+      C_XH, C_YH, C_ZH  // XYZ
     };
-  
-  const TransformedTriangle::DoubleProduct TransformedTriangle::DP_FOR_DETERMINANT_EXPANSION[12] = 
+  // signs associated with entries in DP_FOR_SEGMENT_FACET_INTERSECTION
+  const double TransformedTriangle::SIGN_FOR_SEG_FACET_INTERSECTION[12] = 
     {
-      C_YZ, C_ZX, C_XY, // O
-      C_YZ, C_ZH, C_YH, // X
-      C_ZH, C_ZX, C_XH, // Y
-      C_YH, C_XH, C_XY  // Z
+      1.0, 1.0, -1.0,
+      1.0, 1.0, -1.0,
+      1.0, 1.0, -1.0,
+      1.0, 1.0,  1.0
     };
-  
-  //const double TransformedTriangle::MACH_EPS = 1.0e-15;
-  const long double TransformedTriangle::MACH_EPS = std::numeric_limits<double>::epsilon();
-  const long double TransformedTriangle::MULT_PREC_F = 4.0 * TransformedTriangle::MACH_EPS;
-  const long double TransformedTriangle::THRESHOLD_F = 20.0;
 
-  const double TransformedTriangle::TRIPLE_PRODUCT_ANGLE_THRESHOLD = 0.1;
-
-  // coordinates of corner ptTetCorner
+  // coordinates of corners of tetrahedron
   const double TransformedTriangle::COORDS_TET_CORNER[12] = 
     {
-      0.0, 0.0, 0.0, // O
-      1.0, 0.0, 0.0, // X
-      0.0, 1.0, 0.0, // Y
-      0.0, 0.0, 1.0  // Z
+      0.0, 0.0, 0.0,
+      1.0, 0.0, 0.0,
+      0.0, 1.0, 0.0,
+      0.0, 0.0, 1.0
     };
 
-  ////////////////////////////////////////////////////////////////////////////////////
-  /// Double and triple product calculations                           ///////////////
-  ////////////////////////////////////////////////////////////////////////////////////
+  // indices to use in tables DP_FOR_SEG_FACET_INTERSECTION and SIGN_FOR_SEG_FACET_INTERSECTION
+  // for the calculation of the coordinates (x,y,z) of the intersection points
+  // for Segment-Facet and Segment-Edge intersections
+  // -1 indicates that the coordinate is 0
+  const int TransformedTriangle::DP_INDEX[12] =
+    {
+      // x, y, z
+      -1, 1, 2,  // OYZ
+      5, -1, 4,  // OZX
+      7, 8, -1,  // OXY
+      9, 10, 11  // XYZ
+    };
+
+  // correspondance edge - corners
+  const TransformedTriangle::TetraCorner TransformedTriangle::CORNERS_FOR_EDGE[12] = 
+    {
+      O, X, // OX
+      O, Y, // OY
+      O, Z, // OZ
+      X, Y, // XY
+      Y, Z, // YZ
+      Z, X  // ZX
+    };
   
-  /**
-   * Pre-calculates all double products for this triangle, and stores
-   * them internally. This method makes compensation for precision errors,
-   * and it is thus the "stable" double products that are stored.
-   *
-   */
-  void TransformedTriangle::preCalculateDoubleProducts(void)
-  {
-    if(_isDoubleProductsCalculated)
-      return;
-
-    // aliases to shorten code
-    typedef TransformedTriangle::DoubleProduct DoubleProduct;
-    typedef TransformedTriangle::TetraCorner TetraCorner;
-    typedef TransformedTriangle::TriSegment TriSegment;
-    typedef TransformedTriangle TT; 
-
-    // -- calculate all unstable double products -- store in _doubleProducts
-    for(TriSegment seg = TT::PQ ; seg <= TT::RP ; seg = TriSegment(seg + 1))
-      {
-	for(DoubleProduct dp = TT::C_YZ ; dp <= TT::C_10 ; dp = DoubleProduct(dp + 1))
-	  {
-	    _doubleProducts[8*seg + dp] = calcUnstableC(seg, dp);
-	  }
-      }
-  
-
-    // -- (1) for each segment : check that double products satisfy Grandy, [46]
-    // -- and make corrections if not
-    for(TriSegment seg = TT::PQ ; seg <= TT::RP ; seg = TriSegment(seg + 1))
-      {
-	const double term1 = _doubleProducts[8*seg + TT::C_YZ] * _doubleProducts[8*seg + TT::C_XH];
-	const double term2 = _doubleProducts[8*seg + TT::C_ZX] * _doubleProducts[8*seg + TT::C_YH];
-	const double term3 = _doubleProducts[8*seg + TT::C_XY] * _doubleProducts[8*seg + TT::C_ZH];
-
-	//	std::cout << std::endl;
-	//std::cout << "for seg " << seg << " consistency " << term1 + term2 + term3 << std::endl;
-	//std::cout << "term1 :" << term1 << " term2 :" << term2 << " term3: " << term3 << std::endl;
-
-	//	if(term1 + term2 + term3 != 0.0)
-	const int num_zero = (term1 == 0.0 ? 1 : 0) + (term2 == 0.0 ? 1 : 0) + (term3 == 0.0 ? 1 : 0);
-	const int num_neg = (term1 < 0.0 ? 1 : 0) + (term2 < 0.0 ? 1 : 0) + (term3 < 0.0 ? 1 : 0);
-	
-	
-	if(num_zero == 2 || (num_zero !=3 && num_neg == 0) || (num_zero !=3 && num_neg == 3))
-	  {
-	    //std::cout << "inconsistent! "<< std::endl;
-
-	    // find TetraCorner nearest to segment
-	    double min_dist;
-	    TetraCorner min_corner;
-	  
-	    for(TetraCorner corner = TT::O ; corner <= TT::Z ; corner = TetraCorner(corner + 1))
-	      {
-		// calculate distance corner - segment axis
-		// NB uses fact that TriSegment <=> TriCorner that is first point of segment (PQ <=> P)
-		const TriCorner ptP_idx = TriCorner(seg);
-		const TriCorner ptQ_idx = TriCorner( (seg + 1) % 3);
-
-		const double ptP[3] = { _coords[5*ptP_idx], _coords[5*ptP_idx + 1], _coords[5*ptP_idx + 2]  };
-		const double ptQ[3] = { _coords[5*ptQ_idx], _coords[5*ptQ_idx + 1], _coords[5*ptQ_idx + 2]  };
-
-		// coordinates of corner
-		const double ptTetCorner[3] = 
-		  { 
-		    COORDS_TET_CORNER[3*corner    ],
-		    COORDS_TET_CORNER[3*corner + 1],
-		    COORDS_TET_CORNER[3*corner + 2]
-		  };
-
-		// dist^2 = ( PQ x CP )^2 / |PQ|^2 where C is the corner point
-
-		// difference vectors
-		const double diffPQ[3] = { ptQ[0] - ptP[0], ptQ[1] - ptP[1], ptQ[2] - ptP[2] };
-		const double diffCornerP[3] = { ptP[0] - ptTetCorner[0], ptP[1] - ptTetCorner[1], ptP[2] - ptTetCorner[2] };
-
-		//{ use functions in VectorUtils for this
-
-		// cross product of difference vectors
-		const double cross[3] = 
-		  { 
-		    diffPQ[1]*diffCornerP[2] - diffPQ[2]*diffCornerP[1], 
-		    diffPQ[2]*diffCornerP[0] - diffPQ[0]*diffCornerP[2],
-		    diffPQ[0]*diffCornerP[1] - diffPQ[1]*diffCornerP[0],
-		  };
-
-	      
-		const double cross_squared = cross[0]*cross[0] + cross[1]*cross[1] + cross[2]*cross[2];
-		const double norm_diffPQ_squared = diffPQ[0]*diffPQ[0] + diffPQ[1]*diffPQ[1] + diffPQ[2]*diffPQ[2];
-		const double dist = cross_squared / norm_diffPQ_squared;
-	      
-		// update minimum (initializs with first corner)
-		if(corner == TT::O || dist < min_dist)
-		  {
-		    min_dist = dist;
-		    min_corner = corner;
-		  }
-	      }
-
-	    // set the three corresponding double products to 0.0
-	    static const DoubleProduct DOUBLE_PRODUCTS[12] =
-	      {
-		TT::C_YZ, TT::C_ZX, TT::C_XY, // O
-		TT::C_YZ, TT::C_ZH, TT::C_YH, // X
-		TT::C_ZX, TT::C_ZH, TT::C_XH, // Y
-		TT::C_XY, TT::C_YH, TT::C_XH  // Z
-	      };
-
-	    for(int i = 0 ; i < 3 ; ++i) {
-	      DoubleProduct dp = DOUBLE_PRODUCTS[3*min_corner + i];
-	      
-	      // std::cout << std::endl << "inconsistent dp :" << dp << std::endl;	      
-	      _doubleProducts[8*seg + dp] = 0.0;
-	    }
-
-	  }
-      }
-  
-  
-    // -- (2) check that each double product statisfies Grandy, [47], else set to 0
- 
-    for(TriSegment seg = TT::PQ ; seg <= TT::RP ; seg = TriSegment(seg + 1))
-      {
-	for(DoubleProduct dp = TT::C_YZ ; dp <= TT::C_10 ; dp = DoubleProduct(dp + 1))
-	  {
-	    // find the points of the triangle
-	    // 0 -> P, 1 -> Q, 2 -> R 
-	    const int pt1 = seg;
-	    const int pt2 = (seg + 1) % 3;
-
-	    // find offsets
-	    const int off1 = DP_OFFSET_1[dp];
-	    const int off2 = DP_OFFSET_2[dp];
-
-	    const long double term1 = static_cast<long double>(_coords[5*pt1 + off1]) * static_cast<long double>(_coords[5*pt2 + off2]); 
-	    const long double term2 = static_cast<long double>(_coords[5*pt1 + off2]) * static_cast<long double>(_coords[5*pt2 + off1]);
-
-	    const long double delta = MULT_PREC_F * ( std::abs(term1) + std::abs(term2) );
-	  
-	    if( std::abs(static_cast<long double>(_doubleProducts[8*seg + dp])) < THRESHOLD_F*delta )
-	      {
-		if(_doubleProducts[8*seg + dp] != 0.0)
-		  {
-		    std::cout << "Double product for (seg,dp) = (" << seg << ", " << dp << ") = " << std::abs(_doubleProducts[8*seg + dp]) << " is imprecise, reset to 0.0" << std::endl;
-		  }
-		_doubleProducts[8*seg + dp] = 0.0;
-		  
-	      }
-	  }
-      }
     
-    _isDoubleProductsCalculated = true;
+  ////////////////////////////////////////////////////////////////////////////////////
+  /// Intersection test methods and intersection point calculations           ////////
+  ////////////////////////////////////////////////////////////////////////////////////
+  /**
+   * Tests if the given edge of the tetrahedron intersects the triangle PQR. (Grandy, eq [17])
+   *
+   * @param edge   edge of tetrahedron
+   * @returns      true if PQR intersects the edge, and the edge is not in the plane of the triangle.
+   */
+  bool TransformedTriangle::testSurfaceEdgeIntersection(const TetraEdge edge) const 
+  { 
+    return testTriangleSurroundsEdge(edge) && testEdgeIntersectsTriangle(edge); 
   }
 
   /**
-   * Pre-calculates all triple products for the tetrahedron with respect to
-   * this triangle, and stores them internally. This method takes into account
-   * the problem of errors due to cancellation.
+   * Calculates the point of intersection between the given edge of the tetrahedron and the 
+   * triangle PQR. (Grandy, eq [22])
    *
+   * @pre   testSurfaceEdgeIntersection(edge) returns true
+   * @param edge   edge of tetrahedron
+   * @param pt     array of three doubles in which to store the coordinates of the intersection point
    */
-  void TransformedTriangle::preCalculateTripleProducts(void)
+  void TransformedTriangle::calcIntersectionPtSurfaceEdge(const TetraEdge edge, double* pt) const
   {
-    if(_isTripleProductsCalculated)
-      return;
+    assert(edge < H01);
 
-    for(TetraCorner corner = O ; corner <= Z ; corner = TetraCorner(corner + 1))
+    // barycentric interpolation between points A and B 
+    // : (x,y,z)* = (1-alpha)*A + alpha*B where
+    // alpha = t_A / (t_A - t_B)
+    
+    
+
+    const TetraCorner corners[2] = 
       {
-	bool isGoodRowFound = false;
+	CORNERS_FOR_EDGE[2*edge],
+	CORNERS_FOR_EDGE[2*edge + 1]
+      };
+    
+    // calculate alpha
+    const double tA = calcStableT(corners[0]);
+    const double tB = calcStableT(corners[1]);
+    const double alpha = tA / (tA - tB);
 
-	// find edge / row to use
-	int minRow;
-	double minAngle;
-	bool isMinInitialised = false;
+    // calculate point
+    for(int i = 0; i < 3; ++i)
+      {
+	// std::cout << "alpha= " << alpha << std::endl;
+	pt[i] = (1 - alpha) * COORDS_TET_CORNER[3*corners[0] + i] + 
+	  alpha * COORDS_TET_CORNER[3*corners[1] + i];
+	// std::cout << pt[i] << std::endl;
+	assert(pt[i] >= 0.0);
+	assert(pt[i] <= 1.0);
+      }
+  }
 
-	for(int row = 1 ; row < 4 ; ++row) 
-	  {
-	    DoubleProduct dp = DP_FOR_DETERMINANT_EXPANSION[3*corner + (row - 1)];
+  /**
+   * Tests if the given segment of the triangle intersects the given facet of the tetrahedron. 
+   * (Grandy, eq. [19])
+   *
+   * @param seg    segment of the triangle
+   * @param facet  facet of the tetrahedron
+   * @returns      true if the segment intersects the facet
+   */
+  bool TransformedTriangle::testSegmentFacetIntersection(const TriSegment seg, const TetraFacet facet) const 
+  { 
+    return testFacetSurroundsSegment(seg, facet) && testSegmentIntersectsFacet(seg, facet); 
+  }
 
-	    // get edge by using correspondance between Double Product and Edge
-	    TetraEdge edge = TetraEdge(dp);
-	    
-	    // use edge only if it is surrounded by the surface
-	    if( testTriangleSurroundsEdge(edge) )
-	      {
-		isGoodRowFound = true;
+  /**
+   * Calculates the point of intersection between the given segment of the triangle
+   * and the given facet of the tetrahedron. (Grandy, eq. [23])
+   *
+   * @pre   testSurfaceEdgeIntersection(seg, facet) returns true
+   * 
+   * @param seg    segment of the triangle
+   * @param facet  facet of the tetrahedron
+   * @param pt     array of three doubles in which to store the coordinates of the intersection point
+   */
+  void TransformedTriangle::calcIntersectionPtSegmentFacet(const TriSegment seg, const TetraFacet facet, double* pt) const
+  {
+    // calculate s
+    double s = 0.0;
+    for(int i = 0; i < 3; ++i)
+      {
+	const DoubleProduct dp = DP_FOR_SEG_FACET_INTERSECTION[3*facet + i];
+	const double sign = SIGN_FOR_SEG_FACET_INTERSECTION[3*facet + i];
+	s -= sign * calcStableC(seg, dp);
+      }
 
-		// -- calculate angle between edge and PQR
-		// find normal to PQR - cross PQ and PR
-		const double pq[3] = 
-		  { 
-		    _coords[5*Q]     - _coords[5*P], 
-		    _coords[5*Q + 1] - _coords[5*P + 1],
-		    _coords[5*Q + 2] - _coords[5*P + 2]
-		  };
+    assert(s != 0.0);
 
-		const double pr[3] = 
-		  { 
-		    _coords[5*R]     - _coords[5*P], 
-		    _coords[5*R + 1] - _coords[5*P + 1],
-		    _coords[5*R + 2] - _coords[5*P + 2]
-		  };
-	    
-		const double normal[3] =
-		  {
-		    pq[1]*pr[2] - pq[2]*pr[1],
-		    pq[2]*pr[0] - pq[0]*pr[2],
-		    pq[0]*pr[1] - pq[1]*pr[0]
-		  };
-
-		static const double EDGE_VECTORS[18] =
-		  {
-		    1.0, 0.0, 0.0, // OX
-		    0.0, 1.0, 0.0, // OY
-		    0.0, 0.0, 1.0, // OZ
-		    0.0,-1.0, 1.0, // YZ
-		    1.0, 0.0,-1.0, // ZX
-		   -1.0,-1.0, 1.0  // XY
-		  };
-
-		const double edgeVec[3] = { 
-		  EDGE_VECTORS[3*edge],
-		  EDGE_VECTORS[3*edge + 1],
-		  EDGE_VECTORS[3*edge + 2],
-		};
-
-		const double lenNormal = sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2]);
-		const double lenEdgeVec = sqrt(edgeVec[0]*edgeVec[0] + edgeVec[1]*edgeVec[1] + edgeVec[2]*edgeVec[2]);
-		const double dotProd = normal[0]*edgeVec[0] + normal[1]*edgeVec[1] + normal[2]*edgeVec[2];
-		
-		const double angle = 3.14159262535 - acos( dotProd / ( lenNormal * lenEdgeVec ) );
-		
-		if(!isMinInitialised || angle < minAngle)
-		  {
-		    minAngle = angle;
-		    minRow = row;
-		    isMinInitialised = true;
-		  }
-		
-	      }
-	  }
+    // calculate coordinates of intersection point
+    for(int i = 0 ; i < 3; ++i)
+      {
+	const int dpIdx = DP_INDEX[3*facet + i];
 	
-	if(isGoodRowFound)
+	if(dpIdx < 0)
 	  {
-	    if(minAngle < TRIPLE_PRODUCT_ANGLE_THRESHOLD)
-	      {
-		_tripleProducts[corner] = calcTByDevelopingRow(corner, minRow, true);
-	      } 
-	    else 
-	      {
-		_tripleProducts[corner] = calcTByDevelopingRow(corner, minRow, false);
-	      }
-	    _validTP[corner] = true;
+	    pt[i] = 0.0;
 	  }
 	else
 	  {
-	    // this value will not be used
-	    // we set it to whatever
-	    // std::cout << "Triple product not calculated for corner " << corner << std::endl;
-	    _tripleProducts[corner] = -3.14159265;
-	    _validTP[corner] = false;
-
+	    const DoubleProduct dp = DP_FOR_SEG_FACET_INTERSECTION[dpIdx];
+	    const double sign = SIGN_FOR_SEG_FACET_INTERSECTION[dpIdx];
+	    pt[i] = -( sign * calcStableC(seg, dp) ) / s;
+	    assert(pt[i] > 0.0); 
+	    assert(pt[i] < 1.0);
 	  }
-
       }
-
-    _isTripleProductsCalculated = true;
-  }
-
-  /**
-   * Returns the stable double product  c_{xy}^{pq}
-   *
-   * @pre The stable double products have been calculated with preCalculateDoubleProducts.
-   * @param seg   segment of triangle
-   * @param dp    double product sought
-   *
-   * @returns stabilised double product c_{xy}^{pq}
-   *
-   */
-  double TransformedTriangle::calcStableC(const TriSegment seg, const DoubleProduct dp) const
-  {
-    assert(_isDoubleProductsCalculated);
-    return _doubleProducts[8*seg + dp];
-  }
-
-
-  /**
-   * Returns the stable triple product t_X for a given corner
-   * The triple product gives the signed volume of the tetrahedron between 
-   * this corner and the triangle PQR. These triple products have been calculated
-   * in a way to avoid problems with cancellation.
-   *
-   * @pre            double products have already been calculated
-   * @pre            triple products have already been calculated
-   * @param corner   corner for which the triple product is calculated
-   * @returns        triple product associated with corner (see Grandy, eqs. [50]-[52])
-   */
-  double TransformedTriangle::calcStableT(const TetraCorner corner) const
-  {
-    assert(_isTripleProductsCalculated);
-    //    assert(_validTP[corner]);
-    return _tripleProducts[corner];
-  }
-
-  /**
-   * Calculates the given double product c_{xy}^{pq} = x_p*y_q - y_p*x_q for a
-   * a segment PQ of the triangle. This method does not compensate for 
-   * precision errors.
-   *
-   * @param seg   segment of triangle
-   * @param dp    double product sought
-   *
-   * @returns double product c_{xy}^{pq}
-   *
-   */
-  double TransformedTriangle::calcUnstableC(const TriSegment seg, const DoubleProduct dp) const
-  {
   
-    // find the points of the triangle
-    // 0 -> P, 1 -> Q, 2 -> R 
-    const int pt1 = seg;
-    const int pt2 = (seg + 1) % 3;
-
-    // find offsets
-    const int off1 = DP_OFFSET_1[dp];
-    const int off2 = DP_OFFSET_2[dp];
-
-    return _coords[5*pt1 + off1] * _coords[5*pt2 + off2] - _coords[5*pt1 + off2] * _coords[5*pt2 + off1];
   }
 
   /**
-   * Calculates triple product associated with the given corner of tetrahedron, developing 
-   * the determinant by the given row. The triple product gives the signed volume of 
-   * the tetrahedron between this corner and the triangle PQR. If the flag project is true, 
-   * one coordinate is projected out in order to eliminate errors in the intersection point
-   * calculation due to cancellation.
+   * Tests if the given segment of the triangle intersects the given edge of the tetrahedron (Grandy, eq. [20]
    * 
-   * @pre            double products have already been calculated
-   * @param corner   corner for which the triple product is calculated
-   * @param row      row (1 <= row <= 3) used to calculate the determinant
-   * @param project  indicates whether or not to perform projection as inidicated in Grandy, p.446
-   * @returns        triple product associated with corner (see Grandy, [50]-[52])
+   * @param seg    segment of the triangle
+   * @param edge   edge of tetrahedron
+   * @returns      true if the segment intersects the edge 
    */
-
-  double TransformedTriangle::calcTByDevelopingRow(const TetraCorner corner, const int row, const bool project) const
+  bool TransformedTriangle::testSegmentEdgeIntersection(const TriSegment seg, const TetraEdge edge) const
   {
-    
-    // OVERVIEW OF CALCULATION
-    // --- sign before the determinant
-    // the sign used depends on the sign in front of the triple product (Grandy, [15]),
-    // and the convention used in the definition of the double products
-  
-    // the sign in front of the determinant gives the following schema for the three terms (I): 
-    // corner/row    1    2   3
-    // O (sign:+)    +    -   +
-    // X (sign:-)    -    +   -
-    // Y (sign:-)    -    +   -
-    // Z (sign:-)    -    +   -
-
-    // the 2x2 determinants are the following (C_AB <=> A_p*B_q - B_p*A_q, etc)
-    // corner/row    1       2     3
-    // O (sign:+)   C_YZ   C_XZ  C_XY
-    // X (sign:-)   C_YZ   C_HZ  C_HY
-    // Y (sign:-)   C_HZ   C_XZ  C_XH
-    // Z (sign:-)   C_YH   C_XH  C_XY
-
-    // these are represented in DP_FOR_DETERMINANT_EXPANSION,
-    // except for the fact that certain double products are inversed (C_AB <-> C_BA)
-
-    // comparing with the DOUBLE_PRODUCTS and using the fact that C_AB = -C_BA
-    // we deduce the following schema (II) :
-    // corner/row    1    2   3
-    // O (sign:+)    +    -   +
-    // X (sign:-)    +    -   -
-    // Y (sign:-)    -    -   +
-    // Z (sign:-)    +    +   +
-
-    // comparing the two schemas (I) and (II) gives us the following matrix of signs,
-    // putting 1 when the signs in (I) and (II) are equal and -1 when they are different :
-
-    static const int SIGNS[12] = 
+    // facets shared by each edge
+    static const TetraFacet FACET_FOR_EDGE[12] =
       {
-	1, 1, 1,
-	-1,-1, 1,
-	1,-1,-1,
-	-1, 1,-1
+	OXY, OZX, // OX
+	OXY, OYZ, // OY
+	OZX, OYZ, // OZ
+	OXY, XYZ, // XY
+	OYZ, XYZ, // YZ
+	OZX, XYZ  // ZX
       };
 
-    // find the offsets of the rows of the determinant
-    const int offset = COORDINATE_FOR_DETERMINANT_EXPANSION[3 * corner + (row - 1)];
-  
-    const DoubleProduct dp = DP_FOR_DETERMINANT_EXPANSION[3 * corner + (row - 1)];
-
-    const int sign = SIGNS[3 * corner + (row - 1)];
-
-    const double cQR = calcStableC(QR, dp);
-    const double cRP = calcStableC(RP, dp);
-    const double cPQ = calcStableC(PQ, dp);
-
-    // coordinate to use for projection (Grandy, [57]) with edges
-    // OX, OY, OZ, YZ, ZX, XY in order : 
-    // (y, z, x, h, h, h)
-    // for the first three we could also use {2, 0, 1}
-    static const int PROJECTION_COORDS[6] = { 1, 2, 0, 3, 3, 3 } ;
-
-    double alpha = 0.0;
-    
-    const int coord = PROJECTION_COORDS[ dp ];
-    
-    // coordinate values for P, Q and R
-    const double coordValues[3] = { _coords[5*P + coord], _coords[5*Q + coord], _coords[5*R + coord] };
-
-    if(project)
+    if(calcStableC(seg,DoubleProduct( edge )) != 0.0)
       {
-	// products coordinate values with corresponding double product
-	const double coordDPProd[3] = { coordValues[0] * cQR, coordValues[1] * cRP, coordValues[0] * cPQ };
-	
-	const double sumDPProd = coordDPProd[0] + coordDPProd[1] + coordDPProd[2];
-	const double sumDPProdSq = coordDPProd[0]*coordDPProd[0] + coordDPProd[1]*coordDPProd[1] + coordDPProd[2]*coordDPProd[2];
-	alpha = sumDPProd / sumDPProdSq;
+	return false;
+      } 
+    else
+      {
+	// check condition that the double products for one of the two
+	// facets adjacent to the edge has a positive product
+	bool isFacetCondVerified = false;
+	TetraFacet facet[2];
+	for(int i = 0 ; i < 2 ; ++i) 
+	  {
+	    facet[i] = FACET_FOR_EDGE[2*edge + i];
+	    
+	    // find the two c-values -> the two for the other edges of the facet
+	    int idx1 = 0 ; 
+	    int idx2 = 1;
+	    DoubleProduct dp1 = DP_FOR_SEG_FACET_INTERSECTION[3*facet[i] + idx1];
+	    DoubleProduct dp2 = DP_FOR_SEG_FACET_INTERSECTION[3*facet[i] + idx2];
+	    if(dp1 == DoubleProduct( edge ))
+	      {
+		idx1 = 2;
+		dp1 = DP_FOR_SEG_FACET_INTERSECTION[3*facet[i] + idx1];
+	      }
+	    else if(dp2 == DoubleProduct( edge ))
+	      {
+		idx2 = 2;
+		dp2 = DP_FOR_SEG_FACET_INTERSECTION[3*facet[i] + idx2];
+	      }
+	    
+	    const double c1 = SIGN_FOR_SEG_FACET_INTERSECTION[3*facet[i]+idx1]*calcStableC(seg, dp1);
+	    const double c2 = SIGN_FOR_SEG_FACET_INTERSECTION[3*facet[i]+idx2]*calcStableC(seg, dp2);
+
+	    isFacetCondVerified = isFacetCondVerified || c1*c2 > 0.0;
+	  }
+	if(!isFacetCondVerified)
+	  {
+	    return false;
+	  }
+	else
+	  {
+	    return testSegmentIntersectsFacet(seg, facet[0]) || testSegmentIntersectsFacet(seg, facet[1]);
+	  }
+      }
+  }
+    
+  /**
+   * Calculates the point of intersection between the given segment of the triangle
+   * and the given edge of the tetrahedron. (Grandy, eq. [25])
+   *
+   * @pre   testSegmentEdgeIntersection(seg, edge) returns true
+   * 
+   * @param seg    segment of the triangle
+   * @param edge   edge of the tetrahedron
+   * @param pt     array of three doubles in which to store the coordinates of the intersection point
+   */
+  void TransformedTriangle::calcIntersectionPtSegmentEdge(const TriSegment seg, const TetraEdge edge, double* pt) const 
+  {
+    assert(edge < H01);
+
+    // get the two facets associated with the edge
+    static const TetraFacet FACETS_FOR_EDGE[12] =
+      {
+	OXY, OZX, // OX
+	OXY, OYZ, // OY
+	OZX, OYZ, // OZ
+	OXY, XYZ, // XY
+	OYZ, XYZ, // YZ
+	OZX, XYZ  // ZX
+      };
+
+    const TetraFacet facets[2] = 
+      {
+	FACETS_FOR_EDGE[2*edge],
+	FACETS_FOR_EDGE[2*edge + 1]
+      };
+    
+    // calculate s for the two edges
+    double s[2];
+    for(int i = 0; i < 2; ++i)
+      {
+	s[i] = 0.0;
+	for(int j = 0; j < 3; ++j)
+	  {
+	    const DoubleProduct dp = DP_FOR_SEG_FACET_INTERSECTION[3*facets[i] + j];
+	    const double sign = SIGN_FOR_SEG_FACET_INTERSECTION[3*facets[i] + j];
+	    s[i] += sign * calcStableC(seg, dp);
+	  }
       }
 
-    const double p_term = _coords[5*P + offset] * cQR * (1.0 - alpha * coordValues[0] * cQR) ;
-    const double q_term = _coords[5*Q + offset] * cRP * (1.0 - alpha * coordValues[1] * cRP) ;
-    const double r_term = _coords[5*R + offset] * cPQ * (1.0 - alpha * coordValues[2] * cPQ) ;
+    // calculate denominator
+    const double denominator = s[0]*s[0] + s[1]*s[1];
+
+    // calculate intersection point
+    for(int i = 0; i < 3; ++i)
+      {
+	// calculate double product values for the two faces
+	double c[2];
+	for(int j = 0 ; j < 2; ++j)
+	  {
+	    const int dpIdx = DP_INDEX[3*facets[j] + i];
+	    const DoubleProduct dp = DP_FOR_SEG_FACET_INTERSECTION[dpIdx];
+	    const double sign = SIGN_FOR_SEG_FACET_INTERSECTION[dpIdx];
+	    c[j] = dpIdx < 0.0 ? 0.0 : sign * calcStableC(seg, dp);
+	  }
+	
+	// pt[i] = (c1*s1 + c2*s2) / (s1^2 + s2^2)
+	pt[i] = (c[0] * s[0] + c[1] * s[1]) / denominator;
+	assert(pt[i] >= 0.0); // check we are in tetraeder
+	assert(pt[i] <= 1.0);
+	
+      }
+  }
+
     
-    // NB : using plus also for the middle term compensates for a double product
-    // which is inversely ordered
-    //    std::cout << "Triple product for corner " << corner << ", row " << row << " = " << sign*( p_term + q_term + r_term ) << std::endl;
-    return sign*( p_term + q_term + r_term );
+  /**
+   * Tests if the given segment of the triangle intersects the given corner of the tetrahedron.
+   * (Grandy, eq. [21])
+   *
+   * @param seg    segment of the triangle
+   * @param corner corner of the tetrahedron
+   * @returns      true if the segment intersects the corner
+   */
+  bool TransformedTriangle::testSegmentCornerIntersection(const TriSegment seg, const TetraCorner corner) const 
+  {
+    // edges meeting at a given corner
+    static const TetraEdge EDGES_FOR_CORNER[12] =
+      {
+	OX, OY, OZ, // O
+	OX, XY, ZX, // X
+	OY, XY, YZ, // Y
+	OZ, ZX, YZ  // Z
+      };
+
+    // facets meeting at a given corner
+    static const TetraFacet FACETS_FOR_CORNER[12] =
+      {
+	OXY, OYZ, OZX, // O
+	OZX, OXY, XYZ, // X
+	OYZ, XYZ, OXY, // Y
+	OZX, XYZ, OYZ  // Z
+      };
+
+    // check double products are zero
+    for(int i = 0 ; i < 3 ; ++i)
+      {
+	const TetraEdge edge = EDGES_FOR_CORNER[3*corner + i];
+	const DoubleProduct dp = DoubleProduct( edge );
+	const double c = calcStableC(seg, dp);
+	if(c != 0.0)
+	  {
+	    return false;
+	  }
+      }
+    
+    // check segment intersect a facet
+    for(int i = 0 ; i < 3 ; ++i)
+      {
+	const TetraFacet facet = FACETS_FOR_CORNER[3*corner + i];
+	if(testSegmentIntersectsFacet(seg, facet))
+	  {
+	    return true;
+	  }
+      }
+    
+    return false;
+  }
+    
+
+  /**
+   * Tests if the triangle PQR intersects the ray pointing in the upwards z - direction
+   * from the given corner of the tetrahedron. (Grandy eq. [29])
+   * 
+   * @param corner corner of the tetrahedron on the h = 0 facet (X, Y, or Z)
+   * @returns      true if the upwards ray from the corner intersects the triangle. 
+   */
+  bool TransformedTriangle::testSurfaceRayIntersection(const TetraCorner corner) const
+  { 
+    return testTriangleSurroundsRay( corner ) && testSurfaceAboveCorner( corner ); 
+  }
+
+  /**
+   * Tests if the given segment of the triangle intersects the half-strip above the 
+   * given edge of the h = 0 plane. (Grandy, eq. [30])
+   * 
+   * @param seg    segment of the triangle
+   * @param edge   edge of the h = 0 plane of the tetrahedron (XY, YZ, ZX)
+   * @returns      true if the upwards ray from the corner intersects the triangle. 
+   */
+  bool TransformedTriangle::testSegmentHalfstripIntersection(const TriSegment seg, const TetraEdge edge)
+  {
+    // get right index here to avoid "filling out" array
+    const int edgeIndex = static_cast<int>(edge) - 3;
+    
+    // double products used in test
+    // products 1 and 2 for each edge -> first condition in Grandy [30]
+    // products 3 and 4 for each edge -> third condition
+    // NB : some uncertainty whether these last are correct
+    static const DoubleProduct DP_FOR_HALFSTRIP_INTERSECTION[12] =
+      {
+	C_10, C_01, C_ZH, C_10, // XY
+	C_01, C_XY, C_XH, C_ZX, // YZ
+	C_XY, C_10, C_YH, C_XY  // ZX
+      };
+    
+    /*static const DoubleProduct DP_FOR_HALFSTRIP_INTERSECTION[12] =
+      {
+      C_10, C_01, C_ZH, C_XY, // XY
+      C_01, C_XY, C_XH, C_XY, // YZ
+      C_XY, C_10, C_YH, C_XY  // ZX
+      };
+    */
+
+    // facets to use in second condition (S_m)
+    static TetraFacet FACET_FOR_HALFSTRIP_INTERSECTION[3] = 
+      {
+	NO_TET_FACET, // XY -> special case : test with plane H = 0
+	OYZ, // YZ
+	OZX  // ZX
+      };
+
+    const double cVals[4] = 
+      {
+	calcStableC(seg, DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIndex]),
+	calcStableC(seg, DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIndex + 1]),
+	calcStableC(seg, DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIndex + 2]),
+	calcStableC(seg, DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIndex + 3])
+      };
+    
+    const TetraFacet facet =  FACET_FOR_HALFSTRIP_INTERSECTION[edgeIndex];
+
+    
+    // special case : facet H = 0
+    bool cond2 = (facet == NO_TET_FACET) ? testSegmentIntersectsHPlane(seg) : testSegmentIntersectsFacet(seg, facet);
+    std::cout << "Halfstrip tests (" << seg << ", " << edge << ") : " << (cVals[0]*cVals[1] < 0.0) << ", " << cond2 << ", " << (cVals[2]*cVals[3] > 0.0) << std::endl;
+    std::cout << "c2 = " << cVals[2] << ", c3 = " << cVals[3] << std::endl; 
+  
+    return (cVals[0]*cVals[1] < 0.0) && cond2 && (cVals[2]*cVals[3] > 0.0);
+  }
+
+  /**
+   * Calculates the point of intersection between the given segment of the triangle
+   * and the halfstrip above the given edge of the tetrahedron. (Grandy, eq. [31])
+   *
+   * @pre   testSegmentHalfstripIntersection(seg, edge) returns true
+   * 
+   * @param seg    segment of the triangle
+   * @param edge   edge of the tetrahedron defining the halfstrip
+   * @param pt     array of three doubles in which to store the coordinates of the intersection point
+   */
+  void TransformedTriangle::calcIntersectionPtSegmentHalfstrip(const TriSegment seg, const TetraEdge edge, double* pt) const
+  {
+    assert(edge > OZ);
+    assert(edge < H01);
+
+    // get right index here to avoid "filling out" array
+    const int edgeIndex = static_cast<int>(edge) - 3;
+    assert(edgeIndex >= 0);
+    assert(edgeIndex < 3);
+    
+    // Barycentric interpolation on the edge
+    // for edge AB : (x,y,z)* = (1-alpha) * A + alpha * B
+    // where alpha = cB / (cB - cA)
+
+    const DoubleProduct DP_FOR_EDGE[6] =
+      {
+	C_10, C_01, // XY
+	C_01, C_XY, // YZ
+	C_XY, C_10  // ZX
+      };
+
+    const double cA = calcStableC(seg, DP_FOR_EDGE[2*edgeIndex]);
+    const double cB = calcStableC(seg, DP_FOR_EDGE[2*edgeIndex + 1]);
+    assert(cA != cB);
+    
+    const double alpha = cA / (cA - cB);
+    
+    for(int i = 0; i < 3; ++i)
+      {
+	const TetraCorner corners[2] = 
+	  {
+	    CORNERS_FOR_EDGE[2*edge],
+	    CORNERS_FOR_EDGE[2*edge + 1]
+	  };
+
+	const double cornerCoords[2] = 
+	  {
+	    COORDS_TET_CORNER[3*corners[0] + i],
+	    COORDS_TET_CORNER[3*corners[1] + i]
+	  };
+
+	pt[i] = (1 - alpha) * cornerCoords[0] + alpha * cornerCoords[1];
+	// std::cout << pt[i] << std::endl;
+	assert(pt[i] >= 0.0);
+	assert(pt[i] <= 1.0);
+      }
+    assert(std::abs(pt[0] + pt[1] + pt[2] - 1.0) < 1.0e-9);
+  }
+    
+  /**
+   * Tests if the given segment of triangle PQR intersects the ray pointing 
+   * in the upwards z - direction from the given corner of the tetrahedron. (Grandy eq. [29])
+   * 
+   * @param seg    segment of the triangle PQR
+   * @param corner corner of the tetrahedron on the h = 0 facet (X, Y, or Z)
+   * @returns      true if the upwards ray from the corner intersects the segment. 
+   */
+  bool TransformedTriangle::testSegmentRayIntersection(const TriSegment seg, const TetraCorner corner) const
+  {
+    assert(corner == X || corner == Y || corner == Z);
+
+    // readjust index since O is not used
+    const int cornerIdx = static_cast<int>(corner) - 1;
+
+    // double products to use in test
+    // dp 1   -> cond 1
+    // dp 2-7 -> cond 3
+    //? NB : last two rows are not completely understood and may contain errors
+    static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21] = 
+      {
+	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
+	C_01, C_XH, C_ZH, C_XY, C_10, C_XH, C_ZX, // Y
+	C_XY, C_YH, C_XH, C_10, C_01, C_ZH, C_YZ  // Z
+      };
+
+    // facets to use
+    //? not sure this is correct
+    static const TetraFacet FACET_SEGMENT_RAY_INTERSECTION[3] = 
+      {
+	OZX, // X
+	OXY, // Y
+	OYZ, // Z
+      };
+    
+
+    const DoubleProduct dp0 = DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx];
+    
+    //? epsilon-equality here?
+    if(dp0 == 0.0) // cond. 1
+      {
+	
+	if(testSegmentIntersectsFacet(seg, FACET_SEGMENT_RAY_INTERSECTION[cornerIdx])) // cond. 2.1
+	  { 
+	  const double H1 = _coords[5*seg + 4];
+	  const double H2 = _coords[5*( (seg + 1) % 3) + 4];
+
+	  // S_H -> cond. 2.2
+	  //	  std::cout << "H1 = " << H1 << ", H2= " << H2 << std::endl; 
+	  if(H1*H2 <= 0.0 && H1 != H2) // should equality be in "epsilon-sense" ?
+	    {
+    
+	      const double cVals[6] = 
+		{
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 1]),
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 2]),
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 3]),
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 4]),
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 5]),
+		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 6]),
+		};
+
+	      // cond. 3
+	      return ( (cVals[0] + cVals[1])*(cVals[2] - cVals[3]) - cVals[4]*cVals[5] ) < 0.0;
+	    }
+	  }
+      }
+    
+    return false;
+  }
+
+  /**
+   * Tests if the given corner of triangle PQR lies in the interior of the unit tetrahedron
+   * (0 <= x_p, y_p, z_p, h_p <= 1)
+   * 
+   * @param corner corner of the triangle PQR
+   * @returns      true if the corner lies in the interior of the unit tetrahedron. 
+   */
+  bool TransformedTriangle::testCornerInTetrahedron(const TriCorner corner) const
+  {
+    const double pt[4] = 
+      {
+	_coords[5*corner],     // x
+	_coords[5*corner + 1], // y
+	_coords[5*corner + 2], // z
+	_coords[5*corner + 3]  // z
+      };
+    
+    for(int i = 0 ; i < 4 ; ++i) 
+      {
+	if(pt[i] < 0.0 || pt[i] > 1.0)
+	  {
+	    return false;
+	  }
+      }
+    return true;
+  }
+
+  /**
+   * Tests if the given corner of triangle PQR lies on the facet h = 0 (the XYZ facet)
+   * (0 <= x_p, y_p, z_p <= 1 && h_p = 0)
+   * 
+   * @param corner corner of the triangle PQR
+   * @returns      true if the corner lies on the facet h = 0
+   */
+  bool TransformedTriangle::testCornerOnXYZFacet(const TriCorner corner) const
+  {
+    const double pt[4] = 
+      {
+	_coords[5*corner],     // x
+	_coords[5*corner + 1], // y 
+	_coords[5*corner + 2], // z
+	_coords[5*corner + 3]  // h
+      };
+    
+    if(pt[3] != 0.0) 
+      {
+	return false;
+      }
+
+    for(int i = 0 ; i < 3 ; ++i) 
+      {
+	if(pt[i] < 0.0 || pt[i] > 1.0)
+	  {
+	    return false;
+	  }
+      }
+    return true;
+  }
+
+  bool TransformedTriangle::testCornerAboveXYZFacet(const TriCorner corner) const
+  {
+    const double x = _coords[5*corner];
+    const double y = _coords[5*corner + 1];
+    const double h = _coords[5*corner + 3];
+    const double H = _coords[5*corner + 4];
+        
+    return h < 0.0 && H > 0.0 && x > 0.0 && y > 0.0;
+	
+  }
+    
+    
+
+  ////////////////////////////////////////////////////////////////////////////////////
+  /// Utility methods used in intersection tests                       ///////////////
+  ////////////////////////////////////////////////////////////////////////////////////
+  /**
+   * Tests if the triangle PQR surrounds the axis on which the
+   * given edge of the tetrahedron lies.
+   *
+   * @param edge   edge of tetrahedron
+   * @returns      true if PQR surrounds edge, false if not (see Grandy, eq. [53])
+   */
+  bool TransformedTriangle::testTriangleSurroundsEdge(const TetraEdge edge) const
+  {
+    // NB DoubleProduct enum corresponds to TetraEdge enum according to Grandy, table III
+    // so we can use the edge directly
+    
+    // optimization : we could use _doubleProducts directly here
+    const double cPQ = calcStableC(PQ, DoubleProduct(edge));
+    const double cQR = calcStableC(QR, DoubleProduct(edge));
+    const double cRP = calcStableC(RP, DoubleProduct(edge));
+
+    // std::cout << "TriangleSurroundsEdge : edge = " << edge << " c = [" << cPQ << ", " << cQR << ", " << cRP << "]" << std::endl;
+
+    // if two or more c-values are zero we disallow x-edge intersection
+    // Grandy, p.446
+    const int numZeros = (cPQ == 0.0 ? 1 : 0) + (cQR == 0.0 ? 1 : 0) + (cRP == 0.0 ? 1 : 0);
+    
+    if(numZeros >= 2 ) 
+      {
+	std::cout << "TriangleSurroundsEdge test fails due to too many 0 dp" << std::endl; 
+      }
+
+    return (cPQ*cQR >= 0.0) && (cQR*cRP >= 0.0) && (cRP*cPQ >= 0.0) && numZeros < 2;
+  }
+
+  /**
+   * Tests if the corners of the given edge lie on different sides of the triangle PQR.
+   *
+   * @param edge   edge of the tetrahedron
+   * @returns true if the corners of the given edge lie on different sides of the triangle PQR
+   *          or if one (but not both) lies in the plane of the triangle.
+   */
+  bool TransformedTriangle::testEdgeIntersectsTriangle(const TetraEdge edge) const
+  {
+    
+    assert(edge < H01);
+
+    // correspondance edge - triple products
+    // for edges OX, ..., ZX (Grandy, table III)
+    static const TetraCorner TRIPLE_PRODUCTS[12] = 
+      {
+	X, O, // OX
+	Y, O, // OY
+	Z, O, // OZ 
+	Y, Z, // YZ
+	Z, X, // ZX
+	X, Y  // XY
+      };
+
+    // Grandy, [16]
+    const double t1 = calcStableT(TRIPLE_PRODUCTS[2*edge]);
+    const double t2 = calcStableT(TRIPLE_PRODUCTS[2*edge + 1]);
+
+    //? should equality with zero use epsilon?
+    return (t1*t2 <= 0.0) && (t1 - t2 != 0.0);
+  }
+
+  /**
+   * Tests if the given facet of the tetrahedron surrounds the axis on which the
+   * given segment of the triangle lies.
+   *
+   * @param seg    segment of the triangle
+   * @param facet  facet of the tetrahedron
+   * @returns      true if the facet surrounds the segment, false if not (see Grandy, eq. [18])
+   */
+  bool TransformedTriangle::testFacetSurroundsSegment(const TriSegment seg, const TetraFacet facet) const
+  {
+
+    const double signs[3] = 
+      {
+	SIGN_FOR_SEG_FACET_INTERSECTION[3*facet],
+	SIGN_FOR_SEG_FACET_INTERSECTION[3*facet + 1],
+	SIGN_FOR_SEG_FACET_INTERSECTION[3*facet + 2]
+      };
+    
+    const double c1 = signs[0]*calcStableC(seg, DP_FOR_SEG_FACET_INTERSECTION[3*facet]);
+    const double c2 = signs[1]*calcStableC(seg, DP_FOR_SEG_FACET_INTERSECTION[3*facet + 1]);
+    const double c3 = signs[2]*calcStableC(seg, DP_FOR_SEG_FACET_INTERSECTION[3*facet + 2]);
+
+    return (c1*c3 > 0.0) && (c2*c3 > 0.0);
+  }
+
+  /**
+   * Tests if the corners of the given segment lie on different sides of the given facet.
+   *
+   * @param seg    segment of the triangle
+   * @param facet  facet of the tetrahedron
+   * @returns true if the corners of the given segment lie on different sides of the facet
+   *          or if one (but not both) lies in the plane of the facet. (see Grandy, eq. [18])
+   */
+  bool TransformedTriangle::testSegmentIntersectsFacet(const TriSegment seg, const TetraFacet facet) const
+  {
+    // use correspondance facet a = 0 <=> offset for coordinate a in _coords
+    // and also correspondance segment AB => corner A
+    const double coord1 = _coords[5*seg + facet];
+    const double coord2 = _coords[5*( (seg + 1) % 3) + facet];
+
+    //? should we use epsilon-equality here in second test?
+    //    std::cout << "coord1 : " << coord1 << " coord2 : " << coord2 << std::endl;
+    return (coord1*coord2 <= 0.0) && (coord1 != coord2);
+  }
+
+  bool TransformedTriangle::testSegmentIntersectsHPlane(const TriSegment seg) const
+  {
+    // get the H - coordinates
+    const double coord1 = _coords[5*seg + 4];
+    const double coord2 = _coords[5*( (seg + 1) % 3) + 4];
+    //? should we use epsilon-equality here in second test?
+    //    std::cout << "coord1 : " << coord1 << " coord2 : " << coord2 << std::endl;
+    return (coord1*coord2 <= 0.0) && (coord1 != coord2);
+  }
+
+  /**
+   * Tests if the triangle PQR lies above a given corner in the z-direction (implying that the 
+   * ray pointing upward in the z-direction from the corner can intersect the triangle)
+   * (Grandy eq.[28])
+   *
+   * @param corner corner of the tetrahedron
+   * @returns true if the triangle lies above the corner in the z-direction
+   */
+  bool TransformedTriangle::testSurfaceAboveCorner(const TetraCorner corner) const
+  {
+    //? is it always YZ here ?
+    //? changed to XY !
+    const double normal = calcStableC(PQ, C_XY) + calcStableC(QR, C_XY) + calcStableC(RP, C_XY);
+    std::cout << "surface above corner " << corner << " : " << "n = " << normal << ", t = [" <<  calcTByDevelopingRow(corner, 1, false) << ", "  << calcTByDevelopingRow(corner, 2, false) << ", " << calcTByDevelopingRow(corner, 3, false) << "] - stable : " << calcStableT(corner)  << std::endl;
+    //? we don't care here if the triple product is "invalid", that is, the triangle does not surround one of the
+    // edges going out from the corner (Grandy [53])
+        return ( calcTByDevelopingRow(corner, 2, false) * normal ) >= 0.0;
+    //   return ( calcStableT(corner) * normal ) >= 0.0;
+  }
+
+  /**
+   * Tests if the triangle PQR surrounds the ray pointing upwards in the z-direction
+   * from the given corner.
+   *
+   * @param corner corner on face XYZ of tetrahedron
+   * @returns      true if PQR surrounds ray, false if not (see Grandy, eq. [18])
+   */
+  bool TransformedTriangle::testTriangleSurroundsRay(const TetraCorner corner) const
+  {
+    assert(corner == X || corner == Y || corner == Z);
+
+    // double products to use for the possible corners
+    static const DoubleProduct DP_FOR_RAY_INTERSECTION[4] = 
+      {
+	DoubleProduct(0),        // O - only here to fill out and make indices match
+	C_10,     // X
+	C_01,     // Y
+	C_XY      // Z
+      };
+
+    const DoubleProduct dp = DP_FOR_RAY_INTERSECTION[corner];
+
+    const double cPQ = calcStableC(PQ, dp);
+    const double cQR = calcStableC(QR, dp);
+    const double cRP = calcStableC(RP, dp);
+
+    //? NB here we have no correction for precision - is this good?
+    // Our authority Grandy says nothing
+    std::cout << "dp in triSurrRay for corner " << corner << " = [" << cPQ << ", " << cQR << ", " << cRP << "]" << std::endl;
+    return ( cPQ*cQR > 0.0 ) && ( cPQ*cRP > 0.0 );
 
   }
 
