@@ -99,9 +99,12 @@ namespace INTERP_UTILS
    */
   const double* MeshElement::getCoordsOfNode(int node) const
   {
+    assert(node >= 1);
+    assert(node <= getNumberNodes());
     const int nodeOffset = node - 1;
     const int elemIdx = _mesh->getConnectivityIndex(MED_NODAL, MED_CELL)[_index] - 1;
-    return &(_mesh->getCoordinates(MED_FULL_INTERLACE)[elemIdx + 3*nodeOffset]);
+    const int connIdx = _mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL, MED_CELL, MED_ALL_ELEMENTS)[elemIdx + nodeOffset] - 1;
+    return &(_mesh->getCoordinates(MED_FULL_INTERLACE)[3*connIdx]);
   }
   
   /**
@@ -130,9 +133,10 @@ namespace INTERP_UTILS
 	CELLMODEL faceModel(faceType);
 
 	assert(faceModel.getDimension() == 2);
+	assert(faceModel.getNumberOfNodes() == 3);
 
 	double transformedNodes[3 * faceModel.getNumberOfNodes()];
-	const double* coords = _mesh->getCoordinates(MED_FULL_INTERLACE);
+	
 
 	// loop over nodes of face
 	for(int j = 1; j <= faceModel.getNumberOfNodes(); ++j)
@@ -149,11 +153,13 @@ namespace INTERP_UTILS
 	    //{ not totally efficient since we transform each node once per face
 	    T.apply(&transformedNodes[3*(j-1)], node);
 
+	    std::cout << "Node " << localNodeNumber << " = " << vToStr(node) << " transformed to " << vToStr(&transformedNodes[3*(j-1)]) << std::endl;
+
 	  }
 
 	assert(faceType == MED_TRIA3);
 
-	// create triangles from face
+	// create transformed triangles from face
 	switch(faceType)
 	  {
 	  case MED_TRIA3:
@@ -218,11 +224,22 @@ namespace INTERP_UTILS
       }
   }
 #endif
+
   int MeshElement::getIndex() const
   {
     return _index + 1;
   }
   
+  void MeshElement::dumpCoords() const
+    {
+      std::cout << "Element " << _index + 1 << " has nodes " << std::endl;
+      for(int i = 1 ; i <= getNumberNodes() ; ++i)
+	{
+	  std::cout << vToStr(getCoordsOfNode(i)) << ", ";
+	}
+      std::cout << std::endl;
+    }
+
 
   /// ElementBBoxOrder
   bool ElementBBoxOrder::operator()( MeshElement* elem1, MeshElement* elem2)

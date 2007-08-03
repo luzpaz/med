@@ -109,12 +109,12 @@ namespace INTERP_UTILS
     // calculate point
     for(int i = 0; i < 3; ++i)
       {
-	std::cout << "tA = " << tA << " tB = " << tB << " alpha= " << alpha << std::endl;
+	// std::cout << "tA = " << tA << " tB = " << tB << " alpha= " << alpha << std::endl;
 	pt[i] = (1 - alpha) * COORDS_TET_CORNER[3*corners[0] + i] + 
 	  alpha * COORDS_TET_CORNER[3*corners[1] + i];
-	 std::cout << pt[i] << std::endl;
-	 //assert(pt[i] >= 0.0);
-	 //assert(pt[i] <= 1.0);
+	// std::cout << pt[i] << std::endl;
+	 assert(pt[i] >= 0.0);
+	 assert(pt[i] <= 1.0);
       }
   }
 
@@ -429,8 +429,8 @@ namespace INTERP_UTILS
     
     // special case : facet H = 0
     bool cond2 = (facet == NO_TET_FACET) ? testSegmentIntersectsHPlane(seg) : testSegmentIntersectsFacet(seg, facet);
-    std::cout << "Halfstrip tests (" << seg << ", " << edge << ") : " << (cVals[0]*cVals[1] < 0.0) << ", " << cond2 << ", " << (cVals[2]*cVals[3] > 0.0) << std::endl;
-    std::cout << "c2 = " << cVals[2] << ", c3 = " << cVals[3] << std::endl; 
+    // std::cout << "Halfstrip tests (" << seg << ", " << edge << ") : " << (cVals[0]*cVals[1] < 0.0) << ", " << cond2 << ", " << (cVals[2]*cVals[3] > 0.0) << std::endl;
+    // std::cout << "c2 = " << cVals[2] << ", c3 = " << cVals[3] << std::endl; 
   
     return (cVals[0]*cVals[1] < 0.0) && cond2 && (cVals[2]*cVals[3] > 0.0);
   }
@@ -657,7 +657,7 @@ namespace INTERP_UTILS
     const double cQR = calcStableC(QR, DoubleProduct(edge));
     const double cRP = calcStableC(RP, DoubleProduct(edge));
 
-    std::cout << "TriangleSurroundsEdge : edge = " << edge << " c = [" << cPQ << ", " << cQR << ", " << cRP << "]" << std::endl;
+    // std::cout << "TriangleSurroundsEdge : edge = " << edge << " c = [" << cPQ << ", " << cQR << ", " << cRP << "]" << std::endl;
 
     // if two or more c-values are zero we disallow x-edge intersection
     // Grandy, p.446
@@ -665,7 +665,7 @@ namespace INTERP_UTILS
     
     if(numZeros >= 2 ) 
       {
-	std::cout << "TriangleSurroundsEdge test fails due to too many 0 dp" << std::endl; 
+	// std::cout << "TriangleSurroundsEdge test fails due to too many 0 dp" << std::endl; 
       }
 
     return (cPQ*cQR >= 0.0) && (cQR*cRP >= 0.0) && (cRP*cPQ >= 0.0) && numZeros < 2;
@@ -700,7 +700,7 @@ namespace INTERP_UTILS
     const double t2 = calcStableT(TRIPLE_PRODUCTS[2*edge + 1]);
 
     //? should equality with zero use epsilon?
-    std::cout << "testEdgeIntersectsTriangle : t1 = " << t1 << " t2 = " << t2 << std::endl;
+    // std::cout << "testEdgeIntersectsTriangle : t1 = " << t1 << " t2 = " << t2 << std::endl;
     return (t1*t2 <= 0.0) && (t1 - t2 != 0.0);
   }
 
@@ -807,7 +807,7 @@ namespace INTERP_UTILS
 
     //? NB here we have no correction for precision - is this good?
     // Our authority Grandy says nothing
-    std::cout << "dp in triSurrRay for corner " << corner << " = [" << cPQ << ", " << cQR << ", " << cRP << "]" << std::endl;
+    // std::cout << "dp in triSurrRay for corner " << corner << " = [" << cPQ << ", " << cQR << ", " << cRP << "]" << std::endl;
     return ( cPQ*cQR > 0.0 ) && ( cPQ*cRP > 0.0 );
 
   }

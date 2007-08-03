@@ -97,6 +97,8 @@ namespace INTERP_UTILS
     
     int getIndex() const;
 
+    void dumpCoords() const;
+
   private:
     const int _index;
     const MEDMEM::MESH* _mesh;

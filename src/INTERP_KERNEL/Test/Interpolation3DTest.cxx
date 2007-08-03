@@ -105,8 +105,6 @@ void Interpolation3DTest::calcIntersectionMatrix(const char* mesh1path, const ch
 
   m = interpolator->interpol_maillages(sMesh, tMesh);
 
-  dumpIntersectionMatrix(m);
-
   std::cout << "Intersection calculation done. " << std::endl << std::endl;
 }
 

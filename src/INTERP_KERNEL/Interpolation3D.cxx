@@ -280,11 +280,16 @@ namespace MEDMEM
     double Interpolation3D::calculateIntersectionVolume(const MeshElement& srcElement, const MeshElement& targetElement)
       {
 
-	// std::cout << "Intersecting elems " << srcElement.getIndex() << " and " << targetElement.getIndex() << std::endl;
+	//std::cout << "Intersecting elems " << srcElement.getIndex() << " and " << targetElement.getIndex() << std::endl;
 	// (a), (b) and (c) not yet implemented
 
 	// (d) : without fine-level filtering (a) - (c) for the time being
-	
+
+	std::cout << "Source : ";
+	srcElement.dumpCoords();
+	std::cout << "Target : ";
+	targetElement.dumpCoords();
+
 	// get array of points of target tetraeder
 	const double* tetraCorners[4];
 	for(int i = 0 ; i < 4 ; ++i)
@@ -294,16 +299,18 @@ namespace MEDMEM
 
 	// create AffineTransform
 	TetraAffineTransform T( tetraCorners );
-	std::cout << "Transform : " << std::endl;
-	T.dump();
-	std::cout << std::endl;
-
+	
+	// check if we have planar tetra element
 	if(T.determinant() == 0.0)
 	  {
 	    // tetra is planar
 	    std::cout << "Planar tetra -- volume 0" << std::endl;
 	    return 0.0;
 	  }
+
+	std::cout << "Transform : " << std::endl;
+	T.dump();
+	std::cout << std::endl;
 
 	// triangulate source element faces (assumed tetraeder for the time being)
 	// do nothing
@@ -328,7 +335,7 @@ namespace MEDMEM
 
 	//? fault in article, Grandy, [8] : it is the determinant of the inverse transformation that 
 	// should be used
-	return 1.0 / T.determinant() * volume ;
+	return std::abs(1.0 / T.determinant() * volume) ;
 	
       }
 }

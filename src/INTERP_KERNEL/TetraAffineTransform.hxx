@@ -17,8 +17,8 @@ namespace INTERP_UTILS
     TetraAffineTransform(const double** pts)
     {
 
-      std::cout << "Creating transform from tetraeder : " << std::endl;
-      std::cout << vToStr(pts[0]) << ", " << vToStr(pts[1]) << ", " << vToStr(pts[2]) << ", " << vToStr(pts[3]) << ", " << std::endl;
+      // std::cout << "Creating transform from tetraeder : " << std::endl;
+      // std::cout << vToStr(pts[0]) << ", " << vToStr(pts[1]) << ", " << vToStr(pts[2]) << ", " << vToStr(pts[3]) << ", " << std::endl;
 
 #if 0
       do {
