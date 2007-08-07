@@ -162,7 +162,8 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   }
   // on face ?
   if (!Find) {
-    if ((_mesh->existConnectivity(MED_NODAL,MED_FACE))|(_mesh->existConnectivity(MED_DESCENDING,MED_FACE))) {
+    if ((_mesh->existConnectivityWithPoly(MED_NODAL,MED_FACE)) |
+        (_mesh->existConnectivityWithPoly(MED_DESCENDING,MED_FACE))) {
       Find = build(MED_FACE,MEDArrayFaceFamily) ;
     }
   }

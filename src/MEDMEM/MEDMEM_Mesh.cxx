@@ -166,56 +166,56 @@ MESH::MESH(MESH &m)
   for (int i=0; i<m._familyNode.size(); i++)
     {
       _familyNode[i] = new FAMILY(* m._familyNode[i]);
-      _familyNode[i]->setMesh(this);
+      _familyNode[i]->setMeshDirectly(this);
     }
 
   _familyCell = m._familyCell;
   for (int i=0; i<m._familyCell.size(); i++)
     {
       _familyCell[i] = new FAMILY(* m._familyCell[i]);
-      _familyCell[i]->setMesh(this);
+      _familyCell[i]->setMeshDirectly(this);
     }
 
   _familyFace = m._familyFace;
   for (int i=0; i<m._familyFace.size(); i++)
     {
       _familyFace[i] = new FAMILY(* m._familyFace[i]);
-      _familyFace[i]->setMesh(this);
+      _familyFace[i]->setMeshDirectly(this);
     }
 
   _familyEdge = m._familyEdge;
   for (int i=0; i<m._familyEdge.size(); i++)
     {
       _familyEdge[i] = new FAMILY(* m._familyEdge[i]);
-      _familyEdge[i]->setMesh(this);
+      _familyEdge[i]->setMeshDirectly(this);
     }
 
   _groupNode = m._groupNode;
   for (int i=0; i<m._groupNode.size(); i++)
     {
       _groupNode[i] = new GROUP(* m._groupNode[i]);
-      _groupNode[i]->setMesh(this);
+      _groupNode[i]->setMeshDirectly(this);
     }
 
   _groupCell = m._groupCell;
   for (int i=0; i<m._groupCell.size(); i++)
     {
       _groupCell[i] = new GROUP(* m._groupCell[i]);
-      _groupCell[i]->setMesh(this);
+      _groupCell[i]->setMeshDirectly(this);
     }
 
   _groupFace = m._groupFace;
   for (int i=0; i<m._groupFace.size(); i++)
     {
       _groupFace[i] = new GROUP(* m._groupFace[i]);
-      _groupFace[i]->setMesh(this);
+      _groupFace[i]->setMeshDirectly(this);
     }
 
   _groupEdge = m._groupEdge;
   for (int i=0; i<m._groupEdge.size(); i++)
     {
       _groupEdge[i] = new GROUP(* m._groupEdge[i]);
-      _groupEdge[i]->setMesh(this);
+      _groupEdge[i]->setMeshDirectly(this);
     }
 
   //_drivers = m._drivers;  //Recopie des drivers?
@@ -596,7 +596,7 @@ void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT 
 {
   MED_EN::medEntityMesh entity=supportToFill->getEntity();
   supportToFill->setAll(false);
-  supportToFill->setMesh((MESH *)this);
+  supportToFill->setMeshDirectly((MESH *)this);
 
   int i;
   set<int> nodes;
@@ -1341,7 +1341,6 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
   const medGeometryElement* types;
   int nb_entity_type;
   const int* global_connectivity;
-  const int * global_connectivityIndex;
 
   nb_type = Support->getNumberOfTypes();
   length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
@@ -1368,7 +1367,6 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
     {
       medGeometryElement type = types[i] ;
       nb_entity_type = Support->getNumberOfElements(type);
-      global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
       if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA )
 	{
 	  if (onAll)
@@ -1383,6 +1381,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 
 	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
 		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+		  const int *global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
 		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[global_connectivityIndex[supp_number[k_type]-1]+j_ent-1];
 		}
 	      }
@@ -2237,7 +2236,7 @@ void MESH::createFamilies()
 	    FAMILY* newFam = new FAMILY();
 	    newFam->setTotalNumberOfElements(fam->second.size());
 	    newFam->setName(famName);
-	    newFam->setMesh(this);
+	    newFam->setMeshDirectly(this);
 	    newFam->setNumberOfGeometricType(tab_types_geometriques.size());
 	    newFam->setGeometricType(&tab_types_geometriques[0]); // we know the tab is not empy
 	    newFam->setNumberOfElements(&tab_nombres_elements[0]);

@@ -66,6 +66,8 @@ void MESHING::setMeshDimension(const int MeshDimension)
 void MESHING::setNumberOfNodes(const int NumberOfNodes)
 {
   _numberOfNodes = NumberOfNodes ;
+  if (_connectivity)
+    _connectivity->setNumberOfNodes(NumberOfNodes);
 }
 
 /*! 
