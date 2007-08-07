@@ -6,8 +6,11 @@
 #include <vector>
 #include <cmath>
 
+#include "VectorUtils.hxx"
+
 using namespace MEDMEM;
 using namespace std;
+using namespace INTERP_UTILS;
 
 double Interpolation3DTest::sumVolume(IntersectionMatrix m)
 {
@@ -22,6 +25,37 @@ double Interpolation3DTest::sumVolume(IntersectionMatrix m)
   return vol;
 }
 
+bool Interpolation3DTest::isReflexive(IntersectionMatrix m1, IntersectionMatrix m2)
+{
+  int i = 0;
+  bool isReflexive = true;
+  for(IntersectionMatrix::const_iterator iter = m1.begin() ; iter != m1.end() ; ++iter)
+    {
+      for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
+	{
+	  int j = iter2->first;
+	  const double v1 = iter2->second;
+	  if(m2[j - 1].count(i+1) > 0)
+	    {
+	      const double v2 = m2[j - 1][i + 1];
+	      if(!epsilonEqual(v1, v2))
+		{
+		  std::cout << "V1( " << i << ", " << j << ") = " << v1 << " which is different from V2( " << j - 1 << ", " << i + 1 << ") = " << v2 << std::endl;
+		  isReflexive = false;
+		}
+	    }
+	  else
+	    {
+	      std::cout << "V2( " << iter2->first - 1 << ", " << i + 1 << ") " << " does not exist" << std::endl;
+	      isReflexive = false;
+	    }
+	}
+      ++i;
+    }
+  return isReflexive;
+}
+
+  //? this is not a good test
 bool Interpolation3DTest::isIntersectionConsistent(IntersectionMatrix m)
 {
   bool res = true;
@@ -56,6 +90,7 @@ void Interpolation3DTest::dumpIntersectionMatrix(IntersectionMatrix m)
 	}
       ++i;
     }
+  std::cout << "Sum of volumes = " << sumVolume(m) << std::endl << std::endl;
 }
 
 void Interpolation3DTest::setUp()
@@ -108,7 +143,7 @@ void Interpolation3DTest::calcIntersectionMatrix(const char* mesh1path, const ch
   std::cout << "Intersection calculation done. " << std::endl << std::endl;
 }
 
-void Interpolation3DTest::intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol)
+void Interpolation3DTest::intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec)
 {
   std::cout << std::endl << std::endl << "=============================" << std::endl;
 
@@ -122,8 +157,18 @@ void Interpolation3DTest::intersectMeshes(const char* mesh1path, const char* mes
 
   dumpIntersectionMatrix(matrix2);
 
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, sumVolume(matrix1), 1.0e-6);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, sumVolume(matrix2), 1.0e-6);
+  bool reflexive = isReflexive(matrix1, matrix2);
+
+  const double vol1 = sumVolume(matrix1);
+  const double vol2 = sumVolume(matrix2);
+
+  std::cout.precision(8);
+  std::cout << "vol1 =  " << vol1 << ", vol2 = " << vol2 << ", correctVol = " << correctVol <<   std::endl;
+
+  //CPPUNIT_ASSERT_DOUBLES_EQUAL(vol1, vol2, 1.0e-6);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol2, prec);
+  CPPUNIT_ASSERT_EQUAL(true, reflexive);
 }
 
 
@@ -141,8 +186,8 @@ void Interpolation3DTest::tetraTetraScale()
   std::cout << std::endl << "*** target - src" << std::endl;
   IntersectionMatrix matrix2 = interpolator->interpol_maillages(targetMesh, srcMesh);
 
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.75, sumVolume(matrix1), 1.0e-6);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.75, sumVolume(matrix2), 1.0e-6);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.75, sumVolume(matrix1), 1.0e-6 );
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.75, sumVolume(matrix2), 1.0e-6 );
 }
 
 

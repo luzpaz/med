@@ -12,17 +12,23 @@ class Interpolation3DTest : public CppUnit::TestFixture
 {
 
   CPPUNIT_TEST_SUITE( Interpolation3DTest );
-
+  
   CPPUNIT_TEST( tetraReflexiveUnit );
   CPPUNIT_TEST( tetraReflexiveGeneral );
   CPPUNIT_TEST( tetraNudgedSimpler );
   CPPUNIT_TEST( tetraNudged );
   CPPUNIT_TEST( tetraCorner );
+
   CPPUNIT_TEST( tetraHalfstripOnly );
   CPPUNIT_TEST( tetraHalfstripOnly2 );
   CPPUNIT_TEST( tetraSimpleHalfstripOnly );
+  CPPUNIT_TEST( generalTetra );
+  CPPUNIT_TEST( dividedUnitTetraReflexive );
+#if 0
+  CPPUNIT_TEST( boxReflexive );
 
   CPPUNIT_TEST( tetraBoxes );
+#endif
   //CPPUNIT_TEST( tetraTetraScale );
   //  CPPUNIT_TEST( box1 );
   // CPPUNIT_TEST( cyl1 );
@@ -85,10 +91,27 @@ public:
     intersectMeshes("meshes/SimpleHalfstripOnly.med", "SimpleHalfstripOnly", "meshes/UnitTetra.med", "UnitTetra", 0.0);
   }
 
+  void generalTetra()
+  {
+    intersectMeshes("meshes/GenTetra1.med", "GenTetra1", "meshes/GenTetra2.med", "GenTetra2", 4.91393, 1.0e-5);
+  }
+
+  void dividedUnitTetraReflexive()
+  {
+    intersectMeshes("meshes/DividedUnitTetra.med", "DividedUnitTetra", "meshes/DividedUnitTetra.med", "DividedUnitTetra", 0.1666667);
+  }
+
+  void boxReflexive()
+  {
+    intersectMeshes("meshes/Box3.med", "Box3", "meshes/Box3.med", "Box3", 13.9954,  1.0e-4);
+  }
+
   void tetraBoxes()
   {
-    intersectMeshes("meshes/Box1.med", "Box1", "meshes/Box2.med", "Box2", 124.197);
+    intersectMeshes("meshes/Box1.med", "Box1", "meshes/Box2.med", "Box2", 124.197, 1.0e-3);
   }
+
+  
   
 #if 0
   void tetraHalfstripOnly()
@@ -182,12 +205,14 @@ private:
   Interpolation3D* interpolator;
 
   double sumVolume(IntersectionMatrix m);
+
+  bool Interpolation3DTest::isReflexive(IntersectionMatrix m1, IntersectionMatrix m2);
   
   bool isIntersectionConsistent(IntersectionMatrix m);
   
   void dumpIntersectionMatrix(IntersectionMatrix m);
 
-  void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol);
+  void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec = 1.0e-6);
 
   void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m);
 
