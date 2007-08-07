@@ -12,29 +12,32 @@ class Interpolation3DTest : public CppUnit::TestFixture
 {
 
   CPPUNIT_TEST_SUITE( Interpolation3DTest );
-  
+#if 0
   CPPUNIT_TEST( tetraReflexiveUnit );
   CPPUNIT_TEST( tetraReflexiveGeneral );
   CPPUNIT_TEST( tetraNudgedSimpler );
   CPPUNIT_TEST( tetraNudged );
   CPPUNIT_TEST( tetraCorner );
-
+#endif
+  CPPUNIT_TEST( tetraSimpleIncluded );
+  CPPUNIT_TEST( tetraComplexIncluded );
+#if 0
   CPPUNIT_TEST( tetraHalfstripOnly );
   CPPUNIT_TEST( tetraHalfstripOnly2 );
   CPPUNIT_TEST( tetraSimpleHalfstripOnly );
   CPPUNIT_TEST( generalTetra );
+  CPPUNIT_TEST( dividedUnitTetraSimplerReflexive );
   CPPUNIT_TEST( dividedUnitTetraReflexive );
+  CPPUNIT_TEST( nudgedDividedUnitTetra );
+  CPPUNIT_TEST( nudgedDividedUnitTetraSimpler );
+  CPPUNIT_TEST( dividedGenTetra );
+#endif
 #if 0
   CPPUNIT_TEST( boxReflexive );
 
   CPPUNIT_TEST( tetraBoxes );
 #endif
-  //CPPUNIT_TEST( tetraTetraScale );
-  //  CPPUNIT_TEST( box1 );
-  // CPPUNIT_TEST( cyl1 );
-  //CPPUNIT_TEST( tetra1 );
-  // CPPUNIT_TEST( tetra3 );
-  
+
   CPPUNIT_TEST_SUITE_END();
 
 
@@ -70,6 +73,16 @@ public:
     intersectMeshes("meshes/UnitTetra.med", "UnitTetra", "meshes/CornerTetra.med", "CornerTetra", 0.0135435);
   }
 
+  void tetraSimpleIncluded()
+  {
+    intersectMeshes("meshes/SimpleIncludedTetra.med", "SimpleIncludedTetra", "meshes/SimpleIncludingTetra.med", "SimpleIncludingTetra", 17.0156, 1.0e-4);
+  }
+
+  void tetraComplexIncluded()
+  {
+    intersectMeshes("meshes/ComplexIncludedTetra.med", "ComplexIncludedTetra", "meshes/ComplexIncludingTetra.med", "ComplexIncludingTetra", 17.0156, 1.0e-4);
+  }
+
   void tetraHalfstripOnly()
   {
     // NB this test is not completely significant : we should also verify that 
@@ -99,6 +112,26 @@ public:
   void dividedUnitTetraReflexive()
   {
     intersectMeshes("meshes/DividedUnitTetra.med", "DividedUnitTetra", "meshes/DividedUnitTetra.med", "DividedUnitTetra", 0.1666667);
+  }
+
+  void dividedUnitTetraSimplerReflexive()
+  {
+    intersectMeshes("meshes/DividedUnitTetraSimpler.med", "DividedUnitTetraSimpler", "meshes/DividedUnitTetraSimpler.med", "DividedUnitTetraSimpler", 0.1666667);
+  }
+
+  void nudgedDividedUnitTetra()
+  {
+    intersectMeshes("meshes/NudgedDividedUnitTetra.med", "NudgedDividedUnitTetra", "meshes/DividedUnitTetra.med", "DividedUnitTetra", 0.150191);
+  }
+
+  void nudgedDividedUnitTetraSimpler()
+  {
+    intersectMeshes("meshes/NudgedDividedUnitTetraSimpler.med", "NudgedDividedUnitTetraSimpler", "meshes/DividedUnitTetraSimpler.med", "DividedUnitTetraSimpler", 0.150191);
+  }
+
+  void dividedGenTetra()
+  {
+    intersectMeshes("meshes/DividedGenTetra1.med", "DividedGenTetra1", "meshes/DividedGenTetra2.med", "DividedGenTetra2", 4.91393, 1.0e-5);
   }
 
   void boxReflexive()

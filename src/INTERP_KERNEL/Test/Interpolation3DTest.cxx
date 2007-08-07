@@ -46,8 +46,11 @@ bool Interpolation3DTest::isReflexive(IntersectionMatrix m1, IntersectionMatrix 
 	    }
 	  else
 	    {
-	      std::cout << "V2( " << iter2->first - 1 << ", " << i + 1 << ") " << " does not exist" << std::endl;
-	      isReflexive = false;
+	      if(!epsilonEqual(v1, 0.0))
+		{
+		  std::cout << "V2( " << iter2->first - 1 << ", " << i + 1 << ") " << " does not exist" << std::endl;
+		  isReflexive = false;
+		}
 	    }
 	}
       ++i;

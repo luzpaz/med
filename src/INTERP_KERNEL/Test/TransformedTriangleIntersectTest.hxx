@@ -12,6 +12,7 @@ class TransformedTriangleIntersectTest : public CppUnit::TestFixture
 {
 
   CPPUNIT_TEST_SUITE( TransformedTriangleIntersectTest );
+
   CPPUNIT_TEST( testTriangle1 );
   CPPUNIT_TEST( testTriangle2 );
   CPPUNIT_TEST( testTriangle3 );
@@ -25,6 +26,7 @@ class TransformedTriangleIntersectTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testTriangle11 );
   CPPUNIT_TEST( testTriangle12 );
   CPPUNIT_TEST( testTriangle13 );
+
   CPPUNIT_TEST_SUITE_END();
 
   typedef INTERP_UTILS::TransformedTriangle::TriSegment TriSegment;

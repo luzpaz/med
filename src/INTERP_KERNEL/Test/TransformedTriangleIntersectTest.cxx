@@ -41,9 +41,9 @@
 //     ->  (QR, X)   : -   (QR, Y)   : -   (QR, Z)   : 6
 //     ->  (RP, X)   : -   (RP, Y)   : -   (RP, Z)   : -
 // -----------------------------------------------------------------------------------------------------
-// TE  ->  OX : 4   OY : 7    OZ : 8     XY : 1     ZX : 4    YZ : 3,7
+// TE  ->  OX : 4   OY : 7    OZ : 8     XY : 1     ZX : 4    YZ : 3
 // -----------------------------------------------------------------------------------------------------
-// TR  ->  X : 7     Y : 6     Z : 5
+// TR  ->  X  : 7    Y : 6     Z : 5
 // -----------------------------------------------------------------------------------------------------
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -644,7 +644,7 @@ void TransformedTriangleIntersectTest::testTriangle4()
 
 void TransformedTriangleIntersectTest::testTriangle5()
 {
-
+std::cout << std::endl << "+++++++ Testing triangle 5" << std::endl;
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -779,12 +779,13 @@ void TransformedTriangleIntersectTest::testTriangle5()
 // SE     -
 // SC     -
 // SHS    -
-// SR     (PQ, X), (QR, XY) 
+// SR     (PQ, X), (QR, Z) 
 // TE     -
 // TR     Y 
 
 void TransformedTriangleIntersectTest::testTriangle6()
 {
+  std::cout << std::endl << "+++++++ Testing triangle 6" << std::endl;
 
     typedef TransformedTriangle TT;
 
@@ -890,11 +891,11 @@ void TransformedTriangleIntersectTest::testTriangle6()
 
   CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::QR, TT::X));
   CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::QR, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::QR, TT::Z));
+  CPPUNIT_ASSERT_EQUAL(true , tri->testSegmentRayIntersection(TT::QR, TT::Z));
 
   CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::RP, TT::X));
   CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::RP, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(true , tri->testSegmentRayIntersection(TT::RP, TT::Z));
+  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::RP, TT::Z));
 
   // surface-edge (6 possibilities)
   CPPUNIT_ASSERT_EQUAL(false, tri->testSurfaceEdgeIntersection(TT::OX));
@@ -1485,7 +1486,7 @@ void TransformedTriangleIntersectTest::testTriangle10()
 // SC     (RP, O)
 // SHS    -
 // SR     - 
-// TE     [OY]
+// TE     [OY, OZ]
 // TR     - 
 
 void TransformedTriangleIntersectTest::testTriangle11()
@@ -1604,7 +1605,7 @@ void TransformedTriangleIntersectTest::testTriangle11()
   // surface-edge (6 possibilities)
   CPPUNIT_ASSERT_EQUAL(false, tri->testSurfaceEdgeIntersection(TT::OX));
   CPPUNIT_ASSERT_EQUAL(true , tri->testSurfaceEdgeIntersection(TT::OY));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSurfaceEdgeIntersection(TT::OZ));
+  CPPUNIT_ASSERT_EQUAL(true, tri->testSurfaceEdgeIntersection(TT::OZ));
   CPPUNIT_ASSERT_EQUAL(false, tri->testSurfaceEdgeIntersection(TT::YZ));
   CPPUNIT_ASSERT_EQUAL(false, tri->testSurfaceEdgeIntersection(TT::ZX));
   CPPUNIT_ASSERT_EQUAL(false, tri->testSurfaceEdgeIntersection(TT::XY));
