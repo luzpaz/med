@@ -183,14 +183,13 @@ namespace INTERP_UTILS
     std::cout << std::endl << "-- Calculating intersection polygons ... " << std::endl; 
     calculateIntersectionPolygons();
     
-    // calculate volume under A
-    std::cout << std::endl << "-- Treating polygon A ... " << std::endl; 
     double barycenter[3];
-    
-    double volA = 0.0;
 
+    // calculate volume under A
+    double volA = 0.0;
     if(_polygonA.size() > 2)
       {
+	std::cout << std::endl << "-- Treating polygon A ... " << std::endl; 
 	calculatePolygonBarycenter(A, barycenter);
 	sortIntersectionPolygon(A, barycenter);
 	volA = calculateVolumeUnderPolygon(A, barycenter);

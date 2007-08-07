@@ -157,7 +157,7 @@ namespace MEDMEM
 		  iter != currNode->getTargetRegion().getEndElements() ; ++iter)
 		{
 		  const double vol = calculateIntersectionVolume(*srcElement, **iter);
-		  //		  if(vol != 0.0)
+		  if(vol != 0.0)
 		    {
 		      const int targetIdx = (*iter)->getIndex();
 		  

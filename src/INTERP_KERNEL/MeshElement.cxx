@@ -157,6 +157,7 @@ namespace INTERP_UTILS
 
 	  }
 
+	// to be removed
 	assert(faceType == MED_TRIA3);
 
 	// create transformed triangles from face
@@ -165,6 +166,8 @@ namespace INTERP_UTILS
 	  case MED_TRIA3:
 	    triangles.push_back(TransformedTriangle(&transformedNodes[0], &transformedNodes[3], &transformedNodes[6]));
 	    break;
+
+	    // add other cases here to treat hexahedra, pyramides, etc
 	    
 	  default:
 	    std::cout << "Only elements with triangular faces are supported at the moment." << std::endl;
@@ -174,57 +177,6 @@ namespace INTERP_UTILS
 
   }
   
-
-#if 0
-  void MeshElement::triangulate(std::vector<TransformedTriangle>& triangles, const TetraAffineTransform& T) const
-  {
-    std::cout << "Triangulating element " << getIndex() << std::endl;
-    switch(_type)
-      {
-      case MED_TETRA4 :
-	// triangles == faces
-	const int beginFaceIdx = _mesh->getConnectivityIndex(MED_DESCENDING, MED_CELL)[_index];
-	const int endFaceIdx = _mesh->getConnectivityIndex(MED_DESCENDING, MED_CELL)[_index + 1];
-
-	std::cout << "elements has faces at indices " << beginFaceIdx << " to " << endFaceIdx << std::endl;
-	assert(endFaceIdx - beginFaceIdx == 4);
-
-	for(int i = beginFaceIdx ; i < endFaceIdx ; ++i) // loop over faces of element
-	  {
-	    const int faceIdx = _mesh->getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL, MED_ALL_ELEMENTS)[i - 1];
-	    const int beginNodeIdx = _mesh->getConnectivityIndex(MED_NODAL, MED_FACE)[faceIdx - 1];
-	    const int endNodeIdx = _mesh->getConnectivityIndex(MED_NODAL, MED_FACE)[faceIdx];
-	    std::cout << "Face " << faceIdx << " with nodes in [" << beginNodeIdx << "," << endNodeIdx << "[" <<  std::endl;
-	    assert(endNodeIdx - beginNodeIdx == 3);
-
-	    double transformedPts[9];
-	    	    
-	    for(int j = 0 ; j < 3 ; ++j) // loop over nodes of face
-	      {
-		// { optimise here using getCoordinatesForNode ?
-		// could maybe use the connNodeIdx directly and only transform each node once
-		// instead of once per face
-		const int connNodeIdx = 
-		  _mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL, MED_FACE, MED_ALL_ELEMENTS)[beginNodeIdx + j - 1] - 1;
-		const double* pt = &(_mesh->getCoordinates(MED_FULL_INTERLACE)[3*connNodeIdx]);
-	    
-		//const double* pt = getCoordsOfNode(j + 1);
-
-		// transform
-		T.apply(&transformedPts[3*j], pt);
-		std::cout << "Transforming : " << vToStr(pt) << " -> " << vToStr(&transformedPts[3*j]) << std::endl;
-	      }
-	    
-	    triangles.push_back(TransformedTriangle(&transformedPts[0], &transformedPts[3], &transformedPts[6]));
-	  }
-
-	break;
-      default:
-	break;
-      }
-  }
-#endif
-
   int MeshElement::getIndex() const
   {
     return _index + 1;

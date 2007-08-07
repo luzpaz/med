@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cmath>
 #include <numeric>
+#include <map>
 
 namespace INTERP_UTILS
 {

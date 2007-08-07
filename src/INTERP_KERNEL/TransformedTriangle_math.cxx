@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cmath>
 #include <limits>
+#include "VectorUtils.hxx"
 
 namespace INTERP_UTILS
 {
@@ -129,16 +130,12 @@ namespace INTERP_UTILS
 		//{ use functions in VectorUtils for this
 
 		// cross product of difference vectors
-		const double cross[3] = 
-		  { 
-		    diffPQ[1]*diffCornerP[2] - diffPQ[2]*diffCornerP[1], 
-		    diffPQ[2]*diffCornerP[0] - diffPQ[0]*diffCornerP[2],
-		    diffPQ[0]*diffCornerP[1] - diffPQ[1]*diffCornerP[0],
-		  };
-
+		
+		double crossProd[3];
+		cross(diffPQ, diffCornerP, crossProd);
 	      
-		const double cross_squared = cross[0]*cross[0] + cross[1]*cross[1] + cross[2]*cross[2];
-		const double norm_diffPQ_squared = diffPQ[0]*diffPQ[0] + diffPQ[1]*diffPQ[1] + diffPQ[2]*diffPQ[2];
+		const double cross_squared = dot(crossProd, crossProd);
+		const double norm_diffPQ_squared = dot(diffPQ, diffPQ);
 		const double dist = cross_squared / norm_diffPQ_squared;
 	      
 		// update minimum (initializs with first corner)
@@ -351,7 +348,7 @@ namespace INTERP_UTILS
   double TransformedTriangle::calcStableT(const TetraCorner corner) const
   {
     assert(_isTripleProductsCalculated);
-    //    assert(_validTP[corner]);
+    assert(_validTP[corner]);
     return _tripleProducts[corner];
   }
 
@@ -451,7 +448,7 @@ namespace INTERP_UTILS
     const double cPQ = calcStableC(PQ, dp);
 
     // coordinate to use for projection (Grandy, [57]) with edges
-    // OX, OY, OZ, YZ, ZX, XY in order : 
+    // OX, OY, OZ, XY, YZ, ZX in order : 
     // (y, z, x, h, h, h)
     // for the first three we could also use {2, 0, 1}
     static const int PROJECTION_COORDS[6] = { 1, 2, 0, 3, 3, 3 } ;
@@ -476,11 +473,21 @@ namespace INTERP_UTILS
     const double p_term = _coords[5*P + offset] * cQR * (1.0 - alpha * coordValues[0] * cQR) ;
     const double q_term = _coords[5*Q + offset] * cRP * (1.0 - alpha * coordValues[1] * cRP) ;
     const double r_term = _coords[5*R + offset] * cPQ * (1.0 - alpha * coordValues[2] * cPQ) ;
-    
-    // NB : using plus also for the middle term compensates for a double product
-    // which is inversely ordered
-    //    std::cout << "Triple product for corner " << corner << ", row " << row << " = " << sign*( p_term + q_term + r_term ) << std::endl;
-    return sign*( p_term + q_term + r_term );
+
+    // check that we are not so close to zero that numerical errors could take over, 
+    // otherwise reset to zero (cf Grandy, p. 446)
+    const long double delta = MULT_PREC_F * (std::abs(p_term) + std::abs(q_term) + std::abs(r_term));
+    if( epsilonEqual( p_term + q_term + r_term, 0.0, THRESHOLD_F * delta) )
+      {
+	return 0.0;
+      }
+    else
+      {
+	// NB : using plus also for the middle term compensates for a double product
+	// which is inversely ordered
+	//    std::cout << "Triple product for corner " << corner << ", row " << row << " = " << sign*( p_term + q_term + r_term ) << std::endl;
+	return sign*( p_term + q_term + r_term );
+      }
 
   }
 

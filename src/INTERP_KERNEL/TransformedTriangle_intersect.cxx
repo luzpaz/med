@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cassert>
 #include <cmath>
+#include "VectorUtils.hxx"
 
 namespace INTERP_UTILS
 {
@@ -168,8 +169,9 @@ namespace INTERP_UTILS
 	    const DoubleProduct dp = DP_FOR_SEG_FACET_INTERSECTION[dpIdx];
 	    const double sign = SIGN_FOR_SEG_FACET_INTERSECTION[dpIdx];
 	    pt[i] = -( sign * calcStableC(seg, dp) ) / s;
-	    assert(pt[i] > 0.0); 
-	    assert(pt[i] < 1.0);
+	    //	    std::cout << "SegmentFacetIntPtCalc : pt[" << i << "] = " << pt[i]  << std::endl;
+	    assert(pt[i] >= 0.0); 
+	    assert(pt[i] <= 1.0);
 	  }
       }
   
@@ -396,10 +398,16 @@ namespace INTERP_UTILS
     static const DoubleProduct DP_FOR_HALFSTRIP_INTERSECTION[12] =
       {
 	C_10, C_01, C_ZH, C_10, // XY
+	C_01, C_XY, C_XH, C_01, // YZ
+	C_XY, C_10, C_YH, C_XY  // ZX
+      };
+    /*static const DoubleProduct DP_FOR_HALFSTRIP_INTERSECTION[12] =
+      {
+	C_10, C_01, C_ZH, C_10, // XY
 	C_01, C_XY, C_XH, C_ZX, // YZ
 	C_XY, C_10, C_YH, C_XY  // ZX
       };
-    
+    */
     /*static const DoubleProduct DP_FOR_HALFSTRIP_INTERSECTION[12] =
       {
       C_10, C_01, C_ZH, C_XY, // XY
@@ -491,7 +499,7 @@ namespace INTERP_UTILS
 	assert(pt[i] >= 0.0);
 	assert(pt[i] <= 1.0);
       }
-    assert(std::abs(pt[0] + pt[1] + pt[2] - 1.0) < 1.0e-9);
+    assert(epsilonEqual(pt[0] + pt[1] + pt[2] - 1.0, 0.0, 1.0e-9));
   }
     
   /**
@@ -505,6 +513,7 @@ namespace INTERP_UTILS
   bool TransformedTriangle::testSegmentRayIntersection(const TriSegment seg, const TetraCorner corner) const
   {
     assert(corner == X || corner == Y || corner == Z);
+    // std::cout << "Testing seg - ray intersection for seg = " << seg << ", corner = " << corner << std::endl;
 
     // readjust index since O is not used
     const int cornerIdx = static_cast<int>(corner) - 1;
@@ -513,56 +522,74 @@ namespace INTERP_UTILS
     // dp 1   -> cond 1
     // dp 2-7 -> cond 3
     //? NB : last two rows are not completely understood and may contain errors
+    /*static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21] = 
+      {
+	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
+	C_01, C_XH, C_ZH, C_XY, C_10, C_ZH, C_10, // Y
+	C_XY, C_YH, C_XH, C_10, C_01, C_XH, C_01  // Z
+	};*/
     static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21] = 
+      {
+	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
+	C_01, C_XH, C_ZH, C_XY, C_10, C_ZH, C_YZ, // Y
+	C_XY, C_YH, C_XH, C_10, C_01, C_XH, C_ZX  // Z
+      };
+    /*static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21] = 
       {
 	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
 	C_01, C_XH, C_ZH, C_XY, C_10, C_XH, C_ZX, // Y
 	C_XY, C_YH, C_XH, C_10, C_01, C_ZH, C_YZ  // Z
       };
-
+    */
     // facets to use
     //? not sure this is correct
-    static const TetraFacet FACET_SEGMENT_RAY_INTERSECTION[3] = 
+    static const TetraFacet FIRST_FACET_SEGMENT_RAY_INTERSECTION[3] = 
       {
 	OZX, // X
-	OXY, // Y
-	OYZ, // Z
+	OYZ, // Y
+	OZX, // Z
       };
     
 
     const DoubleProduct dp0 = DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx];
+    const double cVal0 = calcStableC(seg, dp0);
     
     //? epsilon-equality here?
-    if(dp0 == 0.0) // cond. 1
+    // cond. 1
+    if(cVal0 != 0.0) 
       {
+	// std::cout << "SR fails at cond 1 cVal0 = "  << cVal0 << std::endl;
+	return false;
+      }
 	
-	if(testSegmentIntersectsFacet(seg, FACET_SEGMENT_RAY_INTERSECTION[cornerIdx])) // cond. 2.1
-	  { 
-	  const double H1 = _coords[5*seg + 4];
-	  const double H2 = _coords[5*( (seg + 1) % 3) + 4];
-
-	  // S_H -> cond. 2.2
-	  //	  std::cout << "H1 = " << H1 << ", H2= " << H2 << std::endl; 
-	  if(H1*H2 <= 0.0 && H1 != H2) // should equality be in "epsilon-sense" ?
-	    {
+    // cond 2
+    const bool cond21 = testSegmentIntersectsFacet(seg, FIRST_FACET_SEGMENT_RAY_INTERSECTION[cornerIdx]);
+    const bool cond22  = (corner == Z) ? testSegmentIntersectsFacet(seg, OYZ) : testSegmentIntersectsHPlane(seg);
     
-	      const double cVals[6] = 
-		{
-		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 1]),
-		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 2]),
-		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 3]),
-		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 4]),
-		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 5]),
-		  calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 6]),
-		};
-
-	      // cond. 3
-	      return ( (cVals[0] + cVals[1])*(cVals[2] - cVals[3]) - cVals[4]*cVals[5] ) < 0.0;
-	    }
-	  }
+    if(!(cond21 || cond22))
+      {
+	// std::cout << "SR fails at cond 2 : cond21 = " << cond21 << ", cond22 = " << cond22 << std::endl;
+	return false;
       }
     
-    return false;
+    // cond 3 
+    const double cVals[6] = 
+      {
+	calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 1]),
+	calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 2]),
+	calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 3]),
+	calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 4]),
+	calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 5]),
+	calcStableC(seg, DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx + 6]),
+      };
+    
+    // cond. 3
+    if(( (cVals[0] + cVals[1])*(cVals[2] - cVals[3]) - cVals[4]*cVals[5] ) >= 0.0)
+      {
+	std::cout << "SR fails at cond 3 : " << (cVals[0] + cVals[1])*(cVals[2] - cVals[3]) - cVals[4]*cVals[5]  << std::endl;
+      }
+    return ( (cVals[0] + cVals[1])*(cVals[2] - cVals[3]) - cVals[4]*cVals[5] ) < 0.0;
+    
   }
 
   /**
@@ -631,7 +658,7 @@ namespace INTERP_UTILS
     const double h = _coords[5*corner + 3];
     const double H = _coords[5*corner + 4];
         
-    return h < 0.0 && H > 0.0 && x > 0.0 && y > 0.0;
+    return h < 0.0 && H >= 0.0 && x >= 0.0 && y >= 0.0;
 	
   }
     
@@ -775,8 +802,8 @@ namespace INTERP_UTILS
     // std::cout << "surface above corner " << corner << " : " << "n = " << normal << ", t = [" <<  calcTByDevelopingRow(corner, 1, false) << ", "  << calcTByDevelopingRow(corner, 2, false) << ", " << calcTByDevelopingRow(corner, 3, false) << "] - stable : " << calcStableT(corner)  << std::endl;
     //? we don't care here if the triple product is "invalid", that is, the triangle does not surround one of the
     // edges going out from the corner (Grandy [53])
-    //   return ( calcTByDevelopingRow(corner, 2, false) * normal ) >= 0.0;
-       return ( calcStableT(corner) * normal ) >= 0.0;
+    return ( calcTByDevelopingRow(corner, 2, false) * normal ) >= 0.0;
+    //return ( calcStableT(corner) * normal ) >= 0.0;
   }
 
   /**
