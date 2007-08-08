@@ -144,8 +144,12 @@ namespace INTERP_UTILS
     ////////////////////////////////////////////////////////////////////////////////////
     
     void preCalculateDoubleProducts(void);
+
+    double calculateDistanceCornerSegment(const TetraCorner corner, const TriSegment seg) const;
     
     void preCalculateTripleProducts(void);
+
+    double calculateAngleEdgeTriangle(const TetraEdge edge) const;
 
     double calcStableC(const TriSegment seg, const DoubleProduct dp) const;
 

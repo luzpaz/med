@@ -4,6 +4,9 @@
 #include <cassert>
 #include <cmath>
 #include <limits>
+#include <map>
+#include <utility>
+
 #include "VectorUtils.hxx"
 
 namespace INTERP_UTILS
@@ -17,6 +20,7 @@ namespace INTERP_UTILS
 
   const int TransformedTriangle::COORDINATE_FOR_DETERMINANT_EXPANSION[12] =
     {
+      // row 1, 2, 3
       0, 1, 2, // O
       3, 1, 2, // X
       0, 3, 2, // Y
@@ -25,6 +29,7 @@ namespace INTERP_UTILS
   
   const TransformedTriangle::DoubleProduct TransformedTriangle::DP_FOR_DETERMINANT_EXPANSION[12] = 
     {
+      // row 1, 2, 3
       C_YZ, C_ZX, C_XY, // O
       C_YZ, C_ZH, C_YH, // X
       C_ZH, C_ZX, C_XH, // Y
@@ -38,15 +43,6 @@ namespace INTERP_UTILS
 
   const double TransformedTriangle::TRIPLE_PRODUCT_ANGLE_THRESHOLD = 0.1;
 
-  // coordinates of corner ptTetCorner
-  /*  const double TransformedTriangle::COORDS_TET_CORNER[12] = 
-    {
-      0.0, 0.0, 0.0, // O
-      1.0, 0.0, 0.0, // X
-      0.0, 1.0, 0.0, // Y
-      0.0, 0.0, 1.0  // Z
-    };
-  */
   ////////////////////////////////////////////////////////////////////////////////////
   /// Double and triple product calculations                           ///////////////
   ////////////////////////////////////////////////////////////////////////////////////
@@ -62,16 +58,10 @@ namespace INTERP_UTILS
     if(_isDoubleProductsCalculated)
       return;
 
-    // aliases to shorten code
-    typedef TransformedTriangle::DoubleProduct DoubleProduct;
-    typedef TransformedTriangle::TetraCorner TetraCorner;
-    typedef TransformedTriangle::TriSegment TriSegment;
-    typedef TransformedTriangle TT; 
-
     // -- calculate all unstable double products -- store in _doubleProducts
-    for(TriSegment seg = TT::PQ ; seg <= TT::RP ; seg = TriSegment(seg + 1))
+    for(TriSegment seg = PQ ; seg <= RP ; seg = TriSegment(seg + 1))
       {
-	for(DoubleProduct dp = TT::C_YZ ; dp <= TT::C_10 ; dp = DoubleProduct(dp + 1))
+	for(DoubleProduct dp = C_YZ ; dp <= C_10 ; dp = DoubleProduct(dp + 1))
 	  {
 	    _doubleProducts[8*seg + dp] = calcUnstableC(seg, dp);
 	  }
@@ -80,11 +70,11 @@ namespace INTERP_UTILS
 
     // -- (1) for each segment : check that double products satisfy Grandy, [46]
     // -- and make corrections if not
-    for(TriSegment seg = TT::PQ ; seg <= TT::RP ; seg = TriSegment(seg + 1))
+    for(TriSegment seg = PQ ; seg <= RP ; seg = TriSegment(seg + 1))
       {
-	const double term1 = _doubleProducts[8*seg + TT::C_YZ] * _doubleProducts[8*seg + TT::C_XH];
-	const double term2 = _doubleProducts[8*seg + TT::C_ZX] * _doubleProducts[8*seg + TT::C_YH];
-	const double term3 = _doubleProducts[8*seg + TT::C_XY] * _doubleProducts[8*seg + TT::C_ZH];
+	const double term1 = _doubleProducts[8*seg + C_YZ] * _doubleProducts[8*seg + C_XH];
+	const double term2 = _doubleProducts[8*seg + C_ZX] * _doubleProducts[8*seg + C_YH];
+	const double term3 = _doubleProducts[8*seg + C_XY] * _doubleProducts[8*seg + C_ZH];
 
 	//	std::cout << std::endl;
 	//std::cout << "for seg " << seg << " consistency " << term1 + term2 + term3 << std::endl;
@@ -94,69 +84,37 @@ namespace INTERP_UTILS
 	const int num_zero = (term1 == 0.0 ? 1 : 0) + (term2 == 0.0 ? 1 : 0) + (term3 == 0.0 ? 1 : 0);
 	const int num_neg = (term1 < 0.0 ? 1 : 0) + (term2 < 0.0 ? 1 : 0) + (term3 < 0.0 ? 1 : 0);
 	
-	
-	if(num_zero == 2 || (num_zero !=3 && num_neg == 0) || (num_zero !=3 && num_neg == 3))
+	// calculated geometry is inconsistent if we have one of the following cases
+	// * one term zero and the other two of the same sign
+	// * two terms zero
+	// * all terms positive
+	// * all terms negative
+	if((num_zero == 1 && num_neg != 1) || num_zero == 2 || num_neg == 0 || num_neg == 3 )
 	  {
+	    std::map<double, TetraCorner> distances;
 	    //std::cout << "inconsistent! "<< std::endl;
 
-	    // find TetraCorner nearest to segment
-	    double min_dist;
-	    TetraCorner min_corner;
-	  
-	    for(TetraCorner corner = TT::O ; corner <= TT::Z ; corner = TetraCorner(corner + 1))
+	    for(TetraCorner corner = O ; corner <= Z ; corner = TetraCorner(corner + 1))
 	      {
 		// calculate distance corner - segment axis
-		// NB uses fact that TriSegment <=> TriCorner that is first point of segment (PQ <=> P)
-		const TriCorner ptP_idx = TriCorner(seg);
-		const TriCorner ptQ_idx = TriCorner( (seg + 1) % 3);
-
-		const double ptP[3] = { _coords[5*ptP_idx], _coords[5*ptP_idx + 1], _coords[5*ptP_idx + 2]  };
-		const double ptQ[3] = { _coords[5*ptQ_idx], _coords[5*ptQ_idx + 1], _coords[5*ptQ_idx + 2]  };
-
-		// coordinates of corner
-		const double ptTetCorner[3] = 
-		  { 
-		    COORDS_TET_CORNER[3*corner    ],
-		    COORDS_TET_CORNER[3*corner + 1],
-		    COORDS_TET_CORNER[3*corner + 2]
-		  };
-
-		// dist^2 = ( PQ x CP )^2 / |PQ|^2 where C is the corner point
-
-		// difference vectors
-		const double diffPQ[3] = { ptQ[0] - ptP[0], ptQ[1] - ptP[1], ptQ[2] - ptP[2] };
-		const double diffCornerP[3] = { ptP[0] - ptTetCorner[0], ptP[1] - ptTetCorner[1], ptP[2] - ptTetCorner[2] };
-
-		//{ use functions in VectorUtils for this
-
-		// cross product of difference vectors
-		
-		double crossProd[3];
-		cross(diffPQ, diffCornerP, crossProd);
-	      
-		const double cross_squared = dot(crossProd, crossProd);
-		const double norm_diffPQ_squared = dot(diffPQ, diffPQ);
-		const double dist = cross_squared / norm_diffPQ_squared;
-	      
-		// update minimum (initializs with first corner)
-		if(corner == TT::O || dist < min_dist)
-		  {
-		    min_dist = dist;
-		    min_corner = corner;
-		  }
+		const double dist = calculateDistanceCornerSegment(corner, seg);
+		distances.insert( std::make_pair( dist, corner ) );
 	      }
+
+	    // first element -> minimum distance
+	    const TetraCorner minCorner = distances.begin()->second;
 
 	    // set the three corresponding double products to 0.0
 	    static const DoubleProduct DOUBLE_PRODUCTS[12] =
 	      {
-		TT::C_YZ, TT::C_ZX, TT::C_XY, // O
-		TT::C_YZ, TT::C_ZH, TT::C_YH, // X
-		TT::C_ZX, TT::C_ZH, TT::C_XH, // Y
-		TT::C_XY, TT::C_YH, TT::C_XH  // Z
+		C_YZ, C_ZX, C_XY, // O
+		C_YZ, C_ZH, C_YH, // X
+		C_ZX, C_ZH, C_XH, // Y
+		C_XY, C_YH, C_XH  // Z
 	      };
 
 	    for(int i = 0 ; i < 3 ; ++i) {
-	      DoubleProduct dp = DOUBLE_PRODUCTS[3*min_corner + i];
+	      DoubleProduct dp = DOUBLE_PRODUCTS[3*minCorner + i];
 	      
 	      // std::cout << std::endl << "inconsistent dp :" << dp << std::endl;	      
 	      _doubleProducts[8*seg + dp] = 0.0;
@@ -168,9 +126,9 @@ namespace INTERP_UTILS
   
     // -- (2) check that each double product statisfies Grandy, [47], else set to 0
  
-    for(TriSegment seg = TT::PQ ; seg <= TT::RP ; seg = TriSegment(seg + 1))
+    for(TriSegment seg = PQ ; seg <= RP ; seg = TriSegment(seg + 1))
       {
-	for(DoubleProduct dp = TT::C_YZ ; dp <= TT::C_10 ; dp = DoubleProduct(dp + 1))
+	for(DoubleProduct dp = C_YZ ; dp <= C_10 ; dp = DoubleProduct(dp + 1))
 	  {
 	    // find the points of the triangle
 	    // 0 -> P, 1 -> Q, 2 -> R 
@@ -181,16 +139,17 @@ namespace INTERP_UTILS
 	    const int off1 = DP_OFFSET_1[dp];
 	    const int off2 = DP_OFFSET_2[dp];
 
-	    const long double term1 = static_cast<long double>(_coords[5*pt1 + off1]) * static_cast<long double>(_coords[5*pt2 + off2]); 
-	    const long double term2 = static_cast<long double>(_coords[5*pt1 + off2]) * static_cast<long double>(_coords[5*pt2 + off1]);
+	    const double term1 = _coords[5*pt1 + off1] * _coords[5*pt2 + off2]; 
+	    const double term2 = _coords[5*pt1 + off2] * _coords[5*pt2 + off1];
 
 	    const long double delta = MULT_PREC_F * ( std::abs(term1) + std::abs(term2) );
 	  
-	    if( std::abs(static_cast<long double>(_doubleProducts[8*seg + dp])) < THRESHOLD_F*delta )
+	    if( std::abs(_doubleProducts[8*seg + dp]) < THRESHOLD_F*delta )
 	      {
 		if(_doubleProducts[8*seg + dp] != 0.0)
 		  {
-		    std::cout << "Double product for (seg,dp) = (" << seg << ", " << dp << ") = " << std::abs(_doubleProducts[8*seg + dp]) << " is imprecise, reset to 0.0" << std::endl;
+		    // std::cout << "Double product for (seg,dp) = (" << seg << ", " << dp << ") = " 
+		    //			      << std::abs(_doubleProducts[8*seg + dp]) << " is imprecise, reset to 0.0" << std::endl;
 		  }
 		_doubleProducts[8*seg + dp] = 0.0;
 		  
@@ -199,6 +158,41 @@ namespace INTERP_UTILS
       }
     
     _isDoubleProductsCalculated = true;
+  }
+
+  double TransformedTriangle::calculateDistanceCornerSegment(const TetraCorner corner, const TriSegment seg) const
+  {
+    // NB uses fact that TriSegment <=> TriCorner that is first point of segment (PQ <=> P)
+    const TriCorner ptP_idx = TriCorner(seg);
+    const TriCorner ptQ_idx = TriCorner( (seg + 1) % 3);
+    
+    const double ptP[3] = { _coords[5*ptP_idx], _coords[5*ptP_idx + 1], _coords[5*ptP_idx + 2]  };
+    const double ptQ[3] = { _coords[5*ptQ_idx], _coords[5*ptQ_idx + 1], _coords[5*ptQ_idx + 2]  };
+    
+    // coordinates of corner
+    const double ptTetCorner[3] = 
+      { 
+	COORDS_TET_CORNER[3*corner    ],
+	COORDS_TET_CORNER[3*corner + 1],
+	COORDS_TET_CORNER[3*corner + 2]
+      };
+    
+    // dist^2 = ( PQ x CP )^2 / |PQ|^2 where C is the corner point
+    
+    // difference vectors
+    const double diffPQ[3] = { ptQ[0] - ptP[0], ptQ[1] - ptP[1], ptQ[2] - ptP[2] };
+    const double diffCornerP[3] = { ptP[0] - ptTetCorner[0], ptP[1] - ptTetCorner[1], ptP[2] - ptTetCorner[2] };
+    
+    // cross product of difference vectors
+    double crossProd[3];
+    cross(diffPQ, diffCornerP, crossProd);
+    
+    const double cross_squared = dot(crossProd, crossProd);
+    const double norm_diffPQ_squared = dot(diffPQ, diffPQ);
+    
+    assert(norm_diffPQ_squared != 0.0);
+    
+    return cross_squared / norm_diffPQ_squared;
   }
 
   /**
@@ -216,16 +210,14 @@ namespace INTERP_UTILS
     for(TetraCorner corner = O ; corner <= Z ; corner = TetraCorner(corner + 1))
       {
 	// std::cout << "- Triple product for corner " << corner << std::endl;
-	bool isGoodRowFound = false;
 
-	// find edge / row to use
-	int minRow;
-	double minAngle;
-	bool isMinInitialised = false;
+	// find edge / row to use -> that whose edge makes the smallest angle to the triangle
+	// use a map to find the minimum
+	std::map<double, int> anglesForRows;
 
 	for(int row = 1 ; row < 4 ; ++row) 
 	  {
-	    DoubleProduct dp = DP_FOR_DETERMINANT_EXPANSION[3*corner + (row - 1)];
+	    const DoubleProduct dp = DP_FOR_DETERMINANT_EXPANSION[3*corner + (row - 1)];
 
 	    // get edge by using correspondance between Double Product and Edge
 	    TetraEdge edge = TetraEdge(dp);
@@ -233,65 +225,17 @@ namespace INTERP_UTILS
 	    // use edge only if it is surrounded by the surface
 	    if( testTriangleSurroundsEdge(edge) )
 	      {
-		isGoodRowFound = true;
-
 		// -- calculate angle between edge and PQR
-		// find normal to PQR - cross PQ and PR
-		const double pq[3] = 
-		  { 
-		    _coords[5*Q]     - _coords[5*P], 
-		    _coords[5*Q + 1] - _coords[5*P + 1],
-		    _coords[5*Q + 2] - _coords[5*P + 2]
-		  };
-
-		const double pr[3] = 
-		  { 
-		    _coords[5*R]     - _coords[5*P], 
-		    _coords[5*R + 1] - _coords[5*P + 1],
-		    _coords[5*R + 2] - _coords[5*P + 2]
-		  };
-	    
-		const double normal[3] =
-		  {
-		    pq[1]*pr[2] - pq[2]*pr[1],
-		    pq[2]*pr[0] - pq[0]*pr[2],
-		    pq[0]*pr[1] - pq[1]*pr[0]
-		  };
-
-		static const double EDGE_VECTORS[18] =
-		  {
-		    1.0, 0.0, 0.0, // OX
-		    0.0, 1.0, 0.0, // OY
-		    0.0, 0.0, 1.0, // OZ
-		    0.0,-1.0, 1.0, // YZ
-		    1.0, 0.0,-1.0, // ZX
-		   -1.0,-1.0, 1.0  // XY
-		  };
-
-		const double edgeVec[3] = { 
-		  EDGE_VECTORS[3*edge],
-		  EDGE_VECTORS[3*edge + 1],
-		  EDGE_VECTORS[3*edge + 2],
-		};
-
-		const double lenNormal = sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2]);
-		const double lenEdgeVec = sqrt(edgeVec[0]*edgeVec[0] + edgeVec[1]*edgeVec[1] + edgeVec[2]*edgeVec[2]);
-		const double dotProd = normal[0]*edgeVec[0] + normal[1]*edgeVec[1] + normal[2]*edgeVec[2];
-		
-		const double angle = 3.14159262535 - acos( dotProd / ( lenNormal * lenEdgeVec ) );
-		
-		if(!isMinInitialised || angle < minAngle)
-		  {
-		    minAngle = angle;
-		    minRow = row;
-		    isMinInitialised = true;
-		  }
-		
+		const double angle = calculateAngleEdgeTriangle(edge);
+		anglesForRows.insert(std::make_pair(angle, row));		
 	      }
 	  }
 	
-	if(isGoodRowFound)
+	if(anglesForRows.size() != 0) // we have found a good row
 	  {
+	    const double minAngle = anglesForRows.begin()->first;
+	    const int minRow = anglesForRows.begin()->second;
+
 	    if(minAngle < TRIPLE_PRODUCT_ANGLE_THRESHOLD)
 	      {
 		_tripleProducts[corner] = calcTByDevelopingRow(corner, minRow, true);
@@ -306,7 +250,7 @@ namespace INTERP_UTILS
 	  {
 	    // this value will not be used
 	    // we set it to whatever
-	    std::cout << "Triple product not calculated for corner " << corner << std::endl;
+	    // std::cout << "Triple product not calculated for corner " << corner << std::endl;
 	    _tripleProducts[corner] = -3.14159265;
 	    _validTP[corner] = false;
 
@@ -315,6 +259,53 @@ namespace INTERP_UTILS
       }
 
     _isTripleProductsCalculated = true;
+  }
+
+  double TransformedTriangle::calculateAngleEdgeTriangle(const TetraEdge edge) const
+  {
+    // find normal to PQR - cross PQ and PR
+    const double pq[3] = 
+      { 
+	_coords[5*Q]     - _coords[5*P], 
+	_coords[5*Q + 1] - _coords[5*P + 1],
+	_coords[5*Q + 2] - _coords[5*P + 2]
+      };
+    
+    const double pr[3] = 
+      { 
+	_coords[5*R]     - _coords[5*P], 
+	_coords[5*R + 1] - _coords[5*P + 1],
+	_coords[5*R + 2] - _coords[5*P + 2]
+      };
+    
+    const double normal[3] =
+      {
+	pq[1]*pr[2] - pq[2]*pr[1],
+	pq[2]*pr[0] - pq[0]*pr[2],
+	pq[0]*pr[1] - pq[1]*pr[0]
+      };
+    
+    static const double EDGE_VECTORS[18] =
+      {
+	1.0, 0.0, 0.0, // OX
+	0.0, 1.0, 0.0, // OY
+	0.0, 0.0, 1.0, // OZ
+	0.0,-1.0, 1.0, // YZ
+	1.0, 0.0,-1.0, // ZX
+	-1.0,-1.0, 1.0  // XY
+      };
+    
+    const double edgeVec[3] = { 
+      EDGE_VECTORS[3*edge],
+      EDGE_VECTORS[3*edge + 1],
+      EDGE_VECTORS[3*edge + 2],
+    };
+    
+    const double lenNormal = sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2]);
+    const double lenEdgeVec = sqrt(edgeVec[0]*edgeVec[0] + edgeVec[1]*edgeVec[1] + edgeVec[2]*edgeVec[2]);
+    const double dotProd = normal[0]*edgeVec[0] + normal[1]*edgeVec[1] + normal[2]*edgeVec[2];
+    
+    return 3.14159262535 - acos( dotProd / ( lenNormal * lenEdgeVec ) );
   }
 
   /**
@@ -463,20 +454,31 @@ namespace INTERP_UTILS
     if(project)
       {
 	// products coordinate values with corresponding double product
-	const double coordDPProd[3] = { coordValues[0] * cQR, coordValues[1] * cRP, coordValues[0] * cPQ };
+	const double coordDPProd[3] = { coordValues[0] * cQR, coordValues[1] * cRP, coordValues[2] * cPQ };
 	
 	const double sumDPProd = coordDPProd[0] + coordDPProd[1] + coordDPProd[2];
-	const double sumDPProdSq = coordDPProd[0]*coordDPProd[0] + coordDPProd[1]*coordDPProd[1] + coordDPProd[2]*coordDPProd[2];
+	const double sumDPProdSq = dot(coordDPProd, coordDPProd);
+
 	alpha = sumDPProd / sumDPProdSq;
       }
 
-    const double p_term = _coords[5*P + offset] * cQR * (1.0 - alpha * coordValues[0] * cQR) ;
-    const double q_term = _coords[5*Q + offset] * cRP * (1.0 - alpha * coordValues[1] * cRP) ;
-    const double r_term = _coords[5*R + offset] * cPQ * (1.0 - alpha * coordValues[2] * cPQ) ;
+    const double cQRbar = cQR * (1.0 - alpha * coordValues[0] * cQR);
+    const double cRPbar = cRP * (1.0 - alpha * coordValues[1] * cRP);
+    const double cPQbar = cPQ * (1.0 - alpha * coordValues[2] * cPQ);
+
+    // check sign of barred products - should not change
+    assert(cQRbar * cQR >= 0.0);
+    assert(cRPbar * cRP >= 0.0);
+    assert(cPQbar * cPQ >= 0.0);
+
+    const double p_term = _coords[5*P + offset] * cQRbar;
+    const double q_term = _coords[5*Q + offset] * cRPbar;
+    const double r_term = _coords[5*R + offset] * cPQbar;
 
     // check that we are not so close to zero that numerical errors could take over, 
     // otherwise reset to zero (cf Grandy, p. 446)
     const long double delta = MULT_PREC_F * (std::abs(p_term) + std::abs(q_term) + std::abs(r_term));
+    
     if( epsilonEqual( p_term + q_term + r_term, 0.0, THRESHOLD_F * delta) )
       {
 	return 0.0;

@@ -586,7 +586,7 @@ namespace INTERP_UTILS
     // cond. 3
     if(( (cVals[0] + cVals[1])*(cVals[2] - cVals[3]) - cVals[4]*cVals[5] ) >= 0.0)
       {
-	std::cout << "SR fails at cond 3 : " << (cVals[0] + cVals[1])*(cVals[2] - cVals[3]) - cVals[4]*cVals[5]  << std::endl;
+	// std::cout << "SR fails at cond 3 : " << (cVals[0] + cVals[1])*(cVals[2] - cVals[3]) - cVals[4]*cVals[5]  << std::endl;
       }
     return ( (cVals[0] + cVals[1])*(cVals[2] - cVals[3]) - cVals[4]*cVals[5] ) < 0.0;
     

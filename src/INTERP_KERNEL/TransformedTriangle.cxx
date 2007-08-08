@@ -155,7 +155,7 @@ namespace INTERP_UTILS
 
     if(isTriangleBelowTetraeder())
       {
-	std::cout << std::endl << "Triangle is below tetraeder - V = 0.0" << std::endl << std::endl ;
+	// std::cout << std::endl << "Triangle is below tetraeder - V = 0.0" << std::endl << std::endl ;
 	return 0.0;
       }
 
@@ -169,10 +169,10 @@ namespace INTERP_UTILS
       };
 
     double sign = uv_xy[0] * uv_xy[3] - uv_xy[1] * uv_xy[2];
-    
+
     if(sign == 0.0)
       {
-	std::cout << std::endl << "Triangle is perpendicular to z-plane - V = 0.0" << std::endl << std::endl;
+	// std::cout << std::endl << "Triangle is perpendicular to z-plane - V = 0.0" << std::endl << std::endl;
 	return 0.0;
       }
 
@@ -180,7 +180,7 @@ namespace INTERP_UTILS
     sign = sign > 0.0 ? 1.0 : -1.0;
 
 
-    std::cout << std::endl << "-- Calculating intersection polygons ... " << std::endl; 
+    // std::cout << std::endl << "-- Calculating intersection polygons ... " << std::endl; 
     calculateIntersectionPolygons();
     
     double barycenter[3];
@@ -189,11 +189,11 @@ namespace INTERP_UTILS
     double volA = 0.0;
     if(_polygonA.size() > 2)
       {
-	std::cout << std::endl << "-- Treating polygon A ... " << std::endl; 
+	// std::cout << std::endl << "-- Treating polygon A ... " << std::endl; 
 	calculatePolygonBarycenter(A, barycenter);
 	sortIntersectionPolygon(A, barycenter);
 	volA = calculateVolumeUnderPolygon(A, barycenter);
-	std::cout << "Volume is " << sign * volA << std::endl;
+	// std::cout << "Volume is " << sign * volA << std::endl;
       }
 
     double volB = 0.0;
@@ -201,14 +201,14 @@ namespace INTERP_UTILS
     // if triangle is not in h = 0 plane, calculate volume under B
     if(!isTriangleInPlaneOfFacet(XYZ) && _polygonB.size() > 2)
       {
-	std::cout << std::endl << "-- Treating polygon B ... " << std::endl; 
+	// std::cout << std::endl << "-- Treating polygon B ... " << std::endl; 
 	calculatePolygonBarycenter(B, barycenter);
 	sortIntersectionPolygon(B, barycenter);
 	volB = calculateVolumeUnderPolygon(B, barycenter);
-	std::cout << "Volume is " << sign * volB << std::endl;
+	// std::cout << "Volume is " << sign * volB << std::endl;
       }
 
-    std::cout << std::endl << "volA + volB = " << sign * (volA + volB) << std::endl << std::endl;
+    // std::cout << std::endl << "volA + volB = " << sign * (volA + volB) << std::endl << std::endl;
 
     return sign * (volA + volB);
 
@@ -244,13 +244,13 @@ namespace INTERP_UTILS
 	    double* ptA = new double[3];
 	    calcIntersectionPtSurfaceEdge(edge, ptA);
 	    _polygonA.push_back(ptA);
-	    std::cout << "Surface-edge : " << vToStr(ptA) << " added to A " << std::endl;
+	    // std::cout << "Surface-edge : " << vToStr(ptA) << " added to A " << std::endl;
 	    if(edge >= XY)
 	      {
 		double* ptB = new double[3];
 		copyVector3(ptA, ptB);
 		_polygonB.push_back(ptB);
-		std::cout << "Surface-edge : " << vToStr(ptB) << " added to B " << std::endl;
+		// std::cout << "Surface-edge : " << vToStr(ptB) << " added to B " << std::endl;
 	      }
 	    
 	  }
@@ -264,7 +264,7 @@ namespace INTERP_UTILS
 	    double* ptB = new double[3];
 	    copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
 	    _polygonB.push_back(ptB);
-	    std::cout << "Surface-ray : " << vToStr(ptB) << " added to B" << std::endl;
+	    // std::cout << "Surface-ray : " << vToStr(ptB) << " added to B" << std::endl;
 	  }
       }
     
@@ -279,13 +279,13 @@ namespace INTERP_UTILS
 		double* ptA = new double[3];
 		calcIntersectionPtSegmentFacet(seg, facet, ptA);
 		_polygonA.push_back(ptA);
-		std::cout << "Segment-facet : " << vToStr(ptA) << " added to A" << std::endl;
+		// std::cout << "Segment-facet : " << vToStr(ptA) << " added to A" << std::endl;
 		if(facet == XYZ)
 		  {
 		    double* ptB = new double[3];
 		    copyVector3(ptA, ptB);
 		    _polygonB.push_back(ptB);
-		    std::cout << "Segment-facet : " << vToStr(ptB) << " added to B" << std::endl;
+		    // std::cout << "Segment-facet : " << vToStr(ptB) << " added to B" << std::endl;
 		  }
 	      }
 	  }
@@ -298,7 +298,7 @@ namespace INTERP_UTILS
 		double* ptA = new double[3];
 		calcIntersectionPtSegmentEdge(seg, edge, ptA);
 		_polygonA.push_back(ptA);
-		std::cout << "Segment-edge : " << vToStr(ptA) << " added to A" << std::endl;
+		// std::cout << "Segment-edge : " << vToStr(ptA) << " added to A" << std::endl;
 		if(edge >= XY)
 		  {
 		    double* ptB = new double[3];
@@ -316,13 +316,13 @@ namespace INTERP_UTILS
 		double* ptA = new double[3];
 		copyVector3(&COORDS_TET_CORNER[3 * corner], ptA);
 		_polygonA.push_back(ptA);
-		std::cout << "Segment-corner : " << vToStr(ptA) << " added to A" << std::endl;
+		// std::cout << "Segment-corner : " << vToStr(ptA) << " added to A" << std::endl;
 		if(corner != O)
 		  {
 		    double* ptB = new double[3];
 		    _polygonB.push_back(ptB);
 		    copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
-		    std::cout << "Segment-corner : " << vToStr(ptB) << " added to B" << std::endl;
+		    // std::cout << "Segment-corner : " << vToStr(ptB) << " added to B" << std::endl;
 		  }
 	      }
 	  }
@@ -335,7 +335,7 @@ namespace INTERP_UTILS
 		double* ptB = new double[3];
 		copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
 		_polygonB.push_back(ptB);
-		std::cout << "Segment-ray : " << vToStr(ptB) << " added to B" << std::endl;
+		// std::cout << "Segment-ray : " << vToStr(ptB) << " added to B" << std::endl;
 	      }
 	  }
 	
@@ -347,7 +347,7 @@ namespace INTERP_UTILS
 		double* ptB = new double[3];
 		calcIntersectionPtSegmentHalfstrip(seg, edge, ptB);
 		_polygonB.push_back(ptB);
-		std::cout << "Segment-halfstrip : " << vToStr(ptB) << " added to B" << std::endl;
+		// std::cout << "Segment-halfstrip : " << vToStr(ptB) << " added to B" << std::endl;
 	      }
 	  }
       }      
@@ -362,7 +362,7 @@ namespace INTERP_UTILS
 	    double* ptA = new double[3];
 	    copyVector3(&_coords[5*corner], ptA);
 	    _polygonA.push_back(ptA);
-	    std::cout << "Inclusion tetrahedron : " << vToStr(ptA) << " added to A" << std::endl;
+	    // std::cout << "Inclusion tetrahedron : " << vToStr(ptA) << " added to A" << std::endl;
 	  }
 
 	// XYZ - plane
@@ -371,7 +371,7 @@ namespace INTERP_UTILS
 	    double* ptB = new double[3];
 	    copyVector3(&_coords[5*corner], ptB);
 	    _polygonB.push_back(ptB);
-	    std::cout << "Inclusion XYZ-plane : " << vToStr(ptB) << " added to B" << std::endl;
+	    // std::cout << "Inclusion XYZ-plane : " << vToStr(ptB) << " added to B" << std::endl;
 	  }
 
 	// projection on XYZ - facet
@@ -382,7 +382,7 @@ namespace INTERP_UTILS
 	    ptB[2] = 1 - ptB[0] - ptB[1];
 	    assert(epsilonEqual(ptB[0]+ptB[1]+ptB[2] - 1, 0.0));
 	    _polygonB.push_back(ptB);
-	    std::cout << "Projection XYZ-plane : " << vToStr(ptB) << " added to B" << std::endl;
+	    // std::cout << "Projection XYZ-plane : " << vToStr(ptB) << " added to B" << std::endl;
 	  }
 
       }
@@ -400,7 +400,7 @@ namespace INTERP_UTILS
    */
   void TransformedTriangle::calculatePolygonBarycenter(const IntersectionPolygon poly, double* barycenter)
   {
-    std::cout << "--- Calculating polygon barycenter" << std::endl;
+    // std::cout << "--- Calculating polygon barycenter" << std::endl;
 
     // get the polygon points
     std::vector<double*>& polygon = (poly == A) ? _polygonA : _polygonB;
@@ -424,7 +424,7 @@ namespace INTERP_UTILS
 	      }
 	  }
       }
-    std::cout << "Barycenter is " << vToStr(barycenter) << std::endl;
+    // std::cout << "Barycenter is " << vToStr(barycenter) << std::endl;
   }
 
   /**
@@ -440,7 +440,7 @@ namespace INTERP_UTILS
    */
   void TransformedTriangle::sortIntersectionPolygon(const IntersectionPolygon poly, const double* barycenter)
   {
-    std::cout << "--- Sorting polygon ..."<< std::endl;
+    // std::cout << "--- Sorting polygon ..."<< std::endl;
 
     using ::ProjectedCentralCircularSortOrder;
     typedef ProjectedCentralCircularSortOrder SortOrder; // change is only necessary here and in constructor
@@ -477,10 +477,10 @@ namespace INTERP_UTILS
     //stable_sort((++polygon.begin()), polygon.end(), order);
     
     
-    std::cout << "Sorted polygon is " << std::endl;
+    // std::cout << "Sorted polygon is " << std::endl;
     for(int i = 0 ; i < polygon.size() ; ++i)
       {
-	std::cout << vToStr(polygon[i]) << std::endl;
+	// std::cout << vToStr(polygon[i]) << std::endl;
       }
 
   }
@@ -498,7 +498,7 @@ namespace INTERP_UTILS
    */
   double TransformedTriangle::calculateVolumeUnderPolygon(IntersectionPolygon poly, const double* barycenter)
   {
-    std::cout << "--- Calculating volume under polygon" << std::endl;
+    // std::cout << "--- Calculating volume under polygon" << std::endl;
 
     // get the polygon points
     std::vector<double*>& polygon = (poly == A) ? _polygonA : _polygonB;
@@ -519,7 +519,7 @@ namespace INTERP_UTILS
 	vol += (factor1 * factor2) / 6.0;
       }
 
-    //    std::cout << "Abs. Volume is " << vol << std::endl; 
+    //    // std::cout << "Abs. Volume is " << vol << std::endl; 
     return vol;
   }
 
