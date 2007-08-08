@@ -12,31 +12,30 @@ class Interpolation3DTest : public CppUnit::TestFixture
 {
 
   CPPUNIT_TEST_SUITE( Interpolation3DTest );
-#if 0
+
+  // single - element
   CPPUNIT_TEST( tetraReflexiveUnit );
   CPPUNIT_TEST( tetraReflexiveGeneral );
   CPPUNIT_TEST( tetraNudgedSimpler );
   CPPUNIT_TEST( tetraNudged );
   CPPUNIT_TEST( tetraCorner );
-#endif
   CPPUNIT_TEST( tetraSimpleIncluded );
-  CPPUNIT_TEST( tetraComplexIncluded );
-#if 0
+  CPPUNIT_TEST( tetraDegenEdge );
+  CPPUNIT_TEST( tetraDegenFace );
   CPPUNIT_TEST( tetraHalfstripOnly );
   CPPUNIT_TEST( tetraHalfstripOnly2 );
   CPPUNIT_TEST( tetraSimpleHalfstripOnly );
   CPPUNIT_TEST( generalTetra );
+
+  // multi - element
+  CPPUNIT_TEST( tetraComplexIncluded );
   CPPUNIT_TEST( dividedUnitTetraSimplerReflexive );
   CPPUNIT_TEST( dividedUnitTetraReflexive );
   CPPUNIT_TEST( nudgedDividedUnitTetra );
   CPPUNIT_TEST( nudgedDividedUnitTetraSimpler );
   CPPUNIT_TEST( dividedGenTetra );
-#endif
-#if 0
-  CPPUNIT_TEST( boxReflexive );
-
+  //CPPUNIT_TEST( boxReflexive );
   CPPUNIT_TEST( tetraBoxes );
-#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -109,6 +108,16 @@ public:
     intersectMeshes("meshes/GenTetra1.med", "GenTetra1", "meshes/GenTetra2.med", "GenTetra2", 4.91393, 1.0e-5);
   }
 
+  void tetraDegenEdge()
+  {
+    intersectMeshes("meshes/UnitTetraDegenT.med", "UnitTetraDegenT", "meshes/DegenEdgeXY.med", "DegenEdgeXY", 0.0);
+  }
+
+  void tetraDegenFace()
+  {
+    intersectMeshes("meshes/UnitTetraDegenT.med", "UnitTetraDegenT", "meshes/DegenFaceXYZ.med", "DegenFaceXYZ", 0.0);
+  }
+
   void dividedUnitTetraReflexive()
   {
     intersectMeshes("meshes/DividedUnitTetra.med", "DividedUnitTetra", "meshes/DividedUnitTetra.med", "DividedUnitTetra", 0.1666667);
@@ -131,7 +140,7 @@ public:
 
   void dividedGenTetra()
   {
-    intersectMeshes("meshes/DividedGenTetra1.med", "DividedGenTetra1", "meshes/DividedGenTetra2.med", "DividedGenTetra2", 4.91393, 1.0e-5);
+    intersectMeshes("meshes/DividedGenTetra1.med", "DividedGenTetra1", "meshes/DividedGenTetra2.med", "DividedGenTetra2", 0.546329);
   }
 
   void boxReflexive()
