@@ -19,6 +19,7 @@ namespace INTERP_UTILS
   {
     // get coordinates of vertices
     const int numNodes = getNumberNodes();
+    
     const double* vertices[numNodes];
 
     for(int i = 0 ; i < numNodes ; ++i)
@@ -153,7 +154,7 @@ namespace INTERP_UTILS
 	    //{ not totally efficient since we transform each node once per face
 	    T.apply(&transformedNodes[3*(j-1)], node);
 
-	    std::cout << "Node " << localNodeNumber << " = " << vToStr(node) << " transformed to " << vToStr(&transformedNodes[3*(j-1)]) << std::endl;
+	    // std::cout << "Node " << localNodeNumber << " = " << vToStr(node) << " transformed to " << vToStr(&transformedNodes[3*(j-1)]) << std::endl;
 
 	  }
 
@@ -170,7 +171,8 @@ namespace INTERP_UTILS
 	    // add other cases here to treat hexahedra, pyramides, etc
 	    
 	  default:
-	    std::cout << "Only elements with triangular faces are supported at the moment." << std::endl;
+	    // std::cout << "Only elements with triangular faces are supported at the moment." << std::endl;
+	    ;
 	  }
       }
     

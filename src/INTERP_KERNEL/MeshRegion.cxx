@@ -97,7 +97,7 @@ namespace INTERP_UTILS
 	++iter;
       }
 
-    //    assert(std::abs(region1._elements.size() - region2._elements.size()) < 2);
+    // assert(std::abs(region1._elements.size() - region2._elements.size()) < 2);
 	
   }
 
