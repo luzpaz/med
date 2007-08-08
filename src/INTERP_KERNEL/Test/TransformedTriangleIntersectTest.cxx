@@ -644,7 +644,7 @@ void TransformedTriangleIntersectTest::testTriangle4()
 
 void TransformedTriangleIntersectTest::testTriangle5()
 {
-std::cout << std::endl << "+++++++ Testing triangle 5" << std::endl;
+  // std::cout << std::endl << "+++++++ Testing triangle 5" << std::endl;
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -785,7 +785,7 @@ std::cout << std::endl << "+++++++ Testing triangle 5" << std::endl;
 
 void TransformedTriangleIntersectTest::testTriangle6()
 {
-  std::cout << std::endl << "+++++++ Testing triangle 6" << std::endl;
+  //  std::cout << std::endl << "+++++++ Testing triangle 6" << std::endl;
 
     typedef TransformedTriangle TT;
 
