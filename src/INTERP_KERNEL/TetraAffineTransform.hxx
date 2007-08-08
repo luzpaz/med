@@ -35,7 +35,7 @@ namespace INTERP_UTILS
 
 	calculateDeterminant();
 
-	std::cout << "determinant before inverse = " << _determinant << std::endl;
+	// std::cout << "determinant before inverse = " << _determinant << std::endl;
 	
 	// check that tetra is non-planar -> determinant is not zero
 	// otherwise set _determinant to zero to signal caller that transformation did not work
@@ -76,20 +76,20 @@ namespace INTERP_UTILS
       calculateDeterminant();
       
       // self-check
-      std::cout << "transform determinant is " << _determinant << std::endl;
-      std::cout << "*Self-check : Applying transformation to original points ... ";
+      // std::cout << "transform determinant is " << _determinant << std::endl;
+      // std::cout << "*Self-check : Applying transformation to original points ... ";
       for(int i = 0; i < 4 ; ++i)
 	{
 	  double v[3];
 	  apply(v, pts[i]);
-	  std::cout << vToStr(v) << std::endl;
+	  // std::cout << vToStr(v) << std::endl;
 	  for(int j = 0; j < 3; ++j)
 	    {
 	      assert(epsilonEqual(v[j], (3*i+j == 3 || 3*i+j == 7 || 3*i+j == 11 ) ? 1.0 : 0.0));
 	    }
 	}
       
-      std::cout << " ok" << std::endl;
+      // std::cout << " ok" << std::endl;
     }
 
     void apply(double* destPt, const double* srcPt) const
@@ -105,7 +105,7 @@ namespace INTERP_UTILS
 	  // alloc temporary memory
 	  dest = new double[3];
 
-	  //std::cout << "Oops! self-affectation" << std::endl;
+	  //// std::cout << "Oops! self-affectation" << std::endl;
 	}
 
       for(int i = 0 ; i < 3 ; ++i)
@@ -137,7 +137,7 @@ namespace INTERP_UTILS
     {
       using namespace std;
       
-      std::cout << "A = " << std::endl << "[";
+      // std::cout << "A = " << std::endl << "[";
       for(int i = 0; i < 3; ++i)
 	{
 	  cout << _linearTransform[3*i] << ", " << _linearTransform[3*i + 1] << ", " << _linearTransform[3*i + 2];
