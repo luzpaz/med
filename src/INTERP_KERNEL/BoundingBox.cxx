@@ -1,5 +1,6 @@
 #include "BoundingBox.hxx"
 
+#include <iostream>
 #include <algorithm>
 
 namespace INTERP_UTILS
@@ -32,14 +33,16 @@ namespace INTERP_UTILS
      for(BoxCoord c = XMIN ; c <= ZMIN ; c = BoxCoord(c + 1))
        {
 	 _coords[c] = min(pt1[c], pt2[c]);
-	 _coords[c + 3] = max(pt1[c + 3], pt2[c + 3]);
+	 _coords[c + 3] = max(pt1[c], pt2[c]);
        }
 
      for(int i = 2 ; i < numPts ; ++i)
        {
 	 updateWithPoint(pts[i]);
        }
+     assert(isValid());
    }
+
   /**
    * Constructor creating box from union of two boxes
    *
@@ -52,6 +55,7 @@ namespace INTERP_UTILS
 	 _coords[c] = min(box1._coords[c], box2._coords[c]);
 	 _coords[c + 3] = max(box1._coords[c + 3], box2._coords[c + 3]);
        }
+    assert(isValid());
   }
 
   /**
@@ -78,6 +82,12 @@ namespace INTERP_UTILS
 	
 	// boxes are disjoint if there exists a direction in which the 
 	// minimum coordinate of one is greater than the maximum coordinate of the other
+
+	//? stable version
+	/*	const double tol = 1.0e-2;
+	if(_coords[c] > otherMaxCoord + tol 
+	   || _coords[c + 3] < otherMinCoord - tol)
+	*/
 	if(_coords[c] > otherMaxCoord 
 	   || _coords[c + 3] < otherMinCoord)
 	  {
@@ -130,6 +140,21 @@ namespace INTERP_UTILS
 	_coords[c + 3] = max(_coords[c + 3], ptVal);
 
       }
+  }
+
+
+  bool BoundingBox::isValid() const
+  {
+    bool valid = true;
+    for(BoxCoord c = XMIN ; c < ZMIN ; c = BoxCoord(c + 1))
+      {
+	if(_coords[c] >= _coords[c + 3])
+	  {
+	    std::cout << "BoundingBox |: coordinate " << c << " is invalid : " << _coords[c] << " >= " << _coords[c+3] << std::endl;
+	    valid = false;
+	  }
+      }
+    return valid;
   }
 
 };

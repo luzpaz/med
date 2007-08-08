@@ -72,7 +72,12 @@ namespace INTERP_UTILS
     void updateWithPoint(const double* pt);
 
   private:
+    
+    bool isValid() const;
+    
     double _coords[6];
+
+    
 
   };
 
