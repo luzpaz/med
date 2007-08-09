@@ -53,6 +53,7 @@ public:
 
   int compare(const MEDMODULUSARRAY &modulusArray) const;
 
+  const int  *getArray(int& length) const { length=_length; return _array; }
 };
 
 

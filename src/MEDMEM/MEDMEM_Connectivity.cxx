@@ -44,6 +44,27 @@ static inline void insert_vector(vector<int> &Vect, int Indice, int Element)
   Vect[Indice] = Element;
 }
 
+void mergeOrderedTabs(const int *tab1, int lgth1, const int *tab2, int lgth2, int *result, int& lgth)
+{
+  int cpt[2]={0,0};
+  lgth=0;
+  unsigned char switcher=0;
+  const int *tabS[2]={tab1,tab2};
+  while(cpt[0]<lgth1 && cpt[1]<lgth2)
+    {
+      if(tabS[1-switcher][cpt[1-switcher]]<tabS[switcher][cpt[switcher]])
+        cpt[1-switcher]++;
+      else if(tabS[1-switcher][cpt[1-switcher]]>tabS[switcher][cpt[switcher]])
+        switcher=1-switcher;
+      else
+        {
+          int tmp=tabS[switcher][cpt[switcher]];
+          cpt[switcher]++; cpt[1-switcher]++;
+          result[lgth++]=tmp;
+        }
+    }
+}
+
 /*!
    Default Constructor. /n
    Default for Entity is MED_CELL and type of Connectivity is MED_NODAL */
@@ -1653,6 +1674,9 @@ void CONNECTIVITY::calculateDescendingConnectivity()
       vector<int> Constituentpolygonsnodalvalue;
       vector<int> Constituentpolygonsnodalindex(1,1);
       int NumberOfNewFaces = 0; // by convention new faces are polygons
+      //offset to switch between all types and classical types.
+      int offsetCell = getNumberOf(MED_CELL, MED_ALL_ELEMENTS);
+      int *tabRes = new int[1000]; //temporay array for intersection calculation
 
       for (int i=0; i<getNumberOfPolyhedron(); i++) // for each polyhedron
 	{
@@ -1720,22 +1744,56 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 
 	      // we search last in POLYGONS
 	      if (!ret_compare)
-		{
-		  for (int k=0; k<static_cast<int>(Constituentpolygonsnodalindex.size())-1; k++) // we must cast the unsigned int into int before doing -1
-		    {
-		      if (Constituentpolygonsnodalindex[k+1]-Constituentpolygonsnodalindex[k] == myFaceNumberOfNodes)
-			{
-			  MEDMODULUSARRAY face(myFaceNumberOfNodes,&Constituentpolygonsnodalvalue[0] + Constituentpolygonsnodalindex[k]-1);
-			  ret_compare = face_poly.compare(face);
-			  if (ret_compare)
-			    {
-			      PolyDescending.push_back(ret_compare*(NumberOfConstituent+k+1)); // we had it to the connectivity
-			      insert_vector(Reversedescendingconnectivityvalue, 2*(NumberOfConstituent+k)+1, i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polyhedra i to reverse descending connectivity for face_poly (in 2sd place)
-			      break;
-			    }
-			}
-		    }
-		}
+              {
+                int lgth;
+                const int *facePolyTab=face_poly.getArray(lgth);
+                int nbOfCandidatesCell = ReverseNodalConnectivityIndex[facePolyTab[0]] -
+                                         ReverseNodalConnectivityIndex[facePolyTab[0]-1];
+                const int *candidatesCell = ReverseNodalConnectivityValue +
+                                            ReverseNodalConnectivityIndex[facePolyTab[0]-1] - 1;
+                memcpy(tabRes,candidatesCell,nbOfCandidatesCell*sizeof(int));
+                int lgth2=nbOfCandidatesCell;
+                for (int k=1;k<lgth && lgth2!=0;k++)
+                {
+                  nbOfCandidatesCell = ReverseNodalConnectivityIndex[facePolyTab[k]] -
+                                       ReverseNodalConnectivityIndex[facePolyTab[k]-1];
+                  candidatesCell = ReverseNodalConnectivityValue +
+                                   ReverseNodalConnectivityIndex[facePolyTab[k]-1] - 1;
+                  mergeOrderedTabs(tabRes,lgth2,candidatesCell,nbOfCandidatesCell,tabRes,lgth2);
+                }
+                if (lgth2<=1)
+                  ret_compare=0;//here normally tabRes[0]==offsetCell+i+1
+                else //> 2 should never happend : A face is shared by more than 2 polyhedrons...
+                {
+                  if (tabRes[0] == offsetCell+i+1) //as tabRes is ordered by construction tabRes[1] > tabRes[0] so the current 
+                    // face is shared with an another cell whose id > current id. So let's create
+                    ret_compare=0;
+                  else
+                  {//tabRes[0]<Constituentpolygonsnodalindex.size()-1 that is to say the current face has been built previously.
+                    const int *facesConstitutingAlreadyBuiltPolyh = &PolyDescending[0] + _polyhedronNodal->getPolyhedronIndex()[tabRes[0]-offsetCell-1] - 1;
+                    int nbOfFacesConstitutingAlreadyBuiltPolyh = _polyhedronNodal->getPolyhedronIndex()[tabRes[0]-offsetCell] - _polyhedronNodal->getPolyhedronIndex()[tabRes[0]-offsetCell-1];
+                    for (int k1=0; k1<nbOfFacesConstitutingAlreadyBuiltPolyh && (ret_compare==0); k1++)
+                    {
+                      int curFaceId=facesConstitutingAlreadyBuiltPolyh[k1];
+                      if(curFaceId>NumberOfConstituent)//In other case it is not a polyhedron : no chance to fit if you see comment 30 lines behind.
+                      {
+                        int nbOfNodesForCurrentFace =
+                          Constituentpolygonsnodalindex[curFaceId-NumberOfConstituent]
+                          - Constituentpolygonsnodalindex[curFaceId-NumberOfConstituent-1];
+                        MEDMODULUSARRAY face (nbOfNodesForCurrentFace,&Constituentpolygonsnodalvalue[0]+
+                                              Constituentpolygonsnodalindex[curFaceId-NumberOfConstituent-1]-1);
+                        ret_compare = face_poly.compare(face);
+                        if (ret_compare)
+                        {
+                          PolyDescending.push_back(ret_compare*curFaceId); // we had it to the connectivity
+                          insert_vector(Reversedescendingconnectivityvalue, 2*(curFaceId-1)+1,
+                                        i + 1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS));
+                        }
+                      }
+                    }
+                  }
+                }
+              }
 
 	      // if not found, face_poly must be created
 
@@ -1751,6 +1809,7 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 		}
 	    }
 	}
+      delete [] tabRes;
 
       if (getNumberOfPolyhedron() > 0)
 	{
@@ -2261,13 +2320,13 @@ const int * CONNECTIVITY::getConnectivityOfAnElementWithPoly(MED_EN::medConnecti
 	    }
 	  else
 	    {
-	      int localNumber=Number-nbOfClassicalElements;
+	      int localNumber=Number-nbOfClassicalElements-1;
 	      if(localNumber<getNumberOfPolygons())
 		{
 		  newConstituentValue = getPolygonsConnectivity(ConnectivityType,Entity);
 		  newConstituentIndex = getPolygonsConnectivityIndex(ConnectivityType,Entity);
-		  lgth=newConstituentIndex[localNumber]-newConstituentIndex[localNumber-1];
-		  return newConstituentValue+newConstituentIndex[localNumber-1]-1;
+		  lgth=newConstituentIndex[localNumber+1]-newConstituentIndex[localNumber];
+		  return newConstituentValue+newConstituentIndex[localNumber]-1;
 		}
 	      else
 		throw  MEDEXCEPTION("Unknown number");
