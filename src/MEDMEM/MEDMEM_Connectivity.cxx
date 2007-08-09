@@ -1352,7 +1352,9 @@ void CONNECTIVITY::calculateDescendingConnectivity()
       ConstituentNodalConnectivityIndex[0]=1;
 
       _constituent->_entityDimension = _entityDimension-1;
-      if (ConstituentsTypes[1]==MED_NONE)
+      if(ConstituentsTypes[0]==MED_NONE && ConstituentsTypes[1]==MED_NONE && _numberOfTypes==0)
+        _constituent->_numberOfTypes = 0;
+      else if (ConstituentsTypes[1]==MED_NONE)
 	_constituent->_numberOfTypes = 1;
       else
 	_constituent->_numberOfTypes = 2;
@@ -1568,7 +1570,8 @@ void CONNECTIVITY::calculateDescendingConnectivity()
       delete [] ConstituentNodalConnectivityIndex;
       delete [] ConstituentNodalConnectivity;
       delete [] ReverseDescendingConnectivityValue;
-      _constituent->_count[1]=tmp_NumberOfConstituentsForeachType[0]+1;
+      if (_constituent->_numberOfTypes > 0)
+        _constituent->_count[1]=tmp_NumberOfConstituentsForeachType[0]+1;
       delete [] tmp_NumberOfConstituentsForeachType;
 
       _descending = new MEDSKYLINEARRAY(_count[_numberOfTypes]-1,
