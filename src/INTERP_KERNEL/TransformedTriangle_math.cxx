@@ -278,21 +278,18 @@ namespace INTERP_UTILS
 	_coords[5*R + 2] - _coords[5*P + 2]
       };
     
-    const double normal[3] =
-      {
-	pq[1]*pr[2] - pq[2]*pr[1],
-	pq[2]*pr[0] - pq[0]*pr[2],
-	pq[0]*pr[1] - pq[1]*pr[0]
-      };
+    double normal[3];
+
+    cross(pq, pr, normal);
     
     static const double EDGE_VECTORS[18] =
       {
 	1.0, 0.0, 0.0, // OX
 	0.0, 1.0, 0.0, // OY
 	0.0, 0.0, 1.0, // OZ
+	-1.0,-1.0, 1.0, // XY
 	0.0,-1.0, 1.0, // YZ
-	1.0, 0.0,-1.0, // ZX
-	-1.0,-1.0, 1.0  // XY
+	1.0, 0.0,-1.0 // ZX
       };
     
     const double edgeVec[3] = { 
@@ -301,9 +298,9 @@ namespace INTERP_UTILS
       EDGE_VECTORS[3*edge + 2],
     };
     
-    const double lenNormal = sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2]);
-    const double lenEdgeVec = sqrt(edgeVec[0]*edgeVec[0] + edgeVec[1]*edgeVec[1] + edgeVec[2]*edgeVec[2]);
-    const double dotProd = normal[0]*edgeVec[0] + normal[1]*edgeVec[1] + normal[2]*edgeVec[2];
+    const double lenNormal = norm(normal);
+    const double lenEdgeVec = norm(edgeVec);
+    const double dotProd = dot(normal, edgeVec);
     
     return 3.14159262535 - acos( dotProd / ( lenNormal * lenEdgeVec ) );
   }
@@ -438,19 +435,19 @@ namespace INTERP_UTILS
     const double cRP = calcStableC(RP, dp);
     const double cPQ = calcStableC(PQ, dp);
 
+    double alpha = 0.0;
+    
     // coordinate to use for projection (Grandy, [57]) with edges
     // OX, OY, OZ, XY, YZ, ZX in order : 
     // (y, z, x, h, h, h)
     // for the first three we could also use {2, 0, 1}
     static const int PROJECTION_COORDS[6] = { 1, 2, 0, 3, 3, 3 } ;
-
-    double alpha = 0.0;
     
     const int coord = PROJECTION_COORDS[ dp ];
     
     // coordinate values for P, Q and R
     const double coordValues[3] = { _coords[5*P + coord], _coords[5*Q + coord], _coords[5*R + coord] };
-
+    
     if(project)
       {
 	// products coordinate values with corresponding double product

@@ -802,7 +802,7 @@ namespace INTERP_UTILS
     // std::cout << "surface above corner " << corner << " : " << "n = " << normal << ", t = [" <<  calcTByDevelopingRow(corner, 1, false) << ", "  << calcTByDevelopingRow(corner, 2, false) << ", " << calcTByDevelopingRow(corner, 3, false) << "] - stable : " << calcStableT(corner)  << std::endl;
     //? we don't care here if the triple product is "invalid", that is, the triangle does not surround one of the
     // edges going out from the corner (Grandy [53])
-    return ( calcTByDevelopingRow(corner, 2, false) * normal ) >= 0.0;
+    return ( calcTByDevelopingRow(corner, 1, false) * normal ) >= 0.0;
     //return ( calcStableT(corner) * normal ) >= 0.0;
   }
 
