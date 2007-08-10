@@ -168,7 +168,10 @@ bin_PROGRAMS= \
 	create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_mesh_c3h8q4_wrong create_mesh_c2q4s2_wrong create_grid create_mesh_c2q4 create_mesh_c3h8 create_poly3D
 
 AM_CPPFLAGS= $(libmedmem_la_CPPFLAGS)
-LDADD= $(libmedmem_la_LDFLAGS) -lm -lSALOMEBasics libmedmem.la
+LDADD= $(libmedmem_la_LDFLAGS) -lm libmedmem.la
+if MED_ENABLE_KERNEL
+     LDADD+=-lSALOMEBasics
+endif
 
 dist_ensight2med_SOURCES= ensight2med.cxx
 dist_med2ensight_SOURCES= med2ensight.cxx
