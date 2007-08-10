@@ -50,6 +50,15 @@ do
 done
 
 ########################################################################
+# Test if the KERNEL_ROOT_DIR is set correctly if KERNEL required
+
+if test ${MED_WITH_KERNEL} = yes; then
+    if test ! -d "${KERNEL_ROOT_DIR}"; then
+        echo "failed : KERNEL_ROOT_DIR variable is not correct !"
+        exit
+    fi
+fi
+########################################################################
 # Test if the GUI_ROOT_DIR is set correctly if GUI required
 
 if test ${MED_WITH_GUI} = yes; then
