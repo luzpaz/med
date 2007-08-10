@@ -37,8 +37,8 @@ echo
 echo
 
 dnl remember MED_WITH_KERNEL set by build configure
-MED_WITH_KERNEL=yes
-MED_WITH_GUI=yes
+MED_WITH_KERNEL=no
+MED_WITH_GUI=no
 old_with_kernel=${MED_WITH_KERNEL}
 
 dnl
@@ -233,32 +233,34 @@ echo "MED_WITH_GUI   : ${MED_WITH_GUI}"
 echo ---------------------------------------------
 
 openpbs_ok=no
-echo
-echo ---------------------------------------------
-echo testing OpenPBS
-echo ---------------------------------------------
-echo
+# CHECK_OPENPBS ONLY if MED_WITH_KERNEL=yes
+# echo
+# echo ---------------------------------------------
+# echo testing OpenPBS
+# echo ---------------------------------------------
+# echo
 
-CHECK_OPENPBS
-dnl openpbs_ok is set to yes by CHECK_OPENPBS
+# CHECK_OPENPBS
+# dnl openpbs_ok is set to yes by CHECK_OPENPBS
 
-echo
-echo ---------------------------------------------
-echo testing LSF
-echo ---------------------------------------------
-echo
+# CHECK_LSF ONLY if MED_WITH_KERNEL=yes
+# echo
+# echo ---------------------------------------------
+# echo testing LSF
+# echo ---------------------------------------------
+# echo
 
 lsf_ok=no
-CHECK_LSF
-dnl lsf_ok is set to yes by CHECK_LSF
+# CHECK_LSF
+# dnl lsf_ok is set to yes by CHECK_LSF
 
-
-echo
-echo ----------------------------------------------
-echo testing CPPUNIT only required for unit testing
-echo ----------------------------------------------
-echo
-CHECK_CPPUNIT
+# CHECK_CPPUNIT ONLY if MED_WITH_KERNEL=yes
+# echo
+# echo ----------------------------------------------
+# echo testing CPPUNIT only required for unit testing
+# echo ----------------------------------------------
+# echo
+# CHECK_CPPUNIT
 
 echo
 echo ---------------------------------------------
@@ -304,6 +306,22 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	dnl
 
 	CHECK_WITHIHM
+
+        echo
+        echo ---------------------------------------------
+        echo testing OpenPBS
+        echo ---------------------------------------------
+        echo
+
+        CHECK_OPENPBS
+
+        echo
+        echo ---------------------------------------------
+        echo testing LSF
+        echo ---------------------------------------------
+        echo
+
+        CHECK_LSF
 
 	dnl
 	dnl ---------------------------------------------
@@ -441,6 +459,14 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	CHECK_HTML_GENERATORS
 
 
+        echo
+        echo ----------------------------------------------
+        echo testing CPPUNIT only required for unit testing
+        echo ----------------------------------------------
+        echo
+        
+        CHECK_CPPUNIT
+
 }
 else
 {
@@ -450,6 +476,8 @@ else
 	AC_SUBST(WITHIHM)
 	AC_SUBST(WITHOPENPBS)
 	CPPFLAGS="$CPPFLAGS -DMED_WITHOUT_KERNEL"
+
+        AM_CONDITIONAL(CPPUNIT_IS_OK, test)
 }
 fi # MED_WITH_KERNEL
 
