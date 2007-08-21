@@ -49,5 +49,9 @@ dist_libMEDMEMImpl_la_SOURCES= \
 
 libMEDMEMImpl_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../MEDMEM -I$(top_builddir)/idl -I$(top_builddir)/salome_adm/unix -I$(srcdir)/../MEDWrapper/V2_1/Core
-libMEDMEMImpl_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSalomeCommunication -lSalomeGenericObj \
-	../MEDMEM/libmedmem.la ../../idl/libSalomeIDLMED.la
+libMEDMEMImpl_la_LDFLAGS= \
+	../../idl/libSalomeIDLMED.la \
+	../MEDMEM/libmedmem.la \
+	${KERNEL_LDFLAGS} -lSalomeLifeCycleCORBA -lSALOMELocalTrace -lSalomeCommunication -lSalomeGenericObj -lSalomeNS \
+	$(MED2_LIBS) \
+	$(HDF5_LIBS)

@@ -32,8 +32,18 @@ libMEDEngine_la_CPPFLAGS= @CAS_CPPFLAGS@ $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KER
 	-I$(srcdir)/../MEDMEM_I -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
 
-libMEDEngine_la_LDFLAGS= @CAS_OCAF@ $(HDF5_LIBS) ${KERNEL_LDFLAGS} @CORBA_LIBS@ \
-	-lSalomeContainer -lSalomeHDFPersist -lSalomeDS -lSalomeNS -lRegistry -lOpUtil \
-	../MEDMEM_I/libMEDMEMImpl.la $(top_builddir)/idl/libSalomeIDLMED.la
+libMEDEngine_la_LDFLAGS=\
+	$(top_builddir)/idl/libSalomeIDLMED.la \
+	../MEDMEM_I/libMEDMEMImpl.la \
+	${KERNEL_LDFLAGS} -lTOOLSDS -lSalomeHDFPersist
+#	${KERNEL_LDFLAGS} \
+#	@CORBA_LIBS@ \
+#	@CAS_OCAF@ \
+#	$(HDF5_LIBS)
+# -lOpUtil -lSalomeContainer -lSalomeDS -lSalomeNS -lRegistry
+#	
+#	
+
+
 
 dist_salomescript_DATA=  MED_test1.py MED_test2.py Med_Gen_test.py testMedAlliances.py testMedAlliances1.py

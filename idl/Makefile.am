@@ -47,7 +47,9 @@ libSalomeIDLMED_la_CPPFLAGS =\
 	-I$(top_builddir)/idl \
 	@CORBA_CXXFLAGS@ @CORBA_INCLUDES@ @KERNEL_CXXFLAGS@
 libSalomeIDLMED_la_LDFLAGS = -no-undefined -version-info=0:0:0
-libSalomeIDLMED_la_LIBADD  = @CORBA_LIBS@
+libSalomeIDLMED_la_LIBADD  = \
+	@CORBA_LIBS@ \
+	$(KERNEL_LDFLAGS) -lSalomeIDLKernel
 
 # These variables defines the building process of CORBA files
 OMNIORB_IDL         = @OMNIORB_IDL@

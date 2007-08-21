@@ -15,7 +15,6 @@
 
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MED_Gen)
-//#include CORBA_CLIENT_HEADER(SMESH_Mesh)
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
 
 class MedGUI: public SalomeApp_Module
@@ -36,7 +35,7 @@ public:
 
   void createMedAction( const int, const QString&, const QString& = "" );
 
-  virtual void                        contextMenuPopup( const QString&, QMenu*, QString& );
+  //virtual void                        contextMenuPopup( const QString&, QMenu*, QString& );
 
   //virtual bool SetSettings       ();
   //virtual bool CustomPopup       ( QAD_Desktop* parent, QPopupMenu* popup, const QString & theContext,

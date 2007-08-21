@@ -58,15 +58,6 @@
 
 #include <MedGUI_Selection.h>
 
-// QT Includes
-//#include <qinputdialog.h>
-
-//VRV: porting on Qt 3.0.5
-//#if QT_VERSION >= 0x030005
-//#include <qlineedit.h>
-//#endif
-//VRV: porting on Qt 3.0.5
-
 using namespace std;
 
 static CORBA::ORB_var   _orb;
@@ -80,42 +71,6 @@ MedGUI::MedGUI() :
   SalomeApp_Module( "MED" )
 {
 }
-
-//=============================================================================
-/*!
- *
- */
-//=============================================================================
-/* 
-void MedGUI::createPopupItem( const int id,
-                              const QString& clients,
-                              const QString& types,
-                              const QString& theRule,
-			      const int pId )
-{
-  int parentId = pId;
-  if( pId!=-1 )
-    parentId = popupMgr()->actionId( action( pId ) );
-
-  if( !popupMgr()->contains( popupMgr()->actionId( action( id ) ) ) )
-    popupMgr()->insert( action( id ), parentId, 0 );
-
-  QChar lc = QtxPopupMgr::Selection::defEquality();
-  QString rule = "(%1)";
-  if( !types.isEmpty() )
-    rule += " and (%2) and (%3)";
-
-  rule = rule.arg( QString( "client in {%1}" ).arg( clients ) );
-
-  if( !types.isEmpty() )
-  {
-    rule = rule.arg( QString( "%1>0" ).arg( QtxPopupMgr::Selection::defSelCountParam() ) );
-    rule = rule.arg( QString( "%1type in {%2}" ).arg( lc ).arg( types ) );
-  }
-  rule += theRule;
-  popupMgr()->setRule( action( id ), rule, true );
-}
-*/
 
 void MedGUI::createMedAction( const int id, const QString& po_id, const QString& icon_id )
 {
@@ -142,6 +97,9 @@ void MedGUI::createMedAction( const int id, const QString& po_id, const QString&
 		false,
 		this,
 		SLOT( onGUIEvent() ) );
+
+  if ( action( id ) )
+    action( id )->setObjectName( QString( "Action %1" ).arg( id ) );
 }
 
 //=============================================================================
@@ -179,25 +137,6 @@ void MedGUI::initialize( CAM_Application* app )
   createTool( 4031, medTb );
   createTool( 4032, medTb );
   createTool( 4033, medTb );
-
-//   QString OB = "'ObjectBrowser'",
-//           View = QString("'%1'").arg( "VTKViewer" /* SVTK_Viewer::Type()*/ );
-
-//   createPopupItem( 8031, View, "", "" );
-//   createPopupItem( 9002, OB, "", "" );
-//   createPopupItem( 903,  OB, "", "" );
-}
-
-void MedGUI::contextMenuPopup( const QString& client, QMenu* menu, QString& /*title*/ )
-{  
-  SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( application() );
-  if( app )
-  {
-    MedGUI_Selection sel( client, app->selectionMgr() );
-    popupMgr()->setMenu( menu );
-    popupMgr()->setSelection( &sel );
-    popupMgr()->updateMenu();
-  }
 }
 
 QString MedGUI::engineIOR() const
@@ -214,6 +153,7 @@ QString MedGUI::engineIOR() const
 
 void MedGUI::windows( QMap<int, int>& mappa ) const
 {
+  mappa.clear();
   mappa.insert( SalomeApp_Application::WT_ObjectBrowser, Qt::LeftDockWidgetArea );
   mappa.insert( SalomeApp_Application::WT_PyConsole, Qt::BottomDockWidgetArea );
 }
@@ -224,10 +164,12 @@ void MedGUI::windows( QMap<int, int>& mappa ) const
  *
  */
 //=============================================================================
+#include <QMetaObject>
+#include <QtxAction.h>
 void MedGUI::onGUIEvent()
 {
-  const QAction* obj = qobject_cast<QAction *>(sender());
-  if ( !obj );
+  const QtxAction* obj = qobject_cast<const QtxAction*>(sender());
+  if ( !obj )
     return;
   int id = actionId( obj );
   if ( id != -1 )
@@ -507,28 +449,13 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 			anIOR = anAttr;
 			aMesh = SALOME_MED::MESH::_narrow( _orb->string_to_object(anIOR->Value().c_str()) );
 			if ( aMesh->_is_nil() )
-			  {
-			    //  			    aM = SMESH::SMESH_Mesh::_narrow(_orb->string_to_object(anIOR->Value()));
-			    //  			    if ( aM->_is_nil() )
-			    //  			      {
-			    //  				QAD_MessageBox::warn1
-			    //  				  ( QAD_Application::getDesktop(),
-			    //  				    tr ("MED_WRN_WARNING"),
-			    //  				    tr ("MED_INF_NOTIMPL"),
-			    //  				    tr ("MED_BUT_OK") );
-			    //  				break;
-			    //  			      }
-			    //  			    aMesh = aM->GetMEDMesh();
-			    if ( aMesh->_is_nil() )
-			      {
-				SUIT_MessageBox::warning
-				  ( application()->desktop(),
-				    tr ("MED_WRN_WARNING"),
-				    tr ("MED_INF_NOTIMPL") );
-				//tr ("MED_BUT_OK") ); by default
-				break;
-			      }
-  			  }
+                        {
+                          SUIT_MessageBox::warning
+                            ( application()->desktop(),
+                              tr ("MED_WRN_WARNING"),
+                              tr ("MED_INF_NOTIMPL") );
+                          break;
+                        }
   			DumpMesh( aMesh );
 			//Sel->ClearFilters() ;
 		      }
@@ -575,26 +502,6 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 		    if (aMorSM->FindAttribute(anAttr, "AttributeIOR"))
 		      {
 			anIOR = anAttr;
-			//			aSubM = SMESH::SMESH_subMesh::_narrow( _orb->string_to_object(anIOR->Value()) );
-			//  			if ( aSubM->_is_nil() )
-			//  			  {
-			//  			    aFam=SALOME_MED::FAMILY::_narrow( _orb->string_to_object(anIOR->Value()));
-			//  			    if ( aFam->_is_nil() )
-			//  			      {
-			//  				QAD_MessageBox::warn1
-			//  				  ( QAD_Application::getDesktop(),
-			//  				    tr ("MED_WRN_WARNING"),
-			//  				    tr ("MED_INF_NOTIMPL"),
-			//  				    tr ("MED_BUT_OK") );
-			//  				break;
-			//  			      }
-			//  			    DumpSubMesh( aFam );
-			//    }
-			//  			else
-			//  			  {
-			//  			    DumpSubMesh( aSubM );
-			//Sel->ClearFilters() ;
-			//       }
 		      }
 		    else
 		      {
@@ -654,53 +561,6 @@ bool MedGUI::OnKeyPress (QKeyEvent* pe,
   return true;
 }
 
-//=============================================================================
-/*!
- *
- */
-//=============================================================================
-/*bool MedGUI::SetSettings ()
-{
-  MESSAGE("MedGUI::SetSettings");
-  return true;
-}*/
-
-//=============================================================================
-/*!
- *
- */
-//=============================================================================
-/*bool MedGUI::CustomPopup ( QPopupMenu* popup,
-			   const QString & theContext,
-			   const QString & theParent,
-			   const QString & theObject )
-{
-  MESSAGE("MedGUI::CustomPopup");
-  popup->clear();
-  return true;
-}*/
-
-//=============================================================================
-/*!
- *
- */
-//=============================================================================
-/*bool MedGUI::ActiveStudyChanged()
-{
-  return true;
-}*/
-
-//=============================================================================
-/*!
- *
- */
-//=============================================================================
-/*void MedGUI::DefinePopup( QString & theContext, QString & theParent, QString & theObject )
-{
-  theObject = "";
-  theContext = "";
-}
-*/
 //=============================================================================
 /*!
  *
@@ -773,26 +633,6 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
   return true;
 }
 
-//=============================================================================
-/*!
- *
- */
-//=============================================================================
-//  bool MedGUI::DumpSubMesh( SMESH::SMESH_subMesh_ptr aSubMesh )
-//  {
-//    if ( aSubMesh->_is_nil() )
-//      return false;
-
-//    SALOME_MED::FAMILY_var Fam = aSubMesh->GetFamily();
-//    if ( Fam->_is_nil() )
-//      return false;
-
-//    SALOME_MED::long_array_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
-//    for (int l=0;l<tabnoeuds->length();l++)
-//      SCRUTE(tabnoeuds[l]);
-
-//    return true;
-//  }
 //=============================================================================
 /*!
  *
