@@ -179,6 +179,7 @@ public:
   inline void setName(string Name);
   inline void setDescription(string Description);
   void setMesh(MESH *Mesh) const;
+  void setMeshDirectly(MESH *Mesh) const { _mesh=Mesh; }
   inline void setMeshName(const string & meshName);
   inline void setAll(bool All);
   inline void setEntity(MED_EN::medEntityMesh Entity);

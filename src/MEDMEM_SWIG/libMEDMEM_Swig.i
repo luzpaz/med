@@ -790,6 +790,15 @@ public:
 	PyObject * result = Binding<double>::Traducer(nComp*nVal);
 	return result;
       }
+      
+    %newobject execFunc( int nbOfCompo, PyObject * func );
+    FIELD<T1, INTERLACING_TAG> *execFunc( int nbOfCompo, PyObject *func )
+      {
+        MyFunction<T1,T1>::_pyFunc=func;
+        MyFunction<T1,T1>::_nbOfComponent=nbOfCompo;
+        MyFunction<T1,T1>::_spaceDim=self->getNumberOfComponents();
+        return self->execFunc(nbOfCompo, MyFunction<T1,T1>::EvalPy2Cpp);
+      }
 
     %newobject __add__(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * __add__(const FIELD<T1, INTERLACING_TAG> & m)
@@ -2497,10 +2506,10 @@ GRID * createGridFromMesh( MESH * aMesh );
       FIELD<T, INTERLACING_TAG> * fieldAnalytic =
 	new FIELD<T, INTERLACING_TAG>(Support, NumberOfComponents);
 
-      MyFunction<T>::_pyFunc=double_function;
-      MyFunction<T>::_nbOfComponent=NumberOfComponents;
-      MyFunction<T>::_spaceDim=Support->getMesh()->getSpaceDimension();
-      fieldAnalytic->fillFromAnalytic(MyFunction<T>::EvalPy2Cpp);
+      MyFunction<T,double>::_pyFunc=double_function;
+      MyFunction<T,double>::_nbOfComponent=NumberOfComponents;
+      MyFunction<T,double>::_spaceDim=Support->getMesh()->getSpaceDimension();
+      fieldAnalytic->fillFromAnalytic(MyFunction<T,double>::EvalPy2Cpp);
       return fieldAnalytic;
     }
 %}

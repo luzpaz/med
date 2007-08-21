@@ -839,6 +839,8 @@ public:
 
   typedef void (*myFuncType)(const double *,T*);
   void fillFromAnalytic(myFuncType f) throw (MEDEXCEPTION);
+  typedef void (*myFuncType2)(const T *,T*);
+  FIELD<T,INTERLACING_TAG> *execFunc(int nbOfComponents, myFuncType2 f) throw (MEDEXCEPTION);
 };
 }
 
@@ -3295,6 +3297,22 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTI
     for(j=0;j<spaceDim;j++)
       delete [] xyz[j];
   delete [] xyz;
+}
+/*!
+  Execute a function on _values on 'this' and put the result on a newly created field that has to be deallocated.
+  WARNING : "this" must have allocated its array by setting this->_support and this->_numberOfComponents properly.
+  Typically you should use it on a field built with constructor FIELD<T>::FIELD<T>(SUPPORT *,int nbOfComponents)
+ */
+                                                                         template <class T, class INTERLACING_TAG>
+                                                                         FIELD<T,INTERLACING_TAG> *FIELD<T, INTERLACING_TAG>::execFunc(int nbOfComponents, myFuncType2 f) throw (MEDEXCEPTION)
+{
+  FIELD<T,INTERLACING_TAG> *ret=new FIELD<T,INTERLACING_TAG>(_support,nbOfComponents);
+  const T* valsInput=getValue();
+  T* valsOutPut=(T*)ret->getValue();
+  int i,j;
+  for(i=0;i<_numberOfValues;i++)
+    f(valsInput+i*_numberOfComponents,valsOutPut+i*nbOfComponents);
+  return ret;
 }
 
 }//End namespace MEDMEM

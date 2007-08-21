@@ -1386,7 +1386,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
   // If _fieldName is not set in driver, try to use _ptrfield->_fieldName
   if ( ( MED_FIELD_DRIVER<T>::_fieldName.empty()       ) &&
        ( !MED_FIELD_DRIVER<T>::_ptrField->_name.empty() )    )
-    fieldName=MED_FIELD_DRIVER<T>::_ptrField->_name;
+    fieldName = MED_FIELD_DRIVER<T>::_ptrField->_name;
   else
     fieldName = MED_FIELD_DRIVER<T>::_fieldName;
 
@@ -1514,13 +1514,13 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
   // de doubler l'utilisation de la taille mémoire si le champ n'est pas dans
   // le bon mode.
   FIELD<T,FullInterlace> * myField = 0;
+  
   if ( MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
     myField = MED_FIELD_DRIVER<T>::_ptrField;
-  else
-    myField = FieldConvert( *( dynamic_cast< FIELD<T,NoInterlace> * > (MED_FIELD_DRIVER<T>::_ptrField )
-			       )
-			    );
-
+  else {
+    //myField = FieldConvert( *( dynamic_cast< FIELD<T,NoInterlace> * > (MED_FIELD_DRIVER<T>::_ptrField )
+    myField = FieldConvert( *( (FIELD<T,NoInterlace>*) (MED_FIELD_DRIVER<T>::_ptrField ) ) );			    
+   }
 
   // Il est necessaire de calculer le tableau
   // du nombre d'entités cumulées de chaque type géométrique du maillage
@@ -1616,7 +1616,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
       numberOfElForMED = numberOfElements;
     } else {
       value = myField->getRow(number[index-1]);
-      profilName = profilNameList[typeNo].substr(0,MED_TAILLE_NOM);
+      profilName = (profilNameList.size()>typeNo) ? profilNameList[typeNo].substr(0,MED_TAILLE_NOM) : MED_NOPFL;
       // Rem : Si le SUPPORT n'est pas onAll mais que pour un type géométrique donné le nom
       // du profil associé est MED_NOPFL alors le profil n'est pas écrit dans le fichier MED.
       // Car en MEDMEMOIRE si le champ repose sur des éléments de deux types géométriques

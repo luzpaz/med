@@ -151,7 +151,7 @@ endif
 
 bin_PROGRAMS= \
 	ensight2med med2ensight \
-	med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH \
+	med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH test_write_groups_poly\
 	test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray \
 	test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit \
 	testUGeoNameMeshEntities testUMedException testUModulusArray \
@@ -180,6 +180,7 @@ dist_med2vtk_SOURCES= med2vtk.cxx
 dist_duplicateMED_SOURCES= duplicateMED.cxx
 dist_med_test_SOURCES= med_test.cxx
 dist_duplicateMEDMESH_SOURCES= duplicateMEDMESH.cxx
+dist_test_write_groups_poly_SOURCES= test_write_groups_poly.cxx
 dist_test_MEDMEM_ModulusArray_SOURCES= test_MEDMEM_ModulusArray.cxx
 dist_test_MEDMEM_Array_SOURCES= test_MEDMEM_Array.cxx
 dist_test_MEDMEM_SkyLineArray_SOURCES= test_MEDMEM_SkyLineArray.cxx

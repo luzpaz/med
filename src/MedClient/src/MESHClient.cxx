@@ -288,3 +288,15 @@ void MESHClient::write(int index/*=0*/, const string & driverName/* = ""*/)
   MESH::write(index,driverName);
 }
 
+//================================================================================
+/*!
+ * \brief fillCopy() and then print myself to a stream
+ */
+//================================================================================
+
+void MESHClient::printMySelf(ostream &os) const
+{
+  MESHClient* that = (MESHClient*)this;
+  that->fillCopy();
+  MESH::printMySelf( os );  
+}

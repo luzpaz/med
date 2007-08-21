@@ -29,6 +29,17 @@
   using namespace MED_EN;
 %}
 
+%typemap(in) MESH* {
+  if ((SWIG_ConvertPtr($input, (void **) &$1, $1_descriptor, 0)) == -1) {
+    MESHClient *client;
+    if ((SWIG_ConvertPtr($input, (void **) &client, $descriptor(MESHClient *), 0)) == -1) {
+      SWIG_Python_TypeError("MESH* or MESHClient*", $input);
+      return NULL;
+    }
+    $1 = (MESH *) client;
+  }
+}
+
 %include "libMedCorba_Swig.i"
 %include "libMEDMEM_Swig.i"
 
@@ -36,7 +47,6 @@
 {
   $1 = ($input != 0);
 }
-
 
 /*
   managing C++ exception in the Python API

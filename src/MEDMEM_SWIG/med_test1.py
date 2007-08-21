@@ -442,7 +442,10 @@ if (nbMeshes>0):
             nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
             normalBound = mesh.getNormal(suppBound)
-            numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
+            if suppBound.isOnAllElements():
+                numberSuppBound = range(1,nbElmBound+1)
+            else:
+                numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
             for j in range(nbElmBound):
                 valInd = numberSuppBound[j]
                 normalBoundJ = normalBound.getRow(valInd)
@@ -456,7 +459,10 @@ if (nbMeshes>0):
             nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
             normalBound = mesh.getNormal(suppBound)
-            numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
+            if suppBound.isOnAllElements():
+                numberSuppBound = range(1,nbElmBound+1)
+            else:
+                numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
             for j in range(nbElmBound):
                 valInd = numberSuppBound[j]
                 normalBoundJ = normalBound.getRow(valInd)

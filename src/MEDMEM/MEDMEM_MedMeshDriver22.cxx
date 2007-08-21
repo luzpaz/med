@@ -569,6 +569,8 @@ int  MED_MESH_RDONLY_DRIVER22::getCOORDINATE()
       _ptrMesh->_numberOfNodes = NumberOfNodes ;
 
       // create a COORDINATE object
+      if (_ptrMesh->_coordinate)
+        delete _ptrMesh->_coordinate;
       _ptrMesh->_coordinate = new COORDINATE(SpaceDimension, NumberOfNodes, MED_EN::MED_FULL_INTERLACE);
       
       med_2_2::med_repere rep ; // ATTENTION ---> DOIT ETRE INTEGRE DS MESH EF: FAIT NON?
@@ -762,7 +764,8 @@ int MED_MESH_RDONLY_DRIVER22::getCONNECTIVITY()
 	  MESSAGE(LOC<<"No FACE defined.") ;
 	} else {
           MESSAGE(LOC<<" SAUVEGARDE DE LA CONNECTIVITE DES FACES DANS L'OBJET CONNECTIVITY" );
-	  Connectivity->_constituent=ConnectivityFace ; 
+          delete Connectivity->_constituent;
+	  Connectivity->_constituent=ConnectivityFace;
         }
       }
 
@@ -801,6 +804,8 @@ int MED_MESH_RDONLY_DRIVER22::getCONNECTIVITY()
         }
       }
       }
+      if (_ptrMesh->_connectivity)
+        delete _ptrMesh->_connectivity;
       _ptrMesh->_connectivity  = Connectivity ;                                      
 
       // all right !
@@ -1362,100 +1367,123 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 
       
 	} // end classic geometric types
+      else
+        {//Polyg/Polh only...
+          delete [] Connectivity->_count;
+          Connectivity->_count=new int[1];
+          Connectivity->_count[0]=1;
+        }
       delete[] tmp_cells_count;
 
+      int NumberOfPolygons = 0;
+      if (_ptrMesh->_meshDimension != 3 || Connectivity->_entity != MED_EN::MED_CELL)// In the contrary case no search of polygons needed
+      {
+        // Lecture des polygones MED_CELL
+        NumberOfPolygons = MEDnEntMaa(_medIdt,
+                                      const_cast <char *> (_ptrMesh->_name.c_str()),
+                                      med_2_2::MED_CONN,
+                                      med_2_2::MED_MAILLE,
+                                      med_2_2::MED_POLYGONE,
+                                      med_2_2::MED_NOD);
 
+        // Correction to permit the loading of mesh dimensionned at 2 even
+        // if it has only MED_POLYGON elements
 
-      // Lecture des polygones MED_CELL
-      int NumberOfPolygons = MEDnEntMaa(_medIdt,
-					const_cast <char *> (_ptrMesh->_name.c_str()),
-					med_2_2::MED_CONN,
-					Entity,
-					med_2_2::MED_POLYGONE,
-					med_2_2::MED_NOD);
+        if (NumberOfPolygons > 0)
+        {
+          if (Connectivity->_entityDimension < 2) Connectivity->_entityDimension = 2;
+        }
 
-      // Correction to permit the loading of mesh dimensionned at 2 even
-      // if it has only MED_POLYGON elements
+        if (NumberOfPolygons > 0)
+        {
+          // By consequence this exception will never occur
+          if (Connectivity->_entityDimension == 1)
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 2D mesh, polygons need at least one 2D cell of a classic geometric type !"));
+          med_2_2::med_int ConnectivitySize;
+          med_2_2::med_err err1 = MEDpolygoneInfo(_medIdt,
+                                                  const_cast <char *> (_ptrMesh->_name.c_str()),
+                                                  med_2_2::MED_MAILLE,
+                                                  med_2_2::MED_NOD,
+                                                  &ConnectivitySize);
+          if (err1 != MED_VALID)
+          {
+            MESSAGE(LOC<<": MEDpolygoneInfo returns "<<err1);
+            return MED_ERROR;
+          }
 
-      if (NumberOfPolygons > 0)
-	{
-	  if (Connectivity->_entityDimension < 2) Connectivity->_entityDimension = 2;
-	}
+          med_2_2::med_int* PolygonsConnectivity = new med_2_2::med_int[ConnectivitySize];
+          med_2_2::med_int* PolygonsConnectivityIndex = new med_2_2::med_int[NumberOfPolygons+1];
 
-      if (NumberOfPolygons > 0)
-	{
-	  // By consequence this exception will never occur
-	  if (Connectivity->_entityDimension == 1)
-	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 2D mesh, polygons need at least one 2D cell of a classic geometric type !"));
-	  med_2_2::med_int ConnectivitySize;
-	  med_2_2::med_int err1 = MEDpolygoneInfo(_medIdt,
-						  const_cast <char *> (_ptrMesh->_name.c_str()),
-						  Entity,
-						  med_2_2::MED_NOD,
-						  &ConnectivitySize);
-	  if (err1 != MED_VALID)
-	    {
-	      MESSAGE(LOC<<": MEDpolygoneInfo returns "<<err1);
-	      return MED_ERROR;
-	    }
-      
-	  med_2_2::med_int* PolygonsConnectivity = new med_2_2::med_int[ConnectivitySize];
-	  med_2_2::med_int* PolygonsConnectivityIndex = new med_2_2::med_int[NumberOfPolygons+1];
-      
-	  med_2_2::med_err err2 = MEDpolygoneConnLire(_medIdt,
-						      const_cast <char *> (_ptrMesh->_name.c_str()),
-						      PolygonsConnectivityIndex,
-						      NumberOfPolygons+1,
-						      PolygonsConnectivity,
-						      Entity,
-						      med_2_2::MED_NOD);
-	  if (err2 != MED_VALID)
-	    {
-	      MESSAGE(LOC<<": MEDpolygoneConnLire returns "<<err2);
-	      return MED_ERROR;
-	    }
-      
-	  if (Connectivity->_entityDimension == 2) {// 2D mesh : polygons in Connectivity
+          med_2_2::med_err err2 = MEDpolygoneConnLire(_medIdt,
+                                                      const_cast <char *> (_ptrMesh->_name.c_str()),
+                                                      PolygonsConnectivityIndex,
+                                                      NumberOfPolygons+1,
+                                                      PolygonsConnectivity,
+                                                      med_2_2::MED_MAILLE,
+                                                      med_2_2::MED_NOD);
+          if (err2 != MED_VALID)
+          {
+            MESSAGE(LOC<<": MEDpolygoneConnLire returns "<<err2);
+            return MED_ERROR;
+          }
+
+          if (Connectivity->_entityDimension == 2) // 2D mesh : polygons in Connectivity
+          {
 //CCRT
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-	    int* tmp_PolygonsConnectivity = new int[ConnectivitySize];
+            int* tmp_PolygonsConnectivity = new int[ConnectivitySize];
             int i ;
             for ( i = 0 ; i < ConnectivitySize ; i++ )
-               tmp_PolygonsConnectivity[i] = PolygonsConnectivity[i] ;
-	    int* tmp_PolygonsConnectivityIndex = new int[NumberOfPolygons+1];
+              tmp_PolygonsConnectivity[i] = PolygonsConnectivity[i] ;
+
+            int* tmp_PolygonsConnectivityIndex = new int[NumberOfPolygons+1];
             for ( i = 0 ; i < NumberOfPolygons+1 ; i++ )
-               tmp_PolygonsConnectivityIndex[i] = PolygonsConnectivityIndex[i] ;
-	    Connectivity->setPolygonsConnectivity(MED_NODAL,(medEntityMesh) Entity,tmp_PolygonsConnectivity,tmp_PolygonsConnectivityIndex,ConnectivitySize,NumberOfPolygons);
+              tmp_PolygonsConnectivityIndex[i] = PolygonsConnectivityIndex[i] ;
+
+            Connectivity->setPolygonsConnectivity
+              (MED_NODAL, (medEntityMesh) Entity, tmp_PolygonsConnectivity,
+               tmp_PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
+
             delete [] tmp_PolygonsConnectivity ;
             delete [] tmp_PolygonsConnectivityIndex ;
 #else
-	    Connectivity->setPolygonsConnectivity(MED_NODAL,(medEntityMesh) Entity,PolygonsConnectivity,PolygonsConnectivityIndex,ConnectivitySize,NumberOfPolygons);
+            Connectivity->setPolygonsConnectivity
+              (MED_NODAL, (medEntityMesh) Entity, PolygonsConnectivity,
+               PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
 #endif
           }
-	  else if (Connectivity->_entityDimension == 3)
-	    {
-	      if (Connectivity->_constituent == NULL) // 3D mesh : polygons in Connectivity->_constituent
-		Connectivity->_constituent = new CONNECTIVITY(MED_FACE);
+          else if (Connectivity->_entityDimension == 3)
+          {
+            if (Connectivity->_constituent == NULL) // 3D mesh : polygons in Connectivity->_constituent
+              Connectivity->_constituent = new CONNECTIVITY(MED_FACE);
+//CCRT
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-	      int* tmp_PolygonsConnectivity = new int[ConnectivitySize];
-              int i ;
-              for ( i = 0 ; i < ConnectivitySize ; i++ )
-                 tmp_PolygonsConnectivity[i] = PolygonsConnectivity[i] ;
-	      int* tmp_PolygonsConnectivityIndex = new int[NumberOfPolygons+1];
-              for ( i = 0 ; i < NumberOfPolygons+1 ; i++ )
-                 tmp_PolygonsConnectivityIndex[i] = PolygonsConnectivityIndex[i] ;
-	      Connectivity->_constituent->setPolygonsConnectivity(MED_NODAL,MED_FACE,tmp_PolygonsConnectivity,tmp_PolygonsConnectivityIndex,ConnectivitySize,NumberOfPolygons);
-              delete [] tmp_PolygonsConnectivity ;
-              delete [] tmp_PolygonsConnectivityIndex ;
+            int* tmp_PolygonsConnectivity = new int[ConnectivitySize];
+            int i ;
+            for ( i = 0 ; i < ConnectivitySize ; i++ )
+              tmp_PolygonsConnectivity[i] = PolygonsConnectivity[i] ;
+
+            int* tmp_PolygonsConnectivityIndex = new int[NumberOfPolygons+1];
+            for ( i = 0 ; i < NumberOfPolygons+1 ; i++ )
+              tmp_PolygonsConnectivityIndex[i] = PolygonsConnectivityIndex[i] ;
+
+            Connectivity->_constituent->setPolygonsConnectivity
+              (MED_NODAL, MED_FACE, tmp_PolygonsConnectivity,
+               tmp_PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
+
+            delete [] tmp_PolygonsConnectivity ;
+            delete [] tmp_PolygonsConnectivityIndex ;
 #else
-	      Connectivity->_constituent->setPolygonsConnectivity(MED_NODAL,MED_FACE,PolygonsConnectivity,PolygonsConnectivityIndex,ConnectivitySize,NumberOfPolygons);
+            Connectivity->_constituent->setPolygonsConnectivity
+              (MED_NODAL, MED_FACE, PolygonsConnectivity,
+               PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
 #endif
-	    }
-      
-	  delete[] PolygonsConnectivity;
-	  delete[] PolygonsConnectivityIndex;
-	} // end polygons
-  
+          }
+
+          delete[] PolygonsConnectivity;
+          delete[] PolygonsConnectivityIndex;
+        } // end polygons
+      }// end test on CELL
 
 
       // Lecture des polyedres MED_CELL
@@ -1799,21 +1827,21 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 
     if (MEDArrayCellFamily != NULL)
       {
-	for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_CELL);i++)
+	for (int i=0; i<_ptrMesh->getNumberOfTypesWithPoly(MED_CELL); i++)
 	  delete[] MEDArrayCellFamily[i] ;
 	delete[] MEDArrayCellFamily ;
       }
 
     if (MEDArrayFaceFamily != NULL)
       {
-	for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_FACE);i++)
+	for (int i=0; i<_ptrMesh->getNumberOfTypesWithPoly(MED_FACE); i++)
 	  delete[] MEDArrayFaceFamily[i] ;
 	delete[] MEDArrayFaceFamily ;
       }
 
     if (MEDArrayEdgeFamily != NULL)
       {
-	for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_EDGE);i++)
+	for (int i=0; i<_ptrMesh->getNumberOfTypesWithPoly(MED_EDGE); i++)
 	  delete[] MEDArrayEdgeFamily[i] ;
 	delete[] MEDArrayEdgeFamily ;
       }
@@ -2703,7 +2731,7 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
 			       const_cast <med_int*> (PolygonsConnectivity),
  			       //(med_2_2::med_entite_maillage) entity,
                                //because Med Memory works only in Nodal connectivity
-			       (med_2_2::med_entite_maillage) MED_CELL,
+			       (med_2_2::med_entite_maillage) entity,
 			       med_2_2::MED_DESC);
 #endif
 
@@ -3006,8 +3034,9 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
   { // CELLS RELATED BLOCK
     medEntityMesh entity=MED_EN::MED_CELL;
     // SOLUTION TEMPORAIRE CAR _ptrMesh->_MEDArray____Family DOIT ETRE ENLEVER DE LA CLASSE MESH
-    if  ( ( _ptrMesh->existConnectivity(MED_NODAL,entity) )|( _ptrMesh->existConnectivity(MED_DESCENDING,entity) ) ) { 
-
+    if ((_ptrMesh->existConnectivityWithPoly(MED_NODAL,entity)) |
+        (_ptrMesh->existConnectivityWithPoly(MED_DESCENDING,entity)))
+    {
       int numberOfTypes           = _ptrMesh->getNumberOfTypesWithPoly(entity) ;
       medGeometryElement  * types = _ptrMesh->getTypesWithPoly(entity) ;
 
@@ -3097,8 +3126,9 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
   { // FACE RELATED BLOCK
     medEntityMesh entity=MED_EN::MED_FACE;
     // SOLUTION TEMPORAIRE CAR _ptrMesh->_MEDArray____Family DOIT ETRE ENLEVER DE LA CLASSE MESH
-    if  ( ( _ptrMesh->existConnectivity(MED_NODAL,entity) )|( _ptrMesh->existConnectivity(MED_DESCENDING,entity) ) ) { 
-
+    if ((_ptrMesh->existConnectivityWithPoly(MED_NODAL,entity)) ||
+        (_ptrMesh->existConnectivityWithPoly(MED_DESCENDING,entity)))
+    {
       int numberOfTypes           = _ptrMesh->getNumberOfTypesWithPoly(entity) ;
       medGeometryElement  * types = _ptrMesh->getTypesWithPoly(entity) ;
       SCRUTE(numberOfTypes);
