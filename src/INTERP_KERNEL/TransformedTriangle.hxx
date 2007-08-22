@@ -89,6 +89,9 @@ namespace INTERP_UTILS
 
     bool isTriangleBelowTetraeder();
 
+    bool isPolygonAOnHFacet() const;
+
+
     ////////////////////////////////////////////////////////////////////////////////////
     /// Intersection test methods and intersection point calculations           ////////
     ////////////////////////////////////////////////////////////////////////////////////
@@ -144,6 +147,8 @@ namespace INTERP_UTILS
     ////////////////////////////////////////////////////////////////////////////////////
     
     void preCalculateDoubleProducts(void);
+
+    void resetDoubleProducts(const TriSegment seg, const TetraCorner corner);
 
     double calculateDistanceCornerSegment(const TetraCorner corner, const TriSegment seg) const;
     

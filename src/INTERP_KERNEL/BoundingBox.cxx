@@ -84,15 +84,18 @@ namespace INTERP_UTILS
 	// minimum coordinate of one is greater than the maximum coordinate of the other
 
 	//? stable version
-	/*	const double tol = 1.0e-2;
+	/*const double tol = 1.0e-2*_coords[c];
 	if(_coords[c] > otherMaxCoord + tol 
 	   || _coords[c + 3] < otherMinCoord - tol)
 	*/
+	
 	if(_coords[c] > otherMaxCoord 
 	   || _coords[c + 3] < otherMinCoord)
-	  {
+	
+	   {
 	    return true;
 	  }
+	
       }
     return false;
   }

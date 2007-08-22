@@ -5,6 +5,9 @@
 #include <cmath>
 #include "VectorUtils.hxx"
 
+#define SEG_RAY_TABLE 1 // seems correct
+#undef TEST_EPS 0.0//1.0e-14
+
 namespace INTERP_UTILS
 {
 
@@ -94,8 +97,6 @@ namespace INTERP_UTILS
     // : (x,y,z)* = (1-alpha)*A + alpha*B where
     // alpha = t_A / (t_A - t_B)
     
-    
-
     const TetraCorner corners[2] = 
       {
 	CORNERS_FOR_EDGE[2*edge],
@@ -108,12 +109,13 @@ namespace INTERP_UTILS
     const double alpha = tA / (tA - tB);
 
     // calculate point
+    // std::cout << "corner A = " << corners[0] << " corner B = " << corners[1] << std::endl;
+    // std::cout << "tA = " << tA << " tB = " << tB << " alpha= " << alpha << std::endl;
     for(int i = 0; i < 3; ++i)
       {
-	// std::cout << "tA = " << tA << " tB = " << tB << " alpha= " << alpha << std::endl;
 	pt[i] = (1 - alpha) * COORDS_TET_CORNER[3*corners[0] + i] + 
 	  alpha * COORDS_TET_CORNER[3*corners[1] + i];
-	// std::cout << pt[i] << std::endl;
+	// // std::cout << pt[i] << std::endl;
 	 assert(pt[i] >= 0.0);
 	 assert(pt[i] <= 1.0);
       }
@@ -169,7 +171,8 @@ namespace INTERP_UTILS
 	    const DoubleProduct dp = DP_FOR_SEG_FACET_INTERSECTION[dpIdx];
 	    const double sign = SIGN_FOR_SEG_FACET_INTERSECTION[dpIdx];
 	    pt[i] = -( sign * calcStableC(seg, dp) ) / s;
-	    //	    std::cout << "SegmentFacetIntPtCalc : pt[" << i << "] = " << pt[i]  << std::endl;
+	    // std::cout << "SegmentFacetIntPtCalc : pt[" << i << "] = " << pt[i]  << std::endl;
+	    // std::cout << "c(" << seg << ", " << dp << ") = " <<  sign * calcStableC(seg, dp) << std::endl;
 	    assert(pt[i] >= 0.0); 
 	    assert(pt[i] <= 1.0);
 	  }
@@ -197,7 +200,8 @@ namespace INTERP_UTILS
 	OZX, XYZ  // ZX
       };
 
-    if(calcStableC(seg,DoubleProduct( edge )) != 0.0)
+        if(calcStableC(seg,DoubleProduct( edge )) != 0.0)
+    //    if(!epsilonEqual(calcStableC(seg,DoubleProduct( edge )), 0.0, TEST_EPS))
       {
 	return false;
       } 
@@ -216,6 +220,7 @@ namespace INTERP_UTILS
 	    int idx2 = 1;
 	    DoubleProduct dp1 = DP_FOR_SEG_FACET_INTERSECTION[3*facet[i] + idx1];
 	    DoubleProduct dp2 = DP_FOR_SEG_FACET_INTERSECTION[3*facet[i] + idx2];
+	    
 	    if(dp1 == DoubleProduct( edge ))
 	      {
 		idx1 = 2;
@@ -227,11 +232,16 @@ namespace INTERP_UTILS
 		dp2 = DP_FOR_SEG_FACET_INTERSECTION[3*facet[i] + idx2];
 	      }
 	    
-	    const double c1 = SIGN_FOR_SEG_FACET_INTERSECTION[3*facet[i]+idx1]*calcStableC(seg, dp1);
-	    const double c2 = SIGN_FOR_SEG_FACET_INTERSECTION[3*facet[i]+idx2]*calcStableC(seg, dp2);
+	    const double c1 = SIGN_FOR_SEG_FACET_INTERSECTION[3*facet[i] + idx1]*calcStableC(seg, dp1);
+	    const double c2 = SIGN_FOR_SEG_FACET_INTERSECTION[3*facet[i] + idx2]*calcStableC(seg, dp2);
 
-	    isFacetCondVerified = isFacetCondVerified || c1*c2 > 0.0;
+	    //isFacetCondVerified = isFacetCondVerified || c1*c2 > 0.0;
+	    if(c1*c2 > 0.0)
+	      {
+		isFacetCondVerified = true;
+	      }
 	  }
+
 	if(!isFacetCondVerified)
 	  {
 	    return false;
@@ -347,6 +357,7 @@ namespace INTERP_UTILS
 	const DoubleProduct dp = DoubleProduct( edge );
 	const double c = calcStableC(seg, dp);
 	if(c != 0.0)
+	//	if(!epsilonEqual(c, 0.0, TEST_EPS))
 	  {
 	    return false;
 	  }
@@ -522,25 +533,23 @@ namespace INTERP_UTILS
     // dp 1   -> cond 1
     // dp 2-7 -> cond 3
     //? NB : last two rows are not completely understood and may contain errors
-    /*static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21] = 
+#if SEG_RAY_TABLE==1
+    static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21] = 
       {
 	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
 	C_01, C_XH, C_ZH, C_XY, C_10, C_ZH, C_10, // Y
 	C_XY, C_YH, C_XH, C_10, C_01, C_XH, C_01  // Z
-	};*/
+      };
+#else
+
     static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21] = 
       {
 	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
 	C_01, C_XH, C_ZH, C_XY, C_10, C_ZH, C_YZ, // Y
 	C_XY, C_YH, C_XH, C_10, C_01, C_XH, C_ZX  // Z
       };
-    /*static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21] = 
-      {
-	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
-	C_01, C_XH, C_ZH, C_XY, C_10, C_XH, C_ZX, // Y
-	C_XY, C_YH, C_XH, C_10, C_01, C_ZH, C_YZ  // Z
-      };
-    */
+#endif
+
     // facets to use
     //? not sure this is correct
     static const TetraFacet FIRST_FACET_SEGMENT_RAY_INTERSECTION[3] = 
@@ -688,7 +697,8 @@ namespace INTERP_UTILS
 
     // if two or more c-values are zero we disallow x-edge intersection
     // Grandy, p.446
-    const int numZeros = (cPQ == 0.0 ? 1 : 0) + (cQR == 0.0 ? 1 : 0) + (cRP == 0.0 ? 1 : 0);
+        const int numZeros = (cPQ == 0.0 ? 1 : 0) + (cQR == 0.0 ? 1 : 0) + (cRP == 0.0 ? 1 : 0);
+    //?    const int numZeros = (epsilonEqual(cPQ,0.0) ? 1 : 0) + (epsilonEqual(cQR,0.0) ? 1 : 0) + (epsilonEqual(cRP, 0.0) ? 1 : 0);
     
     if(numZeros >= 2 ) 
       {
@@ -717,7 +727,7 @@ namespace INTERP_UTILS
 	X, O, // OX
 	Y, O, // OY
 	Z, O, // OZ 
-	X, Y,  // XY
+	X, Y, // XY
 	Y, Z, // YZ
 	Z, X, // ZX
       };
@@ -753,7 +763,16 @@ namespace INTERP_UTILS
     const double c2 = signs[1]*calcStableC(seg, DP_FOR_SEG_FACET_INTERSECTION[3*facet + 1]);
     const double c3 = signs[2]*calcStableC(seg, DP_FOR_SEG_FACET_INTERSECTION[3*facet + 2]);
 
-    return (c1*c3 > 0.0) && (c2*c3 > 0.0);
+    if(false)
+    //if(epsilonEqual(c1, 0.0, TEST_EPS) || epsilonEqual(c2, 0.0, TEST_EPS) || epsilonEqual(c3, 0.0, TEST_EPS))
+      {
+	return false;
+      }
+    else
+      {
+	return (c1*c3 > 0.0) && (c2*c3 > 0.0);
+      }
+
   }
 
   /**
@@ -773,6 +792,7 @@ namespace INTERP_UTILS
 
     //? should we use epsilon-equality here in second test?
     //    std::cout << "coord1 : " << coord1 << " coord2 : " << coord2 << std::endl;
+    //return (coord1*coord2 <= 0.0) && epsilonEqual(coord1,coord2);
     return (coord1*coord2 <= 0.0) && (coord1 != coord2);
   }
 
@@ -799,11 +819,20 @@ namespace INTERP_UTILS
     //? is it always YZ here ?
     //? changed to XY !
     const double normal = calcStableC(PQ, C_XY) + calcStableC(QR, C_XY) + calcStableC(RP, C_XY);
-    // std::cout << "surface above corner " << corner << " : " << "n = " << normal << ", t = [" <<  calcTByDevelopingRow(corner, 1, false) << ", "  << calcTByDevelopingRow(corner, 2, false) << ", " << calcTByDevelopingRow(corner, 3, false) << "] - stable : " << calcStableT(corner)  << std::endl;
+    //std::cout << "surface above corner " << corner << " : " << "n = " << normal << ", t = [" <<  calcTByDevelopingRow(corner, 1, false) << ", "  << calcTByDevelopingRow(corner, 2, false) << ", " << calcTByDevelopingRow(corner, 3, false) << std::endl;
+    //std::cout  << "] - stable : " << calcStableT(corner)  << std::endl;
+
     //? we don't care here if the triple product is "invalid", that is, the triangle does not surround one of the
     // edges going out from the corner (Grandy [53])
-    return ( calcTByDevelopingRow(corner, 1, false) * normal ) >= 0.0;
-    //return ( calcStableT(corner) * normal ) >= 0.0;
+    //return ( calcTByDevelopingRow(corner, 1, false) * normal ) >= 0.0;
+    if(!_validTP[corner])
+      {
+	return ( calcTByDevelopingRow(corner, 1, false) * normal ) >= 0.0;
+      }
+    else
+      {
+	return ( calcStableT(corner) * normal ) >= 0.0;
+      }
   }
 
   /**

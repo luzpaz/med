@@ -4,8 +4,13 @@
 #include <cassert>
 #include <algorithm>
 #include <functional>
+#include <iterator>
 #include "VectorUtils.hxx"
 #include <math.h>
+#include <vector>
+
+#undef MERGE_CALC
+#undef COORDINATE_CORRECTION 1.0e-15
 
 class CircularSortOrder
 {
@@ -84,6 +89,16 @@ private:
   const double _a, _b;
 };
 
+class Vector3Cmp
+{
+  public:
+  bool operator()(double* const& pt1, double* const& pt2)
+  {
+    //    std::cout << "points are equal ? : " << int((pt1[0] == pt2[0]) && (pt1[1] == pt2[1]) && (pt1[2] == pt2[2])) << std::endl;
+    return (pt1[0] == pt2[0]) && (pt1[1] == pt2[1]) && (pt1[2] == pt2[2]);
+  }
+};
+
 namespace INTERP_UTILS
 {
   ////////////////////////////////////////////////////////////////////////////
@@ -113,14 +128,33 @@ namespace INTERP_UTILS
       }
 
     // h coordinate
+    
     _coords[5*P + 3] = 1 - p[0] - p[1] - p[2];
     _coords[5*Q + 3] = 1 - q[0] - q[1] - q[2];
     _coords[5*R + 3] = 1 - r[0] - r[1] - r[2];
-  
+
+    // order of substractions give different results ?
+    /* 
+    _coords[5*P + 3] = 1 - (p[0] - (p[1] - p[2]));
+    _coords[5*Q + 3] = 1 - (q[0] - (q[1] - q[2]));
+    std::cout << "old = " << 1 - q[0] - q[1] - q[2] << " calculated = " << 1 - (q[0] - (q[1] - q[2])) << " stored : " << _coords[5*Q + 3] << std::endl;
+    _coords[5*R + 3] = 1 - (r[0] -(r[1] - r[2]));
+    */
+
+
     // H coordinate
     _coords[5*P + 4] = 1 - p[0] - p[1];
     _coords[5*Q + 4] = 1 - q[0] - q[1];
     _coords[5*R + 4] = 1 - r[0] - r[1];
+
+#ifdef COORDINATE_CORRECTION
+
+    // correction of small (imprecise) coordinate values
+    for(int i = 0 ; i < 15 ; ++i)
+      {
+	_coords[i] = epsilonEqual(_coords[i], 0.0, COORDINATE_CORRECTION) ? 0.0 : _coords[i];
+      }
+#endif
 
     // initialise rest of data
     preCalculateDoubleProducts();
@@ -170,11 +204,13 @@ namespace INTERP_UTILS
 
     double sign = uv_xy[0] * uv_xy[3] - uv_xy[1] * uv_xy[2];
 
+
     if(sign == 0.0)
       {
 	// std::cout << std::endl << "Triangle is perpendicular to z-plane - V = 0.0" << std::endl << std::endl;
 	return 0.0;
       }
+
 
     // normalize
     sign = sign > 0.0 ? 1.0 : -1.0;
@@ -183,6 +219,17 @@ namespace INTERP_UTILS
     // std::cout << std::endl << "-- Calculating intersection polygons ... " << std::endl; 
     calculateIntersectionPolygons();
     
+#ifdef MERGE_CALC
+    const bool mergeCalculation = isPolygonAOnHFacet();
+    if(mergeCalculation)
+      {
+	// move points in B to A to avoid missing points
+	// NB : need to remove elements from B in order to handle deletion properly
+	_polygonA.insert(_polygonA.end(), _polygonB.begin(), _polygonB.end());
+	_polygonB.clear();
+      }
+#endif
+
     double barycenter[3];
 
     // calculate volume under A
@@ -197,11 +244,16 @@ namespace INTERP_UTILS
       }
 
     double volB = 0.0;
-
     // if triangle is not in h = 0 plane, calculate volume under B
+#ifdef MERGE_CALC
+    if((!mergeCalculation) && _polygonB.size() > 2)
+#else
     if(!isTriangleInPlaneOfFacet(XYZ) && _polygonB.size() > 2)
+#endif
       {
 	// std::cout << std::endl << "-- Treating polygon B ... " << std::endl; 
+	// std::cout << _coords[5*P + 3] << ", " << _coords[5*Q + 3] << ", " << _coords[5*R+ 3] << std::endl;
+	
 	calculatePolygonBarycenter(B, barycenter);
 	sortIntersectionPolygon(B, barycenter);
 	volB = calculateVolumeUnderPolygon(B, barycenter);
@@ -519,7 +571,7 @@ namespace INTERP_UTILS
 	vol += (factor1 * factor2) / 6.0;
       }
 
-    //    // std::cout << "Abs. Volume is " << vol << std::endl; 
+    // std::cout << "Abs. Volume is " << vol << std::endl; 
     return vol;
   }
 
@@ -543,6 +595,7 @@ namespace INTERP_UTILS
     for(TriCorner c = P ; c < NO_TRI_CORNER ; c = TriCorner(c + 1))
       {
 	// ? should have epsilon-equality here?
+	//if(!epsilonEqual(_coords[5*c + coord], 0.0, 1.0e-15))
 	if(_coords[5*c + coord] != 0.0)
 	  {
 	    return false;
@@ -552,6 +605,39 @@ namespace INTERP_UTILS
     return true;
   }
 
+  bool TransformedTriangle::isPolygonAOnHFacet() const
+  {
+    // need to have vector of unique points in order to determine the "real" number of 
+    // of points in the polygon, to avoid problems when polygon A has less than 3 points
+
+    using ::Vector3Cmp;
+    std::vector<double*> pAUnique;
+    pAUnique.reserve(_polygonA.size());
+    Vector3Cmp cmp;
+    unique_copy(_polygonA.begin(), _polygonA.end(), back_inserter(pAUnique), cmp);
+    //for(std::vector<double*>::const_iterator iter = pAUnique.begin() ; iter != pAUnique.end() ; ++iter)
+    //std::cout << "next : " << vToStr(*iter) << std::endl;
+    
+    // std::cout << "paunique size = " << pAUnique.size() << std::endl;
+    if(pAUnique.size() < 3)
+      {
+	return false;
+      }
+    for(std::vector<double*>::const_iterator iter = _polygonA.begin() ; iter != _polygonA.end() ; ++iter)
+      {
+	const double* pt = *iter;
+	const double h = 1.0 - pt[0] - pt[1] - pt[2];
+	//// std::cout << "h = " << h << std::endl;
+	
+	//if(h != 0.0)
+	if(!epsilonEqual(h, 0.0))
+	  {
+	    return false;
+	  }
+      }
+    // std::cout << "Polygon A is on h = 0 facet" << std::endl;
+    return true;
+  }
 
   bool TransformedTriangle::isTriangleBelowTetraeder()
   {
@@ -568,12 +654,12 @@ namespace INTERP_UTILS
 
 void TransformedTriangle::dumpCoords()
 {
-  std::cout << "Coords : ";
+  // std::cout << "Coords : ";
   for(int i = 0 ; i < 3; ++i)
     {
-      std::cout << vToStr(&_coords[5*i]) << ",";
+      // std::cout << vToStr(&_coords[5*i]) << ",";
     }
-  std::cout << std::endl;
+  // std::cout << std::endl;
 }
 
 }; // NAMESPACE

@@ -6,6 +6,8 @@
 
 #include "VectorUtils.hxx"
 
+#undef NULL_COORD_CORRECTION
+
 namespace INTERP_UTILS
 {
 
@@ -69,7 +71,7 @@ namespace INTERP_UTILS
       // and O is the position vector of the point that is mapped onto the origin
       for(int i = 0 ; i < 3 ; ++i)
 	{
-	  _translation[i] = -_linearTransform[3*i]*(pts[0])[0] - _linearTransform[3*i+1]*(pts[0])[1] - _linearTransform[3*i+2]*(pts[0])[2] ;
+	  _translation[i] = -(_linearTransform[3*i]*(pts[0])[0] + _linearTransform[3*i+1]*(pts[0])[1] + _linearTransform[3*i+2]*(pts[0])[2]) ;
 	}
 
       // precalculate determinant (again after inversion of transform)
@@ -115,6 +117,14 @@ namespace INTERP_UTILS
 
 	  // translation
 	  dest[i] += _translation[i];
+
+#ifdef NULL_COORD_CORRECTION
+	  if(epsilonEqual(dest[i], 0.0, 1.0e-15))
+	    {
+	      dest[i] = 0.0;
+	    }
+#endif
+
 	}
 
       if(selfAllocation)
@@ -154,6 +164,7 @@ namespace INTERP_UTILS
     {
       //{ we copy the matrix for the lu-factorization
       // maybe inefficient
+
       double lu[9];
       for(int i = 0 ; i < 9; ++i)
 	{
@@ -162,7 +173,11 @@ namespace INTERP_UTILS
       
       // calculate LU factorization
       int idx[3];
-      factorizeLU(lu, idx);
+      //      double parity = 1.0;
+      factorizeLU(lu, idx/*, &parity*/);
+
+      //_determinant = parity / (lu[3*idx[0]] * lu[3*idx[1] + 1] * lu[3*idx[2] + 2]);
+      //std::cout << "lu-determinant = " << _determinant << std::endl;
 
       // calculate inverse by forward and backward substitution
       // store in _linearTransform
@@ -212,7 +227,7 @@ namespace INTERP_UTILS
     /////////////////////////////////////////////////
     /// Auxiliary methods for inverse calculation ///
     /////////////////////////////////////////////////
-    void factorizeLU(double* lu, int* idx) const
+    void factorizeLU(double* lu, int* idx/*, double* parity*/) const
     {
       // 3 x 3 LU factorization
       // initialise idx
@@ -242,6 +257,9 @@ namespace INTERP_UTILS
 	  int tmp = idx[k];
 	  idx[k] = idx[row];
 	  idx[row] = tmp;
+	  /*	  if(k != row)
+	    *parity = -(*parity);
+	    */
       
 	  // calculate row
 	  for(int j = k + 1 ; j < 3 ; ++j)
@@ -250,7 +268,7 @@ namespace INTERP_UTILS
 	      lu[3*idx[j] + k] /= lu[3*idx[k] + k];
 	      for(int s = k + 1; s < 3 ; ++s)
 		{
-		  // case s = k will always become zero, and then replaced by
+		  // case s = k will always become zero, and then be replaced by
 		  // the l-value
 		  // there's no need to calculate this explicitly
 

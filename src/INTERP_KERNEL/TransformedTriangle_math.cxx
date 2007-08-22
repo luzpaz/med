@@ -9,6 +9,10 @@
 
 #include "VectorUtils.hxx"
 
+#undef SECOND_CORNER_RESET
+#undef FIXED_DELTA 1.0e-15
+
+
 namespace INTERP_UTILS
 {
   
@@ -77,8 +81,8 @@ namespace INTERP_UTILS
 	const double term3 = _doubleProducts[8*seg + C_XY] * _doubleProducts[8*seg + C_ZH];
 
 	//	std::cout << std::endl;
-	//std::cout << "for seg " << seg << " consistency " << term1 + term2 + term3 << std::endl;
-	//std::cout << "term1 :" << term1 << " term2 :" << term2 << " term3: " << term3 << std::endl;
+	// std::cout << "for seg " << seg << " consistency " << term1 + term2 + term3 << std::endl;
+	// std::cout << "term1 :" << term1 << " term2 :" << term2 << " term3: " << term3 << std::endl;
 
 	//	if(term1 + term2 + term3 != 0.0)
 	const int num_zero = (term1 == 0.0 ? 1 : 0) + (term2 == 0.0 ? 1 : 0) + (term3 == 0.0 ? 1 : 0);
@@ -89,7 +93,7 @@ namespace INTERP_UTILS
 	// * two terms zero
 	// * all terms positive
 	// * all terms negative
-	if((num_zero == 1 && num_neg != 1) || num_zero == 2 || num_neg == 0 || num_neg == 3 )
+	if((num_zero == 1 && num_neg != 1) || num_zero == 2 || (num_neg == 0 && num_zero != 3) || num_neg == 3 )
 	  {
 	    std::map<double, TetraCorner> distances;
 	    //std::cout << "inconsistent! "<< std::endl;
@@ -104,23 +108,18 @@ namespace INTERP_UTILS
 	    // first element -> minimum distance
 	    const TetraCorner minCorner = distances.begin()->second;
 
-	    // set the three corresponding double products to 0.0
-	    static const DoubleProduct DOUBLE_PRODUCTS[12] =
+	    resetDoubleProducts(seg, minCorner);
+	    // test : reset also for second corner if distance is small enough
+#ifdef SECOND_CORNER_RESET
+	    std::map<double, TetraCorner>::const_iterator iter = distances.begin();
+	    ++iter;
+	    if(iter->first < 1.0e-12)
 	      {
-		C_YZ, C_ZX, C_XY, // O
-		C_YZ, C_ZH, C_YH, // X
-		C_ZX, C_ZH, C_XH, // Y
-		C_XY, C_YH, C_XH  // Z
-	      };
-
-	    for(int i = 0 ; i < 3 ; ++i) {
-	      DoubleProduct dp = DOUBLE_PRODUCTS[3*minCorner + i];
-	      
-	      // std::cout << std::endl << "inconsistent dp :" << dp << std::endl;	      
-	      _doubleProducts[8*seg + dp] = 0.0;
-	    }
-
+		resetDoubleProducts(seg, iter->second);
+	      }
+#endif	    
 	  }
+
       }
   
   
@@ -128,7 +127,7 @@ namespace INTERP_UTILS
  
     for(TriSegment seg = PQ ; seg <= RP ; seg = TriSegment(seg + 1))
       {
-	for(DoubleProduct dp = C_YZ ; dp <= C_10 ; dp = DoubleProduct(dp + 1))
+	for(DoubleProduct dp = C_YZ ; dp <=  C_10 ; dp = DoubleProduct(dp + 1))
 	  {
 	    // find the points of the triangle
 	    // 0 -> P, 1 -> Q, 2 -> R 
@@ -141,15 +140,18 @@ namespace INTERP_UTILS
 
 	    const double term1 = _coords[5*pt1 + off1] * _coords[5*pt2 + off2]; 
 	    const double term2 = _coords[5*pt1 + off2] * _coords[5*pt2 + off1];
-
+#ifdef FIXED_DELTA
+	    const double delta = FIXED_DELTA;
+#else
 	    const long double delta = MULT_PREC_F * ( std::abs(term1) + std::abs(term2) );
+#endif
 	  
-	    if( std::abs(_doubleProducts[8*seg + dp]) < THRESHOLD_F*delta )
+	    if( epsilonEqual(_doubleProducts[8*seg + dp], 0.0, THRESHOLD_F * delta))
 	      {
 		if(_doubleProducts[8*seg + dp] != 0.0)
 		  {
-		    // std::cout << "Double product for (seg,dp) = (" << seg << ", " << dp << ") = " 
-		    //			      << std::abs(_doubleProducts[8*seg + dp]) << " is imprecise, reset to 0.0" << std::endl;
+		     // std::cout << "Double product for (seg,dp) = (" << seg << ", " << dp << ") = " 
+		    //		    			      << std::abs(_doubleProducts[8*seg + dp]) << " is imprecise, reset to 0.0" << std::endl;
 		  }
 		_doubleProducts[8*seg + dp] = 0.0;
 		  
@@ -158,6 +160,25 @@ namespace INTERP_UTILS
       }
     
     _isDoubleProductsCalculated = true;
+  }
+
+  void TransformedTriangle::resetDoubleProducts(const TriSegment seg, const TetraCorner corner)
+  {
+    // set the three corresponding double products to 0.0
+    static const DoubleProduct DOUBLE_PRODUCTS[12] =
+      {
+	C_YZ, C_ZX, C_XY, // O
+	C_YZ, C_ZH, C_YH, // X
+	C_ZX, C_ZH, C_XH, // Y
+	C_XY, C_YH, C_XH  // Z
+      };
+    
+    for(int i = 0 ; i < 3 ; ++i) {
+      const DoubleProduct dp = DOUBLE_PRODUCTS[3*corner + i];
+      
+      // std::cout << std::endl << "resetting inconsistent dp :" << dp << " for corner " << corner <<  std::endl;	      
+      _doubleProducts[8*seg + dp] = 0.0;
+    };
   }
 
   double TransformedTriangle::calculateDistanceCornerSegment(const TetraCorner corner, const TriSegment seg) const
@@ -239,10 +260,12 @@ namespace INTERP_UTILS
 	    if(minAngle < TRIPLE_PRODUCT_ANGLE_THRESHOLD)
 	      {
 		_tripleProducts[corner] = calcTByDevelopingRow(corner, minRow, true);
+		//_tripleProducts[corner] = calcTByDevelopingRow(corner, 1, false);
 	      } 
 	    else 
 	      {
-		_tripleProducts[corner] = calcTByDevelopingRow(corner, minRow, false);
+		 _tripleProducts[corner] = calcTByDevelopingRow(corner, minRow, false);
+		//_tripleProducts[corner] = calcTByDevelopingRow(corner, 1, false);
 	      }
 	    _validTP[corner] = true;
 	  }
@@ -287,7 +310,7 @@ namespace INTERP_UTILS
 	1.0, 0.0, 0.0, // OX
 	0.0, 1.0, 0.0, // OY
 	0.0, 0.0, 1.0, // OZ
-	-1.0,-1.0, 1.0, // XY
+	-1.0, 1.0, 0.0, // XY
 	0.0,-1.0, 1.0, // YZ
 	1.0, 0.0,-1.0 // ZX
       };
@@ -297,12 +320,20 @@ namespace INTERP_UTILS
       EDGE_VECTORS[3*edge + 1],
       EDGE_VECTORS[3*edge + 2],
     };
-    
+
+    //return angleBetweenVectors(normal, edgeVec);
+
     const double lenNormal = norm(normal);
     const double lenEdgeVec = norm(edgeVec);
     const double dotProd = dot(normal, edgeVec);
+    //    return asin( dotProd / ( lenNormal * lenEdgeVec ) );
+    //#    assert(dotProd / ( lenNormal * lenEdgeVec ) + 1.0 >= 0.0);
+    //#    assert(dotProd / ( lenNormal * lenEdgeVec ) - 1.0 <= 0.0);
     
+    //? is this more stable? -> no subtraction
+    //    return asin( dotProd / ( lenNormal * lenEdgeVec ) ) + 3.141592625358979 / 2.0;
     return 3.14159262535 - acos( dotProd / ( lenNormal * lenEdgeVec ) );
+
   }
 
   /**
@@ -456,7 +487,8 @@ namespace INTERP_UTILS
 	const double sumDPProd = coordDPProd[0] + coordDPProd[1] + coordDPProd[2];
 	const double sumDPProdSq = dot(coordDPProd, coordDPProd);
 
-	alpha = sumDPProd / sumDPProdSq;
+	//	alpha = sumDPProd / sumDPProdSq;
+		alpha = (sumDPProdSq != 0.0) ? sumDPProd / sumDPProdSq : 0.0;
       }
 
     const double cQRbar = cQR * (1.0 - alpha * coordValues[0] * cQR);
@@ -464,9 +496,9 @@ namespace INTERP_UTILS
     const double cPQbar = cPQ * (1.0 - alpha * coordValues[2] * cPQ);
 
     // check sign of barred products - should not change
-    assert(cQRbar * cQR >= 0.0);
-    assert(cRPbar * cRP >= 0.0);
-    assert(cPQbar * cPQ >= 0.0);
+    //    assert(cQRbar * cQR >= 0.0);
+    //assert(cRPbar * cRP >= 0.0);
+    //assert(cPQbar * cPQ >= 0.0);
 
     const double p_term = _coords[5*P + offset] * cQRbar;
     const double q_term = _coords[5*Q + offset] * cRPbar;
@@ -474,10 +506,15 @@ namespace INTERP_UTILS
 
     // check that we are not so close to zero that numerical errors could take over, 
     // otherwise reset to zero (cf Grandy, p. 446)
+#ifdef FIXED_DELTA
+    const double delta = FIXED_DELTA;
+#else
     const long double delta = MULT_PREC_F * (std::abs(p_term) + std::abs(q_term) + std::abs(r_term));
-    
+#endif
+
     if( epsilonEqual( p_term + q_term + r_term, 0.0, THRESHOLD_F * delta) )
       {
+	// std::cout << "Reset imprecise triple product for corner " << corner << " to zero" << std::endl; 
 	return 0.0;
       }
     else

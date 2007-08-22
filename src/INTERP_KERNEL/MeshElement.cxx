@@ -162,9 +162,11 @@ namespace INTERP_UTILS
 	assert(faceType == MED_TRIA3);
 
 	// create transformed triangles from face
+
 	switch(faceType)
 	  {
 	  case MED_TRIA3:
+	    // std::cout << std::endl<< "** Adding triangle " << i << std::endl;	    
 	    triangles.push_back(TransformedTriangle(&transformedNodes[0], &transformedNodes[3], &transformedNodes[6]));
 	    break;
 
@@ -186,12 +188,12 @@ namespace INTERP_UTILS
   
   void MeshElement::dumpCoords() const
     {
-      std::cout << "Element " << _index + 1 << " has nodes " << std::endl;
+      // std::cout << "Element " << _index + 1 << " has nodes " << std::endl;
       for(int i = 1 ; i <= getNumberNodes() ; ++i)
 	{
-	  std::cout << vToStr(getCoordsOfNode(i)) << ", ";
+	  // std::cout << vToStr(getCoordsOfNode(i)) << ", ";
 	}
-      std::cout << std::endl;
+      // std::cout << std::endl;
     }
 
 
