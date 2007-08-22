@@ -14,18 +14,25 @@ class Interpolation3DTest : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE( Interpolation3DTest );
 
   // single - element
+  //#if 0
+
   CPPUNIT_TEST( tetraReflexiveUnit );
+
   CPPUNIT_TEST( tetraReflexiveGeneral );
+
   CPPUNIT_TEST( tetraNudgedSimpler );
   CPPUNIT_TEST( tetraNudged );
   CPPUNIT_TEST( tetraCorner );
   CPPUNIT_TEST( tetraSimpleIncluded );
   CPPUNIT_TEST( tetraDegenEdge );
   CPPUNIT_TEST( tetraDegenFace );
+  CPPUNIT_TEST( tetraDegenTranslatedInPlane );
   CPPUNIT_TEST( tetraHalfstripOnly );
   CPPUNIT_TEST( tetraHalfstripOnly2 );
   CPPUNIT_TEST( tetraSimpleHalfstripOnly );
   CPPUNIT_TEST( generalTetra );
+
+  CPPUNIT_TEST( trickyTetra1 );
 
   // multi - element
   CPPUNIT_TEST( tetraComplexIncluded );
@@ -34,8 +41,28 @@ class Interpolation3DTest : public CppUnit::TestFixture
   CPPUNIT_TEST( nudgedDividedUnitTetra );
   CPPUNIT_TEST( nudgedDividedUnitTetraSimpler );
   CPPUNIT_TEST( dividedGenTetra );
-  //CPPUNIT_TEST( boxReflexive );
+  //#endif
+  CPPUNIT_TEST( boxReflexive );
+
+
+  CPPUNIT_TEST( boxReflexiveModerate );
+  //#if 0
+
   CPPUNIT_TEST( tetraBoxes );
+
+  CPPUNIT_TEST( moderateBoxes );
+
+  CPPUNIT_TEST( moderateBoxesSmaller );
+
+
+  CPPUNIT_TEST( moderateBoxSmallReflexive );
+
+
+  CPPUNIT_TEST( moderateBoxEvenSmallerReflexive );
+
+  CPPUNIT_TEST( tinyBoxReflexive );
+  //#endif
+
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -89,11 +116,11 @@ public:
     intersectMeshes("meshes/HalfstripOnly.med", "HalfstripOnly", "meshes/UnitTetra.med", "UnitTetra", 0.0);
   }
 
-   void tetraHalfstripOnly2()
+  void tetraHalfstripOnly2()
   {
     // NB this test is not completely significant : we should also verify that 
     // there are triangles on the element that give a non-zero volume
-     intersectMeshes("meshes/HalfstripOnly2.med", "HalfstripOnly2", "meshes/UnitTetra.med", "UnitTetra", 0.0);
+    intersectMeshes("meshes/HalfstripOnly2.med", "HalfstripOnly2", "meshes/UnitTetra.med", "UnitTetra", 0.0);
   }
   
   void tetraSimpleHalfstripOnly()
@@ -108,6 +135,11 @@ public:
     intersectMeshes("meshes/GenTetra1.med", "GenTetra1", "meshes/GenTetra2.med", "GenTetra2", 4.91393, 1.0e-5);
   }
 
+  void trickyTetra1()
+  {
+    intersectMeshes("meshes/UnitTetra.med", "UnitTetra", "meshes/TrickyTetra1.med", "TrickyTetra1", 0.0, 1.0e-8);
+  }
+
   void tetraDegenEdge()
   {
     intersectMeshes("meshes/UnitTetraDegenT.med", "UnitTetraDegenT", "meshes/DegenEdgeXY.med", "DegenEdgeXY", 0.0);
@@ -116,6 +148,11 @@ public:
   void tetraDegenFace()
   {
     intersectMeshes("meshes/UnitTetraDegenT.med", "UnitTetraDegenT", "meshes/DegenFaceXYZ.med", "DegenFaceXYZ", 0.0);
+  }
+
+  void tetraDegenTranslatedInPlane()
+  {
+    intersectMeshes("meshes/UnitTetraDegenT.med", "UnitTetraDegenT", "meshes/DegenTranslatedInPlane.med", "DegenTranslatedInPlane", 0.0571667);
   }
 
   void dividedUnitTetraReflexive()
@@ -148,115 +185,58 @@ public:
     intersectMeshes("meshes/Box3.med", "Box3", "meshes/Box3.med", "Box3", 13.9954,  1.0e-4);
   }
 
+  void boxReflexiveModerate()
+  {
+    intersectMeshes("meshes/Box1Moderate.med", "Box1Moderate", "meshes/Box1Moderate.med", "Box1Moderate", 1.0e6,  1.0);
+  }
+
   void tetraBoxes()
   {
     intersectMeshes("meshes/Box1.med", "Box1", "meshes/Box2.med", "Box2", 124.197, 1.0e-3);
   }
 
-  
-  
-#if 0
-  void tetraHalfstripOnly()
+  void moderateBoxes()
   {
-    std::cout << std::endl << std::endl << "=============================" << std::endl;
-    IntersectionMatrix matrix;
-    // we want no transformation - unit tetra is target
-    calcIntersectionMatrix("meshes/HalfstripOnly.med", "HalfstripOnly", "meshes/UnitTetra.med", "UnitTetra", matrix);
-
-    // check that the total volume is zero
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, sumVolume(matrix), 1.0e-6);
-
-    // check that we have non-zero volumes that cancel
-    bool allVolumesZero = true;
-
-    for(IntersectionMatrix::const_iterator iter = matrix.begin() ; iter != matrix.end() ; ++iter)
-    {
-      for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  allVolumesZero = allVolumesZero && (iter2->second == 0.0);
-	}
-    }
-
-    CPPUNIT_ASSERT_EQUAL(false, allVolumesZero);
-    
+    intersectMeshes("meshes/Box1Moderate.med", "Box1Moderate", "meshes/Box2Moderate.med", "Box2Moderate", 376856, 1.0);
   }
 
-  void tetraHalfstripOnly2()
+  void moderateBoxesSmaller()
   {
-    std::cout << std::endl << std::endl << "=============================" << std::endl;
-    IntersectionMatrix matrix;
-    // we want no transformation - unit tetra is target
-    calcIntersectionMatrix("meshes/HalfstripOnly2.med", "HalfstripOnly2", "meshes/UnitTetra.med", "UnitTetra", matrix);
-
-    // check that the total volume is zero
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, sumVolume(matrix), 1.0e-6);
-
-    // check that we have non-zero volumes that cancel
-    bool allVolumesZero = true;
-
-    for(IntersectionMatrix::const_iterator iter = matrix.begin() ; iter != matrix.end() ; ++iter)
-    {
-      for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  allVolumesZero = allVolumesZero && (iter2->second == 0.0);
-	}
-    }
-
-    CPPUNIT_ASSERT_EQUAL(false, allVolumesZero);
-    
+    intersectMeshes("meshes/BoxModSmall1.med", "BoxModSmall1", "meshes/BoxModSmall2.med", "BoxModSmall2", 321853, 1.0);
   }
 
-   void tetraSimpleHalfstripOnly()
+  void moderateBoxSmallReflexive()
   {
-    std::cout << std::endl << std::endl << "=============================" << std::endl;
-    IntersectionMatrix matrix;
-    // we want no transformation - unit tetra is target
-    calcIntersectionMatrix("meshes/SimpleHalfstripOnly.med", "SimpleHalfstripOnly", "meshes/UnitTetra.med", "UnitTetra", matrix);
-
-    // check that the total volume is zero
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, sumVolume(matrix), 1.0e-6);
-
-    // check that we have non-zero volumes that cancel
-    bool allVolumesZero = true;
-
-    for(IntersectionMatrix::const_iterator iter = matrix.begin() ; iter != matrix.end() ; ++iter)
-    {
-      for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  allVolumesZero = allVolumesZero && (iter2->second == 0.0);
-	}
-    }
-    CPPUNIT_ASSERT_EQUAL(false, allVolumesZero);
-    
+    intersectMeshes("meshes/BoxModSmall1.med", "BoxModSmall1", "meshes/BoxModSmall1.med", "BoxModSmall1", 1.44018e6, 1.0);
   }
-#endif
-  void reflexiveTetra();
 
-  void tetraTetraScale();
+  void moderateBoxEvenSmallerReflexive()
+  {
+    intersectMeshes("meshes/BoxEvenSmaller1.med", "BoxEvenSmaller1", "meshes/BoxEvenSmaller1.med", "BoxEvenSmaller1", 1.44018e6, 1.0);
+  }
 
-  void cyl1();
-
-  void box1();
-
-  void tetra1();
-
-  void tetra3();
+  void tinyBoxReflexive()
+  {
+    intersectMeshes("meshes/TinyBox.med", "TinyBox", "meshes/TinyBox.med", "TinyBox", 979200, 1.0);
+  }
   
 private:
 
   Interpolation3D* interpolator;
 
-  double sumVolume(IntersectionMatrix m);
+  double sumVolume(const IntersectionMatrix& m) const;
 
-  bool Interpolation3DTest::isReflexive(IntersectionMatrix m1, IntersectionMatrix m2);
+  bool areCompatitable( const IntersectionMatrix& m1,  const IntersectionMatrix& m2) const;
+
+  bool testSymmetric(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const;
+
+  bool testDiagonal(const IntersectionMatrix& m) const;
   
-  bool isIntersectionConsistent(IntersectionMatrix m);
-  
-  void dumpIntersectionMatrix(IntersectionMatrix m);
+  void dumpIntersectionMatrix(const IntersectionMatrix& m) const;
 
-  void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec = 1.0e-6);
+  void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec = 1.0e-6) const;
 
-  void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m);
+  void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) const;
 
 };
 

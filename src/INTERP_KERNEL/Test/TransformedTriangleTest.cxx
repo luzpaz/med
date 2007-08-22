@@ -230,12 +230,12 @@ void TransformedTriangleTest::test_calcStableC_Consistency()
       
       const double consistency = c_yz*c_xh + c_zx*c_yh + c_xy*c_zh;
 
-      const int num_zeros = (c_yz*c_xh == 0.0 ? 1 : 0) + (c_zx*c_yh == 0.0 ? 1 : 0) + (c_xy*c_zh == 0.0 ? 1 : 0);
+      const int num_zero = (c_yz*c_xh == 0.0 ? 1 : 0) + (c_zx*c_yh == 0.0 ? 1 : 0) + (c_xy*c_zh == 0.0 ? 1 : 0);
       const int num_neg = (c_yz*c_xh < 0.0 ? 1 : 0) + (c_zx*c_yh < 0.0 ? 1 : 0) + (c_xy*c_zh < 0.0 ? 1 : 0);
       
       //      if(consistency != 0.0) {
       //      if(num_zeros == 2 || num_neg == 0 || num_neg == 3) 
-      if(num_zeros == 2 || (num_zeros !=3 && num_neg == 0) || (num_neg == 3))
+      if((num_zero == 1 && num_neg != 1) || num_zero == 2 || num_neg == 0 || num_neg == 3 )
 	{
 	  ++num_cases;
 	
@@ -294,8 +294,12 @@ void TransformedTriangleTest::test_calcStableC_Consistency()
 	}
 
     }
+  
+  if(num_cases < 1)
+    {
+      CPPUNIT_FAIL("Consistency test not pertinent");
+    }
 
-  CPPUNIT_ASSERT(num_cases >= 1); // Bad test for consistency
   //  std::cout << std::endl << "Number of geometric inconsistencies : " << num_cases << std::endl; 
     
   // check that all other double products have right value too
