@@ -32,6 +32,9 @@ VPATH=.:$(srcdir):$(top_srcdir)/idl:$(top_builddir)/idl
 
 MACHINE=PCLINUX
 
+#make top_builddir absolute path, else there is a wrong path in .la file (-L../../../lib/salome)
+top_builddir=$(shell (cd ../../..;pwd))
+
 @COMMENCE@
 
 

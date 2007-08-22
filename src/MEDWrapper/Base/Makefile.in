@@ -32,6 +32,9 @@ srcdir=@srcdir@
 VPATH=.:@srcdir@:@top_srcdir@/idl
 BOOST_LIBSUFFIX=@BOOST_LIBSUFFIX@
 
+#make top_builddir absolute path, else there is a wrong path in .la file (-L../../../lib/salome)
+top_builddir=$(shell (cd ../../..;pwd))
+
 @COMMENCE@
 
 EXPORT_HEADERS = \
