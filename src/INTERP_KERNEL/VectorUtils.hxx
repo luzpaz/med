@@ -55,9 +55,22 @@ namespace INTERP_UTILS
 
   inline bool epsilonEqual(const double x, const double y, const double errTol = 1.0e-12)
   {
-    return std::abs(x - y) < errTol;
+    return std::abs(x - y) <= errTol;
   }
-  
+
+  inline bool epsilonEqualRelative(const double x, const double y, const double relTol = 1.0e-6, const double absTol = 1.0e-17)
+  {
+    // necessary for comparing values close to zero
+    // in order to avoid division
+    if(std::abs(x - y) < absTol)
+      {
+	return true;
+      }
+
+    const double relError = std::abs((x - y) / std::max(x, y));
+
+    return relError <= relTol;
+  }
 
 };
 
