@@ -5,6 +5,8 @@
 
 #include "BoundingBox.hxx"
 
+#include "MEDMEM_Mesh.hxx"
+
 namespace INTERP_UTILS
 {
   class MeshElement;
@@ -36,7 +38,7 @@ namespace INTERP_UTILS
      * @param element pointer to element to add to region
      *
      */
-    void addElement(MeshElement* const element);
+    void addElement(MeshElement* const element, const MEDMEM::MESH& mesh);
 
     /**
      * Splits the region in two along the given axis, copying the elements with bounding boxes whose maximum
@@ -48,7 +50,7 @@ namespace INTERP_UTILS
      * @param axis    axis along which to split the region
      *
      */
-    void split(MeshRegion& region1, MeshRegion& region2, BoundingBox::BoxCoord coord);
+    void split(MeshRegion& region1, MeshRegion& region2, BoundingBox::BoxCoord coord, const MEDMEM::MESH& mesh);
 
     bool isDisjointWithElementBoundingBox(const MeshElement& elem) const;
 
@@ -63,7 +65,7 @@ namespace INTERP_UTILS
     // neither allocated or liberated in this class. The elements must therefore be allocated and liberated outside this class
     std::vector<MeshElement*> _elements;
     BoundingBox* _box;
-
+  
   };
 
 };

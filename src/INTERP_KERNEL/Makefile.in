@@ -50,7 +50,10 @@ TranslationRotationMatrix.hxx\
 Interpolation2D.hxx\
 Interpolation3DSurf.hxx\
 InterpolationUtils.hxx\
-BBTree.H
+BBTree.H\
+MeshUtils.hxx\
+Intersector3D.hxx\
+Log.hxx
 
 # Libraries targets
 
@@ -65,7 +68,9 @@ MeshRegion.cxx\
 RegionNode.cxx\
 BoundingBox.cxx\
 TetraAffineTransform.cxx\
-Interpolation3D.cxx
+Interpolation3D.cxx\
+Intersector3D.cxx\
+#Log.cxx
 #Interpolation3DSurf.cxx\
 #Interpolation2D.cxx\
 
@@ -83,12 +88,14 @@ LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MED2_INCLUDES)
 CPPFLAGS+=$(BOOST_CPPFLAGS) 
 
-
+CXXFLAGS+=-fprofile-arcs -ftest-coverage
+CPPFLAGS+=-fprofile-arcs -ftest-coverage
 
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
 LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem   -lutil
 #LDFLAGS+= $(HDF5_LIBS) $(STDLIB) -lutil
+LDFLAGS+= -lgcov
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.

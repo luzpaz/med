@@ -3,6 +3,14 @@
 
 #include <vector>
 
+// Levels : 
+// 1 - overview of algorithm + volume result
+// 2 - algorithm detail
+// 3 - intersection polygon results detail
+// 4 - intersection polygon search detail
+// higher -> misc. gory details of calculation
+//#define LOG_LEVEL 3
+#include "Log.hxx"
 
 class TransformedTriangleTest;
 class TransformedTriangleIntersectTest;
@@ -147,6 +155,8 @@ namespace INTERP_UTILS
     ////////////////////////////////////////////////////////////////////////////////////
     
     void preCalculateDoubleProducts(void);
+
+    bool areDoubleProductsConsistent(const TriSegment seg) const;
 
     void resetDoubleProducts(const TriSegment seg, const TetraCorner corner);
 

@@ -3,6 +3,10 @@
 #include "TetraAffineTransform.hxx"
 #include "TransformedTriangle.hxx"
 #include "MEDMEM_CellModel.hxx"
+#include "MeshUtils.hxx"
+#include "BoundingBox.hxx"
+
+
 
 namespace INTERP_UTILS
 {
@@ -15,16 +19,16 @@ namespace INTERP_UTILS
    * @param index   global number of element in the mesh
    */
   MeshElement::MeshElement(const int index, const MED_EN::medGeometryElement type, const MEDMEM::MESH& mesh)
-    : _index(index - 1), _mesh(&mesh), _type(type), _box(0)
+    : _index(index), _box(0), _type(type)
   {
     // get coordinates of vertices
-    const int numNodes = getNumberNodes();
+    const int numNodes = getNumberOfNodesForType(type);
     
     const double* vertices[numNodes];
 
     for(int i = 0 ; i < numNodes ; ++i)
       {
-	vertices[i] = getCoordsOfNode(i + 1);
+	vertices[i] = getCoordsOfNode(i + 1, index, mesh);
       }
 
     // create bounding box
@@ -76,126 +80,18 @@ namespace INTERP_UTILS
     return false;
   }
 
-  /**
-   * Returns the number of nodes of this element
-   *
-   * @returns  the number of nodes of this element
-   */
-  int MeshElement::getNumberNodes() const
-  {
-    assert(_type > 300);
-    assert(_type < 400);
-
-    // int(type) = yxx where y is dimension of entity (here 3)
-    // and xx is the number of nodes of the element
-    return static_cast<int>(_type) - 300;
-  }
-
-  /**
-   * Returns the coordinates of a node of this element
-   * (1 <= node <= #nodes)
-   *
-   * @param      node  the node for which the coordinates are sought
-   * @returns    pointer to an array of 3 doubles containing the coordinates
-   */
-  const double* MeshElement::getCoordsOfNode(int node) const
-  {
-    assert(node >= 1);
-    assert(node <= getNumberNodes());
-    const int nodeOffset = node - 1;
-    const int elemIdx = _mesh->getConnectivityIndex(MED_NODAL, MED_CELL)[_index] - 1;
-    const int connIdx = _mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL, MED_CELL, MED_ALL_ELEMENTS)[elemIdx + nodeOffset] - 1;
-    return &(_mesh->getCoordinates(MED_FULL_INTERLACE)[3*connIdx]);
-  }
-  
-  /**
-   * Triangulate the faces of this element and apply an affine Transform to the triangles
-   *
-   * @param      triangles  vector in which triangles are stored
-   * @param      T          affine transform that is applied to the nodes of the triangles
-   */
-  void MeshElement::triangulate(std::vector<TransformedTriangle>& triangles, const TetraAffineTransform& T) const
-  {
-    // get cell model for the element
-    CELLMODEL cellModel(_type);
-
-    assert(cellModel.getDimension() == 3);
-
-    // start index in connectivity array for cell
-    //    const int cellIdx = _mesh->getConnectivityIndex(MED_NODAL, MED_CELL)[_index] - 1;
-
-    //    assert(cellIdx >= 0);
-    //assert(cellIdx < _mesh->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
-
-    // loop over faces
-    for(int i = 1 ; i <= cellModel.getNumberOfConstituents(1) ; ++i)
-      {
-	medGeometryElement faceType = cellModel.getConstituentType(1, i);
-	CELLMODEL faceModel(faceType);
-
-	assert(faceModel.getDimension() == 2);
-	assert(faceModel.getNumberOfNodes() == 3);
-
-	double transformedNodes[3 * faceModel.getNumberOfNodes()];
-	
-
-	// loop over nodes of face
-	for(int j = 1; j <= faceModel.getNumberOfNodes(); ++j)
-	  {
-	    // offset of node from cellIdx
-	    int localNodeNumber = cellModel.getNodeConstituent(1, i, j);
-
-	    assert(localNodeNumber >= 1);
-	    assert(localNodeNumber <= cellModel.getNumberOfNodes());
-
-	    const double* node = getCoordsOfNode(localNodeNumber);
-	    
-	    // transform 
-	    //{ not totally efficient since we transform each node once per face
-	    T.apply(&transformedNodes[3*(j-1)], node);
-
-	    // std::cout << "Node " << localNodeNumber << " = " << vToStr(node) << " transformed to " << vToStr(&transformedNodes[3*(j-1)]) << std::endl;
-
-	  }
-
-	// to be removed
-	assert(faceType == MED_TRIA3);
-
-	// create transformed triangles from face
-
-	switch(faceType)
-	  {
-	  case MED_TRIA3:
-	    // std::cout << std::endl<< "** Adding triangle " << i << std::endl;	    
-	    triangles.push_back(TransformedTriangle(&transformedNodes[0], &transformedNodes[3], &transformedNodes[6]));
-	    break;
-
-	    // add other cases here to treat hexahedra, pyramides, etc
-	    
-	  default:
-	    // std::cout << "Only elements with triangular faces are supported at the moment." << std::endl;
-	    ;
-	  }
-      }
-    
-
-  }
   
   int MeshElement::getIndex() const
   {
-    return _index + 1;
+    return _index;
   }
   
   void MeshElement::dumpCoords() const
-    {
-      // std::cout << "Element " << _index + 1 << " has nodes " << std::endl;
-      for(int i = 1 ; i <= getNumberNodes() ; ++i)
-	{
-	  // std::cout << vToStr(getCoordsOfNode(i)) << ", ";
-	}
-      // std::cout << std::endl;
-    }
-
+  {
+    std::cout << "Bounding box of element " << _index << " is " << std::endl;
+    _box->dumpCoords();
+  }
+  
 
   /// ElementBBoxOrder
   bool ElementBBoxOrder::operator()( MeshElement* elem1, MeshElement* elem2)
@@ -211,5 +107,4 @@ namespace INTERP_UTILS
     return coord1 < coord2;
   }
 
-  
 };

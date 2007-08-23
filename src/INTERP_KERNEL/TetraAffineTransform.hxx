@@ -6,6 +6,8 @@
 
 #include "VectorUtils.hxx"
 
+#include "Log.hxx"
+
 #undef NULL_COORD_CORRECTION
 
 namespace INTERP_UTILS
@@ -19,8 +21,8 @@ namespace INTERP_UTILS
     TetraAffineTransform(const double** pts)
     {
 
-      // std::cout << "Creating transform from tetraeder : " << std::endl;
-      // std::cout << vToStr(pts[0]) << ", " << vToStr(pts[1]) << ", " << vToStr(pts[2]) << ", " << vToStr(pts[3]) << ", " << std::endl;
+      LOG(2,"Creating transform from tetraeder : ");
+      LOG(2, vToStr(pts[0]) << ", " << vToStr(pts[1]) << ", " << vToStr(pts[2]) << ", " << vToStr(pts[3]));
 
 #if 0
       do {
@@ -37,7 +39,7 @@ namespace INTERP_UTILS
 
 	calculateDeterminant();
 
-	// std::cout << "determinant before inverse = " << _determinant << std::endl;
+	LOG(3, "determinant before inverse = " << _determinant);
 	
 	// check that tetra is non-planar -> determinant is not zero
 	// otherwise set _determinant to zero to signal caller that transformation did not work
@@ -78,20 +80,20 @@ namespace INTERP_UTILS
       calculateDeterminant();
       
       // self-check
-      // std::cout << "transform determinant is " << _determinant << std::endl;
-      // std::cout << "*Self-check : Applying transformation to original points ... ";
+      LOG(4, "transform determinant is " << _determinant);
+      LOG(4, "*Self-check : Applying transformation to original points ... ");
       for(int i = 0; i < 4 ; ++i)
 	{
 	  double v[3];
 	  apply(v, pts[i]);
-	  // std::cout << vToStr(v) << std::endl;
+	  LOG(4, vToStr(v))
 	  for(int j = 0; j < 3; ++j)
 	    {
 	      assert(epsilonEqual(v[j], (3*i+j == 3 || 3*i+j == 7 || 3*i+j == 11 ) ? 1.0 : 0.0));
 	    }
 	}
       
-      // std::cout << " ok" << std::endl;
+      LOG(4, " ok");
     }
 
     void apply(double* destPt, const double* srcPt) const
@@ -107,7 +109,7 @@ namespace INTERP_UTILS
 	  // alloc temporary memory
 	  dest = new double[3];
 
-	  //// std::cout << "Oops! self-affectation" << std::endl;
+	  LOG(6, "Oops! self-affectation");
 	}
 
       for(int i = 0 ; i < 3 ; ++i)
@@ -147,7 +149,7 @@ namespace INTERP_UTILS
     {
       using namespace std;
       
-      // std::cout << "A = " << std::endl << "[";
+      std::cout << "A = " << std::endl << "[";
       for(int i = 0; i < 3; ++i)
 	{
 	  cout << _linearTransform[3*i] << ", " << _linearTransform[3*i + 1] << ", " << _linearTransform[3*i + 2];
@@ -192,7 +194,7 @@ namespace INTERP_UTILS
 	      int(i == 2)
 	    };
 
-	  //std::cout << "b = [" << b[0] << ", " << b[1] << ", " << b[2] << "]" << std::endl; 
+	  LOG(6,  "b = [" << b[0] << ", " << b[1] << ", " << b[2] << "]");
 	  
 	  double y[3];
 	  forwardSubstitution(y, lu, b, idx);

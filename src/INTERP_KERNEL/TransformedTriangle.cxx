@@ -5,12 +5,14 @@
 #include <algorithm>
 #include <functional>
 #include <iterator>
-#include "VectorUtils.hxx"
 #include <math.h>
 #include <vector>
 
+#include "VectorUtils.hxx"
+
 #undef MERGE_CALC
 #undef COORDINATE_CORRECTION 1.0e-15
+
 
 class CircularSortOrder
 {
@@ -27,8 +29,8 @@ public:
     
     _a = barycenter[_aIdx] - pt0[_aIdx];
     _b = barycenter[_bIdx] - pt0[_bIdx];
-    //    std::cout << "Creating order of type " << type << " with pt0= " << vToStr(pt0) << std::endl;  
-    //    std::cout << "a = " << _a << ", b = " << _b << std::endl;
+    //LOG(4, "Creating order of type " << type << " with pt0= " << vToStr(pt0));
+    //LOG(4, "a = " << _a << ", b = " << _b)
   }
 
   bool operator()(const double* pt1, const double* pt2)
@@ -94,7 +96,7 @@ class Vector3Cmp
   public:
   bool operator()(double* const& pt1, double* const& pt2)
   {
-    //    std::cout << "points are equal ? : " << int((pt1[0] == pt2[0]) && (pt1[1] == pt2[1]) && (pt1[2] == pt2[2])) << std::endl;
+    LOG(6, "points are equal ? : " << int((pt1[0] == pt2[0]) && (pt1[1] == pt2[1]) && (pt1[2] == pt2[2])));
     return (pt1[0] == pt2[0]) && (pt1[1] == pt2[1]) && (pt1[2] == pt2[2]);
   }
 };
@@ -137,7 +139,7 @@ namespace INTERP_UTILS
     /* 
     _coords[5*P + 3] = 1 - (p[0] - (p[1] - p[2]));
     _coords[5*Q + 3] = 1 - (q[0] - (q[1] - q[2]));
-    std::cout << "old = " << 1 - q[0] - q[1] - q[2] << " calculated = " << 1 - (q[0] - (q[1] - q[2])) << " stored : " << _coords[5*Q + 3] << std::endl;
+    LOG(6, "old = " << 1 - q[0] - q[1] - q[2] << " calculated = " << 1 - (q[0] - (q[1] - q[2])) << " stored : " << _coords[5*Q + 3]);
     _coords[5*R + 3] = 1 - (r[0] -(r[1] - r[2]));
     */
 
@@ -189,7 +191,7 @@ namespace INTERP_UTILS
 
     if(isTriangleBelowTetraeder())
       {
-	// std::cout << std::endl << "Triangle is below tetraeder - V = 0.0" << std::endl << std::endl ;
+	LOG(2, " --- Triangle is below tetraeder - V = 0.0");
 	return 0.0;
       }
 
@@ -207,7 +209,7 @@ namespace INTERP_UTILS
 
     if(sign == 0.0)
       {
-	// std::cout << std::endl << "Triangle is perpendicular to z-plane - V = 0.0" << std::endl << std::endl;
+	LOG(2, " --- Triangle is perpendicular to z-plane - V = 0.0");
 	return 0.0;
       }
 
@@ -216,7 +218,7 @@ namespace INTERP_UTILS
     sign = sign > 0.0 ? 1.0 : -1.0;
 
 
-    // std::cout << std::endl << "-- Calculating intersection polygons ... " << std::endl; 
+    LOG(2, "-- Calculating intersection polygons ... ");
     calculateIntersectionPolygons();
     
 #ifdef MERGE_CALC
@@ -236,11 +238,11 @@ namespace INTERP_UTILS
     double volA = 0.0;
     if(_polygonA.size() > 2)
       {
-	// std::cout << std::endl << "-- Treating polygon A ... " << std::endl; 
+	LOG(2, "---- Treating polygon A ... ");
 	calculatePolygonBarycenter(A, barycenter);
 	sortIntersectionPolygon(A, barycenter);
 	volA = calculateVolumeUnderPolygon(A, barycenter);
-	// std::cout << "Volume is " << sign * volA << std::endl;
+	LOG(2, "Volume is " << sign * volA);
       }
 
     double volB = 0.0;
@@ -251,16 +253,15 @@ namespace INTERP_UTILS
     if(!isTriangleInPlaneOfFacet(XYZ) && _polygonB.size() > 2)
 #endif
       {
-	// std::cout << std::endl << "-- Treating polygon B ... " << std::endl; 
-	// std::cout << _coords[5*P + 3] << ", " << _coords[5*Q + 3] << ", " << _coords[5*R+ 3] << std::endl;
+	LOG(2, "---- Treating polygon B ... ");
 	
 	calculatePolygonBarycenter(B, barycenter);
 	sortIntersectionPolygon(B, barycenter);
 	volB = calculateVolumeUnderPolygon(B, barycenter);
-	// std::cout << "Volume is " << sign * volB << std::endl;
+	LOG(2, "Volume is " << sign * volB);
       }
 
-    // std::cout << std::endl << "volA + volB = " << sign * (volA + volB) << std::endl << std::endl;
+    LOG(2, "volA + volB = " << sign * (volA + volB) << std::endl << "***********");
 
     return sign * (volA + volB);
 
@@ -296,13 +297,13 @@ namespace INTERP_UTILS
 	    double* ptA = new double[3];
 	    calcIntersectionPtSurfaceEdge(edge, ptA);
 	    _polygonA.push_back(ptA);
-	    // std::cout << "Surface-edge : " << vToStr(ptA) << " added to A " << std::endl;
+	    LOG(3,"Surface-edge : " << vToStr(ptA) << " added to A ");
 	    if(edge >= XY)
 	      {
 		double* ptB = new double[3];
 		copyVector3(ptA, ptB);
 		_polygonB.push_back(ptB);
-		// std::cout << "Surface-edge : " << vToStr(ptB) << " added to B " << std::endl;
+		LOG(3,"Surface-edge : " << vToStr(ptB) << " added to B ");
 	      }
 	    
 	  }
@@ -316,7 +317,7 @@ namespace INTERP_UTILS
 	    double* ptB = new double[3];
 	    copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
 	    _polygonB.push_back(ptB);
-	    // std::cout << "Surface-ray : " << vToStr(ptB) << " added to B" << std::endl;
+	    LOG(3,"Surface-ray : " << vToStr(ptB) << " added to B");
 	  }
       }
     
@@ -331,13 +332,13 @@ namespace INTERP_UTILS
 		double* ptA = new double[3];
 		calcIntersectionPtSegmentFacet(seg, facet, ptA);
 		_polygonA.push_back(ptA);
-		// std::cout << "Segment-facet : " << vToStr(ptA) << " added to A" << std::endl;
+		LOG(3,"Segment-facet : " << vToStr(ptA) << " added to A");
 		if(facet == XYZ)
 		  {
 		    double* ptB = new double[3];
 		    copyVector3(ptA, ptB);
 		    _polygonB.push_back(ptB);
-		    // std::cout << "Segment-facet : " << vToStr(ptB) << " added to B" << std::endl;
+		    LOG(3,"Segment-facet : " << vToStr(ptB) << " added to B");
 		  }
 	      }
 	  }
@@ -350,7 +351,7 @@ namespace INTERP_UTILS
 		double* ptA = new double[3];
 		calcIntersectionPtSegmentEdge(seg, edge, ptA);
 		_polygonA.push_back(ptA);
-		// std::cout << "Segment-edge : " << vToStr(ptA) << " added to A" << std::endl;
+		LOG(3,"Segment-edge : " << vToStr(ptA) << " added to A");
 		if(edge >= XY)
 		  {
 		    double* ptB = new double[3];
@@ -368,13 +369,13 @@ namespace INTERP_UTILS
 		double* ptA = new double[3];
 		copyVector3(&COORDS_TET_CORNER[3 * corner], ptA);
 		_polygonA.push_back(ptA);
-		// std::cout << "Segment-corner : " << vToStr(ptA) << " added to A" << std::endl;
+		LOG(3,"Segment-corner : " << vToStr(ptA) << " added to A");
 		if(corner != O)
 		  {
 		    double* ptB = new double[3];
 		    _polygonB.push_back(ptB);
 		    copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
-		    // std::cout << "Segment-corner : " << vToStr(ptB) << " added to B" << std::endl;
+		    LOG(3,"Segment-corner : " << vToStr(ptB) << " added to B");
 		  }
 	      }
 	  }
@@ -387,7 +388,7 @@ namespace INTERP_UTILS
 		double* ptB = new double[3];
 		copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
 		_polygonB.push_back(ptB);
-		// std::cout << "Segment-ray : " << vToStr(ptB) << " added to B" << std::endl;
+		LOG(3,"Segment-ray : " << vToStr(ptB) << " added to B");
 	      }
 	  }
 	
@@ -399,7 +400,7 @@ namespace INTERP_UTILS
 		double* ptB = new double[3];
 		calcIntersectionPtSegmentHalfstrip(seg, edge, ptB);
 		_polygonB.push_back(ptB);
-		// std::cout << "Segment-halfstrip : " << vToStr(ptB) << " added to B" << std::endl;
+		LOG(3,"Segment-halfstrip : " << vToStr(ptB) << " added to B");
 	      }
 	  }
       }      
@@ -414,7 +415,7 @@ namespace INTERP_UTILS
 	    double* ptA = new double[3];
 	    copyVector3(&_coords[5*corner], ptA);
 	    _polygonA.push_back(ptA);
-	    // std::cout << "Inclusion tetrahedron : " << vToStr(ptA) << " added to A" << std::endl;
+	    LOG(3,"Inclusion tetrahedron : " << vToStr(ptA) << " added to A");
 	  }
 
 	// XYZ - plane
@@ -423,7 +424,7 @@ namespace INTERP_UTILS
 	    double* ptB = new double[3];
 	    copyVector3(&_coords[5*corner], ptB);
 	    _polygonB.push_back(ptB);
-	    // std::cout << "Inclusion XYZ-plane : " << vToStr(ptB) << " added to B" << std::endl;
+	    LOG(3,"Inclusion XYZ-plane : " << vToStr(ptB) << " added to B");
 	  }
 
 	// projection on XYZ - facet
@@ -434,7 +435,7 @@ namespace INTERP_UTILS
 	    ptB[2] = 1 - ptB[0] - ptB[1];
 	    assert(epsilonEqual(ptB[0]+ptB[1]+ptB[2] - 1, 0.0));
 	    _polygonB.push_back(ptB);
-	    // std::cout << "Projection XYZ-plane : " << vToStr(ptB) << " added to B" << std::endl;
+	    LOG(3,"Projection XYZ-plane : " << vToStr(ptB) << " added to B");
 	  }
 
       }
@@ -452,7 +453,7 @@ namespace INTERP_UTILS
    */
   void TransformedTriangle::calculatePolygonBarycenter(const IntersectionPolygon poly, double* barycenter)
   {
-    // std::cout << "--- Calculating polygon barycenter" << std::endl;
+    LOG(3,"--- Calculating polygon barycenter");
 
     // get the polygon points
     std::vector<double*>& polygon = (poly == A) ? _polygonA : _polygonB;
@@ -476,7 +477,7 @@ namespace INTERP_UTILS
 	      }
 	  }
       }
-    // std::cout << "Barycenter is " << vToStr(barycenter) << std::endl;
+    LOG(3,"Barycenter is " << vToStr(barycenter));
   }
 
   /**
@@ -492,7 +493,7 @@ namespace INTERP_UTILS
    */
   void TransformedTriangle::sortIntersectionPolygon(const IntersectionPolygon poly, const double* barycenter)
   {
-    // std::cout << "--- Sorting polygon ..."<< std::endl;
+    LOG(3,"--- Sorting polygon ...");
 
     using ::ProjectedCentralCircularSortOrder;
     typedef ProjectedCentralCircularSortOrder SortOrder; // change is only necessary here and in constructor
@@ -529,10 +530,10 @@ namespace INTERP_UTILS
     //stable_sort((++polygon.begin()), polygon.end(), order);
     
     
-    // std::cout << "Sorted polygon is " << std::endl;
+    LOG(3,"Sorted polygon is ");
     for(int i = 0 ; i < polygon.size() ; ++i)
       {
-	// std::cout << vToStr(polygon[i]) << std::endl;
+	LOG(3,vToStr(polygon[i]));
       }
 
   }
@@ -550,7 +551,7 @@ namespace INTERP_UTILS
    */
   double TransformedTriangle::calculateVolumeUnderPolygon(IntersectionPolygon poly, const double* barycenter)
   {
-    // std::cout << "--- Calculating volume under polygon" << std::endl;
+    LOG(2,"--- Calculating volume under polygon");
 
     // get the polygon points
     std::vector<double*>& polygon = (poly == A) ? _polygonA : _polygonB;
@@ -571,7 +572,7 @@ namespace INTERP_UTILS
 	vol += (factor1 * factor2) / 6.0;
       }
 
-    // std::cout << "Abs. Volume is " << vol << std::endl; 
+    LOG(2,"Abs. Volume is " << vol); 
     return vol;
   }
 
@@ -654,12 +655,12 @@ namespace INTERP_UTILS
 
 void TransformedTriangle::dumpCoords()
 {
-  // std::cout << "Coords : ";
+  std::cout << "Coords : ";
   for(int i = 0 ; i < 3; ++i)
     {
-      // std::cout << vToStr(&_coords[5*i]) << ",";
+      std::cout << vToStr(&_coords[5*i]) << ",";
     }
-  // std::cout << std::endl;
+  std::cout << std::endl;
 }
 
 }; // NAMESPACE

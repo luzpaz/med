@@ -101,7 +101,7 @@ namespace MEDMEM
      * @returns    volume of intersection between srcElement and targetElement
      *
      */
-    double calculateIntersectionVolume(const INTERP_UTILS::MeshElement& srcElement, const INTERP_UTILS::MeshElement& targetElement);
+    //    double calculateIntersectionVolume(const INTERP_UTILS::MeshElement& srcElement, const INTERP_UTILS::MeshElement& targetElement);
 
   };
 

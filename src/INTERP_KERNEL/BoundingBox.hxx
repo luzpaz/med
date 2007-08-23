@@ -71,6 +71,8 @@ namespace INTERP_UTILS
 
     void updateWithPoint(const double* pt);
 
+    void dumpCoords() const;
+
   private:
     
     bool isValid() const;

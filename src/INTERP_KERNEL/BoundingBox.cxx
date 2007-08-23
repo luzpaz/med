@@ -145,6 +145,13 @@ namespace INTERP_UTILS
       }
   }
 
+  void BoundingBox::dumpCoords() const
+  {
+    std::cout << "[xmin, xmax] = [" << _coords[XMIN] << ", " << _coords[XMAX] << "]" << " | ";
+    std::cout << "[ymin, ymax] = [" << _coords[YMIN] << ", " << _coords[YMAX] << "]" << " | ";
+    std::cout << "[zmin, zmax] = [" << _coords[ZMIN] << ", " << _coords[ZMAX] << "]";
+    std::cout << std::endl;
+  }
 
   bool BoundingBox::isValid() const
   {
@@ -153,7 +160,8 @@ namespace INTERP_UTILS
       {
 	if(_coords[c] >= _coords[c + 3])
 	  {
-	    std::cout << "BoundingBox |: coordinate " << c << " is invalid : " << _coords[c] << " >= " << _coords[c+3] << std::endl;
+	    std::cout << "+++ Error in  BoundingBox |: coordinate " << c << " is invalid : "
+		      <<_coords[c] << " >= " << _coords[c+3] << std::endl;
 	    valid = false;
 	  }
       }

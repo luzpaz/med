@@ -12,7 +12,6 @@
 #undef SECOND_CORNER_RESET
 #undef FIXED_DELTA 1.0e-15
 
-
 namespace INTERP_UTILS
 {
   
@@ -76,27 +75,10 @@ namespace INTERP_UTILS
     // -- and make corrections if not
     for(TriSegment seg = PQ ; seg <= RP ; seg = TriSegment(seg + 1))
       {
-	const double term1 = _doubleProducts[8*seg + C_YZ] * _doubleProducts[8*seg + C_XH];
-	const double term2 = _doubleProducts[8*seg + C_ZX] * _doubleProducts[8*seg + C_YH];
-	const double term3 = _doubleProducts[8*seg + C_XY] * _doubleProducts[8*seg + C_ZH];
-
-	//	std::cout << std::endl;
-	// std::cout << "for seg " << seg << " consistency " << term1 + term2 + term3 << std::endl;
-	// std::cout << "term1 :" << term1 << " term2 :" << term2 << " term3: " << term3 << std::endl;
-
-	//	if(term1 + term2 + term3 != 0.0)
-	const int num_zero = (term1 == 0.0 ? 1 : 0) + (term2 == 0.0 ? 1 : 0) + (term3 == 0.0 ? 1 : 0);
-	const int num_neg = (term1 < 0.0 ? 1 : 0) + (term2 < 0.0 ? 1 : 0) + (term3 < 0.0 ? 1 : 0);
-	
-	// calculated geometry is inconsistent if we have one of the following cases
-	// * one term zero and the other two of the same sign
-	// * two terms zero
-	// * all terms positive
-	// * all terms negative
-	if((num_zero == 1 && num_neg != 1) || num_zero == 2 || (num_neg == 0 && num_zero != 3) || num_neg == 3 )
+	if(!areDoubleProductsConsistent(seg))
 	  {
 	    std::map<double, TetraCorner> distances;
-	    //std::cout << "inconsistent! "<< std::endl;
+	    LOG(4, "inconsistent! ");
 
 	    for(TetraCorner corner = O ; corner <= Z ; corner = TetraCorner(corner + 1))
 	      {
@@ -150,8 +132,8 @@ namespace INTERP_UTILS
 	      {
 		if(_doubleProducts[8*seg + dp] != 0.0)
 		  {
-		     // std::cout << "Double product for (seg,dp) = (" << seg << ", " << dp << ") = " 
-		    //		    			      << std::abs(_doubleProducts[8*seg + dp]) << " is imprecise, reset to 0.0" << std::endl;
+		    LOG(5, "Double product for (seg,dp) = (" << seg << ", " << dp << ") = " );
+		    LOG(5, std::abs(_doubleProducts[8*seg + dp]) << " is imprecise, reset to 0.0" );
 		  }
 		_doubleProducts[8*seg + dp] = 0.0;
 		  
@@ -160,6 +142,37 @@ namespace INTERP_UTILS
       }
     
     _isDoubleProductsCalculated = true;
+  }
+
+  bool TransformedTriangle::areDoubleProductsConsistent(const TriSegment seg) const
+  {
+    const double term1 = _doubleProducts[8*seg + C_YZ] * _doubleProducts[8*seg + C_XH];
+    const double term2 = _doubleProducts[8*seg + C_ZX] * _doubleProducts[8*seg + C_YH];
+    const double term3 = _doubleProducts[8*seg + C_XY] * _doubleProducts[8*seg + C_ZH];
+    
+
+    LOG(6, "for seg " << seg << " consistency " << term1 + term2 + term3 );
+    LOG(6, "term1 :" << term1 << " term2 :" << term2 << " term3: " << term3 );
+    
+    const int num_zero = (term1 == 0.0 ? 1 : 0) + (term2 == 0.0 ? 1 : 0) + (term3 == 0.0 ? 1 : 0);
+    const int num_neg = (term1 < 0.0 ? 1 : 0) + (term2 < 0.0 ? 1 : 0) + (term3 < 0.0 ? 1 : 0);
+    const int num_pos = (term1 > 0.0 ? 1 : 0) + (term2 > 0.0 ? 1 : 0) + (term3 > 0.0 ? 1 : 0);
+    
+    assert( num_zero + num_neg + num_pos == 3 );
+    
+    // calculated geometry is inconsistent if we have one of the following cases
+    // * one term zero and the other two of the same sign
+    // * two terms zero
+    // * all terms positive
+    // * all terms negative
+    if(((num_zero == 1 && num_neg != 1) || num_zero == 2 || (num_neg == 0 && num_zero != 3) || num_neg == 3 ))
+      {
+	LOG(4, "inconsistent dp found" );
+      }
+    return !((num_zero == 1 && num_neg != 1) || num_zero == 2 || (num_neg == 0 && num_zero != 3) || num_neg == 3 );
+
+    //    return (num_zero == 3) || (num_neg != 0 && num_neg != 3 && num_pos != 0 && num_pos != 3);
+			       //    return epsilonEqual(term1 + term2 + term3, 0.0);
   }
 
   void TransformedTriangle::resetDoubleProducts(const TriSegment seg, const TetraCorner corner)
@@ -176,7 +189,7 @@ namespace INTERP_UTILS
     for(int i = 0 ; i < 3 ; ++i) {
       const DoubleProduct dp = DOUBLE_PRODUCTS[3*corner + i];
       
-      // std::cout << std::endl << "resetting inconsistent dp :" << dp << " for corner " << corner <<  std::endl;	      
+      LOG(6, std::endl << "resetting inconsistent dp :" << dp << " for corner " << corner);
       _doubleProducts[8*seg + dp] = 0.0;
     };
   }
@@ -227,10 +240,10 @@ namespace INTERP_UTILS
     if(_isTripleProductsCalculated)
       return;
 
-    // std::cout << "Precalculating triple products" << std::endl;
+    LOG(4, "Precalculating triple products" );
     for(TetraCorner corner = O ; corner <= Z ; corner = TetraCorner(corner + 1))
       {
-	// std::cout << "- Triple product for corner " << corner << std::endl;
+	LOG(6, "- Triple product for corner " << corner );
 
 	// find edge / row to use -> that whose edge makes the smallest angle to the triangle
 	// use a map to find the minimum
@@ -273,7 +286,7 @@ namespace INTERP_UTILS
 	  {
 	    // this value will not be used
 	    // we set it to whatever
-	    // std::cout << "Triple product not calculated for corner " << corner << std::endl;
+	    LOG(6, "Triple product not calculated for corner " << corner );
 	    _tripleProducts[corner] = -3.14159265;
 	    _validTP[corner] = false;
 
@@ -514,14 +527,14 @@ namespace INTERP_UTILS
 
     if( epsilonEqual( p_term + q_term + r_term, 0.0, THRESHOLD_F * delta) )
       {
-	// std::cout << "Reset imprecise triple product for corner " << corner << " to zero" << std::endl; 
+	LOG(4, "Reset imprecise triple product for corner " << corner << " to zero" ); 
 	return 0.0;
       }
     else
       {
 	// NB : using plus also for the middle term compensates for a double product
 	// which is inversely ordered
-	//    std::cout << "Triple product for corner " << corner << ", row " << row << " = " << sign*( p_term + q_term + r_term ) << std::endl;
+	LOG(6, "Triple product for corner " << corner << ", row " << row << " = " << sign*( p_term + q_term + r_term ) );
 	return sign*( p_term + q_term + r_term );
       }
 

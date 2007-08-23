@@ -6,17 +6,17 @@
 
 #include "BoundingBox.hxx"
 
+
+
 using namespace MEDMEM;
 using namespace MED_EN;
-
-
 
 
 namespace INTERP_UTILS
 {
 
-  class TransformedTriangle;
-  class TetraAffineTransform;
+  //  class TransformedTriangle;
+  //  class TetraAffineTransform;
 
   /**
    * Class representing a single element of a mesh together with its bounding box.
@@ -72,39 +72,31 @@ namespace INTERP_UTILS
     bool isElementTriviallyDisjointWith(const MeshElement& otherElement) const;
 
     /**
-     * Returns the number of nodes of this element
-     *
-     * @returns  the number of nodes of this element
-     */
-    int getNumberNodes() const;
-
-    /**
-     * Returns the coordinates of a node of this element
-     * (1 <= node <= #nodes)
-     *
-     * @param      node  the node for which the coordinates are sought
-     * @returns    pointer to an array of 3 doubles containing the coordinates
-     */
-    const double* getCoordsOfNode(int node) const;
-
-    /**
      * Triangulate the faces of this element and apply an affine Transform to the triangles
      *
      * @param      triangles  vector in which triangles are stored
      * @param      T          affine transform that is applied to the nodes of the triangles
      */
-    void triangulate(std::vector<TransformedTriangle>& triangles, const TetraAffineTransform& T) const;
+    //    void triangulate(std::vector<TransformedTriangle>& triangles, const TetraAffineTransform& T) const;
     
     int getIndex() const;
 
     void dumpCoords() const;
+    
+    const BoundingBox* getBoundingBox() const
+    {
+      return _box;
+    }
+
+    MED_EN::medGeometryElement getType() const
+    {
+      return _type;
+    }
 
   private:
     const int _index;
-    const MEDMEM::MESH* _mesh;
-    const MED_EN::medGeometryElement _type;
     BoundingBox* _box; // should not change after initialisation
-    
+    MED_EN::medGeometryElement _type;
   };
 
 
@@ -112,17 +104,20 @@ namespace INTERP_UTILS
   class ElementBBoxOrder
   {
   public : 
-  
+    
     ElementBBoxOrder(BoundingBox::BoxCoord coord)
       : _coord(coord)
     {
     }
-  
+    
     bool operator()(MeshElement* elem1, MeshElement* elem2);
-  
+    
   private :
     BoundingBox::BoxCoord _coord;
   };
 
 };
+
+
+
 #endif

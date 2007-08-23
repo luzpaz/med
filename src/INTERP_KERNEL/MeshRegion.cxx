@@ -2,7 +2,7 @@
 
 #include "MeshElement.hxx"
 
-//#include <math.h>
+#include "MeshUtils.hxx"
 
 namespace INTERP_UTILS
 {
@@ -34,29 +34,30 @@ namespace INTERP_UTILS
    * @param element pointer to element to add to region
    *
    */
-  void MeshRegion::addElement(MeshElement* const element)
+  void MeshRegion::addElement(MeshElement* const element, const MEDMEM::MESH& mesh)
   {
     _elements.push_back(element);
+
+    const int numNodes = getNumberOfNodesForType(element->getType());
+    const int elemIdx = element->getIndex();
 	
     if(_box == 0)
       {
-	const int numNodes = element->getNumberNodes();
 	const double* pts[numNodes];
-	    
+
 	// get coordinates of elements
 	for(int i = 0 ; i < numNodes ; ++i)
 	  {
-	    pts[i] = element->getCoordsOfNode(i + 1);
+	    pts[i] = getCoordsOfNode(i + 1, elemIdx, mesh);
 	  }
 	    
 	_box = new BoundingBox(pts, numNodes);
 	    
       } else {
-	const int numNodes = element->getNumberNodes();
 
-	for(int i = 1 ; i <= numNodes ; ++i)
+	for(int i = 0 ; i < numNodes ; ++i)
 	  {
-	    const double* pt = element->getCoordsOfNode(i);
+	    const double* pt = getCoordsOfNode(i + 1, elemIdx, mesh);
 	    _box->updateWithPoint(pt);
 	  }
       }
@@ -72,7 +73,7 @@ namespace INTERP_UTILS
    * @param coord   coordinate of BoundingBox to use when splitting the region
    *
    */
-  void MeshRegion::split(MeshRegion& region1, MeshRegion& region2, BoundingBox::BoxCoord coord)
+  void MeshRegion::split(MeshRegion& region1, MeshRegion& region2, BoundingBox::BoxCoord coord, const MEDMEM::MESH& mesh)
   {
     ElementBBoxOrder cmp(coord);
 
@@ -86,14 +87,14 @@ namespace INTERP_UTILS
 
     while(elemCount < static_cast<int>(_elements.size() / 2))
       {
-	region1.addElement(*iter);
+	region1.addElement(*iter, mesh);
 	++iter;
 	++elemCount;
       }
 
     while(iter != _elements.end())
       {
-	region2.addElement(*iter);
+	region2.addElement(*iter, mesh);
 	++iter;
       }
 
