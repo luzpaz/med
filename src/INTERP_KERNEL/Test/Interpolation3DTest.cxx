@@ -5,10 +5,20 @@
 #include <map>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 #include "VectorUtils.hxx"
 
-#define VOL_PREC 1.0e-11
+// Levels : 
+// 1 - titles and volume results
+// 2 - empty
+// 3 - symmetry / diagonal results
+// 4 - intersection matrix output
+// 5 - misc
+#include "Log.hxx"
+
+
+#define VOL_PREC 1.0e-6
 
 using namespace MEDMEM;
 using namespace std;
@@ -16,14 +26,22 @@ using namespace INTERP_UTILS;
 
 double Interpolation3DTest::sumVolume(const IntersectionMatrix& m) const
 {
-  double vol = 0.0;
+  
+  vector<double> volumes;
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
 	{
-	  vol += fabs(iter2->second);
+	  volumes.push_back(iter2->second);
+	  //	  vol += std::abs(iter2->second);
 	}
     }
+  
+  // sum in ascending order to avoid rounding errors
+
+  sort(volumes.begin(), volumes.end());
+  const double vol = accumulate(volumes.begin(), volumes.end(), 0.0);
+
   return vol;
 }
 
@@ -38,9 +56,9 @@ bool Interpolation3DTest::areCompatitable(const IntersectionMatrix& m1, const In
 	  int j = iter2->first;
 	  if(m2.at(j-1).count(i+1) == 0)
 	    {
-	      if(!epsilonEqual(iter2->second, 0.0))
+	      if(!epsilonEqualRelative(iter2->second, 0.0, VOL_PREC))
 		{
-		  std::cout << "V1( " << i << ", " << j << ") exists, but V2( " << j - 1 << ", " << i + 1 << ") " << " does not " << std::endl;
+		  LOG(3, "V1( " << i << ", " << j << ") exists, but V2( " << j - 1 << ", " << i + 1 << ") " << " does not " );
 		  compatitable = false;
 		}
 	    }
@@ -56,9 +74,9 @@ bool Interpolation3DTest::testSymmetric(const IntersectionMatrix& m1, const Inte
   int i = 0;
   bool isSymmetric = true;
 
-  std::cout << "Checking symmetry src - target" << std::endl;
+  LOG(1, "Checking symmetry src - target" );
   isSymmetric = isSymmetric & areCompatitable(m1, m2) ;
-  std::cout << "Checking symmetry target - src" << std::endl;
+  LOG(1, "Checking symmetry target - src" );
   isSymmetric = isSymmetric & areCompatitable(m2, m1);
 
  for(IntersectionMatrix::const_iterator iter = m1.begin() ; iter != m1.end() ; ++iter)
@@ -73,8 +91,8 @@ bool Interpolation3DTest::testSymmetric(const IntersectionMatrix& m1, const Inte
 	  const double v2 = theMap[i + 1];
 	  if(v1 != v2)
 	    {
-	      std::cout << "V1( " << i << ", " << j << ") = " << v1 << " which is different from V2( " << j - 1 << ", " << i + 1 << ") = " << v2 << " | diff = " << v1 - v2 << std::endl;
-	      if(!epsilonEqual(v1, v2, VOL_PREC))
+	      LOG(3, "V1( " << i << ", " << j << ") = " << v1 << " which is different from V2( " << j - 1 << ", " << i + 1 << ") = " << v2 << " | diff = " << v1 - v2 );
+	      if(!epsilonEqualRelative(v1, v2, VOL_PREC))
 		{
 		  isSymmetric = false;
 		}
@@ -87,7 +105,7 @@ bool Interpolation3DTest::testSymmetric(const IntersectionMatrix& m1, const Inte
 
 bool Interpolation3DTest::testDiagonal(const IntersectionMatrix& m) const
 {
-  std::cout << "Checking if matrix is diagonal" << std::endl;
+  LOG(1, "Checking if matrix is diagonal" );
   int i = 1;
   bool isDiagonal = true;
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
@@ -98,8 +116,8 @@ bool Interpolation3DTest::testDiagonal(const IntersectionMatrix& m) const
 	  const double vol = iter2->second;
 	  if(vol != 0.0 && (i != j))
 	    {
-	      std::cout << "V( " << i - 1 << ", " << j << ") = " << vol << " which is not zero" << std::endl;
-	      if(!epsilonEqual(vol, 0.0, VOL_PREC))
+	      LOG(3, "V( " << i - 1 << ", " << j << ") = " << vol << " which is not zero" );
+	      if(!epsilonEqualRelative(vol, 0.0, VOL_PREC))
 		{
 		  isDiagonal = false;
 		}
@@ -113,18 +131,18 @@ bool Interpolation3DTest::testDiagonal(const IntersectionMatrix& m) const
 void Interpolation3DTest::dumpIntersectionMatrix(const IntersectionMatrix& m) const
 {
   int i = 0;
-  cout << "Intersection matrix is " << endl;
+  std::cout << "Intersection matrix is " << endl;
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
 	{
 	  
-	  cout << "V(" << i << ", " << iter2->first << ") = " << iter2->second << endl;
+	  std::cout << "V(" << i << ", " << iter2->first << ") = " << iter2->second << endl;
 	  
 	}
       ++i;
     }
-  std::cout << "Sum of volumes = " << sumVolume(m) << std::endl << std::endl;
+  std::cout << "Sum of volumes = " << sumVolume(m) << std::endl;
 }
 
 void Interpolation3DTest::setUp()
@@ -141,22 +159,23 @@ void Interpolation3DTest::calcIntersectionMatrix(const char* mesh1path, const ch
 {
   const string dataDir = getenv("DATA_DIR");
 
-  std::cout << std::endl << "=== -> intersecting src = " << mesh1 << ", target = " << mesh2 << std::endl;
+  LOG(1, std::endl << "=== -> intersecting src = " << mesh1 << ", target = " << mesh2 );
 
-  std::cout << "Loading " << mesh1 << " from " << mesh1path << endl;
+  LOG(5, "Loading " << mesh1 << " from " << mesh1path);
   const MESH sMesh(MED_DRIVER, dataDir+mesh1path, mesh1);
 
-  std::cout << "Loading " << mesh2 << " from " << mesh2path << endl;
+  LOG(5, "Loading " << mesh2 << " from " << mesh2path);
   const MESH tMesh(MED_DRIVER, dataDir+mesh2path, mesh2);
 
   m = interpolator->interpol_maillages(sMesh, tMesh);
 
-  std::cout << "Intersection calculation done. " << std::endl << std::endl;
+  LOG(1, "Intersection calculation done. " << std::endl );
+  
 }
 
 void Interpolation3DTest::intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec) const
 {
-  std::cout << std::endl << std::endl << "=============================" << std::endl;
+  LOG(1, std::endl << std::endl << "=============================" );
 
   using std::string;
   const string path1 = string(mesh1path) + string(mesh1);
@@ -166,30 +185,43 @@ void Interpolation3DTest::intersectMeshes(const char* mesh1path, const char* mes
 
   IntersectionMatrix matrix1;
   calcIntersectionMatrix(mesh1path, mesh1, mesh2path, mesh2, matrix1);
-  dumpIntersectionMatrix(matrix1);
+
+#ifdef LOG_ACTIVE
+  if(LOG_LEVEL >= 4 )
+    {
+      dumpIntersectionMatrix(matrix1);
+    }
+#endif
+
   std::cout.precision(16);
 
   const double vol1 = sumVolume(matrix1);
 
   if(isTestReflexive)
     {
-      std::cout << "vol =  " << vol1 <<"  correctVol = " << correctVol <<  std::endl;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec);
+      LOG(1, "vol =  " << vol1 <<"  correctVol = " << correctVol );
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(correctVol, vol1));
       CPPUNIT_ASSERT_EQUAL_MESSAGE("Reflexive test failed", true, testDiagonal(matrix1));
     }
   else
     {
       IntersectionMatrix matrix2;
       calcIntersectionMatrix(mesh2path, mesh2, mesh1path, mesh1, matrix2);    
-      dumpIntersectionMatrix(matrix2);
+
+#ifdef LOG_ACTIVE      
+      if(LOG_LEVEL >= 4 )
+	{
+	  dumpIntersectionMatrix(matrix2);
+	}
+#endif
       
       const double vol2 = sumVolume(matrix2);
 
-      std::cout << "vol1 =  " << vol1 << ", vol2 = " << vol2 << ", correctVol = " << correctVol <<   std::endl;
+      LOG(1, "vol1 =  " << vol1 << ", vol2 = " << vol2 << ", correctVol = " << correctVol );
 
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol2, prec);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(vol1, vol2, prec);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(vol1, correctVol));
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol2, prec * std::max(vol2, correctVol));
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(vol1, vol2, prec * std::max(vol1, vol2));
       CPPUNIT_ASSERT_EQUAL_MESSAGE("Symmetry test failed", true, testSymmetric(matrix1, matrix2));
     }
 

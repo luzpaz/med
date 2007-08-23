@@ -1,5 +1,8 @@
 #include "TransformedTriangleIntersectTest.hxx"
 #include <iostream>
+
+#include "Log.hxx"
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Intersection tests
 // Each method in this file runs all the intersection tests with some triangle. The goal is to cover all
@@ -84,6 +87,8 @@
 
 void TransformedTriangleIntersectTest::testTriangle1()
 {
+  LOG(1, "+++++++ Testing triangle 1" );
+
   typedef TransformedTriangle TT;
 
   double coords[9] = 
@@ -225,7 +230,7 @@ void TransformedTriangleIntersectTest::testTriangle1()
 
 void TransformedTriangleIntersectTest::testTriangle2()
 {
-
+  LOG(1, "+++++++ Testing triangle 2" );
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -364,7 +369,7 @@ void TransformedTriangleIntersectTest::testTriangle2()
 
 void TransformedTriangleIntersectTest::testTriangle3()
 {
-
+  LOG(1, "+++++++ Testing triangle 3" );
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -503,7 +508,7 @@ void TransformedTriangleIntersectTest::testTriangle3()
 
 void TransformedTriangleIntersectTest::testTriangle4()
 {
-
+  LOG(1, "+++++++ Testing triangle 4" );
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -644,7 +649,8 @@ void TransformedTriangleIntersectTest::testTriangle4()
 
 void TransformedTriangleIntersectTest::testTriangle5()
 {
-  // std::cout << std::endl << "+++++++ Testing triangle 5" << std::endl;
+  LOG(1, "+++++++ Testing triangle 5" );
+  
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -785,17 +791,17 @@ void TransformedTriangleIntersectTest::testTriangle5()
 
 void TransformedTriangleIntersectTest::testTriangle6()
 {
-  //  std::cout << std::endl << "+++++++ Testing triangle 6" << std::endl;
+  LOG(1, "+++++++ Testing triangle 6" );
 
-    typedef TransformedTriangle TT;
-
-    double coords[9] =
+  typedef TransformedTriangle TT;
+  
+  double coords[9] =
     {
       1.5, 0.5, 1.35,  // P
       0.5, -0.5, 2.1,  // Q
       -3.0, 3.0, -0.5   // R
     };
-
+  
   TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
 
   // run all intersection tests and ensure that the ones
@@ -928,6 +934,7 @@ void TransformedTriangleIntersectTest::testTriangle6()
 void TransformedTriangleIntersectTest::testTriangle7()
 {
 
+  LOG(1, "+++++++ Testing triangle 7" );
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -1068,7 +1075,7 @@ void TransformedTriangleIntersectTest::testTriangle7()
 
 void TransformedTriangleIntersectTest::testTriangle8()
 {
-
+  LOG(1, "+++++++ Testing triangle 8" );
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -1209,7 +1216,7 @@ void TransformedTriangleIntersectTest::testTriangle8()
 
 void TransformedTriangleIntersectTest::testTriangle9()
 {
-
+  LOG(1, "+++++++ Testing triangle 9" );
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -1350,7 +1357,7 @@ void TransformedTriangleIntersectTest::testTriangle9()
 
 void TransformedTriangleIntersectTest::testTriangle10()
 {
-
+  LOG(1, "+++++++ Testing triangle 10" );
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -1491,7 +1498,7 @@ void TransformedTriangleIntersectTest::testTriangle10()
 
 void TransformedTriangleIntersectTest::testTriangle11()
 {
-  
+  LOG(1, "+++++++ Testing triangle 11" );  
   typedef TransformedTriangle TT;
   
   double coords[9] =
@@ -1633,7 +1640,7 @@ void TransformedTriangleIntersectTest::testTriangle11()
 
 void TransformedTriangleIntersectTest::testTriangle12()
 {
-
+  LOG(1, "+++++++ Testing triangle 12" );
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -1775,7 +1782,7 @@ void TransformedTriangleIntersectTest::testTriangle12()
 
 void TransformedTriangleIntersectTest::testTriangle13()
 {
-
+  LOG(1, "+++++++ Testing triangle 13" );
     typedef TransformedTriangle TT;
 
     double coords[9] =
@@ -1930,7 +1937,7 @@ void TransformedTriangleIntersectTest::testTriangle13()
 
 void TransformedTriangleIntersectTest::testTriangleX()
 {
-
+  LOG(1, "+++++++ Testing triangle X" );
     typedef TransformedTriangle TT;
 
     double coords[9] =

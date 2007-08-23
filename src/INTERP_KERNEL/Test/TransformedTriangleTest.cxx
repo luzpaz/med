@@ -235,7 +235,7 @@ void TransformedTriangleTest::test_calcStableC_Consistency()
       
       //      if(consistency != 0.0) {
       //      if(num_zeros == 2 || num_neg == 0 || num_neg == 3) 
-      if((num_zero == 1 && num_neg != 1) || num_zero == 2 || num_neg == 0 || num_neg == 3 )
+      if((num_zero == 1 && num_neg != 1) || num_zero == 2 || num_neg == 0 && num_zero !=3 || num_neg == 3 )
 	{
 	  ++num_cases;
 	
@@ -323,3 +323,39 @@ void TransformedTriangleTest::test_calcStableC_Consistency()
       CPPUNIT_ASSERT_DOUBLES_EQUAL(correct_c_vals[i], c_vals[i], ERR_TOL);
     }
 }
+
+#if 0
+void TransformedTriangleTest::inconsistent2()
+{
+
+  typedef TransformedTriangle::TriSegment TriSegment;
+  typedef TransformedTriangle::TetraCorner TetraCorner;
+
+  const double x = 54946.35168415842;
+  const double y = 84351.32165113264;
+  const double z = 14845.65498715654;
+
+  double coords[9] = 
+    {
+      x+0.000001, y, z,
+      -x, -y, -z,
+      0.5*x, 0.25*y, -10.0
+    };
+
+  std::cout << "test : " << coords[0]*coords[4] - coords[1]*coords[3] << std::endl;
+  std::cout << "test : " << coords[0]*coords[5] - coords[2]*coords[3] << std::endl;
+  std::cout << "test : " << coords[1]*coords[5] - coords[2]*coords[4] << std::endl;
+  
+  TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
+
+  for(TriSegment seg = TransformedTriangle::PQ ; seg <= TransformedTriangle::RP ; seg = TriSegment(seg + 1))
+    {
+      std::cout << "seg " << seg << " consistent? = " << tri->areDoubleProductsConsistent(seg) << std::endl;
+    }
+
+  tri->calculateIntersectionVolume();
+
+  delete tri;
+  
+}
+#endif

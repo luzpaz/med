@@ -11,15 +11,11 @@ using MEDMEM::Interpolation3D;
 class Interpolation3DTest : public CppUnit::TestFixture
 {
 
+  // single - element
   CPPUNIT_TEST_SUITE( Interpolation3DTest );
 
-  // single - element
-  //#if 0
-
   CPPUNIT_TEST( tetraReflexiveUnit );
-
   CPPUNIT_TEST( tetraReflexiveGeneral );
-
   CPPUNIT_TEST( tetraNudgedSimpler );
   CPPUNIT_TEST( tetraNudged );
   CPPUNIT_TEST( tetraCorner );
@@ -31,38 +27,28 @@ class Interpolation3DTest : public CppUnit::TestFixture
   CPPUNIT_TEST( tetraHalfstripOnly2 );
   CPPUNIT_TEST( tetraSimpleHalfstripOnly );
   CPPUNIT_TEST( generalTetra );
-
   CPPUNIT_TEST( trickyTetra1 );
 
-  // multi - element
+  CPPUNIT_TEST( inconsistentTetra );
+
+
+  // multi - element  
+  
+
   CPPUNIT_TEST( tetraComplexIncluded );
   CPPUNIT_TEST( dividedUnitTetraSimplerReflexive );
   CPPUNIT_TEST( dividedUnitTetraReflexive );
   CPPUNIT_TEST( nudgedDividedUnitTetra );
   CPPUNIT_TEST( nudgedDividedUnitTetraSimpler );
   CPPUNIT_TEST( dividedGenTetra );
-  //#endif
   CPPUNIT_TEST( boxReflexive );
-
-
   CPPUNIT_TEST( boxReflexiveModerate );
-  //#if 0
-
   CPPUNIT_TEST( tetraBoxes );
-
   CPPUNIT_TEST( moderateBoxes );
-
   CPPUNIT_TEST( moderateBoxesSmaller );
-
-
   CPPUNIT_TEST( moderateBoxSmallReflexive );
-
-
   CPPUNIT_TEST( moderateBoxEvenSmallerReflexive );
-
   CPPUNIT_TEST( tinyBoxReflexive );
-  //#endif
-
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -101,12 +87,12 @@ public:
 
   void tetraSimpleIncluded()
   {
-    intersectMeshes("meshes/SimpleIncludedTetra.med", "SimpleIncludedTetra", "meshes/SimpleIncludingTetra.med", "SimpleIncludingTetra", 17.0156, 1.0e-4);
+    intersectMeshes("meshes/SimpleIncludedTetra.med", "SimpleIncludedTetra", "meshes/SimpleIncludingTetra.med", "SimpleIncludingTetra", 17.0156);
   }
 
   void tetraComplexIncluded()
   {
-    intersectMeshes("meshes/ComplexIncludedTetra.med", "ComplexIncludedTetra", "meshes/ComplexIncludingTetra.med", "ComplexIncludingTetra", 17.0156, 1.0e-4);
+    intersectMeshes("meshes/ComplexIncludedTetra.med", "ComplexIncludedTetra", "meshes/ComplexIncludingTetra.med", "ComplexIncludingTetra", 17.0156);
   }
 
   void tetraHalfstripOnly()
@@ -132,13 +118,19 @@ public:
 
   void generalTetra()
   {
-    intersectMeshes("meshes/GenTetra1.med", "GenTetra1", "meshes/GenTetra2.med", "GenTetra2", 4.91393, 1.0e-5);
+    intersectMeshes("meshes/GenTetra1.med", "GenTetra1", "meshes/GenTetra2.med", "GenTetra2", 4.91393);
   }
 
   void trickyTetra1()
   {
-    intersectMeshes("meshes/UnitTetra.med", "UnitTetra", "meshes/TrickyTetra1.med", "TrickyTetra1", 0.0, 1.0e-8);
+    intersectMeshes("meshes/UnitTetra.med", "UnitTetra", "meshes/TrickyTetra1.med", "TrickyTetra1", 0.0);
   }
+
+  void inconsistentTetra()
+  {
+    intersectMeshes("meshes/LargeUnitTetra.med", "LargeUnitTetra", "meshes/LargeInconsistentTetra.med", "LargeInconsistent", 7.86231e7);
+  }
+
 
   void tetraDegenEdge()
   {
@@ -182,42 +174,42 @@ public:
 
   void boxReflexive()
   {
-    intersectMeshes("meshes/Box3.med", "Box3", "meshes/Box3.med", "Box3", 13.9954,  1.0e-4);
+    intersectMeshes("meshes/Box3.med", "Box3", "meshes/Box3.med", "Box3", 13.9954);
   }
 
   void boxReflexiveModerate()
   {
-    intersectMeshes("meshes/Box1Moderate.med", "Box1Moderate", "meshes/Box1Moderate.med", "Box1Moderate", 1.0e6,  1.0);
+    intersectMeshes("meshes/Box1Moderate.med", "Box1Moderate", "meshes/Box1Moderate.med", "Box1Moderate", 1.0e6);
   }
 
   void tetraBoxes()
   {
-    intersectMeshes("meshes/Box1.med", "Box1", "meshes/Box2.med", "Box2", 124.197, 1.0e-3);
+    intersectMeshes("meshes/Box1.med", "Box1", "meshes/Box2.med", "Box2", 124.197);
   }
 
   void moderateBoxes()
   {
-    intersectMeshes("meshes/Box1Moderate.med", "Box1Moderate", "meshes/Box2Moderate.med", "Box2Moderate", 376856, 1.0);
+    intersectMeshes("meshes/Box1Moderate.med", "Box1Moderate", "meshes/Box2Moderate.med", "Box2Moderate", 376856);
   }
 
   void moderateBoxesSmaller()
   {
-    intersectMeshes("meshes/BoxModSmall1.med", "BoxModSmall1", "meshes/BoxModSmall2.med", "BoxModSmall2", 321853, 1.0);
+    intersectMeshes("meshes/BoxModSmall1.med", "BoxModSmall1", "meshes/BoxModSmall2.med", "BoxModSmall2", 321853);
   }
 
   void moderateBoxSmallReflexive()
   {
-    intersectMeshes("meshes/BoxModSmall1.med", "BoxModSmall1", "meshes/BoxModSmall1.med", "BoxModSmall1", 1.44018e6, 1.0);
+    intersectMeshes("meshes/BoxModSmall1.med", "BoxModSmall1", "meshes/BoxModSmall1.med", "BoxModSmall1", 1.44018e6);
   }
 
   void moderateBoxEvenSmallerReflexive()
   {
-    intersectMeshes("meshes/BoxEvenSmaller1.med", "BoxEvenSmaller1", "meshes/BoxEvenSmaller1.med", "BoxEvenSmaller1", 1.44018e6, 1.0);
+    intersectMeshes("meshes/BoxEvenSmaller1.med", "BoxEvenSmaller1", "meshes/BoxEvenSmaller1.med", "BoxEvenSmaller1", 1.44018e6);
   }
 
   void tinyBoxReflexive()
   {
-    intersectMeshes("meshes/TinyBox.med", "TinyBox", "meshes/TinyBox.med", "TinyBox", 979200, 1.0);
+    intersectMeshes("meshes/TinyBox.med", "TinyBox", "meshes/TinyBox.med", "TinyBox", 979200);
   }
   
 private:

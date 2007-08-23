@@ -34,7 +34,10 @@ public:
   void test_calcUnstableT();
 
   void test_calcStableC_Consistency();
-  
+#if 0
+  void inconsistent2();
+#endif
+
   double p1[3], q1[3], r1[3];
   double hp1, hq1, hr1;
   double Hp1, Hq1, Hr1;
