@@ -3,6 +3,12 @@
 
 #include <vector>
 
+#undef EPS_TESTING  // does not give good results
+
+#ifdef EPS_TESTING
+#define TEST_EPS 1.0e-14
+#endif
+
 // Levels : 
 // 1 - overview of algorithm + volume result
 // 2 - algorithm detail

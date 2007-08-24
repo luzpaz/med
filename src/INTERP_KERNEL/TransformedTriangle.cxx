@@ -596,8 +596,11 @@ namespace INTERP_UTILS
     for(TriCorner c = P ; c < NO_TRI_CORNER ; c = TriCorner(c + 1))
       {
 	// ? should have epsilon-equality here?
-	//if(!epsilonEqual(_coords[5*c + coord], 0.0, 1.0e-15))
+#ifdef EPS_TESTING
+	if(!epsilonEqualRelative(_coords[5*c + coord], 0.0, TEST_EPS * _coords[5*c + coord]))
+#else
 	if(_coords[5*c + coord] != 0.0)
+#endif
 	  {
 	    return false;
 	  }

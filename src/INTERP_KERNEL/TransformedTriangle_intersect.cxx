@@ -6,7 +6,10 @@
 #include "VectorUtils.hxx"
 
 #define SEG_RAY_TABLE 1 // seems correct
-#undef TEST_EPS 0.0//1.0e-14
+
+
+
+
 
 namespace INTERP_UTILS
 {
@@ -200,8 +203,12 @@ namespace INTERP_UTILS
 	OZX, XYZ  // ZX
       };
 
-        if(calcStableC(seg,DoubleProduct( edge )) != 0.0)
-    //    if(!epsilonEqual(calcStableC(seg,DoubleProduct( edge )), 0.0, TEST_EPS))
+#ifdef EPS_TESTING
+    if(!epsilonEqual(calcStableC(seg,DoubleProduct( edge )), 0.0, TEST_EPS))
+
+#else
+      if(calcStableC(seg,DoubleProduct( edge )) != 0.0)
+#endif
       {
 	return false;
       } 
@@ -356,8 +363,11 @@ namespace INTERP_UTILS
 	const TetraEdge edge = EDGES_FOR_CORNER[3*corner + i];
 	const DoubleProduct dp = DoubleProduct( edge );
 	const double c = calcStableC(seg, dp);
+#ifdef EPS_TESTING
+	if(!epsilonEqual(c, 0.0, TEST_EPS))
+#else
 	if(c != 0.0)
-	//	if(!epsilonEqual(c, 0.0, TEST_EPS))
+#endif
 	  {
 	    return false;
 	  }
@@ -510,7 +520,7 @@ namespace INTERP_UTILS
 	assert(pt[i] >= 0.0);
 	assert(pt[i] <= 1.0);
       }
-    assert(epsilonEqual(pt[0] + pt[1] + pt[2] - 1.0, 0.0, 1.0e-9));
+    assert(epsilonEqualRelative(pt[0] + pt[1] + pt[2], 1.0));
   }
     
   /**
@@ -565,7 +575,11 @@ namespace INTERP_UTILS
     
     //? epsilon-equality here?
     // cond. 1
+#ifdef EPS_TESTING
+    if(epsilonEqual(cVal0, 0.0, TEST_EPS))
+#else
     if(cVal0 != 0.0) 
+#endif
       {
 	LOG(4, "SR fails at cond 1 cVal0 = "  << cVal0 );
 	return false;
@@ -697,8 +711,11 @@ namespace INTERP_UTILS
 
     // if two or more c-values are zero we disallow x-edge intersection
     // Grandy, p.446
-        const int numZeros = (cPQ == 0.0 ? 1 : 0) + (cQR == 0.0 ? 1 : 0) + (cRP == 0.0 ? 1 : 0);
-    //?    const int numZeros = (epsilonEqual(cPQ,0.0) ? 1 : 0) + (epsilonEqual(cQR,0.0) ? 1 : 0) + (epsilonEqual(cRP, 0.0) ? 1 : 0);
+#ifdef EPS_TESTING
+    const int numZeros = (epsilonEqual(cPQ,0.0) ? 1 : 0) + (epsilonEqual(cQR,0.0) ? 1 : 0) + (epsilonEqual(cRP, 0.0) ? 1 : 0);
+#else
+    const int numZeros = (cPQ == 0.0 ? 1 : 0) + (cQR == 0.0 ? 1 : 0) + (cRP == 0.0 ? 1 : 0);
+#endif
     
     if(numZeros >= 2 ) 
       {
@@ -738,7 +755,11 @@ namespace INTERP_UTILS
 
     //? should equality with zero use epsilon?
     LOG(5, "testEdgeIntersectsTriangle : t1 = " << t1 << " t2 = " << t2 );
+#ifdef EPS_TESTING
+    return (t1*t2 <= 0.0) && (!epsilonEqualRelative(t1, t2, TEST_EPS * std::max(t1, t2)));
+#else
     return (t1*t2 <= 0.0) && (t1 - t2 != 0.0);
+#endif
   }
 
   /**
@@ -763,12 +784,13 @@ namespace INTERP_UTILS
     const double c2 = signs[1]*calcStableC(seg, DP_FOR_SEG_FACET_INTERSECTION[3*facet + 1]);
     const double c3 = signs[2]*calcStableC(seg, DP_FOR_SEG_FACET_INTERSECTION[3*facet + 2]);
 
-    if(false)
-    //if(epsilonEqual(c1, 0.0, TEST_EPS) || epsilonEqual(c2, 0.0, TEST_EPS) || epsilonEqual(c3, 0.0, TEST_EPS))
+#ifdef EPS_TSTING
+    if(epsilonEqual(c1, 0.0, TEST_EPS) || epsilonEqual(c2, 0.0, TEST_EPS) || epsilonEqual(c3, 0.0, TEST_EPS))
       {
 	return false;
       }
     else
+#endif
       {
 	return (c1*c3 > 0.0) && (c2*c3 > 0.0);
       }
@@ -792,8 +814,11 @@ namespace INTERP_UTILS
 
     //? should we use epsilon-equality here in second test?
     LOG(5, "coord1 : " << coord1 << " coord2 : " << coord2 );
-    //return (coord1*coord2 <= 0.0) && epsilonEqual(coord1,coord2);
+#ifdef EPS_TESTING
+    return (coord1*coord2 <= 0.0) && epsilonEqualRelative(coord1,coord2, TEST_EPS * std::max(coord1, coord2));
+#else
     return (coord1*coord2 <= 0.0) && (coord1 != coord2);
+#endif
   }
 
   bool TransformedTriangle::testSegmentIntersectsHPlane(const TriSegment seg) const
@@ -803,7 +828,11 @@ namespace INTERP_UTILS
     const double coord2 = _coords[5*( (seg + 1) % 3) + 4];
     //? should we use epsilon-equality here in second test?
     LOG(5, "coord1 : " << coord1 << " coord2 : " << coord2 );
+#ifdef EPS_TESTING
+    return (coord1*coord2 <= 0.0) && epsilonEqualRelative(coord1,coord2, TEST_EPS * std::max(coord1, coord2));
+#else
     return (coord1*coord2 <= 0.0) && (coord1 != coord2);
+#endif
   }
 
   /**

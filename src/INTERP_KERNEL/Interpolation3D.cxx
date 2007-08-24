@@ -173,8 +173,7 @@ namespace MEDMEM
 	      {
 		const int targetIdx = (*iter)->getIndex();
 		const double vol = intersector->intersectCells(srcIdx, targetIdx);
-		if(!epsilonEqual(vol, 0.0, 1.0e-10))
-		  //  if(vol != 0.0)
+		if(!epsilonEqual(vol, 0.0))
 		  {
 		    volumes->insert(make_pair(targetIdx, vol));
 		    LOG(2, "Result : V (" << srcIdx << ", " << targetIdx << ") = " << matrix[srcIdx - 1][targetIdx]);
@@ -301,7 +300,7 @@ namespace MEDMEM
 	    const int srcIdx = *iter + 1;
 	    const double vol = intersector->intersectCells(srcIdx, targetIdx);
 
-	    if(!epsilonEqual(vol, 0.0, 1.0e-10))
+	    if(!epsilonEqual(vol, 0.0))
 	      {
 		matrix[srcIdx - 1].insert(make_pair(targetIdx, vol));
 	      }

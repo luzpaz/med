@@ -7,6 +7,10 @@
 #include <numeric>
 #include <map>
 
+#define VOL_PREC 1.0e-6
+#define DEFAULT_REL_TOL 1.0e-6
+#define DEFAULT_ABS_TOL 1.0e-12
+
 namespace INTERP_UTILS
 {
  
@@ -53,15 +57,17 @@ namespace INTERP_UTILS
 
   }
 
-  inline bool epsilonEqual(const double x, const double y, const double errTol = 1.0e-12)
+  /// Should be used for comparisons to zero
+  inline bool epsilonEqual(const double x, const double y, const double errTol = DEFAULT_ABS_TOL)
   {
     return std::abs(x - y) <= errTol;
   }
 
-  inline bool epsilonEqualRelative(const double x, const double y, const double relTol = 1.0e-6, const double absTol = 1.0e-17)
+  // Should be used for comparisons between numbers that could be large
+  inline bool epsilonEqualRelative(const double x, const double y, const double relTol = DEFAULT_REL_TOL, const double absTol = DEFAULT_ABS_TOL)
   {
     // necessary for comparing values close to zero
-    // in order to avoid division
+    // in order to avoid division by very small numbers
     if(std::abs(x - y) < absTol)
       {
 	return true;
