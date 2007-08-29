@@ -31,7 +31,6 @@ namespace MEDMEM
    */
   Interpolation3D::Interpolation3D()
   {
-    // not implemented
   }
     
   /**
@@ -40,7 +39,6 @@ namespace MEDMEM
    */
   Interpolation3D::~Interpolation3D()
   {
-    // not implemented
   }
 
   /**
@@ -57,69 +55,81 @@ namespace MEDMEM
     //} it seems wasteful to make a copy here
     IntersectionMatrix matrix;
 	
-    // we should maybe do more sanity checking here - eliminating meshes that
-    // are too complicated
+    // we should do more sanity checking here - eliminating meshes that
+    // cannot be treated
 	
     calculateIntersectionVolumes(srcMesh, targetMesh, matrix);
     return matrix;
   }
     
   /**
-   * Performs a depth-first search over srcMesh, using bounding boxes to recursively eliminate the elements of targetMesh
-   * which cannot intersect smaller and smaller regions of srcMesh. At each level, each region is divided in two, forming
-   * a binary search tree with leaves consisting of only one element of the source mesh together with the elements of the
-   * target mesh that can intersect it. The recursion is implemented with a stack of RegionNodes, each one containing a 
-   * source region and a target region. Each region has an associated bounding box and a vector of pointers to the elements 
-   * that belong to it. Each element contains a bounding box, an element type and an index in the MEDMEM ConnectivityIndex array.
-   *
+   * Calculates the matrix of volumes of intersection between the elements of srcMesh and the elements of targetMesh.
+   * The calculation is done in two steps. First a filtering process reduces the number of pairs of elements for which the
+   * calculation must be carried out by eliminating pairs that do not intersect based on their bounding boxes. Then, the 
+   * volume of intersection is calculated by an object of type Intersector3D for the remaining pairs, and entered into the
+   * intersection matrix. 
+   * 
+   * The matrix is partially sparse : it is a vector of maps of integer - double pairs. 
+   * The length of the vector is equal to the number of source elements - for each source element there is a map, regardless
+   * of whether the element intersects any target elements or not. But in the maps there are only entries for those target elements
+   * which have a non-zero intersection volume with the source element. The vector has indices running from 
+   * 0 to (#source elements - 1), meaning that the map for source element i is stored at index i - 1. In the maps, however,
+   * the indexing is more natural : the intersection volume of the source element with target element j is found at matrix[i-1][j].
+   * 
+   
    * @param srcMesh     3-dimensional source mesh
    * @param targetMesh  3-dimesional target mesh, containing only tetraedra
    * @param matrix      vector of maps in which the result is stored 
    *
    */
-  void Interpolation3D::calculateIntersectionVolumes(const MEDMEM::MESH& srcMesh, const MEDMEM::MESH& targetMesh, IntersectionMatrix& matrix)
+  void Interpolation3D::calculateIntersectionVolumes(const MESH& srcMesh, const MESH& targetMesh, IntersectionMatrix& matrix)
   {
-    // calculate descending connectivities
-    //      srcMesh.calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL);
-    //      targetMesh.calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL);
+    // create intersector element
+    Intersector3D* intersector = new Intersector3D(srcMesh, targetMesh);
 
     // create MeshElement objects corresponding to each element of the two meshes
-      
     const int numSrcElems = srcMesh.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
     const int numTargetElems = targetMesh.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
 
-    Intersector3D* intersector = new Intersector3D(srcMesh, targetMesh);
-
     LOG(2, "Source mesh has " << numSrcElems << " elements and target mesh has " << numTargetElems << " elements ");
-
-    // create empty maps for all source elements
-    matrix.resize(numSrcElems);
-
 
     MeshElement* srcElems[numSrcElems];
     MeshElement* targetElems[numTargetElems];
-      
+    
     std::map<MeshElement*, int> indices;
-
+    
     for(int i = 0 ; i < numSrcElems ; ++i)
       {
 	//const int index = srcMesh.getConnectivityIndex(MED_NODAL, MED_CELL)[i];
 	const medGeometryElement type = srcMesh.getElementType(MED_CELL, i + 1);
 	srcElems[i] = new MeshElement(i + 1, type, srcMesh);
-	  
+	
       }
-
+    
     for(int i = 0 ; i < numTargetElems ; ++i)
       {
 	//	  const int index = targetMesh.getConnectivityIndex(MED_NODAL, MED_CELL)[i];
 	const medGeometryElement type = targetMesh.getElementType(MED_CELL, i + 1);
 	targetElems[i] = new MeshElement(i + 1, type, targetMesh);
       }
+    
+    // create empty maps for all source elements
+    matrix.resize(numSrcElems);
 
 #ifdef USE_RECURSIVE_BBOX_FILTER
-      
+
+    /*
+     * Performs a depth-first search over srcMesh, using bounding boxes to recursively eliminate the elements of targetMesh
+     * which cannot intersect smaller and smaller regions of srcMesh. At each level, each region is divided in two, forming
+     * a binary search tree with leaves consisting of only one element of the source mesh together with the elements of the
+     * target mesh that can intersect it. The recursion is implemented with a stack of RegionNodes, each one containing a 
+     * source region and a target region. Each region has an associated bounding box and a vector of pointers to the elements 
+     * that belong to it. Each MeshElement contains a bounding box and the global number of the corresponding element in the mesh.
+     */
+
     // create initial RegionNode and fill up its source region with all the source mesh elements and
-    // its target region with all the target mesh elements whose bbox intersects that of the source region
+    // its target region with all the target mesh elements whose bounding box
+    //  intersects that of the source region
 
     RegionNode* firstNode = new RegionNode();
       
@@ -141,7 +151,7 @@ namespace MEDMEM
       }
 
     // using a stack, descend recursively, creating at each step two new RegionNodes having as source region the left and
-    // right part of the source region of the current node (determined using MeshRegion::split()) and as target region all the 
+    // right part of the source region of the current node (created using MeshRegion::split()) and as target region all the 
     // elements of the target mesh whose bounding box intersects the corresponding part
     // Continue until the source region contains only one element, at which point the intersection volumes are
     // calculated with all the remaining target mesh elements and stored in the matrix if they are non-zero.
@@ -157,9 +167,9 @@ namespace MEDMEM
 
 	if(currNode->getSrcRegion().getNumberOfElements() == 1)
 	  {
+	    // calculate volumes
 	    LOG(4, " - One element");
 
-	    // volume calculation
 	    MeshElement* srcElement = *(currNode->getSrcRegion().getBeginElements());
 	      
 	    // NB : srcElement indices are from 0 .. numSrcElements - 1
@@ -171,14 +181,17 @@ namespace MEDMEM
 	    for(vector<MeshElement*>::const_iterator iter = currNode->getTargetRegion().getBeginElements() ; 
 		iter != currNode->getTargetRegion().getEndElements() ; ++iter)
 	      {
+	     
 		const int targetIdx = (*iter)->getIndex();
 		const double vol = intersector->intersectCells(srcIdx, targetIdx);
-		if(!epsilonEqual(vol, 0.0))
+		//if(!epsilonEqual(vol, 0.0))
+		if(vol != 0.0)
 		  {
 		    volumes->insert(make_pair(targetIdx, vol));
 		    LOG(2, "Result : V (" << srcIdx << ", " << targetIdx << ") = " << matrix[srcIdx - 1][targetIdx]);
 		  }
 	      }
+
 	  } 
 	else // recursion 
 	  {
@@ -200,10 +213,10 @@ namespace MEDMEM
 
 	    // ugly hack to avoid problem with enum which does not start at 0
 	    // I guess I ought to implement ++ for it instead ...
-	    // Anyway, it basically chooses the next axis, circually
+	    // Anyway, it basically chooses the next axis, cyclically
 	    axis = (axis != BoundingBox::ZMAX) ? static_cast<BoundingBox::BoxCoord>(axis + 1) : BoundingBox::XMAX;
 
-	    // add target elements of curr node that overlap the two new nodes
+	    // add target elements of current node that overlap the source regions of the new nodes
 	    LOG(5, " -- Adding target elements");
 	    int numLeftElements = 0;
 	    int numRightElements = 0;
@@ -229,6 +242,7 @@ namespace MEDMEM
 	    LOG(5, "Left target region has " << numLeftElements << " elements and right target region has " 
 		<< numRightElements << " elements");
 
+	    // push new nodes on stack
 	    if(numLeftElements != 0)
 	      {
 		nodes.push(leftNode);
@@ -297,6 +311,7 @@ namespace MEDMEM
 
 	for(vector<int>::const_iterator iter = intersectElems.begin() ; iter != intersectElems.end() ; ++iter)
 	  {
+#if 0
 	    const int srcIdx = *iter + 1;
 	    const double vol = intersector->intersectCells(srcIdx, targetIdx);
 
@@ -304,6 +319,7 @@ namespace MEDMEM
 	      {
 		matrix[srcIdx - 1].insert(make_pair(targetIdx, vol));
 	      }
+#endif
 	  }
       }
     
@@ -323,92 +339,4 @@ namespace MEDMEM
 
   }
 
-  /**
-   * Calculates volume of intersection between an element of the source mesh and an element of the target mesh.
-   * The calculation passes by the following steps : 
-   * a) test if srcElement is in the interior of targetElement -> if yes, return volume of srcElement
-   *    --> test by call to Element::isElementIncludedIn
-   * b) test if targetElement is in the interior of srcElement -> if yes return volume of targetElement
-   *    --> test by call to Element::isElementIncludedIn
-   * c) test if srcElement and targetElement are disjoint -> if yes return 0.0 [this test is only possible if srcElement is convex]
-   *    --> test by call to Element::isElementTriviallyDisjointWith
-   * d) (1) find transformation M that takes the target element (a tetraeder) to the unit tetraeder
-   *    --> call calculateTransform()
-   *    (2) divide srcElement in triangles
-   *    --> call triangulateElement()
-   *    (3) for each triangle in element, 
-   *        (i) find polygones --> calculateIntersectionPolygones()
-   *        (ii) calculate volume under polygones --> calculateVolumeUnderPolygone()
-   *        (iii) add volume to sum
-   *    (4) return det(M)*sumVolume (det(M) = 6*vol(targetElement))
-   *
-   * @param      srcElement
-   * @param      targetElement 
-   * @returns    volume of intersection between srcElement and targetElement
-   *
-   */
-#if 0
-  double Interpolation3D::calculateIntersectionVolume(const MeshElement& srcElement, const MeshElement& targetElement)
-  {
-
-    //std::cout << "Intersecting elems " << srcElement.getIndex() << " and " << targetElement.getIndex() << std::endl;
-    // (a), (b) and (c) not yet implemented
-
-    // (d) : without fine-level filtering (a) - (c) for the time being
-    // std::cout << "------------------" << std::endl;
-    std::cout << "Source : ";
-    srcElement.dumpCoords();
-    std::cout << "Target : ";
-    targetElement.dumpCoords();
-
-    // get array of points of target tetraeder
-    const double* tetraCorners[4];
-    for(int i = 0 ; i < 4 ; ++i)
-      {
-	tetraCorners[i] = targetElement.getCoordsOfNode(i + 1);
-      }
-
-    // create AffineTransform
-    TetraAffineTransform T( tetraCorners );
-	
-    // check if we have planar tetra element
-    if(epsilonEqual(T.determinant(), 0.0, 1.0e-16))
-      {
-	// tetra is planar
-	// std::cout << "Planar tetra -- volume 0" << std::endl;
-	return 0.0;
-      }
-
-    // std::cout << "Transform : " << std::endl;
-    // T.dump();
-    // std::cout << std::endl;
-
-    // triangulate source element faces (assumed tetraeder for the time being)
-    // do nothing
-    vector<TransformedTriangle> triangles;
-    srcElement.triangulate(triangles, T);
-	
-    double volume = 0.0;
-
-    // std::cout << "num triangles = " << triangles.size() << std::endl;
-    int i = 0;
-    for(vector<TransformedTriangle>::iterator iter = triangles.begin() ; iter != triangles.end(); ++iter)
-      {
-	std::cout << std::endl << "= > Triangle " << ++i << std::endl;  
-	iter->dumpCoords();
-	volume += iter->calculateIntersectionVolume();
-      }
-
-    std::cout << "Volume = " << volume << ", det= " << T.determinant() << std::endl;
-
-    //? trying without abs to see if the sign of the determinant will always cancel that of the volume
-    //? but maybe we should take abs( det ( T ) ) or abs ( 1 / det * vol )
-
-    //? fault in article, Grandy, [8] : it is the determinant of the inverse transformation that 
-    // should be used
-
-    return std::abs(1.0 / T.determinant() * volume) ;
-	
-  }
-#endif
 }

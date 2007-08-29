@@ -7,23 +7,24 @@
 #include "BoundingBox.hxx"
 
 
-
 namespace INTERP_UTILS
 {
 
   /**
    * Constructor
    *
+   * @param index   global number of element in the mesh
    * @param mesh    mesh that the element belongs to
    * @param type    geometric type of the element
-   * @param index   global number of element in the mesh
    */
   MeshElement::MeshElement(const int index, const MED_EN::medGeometryElement type, const MEDMEM::MESH& mesh)
     : _index(index), _box(0), _type(type)
   {
     // get coordinates of vertices
     const int numNodes = getNumberOfNodesForType(type);
-    
+
+    assert(numNodes >= 3);
+
     const double* vertices[numNodes];
 
     for(int i = 0 ; i < numNodes ; ++i)
@@ -48,61 +49,67 @@ namespace INTERP_UTILS
       }
   }
 
-  /**
-   * Determines if this element is in the interior of another element 
-   * by calculating the triple products for each point of this element with respect
-   * to all the faces of the other object (faces must be triangulated ... ) If all triple
-   * products have the same sign, then the element is in the interior of the other element
+  /*
+   * Accessor to global number
    *
-   * @param otherElement the supposedly enclosing element
-   * @returns true if this element is enclosed in the other element, false if not
+   * @return  global number of the element
    */
-  bool MeshElement::isElementIncludedIn(const MeshElement& otherElement) const
-  {
-    // not implemented
-    return false;
-  }
-
-  /**
-   * Determines whether the intersection of this element is trivially empty. This is done by checking for each
-   * face of one element if it is such that all the vertices of the other element is on the same side of this face.
-   * If there is such a face, then the intersection is trivially empty. If there is no such face, we do not know if 
-   * the intersection is empty.
-   *
-   * @pre The elements are convex. If this is not true, we return false.
-   * @param otherElement the element believed to be disjoint with this one
-   * @returns true if the two elements are convex and there exists a face of this element such as described 
-   *          above, false otherwise
-   */
-  bool MeshElement::isElementTriviallyDisjointWith(const MeshElement& otherElement) const
-  {
-    // not implemented
-    return false;
-  }
-
-  
   int MeshElement::getIndex() const
   {
     return _index;
-  }
+  }  
   
-  void MeshElement::dumpCoords() const
-  {
-    std::cout << "Bounding box of element " << _index << " is " << std::endl;
-    _box->dumpCoords();
-  }
-  
+  /*
+   * Accessor to bounding box
+   *
+   * @return pointer to bounding box of the element
+   */
+  const BoundingBox* MeshElement::getBoundingBox() const
+    {
+      return _box;
+    }
 
-  /// ElementBBoxOrder
+  /*
+   * Accessor to the type of the element
+   *
+   * @return  type of the element
+   */
+  MED_EN::medGeometryElement MeshElement::getType() const
+    {
+      return _type;
+    }
+
+  /////////////////////////////////////////////////////////////////////
+  /// ElementBBoxOrder                                    /////////////
+  /////////////////////////////////////////////////////////////////////
+  /*
+   * Constructor
+   *
+   * @param  coord   BoundingBox coordinate (XMIN, XMAX, etc) on which to base the ordering
+   */
+  ElementBBoxOrder::ElementBBoxOrder(BoundingBox::BoxCoord coord)
+    : _coord(coord)
+  {
+  }
+
+  /*
+   * Comparison operator based on the bounding boxes of the elements
+   *
+   * @returns true if the coordinate _coord of the bounding box of elem1 is 
+   *          strictly smaller than that of the bounding box of elem2
+   */
   bool ElementBBoxOrder::operator()( MeshElement* elem1, MeshElement* elem2)
   {
+    const BoundingBox* box1 = elem1->getBoundingBox();
+    const BoundingBox* box2 = elem2->getBoundingBox();
+
     assert(elem1 != 0);
     assert(elem2 != 0);
-    assert(elem1->_box != 0);
-    assert(elem2->_box != 0);
+    assert(box1 != 0);
+    assert(box2 != 0);
     
-    const double coord1 = elem1->_box->getCoordinate(_coord);
-    const double coord2 = elem2->_box->getCoordinate(_coord);
+    const double coord1 = box1->getCoordinate(_coord);
+    const double coord2 = box2->getCoordinate(_coord);
     
     return coord1 < coord2;
   }

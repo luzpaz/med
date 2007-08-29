@@ -29,7 +29,8 @@ namespace INTERP_UTILS
   }
 
   /**
-   * Adds an element to the region, updating the bounding box.
+   * Adds an element to the region, updating the bounding box. If the bounding box does not yet
+   * exist, it is created here. This creation is delayed to make it possible to have empty MeshRegions
    *
    * @param element pointer to element to add to region
    *
@@ -45,7 +46,7 @@ namespace INTERP_UTILS
       {
 	const double* pts[numNodes];
 
-	// get coordinates of elements
+	// get coordinates of the nodes of the element
 	for(int i = 0 ; i < numNodes ; ++i)
 	  {
 	    pts[i] = getCoordsOfNode(i + 1, elemIdx, mesh);
@@ -75,6 +76,7 @@ namespace INTERP_UTILS
    */
   void MeshRegion::split(MeshRegion& region1, MeshRegion& region2, BoundingBox::BoxCoord coord, const MEDMEM::MESH& mesh)
   {
+    // create ordering
     ElementBBoxOrder cmp(coord);
 
     // sort elements by their bounding boxes
@@ -97,29 +99,53 @@ namespace INTERP_UTILS
 	region2.addElement(*iter, mesh);
 	++iter;
       }
-
-    // assert(std::abs(region1._elements.size() - region2._elements.size()) < 2);
-	
   }
 
+  /*
+   * Determines if a given element can intersect the elements of this region by 
+   * testing whether the bounding box of the region intersects the bounding box of the element.
+   * Note that the test is only true in one direction : if the bounding boxes are disjoint, the
+   * element cannot intersect any of the elements in the region, but if they are not disjoint, the 
+   * element may or may not do so.
+   *
+   * @param   elem  Element with which to test for disjoint-ness
+   * @return  true if the bounding box of the element is disjoint with the bounding box of the region, false otherwise
+   */
   bool MeshRegion::isDisjointWithElementBoundingBox(const MeshElement& elem) const
   {
-    assert(_box != 0);
-    assert(elem._box != 0);
+    const BoundingBox* elemBox = elem.getBoundingBox();
 
-    return _box->isDisjointWith(*(elem._box));
+    assert(_box != 0);
+    assert(elemBox != 0);
+
+    return _box->isDisjointWith(*elemBox);
   }
 
+  /*
+   * Accessor to beginning of elements vector
+   *
+   * @return  constant iterator pointing at the beginning of the vector or elements
+   */
   std::vector<MeshElement*>::const_iterator MeshRegion::getBeginElements() const
   {
     return _elements.begin();
   }
 
+  /*
+   * Accessor to end of elements vector
+   *
+   * @return  constant iterator pointing at the end of the vector or elements
+   */
   std::vector<MeshElement*>::const_iterator MeshRegion::getEndElements() const
   {
     return _elements.end();
   }
-
+  
+  /*
+   * Gives information on how many elements are contained in the region.
+   *
+   * @return  the number of elements contained in the region
+   */
   int MeshRegion::getNumberOfElements() const
   {
     return _elements.size();

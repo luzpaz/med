@@ -88,19 +88,37 @@ LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MED2_INCLUDES)
 CPPFLAGS+=$(BOOST_CPPFLAGS) 
 
-CXXFLAGS+=-fprofile-arcs -ftest-coverage
-CPPFLAGS+=-fprofile-arcs -ftest-coverage
+# optimization
+#CXXFLAGS+= -O1 -DOPTIMIZE
+#CPPFLAGS+= -O1 -DOPTIMIZE
+CXXFLAGS+= -DOPTIMIZE -O2
+CPPFLAGS+= -DOPTIMIZE -O2
+
+# for log
+CXXFLAGS+= -DLOG_LEVEL=0 
+CPPFLAGS+= -DLOG_LEVEL=0 
+
+# for gcov
+#CXXFLAGS+=-fprofile-arcs -ftest-coverage 
+#CPPFLAGS+=-fprofile-arcs -ftest-coverage 
+
+#for gprof
+CXXFLAGS+=-pg
+CPPFLAGS+=-pg
 
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
 LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem   -lutil
 #LDFLAGS+= $(HDF5_LIBS) $(STDLIB) -lutil
-LDFLAGS+= -lgcov
+# for gcov
+#LDFLAGS+= -lgcov
+LDFLAGS+= -pg
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
 LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) -lutil 
 #LDFLAGSFORBIN+= -lm $(HDF5_LIBS) -lmedmem $(BOOST_LIBS) -lutil 
+
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}
@@ -108,6 +126,8 @@ ifeq ($(MED_WITH_KERNEL),yes)
   LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
   LDFLAGSFORBIN+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics
 endif
+
+LDFLAGSFORBIN+= -pg
 
 LIBSFORBIN=$(BOOSTLIBS) $(MPI_LIBS) 
 

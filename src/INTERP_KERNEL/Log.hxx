@@ -2,23 +2,25 @@
 #define _LOG_H_
 
 /* Simple pre-processor logging utility.
- * Replaces LOG( x ) with "if(x <= LOG_LEVEL) std::cout" when logging is active (LOG_ACTIVE defined)
- * x is the level at which the message should be logged. 
+ * Replaces LOG( lvl, x ) with "if(lvl <= LOG_LEVEL) std::cout << x << std::endl" when logging is active 
+ * (LOG_LEVEL > 0 is defined). x is the level at which the message should be logged - if it is smaller or equal to
+ * LOG_LEVEL (which can be defined at compile-time for each file by passing option -DLOG_LEVEL=x to gcc)
+ * than the message is logged.
  *
  *
  *
  */
 
+/// define LOG_LEVEL here if it is not already defined
+#ifndef LOG_LEVEL
+#define LOG_LEVEL 0
+#endif
 
-
-#define LOG_ACTIVE
-
-#ifdef LOG_ACTIVE
+#if LOG_LEVEL > 0
 
 #include <iostream>
 
-#define LOG_LEVEL 1
-
+/// write message msg to std::cout if x <= LOG_LEVEL
 #define LOG(x, msg) if(x <= LOG_LEVEL) std::cout << msg << std::endl; 
 
 #else

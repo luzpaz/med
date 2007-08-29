@@ -1,4 +1,7 @@
-#include "Interpolation3DTest.hxx"
+#ifndef _TESTING_UTILS_HXX_
+#define _TESTING_UTILS_HXX_
+
+#include "Interpolation3D.hxx"
 #include "MEDMEM_Mesh.hxx"
 
 #include <iostream>
@@ -17,14 +20,13 @@
 // 5 - misc
 #include "Log.hxx"
 
-
-//#define VOL_PREC 1.0e-6
-
 using namespace MEDMEM;
 using namespace std;
 using namespace INTERP_UTILS;
+using namespace MED_EN;
 
-double Interpolation3DTest::sumVolume(const IntersectionMatrix& m) const
+
+double sumVolume(const IntersectionMatrix& m) 
 {
   
   vector<double> volumes;
@@ -45,7 +47,9 @@ double Interpolation3DTest::sumVolume(const IntersectionMatrix& m) const
   return vol;
 }
 
-bool Interpolation3DTest::areCompatitable(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const
+#if 0
+
+bool areCompatitable(const IntersectionMatrix& m1, const IntersectionMatrix& m2)
 {
   bool compatitable = true;
   int i = 0;
@@ -73,7 +77,7 @@ bool Interpolation3DTest::areCompatitable(const IntersectionMatrix& m1, const In
   return compatitable;
 }
 	    
-bool Interpolation3DTest::testSymmetric(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const
+bool testSymmetric(const IntersectionMatrix& m1, const IntersectionMatrix& m2)
 {
 
   int i = 0;
@@ -113,7 +117,7 @@ bool Interpolation3DTest::testSymmetric(const IntersectionMatrix& m1, const Inte
  return isSymmetric;
 }
 
-bool Interpolation3DTest::testDiagonal(const IntersectionMatrix& m) const
+bool testDiagonal(const IntersectionMatrix& m)
 {
   LOG(1, "Checking if matrix is diagonal" );
   int i = 1;
@@ -143,7 +147,9 @@ bool Interpolation3DTest::testDiagonal(const IntersectionMatrix& m) const
   return isDiagonal;
 }
 
-void Interpolation3DTest::dumpIntersectionMatrix(const IntersectionMatrix& m) const
+#endif
+
+void dumpIntersectionMatrix(const IntersectionMatrix& m) 
 {
   int i = 0;
   std::cout << "Intersection matrix is " << endl;
@@ -160,17 +166,27 @@ void Interpolation3DTest::dumpIntersectionMatrix(const IntersectionMatrix& m) co
   std::cout << "Sum of volumes = " << sumVolume(m) << std::endl;
 }
 
-void Interpolation3DTest::setUp()
+std::pair<int,int> countNumberOfMatrixEntries(const IntersectionMatrix& m)
 {
-  interpolator = new Interpolation3D();
+  
+  int numElems = 0;
+  int numNonZero = 0;
+  for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
+    {
+      numElems += iter->size();
+      for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
+	{
+	  if(!epsilonEqual(iter2->second, 0.0, VOL_PREC))
+	    {
+	      ++numNonZero;
+	    }
+	}
+    }
+  return std::make_pair(numElems, numNonZero);
 }
 
-void Interpolation3DTest::tearDown()
-{
-  delete interpolator;
-} 
 
-void Interpolation3DTest::calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) const
+void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) 
 {
   const string dataDir = getenv("DATA_DIR");
 
@@ -178,17 +194,41 @@ void Interpolation3DTest::calcIntersectionMatrix(const char* mesh1path, const ch
 
   LOG(5, "Loading " << mesh1 << " from " << mesh1path);
   const MESH sMesh(MED_DRIVER, dataDir+mesh1path, mesh1);
+  const int numSrcElems = sMesh.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
+  LOG(1, "Source mesh has " << numSrcElems << " elements");
+
 
   LOG(5, "Loading " << mesh2 << " from " << mesh2path);
   const MESH tMesh(MED_DRIVER, dataDir+mesh2path, mesh2);
+  const int numTargetElems = tMesh.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
+
+  LOG(1, "Target mesh has " << numTargetElems << " elements");
+
+  Interpolation3D* interpolator = new Interpolation3D();
 
   m = interpolator->interpol_maillages(sMesh, tMesh);
+
+  std::pair<int, int> eff = countNumberOfMatrixEntries(m);
+  LOG(1, eff.first << " of " << numTargetElems * numSrcElems << " intersections calculated : ratio = " 
+      << double(eff.first) / double(numTargetElems * numSrcElems));
+  LOG(1, eff.second << " non-zero elements of " << eff.first << " total : filter efficiency = " 
+      << double(eff.second) / double(eff.first));
+
+  delete interpolator;
 
   LOG(1, "Intersection calculation done. " << std::endl );
   
 }
 
-void Interpolation3DTest::intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec, bool doubleTest) const
+
+
+
+
+
+
+
+#if 0
+void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec, bool doubleTest) 
 {
   LOG(1, std::endl << std::endl << "=============================" );
 
@@ -212,11 +252,11 @@ void Interpolation3DTest::intersectMeshes(const char* mesh1path, const char* mes
   if(!doubleTest)
     {
       LOG(1, "vol =  " << vol1 <<"  correctVol = " << correctVol );
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(correctVol, vol1));
+      // CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(correctVol, vol1));
      
       if(isTestReflexive)
 	{
-	  CPPUNIT_ASSERT_EQUAL_MESSAGE("Reflexive test failed", true, testDiagonal(matrix1));
+	  // CPPUNIT_ASSERT_EQUAL_MESSAGE("Reflexive test failed", true, testDiagonal(matrix1));
 	}
     }
   else
@@ -233,13 +273,17 @@ void Interpolation3DTest::intersectMeshes(const char* mesh1path, const char* mes
 
       LOG(1, "vol1 =  " << vol1 << ", vol2 = " << vol2 << ", correctVol = " << correctVol );
 
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(vol1, correctVol));
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol2, prec * std::max(vol2, correctVol));
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(vol1, vol2, prec * std::max(vol1, vol2));
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("Symmetry test failed", true, testSymmetric(matrix1, matrix2));
+      // CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(vol1, correctVol));
+      // CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol2, prec * std::max(vol2, correctVol));
+      // CPPUNIT_ASSERT_DOUBLES_EQUAL(vol1, vol2, prec * std::max(vol1, vol2));
+      // CPPUNIT_ASSERT_EQUAL_MESSAGE("Symmetry test failed", true, testSymmetric(matrix1, matrix2));
     }
 
 }
 
 
 
+#endif
+
+
+#endif

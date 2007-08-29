@@ -25,9 +25,9 @@
 
 // --- Registers the fixture into the 'registry'
 //CPPUNIT_TEST_SUITE_REGISTRATION( Interpolation3DTestMultiElement );
-CPPUNIT_TEST_SUITE_REGISTRATION( Interpolation3DTest );
+//CPPUNIT_TEST_SUITE_REGISTRATION( Interpolation3DTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleIntersectTest );
-CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleTest );
+//CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleTest );
 //CPPUNIT_TEST_SUITE_REGISTRATION( TestBogusClass );
 
 // --- generic Main program from KERNEL_SRC/src/Basics/Test

@@ -69,7 +69,8 @@ namespace INTERP_UTILS
 	    _doubleProducts[8*seg + dp] = calcUnstableC(seg, dp);
 	  }
       }
-  
+
+    std::map<double, TetraCorner> distances;
 
     // -- (1) for each segment : check that double products satisfy Grandy, [46]
     // -- and make corrections if not
@@ -77,7 +78,7 @@ namespace INTERP_UTILS
       {
 	if(!areDoubleProductsConsistent(seg))
 	  {
-	    std::map<double, TetraCorner> distances;
+
 	    LOG(4, "inconsistent! ");
 
 	    for(TetraCorner corner = O ; corner <= Z ; corner = TetraCorner(corner + 1))
@@ -101,6 +102,7 @@ namespace INTERP_UTILS
 	      }
 #endif	    
 	  }
+	distances.clear();
 
       }
   
@@ -151,8 +153,8 @@ namespace INTERP_UTILS
     const double term3 = _doubleProducts[8*seg + C_XY] * _doubleProducts[8*seg + C_ZH];
     
 
-    LOG(6, "for seg " << seg << " consistency " << term1 + term2 + term3 );
-    LOG(6, "term1 :" << term1 << " term2 :" << term2 << " term3: " << term3 );
+    LOG(2, "for seg " << seg << " consistency " << term1 + term2 + term3 );
+    LOG(2, "term1 :" << term1 << " term2 :" << term2 << " term3: " << term3 );
     
     const int num_zero = (term1 == 0.0 ? 1 : 0) + (term2 == 0.0 ? 1 : 0) + (term3 == 0.0 ? 1 : 0);
     const int num_neg = (term1 < 0.0 ? 1 : 0) + (term2 < 0.0 ? 1 : 0) + (term3 < 0.0 ? 1 : 0);
@@ -175,6 +177,7 @@ namespace INTERP_UTILS
 			       //    return epsilonEqual(term1 + term2 + term3, 0.0);
   }
 
+#ifndef OPTIMIZE
   void TransformedTriangle::resetDoubleProducts(const TriSegment seg, const TetraCorner corner)
   {
     // set the three corresponding double products to 0.0
@@ -193,7 +196,7 @@ namespace INTERP_UTILS
       _doubleProducts[8*seg + dp] = 0.0;
     };
   }
-
+#endif OPTIMIZE
   double TransformedTriangle::calculateDistanceCornerSegment(const TetraCorner corner, const TriSegment seg) const
   {
     // NB uses fact that TriSegment <=> TriCorner that is first point of segment (PQ <=> P)
@@ -238,16 +241,19 @@ namespace INTERP_UTILS
   void TransformedTriangle::preCalculateTripleProducts(void)
   {
     if(_isTripleProductsCalculated)
-      return;
+      {
+	return;
+      }
+
+    // find edge / row to use -> that whose edge makes the smallest angle to the triangle
+    // use a map to find the minimum
+    std::map<double, int> anglesForRows;
 
     LOG(4, "Precalculating triple products" );
     for(TetraCorner corner = O ; corner <= Z ; corner = TetraCorner(corner + 1))
       {
 	LOG(6, "- Triple product for corner " << corner );
 
-	// find edge / row to use -> that whose edge makes the smallest angle to the triangle
-	// use a map to find the minimum
-	std::map<double, int> anglesForRows;
 
 	for(int row = 1 ; row < 4 ; ++row) 
 	  {
@@ -257,7 +263,11 @@ namespace INTERP_UTILS
 	    TetraEdge edge = TetraEdge(dp);
 	    
 	    // use edge only if it is surrounded by the surface
+#ifdef OPTIMIZE
+	    if( _triangleSurroundsEdgeCache[edge] )
+#else
 	    if( testTriangleSurroundsEdge(edge) )
+#endif
 	      {
 		// -- calculate angle between edge and PQR
 		const double angle = calculateAngleEdgeTriangle(edge);
@@ -291,6 +301,7 @@ namespace INTERP_UTILS
 	    _validTP[corner] = false;
 
 	  }
+	anglesForRows.clear();
 
       }
 
@@ -349,6 +360,7 @@ namespace INTERP_UTILS
 
   }
 
+#ifndef OPTIMIZE
   /**
    * Returns the stable double product  c_{xy}^{pq}
    *
@@ -364,7 +376,6 @@ namespace INTERP_UTILS
     assert(_isDoubleProductsCalculated);
     return _doubleProducts[8*seg + dp];
   }
-
 
   /**
    * Returns the stable triple product t_X for a given corner
@@ -383,6 +394,7 @@ namespace INTERP_UTILS
     assert(_validTP[corner]);
     return _tripleProducts[corner];
   }
+
 
   /**
    * Calculates the given double product c_{xy}^{pq} = x_p*y_q - y_p*x_q for a
@@ -409,6 +421,8 @@ namespace INTERP_UTILS
 
     return _coords[5*pt1 + off1] * _coords[5*pt2 + off2] - _coords[5*pt1 + off2] * _coords[5*pt2 + off1];
   }
+
+#endif
 
   /**
    * Calculates triple product associated with the given corner of tetrahedron, developing 

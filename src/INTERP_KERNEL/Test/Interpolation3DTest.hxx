@@ -28,13 +28,11 @@ class Interpolation3DTest : public CppUnit::TestFixture
   CPPUNIT_TEST( tetraSimpleHalfstripOnly );
   CPPUNIT_TEST( generalTetra );
   CPPUNIT_TEST( trickyTetra1 );
-
   CPPUNIT_TEST( inconsistentTetra );
 
 
   // multi - element  
-  
-
+ 
   CPPUNIT_TEST( tetraComplexIncluded );
   CPPUNIT_TEST( dividedUnitTetraSimplerReflexive );
   CPPUNIT_TEST( dividedUnitTetraReflexive );
@@ -50,6 +48,7 @@ class Interpolation3DTest : public CppUnit::TestFixture
   CPPUNIT_TEST( moderateBoxEvenSmallerReflexive );
   CPPUNIT_TEST( tinyBoxReflexive );
 
+  CPPUNIT_TEST( simpleHexaBox );
   CPPUNIT_TEST_SUITE_END();
 
 
@@ -211,7 +210,12 @@ public:
   {
     intersectMeshes("meshes/TinyBox.med", "TinyBox", "meshes/TinyBox.med", "TinyBox", 979200);
   }
-  
+
+  void simpleHexaBox()
+  {
+    intersectMeshes("meshes/BoxHexa1.med", "BoxHexa1", "meshes/BoxTetra2.med", "BoxTetra2", 65250, 1.0e-5, false);
+  }
+
 private:
 
   Interpolation3D* interpolator;
@@ -226,7 +230,8 @@ private:
   
   void dumpIntersectionMatrix(const IntersectionMatrix& m) const;
 
-  void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec = 1.0e-6) const;
+  // 1.0e-5 here is due to limited precision of "correct" volumes calculated in Salome
+  void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec = 1.0e-5, bool doubleTest = true) const;
 
   void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) const;
 

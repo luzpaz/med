@@ -9,19 +9,23 @@
 #define TEST_EPS 1.0e-14
 #endif
 
+#ifdef OPTIMIZE
+#define OPT_INLINE inline
+#else
+#define OPT_INLINE 
+#endif
+
 // Levels : 
 // 1 - overview of algorithm + volume result
 // 2 - algorithm detail
 // 3 - intersection polygon results detail
 // 4 - intersection polygon search detail
 // higher -> misc. gory details of calculation
-//#define LOG_LEVEL 3
+
 #include "Log.hxx"
 
 class TransformedTriangleTest;
 class TransformedTriangleIntersectTest;
-class TransformedTriangleCalcVolumeTest;
-
 
 namespace INTERP_UTILS
 {
@@ -33,6 +37,41 @@ namespace INTERP_UTILS
    *
    * Reference : J. Grandy, "Conservative Remapping and Region Overlays by Intersecting Arbitrary Polyhedra", 
    *             Journal of Computational Physics (1999)
+   */
+
+  /* ! READ ME FIRST !
+   * OVERVIEW of how the class works : (details can be found in the commentaries above each method)
+   * 
+   * Constructor : 
+   * The constructor takes as arguments three pointers to double[3] vectors holding the transformed
+   * coordinates of the corners of the triangle. It copies there coordinates and then proceeds to pre-calculating certain
+   * entities used in the intersection calculation : the double products, triple products and the values of the function E
+   * (Grandy, [53]).
+   *
+   * calculateIntersectionVolume() : 
+   * This is the only method in the public interface. It calculates the volume under the intersection polygons
+   * between the triangle and the unit tetrahedron, as described in Grandy, pp. 435-447. It does this by first calculating the
+   * intersection polygons A and B, with the method calculateIntersectionPolygons(). It then calculates the barycenter of each
+   * polygon in calculatePolygonBarycenter(), and sorts their points in a circular order around the barycenter in 
+   * sortIntersecionPolygon(). The sorting is done with STL sort, using the order defined in the class 
+   * ProjectedCentralCircularSortOrder. The volume under each polygon is then calculated with calculateVolumeUnderPolygon(), which
+   * implements formula [34] in Grandy.
+   *
+   * calculateIntersectionPolygons() :
+   * This method goes through all the possible ways in which the triangle can intersect the tetrahedron and tests for these 
+   * types of intersections in accordance with the formulas described in Grandy. These tests are implemented in the test* - methods.
+   * The formulas in the article are stated for one case each only, while the calculation must take into account all cases. 
+   * To this end, a number of tables, implemented as static const arrays of different types, are used. The tables 
+   * mainly contain values of the different enumeration types described at the beginning of the class interface. For example, 
+   * the formula Grandy gives for the segment-halfstrip intersection tests ([30]) is for use with the halfstrip above the zx edge. 
+   * For the other two halfstrips (above the xy and yz edges), other double products are used. 
+   * These double products are stored in the table DP_FOR_HALFSTRIP_INTERSECTION, which permits to treat
+   * all the edges equally, avoiding switch() - statements. It is the careful choice of order of the enumeration types that makes this
+   * possible. Notably, there is a correspondance between the TetraEdge type and the DoubleProduct type (see Grandy, tatble III) that
+   * is used throughout the code, permitting statements such as DoubleProduct(my_edge) to work.
+   *    When an intersection point has been detected it is calculated with a corresponding calc* - method in the cases where it
+   * is not known directly. It is then added to the polygon A and/or B as necessary.
+   *
    *
    */
   class TransformedTriangle
@@ -43,7 +82,6 @@ namespace INTERP_UTILS
 
     friend class ::TransformedTriangleTest;
     friend class ::TransformedTriangleIntersectTest;
-    friend class ::TransformedTriangleCalcVolumeTest;
 
 
     /**
@@ -77,7 +115,6 @@ namespace INTERP_UTILS
 
     double calculateIntersectionVolume(); 
 
-    // temporary debug method
     void dumpCoords();
 
     
@@ -110,11 +147,11 @@ namespace INTERP_UTILS
     /// Intersection test methods and intersection point calculations           ////////
     ////////////////////////////////////////////////////////////////////////////////////
  
-    bool testSurfaceEdgeIntersection(const TetraEdge edge) const; 
+    OPT_INLINE bool testSurfaceEdgeIntersection(const TetraEdge edge) const; 
 
     void calcIntersectionPtSurfaceEdge(const TetraEdge edge, double* pt) const;  
 
-    bool testSegmentFacetIntersection(const TriSegment seg, const TetraFacet facet) const; 
+    OPT_INLINE bool testSegmentFacetIntersection(const TriSegment seg, const TetraFacet facet) const; 
 
     void calcIntersectionPtSegmentFacet(const TriSegment seg, const TetraFacet facet, double* pt) const;  
 
@@ -124,7 +161,7 @@ namespace INTERP_UTILS
 
     bool testSegmentCornerIntersection(const TriSegment seg, const TetraCorner corner) const ;
 
-    bool testSurfaceRayIntersection(const TetraCorner corner) const;
+    OPT_INLINE bool testSurfaceRayIntersection(const TetraCorner corner) const;
 
     bool testSegmentHalfstripIntersection(const TriSegment seg, const TetraEdge edg);
 
@@ -132,11 +169,11 @@ namespace INTERP_UTILS
     
     bool testSegmentRayIntersection(const TriSegment seg, const TetraCorner corner) const;
 
-    bool testCornerInTetrahedron(const TriCorner corner) const;
+    OPT_INLINE bool testCornerInTetrahedron(const TriCorner corner) const;
 
-    bool testCornerOnXYZFacet(const TriCorner corner) const;
+    OPT_INLINE bool testCornerOnXYZFacet(const TriCorner corner) const;
 
-    bool testCornerAboveXYZFacet(const TriCorner corner) const;
+    OPT_INLINE bool testCornerAboveXYZFacet(const TriCorner corner) const;
 
     ////////////////////////////////////////////////////////////////////////////////////
     /// Utility methods used in intersection tests                       ///////////////
@@ -164,7 +201,7 @@ namespace INTERP_UTILS
 
     bool areDoubleProductsConsistent(const TriSegment seg) const;
 
-    void resetDoubleProducts(const TriSegment seg, const TetraCorner corner);
+    OPT_INLINE void resetDoubleProducts(const TriSegment seg, const TetraCorner corner);
 
     double calculateDistanceCornerSegment(const TetraCorner corner, const TriSegment seg) const;
     
@@ -172,11 +209,11 @@ namespace INTERP_UTILS
 
     double calculateAngleEdgeTriangle(const TetraEdge edge) const;
 
-    double calcStableC(const TriSegment seg, const DoubleProduct dp) const;
+    OPT_INLINE double calcStableC(const TriSegment seg, const DoubleProduct dp) const;
 
-    double calcStableT(const TetraCorner corner) const;
+    OPT_INLINE double calcStableT(const TetraCorner corner) const;
 
-    double calcUnstableC(const TriSegment seg, const DoubleProduct dp) const;
+    OPT_INLINE double calcUnstableC(const TriSegment seg, const DoubleProduct dp) const;
 
     double calcTByDevelopingRow(const TetraCorner corner, const int row = 1, const bool project = false) const;
 
@@ -185,18 +222,38 @@ namespace INTERP_UTILS
     ////////////////////////////////////////////////////////////////////////////////////
   private:
 
-    // storage : 
+    // order : 
     // [ p_x, p_y, p_z, p_h, p_H, q_x, q_y, q_z, q_h, q_H, r_x, r_y, r_z, r_h, r_H ]
     double _coords[15];
+    
+    /// flags showing whether the double and triple products have been precalculated for this class
+    bool _isDoubleProductsCalculated, _isTripleProductsCalculated; 
 
-    bool _isDoubleProductsCalculated, _isTripleProductsCalculated;
+    /// array containing the 24 double products
+    /// order : c^PQ_YZ, ... ,cPQ_10, ... c^QR_YZ, ... c^RP_YZ
+    /// following order in enumeration DoubleProduct
     double _doubleProducts[24];
+
+    /// array containing the 4 triple products
+    /// order : t_O, t_X, t_Y, t_Z
     double _tripleProducts[4];
+
+    /// arrays holding the points in the two intersection polygons A and B
+    /// these points are allocated in calculateIntersectionPolygons() and liberated in the destructor
     std::vector<double*> _polygonA, _polygonB;
+    
+    /// vectors holding the coordinates of the barycenters of the polygons A and B
+    /// these points are calculated in calculatePolygonBarycenter
     double _barycenterA[3], _barycenterB[3];
 
     // used for debugging
     bool _validTP[4];
+
+#ifdef OPTIMIZE
+    void preCalculateTriangleSurroundsEdge();     
+    bool _triangleSurroundsEdgeCache[NO_TET_EDGE];
+    bool _isOutsideTetra;
+#endif
 
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -245,7 +302,32 @@ namespace INTERP_UTILS
     // correspondance edge - corners
     static const TetraCorner CORNERS_FOR_EDGE[12];
 
+    // correspondance edge - facets
+    // facets shared by each edge
+    static const TetraFacet FACET_FOR_EDGE[12];
+
+    // correspondance edge - corners
+    static const TetraEdge EDGES_FOR_CORNER[12];
+   
+    // double products used in segment-halfstrip test
+    static const DoubleProduct DP_FOR_HALFSTRIP_INTERSECTION[12];
+
+    // double products used in segment - ray test
+    static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21];
+
+
+    inline bool isTriangleOutsideTetra(void) const;
+
   };
+
+
+
+  // include definitions of inline methods
+#ifdef OPTIMIZE
+
+#include "TransformedTriangle_inline.hxx"
+  
+#endif
 
 };
 

@@ -2,15 +2,10 @@
 
 #include <iostream>
 #include <algorithm>
+#include <cassert>
 
 namespace INTERP_UTILS
 {
-
-  /**
-   * Default constructor
-   * 
-   */
-  //BoundingBox() : coords({0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {}
   
   /**
    * Constructor creating box from an array of the points corresponding
@@ -22,9 +17,12 @@ namespace INTERP_UTILS
    *
    */
    BoundingBox::BoundingBox(const double** pts, const int numPts)
+     :_coords(new double[6])
    {
      using namespace std;
+     assert(_coords != 0);
      assert(numPts > 1);
+     
 
      // initialize with first two points
      const double* pt1 = pts[0];
@@ -44,12 +42,17 @@ namespace INTERP_UTILS
    }
 
   /**
-   * Constructor creating box from union of two boxes
+   * Constructor creating box from union of two boxes, resulting in a box that enclose both of them
    *
+   * @param  box1  the first box
+   * @param  box2  the second box
    */
   BoundingBox::BoundingBox(const BoundingBox& box1, const BoundingBox& box2) 
+    : _coords(new double[6])
   {
     using namespace std;
+    assert(_coords != 0);
+
     for(BoxCoord c = XMIN ; c <= ZMIN ; c = BoxCoord(c + 1))
        {
 	 _coords[c] = min(box1._coords[c], box2._coords[c]);
@@ -64,26 +67,26 @@ namespace INTERP_UTILS
    */
   BoundingBox::~BoundingBox()
   {
+    delete[] _coords;
   }
 
   /**
    * Determines if the intersection with a given box is empty
    * 
-   * @param    box box with which intersection is tested
+   * @param    box   BoundingBox with which intersection is tested
    * @returns  true if intersection between boxes is empty, false if not
    */
   bool BoundingBox::isDisjointWith(const BoundingBox& box) const
   {
     for(BoxCoord c = XMIN ; c <= ZMIN ; c = BoxCoord(c + 1))
       {
-	
 	const double otherMinCoord = box.getCoordinate(c);
 	const double otherMaxCoord = box.getCoordinate(BoxCoord(c + 3));
 	
 	// boxes are disjoint if there exists a direction in which the 
 	// minimum coordinate of one is greater than the maximum coordinate of the other
 
-	//? stable version
+	//? more stable version
 	/*const double tol = 1.0e-2*_coords[c];
 	if(_coords[c] > otherMaxCoord + tol 
 	   || _coords[c + 3] < otherMinCoord - tol)
@@ -145,6 +148,10 @@ namespace INTERP_UTILS
       }
   }
 
+  /*
+   * Prints the coordinates of the box to std::cout
+   *
+   */
   void BoundingBox::dumpCoords() const
   {
     std::cout << "[xmin, xmax] = [" << _coords[XMIN] << ", " << _coords[XMAX] << "]" << " | ";
@@ -153,15 +160,21 @@ namespace INTERP_UTILS
     std::cout << std::endl;
   }
 
+  /*
+   * Checks if the box is valid, which it is if its minimum coordinates are
+   * smaller than its maximum coordinates in all directions.
+   *
+   * @returns  true if the box is valid, false if not
+   */
   bool BoundingBox::isValid() const
   {
     bool valid = true;
     for(BoxCoord c = XMIN ; c < ZMIN ; c = BoxCoord(c + 1))
       {
-	if(_coords[c] >= _coords[c + 3])
+	if(_coords[c] > _coords[c + 3])
 	  {
 	    std::cout << "+++ Error in  BoundingBox |: coordinate " << c << " is invalid : "
-		      <<_coords[c] << " >= " << _coords[c+3] << std::endl;
+		      <<_coords[c] << " > " << _coords[c+3] << std::endl;
 	    valid = false;
 	  }
       }

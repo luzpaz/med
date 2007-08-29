@@ -68,11 +68,63 @@ namespace INTERP_UTILS
       Y, Z, // YZ
       Z, X  // ZX
     };
+
+  // correspondance edge - facets
+  // facets shared by each edge
+  const TransformedTriangle::TetraFacet TransformedTriangle::FACET_FOR_EDGE[12] =
+    {
+      OXY, OZX, // OX
+      OXY, OYZ, // OY
+      OZX, OYZ, // OZ
+      OXY, XYZ, // XY
+      OYZ, XYZ, // YZ
+      OZX, XYZ  // ZX
+    };
+
+  // edges meeting at a given corner
+  const TransformedTriangle::TetraEdge TransformedTriangle::EDGES_FOR_CORNER[12] =
+    {
+      OX, OY, OZ, // O
+      OX, XY, ZX, // X
+      OY, XY, YZ, // Y
+      OZ, ZX, YZ  // Z
+    };
+
+  // NB : some uncertainty whether these last are correct
+  const TransformedTriangle::DoubleProduct TransformedTriangle::DP_FOR_HALFSTRIP_INTERSECTION[12] =
+    {
+      C_10, C_01, C_ZH, C_10, // XY
+      C_01, C_XY, C_XH, C_01, // YZ
+      C_XY, C_10, C_YH, C_XY  // ZX
+    };
   
+    // double products to use in segment-ray test
+    // dp 1   -> cond 1
+    // dp 2-7 -> cond 3
+#if SEG_RAY_TABLE==1
+  const TransformedTriangle::DoubleProduct TransformedTriangle::DP_SEGMENT_RAY_INTERSECTION[21] = 
+    {
+	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
+	C_01, C_XH, C_ZH, C_XY, C_10, C_ZH, C_10, // Y
+	C_XY, C_YH, C_XH, C_10, C_01, C_XH, C_01  // Z
+    };
+#else
+  
+  const TransformedTriangle::DoubleProduct TransformedTriangle::DP_SEGMENT_RAY_INTERSECTION[21] = 
+    {
+      C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
+      C_01, C_XH, C_ZH, C_XY, C_10, C_ZH, C_YZ, // Y
+      C_XY, C_YH, C_XH, C_10, C_01, C_XH, C_ZX  // Z
+    };
+#endif
+
+
+
     
   ////////////////////////////////////////////////////////////////////////////////////
   /// Intersection test methods and intersection point calculations           ////////
   ////////////////////////////////////////////////////////////////////////////////////
+#ifndef OPTIMIZE
   /**
    * Tests if the given edge of the tetrahedron intersects the triangle PQR. (Grandy, eq [17])
    *
@@ -83,7 +135,7 @@ namespace INTERP_UTILS
   { 
     return testTriangleSurroundsEdge(edge) && testEdgeIntersectsTriangle(edge); 
   }
-
+#endif
   /**
    * Calculates the point of intersection between the given edge of the tetrahedron and the 
    * triangle PQR. (Grandy, eq [22])
@@ -124,6 +176,7 @@ namespace INTERP_UTILS
       }
   }
 
+#ifndef OPTIMIZE
   /**
    * Tests if the given segment of the triangle intersects the given facet of the tetrahedron. 
    * (Grandy, eq. [19])
@@ -136,6 +189,7 @@ namespace INTERP_UTILS
   { 
     return testFacetSurroundsSegment(seg, facet) && testSegmentIntersectsFacet(seg, facet); 
   }
+#endif
 
   /**
    * Calculates the point of intersection between the given segment of the triangle
@@ -192,16 +246,8 @@ namespace INTERP_UTILS
    */
   bool TransformedTriangle::testSegmentEdgeIntersection(const TriSegment seg, const TetraEdge edge) const
   {
-    // facets shared by each edge
-    static const TetraFacet FACET_FOR_EDGE[12] =
-      {
-	OXY, OZX, // OX
-	OXY, OYZ, // OY
-	OZX, OYZ, // OZ
-	OXY, XYZ, // XY
-	OYZ, XYZ, // YZ
-	OZX, XYZ  // ZX
-      };
+
+#ifndef OPTIMIZE // in this case, we have already checked if the double product is zero
 
 #ifdef EPS_TESTING
     if(!epsilonEqual(calcStableC(seg,DoubleProduct( edge )), 0.0, TEST_EPS))
@@ -212,7 +258,8 @@ namespace INTERP_UTILS
       {
 	return false;
       } 
-    else
+      else
+#endif // OPTIMIZE
       {
 	// check condition that the double products for one of the two
 	// facets adjacent to the edge has a positive product
@@ -339,14 +386,7 @@ namespace INTERP_UTILS
    */
   bool TransformedTriangle::testSegmentCornerIntersection(const TriSegment seg, const TetraCorner corner) const 
   {
-    // edges meeting at a given corner
-    static const TetraEdge EDGES_FOR_CORNER[12] =
-      {
-	OX, OY, OZ, // O
-	OX, XY, ZX, // X
-	OY, XY, YZ, // Y
-	OZ, ZX, YZ  // Z
-      };
+    
 
     // facets meeting at a given corner
     static const TetraFacet FACETS_FOR_CORNER[12] =
@@ -357,6 +397,7 @@ namespace INTERP_UTILS
 	OZX, XYZ, OYZ  // Z
       };
 
+#ifndef OPTIMIZE // if optimized, we have already checked that the double products are zero
     // check double products are zero
     for(int i = 0 ; i < 3 ; ++i)
       {
@@ -372,6 +413,7 @@ namespace INTERP_UTILS
 	    return false;
 	  }
       }
+#endif
     
     // check segment intersect a facet
     for(int i = 0 ; i < 3 ; ++i)
@@ -386,7 +428,7 @@ namespace INTERP_UTILS
     return false;
   }
     
-
+#ifndef OPTIMIZE
   /**
    * Tests if the triangle PQR intersects the ray pointing in the upwards z - direction
    * from the given corner of the tetrahedron. (Grandy eq. [29])
@@ -398,6 +440,7 @@ namespace INTERP_UTILS
   { 
     return testTriangleSurroundsRay( corner ) && testSurfaceAboveCorner( corner ); 
   }
+#endif
 
   /**
    * Tests if the given segment of the triangle intersects the half-strip above the 
@@ -422,23 +465,9 @@ namespace INTERP_UTILS
 	C_01, C_XY, C_XH, C_01, // YZ
 	C_XY, C_10, C_YH, C_XY  // ZX
       };
-    /*static const DoubleProduct DP_FOR_HALFSTRIP_INTERSECTION[12] =
-      {
-	C_10, C_01, C_ZH, C_10, // XY
-	C_01, C_XY, C_XH, C_ZX, // YZ
-	C_XY, C_10, C_YH, C_XY  // ZX
-      };
-    */
-    /*static const DoubleProduct DP_FOR_HALFSTRIP_INTERSECTION[12] =
-      {
-      C_10, C_01, C_ZH, C_XY, // XY
-      C_01, C_XY, C_XH, C_XY, // YZ
-      C_XY, C_10, C_YH, C_XY  // ZX
-      };
-    */
-
+    
     // facets to use in second condition (S_m)
-    static TetraFacet FACET_FOR_HALFSTRIP_INTERSECTION[3] = 
+    static const TetraFacet FACET_FOR_HALFSTRIP_INTERSECTION[3] = 
       {
 	NO_TET_FACET, // XY -> special case : test with plane H = 0
 	OYZ, // YZ
@@ -457,7 +486,7 @@ namespace INTERP_UTILS
 
     
     // special case : facet H = 0
-    bool cond2 = (facet == NO_TET_FACET) ? testSegmentIntersectsHPlane(seg) : testSegmentIntersectsFacet(seg, facet);
+    const bool cond2 = (facet == NO_TET_FACET) ? testSegmentIntersectsHPlane(seg) : testSegmentIntersectsFacet(seg, facet);
     LOG(4, "Halfstrip tests (" << seg << ", " << edge << ") : " << (cVals[0]*cVals[1] < 0.0) << ", " << cond2 << ", " << (cVals[2]*cVals[3] > 0.0) );
     LOG(4, "c2 = " << cVals[2] << ", c3 = " << cVals[3] ); 
   
@@ -488,15 +517,8 @@ namespace INTERP_UTILS
     // for edge AB : (x,y,z)* = (1-alpha) * A + alpha * B
     // where alpha = cB / (cB - cA)
 
-    const DoubleProduct DP_FOR_EDGE[6] =
-      {
-	C_10, C_01, // XY
-	C_01, C_XY, // YZ
-	C_XY, C_10  // ZX
-      };
-
-    const double cA = calcStableC(seg, DP_FOR_EDGE[2*edgeIndex]);
-    const double cB = calcStableC(seg, DP_FOR_EDGE[2*edgeIndex + 1]);
+    const double cA = calcStableC(seg, DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIndex]);
+    const double cB = calcStableC(seg, DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIndex + 1]);
     assert(cA != cB);
     
     const double alpha = cA / (cA - cB);
@@ -539,27 +561,6 @@ namespace INTERP_UTILS
     // readjust index since O is not used
     const int cornerIdx = static_cast<int>(corner) - 1;
 
-    // double products to use in test
-    // dp 1   -> cond 1
-    // dp 2-7 -> cond 3
-    //? NB : last two rows are not completely understood and may contain errors
-#if SEG_RAY_TABLE==1
-    static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21] = 
-      {
-	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
-	C_01, C_XH, C_ZH, C_XY, C_10, C_ZH, C_10, // Y
-	C_XY, C_YH, C_XH, C_10, C_01, C_XH, C_01  // Z
-      };
-#else
-
-    static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21] = 
-      {
-	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
-	C_01, C_XH, C_ZH, C_XY, C_10, C_ZH, C_YZ, // Y
-	C_XY, C_YH, C_XH, C_10, C_01, C_XH, C_ZX  // Z
-      };
-#endif
-
     // facets to use
     //? not sure this is correct
     static const TetraFacet FIRST_FACET_SEGMENT_RAY_INTERSECTION[3] = 
@@ -572,7 +573,8 @@ namespace INTERP_UTILS
 
     const DoubleProduct dp0 = DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx];
     const double cVal0 = calcStableC(seg, dp0);
-    
+
+#ifndef OPTIMIZE // in this case we have already checked that the double product is zero    
     //? epsilon-equality here?
     // cond. 1
 #ifdef EPS_TESTING
@@ -585,6 +587,8 @@ namespace INTERP_UTILS
 	return false;
       }
 	
+#endif
+
     // cond 2
     const bool cond21 = testSegmentIntersectsFacet(seg, FIRST_FACET_SEGMENT_RAY_INTERSECTION[cornerIdx]);
     const bool cond22  = (corner == Z) ? testSegmentIntersectsFacet(seg, OYZ) : testSegmentIntersectsHPlane(seg);
@@ -615,6 +619,7 @@ namespace INTERP_UTILS
     
   }
 
+#ifndef OPTIMIZE
   /**
    * Tests if the given corner of triangle PQR lies in the interior of the unit tetrahedron
    * (0 <= x_p, y_p, z_p, h_p <= 1)
@@ -641,6 +646,7 @@ namespace INTERP_UTILS
       }
     return true;
   }
+
 
   /**
    * Tests if the given corner of triangle PQR lies on the facet h = 0 (the XYZ facet)
@@ -684,7 +690,7 @@ namespace INTERP_UTILS
     return h < 0.0 && H >= 0.0 && x >= 0.0 && y >= 0.0;
 	
   }
-    
+#endif    
     
 
   ////////////////////////////////////////////////////////////////////////////////////

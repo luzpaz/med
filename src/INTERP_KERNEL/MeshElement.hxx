@@ -15,105 +15,50 @@ using namespace MED_EN;
 namespace INTERP_UTILS
 {
 
-  //  class TransformedTriangle;
-  //  class TetraAffineTransform;
-
   /**
    * Class representing a single element of a mesh together with its bounding box.
-   * It permits access to the nodes of the element, to test for disunion and inclusion with other elements
-   * and to triangulate its faces.
+   * It permits access to the element's global number, type and bounding box and allows
+   * easy bounding box intersection tests between MeshElements and collections of MeshElement (MeshRegions)
    */
   class MeshElement
   {
-    
-
-    friend class ElementBBoxOrder;
-    friend class MeshRegion;
 
   public:
     
-    /**
-     * Constructor
-     *
-     * @param mesh    mesh that the element belongs to
-     * @param type    geometric type of the element
-     * @param index   connectivity index of element in the mesh
-     */
     MeshElement(const int index, const MED_EN::medGeometryElement type, const MEDMEM::MESH& mesh);
     
-    /**
-     * Destructor
-     *
-     */
     ~MeshElement();
-
-    /**
-     * Determines if this element is in the interior of another element 
-     * by calculating the triple products for each point of this element with respect
-     * to all the faces of the other object (faces must be triangulated ... ) If all triple
-     * products have the same sign, then the element is in the interior of the other element
-     *
-     * @param otherElement the supposedly enclosing element
-     * @returns true if this element is enclosed in the other element, false if not
-     */
-    bool isElementIncludedIn(const MeshElement& otherElement) const;
-
-    /**
-     * Determines whether the intersection of this element is trivially empty. This is done by checking for each
-     * face of one element if it is such that all the vertices of the other element is on the same side of this face.
-     * If there is such a face, then the intersection is trivially empty. If there is no such face, we do not know if 
-     * the intersection is empty.
-     *
-     * @pre The elements are convex. If this is no true, we return false.
-     * @param otherElement the element believed to be disjoint with this one
-     * @returns true if the two elements are convex and there exists a face of this element such as described 
-     *          above, false otherwise
-     */
-    bool isElementTriviallyDisjointWith(const MeshElement& otherElement) const;
-
-    /**
-     * Triangulate the faces of this element and apply an affine Transform to the triangles
-     *
-     * @param      triangles  vector in which triangles are stored
-     * @param      T          affine transform that is applied to the nodes of the triangles
-     */
-    //    void triangulate(std::vector<TransformedTriangle>& triangles, const TetraAffineTransform& T) const;
     
     int getIndex() const;
-
-    void dumpCoords() const;
     
-    const BoundingBox* getBoundingBox() const
-    {
-      return _box;
-    }
+    const BoundingBox* getBoundingBox() const;
 
-    MED_EN::medGeometryElement getType() const
-    {
-      return _type;
-    }
+    MED_EN::medGeometryElement getType() const;
 
   private:
-    const int _index;
-    BoundingBox* _box; // should not change after initialisation
-    MED_EN::medGeometryElement _type;
+    const int _index;                /// global number of the element
+    BoundingBox* _box;               /// bounding box of the element - does not change after having been initialised
+    MED_EN::medGeometryElement _type;/// type of the element
   };
 
 
-
+  /*
+   * Class defining an order for MeshElements based on their bounding boxes.
+   * The order defined between two elements is that between a given coordinate of 
+   * their bounding boxes. For instance, if the order is based on YMIN, an element whose boxes
+   * has a smaller YMIN is sorted before one with a larger YMIN.
+   *
+   */
   class ElementBBoxOrder
   {
   public : 
     
-    ElementBBoxOrder(BoundingBox::BoxCoord coord)
-      : _coord(coord)
-    {
-    }
+    ElementBBoxOrder(BoundingBox::BoxCoord coord);
     
     bool operator()(MeshElement* elem1, MeshElement* elem2);
     
   private :
-    BoundingBox::BoxCoord _coord;
+    BoundingBox::BoxCoord _coord;  /// BoundingBox coordinate (XMIN, XMAX, etc) on which to base the ordering
   };
 
 };

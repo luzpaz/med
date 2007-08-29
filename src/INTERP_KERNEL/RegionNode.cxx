@@ -17,7 +17,6 @@ namespace INTERP_UTILS
   RegionNode::~RegionNode()
   {
   }
-
     
   /**
    *  Accessor to source region
