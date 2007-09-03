@@ -10,9 +10,6 @@
 
 #include "VectorUtils.hxx"
 
-#undef MERGE_CALC
-#undef COORDINATE_CORRECTION 1.0e-15
-
 
 
 class ProjectedCentralCircularSortOrder
@@ -62,7 +59,6 @@ namespace INTERP_UTILS
    * Constructor
    *
    * The coordinates are copied to the internal member variables
-   * (slower but safer - investigate if this is necessary)
    *
    * @param p   array of three doubles containing coordinates of P
    * @param q   array of three doubles containing coordinates of Q
@@ -91,15 +87,6 @@ namespace INTERP_UTILS
     _coords[5*Q + 4] = 1 - q[0] - q[1];
     _coords[5*R + 4] = 1 - r[0] - r[1];
 
-#ifdef COORDINATE_CORRECTION
-
-    // correction of small (imprecise) coordinate values
-    for(int i = 0 ; i < 15 ; ++i)
-      {
-	_coords[i] = epsilonEqual(_coords[i], 0.0, COORDINATE_CORRECTION) ? 0.0 : _coords[i];
-      }
-#endif
-
     // initialise rest of data
     preCalculateDoubleProducts();
 
@@ -111,6 +98,12 @@ namespace INTERP_UTILS
  
   }
 
+  /* 
+   * Destructor
+   *
+   * Deallocates the memory used to store the points of the polygons.
+   * This memory is allocated in calculateIntersectionPolygons().
+   */
   TransformedTriangle::~TransformedTriangle()
   {
     // delete elements of polygons
@@ -128,7 +121,7 @@ namespace INTERP_UTILS
    * Calculates the volume of intersection between the triangle and the 
    * unit tetrahedron.
    *
-   * @returns   volume of intersection of this triangle with unit tetrahedron, 
+   * @return   volume of intersection of this triangle with unit tetrahedron, 
    *            as described in Grandy
    *
    */
@@ -159,23 +152,12 @@ namespace INTERP_UTILS
       }
 
 
-    // normalize
+    // normalize sign
     sign = sign > 0.0 ? 1.0 : -1.0;
 
     LOG(2, "-- Calculating intersection polygons ... ");
     calculateIntersectionPolygons();
     
-#ifdef MERGE_CALC
-    const bool mergeCalculation = isPolygonAOnHFacet();
-    if(mergeCalculation)
-      {
-	// move points in B to A to avoid missing points
-	// NB : need to remove elements from B in order to handle deletion properly
-	_polygonA.insert(_polygonA.end(), _polygonB.begin(), _polygonB.end());
-	_polygonB.clear();
-      }
-#endif
-
     double barycenter[3];
 
     // calculate volume under A
@@ -191,11 +173,7 @@ namespace INTERP_UTILS
 
     double volB = 0.0;
     // if triangle is not in h = 0 plane, calculate volume under B
-#ifdef MERGE_CALC
-    if((!mergeCalculation) && _polygonB.size() > 2)
-#else
-      if(!isTriangleInPlaneOfFacet(XYZ) && _polygonB.size() > 2)
-#endif
+      if(_polygonB.size() > 2 && !isTriangleInPlaneOfFacet(XYZ))
 	{
 	  LOG(2, "---- Treating polygon B ... ");
 	
@@ -206,7 +184,7 @@ namespace INTERP_UTILS
 	}
 
     LOG(2, "volA + volB = " << sign * (volA + volB) << std::endl << "***********");
-
+  
     return sign * (volA + volB);
 
   } 
@@ -423,7 +401,7 @@ namespace INTERP_UTILS
 	// segment - ray 
 	for(TetraCorner corner = X ; corner < NO_TET_CORNER ; corner = TetraCorner(corner + 1))
 	  {
-	    if(isZero[DP_SEGMENT_RAY_INTERSECTION[7*corner]] && testSegmentRayIntersection(seg, corner))
+	    if(isZero[DP_SEGMENT_RAY_INTERSECTION[7*(corner-1)]] && testSegmentRayIntersection(seg, corner))
 	      {
 		double* ptB = new double[3];
 		copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
@@ -588,6 +566,10 @@ namespace INTERP_UTILS
     CoordType type = SortOrder::XY;
     if(poly == A) // B is on h = 0 plane -> ok
       {
+	// NB : the following test is never true if we have eliminated the
+	// triangles parallel to x == 0 and y == 0 in calculateIntersectionVolume().
+	// We keep the test here anyway, to avoid interdependency.
+
 	// is triangle parallel to x == 0 ?
 	if(isTriangleInPlaneOfFacet(OZX)) 
 	  {
@@ -606,8 +588,6 @@ namespace INTERP_UTILS
     // NB : do not change place of first object, with respect to which the order
     // is defined
     sort((polygon.begin()), polygon.end(), order);
-    //stable_sort((++polygon.begin()), polygon.end(), order);
-    
     
     LOG(3,"Sorted polygon is ");
     for(int i = 0 ; i < polygon.size() ; ++i)
@@ -625,7 +605,7 @@ namespace INTERP_UTILS
    * 
    * @param poly        one of the two intersection polygons
    * @param barycenter  array of three doubles with the coordinates of the barycenter
-   * @returns           the volume between the polygon and the z = 0 plane
+   * @return           the volume between the polygon and the z = 0 plane
    *
    */
   double TransformedTriangle::calculateVolumeUnderPolygon(IntersectionPolygon poly, const double* barycenter)
@@ -664,7 +644,7 @@ namespace INTERP_UTILS
    * Checks if the triangle lies in the plane of a given facet
    *
    * @param facet     one of the facets of the tetrahedron
-   * @returns         true if PQR lies in the plane of the facet, false if not
+   * @return         true if PQR lies in the plane of the facet, false if not
    */
   bool TransformedTriangle::isTriangleInPlaneOfFacet(const TetraFacet facet)
   {
@@ -674,60 +654,26 @@ namespace INTERP_UTILS
 
     for(TriCorner c = P ; c < NO_TRI_CORNER ; c = TriCorner(c + 1))
       {
-	// ? should have epsilon-equality here?
-#ifdef EPS_TESTING
-	if(!epsilonEqualRelative(_coords[5*c + coord], 0.0, TEST_EPS * _coords[5*c + coord]))
-#else
-	  if(_coords[5*c + coord] != 0.0)
-#endif
-	    {
-	      return false;
-	    }
-      }
-    
-    return true;
-  }
-
-  bool TransformedTriangle::isPolygonAOnHFacet() const
-  {
-    // need to have vector of unique points in order to determine the "real" number of 
-    // of points in the polygon, to avoid problems when polygon A has less than 3 points
-
-    using ::Vector3Cmp;
-    std::vector<double*> pAUnique;
-    pAUnique.reserve(_polygonA.size());
-    Vector3Cmp cmp;
-    unique_copy(_polygonA.begin(), _polygonA.end(), back_inserter(pAUnique), cmp);
-    //for(std::vector<double*>::const_iterator iter = pAUnique.begin() ; iter != pAUnique.end() ; ++iter)
-    //std::cout << "next : " << vToStr(*iter) << std::endl;
-    
-    // std::cout << "paunique size = " << pAUnique.size() << std::endl;
-    if(pAUnique.size() < 3)
-      {
-	return false;
-      }
-    for(std::vector<double*>::const_iterator iter = _polygonA.begin() ; iter != _polygonA.end() ; ++iter)
-      {
-	const double* pt = *iter;
-	const double h = 1.0 - pt[0] - pt[1] - pt[2];
-	//// std::cout << "h = " << h << std::endl;
-	
-	//if(h != 0.0)
-	if(!epsilonEqual(h, 0.0))
+	if(_coords[5*c + coord] != 0.0)
 	  {
 	    return false;
 	  }
       }
-    // std::cout << "Polygon A is on h = 0 facet" << std::endl;
+    
     return true;
   }
 
+  /*
+   * Determines whether the triangle is below the z-plane.
+   * 
+   * @return true if the z-coordinate of the three corners of the triangle are all less than 0, false otherwise.
+   */
   bool TransformedTriangle::isTriangleBelowTetraeder()
   {
     for(TriCorner c = P ; c < NO_TRI_CORNER ; c = TriCorner(c + 1))
       {
 	// check z-coords for all points
-	if(_coords[5*c + 2] > 0.0)
+	if(_coords[5*c + 2] >= 0.0)
 	  {
 	    return false;
 	  }
@@ -735,6 +681,10 @@ namespace INTERP_UTILS
     return true;
   }
 
+  /*
+   * Prints the coordinates of the triangle to std::cout
+   *
+   */
   void TransformedTriangle::dumpCoords()
   {
     std::cout << "Coords : ";

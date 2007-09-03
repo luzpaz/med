@@ -95,7 +95,7 @@ namespace INTERP_UTILS
   /*
    * Comparison operator based on the bounding boxes of the elements
    *
-   * @returns true if the coordinate _coord of the bounding box of elem1 is 
+   * @return true if the coordinate _coord of the bounding box of elem1 is 
    *          strictly smaller than that of the bounding box of elem2
    */
   bool ElementBBoxOrder::operator()( MeshElement* elem1, MeshElement* elem2)

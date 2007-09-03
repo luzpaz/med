@@ -18,6 +18,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// ! NB !
+/// These tests will not pass if the library has been compiled with the -DOPTIMIZED flag. This is because
+/// the tests for zero double products in testSegmentEdgeIntersection, testSegmentCornerIntersection and
+/// testSegmentRayIntersection have in these cases been moved to the calling method 
+/// TransformedTriangle::calculateIntersectionPolygons(). This set of tests is meant to assure the correct
+/// functioning of the lower level, and thus calls these methods directly.
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Intersections tested (number indicates first triangle which contains the intersection):
 // -----------------------------------------------------------------------------------------------------
 // CI  ->  P: 3      Q: 4     R: 7

@@ -53,7 +53,9 @@ InterpolationUtils.hxx\
 BBTree.H\
 MeshUtils.hxx\
 Intersector3D.hxx\
-Log.hxx
+Log.hxx\
+TransformedTriangle_inline.hxx
+
 
 # Libraries targets
 
@@ -70,9 +72,8 @@ BoundingBox.cxx\
 TetraAffineTransform.cxx\
 Interpolation3D.cxx\
 Intersector3D.cxx\
-#Log.cxx
-#Interpolation3DSurf.cxx\
-#Interpolation2D.cxx\
+Interpolation3DSurf.cxx\
+Interpolation2D.cxx
 
 # Executables targets
 BIN = 
@@ -80,7 +81,7 @@ BIN_SRC =
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-TEST_PROGS = #make_plane test_INTERPOL_2D 
+TEST_PROGS = testUnitTetra
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
@@ -91,8 +92,8 @@ CPPFLAGS+=$(BOOST_CPPFLAGS)
 # optimization
 #CXXFLAGS+= -O1 -DOPTIMIZE
 #CPPFLAGS+= -O1 -DOPTIMIZE
-CXXFLAGS+= -DOPTIMIZE -O2
-CPPFLAGS+= -DOPTIMIZE -O2
+CXXFLAGS+=  -O2 -DOPTIMIZE_FILTER -DOPTIMIZE
+CPPFLAGS+=  -O2 -DOPTIMIZE_FILTER -DOPTIMIZE
 
 # for log
 CXXFLAGS+= -DLOG_LEVEL=0 
@@ -103,8 +104,8 @@ CPPFLAGS+= -DLOG_LEVEL=0
 #CPPFLAGS+=-fprofile-arcs -ftest-coverage 
 
 #for gprof
-CXXFLAGS+=-pg
-CPPFLAGS+=-pg
+#CXXFLAGS+=-pg
+#CPPFLAGS+=-pg
 
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
@@ -112,7 +113,7 @@ LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem   -lutil
 #LDFLAGS+= $(HDF5_LIBS) $(STDLIB) -lutil
 # for gcov
 #LDFLAGS+= -lgcov
-LDFLAGS+= -pg
+#LDFLAGS+= -pg
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
@@ -127,7 +128,7 @@ ifeq ($(MED_WITH_KERNEL),yes)
   LDFLAGSFORBIN+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics
 endif
 
-LDFLAGSFORBIN+= -pg
+#LDFLAGSFORBIN+= -pg
 
 LIBSFORBIN=$(BOOSTLIBS) $(MPI_LIBS) 
 

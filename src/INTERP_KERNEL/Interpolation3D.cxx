@@ -47,7 +47,7 @@ namespace MEDMEM
    *
    * @param srcMesh     3-dimensional source mesh
    * @param targetMesh  3-dimesional target mesh, containing only tetraedra
-   * @returns           vector containing for each element i of the source mesh, a map giving for each element j
+   * @return            vector containing for each element i of the source mesh, a map giving for each element j
    *                    of the target mesh which i intersects, the volume of the intersection
    */
   IntersectionMatrix Interpolation3D::interpol_maillages(const MEDMEM::MESH& srcMesh, const MEDMEM::MESH& targetMesh)
@@ -185,7 +185,7 @@ namespace MEDMEM
 		const int targetIdx = (*iter)->getIndex();
 		const double vol = intersector->intersectCells(srcIdx, targetIdx);
 		//if(!epsilonEqual(vol, 0.0))
-		if(vol != 0.0)
+		//if(vol != 0.0)
 		  {
 		    volumes->insert(make_pair(targetIdx, vol));
 		    LOG(2, "Result : V (" << srcIdx << ", " << targetIdx << ") = " << matrix[srcIdx - 1][targetIdx]);
@@ -311,19 +311,21 @@ namespace MEDMEM
 
 	for(vector<int>::const_iterator iter = intersectElems.begin() ; iter != intersectElems.end() ; ++iter)
 	  {
-#if 0
+
 	    const int srcIdx = *iter + 1;
 	    const double vol = intersector->intersectCells(srcIdx, targetIdx);
 
-	    if(!epsilonEqual(vol, 0.0))
+	    //	    if(!epsilonEqual(vol, 0.0))
 	      {
 		matrix[srcIdx - 1].insert(make_pair(targetIdx, vol));
 	      }
-#endif
+
 	  }
       }
     
 #endif
+
+
 
     // free allocated memory
     for(int i = 0 ; i < numSrcElems ; ++i)
@@ -335,6 +337,7 @@ namespace MEDMEM
 	delete targetElems[i];
       }
 
+    std::cout << "Intersector filtered out " << intersector->filtered << " elements" << std::endl; 
     delete intersector;
 
   }

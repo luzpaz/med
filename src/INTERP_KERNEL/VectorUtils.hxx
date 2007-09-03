@@ -89,7 +89,7 @@ namespace INTERP_UTILS
    * @param x         first value
    * @param y         second value
    * @param errTol    maximum allowed absolute difference that is to be treated as equality
-   * @returns  true if |x - y| < errTol, false otherwise
+   * @return  true if |x - y| < errTol, false otherwise
    */
   inline bool epsilonEqual(const double x, const double y, const double errTol = DEFAULT_ABS_TOL)
   {
@@ -106,7 +106,7 @@ namespace INTERP_UTILS
    * @param y         second value
    * @param relTol    maximum allowed relative difference that is to be treated as equality
    * @param absTol    maximum allowed absolute difference that is to be treated as equality
-   * @returns  true if |x - y| <= absTol or |x - y|/max(|x|,|y|) <= relTol, false otherwise
+   * @return  true if |x - y| <= absTol or |x - y|/max(|x|,|y|) <= relTol, false otherwise
    */
   inline bool epsilonEqualRelative(const double x, const double y, const double relTol = DEFAULT_REL_TOL, const double absTol = DEFAULT_ABS_TOL)
   {

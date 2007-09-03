@@ -101,14 +101,13 @@ namespace INTERP_UTILS
 		resetDoubleProducts(seg, iter->second);
 	      }
 #endif	    
+	    distances.clear();
 	  }
-	distances.clear();
 
       }
   
   
     // -- (2) check that each double product statisfies Grandy, [47], else set to 0
- 
     for(TriSegment seg = PQ ; seg <= RP ; seg = TriSegment(seg + 1))
       {
 	for(DoubleProduct dp = C_YZ ; dp <=  C_10 ; dp = DoubleProduct(dp + 1))
@@ -132,11 +131,16 @@ namespace INTERP_UTILS
 	  
 	    if( epsilonEqual(_doubleProducts[8*seg + dp], 0.0, THRESHOLD_F * delta))
 	      {
+		// debug output
+#if LOG_LEVEL >= 5
 		if(_doubleProducts[8*seg + dp] != 0.0)
 		  {
 		    LOG(5, "Double product for (seg,dp) = (" << seg << ", " << dp << ") = " );
 		    LOG(5, std::abs(_doubleProducts[8*seg + dp]) << " is imprecise, reset to 0.0" );
 		  }
+#endif 
+
+
 		_doubleProducts[8*seg + dp] = 0.0;
 		  
 	      }
@@ -146,12 +150,18 @@ namespace INTERP_UTILS
     _isDoubleProductsCalculated = true;
   }
 
+  /*
+   * Checks if the double products for a given segment are consistent, as defined by
+   * Grandy, [46]
+   *
+   * @param   seg Segment for which to check consistency of double products
+   * @return  true if the double products are consistent, false if not
+   */
   bool TransformedTriangle::areDoubleProductsConsistent(const TriSegment seg) const
   {
     const double term1 = _doubleProducts[8*seg + C_YZ] * _doubleProducts[8*seg + C_XH];
     const double term2 = _doubleProducts[8*seg + C_ZX] * _doubleProducts[8*seg + C_YH];
     const double term3 = _doubleProducts[8*seg + C_XY] * _doubleProducts[8*seg + C_ZH];
-    
 
     LOG(2, "for seg " << seg << " consistency " << term1 + term2 + term3 );
     LOG(2, "term1 :" << term1 << " term2 :" << term2 << " term3: " << term3 );
@@ -173,11 +183,9 @@ namespace INTERP_UTILS
       }
     return !((num_zero == 1 && num_neg != 1) || num_zero == 2 || (num_neg == 0 && num_zero != 3) || num_neg == 3 );
 
-    //    return (num_zero == 3) || (num_neg != 0 && num_neg != 3 && num_pos != 0 && num_pos != 3);
-			       //    return epsilonEqual(term1 + term2 + term3, 0.0);
   }
 
-#ifndef OPTIMIZE
+#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
   void TransformedTriangle::resetDoubleProducts(const TriSegment seg, const TetraCorner corner)
   {
     // set the three corresponding double products to 0.0
@@ -197,6 +205,14 @@ namespace INTERP_UTILS
     };
   }
 #endif OPTIMIZE
+
+  /*
+   * Calculate the shortest distance between a tetrahedron corner and a triangle segment.
+   * 
+   * @param  corner corner of the tetrahedron
+   * @param  seg    segment of the triangle
+   * @return shortest distance from the corner to the segment
+   */
   double TransformedTriangle::calculateDistanceCornerSegment(const TetraCorner corner, const TriSegment seg) const
   {
     // NB uses fact that TriSegment <=> TriCorner that is first point of segment (PQ <=> P)
@@ -254,7 +270,6 @@ namespace INTERP_UTILS
       {
 	LOG(6, "- Triple product for corner " << corner );
 
-
 	for(int row = 1 ; row < 4 ; ++row) 
 	  {
 	    const DoubleProduct dp = DP_FOR_DETERMINANT_EXPANSION[3*corner + (row - 1)];
@@ -283,12 +298,10 @@ namespace INTERP_UTILS
 	    if(minAngle < TRIPLE_PRODUCT_ANGLE_THRESHOLD)
 	      {
 		_tripleProducts[corner] = calcTByDevelopingRow(corner, minRow, true);
-		//_tripleProducts[corner] = calcTByDevelopingRow(corner, 1, false);
 	      } 
 	    else 
 	      {
 		 _tripleProducts[corner] = calcTByDevelopingRow(corner, minRow, false);
-		//_tripleProducts[corner] = calcTByDevelopingRow(corner, 1, false);
 	      }
 	    _validTP[corner] = true;
 	  }
@@ -308,6 +321,12 @@ namespace INTERP_UTILS
     _isTripleProductsCalculated = true;
   }
 
+  /*
+   * Calculates the angle between an edge of the tetrahedron and the triangle
+   *
+   * @param  edge edge of the tetrahedron
+   * @return angle between triangle and edge
+   */
   double TransformedTriangle::calculateAngleEdgeTriangle(const TetraEdge edge) const
   {
     // find normal to PQR - cross PQ and PR
@@ -350,9 +369,6 @@ namespace INTERP_UTILS
     const double lenNormal = norm(normal);
     const double lenEdgeVec = norm(edgeVec);
     const double dotProd = dot(normal, edgeVec);
-    //    return asin( dotProd / ( lenNormal * lenEdgeVec ) );
-    //#    assert(dotProd / ( lenNormal * lenEdgeVec ) + 1.0 >= 0.0);
-    //#    assert(dotProd / ( lenNormal * lenEdgeVec ) - 1.0 <= 0.0);
     
     //? is this more stable? -> no subtraction
     //    return asin( dotProd / ( lenNormal * lenEdgeVec ) ) + 3.141592625358979 / 2.0;
@@ -368,7 +384,7 @@ namespace INTERP_UTILS
    * @param seg   segment of triangle
    * @param dp    double product sought
    *
-   * @returns stabilised double product c_{xy}^{pq}
+   * @return stabilised double product c_{xy}^{pq}
    *
    */
   double TransformedTriangle::calcStableC(const TriSegment seg, const DoubleProduct dp) const
@@ -386,7 +402,7 @@ namespace INTERP_UTILS
    * @pre            double products have already been calculated
    * @pre            triple products have already been calculated
    * @param corner   corner for which the triple product is calculated
-   * @returns        triple product associated with corner (see Grandy, eqs. [50]-[52])
+   * @return        triple product associated with corner (see Grandy, eqs. [50]-[52])
    */
   double TransformedTriangle::calcStableT(const TetraCorner corner) const
   {
@@ -404,7 +420,7 @@ namespace INTERP_UTILS
    * @param seg   segment of triangle
    * @param dp    double product sought
    *
-   * @returns double product c_{xy}^{pq}
+   * @return double product c_{xy}^{pq}
    *
    */
   double TransformedTriangle::calcUnstableC(const TriSegment seg, const DoubleProduct dp) const
@@ -435,7 +451,7 @@ namespace INTERP_UTILS
    * @param corner   corner for which the triple product is calculated
    * @param row      row (1 <= row <= 3) used to calculate the determinant
    * @param project  indicates whether or not to perform projection as inidicated in Grandy, p.446
-   * @returns        triple product associated with corner (see Grandy, [50]-[52])
+   * @return        triple product associated with corner (see Grandy, [50]-[52])
    */
 
   double TransformedTriangle::calcTByDevelopingRow(const TetraCorner corner, const int row, const bool project) const

@@ -74,7 +74,7 @@ namespace INTERP_UTILS
    * Determines if the intersection with a given box is empty
    * 
    * @param    box   BoundingBox with which intersection is tested
-   * @returns  true if intersection between boxes is empty, false if not
+   * @return  true if intersection between boxes is empty, false if not
    */
   bool BoundingBox::isDisjointWith(const BoundingBox& box) const
   {
@@ -119,7 +119,7 @@ namespace INTERP_UTILS
    * Gets a coordinate of the box
    * 
    * @param coord coordinate to set
-   * @returns value of coordinate
+   * @return value of coordinate
    *
    */
   double BoundingBox::getCoordinate(const BoxCoord coord) const
@@ -164,7 +164,7 @@ namespace INTERP_UTILS
    * Checks if the box is valid, which it is if its minimum coordinates are
    * smaller than its maximum coordinates in all directions.
    *
-   * @returns  true if the box is valid, false if not
+   * @return  true if the box is valid, false if not
    */
   bool BoundingBox::isValid() const
   {

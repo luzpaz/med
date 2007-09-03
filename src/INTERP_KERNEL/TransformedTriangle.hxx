@@ -3,12 +3,6 @@
 
 #include <vector>
 
-#undef EPS_TESTING  // does not give good results
-
-#ifdef EPS_TESTING
-#define TEST_EPS 1.0e-14
-#endif
-
 #ifdef OPTIMIZE
 #define OPT_INLINE inline
 #else
@@ -60,7 +54,7 @@ namespace INTERP_UTILS
    * calculateIntersectionPolygons() :
    * This method goes through all the possible ways in which the triangle can intersect the tetrahedron and tests for these 
    * types of intersections in accordance with the formulas described in Grandy. These tests are implemented in the test* - methods.
-   * The formulas in the article are stated for one case each only, while the calculation must take into account all cases. 
+   *    The formulas in the article are stated for one case each only, while the calculation must take into account all cases. 
    * To this end, a number of tables, implemented as static const arrays of different types, are used. The tables 
    * mainly contain values of the different enumeration types described at the beginning of the class interface. For example, 
    * the formula Grandy gives for the segment-halfstrip intersection tests ([30]) is for use with the halfstrip above the zx edge. 
@@ -79,14 +73,13 @@ namespace INTERP_UTILS
 
   public:
 
-
     friend class ::TransformedTriangleTest;
     friend class ::TransformedTriangleIntersectTest;
 
-
     /**
      * Enumerations representing the different geometric elements of the unit tetrahedron
-     * and the triangle.
+     * and the triangle. The end element, NO_* gives the number of elements in the enumeration
+     * and can be used as end element in loops.
      */
     /// Corners of tetrahedron
     enum TetraCorner { O = 0, X, Y, Z, NO_TET_CORNER };
@@ -117,7 +110,6 @@ namespace INTERP_UTILS
 
     void dumpCoords();
 
-    
   private:
     
     ////////////////////////////////////////////////////////////////////////////////////
@@ -133,15 +125,12 @@ namespace INTERP_UTILS
     double calculateVolumeUnderPolygon(IntersectionPolygon poly, const double* barycenter); 
 
     ////////////////////////////////////////////////////////////////////////////////////
-    /// Detection of (very) degenerate cases                                ////////////
+    /// Detection of degenerate triangles                                   ////////////
     ////////////////////////////////////////////////////////////////////////////////////
 
     bool isTriangleInPlaneOfFacet(const TetraFacet facet);
 
     bool isTriangleBelowTetraeder();
-
-    bool isPolygonAOnHFacet() const;
-
 
     ////////////////////////////////////////////////////////////////////////////////////
     /// Intersection test methods and intersection point calculations           ////////
@@ -181,11 +170,11 @@ namespace INTERP_UTILS
     
     bool testTriangleSurroundsEdge(const TetraEdge edge) const;
 
-    bool testEdgeIntersectsTriangle(const TetraEdge edge) const;
+    OPT_INLINE bool testEdgeIntersectsTriangle(const TetraEdge edge) const;
 
-    bool testFacetSurroundsSegment(const TriSegment seg, const TetraFacet facet) const;
+    OPT_INLINE bool testFacetSurroundsSegment(const TriSegment seg, const TetraFacet facet) const;
 
-    bool testSegmentIntersectsFacet(const TriSegment seg, const TetraFacet facet) const;
+    OPT_INLINE bool testSegmentIntersectsFacet(const TriSegment seg, const TetraFacet facet) const;
 
     bool testSegmentIntersectsHPlane(const TriSegment seg) const;
 

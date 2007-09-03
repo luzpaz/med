@@ -7,15 +7,11 @@
 
 #define SEG_RAY_TABLE 1 // seems correct
 
-
-
-
-
 namespace INTERP_UTILS
 {
 
   ////////////////////////////////////////////////////////////////////////////////////
-  /// Constants                                                      /////////////////
+  /// Correspondance tables describing all the variations of formulas.  //////////////
   ////////////////////////////////////////////////////////////////////////////////////
 
   // correspondance facet - double product
@@ -27,6 +23,24 @@ namespace INTERP_UTILS
       C_ZH, C_ZX, C_YZ, // OXY
       C_XH, C_YH, C_ZH  // XYZ
     };
+#if 0
+  template<TetraFacet facet, TriSegment seg>
+  inline TransformedTriangle::DoubleProduct getDPForSegFacetIntersection()
+  {
+    return NO_DP;
+  }
+  
+  template<>
+  inline TransformedTriangle::DoubleProduct getDPForSegFacetIntersection<OYZ, PQ>
+  {
+    return C_XH;
+  }
+
+#define DEF_DP_FOR_SEG_FACET(FACET,SEG,DP) template<> inline TransformedTriangle::DoubleProduct getDPForSegFacetIntersection<FACET,SEG> { return DP; }
+  DEF_DP_FOR_SEG_FACET()
+
+#endif
+
   // signs associated with entries in DP_FOR_SEGMENT_FACET_INTERSECTION
   const double TransformedTriangle::SIGN_FOR_SEG_FACET_INTERSECTION[12] = 
     {
@@ -118,24 +132,23 @@ namespace INTERP_UTILS
     };
 #endif
 
-
-
-    
+  
   ////////////////////////////////////////////////////////////////////////////////////
   /// Intersection test methods and intersection point calculations           ////////
   ////////////////////////////////////////////////////////////////////////////////////
-#ifndef OPTIMIZE
+#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
   /**
    * Tests if the given edge of the tetrahedron intersects the triangle PQR. (Grandy, eq [17])
    *
    * @param edge   edge of tetrahedron
-   * @returns      true if PQR intersects the edge, and the edge is not in the plane of the triangle.
+   * @return      true if PQR intersects the edge, and the edge is not in the plane of the triangle.
    */
   bool TransformedTriangle::testSurfaceEdgeIntersection(const TetraEdge edge) const 
   { 
     return testTriangleSurroundsEdge(edge) && testEdgeIntersectsTriangle(edge); 
   }
 #endif
+
   /**
    * Calculates the point of intersection between the given edge of the tetrahedron and the 
    * triangle PQR. (Grandy, eq [22])
@@ -176,14 +189,14 @@ namespace INTERP_UTILS
       }
   }
 
-#ifndef OPTIMIZE
+#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
   /**
    * Tests if the given segment of the triangle intersects the given facet of the tetrahedron. 
    * (Grandy, eq. [19])
    *
    * @param seg    segment of the triangle
    * @param facet  facet of the tetrahedron
-   * @returns      true if the segment intersects the facet
+   * @return      true if the segment intersects the facet
    */
   bool TransformedTriangle::testSegmentFacetIntersection(const TriSegment seg, const TetraFacet facet) const 
   { 
@@ -228,6 +241,7 @@ namespace INTERP_UTILS
 	    const DoubleProduct dp = DP_FOR_SEG_FACET_INTERSECTION[dpIdx];
 	    const double sign = SIGN_FOR_SEG_FACET_INTERSECTION[dpIdx];
 	    pt[i] = -( sign * calcStableC(seg, dp) ) / s;
+
 	    LOG(4, "SegmentFacetIntPtCalc : pt[" << i << "] = " << pt[i]  );
 	    LOG(4, "c(" << seg << ", " << dp << ") = " <<  sign * calcStableC(seg, dp) );
 	    assert(pt[i] >= 0.0); 
@@ -239,22 +253,17 @@ namespace INTERP_UTILS
 
   /**
    * Tests if the given segment of the triangle intersects the given edge of the tetrahedron (Grandy, eq. [20]
-   * 
+   * If the OPTIMIZE is defined, it does not do the test the double product that should be zero.
    * @param seg    segment of the triangle
    * @param edge   edge of tetrahedron
-   * @returns      true if the segment intersects the edge 
+   * @return      true if the segment intersects the edge 
    */
   bool TransformedTriangle::testSegmentEdgeIntersection(const TriSegment seg, const TetraEdge edge) const
   {
 
 #ifndef OPTIMIZE // in this case, we have already checked if the double product is zero
 
-#ifdef EPS_TESTING
-    if(!epsilonEqual(calcStableC(seg,DoubleProduct( edge )), 0.0, TEST_EPS))
-
-#else
       if(calcStableC(seg,DoubleProduct( edge )) != 0.0)
-#endif
       {
 	return false;
       } 
@@ -368,7 +377,9 @@ namespace INTERP_UTILS
 	  }
 	
 	// pt[i] = (c1*s1 + c2*s2) / (s1^2 + s2^2)
+
 	pt[i] = (c[0] * s[0] + c[1] * s[1]) / denominator;
+	//std::cout << "pt[i] = " << pt[i] << std::endl;
 	assert(pt[i] >= 0.0); // check we are in tetraeder
 	assert(pt[i] <= 1.0);
 	
@@ -378,11 +389,11 @@ namespace INTERP_UTILS
     
   /**
    * Tests if the given segment of the triangle intersects the given corner of the tetrahedron.
-   * (Grandy, eq. [21])
+   * (Grandy, eq. [21]). If OPTIMIZE is defined, the double products that should be zero are not verified.
    *
    * @param seg    segment of the triangle
    * @param corner corner of the tetrahedron
-   * @returns      true if the segment intersects the corner
+   * @return      true if the segment intersects the corner
    */
   bool TransformedTriangle::testSegmentCornerIntersection(const TriSegment seg, const TetraCorner corner) const 
   {
@@ -404,11 +415,8 @@ namespace INTERP_UTILS
 	const TetraEdge edge = EDGES_FOR_CORNER[3*corner + i];
 	const DoubleProduct dp = DoubleProduct( edge );
 	const double c = calcStableC(seg, dp);
-#ifdef EPS_TESTING
-	if(!epsilonEqual(c, 0.0, TEST_EPS))
-#else
+
 	if(c != 0.0)
-#endif
 	  {
 	    return false;
 	  }
@@ -428,13 +436,13 @@ namespace INTERP_UTILS
     return false;
   }
     
-#ifndef OPTIMIZE
+#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
   /**
    * Tests if the triangle PQR intersects the ray pointing in the upwards z - direction
    * from the given corner of the tetrahedron. (Grandy eq. [29])
    * 
    * @param corner corner of the tetrahedron on the h = 0 facet (X, Y, or Z)
-   * @returns      true if the upwards ray from the corner intersects the triangle. 
+   * @return      true if the upwards ray from the corner intersects the triangle. 
    */
   bool TransformedTriangle::testSurfaceRayIntersection(const TetraCorner corner) const
   { 
@@ -448,7 +456,7 @@ namespace INTERP_UTILS
    * 
    * @param seg    segment of the triangle
    * @param edge   edge of the h = 0 plane of the tetrahedron (XY, YZ, ZX)
-   * @returns      true if the upwards ray from the corner intersects the triangle. 
+   * @return      true if the upwards ray from the corner intersects the triangle. 
    */
   bool TransformedTriangle::testSegmentHalfstripIntersection(const TriSegment seg, const TetraEdge edge)
   {
@@ -548,10 +556,11 @@ namespace INTERP_UTILS
   /**
    * Tests if the given segment of triangle PQR intersects the ray pointing 
    * in the upwards z - direction from the given corner of the tetrahedron. (Grandy eq. [29])
+   * If OPTIMIZE is defined, the double product that should be zero is not verified.
    * 
    * @param seg    segment of the triangle PQR
    * @param corner corner of the tetrahedron on the h = 0 facet (X, Y, or Z)
-   * @returns      true if the upwards ray from the corner intersects the segment. 
+   * @return      true if the upwards ray from the corner intersects the segment. 
    */
   bool TransformedTriangle::testSegmentRayIntersection(const TriSegment seg, const TetraCorner corner) const
   {
@@ -570,18 +579,14 @@ namespace INTERP_UTILS
 	OZX, // Z
       };
     
-
+#ifndef OPTIMIZE // in this case we have already checked that the double product is zero    
     const DoubleProduct dp0 = DP_SEGMENT_RAY_INTERSECTION[7*cornerIdx];
     const double cVal0 = calcStableC(seg, dp0);
 
-#ifndef OPTIMIZE // in this case we have already checked that the double product is zero    
+
     //? epsilon-equality here?
     // cond. 1
-#ifdef EPS_TESTING
-    if(epsilonEqual(cVal0, 0.0, TEST_EPS))
-#else
     if(cVal0 != 0.0) 
-#endif
       {
 	LOG(4, "SR fails at cond 1 cVal0 = "  << cVal0 );
 	return false;
@@ -619,13 +624,13 @@ namespace INTERP_UTILS
     
   }
 
-#ifndef OPTIMIZE
+#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
   /**
    * Tests if the given corner of triangle PQR lies in the interior of the unit tetrahedron
    * (0 <= x_p, y_p, z_p, h_p <= 1)
    * 
    * @param corner corner of the triangle PQR
-   * @returns      true if the corner lies in the interior of the unit tetrahedron. 
+   * @return      true if the corner lies in the interior of the unit tetrahedron. 
    */
   bool TransformedTriangle::testCornerInTetrahedron(const TriCorner corner) const
   {
@@ -653,7 +658,7 @@ namespace INTERP_UTILS
    * (0 <= x_p, y_p, z_p <= 1 && h_p = 0)
    * 
    * @param corner corner of the triangle PQR
-   * @returns      true if the corner lies on the facet h = 0
+   * @return      true if the corner lies on the facet h = 0
    */
   bool TransformedTriangle::testCornerOnXYZFacet(const TriCorner corner) const
   {
@@ -680,6 +685,12 @@ namespace INTERP_UTILS
     return true;
   }
 
+  /*
+   * Tests if the given corner of the triangle lies above the XYZ-facet of the tetrahedron.
+   *
+   * @param  corner corner of the triangle
+   * @return true if the corner lies above the XYZ facet, false if not.
+   */
   bool TransformedTriangle::testCornerAboveXYZFacet(const TriCorner corner) const
   {
     const double x = _coords[5*corner];
@@ -688,7 +699,6 @@ namespace INTERP_UTILS
     const double H = _coords[5*corner + 4];
         
     return h < 0.0 && H >= 0.0 && x >= 0.0 && y >= 0.0;
-	
   }
 #endif    
     
@@ -701,14 +711,13 @@ namespace INTERP_UTILS
    * given edge of the tetrahedron lies.
    *
    * @param edge   edge of tetrahedron
-   * @returns      true if PQR surrounds edge, false if not (see Grandy, eq. [53])
+   * @return      true if PQR surrounds edge, false if not (see Grandy, eq. [53])
    */
   bool TransformedTriangle::testTriangleSurroundsEdge(const TetraEdge edge) const
   {
     // NB DoubleProduct enum corresponds to TetraEdge enum according to Grandy, table III
     // so we can use the edge directly
     
-    // optimization : we could use _doubleProducts directly here
     const double cPQ = calcStableC(PQ, DoubleProduct(edge));
     const double cQR = calcStableC(QR, DoubleProduct(edge));
     const double cRP = calcStableC(RP, DoubleProduct(edge));
@@ -717,11 +726,7 @@ namespace INTERP_UTILS
 
     // if two or more c-values are zero we disallow x-edge intersection
     // Grandy, p.446
-#ifdef EPS_TESTING
-    const int numZeros = (epsilonEqual(cPQ,0.0) ? 1 : 0) + (epsilonEqual(cQR,0.0) ? 1 : 0) + (epsilonEqual(cRP, 0.0) ? 1 : 0);
-#else
     const int numZeros = (cPQ == 0.0 ? 1 : 0) + (cQR == 0.0 ? 1 : 0) + (cRP == 0.0 ? 1 : 0);
-#endif
     
     if(numZeros >= 2 ) 
       {
@@ -731,11 +736,12 @@ namespace INTERP_UTILS
     return (cPQ*cQR >= 0.0) && (cQR*cRP >= 0.0) && (cRP*cPQ >= 0.0) && numZeros < 2;
   }
 
+#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
   /**
    * Tests if the corners of the given edge lie on different sides of the triangle PQR.
    *
    * @param edge   edge of the tetrahedron
-   * @returns true if the corners of the given edge lie on different sides of the triangle PQR
+   * @return true if the corners of the given edge lie on different sides of the triangle PQR
    *          or if one (but not both) lies in the plane of the triangle.
    */
   bool TransformedTriangle::testEdgeIntersectsTriangle(const TetraEdge edge) const
@@ -761,20 +767,18 @@ namespace INTERP_UTILS
 
     //? should equality with zero use epsilon?
     LOG(5, "testEdgeIntersectsTriangle : t1 = " << t1 << " t2 = " << t2 );
-#ifdef EPS_TESTING
-    return (t1*t2 <= 0.0) && (!epsilonEqualRelative(t1, t2, TEST_EPS * std::max(t1, t2)));
-#else
     return (t1*t2 <= 0.0) && (t1 - t2 != 0.0);
-#endif
   }
+#endif
 
+#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
   /**
    * Tests if the given facet of the tetrahedron surrounds the axis on which the
    * given segment of the triangle lies.
    *
    * @param seg    segment of the triangle
    * @param facet  facet of the tetrahedron
-   * @returns      true if the facet surrounds the segment, false if not (see Grandy, eq. [18])
+   * @return      true if the facet surrounds the segment, false if not (see Grandy, eq. [18])
    */
   bool TransformedTriangle::testFacetSurroundsSegment(const TriSegment seg, const TetraFacet facet) const
   {
@@ -785,30 +789,23 @@ namespace INTERP_UTILS
 	SIGN_FOR_SEG_FACET_INTERSECTION[3*facet + 1],
 	SIGN_FOR_SEG_FACET_INTERSECTION[3*facet + 2]
       };
-    
+
     const double c1 = signs[0]*calcStableC(seg, DP_FOR_SEG_FACET_INTERSECTION[3*facet]);
     const double c2 = signs[1]*calcStableC(seg, DP_FOR_SEG_FACET_INTERSECTION[3*facet + 1]);
     const double c3 = signs[2]*calcStableC(seg, DP_FOR_SEG_FACET_INTERSECTION[3*facet + 2]);
 
-#ifdef EPS_TSTING
-    if(epsilonEqual(c1, 0.0, TEST_EPS) || epsilonEqual(c2, 0.0, TEST_EPS) || epsilonEqual(c3, 0.0, TEST_EPS))
-      {
-	return false;
-      }
-    else
-#endif
-      {
-	return (c1*c3 > 0.0) && (c2*c3 > 0.0);
-      }
 
+    return (c1*c3 > 0.0) && (c2*c3 > 0.0);
   }
+#endif
 
+#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
   /**
    * Tests if the corners of the given segment lie on different sides of the given facet.
    *
    * @param seg    segment of the triangle
    * @param facet  facet of the tetrahedron
-   * @returns true if the corners of the given segment lie on different sides of the facet
+   * @return true if the corners of the given segment lie on different sides of the facet
    *          or if one (but not both) lies in the plane of the facet. (see Grandy, eq. [18])
    */
   bool TransformedTriangle::testSegmentIntersectsFacet(const TriSegment seg, const TetraFacet facet) const
@@ -820,13 +817,20 @@ namespace INTERP_UTILS
 
     //? should we use epsilon-equality here in second test?
     LOG(5, "coord1 : " << coord1 << " coord2 : " << coord2 );
-#ifdef EPS_TESTING
-    return (coord1*coord2 <= 0.0) && epsilonEqualRelative(coord1,coord2, TEST_EPS * std::max(coord1, coord2));
-#else
-    return (coord1*coord2 <= 0.0) && (coord1 != coord2);
-#endif
-  }
 
+    return (coord1*coord2 <= 0.0) && (coord1 != coord2);
+  }
+#endif
+
+#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
+  /*
+   * Tests if the H-coordinates (1 - x - y) for the two end of a segment of the triangle
+   * lie on different sides of the H = 0 plane.
+   *
+   * @param seg  segment of the Triangle
+   * @return true if the two points of the triangle lie on different sides of the H = 0 plane : 
+   *         that is, if their H-coordinates have different signs
+   */
   bool TransformedTriangle::testSegmentIntersectsHPlane(const TriSegment seg) const
   {
     // get the H - coordinates
@@ -834,32 +838,31 @@ namespace INTERP_UTILS
     const double coord2 = _coords[5*( (seg + 1) % 3) + 4];
     //? should we use epsilon-equality here in second test?
     LOG(5, "coord1 : " << coord1 << " coord2 : " << coord2 );
-#ifdef EPS_TESTING
-    return (coord1*coord2 <= 0.0) && epsilonEqualRelative(coord1,coord2, TEST_EPS * std::max(coord1, coord2));
-#else
-    return (coord1*coord2 <= 0.0) && (coord1 != coord2);
-#endif
-  }
 
+    return (coord1*coord2 <= 0.0) && (coord1 != coord2);
+  }
+#endif
+
+#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
   /**
    * Tests if the triangle PQR lies above a given corner in the z-direction (implying that the 
    * ray pointing upward in the z-direction from the corner can intersect the triangle)
    * (Grandy eq.[28])
    *
    * @param corner corner of the tetrahedron
-   * @returns true if the triangle lies above the corner in the z-direction
+   * @return true if the triangle lies above the corner in the z-direction
    */
   bool TransformedTriangle::testSurfaceAboveCorner(const TetraCorner corner) const
   {
-    //? is it always YZ here ?
-    //? changed to XY !
+    // ? There seems to be an error in Grandy -> it should be C_XY instead of C_YZ in [28].
+    // ? I haven't really figured out why, but it seems to work.
     const double normal = calcStableC(PQ, C_XY) + calcStableC(QR, C_XY) + calcStableC(RP, C_XY);
+
     LOG(6, "surface above corner " << corner << " : " << "n = " << normal << ", t = [" <<  calcTByDevelopingRow(corner, 1, false) << ", "  << calcTByDevelopingRow(corner, 2, false) << ", " << calcTByDevelopingRow(corner, 3, false) );
     LOG(6, "] - stable : " << calcStableT(corner)  );
 
     //? we don't care here if the triple product is "invalid", that is, the triangle does not surround one of the
     // edges going out from the corner (Grandy [53])
-    //return ( calcTByDevelopingRow(corner, 1, false) * normal ) >= 0.0;
     if(!_validTP[corner])
       {
 	return ( calcTByDevelopingRow(corner, 1, false) * normal ) >= 0.0;
@@ -869,13 +872,15 @@ namespace INTERP_UTILS
 	return ( calcStableT(corner) * normal ) >= 0.0;
       }
   }
+#endif
 
+#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
   /**
    * Tests if the triangle PQR surrounds the ray pointing upwards in the z-direction
    * from the given corner.
    *
    * @param corner corner on face XYZ of tetrahedron
-   * @returns      true if PQR surrounds ray, false if not (see Grandy, eq. [18])
+   * @return      true if PQR surrounds ray, false if not (see Grandy, eq. [18])
    */
   bool TransformedTriangle::testTriangleSurroundsRay(const TetraCorner corner) const
   {
@@ -899,8 +904,9 @@ namespace INTERP_UTILS
     //? NB here we have no correction for precision - is this good?
     // Our authority Grandy says nothing
     LOG(5, "dp in triSurrRay for corner " << corner << " = [" << cPQ << ", " << cQR << ", " << cRP << "]" );
+
     return ( cPQ*cQR > 0.0 ) && ( cPQ*cRP > 0.0 );
 
   }
-
+#endif
 }; // NAMESPACE

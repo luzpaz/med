@@ -64,8 +64,8 @@ CPPFLAGS+=$(BOOST_CPPFLAGS) $(MED2_INCLUDES) $(HDF5_INCLUDES) -I$(top_srcdir)/sr
 #CPPFLAGS+= -I/usr/include/cppunit
 
 # for log
-CXXFLAGS+= -DLOG_LEVEL=1
-CPPFLAGS+= -DLOG_LEVEL=1 
+CXXFLAGS+= -DLOG_LEVEL=0
+CPPFLAGS+= -DLOG_LEVEL=0 
 
 # for gcov
 #CXXFLAGS+=-fprofile-arcs -ftest-coverage 

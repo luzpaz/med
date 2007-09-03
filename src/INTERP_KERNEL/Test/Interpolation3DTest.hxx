@@ -7,15 +7,17 @@
 #define ERR_TOL 1.0e-8
 
 using MEDMEM::Interpolation3D;
+class MEDMEM::MESH;
 
 class Interpolation3DTest : public CppUnit::TestFixture
 {
 
   // single - element
   CPPUNIT_TEST_SUITE( Interpolation3DTest );
-
+#if 0
   CPPUNIT_TEST( tetraReflexiveUnit );
   CPPUNIT_TEST( tetraReflexiveGeneral );
+
   CPPUNIT_TEST( tetraNudgedSimpler );
   CPPUNIT_TEST( tetraNudged );
   CPPUNIT_TEST( tetraCorner );
@@ -34,21 +36,24 @@ class Interpolation3DTest : public CppUnit::TestFixture
   // multi - element  
  
   CPPUNIT_TEST( tetraComplexIncluded );
+#endif
   CPPUNIT_TEST( dividedUnitTetraSimplerReflexive );
   CPPUNIT_TEST( dividedUnitTetraReflexive );
-  CPPUNIT_TEST( nudgedDividedUnitTetra );
-  CPPUNIT_TEST( nudgedDividedUnitTetraSimpler );
-  CPPUNIT_TEST( dividedGenTetra );
+  //#if 0
+  //CPPUNIT_TEST( nudgedDividedUnitTetra );
+  //CPPUNIT_TEST( nudgedDividedUnitTetraSimpler );
+  //CPPUNIT_TEST( dividedGenTetra );
   CPPUNIT_TEST( boxReflexive );
   CPPUNIT_TEST( boxReflexiveModerate );
-  CPPUNIT_TEST( tetraBoxes );
-  CPPUNIT_TEST( moderateBoxes );
-  CPPUNIT_TEST( moderateBoxesSmaller );
+  //CPPUNIT_TEST( tetraBoxes );
+  //CPPUNIT_TEST( moderateBoxes );
+  //CPPUNIT_TEST( moderateBoxesSmaller );
   CPPUNIT_TEST( moderateBoxSmallReflexive );
   CPPUNIT_TEST( moderateBoxEvenSmallerReflexive );
   CPPUNIT_TEST( tinyBoxReflexive );
 
-  CPPUNIT_TEST( simpleHexaBox );
+  //CPPUNIT_TEST( simpleHexaBox );
+  //#endif
   CPPUNIT_TEST_SUITE_END();
 
 
@@ -220,6 +225,14 @@ private:
 
   Interpolation3D* interpolator;
 
+  double sumRow(const IntersectionMatrix& m, int i) const;
+
+  double sumCol(const IntersectionMatrix& m, int i) const;
+
+  void getVolumes( MEDMEM::MESH& mesh,const double*& tab) const;
+
+  bool testVolumes(const IntersectionMatrix& m,  MEDMEM::MESH& sMesh,  MEDMEM::MESH& tMesh) const;
+
   double sumVolume(const IntersectionMatrix& m) const;
 
   bool areCompatitable( const IntersectionMatrix& m1,  const IntersectionMatrix& m2) const;
@@ -234,6 +247,7 @@ private:
   void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec = 1.0e-5, bool doubleTest = true) const;
 
   void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) const;
+
 
 };
 

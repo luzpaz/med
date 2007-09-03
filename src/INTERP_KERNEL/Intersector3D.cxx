@@ -23,7 +23,7 @@ namespace MEDMEM
    *
    */
   Intersector3D::Intersector3D(const MESH& srcMesh, const MESH& targetMesh)
-    : _srcMesh(srcMesh), _targetMesh(targetMesh)
+    : _srcMesh(srcMesh), _targetMesh(targetMesh), filtered(0)
   {
   }
 
@@ -97,6 +97,13 @@ namespace MEDMEM
 	volume += iter->calculateIntersectionVolume();
       }
 
+    // reset if it is very small to keep the matrix sparse
+    // is this a good idea?
+    if(epsilonEqual(volume, 0.0, 1.0e-11))
+      {
+    	volume = 0.0;
+      }
+    
     LOG(2, "Volume = " << volume << ", det= " << T.determinant());
 
     // NB : fault in article, Grandy, [8] : it is the determinant of the inverse transformation 
@@ -112,10 +119,10 @@ namespace MEDMEM
    * @param  triangles  vector in which the transformed triangles are stored
    * @param  T          affine transform that is applied to the nodes of the triangles
    */
-#ifdef OPTIMIZE_ // optimized version
+#ifdef OPTIMIZE_FILTER // optimized version
   void Intersector3D::triangulate(const medGeometryElement type, const int element, std::vector<TransformedTriangle>& triangles, const TetraAffineTransform& T) const
   {
-    
+
     // get cell model for the element
     CELLMODEL cellModel(type);
 
@@ -128,56 +135,61 @@ namespace MEDMEM
     triangles.reserve(2 * cellModel.getNumberOfConstituents(1));
 
     // loop over faces
-    const int numFaces = cellModel.getNumberOfConstituents(1);
-    double* transformedNodeList[numFaces];
-    medGeometryElement faceTypes[numFaces];
-    bool isOutsideTetra = true;
+    double** transformedNodes = new double*[cellModel.getNumberOfNodes()];
+    bool isOutside[8] = {true, true, true, true, true, true, true, true};
+    bool isTargetOutside = false;
     
-    for(int i = 1 ; i <= numFaces ; ++i)
+    // calculate the coordinates of the nodes
+    for(int i = 1; i <= cellModel.getNumberOfNodes() ; ++i)
       {
-	faceTypes[i - 1] = cellModel.getConstituentType(1, i);
-	CELLMODEL faceModel(faceTypes[i-1]);
+	const double* node = getCoordsOfNode(i, element, _srcMesh);
+	transformedNodes[i-1] = new double[3];
+	assert(transformedNodes[i-1] != 0);
 	
-	assert(faceModel.getDimension() == 2);
-	//	assert(faceModel.getNumberOfNodes() == 3);
-	
-	transformedNodeList[i - 1] = new double[3 * faceModel.getNumberOfNodes()];
-	
-	// loop over nodes of face
-	for(int j = 1; j <= faceModel.getNumberOfNodes(); ++j)
-	  {
-	    // offset of node from cellIdx
-	    int localNodeNumber = cellModel.getNodeConstituent(1, i, j);
+	T.apply(transformedNodes[i - 1], node);
 
-	    assert(localNodeNumber >= 1);
-	    assert(localNodeNumber <= cellModel.getNumberOfNodes());
+	//	LOG(4, "Node " << i << " = " << vToStr(node) << " transformed to " << vToStr(&transformedNodes[i - 1]);
 
-	    const double* node = getCoordsOfNode(localNodeNumber, element, _srcMesh);
-	    
-	    // transform 
-	    //{ not totally efficient since we transform each node once per face
-	    T.apply(&transformedNodeList[i - 1][3*(j-1)], node);
-	    //T.apply(&transformedNodes[3*(j-1)], node);
-
-	    LOG(4, "Node " << localNodeNumber << " = " << vToStr(node) << " transformed to " 
-		<< vToStr(&transformedNodeList[i - 1][3*(j-1)]));
-
-	  }
-
-	isOutsideTetra = isOutsideTetra && isTriangleOutsideTetra(transformedNodeList[i - 1]);
+	checkIsOutside(transformedNodes[i - 1], isOutside);
       }
-
-    if(!isOutsideTetra)
+    // std:cout << "here1" << std::endl;
+    // check if we need to calculate intersection volume
+    for(int i = 0; i < 8; ++i)
       {
-	for(int i = 1 ; i <= numFaces ; ++i)
+	if(isOutside[i])
 	  {
+	    isTargetOutside = true;
+	  }
+      }
+    // std:cout << "here2" << std::endl;
+
+    if(!isTargetOutside)
+      {
+	for(int i = 1 ; i <= cellModel.getNumberOfConstituents(1) ; ++i)
+	  {
+	    const medGeometryElement faceType = cellModel.getConstituentType(1, i);
+	    CELLMODEL faceModel(faceType);
+	
+	    assert(faceModel.getDimension() == 2);
 	    
+	    int nodes[faceModel.getNumberOfNodes()];
+	
+	    // get the nodes of the face
+	    for(int j = 1; j <= faceModel.getNumberOfNodes(); ++j)
+	      {
+		nodes[j-1] = cellModel.getNodeConstituent(1, i, j) - 1;
+		
+		assert(nodes[j-1] +1 >= 0);
+		assert(nodes[j-1] +1 <= cellModel.getNumberOfNodes());
+	      }
+	    //	     std::cout << "here3 : " << nodes[0] << "," <<  nodes[1] << ", " <<  nodes[2] << std::endl;
 	    // create transformed triangles from face
-	    switch(faceTypes[i - 1])
+	    switch(faceType)
 	      {
 	      case MED_TRIA3:
 		// simple take the triangle as it is
-		triangles.push_back(TransformedTriangle(&transformedNodeList[i - 1][0], &transformedNodeList[i - 1][3], &transformedNodeList[i - 1][6]));
+		//std::cout << "here3.1 : " << transformedNodes[nodes[0]] << "," <<  transformedNodes[nodes[1]] << ", " << transformedNodes[nodes[2]]  << std::endl;
+		triangles.push_back(TransformedTriangle(transformedNodes[nodes[0]], transformedNodes[nodes[1]], transformedNodes[nodes[2]]));
 		break;
 		
 	      case MED_QUAD4:
@@ -195,10 +207,10 @@ namespace MEDMEM
 		//? not sure if this always works 
 		
 		// local nodes 1, 2, 3
-		triangles.push_back(TransformedTriangle(&transformedNodeList[i - 1][0], &transformedNodeList[i - 1][3], &transformedNodeList[i - 1][6]));
+		triangles.push_back(TransformedTriangle(transformedNodes[nodes[0]], transformedNodes[nodes[1]], transformedNodes[nodes[2]]));
 		
 		// local nodes 1, 3, 4
-		triangles.push_back(TransformedTriangle(&transformedNodeList[i - 1][0], &transformedNodeList[i - 1][6], &transformedNodeList[i - 1][9]));
+		triangles.push_back(TransformedTriangle(transformedNodes[nodes[0]], transformedNodes[nodes[2]], transformedNodes[nodes[3]]));
 		
 		break;
 		
@@ -206,12 +218,20 @@ namespace MEDMEM
 		std::cout << "+++ Error : Only elements with triangular and quadratilateral faces are supported at the moment." << std::endl;
 		assert(false);
 	      }
+	    // std:cout << "here4" << std::endl;
 	  }
       }
-    for(int i = 1 ; i <= numFaces ; ++i)
+    else
       {
-	delete[] transformedNodeList[i-1];
+	++filtered;
       }
+
+    for(int i = 0 ; i < cellModel.getNumberOfNodes() ; ++i)
+      {
+	delete[] transformedNodes[i];
+      }
+    delete[] transformedNodes;
+    // std:cout << "here5" << std::endl;
   }
     
 #else // un-optimized version

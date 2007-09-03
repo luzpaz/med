@@ -9,6 +9,9 @@
 
 #include "VectorUtils.hxx"
 
+#include "MEDMEM_Field.hxx"
+#include "MEDMEM_Support.hxx"
+
 // levels : 
 // 1 - titles and volume results
 // 2 - symmetry / diagonal results and intersection matrix output
@@ -23,6 +26,41 @@
 using namespace MEDMEM;
 using namespace std;
 using namespace INTERP_UTILS;
+using namespace MED_EN;
+
+double Interpolation3DTest::sumRow(const IntersectionMatrix& m, int i) const
+{
+  double vol = 0.0;
+  for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
+    {
+      if(iter->count(i) != 0.0)
+	{
+	  map<int, double>::const_iterator iter2 = iter->find(i);
+	  vol += iter2->second;
+	}
+    }
+  return vol;
+}
+
+double Interpolation3DTest::sumCol(const IntersectionMatrix& m, int i) const
+{
+  double vol = 0.0;
+  const std::map<int, double>& col = m[i];
+  for(map<int, double>::const_iterator iter = col.begin() ; iter != col.end() ; ++iter)
+    {
+      vol += std::abs(iter->second);
+    }
+  return vol;
+}
+
+
+void Interpolation3DTest::getVolumes(MESH& mesh, const double*& tab) const
+{
+  SUPPORT *sup=new SUPPORT(&mesh,"dummy",MED_CELL);
+  FIELD<double>* f=mesh.getVolume(sup);
+  tab = f->getValue();
+  //  delete sup;
+}
 
 double Interpolation3DTest::sumVolume(const IntersectionMatrix& m) const
 {
@@ -43,6 +81,43 @@ double Interpolation3DTest::sumVolume(const IntersectionMatrix& m) const
   const double vol = accumulate(volumes.begin(), volumes.end(), 0.0);
 
   return vol;
+}
+
+bool Interpolation3DTest::testVolumes(const IntersectionMatrix& m,  MESH& sMesh,  MESH& tMesh) const
+{
+  bool ok = true;
+
+  // source elements
+  const double* sVol = new double[sMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)];
+  getVolumes(sMesh, sVol);
+
+  for(int i = 0; i < sMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS); ++i)
+    {
+      const double sum_row = sumRow(m, i+1);
+      if(!epsilonEqualRelative(sum_row, sVol[i], VOL_PREC))
+	{
+	  LOG(1, "Source volume inconsistent : vol of cell " << i << " = " << sVol[i] << " but the row sum is " << sum_row );
+	  ok = false;
+	}
+      LOG(1, "diff = " <<sum_row - sVol[i] );
+    }
+
+  // target elements
+  const double* tVol = new double[tMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)];
+  getVolumes(tMesh, tVol);
+  for(int i = 0; i < tMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS); ++i)
+    {
+      const double sum_col = sumCol(m, i);
+      if(!epsilonEqualRelative(sum_col, tVol[i], VOL_PREC))
+	{
+	  LOG(1, "Target volume inconsistent : vol of cell " << i << " = " << tVol[i] << " but the col sum is " << sum_col);
+	  ok = false;
+	}
+      LOG(1, "diff = " <<sum_col - tVol[i] );
+    }
+  delete[] sVol;
+  delete[] tVol;
+  return ok;
 }
 
 bool Interpolation3DTest::areCompatitable(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const
@@ -177,12 +252,14 @@ void Interpolation3DTest::calcIntersectionMatrix(const char* mesh1path, const ch
   LOG(1, std::endl << "=== -> intersecting src = " << mesh1 << ", target = " << mesh2 );
 
   LOG(5, "Loading " << mesh1 << " from " << mesh1path);
-  const MESH sMesh(MED_DRIVER, dataDir+mesh1path, mesh1);
-
+  MESH sMesh(MED_DRIVER, dataDir+mesh1path, mesh1);
+  
   LOG(5, "Loading " << mesh2 << " from " << mesh2path);
-  const MESH tMesh(MED_DRIVER, dataDir+mesh2path, mesh2);
+  MESH tMesh(MED_DRIVER, dataDir+mesh2path, mesh2);
 
   m = interpolator->interpol_maillages(sMesh, tMesh);
+
+  testVolumes(m, sMesh, tMesh);
 
   LOG(1, "Intersection calculation done. " << std::endl );
   
@@ -213,7 +290,7 @@ void Interpolation3DTest::intersectMeshes(const char* mesh1path, const char* mes
     {
       LOG(1, "vol =  " << vol1 <<"  correctVol = " << correctVol );
       CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(correctVol, vol1));
-     
+
       if(isTestReflexive)
 	{
 	  CPPUNIT_ASSERT_EQUAL_MESSAGE("Reflexive test failed", true, testDiagonal(matrix1));
