@@ -596,8 +596,9 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   BEGIN_OF(LOC);
 
   typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array   ArrayNo;
-  //typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array ArrayFull;
   typedef typename MEDMEM_ArrayInterface<T,NoInterlace,Gauss>::Array     ArrayNoWg;
+  typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array ArrayFull;
+  typedef typename MEDMEM_ArrayInterface<T,FullInterlace,Gauss>::Array   ArrayFullWg;
 
   if ( ( MED_FIELD_DRIVER<T>::_fieldName.empty()       ) &&
        ( MED_FIELD_DRIVER<T>::_ptrField->_name.empty() )    )
@@ -818,6 +819,13 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues=0 ;
   bool anyGauss=false;
 
+  // PAL16681 (Read no interlace field from file) ->
+  // use medModeSwitch of a field in MEDchampLire() if there is one geometric type
+  med_2_1::med_mode_switch modswt = med_2_1::MED_NO_INTERLACE;
+  if ( NumberOfTypes == 1 &&
+       MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == med_2_1::MED_FULL_INTERLACE )
+    modswt = med_2_1::MED_FULL_INTERLACE;
+
   for (int i=0; i<NumberOfTypes; i++) {
     MESSAGE ("Type["<<i+1<<"] :"<< Types[i]);
     MESSAGE ("Entity :"<< mySupport->getEntity());
@@ -865,7 +873,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
 	ret=med_2_1::MEDchampLire(id,const_cast <char*> (meshName.c_str()),
 				  const_cast <char*> (MED_FIELD_DRIVER<T>::_fieldName.c_str()),
 				  (unsigned char*) temp,
-				  med_2_1::MED_NO_INTERLACE,
+				  modswt /*med_2_1::MED_NO_INTERLACE*/, // PAL16681
 				  MED_ALL,
 				  ProfilName,
 				  (med_2_1::med_entite_maillage) mySupport->getEntity(),
@@ -882,7 +890,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
       ret=med_2_1::MEDchampLire(id,const_cast <char*> (meshName.c_str()),
 				const_cast <char*> (MED_FIELD_DRIVER<T>::_fieldName.c_str()),
 				(unsigned char*) myValues[i],
-				med_2_1::MED_NO_INTERLACE,
+                                modswt /*med_2_1::MED_NO_INTERLACE*/, // PAL16681
 				MED_ALL,
 				ProfilName,
 				(med_2_1::med_entite_maillage) mySupport->getEntity()
@@ -931,9 +939,6 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     }
   }
   // allocate _value
-  // probleme avec les points de gauss : voir lorsqu-il y en a (!= 1)
-  // Creer un driver spécifique pour les modes MED_FULL_INTERLACE et MED_NO_INTERLACE
-  // serait plus efficicace.
   MEDMEM_Array_ * Values;
   if ( anyGauss ) {
     vector<int> nbelgeoc( supNbOfElOfType.size()+1, 0 ), nbgaussgeo( supNbOfElOfType.size()+1, 0);
@@ -941,72 +946,112 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
       nbelgeoc  [ t+1 ] = nbelgeoc  [ t ] + supNbOfElOfType    [ t ];
       nbgaussgeo[ t+1 ] = /*nbgaussgeo[ t ] +*/ numberOfGaussPoints[ t ];
     }
-    ArrayNoWg* aValues = new ArrayNoWg(numberOfComponents,
-                                       mySupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS),
-                                       NumberOfTypes,
-                                       &nbelgeoc[0],
-                                       &nbgaussgeo[0]);
-    Values = aValues;
-    for (int j=1; j<=numberOfComponents; j++)
-    {
-      int Count = 1 ;
-      for (int t=0; t<NumberOfTypes; t++)
+    // PAL16681. If NumberOfTypes == 1 then myValues[0] is what should be
+    // in a field value, i.e. no conversion needed
+    if ( NumberOfTypes == 1 ) {
+      if ( modswt == med_2_1::MED_NO_INTERLACE )
+        Values = new ArrayNoWg(myValues[0],
+                               numberOfComponents,
+                               mySupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS),
+                               NumberOfTypes,
+                               &nbelgeoc[0],
+                               &nbgaussgeo[0],
+                               true, //shallowCopy
+                               true); // ownershipOfValues
+      else
+        Values = new ArrayFullWg(myValues[0],
+                                 numberOfComponents,
+                                 mySupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS),
+                                 NumberOfTypes,
+                                 &nbelgeoc[0],
+                                 &nbgaussgeo[0],
+                                 true, //shallowCopy
+                                 true); // ownershipOfValues
+    }
+    else {
+      ArrayNoWg* aValues = new ArrayNoWg(numberOfComponents,
+                                         mySupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS),
+                                         NumberOfTypes,
+                                         &nbelgeoc[0],
+                                         &nbgaussgeo[0]);
+      Values = aValues;
+      for (int j=1; j<=numberOfComponents; j++)
       {
-        T * myValue = myValues[t] ;
-        int nbElem  = supNbOfElOfType[ t ];
-        int nbGauss = numberOfGaussPoints[ t ];
-        nbelgeoc[1] = nbElem;
-        nbgaussgeo[1] = nbGauss;
-        ArrayNoWg indexer( numberOfComponents, nbElem, 1, &nbelgeoc[0], &nbgaussgeo[0]);
-        for (int i=1; i<=nbElem; i++) {
-          for (int k=1 ; k<=nbGauss; k++)
-            aValues->setIJK( Count, j, k, myValue[ indexer.getIndex( i, j, k )]);
-          Count++;
+        int Count = 1 ;
+        for (int t=0; t<NumberOfTypes; t++)
+        {
+          T * myValue = myValues[t] ;
+          int nbElem  = supNbOfElOfType[ t ];
+          int nbGauss = numberOfGaussPoints[ t ];
+          nbelgeoc[1] = nbElem;
+          nbgaussgeo[1] = nbGauss;
+          ArrayNoWg indexer( numberOfComponents, nbElem, 1, &nbelgeoc[0], &nbgaussgeo[0]);
+          for (int i=1; i<=nbElem; i++) {
+            for (int k=1 ; k<=nbGauss; k++)
+              aValues->setIJK( Count, j, k, myValue[ indexer.getIndex( i, j, k )]);
+            Count++;
+          }
         }
       }
     }
   }
   else {
-    ArrayNo* aValues = new ArrayNo(numberOfComponents,TotalNumberOfValues);
-    Values = aValues;
+    // PAL16681. If NumberOfTypes == 1 then myValues[0] is what should be
+    // in a field value, i.e. no conversion needed
+    if ( NumberOfTypes == 1 ) {
+      if ( modswt == med_2_1::MED_NO_INTERLACE )
+        Values = new ArrayNo( myValues[0],
+                              numberOfComponents,
+                              TotalNumberOfValues,
+                              true, //shallowCopy
+                              true); // ownershipOfValues
+      else
+        Values = new ArrayFull( myValues[0],
+                                numberOfComponents,
+                                TotalNumberOfValues,
+                                true, //shallowCopy
+                                true); // ownershipOfValues
+    }
+    else {
+      ArrayNo* aValues = new ArrayNo(numberOfComponents,TotalNumberOfValues);
+      Values = aValues;
 
-    for (int i=0; i<numberOfComponents; i++)
-    {
-      //T * ValuesT = Values->getRow(i+1) ;
-      int Count = 1 ;
-      for (int j=0; j<NumberOfTypes; j++)
+      for (int i=0; i<numberOfComponents; i++)
       {
-        T * myValue = myValues[j] ;
-        int NumberOf = NumberOfValues[j] ;
-        //	  MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues+=NumberOf; // problem with gauss point : _numberOfValues != TotalNumberOfValues !!!!!!!
-        int offset = NumberOf*i ;
-        for (int k=0 ; k<NumberOf; k++) {
-          //ValuesT[Count]=myValue[k+offset] ;
-          aValues->setIJ(Count,i+1,myValue[k+offset]);
-          //jfa 22.07.2005:SCRUTE(Count);
-          //jfa 22.07.2005:SCRUTE(Values->getIJ(Count,i+1));
-          Count++;
+        //T * ValuesT = Values->getRow(i+1) ;
+        int Count = 1 ;
+        for (int j=0; j<NumberOfTypes; j++)
+        {
+          T * myValue = myValues[j] ;
+          int NumberOf = NumberOfValues[j] ;
+          int offset = NumberOf*i ;
+          for (int k=0 ; k<NumberOf; k++) {
+            //ValuesT[Count]=myValue[k+offset] ;
+            aValues->setIJ(Count,i+1,myValue[k+offset]);
+            Count++;
+          }
         }
       }
     }
   }
    
-  for (int j=0; j<NumberOfTypes; j++)
-    delete[] myValues[j] ;
+  // PAL16681. If NumberOfTypes == 1 then myValues[0] is used in field value
+  if ( NumberOfTypes != 1 )
+    for (int j=0; j<NumberOfTypes; j++)
+      delete[] myValues[j] ;
   delete[] myValues ;
   delete[] NumberOfValues ;
 
   if (MED_FIELD_DRIVER<T>::_ptrField->_value != NULL)
     delete MED_FIELD_DRIVER<T>::_ptrField->_value;
 
-  if ( MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
+  if ( NumberOfTypes != 1 &&  // PAL16681
+       MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
     {
       if (Values->getGaussPresence())
 	MED_FIELD_DRIVER<T>::_ptrField->_value=ArrayConvert(*static_cast<ArrayNoWg*>(Values));
       else
 	MED_FIELD_DRIVER<T>::_ptrField->_value=ArrayConvert(*static_cast<ArrayNo*  >(Values));
-//       // dynamic_cast inutile
-//       MED_FIELD_DRIVER<T>::_ptrField->_value=dynamic_cast<ArrayFull *>(ArrayConvert(*Values));
       delete Values;
     }
   else
