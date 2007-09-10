@@ -21,6 +21,8 @@
 class TransformedTriangleTest;
 class TransformedTriangleIntersectTest;
 
+
+
 namespace INTERP_UTILS
 {
 
@@ -319,5 +321,7 @@ namespace INTERP_UTILS
 #endif
 
 };
+
+#include "TransformedTriangle_tables.hxx"
 
 #endif

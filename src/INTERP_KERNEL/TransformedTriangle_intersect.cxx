@@ -23,23 +23,6 @@ namespace INTERP_UTILS
       C_ZH, C_ZX, C_YZ, // OXY
       C_XH, C_YH, C_ZH  // XYZ
     };
-#if 0
-  template<TetraFacet facet, TriSegment seg>
-  inline TransformedTriangle::DoubleProduct getDPForSegFacetIntersection()
-  {
-    return NO_DP;
-  }
-  
-  template<>
-  inline TransformedTriangle::DoubleProduct getDPForSegFacetIntersection<OYZ, PQ>
-  {
-    return C_XH;
-  }
-
-#define DEF_DP_FOR_SEG_FACET(FACET,SEG,DP) template<> inline TransformedTriangle::DoubleProduct getDPForSegFacetIntersection<FACET,SEG> { return DP; }
-  DEF_DP_FOR_SEG_FACET()
-
-#endif
 
   // signs associated with entries in DP_FOR_SEGMENT_FACET_INTERSECTION
   const double TransformedTriangle::SIGN_FOR_SEG_FACET_INTERSECTION[12] = 
@@ -181,8 +164,13 @@ namespace INTERP_UTILS
     LOG(4, "tA = " << tA << " tB = " << tB << " alpha= " << alpha );
     for(int i = 0; i < 3; ++i)
       {
+
 	pt[i] = (1 - alpha) * COORDS_TET_CORNER[3*corners[0] + i] + 
 	  alpha * COORDS_TET_CORNER[3*corners[1] + i];
+#if 0
+	pt[i] = (1 - alpha) * getCoordinateForTetCorner<corners[0], i>() + 
+	  alpha * getCoordinateForTetCorner<corners[0], i>();
+#endif
 	LOG(6, pt[i] );
 	assert(pt[i] >= 0.0);
 	assert(pt[i] <= 1.0);

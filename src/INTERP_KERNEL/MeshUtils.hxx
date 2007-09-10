@@ -4,6 +4,8 @@
 #include "MEDMEM_define.hxx"
 #include <cassert>
 
+#include <set>
+
 using namespace MEDMEM;
 using namespace MED_EN;
 
@@ -45,6 +47,15 @@ namespace INTERP_UTILS
     return static_cast<int>(type) - 300;
   }
 
+  inline int getGlobalNumberOfNode(int node, int element, const MESH& mesh)
+  {
+    assert(node >= 1);
+    assert(node <= mesh.getNumberOfNodes());
+    const int nodeOffset = node - 1;
+    const int elemIdx = mesh.getConnectivityIndex(MED_NODAL, MED_CELL)[element - 1] - 1;
+    return mesh.getConnectivity(MED_FULL_INTERLACE, MED_NODAL, MED_CELL, MED_ALL_ELEMENTS)[elemIdx + nodeOffset] - 1;
+  }
+    
 };  
 
 

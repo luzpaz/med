@@ -321,7 +321,7 @@ namespace INTERP_UTILS
     _isTripleProductsCalculated = true;
   }
 
-  /*
+  /**
    * Calculates the angle between an edge of the tetrahedron and the triangle
    *
    * @param  edge edge of the tetrahedron

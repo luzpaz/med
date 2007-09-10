@@ -259,7 +259,12 @@ void Interpolation3DTest::calcIntersectionMatrix(const char* mesh1path, const ch
 
   m = interpolator->interpol_maillages(sMesh, tMesh);
 
-  testVolumes(m, sMesh, tMesh);
+  // if reflexive, check volumes
+  if(strcmp(mesh1path,mesh2path) == 0)
+    {
+      const bool row_and_col_sums_ok = testVolumes(m, sMesh, tMesh);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Row or column sums incorrect", true, row_and_col_sums_ok);
+    }
 
   LOG(1, "Intersection calculation done. " << std::endl );
   

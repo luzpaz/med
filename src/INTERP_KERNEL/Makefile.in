@@ -54,7 +54,8 @@ BBTree.H\
 MeshUtils.hxx\
 Intersector3D.hxx\
 Log.hxx\
-TransformedTriangle_inline.hxx
+TransformedTriangle_inline.hxx\
+IntersectorTetra.hxx
 
 
 # Libraries targets
@@ -73,7 +74,8 @@ TetraAffineTransform.cxx\
 Interpolation3D.cxx\
 Intersector3D.cxx\
 Interpolation3DSurf.cxx\
-Interpolation2D.cxx
+Interpolation2D.cxx\
+IntersectorTetra.cxx
 
 # Executables targets
 BIN = 
@@ -90,8 +92,7 @@ CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MED2_INCLUDES)
 CPPFLAGS+=$(BOOST_CPPFLAGS) 
 
 # optimization
-#CXXFLAGS+= -O1 -DOPTIMIZE
-#CPPFLAGS+= -O1 -DOPTIMIZE
+
 CXXFLAGS+=  -O2 -DOPTIMIZE_FILTER -DOPTIMIZE
 CPPFLAGS+=  -O2 -DOPTIMIZE_FILTER -DOPTIMIZE
 

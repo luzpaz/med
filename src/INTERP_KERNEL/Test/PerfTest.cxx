@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 
   calcIntersectionMatrix(mesh1path.c_str(), mesh1.c_str(), mesh2path.c_str(), mesh2.c_str(), m);
 
-  //dumpIntersectionMatrix(m);
+  // dumpIntersectionMatrix(m);
   
   return 0;
 

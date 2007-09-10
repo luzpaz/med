@@ -36,24 +36,26 @@ class Interpolation3DTest : public CppUnit::TestFixture
   // multi - element  
  
   CPPUNIT_TEST( tetraComplexIncluded );
-#endif
+
   CPPUNIT_TEST( dividedUnitTetraSimplerReflexive );
   CPPUNIT_TEST( dividedUnitTetraReflexive );
-  //#if 0
-  //CPPUNIT_TEST( nudgedDividedUnitTetra );
-  //CPPUNIT_TEST( nudgedDividedUnitTetraSimpler );
-  //CPPUNIT_TEST( dividedGenTetra );
+
+  CPPUNIT_TEST( nudgedDividedUnitTetra );
+  CPPUNIT_TEST( nudgedDividedUnitTetraSimpler );
+  CPPUNIT_TEST( dividedGenTetra );
   CPPUNIT_TEST( boxReflexive );
   CPPUNIT_TEST( boxReflexiveModerate );
-  //CPPUNIT_TEST( tetraBoxes );
-  //CPPUNIT_TEST( moderateBoxes );
-  //CPPUNIT_TEST( moderateBoxesSmaller );
+  CPPUNIT_TEST( tetraBoxes );
+  CPPUNIT_TEST( moderateBoxes );
+#endif
+  CPPUNIT_TEST( moderateBoxesSmaller );
   CPPUNIT_TEST( moderateBoxSmallReflexive );
+#if 0
   CPPUNIT_TEST( moderateBoxEvenSmallerReflexive );
   CPPUNIT_TEST( tinyBoxReflexive );
 
-  //CPPUNIT_TEST( simpleHexaBox );
-  //#endif
+  CPPUNIT_TEST( simpleHexaBox );
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 

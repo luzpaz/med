@@ -34,7 +34,11 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 @COMMENCE@
 
 # header files
-EXPORT_HEADERS = TestingUtils.hxx
+EXPORT_HEADERS = CppUnitTest.hxx \
+		 TransformedTriangleTest.hxx \
+		 TransformedTriangleIntersectTest.hxx \
+		 Interpolation3DTest.hxx \
+	         TestingUtils.hxx
 
 
 # Libraries targets
@@ -46,9 +50,10 @@ LIB_CLIENT_IDL =
 
 # Executables targets
 
-BIN = PerfTest
+BIN = PerfTest TestInterpKernel
 
-BIN_SRC = 
+BIN_SRC = CppUnitTest.cxx TransformedTriangleTest.cxx TransformedTriangleIntersectTest.cxx \
+Interpolation3DTest.cxx
 
 BIN_CLIENT_IDL =
 
@@ -60,20 +65,20 @@ CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MED2_INCLUDES) $(HDF5_INCLUDES) -I$(top_srcdir)/sr
 CPPFLAGS+=$(BOOST_CPPFLAGS) $(MED2_INCLUDES) $(HDF5_INCLUDES) -I$(top_srcdir)/src/INTERP_KERNEL
 
 #include CppUnit
-#CXXFLAGS+= -I/usr/include/cppunit
-#CPPFLAGS+= -I/usr/include/cppunit
+CXXFLAGS+= -I/usr/include/cppunit
+CPPFLAGS+= -I/usr/include/cppunit
 
 # for log
-CXXFLAGS+= -DLOG_LEVEL=0
-CPPFLAGS+= -DLOG_LEVEL=0 
+CXXFLAGS+= -DLOG_LEVEL=3 #-DOPTIMIZE -O2
+CPPFLAGS+= -DLOG_LEVEL=3 #-DOPTIMIZE -O2
 
 # for gcov
 #CXXFLAGS+=-fprofile-arcs -ftest-coverage 
 #CPPFLAGS+=-fprofile-arcs -ftest-coverage 
 
 #for gprof
-CXXFLAGS+=-pg
-CPPFLAGS+=-pg
+#CXXFLAGS+=-pg
+#CPPFLAGS+=-pg
 
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
@@ -82,7 +87,7 @@ LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem  -lutil
 
 # for gcov
 #LDFLAGS+= -lgcov
-LDFLAGS+= -pg
+#LDFLAGS+= -pg
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
@@ -99,15 +104,12 @@ endif
 
 LIBS = @LIBS@ @CPPUNIT_LIBS@
 
-LDFLAGSFORBIN += $(LDFLAGS) -lm $(MED2_LIBS) $(HDF5_LIBS) \
-                 -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome -lmed_V2_1  -lmedmem \
-                 -linterpkernel
-#LDFLAGSFORBIN += $(LDFLAGS) -lm $(HDF5_LIBS) \
-#                -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome \
-#                 -lcppunit -linterpkernel
+LDFLAGSFORBIN += $(LDFLAGS) -lm $(HDF5_LIBS) \
+                -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome \
+                -lcppunit -linterpkernel
 
-LDFLAGSFORBIN += -pg
+#LDFLAGSFORBIN += -pg
 
-UNIT_TEST_PROG = #PerfTest
+UNIT_TEST_PROG = PerfTest TestInterpKernel
 
 @CONCLUDE@
