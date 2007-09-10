@@ -22,7 +22,6 @@ class TransformedTriangleTest;
 class TransformedTriangleIntersectTest;
 
 
-
 namespace INTERP_UTILS
 {
 
@@ -120,10 +119,6 @@ namespace INTERP_UTILS
 
   private:
     
-    ////////////////////////////////////////////////////////////////////////////////////
-    /// High-level methods called directly by calculateIntersectionVolume()     ////////
-    ////////////////////////////////////////////////////////////////////////////////////
- 
     void calculateIntersectionPolygons(); 
 
     void calculatePolygonBarycenter(const IntersectionPolygon poly, double* barycenter); 

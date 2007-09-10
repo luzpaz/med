@@ -14,7 +14,7 @@ class Interpolation3DTest : public CppUnit::TestFixture
 
   // single - element
   CPPUNIT_TEST_SUITE( Interpolation3DTest );
-#if 0
+
   CPPUNIT_TEST( tetraReflexiveUnit );
   CPPUNIT_TEST( tetraReflexiveGeneral );
 
@@ -47,15 +47,15 @@ class Interpolation3DTest : public CppUnit::TestFixture
   CPPUNIT_TEST( boxReflexiveModerate );
   CPPUNIT_TEST( tetraBoxes );
   CPPUNIT_TEST( moderateBoxes );
-#endif
+
   CPPUNIT_TEST( moderateBoxesSmaller );
   CPPUNIT_TEST( moderateBoxSmallReflexive );
-#if 0
+
   CPPUNIT_TEST( moderateBoxEvenSmallerReflexive );
   CPPUNIT_TEST( tinyBoxReflexive );
 
   CPPUNIT_TEST( simpleHexaBox );
-#endif
+
   CPPUNIT_TEST_SUITE_END();
 
 

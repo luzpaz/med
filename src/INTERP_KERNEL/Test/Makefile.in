@@ -69,8 +69,8 @@ CXXFLAGS+= -I/usr/include/cppunit
 CPPFLAGS+= -I/usr/include/cppunit
 
 # for log
-CXXFLAGS+= -DLOG_LEVEL=3 #-DOPTIMIZE -O2
-CPPFLAGS+= -DLOG_LEVEL=3 #-DOPTIMIZE -O2
+CXXFLAGS+= -DLOG_LEVEL=3 -DOPTIMIZE -O2
+CPPFLAGS+= -DLOG_LEVEL=3 -DOPTIMIZE -O2
 
 # for gcov
 #CXXFLAGS+=-fprofile-arcs -ftest-coverage 
