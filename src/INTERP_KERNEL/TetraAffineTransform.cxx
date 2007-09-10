@@ -128,7 +128,7 @@ namespace INTERP_UTILS
   }
 
   /**
-   * Gives the determinant of the linear part of the transform
+   * Returns the determinant of the linear part A of the transform.
    *
    * @return determinant of the transform
    *
@@ -227,6 +227,12 @@ namespace INTERP_UTILS
 
     _determinant = _linearTransform[0] * subDet[0] - _linearTransform[1] * subDet[1] + _linearTransform[2] * subDet[2]; 
   }
+
+  
+  /////////////////////////////////////////////////
+  /// Auxiliary methods for inverse calculation ///
+  /////////////////////////////////////////////////
+
 
   /**
    * Calculates the LU-factorization of the matrix A (_linearTransform)

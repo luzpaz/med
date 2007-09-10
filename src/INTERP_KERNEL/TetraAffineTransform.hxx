@@ -29,10 +29,6 @@ namespace INTERP_UTILS
 
     void calculateDeterminant();
 
-    /////////////////////////////////////////////////
-    /// Auxiliary methods for inverse calculation ///
-    /////////////////////////////////////////////////
-
     void factorizeLU(double* lu, int* idx) const;
       
     void forwardSubstitution(double* x, const double* lu, const double* b, const int* idx) const;
