@@ -150,7 +150,7 @@ namespace INTERP_UTILS
     _isDoubleProductsCalculated = true;
   }
 
-  /*
+  /**
    * Checks if the double products for a given segment are consistent, as defined by
    * Grandy, [46]
    *
@@ -206,7 +206,7 @@ namespace INTERP_UTILS
   }
 #endif OPTIMIZE
 
-  /*
+  /**
    * Calculate the shortest distance between a tetrahedron corner and a triangle segment.
    * 
    * @param  corner corner of the tetrahedron

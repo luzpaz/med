@@ -35,7 +35,8 @@ namespace INTERP_UTILS
    *             Journal of Computational Physics (1999)
    */
 
-  /* ! READ ME FIRST !
+  /** \file TransformedTriangle.hxx
+   * ! READ ME FIRST !
    * OVERVIEW of how the class works : (details can be found in the commentaries above each method)
    * 
    * Constructor : 
@@ -83,6 +84,7 @@ namespace INTERP_UTILS
      * and the triangle. The end element, NO_* gives the number of elements in the enumeration
      * and can be used as end element in loops.
      */
+
     /// Corners of tetrahedron
     enum TetraCorner { O = 0, X, Y, Z, NO_TET_CORNER };
 
@@ -102,6 +104,7 @@ namespace INTERP_UTILS
     enum IntersectionPolygon{ A = 0, B, NO_INTERSECTION_POLYGONS };
 
     /// Double products
+    /// 
     /// NB : order corresponds to TetraEdges (Grandy, table III)
     enum DoubleProduct { C_YZ = 0, C_ZX, C_XY, C_ZH, C_XH, C_YH, C_01, C_10, NO_DP };
 

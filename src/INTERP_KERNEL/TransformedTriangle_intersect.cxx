@@ -673,7 +673,7 @@ namespace INTERP_UTILS
     return true;
   }
 
-  /*
+  /**
    * Tests if the given corner of the triangle lies above the XYZ-facet of the tetrahedron.
    *
    * @param  corner corner of the triangle
@@ -811,7 +811,7 @@ namespace INTERP_UTILS
 #endif
 
 #ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
-  /*
+  /**
    * Tests if the H-coordinates (1 - x - y) for the two end of a segment of the triangle
    * lie on different sides of the H = 0 plane.
    *

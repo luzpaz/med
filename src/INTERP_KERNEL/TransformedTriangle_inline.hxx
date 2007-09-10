@@ -8,6 +8,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 /// Optimization methods. These are only defined and used if OPTIMIZE is defined.
 ////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Calls TransformedTriangle::testTriangleSurroundsEdge for edges OX to ZX and stores the result in
+ * member variable array_triangleSurroundsEdgeCache. 
+ *
+ */
+
 inline void TransformedTriangle::preCalculateTriangleSurroundsEdge() 
 {
   for(TetraEdge edge = OX ; edge <= ZX ; edge = TetraEdge(edge + 1))
