@@ -35,6 +35,7 @@ namespace INTERP_UTILS
    *
    * Reference : J. Grandy, "Conservative Remapping and Region Overlays by Intersecting Arbitrary Polyhedra", 
    *             Journal of Computational Physics (1999)
+   *
    */
 
   /** \file TransformedTriangle.hxx
@@ -43,7 +44,7 @@ namespace INTERP_UTILS
    * 
    * Constructor : 
    * The constructor takes as arguments three pointers to double[3] vectors holding the transformed
-   * coordinates of the corners of the triangle. It copies there coordinates and then proceeds to pre-calculating certain
+   * coordinates of the corners of the triangle. It copies their coordinates and then proceeds to pre-calculating certain
    * entities used in the intersection calculation : the double products, triple products and the values of the function E
    * (Grandy, [53]).
    *
@@ -63,11 +64,11 @@ namespace INTERP_UTILS
    * To this end, a number of tables, implemented as static const arrays of different types, are used. The tables 
    * mainly contain values of the different enumeration types described at the beginning of the class interface. For example, 
    * the formula Grandy gives for the segment-halfstrip intersection tests ([30]) is for use with the halfstrip above the zx edge. 
-   * For the other two halfstrips (above the xy and yz edges), other double products are used. 
-   * These double products are stored in the table DP_FOR_HALFSTRIP_INTERSECTION, which permits to treat
+   * For the other two halfstrips (above the xy and yz edges), other double products are used, which 
+   * are stored in the table DP_FOR_HALFSTRIP_INTERSECTION. This allows us to treat
    * all the edges equally, avoiding switch() - statements. It is the careful choice of order of the enumeration types that makes this
    * possible. Notably, there is a correspondance between the TetraEdge type and the DoubleProduct type (see Grandy, tatble III) that
-   * is used throughout the code, permitting statements such as DoubleProduct(my_edge) to work.
+   * is used throughout the code, permitting statements such as DoubleProduct(some_edge) to work.
    *    When an intersection point has been detected it is calculated with a corresponding calc* - method in the cases where it
    * is not known directly. It is then added to the polygon A and/or B as necessary.
    *
@@ -81,7 +82,7 @@ namespace INTERP_UTILS
     friend class ::TransformedTriangleTest;
     friend class ::TransformedTriangleIntersectTest;
 
-    /**
+    /*
      * Enumerations representing the different geometric elements of the unit tetrahedron
      * and the triangle. The end element, NO_* gives the number of elements in the enumeration
      * and can be used as end element in loops.
@@ -102,7 +103,7 @@ namespace INTERP_UTILS
     /// Segments (edges) of triangle
     enum TriSegment { PQ = 0, QR, RP, NO_TRI_SEGMENT };
     
-    /// Polygons
+    /// Intersection polygons
     enum IntersectionPolygon{ A = 0, B, NO_INTERSECTION_POLYGONS };
 
     /// Double products
