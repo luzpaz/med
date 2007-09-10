@@ -12,7 +12,7 @@ namespace INTERP_UTILS
   /// PUBLIC INTERFACE METHODS                                               //////////////
   /////////////////////////////////////////////////////////////////////////////////////////
 
-  /*
+  /**
    * Constructor
    * Create the TetraAffineTransform object from the tetrahedron 
    * with corners specified in pts. If the tetrahedron is degenerate or almost degenerate, 
@@ -83,7 +83,7 @@ namespace INTERP_UTILS
 #endif
   }
 
-  /*
+  /**
    * Calculates the transform of point srcPt and stores the result in destPt.
    * If destPt == srcPt, then srcPt is overwritten safely.
    *  
@@ -127,7 +127,7 @@ namespace INTERP_UTILS
       }
   }
 
-  /*
+  /**
    * Gives the determinant of the linear part of the transform
    *
    * @return determinant of the transform
@@ -138,7 +138,7 @@ namespace INTERP_UTILS
     return _determinant;
   }
 
-  /*
+  /**
    * Outputs  to std::cout the matrix A and the vector b
    * of the transform Ax + b
    *
@@ -162,7 +162,7 @@ namespace INTERP_UTILS
   /// PRIVATE  METHODS                                                       //////////////
   /////////////////////////////////////////////////////////////////////////////////////////
 
-  /*
+  /**
    * Calculates the inverse of the matrix A, stored in _linearTransform
    * by LU-factorization and substitution
    *
@@ -212,7 +212,7 @@ namespace INTERP_UTILS
       }
   }
   
-  /*
+  /**
    * Updates the member _determinant of the matrix A of the transformation.
    *
    */
@@ -228,7 +228,7 @@ namespace INTERP_UTILS
     _determinant = _linearTransform[0] * subDet[0] - _linearTransform[1] * subDet[1] + _linearTransform[2] * subDet[2]; 
   }
 
-  /* 
+  /**
    * Calculates the LU-factorization of the matrix A (_linearTransform)
    * and stores it in lu. Since partial pivoting is used, there are 
    * row swaps. This is represented by the index permutation vector idx : to access element
@@ -286,7 +286,7 @@ namespace INTERP_UTILS
       }
   }
 
-  /*
+  /**
    * Solves the system Lx = b, where L is lower unit-triangular (ones on the diagonal)
    * 
    * @param x   double[3] in which the solution is stored
@@ -299,12 +299,13 @@ namespace INTERP_UTILS
   {
     // divisions are not carried out explicitly because lu does not store
     // the diagonal values of L, which are all 1
-    x[idx[0]] = ( b[idx[0]] );// / lu[3*idx[0]]
+    // Compare with backwardSubstitution()
+    x[idx[0]] = ( b[idx[0]] ); // / lu[3*idx[0]]
     x[idx[1]] = ( b[idx[1]] - lu[3*idx[1]] * x[idx[0]] ); // / lu[3*idx[1] + 1];
     x[idx[2]] = ( b[idx[2]] - lu[3*idx[2]] * x[idx[0]] - lu[3*idx[2] + 1] * x[idx[1]] ); // / lu[3*idx[2] + 2];
   }
 
-  /*
+  /**
    * Solves the system Ux = b, where U is upper-triangular 
    * 
    * @param x   double[3] in which the solution is stored
