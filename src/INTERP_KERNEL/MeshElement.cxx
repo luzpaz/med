@@ -17,11 +17,11 @@ namespace INTERP_UTILS
    * @param mesh    mesh that the element belongs to
    * @param type    geometric type of the element
    */
-  MeshElement::MeshElement(const int index, const MED_EN::medGeometryElement type, const MEDMEM::MESH& mesh)
-    : _index(index), _box(0), _type(type)
+  MeshElement::MeshElement(const int index, const MEDMEM::MESH& mesh)
+    : _index(index), _box(0), _type(mesh.getElementType(MED_EN::MED_CELL, index))
   {
     // get coordinates of vertices
-    const int numNodes = getNumberOfNodesForType(type);
+    const int numNodes = getNumberOfNodesForType(_type);
 
     assert(numNodes >= 3);
 
@@ -49,40 +49,12 @@ namespace INTERP_UTILS
       }
   }
 
-  /*
-   * Accessor to global number
-   *
-   * @return  global number of the element
-   */
-  int MeshElement::getIndex() const
-  {
-    return _index;
-  }  
   
-  /*
-   * Accessor to bounding box
-   *
-   * @return pointer to bounding box of the element
-   */
-  const BoundingBox* MeshElement::getBoundingBox() const
-    {
-      return _box;
-    }
-
-  /*
-   * Accessor to the type of the element
-   *
-   * @return  type of the element
-   */
-  MED_EN::medGeometryElement MeshElement::getType() const
-    {
-      return _type;
-    }
 
   /////////////////////////////////////////////////////////////////////
   /// ElementBBoxOrder                                    /////////////
   /////////////////////////////////////////////////////////////////////
-  /*
+  /**
    * Constructor
    *
    * @param  coord   BoundingBox coordinate (XMIN, XMAX, etc) on which to base the ordering
@@ -92,7 +64,7 @@ namespace INTERP_UTILS
   {
   }
 
-  /*
+  /**
    * Comparison operator based on the bounding boxes of the elements
    *
    * @return true if the coordinate _coord of the bounding box of elem1 is 

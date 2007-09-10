@@ -36,6 +36,13 @@ namespace INTERP_UTILS
     inline int getNumberOfElements() const;
 
   private:
+
+    /// disallow copying
+    MeshRegion(const MeshRegion& m);
+
+    /// disallow assignment
+    MeshRegion& operator=(const MeshRegion& m);
+
     /// Vector of pointers to contained MeshElements. 
     /// NB : these pointers are not owned by the region object, and are thus
     /// neither allocated or liberated in this class. The elements must therefore be allocated and liberated outside the class.

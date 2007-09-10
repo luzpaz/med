@@ -21,8 +21,7 @@ namespace INTERP_UTILS
    {
      using namespace std;
      assert(_coords != 0);
-     assert(numPts > 1);
-     
+     assert(numPts > 1);     
 
      // initialize with first two points
      const double* pt1 = pts[0];
@@ -38,11 +37,12 @@ namespace INTERP_UTILS
        {
 	 updateWithPoint(pts[i]);
        }
+  
      assert(isValid());
    }
 
   /**
-   * Constructor creating box from union of two boxes, resulting in a box that enclose both of them
+   * Constructor creating box from union of two boxes, resulting in a box that encloses both of them
    *
    * @param  box1  the first box
    * @param  box2  the second box
@@ -58,6 +58,7 @@ namespace INTERP_UTILS
 	 _coords[c] = min(box1._coords[c], box2._coords[c]);
 	 _coords[c + 3] = max(box1._coords[c + 3], box2._coords[c + 3]);
        }
+    
     assert(isValid());
   }
 
@@ -86,11 +87,11 @@ namespace INTERP_UTILS
 	// boxes are disjoint if there exists a direction in which the 
 	// minimum coordinate of one is greater than the maximum coordinate of the other
 
-	//? more stable version
-	/*const double tol = 1.0e-2*_coords[c];
-	if(_coords[c] > otherMaxCoord + tol 
-	   || _coords[c + 3] < otherMinCoord - tol)
-	*/
+	// more stable version ?
+	// const double tol = 1.0e-2*_coords[c];
+	// if(_coords[c] > otherMaxCoord + tol 
+	//   || _coords[c + 3] < otherMinCoord - tol)
+	
 	
 	if(_coords[c] > otherMaxCoord 
 	   || _coords[c + 3] < otherMinCoord)
@@ -103,29 +104,7 @@ namespace INTERP_UTILS
     return false;
   }
     
-  /**
-   * Sets a coordinate of the box to a given value.
-   * 
-   * @param coord coordinate to set
-   * @param value new value for coordinate
-   *
-   */
-  void BoundingBox::setCoordinate(const BoxCoord coord, double value)
-  {
-    _coords[coord] = value;
-  }
-
-  /**
-   * Gets a coordinate of the box
-   * 
-   * @param coord coordinate to set
-   * @return value of coordinate
-   *
-   */
-  double BoundingBox::getCoordinate(const BoxCoord coord) const
-  {
-    return _coords[coord];
-  }
+  
 
   /**
    * Updates the bounding box to include a given point
@@ -147,20 +126,8 @@ namespace INTERP_UTILS
 
       }
   }
-
-  /*
-   * Prints the coordinates of the box to std::cout
-   *
-   */
-  void BoundingBox::dumpCoords() const
-  {
-    std::cout << "[xmin, xmax] = [" << _coords[XMIN] << ", " << _coords[XMAX] << "]" << " | ";
-    std::cout << "[ymin, ymax] = [" << _coords[YMIN] << ", " << _coords[YMAX] << "]" << " | ";
-    std::cout << "[zmin, zmax] = [" << _coords[ZMIN] << ", " << _coords[ZMAX] << "]";
-    std::cout << std::endl;
-  }
-
-  /*
+  
+  /**
    * Checks if the box is valid, which it is if its minimum coordinates are
    * smaller than its maximum coordinates in all directions.
    *
