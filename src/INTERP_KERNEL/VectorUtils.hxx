@@ -7,17 +7,22 @@
 #include <numeric>
 #include <map>
 
+/// Precision used for tests of 3D part of INTERP_KERNEL
 #define VOL_PREC 1.0e-6
+
+/// Default relative tolerance in epsilonEqualRelative
 #define DEFAULT_REL_TOL 1.0e-6
+
+/// Default absolute tolerance in epsilonEqual and epsilonEqualRelative
 #define DEFAULT_ABS_TOL 5.0e-12
 
 namespace INTERP_UTILS
 {
-  ///////////////////////////////////////////////////////////////////////
-  // Math operations for vectors represented by double[3] - arrays   ////
-  ///////////////////////////////////////////////////////////////////////
+  // -------------------------------------------------------------------
+  // Math operations for vectors represented by double[3] - arrays  
+  // -------------------------------------------------------------------
   
-  /*
+  /**
    * Copies a double[3] vector from src to dest
    *
    * @param src   source vector
@@ -32,7 +37,7 @@ namespace INTERP_UTILS
       }
   }
   
-  /*
+  /**
    * Creates a string representation of a double[3] vector
    *
    * @param  pt  a 3-vector
@@ -45,7 +50,7 @@ namespace INTERP_UTILS
     return ss.str();
   }
 
-  /*
+  /**
    * Calculates the cross product of two double[3] - vectors.
    *
    * @param v1    vector v1
@@ -59,7 +64,7 @@ namespace INTERP_UTILS
     res[2] = v1[0]*v2[1] - v1[1]*v2[0];
   }
 
-  /*
+  /**
    * Calculates the dot product of two double[3] - vectors
    *
    * @param v1   vector v1
@@ -71,7 +76,7 @@ namespace INTERP_UTILS
     return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
   }
 
-  /*
+  /**
    * Calculates norm of a double[3] vector
    *
    * @param v  a vector v
@@ -82,7 +87,7 @@ namespace INTERP_UTILS
     return sqrt(dot(v,v));
   }
 
-  /*
+  /**
    * Compares doubles using an absolute tolerance
    * This is suitable mainly for comparisons with 0.0
    * 
@@ -97,7 +102,7 @@ namespace INTERP_UTILS
     //    return std::abs(x - y) < errTol;
   }
 
-  /*
+  /**
    * Compares doubles using a relative tolerance
    * This is suitable mainly for comparing larger values to each other. Before performing the relative test,
    * an absolute test is performed to guard from problems when comparing to 0.0

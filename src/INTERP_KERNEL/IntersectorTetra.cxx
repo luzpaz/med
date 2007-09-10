@@ -17,12 +17,12 @@ using namespace INTERP_UTILS;
 
 namespace MEDMEM
 {
-  /*
+  /**
    * Constructor
    * 
    * @param srcMesh     mesh containing the source elements
    * @param targetMesh  mesh containing the target elements
-   *
+   * @param targetCell  global number of the target cell
    */
   IntersectorTetra::IntersectorTetra(const MESH& srcMesh, const MESH& targetMesh, int targetCell)
     : _srcMesh(srcMesh), filtered(0)
@@ -44,7 +44,7 @@ namespace MEDMEM
 
   }
 
-  /*
+  /**
    * Destructor
    *
    */
@@ -58,18 +58,19 @@ namespace MEDMEM
       }
   }
 
-  /*
-   * Calculates the volume of intersection of an element in the source mesh and an element 
-   * in the target mesh. The method is based on the algorithm of Grandy. It first calculates the transformation
-   * that takes the target tetrahedron into the unit tetrahedron. After that, the 
+  /**
+   * Calculates the volume of intersection of an element in the source mesh and the target element.
+   * It first calculates the transformation that takes the target tetrahedron into the unit tetrahedron. After that, the 
    * faces of the source element are triangulated and the calculated transformation is applied 
    * to each triangle. The algorithm of Grandy, implemented in INTERP_UTILS::TransformedTriangle is used
    * to calculate the contribution to the volume from each triangle. The volume returned is the sum of these contributions
    * divided by the determinant of the transformation.
    *
+   * The class will cache the intermediary calculations of transformed nodes of source cells and volumes associated 
+   * with triangulated faces to avoid having to recalculate these.
+   *
    * @pre The element in _targetMesh referenced by targetCell is of type MED_TETRA4.
    * @param srcCell      global number of the source element (1 <= srcCell < # source cells)
-   * @param targetCell   global number of the target element (1 <= targetCell < # target cells) - this element must be a tetrahedron
    */
   double IntersectorTetra::intersectSourceCell(int element)
   {

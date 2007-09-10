@@ -5,9 +5,10 @@
 // It replaces those methods if OPTIMIZE is defined.
 // NB : most of these methods have documentation in their corresponding .cxx - file.
 
-////////////////////////////////////////////////////////////////////////////////////////
-/// Optimization methods. These are only defined and used if OPTIMIZE is defined.
-////////////////////////////////////////////////////////////////////////////////////////
+// ----------------------------------------------------------------------------------
+//  Optimization methods. These are only defined and used if OPTIMIZE is defined.
+// -----------------------------------------------------------------------------------
+
 /**
  * Calls TransformedTriangle::testTriangleSurroundsEdge for edges OX to ZX and stores the result in
  * member variable array_triangleSurroundsEdgeCache. 
@@ -22,9 +23,10 @@ inline void TransformedTriangle::preCalculateTriangleSurroundsEdge()
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////
-/// TransformedTriangle_math.cxx                                                 ///////
-////////////////////////////////////////////////////////////////////////////////////////
+// ----------------------------------------------------------------------------------
+//   TransformedTriangle_math.cxx                                                 
+// ----------------------------------------------------------------------------------
+
 inline void TransformedTriangle::resetDoubleProducts(const TriSegment seg, const TetraCorner corner)
 {
   // set the three corresponding double products to 0.0
@@ -71,9 +73,9 @@ inline double TransformedTriangle::calcUnstableC(const TriSegment seg, const Dou
   return _coords[5*pt1 + off1] * _coords[5*pt2 + off2] - _coords[5*pt1 + off2] * _coords[5*pt2 + off1];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-/// TransformedTriangle_intersect.cxx                                            ///////
-////////////////////////////////////////////////////////////////////////////////////////
+// ----------------------------------------------------------------------------------
+//  TransformedTriangle_intersect.cxx                                            
+// ----------------------------------------------------------------------------------
 inline bool TransformedTriangle::testSurfaceEdgeIntersection(const TetraEdge edge) const 
 { 
   return _triangleSurroundsEdgeCache[edge] && testEdgeIntersectsTriangle(edge);

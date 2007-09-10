@@ -5,17 +5,15 @@
 #include <cmath>
 #include "VectorUtils.hxx"
 
-#define SEG_RAY_TABLE 1 // seems correct
-
 namespace INTERP_UTILS
 {
 
-  ////////////////////////////////////////////////////////////////////////////////////
-  /// Correspondance tables describing all the variations of formulas.  //////////////
-  ////////////////////////////////////////////////////////////////////////////////////
+  // ----------------------------------------------------------------------------------
+  //  Correspondance tables describing all the variations of formulas. 
+  // ----------------------------------------------------------------------------------
 
-  // correspondance facet - double product
-  // Grandy, table IV
+  /// Correspondance between facets and double products.
+  /// This table encodes Grandy, table IV. Use 3*facet + {0,1,2} as index
   const TransformedTriangle::DoubleProduct TransformedTriangle::DP_FOR_SEG_FACET_INTERSECTION[12] = 
     {
       C_XH, C_XY, C_ZX, // OYZ
@@ -24,7 +22,8 @@ namespace INTERP_UTILS
       C_XH, C_YH, C_ZH  // XYZ
     };
 
-  // signs associated with entries in DP_FOR_SEGMENT_FACET_INTERSECTION
+  /// Signs associated with entries in DP_FOR_SEGMENT_FACET_INTERSECTION
+  /// This table encodes Grandy, table IV. Use 3*facet + {0,1,2} as index
   const double TransformedTriangle::SIGN_FOR_SEG_FACET_INTERSECTION[12] = 
     {
       1.0, 1.0, -1.0,
@@ -33,7 +32,8 @@ namespace INTERP_UTILS
       1.0, 1.0,  1.0
     };
 
-  // coordinates of corners of tetrahedron
+  /// Coordinates of corners of tetrahedron.
+  /// Use 3*Corner + coordinate as index
   const double TransformedTriangle::COORDS_TET_CORNER[12] = 
     {
       0.0, 0.0, 0.0,
@@ -42,10 +42,10 @@ namespace INTERP_UTILS
       0.0, 0.0, 1.0
     };
 
-  // indices to use in tables DP_FOR_SEG_FACET_INTERSECTION and SIGN_FOR_SEG_FACET_INTERSECTION
-  // for the calculation of the coordinates (x,y,z) of the intersection points
-  // for Segment-Facet and Segment-Edge intersections
-  // -1 indicates that the coordinate is 0
+  /// Indices to use in tables DP_FOR_SEG_FACET_INTERSECTION and SIGN_FOR_SEG_FACET_INTERSECTION
+  /// for the calculation of the coordinates (x,y,z) of the intersection points
+  /// for Segment-Facet and Segment-Edge intersections.
+  /// Use 3*facet + coordinate as index. -1 indicates that the coordinate is 0.
   const int TransformedTriangle::DP_INDEX[12] =
     {
       // x, y, z
@@ -55,7 +55,9 @@ namespace INTERP_UTILS
       9, 10, 11  // XYZ
     };
 
-  // correspondance edge - corners
+  /// Correspondance edge - corners
+  /// Gives the two corners associated with each edge
+  /// Use 2*edge + {0, 1} as index
   const TransformedTriangle::TetraCorner TransformedTriangle::CORNERS_FOR_EDGE[12] = 
     {
       O, X, // OX
@@ -66,8 +68,8 @@ namespace INTERP_UTILS
       Z, X  // ZX
     };
 
-  // correspondance edge - facets
-  // facets shared by each edge
+  /// Correspondance edge - facets.
+  /// Gives the two facets shared by and edge. Use 2*facet + {0, 1} as index
   const TransformedTriangle::TetraFacet TransformedTriangle::FACET_FOR_EDGE[12] =
     {
       OXY, OZX, // OX
@@ -78,7 +80,8 @@ namespace INTERP_UTILS
       OZX, XYZ  // ZX
     };
 
-  // edges meeting at a given corner
+  /// Correspondance corners - edges
+  /// Gives edges meeting at a given corner. Use 3*corner + {0,1,2} as index
   const TransformedTriangle::TetraEdge TransformedTriangle::EDGES_FOR_CORNER[12] =
     {
       OX, OY, OZ, // O
@@ -87,7 +90,10 @@ namespace INTERP_UTILS
       OZ, ZX, YZ  // Z
     };
 
-  // NB : some uncertainty whether these last are correct
+  /// Double products to use in halfstrip intersection tests
+  /// Use 4*(offset_edge) + {0,1,2,3} as index. offset_edge = edge - 3  (so that XY -> 0, YZ -> 1, ZX -> 2)
+  /// Entries with offset 0 and 1 are for the first condition (positive product) 
+  /// and those with offset 2 and 3 are for the second condition (negative product).
   const TransformedTriangle::DoubleProduct TransformedTriangle::DP_FOR_HALFSTRIP_INTERSECTION[12] =
     {
       C_10, C_01, C_ZH, C_10, // XY
@@ -95,30 +101,20 @@ namespace INTERP_UTILS
       C_XY, C_10, C_YH, C_XY  // ZX
     };
   
-    // double products to use in segment-ray test
-    // dp 1   -> cond 1
-    // dp 2-7 -> cond 3
-#if SEG_RAY_TABLE==1
+  /// Double products to use in segment-ray test
+  /// Use 7*corner_offset + {0,1,2,3,4,5,6} as index. corner_offset = corner - 1 (so that X -> 0, Y-> 1, Z->2)
+  /// Entries with offset 0 are for first condition (zero double product) and the rest are for condition 3 (in the same
+  /// order as in the article)
   const TransformedTriangle::DoubleProduct TransformedTriangle::DP_SEGMENT_RAY_INTERSECTION[21] = 
     {
 	C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
 	C_01, C_XH, C_ZH, C_XY, C_10, C_ZH, C_10, // Y
 	C_XY, C_YH, C_XH, C_10, C_01, C_XH, C_01  // Z
     };
-#else
   
-  const TransformedTriangle::DoubleProduct TransformedTriangle::DP_SEGMENT_RAY_INTERSECTION[21] = 
-    {
-      C_10, C_YH, C_ZH, C_01, C_XY, C_YH, C_XY, // X
-      C_01, C_XH, C_ZH, C_XY, C_10, C_ZH, C_YZ, // Y
-      C_XY, C_YH, C_XH, C_10, C_01, C_XH, C_ZX  // Z
-    };
-#endif
-
-  
-  ////////////////////////////////////////////////////////////////////////////////////
-  /// Intersection test methods and intersection point calculations           ////////
-  ////////////////////////////////////////////////////////////////////////////////////
+  // ----------------------------------------------------------------------------------
+  // Intersection test methods and intersection point calculations      
+  // ----------------------------------------------------------------------------------
 #ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
   /**
    * Tests if the given edge of the tetrahedron intersects the triangle PQR. (Grandy, eq [17])
@@ -691,9 +687,9 @@ namespace INTERP_UTILS
 #endif    
     
 
-  ////////////////////////////////////////////////////////////////////////////////////
-  /// Utility methods used in intersection tests                       ///////////////
-  ////////////////////////////////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////////////////////////////
+  //  Utility methods used in intersection tests                       ///////////////
+  // /////////////////////////////////////////////////////////////////////////////////
   /**
    * Tests if the triangle PQR surrounds the axis on which the
    * given edge of the tetrahedron lies.

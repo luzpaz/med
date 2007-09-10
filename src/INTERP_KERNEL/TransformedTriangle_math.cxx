@@ -9,20 +9,17 @@
 
 #include "VectorUtils.hxx"
 
-#undef SECOND_CORNER_RESET
-#undef FIXED_DELTA 1.0e-15
-
 namespace INTERP_UTILS
 {
   
-  ////////////////////////////////////////////////////////////////////////////////////
-  //  Tables                                                         /////////////////
-  ////////////////////////////////////////////////////////////////////////////////////
+  // ----------------------------------------------------------------------------------
+  //  Tables                                                       
+  // ----------------------------------------------------------------------------------
 
   /// Table with first coordinate (a) used to calculate double product c^pq_ab = p_a * q_b - p_b * q_a (index to be used : DoubleProduct)
   const int TransformedTriangle::DP_OFFSET_1[8] = {1, 2, 0, 2, 0, 1, 4, 1};
 
-  /// Table with second coordinate (a) used to calculate double product c^pq_ab = p_a * q_b - p_b * q_a (index to be used : DoubleProduct)
+  /// Table with second coordinate (b) used to calculate double product c^pq_ab = p_a * q_b - p_b * q_a (index to be used : DoubleProduct)
   const int TransformedTriangle::DP_OFFSET_2[8] = {2, 0, 1, 3, 3, 3, 0, 4};
 
   /// Coordinates used to calculate triple products by the expanding one of the three rows of the determinant (index to be used : 3*Corner + row)
@@ -57,9 +54,9 @@ namespace INTERP_UTILS
   /// Threshold for what is considered a small enough angle to warrant correction of triple products by Grandy, [57]
   const double TransformedTriangle::TRIPLE_PRODUCT_ANGLE_THRESHOLD = 0.1;
 
-  ////////////////////////////////////////////////////////////////////////////////////
-  /// Double and triple product calculations                           ///////////////
-  ////////////////////////////////////////////////////////////////////////////////////
+  // ----------------------------------------------------------------------------------
+  //  Double and triple product calculations                           
+  // ----------------------------------------------------------------------------------
   
   /**
    * Pre-calculates all double products for this triangle, and stores
@@ -103,15 +100,6 @@ namespace INTERP_UTILS
 	    const TetraCorner minCorner = distances.begin()->second;
 
 	    resetDoubleProducts(seg, minCorner);
-	    // test : reset also for second corner if distance is small enough
-#ifdef SECOND_CORNER_RESET
-	    std::map<double, TetraCorner>::const_iterator iter = distances.begin();
-	    ++iter;
-	    if(iter->first < 1.0e-12)
-	      {
-		resetDoubleProducts(seg, iter->second);
-	      }
-#endif	    
 	    distances.clear();
 	  }
 
@@ -133,11 +121,8 @@ namespace INTERP_UTILS
 
 	    const double term1 = _coords[5*pt1 + off1] * _coords[5*pt2 + off2]; 
 	    const double term2 = _coords[5*pt1 + off2] * _coords[5*pt2 + off1];
-#ifdef FIXED_DELTA
-	    const double delta = FIXED_DELTA;
-#else
+
 	    const long double delta = MULT_PREC_F * ( std::abs(term1) + std::abs(term2) );
-#endif
 	  
 	    if( epsilonEqual(_doubleProducts[8*seg + dp], 0.0, THRESHOLD_F * delta))
 	      {

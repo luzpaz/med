@@ -10,83 +10,72 @@
 
 #include "VectorUtils.hxx"
 
-
-/**
- * Class representing a circular order of a set of points around their barycenter.
- * It is used with the STL sort() algorithm to sort the point of the two polygons
- *
- */
-class ProjectedCentralCircularSortOrder
-{
-public:
-
-  /// Enumeration of different planes to project on when calculating order
-  enum CoordType { XY, XZ, YZ };
-  
-  /**
-   * Constructor
-   *
-   * @param barycenter  double[3] containing the barycenter of the points to be compared
-   * @param type        plane to project on when comparing. The comparison will not work if all the points are in a plane perpendicular
-   *                    to the plane being projected on
-   */
-  ProjectedCentralCircularSortOrder(const double* barycenter, const CoordType type)
-    : _aIdx((type == YZ) ? 2 : 0), 
-      _bIdx((type == XY) ? 1 : 2),
-      _a(barycenter[_aIdx]), 
-      _b(barycenter[_bIdx])
-  {
-  }
-
-  /**
-   * Comparison operator.
-   * Compares the relative position between two points in their ordering around the barycenter.
-   *
-   * @param  pt1   a double[3] representing a point
-   * @param  pt2   a double[3] representing a point
-   * @return       true if the angle of the difference vector between pt1 and the barycenter is greater than that 
-   *               of the difference vector between pt2 and the barycenter.
-   */
-  bool operator()(const double* pt1, const double* pt2)
-  {
-    // calculate angles with the axis
-    const double ang1 = atan2(pt1[_aIdx] - _a, pt1[_bIdx] - _b);
-    const double ang2 = atan2(pt2[_aIdx] - _a, pt2[_bIdx] - _b);
-
-    return ang1 > ang2;
-  }
-
-private:
-  /// index corresponding to first coordinate of plane on which points are projected
-  const int _aIdx;
-  
-  /// index corresponding to second coordinate of plane on which points are projected
-  const int _bIdx;
-
-  /// value of first projected coordinate of the barycenter
-  const double _a;
-  
-  /// value of second projected coordinate of the barycenter
-  const double _b;
-};
-
-
-//class Vector3Cmp
-//{
-// public:
-//   bool operator()(double* const& pt1, double* const& pt2)
-//   {
-//     LOG(6, "points are equal ? : " << int((pt1[0] == pt2[0]) && (pt1[1] == pt2[1]) && (pt1[2] == pt2[2])));
-//     return (pt1[0] == pt2[0]) && (pt1[1] == pt2[1]) && (pt1[2] == pt2[2]);
-//   }
-// };
-
 namespace INTERP_UTILS
 {
-  ////////////////////////////////////////////////////////////////////////////
-  /// PUBLIC  ////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * Class representing a circular order of a set of points around their barycenter.
+   * It is used with the STL sort() algorithm to sort the point of the two polygons
+   *
+   */
+  class ProjectedCentralCircularSortOrder
+  {
+  public:
+
+    /// Enumeration of different planes to project on when calculating order
+    enum CoordType { XY, XZ, YZ };
+  
+    /**
+     * Constructor
+     *
+     * @param barycenter  double[3] containing the barycenter of the points to be compared
+     * @param type        plane to project on when comparing. The comparison will not work if all the points are in a plane perpendicular
+     *                    to the plane being projected on
+     */
+    ProjectedCentralCircularSortOrder(const double* barycenter, const CoordType type)
+      : _aIdx((type == YZ) ? 2 : 0), 
+	_bIdx((type == XY) ? 1 : 2),
+	_a(barycenter[_aIdx]), 
+	_b(barycenter[_bIdx])
+    {
+    }
+
+    /**
+     * Comparison operator.
+     * Compares the relative position between two points in their ordering around the barycenter.
+     *
+     * @param  pt1   a double[3] representing a point
+     * @param  pt2   a double[3] representing a point
+     * @return       true if the angle of the difference vector between pt1 and the barycenter is greater than that 
+     *               of the difference vector between pt2 and the barycenter.
+     */
+    bool operator()(const double* pt1, const double* pt2)
+    {
+      // calculate angles with the axis
+      const double ang1 = atan2(pt1[_aIdx] - _a, pt1[_bIdx] - _b);
+      const double ang2 = atan2(pt2[_aIdx] - _a, pt2[_bIdx] - _b);
+
+      return ang1 > ang2;
+    }
+
+  private:
+    /// index corresponding to first coordinate of plane on which points are projected
+    const int _aIdx;
+  
+    /// index corresponding to second coordinate of plane on which points are projected
+    const int _bIdx;
+
+    /// value of first projected coordinate of the barycenter
+    const double _a;
+  
+    /// value of second projected coordinate of the barycenter
+    const double _b;
+  };
+
+  // ----------------------------------------------------------------------------------
+  // TransformedTriangle PUBLIC  
+  // ----------------------------------------------------------------------------------
+  
   /**
    * Constructor
    *
@@ -205,29 +194,25 @@ namespace INTERP_UTILS
 
     double volB = 0.0;
     // if triangle is not in h = 0 plane, calculate volume under B
-      if(_polygonB.size() > 2 && !isTriangleInPlaneOfFacet(XYZ))
-	{
-	  LOG(2, "---- Treating polygon B ... ");
+    if(_polygonB.size() > 2 && !isTriangleInPlaneOfFacet(XYZ))
+      {
+	LOG(2, "---- Treating polygon B ... ");
 	
-	  calculatePolygonBarycenter(B, barycenter);
-	  sortIntersectionPolygon(B, barycenter);
-	  volB = calculateVolumeUnderPolygon(B, barycenter);
-	  LOG(2, "Volume is " << sign * volB);
-	}
+	calculatePolygonBarycenter(B, barycenter);
+	sortIntersectionPolygon(B, barycenter);
+	volB = calculateVolumeUnderPolygon(B, barycenter);
+	LOG(2, "Volume is " << sign * volB);
+      }
 
     LOG(2, "volA + volB = " << sign * (volA + volB) << std::endl << "***********");
   
     return sign * (volA + volB);
 
   } 
-    
-  // //////////////////////////////////////////////////////////////////////////
-  // PRIVATE /////////////////////////////////////////////////////////////////
-  // //////////////////////////////////////////////////////////////////////////
-    
-  // //////////////////////////////////////////////////////////////////////////////////
-  // High-level methods called directly by calculateIntersectionVolume()       
-  // //////////////////////////////////////////////////////////////////////////////////
+
+  // ----------------------------------------------------------------------------------
+  // TransformedTriangle PRIVATE
+  // ----------------------------------------------------------------------------------
 
   /**
    * Calculates the intersection polygons A and B, performing the intersection tests
@@ -367,377 +352,377 @@ namespace INTERP_UTILS
     
 #else
 
-    // -- segment intersections
-    for(TriSegment seg = PQ ; seg < NO_TRI_SEGMENT ; seg = TriSegment(seg + 1))
-      {
-
-	// segment - facet
-	for(TetraFacet facet = OYZ ; facet < NO_TET_FACET ; facet = TetraFacet(facet + 1))
+	// -- segment intersections
+	for(TriSegment seg = PQ ; seg < NO_TRI_SEGMENT ; seg = TriSegment(seg + 1))
 	  {
-	    if(testSegmentFacetIntersection(seg, facet))
+
+	    // segment - facet
+	    for(TetraFacet facet = OYZ ; facet < NO_TET_FACET ; facet = TetraFacet(facet + 1))
 	      {
-		double* ptA = new double[3];
-		calcIntersectionPtSegmentFacet(seg, facet, ptA);
-		_polygonA.push_back(ptA);
-		LOG(3,"Segment-facet : " << vToStr(ptA) << " added to A");
-		if(facet == XYZ)
+		if(testSegmentFacetIntersection(seg, facet))
 		  {
-		    double* ptB = new double[3];
-		    copyVector3(ptA, ptB);
-		    _polygonB.push_back(ptB);
-		    LOG(3,"Segment-facet : " << vToStr(ptB) << " added to B");
-		  }
+		    double* ptA = new double[3];
+		    calcIntersectionPtSegmentFacet(seg, facet, ptA);
+		    _polygonA.push_back(ptA);
+		    LOG(3,"Segment-facet : " << vToStr(ptA) << " added to A");
+		    if(facet == XYZ)
+		      {
+			double* ptB = new double[3];
+			copyVector3(ptA, ptB);
+			_polygonB.push_back(ptB);
+			LOG(3,"Segment-facet : " << vToStr(ptB) << " added to B");
+		      }
 		
+		  }
 	      }
-	  }
 
-	// segment - edge
-	for(TetraEdge edge = OX ; edge <= ZX ; edge = TetraEdge(edge + 1))
-	  {
-	    if(testSegmentEdgeIntersection(seg, edge))
+	    // segment - edge
+	    for(TetraEdge edge = OX ; edge <= ZX ; edge = TetraEdge(edge + 1))
 	      {
-		double* ptA = new double[3];
-		calcIntersectionPtSegmentEdge(seg, edge, ptA);
-		_polygonA.push_back(ptA);
-		LOG(3,"Segment-edge : " << vToStr(ptA) << " added to A");
-		if(edge >= XY)
+		if(testSegmentEdgeIntersection(seg, edge))
 		  {
-		    double* ptB = new double[3];
-		    copyVector3(ptA, ptB);
-		    _polygonB.push_back(ptB);
+		    double* ptA = new double[3];
+		    calcIntersectionPtSegmentEdge(seg, edge, ptA);
+		    _polygonA.push_back(ptA);
+		    LOG(3,"Segment-edge : " << vToStr(ptA) << " added to A");
+		    if(edge >= XY)
+		      {
+			double* ptB = new double[3];
+			copyVector3(ptA, ptB);
+			_polygonB.push_back(ptB);
+		      }
 		  }
 	      }
-	  }
 	
-	// segment - corner
-	for(TetraCorner corner = O ; corner < NO_TET_CORNER ; corner = TetraCorner(corner + 1))
-	  {
-	    if(testSegmentCornerIntersection(seg, corner))
+	    // segment - corner
+	    for(TetraCorner corner = O ; corner < NO_TET_CORNER ; corner = TetraCorner(corner + 1))
 	      {
-		double* ptA = new double[3];
-		copyVector3(&COORDS_TET_CORNER[3 * corner], ptA);
-		_polygonA.push_back(ptA);
-		LOG(3,"Segment-corner : " << vToStr(ptA) << " added to A");
-		if(corner != O)
+		if(testSegmentCornerIntersection(seg, corner))
 		  {
-		    double* ptB = new double[3];
-		    _polygonB.push_back(ptB);
-		    copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
-		    LOG(3,"Segment-corner : " << vToStr(ptB) << " added to B");
+		    double* ptA = new double[3];
+		    copyVector3(&COORDS_TET_CORNER[3 * corner], ptA);
+		    _polygonA.push_back(ptA);
+		    LOG(3,"Segment-corner : " << vToStr(ptA) << " added to A");
+		    if(corner != O)
+		      {
+			double* ptB = new double[3];
+			_polygonB.push_back(ptB);
+			copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
+			LOG(3,"Segment-corner : " << vToStr(ptB) << " added to B");
+		      }
 		  }
 	      }
-	  }
 #endif
 
 #ifdef OPTIMIZE
 
-	// segment - ray 
-	for(TetraCorner corner = X ; corner < NO_TET_CORNER ; corner = TetraCorner(corner + 1))
-	  {
-	    if(isZero[DP_SEGMENT_RAY_INTERSECTION[7*(corner-1)]] && testSegmentRayIntersection(seg, corner))
+	    // segment - ray 
+	    for(TetraCorner corner = X ; corner < NO_TET_CORNER ; corner = TetraCorner(corner + 1))
 	      {
-		double* ptB = new double[3];
-		copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
-		_polygonB.push_back(ptB);
-		LOG(3,"Segment-ray : " << vToStr(ptB) << " added to B");
+		if(isZero[DP_SEGMENT_RAY_INTERSECTION[7*(corner-1)]] && testSegmentRayIntersection(seg, corner))
+		  {
+		    double* ptB = new double[3];
+		    copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
+		    _polygonB.push_back(ptB);
+		    LOG(3,"Segment-ray : " << vToStr(ptB) << " added to B");
+		  }
 	      }
-	  }
 	
-	// segment - halfstrip
-	for(TetraEdge edge = XY ; edge <= ZX ; edge = TetraEdge(edge + 1))
-	  {
+	    // segment - halfstrip
+	    for(TetraEdge edge = XY ; edge <= ZX ; edge = TetraEdge(edge + 1))
+	      {
 
 #if 0
-	    const int edgeIdx = int(edge) - 3; // offset since we only care for edges XY - ZX
-	    const bool doTest = 
-	      !isZero[DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIdx]] &&
-	      !isZero[DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIdx+1]];
+		const int edgeIdx = int(edge) - 3; // offset since we only care for edges XY - ZX
+		const bool doTest = 
+		  !isZero[DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIdx]] &&
+		  !isZero[DP_FOR_HALFSTRIP_INTERSECTION[4*edgeIdx+1]];
 	
 
-	    if(doTest && testSegmentHalfstripIntersection(seg, edge))
+		if(doTest && testSegmentHalfstripIntersection(seg, edge))
 #endif
-	      if(testSegmentHalfstripIntersection(seg, edge))
-	      {
-		double* ptB = new double[3];
-		calcIntersectionPtSegmentHalfstrip(seg, edge, ptB);
-		_polygonB.push_back(ptB);
-		LOG(3,"Segment-halfstrip : " << vToStr(ptB) << " added to B");
+		  if(testSegmentHalfstripIntersection(seg, edge))
+		    {
+		      double* ptB = new double[3];
+		      calcIntersectionPtSegmentHalfstrip(seg, edge, ptB);
+		      _polygonB.push_back(ptB);
+		      LOG(3,"Segment-halfstrip : " << vToStr(ptB) << " added to B");
+		    }
 	      }
-	  }
 
 	       	
 #else
 
-	// segment - ray 
-	for(TetraCorner corner = X ; corner < NO_TET_CORNER ; corner = TetraCorner(corner + 1))
-	  {
-	    if(testSegmentRayIntersection(seg, corner))
+	    // segment - ray 
+	    for(TetraCorner corner = X ; corner < NO_TET_CORNER ; corner = TetraCorner(corner + 1))
 	      {
-		double* ptB = new double[3];
-		copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
-		_polygonB.push_back(ptB);
-		LOG(3,"Segment-ray : " << vToStr(ptB) << " added to B");
+		if(testSegmentRayIntersection(seg, corner))
+		  {
+		    double* ptB = new double[3];
+		    copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
+		    _polygonB.push_back(ptB);
+		    LOG(3,"Segment-ray : " << vToStr(ptB) << " added to B");
+		  }
 	      }
-	  }
 	
-       	// segment - halfstrip
-	for(TetraEdge edge = XY ; edge <= ZX ; edge = TetraEdge(edge + 1))
-	  {
-	    if(testSegmentHalfstripIntersection(seg, edge))
+	    // segment - halfstrip
+	    for(TetraEdge edge = XY ; edge <= ZX ; edge = TetraEdge(edge + 1))
 	      {
-		double* ptB = new double[3];
-		calcIntersectionPtSegmentHalfstrip(seg, edge, ptB);
-		_polygonB.push_back(ptB);
-		LOG(3,"Segment-halfstrip : " << vToStr(ptB) << " added to B");
+		if(testSegmentHalfstripIntersection(seg, edge))
+		  {
+		    double* ptB = new double[3];
+		    calcIntersectionPtSegmentHalfstrip(seg, edge, ptB);
+		    _polygonB.push_back(ptB);
+		    LOG(3,"Segment-halfstrip : " << vToStr(ptB) << " added to B");
+		  }
 	      }
-	  }
 
 #endif
-      }      
+	  }      
     
-    // inclusion tests
-    for(TriCorner corner = P ; corner < NO_TRI_CORNER ; corner = TriCorner(corner + 1))
-      {
-	// { XYZ - inclusion only possible if in Tetrahedron?
-	// tetrahedron
-	if(testCornerInTetrahedron(corner))
+	// inclusion tests
+	for(TriCorner corner = P ; corner < NO_TRI_CORNER ; corner = TriCorner(corner + 1))
 	  {
-	    double* ptA = new double[3];
-	    copyVector3(&_coords[5*corner], ptA);
-	    _polygonA.push_back(ptA);
-	    LOG(3,"Inclusion tetrahedron : " << vToStr(ptA) << " added to A");
-	  }
-
-	// XYZ - plane
-	if(testCornerOnXYZFacet(corner))
-	  {
-	    double* ptB = new double[3];
-	    copyVector3(&_coords[5*corner], ptB);
-	    _polygonB.push_back(ptB);
-	    LOG(3,"Inclusion XYZ-plane : " << vToStr(ptB) << " added to B");
-	  }
-
-	// projection on XYZ - facet
-	if(testCornerAboveXYZFacet(corner))
-	  {
-	    double* ptB = new double[3];
-	    copyVector3(&_coords[5*corner], ptB);
-	    ptB[2] = 1 - ptB[0] - ptB[1];
-	    assert(epsilonEqual(ptB[0]+ptB[1]+ptB[2] - 1, 0.0));
-	    _polygonB.push_back(ptB);
-	    LOG(3,"Projection XYZ-plane : " << vToStr(ptB) << " added to B");
-	  }
-
-      }
-
-  }
-
-  /**
-   * Calculates the barycenters of the given intersection polygon.
-   *
-   * @pre  the intersection polygons have been calculated with calculateIntersectionPolygons()
-   * 
-   * @param poly        one of the two intersection polygons
-   * @param barycenter  array of three doubles where barycenter is stored
-   *
-   */
-  void TransformedTriangle::calculatePolygonBarycenter(const IntersectionPolygon poly, double* barycenter)
-  {
-    LOG(3,"--- Calculating polygon barycenter");
-
-    // get the polygon points
-    std::vector<double*>& polygon = (poly == A) ? _polygonA : _polygonB;
-
-    // calculate barycenter
-    const int m = polygon.size();
-
-    for(int j = 0 ; j < 3 ; ++j)
-      {
-	barycenter[j] = 0.0;
-      }
-
-    if(m != 0)
-      {
-	for(int i = 0 ; i < m ; ++i)
-	  {
-	    const double* pt = polygon[i];
-	    for(int j = 0 ; j < 3 ; ++j)
+	    // { XYZ - inclusion only possible if in Tetrahedron?
+	    // tetrahedron
+	    if(testCornerInTetrahedron(corner))
 	      {
-		barycenter[j] += pt[j] / double(m);
+		double* ptA = new double[3];
+		copyVector3(&_coords[5*corner], ptA);
+		_polygonA.push_back(ptA);
+		LOG(3,"Inclusion tetrahedron : " << vToStr(ptA) << " added to A");
+	      }
+
+	    // XYZ - plane
+	    if(testCornerOnXYZFacet(corner))
+	      {
+		double* ptB = new double[3];
+		copyVector3(&_coords[5*corner], ptB);
+		_polygonB.push_back(ptB);
+		LOG(3,"Inclusion XYZ-plane : " << vToStr(ptB) << " added to B");
+	      }
+
+	    // projection on XYZ - facet
+	    if(testCornerAboveXYZFacet(corner))
+	      {
+		double* ptB = new double[3];
+		copyVector3(&_coords[5*corner], ptB);
+		ptB[2] = 1 - ptB[0] - ptB[1];
+		assert(epsilonEqual(ptB[0]+ptB[1]+ptB[2] - 1, 0.0));
+		_polygonB.push_back(ptB);
+		LOG(3,"Projection XYZ-plane : " << vToStr(ptB) << " added to B");
+	      }
+
+	  }
+
+      }
+
+    /**
+     * Calculates the barycenters of the given intersection polygon.
+     *
+     * @pre  the intersection polygons have been calculated with calculateIntersectionPolygons()
+     * 
+     * @param poly        one of the two intersection polygons
+     * @param barycenter  array of three doubles where barycenter is stored
+     *
+     */
+    void TransformedTriangle::calculatePolygonBarycenter(const IntersectionPolygon poly, double* barycenter)
+      {
+	LOG(3,"--- Calculating polygon barycenter");
+
+	// get the polygon points
+	std::vector<double*>& polygon = (poly == A) ? _polygonA : _polygonB;
+
+	// calculate barycenter
+	const int m = polygon.size();
+
+	for(int j = 0 ; j < 3 ; ++j)
+	  {
+	    barycenter[j] = 0.0;
+	  }
+
+	if(m != 0)
+	  {
+	    for(int i = 0 ; i < m ; ++i)
+	      {
+		const double* pt = polygon[i];
+		for(int j = 0 ; j < 3 ; ++j)
+		  {
+		    barycenter[j] += pt[j] / double(m);
+		  }
 	      }
 	  }
+	LOG(3,"Barycenter is " << vToStr(barycenter));
       }
-    LOG(3,"Barycenter is " << vToStr(barycenter));
-  }
 
-  /**
-   * Sorts the given intersection polygon in circular order around its barycenter.
-   * @pre  the intersection polygons have been calculated with calculateIntersectionPolygons()
-   * @post the vertices in _polygonA and _polygonB are sorted in circular order around their
-   *       respective barycenters
-   *
-   * @param poly        one of the two intersection polygons
-   * @param barycenter  array of three doubles with the coordinates of the barycenter
-   * 
-   */
-  void TransformedTriangle::sortIntersectionPolygon(const IntersectionPolygon poly, const double* barycenter)
-  {
-    LOG(3,"--- Sorting polygon ...");
-
-    using ::ProjectedCentralCircularSortOrder;
-    typedef ProjectedCentralCircularSortOrder SortOrder; // change is only necessary here and in constructor
-    typedef SortOrder::CoordType CoordType;
-
-    // get the polygon points
-    std::vector<double*>& polygon = (poly == A) ? _polygonA : _polygonB;
-
-    if(polygon.size() == 0)
-      return;
-
-    // determine type of sorting
-    CoordType type = SortOrder::XY;
-    if(poly == A) // B is on h = 0 plane -> ok
+    /**
+     * Sorts the given intersection polygon in circular order around its barycenter.
+     * @pre  the intersection polygons have been calculated with calculateIntersectionPolygons()
+     * @post the vertices in _polygonA and _polygonB are sorted in circular order around their
+     *       respective barycenters
+     *
+     * @param poly        one of the two intersection polygons
+     * @param barycenter  array of three doubles with the coordinates of the barycenter
+     * 
+     */
+    void TransformedTriangle::sortIntersectionPolygon(const IntersectionPolygon poly, const double* barycenter)
       {
-	// NB : the following test is never true if we have eliminated the
-	// triangles parallel to x == 0 and y == 0 in calculateIntersectionVolume().
-	// We keep the test here anyway, to avoid interdependency.
+	LOG(3,"--- Sorting polygon ...");
 
-	// is triangle parallel to x == 0 ?
-	if(isTriangleParallelToFacet(OZX))
+	using ::ProjectedCentralCircularSortOrder;
+	typedef ProjectedCentralCircularSortOrder SortOrder; // change is only necessary here and in constructor
+	typedef SortOrder::CoordType CoordType;
+
+	// get the polygon points
+	std::vector<double*>& polygon = (poly == A) ? _polygonA : _polygonB;
+
+	if(polygon.size() == 0)
+	  return;
+
+	// determine type of sorting
+	CoordType type = SortOrder::XY;
+	if(poly == A) // B is on h = 0 plane -> ok
 	  {
-	    type = SortOrder::YZ;
-	  }
-	else if(isTriangleParallelToFacet(OYZ))
-	  {
-	    type = SortOrder::XZ;
-	  }
-      }
+	    // NB : the following test is never true if we have eliminated the
+	    // triangles parallel to x == 0 and y == 0 in calculateIntersectionVolume().
+	    // We keep the test here anyway, to avoid interdependency.
 
-    // create order object
-    SortOrder order(barycenter, type);
+	    // is triangle parallel to x == 0 ?
+	    if(isTriangleParallelToFacet(OZX))
+	      {
+		type = SortOrder::YZ;
+	      }
+	    else if(isTriangleParallelToFacet(OYZ))
+	      {
+		type = SortOrder::XZ;
+	      }
+	  }
 
-    // sort vector with this object
-    // NB : do not change place of first object, with respect to which the order
-    // is defined
-    sort((polygon.begin()), polygon.end(), order);
+	// create order object
+	SortOrder order(barycenter, type);
+
+	// sort vector with this object
+	// NB : do not change place of first object, with respect to which the order
+	// is defined
+	sort((polygon.begin()), polygon.end(), order);
     
-    LOG(3,"Sorted polygon is ");
-    for(int i = 0 ; i < polygon.size() ; ++i)
-      {
-	LOG(3,vToStr(polygon[i]));
+	LOG(3,"Sorted polygon is ");
+	for(int i = 0 ; i < polygon.size() ; ++i)
+	  {
+	    LOG(3,vToStr(polygon[i]));
+	  }
+
       }
 
-  }
-
-  /**
-   * Calculates the volume between the given polygon and the z = 0 plane.
-   *
-   * @pre  the intersection polygones have been calculated with calculateIntersectionPolygons(),
-   *       and they have been sorted in circular order with sortIntersectionPolygons(void)
-   * 
-   * @param poly        one of the two intersection polygons
-   * @param barycenter  array of three doubles with the coordinates of the barycenter
-   * @return           the volume between the polygon and the z = 0 plane
-   *
-   */
-  double TransformedTriangle::calculateVolumeUnderPolygon(IntersectionPolygon poly, const double* barycenter)
-  {
-    LOG(2,"--- Calculating volume under polygon");
-
-    // get the polygon points
-    std::vector<double*>& polygon = (poly == A) ? _polygonA : _polygonB;
-
-    double vol = 0.0;
-    const int m = polygon.size();
-
-    for(int i = 0 ; i < m ; ++i)
+    /**
+     * Calculates the volume between the given polygon and the z = 0 plane.
+     *
+     * @pre  the intersection polygones have been calculated with calculateIntersectionPolygons(),
+     *       and they have been sorted in circular order with sortIntersectionPolygons(void)
+     * 
+     * @param poly        one of the two intersection polygons
+     * @param barycenter  array of three doubles with the coordinates of the barycenter
+     * @return           the volume between the polygon and the z = 0 plane
+     *
+     */
+    double TransformedTriangle::calculateVolumeUnderPolygon(IntersectionPolygon poly, const double* barycenter)
       {
-	const double* ptCurr = polygon[i];  // pt "i"
-	const double* ptNext = polygon[(i + 1) % m]; // pt "i+1" (pt m == pt 0)
+	LOG(2,"--- Calculating volume under polygon");
+
+	// get the polygon points
+	std::vector<double*>& polygon = (poly == A) ? _polygonA : _polygonB;
+
+	double vol = 0.0;
+	const int m = polygon.size();
+
+	for(int i = 0 ; i < m ; ++i)
+	  {
+	    const double* ptCurr = polygon[i];  // pt "i"
+	    const double* ptNext = polygon[(i + 1) % m]; // pt "i+1" (pt m == pt 0)
 	
-	const double factor1 = ptCurr[2] + ptNext[2] + barycenter[2];
-	const double factor2 = 
-	  ptCurr[0]*(ptNext[1] - barycenter[1]) 
-	  + ptNext[0]*(barycenter[1] - ptCurr[1])
-	  + barycenter[0]*(ptCurr[1] - ptNext[1]);
-	vol += (factor1 * factor2) / 6.0;
-      }
-
-    LOG(2,"Abs. Volume is " << vol); 
-    return vol;
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////////////
-  // Detection of (very) degenerate cases                                /////////////
-  ////////////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * Checks if the triangle lies in the plane of a given facet
-   *
-   * @param facet     one of the facets of the tetrahedron
-   * @return         true if PQR lies in the plane of the facet, false if not
-   */
-  bool TransformedTriangle::isTriangleInPlaneOfFacet(const TetraFacet facet) const
-  {
-
-    // coordinate to check
-    const int coord = static_cast<int>(facet);
-
-    for(TriCorner c = P ; c < NO_TRI_CORNER ; c = TriCorner(c + 1))
-      {
-	if(_coords[5*c + coord] != 0.0)
-	  {
-	    return false;
+	    const double factor1 = ptCurr[2] + ptNext[2] + barycenter[2];
+	    const double factor2 = 
+	      ptCurr[0]*(ptNext[1] - barycenter[1]) 
+	      + ptNext[0]*(barycenter[1] - ptCurr[1])
+	      + barycenter[0]*(ptCurr[1] - ptNext[1]);
+	    vol += (factor1 * factor2) / 6.0;
 	  }
+
+	LOG(2,"Abs. Volume is " << vol); 
+	return vol;
       }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    // Detection of (very) degenerate cases                                /////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Checks if the triangle lies in the plane of a given facet
+     *
+     * @param facet     one of the facets of the tetrahedron
+     * @return         true if PQR lies in the plane of the facet, false if not
+     */
+    bool TransformedTriangle::isTriangleInPlaneOfFacet(const TetraFacet facet) const
+      {
+
+	// coordinate to check
+	const int coord = static_cast<int>(facet);
+
+	for(TriCorner c = P ; c < NO_TRI_CORNER ; c = TriCorner(c + 1))
+	  {
+	    if(_coords[5*c + coord] != 0.0)
+	      {
+		return false;
+	      }
+	  }
     
-    return true;
-  }
+	return true;
+      }
 
-  /**
-   * Checks if the triangle is parallel to the given facet
-   *
-   * @param facet  one of the facets of the unit tetrahedron
-   * @return       true if triangle is parallel to facet, false if not
-   */
-  bool TransformedTriangle::isTriangleParallelToFacet(const TetraFacet facet) const
-    {
-      // coordinate to check
-      const int coord = static_cast<int>(facet);
-      return (_coords[5*P + coord] == _coords[5*Q + coord]) && (_coords[5*P + coord] == _coords[5*R + coord]);
-    }
-
-  /**
-   * Determines whether the triangle is below the z-plane.
-   * 
-   * @return true if the z-coordinate of the three corners of the triangle are all less than 0, false otherwise.
-   */
-  bool TransformedTriangle::isTriangleBelowTetraeder() const
-  {
-    for(TriCorner c = P ; c < NO_TRI_CORNER ; c = TriCorner(c + 1))
+    /**
+     * Checks if the triangle is parallel to the given facet
+     *
+     * @param facet  one of the facets of the unit tetrahedron
+     * @return       true if triangle is parallel to facet, false if not
+     */
+    bool TransformedTriangle::isTriangleParallelToFacet(const TetraFacet facet) const
       {
-	// check z-coords for all points
-	if(_coords[5*c + 2] >= 0.0)
+	// coordinate to check
+	const int coord = static_cast<int>(facet);
+	return (_coords[5*P + coord] == _coords[5*Q + coord]) && (_coords[5*P + coord] == _coords[5*R + coord]);
+      }
+
+    /**
+     * Determines whether the triangle is below the z-plane.
+     * 
+     * @return true if the z-coordinate of the three corners of the triangle are all less than 0, false otherwise.
+     */
+    bool TransformedTriangle::isTriangleBelowTetraeder() const
+      {
+	for(TriCorner c = P ; c < NO_TRI_CORNER ; c = TriCorner(c + 1))
 	  {
-	    return false;
+	    // check z-coords for all points
+	    if(_coords[5*c + 2] >= 0.0)
+	      {
+		return false;
+	      }
 	  }
+	return true;
       }
-    return true;
-  }
 
-  /**
-   * Prints the coordinates of the triangle to std::cout
-   *
-   */
-  void TransformedTriangle::dumpCoords() const
-  {
-    std::cout << "Coords : ";
-    for(int i = 0 ; i < 3; ++i)
+    /**
+     * Prints the coordinates of the triangle to std::cout
+     *
+     */
+    void TransformedTriangle::dumpCoords() const
       {
-	std::cout << vToStr(&_coords[5*i]) << ",";
+	std::cout << "Coords : ";
+	for(int i = 0 ; i < 3; ++i)
+	  {
+	    std::cout << vToStr(&_coords[5*i]) << ",";
+	  }
+	std::cout << std::endl;
       }
-    std::cout << std::endl;
-  }
 
-}; // NAMESPACE
+  }; // NAMESPACE

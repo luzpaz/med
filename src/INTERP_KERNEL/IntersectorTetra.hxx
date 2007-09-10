@@ -25,9 +25,6 @@ namespace INTERP_UTILS
     TriangleFaceKey(int node1, int node2, int node3)
     {
       sort3Ints(_nodes, node1, node2, node3);
-      //      assert(_nodes[0] < _nodes[1]);
-      //assert(_nodes[0] < _nodes[2]);
-      //assert(_nodes[1] < _nodes[2]);
       _hashVal = ( _nodes[0] + _nodes[1] + _nodes[2] ) % 29;
     }
 
@@ -62,7 +59,7 @@ namespace INTERP_UTILS
 {
 
  
-  /*
+  /**
    * Class calculating the volume of intersection of individual 3D elements.
    *
    */
@@ -80,6 +77,12 @@ namespace INTERP_UTILS
 
   private:
 
+    /// disallow copying
+    IntersectorTetra(const IntersectorTetra& t);
+    
+    /// disallow assignment
+    IntersectorTetra& operator=(const IntersectorTetra& t);
+
     TetraAffineTransform* _t;
     
     hash_map< int, double*> _nodes;
@@ -88,8 +91,6 @@ namespace INTERP_UTILS
     inline void checkIsOutside(const double* pt, bool* isOutside) const;
     inline void calculateNode(int globalNodeNum);
     inline void calculateVolume(TransformedTriangle& tri, const TriangleFaceKey& key);
-    //    inline void sort3Ints(int* sorted, int node1, int node2, int node3);
-    //inline std::string createFaceKey(int node1, int node2, int node3); 
 
     const MEDMEM::MESH& _srcMesh;
     
@@ -162,18 +163,6 @@ namespace INTERP_UTILS
 	  }
       }
   }
-	    
-#if 0
-  inline std::string IntersectorTetra::createFaceKey(int node1, int node2, int node3)
-  {
-    int sorted[3];
-    sort3Ints(sorted, node1, node2, node3);
-
-    std::stringstream sstr;
-    sstr << node1 << "-" << node2 << "-" << node3;
-    return sstr.str();
-  }
-#endif
 
 };
 

@@ -3,9 +3,13 @@
 
 #include <vector>
 
+
+
 #ifdef OPTIMIZE
+/// OPT_INLINE will be replaced by "inline" if OPTIMIZE is defined and else nothing
 #define OPT_INLINE inline
 #else
+/// OPT_INLINE will be replaced by "inline" if OPTIMIZE is defined and else nothing
 #define OPT_INLINE 
 #endif
 
@@ -71,7 +75,9 @@ namespace INTERP_UTILS
    *    When an intersection point has been detected it is calculated with a corresponding calc* - method in the cases where it
    * is not known directly. It is then added to the polygon A and/or B as necessary.
    *
-   *
+   * OPTIMIZE : 
+   *    If OPTIMIZE is defined, a large number of methods will be prefixed with inline and some optimizations concerning the tests 
+   * with zero double products will be used.
    */
   class TransformedTriangle
   {
@@ -119,6 +125,10 @@ namespace INTERP_UTILS
 
   private:
     
+
+    // ----------------------------------------------------------------------------------
+    //  High-level methods called directly by calculateIntersectionVolume()     
+    // ----------------------------------------------------------------------------------
     void calculateIntersectionPolygons(); 
 
     void calculatePolygonBarycenter(const IntersectionPolygon poly, double* barycenter); 
@@ -127,9 +137,9 @@ namespace INTERP_UTILS
 
     double calculateVolumeUnderPolygon(IntersectionPolygon poly, const double* barycenter); 
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    /// Detection of degenerate triangles                                   ////////////
-    ////////////////////////////////////////////////////////////////////////////////////
+    // ----------------------------------------------------------------------------------
+    //  Detection of degenerate triangles  
+    // ----------------------------------------------------------------------------------
 
     bool isTriangleInPlaneOfFacet(const TetraFacet facet) const;
     
@@ -137,9 +147,9 @@ namespace INTERP_UTILS
 
     bool isTriangleBelowTetraeder() const;
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    /// Intersection test methods and intersection point calculations           ////////
-    ////////////////////////////////////////////////////////////////////////////////////
+    // ----------------------------------------------------------------------------------
+    //  Intersection test methods and intersection point calculations           
+    // ----------------------------------------------------------------------------------
  
     OPT_INLINE bool testSurfaceEdgeIntersection(const TetraEdge edge) const; 
 
@@ -169,9 +179,9 @@ namespace INTERP_UTILS
 
     OPT_INLINE bool testCornerAboveXYZFacet(const TriCorner corner) const;
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    /// Utility methods used in intersection tests                       ///////////////
-    ////////////////////////////////////////////////////////////////////////////////////
+    // ----------------------------------------------------------------------------------
+    //  Utility methods used in intersection tests                       
+    // ----------------------------------------------------------------------------------
     
     bool testTriangleSurroundsEdge(const TetraEdge edge) const;
 
@@ -187,13 +197,15 @@ namespace INTERP_UTILS
     
     bool testTriangleSurroundsRay(const TetraCorner corner) const;
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    /// Double and triple product calculations                           ///////////////
-    ////////////////////////////////////////////////////////////////////////////////////
+    // ----------------------------------------------------------------------------------
+    //  Double and triple product calculations                           
+    // ----------------------------------------------------------------------------------
     
-    void preCalculateDoubleProducts(void);
+
 
     bool areDoubleProductsConsistent(const TriSegment seg) const;
+
+    void preCalculateDoubleProducts(void);
 
     OPT_INLINE void resetDoubleProducts(const TriSegment seg, const TetraCorner corner);
 
@@ -211,48 +223,63 @@ namespace INTERP_UTILS
 
     double calcTByDevelopingRow(const TetraCorner corner, const int row = 1, const bool project = false) const;
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    /// Member variables                                                 ///////////////
-    ////////////////////////////////////////////////////////////////////////////////////
+    // ----------------------------------------------------------------------------------
+    //  Member variables                                                 
+    // ----------------------------------------------------------------------------------
   private:
 
-    // order : 
-    // [ p_x, p_y, p_z, p_h, p_H, q_x, q_y, q_z, q_h, q_H, r_x, r_y, r_z, r_h, r_H ]
+    /// Array holding the coordinates of the triangle's three corners
+    /// order : 
+    /// [ p_x, p_y, p_z, p_h, p_H, q_x, q_y, q_z, q_h, q_H, r_x, r_y, r_z, r_h, r_H ]
     double _coords[15];
     
-    /// flags showing whether the double and triple products have been precalculated for this class
-    bool _isDoubleProductsCalculated, _isTripleProductsCalculated; 
+    /// Flag showing whether the double products have been calculated yet
+    bool _isDoubleProductsCalculated;
 
-    /// array containing the 24 double products
+    /// Flag showing whether the triple products have been calculated yet
+    bool _isTripleProductsCalculated; 
+
+    /// Array containing the 24 double products.
     /// order : c^PQ_YZ, ... ,cPQ_10, ... c^QR_YZ, ... c^RP_YZ
     /// following order in enumeration DoubleProduct
     double _doubleProducts[24];
 
-    /// array containing the 4 triple products
+    /// Array containing the 4 triple products.
     /// order : t_O, t_X, t_Y, t_Z
     double _tripleProducts[4];
 
-    /// arrays holding the points in the two intersection polygons A and B
+    /// Vector holding the points of the intersection polygon A.
     /// these points are allocated in calculateIntersectionPolygons() and liberated in the destructor
-    std::vector<double*> _polygonA, _polygonB;
+    std::vector<double*> _polygonA;
     
-    /// vectors holding the coordinates of the barycenters of the polygons A and B
-    /// these points are calculated in calculatePolygonBarycenter
-    double _barycenterA[3], _barycenterB[3];
+    /// Vector holding the points of the intersection polygon B.
+    /// These points are allocated in calculateIntersectionPolygons() and liberated in the destructor
+    std::vector<double*> _polygonB;
+    
+    /// Array holding the coordinates of the barycenter of the polygon A
+    /// This point is calculated in calculatePolygonBarycenter
+    double _barycenterA[3];
 
-    // used for debugging
+    /// Array holding the coordinates of the barycenter of the polygon B
+    /// This point is calculated in calculatePolygonBarycenter
+    double _barycenterB[3];
+
+    /// Array of flags indicating which of the four triple products have been correctly calculated.
+    /// Used for asserts in debug mode
     bool _validTP[4];
 
 #ifdef OPTIMIZE
-    void preCalculateTriangleSurroundsEdge();     
+    void preCalculateTriangleSurroundsEdge();
+
+    /// Array holding results of the test testTriangleSurroundsEdge() for all the edges. 
+    /// These are calculated in preCalculateTriangleSurroundsEdge().
     bool _triangleSurroundsEdgeCache[NO_TET_EDGE];
-    bool _isOutsideTetra;
 #endif
 
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    /// Constants                                                      /////////////////
-    ////////////////////////////////////////////////////////////////////////////////////
+    // ----------------------------------------------------------------------------------
+    //  Constants                                                    
+    // ----------------------------------------------------------------------------------
 
     // offsets : 0 -> x, 1 -> y, 2 -> z, 3 -> h, 4 -> H
     // corresponds to order of double products in DoubleProduct
@@ -308,9 +335,6 @@ namespace INTERP_UTILS
 
     // double products used in segment - ray test
     static const DoubleProduct DP_SEGMENT_RAY_INTERSECTION[21];
-
-
-    inline bool isTriangleOutsideTetra(void) const;
 
   };
 
