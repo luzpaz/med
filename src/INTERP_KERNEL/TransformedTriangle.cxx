@@ -39,7 +39,7 @@ public:
   }
 
   /**
-   * Comparison operator
+   * Comparison operator.
    * Compares the relative position between two points in their ordering around the barycenter.
    *
    * @param  pt1   a double[3] representing a point
@@ -57,11 +57,17 @@ public:
   }
 
 private:
-  /// indices of X, Y, Z coordinates in double[3] arrays to use : these depend on the projection plane
-  const int _aIdx, _bIdx;
+  /// index corresponding to first coordinate of plane on which points are projected
+  const int _aIdx;
+  
+  /// index corresponding to second coordinate of plane on which points are projected
+  const int _bIdx;
 
-  /// values of projected coordinates for barycenter
-  const double _a, _b;
+  /// value of first projected coordinate of the barycenter
+  const double _a;
+  
+  /// value of second projected coordinate of the barycenter
+  const double _b;
 };
 
 
@@ -225,7 +231,7 @@ namespace INTERP_UTILS
 
   /**
    * Calculates the intersection polygons A and B, performing the intersection tests
-   * and storing the corresponding points in the vectors _polygonA and _polygonB
+   * and storing the corresponding points in the vectors _polygonA and _polygonB.
    *
    * @post _polygonA contains the intersection polygon A and _polygonB contains the
    *       intersection polygon B.
