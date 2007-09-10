@@ -1117,29 +1117,30 @@ void MESHCollection::buildConnectZones()
       }
   }
   
-  //creating faces if required 
+ //creating faces if required 
   if (m_subdomain_boundary_creates)
   {
     int global_face_id = m_topology->getFaceNumber()+1;
     vector <map <MED_EN::medGeometryElement, vector<MEDSPLITTER_FaceModel*> > > face_map(m_topology->nbDomain());
     
      map <pair<int,int>, vector<int> > faces_in_joint;
-     
+
+ // taking faces that are already present in the mesh into account
+    for (int idomain=0; idomain<m_topology->nbDomain(); idomain++)
+    {
+     getFaces(idomain,face_map[idomain]); 
+    }  
+    
+ // creating faces that are located at the interface between
+ // subdomains 
+           
     for (int idomain=0; idomain<m_topology->nbDomain(); idomain++)
     {
       vector<MEDMEM::MEDSKYLINEARRAY*> cell_cell_correspondency;
-    cell_cell_correspondency.resize(m_topology->nbDomain());
+      cell_cell_correspondency.resize(m_topology->nbDomain());
     
-    m_topology->computeCellCellCorrespondencies(idomain, cell_cell_correspondency, m_cell_graph.get());
+      m_topology->computeCellCellCorrespondencies(idomain, cell_cell_correspondency, m_cell_graph.get());
      
-     
-     // taking faces that are already present in the mesh into account
-   
-     getFaces(idomain,face_map[idomain]); 
-     
-    // creating faces that are located at the interface between
-    // subdomains 
-    
     for (int idistant=0; idistant< m_topology->nbDomain(); idistant++)
     {
       if (idistant <= idomain) continue;
