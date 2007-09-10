@@ -116,7 +116,6 @@ namespace MEDMEM
     int totalFiltered = 0;
 
 #ifdef USE_RECURSIVE_BBOX_FILTER
-
     
     /*
      * Performs a depth-first search over srcMesh, using bounding boxes to recursively eliminate the elements of targetMesh
@@ -265,7 +264,9 @@ namespace MEDMEM
 	      }
 	  }
 	      
+	// all nodes are deleted here
 	delete currNode;
+
 	LOG(4, "Next iteration. Nodes left : " << nodes.size());
       }
 

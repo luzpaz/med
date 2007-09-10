@@ -1,7 +1,6 @@
 #include "MeshRegion.hxx"
 
 #include "MeshElement.hxx"
-
 #include "MeshUtils.hxx"
 
 namespace INTERP_UTILS
@@ -33,6 +32,7 @@ namespace INTERP_UTILS
    * exist, it is created here. This creation is delayed to make it possible to have empty MeshRegions
    *
    * @param element pointer to element to add to region
+   * @param mesh    mesh to which element belongs
    *
    */
   void MeshRegion::addElement(MeshElement* const element, const MEDMEM::MESH& mesh)
@@ -72,6 +72,7 @@ namespace INTERP_UTILS
    * @param region1 region in which to store one half of this region
    * @param region2 region in which to store the other of this region
    * @param coord   coordinate of BoundingBox to use when splitting the region
+   * @param mesh    mesh to which region belongs
    *
    */
   void MeshRegion::split(MeshRegion& region1, MeshRegion& region2, BoundingBox::BoxCoord coord, const MEDMEM::MESH& mesh)
@@ -119,37 +120,9 @@ namespace INTERP_UTILS
     assert(elemBox != 0);
 
     return _box->isDisjointWith(*elemBox);
-  }
+  }  
 
-  /*
-   * Accessor to beginning of elements vector
-   *
-   * @return  constant iterator pointing at the beginning of the vector or elements
-   */
-  std::vector<MeshElement*>::const_iterator MeshRegion::getBeginElements() const
-  {
-    return _elements.begin();
-  }
-
-  /*
-   * Accessor to end of elements vector
-   *
-   * @return  constant iterator pointing at the end of the vector or elements
-   */
-  std::vector<MeshElement*>::const_iterator MeshRegion::getEndElements() const
-  {
-    return _elements.end();
-  }
   
-  /*
-   * Gives information on how many elements are contained in the region.
-   *
-   * @return  the number of elements contained in the region
-   */
-  int MeshRegion::getNumberOfElements() const
-  {
-    return _elements.size();
-  }
 };
 
 

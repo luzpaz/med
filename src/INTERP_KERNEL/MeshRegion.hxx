@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "BoundingBox.hxx"
-
 #include "MEDMEM_Mesh.hxx"
 
 namespace INTERP_UTILS
@@ -30,21 +29,52 @@ namespace INTERP_UTILS
 
     bool isDisjointWithElementBoundingBox(const MeshElement& elem) const;
 
-    std::vector<MeshElement*>::const_iterator getBeginElements() const;
+    inline std::vector<MeshElement*>::const_iterator getBeginElements() const;
 
-    std::vector<MeshElement*>::const_iterator getEndElements() const;
+    inline std::vector<MeshElement*>::const_iterator getEndElements() const;
 
-    int getNumberOfElements() const;
+    inline int getNumberOfElements() const;
 
   private:
-    /// Vector of pointers to elements. NB : these pointers are not owned by the region object, and are thus
-    /// neither allocated or liberated in this class. The elements must therefore be allocated and liberated outside this class
+    /// Vector of pointers to contained MeshElements. 
+    /// NB : these pointers are not owned by the region object, and are thus
+    /// neither allocated or liberated in this class. The elements must therefore be allocated and liberated outside the class.
     std::vector<MeshElement*> _elements;
 
     /// BoundingBox containing all the nodes of all the elements in the region.
     BoundingBox* _box;
   
   };
+
+  /*
+   * Accessor to beginning of elements vector
+   *
+   * @return  constant iterator pointing at the beginning of the vector or elements
+   */
+  inline std::vector<MeshElement*>::const_iterator MeshRegion::getBeginElements() const
+  {
+    return _elements.begin();
+  }
+
+  /*
+   * Accessor to end of elements vector
+   *
+   * @return  constant iterator pointing at the end of the vector or elements
+   */
+  inline std::vector<MeshElement*>::const_iterator MeshRegion::getEndElements() const
+  {
+    return _elements.end();
+  }
+  
+  /*
+   * Gives information on how many elements are contained in the region.
+   *
+   * @return  the number of elements contained in the region
+   */
+  inline int MeshRegion::getNumberOfElements() const
+  {
+    return _elements.size();
+  }
 
 };
 

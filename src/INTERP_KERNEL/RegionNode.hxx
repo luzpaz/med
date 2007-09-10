@@ -19,16 +19,38 @@ namespace INTERP_UTILS
     
     ~RegionNode();
 
-    MeshRegion& getSrcRegion();
+    inline MeshRegion& getSrcRegion();
     
-    MeshRegion& getTargetRegion();
+    inline MeshRegion& getTargetRegion();
 
   private:
-
-    MeshRegion _srcRegion;          /// source region
-    MeshRegion _targetRegion;       /// target region
+    
+    /// source region
+    MeshRegion _srcRegion;          
+    
+    /// target region
+    MeshRegion _targetRegion;       
 
   };
+
+  /**
+   *  Accessor to source region
+   *
+   * @return   reference to source region
+   */
+  inline MeshRegion& RegionNode::getSrcRegion()
+  {
+    return _srcRegion;
+  }
+  /**
+   *  Accessor to target region
+   *
+   * @return   reference to target region
+   */
+  inline MeshRegion& RegionNode::getTargetRegion()
+  {
+    return _targetRegion;
+  }
 
 };
 
