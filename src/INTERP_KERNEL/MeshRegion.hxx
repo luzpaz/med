@@ -46,7 +46,7 @@ namespace INTERP_UTILS
   
   };
 
-  /*
+  /**
    * Accessor to beginning of elements vector
    *
    * @return  constant iterator pointing at the beginning of the vector or elements
@@ -56,7 +56,7 @@ namespace INTERP_UTILS
     return _elements.begin();
   }
 
-  /*
+  /**
    * Accessor to end of elements vector
    *
    * @return  constant iterator pointing at the end of the vector or elements
@@ -66,7 +66,7 @@ namespace INTERP_UTILS
     return _elements.end();
   }
   
-  /*
+  /**
    * Gives information on how many elements are contained in the region.
    *
    * @return  the number of elements contained in the region

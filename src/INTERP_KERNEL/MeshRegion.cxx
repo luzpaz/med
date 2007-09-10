@@ -102,7 +102,7 @@ namespace INTERP_UTILS
       }
   }
 
-  /*
+  /**
    * Determines if a given element can intersect the elements of this region by 
    * testing whether the bounding box of the region intersects the bounding box of the element.
    * Note that the test is only true in one direction : if the bounding boxes are disjoint, the
@@ -124,6 +124,3 @@ namespace INTERP_UTILS
 
   
 };
-
-
-  
