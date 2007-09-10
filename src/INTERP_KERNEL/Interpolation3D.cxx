@@ -1,14 +1,8 @@
 #include "Interpolation3D.hxx"
-
-#include <stack>
-
 #include "MeshElement.hxx"
-#include "MeshRegion.hxx"
-#include "RegionNode.hxx"
-#include "TetraAffineTransform.hxx"
 #include "TransformedTriangle.hxx"
-#include "VectorUtils.hxx"
-#include "Intersector3D.hxx"
+//#include "VectorUtils.hxx"
+#include "IntersectorTetra.hxx"
 #include "Log.hxx"
 
 
@@ -16,10 +10,18 @@ using namespace INTERP_UTILS;
 using namespace MEDMEM;
 using namespace MED_EN;
 
+/// If defined, use recursion to traverse the binary search tree, else use the BBTree class
 #define USE_RECURSIVE_BBOX_FILTER
 
-#ifndef USE_RECURSIVE_BBOX_FILTER
+#ifdef USE_RECURSIVE_BBOX_FILTER
+#include "MeshRegion.hxx"
+#include "RegionNode.hxx"
+#include <stack>
+
+#else // use BBTree class
+
 #include "BBTree.H"
+
 #endif
 
 namespace MEDMEM
@@ -70,11 +72,11 @@ namespace MEDMEM
    * intersection matrix. 
    * 
    * The matrix is partially sparse : it is a vector of maps of integer - double pairs. 
-   * The length of the vector is equal to the number of source elements - for each source element there is a map, regardless
-   * of whether the element intersects any target elements or not. But in the maps there are only entries for those target elements
-   * which have a non-zero intersection volume with the source element. The vector has indices running from 
-   * 0 to (#source elements - 1), meaning that the map for source element i is stored at index i - 1. In the maps, however,
-   * the indexing is more natural : the intersection volume of the source element with target element j is found at matrix[i-1][j].
+   * The length of the vector is equal to the number of target elements - for each target element there is a map, regardless
+   * of whether the element intersects any source elements or not. But in the maps there are only entries for those source elements
+   * which have a non-zero intersection volume with the target element. The vector has indices running from 
+   * 0 to (#target elements - 1), meaning that the map for target element i is stored at index i - 1. In the maps, however,
+   * the indexing is more natural : the intersection volume of the target element i with source element j is found at matrix[i-1][j].
    * 
    
    * @param srcMesh     3-dimensional source mesh
@@ -84,8 +86,6 @@ namespace MEDMEM
    */
   void Interpolation3D::calculateIntersectionVolumes(const MESH& srcMesh, const MESH& targetMesh, IntersectionMatrix& matrix)
   {
-    // create intersector element
-    Intersector3D* intersector = new Intersector3D(srcMesh, targetMesh);
 
     // create MeshElement objects corresponding to each element of the two meshes
     const int numSrcElems = srcMesh.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
@@ -100,24 +100,24 @@ namespace MEDMEM
     
     for(int i = 0 ; i < numSrcElems ; ++i)
       {
-	//const int index = srcMesh.getConnectivityIndex(MED_NODAL, MED_CELL)[i];
-	const medGeometryElement type = srcMesh.getElementType(MED_CELL, i + 1);
-	srcElems[i] = new MeshElement(i + 1, type, srcMesh);
-	
+	//const medGeometryElement type = srcMesh.getElementType(MED_CELL, i + 1);
+	srcElems[i] = new MeshElement(i + 1, srcMesh);	
       }
     
     for(int i = 0 ; i < numTargetElems ; ++i)
       {
-	//	  const int index = targetMesh.getConnectivityIndex(MED_NODAL, MED_CELL)[i];
-	const medGeometryElement type = targetMesh.getElementType(MED_CELL, i + 1);
-	targetElems[i] = new MeshElement(i + 1, type, targetMesh);
+	//const medGeometryElement type = targetMesh.getElementType(MED_CELL, i + 1);
+	targetElems[i] = new MeshElement(i + 1, targetMesh);
       }
     
     // create empty maps for all source elements
-    matrix.resize(numSrcElems);
+    matrix.resize(numTargetElems);
+
+    int totalFiltered = 0;
 
 #ifdef USE_RECURSIVE_BBOX_FILTER
 
+    
     /*
      * Performs a depth-first search over srcMesh, using bounding boxes to recursively eliminate the elements of targetMesh
      * which cannot intersect smaller and smaller regions of srcMesh. At each level, each region is divided in two, forming
@@ -129,7 +129,7 @@ namespace MEDMEM
 
     // create initial RegionNode and fill up its source region with all the source mesh elements and
     // its target region with all the target mesh elements whose bounding box
-    //  intersects that of the source region
+    // intersects that of the source region
 
     RegionNode* firstNode = new RegionNode();
       
@@ -150,7 +150,7 @@ namespace MEDMEM
 	  }
       }
 
-    // using a stack, descend recursively, creating at each step two new RegionNodes having as source region the left and
+    // Using a stack, descend recursively, creating at each step two new RegionNodes having as source region the left and
     // right part of the source region of the current node (created using MeshRegion::split()) and as target region all the 
     // elements of the target mesh whose bounding box intersects the corresponding part
     // Continue until the source region contains only one element, at which point the intersection volumes are
@@ -165,32 +165,35 @@ namespace MEDMEM
 	nodes.pop();
 	LOG(4, "Popping node ");
 
-	if(currNode->getSrcRegion().getNumberOfElements() == 1)
+	if(currNode->getTargetRegion().getNumberOfElements() == 1)
 	  {
 	    // calculate volumes
 	    LOG(4, " - One element");
 
-	    MeshElement* srcElement = *(currNode->getSrcRegion().getBeginElements());
+	    MeshElement* targetElement = *(currNode->getTargetRegion().getBeginElements());
 	      
 	    // NB : srcElement indices are from 0 .. numSrcElements - 1
 	    // targetElement indicies from 1 .. numTargetElements
 	    // maybe this is not ideal ...
-	    const int srcIdx = srcElement->getIndex();
-	    std::map< int, double >* volumes = &(matrix[srcIdx - 1]);
+	    const int targetIdx = targetElement->getIndex();
 
-	    for(vector<MeshElement*>::const_iterator iter = currNode->getTargetRegion().getBeginElements() ; 
-		iter != currNode->getTargetRegion().getEndElements() ; ++iter)
+	    IntersectorTetra intersector(srcMesh, targetMesh, targetIdx);
+
+	    for(vector<MeshElement*>::const_iterator iter = currNode->getSrcRegion().getBeginElements() ; 
+		iter != currNode->getSrcRegion().getEndElements() ; ++iter)
 	      {
 	     
-		const int targetIdx = (*iter)->getIndex();
-		const double vol = intersector->intersectCells(srcIdx, targetIdx);
-		//if(!epsilonEqual(vol, 0.0))
-		//if(vol != 0.0)
+		const int srcIdx = (*iter)->getIndex();
+		const double vol = intersector.intersectSourceCell(srcIdx);
+
+		if(vol != 0.0)
 		  {
-		    volumes->insert(make_pair(targetIdx, vol));
+		    matrix[targetIdx - 1][srcIdx] = vol;
 		    LOG(2, "Result : V (" << srcIdx << ", " << targetIdx << ") = " << matrix[srcIdx - 1][targetIdx]);
+		    
 		  }
 	      }
+	    totalFiltered += intersector.filtered;
 
 	  } 
 	else // recursion 
@@ -205,10 +208,10 @@ namespace MEDMEM
 	    //} decide on axis
 	    static BoundingBox::BoxCoord axis = BoundingBox::XMAX;
 	      
-	    currNode->getSrcRegion().split(leftNode->getSrcRegion(), rightNode->getSrcRegion(), axis, srcMesh);
+	    currNode->getTargetRegion().split(leftNode->getTargetRegion(), rightNode->getTargetRegion(), axis, targetMesh);
 
-	    LOG(5, "After split, left src region has " << leftNode->getSrcRegion().getNumberOfElements()
-		<< " elements and right src region has " << rightNode->getSrcRegion().getNumberOfElements() 
+	    LOG(5, "After split, left target region has " << leftNode->getTargetRegion().getNumberOfElements()
+		<< " elements and right target region has " << rightNode->getTargetRegion().getNumberOfElements() 
 		<< " elements");
 
 	    // ugly hack to avoid problem with enum which does not start at 0
@@ -216,30 +219,30 @@ namespace MEDMEM
 	    // Anyway, it basically chooses the next axis, cyclically
 	    axis = (axis != BoundingBox::ZMAX) ? static_cast<BoundingBox::BoxCoord>(axis + 1) : BoundingBox::XMAX;
 
-	    // add target elements of current node that overlap the source regions of the new nodes
-	    LOG(5, " -- Adding target elements");
+	    // add source elements of current node that overlap the target regions of the new nodes
+	    LOG(5, " -- Adding source elements");
 	    int numLeftElements = 0;
 	    int numRightElements = 0;
-	    for(vector<MeshElement*>::const_iterator iter = currNode->getTargetRegion().getBeginElements() ; 
-		iter != currNode->getTargetRegion().getEndElements() ; ++iter)
+	    for(vector<MeshElement*>::const_iterator iter = currNode->getSrcRegion().getBeginElements() ; 
+		iter != currNode->getSrcRegion().getEndElements() ; ++iter)
 	      {
 		LOG(6, " --- New target node");
 		  
-		if(!leftNode->getSrcRegion().isDisjointWithElementBoundingBox(**iter))
+		if(!leftNode->getTargetRegion().isDisjointWithElementBoundingBox(**iter))
 		  {
-		    leftNode->getTargetRegion().addElement(*iter, targetMesh);
+		    leftNode->getSrcRegion().addElement(*iter, srcMesh);
 		    ++numLeftElements;
 		  }
 		  
-		if(!rightNode->getSrcRegion().isDisjointWithElementBoundingBox(**iter))
+		if(!rightNode->getTargetRegion().isDisjointWithElementBoundingBox(**iter))
 		  {
-		    rightNode->getTargetRegion().addElement(*iter, targetMesh);
+		    rightNode->getSrcRegion().addElement(*iter, srcMesh);
 		    ++numRightElements;
 		  }
 		  
 	      }
 
-	    LOG(5, "Left target region has " << numLeftElements << " elements and right target region has " 
+	    LOG(5, "Left src region has " << numLeftElements << " elements and right src region has " 
 		<< numRightElements << " elements");
 
 	    // push new nodes on stack
@@ -268,7 +271,7 @@ namespace MEDMEM
 
       
 
-#else // use BBTree
+#else // Use BBTree
       
       // create BBTree structure
       // - get bounding boxes
@@ -284,6 +287,8 @@ namespace MEDMEM
 	bboxes[6*i+3] = box->getCoordinate(BoundingBox::YMAX);
 	bboxes[6*i+4] = box->getCoordinate(BoundingBox::ZMIN);
 	bboxes[6*i+5] = box->getCoordinate(BoundingBox::ZMAX);
+
+	// source indices have to begin with zero for BBox, I think
 	srcElemIdx[i] = srcElems[i]->getIndex() - 1;
       }
       
@@ -309,22 +314,25 @@ namespace MEDMEM
 
 	tree.getIntersectingElems(targetBox, intersectElems);
 
+	// create intersector
+	IntersectorTetra intersector(srcMesh, targetMesh, targetIdx);
+
 	for(vector<int>::const_iterator iter = intersectElems.begin() ; iter != intersectElems.end() ; ++iter)
 	  {
 
 	    const int srcIdx = *iter + 1;
-	    const double vol = intersector->intersectCells(srcIdx, targetIdx);
+	    const double vol = intersector.intersectSourceCell(srcIdx);
 
-	    //	    if(!epsilonEqual(vol, 0.0))
+	    if(vol != 0.0)
 	      {
-		matrix[srcIdx - 1].insert(make_pair(targetIdx, vol));
+		matrix[targetIdx - 1].insert(make_pair(srcIdx, vol));
 	      }
 
 	  }
+	totalFiltered += intersector.filtered;
       }
     
 #endif
-
 
 
     // free allocated memory
@@ -337,8 +345,7 @@ namespace MEDMEM
 	delete targetElems[i];
       }
 
-    std::cout << "Intersector filtered out " << intersector->filtered << " elements" << std::endl; 
-    delete intersector;
+    LOG(2, "Intersector filtered out " << totalFiltered << " elements" << std::endl);
 
   }
 
