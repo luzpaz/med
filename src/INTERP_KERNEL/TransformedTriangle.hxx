@@ -26,18 +26,20 @@ class TransformedTriangleIntersectTest;
 namespace INTERP_UTILS
 {
 
-  /**
-   * Class representing one of the faces of the triangulated source polyhedron after having been transformed
+  /** \class TransformedTriangle
+   * \brief Class representing one of the faces of the triangulated source polyhedron after having been transformed
    * with the affine transform that takes the target tetrahedron to the unit tetrahedron. It contains the
    * logic for calculating the volume of intersection between the triangle and the unit tetrahedron.
+   * 
+   * \see TransformedTriangle.hxx 
    *
    * Reference : J. Grandy, "Conservative Remapping and Region Overlays by Intersecting Arbitrary Polyhedra", 
    *             Journal of Computational Physics (1999)
    */
 
   /** \file TransformedTriangle.hxx
-   * ! READ ME FIRST !
-   * OVERVIEW of how the class works : (details can be found in the commentaries above each method)
+   * 
+   * OVERVIEW of how the class works : (details can be found in the documentation of each method)
    * 
    * Constructor : 
    * The constructor takes as arguments three pointers to double[3] vectors holding the transformed
