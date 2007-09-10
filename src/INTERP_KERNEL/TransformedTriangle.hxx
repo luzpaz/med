@@ -116,7 +116,7 @@ namespace INTERP_UTILS
 
     double calculateIntersectionVolume(); 
 
-    void dumpCoords();
+    void dumpCoords() const;
 
   private:
     
@@ -136,9 +136,11 @@ namespace INTERP_UTILS
     /// Detection of degenerate triangles                                   ////////////
     ////////////////////////////////////////////////////////////////////////////////////
 
-    bool isTriangleInPlaneOfFacet(const TetraFacet facet);
+    bool isTriangleInPlaneOfFacet(const TetraFacet facet) const;
+    
+    bool isTriangleParallelToFacet(const TetraFacet facet) const;
 
-    bool isTriangleBelowTetraeder();
+    bool isTriangleBelowTetraeder() const;
 
     ////////////////////////////////////////////////////////////////////////////////////
     /// Intersection test methods and intersection point calculations           ////////

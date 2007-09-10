@@ -225,7 +225,7 @@ namespace MEDMEM
 
     // reset if it is very small to keep the matrix sparse
     // is this a good idea?
-    if(epsilonEqual(totalVolume, 0.0, 1.0e-11))
+    if(epsilonEqual(totalVolume, 0.0, 1.0e-14))
       {
     	totalVolume = 0.0;
       }

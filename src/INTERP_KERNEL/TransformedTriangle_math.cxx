@@ -16,11 +16,16 @@ namespace INTERP_UTILS
 {
   
   ////////////////////////////////////////////////////////////////////////////////////
-  /// Constants                                                      /////////////////
+  //  Tables                                                         /////////////////
   ////////////////////////////////////////////////////////////////////////////////////
+
+  /// Table with first coordinate (a) used to calculate double product c^pq_ab = p_a * q_b - p_b * q_a (index to be used : DoubleProduct)
   const int TransformedTriangle::DP_OFFSET_1[8] = {1, 2, 0, 2, 0, 1, 4, 1};
+
+  /// Table with second coordinate (a) used to calculate double product c^pq_ab = p_a * q_b - p_b * q_a (index to be used : DoubleProduct)
   const int TransformedTriangle::DP_OFFSET_2[8] = {2, 0, 1, 3, 3, 3, 0, 4};
 
+  /// Coordinates used to calculate triple products by the expanding one of the three rows of the determinant (index to be used : 3*Corner + row)
   const int TransformedTriangle::COORDINATE_FOR_DETERMINANT_EXPANSION[12] =
     {
       // row 1, 2, 3
@@ -30,6 +35,7 @@ namespace INTERP_UTILS
       0, 1, 3  // Z
     };
   
+  /// Double products used to calculate triple products by expanding one of the three rows of the determinant (index to be used : 3*Corner + row)
   const TransformedTriangle::DoubleProduct TransformedTriangle::DP_FOR_DETERMINANT_EXPANSION[12] = 
     {
       // row 1, 2, 3
@@ -39,11 +45,16 @@ namespace INTERP_UTILS
       C_YH, C_XH, C_XY  // Z
     };
   
-  //const double TransformedTriangle::MACH_EPS = 1.0e-15;
+  /// The machine epsilon, used in precision corrections
   const long double TransformedTriangle::MACH_EPS = std::numeric_limits<double>::epsilon();
+  
+  /// 4.0 * the machine epsilon, represents the precision of multiplication when performing corrections corrections ( f in Grandy )
   const long double TransformedTriangle::MULT_PREC_F = 4.0 * TransformedTriangle::MACH_EPS;
+
+  /// Threshold for resetting double and triple products to zero; ( F / f in Grandy )
   const long double TransformedTriangle::THRESHOLD_F = 20.0;
 
+  /// Threshold for what is considered a small enough angle to warrant correction of triple products by Grandy, [57]
   const double TransformedTriangle::TRIPLE_PRODUCT_ANGLE_THRESHOLD = 0.1;
 
   ////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +117,6 @@ namespace INTERP_UTILS
 
       }
   
-  
     // -- (2) check that each double product statisfies Grandy, [47], else set to 0
     for(TriSegment seg = PQ ; seg <= RP ; seg = TriSegment(seg + 1))
       {
@@ -152,7 +162,7 @@ namespace INTERP_UTILS
 
   /**
    * Checks if the double products for a given segment are consistent, as defined by
-   * Grandy, [46]
+   * Grandy, [46]. 
    *
    * @param   seg Segment for which to check consistency of double products
    * @return  true if the double products are consistent, false if not
@@ -186,6 +196,13 @@ namespace INTERP_UTILS
   }
 
 #ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
+  
+  /**
+   * Sets the three double product associated with a given segment and a given corner to 0.0.
+   *
+   * @param  seg a segment of the triangle
+   * @param  corner a corner of the tetrahedron
+   */ 
   void TransformedTriangle::resetDoubleProducts(const TriSegment seg, const TetraCorner corner)
   {
     // set the three corresponding double products to 0.0
@@ -453,7 +470,6 @@ namespace INTERP_UTILS
    * @param project  indicates whether or not to perform projection as inidicated in Grandy, p.446
    * @return        triple product associated with corner (see Grandy, [50]-[52])
    */
-
   double TransformedTriangle::calcTByDevelopingRow(const TetraCorner corner, const int row, const bool project) const
   {
     

@@ -11,12 +11,25 @@
 #include "VectorUtils.hxx"
 
 
-
+/**
+ * Class representing a circular order of a set of points around their barycenter.
+ * It is used with the STL sort() algorithm to sort the point of the two polygons
+ *
+ */
 class ProjectedCentralCircularSortOrder
 {
-public:  
+public:
+
+  /// Enumeration of different planes to project on when calculating order
   enum CoordType { XY, XZ, YZ };
   
+  /**
+   * Constructor
+   *
+   * @param barycenter  double[3] containing the barycenter of the points to be compared
+   * @param type        plane to project on when comparing. The comparison will not work if all the points are in a plane perpendicular
+   *                    to the plane being projected on
+   */
   ProjectedCentralCircularSortOrder(const double* barycenter, const CoordType type)
     : _aIdx((type == YZ) ? 2 : 0), 
       _bIdx((type == XY) ? 1 : 2),
@@ -25,6 +38,15 @@ public:
   {
   }
 
+  /**
+   * Comparison operator
+   * Compares the relative position between two points in their ordering around the barycenter.
+   *
+   * @param  pt1   a double[3] representing a point
+   * @param  pt2   a double[3] representing a point
+   * @return       true if the angle of the difference vector between pt1 and the barycenter is greater than that 
+   *               of the difference vector between pt2 and the barycenter.
+   */
   bool operator()(const double* pt1, const double* pt2)
   {
     // calculate angles with the axis
@@ -35,19 +57,23 @@ public:
   }
 
 private:
+  /// indices of X, Y, Z coordinates in double[3] arrays to use : these depend on the projection plane
   const int _aIdx, _bIdx;
+
+  /// values of projected coordinates for barycenter
   const double _a, _b;
 };
 
-class Vector3Cmp
-{
-public:
-  bool operator()(double* const& pt1, double* const& pt2)
-  {
-    LOG(6, "points are equal ? : " << int((pt1[0] == pt2[0]) && (pt1[1] == pt2[1]) && (pt1[2] == pt2[2])));
-    return (pt1[0] == pt2[0]) && (pt1[1] == pt2[1]) && (pt1[2] == pt2[2]);
-  }
-};
+
+//class Vector3Cmp
+//{
+// public:
+//   bool operator()(double* const& pt1, double* const& pt2)
+//   {
+//     LOG(6, "points are equal ? : " << int((pt1[0] == pt2[0]) && (pt1[1] == pt2[1]) && (pt1[2] == pt2[2])));
+//     return (pt1[0] == pt2[0]) && (pt1[1] == pt2[1]) && (pt1[2] == pt2[2]);
+//   }
+// };
 
 namespace INTERP_UTILS
 {
@@ -98,7 +124,7 @@ namespace INTERP_UTILS
  
   }
 
-  /* 
+  /**
    * Destructor
    *
    * Deallocates the memory used to store the points of the polygons.
@@ -190,12 +216,13 @@ namespace INTERP_UTILS
   } 
     
   ////////////////////////////////////////////////////////////////////////////
-  /// PRIVATE ////////////////////////////////////////////////////////////////
+  // PRIVATE /////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
     
   ////////////////////////////////////////////////////////////////////////////////////
-  /// High-level methods called directly by calculateIntersectionVolume()     ////////
+  // High-level methods called directly by calculateIntersectionVolume()       ///////
   ////////////////////////////////////////////////////////////////////////////////////
+
   /**
    * Calculates the intersection polygons A and B, performing the intersection tests
    * and storing the corresponding points in the vectors _polygonA and _polygonB
@@ -539,7 +566,6 @@ namespace INTERP_UTILS
 
   /**
    * Sorts the given intersection polygon in circular order around its barycenter.
- 
    * @pre  the intersection polygons have been calculated with calculateIntersectionPolygons()
    * @post the vertices in _polygonA and _polygonB are sorted in circular order around their
    *       respective barycenters
@@ -571,11 +597,11 @@ namespace INTERP_UTILS
 	// We keep the test here anyway, to avoid interdependency.
 
 	// is triangle parallel to x == 0 ?
-	if(isTriangleInPlaneOfFacet(OZX)) 
+	if(isTriangleParallelToFacet(OZX))
 	  {
 	    type = SortOrder::YZ;
 	  }
-	else if(isTriangleInPlaneOfFacet(OYZ))
+	else if(isTriangleParallelToFacet(OYZ))
 	  {
 	    type = SortOrder::XZ;
 	  }
@@ -637,7 +663,7 @@ namespace INTERP_UTILS
 
 
   ////////////////////////////////////////////////////////////////////////////////////
-  /// Detection of (very) degenerate cases                                ////////////
+  // Detection of (very) degenerate cases                                /////////////
   ////////////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -646,7 +672,7 @@ namespace INTERP_UTILS
    * @param facet     one of the facets of the tetrahedron
    * @return         true if PQR lies in the plane of the facet, false if not
    */
-  bool TransformedTriangle::isTriangleInPlaneOfFacet(const TetraFacet facet)
+  bool TransformedTriangle::isTriangleInPlaneOfFacet(const TetraFacet facet) const
   {
 
     // coordinate to check
@@ -663,12 +689,25 @@ namespace INTERP_UTILS
     return true;
   }
 
-  /*
+  /**
+   * Checks if the triangle is parallel to the given facet
+   *
+   * @param facet  one of the facets of the unit tetrahedron
+   * @return       true if triangle is parallel to facet, false if not
+   */
+  bool TransformedTriangle::isTriangleParallelToFacet(const TetraFacet facet) const
+    {
+      // coordinate to check
+      const int coord = static_cast<int>(facet);
+      return (_coords[5*P + coord] == _coords[5*Q + coord]) && (_coords[5*P + coord] == _coords[5*R + coord]);
+    }
+
+  /**
    * Determines whether the triangle is below the z-plane.
    * 
    * @return true if the z-coordinate of the three corners of the triangle are all less than 0, false otherwise.
    */
-  bool TransformedTriangle::isTriangleBelowTetraeder()
+  bool TransformedTriangle::isTriangleBelowTetraeder() const
   {
     for(TriCorner c = P ; c < NO_TRI_CORNER ; c = TriCorner(c + 1))
       {
@@ -681,11 +720,11 @@ namespace INTERP_UTILS
     return true;
   }
 
-  /*
+  /**
    * Prints the coordinates of the triangle to std::cout
    *
    */
-  void TransformedTriangle::dumpCoords()
+  void TransformedTriangle::dumpCoords() const
   {
     std::cout << "Coords : ";
     for(int i = 0 ; i < 3; ++i)

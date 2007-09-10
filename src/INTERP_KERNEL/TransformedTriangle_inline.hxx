@@ -13,7 +13,6 @@
  * member variable array_triangleSurroundsEdgeCache. 
  *
  */
-
 inline void TransformedTriangle::preCalculateTriangleSurroundsEdge() 
 {
   for(TetraEdge edge = OX ; edge <= ZX ; edge = TetraEdge(edge + 1))
