@@ -15,37 +15,59 @@ using namespace MEDMEM;
 using namespace MED_EN;
 using namespace INTERP_UTILS;
 
-namespace MEDMEM
+/// Smallest volume of the intersecting elements in the transformed space that will be returned as non-zero. 
+/// Since the scale is always the same in the transformed space (the target tetrahedron is unitary), this number is independent of the scale of the meshes.
+#define SPARSE_TRUNCATION_LIMIT 1.0e-14
+
+namespace INTERP_UTILS
 {
+  
   /**
-   * Constructor
+   * Constructor creating object from target cell global number 
    * 
    * @param srcMesh     mesh containing the source elements
    * @param targetMesh  mesh containing the target elements
    * @param targetCell  global number of the target cell
+   *
    */
-  IntersectorTetra::IntersectorTetra(const MESH& srcMesh, const MESH& targetMesh, int targetCell)
-    : _srcMesh(srcMesh), filtered(0)
+  IntersectorTetra::IntersectorTetra(const MEDMEM::MESH& srcMesh, const MEDMEM::MESH& targetMesh, int targetCell)
+    : _srcMesh(srcMesh)
   {
     const medGeometryElement targetType = targetMesh.getElementType(MED_CELL, targetCell);
     
     // maybe we should do something more civilized here
     assert(targetType == MED_TETRA4);
     
-    // get array of points of target tetraeder
+    // get array of corners of target tetraeder
     const double* tetraCorners[4];
     for(int i = 0 ; i < 4 ; ++i)
       {
 	tetraCorners[i] = getCoordsOfNode(i + 1, targetCell, targetMesh);
       }
-    
-    // create AffineTransform from tetrahedron
-    _t = new TetraAffineTransform( tetraCorners );
+
+    // create the affine transform
+    createAffineTransform(tetraCorners);
 
   }
 
   /**
+   * Constructor creating object from the four corners of the tetrahedron.
+   *
+   * @param srcMesh       mesh containing the source elements
+   * @param tetraCorners  array of four pointers to double[3] arrays containing the coordinates of the
+   *                      corners of the tetrahedron
+   */
+  IntersectorTetra::IntersectorTetra(const MEDMEM::MESH& srcMesh, const double** tetraCorners)
+    : _srcMesh(srcMesh)
+  {
+    // create the affine transform
+    createAffineTransform(tetraCorners);
+  }
+
+  /**
    * Destructor
+   *
+   * Deletes _t and the coordinates (double[3] vectors) in _nodes
    *
    */
   IntersectorTetra::~IntersectorTetra()
@@ -69,13 +91,12 @@ namespace MEDMEM
    * The class will cache the intermediary calculations of transformed nodes of source cells and volumes associated 
    * with triangulated faces to avoid having to recalculate these.
    *
-   * @pre The element in _targetMesh referenced by targetCell is of type MED_TETRA4.
-   * @param srcCell      global number of the source element (1 <= srcCell < # source cells)
+   * @param element      global number of the source element (1 <= srcCell < # source cells)
    */
   double IntersectorTetra::intersectSourceCell(int element)
   {
         
-    //{ could be done on outside
+    //{ could be done on outside?
     // check if we have planar tetra element
     if(_t->determinant() == 0.0)
       {
@@ -103,16 +124,12 @@ namespace MEDMEM
       {
 	// we could store mapping local -> global numbers too, but not sure it is worth it
 	const int globalNodeNum = getGlobalNumberOfNode(i, element, _srcMesh);
-	if(_nodes.find(globalNodeNum) == _nodes.end())
+	if(_nodes.find(globalNodeNum) == _nodes.end()) 
 	  {
-	    calculateNode(globalNodeNum);
+	    const double* node = calculateNode(globalNodeNum);
 	  }
 
-	checkIsOutside(_nodes[globalNodeNum], isOutside);
-	
-	// local caching of globalNodeNum 
-	// not sure this is efficient
-	//	globalNodeNumbers[i] = globalNodeNum;
+	checkIsOutside(_nodes[globalNodeNum], isOutside);	
       }
 
     // halfspace filtering check
@@ -145,7 +162,7 @@ namespace MEDMEM
 		assert(locNodeNum >= 1);
 		assert(locNodeNum <= cellModel.getNumberOfNodes());
 
-		faceNodes[j-1] = getGlobalNumberOfNode(locNodeNum, element, _srcMesh);//globalNodeNumbers[locNodeNum];		
+		faceNodes[j-1] = getGlobalNumberOfNode(locNodeNum, element, _srcMesh);
 	      }
 
 	    switch(faceType)
@@ -219,14 +236,10 @@ namespace MEDMEM
 	      }
 	  }
       }
-    else
-      {
-	++filtered;
-      }
 
     // reset if it is very small to keep the matrix sparse
     // is this a good idea?
-    if(epsilonEqual(totalVolume, 0.0, 1.0e-14))
+    if(epsilonEqual(totalVolume, 0.0, SPARSE_TRUNCATION_LIMIT))
       {
     	totalVolume = 0.0;
       }

@@ -113,7 +113,6 @@ namespace MEDMEM
     // create empty maps for all source elements
     matrix.resize(numTargetElems);
 
-    int totalFiltered = 0;
 
 #ifdef USE_RECURSIVE_BBOX_FILTER
     
@@ -192,7 +191,6 @@ namespace MEDMEM
 		    
 		  }
 	      }
-	    totalFiltered += intersector.filtered;
 
 	  } 
 	else // recursion 
@@ -330,7 +328,6 @@ namespace MEDMEM
 	      }
 
 	  }
-	totalFiltered += intersector.filtered;
       }
     
 #endif
@@ -346,7 +343,6 @@ namespace MEDMEM
 	delete targetElems[i];
       }
 
-    LOG(2, "Intersector filtered out " << totalFiltered << " elements" << std::endl);
 
   }
 
