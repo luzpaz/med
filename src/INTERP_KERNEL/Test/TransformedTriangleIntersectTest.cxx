@@ -435,6 +435,21 @@ void TransformedTriangleIntersectTest::testTriangle3()
   // listed with yes in the tables above return true and 
   // that the ones listed with no or not listed at all return false
 
+  
+#ifdef OPTIMIZE  
+  bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
+  
+  for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
+    {
+      // check beforehand which double-products are zero
+      for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+	{
+	  isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+	}
+    }
+#endif
+
+
   // corner in tetrahedron (3 possibilities)
   CPPUNIT_ASSERT_EQUAL(true , tri->testCornerInTetrahedron(TT::P));
   CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::Q));
