@@ -4,7 +4,7 @@
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Mesh.hxx"
 
-#include "Intersector.hxx"
+#include "TargetIntersector.hxx"
 #include <vector>
 #include <ext/hash_map>
 #include <functional>
@@ -152,7 +152,7 @@ namespace INTERP_UTILS
    * source elements with triangular or quadratilateral faces.
    *
    */
-  class IntersectorTetra
+  class IntersectorTetra : public TargetIntersector
   {
 
   public: 
@@ -168,7 +168,7 @@ namespace INTERP_UTILS
   private:
     
     // member functions
-    inline void createAffineTransform(const double* corners);
+    inline void createAffineTransform(const double** corners);
     inline void checkIsOutside(const double* pt, bool* isOutside) const;
     inline void calculateNode(int globalNodeNum);
     inline void calculateVolume(TransformedTriangle& tri, const TriangleFaceKey& key);
@@ -203,7 +203,7 @@ namespace INTERP_UTILS
   inline void IntersectorTetra::createAffineTransform(const double** corners)
   {
     // create AffineTransform from tetrahedron
-    _t = new TetraAffineTransform( tetraCorners );
+    _t = new TetraAffineTransform( corners );
   }
 
   /**

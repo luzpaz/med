@@ -35,7 +35,6 @@ namespace INTERP_UTILS
   {
     const medGeometryElement targetType = targetMesh.getElementType(MED_CELL, targetCell);
     
-    // maybe we should do something more civilized here
     assert(targetType == MED_TETRA4);
     
     // get array of corners of target tetraeder
@@ -126,7 +125,7 @@ namespace INTERP_UTILS
 	const int globalNodeNum = getGlobalNumberOfNode(i, element, _srcMesh);
 	if(_nodes.find(globalNodeNum) == _nodes.end()) 
 	  {
-	    const double* node = calculateNode(globalNodeNum);
+	    calculateNode(globalNodeNum);
 	  }
 
 	checkIsOutside(_nodes[globalNodeNum], isOutside);	
