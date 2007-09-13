@@ -52,10 +52,11 @@ Interpolation3DSurf.hxx\
 InterpolationUtils.hxx\
 BBTree.H\
 MeshUtils.hxx\
-Intersector3D.hxx\
 Log.hxx\
 TransformedTriangle_inline.hxx\
-IntersectorTetra.hxx
+IntersectorTetra.hxx\
+TargetIntersector.hxx\
+IntersectorHexa.hxx
 
 
 # Libraries targets
@@ -72,10 +73,10 @@ RegionNode.cxx\
 BoundingBox.cxx\
 TetraAffineTransform.cxx\
 Interpolation3D.cxx\
-Intersector3D.cxx\
 Interpolation3DSurf.cxx\
 Interpolation2D.cxx\
-IntersectorTetra.cxx
+IntersectorTetra.cxx\
+IntersectorHexa.cxx
 
 # Executables targets
 BIN = 
@@ -83,7 +84,7 @@ BIN_SRC =
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-TEST_PROGS = testUnitTetra
+TEST_PROGS = testUnitTetra test_a_mesh
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome

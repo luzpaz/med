@@ -3,6 +3,20 @@
 
 #include "Log.hxx"
 
+#ifdef OPTIMIZE
+#define TEST_ZERO_DP_EDGE(seg, edge) isZero[TT::NO_DP*int(seg) + int(DoubleProduct(edge))]
+#define TEST_ZERO_DP_CORNER(seg, corner) \
+isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner] )] && \
+isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner+1] )] && \
+isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner+2] )]
+#define TEST_ZERO_DP_RAY(seg, corner) isZero[TT::NO_DP*int(seg) + TT::DP_SEGMENT_RAY_INTERSECTION[7*(corner-1)]]
+#else
+
+#define TEST_ZERO_DP_EDGE(seg, edge) true
+#define TEST_ZERO_DP_CORNER(seg, corner) true
+#define TEST_ZERO_DP_RAY(seg, corner) true
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Intersection tests
 // Each method in this file runs all the intersection tests with some triangle. The goal is to cover all
@@ -113,6 +127,19 @@ void TransformedTriangleIntersectTest::testTriangle1()
   // listed with yes in the tables above return true and 
   // that the ones listed with no or not listed at all return false
 
+#ifdef OPTIMIZE  
+  bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
+  
+  for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
+    {
+      // check beforehand which double-products are zero
+      for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+	{
+	  isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+	}
+    }
+#endif
+
   // corner in tetrahedron (3 possibilities)
   CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
   CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::Q));
@@ -145,42 +172,42 @@ void TransformedTriangleIntersectTest::testTriangle1()
   CPPUNIT_ASSERT_EQUAL(true , tri->testSegmentFacetIntersection(TT::RP, TT::XYZ));
 
   // segment-edge (18 possibilities)
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::PQ, TT::OX));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::PQ, TT::OY));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::PQ, TT::OZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::PQ, TT::YZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::PQ, TT::ZX));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::PQ, TT::XY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::PQ, TT::OX) && tri->testSegmentEdgeIntersection(TT::PQ, TT::OX));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::PQ, TT::OY) && tri->testSegmentEdgeIntersection(TT::PQ, TT::OY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::PQ, TT::OZ) && tri->testSegmentEdgeIntersection(TT::PQ, TT::OZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::PQ, TT::YZ) && tri->testSegmentEdgeIntersection(TT::PQ, TT::YZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::PQ, TT::ZX) && tri->testSegmentEdgeIntersection(TT::PQ, TT::ZX));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::PQ, TT::XY) && tri->testSegmentEdgeIntersection(TT::PQ, TT::XY));
 
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::OX));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::OY));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::OZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::YZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::ZX));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::XY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::OX) && tri->testSegmentEdgeIntersection(TT::QR, TT::OX));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::OY) && tri->testSegmentEdgeIntersection(TT::QR, TT::OY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::OZ) && tri->testSegmentEdgeIntersection(TT::QR, TT::OZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::YZ) && tri->testSegmentEdgeIntersection(TT::QR, TT::YZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::ZX) && tri->testSegmentEdgeIntersection(TT::QR, TT::ZX));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::XY) && tri->testSegmentEdgeIntersection(TT::QR, TT::XY));
   
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::OX));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::OY));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::OZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::YZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::ZX));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::XY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::OX) && tri->testSegmentEdgeIntersection(TT::RP, TT::OX));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::OY) && tri->testSegmentEdgeIntersection(TT::RP, TT::OY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::OZ) && tri->testSegmentEdgeIntersection(TT::RP, TT::OZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::YZ) && tri->testSegmentEdgeIntersection(TT::RP, TT::YZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::ZX) && tri->testSegmentEdgeIntersection(TT::RP, TT::ZX));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::XY) && tri->testSegmentEdgeIntersection(TT::RP, TT::XY));
 
   // segment - corner (12 possibilities)
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::PQ, TT::O));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::PQ, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::PQ, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::PQ, TT::Z));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::PQ, TT::O) && tri->testSegmentCornerIntersection(TT::PQ, TT::O));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::PQ, TT::X) && tri->testSegmentCornerIntersection(TT::PQ, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::PQ, TT::Y) && tri->testSegmentCornerIntersection(TT::PQ, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::PQ, TT::Z) && tri->testSegmentCornerIntersection(TT::PQ, TT::Z));
 
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::QR, TT::O));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::QR, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::QR, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::QR, TT::Z));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::QR, TT::O) && tri->testSegmentCornerIntersection(TT::QR, TT::O));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::QR, TT::X) && tri->testSegmentCornerIntersection(TT::QR, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::QR, TT::Y) && tri->testSegmentCornerIntersection(TT::QR, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::QR, TT::Z) && tri->testSegmentCornerIntersection(TT::QR, TT::Z));
 
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::RP, TT::O));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::RP, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::RP, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::RP, TT::Z));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::RP, TT::O) && tri->testSegmentCornerIntersection(TT::RP, TT::O));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::RP, TT::X) && tri->testSegmentCornerIntersection(TT::RP, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::RP, TT::Y) && tri->testSegmentCornerIntersection(TT::RP, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::RP, TT::Z) && tri->testSegmentCornerIntersection(TT::RP, TT::Z));
   
   // segment-halfstrip (9 possibilities)
   CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentHalfstripIntersection(TT::PQ, TT::YZ));
@@ -196,17 +223,17 @@ void TransformedTriangleIntersectTest::testTriangle1()
   CPPUNIT_ASSERT_EQUAL(true , tri->testSegmentHalfstripIntersection(TT::RP, TT::XY));
   
   // segment-ray (9 possibilities)
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::PQ, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::PQ, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::PQ, TT::Z));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::PQ, TT::X) && tri->testSegmentRayIntersection(TT::PQ, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::PQ, TT::Y) && tri->testSegmentRayIntersection(TT::PQ, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::PQ, TT::Z) && tri->testSegmentRayIntersection(TT::PQ, TT::Z));
 
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::QR, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::QR, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::QR, TT::Z));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::QR, TT::X) && tri->testSegmentRayIntersection(TT::QR, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::QR, TT::Y) && tri->testSegmentRayIntersection(TT::QR, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::QR, TT::Z) && tri->testSegmentRayIntersection(TT::QR, TT::Z));
 
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::RP, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::RP, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::RP, TT::Z));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::RP, TT::X) && tri->testSegmentRayIntersection(TT::RP, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::RP, TT::Y) && tri->testSegmentRayIntersection(TT::RP, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::RP, TT::Z) && tri->testSegmentRayIntersection(TT::RP, TT::Z));
 
   // surface-edge (6 possibilities)
   CPPUNIT_ASSERT_EQUAL(false, tri->testSurfaceEdgeIntersection(TT::OX));
@@ -254,6 +281,19 @@ void TransformedTriangleIntersectTest::testTriangle2()
   // listed with yes in the tables above return true and 
   // that the ones listed with no or not listed at all return false
 
+  #ifdef OPTIMIZE  
+  bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
+  
+  for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
+    {
+      // check beforehand which double-products are zero
+      for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+	{
+	  isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+	}
+    }
+#endif
+
   // corner in tetrahedron (3 possibilities)
   CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
   CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::Q));
@@ -286,42 +326,42 @@ void TransformedTriangleIntersectTest::testTriangle2()
   CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentFacetIntersection(TT::RP, TT::XYZ));
 
   // segment-edge (18 possibilities)
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::PQ, TT::OX));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::PQ, TT::OY));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::PQ, TT::OZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::PQ, TT::YZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::PQ, TT::ZX));
-  CPPUNIT_ASSERT_EQUAL(true , tri->testSegmentEdgeIntersection(TT::PQ, TT::XY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::PQ, TT::OX) && tri->testSegmentEdgeIntersection(TT::PQ, TT::OX));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::PQ, TT::OY) && tri->testSegmentEdgeIntersection(TT::PQ, TT::OY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::PQ, TT::OZ) && tri->testSegmentEdgeIntersection(TT::PQ, TT::OZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::PQ, TT::YZ) && tri->testSegmentEdgeIntersection(TT::PQ, TT::YZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::PQ, TT::ZX) && tri->testSegmentEdgeIntersection(TT::PQ, TT::ZX));
+  CPPUNIT_ASSERT_EQUAL(true , TEST_ZERO_DP_EDGE(TT::PQ, TT::XY) && tri->testSegmentEdgeIntersection(TT::PQ, TT::XY));
 
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::OX));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::OY));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::OZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::YZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::ZX));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::QR, TT::XY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::OX) && tri->testSegmentEdgeIntersection(TT::QR, TT::OX));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::OY) && tri->testSegmentEdgeIntersection(TT::QR, TT::OY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::OZ) && tri->testSegmentEdgeIntersection(TT::QR, TT::OZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::YZ) && tri->testSegmentEdgeIntersection(TT::QR, TT::YZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::ZX) && tri->testSegmentEdgeIntersection(TT::QR, TT::ZX));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::QR, TT::XY) && tri->testSegmentEdgeIntersection(TT::QR, TT::XY));
   
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::OX));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::OY));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::OZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::YZ));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::ZX));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentEdgeIntersection(TT::RP, TT::XY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::OX) && tri->testSegmentEdgeIntersection(TT::RP, TT::OX));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::OY) && tri->testSegmentEdgeIntersection(TT::RP, TT::OY));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::OZ) && tri->testSegmentEdgeIntersection(TT::RP, TT::OZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::YZ) && tri->testSegmentEdgeIntersection(TT::RP, TT::YZ));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::ZX) && tri->testSegmentEdgeIntersection(TT::RP, TT::ZX));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_EDGE(TT::RP, TT::XY) && tri->testSegmentEdgeIntersection(TT::RP, TT::XY));
 
   // segment - corner (12 possibilities)
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::PQ, TT::O));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::PQ, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::PQ, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::PQ, TT::Z));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::PQ, TT::O) && tri->testSegmentCornerIntersection(TT::PQ, TT::O));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::PQ, TT::X) && tri->testSegmentCornerIntersection(TT::PQ, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::PQ, TT::Y) && tri->testSegmentCornerIntersection(TT::PQ, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::PQ, TT::Z) && tri->testSegmentCornerIntersection(TT::PQ, TT::Z));
 
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::QR, TT::O));
-  CPPUNIT_ASSERT_EQUAL(true , tri->testSegmentCornerIntersection(TT::QR, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::QR, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::QR, TT::Z));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::QR, TT::O) && tri->testSegmentCornerIntersection(TT::QR, TT::O));
+  CPPUNIT_ASSERT_EQUAL(true , TEST_ZERO_DP_CORNER(TT::QR, TT::X) && tri->testSegmentCornerIntersection(TT::QR, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::QR, TT::Y) && tri->testSegmentCornerIntersection(TT::QR, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::QR, TT::Z) && tri->testSegmentCornerIntersection(TT::QR, TT::Z));
 
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::RP, TT::O));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::RP, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::RP, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentCornerIntersection(TT::RP, TT::Z));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::RP, TT::O) && tri->testSegmentCornerIntersection(TT::RP, TT::O));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::RP, TT::X) && tri->testSegmentCornerIntersection(TT::RP, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::RP, TT::Y) && tri->testSegmentCornerIntersection(TT::RP, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_CORNER(TT::RP, TT::Z) && tri->testSegmentCornerIntersection(TT::RP, TT::Z));
     
   // segment-halfstrip (9 possibilities)
   CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentHalfstripIntersection(TT::PQ, TT::YZ));
@@ -335,18 +375,19 @@ void TransformedTriangleIntersectTest::testTriangle2()
   CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentHalfstripIntersection(TT::RP, TT::YZ));
   CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentHalfstripIntersection(TT::RP, TT::ZX));
   CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentHalfstripIntersection(TT::RP, TT::XY));
-  
-  // segment-ray (9 possibilities)
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::PQ, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::PQ, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::PQ, TT::Z));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::QR, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::QR, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::QR, TT::Z));
 
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::RP, TT::X));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::RP, TT::Y));
-  CPPUNIT_ASSERT_EQUAL(false, tri->testSegmentRayIntersection(TT::RP, TT::Z));
+  // segment-ray (9 possibilities)
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::PQ, TT::X) && tri->testSegmentRayIntersection(TT::PQ, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::PQ, TT::Y) && tri->testSegmentRayIntersection(TT::PQ, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::PQ, TT::Z) && tri->testSegmentRayIntersection(TT::PQ, TT::Z));
+
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::QR, TT::X) && tri->testSegmentRayIntersection(TT::QR, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::QR, TT::Y) && tri->testSegmentRayIntersection(TT::QR, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::QR, TT::Z) && tri->testSegmentRayIntersection(TT::QR, TT::Z));
+
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::RP, TT::X) && tri->testSegmentRayIntersection(TT::RP, TT::X));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::RP, TT::Y) && tri->testSegmentRayIntersection(TT::RP, TT::Y));
+  CPPUNIT_ASSERT_EQUAL(false, TEST_ZERO_DP_RAY(TT::RP, TT::Z) && tri->testSegmentRayIntersection(TT::RP, TT::Z));
 
   // surface-edge (6 possibilities)
   CPPUNIT_ASSERT_EQUAL(true , tri->testSurfaceEdgeIntersection(TT::OX));

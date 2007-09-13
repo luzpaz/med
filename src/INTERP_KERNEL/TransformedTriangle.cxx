@@ -569,7 +569,7 @@ namespace INTERP_UTILS
       {
 	LOG(3,"--- Sorting polygon ...");
 
-	using ::ProjectedCentralCircularSortOrder;
+	using INTERP_UTILS::ProjectedCentralCircularSortOrder;
 	typedef ProjectedCentralCircularSortOrder SortOrder; // change is only necessary here and in constructor
 	typedef SortOrder::CoordType CoordType;
 

@@ -13,6 +13,24 @@ namespace INTERP_UTILS
 {
 
   /**
+   * Returns the global number of the node of an element.
+   * (1 <= node <= #nodes of element)
+   *
+   * @param      node       the node for which the global number is sought
+   * @param      element    an element of the mesh
+   * @param      mesh       a mesh
+   * @return    the node's global number (its coordinates in the coordinates array are at [3*globalNumber, 3*globalNumber + 2]
+   */
+  inline int getGlobalNumberOfNode(int node, int element, const MESH& mesh)
+  {
+    assert(node >= 1);
+    assert(node <= mesh.getNumberOfNodes());
+    const int nodeOffset = node - 1;
+    const int elemIdx = mesh.getConnectivityIndex(MED_NODAL, MED_CELL)[element - 1] - 1;
+    return mesh.getConnectivity(MED_FULL_INTERLACE, MED_NODAL, MED_CELL, MED_ALL_ELEMENTS)[elemIdx + nodeOffset] - 1;
+  }
+
+  /**
    * Returns the coordinates of a node of an element
    * (1 <= node <= #nodes)
    *
@@ -43,23 +61,7 @@ namespace INTERP_UTILS
     return static_cast<int>(type) - 300;
   }
 
-  /**
-   * Returns the global number of the node of an element.
-   * (1 <= node <= #nodes of element)
-   *
-   * @param      node       the node for which the global number is sought
-   * @param      element    an element of the mesh
-   * @param      mesh       a mesh
-   * @return    the node's global number (its coordinates in the coordinates array are at [3*globalNumber, 3*globalNumber + 2]
-   */
-  inline int getGlobalNumberOfNode(int node, int element, const MESH& mesh)
-  {
-    assert(node >= 1);
-    assert(node <= mesh.getNumberOfNodes());
-    const int nodeOffset = node - 1;
-    const int elemIdx = mesh.getConnectivityIndex(MED_NODAL, MED_CELL)[element - 1] - 1;
-    return mesh.getConnectivity(MED_FULL_INTERLACE, MED_NODAL, MED_CELL, MED_ALL_ELEMENTS)[elemIdx + nodeOffset] - 1;
-  }
+  
     
 };  
 

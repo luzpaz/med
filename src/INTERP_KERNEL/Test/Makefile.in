@@ -37,8 +37,13 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 EXPORT_HEADERS = CppUnitTest.hxx \
 		 TransformedTriangleTest.hxx \
 		 TransformedTriangleIntersectTest.hxx \
-		 Interpolation3DTest.hxx \
-	         TestingUtils.hxx
+		 Interpolation3DTestSuite.hxx \
+	 	 SingleElementTetraTests.hxx \
+		 MultiElementTetraTests.hxx \
+	         HexaTests.hxx\
+		 MeshTestToolkit.hxx
+
+		 
 
 
 # Libraries targets
@@ -50,10 +55,11 @@ LIB_CLIENT_IDL =
 
 # Executables targets
 
-BIN = PerfTest TestInterpKernel
+TEST_PROGS =  TestInterpKernel
 
-BIN_SRC = CppUnitTest.cxx TransformedTriangleTest.cxx TransformedTriangleIntersectTest.cxx \
-Interpolation3DTest.cxx
+BIN = PerfTest
+
+BIN_SRC = CppUnitTest.cxx TransformedTriangleTest.cxx TransformedTriangleIntersectTest.cxx MeshTestToolkit.cxx
 
 BIN_CLIENT_IDL =
 

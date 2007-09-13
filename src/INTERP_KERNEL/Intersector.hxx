@@ -3,10 +3,10 @@
 
 namespace MEDMEM
 {
-  class Intersector
+  class TargetIntersector
   {
   public:
-    virtual ~Intersector() {}
+    virtual ~TargetIntersector() {}
     
     /**
      * Calculate the volume of the intersection of two cells

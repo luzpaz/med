@@ -15,8 +15,7 @@ typedef std::vector< std::map< int, double > > IntersectionMatrix;
 
 namespace INTERP_UTILS
 {
-  class MeshElement;
-  class MeshRegion;
+  class MeshTestToolkit;
 };
 
 class Interpolation3DTest;
@@ -29,11 +28,8 @@ namespace MEDMEM
    */
   class Interpolation3D : public Interpolation
   {
-
-    friend class ::Interpolation3DTest;
-
-
-  public :
+  public:
+    //    friend class INTERP_UTILS::MeshTestToolkit;
 
     Interpolation3D();
     virtual ~Interpolation3D();

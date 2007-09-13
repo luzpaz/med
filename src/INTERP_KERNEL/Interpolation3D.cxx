@@ -3,6 +3,8 @@
 #include "TransformedTriangle.hxx"
 //#include "VectorUtils.hxx"
 #include "IntersectorTetra.hxx"
+#include "IntersectorHexa.hxx"
+#include "TargetIntersector.hxx"
 #include "Log.hxx"
 
 
@@ -175,14 +177,31 @@ namespace MEDMEM
 	    // maybe this is not ideal ...
 	    const int targetIdx = targetElement->getIndex();
 
-	    IntersectorTetra intersector(srcMesh, targetMesh, targetIdx);
+
+	    TargetIntersector* intersector;
+
+	    switch(targetElement->getType())
+	      {
+	      case MED_TETRA4:
+		intersector = new IntersectorTetra(srcMesh, targetMesh, targetIdx);
+		break;
+
+	      case MED_HEXA8:
+		intersector = new IntersectorHexa(srcMesh, targetMesh, targetIdx);
+		break;
+		
+	      default:
+		assert(false);
+	      }
+
+
 
 	    for(vector<MeshElement*>::const_iterator iter = currNode->getSrcRegion().getBeginElements() ; 
 		iter != currNode->getSrcRegion().getEndElements() ; ++iter)
 	      {
 	     
 		const int srcIdx = (*iter)->getIndex();
-		const double vol = intersector.intersectSourceCell(srcIdx);
+		const double vol = intersector->intersectSourceCell(srcIdx);
 
 		if(vol != 0.0)
 		  {
@@ -191,6 +210,8 @@ namespace MEDMEM
 		    
 		  }
 	      }
+	    
+	    delete intersector;
 
 	  } 
 	else // recursion 

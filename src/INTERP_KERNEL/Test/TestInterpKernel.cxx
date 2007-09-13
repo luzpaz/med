@@ -21,12 +21,17 @@
 #include "CppUnitTest.hxx"
 #include "TransformedTriangleTest.hxx"
 #include "TransformedTriangleIntersectTest.hxx"
-#include "Interpolation3DTest.hxx"
+#include "MultiElementTetraTests.hxx"
+#include "SingleElementTetraTests.hxx"
+#include "HexaTests.hxx"
+
+using namespace INTERP_UTILS;
 
 // --- Registers the fixture into the 'registry'
-//CPPUNIT_TEST_SUITE_REGISTRATION( Interpolation3DTestMultiElement );
-CPPUNIT_TEST_SUITE_REGISTRATION( Interpolation3DTest );
-//CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleIntersectTest );
+//CPPUNIT_TEST_SUITE_REGISTRATION( HexaTests );
+//CPPUNIT_TEST_SUITE_REGISTRATION( MultiElementTetraTests );
+//CPPUNIT_TEST_SUITE_REGISTRATION( SingleElementTetraTests );
+CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleIntersectTest );
 //CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleTest );
 //CPPUNIT_TEST_SUITE_REGISTRATION( TestBogusClass );
 

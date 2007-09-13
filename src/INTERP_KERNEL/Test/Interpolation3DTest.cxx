@@ -59,7 +59,7 @@ void Interpolation3DTest::getVolumes(MESH& mesh, const double*& tab) const
   SUPPORT *sup=new SUPPORT(&mesh,"dummy",MED_CELL);
   FIELD<double>* f=mesh.getVolume(sup);
   tab = f->getValue();
-  //  delete sup;
+  delete sup;
 }
 
 double Interpolation3DTest::sumVolume(const IntersectionMatrix& m) const
@@ -117,6 +117,7 @@ bool Interpolation3DTest::testVolumes(const IntersectionMatrix& m,  MESH& sMesh,
     }
   delete[] sVol;
   delete[] tVol;
+
   return ok;
 }
 
