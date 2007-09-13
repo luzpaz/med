@@ -349,6 +349,5 @@ namespace INTERP_UTILS
 
 };
 
-#include "TransformedTriangle_tables.hxx"
 
 #endif
