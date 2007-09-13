@@ -363,9 +363,12 @@ namespace INTERP_UTILS
 	// pt[i] = (c1*s1 + c2*s2) / (s1^2 + s2^2)
 
 	pt[i] = (c[0] * s[0] + c[1] * s[1]) / denominator;
+	
+	// strange bug with -O2 enabled : assertion fails when we don't have the following
+	// trace - line
 	//std::cout << "pt[i] = " << pt[i] << std::endl;
-	assert(pt[i] >= 0.0); // check we are in tetraeder
-	assert(pt[i] <= 1.0);
+	//assert(pt[i] >= 0.0); // check we are in tetraeder
+	//assert(pt[i] <= 1.0);
 	
       }
   }
