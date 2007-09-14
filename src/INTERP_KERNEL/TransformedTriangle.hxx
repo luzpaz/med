@@ -271,6 +271,12 @@ namespace INTERP_UTILS
     bool _validTP[4];
 
 #ifdef OPTIMIZE
+
+    /**
+     * Calls TransformedTriangle::testTriangleSurroundsEdge for edges OX to ZX and stores the result in
+     * member variable array_triangleSurroundsEdgeCache. 
+     *
+     */
     void preCalculateTriangleSurroundsEdge();
 
     /// Array holding results of the test testTriangleSurroundsEdge() for all the edges. 

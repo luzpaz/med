@@ -86,8 +86,7 @@ namespace MEDMEM
    * @param matrix      vector of maps in which the result is stored 
    *
    */
-  void Interpolation3D::calculateIntersectionVolumes(const MESH& srcMesh, const MESH& targetMesh, IntersectionMatrix& matrix)
-  {
+  void Interpolation3D::calculateIntersectionVolumes(const MEDMEM::MESH& srcMesh, const MEDMEM::MESH& targetMesh, IntersectionMatrix& matrix)  {
 
     // create MeshElement objects corresponding to each element of the two meshes
     const int numSrcElems = srcMesh.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);

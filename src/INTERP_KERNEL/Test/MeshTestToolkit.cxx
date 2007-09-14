@@ -36,7 +36,7 @@ namespace INTERP_TEST
    * Calculates the sum of a row of an intersection matrix
    *
    * @param m  an intersection matrix
-   * @param i  the index of the row (1 <= i <= #rows)
+   * @param i  the index of the row (1 <= i <= no. rows)
    * @return the sum of the values of row i
    *
    */
@@ -79,7 +79,7 @@ namespace INTERP_TEST
    * @param mesh   the mesh
    * @param tab    pointer to double[no. elements of mesh] array in which to store the volumes
    */
-  void MeshTestToolkit::getVolumes(MESH& mesh, const double*& tab) const
+  void MeshTestToolkit::getVolumes(MEDMEM::MESH& mesh, const double*& tab) const
   {
     SUPPORT *sup=new SUPPORT(&mesh,"dummy",MED_CELL);
     FIELD<double>* f=mesh.getVolume(sup);
@@ -125,7 +125,7 @@ namespace INTERP_TEST
    * @param  tMesh   the target mesh
    * @return true if the condition is verified, false if not.
    */
-  bool MeshTestToolkit::testVolumes(const IntersectionMatrix& m,  MESH& sMesh,  MESH& tMesh) const
+  bool MeshTestToolkit::testVolumes(const IntersectionMatrix& m,  MEDMEM::MESH& sMesh,  MEDMEM::MESH& tMesh) const
   {
     bool ok = true;
 

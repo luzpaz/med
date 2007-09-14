@@ -14,7 +14,7 @@ namespace INTERP_UTILS
 
   /**
    * Returns the global number of the node of an element.
-   * (1 <= node <= #nodes of element)
+   * (1 <= node <= no. nodes of element)
    *
    * @param      node       the node for which the global number is sought
    * @param      element    an element of the mesh
@@ -32,7 +32,7 @@ namespace INTERP_UTILS
 
   /**
    * Returns the coordinates of a node of an element
-   * (1 <= node <= #nodes)
+   * (1 <= node <= no. nodes)
    *
    * @param      node       the node for which the coordinates are sought
    * @param      element    an element of the mesh

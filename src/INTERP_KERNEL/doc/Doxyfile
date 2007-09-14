@@ -122,7 +122,14 @@ FILE_PATTERNS          = *.c \
                          *.M \
                          *.MM
 RECURSIVE              = YES
-EXCLUDE                = 
+EXCLUDE                = Test/Interpolation3DTest.cxx \
+                         Test/Interpolation3DTest.hxx \
+                         TransformedTriangle_inline.hxx \
+                         Intersector3D.hxx \
+                         Test/CppUnitTest.hxx \
+                         Test/CppUnitTest.cxx \
+                         Intersector.hxx \
+                         Test/TestingUtils.hxx
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXAMPLE_PATH           = 
