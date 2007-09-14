@@ -34,24 +34,18 @@ namespace INTERP_TEST
 
     // triangle to test stable C calculation
     const double err = 1.5e-3;
-    const double ptNearO[3] = { 0.0002e-6, 0.0, 0.0};
-    //const double ptNearO[3] = {0.0,0.0,0.0};
+    
     p2[0] = 0.000000000084654984189118; p2[1] = -0.000000000000000027536546231654231688873; p2[2] = 0.0000000000000001649875466831349431;
     q2[0] = -p2[0] +err; q2[1] = -p2[1] + err; q2[2] = -p2[2] +err;
-    /*  for(int i = 0 ; i < 3 ; ++i)
-	{
-	q2[i] = p2[i] + 2.0*(ptNearO[i] - p2[i]) ;
-	q2[i] += err;
-	}
-    */
     r2[0] = 2.01 ; r2[1] = 1.8; r2[2] = 0.92;
+    
     hp2 = 1 - p2[0] - p2[1] - p2[2];
     hq2 = 1 - q2[0] - q2[1] - q2[2];
     hr2 = 1 - r2[0] - r2[1] - r2[2]; 
     Hp2 = 1 - p2[0] - p2[1];
     Hq2 = 1 - q2[0] - q2[1];
     Hr2 = 1 - r2[0] - r2[1];
-    //  std::cout <<std::endl<< "constructing tri2..." << std::endl;
+    
     tri2 = new TransformedTriangle(p2, q2, r2);
   
   
@@ -247,19 +241,15 @@ namespace INTERP_TEST
 	const double c_yh = tri2->calcUnstableC(seg, TransformedTriangle::C_YH);
 	const double c_zh = tri2->calcUnstableC(seg, TransformedTriangle::C_ZH);
       
-	const double consistency = c_yz*c_xh + c_zx*c_yh + c_xy*c_zh;
-
 	const int num_zero = (c_yz*c_xh == 0.0 ? 1 : 0) + (c_zx*c_yh == 0.0 ? 1 : 0) + (c_xy*c_zh == 0.0 ? 1 : 0);
 	const int num_neg = (c_yz*c_xh < 0.0 ? 1 : 0) + (c_zx*c_yh < 0.0 ? 1 : 0) + (c_xy*c_zh < 0.0 ? 1 : 0);
       
-	//      if(consistency != 0.0) {
-	//      if(num_zeros == 2 || num_neg == 0 || num_neg == 3) 
 	if((num_zero == 1 && num_neg != 1) || num_zero == 2 || num_neg == 0 && num_zero !=3 || num_neg == 3 )
 	  {
 	    ++num_cases;
 	
-	    double min_dist;
-	    TetraCorner min_corner;
+	    double min_dist = -1.0; // initialised first time through loop
+	    TetraCorner min_corner = TransformedTriangle::O;
 	
 	    for(TetraCorner corner = TransformedTriangle::O ; corner <= TransformedTriangle::Z ; corner = TetraCorner(corner + 1))
 	      {
