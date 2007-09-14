@@ -5,6 +5,10 @@
 
 namespace INTERP_UTILS
 {
+  /**
+   * Class performing intersection tests on meshes with hexahedral elements.
+   *
+   */
   class HexaTests : public Interpolation3DTestSuite
   {
     CPPUNIT_TEST_SUITE( HexaTests );
@@ -17,24 +21,33 @@ namespace INTERP_UTILS
     CPPUNIT_TEST_SUITE_END();
 
   public:
+    
+    /// Intersection between two boxes, aligned with the axes.One has 60 hexahedral elements and the other has 39 tetrahedral elements
+    /// Status : pass
     void simpleHexaBox()
     {
-      _testTools->intersectMeshes("meshes/BoxHexa1.med", "BoxHexa1", "meshes/BoxTetra2.med", "BoxTetra2", 65250, 1.0e-5);
+      _testTools->intersectMeshes("BoxHexa1", "BoxTetra2", 65250, 1.0e-5);
     }
 
+    /// Intersection of a box with 60 hexahedral elements with itself
+    /// Status : pass
     void reflexiveHexaBox()
     {
-      _testTools->intersectMeshes("meshes/BoxHexa1.med", "BoxHexa1", "meshes/BoxHexa1.med", "BoxHexa1", 204000);
+      _testTools->intersectMeshes("BoxHexa1", "BoxHexa1", 204000);
     }
 
+    /// Intersection between two boxes, aligned with the axes.Both have hexahedral elements : one 36, the other 60
+    /// Status : pass
     void hexaBoxes()
     {
-      _testTools->intersectMeshes("meshes/BoxHexa1.med", "BoxHexa1", "meshes/BoxHexa2.med", "BoxHexa2", 65250);
+      _testTools->intersectMeshes("BoxHexa1", "BoxHexa2", 65250);
     }
 
+    /// Intersection between two boxes in general position with hexahedral elements. One has 200 elements and the other 420.
+    /// Staus : fails - reason unknown. The matrix does not fulfil the transpose requirement : that W_AB = W_BA^T 
     void hexaBoxesMoved()
     {
-      _testTools->intersectMeshes("meshes/MovedHexaBox1.med", "MovedHexaBox1", "meshes/MovedHexaBox2.med", "MovedHexaBox2", 65250);
+      _testTools->intersectMeshes("MovedHexaBox1", "MovedHexaBox2", 65250);
     }
 
   };

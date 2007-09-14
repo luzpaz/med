@@ -16,9 +16,12 @@ class MeshTestToolkit
 {
 
 public:
+
   MeshTestToolkit() : _interpolator(new Interpolation3D()) {}
   
   ~MeshTestToolkit() { delete _interpolator; }
+
+  void intersectMeshes(const char* mesh1, const char* mesh2, const double correctVol, const double prec = 1.0e-5, bool doubleTest = true) const;
 
   // 1.0e-5 here is due to limited precision of "correct" volumes calculated in Salome
   void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec = 1.0e-5, bool doubleTest = true) const;

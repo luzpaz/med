@@ -5,91 +5,135 @@
 
 namespace INTERP_UTILS
 {
+  /**
+   * Class testing algorithm by intersecting meshes of several 
+   * elements (all tetrahedra) - up to a few thousand. This serves to check the 
+   * filtering methods and the matrix assemblage, as well as verifying
+   * that computation errors do not become unmanageable. It uses mehes of 
+   * different geometries : tetrahedra, boxes and cylinders.
+   *
+   */
   class MultiElementTetraTests : public Interpolation3DTestSuite
   {
     CPPUNIT_TEST_SUITE( MultiElementTetraTests );
 
+    CPPUNIT_TEST( tetraComplexIncluded );
     CPPUNIT_TEST( dividedUnitTetraSimplerReflexive );
     CPPUNIT_TEST( dividedUnitTetraReflexive );
-    CPPUNIT_TEST( nudgedDividedUnitTetra );
     CPPUNIT_TEST( nudgedDividedUnitTetraSimpler );
+    CPPUNIT_TEST( nudgedDividedUnitTetra );
     CPPUNIT_TEST( dividedGenTetra );
+    CPPUNIT_TEST( tinyBoxReflexive );
+    CPPUNIT_TEST( moderateBoxEvenSmallerReflexive );
+    CPPUNIT_TEST( moderateBoxSmallReflexive );
     CPPUNIT_TEST( boxReflexive );
     CPPUNIT_TEST( boxReflexiveModerate );
     CPPUNIT_TEST( tetraBoxes );
-    CPPUNIT_TEST( moderateBoxes );
     CPPUNIT_TEST( moderateBoxesSmaller );
-    CPPUNIT_TEST( moderateBoxSmallReflexive );
-    CPPUNIT_TEST( moderateBoxEvenSmallerReflexive );
-    CPPUNIT_TEST( tinyBoxReflexive );
+    CPPUNIT_TEST( moderateBoxes );
 
     CPPUNIT_TEST_SUITE_END();
+
   public:
+
+    /// Tetrahedron situated totally inside another
+    /// Status : pass
+    void tetraComplexIncluded()
+    {
+      _testTools->intersectMeshes("ComplexIncludedTetra", "ComplexIncludingTetra", 17.0156);
+    }
+
+    /// Unit tetrahedron divided in 4 elements intersecting itself.
+    /// Status : pass
     void dividedUnitTetraSimplerReflexive()
     {
-      _testTools->intersectMeshes("meshes/DividedUnitTetraSimpler.med", "DividedUnitTetraSimpler", "meshes/DividedUnitTetraSimpler.med", "DividedUnitTetraSimpler", 0.1666667);
+      _testTools->intersectMeshes("DividedUnitTetraSimpler", "DividedUnitTetraSimpler", 0.1666667);
     }
 
+    /// Unit tetrahedron divided in 14 elements intersecting itself.
+    /// Status : pass
     void dividedUnitTetraReflexive()
     {
-      _testTools->intersectMeshes("meshes/DividedUnitTetra.med", "DividedUnitTetra", "meshes/DividedUnitTetra.med", "DividedUnitTetra", 0.1666667);
+      _testTools->intersectMeshes("DividedUnitTetra", "DividedUnitTetra", 0.1666667);
     }
 
-  
-    void nudgedDividedUnitTetra()
-    {
-      _testTools->intersectMeshes("meshes/NudgedDividedUnitTetra.med", "NudgedDividedUnitTetra", "meshes/DividedUnitTetra.med", "DividedUnitTetra", 0.150191);
-    }
-
+    /// Unit tetrahedron divided in 4 elements intersecting slightly displaced version of itself.
+    /// Status : pass
     void nudgedDividedUnitTetraSimpler()
     {
-      _testTools->intersectMeshes("meshes/NudgedDividedUnitTetraSimpler.med", "NudgedDividedUnitTetraSimpler", "meshes/DividedUnitTetraSimpler.med", "DividedUnitTetraSimpler", 0.150191);
+      _testTools->intersectMeshes("NudgedDividedUnitTetraSimpler", "DividedUnitTetraSimpler", 0.150191);
     }
 
+    /// Unit tetrahedron divided in 14 elements intersecting slightly displaced version of itself.
+    /// Status : pass
+    void nudgedDividedUnitTetra()
+    {
+      _testTools->intersectMeshes("NudgedDividedUnitTetra", "DividedUnitTetra", 0.150191);
+    }
+
+    /// Two intersecting tetrahedra in general position, one with 23 elements, the other with 643 elements
+    /// Status : pass
     void dividedGenTetra()
     {
-      _testTools->intersectMeshes("meshes/DividedGenTetra1.med", "DividedGenTetra1", "meshes/DividedGenTetra2.med", "DividedGenTetra2", 0.546329);
+      _testTools->intersectMeshes("DividedGenTetra1",  "DividedGenTetra2", 0.546329);
     }
 
-    void boxReflexive()
-    {
-      _testTools->intersectMeshes("meshes/Box3.med", "Box3", "meshes/Box3.med", "Box3", 13.9954);
-    }
-
-    void boxReflexiveModerate()
-    {
-      _testTools->intersectMeshes("meshes/Box1Moderate.med", "Box1Moderate", "meshes/Box1Moderate.med", "Box1Moderate", 1.0e6);
-    }
-
-    void tetraBoxes()
-    {
-      _testTools->intersectMeshes("meshes/Box1.med", "Box1", "meshes/Box2.med", "Box2", 124.197);
-    }
-
-    void moderateBoxes()
-    {
-      _testTools->intersectMeshes("meshes/Box1Moderate.med", "Box1Moderate", "meshes/Box2Moderate.med", "Box2Moderate", 376856);
-    }
-
-    void moderateBoxesSmaller()
-    {
-      _testTools->intersectMeshes("meshes/BoxModSmall1.med", "BoxModSmall1", "meshes/BoxModSmall2.med", "BoxModSmall2", 321853);
-    }
-
-    void moderateBoxSmallReflexive()
-    {
-      _testTools->intersectMeshes("meshes/BoxModSmall1.med", "BoxModSmall1", "meshes/BoxModSmall1.med", "BoxModSmall1", 1.44018e6);
-    }
-
-    void moderateBoxEvenSmallerReflexive()
-    {
-      _testTools->intersectMeshes("meshes/BoxEvenSmaller1.med", "BoxEvenSmaller1", "meshes/BoxEvenSmaller1.med", "BoxEvenSmaller1", 1.44018e6);
-    }
-
+    /// Large box in general position with 12 elements intersecting itself
+    /// Status : pass
     void tinyBoxReflexive()
     {
-      _testTools->intersectMeshes("meshes/TinyBox.med", "TinyBox", "meshes/TinyBox.med", "TinyBox", 979200);
+      _testTools->intersectMeshes("TinyBox", "TinyBox", 979200);
     }
+
+    /// Small box in general position with 33 elements intersecting itself
+    /// Status : pass
+    void boxReflexive()
+    {
+      _testTools->intersectMeshes("Box3",  "Box3", 13.9954);
+    }
+
+    /// Box in general position with 67 elements intersecting itself
+    /// Status : pass
+    void moderateBoxEvenSmallerReflexive()
+    {
+      _testTools->intersectMeshes("BoxEvenSmaller1", "BoxEvenSmaller1", 1.44018e6);
+    }
+
+    /// Box in general position with 544 elements intersecting itself
+    /// Status : pass
+    void moderateBoxSmallReflexive()
+    {
+      _testTools->intersectMeshes("BoxModSmall1", "BoxModSmall1", 1.44018e6);
+    }
+
+    /// Large box in general position with 2943 elements intersecting itself
+    /// Status : pass
+    void boxReflexiveModerate()
+    {
+      _testTools->intersectMeshes("Box1Moderate",  "Box1Moderate", 1.0e6);
+    }
+
+    /// Two intersecting boxes in general position with 12 and 18 elements
+    /// Staus : pass
+    void tetraBoxes()
+    {
+      _testTools->intersectMeshes("Box1", "Box2", 124.197);
+    }
+    
+    /// Two intersecting boxes in general position with 430 and 544 elements
+    /// Staus : pass
+    void moderateBoxesSmaller()
+    {
+      _testTools->intersectMeshes("BoxModSmall1", "BoxModSmall2", 321853);
+    }
+
+    /// Two intersecting boxes in general position with 2943 and 3068 elements
+    /// Staus : pass
+    void moderateBoxes()
+    {
+      _testTools->intersectMeshes("Box1Moderate",  "Box2Moderate", 376856);
+    }
+
   };
 }
 

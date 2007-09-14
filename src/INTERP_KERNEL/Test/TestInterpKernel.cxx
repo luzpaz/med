@@ -28,12 +28,11 @@
 using namespace INTERP_UTILS;
 
 // --- Registers the fixture into the 'registry'
-//CPPUNIT_TEST_SUITE_REGISTRATION( HexaTests );
-//CPPUNIT_TEST_SUITE_REGISTRATION( MultiElementTetraTests );
-//CPPUNIT_TEST_SUITE_REGISTRATION( SingleElementTetraTests );
-CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleIntersectTest );
-//CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleTest );
-//CPPUNIT_TEST_SUITE_REGISTRATION( TestBogusClass );
+CPPUNIT_TEST_SUITE_REGISTRATION( HexaTests );
+CPPUNIT_TEST_SUITE_REGISTRATION( MultiElementTetraTests );
+CPPUNIT_TEST_SUITE_REGISTRATION( SingleElementTetraTests );
+CPPUNIT_TEST_SUITE_REGISTRATION( INTERP_UTILS::TransformedTriangleIntersectTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( INTERP_UTILS::TransformedTriangleTest );
 
 // --- generic Main program from KERNEL_SRC/src/Basics/Test
 

@@ -6,58 +6,56 @@
 
 #define ERR_TOL 1.0e-8
 
-using INTERP_UTILS::TransformedTriangle;
-
-class TransformedTriangleTest : public CppUnit::TestFixture
+namespace INTERP_UTILS
 {
 
-  CPPUNIT_TEST_SUITE( TransformedTriangleTest );
-  CPPUNIT_TEST( test_constructor );
-  CPPUNIT_TEST( test_calcUnstableC );
-  CPPUNIT_TEST( test_calcUnstableT );
-  CPPUNIT_TEST( test_calcStableC_Consistency );
-  CPPUNIT_TEST_SUITE_END();
+  class TransformedTriangleTest : public CppUnit::TestFixture
+  {
 
-  typedef INTERP_UTILS::TransformedTriangle::TriSegment TriSegment;
-  typedef INTERP_UTILS::TransformedTriangle::DoubleProduct DoubleProduct;
+    CPPUNIT_TEST_SUITE( TransformedTriangleTest );
+    CPPUNIT_TEST( test_constructor );
+    CPPUNIT_TEST( test_calcUnstableC );
+    CPPUNIT_TEST( test_calcUnstableT );
+    CPPUNIT_TEST( test_calcStableC_Consistency );
+    CPPUNIT_TEST_SUITE_END();
 
-public:
-  void setUp();
+    typedef INTERP_UTILS::TransformedTriangle::TriSegment TriSegment;
+    typedef INTERP_UTILS::TransformedTriangle::DoubleProduct DoubleProduct;
 
-  void tearDown();
+  public:
+    void setUp();
 
-  // tests
-  void test_constructor();
+    void tearDown();
 
-  void test_calcUnstableC(); 
+    // tests
+    void test_constructor();
 
-  void test_calcUnstableT();
+    void test_calcUnstableC(); 
 
-  void test_calcStableC_Consistency();
-#if 0
-  void inconsistent2();
-#endif
+    void test_calcUnstableT();
 
-  double p1[3], q1[3], r1[3];
-  double hp1, hq1, hr1;
-  double Hp1, Hq1, Hr1;
+    void test_calcStableC_Consistency();
 
-  double p2[3], q2[3], r2[3];
-  double hp2, hq2, hr2;
-  double Hp2, Hq2, Hr2;
+    double p1[3], q1[3], r1[3];
+    double hp1, hq1, hr1;
+    double Hp1, Hq1, Hr1;
 
-  double stable_c2[24];
+    double p2[3], q2[3], r2[3];
+    double hp2, hq2, hr2;
+    double Hp2, Hq2, Hr2;
+
+    double stable_c2[24];
   
-private:
-  TransformedTriangle* tri1;
-  TransformedTriangle* tri2;
+  private:
+    TransformedTriangle* tri1;
+    TransformedTriangle* tri2;
 
-};
-
-
+  };
 
 
 
+
+}
 
 
 

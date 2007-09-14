@@ -84,8 +84,8 @@ namespace INTERP_UTILS
 
   public:
 
-    friend class ::TransformedTriangleTest;
-    friend class ::TransformedTriangleIntersectTest;
+    friend class TransformedTriangleTest;
+    friend class TransformedTriangleIntersectTest;
 
     /*
      * Enumerations representing the different geometric elements of the unit tetrahedron

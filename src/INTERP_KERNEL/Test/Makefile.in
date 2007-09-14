@@ -59,7 +59,7 @@ TEST_PROGS =  TestInterpKernel
 
 BIN = PerfTest
 
-BIN_SRC = CppUnitTest.cxx TransformedTriangleTest.cxx TransformedTriangleIntersectTest.cxx MeshTestToolkit.cxx
+BIN_SRC =  MeshTestToolkit.cxx CppUnitTest.cxx TransformedTriangleTest.cxx TransformedTriangleIntersectTest.cxx MeshTestToolkit.cxx
 
 BIN_CLIENT_IDL =
 

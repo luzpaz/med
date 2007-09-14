@@ -241,9 +241,10 @@ void MeshTestToolkit::dumpIntersectionMatrix(const IntersectionMatrix& m) const
 
 void MeshTestToolkit::calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) const
 {
-  const string dataDir = getenv("DATA_DIR");
+  const string dataBaseDir = getenv("MED_ROOT_DIR");
+  const string dataDir = dataBaseDir + string("share/salome/resources/med/");
 
-  LOG(1, std::endl << "=== -> intersecting src = " << mesh1 << ", target = " << mesh2 );
+  LOG(1, std::endl << "=== -> intersecting src = " << mesh1path << ", target = " << mesh2path );
 
   LOG(5, "Loading " << mesh1 << " from " << mesh1path);
   MESH sMesh(MED_DRIVER, dataDir+mesh1path, mesh1);
@@ -316,6 +317,15 @@ void MeshTestToolkit::intersectMeshes(const char* mesh1path, const char* mesh1, 
     }
 
 }
+
+void MeshTestToolkit::intersectMeshes(const char* mesh1, const char* mesh2, const double correctVol, const double prec, bool doubleTest) const
+  {
+    const string path1 = string(mesh1) + string(".med");
+    std::cout << "here :" << path1 << std::endl;
+    const string path2 = string(mesh2) + string(".med");
+
+    intersectMeshes(path1.c_str(), mesh1, path2.c_str(), mesh2, correctVol, prec, doubleTest);
+  }
 
 std::pair<int,int> MeshTestToolkit::countNumberOfMatrixEntries(const IntersectionMatrix& m)
 {
