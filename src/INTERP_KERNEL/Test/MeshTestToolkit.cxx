@@ -58,7 +58,7 @@ namespace INTERP_TEST
    * Calculates the sum of a column of an intersection matrix
    *
    * @param m  an intersection matrix
-   * @param i  the index of the column (0 <= i <= #rows - 1)
+   * @param i  the index of the column (0 <= i <= no. rows - 1)
    * @return the sum of the values of column i
    *
    */
@@ -102,7 +102,6 @@ namespace INTERP_TEST
 	for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
 	  {
 	    volumes.push_back(iter2->second);
-	    //	  vol += std::abs(iter2->second);
 	  }
       }
   
@@ -250,7 +249,7 @@ namespace INTERP_TEST
   /**
    * Tests if an intersection matrix is diagonal.
    *
-   * @param the intersection matrix
+   * @param m   the intersection matrix
    * @return true if m is diagonal; false if not
    *
    */

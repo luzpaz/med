@@ -15,7 +15,6 @@ namespace INTERP_UTILS
    *
    * @param index   global number of element in the mesh
    * @param mesh    mesh that the element belongs to
-   * @param type    geometric type of the element
    */
   MeshElement::MeshElement(const int index, const MEDMEM::MESH& mesh)
     : _index(index), _box(0), _type(mesh.getElementType(MED_EN::MED_CELL, index))

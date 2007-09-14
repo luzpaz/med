@@ -12,7 +12,8 @@ namespace INTERP_UTILS
   //  Correspondance tables describing all the variations of formulas. 
   // ----------------------------------------------------------------------------------
 
-  /// Correspondance between facets and double products.
+  /// \brief Correspondance between facets and double products.
+  ///
   /// This table encodes Grandy, table IV. Use 3*facet + {0,1,2} as index
   const TransformedTriangle::DoubleProduct TransformedTriangle::DP_FOR_SEG_FACET_INTERSECTION[12] = 
     {
@@ -22,7 +23,8 @@ namespace INTERP_UTILS
       C_XH, C_YH, C_ZH  // XYZ
     };
 
-  /// Signs associated with entries in DP_FOR_SEGMENT_FACET_INTERSECTION
+  /// \brief Signs associated with entries in DP_FOR_SEGMENT_FACET_INTERSECTION.
+  /// 
   /// This table encodes Grandy, table IV. Use 3*facet + {0,1,2} as index
   const double TransformedTriangle::SIGN_FOR_SEG_FACET_INTERSECTION[12] = 
     {
@@ -32,7 +34,8 @@ namespace INTERP_UTILS
       1.0, 1.0,  1.0
     };
 
-  /// Coordinates of corners of tetrahedron.
+  /// \brief Coordinates of corners of tetrahedron.
+  ///
   /// Use 3*Corner + coordinate as index
   const double TransformedTriangle::COORDS_TET_CORNER[12] = 
     {
@@ -42,9 +45,10 @@ namespace INTERP_UTILS
       0.0, 0.0, 1.0
     };
 
-  /// Indices to use in tables DP_FOR_SEG_FACET_INTERSECTION and SIGN_FOR_SEG_FACET_INTERSECTION
+  /// \brief Indices to use in tables DP_FOR_SEG_FACET_INTERSECTION and SIGN_FOR_SEG_FACET_INTERSECTION
   /// for the calculation of the coordinates (x,y,z) of the intersection points
   /// for Segment-Facet and Segment-Edge intersections.
+  ///
   /// Use 3*facet + coordinate as index. -1 indicates that the coordinate is 0.
   const int TransformedTriangle::DP_INDEX[12] =
     {
@@ -55,7 +59,8 @@ namespace INTERP_UTILS
       9, 10, 11  // XYZ
     };
 
-  /// Correspondance edge - corners
+  /// \brief Correspondance edge - corners.
+  ///
   /// Gives the two corners associated with each edge
   /// Use 2*edge + {0, 1} as index
   const TransformedTriangle::TetraCorner TransformedTriangle::CORNERS_FOR_EDGE[12] = 
@@ -68,7 +73,8 @@ namespace INTERP_UTILS
       Z, X  // ZX
     };
 
-  /// Correspondance edge - facets.
+  /// \brief Correspondance edge - facets.
+  ///
   /// Gives the two facets shared by and edge. Use 2*facet + {0, 1} as index
   const TransformedTriangle::TetraFacet TransformedTriangle::FACET_FOR_EDGE[12] =
     {
@@ -80,7 +86,8 @@ namespace INTERP_UTILS
       OZX, XYZ  // ZX
     };
 
-  /// Correspondance corners - edges
+  /// \brief Correspondance corners - edges.
+  ///
   /// Gives edges meeting at a given corner. Use 3*corner + {0,1,2} as index
   const TransformedTriangle::TetraEdge TransformedTriangle::EDGES_FOR_CORNER[12] =
     {
@@ -90,7 +97,8 @@ namespace INTERP_UTILS
       OZ, ZX, YZ  // Z
     };
 
-  /// Double products to use in halfstrip intersection tests
+  /// \brief Double products to use in halfstrip intersection tests.
+  ///
   /// Use 4*(offset_edge) + {0,1,2,3} as index. offset_edge = edge - 3  (so that XY -> 0, YZ -> 1, ZX -> 2)
   /// Entries with offset 0 and 1 are for the first condition (positive product) 
   /// and those with offset 2 and 3 are for the second condition (negative product).
@@ -101,7 +109,8 @@ namespace INTERP_UTILS
       C_XY, C_10, C_YH, C_XY  // ZX
     };
   
-  /// Double products to use in segment-ray test
+  /// \brief Double products to use in segment-ray test.
+  ///
   /// Use 7*corner_offset + {0,1,2,3,4,5,6} as index. corner_offset = corner - 1 (so that X -> 0, Y-> 1, Z->2)
   /// Entries with offset 0 are for first condition (zero double product) and the rest are for condition 3 (in the same
   /// order as in the article)

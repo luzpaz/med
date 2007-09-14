@@ -115,7 +115,6 @@ namespace INTERP_UTILS
     enum IntersectionPolygon{ A = 0, B, NO_INTERSECTION_POLYGONS };
 
     /// Double products
-    /// 
     /// NB : order corresponds to TetraEdges (Grandy, table III)
     enum DoubleProduct { C_YZ = 0, C_ZX, C_XY, C_ZH, C_XH, C_YH, C_01, C_10, NO_DP };
 

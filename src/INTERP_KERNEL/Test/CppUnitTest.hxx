@@ -3,6 +3,9 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
+/**
+ * \brief Class tested by TestBogusClass : not very useful
+ */
 class BogusClass {
   friend class TestBogusClass;
 
@@ -16,7 +19,7 @@ private:
 };
   
 /**
- * \brief Class to test CppUnit : not very useful
+ * \brief Class used to figure out CppUnit : not very useful
  *
  */
 class TestBogusClass : public CppUnit::TestFixture
