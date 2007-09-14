@@ -4,6 +4,7 @@
 #include <algorithm>
 
 using namespace MEDMEM;
+using namespace std;
 
 double sumVolume(const IntersectionMatrix& m) 
 {  
