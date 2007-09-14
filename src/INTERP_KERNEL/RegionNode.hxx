@@ -7,7 +7,7 @@ namespace INTERP_UTILS
 {
 
   /**
-   * Class containing a tuplet of a source region and a target region. 
+   * \brief Class containing a tuplet of a source region and a target region. 
    * This is used as the object to put on the stack in the depth-first search
    * in the bounding-box filtering process.
    */

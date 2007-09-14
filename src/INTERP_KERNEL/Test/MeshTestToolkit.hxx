@@ -14,46 +14,46 @@ using namespace INTERP_UTILS;
 namespace INTERP_TEST
 {
 
-class MeshTestToolkit
-{
+  class MeshTestToolkit
+  {
 
-public:
+  public:
 
-  MeshTestToolkit() : _interpolator(new Interpolation3D()) {}
+    MeshTestToolkit() : _interpolator(new Interpolation3D()) {}
   
-  ~MeshTestToolkit() { delete _interpolator; }
+    ~MeshTestToolkit() { delete _interpolator; }
 
-  void intersectMeshes(const char* mesh1, const char* mesh2, const double correctVol, const double prec = 1.0e-5, bool doubleTest = true) const;
+    void intersectMeshes(const char* mesh1, const char* mesh2, const double correctVol, const double prec = 1.0e-5, bool doubleTest = true) const;
 
-  // 1.0e-5 here is due to limited precision of "correct" volumes calculated in Salome
-  void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec = 1.0e-5, bool doubleTest = true) const;
+    // 1.0e-5 here is due to limited precision of "correct" volumes calculated in Salome
+    void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec = 1.0e-5, bool doubleTest = true) const;
   
-  void dumpIntersectionMatrix(const IntersectionMatrix& m) const;
+    void dumpIntersectionMatrix(const IntersectionMatrix& m) const;
 
-  double sumRow(const IntersectionMatrix& m, int i) const;
+    double sumRow(const IntersectionMatrix& m, int i) const;
 
-  double sumCol(const IntersectionMatrix& m, int i) const;
+    double sumCol(const IntersectionMatrix& m, int i) const;
 
-  void getVolumes( MEDMEM::MESH& mesh,const double*& tab) const;
+    void getVolumes( MEDMEM::MESH& mesh,const double*& tab) const;
 
-  bool testVolumes(const IntersectionMatrix& m,  MEDMEM::MESH& sMesh,  MEDMEM::MESH& tMesh) const;
+    bool testVolumes(const IntersectionMatrix& m,  MEDMEM::MESH& sMesh,  MEDMEM::MESH& tMesh) const;
 
-  double sumVolume(const IntersectionMatrix& m) const;
+    double sumVolume(const IntersectionMatrix& m) const;
 
-  bool areCompatitable( const IntersectionMatrix& m1,  const IntersectionMatrix& m2) const;
+    bool areCompatitable( const IntersectionMatrix& m1,  const IntersectionMatrix& m2) const;
 
-  bool testSymmetric(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const;
+    bool testSymmetric(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const;
 
-  bool testDiagonal(const IntersectionMatrix& m) const;
+    bool testDiagonal(const IntersectionMatrix& m) const;
   
-  void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) const;
+    void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) const;
 
-  std::pair<int,int> countNumberOfMatrixEntries(const IntersectionMatrix& m);
+    std::pair<int,int> countNumberOfMatrixEntries(const IntersectionMatrix& m);
 
-protected:
+  protected:
 
-  Interpolation3D* _interpolator;
+    Interpolation3D* _interpolator;
 
-};
+  };
 }
 #endif

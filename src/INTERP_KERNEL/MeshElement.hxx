@@ -84,7 +84,7 @@ namespace INTERP_UTILS
 
 
   /**
-   * Class defining an order for MeshElements based on their bounding boxes.
+   * \brief Class defining an order for MeshElements based on their bounding boxes.
    * The order defined between two elements is that between a given coordinate of 
    * their bounding boxes. For instance, if the order is based on YMIN, an element whose boxes
    * has a smaller YMIN is sorted before one with a larger YMIN.

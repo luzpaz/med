@@ -23,7 +23,7 @@ class Interpolation3DTest;
 namespace MEDMEM 
 {
   /**
-   * Class used to calculate the volumes of intersection between the elements of two 3D meshes.
+   * \brief Class used to calculate the volumes of intersection between the elements of two 3D meshes.
    * 
    */
   class Interpolation3D : public Interpolation
