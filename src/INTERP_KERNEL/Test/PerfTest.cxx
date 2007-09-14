@@ -1,6 +1,7 @@
 #include "Interpolation3D.hxx"
 #include "MeshTestToolkit.hxx"
 #include "Log.hxx"
+#include "VectorUtils.hxx"
 
 #include "MEDMEM_Mesh.hxx"
 
@@ -81,7 +82,7 @@ namespace INTERP_TEST
      * @return  pair<int, int> containing as its first element the number of elements in m and as its second element the
      *                         number these which are non-zero
      */
-    std::pair<int,int> MeshTestToolkit::countNumberOfMatrixEntries(const IntersectionMatrix& m)
+    std::pair<int,int> countNumberOfMatrixEntries(const IntersectionMatrix& m)
     {
       
       int numElems = 0;
