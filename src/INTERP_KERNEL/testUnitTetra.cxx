@@ -1,27 +1,24 @@
 #include "MEDMEM_Mesh.hxx"
 #include "Interpolation3D.hxx"
 
-#include <algorithm>
+#include <cmath>
 
 using namespace MEDMEM;
 using namespace std;
 
 double sumVolume(const IntersectionMatrix& m) 
 {  
-  vector<double> volumes;
+  double vol = 0.0;
+
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
 	{
-	  volumes.push_back(iter2->second);
-	  //	  vol += std::abs(iter2->second);
+	  vol += std::abs(iter2->second);
 	}
     }
   
-  // sum in ascending order to avoid rounding errors
 
-  sort(volumes.begin(), volumes.end());
-  const double vol = accumulate(volumes.begin(), volumes.end(), 0.0);
 
   return vol;
 }
