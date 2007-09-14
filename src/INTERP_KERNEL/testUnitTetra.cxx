@@ -1,7 +1,29 @@
 #include "MEDMEM_Mesh.hxx"
 #include "Interpolation3D.hxx"
 
+#include <algorithm>
+
 using namespace MEDMEM;
+
+double sumVolume(const IntersectionMatrix& m) 
+{  
+  vector<double> volumes;
+  for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
+    {
+      for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
+	{
+	  volumes.push_back(iter2->second);
+	  //	  vol += std::abs(iter2->second);
+	}
+    }
+  
+  // sum in ascending order to avoid rounding errors
+
+  sort(volumes.begin(), volumes.end());
+  const double vol = accumulate(volumes.begin(), volumes.end(), 0.0);
+
+  return vol;
+}
 
 // simple test to see if a certain mesh is diagonal when intersected with itself
 
@@ -22,26 +44,7 @@ void dumpIntersectionMatrix(const IntersectionMatrix& m)
   std::cout << "Sum of volumes = " << sumVolume(m) << std::endl;
 }
 
-double sumVolume(const IntersectionMatrix& m) 
-{
-  
-  vector<double> volumes;
-  for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
-    {
-      for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  volumes.push_back(iter2->second);
-	  //	  vol += std::abs(iter2->second);
-	}
-    }
-  
-  // sum in ascending order to avoid rounding errors
 
-  sort(volumes.begin(), volumes.end());
-  const double vol = accumulate(volumes.begin(), volumes.end(), 0.0);
-
-  return vol;
-}
 
 int main()
 {
