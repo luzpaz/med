@@ -12,7 +12,18 @@ using namespace MEDMEM;
 
 namespace INTERP_UTILS
 {
-  
+
+   /**
+   * Constructor creating object from target cell global number 
+   * The constructor first calculates the necessary nodes, 
+   * (depending on the splitting policy) and then splits the hexahedron into 
+   * tetrahedra, placing these in the internal vector _tetra.
+   * 
+   * @param srcMesh     mesh containing the source elements
+   * @param targetMesh  mesh containing the target elements
+   * @param targetCell  global number of the target cell
+   * @param policy      splitting policy to be used
+   */
   IntersectorHexa::IntersectorHexa(const MEDMEM::MESH& srcMesh, const MEDMEM::MESH& targetMesh, int targetCell, SplittingPolicy policy)
   {
 
@@ -60,6 +71,11 @@ namespace INTERP_UTILS
       }
   }
     
+  /**
+   * Destructor.
+   * Liberates the IntersectorTetra objects and potential sub-node points that have been allocated.
+   *
+   */
   IntersectorHexa::~IntersectorHexa()
   {
     for(vector<IntersectorTetra*>::iterator iter = _tetra.begin(); iter != _tetra.end(); ++iter)
@@ -76,8 +92,30 @@ namespace INTERP_UTILS
       }
   }
 
+  /**
+   * Splits the hexahedron into five tetrahedra.
+   * This method adds five IntersectorTetra objects to the vector _tetra. 
+   *
+   * @param srcMesh  the source mesh
+   * @param subZone  the local node numbers corresponding to the hexahedron corners - these are mapped onto {0,..,7}. Providing this allows the 
+   *                 splitting to be reused on the subzones of the GENERAL_* types of splitting
+   */
   void IntersectorHexa::fiveSplit(const MEDMEM::MESH& srcMesh, const int* const subZone)
   {
+    // Schema according to which the splitting is performed.
+    // Each line represents one tetrahedron. The numbering is as follows :
+    //
+    //          7 ------ 6
+    //         /|       /|
+    //        / |      / |
+    //       3 ------ 2  |
+    //       |  |     |  |
+    //       |  |     |  |
+    //       |  4-----|- 5
+    //       | /      | /
+    //       0 ------ 1
+
+
     static const int SPLIT_NODES_5[20] = 
       {
 	0, 1, 5, 2,
@@ -87,6 +125,7 @@ namespace INTERP_UTILS
 	0, 2, 5, 7
       };
     
+    // create tetrahedra
     for(int i = 0; i < 5; ++i)
       {
 	const double* nodes[4];
@@ -99,8 +138,29 @@ namespace INTERP_UTILS
       }
   }
 
+  /**
+   * Splits the hexahedron into six tetrahedra.
+   * This method adds six IntersectorTetra objects to the vector _tetra. 
+   *
+   * @param srcMesh  the source mesh
+   * @param subZone  the local node numbers corresponding to the hexahedron corners - these are mapped onto {0,..,7}. Providing this allows the 
+   *                 splitting to be reused on the subzones of the GENERAL_* types of splitting
+   */
   void IntersectorHexa::sixSplit(const MEDMEM::MESH& srcMesh, const int* const subZone)
   {
+    // Schema according to which the splitting is performed.
+    // Each line represents one tetrahedron. The numbering is as follows :
+    //
+    //          7 ------ 6
+    //         /|       /|
+    //        / |      / |
+    //       3 ------ 2  |
+    //       |  |     |  |
+    //       |  |     |  |
+    //       |  4-----|- 5
+    //       | /      | /
+    //       0 ------ 1
+
     static const int SPLIT_NODES_6[24] = 
       {
 	0, 1, 5, 6,
@@ -123,10 +183,20 @@ namespace INTERP_UTILS
       }
   }
 
+  /**
+   * Splits the hexahedron into 24 tetrahedra.
+   * The splitting is done by combining the barycenter of the tetrahedron, the barycenter of each face 
+   * and the nodes of each edge of the face. This creates 6 faces * 4 edges / face = 24 tetrahedra.
+   * The submesh nodes introduced are the barycenters of the faces and the barycenter of the cell.
+   *
+   * @param srcMesh  the source mesh
+   * 
+   */
   void IntersectorHexa::calculateGeneral24Tetra(const MEDMEM::MESH& srcMesh)
   {
-    // the two mesh nodes used in each tetrahedron
-    // the tetrahedra all have nodes (cellCenter, faceCenter, edgeNode1, edgeNode2)
+    // The two nodes of the original mesh cell used in each tetrahedron.
+    // The tetrahedra all have nodes (cellCenter, faceCenter, edgeNode1, edgeNode2)
+    // For the correspondance of the nodes, see the GENERAL_48_SUB_NODES table in calculateSubNodes
     static const int TETRA_EDGES[48] = 
       {
 	// face with center 9
@@ -161,6 +231,7 @@ namespace INTERP_UTILS
 	4, 3
       };
     
+    // nodes to use for tetrahedron
     const double* nodes[4];
     
     // get the cell center
@@ -182,12 +253,22 @@ namespace INTERP_UTILS
       }
   }
 
+
+  /**
+   * Splits the hexahedron into 48 tetrahedra.
+   * The splitting is done by introducing the midpoints of all the edges 
+   * and the barycenter of the element as submesh nodes. The 8 hexahedral subzones thus defined
+   * are then split into 6 tetrahedra each, as in Grandy, p. 449. The division of the subzones 
+   * is done by calling sixSplit().
+   *
+   * @param srcMesh  the source mesh
+   * 
+   */
   void IntersectorHexa::calculateGeneral48Tetra(const MEDMEM::MESH& srcMesh)
   {
-    // define 8 hexahedral subzones as in Grandy, p449
+    // Define 8 hexahedral subzones as in Grandy, p449
     // the values correspond to the nodes that correspond to nodes 1,2,3,4,5,6,7,8 in the subcell
-    // these nodes have correspondance 1 -> 0, 2 -> a, 3 -> e, 4 -> d, 5 -> b, 6 -> c, 7 -> g, 8 -> f
-    // with the Fig. 4.c in Grandy
+    // For the correspondance of the nodes, see the GENERAL_48_SUB_NODES table in calculateSubNodes
     static const int subZones[64] = 
       {
 	1, 9, 22, 13, 10, 21, 27, 23,
@@ -206,6 +287,17 @@ namespace INTERP_UTILS
       }
   }
   
+  /**
+   * Precalculates all the nodes.
+   * Retrieves the mesh nodes and allocates the necessary sub-mesh 
+   * nodes according to the splitting policy used.
+   * This method is meant to be called once by the constructor.
+   *
+   * @param targetMesh  the target mesh
+   * @param targetCell  the global number of the cell that the object represents
+   * @param policy      the splitting policy of the object
+   *
+   */
   void IntersectorHexa::calculateSubNodes(const MEDMEM::MESH& targetMesh, int targetCell, SplittingPolicy policy)
   {
     // retrieve real mesh nodes
@@ -220,6 +312,9 @@ namespace INTERP_UTILS
       {
       case GENERAL_24:
 	{
+	  // Each sub-node is the barycenter of 4 other nodes.
+	  // For the faces, these are on the orignal mesh.
+	  // For the barycenter, the four face sub-nodes are used.
 	  static const int GENERAL_24_SUB_NODES[28] = 
 	    {
 	      1, 2, 5, 6, // sub-node 9 (face)
@@ -242,6 +337,10 @@ namespace INTERP_UTILS
 	
       case GENERAL_48:
 	{
+	  // Each sub-node is the barycenter of two other nodes.
+	  // For the edges, these lie on the original mesh.
+	  // For the faces, these are the edge sub-nodes.
+	  // For the cell these are two face sub-nodes.
 	  static const int GENERAL_48_SUB_NODES[38] = 
 	    {
 	      1, 2,  // sub-node 9 (edge)
@@ -279,6 +378,15 @@ namespace INTERP_UTILS
       }
   }	
 
+  /**
+   * Calculates the volume of intersection of an element in the source mesh and the target element
+   * represented by the object.
+   * The calculation is performed by calling the corresponding method for
+   * each IntersectorTetra object created by the splitting.
+   * 
+   * @param srcCell   global number of the source element (1 <= srcCell < # source cells)
+   *
+   */
   double IntersectorHexa::intersectSourceCell(int srcCell)
   {
     double volume = 0.0;

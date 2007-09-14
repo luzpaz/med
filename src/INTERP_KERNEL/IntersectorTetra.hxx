@@ -148,7 +148,7 @@ namespace INTERP_UTILS
 {
 
   /** 
-   * Class calculating the volume of intersection between a tetrahedral target element and
+   * \brief Class calculating the volume of intersection between a tetrahedral target element and
    * source elements with triangular or quadratilateral faces.
    *
    */
