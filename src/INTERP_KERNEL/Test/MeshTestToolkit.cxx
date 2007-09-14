@@ -27,8 +27,9 @@
 using namespace MEDMEM;
 using namespace std;
 using namespace MED_EN;
+using namespace INTERP_UTILS;
 
-namespace INTERP_UTILS
+namespace INTERP_TEST
 {
 
 double MeshTestToolkit::sumRow(const IntersectionMatrix& m, int i) const

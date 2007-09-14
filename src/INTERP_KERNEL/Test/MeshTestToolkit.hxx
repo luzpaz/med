@@ -9,7 +9,9 @@ class MEDMEM::Interpolation3D;
 using MEDMEM::Interpolation3D;
 class MEDMEM::MESH;
 
-namespace INTERP_UTILS
+using namespace INTERP_UTILS;
+
+namespace INTERP_TEST
 {
 
 class MeshTestToolkit

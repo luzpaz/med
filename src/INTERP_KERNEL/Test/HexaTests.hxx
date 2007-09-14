@@ -3,7 +3,7 @@
 
 #include "Interpolation3DTestSuite.hxx"
 
-namespace INTERP_UTILS
+namespace INTERP_TEST
 {
   /**
    * Class performing intersection tests on meshes with hexahedral elements.

@@ -2,7 +2,9 @@
 
 #include <iostream>
 
-namespace INTERP_UTILS
+using namespace INTERP_UTILS;
+
+namespace INTERP_TEST
 {
 
   void TransformedTriangleTest::setUp() 

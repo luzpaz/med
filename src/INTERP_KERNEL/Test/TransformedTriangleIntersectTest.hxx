@@ -4,7 +4,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include "../TransformedTriangle.hxx"
 
-namespace INTERP_UTILS
+namespace INTERP_TEST
 {
 
   class TransformedTriangleIntersectTest : public CppUnit::TestFixture

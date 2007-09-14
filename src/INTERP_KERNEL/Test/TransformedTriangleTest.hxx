@@ -6,7 +6,9 @@
 
 #define ERR_TOL 1.0e-8
 
-namespace INTERP_UTILS
+using INTERP_UTILS::TransformedTriangle;
+
+namespace INTERP_TEST
 {
 
   class TransformedTriangleTest : public CppUnit::TestFixture

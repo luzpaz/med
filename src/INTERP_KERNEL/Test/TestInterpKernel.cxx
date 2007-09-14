@@ -25,14 +25,14 @@
 #include "SingleElementTetraTests.hxx"
 #include "HexaTests.hxx"
 
-using namespace INTERP_UTILS;
+using namespace INTERP_TEST;
 
 // --- Registers the fixture into the 'registry'
 CPPUNIT_TEST_SUITE_REGISTRATION( HexaTests );
 CPPUNIT_TEST_SUITE_REGISTRATION( MultiElementTetraTests );
 CPPUNIT_TEST_SUITE_REGISTRATION( SingleElementTetraTests );
-CPPUNIT_TEST_SUITE_REGISTRATION( INTERP_UTILS::TransformedTriangleIntersectTest );
-CPPUNIT_TEST_SUITE_REGISTRATION( INTERP_UTILS::TransformedTriangleTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( INTERP_TEST::TransformedTriangleIntersectTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( INTERP_TEST::TransformedTriangleTest );
 
 // --- generic Main program from KERNEL_SRC/src/Basics/Test
 

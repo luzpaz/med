@@ -10,7 +10,7 @@
 using namespace MEDMEM;
 using namespace MED_EN;
 
-namespace INTERP_UTILS
+namespace INTERP_TEST
 {
   class PerfTestToolkit : public MeshTestToolkit
   {
@@ -51,7 +51,7 @@ namespace INTERP_UTILS
 
 int main(int argc, char** argv)
 {
-  using INTERP_UTILS::PerfTestToolkit;
+  using INTERP_TEST::PerfTestToolkit;
 
   assert(argc == 3);
   

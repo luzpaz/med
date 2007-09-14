@@ -5,7 +5,7 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
-namespace INTERP_UTILS
+namespace INTERP_TEST
 {
 
   class Interpolation3DTestSuite : public CppUnit::TestFixture

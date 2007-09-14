@@ -22,8 +22,11 @@
 
 #include "Log.hxx"
 
-class TransformedTriangleTest;
-class TransformedTriangleIntersectTest;
+namespace INTERP_TEST
+{
+  class TransformedTriangleTest;
+  class TransformedTriangleIntersectTest;
+}
 
 
 namespace INTERP_UTILS
@@ -84,8 +87,8 @@ namespace INTERP_UTILS
 
   public:
 
-    friend class TransformedTriangleTest;
-    friend class TransformedTriangleIntersectTest;
+    friend class INTERP_TEST::TransformedTriangleTest;
+    friend class INTERP_TEST::TransformedTriangleIntersectTest;
 
     /*
      * Enumerations representing the different geometric elements of the unit tetrahedron

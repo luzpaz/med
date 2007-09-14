@@ -3,7 +3,7 @@
 
 #include "Interpolation3DTestSuite.hxx"
 
-namespace INTERP_UTILS
+namespace INTERP_TEST
 {
   /**
    * Class testing algorithm by intersecting meshes of several 
