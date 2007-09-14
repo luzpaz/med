@@ -32,9 +32,6 @@ namespace INTERP_TEST
     typedef INTERP_UTILS::TransformedTriangle::DoubleProduct DoubleProduct;
 
   public:
-    // void setUp();
-
-    // void tearDown();
 
     void testTriangle1();
   

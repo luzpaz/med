@@ -15,7 +15,10 @@ private:
   double x;
 };
   
-
+/**
+ * \brief Class to test CppUnit : not very useful
+ *
+ */
 class TestBogusClass : public CppUnit::TestFixture
 {
 

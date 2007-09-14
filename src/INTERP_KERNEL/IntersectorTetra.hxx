@@ -17,7 +17,7 @@ using __gnu_cxx::hash_map;
 namespace INTERP_UTILS
 {
   /**
-   * Class representing a triangular face, used as key in caching hash map in IntersectorTetra.
+   * \brief Class representing a triangular face, used as key in caching hash map in IntersectorTetra.
    *
    */
   class TriangleFaceKey
@@ -123,7 +123,7 @@ namespace __gnu_cxx
 {
 
   /**
-   * Template specialization of __gnu_cxx::hash<T> function object for use with a __gnu_cxx::hash_map 
+   * \brief Template specialization of __gnu_cxx::hash<T> function object for use with a __gnu_cxx::hash_map 
    * with TriangleFaceKey as key class.
    * 
    */

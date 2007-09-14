@@ -4,6 +4,7 @@
 /** 
  * \file Log.hxx
  * \brief Simple pre-processor logging utility.
+ *
  * Replaces LOG( lvl, x ) with "if(lvl <= LOG_LEVEL) std::cout << x << std::endl" when logging is active 
  * (LOG_LEVEL > 0 is defined). x is the level at which the message should be logged - if it is smaller or equal to
  * LOG_LEVEL (which can be defined at compile-time for each file by passing option -DLOG_LEVEL=x to gcc)

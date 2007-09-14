@@ -16,7 +16,8 @@ namespace INTERP_UTILS
 
 namespace MEDMEM
 {
-  /*
+  /** 
+   * \brief OBSOLETE
    * Class calculating the volume of intersection of individual 3D elements.
    *
    */

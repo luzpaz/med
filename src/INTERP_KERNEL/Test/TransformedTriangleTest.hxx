@@ -11,6 +11,10 @@ using INTERP_UTILS::TransformedTriangle;
 namespace INTERP_TEST
 {
 
+  /**
+   * \brief Test suite testing some of the low level methods of TransformedTriangle.
+   *
+   */
   class TransformedTriangleTest : public CppUnit::TestFixture
   {
 

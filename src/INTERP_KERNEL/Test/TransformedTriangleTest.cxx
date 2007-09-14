@@ -7,6 +7,10 @@ using namespace INTERP_UTILS;
 namespace INTERP_TEST
 {
 
+  /**
+   * Creates the TransformedTriangle objects used by the tests.
+   *
+   */
   void TransformedTriangleTest::setUp() 
   {
     // tri1 -> no unstable double products - no changes brought about by preCalculateDoubleProducts
@@ -54,6 +58,10 @@ namespace INTERP_TEST
 
   }
 
+  /**
+   * Liberates the transformed triangle objects used by the test suite
+   * 
+   */
   void TransformedTriangleTest::tearDown() 
   {
     delete tri1;
@@ -61,7 +69,7 @@ namespace INTERP_TEST
   }
 
   /// Tests that _coords has correct values after construction of object is finished
-  /// Status : pass
+  /// \brief Status : pass
   void TransformedTriangleTest::test_constructor() {
     // test that _coords has correct values after constructor is called
 
@@ -91,7 +99,7 @@ namespace INTERP_TEST
   }
 
   /// Tests the calculation of double products (without the corrections)
-  /// Status : pass
+  /// \brief Status : pass
   void TransformedTriangleTest::test_calcUnstableC() {
     typedef TransformedTriangle::TriSegment TriSegment;
 
@@ -147,7 +155,7 @@ namespace INTERP_TEST
   }
 
   /// Tests the calculation of triple products (without corrections)
-  /// Status : pass
+  /// \brief Status : pass
   void TransformedTriangleTest::test_calcUnstableT()
   {
     typedef TransformedTriangle::TetraCorner TetraCorner;
@@ -188,7 +196,7 @@ namespace INTERP_TEST
   }
 
   /// Tests the consistency correction
-  /// Status : fails because it is not significant - the consistency correction is not brought into play
+  /// \brief Status : fails because it is not significant - the consistency correction is not brought into play
   void TransformedTriangleTest::test_calcStableC_Consistency()
   {
 

@@ -3,6 +3,7 @@
 
 namespace MEDMEM
 {
+  /// \brief OBSOLETE
   class TargetIntersector
   {
   public:

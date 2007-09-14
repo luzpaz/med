@@ -1,5 +1,5 @@
-#ifndef __TU_INTERPOLATION_3D_TEST_SUITE_HXX__
-#define __TU_INTERPOLATION_3D_TEST_SUITE_HXX__
+#ifndef __TU_INTERPOLATION_3D_TEST_HXX__
+#define __TU_INTERPOLATION_3D_TEST_HXX__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include "../Interpolation3D.hxx"
@@ -9,7 +9,8 @@
 using MEDMEM::Interpolation3D;
 class MEDMEM::MESH;
 
-class Interpolation3DTestSuite : public CppUnit::TestFixture
+/// \brief OBSOLETE - renamed Interpolation3DTestSuite
+class Interpolation3DTest : public CppUnit::TestFixture
 {
 
 public:

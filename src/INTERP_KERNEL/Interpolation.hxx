@@ -7,6 +7,12 @@
 
 #include "MEDMEM_Mesh.hxx"
 
+/**
+ * \mainpage
+ * Status : documentation of 3D - part of intersection matrix calculation more or less complete
+ *
+ *
+ */
 
 namespace MEDMEM
 {

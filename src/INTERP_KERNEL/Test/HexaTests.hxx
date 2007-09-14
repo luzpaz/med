@@ -6,7 +6,7 @@
 namespace INTERP_TEST
 {
   /**
-   * Class performing intersection tests on meshes with hexahedral elements.
+   * \brief Class performing intersection tests on meshes with hexahedral elements.
    *
    */
   class HexaTests : public Interpolation3DTestSuite
@@ -23,28 +23,28 @@ namespace INTERP_TEST
   public:
     
     /// Intersection between two boxes, aligned with the axes.One has 60 hexahedral elements and the other has 39 tetrahedral elements
-    /// Status : pass
+    /// \brief Status : pass
     void simpleHexaBox()
     {
       _testTools->intersectMeshes("BoxHexa1", "BoxTetra2", 65250, 1.0e-5);
     }
 
     /// Intersection of a box with 60 hexahedral elements with itself
-    /// Status : pass
+    /// \brief Status : pass
     void reflexiveHexaBox()
     {
       _testTools->intersectMeshes("BoxHexa1", "BoxHexa1", 204000);
     }
 
     /// Intersection between two boxes, aligned with the axes.Both have hexahedral elements : one 36, the other 60
-    /// Status : pass
+    /// \brief Status : pass
     void hexaBoxes()
     {
       _testTools->intersectMeshes("BoxHexa1", "BoxHexa2", 65250);
     }
 
     /// Intersection between two boxes in general position with hexahedral elements. One has 200 elements and the other 420.
-    /// Staus : fails - reason unknown. The matrix does not fulfil the transpose requirement : that W_AB = W_BA^T 
+    /// \brief Status : fails - reason unknown. The matrix does not fulfil the transpose requirement : that W_AB = W_BA^T 
     void hexaBoxesMoved()
     {
       _testTools->intersectMeshes("MovedHexaBox1", "MovedHexaBox2", 65250);

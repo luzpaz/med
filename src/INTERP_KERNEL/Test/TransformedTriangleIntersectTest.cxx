@@ -4,12 +4,19 @@
 #include "Log.hxx"
 
 #ifdef OPTIMIZE
-
+/// macro to test for zero double products outside the segment-edge intersection test method
+/// as is done in TransformedTriangle when OPTIMIZE is defined
 #define TEST_ZERO_DP_EDGE(seg, edge) isZero[TT::NO_DP*int(seg) + int(DoubleProduct(edge))]
+
+/// macro to test for zero double products outside the segment-corner intersection test method
+/// as is done in TransformedTriangle when OPTIMIZE is defined
 #define TEST_ZERO_DP_CORNER(seg, corner) \
 isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner] )] && \
 isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner+1] )] && \
 isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner+2] )]
+
+/// macro to test for zero double products outside the segment-ray intersection test method
+/// as is done in TransformedTriangle when OPTIMIZE is defined
 #define TEST_ZERO_DP_RAY(seg, corner) isZero[TT::NO_DP*int(seg) + TT::DP_SEGMENT_RAY_INTERSECTION[7*(corner-1)]]
 
 #else
@@ -19,96 +26,100 @@ isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner+2] )]
 #define TEST_ZERO_DP_RAY(seg, corner) true
 #endif
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \file TransformedTriangleIntersectTest.hxx
-/// Contains unit tests for the intersection methods of the TransformedTriangle class.
-///
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Intersection tests
-/// Each method in this file runs all the intersection tests with some triangle. The goal is to cover all
-/// the different types of intersections between a triangle and a tetrahedron. The table below gives a 
-/// a summary of what is being tested. Before each method, there is also a summary of what how the 
-/// triangle in the method intersects the unit tetrahedron.
-/// 
-/// Since performing all tests would require a large number of triangles, we have limited our coverage to 
-/// be such that each column and each row in the table below has at least one entry for each type of 
-/// intersection. The intersection forumlae are totally symmetric with respect to changing the segment
-/// (PQ, QR, or RP) of the triangle, so they only enter in a very simple way in the code. Testing 
-///  all these cases is therefore of low priority.
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-///
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Intersections tested (number indicates first triangle which contains the intersection):
-// -----------------------------------------------------------------------------------------------------
-// CI  ->  P: 3      Q: 4     R: 7
-// COH ->  P: 9      Q: 8     R: 10
-// CAH ->  P: 4      Q: 10    R: 9
-// -----------------------------------------------------------------------------------------------------
-// SF  ->  (PQ, OZX) : 1   (PQ, OYZ) : 2   (PQ, OXY) : 1   (PQ, XYZ) : 3
-//     ->  (QR, OZX) : 8   (QR, OYZ) : -   (QR, OXY) : 4   (QR, XYZ) : 7
-//     ->  (RP, OZX) : 1   (RP, OYZ) : 3   (RP, OXY) : 7   (RP, XYZ) : 1
-// -----------------------------------------------------------------------------------------------------
-// SE  ->  (PQ, OX)  : 11  (PQ, OY)  : -   (PQ, OZ)  : 12  (PQ, XY)  : 2   (PQ, ZX)  : -  (PQ, YZ)  : 10
-//     ->  (QR, OX)  : -   (QR, OY)  : -   (QR, OZ)  : -   (QR, XY)  : -   (QR, ZX)  : 9  (QR, YZ)  : -
-//     ->  (RP, OX)  : -   (RP, OY)  : 12  (RP, OZ)  : -   (RP, XY)  : -   (RP, ZX)  : -  (RP, YZ)  : -
-// -----------------------------------------------------------------------------------------------------
-// SC  ->  (PQ, O)   : -   (PQ, X)   : -   (PQ, Y)   : 8   (PQ, Z)   : -
-//     ->  (QR, O)   : -   (QR, X)   : 2   (QR, Y)   : -   (QR, Z)   : 13
-//     ->  (RP, O)   : 11  (RP, X)   : -   (RP, Y)   : -   (RP, Z)   : -
-// -----------------------------------------------------------------------------------------------------
-// SHS ->  (PQ, XY)  : 3   (PQ, ZX)  : -   (PQ, YZ)  : 13
-//     ->  (QR, XY)  : 3   (QR, ZX)  : 5   (QR, YZ)  : 3
-//     ->  (RP, XY)  : 1   (RP, ZX)  : 4   (RP, YZ)  : -
-// -----------------------------------------------------------------------------------------------------
-// SR  ->  (PQ, X)   : 6   (PQ, Y)   : 5   (PQ, Z)   : -
-//     ->  (QR, X)   : -   (QR, Y)   : -   (QR, Z)   : 6
-//     ->  (RP, X)   : -   (RP, Y)   : -   (RP, Z)   : -
-// -----------------------------------------------------------------------------------------------------
-// TE  ->  OX : 4   OY : 7    OZ : 8     XY : 1     ZX : 4    YZ : 3
-// -----------------------------------------------------------------------------------------------------
-// TR  ->  X  : 7    Y : 6     Z : 5
-// -----------------------------------------------------------------------------------------------------
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Key to triangle descriptions : 
-// CI  = Triangle corner contained in tetrahedron 
-// COH = Triangle corner on h = 0 face of tetrahedron
-// CAH = Triangle corner above h = 0 face of tetrahedron in z-direction
-// SF  = Segment - facet intersection
-// SE  = Segment - edge intersection
-// SC  = Segment - corner intersection
-// SHS = Segment - halfstrip intersection
-// SR  = Segment - ray intersection
-// TE  = Tetrahedron edge intersects triangle (surface - edge intersection)
-// TR  = Surface - ray intersection
-//
-// In the descriptions for each triangle, square brackets indicate superfluous but allowed intersections
-// that arise as by-products of for instance segment-corner intersections.
-// E.g. A segment - corner intersection can imply three surface - edge intersections
-// Since these "extra" intersections arise under special circumstances, they are not counted in the 
-// table above
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 using namespace INTERP_UTILS;
 
 namespace INTERP_TEST
 {
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /// \class TransformedTriangleIntersectTest
+  /// \brief Class testing the intersection detection methods of TransformedTriangle.
+  ///
+  /// This class contains unit tests for the intersection methods of the TransformedTriangle class.
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /// Each method in the class runs all the intersection tests with some triangle. The goal is to cover all
+  /// the different types of intersections between a triangle and a tetrahedron. The table below gives a 
+  /// a summary of what is being tested. Before each method, there is also a summary of what how the 
+  /// triangle in the method intersects the unit tetrahedron.
+  /// 
+  /// Since performing all tests would require a large number of triangles, we have limited our coverage to 
+  /// be such that each column and each row in the table below has at least one entry for each type of 
+  /// intersection. The intersection forumlae are totally symmetric with respect to changing the segment
+  /// (PQ, QR, or RP) of the triangle, so they only enter in a very simple way in the code. Testing 
+  ///  all these cases is therefore of low priority.
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /// Intersections tested (number indicates first triangle which contains the intersection):
+  /// <PRE>
+  /// -----------------------------------------------------------------------------------------------------
+  /// CI  ->  P: 3      Q: 4     R: 7
+  /// COH ->  P: 9      Q: 8     R: 10
+  /// CAH ->  P: 4      Q: 10    R: 9
+  /// -----------------------------------------------------------------------------------------------------
+  /// SF  ->  (PQ, OZX) : 1   (PQ, OYZ) : 2   (PQ, OXY) : 1   (PQ, XYZ) : 3
+  ///     ->  (QR, OZX) : 8   (QR, OYZ) : -   (QR, OXY) : 4   (QR, XYZ) : 7
+  ///     ->  (RP, OZX) : 1   (RP, OYZ) : 3   (RP, OXY) : 7   (RP, XYZ) : 1
+  /// -----------------------------------------------------------------------------------------------------
+  /// SE  ->  (PQ, OX)  : 11  (PQ, OY)  : -   (PQ, OZ)  : 12  (PQ, XY)  : 2   (PQ, ZX)  : -  (PQ, YZ)  : 10
+  ///     ->  (QR, OX)  : -   (QR, OY)  : -   (QR, OZ)  : -   (QR, XY)  : -   (QR, ZX)  : 9  (QR, YZ)  : -
+  ///     ->  (RP, OX)  : -   (RP, OY)  : 12  (RP, OZ)  : -   (RP, XY)  : -   (RP, ZX)  : -  (RP, YZ)  : -
+  /// -----------------------------------------------------------------------------------------------------
+  /// SC  ->  (PQ, O)   : -   (PQ, X)   : -   (PQ, Y)   : 8   (PQ, Z)   : -
+  ///     ->  (QR, O)   : -   (QR, X)   : 2   (QR, Y)   : -   (QR, Z)   : 13
+  ///     ->  (RP, O)   : 11  (RP, X)   : -   (RP, Y)   : -   (RP, Z)   : -
+  /// -----------------------------------------------------------------------------------------------------
+  /// SHS ->  (PQ, XY)  : 3   (PQ, ZX)  : -   (PQ, YZ)  : 13
+  ///     ->  (QR, XY)  : 3   (QR, ZX)  : 5   (QR, YZ)  : 3
+  ///     ->  (RP, XY)  : 1   (RP, ZX)  : 4   (RP, YZ)  : -
+  /// -----------------------------------------------------------------------------------------------------
+  /// SR  ->  (PQ, X)   : 6   (PQ, Y)   : 5   (PQ, Z)   : -
+  ///     ->  (QR, X)   : -   (QR, Y)   : -   (QR, Z)   : 6
+  ///     ->  (RP, X)   : -   (RP, Y)   : -   (RP, Z)   : -
+  /// -----------------------------------------------------------------------------------------------------
+  /// TE  ->  OX : 4   OY : 7    OZ : 8     XY : 1     ZX : 4    YZ : 3
+  /// -----------------------------------------------------------------------------------------------------
+  /// TR  ->  X  : 7    Y : 6     Z : 5
+  /// -----------------------------------------------------------------------------------------------------
+  /// </PRE>
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  // Triangle 1 has the following intersections
-  // CI     -
-  // COH    -
-  // CAH    -
-  // SF     (PQ, OXY), (PQ, OZX), (RP, XYZ), (RP, OZX)
-  // SE     -
-  // SC     - 
-  // SHS    (RP, XY)
-  // SR     - 
-  // TE     XY
-  // TR     - 
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /// Key to triangle descriptions : 
+  /// CI  = Triangle corner contained in tetrahedron 
+  /// COH = Triangle corner on h = 0 face of tetrahedron
+  /// CAH = Triangle corner above h = 0 face of tetrahedron in z-direction
+  /// SF  = Segment - facet intersection
+  /// SE  = Segment - edge intersection
+  /// SC  = Segment - corner intersection
+  /// SHS = Segment - halfstrip intersection
+  /// SR  = Segment - ray intersection
+  /// TE  = Tetrahedron edge intersects triangle (surface - edge intersection)
+  /// TR  = Surface - ray intersection
+  ///
+  /// In the descriptions for each triangle, square brackets indicate superfluous but allowed intersections
+  /// that arise as by-products of for instance segment-corner intersections.
+  /// E.g. A segment - corner intersection can imply three surface - edge intersections
+  /// Since these "extra" intersections arise under special circumstances, they are not counted in the 
+  /// table above
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /// Triangle 1 has the following intersections
+  /// <PRE>
+  /// CI     -
+  /// COH    -
+  /// CAH    -
+  /// SF     (PQ, OXY), (PQ, OZX), (RP, XYZ), (RP, OZX)
+  /// SE     -
+  /// SC     - 
+  /// SHS    (RP, XY)
+  /// SR     - 
+  /// TE     XY
+  /// TR     - 
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle1()
   {
     LOG(1, "+++++++ Testing triangle 1" );
@@ -253,18 +264,20 @@ namespace INTERP_TEST
 
   }
 
-  // Triangle 2 has the following intersections
-  // CI     -
-  // COH    -
-  // CAH    -
-  // SF     (PQ, OYZ)
-  // SE     (PQ, XY)
-  // SC     (QR, X)
-  // SHS    -
-  // SR     - 
-  // TE     [OX, OZ, ZX]
-  // TR     - 
-
+  /// Triangle 2 has the following intersections
+  /// <PRE>
+  /// CI     -
+  /// COH    -
+  /// CAH    -
+  /// SF     (PQ, OYZ)
+  /// SE     (PQ, XY)
+  /// SC     (QR, X)
+  /// SHS    -
+  /// SR     - 
+  /// TE     [OX, OZ, ZX]
+  /// TR     - 
+  /// </PRE>
+  /// \brief Status: pass
   void TransformedTriangleIntersectTest::testTriangle2()
   {
     LOG(1, "+++++++ Testing triangle 2" );
@@ -406,18 +419,20 @@ namespace INTERP_TEST
     delete tri;
   }
 
-  // Triangle 3 has the following intersections
-  // CI     P
-  // COH    -
-  // CAH    -
-  // SF     (PQ, XYZ), (RP, OYZ)
-  // SE     -
-  // SC     -
-  // SHS    (PQ, XY), (QR, YZ), (QR, XY)
-  // SR     - 
-  // TE     YZ
-  // TR     - 
-
+  /// Triangle 3 has the following intersections
+  /// <PRE>
+  /// CI     P
+  /// COH    -
+  /// CAH    -
+  /// SF     (PQ, XYZ), (RP, OYZ)
+  /// SE     -
+  /// SC     -
+  /// SHS    (PQ, XY), (QR, YZ), (QR, XY)
+  /// SR     - 
+  /// TE     YZ
+  /// TR     - 
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle3()
   {
     LOG(1, "+++++++ Testing triangle 3" );
@@ -562,18 +577,20 @@ namespace INTERP_TEST
     delete tri;
   }
 
-  // Triangle 4 has the following intersections
-  // CI     Q
-  // COH    -
-  // CAH    P
-  // SF     (PQ, XYZ), (QR, OXY)
-  // SE     -
-  // SC     -
-  // SHS    (RP, ZX)
-  // SR     - 
-  // TE     (OX, ZX)
-  // TR     - 
-
+  /// Triangle 4 has the following intersections
+  /// <PRE>
+  /// CI     Q
+  /// COH    -
+  /// CAH    P
+  /// SF     (PQ, XYZ), (QR, OXY)
+  /// SE     -
+  /// SC     -
+  /// SHS    (RP, ZX)
+  /// SR     - 
+  /// TE     (OX, ZX)
+  /// TR     - 
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle4()
   {
     LOG(1, "+++++++ Testing triangle 4" );
@@ -717,18 +734,20 @@ namespace INTERP_TEST
     delete tri;
   }
 
-  // Triangle 5 has the following intersections
-  // CI     -
-  // COH    -
-  // CAH    -
-  // SF     -
-  // SE     -
-  // SC     -
-  // SHS    (QR, ZX), (QR, XY)
-  // SR     (PQ, Y)
-  // TE     -
-  // TR     Z
-
+  /// Triangle 5 has the following intersections
+  /// <PRE>
+  /// CI     -
+  /// COH    -
+  /// CAH    -
+  /// SF     -
+  /// SE     -
+  /// SC     -
+  /// SHS    (QR, ZX), (QR, XY)
+  /// SR     (PQ, Y)
+  /// TE     -
+  /// TR     Z
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle5()
   {
     LOG(1, "+++++++ Testing triangle 5" );
@@ -872,18 +891,20 @@ namespace INTERP_TEST
     delete tri;
   }
 
-  // Triangle 6 has the following intersections
-  // CI     -
-  // COH    -
-  // CAH    -
-  // SF     -
-  // SE     -
-  // SC     -
-  // SHS    -
-  // SR     (PQ, X), (QR, Z) 
-  // TE     -
-  // TR     Y 
-
+  /// Triangle 6 has the following intersections
+  /// <PRE>
+  /// CI     -
+  /// COH    -
+  /// CAH    -
+  /// SF     -
+  /// SE     -
+  /// SC     -
+  /// SHS    -
+  /// SR     (PQ, X), (QR, Z) 
+  /// TE     -
+  /// TR     Y 
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle6()
   {
     LOG(1, "+++++++ Testing triangle 6" );
@@ -1027,18 +1048,20 @@ namespace INTERP_TEST
     delete tri;
   }
 
-  // Triangle 7 has the following intersections
-  // CI     R
-  // COH    -
-  // CAH    -
-  // SF     (RP, OXY),(QR,XYZ)
-  // SE     -
-  // SC     -
-  // SHS    (QR, XY)
-  // SR     - 
-  // TE     OX, ZX
-  // TR     X 
-
+  /// Triangle 7 has the following intersections
+  /// <PRE>
+  /// CI     R
+  /// COH    -
+  /// CAH    -
+  /// SF     (RP, OXY),(QR,XYZ)
+  /// SE     -
+  /// SC     -
+  /// SHS    (QR, XY)
+  /// SR     - 
+  /// TE     OX, ZX
+  /// TR     X 
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle7()
   {
 
@@ -1183,18 +1206,20 @@ namespace INTERP_TEST
     delete tri;
   }
 
-  // Triangle 8 has the following intersections
-  // CI     [Q] 
-  // COH    Q
-  // CAH    -
-  // SF     (QR, OZX), [ (QR, XYZ) ]
-  // SE     -
-  // SC     (PQ,Y)
-  // SHS    -
-  // SR     - 
-  // TE     OZ, [YZ,OY,XY]
-  // TR     - 
-
+  /// Triangle 8 has the following intersections
+  /// <PRE>
+  /// CI     [Q] 
+  /// COH    Q
+  /// CAH    -
+  /// SF     (QR, OZX), [ (QR, XYZ) ]
+  /// SE     -
+  /// SC     (PQ,Y)
+  /// SHS    -
+  /// SR     - 
+  /// TE     OZ, [YZ,OY,XY]
+  /// TR     - 
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle8()
   {
     LOG(1, "+++++++ Testing triangle 8" );
@@ -1337,18 +1362,20 @@ namespace INTERP_TEST
     delete tri;
   }
 
-  // Triangle 9 has the following intersections
-  // CI     [P]
-  // COH    P
-  // CAH    R
-  // SF     (PQ, OZX), [(PQ, XYZ), (RP,XYZ)]
-  // SE     (QR, ZX)
-  // SC     -
-  // SHS    -
-  // SR     - 
-  // TE     [ZX]
-  // TR     - 
-
+  /// Triangle 9 has the following intersections
+  /// <PRE>
+  /// CI     [P]
+  /// COH    P
+  /// CAH    R
+  /// SF     (PQ, OZX), [(PQ, XYZ), (RP,XYZ)]
+  /// SE     (QR, ZX)
+  /// SC     -
+  /// SHS    -
+  /// SR     - 
+  /// TE     [ZX]
+  /// TR     - 
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle9()
   {
     LOG(1, "+++++++ Testing triangle 9" );
@@ -1491,18 +1518,21 @@ namespace INTERP_TEST
     delete tri;
   }
 
-  // Triangle 10 has the following intersections
-  // CI     [R]
-  // COH    R
-  // CAH    Q
-  // SF     (RP, OYZ), [ (RP, XYZ), (QR, XYZ) ]
-  // SE     (PQ, YZ)
-  // SC     -
-  // SHS    -
-  // SR     - 
-  // TE     [YZ]
-  // TR     - 
-
+  
+  /// Triangle 10 has the following intersections
+  /// <PRE>
+  /// CI     [R]
+  /// COH    R
+  /// CAH    Q
+  /// SF     (RP, OYZ), [ (RP, XYZ), (QR, XYZ) ]
+  /// SE     (PQ, YZ)
+  /// SC     -
+  /// SHS    -
+  /// SR     - 
+  /// TE     [YZ]
+  /// TR     - 
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle10()
   {
     LOG(1, "+++++++ Testing triangle 10" );
@@ -1645,18 +1675,20 @@ namespace INTERP_TEST
     delete tri;
   }
 
-  // Triangle 11 has the following intersections
-  // CI     Q, R
-  // COH    -
-  // CAH    -
-  // SF     -
-  // SE     (PQ, OX)
-  // SC     (RP, O)
-  // SHS    -
-  // SR     - 
-  // TE     [OY, OZ]
-  // TR     - 
-
+  /// Triangle 11 has the following intersections
+  /// <PRE>
+  /// CI     Q, R
+  /// COH    -
+  /// CAH    -
+  /// SF     -
+  /// SE     (PQ, OX)
+  /// SC     (RP, O)
+  /// SHS    -
+  /// SR     - 
+  /// TE     [OY, OZ]
+  /// TR     - 
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle11()
   {
     LOG(1, "+++++++ Testing triangle 11" );  
@@ -1800,18 +1832,20 @@ namespace INTERP_TEST
   }
 
 
-  // Triangle 12 has the following intersections
-  // CI     -
-  // COH    -
-  // CAH    -
-  // SF     (QR, OXY), (QR, OZX)
-  // SE     (RP, OY), (PQ, OZ)
-  // SC     -
-  // SHS    -
-  // SR     - 
-  // TE     [OY], [OZ]
-  // TR     - 
-
+  /// Triangle 12 has the following intersections
+  /// <PRE>
+  /// CI     -
+  /// COH    -
+  /// CAH    -
+  /// SF     (QR, OXY), (QR, OZX)
+  /// SE     (RP, OY), (PQ, OZ)
+  /// SC     -
+  /// SHS    -
+  /// SR     - 
+  /// TE     [OY], [OZ]
+  /// TR     - 
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle12()
   {
     LOG(1, "+++++++ Testing triangle 12" );
@@ -1954,18 +1988,20 @@ namespace INTERP_TEST
   }
 
 
-  // Triangle 13 has the following intersections
-  // CI     -
-  // COH    -
-  // CAH    -
-  // SF     (QR, OYZ), (PQ, OXY), (PQ, XYZ)
-  // SE     -
-  // SC     (QR, Z)
-  // SHS    (PQ, YZ)
-  // SR     - 
-  // TE     [OZ, YZ, ZX]
-  // TR     - 
-
+  /// Triangle 13 has the following intersections
+  /// <PRE>
+  /// CI     -
+  /// COH    -
+  /// CAH    -
+  /// SF     (QR, OYZ), (PQ, OXY), (PQ, XYZ)
+  /// SE     -
+  /// SC     (QR, Z)
+  /// SHS    (PQ, YZ)
+  /// SR     - 
+  /// TE     [OZ, YZ, ZX]
+  /// TR     - 
+  /// </PRE>
+  /// \brief Status : pass
   void TransformedTriangleIntersectTest::testTriangle13()
   {
     LOG(1, "+++++++ Testing triangle 13" );
