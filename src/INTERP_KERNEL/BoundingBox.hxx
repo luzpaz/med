@@ -7,7 +7,7 @@ namespace INTERP_UTILS
 {
 
   /**
-   * Class representing the bounding box of a number of points.
+   * \brief Class representing the bounding box of a number of points.
    *
    */
   class BoundingBox 

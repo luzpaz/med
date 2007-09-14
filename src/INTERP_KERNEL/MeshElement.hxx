@@ -16,7 +16,7 @@ namespace INTERP_UTILS
 {
 
   /**
-   * Class representing a single element of a mesh together with its bounding box.
+   * \brief Class representing a single element of a mesh together with its bounding box.
    * It gives access to the element's global number, type and bounding box and allows
    * easy bounding box intersection tests between MeshElements and collections of MeshElement (MeshRegions)
    */

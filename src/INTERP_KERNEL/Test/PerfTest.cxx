@@ -10,12 +10,39 @@
 using namespace MEDMEM;
 using namespace MED_EN;
 
+/**
+ * \file PerfTest.cxx
+ * Test program which takes two meshes and calculates their intersection matrix. 
+ * 
+ * USAGE : PerfTest mesh1 mesh2 
+ *         where mesh1 and mesh2 are the names of two meshes located in
+ *         the files mesh1.med, mesh2.med in {$MED_ROOT_DIR}/share/salome/resources/med/
+ *
+ */
+
 namespace INTERP_TEST
 {
+  /**
+   * \brief Specialization of MeshTestToolkit for the purposes of performance testing.
+   *
+   */
   class PerfTestToolkit : public MeshTestToolkit
   {
     
   public:
+
+    /**
+     * Calculates the intersection matrix for two meshes.
+     * Outputs the names of the meshes intersected, the number of elements in each mesh, 
+     * the number of matrix elements and the number of non-zero matrix elements, etc.
+     * These values help to determine how well the filtering algorithm is working.
+     *
+     * @param  mesh1path   the path to the file containing the source mesh, relative to {$MED_ROOT_DIR}/share/salome/resources/med/
+     * @param  mesh1       the name of the source mesh
+     * @param  mesh2path   the path to the file containing the target mesh, relative to {$MED_ROOT_DIR}/share/salome/resources/med/
+     * @param  mesh2       the name of the target mesh
+     * @param  m           intersection matrix in which to store the result of the intersection
+     */
     void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) 
     {
       const string dataBaseDir = getenv("MED_ROOT_DIR");
@@ -46,9 +73,44 @@ namespace INTERP_TEST
       LOG(1, "Intersection calculation done. " << std::endl );
     
     }
+
+    /**
+     * Counts the number of elements in an intersection matrix, and the number of these which are non-zero.
+     *
+     * @param m  the intersection matrix
+     * @return  pair<int, int> containing as its first element the number of elements in m and as its second element the
+     *                         number these which are non-zero
+     */
+    std::pair<int,int> MeshTestToolkit::countNumberOfMatrixEntries(const IntersectionMatrix& m)
+    {
+      
+      int numElems = 0;
+      int numNonZero = 0;
+      for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
+	{
+	  numElems += iter->size();
+	  for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
+	    {
+	      if(!epsilonEqual(iter2->second, 0.0, VOL_PREC))
+		{
+		  ++numNonZero;
+		}
+	    }
+	}
+      return std::make_pair(numElems, numNonZero);
+  }
+    
   };
 }
 
+/**
+ * Main method of the program. 
+ * Intersects the meshes and outputs some information about the calculation as well as the
+ * intersection matrix on std::cout.
+ *
+ * @param argc  number of arguments given to the program (should be 3, the user giving 2 mesh names)
+ * @param argv  vector to the arguments as strings.
+ */
 int main(int argc, char** argv)
 {
   using INTERP_TEST::PerfTestToolkit;

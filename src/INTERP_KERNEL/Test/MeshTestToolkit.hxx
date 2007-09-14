@@ -13,7 +13,10 @@ using namespace INTERP_UTILS;
 
 namespace INTERP_TEST
 {
-
+  /**
+   * \brief Class providing services for mesh intersection tests.
+   *
+   */
   class MeshTestToolkit
   {
 
@@ -42,16 +45,15 @@ namespace INTERP_TEST
 
     bool areCompatitable( const IntersectionMatrix& m1,  const IntersectionMatrix& m2) const;
 
-    bool testSymmetric(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const;
+    bool testTranspose(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const;
 
     bool testDiagonal(const IntersectionMatrix& m) const;
   
     void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) const;
 
-    std::pair<int,int> countNumberOfMatrixEntries(const IntersectionMatrix& m);
-
   protected:
 
+    /// Interpolation3D object used for interpolation
     Interpolation3D* _interpolator;
 
   };

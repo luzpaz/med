@@ -11,7 +11,7 @@ namespace INTERP_UTILS
   class MeshElement;
 
   /**
-   * Class representing a set of elements in a mesh together with their bounding box.
+   * \brief Class representing a set of elements in a mesh together with their bounding box.
    * It permits to split itself in two, which is used in the depth-first search filtering process.
    *
    */

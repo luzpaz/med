@@ -14,7 +14,7 @@ namespace INTERP_UTILS
 {
 
   /**
-   * Class representing a circular order of a set of points around their barycenter.
+   * \brief Class representing a circular order of a set of points around their barycenter.
    * It is used with the STL sort() algorithm to sort the point of the two polygons
    *
    */

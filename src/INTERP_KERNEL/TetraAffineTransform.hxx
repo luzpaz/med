@@ -7,7 +7,7 @@ namespace INTERP_UTILS
 {
 
   /**
-   * Class representing an affine transformation x -> Ax + b that transforms a given tetrahedron
+   * \brief Class representing an affine transformation x -> Ax + b that transforms a given tetrahedron
    * into the unit tetrahedron.
    *
    */
