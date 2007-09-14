@@ -206,7 +206,7 @@ namespace INTERP_UTILS
       _doubleProducts[8*seg + dp] = 0.0;
     };
   }
-#endif OPTIMIZE
+#endif //OPTIMIZE
 
   /**
    * Calculate the shortest distance between a tetrahedron corner and a triangle segment.

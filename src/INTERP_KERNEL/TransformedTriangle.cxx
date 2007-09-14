@@ -607,7 +607,7 @@ namespace INTERP_UTILS
 	sort((polygon.begin()), polygon.end(), order);
     
 	LOG(3,"Sorted polygon is ");
-	for(int i = 0 ; i < polygon.size() ; ++i)
+	for(size_t i = 0 ; i < polygon.size() ; ++i)
 	  {
 	    LOG(3,vToStr(polygon[i]));
 	  }
