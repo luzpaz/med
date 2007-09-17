@@ -423,33 +423,36 @@ void MESH::printMySelf(ostream &os) const
   os << "Space Dimension : " << spacedimension << endl << endl;
 
   os << "Mesh Dimension : " << meshdimension << endl << endl;
-
-  const double * coordinates = myMesh.getCoordinates(MED_FULL_INTERLACE);
-  os << "SHOW NODES COORDINATES : " << endl;
-
-  os << "Name :" << endl;
-  const string * coordinatesnames = myMesh.getCoordinatesNames();
-  for(int i=0; i<spacedimension ; i++)
+  if(myMesh.getCoordinateptr()) {
+    const double * coordinates = myMesh.getCoordinates(MED_FULL_INTERLACE);
+    os << "SHOW NODES COORDINATES : " << endl;
+    
+    os << "Name :" << endl;
+    const string * coordinatesnames = myMesh.getCoordinatesNames();
+    for(int i=0; i<spacedimension ; i++)
     {
       os << " - " << coordinatesnames[i] << endl;
     }
-  os << "Unit :" << endl;
-  const string * coordinatesunits = myMesh.getCoordinatesUnits();
-  for(int i=0; i<spacedimension ; i++)
+    os << "Unit :" << endl;
+    const string * coordinatesunits = myMesh.getCoordinatesUnits();
+    for(int i=0; i<spacedimension ; i++)
     {
       os << " - " << coordinatesunits[i] << endl;
     }
-  for(int i=0; i<numberofnodes ; i++)
+    for(int i=0; i<numberofnodes ; i++)
     {
       os << "Nodes " << i+1 << " : ";
       for (int j=0; j<spacedimension ; j++)
 	os << coordinates[i*spacedimension+j] << " ";
       os << endl;
     }
-
-  os << endl << "SHOW CONNECTIVITY  :" << endl;
-  os << *myMesh._connectivity << endl;
-
+  }
+  
+  if(myMesh.getConnectivityptr()) {
+    os << endl << "SHOW CONNECTIVITY  :" << endl;
+    os << *myMesh._connectivity << endl;
+  }
+  
   medEntityMesh entity;
   os << endl << "SHOW FAMILIES :" << endl << endl;
   for (int k=1; k<=4; k++)
