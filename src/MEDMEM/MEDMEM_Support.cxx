@@ -367,6 +367,17 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
 
   delete[] index ;
 
+  // PAL16854(Partial support on nodes):
+  // giving a default value to profile names
+  vector<string> prof_names( NumberOfGeometricType);
+  for (int itype=0; itype < NumberOfGeometricType; itype++)
+  {
+    ostringstream typestr;
+    typestr<<"type"<<itype;
+    prof_names[itype]=typestr.str();
+  }
+  setProfilNames(prof_names);
+  
   END_OF(LOC);
 };
 
