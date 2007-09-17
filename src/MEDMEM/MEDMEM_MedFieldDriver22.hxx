@@ -1549,7 +1549,6 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
   // de doubler l'utilisation de la taille mémoire si le champ n'est pas dans
   // le bon mode.
   FIELD<T,FullInterlace> * myField = 0;
-  
   if ( MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
     myField = MED_FIELD_DRIVER<T>::_ptrField;
   else {
@@ -1646,12 +1645,22 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
     // rem 2 : Afin de respecter la norme MEDFICHIER, les indices contenus dans les
     //         profils doivent être croissant
     if (onAll) {
+
       value = myField->getRow(index);
       profilName=MED_NOPFL;
       numberOfElForMED = numberOfElements;
+
     } else {
+
       value = myField->getRow(number[index-1]);
-      profilName = (profilNameList.size()>typeNo) ? profilNameList[typeNo].substr(0,MED_TAILLE_NOM) : MED_NOPFL;
+
+      // PAL16854(Partial support on nodes) ->
+      //profilName = (profilNameList.size()>typeNo) ? profilNameList[typeNo].substr(0,MED_TAILLE_NOM) : MED_NOPFL;
+      if (profilNameList[typeNo].size()>MED_TAILLE_NOM)
+        profilName = profilNameList[typeNo].substr(0,MED_TAILLE_NOM);
+      else
+        profilName=  profilNameList[typeNo];
+
       // Rem : Si le SUPPORT n'est pas onAll mais que pour un type géométrique donné le nom
       // du profil associé est MED_NOPFL alors le profil n'est pas écrit dans le fichier MED.
       // Car en MEDMEMOIRE si le champ repose sur des éléments de deux types géométriques
@@ -1660,18 +1669,21 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
       // Ce n'est pas le cas en MEDFICHIER.
       vector<MED_EN::med_int/*int*/> profil(&number[index-1],&(number[index-1])+numberOfElements);
 
-      // Trouve l'index du type géométrique dans la liste des types géométriques du maillage
-      // correspondant au type géométrique du champ en cours de traitement
-      vector<MED_EN::medGeometryElement>::iterator meshTypeNoIt =
-	find(meshGeoType.begin(),meshGeoType.end(),types[typeNo]);
-      if ( meshTypeNoIt ==  meshGeoType.end() )
-	throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Can't find "<< MED_EN::geoNames[types[typeNo]]
-				      << " on entity " << MED_EN::entNames[entityType]
-				      << " in geometric type list of mesh " << meshName
-				      )
-			   );
-
-      int meshTypeNo = meshTypeNoIt -  meshGeoType.begin();
+      int meshTypeNo=0;
+      if ( entityType != MED_EN::MED_NODE ) // PAL16854(Partial support on nodes)
+      {
+        // Trouve l'index du type géométrique dans la liste des types géométriques du maillage
+        // correspondant au type géométrique du champ en cours de traitement
+        vector<MED_EN::medGeometryElement>::iterator meshTypeNoIt =
+          find(meshGeoType.begin(),meshGeoType.end(),types[typeNo]);
+        if ( meshTypeNoIt ==  meshGeoType.end() )
+          throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Can't find "<< MED_EN::geoNames[types[typeNo]]
+                                        << " on entity " << MED_EN::entNames[entityType]
+                                        << " in geometric type list of mesh " << meshName
+                                        )
+                             );
+        meshTypeNo = meshTypeNoIt -  meshGeoType.begin();
+      }
 
       if ( profilName == MED_NOPFL && profil.size() != meshNbOfElOfType[meshTypeNo] )
 	throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while creating profil for FIELD "<< fieldName 
