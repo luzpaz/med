@@ -34,7 +34,7 @@ GENERATE_TODOLIST      = YES
 GENERATE_TESTLIST      = YES
 GENERATE_BUGLIST       = YES
 ALIASES                = 
-ENABLED_SECTIONS       = 
+ENABLED_SECTIONS       = user
 MAX_INITIALIZER_LINES  = 30
 OPTIMIZE_OUTPUT_FOR_C  = NO
 SHOW_USED_FILES        = NO
@@ -49,12 +49,18 @@ WARN_LOGFILE           = log_user
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = @srcdir@
-FILE_PATTERNS          = MEDMEM*.hxx \
-                         MEDMEM*.cxx
+INPUT                  = @srcdir@ \
+			 @srcdir@/../ParaMEDMEM
+		
+FILE_PATTERNS          = MEDMEM_Mesh.hxx \
+                         MEDMEM_Mesh.cxx \
+			 IntersectionDEC.hxx \
+			 IntersectionDEC.cxx \
+			 *.dox
 RECURSIVE              = NO
 EXCLUDE                = CVS
-EXCLUDE_PATTERNS       = MEDMEM_DriversDef.* \
+EXCLUDE_PATTERNS       = MEDMEM_Driver* \
+		         MEDMEM_Med*
 			 MEDMEM_DriverTools.* \
                          MEDMEM_SkyLineArray.* \
 			 MEDMEM_TypeMeshDriver.* \
@@ -70,7 +76,7 @@ EXCLUDE_PATTERNS       = MEDMEM_DriversDef.* \
 			 MEDMEM_Coordinate.cxx \
 			 MEDMEM_Coordinate.hxx \
                          MEDMEM_ModulusArray.hxx
-EXAMPLE_PATH           = 
+EXAMPLE_PATH           = @srcdir@/../ParaMEDMEM/
 EXAMPLE_PATTERNS       = 
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = 

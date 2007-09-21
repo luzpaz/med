@@ -12,10 +12,45 @@
 #include "IntersectionDEC.hxx"
 #include "ElementLocator.hxx"
 
+/*!
+\defgroup intersectiondec IntersectionDEC
+\author V.Bergeaud
+\date 20/09/2007
 
+\section overview Overview
+
+The IntersectionDEC enables the conservative remapping of fields between two parallel codes. This remapping is based on the computation of intersection volumes between elements from code A and elements from code B. The computation is possible for 3D meshes, 2D meshes, and 3D-surface meshes. Dimensions must be similar for code A and code B (for instance, though it could be desirable, it is not yet possible to couple 3D surfaces to 2D surfaces).
+
+In the present version, only fields lying on elements are considered. 
+
+A typical use of IntersectionDEC encompasses two distinct phases :
+- A setup phase during which the intersection volumes are computed and the communication structures are setup. This corresponds to calling the IntersectionDEC::synchronize() method.
+- A use phase during which the remappings are actually performed. This corresponds to the calls to sendData() and recvData() which actually trigger the data exchange. The data exchange are synchronous in the current version of the library so that recvData() and sendData() calls must be synchronized on code A and code B processor groups. 
+
+The following code excerpt illutrates a typical use of the IntersectionDEC class.
+
+\code
+...
+IntersectionDEC dec(groupA, groupB);
+dec.attachLocalField(field);
+dec.synchronize();
+if (groupA.containsMyRank())
+   dec.recvData();
+else if (groupB.containsMyRank())
+   dec.sendData();
+...
+\endcode
+
+Computing the field on the receiving side can be expressed in terms of a matrix-vector product : \f$ \phi_t=W.\phi_s\f$, with \f$ \phi_t \f$ the field on the target side and \f$ \phi_s \f$ the field on the source side.
+
+\section surface Special features for 3D surface remapping
+When remapping a 3D surface to another 3D surface, a projection phase is necessary to match elements from both sides. Care must be taken when defining this projection to avoid non conservative remappings.
+
+*/
+
+/*! @{ */
 namespace ParaMEDMEM
-{
-    
+{    
 IntersectionDEC::IntersectionDEC()
 {	
 }
@@ -32,7 +67,8 @@ IntersectionDEC::~IntersectionDEC()
  
 }
 
-/*! Synchronization process for exchanging topologies
+/*! 
+Synchronization process for exchanging topologies
  */
 void IntersectionDEC::synchronize()
 {
@@ -98,6 +134,9 @@ void IntersectionDEC::synchronize()
 }
 
 
+/*@
+receives the data whether the processor is on the working side or on the lazy side
+ */
 void IntersectionDEC::recvData()
 {
 	if (_source_group->containsMyRank())
@@ -120,6 +159,10 @@ void IntersectionDEC::recvData()
 	
 }
 
+
+/*!
+sends the data whether the processor is on the working side or on the lazy side
+ */
 void IntersectionDEC::sendData()
 {
 	if (_source_group->containsMyRank())
@@ -140,7 +183,7 @@ void IntersectionDEC::sendData()
 		_interpolation_matrix->transposeMultiply(*_local_field->getField());
 }
 
-
+/*! @} */
 	
 }
 

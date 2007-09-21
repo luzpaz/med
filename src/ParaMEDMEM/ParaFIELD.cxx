@@ -34,9 +34,9 @@ ParaFIELD::ParaFIELD(const ParaSUPPORT* para_support, const ComponentTopology& c
 		"ParaFIELD constructor : Unstructured Support not taken into account with component topology yet"));
 	  else 
 	    {
-	      const ExplicitTopology* source_topo=
-		dynamic_cast<const ExplicitTopology*> (para_support->getTopology());
-	      _topology=new ExplicitTopology(*source_topo,component_topology.nbLocalComponents());
+	      const BlockTopology* source_topo=
+		dynamic_cast<const BlockTopology*> (para_support->getTopology());
+	      _topology=new BlockTopology(*source_topo,component_topology.nbLocalComponents());
 					     
 	    }
 	}
