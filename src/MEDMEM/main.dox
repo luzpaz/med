@@ -1,0 +1,25 @@
+/*!
+\page main_page MEDMEM user's guide
+
+\section intro Introduction
+This document constitutes the user guide of the MEDMEM library and of its related tools.
+
+\section outline Outline
+Chapter \ref medmem covers the MEDMEM library itself. Chapter \ref paramedmem describes its MPI implementation, which is called ParaMEDMEM. Last, \ref medsplitter describes the implementation of the medsplitter tool.
+
+
+*/
+/*!
+\page medmem MEDMEM library
+The library is made up of the following classes :
+\ref mesh
+*/
+
+/*!
+\page paramedmem ParaMEDMEM library
+The ParaMEDMEM library is based on several classes that 
+describe the coupling between two parallel codes.
+
+\ref intersectiondec
+
+*/
