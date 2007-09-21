@@ -149,6 +149,11 @@ salomeinclude_HEADERS= \
 	med_proto.hxx \
 	hdf5_version2api.hxx
 
+EXTRA_DIST+= med_outils.hxx \
+	med_misc.hxx \
+	med_hdfi.hxx \
+	med_utils.hxx
+
 libmed_V2_1_la_CPPFLAGS= -D@MACHINE@ $(HDF5_INCLUDES)
 libmed_V2_1_la_LDFLAGS= $(HDF5_LIBS)
 
