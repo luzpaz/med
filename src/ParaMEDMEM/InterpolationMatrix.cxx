@@ -4,6 +4,7 @@
 #include "InterpolationMatrix.hxx"
 #include "Interpolation2D.hxx"
 #include "Interpolation3DSurf.hxx"
+#include "Interpolation3D.hxx"
 
 /*! \class InterpolationMatrix
 
@@ -76,7 +77,9 @@ void InterpolationMatrix::addContribution(MEDMEM::MESH& distant_support, int ipr
   if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==3)
     interpolator=new MEDMEM::Interpolation3DSurf();
   else if (distant_support.getMeshDimension()==2 && distant_support.getSpaceDimension()==2)
-    interpolator=new MEDMEM::Interpolation2D();
+		interpolator=new MEDMEM::Interpolation2D();
+	else if (distant_support.getMeshDimension()==3 && distant_support.getSpaceDimension()==3)
+    interpolator=new MEDMEM::Interpolation3D();
 	else
 		throw MEDMEM::MEDEXCEPTION("no interpolator exists for these mesh and space dimensions ");
   
