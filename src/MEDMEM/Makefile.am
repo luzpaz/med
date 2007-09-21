@@ -95,7 +95,7 @@ MEDMEM_EnsightFieldDriver.hxx \
 MEDMEM.hxx
 
 # not exported headers
-EXTRA_DIST+= DataTest INTERPOLATION \
+EXTRA_DIST+= DataTest ../INTERPOLATION \
 MEDMEM_MEDMEMchampLire.hxx \
 MEDMEM_MEDMEMgaussEcr.hxx \
 MEDMEM_MEDMEMprofilEcr.hxx
