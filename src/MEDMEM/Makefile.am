@@ -98,7 +98,8 @@ MEDMEM.hxx
 EXTRA_DIST+= DataTest ../INTERPOLATION \
 MEDMEM_MEDMEMchampLire.hxx \
 MEDMEM_MEDMEMgaussEcr.hxx \
-MEDMEM_MEDMEMprofilEcr.hxx
+MEDMEM_MEDMEMprofilEcr.hxx \
+MEDMEM_Formulae.hxx
 
 dist_libmedmem_la_SOURCES= \
 MEDMEM_Init.cxx \
