@@ -27,63 +27,60 @@
 
 #include "MEDMEM_Mesh.hxx"
 
+
+namespace MEDMEM {
+
 /*!
   This class MESHING is a special class to set a MESH object.
 */
-
-namespace MEDMEM {
 class MESHING: public MESH
 {
 public :
   MESHING();
   ~MESHING();
 
-  void setSpaceDimension   (const int SpaceDimension) ;
-  void setMeshDimension    (const int MeshDimension) ;
-  void setNumberOfNodes    (const int NumberOfNodes) ;
-  void setCoordinates      (const int SpaceDimension,
-			    const int NumberOfNodes,
+  void setSpaceDimension   (int SpaceDimension) ;
+  void setMeshDimension    (int MeshDimension) ;
+  void setNumberOfNodes    (int NumberOfNodes) ;
+  void setCoordinates      (int SpaceDimension,
+			    int NumberOfNodes,
 			    const double * Coordinates,
-			    const string System,
-			    const MED_EN::medModeSwitch Mode) ;
-  void setCoordinatesSystem(const string System)
+			    const string& System,
+			    MED_EN::medModeSwitch Mode) ;
+  void setCoordinatesSystem(const string& System)
     throw (MEDEXCEPTION) ;
   void setCoordinatesNames (const string * names) ;
-  void setCoordinateName (const string name, const int i) ;
+  void setCoordinateName (const string& name, int i) ;
   void setCoordinatesUnits (const string * units) ;
-  void setCoordinateUnit (const string unit, const int i) ;
+  void setCoordinateUnit (const string& unit, int i) ;
 
-  void setNumberOfTypes    (const int NumberOfTypes,
-			    const MED_EN::medEntityMesh Entity) 
-    throw (MEDEXCEPTION) ;
+  void setNumberOfTypes    (int NumberOfTypes,
+			     MED_EN::medEntityMesh Entity)     throw (MEDEXCEPTION) ;
   void setTypes            (const MED_EN::medGeometryElement * Types,
-			    const MED_EN::medEntityMesh Entity)
-    throw (MEDEXCEPTION) ;
+			     MED_EN::medEntityMesh Entity)    throw (MEDEXCEPTION) ;
   void setNumberOfElements (const int * NumberOfElements,
-			    const MED_EN::medEntityMesh Entity)
-    throw (MEDEXCEPTION) ;
+			     MED_EN::medEntityMesh Entity)    throw (MEDEXCEPTION) ;
   void setConnectivity     (const int * Connectivity,
-			    const MED_EN::medEntityMesh Entity,
-			    const MED_EN::medGeometryElement Type)
-    throw (MEDEXCEPTION) ;
+			     MED_EN::medEntityMesh Entity,
+			     MED_EN::medGeometryElement Type)    throw (MEDEXCEPTION) ;
   
   void setPolygonsConnectivity     (const int * ConnectivityIndex,
 				    const int * ConnectivityValue,
 				    int nbOfPolygons,
-				    const MED_EN::medEntityMesh Entity)
+				     MED_EN::medEntityMesh Entity)
     throw (MEDEXCEPTION) ;
 
   void setPolyhedraConnectivity     (const int * PolyhedronIndex,
 				     const int * FacesIndex,
 				     const int * Nodes,
 				     int nbOfPolyhedra,
-				     const MED_EN::medEntityMesh Entity)
+				     MED_EN::medEntityMesh Entity)
     throw (MEDEXCEPTION) ;
 
   void setConnectivities   (const int * ConnectivityIndex,
 			    const int * ConnectivityValue,
-			    const MED_EN::medConnectivity ConnectivityType,
-			    const MED_EN::medEntityMesh Entity)
+			    MED_EN::medConnectivity ConnectivityType,
+			    MED_EN::medEntityMesh Entity)
     throw (MEDEXCEPTION) ;
 
 //   void setGroup            (const string name,

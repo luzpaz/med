@@ -49,28 +49,28 @@ using namespace MED_EN;
 
 // Block defining groups for the MEDMEM_ug documentation
 /*!\if MEDMEM_ug
-\defgroup MESH_constructors Constructors
+\defgroup MESH_constructors MESH Constructors
 
 The MESH class provides only two constructors : a copy constructor and
 a constructor enabling creation from file reading. The creation of 
 a user-defined mesh implies the use of the MESHING class.
 
-\defgroup MESH_advanced Advanced features
+\defgroup MESH_advanced MESH Advanced features
 These functions provide access to high-level manipulation of the meshes, giving 
 information about the cells or extracting supports from the mesh.
 
-\defgroup MESH_connectivity Connectivity information
+\defgroup MESH_connectivity MESH Connectivity information
 These methods are related to the extraction of connectivity information
 from the mesh.
 
-\defgroup MESH_nodes Nodes information
+\defgroup MESH_nodes MESH Nodes information
 These methods are related to the extraction of information about the mesh nodes.
 
-\defgroup MESH_general General information
+\defgroup MESH_general MESH General information
 
 These methods are related to the retrieval of general information about the mesh.
 
-\defgroup MESH_poly Polygons and Polyhedra information
+\defgroup MESH_poly MESH Polygons and Polyhedra information
 
 These methods are specific methods used for retrieving connectivity
 information for MED_POLYGON and MED_POLYHEDRON elements.

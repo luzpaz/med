@@ -38,9 +38,18 @@ using namespace MED_EN;
 
 
 // Block defining the comments for the MEDMEM_ug documentation
+
 /*! \if MEDMEM_ug
+
 \defgroup GRID_axes Information about axes
+This group of methods retrieves information about the axes of the grid.
+
 \defgroup GRID_connectivity Utility methods for defining element positions in the grid
+These methods enable the user to convert a position on the grid to a global element number
+
+\defgroup GRID_constructors Constructors
+These methods are the different constructors for the grid objects.
+
 \endif
 */
 
@@ -58,6 +67,23 @@ GRID::GRID() {
 ////function : GRID
 ////purpose  : array constructor
 ////=======================================================================
+/*!
+\if MEDMEM_ug
+\addtogroup GRID_constructors
+@{
+\endif
+*/
+/*!
+ * \brief Constructor specifying the axes of the grid
+ *
+ * This constructor describes the grid by specifying the location of the nodes on 
+each of the axis. The dimension of the grid is implicitly defined by the
+size of vector \a xyz_array.
+ *
+ *\param xyz_array specifies the node coordinates for each direction 
+ *\param coord_name names of the different coordinates
+ *\param med_grid_type  grid type (MED_POLAR, MED_CARTESIAN)
+*/
 GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name, 
 	   const std::vector<std::string>& coord_unit, const med_grid_type type) : _gridType(type)
 {
@@ -104,6 +130,7 @@ GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<
     _is_connectivity_filled = false;
     _isAGrid = true;
 }
+/*!\if MEDMEM_ug @} \endif */
 
 //=======================================================================
 //function : GRID
@@ -815,9 +842,24 @@ const double GRID::getArrayValue (const int Axis, const int i) const throw (MEDE
 
 /*!
 \if MEDMEM_ug
+\addtogroup GRID_connectivity
 @{
 \endif
 */
+/*!
+@{
+\name Position to number conversion methods
+\a getXXXNumber methods enable the user to convert an \f$ (i,j,k)\f$ position into a global number in the array.
+
+Axis [1,2,3] means one of directions: along \a i, \a j or \a k.
+For cell constituents (FACE or EDGE), Axis selects one of those having same  \f$ (i, j, k )\f$ :
+- a FACE which is normal to direction along given \a Axis;
+- an EDGE going along given \a Axis.
+
+Exception for \a Axis out of range.
+For 2D grids, \a k is a dummy argument. */
+/*! Edge position to number conversion method*/
+
 int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
   const throw (MEDEXCEPTION)
 {
@@ -893,12 +935,23 @@ int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
 
   return Nb;
 }
+/*! @} */
 
-//=======================================================================
-//function : getNodePosition
-//purpose  : 
-//=======================================================================
 
+/*!
+@{
+\name Number to position conversion methods
+
+\a getXXXPosition functions enable the user to convert
+a number into a \f$ (i,j,k) \f$ position. 
+           Axis [1,2,3] means one of directions: along i, j or k
+           For Cell contituents (FACE or EDGE), Axis selects one of those having same (i,j,k):
+           - a FACE which is normal to direction along given Axis;
+           - an EDGE going along given Axis.
+
+    Exception for Number out of range.
+*/
+/*! Node number to position conversion method */
 void GRID::getNodePosition(const int Number, int& i, int& j, int& k) const
   throw (MEDEXCEPTION)
 {
@@ -929,7 +982,7 @@ void GRID::getNodePosition(const int Number, int& i, int& j, int& k) const
 //function : getCellPosition
 //purpose  : 
 //=======================================================================
-
+/*! Cell number to position conversion method */
 void GRID::getCellPosition(const int Number, int& i, int& j, int& k) const
   throw (MEDEXCEPTION)
 {
@@ -957,7 +1010,7 @@ void GRID::getCellPosition(const int Number, int& i, int& j, int& k) const
 //function : getEdgePosition
 //purpose  : 
 //=======================================================================
-
+/*! Edge number to poistion conversion method*/
 void GRID::getEdgePosition(const int Number, int& Axis, int& i, int& j, int& k)
   const throw (MEDEXCEPTION)
 {
@@ -1022,7 +1075,7 @@ void GRID::getEdgePosition(const int Number, int& Axis, int& i, int& j, int& k)
 //           * an EDGE going along given Axis.
 //           Exception for Number out of range
 //=======================================================================
-
+/*! Face number to position convertion method*/
 void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
   const throw (MEDEXCEPTION)
 {
@@ -1082,6 +1135,7 @@ void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
   throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "Number is out of range: " << Number));
 }
 /*!
+@}
 \if MEDMEM_ug
 @}
 \endif

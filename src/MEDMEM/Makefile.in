@@ -138,6 +138,7 @@ MEDMEM_TopLevel.cxx \
 MEDMEM_ConnectZone.cxx
 
 
+
 # Executables targets
 BIN = med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH 
 BIN_SRC = 
@@ -188,5 +189,8 @@ bin: create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_mesh_c3h8q4_wrong 
 
 create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_grid create_mesh_c2q4 create_mesh_c3h8 create_mesh_c3h8q4_wrong create_mesh_c2q4s2_wrong create_poly3D: %: %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $(MED2_LIBS) $(HDF5_LIBS) $< 
+
+doc :
+	doxygen Doxyfile_med_user
 
 @CONCLUDE@

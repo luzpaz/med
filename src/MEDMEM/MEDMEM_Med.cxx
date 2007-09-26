@@ -39,15 +39,39 @@ using namespace MED_EN;
 
 #define MED_NOPDT -1
 
-/*!
-  Constructor.
+/*!\if MEDMEM_ug
+
+\defgroup MED_constructors Constructors
+
+\defgroup MED_query Query methods
+These methods enable the user to retrieve information
+about a MED file structure, i.e. the meshes, supports
+and fields that it contains.
+
+\defgroup MED_io File I/O methods
+These methods are similar to their MESH counterparts. 
+Reading should be achieved thrfough the MED constructor, while writing 
+is performed thanks to two calls : one attaching a driver to the MED
+object, the other one writing the file.
+\endif
 */
+
+
 MED::MED() {
   MESSAGE("MED::MED()");
 };
 
+/*! \if MEDMEM_ug 
+\addtogroup MED_constructors
+@{
+\endif
+*/
+
 /*!
-  Constructor.
+This constructor constructs the Med object from the file \a filename.
+The driver type can specify whether the file is opened in read, write or
+read/write mode. Specifying MED_DRIVER as a \a driverType opens the file in read/write mode.
+It is also possible to use VTK_DRIVER to open a VTK ascii file.
 */
 MED::MED(driverTypes driverType, const string & fileName)
 {
@@ -65,8 +89,12 @@ MED::MED(driverTypes driverType, const string & fileName)
   END_OF(LOC);
 };
 
-/*!
+/*!\if MEDMEM_ug @} \endif */
+
+
+/*!\ifnot MEDMEM_ug
   Destructor.
+\endif
 */
 MED::~MED()
 {
@@ -170,6 +198,11 @@ MED::~MED()
   END_OF(LOC);
 } ;
 
+/*! \if MEDMEM_ug
+\addtogroup MED_io
+@{
+\endif
+*/
 
 /*!
   Create the specified driver and return its index reference to path to 
@@ -230,6 +263,7 @@ int  MED::addDriver(GENDRIVER & driver) {
   return current;
   
 }
+/*! \if MEDMEM_ug @} \endif */
 
 /*!
   Remove the driver referenced by its index.
@@ -273,6 +307,12 @@ void MED::writeFrom (int index/*=0*/)
   END_OF(LOC);
 }; 
 
+/*!\if MEDMEM_ug 
+\addtogroup MED_io
+@{
+\endif
+*/
+
 /*!
   Write all objects with the driver given by its index.
 */
@@ -294,6 +334,7 @@ void MED::write (int index/*=0*/)
                           ); 
   END_OF(LOC);
 }; 
+/*!\if MEDMEM_ug @} \endif */
 
 /*!
   Parse all the file and generate empty object.
@@ -301,7 +342,7 @@ void MED::write (int index/*=0*/)
   All object must be read explicitly later with their own method read 
   or use MED::read to read all.
 
-  This method is automaticaly call by constructor with driver information.
+  This method is automatically called by constructor with driver information.
 */
 void MED::readFileStruct (int index/*=0*/)
   throw (MED_EXCEPTION)
@@ -354,8 +395,14 @@ void MED::read  (int index/*=0*/)
 
 // ------- End Of Drivers Management Part
 
+/*! \if MEDMEM_ug
+\addtogroup MED_query
+@{
+\endif
+*/
+
 /*!
-  Get the number of MESH objects.
+  Gets the number of MESH objects.
 */
 int      MED::getNumberOfMeshes ( void ) const {
 
@@ -366,7 +413,7 @@ int      MED::getNumberOfMeshes ( void ) const {
 };   
     
 /*!
-  Get the number of FIELD objects.
+  Gets the number of FIELD objects.
 */
 int      MED::getNumberOfFields ( void ) const {
 
@@ -377,7 +424,7 @@ int      MED::getNumberOfFields ( void ) const {
 };       
 
 /*!
-  Get the names of all MESH objects.
+  Gets the names of all MESH objects.
 
   meshNames is an in/out argument.
 
@@ -415,9 +462,9 @@ void MED::getMeshNames      ( string * meshNames ) const
 };
 
 /*!
-  Get the names of all MESH objects.
+  Gets the names of all MESH objects.
 
-  Return a deque<string> object which contain the name of all MESH objects.
+  Returns a deque<string> object which contain the name of all MESH objects.
 */
 deque<string> MED::getMeshNames      () const {
   
@@ -441,7 +488,7 @@ deque<string> MED::getMeshNames      () const {
 
 
 /*!
-  Return a reference to the MESH object named meshName.
+  Returns a reference to the MESH object named meshName.
 */
 MESH   * MED::getMesh           ( const string & meshName )  const
   throw (MED_EXCEPTION)
@@ -465,7 +512,7 @@ MESH   * MED::getMesh           ( const string & meshName )  const
 }
 
 /*!
- \internal Return a reference to the MESH object associated with 
+ \internal Returns a reference to the MESH object associated with 
  field argument.
 */
 MESH   * MED::getMesh           (const FIELD_ * const field ) const
@@ -502,7 +549,7 @@ MESH   * MED::getMesh           (const FIELD_ * const field ) const
 
 
 /*!
-  Get the names of all FIELD objects.
+  Gets the names of all FIELD objects.
 
   fieldNames is an in/out argument.
 
@@ -540,9 +587,9 @@ void MED::getFieldNames     ( string * fieldNames ) const
 };
 
 /*!
-  Get the names of all FIELD objects.
+  Gets the names of all FIELD objects.
 
-  Return a deque<string> object which contain the name of all FIELD objects.
+  Returns a deque<string> object which contain the name of all FIELD objects.
 */
 deque<string> MED::getFieldNames     () const {
 
@@ -565,8 +612,15 @@ deque<string> MED::getFieldNames     () const {
 };
 
 /*!
-  Return a deque<DT_IT_> which contain all iteration step for the FIELD 
-  identified by its name.
+  Returns a deque<DT_IT_> which contain all iteration step for the FIELD 
+  identified by its name. DT_IT_ definition is 
+\verbatim
+typedef struct { int dt; int it; } DT_IT_;
+\endverbatim
+
+\a dt represents the time iteration number, while \a it represents
+the inner iteration number.
+
 */
 deque<DT_IT_> MED::getFieldIteration (const string & fieldName) const
   throw (MED_EXCEPTION)
@@ -615,7 +669,7 @@ deque<DT_IT_> MED::getFieldIteration (const string & fieldName) const
 };
 
 /*!
- Return a reference to the FIELD object named fieldName with 
+ Returns a reference to the FIELD object named fieldName with 
  time step number dt and order number it.
 */
 FIELD_  * MED::getField          ( const string & fieldName, const int dt=MED_NOPDT, const int it=MED_NOPDT ) const
@@ -658,9 +712,14 @@ FIELD_  * MED::getField          ( const string & fieldName, const int dt=MED_NO
   return (*itMap_dtIt).second;
   
 };
+/*!\if MEDMEM_ug
+ @}
+ \endif 
+*/
+
 
 /*!
- Return a reference to the FIELD object named fieldName with 
+ Returns a reference to the FIELD object named fieldName with 
  time and iteration nb it.
 */
 FIELD_  *MED::getField2(const string & fieldName, double time, int it) const throw (MEDEXCEPTION)
@@ -690,8 +749,9 @@ FIELD_  *MED::getField2(const string & fieldName, double time, int it) const thr
 //   return os;
 // };
 
+
 /*!
-  Return a map<MED_EN::medEntityMesh,SUPPORT*> which contain 
+  Returns a map<MED_EN::medEntityMesh,SUPPORT*> which contain 
   foreach entity, a reference to the SUPPORT on all elements.
 */
 const map<MED_EN::medEntityMesh,SUPPORT*> & MED::getSupports(const string & meshName) const
@@ -712,8 +772,15 @@ const map<MED_EN::medEntityMesh,SUPPORT*> & MED::getSupports(const string & mesh
   return (*itSupportOnMesh).second ;
 }
 
+
+/*! \if MEDMEM_ug
+\addtogroup MED_query
+@{
+\endif
+*/
+
 /*!
-  Return a reference to the SUPPORT object on all elements of entity 
+  Returns a reference to the SUPPORT object on all elements of entity 
   for the MESH named meshName.
 */
 SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity) const 
@@ -779,11 +846,24 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
   END_OF(LOC);
   return (*itSupport).second ;
 };
+/*!\if MEDMEM_ug @} \endif */
+
+
 
 /*!
-  Temporary method : when all MESH objects are read, this methods 
-  update all SUPPORT objects with the rigth dimension.
+The need for this method arises from the following situation.
+When loading a mesh, Medmem reads the constituent elements
+in the Med file. It is possible at this stage that not all
+constituent elements are stored in memory (For instance, reading 
+a 2D mesh, not all the edges are present, because only 
+the boundaries were stored in the file). 
+When computing descending connectivities, Medmem stores all the 
+faces and has a corresponding numbering. This introduces a
+discrepancy between the support numbering which was determined at
+file loading and the new numbering. The following method
+synchronizes the two numberings.
 */
+
 void MED::updateSupport ()
 {
  
@@ -810,7 +890,7 @@ void MED::updateSupport ()
 }
 
 /*!
-  Add the given MESH object. MED object control it,
+  Adds the given MESH object. MED object control it,
   and destroy it, so you must not destroy it after.
 
   The meshName is given by the MESH object.
