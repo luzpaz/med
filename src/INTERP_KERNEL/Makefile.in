@@ -34,7 +34,7 @@ MACHINE=PCLINUX
 
 @COMMENCE@
 
-#SUBDIRS=Test
+SUBDIRS= Test
 
 EXPORT_PYSCRIPTS = \
 
@@ -107,8 +107,8 @@ CPPFLAGS+= -DLOG_LEVEL=0
 #CPPFLAGS+=-fprofile-arcs -ftest-coverage 
 
 #for gprof
-#CXXFLAGS+=-pg
-#CPPFLAGS+=-pg
+CXXFLAGS+=-pg -I./Test/
+CPPFLAGS+=-pg
 
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
