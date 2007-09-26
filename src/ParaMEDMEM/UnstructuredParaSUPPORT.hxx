@@ -30,7 +30,7 @@ namespace ParaMEDMEM
     const Topology* UnstructuredParaSUPPORT::getTopology() const
       {return _explicit_topology;}
   private:
-    const ExplicitTopology*  _explicit_topology;
+    const Topology*  _explicit_topology;
     const MED_EN::medEntityMesh _entity;
 	
   };

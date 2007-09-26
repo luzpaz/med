@@ -68,8 +68,10 @@ int main(int argc, char** argv)
   if (source_group->containsMyRank())
     {
 			//      string master = "/home/vb144235/resources/square128000_split";
-      string master = "/home/vb144235/resources/blade_3000_split1";
-      
+			      string master = "/home/vb144235/resources/blade_12000_split2";
+			//			 string master = "/home/vb144235/resources/cube_30_split1";
+			//      			 string master = "/home/vb144235/resources/DividedUnitTetraSimpler_split1";
+
       cout <<"loading source"<<endl;
       source_mesh=new ParaMESH(MED_DRIVER,master,*source_group);
       cout <<"end of load"<<endl;
@@ -80,8 +82,11 @@ int main(int argc, char** argv)
   //loading the geometry for the target group
   if (target_group->containsMyRank())
     {
-			//      string master = "/home/vb144235/resources/square30000_split";
-      string master= "/home/vb144235/resources/blade_12000_split1";
+			//string master = "/home/vb144235/resources/square30000_split";
+			string master= "/home/vb144235/resources/blade_3000_split2";
+			//string master = "/home/vb144235/resources/cube_5_split1";
+			// string master = "/home/vb144235/resources/DividedUnitTetraSimpler_split1";
+
       target_mesh=new ParaMESH(MED_DRIVER,master,*target_group);
       topo_target=target_mesh->getBlockTopology();
    
@@ -94,8 +99,8 @@ int main(int argc, char** argv)
   if (source_group->containsMyRank())
     { 
         
-      //UnstructuredParaSUPPORT source_support(boundary_group, source_group);
-      UnstructuredParaSUPPORT source_support(source_mesh, boundary_group);
+      UnstructuredParaSUPPORT source_support(boundary_group, *source_group);
+      
       ComponentTopology source_comp(1);
       cout << "setting up field"<<endl;
       ParaFIELD source_field (&source_support,source_comp);
@@ -127,7 +132,7 @@ int main(int argc, char** argv)
   if (target_group->containsMyRank())
     {
 
-      UnstructuredParaSUPPORT target_support(target_mesh, boundary_group);
+      UnstructuredParaSUPPORT target_support(boundary_group, *target_group);
       //UnstructuredParaSUPPORT target_support(boundary_group, target_group);	
       ComponentTopology target_comp(1);
       ParaFIELD target_field(&target_support,target_comp);

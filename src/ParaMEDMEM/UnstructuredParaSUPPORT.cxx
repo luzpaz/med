@@ -26,7 +26,9 @@ _entity(support->getEntity())
   name << support->getName();
   _mesh=new ParaMESH(*support->getMesh(), proc_group, name.str() );
   _support=support;
-  _explicit_topology=new ExplicitTopology(*(ParaSUPPORT*)this);
+  int nb_elem=_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  //  _explicit_topology=new ExplicitTopology(*(ParaSUPPORT*)this);
+  _explicit_topology=new BlockTopology(proc_group,nb_elem);
 }
 
 UnstructuredParaSUPPORT::UnstructuredParaSUPPORT(const ParaMESH* const mesh, const MED_EN::medEntityMesh entity):

@@ -67,8 +67,6 @@ CPPFLAGS+=$(BOOST_CPPFLAGS)
 # change motivated by the bug KERNEL4778.
 LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem  $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel -lparamed
 
-#LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
-# change motivated by the bug KERNEL4778.
 LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel  -lparamed
 
 ifeq ($(MED_WITH_KERNEL),yes)

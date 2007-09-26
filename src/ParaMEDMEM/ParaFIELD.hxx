@@ -4,6 +4,7 @@
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_Field.hxx"
+#include "ComponentTopology.hxx"
 
 namespace MEDMEM{
 	class MEDEXCEPTION;
@@ -13,7 +14,7 @@ namespace MEDMEM{
 
 namespace ParaMEDMEM
 {
-class ComponentTopology;
+
 class ParaSUPPORT;
 class ProcessorGroup;
 
@@ -21,7 +22,7 @@ class ParaFIELD
 {
 public:
 
-	ParaFIELD(const ParaSUPPORT* support, const ComponentTopology& component_topology); 
+	ParaFIELD(const ParaMEDMEM::ParaSUPPORT* support, const ParaMEDMEM::ComponentTopology& component_topology); 
 
 	ParaFIELD(MEDMEM::driverTypes driver_type, const string& file_name, 
 		const string& driver_name, const ComponentTopology& component_topology) 
@@ -30,8 +31,8 @@ public:
   
 	virtual ~ParaFIELD();
 	void write(MEDMEM::driverTypes driverType, const string& fileName="", const string& meshName="");
-	void synchronizeTarget(ParaFIELD* source_field);
-	void synchronizeSource(ParaFIELD* target_field);
+	void synchronizeTarget( ParaMEDMEM::ParaFIELD* source_field);
+	void synchronizeSource( ParaMEDMEM::ParaFIELD* target_field);
 	MEDMEM::FIELD<double>* getField() const {return _field;}
   const ParaSUPPORT* getSupport() const {return _support;}
 	Topology* getTopology() const {return _topology;}
@@ -40,10 +41,10 @@ public:
 	double getL2norm()const{return -1;}
 private:
 	MEDMEM::FIELD<double>* getSupportVolumes(const MEDMEM::SUPPORT& support) const;
-	const ComponentTopology& _component_topology;
-	Topology* _topology; 
+	const  ParaMEDMEM::ComponentTopology& _component_topology;
+	 ParaMEDMEM::Topology* _topology; 
 	MEDMEM::FIELD<double>* _field;
-	const ParaSUPPORT* _support;
+	const  ParaMEDMEM::ParaSUPPORT* _support;
 };
 
 }

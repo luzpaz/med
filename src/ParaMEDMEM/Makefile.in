@@ -62,8 +62,10 @@ UnstructuredParaSUPPORT.hxx\
 ExplicitCoincidentDEC.hxx\
 ElementLocator.hxx\
 ExplicitMapping.hxx\
-TranslationRotationMatrix.hxx\
-BBTree.H
+ICoCoField.hxx \
+ICoCoMEDField.hxx \
+ICoCoTrioField.hxx \
+BBTree.H\
 
 # Libraries targets
 
@@ -86,7 +88,9 @@ ExplicitCoincidentDEC.cxx\
 IntersectionDEC.cxx\
 UnstructuredParaSUPPORT.cxx\
 ElementLocator.cxx\
-ExplicitTopology.cxx
+ExplicitTopology.cxx\
+ICoCoMEDField.cxx 
+
 
 
 
@@ -97,7 +101,7 @@ BIN_SERVER_IDL =
 BIN_CLIENT_IDL = 
 
 TEST_PROGS = test_ProcessorGroup test_BlockTopology test_ParaStructuredSupport \
-test_ParaField test_DEC test_UnstructuredDEC test_ExplicitDEC test_IntersectionDEC test_SeqIntersectionDEC test_Seq3DsurfIntersection test_MEDMEMConstructor make_cylinder make_plane test_INTERPOL_2D
+test_ParaField test_DEC test_UnstructuredDEC test_ExplicitDEC test_IntersectionDEC test_SeqIntersectionDEC test_Seq3DsurfIntersection test_MEDMEMConstructor make_cylinder make_plane test_INTERPOL_2D test_IntersectionDEC3D
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
@@ -108,11 +112,11 @@ CXXFLAGS+=@CXXTMPDPTHFLAGS@
 CPPFLAGS+=$(BOOST_CPPFLAGS)
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem  $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem  $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel 
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel
+LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel 
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}

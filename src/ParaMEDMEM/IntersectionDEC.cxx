@@ -14,8 +14,6 @@
 
 /*!
 \defgroup intersectiondec IntersectionDEC
-\author V.Bergeaud
-\date 20/09/2007
 
 \section overview Overview
 
@@ -55,6 +53,15 @@ IntersectionDEC::IntersectionDEC()
 {	
 }
 
+/*!
+This constructor creates an IntersectionDEC which has \a local_group as a working side 
+and  \a distant_group as an idle side. All the processors will actually participate, but intersection computations will be performed on the working side during the \a synchronize() phase.
+The constructor must be called synchronously on all processors of both processor groups.
+
+\param local_group working side ProcessorGroup
+\param distant_group lazy side ProcessorGroup
+
+*/
 IntersectionDEC::IntersectionDEC(ProcessorGroup& local_group, ProcessorGroup& distant_group):
   DEC(local_group, distant_group),_interpolation_matrix(0)
 {
@@ -68,7 +75,15 @@ IntersectionDEC::~IntersectionDEC()
 }
 
 /*! 
-Synchronization process for exchanging topologies
+\brief Synchronization process for exchanging topologies.
+
+This method prepares all the structures necessary for sending data from a processor group to the other. It uses the mesh underlying the fields that have been set with attachLocalField method.
+It works in four steps :
+-# Bounding boxes are computed for each subdomain,
+-# The lazy side mesh parts that are likely to intersect the working side local processor are sent to the working side,
+-# The working side calls the MEDMEM interpolation kernel to compute the intersection between local and imported mesh.
+-# The lazy side is updated so that it knows the structure of the data that will be sent by
+the working side during a \a sendData() call.
  */
 void IntersectionDEC::synchronize()
 {
@@ -134,8 +149,8 @@ void IntersectionDEC::synchronize()
 }
 
 
-/*@
-receives the data whether the processor is on the working side or on the lazy side
+/*!
+Receives the data whether the processor is on the working side or on the lazy side. It must match a \a sendData() call on the other side.
  */
 void IntersectionDEC::recvData()
 {
@@ -161,7 +176,8 @@ void IntersectionDEC::recvData()
 
 
 /*!
-sends the data whether the processor is on the working side or on the lazy side
+Sends the data whether the processor is on the working side or on the lazy side.
+It must match a recvData() call on the other side.
  */
 void IntersectionDEC::sendData()
 {

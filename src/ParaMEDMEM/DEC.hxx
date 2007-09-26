@@ -15,7 +15,7 @@ public:
 	DEC():_local_field(0){}
   DEC(ProcessorGroup& local_group, ProcessorGroup& distant_group); 
 	void attachLocalField(const ParaFIELD* field);
-	void attachLocalField(const ICoCo::Field* field);
+  void attachLocalField(const ICoCo::Field* field);
 	virtual void prepareSourceDE()=0;
 	virtual void prepareTargetDE()=0;
 	virtual void recvData()=0;
