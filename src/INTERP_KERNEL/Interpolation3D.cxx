@@ -56,7 +56,7 @@ namespace MEDMEM
    */
   IntersectionMatrix Interpolation3D::interpol_maillages(const MEDMEM::MESH& srcMesh, const MEDMEM::MESH& targetMesh)
   {
-    //} it seems wasteful to make a copy here
+    // it seems wasteful to make a copy here
     IntersectionMatrix matrix;
 	
     // we should do more sanity checking here - eliminating meshes that
