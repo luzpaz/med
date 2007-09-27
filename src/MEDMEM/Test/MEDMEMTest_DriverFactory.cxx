@@ -209,9 +209,6 @@ void MEDMEMTest::testDriverFactory()
                        MED_EXCEPTION);
 
   // wronly
-#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) In destructor or in method close(): if the file
-  // was not opened (i.e. !(*_vtkFile)), MEDEXCEPTION is generated
   aDriver = DRIVERFACTORY::buildDriverForMed(VTK_DRIVER, "anyfile", &med, MED_EN::MED_ECRI);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::MED_ECRI);
@@ -231,7 +228,6 @@ void MEDMEMTest::testDriverFactory()
   CPPUNIT_ASSERT(aVtkDriverForMed);
 
   delete aDriver;
-#endif
 
   // 3.5: ASCII_DRIVER
   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(ASCII_DRIVER, "anyfile", &med, MED_EN::MED_LECT),
@@ -251,63 +247,38 @@ void MEDMEMTest::testDriverFactory()
   // rdonly
   aDriver = DRIVERFACTORY::buildDriverForMesh
     (MED_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::MED_LECT);
-#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) Arguments are not passed to parent class:
-  // MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh)
-  // {
-  //   _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,MED_LECT);
-  // }
-  // AND methods getFileName and getAccessMode are not
-  // reimplemented to take these values from _concreteMeshDrv
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::MED_LECT);
-#endif
+
 
   MED_MESH_RDONLY_DRIVER * aMedRDriverForMesh = dynamic_cast<MED_MESH_RDONLY_DRIVER *> (aDriver);
   CPPUNIT_ASSERT(aMedRDriverForMesh);
-#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) Incoherence between setMeshName and getMeshName!
-  // setMeshName: _concreteMeshDrv->setMeshName(meshName);
-  // getMeshName: return MED_MESH_DRIVER::getMeshName();
-  // MED_MESH_DRIVER::getMeshName: return _meshName;
   CPPUNIT_ASSERT(aMedRDriverForMesh->getMeshName() == "my driver name");
-#endif
+
 
   delete aDriver;
 
   // wronly
   aDriver = DRIVERFACTORY::buildDriverForMesh
     (MED_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::MED_ECRI);
-#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) See more details above for the same problem of MED_MESH_RDONLY_DRIVER
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::MED_ECRI);
-#endif
 
   MED_MESH_WRONLY_DRIVER * aMedWDriverForMesh = dynamic_cast<MED_MESH_WRONLY_DRIVER *> (aDriver);
   CPPUNIT_ASSERT(aMedWDriverForMesh);
-#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) Incoherence between setMeshName and getMeshName!
   CPPUNIT_ASSERT(aMedWDriverForMesh->getMeshName() == "my driver name");
-#endif
 
   delete aDriver;
 
   // rdwr
   aDriver = DRIVERFACTORY::buildDriverForMesh
     (MED_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::MED_REMP);
-#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) See more details above for the same problem of MED_MESH_RDONLY_DRIVER
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::MED_REMP);
-#endif
 
   MED_MESH_RDWR_DRIVER * aMedRWDriverForMesh = dynamic_cast<MED_MESH_RDWR_DRIVER *> (aDriver);
   CPPUNIT_ASSERT(aMedRWDriverForMesh);
-#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) Incoherence between setMeshName and getMeshName!
   CPPUNIT_ASSERT(aMedRWDriverForMesh->getMeshName() == "my driver name");
-#endif
 
   delete aDriver;
 
@@ -416,14 +387,7 @@ void MEDMEMTest::testDriverFactory()
   // wronly
   aDriver = DRIVERFACTORY::buildDriverForField(MED_DRIVER, "anyfile", &field, MED_EN::MED_ECRI);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
-#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) Wrong access mode (MED_RDONLY) passed to parent class!
-  // MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER(const string & fileName,
-  //                                                     FIELD<T, INTERLACING_TAG> * ptrField):
-  //  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY),
-  //  ...
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::MED_ECRI);
-#endif
 
   MED_FIELD_WRONLY_DRIVER<double> * aMedWDriverForField =
     dynamic_cast<MED_FIELD_WRONLY_DRIVER<double> *> (aDriver);
@@ -435,8 +399,10 @@ void MEDMEMTest::testDriverFactory()
   aDriver = DRIVERFACTORY::buildDriverForField(MED_DRIVER, "anyfile", &field, MED_EN::MED_REMP);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
 #ifdef ENABLE_FORCED_FAILURES
-  // (BUG) Wrong access mode (MED_RDONLY) passed to parent class!
-  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::MED_REMP);
+  // (BUG) Wrong access mode (MED_ECRI) passed to parent class!
+	// confusion between MED_DRWR (defined as MED_ECRI in MEDMEM_define.hxx)
+	// and MED_REMP causes confusion in MEDMEM_MedFieldDriver22.hxx
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_REMP,aDriver->getAccessMode());
 #endif
 
   MED_FIELD_RDWR_DRIVER<double> * aMedRWDriverForField =

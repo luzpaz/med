@@ -226,7 +226,8 @@ MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER()
   _concreteMeshDrv = new MED_MESH_RDONLY_DRIVER21();
 }
 
-MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh)
+MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh):
+  IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,MED_LECT)
 {
   _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,MED_LECT);
 }
@@ -268,7 +269,7 @@ void MED_MESH_RDONLY_DRIVER::setMeshName(const string & meshName)
 
 string MED_MESH_RDONLY_DRIVER::getMeshName() const
 {
-  return MED_MESH_DRIVER::getMeshName();
+  return _concreteMeshDrv->getMeshName();
 }
 
 GENDRIVER * MED_MESH_RDONLY_DRIVER::copy ( void ) const
@@ -322,7 +323,8 @@ MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER()
   _concreteMeshDrv = new MED_MESH_WRONLY_DRIVER21();
 }
 
-MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh)
+MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh):
+  IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,MED_ECRI)
 {
   _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,MED_ECRI);
 }
@@ -354,7 +356,7 @@ void MED_MESH_WRONLY_DRIVER::setMeshName(const string & meshName)
 
 string MED_MESH_WRONLY_DRIVER::getMeshName() const
 {
-  return MED_MESH_DRIVER::getMeshName();
+  return _concreteMeshDrv->getMeshName();
 }
 
 GENDRIVER * MED_MESH_WRONLY_DRIVER::copy ( void ) const
@@ -402,7 +404,8 @@ MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER()
   _concreteMeshDrv=new MED_MESH_RDWR_DRIVER21();
 }
 
-MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh)
+MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh):
+  IMED_MESH_RDWR_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,MED_REMP)
 {
   _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,MED_REMP);
 }
@@ -509,7 +512,7 @@ void MED_MESH_RDWR_DRIVER::setMeshName(const string & meshName)
 
 string MED_MESH_RDWR_DRIVER::getMeshName() const
 {
-  return MED_MESH_DRIVER::getMeshName();
+  return _concreteMeshDrv->getMeshName();
 }
 
 GENDRIVER * MED_MESH_RDWR_DRIVER::copy ( void ) const

@@ -118,6 +118,7 @@ public:
   virtual void readFileStruct ( void );
   // MESH related Part
   virtual void setMeshName    ( const string & meshName);
+  virtual string getMeshName() const { return string(""); }
   // FIELD related Part
   virtual void setFieldName   ( const string & fieldName);
 
@@ -125,7 +126,7 @@ public:
   int    getId       ( void ) const ;
   string getFileName () const;
   void   setFileName ( const string & fileName);
-  MED_EN::med_mode_acces getAccessMode() const;
+  virtual MED_EN::med_mode_acces getAccessMode() const;
 };
 };
 

@@ -91,6 +91,8 @@ CONNECTIVITY::CONNECTIVITY(medEntityMesh Entity /* =MED_CELL */) :
   				_constituent((CONNECTIVITY*)NULL)
 {
    MESSAGE("CONNECTIVITY(medEntityMesh Entity=MED_CELL)");
+  _count = new int[1];
+  _count[0]=1;
 }
 
 /*!
@@ -297,6 +299,9 @@ void CONNECTIVITY::setCount(const int * Count, const medEntityMesh Entity)
   			    throw (MEDEXCEPTION)
 //--------------------------------------------------------------------//
 {
+  if (_numberOfTypes==0)
+    throw MEDEXCEPTION("Number of Types was not set before setting counts");
+
   if (Entity == _entity)
   {
     int * index = new int[Count[_numberOfTypes]];
@@ -385,7 +390,9 @@ void CONNECTIVITY::setPolygonsConnectivity(medConnectivity ConnectivityType, med
     }
   else
     {
-      if (_constituent == (CONNECTIVITY*) NULL)
+      if (_entityDimension==3)
+	_constituent=new CONNECTIVITY(MED_EN::MED_FACE);
+      else if (_constituent == (CONNECTIVITY*) NULL)
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Entity not found !"));
       _constituent->setPolygonsConnectivity(ConnectivityType, Entity, PolygonsConnectivity, PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
     }
@@ -709,7 +716,7 @@ int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEnt
       else {
 	for (int i=0; i<_numberOfTypes; i++)
 	  if (_geometricTypes[i]==Type)
-	    return Connectivity->getNumberOfI(_count[i]);
+	    return (_count[i+1]-_count[i])*getType(Type).getNumberOfNodes();
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Type not found !"));
       }
     else
@@ -996,15 +1003,13 @@ int CONNECTIVITY::getNumberOfPolyhedron() const
 const CELLMODEL & CONNECTIVITY::getType(medGeometryElement Type) const
 //--------------------------------------------------------------//
 {
-  const char * LOC = "CONNECTIVITY::getType";
-  BEGIN_OF(LOC);
-
+ 
   if ((Type==MED_ALL_ELEMENTS) || (Type==MED_NONE))
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : medGeometryElement must be different of MED_ALL_ELEMENTS and MED_NONE !"));
+    throw MEDEXCEPTION("CONNECTIVITY::getType : medGeometryElement must be different of MED_ALL_ELEMENTS and MED_NONE !");
   for (int i=0; i<_numberOfTypes; i++)
     if (_geometricTypes[i]==Type)
       return _type[i];
-  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : medGeometryElement not found !"));
+  throw MEDEXCEPTION("CONNECTIVITY::getType :  medGeometryElement not found !");
 }
 
 /*!  Returns the number of elements of type %medGeometryElement.
@@ -1090,7 +1095,7 @@ const int* CONNECTIVITY::getValue(medConnectivity TypeConnectivity,
 	return _descending->getValue();
       for (int i=0; i<_numberOfTypes; i++)
 	if (_geometricTypes[i]==Type)
-	  return _descending->getI(Type);
+	  return _descending->getI(_count[i]);
     }
   throw MEDEXCEPTION("Not found");
 }
@@ -1324,12 +1329,16 @@ void CONNECTIVITY::calculateDescendingConnectivity()
       int * descend_connectivity_index = new int[_count[_numberOfTypes]];
       if(_numberOfTypes>0)
         descend_connectivity_index[0]=1;
+
+
+      map<medGeometryElement,int> eltsCounter;
       medGeometryElement* ConstituentsTypes = new medGeometryElement[2];
       ConstituentsTypes[0]=MED_NONE;
       ConstituentsTypes[1]=MED_NONE;
       int * NumberOfConstituentsForeachType = new int[2];
       NumberOfConstituentsForeachType[0]=0;
       NumberOfConstituentsForeachType[1]=0;
+      map<medGeometryElement,int>::iterator status;
       for(int i=0; i<_numberOfTypes; i++)
 	{
 	  // initialize descend_connectivity_index array :
@@ -1341,24 +1350,24 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 	      for(int k=1;k<NumberOfConstituents+1;k++)
 		{
 		  medGeometryElement MEDType = _type[i].getConstituentType(1,k);
-		  if (ConstituentsTypes[0]==MED_NONE)
-		    {
-		      ConstituentsTypes[0]=MEDType;
-		      NumberOfConstituentsForeachType[0]++;
-		    } else if (ConstituentsTypes[0]==MEDType)
-		      NumberOfConstituentsForeachType[0]++;
-		  else if (ConstituentsTypes[1]==MED_NONE)
-		    {
-		      ConstituentsTypes[1]=MEDType;
-		      NumberOfConstituentsForeachType[1]++;
-		    } else if (ConstituentsTypes[1]==MEDType)
-		      NumberOfConstituentsForeachType[1]++;
+		  status=eltsCounter.find(MEDType);
+		  if(status!=eltsCounter.end())
+		    (*status).second++;
 		  else
-		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<MEDType<<" is different of "<<ConstituentsTypes[0]<<" and "<<ConstituentsTypes[1]));
+		    eltsCounter[MEDType]=1;
 		}
 	    }
 	}
-
+      if(eltsCounter.size()>2)
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Descending connectivity does not support more than 2 types."));
+      status=eltsCounter.begin();
+      if(!eltsCounter.empty())
+      {
+	ConstituentsTypes[0]=(*status).first; NumberOfConstituentsForeachType[0]=(*status).second;
+	status++;
+	if(status!=eltsCounter.end())
+	  { ConstituentsTypes[1]=(*status).first; NumberOfConstituentsForeachType[1]=(*status).second; }
+      }
       // we could built _constituent !
       int TotalNumberOfConstituents = NumberOfConstituentsForeachType[0]+NumberOfConstituentsForeachType[1];
       int TotalNumberOfNodes = NumberOfConstituentsForeachType[0]*(ConstituentsTypes[0]%100)+NumberOfConstituentsForeachType[1]*(ConstituentsTypes[1]%100);
@@ -2107,6 +2116,8 @@ int *CONNECTIVITY::getNodesOfPolyhedron(int polyhedronId, int& lgthOfTab) const
   const int *glob=getPolyhedronIndex(MED_EN::MED_NODAL);
   int offsetWithClassicType=getNumberOf(_entity,MED_ALL_ELEMENTS);
   set<int> retInSet;
+  if (polyhedronId<offsetWithClassicType || polyhedronId> getNumberOfElementsWithPoly (MED_CELL, MED_ALL_ELEMENTS))
+    throw MEDEXCEPTION("Polyhedron ID does not match a polyhedron in the element range");
   int startFace=glob[polyhedronId-offsetWithClassicType-1]-1;
   int endFace=glob[polyhedronId-offsetWithClassicType]-1;
   int i;
@@ -2136,7 +2147,9 @@ int **CONNECTIVITY::getNodesPerFaceOfPolyhedron(int polyhedronId, int& nbOfFaces
   const int *faces=getPolyhedronFacesIndex();
   const int *glob=getPolyhedronIndex(MED_EN::MED_NODAL);
   int offsetWithClassicType=getNumberOf(_entity,MED_ALL_ELEMENTS);
-
+  if (polyhedronId<offsetWithClassicType || polyhedronId> getNumberOfElementsWithPoly (MED_CELL, MED_ALL_ELEMENTS))
+    throw MEDEXCEPTION("Polyhedron ID does not match a polyhedron in the element range");
+ 
   int startFace=glob[polyhedronId-offsetWithClassicType-1]-1;
   nbOfFaces=glob[polyhedronId-offsetWithClassicType]-startFace-1;
   nbOfNodesPerFaces=new int[nbOfFaces];
@@ -2288,8 +2301,7 @@ void CONNECTIVITY::invertConnectivityForAFace(int faceId, const int *nodalConnFo
 }
 
 /*
-  Method with 2 output : the connectivity required and its length 'lgth'. This method gives the connectivity independently it is a polygons/polyhedrons or normal
-  element.
+  Method with 2 output : the connectivity required and its length 'lgth'. This method gives the connectivity independently it is a polygons/polyhedrons or normal element. 
  */
 const int * CONNECTIVITY::getConnectivityOfAnElementWithPoly(MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity, int Number, int &lgth)
 {
@@ -2349,7 +2361,7 @@ const int * CONNECTIVITY::getConnectivityOfAnElementWithPoly(MED_EN::medConnecti
 	      if(localNumber<getNumberOfPolyhedron())
 		{
 		  if(ConnectivityType==MED_NODAL)
-		    throw  MEDEXCEPTION("NODAL Connectivity required for a polyhedron");
+		    throw  MEDEXCEPTION("NODAL Connectivity for a polyhedron not directly accessible.\n Use getPolyhedronNodal and getPolyhedronFaces instead");
 // 		  newConstituentValue = _polyhedronDescending->getValue();
 // 		  newConstituentIndex = _polyhedronDescending->getIndex();
 		  newConstituentValue = getPolyhedronConnectivity( ConnectivityType );
@@ -2378,8 +2390,15 @@ int CONNECTIVITY::getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_
     return _numberOfNodes;
   if(Entity==_entity)
     {
+      if (Type == MED_ALL_ELEMENTS)
+	return  getNumberOfElementOfPolyType(_entity)+ getNumberOf(_entity,Type) ;
+
       if(Type==MED_POLYGON || Type==MED_POLYHEDRA)
-	return getNumberOfElementOfPolyType(_entity);
+	{
+	  if(Type==MED_POLYGON && Entity==MED_CELL && _entityDimension==3 || Type==MED_POLYHEDRA && Entity==MED_FACE)
+	    return 0;
+	  return getNumberOfElementOfPolyType(_entity);
+	}
       else
 	return getNumberOf(_entity,Type);
     }

@@ -63,9 +63,9 @@ dist_libMEDMEMTest_la_SOURCES= \
           MEDMEMTest_VtkMedDriver.cxx \
           MEDMEMTest_VtkMeshDriver.cxx
 
-libMEDMEMTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(KERNEL_CXXFLAGS) $(MED2_INCLUDES) $(HDF5_INCLUDES) \
+libMEDMEMTest_la_CPPFLAGS= -I/usr/include/cppunit $(KERNEL_CXXFLAGS) $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 	-I$(srcdir)/../../MEDMEM -I$(srcdir)/../../MEDWrapper/V2_1/Core
-libMEDMEMTest_la_LDFLAGS= @CPPUNIT_LIBS@
+libMEDMEMTest_la_LDFLAGS= -lcppunit
 
 # Executables targets
 bin_PROGRAMS = TestMEDMEM \
@@ -98,7 +98,7 @@ dist_MEDMEMTest_Support_fault_SOURCES= MEDMEMTest_Support_fault.cxx
 dist_MEDMEMTest_VtkFieldDriver_fault_SOURCES= MEDMEMTest_VtkFieldDriver_fault.cxx
 dist_MEDMEMTest_VtkMeshDriver_fault_SOURCES= MEDMEMTest_VtkMeshDriver_fault.cxx
 
-LDADD= $(MED2_LIBS) $(libMEDMEMTest_la_LDFLAGS) -lm  ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics \
+LDADD= $(MED2_LIBS) $(libMEDMEMTest_la_LDFLAGS) -lm  ${KERNEL_LDFLAGS}  \
 	../../MEDWrapper/V2_1/Core/libmed_V2_1.la ../libmedmem.la libMEDMEMTest.la
 AM_CPPFLAGS= $(libMEDMEMTest_la_CPPFLAGS)
 

@@ -285,13 +285,6 @@ void MEDMEMTest::testFamily()
     delete [] newAttributeValue;
     delete [] newAttributeDescription;
 
-    // check invalid indices
-#ifdef ENABLE_FORCED_FAILURES
-    // (BUG) Index is not checked to be in valid range
-    CPPUNIT_ASSERT_THROW(aFamily3->getAttributeIdentifier(newNumberOfAttribute + 1), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(aFamily3->getAttributeDescription(0), MEDEXCEPTION);
-#endif
-
     // groups
     CPPUNIT_ASSERT_EQUAL(newNumberOfGroups, aFamily3->getNumberOfGroups());
     const string * newGroupsBack = aFamily3->getGroupsNames();

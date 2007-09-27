@@ -337,9 +337,7 @@ template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & p,bool copyOther ):
 
 //				------------------
 
-//  				/*! This operator does a copy of pointers\n
-//  				    It DOES NOT copy of the memory.
-//  				    The two objects will share data.\n */
+/*! This operator makes a deep copy of the arrays.\n */
 
 template <class T> MEDARRAY<T> & MEDARRAY<T>::operator = (const MEDARRAY & m)
 {

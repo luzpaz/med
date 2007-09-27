@@ -150,7 +150,7 @@ MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER()
   _concreteMedDrv = new MED_MED_RDONLY_DRIVER21();
 }
 
-MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed)
+MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_RDONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_LECT)
 {
   _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,MED_LECT);
 }
@@ -204,7 +204,7 @@ MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER()
   _concreteMedDrv = new MED_MED_WRONLY_DRIVER21();
 }
 
-MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed)
+MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_WRONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_ECRI)
 {
   _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,MED_ECRI);
 }
@@ -258,7 +258,7 @@ MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER()
   _concreteMedDrv = new MED_MED_RDWR_DRIVER21();
 }
 
-MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER(const string & fileName,  MED * const ptrMed)
+MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_RDWR_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_REMP)
 {
   _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,MED_REMP);
 }

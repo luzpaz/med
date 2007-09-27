@@ -62,7 +62,6 @@ VTK_MED_DRIVER::~VTK_MED_DRIVER()
   const char * LOC ="VTK_MED_DRIVER::~VTK_MED_DRIVER()";
   BEGIN_OF(LOC);
 
-  close();
   delete _vtkFile ;
 
   END_OF(LOC);
@@ -112,10 +111,10 @@ void VTK_MED_DRIVER::closeConst() const {
 //    if (*_vtkFile)
 //      _status = MED_CLOSED ;
 //    else
-  if (!(*_vtkFile))
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
-				     << _fileName)
-			  );
+//  if (!(*_vtkFile))
+//    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
+//				     << _fileName)
+//			  );
   END_OF(LOC);
 }
 

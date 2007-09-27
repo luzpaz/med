@@ -218,6 +218,8 @@ namespace MEDMEM {
   template <class T>
   void ASCII_FIELD_DRIVER<T>::open() throw (MEDEXCEPTION)
   {
+		if (_file.is_open())
+			throw MEDEXCEPTION("ASCII_FIELD_DRIVER::open() : file is already open !");
     _file.open(_fileName.c_str(),ofstream::out | ofstream::app);
   }
 
@@ -242,6 +244,9 @@ namespace MEDMEM {
   template <class T>
   void ASCII_FIELD_DRIVER<T>::write( void ) const throw (MEDEXCEPTION)
   {
+		if (!_file.is_open()) 
+			throw MEDEXCEPTION("ASCII_FIELD_DRIVER::write : can't write a file that was not opened !");
+		
     buildIntroduction();
     switch(_spaceDimension)
       {
