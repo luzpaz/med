@@ -233,7 +233,7 @@ echo "MED_WITH_GUI   : ${MED_WITH_GUI}"
 echo ---------------------------------------------
 
 openpbs_ok=no
-# CHECK_OPENPBS ONLY if MED_WITH_KERNEL=yes
+# CHECK_OPENPBS ONLY if MED_WITH_KERNEL=no
 # echo
 # echo ---------------------------------------------
 # echo testing OpenPBS
@@ -243,7 +243,7 @@ openpbs_ok=no
 # CHECK_OPENPBS
 # dnl openpbs_ok is set to yes by CHECK_OPENPBS
 
-# CHECK_LSF ONLY if MED_WITH_KERNEL=yes
+# CHECK_LSF ONLY if MED_WITH_KERNEL=no
 # echo
 # echo ---------------------------------------------
 # echo testing LSF
@@ -254,7 +254,7 @@ lsf_ok=no
 # CHECK_LSF
 # dnl lsf_ok is set to yes by CHECK_LSF
 
-# CHECK_CPPUNIT ONLY if MED_WITH_KERNEL=yes
+# CHECK_CPPUNIT ONLY if MED_WITH_KERNEL=no
 # echo
 # echo ----------------------------------------------
 # echo testing CPPUNIT only required for unit testing
@@ -593,6 +593,9 @@ AC_OUTPUT([ \
 	./adm_local/unix/config_files/Makefile \
         ./adm_local/unix/Makefile \
 	./adm_local/Makefile \
+	./adm_local_without_kernel/unix/config_files/Makefile \
+        ./adm_local_without_kernel/unix/Makefile \
+	./adm_local_without_kernel/Makefile \
 	./resources/Makefile
 	./resources/MEDCatalog.xml \
 	./bin/Makefile \
@@ -610,10 +613,6 @@ AC_OUTPUT([ \
 	./src/MEDMEM/Doxyfile_med_user \
 	./src/MEDMEM/Makefile \
 	./src/MEDMEM/Test/Makefile \
-	./doc/MEDMEM/MEDMEM_Content.tex \
-	./doc/MEDMEM/MEDMEM_UML_light.png \
-	./doc/MEDMEM/MEDMEM_UML.png \
-	./doc/MEDMEM/MEDMEM_UsersGuide.tex \
 	./src/INTERPOLATION/Makefile \
 	./src/MEDMEM_SWIG/Makefile \
 	./src/MEDSPLITTER/Makefile \
@@ -642,8 +641,16 @@ AC_OUTPUT([ \
 	./src/MedClient/test/test2/Makefile \
 	./src/MEDGUI/Makefile \
 	./doc/Makefile \
+	./doc/MEDMEM/Makefile \
+	./doc/MEDMEM/MEDMEM_Content.tex \
+	./doc/MEDMEM/MEDMEM_UML_light.png \
+	./doc/MEDMEM/MEDMEM_UML.png \
+	./doc/MEDMEM/MEDMEM_UsersGuide.tex \
 	./doc/salome/Makefile \
 	./doc/salome/tui/Makefile \
+	./doc/salome/tui/MED/Makefile \
+	./doc/salome/tui/MED/sources/Makefile \
+	./doc/salome/tui/MED/sources/static/Makefile \
 	./doc/salome/tui/MED/doxyfile \
 	./doc/salome/tui/MED/sources/static/tree.js
 ])

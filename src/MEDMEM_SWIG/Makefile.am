@@ -88,3 +88,8 @@ install-exec-hook: $(libdir)/_libMEDMEM_Swig.so
 
 $(libdir)/_libMEDMEM_Swig.so:
 	( cd $(libdir); ln -sf libMEDMEM_Swigcmodule.so _libMEDMEM_Swig.so; )
+
+uninstall-hook: $(libdir)/_libMEDMEM_Swig.so
+
+$(libdir)/_libMEDMEM_Swig.so:
+	( cd $(libdir); rm -f _libMEDMEM_Swig.so; )

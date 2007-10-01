@@ -77,7 +77,7 @@ uninstall-local:
 
 mostlyclean-local: clean-idls
 
-clean-ids:
+clean-idls:
 	-rm -f *.hh *.cc .depidl
 
 # we use cpp to generate dependencies between idl files.

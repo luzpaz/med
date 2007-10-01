@@ -95,7 +95,7 @@ MEDMEM_EnsightFieldDriver.hxx \
 MEDMEM.hxx
 
 # not exported headers
-EXTRA_DIST+= DataTest ../INTERPOLATION \
+EXTRA_DIST+= DataTest \
 MEDMEM_MEDMEMchampLire.hxx \
 MEDMEM_MEDMEMgaussEcr.hxx \
 MEDMEM_MEDMEMprofilEcr.hxx \
@@ -166,7 +166,8 @@ bin_PROGRAMS= \
 	test_MEDMEM_PolyDriverMedMeshRead test_MEDMEM_PolyDriverMedMeshWrite \
 	test_MEDMEM_poly3D test_MEDMEM_nArray test_MEDMEM_Meshing_poly test_profil_MedFieldDriver \
 	test_profil_gauss_MedFieldDriver test_GaussLocalization testAnalFile test_MEDMEM_MeshingFlica \
-	create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_mesh_c3h8q4_wrong create_mesh_c2q4s2_wrong create_grid create_mesh_c2q4 create_mesh_c3h8 create_poly3D
+	create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_mesh_c3h8q4_wrong \
+	create_mesh_c2q4s2_wrong create_grid create_mesh_c2q4 create_mesh_c3h8 create_poly3D
 
 AM_CPPFLAGS= $(libmedmem_la_CPPFLAGS)
 LDADD= $(libmedmem_la_LDFLAGS) -lm libmedmem.la
