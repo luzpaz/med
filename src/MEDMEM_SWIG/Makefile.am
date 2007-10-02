@@ -84,10 +84,10 @@ dist_salomescript_DATA= \
 
 #############################################################################
 
-install-exec-hook: $(libdir)/_libMEDMEM_Swig.so
+install-exec-hook: $(DESTDIR)$(libdir)/_libMEDMEM_Swig.so
 
-$(libdir)/_libMEDMEM_Swig.so:
-	( cd $(libdir); ln -sf libMEDMEM_Swigcmodule.so _libMEDMEM_Swig.so; )
+$(DESTDIR)$(libdir)/_libMEDMEM_Swig.so:
+	( cd $(DESTDIR)$(libdir); ln -sf libMEDMEM_Swigcmodule.so _libMEDMEM_Swig.so; )
 
 uninstall-hook:
-	( cd $(libdir); rm -f _libMEDMEM_Swig.so; )
+	( cd $(DESTDIR)$(libdir); rm -f _libMEDMEM_Swig.so; )
