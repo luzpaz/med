@@ -270,12 +270,14 @@ namespace MED
 	      ADDMSG(MYDEBUG,"\t"<<aCoord2[anId]);
 	    ADDMSG(MYDEBUG,"}\n");
 #ifndef _DEBUG_
+	    BEGMSG(MYDEBUG,"anIsSatisfy = "<<anIsSatisfy<<"\n");
 	    return anIsSatisfy;
 #endif
 	  }
 	}
       }
 
+      BEGMSG(MYDEBUG,"anIsSatisfy = "<<anIsSatisfy<<"\n");
       return anIsSatisfy;
     }
 
@@ -782,10 +784,15 @@ namespace MED
 	aSlice[2] = 0.25*(1.0 + aCoord[0])*(1.0 + aCoord[1])*(-1.0 + aCoord[0] + aCoord[1]);
 	aSlice[3] = 0.25*(1.0 - aCoord[0])*(1.0 + aCoord[1])*(-1.0 - aCoord[0] + aCoord[1]);
 
-	aSlice[4] = 0.25*(1.0 - aCoord[0]*aCoord[0])*(1.0 - aCoord[1]);
-	aSlice[5] = 0.25*(1.0 - aCoord[1]*aCoord[1])*(1.0 + aCoord[0]);
-	aSlice[6] = 0.25*(1.0 - aCoord[0]*aCoord[0])*(1.0 + aCoord[1]);
-	aSlice[7] = 0.25*(1.0 - aCoord[1]*aCoord[1])*(1.0 - aCoord[0]);
+	aSlice[4] = 0.5*(1.0 - aCoord[0]*aCoord[0])*(1.0 - aCoord[1]);
+	aSlice[5] = 0.5*(1.0 - aCoord[1]*aCoord[1])*(1.0 + aCoord[0]);
+	aSlice[6] = 0.5*(1.0 - aCoord[0]*aCoord[0])*(1.0 + aCoord[1]);
+	aSlice[7] = 0.5*(1.0 - aCoord[1]*aCoord[1])*(1.0 - aCoord[0]);
+
+	//aSlice[4] = 0.5*(1.0 - aCoord[0])*(1.0 - aCoord[0])*(1.0 - aCoord[1]);
+	//aSlice[5] = 0.5*(1.0 + aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[1]);
+	//aSlice[6] = 0.5*(1.0 - aCoord[0])*(1.0 - aCoord[0])*(1.0 + aCoord[1]);
+	//aSlice[7] = 0.5*(1.0 - aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[1]);
       }
     }
   };
