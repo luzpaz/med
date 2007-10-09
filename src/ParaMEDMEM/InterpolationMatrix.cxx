@@ -2,6 +2,8 @@
 #include "ProcessorGroup.hxx"
 #include "MxN_Mapping.hxx"
 #include "InterpolationMatrix.hxx"
+#include "TranslationRotationMatrix.hxx"
+#include "Interpolation.hxx"
 #include "Interpolation2D.hxx"
 #include "Interpolation3DSurf.hxx"
 #include "Interpolation3D.hxx"
@@ -85,7 +87,7 @@ void InterpolationMatrix::addContribution(MEDMEM::MESH& distant_support, int ipr
   
 	//computation of the intersection volumes between source and target elements
   int source_size=  _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);  
-  vector<map<int,double> > surfaces = interpolator->interpol_maillages(distant_support,_source_support);
+  vector<map<int,double> > surfaces = interpolator->interpolateMeshes(distant_support,_source_support);
   delete interpolator;  
   if (surfaces.size() != source_size)
     throw MEDEXCEPTION("uncoherent number of rows in interpolation matrix");
