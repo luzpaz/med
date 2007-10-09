@@ -1,7 +1,6 @@
 #include "Interpolation3D.hxx"
 #include "MeshElement.hxx"
 #include "TransformedTriangle.hxx"
-//#include "VectorUtils.hxx"
 #include "IntersectorTetra.hxx"
 #include "IntersectorHexa.hxx"
 #include "TargetIntersector.hxx"
@@ -54,7 +53,7 @@ namespace MEDMEM
    * @return            vector containing for each element i of the source mesh, a map giving for each element j
    *                    of the target mesh which i intersects, the volume of the intersection
    */
-  IntersectionMatrix Interpolation3D::interpol_maillages(const MEDMEM::MESH& srcMesh, const MEDMEM::MESH& targetMesh)
+  IntersectionMatrix Interpolation3D::interpolateMeshes(const MEDMEM::MESH& srcMesh, const MEDMEM::MESH& targetMesh)
   {
     // it seems wasteful to make a copy here
     IntersectionMatrix matrix;

@@ -1,4 +1,5 @@
 #include "InterpolationUtils.hxx"
+#include "TranslationRotationMatrix.hxx"
 #include "Interpolation.hxx"
 #include "Interpolation2D.hxx"
 
@@ -16,7 +17,7 @@ using namespace MEDMEM;
 namespace MEDMEM 
 {
 
-  Interpolation2D::Interpolation2D()
+  Interpolation2D::Interpolation2D():_counter(0)
   {
     _Precision=1.0E-12;
     _DimCaracteristic=1;
@@ -97,10 +98,12 @@ namespace MEDMEM
 
 
 		    //debug cout << "mailles sources testées : " << N_Maille << endl;
-		    vector<double> Inter=INTERP_UTILS::intersec_de_triangle(MaS._Coord+2*(NS_1-1),MaS._Coord+2*(NS_2-1),
-
-									    MaS._Coord+2*(NS_3-1),MaP._Coord+2*(NP_1-1),MaP._Coord+2*(NP_2-1),MaP._Coord+2*(NP_3-1), _DimCaracteristic, _Precision);
-
+		    vector<double> Inter;
+		    INTERP_UTILS::intersec_de_triangle(MaS._Coord+2*(NS_1-1),MaS._Coord+2*(NS_2-1),
+						       MaS._Coord+2*(NS_3-1),MaP._Coord+2*(NP_1-1),
+						       MaP._Coord+2*(NP_2-1),MaP._Coord+2*(NP_3-1),
+						       Inter,_DimCaracteristic, _Precision);
+		    _counter++;
 		    if(Inter.size()>0)
 		      {
 			//debug cout << "Localise : maille proche barycentre trouvée : " << N_Maille << endl; 
@@ -133,9 +136,12 @@ namespace MEDMEM
 			    int N_3=MaS._Connect[3*(N_Maille-1)+2];
 
 			    //debug cout << "mailles sources testées : " << N_Maille << endl;
-			    vector<double> Inter=INTERP_UTILS::intersec_de_triangle(MaS._Coord+2*(N_1-1),MaS._Coord+2*(N_2-1),
-										    MaS._Coord+2*(N_3-1),MaP._Coord+2*(NP_1-1),MaP._Coord+2*(NP_2-1),MaP._Coord+2*(NP_3-1) , _DimCaracteristic, _Precision);	
-
+			    vector<double> Inter;
+			    INTERP_UTILS::intersec_de_triangle(MaS._Coord+2*(N_1-1),MaS._Coord+2*(N_2-1),
+							       MaS._Coord+2*(N_3-1),MaP._Coord+2*(NP_1-1),
+							       MaP._Coord+2*(NP_2-1),MaP._Coord+2*(NP_3-1),
+							       Inter, _DimCaracteristic, _Precision);	
+			    _counter++;
 			    if(Inter.size()>0)
 			      {
 				//debug cout << "Localise : maille proche sommet " << Num+1 << " trouvée : " << N_Maille << endl; 
@@ -171,7 +177,7 @@ namespace MEDMEM
 						       vector<map<int,double> >& Surface_d_intersect,FIELD<double>& myField_P)
   {
 
-
+    
     //on récupere le n° des noeuds.
 
     //debug cout << "\nintersect maille " << i_P << endl;
@@ -201,7 +207,12 @@ namespace MEDMEM
 	    int NS_3=MaS._Connect[3*(i_S-1)+2];
 
 
-	    vector<double> Inter=INTERP_UTILS::intersec_de_triangle(MaS._Coord+2*(NS_1-1),MaS._Coord+2*(NS_2-1),MaS._Coord+2*(NS_3-1),MaP._Coord+2*(NP_1-1),MaP._Coord+2*(NP_2-1),MaP._Coord+2*(NP_3-1), _DimCaracteristic, _Precision);
+	    vector<double> Inter;
+	    INTERP_UTILS::intersec_de_triangle(MaS._Coord+2*(NS_1-1),MaS._Coord+2*(NS_2-1),
+					       MaS._Coord+2*(NS_3-1),MaP._Coord+2*(NP_1-1),
+					       MaP._Coord+2*(NP_2-1),MaP._Coord+2*(NP_3-1),
+					       Inter,_DimCaracteristic, _Precision);
+	    _counter++;
 
 	    //on teste l'intersection.
 	    int taille=Inter.size()/2;
@@ -268,11 +279,11 @@ namespace MEDMEM
 
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */
   //fonction principale pour interpoler deux maillages triangulaires.
-  vector<map<int,double> > Interpolation2D::interpol_maillages(const MEDMEM::MESH& myMesh_S,
+  vector<map<int,double> > Interpolation2D::interpolateMeshes(const MEDMEM::MESH& myMesh_S,
 							       const MEDMEM::MESH& myMesh_P)
   {
 
-
+    long global_start =clock();    
     /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */
     // on vérifie que les deux maillages sont formés de triangles.
     int NumberOfCellsTypes_S = myMesh_S.getNumberOfTypes(MED_CELL);
@@ -336,6 +347,7 @@ namespace MEDMEM
     //on cherche pour chaque maille i_P du maillage projetté
     // une maille i_S du maillage S qui chevauche la maille i_P.
 
+    long start_filtering=clock();
     vector<int> localis;
     localis.reserve(MaP._NbMaille);
     MEDMEM::MESH* ptr_S = const_cast<MEDMEM::MESH*>(&myMesh_S);
@@ -343,6 +355,7 @@ namespace MEDMEM
     
     cout << "Interpolation2D::local_iP_dansS"<<endl;
     local_iP_dans_S(*ptr_S,*ptr_P,MaP,MaS,localis);
+    long end_filtering=clock();
 
     /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */
     //on crée un tableau où l'on rentrera la valeurs des intersections.
@@ -372,7 +385,7 @@ namespace MEDMEM
     /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */
     //boucle sur les mailles de P.
     //Coeur de l'algorithme
-
+    long start_intersection=clock();
     for(int i_P=0; i_P<MaP._NbMaille ; i_P++)
       {
 	int i_S_init=localis[i_P];
@@ -380,22 +393,37 @@ namespace MEDMEM
 	  rempli_vect_d_intersect(i_P+1,i_S_init,MaP,MaS,Surface_d_intersect,myField_P);
 
       }
-
-    if (_PrintLevel >= 2)
+    if (_PrintLevel >= 1)
       {
-	cout<<endl<<"Impression des surfaces d'intersection:"<<endl<<endl;
-	cout<<"(maille source, maille cible):surface d'intersection"<<endl;
-	for(int i=0; i< Surface_d_intersect.size();i++)
-	  { 
-	    if(Surface_d_intersect[i].size()!=0)
-	      {
+	long end_intersection=clock();
+	if (_PrintLevel >= 2)
+	  {
+	    cout<<endl<<"Printing intersection areas:"<<endl<<endl;
+	    cout<<"(source cell, target cell): intersection areas"<<endl;
+	    double total=0.0;
+	    double total_interm=0.0;
+	    int nb_result_areas = Surface_d_intersect.size();
+	    for(int i=0; i< nb_result_areas;i++)
+	      { 
 		map<int,double>::iterator surface;
+		total_interm=0.0;
 		for( surface=Surface_d_intersect[i].begin();surface!=Surface_d_intersect[i].end();surface++)
-		  cout<<"    ("<<i+1<<" , "<<(*surface).first<<")"<<" : "<<(*surface).second<<endl;
+		  {
+		    cout<<"    ("<<i+1<<" , "<<(*surface).first<<")"<<" : "<<(*surface).second<<endl;
+		    total_interm +=(*surface).second;
+		  }
+		cout<< " elem " << i+1 << " area= " << total_interm << endl;
+		total+=total_interm;
 	      }
-	  }  
+	    cout << "total area "<<total<<endl;
+	  }
+	cout<< "Barycenter localisation time= " << end_filtering-start_filtering<< endl;
+	cout<< "Intersection time= " << end_intersection-start_intersection<< endl;
+	cout<< "counter= " << _counter << endl;
+	long global_end =clock();    
+	cout<< "Global time= " << global_end - global_start << endl;
       }
-
+    
     //    /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */
     //    //On sauvegarde le champ crée sur la maillage P.
     //    if (_PrintLevel>=3)

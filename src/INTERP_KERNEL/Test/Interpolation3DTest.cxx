@@ -258,7 +258,7 @@ void Interpolation3DTest::calcIntersectionMatrix(const char* mesh1path, const ch
   LOG(5, "Loading " << mesh2 << " from " << mesh2path);
   MESH tMesh(MED_DRIVER, dataDir+mesh2path, mesh2);
 
-  m = interpolator->interpol_maillages(sMesh, tMesh);
+  m = interpolator->interpolateMeshes(sMesh, tMesh);
 
   // if reflexive, check volumes
   if(strcmp(mesh1path,mesh2path) == 0)

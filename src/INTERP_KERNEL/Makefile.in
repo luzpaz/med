@@ -49,6 +49,7 @@ BoundingBox.hxx\
 TetraAffineTransform.hxx\
 TranslationRotationMatrix.hxx\
 Interpolation2D.hxx\
+Interpolation2Dbis.hxx\
 Interpolation3DSurf.hxx\
 InterpolationUtils.hxx\
 BBTree.H\
@@ -57,7 +58,16 @@ Log.hxx\
 TransformedTriangle_inline.hxx\
 IntersectorTetra.hxx\
 TargetIntersector.hxx\
-IntersectorHexa.hxx
+IntersectorHexa.hxx\
+PolygonAlgorithms.hxx\
+PolygonAlgorithms.cxx\
+PlanarIntersector.hxx\
+TriangulationIntersector.hxx\
+TriangulationIntersector.cxx\
+ConvexIntersector.hxx\
+ConvexIntersector.cxx\
+GenericIntersector.hxx\
+GenericIntersector.cxx
 
 
 # Libraries targets
@@ -76,27 +86,30 @@ TetraAffineTransform.cxx\
 Interpolation3D.cxx\
 Interpolation3DSurf.cxx\
 Interpolation2D.cxx\
+Interpolation2Dbis.cxx\
 IntersectorTetra.cxx\
-IntersectorHexa.cxx
+IntersectorHexa.cxx\
+PlanarIntersector.cxx
 
 # Executables targets
 BIN = 
+# test_InterpolationUtils
 BIN_SRC = 
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-TEST_PROGS = testUnitTetra
+TEST_PROGS = testUnitTetra test_PolygonAlgorithms test_Interpol_2D test_Interpol_2Dbis  test_Interpol_3DSurf
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
-CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MED2_INCLUDES)
+CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MED2_INCLUDES) -I$(srcdir)
 CPPFLAGS+=$(BOOST_CPPFLAGS) 
 
 # optimization
 
-CXXFLAGS+=  -O2 -DOPTIMIZE -Wall
-CPPFLAGS+=  -O2 -DOPTIMIZE -Wall
+CXXFLAGS+=  -DOPTIMIZE -Wall
+CPPFLAGS+=  -DOPTIMIZE -Wall
 
 # for log
 CXXFLAGS+= -DLOG_LEVEL=0 
@@ -115,8 +128,8 @@ CPPFLAGS+=-pg
 LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem   -lutil
 #LDFLAGS+= $(HDF5_LIBS) $(STDLIB) -lutil
 # for gcov
-#LDFLAGS+= -lgcov
-#LDFLAGS+= -pg
+LDFLAGS+= -lgcov
+LDFLAGS+= -pg
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.

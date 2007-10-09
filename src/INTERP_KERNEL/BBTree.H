@@ -2,9 +2,10 @@
 #include <vector>
 #include <algorithm>
 
-const int MIN_NB_ELEMS =10;
-const int MAX_LEVEL=10;
+const int MIN_NB_ELEMS =15;
+const int MAX_LEVEL=20;
 using namespace std;
+
 
 template <int dim> class BBTree
 {
@@ -12,25 +13,27 @@ template <int dim> class BBTree
 private:
   BBTree* _left;
   BBTree* _right;
-  BBTree* _center;
   int _level;
-  double _median;
+  double _max_left;
+  double _min_right;
   double* _bb;
   vector <int> _elems;
   bool _terminal;
+  int _nbelems;
 
 public:
 
 
 BBTree(double* bbs, int* elems, int level, int nbelems):
-  _left(0), _right(0), _center(0), _level(level), _median(0.0), _bb(bbs), _terminal(false)
+  _left(0), _right(0), _level(level), _bb(bbs), _terminal(false),_nbelems(nbelems)
 {
   if (nbelems < MIN_NB_ELEMS || level> MAX_LEVEL)
     {
       _terminal=true;
-		
+      
     }
-  vector<double> nodes (nbelems*2);
+  double* nodes=new double [nbelems];
+  _elems.resize(nbelems);
   for (int i=0; i<nbelems; i++)
     {
       int elem;
@@ -39,23 +42,23 @@ BBTree(double* bbs, int* elems, int level, int nbelems):
       else
 	elem=i;
 
-      _elems.push_back(elem);
-      nodes[i*2]=bbs[elem*dim*2+(level%dim)*2];
-      nodes[i*2+1]=bbs[elem*dim*2+(level%dim)*2+1];
+      _elems[i]=elem;
+      nodes[i]=bbs[elem*dim*2+(level%dim)*2];
     }
-  if (_terminal) return;
+  if (_terminal) { delete[] nodes; return;}
 
-	//elem list is not useful if the node is not terminal
-	_elems.clear();
-
-  vector<double>::iterator median = nodes.begin()+nbelems;
-   nth_element< vector<double>::iterator>(nodes.begin(), nodes.begin()+nbelems, nodes.end());
-   _median=*median;
+   nth_element< double*>(nodes, nodes+nbelems/2, nodes+nbelems);
+   double median = *(nodes+nbelems/2);
+   delete[] nodes;
    // std:: cout << *median <<std::endl;
 
   vector<int> new_elems_left;
   vector<int> new_elems_right;
-  vector<int> new_elems_center;
+ 
+  new_elems_left.reserve(nbelems/2+1);
+  new_elems_right.reserve(nbelems/2+1);
+  double max_left=-HUGE;
+  double min_right=HUGE;
   for (int i=0; i<nbelems;i++)
     {
       int elem;
@@ -64,24 +67,24 @@ BBTree(double* bbs, int* elems, int level, int nbelems):
       else
 	elem=i;
       double max=bbs[elem*dim*2+(level%dim)*2+1];
-      if (max < *median)
-	{
-	  new_elems_left.push_back(elem);
-	  continue;
-	}
       double min = bbs[elem*dim*2+(level%dim)*2];
-      if (min>*median)
+      
+      if (min>median)
 	{
 	  new_elems_right.push_back(elem);
-	  continue;
+	  if (min<min_right) min_right = min;
 	}
-      new_elems_center.push_back(elem);
-    }
+      else
+	{
+	  new_elems_left.push_back(elem);
+	  if (max>max_left) max_left = max;
+	}
 
+    }
+  _max_left=max_left;
+  _min_right=min_right;
   _left=new BBTree(bbs, &(new_elems_left[0]), level+1, new_elems_left.size());
   _right=new BBTree(bbs, &(new_elems_right[0]), level+1, new_elems_right.size());
-  _center=new BBTree(bbs, &(new_elems_center[0]), level+1, new_elems_center.size());
- 
   
 }
 
@@ -89,25 +92,28 @@ BBTree(double* bbs, int* elems, int level, int nbelems):
 {
   if (_left!=0)  delete _left;
   if (_right!=0) delete _right;
-  if (_center!=0) delete _center;
 }
 
-void getIntersectingElems(double* bb, vector<int>& elems)
+void getIntersectingElems(const double* bb, vector<int>& elems) const
 {
   //  terminal node : return list of elements intersecting bb
   if (_terminal)
     {
-      for (int i=0; i<_elems.size(); i++)
+      for (int i=0; i<_nbelems; i++)
 	{
-	  double* bb_ptr=_bb+_elems[i]*2*dim;
+	  const double* const  bb_ptr=_bb+_elems[i]*2*dim;
+// 	  cout << "trying "<<_elems[i]<<endl;
 	  bool intersects = true;
 	  for (int idim=0; idim<dim; idim++)
 	    {
-	      if (bb_ptr[idim*2]>bb[idim*2+1] || bb_ptr[idim*2+1]<bb[idim*2])
+	      if (bb_ptr[idim*2]-bb[idim*2+1]>1e-12|| bb_ptr[idim*2+1]-bb[idim*2]<-1e-12)
 		intersects=false;
 	    }
 	  if (intersects)
-	    elems.push_back(_elems[i]);
+	    {
+	     //  std::c4ut << "in BB "<<_elems[i]<<std::endl;
+	      elems.push_back(_elems[i]);
+	    }
 	}
       return;
     }
@@ -115,20 +121,22 @@ void getIntersectingElems(double* bb, vector<int>& elems)
   //non terminal node 
   double min = bb[(_level%dim)*2];
   double max = bb[(_level%dim)*2+1];
-  if (max < _median)
+  if (max < _min_right)
     {
       _left->getIntersectingElems(bb, elems);
-			_center->getIntersectingElems(bb,elems);
       return;
     }
-  if (min > _median)
+  if (min> _max_left)
     {
       _right->getIntersectingElems(bb,elems);
-			_center->getIntersectingElems(bb,elems);
       return;
     }
   _left->getIntersectingElems(bb,elems);
-  _center->getIntersectingElems(bb,elems);
   _right->getIntersectingElems(bb,elems);
 }
-};
+
+int size()
+{
+  if (_terminal) return _nbelems;
+  return _left->size()+_right->size();
+}};

@@ -63,7 +63,7 @@ namespace INTERP_TEST
     
       LOG(1, "Target mesh has " << numTargetElems << " elements");
     
-      m = _interpolator->interpol_maillages(sMesh, tMesh);
+      m = _interpolator->interpolateMeshes(sMesh, tMesh);
     
       std::pair<int, int> eff = countNumberOfMatrixEntries(m);
       LOG(1, eff.first << " of " << numTargetElems * numSrcElems << " intersections calculated : ratio = " 

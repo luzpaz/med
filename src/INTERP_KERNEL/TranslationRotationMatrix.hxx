@@ -1,6 +1,10 @@
 #ifndef _TRANSLATIONROTATIONMATRIX_HXX_
 #define _TRANSLATIONROTATIONMATRIX_HXX_
 
+#include "InterpolationUtils.hxx"
+#include <cmath>
+//#include <vector>
+
 namespace MEDMEM
 {
 

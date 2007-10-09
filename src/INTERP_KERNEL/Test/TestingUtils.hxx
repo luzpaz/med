@@ -206,7 +206,7 @@ void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char
 
   Interpolation3D* interpolator = new Interpolation3D();
 
-  m = interpolator->interpol_maillages(sMesh, tMesh);
+  m = interpolator->interpolateMeshes(sMesh, tMesh);
 
   std::pair<int, int> eff = countNumberOfMatrixEntries(m);
   LOG(1, eff.first << " of " << numTargetElems * numSrcElems << " intersections calculated : ratio = " 

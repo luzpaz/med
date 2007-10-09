@@ -34,7 +34,7 @@ namespace MEDMEM
     Interpolation3D();
     virtual ~Interpolation3D();
 
-    virtual IntersectionMatrix interpol_maillages(const MEDMEM::MESH& srcMesh, const MEDMEM::MESH& targetMesh);
+    virtual IntersectionMatrix interpolateMeshes(const MEDMEM::MESH& srcMesh, const MEDMEM::MESH& targetMesh);
 
   private:
     

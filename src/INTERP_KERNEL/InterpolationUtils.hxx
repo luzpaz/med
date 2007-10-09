@@ -5,7 +5,6 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Field.hxx"
 
-
 #include <cmath>
 #include <map>
 #include <algorithm>
@@ -85,7 +84,7 @@ namespace INTERP_UTILS
   inline double Surf_Tri(const double* P_1,const double* P_2,const double* P_3)
   {
     double A=(P_3[1]-P_1[1])*(P_2[0]-P_1[0])-(P_2[1]-P_1[1])*(P_3[0]-P_1[0]);
-    double Surface = 1/2.0*abs(A);
+    double Surface = 0.5*abs(A);
     return Surface;
   }
 
@@ -197,14 +196,15 @@ namespace INTERP_UTILS
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */
 
   inline bool point_dans_triangle(const double* P_0,const double* P_1,
-				  const double* P_2,const double* P_3)
+				  const double* P_2,const double* P_3,
+				  double eps)
   {
 
     bool A=false;
     double det_1=mon_determinant(P_1,P_3,P_0);
     double det_2=mon_determinant(P_3,P_2,P_0);
     double det_3=mon_determinant(P_2,P_1,P_0);
-    if( (det_1>=0 && det_2>=0 && det_3>=0) || (det_1<=0 && det_2<=0 && det_3<=0) )
+    if( (det_1>=-eps && det_2>=-eps && det_3>=-eps) || (det_1<=eps && det_2<=eps && det_3<=eps) )
       {
 	A=true;
       }
@@ -219,7 +219,7 @@ namespace INTERP_UTILS
   /*      le vecteur et le rajouter au vecteur sinon.                     */
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */
 
-  inline void verif_point_dans_vect(const double* P, vector<double>& V,double dim_caracteristic, double precision )
+  inline void verif_point_dans_vect(const double* P, vector<double>& V, double absolute_precision )
   {
     //    int taille=V.size();
     //   for(int i=0;i<taille/2;i++) 
@@ -242,7 +242,7 @@ namespace INTERP_UTILS
     bool isPresent=false;
     for(int i=0;i<taille/2;i++) 
       {
-	if (sqrt(((P[0]-V[2*i])*(P[0]-V[2*i])+(P[1]-V[2*i+1])*(P[1]-V[2*i+1])))/dim_caracteristic<precision)
+	if (sqrt(((P[0]-V[2*i])*(P[0]-V[2*i])+(P[1]-V[2*i+1])*(P[1]-V[2*i+1])))<absolute_precision)
 	  isPresent=true;
       
       }
@@ -266,9 +266,10 @@ namespace INTERP_UTILS
 				   const double* P_4,const double* P_5,const double* P_6,vector<double>& V, double dim_caracteristic, double precision)
   {
 
-    bool A_1=INTERP_UTILS::point_dans_triangle(P_1,P_4,P_5,P_6);
+    double absolute_precision = precision*dim_caracteristic;
+    bool A_1=INTERP_UTILS::point_dans_triangle(P_1,P_4,P_5,P_6,absolute_precision);
     if(A_1)
-      {verif_point_dans_vect(P_1,V,dim_caracteristic, precision);
+      {verif_point_dans_vect(P_1,V,absolute_precision);
       //   if (V.size()==1)
       //       {
       // 	// all nodes are necessarily in the triangle
@@ -277,13 +278,13 @@ namespace INTERP_UTILS
       // 	return;
       //       }
       }
-    bool A_2=INTERP_UTILS::point_dans_triangle(P_2,P_4,P_5,P_6);
+    bool A_2=INTERP_UTILS::point_dans_triangle(P_2,P_4,P_5,P_6,absolute_precision);
     if(A_2)
-      {verif_point_dans_vect(P_2,V,dim_caracteristic,precision);}
+      {verif_point_dans_vect(P_2,V,absolute_precision);}
 
-    bool A_3=INTERP_UTILS::point_dans_triangle(P_3,P_4,P_5,P_6);
+    bool A_3=INTERP_UTILS::point_dans_triangle(P_3,P_4,P_5,P_6,absolute_precision);
     if(A_3)
-      {verif_point_dans_vect(P_3,V,dim_caracteristic, precision);}
+      {verif_point_dans_vect(P_3,V,absolute_precision);}
           
   }
 
@@ -300,20 +301,18 @@ namespace INTERP_UTILS
   {
 
 
-    // calcul du déterminant de P1_1P_2 et P_3P_4.
+    // calcul du déterminant de P_1P_2 et P_3P_4.
     double det=(P_2[0]-P_1[0])*(P_4[1]-P_3[1])-(P_4[0]-P_3[0])*(P_2[1]-P_1[1]);
 
-
-    if(abs(det)/dim_caracteristic>precision)
+    double absolute_precision = dim_caracteristic*precision;
+    if(abs(det)>absolute_precision)
       {
 
-	double k_1=1/((P_2[0]-P_1[0])*(P_3[1]-P_4[1])+(P_4[0]-P_3[0])*(P_2[1]-P_1[1]))
-	  *((P_3[1]-P_4[1])*(P_3[0]-P_1[0])+(P_4[0]-P_3[0])*(P_3[1]-P_1[1]));
+	double k_1=-((P_3[1]-P_4[1])*(P_3[0]-P_1[0])+(P_4[0]-P_3[0])*(P_3[1]-P_1[1]))/det;
 	
 	if( k_1>=0 &&  k_1<=1)
 	  {
-	    double k_2=1/((P_4[0]-P_3[0])*(P_1[1]-P_2[1])+(P_2[0]-P_1[0])*(P_4[1]-P_3[1]))
-	      *((P_1[1]-P_2[1])*(P_1[0]-P_3[0])+(P_2[0]-P_1[0])*(P_1[1]-P_3[1]));
+	    double k_2= ((P_1[1]-P_2[1])*(P_1[0]-P_3[0])+(P_2[0]-P_1[0])*(P_1[1]-P_3[1]))/det;
 	    
 
 	    if( k_2>=0 &&  k_2<=1)
@@ -321,7 +320,7 @@ namespace INTERP_UTILS
 		double P_0[2];
 		P_0[0]=P_1[0]+k_1*(P_2[0]-P_1[0]);
 		P_0[1]=P_1[1]+k_1*(P_2[1]-P_1[1]);
-		verif_point_dans_vect(P_0,Vect, dim_caracteristic, precision);
+		verif_point_dans_vect(P_0,Vect,absolute_precision);
 
 	      }
 	  }
@@ -336,13 +335,14 @@ namespace INTERP_UTILS
   /* P_4, P_5, P_6: sommets du deuxième triangle             */
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/ 
 
-  inline vector<double> intersec_de_triangle(const double* P_1,const double* P_2,
-					     const double* P_3,const double* P_4,const double* P_5,const double* P_6, double dim_caracteristic, double precision)
+  inline void intersec_de_triangle(const double* P_1,const double* P_2, const double* P_3,
+				   const double* P_4,const double* P_5,const double* P_6, 
+				   vector<double>& Vect, double dim_caracteristic, double precision)
   {
 
     //		cout << "  T1 : " << *P_1 << " , " << *(P_1+1) << " , " << *P_2 << " , " << *(P_2+1) << " , " << *P_3 << " , " << *(P_3+1)<< endl;
     // cout << "  T2 : " << *P_4 << " , " << *(P_4+1) << " , " << *P_5 << " , " << *(P_5+1) << " , " << *P_6 << " , " << *(P_6+1)<< endl;
-    vector<double> Vect;
+    //MN:    vector<double> Vect;
 
     inters_de_segment(P_1,P_2,P_4,P_5,Vect, dim_caracteristic, precision);
     inters_de_segment(P_1,P_2,P_5,P_6,Vect, dim_caracteristic, precision);
@@ -360,7 +360,7 @@ namespace INTERP_UTILS
     //debug cout << Vect[i] << "  ";
     //debug cout << endl << endl;
 
-    return Vect;
+    //MN:   return Vect;
   }
 
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ __ _ _ _ */ 
@@ -527,29 +527,156 @@ namespace INTERP_UTILS
     FractSurf.write(id3);
   }
 
-  inline void getElemBB(double* bb, const monMaillageP& MaP, int iP)
+  inline void getElemBB(double* bb, const MEDMEM::MESH& mesh, int iP, int nb_nodes)
   {
     bb[0]=HUGE;bb[1]=-HUGE;
     bb[2]=HUGE;bb[3]=-HUGE;
     bb[4]=HUGE;bb[5]=-HUGE;
 		
-    for (int i=0; i<3; i++)
+    for (int i=0; i<nb_nodes; i++)
       {
-	double x = MaP._Coord[(MaP._Connect[3*iP+i]-1)*3];
-	double y = MaP._Coord[(MaP._Connect[3*iP+i]-1)*3+1];
-	double z = MaP._Coord[(MaP._Connect[3*iP+i]-1)*3+2];
+	double x = *(mesh.getCoordinates(MED_FULL_INTERLACE)+3*(iP+i));
+	double y = *(mesh.getCoordinates(MED_FULL_INTERLACE)+3*(iP+i)+1);
+	double z = *(mesh.getCoordinates(MED_FULL_INTERLACE)+3*(iP+i)+2);
 	bb[0]=(x<bb[0])?x:bb[0];
 	bb[1]=(x>bb[1])?x:bb[1];
 	bb[2]=(y<bb[2])?y:bb[2];
 	bb[3]=(y>bb[3])?y:bb[3];
 	bb[4]=(z<bb[4])?z:bb[4];
 	bb[5]=(z>bb[5])?z:bb[5];
-      }
-		
+      }		
   }
 
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  /* Computes the dot product of a and b */
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  template<int dim> inline double dotprod( double * a, double * b)
+  {
+    double result=0;
+    for(int idim = 0; idim < dim ; idim++) result += a[idim]*b[idim];
+    return result;
+  }
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  /* Computes the norm of vector v */
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/  
+  template<int dim> inline double norm( double * v)
+  {   
+    double result =0;
+    for(int idim =0; idim<dim; idim++) result+=v[idim]*v[idim];
+    return sqrt(result);
+  }
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  /* Computes the norm of vector a-b */
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/  
+  template<int dim> inline double distance2( const double * a, const double * b)
+  {   
+    double result =0;
+    for(int idim =0; idim<dim; idim++) result+=(a[idim]-b[idim])*(a[idim]-b[idim]);
+    return result;
+  }
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  /* Computes the determinant of a and b */
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  inline double determinant ( double *  a, double * b)
+  {
+    return a[0]*b[1]-a[1]*b[0];
+  }
+  inline double determinant ( double *  a, double * b, double * c)
+  {
+    return a[0]*determinant(b+1,c+1)-b[0]*determinant(a+1,c+1)+c[0]*determinant(a+1,b+1);
+  }
+  
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  /* Computes the cross product of AB and AC */
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/  
 
- 
+  template<int dim> inline void crossprod( const double * A, const double * B, const double * C, double * V);
+  
+  template<> inline
+  void crossprod<2>( const double * A, const double * B, const double * C, double * V)
+  {   
+    double AB[2];
+    double AC[2];
+    for(int idim =0; idim<2; idim++) AB[idim] = B[idim]-A[idim];//B-A
+    for(int idim =0; idim<2; idim++) AC[idim] = C[idim]-A[idim];//C-A;
 
-};
+    V[0]=determinant(AB,AC);
+    V[1]=0;
+  }
+  template<> inline
+  void crossprod<3>( const double * A, const double * B, const double * C, double * V)
+  {   
+    double AB[3];
+    double AC[3];
+    for(int idim =0; idim<3; idim++) AB[idim] = B[idim]-A[idim];//B-A
+    for(int idim =0; idim<3; idim++) AC[idim] = C[idim]-A[idim];//C-A;
+
+    V[0]=AB[1]*AC[2]-AB[2]*AC[1];
+    V[1]=-AB[0]*AC[2]+AB[2]*AC[0];
+    V[2]=AB[0]*AC[1]-AB[1]*AC[0];    
+  }
+  
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  /* Checks wether point A is inside the quadrangle BCDE */
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/  
+
+  template<int dim> inline double check_inside(const double* A,const double* B,const double* C,const double* D,
+						     const double* E,double* ABC, double* ADE)
+  {
+    crossprod<dim>(A,B,C,ABC);
+    crossprod<dim>(A,D,E,ADE);
+    return dotprod<dim>(ABC,ADE);
+  }   
+
+  
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  /* Computes the geometric angle (in [0,Pi]) between two non zero vectors AB and AC */
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/  
+  template<int dim> inline double angle(const double * A, const double * B, const double * C, double * n)
+  {   
+    double AB[dim];
+    double AC[dim];
+    double orthAB[dim];
+
+    for(int idim =0; idim<dim; idim++) AB[idim] = B[idim]-A[idim];//B-A;
+    for(int idim =0; idim<dim; idim++) AC[idim] = C[idim]-A[idim];//C-A;
+
+    double normAB= norm<dim>(AB);
+    for(int idim =0; idim<dim; idim++) AB[idim]/=normAB;
+
+    double normAC= norm<dim>(AC);
+    double AB_dot_AC=dotprod<dim>(AB,AC);
+    for(int idim =0; idim<dim; idim++) orthAB[idim] = AC[idim]-AB_dot_AC*AB[idim];
+
+    double denom= normAC+AB_dot_AC;
+    double numer=norm<dim>(orthAB);
+    
+    return 2*atan2(numer,denom);
+  }    
+  
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  /* Tells whether the frame constituted of vectors AB, AC and n is direct */
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/  
+  template<int dim> inline double direct_frame(const double * A, const double * B, const double * C, double * n);
+  template<> inline
+  double direct_frame<2>(const double * A, const double * B, const double * C, double * n)
+  {
+    double AB[2];
+    double AC[2];
+    for(int idim =0; idim<2; idim++) AB[idim] = B[idim]-A[idim];//B-A;
+    for(int idim =0; idim<2; idim++) AC[idim] = C[idim]-A[idim];//C-A;
+    
+    return  determinant(AB,AC)*n[0];
+  }
+  template<> inline
+  double direct_frame<3>(const double * A, const double * B, const double * C, double * n)
+  {
+    double AB[3];
+    double AC[3];
+    for(int idim =0; idim<3; idim++) AB[idim] = B[idim]-A[idim];//B-A;
+    for(int idim =0; idim<3; idim++) AC[idim] = C[idim]-A[idim];//C-A;
+    
+    return determinant(AB,AC,n)>0;
+  }
+}; 
 #endif

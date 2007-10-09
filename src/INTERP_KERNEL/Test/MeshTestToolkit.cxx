@@ -318,7 +318,7 @@ namespace INTERP_TEST
   void MeshTestToolkit::calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) const
   {
     const string dataBaseDir = getenv("MED_ROOT_DIR");
-    const string dataDir = dataBaseDir + string("share/salome/resources/med/");
+    const string dataDir = dataBaseDir + string("/share/salome/resources/med/");
 
     LOG(1, std::endl << "=== -> intersecting src = " << mesh1path << ", target = " << mesh2path );
 
@@ -328,7 +328,7 @@ namespace INTERP_TEST
     LOG(5, "Loading " << mesh2 << " from " << mesh2path);
     MESH tMesh(MED_DRIVER, dataDir+mesh2path, mesh2);
 
-    m = _interpolator->interpol_maillages(sMesh, tMesh);
+    m = _interpolator->interpolateMeshes(sMesh, tMesh);
 
     // if reflexive, check volumes
     if(strcmp(mesh1path,mesh2path) == 0)

@@ -71,8 +71,8 @@ CXXFLAGS+=@CXXTMPDPTHFLAGS@ $(MED2_INCLUDES) $(HDF5_INCLUDES) -I$(top_srcdir)/sr
 CPPFLAGS+=$(BOOST_CPPFLAGS) $(MED2_INCLUDES) $(HDF5_INCLUDES) -I$(top_srcdir)/src/INTERP_KERNEL
 
 #include CppUnit
-CXXFLAGS+= -I/usr/include/cppunit
-CPPFLAGS+= -I/usr/include/cppunit
+CXXFLAGS+= ${CPPUNIT_INCLUDES}
+CPPFLAGS+= ${CPPUNIT_INCLUDES}
 
 # for log
 CXXFLAGS+= -DLOG_LEVEL=3 -DOPTIMIZE -O2 -Wall
@@ -83,8 +83,8 @@ CPPFLAGS+= -DLOG_LEVEL=3 -DOPTIMIZE -O2 -Wall
 #CPPFLAGS+=-fprofile-arcs -ftest-coverage 
 
 #for gprof
-#CXXFLAGS+=-pg
-#CPPFLAGS+=-pg
+CXXFLAGS+=-pg
+CPPFLAGS+=-pg
 
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
@@ -92,8 +92,8 @@ LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem  -lutil
 #LDFLAGS+= $(HDF5_LIBS) $(STDLIB)  -lmedmem  -lutil -lmed
 
 # for gcov
-#LDFLAGS+= -lgcov
-#LDFLAGS+= -pg
+LDFLAGS+= -lgcov
+LDFLAGS+= -pg
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
@@ -112,7 +112,7 @@ LIBS = @LIBS@ @CPPUNIT_LIBS@
 
 LDFLAGSFORBIN += $(LDFLAGS) -lm $(HDF5_LIBS) \
                 -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome \
-                -lcppunit -linterpkernel
+                $(CPPUNIT_LIBS) -linterpkernel
 
 #LDFLAGSFORBIN += -pg
 
