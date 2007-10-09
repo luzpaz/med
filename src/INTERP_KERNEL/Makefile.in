@@ -49,7 +49,6 @@ BoundingBox.hxx\
 TetraAffineTransform.hxx\
 TranslationRotationMatrix.hxx\
 Interpolation2D.hxx\
-Interpolation2Dbis.hxx\
 Interpolation3DSurf.hxx\
 InterpolationUtils.hxx\
 BBTree.H\
@@ -86,7 +85,6 @@ TetraAffineTransform.cxx\
 Interpolation3D.cxx\
 Interpolation3DSurf.cxx\
 Interpolation2D.cxx\
-Interpolation2Dbis.cxx\
 IntersectorTetra.cxx\
 IntersectorHexa.cxx\
 PlanarIntersector.cxx
@@ -98,7 +96,7 @@ BIN_SRC =
 BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = 
 
-TEST_PROGS = testUnitTetra test_PolygonAlgorithms test_Interpol_2D test_Interpol_2Dbis  test_Interpol_3DSurf
+TEST_PROGS = testUnitTetra test_PolygonAlgorithms test_Interpol_2D test_Interpol_3DSurf
 
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
