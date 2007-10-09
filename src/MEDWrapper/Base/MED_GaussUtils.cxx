@@ -1428,9 +1428,9 @@ namespace MED
 	aSlice[1] = 0.5*aCoord[2]*(1.0 - aCoord[0])*(2.0*aCoord[2] - 2.0 - aCoord[0]);
 	aSlice[2] = 0.5*(aCoord[0] - 1.0)*(1.0 - aCoord[1] - aCoord[2])*(aCoord[0] + 2.0*aCoord[1] + 2.0*aCoord[2]);
 
-	aSlice[3] = 0.5*aCoord[1]*(1.0 + aCoord[0])*(2.0*aCoord[1] - 2.0 - aCoord[0]);
-	aSlice[4] = 0.5*aCoord[2]*(1.0 + aCoord[0])*(2.0*aCoord[2] - 2.0 - aCoord[0]);
-	aSlice[5] = -0.5*(aCoord[0] + 1.0)*(1.0 - aCoord[1] - aCoord[2])*(-aCoord[0] + 2.0*aCoord[1] + 2.0*aCoord[2]);
+	aSlice[3] = 0.5*aCoord[1]*(1.0 + aCoord[0])*(2.0*aCoord[1] - 2.0 + aCoord[0]);
+	aSlice[4] = 0.5*aCoord[2]*(1.0 + aCoord[0])*(2.0*aCoord[2] - 2.0 + aCoord[0]);
+	aSlice[5] = 0.5*(-aCoord[0] - 1.0)*(1.0 - aCoord[1] - aCoord[2])*(-aCoord[0] + 2.0*aCoord[1] + 2.0*aCoord[2]);
 
 	aSlice[6] = 2.0*aCoord[1]*aCoord[2]*(1.0 - aCoord[0]);
 	aSlice[7] = 2.0*aCoord[2]*(1.0 - aCoord[1] - aCoord[2])*(1.0 - aCoord[0]);
@@ -1495,9 +1495,9 @@ namespace MED
         aSlice[2] = 0.5*aCoord[2]*(1.0 - aCoord[0])*(2.0*aCoord[2] - 2.0 - aCoord[0]);
         aSlice[1] = 0.5*(aCoord[0] - 1.0)*(1.0 - aCoord[1] - aCoord[2])*(aCoord[0] + 2.0*aCoord[1] + 2.0*aCoord[2]);
       
-        aSlice[3] = 0.5*aCoord[1]*(1.0 + aCoord[0])*(2.0*aCoord[1] - 2.0 - aCoord[0]);
-        aSlice[5] = 0.5*aCoord[2]*(1.0 + aCoord[0])*(2.0*aCoord[2] - 2.0 - aCoord[0]);
-        aSlice[4] = -0.5*(aCoord[0] + 1.0)*(1.0 - aCoord[1] - aCoord[2])*(-aCoord[0] + 2.0*aCoord[1] + 2.0*aCoord[2]);
+        aSlice[3] = 0.5*aCoord[1]*(1.0 + aCoord[0])*(2.0*aCoord[1] - 2.0 + aCoord[0]);
+        aSlice[5] = 0.5*aCoord[2]*(1.0 + aCoord[0])*(2.0*aCoord[2] - 2.0 + aCoord[0]);
+        aSlice[4] = 0.5*(-aCoord[0] - 1.0)*(1.0 - aCoord[1] - aCoord[2])*(-aCoord[0] + 2.0*aCoord[1] + 2.0*aCoord[2]);
       
         aSlice[8] = 2.0*aCoord[1]*aCoord[2]*(1.0 - aCoord[0]);
         aSlice[7] = 2.0*aCoord[2]*(1.0 - aCoord[1] - aCoord[2])*(1.0 - aCoord[0]);
