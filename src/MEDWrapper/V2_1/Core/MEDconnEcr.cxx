@@ -106,7 +106,7 @@ MEDconnEcr(med_idt fid,char *maa, med_int mdim, med_int *connectivite,med_mode_s
        return -1;
      }
    dimd[0] = nbre*taille;
-#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
+#if defined(HAVE_F77INT64)
    if ((ret = _MEDdatasetNumEcrire(geoid,nom_dataset,MED_INT64,mode_switch,(med_size)taille,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
 				    (unsigned char*) connectivite,mode)) < 0)
      return -1;

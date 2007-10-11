@@ -54,7 +54,7 @@ _MEDattrNumLire(med_idt pere,med_type_champ type,char *nom,unsigned char *val)
       break;
       
     case MED_INT :
-#if defined(IRIX64) || defined(OSF1) || defined(PCLINUX64)
+#if defined(HAVE_F77INT64)
       type_hdf = H5T_NATIVE_LONG; 
 #else
       type_hdf = H5T_NATIVE_INT;

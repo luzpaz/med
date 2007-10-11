@@ -118,7 +118,7 @@ MEDfamCr(med_idt fid,char* maa,char *famille,med_int numero,
        * Le Data Set "IDE"
        */
       dimd[0] = n_attr;
-#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
+#if defined(HAVE_F77INT64)
       if ((ret = _MEDdatasetNumEcrire(datagroup,MED_NOM_IDE,MED_INT64,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
 				   (unsigned char *)attr_ident,MED_REMP)) < 0)
 	return -1;    
@@ -132,7 +132,7 @@ MEDfamCr(med_idt fid,char* maa,char *famille,med_int numero,
        * Le Data Set "VAL"
        */
       dimd[0] = n_attr;
-#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
+#if defined(HAVE_F77INT64)
       if ((ret = _MEDdatasetNumEcrire(datagroup,MED_NOM_VAL,MED_INT64,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
 				   (unsigned char*)attr_val,MED_REMP)) < 0)
 	return -1;

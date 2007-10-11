@@ -65,7 +65,7 @@ MEDprofilEcr(med_idt fid,med_int *pflval,med_int n,char *nom)
    * On stocke le profil dans un dataset
    */
   dimd[0] = n;
-#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
+#if defined(HAVE_F77INT64)
   if ((ret =  _MEDdatasetNumEcrire(pid,MED_NOM_PFL,MED_INT64,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
 				(unsigned char*) pflval,MED_REMP)) < 0)
     return -1;

@@ -53,5 +53,5 @@ dist_libMEDWrapperBase_la_SOURCES= \
 	MED_CoordUtils.cxx \
 	MED_Utilities.cxx
 
-libMEDWrapperBase_la_CPPFLAGS= $(BOOST_CPPFLAGS) $(HDF5_INCLUDES) -D@MACHINE@ -I$(top_builddir)/salome_adm/unix
+libMEDWrapperBase_la_CPPFLAGS= $(BOOST_CPPFLAGS) $(HDF5_INCLUDES) -D@MACHINE@ -I$(top_builddir)/salome_adm/unix $(MED_CPPFLAGS)
 libMEDWrapperBase_la_LDFLAGS= $(BOOST_LIBS) -lboost_thread${BOOST_LIBSUFFIX}

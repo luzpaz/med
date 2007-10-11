@@ -25,4 +25,6 @@ dist_admlocalm4_DATA=\
     check_scotch.m4 \
     splitter.m4 \
     with_Kernel.m4 \
+    ac_check_sizeof_fortran.m4 \
+    med_check_sizeof_medint.m4 \
     README
