@@ -13,8 +13,8 @@ UnstructuredParaSUPPORT::UnstructuredParaSUPPORT(const ParaMESH* const mesh, con
 ParaSUPPORT(mesh,support),
 _entity(support->getEntity())
 {
-  _mesh=mesh;
-  _support=support;
+  //_mesh=mesh;
+  //_support=support;
   _explicit_topology=new ExplicitTopology(*(ParaSUPPORT*)this);
 }
 
@@ -23,10 +23,10 @@ UnstructuredParaSUPPORT::UnstructuredParaSUPPORT(const MEDMEM::SUPPORT* support,
 	ParaSUPPORT(*support,proc_group),
   _entity(support->getEntity())
 {
-  ostringstream name ("mesh associated with support ");
-  name << support->getName();
-  _mesh=new ParaMESH(*support->getMesh(), proc_group, name.str() );
-  _support=support;
+  //ostringstream name ("mesh associated with support ");
+ // name << support->getName();
+ // _mesh=new ParaMESH(*support->getMesh(), proc_group, name.str() );
+  //_support=support;
   int nb_elem=_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   //  _explicit_topology=new ExplicitTopology(*(ParaSUPPORT*)this);
   _explicit_topology=new BlockTopology(proc_group,nb_elem);
