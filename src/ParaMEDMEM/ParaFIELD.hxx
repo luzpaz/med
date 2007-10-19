@@ -45,6 +45,8 @@ private:
 	 ParaMEDMEM::Topology* _topology; 
 	MEDMEM::FIELD<double>* _field;
 	const  ParaMEDMEM::ParaSUPPORT* _support;
+	bool _has_field_ownership;
+	bool _has_support_ownership;
 };
 
 }

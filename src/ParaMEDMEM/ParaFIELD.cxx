@@ -18,10 +18,20 @@ using namespace MEDMEM;
 namespace ParaMEDMEM
 {
 
+	/*! Constructing a \c ParaFIELD from a \c ParaSUPPORT and a \c ComponentTopology.
+
+		This constructor creates an empty field based on the ParaSUPPORT description 
+and the partitioning of components described in \a component_topology.
+It takes ownership over the \c _field object that it creates.
+ 
+	*/
+
 ParaFIELD::ParaFIELD(const ParaSUPPORT* para_support, const ComponentTopology& component_topology)
 :_support(para_support),
  _component_topology(component_topology),
- _field(0)
+ _field(0),
+ _has_field_ownership(true),
+ _has_support_ownership(false)
 {
 	if (dynamic_cast<const StructuredParaSUPPORT*>(para_support)!=0)
 	{const BlockTopology* source_topo = dynamic_cast<const BlockTopology*>(para_support->getTopology());
@@ -53,7 +63,7 @@ ParaFIELD::ParaFIELD(const ParaSUPPORT* para_support, const ComponentTopology& c
 	_field->setNumberOfValues(para_support->getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 	string* compnames=new string[nb_components];
 	string* compdesc=new string[nb_components];
-		string* compunit=new string[nb_components];
+	string* compunit=new string[nb_components];
 	for (int i=0; i<nb_components; i++)
 	{
 		ostringstream stream(compnames[i]);
@@ -76,15 +86,21 @@ ParaFIELD::ParaFIELD(const ParaSUPPORT* para_support, const ComponentTopology& c
 	_field->setTime(0.0);
 	delete[] compnames;
 	delete[] compdesc;
+  delete[] compunit;
 } 
 
 /*! Constructor creating the ParaFIELD
- * from a given FIELD
+ from a given FIELD and a processor group. 
+
+This constructor supposes that support underlying \a subdomain_field has no ParaSUPPORT 
+attached and it therefore recreates one. It therefore takes ownership over _support.
  */
 ParaFIELD::ParaFIELD(MEDMEM::FIELD<double>* subdomain_field, const ProcessorGroup& proc_group):
 _field(subdomain_field),
 _support(new UnstructuredParaSUPPORT(subdomain_field->getSupport(), proc_group)),
-_component_topology(ComponentTopology(_field->getNumberOfComponents()))
+_component_topology(ComponentTopology(_field->getNumberOfComponents())),
+_has_field_ownership(false),
+_has_support_ownership(true)
 {
   const ExplicitTopology* source_topo=
     dynamic_cast<const ExplicitTopology*> (_support->getTopology());
@@ -97,10 +113,11 @@ ParaFIELD::ParaFIELD(MEDMEM::driverTypes driver_type, const string& file_name,
 
 ParaFIELD::~ParaFIELD()
 {
-  if (_field!=0)
-    delete _field;
   if (_topology!=0)
     delete _topology;
+	if (_has_field_ownership)
+		delete _field;
+			
 }
 
 void ParaFIELD::write(MEDMEM::driverTypes driverType, const string& fileName, const string& meshName){

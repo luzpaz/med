@@ -20,7 +20,8 @@ _entity(support->getEntity())
 
 /*! Constructor on from a ProcessorGroup and a local support*/
 UnstructuredParaSUPPORT::UnstructuredParaSUPPORT(const MEDMEM::SUPPORT* support, const ProcessorGroup& proc_group):
-_entity(support->getEntity())
+	ParaSUPPORT(*support,proc_group),
+  _entity(support->getEntity())
 {
   ostringstream name ("mesh associated with support ");
   name << support->getName();
@@ -40,7 +41,8 @@ UnstructuredParaSUPPORT::UnstructuredParaSUPPORT(const ParaMESH* const mesh, con
 
 UnstructuredParaSUPPORT::~UnstructuredParaSUPPORT()
 {
-	delete _support;
+	//	if (_has_support_ownership)
+	//		delete _support;
 	delete _explicit_topology;
 }
 

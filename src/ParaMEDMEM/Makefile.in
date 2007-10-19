@@ -72,6 +72,7 @@ BBTree.H\
 LIB=libparamed.la
 
 LIB_SRC = \
+ProcessorGroup.cxx \
 MPIProcessorGroup.cxx\
 BlockTopology.cxx\
 ParaGRID.cxx\
@@ -93,7 +94,8 @@ ICoCoMEDField.cxx
 
 
 
-
+MPI_LIBS=-L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam
+MPI_INCLUDES=-I/data/tmpawa/vb144235/lam_install/include
 # Executables targets
 BIN =
 BIN_SRC = 
@@ -106,7 +108,7 @@ test_ParaField test_DEC test_UnstructuredDEC test_ExplicitDEC test_IntersectionD
 LDFLAGS+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 LDFLAGSFORBIN+= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 
-CPPFLAGS+=$(MED2_INCLUDES) $(MPI_INCLUDES) $(LAM_INCLUDES) -I/data/tmpawa/vb144235/lam_install/include -I/data/tmpawa/vb144235/fvm/src -DFVM_HAVE_MPI
+CPPFLAGS+=$(MED2_INCLUDES) $(MPI_INCLUDES) -I/data/tmpawa/vb144235/fvm/src -DFVM_HAVE_MPI
 
 CPPFLAGS+=-I${srcdir}/../INTERP_KERNEL
 
@@ -114,11 +116,11 @@ CXXFLAGS+=@CXXTMPDPTHFLAGS@
 CPPFLAGS+=$(BOOST_CPPFLAGS)
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) 
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem  $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel 
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lmedmem  $(MPI_LIBS) -lutil -linterpkernel 
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) $(MPI_LIBS) $(LAM_LIBS) -L/data/tmpawa/vb144235/lam_install/lib -lmpi -llam -lutil -linterpkernel 
+LDFLAGSFORBIN+= -lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lmedmem   $(BOOST_LIBS) $(MPI_LIBS) -lutil -linterpkernel 
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}

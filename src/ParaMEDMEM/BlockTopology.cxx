@@ -118,7 +118,8 @@ BlockTopology::BlockTopology(const ProcessorGroup& group, int nb_elem):_proc_gro
 	int* nbelems_per_proc = new int[group.size()];
 	const MPIProcessorGroup* mpi_group=dynamic_cast<const MPIProcessorGroup*>(_proc_group);
 	const MPI_Comm* comm=mpi_group->getComm();
-	mpi_group->getCommInterface().allGather(&nb_elem, 1, MPI_INTEGER, 
+	int nbtemp=nb_elem;
+	mpi_group->getCommInterface().allGather(&nbtemp, 1, MPI_INTEGER, 
 										nbelems_per_proc, 1, MPI_INTEGER, 
 										*comm);
 	_nb_elems=0;	

@@ -1,6 +1,7 @@
 #ifndef _ICOCOTRIOFIELD_HXX_
 #define _ICOCOTRIOFIELD_HXX_
 
+#include <ICoCoField.hxx>
 #include <string>
 namespace ICoCo
 {
@@ -18,8 +19,9 @@ namespace ICoCo
     {
     public:
       
-      TrioField();
-
+      TrioField() {_connectivity=0;_coords=0;_field=0;}
+      ~TrioField() {delete[] _connectivity; delete[] _coords;
+      if (_has_field_ownership) delete[] _field;};
     public:
 			int _mesh_dim;
 			int _space_dim;
@@ -27,13 +29,14 @@ namespace ICoCo
 			int _nodes_per_elem;
 			int _nb_elems;
 			int _itnumber;
-			std::string _name;
+      // std::string _name; // ?? Hérité de la classe mère
 			int* _connectivity;
 			double* _coords;
 
-			double _time;
+			double _time1,_time2;
 			int _nb_field_components;
 			double* _field;
+                       bool _has_field_ownership;
     };
 };
 

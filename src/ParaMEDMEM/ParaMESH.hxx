@@ -31,6 +31,8 @@ public:
 private:
 	//mesh object underlying the ParaMESH object
 	MEDMEM::MESH* _mesh;
+  
+  bool _has_mesh_ownership;
 	//name of the mesh
 	string _name;
 	//connect zone
@@ -44,6 +46,7 @@ private:
 	int* _edgeglobal;
 	int* _faceglobal;
 	int* _cellglobal;
+ 
 };
 
 }

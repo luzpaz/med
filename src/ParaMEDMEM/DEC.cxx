@@ -4,9 +4,9 @@
 #include "ComponentTopology.hxx"
 #include "ParaFIELD.hxx"
 #include "DEC.hxx"
-#include "./ICoCo/ICoCoField.hxx"
-#include "./ICoCo/ICoCoMEDField.hxx"
-#include "./ICoCo/ICoCoTrioField.hxx"
+#include "ICoCoField.hxx"
+#include "ICoCoMEDField.hxx"
+#include "ICoCoTrioField.hxx"
 
 
 /*! \defgroup dec DEC
@@ -30,16 +30,22 @@ namespace ParaMEDMEM
 		@{ 
 	*/
   DEC::DEC(ProcessorGroup& source_group, ProcessorGroup& target_group):_local_field(0), 
-																																			 _source_group(&source_group), _target_group(&target_group), _owns_field(false)
+																																			 _source_group(&source_group),
+																																			 _target_group(&target_group),
+																																			 // _owns_field(false),
+																																			 _forced_renormalization_flag(false),
+																																			 _icoco_field(0)
   {
     _union_group = source_group.fuse(target_group);  
   }
 
   DEC::~DEC()
   {
+    //    delete _union_group;
+		//		if (_owns_field)
+		//	delete _local_field;
+		delete _icoco_field;
     delete _union_group;
-		if (_owns_field)
-			delete _local_field;
   }  
 	/*! Attaches a local field to a DEC.
 If the processor is on the receiving end of the DEC, the field
@@ -76,9 +82,10 @@ Reversely, if the processor is on the sending end, the field will be read, possi
  				ProcessorGroup* localgroup;
  				if (_source_group->containsMyRank()) localgroup=_source_group;
  				else localgroup=_target_group;
- 				ICoCo::Field* parafield=new ICoCo::MEDField(*triofield, *localgroup);
- 				_owns_field = true;
- 				attachLocalField(parafield);
+ 				_icoco_field=new ICoCo::MEDField(*const_cast<ICoCo::TrioField* >(triofield), *localgroup);
+				// 				_owns_field = true;
+ 				attachLocalField(_icoco_field);
+				return;
  			}
  		throw MEDMEM::MEDEXCEPTION("incompatible field type");
  	}

@@ -12,7 +12,7 @@ class CommInterface;
 class DEC
 {
 public:
-	DEC():_local_field(0){}
+  DEC():_local_field(0),_forced_renormalization_flag(false){}
   DEC(ProcessorGroup& local_group, ProcessorGroup& distant_group); 
 	void attachLocalField(const ParaFIELD* field);
   void attachLocalField(const ICoCo::Field* field);
@@ -34,7 +34,9 @@ protected:
   
 	const CommInterface* _comm_interface;
 	bool _forced_renormalization_flag;
-	bool _owns_field;
+	//	bool _owns_field;
+  private:
+	ICoCo::Field* _icoco_field;
 };
 
 }

@@ -3,6 +3,7 @@
 
 #include "ParaSUPPORT.hxx"
 #include "MEDMEM_define.hxx"
+#include "Topology.hxx"
 #include "ExplicitTopology.hxx"
 
 using namespace MED_EN;
@@ -32,6 +33,7 @@ namespace ParaMEDMEM
   private:
     const Topology*  _explicit_topology;
     const MED_EN::medEntityMesh _entity;
+
 	
   };
   

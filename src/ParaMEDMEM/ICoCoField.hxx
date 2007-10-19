@@ -10,9 +10,9 @@ class Field
      Field(){};
     virtual ~Field(){};
     void setName(const std::string& name) {_name=name;}
-    std::string getName() {return _name;}
+    std::string getName()const {return _name;}
    
-  private:
+  protected:
     std::string _name;
   };
 }

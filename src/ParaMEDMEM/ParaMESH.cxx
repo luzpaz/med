@@ -18,7 +18,7 @@ namespace ParaMEDMEM
 
 ParaMESH::ParaMESH(MEDMEM::driverTypes driver_type, const string& filename, 
 	const ProcessorGroup& group)
-throw (MEDMEM::MEDEXCEPTION){
+throw (MEDMEM::MEDEXCEPTION) :_has_mesh_ownership(true) {
 
   BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::read()")
   
@@ -201,7 +201,8 @@ throw (MEDMEM::MEDEXCEPTION){
 ParaMESH::ParaMESH(MEDMEM::MESH& subdomain_mesh, const ProcessorGroup& proc_group, const string& name):
 _mesh(&subdomain_mesh),
 _my_domain_id(proc_group.myRank()),
-_block_topology (new BlockTopology(proc_group, subdomain_mesh.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS)))
+_block_topology (new BlockTopology(proc_group, subdomain_mesh.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS))),
+_has_mesh_ownership(false)
 {
 	ostringstream stream;
 	stream<<name<<"_"<<_my_domain_id+1;
@@ -217,7 +218,12 @@ _block_topology (new BlockTopology(proc_group, subdomain_mesh.getNumberOfElement
 
 
 
-ParaMESH::~ParaMESH(){if (_mesh !=0) delete _mesh;};
+ParaMESH::~ParaMESH()
+{
+  if (_has_mesh_ownership) delete _mesh;
+  delete _block_topology;
+  delete[] _cellglobal;
+}
 
 /*! method for writing a distributed MESH
  * 

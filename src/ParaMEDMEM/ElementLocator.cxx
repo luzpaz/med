@@ -155,7 +155,8 @@ bool ElementLocator::_intersectsBoundingBox(int irank)
   double*  distant_bb =  _domain_bounding_boxes+irank*2*dim;
   for (int idim=0; idim < _local_mesh->getSpaceDimension(); idim++)
   {
-    bool intersects = distant_bb[idim*2]<local_bb[idim*2+1] && local_bb[idim*2]<distant_bb[idim*2+1];
+    const double eps =  1e-12;
+    bool intersects = distant_bb[idim*2]<local_bb[idim*2+1]+eps && local_bb[idim*2]<distant_bb[idim*2+1]+eps;
     if (!intersects) return false; 
   }
   return true;
