@@ -100,7 +100,7 @@ namespace MEDMEM
     P3w[0]=PP3[0]; P3w[1]=PP3[1];P3w[2]=PP3[2];
     
     // translating to set P1 at the origin
-    for (int i=0; i<2; i++)
+    for (int i=0; i<3; i++)
       {
 	P2w[i]-=PP1[i];
 	P3w[i]-=PP1[i];
