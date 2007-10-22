@@ -113,8 +113,7 @@ namespace MEDMEM
        	for(int i=0; i<  nb_inter; i++)
 	  {for (int idim=0; idim<DIM; idim++) cout<< inter[DIM*i+idim]<< " "; cout << endl;}
 	cout<<endl<<"Intersection area = " << result << endl;
-	exit(1);
-      }
+     }
     
     return result;
   }
