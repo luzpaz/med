@@ -127,23 +127,23 @@ msgstr "Popup test"
 msgid "STB_POPUPTEST"
 msgstr "Popup test"
 
-msgid "TOP_ERASE"
-msgstr "Erase"
+msgid "TOP_HIDE"
+msgstr "Hide"
 
-msgid "MEN_ERASE"
-msgstr "Erase"
+msgid "MEN_HIDE"
+msgstr "Hide"
 
-msgid "STB_ERASE"
-msgstr "Erase"
+msgid "STB_HIDE"
+msgstr "Hide"
 
-msgid "TOP_DISPLAY"
-msgstr "Display"
+msgid "TOP_SHOW"
+msgstr "Show"
 
-msgid "MEN_DISPLAY"
-msgstr "Display"
+msgid "MEN_SHOW"
+msgstr "Show"
 
-msgid "STB_DISPLAY"
-msgstr "Display"
+msgid "STB_SHOW"
+msgstr "Show"
 
 
 
