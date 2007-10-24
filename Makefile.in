@@ -306,6 +306,7 @@ distclean-other:
 	-$(RM) salome_adm/unix/depend salome_adm/unix/SALOMEconfig.h 
 	-$(RM) config.cache config.log config.status 
 
+
 @MODULE@
 
 install: install-bin install-include install-end
