@@ -34,6 +34,7 @@ namespace MEDMEM
        cout<< "  _intersection_type = Generic " <<endl;
        if(_Do_rotate) cout<< "  _do_rotate = true"<<endl;
        else cout<< "  _do_rotate = false"<<endl;
+       cout<< "warning: Genric case not yet tested" << endl;
      }
  }
 

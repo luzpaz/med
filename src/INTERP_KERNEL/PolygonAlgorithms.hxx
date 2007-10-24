@@ -25,10 +25,9 @@ namespace INTERP_UTILS
   class PolygonAlgorithms
   {
   public:
-    int _Inter_size;//size of the intersection
-
     PolygonAlgorithms(double epsilon, double precision);
     deque<double> intersect_convex_polygons(const double* P_1,const double* P_2, int N1, int N2);
+
     //Not yet tested
     int convex_decomposition(const double * P, int N, vector< map< int,int > >& components,
 			     vector< int >& components_index, const double epsilon);
@@ -45,7 +44,6 @@ namespace INTERP_UTILS
     double _Epsilon;
     double _Precision;
 
-
     void define_indices(int& i_loc, int& i_next, int& i_prev, 
 			const double *& Poly1, const double *& Poly2,
 			int& j1, int& j1_glob, int& j2, int& j2_glob,
@@ -61,8 +59,8 @@ namespace INTERP_UTILS
 		       const double * C, const double * D, int j, int j_next);
     void add_crossing( double * ABCD, pair< int,int > i_i_next, pair< int,int > j_j_next);
     void add_new_vertex( int i, int i_glob, int i_next_glob, int i_prev_glob, const double * P);
-    bool intersect_segment_segment(const double * A,  const double * B, const double * C, const double * D,
-				   const double * E, double * V);
+    bool intersect_segment_segment(const double * A,  const double * B, const double * C,
+				   const double * D,  const double * E, double * V);
 
 
     //Not yet tested

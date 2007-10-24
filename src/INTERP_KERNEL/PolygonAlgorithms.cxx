@@ -12,7 +12,6 @@ namespace INTERP_UTILS
   template< int DIM>
   PolygonAlgorithms<DIM>::PolygonAlgorithms(double epsilon, double precision)//: (0)
   {
-    _Inter_size = 0;//To do remove des push_back and update of _Inter_size
     _Is_in_intersection = false;
     _Epsilon = epsilon;
     _Precision = precision;
@@ -28,31 +27,51 @@ namespace INTERP_UTILS
   bool PolygonAlgorithms<DIM>::intersect_segment_segment(const double * A,  const double * B, const double * C,
 							 const double * D, const double * E, double * V)
   {    
-    double AB[DIM], DC[DIM], AC[DIM];
+    double AB[DIM], DC[DIM], AC[DIM], det, t1, t2, inv_det;
+    
+    /******* Initialisation of the linear system  t1*AB+t2*DC=AC ***********/
     for(int idim=0;idim<DIM;idim++)
       {
 	AB[idim] = B[idim]-A[idim];//B-A
 	DC[idim] = C[idim]-D[idim];//C-D
 	AC[idim] = C[idim]-A[idim];//C-A
       }
-    double det = determinant(AB,DC);//determinant of the first two coefficients
-    double t1, t2;
-    int z_plane=0;
-    if(abs(det) < _Epsilon)
+    
+    /******* Resolution of the linear system  t1*AB+t2*DC=AC ***********/    
+    det = determinant(AB,DC);//determinant of the first two coordinates
+    if(abs(det) >_Epsilon)
+      {   
+	inv_det = 1/det;
+	t1 = determinant(AC,DC)*inv_det;//solves the linear system t1*AB+t2*DC=AC
+	t2 = determinant(AB,AC)*inv_det;//solves the linear system t1*AB+t2*DC=AC
+      }
+    else 
       {
 	switch(DIM)
 	  {
 	  case 2:
 	    return false;
-	  case 3:
-	    det = determinant(&AB[1],&DC[1]);//determinant of the two last coefficients
-	    if(abs(det) < _Epsilon) return false;//case of paralell segments
-	    else z_plane=1;
+	  case 3://beware AB and CD may belong to a vertical plane
+	    det = determinant(&AB[1],&DC[1]);//determinant of the last two coefficients
+	    if(abs(det) > _Epsilon) 
+	      {
+		inv_det = 1/det;
+		t1=(AC[1]*DC[2]-AC[2]*DC[1])*inv_det;
+		t2=(AB[1]*AC[2]-AB[2]*AC[1])*inv_det;
+	      }
+	    else //beware AB and CD may belong to a plane y = constant
+	      {
+		det = AB[0]*DC[2]-AB[2]*DC[0];
+		if(abs(det) > _Epsilon) 
+		  {
+		    inv_det = 1/det;
+		    t1=(AC[0]*DC[2]-AC[2]*DC[0])*inv_det;
+		    t2=(AB[0]*AC[2]-AB[2]*AC[0])*inv_det;
+		  }
+		else return false;//case of paralell segments
+	      }
 	  }
       }
-    
-    t1 = determinant(&AC[z_plane],&DC[z_plane])/det;//solves the linear system t1*AB+t2*DC=AC
-    t2 = determinant(&AB[z_plane],&AC[z_plane])/det;//solves the linear system t1*AB+t2*DC=AC
     
     if(t1>_Precision && t1<1-_Precision)
       {
@@ -79,7 +98,7 @@ namespace INTERP_UTILS
 	    else if( same_side > _Epsilon ) _Terminus= !_Is_in_intersection;//reflexion
 	    else //separation of overlaping edges
 	      {
-		if(_Inter.size() ==0) _Terminus=true;
+		if(_Inter.empty() ) _Terminus=true;
 		else if(!_Is_in_intersection)
 		      {
 			for(int idim=0;idim<DIM;idim++) V[idim]=A[idim];
@@ -105,7 +124,7 @@ namespace INTERP_UTILS
 		crossprod<DIM>(A,E,B,_Vdouble); 
 		if(dotprod<DIM>(_Vdouble,Vdoublebis) >=_Epsilon )//crossing
 		  {
-		    if(_Inter.size()==0) _Terminus=true;
+		    if(_Inter.empty()) _Terminus=true;
 		    else if(!_Is_in_intersection)
 		      {
 			for(int idim=0;idim<DIM;idim++) V[idim]=A[idim];
@@ -148,7 +167,7 @@ namespace INTERP_UTILS
   inline void PolygonAlgorithms<DIM>::add_crossing( double * ABCD, pair< int,int > i_i_next, 
 						    pair< int,int > j_j_next)
   {    
-    if( _Inter.size()>0 )
+    if(!_Inter.empty() )
       {
 	if(_End_segments[1] ==i_i_next)
 	  {
@@ -317,11 +336,11 @@ namespace INTERP_UTILS
  	i_next_glob = i_next+shift;
 	i_prev_glob = i_prev+shift;
 	//warning: sign is either 1 or -1;
-	//To do test and remove from Convex_intersecor.cxx
-	while(distance2<DIM>(&Poly1[DIM*i_loc],&Poly1[DIM*i_next])< _Epsilon && i_next != i_loc)
-	  i_next =(i_next+sign+N0)%N0; 
-	while(distance2<DIM>(&Poly1[DIM*i_loc],&Poly1[DIM*i_prev])< _Epsilon && i_prev != i_loc) 
-	  i_prev =(i_prev+sign+N0)%N0; 
+	//To do: test and remove from Convex_intersecor.cxx
+// 	while(distance2<DIM>(&Poly1[DIM*i_loc],&Poly1[DIM*i_next])< _Epsilon && i_next != i_loc)
+// 	  i_next =(i_next+sign+N0)%N0; 
+// 	while(distance2<DIM>(&Poly1[DIM*i_loc],&Poly1[DIM*i_prev])< _Epsilon && i_prev != i_loc) 
+// 	  i_prev =(i_prev+sign+N0)%N0; 
  }
   /*******************************************************/
   /* computes the vertices of the intersection of two COPLANAR */
@@ -336,10 +355,7 @@ namespace INTERP_UTILS
       i_prev, i_prev_glob, i_next, i_next_glob, nb_prev, sign, idim;
     const double * Poly1, * Poly2;
     bool four_neighbours=false;
-
-    int minN1N2 = N1 < N2 ? N1 : N2;
-//     _Inter.resize(2*minN1N2);
-    _Terminus = minN1N2 < 3;
+    _Terminus = N1 < 3 || N2<3;
 
     /* list of future events ordered according to their coordinates (x,y,z) (lexicographical order) */
     multimap< const double *, int, VertexLess<DIM> > events;
@@ -425,16 +441,15 @@ namespace INTERP_UTILS
 		if( _Is_in_intersection ) add_new_vertex(i_loc, i_glob, i_next_glob, i_prev_glob, Poly1);
 		add_crossings(&Poly1[DIM*i_loc], &Poly1[DIM*i_next], i_glob, i_next_glob,
 			      &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob,
-			      &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob,
-			      &Poly1[DIM*i_prev]); 
+			      &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob, &Poly1[DIM*i_prev]); 
 		break;
 	      case 2 :
-		if(_Inter.size()>0)
+		if(!_Inter.empty())
 		  if(i_glob < N1)  for(idim=0;idim<DIM;idim++) _Inter.push_back(P_1[DIM*i_glob+idim]);
 		  else for(idim=0;idim<DIM;idim++) _Inter.push_back(P_2[DIM*(i_glob-N1)+idim]);
 		return _Inter;
-	      case 0 ://MN: à virer d'ici
-		if(_Inter.size()==0){
+	      case 0 ://To do: remove this case from here
+		if(_Inter.empty() && (i_glob < N1) != which_start){
 		i_next_glob = i_glob+1;
 		i_prev_glob = i_glob-1;
 		define_indices(i_loc,i_next,i_prev, Poly1,Poly2,
@@ -455,12 +470,10 @@ namespace INTERP_UTILS
 		      }
 		    add_crossings(&Poly1[DIM*i_loc], &Poly1[DIM*i_next], i_glob, i_next_glob,
 				  &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob,
-				  &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob,
-				  &Poly1[DIM*i_prev]);
+				  &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob, &Poly1[DIM*i_prev]);
 		    add_crossings(&Poly1[DIM*i_loc], &Poly1[DIM*i_prev], i_glob, i_prev_glob,
 				  &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob,
-				  &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob,
-				  &Poly1[DIM*i_next]); 
+				  &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob, &Poly1[DIM*i_next]); 
 		  }
 		else //vertex on an edge
 		  {

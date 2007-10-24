@@ -513,7 +513,7 @@ int main ()
     cerr<<  " Test17: Résultat théorique" << endl;
     cerr<< 0 << " ,"<< 0.5 << " ,"<< 0 << endl; 
     cerr<< 0 << " ,"<< -0.5 << " ," << 0 << endl;
-    cerr<< "??" << " ," << 1/3 << " ," << 0 << endl; 
+    cerr<< 2./3 << " ," << 1/3 << " ," << 0 << endl; 
     
     cerr<< " Test17: Résultat obtenu" << endl;
     for (int i=0; i<resultat_test17.size()/3; i++)
@@ -521,6 +521,40 @@ int main ()
 	cerr << resultat_test17[3*i] << "  ";
 	cerr << resultat_test17[3*i+1] << "  ";
 	cerr << resultat_test17[3*i+2] << "  ";
+	cerr << endl ;
+      }
+    cerr<< " ************ Test 18  ************ "<< endl;
+    INTERP_UTILS::PolygonAlgorithms<3> P_18(1e-6,1e-6); 
+  
+
+    const double triangle3[9]=
+      {
+	3.928371006592e-03, 0.000000000000e+00, -1.276720577142e-02 ,
+	0.000000000000e+00, 0.000000000000e+00, -1.669557677802e-02 ,
+	3.928371006592e-03, 0.000000000000e+00, -1.669557677802e-02 ,
+      };
+    const double triangle4[9]=
+      {  
+	0.000000000000e+00, 0.000000000000e+00, -1.767766952966e-02, 
+	4.419417382416e-03, 0.000000000000e+00, -1.325825214725e-02, 
+	0.000000000000e+00, 0.000000000000e+00, -1.325825214725e-02, 
+      };
+    
+    deque< double > resultat_test18 = P_18.intersect_convex_polygons(triangle3,triangle4,3,3);
+    
+    cerr<<  " Test18: Résultat théorique" << endl;
+    cerr<< 0.001 << " ,"<< 0. << " ,"<< -0.02 << endl; 
+    cerr<< 0 << " ,"<< 0. << " ," << -1.669557677802e-02 << endl;
+    cerr<< 0.0034 << " ," << 0. << " ," << -0.0132 << endl; 
+    cerr<< 0.0039 << " ," << 0. << " ," << -0.0132 << endl;
+    cerr<< 0.0039 << " ," << 0. << " ," << -0.014 << endl;
+
+    cerr<< " Test18: Résultat obtenu" << endl;
+    for (int i=0; i<resultat_test18.size()/3; i++)
+      {
+	cerr << resultat_test18[3*i] << "  ";
+	cerr << resultat_test18[3*i+1] << "  ";
+	cerr << resultat_test18[3*i+2] << "  ";
 	cerr << endl ;
       }
 
