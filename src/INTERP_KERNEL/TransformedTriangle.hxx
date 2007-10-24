@@ -85,11 +85,12 @@ namespace INTERP_UTILS
   class TransformedTriangle
   {
 
+  
+
   public:
 
     friend class INTERP_TEST::TransformedTriangleTest;
     friend class INTERP_TEST::TransformedTriangleIntersectTest;
-
     /*
      * Enumerations representing the different geometric elements of the unit tetrahedron
      * and the triangle. The end element, NO_* gives the number of elements in the enumeration

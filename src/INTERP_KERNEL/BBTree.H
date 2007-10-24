@@ -75,10 +75,12 @@ BBTree(double* bbs, int* elems, int level, int nbelems):
 	  if (min<min_right) min_right = min;
 	}
       else
+
 	{
 	  new_elems_left.push_back(elem);
 	  if (max>max_left) max_left = max;
 	}
+
 
     }
   _max_left=max_left;
@@ -86,13 +88,24 @@ BBTree(double* bbs, int* elems, int level, int nbelems):
   _left=new BBTree(bbs, &(new_elems_left[0]), level+1, new_elems_left.size());
   _right=new BBTree(bbs, &(new_elems_right[0]), level+1, new_elems_right.size());
   
+
 }
 
+
+ 
 ~BBTree()
 {
   if (_left!=0)  delete _left;
   if (_right!=0) delete _right;
+
 }
+
+  
+  /*! returns in \a elems the list of elements potentially intersecting the bounding box pointed to by \a bb
+    
+  \param bb pointer to query bounding box
+  \param elems list of elements (given in 0-indexing) intersecting the bounding box
+  */
 
 void getIntersectingElems(const double* bb, vector<int>& elems) const
 {
@@ -134,6 +147,8 @@ void getIntersectingElems(const double* bb, vector<int>& elems) const
   _left->getIntersectingElems(bb,elems);
   _right->getIntersectingElems(bb,elems);
 }
+
+
 
 int size()
 {
