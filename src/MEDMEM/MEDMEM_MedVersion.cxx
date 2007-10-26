@@ -30,20 +30,20 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
   medFileVersion version;
 
   med_2_1::med_idt fid21;
-  med_2_2::med_idt fid22;
+  med_2_3::med_idt fid22;
 
   med_2_1::med_err ret21;
-  med_2_2::med_err ret22;
+  med_2_3::med_err ret22;
 
   med_2_1::med_int major21;
   med_2_1::med_int minor21;
   med_2_1::med_int release21;
 
-  med_2_2::med_int major22;
-  med_2_2::med_int minor22;
-  med_2_2::med_int release22;
+  med_2_3::med_int major22;
+  med_2_3::med_int minor22;
+  med_2_3::med_int release22;
 
-  med_2_2::med_mode_acces access22 = med_2_2::MED_LECTURE;
+  med_2_3::med_mode_acces access22 = med_2_3::MED_LECTURE;
   med_2_1::med_mode_acces access21 = med_2_1::MED_LECT;
 
   /*
@@ -74,16 +74,16 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
     throw MEDEXCEPTION("Problem in getMedFileVersion(const string &) Med file V2.1 file closing");
 
   /*
-    Med Version 2.2 access to the file
+    Med Version 2.3 access to the file
   */
 
-  fid22 = med_2_2::MEDouvrir((const_cast <char *> (fileName.c_str())),
+  fid22 = med_2_3::MEDouvrir((const_cast <char *> (fileName.c_str())),
 			     access22);
 
   if (fid22 < 0)
     throw MEDEXCEPTION("Problem in getMedFileVersion(const string &) Med file V2.2 access");
 
-  ret22 = med_2_2::MEDversionLire(fid22,&major22,&minor22,&release22);
+  ret22 = med_2_3::MEDversionLire(fid22,&major22,&minor22,&release22);
 
   if (ret22 < 0)
     throw MEDEXCEPTION("Problem in getMedFileVersion(const string &) Med file V2.2 version numbers reading");
@@ -95,7 +95,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
       release22 = 5;
     }
 
-  ret22 = med_2_2::MEDfermer(fid22);
+  ret22 = med_2_3::MEDfermer(fid22);
 
   if (ret22 < 0)
     throw MEDEXCEPTION("Problem in getMedFileVersion(const string &) Med file V2.2 file closing");
@@ -183,9 +183,9 @@ int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
    MED_CREATION         : Créer le fichier s'il n'existe pas, l'écrase sinon
 */
     switch ( mode ) {
-    case MED_EN::MED_LECT: return med_2_2::MED_LECTURE;
-    case MED_EN::MED_ECRI: return med_2_2::MED_LECTURE_ECRITURE;
-    case MED_EN::MED_REMP: return med_2_2::MED_LECTURE_ECRITURE;
+    case MED_EN::MED_LECT: return med_2_3::MED_LECTURE;
+    case MED_EN::MED_ECRI: return med_2_3::MED_LECTURE_ECRITURE;
+    case MED_EN::MED_REMP: return med_2_3::MED_LECTURE_ECRITURE;
     default:
       throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
     }

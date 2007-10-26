@@ -210,18 +210,18 @@ int main (int argc, char ** argv) {
    //      les types géométriques du MESH ce qui n'est pas forcément le cas d'un champ MEDFICHIER
    //      (même sans profil) lu à posteriori.
    {
-     med_2_2::med_err err=-1;
-     med_2_2::med_idt id = med_2_2::MEDouvrir(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
-					      med_2_2::MED_LECTURE_ECRITURE);
+     med_2_3::med_err err=-1;
+     med_2_3::med_idt id = med_2_3::MEDouvrir(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
+					      med_2_3::MED_LECTURE_ECRITURE);
      if (id <=0) cout << "Erreur dans MEDouvrir pour le fichier " << "Copy_nomesh_"+fileName <<endl;
 
-     err=med_2_2::MEDlienEcr(id, const_cast<char *> ( ("Copy_withmesh_"+fileName).c_str()),
+     err=med_2_3::MEDlienEcr(id, const_cast<char *> ( ("Copy_withmesh_"+fileName).c_str()),
 			     const_cast<char *> (meshName.c_str()) );
      if (err !=0) cout << "Erreur dans MEDlienEcr pour le maillage distant " << meshName
 		       <<" contenu dans le fichier " << "Copy_withmesh_"+fileName <<endl;
 
 
-     err=med_2_2::MEDfermer(id);
+     err=med_2_3::MEDfermer(id);
 
      MESH * myMesh3 = new MESH(MED_DRIVER,fileName,meshName);
      const SUPPORT * mySupport3= new SUPPORT(myMesh3,"Temporary Support",MED_CELL);

@@ -173,14 +173,14 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
   {
     char                  meshName[MED_TAILLE_NOM+1]="";
     char                  meshDescription[MED_TAILLE_DESC+1]="";
-    med_2_2::med_int      meshDim;
-    med_2_2::med_maillage meshType;
-    int numberOfMeshes = med_2_2::MEDnMaa(_medIdt);
+    med_2_3::med_int      meshDim;
+    med_2_3::med_maillage meshType;
+    int numberOfMeshes = med_2_3::MEDnMaa(_medIdt);
     for (int i=1;i<=numberOfMeshes;i++)
     {
       MEDmaaInfo(_medIdt, i ,meshName, &meshDim, &meshType, meshDescription);
       if (_meshName == string(meshName)) {
-        if ( meshType == med_2_2::MED_STRUCTURE ) {
+        if ( meshType == med_2_3::MED_STRUCTURE ) {
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
                                        "class GRID must be used for a structured mesh"));
         }

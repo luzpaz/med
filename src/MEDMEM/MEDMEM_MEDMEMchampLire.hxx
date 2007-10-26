@@ -25,7 +25,7 @@
  * En attendant une correction de la gestion du mode d'accès au fichier dans MEDfichier
  * on intègre la correction ici.
  */
-namespace med_2_2 {
+namespace med_2_3 {
   extern "C" {
 
 # define __UTILITES_H__

@@ -42,12 +42,12 @@ class MED_MESH_DRIVER22 : public virtual MED_MESH_DRIVER
 {
 protected:
   
-  med_2_2::med_idt  _medIdt ;
+  med_2_3::med_idt  _medIdt ;
   
 public :
 
   // all MED cell type
-  static const med_2_2::med_geometrie_element all_cell_type[MED_NBR_GEOMETRIE_MAILLE];
+  static const med_2_3::med_geometrie_element all_cell_type[MED_NBR_GEOMETRIE_MAILLE];
   
   static const char * const all_cell_type_tab [MED_NBR_GEOMETRIE_MAILLE];
 
