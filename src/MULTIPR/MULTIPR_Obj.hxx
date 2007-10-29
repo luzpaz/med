@@ -23,13 +23,18 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <list>
 
+#include <boost/thread/recursive_mutex.hpp>
+
+#include "MULTIPR_Globals.hxx"
 
 namespace multipr
 {
 
 class MeshDis;
-
+class Group;
+class Profil;
 
 //*****************************************************************************
 // Class Obj
@@ -110,6 +115,12 @@ public:
     void setMesh(const char* pMeshName);
      
     /**
+     * Returns the name of mesh, defined via setMesh().
+     * \return the name of mesh, defined via setMesh().
+     */
+    std::string getMeshName() const { return mMeshName; }
+    
+    /**
      * Returns the list of meshes contained in the sequential MED file.
      * Assumes this object encapsulates a sequential MED file.
      * \return the list of meshes contained in the sequential MED file.
@@ -119,18 +130,29 @@ public:
     /**
      * Returns the list of fields contained in the sequential MED file.
      * Assumes this object encapsulates a sequential MED file.
+     * \param pPartList The list of parts to get the fields from (separator is '|').
      * \return the list of fields contained in the sequential MED file.
      */
-    std::vector<std::string> getFields() const;
+    std::vector<std::string> getFields(const char* pPartList) const;
     
     /**
      * Returns the number of timestamps for a given field.
      * Assumes this object encapsulates a sequential MED file.
      * \param  pFieldName name of any field.
+     * \param pPartList The list of parts to get the time stamps from (separator is '|').	 
      * \return the number of timestamps for a given field; 0 if field not found.
      */
-    int getTimeStamps(const char* pFieldName) const;
-    
+    int getTimeStamps(const char* pPartList, const char* pFieldName) const;
+
+    /**
+     * Get the minimum and maximum value of a part's field.
+     * \param pPartName The name of the part.
+     * \param pFieldName The name of the field.
+     * \param pMin The mininum value to fill.
+     * \param pMax The maxinum value to fill.
+     */
+    void getFieldMinMax(const char* pPartName, const char* pFieldName, float& pMin, float& pMax);
+        
     /**
      * Returns the name of all partitions.
      * Assumes this object encapsulates a distributed MED file.
@@ -182,7 +204,7 @@ public:
      * \return the name of each part.
      * \throw  RuntimeException if any error occurs.
      */
-    std::vector<std::string> partitionneGrain(
+    std::vector<std::string> partitionneGroupe(
         const char* pPartName, 
         int         pNbParts, 
         int         pPartitionner=0);
@@ -190,16 +212,13 @@ public:
     /**
      * Creates 3 resolutions of the given part of a distributed MED file (V2.3).
      *         Assumes:
-     *         - the file is a distributed MED file, previously created by partitionneDomaine() or partitionneGrain()
+     *         - the file is a distributed MED file, previously created by partitionneDomaine() or partitionneGroupe()
      *           (=> each part only contain 1 mesh, TETRA10 elements only)
      * \param  pPartName    name of the part to be decimated.
      * \param  pFieldName   name of the field used for decimation.
      * \param  pFieldIt     iteration (time step) of the field.
      * \param  pFilterName  name of the filter to be used.
-     * \param  pTmed        threshold used for medium resolution.
-     * \param  pTlow        threshold used for low resolution; tmed must be less than tlow
-     * \param  pTadius      radius used to determine the neighbourhood.
-     * \param  pBoxing      number of cells along each axis; must be >= 1; e.g. if 100 then acceleration grid will have 100*100*100 = 10**6 cells.
+     * \param  pFilterParams params to be used with the filter (depends on filter; this string will be parsed).
      * \return the name of each part.
      * \throw  RuntimeException if any error occurs.
      */
@@ -208,11 +227,21 @@ public:
         const char* pFieldName,
         int         pFieldIt,
         const char* pFilterName,
-        double      pTmed,
-        double      pTlow,
-        double      pRadius,
-        int         pBoxing);
-    
+        const char* pFilterParam);
+
+    /**
+     * Works exactly like the above method and has the same parameters
+     * and returning value meaning, except the last additional parameter.
+     * \param  pEmptyMeshes list of names of empty meshes, corresponding to medium and/or lower resolution.
+     */
+    std::vector<std::string> decimePartition(
+        const char* pPartName,
+        const char* pFieldName,
+        int         pFieldIt,
+        const char* pFilterName,
+        const char* pFilterParam,
+        std::list<std::string>& pEmptyMeshes);
+
     /**
      * Returns useful information to configure decimation parameters.
      * Depends on part, field and filter: generic operation.
@@ -229,7 +258,13 @@ public:
         const char* pFilterName,
         const char* pFilterParams);
     
-        
+	/**
+	 * Get mesh statistics.
+	 * \param pStats [the number of mesh] space [number of gauss points]
+	 * \param pPartName The path to the part.
+	 */
+	void getMEDInfo(char* pStats, char* pPartName);
+	
     //---------------------------------------------------------------------
     // I/O
     //---------------------------------------------------------------------
@@ -241,6 +276,37 @@ public:
      */
     void save(const char* pPath);
 
+    /**
+     * Reset save progress to zero.
+     * \param pPercents current save progress in percents.
+     */
+    void resetProgress();
+
+    /**
+     * Obtain save progress.
+     * \return current save progress in percents.
+     */
+    int getProgress();
+
+    /**
+     * Saves the associated MED file to the given location.
+     * Calling this method does not influence the object state.
+     *
+     * \note This method is mentioned to be used only in persistence.
+     *
+     * \param  pPath path where to save the file.
+     * \throw  IOException if any i/o error occurs.
+     */
+    void savePersistent(const char* pPath);
+
+    /**
+     * Works like \a create(), but assumes that the distributed MED file was moved
+     * from the original location and its ASCII master file needs to be updated.
+     *
+     * \note This method is mentioned to be used only in persistence.
+     */
+    void restorePersistent(const char* pMEDfilename);
+    
     /**
      * Dumps any Obj to the given output stream.
      * \param  pOs any output stream.
@@ -260,14 +326,18 @@ private:
 
 private:
     
-    std::string  mMEDfilename;     /**< Name of the MED file: sequential or distributed. */
-    std::string  mMeshName;        /**< Mesh to be partitionned. */
-    ObjState     mState;           /**< State of this object. */
-    MeshDis*     mMeshDis;         /**< Distributed mesh. */
-    
-    
+    std::string            mMEDfilename;      /**< Name of the MED file: sequential or distributed. */
+    std::string            mMeshName;         /**< Mesh to be partitionned. */
+    ObjState               mState;            /**< State of this object. */
+    MeshDis*               mMeshDis;          /**< Distributed mesh. */
+    bool                   mDoReadWriteFields;/**< Flag for optimized domain split. */
+    std::vector<Group*>    mGroups;           /**< We need to keep the groups for optimized domain split. */
+    GaussIndexList         mGaussList;        /**< We need to keep gauss information for optimized domain split. */
+    std::vector<Profil*>   mProfils;          /**< We need to keep the profiles for optimized domain split. */
+    boost::recursive_mutex mWriteMutex;       /**< Write progress thread safe access. */
+
 private:
-    
+
     // do not allow copy constructor
     Obj(const Obj&);
     

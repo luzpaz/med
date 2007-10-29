@@ -26,11 +26,17 @@ extern "C"
 }
 
 #include <vector>
-
+#include <set>
 
 namespace multipr
 {
 
+enum eProfilBinding
+{
+    Undef,
+    OnNodes,
+    OnElements
+};
 
 //*****************************************************************************
 // Class Profil
@@ -44,6 +50,12 @@ public:
      * Builds an empty profil (default constructor).
      */
     Profil();
+    
+    /**
+     * Copy constructor.
+     * \param pProfil The profil to copy.
+     */
+    Profil(const Profil& pProfil);
     
     /**
      * Destructor. Removes everything.
@@ -73,18 +85,61 @@ public:
     const char* getName() const;
     
     /**
-     * Returns the nth elements of this profil.
-     * \param  pIndex index of the element to get; must be in [0..NUMBER_OF_ELEMENTS-1].
-     * \return the nth elements of this profil.
-     * \throw  IndexOutOfBoundsException if index is invalid.
+     * Get the complete set of elements of this profile.
+     * \return The set of elements.
      */
-    med_int get(med_int pIndex) const;
+    std::set< med_int>& getSet() { return mTable; }
     
     /**
      * Adds a new element to this profil.
      * \param  pElt element to be added; must be >= 1.
      */
     void add(med_int pElt);
+    
+    /**
+     * Find the given element in the profile.
+     * \param pElt The index of the element.
+     * \return true if the element was found.
+     */
+    bool    find(med_int pElt);
+    
+    /**
+     * Assign a set of element to this profile.
+     * \param pElt The set of element to assign.
+     */
+    void    set(std::set< med_int>& pElt) { this->mTable = pElt; }
+    
+    /**
+     * Select the elements of pIn contained in this profile. The two parameters pIn 
+     * and pOut MUST be different.
+     * \param pIn Set of elements to filter.
+     * \param pOut The result.
+     * \throw IllegalStateException if pIn and pOut are not different.
+     */
+    void    filterSetOfElement(std::set<med_int>& pIn, std::set<med_int>& pOut);
+    
+    /**
+     * Extract a profil. The two parameters pIn 
+     * and pOut MUST be different.
+     * \param pIn Set of elements to extract.
+     * \param pOut The result.
+     * \throw IllegalStateException if pIn and pOut are not different.
+     */
+    void    extractSetOfElement(const std::set<med_int>& pIn, std::set<med_int>& pOut);
+    
+    /**
+     * Returns the association of the profile.
+     * \return OnNodes or OnElements or Undef.
+     */
+    eProfilBinding      getBinding() { return mBinding; }
+    
+    /**
+     * Return the index of the geometry (if any) associated with this profile.
+     * If this profile is on nodes it will return 0. Since the geometry index starts at
+     * 0 use getBinding to know if its on elements.
+     * \return the index of the geometry.
+     */
+    unsigned            getGeomIdx() { return mGeomIdx; }
     
     //---------------------------------------------------------------------
     // I/O
@@ -97,7 +152,17 @@ public:
      * \throw  IOException  if any i/o error occurs.
      */
     void readMED(med_idt pMEDfile, med_int pIndexProfil);
-    
+
+    /**
+     * Try to find in the MED file if this profile is associated to the nodes
+     * or the elements. If the profile is associated with elements it will get the
+     * index of the geometry.
+     * \param pMEDfile any valid MED file opened for reading.
+     * \param pMeshName The name of the mesh.
+     * \throw IllegalStateException if the profile is empty.
+     */
+    void    readProfilBinding(med_idt pMEDfile, char* pMeshName);
+        
     /**
      * Writes this profil to a MED file.
      * \param  pMEDfile    any valid MED file opened for writing.
@@ -115,13 +180,12 @@ public:
     
 private:
     
-    char                  mName[MED_TAILLE_NOM + 1];  /**< Name of the profil. */
-    std::vector<med_int>  mTable;                     /**< Table of elements. */
+    char                mName[MED_TAILLE_NOM + 1];  /**< Name of the profil. */
+    std::set<med_int>   mTable;                     /**< Table of elements. */
+    eProfilBinding      mBinding;                   /**< Profil of nodes or elements. */
+    unsigned            mGeomIdx;                   /**< If this profile is on elements, the index of the geometry. */
     
 private:
-
-    // do not allow copy constructor
-    Profil(const Profil&);
     
     // do not allow copy
     Profil& operator=(const Profil&);

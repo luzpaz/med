@@ -20,18 +20,13 @@
 #include "MULTIPR_Exceptions.hxx"
 
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
 
 namespace multipr
 {
-
-extern "C" {
-  extern med_err MEDgaussInfo(med_idt fid, int indice, char * locname,
-			      med_geometrie_element * type_geo,
-			      med_int * ngauss );
-}
 
 
 //*****************************************************************************
@@ -106,34 +101,27 @@ void GaussLoc::reset()
 
 void GaussLoc::getCoordGaussPoints(
     const med_float* pCooElt,  
-    med_float* pCooGaussPoints) const
+    med_float* pCooGaussPoints,
+	int nb_gauss) const
 {
-    // debug
-    //printArray2D(pCooElt, mNumNodes, mDim, "Node");
-    
-    // WARNING: assumes TETRA10 !!!
-    // This method is not completely generic and should be extended to support all cases.
-    if (mGeom != MED_TETRA10) throw UnsupportedOperationException("only support TETRA10 for the moment", __FILE__, __LINE__);
-    
-    const med_float* pt1 = pCooElt;
-    const med_float* pt2 = pt1 + mDim;
-    const med_float* pt3 = pt2 + mDim;
-    const med_float* pt4 = pt3 + mDim;
-    
-    const med_float* coeff = mGaussCoo;
-    med_float* dest        = pCooGaussPoints;
-    
-    // for each Gauss point
-    for (int i = 0 ; i < mNumGauss ; i++)
+    med_float*              pt    = const_cast<med_float*>(pCooElt);
+    const med_float*        coeff = mGaussCoo;
+    med_float*              dest  = pCooGaussPoints;
+
+    for (int i = 0; i < mNumGauss; ++i)
     {
-        dest[0] = pt2[0] + (pt4[0] - pt2[0]) * coeff[0] + (pt1[0] - pt2[0]) * coeff[1] + (pt3[0] - pt2[0]) * coeff[2];
-        dest[1] = pt2[1] + (pt4[1] - pt2[1]) * coeff[0] + (pt1[1] - pt2[1]) * coeff[1] + (pt3[1] - pt2[1]) * coeff[2];
-        dest[2] = pt2[2] + (pt4[2] - pt2[2]) * coeff[0] + (pt1[2] - pt2[2]) * coeff[1] + (pt3[2] - pt2[2]) * coeff[2];
-        
-        // prepare next point
+		for (int j = 0; j < mDim; ++j)
+		{
+			dest[j] = 0;
+            for (int k = 1; k < nb_gauss; ++k)
+            {
+                dest[j] += pt[k * mDim + j];
+			}
+            dest[j] /= nb_gauss;
+		}
         coeff += mDim;
         dest += mDim;
-    }
+	}
 }
 
 

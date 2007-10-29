@@ -156,12 +156,11 @@ Nodes* Nodes::extractSubSet(const set<med_int>& pSetIndices) const
     // Copy subset of familys id and coords.
     //---------------------------------------------------------------------
     set<med_int>::iterator itSet = pSetIndices.begin();
-    for (int i = 0 ; i < subset->mNum; i++)
+    for (int i = 0 ; i < subset->mNum && itSet != pSetIndices.end(); i++)
     {
         
         med_int srcIndex = (*itSet) - 1; // MED index start at 1
-        subset->mFamIdent[i] = mFamIdent[srcIndex];
-        
+		subset->mFamIdent[i] = mFamIdent[srcIndex];
         med_float* srcCoo = mCoo + srcIndex * mDim;
         med_float* destCoo = subset->mCoo + i * subset->mDim;
         for (int itDim = 0 ; itDim < mDim ; itDim++)
@@ -171,7 +170,6 @@ Nodes* Nodes::extractSubSet(const set<med_int>& pSetIndices) const
         
         itSet++;
     }
-    
     //---------------------------------------------------------------------
     // Copy subset of identifiers if necessary
     //---------------------------------------------------------------------
@@ -179,7 +177,7 @@ Nodes* Nodes::extractSubSet(const set<med_int>& pSetIndices) const
     { 
         itSet = pSetIndices.begin();
         subset->mId = new med_int[subset->mNum]; 
-        for (int i = 0 ; i < subset->mNum; i++)
+        for (int i = 0 ; i < subset->mNum && itSet != pSetIndices.end(); i++)
         {
             med_int srcIndex = (*itSet) - 1; // MED index start at 1
             subset->mId[i] = mId[srcIndex];
@@ -196,7 +194,7 @@ Nodes* Nodes::extractSubSet(const set<med_int>& pSetIndices) const
         subset->mNames = new char[MED_TAILLE_PNOM * subset->mNum + 1]; 
         char* destPtr = subset->mNames;
         itSet = pSetIndices.begin();
-        for (int i = 0 ; i < subset->mNum; i++)
+        for (int i = 0 ; i < subset->mNum && itSet != pSetIndices.end(); i++)
         {
             med_int srcIndex = (*itSet) - 1; // MED index start at 1
             char* srcPtr = mNames + srcIndex * MED_TAILLE_PNOM;
@@ -207,7 +205,6 @@ Nodes* Nodes::extractSubSet(const set<med_int>& pSetIndices) const
         }
         subset->mNames[MED_TAILLE_PNOM * subset->mNum] = '\0';
     }
-    
     return subset;
 }
 
@@ -408,7 +405,7 @@ void Nodes::writeMED(med_idt pMEDfile, char* pMeshName) const
         isIdentifiers()?MED_VRAI:MED_FAUX,
         mFamIdent,
         mNum);
-    
+
     if (ret != 0) throw IOException("i/o error while writing nodes", __FILE__, __LINE__);
     
 }

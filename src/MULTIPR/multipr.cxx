@@ -24,6 +24,7 @@
 #include "MULTIPR_API.hxx"
 #include "MULTIPR_Obj.hxx"
 #include "MULTIPR_Mesh.hxx"
+#include "MULTIPR_MeshDis.hxx"
 #include "MULTIPR_Exceptions.hxx"
 #include "MULTIPR_Utils.hxx"
 
@@ -90,6 +91,7 @@ float g_decimThresholdMed   = 0.0f;
 float g_decimThresholdLow   = 0.0f;
 float g_decimRadius         = 0.0f;
 int   g_boxing              = 100;
+char  g_params[1024]		= "";
 
 // merge
 std::vector<std::string> g_medFilenameSrc;
@@ -301,10 +303,11 @@ void parseCommandLine(int argc, char** argv)
     }
     else if (strcmp(argv[1],"--decim") == 0)
     {
-        if ((argc != 10) && (argc != 11))
+        if (argc < 9)
         {
             g_usage = MULTIPR_USAGE_UNKNOWN; 
             g_errorCode = MULTIPR_APP_WRONG_NUMBER_OF_ARGUMENTS;
+			return ;
         }
         else
         {
@@ -316,13 +319,23 @@ void parseCommandLine(int argc, char** argv)
             g_filterName        = argv[6];
             g_decimThresholdMed = atof(argv[7]);
             g_decimThresholdLow = atof(argv[8]);
-            g_decimRadius       = atof(argv[9]);
-            
-            if (argc == 11)
-            {
-                g_boxing = atoi(argv[10]);
-            }
         }
+		if (strcmp(g_filterName, "Filtre_GradientMoyen") == 0 && argc == 11)
+		{
+            g_decimRadius = atof(argv[9]);
+            g_boxing = atoi(argv[10]);
+			sprintf(g_params, "%lf %lf %lf %d", g_decimThresholdMed, g_decimThresholdLow, g_decimRadius, g_boxing);
+		}
+		else if (strcmp(g_filterName, "Filtre_Direct") == 0)
+		{
+			sprintf(g_params, "%lf %lf", g_decimThresholdMed, g_decimThresholdLow);
+		}
+		else
+		{
+			g_usage = MULTIPR_USAGE_UNKNOWN; 
+			g_errorCode = MULTIPR_APP_ILLEGAL_ARGUMENT;
+		}
+		
     }
     else if (strcmp(argv[1],"--merge") == 0)
     {
@@ -378,8 +391,9 @@ void parseCommandLine(int argc, char** argv)
 int runAutotest()
 {
     cout << "Start autotest..." << endl;
-
+    
     int ret = MULTIPR_APP_OK;
+    int nbPartsSupp = 100;
     try
     {
         string strMEDfilename = g_medFilename;
@@ -393,24 +407,26 @@ int runAutotest()
         multipr::partitionneDomaine(strMEDfilename.c_str(), "MAIL"); 
         
         //---------------------------------------------------------------------
-        // Test partitionneGrain() = split a group from a distributed MED file
+        // Test partitionneGroupe() = split a group from a distributed MED file
         // using MEDSPLITTER (METIS)
         //---------------------------------------------------------------------
         string strDistributedMEDfilename = g_medFilename;
-        strDistributedMEDfilename += "/agregat100grains_12pas_grains_maitre.med";
+        strDistributedMEDfilename += "/agregat100grains_12pas_groupes_maitre.med";
         
-        multipr::partitionneGrain(
+        multipr::partitionneGroupe(
             strDistributedMEDfilename.c_str(), 
             "MAIL_1", 
             4, 
             multipr::MULTIPR_SCOTCH);
-            
-        multipr::partitionneGrain(
+        nbPartsSupp += 4;
+        
+        multipr::partitionneGroupe(
             strDistributedMEDfilename.c_str(), 
             "MAIL_97", 
             3, 
             multipr::MULTIPR_METIS);
-
+        nbPartsSupp += 3;
+        
         //---------------------------------------------------------------------
         // Test decimePartition() = generate 2 lower resolution of a mesh
         // using decimation based on gradient
@@ -421,21 +437,17 @@ int runAutotest()
             "SIG_____SIEF_ELGA_______________",
             12,
             "Filtre_GradientMoyen",
-            10.0,
-            25.0,
-            0.3,
-            100);
-            
+            "10.0 25.0 0.3 100");
+        nbPartsSupp += 2;
+        
         multipr::decimePartition(
             strDistributedMEDfilename.c_str(), 
             "MAIL_92",
             "SIG_____SIEF_ELGA_______________",
             11,
             "Filtre_GradientMoyen",
-            10.0,
-            25.0,
-            0.5,
-            10);
+            "10.0 25.0 0.5 10");
+        nbPartsSupp += 2;
         
         multipr::decimePartition(
             strDistributedMEDfilename.c_str(), 
@@ -443,18 +455,31 @@ int runAutotest()
             "SIG_____SIEF_ELGA_______________",
             10,
             "Filtre_GradientMoyen",
-            10.0,
-            25.0,
-            0.4,
-            20);
-            
+            "10.0 25.0 0.4 20");
+        nbPartsSupp += 2;
+        
         //---------------------------------------------------------------------
         // Test passed: OK!
         //---------------------------------------------------------------------
         cout << endl;
-        cout << "Test passed: everything seems to be OK" << endl;
-        cout << "OK" << endl << endl;
         
+        // Check quantity of parts at the end
+        multipr::MeshDis meshDis;
+        meshDis.readDistributedMED(strDistributedMEDfilename.c_str());
+        int nbParts = meshDis.getNumParts();
+        cout << "Auto Test: final quantity of parts is " << nbParts
+             << " (must be " << nbPartsSupp << ")" << endl;
+        if (nbParts != nbPartsSupp)
+        {
+          cout << "Test failed: wrong quantity of parts obtained!" << endl;
+          cout << "Failure" << endl << endl;
+          ret = MULTIPR_APP_FAILED;
+        }
+        else
+        {
+          cout << "Test passed: everything seems to be OK" << endl;
+          cout << "OK" << endl << endl;
+        }
     }
     catch (multipr::RuntimeException& e)
     {
@@ -501,7 +526,7 @@ int runPartition2()
     int ret = MULTIPR_APP_OK;
     try
     {
-        multipr::partitionneGrain(
+        multipr::partitionneGroupe(
             g_medFilename, 
             g_partName, 
             g_nbParts, 
@@ -523,8 +548,8 @@ int runPartition2()
  * \return MULTIPR_APP_OK if successful, MULTIPR_APP_FAILED if failure.
  */
 int runDecimation()
-{    
-    int ret = MULTIPR_APP_OK;
+{
+    int		ret = MULTIPR_APP_OK;
     try
     {
         multipr::decimePartition(
@@ -533,10 +558,7 @@ int runDecimation()
             g_fieldName,
             g_fieldTimeStepIt,
             g_filterName,
-            g_decimThresholdMed,
-            g_decimThresholdLow,
-            g_decimRadius,
-            g_boxing);
+            g_params);
     }
     catch (multipr::RuntimeException& e)
     {
@@ -554,11 +576,12 @@ int runDecimation()
  * \return MULTIPR_APP_OK if successful, MULTIPR_APP_FAILED if failure.
  */
 int runMerge()
-{    
+{
     int ret = MULTIPR_APP_OK;
     try
     {
-        multipr::merge(
+
+		multipr::merge(
             g_medFilenameSrc, 
             g_meshName,
             g_fieldName,
@@ -651,7 +674,8 @@ int runDumpMED()
             
             {
                 // display list of fields contained in the MED file
-                vector<pair<string,int> > res = multipr::getListScalarFields(g_medFilename);
+                vector<pair<string,int> > res;
+				multipr::getListScalarFields(g_medFilename, res);
                 cout << "List of scalar fields in this MED file:" << endl;
                 for (unsigned i = 0 ; i < res.size() ; i++)
                 {
@@ -719,7 +743,7 @@ int main(int argc, char** argv)
 {
     string strTitle = string("multipr v") + string(multipr::getVersion()) + string(" - by EDF/CS - 04/2007");    
     string strUnderline = "";
-    
+
     for (int i = 0, len = strTitle.length() ; i < len ; i++) strUnderline += '=';
     
     cout << strTitle << endl;

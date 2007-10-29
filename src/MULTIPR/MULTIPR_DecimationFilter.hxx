@@ -159,6 +159,51 @@ private:
     
 }; // class DecimationFilterGradAvg
 
+//*****************************************************************************
+// Filter : Treshold
+//*****************************************************************************
+
+class DecimationFilterTreshold : public DecimationFilter
+{
+public:
+
+    /**
+     * Builds an empty DecimationFilterTreshold (default constructor).
+     */
+    DecimationFilterTreshold();
+    
+    /**
+     * Destructor. Removes everything.
+     */
+    virtual ~DecimationFilterTreshold();
+    
+    /**
+     * Creates a new Mesh by decimating the given Mesh with this DecimationFilter.
+     * 
+     * For each element
+     *     Keep this element if all its points (related to a field) have a value > threshold.
+     *
+     * \param  pMesh        any mesh to be decimated; must not be NULL.
+     * \param  pArgv        all the arguments of the filter as a string; must not be NULL.
+     *                      for GradAvg, expected "fieldName fieldIt threshold radius boxing" (5 parameters).
+     * \param  pNameNewMesh name of the decimated mesh; must not be NULL.
+     * \return the decimated mesh.
+     */
+    virtual Mesh* apply(Mesh* pMesh, const char* pArgv, const char* pNameNewMesh);
+
+    
+private:
+    
+    // do not allow copy constructor
+    DecimationFilterTreshold(const DecimationFilterTreshold&);
+    
+    // do not allow copy
+    DecimationFilterTreshold& operator=(const DecimationFilterTreshold&);
+    
+    // do not allow operator ==
+    bool operator==(const DecimationFilterTreshold&); 
+    
+}; // class DecimationFilterTreshold
 
 } // namespace MULTIPR
 

@@ -40,10 +40,23 @@ Elements::Elements()
     mFamIdent = NULL;
     mNames    = NULL;
     mCon      = NULL;
-    
+    mFlagPrintAll = false;
     reset(); 
 }
 
+Elements::Elements(med_geometrie_element pGeomType) 
+{
+    mId       = NULL;
+    mFamIdent = NULL;
+    mNames    = NULL;
+    mCon      = NULL;
+    mNum      = 0;
+    mGeom          = pGeomType;
+    mNumNodesByElt = mGeom % 100;
+    mDim           = mGeom / 100;
+    mEntity        = MED_MAILLE;
+    mFlagPrintAll  = false;
+}
 
 Elements::~Elements()  
 { 
@@ -141,18 +154,17 @@ Elements* Elements::extractSubSet(const set<med_int>& pSetIndices) const
     //---------------------------------------------------------------------
     med_int* destCon = subset->mCon;
     set<med_int>::iterator itSet = pSetIndices.begin();
-    for (int itElt = 0 ; itElt < subset->mNum; itElt++)
+    for (int itElt = 0 ; itElt < subset->mNum && itSet != pSetIndices.end(); itElt++)
     {
         med_int srcIndex = (*itSet) - 1; // MED index start at 1
-        subset->mFamIdent[itElt] = mFamIdent[srcIndex];
-        
+		subset->mFamIdent[itElt] = mFamIdent[srcIndex]; 
+
         med_int* srcCon = mCon + srcIndex * mNumNodesByElt;
         memcpy(destCon, srcCon, sizeof(med_int) * mNumNodesByElt);
         
         destCon += mNumNodesByElt;
         itSet++;
     }
-    
     //---------------------------------------------------------------------
     // Copy subset of identifiers if necessary
     //---------------------------------------------------------------------
@@ -160,7 +172,7 @@ Elements* Elements::extractSubSet(const set<med_int>& pSetIndices) const
     { 
         itSet = pSetIndices.begin();
         subset->mId = new med_int[subset->mNum]; 
-        for (int itElt = 0 ; itElt < subset->mNum; itElt++)
+        for (int itElt = 0 ; itElt < subset->mNum && itSet != pSetIndices.end(); itElt++)
         {
             med_int srcIndex = (*itSet) - 1; // MED index start at 1
             subset->mId[itElt] = mId[srcIndex];
@@ -177,10 +189,10 @@ Elements* Elements::extractSubSet(const set<med_int>& pSetIndices) const
         itSet = pSetIndices.begin();
         subset->mNames = new char[MED_TAILLE_PNOM * subset->mNum + 1]; 
         char* destPtr = subset->mNames;
-        for (int itElt = 0 ; itElt < subset->mNum; itElt++)
+        for (int itElt = 0 ; itElt < subset->mNum && itSet != pSetIndices.end(); itElt++)
         {
             med_int srcIndex = (*itSet) - 1; // MED index start at 1
-            char* srcPtr = mNames + srcIndex * MED_TAILLE_PNOM;
+            char* srcPtr = mNames + srcIndex * MED_TAILLE_PNOM; 
             memcpy(destPtr, srcPtr, MED_TAILLE_PNOM);
             
             destPtr += MED_TAILLE_PNOM;
@@ -192,6 +204,33 @@ Elements* Elements::extractSubSet(const set<med_int>& pSetIndices) const
     return subset;
 }
 
+void        Elements::extractSubSetFromNodes(const std::set<med_int>& pSetOfNodes, 
+                                   std::set<med_int>& pSubSetOfElements) const
+{
+    if (&pSetOfNodes == &pSubSetOfElements) throw IllegalStateException("pSetOfNodes and pSubSetOfElements must be different !", __FILE__, __LINE__);
+    
+    int     numOfNodes = pSetOfNodes.size();
+    bool    keepElt = false;
+    for (int itElt = 0; itElt < mNum; ++itElt)
+    {
+        keepElt = false;
+        for (std::set<med_int>::iterator itNode = pSetOfNodes.begin();
+             itNode != pSetOfNodes.end() && keepElt == false; ++itNode)
+        {
+            for (int itCon = 0; itCon < mNumNodesByElt && keepElt == false; ++itCon)
+            {
+                if ((*itNode) == mCon[itElt * mNumNodesByElt + itCon])
+                {
+                    keepElt = true;
+                }
+            }
+        }
+        if (keepElt)
+        {
+            pSubSetOfElements.insert(itElt + 1);
+        }
+    }
+}
 
 const set<med_int>& Elements::getSetOfNodes()
 {    
@@ -220,8 +259,9 @@ set<med_int> Elements::getSetOfFamilies() const
 }
 
 
-void Elements::remap()
+void Elements::remap() 
 {
+	int itNode, size;
     // build set of nodes if necessary
     if (mSetOfNodes.size() == 0)
     {
@@ -239,7 +279,7 @@ void Elements::remap()
     }
     
     // for each node referenced by this set of elements
-    for (int itNode = 0, size = mNum * mNumNodesByElt ; itNode < size ; itNode++)
+    for (itNode = 0, size = mNum * mNumNodesByElt ; itNode < size ; itNode++)
     {
         // convert old index to new index (remap)
         mCon[itNode] = mapOldIndexToNewIndex[mCon[itNode]];
@@ -248,6 +288,29 @@ void Elements::remap()
     buildSetOfNodes();
 }
 
+void Elements::remap(std::set<med_int>& pSetOfNodes)
+{
+	int itNode, size;
+	
+	// build the map for indices convertion
+    map<med_int, med_int> mapOldIndexToNewIndex;
+    med_int newIndex = 1; // MED index start at 1
+	itNode = 1;
+    for (std::set<med_int>::iterator it = pSetOfNodes.begin(); it != pSetOfNodes.end(); ++it)
+    {
+        med_int oldIndex = *it;
+        mapOldIndexToNewIndex.insert(make_pair(oldIndex, itNode));
+		++itNode;
+    }
+	// for each node referenced by this set of elements
+    for (itNode = 0, size = mNum * mNumNodesByElt ; itNode < size ; itNode++)
+    {
+        // convert old index to new index (remap).
+        mCon[itNode] = mapOldIndexToNewIndex[mCon[itNode]];;
+    }
+    buildSetOfNodes();
+
+}
 
 Elements* Elements::mergePartial(Elements* pElements, int pOffset)
 {
@@ -263,7 +326,6 @@ Elements* Elements::mergePartial(Elements* pElements, int pOffset)
     
     elements->mGeom          = mGeom;          // e.g. 310 for a TETRA10
     elements->mNumNodesByElt = mNumNodesByElt; // e.g. 10 for a TETRA10
-    
     if (mDim != pElements->mDim) throw IllegalStateException("dimension should be the same", __FILE__, __LINE__);
     elements->mDim           = mDim;           // e.g. 3 for a TETRA10
     
@@ -297,7 +359,7 @@ Elements* Elements::mergePartial(Elements* pElements, int pOffset)
 }
 
 
-Elements* Elements::mergePartial(vector<Elements*> pElements, vector<int> pOffsets)
+Elements* Elements::mergePartial(vector<Elements*> pElements, vector<int>& pOffsets)
 {
     if (pElements.size() == 0) throw IllegalArgumentException("pElements should contain at least 1 element", __FILE__, __LINE__);
     

@@ -16,7 +16,12 @@
 //*****************************************************************************
 
 #include "MULTIPR_Field.hxx"
+#include "MULTIPR_MeshDis.hxx"
+#include "MULTIPR_Mesh.hxx"
+#include "MULTIPR_Family.hxx"
 #include "MULTIPR_Exceptions.hxx"
+#include "MULTIPR_Elements.hxx"
+#include "MULTIPR_Profil.hxx"
 
 #include <iostream>
 
@@ -25,7 +30,6 @@ using namespace std;
 
 namespace multipr
 {
-
 
 //*****************************************************************************
 // Class Field implementation
@@ -48,6 +52,7 @@ void Field::reset()
     mName[0]       = '\0';
     mEntity        = MED_NOEUD;
     mGeom          = MED_NONE;
+	mGeomIdx	   = eMaxMedMesh;
     mType          = MED_FLOAT64;
     mSizeOfType    = 8;
     mNumComponents = 0;
@@ -109,6 +114,12 @@ const unsigned char* Field::getValue(int pTimeStepIt, int pIndex) const
     return ret;
 }
 
+const std::string& Field::getProfil(int pTimeStep) const
+{
+    if ((pTimeStep < 1) || (pTimeStep > int(mProfil.size()))) throw IndexOutOfBoundsException("Unknown time step", __FILE__, __LINE__);
+    
+    return mProfil[pTimeStep - 1];
+}
 
 Field* Field::extractSubSet(const set<med_int>& pSetIndices) const
 {
@@ -134,7 +145,7 @@ Field* Field::extractSubSet(const set<med_int>& pSetIndices) const
     // for each time step
     for (unsigned itTimeStep = 0 ; itTimeStep < mNGauss.size() ; itTimeStep++)
     {
-        if (mProfil[itTimeStep].size() != 0) throw UnsupportedOperationException("", __FILE__, __LINE__);
+        //if (mProfil[itTimeStep].size() != 0) throw UnsupportedOperationException("", __FILE__, __LINE__);
         // WARNING : do not manage profil for the moment
         // if there is a profil,
         // 1. we should set mProfil to NO_PROFIL for this time_step
@@ -305,6 +316,70 @@ Field* Field::merge(vector<Field*> pFields, int pFieldIt)
     return field;
 }
 
+void Field::getMinMax(float& pMin, float& pMax)
+{
+    pMin = std::numeric_limits<med_float>::max();
+    pMax = std::numeric_limits<med_float>::min();
+    
+    for (unsigned itTimeStep = 0 ; itTimeStep < mNGauss.size() ; itTimeStep++)
+    {
+        switch (mType)
+        {
+        case MED_FLOAT64: 
+            {
+                med_float* src = reinterpret_cast<med_float*>(mVal[itTimeStep]);
+                for (int itVal = 0 ; itVal < mNVal[itTimeStep] * mNumComponents ; itVal++)
+                {
+                    if (src[itVal] < pMin)
+                    {
+                        pMin = src[itVal];
+                    }
+                    if (src[itVal] > pMax)
+                    {
+                        pMax = src[itVal];
+                    }
+                }  
+            }
+            break;
+        case MED_INT:
+        case MED_INT32:   
+            {
+                med_int* src = reinterpret_cast<med_int*>(mVal[itTimeStep]);
+                for (int itVal = 0 ; itVal < mNVal[itTimeStep] * mNumComponents ; itVal++)
+                {
+                    if (src[itVal] < pMin)
+                    {
+                        pMin = src[itVal];
+                    }
+                    if (src[itVal] > pMax)
+                    {
+                        pMax = src[itVal];
+                    }
+                }  
+            }
+            break;
+        case MED_INT64:
+            {
+                long* src = reinterpret_cast<long*>(mVal[itTimeStep]);
+                for (int itVal = 0 ; itVal < mNVal[itTimeStep] * mNumComponents ; itVal++)
+                {
+                    if (src[itVal] < pMin)
+                    {
+                        pMin = src[itVal];
+                    }
+                    if (src[itVal] > pMax)
+                    {
+                        pMax = src[itVal];
+                    }
+                }  
+            }
+            break;
+        default:          
+            // should not be there
+            throw IllegalStateException("should not be there", __FILE__, __LINE__);
+        }
+    }
+}
 
 void Field::getSetOfGaussLoc(set<string>& pSetOfGaussLoc) const
 {
@@ -320,13 +395,13 @@ void Field::getSetOfGaussLoc(set<string>& pSetOfGaussLoc) const
 }
 
 
-void Field::readMED(med_idt pMEDfile, med_int pIndex, char* pMeshName)
+void Field::readMED(med_idt pMEDfile, med_int pIndex, char* pMeshName, med_geometrie_element pGeom)
 {
     if (pMEDfile == 0) throw IOException("", __FILE__, __LINE__);
     if (pMeshName == NULL) throw NullArgumentException("", __FILE__, __LINE__);
     if (strlen(pMeshName) > MED_TAILLE_NOM) throw IllegalArgumentException("", __FILE__, __LINE__);
     if (pIndex < 1) throw IllegalArgumentException("", __FILE__, __LINE__);
-    
+     
     reset();
     
     mNumComponents = MEDnChamp(pMEDfile, pIndex);
@@ -347,7 +422,7 @@ void Field::readMED(med_idt pMEDfile, med_int pIndex, char* pMeshName)
         strComponent, 
         strUnit, 
         mNumComponents);
-    
+    mName[MED_TAILLE_NOM] = '\0';
     if (ret != 0) throw IOException("", __FILE__, __LINE__);
     
     mStrComponent = strComponent;
@@ -362,7 +437,7 @@ void Field::readMED(med_idt pMEDfile, med_int pIndex, char* pMeshName)
         case MED_INT64: mSizeOfType = 8; break;
         case MED_INT32: mSizeOfType = 4; break;
         case MED_INT: mSizeOfType = 4; break;
-        default: throw IllegalStateException("should not be there", __FILE__, __LINE__);
+        default: throw IllegalStateException("Unknown field data type", __FILE__, __LINE__);
     }
     
     //---------------------------------------------------------------------
@@ -378,11 +453,12 @@ void Field::readMED(med_idt pMEDfile, med_int pIndex, char* pMeshName)
         
         if (numTimeStepNodes < 0) throw IOException("", __FILE__, __LINE__);
         
-        if (numTimeStepNodes != 0)
+        if (numTimeStepNodes > 0)
         {
             fieldOnNodes = true;
             mEntity = MED_NOEUD;
             mGeom = (med_geometrie_element) 0;
+			mGeomIdx = eMaxMedMesh;
             readMEDtimeSteps(pMEDfile, numTimeStepNodes, pMeshName);
         }
     }
@@ -395,16 +471,23 @@ void Field::readMED(med_idt pMEDfile, med_int pIndex, char* pMeshName)
             pMEDfile, 
             mName, 
             MED_MAILLE, 
-            MED_TETRA10);
+            pGeom);
         
+		for (int i = 0; i < eMaxMedMesh; ++i)
+		{
+			if (CELL_TYPES[i] == pGeom)
+			{
+				mGeomIdx = (eMeshType)i;
+				break;
+			}
+		}
         if (numTimeStepElt  < 0) throw IOException("", __FILE__, __LINE__);    
         
-        if (numTimeStepElt != 0)
+        if (numTimeStepElt > 0)
         {
             if (fieldOnNodes) throw IllegalStateException("", __FILE__, __LINE__);
-            
             mEntity = MED_MAILLE;
-            mGeom = MED_TETRA10;
+            mGeom = pGeom;
             readMEDtimeSteps(pMEDfile, numTimeStepElt, pMeshName);
         }
     }
@@ -446,7 +529,7 @@ void Field::readMEDtimeSteps(med_idt pMEDfile, med_int pNumberOfTimeSteps, char*
             mEntity, 
             mGeom, 
             itTimeStep, 
-                &ngauss, 
+			&ngauss, 
             &numdt, 
             &numo, 
             dtunit, 
@@ -495,7 +578,6 @@ void Field::readMEDtimeSteps(med_idt pMEDfile, med_int pNumberOfTimeSteps, char*
         int sizeOfData = mSizeOfType * mNumComponents * nval;
         mSizeOfData.push_back(sizeOfData);
         unsigned char* fieldData = new unsigned char[sizeOfData];
-        
         ret = MEDchampLire(
             pMEDfile, 
             pMeshName,
@@ -510,7 +592,6 @@ void Field::readMEDtimeSteps(med_idt pMEDfile, med_int pNumberOfTimeSteps, char*
             mGeom, 
             numdt, 
             numo);
-        
         if (ret != 0) throw IOException("i/o error while reading field in MED file", __FILE__, __LINE__);
     
         mGaussLoc.push_back(gaussLocName);
@@ -520,14 +601,17 @@ void Field::readMEDtimeSteps(med_idt pMEDfile, med_int pNumberOfTimeSteps, char*
 }
 
 
-void Field::writeMED(med_idt pMEDfile, char* pMeshName)
+void Field::writeMED(med_idt pMEDfile, char* pMeshName, bool pCreateField)
 {
     if (pMEDfile == 0) throw IOException("", __FILE__, __LINE__);
     if (pMeshName == NULL) throw NullArgumentException("", __FILE__, __LINE__);
     if (strlen(pMeshName) > MED_TAILLE_NOM) throw IllegalArgumentException("", __FILE__, __LINE__);
     if (mNumComponents < 1) throw IllegalStateException("", __FILE__, __LINE__);
-    
-    med_err ret = MEDchampCr(
+    med_err ret;    
+
+    if (pCreateField)
+    {
+        ret = MEDchampCr(
         pMEDfile, 
         mName,                                        // name of the field
         mType,                                        // type of data (MED_FLOAT64, MED_INT32, etc.)
@@ -535,14 +619,14 @@ void Field::writeMED(med_idt pMEDfile, char* pMeshName)
         const_cast<char*>(mStrUnit.c_str()),          // name of units
         mNumComponents);                              // number of components
     
-    if (ret != 0) throw IOException("i/o error while creating field in MED file", __FILE__, __LINE__);
-    
+        if (ret != 0) throw IOException("i/o error while creating field in MED file", __FILE__, __LINE__);
+    }
     // for each time step
     for (unsigned i = 0 ; i < mNGauss.size() ; i++)
     {
         // skip if no values
         if (mNVal[i] == 0) continue;
-        
+
         ret = MEDchampEcr(
             pMEDfile,
             pMeshName,          // name of the mesh (first call to MEDchampEcr => name of reference)
@@ -565,6 +649,171 @@ void Field::writeMED(med_idt pMEDfile, char* pMeshName)
     }
 }
 
+void	Field::writeMEDOptimized(std::vector<MeshDisPart*>* pParts, const char* pMeshName, GaussIndexList* pGaussList, int pGeomIdx, std::vector<med_int>& pFiles, std::map<std::string, Profil*>& pProfils)
+{
+	med_err					ret;
+	unsigned char*			lValue = NULL;
+	unsigned				lGaussIdx = 0;
+    bool                    lCreateField = false;
+    med_int                 nbField;
+    char                    lName[MED_TAILLE_NOM + 1];
+    med_type_champ          type;
+    char*                   comp = new char[mNumComponents * MED_TAILLE_PNOM + 1];
+    char*                   unit = new char[mNumComponents * MED_TAILLE_PNOM + 1];
+    set<med_int>*           idxSet;
+    std::set< med_int>      lSetOfElt;
+    bool                    completeProfil;
+
+    // For each time step.
+	for (unsigned itTimeStep = 0;  itTimeStep < mNGauss.size(); ++itTimeStep)
+	{
+		lGaussIdx = 0;
+        // For each part.
+		for (unsigned itPart = 0 ; itPart < pParts->size() ; ++itPart)
+		{
+			// Skip empty part/mesh !
+			if ((*pParts)[itPart]->getMesh()->getNumberOfElements((eMeshType)pGeomIdx) == 0 &&
+				!this->isFieldOnNodes())
+			{
+				continue;
+			}
+			
+			// Get the index of the nodes or elements of this field. If the index is empty
+            // the corresponding mesh was removed during domain split so we just skip it.
+			do
+			{
+				if (this->isFieldOnNodes())
+				{
+                    // Field is on nodes.
+					idxSet = &(*pGaussList)[lGaussIdx].second;
+				}
+				else
+				{
+                    // Field is on elements.
+					idxSet = &(*pGaussList)[lGaussIdx].first[pGeomIdx];
+				}
+				lGaussIdx++;
+			}
+			while (idxSet->size() == 0 && lGaussIdx < pGaussList->size());
+			
+            // Check if the gauss list is empty.
+            if (lGaussIdx > pGaussList->size() || idxSet == 0)
+			{
+				// We should never go here...
+				throw IllegalStateException("Corrupted file !", __FILE__, __LINE__);
+			}
+            // We check if the field already exists in this MED file.
+            // I guess we could ignore this and always create the field but it seems
+            // to create corrupted MED files.
+            lCreateField = true;
+            nbField = MEDnChamp(pFiles[itPart], 0);
+            for (int i = 1; i <= nbField; ++i)
+            {
+                ret = MEDchampInfo(pFiles[itPart], i, lName, &type, comp, unit, mNumComponents);
+                lName[MED_TAILLE_NOM] = '\0';
+                if (strncmp(mName, lName, MED_TAILLE_NOM) == 0)
+                {
+                    lCreateField = false;
+                    break; 
+                }
+            }
+
+            completeProfil = false;
+            // If we have some profile.
+            if (mProfil.size() > 0)
+            {
+                // Try to find it.
+                if (pProfils.find(mProfil[itTimeStep]) != pProfils.end())
+                {
+                    lSetOfElt.clear();
+                    // Extract the subset of elements contained in the profil and the current part.
+                    pProfils[mProfil[itTimeStep]]->filterSetOfElement(*idxSet, lSetOfElt);
+                    // If this part has no nodes of elements in the profil we skip it.
+                    if (lSetOfElt.size() == 0)
+                    {
+                        continue;
+                    }
+                    // Detect if the profil contains the whole field
+                    if (lSetOfElt.size() == pProfils[mProfil[itTimeStep]]->getSet().size())
+                    {
+                        completeProfil = true;
+                    }
+                    // Replace the previous set.
+                    idxSet = &lSetOfElt;
+                }
+            }
+
+            // If the field doesn't exist we create it.
+			if (lCreateField == true)
+            {
+                ret = MEDchampCr(
+                    pFiles[itPart], 
+                    mName,									 // name of the field
+                    mType,									 // type of data (MED_FLOAT64, MED_INT32, etc.)
+                    const_cast<char*>(mStrComponent.c_str()),// name of components
+                    const_cast<char*>(mStrUnit.c_str()),	 // name of units
+                    mNumComponents);						 // number of components
+            }
+
+            int nval;
+            // If the profil contains the whole field, we dont need to copy it.
+            if (completeProfil)
+            {
+                nval = mNVal[itTimeStep];
+                lValue = mVal[itTimeStep];
+            }
+            else
+            {
+                // Compute field number of values, size of one value etc.
+                nval = idxSet->size() * this->mNGauss[itTimeStep];
+                int sizeOfData = nval * mSizeOfType * mNumComponents;
+                int sizeOfOneData = mSizeOfType * mNumComponents * this->mNGauss[itTimeStep];
+                lValue = new unsigned char[sizeOfData + 1];
+                
+                // Copy the subset of values.
+                unsigned char* dest = lValue;
+                for (set<med_int>::iterator itSet = idxSet->begin() ; itSet != idxSet->end() ; ++itSet)
+                {
+                    int indexElt = (*itSet);
+                    unsigned char* src = mVal[itTimeStep] + (indexElt - 1) * sizeOfOneData;
+                    memcpy(dest, src, sizeOfOneData);
+                    dest += sizeOfOneData;
+                }
+            }
+            
+            // Write the field.
+            ret =MEDchampEcr(
+                pFiles[itPart],
+                const_cast<char*>(pMeshName),// name of the mesh (first call to MEDchampEcr => name of reference)
+                mName,// name of the field
+                lValue,// data (= values)
+                MED_FULL_INTERLACE ,// data organization
+                nval,// number of values
+                const_cast<char*>(mGaussLoc[itTimeStep].c_str()),// name of Gauss reference
+                MED_ALL,// components to be selected
+                const_cast<char*>(mProfil[itTimeStep].c_str()),// name of profil
+                MED_COMPACT,// how to read data: MED_NO_PFLMOD,MED_COMPACT,MED_GLOBAL
+                mEntity,// type of entity (MED_NOEUD, MED_MAILLE, etc.)
+                mGeom,// type of geometry (TETRA10, etc.)
+                mNumDT[itTimeStep],// time step iteration
+                const_cast<char*>(mDTUnit[itTimeStep].c_str()), // unit of time step
+                mDT[itTimeStep],// time key
+                mNumO[itTimeStep]);// order number
+            
+            // If we use the field's data we dont need to delete it.
+            if (!completeProfil)
+            {
+                delete[] lValue;
+            }
+
+			if (ret != 0)
+			{
+				throw IOException("i/o error while writing field in MED file", __FILE__, __LINE__);
+			}
+
+		}
+	}
+}
 
 ostream& operator<<(ostream& pOs, Field& pF)
 {

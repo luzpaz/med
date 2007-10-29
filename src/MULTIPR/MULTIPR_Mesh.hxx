@@ -30,6 +30,7 @@ extern "C"
 #include <vector>
 #include <string>
 
+#include "MULTIPR_Globals.hxx"
 
 namespace multipr
 {
@@ -48,6 +49,29 @@ class Group;
 class MeshDis;
 class PointOfField;
 
+extern const med_geometrie_element CELL_TYPES[MED_NBR_GEOMETRIE_MAILLE];
+extern char CELL_NAMES[MED_NBR_GEOMETRIE_MAILLE][MED_TAILLE_NOM + 1];
+extern const int CELL_NB_NODE[MED_NBR_GEOMETRIE_MAILLE];
+
+enum eMeshType
+{
+    eMED_POINT1,
+    eMED_SEG2, 
+    eMED_SEG3,
+    eMED_TRIA3,
+    eMED_TRIA6,
+    eMED_QUAD4,
+    eMED_QUAD8,
+    eMED_TETRA4,
+    eMED_TETRA10,
+    eMED_HEXA8,
+    eMED_HEXA20,
+    eMED_PENTA6,
+    eMED_PENTA15,
+	eMED_PYRA5,
+	eMED_PYRA13,
+	eMaxMedMesh
+};
 
 //*****************************************************************************
 // Class Mesh
@@ -90,6 +114,32 @@ public:
      */
     const char* getName() const { return mMeshName; }
     
+	/**
+     * Returns the groups of this Mesh.
+     * \return the groups of this Mesh.
+     */
+	std::vector<Group*>* getGroups() { return &mGroups; }
+
+	/**
+     * Returns the nodes of this Mesh.
+     * \return the nodes of this Mesh.
+     */
+	const Nodes* getNodes() const { return mNodes; }
+
+	/**
+     * Returns the elements of this Mesh.
+     * \param pGeomIdx The index of the geometry.
+     * \return the elements of this Mesh.
+     */
+	const Elements* getElements(int pGeomIdx) const { return mElements[pGeomIdx]; }
+
+	/**
+     * Returns the gauss index of the splited meshes.
+	 * Only valid after a call to Mesh::splitGroupsOfElements().
+     * \return the elements of this Mesh.
+     */
+	GaussIndexList* editGaussIndex() { return &mGaussIndex; }
+		
     /**
      * Returns the name of all the scalar fields.
      * \return the name of all the scalar fields.
@@ -105,10 +155,19 @@ public:
     /**
      * Returns a Field from its name; NULL if it does not exist.
      * \param  pFieldName name of the field to be retrieved.
+     * \param  pGeomType The type of the mesh.
      * \return the Field pFieldName of it exists, NULL otherwise.
      * \throw  NullArgumentException if pFieldName is NULL.
      */
-    Field* getFieldByName(const char* pFieldName) const;
+    Field* getFieldByName(const char* pFieldName, eMeshType pGeomType = eMaxMedMesh) const;
+    
+    /**
+     * Get the minimum and maximum value of the field.
+     * \param  pFieldName The name of the field.
+     * \param pMin The mininum value to fill.
+     * \param pMax The maxinum value to fill.
+     */
+    void getFieldMinMax(const char* pFieldName, float& pMin, float& pMax) const;
     
     /**
      * Returns a GaussLoc from its name; NULL if it does not exist.
@@ -119,10 +178,36 @@ public:
     GaussLoc* getGaussLocByName(const char* pGaussLocName) const;    
      
     /**
-     * Returns the number of elements.
+     * Returns the number of elements for all geometry type (TETRA4 AND HEXA8 AND etc).
      * \return the number of elements.
      */
     int getNumberOfElements() const;
+    
+	/**
+	 * Returns the number of elements for the specified geometry type.
+	 * \param pGeomType The type of geometry (eMED_TETRA4 OR eMED_HEXA20 OR etc)
+	 * \return the number of elements.
+	 */
+	int	getNumberOfElements(eMeshType pGeomType) const;
+	
+    /**
+     * Add a profile to the mesh.
+     * \param pProfil The profile to add.
+     */
+    void addProfile(Profil* pProfil) { this->mProfils.push_back(pProfil); }
+
+    /**
+     * Get the vector of profiles of this mesh.
+     * \return A vector of profiles (of this mesh...).
+     */    
+    std::vector<Profil*>& getProfils() { return mProfils; }
+    
+    /**
+     * Get the profile by its name.
+     * \param pProfilName The name of the profil to get.
+     * \return A Profil or NULL.
+     */
+    Profil* getProfil(const std::string pProfilName);
     
     //---------------------------------------------------------------------
     // Algorithms
@@ -135,7 +220,7 @@ public:
      * \return a new Mesh which is a restriction of this Mesh to the given set of elements.
      * \throw  NullArgumentException if pNewMeshName is NULL.
      */
-    Mesh* createFromSetOfElements(const std::set<med_int>& pSetOfElements, const char* pNewMeshName);
+    Mesh* createFromSetOfElements(const std::set<med_int>* pSetOfElements, const char* pNewMeshName);
     
     /**
      * Creates a Mesh from one of its group.
@@ -145,7 +230,16 @@ public:
      * \throw  NullArgumentException if pGroup or pNewMeshName is NULL.
      */
     Mesh* createFromGroup(const Group* pGroup, const char* pNewMeshName);
-    
+
+    /**
+     * Creates a Mesh from one of its family.
+     * \param  pFamily       any family of this Mesh.  
+     * \param  pNewMeshName name of the new Mesh.
+     * \return a new Mesh which is a restriction of this Mesh to pFamily.
+     * \throw  NullArgumentException if pGroup or pNewMeshName is NULL.
+     */
+    Mesh* createFromFamily(const Family* pFamily, const char* pNewMeshName);
+	    
     /**
      * Creates a Mesh by merging this one with the given one.
      * Warning: not all the data are merged (e.g. bounding box if not computed and family/groups are partially filled).
@@ -155,7 +249,7 @@ public:
      * \return a new Mesh which is a the union of this and pMesh.
      * \throw  NullArgumentException if pGroup or pNewMeshName is NULL.
      */
-    Mesh* mergePartial(const Mesh* pMesh);
+    //Mesh* mergePartial(const Mesh* pMesh);
     Mesh* mergePartial(std::vector<Mesh*> pMeshes, const char* pFieldName, int pFieldIt);
     
     /**
@@ -183,10 +277,11 @@ public:
      * \param  pField      any field of this Mesh.
      * \param  pTimeStepIt time step iteration.
      * \param  pPoints     (out) list of points.
+	 * \param  pGeomType   Get the points from this type of geometry. If the values are on the node, this parameter is ignored.
      * \throw  NullArgumentException if pField is NULL.
      * \throw  IllegalArgumentException if pTimeStepIt is invalid.
      */
-    void getAllPointsOfField(Field* pField, int pTimeStepIt, std::vector<PointOfField>& pPoints);
+     void getAllPointsOfField(Field* pField, int pTimeStepIt, std::vector<PointOfField>& pPoints, eMeshType pGeomType);
     
     /**
      * Returns a default value for neighborhood radius.
@@ -204,10 +299,20 @@ public:
      * Reads a Mesh from a sequential MED file. Resets the object before.
      * \param  pMEDfilename
      * \param  pMeshName
+     * \param  pReadFields Set this to false to skip field.
      * \throw  IOException if any i/o error occurs.
      */
-    void readSequentialMED(const char* pMEDfilename, const char* pMeshName);
-    
+    void readSequentialMED(const char* pMEDfilename, const char* pMeshName, bool pReadFields = true);
+
+    /**
+     * Reads a Mesh from a sequential MED file. Resets the object before.
+     * \param  pMEDfilename
+     * \param  pMeshNumber
+     * \param  pReadFields Set this to false to skip field.
+     * \throw  IOException if any i/o error occurs.
+     */
+    void readSequentialMED(const char* pMEDfilename, med_int pMeshNumber, bool pReadFields = true);
+
     /**
      * Writes this Mesh and all related things into a MED file.
      * \param  pMEDfilename
@@ -216,11 +321,19 @@ public:
     void writeMED(const char* pMEDfilename);
     
     /**
+     * Writes this Mesh and all related things into a MED file.
+     * \param  pMEDfilename
+     * \param  pMeshName
+     * \throw  IOException if any i/o error occurs.
+     */
+    void writeMED(const char* pMEDfilename, const char* pMeshName);
+    
+    /**
      * Sets the flag which control the stream operator <<.
      * \param pFlag new flag value.
      */
-    void setPrintAll(bool pFlag) { mFlagPrintAll = pFlag; } 
-    
+    void setPrintAll(bool pFlag) { mFlagPrintAll = pFlag; }
+	
     /**
      * Dumps any Mesh to the given output stream.
      * \param  pOs any output stream.
@@ -231,6 +344,22 @@ public:
     
 private:
      
+    /**
+     * Opens a MED file for the given file name.
+     * \param  pMEDfilename
+     * \param  pMEDModeAccess
+     * \throw  IOException if any i/o error occurs.
+     */
+    void _openMEDFile(const char* pMEDfilename, med_mode_acces pMEDModeAccess = MED_LECTURE);
+
+    /**
+     * Reads a Mesh from a sequential MED file. Resets the object before.
+     * \param  pMeshName
+     * \param  pReadFields Set this to false to skip field.
+     * \throw  IOException if any i/o error occurs.
+     */
+    void _readSequentialMED(const char* pMeshName, bool pReadFields);
+
     /**
      * Reads all Gauss localizations in the current MED file.
      * \throw  IOException if an i/o error occurs.
@@ -306,7 +435,7 @@ private:
     /**
      * All the TETRA10 elements used by this mesh.
      */
-    Elements*                         mElements;
+    Elements*                         mElements[eMaxMedMesh];
     
     /**
      * Table of families used by this mesh.
@@ -340,7 +469,7 @@ private:
     
     /**
      * Table of fields related to this mesh.
-     * Number of fiels = mFields.size().
+     * Number of fields = mFields.size().
      */
     std::vector<Field*>               mFields;
     
@@ -354,6 +483,11 @@ private:
      */
     bool                              mFlagPrintAll;
     
+	/**
+	 * List of gauss points index for optimized domain split.
+	 */
+	GaussIndexList					  mGaussIndex;
+	
 private:
 
     // do not allow copy constructor

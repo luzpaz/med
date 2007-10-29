@@ -27,10 +27,16 @@ extern "C"
 #include <vector>
 #include <set>
 
+#include "MULTIPR_Globals.hxx"
+#include "MULTIPR_Mesh.hxx"
+
 
 namespace multipr
 {
 
+// Forward declaration.
+class MeshDisPart;
+class Group;
 
 //*****************************************************************************
 // Class Field
@@ -89,12 +95,29 @@ public:
      */
     med_type_champ getType() const { return mType; }
     
+	/**
+	 * Get the internal index of geometry type (eMED_TETRA4, etc).
+	 * \return The index of the geometry type.
+	 */
+	eMeshType getGeomIdx() { return mGeomIdx; }	   
     /**
      * Returns the number of components of this Field.
      * \return the number of components of this Field.
      */
     int getNumberOfComponents() const { return mNumComponents; }
     
+	/**
+	 * Return the component string.
+	 * \return the component string.
+	 */
+	const std::string&	getStrComponent() { return mStrComponent; }
+	
+   	/**
+	 * Return the unit string.
+	 * \return the unit string.
+	 */
+	const std::string& getStrUnit() { return mStrUnit; }
+	
     /**
      * Returns the number of Gauss points for each element at the given time step.
      * \param  pTimeStepIt iteration of the field; must be in [1..MAX_ITERATION].
@@ -119,6 +142,14 @@ public:
      * \throw  IndexOutOfBoundsException if pTimeStepIt or pIndex are invalid.
      */
     const unsigned char* getValue(int pTimeStepIt, int pIndex) const;
+    
+    /**
+     * Get the profile (if any) at the given time step.
+     * \param pTimeStep The time step.
+     * \return The name of the profile.
+     * \throw IndexOutOfBoundsException if pTimeStep is invalid.
+     */
+    const std::string& getProfil(int pTimeStep) const;
     
     //---------------------------------------------------------------------
     // Algorithms
@@ -146,6 +177,13 @@ public:
     Field* merge(Field* pField);
     Field* merge(std::vector<Field*> pFields, int pFieldIt = -1);
 
+    /**
+     * Get the minimum and maximum values of this field for all time steps.
+     * \param pMin The mininum value to fill.
+     * \param pMax The maxinum value to fill.
+     */
+    void getMinMax(float& pMin, float& pMax);
+    
     //---------------------------------------------------------------------
     // I/O
     //---------------------------------------------------------------------
@@ -156,18 +194,20 @@ public:
      * \param  pMEDfile  any valid MED file opened for reading.
      * \param  pIndex    index of the field to be read; must be >= 1.
      * \param  pMeshName name of the mesh (a field is always related to a mesh).
+	 * \param  pGeom Type of geometry (MED_TETRA4, etc).
      * \throw  IOException if any i/o error occurs.
      */
-    void readMED(med_idt pMEDfile, med_int pIndex, char* pMeshName);
+    void readMED(med_idt pMEDfile, med_int pIndex, char* pMeshName, med_geometrie_element pGeom = (med_geometrie_element)0);
     
     /**
      * Writes this field to a MED file. The field is linked to the given mesh.
      * WARNING: all related Gauss info must have been added to the MED file before.
      * \param  pMEDfile  any valid MED file opened for writing.
      * \param  pMeshName name of the mesh.
+     * \param  pCreateField set this to false to not create the field.
      * \throw  IOException if any i/o error occurs.
      */
-    void writeMED(med_idt pMEDfile, char* pMeshName);
+    void writeMED(med_idt pMEDfile, char* pMeshName, bool pCreateField = true);
     
     /**
      * Sets the flag which control the stream operator <<.
@@ -175,6 +215,16 @@ public:
      */
     void setPrintAll(bool pFlag) { mFlagPrintAll = pFlag; } 
     
+	/**
+	 * Read and write the fields for optimized domain split.
+	 * \param pParts The splited parts.
+	 * \param pMeshName The name of the current mesh.
+	 * \param pGaussList List of gauss points index.
+	 * \param pGeomIdx Internal geometry type index (eMED_TETRA4, etc).
+	 * \param pFiles List of opened file identifier.
+	 */
+	void writeMEDOptimized(std::vector<MeshDisPart*>* pParts, const char* pMeshName, GaussIndexList* pGaussList, int pGeomIdx, std::vector<med_int>& pFiles, std::map<std::string, Profil*>& pProfils);
+	
     /**
      * Dumps any Field to the given output stream.
      * \param  pOs any output stream.
@@ -199,7 +249,8 @@ private:
     char                         mName[MED_TAILLE_NOM + 1];
     med_entite_maillage          mEntity;      // type of entity, e.g. MED_MAILLE
     med_geometrie_element        mGeom;        // type of primitives, e.g. MED_TETRA10 (MED_NONE for a field on nodes)
-    med_type_champ               mType;        // type of field, e.g. MED_FLOAT64, MED_INT32
+    eMeshType					 mGeomIdx;	   // Internal index of geometry type (eMED_TETRA4, etc).
+	med_type_champ               mType;        // type of field, e.g. MED_FLOAT64, MED_INT32
     int                          mSizeOfType;  // 8 for MED_FLOAT64, 4 for MED_INT32, etc.
     med_int                      mNumComponents;
     std::string                  mStrComponent;
@@ -221,7 +272,7 @@ private:
     std::vector<unsigned char*>  mVal;           /**< For each time step, raw data; can be MED_FLOAT64, MED_INT32, etc. see mType. */
 
     bool                         mFlagPrintAll;  /**< Flag to control the behaviour of the stream operator <<. */
-    
+	
 private:
 
     // do not allow copy constructor
