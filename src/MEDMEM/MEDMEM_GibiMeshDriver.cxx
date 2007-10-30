@@ -942,7 +942,11 @@ bool GIBI_MESH_RDONLY_DRIVER::getLine(char* & aLine)
   if (nBytesRest < GIBI_MaxOutputLen)
   {
     if (nBytesRest > 0) {
-      memcpy (_start, _ptr, nBytesRest);
+      //memcpy (_start, _ptr, nBytesRest);
+      char* tmpBuf = new char [nBytesRest];
+      memcpy (tmpBuf, _ptr, nBytesRest);
+      memcpy (_start, tmpBuf, nBytesRest);
+      delete [] tmpBuf;
     } else
       nBytesRest = 0;
     _ptr = _start;
