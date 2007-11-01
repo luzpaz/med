@@ -34,7 +34,10 @@ salomeinclude_HEADERS= \
 MEDSPLITTER_Topology.hxx \
 MEDSPLITTER_MESHCollection.hxx \
 MEDSPLITTER_MESHCollectionDriver.hxx \
+MEDSPLITTER_MESHCollectionMedXMLDriver.hxx \
+MEDSPLITTER_MESHCollectionMedAsciiDriver.hxx \
 MEDSPLITTER_ParallelTopology.hxx \
+MEDSPLITTER_FaceModel.hxx \
 MEDSPLITTER_Graph.hxx\
 MEDSPLITTER_UserGraph.hxx\
 MEDSPLITTER_API.hxx \
@@ -50,6 +53,8 @@ endif
 dist_libmedsplitter_la_SOURCES= \
 MEDSPLITTER_MESHCollection.cxx \
 MEDSPLITTER_MESHCollectionDriver.cxx \
+MEDSPLITTER_MESHCollectionMedXMLDriver.cxx \
+MEDSPLITTER_MESHCollectionMedAsciiDriver.cxx \
 MEDSPLITTER_ParallelTopology.cxx \
 MEDSPLITTER_Graph.cxx\
 MEDSPLITTER_UserGraph.cxx\
@@ -62,9 +67,10 @@ if MED_ENABLE_SCOTCH
     dist_libmedsplitter_la_SOURCES+= MEDSPLITTER_SCOTCHGraph.cxx
 endif
 
-libmedsplitter_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ $(BOOST_CPPFLAGS) \
+libmedsplitter_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+	$(BOOST_CPPFLAGS) $(LIBXML_CPPFLAGS) \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
-libmedsplitter_la_LDFLAGS= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) \
+libmedsplitter_la_LDFLAGS= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) \
 	../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la
 
 if MED_ENABLE_KERNEL

@@ -1921,7 +1921,10 @@ medGeometryElement CONNECTIVITY::getElementTypeWithPoly(medEntityMesh Entity,int
   int globalNumberMaxOfClassicType;
   if(_entity==Entity)
     {
-      globalNumberMaxOfClassicType=_count[_numberOfTypes];
+      if (_count==0)
+        globalNumberMaxOfClassicType = 1;
+      else
+        globalNumberMaxOfClassicType=_count[_numberOfTypes];
       if(globalNumber>=1)
 	{
 	  if(globalNumber<globalNumberMaxOfClassicType)
@@ -2207,7 +2210,8 @@ int CONNECTIVITY::getNumberOfElementOfPolyType(MED_EN::medEntityMesh Entity)  co
       if(_constituent!=NULL)
 	return _constituent->getNumberOfElementOfPolyType(Entity);
       else
-	throw MEDEXCEPTION("_constituent required to evaluate getNumberOfElementOfPolyType");
+        //throw MEDEXCEPTION("_constituent required to evaluate getNumberOfElementOfPolyType");
+        return 0;
     }
 }
 
@@ -2407,7 +2411,8 @@ int CONNECTIVITY::getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_
       if(_constituent)
 	return _constituent->getNumberOfElementsWithPoly(Entity,Type);
       else
-	throw MEDEXCEPTION("CONNECTIVITY::getNumberOfElementsWithPoly : _constituent needed");
+	//throw MEDEXCEPTION("CONNECTIVITY::getNumberOfElementsWithPoly : _constituent needed");
+        return 0;
     }
 }
 

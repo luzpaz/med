@@ -548,8 +548,9 @@ void MeshDis::splitPart(const char* pPartName, int pNbParts, int pPartitionner)
     //---------------------------------------------------------------------
     // Load the sequential MED file
     //---------------------------------------------------------------------
-    MEDSPLITTER::MESHCollection* collection;
-    collection = new MEDSPLITTER::MESHCollection(part->getMEDFileName(), part->getMeshName());
+    MEDSPLITTER::MESHCollection* collection =
+      new MEDSPLITTER::MESHCollection(part->getMEDFileName(), part->getMeshName());
+    collection->setDriverType(MEDSPLITTER::MedAscii);
     
     //---------------------------------------------------------------------
     // Partition the group
@@ -585,6 +586,7 @@ void MeshDis::splitPart(const char* pPartName, int pNbParts, int pPartitionner)
     try
     {
         MEDSPLITTER::MESHCollection* newCollection = new MEDSPLITTER::MESHCollection(*collection, topology);
+        newCollection->setDriverType(MEDSPLITTER::MedAscii);
 
         part->mToDoOnNextWrite = MeshDisPart::MULTIPR_WRITE_PARTS; 
         part->mSplit           = pNbParts;

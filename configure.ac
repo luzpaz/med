@@ -37,8 +37,8 @@ echo
 echo
 
 dnl remember MED_WITH_KERNEL set by build configure
-MED_WITH_KERNEL=no
-MED_WITH_GUI=no
+MED_WITH_KERNEL=yes
+MED_WITH_GUI=yes
 old_with_kernel=${MED_WITH_KERNEL}
 
 dnl
@@ -233,7 +233,7 @@ echo "MED_WITH_GUI   : ${MED_WITH_GUI}"
 echo ---------------------------------------------
 
 openpbs_ok=no
-# CHECK_OPENPBS ONLY if MED_WITH_KERNEL=no
+# CHECK_OPENPBS ONLY if MED_WITH_KERNEL=yes
 # echo
 # echo ---------------------------------------------
 # echo testing OpenPBS
@@ -243,7 +243,7 @@ openpbs_ok=no
 # CHECK_OPENPBS
 # dnl openpbs_ok is set to yes by CHECK_OPENPBS
 
-# CHECK_LSF ONLY if MED_WITH_KERNEL=no
+# CHECK_LSF ONLY if MED_WITH_KERNEL=yes
 # echo
 # echo ---------------------------------------------
 # echo testing LSF
@@ -254,7 +254,7 @@ lsf_ok=no
 # CHECK_LSF
 # dnl lsf_ok is set to yes by CHECK_LSF
 
-# CHECK_CPPUNIT ONLY if MED_WITH_KERNEL=no
+# CHECK_CPPUNIT ONLY if MED_WITH_KERNEL=yes
 # echo
 # echo ----------------------------------------------
 # echo testing CPPUNIT only required for unit testing
@@ -289,11 +289,20 @@ if test "x$ENABLE_SPLITTER" = "xyes"; then
     CHECK_SCOTCH 
     dnl scotch_ok is set to yes by CHECK_SCOTCH	 
 
+
+    echo        
+    echo --------------------------------------------- 
+    echo testing LIBXML2
+    echo ---------------------------------------------
+    echo libxml_ok=no 
+    CHECK_LIBXML 
+    dnl libxml_ok is set to yes by CHECK_LIBXML         
+
 fi
 
 AM_CONDITIONAL(MED_ENABLE_METIS, [test "$ENABLE_METIS" = yes])
 AM_CONDITIONAL(MED_ENABLE_SCOTCH, [test "$ENABLE_SCOTCH" = yes])
-	
+
 
 if test "${MED_WITH_KERNEL}" = "yes"; then
 {
@@ -538,7 +547,7 @@ done
 dnl optional variables 
 
 echo "---Optional:"
-variables="metis_ok scotch_ok"
+variables="metis_ok scotch_ok libxml_ok"
 for var in $variables
      do
          eval toto=\$$var

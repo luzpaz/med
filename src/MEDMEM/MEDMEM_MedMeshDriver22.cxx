@@ -2430,92 +2430,95 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
 
 
   // Nodal connectivity for classic geometric types
-  if   ( _ptrMesh->existConnectivity(MED_NODAL,entity) ) 
+  if ( _ptrMesh->existConnectivity(MED_NODAL,entity) )
     {
+      int numberOfTypes = _ptrMesh->getNumberOfTypes(entity);
+      const medGeometryElement * types = _ptrMesh->getTypes(entity);
 
-      int numberOfTypes           = _ptrMesh->getNumberOfTypes (entity) ;
-      const medGeometryElement  * types = _ptrMesh->getTypes         (entity) ;
-
-      for (int i=0; i<numberOfTypes; i++) 
+      for (int i=0; i<numberOfTypes; i++)
 	{
+	  int numberOfElements = _ptrMesh->getNumberOfElements(entity,types[i]);
+	  const int * connectivity = _ptrMesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,
+                                                               MED_NODAL, entity, types[i]); // ?? et SI MED_NODAL n'existe pas, recalcul auto ??
 
-	  int    numberOfElements = _ptrMesh->getNumberOfElements (entity,types[i]);
-	  const int * connectivity      = _ptrMesh->getConnectivity     (MED_EN::MED_FULL_INTERLACE, 
-									 MED_NODAL, entity, types[i]); // ?? et SI MED_NODAL n'existe pas, recalcul auto ??
-      
 	  // Pour l'instant la class utilise le multi.....
-	  int multi = 0 ;
+	  int multi = 0;
 	  //	  if (entity==MED_EN::MED_CELL)
-	  //	    if ( (types[i]/ 100) < _ptrMesh->_spaceDimension) 
-	  //	      multi=1 ;
-	  int numberOfNodes = types[i]%100 ;
+	  //	    if ( (types[i]/ 100) < _ptrMesh->_spaceDimension)
+	  //	      multi=1;
+	  int numberOfNodes = types[i]%100;
 //CCRT	  int * connectivityArray = new int[numberOfElements*(numberOfNodes+multi)];
 	  med_2_3::med_int * connectivityArray = new med_2_3::med_int[numberOfElements*(numberOfNodes+multi)];
-      
-	  // version originale sans prise en compte des numéros optionnels 
-	  //     
-	  for (int j=0 ; j<numberOfElements; j++) 
+
+	  // version originale sans prise en compte des numéros optionnels
+	  //
+	  for (int j=0 ; j<numberOfElements; j++)
 	    {
 	      for (int k=0; k<numberOfNodes; k++)
-		connectivityArray[j*(numberOfNodes+multi)+k]=connectivity[j*numberOfNodes+k] ;
+		connectivityArray[j*(numberOfNodes+multi)+k] = connectivity[j*numberOfNodes+k];
 
-	      if (multi>0) connectivityArray[j*(numberOfNodes+multi)+numberOfNodes]=0;
+	      if (multi>0) connectivityArray[j*(numberOfNodes+multi)+numberOfNodes] = 0;
 	    }
-      
+
 	  //////////////////////////////////////////////////////////////////////////////////////
-	  ///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
-	      //////////////////////////////////////////////////////////////////////////////////////
-	      ///
-	      /// Dénumérote les sommets des mailles pour leur rendre leurs numéros optionnels
-	      /// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
+	  ///  Modification pour prise en compte de la numérotation optionnelle des noeuds  ///
+          //////////////////////////////////////////////////////////////////////////////////////
+          ///
+          /// Dénumérote les sommets des mailles pour leur rendre leurs numéros optionnels
+          /// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
 
-	      //  	if (_ptrMesh->_arePresentOptionnalNodesNumbers==1) 
-	      // 		{
-	      // 		const int * nodesNumbers = _ptrMesh->_coordinate->getNodesNumbers();
-	      //       		for (int j=0 ; j<numberOfElements; j++) 
-	      // 			{
-	      // 			for (int k=0; k<numberOfNodes; k++) connectivityArray[j*(numberOfNodes+multi)+k]=nodesNumbers[connectivity[j*numberOfNodes+k]-1] ;
-	      // 			if (multi>0) connectivityArray[j*(numberOfNodes+multi)+numberOfNodes]=0;
-	      // 			}
-	      // 		}
-	      // 	else
-	      // 		{
-	      //       		for (int j=0 ; j<numberOfElements; j++) 
-	      // 			{
-	      // 			for (int k=0; k<numberOfNodes; k++) connectivityArray[j*(numberOfNodes+multi)+k]=connectivity[j*numberOfNodes+k] ;
-	      // 			if (multi>0) connectivityArray[j*(numberOfNodes+multi)+numberOfNodes]=0;
-	      // 			}
-	      // 		}
+          //if (_ptrMesh->_arePresentOptionnalNodesNumbers==1)
+          //{
+          //  const int * nodesNumbers = _ptrMesh->_coordinate->getNodesNumbers();
+          //  for (int j=0 ; j<numberOfElements; j++) 
+          //  {
+          //    for (int k=0; k<numberOfNodes; k++)
+          //      connectivityArray[j*(numberOfNodes+multi)+k] =
+          //        nodesNumbers[connectivity[j*numberOfNodes+k]-1];
+          //    if (multi>0) connectivityArray[j*(numberOfNodes+multi)+numberOfNodes] = 0;
+          //  }
+          //}
+          //else
+          //{
+          //  for (int j=0 ; j<numberOfElements; j++)
+          //  {
+          //    for (int k=0; k<numberOfNodes; k++)
+          //      connectivityArray[j*(numberOfNodes+multi)+k] = connectivity[j*numberOfNodes+k];
+          //    if (multi>0) connectivityArray[j*(numberOfNodes+multi)+numberOfNodes]=0;
+          //  }
+          //}
 
-	      //////////////////////////////////////////////////////////////////////////////////////
-      
-	      //       err = MEDconnEcr( _medIdt, const_cast <char *> ( _meshName.c_str()), _ptrMesh->_spaceDimension,
-	      // 			connectivityArray, MED_FR::MED_FULL_INTERLACE , numberOfElements,
-	      // 			MED_FR::MED_LECTURE_ECRITURE,
-	      // 			(MED_FR::med_entite_maillage  ) entity, 
-	      // 			(MED_FR::med_geometrie_element) types[i], MED_FR::MED_NOD );
+          //////////////////////////////////////////////////////////////////////////////////////
 
-	      // 	  err = MEDconnEcr(_medIdt, const_cast <char *> ( _meshName.c_str()),
-	      // 			   _ptrMesh->_spaceDimension, connectivityArray,
-	      // 			   MED_FR::MED_FULL_INTERLACE , numberOfElements,
-	      // 			   (MED_FR::med_entite_maillage  ) entity, 
-	      // 			   (MED_FR::med_geometrie_element) types[i],
-	      // 			   med_2_3::MED_NOD);
-	      
-	      err = MEDconnEcr(_medIdt, const_cast <char *> ( _meshName.c_str()),
-			       _ptrMesh->_spaceDimension, connectivityArray,
-			       med_2_3::MED_FULL_INTERLACE , numberOfElements,
-// 			       (med_2_3::med_entite_maillage  ) entity, because Med Memory works only in Nodal connectivity
-			       (med_2_3::med_entite_maillage  ) MED_CELL, 
-			       (med_2_3::med_geometrie_element) types[i],
-			       med_2_3::MED_NOD);
+          //err = MEDconnEcr(_medIdt, const_cast <char *> (_meshName.c_str()),
+          //                 _ptrMesh->_spaceDimension, connectivityArray,
+          //                 MED_FR::MED_FULL_INTERLACE, numberOfElements,
+          //                 MED_FR::MED_LECTURE_ECRITURE,
+          //                 (MED_FR::med_entite_maillage  ) entity,
+          //                 (MED_FR::med_geometrie_element) types[i], MED_FR::MED_NOD);
 
-	      delete[] connectivityArray ;
+          //err = MEDconnEcr(_medIdt, const_cast <char *> (_meshName.c_str()),
+          //                 _ptrMesh->_spaceDimension, connectivityArray,
+          //                 MED_FR::MED_FULL_INTERLACE, numberOfElements,
+          //                 (MED_FR::med_entite_maillage  ) entity,
+          //                 (MED_FR::med_geometrie_element) types[i], med_2_3::MED_NOD);
 
-	      if (err<0) // ETENDRE LES EXPLICATIONS
-		throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write connectivities of mesh |" << _meshName.c_str() << "| in file |" << _fileName
-					     << "| with dimension |"  << _ptrMesh->_spaceDimension <<"| and" 
-					     ));
+          err = MEDconnEcr(_medIdt, const_cast <char *> (_meshName.c_str()),
+                           _ptrMesh->_spaceDimension, connectivityArray,
+                           med_2_3::MED_FULL_INTERLACE, numberOfElements,
+                           //(med_2_3::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
+                           (med_2_3::med_entite_maillage  ) MED_CELL,
+                           (med_2_3::med_geometrie_element) types[i], med_2_3::MED_NOD);
+          err = med_2_3::MEDdimEspaceCr
+            (_medIdt, const_cast<char *>(_meshName.c_str()), _ptrMesh->_spaceDimension);
+
+          delete[] connectivityArray;
+
+          if (err<0) // ETENDRE LES EXPLICATIONS
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write connectivities of mesh |"
+                                         << _meshName.c_str() << "| in file |" << _fileName
+                                         << "| with dimension |"  << _ptrMesh->_spaceDimension <<"| and" 
+                                         ));
 	}
 
     }
