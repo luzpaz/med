@@ -97,6 +97,8 @@ SUPPORT::SUPPORT(const SUPPORT & m)
   else
     _number = (MEDSKYLINEARRAY *) NULL;
 
+  _profilNames=m._profilNames;
+
   END_OF(LOC) ;
 };
 /*!
@@ -130,6 +132,7 @@ SUPPORT & SUPPORT::operator=(const SUPPORT & m)
       _number = (MEDSKYLINEARRAY *) NULL;
   } else
     _number = (MEDSKYLINEARRAY *) NULL;
+  _profilNames=m._profilNames;
 
   END_OF(LOC) ;
   return *this;
@@ -373,7 +376,7 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   for (int itype=0; itype < NumberOfGeometricType; itype++)
   {
     ostringstream typestr;
-    typestr<<"type"<<itype;
+    typestr<<_name<<"_type"<<itype;
     prof_names[itype]=typestr.str();
   }
   setProfilNames(prof_names);

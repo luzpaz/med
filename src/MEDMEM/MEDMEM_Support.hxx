@@ -429,6 +429,19 @@ inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *Geometri
     _geometricType.set(_numberOfGeometricType);
   for (int i=0;i<_numberOfGeometricType;i++)
     _geometricType[i] = GeometricType[i];
+
+  if (_profilNames.empty())
+    {
+      // giving a default value to profile names
+      vector<string> prof_names( _numberOfGeometricType);
+      for (int itype=0; itype < _numberOfGeometricType; itype++)
+	{
+	  ostringstream typestr;
+	  typestr<<_name<<"_type"<<itype;
+	  prof_names[itype]=typestr.str();
+	}
+      _profilNames=prof_names;
+    }
 }
 
 

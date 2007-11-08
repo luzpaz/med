@@ -28,7 +28,7 @@ using namespace DRIVERFACTORY;
 int main (int argc, char ** argv)
 {
     // Traitement arguments
-    if (argc != 2) 
+    if (argc > 2) 
     {
 	cerr << "Usage : " << argv[0] 
 	<< " filenameRoot" << endl << endl
@@ -36,7 +36,11 @@ int main (int argc, char ** argv)
 	exit(-1);
     }
 
-    string filenameRoot = argv[1] ;
+    string filenameRoot;
+    if (argc==2) 
+      filenameRoot= argv[1] ;
+    else
+      filenameRoot="/tmp/testMeshingPoly";
 
     string medfilename  = filenameRoot + "22.med";
 

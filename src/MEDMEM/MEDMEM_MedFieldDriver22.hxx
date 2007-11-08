@@ -609,14 +609,14 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 */
 template <class T> void
 MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromFile(med_2_2::med_idt id,
-					  string & meshName,
-					  MED_EN::medEntityMesh  entity,
-					  vector<MED_EN::medGeometryElement> & geoType,
-					  vector<int> &nbOfElOfType,
-					  vector<int> &nbOfElOfTypeC
-					 ) const throw(MEDEXCEPTION)
+                                                    string & meshName,
+                                                    MED_EN::medEntityMesh  entity,
+                                                    vector<MED_EN::medGeometryElement> & geoType,
+                                                    vector<int> &nbOfElOfType,
+                                                    vector<int> &nbOfElOfTypeC
+                                                    ) const throw(MEDEXCEPTION)
 {
-  const char LOC[] = "MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromFile(...)";
+  BEGIN_OF("MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromFile(...)");
 
   int numberOfGeometricType=0;
   MED_EN::medGeometryElement geometricType[MED_NBR_GEOMETRIE_MAILLE];
@@ -624,48 +624,102 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromFile(med_2_2::med_idt id,
   int numberOfElementsOfTypeC[MED_NBR_GEOMETRIE_MAILLE+1];
   med_2_2::med_int   numberOfElements=0;
   med_2_2::med_table quoi;
-  if (entity == MED_EN::MED_CELL) quoi=med_2_2::MED_CONN;
+
+  /*in MED file, all entities are regarded as MED_CELL
+    (except for those related to descending connectivities),
+    whereas in MEDMEM the distinction between MED_CELL, MED_FACE and MED_EDGE exists
+    it is therefore necessary to distinguish the MED-file entity
+    that will be used for the call to MED-file
+    and the MEDMEM entity*/
+  MED_EN::medEntityMesh medfile_entity;
+  if (entity==MED_EN::MED_NODE)
+  {
+    medfile_entity=MED_EN::MED_NODE;
+    quoi=med_2_2::MED_COOR;
+  }
   else
-    if (entity == MED_EN::MED_NODE) quoi=med_2_2::MED_COOR;
-    else
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Support Creation from Mesh |"  << meshName
-				   << "| on entity " << MED_EN::entNames[entity]
-				   << "| is impossible,  must be  on MED_NODE or MED_CELL" ));
+  {
+    medfile_entity=MED_EN::MED_CELL;
+    quoi=med_2_2::MED_CONN;
+  }
 
   list<MED_EN::medGeometryElement>::const_iterator currentGeometry;
   bool alreadyFoundAnEntity = false;
   numberOfElementsOfTypeC[0]=0;
 
   for (currentGeometry  = (MED_EN::meshEntities[entity]).begin();
-       currentGeometry != (MED_EN::meshEntities[entity]).end(); currentGeometry++) {
-
-
-    if ( (numberOfElements =
-	  med_2_2::MEDnEntMaa(id,
-			      const_cast<char*> (meshName.c_str()),
-			      quoi,
-			      (med_2_2::med_entite_maillage)   entity,
-			      (med_2_2::med_geometrie_element)  *currentGeometry,
-			      med_2_2::MED_NOD) ) <= 0)
+       currentGeometry != (MED_EN::meshEntities[entity]).end(); currentGeometry++)
+  {
+    numberOfElements =
+      med_2_2::MEDnEntMaa(id,
+                          const_cast<char*> (meshName.c_str()),
+                          quoi,
+                          (med_2_2::med_entite_maillage) medfile_entity,
+                          (med_2_2::med_geometrie_element) *currentGeometry,
+                          med_2_2::MED_NOD);
+    if (numberOfElements <= 0)
       continue;
 
     alreadyFoundAnEntity = true;
     numberOfElementsOfType[numberOfGeometricType] = numberOfElements;
     numberOfElementsOfTypeC[numberOfGeometricType+1] =
       numberOfElementsOfTypeC[numberOfGeometricType]+numberOfElements;
-    geometricType[numberOfGeometricType] = *currentGeometry;
-    numberOfGeometricType++;
+    MED_EN::medGeometryElement geomType;
 
+    //MED_FILE uses MED_NONE as a geometricType to describe MED_NODE
+    //MEDMEM uses MED_POINT1
+    if ( *currentGeometry==MED_NONE)
+      geomType=MED_POINT1;
+    else
+      geomType=*currentGeometry;
+    geometricType[numberOfGeometricType] = geomType;
+
+    numberOfGeometricType++;
   }
 
-  geoType = vector<MED_EN::medGeometryElement>(geometricType,geometricType+numberOfGeometricType);
-  nbOfElOfType = vector<int> (numberOfElementsOfType,numberOfElementsOfType+numberOfGeometricType);
-  nbOfElOfTypeC = vector<int> (numberOfElementsOfTypeC,numberOfElementsOfTypeC+numberOfGeometricType+1);
+  //Because MEDFILE and MEDMEM differ on the definition of MED_CELL
+  //it is necessary to remove the cells that do not
+  //have maximum cell dimension in the range covered by geometricType
+  int maxdim=0;
+  for (int i=0; i<numberOfGeometricType; i++)
+  {
+    CELLMODEL model(geometricType[i]);
+    int dim = model.getDimension();
+    if (dim>maxdim) maxdim=dim;
+  }
+
+  nbOfElOfTypeC.push_back(0);
+  for (int i=0; i<numberOfGeometricType; i++)
+  {
+    CELLMODEL model(geometricType[i]);
+    int dim = model.getDimension();
+    if (dim==maxdim || entity != MED_CELL)
+    {
+      geoType.push_back(geometricType[i]);
+      int nbelems = numberOfElementsOfType[i];
+      nbOfElOfType.push_back(nbelems);
+      nbOfElOfTypeC.push_back(nbOfElOfTypeC[nbOfElOfTypeC.size()-1]+nbelems);
+    }
+  }
+
+  //  geoType = vector<MED_EN::medGeometryElement>(geometricType,geometricType+numberOfGeometricType);
+  //  nbOfElOfType = vector<int> (numberOfElementsOfType,numberOfElementsOfType+numberOfGeometricType);
+  //  nbOfElOfTypeC = vector<int> (numberOfElementsOfTypeC,numberOfElementsOfTypeC+numberOfGeometricType+1);
 
 //   for (int j =0 ; j<= numberOfGeometricType;++j)
 //       cout << "nbOfElOfTypeC["<<j<<"]="<<nbOfElOfTypeC[j]<<endl;
 
+  END_OF("MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromFile(...)");
 }
+
+/*!
+reads the MESH object in order to retrieve the list of geometric types for a given entity
+\param[in] meshPtr pointer to MESH
+\param[in] entity entity for which the geom types are required
+\param[out] geoType list of geom types
+\param[out] nbOfElOfType vector containing the number of elements per type (size : ntype)
+\param[out] nbOfElOfTypeC accumulated version of nbOfElType (size : ntype+1)
+ */
 
 template <class T> void
 MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromMESH( MESH * meshPtr,
@@ -683,8 +737,7 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromMESH( MESH * meshPtr,
   // Il est plus pratique de créer un support "onAll"
   // pour calculer les tableaux du nombre d'entités cumulées
 
-  SUPPORT mySupportFromMesh = SUPPORT(meshPtr,"Temporary Support From Associated Mesh",
-				      entity);
+  SUPPORT mySupportFromMesh (meshPtr, "Temporary Support From Associated Mesh", entity);
   geoType = vector<MED_EN::medGeometryElement>(mySupportFromMesh.getTypes(),
 			      mySupportFromMesh.getTypes()+mySupportFromMesh.getNumberOfTypes());
   nbOfElOfType.resize(mySupportFromMesh.getNumberOfTypes());
