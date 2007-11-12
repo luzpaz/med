@@ -391,10 +391,17 @@ void CONNECTIVITY::setPolygonsConnectivity(medConnectivity ConnectivityType, med
   else
     {
       if (_entityDimension==3)
-	_constituent=new CONNECTIVITY(MED_EN::MED_FACE);
+      {
+        if (_constituent == (CONNECTIVITY*) NULL)
+          _constituent=new CONNECTIVITY(MED_EN::MED_FACE);
+      }
       else if (_constituent == (CONNECTIVITY*) NULL)
+      {
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Entity not found !"));
-      _constituent->setPolygonsConnectivity(ConnectivityType, Entity, PolygonsConnectivity, PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
+      }
+      _constituent->setPolygonsConnectivity(ConnectivityType, Entity,
+                                            PolygonsConnectivity, PolygonsConnectivityIndex,
+                                            ConnectivitySize, NumberOfPolygons);
     }
 }
 
@@ -1055,11 +1062,11 @@ int CONNECTIVITY::getNumberOf(medEntityMesh Entity, medGeometryElement Type) con
 {
   //const char * LOC = "CONNECTIVITY::getNumberOf";
   if (Entity==_entity) {
-    if (Type==MED_NONE)
+    if (Type==MED_EN::MED_NONE)
       return 0; // not defined !
     //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : medGeometryElement must be different of MED_NONE"));
     if (!existConnectivity(MED_NODAL,Entity) && !existConnectivity(MED_DESCENDING,Entity)) return 0; //case with only polygons for example
-    if (Type==MED_ALL_ELEMENTS)
+    if (Type==MED_EN::MED_ALL_ELEMENTS)
       return _count[_numberOfTypes]-1;
     for (int i=0; i<_numberOfTypes; i++)
       if (_geometricTypes[i]==Type)
