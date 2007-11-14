@@ -254,13 +254,13 @@ lsf_ok=no
 # CHECK_LSF
 # dnl lsf_ok is set to yes by CHECK_LSF
 
-# CHECK_CPPUNIT ONLY if MED_WITH_KERNEL=yes
-# echo
-# echo ----------------------------------------------
-# echo testing CPPUNIT only required for unit testing
-# echo ----------------------------------------------
-# echo
-# CHECK_CPPUNIT
+echo
+echo ----------------------------------------------
+echo testing CPPUNIT only required for unit testing
+echo ----------------------------------------------
+echo
+CHECK_CPPUNIT
+#AM_CONDITIONAL(CPPUNIT_IS_OK, test)
 
 echo
 echo ---------------------------------------------
@@ -466,16 +466,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	echo
 
 	CHECK_HTML_GENERATORS
-
-
-        echo
-        echo ----------------------------------------------
-        echo testing CPPUNIT only required for unit testing
-        echo ----------------------------------------------
-        echo
-        
-        CHECK_CPPUNIT
-
 }
 else
 {
@@ -485,8 +475,6 @@ else
 	AC_SUBST(WITHIHM)
 	AC_SUBST(WITHOPENPBS)
 	CPPFLAGS="$CPPFLAGS -DMED_WITHOUT_KERNEL"
-
-        AM_CONDITIONAL(CPPUNIT_IS_OK, test)
 }
 fi # MED_WITH_KERNEL
 
@@ -529,10 +517,10 @@ fi
 #variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok boost_ok doxygen_ok graphviz_ok OpenGL_ok qt_ok vtk_ok omniORB_ok occ_ok Kernel_ok"
 
 if test "X$WITHIHM" = "Xyes"; then
-variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok"
+variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok cppunit_ok"
 fi
 if test "X$WITHIHM" = "Xno"; then
-variables="cc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok hdf5_ok med2_ok omniORB_ok occ_ok Kernel_ok"
+variables="cc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok hdf5_ok med2_ok omniORB_ok occ_ok Kernel_ok cppunit_ok"
 fi
 
 for var in $variables
@@ -559,7 +547,7 @@ for var in $variables
 
 if test "${MED_WITH_KERNEL}" = "yes"; then
 {
-        variables="cppunit_ok openpbs_ok lsf_ok doxygen_ok graphviz_ok"
+        variables="openpbs_ok lsf_ok doxygen_ok graphviz_ok"
  
         for var in $variables
         do

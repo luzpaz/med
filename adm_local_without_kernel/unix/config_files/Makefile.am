@@ -31,6 +31,7 @@ dist_admlocalwithoutkernelm4_DATA=\
     ac_cxx_warnings.m4 \
     ac_linker_options.m4 \
     check_boost.m4 \
+    check_cppunit.m4 \
     check_hdf5.m4 \
     check_pthreads.m4 \
     check_swig.m4 \

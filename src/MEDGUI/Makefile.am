@@ -30,13 +30,12 @@ MOC_FILES= MedGUI_moc.cxx
 nodist_libMED_la_SOURCES= $(MOC_FILES)
 EXTRA_DIST+= MedGUI_Selection.h MedGUI.h 
 
-libMED_la_CPPFLAGS= $(QT_INCLUDES) $(VTK_INCLUDES) @CAS_CPPFLAGS@ $(PYTHON_INCLUDES) ${KERNEL_CXXFLAGS} ${GUI_CXXFLAGS} ${BOOST_CPPFLAGS} \
+libMED_la_CPPFLAGS= $(QT_INCLUDES) $(VTK_INCLUDES) @CAS_CPPFLAGS@ $(PYTHON_INCLUDES) \
+	${KERNEL_CXXFLAGS} ${GUI_CXXFLAGS} ${BOOST_CPPFLAGS} \
 	@CORBA_INCLUDES@ @CORBA_CXXFLAGS@ \
-	-I$(top_builddir)/idl -I$(top_builddir)/salome_adm/unix -I$(srcdir)/../MED -I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDMEM_I
+	-I$(top_builddir)/idl -I$(top_builddir)/salome_adm/unix
+
 libMED_la_LDFLAGS= \
-	../MED/libMEDEngine.la \
-	../MEDMEM_I/libMEDMEMImpl.la \
-	../MEDMEM/libmedmem.la \
 	${GUI_LDFLAGS} -lSalomeApp
 
 # .po files to transform in .qm
