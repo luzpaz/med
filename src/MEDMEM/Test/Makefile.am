@@ -26,6 +26,8 @@ lib_LTLIBRARIES = libMEDMEMTest.la
 
 salomeinclude_HEADERS = MEDMEMTest.hxx
 
+EXTRA_DIST += BasicMainTest.hxx
+
 dist_libMEDMEMTest_la_SOURCES= \
 	MEDMEMTest.cxx \
 	MEDMEMTest_Array.cxx \
