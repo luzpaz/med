@@ -36,7 +36,9 @@ libMED_la_CPPFLAGS= $(QT_INCLUDES) $(VTK_INCLUDES) @CAS_CPPFLAGS@ $(PYTHON_INCLU
 	-I$(top_builddir)/idl -I$(top_builddir)/salome_adm/unix
 
 libMED_la_LDFLAGS= \
-	${GUI_LDFLAGS} -lSalomeApp
+	../../idl/libSalomeIDLMED.la \
+	$(KERNEL_LDFLAGS) -lSalomeLifeCycleCORBA \
+	$(GUI_LDFLAGS) -lSalomeApp
 
 # .po files to transform in .qm
 nodist_salomeres_DATA= \
