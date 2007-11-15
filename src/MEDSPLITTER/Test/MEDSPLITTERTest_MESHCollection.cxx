@@ -315,6 +315,8 @@ void MEDSPLITTERTest::testMESHCollection_square()
   int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
   med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
+	CPPUNIT_ASSERT(strcmp(jn1,"joint_2")==0);
+	CPPUNIT_ASSERT(strcmp(jn2,"joint_1")==0);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
   
@@ -378,7 +380,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
   for (int i=0; i<2*n1; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
 
-  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
   CPPUNIT_ASSERT_EQUAL(n2,2);
   delete[] tab;
   //joint2
@@ -546,7 +548,7 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
   for (int i=0; i<2*n1; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
             
-  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
   CPPUNIT_ASSERT_EQUAL(n2,2);
   delete[] tab;
   //joint2
@@ -594,7 +596,7 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
   for (int i=0; i<2*n1; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell3[i]);
             
-  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
   CPPUNIT_ASSERT_EQUAL(n2,2);
   delete[] tab;
   //joint2
@@ -993,7 +995,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polygon()
   
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
-  aRemover.Register(filename_para_wr);
+	aRemover.Register(filename_para_wr);
   aRemover.Register(filename_para_med1);
   aRemover.Register(filename_para_med2);
   aRemover.Register(filename_para2_wr);
