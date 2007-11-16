@@ -38,8 +38,7 @@
 //#define ENABLE_FAULTS
 
 // use this define to enable CPPUNIT asserts and fails, showing bugs
-//#define ENABLE_FORCED_FAILURES
-//#undef ENABLE_FORCED_FAILURES
+#define ENABLE_FORCED_FAILURES
 
 using namespace std;
 using namespace MEDMEM;
