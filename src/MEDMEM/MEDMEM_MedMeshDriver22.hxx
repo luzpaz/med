@@ -58,8 +58,8 @@ public :
   /*!
     Constructor.
   */
-  MED_MESH_DRIVER22(const string & fileName,  
-		    MESH * ptrMesh, 
+  MED_MESH_DRIVER22(const string & fileName,
+		    MESH * ptrMesh,
 		    MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.
@@ -110,6 +110,17 @@ public :
     Read MESH in the specified file.
   */
   void read ( void );
+  /*!
+   *  This method activate global faces computation from SCRATCH if a family on FACE exists in the MED file.
+   *  This implies a complete renumbering of FACES. This is the default behaviour of this driver.
+   */
+  void activateFacesComputation() { _computeFaces=true; }
+  /*!
+   *  This method desactivate global face computation.
+   *  That is to say that FACES described in file are supposed to
+   *  be correct and complete. The consequence is that reading is much faster. Use with care !
+   */
+  void desactivateFacesComputation() { _computeFaces=false; }
 
 private:
   int getCOORDINATE();
@@ -122,6 +133,8 @@ private:
 
   GENDRIVER * copy ( void ) const ;
 
+private:
+  bool _computeFaces;
 };
 
 /*!

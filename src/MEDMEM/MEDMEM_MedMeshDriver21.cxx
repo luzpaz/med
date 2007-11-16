@@ -119,19 +119,25 @@ const char * const MED_MESH_DRIVER21::all_cell_type_tab [MED_NBR_GEOMETRIE_MAILL
 
 //---------------------------------- RDONLY PART -------------------------------------------------------------
 
-MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21()
+MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21():_computeFaces(true)
 {
 }
   
 MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21(const string & fileName,
 						   MESH * ptrMesh):
-  IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER21(fileName,ptrMesh,MED_RDONLY),MED_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY)
+  IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),
+  MED_MESH_DRIVER21(fileName,ptrMesh,MED_RDONLY),
+  MED_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY),
+  _computeFaces(true)
 { 
   MESSAGE("MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21(const string & fileName, MESH * ptrMesh) has been created");
 }
   
 MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21(const MED_MESH_RDONLY_DRIVER21 & driver): 
-  IMED_MESH_RDONLY_DRIVER(driver),MED_MESH_DRIVER21(driver),MED_MESH_DRIVER(driver)
+  IMED_MESH_RDONLY_DRIVER(driver),
+  MED_MESH_DRIVER21(driver),
+  MED_MESH_DRIVER(driver),
+  _computeFaces(driver._computeFaces)
 {
 }
 
@@ -199,8 +205,9 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
   
   if (getFAMILY()!=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY"      )) ;
-  
-  updateFamily();
+
+  if (_computeFaces)
+    updateFamily();
 
   // we build all groups
   // on node
@@ -2577,7 +2584,7 @@ MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const string & fileName,
   MESSAGE("MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const string & fileName, MESH * ptrMesh) has been created");
 }
 
-MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const MED_MESH_RDWR_DRIVER21 & driver): 
+MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const MED_MESH_RDWR_DRIVER21 & driver):
   MED_MESH_DRIVER(driver),
   IMED_MESH_RDONLY_DRIVER(driver),
   IMED_MESH_WRONLY_DRIVER(driver),
@@ -2590,8 +2597,8 @@ MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const MED_MESH_RDWR_DRIVER21 & dr
 
 MED_MESH_RDWR_DRIVER21::~MED_MESH_RDWR_DRIVER21() {
   //MESSAGE("MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const string & fileName, MESH * ptrMesh) has been destroyed");
-} 
-  
+}
+
 GENDRIVER * MED_MESH_RDWR_DRIVER21::copy(void) const
 {
   return new MED_MESH_RDWR_DRIVER21(*this);
@@ -2605,4 +2612,3 @@ void MED_MESH_RDWR_DRIVER21::read (void)
 {
   MED_MESH_RDONLY_DRIVER21::read();
 }
-

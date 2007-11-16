@@ -54,6 +54,9 @@ class CELLMODEL;
 class FAMILY;
 class GROUP;
 class SUPPORT;
+class MESH;
+
+ostream & operator<<(ostream &os, const MESH &my);
 
 class MESH : public RCBASE
 {

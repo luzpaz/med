@@ -126,6 +126,8 @@ public :
     Return a MEDEXCEPTION : it is the read-only driver.
   */
   void write( void ) const;
+  virtual void activateFacesComputation() = 0;
+  virtual void desactivateFacesComputation() = 0;
 
 protected:
 //   virtual int getCOORDINATE() = 0 ;
@@ -233,6 +235,8 @@ public:
   void   setMeshName(const string & meshName);
   string getMeshName() const;
   void write( void ) const;
+  void activateFacesComputation();
+  void desactivateFacesComputation();
   void read ( void );
   void open();
   void close();
@@ -279,6 +283,8 @@ public :
   ~MED_MESH_RDWR_DRIVER();
   void   setMeshName(const string & meshName);
   string getMeshName() const;
+  void activateFacesComputation();
+  void desactivateFacesComputation();
   void read ( void );
   void write( void ) const;
   void open();

@@ -58,7 +58,7 @@ public :
  /*!
     Constructor.
   */
-  MED_MESH_DRIVER21(const string & fileName,  
+  MED_MESH_DRIVER21(const string & fileName,
 		    MESH * ptrMesh, 
 		    MED_EN::med_mode_acces accessMode) ;
   /*!
@@ -83,11 +83,11 @@ public :
 
 */
 
-  class MED_MESH_RDONLY_DRIVER21 : public virtual IMED_MESH_RDONLY_DRIVER , public virtual MED_MESH_DRIVER21
+class MED_MESH_RDONLY_DRIVER21 : public virtual IMED_MESH_RDONLY_DRIVER,
+                                 public virtual MED_MESH_DRIVER21
 {
- 
-public :
-  
+public:
+
   /*!
     Constructor.
   */
@@ -106,6 +106,9 @@ public :
   */
   virtual ~MED_MESH_RDONLY_DRIVER21() ;
   void read(void);
+  void activateFacesComputation() { _computeFaces=true; }
+  void desactivateFacesComputation() { _computeFaces=false; }
+
 private:
   int getCOORDINATE();
   int getCONNECTIVITY();
@@ -117,6 +120,8 @@ private:
 
   GENDRIVER * copy ( void ) const ;
 
+private:
+  bool _computeFaces;
 };
 
 /*!

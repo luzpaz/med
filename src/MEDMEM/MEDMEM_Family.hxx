@@ -34,6 +34,10 @@
 
 */
 namespace MEDMEM {
+  class FAMILY;
+  ostream & operator<<(ostream &os, FAMILY &my);
+  ostream & operator<<(ostream &os, const FAMILY &my) ;
+
 class FAMILY : virtual public SUPPORT
 {
 protected :
