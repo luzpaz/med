@@ -41,7 +41,7 @@ namespace med_2_3 {
   }
 }
 
-// Every memory allocation made in the MedDriver members function are desallocated in the Mesh destructor 
+// Every memory allocation made in the MedDriver members function are desallocated in the Mesh destructor
 
 MED_MESH_DRIVER22::MED_MESH_DRIVER22():  _medIdt(MED_INVALID)
 {
@@ -49,11 +49,11 @@ MED_MESH_DRIVER22::MED_MESH_DRIVER22():  _medIdt(MED_INVALID)
 
 MED_MESH_DRIVER22::MED_MESH_DRIVER22(const string & fileName,
 				     MESH * ptrMesh,
-				     MED_EN::med_mode_acces accessMode): 
+				     MED_EN::med_mode_acces accessMode):
   _medIdt(MED_INVALID), MED_MESH_DRIVER(fileName,ptrMesh,accessMode)
 {
 }
-  
+
 MED_MESH_DRIVER22::MED_MESH_DRIVER22(const MED_MESH_DRIVER22 & driver):
   MED_MESH_DRIVER(driver),_medIdt(driver._medIdt)
 {
@@ -120,19 +120,25 @@ const char * const MED_MESH_DRIVER22::all_cell_type_tab [MED_NBR_GEOMETRIE_MAILL
 
 //---------------------------------- RDONLY PART -------------------------------------------------------------
 
-MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22()
+MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22():_computeFaces(true)
 {
 }
   
 MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22(const string & fileName,
 						   MESH * ptrMesh):
-  IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER22(fileName,ptrMesh,MED_RDONLY),MED_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY)
+  IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),
+  MED_MESH_DRIVER22(fileName,ptrMesh,MED_RDONLY),
+  MED_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY),
+  _computeFaces(true)
 { 
   MESSAGE("MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22(const string & fileName, MESH * ptrMesh) has been created");
 }
   
 MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22(const MED_MESH_RDONLY_DRIVER22 & driver): 
-   IMED_MESH_RDONLY_DRIVER(driver),MED_MESH_DRIVER22(driver),MED_MESH_DRIVER(driver)
+   IMED_MESH_RDONLY_DRIVER(driver),
+   MED_MESH_DRIVER22(driver),
+   MED_MESH_DRIVER(driver),
+   _computeFaces(driver._computeFaces)
 {
 }
 
@@ -212,7 +218,8 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
   if (getFAMILY()!=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY"      )) ;
 
-  updateFamily();
+  if (_computeFaces)
+    updateFamily();
 
   // we build all groups
   // on node
@@ -857,22 +864,47 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	  // We suppose there is no cells used as faces in MED 2.2.x , this is forbidden !!!
 	  // In version prior to 2.2.x, it is possible
 	  if (tmp_cells_count[i]>0) 
-	    { 
-	      Connectivity->_entityDimension=all_cell_type[i]/100;  
+	    {
+	      Connectivity->_entityDimension=all_cell_type[i]/100;
 	      Connectivity->_numberOfTypes++;
 	    }
 	}
 
-      
+      /*
+      {
+        // VBD fix to be able reading polygons and polyhedrons
+        // "in the case when the space dimension is 3 and the mesh dimension 2"
+
+        //checking for the number of polygons/polyhedra to get an appropriate mesh dimension
+        int nbpolygons=MEDnEntMaa(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())),
+                                  med_2_3::MED_CONN,(med_2_3::med_entite_maillage) Entity,
+                                  med_2_3::MED_POLYGONE,med_2_3::MED_NOD);
+        if (nbpolygons>0)
+        {
+          if (Connectivity->_entityDimension<2)
+            Connectivity->_entityDimension=2;
+        }
+        int nbpolyhedra=MEDnEntMaa(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())),
+                                   med_2_3::MED_CONN,(med_2_3::med_entite_maillage) Entity,
+                                   med_2_3::MED_POLYEDRE,med_2_3::MED_NOD);
+        if (nbpolyhedra>0)
+          Connectivity->_entityDimension=3;
+
+        //setting a correct mesh dimension as being the dimnsion corresponding to
+        // the highest dimension  element
+        if (Entity==med_2_3::MED_MAILLE)
+          _ptrMesh->_meshDimension = Connectivity->_entityDimension;
+      }
+      */
 
       // begin classic geometric types
       if (Connectivity->_numberOfTypes > 0)
 	{
 	  // if MED version < 2.2.x, we read only entity with dimention = Connectivity->_entityDimension. Lesser dimension are face or edge !
 
-      med_2_3::med_int major, minor, release;
+          med_2_3::med_int major, minor, release;
 
-      if ( med_2_3::MEDversionLire(_medIdt, &major, &minor, &release) != 0 )
+          if ( med_2_3::MEDversionLire(_medIdt, &major, &minor, &release) != 0 )
 	    {
 	      // error : we suppose we have not a good med file !
 	      delete[] tmp_cells_count ;
@@ -3483,8 +3515,8 @@ MED_MESH_RDWR_DRIVER22::MED_MESH_RDWR_DRIVER22(const MED_MESH_RDWR_DRIVER22 & dr
 
 MED_MESH_RDWR_DRIVER22::~MED_MESH_RDWR_DRIVER22() {
   //MESSAGE("MED_MESH_RDWR_DRIVER22::MED_MESH_RDWR_DRIVER22(const string & fileName, MESH * ptrMesh) has been destroyed");
-} 
-  
+}
+
 GENDRIVER * MED_MESH_RDWR_DRIVER22::copy(void) const
 {
   return new MED_MESH_RDWR_DRIVER22(*this);
@@ -3498,4 +3530,3 @@ void MED_MESH_RDWR_DRIVER22::read (void)
 {
   MED_MESH_RDONLY_DRIVER22::read();
 }
-

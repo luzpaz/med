@@ -247,6 +247,20 @@ void MED_MESH_RDONLY_DRIVER::write( void ) const
   _concreteMeshDrv->write();
 }
 
+void MED_MESH_RDONLY_DRIVER::activateFacesComputation()
+{
+  IMED_MESH_RDONLY_DRIVER *drvC=dynamic_cast<IMED_MESH_RDONLY_DRIVER *>(_concreteMeshDrv);
+  if(drvC)
+    drvC->activateFacesComputation();
+}
+
+void MED_MESH_RDONLY_DRIVER::desactivateFacesComputation()
+{
+  IMED_MESH_RDONLY_DRIVER *drvC=dynamic_cast<IMED_MESH_RDONLY_DRIVER *>(_concreteMeshDrv);
+  if(drvC)
+    drvC->desactivateFacesComputation();
+}
+
 void MED_MESH_RDONLY_DRIVER::read ( void )
 {
   _concreteMeshDrv->read();
@@ -430,6 +444,20 @@ void MED_MESH_RDWR_DRIVER::write( void ) const
   _concreteMeshDrv->write();
 }
  
+void MED_MESH_RDWR_DRIVER::activateFacesComputation()
+{
+  IMED_MESH_RDONLY_DRIVER *drvC=dynamic_cast<IMED_MESH_RDONLY_DRIVER *>(_concreteMeshDrv);
+  if(drvC)
+    drvC->activateFacesComputation();
+}
+
+void MED_MESH_RDWR_DRIVER::desactivateFacesComputation()
+{
+  IMED_MESH_RDONLY_DRIVER *drvC=dynamic_cast<IMED_MESH_RDONLY_DRIVER *>(_concreteMeshDrv);
+  if(drvC)
+    drvC->desactivateFacesComputation();
+}
+
 void MED_MESH_RDWR_DRIVER::open()
 {
   _concreteMeshDrv->open();
