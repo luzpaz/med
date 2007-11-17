@@ -1610,8 +1610,6 @@ namespace MED
       return MEDnProfil(myFile->Id());
     }
 
-
-    //----------------------------------------------------------------------------
     TProfileInfo::TInfo
     TVWrapper
     ::GetProfilePreInfo(TInt theId, 
@@ -1638,8 +1636,6 @@ namespace MED
       return TProfileInfo::TInfo(&aName[0],aSize);
     }
 
-
-    //----------------------------------------------------------------------------
     void
     TVWrapper
     ::GetProfileInfo(TInt theId, 
@@ -1651,8 +1647,9 @@ namespace MED
       if(theErr && *theErr < 0)
 	return;
       
-      TValueHolder<TElemNum, med_int> anElemNum(theInfo.myElemNum);
-      TValueHolder<TString, char> aProfileName(theInfo.myName);
+      TProfileInfo& anInfo = const_cast<TProfileInfo&>(theInfo);
+      TValueHolder<TElemNum, med_int> anElemNum(anInfo.myElemNum);
+      TValueHolder<TString, char>     aProfileName(anInfo.myName);
 
       TErr aRet;
       aRet = MEDprofilLire(myFile->Id(),
@@ -1664,6 +1661,49 @@ namespace MED
 	EXCEPTION(std::runtime_error,"GetProfileInfo - MEDprofilLire(...)");
     }
 
+    void
+    TVWrapper
+    ::SetProfileInfo(const TProfileInfo& theInfo,
+                     EModeAcces          theMode,
+		     TErr*               theErr)
+    {
+      TFileWrapper aFileWrapper(myFile,theMode,theErr);
+      
+      if(theErr && *theErr < 0)
+	return;
+      
+      TProfileInfo& anInfo = const_cast<TProfileInfo&>(theInfo);
+      TValueHolder<TElemNum, med_int> anElemNum(anInfo.myElemNum);
+      TValueHolder<TString, char>     aProfileName(anInfo.myName);
+
+      TErr aRet;
+      aRet = MEDprofilEcr(myFile->Id(),      // descripteur du fichier.
+                          &anElemNum,        // tableau de valeurs du profil.
+                          theInfo.GetSize(), // taille du profil.
+                          &aProfileName);    // nom profil.
+      if(theErr)
+	*theErr = aRet;
+      else if(aRet < 0)
+	EXCEPTION(std::runtime_error,"SetProfileInfo - MEDprofilEcr(...)");
+    }
+
+    void
+    TVWrapper
+    ::SetProfileInfo(const TProfileInfo& theInfo,
+		     TErr*               theErr)
+    {
+      TErr aRet;
+      SetProfileInfo(theInfo,eLECTURE_ECRITURE,&aRet);
+      
+      if(aRet < 0)
+	SetProfileInfo(theInfo,eLECTURE_AJOUT,&aRet);
+
+      if(aRet < 0)
+	SetProfileInfo(theInfo,eCREATION,&aRet);
+
+      if(theErr)
+        *theErr = aRet;
+    }
 
     //-----------------------------------------------------------------
     TInt
@@ -2120,7 +2160,7 @@ namespace MED
 	
       }
       
-      INITMSG(MYDEBUG,"TVWrapper::SetMeshInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
+      INITMSG(MYDEBUG,"TVWrapper::SetTimeStampValue - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
     }
 
     

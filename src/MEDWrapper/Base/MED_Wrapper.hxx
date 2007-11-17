@@ -728,6 +728,12 @@ namespace MED
     CrProfileInfo(const TProfileInfo::TInfo& theInfo,
 		  EModeProfil theMode = eCOMPACT) = 0;
 
+    //! Write a MEDWrapper MED PROFILE representation
+    virtual
+    void
+    SetProfileInfo(const TProfileInfo& theInfo,
+                   TErr* theErr = NULL) = 0;
+
     //! Read a MEDWrapper MED PROFILE representation by its order number from defined MED file
     PProfileInfo
     GetPProfileInfo(TInt theId,
