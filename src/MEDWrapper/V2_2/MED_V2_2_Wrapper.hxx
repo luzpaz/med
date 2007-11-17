@@ -397,6 +397,15 @@ namespace MED
 		     TProfileInfo& theInfo,
 		     TErr* theErr = NULL);
 
+      virtual
+      void
+      SetProfileInfo(const TProfileInfo& theInfo,
+                     TErr*               theErr = NULL);
+
+      void
+      SetProfileInfo(const TProfileInfo& theInfo,
+                     EModeAcces          theMode,
+                     TErr*               theErr = NULL);
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       virtual 

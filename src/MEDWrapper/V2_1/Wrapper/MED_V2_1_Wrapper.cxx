@@ -835,9 +835,46 @@ namespace MED
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
-	EXCEPTION(runtime_error,"SetNodeInfo - MEDprofilLire(...)");
+	EXCEPTION(runtime_error,"GetProfileInfo - MEDprofilLire(...)");
     }
 
+    void
+    TVWrapper
+    ::SetProfileInfo(const TProfileInfo& theInfo,
+                     EModeAcces          theMode,
+                     TErr*               theErr)
+    {
+      TFileWrapper aFileWrapper(myFile,theMode,theErr);
+      
+      if(theErr && *theErr < 0)
+	return;
+      
+      TProfileInfo& anInfo = const_cast<TProfileInfo&>(theInfo);
+      TErr aRet;
+      aRet = MEDprofilEcr(myFile->Id(),                    // descripteur du fichier.
+                          (med_int*) &anInfo.myElemNum[0], // tableau de valeurs du profil.
+                          theInfo.GetSize(),               // taille du profil.
+                          (char*) &anInfo.myName[0]);      // nom profil.
+      if(theErr)
+	*theErr = aRet;
+      else if(aRet < 0)
+	EXCEPTION(std::runtime_error,"SetProfileInfo - MEDprofilEcr(...)");
+    }
+
+    void
+    TVWrapper
+    ::SetProfileInfo(const TProfileInfo& theInfo,
+                     TErr* theErr)
+    {
+      TErr aRet;
+      SetProfileInfo(theInfo,eECRI,&aRet);
+      
+      if(aRet < 0)
+	SetProfileInfo(theInfo,eREMP,&aRet);
+
+      if(theErr) 
+	*theErr = aRet;
+    }
 
     //-----------------------------------------------------------------
     TInt
