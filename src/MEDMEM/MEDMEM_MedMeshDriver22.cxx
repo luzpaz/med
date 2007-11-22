@@ -891,33 +891,6 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 			if (Entity==med_2_3::MED_MAILLE)
 				_ptrMesh->_meshDimension = Connectivity->_entityDimension;
 
-      /*
-      {
-        // VBD fix to be able reading polygons and polyhedrons
-        // "in the case when the space dimension is 3 and the mesh dimension 2"
-
-        //checking for the number of polygons/polyhedra to get an appropriate mesh dimension
-        int nbpolygons=MEDnEntMaa(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())),
-                                  med_2_3::MED_CONN,(med_2_3::med_entite_maillage) Entity,
-                                  med_2_3::MED_POLYGONE,med_2_3::MED_NOD);
-        if (nbpolygons>0)
-        {
-          if (Connectivity->_entityDimension<2)
-            Connectivity->_entityDimension=2;
-        }
-        int nbpolyhedra=MEDnEntMaa(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())),
-                                   med_2_3::MED_CONN,(med_2_3::med_entite_maillage) Entity,
-                                   med_2_3::MED_POLYEDRE,med_2_3::MED_NOD);
-        if (nbpolyhedra>0)
-          Connectivity->_entityDimension=3;
-
-        //setting a correct mesh dimension as being the dimnsion corresponding to
-        // the highest dimension  element
-        if (Entity==med_2_3::MED_MAILLE)
-          _ptrMesh->_meshDimension = Connectivity->_entityDimension;
-      }
-      */
-
       // begin classic geometric types
       if (Connectivity->_numberOfTypes > 0)
 	{
