@@ -870,7 +870,6 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	    }
 	}
 
-      /*
       {
         // VBD fix to be able reading polygons and polyhedrons
         // "in the case when the space dimension is 3 and the mesh dimension 2"
@@ -895,7 +894,6 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
         if (Entity==med_2_3::MED_MAILLE)
           _ptrMesh->_meshDimension = Connectivity->_entityDimension;
       }
-      */
 
       // begin classic geometric types
       if (Connectivity->_numberOfTypes > 0)
