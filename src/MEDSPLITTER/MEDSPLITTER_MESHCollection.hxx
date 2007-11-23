@@ -33,7 +33,7 @@ public:
 MESHCollection();
 
 //Constructing from an existing mesh and a new topology
-MESHCollection(const MESHCollection&, Topology*);
+	MESHCollection(const MESHCollection&, Topology*, bool family_splitting=false, bool create_empty_groups=false);
 
 //Constructing the mesh collection from a file
 MESHCollection(const std::string& filename);
@@ -141,6 +141,11 @@ bool isDimensionOK(MED_EN::medGeometryElement type, int dim)
 void setSubdomainBoundaryCreates(bool flag) {  m_subdomain_boundary_creates=flag;}
 bool getSubdomainBoundaryCreates(){return m_subdomain_boundary_creates;}
 
+	void setFamilySplitting(bool flag){m_family_splitting=flag;}
+	bool getFamilySplitting(){return m_family_splitting;}
+
+	void setCreateEmptyGroups(bool flag){m_create_empty_groups=flag;}
+	bool getCreateEmptyGroups(){return m_create_empty_groups;}
 private:
 //!creates connectivities for a domain and an entity (face or cell)
 void createNodalConnectivity(const MESHCollection & initial_collection, int idomain, MED_EN::medEntityMesh entity);
@@ -192,6 +197,13 @@ DriverType m_driver_type;
 so that they are written in joints*/
 bool m_subdomain_boundary_creates;
 
+	/*! flag specifying that families must be preserved by the
+		splitting*/
+	bool m_family_splitting;
+
+	/*! flag specifying that groups must be created on all domains, 
+		even if they are empty*/
+	bool m_create_empty_groups;
 };
 
 }//of namespace

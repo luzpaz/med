@@ -1112,3 +1112,85 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polyhedra()
   delete topo3;
   delete topo1;
 }
+
+/*! Testing a TRIO_U scenario with subzones defined as families
+	
+	
+ */
+
+void MEDSPLITTERTest::testMESHCollection_families()
+{
+  string data_dir                   = getenv("DATA_DIR");
+  string tmp_dir                    = getenv("TMP");
+  if (tmp_dir == "")
+    tmp_dir = "/tmp";
+  string filename_rd                = data_dir + "/MedFiles/trio_2D.med";
+  string filename_wr                 = tmp_dir+"/trio_split_faces";
+  string filename_wr_1                = tmp_dir+"/trio_split_faces1.med";
+  string filename_wr_2                 = tmp_dir+"/trio_split_faces2.med";
+  
+  // To remove tmp files from disk
+  MEDSPLITTERTest_TmpFilesRemover aRemover;
+  aRemover.Register(filename_wr);
+	//  aRemover.Register(filename_wr_1);
+	//aRemover.Register(filename_wr_2);
+  
+  char meshname[30]  = "dom";
+  char meshname1[30]  = "dom_1";
+  char meshname2[30]  = "dom_2";
+
+
+  MESHCollection* collection = new MESHCollection (filename_rd,meshname);
+  MEDSPLITTER::Topology* topo = collection->createPartition(2,Graph::METIS);
+  MESHCollection* new_collection = new MESHCollection (*collection, topo, true, true);
+	new_collection->setSubdomainBoundaryCreates(true);
+  //collection.write("/export/home/test_splitter");
+  new_collection->write(filename_wr);
+  new_collection->castAllFields(*collection);
+
+
+  delete collection;       
+  delete new_collection;
+
+  MEDMEM::MESH mesh1(MEDMEM::MED_DRIVER, filename_wr_1, meshname1);
+  MEDMEM::MESH mesh2(MEDMEM::MED_DRIVER, filename_wr_2, meshname2);
+
+  // testing number of elements for each partition
+  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+
+  CPPUNIT_ASSERT_EQUAL(nbelem1+nbelem2,2020);
+  
+  
+  
+  //testing number of joints
+  med_2_3::med_idt fid1 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_1.c_str()),med_2_3::MED_LECTURE);
+  med_2_3::med_idt fid2 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_2.c_str()),med_2_3::MED_LECTURE);
+  int nj1= med_2_3::MEDnJoint(fid1, meshname1);
+  int nj2= med_2_3::MEDnJoint(fid2, meshname2);
+  CPPUNIT_ASSERT_EQUAL(nj1,1);
+  CPPUNIT_ASSERT_EQUAL(nj2,1);
+       
+  //testing distant domains
+    
+  char desc1[MED_TAILLE_DESC];
+  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
+  char desc2[MED_TAILLE_DESC], maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
+  int dom1, dom2;
+  med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
+  med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
+  CPPUNIT_ASSERT_EQUAL(dom1,1);
+  CPPUNIT_ASSERT_EQUAL(dom2,0);
+  
+
+	int nbEdgesFamilies1= med_2_3::MEDnFam(fid1, meshname1);
+	int nbEdgesFamilies2= med_2_3::MEDnFam(fid2, meshname2);
+
+	CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies1,7); // six initial families + a joint
+	CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies2,7); // six initial families + a joint
+
+	string fam_name = mesh1.getFamily(MED_EN::MED_EDGE,1)->getName();
+	char test_name[MED_TAILLE_NOM]="Sortie";
+	CPPUNIT_ASSERT(strcmp(fam_name.c_str(),test_name)==0);
+       
+}
