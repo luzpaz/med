@@ -62,9 +62,7 @@ MESHCollection::MESHCollection()
     m_owns_topology(false),
     m_driver(0),
     m_driver_type(MEDSPLITTER::MedXML),
-    m_subdomain_boundary_creates(false),
-		m_family_splitting(false),
-		m_create_empty_groups(false)
+    m_subdomain_boundary_creates(false)
 {
 }
 
@@ -79,16 +77,14 @@ MESHCollection::MESHCollection()
  * \param topology topology containing the cell mappings
  */
 
-MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topology* topology, bool family_splitting, bool create_empty_groups)
+MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topology* topology)
   : m_name(initial_collection.m_name),
     m_topology(topology),
     m_owns_topology(false),
     m_cell_graph(topology->getGraph()),
     m_driver(0),
     m_driver_type(MEDSPLITTER::MedXML),
-    m_subdomain_boundary_creates(false),
-		m_family_splitting(family_splitting),
-		m_create_empty_groups(create_empty_groups)
+    m_subdomain_boundary_creates(false)
 {
 	string mesh_name = initial_collection.getName();
 	m_mesh.resize(m_topology->nbDomain());
@@ -135,9 +131,7 @@ MESHCollection::MESHCollection(const string& filename)
     m_owns_topology(true),
     m_driver(0),
     m_driver_type(MEDSPLITTER::Undefined),
-    m_subdomain_boundary_creates(false),
-		m_family_splitting(false),
-		m_create_empty_groups(false)
+    m_subdomain_boundary_creates(false)
 {
 	char filenamechar[256];
 	strcpy(filenamechar,filename.c_str());
@@ -175,9 +169,7 @@ MESHCollection::MESHCollection(const string& filename, const string& meshname)
     m_owns_topology(true),
     m_driver(0),
     m_driver_type(MEDSPLITTER::MedXML),
-    m_subdomain_boundary_creates(false),
-		m_family_splitting(false),
-		m_create_empty_groups(false)
+    m_subdomain_boundary_creates(false)
 {
 	char filenamechar[256];
 	char meshnamechar[256];
@@ -1417,11 +1409,8 @@ void MESHCollection::castFamilies(const MESHCollection& old_collection)
 {
 	vector <list<int> > element_array  (m_topology->nbDomain());
 	
-	//loop on old domains to create groups out of the existing families
-	if (m_family_splitting)
-		for (int idomain=0; idomain < old_collection.m_topology->nbDomain(); idomain++)
-				old_collection.getMesh(idomain)->createGroups();
-			
+	//loop on old domains
+	
 	//definition of the entities array which 
 	//defines the entities over which the information is cast
 	MED_EN::medEntityMesh entities[3];
@@ -1537,7 +1526,7 @@ void MESHCollection::castSupport(const MESHCollection& old_collection, vector<co
 			name = support->getName();
 			description=support->getDescription();
 			int nbelem = support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-			if (nbelem==0 && !m_create_empty_groups) continue;
+			if (nbelem==0) continue;
 		
 			int* list_of_elems;
 			if (support->isOnAllElements())
