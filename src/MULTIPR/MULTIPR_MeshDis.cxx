@@ -27,6 +27,7 @@
 #include "MULTIPR_Profil.hxx"
 
 #include "MEDSPLITTER_API.hxx"
+#include "MED_Factory.hxx"
 
 #include <iostream>
 #include <fstream>
@@ -933,6 +934,12 @@ void MeshDis::readDistributedMED(const char* pMEDfilename)
             int ret = sscanf(strTag, "[SOURCE]=%s", strSequentialMEDFilename);
             if (ret == 1)
             {
+	        MED::EVersion aVersion = MED::GetVersionId(strSequentialMEDFilename, true);
+	        if ( aVersion == MED::eVUnknown ) {
+		    std::string aMessage = std::string("source file - '") + strSequentialMEDFilename + "' is not a valid MED file";	  
+		    throw IOException( aMessage.c_str(), __FILE__, __LINE__ );
+		}
+
                 setSequentialMEDFilename(strSequentialMEDFilename);
             }
         }
@@ -977,6 +984,12 @@ void MeshDis::readDistributedMED(const char* pMEDfilename)
             lMEDFileName);
     
         if (ret != 5) throw IOException("i/o error while reading MED master file; bad format", __FILE__, __LINE__);
+
+	MED::EVersion aVersion = MED::GetVersionId(lMEDFileName, true);
+	if ( aVersion == MED::eVUnknown ) {
+	    std::string aMessage = std::string("partition file - '") + lMEDFileName + "' is not a valid MED file" ;	  
+	    throw IOException( aMessage.c_str(), __FILE__, __LINE__ );
+	}
 
         //cout << "DBG: read: " << lMeshName << " " << lId << " " << lPartName << endl;
         addMesh(

@@ -41,20 +41,21 @@ namespace multipr
 //*****************************************************************************
 
 Obj::Obj()
+  : mMeshDis(NULL)
 {
-  mMeshDis = NULL;
   reset();
 }
 
 
 Obj::~Obj()  
 { 
-    reset();  
+  reset();  
 }
 
 
 void Obj::reset() 
 { 
+    mPrevPath        = "";
     mMEDfilename     = "";
     mMeshName        = "";
     mState           = MULTIPR_OBJ_STATE_RESET;
@@ -588,12 +589,10 @@ vector<string> Obj::getListParts() const
 
 void Obj::save(const char* pPath)
 {
-    static string prevPath = "";
-    
     // only save file if it is a distributed MED file currently in memory or path has changed
-    if ((mState == MULTIPR_OBJ_STATE_DIS_MEM) || (strcmp(pPath, prevPath.c_str()) != 0))
+    if ((mState == MULTIPR_OBJ_STATE_DIS_MEM) || (strcmp(pPath, mPrevPath.c_str()) != 0))
     {
-        prevPath = pPath;
+        mPrevPath = pPath;
         
         //-------------------------------------------------------------
         // Write new distributed mesh

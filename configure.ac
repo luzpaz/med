@@ -267,7 +267,7 @@ echo ---------------------------------------------
 echo checking SPLITTER
 echo ---------------------------------------------
 echo
-AC_ENABLE_SPLITTER(no)
+AC_ENABLE_SPLITTER(yes)
 AM_CONDITIONAL(MED_ENABLE_SPLITTER, [test "$ENABLE_SPLITTER" = yes])
 
 if test "x$ENABLE_SPLITTER" = "xyes"; then

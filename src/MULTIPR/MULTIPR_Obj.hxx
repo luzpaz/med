@@ -336,6 +336,8 @@ private:
     std::vector<Profil*>   mProfils;          /**< We need to keep the profiles for optimized domain split. */
     boost::recursive_mutex mWriteMutex;       /**< Write progress thread safe access. */
 
+    std::string            mPrevPath;
+
 private:
 
     // do not allow copy constructor

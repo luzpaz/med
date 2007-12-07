@@ -79,22 +79,24 @@ string multipr::getFilenameWithoutPath(const char* pFilename)
 
 string multipr::getPath(const char* pFilename)
 {
-    // find (reverse) the first occurrence of '/' in the given string
-    char* res = strrchr(pFilename, '/');
-    
-    // if there is no '/'...
-    if (res == NULL)
-    {
-        return "";
-    }
-    else
-    {
-        int size = res - pFilename + 1;
-        char path[256];
-        memcpy(path, pFilename, size);
-        path[size] = '\0';
-        return path;
-    }
+  // find (reverse) the first occurrence of '/' in the given string
+  std::string aFilename(pFilename);
+  std::string::size_type aPos = aFilename.rfind('/');
+
+  if ( aPos == std::string::npos )
+    return "";
+
+  aFilename = aFilename.substr( 0, aPos + 1 );
+  while ( true ) {
+    aPos = aFilename.find( "//" );
+
+    if ( aPos == std::string::npos )
+      break;
+
+    aFilename.replace( aPos, 2, "/" );
+  }
+
+  return aFilename;
 }
 
 
