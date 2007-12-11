@@ -1265,30 +1265,34 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     }
   }
 
-  delete[] profilName ;
+  delete[] profilName;
 
   //MESSAGE ("Index              : "<< index);
   assert(index == totalNumberOfElWg*numberOfComponents);
-  assert(MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues ==  mySupport->getNumberOfElements(MED_ALL_ELEMENTS));
+  assert(MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues == mySupport->getNumberOfElements(MED_ALL_ELEMENTS));
 
-  if (anyProfil) {
-
-    for (int typeNo=0; typeNo < NumberOfTypes; typeNo++) {
+  if (anyProfil)
+  {
+    for (int typeNo=0; typeNo < NumberOfTypes; typeNo++)
+    {
+      //MED_FILE uses MED_NONE as a geometricType to describe MED_NODE
+      //MEDMEM uses MED_POINT1
+      MED_EN::medGeometryElement geomType = types[typeNo];
+      if (geomType == MED_EN::MED_NONE)
+        geomType = MED_EN::MED_POINT1;
 
       // Trouve l'index du type géométrique dans la liste des types géométriques du maillage
       // correspondant au type géométrique du champ traité
       vector<MED_EN::medGeometryElement>::iterator meshTypeNoIt =
-	find(meshGeoType.begin(),meshGeoType.end(),types[typeNo]); //Gérer l'exception
-      if ( meshTypeNoIt ==  meshGeoType.end() )
-	throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Can't find "<< MED_EN::geoNames[types[typeNo]]
-				      << " on entity " << MED_EN::entNames[entityType]
-				      << " in geometric type list of mesh " << meshName
-				      )
-			   );
-      int meshTypeNo = meshTypeNoIt -  meshGeoType.begin();
+	find(meshGeoType.begin(),meshGeoType.end(),geomType); //Gérer l'exception
+      if (meshTypeNoIt == meshGeoType.end())
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<": Can't find "<< MED_EN::geoNames[geomType]
+                                     << " on entity " << MED_EN::entNames[entityType]
+                                     << " in geometric type list of mesh " << meshName));
+      int meshTypeNo = meshTypeNoIt - meshGeoType.begin();
 
-      if (! profilList[typeNo].empty() ) {
-
+      if (! profilList[typeNo].empty() )
+      {
 // 	for (int j =0 ; j< meshGeoType.size();++j)
 // 	  cout << "--MeshTypeNo : "<<meshTypeNo<<"-> meshNbOfElOfTypeC["<<j<<"]="<<meshNbOfElOfTypeC[j]<<endl;
 // 	cout << "--typeNo--" << typeNo << endl;
