@@ -158,7 +158,6 @@ void MedGUI::windows( QMap<int, int>& mappa ) const
   mappa.insert( SalomeApp_Application::WT_PyConsole, Qt::BottomDockWidgetArea );
 }
 
-
 //=============================================================================
 /*!
  *
