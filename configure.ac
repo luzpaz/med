@@ -308,14 +308,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 {
 
 
-	dnl
-	dnl ---------------------------------------------
-	dnl testing WITHIHM
-	dnl ---------------------------------------------
-	dnl
-
-	CHECK_WITHIHM
-
         echo
         echo ---------------------------------------------
         echo testing OpenPBS
@@ -350,7 +342,7 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	test x$openpbs_ok = xyes || test x$lsf_ok = xyes && WITH_BATCH=yes
 	AC_SUBST(WITH_BATCH)
 
-	if test "X$WITHIHM" = "Xyes"; then
+	if test "${MED_WITH_GUI}" = "yes"; then
 		echo
 		echo ---------------------------------------------
 		echo testing LEX \& YACC
@@ -401,6 +393,8 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	corba=make_$ORB
 	CORBA=adm_local/unix/$corba
 
+	if test "${MED_WITH_GUI}" = "yes"; then
+
 	echo
 	echo ---------------------------------------------
 	echo testing openGL
@@ -417,15 +411,13 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 
 	CHECK_QT
 
-	if test "X$WITHIHM" = "Xyes"; then
-		echo
-		echo ---------------------------------------------
-		echo testing VTK
-		echo ---------------------------------------------
-		echo
+	echo
+	echo ---------------------------------------------
+	echo testing VTK
+	echo ---------------------------------------------
+	echo
 
-		CHECK_VTK
-	fi
+	CHECK_VTK
 
 	echo
 	echo ---------------------------------------------
@@ -434,6 +426,7 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	echo
 
 	CHECK_CAS
+	fi
 
 	echo
 	echo ---------------------------------------------
@@ -451,6 +444,7 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 
 	dnl CHECK_MICO
 
+	if test "${MED_WITH_GUI}" = "yes"; then
 	echo
 	echo ---------------------------------------------
 	echo testing MSG2QM
@@ -458,6 +452,7 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	echo
 
 	CHECK_MSG2QM
+	fi
 
 	echo
 	echo ---------------------------------------------
@@ -516,11 +511,12 @@ fi
 
 #variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok boost_ok doxygen_ok graphviz_ok OpenGL_ok qt_ok vtk_ok omniORB_ok occ_ok Kernel_ok"
 
-if test "X$WITHIHM" = "Xyes"; then
+if test "${MED_WITH_GUI}" = "yes"; then
 variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok cppunit_ok"
 fi
-if test "X$WITHIHM" = "Xno"; then
-variables="cc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok hdf5_ok med2_ok omniORB_ok occ_ok Kernel_ok cppunit_ok"
+
+if test "${MED_WITH_GUI}" = "no"; then
+variables="cc_ok mpi_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok occ_ok Kernel_ok cppunit_ok"
 fi
 
 for var in $variables
