@@ -115,10 +115,12 @@ public:
   ~FIELDClient();
 };
 
-%template (FIELDDOUBLEClient) FIELDClient<double, FullInterlace>;
-%template (FIELDDOUBLENOINTERLACEClient) FIELDClient<double, NoInterlace>;
-%template (FIELDINTClient) FIELDClient<int, FullInterlace>;
-%template (FIELDINTNOINTERLACEClient) FIELDClient<int, NoInterlace>;
+%template (FIELDDOUBLEClient)                  FIELDClient<double, FullInterlace>;
+%template (FIELDDOUBLENOINTERLACEClient)       FIELDClient<double, NoInterlace>;
+%template (FIELDDOUBLENOINTERLACEBYTYPEClient) FIELDClient<double, NoInterlaceByType>;
+%template (FIELDINTClient)                     FIELDClient<int, FullInterlace>;
+%template (FIELDINTNOINTERLACEClient)          FIELDClient<int, NoInterlace>;
+%template (FIELDINTNOINTERLACEBYTYPEClient)    FIELDClient<int, NoInterlaceByType>;
 
 %extend FIELDClient<double, FullInterlace>
 {
@@ -128,6 +130,11 @@ public:
 %extend FIELDClient<double, NoInterlace>
 {
   %template(FIELDDOUBLENOINTERLACEClients) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
+};
+
+%extend FIELDClient<double, NoInterlaceByType>
+{
+  %template(FIELDDOUBLENOINTERLACEBYTYPEClients) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
 };
 
 %extend FIELDClient<int, FullInterlace>
@@ -140,13 +147,22 @@ public:
   %template(FIELDINTNOINTERLACEClients) FIELDClient<SALOME_MED::FIELDINT_ptr>;
 };
 
+%extend FIELDClient<int, NoInterlaceByType>
+{
+  %template(FIELDINTNOINTERLACEBYTYPEClients) FIELDClient<SALOME_MED::FIELDINT_ptr>;
+};
+
 FIELD<double> * getDoublePointer(FIELDClient<double,FullInterlace> * input);
 
 FIELD<double,NoInterlace> *getDoubleNoInterlacePointer(FIELDClient<double,NoInterlace> * input);
 
+FIELD<double,NoInterlaceByType> *getDoubleNoInterlaceByTypePointer(FIELDClient<double,NoInterlaceByType> * input);
+
 FIELD<int> * getIntPointer(FIELDClient<int,FullInterlace> * input);
 
 FIELD<int,NoInterlace> * getIntNoInterlacePointer(FIELDClient<int,NoInterlace> * input);
+
+FIELD<int,NoInterlaceByType> * getIntNoInterlaceByTypePointer(FIELDClient<int,NoInterlaceByType> * input);
 
 %{
   FIELD<double> * getDoublePointer(FIELDClient<double,FullInterlace> * input)
@@ -159,6 +175,11 @@ FIELD<int,NoInterlace> * getIntNoInterlacePointer(FIELDClient<int,NoInterlace> *
       return (FIELD<double,NoInterlace> *) input;
     }
 
+  FIELD<double,NoInterlaceByType> *getDoubleNoInterlaceByTypePointer(FIELDClient<double,NoInterlaceByType> * input)
+    {
+      return (FIELD<double,NoInterlaceByType> *) input;
+    }
+
   FIELD<int> * getIntPointer(FIELDClient<int,FullInterlace> * input)
   {
       return (FIELD<int> *) input;
@@ -167,5 +188,10 @@ FIELD<int,NoInterlace> * getIntNoInterlacePointer(FIELDClient<int,NoInterlace> *
   FIELD<int,NoInterlace> * getIntNoInterlacePointer(FIELDClient<int,NoInterlace> * input)
   {
       return (FIELD<int,NoInterlace> *) input;
+  }
+
+  FIELD<int,NoInterlaceByType> * getIntNoInterlaceByTypePointer(FIELDClient<int,NoInterlaceByType> * input)
+  {
+      return (FIELD<int,NoInterlaceByType> *) input;
   }
 %}
