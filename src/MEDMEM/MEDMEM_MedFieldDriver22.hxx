@@ -765,10 +765,12 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   const char * LOC = " MED_FIELD_RDONLY_DRIVER22::read() " ;
   BEGIN_OF(LOC);
 
-  typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array   ArrayNo;
-  typedef typename MEDMEM_ArrayInterface<T,NoInterlace,Gauss>::Array     ArrayNoWg;
-  typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array ArrayFull;
-  typedef typename MEDMEM_ArrayInterface<T,FullInterlace,Gauss>::Array   ArrayFullWg;
+  typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array       ArrayNo;
+  typedef typename MEDMEM_ArrayInterface<T,NoInterlace,Gauss>::Array         ArrayNoWg;
+  typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array     ArrayFull;
+  typedef typename MEDMEM_ArrayInterface<T,FullInterlace,Gauss>::Array       ArrayFullWg;
+  typedef typename MEDMEM_ArrayInterface<T,NoInterlaceByType,NoGauss>::Array ArrayByType;
+  typedef typename MEDMEM_ArrayInterface<T,NoInterlaceByType,Gauss>::Array   ArrayByTypeWg;
 
   if (MED_FIELD_DRIVER<T>::_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": Method open must be called before method read.")) ;
@@ -797,7 +799,8 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   const string & fieldName = MED_FIELD_DRIVER<T>::_fieldName;
 
   MED_EN::medModeSwitch interlacingType = MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType();
-  bool isFullInterlace = ( interlacingType == MED_EN::MED_FULL_INTERLACE );
+  bool isFullInterlace     = ( interlacingType == MED_EN::MED_FULL_INTERLACE );
+  bool isNoInterlaceByType = ( interlacingType == MED_EN::MED_NO_INTERLACE_BY_TYPE );//PAL17011
 
   MESSAGE("###### "<<LOC<<" fieldNameDRIVER : "<< fieldName << " fieldName : "<< MED_FIELD_DRIVER<T>::_ptrField->_name);
 
@@ -1075,7 +1078,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     //      l'attribut SUPPORT->_number est censé être positionné quand même ! Que faire ?
     // Si on veut être compatible avec la signification première de onAll,
     //  il faudrait créer des profils contenant toutes les entités pour chaque type géométrique
-    //  du SUPPORT  mais d'une part c'est dommage d'un point de vue de l'emcombrement mémoire
+    //  du SUPPORT  mais d'une part c'est dommage d'un point de vue de l'encombrement mémoire
     //  et d'autre part, à la réécriture du fichier MED on stockera des profils 
     //  alors qu'il n'y en avait pas à l'origine (fichier MED différent après lecture/écriture) !
     // Si on laisse setAll à vrai il faut être sûr que les utilisateurs prennent les
@@ -1097,10 +1100,10 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions = new string[numberOfComponents] ;
   MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits     = new string[numberOfComponents] ;
   for (int i=0; i<numberOfComponents; i++) {
-      MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes[i] = 1 ;
-      MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i] = string(componentName+i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
-      SCRUTE(MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i]);
+      MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes[i]    = 1 ;
+      MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i]    = string(componentName+i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
       MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits[i] = string(unitName+i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
+      SCRUTE(MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i]);
       SCRUTE(MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits[i]);
   }
   delete[] componentName;
@@ -1118,20 +1121,21 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   // du SUPPORT est false il faut positionner un profil pour tous les types géométriques 
   // du SUPPORT
   int profilSizeC = 0;
-  vector < int   >        profilSize    (NumberOfTypes,0);
-  vector < vector<MED_EN::med_int>  > profilList    (NumberOfTypes);      // IPAL13481
-  vector < vector<MED_EN::med_int>  > profilListFromFile (NumberOfTypes); // IPAL13481
-  vector < string >       profilNameList(NumberOfTypes);
-  char * profilName = new char[MED_TAILLE_NOM+1];
+  vector < int   >                     profilSize    (NumberOfTypes,0);
+  vector < string >                    profilNameList(NumberOfTypes);
+  vector < vector<med_2_2::med_int>  > profilList    (NumberOfTypes);      // IPAL13481
+  vector < vector<med_2_2::med_int>  > profilListFromFile (NumberOfTypes); // IPAL13481
+  char *                               profilName = new char[MED_TAILLE_NOM+1];
 
   MESSAGE ("NumberOfTypes      : "<< NumberOfTypes);
   MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues=0 ;
 
   // PAL16681 (Read no interlace field from file) ->
   // use medModeSwitch of a field in MEDMEMchampLire() if there is one geometric type
+  // to exclude array conversion
   med_2_2::med_mode_switch modswt = med_2_2::MED_FULL_INTERLACE;
-  if ( NumberOfTypes == 1 &&
-       MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == med_2_2::MED_NO_INTERLACE )
+  // NOTE: field can be either of 3 medModeSwitch'es, MED_NO_INTERLACE_BY_TYPE added (PAL17011)
+  if ( NumberOfTypes == 1 && !isFullInterlace || isNoInterlaceByType )
     modswt = med_2_2::MED_NO_INTERLACE;
 
   for (int typeNo=0; typeNo<NumberOfTypes; typeNo++) {
@@ -1145,6 +1149,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     MESSAGE ("MED_GEOM           : "<< MED_EN::geoNames[types[typeNo]]);
     MESSAGE ("Iteration          : "<< MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
     MESSAGE ("Order              : "<< MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
+    MESSAGE ("Time               : "<< MED_FIELD_DRIVER<T>::_ptrField->getTime());
     MESSAGE ("NumberOfElements   : "<< nbOfElOfType[typeNo]);
     MESSAGE ("NumberOfComponents : "<< numberOfComponents);
     MESSAGE ("NumberOfGaussPts   : "<< numberOfGaussPoint[typeNo+1]);
@@ -1227,8 +1232,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 	med_2_2::med_float * gscoo  = new med_2_2::med_float[t2];
 	med_2_2::med_float * wg     = new med_2_2::med_float[ngauss];
 
-	if (MEDgaussLire(id, refcoo, gscoo, wg, (med_2_2::med_mode_switch) interlacingType,
-			 gaussModelName ) < 0)
+	if (MEDgaussLire(id, refcoo, gscoo, wg, modswt, gaussModelName ) < 0)
 	  throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while reading Gauss Model |"
 				      << gaussModelName << "| for FIELD "<< fieldName
 				      << " on geometric type " << MED_EN::geoNames[types[typeNo]]
@@ -1269,7 +1273,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
   //MESSAGE ("Index              : "<< index);
   assert(index == totalNumberOfElWg*numberOfComponents);
-  assert(MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues == mySupport->getNumberOfElements(MED_ALL_ELEMENTS));
+  assert(MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues ==  mySupport->getNumberOfElements(MED_ALL_ELEMENTS));
 
   if (anyProfil)
   {
@@ -1285,7 +1289,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
       // correspondant au type géométrique du champ traité
       vector<MED_EN::medGeometryElement>::iterator meshTypeNoIt =
 	find(meshGeoType.begin(),meshGeoType.end(),geomType); //Gérer l'exception
-      if (meshTypeNoIt == meshGeoType.end())
+      if (meshTypeNoIt ==  meshGeoType.end())
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<": Can't find "<< MED_EN::geoNames[geomType]
                                      << " on entity " << MED_EN::entNames[entityType]
                                      << " in geometric type list of mesh " << meshName));
@@ -1381,6 +1385,14 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
                              &numberOfElementsOfTypeC[0],
                              &numberOfGaussPoint[0],
                              true,true);
+    else if ( isNoInterlaceByType ) // PAL17011 (MEDMEM : no_interlace_by_type fields)
+      Values = new ArrayByTypeWg(myValues,
+                                 numberOfComponents,
+                                 numberOfElementsOfTypeC[NumberOfTypes]-1,
+                                 NumberOfTypes,
+                                 &numberOfElementsOfTypeC[0],
+                                 &numberOfGaussPoint[0],
+                                 true,true);
     else
       Values = new ArrayFullWg(myValues,
                                numberOfComponents,
@@ -1398,9 +1410,12 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   else {
     // PAL16681. If NumberOfTypes == 1 then myValues is what should be
     // in a field value, inspite of InterlacingType
-    if ( NumberOfTypes == 1 && modswt == med_2_2::MED_NO_INTERLACE )
+    if ( NumberOfTypes == 1 && interlacingType == MED_EN::MED_NO_INTERLACE )
       Values = new ArrayNo(myValues,numberOfComponents,totalNumberOfElWg,
                            true,true);
+    else if ( isNoInterlaceByType ) // PAL17011 (MEDMEM : no_interlace_by_type fields)
+      Values = new ArrayByType(myValues,numberOfComponents,totalNumberOfElWg,
+                               NumberOfTypes, &numberOfElementsOfTypeC[0], true,true);
     else
       Values = new ArrayFull(myValues,numberOfComponents,totalNumberOfElWg,
                              true,true);
@@ -1409,16 +1424,19 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     delete MED_FIELD_DRIVER<T>::_ptrField->_value;
 
   if ( NumberOfTypes != 1 &&  // PAL16681
-       MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-    {
-      if (Values->getGaussPresence())
-	MED_FIELD_DRIVER<T>::_ptrField->_value=ArrayConvert(*static_cast<ArrayFullWg*>(Values));
-      else
-	MED_FIELD_DRIVER<T>::_ptrField->_value=ArrayConvert(*static_cast<ArrayNo*    >(Values));
-      delete Values;
-    }
+       interlacingType == MED_EN::MED_NO_INTERLACE )
+  {
+    // Convert MED_FULL_INTERLACE -> MED_NO_INTERLACE
+    if (Values->getGaussPresence())
+      MED_FIELD_DRIVER<T>::_ptrField->_value=ArrayConvert(*static_cast<ArrayFullWg*>(Values));
+    else
+      MED_FIELD_DRIVER<T>::_ptrField->_value=ArrayConvert(*static_cast<ArrayFull*  >(Values));
+    delete Values;
+  }
   else
+  {
     MED_FIELD_DRIVER<T>::_ptrField->_value=Values;
+  }
 
   MED_FIELD_DRIVER<T>::_ptrField->_isRead = true ;
 
@@ -1606,12 +1624,21 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
   // de doubler l'utilisation de la taille mémoire si le champ n'est pas dans
   // le bon mode.
   FIELD<T,FullInterlace> * myField = 0;
-  if ( MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
+  MED_EN::medModeSwitch interlacingType = MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType();
+  bool isFullInterlace     = ( interlacingType == MED_EN::MED_FULL_INTERLACE );
+  bool isNoInterlaceByType = ( interlacingType == MED_EN::MED_NO_INTERLACE_BY_TYPE );//PAL17011
+  med_2_2::med_mode_switch modswt = med_2_2::MED_FULL_INTERLACE;
+
+  if ( isFullInterlace ) {
     myField = MED_FIELD_DRIVER<T>::_ptrField;
+  }
+  else if ( isNoInterlaceByType ) {
+    // PAL17011, no need to convert, that is what this improvement is needed for
+    modswt = med_2_2::MED_NO_INTERLACE;
+  }
   else {
-    //myField = FieldConvert( *( dynamic_cast< FIELD<T,NoInterlace> * > (MED_FIELD_DRIVER<T>::_ptrField )
-    myField = FieldConvert( *( (FIELD<T,NoInterlace>*) (MED_FIELD_DRIVER<T>::_ptrField ) ) );			    
-   }
+    myField = FieldConvert( *((FIELD<T,NoInterlace>*) MED_FIELD_DRIVER<T>::_ptrField ));
+  }
 
   // Il est necessaire de calculer le tableau
   // du nombre d'entités cumulées de chaque type géométrique du maillage
@@ -1703,14 +1730,24 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
     //         profils doivent être croissant
     if (onAll) {
 
-      value = myField->getRow(index);
+      if ( isNoInterlaceByType ) { //PAL17011
+        value = MED_FIELD_DRIVER<T>::_ptrField->getValueByType(typeNo+1);
+          //((ArrayNoByType *)MED_FIELD_DRIVER<T>::_ptrField->getArray())->getValueByType(i+1);
+      }
+      else {
+        value = myField->getRow(index);
+      }
       profilName=MED_NOPFL;
       numberOfElForMED = numberOfElements;
 
     } else {
 
-      value = myField->getRow(number[index-1]);
-
+      if ( isNoInterlaceByType ) { //PAL17011
+        value = MED_FIELD_DRIVER<T>::_ptrField->getValueByType(typeNo+1);
+      }
+      else {
+        value = myField->getRow(number[index-1]);
+      }
       // PAL16854(Partial support on nodes) ->
       //profilName = (profilNameList.size()>typeNo) ? profilNameList[typeNo].substr(0,MED_TAILLE_NOM) : MED_NOPFL;
       if (profilNameList[typeNo].size()>MED_TAILLE_NOM)
@@ -1724,7 +1761,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
       // différents et est défini sur tous les éléments d'un type géométrique
       // mais pas de l'autre, il existe tout de même des profils sur les deux types géométriques.
       // Ce n'est pas le cas en MEDFICHIER.
-      vector<MED_EN::med_int/*int*/> profil(&number[index-1],&(number[index-1])+numberOfElements);
+      vector<med_2_2::med_int> profil(&number[index-1],&(number[index-1])+numberOfElements);
 
       int meshTypeNo=0;
       if ( entityType != MED_EN::MED_NODE ) // PAL16854(Partial support on nodes)
@@ -1791,9 +1828,9 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 			 );
     }
 
-
+    bool anyGauss = MED_FIELD_DRIVER<T>::_ptrField->getGaussPresence();
     string locName=MED_NOGAUSS;
-    if (myField->getGaussPresence()) {
+    if ( anyGauss ) {
 //       cout << endl << "Nombre de points de Gauss à l'écriture de " << fieldName
 // 	   << " pour le type géométrique : " << MED_EN::geoNames[types[typeNo]]
 // 	   << " : " << myField->getNumberOfGaussPoints(types[typeNo]) << endl;
@@ -1864,7 +1901,8 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
     MESSAGE("numberOfElForMED                : "<<numberOfElForMED);
     MESSAGE("entityType                      : "<<MED_EN::entNames[entityType]);
     MESSAGE("types[i]                        : "<<MED_EN::geoNames[types[typeNo]]);
-    MESSAGE("NumberOfGaussPoint[i]           : "<<myField->getNumberOfGaussPoints(types[typeNo]));
+    if (myField) //myField may be NULL (PAL17011)
+      MESSAGE("NumberOfGaussPoint[i]           : "<<myField->getNumberOfGaussPoints(types[typeNo]));
     MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber() : "<<MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
     MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getTime()            : "<<MED_FIELD_DRIVER<T>::_ptrField->getTime());
     MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()     : "<<MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
@@ -1874,7 +1912,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
     err=med_2_2::MEDchampEcr(id,
 			     const_cast <char*> ( meshName.c_str()) ,
 			     const_cast <char*> ( fieldName.c_str()),
-			     (unsigned char*)value, med_2_2::MED_FULL_INTERLACE,
+			     (unsigned char*)value, modswt,//med_2_2::MED_FULL_INTERLACE,- PAL17011
 			     numberOfElForMED,
 			     //UP : prend en compte le nombre de points de Gauss mais 
 			     //     pas le nombre de composantes
@@ -1890,23 +1928,25 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 			     );
 
     if (err < MED_VALID ) {
-      if ( MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE ) delete myField;
-      throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while writing "<< numberOfElements << " values for FIELD "<< fieldName 
-				   << " on entity " << MED_EN::entNames[entityType]
-				    << " and geometric type " << MED_EN::geoNames[types[typeNo]]
-				   << " with (it,or) = ("
-				   << MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber << ","
-				   << MED_FIELD_DRIVER<T>::_ptrField->_orderNumber << "), with profilName "
-				    << profilName << " on mesh " << meshName
-				    )
-			 );
+      if ( !isFullInterlace )
+        delete myField;
+      throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while writing "<< numberOfElements
+                                    << " values for FIELD "<< fieldName 
+                                    << " on entity " << MED_EN::entNames[entityType]
+                                    << " and geometric type " << MED_EN::geoNames[types[typeNo]]
+                                    << " with (it,or) = ("
+                                    << MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber << ","
+                                    << MED_FIELD_DRIVER<T>::_ptrField->_orderNumber << "), with profilName "
+                                    << profilName << " on mesh " << meshName
+                                    )
+                         );
     }
 
     index += numberOfElements ; //Ne doit pas prendre en compte le nombre de points de GAUSS
                                 //ni les composantes.
 
   }
-  if ( MED_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE ) delete myField;
+  if ( !isFullInterlace ) delete myField;
 
 
   END_OF(LOC);

@@ -20,6 +20,8 @@
 #ifndef DRIVERTOOLS_HXX
 #define DRIVERTOOLS_HXX
 
+#include <MEDMEM.hxx>
+
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_FieldForward.hxx"
@@ -39,7 +41,7 @@ class COORDINATE;
 class GROUP;
 class FAMILY;
 class FIELD_;
-struct _noeud
+struct MEDMEM_EXPORT _noeud
 {
     mutable int number;
     std::vector<double> coord;
@@ -47,7 +49,7 @@ struct _noeud
 
 typedef pair<int,int> _link; // a pair of node numbers
 
-struct _maille
+struct MEDMEM_EXPORT _maille
 {
     typedef std::map<int,_noeud>::iterator iter;
     MED_EN::medGeometryElement geometricType;
@@ -72,7 +74,7 @@ struct _maille
    _link link(int i) const;
 };
 
-struct _mailleIteratorCompare // pour ordonner le set d'iterateurs sur mailles
+struct MEDMEM_EXPORT _mailleIteratorCompare // pour ordonner le set d'iterateurs sur mailles
 {
     bool operator () (std::set<_maille>::iterator i1, std::set<_maille>::iterator i2)
     {
@@ -80,7 +82,7 @@ struct _mailleIteratorCompare // pour ordonner le set d'iterateurs sur mailles
     }
 };
 
-struct _groupe
+struct MEDMEM_EXPORT _groupe
 {
     typedef std::vector< std::set<_maille>::iterator>::const_iterator mailleIter;
     std::string nom;
@@ -90,7 +92,7 @@ struct _groupe
     bool empty() const { return mailles.empty() && groupes.empty(); }
 };
 
-struct _fieldBase {
+struct MEDMEM_EXPORT _fieldBase {
   // a field contains several subcomponents each referring to its own support and
   // having several named components
   struct _sub_data {
@@ -140,7 +142,7 @@ template< class T > class _field: public _fieldBase
  * Read the conception ducumentation for more details.
  * \endif
  */
-struct _intermediateMED
+struct MEDMEM_EXPORT _intermediateMED
 {
     std::set<_maille>        maillage;
     std::vector<_groupe>     groupes;
@@ -287,7 +289,7 @@ template <class T> void _field< T >::dump(std::ostream& os) const
 {
   _fieldBase::dump(os);
   os << endl;
-  for ( int i = 0 ; i < comp_values.size(); ++i )
+  for ( int i = 0 ; i < (int)comp_values.size(); ++i )
   {
     os << "    " << i+1 << "-th component, nb values: " << comp_values[ i ].size() << endl;
   }

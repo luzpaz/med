@@ -20,6 +20,8 @@
 #ifndef MESH_HXX
 #define MESH_HXX
 
+#include <MEDMEM.hxx>
+
 #include <string>
 #include <vector>
 #include <list>
@@ -58,7 +60,7 @@ class MESH;
 
 ostream & operator<<(ostream &os, const MESH &my);
 
-class MESH : public RCBASE
+class MEDMEM_EXPORT MESH : public RCBASE
 {
   //-----------------------//
   //   Attributes
@@ -141,6 +143,8 @@ public :
 
   friend class VTK_MESH_DRIVER;
 
+  friend class ENSIGHT_MESH_RDONLY_DRIVER;
+
   void init();
   MESH();
   MESH(MESH &m);
@@ -150,7 +154,7 @@ public :
   MESH( driverTypes driverType, const string & fileName="",
 	const string & meshName="") throw (MEDEXCEPTION);
   virtual ~MESH();
-  friend ostream & operator<<(ostream &os, const MESH &my);
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, const MESH &my);
   virtual void printMySelf(ostream &os) const;
 
   int  addDriver(driverTypes driverType,
@@ -168,6 +172,7 @@ public :
 
   inline void 	      setName(string name);
   inline void 	      setDescription(string description);
+  inline void 	      setMeshDimension(int dim);
   inline string       getName() const;
   inline string       getDescription() const;
   inline int 	      getSpaceDimension() const;
@@ -376,6 +381,11 @@ inline void MESH::setName(string name)
 inline string MESH::getName() const
 {
   return _name;
+}
+
+inline void MESH::setMeshDimension(int dim)
+{
+  _meshDimension=dim;
 }
 
 /*! Set the MESH description */
@@ -948,7 +958,7 @@ const MEDMEM::FAMILY* MESH::getFamily(MED_EN::medEntityMesh entity, int i) const
   default :
     throw MEDEXCEPTION("MESH::getFamilies : Unknown entity");
   }
-  if (i>Family.size())
+  if (i>(int)Family.size())
     throw MEDEXCEPTION("MESH::getFamily(entity,i) : argument i must be <= _numberOfFamilies");
   return Family[i-1];
 }
@@ -979,7 +989,7 @@ const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
   default :
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Unknown entity"));
   }
-  if (i>Group.size())
+  if (i>(int)Group.size())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i="<<i<<" must be <= _numberOfGroups="<<Group.size()));
   return Group[i-1];
 }

@@ -55,6 +55,18 @@ struct MEDMEM_InterlacingTraits< NoInterlace, NoGauss >
   typedef NoInterlaceNoGaussPolicy Type;
 };
 
+template <>
+struct MEDMEM_InterlacingTraits< NoInterlaceByType, Gauss >
+{
+  typedef NoInterlaceByTypeGaussPolicy Type;
+};
+
+template <>
+struct MEDMEM_InterlacingTraits< NoInterlaceByType, NoGauss >
+{
+  typedef NoInterlaceByTypeNoGaussPolicy Type;
+};
+
 } // END NAMESPACE
 
 #endif

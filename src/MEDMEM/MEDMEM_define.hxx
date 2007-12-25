@@ -75,6 +75,7 @@ namespace MED_EN {
     typedef long medModeSwitch;
     const medModeSwitch MED_FULL_INTERLACE = 0;
     const medModeSwitch MED_NO_INTERLACE = 1;
+    const medModeSwitch MED_NO_INTERLACE_BY_TYPE = 2;
     const medModeSwitch MED_UNDEFINED_INTERLACE = 3;
     
     typedef long medConnectivity;
@@ -243,6 +244,8 @@ typedef double         med_float;
 #define OK 0
 #define KO 1
 
+//maximum number of groups handled by the Family Group converter
+#define MAX_NB_GROUP 100000
   /*
     enum definition for the used Med File version V2.1 or V2.2
     because of incompatibility between them.

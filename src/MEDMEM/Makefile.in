@@ -97,7 +97,8 @@ MEDMEM_GaussLocalization.hxx \
 MEDMEM_MEDMEMgaussEcr.hxx \
 MEDMEM_MEDMEMprofilEcr.hxx \
 MEDMEM_MEDMEMchampLire.hxx \
-MEDMEM_SetInterlacingType.hxx
+MEDMEM_SetInterlacingType.hxx \
+MEDMEM.hxx
 
 # Libraries targets
 
@@ -137,6 +138,7 @@ MEDMEM_PolyhedronArray.cxx \
 MEDMEM_MedMedDriver22.cxx \
 MEDMEM_MedMeshDriver22.cxx \
 MEDMEM_TopLevel.cxx \
+MEDMEM_GaussLocalization.cxx \
 MEDMEM_MEDMEMgaussEcr.cxx \
 MEDMEM_MEDMEMprofilEcr.cxx \
 MEDMEM_MEDMEMchampLire.cxx
@@ -172,11 +174,11 @@ CPPFLAGS+=$(MED2_INCLUDES) $(HDF5_INCLUDES)
 CXXFLAGS+=@CXXTMPDPTHFLAGS@
 #LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB)
+LDFLAGS+=$(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 $(STDLIB) -lMEDWrapperBase
 
 #LDFLAGSFORBIN+=$(MED2_LIBS) $(HDF5_LIBS)
 # change motivated by the bug KERNEL4778.
-LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1
+LDFLAGSFORBIN+=-lm $(MED2_LIBS) $(HDF5_LIBS) -lmed_V2_1 -lMEDWrapperBase
 
 ifeq ($(MED_WITH_KERNEL),yes)
   CPPFLAGS+= ${KERNEL_CXXFLAGS}
