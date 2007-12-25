@@ -280,8 +280,7 @@ public :
     int         _nbElems;
     const int * _ptrElemIDs; // elem ids or 
     int         _elemID1;    // first elem id if isOnAllElements()
-    typeData(): _nbElems(0),  _ptrElemIDs(NULL), _elemID1(0) {}
-    typeData( int nbElems, const int * ptrElemIDs, int elemID1 )
+    typeData( int nbElems=0, const int * ptrElemIDs=NULL, int elemID1=0 )
       : _nbElems(nbElems),  _ptrElemIDs(ptrElemIDs), _elemID1(elemID1) {}
   };
   struct supportData
