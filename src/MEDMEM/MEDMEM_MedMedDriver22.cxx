@@ -384,7 +384,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
   {
     int                           numberOfFields              = 0;      //MED_INVALID
     //    char                          fieldName[MED_TAILLE_NOM+1] = "";
-    char                          fieldName[MED_TAILLE_NOM+1] ;
+    char                          fieldName[MED_TAILLE_LNOM+1] ; // to avoid a crash if the field name is longer than MED_TAILLE_NOM
     int                           numberOfComponents           = 0;
     char                          * componentName              = (char *) MED_NULL;
     char                          * unitName                   =  (char *) MED_NULL;
