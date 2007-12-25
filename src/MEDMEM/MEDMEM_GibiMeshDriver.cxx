@@ -2721,6 +2721,8 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
 	
 	if ( f->getInterlacingType() == MED_NO_INTERLACE )
 	  writeDataSection( gibi, dynamic_cast<FIELD<double,NoInterlace>*>(f), id1, id2 );
+	else if ( f->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE )
+	  writeDataSection( gibi, dynamic_cast<FIELD<double,NoInterlaceByType>*>(f), id1, id2 );
 	else
 	  writeDataSection( gibi, dynamic_cast< FIELD<double,FullInterlace> * >(f), id1, id2 );
 

@@ -508,9 +508,15 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       }
 
       const int * value;
-      ArrayIntNo * myArray;
+      ArrayIntNo * myArray = 0;
       if ( myField->getInterlacingType() == MED_FULL_INTERLACE ) {
 	myArray = ArrayConvert( *( dynamic_cast< FIELD<int,FullInterlace>* >
+				   (myField)->getArrayNoGauss() 
+				   )
+				);
+	value = myArray->getPtr();
+      } else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
+	myArray = ArrayConvert2No( *( dynamic_cast< FIELD<int,NoInterlaceByType>* >
 				   (myField)->getArrayNoGauss() 
 				   )
 				);
@@ -522,9 +528,9 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       for (int i=0; i<NumberOfValue; i++) {
 	for(int j=0; j<NumberOfComponents; j++)
 	  ensightDataFile << setw(12) << value[j*NumberOfValue+i] ;
-     }
-      if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
-	delete[] myArray;
+      }
+      if ( myField->getInterlacingType() != MED_NO_INTERLACE )
+	delete myArray;
       break ;
     }
     case MED_REEL64 : {
@@ -541,9 +547,15 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       }
 
       const double * value;
-      ArrayDoubleNo * myArray;
+      ArrayDoubleNo * myArray = 0;
       if ( myField->getInterlacingType() == MED_FULL_INTERLACE ) {
 	myArray = ArrayConvert( *( dynamic_cast< FIELD<double,FullInterlace>* >
+				   (myField)->getArrayNoGauss()
+				   )
+				);
+	value = myArray->getPtr();
+      } else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
+	myArray = ArrayConvert2No( *( dynamic_cast< FIELD<double,NoInterlaceByType>* >
 				   (myField)->getArrayNoGauss()
 				   )
 				);
@@ -566,9 +578,8 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       }
       ensightDataFile << endl ;
 
-// genere un core  !?!?
-//       if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
-// 	delete[] myArray;
+      if ( myField->getInterlacingType() != MED_NO_INTERLACE )
+ 	delete myArray;
 
       break ;
     }

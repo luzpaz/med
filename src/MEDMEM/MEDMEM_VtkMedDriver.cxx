@@ -480,6 +480,12 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 				   )
 				);
 	value = myArray->getPtr();
+      } else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
+	myArray = ArrayConvert2No( *( dynamic_cast< FIELD<int,NoInterlaceByType>* >
+				   (myField)->getArrayNoGauss() 
+				   )
+				);
+	value = myArray->getPtr();
       } else {
 	value = ((FIELD<int>*)myField)->getValue() ;
       }
@@ -490,8 +496,8 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 	(*_vtkFile) << endl ;
       }
       // mkr : PAL13994 (commented the code below)
-      //if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
-      //delete[] myArray;
+      if ( myField->getInterlacingType() != MED_NO_INTERLACE )
+        delete /*[]*/ myArray;
       break ;
     }
     case MED_REEL64 : {
@@ -514,6 +520,12 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 				   )
 				);
 	value = myArray->getPtr();
+      } else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
+	myArray = ArrayConvert2No( *( dynamic_cast< FIELD<double,NoInterlaceByType>* >
+				   (myField)->getArrayNoGauss()
+				   )
+				);
+	value = myArray->getPtr();
       } else {
 	value = ((FIELD<double>*)myField)->getValue() ;
       }
@@ -524,8 +536,8 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 	(*_vtkFile) << endl ;
       }
       // mkr : PAL13994 (commented the code below)
-      //if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
-      //delete[] myArray;
+      if ( myField->getInterlacingType() != MED_NO_INTERLACE )
+        delete/*[]*/ myArray;
       break ;
     }
     default : { 

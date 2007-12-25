@@ -366,10 +366,11 @@ namespace MEDMEM
   template<int SPACEDIMENSION, unsigned int SORTSTRATEGY>
   void ASCII_FIELD_DRIVER<T>::sortAndWrite() const
   {
-    typedef typename MEDMEM_ArrayInterface<double,NoInterlace,NoGauss>::Array   ArrayDoubleNo;
-    typedef typename MEDMEM_ArrayInterface<double,FullInterlace,NoGauss>::Array ArrayDoubleFull;
-    typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array   ArrayNo;
-    typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array ArrayFull;
+    typedef typename MEDMEM_ArrayInterface<double,NoInterlace,NoGauss>::Array    ArrayDoubleNo;
+    typedef typename MEDMEM_ArrayInterface<double,FullInterlace,NoGauss>::Array  ArrayDoubleFull;
+    typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array         ArrayNo;
+    typedef typename MEDMEM_ArrayInterface<T,NoInterlaceByType,NoGauss>::Array   ArrayNoByType;
+    typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array       ArrayFull;
 
     int i,j;
     int numberOfValues=_ptrField->getNumberOfValues();
@@ -413,6 +414,11 @@ namespace MEDMEM
     ArrayFull * tmpArray = NULL;
     if ( _ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
       valsToSet= _ptrField->getValue();
+    else if ( _ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+      tmpArray = ArrayConvert
+	( *( static_cast<ArrayNoByType*>(_ptrField->getArray()) ) );
+      valsToSet= tmpArray->getPtr();
+    }
     else {
       tmpArray = ArrayConvert
 	( *( static_cast<ArrayNo*>(_ptrField->getArray()) ) );

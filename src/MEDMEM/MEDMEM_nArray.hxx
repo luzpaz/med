@@ -66,11 +66,46 @@ public  :
   };
 
   // Le mot clé inline permettra d'instancier le constructeur uniquement
+  // s'il est appelé NoInterlaceByTypeNoGaussPolicy(...)
+  // Rem : Le constructeur de la policy demandée est appelé
+  inline MEDMEM_Array(int dim, int nbelem,
+                      int nbtypegeo, const int * const nbelgeoc)
+    : InterlacingPolicy(nbelem, dim, nbtypegeo, nbelgeoc)
+  {
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",nbelem);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",dim);
+    _array.set(InterlacingPolicy::_arraySize);
+  };
+
+  // Le mot clé inline permettra d'instancier le constructeur uniquement
   // s'il est appelé ( ...NoGaussPolicy)
   // Rem : Le constructeur de la policy demandée est appelé
   inline MEDMEM_Array( ElementType * values, int dim, int nbelem,
 		       bool shallowCopy=false,
 		       bool ownershipOfValues=false) : InterlacingPolicy(nbelem,dim)
+  {
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",nbelem);
+    CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",dim);
+    if(shallowCopy)
+
+      if(ownershipOfValues)
+	_array.setShallowAndOwnership((const ElementType *)values);
+      else
+	_array.set((const ElementType*)values);
+
+    else // Cas par défaut
+      _array.set(InterlacingPolicy::_arraySize,values);
+
+  }
+
+  // Le mot clé inline permettra d'instancier le constructeur uniquement
+  // s'il est appelé NoInterlaceByTypeNoGaussPolicy(...)
+  // Rem : Le constructeur de la policy demandée est appelé
+  inline MEDMEM_Array( ElementType * values, int dim, int nbelem,
+                       int nbtypegeo, const int * const  nbelgeoc,
+		       bool shallowCopy=false,
+		       bool ownershipOfValues=false) 
+    : InterlacingPolicy(nbelem, dim, nbtypegeo, nbelgeoc)
   {
     CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",nbelem);
     CHECKING_POLICY::checkMoreThanZero("MEDMEM_Array",dim);
@@ -229,11 +264,54 @@ public  :
     return _array[ InterlacingPolicy::getIndex(i,j,k) ];
   };
 
+  inline const ElementType & getIJByType(int i, int j, int t) const  {
+    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
+      throw MEDEXCEPTION(LOCALIZED(STRING("Wrong interlacing type ") << getInterlacingType()));
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
+    if ( InterlacingPolicy::getGaussPresence() )
+      return _array[ ((NoInterlaceByTypeGaussPolicy*)this)->getIndexByType(i,j,t) ];
+    else
+      return _array[ ((NoInterlaceByTypeNoGaussPolicy*)this)->getIndexByType(i,j,t) ];
+  }
+
+  inline const ElementType & getIJKByType(int i, int j, int k, int t) const {
+    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
+      throw MEDEXCEPTION(LOCALIZED(STRING("Wrong interlacing type ") << getInterlacingType()));
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+
+    if ( InterlacingPolicy::getGaussPresence() ) {
+      checkInInclusiveRange("MEDMEM_Array",
+                            1,((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t),k);
+      return _array[ ((NoInterlaceByTypeGaussPolicy*)this)->getIndexByType(i,j,k,t) ];
+    }
+    else {
+      checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGauss(i),k);
+      return _array[ ((NoInterlaceByTypeNoGaussPolicy*)this)->getIndexByType(i,j,k,t) ];
+    }
+  };
+
   inline void setIJ(int i, int j, const ElementType & value) {   //autre signature avec
     checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
     checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
 
     _array[ InterlacingPolicy::getIndex(i,j) ] = value;                      // retour ElementType & ?
+  };
+
+  inline void setIJByType(int i, int j, int t, const ElementType & value) {   //autre signature avec
+    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
+      throw MEDEXCEPTION(LOCALIZED(STRING("Wrong interlacing type ") << getInterlacingType()));
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
+
+    if ( InterlacingPolicy::getGaussPresence() )
+      _array[ ((NoInterlaceByTypeGaussPolicy*)this)->getIndexByType(i,j,t) ] = value;
+    else
+      _array[ ((NoInterlaceByTypeNoGaussPolicy*)this)->getIndexByType(i,j,t) ] = value;
   };
 
   inline void setIJK(int i, int j, int k, const ElementType & value) {   //autre signature avec
@@ -242,6 +320,24 @@ public  :
     checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGauss(i),k);
 
     _array[ InterlacingPolicy::getIndex(i,j,k) ] = value;                      // retour ElementType & ?
+  };
+
+  inline void setIJKByType(int i, int j, int k, int t, const ElementType & value) {   //autre signature avec
+    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
+      throw MEDEXCEPTION(LOCALIZED(STRING("Wrong interlacing type ") << getInterlacingType()));
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
+
+    if ( InterlacingPolicy::getGaussPresence() ) {
+      checkInInclusiveRange("MEDMEM_Array",
+                            1,((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t),k);
+      _array[ ((NoInterlaceByTypeGaussPolicy*)this)->getIndexByType(i,j,k,t) ] = value;
+    }
+    else {
+      checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGauss(i),k);
+      _array[ ((NoInterlaceByTypeNoGaussPolicy*)this)->getIndexByType(i,j,k,t) ] = value;
+    }
   };
 
   bool operator == (const MEDMEM_Array & array ) const {

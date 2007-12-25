@@ -75,6 +75,7 @@ namespace MED_EN {
     typedef long medModeSwitch;
     const medModeSwitch MED_FULL_INTERLACE = 0;
     const medModeSwitch MED_NO_INTERLACE = 1;
+    const medModeSwitch MED_NO_INTERLACE_BY_TYPE = 2;
     const medModeSwitch MED_UNDEFINED_INTERLACE = 3;
     
     typedef long medConnectivity;

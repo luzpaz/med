@@ -25,6 +25,7 @@ struct Gauss {};
 struct NoGauss {};
 struct FullInterlace{};
 struct NoInterlace{};
+struct NoInterlaceByType{};
 
 }
 
