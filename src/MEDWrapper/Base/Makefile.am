@@ -43,6 +43,7 @@ salomeinclude_HEADERS= \
 	MED_GaussUtils.hxx \
 	MED_CoordUtils.hxx \
 	MED_Utilities.hxx \
+	MED_GaussDef.hxx \
 	MED_WrapperBase.hxx
 
 dist_libMEDWrapperBase_la_SOURCES= \
@@ -51,7 +52,8 @@ dist_libMEDWrapperBase_la_SOURCES= \
 	MED_Algorithm.cxx \
 	MED_GaussUtils.cxx \
 	MED_CoordUtils.cxx \
-	MED_Utilities.cxx
+	MED_Utilities.cxx \
+	MED_GaussDef.cxx
 
 libMEDWrapperBase_la_CPPFLAGS= $(BOOST_CPPFLAGS) $(HDF5_INCLUDES) -D@MACHINE@ -I$(top_builddir)/salome_adm/unix $(MED_CPPFLAGS)
 libMEDWrapperBase_la_LDFLAGS= $(BOOST_LIBS) -lboost_thread${BOOST_LIBSUFFIX}
