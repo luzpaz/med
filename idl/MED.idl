@@ -118,6 +118,7 @@ For example an array of coordinates in 3D; tow storage may be considered:
   typedef long medModeSwitch;
   const medModeSwitch MED_FULL_INTERLACE = 0;
   const medModeSwitch MED_NO_INTERLACE = 1;
+  const medModeSwitch MED_NO_INTERLACE_BY_TYPE = 2;
 
 /*!
 This enumeration contains a set of elements defining the type of connectivity.
@@ -991,6 +992,9 @@ Internal Corba method.
   interface FIELDDOUBLENO : FIELDDOUBLE {
   };
 
+  interface FIELDDOUBLENOBYTYPE : FIELDDOUBLE {
+  };
+
   interface FIELDDOUBLEFULL : FIELDDOUBLE {
   };
 
@@ -1011,6 +1015,9 @@ Internal Corba method.
   };
 
   interface FIELDINTNO : FIELDINT {
+  };
+
+  interface FIELDINTNOBYTYPE : FIELDINT {
   };
 
   interface FIELDINTFULL : FIELDINT {
