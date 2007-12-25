@@ -27,38 +27,40 @@
 #include <algorithm>
 
 using namespace std;
-using namespace MEDMEM;
 using namespace MED_EN;
 
 #define DUMP_LINES_LIMIT 20
 
+namespace MEDMEM {
+
 // Cet opérateur permet d'ordonner les mailles dans un set suivant l'ordre requis par MED
 bool _maille::operator < (const _maille& ma) const
 {
-    // si le type géométrique differe, la comparaison est basée dessus
-    // sinon on se base sur une comparaison des numéros de sommets 
-    if(geometricType==ma.geometricType)
+  // si le type géométrique differe, la comparaison est basée dessus
+  // sinon on se base sur une comparaison des numéros de sommets 
+  if(geometricType==ma.geometricType)
+  {
+    // construction de deux vecteur temporaire contenant les numeros de sommets
+    // pour faire le tri et les comparaisons
+    size_t l=sommets.size();
+    std::vector<int> v1(l);
+    std::vector<int> v2(l);
+    for (unsigned int i=0; i!=l; ++i)
     {
-	// construction de deux vecteur temporaire contenant les numeros de sommets
-	// pour faire le tri et les comparaisons
-	size_t l=sommets.size();
-	std::vector<int> v1(l);
-	std::vector<int> v2(l);
-	for (unsigned int i=0; i!=l; ++i)
-	  {
-	    v1[i]=sommets[i]->second.number;
-	    v2[i]=ma.sommets[i]->second.number;
-	  }
-	std::sort(v1.begin(), v1.end());
-	std::sort(v2.begin(), v2.end());
-	for(std::vector<int>::const_iterator i1=v1.begin(), i2=v2.begin(); i1!=v1.end(); ++i1, ++i2)
-	    if(*i1 != *i2)
-		return *i1 < *i2;
-	return false; // cas d'égalité
+      v1[i]=sommets[i]->second.number;
+      v2[i]=ma.sommets[i]->second.number;
     }
-    else
-	return geometricType<ma.geometricType;
+    std::sort(v1.begin(), v1.end());
+    std::sort(v2.begin(), v2.end());
+    for(std::vector<int>::const_iterator i1=v1.begin(), i2=v2.begin(); i1!=v1.end(); ++i1, ++i2)
+      if(*i1 != *i2)
+        return *i1 < *i2;
+    return false; // cas d'égalité
+  }
+  else
+    return geometricType<ma.geometricType;
 };
+
 _link _maille::link(int i) const
 {
   ASSERT ( i >= 0 && i < sommets.size() );
@@ -99,7 +101,7 @@ return entity;
 //END_OF(LOC);
 };
 
-std::ostream& MEDMEM::operator << (std::ostream& os, const _maille& ma)
+std::ostream& operator << (std::ostream& os, const _maille& ma)
 {
     os << "maille " << ma.ordre << " (" << ma.geometricType << ") : < ";
     std::vector< std::map<int,_noeud>::iterator >::const_iterator i=ma.sommets.begin();
@@ -110,7 +112,7 @@ std::ostream& MEDMEM::operator << (std::ostream& os, const _maille& ma)
     return os;
 }
 
-std::ostream& MEDMEM::operator << (std::ostream& os, const _groupe& gr)
+std::ostream& operator << (std::ostream& os, const _groupe& gr)
 {
     os << "--- Groupe " << gr.nom << " --- " << std::endl ;
     os << " -> liste des sous-groupes : ";
@@ -136,7 +138,7 @@ std::ostream& MEDMEM::operator << (std::ostream& os, const _groupe& gr)
     return os;
 }
 
-std::ostream& MEDMEM::operator << (std::ostream& os, const _noeud& no)
+std::ostream& operator << (std::ostream& os, const _noeud& no)
 {
     os << "noeud " << no.number << " : < ";
     std::vector<double>::const_iterator i=no.coord.begin();
@@ -164,13 +166,13 @@ void MEDMEM::_fieldBase::dump(std::ostream& os) const
   }
 }
 
-std::ostream& MEDMEM::operator << (std::ostream& os, const _fieldBase * f)
+std::ostream& operator << (std::ostream& os, const _fieldBase * f)
 {
   f->dump( os );
   return os;
 }
 
-std::ostream& MEDMEM::operator << (std::ostream& os, const _intermediateMED& mi)
+std::ostream& operator << (std::ostream& os, const _intermediateMED& mi)
 {
     os << "Set des " << mi.maillage.size() << " mailles : " << std::endl;
     std::set<_maille>::const_iterator i=mi.maillage.begin();
@@ -998,16 +1000,17 @@ void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
 {
   const char * LOC = "_intermediateMED::getFields() : ";
   BEGIN_OF(LOC);
+
   std::list< _fieldBase* >::const_iterator fIt = fields.begin();
   for ( ; fIt != fields.end(); fIt++ )
   {
     const _fieldBase* fb = *fIt;
-    list<pair< FIELD_*, int> >  ff = fb->getField(groupes);
+    list<pair< FIELD_*, int> >  ff = fb->getField(groupes, medGroupes);
     list<pair< FIELD_*, int> >::iterator f_sup = ff.begin();
     for (int j = 1 ; f_sup != ff.end(); f_sup++, ++j )
     {
-      FIELD_* f = f_sup->first;
-      SUPPORT* sup = getGroup( f_sup->second );
+      FIELD_    * f = f_sup->first;
+      SUPPORT * sup = getGroup( f_sup->second );
       if ( !sup )
         throw MEDEXCEPTION
           (LOCALIZED(STRING(LOC) <<"_intermediateMED::getFields(), NULL field support: "
@@ -1063,13 +1066,15 @@ bool _fieldBase::hasSameComponentsBySupport() const
   const _sub_data& first_sub_data = *sub_data;
   for ( ++sub_data ; sub_data != _sub.end(); ++sub_data )
   {
-    if ( first_sub_data.nbComponents() != sub_data->nbComponents() )
-      return false;
-    for ( int iComp = 0; iComp < first_sub_data.nbComponents(); ++iComp )
-      if ( first_sub_data._comp_names[ iComp ] != sub_data->_comp_names[ iComp ])
-        return false;
+    if ( first_sub_data._comp_names != sub_data->_comp_names )
+      return false; // diff names of components
+
+    if ( first_sub_data._nb_gauss != sub_data->_nb_gauss )
+      return false; // diff nb of gauss points
   }
   return true;
+}
+
 }
 
 /////
