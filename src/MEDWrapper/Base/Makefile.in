@@ -49,7 +49,9 @@ EXPORT_HEADERS = \
 	MED_Algorithm.hxx \
 	MED_GaussUtils.hxx \
 	MED_CoordUtils.hxx \
-	MED_Utilities.hxx
+	MED_Utilities.hxx \
+	MED_GaussDef.hxx \
+	MED_WrapperBase.hxx
 
 # Libraries targets
 
@@ -60,7 +62,8 @@ LIB_SRC = \
 	MED_Algorithm.cxx \
 	MED_GaussUtils.cxx \
 	MED_CoordUtils.cxx \
-	MED_Utilities.cxx
+	MED_Utilities.cxx \
+	MED_GaussDef.cxx
 
 # Executables targets
 BIN = 
