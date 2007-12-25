@@ -137,14 +137,17 @@ MEDMEM_MedMeshDriver22.cxx \
 MEDMEM_TopLevel.cxx \
 MEDMEM_ConnectZone.cxx \
 MEDMEM_EnsightMedDriver.cxx \
-MEDMEM_EnsightMeshDriver.cxx
+MEDMEM_EnsightMeshDriver.cxx \
+MEDMEM_GaussLocalization.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+	-I$(srcdir)/../MEDWrapper/Base \
 	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERPOLATION
 
 # change motivated by the bug KERNEL4778.
-libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la $(STDLIB)
+libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
+	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB)
 if MED_ENABLE_KERNEL
     libmedmem_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
     libmedmem_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
