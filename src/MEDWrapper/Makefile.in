@@ -38,7 +38,7 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 ifeq ($(MED_WITH_KERNEL),yes)
   SUBDIRS = Base V2_1 V2_2 Factory
 else
-  SUBDIRS = V2_1
+  SUBDIRS = Base V2_1
 endif
 
 @MODULE@
