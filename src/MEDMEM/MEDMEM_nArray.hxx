@@ -284,8 +284,13 @@ public  :
     checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
 
     if ( InterlacingPolicy::getGaussPresence() ) {
-      checkInInclusiveRange("MEDMEM_Array",
-                            1,((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t),k);
+        // not compilable on Debian40
+//       checkInInclusiveRange("MEDMEM_Array",
+//                             1,((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t),k);
+      int kmax = ((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t);
+      if ( k < 1 || k > kmax )
+        throw MEDEXCEPTION(LOCALIZED(STRING("MEDMEM_Array::getIJKByType(), ")
+                                     << " k : " << k << " not in rang [1," << kmax <<"]"));
       return _array[ ((NoInterlaceByTypeGaussPolicy*)this)->getIndexByType(i,j,k,t) ];
     }
     else {
@@ -330,8 +335,13 @@ public  :
     checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
 
     if ( InterlacingPolicy::getGaussPresence() ) {
-      checkInInclusiveRange("MEDMEM_Array",
-                            1,((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t),k);
+        // not compilable on Debian40
+//       checkInInclusiveRange("MEDMEM_Array",
+//                             1,((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t),k);
+      int kmax = ((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t);
+      if ( k < 1 || k > kmax )
+        throw MEDEXCEPTION(LOCALIZED(STRING("MEDMEM_Array::getIJKByType(), ")
+                                     << " k : " << k << " not in rang [1," << kmax <<"]"));
       _array[ ((NoInterlaceByTypeGaussPolicy*)this)->getIndexByType(i,j,k,t) ] = value;
     }
     else {
