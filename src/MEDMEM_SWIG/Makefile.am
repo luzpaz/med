@@ -45,7 +45,7 @@ endif
 SWIG_FLAGS=@SWIG_FLAGS@ -I$(srcdir)
 
 nodist_libMEDMEM_Swigcmodule_la_SOURCES= libMEDMEM_Swig_wrap.cxx
-libMEDMEMSwig.py: libMEDMEM_Swig_wrap.cxx
+libMEDMEM_Swig.py: libMEDMEM_Swig_wrap.cxx
 
 libMEDMEM_Swig_wrap.cxx: $(SWIG_DEF)
 	$(SWIG) $(SWIG_FLAGS) -o $@  $<
