@@ -227,39 +227,31 @@ CHECK_MED2
 
 echo
 echo ---------------------------------------------
-echo "MED_WITH_KERNEL: ${MED_WITH_KERNEL}"
-echo "MED_WITH_GUI   : ${MED_WITH_GUI}"
-echo ---------------------------------------------
-
-openpbs_ok=no
-echo
-echo ---------------------------------------------
-echo testing OpenPBS
+echo BOOST Library
 echo ---------------------------------------------
 echo
 
-CHECK_OPENPBS
-dnl openpbs_ok is set to yes by CHECK_OPENPBS
-
-echo
-echo ---------------------------------------------
-echo testing LSF
-echo ---------------------------------------------
-echo
+CHECK_BOOST
 
 lsf_ok=no
-CHECK_LSF
-dnl lsf_ok is set to yes by CHECK_LSF
+openpbs_ok=no
 
 if test "${MED_WITH_KERNEL}" = "yes"; then
 {
-	echo
-	echo ---------------------------------------------
-	echo BOOST Library
-	echo ---------------------------------------------
-	echo
-
-	CHECK_BOOST
+        echo
+        echo ---------------------------------------------
+        echo testing OpenPBS
+        echo ---------------------------------------------
+        echo
+        
+        CHECK_OPENPBS
+        
+        echo
+        echo ---------------------------------------------
+        echo testing LSF
+        echo ---------------------------------------------
+        echo
+        CHECK_LSF
 
 	dnl
 	dnl ---------------------------------------------
@@ -450,6 +442,13 @@ fi # MED_WITH_GUI
 
 echo
 echo ---------------------------------------------
+echo "MED_WITH_KERNEL: ${MED_WITH_KERNEL}"
+echo "MED_WITH_GUI   : ${MED_WITH_GUI}"
+echo ---------------------------------------------
+
+
+echo
+echo ---------------------------------------------
 echo Summary
 echo ---------------------------------------------
 echo
@@ -463,10 +462,10 @@ fi
 #variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok boost_ok doxygen_ok graphviz_ok OpenGL_ok qt_ok vtk_ok omniORB_ok occ_ok Kernel_ok"
 
 if test "X$WITHIHM" = "Xyes"; then
-variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok"
+variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok boost_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok"
 fi
 if test "X$WITHIHM" = "Xno"; then
-variables="cc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok hdf5_ok med2_ok omniORB_ok occ_ok Kernel_ok"
+variables="cc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok hdf5_ok med2_ok boost_ok omniORB_ok occ_ok Kernel_ok"
 fi
 
 for var in $variables
