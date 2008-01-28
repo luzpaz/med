@@ -29,12 +29,14 @@
 #ifndef MEDMEM_Grid_HeaderFile
 #define MEDMEM_Grid_HeaderFile
 
+#include <MEDMEM.hxx>
+
 #include "MEDMEM_Mesh.hxx"
 
 // class containing structured mesh data
 
 namespace MEDMEM {
-class GRID: public MESH
+class MEDMEM_EXPORT GRID: public MESH
 {
  protected:
   //-----------------------//
@@ -247,6 +249,9 @@ class GRID: public MESH
 
   inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
 				MED_EN::medEntityMesh Entity) const;
+
+  inline bool existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
+                                        MED_EN::medEntityMesh Entity) const;
 
   inline MED_EN::medGeometryElement getElementType(MED_EN::medEntityMesh Entity,
 					   int Number) const;
@@ -461,6 +466,15 @@ inline bool GRID::existConnectivity(MED_EN::medConnectivity connectivityType, ME
   if (_connectivity==(CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("GRID::existConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
   return _connectivity->existConnectivity(connectivityType,entity);
+}
+
+/*!
+  Same as the previous
+ */
+inline bool GRID::existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
+                                            MED_EN::medEntityMesh Entity) const
+{
+  return existConnectivity(ConnectivityType,Entity);
 }
 
 /*!
