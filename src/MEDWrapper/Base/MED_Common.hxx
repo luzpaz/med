@@ -122,6 +122,10 @@ namespace MED{
   GetPNOMLength();
   
   template<EVersion>
+  void MEDWRAPPER_EXPORT
+  GetVersionRelease(TInt& majeur, TInt& mineur, TInt& release);
+  
+  template<EVersion>
   MEDWRAPPER_EXPORT
   TInt
   GetNbConn(EGeometrieElement typmai,

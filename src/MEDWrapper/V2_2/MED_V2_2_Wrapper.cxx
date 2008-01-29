@@ -94,6 +94,13 @@ namespace MED
   }
 
   template<>
+  void
+  GetVersionRelease<eV2_2>(TInt& majeur, TInt& mineur, TInt& release)
+  {
+    MEDversionDonner(&majeur, &mineur, &release);
+  }
+
+  template<>
   TInt
   GetNbConn<eV2_2>(EGeometrieElement typmai,
 		   EEntiteMaillage typent,
