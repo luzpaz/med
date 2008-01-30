@@ -134,6 +134,127 @@ public :
 
 };
 
+class MEDMEM_EXPORT NoInterlaceByTypeNoGaussPolicy : public InterlacingPolicy {
+
+protected:
+  ~NoInterlaceByTypeNoGaussPolicy() {} //pour éviter qu'un utilisateur cast la class array en politique
+
+  PointerOf<int> _T; //!< type of element
+  PointerOf<int> _G; //!< where type begin
+  int _nbtypegeo;
+  PointerOf<int> _nbelegeoc;
+
+public :
+
+  NoInterlaceByTypeNoGaussPolicy():InterlacingPolicy(),_nbtypegeo(-1)
+  {
+  }
+
+  NoInterlaceByTypeNoGaussPolicy(int nbelem, int dim):InterlacingPolicy()
+  {
+    // constructor is incoorect for this type of interlace
+    throw MEDEXCEPTION(LOCALIZED("Wrong constructor of NoInterlaceByTypeNoGaussPolicy "));
+  }
+
+  NoInterlaceByTypeNoGaussPolicy(int nbelem, int dim, int nbtypegeo,
+                                 const int * const nbelgeoc) : 
+    InterlacingPolicy(nbelem, dim, dim*nbelem,MED_EN::MED_NO_INTERLACE_BY_TYPE),
+    _nbtypegeo(nbtypegeo)
+  {
+    _nbelegeoc.set(_nbtypegeo+1,nbelgeoc);
+    _G.set(nbtypegeo+1);
+    _T.set(nbelem+1);
+    int elemno = 1;
+    int cumul = 0;
+
+    for (int ntyp=1; ntyp <= nbtypegeo; ntyp++ ) {
+      int nbelcurtype = nbelgeoc[ntyp]-nbelgeoc[ntyp-1];
+      for (int i=0; i < nbelcurtype; i++ ) {
+        _T[ elemno ] = ntyp;
+	elemno++;
+      };
+      _G[ ntyp ] = cumul;
+      cumul += nbelcurtype*_dim;
+#ifdef ARRAY_DEBUG
+      std::cout << "Valeur de cumul " << cumul << std::endl;
+#endif
+    };
+
+    _arraySize = cumul;
+
+#ifdef ARRAY_DEBUG
+    for (int i =0; i< nbelem+1; i++ )
+      std::cout << "Valeur de _T["<<i<<"] = "<<_T[i] << std::endl;
+#endif
+  }
+
+  NoInterlaceByTypeNoGaussPolicy(const NoInterlaceByTypeNoGaussPolicy & policy,
+                                 bool shallowcopie=true)
+    : InterlacingPolicy(policy),_nbtypegeo(policy._nbtypegeo)
+  {
+    //Seuls les tableaux de grande taille sont recopiés superficiellement
+    if(shallowcopie)
+    {
+      this->_G.set(policy._G);
+      this->_T.set(policy._T);
+    }
+    else
+    {
+      this->_G.set(_nbtypegeo+1,policy._G);
+      this->_T.set(_nbelem+1,policy._T);
+    }
+    
+    // Tableaux toujours recopiés par recopie profonde
+    this->_nbelegeoc.set(_nbtypegeo+1,policy._nbelegeoc);
+  }
+
+  NoInterlaceByTypeNoGaussPolicy & operator=(const NoInterlaceByTypeNoGaussPolicy & policy) {
+    if ( this == &policy) return *this;
+
+    BEGIN_OF("NoInterlaceNoGaussPolicy operator =");
+    InterlacingPolicy::operator=(policy);
+    this->_G.set(policy._G);
+    this->_T.set(policy._T);
+
+    // Tableaux toujours recopiés par recopie profonde
+    this->_nbtypegeo=policy._nbtypegeo;
+    this->_nbelegeoc.set(_nbtypegeo+1,policy._nbelegeoc);
+
+    return *this;
+  }
+  inline int getIndex(int t) const {
+    return _G[t];
+  }
+
+  inline int getIndex(int i,int j) const {
+    int t = _T[i];
+    return getIndexByType( i-(_nbelegeoc[t-1]-_nbelegeoc[0]), j, t );
+  }
+
+  inline int getIndex(int i,int j,int k) const {
+    return getIndex(i,j);
+  }
+
+  inline int getIndexByType(int i,int j,int t) const {
+    return _G[t] + i-1 + (j-1)*(_nbelegeoc[t]-_nbelegeoc[t-1]);
+  }
+
+  inline int getIndexByType(int i,int j,int k,int t) const {
+    return getIndexByType( i, j, t );
+  }
+
+  inline int getLengthOfType(int t) const {
+    return (_nbelegeoc[t]-_nbelegeoc[t-1]) * _dim;
+  }
+
+  inline int getNbGauss(int i) const { return 1; }
+
+  inline int getNbGeoType() const {return _nbtypegeo;}
+
+  inline const int * const getNbElemGeoC() const {return _nbelegeoc;}
+
+};
+
 class MEDMEM_EXPORT FullInterlaceGaussPolicy : public InterlacingPolicy {
 protected:
   ~FullInterlaceGaussPolicy() {} //pour éviter qu'un utilisateur cast la class array en politique
@@ -221,7 +342,7 @@ public :
   }
 
   inline int getIndex(int i,int j ) const {
-    return _G[i-1]-1 + (j-1)*_dim ;
+    return _G[i-1]-1 + (j-1);
   }
 
   inline int getIndex(int i,int j, int k ) const {
@@ -347,6 +468,127 @@ public :
   inline const int * const getNbElemGeoC() const {return _nbelegeoc;}
 
   inline const int * const getNbGaussGeo() const {return _nbgaussgeo;}
+
+};
+
+class MEDMEM_EXPORT NoInterlaceByTypeGaussPolicy : public InterlacingPolicy {
+
+protected:
+  ~NoInterlaceByTypeGaussPolicy() {} //pour éviter qu'un utilisateur cast la class array en politique
+
+  PointerOf<int> _T; //!< type of element
+  PointerOf<int> _G; //!< where type begin
+  int _nbtypegeo;
+  PointerOf<int> _nbelegeoc;
+  PointerOf<int> _nbgaussgeo;
+
+public :
+
+  NoInterlaceByTypeGaussPolicy():InterlacingPolicy(),_nbtypegeo(-1) {
+    InterlacingPolicy::_gaussPresence=true;
+  }
+
+  NoInterlaceByTypeGaussPolicy(int nbelem, int dim, int nbtypegeo,
+			       const int * const nbelgeoc, const int * const nbgaussgeo)
+    : InterlacingPolicy(nbelem, dim, -1, MED_EN::MED_NO_INTERLACE_BY_TYPE),_nbtypegeo(nbtypegeo) {
+
+    InterlacingPolicy::_gaussPresence=true;
+
+    _nbelegeoc.set(_nbtypegeo+1,nbelgeoc);
+    _nbgaussgeo.set(_nbtypegeo+1,nbgaussgeo);
+    _G.set(_nbtypegeo+1);
+    _T.set(nbelem+1);
+    int elemno = 1;
+    int cumul = 0;
+
+    for (int ntyp=1; ntyp <= nbtypegeo; ntyp++ ) {
+      int nbelcurtype = nbelgeoc[ntyp]-nbelgeoc[ntyp-1];
+      for (int i=0; i < nbelcurtype; i++ ) {
+        _T[ elemno ] = ntyp;
+	elemno++;
+      };
+      _G[ ntyp ] = cumul;
+      cumul += nbelcurtype * _dim * nbgaussgeo[ntyp];
+#ifdef ARRAY_DEBUG
+      std::cout << "Valeur de cumul " << cumul << std::endl;
+#endif
+    };
+
+    _arraySize = cumul;
+
+#ifdef ARRAY_DEBUG
+    for (int i =0; i< nbelem+1; i++ )
+      std::cout << "Valeur de _T["<<i<<"] = "<<_T[i] << std::endl;
+#endif
+  }
+
+
+  NoInterlaceByTypeGaussPolicy(const NoInterlaceByTypeGaussPolicy & policy,
+			       bool shallowcopie=true)
+    : InterlacingPolicy(policy),_nbtypegeo(policy._nbtypegeo)
+  {
+    //Seuls les tableaux de grande taille sont recopiés superficiellement
+    if(shallowcopie) {
+      this->_G.set(policy._G);
+      this->_T.set(policy._T);
+    } else {
+      this->_G.set(_nbtypegeo+1,policy._G);
+      this->_T.set(_nbelem+1,policy._T);
+    }
+    // Tableaux toujours recopiés par recopie profonde
+    this->_nbelegeoc.set(_nbtypegeo+1,policy._nbelegeoc);
+    this->_nbgaussgeo.set(_nbtypegeo+1,policy._nbgaussgeo);
+  }
+
+  NoInterlaceByTypeGaussPolicy & operator=(const NoInterlaceByTypeGaussPolicy & policy) {
+    if ( this == &policy) return *this;
+
+    BEGIN_OF("NoInterlaceGaussPolicy operator =");
+    InterlacingPolicy::operator=(policy);
+    this->_G.set(policy._G);
+    this->_T.set(policy._T);
+
+    // Tableaux toujours recopiés par recopie profonde
+    this->_nbtypegeo=policy._nbtypegeo;
+    this->_nbelegeoc.set(_nbtypegeo+1,policy._nbelegeoc);
+    this->_nbgaussgeo.set(_nbtypegeo+1,policy._nbgaussgeo);
+
+    return *this;
+  }
+
+  inline int getIndex(int t) const {
+    return _G[t];
+  }
+  inline int getIndex(int i,int j ) const {
+    int t = _T[i];
+    return getIndexByType( i-(_nbelegeoc[t-1]-_nbelegeoc[0]), j, t );
+  }
+
+  inline int getIndex(int i,int j, int k ) const {
+    return getIndex( i, j ) + (k-1);
+  }
+
+  inline int getIndexByType(int i,int j,int t) const {
+    return _G[t] + (i-1 + (j-1)*(_nbelegeoc[t]-_nbelegeoc[t-1])) * _nbgaussgeo[t];
+  }
+
+  inline int getIndexByType(int i,int j,int k,int t) const {
+    return getIndexByType( i,j,t ) + (k-1);
+  }
+
+  inline int getNbGauss(int i) const { return _nbgaussgeo[ _T[i] ]; }
+
+  inline int getNbGaussByType(int t) const { return _nbgaussgeo[ t ]; }
+
+  inline int getNbGeoType() const {return _nbtypegeo;}
+
+  inline const int * const getNbElemGeoC() const {return _nbelegeoc;}
+
+  inline const int * const getNbGaussGeo() const {return _nbgaussgeo;}
+
+  inline int getLengthOfType(int t) const {
+    return (_nbelegeoc[t]-_nbelegeoc[t-1]) * _dim * _nbgaussgeo[t];
+  }
 
 };
 

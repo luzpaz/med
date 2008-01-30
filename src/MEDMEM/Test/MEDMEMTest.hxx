@@ -39,7 +39,7 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testArray );
   CPPUNIT_TEST( testArrayConvert );
   //CPPUNIT_TEST( testArrayInterface /* not in spec */ );
-  CPPUNIT_TEST( testAsciiFieldDriver );
+  //CPPUNIT_TEST( testAsciiFieldDriver );
   //CPPUNIT_TEST( testCellModel /* not in spec */ );
   CPPUNIT_TEST( testConnectivity );
   CPPUNIT_TEST( testCoordinate );

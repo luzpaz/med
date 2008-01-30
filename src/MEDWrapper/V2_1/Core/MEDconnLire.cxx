@@ -116,7 +116,7 @@ MEDconnLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_sw
      }
 
 
-#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
+#if defined(HAVE_F77INT64)
    if ((ret = _MEDdatasetNumLire(geoid,nom_dataset,MED_INT64,
 				 mode_switch,(med_size)taille,MED_ALL,
 				 psize,pfltab,MED_NOPG,

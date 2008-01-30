@@ -65,6 +65,19 @@ struct FIELDI_TRAITS<double, NoInterlace>
 };
 
 template < >
+struct FIELDI_TRAITS<double, NoInterlaceByType>
+{
+  typedef POA_SALOME_MED::FIELDDOUBLENOBYTYPE InterfaceForServant;
+  typedef SALOME_MED::FIELDDOUBLENOBYTYPE_ptr FieldCorbaPtrType;
+  typedef SALOME_MED::FIELDDOUBLE_ptr SimpleFieldCorbaPtrType;
+  typedef SALOME_MED::FIELDDOUBLE SimpleFieldGlobalType;
+  typedef SALOME_MED::double_array SeqType;
+  typedef SALOME_MED::double_array_var SeqVarType;
+  typedef SALOME::SenderDouble_ptr SenderPtrType;
+  typedef SALOME::SenderDouble_var SenderVarType;
+};
+
+template < >
 struct FIELDI_TRAITS<int, FullInterlace>
 {
   typedef POA_SALOME_MED::FIELDINTFULL InterfaceForServant;
@@ -82,6 +95,19 @@ struct FIELDI_TRAITS<int, NoInterlace>
 {
   typedef POA_SALOME_MED::FIELDINTNO InterfaceForServant;
   typedef SALOME_MED::FIELDINTNO_ptr FieldCorbaPtrType;
+  typedef SALOME_MED::FIELDINT_ptr SimpleFieldCorbaPtrType;
+  typedef SALOME_MED::FIELDINT SimpleFieldGlobalType;
+  typedef SALOME_MED::long_array SeqType;
+  typedef SALOME_MED::long_array_var SeqVarType;
+  typedef SALOME::SenderInt_ptr SenderPtrType;
+  typedef SALOME::SenderInt_var SenderVarType;
+};
+
+template < >
+struct FIELDI_TRAITS<int, NoInterlaceByType>
+{
+  typedef POA_SALOME_MED::FIELDINTNOBYTYPE InterfaceForServant;
+  typedef SALOME_MED::FIELDINTNOBYTYPE_ptr FieldCorbaPtrType;
   typedef SALOME_MED::FIELDINT_ptr SimpleFieldCorbaPtrType;
   typedef SALOME_MED::FIELDINT SimpleFieldGlobalType;
   typedef SALOME_MED::long_array SeqType;

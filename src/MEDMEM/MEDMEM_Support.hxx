@@ -179,6 +179,7 @@ public:
   inline void setName(string Name);
   inline void setDescription(string Description);
   void setMesh(MESH *Mesh) const;
+  void setMeshDirectly(MESH *Mesh) const { _mesh=Mesh; }
   inline void setMeshName(const string & meshName);
   inline void setAll(bool All);
   inline void setEntity(MED_EN::medEntityMesh Entity);
@@ -430,6 +431,19 @@ inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *Geometri
     _geometricType.set(_numberOfGeometricType);
   for (int i=0;i<_numberOfGeometricType;i++)
     _geometricType[i] = GeometricType[i];
+
+  if (_profilNames.empty())
+    {
+      // giving a default value to profile names
+      vector<string> prof_names( _numberOfGeometricType);
+      for (int itype=0; itype < _numberOfGeometricType; itype++)
+	{
+	  ostringstream typestr;
+	  typestr<<_name<<"_type"<<itype;
+	  prof_names[itype]=typestr.str();
+	}
+      _profilNames=prof_names;
+    }
 }
 
 

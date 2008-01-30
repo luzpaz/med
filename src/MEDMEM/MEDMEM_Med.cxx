@@ -473,21 +473,21 @@ MESH   * MED::getMesh           (const FIELD_ * const field ) const
                                      << "There is no known mesh associated with |" 
                                      << field << "| pointer"
                                      )
-                          );   
-  
+                          );
+
   string meshName = (*itMeshName).second;
   map<MESH_NAME_,MESH*>::const_iterator itMeshes =  _meshes.find(meshName);
   if ( itMeshes == _meshes.end() )
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
                                      << "There is no known mesh named |"
-                                     << meshName << " while it's associated with the found field |" 
+                                     << meshName << " while it's associated with the found field |"
                                      << field << "| pointer"
                                      )
-                          );   
-  
-  return (*itMeshes).second;
-  
+                          );
+
   END_OF(LOC);
+
+  return (*itMeshes).second;
 };
 
 
@@ -794,7 +794,14 @@ void MED::updateSupport ()
         anEntity2SupportTmp[aKey] = aData;
       }
       catch (MEDEXCEPTION & ex) {
-        MESSAGE(LOC<<ex.what());
+	// entity not defined in mesh -> we remove support on it !
+	MESSAGE(LOC<<ex.what());
+	delete (*itSupport).second ;
+	//(*itSupportOnMesh).second.erase(itSupport) ; // that's right ????
+	//itSupport-- ;
+        map<MED_EN::medEntityMesh,SUPPORT *>::iterator itSupportCurr = itSupport;
+        itSupport--; // decrement before erase()
+	(*itSupportOnMesh).second.erase(itSupportCurr);
       }
     }
 

@@ -53,27 +53,27 @@
 namespace MED
 {
   template<>
-  TInt
+  TInt MED_V22_WRAPPER_EXPORT
   GetDESCLength<eV2_2>();
   
   template<>
-  TInt
+  TInt MED_V22_WRAPPER_EXPORT
   GetIDENTLength<eV2_2>();
   
   template<>
-  TInt
+  TInt MED_V22_WRAPPER_EXPORT
   GetNOMLength<eV2_2>();
   
   template<>
-  TInt
+  TInt MED_V22_WRAPPER_EXPORT
   GetLNOMLength<eV2_2>();
   
   template<>
-  TInt
+  TInt MED_V22_WRAPPER_EXPORT
   GetPNOMLength<eV2_2>();
 
   template<>
-  TInt
+  TInt MED_V22_WRAPPER_EXPORT
   GetNbConn<eV2_2>(EGeometrieElement typmai,
 		   EEntiteMaillage typent,
 		   TInt mdim);
@@ -398,6 +398,15 @@ namespace MED
 		     TProfileInfo& theInfo,
 		     TErr* theErr = NULL);
 
+      virtual
+      void
+      SetProfileInfo(const TProfileInfo& theInfo,
+                     TErr*               theErr = NULL);
+
+      void
+      SetProfileInfo(const TProfileInfo& theInfo,
+                     EModeAcces          theMode,
+                     TErr*               theErr = NULL);
 
       //----------------------------------------------------------------------------
       virtual 

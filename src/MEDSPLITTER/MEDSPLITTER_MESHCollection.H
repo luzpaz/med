@@ -26,6 +26,11 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
 
   //cout << "MEDSPLITTER -  reading fields from old collection"<<endl;
   old_collection.getDriver()->readFields(old_fields,fieldchar, itnumber, ordernumber);
+
+  //if (dynamic_cast<MEDMEM::FIELD<int>*> (old_fields[0])==0)
+  //  old_collection.getDriver()->readFieldsDouble(old_fields,fieldchar, itnumber, ordernumber);
+  //else
+  //  old_collection.getDriver()->readFieldsInt(old_fields,fieldchar, itnumber, ordernumber);
   //cout <<"MEDSPLITTER - end of read"<<endl;
 
   vector <const MEDMEM::SUPPORT*> old_supports(nb_old_domains);
@@ -243,7 +248,10 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
   }
 
   retrieveDriver()->writeFields(new_fields,fieldchar);
-
+  //if (dynamic_cast<MEDMEM::FIELD<int>*>(new_fields[0])==0)
+  //  retrieveDriver()->writeFieldsDouble(new_fields,fieldchar);
+  //else
+  //  retrieveDriver()->writeFieldsInt(new_fields,fieldchar);
   for (int i=0; i<nb_new_domains; i++)
   {
     delete new_supports[i];

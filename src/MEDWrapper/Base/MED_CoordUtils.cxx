@@ -124,15 +124,19 @@ namespace MED
       TInt aMeshDimension = aMeshInfo->GetDim();
       bool anIsDimPresent[3] = {false, false, false};
       for(int iDim = 0; iDim < aMeshDimension; iDim++){
-	std::string aName = theNodeInfo->GetCoordName(iDim);
-        if ( aName.size() > 1 ) // PAL12148, aName has size 8 or 16
-          aName = aName.substr(0,1);
-	if(aName == "x" || aName == "X")
-	  anIsDimPresent[eX] = true;
-	else if(aName == "y" || aName == "Y")
-	  anIsDimPresent[eY] = true;
-	else if(aName == "z" || aName == "Z")
-	  anIsDimPresent[eZ] = true;
+        // PAL16857(SMESH not conform to the MED convention) ->
+        // 1D - always along X
+        // 2D - always in XOY plane
+        anIsDimPresent[iDim] = iDim < aMeshDimension;
+// 	std::string aName = theNodeInfo->GetCoordName(iDim);
+//         if ( aName.size() > 1 ) // PAL12148, aName has size 8 or 16
+//           aName = aName.substr(0,1);
+// 	if(aName == "x" || aName == "X")
+// 	  anIsDimPresent[eX] = true;
+// 	else if(aName == "y" || aName == "Y")
+// 	  anIsDimPresent[eY] = true;
+// 	else if(aName == "z" || aName == "Z")
+// 	  anIsDimPresent[eZ] = true;
       }
 
       switch(aMeshDimension){

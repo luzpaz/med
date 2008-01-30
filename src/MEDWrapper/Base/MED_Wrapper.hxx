@@ -45,7 +45,10 @@ namespace MED
   {
     typedef boost::mutex TMutex;
     //! This is a syncronization primitive which allow to support thread safety for the MED access
-    TMutex myMutex; 
+    TMutex myMutex;
+
+    virtual
+    ~TWrapper();
 
     //----------------------------------------------------------------------------
     //! Gets version of the MED library used for the MED file
@@ -725,6 +728,12 @@ namespace MED
     CrProfileInfo(const TProfileInfo::TInfo& theInfo,
 		  EModeProfil theMode = eCOMPACT) = 0;
 
+    //! Write a MEDWrapper MED PROFILE representation
+    virtual
+    void
+    SetProfileInfo(const TProfileInfo& theInfo,
+                   TErr* theErr = NULL) = 0;
+
     //! Read a MEDWrapper MED PROFILE representation by its order number from defined MED file
     PProfileInfo
     GetPProfileInfo(TInt theId,
@@ -923,7 +932,7 @@ namespace MED
   //----------------------------------------------------------------------------
   //! To specialize the SharedPtr for TWrapper
   template<> 
-  class SharedPtr<TWrapper>: public boost::shared_ptr<TWrapper>
+  class MEDWRAPPER_EXPORT SharedPtr<TWrapper>: public boost::shared_ptr<TWrapper>
   {
   public:
     SharedPtr() {}

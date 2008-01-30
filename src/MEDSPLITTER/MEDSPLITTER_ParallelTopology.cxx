@@ -48,6 +48,10 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 	m_nb_nodes.resize(m_nb_domain);
 	m_nb_faces.resize(m_nb_domain);
 	
+  m_loc_to_glob.resize(m_nb_domain);
+  m_node_loc_to_glob.resize(m_nb_domain);
+  m_face_loc_to_glob.resize(m_nb_domain);
+  
 	MED_EN::medEntityMesh constituent_entity;
 	switch (m_mesh_dimension)
 		{ case 3:
@@ -62,27 +66,33 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 	for (int idomain=0; idomain<m_nb_domain; idomain++)
 		{
 			//creating cell maps
-			m_nb_cells[idomain]=meshes[idomain]->getNumberOfElements(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
+			m_nb_cells[idomain]=meshes[idomain]->getNumberOfElementsWithPoly(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
 			//		cout << "Nb cells (domain "<<idomain<<") = "<<m_nb_cells[idomain];
-			if (cellglobal[idomain]==0)
+	    m_loc_to_glob[idomain].resize(m_nb_cells[idomain]);
+      
+  		if (cellglobal[idomain]==0)
 				{
+          MESSAGE("Creating global numbering"); 
 					//creating global numbering from scratch
 					for (int i=0; i<m_nb_cells[idomain]; i++)
 						{
 							index_global++;
 							m_glob_to_loc[index_global]=make_pair(idomain,i+1);
-							m_loc_to_glob[make_pair(idomain,i+1)]=index_global;
+							//m_loc_to_glob[make_pair(idomain,i+1)]=index_global;
+              m_loc_to_glob[idomain][i]=index_global;
 							//				cout<<"glob:"<<index_global<<" --> ("<<idomain<<","<<i+1<<")"<<endl;
 						}
 				}
 			//using global numbering coming from a previous numbering
 			else
 				{
+          MESSAGE("Using former global numbering");
 					for (int i=0; i<m_nb_cells[idomain]; i++)
 						{
 							int global=cellglobal[idomain][i];
 							m_glob_to_loc[global]=make_pair(idomain,i+1);
-							m_loc_to_glob[make_pair(idomain,i+1)]=global;
+							//m_loc_to_glob[make_pair(idomain,i+1)]=global;
+              m_loc_to_glob[idomain][i]=global;
 							index_global++;
 							//				cout<<"glob:"<<global<<" --> ("<<idomain<<","<<i+1<<")"<<endl;
 						}
@@ -93,20 +103,24 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 				{
 					m_nb_total_cells=index_global;
 					m_nb_cells[0]=index_global;
+          m_node_loc_to_glob[idomain].resize(meshes[idomain]->getNumberOfNodes());
 					for (int i=0; i<meshes[idomain]->getNumberOfNodes(); i++)
 						{
 							m_node_glob_to_loc.insert(make_pair(i+1,make_pair(0,i+1)));
-							m_node_loc_to_glob.insert(make_pair(make_pair(0,i+1), i+1));
+							//m_node_loc_to_glob.insert(make_pair(make_pair(0,i+1), i+1));
+              m_node_loc_to_glob[0][i]=i+1;
 						}
 					m_nb_total_nodes=meshes[idomain]->getNumberOfNodes();		
 					m_nb_nodes[0]=m_nb_total_nodes;	
 			
 					//			meshes[idomain]->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
-					int nbfaces=meshes[idomain]->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+					int nbfaces=meshes[idomain]->getNumberOfElementsWithPoly(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+          m_face_loc_to_glob[idomain].resize(nbfaces);
 					for (int i=0; i<nbfaces; i++)
 						{
 							m_face_glob_to_loc.insert(make_pair(i+1,make_pair(0,i+1)));
-							m_face_loc_to_glob.insert(make_pair(make_pair(0,i+1), i+1));
+							//m_face_loc_to_glob.insert(make_pair(make_pair(0,i+1), i+1));
+              m_face_loc_to_glob[0][i]=i+1;
 						}
 					m_nb_total_faces=nbfaces;		
 					m_nb_faces[0]=nbfaces;
@@ -119,6 +133,7 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 			//creating node maps
 			m_nb_nodes[idomain]=meshes[idomain]->getNumberOfNodes();
 			hash_map <int,pair<int,int> > local2distant;
+      m_node_loc_to_glob[idomain].resize(m_nb_nodes[idomain]);
 			for (int icz=0; icz<cz.size(); icz++)
 				{
 					if (cz[icz]->getLocalDomainNumber() == idomain && 
@@ -144,15 +159,18 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 								{
 									index_node_global++;
 									m_node_glob_to_loc.insert(make_pair(index_node_global,make_pair(idomain,inode+1)));
-									m_node_loc_to_glob[make_pair(idomain,inode+1)]=index_node_global;
+									//m_node_loc_to_glob[make_pair(idomain,inode+1)]=index_node_global;
+                  m_node_loc_to_glob[idomain][inode]=index_node_global;
 								}		
 							else
 								{
 									int ip = (local2distant.find(inode+1)->second).first;
 									int distant = (local2distant.find(inode+1)->second).second;
-									int global_number=m_loc_to_glob[make_pair(ip,distant)];
+									//int global_number=m_loc_to_glob[make_pair(ip,distant)];
+                  int global_number=m_loc_to_glob[ip][distant-1];
 									m_node_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,inode+1)));
-									m_node_loc_to_glob[make_pair(idomain,inode+1)]=global_number;
+									//m_node_loc_to_glob[make_pair(idomain,inode+1)]=global_number;
+                  m_node_loc_to_glob[idomain][inode]=global_number;
 								}	
 						}
 				}			
@@ -164,7 +182,8 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 							int global_number=nodeglobal[idomain][inode];
 							//				cout << "global_number "<<global_number<<endl;
 							m_node_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,inode+1)));
-							m_node_loc_to_glob[make_pair(idomain,inode+1)]=global_number;
+							//m_node_loc_to_glob[make_pair(idomain,inode+1)]=global_number;
+              m_node_loc_to_glob[idomain][inode]=global_number;
 						}
 				}
 		
@@ -172,9 +191,9 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 			//creating  dimension d-1 component mappings
 		
 			//		meshes[idomain]->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
-			m_nb_faces[idomain]=meshes[idomain]->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+			m_nb_faces[idomain]=meshes[idomain]->getNumberOfElementsWithPoly(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
 			MESSAGE ("Nb faces domain " << idomain<<m_nb_faces[idomain]);
-		
+		  m_face_loc_to_glob[idomain].resize(m_nb_faces[idomain]);
 			local2distant.clear();
 			for (int icz=0; icz<cz.size(); icz++)
 				{
@@ -201,15 +220,18 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 								{
 									index_face_global++;
 									m_face_glob_to_loc.insert(make_pair(index_face_global,make_pair(idomain,iface+1)));
-									m_face_loc_to_glob[make_pair(idomain,iface+1)]=index_face_global;
+									//m_face_loc_to_glob[make_pair(idomain,iface+1)]=index_face_global;
+                  m_face_loc_to_glob[idomain][iface]=index_face_global;
 								}		
 							else
 								{
 									int ip = (local2distant.find(iface+1)->second).first;
 									int distant = (local2distant.find(iface+1)->second).second;
-									int global_number=m_loc_to_glob[make_pair(ip,distant)];
+									//int global_number=m_loc_to_glob[make_pair(ip,distant)];
+                  int global_number=m_loc_to_glob[ip][distant-1];
 									m_face_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,iface+1)));
-									m_face_loc_to_glob[make_pair(idomain,iface+1)]=global_number;
+									//m_face_loc_to_glob[make_pair(idomain,iface+1)]=global_number;
+                  m_face_loc_to_glob[idomain][iface]=global_number;
 								}	
 						}
 				}			
@@ -219,9 +241,11 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 					for (int iface=0; iface<m_nb_faces[idomain]; iface++)
 						{
 			
-							int global_number=faceglobal[idomain][iface];
+						  int global_number=faceglobal[idomain][iface];
+						  //SCRUTE(global_number);
 							m_face_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,iface+1)));
-							m_face_loc_to_glob[make_pair(idomain,iface+1)]=global_number;
+							//m_face_loc_to_glob[make_pair(idomain,iface+1)]=global_number;
+              m_face_loc_to_glob[idomain][iface]=global_number;
 						}
 				}			
 		}
@@ -247,6 +271,10 @@ ParallelTopology::ParallelTopology(boost::shared_ptr<Graph> graph, int nb_domain
 	m_nb_nodes.resize(m_nb_domain);
 	m_nb_faces.resize(m_nb_domain);
 	
+  m_loc_to_glob.resize(m_nb_domain);
+  m_node_loc_to_glob.resize(m_nb_domain);
+  m_face_loc_to_glob.resize(m_nb_domain);
+  
 	for (int i=0; i<m_nb_domain; i++)
 		m_nb_cells[i]=0;	
 		
@@ -257,8 +285,10 @@ ParallelTopology::ParallelTopology(boost::shared_ptr<Graph> graph, int nb_domain
 		{
 			int idomain = part[icell];
 			m_nb_cells[idomain]++;
-			m_loc_to_glob[make_pair(idomain,m_nb_cells[idomain])]=icell+1;
+			//m_loc_to_glob[make_pair(idomain,m_nb_cells[idomain])]=icell+1;
+      m_loc_to_glob[idomain].push_back(icell+1);
 			m_glob_to_loc[icell+1]=make_pair(idomain,m_nb_cells[idomain]);
+      
 		}
 	for (int idomain=0; idomain<m_nb_domain; idomain++)
 		MESSAGE("Nombre de cellules dans le domaine "<< idomain <<" : "<<m_nb_cells[idomain]); 
@@ -444,35 +474,92 @@ void ParallelTopology::convertGlobalFaceList(const int* face_list, int nbface, i
 ////creating node mapping 
 void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& type_connectivity,
 																				 map<MED_EN::medGeometryElement,int>& present_type_numbers,
+                                         vector<int>& polygon_conn,
+                                         vector<int>& polygon_conn_index,
+                                         vector<int>& polyhedron_conn,
+                                         vector<int>& polyhedron_conn_index,
+                                         vector<int>& polyhedron_face_index,
 																				 int idomain)
 {
 	set<int> local_numbers;
 	int local_index=0;
-	
-	MED_EN::MESH_ENTITIES::const_iterator currentEntity;
-  list<MED_EN::medGeometryElement>::const_iterator iter;
-	currentEntity  = MED_EN::meshEntities.find(MED_EN::MED_CELL);
-	for (iter = (*currentEntity).second.begin();iter != (*currentEntity).second.end(); iter++)
+  
+  map<MED_EN::medGeometryElement,int>::const_iterator iter;
+  for (iter = present_type_numbers.begin(); iter!=present_type_numbers.end();iter++)
 		{
-			int nodes_per_type= (*iter)%100;
-			int type=*iter;
-			if (type/100 != m_mesh_dimension) continue;
-			for (int icell=0; icell<present_type_numbers[type]; icell++)
-				{
-					for (int inode=0; inode<nodes_per_type; inode++)
-						{
-							int global=type_connectivity[type][icell*nodes_per_type+inode];
-							if(local_numbers.find(global)==local_numbers.end())
-								{
-									local_index++;
-									local_numbers.insert(global);
-									m_node_loc_to_glob.insert(make_pair(make_pair(idomain,local_index),global));
-									m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
-									//					cout << "node : global ="<<global<<" local =("<<idomain<<","<<local_index<<")"<<endl;					
-								}
-						}
-			 
-				}
+      int type=iter->first;
+			int nodes_per_type= type%100;
+		
+			if (!((type/100==m_mesh_dimension)
+        ||(type==MED_EN::MED_POLYGON && m_mesh_dimension==2)
+        ||(type==MED_EN::MED_POLYHEDRA && m_mesh_dimension==3))) continue;
+        
+      if (type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
+      {
+  			for (int icell=0; icell<present_type_numbers[type]; icell++)
+  				{
+  					for (int inode=0; inode<nodes_per_type; inode++)
+  						{
+  							int global=type_connectivity[type][icell*nodes_per_type+inode];
+  							if(local_numbers.find(global)==local_numbers.end())
+  								{
+  									local_index++;
+  									local_numbers.insert(global);
+  									//m_node_loc_to_glob.insert(make_pair(make_pair(idomain,local_index),global));
+                    m_node_loc_to_glob[idomain].push_back(global);
+  									m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
+  									//					cout << "node : global ="<<global<<" local =("<<idomain<<","<<local_index<<")"<<endl;					
+  								}
+  						}
+  			 
+  				}
+      }
+      else if (type== MED_EN::MED_POLYGON)
+      {
+        for (int icell=0; icell<polygon_conn_index.size()-1; icell++)
+          {
+            for (int inode=polygon_conn_index[icell]; inode<polygon_conn_index[icell+1]; inode++)
+              {
+                int global=polygon_conn[inode-1];
+                if(local_numbers.find(global)==local_numbers.end())
+                  {
+                    local_index++;
+                    local_numbers.insert(global);
+                    //m_node_loc_to_glob.insert(make_pair(make_pair(idomain,local_index),global));
+                    m_node_loc_to_glob[idomain].push_back(global);
+                    m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
+                    //          cout << "node : global ="<<global<<" local =("<<idomain<<","<<local_index<<")"<<endl;         
+                  }
+              }
+         
+          }
+      }
+      else if (type==MED_EN::MED_POLYHEDRA)
+      {
+        for (int icell=0; icell<polyhedron_conn_index.size()-1; icell++)
+          {
+            for (int iface = polyhedron_conn_index[icell];
+                 iface < polyhedron_conn_index[icell+1];
+                 iface++)
+                  for (int inode=polyhedron_face_index[iface-1];
+                   inode<polyhedron_face_index[iface]; inode++)
+                  {
+                    int global=polyhedron_conn[inode-1];
+                    if(local_numbers.find(global)==local_numbers.end())
+                     {
+                      local_index++;
+                      local_numbers.insert(global);
+                      //m_node_loc_to_glob.insert(make_pair(make_pair(idomain,local_index),global));
+                      m_node_loc_to_glob[idomain].push_back(global);
+                      m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
+                      //          cout << "node : global ="<<global<<" local =("<<idomain<<","<<local_index<<")"<<endl;         
+                     }
+                   }
+              
+         
+          }
+      }
+       
 		}
 	m_nb_nodes[idomain]=local_index;
 }
@@ -506,47 +593,85 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
 
 	for (int iold=0; iold<nb_domain_old;iold++)
 		{
-			int nbface=old_topology->getFaceNumber(iold);
-		
-			nbface = initial_collection.getMesh(iold)->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
-	
+			int nbplainface = initial_collection.getMesh(iold)->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+      int nbtotalface = initial_collection.getMesh(iold)->getNumberOfElementsWithPoly(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+      SCRUTE(nbplainface);
+      SCRUTE(nbtotalface);	
 			const int* face_conn;
 			const int* face_offset;
-			if (nbface >0)
+      const int* poly_conn;
+      const int* poly_index;
+			if (nbtotalface >0)
 				{
-					face_conn = initial_collection.getMesh(iold)->getConnectivity(MED_EN::MED_FULL_INTERLACE,
+          if (nbplainface >0)
+          {
+					  face_conn = initial_collection.getMesh(iold)->getConnectivity(MED_EN::MED_FULL_INTERLACE,
 																																				MED_EN::MED_NODAL,constituent_entity,MED_EN::MED_ALL_ELEMENTS);
-					face_offset = initial_collection.getMesh(iold)->getConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
+				  	face_offset = initial_collection.getMesh(iold)->getConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
+          }
+          if (nbtotalface > nbplainface)
+          {
+            poly_conn = initial_collection.getMesh(iold)->getPolygonsConnectivity(MED_EN::MED_NODAL,constituent_entity);
+            poly_index = initial_collection.getMesh(iold)->getPolygonsConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
+          }
+          
 				}
 			else 
 				{
 					face_conn=0;
 					face_offset=0;
 				}
-			for (int iface=0;iface<nbface; iface++)
+			for (int iface=0;iface<nbtotalface; iface++)
 				{
 					int global_face_number = old_topology->convertFaceToGlobal(iold,iface+1);
 			
 					//			int inode = face_offset[iface];
 					for (int i=0; i<m_nb_domain; i++) domain_counts[i]=0;
 					set <int> nodes;
-					for (int inode= face_offset[iface];inode < face_offset[iface+1]; inode++)
-						{
-							int node=face_conn[inode-1];
-				
-							int global = old_topology->convertNodeToGlobal(iold,node);
-							//				cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
-							nodes.insert(global);
-							typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
-							pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
-				
-							int ip;
-							for (mmiter it=range.first; it !=range.second; it++)
-								{	
-									ip=(it->second).first;
-									domain_counts[ip]++;
-								}
-						}
+          int nbnodes;
+          if (iface<nbplainface)
+          {
+            nbnodes=face_offset[iface+1]-face_offset[iface];
+  					for (int inode= face_offset[iface];inode < face_offset[iface+1]; inode++)
+  						{
+  							int node=face_conn[inode-1];
+  				
+  							int global = old_topology->convertNodeToGlobal(iold,node);
+  							//				cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
+  							nodes.insert(global);
+  							typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+  							pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
+  				
+  							int ip;
+  							for (mmiter it=range.first; it !=range.second; it++)
+  								{	
+  									ip=(it->second).first;
+  									domain_counts[ip]++;
+  								}
+  						}
+          }
+          else 
+            {
+            nbnodes =poly_index[iface-nbplainface+1]- poly_index[iface-nbplainface];
+            for (int inode= poly_index[iface-nbplainface];inode < poly_index[iface-nbplainface+1]; inode++)
+              {
+                int node=poly_conn[inode-1];
+             //   SCRUTE(node);
+                int global = old_topology->convertNodeToGlobal(iold,node);
+                //        cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
+               // SCRUTE(global);
+                nodes.insert(global);
+                typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+                pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
+          
+                int ip;
+                for (mmiter it=range.first; it !=range.second; it++)
+                  { 
+                    ip=(it->second).first;
+                    domain_counts[ip]++;
+                  }
+              }
+          }
 					set<int>::const_iterator iter_node = nodes.begin();
 					int numbers[3];
 					for (int i=0; i<3; i++)
@@ -560,20 +685,24 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
 					if (iter_triplets==global_treated.end())
 						{
 							global_treated.insert(triplet);
-							int nbnodes=face_offset[iface+1]-face_offset[iface];
+						//	int nbnodes=face_offset[iface+1]-face_offset[iface];
 							if (global_face_number == -1) 
 								{
 									global_index++;
 									global_face_number=global_index;
 					
 								}
+             //  SCRUTE(nbnodes);
+               
 							for (int inew=0;inew<m_nb_domain;inew++)
 								{
+              //     SCRUTE(domain_counts[inew]);
 									if(domain_counts[inew]==nbnodes)
 										{
 											new_counts[inew]++;
 											m_face_glob_to_loc.insert(make_pair(global_face_number,make_pair(inew,new_counts[inew])));
-											m_face_loc_to_glob.insert(make_pair(make_pair(inew,new_counts[inew]),global_face_number));
+											//m_face_loc_to_glob.insert(make_pair(make_pair(inew,new_counts[inew]),global_face_number));
+                      m_face_loc_to_glob[inew].push_back(global_face_number);
 										}
 								}
 						}
@@ -635,8 +764,10 @@ void ParallelTopology::createFaceMapping2ndversion(const MESHCollection& initial
 								{
 									new_counts[inew]++;
 									m_face_glob_to_loc.insert(make_pair(global_face_number,make_pair(inew,new_counts[inew])));
-									m_face_loc_to_glob.insert(make_pair(make_pair(inew,new_counts[inew]),global_face_number));
-									global_treated.insert(global_face_number);
+                  
+									//m_face_loc_to_glob.insert(make_pair(make_pair(inew,new_counts[inew]),global_face_number));
+									m_face_loc_to_glob[inew].push_back(global_face_number);
+                  global_treated.insert(global_face_number);
 		      
 								}
 						}
@@ -700,6 +831,26 @@ void ParallelTopology::convertToLocal(map<MED_EN::medGeometryElement,int*>& type
 		}
 }
 
+//replacing a table of global numbering with a table with local numberings
+// type_connectivity contains global connectivity for each type in input
+// type_connectivity contains local connectivity for each type in output
+void ParallelTopology::convertToLocal2ndVersion(int* nodes, int nbnodes, int idomain)
+{
+  for (int inode=0; inode<nbnodes; inode++)
+    {
+        //      cout <<" inode :"<<inode<< " global = "<<type_connectivity[type][inode];
+          int global = nodes[inode];
+          typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+          pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
+          for (mmiter it=range.first; it !=range.second; it++)
+            {
+              if ((it->second).first==idomain)
+                nodes[inode]=(it->second).second;
+            }        
+    }
+  }
+
+
 //! computing arrays with node/node correspondencies
 void ParallelTopology::computeNodeNodeCorrespondencies(int idomain, vector<MEDMEM::MEDSKYLINEARRAY*>& corr) const
 {
@@ -712,7 +863,8 @@ void ParallelTopology::computeNodeNodeCorrespondencies(int idomain, vector<MEDME
 	
 	for (int inode=0; inode<m_nb_nodes[idomain]; inode++)
 		{
-			int global = (m_node_loc_to_glob.find(make_pair(idomain,inode+1)))->second;
+			//int global = (m_node_loc_to_glob.find(make_pair(idomain,inode+1)))->second;
+      int global = m_node_loc_to_glob[idomain][inode];
 			typedef hash_multimap<int,pair<int,int> >::const_iterator mm;
 			pair<mm,mm> range = m_node_glob_to_loc.equal_range(global);
 			for (mm it=range.first; it !=range.second; it++)
@@ -735,8 +887,9 @@ void ParallelTopology::computeNodeNodeCorrespondencies(int idomain, vector<MEDME
 	
 	for (int inode=0; inode<m_nb_nodes[idomain]; inode++)
 		{
-			int global = (m_node_loc_to_glob.find(make_pair(idomain,inode+1)))->second;
-			typedef hash_multimap<int,pair<int,int> >::const_iterator mm;
+			//int global = (m_node_loc_to_glob.find(make_pair(idomain,inode+1)))->second;
+			int global = m_node_loc_to_glob[idomain][inode];
+      typedef hash_multimap<int,pair<int,int> >::const_iterator mm;
 			pair<mm,mm> range = m_node_glob_to_loc.equal_range(global);
 			for (mm it=range.first; it !=range.second; it++)
 				{
@@ -798,7 +951,8 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
 	
 	for (int icell=0; icell<m_nb_cells[idomain]; icell++)
 		{
-      int global =   m_loc_to_glob.find(make_pair(idomain,icell+1))->second;
+      //int global =   m_loc_to_glob.find(make_pair(idomain,icell+1))->second;
+      int global= m_loc_to_glob[idomain][icell];
 			for (int ii=index[global-1]-1; ii<index[global]-1; ii++)
 				{
 					int distant_global=value[ii];
@@ -867,3 +1021,27 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
 
 }
 
+void ParallelTopology::recreateFaceMapping(vector<map<MED_EN::medGeometryElement, vector<MEDSPLITTER_FaceModel*> > > face_map)
+{
+  m_face_glob_to_loc.clear();
+  for (int i=0; i<m_nb_domain;i++)
+     m_face_loc_to_glob[i].clear();
+     
+  for (int idomain=0; idomain<m_nb_domain; idomain++)
+  {
+    int ilocal=1;
+    map<MED_EN::medGeometryElement, vector<MEDSPLITTER_FaceModel*> >::const_iterator iter = face_map[idomain].begin();
+    for (; iter != face_map[idomain].end(); iter++)
+    {
+      for (int i=0; i< (iter->second).size(); i++)
+      {
+        MEDSPLITTER_FaceModel* face = (iter->second)[i];
+        //cout << "global :"<<face->getGlobal()<<" - "<<ilocal<<endl;
+        m_face_glob_to_loc.insert(make_pair(face->getGlobal(),make_pair(idomain,ilocal)));
+        m_face_loc_to_glob[idomain].push_back(face->getGlobal());
+        ilocal++;
+      }
+    }
+    m_nb_faces[idomain] =ilocal-1;
+  }
+}

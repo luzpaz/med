@@ -154,7 +154,8 @@ Family::Family()
 
 Family::Family(const Family& pFamily)  
 { 
-    strcpy(mName, pFamily.mName);
+    strncpy(mName, pFamily.mName, MED_TAILLE_NOM);
+    mName[MED_TAILLE_NOM] = '\0';
     mId            = pFamily.mId;
     mStrNameGroups = pFamily.mStrNameGroups;
     mNameGroups    = pFamily.mNameGroups;
@@ -174,7 +175,11 @@ void Family::reset()
     mId            = 0;
     mStrNameGroups = "";
     
-    mElt.clear();
+    for (int i = 0; i < eMaxMedMesh; ++i)
+	{
+		mElt[i].clear();
+	}
+
     mNameGroups.clear();
     mAttributs.reset();
     
@@ -184,17 +189,22 @@ void Family::reset()
 }
 
 
-void Family::insertElt(med_int pIndexElt) 
+void Family::insertElt(med_int pIndexElt, eMeshType pMeshIndex) 
 { 
     if (pIndexElt < 1) throw new IllegalArgumentException("", __FILE__, __LINE__);
     
-    mElt.insert(pIndexElt); 
+    mElt[pMeshIndex].insert(pIndexElt);
 }
 
 
 void Family::buildGroups(vector<Group*>& pGroups, map<string, Group*>& pGroupNameToGroup) const
 {
     // pGroups / pGroupNameToGroup can be empty or not
+
+	if (isFamilyOfNodes())
+	{
+		return;
+	}
     
     // for each group in this family
     for (unsigned itGroup = 0 ; itGroup < mNameGroups.size() ; itGroup++)
@@ -213,7 +223,7 @@ void Family::buildGroups(vector<Group*>& pGroups, map<string, Group*>& pGroupNam
         else
         {
             // a new group have been identified: create a new entry
-            group = new Group();
+			group = new Group();
             group->setName(keyName);
             group->setIsGroupOfNodes(isFamilyOfNodes());
             
@@ -221,12 +231,14 @@ void Family::buildGroups(vector<Group*>& pGroups, map<string, Group*>& pGroupNam
             pGroupNameToGroup.insert(make_pair(keyName, group));
         }
         
-        // add all elements of the this family to the group
-        for (set<med_int>::iterator itElt = mElt.begin() ; itElt != mElt.end() ; itElt++)
-        {
-            group->insertElt(*itElt);
+        // add all elements of this family to the group
+		for (int i = 0; i < eMaxMedMesh; ++i)
+		{
+			for (set<med_int>::iterator itElt = mElt[i].begin() ; itElt != mElt[i].end() ; itElt++)
+    	    {
+        	    group->insertElt(*itElt, (eMeshType)i);
+        	}
         }
-        
     }
 }
 
@@ -270,50 +282,64 @@ Family* Family::extractGroup(const char* pGroupName)
 
 void Family::readMED(med_idt pMEDfile, char* pMeshName, med_int pIndex)
 {
-    if (pMEDfile == 0) throw IOException("", __FILE__, __LINE__);
+	med_int*	attrId = NULL;
+	med_int*	attrVal = NULL;
+	char*		attrDesc = NULL;
+    char*		nameGroups = NULL;
+
+	if (pMEDfile == 0) throw IOException("", __FILE__, __LINE__);
     if (pMeshName == NULL) throw NullArgumentException("", __FILE__, __LINE__);
     if (strlen(pMeshName) > MED_TAILLE_NOM) throw IllegalArgumentException("", __FILE__, __LINE__);
     if (pIndex < 1) throw IllegalArgumentException("", __FILE__, __LINE__);
     
     reset();
-    
     med_int numGroups = MEDnGroupe(pMEDfile, pMeshName, pIndex);
-    
     if (numGroups < 0) throw IOException("i/o error while reading number of groups in MED file", __FILE__, __LINE__);
     
     med_int numAttr = MEDnAttribut(pMEDfile, pMeshName, pIndex);
-    
-    med_int* attrId   = new med_int[numAttr];
-    med_int* attrVal  = new med_int[numAttr];
-    char*    attrDesc = new char[MED_TAILLE_DESC * numAttr + 1];
-    attrDesc[0] = '\0';
-    
-    char* nameGroups = new char[MED_TAILLE_LNOM * numGroups + 1];
-    nameGroups[0] = '\0';
-    
-    med_err ret = MEDfamInfo(
-        pMEDfile, 
-        pMeshName, 
-        pIndex, 
-        mName, 
-        &mId, 
-        attrId, 
-        attrVal, 
-        attrDesc, 
-        &numAttr, 
-        nameGroups, 
-        &numGroups);
-    
-    if (ret != 0) throw IOException("i/o error while reading family information in MED file", __FILE__, __LINE__);
-    
-    attrDesc[MED_TAILLE_DESC * numAttr] = '\0';
+	if (numAttr != 0)
+	{
+		attrId   = new med_int[numAttr];
+		attrVal  = new med_int[numAttr];
+		attrDesc = new char[MED_TAILLE_DESC * numAttr + 1];
+		attrDesc[0] = '\0';
+	}    
+	if (numGroups != 0)
+	{
+    	nameGroups = new char[MED_TAILLE_LNOM * numGroups + 1];
+    	nameGroups[0] = '\0';
+	}
+
+	med_err ret = MEDfamInfo(
+		pMEDfile, 
+		pMeshName, 
+		pIndex, 
+		mName, 
+		&mId, 
+		attrId, 
+		attrVal, 
+		attrDesc, 
+		&numAttr, 
+		nameGroups, 
+		&numGroups);
+
+    mName[MED_TAILLE_NOM] = '\0';
+	if (ret != 0) throw IOException("i/o error while reading family information in MED file", __FILE__, __LINE__);
+	
+	if (attrDesc != NULL)
+	{
+    	attrDesc[MED_TAILLE_DESC * numAttr] = '\0';
+	}
     
     mAttributs.mNum  = numAttr;
     mAttributs.mId   = attrId;
     mAttributs.mVal  = attrVal;
     mAttributs.mDesc = attrDesc;
     
-    mStrNameGroups = nameGroups;
+	if (nameGroups)
+	{
+	    mStrNameGroups = nameGroups;
+	}
     
     // split nameGroups
     for (int itGroup = 0 ; itGroup < numGroups ; itGroup++)
@@ -332,19 +358,14 @@ void Family::readMED(med_idt pMEDfile, char* pMeshName, med_int pIndex)
 
 void Family::writeMED(med_idt pMEDfile, char* pMeshName)
 {
-    if (pMEDfile == 0) throw IOException("", __FILE__, __LINE__);
-    if (pMeshName == NULL) throw NullArgumentException("", __FILE__, __LINE__);
-    if (strlen(pMeshName) > MED_TAILLE_NOM) throw IllegalArgumentException("", __FILE__, __LINE__);
-    if (strlen(mName) > MED_TAILLE_NOM) throw IllegalArgumentException("", __FILE__, __LINE__);
-    if (mAttributs.mVal == NULL) throw IllegalStateException("", __FILE__, __LINE__);
-    if (mAttributs.mDesc == NULL) throw IllegalStateException("", __FILE__, __LINE__);
-    if (mAttributs.mId == NULL) throw IllegalStateException("", __FILE__, __LINE__);
-        
-    //cout << "Write family: " << mName << " " << mId << endl;
-    
+    if (pMEDfile == 0) throw IOException("Invalid MED file.", __FILE__, __LINE__);
+    if (pMeshName == NULL) throw NullArgumentException("Invalide mesh name.", __FILE__, __LINE__);
+    if (strlen(pMeshName) > MED_TAILLE_NOM) throw IllegalArgumentException("Mesh name is too long.", __FILE__, __LINE__);
+    if (strlen(mName) > MED_TAILLE_NOM) throw IllegalArgumentException("Family name is too long.", __FILE__, __LINE__);
+	
     med_err ret = MEDfamCr(
-        pMEDfile,
-        pMeshName,
+	pMEDfile,
+	pMeshName,
         mName,
         mId,
         mAttributs.mId,
@@ -354,7 +375,10 @@ void Family::writeMED(med_idt pMEDfile, char* pMeshName)
         const_cast<char*>(mStrNameGroups.c_str()),
         mNameGroups.size());
     
-    if (ret != 0) throw IOException("i/o error while creating family in MED file", __FILE__, __LINE__);
+    if (ret != 0)
+    {
+        throw IOException("i/o error while creating family in MED file", __FILE__, __LINE__);
+    }
     
     // MEDfamEcr is not necessary as we used MEDnoeudsEcr/MEDelementsEcr instead
 
@@ -375,26 +399,29 @@ ostream& operator<<(ostream& pOs, Family& pF)
     }
     pOs << "    Attributs: " << pF.mAttributs;
     
-    if (pF.mElt.size() != 0)
-    {
-        set<med_int>::iterator itSet = pF.mElt.end();
-        itSet--;
-        pOs << "    Elements: #elt=" << pF.mElt.size() << " min_id=" << (*(pF.mElt.begin())) << " max_id=" << (*itSet) << endl;
-        if (pF.mFlagPrintAll)
-        {
-            pOs << "        ";
-            for (set<med_int>::iterator itSet = pF.mElt.begin() ; itSet != pF.mElt.end() ; itSet++)
-            {
-                pOs << (*itSet) << " ";
-            }
-            pOs << endl;
-        }
-    }
-    else
-    {
-        pOs << "    Elements: #elt=0" << endl;
-    }
-    
+	for (int i = 0; i < eMaxMedMesh; ++i)
+	{
+		if (pF.mElt[i].size() != 0)
+		{
+			set<med_int>::iterator itSet = pF.mElt[i].end();
+			itSet--;
+			pOs << "    Elements: #elt=" << pF.mElt[i].size() << " min_id=" << (*(pF.mElt[i].begin())) << " max_id=" << (*itSet) << endl;
+			if (pF.mFlagPrintAll)
+			{
+				pOs << "        ";
+				for (set<med_int>::iterator itSet = pF.mElt[i].begin() ; itSet != pF.mElt[i].end() ; itSet++)
+				{
+					pOs << (*itSet) << " ";
+				}
+				pOs << endl;
+			}
+		}
+		else
+		{
+			pOs << "    Elements: #elt=0" << endl;
+		}
+	}
+    pOs << "Name of groups=" << pF.mStrNameGroups << endl;
     return pOs;
 }
 
@@ -418,9 +445,11 @@ Group::~Group()
 void Group::reset() 
 { 
     mName = "";
-    mElt.clear();
+    for (int i = 0; i < eMaxMedMesh; ++i)
+	{
+		mElt[i].clear();
+	}
     mIsGroupOfNodes = true;
-    
     mFlagPrintAll = false;
 }
 
@@ -433,11 +462,11 @@ void Group::setName(const string& pName)
 }
 
 
-void Group::insertElt(med_int pIndexElt) 
+void Group::insertElt(med_int pIndexElt, eMeshType pMeshIndex) 
 { 
     if (pIndexElt < 1) throw IllegalArgumentException("", __FILE__, __LINE__);
     
-    mElt.insert(pIndexElt); 
+    mElt[pMeshIndex].insert(pIndexElt); 
 }
 
 ostream& operator<<(ostream& pOs, Group& pG)
@@ -446,26 +475,28 @@ ostream& operator<<(ostream& pOs, Group& pG)
     pOs << "    Name     =|" << pG.mName << "| size=" << pG.mName.length() << endl;
     pOs << "    Group of =" << (pG.isGroupOfNodes()?"NODES":"ELEMENTS") << endl;    
 
-    if (pG.mElt.size() != 0)
-    {
-        set<med_int>::iterator itSet = pG.mElt.end();
-        itSet--;
-        pOs << "    Elements: #elt=" << pG.mElt.size() << " min_id=" << (*(pG.mElt.begin())) << " max_id=" << (*itSet) << endl;
-        if (pG.mFlagPrintAll)
-        {
-            pOs << "        ";
-            for (set<med_int>::iterator itSet = pG.mElt.begin() ; itSet != pG.mElt.end() ; itSet++)
-            {
-                pOs << (*itSet) << " ";
-            }
-            pOs << endl;
-        }
-    }
-    else
-    {
-        pOs << "    Elements: #elt=0" << endl;
-    }
-    
+	for (int i = 0; i < eMaxMedMesh; ++i)
+	{
+		if (pG.mElt[i].size() != 0)
+		{
+			set<med_int>::iterator itSet = pG.mElt[i].end();
+			itSet--;
+			pOs << "    Elements: #elt=" << pG.mElt[i].size() << " min_id=" << (*(pG.mElt[i].begin())) << " max_id=" << (*itSet) << endl;
+			if (pG.mFlagPrintAll)
+			{
+				pOs << "        ";
+				for (set<med_int>::iterator itSet = pG.mElt[i].begin() ; itSet != pG.mElt[i].end() ; itSet++)
+				{
+					pOs << (*itSet) << " ";
+				}
+				pOs << endl;
+			}
+		}
+		else
+		{
+			pOs << "    Elements: #elt=0" << endl;
+		}
+	}
     return pOs;
 }
 

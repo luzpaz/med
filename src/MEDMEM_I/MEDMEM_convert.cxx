@@ -139,8 +139,9 @@ throw (SALOME::SALOME_Exception)
 {
   switch (mode)
     {
-    case SALOME_MED::MED_FULL_INTERLACE  :  return MED_FULL_INTERLACE; 
-    case SALOME_MED::MED_NO_INTERLACE    :  return MED_NO_INTERLACE; 
+    case SALOME_MED::MED_FULL_INTERLACE       : return MED_FULL_INTERLACE; 
+    case SALOME_MED::MED_NO_INTERLACE         : return MED_NO_INTERLACE; 
+    case SALOME_MED::MED_NO_INTERLACE_BY_TYPE : return MED_NO_INTERLACE_BY_TYPE; 
     default :
 	{ MESSAGE("Unknown interlace mode");
 	  THROW_SALOME_CORBA_EXCEPTION("Unknown interlace mode",
@@ -154,8 +155,9 @@ throw (SALOME::SALOME_Exception)
 {
   switch (mode)
     {
-    case MED_FULL_INTERLACE  :  return SALOME_MED::MED_FULL_INTERLACE; 
-    case MED_NO_INTERLACE    :  return SALOME_MED::MED_NO_INTERLACE; 
+    case MED_FULL_INTERLACE       :  return SALOME_MED::MED_FULL_INTERLACE; 
+    case MED_NO_INTERLACE         :  return SALOME_MED::MED_NO_INTERLACE; 
+    case MED_NO_INTERLACE_BY_TYPE :  return SALOME_MED::MED_NO_INTERLACE_BY_TYPE; 
     default :
 	{ MESSAGE("Unknown interlace mode");
 	  THROW_SALOME_CORBA_EXCEPTION("Unknown interlace mode",

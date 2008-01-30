@@ -67,7 +67,7 @@ void DRIVERFACTORY::setMedFileVersionForWriting(medFileVersion version)
 driverTypes DRIVERFACTORY::deduceDriverTypeFromFileName(const std::string & fileName)
 {
   string extension(fileName);
-  unsigned int pos=extension.rfind('.');
+  string::size_type pos=extension.rfind('.');
   if(pos==string::npos)
     return NO_DRIVER;
   extension.erase(0,pos+1);

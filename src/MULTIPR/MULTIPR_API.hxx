@@ -55,7 +55,7 @@ void partitionneDomaine(
 
 
 /**
- * \fn     void partitionneGrain(const char* medFilename, const char* groupName, int nbParts, int partitionner)
+ * \fn     void partitionneGroupe(const char* medFilename, const char* groupName, int nbParts, int partitionner)
  * \brief  creates a distributed MED file (V2.3) by splitting a group of a MED file previously created by partitionneDomaine.
  *         Assumes:
  *         - the file is a distributed MED file, previously created by partitionneDomaine()
@@ -67,7 +67,7 @@ void partitionneDomaine(
  * \param  partitionner use value MULTIPR_METIS for Metis or MULTIPR_SCOTCH for Scotch.
  * \throw  RuntimeException if any error occurs.
  */
- void partitionneGrain(
+ void partitionneGroupe(
      const char* medFilename, 
      const char* partName, 
      int         nbParts, 
@@ -78,9 +78,9 @@ void partitionneDomaine(
  * \fn     void decimePartition(const char* medFilename, const char* partName, const char* fieldName, int fieldIt, const char* filterName, double tmed, double tlow, double radius);
  * \brief  creates 3 resolutions of the given part of a distributed MED file (V2.3).
  *         Assumes:
- *         - the file is a distributed MED file, previously created by partitionneDomaine() or partitionneGrain()
+ *         - the file is a distributed MED file, previously created by partitionneDomaine() or partitionneGroupe()
  *           (=> each part only contain 1 mesh, TETRA10 elements only)
- * \param  medFilename filename of any valid distributed MED file previously created by partitionneDomaine or partitionneGrain.
+ * \param  medFilename filename of any valid distributed MED file previously created by partitionneDomaine or partitionneGroupe.
  * \param  partName    name of the part to be decimated.
  * \param  fieldName   name of the field used for decimation.
  * \param  fieldIt     iteration (time step) of the field.
@@ -97,10 +97,7 @@ void decimePartition(
     const char* fieldName,
     int         fieldIt,
     const char* filterName,
-    double      tmed,
-    double      tlow,
-    double      radius,
-    int         boxing);
+    const char*	filterParams);
 
     
 /**

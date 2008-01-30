@@ -203,7 +203,7 @@ MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch
       break;
 
     case MED_INT32 :
-#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
+#if defined(HAVE_F77INT64)
      if ((ret =  _MEDdatasetNumEcrire(datagroup2,MED_NOM_CO,MED_INT64,interlace,ncomp,numco,psize,pfltab,ngauss,dimd,val,
 				       mode)) < 0)
 	return -1;
@@ -215,7 +215,7 @@ MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch
       break;
 
     case MED_INT64 :
-#if defined(IRIX64)||defined(OSF1)||defined(PCLINUX64)
+#if defined(HAVE_F77INT64)
      if ((ret =  _MEDdatasetNumEcrire(datagroup2,MED_NOM_CO,MED_INT64,interlace,ncomp,numco,psize,pfltab,ngauss,dimd,val,
 				       mode)) < 0)
 	return -1;

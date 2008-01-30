@@ -45,7 +45,7 @@ endif
 SWIG_FLAGS=@SWIG_FLAGS@ -I$(srcdir)
 
 nodist_libMEDMEM_Swigcmodule_la_SOURCES= libMEDMEM_Swig_wrap.cxx
-libMEDMEMSwig.py: libMEDMEM_Swig_wrap.cxx
+libMEDMEM_Swig.py: libMEDMEM_Swig_wrap.cxx
 
 libMEDMEM_Swig_wrap.cxx: $(SWIG_DEF)
 	$(SWIG) $(SWIG_FLAGS) -o $@  $<
@@ -84,7 +84,10 @@ dist_salomescript_DATA= \
 
 #############################################################################
 
-install-exec-hook: $(libdir)/_libMEDMEM_Swig.so
+install-exec-hook: $(DESTDIR)$(libdir)/_libMEDMEM_Swig.so
 
-$(libdir)/_libMEDMEM_Swig.so:
-	( cd $(libdir); ln -sf libMEDMEM_Swigcmodule.so _libMEDMEM_Swig.so; )
+$(DESTDIR)$(libdir)/_libMEDMEM_Swig.so:
+	( cd $(DESTDIR)$(libdir); ln -sf libMEDMEM_Swigcmodule.so _libMEDMEM_Swig.so; )
+
+uninstall-hook:
+	( cd $(DESTDIR)$(libdir); rm -f _libMEDMEM_Swig.so; )

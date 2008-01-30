@@ -218,12 +218,10 @@ vector<PointOfField> DecimationAccelGrid::findNeighbours(
     //---------------------------------------------------------------------
     vector<PointOfField> res;
     
-/*
-// debug
-cout << "Center = " << pCenterX << " " << pCenterY << " " << pCenterZ << endl;
-cout << "Radius = " << pRadius << endl;
-cout << "Visited cells : [" << iMinCell[0] << " ; " << iMaxCell[0] << "] x ["<< iMinCell[1] << " ; " << iMaxCell[1] << "] x [" << iMinCell[2] << " ; " << iMaxCell[2] << "]" << endl;
-*/
+    if (isnan(pCenterX) || isnan(pCenterY) || isnan(pCenterZ))
+    {
+        return res;
+    }
     
     // for all the cells in the grid intersected by the sphere ((x, y, z), r)
     for (int i = iMinCell[0] ; i <= iMaxCell[0] ; i++)
@@ -233,8 +231,6 @@ cout << "Visited cells : [" << iMinCell[0] << " ; " << iMaxCell[0] << "] x ["<< 
             for (int k = iMinCell[2] ; k <= iMaxCell[2] ; k++)
             {
                 int idCell = getCellIndex(i, j, k);
-
-//printf("DEBUG: visited cell(%d %d %d) -> %d\n", i, j, k, idCell);
 
                 vector<PointOfField>& cell = mGrid[idCell];
             

@@ -747,7 +747,7 @@ namespace MED
   typedef std::set<EGeometrieElement> TGeom;
 
   //! The class is a base class for MED TimeStamp values holder
-  struct TTimeStampValueBase: 
+  struct MEDWRAPPER_EXPORT TTimeStampValueBase: 
     virtual TModeSwitchInfo 
   {
     //! A reference to correspondig MED TimeStamp
@@ -868,13 +868,13 @@ namespace MED
   typedef TTimeStampValue<TFloatMeshValue> TFloatTimeStampValue;
   typedef SharedPtr<TFloatTimeStampValue> PFloatTimeStampValue;
 
-  PFloatTimeStampValue
+  PFloatTimeStampValue MEDWRAPPER_EXPORT
   CastToFloatTimeStampValue(const PTimeStampValueBase& theTimeStampValue);
 
   typedef TTimeStampValue<TIntMeshValue> TIntTimeStampValue;
   typedef SharedPtr<TIntTimeStampValue> PIntTimeStampValue;
   
-  PIntTimeStampValue
+  PIntTimeStampValue MEDWRAPPER_EXPORT
   CastToIntTimeStampValue(const PTimeStampValueBase& theTimeStampValue);
 
 

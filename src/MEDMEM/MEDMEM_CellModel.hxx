@@ -46,6 +46,9 @@ using namespace std ;
 
 
 namespace MEDMEM {
+  class CELLMODEL;
+  MEDMEM_EXPORT ostream & operator<<(ostream &os,const CELLMODEL &my);
+
 class MEDMEM_EXPORT CELLMODEL 
 {
 

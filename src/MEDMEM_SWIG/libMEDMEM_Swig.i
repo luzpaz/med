@@ -61,6 +61,8 @@
   typedef FIELD <int, FullInterlace> FIELDINT;
   typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
   typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
+  typedef FIELD <double, NoInterlaceByType> FIELDDOUBLENOINTERLACEBYTYPE;
+  typedef FIELD <int, NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 
 %}
 
@@ -76,6 +78,8 @@ typedef FIELD <double, FullInterlace> FIELDDOUBLE;
 typedef FIELD <int, FullInterlace> FIELDINT;
 typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
 typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
+typedef FIELD <double, NoInterlaceByType> FIELDDOUBLENOINTERLACEBYTYPE;
+typedef FIELD <int, NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 
 %include "typemaps.i"
 %include "my_typemap.i"
@@ -306,7 +310,6 @@ typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
 
 %typemap(python,in) vector< FIELDINTNOINTERLACE* >, const vector< FIELDINTNOINTERLACE* >
 { TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDINTNOINTERLACE * ) }
-
 
 /**************************************************
   OUT typemaps for some std::vector's
@@ -703,7 +706,7 @@ public:
 };
 
 /*
-  Class FIELD has now two template parameters T1 is a double or an int
+  Class FIELD has now two template parameters: T1 is a double or an int,
   INTERLACING_TAG is FullInterlace or NoInterlace
 */
 
@@ -730,6 +733,12 @@ public:
 
   T1 getValueIJ(int i,int j) const;
 
+  T1 getValueIJK(int i,int j, int k) const;
+
+  T1 getValueIJByType(int i,int j, int type) const;
+
+  T1 getValueIJKByType(int i,int j, int k, int type) const;
+
   void setValue(T1* value);
 
   void setRow( int i, T1 * value);
@@ -737,6 +746,12 @@ public:
   void setColumn( int i, T1 * value);
 
   void setValueIJ(int i, int j, T1 value);
+
+  void setValueIJK(int i, int j, int k, T1 value);
+
+  void setValueIJByType(int i, int j, int type, T1 value);
+
+  void setValueIJKByType(int i, int j, int k, int type, T1 value);
 
   void allocValue(const int NumberOfComponents);
 
@@ -770,25 +785,79 @@ public:
 
   GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr(medGeometryElement geomElement);
 
+  int getNbGaussI(int i);
+
   %extend {
+
+    /*!
+     * \brief create a field with default gauss localizations
+     */
+    FIELD(const SUPPORT * support, const int numberOfComponents, const int* nbGaussByType)
+      {
+        FIELD<T1,INTERLACING_TAG>* f = new FIELD<T1,INTERLACING_TAG>(support,numberOfComponents);
+
+        int nbtypegeo = support->getNumberOfTypes();
+        vector<int> nbelgeoc (nbtypegeo+1,0);
+        const int * nbElemByType = support->getNumberOfElements();
+        for (int iType = 0; iType < nbtypegeo; ++iType)
+        {
+          nbelgeoc  [ iType+1 ] = nbelgeoc[ iType ] + nbElemByType[ iType ];
+          MED_EN::medGeometryElement type = support->getTypes()[ iType ];
+          ostringstream locname;
+          locname << nbGaussByType[iType] << "points_on" << type << "geomType";
+          f->setGaussLocalization
+            ( type,
+              GAUSS_LOCALIZATION_::makeDefaultLocalization( locname.str(),
+                                                            type,
+                                                            nbGaussByType[ iType ]));
+        }
+        typedef MEDMEM_ArrayInterface<T1,INTERLACING_TAG,Gauss>::Array Array;
+        Array* array = new Array(numberOfComponents,
+                                 support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS),
+                                 support->getNumberOfTypes(),
+                                 &nbelgeoc[0],
+                                 nbGaussByType-1);
+        f->setArray( array );
+        return f;
+      }
+
+    PyObject * getNumberOfGaussPoints()
+      {
+	int size = self->getNumberOfGeometricTypes();
+
+	const int * value = self->getNumberOfGaussPoints();
+        TYPEMAP_OUTPUT_ARRAY(value, size, PyInt_FromLong, FIELD::getNumberOfGaussPoints());
+      }
+
+
+
     PyObject *  applyPyFunc( PyObject * func )
       {
-	MESSAGE("Appel de applyPyFunc");
-	if (!PyCallable_Check(func)) {
-	  PyErr_SetString(PyExc_TypeError, "FIELD.applyPyFunc prend en argument une fonction");
-	  return NULL;
-	}
+        MESSAGE("Appel de applyPyFunc");
+        if (!PyCallable_Check(func)) {
+          PyErr_SetString(PyExc_TypeError, "FIELD.applyPyFunc prend en argument une fonction");
+          return NULL;
+        }
 
-    	int nComp=self->getNumberOfComponents();
-    	int nVal=self->getNumberOfValues();
-	for (int i=1; i!=nVal+1; ++i)
-	  for ( int j=1 ;j!=nComp+1 ;++j )
-	    {
-              self->setValueIJ(i,j, Binding<T1>::Functor( func, self->getValueIJ(i,j) ) );
-	    }
+        int nComp=self->getNumberOfComponents();
+        int nVal=self->getNumberOfValues();
+        for (int i=1; i!=nVal+1; ++i)
+          for ( int j=1 ;j!=nComp+1 ;++j )
+          {
+            self->setValueIJ(i,j, Binding<T1>::Functor( func, self->getValueIJ(i,j) ) );
+          }
 
-	PyObject * result = Binding<double>::Traducer(nComp*nVal);
+        PyObject * result = Binding<double>::Traducer(nComp*nVal);
 	return result;
+      }
+      
+    %newobject execFunc( int nbOfCompo, PyObject * func );
+    FIELD<T1, INTERLACING_TAG> *execFunc( int nbOfCompo, PyObject *func )
+      {
+        MyFunction<T1,T1>::_pyFunc=func;
+        MyFunction<T1,T1>::_nbOfComponent=nbOfCompo;
+        MyFunction<T1,T1>::_spaceDim=self->getNumberOfComponents();
+        return self->execFunc(nbOfCompo, MyFunction<T1,T1>::EvalPy2Cpp);
       }
 
     %newobject __add__(const FIELD<T1, INTERLACING_TAG> & );
@@ -882,6 +951,17 @@ public:
 			     FIELD::getValue);
       }
 
+    // returns values for geom type in NoInterlaceByType mode
+    PyObject * getValueByType(int type)
+      {
+	int size = self->getValueByTypeLength(type);
+
+	const T1 * value = self->getValueByType(type);
+
+        TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,
+			     FIELD::getValueByType());
+      }
+
     // this method replaces getValueI() in FullInterlace mode
     /* %newobject getRow(int );*/
     PyObject * getRow(int index)
@@ -940,9 +1020,11 @@ public:
 /*%template(FIELDDOUBLEFULLINTERLACE) FIELD<double, FullInterlace>;*/
 %template(FIELDDOUBLE) FIELD<double, FullInterlace>;
 %template(FIELDDOUBLENOINTERLACE) FIELD<double, NoInterlace>;
+%template(FIELDDOUBLENOINTERLACEBYTYPE) FIELD<double, NoInterlaceByType>;
 /*%template(FIELDINTFULLINTERLACE) FIELD<int, FullInterlace>;*/
 %template(FIELDINT) FIELD<int, FullInterlace>;
 %template(FIELDINTNOINTERLACE) FIELD<int, NoInterlace>;
+%template(FIELDINTNOINTERLACEBYTYPE) FIELD<int, NoInterlaceByType>;
 
 class GROUP : public SUPPORT
 {
@@ -2372,13 +2454,9 @@ template <class INTERLACING_TAG> class GAUSS_LOCALIZATION
     PyObject * getWeight () const
       {
 	vector<double> wg = self->getWeight();
-	int size = wg.size();
-	double * wgPtr = new double [size];
-	for (int index = 0; index<size; index++)
-	  wgPtr[index] = wg[index];
-        TYPEMAP_OUTPUT_ARRAY(wgPtr, size, PyFloat_FromDouble,
+	double * wgPtr = &wg[0];
+        TYPEMAP_OUTPUT_ARRAY(wgPtr, wg.size(), PyFloat_FromDouble,
 			     GAUSS_LOCALIZATION::getWeight);
-	delete wgPtr;
       }
   }
 };
@@ -2409,6 +2487,12 @@ template <class INTERLACING_TAG> class GAUSS_LOCALIZATION
     {
       MESSAGE("createTypedFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
       MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
+      if ( field ) {
+        if (field->getInterlacingType() != SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType)
+          throw MEDEXCEPTION("cast to wrong medModeSwitch (_interlacingType)");
+        if (field->getValueType() != SET_VALUE_TYPE<T>::_valueType)
+          throw MEDEXCEPTION("cast to wrong med_type_champ (_valueType)");
+      }
       return (FIELD<T, INTERLACING_TAG> *) field;
     }
 
@@ -2430,26 +2514,36 @@ template<class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createTyped
 %template ( createFieldIntFromField ) createTypedFieldFromField < int, FullInterlace >;
 %template ( createFieldDoubleNoInterlaceFromField ) createTypedFieldFromField < double, NoInterlace>;
 %template ( createFieldIntNoInterlaceFromField ) createTypedFieldFromField < int, NoInterlace >;
+%template ( createFieldDoubleNoInterlaceByTypeFromField ) createTypedFieldFromField < double, NoInterlaceByType>;
+%template ( createFieldIntNoInterlaceByTypeFromField ) createTypedFieldFromField < int, NoInterlaceByType >;
 
 template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldScalarProduct(FIELD<T, INTERLACING_TAG> * field1, FIELD<T, INTERLACING_TAG> * field2);
 %newobject createFieldDoubleScalarProduct ;
 %newobject createFieldIntScalarProduct ;
 %newobject createFieldDoubleNoInterlaceScalarProduct ;
 %newobject createFieldIntNoInterlaceScalarProduct ;
+%newobject createFieldDoubleNoInterlaceByTypeScalarProduct ;
+%newobject createFieldIntNoInterlaceByTypeScalarProduct ;
 %template ( createFieldDoubleScalarProduct ) createFieldScalarProduct < double, FullInterlace >;
 %template ( createFieldIntScalarProduct ) createFieldScalarProduct < int, FullInterlace >;
 %template ( createFieldDoubleNoInterlaceScalarProduct ) createFieldScalarProduct < double, NoInterlace >;
 %template ( createFieldIntNoInterlaceScalarProduct ) createFieldScalarProduct < int, NoInterlace >;
+%template ( createFieldDoubleNoInterlaceByTypeScalarProduct ) createFieldScalarProduct < double, NoInterlaceByType >;
+%template ( createFieldIntNoInterlaceByTypeScalarProduct ) createFieldScalarProduct < int, NoInterlaceByType >;
 
 template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldScalarProductDeep(FIELD<T, INTERLACING_TAG> * field1, FIELD<T, INTERLACING_TAG> * field2);
 %newobject createFieldDoubleScalarProductDeep ;
 %newobject createFieldIntScalarProductDeep ;
 %newobject createFieldDoubleNoInterlaceScalarProductDeep ;
 %newobject createFieldIntNoInterlaceScalarProductDeep ;
+%newobject createFieldDoubleNoInterlaceByTypeScalarProductDeep ;
+%newobject createFieldIntNoInterlaceByTypeScalarProductDeep ;
 %template ( createFieldDoubleScalarProductDeep ) createFieldScalarProductDeep < double, FullInterlace >;
 %template ( createFieldIntScalarProductDeep ) createFieldScalarProductDeep < int, FullInterlace >;
 %template ( createFieldDoubleNoInterlaceScalarProductDeep ) createFieldScalarProductDeep < double, NoInterlace >;
 %template ( createFieldIntNoInterlaceScalarProductDeep ) createFieldScalarProductDeep < int, NoInterlace >;
+%template ( createFieldDoubleNoInterlaceByTypeScalarProductDeep ) createFieldScalarProductDeep < double, NoInterlaceByType >;
+%template ( createFieldIntNoInterlaceByTypeScalarProductDeep ) createFieldScalarProductDeep < int, NoInterlaceByType >;
 
 template<class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG> * createFieldFromAnalytic(SUPPORT * Support, int NumberOfComponents, PyObject * double_function);
 
@@ -2460,6 +2554,7 @@ template <class T> FIELD<T, FullInterlace> * createTypedFieldConvertFullInterlac
 %template (createFieldIntConvertFullInterlace) createTypedFieldConvertFullInterlace<int>;
 
 template <class T> FIELD<T, NoInterlace> * createTypedFieldConvertNoInterlace(const FIELD<T, FullInterlace> & field );
+//template <class T> FIELD<T, NoInterlace> * createTypedFieldConvertNoInterlace(const FIELD<T, NoInterlaceByType> & field );
 
 %template (createFieldDoubleConvertNoInterlace) createTypedFieldConvertNoInterlace<double>;
 
@@ -2497,10 +2592,10 @@ GRID * createGridFromMesh( MESH * aMesh );
       FIELD<T, INTERLACING_TAG> * fieldAnalytic =
 	new FIELD<T, INTERLACING_TAG>(Support, NumberOfComponents);
 
-      MyFunction<T>::_pyFunc=double_function;
-      MyFunction<T>::_nbOfComponent=NumberOfComponents;
-      MyFunction<T>::_spaceDim=Support->getMesh()->getSpaceDimension();
-      fieldAnalytic->fillFromAnalytic(MyFunction<T>::EvalPy2Cpp);
+      MyFunction<T,double>::_pyFunc=double_function;
+      MyFunction<T,double>::_nbOfComponent=NumberOfComponents;
+      MyFunction<T,double>::_spaceDim=Support->getMesh()->getSpaceDimension();
+      fieldAnalytic->fillFromAnalytic(MyFunction<T,double>::EvalPy2Cpp);
       return fieldAnalytic;
     }
 %}

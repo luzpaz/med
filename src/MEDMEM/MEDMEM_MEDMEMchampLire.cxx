@@ -22,7 +22,7 @@
  * on intègre la correction ici.
  */
 
-namespace med_2_2 {
+namespace med_2_3 {
   extern "C" {
 
 # define ICI                    {					\

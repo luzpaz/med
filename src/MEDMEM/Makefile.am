@@ -95,10 +95,11 @@ MEDMEM_EnsightFieldDriver.hxx \
 MEDMEM.hxx
 
 # not exported headers
-EXTRA_DIST+= DataTest INTERPOLATION \
+EXTRA_DIST+= DataTest \
 MEDMEM_MEDMEMchampLire.hxx \
 MEDMEM_MEDMEMgaussEcr.hxx \
-MEDMEM_MEDMEMprofilEcr.hxx
+MEDMEM_MEDMEMprofilEcr.hxx \
+MEDMEM_Formulae.hxx
 
 dist_libmedmem_la_SOURCES= \
 MEDMEM_Init.cxx \
@@ -136,14 +137,17 @@ MEDMEM_MedMeshDriver22.cxx \
 MEDMEM_TopLevel.cxx \
 MEDMEM_ConnectZone.cxx \
 MEDMEM_EnsightMedDriver.cxx \
-MEDMEM_EnsightMeshDriver.cxx
+MEDMEM_EnsightMeshDriver.cxx \
+MEDMEM_GaussLocalization.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+	-I$(srcdir)/../MEDWrapper/Base \
 	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERPOLATION
 
 # change motivated by the bug KERNEL4778.
-libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la $(STDLIB)
+libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
+	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB)
 if MED_ENABLE_KERNEL
     libmedmem_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
     libmedmem_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
@@ -151,7 +155,7 @@ endif
 
 bin_PROGRAMS= \
 	ensight2med med2ensight \
-	med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH \
+	med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH test_write_groups_poly\
 	test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray \
 	test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit \
 	testUGeoNameMeshEntities testUMedException testUModulusArray \
@@ -165,10 +169,14 @@ bin_PROGRAMS= \
 	test_MEDMEM_PolyDriverMedMeshRead test_MEDMEM_PolyDriverMedMeshWrite \
 	test_MEDMEM_poly3D test_MEDMEM_nArray test_MEDMEM_Meshing_poly test_profil_MedFieldDriver \
 	test_profil_gauss_MedFieldDriver test_GaussLocalization testAnalFile test_MEDMEM_MeshingFlica \
-	create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_mesh_c3h8q4_wrong create_mesh_c2q4s2_wrong create_grid create_mesh_c2q4 create_mesh_c3h8 create_poly3D
+	create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_mesh_c3h8q4_wrong \
+	create_mesh_c2q4s2_wrong create_grid create_mesh_c2q4 create_mesh_c3h8 create_poly3D
 
 AM_CPPFLAGS= $(libmedmem_la_CPPFLAGS)
-LDADD= $(libmedmem_la_LDFLAGS) -lm -lSALOMEBasics libmedmem.la
+LDADD= $(libmedmem_la_LDFLAGS) -lm libmedmem.la
+if MED_ENABLE_KERNEL
+     LDADD+=-lSALOMEBasics
+endif
 
 dist_ensight2med_SOURCES= ensight2med.cxx
 dist_med2ensight_SOURCES= med2ensight.cxx
@@ -177,6 +185,7 @@ dist_med2vtk_SOURCES= med2vtk.cxx
 dist_duplicateMED_SOURCES= duplicateMED.cxx
 dist_med_test_SOURCES= med_test.cxx
 dist_duplicateMEDMESH_SOURCES= duplicateMEDMESH.cxx
+dist_test_write_groups_poly_SOURCES= test_write_groups_poly.cxx
 dist_test_MEDMEM_ModulusArray_SOURCES= test_MEDMEM_ModulusArray.cxx
 dist_test_MEDMEM_Array_SOURCES= test_MEDMEM_Array.cxx
 dist_test_MEDMEM_SkyLineArray_SOURCES= test_MEDMEM_SkyLineArray.cxx

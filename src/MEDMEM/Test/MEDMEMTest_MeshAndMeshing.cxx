@@ -28,6 +28,9 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_Grid.hxx"
 
+#include "MEDMEM_Med.hxx"
+#include "MEDMEM_MedMeshDriver22.hxx"
+
 #include <sstream>
 #include <cmath>
 
@@ -44,6 +47,30 @@ using namespace MED_EN;
 double dmax(double x, double y) { return (x>y)?x:y;}
 
 double dmin(double x, double y) { return (x>y)?y:x;}
+
+void addMedFacesGroup (MESHING& meshing, int nFaces, const int *groupValue,
+		       string groupName, const MED_EN::medGeometryElement *mytypes,
+                       const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
+{
+  GROUP faces;
+  faces.setName(groupName);
+  faces.setMesh(&meshing);
+  faces.setEntity(MED_EN::MED_FACE);
+  faces.setNumberOfGeometricType(nbOfGeomTypes);
+  faces.setGeometricType(mytypes);
+  faces.setNumberOfElements(myNumberOfElements);
+  faces.setNumber(index, groupValue);
+  meshing.addGroup(faces);
+}
+
+void addMedFacesGroupAll (MESHING& meshing, string groupName)
+{
+  GROUP faces;
+  faces.setName(groupName);
+  faces.setMesh(&meshing);
+  faces.setEntity(MED_EN::MED_FACE);
+  meshing.addGroup(faces);
+}
 
 /*!
  *  Check methods (18), defined in MEDMEM_Meshing.hxx:
@@ -1686,4 +1713,132 @@ void MEDMEMTest::testMeshAndMeshing()
     CPPUNIT_FAIL("Unknown exception");
   }
   CPPUNIT_ASSERT(idxNoElem == -1);
+
+  ///////////////////////////////////////////////////////
+  // TEST 5: test desactivateFacesComputation() method //
+  //         of driver: NPAL17670                      //
+  ///////////////////////////////////////////////////////
+  double coords[54] = {
+    -0.215040, -0.107520, +0.000000,
+    +0.000000, -0.107520, +0.000000, 
+    +0.000000, +0.107520, +0.000000, 
+    -0.215040, +0.107520, +0.000000, 
+    +0.215040, -0.107520, +0.000000, 
+    +0.215040, +0.107520, +0.000000, 
+    -0.215040, -0.107520, +1.500000, 
+    -0.215040, -0.107520, +4.080623, 
+    +0.000000, -0.107520, +1.500000, 
+    +0.000000, -0.107520, +4.080623, 
+    +0.000000, +0.107520, +1.500000, 
+    +0.000000, +0.107520, +4.080623, 
+    -0.215040, +0.107520, +1.500000, 
+    -0.215040, +0.107520, +4.080623, 
+    +0.215040, -0.107520, +1.500000, 
+    +0.215040, -0.107520, +4.080623, 
+    +0.215040, +0.107520, +1.500000, 
+    +0.215040, +0.107520, +4.080623 
+  };
+
+  int connQuad4[] = {
+    2 ,         5   ,      15   ,       9 ,
+    10,         16  ,       18  ,       12, 
+    11 ,        13  ,       14  ,       12, 
+    7   ,       9   ,      11   ,      13, 
+    3   ,       4   ,      13   ,      11, 
+    1   ,       2   ,       9   ,       7, 
+    1   ,       2   ,       3   ,       4, 
+    15   ,      17  ,       18  ,       16 ,
+    5    ,      6   ,      17   ,      15, 
+    9    ,     15   ,      17   ,      11 ,
+    13    ,      7  ,        8  ,       14, 
+    4     ,     1   ,       7   ,      13, 
+    9     ,    11   ,      12   ,      10, 
+    8     ,    10   ,      12   ,      14, 
+    2     ,     5   ,       6   ,       3, 
+    17    ,     11,         12  ,       18 ,
+    2     ,     3  ,       11   ,       9, 
+    6     ,     3  ,       11   ,      17,
+    7     ,     9  ,       10   ,       8, 
+    9     ,    15  ,       16   ,      10 
+  };
+
+  int connHexa8[] = {
+    3       ,   2      ,    1   ,       4    ,     11     ,     9    ,      7    ,     13, 
+    17     ,    15     ,     9    ,     11   ,      18    ,     16   ,      10   ,      12, 
+    11    ,      9     ,     7    ,     13   ,      12    ,     10   ,       8   ,       14 ,
+    6 ,         5      ,    2     ,     3    ,     17     ,    15    ,      9    ,     11
+  };
+
+  int bottom[2] = {7,15};
+  MED_EN::medGeometryElement bottomTypes[1] = {MED_EN::MED_QUAD4};
+  int bottomIndex[2] = {1,3};
+  int bottomNbOfElts[1] = {2};
+
+  MESHING* meshing = new MESHING();
+  meshing->setName( "TESTMESH" );
+  meshing->setSpaceDimension(3);
+  const int nFaces=20;
+  const int nNodes=18;
+  meshing->setNumberOfNodes(nNodes);
+  meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
+			  MED_EN::MED_FULL_INTERLACE);
+  string coordname[3] = { "x", "y", "z" };
+  meshing->setCoordinatesNames(coordname);
+  string coordunit[3] = { "m", "m", "m" };
+  meshing->setCoordinatesUnits(coordunit);
+  //Cell connectivity info for classical elts
+  const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_HEXA8};
+  const int nbOfCellElts[1]={4};
+  meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
+  meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
+  meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
+  meshing->setMeshDimension(3);
+  //Face connectivity info for classical elts
+  const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MED_QUAD4};
+  const int nbOfFaceElts[1]={nFaces};
+  meshing->setNumberOfTypes(1,MED_EN::MED_FACE);
+  meshing->setTypes(classicalTypesFace,MED_EN::MED_FACE);
+  meshing->setNumberOfElements(nbOfFaceElts,MED_EN::MED_FACE);
+  //All cell conn
+  meshing->setConnectivity(connHexa8,MED_EN::MED_CELL,MED_EN::MED_HEXA8);
+  //All face conn
+  meshing->setConnectivity(connQuad4,MED_EN::MED_FACE,MED_EN::MED_QUAD4);
+  //Adding some groups on faces
+  addMedFacesGroup( *meshing, 4,  bottom, "BottomFaces",bottomTypes,bottomIndex,bottomNbOfElts,1) ;
+  //addMedFacesGroupAll( *meshing, "AllFaces");
+  //writing...
+  int id=meshing->addDriver(MED_DRIVER,"out.med",meshing->getName());
+  meshing->write(id);
+  // Field writing
+  SUPPORT *sup=new SUPPORT(meshing,"AllFaces",MED_FACE);
+  FIELD<double> * field = new FIELD<double>(sup, 1);
+  field->setName("temperature");
+  field->setComponentName(1,"T"); field->setMEDComponentUnit(1,"K");
+  double *tab=(double *)field->getValue();
+  for(int i=0;i<nFaces;i++)
+    tab[i]=i*(1.22);
+  //field->setIterationNumber(-1);
+  field->setTime(12.);
+  id=field->addDriver(MED_DRIVER,"out.med",field->getName());
+  field->write(id);
+  delete field;
+  delete meshing;
+  //
+  MED medObj(MED_DRIVER,"out.med");
+  MESH *mesh=medObj.getMesh("TESTMESH");
+  MED_MESH_RDONLY_DRIVER22 *drv=new MED_MESH_RDONLY_DRIVER22("out.med",mesh);
+  drv->desactivateFacesComputation();
+  int newDrv=mesh->addDriver(*drv);
+  delete drv;
+  mesh->read(newDrv);
+  FIELD<double> *f=(FIELD<double> *)medObj.getField("temperature",-1,-1);
+  f->read();
+  const int *conn=mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_FACE,MED_ALL_ELEMENTS);
+  for (int j = 0; j < nFaces; j++) {
+      for (int k = 0; k < 4; k++) {
+        cout << conn[4*j+k] << " ";
+        CPPUNIT_ASSERT_EQUAL(conn[4*j+k], connQuad4[4*j+k]);
+      }
+      cout << endl;
+    }
 }

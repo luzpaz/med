@@ -40,6 +40,9 @@ namespace MEDMEM {
 
 /* Modify the following line to add a new driver type (step 1) */
 typedef enum { MED_DRIVER = 0, GIBI_DRIVER = 1, PORFLOW_DRIVER = 2, ENSIGHT_DRIVER = 250, VTK_DRIVER = 254, ASCII_DRIVER = 3, NO_DRIVER = 255 } driverTypes;
+  class GENDRIVER;
+  ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
+
 class MEDMEM_EXPORT GENDRIVER {
 
 protected :
@@ -118,6 +121,7 @@ public:
   virtual void readFileStruct ( void );
   // MESH related Part
   virtual void setMeshName    ( const string & meshName);
+  virtual string getMeshName() const { return string(""); }
   // FIELD related Part
   virtual void setFieldName   ( const string & fieldName);
 
@@ -125,7 +129,7 @@ public:
   int    getId       ( void ) const ;
   string getFileName () const;
   void   setFileName ( const string & fileName);
-  MED_EN::med_mode_acces getAccessMode() const;
+  virtual MED_EN::med_mode_acces getAccessMode() const;
 };
 };
 

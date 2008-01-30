@@ -42,12 +42,12 @@ class MED_MESH_DRIVER22 : public virtual MED_MESH_DRIVER
 {
 protected:
   
-  med_2_2::med_idt  _medIdt ;
+  med_2_3::med_idt  _medIdt ;
   
 public :
 
   // all MED cell type
-  static const med_2_2::med_geometrie_element all_cell_type[MED_NBR_GEOMETRIE_MAILLE];
+  static const med_2_3::med_geometrie_element all_cell_type[MED_NBR_GEOMETRIE_MAILLE];
   
   static const char * const all_cell_type_tab [MED_NBR_GEOMETRIE_MAILLE];
 
@@ -58,8 +58,8 @@ public :
   /*!
     Constructor.
   */
-  MED_MESH_DRIVER22(const string & fileName,  
-		    MESH * ptrMesh, 
+  MED_MESH_DRIVER22(const string & fileName,
+		    MESH * ptrMesh,
 		    MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.
@@ -85,7 +85,7 @@ public :
 
 class MED_MESH_RDONLY_DRIVER22 : public virtual IMED_MESH_RDONLY_DRIVER, public virtual MED_MESH_DRIVER22
 {
- 
+
 public :
   
   /*!
@@ -110,6 +110,17 @@ public :
     Read MESH in the specified file.
   */
   void read ( void );
+  /*!
+   *  This method activate global faces computation from SCRATCH if a family on FACE exists in the MED file.
+   *  This implies a complete renumbering of FACES. This is the default behaviour of this driver.
+   */
+  void activateFacesComputation() { _computeFaces=true; }
+  /*!
+   *  This method desactivate global face computation.
+   *  That is to say that FACES described in file are supposed to
+   *  be correct and complete. The consequence is that reading is much faster. Use with care !
+   */
+  void desactivateFacesComputation() { _computeFaces=false; }
 
 private:
   int getCOORDINATE();
@@ -122,6 +133,8 @@ private:
 
   GENDRIVER * copy ( void ) const ;
 
+private:
+  bool _computeFaces;
 };
 
 /*!

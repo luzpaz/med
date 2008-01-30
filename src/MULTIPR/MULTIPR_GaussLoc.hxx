@@ -90,7 +90,7 @@ public:
      * \param  pCooElt (in)  coordinates of nodes of an element.
      * \param  pCoo    (out) coordinates of all the Gauss points (interlaced); memory must have been allocated.
      */
-    void getCoordGaussPoints(const med_float* pCooElt, med_float* pCooGaussPoints) const;
+    void getCoordGaussPoints(const med_float* pCooElt, med_float* pCooGaussPoints, int nb_gauss) const;
     
     //---------------------------------------------------------------------
     // I/O

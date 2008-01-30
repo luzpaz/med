@@ -52,7 +52,14 @@ public:
      * Builds an empty set of elements (default constructor).
      */
     Elements();
-    
+
+    /** 
+     * Builds an empty set of elements with of the defined geometry type.
+     * \param pGeomType The geometry type.
+     */
+    Elements(med_geometrie_element pGeomType);
+
+        
     /**
      * Destructor. Removes everything.
      */
@@ -138,7 +145,15 @@ public:
      * \param  pSetIndices set of indices (start at 1).
      * \return a restriction of this set of elements.
      */
-    Elements* extractSubSet(const std::set<med_int>& pSetIndices) const;
+    Elements*   extractSubSet(const std::set<med_int>& pSetIndices) const;
+    
+    /**
+     * Create a subset of elements containing the given nodes. 
+     * \param pSetOfNodes The set of nodes.
+     * \param pSubSetOfElements The subset of elements to fill.
+     * \throw IllegalStateException if pSetOfNodes and pSubSetOfElements are not different.
+     */
+    void        extractSubSetFromNodes(const std::set<med_int>& pSetOfNodes, std::set<med_int>& pSubSetOfElements) const;
     
     /**
      * Returns the set of indices (starting at 1) of all nodes used by this set of elements.
@@ -157,8 +172,18 @@ public:
      * Remaps this set of elements such that indices of nodes are continous 1 2 3 4 5 ... *
      * This method is intended to be used after extractSubSet().
      */
-    void remap();
+    void remap(void);
     
+	
+    /**
+     * Remaps this set of elements such that indices of nodes are continous 1 2 3 4 5 ... *
+     * This method is intended to be used after extractSubSet().
+	 * This remap method allows to use the same set of nodes with several mesh type.
+	 * \param pSetOfNodes The set of nodes index extracted from the original med file.
+     */
+    void remap(std::set<med_int>& pSetOfNodes);
+	
+	
     /**
      * Builds a new set of elements by merging two set of elements (this and pElements) if possible.
      * Merge is partial because Id and Names are not take into account.
@@ -168,7 +193,7 @@ public:
      * \throw  IllegalStateException if the two sets of elements are incompatible.
      */
     Elements* mergePartial(Elements* pElements, int pOffset);
-    Elements* mergePartial(std::vector<Elements*> pElements, std::vector<int> pOffsets);
+    Elements* mergePartial(std::vector<Elements*> pElements, std::vector<int>& pOffsets);
     
     //---------------------------------------------------------------------
     // I/O

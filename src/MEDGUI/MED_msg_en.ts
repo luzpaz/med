@@ -28,8 +28,8 @@
             <translation>Warning</translation>
         </message>
         <message>
-            <source>MEN_DISPLAY</source>
-            <translation>Display</translation>
+            <source>MEN_SHOW</source>
+            <translation>Show</translation>
         </message>
         <message>
             <source>MEN_DUMPMESH</source>
@@ -40,8 +40,8 @@
             <translation>Dump SubMesh</translation>
         </message>
         <message>
-            <source>MEN_ERASE</source>
-            <translation>Erase</translation>
+            <source>MEN_HIDE</source>
+            <translation>Hide</translation>
         </message>
         <message>
             <source>MEN_EXPLORE</source>
@@ -60,8 +60,8 @@
             <translation>Popup test</translation>
         </message>
         <message>
-            <source>STB_DISPLAY</source>
-            <translation>Display</translation>
+            <source>STB_SHOW</source>
+            <translation>Show</translation>
         </message>
         <message>
             <source>STB_DUMPMESH</source>
@@ -72,8 +72,8 @@
             <translation>dump Mesh</translation>
         </message>
         <message>
-            <source>STB_ERASE</source>
-            <translation>Erase</translation>
+            <source>STB_HIDE</source>
+            <translation>Hide</translation>
         </message>
         <message>
             <source>STB_EXPLORE</source>
@@ -96,8 +96,8 @@
             <translation>Med Toolbar</translation>
         </message>
         <message>
-            <source>TOP_DISPLAY</source>
-            <translation>Display</translation>
+            <source>TOP_SHOW</source>
+            <translation>Show</translation>
         </message>
         <message>
             <source>TOP_DUMPMESH</source>
@@ -108,8 +108,8 @@
             <translation>Dump SubMesh</translation>
         </message>
         <message>
-            <source>TOP_ERASE</source>
-            <translation>Erase</translation>
+            <source>TOP_HIDE</source>
+            <translation>Hide</translation>
         </message>
         <message>
             <source>TOP_EXPLORE</source>

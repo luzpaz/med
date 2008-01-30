@@ -169,7 +169,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
       int len       = _fileName.size() ;
       string prefix = _fileName.substr(0,len-5); // extraction de .case
       (*_ensightFile) << "# Mesh " << i+1 << " detected with name = " << MeshNames[i] << endl ;
-      (*_ensightFile) << "model: " << i+1 << " " << prefix << "-" << i+1 << ".geom"  << endl ;
+      (*_ensightFile) << "model: " << prefix << "-" << i+1 << ".geom"  << endl ;
     }
   }
   (*_ensightFile) << endl ;
@@ -508,9 +508,15 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       }
 
       const int * value;
-      ArrayIntNo * myArray;
+      ArrayIntNo * myArray = 0;
       if ( myField->getInterlacingType() == MED_FULL_INTERLACE ) {
 	myArray = ArrayConvert( *( dynamic_cast< FIELD<int,FullInterlace>* >
+				   (myField)->getArrayNoGauss() 
+				   )
+				);
+	value = myArray->getPtr();
+      } else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
+	myArray = ArrayConvert2No( *( dynamic_cast< FIELD<int,NoInterlaceByType>* >
 				   (myField)->getArrayNoGauss() 
 				   )
 				);
@@ -522,9 +528,9 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       for (int i=0; i<NumberOfValue; i++) {
 	for(int j=0; j<NumberOfComponents; j++)
 	  ensightDataFile << setw(12) << value[j*NumberOfValue+i] ;
-     }
-      if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
-	delete[] myArray;
+      }
+      if ( myField->getInterlacingType() != MED_NO_INTERLACE )
+	delete myArray;
       break ;
     }
     case MED_REEL64 : {
@@ -541,9 +547,15 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       }
 
       const double * value;
-      ArrayDoubleNo * myArray;
+      ArrayDoubleNo * myArray = 0;
       if ( myField->getInterlacingType() == MED_FULL_INTERLACE ) {
 	myArray = ArrayConvert( *( dynamic_cast< FIELD<double,FullInterlace>* >
+				   (myField)->getArrayNoGauss()
+				   )
+				);
+	value = myArray->getPtr();
+      } else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
+	myArray = ArrayConvert2No( *( dynamic_cast< FIELD<double,NoInterlaceByType>* >
 				   (myField)->getArrayNoGauss()
 				   )
 				);
@@ -566,9 +578,8 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       }
       ensightDataFile << endl ;
 
-// genere un core  !?!?
-//       if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
-// 	delete[] myArray;
+      if ( myField->getInterlacingType() != MED_NO_INTERLACE )
+ 	delete myArray;
 
       break ;
     }
@@ -672,7 +683,7 @@ void ENSIGHT_MED_RDONLY_DRIVER::read() {
   vector<double> var ;
 
   char ligne[80]; 
-  int number_of_geom ;
+  //int number_of_geom ;
   string geom_namefile ;
 //   vector<string> field_namefile ;
   string field_namefile ;

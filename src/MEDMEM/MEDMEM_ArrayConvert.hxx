@@ -90,6 +90,74 @@ ArrayConvert(
 };
 
 template  <class T, class CHECKING_POLICY>
+MEDMEM_Array<T, FullInterlaceGaussPolicy, CHECKING_POLICY> *
+ArrayConvert(
+	     const MEDMEM_Array< T, NoInterlaceByTypeGaussPolicy, CHECKING_POLICY > &array, T* values=0
+	     )
+{
+  MEDMEM_Array<T,FullInterlaceGaussPolicy,CHECKING_POLICY> * myArray;
+  if(values)
+    myArray = new MEDMEM_Array<T, FullInterlaceGaussPolicy,CHECKING_POLICY> (
+									   values,
+									   array.getDim(),
+									   array.getNbElem(),
+									   array.getNbGeoType(),
+									   array.getNbElemGeoC(),
+									   array.getNbGaussGeo(),
+									   true,false
+									   );
+  else
+    myArray = new MEDMEM_Array<T, FullInterlaceGaussPolicy,CHECKING_POLICY> (
+									   array.getDim(),
+									   array.getNbElem(),
+									   array.getNbGeoType(),
+									   array.getNbElemGeoC(),
+									   array.getNbGaussGeo()
+									   );
+  for (int i=1; i <= array.getNbElem() ; i++ )
+    for (int k=1; k<= array.getNbGauss(i); k++ )
+      for (int j=1; j<= array.getDim(); j++ )
+        myArray->setIJK(i,j,k,array.getIJK(i,j,k));
+  
+  return myArray;
+
+}
+
+template  <class T, class CHECKING_POLICY>
+MEDMEM_Array<T, NoInterlaceGaussPolicy, CHECKING_POLICY> *
+ArrayConvert2No(
+	     const MEDMEM_Array< T, NoInterlaceByTypeGaussPolicy, CHECKING_POLICY > &array, T* values=0
+	     )
+{
+  MEDMEM_Array<T,NoInterlaceGaussPolicy,CHECKING_POLICY> * myArray;
+  if(values)
+    myArray = new MEDMEM_Array<T, NoInterlaceGaussPolicy,CHECKING_POLICY> (
+									   values,
+									   array.getDim(),
+									   array.getNbElem(),
+									   array.getNbGeoType(),
+									   array.getNbElemGeoC(),
+									   array.getNbGaussGeo(),
+									   true,false
+									   );
+  else
+    myArray = new MEDMEM_Array<T, NoInterlaceGaussPolicy,CHECKING_POLICY> (
+									   array.getDim(),
+									   array.getNbElem(),
+									   array.getNbGeoType(),
+									   array.getNbElemGeoC(),
+									   array.getNbGaussGeo()
+									   );
+  for (int i=1; i <= array.getNbElem() ; i++ )
+    for (int k=1; k<= array.getNbGauss(i); k++ )
+      for (int j=1; j<= array.getDim(); j++ )
+        myArray->setIJK(i,j,k,array.getIJK(i,j,k));
+  
+  return myArray;
+
+};
+
+template  <class T, class CHECKING_POLICY>
 MEDMEM_Array<T, NoInterlaceNoGaussPolicy, CHECKING_POLICY> *
 ArrayConvert(
 	     const MEDMEM_Array< T, FullInterlaceNoGaussPolicy, CHECKING_POLICY > &array, T* values=0
@@ -111,6 +179,58 @@ ArrayConvert(
     for (int j=1; j<= array.getDim(); j++ )
       myArray->setIJ(i,j,array.getIJ(i,j));
 
+  return myArray;
+
+};
+
+template  <class T, class CHECKING_POLICY>
+MEDMEM_Array<T, FullInterlaceNoGaussPolicy, CHECKING_POLICY> *
+ArrayConvert(
+	     const MEDMEM_Array< T, NoInterlaceByTypeNoGaussPolicy, CHECKING_POLICY > &array, T* values=0
+	     )
+{
+  MEDMEM_Array<T,FullInterlaceNoGaussPolicy,CHECKING_POLICY> * myArray;
+  if(values)
+    myArray=new MEDMEM_Array<T, FullInterlaceNoGaussPolicy, CHECKING_POLICY> ( values,
+									     array.getDim(),
+									     array.getNbElem(),
+									     true,false
+									     );
+  else
+    myArray = new MEDMEM_Array<T, FullInterlaceNoGaussPolicy, CHECKING_POLICY> (
+									      array.getDim(),
+									      array.getNbElem()
+									      );
+  for (int i=1; i <= array.getNbElem() ; i++ )
+    for (int j=1; j<= array.getDim(); j++ )
+      myArray->setIJ(i,j,array.getIJ(i,j));
+  
+  return myArray;
+
+}
+
+template  <class T, class CHECKING_POLICY>
+MEDMEM_Array<T, NoInterlaceNoGaussPolicy, CHECKING_POLICY> *
+ArrayConvert2No(
+	     const MEDMEM_Array< T, NoInterlaceByTypeNoGaussPolicy, CHECKING_POLICY > &array, T* values=0
+	     )
+{
+  MEDMEM_Array<T,NoInterlaceNoGaussPolicy,CHECKING_POLICY> * myArray;
+  if(values)
+    myArray=new MEDMEM_Array<T, NoInterlaceNoGaussPolicy, CHECKING_POLICY> ( values,
+									     array.getDim(),
+									     array.getNbElem(),
+									     true,false
+									     );
+  else
+    myArray = new MEDMEM_Array<T, NoInterlaceNoGaussPolicy, CHECKING_POLICY> (
+									      array.getDim(),
+									      array.getNbElem()
+									      );
+  for (int i=1; i <= array.getNbElem() ; i++ )
+    for (int j=1; j<= array.getDim(); j++ )
+      myArray->setIJ(i,j,array.getIJ(i,j));
+  
   return myArray;
 
 };

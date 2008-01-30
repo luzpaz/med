@@ -808,6 +808,12 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
       if ( ENSIGHT_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
 	value = ENSIGHT_FIELD_DRIVER<T>::_ptrField->getValue(); 
       }
+      else if ( ENSIGHT_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+	MEDMEM_Array_ * ptrArray = ENSIGHT_FIELD_DRIVER<T>::_ptrField->getArray();
+	MEDMEM_Array<T,NoInterlaceByTypeNoGaussPolicy> * temp = dynamic_cast<MEDMEM_Array<T,NoInterlaceByTypeNoGaussPolicy> * >  ( ptrArray );
+	MEDMEM_Array<T,NoInterlaceNoGaussPolicy> * array = ArrayConvert2No( *temp );
+	value = array->getPtr();
+      }
       else {
 	MEDMEM_Array_ * ptrArray = ENSIGHT_FIELD_DRIVER<T>::_ptrField->getArray();
 	MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * temp = dynamic_cast<MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * >  ( ptrArray );
@@ -827,7 +833,7 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
 	}
       }
   
-      if ( ENSIGHT_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) delete value;
+      if ( ENSIGHT_FIELD_DRIVER<T>::_ptrField->getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete value;
       break ;
     }
 
@@ -847,6 +853,12 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
       const T * value;
       if ( ENSIGHT_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE )
 	value = ENSIGHT_FIELD_DRIVER<T>::_ptrField->getValue();
+      else if ( ENSIGHT_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+	MEDMEM_Array_ * ptrArray = ENSIGHT_FIELD_DRIVER<T>::_ptrField->getArray();
+	MEDMEM_Array<T,NoInterlaceByTypeNoGaussPolicy> * temp = dynamic_cast<MEDMEM_Array<T,NoInterlaceByTypeNoGaussPolicy> * >  ( ptrArray );
+	MEDMEM_Array<T,NoInterlaceNoGaussPolicy> * array = ArrayConvert2No( *temp ); // ici ca pond un p'tain de core //  
+	value = array->getPtr();
+      }
       else {
 	MEDMEM_Array_ * ptrArray = ENSIGHT_FIELD_DRIVER<T>::_ptrField->getArray();
 	MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * temp = dynamic_cast<MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * >  ( ptrArray );
@@ -866,7 +878,7 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
 	}
       }
  
-      if ( ENSIGHT_FIELD_DRIVER<T>::_ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) delete value;
+      if ( ENSIGHT_FIELD_DRIVER<T>::_ptrField->getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete value;
       ensightDataFile << endl ;
       break ;
     }

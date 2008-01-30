@@ -5,18 +5,13 @@
 # Modified by : Mikhail PONIKAROV (OCN)
 #
 
-AC_INIT([Salome2 Project MED module], [4.0.0])
+AC_INIT([Salome2 Project MED module], [5.0.0], [webmaster.salome@opencascade.com], [salome])
 AC_CONFIG_AUX_DIR(salome_adm/unix/config_files)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 
-PACKAGE=salome
-AC_SUBST(PACKAGE)
-
-VERSION=4.0.0
-XVERSION=0x040000
-AC_SUBST(VERSION)
+XVERSION=`echo $VERSION | awk -F. '{printf("0x%02x%02x%02x",$1,$2,$3)}'`
 AC_SUBST(XVERSION)
 
 # set up MODULE_NAME variable for dynamic construction of directories (resources, etc.)
@@ -238,25 +233,26 @@ echo "MED_WITH_GUI   : ${MED_WITH_GUI}"
 echo ---------------------------------------------
 
 openpbs_ok=no
-echo
-echo ---------------------------------------------
-echo testing OpenPBS
-echo ---------------------------------------------
-echo
+# CHECK_OPENPBS ONLY if MED_WITH_KERNEL=yes
+# echo
+# echo ---------------------------------------------
+# echo testing OpenPBS
+# echo ---------------------------------------------
+# echo
 
-CHECK_OPENPBS
-dnl openpbs_ok is set to yes by CHECK_OPENPBS
+# CHECK_OPENPBS
+# dnl openpbs_ok is set to yes by CHECK_OPENPBS
 
-echo
-echo ---------------------------------------------
-echo testing LSF
-echo ---------------------------------------------
-echo
+# CHECK_LSF ONLY if MED_WITH_KERNEL=yes
+# echo
+# echo ---------------------------------------------
+# echo testing LSF
+# echo ---------------------------------------------
+# echo
 
 lsf_ok=no
-CHECK_LSF
-dnl lsf_ok is set to yes by CHECK_LSF
-
+# CHECK_LSF
+# dnl lsf_ok is set to yes by CHECK_LSF
 
 echo
 echo ----------------------------------------------
@@ -264,13 +260,14 @@ echo testing CPPUNIT only required for unit testing
 echo ----------------------------------------------
 echo
 CHECK_CPPUNIT
+#AM_CONDITIONAL(CPPUNIT_IS_OK, test)
 
 echo
 echo ---------------------------------------------
 echo checking SPLITTER
 echo ---------------------------------------------
 echo
-AC_ENABLE_SPLITTER(no)
+AC_ENABLE_SPLITTER(yes)
 AM_CONDITIONAL(MED_ENABLE_SPLITTER, [test "$ENABLE_SPLITTER" = yes])
 
 if test "x$ENABLE_SPLITTER" = "xyes"; then
@@ -292,23 +289,40 @@ if test "x$ENABLE_SPLITTER" = "xyes"; then
     CHECK_SCOTCH 
     dnl scotch_ok is set to yes by CHECK_SCOTCH	 
 
+
+    echo        
+    echo --------------------------------------------- 
+    echo testing LIBXML2
+    echo ---------------------------------------------
+    echo libxml_ok=no 
+    CHECK_LIBXML 
+    dnl libxml_ok is set to yes by CHECK_LIBXML         
+
 fi
 
 AM_CONDITIONAL(MED_ENABLE_METIS, [test "$ENABLE_METIS" = yes])
 AM_CONDITIONAL(MED_ENABLE_SCOTCH, [test "$ENABLE_SCOTCH" = yes])
-	
+
 
 if test "${MED_WITH_KERNEL}" = "yes"; then
 {
 
 
-	dnl
-	dnl ---------------------------------------------
-	dnl testing WITHIHM
-	dnl ---------------------------------------------
-	dnl
+        echo
+        echo ---------------------------------------------
+        echo testing OpenPBS
+        echo ---------------------------------------------
+        echo
 
-	CHECK_WITHIHM
+        CHECK_OPENPBS
+
+        echo
+        echo ---------------------------------------------
+        echo testing LSF
+        echo ---------------------------------------------
+        echo
+
+        CHECK_LSF
 
 	dnl
 	dnl ---------------------------------------------
@@ -328,7 +342,7 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	test x$openpbs_ok = xyes || test x$lsf_ok = xyes && WITH_BATCH=yes
 	AC_SUBST(WITH_BATCH)
 
-	if test "X$WITHIHM" = "Xyes"; then
+	if test "${MED_WITH_GUI}" = "yes"; then
 		echo
 		echo ---------------------------------------------
 		echo testing LEX \& YACC
@@ -379,6 +393,8 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	corba=make_$ORB
 	CORBA=adm_local/unix/$corba
 
+	if test "${MED_WITH_GUI}" = "yes"; then
+
 	echo
 	echo ---------------------------------------------
 	echo testing openGL
@@ -395,15 +411,13 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 
 	CHECK_QT
 
-	if test "X$WITHIHM" = "Xyes"; then
-		echo
-		echo ---------------------------------------------
-		echo testing VTK
-		echo ---------------------------------------------
-		echo
+	echo
+	echo ---------------------------------------------
+	echo testing VTK
+	echo ---------------------------------------------
+	echo
 
-		CHECK_VTK
-	fi
+	CHECK_VTK
 
 	echo
 	echo ---------------------------------------------
@@ -412,6 +426,7 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	echo
 
 	CHECK_CAS
+	fi
 
 	echo
 	echo ---------------------------------------------
@@ -429,14 +444,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 
 	dnl CHECK_MICO
 
-	dnl echo
-	dnl echo ---------------------------------------------
-	dnl echo testing MSG2QM
-	dnl echo ---------------------------------------------
-	dnl echo
-
-	dnl CHECK_MSG2QM
-
 	echo
 	echo ---------------------------------------------
 	echo Testing html generators
@@ -444,8 +451,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	echo
 
 	CHECK_HTML_GENERATORS
-
-
 }
 else
 {
@@ -496,11 +501,12 @@ fi
 
 #variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok boost_ok doxygen_ok graphviz_ok OpenGL_ok qt_ok vtk_ok omniORB_ok occ_ok Kernel_ok"
 
-if test "X$WITHIHM" = "Xyes"; then
-variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok"
+if test "${MED_WITH_GUI}" = "yes"; then
+variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok cppunit_ok"
 fi
-if test "X$WITHIHM" = "Xno"; then
-variables="cc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok hdf5_ok med2_ok omniORB_ok occ_ok Kernel_ok"
+
+if test "${MED_WITH_GUI}" = "no"; then
+variables="cc_ok mpi_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok occ_ok Kernel_ok cppunit_ok"
 fi
 
 for var in $variables
@@ -515,7 +521,7 @@ done
 dnl optional variables 
 
 echo "---Optional:"
-variables="metis_ok scotch_ok"
+variables="metis_ok scotch_ok libxml_ok"
 for var in $variables
      do
          eval toto=\$$var
@@ -527,7 +533,7 @@ for var in $variables
 
 if test "${MED_WITH_KERNEL}" = "yes"; then
 {
-        variables="cppunit_ok openpbs_ok lsf_ok doxygen_ok graphviz_ok"
+        variables="openpbs_ok lsf_ok doxygen_ok graphviz_ok"
  
         for var in $variables
         do
@@ -570,6 +576,9 @@ AC_OUTPUT([ \
 	./adm_local/unix/config_files/Makefile \
         ./adm_local/unix/Makefile \
 	./adm_local/Makefile \
+	./adm_local_without_kernel/unix/config_files/Makefile \
+        ./adm_local_without_kernel/unix/Makefile \
+	./adm_local_without_kernel/Makefile \
 	./resources/Makefile
 	./resources/MEDCatalog.xml \
 	./bin/Makefile \
@@ -587,10 +596,6 @@ AC_OUTPUT([ \
 	./src/MEDMEM/Doxyfile_med_user \
 	./src/MEDMEM/Makefile \
 	./src/MEDMEM/Test/Makefile \
-	./doc/MEDMEM/MEDMEM_Content.tex \
-	./doc/MEDMEM/MEDMEM_UML_light.png \
-	./doc/MEDMEM/MEDMEM_UML.png \
-	./doc/MEDMEM/MEDMEM_UsersGuide.tex \
 	./src/INTERPOLATION/Makefile \
 	./src/MEDMEM_SWIG/Makefile \
 	./src/MEDSPLITTER/Makefile \
@@ -619,8 +624,16 @@ AC_OUTPUT([ \
 	./src/MedClient/test/test2/Makefile \
 	./src/MEDGUI/Makefile \
 	./doc/Makefile \
+	./doc/MEDMEM/Makefile \
+	./doc/MEDMEM/MEDMEM_Content.tex \
+	./doc/MEDMEM/MEDMEM_UML_light.png \
+	./doc/MEDMEM/MEDMEM_UML.png \
+	./doc/MEDMEM/MEDMEM_UsersGuide.tex \
 	./doc/salome/Makefile \
 	./doc/salome/tui/Makefile \
+	./doc/salome/tui/MED/Makefile \
+	./doc/salome/tui/MED/sources/Makefile \
+	./doc/salome/tui/MED/sources/static/Makefile \
 	./doc/salome/tui/MED/doxyfile \
 	./doc/salome/tui/MED/sources/static/tree.js
 ])

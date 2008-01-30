@@ -120,10 +120,10 @@ void CONNECTIVITYClient::blankCopy()
 // has not calculated nodal connectivity of dimension d-1, heavy method
 // (CPU and memory) calculateDecsendingConnectivity is called on this
 // server for a potentially useless information for client side . (by Anthony GEAY)
-//   if ( Entity == MED_CELL ) {
-//     Entity = ( IOR_Mesh->getMeshDimension() == 3 ? MED_FACE : MED_EDGE );
-//     _constituent = new CONNECTIVITYClient( IOR_Mesh, Entity );
-//   }
+   if ( Entity == MED_CELL ) {
+     Entity = ( IOR_Mesh->getMeshDimension() == 3 ? MED_FACE : MED_EDGE );
+     _constituent = new CONNECTIVITYClient( IOR_Mesh, Entity );
+   }
 
   _complete = false;
 
@@ -224,7 +224,8 @@ void CONNECTIVITYClient::fillCopy()
     }
 
     delete[] Count;
-    
+    if (_constituent)
+      ((CONNECTIVITYClient *)_constituent)->fillCopy();
     _complete = true;
   }
 

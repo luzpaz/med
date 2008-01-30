@@ -17,6 +17,6 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 # 
 
-SUBDIRS= salome
+SUBDIRS= MEDMEM salome
 
-EXTRA_DIST= MEDMEM html
+EXTRA_DIST= html

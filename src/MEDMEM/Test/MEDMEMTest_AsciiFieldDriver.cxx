@@ -199,21 +199,17 @@ void MEDMEMTest::testAsciiFieldDriver()
   // and write the field on disk
 
   // must throw because the file is not opened
-#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) Invalid opened/closed state management
+
   CPPUNIT_ASSERT_THROW(aDriver1->write(), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aDriver1->close(), MEDEXCEPTION);
-#endif
 
   aDriver1->open();
 
   // must throw because the file is opened
-#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) Invalid opened/closed state management
+
   CPPUNIT_ASSERT_THROW(aDriver1->open(), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aDriver1->setFileName("anyfile2"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aDriver1->setFileName(anyfile1), MEDEXCEPTION);
-#endif
+
 
   // must throw because it is a writeonly driver
   CPPUNIT_ASSERT_THROW(aDriver1->read(), MEDEXCEPTION);
@@ -222,11 +218,9 @@ void MEDMEMTest::testAsciiFieldDriver()
   aDriver1->close();
 
   // must throw because the file is not opened
-#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) Invalid opened/closed state management
+
   CPPUNIT_ASSERT_THROW(aDriver1->write(), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aDriver1->close(), MEDEXCEPTION);
-#endif
 
   // check priority definition
   int spaceDimension = aMesh->getSpaceDimension();

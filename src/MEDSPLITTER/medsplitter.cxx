@@ -33,6 +33,7 @@ namespace po=boost::program_options;
 #endif
 
 #include <string>
+#include <fstream>
 
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Mesh.hxx"
@@ -58,6 +59,8 @@ int main(int argc, char** argv)
   // by parsing the command line
   bool mesh_only = false;
   bool is_sequential = true;
+  bool xml_output_master=true;
+  bool creates_boundary_faces=false;  
   string input;
   string output;
   string meshname;
@@ -82,7 +85,9 @@ int main(int argc, char** argv)
 #endif
 #endif
     ("ndomains",po::value<int>(&ndomains)->default_value(1),"number of subdomains in the output file")
-    ;
+    ("plain-master","creates a plain masterfile instead of an XML file")
+    ("creates-boundary-faces","creates the necessary faces so that faces joints are created in the output files")
+  ;
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc,argv,desc),vm);
@@ -94,12 +99,25 @@ int main(int argc, char** argv)
     return 1;
   }
 
+  if (!vm.count("ndomains"))
+  {
+    cout << "ndomains must be specified !"<<endl;
+    return 1;
+  }
+
   ndomains = vm["ndomains"].as<int>();
   if (!vm.count("input-file") || !vm.count("output-file"))
   {
     cout << "input-file and output-file names must be specified"<<endl;
     return 1;
   }
+
+  if (!vm.count("distributed") && !vm.count("meshname") )
+  {
+    cout << "MEDSPLITTER : for a serial MED file, mesh name must be selected with --meshname=..."<<endl;
+    return 1;
+  }
+
   input = vm["input-file"].as<string>();
   output = vm["output-file"].as<string>();
 
@@ -111,6 +129,12 @@ int main(int argc, char** argv)
 
   if (is_sequential)
     meshname = vm["meshname"].as<string>();
+
+  if (vm.count("plain-master"))
+    xml_output_master=false;
+
+  if (vm.count("creates-boundary-faces"))
+    creates_boundary_faces=true;
 
 #else // BOOST_PROGRAM_OPTIONS_LIB
 
@@ -129,6 +153,8 @@ int main(int argc, char** argv)
                "\t--split-method=<string>: name of the splitting library (metis/scotch), default is metis\n"
 #endif
 #endif
+               "\t--plain-master         : creates a plain masterfile instead of an XML file\n"
+               "\t--creates-boundary-faces: creates the necessary faces so that faces joints are created in the output files\n"
                );
 
   if (argc < 4) {
@@ -180,6 +206,14 @@ int main(int argc, char** argv)
         cout << "\tndomains = " << ndomains << endl; // tmp
       }
     }
+    else if (strncmp(argv[i],"--p",3) == 0) { // "--plain-master"
+      xml_output_master = false;
+      cout << "\txml_output_master = " << xml_output_master << endl; // tmp
+    }
+    else if (strncmp(argv[i],"--c",3) == 0) { // "--creates-boundary-faces"
+      creates_boundary_faces = true;
+      cout << "\tcreates_boundary_faces = " << creates_boundary_faces << endl; // tmp
+    }
     else {
       cout << desc.c_str() << endl;
       return 1;
@@ -194,6 +228,17 @@ int main(int argc, char** argv)
 
 #endif // BOOST_PROGRAM_OPTIONS_LIB
 
+
+  //testing whether it is possible to write a file at the specified location
+  string outputtest = output + ".testioms.";
+  ofstream testfile (outputtest.c_str());
+  if (testfile.fail())
+  { 
+    cout << "MEDSPLITTER : output-file directory does not exist or is in read-only access" << endl;
+    return 1;
+  };
+  //deletes test file
+  remove(outputtest.c_str());
 
   // Beginning of the computation
 
@@ -227,6 +272,11 @@ int main(int argc, char** argv)
 
   // Creating a new mesh collection from the partitioning
   MEDSPLITTER::MESHCollection new_collection(*collection, new_topo);
+  if (!xml_output_master)
+    new_collection.setDriverType(MEDSPLITTER::MedAscii);
+
+  new_collection.setSubdomainBoundaryCreates(creates_boundary_faces);
+
   cout << "MEDSPLITTER - writing output files "<<endl;
   new_collection.write(output);
 

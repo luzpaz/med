@@ -116,11 +116,13 @@ std::string realToString(med_float mV);
   * For each scalar field in a sequential MED file, returns its name and the related number of time stamps.
   * Do not returns info about vectorial fields (because, currently, decimation can only be performed on scalar fields).
   * \param  pMEDfilename name of any valid sequential MED file; must not be NULL.
-  * \return a list of (name, #time stamps).
+  * \param  pFields The information on the fields.
+  * \param  pAddNbGaussPoint If set to true, the number of gauss point of each field is added.
+  * \param  pMeshName Mesh name used if pAddNbGaussPoint is true.
   * \throw  NullArgumentException if pMEDfilename is NULL.
   * \throw  IOException if any other error occurs while reading MED file.
   */
- std::vector< std::pair<std::string, int> > getListScalarFields(const char* pMEDfilename);
+ void	getListScalarFields(const char* pMEDfilename, std::vector<std::pair<std::string, int> >& pFields, bool pAddNbGaussPoint = false, const char *pMeshName = NULL);
 
 } // namespace MULTIPR
 

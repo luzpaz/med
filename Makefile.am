@@ -38,11 +38,11 @@ if MED_ENABLE_GUI
 endif
 
 SUBDIRS+= resources bin
-DIST_SUBDIRS= adm_local idl src doc resources bin
+DIST_SUBDIRS= adm_local adm_local_without_kernel idl src doc resources bin
 
 DISTCLEANFILES= a.out aclocal.m4 configure 
 
-EXTRA_DIST+= build_configure clean_configure LICENCE INSTALL README adm_local_without_kernel
+EXTRA_DIST+= build_configure clean_configure LICENCE INSTALL README
 
 dist-hook:
 	rm -rf `find . -name CVS`

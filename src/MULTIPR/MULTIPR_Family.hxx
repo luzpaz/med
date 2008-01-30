@@ -29,6 +29,7 @@ extern "C"
 #include <set>
 #include <map>
 
+#include "MULTIPR_Mesh.hxx"
 
 namespace multipr
 {
@@ -139,6 +140,12 @@ public:
     med_int getId() const { return mId; }
     
     /**
+     * Set the identifier of this family.
+     * \param pId The identifier.
+     */
+    void    setId(med_int pId) { mId = pId; };
+     
+    /**
      * Returns the name of this Family.
      * \return the name of this Family.
      */
@@ -159,15 +166,16 @@ public:
     /**
      * Inserts a new element (by its index) into this Family.
      * \param  pIndexElt index of the element to be added; must be >= 1.
+	 * \param  pMeshIndex Index of the mesh (eMED_TETRA4 etc...). Default value when its a family of nodes.
      * \throw  IllegalArgumentException if pIndexElt <= 0.
      */
-    void insertElt(med_int pIndexElt);
+    void insertElt(med_int pIndexElt, eMeshType pMeshIndex = eMED_POINT1); 
     
     /**
      * Returns the number of elements in this Family.
      * \return the number of elements in this Family.
      */
-    int getSize() const { return mElt.size(); }
+    int getSize(eMeshType pMeshIndex = eMED_POINT1) const { return mElt[pMeshIndex].size(); }
     
     //---------------------------------------------------------------------
     // Algorithms
@@ -193,6 +201,12 @@ public:
      */
     Family* extractGroup(const char* pGroupName);
     
+	/**
+     * Returns the set of all the elements referenced in this Family.
+     * \return the set of all the elements referenced in this Family.
+     */
+    const std::set<med_int>& getSetOfElt(eMeshType pMeshIndex) const { return mElt[pMeshIndex]; }
+	
     //---------------------------------------------------------------------
     // I/O
     //---------------------------------------------------------------------
@@ -233,7 +247,7 @@ private:
     
     char                     mName[MED_TAILLE_NOM + 1];   /** Name of the Family */
     med_int                  mId;               /**< Id: > 0 if family of nodes; < 0 if family of elements. */
-    std::set<med_int>        mElt;              /**< Set of all the elements (by their index in 1..*). */
+    std::set<med_int>        mElt[eMaxMedMesh]; /**< Set of all the elements (by their index in 1..*). */
     std::string              mStrNameGroups;    /**< A string with name of all groups which contain the Family. */
     std::vector<std::string> mNameGroups;       /**< List of groups (by name) which contain the Family. */
     Attributs                mAttributs;        /**< All the attributed related to the Family. */
@@ -309,21 +323,29 @@ public:
     /**
      * Adds the index of a new element to this Group.
      * \param  pIndexElt must be >= 1.
+     * \param pMeshIndex The index of the mesh type.
      */
-    void insertElt(med_int pIndexElt);
+    void insertElt(med_int pIndexElt, eMeshType pMeshIndex);
+    
+    /**
+     * Set a complete set of elements.
+     * \param pMeshIndex The index of the mesh type.
+     * \param pSetOfElt The set of elements.
+     */
+    void setSetOfElt(eMeshType pMeshIndex, const std::set<med_int>& pSetOfElt) { mElt[pMeshIndex] = pSetOfElt; };
     
     /**
      * Returns the set of all the elements referenced in this Group.
      * \return the set of all the elements referenced in this Group.
      */
-    const std::set<med_int>& getSetOfElt() const { return mElt; }
+    const std::set<med_int>& getSetOfElt(eMeshType pMeshIndex) const { return mElt[pMeshIndex]; }
     
     /**
      * Returns the number of elements referenced in this Group.
      * \return the number of elements referenced in this Group.
      */
-    int getSize() const { return mElt.size(); }
-    
+    int getSize(eMeshType pMeshIndex) const { return mElt[pMeshIndex].size(); }
+	
     //---------------------------------------------------------------------
     // I/O
     //---------------------------------------------------------------------
@@ -345,11 +367,11 @@ public:
 private:
     
     std::string        mName;            /**< Name of the group. */
-    std::set<med_int>  mElt;             /**< All elements of this group; each element is referenced by its index >= 1; each element is unique. */
+    std::set<med_int>  mElt[eMaxMedMesh];             /**< All elements of this group; each element is referenced by its index >= 1; each element is unique. */
     bool               mIsGroupOfNodes;  /**< Is it a group of nodes or a group of elements? */
     
     bool               mFlagPrintAll;    /** Flag to control the behaviour of the stream operator <<. */
-    
+	
 private:
 
     // do not allow copy constructor

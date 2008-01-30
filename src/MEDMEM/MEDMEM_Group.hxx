@@ -41,7 +41,10 @@
 */
 
 namespace MEDMEM {
-class FAMILY;
+  class FAMILY;
+  class GROUP;
+  ostream & operator<<(ostream &os, GROUP &my) ;
+
 class MEDMEM_EXPORT GROUP : virtual public SUPPORT
 {
 protected :

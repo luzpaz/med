@@ -42,7 +42,7 @@ using namespace std;
 
 const char* multipr::getVersion()
 {
-    return "1.0.5";
+    return "2.0.1";
 }
 
 
@@ -54,10 +54,12 @@ void multipr::partitionneDomaine(const char* pMEDfilename, const char* pMeshName
     //---------------------------------------------------------------------
     // Read the sequential mesh
     //---------------------------------------------------------------------
-    cout << "Read sequential MED file: " << pMEDfilename << ": please wait... " << endl;
+    cout << "Read sequential MED file: " <<
+    pMEDfilename << ": please wait... " << endl;
     
     multipr::Mesh mesh;
-    mesh.readSequentialMED(pMEDfilename, pMeshName);
+    mesh.readSequentialMED(pMEDfilename, pMeshName, false);
+    std::vector<Group*>* lGroups = mesh.getGroups();
     cout << mesh << endl;
     
     //---------------------------------------------------------------------
@@ -69,15 +71,19 @@ void multipr::partitionneDomaine(const char* pMEDfilename, const char* pMeshName
     
     try
     {
+        GaussIndexList*	lGaussList;
         meshDis = mesh.splitGroupsOfElements();
-    
+        lGaussList = mesh.editGaussIndex();
+        std::vector<Profil*>& lProfils = mesh.getProfils();
         //-------------------------------------------------------------
         // Write distributed mesh
         //-------------------------------------------------------------
         cout << "Write distributed mesh: please wait... " << endl;
         string strPrefix = removeExtension(pMEDfilename, ".med");    
         meshDis->writeDistributedMED(strPrefix.c_str());
-        
+        meshDis->readAndWriteFields(pMeshName, lGroups, lGaussList, lProfils);
+        // need to delete some garb
+        lGaussList->clear();
         delete meshDis;
     }
     catch (RuntimeException& e)
@@ -88,7 +94,7 @@ void multipr::partitionneDomaine(const char* pMEDfilename, const char* pMeshName
 }
 
 
-void multipr::partitionneGrain(
+void multipr::partitionneGroupe(
     const char* pMEDfilename, 
     const char* pGroupName, 
     int         pNbParts, 
@@ -140,10 +146,7 @@ void multipr::decimePartition(
     const char* pFieldName,
     int         pFieldIt,
     const char* pFilterName,
-    double      pTMed,
-    double      pTLow,
-    double      pRadius,
-    int         pBoxing)
+    const char*	pFilterParams)
 {
     //---------------------------------------------------------------------
     // Check arguments
@@ -152,12 +155,14 @@ void multipr::decimePartition(
     if (pPartName == NULL) throw NullArgumentException("pPartName should not be NULL", __FILE__, __LINE__);
     if (pFieldName == NULL) throw NullArgumentException("pFieldName should not be NULL", __FILE__, __LINE__);
     if (pFieldIt < 1) throw IllegalArgumentException("pFieldIt: invalid field iteration; should be >= 1", __FILE__, __LINE__);
-    if (pTMed < 0.0) throw IllegalArgumentException("med res.: threshold must be > 0", __FILE__, __LINE__);
+    /*
+	if (pTMed < 0.0) throw IllegalArgumentException("med res.: threshold must be > 0", __FILE__, __LINE__);
     if (pTMed >= pTLow) throw IllegalArgumentException("threshold for med res. must be < threshold for low res.", __FILE__, __LINE__);
     if (pRadius <= 0.0) throw IllegalArgumentException("radius should be > 0", __FILE__, __LINE__);
     if ((pBoxing < 1) || (pBoxing > 200)) throw IllegalArgumentException("boxing should be in [1..200]", __FILE__, __LINE__);
+	*/
     
-    cout << "--decim file=" << pMEDfilename << " part=" << pPartName << " filter=" << pFilterName << " tmed=" << pTMed << " tlow=" << pTLow << " radius=" << pRadius << endl;
+    //cout << "--decim file=" << pMEDfilename << " part=" << pPartName << " filter=" << pFilterName << " tmed=" << pTMed << " tlow=" << pTLow << " radius=" << pRadius << endl;
     
     //---------------------------------------------------------------------
     // Read the distributed mesh
@@ -179,10 +184,7 @@ void multipr::decimePartition(
         pFieldName,
         pFieldIt,
         pFilterName,
-        pTMed,
-        pTLow,
-        pRadius,
-        pBoxing);
+        pFilterParams);
     cout << meshDis << endl;
     
     //---------------------------------------------------------------------
@@ -200,7 +202,7 @@ int multipr::merge(
     const char*              pMEDFilenameDst)
 {
     if (pMEDFilenameSrc.size() < 2) throw IllegalArgumentException("list must contain two files at least", __FILE__, __LINE__);
-    if (pMeshName == NULL) throw NullArgumentException("pMeshName1 should not be NULL", __FILE__, __LINE__);
+    if (pMeshName == NULL) throw NullArgumentException("pMeshName should not be NULL", __FILE__, __LINE__);
     if (pMEDFilenameDst == NULL)  throw NullArgumentException("pMEDFilenameDst should not be NULL", __FILE__, __LINE__);
     
     //---------------------------------------------------------------------
@@ -210,9 +212,8 @@ int multipr::merge(
     for (unsigned i = 0 ; i < pMEDFilenameSrc.size() ; i++)
     {
         multipr::Mesh* mesh = new multipr::Mesh();
-        mesh->readSequentialMED(pMEDFilenameSrc[i].c_str(), pMeshName);
-        //mesh->setPrintAll(true);
-        //cout << (*mesh) << endl;
+        mesh->readSequentialMED(pMEDFilenameSrc[i].c_str(), 1);
+
         if (mesh->getNumberOfElements() != 0)
         {
             meshes.push_back(mesh);
@@ -244,7 +245,7 @@ int multipr::merge(
     //meshMerged->setPrintAll(true);
     //cout << (*meshMerged) << endl;
     
-    meshMerged->writeMED(pMEDFilenameDst);
+    meshMerged->writeMED(pMEDFilenameDst, pMeshName);
     
     delete meshMerged;
     delete meshFirst;

@@ -618,12 +618,21 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   // IL EST POSSIBLE D'AVOIR LES DEUX BOUCLES D'ECRITURE POUR EVITER
   // DE CONVERTIR LE CHAMP DANS LE BON TYPE D'ENTRELACEMENT
   const T * value;
+  MEDMEM_Array_ * tmpArray = 0;
   if ( _ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE )
     value = _ptrField->getValue();
+  else if ( _ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+    MEDMEM_Array_ * ptrArray = _ptrField->getArray();
+    MEDMEM_Array<T,NoInterlaceByTypeNoGaussPolicy> * temp = dynamic_cast<MEDMEM_Array<T,NoInterlaceByTypeNoGaussPolicy> * >  ( ptrArray );
+    MEDMEM_Array<T,NoInterlaceNoGaussPolicy> * array = ArrayConvert2No( *temp );
+    tmpArray = array;
+    value = array->getPtr();
+  }
   else {
     MEDMEM_Array_ * ptrArray = _ptrField->getArray();
     MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * temp = dynamic_cast<MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * >  ( ptrArray );
     MEDMEM_Array<T,NoInterlaceNoGaussPolicy> * array = ArrayConvert( *temp );
+    tmpArray = array;
     value = array->getPtr();
   }
 
@@ -634,8 +643,8 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
       (*_vtkFile) << endl ;
     }
   
-  if ( _ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
-    delete value;
+  if ( _ptrField->getInterlacingType() != MED_EN::MED_NO_INTERLACE )
+    delete tmpArray;
   END_OF(LOC);
 }
 
@@ -715,12 +724,21 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" there are more than 4 components !"));
 
   const T * value ;
+  MEDMEM_Array_ * tmpArray = 0;
   if ( _ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE )
     value = _ptrField->getValue();
+  else if ( _ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+    MEDMEM_Array_ * ptrArray = _ptrField->getArray();
+    MEDMEM_Array<T,NoInterlaceByTypeNoGaussPolicy> * temp = dynamic_cast<MEDMEM_Array<T,NoInterlaceByTypeNoGaussPolicy> * >  ( ptrArray );
+    MEDMEM_Array<T,NoInterlaceNoGaussPolicy> * array = ArrayConvert2No( *temp );
+    tmpArray = array;
+    value = array->getPtr();
+  }
   else {
     MEDMEM_Array_ * ptrArray = _ptrField->getArray();
     MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * temp = dynamic_cast<MEDMEM_Array<T,FullInterlaceNoGaussPolicy> * >  ( ptrArray );
     MEDMEM_Array<T,NoInterlaceNoGaussPolicy> * array = ArrayConvert( *temp );
+    tmpArray = array;
     value = array->getPtr();
   }
 
@@ -731,8 +749,8 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
       (*_vtkFile) << endl ;
     }
 
-  if ( _ptrField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE )
-    delete value;
+  if ( _ptrField->getInterlacingType() != MED_EN::MED_NO_INTERLACE )
+    delete tmpArray;
 
   END_OF(LOC);
 }

@@ -46,6 +46,7 @@ public :
   virtual void addReference() const;
   virtual void removeReference() const;
   virtual void write(int index=0, const string & driverName = "");
+  virtual void printMySelf(ostream &os) const;
 
 private:
   virtual ~MESHClient();

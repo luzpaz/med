@@ -17,11 +17,11 @@
 
 #include "MULTIPR_Utils.hxx"
 #include "MULTIPR_Exceptions.hxx"
+#include "MULTIPR_Mesh.hxx"
 
 #include <iostream>
 
 using namespace std;
-
 
 //*****************************************************************************
 // Implementation
@@ -79,42 +79,44 @@ string multipr::getFilenameWithoutPath(const char* pFilename)
 
 string multipr::getPath(const char* pFilename)
 {
-    // find (reverse) the first occurrence of '/' in the given string
-    char* res = strrchr(pFilename, '/');
-    
-    // if there is no '/'...
-    if (res == NULL)
-    {
-        return "";
-    }
-    else
-    {
-        int size = res - pFilename + 1;
-        char path[256];
-        memcpy(path, pFilename, size);
-        path[size] = '\0';
-        return path;
-    }
+  // find (reverse) the first occurrence of '/' in the given string
+  std::string aFilename(pFilename);
+  std::string::size_type aPos = aFilename.rfind('/');
+
+  if ( aPos == std::string::npos )
+    return "";
+
+  aFilename = aFilename.substr( 0, aPos + 1 );
+  while ( true ) {
+    aPos = aFilename.find( "//" );
+
+    if ( aPos == std::string::npos )
+      break;
+
+    aFilename.replace( aPos, 2, "/" );
+  }
+
+  return aFilename;
 }
 
 
 void multipr::copyFile(const char* pFilename, const char* pDestDir)
 {
-    const char* srcDir = multipr::getPath(pFilename).c_str();
-    if (strcmp(srcDir, pDestDir) == 0) return;
-    
-    const char* filenameWithoutPath = multipr::getFilenameWithoutPath(pFilename).c_str();
-    char pDstFilename[256];
-    sprintf(pDstFilename, "%s%s", pDestDir, filenameWithoutPath);
-    
+    std::string srcDir = multipr::getPath(pFilename);
+    if (strcmp(srcDir.c_str(), pDestDir) == 0) return;
+
+    std::string filenameWithoutPath = multipr::getFilenameWithoutPath(pFilename);
+    std::string pDstFilename (pDestDir);
+    pDstFilename += filenameWithoutPath;
+
     // open binary source file
     FILE* src = fopen(pFilename, "rb");
     if (src == NULL) return;
-    
+
     // open (create) binary destination file
-    FILE* dst = fopen(pDstFilename, "wb");
+    FILE* dst = fopen(pDstFilename.c_str(), "wb");
     if (dst == NULL) return;
-    
+
     const int size = 65536; // size of buffer is 64Kb
     char* buf = new char[size];
     int ret;
@@ -124,7 +126,7 @@ void multipr::copyFile(const char* pFilename, const char* pDestDir)
         fwrite(buf, 1, ret, dst); // write to destination
         ret = fread(buf, 1, size, src); // read from source
     }
-    
+
     delete[] buf;
     fclose(src);
     fclose(dst);
@@ -215,48 +217,51 @@ vector<string> multipr::getListMeshes(const char* pMEDfilename)
 }
 
 
-vector<pair<string,int> > multipr::getListScalarFields(const char* pMEDfilename)
+void multipr::getListScalarFields(const char* pMEDfilename, vector<pair<string, int> >& pFields, bool pAddNbGaussPoint, const char *pMeshName)
 {
     if (pMEDfilename == NULL) throw multipr::NullArgumentException("", __FILE__, __LINE__);
-    
-    vector<pair<string, int> > res;
     med_err ret;
-    
+    med_int ngauss = 0;
+    bool    isOnNodes = true;
     //---------------------------------------------------------------------
     // Open MED file (READ_ONLY)
     //---------------------------------------------------------------------
     med_idt file = MEDouvrir(const_cast<char*>(pMEDfilename), MED_LECTURE); // open MED file for reading
     if (file <= 0) throw multipr::IOException("MED file not found or not a sequential MED file", __FILE__, __LINE__);
-    
+
     //---------------------------------------------------------------------
     // Read number of fields
     //---------------------------------------------------------------------
     med_int numFields = MEDnChamp(file, 0);
-    if (numFields <= 0) throw IOException("", __FILE__, __LINE__);
-    
+    if (numFields < 0) throw IOException("Can't read number of fields.", __FILE__, __LINE__);
+    if (numFields == 0)
+    {
+        return ;
+    }
+
     //---------------------------------------------------------------------
     // For each field, read its name
     //---------------------------------------------------------------------
     for (int itField = 1 ; itField <= numFields ; itField++)
     {
-        char           name[MED_TAILLE_NOM + 1];
-        med_type_champ type;
+        char*           name = new char[MED_TAILLE_NOM + 1024];
+        med_type_champ  type;
+        med_int         numComponents = MEDnChamp(file, itField);
         
-        med_int numComponents = MEDnChamp(file, itField);
-    
-        if (numComponents < 0) throw IOException("", __FILE__, __LINE__);
+        if (numComponents < 0) throw IOException("Number of component less than zero.", __FILE__, __LINE__);
         
         // collect scalar field only (not vectorial fields)
-        if (numComponents != 1) 
+        if (numComponents != 1)
+        {
             continue;
-        
+        }
         // temporary buffers
         char* strComponent = new char[numComponents * MED_TAILLE_PNOM + 1];
         char* strUnit      = new char[numComponents * MED_TAILLE_PNOM + 1];
-        
         strComponent[0] = '\0';
         strUnit[0] = '\0';
         
+        // Get field info.
         med_err ret = MEDchampInfo(
             file, 
             itField, 
@@ -265,44 +270,96 @@ vector<pair<string,int> > multipr::getListScalarFields(const char* pMEDfilename)
             strComponent, 
             strUnit, 
             numComponents);
-        
-        if (ret != 0) throw IOException("", __FILE__, __LINE__);
-        
         delete[] strUnit;
         delete[] strComponent;
+        if (ret != 0) throw IOException("Can't get information on a field.", __FILE__, __LINE__);
         
+        // Get number of time step on nodes.
         med_int numTimeStamps = MEDnPasdetemps(
             file, 
             name, 
             MED_NOEUD, 
             (med_geometrie_element) 0);
+        if (numTimeStamps < 0) throw IOException("Can't get number of time steps on nodes", __FILE__, __LINE__);
         
-        if (numTimeStamps < 0) throw IOException("", __FILE__, __LINE__);
-        
+        // Get the number of time step on elements.
         if (numTimeStamps == 0)
         {
-            numTimeStamps = MEDnPasdetemps(
-                file, 
-                name, 
-                MED_MAILLE, 
-                MED_TETRA10);
-        
-            if (numTimeStamps  < 0) throw IOException("", __FILE__, __LINE__);    
-            
+            for (int i = 0; i < eMaxMedMesh; ++i)
+            {
+                numTimeStamps = MEDnPasdetemps(
+                    file, 
+                    name, 
+                    MED_MAILLE, 
+                    CELL_TYPES[i]);
+                if (numTimeStamps > 0)
+                {
+                    isOnNodes = false;
+                    break;
+                }
+            }
         }
-        
+
+        if (numTimeStamps  < 0) throw IOException("Can't get number of time steps on elements", __FILE__, __LINE__);    
+        // For GUI only : add the nomber of gauss points to the string.
+        if (pAddNbGaussPoint == true && pMeshName != NULL)
+        {
+            char*       tmp = new char[1024];
+            char*       tmp2 = new char[1024];
+            med_booleen local;
+            med_int     numdt, numo, nmaa;
+            med_float   dt;
+            med_int     nb_values = -1;
+
+            if (isOnNodes)
+            {
+                // Get number of gauss points on nodes.
+                ret = MEDpasdetempsInfo(file, name, MED_NOEUD, (med_geometrie_element) 0, 1, &ngauss, &numdt, &numo, tmp2, &dt, tmp, &local, &nmaa);
+                nb_values = MEDnVal(file, name, MED_NOEUD,(med_geometrie_element) 0, numdt, numo, const_cast<char*>(pMeshName), MED_COMPACT);
+            }
+            else
+            {
+                // Get number of gauss points on elements.
+                // For each geometry type.
+                for (int itCell = 0 ; itCell < eMaxMedMesh ; ++itCell)
+                {
+                    tmp[0] = '\0';
+                    // For each time step.
+                    for (int j = 1; j <= numTimeStamps; ++j)
+                    {
+                        ret = MEDpasdetempsInfo(file, name, MED_MAILLE, const_cast<med_geometrie_element*>(CELL_TYPES)[itCell], j, &ngauss, &numdt, &numo, tmp2, &dt, tmp, &local, &nmaa);
+                        // If we can get info on this field, it must exist.
+                        if (ret == 0)
+                        {
+                            nb_values = MEDnVal(file, name, MED_MAILLE,const_cast<med_geometrie_element*>(CELL_TYPES)[itCell], numdt, numo, const_cast<char*>(pMeshName), MED_COMPACT);
+                            if (nb_values > 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    // We got what we need : don't need to go further.
+                    if (ret == 0)
+                    {
+                        break;
+                    }
+                    
+                }
+            }
+            tmp[0] = '\0';
+            sprintf(tmp, "%s : %d gauss points", name, nb_values);
+            sprintf(name, "%s", tmp);
+        }
+
         // add the pair(name, #time stamps) to the result
-        res.push_back( make_pair(name, numTimeStamps) );
+        pFields.push_back(make_pair(name, numTimeStamps));
     }
-    
+	
     //---------------------------------------------------------------------
     // Close the MED file
     //---------------------------------------------------------------------
     ret = MEDfermer(file);
     if (ret != 0) throw multipr::IOException("i/o error while closing MED file", __FILE__, __LINE__);
-    
-    // return the list of fields
-    return res;
 }
 
 

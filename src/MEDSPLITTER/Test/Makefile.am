@@ -30,9 +30,16 @@ dist_libMEDSPLITTERTest_la_SOURCES= \
 
 salomeinclude_HEADERS = MEDSPLITTERTest.hxx
 
-libMEDSPLITTERTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(KERNEL_CXXFLAGS) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
-	-I$(srcdir)/.. -I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM
+libMEDSPLITTERTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) \
+	$(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ $(BOOST_CPPFLAGS) $(LIBXML_CXXFLAGS) \
+	-I$(srcdir)/.. -I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM \
+	-I$(srcdir)/../../MEDMEM/Test
 libMEDSPLITTERTest_la_LDFLAGS= @CPPUNIT_LIBS@
+
+if MED_ENABLE_KERNEL
+    libMEDSPLITTERTest_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
+    libMEDSPLITTERTest_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
+endif
 
 if MED_ENABLE_METIS
   libMEDSPLITTERTest_la_CPPFLAGS+= $(METIS_CPPFLAGS)
@@ -49,8 +56,12 @@ bin_PROGRAMS= TestMEDSPLITTER
 TestMEDSPLITTER_SOURCES= TestMEDSPLITTER.cxx
 
 TestMEDSPLITTER_CPPFLAGS= $(libMEDSPLITTERTest_la_CPPFLAGS) 
-TestMEDSPLITTER_LDADD= $(MED2_LIBS) $(libMEDSPLITTERTest_la_LDFLAGS) -lm ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics \
-	libMEDSPLITTERTest.la ../../MEDWrapper/V2_1/Core/libmed_V2_1.la ../../MEDMEM/libmedmem.la ../libmedsplitter.la
+TestMEDSPLITTER_LDADD= $(MED2_LIBS) $(libMEDSPLITTERTest_la_LDFLAGS) -lm \
+	libMEDSPLITTERTest.la ../../MEDWrapper/V2_1/Core/libmed_V2_1.la \
+	../../MEDMEM/libmedmem.la ../libmedsplitter.la
+if MED_ENABLE_KERNEL
+     TestMEDSPLITTER_LDADD+= -lSALOMEBasics
+endif
 
 salomescript_DATA = testMEDSPLITTER.py
 UNIT_TEST_PROG = TestMEDSPLITTER

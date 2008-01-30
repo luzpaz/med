@@ -146,6 +146,7 @@ void MEDSPLITTERTest::testMESHCollection_read_seq()
 	//  /////////////////////////////////////////////
   string meshname="maa1";
   MESHCollection collection(filename_rd,meshname);
+	collection.setDriverType(MEDSPLITTER::MedAscii);
   CPPUNIT_ASSERT_EQUAL(meshname,collection.getName());
   string newname = "New_name";
   collection.setName(newname);
@@ -154,7 +155,7 @@ void MEDSPLITTERTest::testMESHCollection_read_seq()
   CPPUNIT_ASSERT_EQUAL(systemname,collection.getSystem());
   CPPUNIT_ASSERT_EQUAL(3,collection.getMeshDimension());
   CPPUNIT_ASSERT_EQUAL(3,collection.getSpaceDimension());
-  
+	
   collection.write(filename_seq_wr);
   
   //Reading from the master file
@@ -176,14 +177,15 @@ void MEDSPLITTERTest::testMESHCollection_read_para()
   if (tmp_dir == "")
     tmp_dir = "/tmp";
   string filename_rd                = data_dir + "/MedFiles/pointe_import22.med";  
-  string filename_para_wr            = tmp_dir + "/myWrField_seq_pointe22_";
-  string filename_para_med0           = tmp_dir + "/myWrField_seq_pointe22_1.med";
-  string filename_para_med1           = tmp_dir + "/myWrField_seq_pointe22_2.med";
+  string filename_para_wr            = tmp_dir + "/myWrField_para_pointe22_";
+	string filename_xml                = tmp_dir + "/myWrField_para_pointe22_.xml";
+  string filename_para_med0           = tmp_dir + "/myWrField_para_pointe22_1.med";
+  string filename_para_med1           = tmp_dir + "/myWrField_para_pointe22_2.med";
   
   
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
-  aRemover.Register(filename_para_wr);
+  aRemover.Register(filename_xml);
   aRemover.Register(filename_para_med0);
   aRemover.Register(filename_para_med1);
   
@@ -202,7 +204,7 @@ void MEDSPLITTERTest::testMESHCollection_read_para()
   new_collection.write(filename_para_wr);
     
   CPPUNIT_ASSERT_EQUAL(meshname,new_collection.getName());
-  MESHCollection new_collection2(filename_para_wr);
+  MESHCollection new_collection2(filename_xml);
   CPPUNIT_ASSERT_EQUAL(collection.getName(),new_collection2.getName());
   
   MESHCollection new_collection3(filename_para_med0,"maa1_1");
@@ -268,12 +270,10 @@ void MEDSPLITTERTest::testMESHCollection_square()
   aRemover.Register(filename_wr_1);
   aRemover.Register(filename_wr_2);
   
-  
   char meshname[20]  = "carre_en_quad4";
   char meshname1[20]  = "carre_en_quad4_1";
   char meshname2[20]  = "carre_en_quad4_2";
-  
-  
+    
   MESHCollection collection(filename_rd,meshname);
   MEDSPLITTER::Topology* topo;
 #ifdef ENABLE_METIS
@@ -300,10 +300,10 @@ void MEDSPLITTERTest::testMESHCollection_square()
   
   
   //testing number of joints
-  med_2_2::med_idt fid1 = med_2_2::MEDouvrir(const_cast<char*> (filename_wr_1.c_str()),med_2_2::MED_LECTURE);
-  med_2_2::med_idt fid2 = med_2_2::MEDouvrir(const_cast<char*> (filename_wr_2.c_str()),med_2_2::MED_LECTURE);
-  int nj1= med_2_2::MEDnJoint(fid1, meshname1);
-  int nj2= med_2_2::MEDnJoint(fid2, meshname2);
+  med_2_3::med_idt fid1 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_1.c_str()),med_2_3::MED_LECTURE);
+  med_2_3::med_idt fid2 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_2.c_str()),med_2_3::MED_LECTURE);
+  int nj1= med_2_3::MEDnJoint(fid1, meshname1);
+  int nj2= med_2_3::MEDnJoint(fid2, meshname2);
   CPPUNIT_ASSERT_EQUAL(nj1,1);
   CPPUNIT_ASSERT_EQUAL(nj2,1);
        
@@ -313,89 +313,90 @@ void MEDSPLITTERTest::testMESHCollection_square()
   char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
   char desc2[MED_TAILLE_DESC], maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
   int dom1, dom2;
-  med_2_2::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
-  med_2_2::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
+  med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
+  med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
+	CPPUNIT_ASSERT(strcmp(jn1,"joint_2")==0);
+	CPPUNIT_ASSERT(strcmp(jn2,"joint_1")==0);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
   
   // testing node-node correspondency
-  med_2_2::med_entite_maillage typ_ent_loc=med_2_2::MED_NOEUD;
-  med_2_2::med_entite_maillage typ_ent_dist=med_2_2::MED_NOEUD;
-  med_2_2::med_geometrie_element typ_geo_loc= med_2_2::MED_POINT1;
-  med_2_2::med_geometrie_element typ_geo_dist= med_2_2::MED_POINT1;
+  med_2_3::med_entite_maillage typ_ent_loc=med_2_3::MED_NOEUD;
+  med_2_3::med_entite_maillage typ_ent_dist=med_2_3::MED_NOEUD;
+  med_2_3::med_geometrie_element typ_geo_loc= med_2_3::MED_POINT1;
+  med_2_3::med_geometrie_element typ_geo_dist= med_2_3::MED_POINT1;
 
-  int n1 = med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  med_2_2::med_int* tab = new med_2_2::med_int[2*n1];
+  int n1 = med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::med_int* tab = new med_2_3::med_int[2*n1];
    
-  med_2_2::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
     
-  med_2_2::med_int tabreference1[6] = {2,1,3,4,6,5};
+  med_2_3::med_int tabreference1[6] = {2,1,3,4,6,5};
   for (int i=0; i<2*n1; i++)
 		CPPUNIT_ASSERT_EQUAL(tab[i],tabreference1[i]);
 
   delete[] tab;
 
-  int n2 =med_2_2::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  tab = new med_2_2::med_int[2*n2];
+  int n2 =med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  tab = new med_2_3::med_int[2*n2];
 
-  med_2_2::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
 
-  med_2_2::med_int tabreference2[] = {1,2,4,3,5,6};
+  med_2_3::med_int tabreference2[] = {1,2,4,3,5,6};
   for (int i=0; i<2*n1; i++)
 		CPPUNIT_ASSERT_EQUAL(tab[i],tabreference2[i]);
   delete[] tab;
 
   //testing nodes global numbering
-  med_2_2::med_int* num = new med_2_2::med_int[6];
-  cout <<"Reading global "<<
-		MEDglobalNumLire(fid1, meshname1, num, 6, typ_ent_loc, typ_geo_loc)<<endl;
+  med_2_3::med_int* num = new med_2_3::med_int[6];
+  cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 6, typ_ent_loc, typ_geo_loc) << endl;
   
-  med_2_2::med_int globnoderef1[] = {4,5,2,1,7,8};
+  med_2_3::med_int globnoderef1[] = {4,5,2,1,7,8};
 
   for (int i=0; i<6; i++)
 		CPPUNIT_ASSERT_EQUAL(num[i],globnoderef1[i]);
   delete[] num;
 
   //testing nodes global numbering
-  num = new med_2_2::med_int[6];
+  num = new med_2_3::med_int[6];
   MEDglobalNumLire(fid2, meshname2, num, 6, typ_ent_loc, typ_geo_loc);
-  med_2_2::med_int globnoderef2[] = {5,6,3,2,8,9};
+  med_2_3::med_int globnoderef2[] = {5,6,3,2,8,9};
   for (int i=0; i<6; i++)
     CPPUNIT_ASSERT_EQUAL(num[i],globnoderef2[i]);
   delete[] num;
 
   //testing cell-cell correspondency
-  typ_ent_loc=med_2_2::MED_MAILLE;
-  typ_ent_dist=med_2_2::MED_MAILLE;
-  typ_geo_loc= med_2_2::MED_QUAD4;
-  typ_geo_dist= med_2_2::MED_QUAD4;
+  typ_ent_loc=med_2_3::MED_MAILLE;
+  typ_ent_dist=med_2_3::MED_MAILLE;
+  typ_geo_loc= med_2_3::MED_QUAD4;
+  typ_geo_dist= med_2_3::MED_QUAD4;
   //joint1
-  n1=med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  n1=med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
   CPPUNIT_ASSERT_EQUAL(n1,2);
-  tab = new med_2_2::med_int[2*n1];
-  med_2_2::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  tab = new med_2_3::med_int[2*n1];
+  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
 
-  med_2_2::med_int tabreferencecell1[4] = {1,1,2,2};
+  med_2_3::med_int tabreferencecell1[4] = {1,1,2,2};
   for (int i=0; i<2*n1; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
 
-  n2=med_2_2::MEDjointnCorres(fid2,meshname2,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
   CPPUNIT_ASSERT_EQUAL(n2,2);
   delete[] tab;
   //joint2
-  tab = new med_2_2::med_int[2*n2];
-  med_2_2::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  tab = new med_2_3::med_int[2*n2];
+  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
 
-  med_2_2::med_int tabreferencecell2[4] = {1,1,2,2};
+  med_2_3::med_int tabreferencecell2[4] = {1,1,2,2};
   for (int i=0; i<n2; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell2[i]);
 
   delete[]tab;
 
   //testing cells global numbering
-  num = new med_2_2::med_int[2];
+  num = new med_2_3::med_int[2];
   MEDglobalNumLire(fid1, meshname1, num, 2, typ_ent_loc, typ_geo_loc);
-  med_2_2::med_int* globcellref = new med_2_2::med_int[2];
+  med_2_3::med_int* globcellref = new med_2_3::med_int[2];
   globcellref[0]=1;
   globcellref[1]=3;
 
@@ -404,7 +405,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
   delete[] num;
 
   //testing cells global numbering
-  num = new med_2_2::med_int[2];
+  num = new med_2_3::med_int[2];
   MEDglobalNumLire(fid2, meshname2, num, 2, typ_ent_loc, typ_geo_loc);
   globcellref[0]=2;
   globcellref[1]=4;
@@ -413,6 +414,206 @@ void MEDSPLITTERTest::testMESHCollection_square()
   delete[] num;
   delete[] globcellref;
   delete topo;
+}
+
+
+void MEDSPLITTERTest::testMESHCollection_square_with_faces()
+{
+  string data_dir                   = getenv("DATA_DIR");
+  string tmp_dir                    = getenv("TMP");
+  if (tmp_dir == "")
+    tmp_dir = "/tmp";
+  string filename_rd                = data_dir + "/MedFiles/carre_en_quad4_import22.med";
+  string filename_wr                 = tmp_dir+"/carre_split_faces";
+  string filename_wr_1                = tmp_dir+"/carre_split_faces1.med";
+  string filename_wr_2                 = tmp_dir+"/carre_split_faces2.med";
+  
+  // To remove tmp files from disk
+  MEDSPLITTERTest_TmpFilesRemover aRemover;
+  aRemover.Register(filename_wr);
+  aRemover.Register(filename_wr_1);
+  aRemover.Register(filename_wr_2);
+  
+  char meshname[20]  = "carre_en_quad4";
+  char meshname1[20]  = "carre_en_quad4_1";
+  char meshname2[20]  = "carre_en_quad4_2";
+
+  /*
+  MESHCollection collection(filename_rd,meshname);
+  MEDSPLITTER::Topology* topo = collection.createPartition(2,Graph::METIS);
+  MESHCollection new_collection(collection, topo);
+  new_collection.setSubdomainBoundaryCreates(true);
+
+  //collection.write("/export/home/test_splitter");
+  new_collection.write(filename_wr);
+  new_collection.castAllFields(collection);
+  */
+
+  MESHCollection* collection = new MESHCollection (filename_rd,meshname);
+  MEDSPLITTER::Topology* topo = collection->createPartition(2,Graph::METIS);
+  MESHCollection* new_collection = new MESHCollection (*collection, topo);
+  new_collection->setSubdomainBoundaryCreates(true);
+
+  //collection.write("/export/home/test_splitter");
+  new_collection->write(filename_wr);
+  new_collection->castAllFields(*collection);
+
+  MEDMEM::MESH mesh1(MEDMEM::MED_DRIVER, filename_wr_1, meshname1);
+  MEDMEM::MESH mesh2(MEDMEM::MED_DRIVER, filename_wr_2, meshname2);
+
+  // testing number of elements for each partition
+  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+
+  CPPUNIT_ASSERT_EQUAL(nbelem1,2);
+  CPPUNIT_ASSERT_EQUAL(nbelem2,2);
+  
+  
+  //testing number of joints
+  med_2_3::med_idt fid1 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_1.c_str()),med_2_3::MED_LECTURE);
+  med_2_3::med_idt fid2 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_2.c_str()),med_2_3::MED_LECTURE);
+  int nj1= med_2_3::MEDnJoint(fid1, meshname1);
+  int nj2= med_2_3::MEDnJoint(fid2, meshname2);
+  CPPUNIT_ASSERT_EQUAL(nj1,1);
+  CPPUNIT_ASSERT_EQUAL(nj2,1);
+       
+  //testing distant domains
+    
+  char desc1[MED_TAILLE_DESC];
+  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
+  char desc2[MED_TAILLE_DESC], maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
+  int dom1, dom2;
+  med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
+  med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
+  CPPUNIT_ASSERT_EQUAL(dom1,1);
+  CPPUNIT_ASSERT_EQUAL(dom2,0);
+  
+  // testing node-node correspondency
+  med_2_3::med_entite_maillage typ_ent_loc=med_2_3::MED_NOEUD;
+  med_2_3::med_entite_maillage typ_ent_dist=med_2_3::MED_NOEUD;
+  med_2_3::med_geometrie_element typ_geo_loc= med_2_3::MED_POINT1;
+  med_2_3::med_geometrie_element typ_geo_dist= med_2_3::MED_POINT1;
+    
+  int n1 =med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::med_int* tab = new med_2_3::med_int[2*n1];
+   
+  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+    
+  med_2_3::med_int tabreference1[6] = {2,1,3,4,6,5};
+  for (int i=0; i<2*n1; i++)
+    CPPUNIT_ASSERT_EQUAL(tab[i],tabreference1[i]);
+    
+  delete[] tab;
+
+  int n2 = med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  tab = new med_2_3::med_int[2*n2];
+    
+  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+    
+  med_2_3::med_int tabreference2[]={1,2,4,3,5,6};
+  for (int i=0; i<2*n1; i++)
+    CPPUNIT_ASSERT_EQUAL(tab[i],tabreference2[i]);
+  delete[] tab;
+
+  //testing nodes global numbering
+  med_2_3::med_int* num = new med_2_3::med_int[6];
+  cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 6, typ_ent_loc, typ_geo_loc) << endl;
+
+  med_2_3::med_int globnoderef1[]={4,5,2,1,7,8};
+
+  for (int i=0; i<6; i++)
+    CPPUNIT_ASSERT_EQUAL(num[i],globnoderef1[i]);
+  delete[] num;
+
+  //testing nodes global numbering
+  num = new med_2_3::med_int[6];
+  MEDglobalNumLire(fid2, meshname2, num, 6, typ_ent_loc, typ_geo_loc);
+  med_2_3::med_int globnoderef2[]={5,6,3,2,8,9};
+  for (int i=0; i<6; i++)
+    CPPUNIT_ASSERT_EQUAL(num[i],globnoderef2[i]);
+  delete[] num;
+  
+  //testing cell-cell correspondency
+  typ_ent_loc=med_2_3::MED_MAILLE;
+  typ_ent_dist=med_2_3::MED_MAILLE;
+  typ_geo_loc= med_2_3::MED_QUAD4;
+  typ_geo_dist= med_2_3::MED_QUAD4;
+  //joint1
+  n1=med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  CPPUNIT_ASSERT_EQUAL(n1,2);
+  tab = new med_2_3::med_int[2*n1];
+  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+    
+  med_2_3::med_int tabreferencecell1[4]={1,1,2,2};
+  for (int i=0; i<2*n1; i++)
+    CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
+            
+  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  CPPUNIT_ASSERT_EQUAL(n2,2);
+  delete[] tab;
+  //joint2
+  tab = new med_2_3::med_int[2*n2];
+  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+    
+  med_2_3::med_int tabreferencecell2[4]={1,1,2,2};
+  for (int i=0; i<n2; i++)
+    CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell2[i]);
+            
+  delete[]tab;
+        
+  //testing cells global numbering
+  num = new med_2_3::med_int[2];
+  MEDglobalNumLire(fid1, meshname1, num, 2, typ_ent_loc, typ_geo_loc);
+  med_2_3::med_int* globcellref = new int[2];
+  globcellref[0]=1;
+  globcellref[1]=3;
+  
+  for (int i=0; i<2; i++)
+    CPPUNIT_ASSERT_EQUAL(num[i],globcellref[i]);
+  delete[] num;
+    
+  //testing cells global numbering
+  num = new med_2_3::med_int[2];
+  MEDglobalNumLire(fid2, meshname2, num, 2, typ_ent_loc, typ_geo_loc);
+  globcellref[0]=2;
+  globcellref[1]=4;
+  for (int i=0; i<2; i++)
+    CPPUNIT_ASSERT_EQUAL(num[i],globcellref[i]);
+  delete[] num;
+  
+  //testing face/face/correspondency
+  typ_ent_loc=med_2_3::MED_MAILLE;
+  typ_ent_dist=med_2_3::MED_MAILLE;
+  typ_geo_loc= med_2_3::MED_SEG2;
+  typ_geo_dist= med_2_3::MED_SEG2;
+  //joint1
+  n1=med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  CPPUNIT_ASSERT_EQUAL(n1,2);
+  tab = new med_2_3::med_int[2*n1];
+  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+    
+  med_2_3::med_int tabreferencecell3[4]={1,1,2,2};
+  for (int i=0; i<2*n1; i++)
+    CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell3[i]);
+            
+  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  CPPUNIT_ASSERT_EQUAL(n2,2);
+  delete[] tab;
+  //joint2
+  tab = new med_2_3::med_int[2*n2];
+  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+    
+  med_2_3::med_int tabreferencecell4[4]={1,1,2,2};
+  for (int i=0; i<n2; i++)
+    CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell4[i]);
+            
+  delete[]tab;
+  
+  delete[]globcellref;
+  delete topo;   
+
+  delete collection;       
+  delete new_collection;       
 }
 
 /*
@@ -540,91 +741,96 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
   aRemover.Register(filename_wr);
   aRemover.Register(filename_wr_1);
   aRemover.Register(filename_wr_2);
-  
-  
+
   char meshname[20]  = "carre_en_quad4";
   char meshname1[20]  = "carre_en_quad4_1";
   char meshname2[20]  = "carre_en_quad4_2";
-  
-	//int partition[4]={0,1,1,0};
+
+  //int partition[4]={0,1,1,0};
   int* partition=new int[4];
   partition[0]=0;
   partition[1]=1;
   partition[2]=1;
   partition[3]=0;
-	//    
+  //
+  /*
   MESHCollection collection(filename_rd,meshname);
-  Topology* topo = collection.createPartition(partition); 
+  Topology* topo = collection.createPartition(partition);
   MESHCollection new_collection(collection, topo);
-    
+
   //collection.write("/export/home/test_splitter");
   new_collection.write(filename_wr);
   new_collection.castAllFields(collection);
-    
-    
+  */
+
+  MESHCollection* collection = new MESHCollection (filename_rd, meshname);
+  Topology* topo = collection->createPartition(partition);
+  MESHCollection* new_collection = new MESHCollection (*collection, topo);
+  new_collection->write(filename_wr);
+  new_collection->castAllFields(*collection);
+
   MEDMEM::MESH mesh1(MEDMEM::MED_DRIVER, filename_wr_1, meshname1);
   MEDMEM::MESH mesh2(MEDMEM::MED_DRIVER, filename_wr_2, meshname2);
-    
-    
+
   // testing number of elements for each partition
-  
+
   int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
   int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
   CPPUNIT_ASSERT_EQUAL(nbelem1,2);
   CPPUNIT_ASSERT_EQUAL(nbelem2,2);
-    
+
   //testing number of joints
-  med_2_2::med_idt fid1 = med_2_2::MEDouvrir(const_cast<char*>(filename_wr_1.c_str()),med_2_2::MED_LECTURE);
-  med_2_2::med_idt fid2 = med_2_2::MEDouvrir(const_cast<char*>(filename_wr_2.c_str()),med_2_2::MED_LECTURE);
-  
-  int nj1= med_2_2::MEDnJoint(fid1, meshname1);
-  int nj2= med_2_2::MEDnJoint(fid2, meshname2);
+  med_2_3::med_idt fid1 = med_2_3::MEDouvrir(const_cast<char*>(filename_wr_1.c_str()),med_2_3::MED_LECTURE);
+  med_2_3::med_idt fid2 = med_2_3::MEDouvrir(const_cast<char*>(filename_wr_2.c_str()),med_2_3::MED_LECTURE);
+
+  int nj1= med_2_3::MEDnJoint(fid1, meshname1);
+  int nj2= med_2_3::MEDnJoint(fid2, meshname2);
   CPPUNIT_ASSERT_EQUAL(nj1,1);
   CPPUNIT_ASSERT_EQUAL(nj2,1);
-  
-    
-	//testing distant domains
-    
+
+  //testing distant domains
+
   char desc1[MED_TAILLE_DESC];
   char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
-  char desc2[MED_TAILLE_DESC], maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
-  int dom1, dom2;
-  med_2_2::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
-  med_2_2::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
+  char desc2[MED_TAILLE_DESC];
+  char maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
+  //int dom1, dom2;
+  med_2_3::med_int dom1, dom2;
+  med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
+  med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
 
   // testing node-node correspondency
-  med_2_2::med_entite_maillage typ_ent_loc=med_2_2::MED_NOEUD;
-  med_2_2::med_entite_maillage typ_ent_dist=med_2_2::MED_NOEUD;
-  med_2_2::med_geometrie_element typ_geo_loc= med_2_2::MED_POINT1;
-  med_2_2::med_geometrie_element typ_geo_dist= med_2_2::MED_POINT1;
+  med_2_3::med_entite_maillage typ_ent_loc=med_2_3::MED_NOEUD;
+  med_2_3::med_entite_maillage typ_ent_dist=med_2_3::MED_NOEUD;
+  med_2_3::med_geometrie_element typ_geo_loc= med_2_3::MED_POINT1;
+  med_2_3::med_geometrie_element typ_geo_dist= med_2_3::MED_POINT1;
 
-  int n1 = med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  med_2_2::med_int* tab = new med_2_2::med_int[2*n1];
+  int n1 = med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::med_int* tab = new med_2_3::med_int[2*n1];
 
-  med_2_2::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
 
-  med_2_2::med_int tabreference1[10] = {1,7,2,1,3,4,5,6,7,2};
+  med_2_3::med_int tabreference1[10] = {1,7,2,1,3,4,5,6,7,2};
   for (int i=0; i<2*n1; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreference1[i]);
   delete[] tab;
 
-  int n2 = med_2_2::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  tab = new med_2_2::med_int[2*n2];
+  int n2 = med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  tab = new med_2_3::med_int[2*n2];
 
-  med_2_2::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
 
-  med_2_2::med_int tabreference2[10] = {1,2,2,7,4,3,6,5,7,1};
+  med_2_3::med_int tabreference2[10] = {1,2,2,7,4,3,6,5,7,1};
   for (int i=0; i<2*n2; i++)
 		CPPUNIT_ASSERT_EQUAL(tab[i],tabreference2[i]);
   delete[] tab;
 
   //testing nodes global numbering
-  med_2_2::med_int* num = new med_2_2::med_int[7];
-  cout <<"Reading global "<<
-		MEDglobalNumLire(fid1, meshname1, num, 7, typ_ent_loc, typ_geo_loc)<<endl;
-  med_2_2::med_int globnoderef1[7] = {4,5,2,1,8,9,6};
+  med_2_3::med_int* num = new med_2_3::med_int[7];
+  cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 7, typ_ent_loc, typ_geo_loc) << endl;
+  med_2_3::med_int globnoderef1[7] = {4,5,2,1,8,9,6};
 
   for (int i=0; i<7; i++)
 		CPPUNIT_ASSERT_EQUAL(num[i],globnoderef1[i]);
@@ -632,56 +838,58 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
   delete[] num;
 
   //testing nodes global numbering
-  num = new med_2_2::med_int[7];
+  num = new med_2_3::med_int[7];
   MEDglobalNumLire(fid2, meshname2, num, 7, typ_ent_loc, typ_geo_loc);
-  med_2_2::med_int globnoderef2[7] = {5,6,3,2,7,8,4};
+  med_2_3::med_int globnoderef2[7] = {5,6,3,2,7,8,4};
   for (int i=0; i<7; i++)
 		CPPUNIT_ASSERT_EQUAL(num[i],globnoderef2[i]);
   delete[] num;
 
   //testing cell-cell correspondency
-  typ_ent_loc=med_2_2::MED_MAILLE;
-  typ_ent_dist=med_2_2::MED_MAILLE;
-  typ_geo_loc= med_2_2::MED_QUAD4;
-  typ_geo_dist= med_2_2::MED_QUAD4;
+  typ_ent_loc=med_2_3::MED_MAILLE;
+  typ_ent_dist=med_2_3::MED_MAILLE;
+  typ_geo_loc= med_2_3::MED_QUAD4;
+  typ_geo_dist= med_2_3::MED_QUAD4;
   //joint1
-  n1 = med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  tab = new med_2_2::med_int[2*n1];
-  med_2_2::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  n1 = med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  tab = new med_2_3::med_int[2*n1];
+  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
 
-  med_2_2::med_int tabreferencecell1[8] = {1,1,1,2,2,1,2,2};
+  med_2_3::med_int tabreferencecell1[8] = {1,1,1,2,2,1,2,2};
   for (int i=0; i<2*n1; i++)
 		CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
 
-  n2 = med_2_2::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  n2 = med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
   delete[] tab;
   //joint2
-  tab = new med_2_2::med_int[2*n2];
-  med_2_2::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  tab = new med_2_3::med_int[2*n2];
+  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
 
-  med_2_2::med_int tabreferencecell2[8] = {1,1,1,2,2,1,2,2};
+  med_2_3::med_int tabreferencecell2[8] = {1,1,1,2,2,1,2,2};
   for (int i=0; i<n2; i++)
-		CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell2[i]);   
+		CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell2[i]);
   delete[] tab;
 
   //testing cells global numbering
-  num = new med_2_2::med_int[2];
+  num = new med_2_3::med_int[2];
   MEDglobalNumLire(fid1, meshname1, num, 2, typ_ent_loc, typ_geo_loc);
-  med_2_2::med_int globcellref1[2] = {1,4};
+  med_2_3::med_int globcellref1[2] = {1,4};
   for (int i=0; i<2; i++)
-    CPPUNIT_ASSERT_EQUAL(num[i],globcellref1[i]);   
+    CPPUNIT_ASSERT_EQUAL(num[i],globcellref1[i]);
   delete[] num;
 
   //testing cells global numbering
-  num = new med_2_2::med_int[2];
+  num = new med_2_3::med_int[2];
   MEDglobalNumLire(fid2, meshname2, num, 2, typ_ent_loc, typ_geo_loc);
-  med_2_2::med_int globcellref2[2] = {2,3};
+  med_2_3::med_int globcellref2[2] = {2,3};
   for (int i=0; i<2; i++)
-		CPPUNIT_ASSERT_EQUAL(num[i],globcellref2[i]);   
+    CPPUNIT_ASSERT_EQUAL(num[i],globcellref2[i]);
 
-  delete[] num;   
+  delete[] num;
   delete topo;
   delete[] partition;
+  delete collection;
+  delete new_collection;
 }
 
 
@@ -696,9 +904,9 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   if (tmp_dir == "")
     tmp_dir = "/tmp";
   string filename_rd                = data_dir + "/MedFiles/pointe_import22.med";  
-  string filename_para_wr            = tmp_dir + "/myWrField_para_pointe22_";
-  string filename_para_med1           = tmp_dir + "/myWrField_para_pointe22_1.med";
-  string filename_para_med2           = tmp_dir + "/myWrField_para_pointe22_2.med";
+  string filename_para_wr            = tmp_dir + "/myWrField_para1_pointe22_";
+  string filename_para_med1           = tmp_dir + "/myWrField_para1_pointe22_1.med";
+  string filename_para_med2           = tmp_dir + "/myWrField_para1_pointe22_2.med";
   string filename_para2_wr            = tmp_dir + "/myWrField_para2_pointe22_";
   string filename_para2_med1           = tmp_dir + "/myWrField_para2_pointe22_1.med";
   string filename_para2_med2           = tmp_dir + "/myWrField_para2_pointe22_2.med";
@@ -730,6 +938,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   CPPUNIT_FAIL("METIS is not available, further test execution is not possible.");
 #endif
   MESHCollection new_collection(collection, topo2);
+	new_collection.setDriverType(MEDSPLITTER::MedAscii);
   new_collection.write(filename_para_wr);
     
   MESHCollection new_collection2(filename_para_wr);
@@ -743,8 +952,75 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
 #endif
   MESHCollection new_collection3(new_collection2,topo3);
   CPPUNIT_ASSERT_EQUAL(topo3->nbCells(),topo2->nbCells());
+	new_collection3.setDriverType(MEDSPLITTER::MedAscii);
   new_collection3.write(filename_para2_wr);
+
+  MESHCollection new_collection4(filename_para2_wr);
+  Topology* topo1=new_collection4.createPartition(1,Graph::METIS);
+
+  MESHCollection new_collection_seq(new_collection4,topo1);
+  new_collection_seq.write(filename_seq_wr);
+  MEDMEM::MESH* mesh_after = new_collection_seq.getMesh(0);
+  MEDMEM::MESH* mesh_before = collection.getMesh(0);
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfNodes(), mesh_after->getNumberOfNodes());
+  delete topo2;
+  delete topo3;
+  delete topo1;
+}
+
+/*! Testing a complex scenario to involve several shared pointers
+ * on similar structures
+ */
+ 
+void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polygon()
+{
+  string data_dir                   = getenv("DATA_DIR");
+  string tmp_dir                    = getenv("TMP");
+  if (tmp_dir == "")
+    tmp_dir = "/tmp";
+  string filename_rd                = data_dir + "/MedFiles/recoll_bord.med";  
+  string filename_para_wr            = tmp_dir + "/myWrField_para_recoll_";
+  string filename_para_med1           = tmp_dir + "/myWrField_para_recoll_1.med";
+  string filename_para_med2           = tmp_dir + "/myWrField_para_recoll_2.med";
+  string filename_para2_wr            = tmp_dir + "/myWrField_para2_recoll_";
+  string filename_para2_med1           = tmp_dir + "/myWrField_para2_recoll_1.med";
+  string filename_para2_med2           = tmp_dir + "/myWrField_para2_recoll_2.med";
+  string filename_para2_med3           = tmp_dir + "/myWrField_para2_recoll_3.med";
+  string filename_seq_wr               = tmp_dir + "/myWrField_seq_recoll_";
+  string filename_seq_med               = tmp_dir + "/myWrField_seq_recoll_1.med";
   
+  
+  // To remove tmp files from disk
+  MEDSPLITTERTest_TmpFilesRemover aRemover;
+	aRemover.Register(filename_para_wr);
+  aRemover.Register(filename_para_med1);
+  aRemover.Register(filename_para_med2);
+  aRemover.Register(filename_para2_wr);
+  aRemover.Register(filename_para2_med1);
+  aRemover.Register(filename_para2_med2);
+  aRemover.Register(filename_para2_med3);
+  aRemover.Register(filename_seq_wr);
+  aRemover.Register(filename_seq_med);
+  
+  
+  string meshname="Bord";
+  MESHCollection collection(filename_rd,meshname);
+  Topology* topo2=collection.createPartition(2,Graph::METIS);
+  MESHCollection new_collection(collection, topo2);
+  new_collection.setDriverType(MEDSPLITTER::MedAscii);
+  new_collection.write(filename_para_wr);
+    
+  MESHCollection new_collection2(filename_para_wr);
+  CPPUNIT_ASSERT_EQUAL(collection.getName(),new_collection2.getName());
+  Topology* topo3=new_collection2.createPartition(3,Graph::SCOTCH);
+  MESHCollection new_collection3(new_collection2,topo3);
+  CPPUNIT_ASSERT_EQUAL(topo3->nbCells(),topo2->nbCells());
+  new_collection3.setDriverType(MEDSPLITTER::MedAscii);
+  new_collection3.write(filename_para2_wr);
+
   MESHCollection new_collection4(filename_para2_wr);
   Topology* topo1;
 #ifdef ENABLE_METIS
@@ -753,6 +1029,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   CPPUNIT_ASSERT_THROW(topo1 = new_collection4.createPartition(1,Graph::METIS), MEDEXCEPTION);
   CPPUNIT_FAIL("METIS is not available, further test execution is not possible.");
 #endif
+
   MESHCollection new_collection_seq(new_collection4,topo1);
   new_collection_seq.write(filename_seq_wr);
   MEDMEM::MESH* mesh_after = new_collection_seq.getMesh(0);
@@ -763,6 +1040,73 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
                        mesh_after->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS),
                        mesh_after->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfNodes(), mesh_after->getNumberOfNodes());
+  delete topo2;
+  delete topo3;
+  delete topo1;
+}
+
+/*! Testing a complex scenario to involve several shared pointers
+ * on similar structures
+ */
+ 
+void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polyhedra()
+{
+  string data_dir                   = getenv("DATA_DIR");
+  string tmp_dir                    = getenv("TMP");
+  if (tmp_dir == "")
+    tmp_dir = "/tmp";
+  string filename_rd                = data_dir + "/MedFiles/poly3D.med";
+  //string filename_rd = "/tmp/polyedres.med"  ;
+  string filename_para_wr            = tmp_dir + "/myWrField_para_poly3D_";
+  string filename_para_med1           = tmp_dir + "/myWrField_para_poly3D_1.med";
+  string filename_para_med2           = tmp_dir + "/myWrField_para_poly3D_2.med";
+  string filename_para2_wr            = tmp_dir + "/myWrField_para2_poly3D_";
+  string filename_para2_med1           = tmp_dir + "/myWrField_para2_poly3D_1.med";
+  string filename_para2_med2           = tmp_dir + "/myWrField_para2_poly3D_2.med";
+  string filename_para2_med3           = tmp_dir + "/myWrField_para2_poly3D_3.med";
+  string filename_seq_wr               = tmp_dir + "/myWrField_seq_poly3D_";
+  string filename_seq_med               = tmp_dir + "/myWrField_seq_poly3D_1.med";
+  
+  
+  // To remove tmp files from disk
+  MEDSPLITTERTest_TmpFilesRemover aRemover;
+  aRemover.Register(filename_para_wr);
+ aRemover.Register(filename_para_med1);
+  aRemover.Register(filename_para_med2);
+  aRemover.Register(filename_para2_wr);
+  aRemover.Register(filename_para2_med1);
+  aRemover.Register(filename_para2_med2);
+  aRemover.Register(filename_para2_med3);
+  aRemover.Register(filename_seq_wr);
+  aRemover.Register(filename_seq_med);
+  
+  
+  string meshname="poly3D";
+  MESHCollection collection(filename_rd,meshname);
+  Topology* topo2=collection.createPartition(2,Graph::METIS);
+  MESHCollection new_collection(collection, topo2);
+  new_collection.setDriverType(MEDSPLITTER::MedAscii);
+  new_collection.write(filename_para_wr);
+    
+  MESHCollection new_collection2(filename_para_wr);
+  CPPUNIT_ASSERT_EQUAL(collection.getName(),new_collection2.getName());
+  Topology* topo3=new_collection2.createPartition(3,Graph::SCOTCH);
+  MESHCollection new_collection3(new_collection2,topo3);
+  CPPUNIT_ASSERT_EQUAL(topo3->nbCells(),topo2->nbCells());
+  new_collection3.setDriverType(MEDSPLITTER::MedAscii);
+  new_collection3.write(filename_para2_wr);
+
+  MESHCollection new_collection4(filename_para2_wr);
+  Topology* topo1=new_collection4.createPartition(1,Graph::METIS);
+
+  MESHCollection new_collection_seq(new_collection4,topo1);
+  new_collection_seq.write(filename_seq_wr);
+  MEDMEM::MESH* mesh_after = new_collection_seq.getMesh(0);
+  MEDMEM::MESH* mesh_before = collection.getMesh(0);
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfNodes(), mesh_after->getNumberOfNodes());
   delete topo2;
   delete topo3;

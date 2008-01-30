@@ -26,46 +26,53 @@ lib_LTLIBRARIES = libMEDMEMTest.la
 
 salomeinclude_HEADERS = MEDMEMTest.hxx
 
-dist_libMEDMEMTest_la_SOURCES= \
-	  MEDMEMTest.cxx \
-	  MEDMEMTest_Array.cxx \
-	  MEDMEMTest_AsciiFieldDriver.cxx \
-	  MEDMEMTest_Connectivity.cxx \
-	  MEDMEMTest_Coordinate.cxx \
-	  MEDMEMTest_DriverFactory.cxx \
-	  MEDMEMTest_Exception.cxx \
-	  MEDMEMTest_Family.cxx \
-	  MEDMEMTest_Field.cxx \
-	  MEDMEMTest_Formulae.cxx \
-	  MEDMEMTest_GaussLocalization.cxx \
-          MEDMEMTest_GibiMeshDriver.cxx \
-	  MEDMEMTest_Grid.cxx \
-	  MEDMEMTest_Group.cxx \
-          MEDMEMTest_Med.cxx \
-	  MEDMEMTest_MedFieldDriver21.cxx \
-	  MEDMEMTest_MedFieldDriver22.cxx \
-	  MEDMEMTest_MedMedDriver21.cxx \
-	  MEDMEMTest_MedMedDriver22.cxx \
-	  MEDMEMTest_MedMeshDriver21.cxx \
-	  MEDMEMTest_MedMeshDriver22.cxx \
-	  MEDMEMTest_MedVersion.cxx \
-          MEDMEMTest_MeshAndMeshing.cxx \
-	  MEDMEMTest_ModulusArray.cxx \
-	  MEDMEMTest_nArray.cxx \
-          MEDMEMTest_PointerOf.cxx \
-	  MEDMEMTest_PolyhedronArray.cxx \
-	  MEDMEMTest_PorflowMeshDriver.cxx \
-          MEDMEMTest_SkyLineArray.cxx \
-          MEDMEMTest_Support.cxx \
-          MEDMEMTest_TopLevel.cxx \
-	  MEDMEMTest_Unit.cxx \
-	  MEDMEMTest_VtkFieldDriver.cxx \
-          MEDMEMTest_VtkMedDriver.cxx \
-          MEDMEMTest_VtkMeshDriver.cxx
+EXTRA_DIST += BasicMainTest.hxx
 
-libMEDMEMTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(KERNEL_CXXFLAGS) $(MED2_INCLUDES) $(HDF5_INCLUDES) \
+dist_libMEDMEMTest_la_SOURCES= \
+	MEDMEMTest.cxx \
+	MEDMEMTest_Array.cxx \
+	MEDMEMTest_AsciiFieldDriver.cxx \
+	MEDMEMTest_Connectivity.cxx \
+	MEDMEMTest_Coordinate.cxx \
+	MEDMEMTest_DriverFactory.cxx \
+	MEDMEMTest_Exception.cxx \
+	MEDMEMTest_Family.cxx \
+	MEDMEMTest_Field.cxx \
+	MEDMEMTest_Formulae.cxx \
+	MEDMEMTest_GaussLocalization.cxx \
+	MEDMEMTest_GibiMeshDriver.cxx \
+	MEDMEMTest_Grid.cxx \
+	MEDMEMTest_Group.cxx \
+	MEDMEMTest_Med.cxx \
+	MEDMEMTest_MedFieldDriver21.cxx \
+	MEDMEMTest_MedFieldDriver22.cxx \
+	MEDMEMTest_MedMedDriver21.cxx \
+	MEDMEMTest_MedMedDriver22.cxx \
+	MEDMEMTest_MedMeshDriver21.cxx \
+	MEDMEMTest_MedMeshDriver22.cxx \
+	MEDMEMTest_MedVersion.cxx \
+	MEDMEMTest_MeshAndMeshing.cxx \
+	MEDMEMTest_ModulusArray.cxx \
+	MEDMEMTest_nArray.cxx \
+	MEDMEMTest_PointerOf.cxx \
+	MEDMEMTest_PolyhedronArray.cxx \
+	MEDMEMTest_PorflowMeshDriver.cxx \
+	MEDMEMTest_SkyLineArray.cxx \
+	MEDMEMTest_Support.cxx \
+	MEDMEMTest_TopLevel.cxx \
+	MEDMEMTest_Unit.cxx \
+	MEDMEMTest_VtkFieldDriver.cxx \
+	MEDMEMTest_VtkMedDriver.cxx \
+	MEDMEMTest_VtkMeshDriver.cxx
+
+libMEDMEMTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 	-I$(srcdir)/../../MEDMEM -I$(srcdir)/../../MEDWrapper/V2_1/Core
 libMEDMEMTest_la_LDFLAGS= @CPPUNIT_LIBS@
+
+if MED_ENABLE_KERNEL
+    libMEDMEMTest_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
+    libMEDMEMTest_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
+endif
 
 # Executables targets
 bin_PROGRAMS = TestMEDMEM \
@@ -98,10 +105,12 @@ dist_MEDMEMTest_Support_fault_SOURCES= MEDMEMTest_Support_fault.cxx
 dist_MEDMEMTest_VtkFieldDriver_fault_SOURCES= MEDMEMTest_VtkFieldDriver_fault.cxx
 dist_MEDMEMTest_VtkMeshDriver_fault_SOURCES= MEDMEMTest_VtkMeshDriver_fault.cxx
 
-LDADD= $(MED2_LIBS) $(libMEDMEMTest_la_LDFLAGS) -lm  ${KERNEL_LDFLAGS} -lSALOMELocalTrace -lSALOMEBasics \
+LDADD= $(MED2_LIBS) $(libMEDMEMTest_la_LDFLAGS) -lm \
 	../../MEDWrapper/V2_1/Core/libmed_V2_1.la ../libmedmem.la libMEDMEMTest.la
+if MED_ENABLE_KERNEL
+     LDADD+= -lSALOMEBasics
+endif
 AM_CPPFLAGS= $(libMEDMEMTest_la_CPPFLAGS)
 
 salomescript_DATA = testMEDMEM.py
 UNIT_TEST_PROG = TestMEDMEM
-

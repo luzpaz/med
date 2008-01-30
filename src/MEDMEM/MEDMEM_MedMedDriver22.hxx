@@ -45,7 +45,7 @@ class MED_MED_DRIVER22 : public virtual MED_MED_DRIVER
 {
 protected:
   
-  med_2_2::med_idt           _medIdt;         // The _medIdt used to write/read Meshes to ::_filename
+  med_2_3::med_idt           _medIdt;         // The _medIdt used to write/read Meshes to ::_filename
    
   //private:
   //  MED_MED_DRIVER();

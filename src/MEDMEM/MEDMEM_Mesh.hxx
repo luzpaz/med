@@ -56,6 +56,9 @@ class CELLMODEL;
 class FAMILY;
 class GROUP;
 class SUPPORT;
+class MESH;
+
+ostream & operator<<(ostream &os, const MESH &my);
 
 class MEDMEM_EXPORT MESH : public RCBASE
 {
@@ -152,6 +155,7 @@ public :
 	const string & meshName="") throw (MEDEXCEPTION);
   virtual ~MESH();
   friend MEDMEM_EXPORT ostream & operator<<(ostream &os, const MESH &my);
+  virtual void printMySelf(ostream &os) const;
 
   int  addDriver(driverTypes driverType,
 		 const string & fileName  ="Default File Name.med",
@@ -197,6 +201,8 @@ public :
 					 MED_EN::medGeometryElement Type) const;
   virtual inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
 					MED_EN::medEntityMesh Entity) const;
+  virtual bool existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
+                                         MED_EN::medEntityMesh Entity) const;
   inline bool existPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
 					MED_EN::medEntityMesh Entity) const;
   inline bool existPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,

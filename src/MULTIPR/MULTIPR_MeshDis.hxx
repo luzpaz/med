@@ -34,7 +34,11 @@ extern "C"
 #include "MEDSPLITTER_Graph.hxx"
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_Topology.hxx"
+#include "MULTIPR_Globals.hxx"
 
+#include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace multipr
 {
@@ -44,7 +48,8 @@ namespace multipr
 //*****************************************************************************
 
 class Mesh;
-
+class Group;
+class Profil;
 
 //*****************************************************************************
 // Class MeshDisPart = a sub-part of a distributed mesh.
@@ -123,6 +128,12 @@ public:
      */
     const char* getMeshName() const { return mMeshName; }
     
+    /**
+     * Returns the mesh of this part.
+     * \return the mesh of this part.
+     */
+    const Mesh*	getMesh() const { return mMesh; }
+	
     /**
      * Returns the MED filename which contain this part.
      * \return the MED filename which contain this part.
@@ -326,16 +337,19 @@ public:
     
     /**
      * Returns the list of fields contained in this distributed MED file.
+     * \param pPartList The list of parts to get the fields from (separator is '|').
+     * \param  pAddNbGaussPoint If set to true, the number of gauss point of each field is added.
      * \return the list of fields contained in this distributed MED file.
      */
-    std::vector<std::string> getFields() const; 
+    std::vector<std::string> getFields(const char* pPartList, bool pAddNbGaussPoint = false) const; 
     
     /**
      * Returns the number of iteration for a given field.
+     * \param pPartList The list of parts to get the fields from (separator is '|').
      * \param  pFieldName field name.
      * \return the number of iteration for a given field.
      */
-    int getTimeStamps(const char* pFieldName) const; 
+    int getTimeStamps(const char* pPartList, const char* pFieldName) const; 
     
     /**
      * Returns all information about a part.
@@ -378,17 +392,15 @@ public:
      * \param  pTLow        threshold used to generate LOW resolution (must be >= pTMed).
      * \param  pRadius
      * \param  pBoxing number of cells along each axis; e.g. if 100 then grid will have 100*100*100 = 10**6 cells; 100 by default.
+     * \return a list of strings, containing names of empty resulting parts, empty list if all resolutions are non-empty.
      * \throw  RuntimeException if any error occurs.
      */
-    void decimatePart(
+    std::list<std::string> decimatePart(
         const char* pPartName, 
         const char* pFieldName,
         med_int     pFieldIt,
         const char* pFilterName,
-        med_float   pTMed, 
-        med_float   pTLow,
-        med_float   pRadius,
-        int         pBoxing = 100);
+        const char* pFilterParams);
         
     /**
      * Returns useful information to configure decimation parameters.
@@ -407,6 +419,12 @@ public:
         const char* pFilterName,
         const char* pFilterParams);
     
+	/**
+	 * Get the statistics of the last decimation.
+	 * The format is : "lowres-compression-rate medres-compression-rate".
+	 */
+	std::string& getDecimationStatistics() { return mStats; }
+		
     //---------------------------------------------------------------------
     // I/O
     //---------------------------------------------------------------------
@@ -418,15 +436,46 @@ public:
      * \throw  IOException if any i/o error occurs.
      */
     void readDistributedMED(const char* pMEDfilename);
-    
+
+    /**
+     * Works like \a readDistributedMED(), but assumes that the distributed MED file was
+     * moved from the original location and its ASCII master file needs to be updated.
+     *
+     * \note This method is mentioned to be used only in persistence.
+     */
+    void readPersistentDistributedMED(const char* pMEDfilename);
+
     /**
      * Writes this distributed MED file (including master file and sub MED files if necessary).
      * \param  pMEDfilenamePrefix
      * \throw  NullArgumentException if pMEDfilename is NULL.
      * \throw  IOException if any i/o error occurs.
      */
-    void writeDistributedMED(const char* pMEDfilenamePrefix);
+    void writeDistributedMED (const char* pMEDfilenamePrefix,
+                              bool        pIsPersistence = false);
+
+    /**
+     * Update save progress.
+     * \param pPercents current save progress in percents.
+     */
+    void setProgress (int pPercents);
+
+    /**
+     * Obtain save progress.
+     * \return current save progress in percents.
+     */
+    int getProgress();
     
+    /**
+     * Read and write the fields for optimized domain split.
+     * \param pMeshName The name of the current mesh.
+     * \param pGroups The groups.
+     * \param pGaussList The list of gauss index.
+     * \param pProfils The profiles of the mesh.
+     */
+    void readAndWriteFields (const char* pMeshName, std::vector<Group*>* pGroups,
+                             GaussIndexList* pGaussList, std::vector<Profil*>& pProfils);
+
     /**
      * Dumps any MeshDis to the given output stream.
      * \param  pOs any output stream.
@@ -449,8 +498,11 @@ private:
     char                      mSequentialMEDFilename[256];  /**< Name of the original MED file used to build distribyuted MED. */
     char                      mDistributedMEDFilename[256]; /**< Name of this distributed MED file (= name of the master file). */
     std::vector<MeshDisPart*> mParts;                       /**< Table of sub-parts; a distributed mesh is composed of N sub-part, where N = mParts.size(). */
-    //MULTIPR_ProgressCallback*   mProgressCallback;
-    
+    std::string               mStats;                       /**< Statistics of the last decimation */
+
+    int                       mWriteProgress;               /**< Mesh saving progress in percents */
+    boost::recursive_mutex    mWriteMutex;                  /**< For thread-safe access to mWriteProgress */
+
 private:
 
     // do not allow copy constructor
@@ -464,6 +516,100 @@ private:
     
 }; // class MeshDis
 
+/*
+//----------------------------------------------------------------------------
+//! This class provide thread-safety for MEDWrapper interaction
+class TLockProxy
+{
+  TLockProxy& operator=(const TLockProxy& );
+  MeshDis* myMeshDis;
+  boost::shared_ptr<boost::mutex> myMutex;
+
+public:
+  TLockProxy(MeshDis* theMeshDis, boost::shared_ptr<boost::mutex> theMutex);
+
+  ~TLockProxy();
+
+  MeshDis * operator-> () const;
+};
+
+//----------------------------------------------------------------------------
+//! To specialize the SharedPtr for MeshDis
+template<class T>
+class SharedPtr: public boost::shared_ptr<T>
+{
+public:
+  SharedPtr()
+    : myMutex(new boost::mutex())
+  {}
+
+  template<class Y>
+  explicit SharedPtr(Y * p)
+    : boost::shared_ptr<T>(p),
+      myMutex(new boost::mutex())
+  {}
+
+  template<class Y>
+  SharedPtr(SharedPtr<Y> const & r)
+    : boost::shared_ptr<T>(r,boost::detail::dynamic_cast_tag()),
+      myMutex(r->myMutex)
+  {}
+
+  template<class Y>
+  SharedPtr&
+  operator=(SharedPtr<Y> const & r)
+  {
+    boost::shared_ptr<T>(r,boost::detail::dynamic_cast_tag()).swap(*this);
+    myMutex = r->myMutex;
+    return *this;
+  }
+
+  template<class Y>
+  SharedPtr&
+  operator()(Y * p) // Y must be complete
+  {
+    return operator=<Y>(SharedPtr<Y>(p));
+  }
+
+  template<class Y>
+  SharedPtr&
+  operator()(SharedPtr<Y> const & r) // Y must be complete
+  {
+    return operator=<Y>(SharedPtr<Y>(r));
+  }
+
+  TLockProxy operator-> () const // never throws
+  {
+    return TLockProxy(this->get(), myMutex);
+  }
+
+  template<class Y>
+  void reset (Y * p) // Y must be complete
+  {
+    //boost::detail::thread::lock_ops<typename T::TMutex>::lock(p->myMutex);
+    boost::detail::thread::lock_ops<boost::mutex>::lock(*myMutex);
+    if (boost::shared_ptr<T>::get() != NULL) delete (boost::shared_ptr<T>::get());
+    boost::shared_ptr<T>(p).swap(*this);
+    //boost::detail::thread::lock_ops<typename T::TMutex>::unlock(p->myMutex);
+    boost::detail::thread::lock_ops<boost::mutex>::unlock(*myMutex);
+  }
+
+protected:
+  operator const T& () const;
+
+  operator T& ();
+
+  T& operator* () const;
+
+  T * get() const // never throws
+  {
+    return boost::shared_ptr<T>::get();
+  }
+
+private:
+  boost::shared_ptr<boost::mutex> myMutex;
+};
+*/
 
 } // namespace MULTIPR
 
