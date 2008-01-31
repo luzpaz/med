@@ -2294,7 +2294,7 @@ namespace MED
       GetGrilleType(aMeshInfo, theInfo.myGrilleType, theErr);
       EGrilleType aGrilleType = theInfo.myGrilleType;
 
-      TErr aRet;
+      TErr aRet = 0;
       if(aMaillageType == eSTRUCTURE && aGrilleType == eGRILLE_STANDARD){
 	GetGrilleStruct(aMeshInfo, theInfo.myGrilleStructure, theErr);
 
