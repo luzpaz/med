@@ -120,6 +120,10 @@ namespace MED{
   GetPNOMLength();
   
   template<EVersion>
+  void
+  GetVersionRelease(TInt& majeur, TInt& mineur, TInt& release);
+  
+  template<EVersion>
   TInt
   GetNbConn(EGeometrieElement typmai,
 	    EEntiteMaillage typent,

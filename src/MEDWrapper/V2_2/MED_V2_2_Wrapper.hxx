@@ -55,6 +55,10 @@ namespace MED
   GetPNOMLength<eV2_2>();
 
   template<>
+  void
+  GetVersionRelease<eV2_2>(TInt& majeur, TInt& mineur, TInt& release);
+
+  template<>
   TInt
   GetNbConn<eV2_2>(EGeometrieElement typmai,
 		   EEntiteMaillage typent,
