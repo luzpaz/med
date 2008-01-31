@@ -546,7 +546,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
             }
           }
           // (4) nb harmonics ( ignored )
-          for ( initIntReading( nb_sub ); more(); next() )
+          for ( initIntReading( total_nb_comp ); more(); next() )
             ;
           // (5) TYPE ( ignored )
           getNextLine( ligne );
