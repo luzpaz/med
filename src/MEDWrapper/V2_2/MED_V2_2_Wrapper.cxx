@@ -2093,7 +2093,7 @@ namespace MED
       GetGrilleType(aMeshInfo,theInfo.myGrilleType,theErr);
       EGrilleType       aGrtype = theInfo.myGrilleType;
 
-      TErr aRet;
+      TErr aRet = 0;
       if(type_maillage == eSTRUCTURE && aGrtype == eGRILLE_STANDARD){
 	GetGrilleStruct(aMeshInfo,theInfo.myGrilleStructure,theErr);
 	med_repere aRep;
