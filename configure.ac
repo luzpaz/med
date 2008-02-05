@@ -395,29 +395,30 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 
 	if test "${MED_WITH_GUI}" = "yes"; then
 
-	echo
-	echo ---------------------------------------------
-	echo testing openGL
-	echo ---------------------------------------------
-	echo
+		echo
+		echo ---------------------------------------------
+		echo testing openGL
+		echo ---------------------------------------------
+		echo
 
-	CHECK_OPENGL
+		CHECK_OPENGL
 
-	echo
-	echo ---------------------------------------------
-	echo testing QT
-	echo ---------------------------------------------
-	echo
+		echo
+		echo ---------------------------------------------
+		echo testing QT
+		echo ---------------------------------------------
+		echo
 
-	CHECK_QT
+		CHECK_QT
 
-	echo
-	echo ---------------------------------------------
-	echo testing VTK
-	echo ---------------------------------------------
-	echo
+		echo
+		echo ---------------------------------------------
+		echo testing VTK
+		echo ---------------------------------------------
+		echo
 
-	CHECK_VTK
+		CHECK_VTK
+	fi
 
 	echo
 	echo ---------------------------------------------
@@ -426,7 +427,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	echo
 
 	CHECK_CAS
-	fi
 
 	echo
 	echo ---------------------------------------------
@@ -445,13 +445,13 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	dnl CHECK_MICO
 
 	if test "${MED_WITH_GUI}" = "yes"; then
-	echo
-	echo ---------------------------------------------
-	echo testing MSG2QM
-	echo ---------------------------------------------
-	echo
+		echo
+		echo ---------------------------------------------
+		echo testing MSG2QM
+		echo ---------------------------------------------
+		echo
 
-	CHECK_MSG2QM
+		CHECK_MSG2QM
 	fi
 
 	echo
