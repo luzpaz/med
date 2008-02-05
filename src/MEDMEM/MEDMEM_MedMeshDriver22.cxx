@@ -854,6 +854,7 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
       int * tmp_cells_count = new int[MED_NBR_GEOMETRIE_MAILLE] ;
       int i;
       for (i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++) 
+<<<<<<< MEDMEM_MedMeshDriver22.cxx
 	{                       // EF :ON SCANNE DES GEOMETRIES INUTILES, UTILISER LES MAPS
 	  tmp_cells_count[i]=MEDnEntMaa(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())),
 					med_2_3::MED_CONN,(med_2_3::med_entite_maillage) Entity,
@@ -1819,6 +1820,10 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	    // All good ?
 	    // if nothing found, delete Family
 
+			/*! \todo TODO : once unit tests are ready, check that there is no side effect
+				and let the driver read empty families by removing the if case of the
+				few following lines */
+
 	    if (Family->getNumberOfTypes() == 0)
 	      {
 		MESSAGE(LOC<<"Nothing found for family "<<FamilyName<<
@@ -1988,8 +1993,9 @@ MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22()
 }
   
 MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22(const string & fileName,
-						   MESH * ptrMesh):
-  MED_MESH_DRIVER22(fileName,ptrMesh,MED_WRONLY),IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,MED_WRONLY)
+																									 MESH * ptrMesh, 
+																									 MED_EN::med_mode_acces access):
+  MED_MESH_DRIVER22(fileName,ptrMesh,access),IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,access)
 {
   MESSAGE("MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22(const string & fileName, MESH * ptrMesh) has been created");
 }
@@ -2848,6 +2854,7 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
 void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGroups, vector <FAMILY*>& myFamilies ) const 
 {
 
+	BEGIN_OF("MED_MESH_WRONLY_DRIVER::groupFamilyConverter");
   if (myGroups.empty()) return;
 	
 //	if (!myFamilies.empty())
@@ -2971,7 +2978,23 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
  		myFamily->setIdentifier(ifamily);
  		myFamily->setNumberOfGroups(key.size());
 		char family_name[MED_TAILLE_NOM];
-		sprintf(family_name,"family%d",ifamily);
+
+		//if the family has one group to which only one family
+		//is associated, the name of the family underlying the group
+		//is given back to the family
+		if (key.size()==1 && myGroups[key[0]]->getNumberOfFamilies()==0)
+			{
+				vector<FAMILY*> families;
+				families.push_back(myFamily);
+				myGroups[key[0]]->setFamilies(families);
+				//it is necessary to use strncpy because group and family
+				//have different name sizes
+				strncpy(family_name,myGroups[key[0]]->getName().c_str(),MED_TAILLE_NOM);
+				family_name[MED_TAILLE_NOM-1]='\0';
+			}
+		else
+			sprintf(family_name,"family%d",ifamily);
+	
 		myFamily->setName(family_name);
 
  		string* groupnames=new string[key.size()];
@@ -2988,7 +3011,28 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
  		myFamilies.push_back(myFamily);
  		ifamily++;
  	}
- 		
+
+	//adding empty families corresponding to empty groups
+	for (int i=0; i<myGroups.size(); i++)
+		{
+			if (myGroups[i]->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)==0)
+				{
+					FAMILY* myFamily=new FAMILY(*(myGroups[i]));
+					char family_name[MED_TAILLE_NOM];
+					//it is necessary to use strncpy because group and family
+					//have different name sizes
+					strncpy(family_name,myGroups[i]->getName().c_str(),MED_TAILLE_NOM);
+					family_name[MED_TAILLE_NOM-1]='\0';
+					myFamily->setName(family_name);
+					myFamily->setIdentifier(ifamily);
+					ifamily++;
+					vector<string> groupnames;
+					groupnames.push_back(myGroups[i]->getName());
+					myFamily->setGroupsNames(&groupnames[0]);
+					myFamilies.push_back(myFamily);
+				}
+		}
+	END_OF("MED_MESH_WRONLY_DRIVER::groupFamilyConverter");
 }
 
 int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {

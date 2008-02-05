@@ -84,7 +84,7 @@ namespace MED_EN {
 
     typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
 
-    typedef enum {MED_LECT,MED_ECRI,MED_REMP} med_mode_acces;
+    typedef enum {MED_LECT,MED_ECRI,MED_REMP,MED_CREA} med_mode_acces;
 
     typedef enum {ASCENDING=7,DESCENDING=77} med_sort_direc;
 
@@ -212,6 +212,7 @@ typedef double         med_float;
   //   réinitialisé. Cf une évolution de MED.
 #define MED_WRONLY MED_ECRI
 #define MED_RDWR   MED_ECRI
+#define MED_CREATE MED_CREA
 // Fin
 
 #define FAUX 0

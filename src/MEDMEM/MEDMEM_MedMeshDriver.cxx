@@ -175,8 +175,9 @@ IMED_MESH_WRONLY_DRIVER::IMED_MESH_WRONLY_DRIVER():MED_MESH_DRIVER()
 }
   
 IMED_MESH_WRONLY_DRIVER::IMED_MESH_WRONLY_DRIVER(const string & fileName,
-					       MESH * ptrMesh):
-  MED_MESH_DRIVER(fileName,ptrMesh,MED_WRONLY)
+																								 MESH * ptrMesh,
+																								 MED_EN::med_mode_acces access):
+  MED_MESH_DRIVER(fileName,ptrMesh,access)
 {
   MESSAGE("MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
@@ -337,10 +338,10 @@ MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER()
   _concreteMeshDrv = new MED_MESH_WRONLY_DRIVER21();
 }
 
-MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh):
-  IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,MED_ECRI)
+MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces access):
+  IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,access)
 {
-  _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,MED_ECRI);
+  _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,access);
 }
 
 MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const MED_MESH_WRONLY_DRIVER & driver):MED_MESH_DRIVER(driver)

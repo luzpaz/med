@@ -2099,6 +2099,52 @@ struct _cell
     MED_EN::medGeometryElement geometricType;
 };
 
+/*!
+Create groups from families.
+
+It is used to create groups that have only one family
+for meshes that come from codes that use families instead 
+of groups to define a subregion.
+*/
+void MESH::createGroups()
+{
+  for (medEntityMesh entity=MED_CELL; entity!=MED_ALL_ENTITIES; ++entity)
+    {
+      // make myFamilies points to the member corresponding to entity
+      vector<FAMILY*>* myFamilies;
+      vector<GROUP*>* myGroups;
+      switch ( entity )
+				{
+				case MED_CELL :
+					myFamilies = & _familyCell;
+					myGroups = & _groupCell;
+					break;
+				case MED_FACE :
+					myFamilies = & _familyFace;
+					myGroups = & _groupFace;
+					break;
+				case MED_EDGE :
+					myFamilies = & _familyEdge;
+					myGroups = & _groupEdge;
+					break;
+				case MED_NODE :
+					myFamilies = & _familyNode;
+					myGroups = & _groupNode;
+					break;
+				}
+      
+      
+			for (int i=0; i< myFamilies->size(); i++)
+				{
+					list <FAMILY*> fam_list;
+					fam_list.push_back((*myFamilies)[i]);
+					//creates a group with the family name and only one family
+					GROUP* group=new GROUP((*myFamilies)[i]->getName(),fam_list);
+					(*myGroups).push_back(group);
+				}
+    }
+}
+
 // Create families from groups
 void MESH::createFamilies()
 {
