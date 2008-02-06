@@ -170,7 +170,8 @@ inline void FAMILY::setNumberOfAttributes(int NumberOfAttribute)
 inline void FAMILY::setAttributesIdentifiers(int * AttributeIdentifier) 
 //---------------------------------------------------------------------
 { 
-    _attributeIdentifier = AttributeIdentifier ; 
+    //_attributeIdentifier = AttributeIdentifier ; 
+    _attributeIdentifier.setShallowAndOwnership(AttributeIdentifier) ;
 }
 
 /*! Sets the attribute _attributeValue to AttributeValue. */
@@ -178,7 +179,8 @@ inline void FAMILY::setAttributesIdentifiers(int * AttributeIdentifier)
 inline void FAMILY::setAttributesValues(int * AttributeValue) 
 //-----------------------------------------------------------
 { 
-    _attributeValue = AttributeValue ; 
+    //_attributeValue = AttributeValue ; 
+    _attributeValue.setShallowAndOwnership(AttributeValue) ;
 }
 
 /*! Sets the attribute _attributeDescription to  AttributeDescription. */
@@ -186,7 +188,8 @@ inline void FAMILY::setAttributesValues(int * AttributeValue)
 inline void FAMILY::setAttributesDescriptions(string * AttributeDescription) 
 //--------------------------------------------------------------------------
 { 
-    _attributeDescription = AttributeDescription ; 
+    //_attributeDescription = AttributeDescription ; 
+    _attributeDescription.setShallowAndOwnership(AttributeDescription) ;
 }
 
 /*! Sets the attribute _numberOfGroup to NumberOfGroups. */
@@ -205,7 +208,8 @@ inline void FAMILY::setNumberOfGroups(int NumberOfGroups)
 	if (giveOwnership)
 		_groupName.setShallowAndOwnership(GroupName);
 	else	
-    	_groupName = GroupName ; 
+    	//_groupName = GroupName ; 
+    _groupName.set(_numberOfGroup, GroupName) ;
 }
 /*! Returns the attribute _identifier.\n
    Note that there is one identifier precisely for each family. */

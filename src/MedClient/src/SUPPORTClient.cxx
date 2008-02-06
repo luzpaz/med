@@ -45,7 +45,8 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
     _mesh=M;
   else
     {
-      _mesh=new MESHClient(IOR_Support->getMesh());
+      SALOME_MED::MESH_var ior_mesh=IOR_Support->getMesh();
+      _mesh=new MESHClient(ior_mesh);
     }
   blankCopy();
 

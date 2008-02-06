@@ -159,6 +159,9 @@ FIELD_::~FIELD_()
       SCRUTE(_drivers[index]);
       if ( _drivers[index] != NULL) delete _drivers[index];
     }
+  //CCAR: if _support is a SUPPORTClient remove reference
+  if(_support)
+    _support->removeReference();
 }
 
 /*! 

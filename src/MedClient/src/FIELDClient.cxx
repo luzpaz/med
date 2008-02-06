@@ -84,7 +84,9 @@ FIELDClient<T,INTERLACING_TAG>::~FIELDClient()
 {
   _fieldPtr->Destroy();
   CORBA::release(_fieldPtr);
+  /* CCAR : better put in FIELD_ destructor if support is a SUPPORTClient
   if(FIELD<T,INTERLACING_TAG>::_support)
     FIELD<T,INTERLACING_TAG>::_support->removeReference();
+    */
 }
 

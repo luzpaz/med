@@ -80,7 +80,7 @@ void COORDINATEClient::blankCopy()
   delete [] tA;
 
 
-  setCoordinatesSystem( CORBA::string_dup(all->coordSystem));
+  setCoordinatesSystem( all->coordSystem.in());
 
   _complete = false;
 
