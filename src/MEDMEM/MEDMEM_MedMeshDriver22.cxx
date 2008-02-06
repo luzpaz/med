@@ -854,22 +854,21 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
       int * tmp_cells_count = new int[MED_NBR_GEOMETRIE_MAILLE] ;
       int i;
       for (i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++) 
-<<<<<<< MEDMEM_MedMeshDriver22.cxx
-	{                       // EF :ON SCANNE DES GEOMETRIES INUTILES, UTILISER LES MAPS
-	  tmp_cells_count[i]=MEDnEntMaa(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())),
-					med_2_3::MED_CONN,(med_2_3::med_entite_maillage) Entity,
-					all_cell_type[i],med_2_3::MED_NOD); 
+      {                       // EF :ON SCANNE DES GEOMETRIES INUTILES, UTILISER LES MAPS
+        tmp_cells_count[i]=MEDnEntMaa(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())),
+                                      med_2_3::MED_CONN,(med_2_3::med_entite_maillage) Entity,
+                                      all_cell_type[i],med_2_3::MED_NOD); 
 
 
-	  // Get the greatest dimension of the cells : Connectivity->_entityDimension
-	  // We suppose there is no cells used as faces in MED 2.2.x , this is forbidden !!!
-	  // In version prior to 2.2.x, it is possible
-	  if (tmp_cells_count[i]>0) 
-	    {
-	      Connectivity->_entityDimension=all_cell_type[i]/100;
-	      Connectivity->_numberOfTypes++;
-	    }
-	}
+        // Get the greatest dimension of the cells : Connectivity->_entityDimension
+        // We suppose there is no cells used as faces in MED 2.2.x , this is forbidden !!!
+        // In version prior to 2.2.x, it is possible
+        if (tmp_cells_count[i]>0) 
+        {
+          Connectivity->_entityDimension=all_cell_type[i]/100;
+          Connectivity->_numberOfTypes++;
+        }
+      }
 
       {
         // VBD fix to be able reading polygons and polyhedrons
