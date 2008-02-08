@@ -167,8 +167,8 @@ int main (int argc, char ** argv) {
   for(i=0;i<4;i++)
     if(fabs(REFAreaOfPolyg[i]-vals2[i])<1e-12)
       nbPts++;
-  delete sup2;
   delete areas;
+  delete sup2;
 
   SUPPORT *sup = new SUPPORT(&myMeshing);
   FIELD<double> *vols = myMeshing.getVolume(sup);
