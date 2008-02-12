@@ -73,6 +73,10 @@ namespace MED
   GetPNOMLength<eV2_2>();
 
   template<>
+  void MED_V22_WRAPPER_EXPORT
+  GetVersionRelease<eV2_2>(TInt& majeur, TInt& mineur, TInt& release);
+
+  template<>
   TInt MED_V22_WRAPPER_EXPORT
   GetNbConn<eV2_2>(EGeometrieElement typmai,
 		   EEntiteMaillage typent,

@@ -395,29 +395,30 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 
 	if test "${MED_WITH_GUI}" = "yes"; then
 
-	echo
-	echo ---------------------------------------------
-	echo testing openGL
-	echo ---------------------------------------------
-	echo
+		echo
+		echo ---------------------------------------------
+		echo testing openGL
+		echo ---------------------------------------------
+		echo
 
-	CHECK_OPENGL
+		CHECK_OPENGL
 
-	echo
-	echo ---------------------------------------------
-	echo testing QT
-	echo ---------------------------------------------
-	echo
+		echo
+		echo ---------------------------------------------
+		echo testing QT
+		echo ---------------------------------------------
+		echo
 
-	CHECK_QT
+		CHECK_QT
 
-	echo
-	echo ---------------------------------------------
-	echo testing VTK
-	echo ---------------------------------------------
-	echo
+		echo
+		echo ---------------------------------------------
+		echo testing VTK
+		echo ---------------------------------------------
+		echo
 
-	CHECK_VTK
+		CHECK_VTK
+	fi
 
 	echo
 	echo ---------------------------------------------
@@ -426,7 +427,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	echo
 
 	CHECK_CAS
-	fi
 
 	echo
 	echo ---------------------------------------------
@@ -502,7 +502,7 @@ fi
 #variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok boost_ok doxygen_ok graphviz_ok OpenGL_ok qt_ok vtk_ok omniORB_ok occ_ok Kernel_ok"
 
 if test "${MED_WITH_GUI}" = "yes"; then
-variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok cppunit_ok"
+variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok cppunit_ok SalomeGUI_ok"
 fi
 
 if test "${MED_WITH_GUI}" = "no"; then

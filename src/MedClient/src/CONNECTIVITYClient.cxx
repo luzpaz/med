@@ -96,6 +96,8 @@ void CONNECTIVITYClient::blankCopy()
   setGeometricTypes(Types, Entity);
 
   _totalNumberOfElements_client = 0L;
+  if (_numberOfElements_client)
+    delete [] _numberOfElements_client;
   _numberOfElements_client = new long[nTwithPoly];
   for (iT=0; iT<nT; iT++) 
    {
@@ -115,6 +117,9 @@ void CONNECTIVITYClient::blankCopy()
     _polyType_client = MED_EN::MED_NONE;
   }
 
+  if(Types)
+    delete [] Types;
+
   // create a constituent (PAL10556)
 // The consequence is that, if the remote server
 // has not calculated nodal connectivity of dimension d-1, heavy method
@@ -122,6 +127,8 @@ void CONNECTIVITYClient::blankCopy()
 // server for a potentially useless information for client side . (by Anthony GEAY)
    if ( Entity == MED_CELL ) {
      Entity = ( IOR_Mesh->getMeshDimension() == 3 ? MED_FACE : MED_EDGE );
+     if(_constituent)
+       delete _constituent;
      _constituent = new CONNECTIVITYClient( IOR_Mesh, Entity );
    }
 

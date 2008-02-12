@@ -177,7 +177,7 @@ void MESHCollectionMedAsciiDriver::write(char* filename)
 		
       MESSAGE("File name "<<string(distfilename));
 		
-      int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName());
+      int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::MED_CREATE);
 		
       MESSAGE("Start writing");
       (m_collection->getMesh())[idomain]->write(id);

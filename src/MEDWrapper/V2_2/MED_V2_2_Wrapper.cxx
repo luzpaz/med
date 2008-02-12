@@ -94,6 +94,13 @@ namespace MED
   }
 
   template<>
+  void
+  GetVersionRelease<eV2_2>(TInt& majeur, TInt& mineur, TInt& release)
+  {
+    MEDversionDonner(&majeur, &mineur, &release);
+  }
+
+  template<>
   TInt
   GetNbConn<eV2_2>(EGeometrieElement typmai,
 		   EEntiteMaillage typent,
@@ -2287,7 +2294,7 @@ namespace MED
       GetGrilleType(aMeshInfo, theInfo.myGrilleType, theErr);
       EGrilleType aGrilleType = theInfo.myGrilleType;
 
-      TErr aRet;
+      TErr aRet = 0;
       if(aMaillageType == eSTRUCTURE && aGrilleType == eGRILLE_STANDARD){
 	GetGrilleStruct(aMeshInfo, theInfo.myGrilleStructure, theErr);
 

@@ -254,15 +254,15 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
   //  retrieveDriver()->writeFieldsInt(new_fields,fieldchar);
   for (int i=0; i<nb_new_domains; i++)
   {
-    delete new_supports[i];
     delete new_fields[i];
+    delete new_supports[i];
     //delete medarray[i];
   }
   for (int i=0; i<old_fields.size(); i++)
   {
     cout << "old field deletion" <<endl;
-    delete old_supports[i];
     delete old_fields[i];
+    delete old_supports[i];
   }
 }
 

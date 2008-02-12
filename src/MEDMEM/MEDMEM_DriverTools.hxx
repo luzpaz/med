@@ -221,6 +221,8 @@ template <class T>
 std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> & groupes,
                                                            std::vector<GROUP *> & medGroups) const
 {
+  const char* LOC = "_field< T >::getField()";
+
   std::list<std::pair< FIELD_*, int> > res;
 
   // gauss array data
@@ -365,6 +367,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
     const int gauss_step = nb_supp_elems;
     const int elem_step = 1;
 #endif
+    int i; // elem index
     // loop on components of a sub
     for ( int i_comp = 1; i_comp <= sub_data->nbComponents(); ++i_comp )
     {
@@ -376,27 +379,32 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
       {
         const T& val = oneValue ? values[ 0 ] : values[ k * elem_step ];
         const _maille* ma = &(*sub_grp.mailles[ k ]);
-        std::map<const _maille*,int>::const_iterator ma_i = grp->relocMap.find( ma );
-        if ( ma_i == grp->relocMap.end() )
-          throw MEDEXCEPTION
-            (LOCALIZED(STRING("_field< T >::getField(), cant find elem index. ")
-                       << k << "-th elem: " << ma));
-        if ( ma_i->second > nb_val )
-          throw MEDEXCEPTION
-            (LOCALIZED(STRING("_field< T >::getField(), wrong elem position. ")
-                       << k << "-th elem: " << ma
-                       << ", pos (" << ma_i->second << ") must be <= " << nb_val));
+        if ( medGrp->isOnAllElements() ) {
+          i = ma->ordre;
+          if ( i > nb_val )
+            throw MEDEXCEPTION (LOCALIZED(STRING(LOC) << ", wrong elem position. "
+                                          << k << "-th elem: " << ma
+                                          << ", pos (" << i << ") must be <= " << nb_val));
+        }
+        else {
+          std::map<const _maille*,int>::const_iterator ma_i = grp->relocMap.find( ma );
+          if ( ma_i == grp->relocMap.end() )
+            throw MEDEXCEPTION (LOCALIZED(STRING(LOC) << ", cant find elem index. "
+                                          << k << "-th elem: " << ma));
+          i = ma_i->second;
+        }
         if ( arrayNoGauss ) {
-          arrayNoGauss->setIJ( ma_i->second, i_comp, val );
+          arrayNoGauss->setIJ( i, i_comp, val );
         }
         else {
           const T* pVal = & val;
           for ( int iGauss = 1; iGauss <= nb_gauss; ++iGauss, pVal += gauss_step )
-            arrayGauss->setIJK( ma_i->second, i_comp, iGauss, *pVal);
+            arrayGauss->setIJK( i, i_comp, iGauss, *pVal);
         }
       }
     }
-  }
+  } // loop on subs of the field
+
   return res;
 }
 

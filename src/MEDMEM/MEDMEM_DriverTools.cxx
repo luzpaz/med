@@ -1021,8 +1021,11 @@ void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
           (LOCALIZED(STRING("_intermediateMED::getFields(), field support size (")
                      << nb_elems  << ") != NumberOfValues (" << f->getNumberOfValues()));
       theFields.push_back( f );
-      if ( sup->getName().empty() )
-        sup->setName( "GRP_" + f->getName() );
+      if ( sup->getName().empty() ) {
+        ostringstream name;
+        name << "GRP_" << f->getName() << "_" << j;
+        sup->setName( name.str() );
+      }
       f->setSupport( sup );
       //f->setIterationNumber( j );
       f->setOrderNumber( j );

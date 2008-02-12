@@ -186,6 +186,7 @@ int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
     case MED_EN::MED_LECT: return med_2_3::MED_LECTURE;
     case MED_EN::MED_ECRI: return med_2_3::MED_LECTURE_ECRITURE;
     case MED_EN::MED_REMP: return med_2_3::MED_LECTURE_ECRITURE;
+		case MED_EN::MED_CREA: return med_2_3::MED_CREATION;
     default:
       throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
     }

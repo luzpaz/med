@@ -63,7 +63,7 @@ namespace MEDMEM
   {
     FIELD<T> *fieldObjNoC=(FIELD<T> *)fieldObj;
     driverTypes type=DRIVERFACTORY::deduceDriverTypeFromFileName(fileName);
-    int id=fieldObj->addDriver(type, fileName, fieldObj->getName());
+    int id=fieldObjNoC->addDriver(type, fileName, fieldObj->getName());
     fieldObjNoC->write(id);
   }
 }

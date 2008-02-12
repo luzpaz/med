@@ -101,8 +101,9 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
 	  ret->setMeshName(driverName);
 	  return ret;
 	}
+	case MED_CREA :
 	case MED_ECRI : {
-	  ret = new MED_MESH_WRONLY_DRIVER(fileName, mesh);
+	  ret = new MED_MESH_WRONLY_DRIVER(fileName, mesh, access);
 	  ret->setMeshName(driverName);
 	  return ret;
 	}
@@ -124,13 +125,12 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
 	  ret=new GIBI_MESH_RDONLY_DRIVER(fileName,mesh);
 	  return ret;
 	}
+	case MED_REMP :
+	case MED_CREA :
 	case MED_ECRI : {
 	  throw MED_EXCEPTION ("access mode other than MED_LECT has been specified with the GIBI_DRIVER type which is not allowed because GIBI_DRIVER is only a read access driver");
 	}
-	case MED_REMP : {
-	  throw MED_EXCEPTION ("access mode other than MED_LECT has been specified with the GIBI_DRIVER type which is not allowed because GIBI_DRIVER is only a read access driver");
-	}
-	default:
+ 	default:
 	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
 	}
       break;
@@ -143,10 +143,9 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
 	  ret=new PORFLOW_MESH_RDONLY_DRIVER(fileName,mesh);
 	  return ret;
 	}
+	case MED_CREA :
+	case MED_REMP :
 	case MED_ECRI : {
-	  throw MED_EXCEPTION ("access mode other than MED_LECT has been specified with the PORFLOW_DRIVER type which is not allowed because PORFLOW_DRIVER is only a read access driver");
-	}
-	case MED_REMP : {
 	  throw MED_EXCEPTION ("access mode other than MED_LECT has been specified with the PORFLOW_DRIVER type which is not allowed because PORFLOW_DRIVER is only a read access driver");
 	}
 	default:
@@ -166,6 +165,7 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
 	  ret=new ENSIGHT_MESH_WRONLY_DRIVER(fileName,mesh);
 	  return ret;
 	}
+  case MED_CREA :
 	case MED_REMP : {
 	  throw MED_EXCEPTION ("not yet implemented");
 	  return ret;
@@ -182,14 +182,13 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
 	case MED_LECT : {
 	  throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
 	}
+  case MED_CREA :
+  case MED_REMP :
 	case MED_ECRI : {
 	  ret=new VTK_MESH_DRIVER(fileName,mesh);
 	  return ret;
 	}
-	case MED_REMP : {
-	  ret=new VTK_MESH_DRIVER(fileName,mesh);
-	  return ret;
-	}
+
 	default:
 	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
 	}
@@ -219,6 +218,7 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
 	  ret=new MED_MED_RDONLY_DRIVER(fileName,med);
 	  break ;
 	}
+  case MED_CREA :
 	case MED_ECRI : {
 	  ret=new MED_MED_WRONLY_DRIVER(fileName,med);
 	  break ;
@@ -239,6 +239,7 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
 	case MED_LECT : {
 	  throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
 	}
+  case MED_CREA :
 	case MED_ECRI : {
 	  ret=new VTK_MED_DRIVER(fileName,med);
 	  break ;
@@ -260,6 +261,7 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
 	  ret=new ENSIGHT_MED_RDONLY_DRIVER(fileName,med);
 	  break ;
 	}
+  case MED_CREA :
 	case MED_ECRI : {
 	  ret=new ENSIGHT_MED_WRONLY_DRIVER(fileName,med);
 	  break ;
@@ -322,6 +324,7 @@ GENDRIVER * DRIVERFACTORY::buildMedDriverFromFile(const string & fileName,
 	driver = new MED_MED_RDONLY_DRIVER22(fileName,ptrMed);
       return driver;
     }
+    case MED_CREA :
     case MED_ECRI : {
       if (version == V21)
 	driver = new MED_MED_WRONLY_DRIVER21(fileName,ptrMed);
@@ -369,11 +372,12 @@ GENDRIVER * DRIVERFACTORY::buildMeshDriverFromFile(const string & fileName,
 	driver = new MED_MESH_RDONLY_DRIVER22(fileName,ptrMesh);
       return driver;
     }
+    case MED_CREA :
     case MED_ECRI : {
       if (version == V21)
 	driver = new MED_MESH_WRONLY_DRIVER21(fileName,ptrMesh);
       else if (version == V22)
-	driver = new MED_MESH_WRONLY_DRIVER22(fileName,ptrMesh);
+				driver = new MED_MESH_WRONLY_DRIVER22(fileName,ptrMesh,access);
       return driver;
     }
     case MED_REMP : {
@@ -407,6 +411,7 @@ GENDRIVER * DRIVERFACTORY::buildConcreteMedDriverForMesh(const std::string & fil
       driver->setMeshName(driverName);
       return driver;
     }
+    case MED_CREA :
     case MED_ECRI : {
       if (version == V21)
 	driver = new MED_MESH_WRONLY_DRIVER21(fileName,ptrMesh);

@@ -1094,6 +1094,7 @@ SALOME_MED::MESH::connectivityInfos * MESH_i::getConnectGlobal (SALOME_MED::medE
                                        anEntity,types[i]);
       }
     }
+    delete [] types;
   }
   catch (MEDEXCEPTION &ex)
   {
