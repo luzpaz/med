@@ -1405,11 +1405,8 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
         }
       delete[] tmp_cells_count;
 
-      int NumberOfPolygons = 0;
-      if (_ptrMesh->_meshDimension != 3 || Connectivity->_entity != MED_EN::MED_CELL)// In the contrary case no search of polygons needed
-      {
-        // Lecture des polygones MED_CELL
-        NumberOfPolygons = MEDnEntMaa(_medIdt,
+         // Lecture des polygones MED_CELL
+      int NumberOfPolygons = MEDnEntMaa(_medIdt,
                                       const_cast <char *> (_ptrMesh->_name.c_str()),
                                       med_2_3::MED_CONN,
                                       med_2_3::MED_MAILLE,
@@ -1513,7 +1510,6 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
           delete[] PolygonsConnectivity;
           delete[] PolygonsConnectivityIndex;
         } // end polygons
-      }// end test on CELL
 
 
       // Lecture des polyedres MED_CELL
