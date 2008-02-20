@@ -299,11 +299,10 @@ void CONNECTIVITY::setCount(const int * Count, const medEntityMesh Entity)
   			    throw (MEDEXCEPTION)
 //--------------------------------------------------------------------//
 {
-  if (_numberOfTypes==0)
-    throw MEDEXCEPTION("Number of Types was not set before setting counts");
-
   if (Entity == _entity)
   {
+		if (_numberOfTypes==0)
+			throw MEDEXCEPTION("Number of Types was not set before setting counts");
     int * index = new int[Count[_numberOfTypes]];
     index[0]=1;
     _count[0]=1;
