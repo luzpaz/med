@@ -174,10 +174,7 @@ dnl check med2 library
 
   if  test "x$med2_ok" = "xyes"
   then
-   LIBS_old="$LIBS"
-   LIBS="$LIBS $LOCAL_LIBS"
    AC_CHECK_LIB(medimportcxx,HAVE_MEDimport,med2_ok=yes,med2_ok=no)
-   LIBS="$LIBS_old"
   fi
   LIBS="$LIBS_old"
  
