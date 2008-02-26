@@ -1173,9 +1173,9 @@ void MEDSPLITTERTest::testMESHCollection_families()
        
   //testing distant domains
     
-  char desc1[MED_TAILLE_DESC];
-  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
-  char desc2[MED_TAILLE_DESC], maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
+  char desc1[MED_TAILLE_DESC+1];
+  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
+  char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
   int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
   med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
