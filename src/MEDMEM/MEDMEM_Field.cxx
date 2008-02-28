@@ -160,8 +160,9 @@ FIELD_::~FIELD_()
       if ( _drivers[index] != NULL) delete _drivers[index];
     }
   //CCAR: if _support is a SUPPORTClient remove reference
-  if(_support)
-    _support->removeReference();
+  // This is correct but it's highlighting other problem
+ // if(_support)
+ //   _support->removeReference();
 }
 
 /*! 
