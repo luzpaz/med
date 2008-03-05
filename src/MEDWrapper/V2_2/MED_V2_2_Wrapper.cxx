@@ -1815,18 +1815,6 @@ namespace MED
 	  }
 	}
 
-	if(aNbGauss > 1 && !aGaussInfo){
-	  if(theErr){
-	    *theErr = MED_FAUX;
-	    return;
-	  }
-	  EXCEPTION(runtime_error,"GetValTimeStamp "<<
-		    "- aNbGauss("<<aNbGauss<<") > 1 && !aGaussInfo"<<
-		    "; aGaussName = '"<<&aGaussName[0]<<"'"<<
-		    "; aGeom = "<<aGeom<<
-		    "");
-	}
-	  
 	if(aGaussInfo && aNbGauss != aGaussInfo->GetNbGauss()){
 	  if(theErr){
 	    *theErr = MED_FAUX;
