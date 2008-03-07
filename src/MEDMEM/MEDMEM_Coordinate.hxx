@@ -25,6 +25,8 @@
 #ifndef COORDINATE_HXX
 #define COORDINATE_HXX
 
+#include <MEDMEM.hxx>
+
 #include <string>
 
 #include "MEDMEM_PointerOf.hxx"
@@ -42,7 +44,7 @@
 */
 
 namespace MEDMEM {
-class COORDINATE
+class MEDMEM_EXPORT COORDINATE
 {
 
 protected:

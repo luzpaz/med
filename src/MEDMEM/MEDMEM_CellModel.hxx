@@ -25,6 +25,8 @@
 #ifndef CELLMODEL_HXX
 #define CELLMODEL_HXX
 
+#include <MEDMEM.hxx>
+
 #include <set>
 #include <map>
 #include <string>
@@ -42,8 +44,12 @@ using namespace std ;
   the cell model it describes as cell dimensions, number of nodes...
 */
 
+
 namespace MEDMEM {
-class CELLMODEL 
+  class CELLMODEL;
+  MEDMEM_EXPORT ostream & operator<<(ostream &os,const CELLMODEL &my);
+
+class MEDMEM_EXPORT CELLMODEL 
 {
 
 private:
@@ -99,7 +105,7 @@ public :
   inline CELLMODEL & operator=(const CELLMODEL &m);
 
   			/*! Operator << : print CELLMODEL to the given stream. */
-  friend ostream & operator<<(ostream &os,const CELLMODEL &my);
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const CELLMODEL &my);
 
   			/*! returns _name attribute (ie: MED_PENTA15).\n
 		    	    see med.h (in med/include) */

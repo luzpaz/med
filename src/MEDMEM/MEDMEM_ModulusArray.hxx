@@ -20,7 +20,11 @@
 #ifndef __MEDMODULUSARRAY_H__
 #define __MEDMODULUSARRAY_H__
 
+#include "MEDMEM.hxx"
+
 #include "MEDMEM_Utilities.hxx"
+#include "MEDMEM_define.hxx"
+
 
 /*
   This class is use to set cyclic (modulus length) array.
@@ -31,29 +35,43 @@
 */
 
 namespace MEDMEM {
-class MEDMODULUSARRAY {
+class MEDMEM_EXPORT MEDMODULUSARRAY {
 private:
+  // nb vertex nodes; only vertex nodes are in cycle
   int   _length ;
+  // total nb nodes; not vertex nodes exists in 2-nd order elements,
+  // only presence of not vertex nodes is checked by compare()
+  int   _length2;
   const int * _array ;
+
+  bool compareNotVertexNodes(const MEDMODULUSARRAY &modulusArray) const;
 
 public:
   MEDMODULUSARRAY(int length, const int * array) ;
+  MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array);
   ~MEDMODULUSARRAY() ;
-  
-  const int & operator[](const int &i) const ;
+
+  const int operator[](const int &i) const ;
 
   int compare(const MEDMODULUSARRAY &modulusArray) const;
 
+  const int  *getArray(int& length) const { length=_length; return _array; }
 };
 
+
 MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) : 
-  _length(length), _array(array)
+  _length(length), _array(array), _length2(0)
 {
 //    SCRUTE(_length);
 //    for (int i=0;i<_length;i++){
 //      MESSAGE("MEDMODULUSARRAY["<<i<<"]="<<_array[i]);
 //    }
 };
+
+  MEDMODULUSARRAY::MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array):
+  _length(vertexLength), _length2( totalLength ), _array(array)
+{
+}
 
 MEDMODULUSARRAY::~MEDMODULUSARRAY()
 {
@@ -62,11 +80,13 @@ MEDMODULUSARRAY::~MEDMODULUSARRAY()
 };
 
 
-const int & MEDMODULUSARRAY::operator[](const int &i) const
+const int MEDMODULUSARRAY::operator[](const int &i) const
 {
   int position = i%_length ;
-  if (position<0)
+  //int position = i%_length2 ;
+  if (position < 0)
     position+=_length ;
+  //position += _length2 ;
   return _array[position] ;
 };
 
@@ -74,7 +94,8 @@ int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
 {
   int ret = 0 ;
 
-  if (modulusArray._length != _length)
+  if (modulusArray._length  != _length ||
+      modulusArray._length2 != _length2 )
     return ret ;
 
   if (_length==1)
@@ -83,13 +104,17 @@ int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
     else 
       return 0;
 
-  if (_length==2)
+  if (_length==2) {
     if ((_array[0]==modulusArray[0])&(_array[1]==modulusArray[1]))
-      return 1;
+      ret = 1;
     else if ((_array[0]==modulusArray[1])&(_array[1]==modulusArray[0]))
-      return -1;
+      ret = -1;
     else
       return 0;
+    if ( !compareNotVertexNodes( modulusArray ) )
+      ret = 0;
+    return ret;
+  }
 
   //search if there is one start point in common in two array
   for(int i=0;i<_length;i++)
@@ -111,13 +136,34 @@ int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
 	  }
       }
       if (ret!=0) {// we have found it !
+        if ( !compareNotVertexNodes( modulusArray ) )
+          ret = 0;
 	break ;
       }
       // else we continue if there is another start point i
     }
     return ret ;
 }
+
+/*!
+ * \brief Check presence of the same not vertex nodes
+  * \retval bool - comparison result
+ */
+bool MEDMODULUSARRAY::compareNotVertexNodes(const MEDMODULUSARRAY &modulusArray) const
+{
+  if ( _length2 > _length ) {
+    for ( int i = _length; i < _length2; ++i ) {
+      bool found = false;
+      for ( int j = _length; ( j < _length2 && !found ); ++j )
+        found = ( _array[ i ] == modulusArray._array[ j ] );
+      if ( !found )
+        return false;
+    }
+  }
+  return true;
 }
 
-# endif 	/* # ifndef __MEDMODULUSARRAY_H__ */
+}
+
+# endif         /* # ifndef __MEDMODULUSARRAY_H__ */
 

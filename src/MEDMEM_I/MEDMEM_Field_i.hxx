@@ -20,12 +20,14 @@
 // File      : MEDMEM_Field_i.hxx
 // Project   : SALOME
 // Author    : EDF
-// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Field_i.hxx
+// $Header   : $
 //=============================================================================
 
 
 #ifndef MED_FIELD_I_HXX_
 #define MED_FIELD_I_HXX_
+
+#include <MEDMEM_I.hxx>
 
 #include <map>
 #include <string>
@@ -47,7 +49,7 @@
 #include "MEDMEM_Field.hxx"
 
 namespace MEDMEM {
-class FIELD_i: public virtual POA_SALOME_MED::FIELD,
+class MEDMEM_I_EXPORT FIELD_i: public virtual POA_SALOME_MED::FIELD,
 	       public SALOME::GenericObj_i
 {
 public :
@@ -71,6 +73,9 @@ public :
     ~FIELD_i();
 
     char *   		    getName() 	     throw (SALOME::SALOME_Exception);
+    void                    setName(const char* theName)
+					     throw (SALOME::SALOME_Exception);
+
     char *   		    getDescription() throw (SALOME::SALOME_Exception);
     SALOME_MED::SUPPORT_ptr getSupport()     throw (SALOME::SALOME_Exception);
     CORBA::Long             getNumberOfComponents()   	   
@@ -91,10 +96,16 @@ public :
     SALOME_MED::string_array * getComponentsNames()  throw (SALOME::SALOME_Exception);
     SALOME_MED::string_array * getComponentsUnits()  throw (SALOME::SALOME_Exception);
     SALOME_MED::string_array * getComponentsDescriptions()  throw (SALOME::SALOME_Exception);
-    void addInStudy(SALOMEDS::Study_ptr myStudy, 
-		    SALOME_MED::FIELD_ptr myIor)  
-		    throw (SALOME::SALOME_Exception, 
+
+    void addInStudy(SALOMEDS::Study_ptr myStudy,
+                    SALOME_MED::FIELD_ptr myIor)
+                    throw (SALOME::SALOME_Exception,
                            SALOMEDS::StudyBuilder::LockProtection);
+
+    void addInStudyToComponent(SALOMEDS::SComponent_ptr myComponent,
+                               SALOME_MED::FIELD_ptr    myIor)
+                               throw (SALOME::SALOME_Exception,
+                                      SALOMEDS::StudyBuilder::LockProtection);
 
     CORBA::Long addDriver (SALOME_MED::medDriverTypes driverType, 
 			   const char* fileName, const char* fieldName)
@@ -105,6 +116,12 @@ public :
                     		          throw (SALOME::SALOME_Exception);
     // Cuisine Interne
     MEDMEM::FIELD_ * constructConstField() const;
+
+    // Publish MED Component
+    SALOMEDS::SComponent_ptr PublishMedComponent(SALOMEDS::Study_ptr theStudy);
+
+    // Return a default path to publish this field
+    std::string getEntryPath ();
 
  };
 }

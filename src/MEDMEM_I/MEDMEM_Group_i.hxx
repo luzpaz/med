@@ -26,15 +26,17 @@
 #ifndef MED_GROUP_I_HXX_
 #define MED_GROUP_I_HXX_
 
+#include "MEDMEM_I.hxx"
+
 #include "MEDMEM_Support_i.hxx"
 
 namespace MEDMEM {
 class FAMILY_i;
 class GROUP;
 
-class GROUP_i:
-                public POA_SALOME_MED::GROUP,
-	        public SUPPORT_i
+class MEDMEM_I_EXPORT GROUP_i:
+                virtual public POA_SALOME_MED::GROUP,
+	        virtual public SUPPORT_i
 {
 protected :
     GROUP_i();

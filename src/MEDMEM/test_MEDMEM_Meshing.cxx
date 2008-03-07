@@ -17,6 +17,10 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
+//#define protected public
+//#define private public
+
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Field.hxx"
@@ -28,7 +32,7 @@ using namespace DRIVERFACTORY;
 
 int main (int argc, char ** argv) {
 
-  if (argc <2) {
+  if (argc >2) {
     cerr << "Usage : " << argv[0] 
 	 << " filenameRoot" << endl;
     cerr << "        where filenameRoot is a root filename, the program will produce" << endl;
@@ -36,9 +40,13 @@ int main (int argc, char ** argv) {
     exit(-1);
   }
 
-  // filename to save the generated MESH
-  string filenameRoot = argv[1] ;
-
+  string filenameRoot;
+  if (argc==1)
+      // filename to save the generated MESH
+    filenameRoot = "/tmp/test_MEDMEM_Meshing" ;
+  else
+    filenameRoot=argv[1];
+    
   string filenameMed21 = filenameRoot+"_V21.med";
   string filenameMed22 = filenameRoot+"_V22.med";
   string filenameVtk = filenameRoot+".vtk";
@@ -168,138 +176,140 @@ int main (int argc, char ** argv) {
   // Some groups :
 
   // Node :
+  
+  GROUP partialGroupOnNodes ;
   {
-    GROUP myGroup ;
-    myGroup.setName("SomeNodes");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_NODE);
-    myGroup.setNumberOfGeometricType(1);
-    medGeometryElement myTypes[1] = {MED_NONE};
-    myGroup.setGeometricType(myTypes);
-    const int myNumberOfElements[1] = {4} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[1+1] = {1,5} ;
-    const int value[4]= { 1,4,5,7} ;
-    myGroup.setNumber(index,value);
-    
-    myMeshing.addGroup(myGroup);
-  }
+  partialGroupOnNodes.setName("SomeNodes");
+  partialGroupOnNodes.setMesh(&myMeshing);
+  partialGroupOnNodes.setEntity(MED_NODE);
+  partialGroupOnNodes.setNumberOfGeometricType(1);
+  medGeometryElement myTypes[1] = {MED_NONE};
+  partialGroupOnNodes.setGeometricType(myTypes);
+  const int myNumberOfElements[1] = {4} ;
+  partialGroupOnNodes.setNumberOfElements(myNumberOfElements);
+  const int index[1+1] = {1,5} ;
+  const int value[4]= { 1,4,5,7} ;
+  partialGroupOnNodes.setNumber(index,value);
+  } 
+  myMeshing.addGroup(partialGroupOnNodes);
+  
+  
+  GROUP partialGroupOnNodes2 ;
   {
-    GROUP myGroup ;
-    myGroup.setName("OtherNodes");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_NODE);
-    myGroup.setNumberOfGeometricType(1);
-    medGeometryElement myTypes[1] = {MED_NONE};
-    myGroup.setGeometricType(myTypes);
-    const int myNumberOfElements[1] = {3} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[1+1] = {1,4} ;
-    const int value[3]= { 2,3,6} ;
-    myGroup.setNumber(index,value);
-    
-    myMeshing.addGroup(myGroup);
+  partialGroupOnNodes2.setName("OtherNodes");
+  partialGroupOnNodes2.setMesh(&myMeshing);
+  partialGroupOnNodes2.setEntity(MED_NODE);
+  partialGroupOnNodes2.setNumberOfGeometricType(1);
+  medGeometryElement myTypes[1] = {MED_NONE};
+  partialGroupOnNodes2.setGeometricType(myTypes);
+  const int myNumberOfElements[1] = {3} ;
+  partialGroupOnNodes2.setNumberOfElements(myNumberOfElements);
+  const int index[1+1] = {1,4} ;
+  const int value[3]= { 2,3,6} ;
+  partialGroupOnNodes2.setNumber(index,value);
   }
+  myMeshing.addGroup(partialGroupOnNodes2);
+  
 
   // Cell :
+  
+  GROUP partialGroupOnCells ;
   {
-    GROUP myGroup ;
-    myGroup.setName("SomeCells");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_CELL);
-    myGroup.setNumberOfGeometricType(3);
-    medGeometryElement myTypes[3] = {MED_TETRA4,MED_PYRA5,MED_HEXA8};
-    myGroup.setGeometricType(myTypes);
-    const int myNumberOfElements[3] = {4,1,2} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[3+1] = {1,5,6,8} ;
-    const int value[4+1+2]=
+  partialGroupOnCells.setName("SomeCells");
+  partialGroupOnCells.setMesh(&myMeshing);
+  partialGroupOnCells.setEntity(MED_CELL);
+  partialGroupOnCells.setNumberOfGeometricType(3);
+  medGeometryElement myTypes[3] = {MED_TETRA4,MED_PYRA5,MED_HEXA8};
+  partialGroupOnCells.setGeometricType(myTypes);
+  const int myNumberOfElements[3] = {4,1,2} ;
+  partialGroupOnCells.setNumberOfElements(myNumberOfElements);
+  const int index[3+1] = {1,5,6,8} ;
+  const int value[4+1+2]=
     {
       2,7,8,12,
       13,
       15,16
     };
-    myGroup.setNumber(index,value);
-    
-    myMeshing.addGroup(myGroup);
+  partialGroupOnCells.setNumber(index,value);
   }
-  {
-    GROUP myGroup ;
-    myGroup.setName("OtherCells");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_CELL);
-    myGroup.setNumberOfGeometricType(2);
+  myMeshing.addGroup(partialGroupOnCells);
+  
+  
+    GROUP partialGroupOnCells2 ;
+    {
+    partialGroupOnCells2.setName("OtherCells");
+    partialGroupOnCells2.setMesh(&myMeshing);
+    partialGroupOnCells2.setEntity(MED_CELL);
+    partialGroupOnCells2.setNumberOfGeometricType(2);
     medGeometryElement myTypes[] = {MED_TETRA4,MED_PYRA5};
-    myGroup.setGeometricType(myTypes);
+    partialGroupOnCells2.setGeometricType(myTypes);
     const int myNumberOfElements[] = {4,1} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
+    partialGroupOnCells2.setNumberOfElements(myNumberOfElements);
     const int index[2+1] = {1,5,6} ;
     const int value[4+1]=
     {
       3,4,5,9,
       14
     };
-    myGroup.setNumber(index,value);
-    
-    myMeshing.addGroup(myGroup);
-  }
+    partialGroupOnCells2.setNumber(index,value);
+    }
+    myMeshing.addGroup(partialGroupOnCells2);
+  
 
   // Face :
-  {
-    GROUP myGroup ;
-    myGroup.setName("SomeFaces");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_FACE);
-    myGroup.setNumberOfGeometricType(2);
+    
+    GROUP partialGroupOnFaces ;
+    {
+    partialGroupOnFaces.setName("SomeFaces");
+    partialGroupOnFaces.setMesh(&myMeshing);
+    partialGroupOnFaces.setEntity(MED_FACE);
+    partialGroupOnFaces.setNumberOfGeometricType(2);
     medGeometryElement myTypes[2] = {MED_TRIA3,MED_QUAD4};
-    myGroup.setGeometricType(myTypes);
+    partialGroupOnFaces.setGeometricType(myTypes);
     const int myNumberOfElements[2] = {2,3} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
+    partialGroupOnFaces.setNumberOfElements(myNumberOfElements);
     const int index[2+1] = {1,3,6} ;
     const int value[2+3]=
     {
       2,4,
       5,6,8
     } ;
-    myGroup.setNumber(index,value);
-    
-    myMeshing.addGroup(myGroup);
-  }
-  {
-    GROUP myGroup ;
-    myGroup.setName("OtherFaces");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_FACE);
-    myGroup.setNumberOfGeometricType(1);
-    medGeometryElement myTypes[1] = {MED_TRIA3};
-    myGroup.setGeometricType(myTypes);
-    const int myNumberOfElements[1] = {2} ;
-    myGroup.setNumberOfElements(myNumberOfElements);
-    const int index[1+1] = {1,3} ;
-    const int value[2]=
-    {
-      1,3
-    } ;
-    myGroup.setNumber(index,value);
-    
-    myMeshing.addGroup(myGroup);
-  }
+    partialGroupOnFaces.setNumber(index,value);
+    }
+    myMeshing.addGroup(partialGroupOnFaces);
+  
+  
+    GROUP partialGroupOnFaces2 ;
+    {   
+      partialGroupOnFaces2.setName("OtherFaces");
+      partialGroupOnFaces2.setMesh(&myMeshing);
+      partialGroupOnFaces2.setEntity(MED_FACE);
+      medGeometryElement myTypes[1] = {MED_TRIA3}; 
+      int myNumberOfElements[1] = {2} ;
+      int value[2]=
+	{
+	  1,3
+	} ;
+      //    partialGroupOnFaces2.setNumber(index,value);
+      partialGroupOnFaces2.setpartial("description",1,2,myTypes,myNumberOfElements,value);
+    }
+    myMeshing.addGroup(partialGroupOnFaces2);
 
-  // all rigtht, we save it in Med 2.1 2.2 and vtk !
+  // all right, we save it in Med 2.1 2.2 and vtk !
 
   medFileVersion version = getMedFileVersionForWriting();
-  if (version == V22)
-    setMedFileVersionForWriting(V21);
-
-  int idMed21 = myMeshing.addDriver(MED_DRIVER,filenameMed21,myMeshing.getName());
-  myMeshing.write(idMed21) ;
-
-  version = getMedFileVersionForWriting();
   if (version == V21)
     setMedFileVersionForWriting(V22);
 
   int idMed22 = myMeshing.addDriver(MED_DRIVER,filenameMed22,myMeshing.getName());
   myMeshing.write(idMed22) ;
+
+  version = getMedFileVersionForWriting();
+  if (version == V22)
+    setMedFileVersionForWriting(V21);
+
+  int idMed21 = myMeshing.addDriver(MED_DRIVER,filenameMed21,myMeshing.getName());
+  myMeshing.write(idMed21) ;
 
   int idVtk = myMeshing.addDriver(VTK_DRIVER,filenameVtk,myMeshing.getName());
   myMeshing.write(idVtk) ;
@@ -323,6 +333,16 @@ int main (int argc, char ** argv) {
   fieldDoubleScalarOnNodes->setComponentName(1,"Vx");
   fieldDoubleScalarOnNodes->setComponentDescription(1,"comp1");
   fieldDoubleScalarOnNodes->setMEDComponentUnit(1,"unit1");
+
+  FIELD<double>* fieldDoubleScalarOnPartialNodes = new FIELD<double>(&partialGroupOnNodes,1);
+  fieldDoubleScalarOnPartialNodes->setName("fieldScalarDoublePartialNodes");
+  fieldDoubleScalarOnPartialNodes->setIterationNumber(-1);
+  fieldDoubleScalarOnPartialNodes->setOrderNumber(-1);
+  fieldDoubleScalarOnPartialNodes->setTime(0.0);
+  fieldDoubleScalarOnPartialNodes->setComponentName(1,"Vx");
+  fieldDoubleScalarOnPartialNodes->setComponentDescription(1,"comp1");
+  fieldDoubleScalarOnPartialNodes->setMEDComponentUnit(1,"unit1");
+
 
   FIELD<double> * fieldDoubleVectorOnNodes = new FIELD<double>(supportOnNodes,SpaceDimension);
   fieldDoubleVectorOnNodes->setName("fieldVectorDoubleNode");
@@ -349,6 +369,41 @@ int main (int argc, char ** argv) {
   fieldDoubleScalarOnCells->setComponentName(1,"Vx");
   fieldDoubleScalarOnCells->setComponentDescription(1,"comp1");
   fieldDoubleScalarOnCells->setMEDComponentUnit(1,"unit1");
+
+
+  FIELD<double> * fieldDoubleScalarOnPartialCells = new FIELD<double>(&partialGroupOnCells,1);
+  fieldDoubleScalarOnPartialCells->setName("fieldScalarDoublePartialCell");
+  fieldDoubleScalarOnPartialCells->setIterationNumber(-1);
+  fieldDoubleScalarOnPartialCells->setOrderNumber(-1);
+  fieldDoubleScalarOnPartialCells->setTime(0.0);
+
+  fieldDoubleScalarOnPartialCells->setComponentName(1,"Vx");
+  fieldDoubleScalarOnPartialCells->setComponentDescription(1,"comp1");
+  fieldDoubleScalarOnPartialCells->setMEDComponentUnit(1,"unit1");
+
+  FIELD<double> * fieldDoubleScalarOnPartialFaces = new FIELD<double>(&partialGroupOnFaces,1);
+  fieldDoubleScalarOnPartialFaces->setName("fieldScalarDoublePartialFace");
+  fieldDoubleScalarOnPartialFaces->setIterationNumber(-1);
+  fieldDoubleScalarOnPartialFaces->setOrderNumber(-1);
+  fieldDoubleScalarOnPartialFaces->setTime(0.0);
+  fieldDoubleScalarOnPartialFaces->setComponentName(1,"Vx");
+  fieldDoubleScalarOnPartialFaces->setComponentDescription(1,"comp1");
+  fieldDoubleScalarOnPartialFaces->setMEDComponentUnit(1,"unit1");
+
+ FIELD<double> * fieldDoubleVectorOnPartialFaces = new FIELD<double>(&partialGroupOnFaces2,2);
+  fieldDoubleVectorOnPartialFaces->setName("fieldVectorDoublePartialFace");
+  fieldDoubleVectorOnPartialFaces->setIterationNumber(-1);
+  fieldDoubleVectorOnPartialFaces->setOrderNumber(-1);
+  fieldDoubleVectorOnPartialFaces->setTime(0.0);
+  fieldDoubleVectorOnPartialFaces->setComponentName(1,"Vx");
+  fieldDoubleVectorOnPartialFaces->setComponentName(2,"Vy");
+
+  fieldDoubleVectorOnPartialFaces->setComponentDescription(1,"comp1");
+  fieldDoubleVectorOnPartialFaces->setComponentDescription(2,"comp2");
+
+  fieldDoubleVectorOnPartialFaces->setMEDComponentUnit(1,"unit1");
+  fieldDoubleVectorOnPartialFaces->setMEDComponentUnit(2,"unit2");
+
 
   FIELD<double> * fieldDoubleVectorOnCells = new FIELD<double>(supportOnCells,SpaceDimension);
   fieldDoubleVectorOnCells->setName("fieldVectorrDoubleCell");
@@ -464,6 +519,31 @@ int main (int argc, char ** argv) {
       fieldIntVectorOnCells->setValueIJ(i+1,3,valueInt3);
     }
 
+  for (int i=0; i<partialGroupOnNodes.getNumberOfElements(MED_ALL_ELEMENTS); i++)
+    {
+      const int* number=partialGroupOnNodes.getNumber(MED_ALL_ELEMENTS);
+      fieldDoubleScalarOnPartialNodes->setValueIJ(number[i],1,i+1);
+    }
+    
+  for (int i=0; i<partialGroupOnCells.getNumberOfElements(MED_ALL_ELEMENTS); i++)
+    {
+      const int* number=partialGroupOnCells.getNumber(MED_ALL_ELEMENTS);
+      fieldDoubleScalarOnPartialCells->setValueIJ(number[i],1,i+1);
+    }
+  
+  for (int i=0; i<partialGroupOnFaces.getNumberOfElements(MED_ALL_ELEMENTS); i++)
+    {
+      const int* number=partialGroupOnFaces.getNumber(MED_ALL_ELEMENTS);
+      fieldDoubleScalarOnPartialFaces->setValueIJ(number[i],1,i+1);
+    }
+
+  for (int i=0; i<partialGroupOnFaces2.getNumberOfElements(MED_ALL_ELEMENTS); i++)
+    {
+      const int* number=partialGroupOnFaces2.getNumber(MED_ALL_ELEMENTS);
+      fieldDoubleVectorOnPartialFaces->setValueIJ(number[i],1,i+1);
+      fieldDoubleVectorOnPartialFaces->setValueIJ(number[i],2,-i-1);
+    }
+
   version = getMedFileVersionForWriting();
   if (version == V22)
     setMedFileVersionForWriting(V21);
@@ -491,6 +571,7 @@ int main (int argc, char ** argv) {
 
   idMed21 = fieldIntVectorOnCells->addDriver(MED_DRIVER,filenameMed21,fieldIntVectorOnCells->getName());
   fieldIntVectorOnCells->write(idMed21) ;
+
 
   version = getMedFileVersionForWriting();
   if (version == V21)
@@ -520,6 +601,19 @@ int main (int argc, char ** argv) {
   idMed22 = fieldIntVectorOnCells->addDriver(MED_DRIVER,filenameMed22,fieldIntVectorOnCells->getName());
   fieldIntVectorOnCells->write(idMed22) ;
 
+  idMed22 = fieldDoubleScalarOnPartialNodes->addDriver(MED_DRIVER,filenameMed22,fieldDoubleScalarOnPartialNodes->getName());
+  fieldDoubleScalarOnPartialNodes->write(idMed22) ;
+  
+  idMed22 = fieldDoubleScalarOnPartialCells->addDriver(MED_DRIVER,filenameMed22,fieldDoubleScalarOnPartialCells->getName());
+  fieldDoubleScalarOnPartialCells->write(idMed22) ;
+
+  idMed22 = fieldDoubleScalarOnPartialFaces->addDriver(MED_DRIVER,filenameMed22,fieldDoubleScalarOnPartialFaces->getName());
+  fieldDoubleScalarOnPartialFaces->write(idMed22) ;
+
+  idMed22 = fieldDoubleVectorOnPartialFaces->addDriver(MED_DRIVER,filenameMed22,fieldDoubleVectorOnPartialFaces->getName());
+  fieldDoubleVectorOnPartialFaces->write(idMed22) ;
+
+
   idVtk = fieldDoubleScalarOnNodes->addDriver(VTK_DRIVER,filenameVtk,fieldDoubleScalarOnNodes->getName());
   fieldDoubleScalarOnNodes->writeAppend(idVtk) ;
 
@@ -544,6 +638,7 @@ int main (int argc, char ** argv) {
   idVtk = fieldIntVectorOnCells->addDriver(VTK_DRIVER,filenameVtk,fieldIntVectorOnCells->getName());
   fieldIntVectorOnCells->writeAppend(idVtk) ;
 
+
   delete fieldDoubleScalarOnNodes;
   delete fieldIntScalarOnNodes;
   delete fieldDoubleVectorOnNodes;
@@ -552,6 +647,10 @@ int main (int argc, char ** argv) {
   delete fieldIntScalarOnCells;
   delete fieldDoubleVectorOnCells;
   delete fieldIntVectorOnCells;
+  delete fieldDoubleScalarOnPartialCells;
+  delete fieldDoubleScalarOnPartialNodes;
+  delete fieldDoubleScalarOnPartialFaces;
+  delete fieldDoubleVectorOnPartialFaces;
 
   delete supportOnNodes;
   delete supportOnCells;

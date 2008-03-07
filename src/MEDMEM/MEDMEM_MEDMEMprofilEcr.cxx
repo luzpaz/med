@@ -22,7 +22,7 @@
  * on intègre la correction ici.
  */
 
-namespace med_2_2 {
+namespace med_2_3 {
   extern "C" {
 
 # define ICI                    {			\
@@ -103,7 +103,8 @@ namespace med_2_2 {
        * Sinon => erreur
        */
       if ((chid = _MEDdatagroupOuvrir(gid,profilname)) >= 0) {
-	if ( MED_MODE_ACCES != MED_LECTURE_ECRITURE ) {
+	if ( false )//MED_MODE_ACCES != MED_LECTURE_ECRITURE )
+  {
 	  MESSAGE("Le profil existe déjà : ");
 	  SSCRUTE(profilname); goto ERROR;
 	}

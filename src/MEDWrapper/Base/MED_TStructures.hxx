@@ -34,6 +34,66 @@
 namespace MED
 {
   //---------------------------------------------------------------
+  //! To provide a common way to handle values of MEDWrapper types as native MED types
+  template<class TValue, class TRepresentation>
+  struct TValueHolder
+  {
+    TValue& myValue;
+    TRepresentation myRepresentation;
+
+    TValueHolder(TValue& theValue):
+      myValue(theValue),
+      myRepresentation(TRepresentation(theValue))
+    {}
+
+    ~TValueHolder()
+    {
+      myValue = TValue(myRepresentation);
+    }
+
+    TRepresentation*
+    operator& ()
+    {
+      return &myRepresentation;
+    }
+
+    operator TRepresentation () const
+    {
+      return myRepresentation;
+    }  
+
+    const TValue&
+    operator() () const
+    {
+      return myValue;
+    }  
+  };
+  
+  //! To customize TValueHolder common template definition for TVector
+  template<class TVal, class TRepresentation>
+  struct TValueHolder<TVector<TVal>, TRepresentation>
+  {
+    typedef TVector<TVal> TValue;
+    TValue& myValue;
+    TRepresentation* myRepresentation;
+
+    TValueHolder(TValue& theValue):
+      myValue(theValue)
+    {
+      if(theValue.empty())
+	myRepresentation = (TRepresentation*)NULL;
+      else
+	myRepresentation = (TRepresentation*)&theValue[0];
+    }
+
+    TRepresentation*
+    operator& ()
+    {
+      return myRepresentation;
+    }
+  };
+  
+  //---------------------------------------------------------------
   template<EVersion eVersion>
   struct TTNameInfo: virtual TNameInfo
   {
@@ -47,14 +107,21 @@ namespace MED
     std::string
     GetName() const 
     { 
-      return GetString(0,GetNOMLength<eVersion>(),myName);
+      return GetString(0, GetNOMLength<eVersion>(), myName);
     }
 
     virtual
     void
     SetName(const std::string& theValue)
     {
-      SetString(0,GetNOMLength<eVersion>(),myName,theValue);
+      SetString(0, GetNOMLength<eVersion>(), myName, theValue);
+    }
+
+    virtual
+    void
+    SetName(const TString& theValue)
+    {
+      SetString(0, GetNOMLength<eVersion>(), myName, theValue);
     }
   };
 
@@ -94,14 +161,14 @@ namespace MED
     std::string
     GetDesc() const 
     { 
-      return GetString(0,GetDESCLength<eVersion>(),myDesc);
+      return GetString(0, GetDESCLength<eVersion>(), myDesc);
     }
 
     virtual
     void
     SetDesc(const std::string& theValue)
     {
-      SetString(0,GetDESCLength<eVersion>(),myDesc,theValue);
+      SetString(0, GetDESCLength<eVersion>(), myDesc, theValue);
     }
   };
 
@@ -175,7 +242,7 @@ namespace MED
 
       myId = theId;
 
-      myNbGroup = theGroupNames.size();
+      myNbGroup = (TInt)theGroupNames.size();
       myGroupNames.resize(myNbGroup*GetLNOMLength<eVersion>()+1);
       if(myNbGroup){
 	TStringSet::const_iterator anIter = theGroupNames.begin();
@@ -185,12 +252,12 @@ namespace MED
 	}
       }
 
-      myNbAttr = theAttrDescs.size();
+      myNbAttr = (TInt)theAttrDescs.size();
       myAttrId.resize(myNbAttr);
       myAttrVal.resize(myNbAttr);
       myAttrDesc.resize(myNbAttr*GetDESCLength<eVersion>()+1);
       if(myNbAttr){
-	for(TInt anId = 0, anEnd = theAttrDescs.size(); anId < anEnd; anId++){
+	for(TInt anId = 0, anEnd = (TInt)theAttrDescs.size(); anId < anEnd; anId++){
 	  SetAttrDesc(anId,theAttrDescs[anId]);
 	  myAttrVal[anId] = theAttrVals[anId];
 	  myAttrId[anId] = theAttrIds[anId];
@@ -202,28 +269,28 @@ namespace MED
     std::string
     GetGroupName(TInt theId) const 
     { 
-      return GetString(theId,GetLNOMLength<eVersion>(),myGroupNames);
+      return GetString(theId, GetLNOMLength<eVersion>(), myGroupNames);
     }
 
     virtual
     void
     SetGroupName(TInt theId, const std::string& theValue)
     {
-      SetString(theId,GetLNOMLength<eVersion>(),myGroupNames,theValue);
+      SetString(theId, GetLNOMLength<eVersion>(), myGroupNames, theValue);
     }
 
     virtual
     std::string
     GetAttrDesc(TInt theId) const 
     { 
-      return GetString(theId,GetDESCLength<eVersion>(),myAttrDesc);
+      return GetString(theId, GetDESCLength<eVersion>(), myAttrDesc);
     }
 
     virtual
     void
     SetAttrDesc(TInt theId, const std::string& theValue)
     {
-      SetString(theId,GetDESCLength<eVersion>(),myAttrDesc,theValue);
+      SetString(theId, GetDESCLength<eVersion>(), myAttrDesc, theValue);
     }
   };
 
@@ -237,24 +304,30 @@ namespace MED
       myMeshInfo = theMeshInfo;
       
       myNbElem = theInfo->GetNbElem();
-      myFamNum.resize(myNbElem);
+      myFamNum.reset(new TElemNum(myNbElem));
 
       myIsElemNum = theInfo->IsElemNum();
-      myElemNum.resize(myIsElemNum == eFAUX? 0: myNbElem);
+      if(theInfo->IsElemNum())
+	myElemNum.reset(new TElemNum(myNbElem));
+      else
+	myElemNum.reset(new TElemNum());
 
       myIsElemNames = theInfo->IsElemNames();
-      myElemNames.resize(myNbElem*GetPNOMLength<eVersion>()+1);
+      if(theInfo->IsElemNames())
+	myElemNames.reset(new TString(myNbElem*GetPNOMLength<eVersion>() + 1));
+      else
+	myElemNames.reset(new TString());
 
-      if(myNbElem){
+      if(theInfo->GetNbElem()){
 	for(TInt anId = 0; anId < myNbElem; anId++){
-	  myFamNum[anId] = theInfo->GetFamNum(anId);
+	  SetFamNum(anId, theInfo->GetFamNum(anId));
 	}
-	if(myIsElemNum == eVRAI){
+	if(theInfo->IsElemNum() == eVRAI){
 	  for(TInt anId = 0; anId < myNbElem; anId++){
-	    myElemNum[anId] = theInfo->GetElemNum(anId);
+	    SetElemNum(anId, theInfo->GetElemNum(anId));
 	  }
 	}
-	if(myIsElemNames == eVRAI){
+	if(theInfo->IsElemNames() == eVRAI){
 	  for(TInt anId = 0; anId < myNbElem; anId++){
 	    SetElemName(anId,theInfo->GetElemName(anId));
 	  }
@@ -270,16 +343,20 @@ namespace MED
       myMeshInfo = theMeshInfo;
 
       myNbElem = theNbElem;
-      myFamNum.resize(theNbElem);
+      myFamNum.reset(new TElemNum(theNbElem));
 
       myIsElemNum = theIsElemNum;
       if(theIsElemNum)
-	myElemNum.resize(theNbElem);
+	myElemNum.reset(new TElemNum(theNbElem));
+      else
+	myElemNum.reset(new TElemNum());
 
       myIsElemNames = theIsElemNames;
       if(theIsElemNames)
-	myElemNames.resize(theNbElem*GetPNOMLength<eVersion>()+1);
-    }
+	myElemNames.reset(new TString(theNbElem*GetPNOMLength<eVersion>() + 1));
+      else
+	myElemNames.reset(new TString());
+   }
     
     TTElemInfo(const PMeshInfo& theMeshInfo, 
 	       TInt theNbElem,
@@ -290,23 +367,27 @@ namespace MED
       myMeshInfo = theMeshInfo;
       
       myNbElem = theNbElem;
+      myFamNum.reset(new TElemNum(theNbElem));
       
       myIsElemNum = theElemNums.size()? eVRAI: eFAUX;
       if(myIsElemNum)
-	myElemNum.resize(theNbElem);
+	myElemNum.reset(new TElemNum(theNbElem));
+      else
+	myElemNum.reset(new TElemNum());
       
       myIsElemNames = theElemNames.size()? eVRAI: eFAUX;
       if(myIsElemNames)
-	myElemNames.resize(theNbElem*GetPNOMLength<eVersion>()+1);
-      
+	myElemNames.reset(new TString(theNbElem*GetPNOMLength<eVersion>() + 1));
+      else
+	myElemNames.reset(new TString());
+     
       if(theNbElem){
 
-	myFamNum.resize(theNbElem);
 	if(theFamilyNums.size())
-	  myFamNum = theFamilyNums;
+	  *myFamNum = theFamilyNums;
 
 	if(myIsElemNum)
-	  myElemNum = theElemNums;
+	  *myElemNum = theElemNums;
 
 	if(myIsElemNames){
 	  for(TInt anId = 0; anId < theNbElem; anId++){
@@ -321,14 +402,14 @@ namespace MED
     std::string
     GetElemName(TInt theId) const 
     { 
-      return GetString(theId,GetPNOMLength<eVersion>(),myElemNames);
+      return GetString(theId,GetPNOMLength<eVersion>(), *myElemNames);
     }
 
     virtual
     void
     SetElemName(TInt theId, const std::string& theValue)
     {
-      SetString(theId,GetPNOMLength<eVersion>(),myElemNames,theValue);
+      SetString(theId,GetPNOMLength<eVersion>(), *myElemNames, theValue);
     }
   };
 
@@ -342,14 +423,14 @@ namespace MED
     typedef TTElemInfo<eVersion> TElemInfoBase;
 
     TTNodeInfo(const PMeshInfo& theMeshInfo, const PNodeInfo& theInfo):
-      TElemInfoBase(theMeshInfo,theInfo),
+      TElemInfoBase(theMeshInfo, theInfo),
       TNodeInfo(theInfo)
     {
       myModeSwitch = theInfo->GetModeSwitch();
       
       mySystem = theInfo->GetSystem();
       
-      myCoord = theInfo->myCoord;
+      myCoord.reset(new TNodeCoord(*theInfo->myCoord));
       
       TInt aDim = theMeshInfo->GetDim();
 
@@ -376,7 +457,7 @@ namespace MED
     {
       mySystem = theSystem;
 
-      myCoord.resize(theNbElem*theMeshInfo->myDim);
+      myCoord.reset(new TNodeCoord(theNbElem * theMeshInfo->myDim));
 
       if(theIsElemNum)
 	myCoordUnits.resize(theMeshInfo->myDim*GetPNOMLength<eVersion>()+1);
@@ -396,7 +477,7 @@ namespace MED
 	       const TIntVector& theElemNums,
 	       const TStringVector& theElemNames):
       TElemInfoBase(theMeshInfo,
-		    theNodeCoords.size()/theMeshInfo->GetDim(),
+		    (TInt)theNodeCoords.size()/theMeshInfo->GetDim(),
 		    theFamilyNums,
 		    theElemNums,
 		    theElemNames),
@@ -404,7 +485,7 @@ namespace MED
     {
       mySystem = theSystem;
 
-      myCoord = theNodeCoords;
+      myCoord.reset(new TNodeCoord(theNodeCoords));
       
       TInt aDim = theMeshInfo->GetDim();
 
@@ -413,10 +494,10 @@ namespace MED
 	for(TInt anId = 0; anId < aDim; anId++)
 	  SetCoordName(anId,theCoordNames[anId]);
       
-      myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+1);
+      myCoordUnits.resize(aDim*GetPNOMLength<eVersion>() + 1);
       if(!theCoordUnits.empty())
 	for(TInt anId = 0; anId < aDim; anId++)
-	  SetCoordUnit(anId,theCoordUnits[anId]);
+	  SetCoordUnit(anId, theCoordUnits[anId]);
     }
 
     virtual
@@ -462,8 +543,8 @@ namespace MED
       myEntity = theInfo->GetEntity();
       myGeom = theInfo->GetGeom();
 
-      myIndex = theInfo->myIndex;
-      myConn = theInfo->myConn;
+      myIndex.reset(new TElemNum(*theInfo->myIndex));
+      myConn.reset(new TElemNum(*theInfo->myConn));
 
       myConnMode = theInfo->GetConnMode();
     }
@@ -484,8 +565,8 @@ namespace MED
       myEntity = theEntity;
       myGeom = theGeom;
 
-      myIndex.resize(theNbElem+1);
-      myConn.resize(theConnSize);
+      myIndex.reset(new TElemNum(theNbElem + 1));
+      myConn.reset(new TElemNum(theConnSize));
 
       myConnMode = theConnMode;
     }
@@ -500,7 +581,7 @@ namespace MED
 		   const TIntVector& theElemNums,
 		   const TStringVector& theElemNames):
       TElemInfoBase(theMeshInfo,
-		    theIndexes.size() - 1,
+		    (TInt)theIndexes.size() - 1,
 		    theFamilyNums,
 		    theElemNums,
 		    theElemNames)
@@ -508,8 +589,8 @@ namespace MED
       myEntity = theEntity;
       myGeom = theGeom;
 
-      myIndex = theIndexes;
-      myConn = theConnectivities;
+      myIndex.reset(new TElemNum(theIndexes));
+      myConn.reset(new TElemNum(theConnectivities));
 
       myConnMode = theConnMode;
     }
@@ -529,9 +610,9 @@ namespace MED
       myEntity = theInfo->GetEntity();
       myGeom = theInfo->GetGeom();
 
-      myIndex = theInfo->myIndex;
-      myFaces = theInfo->myFaces;
-      myConn = theInfo->myConn;
+      myIndex.reset(new TElemNum(*theInfo->myIndex));
+      myFaces.reset(new TElemNum(*theInfo->myFaces));
+      myConn.reset(new TElemNum(*theInfo->myConn));
 
       myConnMode = theInfo->GetConnMode();
     }
@@ -553,9 +634,9 @@ namespace MED
       myEntity = theEntity;
       myGeom = theGeom;
 
-      myIndex.resize(theNbElem + 1);
-      myFaces.resize(theNbFaces);
-      myConn.resize(theConnSize);
+      myIndex.reset(new TElemNum(theNbElem + 1));
+      myFaces.reset(new TElemNum(theNbFaces));
+      myConn.reset(new TElemNum(theConnSize));
 
       myConnMode = theConnMode;
     }
@@ -571,7 +652,7 @@ namespace MED
 		   const TIntVector& theElemNums,
 		   const TStringVector& theElemNames):
       TElemInfoBase(theMeshInfo,
-		    theIndexes.size()-1,
+		    (TInt)theIndexes.size()-1,
 		    theFamilyNums,
 		    theElemNums,
 		    theElemNames)
@@ -579,9 +660,9 @@ namespace MED
       myEntity = theEntity;
       myGeom = theGeom;
 
-      myIndex = theIndexes;
-      myFaces = theFaces;
-      myConn = theConnectivities;
+      myIndex.reset(new TElemNum(theIndexes));
+      myFaces.reset(new TElemNum(theFaces));
+      myConn.reset(new TElemNum(theConnectivities));
 
       myConnMode = theConnMode;
     }
@@ -603,7 +684,8 @@ namespace MED
       myConnMode  = theInfo->GetConnMode();
       
       TInt aConnDim = GetNbNodes(myGeom);
-      myConn.resize(myNbElem*GetNbConn<eVersion>(myGeom,myEntity,myMeshInfo->myDim));
+      TInt aNbConn = GetNbConn<eVersion>(myGeom, myEntity, myMeshInfo->myDim);
+      myConn.reset(new TElemNum(myNbElem * aNbConn));
       for(TInt anElemId = 0; anElemId < myNbElem; anElemId++){
 	TConnSlice aConnSlice = GetConnSlice(anElemId);
 	TCConnSlice aConnSlice2 = theInfo->GetConnSlice(anElemId);
@@ -631,7 +713,8 @@ namespace MED
       myGeom = theGeom;
 
       myConnMode = theConnMode;
-      myConn.resize(theNbElem*GetNbConn<eVersion>(theGeom,myEntity,theMeshInfo->myDim));
+      TInt aNbConn = GetNbConn<eVersion>(theGeom, myEntity, theMeshInfo->myDim);
+      myConn.reset(new TElemNum(theNbElem * aNbConn));
     }
     
     TTCellInfo(const PMeshInfo& theMeshInfo, 
@@ -644,7 +727,7 @@ namespace MED
 	       const TStringVector& theElemNames,
 	       EModeSwitch theMode):
       TElemInfoBase(theMeshInfo,
-		    theConnectivities.size()/GetNbNodes(theGeom),
+		    (TInt)theConnectivities.size() / GetNbNodes(theGeom),
 		    theFamilyNums,
 		    theElemNums,
 		    theElemNames),
@@ -655,21 +738,21 @@ namespace MED
 
       myConnMode = theConnMode;
       TInt aConnDim = GetNbNodes(myGeom);
-      myConn.resize(myNbElem*GetNbConn<eVersion>(myGeom,myEntity,myMeshInfo->myDim));
+      TInt aNbConn = GetNbConn<eVersion>(myGeom, myEntity, myMeshInfo->myDim);
+      myConn.reset(new TElemNum(myNbElem * aNbConn));
       for(TInt anElemId = 0; anElemId < myNbElem; anElemId++){
 	TConnSlice aConnSlice = GetConnSlice(anElemId);
 	for(TInt anConnId = 0; anConnId < aConnDim; anConnId++){
-	  aConnSlice[anConnId] = theConnectivities[anElemId*aConnDim+anConnId];
+	  aConnSlice[anConnId] = theConnectivities[anElemId*aConnDim + anConnId];
 	}
       }
-
     }
 
     virtual 
     TInt
     GetConnDim() const 
     { 
-      return GetNbConn<eVersion>(myGeom,myEntity,myMeshInfo->myDim);
+      return GetNbConn<eVersion>(myGeom, myEntity, myMeshInfo->myDim);
     }
 
   };
@@ -857,38 +940,46 @@ namespace MED
       TNameInfoBase(boost::get<0>(theInfo))
     {
       TInt aSize = boost::get<1>(theInfo);
-      myElemNum.resize(aSize);
+      myElemNum.reset(new TElemNum(aSize));
       myMode = aSize > 0? theMode: eNO_PFLMOD;
     }
   };
 
 
   //---------------------------------------------------------------
-  template<EVersion eVersion>
-  struct TTTimeStampVal: virtual TTimeStampVal
+  template<EVersion eVersion, class TMeshValueType>
+  struct TTTimeStampValue: virtual TTimeStampValue<TMeshValueType>
   {
-    TTTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const PTimeStampVal& theInfo)
+    TTTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const PTimeStampValueBase& theInfo,
+		     ETypeChamp theTypeChamp)
     {
-      myTimeStampInfo = theTimeStampInfo;
-
-      myGeom2Profile = theInfo->GetGeom2Profile();
-
-      myGeom2Value = theInfo->myGeom2Value;
+      typedef TTimeStampValue<TMeshValueType> TCompatible;
+      if(TCompatible* aCompatible = dynamic_cast<TCompatible*>(theInfo.get())){
+	this->myTimeStampInfo = theTimeStampInfo;
+	this->myTypeChamp = theTypeChamp;
+	this->myGeom2Profile = aCompatible->GetGeom2Profile();
+	this->myGeom2Value = aCompatible->myGeom2Value;
+	this->myGeomSet = aCompatible->GetGeomSet();
+      }else
+	EXCEPTION(std::runtime_error,"TTTimeStampValue::TTTimeStampValue - use incompatible arguments!");
     }
 
-    TTTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const TGeom2Profile& theGeom2Profile,
-		   EModeSwitch theMode):
+    TTTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     ETypeChamp theTypeChamp,
+		     const TGeom2Profile& theGeom2Profile,
+		     EModeSwitch theMode):
       TModeSwitchInfo(theMode)
     {
-      myTimeStampInfo = theTimeStampInfo;
+      this->myTimeStampInfo = theTimeStampInfo;
 
-      myGeom2Profile = theGeom2Profile;
+      this->myTypeChamp = theTypeChamp;
+
+      this->myGeom2Profile = theGeom2Profile;
 
       TInt aNbComp = theTimeStampInfo->myFieldInfo->myNbComp;
 
-      const TGeom2Size& aGeom2Size = theTimeStampInfo->myGeom2Size;
+      const TGeom2Size& aGeom2Size = theTimeStampInfo->GetGeom2Size();
       TGeom2Size::const_iterator anIter = aGeom2Size.begin();
       for(; anIter != aGeom2Size.end(); anIter++){
 	const EGeometrieElement& aGeom = anIter->first;
@@ -904,9 +995,47 @@ namespace MED
 
 	TInt aNbGauss = theTimeStampInfo->GetNbGauss(aGeom);
 	
-	TMeshValue& aMeshValue = GetMeshValue(aGeom);
-	aMeshValue.Init(aNbElem,aNbGauss,aNbComp);
+	this->GetMeshValue(aGeom).Allocate(aNbElem,aNbGauss,aNbComp);
       }
+    }
+
+    virtual 
+    size_t
+    GetValueSize(EGeometrieElement theGeom) const
+    {
+      return this->GetMeshValue(theGeom).GetSize();
+    }
+
+    virtual 
+    size_t
+    GetNbVal(EGeometrieElement theGeom) const
+    {
+      return this->GetMeshValue(theGeom).GetNbVal();
+    }
+
+    virtual 
+    size_t
+    GetNbGauss(EGeometrieElement theGeom) const
+    {
+      return this->GetMeshValue(theGeom).GetNbGauss();
+    }
+
+    virtual 
+    void
+    AllocateValue(EGeometrieElement theGeom,
+		  TInt theNbElem,
+		  TInt theNbGauss,
+		  TInt theNbComp,
+		  EModeSwitch theMode = eFULL_INTERLACE)
+    {
+      this->GetMeshValue(theGeom).Allocate(theNbElem,theNbGauss,theNbComp,theMode);
+    }
+    
+    virtual 
+    unsigned char*
+    GetValuePtr(EGeometrieElement theGeom)
+    {
+      return this->GetMeshValue(theGeom).GetValuePtr();
     }
   };
 
@@ -934,6 +1063,10 @@ namespace MED
 
       myGrilleType      = theInfo->GetGrilleType();
 
+      myFamNumNode.resize(theInfo->GetNbNodes());
+      myFamNumNode      = theInfo->myFamNumNode;
+
+      myFamNum      = theInfo->myFamNum;
     }
 
     TTGrilleInfo(const PMeshInfo& theMeshInfo,
@@ -952,7 +1085,7 @@ namespace MED
       }
       
       myGrilleStructure.resize(theMeshInfo->myDim);
-      
+      myFamNumNode.resize(nnoeuds);
     }
 
     TTGrilleInfo(const PMeshInfo& theMeshInfo,

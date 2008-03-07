@@ -27,6 +27,8 @@
 #ifndef _MED_SUPPORT_I_HXX_
 #define _MED_SUPPORT_I_HXX_
 
+#include "MEDMEM_I.hxx"
+
 #include <map>
 #include <string>
 
@@ -40,9 +42,9 @@
 namespace MEDMEM {
 class SUPPORT;
 
-  class SUPPORT_i: public POA_SALOME_MED::SUPPORT,
-		   public SALOMEMultiComm,
-		   public SALOME::GenericObj_i
+class MEDMEM_I_EXPORT SUPPORT_i: virtual public POA_SALOME_MED::SUPPORT,
+		   virtual public SALOMEMultiComm,
+		   virtual public SALOME::GenericObj_i
 {
 public :
     static std::map < int,::MEDMEM::SUPPORT *> supportMap;
@@ -77,6 +79,10 @@ public:
                                            throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumber(SALOME_MED::medGeometryElement geomElement) 
 					   throw (SALOME::SALOME_Exception);
+
+    SALOME_MED::long_array* getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
+                                           throw (SALOME::SALOME_Exception);
+
     SALOME::SenderInt_ptr getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumberIndex() 
@@ -99,8 +105,7 @@ public:
 			  SALOME_MED::SUPPORT_ptr myIor)
     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
-  static std::string getEntryPath (const std::string&        aMeshName,
-                                   const ::MEDMEM::SUPPORT * aSupport);
+  static std::string getEntryPath (const MEDMEM::SUPPORT * aSupport);
 
   void release();
   //					Cuisine interne

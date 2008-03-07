@@ -163,59 +163,59 @@ MESH::MESH(MESH &m)
   _numberOfNodes = m._numberOfNodes;
 
   _familyNode = m._familyNode;
-  for (int i=0; i<m._familyNode.size(); i++)
+  for (int i=0; i<(int)m._familyNode.size(); i++)
     {
       _familyNode[i] = new FAMILY(* m._familyNode[i]);
-      _familyNode[i]->setMesh(this);
+      _familyNode[i]->setMeshDirectly(this);
     }
 
   _familyCell = m._familyCell;
-  for (int i=0; i<m._familyCell.size(); i++)
+  for (int i=0; i<(int)m._familyCell.size(); i++)
     {
       _familyCell[i] = new FAMILY(* m._familyCell[i]);
-      _familyCell[i]->setMesh(this);
+      _familyCell[i]->setMeshDirectly(this);
     }
 
   _familyFace = m._familyFace;
-  for (int i=0; i<m._familyFace.size(); i++)
+  for (int i=0; i<(int)m._familyFace.size(); i++)
     {
       _familyFace[i] = new FAMILY(* m._familyFace[i]);
-      _familyFace[i]->setMesh(this);
+      _familyFace[i]->setMeshDirectly(this);
     }
 
   _familyEdge = m._familyEdge;
-  for (int i=0; i<m._familyEdge.size(); i++)
+  for (int i=0; i<(int)m._familyEdge.size(); i++)
     {
       _familyEdge[i] = new FAMILY(* m._familyEdge[i]);
-      _familyEdge[i]->setMesh(this);
+      _familyEdge[i]->setMeshDirectly(this);
     }
 
   _groupNode = m._groupNode;
-  for (int i=0; i<m._groupNode.size(); i++)
+  for (int i=0; i<(int)m._groupNode.size(); i++)
     {
       _groupNode[i] = new GROUP(* m._groupNode[i]);
-      _groupNode[i]->setMesh(this);
+      _groupNode[i]->setMeshDirectly(this);
     }
 
   _groupCell = m._groupCell;
-  for (int i=0; i<m._groupCell.size(); i++)
+  for (int i=0; i<(int)m._groupCell.size(); i++)
     {
       _groupCell[i] = new GROUP(* m._groupCell[i]);
-      _groupCell[i]->setMesh(this);
+      _groupCell[i]->setMeshDirectly(this);
     }
 
   _groupFace = m._groupFace;
-  for (int i=0; i<m._groupFace.size(); i++)
+  for (int i=0; i<(int)m._groupFace.size(); i++)
     {
       _groupFace[i] = new GROUP(* m._groupFace[i]);
-      _groupFace[i]->setMesh(this);
+      _groupFace[i]->setMeshDirectly(this);
     }
 
   _groupEdge = m._groupEdge;
-  for (int i=0; i<m._groupEdge.size(); i++)
+  for (int i=0; i<(int)m._groupEdge.size(); i++)
     {
       _groupEdge[i] = new GROUP(* m._groupEdge[i]);
-      _groupEdge[i]->setMesh(this);
+      _groupEdge[i]->setMeshDirectly(this);
     }
 
   //_drivers = m._drivers;  //Recopie des drivers?
@@ -303,6 +303,14 @@ int MESH::getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_EN::medG
     }
   else
     return getNumberOfElements(Entity,Type);
+}
+
+bool MESH::existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
+                                     MED_EN::medEntityMesh Entity) const
+{
+  if (_connectivity==(CONNECTIVITY*)NULL)
+    throw MEDEXCEPTION("MESH::existConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
+  return _connectivity->existConnectivityWithPoly(ConnectivityType,Entity);
 }
 
 MESH & MESH::operator=(const MESH &m)
@@ -397,8 +405,17 @@ bool MESH::deepCompare(const MESH& other) const
   return ret;
 }
 
+/*!
+ * \brief print my contents
+ */
 ostream & ::MEDMEM::operator<<(ostream &os, const MESH &myMesh)
 {
+  myMesh.printMySelf(os);
+  return os;
+}
+void MESH::printMySelf(ostream &os) const
+{
+  const MESH &myMesh = *this;
   int spacedimension = myMesh.getSpaceDimension();
   int meshdimension  = myMesh.getMeshDimension();
   int numberofnodes  = myMesh.getNumberOfNodes();
@@ -406,33 +423,37 @@ ostream & ::MEDMEM::operator<<(ostream &os, const MESH &myMesh)
   os << "Space Dimension : " << spacedimension << endl << endl;
 
   os << "Mesh Dimension : " << meshdimension << endl << endl;
-
-  const double * coordinates = myMesh.getCoordinates(MED_FULL_INTERLACE);
-  os << "SHOW NODES COORDINATES : " << endl;
-
-  os << "Name :" << endl;
-  const string * coordinatesnames = myMesh.getCoordinatesNames();
-  for(int i=0; i<spacedimension ; i++)
+  
+  if(myMesh.getCoordinateptr()) {
+    const double * coordinates = myMesh.getCoordinates(MED_FULL_INTERLACE);
+    
+    os << "SHOW NODES COORDINATES : " << endl;
+    os << "Name :" << endl;
+    const string * coordinatesnames = myMesh.getCoordinatesNames();
+    for(int i=0; i<spacedimension ; i++)
     {
       os << " - " << coordinatesnames[i] << endl;
     }
-  os << "Unit :" << endl;
-  const string * coordinatesunits = myMesh.getCoordinatesUnits();
-  for(int i=0; i<spacedimension ; i++)
+    os << "Unit :" << endl;
+    const string * coordinatesunits = myMesh.getCoordinatesUnits();
+    for(int i=0; i<spacedimension ; i++)
     {
       os << " - " << coordinatesunits[i] << endl;
     }
-  for(int i=0; i<numberofnodes ; i++)
+    for(int i=0; i<numberofnodes ; i++)
     {
       os << "Nodes " << i+1 << " : ";
       for (int j=0; j<spacedimension ; j++)
 	os << coordinates[i*spacedimension+j] << " ";
       os << endl;
     }
-
-  os << endl << "SHOW CONNECTIVITY  :" << endl;
-  os << *myMesh._connectivity << endl;
-
+  }
+  
+  if(myMesh.getConnectivityptr()) {
+    os << endl << "SHOW CONNECTIVITY  :" << endl;
+    os << *myMesh._connectivity << endl;
+  }
+  
   medEntityMesh entity;
   os << endl << "SHOW FAMILIES :" << endl << endl;
   for (int k=1; k<=4; k++)
@@ -465,8 +486,6 @@ ostream & ::MEDMEM::operator<<(ostream &os, const MESH &myMesh)
 	  os << * myMesh.getGroup(entity,i) << endl;
 	}
     }
-
-  return os;
 }
 
 /*!
@@ -581,7 +600,7 @@ void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT 
 {
   MED_EN::medEntityMesh entity=supportToFill->getEntity();
   supportToFill->setAll(false);
-  supportToFill->setMesh((MESH *)this);
+  supportToFill->setMeshDirectly((MESH *)this);
 
   int i;
   set<int> nodes;
@@ -730,7 +749,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 		int N5 = global_connectivity[pyra_index+4]-1;
 		xvolume=CalculateVolumeForPyra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5);
 		volume->setIJ(index,1,xvolume) ;
-		index = index++;
+		index++;
 	      }
 	    break;
 	  }
@@ -1326,7 +1345,6 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
   const medGeometryElement* types;
   int nb_entity_type;
   const int* global_connectivity;
-  const int * global_connectivityIndex;
 
   nb_type = Support->getNumberOfTypes();
   length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
@@ -1353,7 +1371,6 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
     {
       medGeometryElement type = types[i] ;
       nb_entity_type = Support->getNumberOfElements(type);
-      global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
       if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA )
 	{
 	  if (onAll)
@@ -1368,6 +1385,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 
 	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
 		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+		  const int *global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
 		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[global_connectivityIndex[supp_number[k_type]-1]+j_ent-1];
 		}
 	      }
@@ -1646,6 +1664,28 @@ void MESH::read(int index)
                           );
   END_OF(LOC);
 }
+
+/*! Write all the content of the MESH using driver referenced by the integer handler index.*/
+void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
+{
+  const char * LOC = "MESH::write(int index=0, const string & driverName = \"\") : ";
+  BEGIN_OF(LOC);
+
+  if ( _drivers[index] ) {
+    _drivers[index]->open();
+    if (driverName != "") _drivers[index]->setMeshName(driverName);
+    _drivers[index]->write();
+    _drivers[index]->close();
+  }
+  else
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
+                                     << "The index given is invalid, index must be between  0 and |"
+                                     << _drivers.size()
+                                     )
+                          );
+  END_OF(LOC);
+}
+
 //=======================================================================
 //function : getSkin
 //purpose  :
@@ -2059,6 +2099,52 @@ struct _cell
     MED_EN::medGeometryElement geometricType;
 };
 
+/*!
+Create groups from families.
+
+It is used to create groups that have only one family
+for meshes that come from codes that use families instead 
+of groups to define a subregion.
+*/
+void MESH::createGroups()
+{
+  for (medEntityMesh entity=MED_CELL; entity!=MED_ALL_ENTITIES; ++entity)
+    {
+      // make myFamilies points to the member corresponding to entity
+      vector<FAMILY*>* myFamilies;
+      vector<GROUP*>* myGroups;
+      switch ( entity )
+				{
+				case MED_CELL :
+					myFamilies = & _familyCell;
+					myGroups = & _groupCell;
+					break;
+				case MED_FACE :
+					myFamilies = & _familyFace;
+					myGroups = & _groupFace;
+					break;
+				case MED_EDGE :
+					myFamilies = & _familyEdge;
+					myGroups = & _groupEdge;
+					break;
+				case MED_NODE :
+					myFamilies = & _familyNode;
+					myGroups = & _groupNode;
+					break;
+				}
+      
+      
+			for (int i=0; i< myFamilies->size(); i++)
+				{
+					list <FAMILY*> fam_list;
+					fam_list.push_back((*myFamilies)[i]);
+					//creates a group with the family name and only one family
+					GROUP* group=new GROUP((*myFamilies)[i]->getName(),fam_list);
+					(*myGroups).push_back(group);
+				}
+    }
+}
+
 // Create families from groups
 void MESH::createFamilies()
 {
@@ -2200,7 +2286,7 @@ void MESH::createFamilies()
 	    FAMILY* newFam = new FAMILY();
 	    newFam->setTotalNumberOfElements(fam->second.size());
 	    newFam->setName(famName);
-	    newFam->setMesh(this);
+	    newFam->setMeshDirectly(this);
 	    newFam->setNumberOfGeometricType(tab_types_geometriques.size());
 	    newFam->setGeometricType(&tab_types_geometriques[0]); // we know the tab is not empy
 	    newFam->setNumberOfElements(&tab_nombres_elements[0]);
@@ -2259,11 +2345,11 @@ void MESH::createFamilies()
 	}
 
 	// delete old families
-	for (int i=0;i<myOldFamilies.size();i++)
+	for (unsigned int i=0;i<myOldFamilies.size();i++)
 	    delete myOldFamilies[i] ;
 
 	// update references in groups
-	for (int i=0;i<myGroups.size();i++)
+	for (unsigned int i=0;i<myGroups.size();i++)
 	{
 	    myGroups[i]->setNumberOfFamilies(whichFamilyInGroup[i].size());
 	    myGroups[i]->setFamilies(whichFamilyInGroup[i]);

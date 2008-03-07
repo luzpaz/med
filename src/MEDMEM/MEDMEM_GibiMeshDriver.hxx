@@ -20,6 +20,8 @@
 #ifndef GIBI_MESH_DRIVER_HXX
 #define GIBI_MESH_DRIVER_HXX
 
+#include <MEDMEM.hxx>
+
 #include <string>
 #include <vector>
 #include <map>
@@ -56,8 +58,8 @@ class FAMILY;
 class GROUP;
 class SUPPORT;
 class CONNECTIVITY;
-class _intermediateMED;
-class GIBI_MESH_DRIVER : public GENDRIVER
+struct _intermediateMED;
+class MEDMEM_EXPORT GIBI_MESH_DRIVER : public GENDRIVER
 {
 protected:
   
@@ -66,8 +68,14 @@ protected:
   string          _meshName;
   /////
 
+  // This enumeration is used to substitude static const
+  // memers data causing link errors on VC7 compiler.
+  enum
+  {
+    nb_geometrie_gibi = 47
+  };
   // tableau de correspondance des types géométriques de CASTEM -> MED
-  static const size_t nb_geometrie_gibi=47;
+  //static const size_t nb_geometrie_gibi=47;
   static const MED_EN::medGeometryElement geomGIBItoMED[nb_geometrie_gibi];
   /////
 
@@ -116,7 +124,7 @@ public :
 };
 
 
-class GIBI_MESH_RDONLY_DRIVER : public virtual GIBI_MESH_DRIVER
+class MEDMEM_EXPORT GIBI_MESH_RDONLY_DRIVER : public virtual GIBI_MESH_DRIVER
 {
 public :
   
@@ -205,7 +213,7 @@ private:
 
 */
 
-class GIBI_MESH_WRONLY_DRIVER : public virtual GIBI_MESH_DRIVER {
+class MEDMEM_EXPORT GIBI_MESH_WRONLY_DRIVER : public virtual GIBI_MESH_DRIVER {
   
 public :
   
@@ -272,8 +280,7 @@ public :
     int         _nbElems;
     const int * _ptrElemIDs; // elem ids or 
     int         _elemID1;    // first elem id if isOnAllElements()
-    typeData(): _nbElems(0),  _ptrElemIDs(NULL), _elemID1(0) {}
-    typeData( int nbElems, const int * ptrElemIDs, int elemID1 )
+    typeData( int nbElems=0, const int * ptrElemIDs=NULL, int elemID1=0 )
       : _nbElems(nbElems),  _ptrElemIDs(ptrElemIDs), _elemID1(elemID1) {}
   };
   struct supportData
@@ -310,7 +317,7 @@ public :
 
 */
 
-class GIBI_MESH_RDWR_DRIVER : public GIBI_MESH_RDONLY_DRIVER, public GIBI_MESH_WRONLY_DRIVER {
+class MEDMEM_EXPORT GIBI_MESH_RDWR_DRIVER : public GIBI_MESH_RDONLY_DRIVER, public GIBI_MESH_WRONLY_DRIVER {
 
 public :
 
@@ -349,7 +356,7 @@ public :
 
 };
 
-class GIBI_MED_RDONLY_DRIVER : public GIBI_MESH_RDONLY_DRIVER {
+class MEDMEM_EXPORT GIBI_MED_RDONLY_DRIVER : public GIBI_MESH_RDONLY_DRIVER {
 
   MED * _med;
 
@@ -392,7 +399,7 @@ private:
 
 */
 
-class GIBI_MED_WRONLY_DRIVER : public GIBI_MESH_WRONLY_DRIVER {
+class MEDMEM_EXPORT GIBI_MED_WRONLY_DRIVER : public GIBI_MESH_WRONLY_DRIVER {
 
   MED * _med;
 

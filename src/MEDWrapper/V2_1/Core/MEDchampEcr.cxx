@@ -177,8 +177,8 @@ MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch
     else
       psize = i;
     
-    pfltabtmp = (med_int *)   malloc (sizeof(med_int)*psize);
-    pfltab    = (med_ssize *) malloc (sizeof(med_ssize)*psize);
+    pfltabtmp = (med_int *)   malloc (sizeof(med_int)*(size_t)psize);
+    pfltab    = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
     if ((ret = MEDprofilLire(fid,pfltabtmp,pflname)) < 0)
       return -1;
     for (i=0;i<psize;i++)
@@ -203,7 +203,7 @@ MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch
       break;
 
     case MED_INT32 :
-#if defined(IRIX64)||defined(OSF1) 
+#if defined(HAVE_F77INT64)
      if ((ret =  _MEDdatasetNumEcrire(datagroup2,MED_NOM_CO,MED_INT64,interlace,ncomp,numco,psize,pfltab,ngauss,dimd,val,
 				       mode)) < 0)
 	return -1;
@@ -215,7 +215,7 @@ MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch
       break;
 
     case MED_INT64 :
-#if defined(IRIX64)||defined(OSF1) 
+#if defined(HAVE_F77INT64)
      if ((ret =  _MEDdatasetNumEcrire(datagroup2,MED_NOM_CO,MED_INT64,interlace,ncomp,numco,psize,pfltab,ngauss,dimd,val,
 				       mode)) < 0)
 	return -1;

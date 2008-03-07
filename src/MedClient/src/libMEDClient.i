@@ -29,6 +29,17 @@
   using namespace MED_EN;
 %}
 
+%typemap(in) MESH* {
+  if ((SWIG_ConvertPtr($input, (void **) &$1, $1_descriptor, 0)) == -1) {
+    MESHClient *client;
+    if ((SWIG_ConvertPtr($input, (void **) &client, $descriptor(MESHClient *), 0)) == -1) {
+      SWIG_Python_TypeError("MESH* or MESHClient*", $input);
+      return NULL;
+    }
+    $1 = (MESH *) client;
+  }
+}
+
 %include "libMedCorba_Swig.i"
 %include "libMEDMEM_Swig.i"
 
@@ -37,6 +48,23 @@
   $1 = ($input != 0);
 }
 
+/*
+  managing C++ exception in the Python API
+*/
+/*%exception
+{
+  class PyAllowThreadsGuard {
+   public:
+    PyAllowThreadsGuard() { _save = PyEval_SaveThread(); }
+    ~PyAllowThreadsGuard() { PyEval_RestoreThread(_save); }
+   private:
+    PyThreadState *_save;
+  };
+
+  PyAllowThreadsGuard guard;
+
+  $action
+}*/
 
 class MESHClient : public MESH {
 
@@ -87,38 +115,54 @@ public:
   ~FIELDClient();
 };
 
-%template (FIELDDOUBLEClient) FIELDClient<double, FullInterlace>;
-%template (FIELDDOUBLENOINTERLACEClient) FIELDClient<double, NoInterlace>;
-%template (FIELDINTClient) FIELDClient<int, FullInterlace>;
-%template (FIELDINTNOINTERLACEClient) FIELDClient<int, NoInterlace>;
+%template (FIELDDOUBLEClient)                  FIELDClient<double, FullInterlace>;
+%template (FIELDDOUBLENOINTERLACEClient)       FIELDClient<double, NoInterlace>;
+%template (FIELDDOUBLENOINTERLACEBYTYPEClient) FIELDClient<double, NoInterlaceByType>;
+%template (FIELDINTClient)                     FIELDClient<int, FullInterlace>;
+%template (FIELDINTNOINTERLACEClient)          FIELDClient<int, NoInterlace>;
+%template (FIELDINTNOINTERLACEBYTYPEClient)    FIELDClient<int, NoInterlaceByType>;
 
 %extend FIELDClient<double, FullInterlace>
 {
-  %template(FIELDDOUBLEClients) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
+  %template(FIELDDOUBLEClient) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
 };
 
 %extend FIELDClient<double, NoInterlace>
 {
-  %template(FIELDDOUBLENOINTERLACEClients) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
+  %template(FIELDDOUBLENOINTERLACEClient) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
+};
+
+%extend FIELDClient<double, NoInterlaceByType>
+{
+  %template(FIELDDOUBLENOINTERLACEBYTYPEClient) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
 };
 
 %extend FIELDClient<int, FullInterlace>
 {
-  %template(FIELDINTClients) FIELDClient<SALOME_MED::FIELDINT_ptr>;
+  %template(FIELDINTClient) FIELDClient<SALOME_MED::FIELDINT_ptr>;
 };
 
 %extend FIELDClient<int, NoInterlace>
 {
-  %template(FIELDINTNOINTERLACEClients) FIELDClient<SALOME_MED::FIELDINT_ptr>;
+  %template(FIELDINTNOINTERLACEClient) FIELDClient<SALOME_MED::FIELDINT_ptr>;
+};
+
+%extend FIELDClient<int, NoInterlaceByType>
+{
+  %template(FIELDINTNOINTERLACEBYTYPEClient) FIELDClient<SALOME_MED::FIELDINT_ptr>;
 };
 
 FIELD<double> * getDoublePointer(FIELDClient<double,FullInterlace> * input);
 
 FIELD<double,NoInterlace> *getDoubleNoInterlacePointer(FIELDClient<double,NoInterlace> * input);
 
+FIELD<double,NoInterlaceByType> *getDoubleNoInterlaceByTypePointer(FIELDClient<double,NoInterlaceByType> * input);
+
 FIELD<int> * getIntPointer(FIELDClient<int,FullInterlace> * input);
 
 FIELD<int,NoInterlace> * getIntNoInterlacePointer(FIELDClient<int,NoInterlace> * input);
+
+FIELD<int,NoInterlaceByType> * getIntNoInterlaceByTypePointer(FIELDClient<int,NoInterlaceByType> * input);
 
 %{
   FIELD<double> * getDoublePointer(FIELDClient<double,FullInterlace> * input)
@@ -131,6 +175,11 @@ FIELD<int,NoInterlace> * getIntNoInterlacePointer(FIELDClient<int,NoInterlace> *
       return (FIELD<double,NoInterlace> *) input;
     }
 
+  FIELD<double,NoInterlaceByType> *getDoubleNoInterlaceByTypePointer(FIELDClient<double,NoInterlaceByType> * input)
+    {
+      return (FIELD<double,NoInterlaceByType> *) input;
+    }
+
   FIELD<int> * getIntPointer(FIELDClient<int,FullInterlace> * input)
   {
       return (FIELD<int> *) input;
@@ -139,5 +188,10 @@ FIELD<int,NoInterlace> * getIntNoInterlacePointer(FIELDClient<int,NoInterlace> *
   FIELD<int,NoInterlace> * getIntNoInterlacePointer(FIELDClient<int,NoInterlace> * input)
   {
       return (FIELD<int,NoInterlace> *) input;
+  }
+
+  FIELD<int,NoInterlaceByType> * getIntNoInterlaceByTypePointer(FIELDClient<int,NoInterlaceByType> * input)
+  {
+      return (FIELD<int,NoInterlaceByType> *) input;
   }
 %}

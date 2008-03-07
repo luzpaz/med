@@ -31,6 +31,7 @@
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
+#include "MEDMEM_DriverFactory.hxx"
 
 using namespace std;
 using namespace MEDMEM;
@@ -50,10 +51,16 @@ GRID::GRID() {
 ////function : GRID
 ////purpose  : array constructor
 ////=======================================================================
-GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name, 
-	   const std::vector<std::string>& coord_unit, const med_grid_type type) : _gridType(type)
+GRID::GRID(const std::vector<std::vector<double> >& xyz_array,
+           const std::vector<std::string>&          coord_name, 
+	   const std::vector<std::string>&          coord_unit,
+           const med_grid_type                      type) : _gridType(type)
 {
+    init(); // PAL 12136
+    _is_default_gridType = false;
+
     _spaceDimension = xyz_array.size();
+    _meshDimension  = _spaceDimension; // PAL14482
 
     // compute & set _numberOfNodes
     int NumberOfNodes=1 ;
@@ -104,6 +111,7 @@ GRID::GRID(const med_grid_type type)
 {
   init();
   _gridType = type;
+  _is_default_gridType = false;
   MESSAGE("A TYPED GRID CREATED");
 }
 
@@ -136,7 +144,8 @@ GRID::~GRID() {
 void GRID::init()
 {
   _gridType = MED_CARTESIAN;
-    
+  _is_default_gridType = true;
+
   _iArray = _jArray = _kArray = (double* ) NULL;
   _iArrayLength = _jArrayLength = _kArrayLength = 0;
 
@@ -168,35 +177,22 @@ GRID & GRID::operator=(const GRID & otherGrid)
 //=======================================================================
 
 GRID::GRID(driverTypes driverType, const string &  fileName,
-           const string &  driverName) : MESH(driverType, fileName, driverName)
+           const string &  driverName)// : MESH(driverType, fileName, driverName)
 {
   const char * LOC ="GRID::GRID(driverTypes , const string &  , const string &) : ";
   
   BEGIN_OF(LOC);
   
-//  int current;
-
-//   init();
-//   MESH(driverType,fileName,driverName);
-
-//   current = addDriver(driverType,fileName,driverName);
-  
-//   switch(_drivers[current]->getAccessMode() ) {
-//   case MED_RDONLY :
-//     MESSAGE(LOC << "driverType must have a MED_RDWR accessMode");
-//     rmDriver(current);
-//     break;
-//   default: {}
-//   }
-//   _drivers[current]->open();   
-//   _drivers[current]->read();
-//   _drivers[current]->close();
-
-//   // fill some fields of MESH
-//   fillMeshAfterRead();
+  init();
+  GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,MED_LECT);
+  int current = addDriver(*myDriver);
+  delete myDriver;
+  _drivers[current]->open();
+  _drivers[current]->read();
+  _drivers[current]->close();
 
   fillMeshAfterRead();
-    
+
   END_OF(LOC);
 };
 

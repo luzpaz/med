@@ -20,6 +20,8 @@
 #ifndef VTK_MED_DRIVER_HXX
 #define VTK_MED_DRIVER_HXX
 
+#include "MEDMEM.hxx"
+
 #include <string>
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Utilities.hxx"
@@ -38,7 +40,7 @@ class SUPPORT;
 class FIELD_;
 class MED;
 // This driver pilots within a VTK class read/write accesses of fields/meshes
-class VTK_MED_DRIVER : public GENDRIVER
+class MEDMEM_EXPORT VTK_MED_DRIVER : public GENDRIVER
 {
 protected:
   

@@ -1,4 +1,3 @@
-
 // Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
 //           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
 // This library is free software; you can redistribute it and/or
@@ -22,15 +21,23 @@
 // Created   : mer fév 20 15:47:57 CET 2002
 // Author    : EDF
 // Project   : SALOME
-// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Field_i.cxx
+// $Header   : $
 //=============================================================================
+
 #include "MEDMEM_Field_i.hxx"
+
+#include "SALOME_NamingService.hxx"
+#include "SALOME_LifeCycleCORBA.hxx"
+
+#include CORBA_SERVER_HEADER(SALOME_ModuleCatalog)
+#include CORBA_CLIENT_HEADER(MED_Gen)
 
 using namespace MEDMEM;
 using namespace MED_EN;
 
 map < int, ::FIELD_ * > FIELD_i::fieldMap ;
 int  FIELD_i::fieldIndex = 0;
+
 //=============================================================================
 /*!
  * Default constructor
@@ -96,6 +103,7 @@ FIELD_i::FIELD_i( FIELD_i & f):_fieldTptr(f._fieldTptr),
         ::FIELD_ * const ptrField =new ::FIELD_();
         return ptrField;
 }
+
 //=============================================================================
 /*!
  * CORBA: Accessor for Fields's Name
@@ -117,6 +125,22 @@ throw (SALOME::SALOME_Exception)
 	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
+
+void FIELD_i::setName(const char* theName)
+  throw (SALOME::SALOME_Exception)
+{
+  if (_fieldTptr == NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Field", SALOME::INTERNAL_ERROR);
+
+  try {
+    _fieldTptr->setName(theName);
+  }
+  catch (MEDEXCEPTION &ex) {
+    MESSAGE("Exception en accedant au nom");
+    THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+  }
+}
+
 //=============================================================================
 /*!
  * CORBA: Accessor for Fields's Description
@@ -143,7 +167,6 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Fields's Support
  */
 //=============================================================================
-
 SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()
   throw (SALOME::SALOME_Exception)
 {
@@ -431,72 +454,96 @@ throw (SALOME::SALOME_Exception)
         }
 	return myseq._retn();
 }
+
 //=============================================================================
 /*!
  * CORBA: Add in Study
  */
 //=============================================================================
-void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy, 
-						 SALOME_MED::FIELD_ptr myIor )
-		    throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
+void FIELD_i::addInStudy (SALOMEDS::Study_ptr   myStudy, 
+                          SALOME_MED::FIELD_ptr myIor)
+  throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
+{
+  SALOMEDS::SComponent_var aComponent = PublishMedComponent(myStudy);
+  if (CORBA::is_nil(aComponent))
+    THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found", SALOME::INTERNAL_ERROR);
+  addInStudyToComponent(aComponent, myIor);
+}
+
+static SALOMEDS::SObject_ptr FindChildByName (SALOMEDS::SObject_ptr theFather,
+                                              const string          theName)
+{
+  SALOMEDS::SObject_var aChild;
+  if (CORBA::is_nil(theFather))
+    return aChild._retn();
+
+  SALOMEDS::SObject_var aCurChild;
+  SALOMEDS::ChildIterator_ptr anIter = theFather->GetStudy()->NewChildIterator(theFather);
+  for (; anIter->More() && aChild->_is_nil(); anIter->Next()) {
+    aCurChild = anIter->Value();
+    string aCurName = aCurChild->GetName();
+    if (aCurName == theName)
+      aChild = aCurChild;
+  }
+  return aChild._retn();
+}
+
+void FIELD_i::addInStudyToComponent (SALOMEDS::SComponent_ptr myComponent,
+                                     SALOME_MED::FIELD_ptr    myIor)
+  throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
 {
         BEGIN_OF(" FIELD_i::addInStudy");
-        if (_fieldTptr==NULL)
-                THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
-                                             SALOME::INTERNAL_ERROR);
-        if ( _FieldId != "" )
-        {
-                MESSAGE("Field already in Study");
-                    THROW_SALOME_CORBA_EXCEPTION("Field already in Study", \
-                                 SALOME::BAD_PARAM);
-        };
 
+        if (CORBA::is_nil(myComponent) || CORBA::is_nil(myIor))
+	  THROW_SALOME_CORBA_EXCEPTION("Null parameter", SALOME::BAD_PARAM);
 
-        SALOMEDS::StudyBuilder_var myBuilder = myStudy->NewBuilder();
+        if (_fieldTptr == NULL)
+          THROW_SALOME_CORBA_EXCEPTION("No associated Field", SALOME::INTERNAL_ERROR);
+
+        if (_FieldId != "") {
+          MESSAGE("Field already in Study");
+          THROW_SALOME_CORBA_EXCEPTION("Field already in Study", SALOME::BAD_PARAM);
+        }
+
+        SALOMEDS::Study_var myStudy = myComponent->GetStudy();
+        SALOMEDS::StudyBuilder_var aBuilder = myStudy->NewBuilder();
+
         SALOMEDS::GenericAttribute_var anAttr;
         SALOMEDS::AttributeName_var    aName;
         SALOMEDS::AttributeIOR_var     aIOR;
 
-        // Create SComponent labelled 'Med'
-        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
-        if ( CORBA::is_nil(medfather) )
-	  THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'MED' not Found",SALOME::INTERNAL_ERROR);
-
- 	// Create SObject labelled 'MEDFIELD' if it doesn't already exit
-	SALOMEDS::SObject_var medfieldfather = myStudy->FindObject("MEDFIELD");
-  	if ( CORBA::is_nil(medfieldfather) ) 
-	{
+ 	// Create SObject labelled 'MEDFIELD' if it doesn't already exist
+	SALOMEDS::Study::ListOfSObject_var aMEDFIELDs =
+          myStudy->FindObjectByName("MEDFIELD", myComponent->ComponentDataType());
+        int aLength = aMEDFIELDs->length();
+        SALOMEDS::SObject_var medfieldfather;
+        if (aLength > 0) {
+          medfieldfather = aMEDFIELDs[0];
+        }
+        else {
 	  MESSAGE("Add Object 'MEDFIELD'");
-	  medfieldfather = myBuilder->NewObject(medfather);
-	  anAttr = myBuilder->FindOrCreateAttribute(medfieldfather, "AttributeName");
+	  medfieldfather = aBuilder->NewObject(myComponent);
+	  anAttr = aBuilder->FindOrCreateAttribute(medfieldfather, "AttributeName");
 	  aName = SALOMEDS::AttributeName::_narrow(anAttr);
 	  aName->SetValue("MEDFIELD");
-	  
-  	} ;
-
-	string fieldName = _fieldTptr->getName();
+        }
 
  	// Create SObject labelled 'FIELDNAME' if it doesn't already exit
-	SALOMEDS::SObject_var medfieldnamefather = myStudy->FindObject(fieldName.c_str());
+	string fieldName = _fieldTptr->getName();
+        SALOMEDS::SObject_var medfieldnamefather = FindChildByName(medfieldfather, fieldName);
   	if ( CORBA::is_nil(medfieldnamefather) ) 
 	{
 	  MESSAGE("Add Object "<<fieldName);
-	  medfieldnamefather = myBuilder->NewObject(medfieldfather);
-	  anAttr = myBuilder->FindOrCreateAttribute(medfieldnamefather, "AttributeName");
+	  medfieldnamefather = aBuilder->NewObject(medfieldfather);
+	  anAttr = aBuilder->FindOrCreateAttribute(medfieldnamefather, "AttributeName");
 	  aName = SALOMEDS::AttributeName::_narrow(anAttr);
 	  aName->SetValue(fieldName.c_str());
+  	}
 
-  	} ;
-
-        // Create object labelled according to Field's Name
-
-        MESSAGE("Add a Field Object under "<<fieldName);
-        myBuilder->NewCommand();
-        SALOMEDS::SObject_var newObj = myBuilder->NewObject(medfieldnamefather);
-
-        ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
-        ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
-        CORBA::ORB_var &orb = init(0,0);
+        string fieldEntryPath = "/";
+        //fieldEntryPath += "Med/";
+        string componentName = myComponent->GetName();
+        fieldEntryPath += componentName + "/MEDFIELD/" + fieldName + "/";
 
 	int iterationNumber = _fieldTptr->getIterationNumber();
 	SCRUTE(iterationNumber);
@@ -504,13 +551,15 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 	int orderNumber = _fieldTptr->getOrderNumber();
 	SCRUTE(orderNumber);
 
-	ostringstream iterationName ;
+	ostringstream iterationName;
 	iterationName<<"(" << iterationNumber << "," << orderNumber << ")";
-	//	string supportName = _support->getName();
 	string supportName = (_fieldTptr->getSupport())->getName();
-	//	string meshName = (_support->getMesh())->getName();
 	string meshName = ((_fieldTptr->getSupport())->getMesh())->getName();
-	string meshNameStudy = meshName;
+
+	SCRUTE(meshName);
+	for (string::size_type pos=0; pos<meshName.size(); ++pos) {
+          if (isspace(meshName[pos])) meshName[pos] = '_';
+        }
 
 	char * fieldEntryName;
 	int lenName = strlen(iterationName.str().c_str()) + 4 +
@@ -521,66 +570,68 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 	fieldEntryName = strcat(fieldEntryName,"_ON_");
 	fieldEntryName = strcat(fieldEntryName,supportName.c_str());
 	fieldEntryName = strcat(fieldEntryName,"_OF_");
-
-	for (string::size_type pos=0; pos<meshNameStudy.size();++pos)
-	  {
-	    if (isspace(meshNameStudy[pos])) meshNameStudy[pos] = '_';
-	  }
-
-	SCRUTE(meshNameStudy);
-
-	fieldEntryName = strcat(fieldEntryName,meshNameStudy.c_str());
+	fieldEntryName = strcat(fieldEntryName,meshName.c_str());
 
 	SCRUTE(fieldEntryName);
+        fieldEntryPath += fieldEntryName;
 
-        anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
+        // Create object labelled according to Field's Name
+
+        SALOMEDS::SObject_var fieldSO = myStudy->FindObjectByPath(fieldEntryPath.c_str());
+        bool alreadyPublished = ! CORBA::is_nil(fieldSO);
+        aBuilder->NewCommand();
+        if ( !alreadyPublished )
+        {
+          MESSAGE("Add a Field Object under "<<fieldName);
+          fieldSO = aBuilder->NewObject(medfieldnamefather);
+          // check that this method and getEntryPath() build the same path,
+          // though this is true only for MED component
+          MESSAGE("fieldEntryPath: "<< fieldEntryPath);
+          MESSAGE("getEntryPath(): "<< getEntryPath());
+          if (componentName == "Med")
+            ASSERT( getEntryPath() == fieldEntryPath );
+        }
+        anAttr = aBuilder->FindOrCreateAttribute(fieldSO, "AttributeName");
         aName = SALOMEDS::AttributeName::_narrow(anAttr);
-//         aName->SetValue(iterationName.str().c_str());
         aName->SetValue(fieldEntryName);
 
+        ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
+        ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
+        CORBA::ORB_var &orb = init(0,0);
 	string iorStr = orb->object_to_string(myIor);
-        anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
+        anAttr = aBuilder->FindOrCreateAttribute(fieldSO, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
         aIOR->SetValue(iorStr.c_str());
-        myBuilder->CommitCommand();
-        _FieldId = newObj->GetID();
+        _FieldId = fieldSO->GetID();
 
-	MESSAGE("Computing path to Support");
-
-	char * supportEntryPath;
-	lenName = 28 + 15 + strlen(meshName.c_str()) + 1 +
-	  strlen(supportName.c_str()) + 1;
-	supportEntryPath = new char[lenName];
-	supportEntryPath = strcpy(supportEntryPath,"/Med/MEDMESH/MEDSUPPORTS_OF_");
-	supportEntryPath = strcat(supportEntryPath,meshNameStudy.c_str());
-	supportEntryPath = strcat(supportEntryPath,"/");
-	supportEntryPath = strcat(supportEntryPath,supportName.c_str());
-
-	SCRUTE(supportEntryPath);
-
-	MESSAGE("supportEntryPath in field " << supportEntryPath << " length " << lenName);
-
-// 	SALOMEDS::SObject_var supportObject = myStudy->FindObject(supportName.c_str());
-	SALOMEDS::SObject_var supportObject = myStudy->FindObjectByPath(supportEntryPath);
-
-	SCRUTE(supportObject);
-
-  	if ( CORBA::is_nil(supportObject) ) 
+        if ( !alreadyPublished )
         {
-	  MESSAGE("supportObject is a nil corba object");
-	  MESSAGE("FIELD_i::addInStudy : SUPPORT not found") ;
-	} 
-        else 
-        {
-	  MESSAGE("supportObject is OK and is now going to be referenced !");
-	  SALOMEDS::SObject_var newObjSupport = myBuilder->NewObject(newObj);
-	  myBuilder->Addreference(newObjSupport,supportObject);
-	  MESSAGE(" OUF !!!");
-	}
+          MESSAGE("Computing path to Support");
 
-        myBuilder->CommitCommand();
+          string supportEntryPath = SUPPORT_i::getEntryPath( _fieldTptr->getSupport() );
+          SCRUTE(supportEntryPath);
 
-	delete [] supportEntryPath;
+          SALOMEDS::SObject_var supportObject =
+            myStudy->FindObjectByPath(supportEntryPath.c_str());
+
+          SCRUTE(supportObject);
+
+          if ( CORBA::is_nil(supportObject) ) 
+          {
+            MESSAGE("supportObject is a nil corba object");
+            MESSAGE("FIELD_i::addInStudy : SUPPORT not found") ;
+          } 
+          else 
+          {
+            MESSAGE("supportObject is OK and is now going to be referenced !");
+            SALOMEDS::SObject_var newObjSupport = aBuilder->NewObject(fieldSO);
+            aBuilder->Addreference(newObjSupport,supportObject);
+            MESSAGE(" OUF !!!");
+          }
+        }
+
+        aBuilder->CommitCommand();
+
 	delete [] fieldEntryName;
 
 	// register the Corba pointer: increase the referrence count
@@ -591,6 +642,7 @@ void FIELD_i::addInStudy(SALOMEDS::Study_ptr myStudy,
 
         //END_OF("FIELD_i::addInStudy");
 }
+
 //=============================================================================
 /*!
  * CORBA: write
@@ -606,7 +658,7 @@ throw (SALOME::SALOME_Exception)
 	{
 		_fieldTptr->write(i,driverFieldName);
         }
-        catch (MEDEXCEPTION &ex)
+        catch (MEDEXCEPTION &)
         {
 		MESSAGE("Exception en accedant au champ");
                 THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
@@ -681,3 +733,87 @@ CORBA::Long FIELD_i::addDriver (SALOME_MED::medDriverTypes driverType,
         }
 }
 
+//=============================================================================
+/*!
+ * internal method: publish MED component
+ */
+//=============================================================================
+
+SALOMEDS::SComponent_ptr FIELD_i::PublishMedComponent(SALOMEDS::Study_ptr theStudy)
+{
+  if ( CORBA::is_nil(theStudy) )
+    return SALOMEDS::SComponent::_nil();
+
+  SALOMEDS::SComponent_var medfather = theStudy->FindComponent("MED");
+  if ( !CORBA::is_nil(medfather) )
+    return medfather._retn();
+
+  ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
+  ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
+  CORBA::ORB_var &orb = init(0,0);
+
+  SALOME_NamingService* ns = SINGLETON_<SALOME_NamingService>::Instance();
+  ASSERT(SINGLETON_<SALOME_NamingService>::IsAlreadyExisting());
+  ns->init_orb( orb );
+
+  SALOME_LifeCycleCORBA* lcc = new SALOME_LifeCycleCORBA( ns );
+
+  SALOME_ModuleCatalog::ModuleCatalog_var aCatalog  = 
+    SALOME_ModuleCatalog::ModuleCatalog::_narrow(ns->Resolve("/Kernel/ModulCatalog"));
+  if ( CORBA::is_nil( aCatalog ) )
+    return medfather._retn();
+  SALOME_ModuleCatalog::Acomponent_var aComp = aCatalog->GetComponent( "MED" );
+  if ( CORBA::is_nil( aComp ) )
+    return medfather._retn();
+  
+  SALOMEDS::StudyBuilder_var aBuilder = theStudy->NewBuilder();
+  aBuilder->NewCommand();
+  bool aLocked = theStudy->GetProperties()->IsLocked();
+  if (aLocked) theStudy->GetProperties()->SetLocked(false);
+  
+  medfather = aBuilder->NewComponent("MED");
+  SALOMEDS::GenericAttribute_var anAttr = aBuilder->FindOrCreateAttribute(medfather, "AttributeName");
+  SALOMEDS::AttributeName_var aName = SALOMEDS::AttributeName::_narrow(anAttr);
+  aName->SetValue( aComp->componentusername() );
+  
+  Engines::Component_var aMedComponent = lcc->FindOrLoad_Component("FactoryServer", "MED");
+  SALOME_MED::MED_Gen_var aMedEngine = SALOME_MED::MED_Gen::_narrow( aMedComponent );
+  aBuilder->DefineComponentInstance(medfather, aMedEngine);
+  
+  if (aLocked) theStudy->GetProperties()->SetLocked(true);
+  aBuilder->CommitCommand();
+  
+  return medfather._retn();
+}
+
+//================================================================================
+/*!
+ * \brief Return a default path to publish this field
+  * \retval string - the path
+ */
+//================================================================================
+
+string FIELD_i::getEntryPath ()
+{
+  string path;
+  if ( _fieldTptr &&
+       _fieldTptr->getSupport() &&
+       _fieldTptr->getSupport()->getMesh() )
+  {
+    string meshName = _fieldTptr->getSupport()->getMesh()->getName();
+    for (string::size_type pos=0; pos<meshName.size(); ++pos)
+    {
+      if (isspace(meshName[pos])) meshName[pos] = '_';
+    }
+    ostringstream os ;
+
+    os << "/Med/MEDFIELD/" << _fieldTptr->getName() << "/" 
+       << "(" << _fieldTptr->getIterationNumber()
+       << "," << _fieldTptr->getOrderNumber()
+       << ")_ON_" << _fieldTptr->getSupport()->getName()
+       << "_OF_" << meshName;
+
+    path = os.str();
+  }
+  return path;
+}

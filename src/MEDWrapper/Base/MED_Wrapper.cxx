@@ -24,13 +24,13 @@ namespace MED
     myWrapper(theWrapper)
   {
     boost::detail::thread::lock_ops<TWrapper::TMutex>::lock(myWrapper->myMutex);
-    INITMSG(MYDEBUG,"TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<endl);
+    INITMSG(MYDEBUG,"TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<std::endl);
   }
   
   TLockProxy
   ::~TLockProxy()
   {
-    INITMSG(MYDEBUG,"~TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<endl);
+    INITMSG(MYDEBUG,"~TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<std::endl);
     boost::detail::thread::lock_ops<TWrapper::TMutex>::unlock(myWrapper->myMutex);
   }
   
@@ -41,7 +41,12 @@ namespace MED
     return myWrapper;
   }
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
+  TWrapper::~TWrapper()
+  {
+  }
+
+  //----------------------------------------------------------------------------
   PMeshInfo
   TWrapper
   ::GetPMeshInfo(TInt theId,
@@ -53,7 +58,7 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PFamilyInfo 
   TWrapper
   ::GetPFamilyInfo(const PMeshInfo& theMeshInfo, 
@@ -70,7 +75,7 @@ namespace MED
     GetFamilyInfo(theId,*anInfo,theErr);
 
 #ifdef _DEBUG_
-    string aName = anInfo->GetName();
+    std::string aName = anInfo->GetName();
     INITMSG(MYDEBUG,"GetPFamilyInfo - aFamilyName = '"<<aName<<
 	    "'; andId = "<<anInfo->GetId()<<
 	    "; aNbAttr = "<<aNbAttr<<
@@ -85,7 +90,7 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PNodeInfo
   TWrapper
   ::GetPNodeInfo(const PMeshInfo& theMeshInfo,
@@ -112,29 +117,29 @@ namespace MED
 	}
 	ADDMSG(MYVALUEDEBUG," ");
       }
-      ADDMSG(MYDEBUG,endl);
+      ADDMSG(MYDEBUG, std::endl);
       
-      BEGMSG(MYVALUEDEBUG,"GetFamNum: ");
+      BEGMSG(MYVALUEDEBUG, "GetFamNum: ");
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
 	ADDMSG(MYVALUEDEBUG,anInfo->GetFamNum(iElem)<<", ");
       }
-      ADDMSG(MYVALUEDEBUG,endl);
+      ADDMSG(MYVALUEDEBUG, std::endl);
       
       if(anInfo->IsElemNum()){
 	BEGMSG(MYVALUEDEBUG,"GetElemNum: ");
 	for(TInt iElem = 0; iElem < aNbElem; iElem++){
 	  ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
 	}
-	ADDMSG(MYVALUEDEBUG,endl);
+	ADDMSG(MYVALUEDEBUG, std::endl);
       }
     }
-    ADDMSG(MYDEBUG,endl);
+    ADDMSG(MYDEBUG, std::endl);
 #endif
     
     return anInfo;
   }
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PPolygoneInfo
   TWrapper
   ::GetPPolygoneInfo(const PMeshInfo& theMeshInfo,
@@ -162,13 +167,13 @@ namespace MED
       }
       ADDMSG(MYDEBUG," ");
     }
-    ADDMSG(MYDEBUG,endl);
+    ADDMSG(MYDEBUG, std::endl);
 #endif
 
     return anInfo;
   }
   
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PPolyedreInfo
   TWrapper
   ::GetPPolyedreInfo(const PMeshInfo& theMeshInfo,
@@ -203,12 +208,13 @@ namespace MED
       }
       ADDMSG(MYDEBUG,"} ");
     }
-    ADDMSG(MYDEBUG,endl);
+    ADDMSG(MYDEBUG, std::endl);
 #endif
 
     return anInfo;
   }
   
+  //----------------------------------------------------------------------------
   PElemInfo 
   TWrapper
   ::GetPElemInfo(const PMeshInfo& theMeshInfo,
@@ -297,7 +303,7 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PCellInfo 
   TWrapper
   ::GetPCellInfo(const PMeshInfo& theMeshInfo,
@@ -323,29 +329,29 @@ namespace MED
       }
       ADDMSG(MYVALUEDEBUG," ");
     }
-    ADDMSG(MYDEBUG,endl);
+    ADDMSG(MYDEBUG, std::endl);
 
     BEGMSG(MYVALUEDEBUG,"GetPCellInfo - GetFamNum: ");
     for(TInt iElem = 0; iElem < aNbElem; iElem++){
       ADDMSG(MYVALUEDEBUG,anInfo->GetFamNum(iElem)<<", ");
     }
-    ADDMSG(MYVALUEDEBUG,endl);
+    ADDMSG(MYVALUEDEBUG, std::endl);
 
     if(anInfo->IsElemNum()){
       BEGMSG(MYVALUEDEBUG,"GetPCellInfo - GetElemNum: ");
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
 	ADDMSG(MYVALUEDEBUG,anInfo->GetElemNum(iElem)<<", ");
       }
-      ADDMSG(MYVALUEDEBUG,endl);
+      ADDMSG(MYVALUEDEBUG, std::endl);
     }
-    ADDMSG(MYDEBUG,endl);
+    ADDMSG(MYDEBUG, std::endl);
 #endif
     
     return anInfo;
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PFieldInfo
   TWrapper
   ::GetPFieldInfo(const PMeshInfo& theMeshInfo, 
@@ -362,14 +368,14 @@ namespace MED
 	    "- aName = '"<<anInfo->GetName()<<"'"<<
 	    "; aType = "<<anInfo->GetType()<<
 	    "; aNbComp = "<<aNbComp<<
-	    endl);
+	    std::endl);
 #endif
     
     return anInfo;
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PTimeStampInfo
   TWrapper
   ::GetPTimeStampInfo(const PFieldInfo& theFieldInfo,
@@ -395,7 +401,7 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //----------------------------------------------------------------------------
   PProfileInfo
   TWrapper
   ::GetPProfileInfo(TInt theId,
@@ -410,34 +416,52 @@ namespace MED
   }
 
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  PTimeStampVal 
+  //----------------------------------------------------------------------------
+  PTimeStampValueBase
   TWrapper
-  ::GetPTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		     const TMKey2Profile& theMKey2Profile,
-		     const TKey2Gauss& theKey2Gauss,
-		     TErr* theErr)
+  ::CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const TGeom2Profile& theGeom2Profile,
+		     EModeSwitch theMode)
   {
-    PTimeStampVal anInfo = CrTimeStampVal(theTimeStampInfo);
-    GetTimeStampVal(*anInfo,theMKey2Profile,theKey2Gauss,theErr);
-
-#ifdef _DEBUG_
     PFieldInfo aFieldInfo = theTimeStampInfo->GetFieldInfo();
-    INITMSG(MYDEBUG,"GetPTimeStampVal\n");
-    TGeom2Value& aGeom2Value = anInfo->myGeom2Value;
-    TGeom2Value::const_iterator anIter = aGeom2Value.begin();
+    return CrTimeStampValue(theTimeStampInfo,
+			    aFieldInfo->GetType(),
+			    theGeom2Profile,
+			    theMode);
+  }
+
+  //----------------------------------------------------------------------------
+  PTimeStampValueBase
+  TWrapper
+  ::CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const PTimeStampValueBase& theInfo)
+  {
+    PFieldInfo aFieldInfo = theTimeStampInfo->GetFieldInfo();
+    return CrTimeStampValue(theTimeStampInfo,
+			    theInfo,
+			    aFieldInfo->GetType());
+  }
+
+  //----------------------------------------------------------------------------
+  template<class TimeStampValueType>
+  void
+  Print(SharedPtr<TimeStampValueType> theTimeStampValue)
+  {
+    INITMSG(MYDEBUG,"Print - TimeStampValue\n");
+    typename TimeStampValueType::TTGeom2Value& aGeom2Value = theTimeStampValue->myGeom2Value;
+    typename TimeStampValueType::TTGeom2Value::const_iterator anIter = aGeom2Value.begin();
     for(; anIter != aGeom2Value.end(); anIter++){
       const EGeometrieElement& aGeom = anIter->first;
-      const TMeshValue& aMeshValue = anIter->second;
+      const typename TimeStampValueType::TTMeshValue& aMeshValue = anIter->second;
       TInt aNbElem = aMeshValue.myNbElem;
       TInt aNbGauss = aMeshValue.myNbGauss;
       TInt aNbComp = aMeshValue.myNbComp;
       INITMSG(MYDEBUG,"aGeom = "<<aGeom<<" - "<<aNbElem<<": ");
       for(TInt iElem = 0; iElem < aNbElem; iElem++){
-	TCValueSliceArr aValueSliceArr = aMeshValue.GetGaussValueSliceArr(iElem);
+	typename TimeStampValueType::TTMeshValue::TCValueSliceArr aValueSliceArr = aMeshValue.GetGaussValueSliceArr(iElem);
 	ADDMSG(MYVALUEDEBUG,"{");
 	for(TInt iGauss = 0; iGauss < aNbGauss; iGauss++){
-	  const TCValueSlice& aValueSlice = aValueSliceArr[iGauss];
+	  const typename TimeStampValueType::TTMeshValue::TCValueSlice& aValueSlice = aValueSliceArr[iGauss];
 	  for(TInt iComp = 0; iComp < aNbComp; iComp++){
 	    ADDMSG(MYVALUEDEBUG,aValueSlice[iComp]<<" ");
 	  }
@@ -447,11 +471,120 @@ namespace MED
       }
       ADDMSG(MYDEBUG,"\n");
     }
-#endif
+  }
 
+  //----------------------------------------------------------------------------
+  PTimeStampValueBase 
+  TWrapper
+  ::GetPTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		       const TMKey2Profile& theMKey2Profile,
+		       const TKey2Gauss& theKey2Gauss,
+		       TErr* theErr)
+  {
+    PFieldInfo aFieldInfo = theTimeStampInfo->GetFieldInfo();
+    PTimeStampValueBase anInfo = CrTimeStampValue(theTimeStampInfo,
+						  aFieldInfo->GetType());
+    GetTimeStampValue(anInfo, 
+		      theMKey2Profile, 
+		      theKey2Gauss,
+		      theErr);
+#ifdef _DEBUG_
+    if(aFieldInfo->GetType() == eFLOAT64)
+      Print<TFloatTimeStampValue>(anInfo);
+    else
+      Print<TIntTimeStampValue>(anInfo);
+#endif
     return anInfo;
   }
 
+  //----------------------------------------------------------------------------
+  void 
+  TWrapper
+  ::GetTimeStampVal(const PTimeStampVal& theVal,
+		    const TMKey2Profile& theMKey2Profile,
+		    const TKey2Gauss& theKey2Gauss,
+		    TErr* theErr)
+  {
+    PTimeStampInfo aTimeStampInfo = theVal->GetTimeStampInfo();
+    PFieldInfo aFieldInfo = aTimeStampInfo->GetFieldInfo();
+    if(aFieldInfo->GetType() == eFLOAT64)
+      GetTimeStampValue(theVal,
+			theMKey2Profile,
+			theKey2Gauss,
+			theErr);
+    else{
+      PTimeStampValueBase aVal = CrTimeStampValue(aTimeStampInfo,
+						  theVal,
+						  eINT);
+      GetTimeStampValue(aVal,
+			theMKey2Profile,
+			theKey2Gauss,
+			theErr);
+      CopyTimeStampValueBase(aVal, theVal);
+    }
+  }
+
+  //----------------------------------------------------------------------------
+  void
+  TWrapper
+  ::SetTimeStamp(const PTimeStampVal& theVal,
+		 TErr* theErr)
+  {
+    PTimeStampInfo aTimeStampInfo = theVal->GetTimeStampInfo();
+    PFieldInfo aFieldInfo = aTimeStampInfo->GetFieldInfo();
+    if(aFieldInfo->GetType() == eFLOAT64)
+      SetTimeStampValue(theVal, theErr);
+    else{
+      PTimeStampValueBase aVal = CrTimeStampValue(aTimeStampInfo,
+						  eINT,
+						  theVal->GetGeom2Profile(),
+						  theVal->GetModeSwitch());
+      CopyTimeStampValueBase(theVal, aVal);
+      SetTimeStampValue(aVal, theErr);
+    }
+  }
+
+  //----------------------------------------------------------------------------
+  PTimeStampVal
+  TWrapper
+  ::CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
+		   const TGeom2Profile& theGeom2Profile,
+		   EModeSwitch theMode)
+  {
+    return CrTimeStampValue(theTimeStampInfo,
+			    eFLOAT64,
+			    theGeom2Profile,
+			    theMode);
+  }
+
+  //----------------------------------------------------------------------------
+  PTimeStampVal
+  TWrapper
+  ::CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
+		   const PTimeStampVal& theInfo)
+  {
+    return CrTimeStampValue(theTimeStampInfo,
+			    theInfo,
+			    eFLOAT64);
+  }
+
+  //----------------------------------------------------------------------------
+  PTimeStampVal 
+  TWrapper
+  ::GetPTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
+		     const TMKey2Profile& theMKey2Profile,
+		     const TKey2Gauss& theKey2Gauss,
+		     TErr* theErr)
+  {
+    PTimeStampVal anInfo = CrTimeStampVal(theTimeStampInfo);
+    GetTimeStampVal(anInfo, 
+		    theMKey2Profile, 
+		    theKey2Gauss,
+		    theErr);
+    return anInfo;
+  }
+
+  //----------------------------------------------------------------------------
   PGrilleInfo
   TWrapper
   ::GetPGrilleInfo(const PMeshInfo& theMeshInfo)
@@ -489,9 +622,39 @@ namespace MED
 
     GetGrilleInfo(anInfo);
     anInfo->SetGrilleType(type);
+
+#ifdef _DEBUG_
+    INITMSG(MYDEBUG,"GetPGrilleInfo: ");
+    {
+      TInt aNbElem = anInfo->GetNbNodes();
+      BEGMSG(MYVALUEDEBUG,"GetFamNumNode: ");
+      for(TInt iElem = 0; iElem < aNbElem; iElem++){
+	ADDMSG(MYVALUEDEBUG,anInfo->GetFamNumNode(iElem)<<", ");
+      }
+      TInt aNbCells = anInfo->GetNbCells();
+      BEGMSG(MYVALUEDEBUG,"GetFamNum: ");
+      for(TInt iElem = 0; iElem < aNbCells; iElem++){
+	ADDMSG(MYVALUEDEBUG,anInfo->GetFamNum(iElem)<<", ");
+      }
+      ADDMSG(MYVALUEDEBUG, std::endl);
+      BEGMSG(MYVALUEDEBUG,"GetCoordName: ");
+      for(TInt iElem = 0; iElem < theMeshInfo->GetDim(); iElem++){
+	ADDMSG(MYVALUEDEBUG,anInfo->GetCoordName(iElem)<<", ");
+      }
+      ADDMSG(MYVALUEDEBUG, std::endl);
+      BEGMSG(MYVALUEDEBUG,"GetCoordUnit: ");
+      for(TInt iElem = 0; iElem < theMeshInfo->GetDim(); iElem++){
+	ADDMSG(MYVALUEDEBUG,anInfo->GetCoordUnit(iElem)<<", ");
+      }
+      ADDMSG(MYVALUEDEBUG, std::endl);
+      
+    }
+#endif
+    
     return anInfo;
   }
   
+  //----------------------------------------------------------------------------
   PGrilleInfo
   TWrapper
   ::GetPGrilleInfo(const PMeshInfo& theMeshInfo,

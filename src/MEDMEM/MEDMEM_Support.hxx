@@ -25,6 +25,8 @@
 #ifndef SUPPORT_HXX
 #define SUPPORT_HXX
 
+#include <MEDMEM.hxx>
+
 #include <list>
 #include <vector>
 #include <string>
@@ -50,7 +52,7 @@ namespace MEDMEM {
 
   class MESH;
 
-class SUPPORT : public RCBASE
+class MEDMEM_EXPORT SUPPORT : public RCBASE
 {
 protected:
   /*!
@@ -140,6 +142,15 @@ protected:
 
   /*!
     \if developper
+    Array of size _index[_numberOfType]-1 wich contain number of
+    entities of each geometric type. We use file numbering.\n
+    Defined only if _isOnAllElts is false.
+    \endif
+  */
+  mutable MEDSKYLINEARRAY * _number_fromfile;
+
+  /*!
+    \if developper
     Array of size <_numberOfGeometricType> wich contain the profil name of 
     entities of each geometric type.\n
     Defined only if _isOnAllElts is false.
@@ -157,7 +168,7 @@ public:
   SUPPORT(MESH* Mesh, string Name="", MED_EN::medEntityMesh Entity=MED_EN::MED_CELL);
   SUPPORT(const SUPPORT & m);
   virtual ~SUPPORT();
-  friend ostream & operator<<(ostream &os,const SUPPORT &my);
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const SUPPORT &my);
 
   SUPPORT& operator=(const SUPPORT &support);
   bool operator == (const SUPPORT &support) const;
@@ -168,6 +179,7 @@ public:
   inline void setName(string Name);
   inline void setDescription(string Description);
   void setMesh(MESH *Mesh) const;
+  void setMeshDirectly(MESH *Mesh) const { _mesh=Mesh; }
   inline void setMeshName(const string & meshName);
   inline void setAll(bool All);
   inline void setEntity(MED_EN::medEntityMesh Entity);
@@ -190,7 +202,9 @@ public:
   inline int    getNumberOfElements(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
   inline  const int * getNumberOfElements() const throw (MEDEXCEPTION);
   virtual inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
+  virtual inline MEDSKYLINEARRAY *  getnumberFromFile() const throw (MEDEXCEPTION);
   virtual inline const int *  getNumber(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+  virtual inline const int *  getNumberFromFile(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
   virtual inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
   virtual int getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION);
 
@@ -204,6 +218,9 @@ public:
 
   void setpartial(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
 
+
+  void setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
+  
   // Si les noms de profils ne sont pas positionnés, les profils ne seront
   // pas écrits par MEDFICHIER.
   void   setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION);
@@ -273,6 +290,16 @@ inline MEDSKYLINEARRAY * SUPPORT::getnumber() const
   return _number ;
 }
 
+//---------------------------------------------------------------------
+inline MEDSKYLINEARRAY * SUPPORT::getnumberFromFile() const
+  throw (MEDEXCEPTION)
+//---------------------------------------------------------------------
+{
+  if (_number_fromfile==NULL)
+    throw MEDEXCEPTION("Support::getnumberFromFile : Not defined !") ;
+  return _number_fromfile ;
+}
+
 /*!
   If isOnAllElements is false, returns an array which contains
   all number of given medGeometryElement.
@@ -297,6 +324,22 @@ inline const int * SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) 
   for (int i=0;i<_numberOfGeometricType;i++)
     if (_geometricType[i]==GeometricType)
       return _number->getI(i+1) ;
+  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"GeometricType not found !")) ;
+}
+
+//---------------------------------------------------------------------
+inline const int * SUPPORT::getNumberFromFile(MED_EN::medGeometryElement GeometricType) const
+  throw (MEDEXCEPTION)
+//---------------------------------------------------------------------
+{
+  const char * LOC = "Support::getNumberFromFile : " ;
+//   if (_isOnAllElts)
+//     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined, support is on all entity !")) ;
+  if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
+    return _number_fromfile->getValue() ;
+  for (int i=0;i<_numberOfGeometricType;i++)
+    if (_geometricType[i]==GeometricType)
+      return _number_fromfile->getI(i+1) ;
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"GeometricType not found !")) ;
 }
 
@@ -384,10 +427,23 @@ inline void SUPPORT::setNumberOfGeometricType(int NumberOfGeometricType)
 inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *GeometricType)
 //---------------------------------------------------------------------
 {
-  if (NULL == _geometricType)
+  if (!_geometricType)
     _geometricType.set(_numberOfGeometricType);
   for (int i=0;i<_numberOfGeometricType;i++)
     _geometricType[i] = GeometricType[i];
+
+  if (_profilNames.empty())
+    {
+      // giving a default value to profile names
+      vector<string> prof_names( _numberOfGeometricType);
+      for (int itype=0; itype < _numberOfGeometricType; itype++)
+	{
+	  ostringstream typestr;
+	  typestr<<_name<<"_type"<<itype;
+	  prof_names[itype]=typestr.str();
+	}
+      _profilNames=prof_names;
+    }
 }
 
 
@@ -399,8 +455,11 @@ inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *Geometri
 inline void SUPPORT::setNumberOfElements(const int *NumberOfElements)
 //----------------------------------------------------------
 {
-  if (NULL == _numberOfElements)
-    _numberOfElements.set(_numberOfGeometricType,NumberOfElements);
+  if (_numberOfElements == NULL)
+    if (_numberOfGeometricType)
+      _numberOfElements.set(_numberOfGeometricType,NumberOfElements);
+    else
+      _numberOfElements.set(0);
   _totalNumberOfElements = 0 ;
   for (int i=0;i<_numberOfGeometricType;i++)
     _totalNumberOfElements+=_numberOfElements[i];

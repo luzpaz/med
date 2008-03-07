@@ -34,7 +34,11 @@
 
 */
 namespace MEDMEM {
-class FAMILY : virtual public SUPPORT
+  class FAMILY;
+  ostream & operator<<(ostream &os, FAMILY &my);
+  ostream & operator<<(ostream &os, const FAMILY &my) ;
+
+class MEDMEM_EXPORT FAMILY : virtual public SUPPORT
 {
 protected :
   /*!
@@ -112,9 +116,9 @@ public:
 			/*! Destructor. */
   virtual ~FAMILY();
   FAMILY & operator=(const FAMILY &fam);
-  friend ostream & operator<<(ostream &os, FAMILY &my) ;
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, FAMILY &my) ;
 
-  friend ostream & operator<<(ostream &os, const FAMILY &my) ;
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, const FAMILY &my) ;
 
   bool build(MED_EN::medEntityMesh Entity,int **FamilyNumber);
 
@@ -127,7 +131,7 @@ public:
   inline void setAttributesValues       (int * AttributeValue);
   inline void setAttributesDescriptions (string * AttributeDescription); 
   inline void setNumberOfGroups         (int NumberOfGroups);
-  inline void setGroupsNames            (string * GroupName);
+  inline void setGroupsNames            (string * GroupName, bool giveOwnership=false);
 
   inline int      getIdentifier()                    const;
   inline int      getNumberOfAttributes()            const;
@@ -166,7 +170,8 @@ inline void FAMILY::setNumberOfAttributes(int NumberOfAttribute)
 inline void FAMILY::setAttributesIdentifiers(int * AttributeIdentifier) 
 //---------------------------------------------------------------------
 { 
-    _attributeIdentifier = AttributeIdentifier ; 
+    //_attributeIdentifier = AttributeIdentifier ; 
+    _attributeIdentifier.setShallowAndOwnership(AttributeIdentifier) ;
 }
 
 /*! Sets the attribute _attributeValue to AttributeValue. */
@@ -174,7 +179,8 @@ inline void FAMILY::setAttributesIdentifiers(int * AttributeIdentifier)
 inline void FAMILY::setAttributesValues(int * AttributeValue) 
 //-----------------------------------------------------------
 { 
-    _attributeValue = AttributeValue ; 
+    //_attributeValue = AttributeValue ; 
+    _attributeValue.setShallowAndOwnership(AttributeValue) ;
 }
 
 /*! Sets the attribute _attributeDescription to  AttributeDescription. */
@@ -182,7 +188,8 @@ inline void FAMILY::setAttributesValues(int * AttributeValue)
 inline void FAMILY::setAttributesDescriptions(string * AttributeDescription) 
 //--------------------------------------------------------------------------
 { 
-    _attributeDescription = AttributeDescription ; 
+    //_attributeDescription = AttributeDescription ; 
+    _attributeDescription.setShallowAndOwnership(AttributeDescription) ;
 }
 
 /*! Sets the attribute _numberOfGroup to NumberOfGroups. */
@@ -195,10 +202,14 @@ inline void FAMILY::setNumberOfGroups(int NumberOfGroups)
 
 /*! Sets the attribute _groupName to GroupName. */
 //----------------------------------------------------
-inline void FAMILY::setGroupsNames(string * GroupName) 
+  inline void FAMILY::setGroupsNames(string * GroupName, bool giveOwnership) 
 //----------------------------------------------------
 { 
-    _groupName = GroupName ; 
+	if (giveOwnership)
+		_groupName.setShallowAndOwnership(GroupName);
+	else	
+    	//_groupName = GroupName ; 
+    _groupName.set(_numberOfGroup, GroupName) ;
 }
 /*! Returns the attribute _identifier.\n
    Note that there is one identifier precisely for each family. */

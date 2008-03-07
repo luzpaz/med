@@ -284,11 +284,13 @@ public :
   MED_FIELD_RDONLY_DRIVER(const MED_FIELD_RDONLY_DRIVER & fieldDriver):IMED_FIELD_RDONLY_DRIVER<T>(fieldDriver) { _concreteFieldDrv = fieldDriver._concreteFieldDrv->copy(); }
   virtual ~MED_FIELD_RDONLY_DRIVER() {     if (_concreteFieldDrv) delete _concreteFieldDrv; }
   virtual void read ( void ) throw (MEDEXCEPTION) { _concreteFieldDrv->read(); }
+  virtual MED_EN::med_mode_acces getAccessMode() const { return _concreteFieldDrv->getAccessMode(); }
   virtual void write( void ) const throw (MEDEXCEPTION) { _concreteFieldDrv->write(); }
   virtual void open() throw (MEDEXCEPTION) { _concreteFieldDrv->open(); }
   virtual void close() { _concreteFieldDrv->close(); }
   virtual void   setFieldName(const string & fieldName) { _concreteFieldDrv->setFieldName(fieldName); }
   virtual string getFieldName() const { return MED_FIELD_DRIVER<T>::getFieldName(); }
+  
 private:
   virtual GENDRIVER * copy ( void ) const { return new MED_FIELD_RDONLY_DRIVER<T>(*this); }
 protected:
@@ -306,6 +308,7 @@ public :
   MED_FIELD_WRONLY_DRIVER(const MED_FIELD_WRONLY_DRIVER & fieldDriver):IMED_FIELD_WRONLY_DRIVER<T>(fieldDriver) { _concreteFieldDrv = fieldDriver._concreteFieldDrv->copy(); }
   virtual ~MED_FIELD_WRONLY_DRIVER() {    if (_concreteFieldDrv) delete _concreteFieldDrv;}
   virtual void read ( void ) throw (MEDEXCEPTION) { _concreteFieldDrv->read(); }
+  virtual MED_EN::med_mode_acces getAccessMode() const { return _concreteFieldDrv->getAccessMode(); }
   virtual void write( void ) const throw (MEDEXCEPTION) { _concreteFieldDrv->write(); }
   virtual void open() throw (MEDEXCEPTION) { _concreteFieldDrv->open(); }
   virtual void close() { _concreteFieldDrv->close(); }
@@ -332,6 +335,7 @@ public:
   { _concreteFieldDrv = fieldDriver._concreteFieldDrv->copy(); }
   ~MED_FIELD_RDWR_DRIVER() {    if (_concreteFieldDrv) delete _concreteFieldDrv;}
   virtual void read ( void ) throw (MEDEXCEPTION) { _concreteFieldDrv->read(); }
+  virtual MED_EN::med_mode_acces getAccessMode() const { return _concreteFieldDrv->getAccessMode(); }
   virtual void write( void ) const throw (MEDEXCEPTION) { _concreteFieldDrv->write(); }
   virtual void open() throw (MEDEXCEPTION) { _concreteFieldDrv->open(); }
   virtual void close() { _concreteFieldDrv->close(); }
@@ -408,7 +412,7 @@ template <class T>  MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER() {
 template <class T> template < class INTERLACING_TAG >
 MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER(const string & fileName,
 						    FIELD<T, INTERLACING_TAG> * ptrField):
-  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY),
+  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_WRONLY),
   IMED_FIELD_WRONLY_DRIVER<T>( fileName, ptrField)
 {
   BEGIN_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
@@ -429,7 +433,7 @@ template <class T>  MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER() {
 template <class T> template < class INTERLACING_TAG >
 MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER(const string & fileName,
 						FIELD<T, INTERLACING_TAG> * ptrField):
-  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY),
+  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_REMP),
   IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
 {
   BEGIN_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");

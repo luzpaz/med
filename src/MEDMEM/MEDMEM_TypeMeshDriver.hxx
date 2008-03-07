@@ -20,6 +20,8 @@
 #ifndef TYPE_MESH_DRIVER_HXX
 #define TYPE_MESH_DRIVER_HXX
 
+#include "MEDMEM.hxx"
+
 #include <string>
 #include <vector>
 
@@ -44,7 +46,7 @@ class MESH;
 class FAMILY;
 class GROUP;
 class CONNECTIVITY;
-class TYPE_MESH_DRIVER : public GENDRIVER
+class MEDMEM_EXPORT TYPE_MESH_DRIVER : public GENDRIVER
 {
 protected:
   
@@ -61,7 +63,7 @@ public :
   /*!
     Constructor.
   */
-  TYPE_MESH_DRIVER(const string & fileName,  
+  TYPE_MESH_DRIVER(const std::string & fileName,  
 		  MESH * ptrMesh, 
 		  med_mode_acces accessMode) ;
   /*!
@@ -97,7 +99,7 @@ private:
 };
 
 
-class TYPE_MESH_RDONLY_DRIVER : public virtual TYPE_MESH_DRIVER
+class MEDMEM_EXPORT TYPE_MESH_RDONLY_DRIVER : public virtual TYPE_MESH_DRIVER
 {
  
 public :
@@ -143,7 +145,7 @@ private:
 
 */
 
-class TYPE_MESH_WRONLY_DRIVER : public virtual TYPE_MESH_DRIVER {
+class MEDMEM_EXPORT TYPE_MESH_WRONLY_DRIVER : public virtual TYPE_MESH_DRIVER {
   
 public :
   
@@ -188,7 +190,7 @@ private:
 
 */
 
-class TYPE_MESH_RDWR_DRIVER : public TYPE_MESH_RDONLY_DRIVER, public TYPE_MESH_WRONLY_DRIVER {
+class MEDMEM_EXPORT TYPE_MESH_RDWR_DRIVER : public TYPE_MESH_RDONLY_DRIVER, public TYPE_MESH_WRONLY_DRIVER {
 
 public :
 

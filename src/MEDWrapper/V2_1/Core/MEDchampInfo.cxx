@@ -28,7 +28,8 @@ MEDchampInfo(med_idt fid,int indice,char *champ,
 {
   med_err ret=0;
   med_idt gid;
-  char chemin[MED_TAILLE_CHA+MED_TAILLE_NOM+1];
+  char chemin[MED_TAILLE_CHA+MED_TAILLE_LNOM+1]; //SRN: Changed to MED_TAILLE_LNOM to avoid a crash 
+                                                 //     in case if a field name longer than MED_TAILLE_NOM
   int num;
 
   /*
@@ -44,6 +45,8 @@ MEDchampInfo(med_idt fid,int indice,char *champ,
   if ((ret = _MEDobjetIdentifier(fid,chemin,num,champ)) < 0)
     return -1;
 
+  if(strlen(champ) > MED_TAILLE_NOM) return -1;
+
   /* 
    * Si le Data Group cha n'existe pas => erreur
    */
@@ -55,8 +58,15 @@ MEDchampInfo(med_idt fid,int indice,char *champ,
   /*
    * La liste des attributs
    */
-  if ((ret = _MEDattrEntierLire(gid,MED_NOM_TYP,(med_int*) type)) < 0)
+
+  // MPV 05.10.2006
+  // BUG IPAL 13482: on 64bit Mandriva OS sizeof(med_int)=8, but sizeof(med_type_champ)=4
+  med_int aType;
+  //  if ((ret = _MEDattrEntierLire(gid,MED_NOM_TYP,(med_int*) type)) < 0)
+  if ((ret = _MEDattrEntierLire(gid,MED_NOM_TYP,&aType)) < 0)
     return -1;
+  *type = (med_type_champ)aType;
+  
   if ((ret = _MEDattrStringLire(gid,MED_NOM_NOM,ncomp*MED_TAILLE_PNOM,
 				comp)) < 0)
     return -1;

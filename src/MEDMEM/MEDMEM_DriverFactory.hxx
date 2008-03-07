@@ -20,6 +20,8 @@
 #ifndef DRIVERFACTORY_HXX
 #define DRIVERFACTORY_HXX
 
+#include <MEDMEM.hxx>
+
 #include "MEDMEM_MedVersion.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_define.hxx"
@@ -41,11 +43,13 @@ namespace MEDMEM {
       for the writing of Med File set to V22
     */
 
-    extern MED_EN::medFileVersion globalMedFileVersionForWriting;
+    MEDMEM_EXPORT extern MED_EN::medFileVersion globalMedFileVersionForWriting;
 
-    MED_EN::medFileVersion getMedFileVersionForWriting();
+    MEDMEM_EXPORT MED_EN::medFileVersion getMedFileVersionForWriting();
 
-    void setMedFileVersionForWriting(MED_EN::medFileVersion version);
+    MEDMEM_EXPORT void setMedFileVersionForWriting(MED_EN::medFileVersion version);
+
+    MEDMEM_EXPORT driverTypes deduceDriverTypeFromFileName(const std::string & fileName);
 
     driverTypes deduceDriverTypeFromFileName(const std::string & fileName);
 
@@ -86,6 +90,7 @@ namespace MEDMEM {
   }
 }
 
+#include "MEDMEM_EnsightFieldDriver.hxx"
 #include "MEDMEM_VtkFieldDriver.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_MedFieldDriver21.hxx"
@@ -116,6 +121,27 @@ namespace MEDMEM {
 	  case MED_EN::MED_REMP : {
 	    ret = new MED_FIELD_RDWR_DRIVER<T>(fileName,field);
 	    break;
+	  }
+	  default:
+	    throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	  }
+	break;
+      }
+
+      case ENSIGHT_DRIVER : {
+	switch(access)
+	  {
+	  case MED_EN::MED_LECT : {
+	    ret = new ENSIGHT_FIELD_RDONLY_DRIVER<T>(fileName,field);
+	    break;
+	  }
+	  case MED_EN::MED_ECRI : {
+	    ret=new ENSIGHT_FIELD_WRONLY_DRIVER<T>(fileName,field);
+	    break;
+	  }
+	  case MED_EN::MED_REMP : {
+	    throw MED_EXCEPTION ("not yet implemented");
+	    break ;
 	  }
 	  default:
 	    throw MED_EXCEPTION ("access type has not been properly specified to the method");
@@ -188,7 +214,7 @@ namespace MEDMEM {
       {
 	version = getMedFileVersion(fileName);
       }
-    catch (MEDEXCEPTION & ex)
+    catch (MEDEXCEPTION & )
       {
 	version = DRIVERFACTORY::globalMedFileVersionForWriting;
       }

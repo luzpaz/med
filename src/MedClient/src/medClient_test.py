@@ -137,7 +137,7 @@ medComp=salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
 import os
 
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/"
+filePath=filePath+"/share/salome/resources/med/"
 
 filePathName = filePath + fileName
 
@@ -204,6 +204,10 @@ for i in range(nbOfMeshes):
 
 
 
+    meshLocalCopy0 = MESHClient(meshObj)
+    print "\n=============== Test printing of MESHClient (bug NPAL14100) ======================="
+    print meshLocalCopy0
+    print "============= End Test printing of MESHClient (bug NPAL14100) =======================\n\n"
 
 
     meshLocalCopy = MESHClient(meshObj)

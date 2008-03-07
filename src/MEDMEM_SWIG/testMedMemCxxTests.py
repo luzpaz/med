@@ -21,7 +21,7 @@ from libMEDMEM_Swig import *
 import os,string
 
 filesPath=os.environ["MED_ROOT_DIR"]
-filesPath=filesPath+"/share/salome/resources/"
+filesPath=filesPath+"/share/salome/resources/med/"
 
 testExecfiles = []
 argListTest = []

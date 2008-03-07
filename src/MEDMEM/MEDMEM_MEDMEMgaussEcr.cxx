@@ -22,7 +22,7 @@
  * on intègre la correction ici.
  */
 
-namespace med_2_2 {
+namespace med_2_3 {
   extern "C" {
 # define ICI                    {\
                                         fflush(stdout);\
@@ -117,7 +117,8 @@ namespace med_2_2 {
        * Sinon => erreur
        */
       if ((chid = _MEDdatagroupOuvrir(gid,locname)) >= 0) {
-	if ( MED_MODE_ACCES != MED_LECTURE_ECRITURE ) {
+	if ( false )//MED_MODE_ACCES != MED_LECTURE_ECRITURE )
+  {
 	  MESSAGE("Le nom de localisation existe déjà : ");
 	  SSCRUTE(locname); goto ERROR;
 	}

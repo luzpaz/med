@@ -27,38 +27,40 @@
 #include <algorithm>
 
 using namespace std;
-using namespace MEDMEM;
 using namespace MED_EN;
 
 #define DUMP_LINES_LIMIT 20
 
+namespace MEDMEM {
+
 // Cet opérateur permet d'ordonner les mailles dans un set suivant l'ordre requis par MED
 bool _maille::operator < (const _maille& ma) const
 {
-    // si le type géométrique differe, la comparaison est basée dessus
-    // sinon on se base sur une comparaison des numéros de sommets 
-    if(geometricType==ma.geometricType)
+  // si le type géométrique differe, la comparaison est basée dessus
+  // sinon on se base sur une comparaison des numéros de sommets 
+  if(geometricType==ma.geometricType)
+  {
+    // construction de deux vecteur temporaire contenant les numeros de sommets
+    // pour faire le tri et les comparaisons
+    size_t l=sommets.size();
+    std::vector<int> v1(l);
+    std::vector<int> v2(l);
+    for (unsigned int i=0; i!=l; ++i)
     {
-	// construction de deux vecteur temporaire contenant les numeros de sommets
-	// pour faire le tri et les comparaisons
-	size_t l=sommets.size();
-	std::vector<int> v1(l);
-	std::vector<int> v2(l);
-	for (unsigned int i=0; i!=l; ++i)
-	  {
-	    v1[i]=sommets[i]->second.number;
-	    v2[i]=ma.sommets[i]->second.number;
-	  }
-	std::sort(v1.begin(), v1.end());
-	std::sort(v2.begin(), v2.end());
-	for(std::vector<int>::const_iterator i1=v1.begin(), i2=v2.begin(); i1!=v1.end(); ++i1, ++i2)
-	    if(*i1 != *i2)
-		return *i1 < *i2;
-	return false; // cas d'égalité
+      v1[i]=sommets[i]->second.number;
+      v2[i]=ma.sommets[i]->second.number;
     }
-    else
-	return geometricType<ma.geometricType;
+    std::sort(v1.begin(), v1.end());
+    std::sort(v2.begin(), v2.end());
+    for(std::vector<int>::const_iterator i1=v1.begin(), i2=v2.begin(); i1!=v1.end(); ++i1, ++i2)
+      if(*i1 != *i2)
+        return *i1 < *i2;
+    return false; // cas d'égalité
+  }
+  else
+    return geometricType<ma.geometricType;
 };
+
 _link _maille::link(int i) const
 {
   ASSERT ( i >= 0 && i < sommets.size() );
@@ -99,7 +101,7 @@ return entity;
 //END_OF(LOC);
 };
 
-std::ostream& MEDMEM::operator << (std::ostream& os, const _maille& ma)
+std::ostream& operator << (std::ostream& os, const _maille& ma)
 {
     os << "maille " << ma.ordre << " (" << ma.geometricType << ") : < ";
     std::vector< std::map<int,_noeud>::iterator >::const_iterator i=ma.sommets.begin();
@@ -110,19 +112,23 @@ std::ostream& MEDMEM::operator << (std::ostream& os, const _maille& ma)
     return os;
 }
 
-std::ostream& MEDMEM::operator << (std::ostream& os, const _groupe& gr)
+std::ostream& operator << (std::ostream& os, const _groupe& gr)
 {
     os << "--- Groupe " << gr.nom << " --- " << std::endl ;
     os << " -> liste des sous-groupes : ";
     for( std::vector<int>::const_iterator i=gr.groupes.begin(); i!=gr.groupes.end(); ++i)
-	os << *i << " ";
+	    os << *i << " ";
+    
     os << std::endl << " -> liste des "<< gr.mailles.size() << " mailles : " << std::endl;
-    _groupe::mailleIter i=gr.mailles.begin();
+    
+    _groupe::mailleIter i1=gr.mailles.begin();
     int l;
-    for(l = 0; l < DUMP_LINES_LIMIT && i!=gr.mailles.end(); i++, l++)
-	os << setw(3) << l+1 << " " << *(*i) << std::endl;
+    for(l = 0; l < DUMP_LINES_LIMIT && i1!=gr.mailles.end(); i1++, l++)
+	    os << setw(3) << l+1 << " " << *(*i1) << std::endl;
+    
     if ( l == DUMP_LINES_LIMIT )
       os << "   ... skip " << gr.mailles.size() - l << " mailles" << endl;
+    
     os << " relocMap, size=" << gr.relocMap.size() << endl;
     map<const _maille*,int>::const_iterator it = gr.relocMap.begin();
     for ( l = 0; l < DUMP_LINES_LIMIT && it != gr.relocMap.end(); ++it, ++l )
@@ -132,7 +138,7 @@ std::ostream& MEDMEM::operator << (std::ostream& os, const _groupe& gr)
     return os;
 }
 
-std::ostream& MEDMEM::operator << (std::ostream& os, const _noeud& no)
+std::ostream& operator << (std::ostream& os, const _noeud& no)
 {
     os << "noeud " << no.number << " : < ";
     std::vector<double>::const_iterator i=no.coord.begin();
@@ -151,7 +157,7 @@ void MEDMEM::_fieldBase::dump(std::ostream& os) const
     "  type: " << _type << endl;
   os << "  subcomponents:" << endl;
   vector< _sub_data >::const_iterator sub_data = _sub.begin();
-  for ( int i_sub = 1; sub_data != _sub.end(); ++sub_data, i_sub ) {
+  for ( ; sub_data != _sub.end(); ++sub_data ) {
     os << "    group index: " << sub_data->_supp_id <<
       ", " << sub_data->nbComponents() << " comp names: ";
     for ( int i_comp = 0; i_comp < sub_data->nbComponents(); ++i_comp )
@@ -160,13 +166,13 @@ void MEDMEM::_fieldBase::dump(std::ostream& os) const
   }
 }
 
-std::ostream& MEDMEM::operator << (std::ostream& os, const _fieldBase * f)
+std::ostream& operator << (std::ostream& os, const _fieldBase * f)
 {
   f->dump( os );
   return os;
 }
 
-std::ostream& MEDMEM::operator << (std::ostream& os, const _intermediateMED& mi)
+std::ostream& operator << (std::ostream& os, const _intermediateMED& mi)
 {
     os << "Set des " << mi.maillage.size() << " mailles : " << std::endl;
     std::set<_maille>::const_iterator i=mi.maillage.begin();
@@ -206,6 +212,10 @@ void _intermediateMED::treatGroupes()
 {
   const char * LOC = "_intermediateMED::treatGroupes() : ";
   BEGIN_OF(LOC);
+
+  if ( myGroupsTreated )
+    return;
+  myGroupsTreated = true;
   
   // --------------------
   // erase useless group
@@ -220,7 +230,7 @@ void _intermediateMED::treatGroupes()
     j = grp.groupes.begin();
     while( j!=grp.groupes.end() ) {
       int grpInd = *j-1;
-      if ( grpInd < 0 || grpInd >= groupes.size() ) {
+      if ( grpInd < 0 || grpInd >= (int)groupes.size() ) {
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad subgroup index: " << grpInd <<
                                      ", in " << i << " groupe.nom=" << grp.nom));
       }
@@ -229,7 +239,7 @@ void _intermediateMED::treatGroupes()
         MESSAGE("High hierarchical depth of subgroups in group " << i );
         *j = sub_grp.groupes[0]; // replace j with its 1st subgroup
         // push back the rest subs
-        for ( int k = 1; k < sub_grp.groupes.size(); ++k )
+        for ( int k = 1; k < (int)sub_grp.groupes.size(); ++k )
           grp.groupes.push_back( sub_grp.groupes[ k ]);
         // vector maybe is reallocated: restart iterator
         j = grp.groupes.begin();
@@ -330,24 +340,91 @@ void _intermediateMED::numerotationMaillage()
       i++;
     }
   }
+
+  // check if numeration is needed
+  if ( i->ordre  > 0 && maillage.rbegin()->ordre > 0 )
+  {
+    // already numerated, check numeration
+    bool ok = true;
+    const int maxNbTypes = 20;
+    pair< unsigned, unsigned > minMaxOrder[ maxNbTypes ];
+    int nbElems[ maxNbTypes ];
+    std::set<_maille>::iterator j=i;
+
+    do { // loop on elements of one entity
+      int iType = 0;
+      minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
+      int i_maille = 0, dimension = j->dimension(), type = j->geometricType;
+
+      std::set<_maille>::iterator k=j;
+      for ( ; j!=maillage.end() && (hasMixedCells || dimension==j->dimension()); ++j)
+      {
+        if (type != j->geometricType) // si changement de type geometrique
+        {
+          nbElems[ iType ] = i_maille;
+          i_maille=0;
+          type = j->geometricType;
+          iType++;
+          minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
+        }
+        ++i_maille;
+        if ( j->ordre < minMaxOrder[ iType ].first )
+          minMaxOrder[ iType ].first = j->ordre;
+        if ( j->ordre > minMaxOrder[ iType ].second )
+          minMaxOrder[ iType ].second = j->ordre;
+      }
+      nbElems[ iType ] = i_maille;
+
+      bool renumEntity = false; 
+      for ( int t = 0; t <= iType; ++t ) {
+        int orderRange = minMaxOrder[ t ].second - minMaxOrder[ t ].first;
+        if ( nbElems[ t ] != orderRange + 1 )
+          ok = false;
+        if ( t > 0 ) {
+          if ( minMaxOrder[ t ].first == 1 )
+            renumEntity = true;
+          else if ( minMaxOrder[ t-1 ].second+1 != minMaxOrder[ t ].first )
+            ok = false;
+        }
+      }
+      if ( ok && renumEntity ) { // each type of entity is numerated separately
+        int iType = 0, i_shift = 0;
+        type = k->geometricType;
+        for ( ; k != j; ++k ) {
+          if (type != k->geometricType) { // si changement de type geometrique
+            i_shift = minMaxOrder[ iType++ ].second;
+            type = k->geometricType;
+          }
+          k->ordre += i_shift;
+        }
+      }
+
+    } while ( ok && j != maillage.end() );
+
+    if ( ok ) return; // renumeration not needed
+  }
+
   // numerotation des mailles par entité
-    int i_maille=0;
-    int dimension=i->dimension();
-    for( ; i!=maillage.end(); ++i)
+  int i_maille=0;
+  int dimension=i->dimension();
+  for( ; i!=maillage.end(); ++i)
+  {
+    if ( !hasMixedCells && dimension != i->dimension() ) // on change d'entite
     {
-	if ( !hasMixedCells && dimension!=i->dimension() ) // on change d'entite
-	{
-          MESSAGE( "NB dim " << dimension << " entities: " << i_maille);
-	    dimension=i->dimension();
-	    i_maille=0;
-	}
-	(*i).ordre=++i_maille;
+      MESSAGE( "NB dim " << dimension << " entities: " << i_maille);
+      dimension=i->dimension();
+      i_maille=0;
     }
+    i->ordre=++i_maille;
+  }
   END_OF(LOC);
 }
 
 void _intermediateMED::numerotationPoints()
 {
+//   if ( myPointsNumerated )
+//     return;
+//   myPointsNumerated = true;
     // Fonction de renumerotation des noeuds (necessaire quand il y a des trous dans la numerotation.
     int i_noeud=0;
     for( std::map<int,_noeud>::const_iterator i=points.begin(); i!=points.end(); ++i)
@@ -412,6 +489,10 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 
     std::set<_maille>::const_iterator i, j; // iterateurs sur les mailles
 
+    // min and max element nb for each geom type
+    const int maxNbTypes = 20;
+    vector< pair< unsigned, unsigned > > minMaxOrder( maxNbTypes );
+
     // skip nodes and elements of <dimension_maillage - 2> or less dimension
     // Unfortunately, it is impossible because of MESH::createFamilies() that requires
     // presence of connectivity even for nodes!
@@ -431,13 +512,19 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 	//   - on alloue la connectivite
 	//   - on parcourt une deuxieme fois avec j pour lire les noeuds.
 
-
 	type=i->geometricType; // init boucle for
 	dimension=i->dimension();
 	nbtype=0;
 	vtype.push_back(type);
 	// Boucle sur i de parcours des mailles d'une entite
 	// Une entite se termine lorsqu'on atteint la fin de maillage ou lorsque la dimension des mailles change
+
+        int iType=0;
+        minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
+
+        // if hasMixedCells, store POINT1 elems as MED_NODE and
+        // elems of all the rest types as MED_CELL, i.e. do not break the loop
+        // when dimension changes
         bool ignoreDimChange = hasMixedCells && dimension > 0;
 	for( ; i!=maillage.end() && ( ignoreDimChange || dimension==i->dimension()) ; ++i)
 	{
@@ -448,8 +535,13 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 		type=i->geometricType;
 		vtype.push_back(type); // stocke le nouveau type geometrique rencontre
                 dimension=i->dimension();
+                iType++;
+                minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
 	    }
-
+            if ( i->ordre < minMaxOrder[ iType ].first )
+              minMaxOrder[ iType ].first = i->ordre;
+            if ( i->ordre > minMaxOrder[ iType ].second )
+              minMaxOrder[ iType ].second = i->ordre;
 	    ++nbtype;
 	}
 	vcount.push_back(dimension ? nbtype : numberOfNodes); // n'a pas été stocké dans la boucle
@@ -492,18 +584,23 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 
 	for (int k=0; k!=numberOfTypes; ++k )
 	  {
+            int orderShift = 1;
+            if ( minMaxOrder[ k ].first > 1 ) // min elem number != 1
+              orderShift += minMaxOrder[ k-1 ].second; // max elem number in previous type
 	    // pour chaque type géometrique k, copie des sommets dans connectivity et set dans Connectivity
 	    int nbSommetsParMaille = j->sommets.size();
-	    int n, nbSommets = vcount[k] * j->sommets.size();
+	    int n, nbSommets = vcount[k] * nbSommetsParMaille;
 	    connectivity = new int[ nbSommets ];
-	    for (int l=0; l!=vcount[k]; ++l)
+	    for (int l=0; l!=vcount[k]; ++l) // loop on elements of geom type
 	    {
                 if ( entity==MED_NODE )
                   connectivity[l] = l+1;
                 else
                 {
+                  int index0 = nbSommetsParMaille * ( j->ordre - orderShift );
                   for ( n=0; n != nbSommetsParMaille; ++n) {
-		    connectivity[nbSommetsParMaille*l+n] =
+		    //connectivity[nbSommetsParMaille*l+n] =
+                    connectivity[ index0 + n ] =
                       j->sommets[ j->reverse ? nbSommetsParMaille-n-1 : n ]->second.number;
                   }
                 // DO NOT ERASE, maillage will be used while fields construction
@@ -625,7 +722,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
               field->getGroupIds( sub_grps, false );
             }
           }
-          if ( i > *sub_grps.begin() ) { // roll back
+          if ( (int)i > *sub_grps.begin() ) { // roll back
             support_groups.erase( i );
             support_groups.insert( sub_grps.begin(), sub_grps.end() ); 
             i = *sub_grps.begin() - 1;
@@ -887,7 +984,7 @@ void _intermediateMED::getFamilies(std::vector<FAMILY *> & _famCell,
 
 GROUP * _intermediateMED::getGroup( int i )
 {
-  if ( i < medGroupes.size() )
+  if ( i <(int) medGroupes.size() )
     return medGroupes[ i ];
   throw MEDEXCEPTION
     (LOCALIZED(STRING("_intermediateMED::getGroup(): WRONG GROUP INDEX: ")
@@ -903,16 +1000,17 @@ void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
 {
   const char * LOC = "_intermediateMED::getFields() : ";
   BEGIN_OF(LOC);
+
   std::list< _fieldBase* >::const_iterator fIt = fields.begin();
   for ( ; fIt != fields.end(); fIt++ )
   {
     const _fieldBase* fb = *fIt;
-    list<pair< FIELD_*, int> >  ff = fb->getField(groupes);
+    list<pair< FIELD_*, int> >  ff = fb->getField(groupes, medGroupes);
     list<pair< FIELD_*, int> >::iterator f_sup = ff.begin();
     for (int j = 1 ; f_sup != ff.end(); f_sup++, ++j )
     {
-      FIELD_* f = f_sup->first;
-      SUPPORT* sup = getGroup( f_sup->second );
+      FIELD_    * f = f_sup->first;
+      SUPPORT * sup = getGroup( f_sup->second );
       if ( !sup )
         throw MEDEXCEPTION
           (LOCALIZED(STRING(LOC) <<"_intermediateMED::getFields(), NULL field support: "
@@ -923,8 +1021,11 @@ void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
           (LOCALIZED(STRING("_intermediateMED::getFields(), field support size (")
                      << nb_elems  << ") != NumberOfValues (" << f->getNumberOfValues()));
       theFields.push_back( f );
-      if ( sup->getName().empty() )
-        sup->setName( "GRP_" + f->getName() );
+      if ( sup->getName().empty() ) {
+        ostringstream name;
+        name << "GRP_" << f->getName() << "_" << j;
+        sup->setName( name.str() );
+      }
       f->setSupport( sup );
       //f->setIterationNumber( j );
       f->setOrderNumber( j );
@@ -968,13 +1069,15 @@ bool _fieldBase::hasSameComponentsBySupport() const
   const _sub_data& first_sub_data = *sub_data;
   for ( ++sub_data ; sub_data != _sub.end(); ++sub_data )
   {
-    if ( first_sub_data.nbComponents() != sub_data->nbComponents() )
-      return false;
-    for ( int iComp = 0; iComp < first_sub_data.nbComponents(); ++iComp )
-      if ( first_sub_data._comp_names[ iComp ] != sub_data->_comp_names[ iComp ])
-        return false;
+    if ( first_sub_data._comp_names != sub_data->_comp_names )
+      return false; // diff names of components
+
+    if ( first_sub_data._nb_gauss != sub_data->_nb_gauss )
+      return false; // diff nb of gauss points
   }
   return true;
+}
+
 }
 
 /////

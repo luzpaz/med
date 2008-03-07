@@ -75,6 +75,7 @@ namespace MED_EN {
     typedef long medModeSwitch;
     const medModeSwitch MED_FULL_INTERLACE = 0;
     const medModeSwitch MED_NO_INTERLACE = 1;
+    const medModeSwitch MED_NO_INTERLACE_BY_TYPE = 2;
     const medModeSwitch MED_UNDEFINED_INTERLACE = 3;
     
     typedef long medConnectivity;
@@ -83,7 +84,7 @@ namespace MED_EN {
 
     typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
 
-    typedef enum {MED_LECT,MED_ECRI,MED_REMP} med_mode_acces;
+    typedef enum {MED_LECT,MED_ECRI,MED_REMP,MED_CREA} med_mode_acces;
 
     typedef enum {ASCENDING=7,DESCENDING=77} med_sort_direc;
 
@@ -113,7 +114,7 @@ typedef enum {MED_HDF_VERSION, MED_VERSION, MED_FICH_DES} med_fich_info;
 //   //#define MED_ALL    0 !!!!! NB: WARNING MED_ALL deja utilise dans l'enum medGeometryElement !!!!!!!!
 // #define MED_ALL    0
 
-#if defined(SUN4SOL2) || defined(PCLINUX) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000)
+#if defined(SUN4SOL2) || defined(PCLINUX) || defined(PCLINUX64_32) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000)
 /* interface C/FORTRAN */
 /* this true only with g77 and gcc : we must change it to use directly NOMF_... and INT32 or INT64 - it will be more simple to understand and to use ! */
 // #define NOMF_POST_UNDERSCORE
@@ -141,7 +142,7 @@ typedef int            med_int;
 typedef double         med_float;
 #endif
 
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000)
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64) 
 // #define NOMF_POST_UNDERSCORE
 
 /* correspondance des types avec HDF 5 */
@@ -211,6 +212,7 @@ typedef double         med_float;
   //   réinitialisé. Cf une évolution de MED.
 #define MED_WRONLY MED_ECRI
 #define MED_RDWR   MED_ECRI
+#define MED_CREATE MED_CREA
 // Fin
 
 #define FAUX 0
@@ -243,6 +245,8 @@ typedef double         med_float;
 #define OK 0
 #define KO 1
 
+//maximum number of groups handled by the Family Group converter
+#define MAX_NB_GROUP 100000
   /*
     enum definition for the used Med File version V2.1 or V2.2
     because of incompatibility between them.

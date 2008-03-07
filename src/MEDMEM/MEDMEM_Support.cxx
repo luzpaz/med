@@ -97,6 +97,8 @@ SUPPORT::SUPPORT(const SUPPORT & m)
   else
     _number = (MEDSKYLINEARRAY *) NULL;
 
+  _profilNames=m._profilNames;
+
   END_OF(LOC) ;
 };
 /*!
@@ -130,6 +132,7 @@ SUPPORT & SUPPORT::operator=(const SUPPORT & m)
       _number = (MEDSKYLINEARRAY *) NULL;
   } else
     _number = (MEDSKYLINEARRAY *) NULL;
+  _profilNames=m._profilNames;
 
   END_OF(LOC) ;
   return *this;
@@ -202,7 +205,7 @@ void SUPPORT::update()
 	{
 	  _numberOfGeometricType=1 ;
 	  _geometricType.set(1);
-	  _geometricType[0]=MED_NONE;
+	  _geometricType[0]=MED_POINT1;
 	  _numberOfElements.set(1);
 	  _numberOfElements[0]=_mesh->getNumberOfNodes(); // Vérifier le pointeur !
 	  _totalNumberOfElements=_numberOfElements[0];
@@ -242,9 +245,6 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
   if (_isOnAllElts) return number;
 
   int nbOfEltsThis    = getNumberOfElements(MED_ALL_ELEMENTS);
-  int nbOfEltsThisVerif    = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
-
-  if (nbOfEltsThis == nbOfEltsThisVerif) return number;
 
   const int *eltsThis = _number->getValue();
 
@@ -370,6 +370,17 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
 
   delete[] index ;
 
+  // PAL16854(Partial support on nodes):
+  // giving a default value to profile names
+  vector<string> prof_names( NumberOfGeometricType);
+  for (int itype=0; itype < NumberOfGeometricType; itype++)
+  {
+    ostringstream typestr;
+    typestr<<_name<<"_type"<<itype;
+    prof_names[itype]=typestr.str();
+  }
+  setProfilNames(prof_names);
+  
   END_OF(LOC);
 };
 
@@ -413,6 +424,20 @@ void SUPPORT::setpartial(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDE
     _number = new MEDSKYLINEARRAY(*number);
 
   // cout << *_number << endl;
+
+  END_OF(LOC);
+};
+
+void SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDEXCEPTION)
+//-------------------
+{
+  const char * LOC = "SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number) : " ;
+  BEGIN_OF(LOC) ;
+
+  if ( shallowCopy )
+    _number_fromfile = number;
+  else
+    _number_fromfile = new MEDSKYLINEARRAY(*number);
 
   END_OF(LOC);
 };

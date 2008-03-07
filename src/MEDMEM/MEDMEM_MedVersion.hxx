@@ -20,13 +20,23 @@
 #ifndef MED_VERSION_HXX
 #define MED_VERSION_HXX
 
+#include "MEDMEM.hxx"
+
 #include <string>
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 
 namespace MEDMEM {
 
-  MED_EN::medFileVersion getMedFileVersion(const string & fileName)
+  MEDMEM_EXPORT MED_EN::medFileVersion getMedFileVersion(const string & fileName)
+    throw (MEDEXCEPTION);
+
+  int getMedAccessMode(MED_EN::med_mode_acces mode,
+                       MED_EN::medFileVersion medVersion)
+    throw (MEDEXCEPTION);
+
+  int getMedAccessMode(MED_EN::med_mode_acces mode,
+                       MED_EN::medFileVersion medVersion)
     throw (MEDEXCEPTION);
 }
 

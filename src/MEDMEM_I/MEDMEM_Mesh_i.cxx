@@ -516,8 +516,13 @@ throw (SALOME::SALOME_Exception)
 	
 	try
         {
-		return _mesh->getNumberOfElements(convertIdlEntToMedEnt(entity),
-						  convertIdlEltToMedElt(geomElement));
+//           if ( geomElement == SALOME_MED::MED_POLYGON ||
+//                geomElement == SALOME_MED::MED_POLYHEDRA )
+//             return _mesh->getNumberOfElementsWithPoly(convertIdlEntToMedEnt(entity),
+//                                                       convertIdlEltToMedElt(geomElement));
+//           else
+            return _mesh->getNumberOfElements(convertIdlEntToMedEnt(entity),
+                                              convertIdlEltToMedElt(geomElement));
 	}
 	catch (MEDEXCEPTION &ex)
         {
@@ -561,10 +566,15 @@ SCRUTE(elt2);
 		else
 		{
 MESSAGE("MED_NODAL");
-			const int * tab=_mesh->getConnectivityIndex(
-				convertIdlConnToMedConn(mode),
-				convertIdlEntToMedEnt(entity));
-			nbelements = elt1*(convertIdlEltToMedElt(geomElement)%100);
+// 			const int * tab=_mesh->getConnectivityIndex(
+// 				convertIdlConnToMedConn(mode),
+// 				convertIdlEntToMedEnt(entity));
+                        nbelements = _mesh->getConnectivityLength
+                          (convertIdlModeToMedMode(typeSwitch),
+                           convertIdlConnToMedConn(mode),
+                           convertIdlEntToMedEnt(entity),
+                           convertIdlEltToMedElt(geomElement));
+			//nbelements = elt1*(convertIdlEltToMedElt(geomElement)%100);
 			//			nbelements = tab[elt1 ] - 1 ;
 		}
 SCRUTE(entity);
@@ -679,7 +689,7 @@ SALOME::SenderInt_ptr MESH_i::getSenderForPolygonsConnectivityIndex(SALOME_MED::
   SALOME::SenderInt_ptr ret;
   try
     {
-      int nbelements = _mesh->getNumberOfPolygons() + 1;
+      int nbelements = _mesh->getNumberOfPolygons(entity) + 1;
       const int * numbers=_mesh->getPolygonsConnectivityIndex (convertIdlConnToMedConn(mode),
                                                                convertIdlEntToMedEnt(entity));
       ret=SenderFactory::buildSender(*this,numbers,nbelements);
@@ -795,7 +805,7 @@ throw (SALOME::SALOME_Exception)
         {
 		int nbelements = _mesh->getNumberOfElements(
 					convertIdlEntToMedEnt(entity),
-					MED_ALL_ELEMENTS);
+					MED_ALL_ELEMENTS) + 1;
                 myseq->length(nbelements);
                 const int * numbers=_mesh->getConnectivityIndex(convertIdlConnToMedConn(mode),
 						          convertIdlEntToMedEnt(entity));
@@ -996,7 +1006,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbfam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(fam[i]);
-                        myseq[i] = f1->POA_SALOME_MED::FAMILY::_this();
+                        myseq[i] = f1->_this();
                 }
         }
         catch (MEDEXCEPTION &ex)
@@ -1046,37 +1056,52 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Returns connectivity global informations
  */
 //=============================================================================
-SALOME_MED::MESH::connectivityInfos * MESH_i::getConnectGlobal
-                        (SALOME_MED::medEntityMesh entity)
-throw (SALOME::SALOME_Exception)
+SALOME_MED::MESH::connectivityInfos * MESH_i::getConnectGlobal (SALOME_MED::medEntityMesh entity)
+  throw (SALOME::SALOME_Exception)
 {
-        if (_mesh==NULL)
-                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
-                                             SALOME::INTERNAL_ERROR);
-        SALOME_MED::MESH::connectivityInfos_var all=new SALOME_MED::MESH::connectivityInfos;
-        try
-        {
-                all->numberOfNodes  = _mesh->getNumberOfNodes();
+  if (_mesh==NULL)
+    THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                 SALOME::INTERNAL_ERROR);
+  SALOME_MED::MESH::connectivityInfos_var all=new SALOME_MED::MESH::connectivityInfos;
+  try
+  {
+    MED_EN::medEntityMesh anEntity = convertIdlEntToMedEnt(entity);
+    all->numberOfNodes  = _mesh->getNumberOfNodes();
 
-                int nbTypes=_mesh->getNumberOfTypesWithPoly(convertIdlEntToMedEnt(entity));
-                const medGeometryElement * elemts  =_mesh->getTypesWithPoly(
-                                       convertIdlEntToMedEnt(entity));
-                all->meshTypes.length(nbTypes);
-                all->numberOfElements.length(nbTypes);
-		all->entityDimension=_mesh->getConnectivityptr()->getEntityDimension();
-                for (int i=0; i<nbTypes; i++)
-                {
-                        all->meshTypes[i]=convertMedEltToIdlElt(elemts[i]);
-                        all->numberOfElements[i]=_mesh->getNumberOfElementsWithPoly(
-                                       convertIdlEntToMedEnt(entity),elemts[i]);
-                }
-        }
-        catch (MEDEXCEPTION &ex)
-        {
-                MESSAGE("Unable to acces connectivities informations");
-                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-        }
-        return all._retn();
+    int nbTypes=_mesh->getNumberOfTypesWithPoly(anEntity);
+    medGeometryElement * types =_mesh->getTypesWithPoly(anEntity);
+    all->meshTypes.length(nbTypes);
+    all->numberOfElements.length(nbTypes);
+    all->nodalConnectivityLength.length(nbTypes);
+    all->entityDimension=_mesh->getConnectivityptr()->getEntityDimension();
+    for (int i=0; i<nbTypes; i++)
+    {
+      all->meshTypes[i]=convertMedEltToIdlElt(types[i]);
+      all->numberOfElements[i]=_mesh->getNumberOfElementsWithPoly(anEntity,types[i]);
+      switch ( types[i] )
+      {
+      case MED_EN::MED_POLYGON:
+        all->nodalConnectivityLength[i]=
+          _mesh->getPolygonsConnectivityLength(MED_EN::MED_NODAL,anEntity);
+        break;
+      case MED_EN::MED_POLYHEDRA:
+        all->nodalConnectivityLength[i]=
+          _mesh->getPolyhedronConnectivityLength(MED_EN::MED_NODAL);
+        break;
+      default:
+        all->nodalConnectivityLength[i]=
+          _mesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,
+                                       anEntity,types[i]);
+      }
+    }
+    delete [] types;
+  }
+  catch (MEDEXCEPTION &ex)
+  {
+    MESSAGE("Unable to acces connectivities informations");
+    THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+  }
+  return all._retn();
 }
 
 //=============================================================================
@@ -1095,7 +1120,7 @@ throw (SALOME::SALOME_Exception)
         {
                 const FAMILY * fam = _mesh->getFamily(convertIdlEntToMedEnt(entity),i);
                 FAMILY_i * f1=new FAMILY_i(fam);
-	        return f1->POA_SALOME_MED::FAMILY::_this();
+	        return f1->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1131,7 +1156,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vNode[i]);
-                        all->famNode[i] = f1->POA_SALOME_MED::FAMILY::_this();
+                        all->famNode[i] = f1->_this();
                 }
 
                 nbFam = _mesh->getNumberOfFamilies(MED_EDGE);
@@ -1142,7 +1167,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vEdge[i]);
-                        all->famEdge[i] = f1->POA_SALOME_MED::FAMILY::_this();
+                        all->famEdge[i] = f1->_this();
                 }
 
                 nbFam = _mesh->getNumberOfFamilies(MED_FACE);
@@ -1152,7 +1177,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vFace[i]);
-                        all->famFace[i] = f1->POA_SALOME_MED::FAMILY::_this();
+                        all->famFace[i] = f1->_this();
                 }
 
                 nbFam = _mesh->getNumberOfFamilies(MED_CELL);
@@ -1162,7 +1187,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbFam;i++)
                 {
                         FAMILY_i * f1=new FAMILY_i(vCell[i]);
-                        all->famCell[i] = f1->POA_SALOME_MED::FAMILY::_this();
+                        all->famCell[i] = f1->_this();
                 }
 
                 int nbGroup = _mesh->getNumberOfGroups(MED_NODE);
@@ -1172,7 +1197,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gNode[i]);
-                        all->groupNode[i] = f1->POA_SALOME_MED::GROUP::_this();
+                        all->groupNode[i] = f1->_this();
                 }
 
                 nbGroup = _mesh->getNumberOfGroups(MED_EDGE);
@@ -1182,7 +1207,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gEdge[i]);
-                        all->groupEdge[i] = f1->POA_SALOME_MED::GROUP::_this();
+                        all->groupEdge[i] = f1->_this();
                 }
                 nbGroup = _mesh->getNumberOfGroups(MED_FACE);
                 all->groupFace.length(nbGroup);
@@ -1191,7 +1216,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gFace[i]);
-                        all->groupFace[i] = f1->POA_SALOME_MED::GROUP::_this();
+                        all->groupFace[i] = f1->_this();
                 }
 
                 nbGroup = _mesh->getNumberOfGroups(MED_CELL);
@@ -1201,7 +1226,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbGroup;i++)
                 {
                         GROUP_i * f1=new GROUP_i(gCell[i]);
-                        all->groupCell[i] = f1->POA_SALOME_MED::GROUP::_this();
+                        all->groupCell[i] = f1->_this();
                 }
 
         }
@@ -1233,7 +1258,7 @@ throw (SALOME::SALOME_Exception)
                 for (int i=0;i<nbgroups;i++)
                 {
                 	GROUP_i * f1=new GROUP_i(groups[i]);
-                        myseq[i] = f1->POA_SALOME_MED::GROUP::_this();
+                        myseq[i] = f1->_this();
                 }
         }
         catch (MEDEXCEPTION &ex)
@@ -1259,7 +1284,7 @@ throw (SALOME::SALOME_Exception)
         {
                 const GROUP * grou = _mesh->getGroup(convertIdlEntToMedEnt(entity),i);
                 GROUP_i * f1=new GROUP_i(grou);
-	        return f1->POA_SALOME_MED::GROUP::_this();
+	        return f1->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1457,6 +1482,7 @@ throw (SALOME::SALOME_Exception)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                               SALOME::INTERNAL_ERROR);
 	MESSAGE("Not Implemented");
+        return SALOME_MED::FIELD::_nil();
 }
 //=============================================================================
 /*!
@@ -1498,29 +1524,36 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 
 //   	} ;
 
-	SALOMEDS::SObject_var medmeshfather = myStudy->FindObjectByPath("/Med/MEDMESH");
+        string aPath = "/Med/MEDMESH";
+	SALOMEDS::SObject_var medmeshfather = myStudy->FindObjectByPath( aPath.c_str() );
   	if ( CORBA::is_nil(medmeshfather) ) 
 	  {
 	    MESSAGE("Add Object MEDMESH");
 
-	    myBuilder->AddDirectory("/Med/MEDMESH");
-            medmeshfather = myStudy->FindObjectByPath("/Med/MEDMESH");
+	    myBuilder->AddDirectory( aPath.c_str() );
+            medmeshfather = myStudy->FindObjectByPath( aPath.c_str() );
 	  } ;
 
-   	MESSAGE("Add a mesh Object under MED/MEDMESH");
-  	SALOMEDS::SObject_var newObj = myBuilder->NewObject(medmeshfather);
+        aPath += "/" + _mesh->getName();
+        SALOMEDS::SObject_var meshSO = myStudy->FindObjectByPath( aPath.c_str());
+        bool alreadyPublished = ! CORBA::is_nil( meshSO );
+        if ( !alreadyPublished ) {
+          MESSAGE("Add a mesh Object under MED/MEDMESH");
+          meshSO = myBuilder->NewObject(medmeshfather);
+
+          anAttr = myBuilder->FindOrCreateAttribute(meshSO, "AttributeName");
+          aName = SALOMEDS::AttributeName::_narrow(anAttr);
+          aName->SetValue(_mesh->getName().c_str());
+        }
 
 	ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
         ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
         CORBA::ORB_var &orb = init(0,0);
 	string iorStr = orb->object_to_string(myIor);
-        anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
+        anAttr = myBuilder->FindOrCreateAttribute(meshSO, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
         aIOR->SetValue(iorStr.c_str());
-        anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
-        aName = SALOMEDS::AttributeName::_narrow(anAttr);
-        aName->SetValue(_mesh->getName().c_str());
-  	_meshId = newObj->GetID();
+  	_meshId = meshSO->GetID();
   	myBuilder->CommitCommand();
 
 	// register the Corba pointer: increase the referrence count
@@ -1576,10 +1609,10 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
         ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
         ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
         CORBA::ORB_var &orb = init(0,0);
-        string iorStr = orb->object_to_string(myIor);
+        CORBA::String_var iorStr = orb->object_to_string(myIor);
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
-        aIOR->SetValue(iorStr.c_str());
+        aIOR->SetValue(iorStr.in());
         anAttr = myBuilder->FindOrCreateAttribute(newObj, "AttributeName");
         aName = SALOMEDS::AttributeName::_narrow(anAttr);
         aName->SetValue(_mesh->getName().c_str());

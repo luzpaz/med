@@ -25,7 +25,8 @@
 #include <stdio.h>
 #include <time.h>
 
-#ifdef PPRO_NT
+//#ifdef PPRO_NT
+#ifdef WIN32
 // Windows Header Files:
 #include <windows.h>
 #include <Lmcons.h>
@@ -43,7 +44,8 @@ MEDunvCr(med_idt fid, char *maa)
   char chemin [MED_TAILLE_MAA+MED_TAILLE_NOM+1];
   char nomu   [MED_TAILLE_LNOM+1];    
   time_t  temps;
-#ifdef PPRO_NT
+//#ifdef PPRO_NT
+#ifdef WIN32
   struct timeb   tp;
   char   lpBuffer [UNLEN+1];
   long   nSize   = UNLEN+1;
@@ -69,15 +71,16 @@ MEDunvCr(med_idt fid, char *maa)
    * Creation/Ecriture de l'attribut nom universel 
    */
   
-#ifdef PPRO_NT
-  if ( GetUserName(lpBuffer,&nSize) == 0 ) return -1;
+//#ifdef PPRO_NT
+#ifdef WIN32
+  if ( GetUserName(lpBuffer,LPDWORD(&nSize)) == 0 ) return -1;
   if ( nSize > MED_TAILLE_NOM ) nSize = MED_TAILLE_NOM;
   strncpy(nomu,lpBuffer,nSize);
   strcat(nomu," ");
   temps=time(&temps);
   strcat(nomu,ctime(&temps));
   ftime(&tp);
-  nSize = strlen(nomu)-1;
+  nSize = (long)strlen(nomu)-1;
   if ( sprintf(&nomu[nSize]," %hu",tp.millitm) < 0 ) return -1;
 #else
   if (cuserid(nomu) == (void*) NULL) return -1;

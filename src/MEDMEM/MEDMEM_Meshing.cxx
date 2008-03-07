@@ -59,13 +59,16 @@ void MESHING::setSpaceDimension(const int SpaceDimension)
 void MESHING::setMeshDimension(const int MeshDimension)
 {
    _meshDimension = MeshDimension ;
-   _connectivity->setEntityDimension(MeshDimension);
+   if (_connectivity)
+     _connectivity->setEntityDimension(MeshDimension);
 }
 
 /*! Set the number of nodes used in the MESH */
 void MESHING::setNumberOfNodes(const int NumberOfNodes)
 {
   _numberOfNodes = NumberOfNodes ;
+  if (_connectivity)
+    _connectivity->setNumberOfNodes(NumberOfNodes);
 }
 
 /*! 

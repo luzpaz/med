@@ -71,7 +71,7 @@ MEDequivLire(med_idt fid, char *maa, char *eq, med_int *corr, med_int n,
     }
   if ((datagroup = _MEDdatagroupOuvrir(eqid,nomdatagroup)) < 0)
     return -1;
-#if defined(IRIX64)||defined(OSF1)
+#if defined(HAVE_F77INT64)
   if ((ret =  _MEDdatasetNumLire(datagroup,MED_NOM_COR,MED_INT64,
 				 MED_NO_INTERLACE,1,MED_ALL,
 				 MED_NOPF,0,MED_NOPG,

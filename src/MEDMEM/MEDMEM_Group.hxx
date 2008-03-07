@@ -25,6 +25,8 @@
 #ifndef GROUP_HXX
 #define GROUP_HXX
 
+#include <MEDMEM.hxx>
+
 #include <vector>
 #include <list>
 #include "MEDMEM_Family.hxx"
@@ -39,8 +41,11 @@
 */
 
 namespace MEDMEM {
-class FAMILY;
-class GROUP : virtual public SUPPORT
+  class FAMILY;
+  class GROUP;
+  ostream & operator<<(ostream &os, GROUP &my) ;
+
+class MEDMEM_EXPORT GROUP : virtual public SUPPORT
 {
 protected :
   /*!

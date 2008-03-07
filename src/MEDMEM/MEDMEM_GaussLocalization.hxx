@@ -37,6 +37,13 @@ namespace MEDMEM {
   public:
     virtual MED_EN::medModeSwitch getInterlacingType() const {return MED_EN::MED_UNDEFINED_INTERLACE;}
     virtual ~GAUSS_LOCALIZATION_() {}; //Indispensable pour détruire le vrai objet pointé
+
+    /*!
+     * \brief Creates a localization filled with default values. The caller gets pointer ownership
+     */
+    static GAUSS_LOCALIZATION_* makeDefaultLocalization(const string &     locName,
+                                                        medGeometryElement typeGeo,
+                                                        int                nGauss) throw (MEDEXCEPTION);
   };
 
   template <class INTERLACING_TAG=FullInterlace> class GAUSS_LOCALIZATION;

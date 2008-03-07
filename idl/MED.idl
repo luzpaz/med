@@ -118,6 +118,7 @@ For example an array of coordinates in 3D; tow storage may be considered:
   typedef long medModeSwitch;
   const medModeSwitch MED_FULL_INTERLACE = 0;
   const medModeSwitch MED_NO_INTERLACE = 1;
+  const medModeSwitch MED_NO_INTERLACE_BY_TYPE = 2;
 
 /*!
 This enumeration contains a set of elements defining the type of connectivity.
@@ -425,8 +426,9 @@ This enumeration contains a set of elements defining the type of connectivity.
     {
     	long                     numberOfNodes;
         medGeometryElement_array meshTypes;
-    	SALOME_MED::long_array      numberOfElements;
-        long                       entityDimension;
+    	SALOME_MED::long_array   numberOfElements;
+    	SALOME_MED::long_array   nodalConnectivityLength;
+        long                     entityDimension;
     };
     connectivityInfos getConnectGlobal(in medEntityMesh entity)
     raises (SALOME::SALOME_Exception);
@@ -651,6 +653,20 @@ Internal Corba method.
       raises (SALOME::SALOME_Exception);
 
     /*!
+      If the method %isOnAllElements() returns False, this method returns an array which
+     contains all numbers of given %medGeometryElement.
+
+      Numbering is from file, ie numbers are bounded by 1 and
+      MESH::getNumberOfElement(entity,MED_ALL_ELEMENTS) and not by 1 and
+      MESH::getNumberOfElement(entity,geomElement).
+
+      \note
+      If %SUPPORT is defined on MED_NODE, use MED_NONE %medGeometryElement type.
+    */
+    SALOME_MED::long_array getNumberFromFile(in medGeometryElement geomElement)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
       Idem SALOME::Sender getNumber(in medGeometryElement geomElement) but returning Sender.\n
       It could be used in a Client code using the MED Client classes.
      */
@@ -691,7 +707,8 @@ Internal Corba method.
     	   medEntityMesh entity;
            long          numberOfGeometricType;
            medGeometryElement_array types;
-           SALOME_MED::long_array nbEltTypes;
+           SALOME_MED::long_array   nbEltTypes;
+           SALOME_MED::long_array   nodalConnectivityLength;
     };
     supportInfos getSupportGlobal()		raises (SALOME::SALOME_Exception);
 
@@ -826,9 +843,16 @@ Internal Corba method.
     {
 
       /*!
-	Returns the field name.
-      */
+       *  Returns the field name.
+       */
       string getName() raises (SALOME::SALOME_Exception);
+
+      /*!
+       *  Changes the field name.
+       *
+       *  \param theName The new name for this field.
+       */
+      void setName (in string theName) raises (SALOME::SALOME_Exception);
 
       /*!
 	Returns the field description.
@@ -868,11 +892,10 @@ Internal Corba method.
 	raises (SALOME::SALOME_Exception);
 
       /*!
-	Returns the unit of i-th component.
-
-	\note
-      i is bounded by 1 and NumberOfComponents.
-      */
+       *  Returns the unit of i-th component.
+       *
+       *  \note i is bounded by 1 and NumberOfComponents.
+       */
       string getComponentUnit(in long i) raises (SALOME::SALOME_Exception);
 
       /*!
@@ -936,7 +959,9 @@ Internal Corba method.
       /*!
 	Adds the Field in the StudyManager.
       */
-      void addInStudy(in SALOMEDS::Study myStudy, in FIELD myIor )
+      void addInStudy(in SALOMEDS::Study myStudy, in FIELD myIor)
+	raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
+      void addInStudyToComponent(in SALOMEDS::SComponent myComponent, in FIELD myIor)
 	raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
 /*!
@@ -967,6 +992,9 @@ Internal Corba method.
   interface FIELDDOUBLENO : FIELDDOUBLE {
   };
 
+  interface FIELDDOUBLENOBYTYPE : FIELDDOUBLE {
+  };
+
   interface FIELDDOUBLEFULL : FIELDDOUBLE {
   };
 
@@ -987,6 +1015,9 @@ Internal Corba method.
   };
 
   interface FIELDINTNO : FIELDINT {
+  };
+
+  interface FIELDINTNOBYTYPE : FIELDINT {
   };
 
   interface FIELDINTFULL : FIELDINT {

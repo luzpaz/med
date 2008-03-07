@@ -54,10 +54,12 @@ namespace MED
     INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'"<<std::endl);
     EVersion aVersion = eVUnknown;    
 
+#ifndef WIN32
     if(theDoPreCheckInSeparateProcess){
       // First check, is it possible to deal with the file
       std::ostringstream aStr;
-      aStr<<"bash -c \""<<getenv("MED_ROOT_DIR")<<"/bin/salome/mprint_version "<<theFileName<<"\"";
+      // File name is in quotes for the case of space(s) inside it (PAL13009)
+      aStr<<"bash -c \""<<getenv("MED_ROOT_DIR")<<"/bin/salome/mprint_version \'"<<theFileName<<"\'\"";
       if(!MYDEBUG)
 	aStr<<" 2>&1 > /dev/null";
       
@@ -68,16 +70,17 @@ namespace MED
       if(aStatus != 0)
 	return aVersion;
     }
+#endif
 
     // Next, try to open the file trough the MED API
     char* aFileName = const_cast<char*>(theFileName.c_str());
     med_idt aFid = MEDouvrir(aFileName,MED_LECTURE);
 
-    MSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aFid = "<<aFid<<endl);
+    MSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aFid = "<<aFid<<std::endl);
     if(aFid >= 0){
       med_int aMajor, aMinor, aRelease;
       med_err aRet = MEDversionLire(aFid,&aMajor,&aMinor,&aRelease);
-      INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aRet = "<<aRet<<endl);
+      INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aRet = "<<aRet<<std::endl);
       if(aRet >= 0){
 	if(aMajor >= 2 && aMinor >= 2)
 	  aVersion = eV2_2;
@@ -104,7 +107,7 @@ namespace MED
       aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
       break;
     default:
-      EXCEPTION(runtime_error,"MED::CrWrapper - theFileName = '"<<theFileName<<"'");
+      EXCEPTION(std::runtime_error,"MED::CrWrapper - theFileName = '"<<theFileName<<"'");
     }
     return aWrapper;
   }

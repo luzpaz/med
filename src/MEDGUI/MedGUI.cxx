@@ -186,10 +186,14 @@ void MedGUI::contextMenuPopup( const QString& client, QPopupMenu* menu, QString&
 
 QString MedGUI::engineIOR() const
 {
+  QString anIOR( "" );
   SALOME_MED::MED_Gen_ptr aMedGen = InitMedGen();
   if ( !CORBA::is_nil( aMedGen) )
-    return QString( getApp()->orb()->object_to_string( aMedGen ));
-  return QString( "" );
+  {
+    CORBA::String_var objStr = getApp()->orb()->object_to_string( aMedGen );
+    anIOR = QString( objStr.in() );
+  }
+  return anIOR;
 }
 
 void MedGUI::windows( QMap<int, int>& mappa ) const
@@ -732,7 +736,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
     int nbelemnts=Families[k]->getNumberOfElements(SALOME_MED::MED_NONE);
     SCRUTE(nbelemnts);
     SALOME_MED::long_array_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MED_NONE);
-    for (int l=0;l<tabnoeuds->length();l++)
+    for (int l=0;l<(int)tabnoeuds->length();l++)
       SCRUTE(tabnoeuds[l]);
   }
 
@@ -782,7 +786,7 @@ bool MedGUI::DumpSubMesh( SALOME_MED::FAMILY_var Fam )
     return false;
 
   SALOME_MED::long_array_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
-  for (int l=0;l<tabnoeuds->length();l++)
+  for (int l=0;l<(int)tabnoeuds->length();l++)
     SCRUTE(tabnoeuds[l]);
 
   return true;

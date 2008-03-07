@@ -30,13 +30,14 @@
 #include "MEDMEM_Med_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_Support_i.hxx"
+#include "Med_Gen_i.hxx"
 
   using namespace MEDMEM;
   using namespace MED_EN;
 %}
 
 /*
-  typemap in and out for Corba Objects (MESH, FIELDDOUBLE, FIELDINT and
+  typemap in, out and typecheck for Corba Objects (MESH, FIELDDOUBLE, FIELDINT and
   Support) between C++ and Python
 
   WARNING (NB) to the user of those typmaps (SWIG wrapping for C++ routines
@@ -46,6 +47,9 @@
   using, because CORBA pointeur _ptr or _var could be wrapped by SWIG using
   their reference rather than the pointeur itself (differences detected using
   SWIG 1.1.x, SWIG 1.3.13 and SWIG 1.3.17)
+
+  typecheck always says OK, as currently all overloaded methods HERE differ
+  only in nb of parameters (there are default ones)
 */
 
 %typemap(python,out) SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
@@ -79,7 +83,25 @@
   SCRUTE(s);
   PyObject * tmp = PyString_FromString(s.c_str());
   SCRUTE(tmp);
-  $result = PyObject_CallMethod(orb, "string_to_object", "O", tmp);
+  PyObject * corbaObj = PyObject_CallMethod(orb, "string_to_object", "O", tmp);
+  $result = corbaObj;
+
+  // cast CORBA object, if necessary
+
+  // make target class name
+//   string className = "$1_type";
+//   className.replace( className.find(':'), 2, ".");
+//   className.erase( className.find("_ptr"));
+
+//   // get target class object
+//   string getClassCmd = ( "cls = " + className );
+//   PyRun_String("import SALOME_MED", Py_single_input, pdict, pdict);
+//   PyRun_String(getClassCmd.c_str(), Py_single_input, pdict, pdict);
+//   PyObject* cls = PyDict_GetItemString(pdict, "cls");
+
+//   // cast
+//   $result = PyObject_CallMethod(corbaObj, "_narrow", "O", cls);
+
   SCRUTE($result);
 }
 
@@ -114,6 +136,18 @@
   SCRUTE(tmp);
   $result = PyObject_CallMethod(orb, "string_to_object", "O", tmp);
   SCRUTE($result);
+}
+
+%typemap(typecheck) SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
+                    SALOME_MED::FIELDINT_ptr, SALOME_MED::SUPPORT_ptr,
+                    const SALOME_MED::MESH_ptr, const SALOME_MED::FIELDDOUBLE_ptr,
+                    const SALOME_MED::FIELDINT_ptr, const SALOME_MED::SUPPORT_ptr,
+                    SALOME_MED::MESH_var, SALOME_MED::FIELDDOUBLE_var,
+                    SALOME_MED::FIELDINT_var, SALOME_MED::SUPPORT_var,
+                    const SALOME_MED::MESH_var, const SALOME_MED::FIELDDOUBLE_var,
+                    const SALOME_MED::FIELDINT_var, const SALOME_MED::SUPPORT_var
+{
+  $1 = 1;
 }
 
 %typemap(python,in) const SALOME_MED::MESH_ptr &, SALOME_MED::MESH_ptr &
@@ -500,6 +534,25 @@
   SCRUTE($1);
 }
 
+
+/*
+  managing C++ exception in the Python API
+*/
+/*%exception
+{
+  class PyAllowThreadsGuard {
+   public:
+    PyAllowThreadsGuard() { _save = PyEval_SaveThread(); }
+    ~PyAllowThreadsGuard() { PyEval_RestoreThread(_save); }
+   private:
+    PyThreadState *_save;
+  };
+
+  PyAllowThreadsGuard guard;
+
+  $action
+}*/
+
 SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr,
 						   FIELDDOUBLE *,
 						   bool ownCppPtr=false);
@@ -546,7 +599,20 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       delete [] name;
 
-     return fieldcorba2;
+      // try to set support to field
+      ::MEDMEM::SUPPORT * sup = 0;
+      if ( SUPPORT_i * sup_i = Med_Gen_i::DownCast< SUPPORT_i * >( mySupportIOR ))
+      {
+        std::map < int,::MEDMEM::SUPPORT *>::iterator index_supp = 
+          SUPPORT_i::supportMap.find( sup_i->getCorbaIndex() );
+        if ( index_supp != SUPPORT_i::supportMap.end() )
+          sup = index_supp->second;
+      }
+      SCRUTE( sup );
+      if ( sup )
+        field->setSupport( sup );
+
+      return fieldcorba2;
     }
 
   SALOME_MED::FIELDINT_ptr createCorbaFieldInt(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDINT * field, bool ownCppPtr=false)
@@ -576,6 +642,19 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
       SCRUTE(name);
 
       delete [] name;
+
+      // try to set support to field
+      ::MEDMEM::SUPPORT * sup = 0;
+      if ( SUPPORT_i * sup_i = Med_Gen_i::DownCast< SUPPORT_i * >( mySupportIOR ))
+      {
+        std::map < int,::MEDMEM::SUPPORT *>::iterator index_supp = 
+          SUPPORT_i::supportMap.find( sup_i->getCorbaIndex() );
+        if ( index_supp != SUPPORT_i::supportMap.end() )
+          sup = index_supp->second;
+      }
+      SCRUTE( sup );
+      if ( sup )
+        field->setSupport( sup );
 
       return fieldcorba2;
     }

@@ -103,7 +103,7 @@ int main (int argc, char ** argv)
 {
   if (argc<2) // after 2, ignored !
     {
-      cerr << "Usage : " << argv[0] << " poly3D.med typically in ../../share/salome/resources" << endl << endl;
+      cerr << "Usage : " << argv[0] << " poly3D.med typically in ../../share/salome/resources/med" << endl << endl;
       exit(-1);
     }
   int nbOfPtsForTest=0;

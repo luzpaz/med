@@ -20,6 +20,8 @@
 #ifndef MESH_HXX
 #define MESH_HXX
 
+#include <MEDMEM.hxx>
+
 #include <string>
 #include <vector>
 #include <list>
@@ -54,8 +56,11 @@ class CELLMODEL;
 class FAMILY;
 class GROUP;
 class SUPPORT;
+class MESH;
 
-class MESH : public RCBASE
+ostream & operator<<(ostream &os, const MESH &my);
+
+class MEDMEM_EXPORT MESH : public RCBASE
 {
   //-----------------------//
   //   Attributes
@@ -138,6 +143,8 @@ public :
 
   friend class VTK_MESH_DRIVER;
 
+  friend class ENSIGHT_MESH_RDONLY_DRIVER;
+
   void init();
   MESH();
   MESH(MESH &m);
@@ -147,7 +154,8 @@ public :
   MESH( driverTypes driverType, const string & fileName="",
 	const string & meshName="") throw (MEDEXCEPTION);
   virtual ~MESH();
-  friend ostream & operator<<(ostream &os, const MESH &my);
+  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, const MESH &my);
+  virtual void printMySelf(ostream &os) const;
 
   int  addDriver(driverTypes driverType,
 		 const string & fileName  ="Default File Name.med",
@@ -158,11 +166,13 @@ public :
 
   virtual void read(int index=0);
   inline void read(const GENDRIVER & genDriver);
-  inline void write(int index=0, const string & driverName = "");
+  //inline void write(int index=0, const string & driverName = "");
+  virtual void write(int index=0, const string & driverName = "");
   inline void write(const GENDRIVER & genDriver);
 
   inline void 	      setName(string name);
   inline void 	      setDescription(string description);
+  inline void 	      setMeshDimension(int dim);
   inline string       getName() const;
   inline string       getDescription() const;
   inline int 	      getSpaceDimension() const;
@@ -191,6 +201,8 @@ public :
 					 MED_EN::medGeometryElement Type) const;
   virtual inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
 					MED_EN::medEntityMesh Entity) const;
+  virtual bool existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
+                                         MED_EN::medEntityMesh Entity) const;
   inline bool existPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
 					MED_EN::medEntityMesh Entity) const;
   inline bool existPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,
@@ -295,11 +307,13 @@ public :
    * (There is no way to know which family has change.)
    */
   void createFamilies();
+	void createGroups();
   SUPPORT *buildSupportOnNodeFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
   void fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT *supportToFill) const throw (MEDEXCEPTION);
   SUPPORT *buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
   int getElementContainingPoint(const double *coord);
-  vector< vector<double> > MESH::getBoundingBox() const;
+//  vector< vector<double> > MESH::getBoundingBox() const;
+  vector< vector<double> > getBoundingBox() const;
   template<class T> static
   FIELD<T> * mergeFields(const vector< FIELD<T> * > & others, bool meshCompare=false);
   /*!
@@ -319,45 +333,6 @@ inline const CONNECTIVITY* MESH::getConnectivityptr() const
   return _connectivity;
 }
 
-// inline void MESH::read(int index/*=0*/)
-// {
-//   const char * LOC = "MESH::read(int index=0) : ";
-//   BEGIN_OF(LOC);
-
-//   if (_drivers[index]) {
-//     _drivers[index]->open();
-//     _drivers[index]->read();
-//     _drivers[index]->close();
-//   }
-//   else
-//     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
-//                                      << "The index given is invalid, index must be between  0 and |"
-//                                      << _drivers.size()
-//                                      )
-//                           );
-//   END_OF(LOC);
-// }
-
-/*! Write all the content of the MESH using driver referenced by the integer handler index.*/
-inline void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
-{
-  const char * LOC = "MESH::write(int index=0, const string & driverName = \"\") : ";
-  BEGIN_OF(LOC);
-
-  if ( _drivers[index] ) {
-    _drivers[index]->open();
-    if (driverName != "") _drivers[index]->setMeshName(driverName);
-    _drivers[index]->write();
-    _drivers[index]->close();
-  }
-  else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
-                                     << "The index given is invalid, index must be between  0 and |"
-                                     << _drivers.size()
-                                     )
-                          );
-  END_OF(LOC);
-}
 
 // This method is MED specific : don't use it
 // must be private.
@@ -407,6 +382,11 @@ inline void MESH::setName(string name)
 inline string MESH::getName() const
 {
   return _name;
+}
+
+inline void MESH::setMeshDimension(int dim)
+{
+  _meshDimension=dim;
 }
 
 /*! Set the MESH description */
@@ -727,7 +707,7 @@ inline const int * MESH::getConnectivityIndex(MED_EN::medConnectivity Connectivi
 inline int MESH::getPolygonsConnectivityLength(MED_EN::medConnectivity ConnectivityType,
                                                MED_EN::medEntityMesh Entity) const
 {
-  return getPolygonsConnectivityIndex (ConnectivityType,Entity)[ getNumberOfPolygons() ] - 1;
+  return getPolygonsConnectivityIndex (ConnectivityType,Entity)[ getNumberOfPolygons(Entity) ] - 1;
 }
 /*!
   Return the required connectivity of polygons for the given entity.
@@ -979,7 +959,7 @@ const MEDMEM::FAMILY* MESH::getFamily(MED_EN::medEntityMesh entity, int i) const
   default :
     throw MEDEXCEPTION("MESH::getFamilies : Unknown entity");
   }
-  if (i>Family.size())
+  if (i>(int)Family.size())
     throw MEDEXCEPTION("MESH::getFamily(entity,i) : argument i must be <= _numberOfFamilies");
   return Family[i-1];
 }
@@ -1010,7 +990,7 @@ const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
   default :
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Unknown entity"));
   }
-  if (i>Group.size())
+  if (i>(int)Group.size())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i="<<i<<" must be <= _numberOfGroups="<<Group.size()));
   return Group[i-1];
 }

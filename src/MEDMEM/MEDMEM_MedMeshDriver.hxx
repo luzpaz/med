@@ -20,6 +20,8 @@
 #ifndef MED_MESH_DRIVER_HXX
 #define MED_MESH_DRIVER_HXX
 
+#include <MEDMEM.hxx>
+
 #include <string>
 #include <vector>
 #include "MEDMEM_define.hxx"
@@ -42,7 +44,7 @@ class MESH;
 class FAMILY;
 class GROUP;
 class CONNECTIVITY;
-class MED_MESH_DRIVER : public GENDRIVER
+class MEDMEM_EXPORT MED_MESH_DRIVER : public GENDRIVER
 {
 protected:
 
@@ -103,7 +105,7 @@ public:
 
 */
 
-  class IMED_MESH_RDONLY_DRIVER : public virtual MED_MESH_DRIVER
+class MEDMEM_EXPORT IMED_MESH_RDONLY_DRIVER : public virtual MED_MESH_DRIVER
 {
  
 public :
@@ -126,6 +128,8 @@ public :
     Return a MEDEXCEPTION : it is the read-only driver.
   */
   void write( void ) const;
+  virtual void activateFacesComputation() = 0;
+  virtual void desactivateFacesComputation() = 0;
 
 protected:
 //   virtual int getCOORDINATE() = 0 ;
@@ -151,7 +155,7 @@ protected:
 
 */
 
-class IMED_MESH_WRONLY_DRIVER : public virtual MED_MESH_DRIVER {
+class MEDMEM_EXPORT IMED_MESH_WRONLY_DRIVER : public virtual MED_MESH_DRIVER {
   
 public :
   
@@ -162,7 +166,7 @@ public :
   /*!
     Constructor.
   */
-  IMED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) ;
+  IMED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces access=MED_EN::MED_WRONLY) ;
   /*!
     Copy constructor.
   */
@@ -197,7 +201,7 @@ public :
 
 */
 
-class IMED_MESH_RDWR_DRIVER : public virtual IMED_MESH_RDONLY_DRIVER, public virtual IMED_MESH_WRONLY_DRIVER {
+class MEDMEM_EXPORT IMED_MESH_RDWR_DRIVER : public virtual IMED_MESH_RDONLY_DRIVER, public virtual IMED_MESH_WRONLY_DRIVER {
 
 public :
 
@@ -223,7 +227,7 @@ public :
 
 };
 
-class MED_MESH_RDONLY_DRIVER : public virtual IMED_MESH_RDONLY_DRIVER
+class MEDMEM_EXPORT MED_MESH_RDONLY_DRIVER : public virtual IMED_MESH_RDONLY_DRIVER
 {
 public:
   MED_MESH_RDONLY_DRIVER();
@@ -233,6 +237,8 @@ public:
   void   setMeshName(const string & meshName);
   string getMeshName() const;
   void write( void ) const;
+  void activateFacesComputation();
+  void desactivateFacesComputation();
   void read ( void );
   void open();
   void close();
@@ -249,10 +255,10 @@ protected:
   GENDRIVER * copy ( void ) const;
 };
 
-class MED_MESH_WRONLY_DRIVER : public virtual IMED_MESH_WRONLY_DRIVER {
+class MEDMEM_EXPORT MED_MESH_WRONLY_DRIVER : public virtual IMED_MESH_WRONLY_DRIVER {
 public :
   MED_MESH_WRONLY_DRIVER();
-  MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh);
+  MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces access=MED_EN::MED_ECRI);
   MED_MESH_WRONLY_DRIVER(const MED_MESH_WRONLY_DRIVER & driver);
   ~MED_MESH_WRONLY_DRIVER();
   void   setMeshName(const string & meshName);
@@ -271,7 +277,7 @@ protected:
   GENDRIVER * copy ( void ) const;
 };
 
-class MED_MESH_RDWR_DRIVER : public IMED_MESH_RDWR_DRIVER {
+class MEDMEM_EXPORT MED_MESH_RDWR_DRIVER : public IMED_MESH_RDWR_DRIVER {
 public :
   MED_MESH_RDWR_DRIVER();
   MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh);
@@ -281,6 +287,8 @@ public :
   string getMeshName() const;
   void read ( void );
   void write( void ) const;
+  void activateFacesComputation();
+  void desactivateFacesComputation();
   void open();
   void close();
 protected:

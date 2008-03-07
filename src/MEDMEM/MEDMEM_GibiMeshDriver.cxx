@@ -53,12 +53,11 @@ using namespace MED_EN;
 using namespace MEDMEM;
 /////
 
-// allows to continue reading if some data not supported by MEDMEM encountered,
-// e.g. non-scalar fields
-//#define STOP_READING_UNSUP_DATA
-
 // read or not non-named fields
 //#define GIBI_READ_ONLY_NAMED_FIELD
+
+// to throw an exception when try to write a name longer than 8 or non-unique encounters
+#define THROW_ON_BAD_NAME
 
 // to see full dump of RESULTATS STRUCTURE INTERMEDIAIRES
 #ifdef _DEBUG_
@@ -71,19 +70,19 @@ using namespace MEDMEM;
 // Every memory allocation made in the MedDriver members function are desallocated in the Mesh destructor
 
 /////
-const size_t GIBI_MESH_DRIVER::nb_geometrie_gibi;
+//const size_t GIBI_MESH_DRIVER::nb_geometrie_gibi;
 
 const medGeometryElement GIBI_MESH_DRIVER::geomGIBItoMED[nb_geometrie_gibi] =
-     {   /*1 */ MED_POINT1 ,/*2 */ MED_SEG2   ,/*3 */ MED_SEG3   ,/*4 */ MED_TRIA3  ,/*5 */ MED_NONE   ,
-       /*6 */ MED_TRIA6  ,/*7 */ MED_NONE   ,/*8 */ MED_QUAD4  ,/*9 */ MED_NONE   ,/*10*/ MED_QUAD8  ,
-       /*11*/ MED_NONE   ,/*12*/ MED_NONE   ,/*13*/ MED_NONE   ,/*14*/ MED_HEXA8  ,/*15*/ MED_HEXA20 ,
-       /*16*/ MED_PENTA6 ,/*17*/ MED_PENTA15,/*18*/ MED_NONE   ,/*19*/ MED_NONE   ,/*20*/ MED_NONE   ,
-       /*21*/ MED_NONE   ,/*22*/ MED_NONE   ,/*23*/ MED_TETRA4 ,/*24*/ MED_TETRA10,/*25*/ MED_PYRA5  ,
-       /*26*/ MED_PYRA13 ,/*27*/ MED_NONE   ,/*28*/ MED_NONE   ,/*29*/ MED_NONE   ,/*30*/ MED_NONE   ,
-       /*31*/ MED_NONE   ,/*32*/ MED_NONE   ,/*33*/ MED_NONE   ,/*34*/ MED_NONE   ,/*35*/ MED_NONE   ,
-       /*36*/ MED_NONE   ,/*37*/ MED_NONE   ,/*38*/ MED_NONE   ,/*39*/ MED_NONE   ,/*40*/ MED_NONE   ,
-       /*41*/ MED_NONE   ,/*42*/ MED_NONE   ,/*43*/ MED_NONE   ,/*44*/ MED_NONE   ,/*45*/ MED_NONE   ,
-       /*46*/ MED_NONE   ,/*47*/ MED_NONE   };
+  {   /*1 */ MED_POINT1 ,/*2 */ MED_SEG2   ,/*3 */ MED_SEG3   ,/*4 */ MED_TRIA3  ,/*5 */ MED_NONE   ,
+      /*6 */ MED_TRIA6  ,/*7 */ MED_NONE   ,/*8 */ MED_QUAD4  ,/*9 */ MED_NONE   ,/*10*/ MED_QUAD8  ,
+      /*11*/ MED_NONE   ,/*12*/ MED_NONE   ,/*13*/ MED_NONE   ,/*14*/ MED_HEXA8  ,/*15*/ MED_HEXA20 ,
+      /*16*/ MED_PENTA6 ,/*17*/ MED_PENTA15,/*18*/ MED_NONE   ,/*19*/ MED_NONE   ,/*20*/ MED_NONE   ,
+      /*21*/ MED_NONE   ,/*22*/ MED_NONE   ,/*23*/ MED_TETRA4 ,/*24*/ MED_TETRA10,/*25*/ MED_PYRA5  ,
+      /*26*/ MED_PYRA13 ,/*27*/ MED_NONE   ,/*28*/ MED_NONE   ,/*29*/ MED_NONE   ,/*30*/ MED_NONE   ,
+      /*31*/ MED_NONE   ,/*32*/ MED_NONE   ,/*33*/ MED_NONE   ,/*34*/ MED_NONE   ,/*35*/ MED_NONE   ,
+      /*36*/ MED_NONE   ,/*37*/ MED_NONE   ,/*38*/ MED_NONE   ,/*39*/ MED_NONE   ,/*40*/ MED_NONE   ,
+      /*41*/ MED_NONE   ,/*42*/ MED_NONE   ,/*43*/ MED_NONE   ,/*44*/ MED_NONE   ,/*45*/ MED_NONE   ,
+      /*46*/ MED_NONE   ,/*47*/ MED_NONE   };
 
 //=======================================================================
 //function : gibi2medGeom
@@ -132,7 +131,7 @@ static int getGroupId(const vector<int>& support_ids, _intermediateMED*  medi)
     set<int> sup_set;
     sup_set.insert( sb, se );
 
-    for ( group_id = 0; group_id < medi->groupes.size(); ++group_id )
+    for ( group_id = 0; group_id < (int)medi->groupes.size(); ++group_id )
     {
       if (sup_set.size() == medi->groupes[ group_id ].groupes.size() &&
           std::equal (sup_set.begin(), sup_set.end(),
@@ -200,6 +199,11 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
     PILE_FIELD,
     PILE_LAST_READABLE
     };
+  // other known piles:
+  // PILE NUMERO  26 - Integers
+  // PILE NUMERO  25 - Floats
+  // PILE NUMERO  27 - Strings
+  // PILE NUMERO  10 - Tables
   char* ligne; // pour lire une ligne
   const char* enregistrement_type=" ENREGISTREMENT DE TYPE";
   vector<int> numero_noeuds; // tableau de travail (indices)
@@ -283,10 +287,12 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       //                        MESH GROUPS
       // -----------------------------------
 
-      if (numero_pile == PILE_SOUS_MAILLAGE )
+      if (numero_pile == PILE_SOUS_MAILLAGE ) // PILE NUMERO   1
       {
         map<int,int> strangeGroupType;
         medi->groupes.reserve(nb_objets*2); // fields may add some groups
+        map< int , int > nbElemsByGeomType;
+
         for (int objet=0; objet!=nb_objets; ++objet) // pour chaque groupe
         {
           initIntReading( 5 );
@@ -319,20 +325,28 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
               std::sort( groupe.groupes.begin(), groupe.groupes.end() );
           }
           // lecture des references (non utilisé pour MED)
-          for ( i = 0; i < nb_reference; i += 10 ) {// FORMAT(10I8)
+          for ( i = 0; i < (int)nb_reference; i += 10 ) {// FORMAT(10I8)
             getNextLine(ligne);
           }
           // lecture des couleurs (non utilisé pour MED)
-          for ( i = 0; i < nb_elements; i += 10 ) {
+          for ( i = 0; i < (int)nb_elements; i += 10 ) {
             getNextLine(ligne);
           }
           // not a composit group
           if (type_geom_castem>0 && nb_sous_maillage==0)
           {
             medGeometryElement medType = gibi2medGeom(type_geom_castem);
-            bool goodType = ( medType!=MED_NONE );
-            if ( !goodType )
+
+            initIntReading( nb_elements * nb_noeud );
+            if ( medType == MED_NONE ) { // look for group end
+              while ( more() )
+                next();
               strangeGroupType.insert( make_pair( objet, type_geom_castem ));
+              continue;
+            }
+            if ( nbElemsByGeomType.find( medType ) == nbElemsByGeomType.end())
+              nbElemsByGeomType[ medType ] = 0;
+            int & order = nbElemsByGeomType[ medType ];
 
             pair<set<_maille>::iterator,bool> p;
             pair<map<int,_noeud>::iterator,bool> p_no;
@@ -340,31 +354,24 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
             no.coord.resize(space_dimension);
             _maille ma( medType, nb_noeud );
             ma.sommets.resize(nb_noeud);
-            if ( goodType )
-              groupe.mailles.resize( nb_elements );
+            groupe.mailles.resize( nb_elements );
 
             // lecture pour chaque maille des sommets et insertions
-            initIntReading( nb_elements * nb_noeud );
-            if ( !goodType ) {
-              while ( more() )
-                next();
-            }
-            else {
-              for ( i = 0; i < nb_elements; ++i )
+            for ( i = 0; i < nb_elements; ++i )
+            {
+              for (unsigned n = 0; n < nb_noeud; ++n, next() )
               {
-                for (unsigned n = 0; n < nb_noeud; ++n, next() )
-                {
-                  if ( !more() ) {
-                    INFOS( " Error while reading elem nodes ");
-                    return false;
-                  }
-                  no.number = getInt();
-                  p_no=medi->points.insert(make_pair(no.number, no));
-                  ma.sommets[n]=p_no.first;
+                if ( !more() ) {
+                  INFOS( " Error while reading elem nodes ");
+                  return false;
                 }
-                p=medi->maillage.insert(ma);
-                groupe.mailles[i] = p.first; // on stocke dans le groupe un iterateur sur la maille
+                no.number = getInt();
+                p_no=medi->points.insert(make_pair(no.number, no));
+                ma.sommets[n]=p_no.first;
               }
+              ma.ordre = ++order;
+              p=medi->maillage.insert(ma);
+              groupe.mailles[i] = p.first; // on stocke dans le groupe un iterateur sur la maille
             }
           }
         } // loop on groups
@@ -382,6 +389,9 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           grp.nom=objets_nommes[i];
           map<int,int>::iterator it = strangeGroupType.find( grpID - 1 );
           if ( it != strangeGroupType.end() ) {
+#ifdef _DEBUG
+            cout << "Skip " << grp.nom << " of not supported CASTEM type: " << it->second << endl;
+#endif
             //INFOS( "Skip " << grp.nom << " of not supported CASTEM type: " << it->second );
           }
         }
@@ -392,7 +402,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       //                            NODES
       // ---------------------------------
 
-      else if ( numero_pile == PILE_NOEUDS )
+      else if ( numero_pile == PILE_NOEUDS ) // PILE NUMERO  32
       {
         getNextLine( ligne );
         std::vector<int> place_noeuds;
@@ -421,7 +431,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       //                            COORDINATES
       // ---------------------------------------
 
-      else if ( numero_pile == PILE_COORDONNEES )
+      else if ( numero_pile == PILE_COORDONNEES )// PILE NUMERO  33
       {
         getNextLine( ligne );
         unsigned nb_reels = atoi( ligne );
@@ -456,7 +466,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       //                            NODE FIELDS
       // ---------------------------------------
 
-      else if ( numero_pile == PILE_NODES_FIELD && readFields )
+      else if ( numero_pile == PILE_NODES_FIELD && readFields ) // PILE NUMERO   2
       {
         vector< _fieldBase* > fields( nb_objets );
         for (int objet=0; objet!=nb_objets; ++objet) // pour chaque field
@@ -536,7 +546,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
             }
           }
           // (4) nb harmonics ( ignored )
-          for ( initIntReading( nb_sub ); more(); next() )
+          for ( initIntReading( total_nb_comp ); more(); next() )
             ;
           // (5) TYPE ( ignored )
           getNextLine( ligne );
@@ -570,7 +580,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         // set field names
         for ( i = 0; i < nb_objets_nommes; ++i ) {
           int fieldIndex = indices_objets_nommes[ i ];
-          if ( fields[ fieldIndex - 1 ] )
+          if ( fields[ fieldIndex - 1 ] ) 
             fields[ fieldIndex - 1 ]->_name = objets_nommes[ i ];
         }
 
@@ -580,7 +590,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       //                                           FIELDS
       // -------------------------------------------------
 
-      else if ( numero_pile == PILE_FIELD && readFields )
+      else if ( numero_pile == PILE_FIELD && readFields ) // PILE NUMERO  39
       {
         // REAL EXAMPLE
         
@@ -620,8 +630,13 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           }
           next(); next(); next(); // skip (1) <nb_sub> 2 6 
           int title_length = getInt(); // <title length>
-          if ( title_length )
+          string description;
+          if ( title_length ) {
             getNextLine( ligne ); // (2) title
+            const int len = 72; // line length
+            // title is right justified
+            description = string(ligne + len - title_length, title_length);
+          }
           // look for a line starting with '-' : <reference to support>
           do {
             initIntReading( nb_sub * 9 );
@@ -693,9 +708,10 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
               medi->fields.push_back( fields[ objet ] = fbase ); // medi->fields is a std::list
             }
             // store support id and nb components of a sub
-            if ( fbase )
+            if ( fbase ) {
               fbase->_sub[ i_sub ].setData( nb_comp[ i_sub ], support_ids[ i_sub ]);
-
+              fbase->_description = description;
+            }
             // loop on components: read values
             for ( int i_comp = 0; i_comp < nb_comp[ i_sub ]; ++i_comp )
             {
@@ -703,22 +719,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
               initIntReading( 2 );
               int nb_val_by_elem = getInt(); next();
               int nb_values      = getInt();
-              if ( nb_val_by_elem != 1 ) {
-#ifdef STOP_READING_UNSUP_DATA
-                INFOS("Error of reading field " << objet + 1 << ": nb of values by element "
-                      << " != 1 : " << nb_val_by_elem << DUMP_LINE_NB );
-                return false;
-#else
-                if ( fbase ) {
-                  if ( isReal ) delete fdouble;
-                  else          delete fint;
-                  fields[ objet ] = fbase = 0;
-                  medi->fields.pop_back();
-                  INFOS("Skip field " << objet + 1 << ": nb of values by element != 1 : "
-                        << nb_val_by_elem << DUMP_LINE_NB);
-                }
-#endif
-              }
+              fbase->_sub[ i_sub ]._nb_gauss[ i_comp ] = nb_val_by_elem;
               // (10) values
               nb_values *= nb_val_by_elem;
               if ( fbase ) {
@@ -755,7 +756,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         // set field names
         for ( i = 0; i < nb_objets_nommes; ++i ) {
           int fieldIndex = indices_objets_nommes[ i ] - 1;
-          if ( fields[ fieldIndex ])
+          if ( fields[ fieldIndex ]) 
             fields[ fieldIndex ]->_name = objets_nommes[ i ];
         }
 
@@ -939,7 +940,11 @@ bool GIBI_MESH_RDONLY_DRIVER::getLine(char* & aLine)
   if (nBytesRest < GIBI_MaxOutputLen)
   {
     if (nBytesRest > 0) {
-      memcpy (_start, _ptr, nBytesRest);
+      //memcpy (_start, _ptr, nBytesRest);
+      char* tmpBuf = new char [nBytesRest];
+      memcpy (tmpBuf, _ptr, nBytesRest);
+      memcpy (_start, tmpBuf, nBytesRest);
+      delete [] tmpBuf;
     } else
       nBytesRest = 0;
     _ptr = _start;
@@ -1130,6 +1135,10 @@ static void getReverseVector (const medGeometryElement type,
     swapVec[5] = make_pair( 13, 14 );
     swapVec[6] = make_pair( 17, 19 );
     break;
+//   case MED_SEG3: no need to reverse edges
+//     swapVec.resize(1);
+//     swapVec[0] = make_pair( 1, 2 );
+//     break;
   case MED_TRIA6:
     swapVec.resize(2);
     swapVec[0] = make_pair( 1, 2 );
@@ -1155,9 +1164,8 @@ static void reverse(const _maille & aMaille, const vector<pair<int,int> > & swap
 {
   _maille* ma = (_maille*) & aMaille;
   for ( int i = 0; i < swapVec.size(); ++i ) {
-    _maille::iter tmp = ma->sommets[ swapVec[i].first ];
-    ma->sommets[ swapVec[i].first ] = ma->sommets[ swapVec[i].second ];
-    ma->sommets[ swapVec[i].second ] = tmp;
+    std::swap( ma->sommets[ swapVec[i].first ],
+               ma->sommets[ swapVec[i].second ]);
   }
   if ( swapVec.empty() )
     ma->reverse = true;
@@ -1179,12 +1187,14 @@ static const int * getGibi2MedConnectivity( const medGeometryElement type )
   static int tetra10[] = {0,2,4, 9, 1,3,5, 6,7,8};
   static int quad8  [] = {0,2,4,6, 1,3,5,7};
   static int tria6  [] = {0,2,4, 1,3,5};
+  static int seg3   [] = {0,2,1};
   if ( conn.empty() ) {
     conn.resize( MED_HEXA20 + 1, 0 );
     conn[ MED_HEXA20 ] = hexa20;
     conn[ MED_PENTA15] = penta15;
     conn[ MED_PYRA13 ] = pyra13; 
     conn[ MED_TETRA10] = tetra10;
+    conn[ MED_SEG3   ] = seg3;
     conn[ MED_TRIA6  ] = tria6;  
     conn[ MED_QUAD8  ] = quad8;
   }
@@ -1221,6 +1231,7 @@ static void orientElements( _intermediateMED& medi )
 
   int type = -100;
   vector< pair<int,int> > swapVec;
+  bool isQuadratic = ( getGibi2MedConnectivity( medi.maillage.rbegin()->geometricType ));
 
   if ( elemIt->sommets[0]->second.coord.size() == 2 ) { // space dimension
 
@@ -1232,7 +1243,8 @@ static void orientElements( _intermediateMED& medi )
       if ( elemIt->dimension() == 2 )
       {
         // fix connectivity of quadratic faces
-        fixConnectivity( *elemIt );
+        if ( isQuadratic )
+          fixConnectivity( *elemIt );
 
         // look for index of the most left node
         int iLeft = 0, iNode, nbNodes = elemIt->sommets.size();
@@ -1276,13 +1288,20 @@ static void orientElements( _intermediateMED& medi )
           }
         }
       }
+      else
+      {
+        // fix connectivity of quadratic edges
+        if ( isQuadratic )
+          fixConnectivity( *elemIt );
+      }
   }
   else {
 
     // --------------------------------------
     // orient equally all connected 3D faces
     // --------------------------------------
-    // quadratic faces will be reversed in the following fixConnectivity();
+    // connectivity of quadratic faces will be fixed by fixConnectivity()
+    // in the next loop on elements
 
     // fill map of links and their faces
     set<const _maille*> faces;
@@ -1299,7 +1318,7 @@ static void orientElements( _intermediateMED& medi )
         continue;
       for(; maIt!=grp.mailles.end(); ++maIt) {
         if ( faces.insert( &(**maIt )).second ) {
-          for ( int j = 0; j < (*maIt)->sommets.size(); ++j )
+          for ( int j = 0; j < (int)(*maIt)->sommets.size(); ++j )
             linkFacesMap[ (*maIt)->link( j ) ].push_back( &(**maIt) );
           fgm.insert( make_pair( &(**maIt), &grp ));
         }
@@ -1332,7 +1351,7 @@ static void orientElements( _intermediateMED& medi )
         faceQueue.pop();
 
         // loop on links of <face>
-        for ( int i = 0; i < face->sommets.size(); ++i ) {
+        for ( int i = 0; i < (int)face->sommets.size(); ++i ) {
           _link link = face->link( i );
           // find the neighbor faces
           lfIt = linkFacesMap.find( link );
@@ -1349,7 +1368,7 @@ static void orientElements( _intermediateMED& medi )
               {
                 const _maille* badFace = *fIt;
                 // reverse and remove badFace from linkFacesMap
-                for ( int j = 0; j < badFace->sommets.size(); ++j ) {
+                for ( int j = 0; j < (int)badFace->sommets.size(); ++j ) {
                   _link badlink = badFace->link( j );
                   if ( badlink == link ) continue;
                   lfIt2 = linkFacesMap.find( badlink );
@@ -1409,7 +1428,8 @@ static void orientElements( _intermediateMED& medi )
     for ( ; elemIt != medi.maillage.end(); elemIt++ ) {
 
       // GIBI connectivity -> MED one
-      fixConnectivity( *elemIt );
+      if ( isQuadratic )
+        fixConnectivity( *elemIt );
 
       // reverse quadratic faces
       if ( elemIt->reverse ) {
@@ -1652,18 +1672,21 @@ void GIBI_MESH_WRONLY_DRIVER::open()
   default:
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Bad file mode access ! " << aMode));
   }
-  if (_gibi &&
+  //change for windows compilation
+  if ( !_gibi ||
 #ifdef WNT
-      _gibi.is_open()
+      !_gibi.is_open()
 #else
-      _gibi.rdbuf()->is_open()
+      !_gibi.rdbuf()->is_open()
 #endif
       )
-    _status = MED_OPENED;
-  else
   {
     _status = MED_CLOSED;
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName));
+  }
+  else
+  {
+    _status = MED_OPENED;
   }
   END_OF(LOC);
 }
@@ -1816,7 +1839,7 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
         nbElems = (*sIt)->getNumberOfElements( geomType );
         ptrElemIDs = (*sIt)->getNumber( geomType );
       }
-      if ( geomType == 0 )
+      if ( geomType == 0 || ( entity == MED_NODE ))
         geomType = MED_POINT1;
 
       data.addTypeData( geomType, nbElems, ptrElemIDs, elemID1 );
@@ -1974,8 +1997,6 @@ void GIBI_MESH_WRONLY_DRIVER::writeElements (medGeometryElement geomType,
 //purpose  : make name uppercase and shorter than 9, add it to nameNbMap,
 //           raise if not unique
 //=======================================================================
-
-#define THROW_ON_BAD_NAME
 
 void GIBI_MESH_WRONLY_DRIVER::addName(map<string,int>& nameMap,
                                       string&          theName,
@@ -2442,6 +2463,17 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
 
     list< FIELD_* >::iterator it = fields.begin();
     for ( ; it != fields.end(); it++ ) {
+      int nbComponents = (*it)->getNumberOfComponents();
+      if(nbComponents>0) { 
+	UNIT* compoUnits = new UNIT[nbComponents];
+	string* MEDcompoUnits = new string[nbComponents];
+	for(int l = 0; l<nbComponents; l++) {
+	  compoUnits[l] = UNIT("", "");
+	  MEDcompoUnits[l] = "";
+	}
+	(*it)->setComponentsUnits(compoUnits);
+	(*it)->setMEDComponentsUnits(MEDcompoUnits);
+      }
       _med->addField( *it );
     }
   }
@@ -2492,36 +2524,70 @@ GENDRIVER * GIBI_MED_WRONLY_DRIVER::copy ( void ) const
 //=======================================================================
 
 template< class T, class INTERLACING_TAG>
-static void writeDataSection (fstream& file,
-			      FIELD<T, INTERLACING_TAG> *  field,
-			      int      id1,
-			      int      id2) throw (MEDEXCEPTION)
+static void writeDataSection (fstream&                    file,
+			      FIELD<T, INTERLACING_TAG> * field,
+			      const int                   id1,
+			      const int                   id2) throw (MEDEXCEPTION)
 {
   const char * LOC="writeDataSection (.....) :";
   BEGIN_OF(LOC);
 
-  int ld = field->getNumberOfComponents();
+  int nbGauss, nbComp = field->getNumberOfComponents();
 
-//   FIELD<T>* f = dynamic_cast<FIELD<T>*>( field );
-//   if (!f) return;
-//   MEDARRAY<T>* array = f->getvalue();
-//   int ld = array->getLeadingValue();
-  //SCRUTE( array->getLengthValue() );
+  typedef typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,NoGauss>::Array ArrayNoGauss;
+  typedef typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,Gauss>::Array   ArrayGauss;
 
-  for ( int iComp = 0; iComp < ld; ++iComp )
+  MEDMEM_Array_ * array        = field->getArray();
+  ArrayNoGauss  * arrayNoGauss = 0;
+  ArrayGauss    * arrayGauss   = 0;
+
+  if ( !array )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |"<< field->getName()
+                                 << "| not allocated"));
+
+  if ( array->getGaussPresence() ) {
+    arrayGauss = field->getArrayGauss();
+    nbGauss    = arrayGauss->getNbGauss( id1 );
+  }
+  else {
+    arrayNoGauss = field->getArrayNoGauss();
+    nbGauss      = 1;
+  }
+
+  TFieldCounter fcount( file, 3 ); // 3 values on a line
+
+#ifdef CASTEM_FULL_INTERLACE
+  const int gauss_step = field->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ? nbComp : 1;
+#endif
+
+  for ( int iComp = 1; iComp <= nbComp; ++iComp )
   {
-    file << setw(8) << 1          // nb scalar values by element
-      << setw(8) << ( id2 - id1 ) // total nb of scalar values
-        << setw(8) << 0
-          << setw(8) << 0 << endl;
+    file << setw(8) << nbGauss       // nb scalar values by element
+         << setw(8) << ( id2 - id1 ) // total nb of scalar values
+         << setw(8) << 0
+         << setw(8) << 0
+         << endl;
     // * 8003   FORMAT(1P,3E22.14)
-    int id = id1;
-    while ( id < id2 )
-    {
-      for ( int i = 0; id < id2 && i < 3; ++i )
-        file << setw(22) << field->getValueIJ( id++, iComp + 1);
-      file << endl;
+    if ( arrayNoGauss ) {
+      for (int id = id1; id < id2; id++, fcount++ )
+        file << setw(22) << arrayNoGauss->getIJ( id, iComp );
     }
+    else {
+#ifdef CASTEM_FULL_INTERLACE
+      for (int id = id1; id < id2; id++ ) {
+        const T* val = & arrayGauss->getIJK( id, iComp, 1 );
+        const T* valEnd = val + nbGauss * gauss_step;
+        for ( ; val < valEnd; val += gauss_step, fcount++ )
+          file << setw(22) << *val;
+      }
+#else
+      for ( int iGauss = 1; iGauss <= nbGauss; ++iGauss ) {
+        for (int id = id1; id < id2; id++, fcount++  )
+          file << setw(22) << arrayGauss->getIJK( id, iComp, iGauss );
+      }
+#endif
+    }
+    fcount.stop();
   }
   END_OF(LOC);
 }
@@ -2559,7 +2625,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
     for ( ; fIt != dtit.end(); fIt++ )
     {
       FIELD_ * f = _med->getField( names[ iField ], fIt->dt, fIt->it );
-      if ( f->getValueType() != MED_EN::MED_INT32 )
+      if ( f->getValueType() != MED_EN::MED_REEL64 )
       {
         MESSAGE("GIBI_MED_WRONLY_DRIVER::write( FIELD< int > ) not implemented");
         continue;
@@ -2609,10 +2675,13 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
       if ( cur_nb_sub == nb_sub && itNbSub != nb_sub_list.end() ) {
         // start the next field writting
         nb_sub = *(itNbSub++);
-        gibi << setw(8) << nb_sub << "      -1       6      72" << endl;
-        gibi << left;
-        gibi << setw(72) << " Field" << endl;
-        gibi << right;
+        string description = (*itF)->getDescription();
+        gibi << setw(8) << nb_sub
+             << setw(8) << -1
+             << setw(8) << 6
+             << setw(8) << description.size() << endl;
+        if ( !description.empty() )
+          gibi << setw(72) << description << endl;
         gibi << setw(72) << " " << endl;
 
         // Sub Components section
@@ -2630,7 +2699,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
           {
             ++cur_nb_sub;
             vals[0] = -idsize->first; // support id
-            for ( int i = 0; i < vals.size(); ++i, fcount++ )
+            for ( int i = 0; i < (int)vals.size(); ++i, fcount++ )
               gibi << setw(8) << vals[ i ];
           }
         }
@@ -2660,8 +2729,12 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
         fcount.stop();
         // component names
         gibi << left;
-        for ( fcount.init(8), iComp = 0; iComp < nbComp; ++iComp, fcount++ )
-          gibi << " "  << setw(8) << f->getComponentName( iComp + 1 );
+        for ( fcount.init(8), iComp = 0; iComp < nbComp; ++iComp, fcount++ ) {
+          string compName = f->getComponentName( iComp + 1 );
+          if ( compName.size() > 8 )
+            compName = compName.substr(0, 8);
+          gibi << " "  << setw(8) << compName;
+        }
         fcount.stop();
         // component types
         for ( fcount.init(4), iComp = 0; iComp < nbComp; ++iComp, fcount++ )
@@ -2672,13 +2745,16 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
         // Data section
         int id2 = id1 + idsize->second;
 
-	if  (f->getGaussPresence() )
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " GibiDriver don't support Field with Gauss point" ));
+        // PAL11040
+	//if  (f->getGaussPresence() )
+        //throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "GibiDriver don't support Field with Gauss point"));
 	
 	if ( f->getInterlacingType() == MED_NO_INTERLACE )
-	  writeDataSection( gibi, dynamic_cast<FIELD<double,NoInterlace>*>(f), id1, id2 );
+	  writeDataSection( gibi, static_cast<FIELD<double,NoInterlace  > * >(f), id1, id2 );
+	else if ( f->getInterlacingType() == MED_FULL_INTERLACE )
+	  writeDataSection( gibi, static_cast<FIELD<double,FullInterlace> * >(f), id1, id2 );
 	else
-	  writeDataSection( gibi, dynamic_cast< FIELD<double,FullInterlace> * >(f), id1, id2 );
+	  writeDataSection( gibi, static_cast<FIELD<double,NoInterlaceByType> * >(f), id1, id2 );
 
         id1 = id2;
       }

@@ -3,7 +3,7 @@ import SALOME
 import os
 
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/"
+filePath=filePath+"/share/salome/resources/med/"
 
 import string
 
@@ -126,13 +126,37 @@ medFiles.append("H_Traces_I129_COUPLEX1.med")
 medFiles.append("H_Traces_Se79_COUPLEX1.med")
 medFiles.append("maillage_5_5_5.med")
 medFiles.append("maillage_chemvalIV_cas1_40elts.med")
+medFiles.append("Old_ChampsDarcy.med")
+medFiles.append("Old_darcy_1.1_res.med")
+medFiles.append("Old_darcy_1.3_resCASTEM.med")
+medFiles.append("Old_darcy_1.3_resPORFLOW.med")
+medFiles.append("Old_darcy_1.3_resTRACES.med")
+medFiles.append("Old_darcy2_Castem_EFMH.med")
+medFiles.append("Old_darcy2_Castem_qua_EFMH.med")
+medFiles.append("Old_darcy2_Castem_qua_VF.med")
+medFiles.append("Old_Deff_fdt_5.8_castem_efmh_diff_conc_dom.med")
+medFiles.append("Old_Deff_fdt_5.8_castem_vf_diff_conc_dom.med")
+medFiles.append("Old_H_CastCast_EFMH_I129_COUPLEX1.med")
+medFiles.append("Old_H_CastCast_VF_I129_COUPLEX1.med")
+medFiles.append("Old_H_CastCast_VF_Se79_COUPLEX1.med")
+medFiles.append("Old_H_CastPorf_I129_COUPLEX1.med")
+medFiles.append("Old_H_CastPorf_Se79_COUPLEX1.med")
+medFiles.append("Old_H_PorfCast_EFMH_I129_COUPLEX1.med")
+medFiles.append("Old_H_PorfCast_EFMH_Se79_COUPLEX1.med")
+medFiles.append("Old_H_PorfPorf_I129_COUPLEX1.med")
+medFiles.append("Old_H_PorfPorf_Se79_COUPLEX1.med")
+medFiles.append("Old_H_Traces_I129_COUPLEX1.med")
+medFiles.append("Old_H_Traces_Se79_COUPLEX1.med")
+medFiles.append("Old_maillage_chemvalIV_cas1_40elts.med")
 
 nbOfFiles = len(medFiles)
 
-med=salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
+med = salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
 
 for i in range(nbOfFiles):
-  medFile = filePath + medFiles[i]
+  medFile = medFiles[i]
+  print "Testing with the file ",medFile
+  medFile = filePath + medFile
   med.readStructFile(medFile,salome.myStudyName)
 
 print "END of the Pyhton script ..... Ctrl D to exit"

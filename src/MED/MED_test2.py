@@ -31,7 +31,7 @@ import SALOME
 import os
 
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/"
+filePath=filePath+"/share/salome/resources/med/"
 medFile=filePath+"mesh.med"
 
 med=salome.lcc.FindOrLoadComponent("FactoryServer", "MED")

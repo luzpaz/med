@@ -219,7 +219,7 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 	// pour chaque face, dite primaire, on prend le premier noeud, et on parcourt les mailles qui contiennent ce noeud tant qu'on n'a pas trouvé de voisin
 	// (borné, par un coefficient qui dépend de l'anisotropie du maillage, le nombre maximum de maille qui contient un sommet)
 			
-			for (ind_num_maille_sec=0;(flag_existence==0)&&(ind_num_maille_sec<mailles_contenant_noeud[num_noeud].size());ind_num_maille_sec++)
+			for (ind_num_maille_sec=0;(flag_existence==0)&&(ind_num_maille_sec<(int)mailles_contenant_noeud[num_noeud].size());ind_num_maille_sec++)
 				{
 				num_maille_sec=mailles_contenant_noeud[num_noeud][ind_num_maille_sec];
 				
@@ -267,7 +267,7 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 		
 	// on examine les faces de cette maille dans la numérotation globale faces_contenues
 		
-		for (ind_num_cont=0;ind_num_cont<faces_contenues[num_maille].size();ind_num_cont++)
+		for (ind_num_cont=0;ind_num_cont<(int)faces_contenues[num_maille].size();ind_num_cont++)
 			{
 			
 	// On regarde si tous les numéros globaux des faces sont définis
@@ -306,7 +306,7 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 	for (i=0;i<nbr_mailles;i++) 
 		{
 		nf=0;
-		for (j=0;j<faces_contenues[i].size();j++) 
+		for (j=0;j<(int)faces_contenues[i].size();j++) 
 			{
 			if (faces_contenues[i][j]==UNDEFINED) verif++;
 			if (voisins_de_maille[i][j]==UNDEFINED) nf++;

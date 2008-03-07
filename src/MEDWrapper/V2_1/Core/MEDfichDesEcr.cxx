@@ -26,7 +26,6 @@ namespace med_2_1{
 med_err 
 MEDfichDesEcr(med_idt fid, char *des, med_mode_acces mode)
 { 
-  med_idt attr; 
   med_idt root;
   med_err ret;
   char nom[] = MED_NOM_DESCRIPTEUR;

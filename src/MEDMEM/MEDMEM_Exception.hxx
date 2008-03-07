@@ -25,6 +25,8 @@
 #ifndef MEDEXCEPTION_HXX
 #define MEDEXCEPTION_HXX
 
+#include <MEDMEM.hxx>
+
 #include <exception>
 #include <iostream>
 
@@ -41,8 +43,10 @@ using namespace std;
   Inherits from public exception.
 */
 namespace MEDMEM {
+  class MEDEXCEPTION;
+  ostream & operator<< (ostream &os, const MEDEXCEPTION &ex );
 //--------------------------------------//
-  class MEDEXCEPTION : public std::exception
+  class MEDMEM_EXPORT MEDEXCEPTION : public std::exception
 //--------------------------------------//
 {
 private :

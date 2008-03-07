@@ -27,6 +27,8 @@
 #ifndef _MED_MESH_I_HXX_
 #define _MED_MESH_I_HXX_
 
+#include <MEDMEM_I.hxx>
+
 #include <map>
 #include <string>
 
@@ -39,9 +41,9 @@
 
 namespace MEDMEM {
 class MESH;
-class MESH_i: public POA_SALOME_MED::MESH,
-	      public SALOMEMultiComm,
-	      public SALOME::GenericObj_i
+class MEDMEM_I_EXPORT MESH_i: virtual public POA_SALOME_MED::MESH,
+	      virtual public SALOMEMultiComm,
+	      virtual public SALOME::GenericObj_i
 {
 public :
     static std::map < int,::MEDMEM::MESH *> meshMap;

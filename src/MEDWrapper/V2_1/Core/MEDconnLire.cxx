@@ -37,12 +37,12 @@ MEDconnLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_sw
   char nom_ent[MED_TAILLE_NOM_ENTITE+1];
   char nom_geo[MED_TAILLE_NOM_ENTITE+1];
   char nom_dataset[MED_TAILLE_NOM_ENTITE+1];
-  med_ssize * pfltab;
+  med_ssize * pfltab = NULL;
   med_size    psize;
   int dim,nnoe,ndes;
   int nsup = 0;
   int taille;  
-  int i,j;
+  int i;
   
   /*
    * On inhibe le gestionnaire d'erreur HDF 5
@@ -104,7 +104,7 @@ MEDconnLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_sw
        taille = nsup + ndes;
        if ( psizetmp != MED_NOPF ) {  
 	 psize = psizetmp;
-	 pfltab = (med_ssize *) malloc (sizeof(med_ssize)*psize);
+	 pfltab = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
 	 for (i=0;i<psizetmp;i++)
 	   pfltab[i] = (med_ssize) (pfltabtmp[i]);
        };
@@ -116,7 +116,7 @@ MEDconnLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_sw
      }
 
 
-#if defined(IRIX64)||defined(OSF1)
+#if defined(HAVE_F77INT64)
    if ((ret = _MEDdatasetNumLire(geoid,nom_dataset,MED_INT64,
 				 mode_switch,(med_size)taille,MED_ALL,
 				 psize,pfltab,MED_NOPG,

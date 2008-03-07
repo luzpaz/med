@@ -5,16 +5,18 @@ import os
 from libMEDClient import *
 
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/"
+filePath=filePath+"/share/salome/resources/med/"
 
 medFiles = []
 medFiles.append("extendedtransport53_triangles.med")
 medFiles.append("maillage_5_5_5.med")
 medFiles.append("maillage_chemvalIV_cas1_40elts.med")
+medFiles.append("Old_maillage_chemvalIV_cas1_40elts.med")
 
 meshNames = []
 meshNames.append("TestA3_2094_0.1_rsurf_tri")
 meshNames.append("maillage_5_5_5")
+meshNames.append("maillage_chemvalIV_cas1_40elts")
 meshNames.append("maillage_chemvalIV_cas1_40elts")
 
 nbOfFiles = len(medFiles)

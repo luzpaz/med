@@ -30,6 +30,8 @@ namespace {
     static const MED_EN::medModeSwitch _interlacingType = MED_EN::MED_FULL_INTERLACE; };
   template < > struct SET_INTERLACING_TYPE<NoInterlace> {
     static const MED_EN::medModeSwitch _interlacingType = MED_EN::MED_NO_INTERLACE; };
+  template < > struct SET_INTERLACING_TYPE<NoInterlaceByType> {
+    static const MED_EN::medModeSwitch _interlacingType = MED_EN::MED_NO_INTERLACE_BY_TYPE; };
 
 }
 #endif

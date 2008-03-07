@@ -81,7 +81,7 @@ MEDfamLire(med_idt fid,char *maa, med_int *fam, med_int n,
      root = entid;
    else
      root = geoid;
-#if defined(IRIX64)||defined(OSF1)
+#if defined(HAVE_F77INT64)
    if ((ret = _MEDdatasetNumLire(root,MED_NOM_FAM,MED_INT64,
 				 MED_NO_INTERLACE,1,MED_ALL,
 				 MED_NOPF,0,MED_NOPG,

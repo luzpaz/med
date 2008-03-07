@@ -17,7 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 # 
 import os
-BASE = os.environ["MED_ROOT_DIR"] + '/share/salome/resources/'
+BASE = os.environ["MED_ROOT_DIR"] + '/share/salome/resources/med/'
 
 fileName = BASE + 'pointe.med'
 fileName = BASE + 'carre_en_quad4_seg2.med'

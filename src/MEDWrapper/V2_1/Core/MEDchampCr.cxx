@@ -31,7 +31,6 @@ MEDchampCr(med_idt fid, char *champ, med_type_champ type, char *comp,
   med_err ret = 0;
   med_idt root,gid;
   char chemin[MED_TAILLE_CHA+1];
-  med_size dimd[1];
   med_int _type = (med_int) type;
   
   /*

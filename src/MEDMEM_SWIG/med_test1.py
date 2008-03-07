@@ -32,7 +32,7 @@ import os
 #befor running this script, please be sure about the path the file fileName
 #
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/"
+filePath=filePath+"/share/salome/resources/med/"
 
 medFile = filePath + "carre_en_quad4_seg2.med"
 #medFile = filePath + "cube_hexa8_quad4.med"
@@ -442,7 +442,10 @@ if (nbMeshes>0):
             nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
             normalBound = mesh.getNormal(suppBound)
-            numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
+            if suppBound.isOnAllElements():
+                numberSuppBound = range(1,nbElmBound+1)
+            else:
+                numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
             for j in range(nbElmBound):
                 valInd = numberSuppBound[j]
                 normalBoundJ = normalBound.getRow(valInd)
@@ -456,7 +459,10 @@ if (nbMeshes>0):
             nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
             normalBound = mesh.getNormal(suppBound)
-            numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
+            if suppBound.isOnAllElements():
+                numberSuppBound = range(1,nbElmBound+1)
+            else:
+                numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
             for j in range(nbElmBound):
                 valInd = numberSuppBound[j]
                 normalBoundJ = normalBound.getRow(valInd)

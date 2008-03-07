@@ -122,7 +122,7 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
   if (! _fromMesh ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"fromMesh is a NULL pointer  !")) ;
   
   int spaceDimension = _fromMesh->getSpaceDimension();
-  if (spaceDimension != DIMENSION ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The spaceDimension of mesh |" << _fromMesh->getName() << "| is |" << spaceDimension << "| and should be |" << DIMENSION << "|" << endl)) ;
+  if (spaceDimension != DIMENSION ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The spaceDimension of mesh |" << _fromMesh->getName() << "| is |" << spaceDimension << "| and should be |" << DIMENSION << "|")) ;
 
   _fromWrapper = new Meta_Wrapper<DIMENSION>(_fromMesh->getNumberOfNodes(),
                                              const_cast<double *> (_fromMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE)),
@@ -150,8 +150,8 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
   int fromSpaceDimension = _fromMesh->getSpaceDimension();
   int toSpaceDimension   =   _toMesh->getSpaceDimension();
   
-  if (fromSpaceDimension != DIMENSION ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The spaceDimension of mesh |" << _fromMesh->getName() << "| is |" << INTERPOLATION<DIMENSION>::spaceDimension << "| and should be |" << DIMENSION << "|" << endl)) ;
-  if (  toSpaceDimension != DIMENSION ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The spaceDimension of mesh |" <<   _toMesh->getName() << "| is |" << INTERPOLATION<DIMENSION>::spaceDimension << "| and should be |" << DIMENSION << "|" << endl)) ;
+  if (fromSpaceDimension != DIMENSION ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The spaceDimension of mesh |" << _fromMesh->getName() << "| is |" << fromSpaceDimension << "| and should be |" << DIMENSION << "|")) ;
+  if (  toSpaceDimension != DIMENSION ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The spaceDimension of mesh |" <<   _toMesh->getName() << "| is |" << toSpaceDimension << "| and should be |" << DIMENSION << "|")) ;
  
   _fromWrapper = new Meta_Wrapper<DIMENSION>(_fromMesh->getNumberOfNodes(),
                                              const_cast<double *> (_fromMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE)),

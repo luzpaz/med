@@ -162,7 +162,8 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   }
   // on face ?
   if (!Find) {
-    if ((_mesh->existConnectivity(MED_NODAL,MED_FACE))|(_mesh->existConnectivity(MED_DESCENDING,MED_FACE))) {
+    if ((_mesh->existConnectivityWithPoly(MED_NODAL,MED_FACE)) |
+        (_mesh->existConnectivityWithPoly(MED_DESCENDING,MED_FACE))) {
       Find = build(MED_FACE,MEDArrayFaceFamily) ;
     }
   }
@@ -214,10 +215,12 @@ FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
   _identifier = m._identifier;
   _numberOfAttribute = m._numberOfAttribute;
 
- _attributeIdentifier.set(_numberOfAttribute,m._attributeIdentifier);
-  _attributeValue.set(_numberOfAttribute,m._attributeValue);
-  _attributeDescription.set(_numberOfAttribute);
+  if (_numberOfAttribute) {
+    _attributeIdentifier.set(_numberOfAttribute,m._attributeIdentifier);
+    _attributeValue.set(_numberOfAttribute,m._attributeValue);
+  }
 
+  _attributeDescription.set(_numberOfAttribute);
   for (int i=0;i<m._numberOfAttribute;i++)
     _attributeDescription[i] = m._attributeDescription[i];
 

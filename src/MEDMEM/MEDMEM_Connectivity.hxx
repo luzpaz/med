@@ -20,6 +20,8 @@
 #ifndef CONNECTIVITY_HXX
 #define CONNECTIVITY_HXX
 
+#include <MEDMEM.hxx>
+
 #include <vector>
 
 #include "MEDMEM_Utilities.hxx"
@@ -39,7 +41,7 @@ class GROUP;
 */
 
 /* ------------------------------------------- */
-class CONNECTIVITY
+class MEDMEM_EXPORT CONNECTIVITY
 /* ------------------------------------------- */
 {
   /* ---------------------- */
@@ -196,30 +198,37 @@ public:
 				 const int* PolyhedronFacesIndex= (int*) NULL,
 				 int NumberOfFaces=0);
 
-  inline bool   existConnectivity     (MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh Entity) const;
-  
-  virtual bool existPolygonsConnectivity(MED_EN::medConnectivity connectivityType,
-                                         MED_EN::medEntityMesh Entity) const;
+  inline bool    existConnectivity (MED_EN::medConnectivity connectivityType,
+                                    MED_EN::medEntityMesh Entity) const;
+  bool   existConnectivityWithPoly (MED_EN::medConnectivity connectivityType,
+                                    MED_EN::medEntityMesh Entity) const;
 
-  virtual bool existPolyhedronConnectivity(MED_EN::medConnectivity connectivityType,
-                                           MED_EN::medEntityMesh Entity) const;
+  virtual bool existPolygonsConnectivity (MED_EN::medConnectivity connectivityType,
+                                          MED_EN::medEntityMesh Entity) const;
 
-  virtual void          calculateConnectivity (MED_EN::medConnectivity connectivityType, MED_EN::medEntityMesh Entity);
+  virtual bool existPolyhedronConnectivity (MED_EN::medConnectivity connectivityType,
+                                            MED_EN::medEntityMesh Entity) const;
+
+  virtual void      calculateConnectivity (MED_EN::medConnectivity connectivityType,
+                                           MED_EN::medEntityMesh Entity);
 
   virtual void          updateFamily (const vector<FAMILY*>& myFamilies);
 
-  inline MED_EN::medEntityMesh              getEntity               ()                     const;
-  inline int                    getNumberOfTypes        (MED_EN::medEntityMesh Entity) const;
-  int                    getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
-  const int * getConnectivityOfAnElementWithPoly(MED_EN::medConnectivity ConnectivityType,
-						 MED_EN::medEntityMesh Entity,
-						 int Number, int &lgth);
+  inline MED_EN::medEntityMesh         getEntity () const;
+
+  inline int                    getNumberOfTypes (MED_EN::medEntityMesh Entity) const;
+  int                   getNumberOfTypesWithPoly (MED_EN::medEntityMesh Entity) const;
+  const int * getConnectivityOfAnElementWithPoly (MED_EN::medConnectivity ConnectivityType,
+                                                  MED_EN::medEntityMesh Entity,
+                                                  int Number, int &lgth);
+
   int getNumberOfPolyType()  const;
   int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const;
   int getNumberOfElementOfPolyType(MED_EN::medEntityMesh Entity)  const;
-  inline const MED_EN::medGeometryElement * getGeometricTypes       (MED_EN::medEntityMesh Entity) const
+
+  inline const MED_EN::medGeometryElement * getGeometricTypes (MED_EN::medEntityMesh Entity) const
                                     			     throw (MEDEXCEPTION);
-  MED_EN::medGeometryElement * getGeometricTypesWithPoly       (MED_EN::medEntityMesh Entity) const
+  MED_EN::medGeometryElement * getGeometricTypesWithPoly      (MED_EN::medEntityMesh Entity) const
                                     			     throw (MEDEXCEPTION);
   MED_EN::medGeometryElement                getElementType          (MED_EN::medEntityMesh Entity,
 							     int Number)           const;
@@ -307,7 +316,7 @@ inline int CONNECTIVITY::getNumberOfTypes(MED_EN::medEntityMesh Entity) const
 	{
 	  (const_cast <CONNECTIVITY *> (this))->calculateDescendingConnectivity();
 	}
-      catch (MEDEXCEPTION & ex)
+      catch (MEDEXCEPTION &)
 	{
 	  return 0 ;
 	}
@@ -320,7 +329,7 @@ inline int CONNECTIVITY::getNumberOfTypes(MED_EN::medEntityMesh Entity) const
 	{
 	  _constituent->calculateConnectivity(MED_EN::MED_NODAL,Entity);
 	}
-      catch (MEDEXCEPTION & ex)
+      catch (MEDEXCEPTION &)
 	{
 	  return 0 ;
 	}
@@ -382,7 +391,7 @@ inline bool CONNECTIVITY::existConnectivity( MED_EN::medConnectivity Connectivit
 //-----------------------------------------------------------------------------//
 {
   if (_entity==Entity) {
-    if ((ConnectivityType==MED_EN::MED_NODAL)&(_nodal!=(MEDSKYLINEARRAY*)NULL))
+    if ((ConnectivityType == MED_EN::MED_NODAL) && (_nodal != (MEDSKYLINEARRAY*)NULL))
       return true;
     if ((ConnectivityType==MED_EN::MED_DESCENDING)&(_descending!=(MEDSKYLINEARRAY*)NULL))
       return true;

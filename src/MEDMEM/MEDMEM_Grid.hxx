@@ -29,12 +29,14 @@
 #ifndef MEDMEM_Grid_HeaderFile
 #define MEDMEM_Grid_HeaderFile
 
+#include <MEDMEM.hxx>
+
 #include "MEDMEM_Mesh.hxx"
 
 // class containing structured mesh data
 
 namespace MEDMEM {
-class GRID: public MESH
+class MEDMEM_EXPORT GRID: public MESH
 {
  protected:
   //-----------------------//
@@ -60,6 +62,9 @@ class GRID: public MESH
   // 3. flags to know that _coordinates and _connectivity of MESH are filled
   bool              _is_coordinates_filled;
   bool              _is_connectivity_filled;
+
+  // 4. is _gridType a true value or just a default one
+  bool              _is_default_gridType;
 
   //-----------------------//
   //   Protected Methods
@@ -245,6 +250,9 @@ class GRID: public MESH
   inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
 				MED_EN::medEntityMesh Entity) const;
 
+  inline bool existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
+                                        MED_EN::medEntityMesh Entity) const;
+
   inline MED_EN::medGeometryElement getElementType(MED_EN::medEntityMesh Entity,
 					   int Number) const;
 
@@ -418,11 +426,26 @@ inline int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
     
     // Cas où le nombre d'éléments n'est pas nul
     if (entity==MED_EN::MED_FACE && (Type==MED_EN::MED_QUAD4 || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>2)
+      if ( _meshDimension == 2 )
 	numberOfElements=(_iArrayLength-1)*(_jArrayLength-1);
-    
+      else
+	numberOfElements=
+          (_iArrayLength-1)*(_jArrayLength-1)*_kArrayLength +
+          (_jArrayLength-1)*(_kArrayLength-1)*_iArrayLength +
+          (_iArrayLength-1)*(_kArrayLength-1)*_jArrayLength;
+
     else if (entity==MED_EN::MED_EDGE && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>1)
+      if ( _meshDimension == 1 )
 	numberOfElements=_iArrayLength-1;
-    
+      else if ( _meshDimension == 2 )
+	numberOfElements=
+          (_iArrayLength-1)*_jArrayLength + (_jArrayLength-1)*_iArrayLength;
+      else
+	numberOfElements=
+          (_iArrayLength-1)*_jArrayLength*_kArrayLength +
+          (_jArrayLength-1)*_kArrayLength*_iArrayLength +
+          (_kArrayLength-1)*_iArrayLength*_jArrayLength;
+
     else if (entity==MED_EN::MED_NODE && (Type==MED_EN::MED_NONE || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>0)
 	numberOfElements=_numberOfNodes;
     
@@ -458,6 +481,15 @@ inline bool GRID::existConnectivity(MED_EN::medConnectivity connectivityType, ME
   if (_connectivity==(CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("GRID::existConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
   return _connectivity->existConnectivity(connectivityType,entity);
+}
+
+/*!
+  Same as the previous
+ */
+inline bool GRID::existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
+                                            MED_EN::medEntityMesh Entity) const
+{
+  return existConnectivity(ConnectivityType,Entity);
 }
 
 /*!

@@ -35,7 +35,7 @@ import os
 #befor running this script, please be sure about the path the file fileName
 #
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/"
+filePath=filePath+"/share/salome/resources/med/"
 fileName="pointe.med"
 fileTout=filePath+fileName
 

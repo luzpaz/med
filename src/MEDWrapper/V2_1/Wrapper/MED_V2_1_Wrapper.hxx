@@ -29,60 +29,68 @@
 #ifndef MED_V2_1_Wrapper_HeaderFile
 #define MED_V2_1_Wrapper_HeaderFile
 
+#ifdef WNT
+ #if defined MEDWRAPPER_V2_1_EXPORTS
+  #if defined WIN32
+   #define MED_V21_WRAPPER_EXPORT __declspec( dllexport )
+  #else
+   #define MED_V21_WRAPPER_EXPORT
+  #endif
+ #else
+  #if defined WIN32
+   #define MED_V21_WRAPPER_EXPORT __declspec( dllimport )
+  #else
+   #define MED_V21_WRAPPER_EXPORT
+  #endif
+ #endif
+#else
+ #define MED_V21_WRAPPER_EXPORT
+#endif
+
 #include "MED_TWrapper.hxx"
 
 namespace MED
 {
   template<>
-  TInt
+  TInt MED_V21_WRAPPER_EXPORT
   GetDESCLength<eV2_1>();
   
   template<>
-  TInt
+  TInt MED_V21_WRAPPER_EXPORT
   GetIDENTLength<eV2_1>();
   
   template<>
-  TInt
+  TInt MED_V21_WRAPPER_EXPORT
   GetNOMLength<eV2_1>();
   
   template<>
-  TInt
+  TInt MED_V21_WRAPPER_EXPORT
   GetLNOMLength<eV2_1>();
   
   template<>
-  TInt
+  TInt MED_V21_WRAPPER_EXPORT
   GetPNOMLength<eV2_1>();
 
   template<>
-  TInt
+  void MED_V21_WRAPPER_EXPORT
+  GetVersionRelease<eV2_1>(TInt& majeur, TInt& mineur, TInt& release);
+
+  template<>
+  TInt MED_V21_WRAPPER_EXPORT
   GetNbConn<eV2_1>(EGeometrieElement typmai,
 		   EEntiteMaillage typent,
 		   TInt mdim);
   
   namespace V2_1
   {
-    typedef MED::TTMeshInfo<eV2_1> TVMeshInfo;
-
-    typedef MED::TTFamilyInfo<eV2_1> TVFamilyInfo;
-
-    typedef MED::TTNodeInfo<eV2_1> TVNodeInfo;
-
-    typedef MED::TTCellInfo<eV2_1> TVCellInfo;
-
-    typedef MED::TTFieldInfo<eV2_1> TVFieldInfo;
-
-    typedef MED::TTTimeStampInfo<eV2_1> TVTimeStampInfo;
-
-    typedef MED::TTTimeStampVal<eV2_1> TVTimeStampVal;
-
-    //---------------------------------------------------------------
+    //----------------------------------------------------------------------------
     class TFile;
     typedef boost::shared_ptr<TFile> PFile;
     
     typedef enum {eLECT, eECRI, eREMP} EModeAcces; 
 
-    //---------------------------------------------------------------
-    class TVWrapper: public MED::TTWrapper<eV2_1>
+    //----------------------------------------------------------------------------
+    class MED_V21_WRAPPER_EXPORT TVWrapper: public MED::TTWrapper<eV2_1>
     {
       TVWrapper();
       TVWrapper(const TVWrapper&);
@@ -92,7 +100,7 @@ namespace MED
       TVWrapper(const std::string& theFileName);
 
 
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      //----------------------------------------------------------------------------
       virtual
       TInt
       GetNbMeshes(TErr* theErr = NULL);
@@ -113,7 +121,7 @@ namespace MED
 		  TErr* theErr = NULL);
       
       
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      //----------------------------------------------------------------------------
       virtual
       TInt
       GetNbFamilies(const MED::TMeshInfo& theMeshInfo,
@@ -146,7 +154,7 @@ namespace MED
 		    TErr* theErr = NULL);
       
       
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      //----------------------------------------------------------------------------
       virtual
       TInt
       GetNbNodes(const MED::TMeshInfo& theMeshInfo,
@@ -168,7 +176,7 @@ namespace MED
 		  TErr* theErr = NULL);
       
       
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      //----------------------------------------------------------------------------
       virtual
       TEntityInfo
       GetEntityInfo(const MED::TMeshInfo& theMeshInfo,
@@ -199,7 +207,7 @@ namespace MED
 		  TErr* theErr = NULL);
 
       
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      //----------------------------------------------------------------------------
       virtual 
       TInt
       GetNbFields(TErr* theErr = NULL);
@@ -226,7 +234,7 @@ namespace MED
 		   TErr* theErr = NULL);
 
       
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      //----------------------------------------------------------------------------
       virtual 
       TInt
       GetNbProfiles(TErr* theErr = NULL);
@@ -242,8 +250,17 @@ namespace MED
 		     TProfileInfo& theInfo,
 		     TErr* theErr = NULL);
 
+      virtual
+      void
+      SetProfileInfo(const TProfileInfo& theInfo,
+                     TErr*               theErr = NULL);
+
+      void
+      SetProfileInfo(const TProfileInfo& theInfo,
+                     EModeAcces          theMode,
+                     TErr*               theErr = NULL);
       
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      //----------------------------------------------------------------------------
       virtual 
       TInt
       GetNbTimeStamps(const MED::TFieldInfo& theInfo, 
@@ -260,20 +277,20 @@ namespace MED
 
       virtual 
       void
-      GetTimeStampVal(TTimeStampVal& theVal,
-		      const TMKey2Profile& theMKey2Profile,
-		      const TKey2Gauss& theKey2Gauss,
-		      TErr* theErr = NULL);
+      GetTimeStampValue(const PTimeStampValueBase& theTimeStampValue,
+			const TMKey2Profile& theMKey2Profile,
+			const TKey2Gauss& theKey2Gauss,
+			TErr* theErr = NULL);
       
       virtual 
       void
-      SetTimeStamp(const MED::TTimeStampVal& theTimeStampVal,
-		   TErr* theErr = NULL);
+      SetTimeStampValue(const PTimeStampValueBase& theTimeStampValue,
+			TErr* theErr = NULL);
       
       void
-      SetTimeStamp(const MED::TTimeStampVal& theTimeStampVal,
-		   EModeAcces theMode,
-		   TErr* theErr = NULL);
+      SetTimeStampValue(const PTimeStampValueBase& theTimeStampValue,
+			EModeAcces theMode,
+			TErr* theErr = NULL);
 
     protected:
       PFile myFile;

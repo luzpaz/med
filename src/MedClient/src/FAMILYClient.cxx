@@ -62,24 +62,34 @@ void FAMILYClient::blankCopy(bool blankSupport)
   nAttr = IOR_Family->getNumberOfAttributes();
   setNumberOfAttributes(nAttr);
 
-  convertCorbaArray(i, n, IOR_Family->getAttributesIdentifiers());
+  SALOME_MED::long_array* attrId= IOR_Family->getAttributesIdentifiers();
+  convertCorbaArray(i, n, attrId);
+  delete attrId;
   ASSERT(n == nAttr);
   setAttributesIdentifiers(i);
 
-  convertCorbaArray(i, n, IOR_Family->getAttributesValues());
+  attrId=IOR_Family->getAttributesValues();
+  i=0;
+  convertCorbaArray(i, n, attrId);
+  delete attrId;
   ASSERT(n == _numberOfAttribute);
   setAttributesValues(i);
 
-  convertCorbaArray(s, n, IOR_Family->getAttributesDescriptions());
+  SALOME_MED::string_array * attrDesc=IOR_Family->getAttributesDescriptions();
+  convertCorbaArray(s, n, attrDesc);
+  delete attrDesc;
   ASSERT(n == _numberOfAttribute);
   setAttributesDescriptions(s);
 
   nGr = IOR_Family->getNumberOfGroups();
   setNumberOfGroups(nGr);
 
-  convertCorbaArray(s, n, IOR_Family->getGroupsNames());
+  attrDesc=IOR_Family->getGroupsNames();
+  s=0;
+  convertCorbaArray(s, n, attrDesc);
+  delete attrDesc;
   ASSERT(n == _numberOfGroup);
-  setGroupsNames(s);
+  setGroupsNames(s,true);
 
   _complete = false;
 

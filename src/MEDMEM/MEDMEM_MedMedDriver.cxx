@@ -64,18 +64,18 @@ MED_MED_DRIVER::~MED_MED_DRIVER()
 
 // ------------- Read Only Part --------------
 
-IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER():MED_MED_DRIVER()
+IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER():MED_MED_DRIVER(),_fileStructIsRead(false)
 {
 }
 
 IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed):
-  MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_RDONLY)
+  MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_RDONLY),_fileStructIsRead(false)
 {
   MESSAGE("MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed) Constructeur read only");
 }
 
 IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER(const IMED_MED_RDONLY_DRIVER & driver):
-  MED_MED_DRIVER(driver)
+  MED_MED_DRIVER(driver),_fileStructIsRead(false)
 {
 }
 
@@ -150,7 +150,7 @@ MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER()
   _concreteMedDrv = new MED_MED_RDONLY_DRIVER21();
 }
 
-MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed)
+MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_RDONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_LECT)
 {
   _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,MED_LECT);
 }
@@ -204,7 +204,7 @@ MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER()
   _concreteMedDrv = new MED_MED_WRONLY_DRIVER21();
 }
 
-MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed)
+MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_WRONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_ECRI)
 {
   _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,MED_ECRI);
 }
@@ -258,7 +258,7 @@ MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER()
   _concreteMedDrv = new MED_MED_RDWR_DRIVER21();
 }
 
-MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER(const string & fileName,  MED * const ptrMed)
+MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_RDWR_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_REMP)
 {
   _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,MED_REMP);
 }

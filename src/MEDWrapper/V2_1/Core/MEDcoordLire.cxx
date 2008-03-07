@@ -34,10 +34,9 @@ MEDcoordLire(med_idt fid, char *maa, med_int mdim, med_float *coo,
   med_idt   maaid, noeid, dataset;
   med_err   ret;
   char      chemin[MED_TAILLE_MAA+MED_TAILLE_NOM+1];
-  int       i,j;
-  med_float *new_coo;
+  int       i;
   med_int   type_rep_int;
-  med_ssize * pfltab;
+  med_ssize * pfltab = NULL;
 
   /*
    * On inhibe le gestionnaire d'erreur
@@ -63,7 +62,7 @@ MEDcoordLire(med_idt fid, char *maa, med_int mdim, med_float *coo,
    * Convertion de med_int en med_ssize
    */
   if ( psize != MED_NOPF ) {  
-    pfltab = (med_ssize *) malloc (sizeof(med_ssize)*psize);
+    pfltab = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
     for (i=0;i<psize;i++)
       pfltab[i] = (med_ssize) pfltabtmp[i];
   }

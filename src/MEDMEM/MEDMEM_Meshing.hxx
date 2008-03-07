@@ -25,6 +25,8 @@
 #ifndef MESHING_HXX
 #define MESHING_HXX
 
+#include "MEDMEM.hxx"
+
 #include "MEDMEM_Mesh.hxx"
 
 /*!
@@ -32,7 +34,7 @@
 */
 
 namespace MEDMEM {
-class MESHING: public MESH
+class MEDMEM_EXPORT MESHING: public MESH
 {
 public :
   MESHING();

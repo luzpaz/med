@@ -19,11 +19,13 @@
 #ifndef MED_H
 #define MED_H
 
+
 extern "C"{
 #include <hdf5.h>
 }
 
 namespace med_2_1{
+  
 
 #define MED_NULL       (void *) NULL
 #define MED_MAX_PARA        20
@@ -32,7 +34,7 @@ namespace med_2_1{
 #define MED_TAILLE_IDENT  8
 #define MED_TAILLE_NOM   32
 #define MED_TAILLE_LNOM  80    
-#define MED_TAILLE_PNOM   8 
+#define MED_TAILLE_PNOM   8
 
 /* Integration des developpements OCC */
 typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
@@ -87,11 +89,8 @@ typedef enum {MED_HDF_VERSION, MED_VERSION, MED_FICH_DES} med_fich_info;
 #define MED_DIM1   1                   /* PAS */
 #define MED_ALL    0
 
-#if defined(SUN4SOL2) || defined(PCLINUX) || defined(OSF1_32) || defined(IRIX64_32) || defined(RS6000)
-/* interface C/FORTRAN */
-/* this true only with g77 and gcc : we must change it to use directly NOMF_... and INT32 or INT64 -
- it will be more simple to understand and to use ! */
-#define NOMF_POST_UNDERSCORE 
+
+
 
 /* correspondance des types avec HDF 5 */
 typedef hsize_t        med_size;
@@ -100,61 +99,12 @@ typedef hid_t          med_idt;
 typedef herr_t         med_err;
 
 /* types elementaires */
-typedef int            med_int;
+
 typedef double         med_float;
-#endif
-
-#if defined(HP9000)
-/* correspondance des types avec HDF 5 */
-typedef hsize_t        med_size;
-typedef hssize_t       med_ssize;
-typedef hid_t          med_idt;
-typedef herr_t         med_err;
-
-/* types elementaires */
-typedef int            med_int;
-typedef double         med_float;
-#endif
-
-#if defined(IRIX64) || defined(OSF1)
-#define NOMF_POST_UNDERSCORE
-
-/* correspondance des types avec HDF 5 */
-typedef hsize_t        med_size;
-typedef hssize_t       med_ssize;
-typedef hid_t          med_idt;
-typedef herr_t         med_err;
-
-/* types elementaires */
-typedef long           med_int;
-typedef double         med_float;
-#endif
-
-
-#if defined(PPRO_NT) 
-/* correspondance des types avec HDF 5 */
-typedef hsize_t        med_size;
-typedef hssize_t       med_ssize;
-typedef hid_t          med_idt;
-typedef herr_t         med_err;
-
-/* types elementaires */
-typedef int	       med_int;
-typedef double         med_float;
-#endif
-
-
-#if defined(NOMF_PRE_UNDERSCORE) && defined(NOMF_POST_UNDERSCORE)
-#   define NOMF(x)     _##x##_
-#endif
-#if defined(NOMF_PRE_UNDERSCORE) && !defined(NOMF_POST_UNDERSCORE)
-#   define NOMF(x)     _##x
-#endif
-#if !defined(NOMF_PRE_UNDERSCORE) && defined(NOMF_POST_UNDERSCORE)
-#   define NOMF(x)     x##_
-#endif
-#if !defined(NOMF_PRE_UNDERSCORE) && !defined(NOMF_POST_UNDERSCORE)
-#   define NOMF(x)     x
+#if defined(HAVE_F77INT64)
+    typedef long med_int;
+#else
+    typedef int med_int;
 #endif
 
 }

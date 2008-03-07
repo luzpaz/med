@@ -1,0 +1,652 @@
+# Author : Marc Tajchman (CEA)
+# Date : 28/06/2001
+# Modified by : Patrick GOLDBRONN (CEA)
+# Modified by : Marc Tajchman (CEA)
+# Modified by : Mikhail PONIKAROV (OCN)
+#
+
+AC_INIT([Salome2 Project MED module], [4.1.1], [webmaster.salome@opencascade.com], [salome])
+AC_CONFIG_AUX_DIR(salome_adm/unix/config_files)
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+AM_INIT_AUTOMAKE
+
+XVERSION=`echo $VERSION | awk -F. '{printf("0x%02x%02x%02x",$1,$2,$3)}'`
+AC_SUBST(XVERSION)
+
+# set up MODULE_NAME variable for dynamic construction of directories (resources, etc.)
+MODULE_NAME=med
+AC_SUBST(MODULE_NAME)
+
+dnl
+dnl Initialize source and build root directories
+dnl
+ROOT_BUILDDIR=`pwd`
+ROOT_SRCDIR=`echo $0 | sed -e "s,[[^/]]*$,,;s,/$,,;s,^$,.,"`
+cd $ROOT_SRCDIR
+ROOT_SRCDIR=`pwd`
+cd $ROOT_BUILDDIR
+
+AC_SUBST(ROOT_SRCDIR)
+AC_SUBST(ROOT_BUILDDIR)
+
+echo
+echo Source root directory : $ROOT_SRCDIR
+echo Build  root directory : $ROOT_BUILDDIR
+echo
+echo
+
+dnl remember MED_WITH_KERNEL set by build configure
+MED_WITH_KERNEL=yes
+MED_WITH_GUI=yes
+old_with_kernel=${MED_WITH_KERNEL}
+
+dnl
+dnl Check --with-kernel option
+echo
+dnl  ---------------------------------------------
+                 WITH_KERNEL
+dnl  ---------------------------------------------
+dnl
+
+dnl   Update and re-run configure if there was  build_configure --without-kernel
+dnl   but configure --with-kernel=DIR is being called
+
+if test "x${old_with_kernel}" != "x${MED_WITH_KERNEL}"; then
+    if test "x${old_with_kernel}" = "xno" ; then
+         if test ! -d "${KERNEL_ROOT_DIR}"; then
+             echo "failed : KERNEL_ROOT_DIR variable is not correct !"
+             exit
+         fi
+         kernel_check_in_aclocal=`grep KERNEL_ROOT_DIR ${ROOT_SRCDIR}/aclocal.m4`
+         if test "x${kernel_check_in_aclocal}" = "x"; then
+             echo "Configuration changed: without KERNEL -> with KERNEL"
+             echo -n "Updating 'configure' script ...  "
+             cd $ROOT_SRCDIR
+	     if build_configure --with-kernel={MED_WITH_KERNEL} --with-gui={MED_WITH_GUI}; then
+	       echo "... done"
+	     else
+	       echo "... failed"
+	       cd $ROOT_BUILDDIR
+	       exit 1
+	     fi
+             cd $ROOT_BUILDDIR
+             $0 $*
+             exit
+         fi
+    fi
+fi
+
+AM_CONDITIONAL(MED_ENABLE_KERNEL, [test "$MED_WITH_KERNEL" = yes])
+AM_CONDITIONAL(MED_ENABLE_GUI, [test "$MED_WITH_GUI" = yes])
+
+dnl Modification B. Secher portage sur osf CCRT
+AC_CHECK_PROG(SHELL,sh,,)
+AC_SUBST(SHELL)
+
+if test -z "$AR"; then
+   AC_CHECK_PROGS(AR,ar xar,:,$PATH)
+fi
+AC_SUBST(AR)
+
+dnl Export the AR macro so that it will be placed in the libtool file
+dnl correctly.
+export AR
+
+echo
+echo ---------------------------------------------
+echo testing make
+echo ---------------------------------------------
+echo
+
+AC_PROG_MAKE_SET
+AC_PROG_INSTALL
+dnl 
+dnl libtool macro check for CC, LD, NM, LN_S, RANLIB, STRIP + pour les librairies dynamiques !
+
+AC_ENABLE_DEBUG(yes)
+AC_DISABLE_PRODUCTION
+
+echo ---------------------------------------------
+echo testing libtool
+echo ---------------------------------------------
+
+dnl first, we set static to no!
+dnl if we want it, use --enable-static
+AC_ENABLE_STATIC(no)
+
+AC_LIBTOOL_DLOPEN
+AC_PROG_LIBTOOL
+
+dnl Fix up the INSTALL macro if it s a relative path. We want the
+dnl full-path to the binary instead.
+case "$INSTALL" in
+   *install-sh*)
+      INSTALL='\${ROOT_BUILDDIR}'/salome_adm/unix/config_files/install-sh
+      ;;
+esac
+
+echo
+echo ---------------------------------------------
+echo testing C/C++
+echo ---------------------------------------------
+echo
+
+cc_ok=no
+dnl inutil car libtool
+dnl AC_PROG_CC
+AC_PROG_CXX
+AC_CXX_WARNINGS
+AC_CXX_TEMPLATE_OPTIONS
+AC_DEPEND_FLAG
+# AC_CC_WARNINGS([ansi])
+cc_ok=yes
+
+dnl Library libdl :
+AC_CHECK_LIB(dl,dlopen)
+
+dnl Library librt : for alpha/osf
+AC_CHECK_LIB(rt,nanosleep)
+
+dnl add library libm :
+AC_CHECK_LIB(m,ceil)
+
+dnl 
+dnl Check if we use std iostream by default or if we must add
+dnl a compiler directive for that
+dnl
+
+AC_CXX_USE_STD_IOSTREAM
+
+dnl 
+dnl Well we use sstream which is not in gcc pre-2.95.3
+dnl We must test if it exists. If not, add it in include !
+dnl
+
+AC_CXX_HAVE_SSTREAM
+AM_CONDITIONAL(MED_ENABLE_SSTREAM, [test "$HAVE_SSTREAM" = yes])
+
+dnl
+dnl ---------------------------------------------
+dnl testing linker
+dnl ---------------------------------------------
+dnl
+
+AC_LINKER_OPTIONS
+
+echo
+echo ---------------------------------------------
+echo testing threads
+echo ---------------------------------------------
+echo
+
+ENABLE_PTHREADS
+
+echo
+echo ---------------------------------------------
+echo testing python
+echo ---------------------------------------------
+echo
+
+CHECK_PYTHON
+
+echo
+echo ---------------------------------------------
+echo testing swig
+echo ---------------------------------------------
+echo
+
+AM_PATH_PYTHON(2.3)
+CHECK_SWIG
+AM_CONDITIONAL(MED_SWIG_1_3_21, [test "$SWIG_VERSION" = 1.3.21])
+
+echo
+echo ---------------------------------------------
+echo testing HDF5
+echo ---------------------------------------------
+echo
+
+CHECK_HDF5
+
+
+echo
+echo ---------------------------------------------
+echo BOOST Library
+echo ---------------------------------------------
+echo
+
+CHECK_BOOST
+
+
+echo
+echo ---------------------------------------------
+echo testing MED2
+echo ---------------------------------------------
+echo
+
+CHECK_MED2
+
+echo
+echo ---------------------------------------------
+echo "MED_WITH_KERNEL: ${MED_WITH_KERNEL}"
+echo "MED_WITH_GUI   : ${MED_WITH_GUI}"
+echo ---------------------------------------------
+
+openpbs_ok=no
+# CHECK_OPENPBS ONLY if MED_WITH_KERNEL=yes
+# echo
+# echo ---------------------------------------------
+# echo testing OpenPBS
+# echo ---------------------------------------------
+# echo
+
+# CHECK_OPENPBS
+# dnl openpbs_ok is set to yes by CHECK_OPENPBS
+
+# CHECK_LSF ONLY if MED_WITH_KERNEL=yes
+# echo
+# echo ---------------------------------------------
+# echo testing LSF
+# echo ---------------------------------------------
+# echo
+
+lsf_ok=no
+# CHECK_LSF
+# dnl lsf_ok is set to yes by CHECK_LSF
+
+echo
+echo ----------------------------------------------
+echo testing CPPUNIT only required for unit testing
+echo ----------------------------------------------
+echo
+CHECK_CPPUNIT
+#AM_CONDITIONAL(CPPUNIT_IS_OK, test)
+
+echo
+echo ---------------------------------------------
+echo checking SPLITTER
+echo ---------------------------------------------
+echo
+AC_ENABLE_SPLITTER(yes)
+AM_CONDITIONAL(MED_ENABLE_SPLITTER, [test "$ENABLE_SPLITTER" = yes])
+
+if test "x$ENABLE_SPLITTER" = "xyes"; then
+
+    echo  
+    echo --------------------------------------------- 
+    echo testing METIS 
+    echo ---------------------------------------------
+    echo 
+    metis_ok=no 
+    CHECK_METIS dnl metis_ok is set to yes by CHECK_METIS
+    
+
+    echo  
+    echo --------------------------------------------- 
+    echo testing SCOTCH 
+    echo ---------------------------------------------
+    echo scotch_ok=no 
+    CHECK_SCOTCH 
+    dnl scotch_ok is set to yes by CHECK_SCOTCH	 
+
+
+    echo        
+    echo --------------------------------------------- 
+    echo testing LIBXML2
+    echo ---------------------------------------------
+    echo libxml_ok=no 
+    CHECK_LIBXML 
+    dnl libxml_ok is set to yes by CHECK_LIBXML         
+
+fi
+
+AM_CONDITIONAL(MED_ENABLE_METIS, [test "$ENABLE_METIS" = yes])
+AM_CONDITIONAL(MED_ENABLE_SCOTCH, [test "$ENABLE_SCOTCH" = yes])
+
+
+if test "${MED_WITH_KERNEL}" = "yes"; then
+{
+
+
+        echo
+        echo ---------------------------------------------
+        echo testing OpenPBS
+        echo ---------------------------------------------
+        echo
+
+        CHECK_OPENPBS
+
+        echo
+        echo ---------------------------------------------
+        echo testing LSF
+        echo ---------------------------------------------
+        echo
+
+        CHECK_LSF
+
+	dnl
+	dnl ---------------------------------------------
+	dnl testing sockets
+	dnl ---------------------------------------------
+	dnl
+
+	CHECK_SOCKETS
+
+	dnl
+	dnl ---------------------------------------------
+	dnl testing Batch
+	dnl ---------------------------------------------
+	dnl
+
+	WITH_BATCH=no
+	test x$openpbs_ok = xyes || test x$lsf_ok = xyes && WITH_BATCH=yes
+	AC_SUBST(WITH_BATCH)
+
+	if test "${MED_WITH_GUI}" = "yes"; then
+		echo
+		echo ---------------------------------------------
+		echo testing LEX \& YACC
+		echo ---------------------------------------------
+		echo
+
+		lex_yacc_ok=no
+		AC_PROG_YACC
+		AC_PROG_LEX
+		lex_yacc_ok=yes
+	fi
+
+	dnl
+	dnl ---------------------------------------------
+	dnl testing MPI
+	dnl ---------------------------------------------
+	dnl
+
+	CHECK_MPI
+	CHECK_MPICH
+
+	dnl echo
+	dnl echo ---------------------------------------------
+	dnl echo testing java
+	dnl echo ---------------------------------------------
+	dnl echo
+
+	dnl CHECK_JAVA
+
+	echo
+	echo ---------------------------------------------
+	echo testing omniORB
+	echo ---------------------------------------------
+	echo
+
+	CHECK_OMNIORB
+
+	echo
+	echo ---------------------------------------------
+	echo default ORB : omniORB
+	echo ---------------------------------------------
+	echo
+
+	DEFAULT_ORB=omniORB
+	CHECK_CORBA
+
+	AC_SUBST_FILE(CORBA)
+	corba=make_$ORB
+	CORBA=adm_local/unix/$corba
+
+	if test "${MED_WITH_GUI}" = "yes"; then
+
+		echo
+		echo ---------------------------------------------
+		echo testing openGL
+		echo ---------------------------------------------
+		echo
+
+		CHECK_OPENGL
+
+		echo
+		echo ---------------------------------------------
+		echo testing QT
+		echo ---------------------------------------------
+		echo
+
+		CHECK_QT
+
+		echo
+		echo ---------------------------------------------
+		echo testing VTK
+		echo ---------------------------------------------
+		echo
+
+		CHECK_VTK
+	fi
+
+	echo
+	echo ---------------------------------------------
+	echo Testing OpenCascade
+	echo ---------------------------------------------
+	echo
+
+	CHECK_CAS
+
+	echo
+	echo ---------------------------------------------
+	echo Testing Kernel
+	echo ---------------------------------------------
+	echo
+
+	CHECK_KERNEL
+
+	dnl echo
+	dnl echo ---------------------------------------------
+	dnl echo testing mico
+	dnl echo ---------------------------------------------
+	dnl echo
+
+	dnl CHECK_MICO
+
+	if test "${MED_WITH_GUI}" = "yes"; then
+		echo
+		echo ---------------------------------------------
+		echo testing MSG2QM
+		echo ---------------------------------------------
+		echo
+
+		CHECK_MSG2QM
+	fi
+
+	echo
+	echo ---------------------------------------------
+	echo Testing html generators
+	echo ---------------------------------------------
+	echo
+
+	CHECK_HTML_GENERATORS
+}
+else
+{
+	WITHIHM="no"
+	WITHOPENPBS="no"
+	
+	AC_SUBST(WITHIHM)
+	AC_SUBST(WITHOPENPBS)
+	CPPFLAGS="$CPPFLAGS -DMED_WITHOUT_KERNEL"
+}
+fi # MED_WITH_KERNEL
+
+if test "${MED_WITH_GUI}" = "yes"; then
+{
+    echo
+    echo ---------------------------------------------
+    echo Testing GUI
+    echo ---------------------------------------------
+    echo
+
+    CHECK_SALOME_GUI
+
+    echo
+    echo ---------------------------------------------
+    echo Testing full GUI
+    echo ---------------------------------------------
+    echo
+
+    CHECK_CORBA_IN_GUI
+    if test "x${CORBA_IN_GUI}" != "xyes"; then
+      echo "failed : For configure MED module necessary full GUI !"
+      exit
+    fi
+}
+fi # MED_WITH_GUI
+
+echo
+echo ---------------------------------------------
+echo Summary
+echo ---------------------------------------------
+echo
+
+if test "$MED_WITH_KERNEL" = "no"; then 
+   echo "Configure (without Kernel)"
+else
+   echo Configure
+fi
+
+#variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok boost_ok doxygen_ok graphviz_ok OpenGL_ok qt_ok vtk_ok omniORB_ok occ_ok Kernel_ok"
+
+if test "${MED_WITH_GUI}" = "yes"; then
+variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok cppunit_ok"
+fi
+
+if test "${MED_WITH_GUI}" = "no"; then
+variables="cc_ok mpi_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok occ_ok Kernel_ok cppunit_ok"
+fi
+
+for var in $variables
+do
+   eval toto=\$$var
+   if test x$toto != "x"; then
+     printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
+     eval echo \$$var
+   fi
+done
+
+dnl optional variables 
+
+echo "---Optional:"
+variables="metis_ok scotch_ok libxml_ok"
+for var in $variables
+     do
+         eval toto=\$$var
+         if test x$toto != "x"; then
+                printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
+                eval echo \$$var
+         fi
+     done
+
+if test "${MED_WITH_KERNEL}" = "yes"; then
+{
+        variables="openpbs_ok lsf_ok doxygen_ok graphviz_ok"
+ 
+        for var in $variables
+        do
+           eval toto=\$$var
+           if test x$toto != "x"; then
+                printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
+                eval echo \$$var
+           fi
+        done
+}
+fi
+
+echo
+echo "Default ORB   : $DEFAULT_ORB"
+echo
+
+dnl We don t need to say when we re entering directories if we re using
+dnl GNU make becuase make does it for us.
+if test "X$GMAKE" = "Xyes"; then
+   AC_SUBST(SETX) SETX=":"
+else
+   AC_SUBST(SETX) SETX="set -x"
+fi
+
+echo
+echo ---------------------------------------------
+echo generating Makefiles and configure files
+echo ---------------------------------------------
+echo
+
+AC_OUTPUT_COMMANDS([ \
+	chmod +x ./bin/* \
+])
+
+AC_OUTPUT([ \
+	./salome_adm/unix/SALOMEconfig.h \
+	./adm_local_without_kernel/unix/sstream \
+	Makefile \
+	./MED_version.h \
+	./adm_local/unix/config_files/Makefile \
+        ./adm_local/unix/Makefile \
+	./adm_local/Makefile \
+	./adm_local_without_kernel/unix/config_files/Makefile \
+        ./adm_local_without_kernel/unix/Makefile \
+	./adm_local_without_kernel/Makefile \
+	./resources/Makefile
+	./resources/MEDCatalog.xml \
+	./bin/Makefile \
+	./bin/VERSION \
+	./idl/Makefile \
+	./src/Makefile \
+	./src/MEDWrapper/Makefile \
+	./src/MEDWrapper/Base/Makefile \
+	./src/MEDWrapper/Factory/Makefile \
+	./src/MEDWrapper/V2_1/Makefile \
+	./src/MEDWrapper/V2_1/Core/Makefile \
+	./src/MEDWrapper/V2_1/Wrapper/Makefile \
+	./src/MEDWrapper/V2_2/Makefile \
+	./src/MEDMEM/Doxyfile_med_devel \
+	./src/MEDMEM/Doxyfile_med_user \
+	./src/MEDMEM/Makefile \
+	./src/MEDMEM/Test/Makefile \
+	./src/INTERPOLATION/Makefile \
+	./src/MEDMEM_SWIG/Makefile \
+	./src/MEDSPLITTER/Makefile \
+	./src/MEDSPLITTER/Test/Makefile \
+	./src/MULTIPR/Makefile \
+	./src/MEDMEM_I/Makefile \
+	./src/MED/Makefile \
+	./src/MedCorba_Swig/Makefile \
+	./src/MED_SWIG/Makefile \
+	./src/MedClient/Makefile \
+	./src/MedClient/src/Makefile \
+	./src/MedClient/test/Makefile \
+	./src/MedClient/test/environ/Makefile \
+	./src/MedClient/test/environ/runContainer \
+	./src/MedClient/test/environ/runEnvironTests \
+	./src/MedClient/test/environ/runTestMedCorba \
+	./src/MedClient/test/environ/stopContainer \
+	./src/MedClient/test/environ/csh/init1 \
+	./src/MedClient/test/environ/csh/init2 \
+	./src/MedClient/test/environ/csh/init3 \
+	./src/MedClient/test/environ/csh/Makefile \
+	./src/MedClient/test/environ/csh/runContainer \
+	./src/MedClient/test/environ/csh/runEnvironTests \
+	./src/MedClient/test/environ/csh/stopContainer \
+	./src/MedClient/test/test1/Makefile \
+	./src/MedClient/test/test2/Makefile \
+	./src/MEDGUI/Makefile \
+	./doc/Makefile \
+	./doc/MEDMEM/Makefile \
+	./doc/MEDMEM/MEDMEM_Content.tex \
+	./doc/MEDMEM/MEDMEM_UML_light.png \
+	./doc/MEDMEM/MEDMEM_UML.png \
+	./doc/MEDMEM/MEDMEM_UsersGuide.tex \
+	./doc/salome/Makefile \
+	./doc/salome/tui/Makefile \
+	./doc/salome/tui/MED/Makefile \
+	./doc/salome/tui/MED/sources/Makefile \
+	./doc/salome/tui/MED/sources/static/Makefile \
+	./doc/salome/tui/MED/doxyfile \
+	./doc/salome/tui/MED/sources/static/tree.js
+])
+
+dnl To avoid recompiling half of the sources because of SALOMEconfig.h recreating
+touch -d 01Jan2007 ./salome_adm/unix/SALOMEconfig.h

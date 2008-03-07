@@ -16,13 +16,16 @@
 // 
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 // 
-#ifndef  MEDMEM_MEDMEM_GAUSSECR_HXX
-#define  MEDMEM_MEDMEM_GAUSSECR_HXX
+#ifndef  MEDMEM_MEDMEMGAUSSECR_HXX
+#define  MEDMEM_MEDMEMGAUSSECR_HXX
+
+#include "MEDMEM.hxx"
+
 /*
  * En attendant une correction de la gestion du mode d'accès au fichier dans MEDfichier
  * on intègre la correction ici.
  */
-namespace med_2_2 {
+namespace med_2_3 {
   extern "C" {
 
 # define __UTILITES_H__
@@ -32,7 +35,7 @@ namespace med_2_2 {
 #include <string.h>
 #include <stdlib.h>
 
-med_err
+MEDMEM_EXPORT med_err
 MEDMEMgaussEcr(med_idt fid, med_geometrie_element type_geo, med_float *refcoo, med_mode_switch mode_coo,
 	    med_int ngauss, med_float *gscoo, med_float * wg, char * locname );
 

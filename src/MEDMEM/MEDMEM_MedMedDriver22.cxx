@@ -112,9 +112,10 @@ void MED_MED_DRIVER22::open()
                                      )
                           );
 
-  MESSAGE(LOC<<"_fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
+  int accessMode = getMedAccessMode( _accessMode, MED_EN::V22 );
+  MESSAGE(LOC<<"_fileName.c_str : "<< _fileName.c_str()<<",mode : "<< accessMode);
 
-  _medIdt = med_2_2::MEDouvrir( (const_cast <char *> (_fileName.c_str())), (med_2_2::med_mode_acces) _accessMode);
+  _medIdt = med_2_3::MEDouvrir( (const_cast <char *> (_fileName.c_str())), (med_2_3::med_mode_acces) accessMode);
   MESSAGE(LOC<<" _medIdt = "<<_medIdt);
   
   if (_medIdt > 0) 
@@ -135,7 +136,7 @@ void MED_MED_DRIVER22::open()
 
 void MED_MED_DRIVER22::close()
 {
-  med_2_2::med_int err = 0;
+  med_2_3::med_int err = 0;
   const char * LOC = "MED_MED_DRIVER22::close() : ";
   
   
@@ -152,7 +153,7 @@ void MED_MED_DRIVER22::close()
 //                            );   
 
   if ( _medIdt != MED_INVALID )
-    err=med_2_2::MEDfermer(_medIdt);
+    err=med_2_3::MEDfermer(_medIdt);
   
 //    if (err != MED_VALID) 
 //      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "the file |" 
@@ -209,7 +210,13 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 {
   const char * LOC = "MED_MED_DRIVER22::readFileStruct() : ";
   int          err,i,j;
-      
+
+  // PAL12192
+  if ( IMED_MED_RDONLY_DRIVER::_fileStructIsRead )
+    return;
+  else
+    IMED_MED_RDONLY_DRIVER::_fileStructIsRead = true;
+
   BEGIN_OF(LOC);
 
   if ( _medIdt == MED_INVALID ) 
@@ -224,13 +231,13 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
     char         meshName[MED_TAILLE_NOM+1]="";
     char         meshDescription[MED_TAILLE_DESC+1]="";
 //CCRT    int          meshDim;
-    med_2_2::med_int          meshDim;
-    med_2_2::med_maillage meshType;
+    med_2_3::med_int          meshDim;
+    med_2_3::med_maillage meshType;
 
     MESH *       ptrMesh;
     //    MED_MESH_RDWR_DRIVER * ptrDriver; !! UNUSED VARIABLE !!
     
-    numberOfMeshes = med_2_2::MEDnMaa(_medIdt) ;
+    numberOfMeshes = med_2_3::MEDnMaa(_medIdt) ;
     if ( numberOfMeshes <= 0 ) 
       MESSAGE(LOC << "Be careful there is no mesh in file |"<<_fileName<<"| !");
 
@@ -247,10 +254,10 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 
 	switch (meshType)
 	  {
-	  case med_2_2::MED_STRUCTURE:
+	  case med_2_3::MED_STRUCTURE:
 	    MESSAGE(LOC<<": Mesh n°"<< i <<" nammed "<< meshName << " with the description " << meshDescription << " is structured");
 
-	    med_2_2::med_type_grille type;
+	    med_2_3::med_type_grille type;
 
 	    err = MEDnatureGrilleLire(_medIdt, meshName, &type);
 
@@ -259,7 +266,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 
 	    ptrMesh = new GRID((MED_EN::med_grid_type) type);
 	    break;
-	  case med_2_2::MED_NON_STRUCTURE:
+	  case med_2_3::MED_NON_STRUCTURE:
 	    MESSAGE(LOC<<": Mesh n°"<< i <<" nammed "<< meshName << " with the description " << meshDescription << " is not structured");
 
 	    ptrMesh = new MESH();
@@ -306,6 +313,9 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 	ptrMesh->setName(meshName);
 
 	ptrMesh->setDescription(meshDescription);
+
+	// add by B. Secher for filter module
+	ptrMesh->setMeshDimension(meshDim);
 
 	SCRUTE(ptrMesh);
 
@@ -374,13 +384,13 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
   {
     int                           numberOfFields              = 0;      //MED_INVALID
     //    char                          fieldName[MED_TAILLE_NOM+1] = "";
-    char                          fieldName[MED_TAILLE_NOM+1] ;
+    char                          fieldName[MED_TAILLE_LNOM+1] ; // to avoid a crash if the field name is longer than MED_TAILLE_NOM
     int                           numberOfComponents           = 0;
     char                          * componentName              = (char *) MED_NULL;
     char                          * unitName                   =  (char *) MED_NULL;
     //    char                          meshName[MED_TAILLE_NOM+1]  = "";
     char                          meshName[MED_TAILLE_NOM+1]  ;
-    med_2_2::med_type_champ        type;
+    med_2_3::med_type_champ        type;
     MESH                          * ptrMesh                        = (MESH  *) MED_NULL;
     FIELD_                        * ptrField                       = (FIELD_ *) MED_NULL;
     //MED_FIELD_RDWR_DRIVER         * ptrDriver                      = (MED_FIELD_RDWR_DRIVER * ) MED_NULL;
@@ -388,30 +398,30 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
     SUPPORT                       * ptrSupport                     = (SUPPORT *   ) MED_NULL;
     MESH_ENTITIES::const_iterator currentEntity; 
     list<MED_EN::medGeometryElement>::const_iterator currentGeometry;
-    med_2_2::med_int                           NbOfGaussPts                 =  0;
+    med_2_3::med_int                           NbOfGaussPts                 =  0;
     int                           numberOfTimeSteps            =  -1;
-    med_2_2::med_int                           timeStepNumber               =  -1;
+    med_2_3::med_int                           timeStepNumber               =  -1;
     //    char                          timeStepUnit[MED_TAILLE_PNOM]= "";
     char                          timeStepUnit[MED_TAILLE_PNOM22+1] ;
     double                        timeStep                     = 0.0;
 //CCRT    int                           orderNumber                  =  -1;                           //???init?????
-    med_2_2::med_int                           orderNumber                  =  -1;                           //???init?????
+    med_2_3::med_int                           orderNumber                  =  -1;                           //???init?????
 //CCRT    int                           numberOfRefMesh = 0;
-    med_2_2::med_int                           numberOfRefMesh = 0;
-    med_2_2::med_booleen           meshLink;
+    med_2_3::med_int                           numberOfRefMesh = 0;
+    med_2_3::med_booleen           meshLink;
     map<MESH_NAME_,MESH*>      & _meshes   =  _ptrMed->_meshes; 
     map<FIELD_NAME_,MAP_DT_IT_> & _fields   =  _ptrMed->_fields; 
     map<FIELD_ *, MESH_NAME_>  & _meshName =  _ptrMed->_meshName; 
     map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> > & support = _ptrMed->_support;
 
-    numberOfFields = med_2_2::MEDnChamp(_medIdt,0) ;
+    numberOfFields = med_2_3::MEDnChamp(_medIdt,0) ;
     if ( numberOfFields <= 0 ) 
       MESSAGE(LOC << "Be careful there is no field in file |"<<
 	      _fileName<<"| !");
 
     for (i=1;i<=numberOfFields;i++)
       {
-	numberOfComponents = med_2_2::MEDnChamp(_medIdt,i) ;
+	numberOfComponents = med_2_3::MEDnChamp(_medIdt,i) ;
 
 	if ( numberOfComponents <= 0 ) 
 	  if (err != MED_VALID)
@@ -422,6 +432,10 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
       
 	err = MEDchampInfo(_medIdt, i, fieldName, &type, componentName, 
 			   unitName, numberOfComponents) ;
+
+	MESSAGE("Field n°" << i << " nammed " << fieldName << endl
+                << "Name real length = " << strlen(fieldName)
+                << ", while reserved " << MED_TAILLE_NOM);
 
 	if (err != MED_VALID)
 	  throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << ": can't get information about the field n°" << i <<" of the file |" << _fileName << "| !")); 
@@ -449,8 +463,8 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 
 		numberOfTimeSteps =
 		  MEDnPasdetemps(_medIdt, fieldName,
-				 (med_2_2::med_entite_maillage)(*currentEntity).first,
-				 (med_2_2::med_geometrie_element) (*currentGeometry) );
+				 (med_2_3::med_entite_maillage)(*currentEntity).first,
+				 (med_2_3::med_geometrie_element) (*currentGeometry) );
 
 		MESSAGE("Field information 2 : NumberOfTimeStep :"<<
 			numberOfTimeSteps);
@@ -473,15 +487,15 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 		      MESSAGE("Field information 4 : time step j = "<<j);
 		
 		      // err = MEDpasdetempsInfo( _medIdt, fieldName,
-		      // (med_2_2::med_entite_maillage) (*currentEntity).first, 
+		      // (med_2_3::med_entite_maillage) (*currentEntity).first, 
 		      // (*currentGeometry),j, meshName,
 		      // &NbOfGaussPts, &timeStepNumber,
 		      // timeStepUnit, &timeStep, &orderNumber);
 
 		      err = MEDpasdetempsInfo(_medIdt, fieldName,
-					      (med_2_2::med_entite_maillage)
+					      (med_2_3::med_entite_maillage)
 					      (*currentEntity).first,
-					      (med_2_2::med_geometrie_element)
+					      (med_2_3::med_geometrie_element)
 					      (*currentGeometry),j,
 					      &NbOfGaussPts, &timeStepNumber,
 					      &orderNumber, timeStepUnit,
@@ -497,7 +511,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 		
 			  if (timeStepNumber<0)  timeStepNumber=-1 ;
 			  if ((numberOfRefMesh != 1) ||
-			      (meshLink != med_2_2::MED_VRAI) ||
+			      (meshLink != med_2_3::MED_VRAI) ||
 			      (NbOfGaussPts != 1))
 			    {
 			      NbOfGaussPts = 1;
@@ -525,7 +539,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 				    "|, but  |" << meshName <<
 				    "| is referenced by field |" <<
 				    fieldName <<"|, entity : |" <<
-				    entNames[ (med_2_2::med_entite_maillage)
+				    entNames[ (med_2_3::med_entite_maillage)
 					       (*currentEntity).first] <<
 				    "|, geometric element of type |"  <<
 				    geoNames [(*currentGeometry)]     <<"|"); 
@@ -546,11 +560,11 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 			  ptrDriver = (GENDRIVER*)NULL ;
 
 			  switch ( type) {
-			  case med_2_2::MED_INT64 :
-			    if ( sizeof(med_2_2::med_int) != 8 )
-			      throw MED_EXCEPTION(LOCALIZED(STRING(LOC) <<" The Field type of |" << fieldName <<"|, entity : |" << entNames[(med_2_2::med_entite_maillage) (*currentEntity).first] <<"|, geometric element of type |" << geoNames [(*currentGeometry)] << "| is  MED_INT64 but size of med_int is not equal to 8 bytes !"));
+			  case med_2_3::MED_INT64 :
+			    if ( sizeof(med_2_3::med_int) != 8 )
+			      throw MED_EXCEPTION(LOCALIZED(STRING(LOC) <<" The Field type of |" << fieldName <<"|, entity : |" << entNames[(med_2_3::med_entite_maillage) (*currentEntity).first] <<"|, geometric element of type |" << geoNames [(*currentGeometry)] << "| is  MED_INT64 but size of med_int is not equal to 8 bytes !"));
 			    break;
-			  case med_2_2::MED_INT32 : {
+			  case med_2_3::MED_INT32 : {
 			    ptrField =  new FIELD<int> ( );
 			    // Les valeurs du champ ne doivent pas être lue
 			    // pour l'instant
@@ -638,7 +652,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 			  }
 			  default : {
 			    if ( numberOfTimeSteps > 1) 
-			      throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << " The Field type of |" << fieldName <<"|, entity : |" << entNames[(med_2_2::med_entite_maillage) (*currentEntity).first] <<"|, geometric element of type |" << geoNames [(*currentGeometry)] <<"| is neither MED_INT, MED_INT32, MED_INT64 nor MED_REEL64 !"));
+			      throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << " The Field type of |" << fieldName <<"|, entity : |" << entNames[(med_2_3::med_entite_maillage) (*currentEntity).first] <<"|, geometric element of type |" << geoNames [(*currentGeometry)] <<"| is neither MED_INT, MED_INT32, MED_INT64 nor MED_REEL64 !"));
 			    break ;
 			  }
 			  }
@@ -692,6 +706,11 @@ void MED_MED_RDONLY_DRIVER22::read( void )
   const char * LOC = "MED_MED_DRIVER22::read() : ";
  
   BEGIN_OF(LOC);
+
+  // For PAL12192: assure that file structure is already read
+  this->open();
+  this->readFileStruct();
+  this->close();
 
   const map<MESH_NAME_, MESH*> & _meshes = const_cast<const map<MESH_NAME_, MESH*>& > (_ptrMed->_meshes); 
   map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
@@ -769,7 +788,7 @@ void MED_MED_WRONLY_DRIVER22::writeFrom( void) const
       (*currentMesh).second->write(*this); 
       // On utilise pour les objects MESH ET FIELD le write(GENDRIVER *) et le == ds GENDRIVER avec eventuellement 1 id 
     }
-    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ex ) {
+    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ) {
       continue;
     }
   }
@@ -778,7 +797,7 @@ void MED_MED_WRONLY_DRIVER22::writeFrom( void) const
     try {
       (*currentField).first->write(*this);
     }
-    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ex ) {
+    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ) {
       continue;
     }
   }

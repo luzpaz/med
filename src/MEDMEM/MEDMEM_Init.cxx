@@ -46,7 +46,11 @@ MEDMEM::INIT::INIT()
 
   if (traceKind == NULL)
     {
+#ifndef WNT
       setenv("SALOME_trace","local",1);
+#else
+      _putenv("SALOME_trace=%TEMP%\\local");
+#endif
       traceKind = getenv("SALOME_trace");
       assert(traceKind);
     }

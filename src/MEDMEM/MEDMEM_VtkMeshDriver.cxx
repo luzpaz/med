@@ -68,7 +68,8 @@ VTK_MESH_DRIVER::VTK_MESH_DRIVER(const VTK_MESH_DRIVER & driver):
   _ptrMesh(driver._ptrMesh),
   _meshName(driver._meshName)
 {
-  _ptrMesh->addDriver(*this);
+  // next string commented by skl for bug NPAL14840
+  //_ptrMesh->addDriver(*this);
   _vtkFile = new ofstream();
 }
 
@@ -406,7 +407,6 @@ void VTK_MESH_DRIVER::write(void) const
     for (int j=0;j<numberOfCell;j++)
       (*_vtkFile) << vtkType << endl ;
   }
-
 
   END_OF(LOC);
 } 

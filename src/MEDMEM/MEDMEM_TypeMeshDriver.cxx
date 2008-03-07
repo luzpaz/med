@@ -40,7 +40,7 @@ TYPE_MESH_DRIVER::TYPE_MESH_DRIVER():
 {
 }
 
-TYPE_MESH_DRIVER::TYPE_MESH_DRIVER(const string & fileName,
+TYPE_MESH_DRIVER::TYPE_MESH_DRIVER(const std::string & fileName,
                                    MESH * ptrMesh,
                                    MED_EN::med_mode_acces accessMode): 
   GENDRIVER(fileName,accessMode),

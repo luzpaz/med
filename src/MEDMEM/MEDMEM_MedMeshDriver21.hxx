@@ -20,6 +20,8 @@
 #ifndef MED_MESH_DRIVER21_HXX
 #define MED_MESH_DRIVER21_HXX
 
+#include "MEDMEM.hxx"
+
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Compatibility21_22.hxx"
@@ -38,12 +40,12 @@ class FAMILY;
 class GROUP;
 class CONNECTIVITY;
 
-class MED_MESH_DRIVER21 : public virtual MED_MESH_DRIVER
+class MEDMEM_EXPORT MED_MESH_DRIVER21 : public virtual MED_MESH_DRIVER
 {
 protected:
 
   med_2_1::med_idt        _medIdt;
-  
+
 public :
 
   // all MED cell type
@@ -58,8 +60,8 @@ public :
  /*!
     Constructor.
   */
-  MED_MESH_DRIVER21(const string & fileName,  
-		    MESH * ptrMesh, 
+  MED_MESH_DRIVER21(const string & fileName,
+		    MESH * ptrMesh,
 		    MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.
@@ -83,11 +85,11 @@ public :
 
 */
 
-  class MED_MESH_RDONLY_DRIVER21 : public virtual IMED_MESH_RDONLY_DRIVER , public virtual MED_MESH_DRIVER21
+class MEDMEM_EXPORT MED_MESH_RDONLY_DRIVER21 : public virtual IMED_MESH_RDONLY_DRIVER,
+                                               public virtual MED_MESH_DRIVER21
 {
- 
-public :
-  
+public:
+
   /*!
     Constructor.
   */
@@ -106,6 +108,9 @@ public :
   */
   virtual ~MED_MESH_RDONLY_DRIVER21() ;
   void read(void);
+  void activateFacesComputation() { _computeFaces=true; }
+  void desactivateFacesComputation() { _computeFaces=false; }
+
 private:
   int getCOORDINATE();
   int getCONNECTIVITY();
@@ -117,6 +122,8 @@ private:
 
   GENDRIVER * copy ( void ) const ;
 
+private:
+  bool _computeFaces;
 };
 
 /*!
@@ -127,7 +134,7 @@ private:
 
 */
 
-class MED_MESH_WRONLY_DRIVER21 : public virtual IMED_MESH_WRONLY_DRIVER, public virtual MED_MESH_DRIVER21 {
+class MEDMEM_EXPORT MED_MESH_WRONLY_DRIVER21 : public virtual IMED_MESH_WRONLY_DRIVER, public virtual MED_MESH_DRIVER21 {
   
 public :
   
@@ -173,7 +180,7 @@ private:
 
 */
 
-class MED_MESH_RDWR_DRIVER21 : public IMED_MESH_RDWR_DRIVER, public MED_MESH_RDONLY_DRIVER21, public MED_MESH_WRONLY_DRIVER21 {
+class MEDMEM_EXPORT MED_MESH_RDWR_DRIVER21 : public IMED_MESH_RDWR_DRIVER, public MED_MESH_RDONLY_DRIVER21, public MED_MESH_WRONLY_DRIVER21 {
 
 public :
 

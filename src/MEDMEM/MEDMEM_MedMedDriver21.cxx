@@ -107,9 +107,9 @@ void MED_MED_DRIVER21::open()
                                      << "_fileName is |\"\"|, please set a correct fileName before calling open()"
                                      )
                           );
-  
-  MESSAGE(LOC<<"_fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
-  _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (_fileName.c_str())), (med_2_1::med_mode_acces) _accessMode);
+  int accessMode = getMedAccessMode( _accessMode, MED_EN::V21 );
+  MESSAGE(LOC<<"_fileName.c_str : "<< _fileName.c_str()<<",mode : "<< accessMode);
+  _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (_fileName.c_str())), (med_2_1::med_mode_acces) accessMode);
   MESSAGE(LOC<<" _medIdt = "<<_medIdt);
   
   if (_medIdt > 0) 
@@ -205,6 +205,12 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
   const char * LOC = "MED_MED_DRIVER21::readFileStruct() : ";
   int          err,i,j;
       
+  // PAL12192
+  if ( IMED_MED_RDONLY_DRIVER::_fileStructIsRead )
+    return;
+  else
+    IMED_MED_RDONLY_DRIVER::_fileStructIsRead = true;
+
   BEGIN_OF(LOC);
 
   if ( _medIdt == MED_INVALID ) 
@@ -291,6 +297,9 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 
       ptrMesh->setName(meshName);
 
+      // add by B. Secher for filter module
+      ptrMesh->setMeshDimension(meshDim);
+
       SCRUTE(ptrMesh);
 
       MESSAGE(LOC<<"is" << (isAGrid ? "" : " NOT") << " a GRID and its name is "<<ptrMesh->getName());
@@ -352,7 +361,8 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
   {
     int                           numberOfFields              = 0;      //MED_INVALID
     //    char                          fieldName[MED_TAILLE_NOM+1] = "";
-    char                          fieldName[MED_TAILLE_NOM+1] ;
+    //    char                          fieldName[MED_TAILLE_NOM+1] ;
+    char                          fieldName[MED_TAILLE_LNOM+1] ; //SRN: to avoid a crash if the field name is longer than MED_TAILLE_NOM
     int                           numberOfComponents           = 0;
     char                          * componentName              = (char *) MED_NULL;
     char                          * unitName                   =  (char *) MED_NULL;
@@ -388,9 +398,9 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
       numberOfComponents = med_2_1::MEDnChamp(_medIdt,i) ;
       if ( numberOfComponents <= 0 ) 
         if (err != MED_VALID) 
-          throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) <<  "Be careful there is no compound for field n°" 
+	  throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) <<  "Be careful there is no compound for field n°" 
                                            << i << "in file |"<<_fileName<<"| !"));
-      
+	
       componentName = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;
       unitName      = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;   
       
@@ -473,8 +483,8 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 		  ptrMesh = _meshes[meshName];
 		
 		ptrSupport     =  support[meshName][(MED_EN::medEntityMesh) (*currentEntity).first];
-		if (NbOfGaussPts != 1)
-		  throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<"Number of Gauss Point must be equal to 1 for instance")) ;
+// 		if (NbOfGaussPts != 1)
+// 		  throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<"Number of Gauss Point must be equal to 1 for instance")) ;
 		
 		// init to null to prevent some error if not correctly allocated !
 		ptrField = (FIELD_*)NULL ;
@@ -614,6 +624,11 @@ void MED_MED_RDONLY_DRIVER21::read( void )
  
   BEGIN_OF(LOC);
 
+  // For PAL12192: assure that file structure is already read
+  this->open();
+  this->readFileStruct();
+  this->close();
+
   const map<MESH_NAME_, MESH*> & _meshes = const_cast<const map<MESH_NAME_, MESH*>& > (_ptrMed->_meshes); 
   map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
 
@@ -688,7 +703,7 @@ void MED_MED_WRONLY_DRIVER21::writeFrom( void) const
       (*currentMesh).second->write(*this); 
       // On utilise pour les objects MESH ET FIELD le write(GENDRIVER *) et le == ds GENDRIVER avec eventuellement 1 id 
     }
-    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ex ) {
+    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ) {
       continue;
     }
   }
@@ -697,7 +712,7 @@ void MED_MED_WRONLY_DRIVER21::writeFrom( void) const
     try {
       (*currentField).first->write(*this);
     }
-    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ex ) {
+    catch ( const MED_DRIVER_NOT_FOUND_EXCEPTION & ) {
       continue;
     }
   }

@@ -29,6 +29,8 @@
 #ifndef MED_Wrapper_HeaderFile
 #define MED_Wrapper_HeaderFile
 
+#include "MED_WrapperBase.hxx"
+
 #include "MED_Structures.hxx"
 #include "MED_Algorithm.hxx"
 
@@ -39,13 +41,22 @@ namespace MED
 
   //----------------------------------------------------------------------------
   //! Define a base class that wraps the MED API
-  struct TWrapper
+  struct MEDWRAPPER_EXPORT TWrapper
   {
     typedef boost::mutex TMutex;
     //! This is a syncronization primitive which allow to support thread safety for the MED access
-    TMutex myMutex; 
+    TMutex myMutex;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    virtual
+    ~TWrapper();
+
+    //----------------------------------------------------------------------------
+    //! Gets version of the MED library used for the MED file
+    virtual 
+    EVersion
+    GetVersion() = 0;
+    
+    //----------------------------------------------------------------------------
     //! Creates a MEDWrapper MED Mesh representation
     virtual 
     PMeshInfo 
@@ -84,7 +95,7 @@ namespace MED
 		 TErr* theErr = NULL);
 
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     //! Read number of MED Family entities in the defined MED file
     virtual 
     TInt
@@ -150,7 +161,7 @@ namespace MED
 		   TInt theId,
 		   TErr* theErr = NULL);
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     //! Read sequence of names for any descendant of TElemInfo
     virtual
     void
@@ -216,7 +227,7 @@ namespace MED
 		 EConnectivite theConnMode = eNOD,
 		 TErr* theErr = NULL);
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     //! Read number of nodes in defined MED Mesh
     virtual
     TInt
@@ -301,7 +312,7 @@ namespace MED
     GetPNodeInfo(const PMeshInfo& theMeshInfo,
 		 TErr* theErr = NULL);
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     //! Read a MEDWrapper MED Polygones representation from defined MED file
     /*! This feature is support only for version of 2.2 and higher */
     virtual
@@ -394,7 +405,7 @@ namespace MED
 		     EGeometrieElement theGeom, 
 		     EConnectivite theConnMode = eNOD);
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     //! Read a MEDWrapper MED Polyedres representation from defined MED file
     /*! This feature is support only for version of 2.2 and higher */
     virtual 
@@ -487,7 +498,7 @@ namespace MED
 		     EGeometrieElement theGeom, 
 		     EConnectivite theConnMode = eNOD);
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     //! Get TEntityInfo which contains brief information about existing cells and their destribution among MED ENTITIES
     virtual
     TEntityInfo
@@ -556,7 +567,7 @@ namespace MED
 		 TErr* theErr = NULL);
 
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     //! Read number of MED FIELDS in defined MED Mesh
     virtual 
     TInt
@@ -605,7 +616,7 @@ namespace MED
 		  TErr* theErr = NULL);
 
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     //! Read number of MED GAUSS in defined MED Mesh
     /*! This feature is support only for version of 2.2 and higher */
     virtual 
@@ -622,7 +633,7 @@ namespace MED
     GetGaussPreInfo(TInt theId, 
 		    TErr* theErr = NULL)
     {
-      return TGaussInfo::TInfo();
+      return TGaussInfo::TInfo( TGaussInfo::TKey(ePOINT1,""),0 );
     }
     
     //! Read a MEDWrapper MED GAUSS representation by its order number from defined MED file
@@ -642,7 +653,7 @@ namespace MED
 		EModeSwitch theMode = eFULL_INTERLACE) = 0;
 
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     //! Read number of MED TIMESTAMPS in defined MED Mesh
     /*!
       By the way some additional information can be obtained:
@@ -692,7 +703,7 @@ namespace MED
 		      TErr* theErr = NULL);
     
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     //! Read number of MED PROFILES in defined MED Mesh
     virtual 
     TInt
@@ -717,6 +728,12 @@ namespace MED
     CrProfileInfo(const TProfileInfo::TInfo& theInfo,
 		  EModeProfil theMode = eCOMPACT) = 0;
 
+    //! Write a MEDWrapper MED PROFILE representation
+    virtual
+    void
+    SetProfileInfo(const TProfileInfo& theInfo,
+                   TErr* theErr = NULL) = 0;
+
     //! Read a MEDWrapper MED PROFILE representation by its order number from defined MED file
     PProfileInfo
     GetPProfileInfo(TInt theId,
@@ -724,33 +741,84 @@ namespace MED
 		    TErr* theErr = NULL);
 
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //----------------------------------------------------------------------------
     //! Read the values for MEDWrapper MED TIEMSTAMP from defined MED file
     virtual 
     void
-    GetTimeStampVal(TTimeStampVal& theVal,
-		    const TMKey2Profile& theMKey2Profile,
-		    const TKey2Gauss& theKey2Gauss,
-		    TErr* theErr = NULL) = 0;
+    GetTimeStampValue(const PTimeStampValueBase& theTimeStampValue,
+		      const TMKey2Profile& theMKey2Profile,
+		      const TKey2Gauss& theKey2Gauss,
+		      TErr* theErr = NULL) = 0;
     
     //! Write the values for MEDWrapper MED TIEMSTAMP to defined MED file
     virtual 
     void
-    SetTimeStamp(const TTimeStampVal& theTimeStampVal,
-		 TErr* theErr = NULL) = 0;
+    SetTimeStampValue(const PTimeStampValueBase& theTimeStampValue,
+		      TErr* theErr = NULL) = 0;
+    
+    //! Creates the values for MEDWrapper MED TIEMSTAMP representation
+    virtual
+    PTimeStampValueBase
+    CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     ETypeChamp theTypeChamp,
+		     const TGeom2Profile& theGeom2Profile = TGeom2Profile(),
+		     EModeSwitch theMode = eFULL_INTERLACE) = 0;
+
+    //! Creates the values for MEDWrapper MED TIEMSTAMP representation
+    virtual
+    PTimeStampValueBase
+    CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const TGeom2Profile& theGeom2Profile = TGeom2Profile(),
+		     EModeSwitch theMode = eFULL_INTERLACE);
+
+    //! A copy-constructor for the values for MEDWrapper MED TIEMSTAMP representation
+    virtual 
+    PTimeStampValueBase
+    CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const PTimeStampValueBase& theInfo,
+		     ETypeChamp theTypeChamp) = 0;
+    
+    //! A copy-constructor for the values for MEDWrapper MED TIEMSTAMP representation
+    virtual 
+    PTimeStampValueBase
+    CrTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		     const PTimeStampValueBase& theInfo);
+    
+    //! Read the values for MEDWrapper MED TIEMSTAMP from defined MED file
+    PTimeStampValueBase
+    GetPTimeStampValue(const PTimeStampInfo& theTimeStampInfo,
+		       const TMKey2Profile& theMKey2Profile,
+		       const TKey2Gauss& theKey2Gauss,
+		       TErr* theErr = NULL);
+    
+    //----------------------------------------------------------------------------
+    // Backward compatibility  declarations
+    //! Read the values for MEDWrapper MED TIEMSTAMP from defined MED file
+    virtual 
+    void
+    GetTimeStampVal(const PTimeStampVal& theVal,
+		    const TMKey2Profile& theMKey2Profile,
+		    const TKey2Gauss& theKey2Gauss,
+		    TErr* theErr = NULL);
+    
+    //! Write the values for MEDWrapper MED TIEMSTAMP to defined MED file
+    virtual 
+    void
+    SetTimeStamp(const PTimeStampVal& theVal,
+		 TErr* theErr = NULL);
     
     //! Creates the values for MEDWrapper MED TIEMSTAMP representation
     virtual
     PTimeStampVal
     CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
 		   const TGeom2Profile& theGeom2Profile = TGeom2Profile(),
-		   EModeSwitch theMode = eFULL_INTERLACE) = 0;
+		   EModeSwitch theMode = eFULL_INTERLACE);
 
     //! A copy-constructor for the values for MEDWrapper MED TIEMSTAMP representation
     virtual 
     PTimeStampVal
     CrTimeStampVal(const PTimeStampInfo& theTimeStampInfo,
-		   const PTimeStampVal& theInfo) = 0;
+		   const PTimeStampVal& theInfo);
     
     //! Read the values for MEDWrapper MED TIEMSTAMP from defined MED file
     PTimeStampVal
@@ -759,6 +827,7 @@ namespace MED
 		     const TKey2Gauss& theKey2Gauss,
 		     TErr* theErr = NULL);
 
+    //----------------------------------------------------------------------------
     //! Read a MEDWrapper MED Grille representation from defined MED file
     /*! This feature is support only for version of 2.2 and higher */
     PGrilleInfo
@@ -846,7 +915,7 @@ namespace MED
 
   //----------------------------------------------------------------------------
   //! This class provide thread-safety for MEDWrapper interaction
-  class TLockProxy
+  class MEDWRAPPER_EXPORT TLockProxy
   {
     TLockProxy& operator=(const TLockProxy& );
     TWrapper* myWrapper;
@@ -863,7 +932,7 @@ namespace MED
   //----------------------------------------------------------------------------
   //! To specialize the SharedPtr for TWrapper
   template<> 
-  class SharedPtr<TWrapper>: public boost::shared_ptr<TWrapper>
+  class MEDWRAPPER_EXPORT SharedPtr<TWrapper>: public boost::shared_ptr<TWrapper>
   {
   public:
     SharedPtr() {}

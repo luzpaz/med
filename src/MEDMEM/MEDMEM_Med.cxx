@@ -390,17 +390,7 @@ void MED::getMeshNames      ( string * meshNames ) const
 {
   const char * LOC = "MED::getMeshNames ( string * ) const : ";
   BEGIN_OF(LOC);
-  unsigned int meshNamesSize;
-  
-  if (  ( meshNamesSize = sizeof(meshNames) / sizeof(string *) )
-       != _meshes.size() )
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "Size of parameter meshNames is |" 
-                                     << meshNamesSize    << "| and should be |" 
-                                     << _meshes.size() << "| and should be |" 
-                                     )
-                          );   
-  
+
   // REM : ALLOCATION D'UN TABLEAU DE POINTEURS SUR STRING FAITE PAR LE CLIENT
   map<MESH_NAME_,MESH*>::const_iterator  currentMesh; // ??ITERATEUR CONST SUR UN OBJET NON CONST ??
 
@@ -483,21 +473,21 @@ MESH   * MED::getMesh           (const FIELD_ * const field ) const
                                      << "There is no known mesh associated with |" 
                                      << field << "| pointer"
                                      )
-                          );   
-  
+                          );
+
   string meshName = (*itMeshName).second;
   map<MESH_NAME_,MESH*>::const_iterator itMeshes =  _meshes.find(meshName);
   if ( itMeshes == _meshes.end() )
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
                                      << "There is no known mesh named |"
-                                     << meshName << " while it's associated with the found field |" 
+                                     << meshName << " while it's associated with the found field |"
                                      << field << "| pointer"
                                      )
-                          );   
-  
-  return (*itMeshes).second;
-  
+                          );
+
   END_OF(LOC);
+
+  return (*itMeshes).second;
 };
 
 
@@ -723,7 +713,9 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
   BEGIN_OF(LOC);
 
   int index = 0;
-  for (map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator const_itSupportOnMesh=_support.begin(); const_itSupportOnMesh != _support.end();
+  map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator const_itSupportOnMesh;
+
+  for (const_itSupportOnMesh=_support.begin(); const_itSupportOnMesh != _support.end();
        const_itSupportOnMesh++ )
     {
       map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator const_itSupport ;
@@ -733,7 +725,7 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
 
   MESSAGE(LOC << "In this MED object there is(are) " << index << " support(s):");
 
-  for (map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator const_itSupportOnMesh=_support.begin();const_itSupportOnMesh != _support.end(); const_itSupportOnMesh++ )
+  for (const_itSupportOnMesh=_support.begin();const_itSupportOnMesh != _support.end(); const_itSupportOnMesh++ )
     {
       map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator const_itSupport ;
       for (const_itSupport=(*const_itSupportOnMesh).second.begin();
@@ -743,8 +735,7 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
 	}
   }
 
-
-  map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::const_iterator const_itSupportOnMesh = _support.find(meshName) ;
+  const_itSupportOnMesh = _support.find(meshName) ;
   
   if ( const_itSupportOnMesh == _support.end() )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -786,24 +777,44 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
 */
 void MED::updateSupport ()
 {
- 
   const char * LOC = "MED::updateSupport () : ";
   BEGIN_OF(LOC);
 
   map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::iterator itSupportOnMesh ;
   for ( itSupportOnMesh=_support.begin();itSupportOnMesh != _support.end(); itSupportOnMesh++ ) {
+    map<MED_EN::medEntityMesh,SUPPORT *>& anEntity2Support = (*itSupportOnMesh).second;
+    map<MED_EN::medEntityMesh,SUPPORT *> anEntity2SupportTmp;
     map<MED_EN::medEntityMesh,SUPPORT *>::iterator itSupport ;
-    for ( itSupport=(*itSupportOnMesh).second.begin();itSupport!=(*itSupportOnMesh).second.end();itSupport++)
+    for ( itSupport=anEntity2Support.begin();itSupport!=anEntity2Support.end();itSupport++)
+    {
+      MED_EN::medEntityMesh aKey = (*itSupport).first;
+      SUPPORT* aData = (*itSupport).second;
       try {
-	(*itSupport).second->update() ;
+        aData->update() ;
+        anEntity2SupportTmp[aKey] = aData;
       }
       catch (MEDEXCEPTION & ex) {
 	// entity not defined in mesh -> we remove support on it !
 	MESSAGE(LOC<<ex.what());
 	delete (*itSupport).second ;
-	(*itSupportOnMesh).second.erase(itSupport) ; // that's rigth ????
-	itSupport-- ;
+	//(*itSupportOnMesh).second.erase(itSupport) ; // that's right ????
+	//itSupport-- ;
+        map<MED_EN::medEntityMesh,SUPPORT *>::iterator itSupportCurr = itSupport;
+        itSupport--; // decrement before erase()
+	(*itSupportOnMesh).second.erase(itSupportCurr);
       }
+    }
+
+    // some entities has not defined in mesh -> we should remove their supports!
+    anEntity2Support.swap( anEntity2SupportTmp );
+
+    for ( itSupport=anEntity2SupportTmp.begin();itSupport!=anEntity2SupportTmp.end();itSupport++)
+    {
+      MED_EN::medEntityMesh aKey = (*itSupport).first;
+      SUPPORT* aData = (*itSupport).second;
+      if( anEntity2Support.find( aKey ) == anEntity2Support.end() )
+        delete aData;
+    }
   }
 
   END_OF(LOC);

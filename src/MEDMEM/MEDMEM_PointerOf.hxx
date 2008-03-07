@@ -97,7 +97,7 @@ template <typename T> PointerOf<T>::PointerOf( const int &size, const PointerOf<
     Memory will be desallocated  when erasing this PointerOf*/
 template <typename T> PointerOf<T>::PointerOf( const int &size )
 {
-        if (size <= 0)
+        if (size < 0)
         {
                 _pointer=(T*)NULL;
 		_done=false;
@@ -121,7 +121,7 @@ template <typename T> PointerOf<T>::PointerOf( const T* pointer ) : _pointer( (T
     Memory will be desallocated  when erasing this PointerOf*/
 template <typename T> PointerOf<T>::PointerOf( const int &size, const T* pointer)
 {
-  if (size <= 0)
+  if (size < 0)
     throw MEDEXCEPTION("PointerOf( const int,const T*) : array size <= 0");
 
   _pointer = new T[ size ] ;
@@ -180,7 +180,6 @@ template <typename T> PointerOf<T>::operator const T*() const
 	return _pointer ;
 }
 
-
 /*! If necessary, released memory holded by PointerOf\n.
     Else allocates memory and sets desallocation boolean to true.\n
     Can be used in order to "nullify" an existing PointerOf\n
@@ -238,7 +237,7 @@ template <typename T> void PointerOf<T>::set( const int &size, const T *pointer)
       delete [] _pointer ;
       _pointer = NULL ;
     }
-  if (size <= 0)
+  if (size < 0)
     throw MEDEXCEPTION("PointerOf( const int,const T*) : array size <= 0");
 
   _pointer = new T[ size ] ;
