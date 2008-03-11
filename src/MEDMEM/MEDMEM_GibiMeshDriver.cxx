@@ -2676,12 +2676,16 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
         // start the next field writting
         nb_sub = *(itNbSub++);
         string description = (*itF)->getDescription();
+        if ( description.size() > 72 )
+          description = description.substr(0,72);
         gibi << setw(8) << nb_sub
              << setw(8) << -1
              << setw(8) << 6
-             << setw(8) << description.size() << endl;
+             << setw(8) << 72 /*description.size()*/ << endl; // PAL19100
         if ( !description.empty() )
           gibi << setw(72) << description << endl;
+        else
+          gibi << setw(72) << "Field" << endl;
         gibi << setw(72) << " " << endl;
 
         // Sub Components section
