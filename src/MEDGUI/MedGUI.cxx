@@ -315,7 +315,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 
 	// Selection du Fichier
 	file = SUIT_FileDlg::getFileName(application()->desktop(),
-					"",
+					QDir::currentDirPath(),
 					filtersList,
 					tr("MED_MEN_IMPORT"),
 					true);
@@ -369,7 +369,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 
 	// Selection du Fichier
 	file = SUIT_FileDlg::getFileName(application()->desktop(),
-					"",
+					QDir::currentDirPath(),
 					filtersList,
 					tr("MED_MEN_IMPORT"),
 					true);
@@ -421,7 +421,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 
 	// Selection du Fichier
 	file = SUIT_FileDlg::getFileName(application()->desktop(),
-					"",
+					QDir::currentDirPath(),
 					filtersList,
 					tr("MED_MEN_IMPORT"),
 					true);
