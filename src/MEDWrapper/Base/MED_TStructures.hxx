@@ -385,11 +385,9 @@ namespace MED
 
       myCoord.resize(theNbElem*theMeshInfo->myDim);
 
-      if(theIsElemNum)
-	myCoordUnits.resize(theMeshInfo->myDim*GetPNOMLength<eVersion>()+1);
+      myCoordUnits.resize(theMeshInfo->myDim*GetPNOMLength<eVersion>()+1);
 
-      if(theIsElemNames)
-	myCoordNames.resize(theMeshInfo->myDim*GetPNOMLength<eVersion>()+1);
+      myCoordNames.resize(theMeshInfo->myDim*GetPNOMLength<eVersion>()+1);
     }
 
     
