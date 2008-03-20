@@ -117,6 +117,12 @@ TElemInfo
   myFamNum[theId] = theVal;
 }
 
+void
+TElemInfo
+::SetElemNum(TInt theId, TInt theVal) 
+{
+  myElemNum[theId] = theVal;
+}
 //---------------------------------------------------------------
 TCCoordSlice 
 TNodeInfo
