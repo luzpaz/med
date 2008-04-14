@@ -525,14 +525,15 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 // 					   << "is using a mesh on a different file which is not yet supported" ));
 	  }
 
-	  if ( ! meshName.empty() )
-	    if ( meshName != maa ) {
-	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = ("
-					   << ndt << "," << od << ") for (entityType,geometricType)=("
-					   << MED_EN::entNames[entityCurrent] << ","
-					   << MED_EN::geoNames[*currentGeometry] << ")"
-					   << "is defined on mesh |" << maa << "| not on mesh |" << meshName ));
-	    }
+		//VB : commented out for allowing fields on different meshes
+	//   if ( ! meshName.empty() )
+// 	    if ( meshName != maa ) {
+// 	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = ("
+// 					   << ndt << "," << od << ") for (entityType,geometricType)=("
+// 					   << MED_EN::entNames[entityCurrent] << ","
+// 					   << MED_EN::geoNames[*currentGeometry] << ")"
+// 					   << "is defined on mesh |" << maa << "| not on mesh |" << meshName ));
+// 	    }
 	  break;
 	}
 
@@ -556,7 +557,7 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
       if ( (numberOfElements =  med_2_2::MEDnVal(id, const_cast <char*> ( fieldName.c_str() ),
 						(med_2_2::med_entite_maillage)   entityCurrent,
 						(med_2_2::med_geometrie_element) *currentGeometry,
-						 numdt, numo, maa, med_2_2::MED_COMPACT))  <=  0 )
+						 numdt, numo,(char*) meshName.c_str(), med_2_2::MED_COMPACT))  <=  0 )
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Error in MEDnVal for  Field |" << fieldName
 				     << "| with (ndt,or) = ("
 				     << ndt << "," << od << ") for (entityType,geometricType)=("
@@ -578,7 +579,7 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_2::med_idt id,
 
   if ( alreadyFoundAnEntity) {
     support.setName(fieldName+"Support");
-    support.setMeshName(string(maa)); // Vérifier que les différents noms de maillages lus soient identiques
+    support.setMeshName(meshName); // Vérifier que les différents noms de maillages lus soient identiques
     support.setEntity(entity);
     // REM : Le nombre <numberOfGeometricType> dans la précédente version du Driver 
     //       était erronée pour un champ qui ne reposait pas sur toutes les entités géométriques 
