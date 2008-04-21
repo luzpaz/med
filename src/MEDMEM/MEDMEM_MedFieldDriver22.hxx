@@ -549,6 +549,9 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_3::med_idt id,
 				     << MED_EN::entNames[entityCurrent] << ","
 				     << MED_EN::geoNames[*currentGeometry] << ")" )); ;
 
+      if ( meshName.empty() ) // PAL19635: error with TestMEDSPLITTER
+        meshName = maa;
+
       if ( (numberOfElements =  med_2_3::MEDnVal(id, const_cast <char*> ( fieldName.c_str() ),
 						(med_2_3::med_entite_maillage)   entityCurrent,
 						(med_2_3::med_geometrie_element) *currentGeometry,
