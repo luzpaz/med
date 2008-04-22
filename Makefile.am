@@ -31,11 +31,7 @@ if MED_ENABLE_KERNEL
       SUBDIRS+= idl
 endif
 
-SUBDIRS+= src
-
-if MED_ENABLE_GUI
-      SUBDIRS+= doc
-endif
+SUBDIRS+= src doc
 
 SUBDIRS+= resources bin
 DIST_SUBDIRS= adm_local adm_local_without_kernel idl src doc resources bin

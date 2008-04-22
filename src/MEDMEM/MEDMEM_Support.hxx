@@ -39,6 +39,11 @@
 #include "MEDMEM_SkyLineArray.hxx"
 #include "MEDMEM_RCBase.hxx"
 
+
+namespace MEDMEM {
+
+  class MESH;
+
 /*!
 
   This class describe a support of elements on an entity of the mesh.
@@ -47,11 +52,6 @@
   MED_CELL, MED_FACE or MED_EDGE).
 
 */
-
-namespace MEDMEM {
-
-  class MESH;
-
 class MEDMEM_EXPORT SUPPORT : public RCBASE
 {
 protected:
@@ -210,7 +210,7 @@ public:
 
   void blending(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
 
-  // Les numéros d'entités dans les profils doivent être croissant
+  // Les numÃ©ros d'entitÃ©s dans les profils doivent Ãªtre croissant
   // pour respecter la norme MED
   void setpartial(string Description, int NumberOfGeometricType,
 		  int TotalNumberOfEntity, MED_EN::medGeometryElement *GeometricType,
@@ -221,8 +221,8 @@ public:
 
   void setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
   
-  // Si les noms de profils ne sont pas positionnés, les profils ne seront
-  // pas écrits par MEDFICHIER.
+  // Si les noms de profils ne sont pas positionnÃ©s, les profils ne seront
+  // pas Ã©crits par MEDFICHIER.
   void   setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION);
   //string getProfilName(const MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
   vector<string> getProfilNames() const throw (MEDEXCEPTION);
@@ -249,17 +249,23 @@ protected:
 // Methodes Inline
 // _____________________
 
+/*!\if MEDMEM_ug 
+\addtogroup SUPPORT_query
+@{
+\endif
+*/
+
 /*!
   This method returns the number of all elements of the type GeometricType.
 
   If isOnAllElements is false, it returns the number of elements in the
-  support else it returns number of elements in the mesh.
+  support otherwise it returns number of elements in the mesh.
 
   Example : number of MED_TRIA3 or MED_ALL_ELEMENTS elements
-  in entity of support.
+  in support.
 
   Note : If SUPPORT is defined on MED_NODE, use MED_ALL_ELEMENTS as
-         medGeometryElement GeometricType and it will returns the number
+         medGeometryElement GeometricType and it will return the number
 	 of nodes in the support (or in the mesh).
 */
 //-----------------------------------------------------------------------------
@@ -274,6 +280,8 @@ inline int SUPPORT::getNumberOfElements(MED_EN::medGeometryElement GeometricType
       return _numberOfElements[i];
   throw MEDEXCEPTION("Support::getNumberOfElements : Geometric type not found !") ;
 }
+
+  /*! Returns the total number of elements in the support. */
 //-----------------------------------------------------------------------------
 inline  const int * SUPPORT::getNumberOfElements() const throw (MEDEXCEPTION) {
 //-----------------------------------------------------------------------------
@@ -358,7 +366,9 @@ inline const int * SUPPORT::getNumberIndex() const
     throw MEDEXCEPTION("Support::getNumberIndex : Not defined, support is on all entity !") ;
   return _number->getIndex() ;
 }
-
+/*! \if MEDMEM_ug
+@}
+\endif */
 
 /*! set the attribute _name to Name */
 //--------------------------------------
@@ -390,10 +400,17 @@ inline void SUPPORT::setMeshName(const string & meshName)
   _meshName=meshName;
 }
 
-/*! set the attribute _isOnAllElts to All
-  Even if _isonAllElts is true, geometric types definning the FIELD's SUPPORT
+  /*! \if MEDMEM_ug
+\addtogroup SUPPORT_creation
+@{
+\endif
+  */
+
+/*! Creates a support on all elements of the type specified in the constructor.
+
+  Even if _isonAllElts is true, geometric types defining the FIELD's SUPPORT
   must be read from the SUPPORT not from the associated MESH (the geometric
-  types definning the FIELD's SUPPORT may be a subset of the geometric types
+  types defining the FIELD's SUPPORT may be a subset of the geometric types
   defined in the MESH even if for each SUPPORT geometric type all MESH entities
   are used).
 */
@@ -403,6 +420,7 @@ inline void SUPPORT::setAll(bool All)
 {
   _isOnAllElts=All;
 }
+  /*! \if MEDMEM_ug  @} \endif */
 
 /*! set the attribute _entity to Entity */
 //------------------------------------------

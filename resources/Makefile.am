@@ -25,7 +25,7 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 # ===============================================================
 #
 
-dist_salomeres_DATA=\
+medfiles_DATA=\
     boitenew.cnc \
     boitenew.inp \
     boitenew.xyz \
@@ -158,7 +158,61 @@ dist_salomeres_DATA=\
     titi.inp \
     titi.xyz \
     zzzz121b.med \
-    zzzz121b_without_tr6.med
+    zzzz121b_without_tr6.med \
+		UnitTetra.med \
+		GeneralTetra.med \
+		NudgedSimpler.med \
+		NudgedTetra.med \
+		CornerTetra.med \
+		SimpleIncludedTetra.med \
+		SimpleIncludingTetra.med \
+		UnitTetraDegenT.med \
+		DegenEdgeXY.med \
+		DegenFaceXYZ.med \
+		DegenTranslatedInPlane.med \
+		ComplexIncludedTetra.med \
+		ComplexIncludingTetra.med \
+		HalfstripOnly.med \
+		HalfstripOnly2.med \
+		SimpleHalfstripOnly.med \
+		GenTetra1.med \
+		GenTetra2.med \
+		TrickyTetra1.med \
+		LargeUnitTetra.med \
+		LargeInconsistentTetra.med \
+		DividedUnitTetraSimpler.med \
+		DividedUnitTetra.med \
+		NudgedDividedUnitTetra.med \
+		NudgedDividedUnitTetraSimpler.med \
+		DividedGenTetra1.med DividedGenTetra2.med \
+		Box1.med \
+		Box2.med \
+		Box3.med \
+		Box1Moderate.med \
+		Box2Moderate.med \
+		BoxModSmall1.med \
+		BoxModSmall2.med \
+		BoxEvenSmaller1.med \
+		TinyBox.med \
+		BoxHexa1.med \
+		BoxHexa2.med \
+		MovedHexaBox1.med \
+		MovedHexaBox2.med \
+		BoxTetra2.med \
+		square1.med \
+		square1_split \
+		square1_split1.med \
+		square1_split2.med \
+		square1_split3.med \
+		square2.med \
+		square2_split \
+		square2_split1.med \
+		square2_split2.med 
 
-nodist_salomeres_DATA=MEDCatalog.xml
+medfilesdir = $(datadir)/salome/resources/MedFiles
+salomexml_DATA=MEDCatalog.xml
+salomexmldir=share/salome
+
+nodist_salomexml_DATA=$(salomexml_DATA)
+
 EXTRA_DIST+= config

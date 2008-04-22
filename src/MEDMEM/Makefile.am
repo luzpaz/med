@@ -168,7 +168,7 @@ bin_PROGRAMS= \
 	test_grid test_MEDMEM_PolyhedronArray test_MEDMEM_PolyConnectivity \
 	test_MEDMEM_PolyDriverMedMeshRead test_MEDMEM_PolyDriverMedMeshWrite \
 	test_MEDMEM_poly3D test_MEDMEM_nArray test_MEDMEM_Meshing_poly test_profil_MedFieldDriver \
-	test_profil_gauss_MedFieldDriver test_GaussLocalization testAnalFile test_MEDMEM_MeshingFlica \
+	test_profil_gauss_MedFieldDriver test_GaussLocalization testAnalFile test_MEDMEM_MeshingFlica testConvertPolygon \
 	create_mesh create_mesh_c2q4s2 create_mesh_c3h8q4 create_mesh_c3h8q4_wrong \
 	create_mesh_c2q4s2_wrong create_grid create_mesh_c2q4 create_mesh_c3h8 create_poly3D
 
@@ -230,3 +230,4 @@ dist_test_profil_gauss_MedFieldDriver_SOURCES= test_profil_gauss_MedFieldDriver.
 dist_test_GaussLocalization_SOURCES= test_GaussLocalization.cxx
 dist_testAnalFile_SOURCES= testAnalFile.cxx
 dist_test_MEDMEM_MeshingFlica_SOURCES= test_MEDMEM_MeshingFlica.cxx
+dist_testConvertPolygon_SOURCES=testConvertPolygon.cxx

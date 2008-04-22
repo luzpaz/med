@@ -37,6 +37,16 @@
 #include "MEDMEM_RCBase.hxx"
 #include "MEDMEM_FieldForward.hxx"
 
+namespace MEDMEM {
+
+class CELLMODEL;
+class FAMILY;
+class GROUP;
+class SUPPORT;
+class MESH;
+
+ostream & operator<<(ostream &os, const MESH &my);
+
 /*! This class contains all the informations related with a MESH :
   - COORDINATES
   - CONNECTIVITIES
@@ -49,16 +59,6 @@
   You can't have a family on MED_CELL and MED_FACE
 
 */
-
-namespace MEDMEM {
-
-class CELLMODEL;
-class FAMILY;
-class GROUP;
-class SUPPORT;
-class MESH;
-
-ostream & operator<<(ostream &os, const MESH &my);
 
 class MEDMEM_EXPORT MESH : public RCBASE
 {
@@ -257,8 +257,9 @@ public :
   virtual inline const vector<FAMILY*> getFamilies(MED_EN::medEntityMesh Entity) const;
   virtual inline const FAMILY*         getFamily(MED_EN::medEntityMesh Entity,int i) const;
   virtual int          		       getNumberOfGroups(MED_EN::medEntityMesh Entity) const;
-  virtual inline const vector<GROUP*>  getGroups(MED_EN::medEntityMesh Entity) const;
-  virtual inline const GROUP*          getGroup(MED_EN::medEntityMesh Entity,int i) const;
+  virtual const vector<GROUP*>  getGroups(MED_EN::medEntityMesh Entity) const;
+  virtual const GROUP*          getGroup(MED_EN::medEntityMesh Entity,int i) const;
+	virtual const GROUP*          getGroup(const string& name) const throw (MEDEXCEPTION);
   virtual inline const CONNECTIVITY* getConnectivityptr() const;
   virtual SUPPORT *                    getBoundaryElements(MED_EN::medEntityMesh Entity)
 						throw (MEDEXCEPTION);
@@ -316,6 +317,8 @@ public :
   vector< vector<double> > getBoundingBox() const;
   template<class T> static
   FIELD<T> * mergeFields(const vector< FIELD<T> * > & others, bool meshCompare=false);
+  void convertToPoly();
+
   /*!
    *For ref counter. Only for client
    */
@@ -372,13 +375,21 @@ inline void MESH::read(const GENDRIVER & genDriver)
 
 }
 
-/*! Set the MESH name */
+/*! Sets the MESH name. Name should not exceed MED_TAILLE_NOM
+length defined in Med (i.e. 32 characters).*/
 inline void MESH::setName(string name)
 {
   _name=name; //NOM interne à la classe
 }
 
-/*! Get the MESH name */
+/*! \if MEDMEM_ug
+\addtogroup MESH_general
+@{
+\endif
+*/
+
+/*!
+Gets the MESH name.*/
 inline string MESH::getName() const
 {
   return _name;
@@ -390,49 +401,72 @@ inline void MESH::setMeshDimension(int dim)
 }
 
 /*! Set the MESH description */
+/*! \ifnot MEDMEM_ug
+Sets the MESH description. Description should not exceed MED_TAILLE_DESC length defined in Med (i.e. 200 characters).
+\endif */
 inline void MESH::setDescription(string description)
 {
   _description=description; //NOM interne à la classe
 }
 
-/*! Get the MESH description */
+/*! Gets the MESH description. The string returned contains 
+a short description of the mesh, which is stored for 
+information purposes only.*/
 inline string MESH::getDescription() const
 {
   return _description;
 }
 
-/*! Get the dimension of the space */
+/*! Gets the dimension of the space in which the
+mesh is described (2 for planar meshes, 3 for volumes and
+3D surfaces) . */
 inline int MESH::getSpaceDimension() const
 {
   return _spaceDimension;
 }
 
-/*! Get the dimension of the MESH */
+/*! Gets the dimension of the mesh (2 for 2D- and 3D-surfaces, 3 for volumes). */
 inline int MESH::getMeshDimension() const
 {
   return _meshDimension;
 }
 
-/*! Get the number of nodes used in the MESH */
+/*! \if MEDMEM_ug
+The retrieval of general information about a mesh is illustrated in the following C++ example. Its Python equivalent can be found in \a MESHgeneral.py.
+This example illustrates how to retrieve the name, description, mesh and space dimensions.
+
+\example MESHgeneral.cxx
+@}
+\endif
+*/
+/*! \if MEDMEM_ug
+\addtogroup MESH_nodes
+@{
+\endif
+*/
+/*! Gets the number of nodes used in the mesh. */
 inline int MESH::getNumberOfNodes() const
 {
   return _numberOfNodes;
 }
 
-/*! Get the COORDINATES object. Use it only if you need COORDINATES informations not provided by the MESH class.*/
+/*! \ifnot MEDMEM_ug 
+ Gets the COORDINATES object. Use it only if you need COORDINATES informations not provided by the MESH class.
+\endif
+*/
 inline const COORDINATE * MESH::getCoordinateptr() const
 {
 //   checkGridFillCoords();
   return _coordinate;
 }
 
-/*! Get the system in which coordinates are given (CARTESIAN,CYLINDRICAL,SPHERICAL) __??MED_CART??__. */
+/*! Retrieves the system in which coordinates are given (CARTESIAN,CYLINDRICAL,SPHERICAL). */
 inline string MESH::getCoordinatesSystem() const
 {
   return _coordinate->getCoordinatesSystem();
 }
 
-/*! Get the whole coordinates array in a given interlacing mode. The interlacing mode are :
+/*! Gets the whole coordinates array in a given interlacing mode. The interlacing mode are :
   - MED_NO_INTERLACE   :  X1 X2 Y1 Y2 Z1 Z2
   - MED_FULL_INTERLACE :  X1 Y1 Z1 X2 Y2 Z2
  */
@@ -442,43 +476,59 @@ inline const double * MESH::getCoordinates(MED_EN::medModeSwitch Mode) const
   return _coordinate->getCoordinates(Mode);
 }
 
-/*! Get the coordinate n° number on axis n°axis*/
+/*! Gets the coordinate number \a number on axis \a axis.*/
 inline const double MESH::getCoordinate(int number, int axis) const
 {
 //   checkGridFillCoords();
   return _coordinate->getCoordinate(number,axis);
 }
 
-/*! Get the coordinate names array ("x       ","y       ","z       ")
-  of size n*MED_TAILLE_PNOM
+/*! Gets a pointer to the coordinate names array.
 */
 inline const string * MESH::getCoordinatesNames() const
 {
   return _coordinate->getCoordinatesNames();
 }
 
-/*! Get the coordinate unit names array ("cm       ","cm       ","cm       ")
-  of size n*MED_TAILLE_PNOM
+/*! Gets a pointer to the coordinate units array.
 */
 inline const string * MESH::getCoordinatesUnits() const
 {
   return _coordinate->getCoordinatesUnits();
 }
+/*!\if MEDMEM_ug
+
+Here is a small C++ example program for which the
+Python version may be found in
+\a MESHcoordinates.py.
+
+\example MESHcoordinates.cxx 
+
+@}
+\endif
+*/
+
 //  int * MESH::getNodesNumbers() const
 //  {
 //    return nodesNumbers;
 //  }
 
-/*! Get the number of different geometric types for a given entity type.
+/*!\if MEDMEM_ug
+\addtogroup MESH_connectivity
+@{
+\endif
+*/
 
-    For exemple getNumberOfTypes(MED_CELL) would return 3 if the MESH
-    have some MED_TETRA4, MED_PYRA5 and MED_HEXA6 in it.
+/*! Gets the number of different geometric types for a given entity type.
 
-    medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_NODE, MED_ALL_ENTITIES
+    For example getNumberOfTypes(MED_CELL) would return 3 if the MESH
+    have some MED_TETRA4, MED_PYRA5 and MED_HEXA8 in it.
+    If entity is not defined, returns 0.
+    If there is no connectivity, returns an exception.
 
-    If entity is not defined, return 0.
+    \param entity  entity type (MED_CELL, MED_FACE, MED_EDGE, MED_NODE, MED_ALL_ENTITIES)
 
-    If there is no connectivity, return an exception.
+    
 */
 inline int MESH::getNumberOfTypes(MED_EN::medEntityMesh entity) const
 {
@@ -493,11 +543,9 @@ inline int MESH::getNumberOfTypes(MED_EN::medEntityMesh entity) const
 
 /*!
   Gets the list of geometric types used by a given entity.
-  medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_ALL_ENTITIES
-
-  REM : Don't use MED_NODE
-
-  If entity is not defined, it returns an exception.
+ If entity is not defined, it returns an exception.
+\param entity Entity type must be MED_CELL, MED_FACE, MED_EDGE or MED_ALL_ENTITIES.
+ Passing MED_NODE as an entity type will throw an exception.
 */
 inline const MED_EN::medGeometryElement * MESH::getTypes(MED_EN::medEntityMesh entity) const
 {
@@ -510,11 +558,11 @@ inline const MED_EN::medGeometryElement * MESH::getTypes(MED_EN::medEntityMesh e
     return _connectivity->getGeometricTypes(entity);
   throw MEDEXCEPTION(LOCALIZED("MESH::getTypes( medEntityMesh ) : Connectivity not defined !"));
 }
+/*! \if MEDMEM_ug @} \endif */
 
 /*!
   Get the whole list of CELLMODEL used by cells of given type (medEntityMesh).
-
-  REMARK : Don't use MED_NODE as medEntityMesh
+ Passing MED_NODE as an entity type will throw an exception.
 */
 inline const CELLMODEL * MESH::getCellsTypes(MED_EN::medEntityMesh Entity) const
 {
@@ -537,8 +585,13 @@ inline string * MESH::getCellTypeNames(MED_EN::medEntityMesh Entity) const
     return _connectivity->getCellTypeNames(Entity);
   throw MEDEXCEPTION(LOCALIZED("MESH::getCellTypesName( medEntityMesh ) : Connectivity not defined !"));
 }
+/*!\if MEDMEM_ug
+\addtogroup MESH_connectivity
+@{
+\endif
+*/
 
-/*! Returns an array of size NumbreOfTypes+1 which contains, for each
+/*! Returns an array of size NumberOfTypes+1 which contains, for each
     geometric type of the given entity, the first global element number
     of this type.
 
@@ -556,12 +609,12 @@ inline const int * MESH::getGlobalNumberingIndex(MED_EN::medEntityMesh entity) c
   throw MEDEXCEPTION(LOCALIZED("MESH::getNumberOfTypes( medEntityMesh ) : Connectivity not defined !"));
 }
 /*!
-  Returns the number of element of given geometric type of given entity. Return 0 if query is not defined.
+  Returns the number of elements of given geometric type of given entity. Returns 0 if query is not defined.
 
   Example :
-  - getNumberOfElements(MED_NODE,MED_NONE) : number of node
+  - getNumberOfElements(MED_NODE,MED_NONE) : number of nodes
   - getNumberOfElements(MED_NODE,MED_TRIA3) : returns 0 (not defined)
-  - getNumberOfElements(MED_FACE,MED_TRIA3) : returns number of triangles
+  - getNumberOfElements(MED_FACE,MED_TRIA3) : returns number of triangle
   elements defined in face entity (0 if not defined)
   - getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) : returns total number
   of elements defined in cell entity
@@ -585,6 +638,33 @@ inline int MESH::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
       //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"connectivity not defined !"));
     }
 }
+/*! \if MEDMEM_ug
+
+This example shows the use of connectivity retrieval methods on a mesh which
+corresponds to the four-element mesh given in figure ??. Note
+the use of connectivity and connnectivity index tables, and the 
+offsets used to convert Fortran-style numbering to C arrays.
+
+The output of this program reads :
+\code
+Number of types : 3
+Type #0
+Element 1 : 1 2 3 
+Type #1
+Element 1 : 2 4 5 3
+Element 2 : 5 6 7 8
+Type #2
+Element 1 : 4 6 5 10 11 9
+\endcode
+
+\example read_example.cxx
+
+A more complete example involving descending connectivities 
+can be found in \c MESHconnectivities.cxx and \c MESHconnectivities.py.
+
+@}
+\endif
+*/
 /*!
   Returns true if the wanted connectivity exist, else returns false
   (to use before a getSomething method).
@@ -614,10 +694,17 @@ inline bool MESH::existPolyhedronConnectivity(MED_EN::medConnectivity connectivi
     throw MEDEXCEPTION("MESH::existPolyhedronConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
   return _connectivity->existPolyhedronConnectivity(connectivityType,entity);
 }
-/*!
-  Returns the geometric type of global element Number of entity Entity.
 
-  Throw an exception if Entity is not defined or Number are wrong (too big).
+/*!\if MEDMEM_ug
+\addtogroup MESH_connectivity
+@{
+\endif
+*/
+
+/*!
+  Returns the geometric type of global element number \a Number of entity \a Entity.
+
+  Throw an exception if \a Entity is not defined or if \a Numberis wrong.
  */
 inline MED_EN::medGeometryElement MESH::getElementType(MED_EN::medEntityMesh Entity,int Number) const
 {
@@ -626,8 +713,19 @@ inline MED_EN::medGeometryElement MESH::getElementType(MED_EN::medEntityMesh Ent
     throw MEDEXCEPTION("MESH::getElementType(medEntityMesh,int) : no connectivity defined !");
   return _connectivity->getElementType(Entity,Number);
 }
+/*!
+\if MEDMEM_ug
+@}
+\endif
+ */
 
-/*
+/*!\if MEDMEM_ug
+\addtogroup MESH_poly
+@{
+\endif
+*/
+
+/*!
   Method equivalent to getElementType except that it includes not only classical Types but polygons/polyhedra also.
  */
 MED_EN::medGeometryElement MESH::getElementTypeWithPoly(MED_EN::medEntityMesh Entity, int Number) const
@@ -638,7 +736,13 @@ MED_EN::medGeometryElement MESH::getElementTypeWithPoly(MED_EN::medEntityMesh En
 }
 
 /*!
-  Calculate the ask connectivity. Returns an exception if this could not be
+\if MEDMEM_ug
+@}
+\endif
+ */
+
+/*!
+  Calculates the required connectivity. Returns an exception if this could not be
   done. Do nothing if connectivity already exist.
  */
 
@@ -669,12 +773,20 @@ inline int MESH::getConnectivityLength(MED_EN::medModeSwitch Mode,MED_EN::medCon
     }
   return size;
 }
-/*!
-  Returns the required connectivity in the right mode for the given
-  geometric type of the given entity.
 
-  To get connectivity for all geometric type, use Mode=MED_FULL_INTERLACE
-  and Type=MED_ALL_ELEMENTS.
+/*!\if MEDMEM_ug
+\addtogroup MESH_connectivity
+@{
+\endif
+*/
+
+/*!
+  Returns the required connectivity in mode \a Mode for the
+  geometric type \a Type of the entity type \a entity.
+\a ConnectivityType specifies descending or nodal connectivity.
+
+  To get connectivity for all geometric type, use \a Mode=MED_FULL_INTERLACE
+  and \a Type=MED_ALL_ELEMENTS.
   You must also get the corresponding index array.
  */
 inline const int * MESH::getConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
@@ -686,20 +798,26 @@ inline const int * MESH::getConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medC
 }
 /*!
   Returns the required index array for a connectivity received in
-  MED_FULL_ENTERLACE mode and MED_ALL_ELEMENTS type.
+  MED_FULL_INTERLACE mode and MED_ALL_ELEMENTS type.
 
-  This array allow to find connectivity of each elements.
+  This array allows to find connectivity of each element.
 
-  Example : Connectivity of i^{th} elements (1<=i<=NumberOfElement) begin
-  at index ConnectivityIndex[i-1] and end at index ConnectivityIndex[i]-1
+  Example : Connectivity of i-th element (1<=i<=NumberOfElement) begins
+  at index ConnectivityIndex[i-1] and ends at index ConnectivityIndex[i]-1
   in Connectivity array (Connectivity[ConnectivityIndex[i-1]-1] is the
-  first value)
+  first node of the element)
  */
 inline const int * MESH::getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity) const
 {
   //  checkGridFillConnectivity();
   return _connectivity->getConnectivityIndex(ConnectivityType, entity);
 }
+
+/*!\if MEDMEM_ug @} \endif */
+
+
+
+
 /*!
  Returns the corresponding length of the array returned by MESH::getPolygonsConnectivity.
  Used particulary for wrapping CORBA and python.
@@ -709,6 +827,12 @@ inline int MESH::getPolygonsConnectivityLength(MED_EN::medConnectivity Connectiv
 {
   return getPolygonsConnectivityIndex (ConnectivityType,Entity)[ getNumberOfPolygons(Entity) ] - 1;
 }
+
+/*!\if MEDMEM_ug
+\addtogroup MESH_poly
+@{
+\endif
+*/
 /*!
   Return the required connectivity of polygons for the given entity.
   You must also get the corresponding index array.
@@ -733,6 +857,8 @@ inline int MESH::getNumberOfPolygons(MED_EN::medEntityMesh Entity) const
 {
   return _connectivity->getNumberOfPolygons(Entity);
 }
+/*! \if MEDMEM_ug @} \endif */
+
 /*!
  Returns the corresponding length of the array returned by MESH::getPolyhedronConnectivity with exactly the same arguments.
  Used particulary for wrapping CORBA and python.
@@ -744,8 +870,13 @@ inline int MESH::getPolyhedronConnectivityLength(MED_EN::medConnectivity Connect
 
   return getPolyhedronFacesIndex()[ getNumberOfPolyhedronFaces() ] - 1;
 }
+
+/*! \if MEDMEM_ug 
+\addtogroup MESH_poly
+@{ \endif */
+
 /*!
-  Return the required connectivity of polyhedron :
+  Returns the required connectivity of polyhedron :
   - in nodal mode, it gives you the polyhedron faces nodal connectivity.
   - in descending mode, it gives you the polyhedron faces list.
   You must also get :
@@ -757,7 +888,7 @@ inline const int * MESH::getPolyhedronConnectivity(MED_EN::medConnectivity Conne
   return _connectivity->getPolyhedronConnectivity(ConnectivityType);
 }
 /*!
-  Return the index array of polyhedron faces in nodal mode.
+  Returns the index array of polyhedron faces in nodal mode.
   You must also get the polyhedron index array.
  */
 inline const int * MESH::getPolyhedronFacesIndex() const
@@ -765,26 +896,32 @@ inline const int * MESH::getPolyhedronFacesIndex() const
   return _connectivity->getPolyhedronFacesIndex();
 }
 /*!
-  Return the required polyhedron index array.
+  Returns the required polyhedron index array.
  */
 inline const int * MESH::getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const
 {
   return _connectivity->getPolyhedronIndex(ConnectivityType);
 }
 /*!
-  Return the number of polyhedron faces.
+  Returns the number of polyhedron faces.
  */
 inline int MESH::getNumberOfPolyhedronFaces() const
 {
   return _connectivity->getNumberOfPolyhedronFaces();
 }
 /*!
-  Return the number of polyhedron.
+  Returns the number of polyhedron.
  */
 inline int MESH::getNumberOfPolyhedron() const
 {
   return _connectivity->getNumberOfPolyhedron();
 }
+
+/*!\if MEDMEM_ug
+@}
+\endif
+*/
+
 /*!
   Returns the corresponding length of the array returned by MESH::getReverseConnectivity with exactly the same arguments.
   Used particulary for wrapping CORBA and python.
@@ -872,6 +1009,9 @@ inline const int * MESH::getReverseConnectivityIndex(MED_EN::medConnectivity Con
 }
 
 
+/*!
+Retrieves the number of families in the mesh for entity type \a entity
+*/
 inline int MESH::getNumberOfFamilies (MED_EN::medEntityMesh entity) const
 {
   switch (entity) {
@@ -887,6 +1027,10 @@ inline int MESH::getNumberOfFamilies (MED_EN::medEntityMesh entity) const
     throw MEDEXCEPTION("MESH::getNumberOfFamilies : Unknown entity");
   }
 }
+
+/*! Retrieves the number of groups in the mesh for entity type \a entity
+ */
+
 inline int MESH::getNumberOfGroups (MED_EN::medEntityMesh entity) const
 {
   switch (entity) {
@@ -902,6 +1046,7 @@ inline int MESH::getNumberOfGroups (MED_EN::medEntityMesh entity) const
     throw MEDEXCEPTION("MESH::getNumberOfGroups : Unknown entity");
   }
 }
+/*! Returns the families of type \a entity present in the mesh as a vector of pointers */
 const vector<MEDMEM::FAMILY*> MESH::getFamilies(MED_EN::medEntityMesh entity) const
 {
   switch (entity) {
@@ -918,21 +1063,7 @@ const vector<MEDMEM::FAMILY*> MESH::getFamilies(MED_EN::medEntityMesh entity) co
   }
 }
 
-const vector<GROUP*> MESH::getGroups(MED_EN::medEntityMesh entity) const
-{
-  switch (entity) {
-  case MED_EN::MED_NODE :
-    return _groupNode;
-  case MED_EN::MED_CELL :
-    return _groupCell;
-  case MED_EN::MED_FACE :
-    return _groupFace;
-  case MED_EN::MED_EDGE :
-    return _groupEdge;
-  default :
-    throw MEDEXCEPTION("MESH::getGroups : Unknown entity");
-  }
-}
+
 
 const MEDMEM::FAMILY* MESH::getFamily(MED_EN::medEntityMesh entity, int i) const
 {
@@ -962,37 +1093,6 @@ const MEDMEM::FAMILY* MESH::getFamily(MED_EN::medEntityMesh entity, int i) const
   if (i>(int)Family.size())
     throw MEDEXCEPTION("MESH::getFamily(entity,i) : argument i must be <= _numberOfFamilies");
   return Family[i-1];
-}
-
-const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
-{
-  const char * LOC = "MESH::getGroup(medEntityMesh entity, int i) : ";
-  if (i<=0)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i must be > 0"));
-  vector<GROUP*> Group;
-  switch (entity) {
-  case MED_EN::MED_NODE : {
-    Group = _groupNode;
-    break;
-  }
-  case MED_EN::MED_CELL : {
-    Group = _groupCell;
-    break;
-  }
-  case MED_EN::MED_FACE : {
-    Group = _groupFace;
-    break;
-  }
-  case MED_EN::MED_EDGE : {
-    Group = _groupEdge;
-    break;
-  }
-  default :
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Unknown entity"));
-  }
-  if (i>(int)Group.size())
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i="<<i<<" must be <= _numberOfGroups="<<Group.size()));
-  return Group[i-1];
 }
 
 

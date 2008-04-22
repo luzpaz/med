@@ -8,15 +8,6 @@
 <path-prefix-list>
 </path-prefix-list>
 
-<type-list>
-  <objref name="MED" id="IDL:SALOME_MED/MED:1.0"/>
-  <objref name="MESH" id="IDL:SALOME_MED/MESH:1.0"/>
-  <objref name="FIELD" id="IDL:SALOME_MED/FIELD:1.0"/>
-  <objref name="FIELDDOUBLE" id="IDL:SALOME_MED/FIELDDOUBLE:1.0">
-    <base>FIELD</base>
-  </objref>
-</type-list>
-
 <!-- Component list -->
 <component-list>
 	<component>

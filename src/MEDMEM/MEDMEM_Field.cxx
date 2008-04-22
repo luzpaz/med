@@ -366,7 +366,7 @@ void     FIELD_::rmDriver      (int index)
 int      FIELD_::addDriver     (driverTypes driverType, 
                                 const string & fileName,
 				const string & driverFieldName,
-				med_mode_acces access)
+				MED_EN::med_mode_acces access)
 {
   MESSAGE("int FIELD_::addDriver(driverTypes driverType, const string & fileName, const string & driverFieldName) : adding the driver " << driverType << " fileName = " << fileName.c_str() << " driverFieldName = " << driverFieldName.c_str());
   return 0;

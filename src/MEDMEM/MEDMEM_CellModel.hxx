@@ -238,6 +238,34 @@ inline MED_EN::medGeometryElement CELLMODEL::getConstituentType(int dim,int num)
   return _constituentsType[dim-1][num-1];
 }
 
+/*!: Utility  class for storing cell models. Avoids calling the cellmodel constructor too
+often.
+*/
+class CELLMODEL_Map
+{
+public:
+	static const MEDMEM::CELLMODEL& retrieveCellModel(MED_EN::medGeometryElement type) { return CELLMODEL_Map::getInstance()->getCellModel(type); }
+private:
+	static CELLMODEL_Map *getInstance() { if(!_singleton) _singleton=new CELLMODEL_Map; return _singleton; }
+	static CELLMODEL_Map *_singleton;
+ std::map<MED_EN::medGeometryElement,MEDMEM::CELLMODEL> _cell_models;
+	
+	CELLMODEL_Map(){
+		_cell_models.insert(make_pair(MED_EN::MED_TRIA3,CELLMODEL(MED_EN::MED_TRIA3)));
+		_cell_models.insert(make_pair(MED_EN::MED_QUAD4,CELLMODEL(MED_EN::MED_QUAD4)));
+		_cell_models.insert(make_pair(MED_EN::MED_TETRA4,CELLMODEL(MED_EN::MED_TETRA4)));
+		_cell_models.insert(make_pair(MED_EN::MED_HEXA8,CELLMODEL(MED_EN::MED_HEXA8)));
+		
+	};
+	~CELLMODEL_Map(){ if(_singleton) delete _singleton;};
+	
+	const MEDMEM::CELLMODEL& getCellModel(MED_EN::medGeometryElement type)
+	{
+		return _cell_models[type];
+	};
+
+};
+
 }//End of namespace MEDMEM
 
 #endif /* CELLMODEL_HXX */

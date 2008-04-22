@@ -36,8 +36,8 @@
 #define VRAI 1
 #endif
 
-#ifndef UNDEFINED
-#define UNDEFINED -1
+#ifndef MED_UNDEFINED
+#define MED_UNDEFINED -1
 #endif
 
 #include "MEDMEM_define.hxx"
@@ -317,7 +317,7 @@ inline int  Wrapper_Maille::DONNE_NUM_LOC_FACE_EGALE_A_FORMANT(const type_retour
 		DONNE_FACE(num_face,face_loc);
 		if (Comparaison_Informe(face_loc,sommets_face)) return num_face;
 		}
-	return UNDEFINED;
+	return MED_UNDEFINED;
 	}
 inline int  Wrapper_Maille::DONNE_TYPE_MAILLE()     const
 	{

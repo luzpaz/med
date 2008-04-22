@@ -1,4 +1,5 @@
-This is the Med Memory package V3.2.0
+Documentation for the MEDMEM library and related tools is given in
+$(prefix)/doc/user/html/index.html
 
 I : Major evolution of the Med Memory package between V2.2.x and V3.2.x :
 =========================================================================

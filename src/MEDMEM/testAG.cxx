@@ -1,0 +1,99 @@
+#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Group.hxx"
+#include "MEDMEM_Meshing.hxx"
+#include "MEDMEM_MedMeshDriver22.hxx"
+
+using namespace MED_EN;
+using namespace std;
+using namespace MEDMEM;
+
+void addMedFacesGroup( MESHING& meshing, int nFaces, int *groupValue,string groupName)
+  {
+    GROUP faces ;
+    int myNumberOfElements[1];
+    medGeometryElement mytypes[1];
+    int index[2];
+    int nbOfGeomTypes;
+    faces.setName(groupName) ;
+    faces.setMesh(&meshing) ;
+    faces.setEntity(MED_EN::MED_FACE) ;
+    faces.setNumberOfGeometricType(1) ;
+    mytypes[0]=MED_EN::MED_POLYGON;
+    faces.setGeometricType(mytypes);
+    myNumberOfElements[0]=nFaces;
+    faces.setNumberOfElements(myNumberOfElements) ;
+    index[0]=1; index[1]=nFaces;
+    faces.setNumber(index, groupValue) ;
+    meshing.addGroup(faces) ;
+  }
+
+const int NB_OF_HEXA=1;
+const int NB_OF_CELL_AXIAL=1;
+char NomBottom[]="Bottom";
+
+int main()
+{
+  MESHING *pmesh=new MESHING;
+  pmesh->setName( "RJHMESH" ) ;
+  pmesh->setSpaceDimension(3) ;
+
+  double coord3DTab[36]={0.024155000000000003, 0.041837687256826218, -0.30499999999999999, 0.048310000000000013, -1.015761910347357e-17, -0.30499999999999999, 0.096620000000000011, -1.8329792978583059e-18,
+  -0.30499999999999999, 0.12077499999999999, 0.041837687256826225, -0.30499999999999999, 0.096620000000000011, 0.083675374513652451, -0.30499999999999999, 0.048310000000000013, 0.083675374513652465,
+  -0.30499999999999999, 0.024155000000000003, 0.041837687256826218, -0.2863, 0.048310000000000013, -1.015761910347357e-17, -0.2863, 0.096620000000000011, -1.8329792978583059e-18, -0.2863,
+  0.12077499999999999, 0.041837687256826225, -0.2863, 0.096620000000000011, 0.083675374513652451, -0.2863, 0.048310000000000013, 0.083675374513652465, -0.2863};
+  vector<double> coords3D(coord3DTab,coord3DTab+36);
+  unsigned nNodes=coords3D.size()/3;
+  pmesh->setNumberOfNodes(nNodes);
+  pmesh->setCoordinates(3, nNodes, &(coords3D[0]), "CARTESIAN",MED_EN::MED_FULL_INTERLACE);
+  string coordname[3] = { "x", "y", "z" } ;
+  pmesh->setCoordinatesNames(coordname) ;
+  // Set coordinates units
+  string coordunit[3] = { "cm", "cm", "cm" } ;
+  pmesh->setCoordinatesUnits(coordunit) ;
+  pmesh->setNumberOfTypes(0, MED_EN::MED_CELL);
+  pmesh->setMeshDimension(3);
+  pmesh->setNumberOfTypes(1,MED_EN::MED_FACE);
+  medGeometryElement mytypes2D[1]={MED_QUAD4};
+  //
+  int conn2DClassicalTab[24]={2, 3, 9, 8, 3, 4, 10, 9, 4, 5, 11, 10, 5, 6, 12, 11, 6, 1, 7, 12, 1, 2, 8, 7};
+  vector<int> conn2DClassical(conn2DClassicalTab,conn2DClassicalTab+24);
+  //
+  int nbOfElemsFace=conn2DClassical.size()/4;
+  pmesh->setTypes(mytypes2D,MED_EN::MED_FACE);
+  pmesh->setNumberOfElements(&nbOfElemsFace,MED_EN::MED_FACE);
+  //
+  int polyHInd[2]={1, 9};
+  int polyHFaceInd[9]={1, 7, 13, 17, 21, 25, 29, 33, 37};
+  int polyHFaceConn[36]={8, 9, 10, 11, 12, 7, 2, 1, 6, 5, 4, 3, 2, 3, 9, 8, 3, 4, 10, 9, 4, 5, 11, 10, 5, 6, 12, 11, 6, 1, 7, 12, 1, 2, 8, 7};
+  //
+  pmesh->setPolyhedraConnectivity(polyHInd,polyHFaceInd,polyHFaceConn,NB_OF_HEXA*(NB_OF_CELL_AXIAL),MED_EN::MED_CELL);
+  pmesh->setConnectivity(&conn2DClassical[0], MED_EN::MED_FACE, MED_EN::MED_QUAD4);
+  //
+  int conn2DPolyIndTab[3]={1, 7, 13};
+  vector<int > conn2DPolyInd(conn2DPolyIndTab,conn2DPolyIndTab+3);
+  int conn2DPolyTab[12]={1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+  //
+  pmesh->setPolygonsConnectivity(&conn2DPolyInd[0],conn2DPolyTab,conn2DPolyInd.size()-1,MED_EN::MED_FACE);
+  int bottom=7;
+  addMedFacesGroup(*pmesh,1,&bottom,NomBottom);
+  int id = pmesh->addDriver(MED_DRIVER, "coeur.med", pmesh->getName());
+  pmesh->write(id) ;
+	pmesh->rmDriver(id);
+  delete pmesh;
+  //
+  
+  MESH mesh;//(MED_DRIVER,,"RJHMESH");//"/home/geay/test_FGUI.med","FluidMesh_1");//../STEP3/coeur.med","RJHMESH");
+  mesh.setName("RJHMESH");
+  MED_MESH_RDONLY_DRIVER22 *drv=new MED_MESH_RDONLY_DRIVER22("coeur.med",&mesh);
+  drv->desactivateFacesComputation();
+  int newDrv=mesh.addDriver(*drv);
+  delete drv;
+  mesh.read(newDrv);
+  cout << " *** " << mesh.getNumberOfTypes(MED_EN::MED_FACE) << endl;
+  cout << "Expected 8 - having " << mesh.getNumberOfElementsWithPoly(MED_FACE,MED_ALL_ELEMENTS) << endl;
+  cout << "Expected 6 - having " << mesh.getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS) << endl;
+  cout << "Expected 6 - having " << mesh.getNumberOfElements(MED_FACE,MED_QUAD4) << endl;
+  cout << "Expected 1 - having " << mesh.getNumberOfElementsWithPoly(MED_CELL,MED_ALL_ELEMENTS) << endl;
+  cout << "Expected 0 - having " << mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) << endl;
+  return 0;
+}

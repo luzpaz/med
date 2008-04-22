@@ -842,11 +842,11 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER22::getNodalConnectivity : " ;
   BEGIN_OF(LOC);
-
+	
   if (_status==MED_OPENED)
     {
       int spaceDimension = _ptrMesh->_spaceDimension;
-
+			
       // Get the type of entity to work on (previously set in the Connectivity Object)
       med_2_3::med_entite_maillage Entity = (med_2_3::med_entite_maillage) Connectivity->getEntity();
       
@@ -858,8 +858,8 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
         tmp_cells_count[i]=MEDnEntMaa(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())),
                                       med_2_3::MED_CONN,(med_2_3::med_entite_maillage) Entity,
                                       all_cell_type[i],med_2_3::MED_NOD); 
-
-
+				
+				
         // Get the greatest dimension of the cells : Connectivity->_entityDimension
         // We suppose there is no cells used as faces in MED 2.2.x , this is forbidden !!!
         // In version prior to 2.2.x, it is possible
@@ -897,506 +897,469 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 
       // begin classic geometric types
       if (Connectivity->_numberOfTypes > 0)
-	{
-	  // if MED version < 2.2.x, we read only entity with dimention = Connectivity->_entityDimension. Lesser dimension are face or edge !
-
+				{
+					// if MED version < 2.2.x, we read only entity with dimention = Connectivity->_entityDimension. Lesser dimension are face or edge !
+					
           med_2_3::med_int major, minor, release;
-
+					
           if ( med_2_3::MEDversionLire(_medIdt, &major, &minor, &release) != 0 )
-	    {
-	      // error : we suppose we have not a good med file !
-	      delete[] tmp_cells_count ;
-	      return MED_ERROR ;
-	    }
-
-	  // we get MED version number
-	  // If MED version is < 2.2 then the cells which dimension
-	  // is lesser than the main dimension ( Connectivity->_entityDimension )
-	  // are either faces or edges
-
-	  //        string medVersion(version_med);
-	  //        int firstNumber = 
-	  int * tmpEdgeCount = new int[MED_NBR_GEOMETRIE_MAILLE] ;
-	  tmpEdgeCount[0]     = 0 ;
-	  int numberOfEdgesTypes = 0;
-	  int * tmpFaceCount = new int[MED_NBR_GEOMETRIE_MAILLE] ;
-	  tmpFaceCount[0]     = 0 ;
-	  int numberOfFacesTypes = 0;
-  
-//       if ((version_med != "2.2")&(Entity==MED_FR::MED_MAILLE))
-// 	{
-// 	  Connectivity->_numberOfTypes=0;
-	
-// 	  for ( i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++)
-// 	    {
-// 	      tmpFaceCount[i]=0;
-// 	      tmpEdgeCount[i]=0;
-// 	      if (tmp_cells_count[i]!=0)
-// 		{
-// 		  int dimension = all_cell_type[i]/100 ;
-// 		  if (Connectivity->_entityDimension==dimension) 
-// 		    Connectivity->_numberOfTypes++ ;
-	    
-// 		  if (dimension == 2)
-// 		    if (Connectivity->_entityDimension==3)
-// 		      {
-// 			tmpFaceCount[i]=tmp_cells_count[i] ;
-// 			tmp_cells_count[i]=0 ;
-// 			numberOfFacesTypes++;
-// 		      }
-// 		  if (dimension == 1)
-// 		    if (Connectivity->_entityDimension>dimension)
-// 		      {
-// 			tmpEdgeCount[i]=tmp_cells_count[i] ;
-// 			tmp_cells_count[i]=0;
-// 			numberOfEdgesTypes++ ;
-// 		      }
-// 		}
-// 	    }
-// 	}
-	
-      if (Entity==med_2_3::MED_MAILLE)
-	{
-	      Connectivity->_numberOfTypes=0;
-	
-	      for ( i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++) 
-		{
-		  tmpFaceCount[i]=0;
-		  tmpEdgeCount[i]=0;
-		  if (tmp_cells_count[i]!=0) 
-		    {
-		      int dimension = all_cell_type[i]/100 ;
-		      if (Connectivity->_entityDimension==dimension) 
-			Connectivity->_numberOfTypes++ ;
+						{
+							// error : we suppose we have not a good med file !
+							delete[] tmp_cells_count ;
+							return MED_ERROR ;
+						}
+					
+					// we get MED version number
+					// If MED version is < 2.2 then the cells which dimension
+					// is lesser than the main dimension ( Connectivity->_entityDimension )
+					// are either faces or edges
+					
+					int * tmpEdgeCount = new int[MED_NBR_GEOMETRIE_MAILLE] ;
+					tmpEdgeCount[0]     = 0 ;
+					int numberOfEdgesTypes = 0;
+					int * tmpFaceCount = new int[MED_NBR_GEOMETRIE_MAILLE] ;
+					tmpFaceCount[0]     = 0 ;
+					int numberOfFacesTypes = 0;
 		
-		      if (dimension == 2)
-			if (Connectivity->_entityDimension==3) 
-			  {
-			    tmpFaceCount[i]=tmp_cells_count[i] ;
-			//tmp_cells_count[i]=0 ;
-			//Connectivity->_numberOfTypes++ ;
-			    numberOfFacesTypes++;
-			  }
-		      if (dimension == 1)
-			if (Connectivity->_entityDimension>dimension) 
-			  {
-			    tmpEdgeCount[i]=tmp_cells_count[i] ;
-			//tmp_cells_count[i]=0;
-			//Connectivity->_numberOfTypes++ ;
-			    numberOfEdgesTypes++ ;
-			  }
-		    }
-		}
-	    }
-
-	  // bloc to read CELL :
-	  {
-	    // Prepare an array of indexes on the different cell types to create a MEDSKYLINEARRAY
-	    // We use <tmp_cells_count> to calculate <Connectivity->_count> then we release it
-	    Connectivity->_geometricTypes = new MED_EN::medGeometryElement [Connectivity->_numberOfTypes]   ;  // Double emploi pour des raisons pratiques 
-	    Connectivity->_type           = new CELLMODEL                  [Connectivity->_numberOfTypes]   ;  //
-	    Connectivity->_count          = new int                        [Connectivity->_numberOfTypes+1] ;
-	    Connectivity->_count[0]       = 1;
-	    
-	    int size = 0 ; 
-	    int typeNumber=1 ;
-	    int i;
-	    for ( i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++)  
-	      { // no point1 cell type (?)
-	    int dimension = all_cell_type[i]/100 ;
-	    if ((tmp_cells_count[i]>0) && (Connectivity->_entityDimension == dimension))
-		  {
-		    Connectivity->_count[typeNumber]=Connectivity->_count[typeNumber-1]+tmp_cells_count[i];
-
-		    CELLMODEL t( (MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i]) ;
-
-		Connectivity->_type[typeNumber-1] = t ;
-	    
-		    Connectivity->_geometricTypes[typeNumber-1]=( MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i] ;
-	    
-		    // probleme avec les mailles de dimension < a dimension du maillage :
-		    // Il faut oter le zero a la lecture est le remettre a l'ecriture : ce n'est pas fait !!!!! On interdit ce cas pour l'instant !!!
-
-	      
-		    size+=tmp_cells_count[i]*((MED_MESH_DRIVER22::all_cell_type[i])%100) ;
-	    
-		    MESSAGE(LOC
-			    << Connectivity->_count[typeNumber]-1 << " cells of type " 
-			    << all_cell_type_tab[i] ); 
-		    typeNumber++;
-		  }
-	      }
-	
-	    // Creation of the MEDSKYLINEARRAY
-	    //Connectivity->_nodal = new MEDSKYLINEARRAY(Connectivity->_count[Connectivity->_numberOfTypes]-1,size) ; 
+					
+					if (Entity==med_2_3::MED_MAILLE)
+						{
+							Connectivity->_numberOfTypes=0;
+							
+							for ( i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++) 
+								{
+									tmpFaceCount[i]=0;
+									tmpEdgeCount[i]=0;
+									if (tmp_cells_count[i]!=0) 
+										{
+											int dimension = all_cell_type[i]/100 ;
+											if (Connectivity->_entityDimension==dimension) 
+												Connectivity->_numberOfTypes++ ;
+											
+											if (dimension == 2)
+												if (Connectivity->_entityDimension==3) 
+													{
+														tmpFaceCount[i]=tmp_cells_count[i] ;
+														//tmp_cells_count[i]=0 ;
+														//Connectivity->_numberOfTypes++ ;
+														numberOfFacesTypes++;
+													}
+											if (dimension == 1)
+												if (Connectivity->_entityDimension>dimension) 
+													{
+														tmpEdgeCount[i]=tmp_cells_count[i] ;
+														//tmp_cells_count[i]=0;
+														//Connectivity->_numberOfTypes++ ;
+														numberOfEdgesTypes++ ;
+													}
+										}
+								}
+						}
+					
+					// bloc to read CELL :
+					{
+						// Prepare an array of indexes on the different cell types to create a MEDSKYLINEARRAY
+						// We use <tmp_cells_count> to calculate <Connectivity->_count> then we release it
+						Connectivity->_geometricTypes = new MED_EN::medGeometryElement [Connectivity->_numberOfTypes]   ;  // Double emploi pour des raisons pratiques 
+						Connectivity->_type           = new CELLMODEL                  [Connectivity->_numberOfTypes]   ;  //
+						Connectivity->_count          = new int                        [Connectivity->_numberOfTypes+1] ;
+						Connectivity->_count[0]       = 1;
+						
+						int size = 0 ; 
+						int typeNumber=1 ;
+						int i;
+						for ( i=1;i<MED_NBR_GEOMETRIE_MAILLE;i++)  
+							{ // no point1 cell type (?)
+								int dimension = all_cell_type[i]/100 ;
+								if ((tmp_cells_count[i]>0) && (Connectivity->_entityDimension == dimension))
+									{
+										Connectivity->_count[typeNumber]=Connectivity->_count[typeNumber-1]+tmp_cells_count[i];
+										
+										CELLMODEL t( (MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i]) ;
+										
+										Connectivity->_type[typeNumber-1] = t ;
+										
+										Connectivity->_geometricTypes[typeNumber-1]=( MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i] ;
+										
+										// probleme avec les mailles de dimension < a dimension du maillage :
+										// Il faut oter le zero a la lecture est le remettre a l'ecriture : ce n'est pas fait !!!!! On interdit ce cas pour l'instant !!!
+										
+										
+										size+=tmp_cells_count[i]*((MED_MESH_DRIVER22::all_cell_type[i])%100) ;
+										
+										MESSAGE(LOC
+														<< Connectivity->_count[typeNumber]-1 << " cells of type " 
+														<< all_cell_type_tab[i] ); 
+										typeNumber++;
+									}
+							}
+						
+						// Creation of the MEDSKYLINEARRAY
+						//Connectivity->_nodal = new MEDSKYLINEARRAY(Connectivity->_count[Connectivity->_numberOfTypes]-1,size) ; 
 	    //int * NodalIndex = Connectivity->_nodal->getIndex() ;
-	    int * NodalValue = new int[size] ;
-	    int * NodalIndex = new int[Connectivity->_count[Connectivity->_numberOfTypes]] ;
-	    NodalIndex[0]=1 ;
-	
-	    // Fill the MEDSKYLINEARRAY by reading the MED file.
-	    int j=0;
-	    for ( i=0;i<Connectivity->_numberOfTypes;i++) 
-	      {
-		int multi = 0 ;
-		med_2_3::med_geometrie_element med_type = (med_2_3::med_geometrie_element) Connectivity->_type[i].getType() ;
-		//  	  if ( Connectivity->_type[i].getDimension() < Connectivity->_entityDimension) 
-		// 	  if (Connectivity->_entity == MED_CELL)
-		// 	    if ( Connectivity->_type[i].getDimension() < _ptrMesh->_spaceDimension) 
-		// 	      multi=1;
-	  
-		//	  int NumberOfCell = Connectivity->_count[i+1]-Connectivity->_count[i] ;
-		int NumberOfNodeByCell = Connectivity->_type[i].getNumberOfNodes() ;
-	  
-		// initialise index
-		for ( j=Connectivity->_count[i]; j<Connectivity->_count[i+1];j++)
-		  NodalIndex[j]=NodalIndex[j-1]+NumberOfNodeByCell ; 
-
-	    int tmp_numberOfCells = Connectivity->_count[i+1]-Connectivity->_count[i] ;
-//CCRT		int * tmp_ConnectivityArray = new int[(NumberOfNodeByCell+multi)*tmp_numberOfCells];
-		med_2_3::med_int * tmp_ConnectivityArray = new med_2_3::med_int[(NumberOfNodeByCell+multi)*tmp_numberOfCells];
-	  
-		//  	  int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-	    //                    Connectivity->_entityDimension,tmp_ConnectivityArray,
-		//  			      MED_FR::MED_FULL_INTERLACE,NULL,0,Entity,med_type,MED_FR::MED_NOD);
-	    int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-				spaceDimension,tmp_ConnectivityArray,
-				    med_2_3::MED_FULL_INTERLACE,NULL,0,Entity,med_type,med_2_3::MED_NOD);
-
-	    if ( err != MED_VALID)
-	      {
-		delete[] tmp_ConnectivityArray;
-		delete[] tmp_cells_count;
-		delete[] tmpFaceCount;
-		delete[] tmpEdgeCount;
-		MESSAGE(LOC<<": MEDconnLire returns "<<err) ;
-		return MED_ERROR ;
-	      }
-
-	    int * ConnectivityArray = NodalValue + NodalIndex[Connectivity->_count[i]-1]-1 ;
-
-	    // version originale sans prise en compte des numéros optionnels
-	    //
-	    for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
-		  ConnectivityArray[j*NumberOfNodeByCell+k]=tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k] ;
-
-	    //////////////////////////////////////////////////////////////////////////////
-	    // Modification pour prise en compte de la numérotation optionnelle des noeuds ///
-	    //////////////////////////////////////////////////////////////////////////////
-	    //
-	    // Rénumérote le tableau temporaire tmp_ConnectivityArray en utilisant _optionnalToCanonicNodesNumbers
-	    // Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
+						int * NodalValue = new int[size] ;
+						int * NodalIndex = new int[Connectivity->_count[Connectivity->_numberOfTypes]] ;
+						NodalIndex[0]=1 ;
+						
+						// Fill the MEDSKYLINEARRAY by reading the MED file.
+						int j=0;
+						for ( i=0;i<Connectivity->_numberOfTypes;i++) 
+							{
+								int multi = 0 ;
+								med_2_3::med_geometrie_element med_type = (med_2_3::med_geometrie_element) Connectivity->_type[i].getType() ;
+								//  	  if ( Connectivity->_type[i].getDimension() < Connectivity->_entityDimension) 
+								// 	  if (Connectivity->_entity == MED_CELL)
+								// 	    if ( Connectivity->_type[i].getDimension() < _ptrMesh->_spaceDimension) 
+								// 	      multi=1;
+								
+								//	  int NumberOfCell = Connectivity->_count[i+1]-Connectivity->_count[i] ;
+								int NumberOfNodeByCell = Connectivity->_type[i].getNumberOfNodes() ;
+								
+								// initialise index
+								for ( j=Connectivity->_count[i]; j<Connectivity->_count[i+1];j++)
+									NodalIndex[j]=NodalIndex[j-1]+NumberOfNodeByCell ; 
+								
+								int tmp_numberOfCells = Connectivity->_count[i+1]-Connectivity->_count[i] ;
+								//CCRT		int * tmp_ConnectivityArray = new int[(NumberOfNodeByCell+multi)*tmp_numberOfCells];
+								med_2_3::med_int * tmp_ConnectivityArray = new med_2_3::med_int[(NumberOfNodeByCell+multi)*tmp_numberOfCells];
+								int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
+																		spaceDimension,tmp_ConnectivityArray,
+																		med_2_3::MED_FULL_INTERLACE,NULL,0,Entity,med_type,med_2_3::MED_NOD);
+								
+								if ( err != MED_VALID)
+									{
+										delete[] tmp_ConnectivityArray;
+										delete[] tmp_cells_count;
+										delete[] tmpFaceCount;
+										delete[] tmpEdgeCount;
+										MESSAGE(LOC<<": MEDconnLire returns "<<err) ;
+										return MED_ERROR ;
+									}
+								
+								int * ConnectivityArray = NodalValue + NodalIndex[Connectivity->_count[i]-1]-1 ;
+								
+								// version originale sans prise en compte des numéros optionnels
+								//
+								for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
+									ConnectivityArray[j*NumberOfNodeByCell+k]=tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k] ;
+								
+								//////////////////////////////////////////////////////////////////////////////
+								// Modification pour prise en compte de la numérotation optionnelle des noeuds ///
+								//////////////////////////////////////////////////////////////////////////////
+								//
+								// Rénumérote le tableau temporaire tmp_ConnectivityArray en utilisant _optionnalToCanonicNodesNumbers
+								// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
 						     
-						       // 	if (_ptrMesh->_arePresentOptionnalNodesNumbers==1) 
-						       // 		{
-						       // 	 	for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
-						       // 	 		ConnectivityArray[j*NumberOfNodeByCell+k]=_ptrMesh->_optionnalToCanonicNodesNumbers[tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k]] ;
-						       // 		}
-						       // 	else
-						       // 		{
-						       // 	 	for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
-						       // 	 		ConnectivityArray[j*NumberOfNodeByCell+k]=tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k] ;
-						       // 		}
-	    ////////////////////////////////////////////////////////////////////////////
+								// 	if (_ptrMesh->_arePresentOptionnalNodesNumbers==1) 
+								// 		{
+								// 	 	for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
+								// 	 		ConnectivityArray[j*NumberOfNodeByCell+k]=_ptrMesh->_optionnalToCanonicNodesNumbers[tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k]] ;
+								// 		}
+								// 	else
+								// 		{
+								// 	 	for ( j=0; j<tmp_numberOfCells; j++) for (int k=0; k<NumberOfNodeByCell; k++) 
+								// 	 		ConnectivityArray[j*NumberOfNodeByCell+k]=tmp_ConnectivityArray[j*(NumberOfNodeByCell+multi)+k] ;
+								// 		}
+								////////////////////////////////////////////////////////////////////////////
 	
-						       delete[] tmp_ConnectivityArray;
+								delete[] tmp_ConnectivityArray;
   
-	      }
+							}
 
-	    Connectivity->_nodal = new MEDSKYLINEARRAY(Connectivity->_count[Connectivity->_numberOfTypes]-1,
-						       size,
-						       NodalIndex,
-						       NodalValue) ; 
+						Connectivity->_nodal = new MEDSKYLINEARRAY(Connectivity->_count[Connectivity->_numberOfTypes]-1,
+																											 size,
+																											 NodalIndex,
+																											 NodalValue) ; 
 
-	    delete[] NodalIndex;
-	    delete[] NodalValue;
+						delete[] NodalIndex;
+						delete[] NodalValue;
 
-	  } // end of bloc to read CELL
+					} // end of bloc to read CELL
 
 
-	  // Get Face if any
-	  // ===============
+					// Get Face if any
+					// ===============
      
-	  if (numberOfFacesTypes!=0) 
-	    {
+					if (numberOfFacesTypes!=0) 
+						{
 
-	      // Create a CONNECTIVITY constituent to put in the top level CONNECTIVITY recursive class
-	      CONNECTIVITY * constituent = new CONNECTIVITY(numberOfFacesTypes,MED_EN::MED_FACE) ;
-	      constituent->_entityDimension = 2 ;
-	      constituent->_count[0]=1 ;
+							// Create a CONNECTIVITY constituent to put in the top level CONNECTIVITY recursive class
+							CONNECTIVITY * constituent = new CONNECTIVITY(numberOfFacesTypes,MED_EN::MED_FACE) ;
+							constituent->_entityDimension = 2 ;
+							constituent->_count[0]=1 ;
 
-	      // In order to create the MEDSKYLINEARRAY of the constituent object we need :
-	      // 1:
-	      // To initialize the _count array of the constituent object (containning cumulated face count by geometric type)
-	      // _count[0]=1 and _count[_numberOfTypes] give the size of NodalIndex
-	      // 2:
-	      // To calculate the total number of face nodes whatever the geometric type is.
-	      // The result is the size of the array containning all the nodes : NodalValue
-	      // 3 :
-	      // To calculate the starting indexes of the different face types in NodalValue, 
-	      // this is the NodalIndex array.
+							// In order to create the MEDSKYLINEARRAY of the constituent object we need :
+							// 1:
+							// To initialize the _count array of the constituent object (containning cumulated face count by geometric type)
+							// _count[0]=1 and _count[_numberOfTypes] give the size of NodalIndex
+							// 2:
+							// To calculate the total number of face nodes whatever the geometric type is.
+							// The result is the size of the array containning all the nodes : NodalValue
+							// 3 :
+							// To calculate the starting indexes of the different face types in NodalValue, 
+							// this is the NodalIndex array.
         
-	      int size       = 0 ; 
-	      int typeNumber = 1 ;
-	      int i;
-	      for ( i=1; i < MED_NBR_GEOMETRIE_MAILLE; i++)
-		{ // no point1 cell type (?)
-		  if (tmpFaceCount[i]>0)
-		    {
-		      constituent->_count[typeNumber] = constituent->_count[typeNumber-1] + tmpFaceCount[i];
-		      CELLMODEL t( (MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i]) ;
-		      constituent->_type[typeNumber-1]=t ;
+							int size       = 0 ; 
+							int typeNumber = 1 ;
+							int i;
+							for ( i=1; i < MED_NBR_GEOMETRIE_MAILLE; i++)
+								{ // no point1 cell type (?)
+									if (tmpFaceCount[i]>0)
+										{
+											constituent->_count[typeNumber] = constituent->_count[typeNumber-1] + tmpFaceCount[i];
+											CELLMODEL t( (MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i]) ;
+											constituent->_type[typeNumber-1]=t ;
 	    
-		      constituent->_geometricTypes[typeNumber-1]=( MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i] ;
+											constituent->_geometricTypes[typeNumber-1]=( MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i] ;
 	    
-		      size+=tmpFaceCount[i]*((MED_MESH_DRIVER22::all_cell_type[i])%100) ;
-		      typeNumber++;
-		    }
-		}
+											size+=tmpFaceCount[i]*((MED_MESH_DRIVER22::all_cell_type[i])%100) ;
+											typeNumber++;
+										}
+								}
 	
-	      // Creation of the MEDSKYLINEARRAY
-	      //constituent->_nodal = new MEDSKYLINEARRAY(constituent->_count[constituent->_numberOfTypes]-1,size) ; 
-	      //int * NodalIndex = constituent->_nodal->getIndex() ;
-	      int * NodalValue = new int[size] ;
-	      int * NodalIndex = new int[constituent->_count[constituent->_numberOfTypes]] ;
-	      NodalIndex[0]=1 ;
+							// Creation of the MEDSKYLINEARRAY
+							//constituent->_nodal = new MEDSKYLINEARRAY(constituent->_count[constituent->_numberOfTypes]-1,size) ; 
+							//int * NodalIndex = constituent->_nodal->getIndex() ;
+							int * NodalValue = new int[size] ;
+							int * NodalIndex = new int[constituent->_count[constituent->_numberOfTypes]] ;
+							NodalIndex[0]=1 ;
 	
-	      // Fill the MEDSKYLINEARRAY by reading the MED file.
-	      for ( i=0; i<constituent->_numberOfTypes; i++) 
-		{
-		  med_2_3::med_geometrie_element med_type = (med_2_3::med_geometrie_element) constituent->_type[i].getType() ;
+							// Fill the MEDSKYLINEARRAY by reading the MED file.
+							for ( i=0; i<constituent->_numberOfTypes; i++) 
+								{
+									med_2_3::med_geometrie_element med_type = (med_2_3::med_geometrie_element) constituent->_type[i].getType() ;
 
-		  int NumberOfNodeByFace = constituent->_type[i].getNumberOfNodes() ;
+									int NumberOfNodeByFace = constituent->_type[i].getNumberOfNodes() ;
 	  
-		  // initialise NodalIndex
-		  for (int j=constituent->_count[i]; j<constituent->_count[i+1];j++)
-		    NodalIndex[j]=NodalIndex[j-1]+NumberOfNodeByFace ; 
+									// initialise NodalIndex
+									for (int j=constituent->_count[i]; j<constituent->_count[i+1];j++)
+										NodalIndex[j]=NodalIndex[j-1]+NumberOfNodeByFace ; 
 	  
-	  int tmp_numberOfFaces = constituent->_count[i+1]-constituent->_count[i] ;
-	  // Il faut ajouter 1 pour le zero a la lecture !!!
-          // ATTENTION UNIQUEMENT POUR MED < 2.2.x
-//CCRT		  int * tmp_constituentArray = NULL;
-		  med_2_3::med_int * tmp_constituentArray = NULL;
+									int tmp_numberOfFaces = constituent->_count[i+1]-constituent->_count[i] ;
+									// Il faut ajouter 1 pour le zero a la lecture !!!
+									// ATTENTION UNIQUEMENT POUR MED < 2.2.x
+									//CCRT		  int * tmp_constituentArray = NULL;
+									med_2_3::med_int * tmp_constituentArray = NULL;
 
-	    MESSAGE(LOC << "Med file version used here " << major << " " << minor << " " << release);
+									MESSAGE(LOC << "Med file version used here " << major << " " << minor << " " << release);
 
-	    if ((major == 2) && (minor <= 1))
-//CCRT		    tmp_constituentArray = new int[(NumberOfNodeByFace+1)*tmp_numberOfFaces] ;
-		    tmp_constituentArray = new med_2_3::med_int[(NumberOfNodeByFace+1)*tmp_numberOfFaces] ;
-	    else if ((major == 2) && (minor >= 2))
-		    {
-//CCRT		      tmp_constituentArray = new int[NumberOfNodeByFace*tmp_numberOfFaces] ;
-		      tmp_constituentArray = new med_2_3::med_int[NumberOfNodeByFace*tmp_numberOfFaces] ;
-            MESSAGE(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !") ;
-	  }
+									if ((major == 2) && (minor <= 1))
+										//CCRT		    tmp_constituentArray = new int[(NumberOfNodeByFace+1)*tmp_numberOfFaces] ;
+										tmp_constituentArray = new med_2_3::med_int[(NumberOfNodeByFace+1)*tmp_numberOfFaces] ;
+									else if ((major == 2) && (minor >= 2))
+										{
+											//CCRT		      tmp_constituentArray = new int[NumberOfNodeByFace*tmp_numberOfFaces] ;
+											tmp_constituentArray = new med_2_3::med_int[NumberOfNodeByFace*tmp_numberOfFaces] ;
+											MESSAGE(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !") ;
+										}
 
-		  int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-				      Connectivity->_entityDimension,tmp_constituentArray,
-				      med_2_3::MED_FULL_INTERLACE,NULL,0,med_2_3::MED_MAILLE,med_type,med_2_3::MED_NOD);
+									int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
+																			Connectivity->_entityDimension,tmp_constituentArray,
+																			med_2_3::MED_FULL_INTERLACE,NULL,0,med_2_3::MED_MAILLE,med_type,med_2_3::MED_NOD);
 
-		  if ( err != MED_VALID) 
-		    {
-		      MESSAGE(LOC<<": MEDconnLire returns "<<err) ;
-		      delete constituent ;
-		      delete[] tmp_constituentArray;
-		      delete[] tmpFaceCount;
-		      delete[] tmpEdgeCount;
-		      return MED_ERROR ;
-		    }
+									if ( err != MED_VALID) 
+										{
+											MESSAGE(LOC<<": MEDconnLire returns "<<err) ;
+											delete constituent ;
+											delete[] tmp_constituentArray;
+											delete[] tmpFaceCount;
+											delete[] tmpEdgeCount;
+											return MED_ERROR ;
+										}
 
-		  int * constituentArray = NodalValue + NodalIndex[constituent->_count[i]-1]-1 ;
+									int * constituentArray = NodalValue + NodalIndex[constituent->_count[i]-1]-1 ;
 	  
-	  // version originale sans prise en compte des numéros optionnels
-	  //	
-		  int multi = 0; // quand est-ce que multi vaut 1 ?? en MED-fichier < 2.2 ??
-	    MESSAGE(LOC << "Med file version used here " << major << " " << minor << " " << release);
+									// version originale sans prise en compte des numéros optionnels
+									//	
+									int multi = 0; // quand est-ce que multi vaut 1 ?? en MED-fichier < 2.2 ??
+									MESSAGE(LOC << "Med file version used here " << major << " " << minor << " " << release);
 
-	    if ((major == 2) && (minor <= 1))
-	      for (int j=0; j<tmp_numberOfFaces; j++)
-		for (int k=0; k<NumberOfNodeByFace; k++)
-		  constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace+1)+k] ;
-	    else if ((major == 2) && (minor >= 2))
-		  for (int j=0; j<tmp_numberOfFaces; j++)
-		    for (int k=0; k<NumberOfNodeByFace; k++)
-		  constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace+multi)+k] ;
+									if ((major == 2) && (minor <= 1))
+										for (int j=0; j<tmp_numberOfFaces; j++)
+											for (int k=0; k<NumberOfNodeByFace; k++)
+												constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace+1)+k] ;
+									else if ((major == 2) && (minor >= 2))
+										for (int j=0; j<tmp_numberOfFaces; j++)
+											for (int k=0; k<NumberOfNodeByFace; k++)
+												constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace+multi)+k] ;
 
-		  //////////////////////////////////////////////////////////////////////////////////////
-		  ///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
-		      //////////////////////////////////////////////////////////////////////////////////////
-		      ///
-		      /// Rénumérote le tableau temporaire tmp_constituentArray en utilisant _optionnalToCanonicNodesNumbers
-		      /// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
+									//////////////////////////////////////////////////////////////////////////////////////
+									///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
+										//////////////////////////////////////////////////////////////////////////////////////
+										///
+										/// Rénumérote le tableau temporaire tmp_constituentArray en utilisant _optionnalToCanonicNodesNumbers
+										/// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
 	
-		      // 	if (_ptrMesh->_arePresentOptionnalNodesNumbers) 
-		      // 		{
-		      // 		for (int j=0; j<tmp_numberOfFaces; j++) for (int k=0; k<NumberOfNodeByFace; k++)
-		      // 			constituentArray[j*NumberOfNodeByFace+k]=_ptrMesh->_optionnalToCanonicNodesNumbers[tmp_constituentArray[j*(NumberOfNodeByFace+1)+k]] ;
-		      // 		}
-		      // 	else
-		      // 		{
-		      // 		for (int j=0; j<tmp_numberOfFaces; j++) for (int k=0; k<NumberOfNodeByFace; k++)
-		      // 			constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace+1)+k] ;
-		      // 		}
+										// 	if (_ptrMesh->_arePresentOptionnalNodesNumbers) 
+										// 		{
+										// 		for (int j=0; j<tmp_numberOfFaces; j++) for (int k=0; k<NumberOfNodeByFace; k++)
+										// 			constituentArray[j*NumberOfNodeByFace+k]=_ptrMesh->_optionnalToCanonicNodesNumbers[tmp_constituentArray[j*(NumberOfNodeByFace+1)+k]] ;
+										// 		}
+										// 	else
+										// 		{
+										// 		for (int j=0; j<tmp_numberOfFaces; j++) for (int k=0; k<NumberOfNodeByFace; k++)
+										// 			constituentArray[j*NumberOfNodeByFace+k]=tmp_constituentArray[j*(NumberOfNodeByFace+1)+k] ;
+										// 		}
   	
-		      //////////////////////////////////////////////////////////////////////////////////////
+										//////////////////////////////////////////////////////////////////////////////////////
 	  
-		      delete[] tmp_constituentArray;
-		}
+										delete[] tmp_constituentArray;
+								}
 	
-	      constituent->_nodal = new MEDSKYLINEARRAY(constituent->_count[constituent->_numberOfTypes]-1,
-							size,
-							NodalIndex,
-							NodalValue) ;
-	      delete[] NodalIndex ;
-	      delete[] NodalValue ;
+							constituent->_nodal = new MEDSKYLINEARRAY(constituent->_count[constituent->_numberOfTypes]-1,
+																												size,
+																												NodalIndex,
+																												NodalValue) ;
+							delete[] NodalIndex ;
+							delete[] NodalValue ;
 
 
-	      Connectivity->_constituent = constituent ;
-	    }
+							Connectivity->_constituent = constituent ;
+						}
 
-	  delete[] tmpFaceCount;
+					delete[] tmpFaceCount;
 
 
-	  // get Edge if any
-	  // ===============
-	  if (numberOfEdgesTypes!=0) 
-	    {
-	      CONNECTIVITY * constituent = new CONNECTIVITY(numberOfEdgesTypes,MED_EDGE) ;
-	      constituent->_entityDimension = 1 ;
-	      constituent->_count[0]=1 ;
+					// get Edge if any
+					// ===============
+					if (numberOfEdgesTypes!=0) 
+						{
+							CONNECTIVITY * constituent = new CONNECTIVITY(numberOfEdgesTypes,MED_EDGE) ;
+							constituent->_entityDimension = 1 ;
+							constituent->_count[0]=1 ;
 
-	      int size = 0 ; 
-	      int typeNumber=1 ;
-	      // if you declare a variable <i> in two <for> initialization statement, 
-	      // compiler gcc2.95.3 says nothing but there are two <i> variables in the same block 
-	      //and the value you get in the common block seems to be the value of the first variable !
-	      int i; 
+							int size = 0 ; 
+							int typeNumber=1 ;
+							// if you declare a variable <i> in two <for> initialization statement, 
+							// compiler gcc2.95.3 says nothing but there are two <i> variables in the same block 
+							//and the value you get in the common block seems to be the value of the first variable !
+							int i; 
 
-	      for ( i=1; i<MED_NBR_GEOMETRIE_MAILLE; i++)  
-		{ // no point1 cell type (?)
-		  if (tmpEdgeCount[i]>0) 
-		    {
+							for ( i=1; i<MED_NBR_GEOMETRIE_MAILLE; i++)  
+								{ // no point1 cell type (?)
+									if (tmpEdgeCount[i]>0) 
+										{
 	    
-		      constituent->_count[typeNumber]=constituent->_count[typeNumber-1]+tmpEdgeCount[i];
-		      CELLMODEL t( (MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i]) ;
-		      constituent->_type[typeNumber-1]=t ;
+											constituent->_count[typeNumber]=constituent->_count[typeNumber-1]+tmpEdgeCount[i];
+											CELLMODEL t( (MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i]) ;
+											constituent->_type[typeNumber-1]=t ;
 	    
-		      constituent->_geometricTypes[typeNumber-1]=( MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i] ;
+											constituent->_geometricTypes[typeNumber-1]=( MED_EN::medGeometryElement) MED_MESH_DRIVER22::all_cell_type[i] ;
 	    
-		      size+=tmpEdgeCount[i]*((MED_MESH_DRIVER22::all_cell_type[i])%100) ;
-		      typeNumber++;
-		    }
-		}
+											size+=tmpEdgeCount[i]*((MED_MESH_DRIVER22::all_cell_type[i])%100) ;
+											typeNumber++;
+										}
+								}
 	
-	      // Creation of the MEDSKYLINEARRAY
-	      //constituent->_nodal = new MEDSKYLINEARRAY(constituent->_count[constituent->_numberOfTypes]-1,size) ; 
-	      //int * NodalIndex = constituent->_nodal->getIndex() ;
-	      int * NodalValue = new int[size] ;
-	      int * NodalIndex = new int[constituent->_count[constituent->_numberOfTypes]] ;
-	      NodalIndex[0]=1 ;
+							// Creation of the MEDSKYLINEARRAY
+							//constituent->_nodal = new MEDSKYLINEARRAY(constituent->_count[constituent->_numberOfTypes]-1,size) ; 
+							//int * NodalIndex = constituent->_nodal->getIndex() ;
+							int * NodalValue = new int[size] ;
+							int * NodalIndex = new int[constituent->_count[constituent->_numberOfTypes]] ;
+							NodalIndex[0]=1 ;
 	
-	      // Fill the MEDSKYLINEARRAY by reading the MED file.
-	      for ( i=0; i<constituent->_numberOfTypes; i++) 
-		{
-		  med_2_3::med_geometrie_element med_type = (med_2_3::med_geometrie_element) constituent->_type[i].getType() ;
+							// Fill the MEDSKYLINEARRAY by reading the MED file.
+							for ( i=0; i<constituent->_numberOfTypes; i++) 
+								{
+									med_2_3::med_geometrie_element med_type = (med_2_3::med_geometrie_element) constituent->_type[i].getType() ;
 
-		  int NumberOfNodeByEdge = constituent->_type[i].getNumberOfNodes() ;
+									int NumberOfNodeByEdge = constituent->_type[i].getNumberOfNodes() ;
 	  
-		  // initialise index
-		  for (int j=constituent->_count[i]; j<constituent->_count[i+1];j++)
-		    NodalIndex[j]=NodalIndex[j-1]+NumberOfNodeByEdge ; 
+									// initialise index
+									for (int j=constituent->_count[i]; j<constituent->_count[i+1];j++)
+										NodalIndex[j]=NodalIndex[j-1]+NumberOfNodeByEdge ; 
 	  
-		  int tmp_numberOfEdges = constituent->_count[i+1]-constituent->_count[i] ;
-		  // Il faut ajouter 1 pour le zero a la lecture !!!
+									int tmp_numberOfEdges = constituent->_count[i+1]-constituent->_count[i] ;
+									// Il faut ajouter 1 pour le zero a la lecture !!!
 
-		  // ATTENTION UNIQUEMENT POUR MED < 2.2.x
-//CCRT		  int * tmp_constituentArray = NULL;
-		  med_2_3::med_int * tmp_constituentArray = NULL;
+									// ATTENTION UNIQUEMENT POUR MED < 2.2.x
+									//CCRT		  int * tmp_constituentArray = NULL;
+									med_2_3::med_int * tmp_constituentArray = NULL;
 
-	      MESSAGE(LOC << "Med file version used here " << major << " " << minor << " " << release);
+									MESSAGE(LOC << "Med file version used here " << major << " " << minor << " " << release);
 
-	      if ((major == 2) && (minor <= 1))
-//CCRT		    tmp_constituentArray = new int[(NumberOfNodeByEdge+1)*tmp_numberOfEdges] ;
-		    tmp_constituentArray = new med_2_3::med_int[(NumberOfNodeByEdge+1)*tmp_numberOfEdges] ;
-	      else if ((major == 2) && (minor >= 2))
-		    {
-//CCRT		      tmp_constituentArray = new int[NumberOfNodeByEdge*tmp_numberOfEdges] ;
-		      tmp_constituentArray = new med_2_3::med_int[NumberOfNodeByEdge*tmp_numberOfEdges] ;
-            MESSAGE(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !") ;
-          }
+									if ((major == 2) && (minor <= 1))
+										//CCRT		    tmp_constituentArray = new int[(NumberOfNodeByEdge+1)*tmp_numberOfEdges] ;
+										tmp_constituentArray = new med_2_3::med_int[(NumberOfNodeByEdge+1)*tmp_numberOfEdges] ;
+									else if ((major == 2) && (minor >= 2))
+										{
+											//CCRT		      tmp_constituentArray = new int[NumberOfNodeByEdge*tmp_numberOfEdges] ;
+											tmp_constituentArray = new med_2_3::med_int[NumberOfNodeByEdge*tmp_numberOfEdges] ;
+											MESSAGE(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !") ;
+										}
 	  
-		  int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-				      spaceDimension,tmp_constituentArray,
-				      med_2_3::MED_FULL_INTERLACE,NULL,0,med_2_3::MED_MAILLE,med_type,med_2_3::MED_NOD);
-		  if ( err != MED_VALID) 
-		    {
-		      MESSAGE(LOC<<": MEDconnLire returns "<<err) ;
-		      delete constituent ;
-		      delete[] tmp_constituentArray;
-		      delete[] tmpEdgeCount;
-		      return MED_ERROR ;
-		    }
+									int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
+																			spaceDimension,tmp_constituentArray,
+																			med_2_3::MED_FULL_INTERLACE,NULL,0,med_2_3::MED_MAILLE,med_type,med_2_3::MED_NOD);
+									if ( err != MED_VALID) 
+										{
+											MESSAGE(LOC<<": MEDconnLire returns "<<err) ;
+											delete constituent ;
+											delete[] tmp_constituentArray;
+											delete[] tmpEdgeCount;
+											return MED_ERROR ;
+										}
 
-		  int * constituentArray = NodalValue + NodalIndex[constituent->_count[i]-1]-1 ;
+									int * constituentArray = NodalValue + NodalIndex[constituent->_count[i]-1]-1 ;
 	  
-	  // version originale sans prise en compte des numéros optionnels	
-	  //
-		  int multi = 0; // quand est-ce que multi vaut 1 ?? en MED-fichier < 2.2 ??
-	      MESSAGE(LOC << "Med file version used here " << major << " " << minor << " " << release);
+									// version originale sans prise en compte des numéros optionnels	
+									//
+									int multi = 0; // quand est-ce que multi vaut 1 ?? en MED-fichier < 2.2 ??
+									MESSAGE(LOC << "Med file version used here " << major << " " << minor << " " << release);
 
-	      if ((major == 2) && (minor <= 1))
-		  for (int j=0; j<tmp_numberOfEdges; j++)
-		    for (int k=0; k<NumberOfNodeByEdge; k++)
-		    constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge+multi)+k] ;
-	      else if ((major == 2) && (minor >= 2))
-		for (int j=0; j<tmp_numberOfEdges; j++)
-		  for (int k=0; k<NumberOfNodeByEdge; k++)
-		    constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge)+k] ;
+									if ((major == 2) && (minor <= 1))
+										for (int j=0; j<tmp_numberOfEdges; j++)
+											for (int k=0; k<NumberOfNodeByEdge; k++)
+												constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge+multi)+k] ;
+									else if ((major == 2) && (minor >= 2))
+										for (int j=0; j<tmp_numberOfEdges; j++)
+											for (int k=0; k<NumberOfNodeByEdge; k++)
+												constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge)+k] ;
 
-		  //////////////////////////////////////////////////////////////////////////////////////
-		  ///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
-		      //////////////////////////////////////////////////////////////////////////////////////
-		      ///
-		      /// Rénumérote le tableau temporaire tmp_constituentArray en utilisant _optionnalToCanonicNodesNumbers
-		      /// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
+									//////////////////////////////////////////////////////////////////////////////////////
+									///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
+										//////////////////////////////////////////////////////////////////////////////////////
+										///
+										/// Rénumérote le tableau temporaire tmp_constituentArray en utilisant _optionnalToCanonicNodesNumbers
+										/// Le traitement est identique à la version originelle s'il n'y a pas de numérotation optionnelle
 	
-		      // 	if (_ptrMesh->_arePresentOptionnalNodesNumbers) 
-		      // 		{
-		      // 		for (int j=0; j<tmp_numberOfEdges; j++) for (int k=0; k<NumberOfNodeByEdge; k++)
-		      // 			constituentArray[j*NumberOfNodeByEdge+k]=_ptrMesh->_optionnalToCanonicNodesNumbers[tmp_constituentArray[j*(NumberOfNodeByEdge+1)+k]] ;
-		      // 		}
-		      // 	else
-		      // 		{
-		      // 		for (int j=0; j<tmp_numberOfEdges; j++) for (int k=0; k<NumberOfNodeByEdge; k++)
-		      // 			constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge+1)+k] ;
-		      // 		}
+										// 	if (_ptrMesh->_arePresentOptionnalNodesNumbers) 
+										// 		{
+										// 		for (int j=0; j<tmp_numberOfEdges; j++) for (int k=0; k<NumberOfNodeByEdge; k++)
+										// 			constituentArray[j*NumberOfNodeByEdge+k]=_ptrMesh->_optionnalToCanonicNodesNumbers[tmp_constituentArray[j*(NumberOfNodeByEdge+1)+k]] ;
+										// 		}
+										// 	else
+										// 		{
+										// 		for (int j=0; j<tmp_numberOfEdges; j++) for (int k=0; k<NumberOfNodeByEdge; k++)
+										// 			constituentArray[j*NumberOfNodeByEdge+k]=tmp_constituentArray[j*(NumberOfNodeByEdge+1)+k] ;
+										// 		}
   	
-		      //////////////////////////////////////////////////////////////////////////////////////
+										//////////////////////////////////////////////////////////////////////////////////////
 
-		      delete[] tmp_constituentArray;
-		}
+										delete[] tmp_constituentArray;
+								}
 
-	      constituent->_nodal = new MEDSKYLINEARRAY(constituent->_count[constituent->_numberOfTypes]-1,
-							size,
-							NodalIndex,
-							NodalValue) ;
+							constituent->_nodal = new MEDSKYLINEARRAY(constituent->_count[constituent->_numberOfTypes]-1,
+																												size,
+																												NodalIndex,
+																												NodalValue) ;
 
-	      delete[] NodalIndex ;
-	      delete[] NodalValue ;
+							delete[] NodalIndex ;
+							delete[] NodalValue ;
 
-	      if (Connectivity->_entityDimension == 3) 
-		{
-		  if (Connectivity->_constituent==NULL)
-		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Edges are defined but there are no Faces !"));
-		  Connectivity->_constituent->_constituent = constituent ;
-		} else 
-		  Connectivity->_constituent = constituent ;
-	    }
-
-	  delete[] tmpEdgeCount; 
-
-      
-	} // end classic geometric types
+							if (Connectivity->_entityDimension == 3) 
+								{
+									if (Connectivity->_constituent==NULL)
+										throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Edges are defined but there are no Faces !"));
+									Connectivity->_constituent->_constituent = constituent ;
+								} else 
+								Connectivity->_constituent = constituent ;
+						}
+		
+					delete[] tmpEdgeCount; 
+		
+    
+				} // end classic geometric types
       else
         {//Polyg/Polh only...
           delete [] Connectivity->_count;
@@ -1404,27 +1367,23 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
           Connectivity->_count[0]=1;
         }
       delete[] tmp_cells_count;
-
-      int NumberOfPolygons = 0;
-      if (_ptrMesh->_meshDimension != 3 || Connectivity->_entity != MED_EN::MED_CELL)// In the contrary case no search of polygons needed
-      {
-        // Lecture des polygones MED_CELL
-        NumberOfPolygons = MEDnEntMaa(_medIdt,
-                                      const_cast <char *> (_ptrMesh->_name.c_str()),
-                                      med_2_3::MED_CONN,
-                                      med_2_3::MED_MAILLE,
-                                      med_2_3::MED_POLYGONE,
-                                      med_2_3::MED_NOD);
-
-        // Correction to permit the loading of mesh dimensionned at 2 even
-        // if it has only MED_POLYGON elements
-
-        if (NumberOfPolygons > 0)
+			
+      int NumberOfPolygons  = MEDnEntMaa(_medIdt,
+																				 const_cast <char *> (_ptrMesh->_name.c_str()),
+																				 med_2_3::MED_CONN,
+																				 med_2_3::MED_MAILLE,
+																				 med_2_3::MED_POLYGONE,
+																				 med_2_3::MED_NOD);
+			
+			// Correction to permit the loading of mesh dimensionned at 2 even
+			// if it has only MED_POLYGON elements
+			
+			if (NumberOfPolygons > 0)
         {
           if (Connectivity->_entityDimension < 2) Connectivity->_entityDimension = 2;
         }
-
-        if (NumberOfPolygons > 0)
+			
+			if (NumberOfPolygons > 0)
         {
           // By consequence this exception will never occur
           if (Connectivity->_entityDimension == 1)
@@ -1436,14 +1395,14 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
                                                   med_2_3::MED_NOD,
                                                   &ConnectivitySize);
           if (err1 != MED_VALID)
-          {
-            MESSAGE(LOC<<": MEDpolygoneInfo returns "<<err1);
-            return MED_ERROR;
-          }
-
+						{
+							MESSAGE(LOC<<": MEDpolygoneInfo returns "<<err1);
+							return MED_ERROR;
+						}
+					
           med_2_3::med_int* PolygonsConnectivity = new med_2_3::med_int[ConnectivitySize];
           med_2_3::med_int* PolygonsConnectivityIndex = new med_2_3::med_int[NumberOfPolygons+1];
-
+					
           med_2_3::med_err err2 = MEDpolygoneConnLire(_medIdt,
                                                       const_cast <char *> (_ptrMesh->_name.c_str()),
                                                       PolygonsConnectivityIndex,
@@ -1452,154 +1411,153 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
                                                       med_2_3::MED_MAILLE,
                                                       med_2_3::MED_NOD);
           if (err2 != MED_VALID)
-          {
-            MESSAGE(LOC<<": MEDpolygoneConnLire returns "<<err2);
-            return MED_ERROR;
-          }
+						{
+							MESSAGE(LOC<<": MEDpolygoneConnLire returns "<<err2);
+							return MED_ERROR;
+						}
 
           if (Connectivity->_entityDimension == 2) // 2D mesh : polygons in Connectivity
-          {
-//CCRT
+						{
+							//CCRT
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-            int* tmp_PolygonsConnectivity = new int[ConnectivitySize];
-            int i ;
-            for ( i = 0 ; i < ConnectivitySize ; i++ )
-              tmp_PolygonsConnectivity[i] = PolygonsConnectivity[i] ;
+							int* tmp_PolygonsConnectivity = new int[ConnectivitySize];
+							int i ;
+							for ( i = 0 ; i < ConnectivitySize ; i++ )
+								tmp_PolygonsConnectivity[i] = PolygonsConnectivity[i] ;
 
-            int* tmp_PolygonsConnectivityIndex = new int[NumberOfPolygons+1];
-            for ( i = 0 ; i < NumberOfPolygons+1 ; i++ )
-              tmp_PolygonsConnectivityIndex[i] = PolygonsConnectivityIndex[i] ;
+							int* tmp_PolygonsConnectivityIndex = new int[NumberOfPolygons+1];
+							for ( i = 0 ; i < NumberOfPolygons+1 ; i++ )
+								tmp_PolygonsConnectivityIndex[i] = PolygonsConnectivityIndex[i] ;
 
-            Connectivity->setPolygonsConnectivity
-              (MED_NODAL, (medEntityMesh) Entity, tmp_PolygonsConnectivity,
-               tmp_PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
+							Connectivity->setPolygonsConnectivity
+								(MED_NODAL, (medEntityMesh) Entity, tmp_PolygonsConnectivity,
+								 tmp_PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
 
-            delete [] tmp_PolygonsConnectivity ;
-            delete [] tmp_PolygonsConnectivityIndex ;
+							delete [] tmp_PolygonsConnectivity ;
+							delete [] tmp_PolygonsConnectivityIndex ;
 #else
-            Connectivity->setPolygonsConnectivity
-              (MED_NODAL, (medEntityMesh) Entity, PolygonsConnectivity,
-               PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
+							Connectivity->setPolygonsConnectivity
+								(MED_NODAL, (medEntityMesh) Entity, PolygonsConnectivity,
+								 PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
 #endif
-          }
+						}
           else if (Connectivity->_entityDimension == 3)
-          {
-            if (Connectivity->_constituent == NULL) // 3D mesh : polygons in Connectivity->_constituent
-              Connectivity->_constituent = new CONNECTIVITY(MED_FACE);
-//CCRT
+						{
+							if (Connectivity->_constituent == NULL) // 3D mesh : polygons in Connectivity->_constituent
+								Connectivity->_constituent = new CONNECTIVITY(MED_FACE);
+							//CCRT
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-            int* tmp_PolygonsConnectivity = new int[ConnectivitySize];
-            int i ;
-            for ( i = 0 ; i < ConnectivitySize ; i++ )
-              tmp_PolygonsConnectivity[i] = PolygonsConnectivity[i] ;
+							int* tmp_PolygonsConnectivity = new int[ConnectivitySize];
+							int i ;
+							for ( i = 0 ; i < ConnectivitySize ; i++ )
+								tmp_PolygonsConnectivity[i] = PolygonsConnectivity[i] ;
 
-            int* tmp_PolygonsConnectivityIndex = new int[NumberOfPolygons+1];
-            for ( i = 0 ; i < NumberOfPolygons+1 ; i++ )
-              tmp_PolygonsConnectivityIndex[i] = PolygonsConnectivityIndex[i] ;
+							int* tmp_PolygonsConnectivityIndex = new int[NumberOfPolygons+1];
+							for ( i = 0 ; i < NumberOfPolygons+1 ; i++ )
+								tmp_PolygonsConnectivityIndex[i] = PolygonsConnectivityIndex[i] ;
 
-            Connectivity->_constituent->setPolygonsConnectivity
-              (MED_NODAL, MED_FACE, tmp_PolygonsConnectivity,
-               tmp_PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
+							Connectivity->_constituent->setPolygonsConnectivity
+								(MED_NODAL, MED_FACE, tmp_PolygonsConnectivity,
+								 tmp_PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
 
-            delete [] tmp_PolygonsConnectivity ;
-            delete [] tmp_PolygonsConnectivityIndex ;
+							delete [] tmp_PolygonsConnectivity ;
+							delete [] tmp_PolygonsConnectivityIndex ;
 #else
-            Connectivity->_constituent->setPolygonsConnectivity
-              (MED_NODAL, MED_FACE, PolygonsConnectivity,
-               PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
+							Connectivity->_constituent->setPolygonsConnectivity
+								(MED_NODAL, MED_FACE, PolygonsConnectivity,
+								 PolygonsConnectivityIndex, ConnectivitySize, NumberOfPolygons);
 #endif
-          }
+						}
 
           delete[] PolygonsConnectivity;
           delete[] PolygonsConnectivityIndex;
         } // end polygons
-      }// end test on CELL
-
-
+			
+			
       // Lecture des polyedres MED_CELL
       med_int NumberOfPolyhedron = MEDnEntMaa(_medIdt,
-					      const_cast <char *> (_ptrMesh->_name.c_str()),
-					      med_2_3::MED_CONN,
-					      Entity,
-					      med_2_3::MED_POLYEDRE,
-					      med_2_3::MED_NOD);
+																							const_cast <char *> (_ptrMesh->_name.c_str()),
+																							med_2_3::MED_CONN,
+																							Entity,
+																							med_2_3::MED_POLYEDRE,
+																							med_2_3::MED_NOD);
 
       // Correction to permit the loading of mesh dimensionned at 3 even
       // if it has only MED_POLYEDRE elements
 
       if (NumberOfPolyhedron > 0)
-	{
-	  Connectivity->_entityDimension = 3;
-	}
+				{
+					Connectivity->_entityDimension = 3;
+				}
 
       if (NumberOfPolyhedron > 0)
-	{
-	  // By consequence this exception will never occur
-	  if (Connectivity->_entityDimension == 2 || Connectivity->_entityDimension == 1)
-	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 3D mesh, polyhedron need at least one 3D cell of a classic geometric type !"));
-	  med_2_3::med_int FacesIndexSize, NumberOfNodes, NumberOfFaces;
-	  med_2_3::med_err err3 = MEDpolyedreInfo(_medIdt,
-						  const_cast <char *> (_ptrMesh->_name.c_str()),
-						  med_2_3::MED_NOD,
-						  &FacesIndexSize,
-						  &NumberOfNodes);
-	  NumberOfFaces = FacesIndexSize-1;
-	  if (err3 != MED_VALID)
-	    {
-	      MESSAGE(LOC<<": MEDpolyhedreInfo returns "<<err3);
-	      return MED_ERROR;
-	    }
+				{
+					// By consequence this exception will never occur
+					if (Connectivity->_entityDimension == 2 || Connectivity->_entityDimension == 1)
+						throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"In a 3D mesh, polyhedron need at least one 3D cell of a classic geometric type !"));
+					med_2_3::med_int FacesIndexSize, NumberOfNodes, NumberOfFaces;
+					med_2_3::med_err err3 = MEDpolyedreInfo(_medIdt,
+																									const_cast <char *> (_ptrMesh->_name.c_str()),
+																									med_2_3::MED_NOD,
+																									&FacesIndexSize,
+																									&NumberOfNodes);
+					NumberOfFaces = FacesIndexSize-1;
+					if (err3 != MED_VALID)
+						{
+							MESSAGE(LOC<<": MEDpolyhedreInfo returns "<<err3);
+							return MED_ERROR;
+						}
       
-	  med_2_3::med_int* Nodes = new med_2_3::med_int[NumberOfNodes];
-	  med_2_3::med_int* FacesIndex = new med_2_3::med_int[NumberOfFaces+1];
-	  med_2_3::med_int* PolyhedronIndex = new med_2_3::med_int[NumberOfPolyhedron+1];
+					med_2_3::med_int* Nodes = new med_2_3::med_int[NumberOfNodes];
+					med_2_3::med_int* FacesIndex = new med_2_3::med_int[NumberOfFaces+1];
+					med_2_3::med_int* PolyhedronIndex = new med_2_3::med_int[NumberOfPolyhedron+1];
 	  
-	  med_2_3::med_err err4 = MEDpolyedreConnLire(_medIdt,
-						      const_cast <char *> (_ptrMesh->_name.c_str()),
-						      PolyhedronIndex,
-						      NumberOfPolyhedron+1,
-						      FacesIndex,
-						      NumberOfFaces+1,
-						      Nodes,
-						      med_2_3::MED_NOD);
-	  if (err4 != MED_VALID)
-	    {
-	      MESSAGE(LOC<<": MEDpolyedreConnLire returns "<<err4);
-	      return MED_ERROR;
-	    }
+					med_2_3::med_err err4 = MEDpolyedreConnLire(_medIdt,
+																											const_cast <char *> (_ptrMesh->_name.c_str()),
+																											PolyhedronIndex,
+																											NumberOfPolyhedron+1,
+																											FacesIndex,
+																											NumberOfFaces+1,
+																											Nodes,
+																											med_2_3::MED_NOD);
+					if (err4 != MED_VALID)
+						{
+							MESSAGE(LOC<<": MEDpolyedreConnLire returns "<<err4);
+							return MED_ERROR;
+						}
       
-//CCRT
+					//CCRT
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-	  int* tmp_Nodes = new int[NumberOfNodes];
+					int* tmp_Nodes = new int[NumberOfNodes];
           int i ;
           for ( i = 0 ; i < NumberOfNodes ; i++ )
-             tmp_Nodes[i] = Nodes[i] ;
-	  int* tmp_FacesIndex = new int[NumberOfFaces+1];
+						tmp_Nodes[i] = Nodes[i] ;
+					int* tmp_FacesIndex = new int[NumberOfFaces+1];
           for ( i = 0 ; i < NumberOfFaces+1 ; i++ )
-             tmp_FacesIndex[i] = FacesIndex[i] ;
-	  int* tmp_PolyhedronIndex = new int[NumberOfPolyhedron+1];
+						tmp_FacesIndex[i] = FacesIndex[i] ;
+					int* tmp_PolyhedronIndex = new int[NumberOfPolyhedron+1];
           for ( i = 0 ; i < NumberOfPolyhedron+1 ; i++ )
-             tmp_PolyhedronIndex[i] = PolyhedronIndex[i] ;
-	  Connectivity->setPolyhedronConnectivity(MED_NODAL,tmp_Nodes,tmp_PolyhedronIndex,NumberOfNodes,NumberOfPolyhedron,tmp_FacesIndex,NumberOfFaces);
-	  delete[] tmp_Nodes;
-	  delete[] tmp_FacesIndex;
-	  delete[] tmp_PolyhedronIndex;
+						tmp_PolyhedronIndex[i] = PolyhedronIndex[i] ;
+					Connectivity->setPolyhedronConnectivity(MED_NODAL,tmp_Nodes,tmp_PolyhedronIndex,NumberOfNodes,NumberOfPolyhedron,tmp_FacesIndex,NumberOfFaces);
+					delete[] tmp_Nodes;
+					delete[] tmp_FacesIndex;
+					delete[] tmp_PolyhedronIndex;
 #else
-	  Connectivity->setPolyhedronConnectivity(MED_NODAL,Nodes,PolyhedronIndex,NumberOfNodes,NumberOfPolyhedron,FacesIndex,NumberOfFaces);
+					Connectivity->setPolyhedronConnectivity(MED_NODAL,Nodes,PolyhedronIndex,NumberOfNodes,NumberOfPolyhedron,FacesIndex,NumberOfFaces);
 #endif
 	  
-	  delete[] Nodes;
-	  delete[] FacesIndex;
-	  delete[] PolyhedronIndex;
-	} // end polyhedron
+					delete[] Nodes;
+					delete[] FacesIndex;
+					delete[] PolyhedronIndex;
+				} // end polyhedron
 
 
 
       // If there is no nodal connectivity, we return MED_ERROR !
       if (Connectivity->_numberOfTypes == 0 && NumberOfPolygons == 0 && NumberOfPolyhedron == 0)
-	return MED_ERROR;
+				return MED_ERROR;
       else
-	return MED_VALID;
+				return MED_VALID;
 
     }
   return MED_ERROR;

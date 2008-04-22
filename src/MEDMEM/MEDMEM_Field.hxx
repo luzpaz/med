@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <math.h>
 #include <cmath>
+#include <float.h>
 
 #include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_Exception.hxx"
@@ -45,17 +46,7 @@
 #include "MEDMEM_FieldForward.hxx"
 #include "MEDMEM_GaussLocalization.hxx"
 
-#define DBL_MAX 1.0E+308
-#define DBL_MIN -1.0E+308
 
-/*!
-
-  This class contains all the informations related with a template class FIELD :
-  - Components descriptions
-  - Time step description
-  - Location of the values (a SUPPORT class)
-
-*/
 
 namespace MEDMEM {
 
@@ -82,6 +73,146 @@ namespace MEDMEM {
   template < > struct SET_VALUE_TYPE<int> {
     static const MED_EN::med_type_champ _valueType = MED_EN::MED_INT32; };
 
+	/*!\defgroup FIELD_io Reading and writing files
+
+Fields can be read or written to/from MED files.
+
+\par Reading fields
+
+ For reading a field a typical use consists in :
+- reading the mesh associated on which the field lies
+- retrieve the support on which the field will be defined
+- read the field, specifying its time step and order number
+
+As an example :
+\verbatim
+//reading mesh from file
+MESH mesh(MED_DRIVER, "file.med", "my_Mesh");
+//retrieving group in the mesh structure
+GROUP* group= mesh->getGroup("myGroup");
+//reading the field from the file
+FIELD<double> field(group,MED_DRIVER,"file.med","my_Field",1,1);
+\endverbatim
+
+If the field is defined on all elements, one could have :
+\verbatim
+//reading mesh from file
+MESH mesh(MED_DRIVER, "file.med", "my_Mesh");
+//creating a support on all faces
+SUPPORT support (mesh,"mySupport",MED_FACE);
+//reading the field from the file
+FIELD<double> field(&support,MED_DRIVER,"file.med","my_FieldOnFaces",1,1);
+\endverbatim
+
+It is also possible to read a field without specifying its support. In this case, the field constructor 
+creates a support with no link to the initial mesh:
+\verbatim
+FIELD<double> field(MED_DRIVER, "file.med", "myField",1,1);
+SUPPORT* support= field->getSupport();
+\endverbatim
+
+See also \ref FIELD_constructors
+
+\par Writing fields
+
+When it comes to write fields, it is necessary to use addDriver and then write.
+A typical use will be :
+
+\verbatim
+mesh.addDriver(MED_DRIVER, "myResultFile.med", "myMesh");
+mesh.write();
+field.addDriver(MED_DRIVER, "myResultFile.med, "myField");
+field.write();
+\endverbatim
+
+\defgroup FIELD_constructors
+
+The different field constructors correspond to the two main 
+ways a field is used :
+- either it is read from a file to be consulted,
+- or it can be created from scratch with a link to a support on which the values will be built.
+
+\defgroup FIELD_algo Numerical operations on fields
+This section groups together the different operators that enable the user to 
+treat the FIELD objects as high-level numerical arrays, giving operators for 
+numerical treatment (overloading of basic operators, algorithms, etc...)
+
+\defgroup FIELD_getset Basic Get/Set operations
+
+This sections groups together the basic operations
+that describe access to all the elements constitutive of the description of the field :
+- name (compulsory),
+- time iteration number(compulsory),
+- inner loop iteration number(compulsory),
+- time(compulsory),
+- description(optional), 
+- number of components(compulsory),
+- components names(optional),
+- components description(optional).
+
+Some of these items are compulsory because they are essential to the field in order to define
+its structure or to be identified inside a MED file during the write process. The other ones 
+are there for additional information and can be overlooked if not necessary.
+
+When creating a field by reading a file, all the parameters are set according to the file 
+data and can be consulted via the get methods. When creating a file from scratch, the
+ name and number of components are set by the constructor, but the other items have to be
+ set via the setXXX methods.
+
+\defgroup FIELD_gauss Gauss points
+
+In MED, it is possible to declare a Gauss model that 
+describes the location of Gauss points in a reference cell.
+This Gauss model definition is contained in the 
+\a GAUSS_LOCALIZATION class. A \a GAUSS_LOCALIZATION object
+is associated to a field and to a type.
+
+It is not permitted to define a Gauss model in a polygonal 
+or polyhedric element.
+
+The Gauss model can be :
+- loaded from a MED file,
+- written to a MED file,
+- used to define a FIELD with multiple localizations per element.
+
+\section gauss_constructors Constructing a Gauss Model
+
+A Gauss model can be constructed with the following constructor :
+\param locName defines a name associated with the gauss model
+\param typeGeo names the type to which the Gauss model is assocaited  
+\param nGauss defines the number of Gauss points
+\param cooRef defines an array giving the coordinates of the nodes of the reference element (dimension : spaceDimension * number of nodes for type \a typeGeo)
+\param cooGauss defines an array giving the coordinates of the nodes of the Gauss points (dimension : spaceDimension * \a nGauss
+)
+\param wg weights associated with each Gauss point (dimension : \a nGauss)
+
+Example : in 2D, a Gauss model definition for a triangle 
+would be written as :
+
+\code
+string locname("gauss model");
+double cooRef[6] ={0.0, 0.0, 1.0, 0.0, 0.0, 1.0};
+double cooGauss[6]={0.2, 0.2, 0.8, 0.1, 0.1, 0.8};
+double wg[3]={0.3334, 0.3334, 0.3334};
+GAUSS_LOCALIZATION model(locname, 
+			 MED_EN::MED_TRIA3,  
+			 3,
+			 cooRef,
+			 cooGauss,
+			 wg);
+\endcode
+
+*/
+	
+
+/*!
+
+  This class contains all the informations related with a template class FIELD :
+  - Components descriptions
+  - Time step description
+  - Location of the values (a SUPPORT class)
+
+*/
 class MEDMEM_EXPORT FIELD_    // GENERIC POINTER TO a template <class T, class INTERLACING_TAG> class FIELD
 {
 protected:
@@ -222,12 +353,14 @@ public:
     Constructor.
   */
   FIELD_ ();
-  /*!
+  /*! \ifnot MEDMEM_ug
     Constructor.
+\endif
   */
   FIELD_(const SUPPORT * Support, const int NumberOfComponents);
-  /*!
+  /*!  \ifnot MEDMEM_ug
     Copy constructor.
+\endif
   */
   FIELD_(const FIELD_ &m);
 
@@ -239,6 +372,20 @@ public:
  FIELD_& operator=(const FIELD_ &m);
 
   virtual  void     rmDriver(int index=0);
+
+  /*! \if MEDMEM_ug
+    \addtogroup FIELD_io
+    @{
+    \endif
+  */
+  
+  /*! Creates a driver for reading/writing fields in a file.
+    \param driverType specifies the file type (MED_DRIVER, VTK_DRIVER)
+    \param fileName name of the output file
+    \param driverFieldName name of the field
+    \param access specifies whether the file is opened for read, write or both.
+  */
+
   virtual   int     addDriver(driverTypes driverType,
                               const string & fileName="Default File Name.med",
 			      const string & driverFieldName="Default Field Nam",
@@ -249,7 +396,11 @@ public:
   virtual  void     read(int index=0);
   virtual  void     openAppend( void );
   virtual  void     write(const GENDRIVER &);
+
+  /*! Triggers the writing of the field with respect to the driver handle
+    \a index given by \a addDriver(...) method. */
   virtual  void     write(int index=0, const string & driverName="");
+  /*!\if MEDMEM_ug @} \endif */
 
   virtual  void     writeAppend(const GENDRIVER &);
   virtual  void     writeAppend(int index=0, const string & driverName="");
@@ -306,50 +457,56 @@ protected:
 // -----------------
 // Methodes Inline
 // -----------------
+/*! \if MEDMEM_ug 
+\addtogroup FIELD_getset
+@{
+\endif
+*/
 /*!
-  Set FIELD name.
+  Sets FIELD name. The length should not exceed MED_TAILLE_NOM
+as defined in Med (i.e. 32 characters).
 */
 inline void FIELD_::setName(const string Name)
 {
   _name=Name;
 }
 /*!
-  Get FIELD name.
+  Gets FIELD name.
 */
 inline string FIELD_::getName() const
 {
   return _name;
 }
 /*!
-  Set FIELD description.
+  Sets FIELD description. The length should not exceed MED_TAILLE_DESC as defined in Med (i.e. 200 characters).
 */
 inline void FIELD_::setDescription(const string Description)
 {
   _description=Description;
 }
 /*!
-  Get FIELD description.
+  Gets FIELD description.
 */
 inline string FIELD_::getDescription() const
 {
   return _description;
 }
 /*!
-  Set FIELD number of components.
+  Sets FIELD number of components.
 */
 inline void FIELD_::setNumberOfComponents(const int NumberOfComponents)
 {
   _numberOfComponents=NumberOfComponents;
 }
 /*!
-  Get FIELD number of components.
+  Gets FIELD number of components.
 */
 inline int FIELD_::getNumberOfComponents() const
 {
   return _numberOfComponents ;
 }
 /*!
-  Set FIELD number of values.
+  Sets FIELD number of values.
 
   It must be the same than in the associated SUPPORT object.
 */
@@ -358,7 +515,7 @@ inline void FIELD_::setNumberOfValues(const int NumberOfValues)
   _numberOfValues=NumberOfValues;
 }
 /*!
-  Get FIELD number of value.
+  Gets FIELD number of value.
 */
 inline int FIELD_::getNumberOfValues() const
 {
@@ -379,9 +536,9 @@ inline int FIELD_::getNumberOfValues() const
 //  }
 
 /*!
-  Set FIELD components names.
+  Sets FIELD components names.
 
-  Duplicate the ComponentsNames string array to put components names in
+  Duplicates the ComponentsNames string array to put components names in
   FIELD. ComponentsNames size must be equal to number of components.
 */
 inline void FIELD_::setComponentsNames(const string * ComponentsNames)
@@ -391,17 +548,18 @@ inline void FIELD_::setComponentsNames(const string * ComponentsNames)
   for (int i=0; i<_numberOfComponents; i++)
     _componentsNames[i]=ComponentsNames[i] ;
 }
-/*!
-  Set FIELD i^th component name.
+/*! \ifnot MEDMEM_ug
+  Sets FIELD i^th component name.
 
   i must be >=1 and <= number of components.
+\endif
 */
 inline void FIELD_::setComponentName(int i, const string ComponentName)
 {
   _componentsNames[i-1]=ComponentName ;
 }
 /*!
-  Get a reference to the string array which contain the components names.
+  Gets a reference to the string array which contain the components names.
 
   This Array size is equal to number of components
 */
@@ -409,17 +567,18 @@ inline const string * FIELD_::getComponentsNames() const
 {
   return _componentsNames ;
 }
-/*!
-  Get the name of the i^th component.
+/*!\ifnot MEDMEM_ug
+  Gets the name of the i^th component.
+\endif
 */
 inline string FIELD_::getComponentName(int i) const
 {
   return _componentsNames[i-1] ;
 }
 /*!
-  Set FIELD components descriptions.
+  Sets FIELD components descriptions.
 
-  Duplicate the ComponentsDescriptions string array to put components
+  Duplicates the ComponentsDescriptions string array to put components
   descriptions in FIELD.
   ComponentsDescriptions size must be equal to number of components.
 */
@@ -430,17 +589,18 @@ inline void FIELD_::setComponentsDescriptions(const string * ComponentsDescripti
   for (int i=0; i<_numberOfComponents; i++)
     _componentsDescriptions[i]=ComponentsDescriptions[i] ;
 }
-/*!
-  Set FIELD i^th component description.
+/*!\ifnot MEDMEM_ug
+  Sets FIELD i^th component description.
 
   i must be >=1 and <= number of components.
+\endif
 */
 inline void FIELD_::setComponentDescription(int i,const string ComponentDescription)
 {
   _componentsDescriptions[i-1]=ComponentDescription ;
 }
 /*!
-  Get a reference to the string array which contain the components descriptions.
+  Gets a reference to the string array which contain the components descriptions.
 
   This Array size is equal to number of components
 */
@@ -448,21 +608,23 @@ inline const string * FIELD_::getComponentsDescriptions() const
 {
   return _componentsDescriptions ;
 }
-/*!
-  Get the description of the i^th component.
+/*!\ifnot MEDMEM_ug
+  Gets the description of the i^th component.
+\endif
 */
 inline string FIELD_::getComponentDescription(int i) const
 {
   return _componentsDescriptions[i-1];
 }
 
-/*!
+/*!\ifnot MEDMEM_ug
   \todo
-  Set FIELD components UNIT.
+  Sets FIELD components UNIT.
 
-  Duplicate the ComponentsUnits UNIT array to put components
+  Duplicates the ComponentsUnits UNIT array to put components
   units in FIELD.
   ComponentsUnits size must be equal to number of components.
+\endif
 */
 inline void FIELD_::setComponentsUnits(const UNIT * ComponentsUnits)
 {
@@ -471,26 +633,28 @@ inline void FIELD_::setComponentsUnits(const UNIT * ComponentsUnits)
   for (int i=0; i<_numberOfComponents; i++)
     _componentsUnits[i]=ComponentsUnits[i] ;
 }
-/*!
-  Get a reference to the UNIT array which contain the components units.
+/*!\ifnot MEDMEM_ug
+  Gets a reference to the UNIT array which contain the components units.
 
-  This Array size is equal to number of components
+  This array size is equal to number of components
+\endif
 */
 inline const UNIT * FIELD_::getComponentsUnits() const
 {
   return _componentsUnits ;
 }
-/*!
-  Get the UNIT of the i^th component.
+/*!\ifnot MEDMEM_ug
+  Gets the UNIT of the i^th component.
+\endif
 */
 inline const UNIT * FIELD_::getComponentUnit(int i) const
 {
   return &_componentsUnits[i-1] ;
 }
 /*!
-  Set FIELD components unit.
+  Sets FIELD components unit.
 
-  Duplicate the MEDComponentsUnits string array to put components
+  Duplicates the MEDComponentsUnits string array to put components
   units in FIELD.
   MEDComponentsUnits size must be equal to number of components.
 
@@ -502,61 +666,63 @@ inline void FIELD_::setMEDComponentsUnits(const string * MEDComponentsUnits)
   for (int i=0; i<_numberOfComponents; i++)
     _MEDComponentsUnits[i]=MEDComponentsUnits[i] ;
 }
-/*!
-  Set FIELD i^th component unit.
+/*!\ifnot MEDMEM_ug
+  Sets FIELD i^th component unit.
 
   i must be >=1 and <= number of components.
+\endif
 */
 inline void FIELD_::setMEDComponentUnit(int i, const string MEDComponentUnit)
 {
   _MEDComponentsUnits[i-1]=MEDComponentUnit ;
 }
 /*!
-  Get a reference to the string array which contain the components units.
+  Gets a reference to the string array which contain the components units.
 
-  This Array size is equal to number of components
+  This array size is equal to number of components
 */
 inline const string * FIELD_::getMEDComponentsUnits() const
 {
   return _MEDComponentsUnits ;
 }
-/*!
-  Get the string for unit of the i^th component.
+/*! \ifnot MEDMEM_ug
+  Gets the string for unit of the i^th component.
+\endif
 */
 inline string FIELD_::getMEDComponentUnit(int i) const
 {
   return _MEDComponentsUnits[i-1] ;
 }
 /*!
-  Set the iteration number where FIELD has been calculated.
+  Sets the iteration number where FIELD has been calculated.
 */
 inline void FIELD_::setIterationNumber(int IterationNumber)
 {
   _iterationNumber=IterationNumber;
 }
 /*!
-  Get the iteration number where FIELD has been calculated.
+  Gets the iteration number where FIELD has been calculated.
 */
 inline int FIELD_::getIterationNumber() const
 {
   return _iterationNumber ;
 }
 /*!
-  Set the time (in second) where FIELD has been calculated.
+  Sets the time when FIELD has been calculated.
 */
 inline void FIELD_::setTime(double Time)
 {
   _time=Time ;
 }
 /*!
-  Get the time (in second) where FIELD has been calculated.
+  Gets the time when FIELD has been calculated.
 */
 inline double FIELD_::getTime() const
 {
   return _time ;
 }
 /*!
-  Set the order number where FIELD has been calculated.
+  Sets the order number where FIELD has been calculated.
 
   It corresponds to internal iteration during one time step.
 */
@@ -565,21 +731,21 @@ inline void FIELD_::setOrderNumber(int OrderNumber)
   _orderNumber=OrderNumber ;
 }
 /*!
-  Get the order number where FIELD has been calculated.
+  Gets the order number where FIELD has been calculated.
 */
 inline int FIELD_::getOrderNumber() const
 {
   return _orderNumber ;
 }
 /*!
-  Get a reference to the SUPPORT object associated to FIELD.
+  Gets a reference to the SUPPORT object associated to FIELD.
 */
 inline  const SUPPORT * FIELD_::getSupport() const
 {
   return _support ;
 }
 /*!
-  Set the reference to the SUPPORT object associated to FIELD.
+  Sets the reference to the SUPPORT object associated to FIELD.
 
   Reference is not duplicate, so it must not be deleted.
 */
@@ -593,7 +759,7 @@ inline void FIELD_::setSupport(const SUPPORT * support)
     _support->addReference();
 }
 /*!
-  Get the FIELD med value type (MED_INT32 or MED_REEL64).
+  Gets the FIELD med value type (MED_INT32 or MED_REEL64).
 */
 inline MED_EN::med_type_champ FIELD_::getValueType () const
 {
@@ -601,21 +767,29 @@ inline MED_EN::med_type_champ FIELD_::getValueType () const
 }
 
 /*!
-  Get the FIELD med interlacing type (MED_FULL_INTERLACE, MED_NO_INTERLACE or MED_NO_INTERLACE_BY_TYPE).
+  Gets the FIELD med interlacing type (MED_FULL_INTERLACE or MED_NO_INTERLACE).
 */
   inline MED_EN::medModeSwitch FIELD_::getInterlacingType () const
 {
   return _interlacingType ;
 }
+ /*!\if MEDMEM_ug @} \endif*/
+
+/*!\if MEDMEM_ug 
+\addtogroup FIELD_gauss 
+@{ 
+\endif */
 
 /*!
-  Get the FIELD gauss presence.
+ Determines whether the field stores several Gauss points per element.
 */
   inline bool  FIELD_::getGaussPresence() const throw (MEDEXCEPTION)
 {
   const char * LOC = "FIELD_::getGaussPresence() : ";
   throw MEDEXCEPTION(STRING(LOC) << " This FIELD_ doesn't rely on a FIELD<T>" );
 }
+
+  /*!\if MEDMEM_ug @} \endif*/
 
 } //End namespace MEDMEM
 
@@ -631,6 +805,7 @@ inline MED_EN::med_type_champ FIELD_::getValueType () const
 
 */
 
+
 namespace MEDMEM {
 
   template<class T2> class MED_FIELD_RDONLY_DRIVER21;
@@ -638,6 +813,7 @@ namespace MEDMEM {
   template<class T2> class MED_FIELD_RDONLY_DRIVER22;
   template<class T2> class MED_FIELD_WRONLY_DRIVER22;
   template<class T2> class VTK_FIELD_DRIVER;
+
 
   template <class T,
 	    class INTERLACING_TAG
@@ -702,6 +878,8 @@ public:
   FIELD& operator-=(const FIELD& m);
   FIELD& operator*=(const FIELD& m);
   FIELD& operator/=(const FIELD& m);
+
+	void applyLin(T a, T b, int icomp);
   static FIELD* add(const FIELD& m, const FIELD& n);
   static FIELD* addDeep(const FIELD& m, const FIELD& n);
   static FIELD* sub(const FIELD& m, const FIELD& n);
@@ -767,16 +945,46 @@ public:
   inline bool            getGaussPresence() const throw (MEDEXCEPTION);
 
   inline int          getValueLength() const throw (MEDEXCEPTION);
+
+  /*! \if MEDMEM_ug 
+\addtogroup FIELD_value
+@{
+\endif  */
+  /*! Returns a pointer to the value array.*/
   inline const T*     getValue()       const throw (MEDEXCEPTION);
   inline const T*     getRow(int i)    const throw (MEDEXCEPTION);
   inline const T*     getColumn(int j) const throw (MEDEXCEPTION);
+/*!
+  Returns the value of \f$ i^{th} \f$ element and \f$ j^{th}\f$ component.
+  This method only works with fields having no particular Gauss point 
+definition (i.e., fields having one value per element).
+ This method makes the retrieval of the value independent from the
+  interlacing pattern, but it is slower than the complete retrieval 
+  obtained by the \b getValue() method.
+*/
+
   inline T            getValueIJ(int i,int j) const throw (MEDEXCEPTION);
+
+/*!
+  Returns the \f$ j^{th}\f$  component of \f$ k^{th}\f$  Gauss points of \f$ i^{th}\f$  value.
+  This method is compatible with elements having more than one Gauss point.
+  This method makes the retrieval of the value independent from the
+  interlacing pattern, but it is slower than the complete retrieval 
+  obtained by the \b getValue() method.
+*/
   inline T            getValueIJK(int i,int j,int k) const throw (MEDEXCEPTION);
 
   inline int          getValueByTypeLength(int t)                const throw (MEDEXCEPTION);
   inline const T*     getValueByType(int t)                      const throw (MEDEXCEPTION);
   inline T            getValueIJByType(int i,int j,int t)        const throw (MEDEXCEPTION);
   inline T            getValueIJKByType(int i,int j,int k,int t) const throw (MEDEXCEPTION);
+
+  /*!
+		The following example describes the creation of a FIELD.
+		
+		\example FIELDcreate.cxx
+
+ \if MEDMEM_ug @} \endif */
 
   bool                getValueOnElement(int eltIdInSup,T* retValues) const throw (MEDEXCEPTION);
 
@@ -794,10 +1002,27 @@ public:
   bool        isOnAllElements()           const throw (MEDEXCEPTION);
  
   inline void setArray(MEDMEM_Array_ *value) throw (MEDEXCEPTION);
+
+  /*! \if MEDMEM_ug
+ \addtogroup FIELD_value
+@{
+\endif
+  */
+/*!
+This method makes it possible to have the field pointing to 
+an existing value array. The ordering of the elements in the value array must 
+conform to the MEDMEM ordering (I,K,J) : the outer loop is on the elements,
+the intermediate loop is on the Gauss points, the inner loop is on 
+the components. 
+*/
   inline void setValue( T* value) throw (MEDEXCEPTION);
   inline void setRow( int i, T* value) throw (MEDEXCEPTION);
   inline void setColumn( int i, T* value) throw (MEDEXCEPTION);
+/*!
+  Sets the value of \f$ i^{th} \f$ element and \f$ j^{th}\f$ component with \a value.
+*/
   inline void setValueIJ(int i, int j, T value) throw (MEDEXCEPTION);
+  /*! \if MEDMEM_ug @} \endif */
   inline void setValueIJK(int i, int j, int k, T value) throw (MEDEXCEPTION);
   inline void setValueIJByType(int i, int j, int t, T value) throw (MEDEXCEPTION);
   inline void setValueIJKByType(int i, int j, int k, int t, T value) throw (MEDEXCEPTION);
@@ -886,9 +1111,27 @@ FIELD<T, INTERLACING_TAG>::FIELD():FIELD_()
   _value = ( ArrayNoGauss * ) NULL;
 }
 
+	/*!
+\addtogroup FIELD_constructors FIELD<T> constructors
+@{
+	*/
+
 /*!
-  Constructor with parameters such that all attrribut are set but the _value
-  attribut is allocated but not set.
+  Constructor that allocates the value array with the dimensions provided by
+\a NumberOfComponents and the dimension of \a Support. The value array is
+ allocated but not initialized.
+This constructor does not allow the creation of fields with Gauss points. 
+\param Support support on which the field lies
+\param NumberOfComponents number of components of the variable stored. For instance, 
+it will be 3 for a (vx,vy,vz) vector.
+
+\code
+FIELD<double> field (support, 3);
+int nbelem = support->getNumberOfElements(MED_ALL_ELEMENTS);
+for (int i=1; i<=nbelem; i++)
+   for (j=1; j<=3;j++)
+       field->setValueIJ(i,j,0.0);
+\endcode
 */
 template <class T, class INTERLACING_TAG>
 FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
@@ -925,7 +1168,9 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
 
   END_OF("FIELD<T>::FIELD(const SUPPORT * Support, const int NumberOfComponents)");
 }
-
+	/*!
+@}
+	*/
 /*!
   \if developper
   \endif
@@ -993,6 +1238,10 @@ FIELD<T, INTERLACING_TAG> & FIELD<T, INTERLACING_TAG>::operator=(const FIELD &m)
 
   return *this;
 }
+
+/*!\addtogroup FIELD_algo 
+@{
+*/
 
 /*!
      Overload addition operator.
@@ -1182,6 +1431,27 @@ FIELD<T, INTERLACING_TAG>& FIELD<T, INTERLACING_TAG>::operator-=(const FIELD & m
     return *this;
 }
 
+
+
+/*!  Apply to a given field component the linear function x -> ax+b.
+ *   calculation is done "in place".
+ */
+template <class T, class INTERLACIN_TAG> void FIELD<T, INTERLACIN_TAG>::applyLin(T a, T b, int icomp)
+{
+    // get a non const pointer to the inside array of values and perform operation in place
+    T * value=const_cast<T *> (getValue());
+	 
+    const int size=getNumberOfValues()*getNumberOfComponents(); // size of array
+
+    if (size>0) // for a negative size, there is nothing to do
+    {
+			value+=icomp-1;
+			const T* lastvalue=value+size; // pointer to the end of value
+ 
+			for(;value!=lastvalue; value+=getNumberOfComponents()) // apply linear transformation
+				*value = a*(*value)+b;
+    }
+}
 
 /*! Substraction of fields. Static member function.
  *  The function return a pointer to a new created field that holds the substraction.
@@ -1423,6 +1693,11 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::divDeep(const FIELD& m, co
   return result;
 }
 
+
+/*! 
+@}
+*/
+
 /*!
   \if developper
   This internal method initialize the members of a new field created to hold the result of the operation Op .
@@ -1559,7 +1834,12 @@ void FIELD<T, INTERLACING_TAG>::_div_in_place(const FIELD& m,const FIELD& n) thr
     }
 }
 
-/*!  Return Max Norm
+/*!
+\addtogroup FIELD_algo
+@{
+*/
+
+/*!  Return maximum of all absolute values contained in the array (all elements and all components are browsed).
  */
 template <class T, class INTERLACIN_TAG> double FIELD<T, INTERLACIN_TAG>::normMax() const throw (MEDEXCEPTION)
 {
@@ -1591,7 +1871,7 @@ template <class T, class INTERLACIN_TAG> double FIELD<T, INTERLACIN_TAG>::normMa
     return Max>Min ? static_cast<double>(Max) : static_cast<double>(Min);
 }
 
-/*!  Return Euclidien norm
+/*!  Return Euclidian norm for all elements of the array.
  */
 template <class T, class INTERLACIN_TAG> double FIELD<T, INTERLACIN_TAG>::norm2() const throw (MEDEXCEPTION)
 {
@@ -1616,7 +1896,7 @@ template <class T, class INTERLACIN_TAG> double FIELD<T, INTERLACIN_TAG>::norm2(
 
 //------------- TDG and BS addings 
 
-/*!  Return Extremums of field
+/*!  Return Extrema of field
  */
  template <class T, class INTERLACIN_TAG> void FIELD<T, INTERLACIN_TAG>::getMinMax(T &vmin, T &vmax) throw (MEDEXCEPTION)
 {
@@ -2034,7 +2314,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
 
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃ©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
@@ -2084,7 +2364,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
     _checkNormCompatibility(p_field_volume); // may throw exception
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÂ©mentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃƒÂ©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
@@ -2136,7 +2416,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
 
     const FIELD<double,FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÂ©mentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃƒÂ©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
@@ -2159,7 +2439,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
     double totVol=0.0;
     for (; value!=lastvalue ; ++value ,++vol)
     {
-	integrale += std::abs( static_cast<double>(*value) ) * (*vol);
+	integrale += std::fabs( static_cast<double>(*value) ) * (*vol);
 	totVol+=*vol;
     }
 
@@ -2182,7 +2462,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_
     _checkNormCompatibility(p_field_volume); // may throw exception
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÂ©mentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃƒÂ©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
@@ -2209,7 +2489,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_
     double integrale=0.0;
     for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
 	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
-	    integrale += std::abs( static_cast<double>(*value) ) * (*p_vol);
+	    integrale += std::fabs( static_cast<double>(*value) ) * (*p_vol);
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
@@ -2254,7 +2534,14 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::extract(const SUPPORT *sub
   ret->copyGlobalInfo(*this);
   return ret;
 }
+/*!
+@}
+*/
 
+/*!
+	\addtogroup FIELD_io
+	@{
+*/
 /*!
   Constructor with parameters; the object is set via a file and its associated
   driver. For the moment only the MED_DRIVER is considered and if the last two
@@ -2359,6 +2646,9 @@ FIELD<T,INTERLACING_TAG>::FIELD(driverTypes driverType,
 
   END_OF(LOC);
 }
+/*! 
+@}
+*/
 
 /*!
   Destructor.
@@ -2404,7 +2694,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
     _numberOfValues = _support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
     MESSAGE(LOC <<" : "<<_numberOfValues <<" et "<< NumberOfComponents);
 
-    //EF : A modifier lors de l'intégration de la classe de localisation des points de gauss
+    //EF : A modifier lors de l'intÃ©gration de la classe de localisation des points de gauss
     _value = new ArrayNoGauss(_numberOfComponents,_numberOfValues);
 
     _isRead = true ;
@@ -2450,7 +2740,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents,
   MESSAGE("FIELD : constructeur : "<<LengthValue <<" et "<< NumberOfComponents);
   _numberOfValues = LengthValue ;
 
-  //EF : A modifier lors de l'intégration de la classe de localisation des points de gauss
+  //EF : A modifier lors de l'intÃ©gration de la classe de localisation des points de gauss
   _value = new ArrayNoGauss(_numberOfComponents,_numberOfValues);
 
   _isRead = true ;
@@ -2474,13 +2764,26 @@ void FIELD<T, INTERLACING_TAG>::deallocValue()
   END_OF("void FIELD<T, INTERLACING_TAG>::deallocValue()");
 }
 
+
+
+/*!\if MEDMEM_ug
+
+\addtogroup FIELD_io
+@{ 
+\endif */
 // -----------------
 // Methodes Inline
 // -----------------
 
 /*!
-  Create the specified driver and return its index reference to path to
+  Creates the specified driver and return its index reference to path to
   read or write methods.
+
+\param driverType specifies the file type (MED_DRIVER or VTK_DRIVER)
+\param fileName name of the output file
+\param driverName name of the field
+\param access access type (read, write or both)
+
 */
 
 template <class T, class INTERLACING_TAG>
@@ -2510,10 +2813,10 @@ int FIELD<T, INTERLACING_TAG>::addDriver(driverTypes driverType,
 
   return current;
 }
-
+/*! \if MEDMEM_ug @} \endif */
 
 /*!
-  Duplicate the given driver and return its index reference to path to
+  Duplicates the given driver and return its index reference to path to
   read or write methods.
 */
 template <class T, class INTERLACING_TAG>
@@ -2586,8 +2889,22 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   END_OF(LOC);
 }
 
+/*! \if MEDMEM_ug
+\addtogroup FIELD_io
+@{
+\endif */
+
 /*!
-  Write FIELD in the file specified in the driver given by its index.
+  Writes FIELD in the file specified by the driver handle \a index.
+
+Example :
+\verbatim
+//...
+// Attaching the friver to file "output.med", meshname "Mesh"
+int driver_handle = mesh.addDriver(MED_DRIVER, "output.med", "Mesh");
+// Writing the content of mesh to the file 
+mesh.write(driver_handle);
+\endverbatim
 */
 template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(int index/*=0*/, const string & driverName /*= ""*/)
 {
@@ -2608,7 +2925,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
                           );
   END_OF(LOC);
 }
-
+/*! \if MEDMEM_ug @} \endif */
 /*!
   Write FIELD in the file specified in the driver given by its index. Use this
   method for ASCII drivers (e.g. VTK_DRIVER)
@@ -2828,8 +3145,33 @@ inline int FIELD<T, INTERLACING_TAG>::getValueLength() const
     return static_cast<ArrayNoGauss *>(_value)->getArraySize() ;
 }
 
+
+/*! \if MEDMEM_ug 
+\defgroup FIELD_value Field values
+
+These methods are provided for accessing the values of a field. 
+There are two ways to do so : one consists in using accessors
+that retrieve elements or group of elements from the entire field. Typical use is 
+\verbatim
+FIELD field(MED_DRIVER, "result.med","Pressure");
+double P0=field.getValueIJ(1,1);
+\endverbatim
+
+Another way is to retrieve the pointer to the array that contains the 
+variable values. In this case, the user should be aware of the interlacing mode
+so that no mistakes are made when retrieving the values.
+
+\verbatim
+FIELD field(MED_DRIVER, "result.med","Pressure");
+double* ptrP=field.getValue();
+double P0=ptrP[0];
+\endverbatim
+
+@{
+\endif
+*/
 /*!
-  Return a reference to values array to read them.
+  Returns a reference to values array to read them.
 */
 template <class T, class INTERLACIN_TAG>
 inline const T* FIELD<T, INTERLACIN_TAG>::getValue() const throw (MEDEXCEPTION)
@@ -2842,7 +3184,7 @@ inline const T* FIELD<T, INTERLACIN_TAG>::getValue() const throw (MEDEXCEPTION)
     return static_cast<ArrayNoGauss *>(_value)->getPtr() ;
 }
 /*!
-  Return a reference to i^{th} row
+  Returns a reference to \f$ i^{th} \f$ row
   of FIELD values array.
   If a faster accessor is intended you may use getArray() once,
   then MEDMEM_Array accessors.
@@ -2871,7 +3213,7 @@ FIELD<T,INTERLACING_TAG>::getRow(int i) const throw (MEDEXCEPTION)
 }
 
 /*!
-  Return a reference to j^{th} column
+  Returns a reference to $j^{th}$ column
   of FIELD values array.
 */
 template <class T,class INTERLACING_TAG> inline const T*
@@ -2886,7 +3228,12 @@ FIELD<T,INTERLACING_TAG>::getColumn(int j) const throw (MEDEXCEPTION)
 }
 
 /*!
-  Return the value of i^{th} element and j^{th} component.
+  Returns the value of $i^{th}$ element and $j^{th}$ component.
+  This method only works with fields having no particular Gauss point 
+definition (i.e., fields having one value per element).
+ This method makes the retrieval of the value independent from the
+  interlacing pattern, but it is slower than the complete retrieval 
+  obtained by the \b getValue() method.
 */
 template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getValueIJ(int i,int j) const throw (MEDEXCEPTION)
 {
@@ -2905,7 +3252,11 @@ template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getV
 }
 
 /*!
-  Return the j^{th} component of k^{th} gauss points of i^{th} value.
+  Returns the $j^{th}$ component of $k^{th}$ Gauss points of $i^{th}$ value.
+  This method is compatible with elements having more than one Gauss point.
+  This method makes the retrieval of the value independent from the
+  interlacing pattern, but it is slower than the complete retrieval 
+  obtained by the \b getValue() method.
 */
 template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getValueIJK(int i,int j,int k) const throw (MEDEXCEPTION)
 {
@@ -2922,6 +3273,7 @@ template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getV
   else
     return static_cast<ArrayNoGauss *>(_value)->getIJK(valIndex,j,k) ;
 }
+/*! \if MEDMEM_ug @} \endif */
 
 /*!
   Return number of values of a geomertic type in NoInterlaceByType mode
@@ -3013,6 +3365,11 @@ template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::get
   END_OF(LOC);
 };
 
+/*! \if MEDMEM_ug
+\addtogroup FIELD_gauss
+@{
+\endif
+ */
 
 template <class T,class INTERLACING_TAG> const GAUSS_LOCALIZATION<INTERLACING_TAG> &
 FIELD<T,INTERLACING_TAG>::getGaussLocalization(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION)
@@ -3149,7 +3506,7 @@ template <class T,class INTERLACING_TAG> const int * FIELD<T,INTERLACING_TAG>::g
 }
 
 /*!
-  Returns number of Gauss points for element n°i.
+  Returns number of Gauss points for element nÂ°i.
   The i index is a global index (take care of previous element
   on different geometric type).
 */
@@ -3173,6 +3530,10 @@ template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::get
    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_value not defined" ));
 //   END_OF(LOC);
 };
+/*!
+@}
+ */
+
 
 template <class T,class INTERLACING_TAG> const int * FIELD<T,INTERLACING_TAG>::getNumberOfElements() const throw (MEDEXCEPTION)
 {
@@ -3207,10 +3568,17 @@ template <class T,class INTERLACING_TAG> bool  FIELD<T,INTERLACING_TAG>::isOnAll
 };
 
 
+/*! \if MEDMEM_ug
+\addtogroup FIELD_value
+@{
+\endif */
+
 /*!
   Copy new values array in FIELD according to the given mode.
 
   Array must have right size. If not results are unpredicable.
+  In MED_FULL_INTERLACE mode, values are stored elementwise in X1,Y1,Z1,X2,Y2,Z2.. order.
+In MED_NO_INTERLACE mode, values are stored componentwise in X1,X2,X3,...,Y1,Y2,Y3,... order.
 */
 template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::setValue( T* value) throw (MEDEXCEPTION) 
 {
@@ -3241,7 +3609,7 @@ inline void FIELD<T,INTERLACING_TAG>::setRow( int i, T* value) throw (MEDEXCEPTI
 }
 
 /*!
-  Update values array in the j^{th} column of FIELD values array with the given ones and
+  Update values array in the $j^{th}$ column of FIELD values array with the given ones and
   according to specified mode.
 */
 template <class T,class INTERLACING_TAG>
@@ -3254,7 +3622,7 @@ inline void FIELD<T,INTERLACING_TAG>::setColumn( int j, T* value) throw (MEDEXCE
 }
 
 /*!
-  Set the value of i^{th} element and j^{th} component with the given one.
+  Sets the value of i^{th} element and j^{th} component with the given one.
 */
 template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::setValueIJ(int i, int j, T value) throw (MEDEXCEPTION) 
 {
@@ -3318,6 +3686,7 @@ template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::s
   else
     return static_cast<ArrayNoByType *>(_value)->setIJKByType(i,j,k,t,value) ;
 }
+/*! \if MEDMEM_ug @} \endif */
 
 /*
   METHODS

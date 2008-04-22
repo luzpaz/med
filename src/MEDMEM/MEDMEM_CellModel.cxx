@@ -28,6 +28,8 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
+CELLMODEL_Map *CELLMODEL_Map::_singleton=0;
+
 CELLMODEL::CELLMODEL(medGeometryElement t)
 {
   // init first all to nothing

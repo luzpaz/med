@@ -36,6 +36,25 @@ using namespace MEDMEM;
 
 #define MED_NBR_GEOMETRIE_MAILLE 15
 
+/*!
+\defgroup SUPPORT_general General information
+
+\defgroup SUPPORT_creation Creation methods
+The creation of a support requires a number of information
+which is supplied to the MedMem library with the following methods.
+When the support is defined on all elements, the creation method is 
+very simple, for the element list is implicitly defined.
+
+\defgroup SUPPORT_query Query methods
+
+\defgroup SUPPORT_constructors Constructors
+
+\defgroup SUPPORT_advanced Advanced methods
+
+*/
+
+
+
 /* This class is a generic class for family and group */
 
 /*!
@@ -53,10 +72,21 @@ SUPPORT::SUPPORT(): _name(""),	_description("None"), _mesh((MESH*)NULL),
 };
 
 /*!
-  Constructor.
+\addtogroup SUPPORT_constructors
+@{
+*/
+
+/*!
+  Constructor of a support lying on mesh \a Mesh. By default,
+the support lies on all elements of type \a Entity. 
+Partial support can be described using \a setpartial method.
+
+\param Mesh Pointer to the mesh on which the support lies
+\param Name Support name (should not exceed MED_TAILLE_NOM as defined in Med - i.e. 32 characters)
+\param Entity Entity type of the support (MED_CELL,MED_FACE,MED_EDGE, MED_NODE)
 */
 //--------------------------------------------------------------------------
-SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL*/):
+SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, MED_EN::medEntityMesh Entity/*=MED_CELL*/):
 		_name(Name), _description("None"), _mesh(Mesh), _entity(Entity),
 		_numberOfGeometricType(0), _isOnAllElts(true),
 		_totalNumberOfElements(0), _number((MEDSKYLINEARRAY*)NULL)
@@ -102,7 +132,12 @@ SUPPORT::SUPPORT(const SUPPORT & m)
   END_OF(LOC) ;
 };
 /*!
+@}
+ */
+
+/*!\ifnot MEDMEM_ug
   Affectation operator. operator = perform et deep copy except for attribute _mesh
+\endif
 */
 //--------------------------------------------------------------------------
 SUPPORT & SUPPORT::operator=(const SUPPORT & m)
@@ -186,7 +221,7 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
 }
 
 /*!
-  Updade the SUPPORT attributs with rigth MESH information.
+  Updade the SUPPORT attributs with right MESH information.
 
   It has an effect only if SUPPORT is on all elements.
 
@@ -207,7 +242,7 @@ void SUPPORT::update()
 	  _geometricType.set(1);
 	  _geometricType[0]=MED_POINT1;
 	  _numberOfElements.set(1);
-	  _numberOfElements[0]=_mesh->getNumberOfNodes(); // Vérifier le pointeur !
+	  _numberOfElements[0]=_mesh->getNumberOfNodes(); // VÃ©rifier le pointeur !
 	  _totalNumberOfElements=_numberOfElements[0];
 	}
       else
@@ -276,7 +311,22 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
 }
 
 /*!
-  Blend the given SUPPORT mySupport into the calling object SUPPORT.
+\addtogroup SUPPORT_advanced
+@{
+
+ */
+
+/*!
+Blends the given SUPPORT mySupport into the calling object SUPPORT.
+Example :
+\verbatim
+SUPPORT mySupport ;
+SUPPORT myOtherSupport ;
+...
+mySupport.blending(myOtherSupport) ;
+\endverbatim
+Support \a mySupport now contains a union of the elements originally
+contained in \a mySupport and \a myOtherSupport.
 */
 //-------------------
 void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
@@ -323,19 +373,55 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
     clearDataOnNumbers();
   END_OF(LOC);
 }
+/*!  @}  */
+
+/*! 
+\addtogroup SUPPORT_creation
+@{
+*/
 
 /*!
-    This function allows the user to set a support not on all entities Entity,
-    it should be used after an initialisation with the constructor
-    SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL) and
-    after the call to the function setAll(false).
-    It allocates and initialises all the attributs of the class SUPPORT.
+This function allows the user to set a support not on all entities Entity,
+it should be used after an initialisation with the constructor
+SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL).
+It allocates and initialises all the attributs of the class SUPPORT.
+
+\param Description string describing the support for information purposes (should not exceed MED_TAILLE_DESC length - i.e. 200 characters)
+\param NumberOfGeometricType number of geometric types contained in the support 
+\param TotalNumberOfElements number of elements in the support
+\param GeometricType array describing the geometric types (must be consistent with the entity that was passed as an argument to the support constructor)
+\param NumberOfElements array describing the number of elements for each type
+\param NumberValue array of IDs of the elements that constitute the group.
+
+The following example refers to the mesh given in the mesh connectivity example.
+It creates a group containing the two cells on the right (the quadratic triangle and the quadrangle on the right).
+
+\verbatim
+// creating SUPPORT on cells with one value per cell
+SUPPORT right_group(mesh, MED_CELL, 1);
+
+string description = "right group";
+int number_of_types=2;
+int number_of_elements=2;
+medGeometryElement geom_types[2]={MED_QUAD4, MED_TRIA6};
+int number_of_elem_per_type[2]={1,1};
+int number_value[2]={3,4};
+
+//defining the region of the support
+right_group.setpartial(description, number_of_types,
+                       number_of_elements, geom_types,
+                       number_of_elem_per_type, number_value);
+\endverbatim
+
+When MED_POLYGON or MED_POLYHEDRON elements are included in the support,
+their global number should be given. For instance, on a mesh having ten MED_TRIA3 
+and five MED_POLYGON, the number of the first polygonal element is 11. 
  */
 
 //-------------------
 void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
 			 int TotalNumberOfElements,
-			 medGeometryElement *GeometricType,
+												 MED_EN::medGeometryElement *GeometricType,
 			 int *NumberOfElements, int *NumberValue)
 //-------------------
 {
@@ -384,14 +470,17 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   END_OF(LOC);
 };
 
+/*! @}  */
 
 /*!
+\ifnot MEDMEM_ug
     This function allows the user to set a support not on all entities Entity,
     it should be used after an initialisation of :
     SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL) and
     after calling  at least setGeometricType and perharps setEntity.
     It allocates and initialises all the attributs of the class SUPPORT but
     doesn't set a description, a SUPPORT name, a meshName and an associated MESH.
+\endif
  */
 
 //-------------------
@@ -481,6 +570,10 @@ vector<string> SUPPORT::getProfilNames() const throw (MEDEXCEPTION)
   return _profilNames;
 };
 
+/*!
+\addtogroup SUPPORT_advanced
+@{
+*/
 
 /*!
   This method gets the boundary elements of the mesh. The support has to be
@@ -613,7 +706,8 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
 }
 
 /*!
-  intersect the given SUPPORT mySupport into the calling SUPPORT object.
+Intersects \a mySupport into the calling SUPPORT object.
+If A.intersecting(B) is called, on output, \f$ A \f$ contains \f$A \cap B\f$.
 */
 //-------------------
 void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
@@ -661,6 +755,7 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
     }
   END_OF(LOC);
 };
+/*!  @}  */
 
 /*!
   Method that cleans up all the fields related to _numbers. Defined for code factorization.

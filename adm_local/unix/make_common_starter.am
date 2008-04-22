@@ -57,3 +57,8 @@ unittest: $(UNIT_TEST_PROG)
 	@if test "x$(UNIT_TEST_PROG)" != "x"; then \
 	    $(UNIT_TEST_PROG);                     \
 	fi;
+
+html-local : $(DOX_INPUT_FILE)
+	@if test "x$(DOX_INPUT_FILE)" != "x"; then \
+	    doxygen $(DOX_INPUT_FILE);                     \
+	fi;

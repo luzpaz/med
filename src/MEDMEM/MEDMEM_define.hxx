@@ -220,7 +220,7 @@ typedef double         med_float;
 #define longueur_string 100
 #define PRECISION 0.0000001
 // #define undefined -1
-#define UNDEFINED -1
+#define MED_UNDEFINED -1
 
 // type des connectivites
 //#define CONN_NOD 0

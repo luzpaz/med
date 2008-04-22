@@ -29,11 +29,13 @@
 
 #include "MEDMEM_Mesh.hxx"
 
+
+namespace MEDMEM {
+
 /*!
   This class MESHING is a special class to set a MESH object.
 */
 
-namespace MEDMEM {
 class MEDMEM_EXPORT MESHING: public MESH
 {
 public :
@@ -48,7 +50,7 @@ public :
 			    const double * Coordinates,
 			    const string System,
 			    const MED_EN::medModeSwitch Mode) ;
-  void setCoordinatesSystem(const string System)
+  void setCoordinatesSystem(const string& System)
     throw (MEDEXCEPTION) ;
   void setCoordinatesNames (const string * names) ;
   void setCoordinateName (const string name, const int i) ;
