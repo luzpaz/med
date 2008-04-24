@@ -207,7 +207,10 @@ medfiles_DATA=\
 		square2.med \
 		square2_split \
 		square2_split1.med \
-		square2_split2.med 
+		square2_split2.med \
+		explore_med_file.png \
+		field_selection.png \
+		mesh_selection.png
 
 medfilesdir = $(datadir)/salome/resources/MedFiles
 salomexml_DATA=MEDCatalog.xml

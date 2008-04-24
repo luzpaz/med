@@ -5,15 +5,15 @@
         <name>@default</name>
         <message>
             <source>ICO_TB_EXPLORE</source>
-            <translation>Structure.png</translation>
+            <translation>explore_med_file.png</translation>
         </message>
         <message>
             <source>ICO_TB_FIELDSEL</source>
-            <translation>Infos.png</translation>
+            <translation>field_selection.png</translation>
         </message>
         <message>
             <source>ICO_TB_MESHSEL</source>
-            <translation>Data.png</translation>
+            <translation>mesh_selection.png</translation>
         </message>
     </context>
 </TS>
