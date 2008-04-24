@@ -113,9 +113,9 @@ void MedGUI::initialize( CAM_Application* app )
 
   //QWidget* parent = application()->desktop();
 
-  createMedAction( 931, "MESHSEL" );
-  createMedAction( 932, "FIELDSEL" );
-  createMedAction( 933, "EXPLORE" );
+  createMedAction( 931, "MESHSEL", "ICO_TB_MESHSEL" );
+  createMedAction( 932, "FIELDSEL", "ICO_TB_FIELDSEL" );
+  createMedAction( 933, "EXPLORE", "ICO_TB_EXPLORE" );
   createMedAction( 934, "DUMPMESH" );
   createMedAction( 935, "DUMPSUBMESH" );
 //   createMedAction( 8031, "POPUPTEST" );
