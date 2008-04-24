@@ -25,26 +25,44 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 # ===============================================================
 #
 
-medfiles_DATA=\
+dist_salomeres_DATA=\
+    MED.config \
+    MED_en.xml \
+    SalomeApp.xml \
+    ModuleMed.png \
+    Data.png \
+    Infos.png \
+    Structure.png \
+    explore_med_file.png \
+    field_selection.png \
+    mesh_selection.png \
     boitenew.cnc \
     boitenew.inp \
     boitenew.xyz \
+    Case1.cnc \
+    Case1.inp \
+    Case1.xyz \
+    cube.cnc \
+    cube.inp \
+    cube.xyz \
+    test3.cnc \
+    test3.inp \
+    test3.xyz \
+    titi.cnc \
+    titi.inp \
+    titi.xyz
+
+medfiles_DATA=\
     carre_en_quad4_import22.med \
     carre_en_quad4.med \
     carre_en_quad4_seg2_import22.med \
     carre_en_quad4_seg2.med \
     cas_defaut_domaine_fluide.med \
-    Case1.cnc \
-    Case1.inp \
-    Case1.xyz \
     ChampsDarcy.med \
-    cube.cnc \
     cube_hexa8_import22.med \
     cube_hexa8.med \
     cube_hexa8_quad4_import22.med \
     cube_hexa8_quad4.med \
-    cube.inp \
-    cube.xyz \
     darcy_1.1_res.med \
     darcy_1.3_resCASTEM.med \
     darcy_1.3_resPORFLOW.med \
@@ -54,7 +72,6 @@ medfiles_DATA=\
     darcy2_Castem_qua_VF.med \
     Darcy3_3D_H_10x10x10_2.med \
     Darcy3_3D_H_10x10x10.sauve \
-    Data.png \
     Deff_fdt_5.8_castem_efmh_diff_conc_dom.med \
     Deff_fdt_5.8_castem_vf_diff_conc_dom.med \
     dx200_dy1_avec_2couches.sauve \
@@ -83,7 +100,6 @@ medfiles_DATA=\
     H_Traces_Se79_COUPLEX1.med \
     inclusion_2d_raf.sauve \
     inclusion_2d.sauve \
-    Infos.png \
     mail_ktest1-3-hexa.sauve \
     mail_ktest1-3-tetra.sauve \
     mail_ktest3-1.sauve \
@@ -110,13 +126,10 @@ medfiles_DATA=\
     mail_test1-2-tri.sauve \
     mail-test1-4-1.sauve \
     mail-test1-4-2.sauve \
-    MED.config \
-    MED_en.xml \
     mesh_import22.med \
     mesh.med \
     Mistrat_import22.med \
     Mistrat.med \
-    ModuleMed.png \
     Old_ChampsDarcy.med \
     Old_darcy_1.1_res.med \
     Old_darcy_1.3_resCASTEM.med \
@@ -145,77 +158,62 @@ medfiles_DATA=\
     polyedres.med \
     polygones.med \
     recoll_bord.med \
-    SalomeApp.xml \
-    Structure.png \
     test19.med \
     test_2D.med \
-    test3.cnc \
-    test3.inp \
-    test3.xyz \
     TimeStamps_import22.med \
     TimeStamps.med \
-    titi.cnc \
-    titi.inp \
-    titi.xyz \
     zzzz121b.med \
     zzzz121b_without_tr6.med \
-		UnitTetra.med \
-		GeneralTetra.med \
-		NudgedSimpler.med \
-		NudgedTetra.med \
-		CornerTetra.med \
-		SimpleIncludedTetra.med \
-		SimpleIncludingTetra.med \
-		UnitTetraDegenT.med \
-		DegenEdgeXY.med \
-		DegenFaceXYZ.med \
-		DegenTranslatedInPlane.med \
-		ComplexIncludedTetra.med \
-		ComplexIncludingTetra.med \
-		HalfstripOnly.med \
-		HalfstripOnly2.med \
-		SimpleHalfstripOnly.med \
-		GenTetra1.med \
-		GenTetra2.med \
-		TrickyTetra1.med \
-		LargeUnitTetra.med \
-		LargeInconsistentTetra.med \
-		DividedUnitTetraSimpler.med \
-		DividedUnitTetra.med \
-		NudgedDividedUnitTetra.med \
-		NudgedDividedUnitTetraSimpler.med \
-		DividedGenTetra1.med DividedGenTetra2.med \
-		Box1.med \
-		Box2.med \
-		Box3.med \
-		Box1Moderate.med \
-		Box2Moderate.med \
-		BoxModSmall1.med \
-		BoxModSmall2.med \
-		BoxEvenSmaller1.med \
-		TinyBox.med \
-		BoxHexa1.med \
-		BoxHexa2.med \
-		MovedHexaBox1.med \
-		MovedHexaBox2.med \
-		BoxTetra2.med \
-		square1.med \
-		square1_split \
-		square1_split1.med \
-		square1_split2.med \
-		square1_split3.med \
-		square2.med \
-		square2_split \
-		square2_split1.med \
-		square2_split2.med \
-		explore_med_file.png \
-		field_selection.png \
-		mesh_selection.png
+    UnitTetra.med \
+    GeneralTetra.med \
+    NudgedSimpler.med \
+    NudgedTetra.med \
+    CornerTetra.med \
+    SimpleIncludedTetra.med \
+    SimpleIncludingTetra.med \
+    UnitTetraDegenT.med \
+    DegenEdgeXY.med \
+    DegenFaceXYZ.med \
+    DegenTranslatedInPlane.med \
+    ComplexIncludedTetra.med \
+    ComplexIncludingTetra.med \
+    HalfstripOnly.med \
+    HalfstripOnly2.med \
+    SimpleHalfstripOnly.med \
+    GenTetra1.med \
+    GenTetra2.med \
+    TrickyTetra1.med \
+    LargeUnitTetra.med \
+    LargeInconsistentTetra.med \
+    DividedUnitTetraSimpler.med \
+    DividedUnitTetra.med \
+    NudgedDividedUnitTetra.med \
+    NudgedDividedUnitTetraSimpler.med \
+    DividedGenTetra1.med DividedGenTetra2.med \
+    Box1.med \
+    Box2.med \
+    Box3.med \
+    Box1Moderate.med \
+    Box2Moderate.med \
+    BoxModSmall1.med \
+    BoxModSmall2.med \
+    BoxEvenSmaller1.med \
+    TinyBox.med \
+    BoxHexa1.med \
+    BoxHexa2.med \
+    MovedHexaBox1.med \
+    MovedHexaBox2.med \
+    BoxTetra2.med \
+    square1.med \
+    square1_split \
+    square1_split1.med \
+    square1_split2.med \
+    square1_split3.med \
+    square2.med \
+    square2_split \
+    square2_split1.med \
+    square2_split2.med
 
 medfilesdir = $(datadir)/salome/resources/MedFiles
-salomexml_DATA=MEDCatalog.xml
-salomexmldir=share/salome
 
-nodist_salomexml_DATA=$(salomexml_DATA)
-
-EXTRA_DIST+= config
+nodist_salomeres_DATA=MEDCatalog.xml
