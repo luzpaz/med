@@ -312,10 +312,14 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 
 	// load MED engine
 	SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
-
+	
 	// Selection du Fichier
+	QString anInitialPath = "";
+	if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
+	  anInitialPath = QDir::currentDirPath();
+
 	file = SUIT_FileDlg::getFileName(application()->desktop(),
-					QDir::currentDirPath(),
+					anInitialPath,
 					filtersList,
 					tr("MED_MEN_IMPORT"),
 					true);
@@ -368,8 +372,12 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 	SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
 
 	// Selection du Fichier
+	QString anInitialPath = "";
+	if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
+	  anInitialPath = QDir::currentDirPath();
+
 	file = SUIT_FileDlg::getFileName(application()->desktop(),
-					QDir::currentDirPath(),
+					anInitialPath,
 					filtersList,
 					tr("MED_MEN_IMPORT"),
 					true);
@@ -420,8 +428,12 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 	SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
 
 	// Selection du Fichier
+	QString anInitialPath = "";
+	if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
+	  anInitialPath = QDir::currentDirPath();
+
 	file = SUIT_FileDlg::getFileName(application()->desktop(),
-					QDir::currentDirPath(),
+					anInitialPath,
 					filtersList,
 					tr("MED_MEN_IMPORT"),
 					true);
