@@ -49,7 +49,7 @@ public :
 	PointerOf( const T *pointer ) ;
 	PointerOf( const int &size, const T *pointer ) ;
 	PointerOf( const PointerOf<T> & pointerOf ) ;
-	PointerOf( const int &size, const PointerOf<T> & pointerOf ) ;
+  ///PointerOf( const int &size, const PointerOf<T> & pointerOf ) ;
 	operator T*() ;
 	operator const T*() const ;
 	void set( const int &size ) ;
@@ -81,18 +81,18 @@ template <typename T> PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf) :
 {
 	BEGIN_OF("PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf)");
 	MESSAGE("Warning ! No Propriety Transfer");
-	END_OF  ("PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf)");
+	END_OF();
 }
 
 /*! 
   Duplicate array of size size pointed in pointerOf.
 */
-template <typename T> PointerOf<T>::PointerOf( const int &size, const PointerOf<T> & pointerOf) : 
-  _pointer((size,(T*)pointerOf))
-{
-}
+//template <typename T> PointerOf<T>::PointerOf( const int &size, const PointerOf<T> & pointerOf) : 
+//  _pointer((size,(T*)pointerOf))
+//{
+//}
 
-/*! If size <= 0, creates a null "T*" pointer\n
+/*! If size < 0, creates a null "T*" pointer\n
     Else allocates memory and sets desallocation boolean to true.\n
     Memory will be desallocated  when erasing this PointerOf*/
 template <typename T> PointerOf<T>::PointerOf( const int &size )
@@ -116,13 +116,13 @@ template <typename T> PointerOf<T>::PointerOf( const T* pointer ) : _pointer( (T
 {
 }
 
-/*! If size <= 0, return an exception\n
+/*! If size < 0, return an exception\n
     Else duplicate array and sets desallocation boolean to true.\n
     Memory will be desallocated  when erasing this PointerOf*/
 template <typename T> PointerOf<T>::PointerOf( const int &size, const T* pointer)
 {
   if (size < 0)
-    throw MEDEXCEPTION("PointerOf( const int,const T*) : array size <= 0");
+    throw MEDEXCEPTION("PointerOf( const int,const T*) : array size < 0");
 
   _pointer = new T[ size ] ;
   memcpy(_pointer,pointer,size*sizeof(T));
@@ -163,7 +163,7 @@ template <typename T> PointerOf<T>& PointerOf<T>::operator=( const PointerOf<T> 
 	{
 		this->set( pointer._pointer ) ;
 	}
-	END_OF("PointerOf<T>::operator=( const PointerOf<T> &pointer )") ;
+	END_OF();
 	return *this ;
 }
 
@@ -191,6 +191,7 @@ template <typename T> void PointerOf<T>::set( const int &size )
 		delete [] _pointer ;
 		_pointer=0 ;
 	}
+	// if (size < 0) TODO: analyse why it does not work
 	if (size <= 0)
 	{
 		_pointer=(T*)NULL;
@@ -226,7 +227,7 @@ template <typename T> void PointerOf<T>::set( const T *pointer )
 }
 
 /*! If necessary, released memory holded by PointerOf\n.
-    If size <= 0, return an exception\n.
+    If size < 0, return an exception\n.
     Else allocates memory and sets desallocation boolean to true.\n
     Can be used in order to "nullify" an existing PointerOf\n
     Memory will be desallocated  when erasing this PointerOf*/
@@ -238,7 +239,7 @@ template <typename T> void PointerOf<T>::set( const int &size, const T *pointer)
       _pointer = NULL ;
     }
   if (size < 0)
-    throw MEDEXCEPTION("PointerOf( const int,const T*) : array size <= 0");
+    throw MEDEXCEPTION("PointerOf( const int,const T*) : array size < 0");
 
   _pointer = new T[ size ] ;
   memcpy(_pointer,pointer,size*sizeof(T));

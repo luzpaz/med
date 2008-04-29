@@ -124,14 +124,15 @@ void MED_MED_DRIVER21::open()
                          );
   }
 
-  END_OF(LOC);
+  END_OF();
 }
 
 
 void MED_MED_DRIVER21::close()
 {
   med_2_1::med_int err = 0;
-  const char * LOC = "MED_MED_DRIVER21::close() : ";
+  //const char * LOC = "MED_MED_DRIVER21::close() : ";
+  BEGIN_OF("MED_MED_DRIVER21::close() : ");
   
   
 //    if ( _status == MED_CLOSED)
@@ -158,7 +159,7 @@ void MED_MED_DRIVER21::close()
   _status = MED_CLOSED;
   _medIdt = MED_INVALID;
     
-  END_OF(LOC);
+  END_OF();
 }
 
 
@@ -166,10 +167,13 @@ void MED_MED_DRIVER21::close()
 
 MED_MED_RDONLY_DRIVER21::MED_MED_RDONLY_DRIVER21()
 {
+  this->GENDRIVER::_accessMode = MED_EN::RDONLY;
 }
 
 MED_MED_RDONLY_DRIVER21::MED_MED_RDONLY_DRIVER21(const string & fileName,  MED * const ptrMed):
-  IMED_MED_RDONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER21(fileName,ptrMed,MED_EN::MED_RDONLY),MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_RDONLY)
+  IMED_MED_RDONLY_DRIVER(fileName,ptrMed),
+  MED_MED_DRIVER21(fileName,ptrMed,MED_EN::RDONLY),
+  MED_MED_DRIVER(fileName,ptrMed,MED_EN::RDONLY)
 {
   MESSAGE("MED_MED_RDONLY_DRIVER21::MED_MED_RDONLY_DRIVER21(const string & fileName,  MED * const ptrMed) Constructeur read only");
 }
@@ -611,7 +615,7 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
   // il faut lire les champs pour avoir les profils stockes !!!
   // il faudrait implémenter la lecture des profils dans med !!!
   
-  END_OF(LOC);
+  END_OF();
   
 }
 
@@ -620,9 +624,8 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 void MED_MED_RDONLY_DRIVER21::read( void )
   throw (MEDEXCEPTION) // from objects method read !
 {
-  const char * LOC = "MED_MED_DRIVER21::read() : ";
- 
-  BEGIN_OF(LOC);
+  //const char * LOC = "MED_MED_DRIVER21::read() : ";
+  BEGIN_OF("MED_MED_DRIVER21::read() : ");
 
   // For PAL12192: assure that file structure is already read
   this->open();
@@ -646,17 +649,20 @@ void MED_MED_RDONLY_DRIVER21::read( void )
     (*currentField).first->read(*this);
   //(*currentField).first->read(); // default reader, from readFileStruct
 
-  END_OF(LOC);
+  END_OF();
 }
 
 // ------------- Write Only Part --------------
 
 MED_MED_WRONLY_DRIVER21::MED_MED_WRONLY_DRIVER21()
 {
+  this->GENDRIVER::_accessMode = MED_EN::WRONLY;
 }
 
 MED_MED_WRONLY_DRIVER21::MED_MED_WRONLY_DRIVER21(const string & fileName,  MED * const ptrMed):
-  IMED_MED_WRONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER21(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_WRONLY)
+  IMED_MED_WRONLY_DRIVER(fileName,ptrMed),
+  MED_MED_DRIVER21(fileName,ptrMed),
+  MED_MED_DRIVER(fileName,ptrMed,MED_EN::WRONLY)
 {}
 
 MED_MED_WRONLY_DRIVER21::MED_MED_WRONLY_DRIVER21(const MED_MED_WRONLY_DRIVER21 & driver):
@@ -688,9 +694,8 @@ void MED_MED_WRONLY_DRIVER21::readFileStruct ( void ) throw (MEDEXCEPTION)
 void MED_MED_WRONLY_DRIVER21::writeFrom( void) const
   throw (MEDEXCEPTION) //from object method write !
 {
-  const char * LOC = "MED_MED_DRIVER21::writeFrom() : ";
-
-  BEGIN_OF(LOC);
+  //const char * LOC = "MED_MED_DRIVER21::writeFrom() : ";
+  BEGIN_OF("MED_MED_DRIVER21::writeFrom() : ");
 
   const map<MESH_NAME_, MESH*> & _meshes = const_cast<const map<MESH_NAME_, MESH*>& > (_ptrMed->_meshes); 
   map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
@@ -717,17 +722,16 @@ void MED_MED_WRONLY_DRIVER21::writeFrom( void) const
     }
   }
 
-  END_OF(LOC);
+  END_OF();
 
 }
 
 void MED_MED_WRONLY_DRIVER21::write(void ) const
   throw (MEDEXCEPTION) // from object method write !
 {
-  const char * LOC = "MED_MED_DRIVER21::write() : ";
+  //const char * LOC = "MED_MED_DRIVER21::write() : ";
   int current;
-
-  BEGIN_OF(LOC);
+  BEGIN_OF("MED_MED_DRIVER21::write() : ");
 
   // BCLE SUR LES OBJETS AVEC AJOUT DE DRIVER ET APPELS write
 
@@ -756,23 +760,25 @@ void MED_MED_WRONLY_DRIVER21::write(void ) const
   // that's work, but it is more efficenty to write directly when we had driver, no ?
   //  writeFrom();
   
-  END_OF(LOC);
+  END_OF();
 
 }
 
 // ------------- Read Write Part --------------
 
 MED_MED_RDWR_DRIVER21::MED_MED_RDWR_DRIVER21()
-{}
+{
+  this->GENDRIVER::_accessMode = MED_EN::RDWR;
+}
 
 MED_MED_RDWR_DRIVER21::MED_MED_RDWR_DRIVER21(const string & fileName,  MED * const ptrMed):
   MED_MED_RDONLY_DRIVER21(fileName,ptrMed),
   MED_MED_WRONLY_DRIVER21(fileName,ptrMed),
   IMED_MED_RDWR_DRIVER(fileName,ptrMed),
-  MED_MED_DRIVER21(fileName,ptrMed,MED_REMP),
+  MED_MED_DRIVER21(fileName,ptrMed,RDWR),
   IMED_MED_WRONLY_DRIVER(fileName,ptrMed),
   IMED_MED_RDONLY_DRIVER(fileName,ptrMed),
-  MED_MED_DRIVER(fileName,ptrMed,MED_REMP)
+  MED_MED_DRIVER(fileName,ptrMed,RDWR)
 {}
 
 MED_MED_RDWR_DRIVER21::MED_MED_RDWR_DRIVER21(const MED_MED_RDWR_DRIVER21 & driver):
@@ -799,7 +805,7 @@ void MED_MED_RDWR_DRIVER21::read(void)
 {
   BEGIN_OF("MED_MED_RDWR_DRIVER21::read(void)");
   MED_MED_RDONLY_DRIVER21::read();
-  END_OF("MED_MED_RDWR_DRIVER21::read(void)");
+  END_OF();
 }
 
 void MED_MED_RDWR_DRIVER21::readFileStruct(void)
@@ -807,7 +813,7 @@ void MED_MED_RDWR_DRIVER21::readFileStruct(void)
 {
   BEGIN_OF("MED_MED_RDWR_DRIVER21::readFileStruct(void)");
   MED_MED_RDONLY_DRIVER21::readFileStruct();
-  END_OF("MED_MED_RDWR_DRIVER21::readFileStruct(void)");
+  END_OF();
 }
 
 void MED_MED_RDWR_DRIVER21::write(void) const
@@ -815,7 +821,7 @@ void MED_MED_RDWR_DRIVER21::write(void) const
 {
   BEGIN_OF("MED_MED_RDWR_DRIVER21::write(void) const");
   MED_MED_WRONLY_DRIVER21::write();
-  END_OF("MED_MED_RDWR_DRIVER21::write(void) const");
+  END_OF();
 }
 
 void MED_MED_RDWR_DRIVER21::writeFrom(void) const
@@ -823,5 +829,5 @@ void MED_MED_RDWR_DRIVER21::writeFrom(void) const
 {
   BEGIN_OF("MED_MED_RDWR_DRIVER21::writeFrom(void) const");
   MED_MED_WRONLY_DRIVER21::writeFrom();
-  END_OF("MED_MED_RDWR_DRIVER21::writeFrom(void) const");
+  END_OF();
 }

@@ -28,6 +28,7 @@
 #include <MEDMEM.hxx>
 
 #include <string>
+#include <vector>
 
 #include "MEDMEM_PointerOf.hxx"
 #include "MEDMEM_Exception.hxx"
@@ -65,10 +66,12 @@ protected:
   mutable MEDARRAY<double>            _coordinate;
 
 				     /*! PointerOf to an array of size spaceDimension storing axes names*/
-  PointerOf<string>          _coordinateName;
+  //PointerOf<string>          _coordinateName;
+  vector<string>          _coordinateName;
 
 				     /*! PointerOf to an array of size spaceDimension storing units */
-  PointerOf<string>          _coordinateUnit;
+  //PointerOf<string>          _coordinateUnit;
+  vector<string>          _coordinateUnit;
 
 				     /*! PointerOf to an array of size NumberOfNodes : optional nodes numbers */
   PointerOf<int>             _nodeNumber;

@@ -57,7 +57,7 @@ int SUPPORT_i::supportIndex = 0 ;
 SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL),_corbaIndex(SUPPORT_i::supportIndex++)
 {
 	BEGIN_OF("Default Constructor SUPPORT_i");
-	END_OF("Default Constructor SUPPORT_i");
+	END_OF();
 }
 
 //=============================================================================
@@ -70,7 +70,7 @@ SUPPORT_i::SUPPORT_i(const ::SUPPORT * const s) :_support(s),
 {
 	BEGIN_OF("Constructor SUPPORT_i");
 	SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
-	END_OF("Constructor SUPPORT_i");
+	END_OF();
 }
 //=============================================================================
 /*!
@@ -82,7 +82,7 @@ SUPPORT_i::SUPPORT_i(const SUPPORT_i &s) :_support(s._support),
 {
 	BEGIN_OF("Constructor SUPPORT_i");
 	SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
-	END_OF("Constructor SUPPORT_i");
+	END_OF();
 }
 //=============================================================================
 /*!
@@ -271,7 +271,7 @@ throw (SALOME::SALOME_Exception)
 		SCRUTE(m1);
 		SCRUTE(m2);
 
-		END_OF("SALOME_MED::MESH_ptr SUPPORT_i::getMesh()");
+		END_OF();
 
 	        return (m2);
         }
@@ -345,7 +345,7 @@ throw (SALOME::SALOME_Exception)
 				             SALOME::INTERNAL_ERROR);
   try
     {
-      END_OF("SALOME_MED::medEntityMesh SUPPORT_i::getEntity()");
+      END_OF();
       return convertMedEntToIdlEnt(_support->getEntity());
     }
   catch (MEDEXCEPTION &ex)
@@ -616,19 +616,19 @@ throw (SALOME::SALOME_Exception)
 void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr myIor)
   throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-  const char * LOC = "SUPPORT_i::addInStudy";
-  BEGIN_OF(LOC);
+  //const char * LOC = "SUPPORT_i::addInStudy";
+  BEGIN_OF("SUPPORT_i::addInStudy");
 
   if ( _supportId != "" )
   {
-      MESSAGE(LOC << "Support already in Study");
+      MESSAGE(__LOC << "Support already in Study");
       THROW_SALOME_CORBA_EXCEPTION("Support already in Study", \
 				   SALOME::BAD_PARAM);
   };
 
   if ( CORBA::is_nil(myStudy) )
   {
-      MESSAGE(LOC << "Study not found");
+      MESSAGE(__LOC << "Study not found");
       THROW_SALOME_CORBA_EXCEPTION("Study deleted !!!",
                                     SALOME::INTERNAL_ERROR);
   }
@@ -640,11 +640,11 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   SALOMEDS::AttributeIOR_var     aIOR;
   
   // Find SComponent labelled 'Med'
-  MESSAGE(LOC << " Find SComponent labelled 'MED'");
+  MESSAGE(__LOC << " Find SComponent labelled 'MED'");
   SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
   if ( CORBA::is_nil(medfather) ) 
   { 
-    MESSAGE(LOC << "MED not found");
+    MESSAGE(__LOC << "MED not found");
     THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
   }
 
@@ -652,10 +652,10 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   SALOMEDS::SObject_var medmeshfather = myStudy->FindObjectByPath("/Med/MEDMESH");
   if ( CORBA::is_nil(medmeshfather) )
   { 
-    MESSAGE(LOC << " No /Med/MEDMESH Found in study")
+    MESSAGE(__LOC << " No /Med/MEDMESH Found in study")
     THROW_SALOME_CORBA_EXCEPTION("SObject labelled 'MEDMESH' not Found",SALOME::INTERNAL_ERROR);
   }
-  MESSAGE(LOC << " Find SObject MESH (represent mesh in support)");
+  MESSAGE(__LOC << " Find SObject MESH (represent mesh in support)");
 
   string meshName = _support->getMesh()->getName() ;
   string meshNameStudy = meshName;
@@ -750,7 +750,7 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   MESSAGE("Registering of the Corba Support pointer");
   Register();
 
-  END_OF(LOC);
+  END_OF();
 }
 
 //=======================================================================

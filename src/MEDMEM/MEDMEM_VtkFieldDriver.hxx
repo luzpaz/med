@@ -77,7 +77,7 @@ public :
 
     _vtkFile = new ofstream();
 
-    END_OF(LOC);
+    END_OF();
   }
   /*!
     Constructor.
@@ -85,16 +85,16 @@ public :
   template <class INTERLACING_TAG>
   VTK_FIELD_DRIVER(const string & fileName,
 		   FIELD<T, INTERLACING_TAG> * ptrField):
-    GENDRIVER(fileName,MED_EN::MED_WRONLY),
+    GENDRIVER(fileName, MED_EN::WRONLY, VTK_DRIVER),
     _ptrField((FIELD<T> *) ptrField),
     _fieldName(fileName),_fieldNum(MED_INVALID) 
   {
-    const char * LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
-    BEGIN_OF(LOC);
+    //const char * LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
+    BEGIN_OF("VTK_FIELD_DRIVER::VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField) ");
 
     _vtkFile = new ofstream();
 
-    END_OF(LOC);
+    END_OF();
   }
 
   /*!
@@ -115,18 +115,18 @@ public :
   */
   ~VTK_FIELD_DRIVER()
   {
-  const char * LOC ="VTK_FIELD_DRIVER::~VTK_FIELD_DRIVER()";
-  BEGIN_OF(LOC);
+    //const char * LOC ="VTK_FIELD_DRIVER::~VTK_FIELD_DRIVER()";
+    BEGIN_OF("VTK_FIELD_DRIVER::~VTK_FIELD_DRIVER()");
 
-  close();
+    close();
 
-  SCRUTE(_vtkFile);
+    SCRUTE(_vtkFile);
 
-  delete _vtkFile ;
+    delete _vtkFile ;
 
-  SCRUTE(_vtkFile);
+    SCRUTE(_vtkFile);
 
-  END_OF(LOC);
+    END_OF();
   }
 
   void openConst() const throw (MEDEXCEPTION)
@@ -158,7 +158,7 @@ public :
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				       << _fileName)
 			    );
-    END_OF(LOC);
+    END_OF();
   }
 
   void openConstAppend() const throw (MEDEXCEPTION)
@@ -205,7 +205,7 @@ public :
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				       << _fileName)
 			    );
-    END_OF(LOC);
+    END_OF();
   }
 
   void open() throw (MEDEXCEPTION)
@@ -237,12 +237,13 @@ public :
     SCRUTE(_vtkFile);
     SCRUTE(*_vtkFile);
 
-    if (!(*_vtkFile))
+    if ( (*_vtkFile) && _vtkFile->is_open() )
+      //if (!(*_vtkFile))
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
 				       << _fileName)
 			    );
 
-    END_OF(LOC);
+    END_OF();
   }
 
   void close() {
@@ -324,6 +325,8 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
 
   const SUPPORT * supportField = _ptrField->getSupport();
   MESH * meshField = supportField->getMesh();
+  if (! meshField )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": mesh was not read before writing")) ;
 
   // Well we must open vtk file first, because there are
   // no other driver than MED for VTK that do it !
@@ -645,7 +648,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   
   if ( _ptrField->getInterlacingType() != MED_EN::MED_NO_INTERLACE )
     delete tmpArray;
-  END_OF(LOC);
+  END_OF();
 }
 
 template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
@@ -658,6 +661,8 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
 
   const SUPPORT * supportField = _ptrField->getSupport();
   MESH * meshField = supportField->getMesh();
+  if (! meshField )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": mesh was not read before writing")) ;
 
   // Well we must open vtk file first, because there are
   // no other driver than MED for VTK that do it !
@@ -752,7 +757,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   if ( _ptrField->getInterlacingType() != MED_EN::MED_NO_INTERLACE )
     delete tmpArray;
 
-  END_OF(LOC);
+  END_OF();
 }
 }//End namespace MEDMEM
 

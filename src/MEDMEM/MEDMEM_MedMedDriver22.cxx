@@ -130,14 +130,14 @@ void MED_MED_DRIVER22::open()
                          );
   }
 
-  END_OF(LOC);
+  END_OF();
 }
 
 
 void MED_MED_DRIVER22::close()
 {
   med_2_3::med_int err = 0;
-  const char * LOC = "MED_MED_DRIVER22::close() : ";
+  //const char * LOC = "MED_MED_DRIVER22::close() : ";
   
   
 //    if ( _status == MED_CLOSED)
@@ -164,7 +164,7 @@ void MED_MED_DRIVER22::close()
   _status = MED_CLOSED;
   _medIdt = MED_INVALID;
     
-  END_OF(LOC);
+  //END_OF();
 }
 
 
@@ -172,10 +172,13 @@ void MED_MED_DRIVER22::close()
 
 MED_MED_RDONLY_DRIVER22::MED_MED_RDONLY_DRIVER22()
 {
+  this->GENDRIVER::_accessMode = MED_EN::RDONLY;
 }
 
 MED_MED_RDONLY_DRIVER22::MED_MED_RDONLY_DRIVER22(const string & fileName,  MED * const ptrMed):
-  IMED_MED_RDONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER22(fileName,ptrMed,MED_EN::MED_RDONLY),MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_RDONLY)
+  IMED_MED_RDONLY_DRIVER(fileName,ptrMed),
+  MED_MED_DRIVER22(fileName,ptrMed,MED_EN::RDONLY),
+  MED_MED_DRIVER(fileName,ptrMed,MED_EN::RDONLY)
 {
   MESSAGE("MED_MED_RDONLY_DRIVER22::MED_MED_RDONLY_DRIVER22(const string & fileName,  MED * const ptrMed) Constructeur read only");
 }
@@ -694,7 +697,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
   // il faut lire les champs pour avoir les profils stockes !!!
   // il faudrait implémenter la lecture des profils dans med !!!
   
-  END_OF(LOC);
+  END_OF();
   
 }
 
@@ -703,9 +706,9 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 void MED_MED_RDONLY_DRIVER22::read( void )
   throw (MEDEXCEPTION) // from objects method read !
 {
-  const char * LOC = "MED_MED_DRIVER22::read() : ";
+  //const char * LOC = "MED_MED_DRIVER22::read() : ";
  
-  BEGIN_OF(LOC);
+  BEGIN_OF("MED_MED_DRIVER22::read() : ");
 
   // For PAL12192: assure that file structure is already read
   this->open();
@@ -719,31 +722,36 @@ void MED_MED_RDONLY_DRIVER22::read( void )
   map<FIELD_ *, MESH_NAME_>::const_iterator currentField;
   
   for ( currentMesh=_meshes.begin();currentMesh != _meshes.end(); currentMesh++ ) 
-    (*currentMesh).second->read(*this); 
-  //(*currentMesh).second->read(); // default reader, from readFileStruct
+    //(*currentMesh).second->read(*this); -> crash in MEDMEMTest_TopLevel.cxx
+    (*currentMesh).second->read(); // default reader, from readFileStruct
     
   // PROVISOIRE
   _ptrMed->updateSupport() ;
 
   for ( currentField =_meshName.begin(); currentField != _meshName.end(); currentField++ )
-    (*currentField).first->read(*this);
-  //(*currentField).first->read(); // default reader, from readFileStruct
+    //(*currentField).first->read(*this);
+    (*currentField).first->read(); // default reader, from readFileStruct
 
-  END_OF(LOC);
+  END_OF();
 }
 
 // ------------- Write Only Part --------------
 
 MED_MED_WRONLY_DRIVER22::MED_MED_WRONLY_DRIVER22()
 {
+  this->GENDRIVER::_accessMode = MED_EN::WRONLY;
 }
 
 MED_MED_WRONLY_DRIVER22::MED_MED_WRONLY_DRIVER22(const string & fileName,  MED * const ptrMed):
-  IMED_MED_WRONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER22(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_WRONLY)
+  IMED_MED_WRONLY_DRIVER(fileName,ptrMed),
+  MED_MED_DRIVER22(fileName,ptrMed),
+  MED_MED_DRIVER(fileName,ptrMed,MED_EN::WRONLY)
 {}
 
 MED_MED_WRONLY_DRIVER22::MED_MED_WRONLY_DRIVER22(const MED_MED_WRONLY_DRIVER22 & driver):
-  IMED_MED_WRONLY_DRIVER(driver),MED_MED_DRIVER(driver),MED_MED_DRIVER22(driver)
+  IMED_MED_WRONLY_DRIVER(driver),
+  MED_MED_DRIVER(driver),
+  MED_MED_DRIVER22(driver)
 {}
 
 MED_MED_WRONLY_DRIVER22::~MED_MED_WRONLY_DRIVER22()
@@ -773,9 +781,9 @@ void MED_MED_WRONLY_DRIVER22::readFileStruct(void)
 void MED_MED_WRONLY_DRIVER22::writeFrom( void) const
   throw (MEDEXCEPTION) //from object method write !
 {
-  const char * LOC = "MED_MED_DRIVER22::writeFrom() : ";
+  //const char * LOC = "MED_MED_DRIVER22::writeFrom() : ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF("MED_MED_DRIVER22::writeFrom() : ");
 
   const map<MESH_NAME_, MESH*> & _meshes = const_cast<const map<MESH_NAME_, MESH*>& > (_ptrMed->_meshes); 
   map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
@@ -802,17 +810,17 @@ void MED_MED_WRONLY_DRIVER22::writeFrom( void) const
     }
   }
 
-  END_OF(LOC);
+  END_OF();
 
 }
 
 void MED_MED_WRONLY_DRIVER22::write(void ) const
   throw (MEDEXCEPTION) // from object method write !
 {
-  const char * LOC = "MED_MED_DRIVER22::write() : ";
+  //const char * LOC = "MED_MED_DRIVER22::write() : ";
   int current;
 
-  BEGIN_OF(LOC);
+  BEGIN_OF("MED_MED_DRIVER22::write() : ");
 
   // BCLE SUR LES OBJETS AVEC AJOUT DE DRIVER ET APPELS write
 
@@ -841,23 +849,25 @@ void MED_MED_WRONLY_DRIVER22::write(void ) const
   // that's work, but it is more efficenty to write directly when we had driver, no ?
   //writeFrom();
   
-  END_OF(LOC);
+  END_OF();
 
 }
 
 // ------------- Read Write Part --------------
 
 MED_MED_RDWR_DRIVER22::MED_MED_RDWR_DRIVER22()
-{}
+{
+  this->GENDRIVER::_accessMode = MED_EN::RDWR;
+}
 
 MED_MED_RDWR_DRIVER22::MED_MED_RDWR_DRIVER22(const string & fileName,  MED * const ptrMed):
   MED_MED_RDONLY_DRIVER22(fileName,ptrMed),
   MED_MED_WRONLY_DRIVER22(fileName,ptrMed),
   IMED_MED_RDWR_DRIVER(fileName,ptrMed),
-  MED_MED_DRIVER22(fileName,ptrMed,MED_REMP),
+  MED_MED_DRIVER22(fileName,ptrMed,RDWR),
   IMED_MED_WRONLY_DRIVER(fileName,ptrMed),
   IMED_MED_RDONLY_DRIVER(fileName,ptrMed),
-  MED_MED_DRIVER(fileName,ptrMed,MED_REMP)
+  MED_MED_DRIVER(fileName,ptrMed,RDWR)
 {}
 
 MED_MED_RDWR_DRIVER22::MED_MED_RDWR_DRIVER22(const MED_MED_RDWR_DRIVER22 & driver):
@@ -884,7 +894,7 @@ void MED_MED_RDWR_DRIVER22::read(void)
 {
   BEGIN_OF("MED_MED_RDWR_DRIVER22::read(void)");
   MED_MED_RDONLY_DRIVER22::read();
-  END_OF("MED_MED_RDWR_DRIVER22::read(void)");
+  END_OF();
 }
 
 void MED_MED_RDWR_DRIVER22::readFileStruct(void)
@@ -892,7 +902,7 @@ void MED_MED_RDWR_DRIVER22::readFileStruct(void)
 {
   BEGIN_OF("MED_MED_RDWR_DRIVER22::readFileStruct(void)");
   MED_MED_RDONLY_DRIVER22::readFileStruct();
-  END_OF("MED_MED_RDWR_DRIVER22::readFileStruct(void)");
+  END_OF();
 }
 
 void MED_MED_RDWR_DRIVER22::write(void) const
@@ -900,7 +910,7 @@ void MED_MED_RDWR_DRIVER22::write(void) const
 {
   BEGIN_OF("MED_MED_RDWR_DRIVER22::write(void) const");
   MED_MED_WRONLY_DRIVER22::write();
-  END_OF("MED_MED_RDWR_DRIVER22::write(void) const");
+  END_OF();
 }
 
 void MED_MED_RDWR_DRIVER22::writeFrom(void) const
@@ -908,5 +918,5 @@ void MED_MED_RDWR_DRIVER22::writeFrom(void) const
 {
   BEGIN_OF("MED_MED_RDWR_DRIVER22::writeFrom(void) const");
   MED_MED_WRONLY_DRIVER22::writeFrom();
-  END_OF("MED_MED_RDWR_DRIVER22::writeFrom(void) const");
+  END_OF();
 }

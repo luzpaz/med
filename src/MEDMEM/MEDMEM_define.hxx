@@ -84,7 +84,8 @@ namespace MED_EN {
 
     typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
 
-    typedef enum {MED_LECT,MED_ECRI,MED_REMP,MED_CREA} med_mode_acces;
+    //typedef enum {MED_LECT,MED_ECRI,MED_REMP,MED_CREA} med_mode_acces;
+    typedef enum {RDONLY,WRONLY,RDWR} med_mode_acces;
 
     typedef enum {ASCENDING=7,DESCENDING=77} med_sort_direc;
 
@@ -204,15 +205,15 @@ typedef double         med_float;
 #define MED_VALID    0
 //#define MED_NULL     NULL
 
-#define MED_RDONLY MED_LECT
-  //   rem: MED_WRONLY=MED_ECR n'empêche malheureusement pas de lire le fichier
-  //   mais permet de conserver l'existant. Attention à la création d'objet
-  //   ne prenant pas de paramètre de type mode d'accès il faut tester si il
-  //   est déjà présent dans le fichier. Si  MED_WRONLY=MED_REMP le fichier est
-  //   réinitialisé. Cf une évolution de MED.
-#define MED_WRONLY MED_ECRI
-#define MED_RDWR   MED_ECRI
-#define MED_CREATE MED_CREA
+//#define MED_RDONLY RDONLY
+////   rem: MED_WRONLY=MED_ECR n'empêche malheureusement pas de lire le fichier
+////   mais permet de conserver l'existant. Attention à la création d'objet
+////   ne prenant pas de paramètre de type mode d'accès il faut tester si il
+////   est déjà présent dans le fichier. Si  MED_WRONLY=MED_REMP le fichier est
+////   réinitialisé. Cf une évolution de MED.
+//#define MED_WRONLY WRONLY
+//#define MED_RDWR   RDWR
+//#define MED_CREATE MED_CREA
 // Fin
 
 #define FAUX 0

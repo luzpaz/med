@@ -25,18 +25,23 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-GENDRIVER::GENDRIVER(): _id(MED_INVALID),
-                        _fileName(""),
-                        _accessMode( (med_mode_acces) MED_INVALID ),
-                        _status(MED_INVALID),
-                        _driverType(NO_DRIVER) {}
+GENDRIVER::GENDRIVER(driverTypes driverType):
+  _id(MED_INVALID),
+  _fileName(""),
+  _accessMode( (med_mode_acces) MED_INVALID ),
+  _status(MED_INVALID),
+  _driverType(driverType) {}
 
 GENDRIVER::GENDRIVER(const string & fileName,
-                     med_mode_acces accessMode=(med_mode_acces) MED_INVALID): _id(MED_INVALID),
-                                                                              _fileName(fileName),
-                                                                              _accessMode(accessMode),
-                                                                              _status(MED_CLOSED),
-                                                                              _driverType(NO_DRIVER) {}
+                     med_mode_acces accessMode/*=(med_mode_acces) MED_INVALID*/,
+                     driverTypes driverType)
+  : _id(MED_INVALID),
+    _fileName(fileName),
+    _accessMode(accessMode),
+    _status(MED_CLOSED),
+    _driverType(driverType) 
+{
+}
 
 GENDRIVER::GENDRIVER(const GENDRIVER & genDriver):
   //_id(MED_INVALID), 
@@ -52,13 +57,13 @@ GENDRIVER::~GENDRIVER() {}
 
 GENDRIVER & MEDMEM::GENDRIVER::operator=(const GENDRIVER &  genDriver) 
 {
-  const char * LOC = " GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver)  : ";
-  
-  BEGIN_OF(LOC);
+  //const char * LOC = " GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver)  : ";
+  BEGIN_OF(" GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver)  : ");
   _fileName    = genDriver._fileName;
   _accessMode  = genDriver._accessMode;
   _status      = genDriver._status;
   _id          = genDriver._id;
+  _driverType  = genDriver._driverType;
   return *this;
 }
 
@@ -71,35 +76,35 @@ void GENDRIVER::setFieldName   (const string & ) {};
 void GENDRIVER::openAppend ( void ) {};
 void GENDRIVER::writeAppend ( void ) const {};
 
-void GENDRIVER::setId ( int id ) {
-  const char * LOC = "void GENDRIVER::setId ( int id ) : ";
-
-  BEGIN_OF(LOC);
+void GENDRIVER::setId ( int id )
+{
+  //const char * LOC = "void GENDRIVER::setId ( int id ) : ";
+  BEGIN_OF("void GENDRIVER::setId ( int id ) : ");
 
   if ( id >= 0 ) _id=id; else _id = MED_INVALID ;
 
-  END_OF(LOC);
+  END_OF();
 };
 
-int GENDRIVER::getId ( void) const {
-  const char * LOC = "int GENDRIVER::getId ( void) const ";
-
-  BEGIN_OF(LOC);
+int GENDRIVER::getId ( void) const
+{
+  //const char * LOC = "int GENDRIVER::getId ( void) const ";
+  BEGIN_OF("int GENDRIVER::getId ( void) const ");
 
   return _id ;
 };
 
 string GENDRIVER::getFileName() const {
 
-  const char * LOC = "string GENDRIVER::getFileName() const : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = "string GENDRIVER::getFileName() const : ";
+  BEGIN_OF("string GENDRIVER::getFileName() const : ");
   
   return _fileName;
 }
     
 
-void GENDRIVER::setFileName(const string & fileName)  {
-
+void GENDRIVER::setFileName(const string & fileName)
+{
   const char * LOC = "void GENDRIVER::setFileName(const string & fileName) : ";
   BEGIN_OF(LOC);
 
@@ -109,16 +114,15 @@ void GENDRIVER::setFileName(const string & fileName)  {
   else
     _fileName = fileName; 
 
-  END_OF(LOC);
+  END_OF();
 }
        
 
 
-med_mode_acces GENDRIVER::getAccessMode() const {
-
-  const char * LOC = "med_mode_acces GENDRIVER::getAccessMode() const : ";
-
-  BEGIN_OF(LOC);
+med_mode_acces GENDRIVER::getAccessMode() const
+{
+  //const char * LOC = "med_mode_acces GENDRIVER::getAccessMode() const : ";
+  BEGIN_OF("med_mode_acces GENDRIVER::getAccessMode() const : ");
 
   return _accessMode;
 }
@@ -127,18 +131,15 @@ ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
 {
   switch (drv._accessMode)
     {
-    case MED_RDONLY : 
+    case RDONLY : 
       os<<"C'est un IO de READ"<<endl;
       break;
-    case MED_RDWR :
+    case RDWR :
       os<<"C'est un IO d'READ/WRITE"<<endl;
       break;
-    case MED_REMP :
-      os <<"C'est un IO de remplacement"<<endl;
-      break;
-		case MED_CREATE :
-			os <<"C'est un IO de création"<<endl;
-			break;
+      //case MED_REMP :
+      //os <<"C'est un IO de remplacement"<<endl;
+      //break;
     }
   switch (drv._status)
     {
@@ -158,11 +159,11 @@ ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
 // Test if this driver has been created from  MED driver
 bool MEDMEM::GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
   
-  const char * LOC = "bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const : ";
+  //const char * LOC = "bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const : ";
 
-  MESSAGE(LOC);
+  MESSAGE("bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const : ");
 
-  return ( _id == genDriver._id )  &&
+  return /*( _id == genDriver._id )  &&*/
     ( _driverType == genDriver._driverType ) &&
     (_accessMode == genDriver._accessMode);
   

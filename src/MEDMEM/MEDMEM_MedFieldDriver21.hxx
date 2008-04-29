@@ -105,14 +105,20 @@ public :
     BEGIN_OF(LOC);
 
     // we must set fieldname before open, because we must find field number in file (if it exist !!!)
-    if ( MED_FIELD_DRIVER<T>::_fileName == "" )
+    if ( MED_FIELD_DRIVER<T>::_fileName == "" ) {
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
 				       << "_fileName is |\"\"|, please set a correct fileName before calling open()"
 				       )
 			    );
+    }
 
+    //MED_EN::med_mode_acces mode = dynamic_cast<GENDRIVER*>(this)->getAccessMode();
+    //med_2_1::med_mode_acces m21mode = (med_2_1::med_mode_acces)getMedAccessMode(mode,MED_EN::V21);
     MESSAGE(LOC<<"_fileName.c_str : "<< MED_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< MED_FIELD_DRIVER<T>::_accessMode);
-    _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (MED_FIELD_DRIVER<T>::_fileName.c_str())),(med_2_1::med_mode_acces) MED_FIELD_DRIVER<T>::_accessMode);
+    _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (MED_FIELD_DRIVER<T>::_fileName.c_str())),
+                                  (med_2_1::med_mode_acces) MED_FIELD_DRIVER<T>::_accessMode);
+    //                              m21mode);
+    //                             (med_2_1::med_mode_acces) mode);
     MESSAGE(LOC<<"_medIdt : "<< _medIdt );
     if (_medIdt > 0) 
       MED_FIELD_DRIVER<T>::_status=MED_OPENED;
@@ -126,7 +132,7 @@ public :
 			   );
     }
 
-    END_OF(LOC);
+    END_OF();
   }
   
   void close() {
@@ -140,7 +146,7 @@ public :
       MESSAGE(" MED_FIELD_DRIVER21::close() : MEDfermer : MED_FIELD_DRIVER21<T>::_medIdt= " << _medIdt );
       MESSAGE(" MED_FIELD_DRIVER21::close() : MEDfermer : err    = " << err );
     }
-    END_OF("MED_FIELD_DRIVER21::close()");
+    END_OF();
   }
 
 
@@ -162,7 +168,10 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_RDONLY_DRIVER21():MED_FIELD_DRIVER<T>() {};
+  MED_FIELD_RDONLY_DRIVER21():MED_FIELD_DRIVER<T>()
+  {
+    this->GENDRIVER::_accessMode = MED_EN::RDONLY;
+  };
   
   /*!
     Constructor.
@@ -170,12 +179,12 @@ public :
   template <class INTERLACING_TAG>
   MED_FIELD_RDONLY_DRIVER21(const string & fileName,
 			    FIELD<T, INTERLACING_TAG> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY),
-    MED_FIELD_DRIVER21<T>(fileName,ptrField,MED_EN::MED_RDONLY),
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY),
+    MED_FIELD_DRIVER21<T>(fileName,ptrField,MED_EN::RDONLY),
     IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField)
   { 
     BEGIN_OF("MED_FIELD_RDONLY_DRIVER21::MED_FIELD_RDONLY_DRIVER21(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
-    END_OF("MED_FIELD_RDONLY_DRIVER21::MED_FIELD_RDONLY_DRIVER21(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
+    END_OF();
   }
   
   /*!
@@ -223,7 +232,10 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_WRONLY_DRIVER21():MED_FIELD_DRIVER<T>() {}
+  MED_FIELD_WRONLY_DRIVER21():MED_FIELD_DRIVER<T>()
+  {
+    this->GENDRIVER::_accessMode = MED_EN::WRONLY;
+  }
   
   /*!
     Constructor.
@@ -232,11 +244,11 @@ public :
   MED_FIELD_WRONLY_DRIVER21(const string & fileName,
 			    FIELD<T, INTERLACING_TAG> * ptrField):
     IMED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField),
-    MED_FIELD_DRIVER21<T>(fileName,ptrField,MED_EN::MED_WRONLY),
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_WRONLY)
+    MED_FIELD_DRIVER21<T>(fileName,ptrField,MED_EN::WRONLY),
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
     BEGIN_OF("MED_FIELD_WRONLY_DRIVER21::MED_FIELD_WRONLY_DRIVER21(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
-    END_OF("MED_FIELD_WRONLY_DRIVER21::MED_FIELD_WRONLY_DRIVER21(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
+    END_OF();
   }
 
   /*!
@@ -283,7 +295,10 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_RDWR_DRIVER21():MED_FIELD_DRIVER21<T>() {}
+  MED_FIELD_RDWR_DRIVER21():MED_FIELD_DRIVER21<T>()
+  {
+    this->GENDRIVER::_accessMode = MED_EN::RDWR;
+  }
   
   /*!
     Constructor.
@@ -295,12 +310,12 @@ public :
     MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField),
     IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField),
     IMED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField),
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDWR),
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR),
     IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
   {
     BEGIN_OF("MED_FIELD_RDWR_DRIVER21::MED_FIELD_RDWR_DRIVER21(const string & fileName, const FIELD<T> * ptrField)");
     //_accessMode = MED_RDWR ;
-    END_OF("MED_FIELD_RDWR_DRIVER21::MED_FIELD_RDWR_DRIVER21(const string & fileName, const FIELD<T> * ptrField)");
+    END_OF();
   };
 
   /*!
@@ -517,12 +532,12 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
     support.setNumberOfElements(numberOfElementsOfType);    //setNumberOfElements effectue une copie
     support.setAll(true);
 
-    END_OF(LOC);
+    END_OF();
 
     return alreadyFoundAnEntity;
   } else
     {
-      END_OF(LOC);
+      END_OF();
 
       return false;
     }
@@ -535,7 +550,7 @@ MED_FIELD_DRIVER21<T>::getMeshGeometricType(med_2_1::med_idt id,
 					  vector<MED_EN::medGeometryElement> & geoType,
 					  vector<int> &nbOfElOfType) const
 {
-  const char LOC[] = "MED_FIELD_DRIVER<T>::getMeshGeometricType(...)";
+  //const char LOC[] = "MED_FIELD_DRIVER<T>::getMeshGeometricType(...)";
 
   int numberOfGeometricType=0;
   MED_EN::medGeometryElement geometricType[MED_NBR_GEOMETRIE_MAILLE];
@@ -546,7 +561,7 @@ MED_FIELD_DRIVER21<T>::getMeshGeometricType(med_2_1::med_idt id,
   else
     if (entity == MED_EN::MED_NODE) quoi=med_2_1::MED_COOR;
     else
-      MESSAGE(LOC<<" Support Creation from Mesh |"  << meshName
+      MESSAGE("MED_FIELD_DRIVER<T>::getMeshGeometricType(...)"<<" Support Creation from Mesh |"  << meshName
 				   << "| on entity " << MED_EN::entNames[entity]
 				   << "| is impossible,  must be  on MED_NODE or MED_CELL");
 
@@ -793,11 +808,16 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   // If an error occurs while reading the field, these allocated FIELD member will be deleted
   MED_FIELD_DRIVER<T>::_ptrField->_name =  MED_FIELD_DRIVER<T>::_fieldName;
   MED_FIELD_DRIVER<T>::_ptrField->_numberOfComponents = numberOfComponents ;
-  MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes = new int[numberOfComponents] ;
-  MED_FIELD_DRIVER<T>::_ptrField->_componentsNames = new string[numberOfComponents] ;
-  MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits = new UNIT[numberOfComponents] ;
-  MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions = new string[numberOfComponents] ;
-  MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits = new string[numberOfComponents] ;
+  //MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes = new int[numberOfComponents] ;
+  //MED_FIELD_DRIVER<T>::_ptrField->_componentsNames = new string[numberOfComponents] ;
+  //MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits = new UNIT[numberOfComponents] ;
+  //MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions = new string[numberOfComponents] ;
+  //MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits = new string[numberOfComponents] ;
+  MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes.resize(numberOfComponents);
+  MED_FIELD_DRIVER<T>::_ptrField->_componentsNames.resize(numberOfComponents);
+  MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits.resize(numberOfComponents);
+  MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions.resize(numberOfComponents);
+  MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits.resize(numberOfComponents);
 
   for (int i=0; i<numberOfComponents; i++)
     {
@@ -913,16 +933,21 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
 	delete[] myValues;
 	delete[] NumberOfValues ;
 	delete[] ProfilName;
-	delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes ;
-	delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsNames ;
-	delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits ;
-	delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions ;
-	delete[] MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits ;
-	MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes = NULL ;
-	MED_FIELD_DRIVER<T>::_ptrField->_componentsNames = NULL ;
-	MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits = NULL ;
-	MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions = NULL ;
-	MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits = NULL ;
+	//delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes ;
+	//delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsNames ;
+	//delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits ;
+	//delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions ;
+	//delete[] MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits ;
+	//MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes = NULL ;
+	//MED_FIELD_DRIVER<T>::_ptrField->_componentsNames = NULL ;
+	//MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits = NULL ;
+	//MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions = NULL ;
+	//MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits = NULL ;
+	MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes.clear();
+	MED_FIELD_DRIVER<T>::_ptrField->_componentsNames.clear();
+	MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits.clear();
+	MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions.clear();
+	MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits.clear();
 	MED_FIELD_DRIVER<T>::_fieldNum = MED_INVALID ; // we have not found right field, so reset the field number 
 	throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<": ERROR when read value")) ;
       }
@@ -1133,7 +1158,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     }
   }
       
-  //  END_OF(LOC);
+  //  END_OF();
 }
 
 template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::write( void ) const
@@ -1170,6 +1195,19 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
   if (MED_FIELD_DRIVER<T>::_status==MED_OPENED)
     {
       int err ;
+
+      const SUPPORT * mySupport = MED_FIELD_DRIVER<T>::_ptrField->getSupport() ;
+      if (! mySupport->isOnAllElements())
+	throw MEDEXCEPTION( LOCALIZED (STRING(LOC)
+				       <<": Field must be on all entity"
+				       )
+                            );
+      MESH * myMesh = mySupport->getMesh() ;
+      if(!myMesh)
+	throw MEDEXCEPTION( LOCALIZED (STRING(LOC)
+				       <<": Mesh in support is null"
+				       )
+                            );
 
       int component_count=MED_FIELD_DRIVER<T>::_ptrField->getNumberOfComponents();
       string   component_name(component_count*MED_TAILLE_PNOM21,' ') ;
@@ -1260,15 +1298,6 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
         else H5Gclose(gid);
       }
 
-      const SUPPORT * mySupport = MED_FIELD_DRIVER<T>::_ptrField->getSupport() ;
-
-      if (! mySupport->isOnAllElements())
-	throw MEDEXCEPTION( LOCALIZED (STRING(LOC)
-				       <<": Field must be on all entity"
-				       )
-			    );
-      
-      MESH * myMesh = mySupport->getMesh() ;
       string MeshName = myMesh->getName() ;
       //MED_EN::medModeSwitch Mode = MED_FIELD_DRIVER<T>::_ptrField->_value->getMode() ;
       // on boucle sur tout les types pour ecrire les tableaux de valeur
@@ -1402,7 +1431,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 
     }
   
-  END_OF(LOC);
+  END_OF();
 }
 
 /*--------------------- RDWR PART -------------------------------*/
@@ -1417,7 +1446,7 @@ template <class T> void MED_FIELD_RDWR_DRIVER21<T>::write(void) const
 {
   BEGIN_OF("MED_FIELD_RDWR_DRIVER21::write(void)");
   MED_FIELD_WRONLY_DRIVER21<T>::write(); 
-  END_OF("MED_FIELD_RDWR_DRIVER21::write(void)");
+  END_OF();
 } 
 
 template <class T> void MED_FIELD_RDWR_DRIVER21<T>::read (void)
@@ -1425,7 +1454,7 @@ template <class T> void MED_FIELD_RDWR_DRIVER21<T>::read (void)
 {
   BEGIN_OF("MED_FIELD_RDWR_DRIVER21::read(void)");
   MED_FIELD_RDONLY_DRIVER21<T>::read();
-  END_OF("MED_FIELD_RDWR_DRIVER21::read(void)");
+  END_OF();
 }
 }//End namespace MEDMEM
 /*-----------------------------------------------------------------*/

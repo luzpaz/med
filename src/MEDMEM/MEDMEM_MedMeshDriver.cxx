@@ -38,7 +38,7 @@ using namespace MED_EN;
 // Every memory allocation made in the MedDriver members function are desallocated in the Mesh destructor 
 
 MED_MESH_DRIVER::MED_MESH_DRIVER():
-  GENDRIVER(),
+  GENDRIVER(MED_DRIVER),
   _ptrMesh(( MESH *)MED_NULL),
   _meshName(""),
   _meshNum(MED_INVALID)
@@ -48,7 +48,7 @@ MED_MESH_DRIVER::MED_MESH_DRIVER():
 MED_MESH_DRIVER::MED_MESH_DRIVER(const string & fileName,
 				 MESH * ptrMesh,
 				 MED_EN::med_mode_acces accessMode): 
-  GENDRIVER(fileName,accessMode),
+  GENDRIVER(fileName, accessMode, MED_DRIVER),
   _ptrMesh(ptrMesh), 
   _meshName(""),
   _meshNum(MED_INVALID)
@@ -88,7 +88,7 @@ IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(): MED_MESH_DRIVER()
   
 IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(const string & fileName,
 						 MESH * ptrMesh):
-  MED_MESH_DRIVER(fileName, ptrMesh, MED_EN::MED_RDONLY)
+  MED_MESH_DRIVER(fileName, ptrMesh, MED_EN::RDONLY)
 { 
   MESSAGE("IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
@@ -100,19 +100,19 @@ IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(const IMED_MESH_RDONLY_DRIVER &
 
 int IMED_MESH_RDONLY_DRIVER::getDescendingConnectivity(CONNECTIVITY * Connectivity) 
 {
-  const char * LOC = "MED_MESH_RDONLY_DRIVER::getDescendingConnectivity : " ;
+  //const char * LOC = "MED_MESH_RDONLY_DRIVER::getDescendingConnectivity : " ;
   if (_status==MED_OPENED)
     {
-      MESSAGE(LOC<<"call on the object " << Connectivity);
-      MESSAGE(LOC<<"Not yet implemented !");
+      MESSAGE("MED_MESH_RDONLY_DRIVER::getDescendingConnectivity : "<<"call on the object " << Connectivity);
+      MESSAGE("MED_MESH_RDONLY_DRIVER::getDescendingConnectivity : "<<"Not yet implemented !");
     }
   return MED_ERROR;
 }
 
 void IMED_MESH_RDONLY_DRIVER::buildAllGroups(vector<GROUP*> & Groups, vector<FAMILY*> & Families) 
 {
-  const char * LOC = "MED_MESH_RDONLY_DRIVER::buildAllGroups " ;
-  BEGIN_OF(LOC);
+  //const char * LOC = "MED_MESH_RDONLY_DRIVER::buildAllGroups " ;
+  BEGIN_OF("MED_MESH_RDONLY_DRIVER::buildAllGroups ");
 
   int numberOfFamilies = Families.size() ;
   //SCRUTE(numberOfFamilies);
@@ -145,13 +145,13 @@ void IMED_MESH_RDONLY_DRIVER::buildAllGroups(vector<GROUP*> & Groups, vector<FAM
     it++;
   }
 
-  END_OF(LOC);
+  END_OF();
 }
 
 void IMED_MESH_RDONLY_DRIVER::updateFamily()
 {
-  const char * LOC = "MED_MESH_RDONLY_DRIVER::updateFamily() " ;
-  BEGIN_OF(LOC);
+  //const char * LOC = "MED_MESH_RDONLY_DRIVER::updateFamily() " ;
+  BEGIN_OF("MED_MESH_RDONLY_DRIVER::updateFamily() ");
 
   // we need to update family on constituent if we have constituent, but no 
   // descending connectivity, so, we must calculate all constituent and
@@ -159,7 +159,7 @@ void IMED_MESH_RDONLY_DRIVER::updateFamily()
   _ptrMesh->_connectivity->updateFamily(_ptrMesh->_familyFace) ; // in 2d, do nothing
   _ptrMesh->_connectivity->updateFamily(_ptrMesh->_familyEdge) ; // in 3d, do nothing
 
-  END_OF(LOC);
+  END_OF();
 }
 
 
@@ -205,7 +205,7 @@ IMED_MESH_RDWR_DRIVER::IMED_MESH_RDWR_DRIVER()
 
 IMED_MESH_RDWR_DRIVER::IMED_MESH_RDWR_DRIVER(const string & fileName,
 					   MESH * ptrMesh):
-   IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,MED_RDWR)
+   IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,RDWR)
 {
   MESSAGE("MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
@@ -228,9 +228,9 @@ MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER()
 }
 
 MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh):
-  IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,MED_LECT)
+  IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,RDONLY)
 {
-  _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,MED_LECT);
+  _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,RDONLY);
 }
 
 MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER(const MED_MESH_RDONLY_DRIVER & driver):MED_MESH_DRIVER(driver)
@@ -420,9 +420,9 @@ MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER()
 }
 
 MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh):
-  IMED_MESH_RDWR_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,MED_REMP)
+  IMED_MESH_RDWR_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,RDWR)
 {
-  _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,MED_REMP);
+  _concreteMeshDrv = DRIVERFACTORY::buildMeshDriverFromFile(fileName,ptrMesh,RDWR);
 }
 
 MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const MED_MESH_RDWR_DRIVER & driver): MED_MESH_DRIVER(driver)

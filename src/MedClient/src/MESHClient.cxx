@@ -49,7 +49,7 @@ MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) :
 
   blankCopy();
 
-  END_OF("MESHClient::MESHClient(SALOME_MED::MESH_ptr m)");
+  END_OF();
 }
 //=============================================================================
 /*!
@@ -151,7 +151,7 @@ void MESHClient::blankCopy()
  
   _complete = false;
 
-  END_OF("MESHClient::blankCopy()");
+  END_OF();
 }
 //=============================================================================
 /*!
@@ -215,7 +215,7 @@ void MESHClient::fillCopy()
 
   _complete = true;
 
-  END_OF("MESHClient::fillCopy()");
+  END_OF();
 }
 
 //=============================================================================
@@ -248,7 +248,7 @@ MESHClient::~MESHClient()
 {
   BEGIN_OF("MESHClient::~MESHClient()");
   IOR_Mesh->Destroy();
-  END_OF("MESHClient::~MESHClient()");
+  END_OF();
 }
 
 //=============================================================================

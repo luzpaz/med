@@ -38,12 +38,15 @@ using namespace std;
 */
 namespace MEDMEM {
 
-/* Modify the following line to add a new driver type (step 1) */
-typedef enum { MED_DRIVER = 0, GIBI_DRIVER = 1, PORFLOW_DRIVER = 2, ENSIGHT_DRIVER = 250, VTK_DRIVER = 254, ASCII_DRIVER = 3, NO_DRIVER = 255 } driverTypes;
+  /* Modify the following line to add a new driver type (step 1) */
+  typedef enum { MED_DRIVER = 0, GIBI_DRIVER = 1, PORFLOW_DRIVER = 2,
+                 ENSIGHT_DRIVER = 250, VTK_DRIVER = 254, ASCII_DRIVER = 3,
+                 NO_DRIVER = 255 } driverTypes;
+
   class GENDRIVER;
   ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
 
-class MEDMEM_EXPORT GENDRIVER {
+  class MEDMEM_EXPORT GENDRIVER {
 
 protected :
 
@@ -60,11 +63,12 @@ public:
   /*!
     Constructor.
   */
-  GENDRIVER();
+  GENDRIVER(driverTypes driverType);
   /*!
     Constructor.
   */
-  GENDRIVER(const string & fileName,MED_EN::med_mode_acces accessMode);
+  GENDRIVER(const string & fileName, MED_EN::med_mode_acces accessMode,
+            driverTypes driverType);
   /*!
     Copy constructor.
   */
@@ -130,6 +134,7 @@ public:
   string getFileName () const;
   void   setFileName ( const string & fileName);
   virtual MED_EN::med_mode_acces getAccessMode() const;
+  driverTypes getDriverType() const { return _driverType; }
 };
 };
 

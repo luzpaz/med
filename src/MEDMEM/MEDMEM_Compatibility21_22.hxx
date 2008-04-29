@@ -70,4 +70,15 @@ namespace med_2_3 {
 #define MED_TAILLE_PNOM21   8
 #define MED_TAILLE_PNOM22  16
 
+//#include "MEDMEM_define.hxx"
+#include "MEDMEM_MedVersion.hxx"
+
+namespace MEDMEM {
+
+  int getMedAccessMode(MED_EN::med_mode_acces mode,
+                       MED_EN::medFileVersion medVersion)
+    throw (MEDEXCEPTION);
+
+}
+
 #endif /* COMPATIBILITY_21_22_HXX */

@@ -75,7 +75,7 @@ public :
   ENSIGHT_FIELD_DRIVER(const string & fileName,
 		       FIELD<T,INTERLACING_TAG> * ptrField,
 		   MED_EN::med_mode_acces accessMode):
-    GENDRIVER(fileName,accessMode),
+    GENDRIVER(fileName, accessMode, MED_DRIVER),
     _ptrField((FIELD<T> *) ptrField),
     _fieldNum(MED_INVALID) 
   {
@@ -136,20 +136,20 @@ public :
 
     _ensightFile = new ifstream();
 
-    END_OF(LOC);
+    END_OF();
   }
   /*!
     Constructor.
   */
   template<class INTERLACING_TAG>
   ENSIGHT_FIELD_RDONLY_DRIVER<T>(const string & fileName,
-				 FIELD<T,INTERLACING_TAG> * ptrField):ENSIGHT_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY)
+				 FIELD<T,INTERLACING_TAG> * ptrField):ENSIGHT_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY)
   {
-    const char * LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::ENSIGHT_FIELD_RDONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
-    BEGIN_OF(LOC);
+    //const char * LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::ENSIGHT_FIELD_RDONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
+    BEGIN_OF("ENSIGHT_FIELD_RDONLY_DRIVER::ENSIGHT_FIELD_RDONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ");
     _ensightFile = new ifstream();
 
-    END_OF(LOC);
+    END_OF();
   }
 
   /*!
@@ -165,8 +165,8 @@ public :
   */
   ~ENSIGHT_FIELD_RDONLY_DRIVER()
   {
-    const char * LOC ="ENSIGHT_FIELD_RDONLY_DRIVER::~ENSIGHT_FIELD_RDONLY_DRIVER()";
-    BEGIN_OF(LOC);
+    //const char * LOC ="ENSIGHT_FIELD_RDONLY_DRIVER::~ENSIGHT_FIELD_RDONLY_DRIVER()";
+    BEGIN_OF("ENSIGHT_FIELD_RDONLY_DRIVER::~ENSIGHT_FIELD_RDONLY_DRIVER()");
 
     close();
 
@@ -176,7 +176,7 @@ public :
 
     SCRUTE(_ensightFile);
 
-    END_OF(LOC);
+    END_OF();
   }
 
   void openConst() const throw (MEDEXCEPTION)
@@ -204,7 +204,7 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-    END_OF(LOC);
+    END_OF();
   }
 
   void openConstAppend() const throw (MEDEXCEPTION)
@@ -245,7 +245,7 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-    END_OF(LOC);
+    END_OF();
   }
 
   void open() throw (MEDEXCEPTION)
@@ -278,7 +278,7 @@ public :
 				       << ENSIGHT_FIELD_DRIVER<T>::_fileName)
 			    );
 
-    END_OF(LOC);
+    END_OF();
   }
 
   void close() {
@@ -337,7 +337,7 @@ public :
 
     _ensightFile = new ifstream();
 
-    END_OF(LOC);
+    END_OF();
   }
   /*!
     Constructor.
@@ -345,13 +345,13 @@ public :
   template<class INTERLACING_TAG>
   ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName,
 			      FIELD<T,INTERLACING_TAG> * ptrField):
-    ENSIGHT_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_WRONLY)
+    ENSIGHT_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
-    const char * LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
-    BEGIN_OF(LOC);
+    //const char * LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
+    BEGIN_OF("ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ");
     _ensightFile = new ifstream();
 
-    END_OF(LOC);
+    END_OF();
   }
 
   /*!
@@ -367,18 +367,18 @@ public :
   */
   ~ENSIGHT_FIELD_WRONLY_DRIVER()
   {
-  const char * LOC ="ENSIGHT_FIELD_WRONLY_DRIVER::~ENSIGHT_FIELD_WRONLY_DRIVER()";
-  BEGIN_OF(LOC);
+    //const char * LOC ="ENSIGHT_FIELD_WRONLY_DRIVER::~ENSIGHT_FIELD_WRONLY_DRIVER()";
+    BEGIN_OF("ENSIGHT_FIELD_WRONLY_DRIVER::~ENSIGHT_FIELD_WRONLY_DRIVER()");
 
-  close();
+    close();
 
-  SCRUTE(_ensightFile);
+    SCRUTE(_ensightFile);
 
-  delete _ensightFile ;
+    delete _ensightFile ;
 
-  SCRUTE(_ensightFile);
+    SCRUTE(_ensightFile);
 
-  END_OF(LOC);
+    END_OF();
   }
 
   void openConst() const throw (MEDEXCEPTION)
@@ -406,7 +406,7 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-    END_OF(LOC);
+    END_OF();
   }
 
   void openConstAppend() const throw (MEDEXCEPTION)
@@ -447,7 +447,7 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-    END_OF(LOC);
+    END_OF();
   }
 
   void open() throw (MEDEXCEPTION)
@@ -480,7 +480,7 @@ public :
 				       << ENSIGHT_FIELD_DRIVER<T>::_fileName)
 			    );
 
-    END_OF(LOC);
+    END_OF();
   }
 
   void close() {
@@ -894,12 +894,12 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
 template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::writeAppend(void) const
   throw (MEDEXCEPTION)
 {
-  const char * LOC = "ENSIGHT_FIELD_DRIVER::writeAppend(void) const " ;
-  BEGIN_OF(LOC);
+  //const char * LOC = "ENSIGHT_FIELD_DRIVER::writeAppend(void) const " ;
+  BEGIN_OF("ENSIGHT_FIELD_DRIVER::writeAppend(void) const ");
 
 // redondant avec write()
 
-  END_OF(LOC);
+  END_OF();
 }
 
 }//End namespace MEDMEM

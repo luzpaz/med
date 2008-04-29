@@ -76,7 +76,7 @@ void TYPE_MESH_DRIVER::open()
 //     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName<<" in mode "<<_accessMode));
 //   }
   
-  END_OF(LOC);
+  END_OF();
 }
   
 void TYPE_MESH_DRIVER::close()
@@ -98,7 +98,7 @@ void TYPE_MESH_DRIVER::close()
 //     _medIdt = MED_INVALID;
 //   }
 
-  END_OF(LOC);
+  END_OF();
 }
 
 void    TYPE_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
@@ -145,7 +145,7 @@ void TYPE_MESH_RDONLY_DRIVER::read(void)
   _ptrMesh->_name =  _meshName;
   
  
-  END_OF(LOC);
+  END_OF();
 }
 
 void TYPE_MESH_RDONLY_DRIVER::write( void ) const
@@ -197,7 +197,7 @@ void TYPE_MESH_WRONLY_DRIVER::write(void) const
 
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "Write Driver isn\'t implemented"));
 
-  END_OF(LOC);
+  END_OF();
 } 
 
 

@@ -80,7 +80,7 @@ void MED_MESH_DRIVER21::open()
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName<<" in mode "<<_accessMode));
   }
   
-  END_OF(LOC);
+  END_OF();
 }
   
 void MED_MESH_DRIVER21::close()
@@ -103,7 +103,7 @@ void MED_MESH_DRIVER21::close()
     _status = MED_CLOSED;
     _medIdt = MED_INVALID;
   }
-  END_OF(LOC);
+  END_OF();
 }
 
 //A FAIRE UTILISER LES MAPS...
@@ -121,13 +121,14 @@ const char * const MED_MESH_DRIVER21::all_cell_type_tab [MED_NBR_GEOMETRIE_MAILL
 
 MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21():_computeFaces(true)
 {
+  this->GENDRIVER::_accessMode = MED_EN::RDONLY;
 }
   
 MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21(const string & fileName,
 						   MESH * ptrMesh):
   IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),
-  MED_MESH_DRIVER21(fileName,ptrMesh,MED_RDONLY),
-  MED_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY),
+  MED_MESH_DRIVER21(fileName,ptrMesh,RDONLY),
+  MED_MESH_DRIVER(fileName,ptrMesh,RDONLY),
   _computeFaces(true)
 { 
   MESSAGE("MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21(const string & fileName, MESH * ptrMesh) has been created");
@@ -172,30 +173,32 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
 	  buildAllGroups(_ptrMesh->_groupNode,_ptrMesh->_familyNode) ;
 	}
 
-      END_OF(LOC);
+      END_OF();
       return;
     }
-  else // check that the mesh is really unstructured (PAL14113)
-  {
-    char                  meshName[MED_TAILLE_NOM+1]="";
-    char                  meshDescription[MED_TAILLE_DESC+1]="";
-    med_2_3::med_int      meshDim;
-    med_2_3::med_maillage meshType;
-    int numberOfMeshes = med_2_3::MEDnMaa(_medIdt);
-    for (int i=1;i<=numberOfMeshes;i++)
-    {
-      MEDmaaInfo(_medIdt, i ,meshName, &meshDim, &meshType, meshDescription);
-      if (_meshName == string(meshName)) {
-        if ( meshType == med_2_3::MED_STRUCTURE ) {
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
-                                       "class GRID must be used for a structured mesh"));
-        }
-        else {
-          break;
-        }
-      }
-    }
-  }
+  // (EAP at EDF): Commented for MEDMEMTest_VtkMedDriver.cxx:126 -
+  // aMedMeshRdDriver21->read();
+//   else // check that the mesh is really unstructured (PAL14113)
+//   {
+//     char                  meshName[MED_TAILLE_NOM+1]="";
+//     char                  meshDescription[MED_TAILLE_DESC+1]="";
+//     med_2_3::med_int      meshDim;
+//     med_2_3::med_maillage meshType;
+//     int numberOfMeshes = med_2_3::MEDnMaa(_medIdt);
+//     for (int i=1;i<=numberOfMeshes;i++)
+//     {
+//       MEDmaaInfo(_medIdt, i ,meshName, &meshDim, &meshType, meshDescription);
+//       if (_meshName == string(meshName)) {
+//         if ( meshType == med_2_3::MED_STRUCTURE ) {
+//           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
+//                                        "class GRID must be used for a structured mesh"));
+//         }
+//         else {
+//           break;
+//         }
+//       }
+//     }
+//   }
 
   if (getCOORDINATE()!=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getCOORDINATE"  )) ;
@@ -231,7 +234,7 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
 //        MESSAGE(LOC << _ptrMesh->_connectivity->_type[i]) ;
 //      }
 
-  END_OF(LOC);
+  END_OF();
 }
 
 //=======================================================================
@@ -410,7 +413,7 @@ void MED_MESH_RDONLY_DRIVER21::getGRID()
   _ptrMesh->_coordinate->setCoordinatesSystem(coordinateSystem);
 
 
-  END_OF(LOC);
+  END_OF();
 }
 
 //=======================================================================
@@ -562,7 +565,7 @@ int  MED_MESH_RDONLY_DRIVER21::getCOORDINATE()
 
       delete[] tmp_node_number ;
       
-      END_OF(LOC);
+      END_OF();
       return MED_VALID;
     }
   return MED_ERROR;
@@ -726,7 +729,7 @@ int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY()
 	  
 //  	}
       
-      END_OF(LOC);
+      END_OF();
       return MED_VALID;
     }
   return MED_ERROR;
@@ -1467,7 +1470,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
       delete[] MEDArrayEdgeFamily ;
     }
 
-    END_OF(LOC);
+    END_OF();
     return MED_VALID ;
   }
   return MED_ERROR;
@@ -1500,7 +1503,7 @@ int  MED_MESH_RDONLY_DRIVER21::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
                                    << "| nodes in mesh |" 
                                    << _ptrMesh->_name.c_str() << "|" ));
     }
-    END_OF(LOC);
+    END_OF();
     return MED_VALID;
   }
   return MED_ERROR;
@@ -1569,11 +1572,14 @@ int  MED_MESH_RDONLY_DRIVER21::getCellsFamiliesNumber(int **MEDArrayFamily,
 
 MED_MESH_WRONLY_DRIVER21::MED_MESH_WRONLY_DRIVER21()
 {
+  this->GENDRIVER::_accessMode = MED_EN::WRONLY;
 }
   
 MED_MESH_WRONLY_DRIVER21::MED_MESH_WRONLY_DRIVER21(const string & fileName,
 						   MESH * ptrMesh):
-  MED_MESH_DRIVER21(fileName,ptrMesh,MED_WRONLY),IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,MED_WRONLY)
+  MED_MESH_DRIVER21(fileName,ptrMesh,WRONLY),
+  IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),
+  MED_MESH_DRIVER(fileName,ptrMesh,WRONLY)
 {
   MESSAGE("MED_MESH_WRONLY_DRIVER21::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
@@ -1603,6 +1609,9 @@ void MED_MESH_WRONLY_DRIVER21::write(void) const
 
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "File "<<_fileName<<" is not open. Open it before write !"));
+
+  if (_ptrMesh->_spaceDimension == MED_INVALID )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh was not defined before calling write()"));
 
   if (_ptrMesh->getIsAGrid())
   {
@@ -1666,7 +1675,7 @@ void MED_MESH_WRONLY_DRIVER21::write(void) const
   if (writeFamilies(_ptrMesh->_familyEdge) !=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERROR in writeFamilies(_ptrMesh->_familyEdge)"  )) ;
 
-  END_OF(LOC);
+  END_OF();
 } 
 
 //=======================================================================
@@ -1812,7 +1821,7 @@ int MED_MESH_WRONLY_DRIVER21::writeGRID() const
 
   } // end Write  Cartesian or Polar Grid
 
-  END_OF(LOC);
+  END_OF();
   return MED_VALID;
 }
 
@@ -1925,7 +1934,7 @@ int MED_MESH_WRONLY_DRIVER21::writeCoordinates() const {
       }
       //////////////////////////////////////////////////////////////////////////////////////
 
-  END_OF(LOC);
+  END_OF();
     
   return MED_VALID;
 }
@@ -2076,7 +2085,7 @@ int MED_MESH_WRONLY_DRIVER21::writeConnectivities(medEntityMesh entity) const {
             
     }
   }
-  END_OF(LOC);
+  END_OF();
   return MED_VALID;
 }
 
@@ -2436,7 +2445,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
     }
   }
     
-  END_OF(LOC);
+  END_OF();
   return MED_VALID;
 }
 
@@ -2555,7 +2564,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
 
   }
 
-  END_OF(LOC);
+  END_OF();
     
   return MED_VALID;
 }
@@ -2569,15 +2578,16 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
 
 MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21()
 {
+  this->GENDRIVER::_accessMode = MED_EN::RDWR;
 }
 
 MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const string & fileName,
 					       MESH * ptrMesh):
-  MED_MESH_DRIVER(fileName,ptrMesh,MED_RDWR),
+  MED_MESH_DRIVER(fileName,ptrMesh,RDWR),
   IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),
   IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),
   IMED_MESH_RDWR_DRIVER(fileName,ptrMesh),
-  MED_MESH_DRIVER21(fileName,ptrMesh,MED_RDWR),
+  MED_MESH_DRIVER21(fileName,ptrMesh,RDWR),
   MED_MESH_RDONLY_DRIVER21(fileName,ptrMesh),
   MED_MESH_WRONLY_DRIVER21(fileName,ptrMesh)
 {

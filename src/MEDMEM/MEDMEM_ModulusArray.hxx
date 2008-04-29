@@ -60,7 +60,7 @@ public:
 
 
 MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) : 
-  _length(length), _array(array), _length2(0)
+  _length(length), _array(array), _length2(length)
 {
 //    SCRUTE(_length);
 //    for (int i=0;i<_length;i++){

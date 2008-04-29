@@ -228,7 +228,7 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 			if (faceglobal[i]!=0) delete[] faceglobal[i];
     }
 
-  END_OF("MEDSPLITTER::MESHCollectionDriver::read()")
+  END_OF();
 		return 0;
 }
 
@@ -316,7 +316,7 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 		
 			MESSAGE("File name "<<string(distfilename));
 		
-			int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::MED_CREATE);
+			int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
 		
 			MESSAGE("Start writing");
 			(m_collection->getMesh())[idomain]->write(id);
@@ -341,6 +341,6 @@ void MESHCollectionMedXMLDriver::write(char* filename)
  	xmlFreeDoc(master_doc);
 	xmlCleanupParser();
 
-	END_OF("MEDSPLITTER::MESHCollectionDriver::writeXML()");
+	END_OF();
 
 }

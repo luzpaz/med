@@ -39,7 +39,7 @@ FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr S,
 
   blankCopy(false);
 
-  END_OF("FAMILYClient::FAMILYClient(SALOME_MED::FAMILY_ptr m)");
+  END_OF();
 }
 //=============================================================================
 /*!
@@ -93,7 +93,7 @@ void FAMILYClient::blankCopy(bool blankSupport)
 
   _complete = false;
 
-  END_OF("FAMILYClient::blankCopy()");
+  END_OF();
 }
 
 //=============================================================================
@@ -115,7 +115,7 @@ void FAMILYClient::fillCopy(bool fillSupport)
     _complete = true;
   }
 
-  END_OF("FAMILYClient::fillCopy()");
+  END_OF();
 }
 
 //=============================================================================
@@ -127,5 +127,5 @@ void FAMILYClient::fillCopy(bool fillSupport)
 FAMILYClient::~FAMILYClient()
 {
   BEGIN_OF("FAMILYClient::~FAMILYClient()");
-  END_OF("FAMILYClient::~FAMILYClient()");
+  END_OF();
 }

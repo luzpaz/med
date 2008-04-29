@@ -156,7 +156,7 @@ public :
   /*!
     Constructor.
   */
-  MED_MESH_WRONLY_DRIVER22(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces access=MED_EN::MED_WRONLY) ;
+  MED_MESH_WRONLY_DRIVER22(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces access=MED_EN::WRONLY) ;
   /*!
     Copy constructor.
   */

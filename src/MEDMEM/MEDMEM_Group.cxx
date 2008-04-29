@@ -158,7 +158,7 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
 
   //MESSAGE(LOC<<"Printing of the object GROUP built "<< (GROUP)*this);
 
-  END_OF(LOC);
+  END_OF();
 };
 
 GROUP::GROUP(const GROUP & m):SUPPORT(m)
@@ -217,6 +217,6 @@ GROUP::GROUP(const GROUP & m):SUPPORT(m)
 //     it++ ;
 //   }
   
-//   END_OF(LOC);
+//   END_OF();
 // };
 

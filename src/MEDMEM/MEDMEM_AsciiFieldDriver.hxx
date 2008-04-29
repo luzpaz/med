@@ -176,7 +176,10 @@ namespace MEDMEM {
 					    FIELD<T,INTERLACING_TAG> * ptrField,
 					    MED_EN::med_sort_direc direction,
 					    const char *priority)
-    :GENDRIVER(fileName,MED_EN::MED_ECRI),_ptrField((FIELD<T>*)ptrField),_fileName(fileName),_direc(direction)
+    :GENDRIVER(fileName, MED_EN::WRONLY, ASCII_DRIVER),
+     _ptrField((FIELD<T>*)ptrField),
+     _fileName(fileName),
+     _direc(direction)
     {
       _nbComponents=_ptrField->getNumberOfComponents();
       if(_nbComponents<=0)
@@ -209,9 +212,16 @@ namespace MEDMEM {
 
 
   template <class T>
-  ASCII_FIELD_DRIVER<T>::ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other)
-    :_ptrField(other._ptrField),_fileName(other._fileName),_direc(other._direc),_mesh(other._mesh),_nbComponents(other._nbComponents),
-     _code(other._code),_spaceDimension(other._spaceDimension),_support(other._support)
+  ASCII_FIELD_DRIVER<T>::ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other):
+    GENDRIVER(ASCII_DRIVER),
+    _ptrField(other._ptrField),
+    _fileName(other._fileName),
+    _direc(other._direc),
+    _mesh(other._mesh),
+    _nbComponents(other._nbComponents),
+    _code(other._code),
+    _spaceDimension(other._spaceDimension),
+    _support(other._support)
   {
   }
 

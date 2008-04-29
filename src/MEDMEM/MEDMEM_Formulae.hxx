@@ -22,6 +22,9 @@
 
 #include <math.h>
 
+#include "MEDMEM_Exception.hxx"
+
+
 inline void CalculateBarycenterDyn(const double **pts, int nbPts, int dim, double *bary);
 
 inline double CalculateAreaForPolyg(const double **coords, int nbOfPtsInPolygs, int spaceDim);
@@ -68,14 +71,17 @@ inline double CalculateAreaForQuad(const double *p1, const double *p2, const dou
     }
 }
 
-inline void CalculateNormalForTria(const double *p1, const double *p2, const double *p3, double *normal)
+inline void CalculateNormalForTria(const double *p1, const double *p2,
+                                   const double *p3, double *normal)
 {
   normal[0] = ((p2[1]-p1[1])*(p3[2]-p1[2]) - (p3[1]-p1[1])*(p2[2]-p1[2]))/2.0;
   normal[1] = ((p3[0]-p1[0])*(p2[2]-p1[2]) - (p2[0]-p1[0])*(p3[2]-p1[2]))/2.0;
   normal[2] = ((p2[0]-p1[0])*(p3[1]-p1[1]) - (p3[0]-p1[0])*(p2[1]-p1[1]))/2.0;
 }
 
-inline void CalculateNormalForQuad(const double *p1, const double *p2, const double *p3, const double *p4, double *normal)
+inline void CalculateNormalForQuad(const double *p1, const double *p2,
+                                   const double *p3, const double *p4,
+                                   double *normal)
 {
   double xnormal1 = (p2[1]-p1[1])*(p4[2]-p1[2]) - (p4[1]-p1[1])*(p2[2]-p1[2]);
   double xnormal2 = (p4[0]-p1[0])*(p2[2]-p1[2]) - (p2[0]-p1[0])*(p4[2]-p1[2]);
@@ -90,17 +96,30 @@ inline void CalculateNormalForQuad(const double *p1, const double *p2, const dou
   normal[2] = xnormal3*xarea ;
 }
 
-inline void CalculateNormalForPolyg(const double **coords, int nbOfPtsInPolygs, double *normal)
+inline void CalculateNormalForPolyg(const double **coords,
+                                    int nbOfPtsInPolygs,
+                                    double *normal)
 {
   double coordOfBary[3];
   CalculateBarycenterDyn(coords,nbOfPtsInPolygs,3,coordOfBary);
-  double xnormal1 = (coords[0][1]-coords[1][1])*(coordOfBary[2]-coords[1][2])-(coords[0][2]-coords[1][2])*(coordOfBary[1]-coords[1][1]);
-  double xnormal2 = (coords[0][2]-coords[1][2])*(coordOfBary[0]-coords[1][0])-(coords[0][0]-coords[1][0])*(coordOfBary[2]-coords[1][2]);
-  double xnormal3 = (coords[0][0]-coords[1][0])*(coordOfBary[1]-coords[1][1])-(coords[0][1]-coords[1][1])*(coordOfBary[0]-coords[1][0]);
+  double xnormal1 =
+    (coords[0][1]-coords[1][1]) * (coordOfBary[2]-coords[1][2]) - 
+    (coords[0][2]-coords[1][2]) * (coordOfBary[1]-coords[1][1]);
+  double xnormal2 =
+    (coords[0][2]-coords[1][2]) * (coordOfBary[0]-coords[1][0]) -
+    (coords[0][0]-coords[1][0]) * (coordOfBary[2]-coords[1][2]);
+  double xnormal3 =
+    (coords[0][0]-coords[1][0]) * (coordOfBary[1]-coords[1][1]) -
+    (coords[0][1]-coords[1][1]) * (coordOfBary[0]-coords[1][0]);
   double xarea = sqrt(xnormal1*xnormal1 + xnormal2*xnormal2 + xnormal3*xnormal3);
-  xnormal1 = xnormal1/xarea;
-  xnormal2 = xnormal2/xarea;
-  xnormal3 = xnormal3/xarea;
+  if(xarea<1.e-6) {
+    std::string diagnosis;
+    diagnosis="Can not calculate normal - polygon is singular";
+    throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
+  }
+  xnormal1 = -xnormal1/xarea;
+  xnormal2 = -xnormal2/xarea;
+  xnormal3 = -xnormal3/xarea;
   xarea = CalculateAreaForPolyg(coords,nbOfPtsInPolygs,3);
   normal[0] = xnormal1*xarea ;
   normal[1] = xnormal2*xarea ;
@@ -112,11 +131,10 @@ inline double CalculateAreaForPolyg(const double **coords, int nbOfPtsInPolygs, 
   double coordOfBary[3];
   CalculateBarycenterDyn(coords,nbOfPtsInPolygs,spaceDim,coordOfBary);
   double ret=0.;
-  for(int i=0;i<nbOfPtsInPolygs;i++)
-    {
-      double tmp=CalculateAreaForTria(coords[i],coords[(i+1)%nbOfPtsInPolygs],coordOfBary,spaceDim);
-      ret+=tmp;
-    }
+  for(int i=0;i<nbOfPtsInPolygs;i++) {
+    double tmp = CalculateAreaForTria(coords[i],coords[(i+1)%nbOfPtsInPolygs],coordOfBary,spaceDim);
+    ret+=tmp;
+  }
   return ret;
 }
 

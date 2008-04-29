@@ -75,7 +75,8 @@ protected :
     There is one for each attribute.
     \endif
   */
-  PointerOf<string>  _attributeDescription ;
+  //PointerOf<string>  _attributeDescription ;
+  vector<string>  _attributeDescription ;
   /*!
     \if developper
     Number of the group the family belongs to.
@@ -87,7 +88,8 @@ protected :
     Name of the group the family belongs to.
     \endif
   */
-  PointerOf<string> _groupName ;
+  //PointerOf<string> _groupName ;
+  vector<string> _groupName ;
 
 public:
 			/*! Constructor. */
@@ -137,9 +139,9 @@ public:
   inline int      getNumberOfAttributes()            const;
   inline const int *    getAttributesIdentifiers()   const;
   inline const int *    getAttributesValues()        const;
-  inline const string * getAttributesDescriptions()  const;
+  inline const string*  getAttributesDescriptions()  const;
   inline int      getNumberOfGroups()                const;
-  inline const string * getGroupsNames()             const;
+  inline const string*  getGroupsNames()             const;
 
   // A FAIRE : VERIFIER LA VALIDITE DES PARAMETRES !
   inline int      getAttributeIdentifier(int i)  const;
@@ -188,8 +190,18 @@ inline void FAMILY::setAttributesValues(int * AttributeValue)
 inline void FAMILY::setAttributesDescriptions(string * AttributeDescription) 
 //--------------------------------------------------------------------------
 { 
-    //_attributeDescription = AttributeDescription ; 
-    _attributeDescription.setShallowAndOwnership(AttributeDescription) ;
+  //_attributeDescription = AttributeDescription ; 
+  //_attributeDescription.setShallowAndOwnership(AttributeDescription) ;
+  int nbAttr = getNumberOfAttributes();
+  if(nbAttr<1) {
+    std::string diagnosis;
+    diagnosis="Can not set attributes descriptions - number of attributes is not set";
+    throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
+  }
+  _attributeDescription.resize(nbAttr);
+  for(int i=0; i<nbAttr; i++) {
+    _attributeDescription[i] = AttributeDescription[i];
+  }
 }
 
 /*! Sets the attribute _numberOfGroup to NumberOfGroups. */
@@ -205,11 +217,28 @@ inline void FAMILY::setNumberOfGroups(int NumberOfGroups)
   inline void FAMILY::setGroupsNames(string * GroupName, bool giveOwnership) 
 //----------------------------------------------------
 { 
-	if (giveOwnership)
-		_groupName.setShallowAndOwnership(GroupName);
-	else	
-    	//_groupName = GroupName ; 
-    _groupName.set(_numberOfGroup, GroupName) ;
+  int nbGr = getNumberOfGroups();
+  if(nbGr<1) {
+    std::string diagnosis;
+    diagnosis="Can not set groups names - number of groups is not set";
+    throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
+  }
+  if (giveOwnership) {
+    //_groupName.setShallowAndOwnership(GroupName);
+    _groupName.resize(nbGr);
+    for(int i=0; i<nbGr; i++) {
+      _groupName[i] = GroupName[i];
+    }
+    delete [] GroupName;
+  }
+  else {
+    //_groupName = GroupName ; 
+    //_groupName.set(_numberOfGroup, GroupName) ;
+    _groupName.resize(nbGr);
+    for(int i=0; i<nbGr; i++) {
+      _groupName[i] = GroupName[i];
+    }
+  }
 }
 /*! Returns the attribute _identifier.\n
    Note that there is one identifier precisely for each family. */
@@ -263,7 +292,7 @@ inline int FAMILY::getAttributeValue(int i) const
 inline const string * FAMILY::getAttributesDescriptions() const
 //-------------------------------------------------------
 { 
-    return _attributeDescription ; 
+    return &(_attributeDescription[0]);
 }
 /*! Returns description of the Ith attribute of the family\n
    Note that they are numbered from 1 to N */
@@ -285,7 +314,7 @@ inline int FAMILY::getNumberOfGroups() const
 inline const string * FAMILY::getGroupsNames() const
 //--------------------------------------------
 { 
-    return _groupName ; 
+  return &(_groupName[0]);
 }
 /*! Returns the name of the Ith group the family belongs to.\n
     Note that they are numbered from 1 to N*/

@@ -197,6 +197,10 @@ public  :
     return  _array;
   }
 
+  const ElementType * getPtr() const {
+    return  _array;
+  }
+
   void setPtr(ElementType * values, bool shallowCopy=false,
 	      bool ownershipOfValues=false) {
 
@@ -227,9 +231,14 @@ public  :
     // setRow fonctionne
     // dans les deux modes d'entrelacement.
 
-    for (int j =1; j <= InterlacingPolicy::getDim(); j++)
-      for (int k = 1 ; k <= InterlacingPolicy::getNbGauss(i); k++)
-	_array[InterlacingPolicy::getIndex(i,j,k)] = value[InterlacingPolicy::getIndex(1,j,k)];
+    int index = -1;
+    for (int j =1; j <= InterlacingPolicy::getDim(); j++) {
+      for (int k = 1 ; k <= InterlacingPolicy::getNbGauss(i); k++) {
+	//_array[InterlacingPolicy::getIndex(i,j,k)] = value[InterlacingPolicy::getIndex(1,j,k)];
+        index++;
+	_array[InterlacingPolicy::getIndex(i,j,k)] = value[index];
+      }
+    }
   }
 
   inline const ElementType * getColumn(int j) const {
@@ -244,9 +253,14 @@ public  :
     // setColumn fonctionne
     // dans les deux modes d'entrelacement.
 
-    for (int i=1; i <= InterlacingPolicy::getNbElem(); i++)
-      for (int k = 1 ; k <= InterlacingPolicy::getNbGauss(i); k++)
-	_array[InterlacingPolicy::getIndex(i,j,k)] = value[InterlacingPolicy::getIndex(i,1,k)];
+    int index = -1;
+    for (int i=1; i <= InterlacingPolicy::getNbElem(); i++) {
+      for (int k = 1 ; k <= InterlacingPolicy::getNbGauss(i); k++) {
+	//_array[InterlacingPolicy::getIndex(i,j,k)] = value[InterlacingPolicy::getIndex(i,1,k)];
+        index++;
+	_array[InterlacingPolicy::getIndex(i,j,k)] = value[index];
+      }
+    }
   }
 
 

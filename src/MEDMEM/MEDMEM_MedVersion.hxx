@@ -31,13 +31,13 @@ namespace MEDMEM {
   MEDMEM_EXPORT MED_EN::medFileVersion getMedFileVersion(const string & fileName)
     throw (MEDEXCEPTION);
 
-  int getMedAccessMode(MED_EN::med_mode_acces mode,
-                       MED_EN::medFileVersion medVersion)
-    throw (MEDEXCEPTION);
+  //int getMedAccessMode(MED_EN::med_mode_acces mode,
+  //                     MED_EN::medFileVersion medVersion)
+  //  throw (MEDEXCEPTION);
 
-  int getMedAccessMode(MED_EN::med_mode_acces mode,
-                       MED_EN::medFileVersion medVersion)
-    throw (MEDEXCEPTION);
+  //int getMedAccessMode(MED_EN::med_mode_acces mode,
+  //                     MED_EN::medFileVersion medVersion)
+  //  throw (MEDEXCEPTION);
 }
 
 #endif /* MED_VERSION_HXX */

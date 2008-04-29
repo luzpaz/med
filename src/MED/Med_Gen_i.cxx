@@ -295,7 +295,7 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
         }
 
         endService("Med_Gen_i::readStructFileWithFieldType");
-	END_OF("Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)");
+	END_OF();
 }
 
 //=============================================================================

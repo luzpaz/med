@@ -138,7 +138,7 @@ public :
 			   );
     }
 
-    END_OF(LOC);
+    END_OF();
   }
 
   void close() {
@@ -152,7 +152,7 @@ public :
       MESSAGE(" MED_FIELD_DRIVER22::close() : MEDfermer : _medIdt= " << MED_FIELD_DRIVER22<T>::_medIdt );
       MESSAGE(" MED_FIELD_DRIVER22::close() : MEDfermer : err    = " << err );
     }
-    END_OF("MED_FIELD_DRIVER22::close()");
+    END_OF();
   }
 };
 
@@ -172,7 +172,10 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_RDONLY_DRIVER22():MED_FIELD_DRIVER<T>() {};
+  MED_FIELD_RDONLY_DRIVER22():MED_FIELD_DRIVER<T>()
+  {
+    this->GENDRIVER::_accessMode = MED_EN::RDONLY;
+  }
 
   /*!
     Constructor.
@@ -181,11 +184,11 @@ public :
   MED_FIELD_RDONLY_DRIVER22(const string & fileName,
 			    FIELD<T, INTERLACING_TAG> * ptrField):
     IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField),
-    MED_FIELD_DRIVER22<T>(fileName,ptrField,MED_EN::MED_RDONLY),
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY)
+    MED_FIELD_DRIVER22<T>(fileName,ptrField,MED_EN::RDONLY),
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY)
   {
     BEGIN_OF("MED_FIELD_RDONLY_DRIVER22::MED_FIELD_RDONLY_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
-    END_OF("MED_FIELD_RDONLY_DRIVER22::MED_FIELD_RDONLY_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
+    END_OF();
   }
 
   /*!
@@ -233,7 +236,10 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_WRONLY_DRIVER22():MED_FIELD_DRIVER<T>() {}
+  MED_FIELD_WRONLY_DRIVER22():MED_FIELD_DRIVER<T>()
+  {
+    this->GENDRIVER::_accessMode = MED_EN::WRONLY;
+  }
 
   /*!
     Constructor.
@@ -242,11 +248,11 @@ public :
   MED_FIELD_WRONLY_DRIVER22(const string & fileName,
 			    FIELD<T, INTERLACING_TAG> * ptrField):
     IMED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField),
-    MED_FIELD_DRIVER22<T>(fileName,ptrField,MED_EN::MED_WRONLY),
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_WRONLY)
+    MED_FIELD_DRIVER22<T>(fileName,ptrField,MED_EN::WRONLY),
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
     BEGIN_OF("MED_FIELD_WRONLY_DRIVER22::MED_FIELD_WRONLY_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
-    END_OF("MED_FIELD_WRONLY_DRIVER22::MED_FIELD_WRONLY_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
+    END_OF();
   }
 
   /*!
@@ -293,7 +299,10 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_RDWR_DRIVER22():MED_FIELD_DRIVER22<T>() {}
+  MED_FIELD_RDWR_DRIVER22():MED_FIELD_DRIVER22<T>()
+  {
+    this->GENDRIVER::_accessMode = MED_EN::RDWR;
+  }
 
   /*!
     Constructor.
@@ -305,12 +314,12 @@ public :
     MED_FIELD_RDONLY_DRIVER22<T>(fileName,ptrField),
     IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField),
     IMED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField),
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDWR),
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR),
     IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
   {
     BEGIN_OF("MED_FIELD_RDWR_DRIVER22::MED_FIELD_RDWR_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
     //_accessMode = MED_RDWR ;
-    END_OF("MED_FIELD_RDWR_DRIVER22::MED_FIELD_RDWR_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
+    END_OF();
   }
 
   /*!
@@ -708,7 +717,7 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromFile(med_2_3::med_idt id,
 //   for (int j =0 ; j<= numberOfGeometricType;++j)
 //       cout << "nbOfElOfTypeC["<<j<<"]="<<nbOfElOfTypeC[j]<<endl;
 
-  END_OF("MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromFile(...)");
+  END_OF();
 }
 
 /*!
@@ -748,7 +757,7 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromMESH( MESH * meshPtr,
     nbOfElOfTypeC[j]+=nbOfElOfTypeC[j-1]+nbOfElOfType[j-1];
   }
 
-  END_OF(LOC);
+  END_OF();
 }
 
 /*--------------------- RDONLY PART -------------------------------*/
@@ -1093,11 +1102,16 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
   MED_FIELD_DRIVER<T>::_ptrField->_name                   = fieldName;
   MED_FIELD_DRIVER<T>::_ptrField->_numberOfComponents     = numberOfComponents ;
-  MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes        = new int   [numberOfComponents] ;
-  MED_FIELD_DRIVER<T>::_ptrField->_componentsNames        = new string[numberOfComponents] ;
-  MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits        = new UNIT  [numberOfComponents] ;
-  MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions = new string[numberOfComponents] ;
-  MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits     = new string[numberOfComponents] ;
+  //MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes        = new int   [numberOfComponents] ;
+  //MED_FIELD_DRIVER<T>::_ptrField->_componentsNames        = new string[numberOfComponents] ;
+  //MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits        = new UNIT  [numberOfComponents] ;
+  //MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions = new string[numberOfComponents] ;
+  //MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits     = new string[numberOfComponents] ;
+  MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes.resize(numberOfComponents);
+  MED_FIELD_DRIVER<T>::_ptrField->_componentsNames.resize(numberOfComponents);
+  MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits.resize(numberOfComponents);
+  MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions.resize(numberOfComponents);
+  MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits.resize(numberOfComponents);
   for (int i=0; i<numberOfComponents; i++) {
       MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes[i]    = 1 ;
       MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i]    = string(componentName+i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
@@ -1200,16 +1214,21 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 	//delete[] NumberOfValues ;
 	delete[] profilName;
 	delete[] gaussModelName;
-	delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes ;
-	delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsNames ;
-	delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits ;
-	delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions ;
-	delete[] MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits ;
-	MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes = NULL ;
-	MED_FIELD_DRIVER<T>::_ptrField->_componentsNames = NULL ;
-	MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits = NULL ;
-	MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions = NULL ;
-	MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits = NULL ;
+	//delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes ;
+	//delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsNames ;
+	//delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits ;
+	//delete[] MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions ;
+	//delete[] MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits ;
+	//MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes = NULL ;
+	//MED_FIELD_DRIVER<T>::_ptrField->_componentsNames = NULL ;
+	//MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits = NULL ;
+	//MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions = NULL ;
+	//MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits = NULL ;
+	MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes.clear();
+	MED_FIELD_DRIVER<T>::_ptrField->_componentsNames.clear();
+	MED_FIELD_DRIVER<T>::_ptrField->_componentsUnits.clear();
+	MED_FIELD_DRIVER<T>::_ptrField->_componentsDescriptions.clear();
+	MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits.clear();
 	MED_FIELD_DRIVER<T>::_fieldNum = MED_INVALID ; // we have not found right field, so reset the field number
 	throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<": ERROR while reading values")) ;
       }
@@ -1441,7 +1460,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
   MED_FIELD_DRIVER<T>::_ptrField->_support=mySupport; //Prévenir l'utilisateur ?
 
-  END_OF(LOC);
+  END_OF();
 }
 
 template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::write( void ) const
@@ -1667,6 +1686,11 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 
     fileHasMesh = ( med_2_3::MEDdimLire(id, const_cast<char *>(meshName.c_str())) > 0);
     MESH * meshPtr = mySupport->getMesh();
+    if(!meshPtr)
+      throw MEDEXCEPTION( LOCALIZED (STRING(LOC)
+                                     <<": Mesh in support is null"
+                                     )
+                          );
 
     if (fileHasMesh)
       this->getMeshGeometricTypeFromFile(id, meshName,
@@ -1948,7 +1972,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
   if ( !isFullInterlace ) delete myField;
 
 
-  END_OF(LOC);
+  END_OF();
 }
 
 /*--------------------- RDWR PART -------------------------------*/
@@ -1963,7 +1987,7 @@ template <class T> void MED_FIELD_RDWR_DRIVER22<T>::write(void) const
 {
   BEGIN_OF("MED_FIELD_RDWR_DRIVER22::write(void)");
   MED_FIELD_WRONLY_DRIVER22<T>::write();
-  END_OF("MED_FIELD_RDWR_DRIVER22::write(void)");
+  END_OF();
 }
 
 template <class T> void MED_FIELD_RDWR_DRIVER22<T>::read (void)
@@ -1971,7 +1995,7 @@ template <class T> void MED_FIELD_RDWR_DRIVER22<T>::read (void)
 {
   BEGIN_OF("MED_FIELD_RDWR_DRIVER22::read(void)");
   MED_FIELD_RDONLY_DRIVER22<T>::read();
-  END_OF("MED_FIELD_RDWR_DRIVER22::read(void)");
+  END_OF();
 }
 
 } //End namespace MEDMEM

@@ -175,6 +175,8 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
 //       delete _connectivity ;
     _connectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;
 
+    _connectivity->setNumberOfNodes( _numberOfNodes );
+
   } else {
 
     if (_connectivity == NULL) // we must have defined MED_CELL connectivity
@@ -196,6 +198,8 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
     CONNECTIVITY * myConnectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;
     myConnectivity->setEntityDimension(_connectivity->getEntityDimension()-1);
     _connectivity->setConstituent(myConnectivity);
+
+    myConnectivity->setNumberOfNodes( _numberOfNodes );
   }
 }
 
