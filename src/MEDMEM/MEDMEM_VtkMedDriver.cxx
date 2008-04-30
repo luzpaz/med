@@ -171,7 +171,7 @@ void VTK_MED_DRIVER::write() const
 	      name << myField->getName() << "_" << dt << "_" << it ;
 	      writeField(myField,name.str()) ;
 	    } else
-	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
+	      MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
 	}
       }
     }
@@ -192,8 +192,9 @@ void VTK_MED_DRIVER::write() const
 	      ostringstream name ; 
 	      name << myField->getName() << "_" << dt << "_" << it ;
 	      writeField(myField,name.str()) ;
-	    } else
-	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all cells !");
+	    }
+            else
+	      MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" which is not on all cells !");
 	}
       }
     }
@@ -464,11 +465,13 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
       MESSAGE("MED_INT32");
       if (NumberOfComponents==3) {
 	(*_vtkFile) << "VECTORS " << name << " int" << endl ;
-      } else if (NumberOfComponents<=4) {
+      }
+      else if (NumberOfComponents<=4) {
 	(*_vtkFile) << "SCALARS " << name << " int " << NumberOfComponents << endl ;
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
-      } else {
-	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+      }
+      else {
+	MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -504,11 +507,13 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
       MESSAGE("MED_REEL64");
       if (NumberOfComponents==3) {
 	(*_vtkFile) << "VECTORS " << name << " float" << endl ;
-      } else if (NumberOfComponents<=4) {
+      }
+      else if (NumberOfComponents<=4) {
 	(*_vtkFile) << "SCALARS " << name << " float " << NumberOfComponents << endl ;
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
-      } else {
-	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+      }
+      else {
+	MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -520,13 +525,15 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
 				   )
 				);
 	value = myArray->getPtr();
-      } else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
+      }
+      else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
 	myArray = ArrayConvert2No( *( dynamic_cast< FIELD<double,NoInterlaceByType>* >
 				   (myField)->getArrayNoGauss()
 				   )
 				);
 	value = myArray->getPtr();
-      } else {
+      }
+      else {
 	value = ((FIELD<double>*)myField)->getValue() ;
       }
 
@@ -541,7 +548,7 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
       break ;
     }
     default : { 
-      MESSAGE(LOC << "Could not write field "<<name<<" the type is not int or double !");
+      MESSAGE(__LOC << "Could not write field "<<name<<" the type is not int or double !");
     }
     }
   

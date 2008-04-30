@@ -2007,7 +2007,7 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEX
 
   if (size == 1)
     {
-      MESSAGE(LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
+      MESSAGE(__LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
       SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
 
       returnedSupport = new SUPPORT(*obj);

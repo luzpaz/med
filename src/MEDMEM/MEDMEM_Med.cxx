@@ -130,7 +130,7 @@ MED::~MED()
 	delete (FIELD<double>*) (*currentField).first ;
 	break ;
       default : 
-	MESSAGE(LOC << "Field has type different of int or double, could not destroy its values array !") ;
+	MESSAGE(__LOC << "Field has type different of int or double, could not destroy its values array !") ;
 	delete (*currentField).first;
       }
     }
@@ -799,7 +799,7 @@ void MED::updateSupport ()
       }
       catch (MEDEXCEPTION & ex) {
 	// entity not defined in mesh -> we remove support on it !
-	MESSAGE(LOC<<ex.what());
+	MESSAGE(__LOC<<ex.what());
 	delete (*itSupport).second ;
 	//(*itSupportOnMesh).second.erase(itSupport) ; // that's right ????
 	//itSupport-- ;
