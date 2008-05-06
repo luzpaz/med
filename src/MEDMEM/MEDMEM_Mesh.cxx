@@ -2756,13 +2756,13 @@ void MESH::convertToPoly()
 
   for (int i=0; i<nboldpolyhedra; i++)
     {
-      newconnindex.push_back(newconnindex[newconnindex.size()-1]+oldconnpoly[i+1]-oldconnpoly[i]);
+      newconnindex.push_back(newconnindex[newconnindex.size()-1]+oldconnpolyindex[i+1]-oldconnpolyindex[i]);
     }
-  for (int i=0; i<oldconnpoly[nboldpolyhedra]-1;i++)
+  for (int i=0; i<oldconnpolyindex[nboldpolyhedra]-1;i++)
     {
       newfaceindex.push_back(newfaceindex[newfaceindex.size()-1]+oldfaceindex[i+1]-oldfaceindex[i]);
     }
-  for (int i=0; i< oldfaceindex[oldconnpoly[nboldpolyhedra]-1]-1; i++)
+  for (int i=0; i< oldfaceindex[oldconnpolyindex[nboldpolyhedra]-1]-1; i++)
     newconn.push_back(oldconnpoly[i]);
   //  memcpy(newconn_ptr,oldconnpoly,sizeof(int)*(oldfaceindex[oldconnpoly[nboldpolyhedra]-1]-1));
 
