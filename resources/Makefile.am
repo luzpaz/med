@@ -214,6 +214,8 @@ medfiles_DATA=\
     square2_split1.med \
     square2_split2.med
 
-medfilesdir = $(datadir)/salome/resources/MedFiles
+# the folder for the med files exporting
+# can be changed later
+medfilesdir = $(datadir)/salome/resources/med
 
 nodist_salomeres_DATA=MEDCatalog.xml
