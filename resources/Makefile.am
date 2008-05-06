@@ -216,6 +216,6 @@ medfiles_DATA=\
 
 # the folder for the med files exporting
 # can be changed later
-medfilesdir = $(datadir)/salome/resources/med
+medfilesdir = $(prefix)/share/@PACKAGE@/resources/@MODULE_NAME@
 
 nodist_salomeres_DATA=MEDCatalog.xml
