@@ -51,10 +51,11 @@
 #include "MEDMEM_GaussLocalization.hxx"
 #include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_SWIG_Templates.hxx"
+#include "PointLocator.hxx"
 
   using namespace MEDMEM;
   using namespace MED_EN;
-
+	using namespace INTERP_KERNEL;
   /*  typedef FIELD <double, FullInterlace> FIELDDOUBLEFULLINTERLACE;*/
   /*  typedef FIELD <int, FullInterlace> FIELDINTFULLINTERLACE;*/
   typedef FIELD <double, FullInterlace> FIELDDOUBLE;
@@ -1520,6 +1521,34 @@ class GRID : public MESH
       return result;
     }
   }
+};
+
+class PointLocator
+{
+public:
+	PointLocator(const MESH& mesh);
+	virtual ~PointLocator();
+	%extend{
+	  PyObject* locate(const double* x)
+	    {
+		    std::list<int> mylist = self->locate(x);
+			  if (mylist.size()>10)
+			  {
+			  char * message = "Error in PointLocator : SWIG interface limits the number of cells to 10";
+        PyErr_SetString(PyExc_RuntimeError, message);
+        return NULL;
+				}
+			  
+			  int array[10]; // maximum number of cells in which the point lies
+			  int index=0;
+			  for (list<int>::const_iterator iter= mylist.begin();
+			   iter != mylist.end();
+			  	iter++)
+				    array[index++]= *iter;
+		    TYPEMAP_OUTPUT_ARRAY(array, mylist.size(), PyInt_FromLong,
+			     PointLocator::locate);
+      }
+   }
 };
 
 class MED

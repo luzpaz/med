@@ -51,9 +51,10 @@ libMEDMEM_Swig_wrap.cxx: $(SWIG_DEF)
 	$(SWIG) $(SWIG_FLAGS) -o $@  $<
 
 libMEDMEM_Swigcmodule_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
-	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
+	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERP_KERNEL
+
 libMEDMEM_Swigcmodule_la_LDFLAGS= $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
-	../MEDMEM/libmedmem.la
+	../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
 if MED_ENABLE_KERNEL
   libMEDMEM_Swigcmodule_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
   libMEDMEM_Swigcmodule_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace
