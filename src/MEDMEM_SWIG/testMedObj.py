@@ -34,11 +34,11 @@ import os
 #befor running this script, please be sure about the path the files
 #
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
+filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
 medFile = "pointe.med"
 
-medFile = filePath + medFile
+medFile = os.path.join(filePath, medFile)
 rootFile = string.split(medFile,".")[0]
 medFileOut21 = rootFile + "_Out21.med"
 medFileOut22 = rootFile + "_Out22.med"

@@ -30,9 +30,9 @@ import os
 #befor running this script, please be sure about the path the file fileName
 #
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
+filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
-medFile = filePath + "test19.med"
+medFile = os.path.join(filePath, "test19.med")
 print "Read file", medFile
 
 md = MED()

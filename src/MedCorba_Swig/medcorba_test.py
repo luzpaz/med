@@ -37,10 +37,9 @@ from random import *
 
 import os
 
-# filePath=os.environ["MED_ROOT_DIR"]
-# filePath=filePath+"/share/salome/resources/med/"
-filePath = os.environ["DATA_DIR"]
-filePath = os.path.join( filePath, "MedFiles" )
+filePath = os.environ["MED_ROOT_DIR"]
+filePath = os.path.join( filePath, "share", "salome", "resources", "med" )
+
 #==============================================================================
 
 def AnalyzeField(field):

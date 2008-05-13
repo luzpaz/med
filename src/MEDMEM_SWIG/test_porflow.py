@@ -29,11 +29,11 @@ import os
 #befor running this script, please be sure about the path the file fileName
 #
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
+filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 porflowFile = "boitenew.inp"
 mesh1Name = string.split(porflowFile,".")[0]+"_fromPorflowDriver"
 
-porflowFile = filePath + porflowFile
+porflowFile = os.path.join(filePath, porflowFile)
 medFile = string.split(porflowFile,".")[0]+"_fromPorflowDriver.med"
 vtkFile = string.split(porflowFile,".")[0]+"_fromPorflowDriver.vtk"
 mesh2Name = mesh1Name

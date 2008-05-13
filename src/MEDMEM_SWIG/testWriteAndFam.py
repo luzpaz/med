@@ -31,7 +31,7 @@ import os
 #befor running this script, please be sure about the path the files
 #
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
+filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
 medFiles = []
 medFiles.append("geomMesh21.med")
@@ -40,7 +40,7 @@ nbOfFiles = len(medFiles)
 
 for i in range(nbOfFiles):
     medFile = medFiles[i]
-    medFile = filePath + medFile
+    medFile = os.path.join( filePath, medFile )
     medFiles[i] = medFile
     pass
 

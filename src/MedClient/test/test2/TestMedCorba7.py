@@ -18,11 +18,12 @@
 # 
 import os
 
-BASE = os.environ["MED_ROOT_DIR"] + '/share/salome/resources/med/'
+BASE = os.environ["MED_ROOT_DIR"]
+BASE = os.path.join( BASE, 'share', 'salome', 'resources', 'med' )
 
-fileName = BASE + 'pointe.med'
-fileName = BASE + 'test_hydro_darcy1a_out.med'
-fileName = BASE + 'carre_en_quad4_seg2.med'
+fileName = os.path.join( BASE, 'pointe.med' )
+fileName = os.path.join( BASE, 'test_hydro_darcy1a_out.med' )
+fileName = os.path.join( BASE, 'carre_en_quad4_seg2.med' )
 
 def compare(x, y):
     if (len(x) != len(y)):

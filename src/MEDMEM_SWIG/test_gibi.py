@@ -29,11 +29,11 @@ import os
 #befor running this script, please be sure about the path the file fileName
 #
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
+filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 gibiFile = "elle_2D_QT_2x2.sauve"
 mesh1Name = string.split(gibiFile,".")[0]+"_fromGibiDriver"
 
-gibiFile = filePath + gibiFile
+gibiFile = os.path.join(filePath, gibiFile)
 medFile = string.split(gibiFile,".")[0]+"_fromGibiDriver.med"
 vtkFile = string.split(gibiFile,".")[0]+"_fromGibiDriver.vtk"
 mesh2Name = mesh1Name

@@ -5,7 +5,7 @@ import os
 from libMEDClient import *
 
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
+filePath=os.path.join( filePath, "share", "salome", "resources", "med" )
 
 medFiles = []
 medFiles.append("extendedtransport53_triangles.med")
@@ -24,7 +24,7 @@ nbOfFiles = len(medFiles)
 med=salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
 
 for i in range(nbOfFiles):
-  medFile = filePath + medFiles[i]
+  medFile = os.path.join( filePath, medFiles[i] )
   meshName = meshNames[i]
 
 

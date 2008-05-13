@@ -137,9 +137,9 @@ medComp=salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
 import os
 
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
+filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
-filePathName = filePath + fileName
+filePathName = os.path.join( filePath, fileName )
 
 print "Reading the .med file ",filePathName," and pushing corba objects in the SALOME study"
 medComp.readStructFileWithFieldType(filePathName,salome.myStudyName)

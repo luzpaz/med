@@ -25,9 +25,9 @@ import os
 #befor running this script, please be sure about the path the file fileName
 #
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
+filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
-medFile = filePath + "cube_hexa8_quad4.med"
+medFile = os.path.join(filePath, "cube_hexa8_quad4.med")
 
 md = MED()
 

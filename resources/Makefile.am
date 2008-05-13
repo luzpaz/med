@@ -50,9 +50,7 @@ dist_salomeres_DATA=\
     test3.xyz \
     titi.cnc \
     titi.inp \
-    titi.xyz
-
-medfiles_DATA=\
+    titi.xyz \
     carre_en_quad4_import22.med \
     carre_en_quad4.med \
     carre_en_quad4_seg2_import22.med \
@@ -216,6 +214,6 @@ medfiles_DATA=\
 
 # the folder for the med files exporting
 # can be changed later
-medfilesdir = $(prefix)/share/@PACKAGE@/resources/@MODULE_NAME@
+# medfilesdir = $(prefix)/share/@PACKAGE@/resources/@MODULE_NAME@
 
 nodist_salomeres_DATA=MEDCatalog.xml

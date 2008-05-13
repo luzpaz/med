@@ -17,8 +17,8 @@ from random import *
 
 import os
 
-filePath=os.environ["DATA_DIR"]
-filePath=filePath+"/MedFiles/"
+filePath = os.environ["MED_ROOT_DIR"]
+filePath = os.path.join( filePath, "share", "salome", "resources", "med" )
 
 #==============================================================================
 

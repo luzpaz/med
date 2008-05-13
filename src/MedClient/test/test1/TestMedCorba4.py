@@ -17,10 +17,11 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 # 
 import os
-BASE = os.environ["MED_ROOT_DIR"] + '/share/salome/resources/med/'
+BASE = os.environ["MED_ROOT_DIR"]
+BASE = os.path.join( BASE, 'share', 'salome', 'resources', 'med' )
 
-fileName = BASE + 'pointe.med'
-fileName = BASE + 'carre_en_quad4_seg2.med'
+fileName = os.path.join( BASE, 'pointe.med' )
+fileName = os.path.join( BASE, 'carre_en_quad4_seg2.med' )
 
 # MED Mesh read from a (local) file
 

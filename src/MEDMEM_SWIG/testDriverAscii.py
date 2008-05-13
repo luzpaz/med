@@ -25,9 +25,9 @@ import os
 #
 
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
+filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
-medFile = filePath + "test_2D.med"
+medFile = os.path.join(filePath, "test_2D.med")
 
 asciiFile = "tyst.txt"
 
