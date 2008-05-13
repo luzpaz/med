@@ -79,9 +79,9 @@ using namespace MEDMEM;
 void MEDMEMTest::testAsciiFieldDriver()
 {
   // read a mesh from a MED file
-  string datadir   = getenv("DATA_DIR");
+  string datadir   = getenv("MED_ROOT_DIR");
   string tmp_dir   = getenv("TMP");
-  string filename  = datadir + "/MedFiles/pointe.med";
+  string filename  = datadir + "/share/salome/resources/med/pointe.med";
   string meshname  = "maa1";
   string fieldname = "fieldcelldouble";
 

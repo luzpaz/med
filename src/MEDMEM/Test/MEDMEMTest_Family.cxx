@@ -151,8 +151,8 @@ void MEDMEMTest::testFamily()
   ///////////////////////////////////
   // TEST 1: test_copie_family.cxx //
   ///////////////////////////////////
-  string datadir  = getenv("DATA_DIR");
-  string filename = datadir + "/MedFiles/pointe.med";
+  string datadir  = getenv("MED_ROOT_DIR");
+  string filename = datadir + "/share/salome/resources/med/pointe.med";
   string meshname = "maa1";
 
   MESH * aMesh = new MESH();
