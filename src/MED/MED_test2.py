@@ -31,8 +31,8 @@ import SALOME
 import os
 
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
-medFile=filePath+"mesh.med"
+filePath=os.path.join(filePath, "share", "salome", "resources", "med")
+medFile=os.path.join(filePath, "mesh.med")
 
 med=salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
 
@@ -50,7 +50,7 @@ except SALOME.SALOME_Exception, ex:
 print mesh.getName()
 print mesh.getNumberOfNodes()
 
-medFile = filePath+"pointe.med"
+medFile = os.path.join(filePath,"pointe.med")
 try:
   field=med.readFieldInFile(medFile,salome.myStudyName,"fieldcelldouble",-1,-1)
 except SALOME.SALOME_Exception, ex:

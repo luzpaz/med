@@ -3,7 +3,7 @@ import SALOME
 import os
 
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
+filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
 import string
 
@@ -156,7 +156,7 @@ med=salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
 for i in range(nbOfFiles):
     medFile = medFiles[i]
     print "Testing with the file ",medFile
-    medFile = filePath + medFile
+    medFile = os.path.join(filePath, medFile)
     med.readStructFileWithFieldType(medFile,salome.myStudyName)
 
 print "END of the Pyhton script ..... Ctrl D to exit"
