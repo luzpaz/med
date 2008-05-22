@@ -173,7 +173,7 @@ namespace MED
       if(aTimeStampInfoSet.empty()) 
 	continue;
       const PTimeStampInfo& aTimeStampInfo = *aTimeStampInfoSet.begin();
-      anEntite2TFieldInfo2TimeStampInfoSet[aTimeStampInfo->GetEntity()].insert(*anIter);
+      anEntite2TFieldInfo2TimeStampInfoSet[ConvertEntity(aTimeStampInfo->GetEntity())].insert(*anIter);
     }
     return anEntite2TFieldInfo2TimeStampInfoSet;
   }
@@ -363,5 +363,19 @@ namespace MED
     for(TInt i=0; i<aNbNodes; i++) aFamily2NbCells[theInfo->GetFamNumNode(i)] += 1;
     for(TInt i=0; i<aNbCells; i++) aFamily2NbCells[theInfo->GetFamNum(i)] += 1;
     return aFamily2NbCells;
+  }
+
+  EEntiteMaillage ConvertEntity(const EEntiteMaillage& aEntity){
+    switch( aEntity ){
+      
+    case eNOEUD_ELEMENT:
+    case eMAILLE: return eMAILLE; //eNOEUD_ELEMENT it is eMAILLE
+      
+    case eFACE:
+    case eARETE:
+    case eNOEUD: return aEntity; break;
+    default: return EEntiteMaillage(-1);
+      
+    }
   }
 }

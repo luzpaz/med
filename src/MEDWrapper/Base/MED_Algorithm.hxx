@@ -152,7 +152,12 @@ namespace MED
   MEDWRAPPER_EXPORT
   TFamilyID2NbCells
   GetFamilyID2NbCells(PGrilleInfo& theInfo);
-  
+
+  //! Convert eNOEUD_ELEMENT to eMAILLE
+  MEDWRAPPER_EXPORT
+  EEntiteMaillage
+  ConvertEntity(const EEntiteMaillage& aEntity);
+
 }
 
 #endif
