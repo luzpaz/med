@@ -73,6 +73,7 @@ ABS_CONF_DIR=`pwd`
 
 #######################################################################
 # Update configure.ac script: to set MED_WITH_KERNEL and MED_WITH_GUI variables
+chmod +w configure.ac
 sed -e s/MED_WITH_KERNEL=[a-z]*/MED_WITH_KERNEL=${MED_WITH_KERNEL}/g configure.ac > configure.tmp
 sed -e s/MED_WITH_GUI=[a-z]*/MED_WITH_GUI=${MED_WITH_GUI}/g configure.tmp > configure.ac
 rm configure.tmp
