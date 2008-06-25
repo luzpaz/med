@@ -512,9 +512,9 @@ fi
 #variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok boost_ok doxygen_ok graphviz_ok OpenGL_ok qt_ok vtk_ok omniORB_ok occ_ok Kernel_ok"
 
 if test "${MED_WITH_GUI}" = "yes"; then
-  variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok cppunit_ok"
+  variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok sip_ok pyqt_ok qwt_ok occ_ok Kernel_ok cppunit_ok"
 else
-  variables="cc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok occ_ok Kernel_ok cppunit_ok"
+  variables="cc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok Kernel_ok cppunit_ok"
 fi
 
 if test "x$ENABLE_SPLITTER" = "xyes"; then
@@ -537,6 +537,9 @@ echo "---Optional:"
 variables="mpi_ok"
 if test "${MED_WITH_KERNEL}" = "yes"; then
    variables="mpi_ok openpbs_ok lsf_ok doxygen_ok graphviz_ok"
+fi
+if test "${MED_WITH_GUI}" = "no"; then
+  variables="$variables occ_ok"
 fi
 
 for var in $variables

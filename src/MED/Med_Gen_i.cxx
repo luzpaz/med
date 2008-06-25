@@ -55,9 +55,6 @@
 #include <deque>
 #include <map>
 
-#include <TCollection_AsciiString.hxx>
-#include <TColStd_SequenceOfAsciiString.hxx>
-
 #include <HDFascii.hxx>
 
 using namespace std;
