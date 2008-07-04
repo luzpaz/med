@@ -255,6 +255,8 @@ private:
 		_cell_models.insert(make_pair(MED_EN::MED_QUAD4,CELLMODEL(MED_EN::MED_QUAD4)));
 		_cell_models.insert(make_pair(MED_EN::MED_TETRA4,CELLMODEL(MED_EN::MED_TETRA4)));
 		_cell_models.insert(make_pair(MED_EN::MED_HEXA8,CELLMODEL(MED_EN::MED_HEXA8)));
+		_cell_models.insert(make_pair(MED_EN::MED_PYRA5,CELLMODEL(MED_EN::MED_PYRA5)));
+		_cell_models.insert(make_pair(MED_EN::MED_PENTA6,CELLMODEL(MED_EN::MED_PENTA6)));
 		
 	};
 	~CELLMODEL_Map(){ if(_singleton) delete _singleton;};
