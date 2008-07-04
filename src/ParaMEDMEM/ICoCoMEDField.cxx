@@ -135,8 +135,10 @@ namespace ICoCo
 	{
 		delete _local_mesh;
 		delete _local_support;
+		   _local_support=0;
 		delete _comp_topology;
 		delete _support;
+		_support=0;
 		if (_has_field_ownership)
 			{
 				delete _field;

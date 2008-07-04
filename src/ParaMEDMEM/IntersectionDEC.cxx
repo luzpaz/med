@@ -126,7 +126,7 @@ the working side during a \a sendData() call.
 void IntersectionDEC::synchronize()
 {
 	const ParaMEDMEM::ParaMESH* para_mesh = _local_field->getSupport()->getMesh();
-	cout <<"size of Interpolation Matrix"<<sizeof(InterpolationMatrix)<<endl;
+	//cout <<"size of Interpolation Matrix"<<sizeof(InterpolationMatrix)<<endl;
 	_interpolation_matrix = new InterpolationMatrix (*para_mesh, *_source_group,*_target_group,"P0"); 
   _interpolation_matrix->setAllToAllMethod(_allToAllMethod);
   _interpolation_matrix->getAccessDEC()->Asynchronous( _asynchronous ) ;

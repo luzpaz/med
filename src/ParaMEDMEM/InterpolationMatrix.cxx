@@ -259,31 +259,32 @@ On the idle side, no computation is done, but the field is sent.
  */ 
 void InterpolationMatrix::transposeMultiply(MEDMEM::FIELD<double>& field) const
 {
-  vector<double> source_value(_col_offsets.size()* field.getNumberOfComponents(),0.0);
+	int nbcomp = field.getNumberOfComponents();
+  vector<double> source_value(_col_offsets.size()* nbcomp,0.0);
   _mapping.reverseSendRecv(&source_value[0],field);
 
 	//treatment of the transpose matrix multiply on the source side
 	if (_source_group.containsMyRank())
 		{
-			int nbcomp = field.getNumberOfComponents();
 			int nbrows = _source_support.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 			
-			vector<double> target_value(nbrows,0.0);
+			vector<double> target_value(nbrows*nbcomp,0.0);
 
 			//performing WT.T
 			//WT is W transpose
 			//T is the target vector
 			for (int irow=0; irow<nbrows; irow++)
 				for (int icol=_row_offsets[irow]; icol< _row_offsets[irow+1];icol++)
-					for (int icomp=0; icomp<nbcomp; icomp++)
-						{
-							int colid= _coeffs[irow][icol-_row_offsets[irow]].first;
-							double value = _coeffs[irow][icol-_row_offsets[irow]].second;
-
-							double coeff_row = source_value[colid-1];
-							target_value[irow*nbcomp+icomp]+=value*coeff_row;
-						}
-				
+					{
+						int colid= _coeffs[irow][icol-_row_offsets[irow]].first;
+						double value = _coeffs[irow][icol-_row_offsets[irow]].second;
+						
+						for (int icomp=0; icomp<nbcomp; icomp++)
+							{
+								double coeff_row = source_value[(colid-1)*nbcomp+icomp];
+								target_value[irow*nbcomp+icomp]+=value*coeff_row;
+							}
+					}
 			//performing VS^(-1).(WT.T)
 			//VS^(-1) is the inverse of the diagonal matrix storing
 			//volumes of the source cells

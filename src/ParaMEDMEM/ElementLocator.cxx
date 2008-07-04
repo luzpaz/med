@@ -12,11 +12,10 @@
 
 #include <set>
 using namespace std;
+//const double HUGE=1e200;
 
 namespace ParaMEDMEM 
 { 
-
-const double HUGE = 1e300;
  
 ElementLocator::ElementLocator(const ParaMESH& mesh, const ProcessorGroup& distant_group) 
 :_local_mesh(mesh.getMesh()),

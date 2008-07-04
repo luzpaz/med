@@ -3,7 +3,7 @@
 
 #include "MEDMEM_OptionManager.hxx"
 #include "MPI_AccessDEC.hxx"
- 
+#include "MxN_Mapping.hxx" 
 namespace ParaMEDMEM
 {
   class DEC;

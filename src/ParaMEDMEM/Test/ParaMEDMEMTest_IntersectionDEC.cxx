@@ -237,13 +237,13 @@ void ParaMEDMEMTest::testIntersectionDEC_2D()
   delete target_group;
   delete self_group;
   delete mesh;
-  delete support;
   delete paramesh;
   delete parafield;
   delete parasupport;
   delete [] value;
   delete icocofield;
- 
+  delete support;
+
   MPI_Barrier(MPI_COMM_WORLD);
   cout << "end of IntersectionDEC_2D test"<<endl;
 }
@@ -500,12 +500,12 @@ void ParaMEDMEMTest::testAsynchronousIntersectionDEC_2D(double dtA, double tmaxA
   delete target_group;
   delete self_group;
   delete mesh ;
-  delete support ;
   delete paramesh ;
   delete parafield ;
   delete parasupport ;
   delete [] value ;
   delete icocofield ;
+  delete support ;
 
   cout << "testAsynchronousIntersectionDEC_2D" << rank << " MPI_Barrier " << endl ;
  
