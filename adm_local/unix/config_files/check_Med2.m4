@@ -47,7 +47,7 @@ MED_CPPFLAGS="$DEFINED_F77INT64"
 med2_ok=no
 
 LOCAL_INCLUDES="$HDF5_INCLUDES"
-LOCAL_LIBS="-lmed $HDF5_LIBS"
+LOCAL_LIBS="-lmed -lmedimportcxx $HDF5_LIBS"
 
 if test -z $MED2HOME
 then
@@ -171,8 +171,13 @@ dnl check med2 library
   LIBS_old="$LIBS"
   LIBS="$LIBS $LOCAL_LIBS"
   AC_CHECK_LIB(med,MEDouvrir,med2_ok=yes,med2_ok=no)
-  LIBS="$LIBS_old"
 
+  if  test "x$med2_ok" = "xyes"
+  then
+   AC_CHECK_LIB(medimportcxx,HAVE_MEDimport,med2_ok=yes,med2_ok=no)
+  fi
+  LIBS="$LIBS_old"
+ 
 fi
 
 if  test "x$med2_ok" = "xyes"
@@ -189,6 +194,7 @@ esac
   MED2_LIBS="$LOCAL_LIBS"
   MED2_MT_LIBS="$LOCAL_LIBS"
 fi
+
 
 AC_MSG_RESULT(for med2: $med2_ok)
 

@@ -124,32 +124,32 @@ public:
 
 %extend FIELDClient<double, FullInterlace>
 {
-  %template(FIELDDOUBLEClients) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
+  %template(FIELDDOUBLEClient) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
 };
 
 %extend FIELDClient<double, NoInterlace>
 {
-  %template(FIELDDOUBLENOINTERLACEClients) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
+  %template(FIELDDOUBLENOINTERLACEClient) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
 };
 
 %extend FIELDClient<double, NoInterlaceByType>
 {
-  %template(FIELDDOUBLENOINTERLACEBYTYPEClients) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
+  %template(FIELDDOUBLENOINTERLACEBYTYPEClient) FIELDClient<SALOME_MED::FIELDDOUBLE_ptr>;
 };
 
 %extend FIELDClient<int, FullInterlace>
 {
-  %template(FIELDINTClients) FIELDClient<SALOME_MED::FIELDINT_ptr>;
+  %template(FIELDINTClient) FIELDClient<SALOME_MED::FIELDINT_ptr>;
 };
 
 %extend FIELDClient<int, NoInterlace>
 {
-  %template(FIELDINTNOINTERLACEClients) FIELDClient<SALOME_MED::FIELDINT_ptr>;
+  %template(FIELDINTNOINTERLACEClient) FIELDClient<SALOME_MED::FIELDINT_ptr>;
 };
 
 %extend FIELDClient<int, NoInterlaceByType>
 {
-  %template(FIELDINTNOINTERLACEBYTYPEClients) FIELDClient<SALOME_MED::FIELDINT_ptr>;
+  %template(FIELDINTNOINTERLACEBYTYPEClient) FIELDClient<SALOME_MED::FIELDINT_ptr>;
 };
 
 FIELD<double> * getDoublePointer(FIELDClient<double,FullInterlace> * input);

@@ -180,6 +180,8 @@ namespace MED{
 
   struct TWrapper;
   typedef SharedPtr<TWrapper> PWrapper;
+
+  bool getMEDVersion( const std::string&, int&, int&, int& );
 };
 
 

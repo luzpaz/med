@@ -1097,6 +1097,15 @@ Internal Corba method.
 
     void addInStudy (in SALOMEDS::Study myStudy, in MED medPtr) raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
   };
+  
+  /*! \brief A structure containing information about MED file
+  */
+  struct MedFileInfo
+  {
+    string fileName; //!< name of file
+    long   fileSize; //!< size of file
+    long   major, minor, release; //!< MED file version
+  };
 };
 
 #endif /* MED_IDL */

@@ -387,12 +387,12 @@ void _intermediateMED::numerotationMaillage()
             ok = false;
         }
       }
-      if ( ok && renumEntity ) { // each type of entity is numerated separately
+      if ( ok && renumEntity ) { // each geom type was numerated separately
         int iType = 0, i_shift = 0;
         type = k->geometricType;
         for ( ; k != j; ++k ) {
           if (type != k->geometricType) { // si changement de type geometrique
-            i_shift = minMaxOrder[ iType++ ].second;
+            i_shift += minMaxOrder[ iType++ ].second;
             type = k->geometricType;
           }
           k->ordre += i_shift;
