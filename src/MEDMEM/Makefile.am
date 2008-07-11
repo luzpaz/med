@@ -141,9 +141,11 @@ MEDMEM_EnsightMeshDriver.cxx \
 MEDMEM_GaussLocalization.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
-libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+# libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@
+libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 	-I$(srcdir)/../MEDWrapper/Base \
 	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERPOLATION
+libmedmem_la_CXXFLAGS= @CXXTMPDPTHFLAGS@
 
 # change motivated by the bug KERNEL4778.
 libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
@@ -173,6 +175,7 @@ bin_PROGRAMS= \
 	create_mesh_c2q4s2_wrong create_grid create_mesh_c2q4 create_mesh_c3h8 create_poly3D
 
 AM_CPPFLAGS= $(libmedmem_la_CPPFLAGS)
+AM_CXXFLAGS= $(libmedmem_la_CXXFLAGS)
 LDADD= $(libmedmem_la_LDFLAGS) -lm libmedmem.la
 if MED_ENABLE_KERNEL
      LDADD+=-lSALOMEBasics

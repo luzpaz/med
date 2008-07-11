@@ -1742,8 +1742,14 @@ namespace MED
       TValueHolder<TString, char> aFieldName(anInfo.myName);
       MED::TMeshInfo& aMeshInfo = anInfo.myMeshInfo;
 
-      TEntityInfo::const_iterator anIter = theEntityInfo.begin();
-      for(; anIter != theEntityInfo.end(); anIter++){
+      MED::TEntityInfo localEntityInfo = theEntityInfo;
+      TEntityInfo::iterator anLocalIter = localEntityInfo.find(eMAILLE);
+      if(anLocalIter != localEntityInfo.end()){
+        localEntityInfo[eNOEUD_ELEMENT] = anLocalIter->second;
+      }
+        
+      TEntityInfo::const_iterator anIter = localEntityInfo.begin();
+      for(; anIter != localEntityInfo.end(); anIter++){
 	med_entite_maillage anEntity = med_entite_maillage(anIter->first);
 	const TGeom2Size& aGeom2Size = anIter->second;
 	TGeom2Size::const_iterator anGeomIter = aGeom2Size.begin();

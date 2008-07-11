@@ -44,6 +44,12 @@ LIBS_old=$LIBS
 if test "x${LIBXML_DIR}" != "x" ; then
   LIBXML_CPPFLAGS="-I${LIBXML_DIR}/include/libxml2"
   LIBXML_LIBS="-L${LIBXML_DIR}/lib -lxml2"
+else
+  if test -f /usr/include/libxml2/libxml/tree.h ; then
+    LIBXML_DIR="/usr"
+    LIBXML_CPPFLAGS="-I${LIBXML_DIR}/include/libxml2"
+    LIBXML_LIBS="-lxml2"
+  fi
 fi
 
 libxml_ok=no

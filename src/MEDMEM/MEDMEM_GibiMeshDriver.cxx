@@ -656,7 +656,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
                     support_ids[ i_sub ] << DUMP_LINE_NB );
               return false;
             }
-            if ( nb_comp[ i_sub ] < 1 ) {
+            if ( nb_comp[ i_sub ] < 0 /*1*/ ) { // [SALOME platform 0019886]
               INFOS("Error of field reading: wrong nb of components " <<
                     nb_comp[ i_sub ] << DUMP_LINE_NB );
               return false;
@@ -696,8 +696,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
               }
             }
             // now type is known, create a field, one for all subs
-            bool isReal = ( comp_type[0] == "REAL*8" );
-            if ( !ignoreField && !fbase ) {
+            bool isReal = (nb_comp[i_sub] > 0) ? (comp_type[0] == "REAL*8") : true;
+            if ( !ignoreField && !fbase && total_nb_comp ) {
               if ( !isReal ) {
                 fbase = fint = new _field<int>( MED_INT32, nb_sub, total_nb_comp );
                 INFOS( "Warning: read NOT REAL field, type <" << comp_type[0] << ">"
@@ -2676,12 +2676,16 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
         // start the next field writting
         nb_sub = *(itNbSub++);
         string description = (*itF)->getDescription();
+        if ( description.size() > 72 )
+          description = description.substr(0,72);
         gibi << setw(8) << nb_sub
              << setw(8) << -1
              << setw(8) << 6
-             << setw(8) << description.size() << endl;
+             << setw(8) << 72 /*description.size()*/ << endl; // PAL19100
         if ( !description.empty() )
           gibi << setw(72) << description << endl;
+        else
+          gibi << setw(72) << "Field" << endl;
         gibi << setw(72) << " " << endl;
 
         // Sub Components section

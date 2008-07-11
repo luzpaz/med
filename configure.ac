@@ -37,8 +37,8 @@ echo
 echo
 
 dnl remember MED_WITH_KERNEL set by build configure
-MED_WITH_KERNEL=no
-MED_WITH_GUI=no
+MED_WITH_KERNEL=yes
+MED_WITH_GUI=yes
 old_with_kernel=${MED_WITH_KERNEL}
 
 dnl
@@ -208,7 +208,6 @@ echo
 
 CHECK_HDF5
 
-
 echo
 echo ---------------------------------------------
 echo BOOST Library
@@ -216,7 +215,6 @@ echo ---------------------------------------------
 echo
 
 CHECK_BOOST
-
 
 echo
 echo ---------------------------------------------
@@ -233,40 +231,25 @@ echo "MED_WITH_GUI   : ${MED_WITH_GUI}"
 echo ---------------------------------------------
 
 openpbs_ok=no
-# CHECK_OPENPBS ONLY if MED_WITH_KERNEL=no
-# echo
-# echo ---------------------------------------------
-# echo testing OpenPBS
-# echo ---------------------------------------------
-# echo
-
-# CHECK_OPENPBS
-# dnl openpbs_ok is set to yes by CHECK_OPENPBS
-
-# CHECK_LSF ONLY if MED_WITH_KERNEL=no
-# echo
-# echo ---------------------------------------------
-# echo testing LSF
-# echo ---------------------------------------------
-# echo
+# CHECK_OPENPBS ONLY if MED_WITH_KERNEL is yes
 
 lsf_ok=no
-# CHECK_LSF
-# dnl lsf_ok is set to yes by CHECK_LSF
+# CHECK_LSF ONLY if MED_WITH_KERNEL is yes
 
 echo
 echo ----------------------------------------------
 echo testing CPPUNIT only required for unit testing
 echo ----------------------------------------------
 echo
+
 CHECK_CPPUNIT
-#AM_CONDITIONAL(CPPUNIT_IS_OK, test)
 
 echo
 echo ---------------------------------------------
 echo checking SPLITTER
 echo ---------------------------------------------
 echo
+
 AC_ENABLE_SPLITTER(yes)
 AM_CONDITIONAL(MED_ENABLE_SPLITTER, [test "$ENABLE_SPLITTER" = yes])
 
@@ -303,7 +286,14 @@ fi
 AM_CONDITIONAL(MED_ENABLE_METIS, [test "$ENABLE_METIS" = yes])
 AM_CONDITIONAL(MED_ENABLE_SCOTCH, [test "$ENABLE_SCOTCH" = yes])
 
+dnl
+dnl ---------------------------------------------
+dnl testing MPI
+dnl ---------------------------------------------
+dnl
+
 CHECK_MPI
+#CHECK_MPICH
 AM_CONDITIONAL(MED_WITHMPI, [test "$WITHMPI" = yes])
 
 echo
@@ -323,23 +313,23 @@ echo
 
 CHECK_HTML_GENERATORS
 
-
 if test "${MED_WITH_KERNEL}" = "yes"; then
 {
-   echo
-   echo ---------------------------------------------
-   echo testing OpenPBS
-   echo ---------------------------------------------
-   echo
-   CHECK_OPENPBS
+        echo
+        echo ---------------------------------------------
+        echo testing OpenPBS
+        echo ---------------------------------------------
+        echo
 
-   echo
-   echo ---------------------------------------------
-   echo testing LSF
-   echo ---------------------------------------------
-   echo
+        CHECK_OPENPBS
 
-   CHECK_LSF
+        echo
+        echo ---------------------------------------------
+        echo testing LSF
+        echo ---------------------------------------------
+        echo
+
+        CHECK_LSF
 
 	dnl
 	dnl ---------------------------------------------
@@ -418,15 +408,15 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 		echo
 
 		CHECK_VTK
+
+		echo
+		echo ---------------------------------------------
+		echo Testing OpenCascade
+		echo ---------------------------------------------
+		echo
+
+		CHECK_CAS
 	fi
-
-	echo
-	echo ---------------------------------------------
-	echo Testing OpenCascade
-	echo ---------------------------------------------
-	echo
-
-	CHECK_CAS
 
 	echo
 	echo ---------------------------------------------
@@ -443,16 +433,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	dnl echo
 
 	dnl CHECK_MICO
-
-	if test "${MED_WITH_GUI}" = "yes"; then
-		echo
-		echo ---------------------------------------------
-		echo testing MSG2QM
-		echo ---------------------------------------------
-		echo
-
-		CHECK_MSG2QM
-	fi
 }
 else
 {
@@ -501,14 +481,14 @@ else
    echo Configure
 fi
 
-#variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok boost_ok doxygen_ok graphviz_ok OpenGL_ok qt_ok vtk_ok omniORB_ok occ_ok Kernel_ok"
-
 if test "${MED_WITH_GUI}" = "yes"; then
-variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok cppunit_ok SalomeGUI_ok doxygen_ok"
+  variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok sip_ok pyqt_ok qwt_ok occ_ok cppunit_ok doxygen_ok Kernel_ok SalomeGUI_ok"
+else
+  variables="cc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok cppunit_ok doxygen_ok Kernel_ok"
 fi
 
-if test "${MED_WITH_GUI}" = "no"; then
-variables="cc_ok mpi_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok occ_ok Kernel_ok cppunit_ok doxygen_ok"
+if test "x$ENABLE_SPLITTER" = "xyes"; then
+  variables="$variables metis_ok scotch_ok libxml_ok"
 fi
 
 for var in $variables
@@ -523,30 +503,20 @@ done
 dnl optional variables 
 
 echo "---Optional:"
-variables="metis_ok scotch_ok libxml_ok fvm_ok"
-for var in $variables
-     do
-         eval toto=\$$var
-         if test x$toto != "x"; then
-                printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
-                eval echo \$$var
-         fi
-     done
 
+variables="mpi_ok fvm_ok"
 if test "${MED_WITH_KERNEL}" = "yes"; then
-{
-        variables="openpbs_ok lsf_ok graphviz_ok"
- 
-        for var in $variables
-        do
-           eval toto=\$$var
-           if test x$toto != "x"; then
-                printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
-                eval echo \$$var
-           fi
-        done
-}
+   variables="$variables openpbs_ok lsf_ok graphviz_ok"
 fi
+
+for var in $variables
+do
+   eval toto=\$$var
+   if test x$toto != "x"; then
+     printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
+     eval echo \$$var
+   fi
+done
 
 echo
 echo "Default ORB   : $DEFAULT_ORB"
@@ -644,7 +614,7 @@ AC_OUTPUT([ \
 	./doc/salome/tui/MED/doxyfile \
 	./doc/salome/tui/MED/sources/static/tree.js \
 	./doc/doxygen/Makefile \
-	./doc/doxygen/Doxyfile_med_user 
+	./doc/doxygen/Doxyfile_med_user \
 ])
 
 dnl To avoid recompiling half of the sources because of SALOMEconfig.h recreating

@@ -304,8 +304,13 @@ void CONNECTIVITY::setCount(const int * Count, const medEntityMesh Entity)
 {
   if (Entity == _entity)
   {
-		if (_numberOfTypes==0)
-			throw MEDEXCEPTION("Number of Types was not set before setting counts");
+    // this exception was added at 1.18.2.2.2.4 for NPAL17043: "Correction of
+    // MEDMEM CPPUNIT tests. Integrated a work of V. Bergeaud and A. Geay."
+    // and removed for PAL19744: "regression in MEDMEM_Connectivity.cxx"
+    // Commenting this exception at least looks safe as the case
+    // _numberOfTypes==0 is previewed here
+// 		if (_numberOfTypes==0)
+// 			throw MEDEXCEPTION("Number of Types was not set before setting counts");
     int * index = new int[Count[_numberOfTypes]];
     index[0]=1;
     _count[0]=1;

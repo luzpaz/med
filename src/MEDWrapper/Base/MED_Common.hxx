@@ -78,7 +78,7 @@ namespace MED{
 		ePYRA13=313, ePENTA15=315, eHEXA20=320, 
 		ePOLYGONE=400, ePOLYEDRE=500, eNONE=0} EGeometrieElement;
 
-  typedef enum {eMAILLE, eFACE, eARETE, eNOEUD} EEntiteMaillage; 
+  typedef enum {eMAILLE, eFACE, eARETE, eNOEUD, eNOEUD_ELEMENT} EEntiteMaillage; 
 
   typedef enum {eNO_PFLMOD, eGLOBAL, eCOMPACT}  EModeProfil; 
 

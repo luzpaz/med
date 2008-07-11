@@ -349,7 +349,8 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 	  {
 	    vectSupp[index] = (*const_itSupport).second;
 	    SCRUTE(vectSupp[index]);
-	    MESSAGE(LOC << "Support number " << index << " is "<< *vectSupp[index]);
+            // comment the next line for PAL19767 Modification for icc and icpc (INTEL compilators)
+	    //MESSAGE(STRING(LOC) << "Support number " << index << " is "<< *vectSupp[index]));
 	    index++;
 	  }
       }

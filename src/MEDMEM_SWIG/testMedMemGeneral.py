@@ -175,11 +175,17 @@ meshNameFiles.append("mail_test1-2-qua")
 files.append("darcy2_Castem_qua_VF.med")
 meshNameFiles.append("mail_test1-2-qua")
 
-files.append("Deff_fdt_5.8_castem_efmh_diff_conc_dom.med")
-meshNameFiles.append("maillage_deffec_fdt")
+# there is a field with too long name (38 > MED_TAILLE_NOM==32):
+# "analytical_field - CONCENTRATION of A1"
+# so that invalid writing is sometimes fatal
+# files.append("Deff_fdt_5.8_castem_efmh_diff_conc_dom.med")
+# meshNameFiles.append("maillage_deffec_fdt")
 
-files.append("Deff_fdt_5.8_castem_vf_diff_conc_dom.med")
-meshNameFiles.append("maillage_deffec_fdt")
+# there is a field with too long name (38 > MED_TAILLE_NOM==32):
+# "analytical_field - CONCENTRATION of A1"
+# so that invalid writing is sometimes fatal
+# files.append("Deff_fdt_5.8_castem_vf_diff_conc_dom.med")
+# meshNameFiles.append("maillage_deffec_fdt")
 
 files.append("extendedtransport53_triangles.med")
 meshNameFiles.append("TestA3_2094_0.1_rsurf_tri")
