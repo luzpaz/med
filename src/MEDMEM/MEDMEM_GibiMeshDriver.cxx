@@ -159,13 +159,45 @@ static int getGroupId(const vector<int>& support_ids, _intermediateMED*  medi)
 //purpose  : 
 //=======================================================================
 
-#ifdef GIBI_READ_ONLY_NAMED_FIELD
+//#ifdef GIBI_READ_ONLY_NAMED_FIELD
 static inline bool isNamedObject( int obj_index, const vector<int>& indices_objets_nommes )
 {
   return ( std::find( indices_objets_nommes.begin(), indices_objets_nommes.end(), obj_index)
            != indices_objets_nommes.end() );
 }
-#endif
+//#endif
+
+//=======================================================================
+//function : setFieldNames
+//purpose  : set field names
+//=======================================================================
+
+static void setFieldNames(const vector< _fieldBase* >& fields,
+                          const vector<string>&        objets_nommes,
+                          const vector<int>&           indices_objets_nommes)
+{
+  // set field names
+  int i;
+  set<string> fnames;
+  for ( i = 0; i < indices_objets_nommes.size(); ++i ) {
+    int fieldIndex = indices_objets_nommes[ i ];
+    fnames.insert( objets_nommes[ i ]);
+    if ( fields[ fieldIndex - 1 ] )
+      fields[ fieldIndex - 1 ]->_name = objets_nommes[ i ];
+  }
+  int noNameIndex = 0;
+  for ( int i = 0; i < fields.size(); ++i ) {
+    if ( !fields[ i ] ) {
+      if ( !isNamedObject( i+1, indices_objets_nommes ))
+        ++noNameIndex;
+    }
+    else if ( fields[ i ]->_name.empty() ) {
+      do {
+        fields[ i ]->_name = STRING("F_") << ++noNameIndex;
+      } while ( !fnames.insert( fields[ i ]->_name ).second );
+    }
+  }
+}
 
 //=======================================================================
 //function : read
@@ -578,11 +610,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         } // end loop on field objects
 
         // set field names
-        for ( i = 0; i < nb_objets_nommes; ++i ) {
-          int fieldIndex = indices_objets_nommes[ i ];
-          if ( fields[ fieldIndex - 1 ] ) 
-            fields[ fieldIndex - 1 ]->_name = objets_nommes[ i ];
-        }
+        setFieldNames( fields, objets_nommes, indices_objets_nommes );
 
       }  // Fin numero_pile == PILE_NODES_FIELD
 
@@ -754,11 +782,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         } // end loop on field objects
 
         // set field names
-        for ( i = 0; i < nb_objets_nommes; ++i ) {
-          int fieldIndex = indices_objets_nommes[ i ] - 1;
-          if ( fields[ fieldIndex ]) 
-            fields[ fieldIndex ]->_name = objets_nommes[ i ];
-        }
+        setFieldNames( fields, objets_nommes, indices_objets_nommes );
 
       } // numero_pile == PILE_FIELD && readFields
 
@@ -2431,22 +2455,6 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
     if ( !readFile( &medi, true ) )
       return;
 
-    // set name of field if it is empty
-    set<string> fnames;
-    list< _fieldBase* >::iterator fIt = medi.fields.begin();
-    for ( ; fIt != medi.fields.end(); fIt++ )
-      fnames.insert( (*fIt)->_name );
-    int i = 0;
-    for (fIt = medi.fields.begin(); fIt != medi.fields.end(); fIt++ ) {
-      _fieldBase* f = *fIt;
-      if ( f->_name.empty() ) {
-        do {
-          ostringstream name;
-          name << "F_" << ++i;
-          f->_name = name.str();
-        } while ( !fnames.insert( f->_name ).second );
-      }
-    }
     //MESSAGE(LOC <<  medi );
     fillMesh( &medi );
     MESSAGE(LOC << "GIBI_MED_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
