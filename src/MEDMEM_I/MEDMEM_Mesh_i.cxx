@@ -63,7 +63,7 @@ MESH_i::MESH_i(): _mesh(constructConstMesh()),
 {
         BEGIN_OF("Default Constructor MESH_i");
         MESH_i::meshMap[_corbaIndex]=_mesh;
-        END_OF("Default Constructor MESH_i");
+        END_OF();
 }
 //=============================================================================
 /*!
@@ -86,7 +86,7 @@ MESH_i::MESH_i(::MESH * const m ) :_mesh(m),
         MESH_i::meshMap[_corbaIndex]=_mesh;
 	SCRUTE(_mesh);
 
-        END_OF("Constructor MESH_i(::MESH * const m )");
+        END_OF();
 }
 //=============================================================================
 /*!
@@ -100,7 +100,7 @@ MESH_i::MESH_i( MESH_i & m) :_mesh(m._mesh),
 {
         BEGIN_OF("Constructor MESH_i");
         MESH_i::meshMap[_corbaIndex]=_mesh;
-        END_OF("Constructor MESH_i");
+        END_OF();
 }
 //=============================================================================
 /*!
@@ -1560,7 +1560,7 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
    	MESSAGE("Registering of the Corba Mesh pointer");
 	Register();
 
-	END_OF("Mesh_i::addInStudy(SALOMEDS::Study_ptr myStudy)");
+	END_OF();
 }
 //=============================================================================
 /*!
@@ -1626,7 +1626,7 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
    	MESSAGE("Registering of the Corba Mesh pointer");
 	Register();
 
-        END_OF("Mesh_i::addInStudy(SALOMEDS::Study_ptr myStudy)");
+        END_OF();
 }
 //=============================================================================
 

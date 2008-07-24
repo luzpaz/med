@@ -28,14 +28,15 @@ using namespace std;
 using namespace MED_EN;
 using namespace MEDMEM;
 
-MED_MED_DRIVER::MED_MED_DRIVER(): GENDRIVER(), 
-                                  _ptrMed((MED * const)MED_NULL),
-				  _concreteMedDrv((GENDRIVER *) MED_NULL)
+MED_MED_DRIVER::MED_MED_DRIVER(): GENDRIVER(MED_DRIVER), 
+                                  _ptrMed(0),
+				  _concreteMedDrv(0)
 {}
 
 MED_MED_DRIVER::MED_MED_DRIVER(const string & fileName,  MED * const ptrMed):
-  GENDRIVER(fileName,MED_EN::MED_RDWR), _ptrMed(ptrMed),
-  _concreteMedDrv((GENDRIVER *) MED_NULL)
+  GENDRIVER(fileName, MED_EN::RDWR, MED_DRIVER),
+  _ptrMed(ptrMed),
+  _concreteMedDrv(0)
 {
   //_ptrMed->addDriver(*this); // The specific MED driver id is set within the addDriver method.
 }
@@ -43,23 +44,29 @@ MED_MED_DRIVER::MED_MED_DRIVER(const string & fileName,  MED * const ptrMed):
 MED_MED_DRIVER::MED_MED_DRIVER(const string & fileName,
 			       MED * const ptrMed,
 			       MED_EN::med_mode_acces accessMode):
-  GENDRIVER(fileName,accessMode), _ptrMed(ptrMed),
-  _concreteMedDrv((GENDRIVER *) MED_NULL)
+  GENDRIVER(fileName, accessMode, MED_DRIVER),
+  _ptrMed(ptrMed),
+  _concreteMedDrv(0)
 {
 }
 //REM :  As t'on besoin du champ _status :  _medIdt <-> _status  ?  Oui
 
 MED_MED_DRIVER::MED_MED_DRIVER(const MED_MED_DRIVER & driver):
   GENDRIVER(driver),
-  _ptrMed(driver._ptrMed),
-  _concreteMedDrv(driver._concreteMedDrv->copy())
+  _ptrMed(driver._ptrMed)
+  //  _concreteMedDrv(driver._concreteMedDrv->copy())
 {
+  if ( driver._concreteMedDrv )
+    _concreteMedDrv = driver._concreteMedDrv->copy();
+  else 
+    _concreteMedDrv=0;
 }
 
 MED_MED_DRIVER::~MED_MED_DRIVER()
 {
   MESSAGE("MED_MED_DRIVER::~MED_MED_DRIVER() has been destroyed");
   if (_concreteMedDrv) delete _concreteMedDrv;
+  _concreteMedDrv=0;
 }
 
 // ------------- Read Only Part --------------
@@ -69,7 +76,7 @@ IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER():MED_MED_DRIVER(),_fileStructIsR
 }
 
 IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed):
-  MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_RDONLY),_fileStructIsRead(false)
+  MED_MED_DRIVER(fileName,ptrMed,MED_EN::RDONLY),_fileStructIsRead(false)
 {
   MESSAGE("MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed) Constructeur read only");
 }
@@ -103,7 +110,7 @@ IMED_MED_WRONLY_DRIVER::IMED_MED_WRONLY_DRIVER()
 }
 
 IMED_MED_WRONLY_DRIVER::IMED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed):
-  MED_MED_DRIVER(fileName,ptrMed,MED_EN::MED_ECRI)
+  MED_MED_DRIVER(fileName,ptrMed,MED_EN::WRONLY)
 {}
 
 IMED_MED_WRONLY_DRIVER::IMED_MED_WRONLY_DRIVER(const IMED_MED_WRONLY_DRIVER & driver):
@@ -133,7 +140,7 @@ IMED_MED_RDWR_DRIVER::IMED_MED_RDWR_DRIVER()
 {}
 
 IMED_MED_RDWR_DRIVER::IMED_MED_RDWR_DRIVER(const string & fileName,  MED * const ptrMed):
-  IMED_MED_RDONLY_DRIVER(fileName,ptrMed),IMED_MED_WRONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_REMP)
+  IMED_MED_RDONLY_DRIVER(fileName,ptrMed),IMED_MED_WRONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,RDWR)
 {}
 
 IMED_MED_RDWR_DRIVER::IMED_MED_RDWR_DRIVER(const IMED_MED_RDWR_DRIVER & driver):
@@ -150,9 +157,9 @@ MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER()
   _concreteMedDrv = new MED_MED_RDONLY_DRIVER21();
 }
 
-MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_RDONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_LECT)
+MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_RDONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,RDONLY)
 {
-  _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,MED_LECT);
+  _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,RDONLY);
 }
 
 MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const MED_MED_RDONLY_DRIVER & driver):MED_MED_DRIVER(driver)
@@ -204,9 +211,9 @@ MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER()
   _concreteMedDrv = new MED_MED_WRONLY_DRIVER21();
 }
 
-MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_WRONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_ECRI)
+MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_WRONLY_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,WRONLY)
 {
-  _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,MED_ECRI);
+  _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,WRONLY);
 }
 
 MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER(const MED_MED_WRONLY_DRIVER & driver):MED_MED_DRIVER(driver)
@@ -258,9 +265,9 @@ MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER()
   _concreteMedDrv = new MED_MED_RDWR_DRIVER21();
 }
 
-MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_RDWR_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,MED_REMP)
+MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER(const string & fileName,  MED * const ptrMed):IMED_MED_RDWR_DRIVER(fileName,ptrMed),MED_MED_DRIVER(fileName,ptrMed,RDWR)
 {
-  _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,MED_REMP);
+  _concreteMedDrv = DRIVERFACTORY::buildMedDriverFromFile(fileName,ptrMed,RDWR);
 }
 
 MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER(const MED_MED_RDWR_DRIVER & driver):

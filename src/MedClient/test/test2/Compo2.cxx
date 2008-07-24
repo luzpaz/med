@@ -56,7 +56,7 @@ std::string Compo2::Calcul(const MESH &M)
     std::cerr << "erreur Compo2::Calcul" << std::endl;
   }
 
-  END_OF("std::string Compo2::Calcul(MESH &M)");
+  END_OF();
   return name;
 }
 
@@ -73,7 +73,7 @@ const FAMILY * Compo2::Calcul2(const MESH &M)
     std::cerr << "erreur Compo2::Calcul2" << std::endl;
   }
 
-  END_OF("const FAMILY * Compo2::Calcul2(const MESH &M)");
+  END_OF();
   return F;
 }
 
@@ -92,5 +92,5 @@ void Compo2::Calcul3(const FIELD<double> &F)
     std::cout << std::endl;
   }
   
-  END_OF("void Compo2::Calcul2(const FIELD<double> *)");
+  END_OF();
 }

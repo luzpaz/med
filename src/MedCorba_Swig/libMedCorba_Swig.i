@@ -589,7 +589,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(fieldcorba2);
 
-      END_OF("SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble from libMedCorba_Swig");
+      END_OF();
 
       MESSAGE("Test de tirarge sur le pointeur Corba Field dans le cxx");
 
@@ -634,7 +634,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(fieldcorba2);
 
-      END_OF("SALOME_MED::FIELDINT_ptr createCorbaFieldInt from libMedCorba_Swig");
+      END_OF();
       MESSAGE("Test de tirarge sur le pointeur Corba Field dans le cxx");
 
       char * name = fieldcorba2->getName();
@@ -674,7 +674,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(supportcorba);
 
-      END_OF("SALOME_MED::SUPPORT_ptr createCorbaSupport from libMedCorba_Swig");
+      END_OF();
 
       return supportcorba;
     }
@@ -694,7 +694,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(meshcorba);
 
-      END_OF("SALOME_MED::MESH_ptr createCorbaMesh from libMedCorba_Swig");
+      END_OF();
 
       return meshcorba;
     }
@@ -711,7 +711,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
       FIELDDOUBLE * fieldloc =  new FIELDDOUBLE();
       fieldloc -> allocValue(NumberOfComponents,LengthValue);
 
-      END_OF("FIELDDOUBLE createLocalFieldDouble from libMedCorba_Swig");
+      END_OF();
 
       return fieldloc;
     }
@@ -728,7 +728,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
       FIELDINT * fieldloc =  new FIELDINT();
       fieldloc -> allocValue(NumberOfComponents,LengthValue);
 
-      END_OF("FIELDDOUBLE createLocalFieldInt from libMedCorba_Swig");
+      END_OF();
 
       return fieldloc;
     }

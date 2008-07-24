@@ -31,7 +31,7 @@ FIELDINTClient::FIELDINTClient(SALOME_MED::FIELDINT_ptr ptrCorba,
 {
   BEGIN_OF("Constructor with arguments (for Python API) FIELDINTClient");
 
-  END_OF("Constructor with arguments (for Python API) FIELDINTClient");
+  END_OF();
 }
 //=============================================================================
 /*!
@@ -42,7 +42,7 @@ FIELDINTClient::~FIELDINTClient()
 {
   BEGIN_OF("Default Destructor (for Python API) FIELDINTClient");
 
-  END_OF("Default Destructor (for Python API) FIELDINTClient");
+  END_OF();
 }
 
 }

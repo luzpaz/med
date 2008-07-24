@@ -79,7 +79,7 @@ inline static medGeometryElement get2DMedGeomType(int nbSommets);
 // Every memory allocation made in the MedDriver members function are desallocated in the Mesh destructor 
 
 PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER():
-  GENDRIVER(),
+  GENDRIVER(PORFLOW_DRIVER),
   _ptrMesh(( MESH *) NULL),
   // A VOIR _medIdt(MED_INVALID),
   _meshName("")
@@ -89,7 +89,7 @@ PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER():
 PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER(const string & fileName,
                                    MESH * ptrMesh,
                                    MED_EN::med_mode_acces accessMode): 
-  GENDRIVER(fileName,accessMode),
+  GENDRIVER(fileName, accessMode, PORFLOW_DRIVER),
   _ptrMesh(ptrMesh)
 {
     // mesh name construction from fileName
@@ -117,6 +117,10 @@ void PORFLOW_MESH_DRIVER::open()
 {
     const char * LOC = "PORFLOW_MESH_DRIVER::open()" ;
     BEGIN_OF(LOC);
+
+    if (_status == MED_OPENED)
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"File "<<_fileName<<" is already open"));
+
     _porflow.open(_fileName.c_str(), ios::in);
     if(_porflow)
 	_status = MED_OPENED;
@@ -125,20 +129,19 @@ void PORFLOW_MESH_DRIVER::open()
 	_status = MED_CLOSED;
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName<<" in mode ios::in"));
     }
-    END_OF(LOC);
+    END_OF();
 }
   
 void PORFLOW_MESH_DRIVER::close()
   throw (MEDEXCEPTION)
 {
-    const char * LOC = "PORFLOW_MESH_DRIVER::close() " ;
-    BEGIN_OF(LOC);
-    if ( _status == MED_OPENED) 
-    {
-	_porflow.close();
-	_status = MED_CLOSED;
-    }
-    END_OF(LOC);
+  //const char * LOC = "PORFLOW_MESH_DRIVER::close() " ;
+  BEGIN_OF("PORFLOW_MESH_DRIVER::close() ");
+  if ( _status == MED_OPENED) {
+    _porflow.close();
+    _status = MED_CLOSED;
+  }
+  END_OF();
 }
 
 void    PORFLOW_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
@@ -153,7 +156,7 @@ PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(): PORFLOW_MESH_DRIVER()
   
 PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const string & fileName,
                                                  MESH * ptrMesh):
-  PORFLOW_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY)
+  PORFLOW_MESH_DRIVER(fileName,ptrMesh,RDONLY)
 { 
   MESSAGE("PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
@@ -676,7 +679,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     }
 
 
-    END_OF(LOC);
+    END_OF();
 }
 
 void PORFLOW_MESH_RDONLY_DRIVER::write( void ) const
@@ -694,7 +697,7 @@ PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER():PORFLOW_MESH_DRIVER()
   
 PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName,
                                                  MESH * ptrMesh):
-  PORFLOW_MESH_DRIVER(fileName,ptrMesh,MED_WRONLY)
+  PORFLOW_MESH_DRIVER(fileName,ptrMesh,WRONLY)
 {
   MESSAGE("PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
@@ -728,7 +731,7 @@ void PORFLOW_MESH_WRONLY_DRIVER::write(void) const
 
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "Write Driver isn\'t implemented"));
 
-  END_OF(LOC);
+  END_OF();
 } 
 
 
@@ -741,7 +744,7 @@ PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER():PORFLOW_MESH_DRIVER()
 
 PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName,
 					   MESH * ptrMesh):
-  PORFLOW_MESH_DRIVER(fileName,ptrMesh,MED_RDWR)
+  PORFLOW_MESH_DRIVER(fileName,ptrMesh,RDWR)
 {
   MESSAGE("PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }

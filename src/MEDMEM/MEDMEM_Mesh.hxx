@@ -160,7 +160,7 @@ public :
   int  addDriver(driverTypes driverType,
 		 const string & fileName  ="Default File Name.med",
 		 const string & driverName="Default Mesh Name",
-		 MED_EN::med_mode_acces access=MED_EN::MED_REMP);
+		 MED_EN::med_mode_acces access=MED_EN::RDWR);
   int  addDriver(GENDRIVER & driver);
   void rmDriver(int index=0);
 
@@ -259,7 +259,8 @@ public :
   virtual int          		       getNumberOfGroups(MED_EN::medEntityMesh Entity) const;
   virtual inline const vector<GROUP*>  getGroups(MED_EN::medEntityMesh Entity) const;
   virtual inline const GROUP*          getGroup(MED_EN::medEntityMesh Entity,int i) const;
-  virtual inline const CONNECTIVITY* getConnectivityptr() const;
+  virtual inline const CONNECTIVITY*   getConnectivityptr() const;
+	inline void setConnectivityptr(CONNECTIVITY*);
   virtual SUPPORT *                    getBoundaryElements(MED_EN::medEntityMesh Entity)
 						throw (MEDEXCEPTION);
   // problème avec le maillage dans le support :
@@ -333,13 +334,16 @@ inline const CONNECTIVITY* MESH::getConnectivityptr() const
   return _connectivity;
 }
 
-
+inline void MESH::setConnectivityptr(CONNECTIVITY* conn)
+{
+	_connectivity=conn;
+}
 // This method is MED specific : don't use it
 // must be private.
 inline void MESH::write(const GENDRIVER & genDriver)
 {
-  const char * LOC = "MESH::write(const MED_MED_DRIVER & genDriver): ";
-  BEGIN_OF(LOC);
+  //const char * LOC = "MESH::write(const MED_MED_DRIVER & genDriver): ";
+  BEGIN_OF("MESH::write(const MED_MED_DRIVER & genDriver): ");
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
@@ -349,7 +353,7 @@ inline void MESH::write(const GENDRIVER & genDriver)
       // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
     }
 
-  END_OF(LOC);
+  END_OF();
 
 }
 
@@ -357,8 +361,8 @@ inline void MESH::write(const GENDRIVER & genDriver)
 // must be private.
 inline void MESH::read(const GENDRIVER & genDriver)
 {
-  const char * LOC = "MESH::read(const MED_MED_DRIVER & genDriver): ";
-  BEGIN_OF(LOC);
+  //const char * LOC = "MESH::read(const MED_MED_DRIVER & genDriver): ";
+  BEGIN_OF("MESH::read(const MED_MED_DRIVER & genDriver): ");
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
@@ -368,7 +372,7 @@ inline void MESH::read(const GENDRIVER & genDriver)
       // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
     }
 
-  END_OF(LOC);
+  END_OF();
 
 }
 
@@ -1078,7 +1082,7 @@ FIELD<T, FullInterlace> * MESH::mergeFields(const vector< FIELD<T, FullInterlace
 	}
     }
   delete [] tempValues;
-  END_OF(LOC);
+  END_OF();
   return ret;
 }
 

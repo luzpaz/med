@@ -38,7 +38,7 @@ GROUPClient::GROUPClient(const SALOME_MED::GROUP_ptr G,
   SCRUTE(G);
   SCRUTE(M);
 
-  END_OF("GROUPClient::GROUPClient()");
+  END_OF();
 }
 
 //=============================================================================
@@ -53,7 +53,7 @@ void GROUPClient::blankCopy()
   SUPPORTClient::blankCopy();
   _complete = false;
 
-  END_OF("GROUPClient::blankCopy()");
+  END_OF();
 }
 //=============================================================================
 /*!
@@ -68,7 +68,7 @@ void GROUPClient::fillCopy()
   SUPPORTClient::fillCopy();
   _complete = true;
 
-  END_OF("GROUPClient::fillCopy()");
+  END_OF();
 }
 
 //=============================================================================
@@ -80,5 +80,5 @@ void GROUPClient::fillCopy()
 GROUPClient::~GROUPClient()
 {
   BEGIN_OF("GROUPClient::~GROUPClient()");
-  END_OF("GROUPClient::~GROUPClient()");
+  END_OF();
 }

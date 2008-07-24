@@ -43,7 +43,7 @@ CONNECTIVITYClient::CONNECTIVITYClient(const SALOME_MED::MESH_ptr m,
 
   blankCopy();
   
-  END_OF("CONNECTIVITYClient::CONNECTIVITYClient()");
+  END_OF();
 }
 
 //=============================================================================
@@ -58,7 +58,7 @@ CONNECTIVITYClient::~CONNECTIVITYClient()
   if (_numberOfElements_client)
     delete [] _numberOfElements_client;
 
-  END_OF("CONNECTIVITYClient::~CONNECTIVITYClient()");
+  END_OF();
 }
 
 //=============================================================================
@@ -134,7 +134,7 @@ void CONNECTIVITYClient::blankCopy()
 
   _complete = false;
 
-  END_OF("CONNECTIVITYClient::blankCopy()");
+  END_OF();
 }
 
 //=============================================================================
@@ -236,7 +236,7 @@ void CONNECTIVITYClient::fillCopy()
     _complete = true;
   }
 
-  END_OF("void CONNECTIVITYClient::fillCopy()");
+  END_OF();
 }
 
 //=============================================================================
@@ -276,7 +276,7 @@ int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity,
     n = CONNECTIVITY::getNumberOf(Entity, Type);
 
   SCRUTE(n);
-  END_OF("void CONNECTIVITYClient::getNumberOf()");
+  END_OF();
   return n;
 }
 
@@ -297,7 +297,7 @@ const int * CONNECTIVITYClient::getConnectivity
   const int * c = CONNECTIVITY::getConnectivity
     (ConnectivityType, Entity, Type);
 
-  END_OF("void CONNECTIVITYClient::getConnectivity()");
+  END_OF();
   return c;
 }
 
@@ -317,7 +317,7 @@ const int * CONNECTIVITYClient::getConnectivityIndex
   const int *c = CONNECTIVITY::getConnectivityIndex
     (ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::getConnectivityIndex()");
+  END_OF();
   return c;
 }
 
@@ -336,7 +336,7 @@ void CONNECTIVITYClient::calculateConnectivity
 
   CONNECTIVITY::calculateConnectivity(connectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::calculateConnectivity()");
+  END_OF();
 }
 
 //=============================================================================
@@ -352,7 +352,7 @@ void  CONNECTIVITYClient::updateFamily (vector<FAMILY*> myFamilies)
 
   CONNECTIVITY::updateFamily(myFamilies);
 
-  END_OF("void CONNECTIVITYClient::updateFamily()");
+  END_OF();
 }
 
 //=============================================================================
@@ -369,7 +369,7 @@ const int * CONNECTIVITYClient::getGlobalNumberingIndex
 
   const int * index = CONNECTIVITY::getGlobalNumberingIndex(Entity);
 
-  END_OF("void CONNECTIVITYClient::getGlobalNumberingIndex()");
+  END_OF();
 
   return index;
 }
@@ -388,7 +388,7 @@ bool CONNECTIVITYClient::existConnectivity(medConnectivity ConnectivityType,
 
   bool b = CONNECTIVITY::existConnectivity(ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::existConnectivity()");
+  END_OF();
 
   return b;
 }
@@ -409,7 +409,7 @@ const int * CONNECTIVITYClient::getReverseConnectivity
   const int *c = CONNECTIVITY::getReverseConnectivity
     (ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::getReverseConnectivity()");
+  END_OF();
 
   return c;
 }
@@ -430,7 +430,7 @@ const int * CONNECTIVITYClient::getReverseConnectivityIndex
   const int *c =  CONNECTIVITY::getReverseConnectivityIndex
     (ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::getReverseConnectivityIndex()");
+  END_OF();
 
   return c;
 }
@@ -449,7 +449,7 @@ const int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity,
 
   const int * c =  CONNECTIVITY::getValue(TypeConnectivity, Type);
 
-  END_OF("void CONNECTIVITYClient::()");
+  END_OF();
 
   return c;
 }
@@ -467,7 +467,7 @@ const int* CONNECTIVITYClient::getValueIndex(medConnectivity TypeConnectivity)
 
   const int * c =  CONNECTIVITY::getValueIndex(TypeConnectivity);
 
-  END_OF("void CONNECTIVITYClient::getValueIndex()");
+  END_OF();
 
   return c;
 }
@@ -485,7 +485,7 @@ const int* CONNECTIVITYClient::getNeighbourhood() const
 
   const int * c =  CONNECTIVITY::getNeighbourhood();
 
-  END_OF("void CONNECTIVITYClient::getNeighbourhood()");
+  END_OF();
 
   return c;
 }
@@ -505,7 +505,7 @@ bool CONNECTIVITYClient::existPolygonsConnectivity(medConnectivity connectivityT
 
   bool b = CONNECTIVITY::existPolygonsConnectivity( connectivityType, Entity );
 
-  END_OF("void CONNECTIVITYClient::existPolygonsConnectivity(connectivityType, Entity)");
+  END_OF();
 
   return b;
 }
@@ -525,7 +525,7 @@ bool CONNECTIVITYClient::existPolyhedronConnectivity(medConnectivity connectivit
 
   bool b = CONNECTIVITY::existPolyhedronConnectivity( connectivityType, Entity );
 
-  END_OF("void CONNECTIVITYClient::existPolyhedronConnectivity(connectivityType, Entity)");
+  END_OF();
 
   return b;
 }
@@ -545,7 +545,7 @@ const int* CONNECTIVITYClient::getPolygonsConnectivity(medConnectivity Connectiv
 
   const int * c = CONNECTIVITY::getPolygonsConnectivity (ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::getPolygonsConnectivity()");
+  END_OF();
   return c;
 }
 
@@ -564,7 +564,7 @@ const int* CONNECTIVITYClient::getPolygonsConnectivityIndex(medConnectivity Conn
 
   const int * c = CONNECTIVITY::getPolygonsConnectivityIndex (ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::getPolygonsConnectivityIndex()");
+  END_OF();
   return c;
 }
 
@@ -582,7 +582,7 @@ const int* CONNECTIVITYClient::getPolyhedronConnectivity(medConnectivity Connect
 
   const int * c = CONNECTIVITY::getPolyhedronConnectivity (ConnectivityType);
 
-  END_OF("void CONNECTIVITYClient::getPolyhedronConnectivity()");
+  END_OF();
   return c;
 }
 
@@ -600,7 +600,7 @@ const int* CONNECTIVITYClient::getPolyhedronFacesIndex() const
 
   const int * c = CONNECTIVITY::getPolyhedronFacesIndex();
 
-  END_OF("void CONNECTIVITYClient::getPolyhedronFacesIndex()");
+  END_OF();
   return c;
 }
 
@@ -618,7 +618,7 @@ const int* CONNECTIVITYClient::getPolyhedronIndex(medConnectivity ConnectivityTy
 
   const int * c = CONNECTIVITY::getPolyhedronIndex (ConnectivityType);
 
-  END_OF("void CONNECTIVITYClient::getPolyhedronIndex()");
+  END_OF();
   return c;
 }
 
@@ -642,7 +642,7 @@ int CONNECTIVITYClient::getNumberOfPolygons() const
 
   SCRUTE(n);
 
-  END_OF("void CONNECTIVITYClient::getNumberOfPolygons()");
+  END_OF();
   return n;
 }
 
@@ -662,7 +662,7 @@ int CONNECTIVITYClient::getNumberOfPolyhedronFaces() const
 
   SCRUTE(n);
 
-  END_OF("void CONNECTIVITYClient::getNumberOfPolyhedronFaces()");
+  END_OF();
   return n;
 }
 
@@ -686,7 +686,7 @@ int CONNECTIVITYClient::getNumberOfPolyhedron() const
 
   SCRUTE(n);
 
-  END_OF("void CONNECTIVITYClient::getNumberOfPolyhedron()");
+  END_OF();
   return n;
 }
 

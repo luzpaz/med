@@ -106,7 +106,7 @@ public:
   void addMesh  ( MESH    * const ptrMesh   ) throw (MED_EXCEPTION) ;
   int  addDriver     (driverTypes driverType,
 		      const string & fileName,
-		      MED_EN::med_mode_acces access=MED_EN::MED_REMP);
+		      MED_EN::med_mode_acces access=MED_EN::RDWR);
   int  addDriver     (GENDRIVER & driver);
   void rmDriver      (int index=0) throw (MEDEXCEPTION) ;
 
@@ -152,7 +152,7 @@ template<class T>
 FIELD<T> * MED::getFieldT( const string & fieldName, const int dt,  const int it) const throw (MEDEXCEPTION)
 {
   const char *LOC="Unexpected type of field";
-  FIELD_ retUp=getField(fieldName,dt,it);
+  FIELD_* retUp=getField(fieldName,dt,it);
   FIELD<T> *ret=dynamic_cast< FIELD<T> * >(retUp);
   if(!ret)
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) ) );

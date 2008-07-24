@@ -138,35 +138,40 @@ protected:
     Not implemented yet! All type are scalar !
     \endif
   */
-  int *           _componentsTypes ;
+  //int *           _componentsTypes ;
+  vector<int>     _componentsTypes ;
   /*!
     \if developper
     Array of size _numberOfComponents
     storing components names if any.
     \endif
   */
-  string * 	  _componentsNames;
+  //string * 	  _componentsNames;
+  vector<string>  _componentsNames;
   /*!
     \if developper
     Array of size _numberOfComponents
     storing components descriptions if any.
     \endif
- */
-  string *        _componentsDescriptions;
-  /*!
-    \if developper
-    Array of size _numberOfComponents
-    storing components units if any.
-    \endif
- */
-  UNIT *          _componentsUnits;
+  */
+  //string *        _componentsDescriptions;
+  vector<string>  _componentsDescriptions;
   /*!
     \if developper
     Array of size _numberOfComponents
     storing components units if any.
     \endif
   */
-  string *        _MEDComponentsUnits;
+  //UNIT *          _componentsUnits;
+  vector<UNIT>    _componentsUnits;
+  /*!
+    \if developper
+    Array of size _numberOfComponents
+    storing components units if any.
+    \endif
+  */
+  //string *        _MEDComponentsUnits;
+  vector<string>  _MEDComponentsUnits;
   /*!
     \if developper
     Iteration number of the field.
@@ -242,7 +247,7 @@ public:
   virtual   int     addDriver(driverTypes driverType,
                               const string & fileName="Default File Name.med",
 			      const string & driverFieldName="Default Field Nam",
-			      MED_EN::med_mode_acces access=MED_EN::MED_REMP) ;
+			      MED_EN::med_mode_acces access=MED_EN::RDWR) ;
 
   virtual  int      addDriver( GENDRIVER & driver);
   virtual  void     read (const GENDRIVER &);
@@ -260,7 +265,7 @@ public:
   inline string   getDescription() const;
   inline const SUPPORT * getSupport() const;
   inline void     setSupport(const SUPPORT * support);
-  inline void     setNumberOfComponents(const int NumberOfComponents);
+  /*inline*/ void     setNumberOfComponents(const int NumberOfComponents);
   inline int      getNumberOfComponents() const;
   inline void     setNumberOfValues(const int NumberOfValues);
   inline int      getNumberOfValues() const;
@@ -340,6 +345,11 @@ inline string FIELD_::getDescription() const
 inline void FIELD_::setNumberOfComponents(const int NumberOfComponents)
 {
   _numberOfComponents=NumberOfComponents;
+  _componentsTypes.resize(_numberOfComponents);
+  _componentsNames.resize(_numberOfComponents);
+  _componentsDescriptions.resize(_numberOfComponents);
+  _componentsUnits.resize(_numberOfComponents);
+  _MEDComponentsUnits.resize(_numberOfComponents);
 }
 /*!
   Get FIELD number of components.
@@ -386,8 +396,9 @@ inline int FIELD_::getNumberOfValues() const
 */
 inline void FIELD_::setComponentsNames(const string * ComponentsNames)
 {
-  if (NULL == _componentsNames)
-    _componentsNames = new string[_numberOfComponents] ;
+  //if (NULL == _componentsNames)
+  //  _componentsNames = new string[_numberOfComponents] ;
+  _componentsNames.resize(_numberOfComponents);
   for (int i=0; i<_numberOfComponents; i++)
     _componentsNames[i]=ComponentsNames[i] ;
 }
@@ -398,6 +409,11 @@ inline void FIELD_::setComponentsNames(const string * ComponentsNames)
 */
 inline void FIELD_::setComponentName(int i, const string ComponentName)
 {
+  const char * LOC = " FIELD_::setComponentName() : ";
+  BEGIN_OF(LOC);
+  if( i<1 || i>_numberOfComponents )
+    throw MEDEXCEPTION(STRING(LOC)<<" invalid index" );
+
   _componentsNames[i-1]=ComponentName ;
 }
 /*!
@@ -407,13 +423,18 @@ inline void FIELD_::setComponentName(int i, const string ComponentName)
 */
 inline const string * FIELD_::getComponentsNames() const
 {
-  return _componentsNames ;
+  return &(_componentsNames[0]) ;
 }
 /*!
   Get the name of the i^th component.
 */
 inline string FIELD_::getComponentName(int i) const
 {
+  const char * LOC = " FIELD_::getComponentName() : ";
+  BEGIN_OF(LOC);
+  if( i<1 || i>_numberOfComponents )
+    throw MEDEXCEPTION(STRING(LOC)<<" invalid index" );
+
   return _componentsNames[i-1] ;
 }
 /*!
@@ -425,8 +446,9 @@ inline string FIELD_::getComponentName(int i) const
 */
 inline void FIELD_::setComponentsDescriptions(const string * ComponentsDescriptions)
 {
-  if (NULL == _componentsDescriptions)
-    _componentsDescriptions = new string[_numberOfComponents] ;
+  //if (NULL == _componentsDescriptions)
+  //  _componentsDescriptions = new string[_numberOfComponents] ;
+  _componentsDescriptions.resize(_numberOfComponents);
   for (int i=0; i<_numberOfComponents; i++)
     _componentsDescriptions[i]=ComponentsDescriptions[i] ;
 }
@@ -437,6 +459,11 @@ inline void FIELD_::setComponentsDescriptions(const string * ComponentsDescripti
 */
 inline void FIELD_::setComponentDescription(int i,const string ComponentDescription)
 {
+  const char * LOC = " FIELD_::setComponentDescription() : ";
+  BEGIN_OF(LOC);
+  if( i<1 || i>_numberOfComponents )
+    throw MEDEXCEPTION(STRING(LOC)<<" invalid index" );
+
   _componentsDescriptions[i-1]=ComponentDescription ;
 }
 /*!
@@ -446,13 +473,18 @@ inline void FIELD_::setComponentDescription(int i,const string ComponentDescript
 */
 inline const string * FIELD_::getComponentsDescriptions() const
 {
-  return _componentsDescriptions ;
+  return &(_componentsDescriptions[0]);
 }
 /*!
   Get the description of the i^th component.
 */
 inline string FIELD_::getComponentDescription(int i) const
 {
+  const char * LOC = " FIELD_::setComponentDescription() : ";
+  BEGIN_OF(LOC);
+  if( i<1 || i>_numberOfComponents )
+    throw MEDEXCEPTION(STRING(LOC)<<" invalid index" );
+
   return _componentsDescriptions[i-1];
 }
 
@@ -466,8 +498,9 @@ inline string FIELD_::getComponentDescription(int i) const
 */
 inline void FIELD_::setComponentsUnits(const UNIT * ComponentsUnits)
 {
-  if (NULL == _componentsUnits)
-    _componentsUnits = new UNIT[_numberOfComponents] ;
+  //if (NULL == _componentsUnits)
+  //  _componentsUnits = new UNIT[_numberOfComponents] ;
+  _componentsUnits.resize(_numberOfComponents);
   for (int i=0; i<_numberOfComponents; i++)
     _componentsUnits[i]=ComponentsUnits[i] ;
 }
@@ -478,13 +511,18 @@ inline void FIELD_::setComponentsUnits(const UNIT * ComponentsUnits)
 */
 inline const UNIT * FIELD_::getComponentsUnits() const
 {
-  return _componentsUnits ;
+  return &(_componentsUnits[0]);
 }
 /*!
   Get the UNIT of the i^th component.
 */
 inline const UNIT * FIELD_::getComponentUnit(int i) const
 {
+  const char * LOC = " FIELD_::getComponentUnit() : ";
+  BEGIN_OF(LOC);
+  if( i<1 || i>_numberOfComponents )
+    throw MEDEXCEPTION(STRING(LOC)<<" invalid index" );
+
   return &_componentsUnits[i-1] ;
 }
 /*!
@@ -497,8 +535,9 @@ inline const UNIT * FIELD_::getComponentUnit(int i) const
 */
 inline void FIELD_::setMEDComponentsUnits(const string * MEDComponentsUnits)
 {
-  if (NULL == _MEDComponentsUnits)
-    _MEDComponentsUnits = new string[_numberOfComponents] ;
+  //if (NULL == _MEDComponentsUnits)
+  //  _MEDComponentsUnits = new string[_numberOfComponents] ;
+  _MEDComponentsUnits.resize(_numberOfComponents);
   for (int i=0; i<_numberOfComponents; i++)
     _MEDComponentsUnits[i]=MEDComponentsUnits[i] ;
 }
@@ -509,6 +548,11 @@ inline void FIELD_::setMEDComponentsUnits(const string * MEDComponentsUnits)
 */
 inline void FIELD_::setMEDComponentUnit(int i, const string MEDComponentUnit)
 {
+  const char * LOC = " FIELD_::setMEDComponentUnit() : ";
+  BEGIN_OF(LOC);
+  if( i<1 || i>_numberOfComponents )
+    throw MEDEXCEPTION(STRING(LOC)<<" invalid index" );
+
   _MEDComponentsUnits[i-1]=MEDComponentUnit ;
 }
 /*!
@@ -518,13 +562,18 @@ inline void FIELD_::setMEDComponentUnit(int i, const string MEDComponentUnit)
 */
 inline const string * FIELD_::getMEDComponentsUnits() const
 {
-  return _MEDComponentsUnits ;
+  return &(_MEDComponentsUnits[0]);
 }
 /*!
   Get the string for unit of the i^th component.
 */
 inline string FIELD_::getMEDComponentUnit(int i) const
 {
+  const char * LOC = " FIELD_::getMEDComponentUnit() : ";
+  BEGIN_OF(LOC);
+  if( i<1 || i>_numberOfComponents )
+    throw MEDEXCEPTION(STRING(LOC)<<" invalid index" );
+
   return _MEDComponentsUnits[i-1] ;
 }
 /*!
@@ -744,7 +793,7 @@ public:
   int  addDriver(driverTypes driverType,
 		 const string & fileName="Default File Name.med",
 		 const string & driverFieldName="Default Field Name",
-		 MED_EN::med_mode_acces access=MED_EN::MED_REMP) ;
+		 MED_EN::med_mode_acces access=MED_EN::RDWR) ;
 
   int  addDriver(GENDRIVER & driver);
 
@@ -923,7 +972,7 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
     _isRead = true ;
   }
 
-  END_OF("FIELD<T>::FIELD(const SUPPORT * Support, const int NumberOfComponents)");
+  END_OF();
 }
 
 /*!
@@ -1026,7 +1075,7 @@ const FIELD<T, INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::operator+(const FIELD
     result._operationInitialize(*this,m,"+"); // perform Atribute's initialization
     result._add_in_place(*this,m); // perform addition
 
-    END_OF("FIELD<T>::operator+(const FIELD & m)");
+    END_OF();
     return result;
 }
 
@@ -1048,7 +1097,7 @@ FIELD<T, INTERLACING_TAG>& FIELD<T, INTERLACING_TAG>::operator+=(const FIELD & m
     const T* endV=value+size; // pointer to the end of value
     for(;value!=endV; value1++,value++)
 	*value += *value1;
-    END_OF("FIELD<T>::operator+=(const FIELD & m)");
+    END_OF();
     return *this;
 }
 
@@ -1070,7 +1119,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::add(const FIELD& m, const 
     result->_operationInitialize(m,n,"+"); // perform Atribute's initialization
     result->_add_in_place(m,n); // perform addition
 
-    END_OF("FIELD<T>::add(const FIELD & m, const FIELD& n)");
+    END_OF();
     return result;
 }
 
@@ -1088,7 +1137,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::addDeep(const FIELD& m, co
     result->_operationInitialize(m,n,"+"); // perform Atribute's initialization
     result->_add_in_place(m,n); // perform addition
 
-    END_OF("FIELD<T>::addDeep(const FIELD & m, const FIELD& n)");
+    END_OF();
     return result;
 }
 
@@ -1124,7 +1173,7 @@ const FIELD<T, INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::operator-(const FIELD
     result._operationInitialize(*this,m,"-"); // perform Atribute's initialization
     result._sub_in_place(*this,m); // perform substracion
 
-    END_OF("FIELD<T>::operator-(const FIELD & m)");
+    END_OF();
     return result;
 }
 
@@ -1154,7 +1203,7 @@ const FIELD<T, INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::operator-() const
 
     for(;value!=endV; value1++,value++)
 	*value = -(*value1);
-    END_OF("FIELD<T>::operator-=(const FIELD & m)");
+    END_OF();
     return result;
 }
 
@@ -1178,7 +1227,7 @@ FIELD<T, INTERLACING_TAG>& FIELD<T, INTERLACING_TAG>::operator-=(const FIELD & m
     for(;value!=endV; value1++,value++)
 	*value -= *value1;
 
-    END_OF("FIELD<T>::operator-=(const FIELD & m)");
+    END_OF();
     return *this;
 }
 
@@ -1200,7 +1249,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::sub(const FIELD& m, const 
     result->_operationInitialize(m,n,"-"); // perform Atribute's initialization
     result->_sub_in_place(m,n); // perform substraction
 
-    END_OF("FIELD<T>::sub(const FIELD & m, const FIELD& n)");
+    END_OF();
     return result;
 }
 
@@ -1218,7 +1267,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::subDeep(const FIELD& m, co
     result->_operationInitialize(m,n,"-"); // perform Atribute's initialization
     result->_sub_in_place(m,n); // perform substraction
 
-    END_OF("FIELD<T>::subDeep(const FIELD & m, const FIELD& n)");
+    END_OF();
     return result;
 }
 
@@ -1254,7 +1303,7 @@ const FIELD<T, INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::operator*(const FIELD
     result._operationInitialize(*this,m,"*"); // perform Atribute's initialization
     result._mul_in_place(*this,m); // perform multiplication
 
-    END_OF("FIELD<T>::operator*(const FIELD & m)");
+    END_OF();
     return result;
 }
 
@@ -1278,7 +1327,7 @@ FIELD<T, INTERLACING_TAG>& FIELD<T, INTERLACING_TAG>::operator*=(const FIELD & m
     for(;value!=endV; value1++,value++)
 	*value *= *value1;
 
-    END_OF("FIELD<T>::operator*=(const FIELD & m)");
+    END_OF();
     return *this;
 }
 
@@ -1300,7 +1349,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::mul(const FIELD& m, const 
     result->_operationInitialize(m,n,"*"); // perform Atribute's initialization
     result->_mul_in_place(m,n); // perform multiplication
 
-    END_OF("FIELD<T>::mul(const FIELD & m, const FIELD& n)");
+    END_OF();
     return result;
 }
 
@@ -1318,7 +1367,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::mulDeep(const FIELD& m, co
     result->_operationInitialize(m,n,"*"); // perform Atribute's initialization
     result->_mul_in_place(m,n); // perform multiplication
 
-    END_OF("FIELD<T>::mulDeep(const FIELD & m, const FIELD& n)");
+    END_OF();
     return result;
 }
 
@@ -1354,7 +1403,7 @@ const FIELD<T, INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::operator/(const FIELD
     result._operationInitialize(*this,m,"/"); // perform Atribute's initialization
     result._div_in_place(*this,m); // perform division
 
-    END_OF("FIELD<T>::operator/(const FIELD & m)");
+    END_OF();
     return result;
 }
 
@@ -1379,7 +1428,7 @@ FIELD<T, INTERLACING_TAG>& FIELD<T, INTERLACING_TAG>::operator/=(const FIELD & m
     for(;value!=endV; value1++,value++)
 	*value /= *value1;
 
-    END_OF("FIELD<T>::operator/=(const FIELD & m)");
+    END_OF();
     return *this;
 }
 
@@ -1401,7 +1450,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::div(const FIELD& m, const 
     result->_operationInitialize(m,n,"/"); // perform Atribute's initialization
     result->_div_in_place(m,n); // perform division
 
-    END_OF("FIELD<T>::div(const FIELD & m, const FIELD& n)");
+    END_OF();
     return result;
 }
 
@@ -1419,7 +1468,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::divDeep(const FIELD& m, co
   result->_operationInitialize(m,n,"/"); // perform Atribute's initialization
   result->_div_in_place(m,n); // perform division
 
-  END_OF("FIELD<T>::divDeep(const FIELD & m, const FIELD& n)");
+  END_OF();
   return result;
 }
 
@@ -1446,10 +1495,10 @@ void FIELD<T, INTERLACING_TAG>::_operationInitialize(const FIELD& m,const FIELD&
     // The following data member may differ from field m to n.
     // The initialization is done based on the first field.
 
-    if(m.getComponentsUnits() != NULL)
-      setComponentsUnits(m.getComponentsUnits());
-    else
-      _componentsUnits = (UNIT *) NULL;
+    //if(m.getComponentsUnits() != NULL)
+    setComponentsUnits(m.getComponentsUnits());
+    //else
+    //  _componentsUnits = (UNIT *) NULL;
 
     setIterationNumber(m.getIterationNumber());
     setTime(m.getTime());
@@ -1858,7 +1907,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
 
   delete [] x;
 
-  END_OF(LOC);
+  END_OF();
   return Gradient;
 }
 
@@ -1900,7 +1949,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildNorm2Field() const 
     Norm2Field->setValueIJ(i,1,sqrt(norm2));
   }
 
-  END_OF(LOC);
+  END_OF();
   return Norm2Field;
 
 }
@@ -2041,33 +2090,77 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
     // Il n'est vraiment pas optimal de mixer des champs dans des modes d'entrelacement
     // different juste pour le calcul
 
-    const T * value     = NULL;
-    ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-      value = getValue();
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-      myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
-    }
-    else {
-      myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
-    }
-    
-    value = value + (component-1) * getNumberOfValues();
-    const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
 
     double integrale=0.0;
     double totVol=0.0;
-    for (; value!=lastvalue ; ++value ,++vol)
-    {
+
+    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+      const T* value = getValue();
+      value = value + (component-1) * getNumberOfValues();
+      const T* lastvalue = value + getNumberOfValues(); // pointing just after the end of column
+      for (; value!=lastvalue ; ++value ,++vol) {
 	integrale += static_cast<double>((*value) * (*value)) * (*vol);
 	totVol+=*vol;
+      }
     }
+    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+      ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
+      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
+      //    integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*vol) );
+      //    totVol+=*vol;
+      //  }
+      //}
+      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+        integrale += static_cast<double>( anArray->getIJ(i,component) * anArray->getIJ(i,component) * (*vol) );
+        totVol+=*vol;
+      }
+      //delete anArray;
+    }
+    else { // FULL_INTERLACE
+      ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
+      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
+      //for (int j=1; j<= anArray->getDim(); j++ ) {
+      //  for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+      //    integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*vol) );
+      //    totVol+=*vol;
+      //  }
+      //}
+      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+        integrale += static_cast<double>( anArray->getIJ(i,component) * anArray->getIJ(i,component) * (*vol) );
+        totVol+=*vol;
+      }
+      //delete anArray;
+    }
+
+    //const T * value     = NULL;
+    //ArrayNo * myArray   = NULL;
+    //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+    //  value = getValue();
+    //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+    //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getPtr();
+    //}
+    //else {
+    //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getPtr();
+    //}
+    
+    //value = value + (component-1) * getNumberOfValues();
+    //const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
+
+    //double integrale=0.0;
+    //double totVol=0.0;
+    //for (; value!=lastvalue ; ++value ,++vol)
+    //{
+    //integrale += static_cast<double>((*value) * (*value)) * (*vol);
+    //totVol+=*vol;
+    //}
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+    //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -2090,32 +2183,69 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
     const double* vol=p_field_size->getValue();
     const double* lastvol=vol+getNumberOfValues(); // pointing just after the end of vol
 
-    const T * value     = NULL;
-    ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-      value = getValue();
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ){
-      myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
-    }
-    else {
-      myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
-    }
 
+    double integrale=0.0;
     double totVol=0.0;
     const double* p_vol=vol;
     for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
 	totVol+=*p_vol;
 
-    double integrale=0.0;
-    for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
-	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
-	    integrale += static_cast<double>((*value) * (*value)) * (*p_vol);
+    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+      const T* value = getValue();
+      for (int i=1; i<=getNumberOfComponents(); ++i) { // compute integral on all components
+	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) {
+          integrale += static_cast<double>((*value) * (*value)) * (*p_vol);
+        }
+      }
+    }
+    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+      ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+      for (int j=1; j<=anArray->getDim(); j++) {
+        int i = 1;
+        for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+          integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*p_vol) );
+        }
+      }
+      //delete anArray;
+    }
+    else { // FULL_INTERLACE
+      ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+      for (int j=1; j<=anArray->getDim(); j++) {
+        int i = 1;
+        for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+          integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*p_vol) );
+        }
+      }
+      //delete anArray;
+    }
+
+
+    //const T * value     = NULL;
+    //ArrayNo * myArray   = NULL;
+    //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+    //  value = getValue();
+    //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ){
+    //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getPtr();
+    //}
+    //else {
+    //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getPtr();
+    //}
+
+    //double totVol=0.0;
+    //const double* p_vol=vol;
+    //for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
+    //totVol+=*p_vol;
+
+    //double integrale=0.0;
+    //for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
+    //for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
+    //    integrale += static_cast<double>((*value) * (*value)) * (*p_vol);
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+    //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -2139,33 +2269,74 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
 	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÂ©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue();
-    const T * value     = NULL;
-    ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-      value = getColumn(component);
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-      myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-      value   = myArray->getColumn(component);
-    }
-    else {
-      myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-      value   = myArray->getColumn(component);
-    }
-
-    const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
+    const double* vol = p_field_size->getValue();
 
     double integrale=0.0;
     double totVol=0.0;
-    for (; value!=lastvalue ; ++value ,++vol)
-    {
+
+    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+      const T* value = getValue();
+      const T* lastvalue = value + getNumberOfValues(); // pointing just after the end of column
+      for (; value!=lastvalue ; ++value ,++vol) {
 	integrale += std::abs( static_cast<double>(*value) ) * (*vol);
 	totVol+=*vol;
+      }
     }
+    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+      ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
+      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
+      //    integrale += std::abs(static_cast<double>( anArray->getIJ(i,j)) ) * (*vol);
+      //    totVol+=*vol;
+      //  }
+      //}
+      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+        integrale += std::abs(static_cast<double>( anArray->getIJ(i,component)) ) * (*vol);
+        totVol+=*vol;
+      }
+      //delete anArray;
+    }
+    else { // FULL_INTERLACE
+      ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
+      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
+      //    integrale += std::abs(static_cast<double>( anArray->getIJ(i,j)) ) * (*vol);
+      //    totVol+=*vol;
+      //  }
+      //}
+      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+        integrale += std::abs(static_cast<double>( anArray->getIJ(i,component)) ) * (*vol);
+        totVol+=*vol;
+      }
+      //delete anArray;
+    }
+    
+    //const T * value     = NULL;
+    //ArrayNo * myArray   = NULL;
+    //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+    //  value = getColumn(component);
+    //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+    //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getColumn(component);
+    //}
+    //else {
+    //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getColumn(component);
+    //}
+
+    //const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
+
+    //double integrale=0.0;
+    //double totVol=0.0;
+    //for (; value!=lastvalue ; ++value ,++vol)
+    //{
+    //integrale += std::abs( static_cast<double>(*value) ) * (*vol);
+    //totVol+=*vol;
+    //}
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+    //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -2179,45 +2350,81 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
 template <class T, class INTERLACING_TAG>
 double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_field_volume) const
 {
-    _checkNormCompatibility(p_field_volume); // may throw exception
-    const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
-    if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÂ©mentation dans mesh]
+  _checkNormCompatibility(p_field_volume); // may throw exception
+  const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
+  if(!p_field_volume) // if the user don't supply the volume
+    p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÂ©mentation dans mesh]
+  
+  // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
+  const double* vol = p_field_size->getValue();
+  const double* lastvol = vol+getNumberOfValues(); // pointing just after the end of vol
 
-    // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue();
-    const double* lastvol=vol+getNumberOfValues(); // pointing just after the end of vol
+  double integrale=0.0;
+  double totVol=0.0;
+  const double* p_vol=vol;
+  for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
+    totVol+=*p_vol;
 
-   const T * value     = NULL;
-    ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-      value = getValue();
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-      myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
+  if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+    const T* value = getValue();
+    for (int i=1; i<=getNumberOfComponents(); ++i) { // compute integral on all components
+      for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) {
+        integrale += std::abs( static_cast<double>(*value) ) * (*p_vol);
+      }
     }
-    else {
-      myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
+  }
+  else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+    ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+    for (int j=1; j<=anArray->getDim(); j++) {
+      int i = 1;
+      for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+        integrale += std::abs(static_cast<double>(anArray->getIJ(i,j))) * (*p_vol);
+      }
     }
-
-    double totVol=0.0;
-    const double* p_vol=vol;
-    for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
-	totVol+=*p_vol;
-
-    double integrale=0.0;
-    for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
-	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
-	    integrale += std::abs( static_cast<double>(*value) ) * (*p_vol);
-
-    if(!p_field_volume) // if the user didn't supply the volume
-	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
-    if( totVol <= 0)
-	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
-
-    return integrale/totVol;
+    //delete anArray;
+  }
+  else { // FULL_INTERLACE
+    ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+    for (int j=1; j<=anArray->getDim(); j++) {
+      int i = 1;
+      for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+        integrale += std::abs(static_cast<double>(anArray->getIJ(i,j))) * (*p_vol);
+      }
+    }
+    //delete anArray;
+  }
+  
+  
+  //const T * value     = NULL;
+  //ArrayNo * myArray   = NULL;
+  //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+  //  value = getValue();
+  //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+  //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
+  //  value   = myArray->getPtr();
+  //}
+  //else {
+  //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
+  //  value   = myArray->getPtr();
+  //}
+  
+  //double totVol=0.0;
+  //const double* p_vol=vol;
+  //for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
+  //  totVol+=*p_vol;
+  
+  //double integrale=0.0;
+  //for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
+  //  for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
+  //    integrale += std::abs( static_cast<double>(*value) ) * (*p_vol);
+  
+  if(!p_field_volume) // if the user didn't supply the volume
+    delete p_field_size; // delete temporary volume field
+  //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+  if( totVol <= 0)
+    throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
+  
+  return integrale/totVol;
 }
 
 /*! Return a new field (to deallocate with delete) lying on subSupport that is included by
@@ -2271,11 +2478,11 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
 				 const int iterationNumber,
 				 const int orderNumber) throw (MEDEXCEPTION)
 {
-  const char * LOC = "template <class T> FIELD<T>::FIELD(const SUPPORT * Support, driverTypes driverType, const string & fileName=\"\", const string & fieldName=\"\", const int iterationNumber=-1, const int orderNumber=-1) : ";
+  //const char * LOC = "template <class T> FIELD<T>::FIELD(const SUPPORT * Support, driverTypes driverType, const string & fileName=\"\", const string & fieldName=\"\", const int iterationNumber=-1, const int orderNumber=-1) : ";
 
   int current;
 
-  BEGIN_OF(LOC);
+  BEGIN_OF("template <class T> FIELD<T>::FIELD(const SUPPORT * Support, driverTypes driverType, const string & fileName=\"\", const string & fieldName=\"\", const int iterationNumber=-1, const int orderNumber=-1) : ");
 
   init();
 
@@ -2302,13 +2509,13 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
   _time = 0.0;
   _orderNumber = orderNumber;
 
-  current = addDriver(driverType,fileName,fieldDriverName,MED_EN::MED_LECT);
+  current = addDriver(driverType,fileName,fieldDriverName,MED_EN::RDONLY);
 
   _drivers[current]->open();
   _drivers[current]->read();
   _drivers[current]->close();
 
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!
@@ -2326,8 +2533,8 @@ FIELD<T,INTERLACING_TAG>::FIELD(driverTypes driverType,
   throw (MEDEXCEPTION) :FIELD_()
 {
   int current;
-  const char * LOC ="FIELD<T,INTERLACING_TAG>::FIELD( driverTypes driverType, const string & fileName, string & fieldDriverName, int iterationNumber, int orderNumber) : ";
-  BEGIN_OF(LOC);
+  //const char * LOC ="FIELD<T,INTERLACING_TAG>::FIELD( driverTypes driverType, const string & fileName, string & fieldDriverName, int iterationNumber, int orderNumber) : ";
+  BEGIN_OF("FIELD<T,INTERLACING_TAG>::FIELD( driverTypes driverType, const string & fileName, string & fieldDriverName, int iterationNumber, int orderNumber) : ");
 
   init();
 
@@ -2351,13 +2558,13 @@ FIELD<T,INTERLACING_TAG>::FIELD(driverTypes driverType,
   _time = 0.0;
   _orderNumber = orderNumber;
 
-  current = addDriver(driverType,fileName,fieldDriverName,MED_EN::MED_LECT);
+  current = addDriver(driverType,fileName,fieldDriverName,MED_EN::RDONLY);
 
   _drivers[current]->open();
   _drivers[current]->read();
   _drivers[current]->close();
 
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!
@@ -2372,7 +2579,7 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::~FIELD()
   for ( it = _gaussModel.begin();it != _gaussModel.end(); it++ )
     delete (*it).second;
 
-  END_OF(" Destructeur FIELD<T,INTERLACING_TAG>::~FIELD()");
+  END_OF();
 }
 
 /*!
@@ -2381,20 +2588,25 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::~FIELD()
 template <class T, class INTERLACING_TAG>
 void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
 {
-  const char* LOC = "FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)" ;
-  BEGIN_OF(LOC);
+  //const char* LOC = "FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)" ;
+  BEGIN_OF("FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)");
 
   _numberOfComponents = NumberOfComponents ;
-  if (_componentsTypes == NULL)
-    _componentsTypes = new int[NumberOfComponents] ;
-  if (_componentsNames == NULL)
-    _componentsNames = new string[NumberOfComponents];
-  if (_componentsDescriptions == NULL)
-    _componentsDescriptions = new string[NumberOfComponents];
-  if (_componentsUnits == NULL)
-    _componentsUnits = new UNIT[NumberOfComponents];
-  if (_MEDComponentsUnits == NULL)
-    _MEDComponentsUnits = new string[NumberOfComponents];
+  //if (_componentsTypes == NULL)
+  //  _componentsTypes = new int[NumberOfComponents] ;
+  _componentsTypes.resize(NumberOfComponents);
+  //if (_componentsNames == NULL)
+  //  _componentsNames = new string[NumberOfComponents];
+  _componentsNames.resize(NumberOfComponents);
+  //if (_componentsDescriptions == NULL)
+  //  _componentsDescriptions = new string[NumberOfComponents];
+  _componentsDescriptions.resize(NumberOfComponents);
+  //if (_componentsUnits == NULL)
+  //  _componentsUnits = new UNIT[NumberOfComponents];
+  _componentsUnits.resize(NumberOfComponents);
+  //if (_MEDComponentsUnits == NULL)
+  //  _MEDComponentsUnits = new string[NumberOfComponents];
+  _MEDComponentsUnits.resize(NumberOfComponents);
   for (int i=0;i<NumberOfComponents;i++) {
     _componentsTypes[i] = 0 ;
   }
@@ -2402,7 +2614,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
   try {
     // becarefull about the number of gauss point
     _numberOfValues = _support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-    MESSAGE(LOC <<" : "<<_numberOfValues <<" et "<< NumberOfComponents);
+    MESSAGE(__LOC <<" : "<<_numberOfValues <<" et "<< NumberOfComponents);
 
     //EF : A modifier lors de l'intégration de la classe de localisation des points de gauss
     _value = new ArrayNoGauss(_numberOfComponents,_numberOfValues);
@@ -2420,7 +2632,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
   }
 
   SCRUTE(_value);
-  END_OF("void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)");
+  END_OF();
 }
 
 /*!
@@ -2433,16 +2645,21 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents,
   BEGIN_OF("void FIELD<T>::allocValue(const int NumberOfComponents,const int LengthValue)");
 
   _numberOfComponents = NumberOfComponents ;
-  if (_componentsTypes == NULL)
-    _componentsTypes = new int[NumberOfComponents] ;
-  if (_componentsNames == NULL)
-    _componentsNames = new string[NumberOfComponents];
-  if (_componentsDescriptions == NULL)
-    _componentsDescriptions = new string[NumberOfComponents];
-  if (_componentsUnits == NULL)
-    _componentsUnits = new UNIT[NumberOfComponents];
-  if (_MEDComponentsUnits == NULL)
-    _MEDComponentsUnits = new string[NumberOfComponents];
+  //if (_componentsTypes == NULL)
+  //  _componentsTypes = new int[NumberOfComponents] ;
+  //if (_componentsNames == NULL)
+  //  _componentsNames = new string[NumberOfComponents];
+  //if (_componentsDescriptions == NULL)
+  //  _componentsDescriptions = new string[NumberOfComponents];
+  //if (_componentsUnits == NULL)
+  //  _componentsUnits = new UNIT[NumberOfComponents];
+  //if (_MEDComponentsUnits == NULL)
+  //  _MEDComponentsUnits = new string[NumberOfComponents];
+  _componentsTypes.resize(NumberOfComponents);
+  _componentsNames.resize(NumberOfComponents);
+  _componentsDescriptions.resize(NumberOfComponents);
+  _componentsUnits.resize(NumberOfComponents);
+  _MEDComponentsUnits.resize(NumberOfComponents);
   for (int i=0;i<NumberOfComponents;i++) {
     _componentsTypes[i] = 0 ;
   }
@@ -2456,7 +2673,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents,
   _isRead = true ;
 
   SCRUTE(_value);
-  END_OF("void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents,const int LengthValue)");
+  END_OF();
 }
 
 /*!
@@ -2468,10 +2685,12 @@ void FIELD<T, INTERLACING_TAG>::deallocValue()
   BEGIN_OF("void FIELD<T, INTERLACING_TAG>::deallocValue()");
   _numberOfValues = 0 ;
   _numberOfComponents = 0 ;
-  if (_value != NULL)
+  if (_value != NULL) {
     delete _value;
+    _value = NULL;
+  }
 
-  END_OF("void FIELD<T, INTERLACING_TAG>::deallocValue()");
+  END_OF();
 }
 
 // -----------------
@@ -2490,11 +2709,11 @@ int FIELD<T, INTERLACING_TAG>::addDriver(driverTypes driverType,
 					 MED_EN::med_mode_acces access)
 {
   //jfa tmp (as last argument has no default value):const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name\",MED_EN::med_mode_acces access) : ";
-  const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName,const string & driverName,MED_EN::med_mode_acces access) :";//jfa tmp
+  //const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName,const string & driverName,MED_EN::med_mode_acces access) :";//jfa tmp
 
   GENDRIVER * driver;
 
-  BEGIN_OF(LOC);
+  BEGIN_OF("FIELD<T>::addDriver(driverTypes driverType, const string & fileName,const string & driverName,MED_EN::med_mode_acces access) :");
 
   SCRUTE(driverType);
 
@@ -2506,7 +2725,7 @@ int FIELD<T, INTERLACING_TAG>::addDriver(driverTypes driverType,
 
   _drivers[current]->setFieldName(driverName);
 
-  END_OF(LOC);
+  END_OF();
 
   return current;
 }
@@ -2519,13 +2738,18 @@ int FIELD<T, INTERLACING_TAG>::addDriver(driverTypes driverType,
 template <class T, class INTERLACING_TAG>
 inline int FIELD<T, INTERLACING_TAG>::addDriver (GENDRIVER & driver )
 {
-  const char * LOC = "FIELD<T, INTERLACING_TAG>::addDriver(GENDRIVER &) : ";
+  //const char * LOC = "FIELD<T, INTERLACING_TAG>::addDriver(GENDRIVER &) : ";
   int current;
 
-  BEGIN_OF(LOC);
+  BEGIN_OF("FIELD<T, INTERLACING_TAG>::addDriver(GENDRIVER &) : ");
 
   // duplicate driver to delete it with destructor !
-  GENDRIVER * newDriver = driver.copy() ;
+  //GENDRIVER * newDriver = driver.copy() ;
+
+  GENDRIVER * newDriver = 
+    DRIVERFACTORY::buildDriverForField(driver.getDriverType(),
+                                       driver.getFileName(), this,
+                                       driver.getAccessMode());
 
   _drivers.push_back(newDriver);
 
@@ -2533,9 +2757,9 @@ inline int FIELD<T, INTERLACING_TAG>::addDriver (GENDRIVER & driver )
   SCRUTE(current);
   driver.setId(current);
 
-  MESSAGE(LOC << " je suis la 1");
-  END_OF(LOC);
-  MESSAGE(LOC << " je suis la 2");
+  MESSAGE(__LOC << " je suis la 1");
+  END_OF();
+  MESSAGE(__LOC << " je suis la 2");
 
   return current ;
 };
@@ -2549,7 +2773,7 @@ void FIELD<T, INTERLACING_TAG>::rmDriver (int index/*=0*/)
   const char * LOC = "FIELD<T, INTERLACING_TAG>::rmDriver (int index=0): ";
   BEGIN_OF(LOC);
 
-  if ( _drivers[index] ) {
+  if ( index>=0 && index<_drivers.size() && _drivers[index] ) {
     //_drivers.erase(&_drivers[index]);
     // why not ????
     MESSAGE ("detruire");
@@ -2561,7 +2785,7 @@ void FIELD<T, INTERLACING_TAG>::rmDriver (int index/*=0*/)
                                      )
                           );
 
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!
@@ -2572,7 +2796,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   const char * LOC = "FIELD<T, INTERLACING_TAG>::read(int index=0) : ";
   BEGIN_OF(LOC);
 
-  if ( _drivers[index] ) {
+  if ( index>=0 && index<_drivers.size() && _drivers[index] ) {
     _drivers[index]->open();
     _drivers[index]->read();
     _drivers[index]->close();
@@ -2583,7 +2807,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
                                      << _drivers.size()
                                      )
                           );
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!
@@ -2594,7 +2818,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   const char * LOC = "FIELD<T,INTERLACING_TAG>::write(int index=0, const string & driverName = \"\") : ";
   BEGIN_OF(LOC);
 
-  if( _drivers[index] ) {
+  if( index>=0 && index<_drivers.size() && _drivers[index] ) {
     _drivers[index]->open();
     if (driverName != "") _drivers[index]->setFieldName(driverName);
     _drivers[index]->write();
@@ -2606,7 +2830,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
                                      << _drivers.size()
                                      )
                           );
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!
@@ -2618,7 +2842,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   const char * LOC = "FIELD<T,INTERLACING_TAG>::write(int index=0, const string & driverName = \"\") : ";
   BEGIN_OF(LOC);
 
-  if( _drivers[index] ) {
+  if( index>=0 && index<_drivers.size() && _drivers[index] ) {
     _drivers[index]->openAppend();
     if (driverName != "") _drivers[index]->setFieldName(driverName);
     _drivers[index]->writeAppend();
@@ -2630,7 +2854,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
                                      << _drivers.size()
                                      )
                           );
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!
@@ -2641,8 +2865,8 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
 */
 template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(const GENDRIVER & genDriver)
 {
-  const char * LOC = " FIELD<T, INTERLACING_TAG>::write(const GENDRIVER &) : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = " FIELD<T, INTERLACING_TAG>::write(const GENDRIVER &) : ";
+  BEGIN_OF(" FIELD<T, INTERLACING_TAG>::write(const GENDRIVER &) : ");
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
@@ -2651,7 +2875,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
       _drivers[index]->close();
     }
 
-  END_OF(LOC);
+  END_OF();
 
 }
 
@@ -2663,8 +2887,8 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
 */
 template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::writeAppend(const GENDRIVER & genDriver)
 {
-  const char * LOC = " FIELD<T, INTERLACING_TAG>::write(const GENDRIVER &) : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = " FIELD<T, INTERLACING_TAG>::write(const GENDRIVER &) : ";
+  BEGIN_OF(" FIELD<T, INTERLACING_TAG>::write(const GENDRIVER &) : ");
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
@@ -2673,7 +2897,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
       _drivers[index]->close();
     }
 
-  END_OF(LOC);
+  END_OF();
 
 }
 
@@ -2685,8 +2909,8 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
 */
 template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::read(const GENDRIVER & genDriver)
 {
-  const char * LOC = " FIELD<T, INTERLACING_TAG>::read(const GENDRIVER &) : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = " FIELD<T, INTERLACING_TAG>::read(const GENDRIVER &) : ";
+  BEGIN_OF(" FIELD<T, INTERLACING_TAG>::read(const GENDRIVER &) : ");
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
@@ -2695,7 +2919,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
       _drivers[index]->close();
     }
 
-  END_OF(LOC);
+  END_OF();
 
 }
 
@@ -2761,9 +2985,9 @@ inline void FIELD<T, INTERLACING_TAG>::setArray(MEDMEM_Array_ * Value)
 template <class T, class INTERLACING_TAG>
 inline MEDMEM_Array_ * FIELD<T, INTERLACING_TAG>::getArray() const throw (MEDEXCEPTION)
 {
-  const char * LOC = "MEDMEM_Array_ * FIELD<T, INTERLACING_TAG>::getArray() : ";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
+  //const char * LOC = "MEDMEM_Array_ * FIELD<T, INTERLACING_TAG>::getArray() : ";
+  BEGIN_OF("MEDMEM_Array_ * FIELD<T, INTERLACING_TAG>::getArray() : ");
+  END_OF();
   return _value ;
 }
 template <class T,class INTERLACING_TAG>  inline
@@ -2779,7 +3003,7 @@ FIELD<T, INTERLACING_TAG>::getArrayGauss() const throw (MEDEXCEPTION)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<
 				 "The field has no Gauss Point"));
 
-  END_OF(LOC);
+  END_OF();
 
 }
 
@@ -2796,7 +3020,7 @@ FIELD<T, INTERLACING_TAG>::getArrayNoGauss() const throw (MEDEXCEPTION)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<
 				 "The field has Gauss Point"));
 
-  END_OF(LOC);
+  END_OF();
 }
 
 
@@ -2811,7 +3035,7 @@ FIELD<T, INTERLACING_TAG>::getGaussPresence() const throw (MEDEXCEPTION)
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't call getGaussPresence on a null _value"));
 
-  //END_OF(LOC);
+  //END_OF();
 }
 
 /*!
@@ -2834,8 +3058,8 @@ inline int FIELD<T, INTERLACING_TAG>::getValueLength() const
 template <class T, class INTERLACIN_TAG>
 inline const T* FIELD<T, INTERLACIN_TAG>::getValue() const throw (MEDEXCEPTION)
 {
-  const char * LOC ="FIELD<T, INTERLACING_TAG>::getValue() : ";
-  BEGIN_OF(LOC);
+  //const char * LOC ="FIELD<T, INTERLACING_TAG>::getValue() : ";
+  BEGIN_OF("FIELD<T, INTERLACING_TAG>::getValue() : ");
   if ( getGaussPresence() )
     return static_cast<ArrayGauss *>(_value)->getPtr() ;
   else
@@ -2867,7 +3091,7 @@ FIELD<T,INTERLACING_TAG>::getRow(int i) const throw (MEDEXCEPTION)
     return static_cast<ArrayGauss *>(_value)->getRow(valIndex) ;
   else
     return static_cast<ArrayNoGauss *>(_value)->getRow(valIndex) ;
-  //END_OF(LOC);
+  //END_OF();
 }
 
 /*!
@@ -3010,7 +3234,7 @@ template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::get
     return _support->getNumberOfTypes();
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
-  END_OF(LOC);
+  END_OF();
 };
 
 
@@ -3171,7 +3395,7 @@ template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::get
      return static_cast<ArrayNoGauss *>(_value)->getNbGauss(valIndex) ;
  else
    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_value not defined" ));
-//   END_OF(LOC);
+//   END_OF();
 };
 
 template <class T,class INTERLACING_TAG> const int * FIELD<T,INTERLACING_TAG>::getNumberOfElements() const throw (MEDEXCEPTION)
@@ -3182,7 +3406,7 @@ template <class T,class INTERLACING_TAG> const int * FIELD<T,INTERLACING_TAG>::g
     return _support->getNumberOfElements();
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
-   END_OF(LOC);
+   END_OF();
 };
 
 template <class T,class INTERLACING_TAG> const MED_EN::medGeometryElement  * FIELD<T,INTERLACING_TAG>::getGeometricTypes()  const throw (MEDEXCEPTION)
@@ -3193,7 +3417,7 @@ template <class T,class INTERLACING_TAG> const MED_EN::medGeometryElement  * FIE
     return _support->getTypes();
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
-   END_OF(LOC);
+   END_OF();
 };
 template <class T,class INTERLACING_TAG> bool  FIELD<T,INTERLACING_TAG>::isOnAllElements() const throw (MEDEXCEPTION)
 {
@@ -3203,7 +3427,7 @@ template <class T,class INTERLACING_TAG> bool  FIELD<T,INTERLACING_TAG>::isOnAll
     return _support->isOnAllElements();
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
-  END_OF(LOC);
+  END_OF();
 };
 
 
@@ -3339,7 +3563,7 @@ void FIELD<T, INTERLACING_TAG>::getVolume() const throw (MEDEXCEPTION)
   if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
 
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!
@@ -3358,7 +3582,7 @@ void FIELD<T, INTERLACING_TAG>::getArea() const throw (MEDEXCEPTION)
   if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
 
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!
@@ -3377,7 +3601,7 @@ void FIELD<T, INTERLACING_TAG>::getLength() const throw (MEDEXCEPTION)
   if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
 
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!
@@ -3401,7 +3625,7 @@ void FIELD<T, INTERLACING_TAG>::getNormal() const throw (MEDEXCEPTION)
   if ((_numberOfComponents != dim_space) || (_valueType != MED_EN::MED_REEL64))
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
 
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!
@@ -3425,7 +3649,7 @@ void FIELD<T, INTERLACING_TAG>::getBarycenter() const throw (MEDEXCEPTION)
   if ((_numberOfComponents != dim_space) || (_valueType != MED_EN::MED_REEL64))
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
 
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!
@@ -3475,9 +3699,16 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTI
   else
     {
       barycenterField = mesh->getBarycenter(_support);
-      bary=barycenterField->getValue();
+      bary = barycenterField->getValue();
+      //for(i=0; i<spaceDim; i++)
+      //  xyz[i]=(double *)(bary+i*_numberOfValues);
       for(i=0; i<spaceDim; i++)
-	xyz[i]=(double *)(bary+i*_numberOfValues);
+        xyz[i]=new double[_numberOfValues];
+      deallocateXyz=true;
+      for(i=0;i<_numberOfValues;i++) {
+        for(j=0;j<spaceDim;j++)
+          xyz[j][i]=bary[i*spaceDim+j];
+      }
     }
   T* valsToSet=(T*)getValue();
   double *temp=new double[spaceDim];
@@ -3495,13 +3726,15 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTI
       delete [] xyz[j];
   delete [] xyz;
 }
+
 /*!
   Execute a function on _values on 'this' and put the result on a newly created field that has to be deallocated.
   WARNING : "this" must have allocated its array by setting this->_support and this->_numberOfComponents properly.
   Typically you should use it on a field built with constructor FIELD<T>::FIELD<T>(SUPPORT *,int nbOfComponents)
  */
-                                                                         template <class T, class INTERLACING_TAG>
-                                                                         FIELD<T,INTERLACING_TAG> *FIELD<T, INTERLACING_TAG>::execFunc(int nbOfComponents, myFuncType2 f) throw (MEDEXCEPTION)
+template <class T, class INTERLACING_TAG>
+FIELD<T,INTERLACING_TAG> *FIELD<T, INTERLACING_TAG>::execFunc(int nbOfComponents,
+                                                              myFuncType2 f) throw (MEDEXCEPTION)
 {
   FIELD<T,INTERLACING_TAG> *ret=new FIELD<T,INTERLACING_TAG>(_support,nbOfComponents);
   const T* valsInput=getValue();

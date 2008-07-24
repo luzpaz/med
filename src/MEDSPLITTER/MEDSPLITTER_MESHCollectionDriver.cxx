@@ -73,7 +73,7 @@ int MESHCollectionDriver::readSeq(char* filename, char* meshname)
         ParallelTopology* aPT = new ParallelTopology
           ((m_collection->getMesh()), (m_collection->getCZ()), cellglobal, nodeglobal, faceglobal);
 	m_collection->setTopology(aPT);
-	END_OF("MEDSPLITTER::MESHCollectionDriver::readSeq()");
+	END_OF();
         return 0;
 }
 
@@ -116,7 +116,7 @@ void MESHCollectionDriver::readFileStruct(vector <string>&  field_names,vector<i
 			
 				}
 		}
-	END_OF("MEDSPLITTER::MESHCollectionDriver::readFileStruct()")
+	END_OF();
 	}
 
 //!retrieves the type of a field for a given fieldname
@@ -131,7 +131,7 @@ int MESHCollectionDriver::getFieldType(const string& fieldname)
 	// testing whether the field is of double or int type		
 	MEDMEM::FIELD_* field = med_struct.getField(fieldname,iter->dt,iter->it);
 
-  END_OF("MEDSPLITTER::MESHCollectionDriver::getFieldType()")
+  END_OF();
   
 	if (dynamic_cast<MEDMEM::FIELD<double>*>(field))
 	  return 1;
@@ -269,7 +269,7 @@ vector<int*>& nodeglobal, int idomain
   med_2_3::MEDfermer(fid);
  
   //        if (nbface!=0) delete[]array;
-  END_OF("MEDSPLITTER::MESHCollectionDriver::readSubdomain()");
+  END_OF();
   }
   
   void MESHCollectionDriver::writeSubdomain(int idomain, int nbdomains, char* distfilename)

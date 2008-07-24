@@ -61,8 +61,10 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_DRIVER():_ptrField((FIELD<T> *) MED_NULL),
-                     _fieldName(""),_fieldNum(MED_INVALID)
+  MED_FIELD_DRIVER():
+    GENDRIVER(MED_DRIVER),
+    _ptrField((FIELD<T> *) MED_NULL),
+    _fieldName(""),_fieldNum(MED_INVALID)
   {}
   /*!
     Constructor.
@@ -70,7 +72,7 @@ public :
   template <class INTERLACING_TAG>
   MED_FIELD_DRIVER(const string & fileName, FIELD<T, INTERLACING_TAG> * ptrField,
 		   MED_EN::med_mode_acces accessMode)
-    : GENDRIVER(fileName,accessMode),
+    : GENDRIVER(fileName, accessMode, MED_DRIVER),
       _ptrField((FIELD<T> *) ptrField),
       _fieldName(""),_fieldNum(MED_INVALID)
   {
@@ -140,10 +142,10 @@ public :
   template <class INTERLACING_TAG>
   IMED_FIELD_RDONLY_DRIVER(const string & fileName,
 			   FIELD<T, INTERLACING_TAG> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY)
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY)
   {
     BEGIN_OF("IMED_FIELD_RDONLY_DRIVER::IMED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
-    END_OF("IMED_FIELD_RDONLY_DRIVER::IMED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+    END_OF();
   }
 
   /*!
@@ -190,10 +192,10 @@ public :
   template <class INTERLACING_TAG>
   IMED_FIELD_WRONLY_DRIVER(const string & fileName,
 			   FIELD<T, INTERLACING_TAG> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_WRONLY)
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
     BEGIN_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
-    END_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+    END_OF();
   }
 
   /*!
@@ -242,11 +244,11 @@ public :
 			 FIELD<T, INTERLACING_TAG> * ptrField):
     IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField),
     IMED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField),
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDWR)
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR)
   {
     BEGIN_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
     //_accessMode = MED_RDWR ;
-    END_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+    END_OF();
   }
 
   /*!
@@ -385,14 +387,14 @@ template <class T>  MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER() {
 template <class T> template < class INTERLACING_TAG >
 MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER(const string & fileName,
 						    FIELD<T, INTERLACING_TAG> * ptrField):
-  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY),
+  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY),
   IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField)
 {
     BEGIN_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
 
-    _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::MED_LECT);
+    _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::RDONLY);
 
-    END_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+    END_OF();
 }
 
 /*--------------------- WRONLY PART -------------------------------*/
@@ -412,14 +414,14 @@ template <class T>  MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER() {
 template <class T> template < class INTERLACING_TAG >
 MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER(const string & fileName,
 						    FIELD<T, INTERLACING_TAG> * ptrField):
-  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_WRONLY),
+  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY),
   IMED_FIELD_WRONLY_DRIVER<T>( fileName, ptrField)
 {
   BEGIN_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
 
-  _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::MED_ECRI);
+  _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::WRONLY/*ECRI*/);
 
-  END_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  END_OF();
 }
 
 /*--------------------- RDWR PART -------------------------------*/
@@ -433,14 +435,14 @@ template <class T>  MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER() {
 template <class T> template < class INTERLACING_TAG >
 MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER(const string & fileName,
 						FIELD<T, INTERLACING_TAG> * ptrField):
-  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_REMP),
+  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR),
   IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
 {
   BEGIN_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
 
-  _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::MED_REMP);
+  _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::RDWR);
 
-  END_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  END_OF();
 }
 
 

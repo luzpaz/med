@@ -139,7 +139,7 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
       if (faceglobal[i]!=0) delete[] faceglobal[i];
     }
   
-  END_OF("MEDSPLITTER::MESHCollectionDriver::read()")
+  END_OF();
     return 0;
 }
 
@@ -177,7 +177,7 @@ void MESHCollectionMedAsciiDriver::write(char* filename)
 		
       MESSAGE("File name "<<string(distfilename));
 		
-      int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::MED_CREATE);
+      int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
 		
       MESSAGE("Start writing");
       (m_collection->getMesh())[idomain]->write(id);
@@ -188,6 +188,6 @@ void MESHCollectionMedAsciiDriver::write(char* filename)
       writeSubdomain(idomain, nbdomains, distfilename);
     }
 	
-  END_OF("MEDSPLITTER::MESHCollectionDriver::write()");
+  END_OF();
 
 }

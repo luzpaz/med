@@ -173,7 +173,6 @@ public:
   SUPPORT& operator=(const SUPPORT &support);
   bool operator == (const SUPPORT &support) const;
   bool deepCompare(const SUPPORT &support) const;
-  // function to set all value when SUPPORT was created by MedMedDriver without all MESH information !!! Change with new API !
   void update();
 
   inline void setName(string Name);
@@ -186,7 +185,7 @@ public:
   inline void setNumberOfGeometricType(int NumberOfGeometricType);
   inline void setGeometricType(const MED_EN::medGeometryElement *GeometricType);
   inline void setNumberOfElements(const int *NumberOfElements);
-  inline void setTotalNumberOfElements(int TotalNumberOfElements);
+  //inline void setTotalNumberOfElements(int TotalNumberOfElements);
   inline void setNumber(MEDSKYLINEARRAY * Number);
   inline void setNumber(const int * index, const int* value, bool shallowCopy=false);
 
@@ -467,17 +466,21 @@ inline void SUPPORT::setNumberOfElements(const int *NumberOfElements)
 
 /*! set the attribute _totalNumberOfElements to TotalNumberOfElements */
 //--------------------------------------------------------------------
-inline void SUPPORT::setTotalNumberOfElements(int TotalNumberOfElements)
+//inline void SUPPORT::setTotalNumberOfElements(int TotalNumberOfElements)
 //--------------------------------------------------------------------
-{
-  _totalNumberOfElements=TotalNumberOfElements;
-}
+//{
+//  _totalNumberOfElements=TotalNumberOfElements;
+//}
 
 /*! set the attribute _number to Number */
 //---------------------------------------------------
 inline void SUPPORT::setNumber(MEDSKYLINEARRAY * Number)
 //---------------------------------------------------
 {
+  const char * LOC = "SUPPORT::setNumber(MEDSKYLINEARRAY * Number)";
+  if ( _isOnAllElts )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support is on all elements")) ;
+
   if (_number != NULL) delete _number ;
   _number=Number;
 }

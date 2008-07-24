@@ -28,34 +28,34 @@ using namespace MEDMEM;
 
 MED *::MEDMEM::readMedInFile(const std::string& fileName) throw(MEDEXCEPTION)
 {
-  MED *myMedObj=new MED;
-  driverTypes type=DRIVERFACTORY::deduceDriverTypeFromFileName(fileName);
-  int id=myMedObj->addDriver(type,fileName,MED_REMP);
+  MED *myMedObj = new MED;
+  driverTypes type = DRIVERFACTORY::deduceDriverTypeFromFileName(fileName);
+  int id = myMedObj->addDriver(type,fileName,RDWR);
   myMedObj->read(id);
   return myMedObj;
 }
 
 MESH *::MEDMEM::readMeshInFile(const std::string& fileName, const std::string& meshName)
 {
-  MESH *mesh=new MESH;
-  driverTypes type=DRIVERFACTORY::deduceDriverTypeFromFileName(fileName);
-  int id=mesh->addDriver(type,fileName,mesh->getName(),MED_REMP);
+  MESH *mesh = new MESH;
+  driverTypes type = DRIVERFACTORY::deduceDriverTypeFromFileName(fileName);
+  int id = mesh->addDriver(type,fileName,meshName,RDWR);
   mesh->read(id);
   return mesh;
 }
 
 void ::MEDMEM::writeMedToFile(const MED *medObj, const std::string& fileName)
 { 
-  MED *medObjNoC=(MED *)medObj;//MED::write should be a const method ... As it's not the case
-  driverTypes type=DRIVERFACTORY::deduceDriverTypeFromFileName(fileName);
-  int id=medObjNoC->addDriver(type,fileName,MED_REMP);
+  MED *medObjNoC = (MED *)medObj;//MED::write should be a const method ... As it's not the case
+  driverTypes type = DRIVERFACTORY::deduceDriverTypeFromFileName(fileName);
+  int id = medObjNoC->addDriver(type,fileName,RDWR);
   medObjNoC->write(id);
 }
 
 void ::MEDMEM::writeMeshToFile(const MESH *meshObj, const std::string& fileName)
 {
-  MESH *meshObjNoC=(MESH *)meshObj;//MED::write should be a const method ... As it's not the case
-  driverTypes type=DRIVERFACTORY::deduceDriverTypeFromFileName(fileName);
-  int id=meshObjNoC->addDriver(type,fileName,meshObjNoC->getName(),MED_REMP);
+  MESH *meshObjNoC = (MESH *)meshObj;//MED::write should be a const method ... As it's not the case
+  driverTypes type = DRIVERFACTORY::deduceDriverTypeFromFileName(fileName);
+  int id = meshObjNoC->addDriver(type,fileName,meshObjNoC->getName(),RDWR);
   meshObjNoC->write(id);
 }

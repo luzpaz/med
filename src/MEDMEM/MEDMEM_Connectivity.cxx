@@ -26,6 +26,7 @@
 #include "MEDMEM_ModulusArray.hxx"
 
 #include "MEDMEM_STRING.hxx"
+#include "MEDMEM_Utilities.hxx"
 #include <iomanip>
 
 using namespace std;
@@ -90,9 +91,11 @@ CONNECTIVITY::CONNECTIVITY(medEntityMesh Entity /* =MED_CELL */) :
   				_neighbourhood((MEDSKYLINEARRAY*)NULL),
   				_constituent((CONNECTIVITY*)NULL)
 {
+  BEGIN_OF("CONNECTIVITY(medEntityMesh Entity=MED_CELL)");
    MESSAGE("CONNECTIVITY(medEntityMesh Entity=MED_CELL)");
   _count = new int[1];
   _count[0]=1;
+  END_OF();
 }
 
 /*!
@@ -1207,8 +1210,8 @@ void CONNECTIVITY::calculateNodalConnectivity()
 void CONNECTIVITY::calculateReverseNodalConnectivity()
 //---------------------------------------------------//
 {
-  const char * LOC = "CONNECTIVITY::calculateReverseNodalConnectivity : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = "CONNECTIVITY::calculateReverseNodalConnectivity : ";
+  BEGIN_OF("CONNECTIVITY::calculateReverseNodalConnectivity : ");
 
   SCRUTE(_nodal);
   SCRUTE(_reverseNodalConnectivity);
@@ -1289,7 +1292,7 @@ void CONNECTIVITY::calculateReverseNodalConnectivity()
 						    reverse_nodal_connectivity_index,
 						    reverse_nodal_connectivity,true);
   }
-  END_OF(LOC);
+  END_OF();
 }
 
 /*! If not yet done, calculate the Descending Connectivity */
@@ -1864,7 +1867,7 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 							   &Reversedescendingconnectivityvalue[0]);
       ////
     }
-  END_OF(LOC);
+  END_OF();
   }
 
 /*! Not implemented yet */
@@ -1872,13 +1875,13 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 void CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity)
 //--------------------------------------------------------------------//
 {
-  const char * LOC = "CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity) : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = "CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity) : ";
+  BEGIN_OF("CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity) : ");
 
-  MESSAGE(LOC<<"method not yet implemented " << myConnectivity._entity);
+  MESSAGE(__LOC<<"method not yet implemented " << myConnectivity._entity);
   // Mesh dimension !
 
-  END_OF(LOC);
+  END_OF();
   return;
 }
 
@@ -1919,7 +1922,7 @@ medGeometryElement CONNECTIVITY::getElementType(medEntityMesh Entity,int globalN
     throw MEDEXCEPTION(LOCALIZED("getElementType : Entity not defined !"));
   throw MEDEXCEPTION(LOCALIZED("getElementType : Wrong Number !"));
 
-  END_OF(LOC);
+  END_OF();
 }
 
 /*!

@@ -166,7 +166,7 @@ public :
   /*!
     Constructor.
   */
-  IMED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces access=MED_EN::MED_WRONLY) ;
+  IMED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces access=MED_EN::WRONLY) ;
   /*!
     Copy constructor.
   */
@@ -258,7 +258,7 @@ protected:
 class MEDMEM_EXPORT MED_MESH_WRONLY_DRIVER : public virtual IMED_MESH_WRONLY_DRIVER {
 public :
   MED_MESH_WRONLY_DRIVER();
-  MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces access=MED_EN::MED_ECRI);
+  MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh, MED_EN::med_mode_acces access=MED_EN::WRONLY);
   MED_MESH_WRONLY_DRIVER(const MED_MESH_WRONLY_DRIVER & driver);
   ~MED_MESH_WRONLY_DRIVER();
   void   setMeshName(const string & meshName);

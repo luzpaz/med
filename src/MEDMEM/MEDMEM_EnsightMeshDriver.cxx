@@ -41,21 +41,21 @@ using namespace MED_EN;
 
 #define MED_NULL     NULL
 
-ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(): GENDRIVER(), 
+ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(): GENDRIVER(ENSIGHT_DRIVER), 
 				    _ptrMesh((MESH *)MED_NULL)
 {
 }
 
 ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(const string & fileName,
 				 MESH * ptrMesh) :
-  GENDRIVER(fileName,MED_EN::MED_RDWR), _ptrMesh(ptrMesh)
+  GENDRIVER(fileName, MED_EN::RDWR, ENSIGHT_DRIVER), _ptrMesh(ptrMesh)
 {
 }
 
 ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(const string & fileName,
 			       MESH * ptrMesh,
 			       MED_EN::med_mode_acces accessMode):
-  GENDRIVER(fileName,accessMode), _ptrMesh(ptrMesh)
+  GENDRIVER(fileName, accessMode, ENSIGHT_DRIVER), _ptrMesh(ptrMesh)
 {
 }
 
@@ -128,7 +128,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::openConst() const
 				     << _fileName)
 			  );
 
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MESH_WRONLY_DRIVER::closeConst() const {
@@ -142,7 +142,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::closeConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close main Ensight file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MESH_WRONLY_DRIVER::read() throw (MEDEXCEPTION) {
@@ -588,7 +588,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
   ensightGeomFile << endl ;
   return ;
 
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MESH_WRONLY_DRIVER::addSupport(SUPPORT *sup)
@@ -600,7 +600,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::addSupport(SUPPORT *sup)
 //   const char * LOC = "ENSIGHT_MESH_WRONLY_DRIVER::writeSupport(SUPPORT *) : " ;
 //   BEGIN_OF(LOC) ;
 //   MESSAGE(LOC << "Not yet implemented, acting on the object " << *mySupport);
-//   END_OF(LOC) ;
+//   END_OF();
 // }
 
 ENSIGHT_MESH_RDONLY_DRIVER::ENSIGHT_MESH_RDONLY_DRIVER() : ENSIGHT_MESH_DRIVER()
@@ -647,7 +647,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::openConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open main Ensight file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MESH_RDONLY_DRIVER::closeConst() const {
@@ -661,17 +661,17 @@ void ENSIGHT_MESH_RDONLY_DRIVER::closeConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close main Ensight file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MESH_RDONLY_DRIVER::write() const throw (MEDEXCEPTION) {
   throw MEDEXCEPTION("ENSIGHT_MESH_RDONLY_DRIVER::write : Can't write with a RDONLY driver !");
 }
 
-void ENSIGHT_MESH_RDONLY_DRIVER::read() {
-
-  const char * LOC = "ENSIGHT_MESH_RDONLY_DRIVER::read() : " ;
-  BEGIN_OF(LOC);
+void ENSIGHT_MESH_RDONLY_DRIVER::read()
+{
+  //const char * LOC = "ENSIGHT_MESH_RDONLY_DRIVER::read() : " ;
+  BEGIN_OF("ENSIGHT_MESH_RDONLY_DRIVER::read() : ");
 
   openConst() ;
 
@@ -888,6 +888,6 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() {
 //     cout << "Impression de _ptrmesh dans EnsightMeshDriver: " << endl;
 //     cout << *_ptrMesh ;
 
-  END_OF(LOC);
+  END_OF();
 }
 
