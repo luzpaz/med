@@ -2038,7 +2038,7 @@ void MED_MESH_WRONLY_DRIVER22::write(void) const
 
   // If _meshName is not set in driver, try to use _ptrmesh->_meshName
   if ( ( _meshName.empty() ) && ( !_ptrMesh->_name.empty() )    )
-    _meshName=_ptrMesh->_name;
+    _meshName = healName(_ptrMesh->_name );
 
   if ( _meshName.size() > MED_TAILLE_NOM )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
@@ -2999,7 +2999,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 		else
 			sprintf(family_name,"family%d",ifamily);
 	
-		myFamily->setName(family_name);
+		myFamily->setName( healName( family_name ));
 
  		string* groupnames=new string[key.size()];
  		//myFamily->getGroupsNames();
@@ -3027,7 +3027,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 					//have different name sizes
 					strncpy(family_name,myGroups[i]->getName().c_str(),MED_TAILLE_NOM);
 					family_name[MED_TAILLE_NOM-1]='\0';
-					myFamily->setName(family_name);
+					myFamily->setName( healName( family_name ));
 					myFamily->setIdentifier(ifamily);
 					ifamily++;
 					vector<string> groupnames;
@@ -3489,7 +3489,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 	}
       err = med_2_3::MEDfamCr( _medIdt, 
 			      const_cast <char *> ( _meshName.c_str() ),
-			      const_cast <char *> ( families[i]->getName().c_str() ),
+			      const_cast <char *> ( healName(families[i]->getName()).c_str() ),
 			      families[i]->getIdentifier(), 
 			      AttributesIdentifier2,
 			      AttributesValues2,
@@ -3502,7 +3502,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 #else
       err = med_2_3::MEDfamCr( _medIdt, 
 			      const_cast <char *> ( _meshName.c_str() ),
-			      const_cast <char *> ( families[i]->getName().c_str() ),
+			      const_cast <char *> ( healName(families[i]->getName()).c_str() ),
 			      families[i]->getIdentifier(), 
 			      (med_2_3::med_int*)families[i]->getAttributesIdentifiers(),
 			      (med_2_3::med_int*)families[i]->getAttributesValues(),

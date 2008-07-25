@@ -313,7 +313,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
 
       //	_ptrMed->_meshes[meshName] = ptrMesh;
 
-	ptrMesh->setName(meshName);
+	ptrMesh->setName( healName( meshName ));
 
 	ptrMesh->setDescription(meshDescription);
 

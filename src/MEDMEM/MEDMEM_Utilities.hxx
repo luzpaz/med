@@ -26,7 +26,7 @@
 #ifndef WNT
   #include <libgen.h>
 #endif
-inline std::string getBaseName( std::string dataname ) {
+inline std::string getBaseName( const std::string& dataname ) {
   std::string aBaseName = "";
 #ifndef WNT
   aBaseName = basename((char*)dataname.c_str());
@@ -41,7 +41,7 @@ inline std::string getBaseName( std::string dataname ) {
   return aBaseName;
 }
 
-inline std::string getDirName( std::string dataname ) {
+inline std::string getDirName(const std::string& dataname ) {
   std::string aDirName = "";
 #ifndef WNT
   aDirName = dirname((char*)dataname.c_str());
@@ -58,6 +58,16 @@ inline std::string getDirName( std::string dataname ) {
     aDirName = '.';
 #endif
   return aDirName;
+}
+
+/*!
+ * \brief Make a name valid. So far, removes white spaces from name end
+ */
+inline std::string healName(const std::string& name ) {
+  size_t last = name.size()-1;
+  while ( last >= 0 && isspace( name[last] ))
+    last--;
+  return name.substr( 0, last + 1 );
 }
 
 #ifdef MED_WITHOUT_KERNEL

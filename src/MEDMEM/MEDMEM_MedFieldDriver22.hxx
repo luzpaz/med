@@ -1515,9 +1515,9 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
   // If _fieldName is not set in driver, try to use _ptrfield->_fieldName
   if ( ( MED_FIELD_DRIVER<T>::_fieldName.empty()       ) &&
        ( !MED_FIELD_DRIVER<T>::_ptrField->_name.empty() )    )
-    fieldName = MED_FIELD_DRIVER<T>::_ptrField->_name;
+    fieldName = healName( MED_FIELD_DRIVER<T>::_ptrField->_name );
   else
-    fieldName = MED_FIELD_DRIVER<T>::_fieldName;
+    fieldName = healName( MED_FIELD_DRIVER<T>::_fieldName );
 
   //if ( ! MED_FIELD_DRIVER<T>::_ptrField->_isRead )
   //  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
@@ -1539,7 +1539,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
   const locMap & gaussModel = MED_FIELD_DRIVER<T>::_ptrField->_gaussModel;
 
 
-  string meshName = mySupport->getMeshName();
+  string meshName = healName( mySupport->getMeshName() );
   SCRUTE(meshName);
   if ( meshName.size() > MED_TAILLE_NOM ) {
     meshName = meshName.substr(0,MED_TAILLE_NOM);
@@ -1779,9 +1779,9 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
       // PAL16854(Partial support on nodes) ->
       //profilName = (profilNameList.size()>typeNo) ? profilNameList[typeNo].substr(0,MED_TAILLE_NOM) : MED_NOPFL;
       if (profilNameList[typeNo].size()>MED_TAILLE_NOM)
-        profilName = profilNameList[typeNo].substr(0,MED_TAILLE_NOM);
+        profilName = healName( profilNameList[typeNo].substr(0,MED_TAILLE_NOM) );
       else
-        profilName=  profilNameList[typeNo];
+        profilName = healName( profilNameList[typeNo] );
 
       // Rem : Si le SUPPORT n'est pas onAll mais que pour un type géométrique donné le nom
       // du profil associé est MED_NOPFL alors le profil n'est pas écrit dans le fichier MED.
@@ -1883,7 +1883,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
       if ( locPtr->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) {
 	const GAUSS_LOCALIZATION<FullInterlace> & loc=*(static_cast<const GAUSS_LOCALIZATION<FullInterlace> * >(locPtr));
 	ngauss = loc.getNbGauss();
-	locName=loc.getName();
+	locName=healName( loc.getName() );
 	err=med_2_3::MEDgaussEcr(id,
 			       (med_2_3::med_geometrie_element) loc.getType(),
 			       (med_2_3::med_float *)           loc.getRefCoo().getPtr(),
@@ -1896,7 +1896,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
       } else {
 	const GAUSS_LOCALIZATION<NoInterlace> & loc=*(static_cast<const GAUSS_LOCALIZATION<NoInterlace> * >(locPtr));
 	ngauss = loc.getNbGauss();
-	locName=loc.getName();
+	locName=healName( loc.getName() );
 	err=med_2_3::MEDgaussEcr(id,
 			       (med_2_3::med_geometrie_element) loc.getType(),
 			       (med_2_3::med_float *)           loc.getRefCoo().getPtr(),
