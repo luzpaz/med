@@ -237,6 +237,7 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
     // on edge
     buildAllGroups(_ptrMesh->_groupEdge,_ptrMesh->_familyEdge) ;
 
+  _ptrMesh->_name = healName( _ptrMesh->_name );
 //   MESSAGE(LOC<<"Checking of CellModel !!!!!!!");
 
 //   int nbOfTypes =  _ptrMesh->_connectivity->_numberOfTypes;

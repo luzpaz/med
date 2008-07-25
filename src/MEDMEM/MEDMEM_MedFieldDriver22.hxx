@@ -1105,7 +1105,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
   // If an error occurs while reading the field, these allocated FIELD member will be deleted
 
-  MED_FIELD_DRIVER<T>::_ptrField->_name                   = fieldName;
+  MED_FIELD_DRIVER<T>::_ptrField->_name                   = healName( fieldName );
   MED_FIELD_DRIVER<T>::_ptrField->_numberOfComponents     = numberOfComponents ;
   //MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes        = new int   [numberOfComponents] ;
   //MED_FIELD_DRIVER<T>::_ptrField->_componentsNames        = new string[numberOfComponents] ;

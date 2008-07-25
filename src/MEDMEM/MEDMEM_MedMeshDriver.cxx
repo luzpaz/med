@@ -134,7 +134,7 @@ void IMED_MESH_RDONLY_DRIVER::buildAllGroups(vector<GROUP*> & Groups, vector<FAM
   map< string,list<FAMILY*> >::const_iterator currentGroup ;
   int it = 0 ;
   for(currentGroup=groupsNames.begin();currentGroup!=groupsNames.end();currentGroup++) {
-    GROUP * myGroup = new GROUP((*currentGroup).first,(*currentGroup).second) ;
+    GROUP * myGroup = new GROUP(healName((*currentGroup).first),(*currentGroup).second) ;
 //     GROUP * myGroup = new GROUP() ;
 //     myGroup->setName((*currentGroup).first);
 //     SCRUTE(myGroup->getName());
