@@ -1434,7 +1434,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
       profilListFromFile[typeNo].resize(pflSize);
       ret = med_2_3::MEDprofilLire(id,&profilList[typeNo][0],profilName); // cf item 16 Effective STL // IPAL13481
       profilListFromFile[typeNo] = profilList[typeNo];
-      profilNameList[typeNo]=string(profilName);
+      profilNameList[typeNo]= healName(profilName);
     }
   }
 
