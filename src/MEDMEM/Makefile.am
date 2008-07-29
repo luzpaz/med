@@ -156,7 +156,8 @@ if MED_ENABLE_KERNEL
     libmedmem_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
 endif
 
-bin_PROGRAMS= \
+bin_PROGRAMS=
+#bin_PROGRAMS= \
 #	ensight2med med2ensight \
 #	med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH test_write_groups_poly\
 #	test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray \
