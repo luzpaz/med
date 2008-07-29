@@ -62,7 +62,8 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
       _attributeIdentifier.set(_numberOfAttribute,AttributeIdentifier);
       _attributeValue.set(_numberOfAttribute,AttributeValue);
 
-      _attributeDescription.set(_numberOfAttribute);
+      //_attributeDescription.set(_numberOfAttribute);
+      _attributeDescription.resize(_numberOfAttribute);
       for (int i=0;i<NumberOfAttribute;i++) {
 	_attributeDescription[i].assign(AttributeDescription,i*MED_TAILLE_DESC,MED_TAILLE_DESC);
 	_attributeDescription[i].erase(strlen(_attributeDescription[i].c_str()));
@@ -73,10 +74,12 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
     {
       _attributeIdentifier.set(_numberOfAttribute);
       _attributeValue.set(_numberOfAttribute);
-      _attributeDescription.set(_numberOfAttribute);
+      //_attributeDescription.set(_numberOfAttribute);
+      _attributeDescription.resize(_numberOfAttribute);
     }
  
-  _groupName.set(_numberOfGroup);
+  //_groupName.set(_numberOfGroup);
+  _groupName.resize(_numberOfGroup);
   for (int i=0;i<NumberOfGroup;i++) {
     _groupName[i].assign(GroupName,i*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
     _groupName[i].erase(strlen(_groupName[i].c_str()));
@@ -220,14 +223,15 @@ FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
     _attributeValue.set(_numberOfAttribute,m._attributeValue);
   }
 
-  _attributeDescription.set(_numberOfAttribute);
+  //_attributeDescription.set(_numberOfAttribute);
+  _attributeDescription.resize(_numberOfAttribute);
   for (int i=0;i<m._numberOfAttribute;i++)
     _attributeDescription[i] = m._attributeDescription[i];
 
   _numberOfGroup = m._numberOfGroup;
 
-  _groupName.set(_numberOfGroup) ;
-
+  //_groupName.set(_numberOfGroup) ;
+  _groupName.resize(_numberOfGroup) ;
   for (int i=0;i<m._numberOfGroup;i++)
     _groupName[i]=m._groupName[i];
 };
@@ -262,9 +266,13 @@ FAMILY & FAMILY::operator=(const FAMILY &fam)
     _numberOfAttribute = fam._numberOfAttribute; 
     _attributeIdentifier.set(_numberOfAttribute, fam._attributeIdentifier) ;
     _attributeValue.set(_numberOfAttribute, fam._attributeValue) ;
-    _attributeDescription.set(_numberOfAttribute, fam._attributeDescription) ;
+    //_attributeDescription.set(_numberOfAttribute, fam._attributeDescription) ;
+    _attributeDescription.clear();
+    _attributeDescription = fam._attributeDescription;
     _numberOfGroup = fam._numberOfGroup;
-    _groupName.set(_numberOfGroup, fam._groupName) ;
+    //_groupName.set(_numberOfGroup, fam._groupName) ;
+    _groupName.clear();
+    _groupName = fam._groupName;
     return *this;
 };
 
@@ -384,7 +392,8 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
     //    delete[] GeometricTypeNumber;
       
     // family on all ELEMENT ?
-    if (_totalNumberOfElements == _mesh->getNumberOfElementsWithPoly(Entity,MED_ALL_ELEMENTS) && Entity==MED_EN::MED_CELL) {
+    if (_totalNumberOfElements == 
+        _mesh->getNumberOfElementsWithPoly(Entity,MED_ALL_ELEMENTS)/* && Entity==MED_EN::MED_CELL*/) {
       _isOnAllElts = true ;
       // all others attributs are rights !
       for (int i=0; i<_numberOfGeometricType; i++)

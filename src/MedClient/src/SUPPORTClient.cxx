@@ -50,7 +50,7 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
     }
   blankCopy();
 
-  END_OF("SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)");
+  END_OF();
 }
 //=============================================================================
 /*!
@@ -96,7 +96,7 @@ void SUPPORTClient::blankCopy()
                                        SALOME::INTERNAL_ERROR);
   }
 
-  END_OF("SUPPORTClient::blankCopy");
+  END_OF();
 
 }
 //=============================================================================
@@ -125,7 +125,7 @@ void SUPPORTClient::fillCopy()
     _complete_support = true;
   }
 
-  END_OF("SUPPORTClient::fillCopy");
+  END_OF();
 }
 //=============================================================================
 /*!
@@ -138,7 +138,7 @@ SUPPORTClient::~SUPPORTClient()
   IOR_Support->Destroy();
   if(_mesh)
     _mesh->removeReference();
-  END_OF("SUPPORTClient::~SUPPORTClient");
+  END_OF();
 }
 
 //=============================================================================
@@ -153,7 +153,7 @@ MEDSKYLINEARRAY *  SUPPORTClient::getnumber() const throw (MEDEXCEPTION)
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   MEDSKYLINEARRAY *m = SUPPORT::getnumber();
 
-  END_OF("SUPPORTClient::getnumber()");
+  END_OF();
   return m;
 }
 
@@ -170,7 +170,7 @@ const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType)
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   const int *n = SUPPORT::getNumber(GeometricType);
 
-  END_OF("SUPPORTClient::getnumber(medGeometryElement)");
+  END_OF();
   return n;
 }
 
@@ -186,7 +186,7 @@ const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION)
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   const int * n = SUPPORT::getNumberIndex();
 
-  END_OF("SUPPORTClient::getnumberIndex()");
+  END_OF();
   return n;
 }
 
@@ -202,7 +202,7 @@ int SUPPORTClient::getValIndFromGlobalNumber(const int number) const throw (MEDE
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   const int n = SUPPORT::getValIndFromGlobalNumber(number);
   
-  END_OF("SUPPORTClient::getValIndFromGlobalNumber()");
+  END_OF();
   return n;
 }
 

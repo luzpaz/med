@@ -55,7 +55,7 @@ namespace MEDMEM
   FIELDTEMPLATE_I<T,INTERLACING_TAG>::FIELDTEMPLATE_I(): FIELD_i()
   {
     BEGIN_OF("Default Constructor FIELDTEMPLATE_I");
-    END_OF("Default Constructor FIELDTEMPLATE_I");
+    END_OF();
   }
   //=============================================================================
   /*!
@@ -66,7 +66,7 @@ namespace MEDMEM
   FIELDTEMPLATE_I<T,INTERLACING_TAG>::~FIELDTEMPLATE_I()
   {
     BEGIN_OF("Default Destructor FIELDTEMPLATE_I");
-    END_OF("Default Destructor FIELDTEMPLATE_I");
+    END_OF();
   }
   //=============================================================================
   /*!
@@ -78,7 +78,7 @@ namespace MEDMEM
     FIELD_i(fd)
   {
     BEGIN_OF("Default Constructor FIELDTEMPLATE_I");
-    END_OF("Default Constructor FIELDTEMPLATE_I");
+    END_OF();
   }
   //=============================================================================
   /*!
@@ -89,7 +89,7 @@ namespace MEDMEM
   FIELDTEMPLATE_I<T,INTERLACING_TAG>::FIELDTEMPLATE_I(MEDMEM::FIELD<T, INTERLACING_TAG> *f, bool ownCppPtr):FIELD_i(f,ownCppPtr)
   {
     BEGIN_OF("Constructor FIELDTEMPLATE_I");
-    END_OF(" Constructor FIELDTEMPLATE_I");
+    END_OF();
   }
 
   //=============================================================================

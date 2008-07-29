@@ -17,8 +17,9 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+#include "MEDMEM_MedMeshDriver.hxx"
+#include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_MedMeshDriver22.hxx"
-
 #include "MEDMEM_DriversDef.hxx"
 
 #include "MEDMEM_Family.hxx"
@@ -80,7 +81,7 @@ void MED_MESH_DRIVER22::open()
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName<<" in mode "<<_accessMode));
   }
   
-  END_OF(LOC);
+  END_OF();
 }
   
 void MED_MESH_DRIVER22::close()
@@ -103,7 +104,7 @@ void MED_MESH_DRIVER22::close()
     _status = MED_CLOSED;
     _medIdt = MED_INVALID;
   }
-  END_OF(LOC);
+  END_OF();
 }
 
 //A FAIRE UTILISER LES MAPS...
@@ -122,13 +123,14 @@ const char * const MED_MESH_DRIVER22::all_cell_type_tab [MED_NBR_GEOMETRIE_MAILL
 
 MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22():_computeFaces(true)
 {
+  this->GENDRIVER::_accessMode = MED_EN::RDONLY;
 }
   
 MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22(const string & fileName,
 						   MESH * ptrMesh):
   IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),
-  MED_MESH_DRIVER22(fileName,ptrMesh,MED_RDONLY),
-  MED_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY),
+  MED_MESH_DRIVER22(fileName,ptrMesh,RDONLY),
+  MED_MESH_DRIVER(fileName,ptrMesh,RDONLY),
   _computeFaces(true)
 { 
   MESSAGE("MED_MESH_RDONLY_DRIVER22::MED_MESH_RDONLY_DRIVER22(const string & fileName, MESH * ptrMesh) has been created");
@@ -184,7 +186,7 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY when the mesh is a grid")) ;
       buildAllGroups(_ptrMesh->_groupNode,_ptrMesh->_familyNode) ;
     }
-    END_OF(LOC);
+    END_OF();
     return;
   }
   else // check that the mesh is really unstructured (PAL14113)
@@ -235,6 +237,7 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
     // on edge
     buildAllGroups(_ptrMesh->_groupEdge,_ptrMesh->_familyEdge) ;
 
+  _ptrMesh->_name = healName( _ptrMesh->_name );
 //   MESSAGE(LOC<<"Checking of CellModel !!!!!!!");
 
 //   int nbOfTypes =  _ptrMesh->_connectivity->_numberOfTypes;
@@ -243,7 +246,7 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
 //        MESSAGE(LOC << _ptrMesh->_connectivity->_type[i]) ;
 //      }
 
-  END_OF(LOC);
+  END_OF();
 }
 
 //=======================================================================
@@ -496,7 +499,7 @@ void MED_MESH_RDONLY_DRIVER22::getGRID()
 
   _ptrMesh->_coordinate->setCoordinatesSystem(coordinateSystem);
 
-  END_OF(LOC);
+  END_OF();
 }
 
 //=======================================================================
@@ -688,7 +691,7 @@ int  MED_MESH_RDONLY_DRIVER22::getCOORDINATE()
 
       delete[] tmp_node_number ;
       
-      END_OF(LOC);
+      END_OF();
       return MED_VALID;
     }
   return MED_ERROR;
@@ -832,7 +835,7 @@ int MED_MESH_RDONLY_DRIVER22::getCONNECTIVITY()
 	  
 //  	}
       
-      END_OF(LOC);
+      END_OF();
       return MED_VALID;
     }
   return MED_ERROR;
@@ -1838,7 +1841,7 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	delete[] MEDArrayEdgeFamily ;
       }
 
-    END_OF(LOC);
+    END_OF();
     return MED_VALID ;
     }
 
@@ -1874,7 +1877,7 @@ int  MED_MESH_RDONLY_DRIVER22::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
       if ( err != MED_VALID)
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "There is no family for the |"<< _ptrMesh->getNumberOfNodes() << "| nodes in mesh |" << _ptrMesh->_name.c_str() << "|"));
 
-      END_OF(LOC);
+      END_OF();
       return MED_VALID;
     }
 
@@ -1947,6 +1950,7 @@ int  MED_MESH_RDONLY_DRIVER22::getCellsFamiliesNumber(int **MEDArrayFamily,
 
 MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22()
 {
+  this->GENDRIVER::_accessMode = MED_EN::WRONLY;
 }
   
 MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22(const string & fileName,
@@ -1960,6 +1964,7 @@ MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22(const string & fileName,
 MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22(const MED_MESH_WRONLY_DRIVER22 & driver):
   IMED_MESH_WRONLY_DRIVER(driver),MED_MESH_DRIVER22(driver),MED_MESH_DRIVER(driver)
 {
+
 }
 
 MED_MESH_WRONLY_DRIVER22::~MED_MESH_WRONLY_DRIVER22()
@@ -1975,6 +1980,10 @@ GENDRIVER * MED_MESH_WRONLY_DRIVER22::copy(void) const
 
 void MED_MESH_WRONLY_DRIVER22::write(void) const
 { 
+  
+  if (_ptrMesh==NULL || _ptrMesh->getCoordinateptr()==NULL)
+    throw MEDEXCEPTION("Error trying to write an empty mesh");
+
   const char * LOC = "void MED_MESH_WRONLY_DRIVER22::write(void) const : ";
   BEGIN_OF(LOC);
 
@@ -1984,6 +1993,7 @@ void MED_MESH_WRONLY_DRIVER22::write(void) const
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "File "<<_fileName<<" is not open. Open it before write !"));
 
+ 
   string fieldName;
   if ( ( _meshName.empty() ) && ( _ptrMesh->_name.empty() )    )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
@@ -1991,7 +2001,7 @@ void MED_MESH_WRONLY_DRIVER22::write(void) const
 
   // If _meshName is not set in driver, try to use _ptrmesh->_meshName
   if ( ( _meshName.empty() ) && ( !_ptrMesh->_name.empty() )    )
-    _meshName=_ptrMesh->_name;
+    _meshName = healName(_ptrMesh->_name );
 
   if ( _meshName.size() > MED_TAILLE_NOM )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
@@ -2065,7 +2075,7 @@ void MED_MESH_WRONLY_DRIVER22::write(void) const
   if (writeFamilies(_ptrMesh->_familyEdge) !=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERROR in writeFamilies(_ptrMesh->_familyEdge)"  )) ;
        
-  END_OF(LOC);
+  END_OF();
 } 
 
 //=======================================================================
@@ -2242,7 +2252,7 @@ int MED_MESH_WRONLY_DRIVER22::writeGRID() const
 	}
   } // end Write  Cartesian or Polar Grid
 
-  END_OF(LOC);
+  END_OF();
   return MED_VALID;
 }
 
@@ -2398,7 +2408,7 @@ int MED_MESH_WRONLY_DRIVER22::writeCoordinates() const {
       }
       //////////////////////////////////////////////////////////////////////////////////////
 
-  END_OF(LOC);
+  END_OF();
     
   return MED_VALID;
 }
@@ -2791,7 +2801,7 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
     }
 
 
-  END_OF(LOC);
+  END_OF();
   return MED_VALID;
 }
 
@@ -2952,7 +2962,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 		else
 			sprintf(family_name,"family%d",ifamily);
 	
-		myFamily->setName(family_name);
+		myFamily->setName( healName( family_name ));
 
  		string* groupnames=new string[key.size()];
  		//myFamily->getGroupsNames();
@@ -2980,7 +2990,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 					//have different name sizes
 					strncpy(family_name,myGroups[i]->getName().c_str(),MED_TAILLE_NOM);
 					family_name[MED_TAILLE_NOM-1]='\0';
-					myFamily->setName(family_name);
+					myFamily->setName( healName( family_name ));
 					myFamily->setIdentifier(ifamily);
 					ifamily++;
 					vector<string> groupnames;
@@ -2989,7 +2999,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 					myFamilies.push_back(myFamily);
 				}
 		}
-	END_OF("MED_MESH_WRONLY_DRIVER::groupFamilyConverter");
+	END_OF();
 }
 
 int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
@@ -3346,7 +3356,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
     }
   }
     
-  END_OF(LOC);
+  END_OF();
   return MED_VALID;
 }
 
@@ -3442,7 +3452,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 	}
       err = med_2_3::MEDfamCr( _medIdt, 
 			      const_cast <char *> ( _meshName.c_str() ),
-			      const_cast <char *> ( families[i]->getName().c_str() ),
+			      const_cast <char *> ( healName(families[i]->getName()).c_str() ),
 			      families[i]->getIdentifier(), 
 			      AttributesIdentifier2,
 			      AttributesValues2,
@@ -3455,7 +3465,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 #else
       err = med_2_3::MEDfamCr( _medIdt, 
 			      const_cast <char *> ( _meshName.c_str() ),
-			      const_cast <char *> ( families[i]->getName().c_str() ),
+			      const_cast <char *> ( healName(families[i]->getName()).c_str() ),
 			      families[i]->getIdentifier(), 
 			      (med_2_3::med_int*)families[i]->getAttributesIdentifiers(),
 			      (med_2_3::med_int*)families[i]->getAttributesValues(),
@@ -3476,7 +3486,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 
   }
 
-  END_OF(LOC);
+  END_OF();
 
   return MED_VALID;
 }
@@ -3490,18 +3500,20 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 
 MED_MESH_RDWR_DRIVER22::MED_MESH_RDWR_DRIVER22()
 {
+  this->GENDRIVER::_accessMode = MED_EN::RDWR;
 }
 
 MED_MESH_RDWR_DRIVER22::MED_MESH_RDWR_DRIVER22(const string & fileName,
 					       MESH * ptrMesh):
-  MED_MESH_DRIVER(fileName,ptrMesh,MED_RDWR),
+  MED_MESH_DRIVER(fileName,ptrMesh,RDWR),
   IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),
   IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),
   IMED_MESH_RDWR_DRIVER(fileName,ptrMesh),
-  MED_MESH_DRIVER22(fileName,ptrMesh,MED_RDWR),
+  MED_MESH_DRIVER22(fileName,ptrMesh,RDWR),
   MED_MESH_RDONLY_DRIVER22(fileName,ptrMesh),
   MED_MESH_WRONLY_DRIVER22(fileName,ptrMesh)
 {
+  
   MESSAGE("MED_MESH_RDWR_DRIVER22::MED_MESH_RDWR_DRIVER22(const string & fileName, MESH * ptrMesh) has been created");
 }
 
@@ -3509,10 +3521,11 @@ MED_MESH_RDWR_DRIVER22::MED_MESH_RDWR_DRIVER22(const MED_MESH_RDWR_DRIVER22 & dr
   MED_MESH_DRIVER(driver),
   IMED_MESH_RDONLY_DRIVER(driver),
   IMED_MESH_WRONLY_DRIVER(driver),
-  IMED_MESH_RDWR_DRIVER(driver),
   MED_MESH_DRIVER22(driver),
   MED_MESH_RDONLY_DRIVER22(driver),
-  MED_MESH_WRONLY_DRIVER22(driver)
+  MED_MESH_WRONLY_DRIVER22(driver),
+  IMED_MESH_RDWR_DRIVER(driver)
+
 {
 }
 

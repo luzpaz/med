@@ -52,7 +52,7 @@ using namespace MEDMEM;
 MED_i::MED_i():_med((::MED*)NULL)
 {
         BEGIN_OF("Default Constructor MED_i");
-        END_OF("Default Constructor MED_i");
+        END_OF();
 }
 
 //=============================================================================
@@ -62,8 +62,8 @@ MED_i::MED_i():_med((::MED*)NULL)
 //=============================================================================
 void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const string & fileName)
 {
-	const char * LOC = "MED_i::init(driverTypes, const string &)";
-	BEGIN_OF(LOC);
+  //const char * LOC = "MED_i::init(driverTypes, const string &)";
+	BEGIN_OF("MED_i::init(driverTypes, const string &)");
 
   // we create all IOR from _med
 	_med = new ::MED(driverType,fileName);
@@ -200,7 +200,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
              }
   }
   
-  END_OF(LOC);
+  END_OF();
 }
 //=============================================================================
 /*!
@@ -243,8 +243,8 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
   // if (persistence):
   //    some objects can be not published
 
-	const char * LOC = "MED_i::initWithFieldType(driverTypes, const string &)";
-	BEGIN_OF(LOC);
+  //const char * LOC = "MED_i::initWithFieldType(driverTypes, const string &)";
+	BEGIN_OF("MED_i::initWithFieldType(driverTypes, const string &)");
 
   // we create all IOR from _med
 
@@ -301,11 +301,13 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		     currentEntity != MED_EN::meshEntities.end(); 
 		     currentEntity++) 
 		{
-		     MESSAGE(LOC << ": for entity " << (*currentEntity).first);
-		// family :
+                  //MESSAGE(LOC << ": for entity " << (*currentEntity).first);
+                  MESSAGE("initWithFieldType: for entity " << (*currentEntity).first);
+                  // family :
   		     familyVector = ptrMesh->getFamilies((MED_EN::medEntityMesh)(*currentEntity).first);
 		     int nb = familyVector.size();
-		     MESSAGE(LOC << ": there is(are) " << nb << " family(ies)");
+		     //MESSAGE(LOC << ": there is(are) " << nb << " family(ies)");
+		     MESSAGE("initWithFieldType: there is(are) " << nb << " family(ies)");
 		     for (familyVectorIt = familyVector.begin();
 			  familyVectorIt != familyVector.end();
 			  familyVectorIt++) 
@@ -322,7 +324,8 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 	       // group :
       		     groupVector = ptrMesh->getGroups((MED_EN::medEntityMesh)(*currentEntity).first);
 		     nb = groupVector.size();
-		     MESSAGE(LOC << ": there is(are) " << nb << " group(s)");
+		     //MESSAGE(LOC << ": there is(are) " << nb << " group(s)");
+		     MESSAGE("initWithFieldType: there is(are) " << nb << " group(s)");
       		    for (groupVectorIt = groupVector.begin();
 			 groupVectorIt != groupVector.end();
 			 groupVectorIt++) 
@@ -539,7 +542,8 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
                         myFieldIntI = new FIELDTEMPLATE_I<int,NoInterlace>((FIELD<int,NoInterlace>*)myField);
                         myFieldIntIOR = myFieldIntI->_this();
                       }
-                      MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str()
+                      //MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str()
+                      MESSAGE("initWithFieldType: add in study of the field " << fieldsNames[i].c_str()
                               << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
                       //if ( !persistence ||
@@ -565,8 +569,9 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
                          myFieldDoubleI = new FIELDTEMPLATE_I<double,NoInterlace>((FIELD<double,NoInterlace>*)myField);
                          myFieldDoubleIOR = myFieldDoubleI->_this();
                        }
-			MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str()
-                                << " dt = " << dtIt.dt << " it = " << dtIt.it);
+                       //MESSAGE(LOC << " add in study of the field "
+                       MESSAGE("initWithFieldType: add in study of the field "
+                               << fieldsNames[i].c_str() << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
                         //if ( !persistence ||
                         //     isPublishedObject( myStudy, myFieldDoubleI->getEntryPath() ))
@@ -589,7 +594,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
 	     MESSAGE("Here we are i="<< i);
 	}
-	END_OF(LOC);
+	END_OF();
 }
 
 //================================================================================
@@ -907,8 +912,8 @@ SALOME_MED::FIELD_ptr MED_i::getField(const char* fieldName,
 				      CORBA::Long numOrdre ) 
 throw (SALOME::SALOME_Exception)
 {
-	const char * LOC="MED_i::getField(const char*,CORBA::Long,CORBA::Long) ";
-	BEGIN_OF(LOC);
+  //const char * LOC="MED_i::getField(const char*,CORBA::Long,CORBA::Long) ";
+	BEGIN_OF("MED_i::getField(const char*,CORBA::Long,CORBA::Long) ");
 
 	DT_IT_ dtIt;
 
@@ -926,7 +931,7 @@ throw (SALOME::SALOME_Exception)
 	if ( itMap_dtIt == map_dtIt.end() )
 		THROW_SALOME_CORBA_EXCEPTION("Iteration not found !", SALOME::INTERNAL_ERROR);
   
-	END_OF(LOC);
+	END_OF();
 	return (*itMap_dtIt).second;
 
 }
@@ -1150,7 +1155,7 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
    	MESSAGE("Registering of the Corba Med pointer");
 	Register();
 
-        END_OF("Med_i::addInStudy(SALOMEDS::Study_ptr myStudy)");
+        END_OF();
 }
 
 //=============================================================================
@@ -1277,5 +1282,5 @@ void MED_i::addInStudy (SALOMEDS::Study_ptr myStudy,
    	MESSAGE("Registering of the Corba Med pointer");
 	Register();
 
-        END_OF("Med_i::addInStudy(myStudy, myIor, medfather, medObjName)");
+        END_OF();
 }

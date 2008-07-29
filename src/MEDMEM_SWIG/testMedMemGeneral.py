@@ -673,13 +673,13 @@ for i in range(nbOfFiles):
     if (medFileVersion == V22):
         setMedFileVersionForWriting(V21)
 
-    idMedV21 = mesh.addDriver(MED_DRIVER,medV21FileName,mesh.getName(),MED_REMP)
+    idMedV21 = mesh.addDriver(MED_DRIVER,medV21FileName,mesh.getName(),RDWR)
     mesh.write(idMedV21)
 
     if (medFileVersion == V21):
         setMedFileVersionForWriting(V22)
 
-    idMedV22 = mesh.addDriver(MED_DRIVER,medV22FileName,mesh.getName(),MED_REMP)
+    idMedV22 = mesh.addDriver(MED_DRIVER,medV22FileName,mesh.getName(),RDWR)
     mesh.write(idMedV22)
 
     idVtk = mesh.addDriver(VTK_DRIVER,vtkFileName,mesh.getName())

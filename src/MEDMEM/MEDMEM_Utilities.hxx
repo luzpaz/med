@@ -26,7 +26,7 @@
 #ifndef WNT
   #include <libgen.h>
 #endif
-inline std::string getBaseName( std::string dataname ) {
+inline std::string getBaseName( const std::string& dataname ) {
   std::string aBaseName = "";
 #ifndef WNT
   aBaseName = basename((char*)dataname.c_str());
@@ -41,7 +41,7 @@ inline std::string getBaseName( std::string dataname ) {
   return aBaseName;
 }
 
-inline std::string getDirName( std::string dataname ) {
+inline std::string getDirName(const std::string& dataname ) {
   std::string aDirName = "";
 #ifndef WNT
   aDirName = dirname((char*)dataname.c_str());
@@ -58,6 +58,16 @@ inline std::string getDirName( std::string dataname ) {
     aDirName = '.';
 #endif
   return aDirName;
+}
+
+/*!
+ * \brief Make a name valid. So far, removes white spaces from name end
+ */
+inline std::string healName(const std::string& name ) {
+  size_t last = name.size()-1;
+  while ( last >= 0 && isspace( name[last] ))
+    last--;
+  return name.substr( 0, last + 1 );
 }
 
 #ifdef MED_WITHOUT_KERNEL
@@ -113,15 +123,15 @@ using namespace std;
 # ifndef ASSERT
 # define ASSERT(condition) if (!(condition)){ HERE ; cerr << "CONDITION " << #condition << " NOT VERIFIED"<< endl ; INTERRUPTION(1) ;}
 # endif /* ASSERT */
-
 #define REPERE {cout<<flush ; cerr << "   --------------" << endl << flush ;}
-#define BEGIN_OF(chain) {REPERE ; HERE ; cerr << "Begin of: " << chain << endl ; REPERE ; }
-#define END_OF(chain) {REPERE ; HERE ; cerr << "Normal end of: " << chain << endl ; REPERE ; }
+#define BEGIN_OF(chain) const char* __LOC = chain; {REPERE ; HERE ; cerr << "Begin of: " << __LOC << endl ; REPERE ; }
+#define END_OF() {REPERE ; HERE ; cerr << "Normal end of: " << __LOC << endl ; REPERE ; }
+//#define BEGIN_OF(chain) {REPERE ; HERE ; cerr << "Begin of: " << chain << endl ; REPERE ; }
+//#define END_OF(chain) {REPERE ; HERE ; cerr << "Normal end of: " << chain << endl ; REPERE ; }
 
 
 
 # else /* ifdef _DEBUG_*/
-
 # define HERE
 # define SCRUTE(var) {}
 # define MESSAGE(chain) {}
@@ -133,13 +143,26 @@ using namespace std;
 
 #define REPERE
 #define BEGIN_OF(chain) {}
-#define END_OF(chain) {}
+//#define END_OF(chain) {}
+#define END_OF() {}
 
 #endif
 
 #else
 // #ifdef _SALOME
 
-#  include <utilities.h>
+#include <utilities.h>
+
+#undef BEGIN_OF
+#undef END_OF
+# ifdef _DEBUG_
+#define BEGIN_OF(msg) const char* __LOC = msg; {MESS_BEGIN(REPERE) << "Begin of: "      << __LOC << MESS_END} 
+#define END_OF()   {MESS_BEGIN(REPERE) << "Normal end of: " << __LOC << MESS_END} 
+#else
+#define BEGIN_OF(msg) {}
+#define END_OF() {}
 #endif
+
+#endif
+
 #endif

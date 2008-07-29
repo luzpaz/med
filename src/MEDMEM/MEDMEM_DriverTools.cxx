@@ -321,13 +321,13 @@ void _intermediateMED::treatGroupes()
 
 //   if ( hasMixedCells )
 //     INFOS( "There will be groups of mixed dimention" );
-  END_OF(LOC);
+  END_OF();
 }
 
 void _intermediateMED::numerotationMaillage()
 {
-  const char * LOC = "_intermediateMED::numerotationMaillage() : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = "_intermediateMED::numerotationMaillage() : ";
+  BEGIN_OF("_intermediateMED::numerotationMaillage() : ");
 
   treatGroupes();
 
@@ -417,7 +417,7 @@ void _intermediateMED::numerotationMaillage()
     }
     i->ordre=++i_maille;
   }
-  END_OF(LOC);
+  END_OF();
 }
 
 void _intermediateMED::numerotationPoints()
@@ -630,7 +630,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
     }
     while ( i != maillage.end() );
 
-    END_OF(LOC);
+    END_OF();
     return Connectivity;
 }
 
@@ -647,8 +647,8 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
                             vector<GROUP *> & _groupEdge,
                             vector<GROUP *> & _groupNode, MESH * _ptrMesh)
 {
-  const char * LOC = "_intermediateMED::getGroups() : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = "_intermediateMED::getGroups() : ";
+  BEGIN_OF("_intermediateMED::getGroups() : ");
 
   medGroupes.resize( groupes.size(), 0 );
   if (maillage.size() == 0) {
@@ -835,7 +835,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     GROUP * new_group = new GROUP();
     medGroupes[ i ] = new_group;
     //Appel methodes set
-    new_group->setTotalNumberOfElements(mailleSet.size());
+    //new_group->setTotalNumberOfElements(mailleSet.size());
     new_group->setName(grp.nom);
     new_group->setMesh(_ptrMesh);
     new_group->setNumberOfGeometricType(nb_geometric_types);
@@ -853,7 +853,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     delete [] tab_nombres_elements;
   }
 
-  END_OF(LOC);
+  END_OF();
 }
 
 //=======================================================================
@@ -868,8 +868,8 @@ void _intermediateMED::getFamilies(std::vector<FAMILY *> & _famCell,
                                    std::vector<FAMILY *> & _famEdge,
                                    std::vector<FAMILY *> & _famNode, MESH * _ptrMesh)
 {
-  const char * LOC = "_intermediateMED::getFamilies() : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = "_intermediateMED::getFamilies() : ";
+  BEGIN_OF("_intermediateMED::getFamilies() : ");
   
   int nbElemFam = 0, nbNodeFam = 0;
   std::map< GROUP*, vector< FAMILY * > > grpFamsMap;
@@ -926,7 +926,7 @@ void _intermediateMED::getFamilies(std::vector<FAMILY *> & _famCell,
 
     // create a empty MED FAMILY and fill it with the tabs we constructed
     FAMILY* newFam = new FAMILY();
-    newFam->setTotalNumberOfElements( iMa );
+    //newFam->setTotalNumberOfElements( iMa );
     newFam->setName( name.str() );
     newFam->setMesh( _ptrMesh );
     newFam->setNumberOfGeometricType( tab_types_geometriques.size() );
@@ -1031,7 +1031,7 @@ void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
       f->setOrderNumber( j );
     }
   }
-  END_OF(LOC);
+  END_OF();
 }
 
 _intermediateMED::~_intermediateMED()

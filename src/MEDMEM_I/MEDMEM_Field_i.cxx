@@ -48,7 +48,7 @@ int  FIELD_i::fieldIndex = 0;
 FIELD_i::FIELD_i():_fieldTptr(constructConstField()),_corbaIndex(FIELD_i::fieldIndex++)
 {
         BEGIN_OF("Default Constructor Field_i");
-        END_OF(" Default Constructor Field_i");
+        END_OF();
 }
 //=============================================================================
 /*!
@@ -77,7 +77,7 @@ FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
 
   SCRUTE(_fieldTptr);
 
-  END_OF("Constructor FIELD_i(SALOME_MED::SUPPORT_ptr support,::FIELD<T> * const field)");
+  END_OF();
 }
 
 //=============================================================================
@@ -91,7 +91,7 @@ FIELD_i::FIELD_i( FIELD_i & f):_fieldTptr(f._fieldTptr),
 {
         BEGIN_OF("Constructor Field_i");
         FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
-        END_OF("Constructor Field_i");
+        END_OF();
 }
 //=============================================================================
 /*!
@@ -182,7 +182,7 @@ SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()
 
   SCRUTE(_fieldTptr);
 
-  END_OF("SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()");
+  END_OF();
 
   return support ;
 }
@@ -640,7 +640,7 @@ void FIELD_i::addInStudyToComponent (SALOMEDS::SComponent_ptr myComponent,
 
 	MESSAGE("FIELD_i::addInStudy");
 
-        //END_OF("FIELD_i::addInStudy");
+        //END_OF();
 }
 
 //=============================================================================

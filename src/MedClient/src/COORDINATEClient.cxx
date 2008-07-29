@@ -43,7 +43,7 @@ COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
 
   blankCopy();
 
-  END_OF("COORDINATEClient::COORDINATEClient(...)");
+  END_OF();
 }
 //=============================================================================
 /*!
@@ -84,7 +84,7 @@ void COORDINATEClient::blankCopy()
 
   _complete = false;
 
-  END_OF("void COORDINATEClient::blankCopy()");
+  END_OF();
 }
 //=============================================================================
 /*!
@@ -112,7 +112,7 @@ void COORDINATEClient::fillCopy()
 
   _complete = true;
 
-  END_OF("void COORDINATEClient::fillCopy()");
+  END_OF();
 }
 
 //=============================================================================
@@ -128,7 +128,7 @@ const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
   if (!_complete) fillCopy();
   const double * c = COORDINATE::getCoordinates(Mode);
 
-  END_OF("void COORDINATEClient::getCoordinates()");
+  END_OF();
 
   return c;
 }
@@ -145,7 +145,7 @@ double COORDINATEClient::getCoordinate(int Number,int Axis)
   if (!_complete) fillCopy();
   double d = COORDINATE::getCoordinate(Number, Axis);
 
-  END_OF("void COORDINATEClient::getCoordinate()");
+  END_OF();
 
   return d;
 }
@@ -161,7 +161,7 @@ const double *  COORDINATEClient::getCoordinateAxis(int Axis)
   if (!_complete) fillCopy();
   const double *c = COORDINATE::getCoordinateAxis(Axis);
 
-  END_OF("void COORDINATEClient::getCoordinateAxis()");
+  END_OF();
 
   return c;
 }
@@ -177,7 +177,7 @@ const int*      COORDINATEClient::getNodesNumbers() const
   if (!_complete) (const_cast < COORDINATEClient * >(this))->fillCopy();
 
   MESSAGE("NON IMPLEMENTE DANS L'API CORBA");
-  END_OF("void COORDINATEClient::getNodesNumbers()");
+  END_OF();
 
   return NULL;
 }

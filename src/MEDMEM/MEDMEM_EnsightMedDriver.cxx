@@ -38,19 +38,19 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-ENSIGHT_MED_DRIVER::ENSIGHT_MED_DRIVER(): GENDRIVER(), 
+ENSIGHT_MED_DRIVER::ENSIGHT_MED_DRIVER(): GENDRIVER(ENSIGHT_DRIVER), 
                                   _ptrMed((MED * const)MED_NULL)
 {}
 
 ENSIGHT_MED_DRIVER::ENSIGHT_MED_DRIVER(const string & fileName,  MED * const ptrMed):
-  GENDRIVER(fileName,MED_EN::MED_RDWR), _ptrMed(ptrMed)
+  GENDRIVER(fileName, MED_EN::RDWR, ENSIGHT_DRIVER), _ptrMed(ptrMed)
 {
 }
 
 ENSIGHT_MED_DRIVER::ENSIGHT_MED_DRIVER(const string & fileName,
 			       MED * const ptrMed,
 			       MED_EN::med_mode_acces accessMode):
-  GENDRIVER(fileName,accessMode), _ptrMed(ptrMed)
+  GENDRIVER(fileName, accessMode, ENSIGHT_DRIVER), _ptrMed(ptrMed)
 {
 }
 
@@ -117,7 +117,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::openConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open main Ensight file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MED_WRONLY_DRIVER::closeConst() const {
@@ -131,7 +131,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::closeConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close main Ensight file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MED_WRONLY_DRIVER::read() throw (MEDEXCEPTION) {
@@ -140,8 +140,8 @@ void ENSIGHT_MED_WRONLY_DRIVER::read() throw (MEDEXCEPTION) {
 
 void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 
-  const char * LOC = "ENSIGHT_MED_WRONLY_DRIVER::write() : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = "ENSIGHT_MED_WRONLY_DRIVER::write() : ";
+  BEGIN_OF("ENSIGHT_MED_WRONLY_DRIVER::write() : ");
 
   // Well we must open ensight file first, because there are
   // no other driver than MED for ENSIGHT that do it !
@@ -201,8 +201,9 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 	      if (NumberOfComponents==3)      (*_ensightFile) << "vector per node: " << name.str() << " " << name.str() << ".sol" << endl ;
 	      else if (NumberOfComponents<=4) (*_ensightFile) << "scalar per node: " << name.str() << " " << name.str() << ".sol" << endl ;
 	      writeField(myField,name.str()) ;
-	    } else
-	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
+	    }
+            else
+	      MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
 	}
       }
     }
@@ -227,8 +228,9 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 	      if (NumberOfComponents==3)      (*_ensightFile) << "vector per element: " << name.str() << " " << name.str() << ".sol" << endl ;
 	      else if (NumberOfComponents<=4) (*_ensightFile) << "scalar per element: " << name.str() << " " << name.str() << ".sol" << endl ;
 	      writeField(myField,name.str()) ;
-	    } else
-	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all cells !");
+	    }
+            else
+	      MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" which is not on all cells !");
 	}
       }
     }
@@ -239,7 +241,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
   // no other driver than MED for ENSIGHT that do it !
   //  closeConst() ;
   
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh , int imesh) const {
@@ -461,13 +463,13 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeMesh(MESH * myMesh , int imesh) const {
   ensightGeomFile << endl ;
   return ;
 
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
 
-  const char * LOC = "ENSIGHT_MED_WRONLY_DRIVER::writeField() : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = "ENSIGHT_MED_WRONLY_DRIVER::writeField() : ";
+  BEGIN_OF("ENSIGHT_MED_WRONLY_DRIVER::writeField() : ");
   
   typedef MEDMEM_ArrayInterface<int,NoInterlace,NoGauss>::Array ArrayIntNo;
   typedef MEDMEM_ArrayInterface<double,NoInterlace,NoGauss>::Array ArrayDoubleNo;
@@ -499,11 +501,13 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       if (NumberOfComponents==3) {
 	if (is_node)    ensightDataFile << "vector per node integer 32 mode for " << name << " following " << endl ;
 	if (is_element) ensightDataFile << "vector per element integer 32 mode for " << name << " following " << endl ;
-      } else if (NumberOfComponents<=4) {
+      }
+      else if (NumberOfComponents<=4) {
 	if (is_node)    ensightDataFile << "scalar per node integer 32 mode for " << name << " following " << endl ;
 	if (is_element) ensightDataFile << "scalar per element integer 32 mode for " << name << " following " << endl ;
-      } else {
-	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+      }
+      else {
+	MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -538,11 +542,13 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       if (NumberOfComponents==3) {
 	if (is_node)    ensightDataFile << "vector per node real 64 mode for " << name << " following " << endl ;
 	if (is_element) ensightDataFile << "vector per element real 64 mode for " << name << " following " << endl ;
-      } else if (NumberOfComponents<=4) {
+      }
+      else if (NumberOfComponents<=4) {
 	if (is_node)    ensightDataFile << "scalar per node real 64 mode for " << name << " following " << endl ;
 	if (is_element) ensightDataFile << "scalar per element real 64 mode for " << name << " following " << endl ;
-      } else {
-	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+      }
+      else {
+	MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -584,20 +590,20 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       break ;
     }
     default : { 
-      MESSAGE(LOC << "Could not write field "<<name<<" the type is not int or double !");
+      MESSAGE(__LOC << "Could not write field "<<name<<" the type is not int or double !");
     }
     }
 
   ensightDataFile.close();  	
   
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MED_WRONLY_DRIVER::writeSupport(SUPPORT * mySupport) const {
-  const char * LOC = "ENSIGHT_MED_WRONLY_DRIVER::writeSupport(SUPPORT *) : " ;
-  BEGIN_OF(LOC) ;
-  MESSAGE(LOC << "Not yet implemented, acting on the object " << *mySupport);
-  END_OF(LOC) ;
+  //const char * LOC = "ENSIGHT_MED_WRONLY_DRIVER::writeSupport(SUPPORT *) : " ;
+  BEGIN_OF("ENSIGHT_MED_WRONLY_DRIVER::writeSupport(SUPPORT *) : ") ;
+  MESSAGE(__LOC << "Not yet implemented, acting on the object " << *mySupport);
+  END_OF();
 }
 
 ENSIGHT_MED_RDONLY_DRIVER::ENSIGHT_MED_RDONLY_DRIVER() : ENSIGHT_MED_DRIVER()
@@ -644,7 +650,7 @@ void ENSIGHT_MED_RDONLY_DRIVER::openConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open main Ensight file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MED_RDONLY_DRIVER::closeConst() const {
@@ -658,7 +664,7 @@ void ENSIGHT_MED_RDONLY_DRIVER::closeConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close main Ensight file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF();
 }
 
 void ENSIGHT_MED_RDONLY_DRIVER::write() const throw (MEDEXCEPTION) {
@@ -667,8 +673,8 @@ void ENSIGHT_MED_RDONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 
 void ENSIGHT_MED_RDONLY_DRIVER::read() {
 
-  const char * LOC = "ENSIGHT_MED_RDONLY_DRIVER::read() : " ;
-  BEGIN_OF(LOC);
+  //const char * LOC = "ENSIGHT_MED_RDONLY_DRIVER::read() : " ;
+  BEGIN_OF("ENSIGHT_MED_RDONLY_DRIVER::read() : ");
 
   openConst() ;
 

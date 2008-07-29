@@ -567,9 +567,10 @@ AC_OUTPUT([ \
 	./src/MEDMEM/Doxyfile_med_devel \
 	./src/MEDMEM/Doxyfile_med_user \
 	./src/MEDMEM/Makefile \
-	./src/MEDMEM/Test/Makefile \
 	./src/INTERPOLATION/Makefile \
 	./src/MEDMEM_SWIG/Makefile \
+	./src/MEDMEMBinTest/Makefile \
+	./src/MEDMEMCppTest/Makefile \
 	./src/INTERP_KERNEL/Makefile \
 	./src/INTERP_KERNEL/Geometric2D/Makefile \
 	./src/INTERP_KERNEL/Test/Makefile \

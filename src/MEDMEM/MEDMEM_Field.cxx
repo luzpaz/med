@@ -31,11 +31,12 @@ FIELD_::FIELD_():
   _isRead(false),
   _isMinMax(false),
   _name(""), _description(""), _support((SUPPORT *)NULL),
-  _numberOfComponents(0), _numberOfValues(0),_componentsTypes((int *)NULL),
-  _componentsNames((string *)NULL), 
-  _componentsDescriptions((string *)NULL),
-  _componentsUnits((UNIT*)NULL),
-  _MEDComponentsUnits((string *)NULL),
+  _numberOfComponents(0), _numberOfValues(0),
+  //_componentsTypes((int *)NULL),
+  //_componentsNames((string *)NULL), 
+  //_componentsDescriptions((string *)NULL),
+  //_componentsUnits((UNIT*)NULL),
+  //_MEDComponentsUnits((string *)NULL),
   _iterationNumber(-1),_time(0.0),_orderNumber(-1),
   _valueType(MED_EN::MED_UNDEFINED_TYPE),
   _interlacingType(MED_EN::MED_UNDEFINED_INTERLACE)
@@ -55,11 +56,16 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
   MESSAGE("FIELD_(const SUPPORT * Support, const int NumberOfComponents)");
 
   _numberOfValues = Support->getNumberOfElements(MED_ALL_ELEMENTS);
-  _componentsTypes = new int[NumberOfComponents] ;
-  _componentsNames = new string[NumberOfComponents];
-  _componentsDescriptions = new string[NumberOfComponents];
-  _componentsUnits = new UNIT[NumberOfComponents];
-  _MEDComponentsUnits = new string[NumberOfComponents];
+  //_componentsTypes = new int[NumberOfComponents] ;
+  //_componentsNames = new string[NumberOfComponents];
+  //_componentsDescriptions = new string[NumberOfComponents];
+  //_componentsUnits = new UNIT[NumberOfComponents];
+  //_MEDComponentsUnits = new string[NumberOfComponents];
+  _componentsTypes.resize(NumberOfComponents);
+  _componentsNames.resize(NumberOfComponents);
+  _componentsDescriptions.resize(NumberOfComponents);
+  _componentsUnits.resize(NumberOfComponents);
+  _MEDComponentsUnits.resize(NumberOfComponents);
   for(int i=0;i<NumberOfComponents;i++) {
     _componentsTypes[i] = 0 ;
   }
@@ -79,23 +85,32 @@ FIELD_& FIELD_::operator=(const FIELD_ &m) {
   _numberOfComponents = m._numberOfComponents;
   _numberOfValues     = m._numberOfValues;
 
-  if (m._componentsTypes != NULL) {
-    _componentsTypes = new int[m._numberOfComponents] ;
-    memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
-  } else 
-    _componentsTypes = (int *) NULL;
+  //if (m._componentsTypes != NULL) {
+  //  _componentsTypes = new int[m._numberOfComponents] ;
+  //  memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
+  //} else 
+  //  _componentsTypes = (int *) NULL;
 
-  _componentsNames = new string[m._numberOfComponents];
+  _componentsTypes.resize(_numberOfComponents);
+  for (int i=0; i<m._numberOfComponents; i++)
+    {_componentsTypes[i]=m._componentsTypes[i];}
+
+  _componentsNames.resize(_numberOfComponents);
+  _componentsDescriptions.resize(_numberOfComponents);
+  _componentsUnits.resize(_numberOfComponents);
+  _MEDComponentsUnits.resize(_numberOfComponents);
+
+  //_componentsNames = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsNames[i]=m._componentsNames[i];}
-  _componentsDescriptions = new string[m._numberOfComponents];
+  //_componentsDescriptions = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsDescriptions[i]=m._componentsDescriptions[i];}
-  _componentsUnits = new UNIT[m._numberOfComponents];
+  //_componentsUnits = new UNIT[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsUnits[i] = m._componentsUnits[i];}
   // L'operateur '=' est defini dans la classe UNIT
-  _MEDComponentsUnits = new string[m._numberOfComponents];
+  //_MEDComponentsUnits = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_MEDComponentsUnits[i] = m._MEDComponentsUnits[i];}
 
@@ -132,16 +147,16 @@ FIELD_::FIELD_(const FIELD_ &m)
 FIELD_::~FIELD_()
 {
   MESSAGE("~FIELD_()");
-  if ( _componentsTypes !=NULL)
-    delete[] _componentsTypes ;
-  if ( _componentsNames !=NULL)
-    delete[] _componentsNames ;
-  if ( _componentsDescriptions !=NULL)
-    delete[] _componentsDescriptions ;
-  if ( _componentsUnits !=NULL)
-    delete[] _componentsUnits ;
-  if ( _MEDComponentsUnits !=NULL)
-    delete[] _MEDComponentsUnits ;
+  //if ( _componentsTypes !=NULL)
+  //  delete[] _componentsTypes ;
+  //if ( _componentsNames !=NULL)
+  //  delete[] _componentsNames ;
+  //if ( _componentsDescriptions !=NULL)
+  //  delete[] _componentsDescriptions ;
+  //if ( _componentsUnits !=NULL)
+  //  delete[] _componentsUnits ;
+  //if ( _MEDComponentsUnits !=NULL)
+  //  delete[] _MEDComponentsUnits ;
   // delete driver
 //   vector<GENDRIVER *>::const_iterator it ;
 //   SCRUTE(_drivers.size());
@@ -210,6 +225,7 @@ FIELD<double>* FIELD_::_getFieldSize() const
 void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume) const throw (MEDEXCEPTION)
 {
     string diagnosis;
+
     if( getSupport()->getEntity() == MED_NODE )
     {
 	diagnosis="Cannot compute sobolev norm on a field "+getName()+
@@ -222,6 +238,12 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume) const 
 	diagnosis="Cannot compute the norm of "+getName()+
 	    " : it size is non positive!";
 	throw MEDEXCEPTION(diagnosis.c_str());
+    }
+
+    if( getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) != getNumberOfValues() ) {
+      diagnosis="Cannot compute Lnorm of "+getName()+
+        " : the suppors size not corresponded to number of elements!";
+      throw MEDEXCEPTION(diagnosis.c_str());
     }
 
     if (getGaussPresence() ) {
@@ -244,6 +266,12 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume) const 
 	    " : the volume furnished has not the same number of values!";
 	    throw MEDEXCEPTION(diagnosis.c_str());
 	}
+        if( getSupport()->getNumberOfElements() != 
+            support_volume->getSupport()->getNumberOfElements() ) {
+          diagnosis="Cannot compute Lnorm of "+getName()+
+            " : the supports have not the same number of elements!";
+          throw MEDEXCEPTION(diagnosis.c_str());
+        }
     }
 
 }
@@ -359,11 +387,13 @@ void FIELD_::_deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n , boo
 	throw MEDEXCEPTION(diagnosis.c_str());
     }
 } 
-         
+
+
 void     FIELD_::rmDriver      (int index)
 {
   MESSAGE("void FIELD_::rmDriver(int index) : removing the driver " << index);
 };
+
 int      FIELD_::addDriver     (driverTypes driverType, 
                                 const string & fileName,
 				const string & driverFieldName,
@@ -388,34 +418,45 @@ void     FIELD_::writeAppend   (int , const string & ) {};
 void     FIELD_::read          (int )                                  {};
 void     FIELD_::copyGlobalInfo(const FIELD_& m)
 {  
-  if (m._componentsTypes != NULL)
-    {
-      _componentsTypes = new int[m._numberOfComponents] ;
-      memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
-    }
-  else
-    _componentsTypes = (int *) NULL;
 
-  _componentsNames = new string[m._numberOfComponents];
+  _componentsTypes.resize(_numberOfComponents);
+  _componentsNames.resize(_numberOfComponents);
+  _componentsDescriptions.resize(_numberOfComponents);
+  _componentsUnits.resize(_numberOfComponents);
+  _MEDComponentsUnits.resize(_numberOfComponents);
+
+  for (int i=0; i<m._numberOfComponents; i++)
+    {_componentsTypes[i]=m._componentsTypes[i];}
+
+  //if (m._componentsTypes != NULL)
+  //  {
+  //    _componentsTypes = new int[m._numberOfComponents] ;
+  //    memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
+  //  }
+  //else
+  //  _componentsTypes = (int *) NULL;
+
+  //_componentsNames = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     _componentsNames[i]=m._componentsNames[i];
-  _componentsDescriptions = new string[m._numberOfComponents];
+  //_componentsDescriptions = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     _componentsDescriptions[i]=m._componentsDescriptions[i];
 
-  if (m._componentsUnits != NULL)
-    {
-      _componentsUnits = new UNIT[m._numberOfComponents];
-      for (int i=0; i<m._numberOfComponents; i++)
-	_componentsUnits[i] = m._componentsUnits[i];
-    }
-  else
-    _componentsUnits=(UNIT*)NULL;
+  //if (m._componentsUnits != NULL)
+  //  {
+  //    _componentsUnits = new UNIT[m._numberOfComponents];
+  for (int i=0; i<m._numberOfComponents; i++)
+    _componentsUnits[i] = m._componentsUnits[i];
+  //  }
+  //else
+  //  _componentsUnits=(UNIT*)NULL;
   
   // L'operateur '=' est defini dans la classe UNIT
-  _MEDComponentsUnits = new string[m._numberOfComponents];
+  //_MEDComponentsUnits = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_MEDComponentsUnits[i] = m._MEDComponentsUnits[i];}
+
   _iterationNumber = m._iterationNumber;
   _time = m._time;
   _orderNumber = m._orderNumber;

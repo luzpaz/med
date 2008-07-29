@@ -32,7 +32,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(), 
+VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(VTK_DRIVER), 
                                   _ptrMed((MED * const)MED_NULL)
 {
   _vtkFile = new ofstream();
@@ -42,7 +42,7 @@ VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(),
 
 
 VTK_MED_DRIVER::VTK_MED_DRIVER(const string & fileName,  MED * const ptrMed):
-  GENDRIVER(fileName,MED_EN::MED_RDWR), _ptrMed(ptrMed)
+  GENDRIVER(fileName, MED_EN::RDWR, VTK_DRIVER), _ptrMed(ptrMed)
 {
   _vtkFile = new ofstream();
 }
@@ -59,12 +59,12 @@ VTK_MED_DRIVER::VTK_MED_DRIVER(const VTK_MED_DRIVER & driver):
 
 VTK_MED_DRIVER::~VTK_MED_DRIVER()
 {
-  const char * LOC ="VTK_MED_DRIVER::~VTK_MED_DRIVER()";
-  BEGIN_OF(LOC);
+  //const char * LOC ="VTK_MED_DRIVER::~VTK_MED_DRIVER()";
+  BEGIN_OF("VTK_MED_DRIVER::~VTK_MED_DRIVER()");
 
   delete _vtkFile ;
 
-  END_OF(LOC);
+  END_OF();
 }
 
 GENDRIVER * VTK_MED_DRIVER::copy() const
@@ -94,7 +94,7 @@ void VTK_MED_DRIVER::openConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF();
 }
 
 void VTK_MED_DRIVER::open() {
@@ -103,8 +103,8 @@ void VTK_MED_DRIVER::open() {
 
 void VTK_MED_DRIVER::closeConst() const {
 
-  const char * LOC = "VTK_MED_DRIVER::close() : ";
-  BEGIN_OF(LOC);
+  //const char * LOC = "VTK_MED_DRIVER::close() : ";
+  BEGIN_OF("VTK_MED_DRIVER::close() : ");
   
   (*_vtkFile).close();
   
@@ -115,7 +115,7 @@ void VTK_MED_DRIVER::closeConst() const {
 //    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
 //				     << _fileName)
 //			  );
-  END_OF(LOC);
+  END_OF();
 }
 
 void VTK_MED_DRIVER::close() {
@@ -123,10 +123,10 @@ void VTK_MED_DRIVER::close() {
 }
 
 
-void VTK_MED_DRIVER::write() const {
-
-  const char * LOC = "VTK_MED_DRIVER::write() : ";
-  BEGIN_OF(LOC);
+void VTK_MED_DRIVER::write() const
+{
+  //const char * LOC = "VTK_MED_DRIVER::write() : ";
+  BEGIN_OF("VTK_MED_DRIVER::write() : ");
 
   // Well we must open vtk file first, because there are
   // no other driver than MED for VTK that do it !
@@ -171,7 +171,7 @@ void VTK_MED_DRIVER::write() const {
 	      name << myField->getName() << "_" << dt << "_" << it ;
 	      writeField(myField,name.str()) ;
 	    } else
-	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
+	      MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
 	}
       }
     }
@@ -192,8 +192,9 @@ void VTK_MED_DRIVER::write() const {
 	      ostringstream name ; 
 	      name << myField->getName() << "_" << dt << "_" << it ;
 	      writeField(myField,name.str()) ;
-	    } else
-	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all cells !");
+	    }
+            else
+	      MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" which is not on all cells !");
 	}
       }
     }
@@ -204,7 +205,7 @@ void VTK_MED_DRIVER::write() const {
   // no other driver than MED for VTK that do it !
   //  closeConst() ;
   
-  END_OF(LOC);
+  END_OF();
 }
 
 void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
@@ -441,13 +442,13 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
   return ;
 
 
-  END_OF(LOC);
+  END_OF();
 }
 
-void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
-
-  const char * LOC = "VTK_MED_DRIVER::writeField() : ";
-  BEGIN_OF(LOC);
+void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
+{
+  //const char * LOC = "VTK_MED_DRIVER::writeField() : ";
+  BEGIN_OF("VTK_MED_DRIVER::writeField() : ");
   
   typedef MEDMEM_ArrayInterface<int,NoInterlace,NoGauss>::Array ArrayIntNo;
   typedef MEDMEM_ArrayInterface<double,NoInterlace,NoGauss>::Array ArrayDoubleNo;
@@ -464,11 +465,13 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
       MESSAGE("MED_INT32");
       if (NumberOfComponents==3) {
 	(*_vtkFile) << "VECTORS " << name << " int" << endl ;
-      } else if (NumberOfComponents<=4) {
+      }
+      else if (NumberOfComponents<=4) {
 	(*_vtkFile) << "SCALARS " << name << " int " << NumberOfComponents << endl ;
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
-      } else {
-	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+      }
+      else {
+	MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -504,11 +507,13 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
       MESSAGE("MED_REEL64");
       if (NumberOfComponents==3) {
 	(*_vtkFile) << "VECTORS " << name << " float" << endl ;
-      } else if (NumberOfComponents<=4) {
+      }
+      else if (NumberOfComponents<=4) {
 	(*_vtkFile) << "SCALARS " << name << " float " << NumberOfComponents << endl ;
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
-      } else {
-	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+      }
+      else {
+	MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -520,13 +525,15 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 				   )
 				);
 	value = myArray->getPtr();
-      } else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
+      }
+      else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
 	myArray = ArrayConvert2No( *( dynamic_cast< FIELD<double,NoInterlaceByType>* >
 				   (myField)->getArrayNoGauss()
 				   )
 				);
 	value = myArray->getPtr();
-      } else {
+      }
+      else {
 	value = ((FIELD<double>*)myField)->getValue() ;
       }
 
@@ -541,16 +548,16 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
       break ;
     }
     default : { 
-      MESSAGE(LOC << "Could not write field "<<name<<" the type is not int or double !");
+      MESSAGE(__LOC << "Could not write field "<<name<<" the type is not int or double !");
     }
     }
   
-  END_OF(LOC);
+  END_OF();
 }
 
 void VTK_MED_DRIVER::writeSupport(SUPPORT * mySupport) const {
-  const char * LOC = "VTK_MED_DRIVER::writeSupport(SUPPORT *) : " ;
-  BEGIN_OF(LOC) ;
-  MESSAGE(LOC << "Not yet implemented, acting on the object " << *mySupport);
-  END_OF(LOC) ;
+  //const char * LOC = "VTK_MED_DRIVER::writeSupport(SUPPORT *) : " ;
+  BEGIN_OF("VTK_MED_DRIVER::writeSupport(SUPPORT *) : ") ;
+  MESSAGE(__LOC << "Not yet implemented, acting on the object " << *mySupport);
+  END_OF();
 }

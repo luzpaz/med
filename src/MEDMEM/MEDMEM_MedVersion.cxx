@@ -133,12 +133,12 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
  */
 //================================================================================
 
-int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
-                             MED_EN::medFileVersion medVersion)
-  throw (MEDEXCEPTION)
-{
-  switch ( medVersion ) {
-  case V21:
+//int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
+//                             MED_EN::medFileVersion medVersion)
+//  throw (MEDEXCEPTION)
+//{
+//  switch ( medVersion ) {
+//  case V21:
 /*
   from MEDouvrir.c:
      switch(mode_acces)
@@ -167,14 +167,14 @@ int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
 	return -1;
       break;
 */
-    switch ( mode ) {
-    case MED_EN::MED_LECT: return med_2_1::MED_LECT;
-    case MED_EN::MED_ECRI: return med_2_1::MED_ECRI;
-    case MED_EN::MED_REMP: return med_2_1::MED_ECRI;
-    default:
-      throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
-    }
-  case V22:
+//    switch ( mode ) {
+//    case MED_EN::MED_LECT: return med_2_1::MED_LECT;
+//    case MED_EN::MED_ECRI: return med_2_1::MED_ECRI;
+//    case MED_EN::MED_REMP: return med_2_1::MED_ECRI;
+//    default:
+//      throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
+//    }
+//  case V22:
 /*
   from med.h:
    MED_LECTURE          : Ouverture en lecture seule
@@ -182,15 +182,15 @@ int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
    MED_LECTURE_AJOUT    : Ouverture en lecture/ecriture, si un élément existe une erreur est générée
    MED_CREATION         : Créer le fichier s'il n'existe pas, l'écrase sinon
 */
-    switch ( mode ) {
-    case MED_EN::MED_LECT: return med_2_3::MED_LECTURE;
-    case MED_EN::MED_ECRI: return med_2_3::MED_LECTURE_ECRITURE;
-    case MED_EN::MED_REMP: return med_2_3::MED_LECTURE_ECRITURE;
-		case MED_EN::MED_CREA: return med_2_3::MED_CREATION;
-    default:
-      throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
-    }
-  default:;
-  }
-  throw MEDEXCEPTION("getMedAccessMode(): Unknown med version");
-}
+//    switch ( mode ) {
+//    case MED_EN::MED_LECT: return med_2_3::MED_LECTURE;
+//    case MED_EN::MED_ECRI: return med_2_3::MED_LECTURE_ECRITURE;
+//    case MED_EN::MED_REMP: return med_2_3::MED_LECTURE_ECRITURE;
+//		case MED_EN::MED_CREA: return med_2_3::MED_CREATION;
+//    default:
+//      throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
+//    }
+//  default:;
+//  }
+//  throw MEDEXCEPTION("getMedAccessMode(): Unknown med version");
+//}

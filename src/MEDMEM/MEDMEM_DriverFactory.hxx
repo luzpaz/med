@@ -110,15 +110,15 @@ namespace MEDMEM {
       case MED_DRIVER : {
 	switch(access)
 	  {
-	  case MED_EN::MED_LECT : {
+	  case MED_EN::RDONLY : {
 	    ret = new MED_FIELD_RDONLY_DRIVER<T>(fileName,field);
 	    break;
 	  }
-	  case MED_EN::MED_ECRI : {
+	  case MED_EN::WRONLY : {
 	    ret= new MED_FIELD_WRONLY_DRIVER<T>(fileName,field);
 	    break;
 	  }
-	  case MED_EN::MED_REMP : {
+	  case MED_EN::RDWR : {
 	    ret = new MED_FIELD_RDWR_DRIVER<T>(fileName,field);
 	    break;
 	  }
@@ -131,15 +131,15 @@ namespace MEDMEM {
       case ENSIGHT_DRIVER : {
 	switch(access)
 	  {
-	  case MED_EN::MED_LECT : {
+	  case MED_EN::RDONLY : {
 	    ret = new ENSIGHT_FIELD_RDONLY_DRIVER<T>(fileName,field);
 	    break;
 	  }
-	  case MED_EN::MED_ECRI : {
+	  case MED_EN::WRONLY : {
 	    ret=new ENSIGHT_FIELD_WRONLY_DRIVER<T>(fileName,field);
 	    break;
 	  }
-	  case MED_EN::MED_REMP : {
+	  case MED_EN::RDWR : {
 	    throw MED_EXCEPTION ("not yet implemented");
 	    break ;
 	  }
@@ -152,15 +152,15 @@ namespace MEDMEM {
       case VTK_DRIVER : {
 	switch(access)
 	  {
-	  case MED_EN::MED_LECT : {
+	  case MED_EN::RDONLY : {
 	    throw MED_EXCEPTION ("access mode other than MED_ECRI and MED_REMP has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
 	    break;
 	  }
-	  case MED_EN::MED_ECRI : {
+	  case MED_EN::WRONLY : {
 	    ret=new VTK_FIELD_DRIVER<T>(fileName,field);
 	    break;
 	  }
-	  case MED_EN::MED_REMP : {
+	  case MED_EN::RDWR : {
 	    ret=new VTK_FIELD_DRIVER<T>(fileName,field);
 	    break ;
 	  }
@@ -183,7 +183,7 @@ namespace MEDMEM {
       case ASCII_DRIVER : {
 	switch(access)
 	  {
-	  case MED_EN::MED_ECRI : {
+	  case MED_EN::WRONLY : {
 	    ret=new ASCII_FIELD_DRIVER<T>(fileName,field);
 	    break;
 	  }
@@ -225,21 +225,21 @@ namespace MEDMEM {
 
     switch(access)
       {
-      case MED_EN::MED_LECT : {
+      case MED_EN::RDONLY : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)
 	  driver = new MED_FIELD_RDONLY_DRIVER22<T>(fileName,ptrField);
 	return driver;
       }
-      case MED_EN::MED_ECRI : {
+      case MED_EN::WRONLY : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_WRONLY_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)
 	  driver = new MED_FIELD_WRONLY_DRIVER22<T>(fileName,ptrField);
 	return driver;
       }
-      case MED_EN::MED_REMP : {
+      case MED_EN::RDWR : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_RDWR_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)
@@ -264,21 +264,21 @@ namespace MEDMEM {
 
     switch(access)
       {
-      case MED_EN::MED_LECT : {
+      case MED_EN::RDONLY : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)
 	  driver = new MED_FIELD_RDONLY_DRIVER22<T>(fileName,ptrField);
 	return driver;
       }
-      case MED_EN::MED_ECRI : {
+      case MED_EN::WRONLY : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_WRONLY_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)
 	  driver = new MED_FIELD_WRONLY_DRIVER22<T>(fileName,ptrField);
 	return driver;
       }
-      case MED_EN::MED_REMP : {
+      case MED_EN::RDWR : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_RDWR_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)

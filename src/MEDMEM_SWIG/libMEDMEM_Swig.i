@@ -359,7 +359,7 @@ typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
 
 typedef enum {MED_FULL_INTERLACE, MED_NO_INTERLACE} medModeSwitch;
 
-typedef enum {MED_LECT, MED_ECRI, MED_REMP} med_mode_acces;
+typedef enum {RDONLY, WRONLY, RDWR} med_mode_acces;
 
 typedef enum {ASCENDING=7,DESCENDING=77} med_sort_direc;
 
@@ -496,7 +496,7 @@ class SUPPORT
 
   void setNumberOfElements(int *NumberOfElements);
 
-  void setTotalNumberOfElements(int TotalNumberOfElements);
+  //void setTotalNumberOfElements(int TotalNumberOfElements);
 
   void getBoundaryElements();
 
@@ -695,7 +695,7 @@ public:
   int addDriver(driverTypes driverType,
 		const std::string& fileName="Default File Name.med",
                 const std::string& driverName="Default Field Name",
-		med_mode_acces access=MED_REMP);
+		med_mode_acces access=RDWR);
 
   %extend {
     %newobject getSupportAndOwner();
@@ -1157,7 +1157,7 @@ public :
     int addDriver(driverTypes driverType,
 		  char * fileName="Default File Name.med",
 		  char * driverName="Default Mesh Name",
-		  med_mode_acces access=MED_REMP)
+		  med_mode_acces access=RDWR)
       {
 	return self->addDriver(driverType,string(fileName),
 			       string(driverName),access);
@@ -1584,7 +1584,7 @@ class MED
 
     int addDriver(driverTypes driverType,
 		  char * fileName="Default File Name.med",
-		  med_mode_acces access=MED_REMP)
+		  med_mode_acces access=RDWR)
       {
 	return self->addDriver(driverType,string(fileName),access);
       }

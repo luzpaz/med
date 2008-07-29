@@ -1479,12 +1479,19 @@ namespace MED
     for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
       const TCCoordSlice& aCoord = theGauss[aGaussId];
       TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
-
-      aSlice[0] = 0.25*(-aCoord[0] + aCoord[1] + aCoord[2] - 1.0)*(-aCoord[0] - aCoord[1] + aCoord[2] - 1.0)/(1.0 - aCoord[2]);
-      aSlice[1] = 0.25*(-aCoord[0] - aCoord[1] + aCoord[2] - 1.0)*(+aCoord[0] - aCoord[1] + aCoord[2] - 1.0)/(1.0 - aCoord[2]);
-      aSlice[2] = 0.25*(+aCoord[0] + aCoord[1] + aCoord[2] - 1.0)*(+aCoord[0] - aCoord[1] + aCoord[2] - 1.0)/(1.0 - aCoord[2]);
-      aSlice[3] = 0.25*(+aCoord[0] + aCoord[1] + aCoord[2] - 1.0)*(-aCoord[0] + aCoord[1] + aCoord[2] - 1.0)/(1.0 - aCoord[2]);
-      aSlice[4] = 1.0 - aCoord[2];
+      // APO & RNV:
+      // Fix for 0019920: EDF 788 VISU: Bad localisation of gauss points for pyramids
+      // Seems shape function for ePYRA5 elements is:
+      // w0 = 0.25*(-X + Y - 1.0)*(-X - Y - 1.0)*(1.0 - Z);
+      // w1 = 0.25*(-X - Y - 1.0)*(+X - Y - 1.0)*(1.0 - Z);
+      // w2 = 0.25*(+X + Y - 1.0)*(+X - Y - 1.0)*(1.0 - Z);
+      // w3 = 0.25*(+X + Y - 1.0)*(-X + Y - 1.0)*(1.0 - Z);
+      // w4 = +Z;
+      aSlice[0] = 0.25*(-aCoord[0] + aCoord[1] - 1.0)*(-aCoord[0] - aCoord[1] - 1.0)*(1.0 - aCoord[2]);
+      aSlice[1] = 0.25*(-aCoord[0] - aCoord[1] - 1.0)*(+aCoord[0] - aCoord[1] - 1.0)*(1.0 - aCoord[2]);
+      aSlice[2] = 0.25*(+aCoord[0] + aCoord[1] - 1.0)*(+aCoord[0] - aCoord[1] - 1.0)*(1.0 - aCoord[2]);
+      aSlice[3] = 0.25*(+aCoord[0] + aCoord[1] - 1.0)*(-aCoord[0] + aCoord[1] - 1.0)*(1.0 - aCoord[2]);
+      aSlice[4] = aCoord[2];
     }
   }
 
@@ -1497,7 +1504,7 @@ namespace MED
     TInt aNbRef = myRefCoord.size();
     for(TInt aRefId = 0; aRefId < aNbRef; aRefId++){
       TCoordSlice aCoord = GetCoord(aRefId);
-      switch(aRefId){
+      switch(aRefId){        
       case  0: aCoord[0] =  1.0;  aCoord[1] =  0.0;  aCoord[2] =  0.0; break;
       case  3: aCoord[0] =  0.0;  aCoord[1] =  1.0;  aCoord[2] =  0.0; break;
       case  2: aCoord[0] = -1.0;  aCoord[1] =  0.0;  aCoord[2] =  0.0; break;
@@ -1513,20 +1520,27 @@ namespace MED
                    TFun& theFun) const
   {
     GetFun(theRef,theGauss,theFun);
-
+    
     TInt aNbGauss = theGauss.size();
     for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
       const TCCoordSlice& aCoord = theGauss[aGaussId];
       TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
-
-      aSlice[0] = 0.25*(-aCoord[0] + aCoord[1] + aCoord[2] - 1.0)*(-aCoord[0] - aCoord[1] + aCoord[2] - 1.0)/(1.0 - aCoord[2]);
-      aSlice[3] = 0.25*(-aCoord[0] - aCoord[1] + aCoord[2] - 1.0)*(+aCoord[0] - aCoord[1] + aCoord[2] - 1.0)/(1.0 - aCoord[2]);
-      aSlice[2] = 0.25*(+aCoord[0] + aCoord[1] + aCoord[2] - 1.0)*(+aCoord[0] - aCoord[1] + aCoord[2] - 1.0)/(1.0 - aCoord[2]);
-      aSlice[1] = 0.25*(+aCoord[0] + aCoord[1] + aCoord[2] - 1.0)*(-aCoord[0] + aCoord[1] + aCoord[2] - 1.0)/(1.0 - aCoord[2]);
-      aSlice[4] = 1.0 - aCoord[2];
+      // APO & RNV:
+      // Fix for 0019920: EDF 788 VISU: Bad localisation of gauss points for pyramids
+      // Seems shape function for ePYRA5 elements is:
+      // w0 = 0.25*(-X + Y - 1.0)*(-X - Y - 1.0)*(1.0 - Z);
+      // w1 = 0.25*(-X - Y - 1.0)*(+X - Y - 1.0)*(1.0 - Z);
+      // w2 = 0.25*(+X + Y - 1.0)*(+X - Y - 1.0)*(1.0 - Z);
+      // w3 = 0.25*(+X + Y - 1.0)*(-X + Y - 1.0)*(1.0 - Z);
+      // w4 = +Z;
+      aSlice[0] = 0.25*(-aCoord[0] + aCoord[1] - 1.0)*(-aCoord[0] - aCoord[1] - 1.0)*(1.0 - aCoord[2]);
+      aSlice[3] = 0.25*(-aCoord[0] - aCoord[1] - 1.0)*(+aCoord[0] - aCoord[1] - 1.0)*(1.0 - aCoord[2]);
+      aSlice[2] = 0.25*(+aCoord[0] + aCoord[1] - 1.0)*(+aCoord[0] - aCoord[1] - 1.0)*(1.0 - aCoord[2]);
+      aSlice[1] = 0.25*(+aCoord[0] + aCoord[1] - 1.0)*(-aCoord[0] + aCoord[1] - 1.0)*(1.0 - aCoord[2]);
+      aSlice[4] = aCoord[2];
     }
   }
-
+  
 
 
   //---------------------------------------------------------------

@@ -92,8 +92,8 @@ namespace MEDMEM {
     string          getName()    const {return _locName;}
     MED_EN::medGeometryElement getType() const {return _typeGeo;}
     int             getNbGauss() const {return _nGauss;}
-    ArrayNoGauss    getRefCoo () const {return _cooRef;}     //Ces tableaux sont petits
-    ArrayNoGauss    getGsCoo  () const {return _cooGauss;}   //Ces tableaux sont petits
+    const ArrayNoGauss& getRefCoo () const {return _cooRef;}     //Ces tableaux sont petits
+    const ArrayNoGauss& getGsCoo  () const {return _cooGauss;}   //Ces tableaux sont petits
     vector <double> getWeight () const {return _wg;}         //Ces tableaux sont petits
     inline MED_EN::medModeSwitch  getInterlacingType() const { return _interlacingType;}
 
@@ -129,15 +129,16 @@ namespace MEDMEM {
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
 				     << _nGauss ));
 
-    END_OF(LOC);
+    END_OF();
   };
 
-  template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION(const string & locName,
-											   const MED_EN::medGeometryElement  typeGeo,
-											   const int  nGauss,
-											   const double  * const cooRef,
-											   const double  * const cooGauss,
-											   const double  * const wg) throw (MEDEXCEPTION) :
+  template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION
+             (const string & locName,
+              const MED_EN::medGeometryElement  typeGeo,
+              const int  nGauss,
+              const double  * const cooRef,
+              const double  * const cooGauss,
+              const double  * const wg) throw (MEDEXCEPTION) :
     _locName(locName),_typeGeo(typeGeo),_nGauss(nGauss),
     _cooRef(ArrayNoGauss(const_cast<double *>(cooRef),typeGeo/100,typeGeo%100)),
     _cooGauss(ArrayNoGauss(const_cast<double *>(cooGauss),typeGeo/100,_nGauss)),
@@ -159,7 +160,7 @@ namespace MEDMEM {
     if (_wg.size() != _nGauss )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
 				     << _nGauss ));
-    END_OF(LOC);
+    END_OF();
   };
 
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG> &
@@ -170,8 +171,10 @@ namespace MEDMEM {
     _locName  = gaussLoc._locName;
     _typeGeo  = gaussLoc._typeGeo;
     _nGauss   = gaussLoc._nGauss;
-    _cooRef   = ArrayNoGauss(gaussLoc._cooRef);   //utilisation de la copie superficielle par défaut n'est pas une bonne idée
-    _cooGauss = ArrayNoGauss(gaussLoc._cooGauss);  //dans l'opérateur = de MEDnArray
+    //_cooRef.setPtr((double*)gaussLoc._cooRef.getPtr(), false, true);     //utilisation de la copie superficielle par défaut n'est pas une bonne idée
+    //_cooGauss.setPtr((double*)gaussLoc._cooGauss.getPtr(), false, true); //dans l'opérateur = de MEDnArray
+    _cooRef   = gaussLoc._cooRef;
+    _cooGauss = gaussLoc._cooGauss;
     _wg       = gaussLoc._wg;
 
     return *this;
