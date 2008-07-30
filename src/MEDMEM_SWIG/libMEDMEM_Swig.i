@@ -58,12 +58,15 @@
   /*  typedef FIELD <double, FullInterlace> FIELDDOUBLEFULLINTERLACE;*/
   /*  typedef FIELD <int, FullInterlace> FIELDINTFULLINTERLACE;*/
   typedef FIELD <double, FullInterlace> FIELDDOUBLE;
-  typedef FIELD <int, FullInterlace> FIELDINT;
+  typedef FIELD <int   , FullInterlace> FIELDINT;
   typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
-  typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
+  typedef FIELD <int   , NoInterlace> FIELDINTNOINTERLACE;
   typedef FIELD <double, NoInterlaceByType> FIELDDOUBLENOINTERLACEBYTYPE;
-  typedef FIELD <int, NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
+  typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 
+  // to keep old scripts working
+  typedef enum {MED_LECT=RDONLY, MED_ECRI=WRONLY, MED_REMP=RDWR} med_mode_acces_old;
+  
 %}
 
 /*
@@ -75,11 +78,11 @@
 /*typedef FIELD <double, FullInterlace> FIELDDOUBLEFULLINTERLACE;*/
 /*typedef FIELD <int, FullInterlace> FIELDINTFULLINTERLACE;*/
 typedef FIELD <double, FullInterlace> FIELDDOUBLE;
-typedef FIELD <int, FullInterlace> FIELDINT;
+typedef FIELD <int   , FullInterlace> FIELDINT;
 typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
-typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
+typedef FIELD <int   , NoInterlace> FIELDINTNOINTERLACE;
 typedef FIELD <double, NoInterlaceByType> FIELDDOUBLENOINTERLACEBYTYPE;
-typedef FIELD <int, NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
+typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 
 %include "typemaps.i"
 %include "my_typemap.i"
@@ -359,6 +362,7 @@ typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
 typedef enum {MED_FULL_INTERLACE, MED_NO_INTERLACE} medModeSwitch;
 
 typedef enum {RDONLY, WRONLY, RDWR} med_mode_acces;
+typedef enum {MED_LECT, MED_ECRI, MED_REMP} med_mode_acces_old;// to keep old scripts working
 
 typedef enum {ASCENDING=7,DESCENDING=77} med_sort_direc;
 
