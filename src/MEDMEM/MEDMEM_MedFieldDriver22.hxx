@@ -132,8 +132,9 @@ public :
 				       )
 			    );
 
+    int accessMode = getMedAccessMode( MED_FIELD_DRIVER<T>::_accessMode, MED_EN::V22 );
     MESSAGE(LOC<<"_fileName.c_str : "<< MED_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< MED_FIELD_DRIVER<T>::_accessMode);
-    MED_FIELD_DRIVER22<T>::_medIdt = med_2_3::MEDouvrir( (const_cast <char *> (MED_FIELD_DRIVER<T>::_fileName.c_str())),(med_2_3::med_mode_acces) MED_FIELD_DRIVER<T>::_accessMode);
+    MED_FIELD_DRIVER22<T>::_medIdt = med_2_3::MEDouvrir( (const_cast <char *> (MED_FIELD_DRIVER<T>::_fileName.c_str())),(med_2_3::med_mode_acces) accessMode);
     MESSAGE(LOC<<"_medIdt : "<< MED_FIELD_DRIVER22<T>::_medIdt );
     if (MED_FIELD_DRIVER22<T>::_medIdt > 0)
       MED_FIELD_DRIVER<T>::_status=MED_OPENED;
