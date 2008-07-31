@@ -548,28 +548,28 @@ int main (int argc, char ** argv) {
   if (version == V22)
     setMedFileVersionForWriting(V21);
 
-  idMed21 = fieldDoubleScalarOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldDoubleScalarOnNodes->getName());
+  idMed21 = fieldDoubleScalarOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldDoubleScalarOnNodes->getName(),WRONLY);
   fieldDoubleScalarOnNodes->write(idMed21) ;
 
-  idMed21 = fieldIntScalarOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldIntScalarOnNodes->getName());
+  idMed21 = fieldIntScalarOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldIntScalarOnNodes->getName(),WRONLY);
   fieldIntScalarOnNodes->write(idMed21) ;
 
-  idMed21 = fieldDoubleVectorOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldDoubleVectorOnNodes->getName());
+  idMed21 = fieldDoubleVectorOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldDoubleVectorOnNodes->getName(),WRONLY);
   fieldDoubleVectorOnNodes->write(idMed21) ;
 
-  idMed21 = fieldIntVectorOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldIntVectorOnNodes->getName());
+  idMed21 = fieldIntVectorOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldIntVectorOnNodes->getName(),WRONLY);
   fieldIntVectorOnNodes->write(idMed21) ;
 
-  idMed21 = fieldDoubleScalarOnCells->addDriver(MED_DRIVER,filenameMed21,fieldDoubleScalarOnCells->getName());
+  idMed21 = fieldDoubleScalarOnCells->addDriver(MED_DRIVER,filenameMed21,fieldDoubleScalarOnCells->getName(),WRONLY);
   fieldDoubleScalarOnCells->write(idMed21) ;
 
-  idMed21 = fieldIntScalarOnCells->addDriver(MED_DRIVER,filenameMed21,fieldIntScalarOnCells->getName());
+  idMed21 = fieldIntScalarOnCells->addDriver(MED_DRIVER,filenameMed21,fieldIntScalarOnCells->getName(),WRONLY);
   fieldIntScalarOnCells->write(idMed21) ;
 
-  idMed21 = fieldDoubleVectorOnCells->addDriver(MED_DRIVER,filenameMed21,fieldDoubleVectorOnCells->getName());
+  idMed21 = fieldDoubleVectorOnCells->addDriver(MED_DRIVER,filenameMed21,fieldDoubleVectorOnCells->getName(),WRONLY);
   fieldDoubleVectorOnCells->write(idMed21) ;
 
-  idMed21 = fieldIntVectorOnCells->addDriver(MED_DRIVER,filenameMed21,fieldIntVectorOnCells->getName());
+  idMed21 = fieldIntVectorOnCells->addDriver(MED_DRIVER,filenameMed21,fieldIntVectorOnCells->getName(),WRONLY);
   fieldIntVectorOnCells->write(idMed21) ;
 
 
