@@ -698,7 +698,7 @@ void GRID::fillConnectivity() const
     }
   }
   if (nbENodes != indexE+1) {
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Wrong nbFNodes : " \
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Wrong nbENodes : " \
                                         << nbENodes << " indexE : " << indexE ));
   }
 

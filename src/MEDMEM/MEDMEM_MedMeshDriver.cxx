@@ -292,6 +292,14 @@ GENDRIVER * MED_MESH_RDONLY_DRIVER::copy ( void ) const
   return new MED_MESH_RDONLY_DRIVER(*this);
 }
 
+void MED_MESH_RDONLY_DRIVER::merge ( const GENDRIVER& driver )
+{
+  const MED_MESH_RDONLY_DRIVER *other=dynamic_cast<const MED_MESH_RDONLY_DRIVER *>(&driver);
+  if(other)
+    _concreteMeshDrv->merge( *other->_concreteMeshDrv );
+  else
+    _concreteMeshDrv->merge( driver );
+}
 // int MED_MESH_RDONLY_DRIVER::getCOORDINATE()
 // {
 //   return _concreteMeshDrv->getCOORDINATE();
@@ -387,6 +395,15 @@ void MED_MESH_WRONLY_DRIVER::read ()
 void MED_MESH_WRONLY_DRIVER::write( void ) const
 {
   _concreteMeshDrv->write();
+}
+
+void MED_MESH_WRONLY_DRIVER::merge ( const GENDRIVER& driver )
+{
+  const MED_MESH_WRONLY_DRIVER *other=dynamic_cast<const MED_MESH_WRONLY_DRIVER *>(&driver);
+  if(other)
+    _concreteMeshDrv->merge( *other->_concreteMeshDrv );
+  else
+    _concreteMeshDrv->merge( driver );
 }
 
 // int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeCoordinates    ()                           const
@@ -547,4 +564,13 @@ string MED_MESH_RDWR_DRIVER::getMeshName() const
 GENDRIVER * MED_MESH_RDWR_DRIVER::copy ( void ) const
 {
   return new MED_MESH_RDWR_DRIVER(*this);
+}
+
+void MED_MESH_RDWR_DRIVER::merge ( const GENDRIVER& driver )
+{
+  const MED_MESH_RDWR_DRIVER *other=dynamic_cast<const MED_MESH_RDWR_DRIVER *>(&driver);
+  if(other)
+    _concreteMeshDrv->merge( *other->_concreteMeshDrv );
+  else
+    _concreteMeshDrv->merge( driver );
 }

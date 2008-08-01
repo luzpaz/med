@@ -242,6 +242,7 @@ public:
   void read ( void );
   void open();
   void close();
+  virtual void merge ( const GENDRIVER& driver );
 protected:
   GENDRIVER * _concreteMeshDrv;
 //   int getCOORDINATE();
@@ -267,6 +268,7 @@ public :
   void write( void ) const;
   void open();
   void close();
+  virtual void merge ( const GENDRIVER& driver );
 protected:
   GENDRIVER * _concreteMeshDrv;
 //   int writeCoordinates    ()                           const;
@@ -291,6 +293,7 @@ public :
   void desactivateFacesComputation();
   void open();
   void close();
+  virtual void merge ( const GENDRIVER& driver );
 protected:
   GENDRIVER * _concreteMeshDrv;
 //   int getCOORDINATE();
