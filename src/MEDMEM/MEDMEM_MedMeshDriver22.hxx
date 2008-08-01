@@ -132,6 +132,7 @@ private:
   void getGRID ();
 
   GENDRIVER * copy ( void ) const ;
+  virtual void merge ( const GENDRIVER& driver );
 
 private:
   bool _computeFaces;

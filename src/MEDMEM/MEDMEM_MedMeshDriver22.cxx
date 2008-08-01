@@ -154,6 +154,17 @@ GENDRIVER * MED_MESH_RDONLY_DRIVER22::copy(void) const
   return new MED_MESH_RDONLY_DRIVER22(*this);
 }
 
+void MED_MESH_RDONLY_DRIVER22::merge ( const GENDRIVER& driver )
+{
+  MED_MESH_DRIVER::merge( driver );
+
+  const MED_MESH_RDONLY_DRIVER22* other =
+    dynamic_cast< const MED_MESH_RDONLY_DRIVER22* >( &driver );
+  if ( other ) {
+    _computeFaces = other->_computeFaces;
+  }
+}
+
 void MED_MESH_RDONLY_DRIVER22::read(void)
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER22::read() : " ;

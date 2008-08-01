@@ -120,14 +120,23 @@ public:
   // needed to duplicate arrays 
   virtual GENDRIVER * copy ( void ) const = 0 ;
 
+  // Take missing data from other driver.
+  // Is for object->read( genDriver ) if object was not passed to genDriver
+  // (i.e. genDriver has been created through constructor without parameters),
+  // then object asks driverFactory to create a driver initialized by object
+  // and fills the new driver up using merge( genDriver ).
+  // Needed for drivers possessing own data
+  virtual void merge ( const GENDRIVER &genDriver );
+
   // MED  related part
   virtual void writeFrom      ( void );
   virtual void readFileStruct ( void );
   // MESH related Part
   virtual void setMeshName    ( const string & meshName);
-  virtual string getMeshName() const { return string(""); }
+  virtual string getMeshName() const;
   // FIELD related Part
   virtual void setFieldName   ( const string & fieldName);
+  virtual string getFieldName() const;
 
   void   setId       ( int id = MED_INVALID );
   int    getId       ( void ) const ;

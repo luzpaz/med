@@ -70,8 +70,10 @@ GENDRIVER & MEDMEM::GENDRIVER::operator=(const GENDRIVER &  genDriver)
 void GENDRIVER::writeFrom      ( void ) {};
 void GENDRIVER::readFileStruct ( void ) {};
 
-void GENDRIVER::setMeshName    (const string & ) {};
-void GENDRIVER::setFieldName   (const string & ) {};
+void   GENDRIVER::setMeshName   (const string & ) {}
+string GENDRIVER::getMeshName()  const { return ""; }
+void   GENDRIVER::setFieldName  (const string & ) {}
+string GENDRIVER::getFieldName() const { return ""; }
 
 void GENDRIVER::openAppend ( void ) {};
 void GENDRIVER::writeAppend ( void ) const {};
@@ -169,3 +171,22 @@ bool MEDMEM::GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
   
 };
 
+// Take missing data from other driver.
+// Is for object->read( genDriver ) if object was not passed to genDriver,
+// then object asks driverFactory to create a driver initialized by object
+// and fills the new driver up using merge( genDriver )
+
+void GENDRIVER::merge ( const GENDRIVER &genDriver )
+{
+  if ( _id == MED_INVALID )
+    _id = genDriver._id;
+  if ( _fileName.empty() )
+    _fileName = genDriver._fileName;
+  if ( _accessMode == MED_INVALID )
+    _accessMode = genDriver._accessMode;
+
+  if ( getMeshName().empty() )
+    setMeshName( genDriver.getMeshName() );
+  if ( getFieldName().empty() )
+    setFieldName( genDriver.getFieldName() );
+}

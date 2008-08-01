@@ -2746,16 +2746,19 @@ inline int FIELD<T, INTERLACING_TAG>::addDriver (GENDRIVER & driver )
   // duplicate driver to delete it with destructor !
   //GENDRIVER * newDriver = driver.copy() ;
 
+  // for FIELD->read( genDriver ) if FIELD was not passed to genDriver
   GENDRIVER * newDriver = 
     DRIVERFACTORY::buildDriverForField(driver.getDriverType(),
                                        driver.getFileName(), this,
                                        driver.getAccessMode());
-
   _drivers.push_back(newDriver);
 
   current = _drivers.size()-1;
   SCRUTE(current);
   driver.setId(current);
+
+  newDriver->merge( driver );
+  newDriver->setId(current);
 
   MESSAGE(__LOC << " je suis la 1");
   END_OF();
