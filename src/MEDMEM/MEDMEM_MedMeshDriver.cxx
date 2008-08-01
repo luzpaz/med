@@ -297,6 +297,8 @@ void MED_MESH_RDONLY_DRIVER::merge ( const GENDRIVER& driver )
   const MED_MESH_RDONLY_DRIVER *other=dynamic_cast<const MED_MESH_RDONLY_DRIVER *>(&driver);
   if(other)
     _concreteMeshDrv->merge( *other->_concreteMeshDrv );
+  else
+    _concreteMeshDrv->merge( driver );
 }
 // int MED_MESH_RDONLY_DRIVER::getCOORDINATE()
 // {
@@ -400,6 +402,8 @@ void MED_MESH_WRONLY_DRIVER::merge ( const GENDRIVER& driver )
   const MED_MESH_WRONLY_DRIVER *other=dynamic_cast<const MED_MESH_WRONLY_DRIVER *>(&driver);
   if(other)
     _concreteMeshDrv->merge( *other->_concreteMeshDrv );
+  else
+    _concreteMeshDrv->merge( driver );
 }
 
 // int MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER::writeCoordinates    ()                           const
@@ -567,4 +571,6 @@ void MED_MESH_RDWR_DRIVER::merge ( const GENDRIVER& driver )
   const MED_MESH_RDWR_DRIVER *other=dynamic_cast<const MED_MESH_RDWR_DRIVER *>(&driver);
   if(other)
     _concreteMeshDrv->merge( *other->_concreteMeshDrv );
+  else
+    _concreteMeshDrv->merge( driver );
 }
