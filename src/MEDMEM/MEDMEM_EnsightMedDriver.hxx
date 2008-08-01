@@ -25,7 +25,7 @@
 #include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_Exception.hxx"
 
-#include "MEDMEM_EnsightUtils.hxx"
+#include "MEDMEM_GenDriver.hxx"
 
 #include <fstream>
 
@@ -37,75 +37,70 @@ class MESH;
 class SUPPORT;
 class FIELD_;
 class MED;
-
-// ==============================================================================
-/*!
- * \brief Base of EnSight drivers
- */
-// ==============================================================================
-
-class ENSIGHT_MED_DRIVER : public MEDMEM_ENSIGHT::_CaseFileDriver_User
+// This driver pilots within a ENSIGHT class read/write accesses of fields/meshes
+class ENSIGHT_MED_DRIVER : public GENDRIVER
 {
 protected:
   
-  MED * _ptrMed;          // Store 'ENSIGHT_DRIVER (0..n)----(1) ENSIGHT' associations
+  MED * const       _ptrMed ;              // Store 'ENSIGHT_DRIVER (0..n)----(1) ENSIGHT' associations
  
-  virtual void openConst()  const;
+  virtual void openConst()  const =0;
+  virtual void closeConst() const =0;
 
 public :
   ENSIGHT_MED_DRIVER();
-  ENSIGHT_MED_DRIVER(const string & fileName, MED * ptrMed);
-  ENSIGHT_MED_DRIVER(const string & fileName, MED * ptrMed,
-                     MED_EN::med_mode_acces accessMode);
+  ENSIGHT_MED_DRIVER(const string & fileName, MED * const ptrMed);
+  ENSIGHT_MED_DRIVER(const string & fileName,  MED * const ptrMed,
+		 MED_EN::med_mode_acces accessMode);
   ENSIGHT_MED_DRIVER(const ENSIGHT_MED_DRIVER & driver);
   virtual ~ENSIGHT_MED_DRIVER();
+  // OPERATEUR DE RECOPIE AVEC _ensightFile ??
 
-  virtual void open();
-  virtual void close();
+  void open();
+  void close();
+  virtual void write( void ) const = 0 ;
+  virtual void read( void ) = 0 ;
+  virtual GENDRIVER * copy (void ) const = 0;
+
 };
-
-// ==============================================================================
-/*!
- * \brief Reading EnSight driver
- */
-// ==============================================================================
 
 class ENSIGHT_MED_RDONLY_DRIVER : public virtual ENSIGHT_MED_DRIVER
 {
 public :
   ENSIGHT_MED_RDONLY_DRIVER();
-  ENSIGHT_MED_RDONLY_DRIVER(const string & fileName,  MED * ptrMed);
+  ENSIGHT_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed);
   ENSIGHT_MED_RDONLY_DRIVER(const ENSIGHT_MED_RDONLY_DRIVER & driver);
   virtual ~ENSIGHT_MED_RDONLY_DRIVER();
-  virtual void write          ( void ) const throw (MEDEXCEPTION) ;
+  void openConst()  const;
+  void closeConst() const;
+  void write          ( void ) const throw (MEDEXCEPTION) ;
   virtual void read           ( void ) ;
-  virtual void readFileStruct ( void ) ;
-  GENDRIVER * copy ( void ) const;
+//   virtual void readFileStruct ( void ) ;
 private:
-
-  bool _isFileStructRead;
+  ifstream *        _ensightFile;         // The main _ensightFile used to read geom and data _filename
+  GENDRIVER * copy ( void ) const;
 };
-
-// ==============================================================================
-/*!
- * \brief Writing EnSight driver.
- * To set writing format use
- * setEnSightFormatForWriting(EnSightFormat) and
- * setEnSightBinaryFormatForWriting(bool)
- */
-// ==============================================================================
 
 class ENSIGHT_MED_WRONLY_DRIVER : public virtual ENSIGHT_MED_DRIVER
 {
+
 public :
   ENSIGHT_MED_WRONLY_DRIVER();
-  ENSIGHT_MED_WRONLY_DRIVER(const string & fileName,  MED * ptrMed);
+  ENSIGHT_MED_WRONLY_DRIVER(const string & fileName,  MED * const ptrMed);
   ENSIGHT_MED_WRONLY_DRIVER(const ENSIGHT_MED_WRONLY_DRIVER & driver);
   virtual ~ENSIGHT_MED_WRONLY_DRIVER();
-  virtual void write          ( void ) const throw (MEDEXCEPTION) ;
+  void openConst()  const;
+  void closeConst() const;
+  void write          ( void ) const throw (MEDEXCEPTION) ;
+//   void writeFrom      ( void ) const throw (MEDEXCEPTION) ;
   virtual void read           ( void ) throw (MEDEXCEPTION) ;
-  //virtual void readFileStruct ( void ) throw (MEDEXCEPTION) ;
+//   virtual void readFileStruct ( void ) throw (MEDEXCEPTION) ;
+private:
+  ofstream *        _ensightFile;         // The main _ensightFile used to write geom and data _filename
   GENDRIVER * copy ( void ) const;
+  void writeMesh(MESH * myMesh,int imesh) const ;
+  void writeSupport(SUPPORT * mySupport) const ;
+  void writeField(FIELD_ * myField,string name) const ;
 };
 
 };

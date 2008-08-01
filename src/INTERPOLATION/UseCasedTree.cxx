@@ -73,31 +73,5 @@ for (i=0;i<NBR_INC;i++)
 	cout<<endl;
 	}
 
- for (i=0;i<NBR_INC;i++)
- {
-   cout<<"****************"<<endl <<"Nodes close to ";
-   tmp1=&noeuds_inconnus[DIMENSION*i];
-   affiche(tmp1);
-   cout << endl;
-   for ( double toler = 0.3; toler < 3.5; toler+=0.5 )
-   {
-     list<int> close;
-     int nb = Octree.get_all_close( tmp1, toler, close );
-     cout << "With tolerance " << toler << " - " << nb << endl;
-     list<int>::iterator n = close.begin();
-     while ( n != close.end() ) {
-       int node = *n++;
-       tmp2=&noeuds[DIMENSION*node];
-       cout<<"\t"<< node << " : ";
-	affiche(tmp2);
-        double dist = 0;
-        for ( int dim = 0; dim < DIMENSION; ++dim )
-          dist += ( tmp1[dim] - tmp2[dim] ) * ( tmp1[dim] - tmp2[dim] );
-        cout << "\t distance: " << sqrt( dist ) << endl;
-     }
-     if ( nb == NBR_NOEUDS )
-       break; // no sens in increase toler as all nodes found
-   }
- }
 }
 

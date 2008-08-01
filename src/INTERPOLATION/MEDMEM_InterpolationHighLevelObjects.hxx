@@ -60,8 +60,7 @@ public :
 	inline int trouve_plus_proche_point_bourrin(double *node);
 	// FIN PATCH
 	inline int trouve_plus_proche_point(double * node);
-        int get_all_close(double * node, double tolerance, list<int> & closeNumbers);
-  };
+};
 
 /*********************************************************/
 /*                                                       */
@@ -320,12 +319,6 @@ template <int DIMENSION> inline int Meta_dTree<DIMENSION>::trouve_plus_proche_po
 	static Wrapper_Noeud<DIMENSION> nodetmp;
 	nodetmp.positionne(node);
 	return dTree<Wrapper_Noeud<DIMENSION>,Wrapper_Nuage_Noeud<DIMENSION>,DIMENSION>::trouve_plus_proche_point_bourrin(Wrapper_Noeud<DIMENSION>(nodetmp));
-	}
-template <int DIMENSION> inline int Meta_dTree<DIMENSION>::get_all_close(double * node, double tolerance, list<int> & closeNumbers)
-	{
-	static Wrapper_Noeud<DIMENSION> nodetmp;
-	nodetmp.positionne(node);
-	return dTree<Wrapper_Noeud<DIMENSION>,Wrapper_Nuage_Noeud<DIMENSION>,DIMENSION>::get_all_close(Wrapper_Noeud<DIMENSION>(nodetmp), tolerance, closeNumbers );
 	}
 /*********************************************************/
 /*                                                       */

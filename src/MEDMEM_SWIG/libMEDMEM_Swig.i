@@ -51,9 +51,6 @@
 #include "MEDMEM_GaussLocalization.hxx"
 #include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_SWIG_Templates.hxx"
-#include "MEDMEM_EnsightMedDriver.hxx"
-#include "MEDMEM_EnsightMeshDriver.hxx"
-#include "MEDMEM_EnsightFieldDriver.hxx"
 
   using namespace MEDMEM;
   using namespace MED_EN;
@@ -382,7 +379,7 @@ typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
 typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ;
 
 typedef enum {MED_DRIVER=0, GIBI_DRIVER=1, PORFLOW_DRIVER = 2, VTK_DRIVER=254,
-	      NO_DRIVER=255, ASCII_DRIVER = 3, ENSIGHT_DRIVER = 250 } driverTypes;
+	      NO_DRIVER=255, ASCII_DRIVER = 3} driverTypes;
 
 typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26} med_type_champ;
 
@@ -2399,89 +2396,8 @@ public:
 %template (ASCII_FIELDDOUBLE_DRIVER) ASCII_FIELD_DRIVER< double >;
 %template (ASCII_FIELDINT_DRIVER) ASCII_FIELD_DRIVER< int >;
 
-//=======================================================================
 /*
-  EnSight drivers
 */
-// ---------------------------------------------------------------
-//!< supported formats
-enum EnSightFormat { ENSIGHT_6, ENSIGHT_GOLD };
-
-// ---------------------------------------------------------------
-//!< set writing format
-
-void setEnSightFormatForWriting (EnSightFormat format, bool isBinary);
-
-// ---------------------------------------------------------------
-//!< To raise or not if MEDMEM-EnSight incompatibility encounters or suspected.
-// See MEDMEM_EnsightUtils.hxx for raison why
-
-void setIgnoreIncompatibility(bool toIgnore=true);
-
-// ---------------------------------------------------------------
-//!< EnSight reading driver reads all meshes and fields
-
-class ENSIGHT_MED_RDONLY_DRIVER
-{
-public:
-  ENSIGHT_MED_RDONLY_DRIVER(const std::string & fileName,  MED * ptrMed);
-  void read();
-  void readFileStruct();
-};
-// ---------------------------------------------------------------
-//!< EnSight writing driver
-
-class ENSIGHT_MED_WRONLY_DRIVER
-{
-public :
-  ENSIGHT_MED_WRONLY_DRIVER(const std::string & fileName, MED * ptrMed);
-  void write();
-};
-// ---------------------------------------------------------------
-//!< EnSight mesh reading driver
-
-class ENSIGHT_MESH_RDONLY_DRIVER
-{
-public :
-  //!< to read mesh of index-th time step
-  ENSIGHT_MESH_RDONLY_DRIVER(const std::string & fileName, MESH * ptrMesh, int index=1);
-  void read();
-};
-// ---------------------------------------------------------------
-//!< Writing EnSight mesh driver.
-
-class ENSIGHT_MESH_WRONLY_DRIVER
-{
-public :
-  ENSIGHT_MESH_WRONLY_DRIVER(const std::string & fileName, MESH * ptrMesh, bool append=false);
-  void write();
-};
-// ---------------------------------------------------------------
-//!< EnSight field reading driver
-
-class ENSIGHT_FIELD_RDONLY_DRIVER
-{
-public :
-  //!< Set the name of the FIELD in EnSight file
-  void setFieldName(const string & fieldName);
-  //!<  read the field of a specified name and index-th time step.
-  ENSIGHT_FIELD_RDONLY_DRIVER(const std::string & fileName, FIELD_ * ptrField, int step=1);
-  void read();
-};
-// ---------------------------------------------------------------
-//!< Writing EnSight field driver.
-
-class ENSIGHT_FIELD_WRONLY_DRIVER
-{
-public :
-  //!< Set the name of the FIELD in EnSight file
-  void setFieldName(const std::string & fieldName);
-  ENSIGHT_FIELD_WRONLY_DRIVER(const std::string & fileName, FIELD_ * ptrField);
-  //!<  Write FIELD, the mesh is supposed to be written in this file.
-  void write();
-};
-// end of EnSight drivers
-//=======================================================================
 
 
 template <class INTERLACING_TAG> class GAUSS_LOCALIZATION

@@ -2231,19 +2231,17 @@ void MESH::createFamilies()
 	// 1 - Create a vector containing for each cell (of the entity) an information structure
 	//     giving geometric type and the groups it belong to
 
-	med_int numberOfTypes=getNumberOfTypesWithPoly(entity);
-	medGeometryElement* geometricTypes=_connectivity->getGeometricTypesWithPoly(entity); // pb avec entity=MED_NODE???
-	med_int numberOfCells=getNumberOfElementsWithPoly(entity, MED_ALL_ELEMENTS);  // total number of cells for that entity
+	med_int numberOfTypes=getNumberOfTypes(entity);
+	const int * index=getGlobalNumberingIndex(entity);
+	const medGeometryElement* geometricTypes=_connectivity->getGeometricTypes(entity); // pb avec entity=MED_NODE???
+	med_int numberOfCells=index[numberOfTypes]-1;  // total number of cells for that entity
 	SCRUTE(numberOfTypes);
 	SCRUTE(numberOfCells);
 	vector< _cell > tab_cell(numberOfCells);
-        vector< _cell >::iterator cell = tab_cell.begin();
-	for(med_int t=0; t!=numberOfTypes; ++t) {
-          int nbCellsOfType = getNumberOfElementsWithPoly(entity,geometricTypes[t]);
-          for(int n=0; n!=nbCellsOfType; ++n, ++cell)
-            cell->geometricType=geometricTypes[t];
-        }
-        delete [] geometricTypes;
+	for(med_int t=0; t!=numberOfTypes; ++t)
+	    for(int n=index[t]-1; n!=index[t+1]-1; ++n)
+		tab_cell[n].geometricType=geometricTypes[t];
+
 
 	// 2 - Scan cells in groups and update in tab_cell the container of groups a cell belong to
 
@@ -2318,11 +2316,9 @@ void MESH::createFamilies()
                 famName = famName.substr(4);
               }
               else { // try to make a unique name by cutting off char by char from the tail
-                famName = famName.substr(0, MED_TAILLE_NOM);
+                famName.substr(0, MED_TAILLE_NOM);
                 map< string,vector<int> >::iterator foundName = tab_families.find( famName );
-                while ( !famName.empty() &&
-                        ( foundName != tab_families.end() || famName[ famName.size()-1 ] == ' ' ))
-                {
+                while ( foundName != tab_families.end() && !famName.empty() ) {
                   famName = famName.substr( 0, famName.size() - 1 );
                   foundName = tab_families.find( famName );
                 }

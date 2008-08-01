@@ -34,9 +34,8 @@
 #define DTREE_NBR_MIN_NOEUDS 2
 #define DTREE_NBR_MAX_DESC 8
 // pour meilleu re lecture
-#define _TEMPLATE_ \
-template <class NOEUD,class NUAGENOEUD,int DIMENSION,int NBR_NOEUDS_PAR_CASE, int MAX_DEPTH> 
-#define _DTREE_ dTree<NOEUD,NUAGENOEUD,DIMENSION,NBR_NOEUDS_PAR_CASE,MAX_DEPTH>
+#define _TEMPLATE_ template <class NOEUD,class NUAGENOEUD,int DIMENSION,int NBR_NOEUDS_PAR_CASE> 
+#define _DTREE_ dTree<NOEUD,NUAGENOEUD,DIMENSION,NBR_NOEUDS_PAR_CASE>
 
 //////////////////////////////////////////////////////////////////
 ///                                                            ///
@@ -80,8 +79,7 @@ template <> struct DeuxPuissance<0>
 //      - NBR_NOEUDS_PAR_CASE ne doit pas être modifié sauf peut-être dans le cas où l'utilisateur veut utiliser des d-Tree parallèles 
 //	  ou utilise des nuages de noeud trop grands
 
-template <class NOEUD,class NUAGENOEUD,int DIMENSION,int NBR_NOEUDS_PAR_CASE=DTREE_NBR_MIN_NOEUDS, int MAX_DEPTH=DTREE_NBR_MAX_DESC>
-class dTree
+template <class NOEUD,class NUAGENOEUD,int DIMENSION,int NBR_NOEUDS_PAR_CASE=DTREE_NBR_MIN_NOEUDS> class dTree
 {
 protected :
 	// types
@@ -141,9 +139,6 @@ public :
 	int Get_Nbr_Descendants_Non_Vides() const;
 	int Get_Nbr_Descendants_Vides() const;
 	int Get_Profondeur_Max() const;
-
-        // return numbers of nodes close to P within tolerance d
-        int get_all_close(NOEUD P, double d, list<int> & closeNumbers) const;
 };
 
 
@@ -580,8 +575,7 @@ _TEMPLATE_ void _DTREE_::cree_filiation()
 		niveau=0;
 		}
 	
-	if (noeud_contenu->size()<=NBR_NOEUDS_PAR_CASE ||
-            niveau > MAX_DEPTH) // badly needed for the case with coincident nodes
+	if (noeud_contenu->size()<=NBR_NOEUDS_PAR_CASE)
 		{
 		etat=DTREE_TERMINAL;
 		}
@@ -674,36 +668,6 @@ _TEMPLATE_ int _DTREE_::Get_Profondeur_Max() const
 			return -1;
 		}
 	}
-
-// return numbers of nodes close to P within tolerance d
-_TEMPLATE_ int _DTREE_::get_all_close(NOEUD P, double d, list<int> & closeNumbers) const
-{
-  int i, nbAdded = 0;
-  if (Localise_Point(P,d))
-  {
-    if (etat==DTREE_TERMINAL)
-    {
-      int nb = noeud_contenu->size();
-      for (i=0;i<nb;i++)
-      {
-        double dist=DistanceL2(P,(*nuage)[(*noeud_contenu)[i]]);
-        if (dist < d )
-        {
-          nbAdded++;
-          closeNumbers.push_back( (*noeud_contenu)[i] );
-        }
-      }
-    }
-    else
-    {
-      for (i=0;i<nbr_descendants;i++)
-      {
-        nbAdded += descendant[i]->get_all_close(P,d,closeNumbers);
-      }
-    }
-  }
-  return nbAdded;
-}
 
 #undef _TEMPLATE_
 #undef _DTREE_
