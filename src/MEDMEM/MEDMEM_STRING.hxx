@@ -47,6 +47,20 @@ namespace MEDMEM {
     STRING() :string(), _s() 
     {
     }
+    STRING(const STRING& s) :string(s)
+    {
+      _s << s ;
+      this->string::operator =( s );
+    }
+    STRING& operator= (const STRING& s)
+    {
+      _s.str("");
+      _s << s ;
+
+      this->string::operator = ( _s.str() ) ;  // freeze is true by now
+
+      return *this ;
+    }
 
     ~STRING()
     {
