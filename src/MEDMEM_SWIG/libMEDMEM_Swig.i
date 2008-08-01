@@ -2099,6 +2099,10 @@ class MED_MESH_RDONLY_DRIVER
 
   void read ( void ) ;
 
+  void desactivateFacesComputation();
+
+  void activateFacesComputation();
+
   %extend {
     MED_MESH_RDONLY_DRIVER(char * fileName,  MESH * ptrMesh)
       {
