@@ -23,6 +23,7 @@
 #include <iostream.h>
 
 #include "MEDMEM_InterpolationHighLevelObjects.hxx"
+#include <list>
 
 #define affiche(NOEUD) cout<<flush;for (int iii=0;iii<DIMENSION;iii++) cout<<NOEUD[iii]<<" "<<flush;
 
