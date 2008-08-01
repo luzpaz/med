@@ -42,7 +42,7 @@ else !MED_SWIG_1_3_21
 SWIG_DEF= libMEDMEM_Swig.i
 endif
 
-SWIG_FLAGS=@SWIG_FLAGS@ -I$(srcdir)
+SWIG_FLAGS=@SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../MEDMEM
 
 nodist_libMEDMEM_Swigcmodule_la_SOURCES= libMEDMEM_Swig_wrap.cxx
 libMEDMEM_Swig.py: libMEDMEM_Swig_wrap.cxx
@@ -80,7 +80,9 @@ dist_salomescript_DATA= \
 		   testMedObj.py \
 		   test_profil_MedFieldDriver.py \
 		   testWriteAndFam.py \
-		   testMedMemGeneral.py
+		   dumpMEDMEM.py \
+		   ensightMedEnsight_test.py \
+		   medEnsightMed_test.py
 
 #############################################################################
 
