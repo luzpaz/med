@@ -113,11 +113,11 @@ public :
     }
 
     //MED_EN::med_mode_acces mode = dynamic_cast<GENDRIVER*>(this)->getAccessMode();
-    //med_2_1::med_mode_acces m21mode = (med_2_1::med_mode_acces)getMedAccessMode(mode,MED_EN::V21);
+    med_2_1::med_mode_acces m21mode = (med_2_1::med_mode_acces)getMedAccessMode(MED_FIELD_DRIVER<T>::_accessMode,MED_EN::V21);
     MESSAGE(LOC<<"_fileName.c_str : "<< MED_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< MED_FIELD_DRIVER<T>::_accessMode);
     _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (MED_FIELD_DRIVER<T>::_fileName.c_str())),
-                                  (med_2_1::med_mode_acces) MED_FIELD_DRIVER<T>::_accessMode);
-    //                              m21mode);
+    //                                  (med_2_1::med_mode_acces) MED_FIELD_DRIVER<T>::_accessMode);
+                                  m21mode);
     //                             (med_2_1::med_mode_acces) mode);
     MESSAGE(LOC<<"_medIdt : "<< _medIdt );
     if (_medIdt > 0) 

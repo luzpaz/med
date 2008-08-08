@@ -70,7 +70,7 @@ int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
     switch ( mode ) {
     case MED_EN::WRONLY: return med_2_1::MED_ECRI;
     case MED_EN::RDONLY: return med_2_1::MED_LECT;
-    case MED_EN::RDWR:   return med_2_1::MED_REMP;
+    case MED_EN::RDWR:   return med_2_1::MED_ECRI;
     default:
       throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
     }
