@@ -44,7 +44,7 @@ namespace MEDMEM {
                  NO_DRIVER = 255 } driverTypes;
 
   class GENDRIVER;
-  ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
+  MEDMEM_EXPORT ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
 
   class MEDMEM_EXPORT GENDRIVER {
 
@@ -87,7 +87,7 @@ public:
   /*!
     Operator << : put GENDRIVER object information to the given stream
   */
-  friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
+  friend ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
 
   bool operator ==(const GENDRIVER &genDriver) const;
   /*!

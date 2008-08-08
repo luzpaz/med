@@ -20,6 +20,7 @@
 #define GAUSS_LOCALIZATION_HXX
 
 #include <vector>
+#include <MEDMEM.hxx>
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_ArrayInterface.hxx"
@@ -33,7 +34,7 @@ using namespace MED_EN;
 
 namespace MEDMEM {
 
-  class GAUSS_LOCALIZATION_ {
+  class MEDMEM_EXPORT GAUSS_LOCALIZATION_ {
   public:
     virtual MED_EN::medModeSwitch getInterlacingType() const {return MED_EN::MED_UNDEFINED_INTERLACE;}
     virtual ~GAUSS_LOCALIZATION_() {}; //Indispensable pour détruire le vrai objet pointé
