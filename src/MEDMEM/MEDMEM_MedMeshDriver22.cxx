@@ -1664,9 +1664,10 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	      int* [_ptrMesh->getNumberOfTypesWithPoly(MED_FACE)] ;
 
 	    myTypes = _ptrMesh->getTypesWithPoly(MED_FACE);
-	    for (int i=0;i<_ptrMesh->getNumberOfTypesWithPoly(MED_FACE);i++)
-	      MEDArrayFaceFamily[i] = new
-		int[_ptrMesh->getNumberOfElementsWithPoly(MED_FACE,myTypes[i])] ;
+	    for (int i=0;i<_ptrMesh->getNumberOfTypesWithPoly(MED_FACE);i++) {
+	      int nbOfElements = _ptrMesh->_connectivity->_constituent->getNumberOfElementsWithPoly(MED_FACE,myTypes[i]);
+	      MEDArrayFaceFamily[i] = new int[nbOfElements];
+	    }
 
 	    err =
 	      getCellsFamiliesNumber(MEDArrayFaceFamily,
@@ -1687,7 +1688,7 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 
 	    err =
 	      getCellsFamiliesNumber(MEDArrayEdgeFamily,
-				     _ptrMesh->_connectivity->_constituent,MED_FACE) ;
+				     _ptrMesh->_connectivity->_constituent,MED_EDGE);
 	  
 	    MESSAGE(LOC << "error returned from getCellsFamiliesNumber for Edges in 2D " << err);
 	  }
@@ -1698,9 +1699,10 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	      int* [_ptrMesh->getNumberOfTypes(MED_EDGE)] ;
 
 	    const medGeometryElement *myTypes2 = _ptrMesh->getTypes(MED_EDGE);
-	    for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_EDGE);i++)
-	      MEDArrayEdgeFamily[i] = new
-		int[_ptrMesh->getNumberOfElements(MED_EDGE,myTypes2[i])] ;
+	    for (int i=0;i<_ptrMesh->getNumberOfTypes(MED_EDGE);i++) {
+	      int nbOfElements = _ptrMesh->_connectivity->_constituent->_constituent->getNumberOfElementsWithPoly(MED_EDGE,myTypes2[i]);
+	      MEDArrayEdgeFamily[i] = new int[nbOfElements] ;
+	    }
 
 	    err =
 	      getCellsFamiliesNumber(MEDArrayEdgeFamily,
