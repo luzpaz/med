@@ -968,9 +968,10 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
     {
       medGeometryElement type = types[i] ;
       nb_entity_type = Support->getNumberOfElements(type);
-      const int *global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+      const int *global_connectivityIndex = 0;
       if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
 	{
+	  global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
 	  if (onAll)
 	    {
 	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
