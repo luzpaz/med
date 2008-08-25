@@ -205,7 +205,7 @@ static void setFieldNames(const vector< _fieldBase* >& fields,
 //=======================================================================
 
 #define GIBI_EQUAL(var_str, stat_str) \
-  (strncmp (var_str, stat_str, sizeof(stat_str)-1) == 0)
+  (strncmp (var_str, stat_str, strlen(stat_str)) == 0)
 #define DUMP_LINE_NB " on line " << _lineNb
 
 bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields )
