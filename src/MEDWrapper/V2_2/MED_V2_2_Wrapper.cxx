@@ -2459,22 +2459,5 @@ namespace MED
 	EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDstructureCoordLire(...)");
     }
 
-  }
-
-  bool getMEDVersion( const std::string& fname, int& major, int& minor, int& release )
-  {
-    med_idt f = MEDouvrir( (char*)fname.c_str(), MED_LECTURE );
-    if( f<0 )
-      return false;
-
-    med_int aMajor, aMinor, aRelease;
-    med_err aRet = MEDversionLire( f, &aMajor, &aMinor, &aRelease );
-    major = aMajor;
-    minor = aMinor;
-    release = aRelease;
-    MEDfermer( f );
-    if( aRet<0 )
-      return false;
-    return true;
-  }
+  }  
 }

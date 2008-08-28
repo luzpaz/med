@@ -2904,7 +2904,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
   try {
     // becarefull about the number of gauss point
     _numberOfValues = _support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-    MESSAGE(__LOC <<" : "<<_numberOfValues <<" et "<< NumberOfComponents);
+    MESSAGE(PREFIX <<" : "<<_numberOfValues <<" et "<< NumberOfComponents);
 
     //EF : A modifier lors de l'intégration de la classe de localisation des points de gauss
     _value = new ArrayNoGauss(_numberOfComponents,_numberOfValues);
@@ -3060,9 +3060,9 @@ inline int FIELD<T, INTERLACING_TAG>::addDriver (GENDRIVER & driver )
   SCRUTE(current);
   driver.setId(current);
 
-  MESSAGE(__LOC << " je suis la 1");
+  MESSAGE(PREFIX << " je suis la 1");
   END_OF();
-  MESSAGE(__LOC << " je suis la 2");
+  MESSAGE(PREFIX << " je suis la 2");
 
   return current ;
 };

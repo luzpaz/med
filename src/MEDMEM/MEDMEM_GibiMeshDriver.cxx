@@ -313,7 +313,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
       // boucle interne : lecture de la pile
 
-      MESSAGE(__LOC << "---- Traitement pile " << numero_pile);
+      MESSAGE(PREFIX << "---- Traitement pile " << numero_pile);
 
       // -----------------------------------
       //                        MESH GROUPS

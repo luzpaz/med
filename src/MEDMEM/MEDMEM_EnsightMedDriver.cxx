@@ -203,7 +203,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 	      writeField(myField,name.str()) ;
 	    }
             else
-	      MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
+	      MESSAGE(PREFIX << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
 	}
       }
     }
@@ -230,7 +230,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 	      writeField(myField,name.str()) ;
 	    }
             else
-	      MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" which is not on all cells !");
+	      MESSAGE(PREFIX << "Could not write field "<<myField->getName()<<" which is not on all cells !");
 	}
       }
     }
@@ -507,7 +507,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
 	if (is_element) ensightDataFile << "scalar per element integer 32 mode for " << name << " following " << endl ;
       }
       else {
-	MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+	MESSAGE(PREFIX << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -548,7 +548,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
 	if (is_element) ensightDataFile << "scalar per element real 64 mode for " << name << " following " << endl ;
       }
       else {
-	MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+	MESSAGE(PREFIX << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -590,7 +590,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
       break ;
     }
     default : { 
-      MESSAGE(__LOC << "Could not write field "<<name<<" the type is not int or double !");
+      MESSAGE(PREFIX << "Could not write field "<<name<<" the type is not int or double !");
     }
     }
 
@@ -602,7 +602,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::writeField(FIELD_ * myField,string name) const {
 void ENSIGHT_MED_WRONLY_DRIVER::writeSupport(SUPPORT * mySupport) const {
   //const char * LOC = "ENSIGHT_MED_WRONLY_DRIVER::writeSupport(SUPPORT *) : " ;
   BEGIN_OF("ENSIGHT_MED_WRONLY_DRIVER::writeSupport(SUPPORT *) : ") ;
-  MESSAGE(__LOC << "Not yet implemented, acting on the object " << *mySupport);
+  MESSAGE(PREFIX << "Not yet implemented, acting on the object " << *mySupport);
   END_OF();
 }
 

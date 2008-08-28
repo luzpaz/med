@@ -662,5 +662,5 @@ namespace MED
   {
     PGrilleInfo anInfo = CrGrilleInfo(theMeshInfo,theInfo);
     return anInfo;
-  }
+  }  
 }

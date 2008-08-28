@@ -241,12 +241,12 @@ inline MED_EN::medGeometryElement CELLMODEL::getConstituentType(int dim,int num)
 /*!: Utility  class for storing cell models. Avoids calling the cellmodel constructor too
 often.
 */
-class CELLMODEL_Map
+class MEDMEM_EXPORT CELLMODEL_Map
 {
 public:
-	static const MEDMEM::CELLMODEL& retrieveCellModel(MED_EN::medGeometryElement type) { return CELLMODEL_Map::getInstance()->getCellModel(type); }
+	static const MEDMEM::CELLMODEL& retrieveCellModel(MED_EN::medGeometryElement type);
 private:
-	static CELLMODEL_Map *getInstance() { if(!_singleton) _singleton=new CELLMODEL_Map; return _singleton; }
+	static CELLMODEL_Map *getInstance();
 	static CELLMODEL_Map *_singleton;
  std::map<MED_EN::medGeometryElement,MEDMEM::CELLMODEL> _cell_models;
 	

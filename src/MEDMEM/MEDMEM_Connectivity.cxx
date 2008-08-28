@@ -1881,7 +1881,7 @@ void CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity)
   //const char * LOC = "CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity) : ";
   BEGIN_OF("CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity) : ");
 
-  MESSAGE(__LOC<<"method not yet implemented " << myConnectivity._entity);
+  MESSAGE(PREFIX<<"method not yet implemented " << myConnectivity._entity);
   // Mesh dimension !
 
   END_OF();

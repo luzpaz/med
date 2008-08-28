@@ -75,7 +75,7 @@ namespace med_2_3 {
 
 namespace MEDMEM {
 
-  int getMedAccessMode(MED_EN::med_mode_acces mode,
+  MEDMEM_EXPORT int getMedAccessMode(MED_EN::med_mode_acces mode,
                        MED_EN::medFileVersion medVersion)
     throw (MEDEXCEPTION);
 

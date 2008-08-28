@@ -23,12 +23,12 @@
 // standart Linux/Unix functions 
 #include <string>
 
-#ifndef WNT
-  #include <libgen.h>
+#ifndef WIN32
+#include <libgen.h>
 #endif
 inline std::string getBaseName( const std::string& dataname ) {
   std::string aBaseName = "";
-#ifndef WNT
+#ifndef WIN32
   aBaseName = basename((char*)dataname.c_str());
 #else
   for ( int i = dataname.size()-1; i >= 0; i-- ) {
@@ -43,7 +43,7 @@ inline std::string getBaseName( const std::string& dataname ) {
 
 inline std::string getDirName(const std::string& dataname ) {
   std::string aDirName = "";
-#ifndef WNT
+#ifndef WIN32
   aDirName = dirname((char*)dataname.c_str());
 #else
   bool aFindLine = false;
@@ -61,8 +61,8 @@ inline std::string getDirName(const std::string& dataname ) {
 }
 
 /*!
- * \brief Make a name valid. So far, removes white spaces from name end
- */
+* \brief Make a name valid. So far, removes white spaces from name end
+*/
 inline std::string healName(const std::string& name ) {
   size_t last = name.size()-1;
   while ( last >= 0 && isspace( name[last] ))
@@ -101,17 +101,17 @@ using namespace std;
 # undef INFOS_COMPILATION
 # endif
 # define INFOS_COMPILATION	{\
-					cerr << flush;\
-					cout << __FILE__ ;\
-					cout << " [" << __LINE__ << "] : " ;\
-					cout << "COMPILED with " << COMPILER ;\
-					cout << ", " << __DATE__ ; \
-					cout << " at " << __TIME__ << endl ;\
-					cout << "\n\n" ;\
-					cout << flush ;\
-				}
+  cerr << flush;\
+  cout << __FILE__ ;\
+  cout << " [" << __LINE__ << "] : " ;\
+  cout << "COMPILED with " << COMPILER ;\
+  cout << ", " << __DATE__ ; \
+  cout << " at " << __TIME__ << endl ;\
+  cout << "\n\n" ;\
+  cout << flush ;\
+}
 
-# ifdef _DEBUG_
+#if defined(_DEBUG_) || defined(_DEBUG)
 
 /* --- the following MACROS are useful at debug time --- */
 
@@ -124,8 +124,10 @@ using namespace std;
 # define ASSERT(condition) if (!(condition)){ HERE ; cerr << "CONDITION " << #condition << " NOT VERIFIED"<< endl ; INTERRUPTION(1) ;}
 # endif /* ASSERT */
 #define REPERE {cout<<flush ; cerr << "   --------------" << endl << flush ;}
-#define BEGIN_OF(chain) const char* __LOC = chain; {REPERE ; HERE ; cerr << "Begin of: " << __LOC << endl ; REPERE ; }
-#define END_OF() {REPERE ; HERE ; cerr << "Normal end of: " << __LOC << endl ; REPERE ; }
+#define __PREFIX const char* __LOC
+#define PREFIX __LOC
+#define BEGIN_OF(chain) __PREFIX = chain; {REPERE ; HERE ; cerr << "Begin of: " << PREFIX << endl ; REPERE ; }
+#define END_OF() {REPERE ; HERE ; cerr << "Normal end of: " << PREFIX << endl ; REPERE ; }
 //#define BEGIN_OF(chain) {REPERE ; HERE ; cerr << "Begin of: " << chain << endl ; REPERE ; }
 //#define END_OF(chain) {REPERE ; HERE ; cerr << "Normal end of: " << chain << endl ; REPERE ; }
 
@@ -148,19 +150,22 @@ using namespace std;
 
 #endif
 
-#else
-// #ifdef _SALOME
+#else //MED_WITH_KERNEL
 
 #include <utilities.h>
 
 #undef BEGIN_OF
 #undef END_OF
-# ifdef _DEBUG_
-#define BEGIN_OF(msg) const char* __LOC = msg; {MESS_BEGIN(REPERE) << "Begin of: "      << __LOC << MESS_END} 
-#define END_OF()   {MESS_BEGIN(REPERE) << "Normal end of: " << __LOC << MESS_END} 
+#if defined(_DEBUG_) || defined(_DEBUG)
+//don't use __PREFIX - it's a auxiliary macros. Use only PREFIX, please.
+# define __PREFIX const char* __LOC
+# define PREFIX __LOC
+# define BEGIN_OF(msg) __PREFIX = msg; {MESS_BEGIN(REPERE) << "Begin of: "      << PREFIX << MESS_END} 
+# define END_OF()   {MESS_BEGIN(REPERE) << "Normal end of: " << PREFIX << MESS_END} 
 #else
-#define BEGIN_OF(msg) {}
-#define END_OF() {}
+# define BEGIN_OF(msg) {}
+# define PREFIX
+# define END_OF() {}
 #endif
 
 #endif

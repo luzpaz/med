@@ -30,6 +30,17 @@ using namespace MED_EN;
 
 CELLMODEL_Map *CELLMODEL_Map::_singleton=0;
 
+const MEDMEM::CELLMODEL& CELLMODEL_Map::retrieveCellModel(MED_EN::medGeometryElement type)
+{
+  return CELLMODEL_Map::getInstance()->getCellModel(type);
+}
+
+CELLMODEL_Map *CELLMODEL_Map::getInstance()
+{
+  if(!_singleton) _singleton=new CELLMODEL_Map;
+  return _singleton;
+}
+
 CELLMODEL::CELLMODEL(medGeometryElement t)
 {
   // init first all to nothing

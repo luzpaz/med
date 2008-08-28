@@ -621,14 +621,14 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
 
   if ( _supportId != "" )
   {
-      MESSAGE(__LOC << "Support already in Study");
+      MESSAGE(PREFIX << "Support already in Study");
       THROW_SALOME_CORBA_EXCEPTION("Support already in Study", \
 				   SALOME::BAD_PARAM);
   };
 
   if ( CORBA::is_nil(myStudy) )
   {
-      MESSAGE(__LOC << "Study not found");
+      MESSAGE(PREFIX << "Study not found");
       THROW_SALOME_CORBA_EXCEPTION("Study deleted !!!",
                                     SALOME::INTERNAL_ERROR);
   }
@@ -640,11 +640,11 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   SALOMEDS::AttributeIOR_var     aIOR;
   
   // Find SComponent labelled 'Med'
-  MESSAGE(__LOC << " Find SComponent labelled 'MED'");
+  MESSAGE(PREFIX << " Find SComponent labelled 'MED'");
   SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
   if ( CORBA::is_nil(medfather) ) 
   { 
-    MESSAGE(__LOC << "MED not found");
+    MESSAGE(PREFIX << "MED not found");
     THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
   }
 
@@ -652,10 +652,10 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   SALOMEDS::SObject_var medmeshfather = myStudy->FindObjectByPath("/Med/MEDMESH");
   if ( CORBA::is_nil(medmeshfather) )
   { 
-    MESSAGE(__LOC << " No /Med/MEDMESH Found in study")
+    MESSAGE(PREFIX << " No /Med/MEDMESH Found in study")
     THROW_SALOME_CORBA_EXCEPTION("SObject labelled 'MEDMESH' not Found",SALOME::INTERNAL_ERROR);
   }
-  MESSAGE(__LOC << " Find SObject MESH (represent mesh in support)");
+  MESSAGE(PREFIX << " Find SObject MESH (represent mesh in support)");
 
   string meshName = _support->getMesh()->getName() ;
   string meshNameStudy = meshName;

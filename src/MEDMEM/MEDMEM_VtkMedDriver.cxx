@@ -171,7 +171,7 @@ void VTK_MED_DRIVER::write() const
 	      name << myField->getName() << "_" << dt << "_" << it ;
 	      writeField(myField,name.str()) ;
 	    } else
-	      MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
+	      MESSAGE(PREFIX << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
 	}
       }
     }
@@ -194,7 +194,7 @@ void VTK_MED_DRIVER::write() const
 	      writeField(myField,name.str()) ;
 	    }
             else
-	      MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" which is not on all cells !");
+	      MESSAGE(PREFIX << "Could not write field "<<myField->getName()<<" which is not on all cells !");
 	}
       }
     }
@@ -471,7 +471,7 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
       }
       else {
-	MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+	MESSAGE(PREFIX << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -513,7 +513,7 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
       }
       else {
-	MESSAGE(__LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+	MESSAGE(PREFIX << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -548,7 +548,7 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
       break ;
     }
     default : { 
-      MESSAGE(__LOC << "Could not write field "<<name<<" the type is not int or double !");
+      MESSAGE(PREFIX << "Could not write field "<<name<<" the type is not int or double !");
     }
     }
   
@@ -558,6 +558,6 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
 void VTK_MED_DRIVER::writeSupport(SUPPORT * mySupport) const {
   //const char * LOC = "VTK_MED_DRIVER::writeSupport(SUPPORT *) : " ;
   BEGIN_OF("VTK_MED_DRIVER::writeSupport(SUPPORT *) : ") ;
-  MESSAGE(__LOC << "Not yet implemented, acting on the object " << *mySupport);
+  MESSAGE(PREFIX << "Not yet implemented, acting on the object " << *mySupport);
   END_OF();
 }

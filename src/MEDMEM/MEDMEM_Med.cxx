@@ -76,7 +76,7 @@ MED::MED(driverTypes driverType, const string & fileName)
   //const char * LOC = "MED::MED(driverTypes driverType, const string & fileName) : ";
   BEGIN_OF("MED::MED(driverTypes driverType, const string & fileName) : ");
 
-  MESSAGE(__LOC << "driverType = " << driverType);
+  MESSAGE(PREFIX << "driverType = " << driverType);
 
   int current = addDriver(driverType,fileName,RDONLY);
 
@@ -109,7 +109,7 @@ MED::~MED()
     if ( (*currentField).first != NULL) index++;
   }
 
-  MESSAGE(__LOC << " there is(are) " << index << " field(s):");
+  MESSAGE(PREFIX << " there is(are) " << index << " field(s):");
   for ( currentField=_meshName.begin();currentField != _meshName.end(); currentField++ ) {
     if ( (*currentField).first != NULL) MESSAGE("             " << ((*currentField).first)->getName().c_str());
   }
@@ -122,7 +122,7 @@ MED::~MED()
       index++;
   }
 
-  MESSAGE(__LOC << " there is(are) " << index << " support(s):");
+  MESSAGE(PREFIX << " there is(are) " << index << " support(s):");
 
   map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
   index =0;
@@ -131,7 +131,7 @@ MED::~MED()
       index++;
   }
 
-  MESSAGE(__LOC << " there is(are) " << index << " meshe(s):");
+  MESSAGE(PREFIX << " there is(are) " << index << " meshe(s):");
 //   for ( currentMesh=_meshes.begin();currentMesh != _meshes.end(); currentMesh++ ) {
 //     if ( (*currentMesh).second != NULL)
 //       {
@@ -156,7 +156,7 @@ MED::~MED()
 	delete (FIELD<double>*) (*currentField).first ;
 	break ;
       default : 
-	MESSAGE(__LOC << "Field has type different of int or double, could not destroy its values array !") ;
+	MESSAGE(PREFIX << "Field has type different of int or double, could not destroy its values array !") ;
 	delete (*currentField).first;
       }
     }
@@ -183,7 +183,7 @@ MED::~MED()
 
   index =_drivers.size();
 
-  MESSAGE(__LOC << "In this object MED there is(are) " << index << " driver(s):");
+  MESSAGE(PREFIX << "In this object MED there is(are) " << index << " driver(s):");
 
   for (unsigned int ind=0; ind < _drivers.size(); ind++ )
     {
@@ -214,7 +214,7 @@ int MED::addDriver(driverTypes driverType,
 
   BEGIN_OF("MED::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\") : ");
 
-  MESSAGE(__LOC << " the file name is " << fileName);
+  MESSAGE(PREFIX << " the file name is " << fileName);
 
   SCRUTE(driverType);
   SCRUTE(access);
@@ -876,7 +876,7 @@ void MED::updateSupport ()
       }
       catch (MEDEXCEPTION & ex) {
 	// entity not defined in mesh -> we remove support on it !
-	MESSAGE(__LOC<<ex.what());
+	MESSAGE(PREFIX<<ex.what());
 	delete (*itSupport).second ;
 	//(*itSupportOnMesh).second.erase(itSupport) ; // that's right ????
 	//itSupport-- ;

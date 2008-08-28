@@ -383,7 +383,7 @@ MESH & MESH::operator=(const MESH &m)
   //const char * LOC = "MESH & MESH::operator=(const MESH &m) : ";
   BEGIN_OF("MESH & MESH::operator=(const MESH &m) : ");
 
-  MESSAGE(__LOC <<"Not yet implemented, operating on the object " << m);
+  MESSAGE(PREFIX <<"Not yet implemented, operating on the object " << m);
   //  A FAIRE.........
 
   // ATTENTION CET OPERATEUR DE RECOPIE EST DANGEREUX POUR LES
@@ -2163,7 +2163,7 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEX
 
   if (size == 1)
     {
-      MESSAGE(__LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
+      MESSAGE(PREFIX <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
       SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
 
       returnedSupport = new SUPPORT(*obj);

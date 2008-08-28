@@ -102,19 +102,19 @@ namespace MED{
   GetEntity2GeomSet();
 
   template<EVersion>
-  TInt
+  TInt MEDWRAPPER_EXPORT
   GetDESCLength();
   
   template<EVersion>
-  TInt
+  TInt MEDWRAPPER_EXPORT
   GetIDENTLength();
   
   template<EVersion>
-  TInt
+  TInt MEDWRAPPER_EXPORT
   GetNOMLength();
   
   template<EVersion>
-  TInt
+  TInt MEDWRAPPER_EXPORT
   GetLNOMLength();
   
   template<EVersion>
@@ -180,8 +180,6 @@ namespace MED{
 
   struct TWrapper;
   typedef SharedPtr<TWrapper> PWrapper;
-
-  bool getMEDVersion( const std::string&, int&, int&, int& );
 };
 
 
