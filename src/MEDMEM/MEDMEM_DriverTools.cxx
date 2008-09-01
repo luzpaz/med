@@ -1374,7 +1374,7 @@ struct _mailleWrap
 
 void _intermediateMED::mergeNodesAndElements(double tolerance)
 {
-  const char * LOC = "_intermediateMED::mergeNodesAndElements(): ";
+  //const char * LOC = "_intermediateMED::mergeNodesAndElements(): ";
   vector< int > newNodeIDs; // for i-th node id, id to replace with
 
   int nbRemovedNodes = 0;
