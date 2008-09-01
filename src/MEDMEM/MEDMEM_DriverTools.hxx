@@ -246,16 +246,19 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
     nbtypegeo = medGrp->getNumberOfTypes();
     nbelgeoc  .resize( nbtypegeo + 1, 0 );
     nbgaussgeo.resize( nbtypegeo + 1, 0 );
-    const int * nbElemByType = medGrp->getNumberOfElements();
-    sub_data = _sub.begin();
+    const int *                nbElemByType = medGrp->getNumberOfElements();
+    const MED_EN::medGeometryElement* types = medGrp->getTypes();
     for (int iType = 0; iType < nbtypegeo; ++iType) {
+      // nb elem by type
       nbelgeoc  [ iType+1 ] = nbelgeoc[ iType ] + nbElemByType[ iType ];
-      nbgaussgeo[ iType+1 ] = sub_data->nbGauss();
-      int nbElemInSubs = 0;
-      while ( nbElemInSubs < nbElemByType[ iType ] && sub_data != sub_end ) {
-        nbElemInSubs += groupes[ sub_data->_supp_id ].relocMap.size();
-        ++sub_data;
+      // nb gauss by type; find a sub for a geo type
+      for ( sub_data = _sub.begin(); sub_data != sub_end; ++sub_data ) {
+        _groupe & sub_grp = groupes[ sub_data->_supp_id ];
+        if ( !sub_grp.empty() && sub_grp.mailles[0]->geometricType == types[ iType ])
+          break;
       }
+      ASSERT( sub_data != sub_end );
+      nbgaussgeo[ iType+1 ] = sub_data->nbGauss();
     }
   }
   typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array TArrayNoGauss;
