@@ -217,6 +217,13 @@ inline void FAMILY::setNumberOfGroups(int NumberOfGroups)
   inline void FAMILY::setGroupsNames(string * GroupName, bool giveOwnership) 
 //----------------------------------------------------
 { 
+  // SKL, CPP TESTS: _groupName is no more PointerOf(string) but vector<string>
+//   if (giveOwnership)
+//     _groupName.setShallowAndOwnership(GroupName);
+//   else  
+//     //_groupName = GroupName ; 
+//     _groupName.set(_numberOfGroup, GroupName) ;
+
   int nbGr = getNumberOfGroups();
   if(nbGr<1) {
     std::string diagnosis;
