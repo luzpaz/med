@@ -2997,6 +2997,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 					ifamily++;
 					vector<string> groupnames;
 					groupnames.push_back(myGroups[i]->getName());
+                                        myFamily->setNumberOfGroups(1);
 					myFamily->setGroupsNames(&groupnames[0]);
 					myFamilies.push_back(myFamily);
 				}
