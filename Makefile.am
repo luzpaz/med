@@ -25,28 +25,47 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-SUBDIRS = adm_local 
-
 if MED_ENABLE_KERNEL
-      SUBDIRS+= idl
+if MED_ENABLE_GUI
+  ACLOCAL_AMFLAGS = -I adm_local/unix/config_files			\
+                    -I ${KERNEL_ROOT_DIR}/unix/config_files		\
+                    -I ${GUI_ROOT_DIR}/adm_local/unix/config_files
+else !MED_ENABLE_GUI
+  ACLOCAL_AMFLAGS = -I adm_local/unix/config_files			\
+                    -I ${KERNEL_ROOT_DIR}/unix/config_files
+endif
+else !MED_ENABLE_KERNEL
+if MED_ENABLE_GUI
+  ACLOCAL_AMFLAGS = -I adm_local/unix/config_files			\
+                    -I adm_local_without_kernel/unix/config_files	\
+                    -I ${GUI_ROOT_DIR}/adm_local/unix/config_files
+else !MED_ENABLE_GUI
+  ACLOCAL_AMFLAGS = -I adm_local/unix/config_files			\
+                    -I adm_local_without_kernel/unix/config_files
+endif
 endif
 
-SUBDIRS+= src doc
+if MED_ENABLE_KERNEL
+  IDLDIR = idl
+endif
 
-SUBDIRS+= resources bin
-DIST_SUBDIRS= adm_local adm_local_without_kernel idl src doc resources bin
+SUBDIRS = adm_local $(IDLDIR) src doc resources bin
 
-DISTCLEANFILES= a.out aclocal.m4 configure 
+DIST_SUBDIRS = adm_local adm_local_without_kernel idl src doc resources bin
 
-EXTRA_DIST+= build_configure clean_configure LICENCE INSTALL README
+DISTCLEANFILES = a.out aclocal.m4 configure 
+
+salomeinclude_DATA = MED_version.h
+
+EXTRA_DIST += build_configure clean_configure LICENCE INSTALL README
 
 dist-hook:
-	rm -rf `find . -name CVS`
+	rm -rf `find $(distdir) -name CVS`
 
 if MED_ENABLE_SSTREAM
   install-data-local: $(pkgincludedir)/SALOMEconfig.h
 else !MED_ENABLE_SSTREAM
-  install-data-local: $(pkgincludedir)/SALOMEconfig.h $(pkgincludedir)/sstream $(pkgincludedir)/MED_version.h
+  install-data-local: $(pkgincludedir)/SALOMEconfig.h $(pkgincludedir)/sstream
 endif
 
 $(pkgincludedir)/SALOMEconfig.h: ./salome_adm/unix/SALOMEconfig.h
@@ -55,5 +74,5 @@ $(pkgincludedir)/SALOMEconfig.h: ./salome_adm/unix/SALOMEconfig.h
 $(pkgincludedir)/sstream: ./include/salome/sstream
 	cp -f $^ $(pkgincludedir)
 
-$(pkgincludedir)/MED_version.h: MED_version.h
-	cp -f $^ $(pkgincludedir)
+dev_docs:
+	(cd doc && $(MAKE) $(AM_MAKEFLAGS) dev_docs)

@@ -19,18 +19,10 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-nodist_testsenvironcsh_SCRIPTS= \
+nodist_testsenvironcsh_SCRIPTS = \
 	init1 \
 	init2 \
 	init3 \
 	runContainer \
 	runEnvironTests \
 	stopContainer
-
-EXTRA_DIST+= \
-	init1.in \
-	init2.in \
-	init3.in \
-	runContainer.in \
-	runEnvironTests.in \
-	stopContainer.in

@@ -33,6 +33,10 @@ lib_LTLIBRARIES= libmedsplitter.la
 salomeinclude_HEADERS= \
 MEDSPLITTER_Topology.hxx \
 MEDSPLITTER_MESHCollection.hxx \
+MEDSPLITTER_MESHCollection.H \
+MEDSPLITTER_MESHCollectionDriver.H \
+MEDSPLITTER_MESHCollectionMedXMLDriver.H \
+MEDSPLITTER_MESHCollectionMedAsciiDriver.H \
 MEDSPLITTER_MESHCollectionDriver.hxx \
 MEDSPLITTER_MESHCollectionMedXMLDriver.hxx \
 MEDSPLITTER_MESHCollectionMedAsciiDriver.hxx \
@@ -41,6 +45,8 @@ MEDSPLITTER_FaceModel.hxx \
 MEDSPLITTER_Graph.hxx\
 MEDSPLITTER_UserGraph.hxx\
 MEDSPLITTER_API.hxx \
+MEDSPLITTER_SequentialTopology.hxx \
+MEDSPLITTER_utils.hxx \
 MEDSPLITTER.hxx
 
 if MED_ENABLE_METIS
@@ -96,3 +102,9 @@ medsplitter_LDADD= $(libmedsplitter_la_LDFLAGS) -lm $(BOOST_LIBS) libmedsplitter
 if MED_ENABLE_KERNEL
   medsplitter_LDADD+= -lSALOMEBasics
 endif
+
+OBSOLETE_FILES = \
+	MEDSPLITTER_SequentialTopology.cxx \
+	test_HighLevelAPI.cxx
+
+EXTRA_DIST += $(OBSOLETE_FILES)

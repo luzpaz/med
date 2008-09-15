@@ -20,3 +20,8 @@
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 SUBDIRS = config_files
+
+##################################
+# not-used (obsolete?) files
+##################################
+# SALOMEconfig.h.in depend.in make_module.in

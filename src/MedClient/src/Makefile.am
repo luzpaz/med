@@ -23,7 +23,7 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-salomeinclude_HEADERS= \
+salomeinclude_HEADERS = \
 	COORDINATEClient.hxx \
 	CONNECTIVITYClient.hxx \
 	MESHClient.hxx \
@@ -32,6 +32,7 @@ salomeinclude_HEADERS= \
 	GROUPClient.hxx \
 	FIELDClient.hxx \
 	FIELDClient.cxx \
+	UtilClient.hxx \
 	libMEDClient.i
 
 if MED_SWIG_1_3_21
@@ -47,39 +48,56 @@ else !MED_SWIG_1_3_21
 SWIG_DEF = libMEDClient.i
 endif
 
-dist_salomescript_DATA= \
+dist_salomescript_DATA =  \
 	medClient_test.py \
 	testMeshAlliances.py
-nodist_salomescript_DATA= libMEDClient.py
+nodist_salomescript_DATA = libMEDClient.py
 
-lib_LTLIBRARIES= libMEDClientcmodule.la
+lib_LTLIBRARIES = _libMEDClient.la
 
-dist_libMEDClientcmodule_la_SOURCES= \
+dist__libMEDClient_la_SOURCES = \
 	COORDINATEClient.cxx \
 	CONNECTIVITYClient.cxx \
 	MESHClient.cxx \
 	SUPPORTClient.cxx \
 	FAMILYClient.cxx \
-	GROUPClient.cxx
+	GROUPClient.cxx \
+	libMEDClient.i
+nodist__libMEDClient_la_SOURCES = libMEDClient_wrap.cxx
 
-libMEDClientcmodule_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
+_libMEDClient_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
 	$(MED2_INCLUDES) $(HDF5_INCLUDES) $(PYTHON_INCLUDES) ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../../MEDMEM_I -I$(srcdir)/../../MEDMEM -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl \
 	-I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM_SWIG -I$(srcdir)/../../MED -I$(srcdir)/../../INTERP_KERNEL
-libMEDClientcmodule_la_LDFLAGS=${KERNEL_LDFLAGS} -lOpUtil -lSalomeCommunication ../../MedCorba_Swig/libMedCorba_Swigcmodule.la ../../MEDMEM/libmedmem.la
+_libMEDClient_la_LDFLAGS  = -module ${KERNEL_LDFLAGS} -lOpUtil -lSalomeCommunication ../../MEDMEM/libmedmem.la
+### ../../MedCorba_Swig/_libMedCorba_Swig.la 
 
-SWIG_FLAGS= @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../../MedCorba_Swig -I$(srcdir)/../../MEDMEM_SWIG
-SWIG_DEP=$(srcdir)/../../MedCorba_Swig/libMedCorba_Swig.i $(srcdir)/../../MEDMEM_SWIG/libMEDMEM_Swig.i
-nodist_libMEDClientcmodule_la_SOURCES= libMEDClient_wrap.cxx
+SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../../MedCorba_Swig -I$(srcdir)/../../MEDMEM_SWIG
+SWIG_DEP   = $(srcdir)/../../MedCorba_Swig/libMedCorba_Swig.i $(srcdir)/../../MEDMEM_SWIG/libMEDMEM_Swig.i
 
 libMEDClient.py: libMEDClient_wrap.cxx
 
 libMEDClient_wrap.cxx: $(SWIG_DEF) $(SWIG_DEP)
 	$(SWIG) $(SWIG_FLAGS) -o $@ $(SWIG_DEF)
 
-CLEANFILES= libMEDClient.py libMEDClient_wrap.cxx
+CLEANFILES = libMEDClient.py libMEDClient_wrap.cxx
 
-install-exec-hook: $(libdir)/_libMEDClient.so
+OBSOLETE_FILES = \
+	FIELDDOUBLEClient.cxx \
+	FIELDDOUBLEClient.hxx \
+	FIELDINTClient.cxx \
+	FIELDINTClient.hxx \
+	MakefileForTest \
+	MemorySpy.cxx \
+	MemorySpy.hxx \
+	README_medclient_test \
+	TESTMEDCLIENT_Gen.idl \
+	TESTMEDCLIENT_Gen_i.cxx \
+	TESTMEDCLIENT_Gen_i.hxx \
+	create_mesh_c2q4.c \
+	create_mesh_c2t3.c \
+	create_mesh_c3h8.c \
+	create_mesh_c3t4.c \
+	test_medclient.py
 
-$(libdir)/_libMEDClient.so:
-	( cd $(libdir); ln -sf libMEDClientcmodule.so _libMEDClient.so; )
+EXTRA_DIST += $(OBSOLETE_FILES)

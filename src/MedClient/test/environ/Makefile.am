@@ -22,14 +22,8 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-SUBDIRS= csh
+SUBDIRS = csh
 
-nodist_purebin_SCRIPTS= runTestMedCorba
+nodist_purebin_SCRIPTS = runTestMedCorba
 
-nodist_testsenviron_SCRIPTS= runEnvironTests
-
-EXTRA_DIST+= \
-	runContainer.in \
-	runEnvironTests.in \
-	runTestMedCorba.in \
-	stopContainer.in
+nodist_testsenviron_SCRIPTS = runEnvironTests

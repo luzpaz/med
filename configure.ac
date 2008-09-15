@@ -5,11 +5,11 @@
 # Modified by : Mikhail PONIKAROV (OCN)
 #
 
-AC_INIT([Salome2 Project MED module], [5.0.0], [webmaster.salome@opencascade.com], [salome])
+AC_INIT([Salome2 Project MED module], [5.0.0], [webmaster.salome@opencascade.com], [SalomeMED])
 AC_CONFIG_AUX_DIR(salome_adm/unix/config_files)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([tar-pax])
 
 XVERSION=`echo $VERSION | awk -F. '{printf("0x%02x%02x%02x",$1,$2,$3)}'`
 AC_SUBST(XVERSION)
@@ -609,11 +609,7 @@ AC_OUTPUT([ \
 	./doc/MEDMEM/MEDMEM_UsersGuide.tex \
 	./doc/salome/Makefile \
 	./doc/salome/tui/Makefile \
-	./doc/salome/tui/MED/Makefile \
-	./doc/salome/tui/MED/sources/Makefile \
-	./doc/salome/tui/MED/sources/static/Makefile \
-	./doc/salome/tui/MED/doxyfile \
-	./doc/salome/tui/MED/sources/static/tree.js \
+	./doc/salome/tui/doxyfile \
 	./doc/doxygen/Makefile \
 	./doc/doxygen/Doxyfile_med_user \
 ])

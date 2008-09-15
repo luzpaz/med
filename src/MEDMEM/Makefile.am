@@ -92,7 +92,8 @@ MEDMEM_ConnectZone.hxx \
 MEDMEM_EnsightMedDriver.hxx \
 MEDMEM_EnsightMeshDriver.hxx \
 MEDMEM_EnsightFieldDriver.hxx \
-MEDMEM.hxx
+MEDMEM.hxx \
+MEDMEM_OptionManager.hxx
 
 # not exported headers
 EXTRA_DIST+= DataTest \
@@ -236,3 +237,26 @@ endif
 #dist_testAnalFile_SOURCES= testAnalFile.cxx
 #dist_test_MEDMEM_MeshingFlica_SOURCES= test_MEDMEM_MeshingFlica.cxx
 #dist_testConvertPolygon_SOURCES=testConvertPolygon.cxx
+
+OBSOLETE_FILES = \
+	MEDMEM_EnsightFieldDriver.cxx \
+	MEDMEM_MEDMEMchampLire.cxx \
+	MEDMEM_MEDMEMgaussEcr.cxx \
+	MEDMEM_MEDMEMprofilEcr.cxx \
+	MEDMEM_TypeMeshDriver.cxx \
+	MEDMEM_TypeMeshDriver.hxx \
+	checkScript \
+	tests/readEntete.cxx \
+	tests/testUArray.cxx.ok \
+	tests/testUCoordinate.cxx \
+	tests/testUMedException.cxx \
+	tests/testUPointerOf.cxx \
+	tests/testUUnit.cxx \
+	tests/readCoordinate.cxx \
+	tests/testUArray.cxx \
+	tests/testUCellModel.cxx \
+	tests/testUGeoNameMeshEntities.cxx \
+	tests/testUModulusArray.cxx \
+	tests/testUSkyLineArray.cxx
+
+EXTRA_DIST += $(OBSOLETE_FILES)

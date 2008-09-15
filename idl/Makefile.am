@@ -28,28 +28,24 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 BASEIDL_FILES= MED.idl MED_Gen.idl Compo1Py.idl
 
-EXTRA_DIST+= $(BASEIDL_FILES)
-
 # This variable defines the files to be installed
-salomeidl_DATA = $(BASEIDL_FILES)
+dist_salomeidl_DATA = $(BASEIDL_FILES)
 
 # GUI idl common library
 lib_LTLIBRARIES = libSalomeIDLMED.la
 
 # Sources built from idl files
-nodist_libSalomeIDLMED_la_SOURCES= MEDSK.cc MED_GenSK.cc Compo1PySK.cc
+nodist_libSalomeIDLMED_la_SOURCES = MEDSK.cc MED_GenSK.cc Compo1PySK.cc
 
 # header files must be exported: other modules have to use this library
-nodist_salomeinclude_HEADERS= $(BASEIDL_FILES:%.idl=%.hh)
+nodist_salomeinclude_HEADERS = $(BASEIDL_FILES:%.idl=%.hh)
 
-libSalomeIDLMED_la_CPPFLAGS =\
-	-I$(top_builddir)/salome_adm/unix \
-	-I$(top_builddir)/idl \
+libSalomeIDLMED_la_CPPFLAGS =			\
+	-I$(top_builddir)/salome_adm/unix	\
+	-I$(top_builddir)/idl			\
 	@CORBA_CXXFLAGS@ @CORBA_INCLUDES@ @KERNEL_CXXFLAGS@
 libSalomeIDLMED_la_LDFLAGS = -no-undefined -version-info=0:0:0
-libSalomeIDLMED_la_LIBADD  = \
-	@CORBA_LIBS@ \
-	$(KERNEL_LDFLAGS) -lSalomeIDLKernel
+libSalomeIDLMED_la_LIBADD  = @CORBA_LIBS@ $(KERNEL_LDFLAGS) -lSalomeIDLKernel
 
 # These variables defines the building process of CORBA files
 OMNIORB_IDL         = @OMNIORB_IDL@
@@ -66,14 +62,14 @@ SUFFIXES = .idl .hh SK.cc
 	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
 
 install-exec-local: $(BASEIDL_FILES:%=$(top_srcdir)/idl/%)
-	$(INSTALL) -d  $(pkgpythondir)
+	$(INSTALL) -d  $(DESTDIR)$(salomepythondir)
 	ls $^ | while read file; do \
-	  $(OMNIORB_IDL) $(IDLPYFLAGS) -C$(pkgpythondir) $$file ; \
+	  $(OMNIORB_IDL) $(IDLPYFLAGS) -C$(DESTDIR)$(salomepythondir) $$file ; \
 	done
 
 # uninstall-local removes too much, but it works in distcheck
 uninstall-local:
-	rm -rf $(pkgpythondir)/*
+	rm -rf $(DESTDIR)$(salomepythondir)/*
 
 mostlyclean-local: clean-idls
 

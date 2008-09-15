@@ -23,7 +23,7 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-EXTRA_DIST+= \
+dist_salomeres_DATA = \
 	resources/CatalogModuleTest.xml \
 	resources/Compo1PyCatalog.xml
 
@@ -35,3 +35,6 @@ dist_salomescript_DATA= \
 	TestMedCorba3.py \
 	TestMedCorba4.py \
 	TestMedCorba5.py
+
+EXTRA_DIST += \
+	Compo1Py.idl

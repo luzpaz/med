@@ -23,29 +23,6 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-dist_salomescript_DATA= \
-	TestMedCorba6.py \
-	TestMedCorba7.py \
-	TestMedCorba8.py
-nodist_salomescript_DATA= \
-	libCompo2.py
-
-# Libraries targets
-lib_LTLIBRARIES= libCompo2cmodule.la
-dist_libCompo2cmodule_la_SOURCES= Compo2.cxx
-nodist_libCompo2cmodule_la_SOURCES= libCompo2_wrap.cxx
-
-EXTRA_DIST+= Compo2.hxx
-
-libCompo2cmodule_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
-	${MED2_INCLUDES} ${HDF5_INCLUDES} ${PYTHON_INCLUDES} ${KERNEL_CXXFLAGS} \
-	-I$(srcdir)/../../../MEDMEM_I -I$(srcdir)/../../../MEDMEM -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl \
-	-I$(srcdir)/../../../MEDWrapper/V2_1/Core -I$(srcdir)/../../../MEDMEM_SWIG -I$(srcdir)/../../../MED -I$(srcdir)/../../src \
-	-I$(srcdir)/../../../INTERP_KERNEL
-libCompo2cmodule_la_LDFLAGS= ${KERNEL_LDFLAGS}  ${MED2_LIBS} ${HDF5_LIBS} \
-	../../src/libMEDClientcmodule.la ../../../MEDMEM_SWIG/libMEDMEM_Swigcmodule.la \
-	../../../MEDMEM/libmedmem.la ../../../MEDMEM_I/libMEDMEMImpl.la
-
 if MED_SWIG_1_3_21
 SWIG_DEF = libCompo2.i dummy.i
 
@@ -59,17 +36,34 @@ else !MED_SWIG_1_3_21
 SWIG_DEF = libCompo2.i
 endif
 
-SWIG_FLAGS= @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../../src -I$(srcdir)/../../../MEDMEM_SWIG -I$(srcdir)/../../../MedCorba_Swig
-SWIG_DEP=../../src/libMEDClient.i ../../../MEDMEM_SWIG/libMEDMEM_Swig.i ../../../MedCorba_Swig/libMedCorba_Swig.i
+dist_salomescript_DATA = \
+	TestMedCorba6.py \
+	TestMedCorba7.py \
+	TestMedCorba8.py
+nodist_salomescript_DATA = \
+	libCompo2.py
+
+# Libraries targets
+lib_LTLIBRARIES = _libCompo2.la
+
+dist__libCompo2_la_SOURCES   = Compo2.hxx Compo2.cxx libCompo2.i
+nodist__libCompo2_la_SOURCES = libCompo2_wrap.cxx
+
+_libCompo2_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
+	${MED2_INCLUDES} ${HDF5_INCLUDES} ${PYTHON_INCLUDES} ${KERNEL_CXXFLAGS} \
+	-I$(srcdir)/../../../MEDMEM_I -I$(srcdir)/../../../MEDMEM -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl \
+	-I$(srcdir)/../../../MEDWrapper/V2_1/Core -I$(srcdir)/../../../MEDMEM_SWIG -I$(srcdir)/../../../MED -I$(srcdir)/../../src \
+	-I$(srcdir)/../../../INTERP_KERNEL
+_libCompo2_la_LDFLAGS  = -module ${KERNEL_LDFLAGS}  ${MED2_LIBS} ${HDF5_LIBS} \
+	../../../MEDMEM/libmedmem.la ../../../MEDMEM_I/libMEDMEMImpl.la
+### 	../../src/_libMEDClient.la ../../../MEDMEM_SWIG/_libMEDMEM_Swig.la
+
+SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../../src -I$(srcdir)/../../../MEDMEM_SWIG -I$(srcdir)/../../../MedCorba_Swig
+SWIG_DEP   = ../../src/libMEDClient.i ../../../MEDMEM_SWIG/libMEDMEM_Swig.i ../../../MedCorba_Swig/libMedCorba_Swig.i
 
 libCompo2.py: libCompo2_wrap.cxx
 
 libCompo2_wrap.cxx: $(SWIG_DEF)
 	$(SWIG) $(SWIG_FLAGS) -o $@ $<
 
-CLEANFILES= libCompo2_wrap.cxx libCompo2.py
-
-install-exec-hook: $(libdir)/_libCompo2.so
-
-$(libdir)/_libCompo2.so:
-	( cd $(libdir); ln -sf libCompo2cmodule.so _libCompo2.so; )
+CLEANFILES = libCompo2_wrap.cxx libCompo2.py

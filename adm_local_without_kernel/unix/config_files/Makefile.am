@@ -18,10 +18,10 @@
 # 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-admlocalwithoutkerneldir = $(prefix)/adm_local_without_kernel
+admlocalwithoutkerneldir   = $(prefix)/adm_local_without_kernel
 admlocalwithoutkernelm4dir = $(prefix)/adm_local_without_kernel/unix/config_files
 
-dist_admlocalwithoutkernelm4_DATA=\
+dist_admlocalwithoutkernelm4_DATA = \
     ac_cxx_depend_flag.m4 \
     ac_cxx_have_sstream.m4 \
     ac_cxx_namespaces.m4 \
@@ -43,4 +43,8 @@ dist_admlocalwithoutkernelm4_DATA=\
     ltconfig \
     ltmain.sh \
     production.m4 \
-    python.m4
+    python.m4 \
+    check_lam.m4 \
+    check_mpi.m4 \
+    check_mpich.m4 \
+    check_openmpi.m4

@@ -63,5 +63,6 @@ if MED_ENABLE_KERNEL
      TestMEDSPLITTER_LDADD+= -lSALOMEBasics
 endif
 
-salomescript_DATA = testMEDSPLITTER.py
+dist_salomescript_DATA = testMEDSPLITTER.py
+
 UNIT_TEST_PROG = TestMEDSPLITTER

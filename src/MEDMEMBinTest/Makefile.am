@@ -139,3 +139,9 @@ dist_test_GaussLocalization_SOURCES= test_GaussLocalization.cxx
 dist_testAnalFile_SOURCES= testAnalFile.cxx
 dist_test_MEDMEM_MeshingFlica_SOURCES= test_MEDMEM_MeshingFlica.cxx
 dist_testConvertPolygon_SOURCES=testConvertPolygon.cxx
+
+OBSOLETE_FILES = \
+	create_poly2D.c \
+	testAG.cxx
+
+EXTRA_DIST += $(OBSOLETE_FILES)

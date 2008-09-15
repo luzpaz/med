@@ -113,5 +113,11 @@ if MED_ENABLE_KERNEL
 endif
 AM_CPPFLAGS= $(libMEDMEMCppTest_la_CPPFLAGS)
 
-salomescript_DATA = testMEDMEM.py
+dist_salomescript_DATA = testMEDMEM.py
+
 UNIT_TEST_PROG = TestMEDMEM
+
+OBSOLETE_FILES = \
+	TestOpenMED.cxx
+
+EXTRA_DIST += $(OBSOLETE_FILES)

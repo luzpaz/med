@@ -25,10 +25,9 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 # Libraries targets
 lib_LTLIBRARIES= libMED.la
-dist_libMED_la_SOURCES= MedGUI.cxx MedGUI_Selection.cxx
+dist_libMED_la_SOURCES = MedGUI_Selection.h MedGUI.h MedGUI.cxx MedGUI_Selection.cxx
 MOC_FILES= MedGUI_moc.cxx
 nodist_libMED_la_SOURCES= $(MOC_FILES)
-EXTRA_DIST+= MedGUI_Selection.h MedGUI.h 
 
 libMED_la_CPPFLAGS= $(QT_INCLUDES) $(VTK_INCLUDES) @CAS_CPPFLAGS@ $(PYTHON_INCLUDES) \
 	${KERNEL_CXXFLAGS} ${GUI_CXXFLAGS} ${BOOST_CPPFLAGS} \

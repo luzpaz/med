@@ -25,7 +25,7 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 # ===============================================================
 #
 
-dist_salomeres_DATA=\
+dist_salomeres_DATA = \
     MED.config \
     MED_en.xml \
     SalomeApp.xml \
@@ -212,8 +212,5 @@ dist_salomeres_DATA=\
     square2_split1.med \
     square2_split2.med
 
-# the folder for the med files exporting
-# can be changed later
-# medfilesdir = $(prefix)/share/@PACKAGE@/resources/@MODULE_NAME@
-
-nodist_salomeres_DATA=MEDCatalog.xml
+# VSR: little trick to avoid putting if MEDCatalog.xml to the distribution archive
+nodist_salomeres_SCRIPTS = MEDCatalog.xml
