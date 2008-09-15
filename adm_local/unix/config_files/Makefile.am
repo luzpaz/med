@@ -18,13 +18,15 @@
 # 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-dist_admlocalm4_DATA=\
-    check_Med2.m4 \
-    check_Med.m4 \
-    check_metis.m4 \
-    check_scotch.m4 \
-    splitter.m4 \
-    with_Kernel.m4 \
-    ac_check_sizeof_fortran.m4 \
-    med_check_sizeof_medint.m4 \
-    README
+dist_admlocalm4_DATA =		\
+    check_Med2.m4		\
+    check_Med.m4		\
+    check_metis.m4		\
+    check_scotch.m4		\
+    splitter.m4			\
+    with_Kernel.m4		\
+    ac_check_sizeof_fortran.m4	\
+    med_check_sizeof_medint.m4	\
+    check_bft.m4		\
+    check_fvm.m4		\
+    check_libxml.m4
