@@ -456,7 +456,7 @@ inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *Geometri
       for (int itype=0; itype < _numberOfGeometricType; itype++)
 	{
 	  ostringstream typestr;
-	  typestr<<_name<<"_type"<<itype;
+	  typestr<<_name<<"_type"<<_geometricType[itype];
 	  prof_names[itype]=typestr.str();
 	}
       _profilNames=prof_names;

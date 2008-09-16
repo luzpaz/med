@@ -36,6 +36,8 @@
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Support.hxx"
+#include "MEDMEM_Family.hxx"
+#include "MEDMEM_Group.hxx"
 #include "MEDMEM_GaussLocalization.hxx"
 
 namespace MEDMEM {
@@ -904,6 +906,21 @@ template <class T> GENDRIVER * MED_FIELD_RDONLY_DRIVER22<T>::copy(void) const
   return new MED_FIELD_RDONLY_DRIVER22<T>(*this);
 }
 
+/*!
+  In MEDMEM, FIELDs lie on support which can be plain SUPPORT, FAMILY
+  or GROUP, while in MED-file, there is no link between the FAMILY and
+  GROUP notions and the FIELDs. FIELDs lie on profiles.
+  The problem arises from the fact that the MED write driver creates
+  profiles when treating fields that lie on MEDMEM::SUPPORT,
+  MEDMEM_FAMILY or MEDMEM::GROUP. The profile is named after the
+  support name : nameOfSupport_<type_of_geometric_entity>.
+  However, the read driver is unable to link supports and profiles
+  and it recreates a new support that corresponds to the field profile.
+
+  To avoid this support recreation, pass the mesh to the FIELD's
+  constructor, and the field driver will find appropriate FAMILY or GROUP
+  in the mesh and use it for the field.
+ */
 template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   throw (MEDEXCEPTION)
 {
@@ -1443,7 +1460,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
   //MESSAGE ("Index              : "<< index);
   assert(index == totalNumberOfElWg*numberOfComponents);
-  assert(MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues ==  mySupport->getNumberOfElements(MED_ALL_ELEMENTS));
+  assert(MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues == mySupport->getNumberOfElements(MED_ALL_ELEMENTS));
 
   if (anyProfil)
   {
@@ -1473,15 +1490,15 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 // 	cout << "meshNbOfElOfTypeC["<<meshTypeNo<<"]=" << meshNbOfElOfTypeC[meshTypeNo] <<endl;
 
 	// Transformer les numéros locaux d'entités medfichier en numéro global medmémoire
-	for (int i = 0 ; i < profilList[typeNo].size(); i++ ) {
-	// Les numéros des entités commencent à 1 dans MEDfichier comme dans MEDmémoire
-	// meshNbOfElOfTypeC[0]=0 ...meshNbOfEltOfTypeC[meshTypeNo]=
-	// meshNbOfElOfTypeC[meshTypeNo-1]+nbrOfElem of meshTypeNo type
-	// rem1 : Si le meshTypeNo trouvé est 0 (premier type géométrique du maillage
-	// il ne faut pas décaler les numéros du profils qui commencent à 1 dans MEDFICHIER
-	// rem2 : meshNbOfElOfTypeC[NumberOfTypes] ne devrait jamais être utilisé
-	  profilList[typeNo][i]+=meshNbOfElOfTypeC[meshTypeNo];
-	}
+        for (int i = 0; i < profilList[typeNo].size(); i++) {
+          // Les numéros des entités commencent à 1 dans MEDfichier comme dans MEDmémoire
+          // meshNbOfElOfTypeC[0]=0 ...meshNbOfEltOfTypeC[meshTypeNo]=
+          // meshNbOfElOfTypeC[meshTypeNo-1]+nbrOfElem of meshTypeNo type
+          // rem1 : Si le meshTypeNo trouvé est 0 (premier type géométrique du maillage
+          // il ne faut pas décaler les numéros du profils qui commencent à 1 dans MEDFICHIER
+          // rem2 : meshNbOfElOfTypeC[NumberOfTypes] ne devrait jamais être utilisé
+          profilList[typeNo][i]+=meshNbOfElOfTypeC[meshTypeNo];
+        }
       } else {
 	// Créer le profil <MED_ALL> pour ce type géométrique
 	// uniquement pour renseigner le tableau skyline avec des accesseurs directs
@@ -1490,18 +1507,18 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 	// profils sur certains types géométriques alors qu'à la lecture il n'y en avait pas !
 	// Solution : Stocker les noms des profils et les utiliser pour savoir si il y avait ou non
 	//            un profil
-	int pflSize   = meshNbOfElOfType[meshTypeNo];
+        int pflSize = meshNbOfElOfType[meshTypeNo];
 	// profil    = new int[pflSize];
 
-	profilList[typeNo].resize(pflSize);
-	profilSize[typeNo]=pflSize;
+        profilList[typeNo].resize(pflSize);
+        profilSize[typeNo] = pflSize;
 
-	for (int j = 1; j <= pflSize; j++) {
-	  profilList[typeNo][j-1]=meshNbOfElOfTypeC[meshTypeNo] + j ; // index MEDMEM commence à 1
-	}
-	profilNameList[typeNo] = MED_NOPFL; //Information a utiliser pour la sauvegarde : PLUTOT MED_ALL
+        for (int j = 1; j <= pflSize; j++) {
+          profilList[typeNo][j-1] = meshNbOfElOfTypeC[meshTypeNo] + j; // index MEDMEM commence à 1
+        }
+        profilNameList[typeNo] = MED_NOPFL; //Information a utiliser pour la sauvegarde : PLUTOT MED_ALL
       }
-      profilSizeC+=profilList[typeNo].size();
+      profilSizeC += profilList[typeNo].size();
     }
 
     MEDSKYLINEARRAY * skyLine = new MEDSKYLINEARRAY(profilList.size(), profilSizeC );
@@ -1610,7 +1627,96 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
   MED_FIELD_DRIVER<T>::_ptrField->_isRead = true ;
 
-  MED_FIELD_DRIVER<T>::_ptrField->_support=mySupport; //Prévenir l'utilisateur ?
+  bool isFound = false;
+  MESH* aMesh = MED_FIELD_DRIVER<T>::_ptrField->_mesh;
+  if (!haveSupport && aMesh && anyProfil)
+  {
+    int it = -1;
+    for (int typeNo = 0; (typeNo < NumberOfTypes) && (it == -1); typeNo++) {
+      if (strcmp(profilNameList[typeNo].c_str(), MED_NOPFL) != 0)
+        it = typeNo;
+    }
+    // IMP 0019953: link between fields and families for MED 2.2 read driver
+    string aPN = profilNameList[it];
+    MED_EN::medGeometryElement aPT = types[it];
+
+    ostringstream typestr;
+    typestr << "_type" << aPT;
+    string aSuff = typestr.str();
+
+    //- If the field profile name is toto_PFL and a family toto exists,
+    //  the field will point to the corresponding FAMILY object.
+    const vector<FAMILY*> aFams = aMesh->getFamilies(entityType);
+    for (int fi = 0; fi < aFams.size() && !isFound; fi++) {
+      FAMILY* aF = aFams[fi];
+      string aFN_suff = aF->getName() + aSuff;
+      if (aPN == aFN_suff) {
+        isFound = true;
+        //family found
+        MED_FIELD_DRIVER<T>::_ptrField->_support = aF; //Prévenir l'utilisateur ?
+      }
+    }
+    if (!isFound) {
+      // - If no family was found, lookup the groups and if a group toto
+      //   exists, the field will point to the corresponding GROUP object.
+      const vector<GROUP*> aGrps = aMesh->getGroups(entityType);
+      for (int gi = 0; gi < aGrps.size() && !isFound; gi++) {
+        GROUP* aG = aGrps[gi];
+        string aGN_suff = aG->getName() + aSuff;
+        if (aPN == aGN_suff) {
+          isFound = true;
+          //group found
+          MED_FIELD_DRIVER<T>::_ptrField->_support = aG; //Prévenir l'utilisateur ?
+        }
+      }
+    }
+    if (!isFound) {
+      // - If no family or group was found and the
+      //   profile name is xxx_PFL, throw an exception
+      int pos = aPN.rfind(aSuff);
+      if (pos + aSuff.length() - 1 == aPN.length())
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
+                                     << ": Can't find appropriate support (GROUP or FAMILY)"
+                                     << " in mesh " << meshName << " for field " << fieldName
+                                     << ", while one of its profiles " << aPN
+                                     << " was generated from a FAMILY or a GROUP"));
+    }
+    else {
+      // - Check that the found support has correct types
+      //   and number of elements. If not, throw an exception
+      const SUPPORT* aSupp = MED_FIELD_DRIVER<T>::_ptrField->_support;
+      if (aSupp->getNumberOfTypes() != NumberOfTypes)
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
+                                     << meshName << " for field " << fieldName << " by name of profile "
+                                     << aPN << ": different number of types in found support |"
+                                     << aSupp->getNumberOfTypes() << "| and in required |"
+                                     << NumberOfTypes << "|"));
+
+      const MED_EN::medGeometryElement* aTypes = aSupp->getTypes();
+      for (int it = 0; it < NumberOfTypes && isFound; it++)
+      {
+        MED_EN::medGeometryElement aType = aTypes[it];
+        if (aType != types[it])
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
+                                       << meshName << " for field " << fieldName << " by name of profile "
+                                       << aPN << ": geometric type in found support |" << aType
+                                       << "| differs from required type |" << types[it] << "|"));
+
+        if (aSupp->getNumberOfElements(aType) != nbOfElOfType[it])
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
+                                       << meshName << " for field " << fieldName << " by name of profile "
+                                       << aPN << ": number of elements of type " << aType
+                                       << " in found support |" << aSupp->getNumberOfElements(aType)
+                                       << "| differs from required |" << nbOfElOfType[it] << "|"));
+      }
+    }
+  }
+
+  if (!isFound) {
+    // No corresponding support (family or group)
+    // found in the mesh, use the newly created one
+    MED_FIELD_DRIVER<T>::_ptrField->_support = mySupport; //Prévenir l'utilisateur ?
+  }
 
   END_OF();
 }

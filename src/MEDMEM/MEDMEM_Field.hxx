@@ -884,6 +884,10 @@ protected:
   // array of value of type T
   Array *_value ;
 
+  // MESH, to be used for field reading from a file (if desired to link
+  // to existing support instead of new support creation for the field)
+  MESH* _mesh;
+
   // extrema values
   T _vmin;
   T _vmax;
@@ -905,10 +909,11 @@ private:
 public:
   FIELD();
   FIELD(const FIELD &m);
-  FIELD(const SUPPORT * Support, const int NumberOfComponents)  throw (MEDEXCEPTION) ;
-  FIELD( driverTypes driverType,
-	 const string & fileName, const string & fieldDriverName,
-	 const int iterationNumber=-1, const int orderNumber=-1)
+  FIELD(const SUPPORT * Support, const int NumberOfComponents) throw (MEDEXCEPTION);
+  FIELD(driverTypes driverType,
+        const string & fileName, const string & fieldDriverName,
+        const int iterationNumber=-1, const int orderNumber=-1,
+        MESH* mesh = 0)
     throw (MEDEXCEPTION);
   FIELD(const SUPPORT * Support, driverTypes driverType,
 	const string & fileName="", const string & fieldName="",
@@ -928,7 +933,7 @@ public:
   FIELD& operator*=(const FIELD& m);
   FIELD& operator/=(const FIELD& m);
 
-	void applyLin(T a, T b, int icomp);
+  void          applyLin(T a, T b, int icomp);
   static FIELD* add(const FIELD& m, const FIELD& n);
   static FIELD* addDeep(const FIELD& m, const FIELD& n);
   static FIELD* sub(const FIELD& m, const FIELD& n);
@@ -1184,7 +1189,7 @@ for (int i=1; i<=nbelem; i++)
 */
 template <class T, class INTERLACING_TAG>
 FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
-				    const int NumberOfComponents) throw (MEDEXCEPTION) :
+                                 const int NumberOfComponents) throw (MEDEXCEPTION) :
   FIELD_(Support, NumberOfComponents),_value(NULL)
 {
   BEGIN_OF("FIELD<T>::FIELD(const SUPPORT * Support, const int NumberOfComponents)");
@@ -2806,17 +2811,23 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
 }
 
 /*!
-  This constructor, at least, allows to create a FIELD without creating any
+  If the mesh argument is not initialized or passed NULL,
+  this constructor, at least, allows to create a FIELD without creating any
   SUPPORT then without having to load a MESH object, a support is created. It
   provides the meshName related mesh but doesn't not set a mesh in the created
   support.
+  If the passed mesh contains corresponding support, this support will be used
+  for the field. This support will be found in mesh by name of one of profiles,
+  on which the FIELD lays in MED-file. This has sense for the case, then MED-file
+  was created by MEDMEM, and so name of profile contains name of corresponding support.
 */
 template <class T, class INTERLACING_TAG>
 FIELD<T,INTERLACING_TAG>::FIELD(driverTypes driverType,
 				const string & fileName,
 				const string & fieldDriverName,
 				const int iterationNumber,
-				const int orderNumber)
+				const int orderNumber,
+                                MESH* mesh)
   throw (MEDEXCEPTION) :FIELD_()
 {
   int current;
@@ -2825,13 +2836,15 @@ FIELD<T,INTERLACING_TAG>::FIELD(driverTypes driverType,
 
   init();
 
+  _mesh = mesh;
+
   //INITIALISATION DE _valueType DS LE CONSTRUCTEUR DE FIELD_
   ASSERT(FIELD_::_valueType == MED_EN::MED_UNDEFINED_TYPE)
-  FIELD_::_valueType=SET_VALUE_TYPE<T>::_valueType;
+  FIELD_::_valueType = SET_VALUE_TYPE<T>::_valueType;
 
   //INITIALISATION DE _interlacingType DS LE CONSTRUCTEUR DE FIELD_
   ASSERT(FIELD_::_interlacingType == MED_EN::MED_UNDEFINED_INTERLACE)
-  FIELD_::_interlacingType=SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType;
+  FIELD_::_interlacingType = SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType;
 
   _support = (SUPPORT *) NULL;
   // OCC 10/03/2006 -- According to the rules defined with help of 
