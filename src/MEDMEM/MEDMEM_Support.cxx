@@ -384,7 +384,7 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   for (int itype=0; itype < NumberOfGeometricType; itype++)
   {
     ostringstream typestr;
-    typestr<<_name<<"_type"<<itype;
+    typestr<<_name<<"_type"<<_geometricType[itype];
     prof_names[itype]=typestr.str();
   }
   setProfilNames(prof_names);

@@ -244,11 +244,13 @@ void MEDMEMTest::testMeshAndMeshing()
   string tmp_dir  = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filenameout21 = tmp_dir + "/myMeshWrite4_pointe21.med";
+  string filenameout21        = tmp_dir + "/myMeshWrite4_pointe21.med";
+  string filename_profiles_wr = tmp_dir + "/myMedProfilesFieldfile.med";
 
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;
   aRemover.Register(filenameout21);
+  aRemover.Register(filename_profiles_wr);
 
   ////////////
   // TEST 1 //
@@ -1836,10 +1838,84 @@ void MEDMEMTest::testMeshAndMeshing()
   f->read();
   const int *conn=mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_FACE,MED_ALL_ELEMENTS);
   for (int j = 0; j < nFaces; j++) {
-      for (int k = 0; k < 4; k++) {
-        cout << conn[4*j+k] << " ";
-        CPPUNIT_ASSERT_EQUAL(conn[4*j+k], connQuad4[4*j+k]);
-      }
-      cout << endl;
+    for (int k = 0; k < 4; k++) {
+      cout << conn[4*j+k] << " ";
+      CPPUNIT_ASSERT_EQUAL(conn[4*j+k], connQuad4[4*j+k]);
     }
+    cout << endl;
+  }
+
+  //////////////////////////////////////////////////////////
+  // TEST 6: Test Reading of a Field with given Mesh.     //
+  // Group from the Mesh must be taken for Field Support. //
+  //////////////////////////////////////////////////////////
+  {
+    // mesh creation
+    MESHING* mesh_prof = new MESHING();
+    mesh_prof->setName("TESTMESH");
+    mesh_prof->setSpaceDimension(3);
+    mesh_prof->setNumberOfNodes(nNodes);
+    mesh_prof->setCoordinates(3, nNodes, coords, "CARTESIAN", MED_EN::MED_FULL_INTERLACE);
+    mesh_prof->setCoordinatesNames(coordname);
+    mesh_prof->setCoordinatesUnits(coordunit);
+
+    //Cell connectivity info for classical elts
+    //mesh_prof->setNumberOfTypes(1,MED_EN::MED_CELL);
+    //mesh_prof->setTypes(classicalTypesCell,MED_EN::MED_CELL);
+    //mesh_prof->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
+    //mesh_prof->setMeshDimension(3);
+    //mesh_prof->setConnectivity(connHexa8,MED_EN::MED_CELL,MED_EN::MED_HEXA8);
+    mesh_prof->setMeshDimension(2);
+
+    //Face connectivity info for classical elts
+    //mesh_prof->setNumberOfTypes(1,MED_EN::MED_FACE);
+    //mesh_prof->setTypes(classicalTypesFace,MED_EN::MED_FACE);
+    //mesh_prof->setNumberOfElements(nbOfFaceElts,MED_EN::MED_FACE);
+    //mesh_prof->setConnectivity(connQuad4,MED_EN::MED_FACE,MED_EN::MED_QUAD4);
+    mesh_prof->setNumberOfTypes(1,MED_EN::MED_CELL);
+    mesh_prof->setTypes(classicalTypesFace,MED_EN::MED_CELL);
+    mesh_prof->setNumberOfElements(nbOfFaceElts,MED_EN::MED_CELL);
+    mesh_prof->setConnectivity(connQuad4,MED_EN::MED_CELL,MED_EN::MED_QUAD4);
+
+    //Adding some groups on faces
+    GROUP faces_prof;
+    faces_prof.setName("BottomFaces");
+    faces_prof.setMesh(mesh_prof);
+    //faces_prof.setEntity(MED_EN::MED_FACE);
+    faces_prof.setEntity(MED_EN::MED_CELL);
+    faces_prof.setNumberOfGeometricType(1);
+    faces_prof.setGeometricType(bottomTypes);
+    faces_prof.setNumberOfElements(bottomNbOfElts);
+    faces_prof.setNumber(bottomIndex, bottom);
+    mesh_prof->addGroup(faces_prof);
+
+    // Field creation
+    FIELD<double> * field_prof = new FIELD<double>(&faces_prof, 1);
+    field_prof->setName("temperature");
+    field_prof->setComponentName(1,"T");
+    field_prof->setMEDComponentUnit(1,"K");
+    double *tab = (double *)field_prof->getValue();
+    for (int i = 0; i < 2; i++)
+      tab[i] = i*(1.22);
+    field_prof->setTime(12.);
+
+    // Writing...
+    int id_prof = mesh_prof->addDriver(MED_DRIVER, filename_profiles_wr, mesh_prof->getName());
+    mesh_prof->write(id_prof);
+    mesh_prof->rmDriver(id_prof);
+
+    // Field writing
+    id_prof = field_prof->addDriver(MED_DRIVER, filename_profiles_wr, field_prof->getName());
+    field_prof->write(id_prof);
+
+    delete field_prof;
+    delete mesh_prof;
+
+    // Reading...
+    MESH mesh_rd (MED_DRIVER, filename_profiles_wr, "TESTMESH");
+    FIELD<double> field_rd (MED_DRIVER, filename_profiles_wr, "temperature", -1, -1, &mesh_rd);
+    //const vector <GROUP*> groups_rd = mesh_rd.getGroups(MED_EN::MED_FACE);
+    const vector <GROUP*> groups_rd = mesh_rd.getGroups(MED_EN::MED_CELL);
+    CPPUNIT_ASSERT(find(groups_rd.begin(),groups_rd.end(),field_rd.getSupport()) != groups_rd.end());
+  }
 }
