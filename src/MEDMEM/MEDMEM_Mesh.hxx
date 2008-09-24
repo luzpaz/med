@@ -108,6 +108,8 @@ protected :
 
   bool           _isAGrid;      // am I a GRID or not
 
+  map<MED_EN::medEntityMesh,SUPPORT*> _entitySupport;
+
   //-----------------------//
   //   Methods
   //-----------------------//
@@ -263,6 +265,9 @@ public :
 	inline void setConnectivityptr(CONNECTIVITY*);
   virtual SUPPORT *                    getBoundaryElements(MED_EN::medEntityMesh Entity)
 						throw (MEDEXCEPTION);
+  
+  virtual SUPPORT *                    getSupportOnAll(MED_EN::medEntityMesh Entity)
+                                                throw (MEDEXCEPTION);
   // problème avec le maillage dans le support :
   //            le pointeur n'est pas const, mais sa valeur oui. A voir !!! PG
 

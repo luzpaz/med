@@ -1320,6 +1320,29 @@ throw (SALOME::SALOME_Exception)
  * CORBA: 
  */
 //=============================================================================
+SALOME_MED::SUPPORT_ptr MESH_i::getSupportOnAll(SALOME_MED::medEntityMesh entity)
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                              SALOME::INTERNAL_ERROR);
+        try
+        {
+                SUPPORT * myNewSupport = _mesh->getSupportOnAll(convertIdlEntToMedEnt(entity));
+                SUPPORT_i * mySupportI = new SUPPORT_i(myNewSupport);
+                return mySupportI->_this();
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to get the support ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+}
+//=============================================================================
+/*!
+ * CORBA: 
+ */
+//=============================================================================
 SALOME_MED::FIELD_ptr MESH_i::getVolume(SALOME_MED::SUPPORT_ptr mySupport)
 throw (SALOME::SALOME_Exception)
 {
