@@ -42,6 +42,8 @@ DIST_SUBDIRS= adm_local adm_local_without_kernel idl src doc resources bin
 
 DISTCLEANFILES= a.out aclocal.m4 configure 
 
+salomeinclude_DATA = MED_version.h
+
 EXTRA_DIST+= build_configure clean_configure LICENCE INSTALL README
 
 dist-hook:
@@ -50,14 +52,11 @@ dist-hook:
 if MED_ENABLE_SSTREAM
   install-data-local: $(pkgincludedir)/SALOMEconfig.h
 else !MED_ENABLE_SSTREAM
-  install-data-local: $(pkgincludedir)/SALOMEconfig.h $(pkgincludedir)/sstream $(pkgincludedir)/MED_version.h
+  install-data-local: $(pkgincludedir)/SALOMEconfig.h $(pkgincludedir)/sstream
 endif
 
 $(pkgincludedir)/SALOMEconfig.h: ./salome_adm/unix/SALOMEconfig.h
 	cp -f $^ $(pkgincludedir)
 
 $(pkgincludedir)/sstream: ./include/salome/sstream
-	cp -f $^ $(pkgincludedir)
-
-$(pkgincludedir)/MED_version.h: MED_version.h
 	cp -f $^ $(pkgincludedir)
