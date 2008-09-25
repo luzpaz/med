@@ -259,6 +259,12 @@ This enumeration contains a set of elements defining the type of connectivity.
       raises (SALOME::SALOME_Exception);
 
     /*!
+      Returns the %SUPPORT defined on all the element of an Entity.
+    */
+    SUPPORT getSupportOnAll(in medEntityMesh Entity)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
       Returns the %SUPPORT containing the boundary elements
       of the support mySupport3D.
     */

@@ -722,6 +722,52 @@ SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
 */
 
 /*!
+  Method return a reference on a support define on all the element of an entity.
+*/
+
+SUPPORT * MESH::getSupportOnAll(medEntityMesh entity)
+  throw(MEDEXCEPTION)
+{
+  const char * LOC = "MESH::getSupportOnAll : " ;
+  BEGIN_OF(LOC) ;
+  if(entity == MED_ALL_ENTITIES)
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined on entity MED_ALL_ENTITIES !"));
+
+  map<medEntityMesh,SUPPORT*>::const_iterator it =  _entitySupport.find(entity);
+
+  // find support and return is if exists
+  if(it != _entitySupport.end())
+    return (*it).second;
+  else{
+    //build and store and return support
+    SUPPORT * aSupport;
+    list<int> anElementsList;
+    int numberOf = getNumberOfElementsWithPoly(entity, MED_ALL_ELEMENTS);
+    for (int i=1 ; i<numberOf; i++)
+      anElementsList.push_back(i);
+
+    string aSuppName = "SupportOnAll_";
+    switch(entity){
+    case MED_CELL: aSuppName += "Cells";break;
+    case MED_FACE: aSuppName += "Faces";break;
+    case MED_EDGE: aSuppName += "Edges";break;
+    case MED_NODE: aSuppName += "Nodes";break;
+    }
+    aSupport = new SUPPORT((MESH *)this,aSuppName,entity);
+
+    if(entity == MED_NODE){
+      aSupport->fillFromNodeList(anElementsList);
+    }
+    else{
+      aSupport->fillFromElementList(anElementsList);
+    }
+    _entitySupport.insert(make_pair(entity,aSupport));
+    return aSupport;
+  }
+}
+
+
+/*!
   Method that do the same thing as buildSupportOnNodeFromElementList except that a SUPPORT is not created.
  */
 void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT *supportToFill) const throw (MEDEXCEPTION)

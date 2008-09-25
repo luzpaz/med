@@ -1109,6 +1109,8 @@ public :
 
   medGeometryElement getElementTypeWithPoly(medEntityMesh Entity,int Number);
 
+  SUPPORT * getSupportOnAll(medEntityMesh Entity);
+
   std::string getName() const;
   
   %extend {
