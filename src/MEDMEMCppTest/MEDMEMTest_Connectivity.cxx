@@ -539,14 +539,15 @@ void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
     }
 
     // descending connectivity length
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 16, theC->getConnectivityLength
-                                 (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS));
-
+    // 10 faces in 2 pyra
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 10, theC->getConnectivityLength
                                  (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_PYRA5));
-
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  8, theC->getConnectivityLength
+    // 6 faces in 1 hexa
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  6, theC->getConnectivityLength
                                  (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_HEXA8));
+    // 10 + 6 faces
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 16, theC->getConnectivityLength
+                                 (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS));
 
     // descending connectivity index
     const int * descAllIndex = theC->getConnectivityIndex(MED_EN::MED_DESCENDING, MED_EN::MED_CELL);
