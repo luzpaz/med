@@ -21,6 +21,7 @@
 #define MEDMEM_DTREE_HXX
 
 #include "MEDMEM_dTreeSommet.hxx"
+#include <list>
 
 #define DTREE_FANTOME -1
 #define DTREE_RACINE 0
