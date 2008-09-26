@@ -266,6 +266,11 @@ MESH::~MESH() {
   size = _groupEdge.size() ;
   for (int i=0;i<size;i++)
     delete _groupEdge[i] ;
+  
+  map<medEntityMesh,SUPPORT*>::iterator it = _entitySupport.begin();
+  for(;it!=_entitySupport.end();it++)
+    if((*it).second != NULL)
+      delete (*it).second;
 
   MESSAGE("In this object MESH there is(are) " << _drivers.size() << " driver(s)");
 
@@ -647,32 +652,16 @@ SUPPORT * MESH::getSupportOnAll(medEntityMesh entity)
   if(it != _entitySupport.end())
     return (*it).second;
   else{
-    //build and store and return support
-    SUPPORT * aSupport;
-    list<int> anElementsList;
-    int numberOf = getNumberOfElementsWithPoly(entity, MED_ALL_ELEMENTS);
-    for (int i=1 ; i<numberOf; i++)
-      anElementsList.push_back(i);
     
-    string aSuppName = "SupportOnAll_";
-    switch(entity){
-    case MED_CELL: aSuppName += "Cells";break;
-    case MED_FACE: aSuppName += "Faces";break;
-    case MED_EDGE: aSuppName += "Edges";break;
-    case MED_NODE: aSuppName += "Nodes";break;
-    }
-    aSupport = new SUPPORT((MESH *)this,aSuppName,entity);
+    //build, store and return support
+    string aSuppName = "SupportOnAll_"+entNames[entity];
+    SUPPORT * aSupport = new SUPPORT((MESH *)this,aSuppName,entity);
 
-    if(entity == MED_NODE){
-      aSupport->fillFromNodeList(anElementsList);
-    }
-    else{
-      aSupport->fillFromElementList(anElementsList);
-    }
     _entitySupport.insert(make_pair(entity,aSupport));
     return aSupport;
   }
 }
+
 
 /*!
   Method that do the same thing as buildSupportOnNodeFromElementList except that a SUPPORT is not created.
