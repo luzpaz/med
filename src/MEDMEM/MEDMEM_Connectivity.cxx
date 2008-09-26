@@ -730,8 +730,12 @@ int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEnt
       else {
 	for (int i=0; i<_numberOfTypes; i++)
 	  if (_geometricTypes[i]==Type)
-	    return (_count[i+1]-_count[i])*getType(Type).getNumberOfNodes();
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Type not found !"));
+            // issue 19983
+            //return (_count[i+1]-_count[i])*getType(Type).getNumberOfNodes();
+          {
+            const int *ind=Connectivity->getIndex();
+            return ind[_count[i+1]-1]-ind[_count[i]-1];
+          }
       }
     else
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Connectivity not defined !"));
