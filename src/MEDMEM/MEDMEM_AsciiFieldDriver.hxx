@@ -202,7 +202,7 @@ namespace MEDMEM {
 	  for(i=_spaceDimension-1;i>=0;i--)
 	    {
 	      char c=toupper(priority[i]);
-	      if(int(c-'X')>(_spaceDimension-1))
+	      if(int(c-'X')>(_spaceDimension-1) || int(c-'X')<0)
 		throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid priority definition");
 	      _code<<=2;
 	      _code+=c-'X';
@@ -231,12 +231,17 @@ namespace MEDMEM {
 		if (_file.is_open())
 			throw MEDEXCEPTION("ASCII_FIELD_DRIVER::open() : file is already open !");
     _file.open(_fileName.c_str(),ofstream::out | ofstream::app);
+    // for MEDMEMTest_AsciiFieldDriver.cxx:208 :
+    // must throw because the file is opened
+    //CPPUNIT_ASSERT_THROW(aDriver1->setFileName("anyfile2"), MEDEXCEPTION);
+    _status = _file.is_open() ? MED_OPENED : MED_INVALID;
   }
 
   template <class T>
   void ASCII_FIELD_DRIVER<T>::close()
   {
     _file.close();
+    _status = MED_CLOSED;
   }
 
   template <class T>
