@@ -1613,6 +1613,10 @@ void MED_MESH_WRONLY_DRIVER21::write(void) const
   if (_ptrMesh->_spaceDimension == MED_INVALID )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh was not defined before calling write()"));
 
+  if (_meshName.size() > MED_TAILLE_NOM )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh name |"<<_meshName<<
+                                 "| in object driver MESH is longer than " << MED_TAILLE_NOM));
+
   if (_ptrMesh->getIsAGrid())
   {
     if ( writeGRID() != MED_VALID )
