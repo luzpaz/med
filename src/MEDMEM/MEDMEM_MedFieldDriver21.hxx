@@ -111,6 +111,8 @@ public :
 				       )
 			    );
     }
+    if ( MED_FIELD_DRIVER<T>::_status==MED_OPENED )
+      return;
 
     //MED_EN::med_mode_acces mode = dynamic_cast<GENDRIVER*>(this)->getAccessMode();
     //med_2_1::med_mode_acces m21mode = (med_2_1::med_mode_acces)getMedAccessMode(mode,MED_EN::V21);
@@ -1203,12 +1205,12 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 				       <<": Field must be on all entity"
 				       )
                             );
-      MESH * myMesh = mySupport->getMesh() ;
-      if(!myMesh)
-	throw MEDEXCEPTION( LOCALIZED (STRING(LOC)
-				       <<": Mesh in support is null"
-				       )
-                            );
+//       MESH * myMesh = mySupport->getMesh() ;
+//       if(!myMesh)
+// 	throw MEDEXCEPTION( LOCALIZED (STRING(LOC)
+// 				       <<": Mesh in support is null"
+// 				       )
+//                             );
 
       int component_count=MED_FIELD_DRIVER<T>::_ptrField->getNumberOfComponents();
       string   component_name(component_count*MED_TAILLE_PNOM21,' ') ;
@@ -1247,6 +1249,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
       int nbComp ;
       for (int i=1; i<=n; i++) {
 	nbComp = med_2_1::MEDnChamp(MED_FIELD_DRIVER21<T>::_medIdt,i);
+        if ( nbComp < 1 ) continue; // nbComp can be -1
 	compName = new char[MED_TAILLE_PNOM21*nbComp+1];
 	compUnit = new char[MED_TAILLE_PNOM21*nbComp+1];
 	err = med_2_1::MEDchampInfo(MED_FIELD_DRIVER21<T>::_medIdt,i,champName,&type,compName,compUnit,nbComp);
@@ -1299,7 +1302,8 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
         else H5Gclose(gid);
       }
 
-      string MeshName = myMesh->getName() ;
+      MESH * myMesh = mySupport->getMesh();
+      string MeshName = myMesh ? myMesh->getName() : mySupport->getMeshName();
       //MED_EN::medModeSwitch Mode = MED_FIELD_DRIVER<T>::_ptrField->_value->getMode() ;
       // on boucle sur tout les types pour ecrire les tableaux de valeur
       int NumberOfType = mySupport->getNumberOfTypes() ;
