@@ -133,6 +133,8 @@ public :
 				       << "_fileName is |\"\"|, please set a correct fileName before calling open()"
 				       )
 			    );
+    if ( MED_FIELD_DRIVER<T>::_status==MED_OPENED )
+      return;
 
     int accessMode = getMedAccessMode( MED_FIELD_DRIVER<T>::_accessMode, MED_EN::V22 );
     MESSAGE(LOC<<"_fileName.c_str : "<< MED_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< MED_FIELD_DRIVER<T>::_accessMode);
