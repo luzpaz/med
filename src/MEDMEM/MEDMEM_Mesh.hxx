@@ -686,8 +686,10 @@ inline int MESH::getConnectivityLength(MED_EN::medModeSwitch Mode,MED_EN::medCon
     }
   else
     {
-      // size = nbOfElm*(((int) Type)%100);
-      size = _connectivity->getConnectivityLength(ConnectivityType,entity,Type); // issue 19983
+      if ( ConnectivityType==MED_EN::MED_NODAL )
+        size = nbOfElm*(((int) Type)%100);
+      else
+        size = _connectivity->getConnectivityLength(ConnectivityType,entity,Type); // issue 19983
     }
   return size;
 }
