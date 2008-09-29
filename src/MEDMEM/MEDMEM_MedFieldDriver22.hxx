@@ -133,6 +133,8 @@ public :
 				       << "_fileName is |\"\"|, please set a correct fileName before calling open()"
 				       )
 			    );
+    if ( MED_FIELD_DRIVER<T>::_status==MED_OPENED )
+      return;
 
     int accessMode = getMedAccessMode( MED_FIELD_DRIVER<T>::_accessMode, MED_EN::V22 );
     MESSAGE(LOC<<"_fileName.c_str : "<< MED_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< MED_FIELD_DRIVER<T>::_accessMode);
@@ -1498,7 +1500,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
           // il ne faut pas décaler les numéros du profils qui commencent à 1 dans MEDFICHIER
           // rem2 : meshNbOfElOfTypeC[NumberOfTypes] ne devrait jamais être utilisé
           profilList[typeNo][i]+=meshNbOfElOfTypeC[meshTypeNo];
-        }
+	}
       } else {
 	// Créer le profil <MED_ALL> pour ce type géométrique
 	// uniquement pour renseigner le tableau skyline avec des accesseurs directs
@@ -1510,13 +1512,13 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
         int pflSize = meshNbOfElOfType[meshTypeNo];
 	// profil    = new int[pflSize];
 
-        profilList[typeNo].resize(pflSize);
-        profilSize[typeNo] = pflSize;
+	profilList[typeNo].resize(pflSize);
+	profilSize[typeNo] = pflSize;
 
-        for (int j = 1; j <= pflSize; j++) {
-          profilList[typeNo][j-1] = meshNbOfElOfTypeC[meshTypeNo] + j; // index MEDMEM commence à 1
-        }
-        profilNameList[typeNo] = MED_NOPFL; //Information a utiliser pour la sauvegarde : PLUTOT MED_ALL
+	for (int j = 1; j <= pflSize; j++) {
+          profilList[typeNo][j-1] = meshNbOfElOfTypeC[meshTypeNo] + j ; // index MEDMEM commence à 1
+	}
+	profilNameList[typeNo] = MED_NOPFL; //Information a utiliser pour la sauvegarde : PLUTOT MED_ALL
       }
       profilSizeC += profilList[typeNo].size();
     }
