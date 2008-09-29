@@ -1652,9 +1652,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     for (int fi = 0; fi < aFams.size() && !isFound; fi++) {
       FAMILY* aF = aFams[fi];
       string aFN_suff = aF->getName() + aSuff;
-      //string aFN_suff = aF->getName() + "_type";
       if (aPN == aFN_suff) {
-      //if (strncmp(aPN.c_str(), aFN_suff.c_str(), aFN_suff.length()) == 0) {
         isFound = true;
         //family found
         MED_FIELD_DRIVER<T>::_ptrField->_support = aF; //Prévenir l'utilisateur ?
