@@ -129,7 +129,7 @@ public:
   virtual void merge ( const GENDRIVER &genDriver );
 
   // MED  related part
-  virtual void writeFrom      ( void );
+  virtual void writeFrom      ( void ) const;
   virtual void readFileStruct ( void );
   // MESH related Part
   virtual void setMeshName    ( const string & meshName);

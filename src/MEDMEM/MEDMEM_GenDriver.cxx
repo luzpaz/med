@@ -67,7 +67,7 @@ GENDRIVER & MEDMEM::GENDRIVER::operator=(const GENDRIVER &  genDriver)
   return *this;
 }
 
-void GENDRIVER::writeFrom      ( void ) {};
+void GENDRIVER::writeFrom      ( void ) const {};
 void GENDRIVER::readFileStruct ( void ) {};
 
 void   GENDRIVER::setMeshName   (const string & ) {}
