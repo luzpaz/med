@@ -220,7 +220,9 @@ void MEDMEMTest::testAsciiFieldDriver()
   // must throw because the file is not opened
 
   CPPUNIT_ASSERT_THROW(aDriver1->write(), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aDriver1->close(), MEDEXCEPTION);
+
+  //CPPUNIT_ASSERT_THROW(aDriver1->close(), MEDEXCEPTION);
+  CPPUNIT_ASSERT_NO_THROW(aDriver1->close()); // do not make troubles to the user
 
   // check priority definition
   int spaceDimension = aMesh->getSpaceDimension();

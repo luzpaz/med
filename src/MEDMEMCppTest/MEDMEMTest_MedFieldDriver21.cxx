@@ -279,15 +279,15 @@ void MEDMEMTest::testMedFieldDriver21()
   CPPUNIT_ASSERT_THROW(aInvalidMedWrFieldDriver21_2->open(), MEDEXCEPTION);
 
   ///////////////////////////////////////////////////////
-  //  TEST3: Writing field in empty file without mesh  //
+  //  TEST3: Writing field in empty file without mesh  // -- no problem
   ///////////////////////////////////////////////////////
-  //Creation Invalid Write Only MedFieldDriver21
+  //Creation Write Only MedFieldDriver21
    MED_FIELD_WRONLY_DRIVER21<int> *aInvalidMedWrFieldDriver21_3 =
      new MED_FIELD_WRONLY_DRIVER21<int>(emptyfile_wr, aField);
 
   aInvalidMedWrFieldDriver21_3->open();
   //#ifdef ENABLE_FAULTS
-  CPPUNIT_ASSERT_THROW(aInvalidMedWrFieldDriver21_3->write(), MEDEXCEPTION);
+  CPPUNIT_ASSERT_NO_THROW(aInvalidMedWrFieldDriver21_3->write());
   //=>Segmentation fault in this case
   //#endif
 
@@ -295,13 +295,13 @@ void MEDMEMTest::testMedFieldDriver21()
   //  TEST4: Writing field in the other file  //
   //////////////////////////////////////////////
 
-  //Creation Invalid Write Only MedFieldDriver21
+  //Creation Write Only MedFieldDriver21
   MED_FIELD_WRONLY_DRIVER21<int> *aInvalidMedWrFieldDriver21_4 =
     new MED_FIELD_WRONLY_DRIVER21<int>(other_file_wr, aField);
    aInvalidMedWrFieldDriver21_4->open();
   //#ifdef ENABLE_FAULTS
-  CPPUNIT_ASSERT_THROW(aInvalidMedWrFieldDriver21_4->write(), MEDEXCEPTION);
-	aInvalidMedWrFieldDriver21_4->close();
+  CPPUNIT_ASSERT_NO_THROW(aInvalidMedWrFieldDriver21_4->write());
+  aInvalidMedWrFieldDriver21_4->close();
   //=>Segmentation fault in this case
   //#endif
 
@@ -361,9 +361,12 @@ void MEDMEMTest::testMedFieldDriver21()
   CPPUNIT_ASSERT_EQUAL(fieldname_cpy, aMedWrFieldDriver21->getFieldName());
 
   // there must be exception as mesh is not yet read
-  CPPUNIT_ASSERT_THROW(aMedWrFieldDriver21->write(),MEDEXCEPTION);
+  // !!!!!!! mesh is not needed for writing !!!!!!!
+  //CPPUNIT_ASSERT_THROW(aMedWrFieldDriver21->write(),MEDEXCEPTION);
 
   try {
+    aMedWrFieldDriver21->write();
+
     MESH* aMesh = new MESH();
     aMesh->setName("maa1");
     MED_MESH_RDONLY_DRIVER aMeshDriver (filename_rd, aMesh);
@@ -565,7 +568,7 @@ void MEDMEMTest::testMedFieldDriver21()
   //Test read() method
 	
   aMedRdWrFieldDriver21->setFieldName(fieldnameDouble);
-	aMedRdWrFieldDriver21->open();
+  aMedRdWrFieldDriver21->open(); 
   try
   {
     aMedRdWrFieldDriver21->read();
@@ -621,7 +624,7 @@ void MEDMEMTest::testMedFieldDriver21()
   MED_FIELD_RDWR_DRIVER21<double> aMedRdWrFieldDriver21Cpy_1;
 
   //Test (void operator =) defined in GENDRIVER class
-  //aMedRdWrFieldDriver21Cpy_1 = *aMedRdWrFieldDriver21;
+  aMedRdWrFieldDriver21Cpy_1 = *aMedRdWrFieldDriver21;
 
   //Test (bool operator ==) defined in GENDRIVER class
   CPPUNIT_ASSERT(aMedRdWrFieldDriver21Cpy_1.GENDRIVER::operator==(*aMedRdWrFieldDriver21));

@@ -129,14 +129,15 @@ void MEDMEMTest::testMedMedDriver21() {
   CPPUNIT_ASSERT(aMedMedRdDriver21);
 
   //Trying read mesh from file, if file is not open
+  // !!!!!!!! Med driver does NOT NEED open() before read() but only before readFileStruct() !!!!
   //#ifdef  ENABLE_FORCED_FAILURES
   //CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->read(), MEDEXCEPTION);
-  CPPUNIT_ASSERT_NO_THROW(aMedMedRdDriver21->read());
+  //CPPUNIT_ASSERT_NO_THROW(aMedMedRdDriver21->read());
   // (BUG) No exception in this case.
+  // so here everything is read
   //#endif
 
-  //CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->readFileStruct(),MEDEXCEPTION);
-  CPPUNIT_ASSERT_NO_THROW(aMedMedRdDriver21->readFileStruct());
+  CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->readFileStruct(),MEDEXCEPTION);
 
   //Test open() method
   try
@@ -259,19 +260,21 @@ void MEDMEMTest::testMedMedDriver21() {
 
 
   //Trying write mesh to file, if file is not open
+  // !!!!!!!! Med driver does NOT NEED open() before neither writeFrom() nor before write() !!!!
   //#ifdef ENABLE_FORCED_FAILURES
-  CPPUNIT_ASSERT_THROW(aMedMedWrDriver21->writeFrom(),MEDEXCEPTION);
+  //CPPUNIT_ASSERT_THROW(aMedMedWrDriver21->writeFrom(),MEDEXCEPTION);
   // (BUG) No exception in this case
   //#endif
 
   //#ifdef  ENABLE_FAULTS
-  CPPUNIT_ASSERT_THROW(aMedMedWrDriver21->write(), MEDEXCEPTION);
+  //CPPUNIT_ASSERT_THROW(aMedMedWrDriver21->write(), MEDEXCEPTION);
   //(BUG) => Segmentation fault
   //#endif
 
   //Test open() method
   try
   {
+    // (not necessary)
     aMedMedWrDriver21->open();
   }
   catch(MEDEXCEPTION &e)
@@ -285,7 +288,7 @@ void MEDMEMTest::testMedMedDriver21() {
 
   //Trying open() file twice
   //#ifdef  ENABLE_FORCED_FAILURES
-  CPPUNIT_ASSERT_THROW(aMedMedWrDriver21->open(),MEDEXCEPTION);
+  CPPUNIT_ASSERT_NO_THROW(aMedMedWrDriver21->open());
   //(BUG) No exception in this case.
   //#endif
 
@@ -380,21 +383,26 @@ void MEDMEMTest::testMedMedDriver21() {
   CPPUNIT_ASSERT(aMedMedRdWrDriver21);
 
   //Trying read MED from file if it is not open
+  // !!!!!!!! Med driver does NOT NEED open() before read() but only before readFileStruct() !!!!
   //#ifdef  ENABLE_FORCED_FAILURES
-  CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->read(), MEDEXCEPTION);
+  //CPPUNIT_ASSERT_THROW(aMedMedRdWrDriver21->read(), MEDEXCEPTION);
   // (BUG) No exception in this case.
   //#endif
 
-  CPPUNIT_ASSERT_THROW(aMedMedRdDriver21->readFileStruct(),MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aMedMedRdWrDriver21->readFileStruct(),MEDEXCEPTION);
 
   //Trying write mesh to file, if file is not open
+  // !!!!!!!! Med driver does NOT NEED open() before writeFrom() but only before write() !!!!
   //#ifdef ENABLE_FORCED_FAILURES
-  CPPUNIT_ASSERT_THROW(aMedMedRdWrDriver21->writeFrom(),MEDEXCEPTION);
+  //CPPUNIT_ASSERT_THROW(aMedMedRdWrDriver21->writeFrom(),MEDEXCEPTION);
+  CPPUNIT_ASSERT_NO_THROW(aMedMedRdWrDriver21->writeFrom());
   // (BUG) => No exception in this case
   //#endif
 
   //#ifdef ENABLE_FAULTS
-  CPPUNIT_ASSERT_THROW(aMedMedRdWrDriver21->write(), MEDEXCEPTION);
+  // !!!!!!! It does not throught since nothing has been yet read, so no attempts to write
+  //CPPUNIT_ASSERT_THROW(aMedMedRdWrDriver21->write(),MEDEXCEPTION);
+  CPPUNIT_ASSERT_NO_THROW(aMedMedRdWrDriver21->write());
   //(BUG) => Crash
   //#endif
 
@@ -413,8 +421,9 @@ void MEDMEMTest::testMedMedDriver21() {
   }
 
   //Trying open() file twice
+  //!!!! do not make troubles for the user
   //#ifdef  ENABLE_FORCED_FAILURES
-  CPPUNIT_ASSERT_THROW(aMedMedRdWrDriver21->open(),MEDEXCEPTION);
+  //CPPUNIT_ASSERT_THROW(aMedMedRdWrDriver21->open(),MEDEXCEPTION);
   //(BUG) No exception in this case.
   //#endif
 
