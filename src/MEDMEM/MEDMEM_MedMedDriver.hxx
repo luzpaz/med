@@ -82,6 +82,7 @@ public :
   virtual void writeFrom      ( void ) const = 0 ;
   virtual void read           ( void ) = 0 ;
   virtual void readFileStruct ( void ) = 0 ;
+  virtual void setFileName ( const string & fileName) {_concreteMedDrv->setFileName(fileName); }
 
 protected:
   virtual GENDRIVER * copy ( void ) const = 0 ;
