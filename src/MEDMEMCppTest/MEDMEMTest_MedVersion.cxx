@@ -67,7 +67,7 @@ void MEDMEMTest::testMedVersion()
 
   try
   {
-    CPPUNIT_ASSERT_EQUAL(med_2_1::MED_REMP/*ECRI*/,
+    CPPUNIT_ASSERT_EQUAL(med_2_1::MED_ECRI/*REMP*/,
                          (med_2_1::med_mode_acces)getMedAccessMode(RDWR,myFileVersion));
   }
   catch(MEDEXCEPTION &e)

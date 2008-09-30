@@ -280,8 +280,7 @@ void MEDMEMTest::testMedMeshDriver21()
 
   //Trying write mesh to file with very long name
   aWrDriver21->setMeshName(longmeshname);
-  //CPPUNIT_ASSERT_THROW(aWrDriver21->write(), MEDEXCEPTION);
-  CPPUNIT_ASSERT_NO_THROW(aWrDriver21->write());
+  CPPUNIT_ASSERT_THROW(aWrDriver21->write(), MEDEXCEPTION);
   //No exception in this case
   //#endif
 
@@ -394,7 +393,7 @@ void MEDMEMTest::testMedMeshDriver21()
 
   //#ifdef ENABLE_FORCED_FAILURES
   //Test case: trying open file secondary.
-	//  CPPUNIT_ASSERT_THROW(aRdWrDriver21->open(), MEDEXCEPTION);
+  CPPUNIT_ASSERT_NO_THROW(aRdWrDriver21->open());
   //This case is not work, seems it BUG
   //#endif
 
@@ -426,8 +425,19 @@ void MEDMEMTest::testMedMeshDriver21()
 
   CPPUNIT_ASSERT_EQUAL(meshname, aRdWrDriver21->getMeshName());
 
-  CPPUNIT_ASSERT_THROW(aRdWrDriver21->read(),MEDEXCEPTION);
-  
+  // Test read() method
+  try
+  {
+    aRdWrDriver21->read();
+  }
+  catch(MEDEXCEPTION &e)
+    {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
 
   //Trying read mesh from file, if mesh name is not set, i.e. empty
   //#ifdef ENABLE_FORCED_FAILURES

@@ -279,7 +279,7 @@ void MEDMEMTest::testMedFieldDriver22()
   ///////////////////////////////////////////////////////
   //  TEST3: Writing field in empty file without mesh  //
   ///////////////////////////////////////////////////////
-  //Creation Invalid Write Only MedFieldDriver22
+  //Creation Write Only MedFieldDriver22
    MED_FIELD_WRONLY_DRIVER22<int> *aInvalidMedWrFieldDriver22_3 =
      new MED_FIELD_WRONLY_DRIVER22<int>(emptyfile_wr, aField);
 
