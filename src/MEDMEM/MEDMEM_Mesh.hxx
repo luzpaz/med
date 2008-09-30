@@ -354,9 +354,21 @@ inline void MESH::write(const GENDRIVER & genDriver)
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
+
+      // EAP for MEDMEMTest_Med.cxx:305 :
+      // CPPUNIT_ASSERT_NO_THROW(myMed->writeFrom(idMedV21_from));
+      // CPPUNIT_ASSERT(access(filenameout21_from.data(), F_OK) != 0);
+      string myDrvName = _drivers[index]->getFileName();
+      string otherName = genDriver.getFileName();
+      if ( !otherName.empty() )
+        _drivers[index]->setFileName( otherName );
+      // end EAP for MEDMEMTest_Med.cxx:305
+
       _drivers[index]->open();
       _drivers[index]->write();
       _drivers[index]->close();
+
+      _drivers[index]->setFileName( myDrvName );// EAP for MEDMEMTest_Med.cxx:305
       // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
     }
 
