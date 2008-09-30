@@ -243,6 +243,7 @@ public:
   void open();
   void close();
   virtual void merge ( const GENDRIVER& driver );
+  virtual void setFileName ( const string & fileName) {_concreteMeshDrv->setFileName(fileName); }
 protected:
   GENDRIVER * _concreteMeshDrv;
 //   int getCOORDINATE();
@@ -269,6 +270,7 @@ public :
   void open();
   void close();
   virtual void merge ( const GENDRIVER& driver );
+  virtual void setFileName ( const string & fileName) {_concreteMeshDrv->setFileName(fileName); }
 protected:
   GENDRIVER * _concreteMeshDrv;
 //   int writeCoordinates    ()                           const;
@@ -294,6 +296,7 @@ public :
   void open();
   void close();
   virtual void merge ( const GENDRIVER& driver );
+  virtual void setFileName ( const string & fileName) {_concreteMeshDrv->setFileName(fileName); }
 protected:
   GENDRIVER * _concreteMeshDrv;
 //   int getCOORDINATE();

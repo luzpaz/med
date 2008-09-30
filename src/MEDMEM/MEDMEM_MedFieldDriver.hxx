@@ -292,6 +292,7 @@ public :
   virtual void close() { _concreteFieldDrv->close(); }
   virtual void   setFieldName(const string & fieldName) { _concreteFieldDrv->setFieldName(fieldName); }
   virtual string getFieldName() const { return MED_FIELD_DRIVER<T>::getFieldName(); }
+  virtual void setFileName ( const string & fileName) {_concreteFieldDrv->setFileName(fileName); }
   
 private:
   virtual GENDRIVER * copy ( void ) const { return new MED_FIELD_RDONLY_DRIVER<T>(*this); }
@@ -316,6 +317,7 @@ public :
   virtual void close() { _concreteFieldDrv->close(); }
   virtual void   setFieldName(const string & fieldName) { _concreteFieldDrv->setFieldName(fieldName); }
   virtual string getFieldName() const { return MED_FIELD_DRIVER<T>::getFieldName(); }
+  virtual void setFileName ( const string & fileName) {_concreteFieldDrv->setFileName(fileName); }
 private:
   virtual GENDRIVER * copy ( void ) const { return new MED_FIELD_WRONLY_DRIVER<T>(*this); }
 protected:
@@ -343,6 +345,7 @@ public:
   virtual void close() { _concreteFieldDrv->close(); }
   virtual void   setFieldName(const string & fieldName) { _concreteFieldDrv->setFieldName(fieldName); }
   virtual string getFieldName() const { return MED_FIELD_DRIVER<T>::getFieldName(); }
+  virtual void setFileName ( const string & fileName) {_concreteFieldDrv->setFileName(fileName); }
 private:
   virtual GENDRIVER * copy ( void ) const { return new MED_FIELD_RDWR_DRIVER<T>(*this); }
 protected:

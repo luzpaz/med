@@ -141,7 +141,7 @@ public:
   void   setId       ( int id = MED_INVALID );
   int    getId       ( void ) const ;
   string getFileName () const;
-  void   setFileName ( const string & fileName);
+  virtual void setFileName ( const string & fileName);
   virtual MED_EN::med_mode_acces getAccessMode() const;
   driverTypes getDriverType() const { return _driverType; }
 };
