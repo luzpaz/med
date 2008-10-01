@@ -56,7 +56,7 @@ _libMedCorba_Swig_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
 	-I$(srcdir)/../MEDMEM_I -I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDMEM_SWIG -I$(srcdir)/../MED -I$(srcdir)/../MEDWrapper/V2_1/Core \
 	-I$(srcdir)/../INTERP_KERNEL -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl
 _libMedCorba_Swig_la_LDFLAGS  = -module $(PYTHON_LIBS) $(MED2_LIBS) $(HDF5_LIBS)  ${KERNEL_LDFLAGS} -lSALOMELocalTrace \
-	../MEDMEM_I/libMEDMEMImpl.la ../MEDMEM/libmedmem.la ../MED/libMEDEngine.la
+	../MEDMEM_I/libMEDMEMImpl.la ../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la ../MED/libMEDEngine.la
 ###  ../MEDMEM_SWIG/_libMEDMEM_Swig.la
 
 dist_salomescript_DATA   = medcorba_test.py batchmode_medcorba_test.py batchmode_medcorba_test1.py
