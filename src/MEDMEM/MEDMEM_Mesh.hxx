@@ -58,7 +58,7 @@ class GROUP;
 class SUPPORT;
 class MESH;
 
-ostream & operator<<(ostream &os, const MESH &my);
+MEDMEM_EXPORT ostream & operator<<(ostream &os, const MESH &my);
 
 class MEDMEM_EXPORT MESH : public RCBASE
 {
@@ -156,7 +156,7 @@ public :
   MESH( driverTypes driverType, const string & fileName="",
 	const string & meshName="") throw (MEDEXCEPTION);
   virtual ~MESH();
-  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, const MESH &my);
+  friend ostream & operator<<(ostream &os, const MESH &my);
   virtual void printMySelf(ostream &os) const;
 
   int  addDriver(driverTypes driverType,

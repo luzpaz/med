@@ -35,8 +35,8 @@
 */
 namespace MEDMEM {
   class FAMILY;
-  ostream & operator<<(ostream &os, FAMILY &my);
-  ostream & operator<<(ostream &os, const FAMILY &my) ;
+  MEDMEM_EXPORT ostream & operator<<(ostream &os, FAMILY &my);
+  MEDMEM_EXPORT ostream & operator<<(ostream &os, const FAMILY &my) ;
 
 class MEDMEM_EXPORT FAMILY : virtual public SUPPORT
 {
@@ -124,8 +124,8 @@ public:
 
   bool build(MED_EN::medEntityMesh Entity,int **FamilyNumber);
 
-  // Il faudrait mettre en cohérence les méthodes set
-  // avec l'opérateur d'affection ! Rmq from EF !!!
+  // Il faudrait mettre en cohÃ©rence les mÃ©thodes set
+  // avec l'opÃ©rateur d'affection ! Rmq from EF !!!
 
   inline void setIdentifier             (int Identifier);        
   inline void setNumberOfAttributes     (int NumberOfAttribute);
@@ -190,7 +190,7 @@ inline void FAMILY::setAttributesValues(int * AttributeValue)
 inline void FAMILY::setAttributesDescriptions(string * AttributeDescription) 
 //--------------------------------------------------------------------------
 { 
-  //_attributeDescription = AttributeDescription ; 
+    //_attributeDescription = AttributeDescription ; 
   //_attributeDescription.setShallowAndOwnership(AttributeDescription) ;
   int nbAttr = getNumberOfAttributes();
   if(nbAttr<1) {
@@ -216,7 +216,7 @@ inline void FAMILY::setNumberOfGroups(int NumberOfGroups)
 //----------------------------------------------------
   inline void FAMILY::setGroupsNames(string * GroupName, bool giveOwnership) 
 //----------------------------------------------------
-{
+{ 
   // SKL, CPP TESTS: _groupName is no more PointerOf(string) but vector<string>
 //   if (giveOwnership)
 //     _groupName.setShallowAndOwnership(GroupName);
@@ -239,7 +239,7 @@ inline void FAMILY::setNumberOfGroups(int NumberOfGroups)
     delete [] GroupName;
   }
   else {
-    //_groupName = GroupName ; 
+    	//_groupName = GroupName ; 
     //_groupName.set(_numberOfGroup, GroupName) ;
     _groupName.resize(nbGr);
     for(int i=0; i<nbGr; i++) {

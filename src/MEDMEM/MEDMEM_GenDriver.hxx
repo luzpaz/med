@@ -44,7 +44,7 @@ namespace MEDMEM {
                  NO_DRIVER = 255 } driverTypes;
 
   class GENDRIVER;
-  ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
+  MEDMEM_EXPORT ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
 
   class MEDMEM_EXPORT GENDRIVER {
 

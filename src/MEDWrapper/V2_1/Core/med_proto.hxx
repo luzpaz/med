@@ -20,21 +20,13 @@
 #define MED_PROTO_H
 
 #ifdef WNT
- #if defined MEDWRAPPER_V2_1_CORE_EXPORTS
-  #if defined WIN32
-   #define MEDWRAPPER_V2_1_CORE_EXPORT __declspec( dllexport )
-  #else
-   #define MEDWRAPPER_V2_1_CORE_EXPORT
-  #endif
- #else
-  #if defined WIN32
-   #define MEDWRAPPER_V2_1_CORE_EXPORT __declspec( dllimport )
-  #else
-   #define MEDWRAPPER_V2_1_CORE_EXPORT
-  #endif
- #endif
+# if defined MEDWRAPPER_V2_1_CORE_EXPORTS
+#  define MEDWRAPPER_V2_1_CORE_EXPORT __declspec( dllexport )
+# else
+#  define MEDWRAPPER_V2_1_CORE_EXPORT __declspec( dllimport )
+# endif
 #else
- #define MEDWRAPPER_V2_1_CORE_EXPORT
+# define MEDWRAPPER_V2_1_CORE_EXPORT
 #endif
 
 /* Interface de l'API MED */
@@ -219,7 +211,7 @@ MEDelementsLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mod
 
 /* Routines de haut niveau    */
 
-/*(? On enlève le reste ?)*/
+/*(? On enlÃ¨ve le reste ?)*/
 
 MEDWRAPPER_V2_1_CORE_EXPORT extern med_err
 MEDfamMaaInfo(med_idt fid,char *maa,med_int *nfam,med_int *nattc,
@@ -254,7 +246,7 @@ MEDnValProfil(med_idt fid, char *nom);
 MEDWRAPPER_V2_1_CORE_EXPORT extern med_err 
 MEDprofilLire(med_idt fid, med_int *pflval, char *nom);
 
-/* Routines concernant les pas de temps/ numéros d'ordre */
+/* Routines concernant les pas de temps/ numÃ©ros d'ordre */
 
 MEDWRAPPER_V2_1_CORE_EXPORT extern med_int
 MEDnPasdetemps(med_idt fid,char *cha,med_entite_maillage type_ent, 

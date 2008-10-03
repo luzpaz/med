@@ -24,35 +24,35 @@
 /* CHAINES DE CARACTERES FORTRAN => C */
 namespace med_2_1{
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 char *_MED1cstring(char *chaine,int longueur_reelle,int longueur_fixee);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 char *_MED2cstring(char *chaine, int longueur);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDcstringFree(char *chaine);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDfstring(char *chaine, med_int longueur_fixee);
 
 /* Noms associes aux objets MED */
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDnomEntite(char *nom_ent,med_entite_maillage type_ent);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDnomGeometrie(char *nom_geo,med_geometrie_element type_geo);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDparametresGeometrie(med_entite_maillage type_ent, 
 			       med_geometrie_element type_geo, int *dim, int *nnoe,
 			       int *ndes);
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDnomDataset(char *nom_dataset,med_table quoi,
 		       med_connectivite type_conn);
 
 /* Geometrie des objets MED */
-extern 
+MEDWRAPPER_V2_1_CORE_EXPORT extern 
 med_err _MEDGeometrieElement(med_geometrie_element typ_geo[],
 			     med_entite_maillage typ_ent);
 

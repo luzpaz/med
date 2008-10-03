@@ -24,95 +24,95 @@
 namespace med_2_1{
 
 /* Gestion des fichiers HDF */
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_idt _MEDfichierCreer(char *nom);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_idt _MEDfichierOuvrir(char *nom,med_mode_acces mode);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDfichierFermer(med_idt fid);
 
 
 /* Gestion des datagroups HDF */
-extern 
+MEDWRAPPER_V2_1_CORE_EXPORT extern 
 med_idt _MEDdatagroupCreer(med_idt pid, char *nom);
 
-extern 
+MEDWRAPPER_V2_1_CORE_EXPORT extern 
 med_idt _MEDdatagroupOuvrir(med_idt pid, char *nom);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDdatagroupFermer(med_idt id);
 
 
 /* Gestion des datasets HDF */
 
-extern 
+MEDWRAPPER_V2_1_CORE_EXPORT extern 
 med_idt _MEDdatasetOuvrir(med_idt pid,char *nom);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDdatasetFermer(med_idt id);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDdatasetNumEcrire (med_idt pere,char *nom, med_type_champ type,
 			     med_mode_switch interlace, med_size nbdim, med_size fixdim, 
 			     med_size psize, med_ssize * profil, med_int ngauss,
 			      med_size *size,  unsigned char *val, med_mode_acces mode);
 
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 			   med_mode_switch interlace, med_size nbdim, med_size fixdim, 
 			   med_size psize, med_ssize * pfltab, med_int ngauss,
 			   unsigned char *val);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDdatasetStringEcrire(med_idt pere,char *nom,med_size *dimd,
 				char *val, med_mode_acces mode);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDdatasetStringLire(med_idt pere,char *nom,char *val);
 
 /* Gestion des attributs HDF */
-extern 
+MEDWRAPPER_V2_1_CORE_EXPORT extern 
 med_idt _MEDattrOuvrir(med_idt pid,char * nom);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDattrFermer(med_idt id);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDattrNumEcrire(med_idt pere,med_type_champ type,char *nom,unsigned char *val,med_mode_acces mode);
 
 #define _MEDattrEntierEcrire(w,x,y,z)  _MEDattrNumEcrire(w,MED_INT   ,x,(unsigned char *) y,z)
 #define _MEDattrFloatEcrire(w,x,y,z)   _MEDattrNumEcrire(w,MED_REEL64,x,(unsigned char *) y,z)
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDattrNumLire(med_idt pere,med_type_champ type,char *nom,unsigned char *val);
 
 #define _MEDattrEntierLire(x,y,z) _MEDattrNumLire(x,MED_INT   ,y,(unsigned char*)z)
 #define _MEDattrFloatLire(x,y,z)  _MEDattrNumLire(x,MED_REEL64,y,(unsigned char*)z)
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDattrStringEcrire(med_idt pere,char *nom,int longueur,char *val,med_mode_acces mode);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDattrStringLire(med_idt pere,char *nom,int longueur,char *val);
 
 
 /* Divers */
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDindiceInfo(med_idt id, const char *nom, void *donnees);
 
-extern
+MEDWRAPPER_V2_1_CORE_EXPORT extern
 med_err _MEDindiceNum(med_idt id,const char *nom, void *donnees);
 
-extern  
+MEDWRAPPER_V2_1_CORE_EXPORT extern  
 med_err _MEDobjetIdentifier(med_idt fid,char *chemin,int indice,void *nom);
 
-extern 
+MEDWRAPPER_V2_1_CORE_EXPORT extern 
 med_err _MEDnObjets(med_idt fid,char *chemin,int *n);
 
-extern 
+MEDWRAPPER_V2_1_CORE_EXPORT extern 
 void _MEDmodeErreurVerrouiller(); 
 
 }
