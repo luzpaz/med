@@ -111,58 +111,61 @@ using namespace std;
 					cout << flush ;\
 				}
 
-# ifdef _DEBUG_
+# ifdef _DEBUG_ | _DEBUG
 
 /* --- the following MACROS are useful at debug time --- */
 
-# define HERE {cout<<flush ; cerr << "- Trace " << __FILE__ << " [" << __LINE__ << "] : " << flush ;}
-# define SCRUTE(var) {HERE ; cerr << #var << "=" << var << endl ;}
-# define MESSAGE(chain) {HERE ; cerr << chain << endl ;}
-# define INTERRUPTION(code) {HERE ; cerr << "INTERRUPTION return code= " << code << endl ; exit(code) ;}
+#  define HERE {cout<<flush ; cerr << "- Trace " << __FILE__ << " [" << __LINE__ << "] : " << flush ;}
+#  define SCRUTE(var) {HERE ; cerr << #var << "=" << var << endl ;}
+#  define MESSAGE(chain) {HERE ; cerr << chain << endl ;}
+#  define INTERRUPTION(code) {HERE ; cerr << "INTERRUPTION return code= " << code << endl ; exit(code) ;}
 
-# ifndef ASSERT
-# define ASSERT(condition) if (!(condition)){ HERE ; cerr << "CONDITION " << #condition << " NOT VERIFIED"<< endl ; INTERRUPTION(1) ;}
-# endif /* ASSERT */
-#define REPERE {cout<<flush ; cerr << "   --------------" << endl << flush ;}
-#define BEGIN_OF(chain) const char* __LOC = chain; {REPERE ; HERE ; cerr << "Begin of: " << __LOC << endl ; REPERE ; }
-#define END_OF() {REPERE ; HERE ; cerr << "Normal end of: " << __LOC << endl ; REPERE ; }
+#  ifndef ASSERT
+#   define ASSERT(condition) if (!(condition)){ HERE ; cerr << "CONDITION " << #condition << " NOT VERIFIED"<< endl ; INTERRUPTION(1) ;}
+#  endif /* ASSERT */
+#  define REPERE {cout<<flush ; cerr << "   --------------" << endl << flush ;}
+#  define BEGIN_OF(chain) const char* __LOC = chain; {REPERE ; HERE ; cerr << "Begin of: " << __LOC << endl ; REPERE ; }
+#  define END_OF() {REPERE ; HERE ; cerr << "Normal end of: " << __LOC << endl ; REPERE ; }
 //#define BEGIN_OF(chain) {REPERE ; HERE ; cerr << "Begin of: " << chain << endl ; REPERE ; }
 //#define END_OF(chain) {REPERE ; HERE ; cerr << "Normal end of: " << chain << endl ; REPERE ; }
-
-
-
 # else /* ifdef _DEBUG_*/
-# define HERE
-# define SCRUTE(var) {}
-# define MESSAGE(chain) {}
-# define INTERRUPTION(code) {}
+#  define HERE
+#  define SCRUTE(var) {}
+#  define MESSAGE(chain) {}
+#  define INTERRUPTION(code) {}
 
-# ifndef ASSERT
-# define ASSERT(condition) {}
-# endif /* ASSERT */
+#  ifndef ASSERT
+#   define ASSERT(condition) {}
+#  endif /* ASSERT */
 
-#define REPERE
-#define BEGIN_OF(chain) {}
+#  define REPERE
+#  ifdef WIN32
+#   define BEGIN_OF(chain) const char* __LOC;
+#  else
+#   define BEGIN_OF(chain) {}
+#  endif //WIN32
 //#define END_OF(chain) {}
-#define END_OF() {}
-
-#endif
+#  define END_OF() {}
+# endif
 
 #else
 // #ifdef _SALOME
 
-#include <utilities.h>
+# include <utilities.h>
 
-#undef BEGIN_OF
-#undef END_OF
-# ifdef _DEBUG_
-#define BEGIN_OF(msg) const char* __LOC = msg; {MESS_BEGIN(REPERE) << "Begin of: "      << __LOC << MESS_END} 
-#define END_OF()   {MESS_BEGIN(REPERE) << "Normal end of: " << __LOC << MESS_END} 
-#else
-#define BEGIN_OF(msg) {}
-#define END_OF() {}
-#endif
-
+# undef BEGIN_OF
+# undef END_OF
+# ifdef _DEBUG_ | _DEBUG
+#  define BEGIN_OF(msg) const char* __LOC = msg; {MESS_BEGIN(REPERE) << "Begin of: "      << __LOC << MESS_END} 
+#  define END_OF()   {MESS_BEGIN(REPERE) << "Normal end of: " << __LOC << MESS_END} 
+# else
+#  ifdef WIN32
+#   define BEGIN_OF(msg) const char* __LOC;{}
+#  else
+#   define BEGIN_OF(msg){}
+#  endif //WIN32
+#  define END_OF() {}
+# endif
 #endif
 
 #endif
