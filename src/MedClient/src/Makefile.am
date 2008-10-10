@@ -53,9 +53,9 @@ dist_salomescript_DATA =  \
 	testMeshAlliances.py
 nodist_salomescript_DATA = libMEDClient.py
 
-lib_LTLIBRARIES = _libMEDClient.la
+lib_LTLIBRARIES = libMEDClientcmodule.la
 
-dist__libMEDClient_la_SOURCES = \
+dist_libMEDClientcmodule_la_SOURCES = \
 	COORDINATEClient.cxx \
 	CONNECTIVITYClient.cxx \
 	MESHClient.cxx \
@@ -63,15 +63,14 @@ dist__libMEDClient_la_SOURCES = \
 	FAMILYClient.cxx \
 	GROUPClient.cxx \
 	libMEDClient.i
-nodist__libMEDClient_la_SOURCES = libMEDClient_wrap.cxx
+nodist_libMEDClientcmodule_la_SOURCES = libMEDClient_wrap.cxx
 
-_libMEDClient_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
+libMEDClientcmodule_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
 	$(MED2_INCLUDES) $(HDF5_INCLUDES) $(PYTHON_INCLUDES) ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../../MEDMEM_I -I$(srcdir)/../../MEDMEM -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl \
 	-I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM_SWIG -I$(srcdir)/../../MED -I$(srcdir)/../../INTERP_KERNEL
-_libMEDClient_la_LDFLAGS  = -module ${KERNEL_LDFLAGS} -lOpUtil -lSalomeCommunication ../../MEDMEM/libmedmem.la \
-                            ../../MEDMEM_I/libMEDMEMImpl.la ../../INTERP_KERNEL/libinterpkernel.la ../../MED/libMEDEngine.la
-### ../../MedCorba_Swig/_libMedCorba_Swig.la 
+libMEDClientcmodule_la_LDFLAGS  = ${KERNEL_LDFLAGS} -lOpUtil -lSalomeCommunication ../../MEDMEM/libmedmem.la \
+                                  ../../MEDMEM_I/libMEDMEMImpl.la ../../INTERP_KERNEL/libinterpkernel.la ../../MED/libMEDEngine.la
 
 SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../../MedCorba_Swig -I$(srcdir)/../../MEDMEM_SWIG
 SWIG_DEP   = $(srcdir)/../../MedCorba_Swig/libMedCorba_Swig.i $(srcdir)/../../MEDMEM_SWIG/libMEDMEM_Swig.i
@@ -102,3 +101,9 @@ OBSOLETE_FILES = \
 	test_medclient.py
 
 EXTRA_DIST += $(OBSOLETE_FILES)
+
+install-exec-hook: $(libdir)/_libMEDClient.so
+
+$(libdir)/_libMEDClient.so:
+	( cd $(libdir); ln -sf libMEDClientcmodule.so _libMEDClient.so; )
+

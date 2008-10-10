@@ -55,8 +55,8 @@ _libCompo2_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
 	-I$(srcdir)/../../../MEDWrapper/V2_1/Core -I$(srcdir)/../../../MEDMEM_SWIG -I$(srcdir)/../../../MED -I$(srcdir)/../../src \
 	-I$(srcdir)/../../../INTERP_KERNEL
 _libCompo2_la_LDFLAGS  = -module ${KERNEL_LDFLAGS}  ${MED2_LIBS} ${HDF5_LIBS} \
-	../../../MEDMEM/libmedmem.la ../../../MEDMEM_I/libMEDMEMImpl.la
-### 	../../src/_libMEDClient.la ../../../MEDMEM_SWIG/_libMEDMEM_Swig.la
+	../../../MEDMEM/libmedmem.la ../../../MEDMEM_I/libMEDMEMImpl.la ../../../INTERP_KERNEL/libinterpkernel.la \
+	../../../MED/libMEDEngine.la ../../src/libMEDClientcmodule.la
 
 SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../../src -I$(srcdir)/../../../MEDMEM_SWIG -I$(srcdir)/../../../MedCorba_Swig
 SWIG_DEP   = ../../src/libMEDClient.i ../../../MEDMEM_SWIG/libMEDMEM_Swig.i ../../../MedCorba_Swig/libMedCorba_Swig.i
