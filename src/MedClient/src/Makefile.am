@@ -69,7 +69,8 @@ _libMEDClient_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
 	$(MED2_INCLUDES) $(HDF5_INCLUDES) $(PYTHON_INCLUDES) ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../../MEDMEM_I -I$(srcdir)/../../MEDMEM -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl \
 	-I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM_SWIG -I$(srcdir)/../../MED -I$(srcdir)/../../INTERP_KERNEL
-_libMEDClient_la_LDFLAGS  = -module ${KERNEL_LDFLAGS} -lOpUtil -lSalomeCommunication ../../MEDMEM/libmedmem.la
+_libMEDClient_la_LDFLAGS  = -module ${KERNEL_LDFLAGS} -lOpUtil -lSalomeCommunication ../../MEDMEM/libmedmem.la \
+                            ../../MEDMEM_I/libMEDMEMImpl.la ../../INTERP_KERNEL/libinterpkernel.la ../../MED/libMEDEngine.la
 ### ../../MedCorba_Swig/_libMedCorba_Swig.la 
 
 SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../../MedCorba_Swig -I$(srcdir)/../../MEDMEM_SWIG
