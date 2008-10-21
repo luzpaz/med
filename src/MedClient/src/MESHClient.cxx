@@ -40,7 +40,8 @@ MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) :
   _complete(false)
 
 {
-  BEGIN_OF("MESHClient::MESHClient(SALOME_MED::MESH_ptr m)");
+  const char* LOC = "MESHClient::MESHClient(SALOME_MED::MESH_ptr m)";
+  BEGIN_OF(LOC);
 
   ASSERT(m);
 
@@ -49,7 +50,7 @@ MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) :
 
   blankCopy();
 
-  END_OF();
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -77,7 +78,8 @@ GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, MESH *M)
 //=============================================================================
 void MESHClient::blankCopy()
 {
-  BEGIN_OF("MESHClient::blankCopy()");
+  const char* LOC = "MESHClient::blankCopy()";
+  BEGIN_OF(LOC);
   SALOME_MED::MESH::meshInfos_var all = IOR_Mesh->getMeshGlobal();
 
   //CORBA::String_var s;
@@ -151,7 +153,7 @@ void MESHClient::blankCopy()
  
   _complete = false;
 
-  END_OF();
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -161,7 +163,8 @@ void MESHClient::blankCopy()
 
 void MESHClient::fillCopy()
 {
-  BEGIN_OF("MESHClient::fillCopy()");
+  const char* LOC = "MESHClient::fillCopy()";
+  BEGIN_OF(LOC);
 
   COORDINATEClient *_coord 
     = dynamic_cast<COORDINATEClient *> (_coordinate);
@@ -215,7 +218,7 @@ void MESHClient::fillCopy()
 
   _complete = true;
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -225,7 +228,8 @@ void MESHClient::fillCopy()
 //=============================================================================
 bool MESHClient::operator==(const MESH& other) const
 {
-  BEGIN_OF("MESHClient::operator==");
+  const char* LOC = "MESHClient::operator==";
+  BEGIN_OF(LOC);
   const MESHClient* otherClt=dynamic_cast<const MESHClient *>(&other);
   if(otherClt)
     {
@@ -246,9 +250,10 @@ bool MESHClient::operator==(const MESH& other) const
 
 MESHClient::~MESHClient()
 {
-  BEGIN_OF("MESHClient::~MESHClient()");
+  const char* LOC = "MESHClient::~MESHClient()";
+  BEGIN_OF(LOC);
   IOR_Mesh->Destroy();
-  END_OF();
+  END_OF(LOC);
 }
 
 //=============================================================================

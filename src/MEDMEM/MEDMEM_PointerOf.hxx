@@ -79,9 +79,10 @@ template <typename T> PointerOf<T>::PointerOf() : _pointer(0), _done(false)
 template <typename T> PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf) :
   _pointer((T*)(const T* const)pointerOf), _done(false)
 {
-	BEGIN_OF("PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf)");
+  const char* LOC = "PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf)";
+  BEGIN_OF(LOC);
 	MESSAGE("Warning ! No Propriety Transfer");
-	END_OF();
+  END_OF(LOC);
 }
 
 /*! 
@@ -158,12 +159,13 @@ template <typename T> PointerOf<T>::~PointerOf()
     - it works the same way as PointerOf(const PointerOf<T> & pointerOf) */
 template <typename T> PointerOf<T>& PointerOf<T>::operator=( const PointerOf<T> &pointer )
 {
-	BEGIN_OF("PointerOf<T>::operator=( const PointerOf<T> &pointer )") ;
+  const char* LOC = "PointerOf<T>::operator=( const PointerOf<T> &pointer )";
+  BEGIN_OF(LOC);
 	if ( &pointer != this )
 	{
 		this->set( pointer._pointer ) ;
 	}
-	END_OF();
+  END_OF(LOC);
 	return *this ;
 }
 

@@ -33,10 +33,11 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(const MEDSKYLINEARRAY &myArray):
 			        _count(myArray._count),_length(myArray._length),
 				_index(_count+1),_value(_length)
 {
-  BEGIN_OF("MEDSKYLINEARRAY(const MEDSKYLINEARRAY &)");
+  const char* LOC = "MEDSKYLINEARRAY(const MEDSKYLINEARRAY &)";
+  BEGIN_OF(LOC);
   memcpy(_index,myArray._index,sizeof(int)*(_count+1));
   memcpy(_value,myArray._value,sizeof(int)*_length);
-  END_OF();
+  END_OF(LOC);
 }
 
 MEDSKYLINEARRAY::~MEDSKYLINEARRAY()

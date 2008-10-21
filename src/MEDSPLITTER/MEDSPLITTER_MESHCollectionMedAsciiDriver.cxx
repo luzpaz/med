@@ -54,7 +54,8 @@ MESHCollectionMedAsciiDriver::MESHCollectionMedAsciiDriver(MESHCollection* colle
 int MESHCollectionMedAsciiDriver::read(char* filename)
 {
   
-  BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::read()")
+  const char* LOC = "MEDSPLITTER::MESHCollectionDriver::read()";
+  BEGIN_OF(LOC);
   
     //ditributed meshes
     vector<int*> cellglobal;
@@ -139,7 +140,7 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
       if (faceglobal[i]!=0) delete[] faceglobal[i];
     }
   
-  END_OF();
+  END_OF(LOC);
     return 0;
 }
 
@@ -152,7 +153,8 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
 void MESHCollectionMedAsciiDriver::write(char* filename)
 {
 	
-  BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::write()")
+  const char* LOC = "MEDSPLITTER::MESHCollectionDriver::write()";
+  BEGIN_OF(LOC);
  
     ofstream file(filename);
 
@@ -188,6 +190,6 @@ void MESHCollectionMedAsciiDriver::write(char* filename)
       writeSubdomain(idomain, nbdomains, distfilename);
     }
 	
-  END_OF();
+  END_OF(LOC);
 
 }

@@ -321,13 +321,13 @@ void _intermediateMED::treatGroupes()
 
 //   if ( hasMixedCells )
 //     INFOS( "There will be groups of mixed dimention" );
-  END_OF();
+  END_OF(LOC);
 }
 
 void _intermediateMED::numerotationMaillage()
 {
-  //const char * LOC = "_intermediateMED::numerotationMaillage() : ";
-  BEGIN_OF("_intermediateMED::numerotationMaillage() : ");
+  const char* LOC = "_intermediateMED::numerotationMaillage() : ";
+  BEGIN_OF(LOC);
 
   treatGroupes();
 
@@ -417,7 +417,7 @@ void _intermediateMED::numerotationMaillage()
     }
     i->ordre=++i_maille;
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 void _intermediateMED::numerotationPoints()
@@ -630,7 +630,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
     }
     while ( i != maillage.end() );
 
-    END_OF();
+  END_OF(LOC);
     return Connectivity;
 }
 
@@ -647,8 +647,8 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
                             vector<GROUP *> & _groupEdge,
                             vector<GROUP *> & _groupNode, MESH * _ptrMesh)
 {
-  //const char * LOC = "_intermediateMED::getGroups() : ";
-  BEGIN_OF("_intermediateMED::getGroups() : ");
+  const char* LOC = "_intermediateMED::getGroups() : ";
+  BEGIN_OF(LOC);
 
   medGroupes.resize( groupes.size(), 0 );
   if (maillage.size() == 0) {
@@ -853,7 +853,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     delete [] tab_nombres_elements;
   }
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -868,8 +868,8 @@ void _intermediateMED::getFamilies(std::vector<FAMILY *> & _famCell,
                                    std::vector<FAMILY *> & _famEdge,
                                    std::vector<FAMILY *> & _famNode, MESH * _ptrMesh)
 {
-  //const char * LOC = "_intermediateMED::getFamilies() : ";
-  BEGIN_OF("_intermediateMED::getFamilies() : ");
+  const char* LOC = "_intermediateMED::getFamilies() : ";
+  BEGIN_OF(LOC);
   
   int nbElemFam = 0, nbNodeFam = 0;
   std::map< GROUP*, vector< FAMILY * > > grpFamsMap;
@@ -1031,7 +1031,7 @@ void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
       f->setOrderNumber( j );
     }
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 _intermediateMED::~_intermediateMED()

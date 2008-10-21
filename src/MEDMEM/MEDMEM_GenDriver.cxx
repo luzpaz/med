@@ -57,8 +57,8 @@ GENDRIVER::~GENDRIVER() {}
 
 GENDRIVER & MEDMEM::GENDRIVER::operator=(const GENDRIVER &  genDriver) 
 {
-  //const char * LOC = " GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver)  : ";
-  BEGIN_OF(" GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver)  : ");
+  const char* LOC = " GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver)  : ";
+  BEGIN_OF(LOC);
   _fileName    = genDriver._fileName;
   _accessMode  = genDriver._accessMode;
   _status      = genDriver._status;
@@ -80,26 +80,26 @@ void GENDRIVER::writeAppend ( void ) const {};
 
 void GENDRIVER::setId ( int id )
 {
-  //const char * LOC = "void GENDRIVER::setId ( int id ) : ";
-  BEGIN_OF("void GENDRIVER::setId ( int id ) : ");
+  const char* LOC = "void GENDRIVER::setId ( int id ) : ";
+  BEGIN_OF(LOC);
 
   if ( id >= 0 ) _id=id; else _id = MED_INVALID ;
 
-  END_OF();
+  END_OF(LOC);
 };
 
 int GENDRIVER::getId ( void) const
 {
-  //const char * LOC = "int GENDRIVER::getId ( void) const ";
-  BEGIN_OF("int GENDRIVER::getId ( void) const ");
+  const char* LOC = "int GENDRIVER::getId ( void) const ";
+  BEGIN_OF(LOC);
 
   return _id ;
 };
 
 string GENDRIVER::getFileName() const {
 
-  //const char * LOC = "string GENDRIVER::getFileName() const : ";
-  BEGIN_OF("string GENDRIVER::getFileName() const : ");
+  const char* LOC = "string GENDRIVER::getFileName() const : ";
+  BEGIN_OF(LOC);
   
   return _fileName;
 }
@@ -116,15 +116,15 @@ void GENDRIVER::setFileName(const string & fileName)
   else
     _fileName = fileName; 
 
-  END_OF();
+  END_OF(LOC);
 }
        
 
 
 med_mode_acces GENDRIVER::getAccessMode() const
 {
-  //const char * LOC = "med_mode_acces GENDRIVER::getAccessMode() const : ";
-  BEGIN_OF("med_mode_acces GENDRIVER::getAccessMode() const : ");
+  const char* LOC = "med_mode_acces GENDRIVER::getAccessMode() const : ";
+  BEGIN_OF(LOC);
 
   return _accessMode;
 }
@@ -161,7 +161,6 @@ ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
 // Test if this driver has been created from  MED driver
 bool MEDMEM::GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
   
-  //const char * LOC = "bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const : ";
 
   MESSAGE("bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const : ");
 

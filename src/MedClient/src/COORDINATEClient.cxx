@@ -39,11 +39,12 @@ COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
   _complete(false),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m))
 {
-  BEGIN_OF("COORDINATEClient::COORDINATEClient(...)");
+  const char* LOC = "COORDINATEClient::COORDINATEClient(...)";
+  BEGIN_OF(LOC);
 
   blankCopy();
 
-  END_OF();
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -52,7 +53,8 @@ COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
 //=============================================================================
 void COORDINATEClient::blankCopy()
 {
-  BEGIN_OF("void COORDINATEClient::blankCopy()");
+  const char* LOC = "void COORDINATEClient::blankCopy()";
+  BEGIN_OF(LOC);
 
   std::string *tA;
   long nA;
@@ -84,7 +86,7 @@ void COORDINATEClient::blankCopy()
 
   _complete = false;
 
-  END_OF();
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -94,7 +96,8 @@ void COORDINATEClient::blankCopy()
 
 void COORDINATEClient::fillCopy()
 {
-  BEGIN_OF("void COORDINATEClient::fillCopy()");
+  const char* LOC = "void COORDINATEClient::fillCopy()";
+  BEGIN_OF(LOC);
 
   //PN ?? Est-ce qu on peut pas mettre une variable dans COORDINATEClient
   // qu on remplirait dans blankCopy ??
@@ -112,7 +115,7 @@ void COORDINATEClient::fillCopy()
 
   _complete = true;
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -123,12 +126,13 @@ void COORDINATEClient::fillCopy()
 
 const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 {
-  BEGIN_OF("void COORDINATEClient::getCoordinates()");
+  const char* LOC = "void COORDINATEClient::getCoordinates()";
+  BEGIN_OF(LOC);
 
   if (!_complete) fillCopy();
   const double * c = COORDINATE::getCoordinates(Mode);
 
-  END_OF();
+  END_OF(LOC);
 
   return c;
 }
@@ -140,12 +144,13 @@ const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 
 double COORDINATEClient::getCoordinate(int Number,int Axis)
 {
-  BEGIN_OF("void COORDINATEClient::getCoordinate()");
+  const char* LOC = "void COORDINATEClient::getCoordinate()";
+  BEGIN_OF(LOC);
 
   if (!_complete) fillCopy();
   double d = COORDINATE::getCoordinate(Number, Axis);
 
-  END_OF();
+  END_OF(LOC);
 
   return d;
 }
@@ -156,12 +161,13 @@ double COORDINATEClient::getCoordinate(int Number,int Axis)
 //=============================================================================
 const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 {
-  BEGIN_OF("void COORDINATEClient::getCoordinateAxis()");
+  const char* LOC = "void COORDINATEClient::getCoordinateAxis()";
+  BEGIN_OF(LOC);
 
   if (!_complete) fillCopy();
   const double *c = COORDINATE::getCoordinateAxis(Axis);
 
-  END_OF();
+  END_OF(LOC);
 
   return c;
 }
@@ -172,12 +178,13 @@ const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 //=============================================================================
 const int*      COORDINATEClient::getNodesNumbers() const
 {
-  BEGIN_OF("void COORDINATEClient::getNodesNumbers()");
+  const char* LOC = "void COORDINATEClient::getNodesNumbers()";
+  BEGIN_OF(LOC);
 
   if (!_complete) (const_cast < COORDINATEClient * >(this))->fillCopy();
 
   MESSAGE("NON IMPLEMENTE DANS L'API CORBA");
-  END_OF();
+  END_OF(LOC);
 
   return NULL;
 }

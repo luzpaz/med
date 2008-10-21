@@ -131,7 +131,7 @@ namespace MEDMEM {
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
 				     << _nGauss ));
 
-    END_OF();
+  END_OF(LOC);
   };
 
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION
@@ -162,7 +162,7 @@ namespace MEDMEM {
     if (_wg.size() != _nGauss )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
 				     << _nGauss ));
-    END_OF();
+  END_OF(LOC);
   };
 
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG> &

@@ -129,19 +129,19 @@ void PORFLOW_MESH_DRIVER::open()
 	_status = MED_CLOSED;
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName<<" in mode ios::in"));
     }
-    END_OF();
+  END_OF(LOC);
 }
   
 void PORFLOW_MESH_DRIVER::close()
   throw (MEDEXCEPTION)
 {
-  //const char * LOC = "PORFLOW_MESH_DRIVER::close() " ;
-  BEGIN_OF("PORFLOW_MESH_DRIVER::close() ");
+  const char* LOC = "PORFLOW_MESH_DRIVER::close() ";
+  BEGIN_OF(LOC);
   if ( _status == MED_OPENED) {
     _porflow.close();
     _status = MED_CLOSED;
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 void    PORFLOW_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
@@ -679,7 +679,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     }
 
 
-    END_OF();
+  END_OF(LOC);
 }
 
 void PORFLOW_MESH_RDONLY_DRIVER::write( void ) const
@@ -731,7 +731,7 @@ void PORFLOW_MESH_WRONLY_DRIVER::write(void) const
 
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "Write Driver isn\'t implemented"));
 
-  END_OF();
+  END_OF(LOC);
 } 
 
 

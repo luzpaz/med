@@ -77,7 +77,7 @@ public :
 
     _vtkFile = new ofstream();
 
-    END_OF();
+  END_OF(LOC);
   }
   /*!
     Constructor.
@@ -89,12 +89,12 @@ public :
     _ptrField((FIELD<T> *) ptrField),
     _fieldName(fileName),_fieldNum(MED_INVALID) 
   {
-    //const char * LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
-    BEGIN_OF("VTK_FIELD_DRIVER::VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField) ");
+  const char* LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
+  BEGIN_OF(LOC);
 
     _vtkFile = new ofstream();
 
-    END_OF();
+  END_OF(LOC);
   }
 
   /*!
@@ -115,8 +115,8 @@ public :
   */
   ~VTK_FIELD_DRIVER()
   {
-    //const char * LOC ="VTK_FIELD_DRIVER::~VTK_FIELD_DRIVER()";
-    BEGIN_OF("VTK_FIELD_DRIVER::~VTK_FIELD_DRIVER()");
+  const char* LOC = "VTK_FIELD_DRIVER::~VTK_FIELD_DRIVER()";
+  BEGIN_OF(LOC);
 
     close();
 
@@ -126,7 +126,7 @@ public :
 
     SCRUTE(_vtkFile);
 
-    END_OF();
+  END_OF(LOC);
   }
 
   void openConst() const throw (MEDEXCEPTION)
@@ -158,7 +158,7 @@ public :
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				       << _fileName)
 			    );
-    END_OF();
+  END_OF(LOC);
   }
 
   void openConstAppend() const throw (MEDEXCEPTION)
@@ -205,7 +205,7 @@ public :
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				       << _fileName)
 			    );
-    END_OF();
+  END_OF(LOC);
   }
 
   void open() throw (MEDEXCEPTION)
@@ -243,7 +243,7 @@ public :
 				       << _fileName)
 			    );
 
-    END_OF();
+  END_OF(LOC);
   }
 
   void close() {
@@ -648,7 +648,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   
   if ( _ptrField->getInterlacingType() != MED_EN::MED_NO_INTERLACE )
     delete tmpArray;
-  END_OF();
+  END_OF(LOC);
 }
 
 template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
@@ -757,7 +757,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   if ( _ptrField->getInterlacingType() != MED_EN::MED_NO_INTERLACE )
     delete tmpArray;
 
-  END_OF();
+  END_OF(LOC);
 }
 }//End namespace MEDMEM
 

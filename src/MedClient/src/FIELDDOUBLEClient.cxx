@@ -29,9 +29,10 @@ FIELDDOUBLEClient::FIELDDOUBLEClient(SALOME_MED::FIELDDOUBLE_ptr ptrCorba,
 				     MEDMEM::SUPPORT * S) :
   FIELDClient<double>(ptrCorba,S)
 {
-  BEGIN_OF("Constructor with arguments (for Python API) FIELDDOUBLEClient");
+  const char* LOC = "Constructor with arguments (for Python API) FIELDDOUBLEClient";
+  BEGIN_OF(LOC);
 
-  END_OF();
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -40,9 +41,10 @@ FIELDDOUBLEClient::FIELDDOUBLEClient(SALOME_MED::FIELDDOUBLE_ptr ptrCorba,
 //=============================================================================
 FIELDDOUBLEClient::~FIELDDOUBLEClient()
 {
-  BEGIN_OF("Default Destructor (for Python API) FIELDDOUBLEClient");
+  const char* LOC = "Default Destructor (for Python API) FIELDDOUBLEClient";
+  BEGIN_OF(LOC);
 
-  END_OF();
+  END_OF(LOC);
 }
 
 }

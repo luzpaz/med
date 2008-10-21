@@ -136,7 +136,7 @@ public :
 
     _ensightFile = new ifstream();
 
-    END_OF();
+  END_OF(LOC);
   }
   /*!
     Constructor.
@@ -145,11 +145,11 @@ public :
   ENSIGHT_FIELD_RDONLY_DRIVER<T>(const string & fileName,
 				 FIELD<T,INTERLACING_TAG> * ptrField):ENSIGHT_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY)
   {
-    //const char * LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::ENSIGHT_FIELD_RDONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
-    BEGIN_OF("ENSIGHT_FIELD_RDONLY_DRIVER::ENSIGHT_FIELD_RDONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ");
+  const char* LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::ENSIGHT_FIELD_RDONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
+  BEGIN_OF(LOC);
     _ensightFile = new ifstream();
 
-    END_OF();
+  END_OF(LOC);
   }
 
   /*!
@@ -165,8 +165,8 @@ public :
   */
   ~ENSIGHT_FIELD_RDONLY_DRIVER()
   {
-    //const char * LOC ="ENSIGHT_FIELD_RDONLY_DRIVER::~ENSIGHT_FIELD_RDONLY_DRIVER()";
-    BEGIN_OF("ENSIGHT_FIELD_RDONLY_DRIVER::~ENSIGHT_FIELD_RDONLY_DRIVER()");
+  const char* LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::~ENSIGHT_FIELD_RDONLY_DRIVER()";
+  BEGIN_OF(LOC);
 
     close();
 
@@ -176,7 +176,7 @@ public :
 
     SCRUTE(_ensightFile);
 
-    END_OF();
+  END_OF(LOC);
   }
 
   void openConst() const throw (MEDEXCEPTION)
@@ -204,7 +204,7 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-    END_OF();
+  END_OF(LOC);
   }
 
   void openConstAppend() const throw (MEDEXCEPTION)
@@ -245,7 +245,7 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-    END_OF();
+  END_OF(LOC);
   }
 
   void open() throw (MEDEXCEPTION)
@@ -278,7 +278,7 @@ public :
 				       << ENSIGHT_FIELD_DRIVER<T>::_fileName)
 			    );
 
-    END_OF();
+  END_OF(LOC);
   }
 
   void close() {
@@ -337,7 +337,7 @@ public :
 
     _ensightFile = new ifstream();
 
-    END_OF();
+  END_OF(LOC);
   }
   /*!
     Constructor.
@@ -347,11 +347,11 @@ public :
 			      FIELD<T,INTERLACING_TAG> * ptrField):
     ENSIGHT_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
-    //const char * LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
-    BEGIN_OF("ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ");
+  const char* LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
+  BEGIN_OF(LOC);
     _ensightFile = new ifstream();
 
-    END_OF();
+  END_OF(LOC);
   }
 
   /*!
@@ -367,8 +367,8 @@ public :
   */
   ~ENSIGHT_FIELD_WRONLY_DRIVER()
   {
-    //const char * LOC ="ENSIGHT_FIELD_WRONLY_DRIVER::~ENSIGHT_FIELD_WRONLY_DRIVER()";
-    BEGIN_OF("ENSIGHT_FIELD_WRONLY_DRIVER::~ENSIGHT_FIELD_WRONLY_DRIVER()");
+  const char* LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::~ENSIGHT_FIELD_WRONLY_DRIVER()";
+  BEGIN_OF(LOC);
 
     close();
 
@@ -378,7 +378,7 @@ public :
 
     SCRUTE(_ensightFile);
 
-    END_OF();
+  END_OF(LOC);
   }
 
   void openConst() const throw (MEDEXCEPTION)
@@ -406,7 +406,7 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-    END_OF();
+  END_OF(LOC);
   }
 
   void openConstAppend() const throw (MEDEXCEPTION)
@@ -447,7 +447,7 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-    END_OF();
+  END_OF(LOC);
   }
 
   void open() throw (MEDEXCEPTION)
@@ -480,7 +480,7 @@ public :
 				       << ENSIGHT_FIELD_DRIVER<T>::_fileName)
 			    );
 
-    END_OF();
+  END_OF(LOC);
   }
 
   void close() {
@@ -894,12 +894,12 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
 template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::writeAppend(void) const
   throw (MEDEXCEPTION)
 {
-  //const char * LOC = "ENSIGHT_FIELD_DRIVER::writeAppend(void) const " ;
-  BEGIN_OF("ENSIGHT_FIELD_DRIVER::writeAppend(void) const ");
+  const char* LOC = "ENSIGHT_FIELD_DRIVER::writeAppend(void) const ";
+  BEGIN_OF(LOC);
 
 // redondant avec write()
 
-  END_OF();
+  END_OF(LOC);
 }
 
 }//End namespace MEDMEM

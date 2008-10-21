@@ -262,7 +262,8 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
 {
         beginService("Med_Gen_i::readStructFileWithFieldType");
 
-	BEGIN_OF("Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)");
+  const char* LOC = "Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)";
+  BEGIN_OF(LOC);
 
 	SCRUTE(fileName);
   	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
@@ -292,7 +293,7 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
         }
 
         endService("Med_Gen_i::readStructFileWithFieldType");
-	END_OF();
+  END_OF(LOC);
 }
 
 //=============================================================================

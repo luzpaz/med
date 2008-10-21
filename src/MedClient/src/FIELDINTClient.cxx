@@ -29,9 +29,10 @@ FIELDINTClient::FIELDINTClient(SALOME_MED::FIELDINT_ptr ptrCorba,
 				     MEDMEM::SUPPORT * S) :
   FIELDClient<int>(ptrCorba,S)
 {
-  BEGIN_OF("Constructor with arguments (for Python API) FIELDINTClient");
+  const char* LOC = "Constructor with arguments (for Python API) FIELDINTClient";
+  BEGIN_OF(LOC);
 
-  END_OF();
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -40,9 +41,10 @@ FIELDINTClient::FIELDINTClient(SALOME_MED::FIELDINT_ptr ptrCorba,
 //=============================================================================
 FIELDINTClient::~FIELDINTClient()
 {
-  BEGIN_OF("Default Destructor (for Python API) FIELDINTClient");
+  const char* LOC = "Default Destructor (for Python API) FIELDINTClient";
+  BEGIN_OF(LOC);
 
-  END_OF();
+  END_OF(LOC);
 }
 
 }

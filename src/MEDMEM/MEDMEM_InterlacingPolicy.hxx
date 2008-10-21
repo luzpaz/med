@@ -55,7 +55,8 @@ public :
 
   InterlacingPolicy & operator=(const InterlacingPolicy & intpol) {
     if ( this == &intpol ) return *this;
-    BEGIN_OF("InterlacingPolicy operator =");
+  const char* LOC = "InterlacingPolicy operator =";
+  BEGIN_OF(LOC);
 
     _dim           = intpol._dim;
     _nbelem        = intpol._nbelem; //ne prend pas en compte les points de Gauss
@@ -211,7 +212,8 @@ public :
   NoInterlaceByTypeNoGaussPolicy & operator=(const NoInterlaceByTypeNoGaussPolicy & policy) {
     if ( this == &policy) return *this;
 
-    BEGIN_OF("NoInterlaceNoGaussPolicy operator =");
+  const char* LOC = "NoInterlaceNoGaussPolicy operator =";
+  BEGIN_OF(LOC);
     InterlacingPolicy::operator=(policy);
     this->_G.set(policy._G);
     this->_T.set(policy._T);
@@ -324,7 +326,8 @@ public :
   }
 
   FullInterlaceGaussPolicy & operator=(const FullInterlaceGaussPolicy & policy) {
-    BEGIN_OF("FullInterlaceGaussPolicy operator =");
+  const char* LOC = "FullInterlaceGaussPolicy operator =";
+  BEGIN_OF(LOC);
 
     if ( this == &policy) return *this;
 
@@ -438,7 +441,8 @@ public :
   NoInterlaceGaussPolicy & operator=(const NoInterlaceGaussPolicy & policy) {
     if ( this == &policy) return *this;
 
-    BEGIN_OF("NoInterlaceGaussPolicy operator =");
+  const char* LOC = "NoInterlaceGaussPolicy operator =";
+  BEGIN_OF(LOC);
     InterlacingPolicy::operator=(policy);
     this->_G.set(policy._G);
     this->_S.set(policy._S);
@@ -543,7 +547,8 @@ public :
   NoInterlaceByTypeGaussPolicy & operator=(const NoInterlaceByTypeGaussPolicy & policy) {
     if ( this == &policy) return *this;
 
-    BEGIN_OF("NoInterlaceGaussPolicy operator =");
+  const char* LOC = "NoInterlaceGaussPolicy operator =";
+  BEGIN_OF(LOC);
     InterlacingPolicy::operator=(policy);
     this->_G.set(policy._G);
     this->_T.set(policy._T);

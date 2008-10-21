@@ -67,7 +67,8 @@ MESHCollectionMedXMLDriver::MESHCollectionMedXMLDriver(MESHCollection* collectio
 int MESHCollectionMedXMLDriver::read(char* filename)
 {
   
-  BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::read()");
+  const char* LOC = "MEDSPLITTER::MESHCollectionDriver::read()";
+  BEGIN_OF(LOC);
   
 		//ditributed meshes
 	vector<int*> cellglobal;
@@ -228,7 +229,7 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 			if (faceglobal[i]!=0) delete[] faceglobal[i];
     }
 
-  END_OF();
+  END_OF(LOC);
 		return 0;
 }
 
@@ -241,7 +242,8 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 void MESHCollectionMedXMLDriver::write(char* filename)
 {
 	
-	BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::writeXML()");
+  const char* LOC = "MEDSPLITTER::MESHCollectionDriver::writeXML()";
+  BEGIN_OF(LOC);
  
 	xmlDocPtr master_doc = 0;
 	xmlNodePtr root_node = 0, node, node2;
@@ -341,6 +343,6 @@ void MESHCollectionMedXMLDriver::write(char* filename)
  	xmlFreeDoc(master_doc);
 	xmlCleanupParser();
 
-	END_OF();
+  END_OF(LOC);
 
 }

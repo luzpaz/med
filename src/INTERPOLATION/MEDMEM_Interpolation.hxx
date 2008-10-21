@@ -94,9 +94,9 @@ public :
 
 template <int DIMENSION> void INTERPOLATION<DIMENSION>::init()
 {
-  //const char * LOC = "INTERPOLATION::init(): ";
 
-  BEGIN_OF("INTERPOLATION::init(): ");
+  const char* LOC = "INTERPOLATION::init(): ";
+  BEGIN_OF(LOC);
   _fromField   = ( FIELD<double> * )           NULL;
   _toField     = ( FIELD<double> * )           NULL;
   _fromMesh    = ( MESH * )                    NULL;
@@ -106,7 +106,7 @@ template <int DIMENSION> void INTERPOLATION<DIMENSION>::init()
   _mapping     = ( Meta_Mapping<DIMENSION> * ) NULL;
   _iType            = UNDEFINED ;
   _isConvexFromMesh = UNDEFINED ;
-  END_OF();
+  END_OF(LOC);
 }
 
 
@@ -131,7 +131,7 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
 
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
 					        
-  END_OF();
+  END_OF(LOC);
 }; 
 
 template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fromMesh,const MESH & toMesh ) {
@@ -164,7 +164,7 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
 
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
 					        
-  END_OF();
+  END_OF(LOC);
 };
 
 template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const FIELD<double> & fromField,const MESH & toMesh) {
@@ -199,7 +199,7 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const FIELD<dou
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
   
 					  
-  END_OF();
+  END_OF(LOC);
 };
 
 template <int DIMENSION> INTERPOLATION<DIMENSION>::~INTERPOLATION()
@@ -219,7 +219,7 @@ template <int DIMENSION> int INTERPOLATION<DIMENSION>::getNearestNode(  double *
   
   return _mapping->Donne_dTree()->trouve_plus_proche_point(Wrapper_Noeud<DIMENSION > (node) );
   
-  END_OF();
+  END_OF(LOC);
 
 };
 
@@ -237,7 +237,7 @@ template <int DIMENSION> int INTERPOLATION<DIMENSION>::getContainingCell ( doubl
 
   return _mapping->Trouve_Maille_Contenant_Noeud(node,beginingCell,flagIsConvexMesh);
   
-  END_OF();
+  END_OF(LOC);
 
 };
 
@@ -256,7 +256,7 @@ template <int DIMENSION> vector<int> INTERPOLATION<DIMENSION>::getMapping ( int 
 
   return _mapping->Get_Mapping();
   
-  END_OF();
+  END_OF(LOC);
 
 };
 
@@ -330,10 +330,9 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolate(i
  
   _toWrapper->Construit_Wrapper_Champ(_toField);
 
-  return _toField;
-  
-  END_OF();
+  END_OF(LOC);
 
+  return _toField;
 };
 
 template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolateNextStep(const FIELD <double> & nextFromField, int & flagNewMapping) {

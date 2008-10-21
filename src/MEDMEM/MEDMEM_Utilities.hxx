@@ -111,7 +111,7 @@ using namespace std;
 					cout << flush ;\
 				}
 
-# ifdef _DEBUG_ | _DEBUG
+# if defined(_DEBUG_) || defined(_DEBUG)
 
 /* --- the following MACROS are useful at debug time --- */
 
@@ -124,11 +124,13 @@ using namespace std;
 #   define ASSERT(condition) if (!(condition)){ HERE ; cerr << "CONDITION " << #condition << " NOT VERIFIED"<< endl ; INTERRUPTION(1) ;}
 #  endif /* ASSERT */
 #  define REPERE {cout<<flush ; cerr << "   --------------" << endl << flush ;}
-#  define BEGIN_OF(chain) const char* __LOC = chain; {REPERE ; HERE ; cerr << "Begin of: " << __LOC << endl ; REPERE ; }
-#  define END_OF() {REPERE ; HERE ; cerr << "Normal end of: " << __LOC << endl ; REPERE ; }
-//#define BEGIN_OF(chain) {REPERE ; HERE ; cerr << "Begin of: " << chain << endl ; REPERE ; }
-//#define END_OF(chain) {REPERE ; HERE ; cerr << "Normal end of: " << chain << endl ; REPERE ; }
+#  define BEGIN_OF(chain) const char* __LOC; __LOC=chain; {REPERE ; HERE ; cerr << "Begin of: " << chain << endl ; REPERE ; }
+#  define END_OF(chain) {REPERE ; HERE ; cerr << "Normal end of: " << chain << endl ; REPERE ; }
+
+
 # else /* ifdef _DEBUG_*/
+
+
 #  define HERE
 #  define SCRUTE(var) {}
 #  define MESSAGE(chain) {}
@@ -139,33 +141,33 @@ using namespace std;
 #  endif /* ASSERT */
 
 #  define REPERE
-#  ifdef WIN32
-#   define BEGIN_OF(chain) const char* __LOC;
-#  else
-#   define BEGIN_OF(chain) {}
-#  endif //WIN32
-//#define END_OF(chain) {}
-#  define END_OF() {}
-# endif
+#  define BEGIN_OF(chain) const char* __LOC; {__LOC=chain;}
+#  define END_OF(chain) const char* __LOC_END; {__LOC_END=chain;}
 
-#else
-// #ifdef _SALOME
+
+# endif /* ifdef _DEBUG_*/
+
+
+
+#else //MED_WITH_KERNEL
+
 
 # include <utilities.h>
 
 # undef BEGIN_OF
 # undef END_OF
-# ifdef _DEBUG_ | _DEBUG
+# if defined(_DEBUG_) || defined(_DEBUG)
+
 #  define BEGIN_OF(msg) const char* __LOC = msg; {MESS_BEGIN(REPERE) << "Begin of: "      << __LOC << MESS_END} 
-#  define END_OF()   {MESS_BEGIN(REPERE) << "Normal end of: " << __LOC << MESS_END} 
-# else
-#  ifdef WIN32
-#   define BEGIN_OF(msg) const char* __LOC;{}
-#  else
-#   define BEGIN_OF(msg){}
-#  endif //WIN32
-#  define END_OF() {}
-# endif
-#endif
+#  define END_OF(msg)   {MESS_BEGIN(REPERE) << "Normal end of: " << msg << MESS_END} 
+
+# else // _DEBUG_
+
+#  define BEGIN_OF(msg) const char* __LOC; {__LOC = msg;} // avoid warning on unused variable LOC
+#  define END_OF(msg) const char* __LOC_END; {__LOC_END = msg;}
+
+# endif // _DEBUG_
+
+#endif // #ifdef _SALOME
 
 #endif

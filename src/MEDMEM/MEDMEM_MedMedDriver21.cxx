@@ -124,15 +124,15 @@ void MED_MED_DRIVER21::open()
                          );
   }
 
-  END_OF();
+  END_OF(LOC);
 }
 
 
 void MED_MED_DRIVER21::close()
 {
   med_2_1::med_int err = 0;
-  //const char * LOC = "MED_MED_DRIVER21::close() : ";
-  BEGIN_OF("MED_MED_DRIVER21::close() : ");
+  const char* LOC = "MED_MED_DRIVER21::close() : ";
+  BEGIN_OF(LOC);
   
   
 //    if ( _status == MED_CLOSED)
@@ -159,7 +159,7 @@ void MED_MED_DRIVER21::close()
   _status = MED_CLOSED;
   _medIdt = MED_INVALID;
     
-  END_OF();
+  END_OF(LOC);
 }
 
 
@@ -616,7 +616,7 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
   // il faut lire les champs pour avoir les profils stockes !!!
   // il faudrait implémenter la lecture des profils dans med !!!
   
-  END_OF();
+  END_OF(LOC);
   
 }
 
@@ -625,8 +625,8 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 void MED_MED_RDONLY_DRIVER21::read( void )
   throw (MEDEXCEPTION) // from objects method read !
 {
-  //const char * LOC = "MED_MED_DRIVER21::read() : ";
-  BEGIN_OF("MED_MED_DRIVER21::read() : ");
+  const char* LOC = "MED_MED_DRIVER21::read() : ";
+  BEGIN_OF(LOC);
 
   // For PAL12192: assure that file structure is already read
   this->open();
@@ -650,7 +650,7 @@ void MED_MED_RDONLY_DRIVER21::read( void )
     (*currentField).first->read(*this);
   //(*currentField).first->read(); // default reader, from readFileStruct
 
-  END_OF();
+  END_OF(LOC);
 }
 
 // ------------- Write Only Part --------------
@@ -695,8 +695,8 @@ void MED_MED_WRONLY_DRIVER21::readFileStruct ( void ) throw (MEDEXCEPTION)
 void MED_MED_WRONLY_DRIVER21::writeFrom( void) const
   throw (MEDEXCEPTION) //from object method write !
 {
-  //const char * LOC = "MED_MED_DRIVER21::writeFrom() : ";
-  BEGIN_OF("MED_MED_DRIVER21::writeFrom() : ");
+  const char* LOC = "MED_MED_DRIVER21::writeFrom() : ";
+  BEGIN_OF(LOC);
 
   const map<MESH_NAME_, MESH*> & _meshes = const_cast<const map<MESH_NAME_, MESH*>& > (_ptrMed->_meshes); 
   map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
@@ -723,16 +723,16 @@ void MED_MED_WRONLY_DRIVER21::writeFrom( void) const
     }
   }
 
-  END_OF();
+  END_OF(LOC);
 
 }
 
 void MED_MED_WRONLY_DRIVER21::write(void ) const
   throw (MEDEXCEPTION) // from object method write !
 {
-  //const char * LOC = "MED_MED_DRIVER21::write() : ";
   int current;
-  BEGIN_OF("MED_MED_DRIVER21::write() : ");
+  const char* LOC = "MED_MED_DRIVER21::write() : ";
+  BEGIN_OF(LOC);
 
   // BCLE SUR LES OBJETS AVEC AJOUT DE DRIVER ET APPELS write
 
@@ -761,7 +761,7 @@ void MED_MED_WRONLY_DRIVER21::write(void ) const
   // that's work, but it is more efficenty to write directly when we had driver, no ?
   //  writeFrom();
   
-  END_OF();
+  END_OF(LOC);
 
 }
 
@@ -804,31 +804,35 @@ GENDRIVER * MED_MED_RDWR_DRIVER21::copy(void) const
 void MED_MED_RDWR_DRIVER21::read(void)
   throw (MEDEXCEPTION) // from MED_MED_RDONLY_DRIVER::read()
 {
-  BEGIN_OF("MED_MED_RDWR_DRIVER21::read(void)");
+  const char* LOC = "MED_MED_RDWR_DRIVER21::read(void)";
+  BEGIN_OF(LOC);
   MED_MED_RDONLY_DRIVER21::read();
-  END_OF();
+  END_OF(LOC);
 }
 
 void MED_MED_RDWR_DRIVER21::readFileStruct(void)
   throw (MEDEXCEPTION) // from MED_MED_RDONLY_DRIVER::readFileStruct()
 {
-  BEGIN_OF("MED_MED_RDWR_DRIVER21::readFileStruct(void)");
+  const char* LOC = "MED_MED_RDWR_DRIVER21::readFileStruct(void)";
+  BEGIN_OF(LOC);
   MED_MED_RDONLY_DRIVER21::readFileStruct();
-  END_OF();
+  END_OF(LOC);
 }
 
 void MED_MED_RDWR_DRIVER21::write(void) const
   throw (MEDEXCEPTION) // from MED_MED_WRONLY_DRIVER::write()
 {
-  BEGIN_OF("MED_MED_RDWR_DRIVER21::write(void) const");
+  const char* LOC = "MED_MED_RDWR_DRIVER21::write(void) const";
+  BEGIN_OF(LOC);
   MED_MED_WRONLY_DRIVER21::write();
-  END_OF();
+  END_OF(LOC);
 }
 
 void MED_MED_RDWR_DRIVER21::writeFrom(void) const
   throw (MEDEXCEPTION) // from MED_MED_WRONLY_DRIVER::writeFrom();
 {
-  BEGIN_OF("MED_MED_RDWR_DRIVER21::writeFrom(void) const");
+  const char* LOC = "MED_MED_RDWR_DRIVER21::writeFrom(void) const";
+  BEGIN_OF(LOC);
   MED_MED_WRONLY_DRIVER21::writeFrom();
-  END_OF();
+  END_OF(LOC);
 }

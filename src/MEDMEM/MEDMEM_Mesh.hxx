@@ -347,8 +347,8 @@ inline void MESH::setConnectivityptr(CONNECTIVITY* conn)
 // must be private.
 inline void MESH::write(const GENDRIVER & genDriver)
 {
-  //const char * LOC = "MESH::write(const MED_MED_DRIVER & genDriver): ";
-  BEGIN_OF("MESH::write(const MED_MED_DRIVER & genDriver): ");
+  const char* LOC = "MESH::write(const MED_MED_DRIVER & genDriver): ";
+  BEGIN_OF(LOC);
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
@@ -370,7 +370,7 @@ inline void MESH::write(const GENDRIVER & genDriver)
       // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
     }
 
-  END_OF();
+  END_OF(LOC);
 
 }
 
@@ -378,8 +378,8 @@ inline void MESH::write(const GENDRIVER & genDriver)
 // must be private.
 inline void MESH::read(const GENDRIVER & genDriver)
 {
-  //const char * LOC = "MESH::read(const MED_MED_DRIVER & genDriver): ";
-  BEGIN_OF("MESH::read(const MED_MED_DRIVER & genDriver): ");
+  const char* LOC = "MESH::read(const MED_MED_DRIVER & genDriver): ";
+  BEGIN_OF(LOC);
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
@@ -389,7 +389,7 @@ inline void MESH::read(const GENDRIVER & genDriver)
       // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
     }
 
-  END_OF();
+  END_OF(LOC);
 
 }
 
@@ -589,7 +589,6 @@ inline const int * MESH::getGlobalNumberingIndex(MED_EN::medEntityMesh entity) c
  */
 inline int MESH::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
 {
-  //  const char * LOC = "MESH::getNumberOfElements(medEntityMesh,medGeometryElement) : ";
   if (entity==MED_EN::MED_NODE)
     if ((Type==MED_EN::MED_NONE)|(Type==MED_EN::MED_ALL_ELEMENTS))
       return _numberOfNodes;
@@ -991,6 +990,7 @@ const MEDMEM::FAMILY* MESH::getFamily(MED_EN::medEntityMesh entity, int i) const
 const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
 {
   const char * LOC = "MESH::getGroup(medEntityMesh entity, int i) : ";
+  BEGIN_OF(LOC);
   if (i<=0)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i must be > 0"));
   vector<GROUP*> Group;
@@ -1102,7 +1102,7 @@ FIELD<T, FullInterlace> * MESH::mergeFields(const vector< FIELD<T, FullInterlace
 	}
     }
   delete [] tempValues;
-  END_OF();
+  END_OF(LOC);
   return ret;
 }
 
