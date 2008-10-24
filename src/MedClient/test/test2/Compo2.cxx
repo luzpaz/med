@@ -40,7 +40,8 @@ Compo2::~Compo2()
 
 std::string Compo2::Calcul(const MESH &M)
 {
-  BEGIN_OF("std::string Compo2::Calcul(MESH &M)");
+  const char* LOC = "std::string Compo2::Calcul(MESH &M)";
+  BEGIN_OF(LOC);
 
   MESSAGE("type virtuel : MESH");
   MESSAGE("type reel : " << typeid(M).name());
@@ -56,13 +57,14 @@ std::string Compo2::Calcul(const MESH &M)
     std::cerr << "erreur Compo2::Calcul" << std::endl;
   }
 
-  END_OF();
+  END_OF(LOC);
   return name;
 }
 
 const FAMILY * Compo2::Calcul2(const MESH &M)
 {
-  BEGIN_OF("const FAMILY * Compo2::Calcul2(const MESH &M)");
+  const char* LOC = "const FAMILY * Compo2::Calcul2(const MESH &M)";
+  BEGIN_OF(LOC);
 
   const FAMILY * F = M.getFamily(MED_CELL, 1);
   std::cerr << "ok ici 2" << std::endl;
@@ -73,13 +75,14 @@ const FAMILY * Compo2::Calcul2(const MESH &M)
     std::cerr << "erreur Compo2::Calcul2" << std::endl;
   }
 
-  END_OF();
+  END_OF(LOC);
   return F;
 }
 
 void Compo2::Calcul3(const FIELD<double> &F)
 {
-  BEGIN_OF("void Compo2::Calcul3(const FIELD<double> *)");
+  const char* LOC = "void Compo2::Calcul3(const FIELD<double> *)";
+  BEGIN_OF(LOC);
 
   const double *v = F.getValue();
   long i, n = F.getSupport()->getNumberOfElements(MED_CELL);
@@ -92,5 +95,5 @@ void Compo2::Calcul3(const FIELD<double> &F)
     std::cout << std::endl;
   }
   
-  END_OF();
+  END_OF(LOC);
 }

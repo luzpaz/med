@@ -50,7 +50,6 @@ VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName,
   GENDRIVER(fileName, WRONLY, VTK_DRIVER),
   _ptrMesh(ptrMesh)
 {
-  //const char * LOC = "VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName, MESH * ptrMesh) : " ;
 
   // Send an exception because a VTK_MESH_DRIVER object cannot be instantied
   // from a file and there is no read for that kind of driver
@@ -76,8 +75,8 @@ VTK_MESH_DRIVER::VTK_MESH_DRIVER(const VTK_MESH_DRIVER & driver):
 
 VTK_MESH_DRIVER::~VTK_MESH_DRIVER()
 {
-  //const char * LOC ="VTK_MESH_DRIVER::~VTK_MESH_DRIVER()";
-  BEGIN_OF("VTK_MESH_DRIVER::~VTK_MESH_DRIVER()");
+  const char* LOC = "VTK_MESH_DRIVER::~VTK_MESH_DRIVER()";
+  BEGIN_OF(LOC);
 
   close();
 
@@ -87,7 +86,7 @@ VTK_MESH_DRIVER::~VTK_MESH_DRIVER()
 
   SCRUTE(_vtkFile);
 
-  END_OF();
+  END_OF(LOC);
 }
 
 void VTK_MESH_DRIVER::openConst() const throw (MEDEXCEPTION)
@@ -119,7 +118,7 @@ void VTK_MESH_DRIVER::openConst() const throw (MEDEXCEPTION)
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				     << _fileName)
 			  );
-  END_OF();
+  END_OF(LOC);
 }
 
 void VTK_MESH_DRIVER::open() {
@@ -151,7 +150,7 @@ void VTK_MESH_DRIVER::closeConst() const throw (MEDEXCEPTION)
 				     << _fileName)
 			  );
 
-  END_OF();
+  END_OF(LOC);
 }
 
 void VTK_MESH_DRIVER::close() {
@@ -170,7 +169,7 @@ void VTK_MESH_DRIVER::read(void) throw (MEDEXCEPTION)
 
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "This driver is only used to write in VTK format !"));
 
-  END_OF();
+  END_OF(LOC);
 }
 
 
@@ -413,7 +412,7 @@ void VTK_MESH_DRIVER::write(void) const
       (*_vtkFile) << vtkType << endl ;
   }
 
-  END_OF();
+  END_OF(LOC);
 } 
 
 GENDRIVER * VTK_MESH_DRIVER::copy(void) const

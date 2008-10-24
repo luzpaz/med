@@ -103,8 +103,8 @@ SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, MED_EN::medEntityMesh Entity/*=
 SUPPORT::SUPPORT(const SUPPORT & m)
 //--------------------------------------------------------------------------
 {
-  //const char * LOC = "SUPPORT::SUPPORT(SUPPORT & m) : " ;
-  BEGIN_OF("SUPPORT::SUPPORT(SUPPORT & m) : ") ;
+  const char* LOC = "SUPPORT::SUPPORT(SUPPORT & m) : ";
+  BEGIN_OF(LOC);
 
   _name = m._name ;
   _description = m._description ;
@@ -129,7 +129,7 @@ SUPPORT::SUPPORT(const SUPPORT & m)
 
   _profilNames=m._profilNames;
 
-  END_OF();
+  END_OF(LOC);
 };
 /*!
 @}
@@ -143,8 +143,8 @@ SUPPORT::SUPPORT(const SUPPORT & m)
 SUPPORT & SUPPORT::operator=(const SUPPORT & m)
 //--------------------------------------------------------------------------
 {
-  //const char * LOC = "SUPPORT::operator=(const SUPPORT & m) : " ;
-  BEGIN_OF("SUPPORT::operator=(const SUPPORT & m) : ") ;
+  const char* LOC = "SUPPORT::operator=(const SUPPORT & m) : ";
+  BEGIN_OF(LOC);
 
   if ( this == &m ) return *this;
 
@@ -172,7 +172,7 @@ SUPPORT & SUPPORT::operator=(const SUPPORT & m)
 
   _profilNames=m._profilNames;
 
-  END_OF();
+  END_OF(LOC);
   return *this;
 }
 
@@ -239,8 +239,8 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
 void SUPPORT::update()
 //-------------------
 {
-  //const char * LOC = "SUPPORT::update() : " ;
-  BEGIN_OF("SUPPORT::update() : ") ;
+  const char* LOC = "SUPPORT::update() : ";
+  BEGIN_OF(LOC);
 
   if (_isOnAllElts)
     {
@@ -272,7 +272,7 @@ void SUPPORT::update()
       SCRUTE(_name);
       SCRUTE(_numberOfGeometricType);
     }
-  END_OF();
+  END_OF(LOC);
 };
 /*!
   Get the field value index (in fortran mode) from the support global number.
@@ -379,7 +379,7 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
     }
   else
     clearDataOnNumbers();
-  END_OF();
+  END_OF(LOC);
 }
 /*!  @}  */
 
@@ -475,7 +475,7 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   }
   setProfilNames(prof_names);
   
-  END_OF();
+  END_OF(LOC);
 };
 
 /*! @}  */
@@ -522,21 +522,21 @@ void SUPPORT::setpartial(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDE
 
   // cout << *_number << endl;
 
-  END_OF();
+  END_OF(LOC);
 };
 
 void SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDEXCEPTION)
 //-------------------
 {
-  //const char * LOC = "SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number) : " ;
-  BEGIN_OF("SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number) : ") ;
+  const char* LOC = "SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number) : ";
+  BEGIN_OF(LOC);
 
   if ( shallowCopy )
     _number_fromfile = number;
   else
     _number_fromfile = new MEDSKYLINEARRAY(*number);
 
-  END_OF();
+  END_OF(LOC);
 };
 
 void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
@@ -569,7 +569,7 @@ void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
 
   _profilNames = profilNames;
 
-  END_OF();
+  END_OF(LOC);
 
 };
 
@@ -710,7 +710,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   delete[] myListArray;
   delete mySkyLineArray;
 
-  END_OF();
+  END_OF(LOC);
 }
 
 /*!
@@ -761,7 +761,7 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
     {
       clearDataOnNumbers();
     }
-  END_OF();
+  END_OF(LOC);
 };
 /*!  @}  */
 
@@ -789,9 +789,9 @@ void MEDMEM::SUPPORT::clearDataOnNumbers()
 bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
 //--------------------------------------------------
 {
-  //const char * LOC = "bool SUPPORT::operator ==(const SUPPORT &support) const : ";
 
-  BEGIN_OF("bool SUPPORT::operator ==(const SUPPORT &support) const : ");
+  const char* LOC = "bool SUPPORT::operator ==(const SUPPORT &support) const : ";
+  BEGIN_OF(LOC);
 
   bool operatorReturn = false;
 
@@ -824,7 +824,7 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
 	}
     }
 
-  END_OF();
+  END_OF(LOC);
 
   return operatorReturn;
 };
@@ -1087,7 +1087,7 @@ SUPPORT *MEDMEM::SUPPORT::substract(const SUPPORT& other) const throw (MEDEXCEPT
     ret=_mesh->buildSupportOnElementsFromElementList(*ids,_entity);
   delete ids;
   return ret;
-  END_OF();
+  END_OF(LOC);
 }
 
 /*!

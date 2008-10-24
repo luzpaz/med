@@ -127,13 +127,12 @@ using namespace std;
 #define __PREFIX const char* __LOC
 #define PREFIX __LOC
 #define BEGIN_OF(chain) __PREFIX = chain; {REPERE ; HERE ; cerr << "Begin of: " << PREFIX << endl ; REPERE ; }
-#define END_OF() {REPERE ; HERE ; cerr << "Normal end of: " << PREFIX << endl ; REPERE ; }
-//#define BEGIN_OF(chain) {REPERE ; HERE ; cerr << "Begin of: " << chain << endl ; REPERE ; }
-//#define END_OF(chain) {REPERE ; HERE ; cerr << "Normal end of: " << chain << endl ; REPERE ; }
-
+#define END_OF(chain) {REPERE ; HERE ; cerr << "Normal end of: " << chain << endl ; REPERE ; }
 
 
 # else /* ifdef _DEBUG_*/
+
+
 # define HERE
 # define SCRUTE(var) {}
 # define MESSAGE(chain) {}
@@ -143,14 +142,15 @@ using namespace std;
 # define ASSERT(condition) {}
 # endif /* ASSERT */
 
-#define REPERE
-#define BEGIN_OF(chain) {}
-//#define END_OF(chain) {}
-#define END_OF() {}
+# define REPERE
+# define BEGIN_OF(chain)  const char* __LOC; {__LOC=chain;}
+# define END_OF(chain) const char* __LOC_END; {__LOC_END=chain;}
 
-#endif
+
+#endif /* ifdef _DEBUG_*/
 
 #else //MED_WITH_KERNEL
+
 
 #include <utilities.h>
 
@@ -161,11 +161,11 @@ using namespace std;
 # define __PREFIX const char* __LOC
 # define PREFIX __LOC
 # define BEGIN_OF(msg) __PREFIX = msg; {MESS_BEGIN(REPERE) << "Begin of: "      << PREFIX << MESS_END} 
-# define END_OF()   {MESS_BEGIN(REPERE) << "Normal end of: " << PREFIX << MESS_END} 
+# define END_OF(msg)   {MESS_BEGIN(REPERE) << "Normal end of: " << msg << MESS_END}
 #else
-# define BEGIN_OF(msg) {}
-# define PREFIX
-# define END_OF() {}
+# define PREFIX __LOC
+# define BEGIN_OF(msg) const char* __LOC; {__LOC = msg;} // to avoid warning on unused variable LOC
+# define END_OF(msg) const char* __LOC_END; {__LOC_END = msg;}
 #endif
 
 #endif

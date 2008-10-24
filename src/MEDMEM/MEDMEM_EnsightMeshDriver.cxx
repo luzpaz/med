@@ -128,7 +128,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::openConst() const
 				     << _fileName)
 			  );
 
-  END_OF();
+  END_OF(LOC);
 }
 
 void ENSIGHT_MESH_WRONLY_DRIVER::closeConst() const {
@@ -142,7 +142,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::closeConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close main Ensight file "
 				     << _fileName)
 			  );
-  END_OF();
+  END_OF(LOC);
 }
 
 void ENSIGHT_MESH_WRONLY_DRIVER::read() throw (MEDEXCEPTION) {
@@ -588,7 +588,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
   ensightGeomFile << endl ;
   return ;
 
-  END_OF();
+  END_OF(LOC);
 }
 
 void ENSIGHT_MESH_WRONLY_DRIVER::addSupport(SUPPORT *sup)
@@ -597,7 +597,6 @@ void ENSIGHT_MESH_WRONLY_DRIVER::addSupport(SUPPORT *sup)
 }
 
 // void ENSIGHT_MESH_WRONLY_DRIVER::writeSupport(SUPPORT * mySupport) const {
-//   const char * LOC = "ENSIGHT_MESH_WRONLY_DRIVER::writeSupport(SUPPORT *) : " ;
 //   BEGIN_OF(LOC) ;
 //   MESSAGE(LOC << "Not yet implemented, acting on the object " << *mySupport);
 //   END_OF();
@@ -647,7 +646,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::openConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open main Ensight file "
 				     << _fileName)
 			  );
-  END_OF();
+  END_OF(LOC);
 }
 
 void ENSIGHT_MESH_RDONLY_DRIVER::closeConst() const {
@@ -661,7 +660,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::closeConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close main Ensight file "
 				     << _fileName)
 			  );
-  END_OF();
+  END_OF(LOC);
 }
 
 void ENSIGHT_MESH_RDONLY_DRIVER::write() const throw (MEDEXCEPTION) {
@@ -670,8 +669,8 @@ void ENSIGHT_MESH_RDONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 
 void ENSIGHT_MESH_RDONLY_DRIVER::read()
 {
-  //const char * LOC = "ENSIGHT_MESH_RDONLY_DRIVER::read() : " ;
-  BEGIN_OF("ENSIGHT_MESH_RDONLY_DRIVER::read() : ");
+  const char* LOC = "ENSIGHT_MESH_RDONLY_DRIVER::read() : ";
+  BEGIN_OF(LOC);
 
   openConst() ;
 
@@ -888,6 +887,6 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read()
 //     cout << "Impression de _ptrmesh dans EnsightMeshDriver: " << endl;
 //     cout << *_ptrMesh ;
 
-  END_OF();
+  END_OF(LOC);
 }
 

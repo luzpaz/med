@@ -33,12 +33,13 @@ GROUPClient::GROUPClient(const SALOME_MED::GROUP_ptr G,
     GROUP(),
     IOR_Group(SALOME_MED::GROUP::_duplicate(G))
 {
-  BEGIN_OF("GROUPClient::GROUPClient()");
+  const char* LOC = "GROUPClient::GROUPClient()";
+  BEGIN_OF(LOC);
 
   SCRUTE(G);
   SCRUTE(M);
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -48,12 +49,13 @@ GROUPClient::GROUPClient(const SALOME_MED::GROUP_ptr G,
 //=============================================================================
 void GROUPClient::blankCopy()
 {
-  BEGIN_OF("GROUPClient::blankCopy()");
+  const char* LOC = "GROUPClient::blankCopy()";
+  BEGIN_OF(LOC);
 
   SUPPORTClient::blankCopy();
   _complete = false;
 
-  END_OF();
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -63,12 +65,13 @@ void GROUPClient::blankCopy()
 
 void GROUPClient::fillCopy()
 {
-  BEGIN_OF("GROUPClient::fillCopy()");
+  const char* LOC = "GROUPClient::fillCopy()";
+  BEGIN_OF(LOC);
 
   SUPPORTClient::fillCopy();
   _complete = true;
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -79,6 +82,7 @@ void GROUPClient::fillCopy()
 
 GROUPClient::~GROUPClient()
 {
-  BEGIN_OF("GROUPClient::~GROUPClient()");
-  END_OF();
+  const char* LOC = "GROUPClient::~GROUPClient()";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
 }

@@ -91,11 +91,12 @@ CONNECTIVITY::CONNECTIVITY(medEntityMesh Entity /* =MED_CELL */) :
   				_neighbourhood((MEDSKYLINEARRAY*)NULL),
   				_constituent((CONNECTIVITY*)NULL)
 {
-  BEGIN_OF("CONNECTIVITY(medEntityMesh Entity=MED_CELL)");
+  const char* LOC = "CONNECTIVITY(medEntityMesh Entity=MED_CELL)";
+  BEGIN_OF(LOC);
    MESSAGE("CONNECTIVITY(medEntityMesh Entity=MED_CELL)");
   _count = new int[1];
   _count[0]=1;
-  END_OF();
+  END_OF(LOC);
 }
 
 /*!
@@ -1075,7 +1076,6 @@ int CONNECTIVITY::getNumberOfSubCellInType(medGeometryElement Type) const
 int CONNECTIVITY::getNumberOf(medEntityMesh Entity, medGeometryElement Type) const
 //-----------------------------------------------------------------------------------//
 {
-  //const char * LOC = "CONNECTIVITY::getNumberOf";
   if (Entity==_entity) {
     if (Type==MED_EN::MED_NONE)
       return 0; // not defined !
@@ -1218,8 +1218,8 @@ void CONNECTIVITY::calculateNodalConnectivity()
 void CONNECTIVITY::calculateReverseNodalConnectivity()
 //---------------------------------------------------//
 {
-  //const char * LOC = "CONNECTIVITY::calculateReverseNodalConnectivity : ";
-  BEGIN_OF("CONNECTIVITY::calculateReverseNodalConnectivity : ");
+  const char* LOC = "CONNECTIVITY::calculateReverseNodalConnectivity : ";
+  BEGIN_OF(LOC);
 
   SCRUTE(_nodal);
   SCRUTE(_reverseNodalConnectivity);
@@ -1300,7 +1300,7 @@ void CONNECTIVITY::calculateReverseNodalConnectivity()
 						    reverse_nodal_connectivity_index,
 						    reverse_nodal_connectivity,true);
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 /*! If not yet done, calculate the Descending Connectivity */
@@ -1875,7 +1875,7 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 							   &Reversedescendingconnectivityvalue[0]);
       ////
     }
-  END_OF();
+  END_OF(LOC);
   }
 
 /*! Not implemented yet */
@@ -1883,13 +1883,13 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 void CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity)
 //--------------------------------------------------------------------//
 {
-  //const char * LOC = "CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity) : ";
-  BEGIN_OF("CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity) : ");
+  const char* LOC = "CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity) : ";
+  BEGIN_OF(LOC);
 
   MESSAGE(PREFIX<<"method not yet implemented " << myConnectivity._entity);
   // Mesh dimension !
 
-  END_OF();
+  END_OF(LOC);
   return;
 }
 
@@ -1930,7 +1930,7 @@ medGeometryElement CONNECTIVITY::getElementType(medEntityMesh Entity,int globalN
     throw MEDEXCEPTION(LOCALIZED("getElementType : Entity not defined !"));
   throw MEDEXCEPTION(LOCALIZED("getElementType : Wrong Number !"));
 
-  END_OF();
+  END_OF(LOC);
 }
 
 /*!

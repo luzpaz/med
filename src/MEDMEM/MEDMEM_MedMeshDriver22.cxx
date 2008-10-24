@@ -81,7 +81,7 @@ void MED_MESH_DRIVER22::open()
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName<<" in mode "<<_accessMode));
   }
   
-  END_OF();
+  END_OF(LOC);
 }
   
 void MED_MESH_DRIVER22::close()
@@ -104,7 +104,7 @@ void MED_MESH_DRIVER22::close()
     _status = MED_CLOSED;
     _medIdt = MED_INVALID;
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 //A FAIRE UTILISER LES MAPS...
@@ -186,7 +186,7 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY when the mesh is a grid")) ;
       buildAllGroups(_ptrMesh->_groupNode,_ptrMesh->_familyNode) ;
     }
-    END_OF();
+  END_OF(LOC);
     return;
   }
   else // check that the mesh is really unstructured (PAL14113)
@@ -246,7 +246,7 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
 //        MESSAGE(LOC << _ptrMesh->_connectivity->_type[i]) ;
 //      }
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -499,7 +499,7 @@ void MED_MESH_RDONLY_DRIVER22::getGRID()
 
   _ptrMesh->_coordinate->setCoordinatesSystem(coordinateSystem);
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -691,7 +691,7 @@ int  MED_MESH_RDONLY_DRIVER22::getCOORDINATE()
 
       delete[] tmp_node_number ;
       
-      END_OF();
+  END_OF(LOC);
       return MED_VALID;
     }
   return MED_ERROR;
@@ -835,7 +835,7 @@ int MED_MESH_RDONLY_DRIVER22::getCONNECTIVITY()
 	  
 //  	}
       
-      END_OF();
+  END_OF(LOC);
       return MED_VALID;
     }
   return MED_ERROR;
@@ -1843,7 +1843,7 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 	delete[] MEDArrayEdgeFamily ;
       }
 
-    END_OF();
+  END_OF(LOC);
     return MED_VALID ;
     }
 
@@ -1879,7 +1879,7 @@ int  MED_MESH_RDONLY_DRIVER22::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
       if ( err != MED_VALID)
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "There is no family for the |"<< _ptrMesh->getNumberOfNodes() << "| nodes in mesh |" << _ptrMesh->_name.c_str() << "|"));
 
-      END_OF();
+  END_OF(LOC);
       return MED_VALID;
     }
 
@@ -2077,7 +2077,7 @@ void MED_MESH_WRONLY_DRIVER22::write(void) const
   if (writeFamilies(_ptrMesh->_familyEdge) !=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERROR in writeFamilies(_ptrMesh->_familyEdge)"  )) ;
        
-  END_OF();
+  END_OF(LOC);
 } 
 
 //=======================================================================
@@ -2254,7 +2254,7 @@ int MED_MESH_WRONLY_DRIVER22::writeGRID() const
 	}
   } // end Write  Cartesian or Polar Grid
 
-  END_OF();
+  END_OF(LOC);
   return MED_VALID;
 }
 
@@ -2410,7 +2410,7 @@ int MED_MESH_WRONLY_DRIVER22::writeCoordinates() const {
       }
       //////////////////////////////////////////////////////////////////////////////////////
 
-  END_OF();
+  END_OF(LOC);
     
   return MED_VALID;
 }
@@ -2803,7 +2803,7 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
     }
 
 
-  END_OF();
+  END_OF(LOC);
   return MED_VALID;
 }
 
@@ -2823,7 +2823,8 @@ int MED_MESH_WRONLY_DRIVER22::writeConnectivities(medEntityMesh entity) const
 void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGroups, vector <FAMILY*>& myFamilies ) const 
 {
 
-	BEGIN_OF("MED_MESH_WRONLY_DRIVER::groupFamilyConverter");
+  const char* LOC = "MED_MESH_WRONLY_DRIVER::groupFamilyConverter";
+  BEGIN_OF(LOC);
   if (myGroups.empty()) return;
 	
 //	if (!myFamilies.empty())
@@ -3002,7 +3003,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
 					myFamilies.push_back(myFamily);
 				}
 		}
-	END_OF();
+  END_OF(LOC);
 }
 
 int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
@@ -3359,7 +3360,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
     }
   }
     
-  END_OF();
+  END_OF(LOC);
   return MED_VALID;
 }
 
@@ -3489,7 +3490,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilies(vector<FAMILY*> & families ) const
 
   }
 
-  END_OF();
+  END_OF(LOC);
 
   return MED_VALID;
 }

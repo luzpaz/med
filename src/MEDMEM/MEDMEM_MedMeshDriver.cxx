@@ -100,7 +100,6 @@ IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(const IMED_MESH_RDONLY_DRIVER &
 
 int IMED_MESH_RDONLY_DRIVER::getDescendingConnectivity(CONNECTIVITY * Connectivity) 
 {
-  //const char * LOC = "MED_MESH_RDONLY_DRIVER::getDescendingConnectivity : " ;
   if (_status==MED_OPENED)
     {
       MESSAGE("MED_MESH_RDONLY_DRIVER::getDescendingConnectivity : "<<"call on the object " << Connectivity);
@@ -111,8 +110,8 @@ int IMED_MESH_RDONLY_DRIVER::getDescendingConnectivity(CONNECTIVITY * Connectivi
 
 void IMED_MESH_RDONLY_DRIVER::buildAllGroups(vector<GROUP*> & Groups, vector<FAMILY*> & Families) 
 {
-  //const char * LOC = "MED_MESH_RDONLY_DRIVER::buildAllGroups " ;
-  BEGIN_OF("MED_MESH_RDONLY_DRIVER::buildAllGroups ");
+  const char* LOC = "MED_MESH_RDONLY_DRIVER::buildAllGroups ";
+  BEGIN_OF(LOC);
 
   int numberOfFamilies = Families.size() ;
   //SCRUTE(numberOfFamilies);
@@ -145,13 +144,13 @@ void IMED_MESH_RDONLY_DRIVER::buildAllGroups(vector<GROUP*> & Groups, vector<FAM
     it++;
   }
 
-  END_OF();
+  END_OF(LOC);
 }
 
 void IMED_MESH_RDONLY_DRIVER::updateFamily()
 {
-  //const char * LOC = "MED_MESH_RDONLY_DRIVER::updateFamily() " ;
-  BEGIN_OF("MED_MESH_RDONLY_DRIVER::updateFamily() ");
+  const char* LOC = "MED_MESH_RDONLY_DRIVER::updateFamily() ";
+  BEGIN_OF(LOC);
 
   // we need to update family on constituent if we have constituent, but no 
   // descending connectivity, so, we must calculate all constituent and
@@ -159,7 +158,7 @@ void IMED_MESH_RDONLY_DRIVER::updateFamily()
   _ptrMesh->_connectivity->updateFamily(_ptrMesh->_familyFace) ; // in 2d, do nothing
   _ptrMesh->_connectivity->updateFamily(_ptrMesh->_familyEdge) ; // in 3d, do nothing
 
-  END_OF();
+  END_OF(LOC);
 }
 
 

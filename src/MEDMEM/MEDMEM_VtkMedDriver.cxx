@@ -59,12 +59,12 @@ VTK_MED_DRIVER::VTK_MED_DRIVER(const VTK_MED_DRIVER & driver):
 
 VTK_MED_DRIVER::~VTK_MED_DRIVER()
 {
-  //const char * LOC ="VTK_MED_DRIVER::~VTK_MED_DRIVER()";
-  BEGIN_OF("VTK_MED_DRIVER::~VTK_MED_DRIVER()");
+  const char* LOC = "VTK_MED_DRIVER::~VTK_MED_DRIVER()";
+  BEGIN_OF(LOC);
 
   delete _vtkFile ;
 
-  END_OF();
+  END_OF(LOC);
 }
 
 GENDRIVER * VTK_MED_DRIVER::copy() const
@@ -94,7 +94,7 @@ void VTK_MED_DRIVER::openConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				     << _fileName)
 			  );
-  END_OF();
+  END_OF(LOC);
 }
 
 void VTK_MED_DRIVER::open() {
@@ -103,8 +103,8 @@ void VTK_MED_DRIVER::open() {
 
 void VTK_MED_DRIVER::closeConst() const {
 
-  //const char * LOC = "VTK_MED_DRIVER::close() : ";
-  BEGIN_OF("VTK_MED_DRIVER::close() : ");
+  const char* LOC = "VTK_MED_DRIVER::close() : ";
+  BEGIN_OF(LOC);
   
   (*_vtkFile).close();
   
@@ -115,7 +115,7 @@ void VTK_MED_DRIVER::closeConst() const {
 //    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
 //				     << _fileName)
 //			  );
-  END_OF();
+  END_OF(LOC);
 }
 
 void VTK_MED_DRIVER::close() {
@@ -125,8 +125,8 @@ void VTK_MED_DRIVER::close() {
 
 void VTK_MED_DRIVER::write() const
 {
-  //const char * LOC = "VTK_MED_DRIVER::write() : ";
-  BEGIN_OF("VTK_MED_DRIVER::write() : ");
+  const char* LOC = "VTK_MED_DRIVER::write() : ";
+  BEGIN_OF(LOC);
 
   // Well we must open vtk file first, because there are
   // no other driver than MED for VTK that do it !
@@ -205,7 +205,7 @@ void VTK_MED_DRIVER::write() const
   // no other driver than MED for VTK that do it !
   //  closeConst() ;
   
-  END_OF();
+  END_OF(LOC);
 }
 
 void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
@@ -442,13 +442,13 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
   return ;
 
 
-  END_OF();
+  END_OF(LOC);
 }
 
 void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
 {
-  //const char * LOC = "VTK_MED_DRIVER::writeField() : ";
-  BEGIN_OF("VTK_MED_DRIVER::writeField() : ");
+  const char* LOC = "VTK_MED_DRIVER::writeField() : ";
+  BEGIN_OF(LOC);
   
   typedef MEDMEM_ArrayInterface<int,NoInterlace,NoGauss>::Array ArrayIntNo;
   typedef MEDMEM_ArrayInterface<double,NoInterlace,NoGauss>::Array ArrayDoubleNo;
@@ -552,12 +552,12 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
     }
     }
   
-  END_OF();
+  END_OF(LOC);
 }
 
 void VTK_MED_DRIVER::writeSupport(SUPPORT * mySupport) const {
-  //const char * LOC = "VTK_MED_DRIVER::writeSupport(SUPPORT *) : " ;
-  BEGIN_OF("VTK_MED_DRIVER::writeSupport(SUPPORT *) : ") ;
+  const char* LOC = "VTK_MED_DRIVER::writeSupport(SUPPORT *) : ";
+  BEGIN_OF(LOC);
   MESSAGE(PREFIX << "Not yet implemented, acting on the object " << *mySupport);
-  END_OF();
+  END_OF(LOC);
 }

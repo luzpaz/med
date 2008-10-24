@@ -80,7 +80,7 @@ void MED_MESH_DRIVER21::open()
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName<<" in mode "<<_accessMode));
   }
   
-  END_OF();
+  END_OF(LOC);
 }
   
 void MED_MESH_DRIVER21::close()
@@ -103,7 +103,7 @@ void MED_MESH_DRIVER21::close()
     _status = MED_CLOSED;
     _medIdt = MED_INVALID;
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 //A FAIRE UTILISER LES MAPS...
@@ -173,7 +173,7 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
 	  buildAllGroups(_ptrMesh->_groupNode,_ptrMesh->_familyNode) ;
 	}
 
-      END_OF();
+  END_OF(LOC);
       return;
     }
   // (EAP at EDF): Commented for MEDMEMTest_VtkMedDriver.cxx:126 -
@@ -234,7 +234,7 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
 //        MESSAGE(LOC << _ptrMesh->_connectivity->_type[i]) ;
 //      }
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -413,7 +413,7 @@ void MED_MESH_RDONLY_DRIVER21::getGRID()
   _ptrMesh->_coordinate->setCoordinatesSystem(coordinateSystem);
 
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -565,7 +565,7 @@ int  MED_MESH_RDONLY_DRIVER21::getCOORDINATE()
 
       delete[] tmp_node_number ;
       
-      END_OF();
+  END_OF(LOC);
       return MED_VALID;
     }
   return MED_ERROR;
@@ -729,7 +729,7 @@ int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY()
 	  
 //  	}
       
-      END_OF();
+  END_OF(LOC);
       return MED_VALID;
     }
   return MED_ERROR;
@@ -1470,7 +1470,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
       delete[] MEDArrayEdgeFamily ;
     }
 
-    END_OF();
+  END_OF(LOC);
     return MED_VALID ;
   }
   return MED_ERROR;
@@ -1503,7 +1503,7 @@ int  MED_MESH_RDONLY_DRIVER21::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
                                    << "| nodes in mesh |" 
                                    << _ptrMesh->_name.c_str() << "|" ));
     }
-    END_OF();
+  END_OF(LOC);
     return MED_VALID;
   }
   return MED_ERROR;
@@ -1679,7 +1679,7 @@ void MED_MESH_WRONLY_DRIVER21::write(void) const
   if (writeFamilies(_ptrMesh->_familyEdge) !=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERROR in writeFamilies(_ptrMesh->_familyEdge)"  )) ;
 
-  END_OF();
+  END_OF(LOC);
 } 
 
 //=======================================================================
@@ -1825,7 +1825,7 @@ int MED_MESH_WRONLY_DRIVER21::writeGRID() const
 
   } // end Write  Cartesian or Polar Grid
 
-  END_OF();
+  END_OF(LOC);
   return MED_VALID;
 }
 
@@ -1938,7 +1938,7 @@ int MED_MESH_WRONLY_DRIVER21::writeCoordinates() const {
       }
       //////////////////////////////////////////////////////////////////////////////////////
 
-  END_OF();
+  END_OF(LOC);
     
   return MED_VALID;
 }
@@ -2089,7 +2089,7 @@ int MED_MESH_WRONLY_DRIVER21::writeConnectivities(medEntityMesh entity) const {
             
     }
   }
-  END_OF();
+  END_OF(LOC);
   return MED_VALID;
 }
 
@@ -2449,7 +2449,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
     }
   }
     
-  END_OF();
+  END_OF(LOC);
   return MED_VALID;
 }
 
@@ -2568,7 +2568,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
 
   }
 
-  END_OF();
+  END_OF(LOC);
     
   return MED_VALID;
 }

@@ -73,8 +73,8 @@ It is also possible to use VTK_DRIVER to open a VTK ascii file.
 */
 MED::MED(driverTypes driverType, const string & fileName)
 {
-  //const char * LOC = "MED::MED(driverTypes driverType, const string & fileName) : ";
-  BEGIN_OF("MED::MED(driverTypes driverType, const string & fileName) : ");
+  const char* LOC = "MED::MED(driverTypes driverType, const string & fileName) : ";
+  BEGIN_OF(LOC);
 
   MESSAGE(PREFIX << "driverType = " << driverType);
 
@@ -84,7 +84,7 @@ MED::MED(driverTypes driverType, const string & fileName)
   _drivers[current]->readFileStruct();
   _drivers[current]->close();
 
-  END_OF();
+  END_OF(LOC);
 };
 
 /*!\if MEDMEM_ug @} \endif */
@@ -96,8 +96,8 @@ MED::MED(driverTypes driverType, const string & fileName)
 */
 MED::~MED()
 {
-  //const char * LOC = "MED::~MED() : ";
-  BEGIN_OF("MED::~MED() : ");
+  const char* LOC = "MED::~MED() : ";
+  BEGIN_OF(LOC);
 
   // Analysis of the object MED
 
@@ -193,7 +193,7 @@ MED::~MED()
 
 
 
-  END_OF();
+  END_OF(LOC);
 } ;
 
 /*! \if MEDMEM_ug
@@ -210,9 +210,9 @@ int MED::addDriver(driverTypes driverType,
 		   const string & fileName="Default File Name.med",
 		   MED_EN::med_mode_acces access)
 {
-  //const char * LOC = "MED::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\") : ";
 
-  BEGIN_OF("MED::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\") : ");
+  const char* LOC = "MED::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\") : ";
+  BEGIN_OF(LOC);
 
   MESSAGE(PREFIX << " the file name is " << fileName);
 
@@ -228,7 +228,7 @@ int MED::addDriver(driverTypes driverType,
 
   driver->setId(current); 
 
-  END_OF();
+  END_OF(LOC);
 
   return current;
 }
@@ -238,10 +238,10 @@ int MED::addDriver(driverTypes driverType,
   read or write methods.
 */
 int  MED::addDriver(GENDRIVER & driver) {
-  //const char * LOC = "MED::addDriver(GENDRIVER &) : ";
   int current;
 
-  BEGIN_OF("MED::addDriver(GENDRIVER &) : ");
+  const char* LOC = "MED::addDriver(GENDRIVER &) : ";
+  BEGIN_OF(LOC);
   
   SCRUTE(_drivers.size());
 
@@ -256,7 +256,7 @@ int  MED::addDriver(GENDRIVER & driver) {
   SCRUTE(current);
   driver.setId(current); 
 
-  END_OF();
+  END_OF(LOC);
 
   return current;
   
@@ -283,7 +283,7 @@ void MED::rmDriver (int index/*=0*/)
                                      << _drivers.size()
                                      )
                           );   
-  END_OF();
+  END_OF(LOC);
 }
 
 /*!
@@ -306,7 +306,7 @@ void MED::writeFrom (int index/*=0*/)
                                      )
                           ); 
   }
-  END_OF();
+  END_OF(LOC);
 }; 
 
 /*!\if MEDMEM_ug 
@@ -334,7 +334,7 @@ void MED::write (int index/*=0*/)
                                      << _drivers.size()
                                      )
                           ); 
-  END_OF();
+  END_OF(LOC);
 }; 
 /*!\if MEDMEM_ug @} \endif */
 
@@ -391,7 +391,7 @@ void MED::read  (int index/*=0*/)
 				     << _drivers.size()-1 
 				     )
 			  );  
-  END_OF();
+  END_OF(LOC);
   
 };
 
@@ -408,8 +408,8 @@ void MED::read  (int index/*=0*/)
 */
 int      MED::getNumberOfMeshes ( void ) const
 {
-  //const char * LOC = "MED::getNumberOfMeshes ( void ) const : ";
-  BEGIN_OF("MED::getNumberOfMeshes ( void ) const : ");
+  const char* LOC = "MED::getNumberOfMeshes ( void ) const : ";
+  BEGIN_OF(LOC);
 
   return _meshes.size();
 };   
@@ -419,8 +419,8 @@ int      MED::getNumberOfMeshes ( void ) const
 */
 int      MED::getNumberOfFields ( void ) const
 {
-  //const char * LOC = "MED::getNumberOfFields ( void ) const : ";
-  BEGIN_OF("MED::getNumberOfFields ( void ) const : ");
+  const char* LOC = "MED::getNumberOfFields ( void ) const : ";
+  BEGIN_OF(LOC);
 
   return _fields.size(); // we get number of field with different name
 };       
@@ -437,8 +437,8 @@ int      MED::getNumberOfFields ( void ) const
 void MED::getMeshNames      ( string * meshNames ) const
   throw (MED_EXCEPTION)
 {
-  //const char * LOC = "MED::getMeshNames ( string * ) const : ";
-  BEGIN_OF("MED::getMeshNames ( string * ) const : ");
+  const char* LOC = "MED::getMeshNames ( string * ) const : ";
+  BEGIN_OF(LOC);
 
   // REM : ALLOCATION D'UN TABLEAU DE POINTEURS SUR STRING FAITE PAR LE CLIENT
   map<MESH_NAME_,MESH*>::const_iterator  currentMesh; // ??ITERATEUR CONST SUR UN OBJET NON CONST ??
@@ -450,7 +450,7 @@ void MED::getMeshNames      ( string * meshNames ) const
     meshNamesIndex++;                               // CF OPTIMISATION
   }
 
-  END_OF();
+  END_OF(LOC);
 };
 
 /*!
@@ -460,8 +460,8 @@ void MED::getMeshNames      ( string * meshNames ) const
 */
 deque<string> MED::getMeshNames      () const
 {
-  //const char * LOC = "MED::getMeshNames () const : ";
-  BEGIN_OF("MED::getMeshNames () const : ");
+  const char* LOC = "MED::getMeshNames () const : ";
+  BEGIN_OF(LOC);
 
   deque<string> meshNames(_meshes.size());
   
@@ -474,7 +474,7 @@ deque<string> MED::getMeshNames      () const
     meshNamesIndex++;                               // CF OPTIMISATION
   }
 
-  END_OF();
+  END_OF(LOC);
   return meshNames ;
 };
 
@@ -500,7 +500,7 @@ MESH   * MED::getMesh           ( const string & meshName )  const
   
   return (*itMeshes).second;
   
-  END_OF();
+  END_OF(LOC);
 }
 
 /*!
@@ -534,7 +534,7 @@ MESH   * MED::getMesh           (const FIELD_ * const field ) const
                                      )
                           );
 
-  END_OF();
+  END_OF(LOC);
 
   return (*itMeshes).second;
 };
@@ -552,8 +552,8 @@ MESH   * MED::getMesh           (const FIELD_ * const field ) const
 void MED::getFieldNames     ( string * fieldNames ) const
   throw (MED_EXCEPTION)
 {
-  //const char * LOC = "MED::getFieldNames ( string * ) const : ";
-  BEGIN_OF("MED::getFieldNames ( string * ) const : ");
+  const char* LOC = "MED::getFieldNames ( string * ) const : ";
+  BEGIN_OF(LOC);
 
 //  unsigned int fieldNamesSize =  sizeof(fieldNames) / sizeof(string *);
  
@@ -574,7 +574,7 @@ void MED::getFieldNames     ( string * fieldNames ) const
     fieldNamesIndex++;                               // CF OPTIMISATION
   }
 
-  END_OF();
+  END_OF(LOC);
 
 };
 
@@ -585,8 +585,8 @@ void MED::getFieldNames     ( string * fieldNames ) const
 */
 deque<string> MED::getFieldNames     () const
 {
-  //const char * LOC = "MED::getFieldNames ( ) const : ";
-  BEGIN_OF("MED::getFieldNames ( ) const : ");
+  const char* LOC = "MED::getFieldNames ( ) const : ";
+  BEGIN_OF(LOC);
 
   deque<string> fieldNames(_fields.size());
 
@@ -599,7 +599,7 @@ deque<string> MED::getFieldNames     () const
     fieldNamesIndex++;                               // CF OPTIMISATION
   }
 
-  END_OF();
+  END_OF(LOC);
   return fieldNames ;
 };
 
@@ -656,7 +656,7 @@ deque<DT_IT_> MED::getFieldIteration (const string & fieldName) const
       iterationIndex++;                               // CF OPTIMISATION
     }
 
-  END_OF();
+  END_OF(LOC);
   return Iteration ;
 };
 
@@ -698,7 +698,7 @@ FIELD_  * MED::getField          ( const string & fieldName, const int dt=MED_NO
                                      )
                           );   
 
-  END_OF();
+  END_OF(LOC);
 
   //return _fields[fieldName][dtIt];
   return (*itMap_dtIt).second;
@@ -760,7 +760,7 @@ const map<MED_EN::medEntityMesh,SUPPORT*> & MED::getSupports(const string & mesh
                                      << meshName << "|"
                                      )
                           );
-  END_OF();
+  END_OF(LOC);
   return (*itSupportOnMesh).second ;
 }
 
@@ -836,7 +836,7 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
                                      << meshName << "|"
                                      )
                           );
-  END_OF();
+  END_OF(LOC);
   return (*itSupport).second ;
 };
 /*!\if MEDMEM_ug @} \endif */
@@ -858,8 +858,8 @@ synchronizes the two numberings.
 */
 void MED::updateSupport ()
 {
-  //const char * LOC = "MED::updateSupport () : ";
-  BEGIN_OF("MED::updateSupport () : ");
+  const char* LOC = "MED::updateSupport () : ";
+  BEGIN_OF(LOC);
 
   map<MESH_NAME_, map<MED_EN::medEntityMesh,SUPPORT *> >::iterator itSupportOnMesh ;
   for ( itSupportOnMesh=_support.begin();itSupportOnMesh != _support.end(); itSupportOnMesh++ ) {
@@ -898,7 +898,7 @@ void MED::updateSupport ()
     }
   }
 
-  END_OF();
+  END_OF(LOC);
 }
 
 /*!
@@ -926,7 +926,7 @@ void MED::addMesh( MESH * const ptrMesh)
 
 //   _meshes[meshName] = meshToMed;
 
-  END_OF();
+  END_OF(LOC);
 }
 
 /*!
@@ -972,5 +972,5 @@ void MED::addField( FIELD_ * const ptrField)
   _support  [meshName][ptrSupport->getEntity()] = ptrSupport;// if it already exists it is replaced
 
 
-  END_OF();
+  END_OF(LOC);
 }

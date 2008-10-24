@@ -51,8 +51,9 @@ using namespace MEDMEM;
 //=============================================================================
 MED_i::MED_i():_med((::MED*)NULL)
 {
-        BEGIN_OF("Default Constructor MED_i");
-        END_OF();
+  const char* LOC = "Default Constructor MED_i";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -62,8 +63,8 @@ MED_i::MED_i():_med((::MED*)NULL)
 //=============================================================================
 void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const string & fileName)
 {
-  //const char * LOC = "MED_i::init(driverTypes, const string &)";
-	BEGIN_OF("MED_i::init(driverTypes, const string &)");
+  const char* LOC = "MED_i::init(driverTypes, const string &)";
+  BEGIN_OF(LOC);
 
   // we create all IOR from _med
 	_med = new ::MED(driverType,fileName);
@@ -200,7 +201,7 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
              }
   }
   
-  END_OF();
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -243,8 +244,8 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
   // if (persistence):
   //    some objects can be not published
 
-  //const char * LOC = "MED_i::initWithFieldType(driverTypes, const string &)";
-	BEGIN_OF("MED_i::initWithFieldType(driverTypes, const string &)");
+  const char* LOC = "MED_i::initWithFieldType(driverTypes, const string &)";
+  BEGIN_OF(LOC);
 
   // we create all IOR from _med
 
@@ -594,7 +595,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
 	     MESSAGE("Here we are i="<< i);
 	}
-	END_OF();
+  END_OF(LOC);
 }
 
 //================================================================================
@@ -912,8 +913,8 @@ SALOME_MED::FIELD_ptr MED_i::getField(const char* fieldName,
 				      CORBA::Long numOrdre ) 
 throw (SALOME::SALOME_Exception)
 {
-  //const char * LOC="MED_i::getField(const char*,CORBA::Long,CORBA::Long) ";
-	BEGIN_OF("MED_i::getField(const char*,CORBA::Long,CORBA::Long) ");
+  const char* LOC = "MED_i::getField(const char*,CORBA::Long,CORBA::Long) ";
+  BEGIN_OF(LOC);
 
 	DT_IT_ dtIt;
 
@@ -931,7 +932,7 @@ throw (SALOME::SALOME_Exception)
 	if ( itMap_dtIt == map_dtIt.end() )
 		THROW_SALOME_CORBA_EXCEPTION("Iteration not found !", SALOME::INTERNAL_ERROR);
   
-	END_OF();
+  END_OF(LOC);
 	return (*itMap_dtIt).second;
 
 }
@@ -1113,7 +1114,8 @@ throw (SALOME::SALOME_Exception)
 void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor) 
 throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-	BEGIN_OF("MED_Mesh_i::addInStudy");
+  const char* LOC = "MED_Mesh_i::addInStudy";
+  BEGIN_OF(LOC);
         if ( _medId != "" )
         {
                 MESSAGE("Med already in Study");
@@ -1155,7 +1157,7 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
    	MESSAGE("Registering of the Corba Med pointer");
 	Register();
 
-        END_OF();
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -1172,7 +1174,8 @@ void MED_i::addInStudy (SALOMEDS::Study_ptr myStudy,
                         const char * fileName)
   throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-	BEGIN_OF("MED_i::addInStudy(myStudy, myIor, fileName)");
+  const char* LOC = "MED_i::addInStudy(myStudy, myIor, fileName)";
+  BEGIN_OF(LOC);
         if ( _medId != "" ) {
           MESSAGE("Med already in Study");
           THROW_SALOME_CORBA_EXCEPTION("Med already in Study", SALOME::BAD_PARAM);
@@ -1282,5 +1285,5 @@ void MED_i::addInStudy (SALOMEDS::Study_ptr myStudy,
    	MESSAGE("Registering of the Corba Med pointer");
 	Register();
 
-        END_OF();
+  END_OF(LOC);
 }

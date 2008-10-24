@@ -152,11 +152,12 @@ public :
 			   );
     }
 
-    END_OF();
+  END_OF(LOC);
   }
 
   void close() {
-    BEGIN_OF("MED_FIELD_DRIVER22::close()");
+  const char* LOC = "MED_FIELD_DRIVER22::close()";
+  BEGIN_OF(LOC);
     med_2_3::med_int err = 0;
     if (MED_FIELD_DRIVER<T>::_status == MED_OPENED) {
       err=med_2_3::MEDfermer(MED_FIELD_DRIVER22<T>::_medIdt);
@@ -166,7 +167,7 @@ public :
       MESSAGE(" MED_FIELD_DRIVER22::close() : MEDfermer : _medIdt= " << MED_FIELD_DRIVER22<T>::_medIdt );
       MESSAGE(" MED_FIELD_DRIVER22::close() : MEDfermer : err    = " << err );
     }
-    END_OF();
+  END_OF(LOC);
   }
 };
 
@@ -201,8 +202,9 @@ public :
     MED_FIELD_DRIVER22<T>(fileName,ptrField,MED_EN::RDONLY),
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY)
   {
-    BEGIN_OF("MED_FIELD_RDONLY_DRIVER22::MED_FIELD_RDONLY_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
-    END_OF();
+  const char* LOC = "MED_FIELD_RDONLY_DRIVER22::MED_FIELD_RDONLY_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
   }
 
   /*!
@@ -265,8 +267,9 @@ public :
     MED_FIELD_DRIVER22<T>(fileName,ptrField,MED_EN::WRONLY),
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
-    BEGIN_OF("MED_FIELD_WRONLY_DRIVER22::MED_FIELD_WRONLY_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
-    END_OF();
+  const char* LOC = "MED_FIELD_WRONLY_DRIVER22::MED_FIELD_WRONLY_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
   }
 
   /*!
@@ -331,9 +334,10 @@ public :
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR),
     IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
   {
-    BEGIN_OF("MED_FIELD_RDWR_DRIVER22::MED_FIELD_RDWR_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
+  const char* LOC = "MED_FIELD_RDWR_DRIVER22::MED_FIELD_RDWR_DRIVER22(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)";
+  BEGIN_OF(LOC);
     //_accessMode = MED_RDWR ;
-    END_OF();
+  END_OF(LOC);
   }
 
   /*!
@@ -681,7 +685,8 @@ template <class T> int
 MED_FIELD_DRIVER22<T>::getMeshDimensionFromFile(med_2_3::med_idt id,
                                                 const string &   meshName) const
 {
-  BEGIN_OF("MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(...)");
+  const char* LOC = "MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(...)";
+  BEGIN_OF(LOC);
 
   int numberOfGeometricType=0;
   MED_EN::medGeometryElement geometricType[MED_NBR_GEOMETRIE_MAILLE];
@@ -767,7 +772,8 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromFile(med_2_3::med_idt      id,
                                                     vector<int> &         nbOfElOfTypeC
                                                     ) const throw(MEDEXCEPTION)
 {
-  BEGIN_OF("MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromFile(...)");
+  const char* LOC = "MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromFile(...)";
+  BEGIN_OF(LOC);
 
   int numberOfGeometricType=0;
   MED_EN::medGeometryElement geometricType[MED_NBR_GEOMETRIE_MAILLE];
@@ -858,7 +864,7 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromFile(med_2_3::med_idt      id,
 //   for (int j =0 ; j<= numberOfGeometricType;++j)
 //       cout << "nbOfElOfTypeC["<<j<<"]="<<nbOfElOfTypeC[j]<<endl;
 
-  END_OF();
+  END_OF(LOC);
 }
 
 /*!
@@ -898,7 +904,7 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromMESH( MESH * meshPtr,
     nbOfElOfTypeC[j]+=nbOfElOfTypeC[j-1]+nbOfElOfType[j-1];
   }
 
-  END_OF();
+  END_OF(LOC);
 }
 
 /*--------------------- RDONLY PART -------------------------------*/
@@ -1720,7 +1726,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     MED_FIELD_DRIVER<T>::_ptrField->_support = mySupport; //Prévenir l'utilisateur ?
   }
 
-  END_OF();
+  END_OF(LOC);
 }
 
 template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::write( void ) const
@@ -2237,7 +2243,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
   if ( !isFullInterlace ) delete myField;
 
 
-  END_OF();
+  END_OF(LOC);
 }
 
 /*--------------------- RDWR PART -------------------------------*/
@@ -2250,17 +2256,19 @@ template <class T> GENDRIVER * MED_FIELD_RDWR_DRIVER22<T>::copy(void) const
 template <class T> void MED_FIELD_RDWR_DRIVER22<T>::write(void) const
   throw (MEDEXCEPTION)
 {
-  BEGIN_OF("MED_FIELD_RDWR_DRIVER22::write(void)");
+  const char* LOC = "MED_FIELD_RDWR_DRIVER22::write(void)";
+  BEGIN_OF(LOC);
   MED_FIELD_WRONLY_DRIVER22<T>::write();
-  END_OF();
+  END_OF(LOC);
 }
 
 template <class T> void MED_FIELD_RDWR_DRIVER22<T>::read (void)
   throw (MEDEXCEPTION)
 {
-  BEGIN_OF("MED_FIELD_RDWR_DRIVER22::read(void)");
+  const char* LOC = "MED_FIELD_RDWR_DRIVER22::read(void)";
+  BEGIN_OF(LOC);
   MED_FIELD_RDONLY_DRIVER22<T>::read();
-  END_OF();
+  END_OF(LOC);
 }
 
 } //End namespace MEDMEM

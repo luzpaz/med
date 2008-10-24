@@ -134,11 +134,12 @@ public :
 			   );
     }
 
-    END_OF();
+  END_OF(LOC);
   }
   
   void close() {
-    BEGIN_OF("MED_FIELD_DRIVER21::close()");
+  const char* LOC = "MED_FIELD_DRIVER21::close()";
+  BEGIN_OF(LOC);
     med_2_1::med_int err = 0;
     if (MED_FIELD_DRIVER<T>::_status == MED_OPENED) {
       err=med_2_1::MEDfermer(MED_FIELD_DRIVER21<T>::_medIdt);
@@ -148,7 +149,7 @@ public :
       MESSAGE(" MED_FIELD_DRIVER21::close() : MEDfermer : MED_FIELD_DRIVER21<T>::_medIdt= " << _medIdt );
       MESSAGE(" MED_FIELD_DRIVER21::close() : MEDfermer : err    = " << err );
     }
-    END_OF();
+  END_OF(LOC);
   }
 
 
@@ -185,8 +186,9 @@ public :
     MED_FIELD_DRIVER21<T>(fileName,ptrField,MED_EN::RDONLY),
     IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField)
   { 
-    BEGIN_OF("MED_FIELD_RDONLY_DRIVER21::MED_FIELD_RDONLY_DRIVER21(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
-    END_OF();
+  const char* LOC = "MED_FIELD_RDONLY_DRIVER21::MED_FIELD_RDONLY_DRIVER21(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
   }
   
   /*!
@@ -249,8 +251,9 @@ public :
     MED_FIELD_DRIVER21<T>(fileName,ptrField,MED_EN::WRONLY),
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
-    BEGIN_OF("MED_FIELD_WRONLY_DRIVER21::MED_FIELD_WRONLY_DRIVER21(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)");
-    END_OF();
+  const char* LOC = "MED_FIELD_WRONLY_DRIVER21::MED_FIELD_WRONLY_DRIVER21(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
   }
 
   /*!
@@ -315,9 +318,10 @@ public :
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR),
     IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
   {
-    BEGIN_OF("MED_FIELD_RDWR_DRIVER21::MED_FIELD_RDWR_DRIVER21(const string & fileName, const FIELD<T> * ptrField)");
+  const char* LOC = "MED_FIELD_RDWR_DRIVER21::MED_FIELD_RDWR_DRIVER21(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF(LOC);
     //_accessMode = MED_RDWR ;
-    END_OF();
+  END_OF(LOC);
   };
 
   /*!
@@ -534,12 +538,12 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
     support.setNumberOfElements(numberOfElementsOfType);    //setNumberOfElements effectue une copie
     support.setAll(true);
 
-    END_OF();
+  END_OF(LOC);
 
     return alreadyFoundAnEntity;
   } else
     {
-      END_OF();
+  END_OF(LOC);
 
       return false;
     }
@@ -1436,7 +1440,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 
     }
   
-  END_OF();
+  END_OF(LOC);
 }
 
 /*--------------------- RDWR PART -------------------------------*/
@@ -1449,17 +1453,19 @@ template <class T> GENDRIVER * MED_FIELD_RDWR_DRIVER21<T>::copy(void) const
 template <class T> void MED_FIELD_RDWR_DRIVER21<T>::write(void) const
   throw (MEDEXCEPTION)
 {
-  BEGIN_OF("MED_FIELD_RDWR_DRIVER21::write(void)");
+  const char* LOC = "MED_FIELD_RDWR_DRIVER21::write(void)";
+  BEGIN_OF(LOC);
   MED_FIELD_WRONLY_DRIVER21<T>::write(); 
-  END_OF();
+  END_OF(LOC);
 } 
 
 template <class T> void MED_FIELD_RDWR_DRIVER21<T>::read (void)
   throw (MEDEXCEPTION)
 {
-  BEGIN_OF("MED_FIELD_RDWR_DRIVER21::read(void)");
+  const char* LOC = "MED_FIELD_RDWR_DRIVER21::read(void)";
+  BEGIN_OF(LOC);
   MED_FIELD_RDONLY_DRIVER21<T>::read();
-  END_OF();
+  END_OF(LOC);
 }
 }//End namespace MEDMEM
 /*-----------------------------------------------------------------*/

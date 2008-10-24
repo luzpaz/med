@@ -597,7 +597,7 @@ void ENSIGHT_FIELD_DRIVER::openConst(bool checkDataFile) const throw (MEDEXCEPTI
                      << " in access mode " << getAccessMode()));
   }
 
-  END_OF();
+  END_OF(LOC);
 }
 // ==========================================================================================
 //function : ENSIGHT_FIELD_RDONLY_DRIVER
@@ -763,7 +763,6 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read (void)
 
 void ENSIGHT_FIELD_RDONLY_DRIVER::readGoldASCII ()
 {
-  //const char * LOC ="ENSIGHT_FIELD_RDONLY_DRIVER::readGoldASCII() : ";
 
   // data that was set by CaseFile Driver
   medEntityMesh entity = _ptrField->getSupport()->getEntity();
@@ -828,7 +827,6 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::readGoldASCII ()
 
 void ENSIGHT_FIELD_RDONLY_DRIVER::readGoldBinary()
 {
-  //const char * LOC ="ENSIGHT_FIELD_RDONLY_DRIVER::readGoldBinary() : ";
 
   // data that was set by CaseFile Driver
   medEntityMesh entity = _ptrField->getSupport()->getEntity();
@@ -906,7 +904,6 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::readGoldBinary()
 
 void ENSIGHT_FIELD_RDONLY_DRIVER::read6ASCII()
 {
-  //const char * LOC ="ENSIGHT_FIELD_RDONLY_DRIVER::read6ASCII() : ";
 
   // data that was set by CaseFile Driver
   medEntityMesh entity = _ptrField->getSupport()->getEntity();
@@ -975,7 +972,6 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read6ASCII()
 
 void ENSIGHT_FIELD_RDONLY_DRIVER::read6Binary()
 {
-  //const char * LOC ="ENSIGHT_FIELD_RDONLY_DRIVER::read6Binary() : ";
 
   // data that was set by CaseFile Driver
   medEntityMesh entity = _ptrField->getSupport()->getEntity();

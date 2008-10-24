@@ -144,8 +144,9 @@ public :
 			   FIELD<T, INTERLACING_TAG> * ptrField):
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY)
   {
-    BEGIN_OF("IMED_FIELD_RDONLY_DRIVER::IMED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
-    END_OF();
+  const char* LOC = "IMED_FIELD_RDONLY_DRIVER::IMED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
   }
 
   /*!
@@ -194,8 +195,9 @@ public :
 			   FIELD<T, INTERLACING_TAG> * ptrField):
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
-    BEGIN_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
-    END_OF();
+  const char* LOC = "MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
   }
 
   /*!
@@ -246,9 +248,10 @@ public :
     IMED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField),
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR)
   {
-    BEGIN_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  const char* LOC = "MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF(LOC);
     //_accessMode = MED_RDWR ;
-    END_OF();
+  END_OF(LOC);
   }
 
   /*!
@@ -393,11 +396,12 @@ MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER(const string & fileName,
   MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY),
   IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField)
 {
-    BEGIN_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  const char* LOC = "MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF(LOC);
 
     _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::RDONLY);
 
-    END_OF();
+  END_OF(LOC);
 }
 
 /*--------------------- WRONLY PART -------------------------------*/
@@ -420,11 +424,12 @@ MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER(const string & fileName,
   MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY),
   IMED_FIELD_WRONLY_DRIVER<T>( fileName, ptrField)
 {
-  BEGIN_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  const char* LOC = "MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF(LOC);
 
   _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::WRONLY/*ECRI*/);
 
-  END_OF();
+  END_OF(LOC);
 }
 
 /*--------------------- RDWR PART -------------------------------*/
@@ -441,11 +446,12 @@ MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER(const string & fileName,
   MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR),
   IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
 {
-  BEGIN_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  const char* LOC = "MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF(LOC);
 
   _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::RDWR);
 
-  END_OF();
+  END_OF(LOC);
 }
 
 

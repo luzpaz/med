@@ -210,8 +210,8 @@ static void setFieldNames(const vector< _fieldBase* >& fields,
 
 bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields )
 {
-  //const char * LOC = "GIBI_MESH_RDONLY_DRIVER::readFile() : " ;
-  BEGIN_OF("GIBI_MESH_RDONLY_DRIVER::readFile() : ");
+  const char* LOC = "GIBI_MESH_RDONLY_DRIVER::readFile() : ";
+  BEGIN_OF(LOC);
 
   // LECTURE DES DONNEES DS FICHIER GIBI
 
@@ -805,7 +805,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
     }
   }
 
-  END_OF();
+  END_OF(LOC);
   return true;
 }
 
@@ -873,7 +873,8 @@ GIBI_MESH_DRIVER(driver)
 }
 GIBI_MESH_RDONLY_DRIVER::~GIBI_MESH_RDONLY_DRIVER()
 {
-  BEGIN_OF( "~GIBI_MESH_RDONLY_DRIVER()");
+  const char* LOC = "~GIBI_MESH_RDONLY_DRIVER()";
+  BEGIN_OF(LOC);
   if (_File >= 0)
   {
     ::close (_File);
@@ -927,7 +928,7 @@ void GIBI_MESH_RDONLY_DRIVER::open()
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName
                                  << " fd: " << _File));
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -937,8 +938,8 @@ void GIBI_MESH_RDONLY_DRIVER::open()
 
 void GIBI_MESH_RDONLY_DRIVER::close()
 {
-  //const char * LOC = "GIBI_MESH_DRIVER::close() " ;
-  BEGIN_OF("GIBI_MESH_DRIVER::close() ");
+  const char* LOC = "GIBI_MESH_DRIVER::close() ";
+  BEGIN_OF(LOC);
   if ( _status == MED_OPENED) {
     if (_File >= 0) {
       ::close (_File);
@@ -948,7 +949,7 @@ void GIBI_MESH_RDONLY_DRIVER::close()
     }
     _status = MED_CLOSED;
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -1097,7 +1098,7 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
   {
     INFOS( ex.what() );
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -1108,7 +1109,8 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 static void getReverseVector (const medGeometryElement type,
                               vector<pair<int,int> > & swapVec )
 {
-  BEGIN_OF("void getReverseVector()");
+  const char* LOC = "void getReverseVector()";
+  BEGIN_OF(LOC);
   swapVec.clear();
 
   switch ( type ) {
@@ -1177,7 +1179,7 @@ static void getReverseVector (const medGeometryElement type,
     break;
   default:;
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -1554,8 +1556,8 @@ static void orientElements( _intermediateMED& medi )
 
 void GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi)
 {
-  //const char * LOC = "GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi) : " ;
-  BEGIN_OF("GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi) : ");
+  const char* LOC = "GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi) : ";
+  BEGIN_OF(LOC);
 
   _ptrMesh->_name = _meshName;
 
@@ -1638,7 +1640,7 @@ void GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi)
       }
     }
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 void GIBI_MESH_RDONLY_DRIVER::write( void ) const
@@ -1716,7 +1718,7 @@ void GIBI_MESH_WRONLY_DRIVER::open()
   {
     _status = MED_OPENED;
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -1727,14 +1729,14 @@ void GIBI_MESH_WRONLY_DRIVER::open()
 void GIBI_MESH_WRONLY_DRIVER::close()
   //  throw (MEDEXCEPTION)
 {
-  //const char * LOC = "GIBI_MESH_DRIVER::close() " ;
-    BEGIN_OF("GIBI_MESH_DRIVER::close() ");
+  const char* LOC = "GIBI_MESH_DRIVER::close() ";
+  BEGIN_OF(LOC);
     if ( _status == MED_OPENED)
     {
 	_gibi.close();
 	_status = MED_CLOSED;
     }
-    END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -1745,8 +1747,8 @@ void GIBI_MESH_WRONLY_DRIVER::close()
 void GIBI_MESH_WRONLY_DRIVER::write(void) const
   throw (MEDEXCEPTION)
 {
-  //const char * LOC = "void GIBI_MESH_WRONLY_DRIVER::write(void) const : ";
-  BEGIN_OF("void GIBI_MESH_WRONLY_DRIVER::write(void) const : ");
+  const char* LOC = "void GIBI_MESH_WRONLY_DRIVER::write(void) const : ";
+  BEGIN_OF(LOC);
 
   // we are going to modify the _gibi field
   GIBI_MESH_WRONLY_DRIVER * me = const_cast<GIBI_MESH_WRONLY_DRIVER *>(this);
@@ -1759,7 +1761,7 @@ void GIBI_MESH_WRONLY_DRIVER::write(void) const
 //     INFOS( ex.what() );
 //   }
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -2348,7 +2350,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh()
   }
   fcount.stop();
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -2383,9 +2385,10 @@ GIBI_MESH_RDWR_DRIVER::~GIBI_MESH_RDWR_DRIVER() {
 }
 GENDRIVER * GIBI_MESH_RDWR_DRIVER::copy(void) const
 {
-  BEGIN_OF( "GIBI_MESH_RDWR_DRIVER::copy()");
+  const char* LOC = "GIBI_MESH_RDWR_DRIVER::copy()";
+  BEGIN_OF(LOC);
   GENDRIVER * driver = new GIBI_MESH_RDWR_DRIVER(*this);
-  END_OF();
+  END_OF(LOC);
   return driver;
 }
 void GIBI_MESH_RDWR_DRIVER::write(void) const
@@ -2399,11 +2402,12 @@ void GIBI_MESH_RDWR_DRIVER::write(void) const
 void GIBI_MESH_RDWR_DRIVER::read (void)
   throw (MEDEXCEPTION)
 {
-  BEGIN_OF( "GIBI_MESH_RDWR_DRIVER::read()");
+  const char* LOC = "GIBI_MESH_RDWR_DRIVER::read()";
+  BEGIN_OF(LOC);
   GIBI_MESH_RDONLY_DRIVER::open();
   GIBI_MESH_RDONLY_DRIVER::read();
   GIBI_MESH_RDONLY_DRIVER::close();
-  END_OF();
+  END_OF(LOC);
 }
 void GIBI_MESH_RDWR_DRIVER::open()
   // throw (MEDEXCEPTION)
@@ -2494,7 +2498,7 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
     INFOS( ex.what() );
   }
 
-  END_OF();
+  END_OF(LOC);
 }
 
 //============================== ====================================================
@@ -2601,7 +2605,7 @@ static void writeDataSection (fstream&                    file,
     }
     fcount.stop();
   }
-  END_OF();
+  END_OF(LOC);
 }
 
 //=======================================================================
@@ -2611,8 +2615,8 @@ static void writeDataSection (fstream&                    file,
 
 void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
 {
-  //const char * LOC = "void GIBI_MED_WRONLY_DRIVER::write(void) const : ";
-  BEGIN_OF("void GIBI_MED_WRONLY_DRIVER::write(void) const : ");
+  const char* LOC = "void GIBI_MED_WRONLY_DRIVER::write(void) const : ";
+  BEGIN_OF(LOC);
 
   // we are going to modify the _gibi field
   GIBI_MED_WRONLY_DRIVER * me = const_cast<GIBI_MED_WRONLY_DRIVER *>(this);
@@ -2778,5 +2782,5 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   }
   me->writeLastRecord();
   delete [] names;
-  END_OF();
+  END_OF(LOC);
 }
