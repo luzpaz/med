@@ -446,9 +446,10 @@ void MESHCollection::getPolyhedraNodeConnectivity(const int* cell_list,int nb_ce
 void MESHCollection::write(const string& filename)
 {
   //building the connect zones necessary for writing joints
+	cout<<"Building Connect Zones"<<endl;
   if (m_topology->nbDomain()>1)
     buildConnectZones();
-  
+  cout <<"End of connect zones building"<<endl;
 	//suppresses link with driver so that it can be changed for writing
 	if (m_driver!=0)delete m_driver;
 	m_driver=0;
@@ -1092,13 +1093,16 @@ void MESHCollection::buildConnectZones(int idomain)
 	// constructing node/node correspondencies
 	vector<MEDMEM::MEDSKYLINEARRAY*> node_node_correspondency;
 	node_node_correspondency.resize(m_topology->nbDomain());
+
+	cout << "Computing node/node corresp"<<endl;
+
 	m_topology->computeNodeNodeCorrespondencies(idomain, node_node_correspondency );
 	
 	for (int idistant=0; idistant< m_topology->nbDomain(); idistant++)
 		{
-			// on regarde si une correspondance noeud/noeud a été trouvée 
+			// on regarde si une correspondance noeud/noeud a Ã©tÃ© trouvÃ©e 
 			// entre idomain et idistant
-			// si oui, on crée une connectzone
+			// si oui, on crÃ©e une connectzone
 			if (node_node_correspondency[idistant]!=0)
 				{
 					MEDMEM::CONNECTZONE* cz= new MEDMEM::CONNECTZONE();
@@ -1111,6 +1115,8 @@ void MESHCollection::buildConnectZones(int idomain)
 					m_connect_zones.push_back(cz);	
 				}
 		}
+	cout << "Computing node/node corresp"<<endl;
+
 	vector<MEDMEM::MEDSKYLINEARRAY*> cell_cell_correspondency;
 	cell_cell_correspondency.resize(m_topology->nbDomain());
 	m_topology->computeCellCellCorrespondencies(idomain, cell_cell_correspondency, m_cell_graph.get());
@@ -1140,7 +1146,9 @@ void MESHCollection::buildConnectZones(int idomain)
  
 void MESHCollection::buildConnectZones()
 {
-  
+  cout << "Computing node/node corresp"<<endl;
+
+
    //Creating nodes
   for (int idomain=0; idomain<m_topology->nbDomain(); idomain++)
   {
@@ -1152,9 +1160,9 @@ void MESHCollection::buildConnectZones()
     
     for (int idistant=0; idistant< m_topology->nbDomain(); idistant++)
       {
-        // on regarde si une correspondance noeud/noeud a été trouvée 
+        // on regarde si une correspondance noeud/noeud a Ã©tÃ© trouvÃ©e 
         // entre idomain et idistant
-        // si oui, on crée une connectzone
+        // si oui, on crÃ©e une connectzone
         if (node_node_correspondency[idistant]!=0)
           {
             MEDMEM::CONNECTZONE* cz= new MEDMEM::CONNECTZONE();
@@ -1168,7 +1176,8 @@ void MESHCollection::buildConnectZones()
           }
       }
   }
-  
+  cout << "Computing face corresp"<<endl;
+
  //creating faces if required 
   if (m_subdomain_boundary_creates)
   {
@@ -1192,7 +1201,7 @@ void MESHCollection::buildConnectZones()
       cell_cell_correspondency.resize(m_topology->nbDomain());
     
       m_topology->computeCellCellCorrespondencies(idomain, cell_cell_correspondency, m_cell_graph.get());
-     
+
     for (int idistant=0; idistant< m_topology->nbDomain(); idistant++)
     {
       if (idistant <= idomain) continue;
@@ -1202,17 +1211,18 @@ void MESHCollection::buildConnectZones()
       if (cell_cell_correspondency[idistant]!=0)
         {
           int nbcells = cell_cell_correspondency[idistant]->getNumberOf();
+					//					MEDMEM::CELLMODEL_Map cellmodel_map;
           for (int ilocal=0; ilocal<nbcells; ilocal++)
           { 
-            medGeometryElement local_type = m_mesh[idomain]->getElementType(MED_EN::MED_CELL,ilocal+1);
-            MEDMEM::CELLMODEL local_model (local_type);
+						//            medGeometryElement local_type = m_mesh[idomain]->getElementType(MED_EN::MED_CELL,ilocal+1);
+						//            MEDMEM::CELLMODEL  local_model = cellmodel_map.retrieveCellModel (local_type);
             const int* index = cell_cell_correspondency[idistant]->getIndex();
             const int* value = cell_cell_correspondency[idistant]->getValue();
             for (int icelldistant = index[ilocal]; icelldistant < index[ilocal+1]; icelldistant++)
             {
               int distant_id = value[icelldistant-1];
-               medGeometryElement distant_type = m_mesh[idistant]->getElementType(MED_EN::MED_CELL,distant_id);
-               MEDMEM::CELLMODEL distant_model (distant_type);
+							//               medGeometryElement distant_type = m_mesh[idistant]->getElementType(MED_EN::MED_CELL,distant_id);
+							 //							 MEDMEM::CELLMODEL distant_model = cellmodel_map.retrieveCellModel (distant_type);
                MEDSPLITTER_FaceModel* face = getCommonFace(idomain,ilocal+1,idistant,distant_id,global_face_id);
                face_map[idomain][face->getType()].push_back(face);
                MEDSPLITTER_FaceModel* face2 = getCommonFace(idistant,distant_id,idomain, ilocal+1,global_face_id);
@@ -1382,7 +1392,8 @@ void MESHCollection::buildConnectZones()
             delete (iter->second)[i];
   } 
   
- 
+ cout << "Computing cell/cell corresp"<<endl;
+
   //Creating cell/cell correspondencies
   for (int idomain=0;idomain<m_topology->nbDomain();idomain++)
   {

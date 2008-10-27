@@ -929,20 +929,21 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
 	
 	vector <hash_multimap<int,int> > cell_corresp;
 	//TODO : remplacer int* par une map <int,int>
-	vector<int*  > number_of_connections(m_nb_domain);
-	
+	//	vector<int*  > number_of_connections(m_nb_domain);
+	//	vector<map<int,int> > number_of_connections;
+	vector<map<int,int> > number_of_connections;
 	cell_corresp.resize(m_nb_domain);
-	number_of_connections.resize(m_nb_domain);
-	for (int i=0; i<m_nb_domain; i++)
-		{
-			//		cell_corresp[i]=new multimap<int,int>;
-			if (m_nb_cells[i] >0)
-				{
-					number_of_connections[i]=new int[m_nb_cells[idomain]];
-					for (int j=0; j<m_nb_cells[idomain]; j++)
-						number_of_connections[i][j]=0;
-				}
-		}
+ 	number_of_connections.resize(m_nb_domain);
+// 	for (int i=0; i<m_nb_domain; i++)
+// 		{
+// 			//		cell_corresp[i]=new multimap<int,int>;
+// 			if (m_nb_cells[i] >0)
+// 				{
+// 					number_of_connections[i]=new int[m_nb_cells[idomain]];
+// 					for (int j=0; j<m_nb_cells[idomain]; j++)
+// 						number_of_connections[i][j]=0;
+// 				}
+// 		}
 	
 	const MEDMEM::MEDSKYLINEARRAY* skylinegraph = graph->getGraph();
 	
@@ -968,7 +969,11 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
 					if (local.first != idomain)
 						{
 							cell_corresp[local.first].insert(make_pair(icell+1,local.second));
-							number_of_connections[local.first][icell]++;
+							//							number_of_connections[local.first][icell]++;
+							if (number_of_connections[local.first].find(icell)==number_of_connections[local.first].end())
+								number_of_connections[local.first].insert(make_pair(icell,1));
+							else
+								number_of_connections[local.first][icell]++;
                
 						}
 				}
@@ -976,13 +981,17 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
 	
 	for (int inew=0; inew<m_nb_domain; inew++)
 		{
-			if (inew==idomain) continue;
+			if (inew==idomain || number_of_connections[inew].empty()) continue;
 		
 			int* new_index=new int[m_nb_cells[idomain]+1];
 			new_index[0]=1;
 			for (int i=0; i<m_nb_cells[idomain]; i++)
 				{
-					new_index[i+1]=new_index[i]+number_of_connections[inew][i];
+					
+					if (number_of_connections[inew].find(i)!=number_of_connections[inew].end())
+						new_index[i+1]=new_index[i]+number_of_connections[inew][i];
+					else
+						new_index[i+1]=new_index[i];
 				}
 			int* new_value;
 			if (new_index[m_nb_cells[idomain]]-1 > 0)
@@ -992,8 +1001,13 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
            
 			int value_i=0;
 		
+			//			hash_multimap<int,int>::iterator iter=cell_corresp[inew].begin();
+
 			for (int i=0; i<m_nb_cells[idomain]; i++)
 				{
+					//					for (int j=new_index[i];j<new_index[i+1];j++,value_i++,iter++)
+					//						new_value[value_i]=iter->second;
+					
 					typedef hash_multimap<int,int>::iterator mmiter;
 					pair<mmiter,mmiter> range=cell_corresp[inew].equal_range(i+1);
 					for (mmiter it=range.first; it!=range.second; it++)
@@ -1015,9 +1029,9 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
 	
 		}
 
-	for (int inew=0; inew<m_nb_domain; inew++)
-	  if (m_nb_cells[inew]>0)
-	    delete[] number_of_connections[inew];
+// 		for (int inew=0; inew<m_nb_domain; inew++)
+// 	  if (m_nb_cells[inew]>0)
+// 	    delete[] number_of_connections[inew];
 
 }
 

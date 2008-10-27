@@ -19,6 +19,7 @@
 //
 #include "MEDMEM_SkyLineArray.hxx"
 #include "MEDMEM_Utilities.hxx"
+#include <map>
 
 using namespace std;
 using namespace MEDMEM;
@@ -72,6 +73,50 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(const int count, const int length,
 	  }
 }
 
+//creates the reverse array
+//creates an array with count maxvalue, where maxvalue
+//is the maximum of the value_ of the present array
+//length is the same as present array
+//
+// For instance
+// 1 : 2 4
+// 2 : 1 2
+//
+//will give
+// 1 : 2
+// 2 : 1 2
+// 3 :
+// 4 : 1
+
+MEDSKYLINEARRAY* MEDSKYLINEARRAY::makeReverseArray()
+{
+	multimap<int,int > reverse;
+	int size=0;
+  for (int i=0; i<_count;i++)
+		for (int j=_index[i];j<_index[i+1];j++)
+			{
+				int value=_value[j-1];
+				reverse.insert(make_pair(value,i+1));
+				if (value>size) size=value;
+			}
+	int* r_index=new int [size+1];
+	int* r_value=new int [_length];
+	r_index[0]=1;
+	pair<multimap<int,int>::iterator,multimap<int,int>::iterator>piter;
+	int* ptr_value=r_value;
+	for (int i=0; i<size;i++)
+		{
+			piter=reverse.equal_range(i);
+			int index_incr=0;
+			for (multimap<int,int>::iterator iter=piter.first; iter!=piter.second; iter++)
+				{
+					*ptr_value++=iter->second;
+					index_incr++;
+				}
+			r_index[i+1]=r_index[i]+index_incr;
+		}
+	return new MEDSKYLINEARRAY(size,_length,r_index,r_value,true);
+}
 ostream& MEDMEM::operator<<(ostream &os, const MEDSKYLINEARRAY &sky) {
   os << "_count : " << sky._count << " ,_length : " << sky._length;
   for (int i = 0; i < sky._count ; i++) {

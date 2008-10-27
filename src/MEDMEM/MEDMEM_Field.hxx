@@ -922,7 +922,7 @@ public:
   ~FIELD();
 
   FIELD & operator=(const FIELD &m);
-
+	FIELD & operator=(T value);
   const FIELD operator+(const FIELD& m) const;
   const FIELD operator-(const FIELD& m) const;
   const FIELD operator*(const FIELD& m) const;
@@ -1290,6 +1290,21 @@ FIELD<T, INTERLACING_TAG> & FIELD<T, INTERLACING_TAG>::operator=(const FIELD &m)
 
   _valueType       = m._valueType;
   _interlacingType = m._interlacingType;
+
+  return *this;
+}
+
+/*!
+	Initializes all the field values to \a value 
+*/
+template <class T, class INTERLACING_TAG>
+FIELD<T, INTERLACING_TAG> & FIELD<T, INTERLACING_TAG>::operator=(T value)
+{
+  MESSAGE("Appel de FIELD<T>::operator= T") ;
+	int size=getNumberOfComponents()*getNumberOfValues();
+	T* ptr= const_cast<T*>( getValue());
+	for (int i=0; i< size; i++)
+		{*ptr++=value;}
 
   return *this;
 }

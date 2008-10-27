@@ -59,7 +59,7 @@ void METISGraph::partGraph(int ndomain, const string& options_string)
 	else
 	  {
 	    for (int i=0; i<n+1; i++)
-	      partition[i]=1;
+	      partition[i]=0;
 	  }
 									 
 	int* index=new int [n+1];

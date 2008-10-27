@@ -264,7 +264,7 @@ vector<int*>& nodeglobal, int idomain
     int ntype = (m_collection->getMesh())[idomain]->getNumberOfElementsWithPoly(MED_EN::MED_FACE,type);
     if (ntype==0) continue;
     med_2_3::MEDglobalNumLire(fid,meshname, array+offset, ntype,
-            med_2_3::MED_FACE, (med_2_3::med_geometrie_element)type);
+            med_2_3::MED_MAILLE, (med_2_3::med_geometrie_element)type);
     offset+=ntype;
         }
       faceglobal[idomain]=array;
@@ -289,7 +289,8 @@ vector<int*>& nodeglobal, int idomain
       med_2_3::med_idt fid = med_2_3::MEDouvrir(distfilename,med_2_3::MED_LECTURE_ECRITURE);  
     
       int index_joint=0;
-      
+		
+			
       for (int icz=0; icz<(m_collection->getCZ()).size(); icz++)
   {
     if ((m_collection->getCZ())[icz]->getLocalDomainNumber()==idomain)
@@ -304,7 +305,8 @@ vector<int*>& nodeglobal, int idomain
         char distant_name[MED_TAILLE_NOM];
         //sprintf(distant_name,"domain_%i",(m_collection->getCZ())[icz]->getDistantDomainNumber());
         
-        sprintf(distant_name,(m_collection->getMesh())[idistant]->getName().c_str());
+				//        sprintf(distant_name,(m_collection->getMesh())[idistant]->getName().c_str());
+				sprintf(distant_name,"domain_%i",idistant);
         char mesh_name[MED_TAILLE_NOM];
               
         strcpy (mesh_name, m_collection->getMesh(idomain)->getName().c_str());
@@ -334,57 +336,62 @@ vector<int*>& nodeglobal, int idomain
         if (error==-1) cout << "erreur creation de joint "<<endl;
         
         //writing cell/cell joint      
-        writeElementJoint(MED_EN::MED_CELL, icz, idomain, idistant, mesh_name,joint_name,fid);
+				writeElementJoint(MED_EN::MED_CELL, icz, idomain, idistant, mesh_name,joint_name,fid);
         //writing face/face joint
         if (m_collection->getSubdomainBoundaryCreates())
         {
           MED_EN::medEntityMesh constituent_entity =
             (m_collection->getMeshDimension()==3)?MED_EN::MED_FACE:MED_EN::MED_EDGE;
-          writeElementJoint(constituent_entity, icz, idomain, idistant, mesh_name,joint_name,fid);                 
+					writeElementJoint(constituent_entity, icz, idomain, idistant, mesh_name,joint_name,fid);                 
         }                   
         index_joint++;
       }
   }
-  
+
+			char meshchar[MED_TAILLE_NOM];
+      strcpy(meshchar,(m_collection->getMesh())[idomain]->getName().c_str());
+
       // Writing cell global numbering
       // 
+			{
       int ncell=m_collection->getTopology()->getCellNumber(idomain);
-      int * array=new int[ncell];
+      int* array=new int[ncell];
       m_collection->getTopology()->getCellList(idomain,array);
       int offset=0;
-    
+			
       MED_EN::MESH_ENTITIES::const_iterator currentEntity;
       list<MED_EN::medGeometryElement>::const_iterator iter;
       currentEntity  = MED_EN::meshEntities.find(MED_EN::MED_CELL);
-      char meshchar[MED_TAILLE_NOM];
-      strcpy(meshchar,(m_collection->getMesh())[idomain]->getName().c_str());
+
       int nbtypes = (m_collection->getMesh())[idomain]->getNumberOfTypesWithPoly(MED_EN::MED_CELL);
       MED_EN::medGeometryElement* types =(m_collection->getMesh())[idomain]->getTypesWithPoly(MED_EN::MED_CELL);
       for (int itype=0; itype<nbtypes;itype++)
-    {
-    MED_EN::medGeometryElement type=types[itype];
-    if (!m_collection->isDimensionOK(type,m_collection->getMeshDimension())) continue;
-    int ntype = (m_collection->getMesh())[idomain]->getNumberOfElementsWithPoly(MED_EN::MED_CELL,type);
-    if (ntype==0) continue;
-    med_2_3::MEDglobalNumEcr(fid,meshchar, array+offset, ntype,
-           med_2_3::MED_MAILLE, (med_2_3::med_geometrie_element)type);
-    offset+=ntype;
+				{
+					MED_EN::medGeometryElement type=types[itype];
+					if (!m_collection->isDimensionOK(type,m_collection->getMeshDimension())) continue;
+					int ntype = (m_collection->getMesh())[idomain]->getNumberOfElementsWithPoly(MED_EN::MED_CELL,type);
+					if (ntype==0) continue;
+					med_2_3::MEDglobalNumEcr(fid,meshchar, array+offset, ntype,
+																	 med_2_3::MED_MAILLE, (med_2_3::med_geometrie_element)type);
+					offset+=ntype;
           
-  }
+				}
       delete[] types;
       delete[] array;
-    
+			}
+	
       MED_EN::medEntityMesh constituent_entity;
       if (m_collection->getMeshDimension()==3)
-       constituent_entity=MED_EN::MED_FACE;
-       else if (m_collection->getMeshDimension()==2)
-       constituent_entity=MED_EN::MED_EDGE;
-       else throw MEDEXCEPTION("Wrong dimension");
-       
-       
+				constituent_entity=MED_EN::MED_FACE;
+			else if (m_collection->getMeshDimension()==2)
+				constituent_entity=MED_EN::MED_EDGE;
+			else throw MEDEXCEPTION("Wrong dimension");
+			
+
       //writing face global numbering
-    
-      offset=0;
+			{
+			int * array;
+      int offset=0;
       int nface= m_collection->getTopology()->getFaceNumber(idomain);
       if (nface >0)
         array=new int[nface];
@@ -394,33 +401,40 @@ vector<int*>& nodeglobal, int idomain
       MED_EN::medGeometryElement* facetypes;
       if (nbfacetypes>0) 
         facetypes =(m_collection->getMesh())[idomain]->getTypesWithPoly(constituent_entity);
-     
+			
       for (int itype=0; itype<nbfacetypes;itype++)
-    {
-    MED_EN::medGeometryElement type=facetypes[itype];
-    if (!m_collection->isDimensionOK(type,m_collection->getMeshDimension()-1)) continue;
-  
-    int ntype = (m_collection->getMesh())[idomain]->getNumberOfElementsWithPoly(constituent_entity,type);
-    if (ntype==0) continue;
-    med_2_3::MEDglobalNumEcr(fid,meshchar, array+offset, ntype,
-           med_2_3::MED_MAILLE, (med_2_3::med_geometrie_element)type);
-    offset+=ntype;
-  }
-  if (nface>0) delete[] array;
-  if (nbfacetypes>0) delete[] facetypes;
-  
-  //writing node global numbering
-  
-  int nnode= m_collection->getTopology()->getNodeNumber(idomain);
-  array=new int[nnode];
-  m_collection->getTopology()->getNodeList(idomain,array);
-  med_2_3::MEDglobalNumEcr(fid,meshchar, array, nnode,
-         med_2_3::MED_NOEUD, med_2_3::MED_POINT1);
-  
-  delete[] array;
-  med_2_3::MEDfermer(fid);
-  MESSAGE("End of writing");
-  
+				{
+					MED_EN::medGeometryElement type=facetypes[itype];
+					if (!m_collection->isDimensionOK(type,m_collection->getMeshDimension()-1)) continue;
+					
+					int ntype = (m_collection->getMesh())[idomain]->getNumberOfElementsWithPoly(constituent_entity,type);
+					if (ntype==0) continue;
+					med_2_3::MEDglobalNumEcr(fid,meshchar, array+offset, ntype,
+																	 med_2_3::MED_MAILLE, (med_2_3::med_geometrie_element)type);
+					
+					offset+=ntype;
+				}
+			if (nface>0) delete[] array;
+			if (nbfacetypes>0) delete[] facetypes;
+			}
+
+		
+			//writing node global numbering
+			{
+			int nnode= m_collection->getTopology()->getNodeNumber(idomain);
+			int* array=new int[nnode];
+      
+			m_collection->getTopology()->getNodeList(idomain,array);
+			
+			med_2_3::MEDglobalNumEcr(fid,meshchar, array, nnode,
+															 med_2_3::MED_NOEUD, med_2_3::MED_POINT1);
+			
+			delete[] array;
+			}
+
+			med_2_3::MEDfermer(fid);
+			MESSAGE("End of writing");
+			
 }
 
 void MESHCollectionDriver::writeElementJoint(medEntityMesh entity ,
@@ -463,47 +477,68 @@ void MESHCollectionDriver::writeElementJoint(medEntityMesh entity ,
     {
       distant_offset[distant_types[i]]=distant_gni[i]-1;
     } 
-  
-  //classifying all thje cell/cell relationships into geomtype/geomtype relationships
-  //there exists a vector for each geomtype/geomtype pair
-  // the vectors are stored in cellmap, a std::map with a pair<geomtype,geomtype> key 
 
-  for (int i=0; i<nbcells; i++)
-    for (int icol = index[i]-1; icol<index[i+1]-1; icol++)
-    {
-      MED_EN::medGeometryElement local_type =  (m_collection->getMesh())[idomain]->getElementType(entity,i+1);
-      MED_EN::medGeometryElement distant_type = (m_collection->getMesh())[idistant]->getElementType(entity,value[icol]);
+	if (nb_types_local==1 && nb_types_distant==1)
+		{
+				MED_EN::medGeometryElement local_type =  (m_collection->getMesh())[idomain]->getElementType(entity,1);
+				MED_EN::medGeometryElement distant_type = (m_collection->getMesh())[idistant]->getElementType(entity,1);
+				vector<int> corresp;
+				for (int i=0; i<nbcells; i++)
+					for (int icol = index[i]-1; icol<index[i+1]-1; icol++)
+						{
+							corresp.push_back(i+1);
+							corresp.push_back(value[icol]);
+						}
+				int size_joint = corresp.size()/2;
+				med_2_3::MEDjointEcr(fid, mesh_name, joint_name, &corresp[0], 
+														 size_joint, med_2_3::MED_MAILLE,
+														 (med_2_3::med_geometrie_element)local_type    ,med_2_3::MED_MAILLE, 
+														 (med_2_3::med_geometrie_element)distant_type    );
+		}
+	else
+		{
+			//classifying all thje cell/cell relationships into geomtype/geomtype relationships
+			//there exists a vector for each geomtype/geomtype pair
+			// the vectors are stored in cellmap, a std::map with a pair<geomtype,geomtype> key 
+			
+			for (int i=0; i<nbcells; i++)
+				for (int icol = index[i]-1; icol<index[i+1]-1; icol++)
+					{
+						MED_EN::medGeometryElement local_type =  (m_collection->getMesh())[idomain]->getElementType(entity,i+1);
+						MED_EN::medGeometryElement distant_type = (m_collection->getMesh())[idistant]->getElementType(entity,value[icol]);
+						
+						cellmap[make_pair(local_type, distant_type)].push_back(i+1-local_offset[local_type]);
+						cellmap[make_pair(local_type, distant_type)].push_back(value[icol]-distant_offset[distant_type]);
 
-      cellmap[make_pair(local_type, distant_type)].push_back(i+1-local_offset[local_type]);
-      cellmap[make_pair(local_type, distant_type)].push_back(value[icol]-distant_offset[distant_type]);
-    }
-  map <pair <MED_EN::medGeometryElement, MED_EN::medGeometryElement> , vector<int> >::const_iterator iter;
-
-  //going through all the (geom,geom) pairs and writing the joints
-  for (iter= cellmap.begin(); iter != cellmap.end(); iter++)
-  {
-    int size= iter->second.size();
-    int *corresp = new int[size];
-    for (int ind=0; ind < size; ind++)
-      corresp[ind]=(iter->second)[ind];
-    med_2_3::med_geometrie_element local_geo_elem=(med_2_3::med_geometrie_element)iter->first.first;
-    med_2_3::med_geometrie_element distant_geo_elem=(med_2_3::med_geometrie_element)iter->first.second;
-    int size_joint=size/2;
-    //med_2_3::med_err error =
-      med_2_3::MEDjointEcr(fid, mesh_name, joint_name, corresp, size_joint, med_2_3::MED_MAILLE,
-                           local_geo_elem,med_2_3::MED_MAILLE, distant_geo_elem);
-
-    // MED v 2.3.1 returns an error code when
-    // writing a joint that is already present in the file.
-    // Also, it returns an error code if a joint
-    // concerns 3D elements.
-    // Until these two items are not
-    // changed, the following line must be commented out
-
-    //if (error==-1) throw MEDEXCEPTION("Error filling joint");
-
-    delete[]corresp;
-  }
+					}
+			map <pair <MED_EN::medGeometryElement, MED_EN::medGeometryElement> , vector<int> >::const_iterator iter;
+			
+			//going through all the (geom,geom) pairs and writing the joints
+			for (iter= cellmap.begin(); iter != cellmap.end(); iter++)
+				{
+					int size= iter->second.size();
+					int *corresp = new int[size];
+					for (int ind=0; ind < size; ind++)
+						corresp[ind]=(iter->second)[ind];
+					med_2_3::med_geometrie_element local_geo_elem=(med_2_3::med_geometrie_element)iter->first.first;
+					med_2_3::med_geometrie_element distant_geo_elem=(med_2_3::med_geometrie_element)iter->first.second;
+					int size_joint=size/2;
+					//med_2_3::med_err error =
+					med_2_3::MEDjointEcr(fid, mesh_name, joint_name, corresp, size_joint, med_2_3::MED_MAILLE,
+															 local_geo_elem,med_2_3::MED_MAILLE, distant_geo_elem);
+					delete[] corresp;
+				}
+			// MED v 2.3.1 returns an error code when
+			// writing a joint that is already present in the file.
+			// Also, it returns an error code if a joint
+			// concerns 3D elements.
+			// Until these two items are not
+			// changed, the following line must be commented out
+			
+			//if (error==-1) throw MEDEXCEPTION("Error filling joint");
+			
+			
+		}
 }
 
 void MESHCollectionDriver::jointSort(int* elems, int nbelems, bool is_first)

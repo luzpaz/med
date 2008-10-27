@@ -284,9 +284,8 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
     // all right, we could create connectivity !
     CONNECTIVITY * myConnectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;
     myConnectivity->setEntityDimension(_connectivity->getEntityDimension()-1);
+    myConnectivity->setNumberOfNodes(_connectivity->getNumberOfNodes());
     _connectivity->setConstituent(myConnectivity);
-
-    myConnectivity->setNumberOfNodes( _numberOfNodes );
   }
 }
 
@@ -387,8 +386,32 @@ void MESHING::setConnectivity(const int * Connectivity,
  @{
   */
 
+/*! Method setting the connectivity for MED_POLYGON
+elements
+\param ConnectivityIndex polygon connectivity index
+\param Connectivity polygon connectivity
+\param nbOfPolygons number of polygons defined
+\param Entity entity of the polygon
+
+The \a Entity parameter specifies whether the polygon is the highest order
+ element (MED_CELL) or it is a 2D element in a 3D mesh (MED_FACE).
+
+This method is fully compatible with the MESHING::setConnectivity method.
+The following code excerpt creates two polygons with 5 and 4 nodes respectively.
+\verbatim
+MESHING myMeshing ;
+myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,System,Mode);
+
+int conn_index[3]={1,6,10};
+int conn[9]={1,2,3,4,5,5,4,6,7};
+int nb_poly=2;
+meshing.setPolygonsConnectivity(conn_index, conn, nb_poly, MED_CELL)
+\endverbatim
+
+*/
+
 void MESHING::setPolygonsConnectivity     (const int * ConnectivityIndex,
-					   const int * ConnectivityValue,
+					   const int * Connectivity,
 					   int nbOfPolygons,
 					   const MED_EN::medEntityMesh Entity)
   throw (MEDEXCEPTION)
@@ -396,7 +419,7 @@ void MESHING::setPolygonsConnectivity     (const int * ConnectivityIndex,
   if (_connectivity == (CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("No connectivity defined !");
   
-  _connectivity->setPolygonsConnectivity(MED_NODAL, Entity, ConnectivityValue, ConnectivityIndex,ConnectivityIndex[nbOfPolygons]-1,nbOfPolygons) ;
+  _connectivity->setPolygonsConnectivity(MED_NODAL, Entity, Connectivity, ConnectivityIndex,ConnectivityIndex[nbOfPolygons]-1,nbOfPolygons) ;
 }
 
 

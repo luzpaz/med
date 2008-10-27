@@ -23,12 +23,24 @@
 #include <MEDMEM.hxx>
 
 #include <vector>
-
+#include <set>
+#include <map>
 #include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_PolyhedronArray.hxx"
 #include "MEDMEM_CellModel.hxx"
+#ifndef WNT
+#include <ext/hash_map>
+#else
+#include <hash_map>
+#endif
+
+#ifndef WNT
+using namespace __gnu_cxx;
+#else
+using namespace std;
+#endif
 
 namespace MEDMEM {
 class MEDSKYLINEARRAY;
@@ -44,6 +56,19 @@ class GROUP;
 class MEDMEM_EXPORT CONNECTIVITY
 /* ------------------------------------------- */
 {
+	class myHashFn
+	{
+	public:
+		size_t operator()(const vector<int>& key) const
+		{
+			size_t sum=0;
+			for (int i=0; i<key.size(); i++)
+				sum+=key[i];
+			return sum;
+		}
+		
+	};
+
   /* ---------------------- */
   /*	Class Attributs     */
   /* ---------------------- */
@@ -127,6 +152,10 @@ private:
 					    does nothing if already exists, else
 					    evaluates _descending from _nodal */
   void calculateDescendingConnectivity();
+
+	void calculatePartialDescendingConnectivity();
+	void addToDescendingConnectivity(const set<int>& nodes, multimap<int,int>& descending, int iglobal_cell , const hash_map<vector<int>,int, myHashFn > &);
+	
 					/*! private method :\n
 					    does nothing if already exists, else
 					    evaluates from _descending */
@@ -180,7 +209,7 @@ public:
                                         throw (MEDEXCEPTION);
 
   inline void setNumberOfNodes(int NumberOfNodes);
-
+	inline int getNumberOfNodes();
   inline int getEntityDimension() const;
 
   inline void setEntityDimension(int EntityDimension);
@@ -284,6 +313,8 @@ public:
   const int*      getNeighbourhood() const;
   void invertConnectivityForAFace(int faceId, const int *nodalConnForFace, bool polygonFace=false);
   bool deepCompare(const CONNECTIVITY& other) const;
+
+
 };
 /*----------------------*/
 /* Methodes Inline	*/
@@ -546,6 +577,11 @@ inline void CONNECTIVITY::setNumberOfNodes(int NumberOfNodes)
     _numberOfNodes=NumberOfNodes;
 }
 
+inline int CONNECTIVITY::getNumberOfNodes()
+{
+	return _numberOfNodes;
+}
+
 inline void CONNECTIVITY::setEntityDimension(int EntityDimension)
 {
     _entityDimension=EntityDimension;
@@ -566,6 +602,20 @@ MED_EN::medGeometryElement CONNECTIVITY::getPolyTypeRelativeTo() const
     throw MEDEXCEPTION("getPolyTypeRelativeTo : ");
 }
 
+
+
+
 }//End namespace MEDMEM
+
+// namespace __gnu_cxx {
+// template <> struct hash< std::vector<int> > {
+// 	size_t operator()(const std::vector<int>& input) {
+// 			size_t sum=0;
+// 			for (int i=0; i<input.size();i++)
+// 				sum+=input[i];
+// 			return sum;
+//     }
+// };
+//}
 
 #endif /* CONNECTIVITY_HXX */

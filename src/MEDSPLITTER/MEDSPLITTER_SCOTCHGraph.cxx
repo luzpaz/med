@@ -66,7 +66,7 @@ void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
 	else
 	  // partition for 1 subdomain
 		for (int i=0; i<n+1; i++)
-			partition[i]=1;
+			partition[i]=0;
 			
 	SCOTCH_stratExit(&scotch_strategy);
 	SCOTCH_graphExit(&scotch_graph);

@@ -291,6 +291,12 @@ int main(int argc, char** argv)
 
   // Creating a new mesh collection from the partitioning
   MEDSPLITTER::MESHCollection new_collection(*collection, new_topo, split_families, empty_groups);
+	if (mesh_only)
+		{
+			delete collection;
+			collection=0;
+		}
+
   if (!xml_output_master)
     new_collection.setDriverType(MEDSPLITTER::MedAscii);
 

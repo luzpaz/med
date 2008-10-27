@@ -305,7 +305,7 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 	m_filename.resize(nbdomains);
 
 	//loop on the domains
-	for (int idomain=0; idomain<nbdomains;idomain++)
+	for (int idomain=nbdomains-1; idomain>=0;idomain--)
 		{
 			char distfilename[256];
 	
@@ -322,6 +322,7 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 		
 			MESSAGE("Start writing");
 			(m_collection->getMesh())[idomain]->write(id);
+			(m_collection->getMesh())[idomain]->rmDriver(id);
 		
 			//updating the ascii description file
 			node = xmlNewChild(file_node, 0, BAD_CAST "subfile",0);
@@ -334,8 +335,7 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 			xmlNewProp(node, BAD_CAST "subdomain", BAD_CAST buff);
       xmlNewChild(node,0,BAD_CAST "name", BAD_CAST (m_collection->getMesh())[idomain]->getName().c_str());
 		
-      writeSubdomain(idomain, nbdomains, distfilename);
-			
+			writeSubdomain(idomain, nbdomains, distfilename);
 		}
 	strcat(filename,".xml");
 	m_master_filename=filename;

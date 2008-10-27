@@ -158,6 +158,7 @@ dist_salomeres_DATA = \
     recoll_bord.med \
     test19.med \
     test_2D.med \
+    trio_2D.med \
     TimeStamps_import22.med \
     TimeStamps.med \
     zzzz121b.med \
@@ -211,7 +212,8 @@ dist_salomeres_DATA = \
     square2.med \
     square2_split \
     square2_split1.med \
-    square2_split2.med
+    square2_split2.med \
+    Pol1.fig Pol2.fig Pol3.fig  Pol4.fig
 
 # VSR: little trick to avoid putting if MEDCatalog.xml to the distribution archive
 nodist_salomeres_SCRIPTS = MEDCatalog.xml

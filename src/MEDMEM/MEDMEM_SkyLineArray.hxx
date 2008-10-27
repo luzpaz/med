@@ -81,6 +81,8 @@ public :
   inline void setIndexValue(int i, int value) throw (MEDEXCEPTION) ;
 
   friend ostream& operator<<(ostream &os, const MEDSKYLINEARRAY &sky);
+	MEDSKYLINEARRAY* makeReverseArray();
+
 };
 
 // ---------------------------------------
