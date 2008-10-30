@@ -2044,64 +2044,62 @@ void CONNECTIVITY::calculatePartialDescendingConnectivity()
 					iglobal_cell++;
 				}
 		}
-	
+
 	// polygon case
 	if (dimension==2 && _polygonsNodal!=0)
-		{
-			int nbcells=getNumberOfElementsWithPoly(_entity,MED_POLYGON);
-			const int* index = _polygonsNodal->getIndex();
-			const int* conn = _polygonsNodal->getValue();
-			
-			for (int icell=0;icell<nbcells;icell++)
-				{
-					int nbnodes=index[icell+1]-index[icell];
-					int nbfaces=nbnodes;
-					for (int iface=0; iface<nbfaces;iface++)
-						{
-							set<int> nodes;
-							if (iface+1!=nbfaces)
-								{
-									nodes.insert(conn[index[icell]-1+iface]);
-									nodes.insert(conn[index[icell]-1+iface+1]);
-								}
-							else
-								{
-									nodes.insert(conn[index[icell]-1+iface]);
-									nodes.insert(conn[index[icell]-1]);
-								}
-							addToDescendingConnectivity(nodes,descending,iglobal_cell,face_map);
-							
-						}
-					iglobal_cell++;
-				}		
-		}
+        {
+          int nbcells=getNumberOfElementsWithPoly(_entity,MED_POLYGON);
+          const int* index = _polygonsNodal->getIndex();
+          const int* conn = _polygonsNodal->getValue();
+
+          for (int icell=0;icell<nbcells;icell++)
+          {
+            int nbnodes=index[icell+1]-index[icell];
+            int nbfaces=nbnodes;
+            for (int iface=0; iface<nbfaces;iface++)
+            {
+              set<int> nodes;
+              if (iface+1!=nbfaces)
+              {
+                nodes.insert(conn[index[icell]-1+iface]);
+                nodes.insert(conn[index[icell]-1+iface+1]);
+              }
+              else
+              {
+                nodes.insert(conn[index[icell]-1+iface]);
+                nodes.insert(conn[index[icell]-1]);
+              }
+              addToDescendingConnectivity(nodes,descending,iglobal_cell,face_map);
+            }
+            iglobal_cell++;
+          }
+        }
 
 	//polyhedra case
 	if (dimension==3 && _polyhedronNodal!=0)
-		{
-			int nbcells=getNumberOfElementsWithPoly(_entity,MED_POLYHEDRA);
-			const int* index = _polyhedronNodal->getPolyhedronIndex();
-			const int* conn = _polyhedronNodal->getNodes();
-			const int* face_index = _polyhedronNodal->getFacesIndex();
-			
-			
-			for (int icell=0;icell<nbcells;icell++)
-				{
-					for (int iface=face_index[icell]; iface<face_index[icell+1];iface++)
-						{
-							set<int> nodes;
-							for (int inode=index[iface-1]; iface<index[iface];iface++)
-								nodes.insert(conn[inode-1]);
-							addToDescendingConnectivity(nodes,descending,iglobal_cell,face_map);
-						}
-					iglobal_cell++;
-				}
-		}		
+        {
+          int nbcells = getNumberOfElementsWithPoly(_entity,MED_POLYHEDRA);
+          const MED_EN::med_int* index = _polyhedronNodal->getPolyhedronIndex();
+          const MED_EN::med_int* conn = _polyhedronNodal->getNodes();
+          const MED_EN::med_int* face_index = _polyhedronNodal->getFacesIndex();
+
+          for (int icell = 0; icell < nbcells; icell++)
+          {
+            for (int iface = face_index[icell]; iface < face_index[icell+1]; iface++)
+            {
+              set<int> nodes;
+              for (int inode = index[iface-1]; iface < index[iface]; iface++)
+                nodes.insert(conn[inode-1]);
+              addToDescendingConnectivity(nodes,descending,iglobal_cell,face_map);
+            }
+            iglobal_cell++;
+          }
+        }
 
 
 	////////////////////////////////////////////////////////////////////////////
 	// Third stage : reorganizing the descending data to store it in a medskylinearray
-	
+
 	vector<int> index;
 	vector<int> value;
 	index.push_back(1);
