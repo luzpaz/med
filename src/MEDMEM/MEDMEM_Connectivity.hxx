@@ -56,7 +56,8 @@ class GROUP;
 class MEDMEM_EXPORT CONNECTIVITY
 /* ------------------------------------------- */
 {
-	class myHashFn
+
+  class myHashFn
 	{
 	public:
 		size_t operator()(const vector<int>& key) const
@@ -66,8 +67,17 @@ class MEDMEM_EXPORT CONNECTIVITY
 				sum+=key[i];
 			return sum;
 		}
-		
+#ifdef WNT
+    static const size_t bucket_size = 4;
+    static const size_t min_buckets = 8;
+		bool operator()(const vector<int>& key1, const vector<int>& key2) const
+		{
+      return ::size_t()(key1) < ::size_t()(key2);
+		}
+#endif		
 	};
+
+  typedef hash_map<vector<int>,int, myHashFn > CONNECTIVITY_HashMap;
 
   /* ---------------------- */
   /*	Class Attributs     */
@@ -154,7 +164,10 @@ private:
   void calculateDescendingConnectivity();
 
 	void calculatePartialDescendingConnectivity();
-	void addToDescendingConnectivity(const set<int>& nodes, multimap<int,int>& descending, int iglobal_cell , const hash_map<vector<int>,int, myHashFn > &);
+	void addToDescendingConnectivity( const set<int>& nodes,
+                                    multimap<int,int>& descending,
+                                    int iglobal_cell ,
+                                    const CONNECTIVITY_HashMap & );
 	
 					/*! private method :\n
 					    does nothing if already exists, else

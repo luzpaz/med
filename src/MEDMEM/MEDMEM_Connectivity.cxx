@@ -1888,11 +1888,14 @@ void CONNECTIVITY::calculateDescendingConnectivity()
   }
 
 	
-void CONNECTIVITY::addToDescendingConnectivity(const set<int>& nodes, multimap<int,int>& descending, int iglobal_cell, const hash_map<vector<int>,int, myHashFn >& face_map )
+void CONNECTIVITY::addToDescendingConnectivity(const set<int>& nodes,
+                                               multimap<int,int>& descending,
+                                               int iglobal_cell,
+                                               const CONNECTIVITY_HashMap & face_map )
 {
 	int dimension = getEntityDimension();
 	vector<int> signature (dimension);
-	set<int>::iterator iter=nodes.begin();
+	set<int>::const_iterator iter=nodes.begin();
 	for (int i=0; i< dimension;i++)
 		{
 			signature[i]=*iter;
@@ -1900,8 +1903,8 @@ void CONNECTIVITY::addToDescendingConnectivity(const set<int>& nodes, multimap<i
 		}
 	
 	
-	hash_map<vector<int>,int, myHashFn>::const_iterator itermap=face_map.find(signature);
-	hash_map<vector<int>,int, myHashFn>::const_iterator iterend=face_map.end();
+	CONNECTIVITY_HashMap::const_iterator itermap=face_map.find(signature);
+	CONNECTIVITY_HashMap::const_iterator iterend=face_map.end();
 	
 	
 	if (itermap!=iterend)
@@ -1954,7 +1957,7 @@ void CONNECTIVITY::calculatePartialDescendingConnectivity()
 	// First stage : creating hash_map referencing faces with the triplet
 	// of the lowest order nodes as a key and the global face number as a value
 	
-	hash_map<vector<int> ,int ,CONNECTIVITY::myHashFn  > face_map;
+	CONNECTIVITY_HashMap face_map;
 	const medGeometryElement* face_types = _constituent->getGeometricTypes(_constituent->getEntity());
 	int nbface_types=_constituent->getNumberOfTypes(_constituent->getEntity());
 	int iglobal_face=1;
