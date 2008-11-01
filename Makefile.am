@@ -28,11 +28,11 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 if MED_ENABLE_KERNEL
 if MED_ENABLE_GUI
   ACLOCAL_AMFLAGS = -I adm_local/unix/config_files			\
-                    -I ${KERNEL_ROOT_DIR}/unix/config_files		\
+                    -I ${KERNEL_ROOT_DIR}/salome_adm/unix/config_files	\
                     -I ${GUI_ROOT_DIR}/adm_local/unix/config_files
 else !MED_ENABLE_GUI
   ACLOCAL_AMFLAGS = -I adm_local/unix/config_files			\
-                    -I ${KERNEL_ROOT_DIR}/unix/config_files
+                    -I ${KERNEL_ROOT_DIR}/salome_adm/unix/config_files
 endif
 else !MED_ENABLE_KERNEL
 if MED_ENABLE_GUI
