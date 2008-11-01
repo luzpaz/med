@@ -53,7 +53,7 @@ dist_salomescript_DATA =  \
 	testMeshAlliances.py
 nodist_salomescript_DATA = libMEDClient.py
 
-lib_LTLIBRARIES = libMEDClientcmodule.la
+lib_LTLIBRARIES = libMEDClientcmodule.la _libMEDClient.la
 
 dist_libMEDClientcmodule_la_SOURCES = \
 	COORDINATEClient.cxx \
@@ -61,9 +61,10 @@ dist_libMEDClientcmodule_la_SOURCES = \
 	MESHClient.cxx \
 	SUPPORTClient.cxx \
 	FAMILYClient.cxx \
-	GROUPClient.cxx \
-	libMEDClient.i
-nodist_libMEDClientcmodule_la_SOURCES = libMEDClient_wrap.cxx
+	GROUPClient.cxx
+
+dist__libMEDClient_la_SOURCES = libMEDClient.i
+nodist__libMEDClient_la_SOURCES = libMEDClient_wrap.cxx
 
 libMEDClientcmodule_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
 	$(MED2_INCLUDES) $(HDF5_INCLUDES) $(PYTHON_INCLUDES) ${KERNEL_CXXFLAGS} \
@@ -71,6 +72,9 @@ libMEDClientcmodule_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
 	-I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM_SWIG -I$(srcdir)/../../MED -I$(srcdir)/../../INTERP_KERNEL
 libMEDClientcmodule_la_LDFLAGS  = ${KERNEL_LDFLAGS} -lOpUtil -lSalomeCommunication ../../MEDMEM/libmedmem.la \
                                   ../../MEDMEM_I/libMEDMEMImpl.la ../../INTERP_KERNEL/libinterpkernel.la ../../MED/libMEDEngine.la
+
+_libMEDClient_la_CPPFLAGS = $(libMEDClientcmodule_la_CPPFLAGS)
+_libMEDClient_la_LDFLAGS  =  -module $(libMEDClientcmodule_la_LDFLAGS) -lMEDClientcmodule
 
 SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../../MedCorba_Swig -I$(srcdir)/../../MEDMEM_SWIG
 SWIG_DEP   = $(srcdir)/../../MedCorba_Swig/libMedCorba_Swig.i $(srcdir)/../../MEDMEM_SWIG/libMEDMEM_Swig.i
@@ -102,8 +106,12 @@ OBSOLETE_FILES = \
 
 EXTRA_DIST += $(OBSOLETE_FILES)
 
-install-exec-hook: $(libdir)/_libMEDClient.so
+#install-exec-hook: $(libdir)/_libMEDClient.so
 
-$(libdir)/_libMEDClient.so:
-	( cd $(libdir); ln -sf libMEDClientcmodule.so _libMEDClient.so; )
+#$(libdir)/_libMEDClient.so:
+#	( cd $(libdir); ln -sf libMEDClientcmodule.so _libMEDClient.so; )
 
+#### chmod +w $(libdir); 
+
+#uninstall-hook:
+#	rm -f $(libdir)/_libMEDClient.so
