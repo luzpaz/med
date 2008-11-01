@@ -105,13 +105,3 @@ OBSOLETE_FILES = \
 	test_medclient.py
 
 EXTRA_DIST += $(OBSOLETE_FILES)
-
-#install-exec-hook: $(libdir)/_libMEDClient.so
-
-#$(libdir)/_libMEDClient.so:
-#	( cd $(libdir); ln -sf libMEDClientcmodule.so _libMEDClient.so; )
-
-#### chmod +w $(libdir); 
-
-#uninstall-hook:
-#	rm -f $(libdir)/_libMEDClient.so
