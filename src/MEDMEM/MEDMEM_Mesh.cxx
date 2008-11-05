@@ -2710,8 +2710,13 @@ void MESH::convertToPoly()
     
     const int* oldconnindex= getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_FACE);
     int oldnbface = getNumberOfElements(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS);
-    const int* oldconnpoly = getPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE);
-    const int* oldconnpolyindex = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_FACE);
+    const int* oldconnpoly =0;
+    const int* oldconnpolyindex =0;
+    if(existPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE))
+    {
+     oldconnpoly = getPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE);
+     oldconnpolyindex = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_FACE);
+     }
     int oldnbtotalface = getNumberOfElementsWithPoly(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS);
     
     int nbnodes=0;
@@ -2729,7 +2734,8 @@ void MESH::convertToPoly()
     memcpy(newconn, oldconn, sizeof(int)*(oldconnindex[oldnbface]-1) );
     
     //copying poly types connectivity
-    memcpy (newconn+oldconnindex[oldnbface]-1, oldconnpoly, sizeof(int)*(oldconnpolyindex[oldnbtotalface-oldnbface]-1) );
+    if(oldconnpoly)
+      memcpy (newconn+oldconnindex[oldnbface]-1, oldconnpoly, sizeof(int)*(oldconnpolyindex[oldnbtotalface-oldnbface]-1) );
     
     newconnindex[0]=1;
     for (int i=0; i<oldnbface;i++)
@@ -2756,9 +2762,15 @@ void MESH::convertToPoly()
     
     const int* oldconnindex= getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
     int oldnbelem = getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
-    const int* oldconnpoly = getPolyhedronConnectivity(MED_EN::MED_NODAL);
-    const int* oldconnpolyindex = getPolyhedronIndex(MED_EN::MED_NODAL);
-    const int* oldfaceindex =  getPolyhedronFacesIndex();
+    const int* oldconnpoly = 0;
+    const int* oldconnpolyindex = 0;
+    const int* oldfaceindex = 0;
+    if(existPolyhedronConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL))
+    {
+       oldconnpoly = getPolyhedronConnectivity(MED_EN::MED_NODAL);
+       oldconnpolyindex = getPolyhedronIndex(MED_EN::MED_NODAL);
+       oldfaceindex =  getPolyhedronFacesIndex();
+    }
     const MED_EN::medGeometryElement* oldtypes = getTypes(MED_EN::MED_CELL);
     int nboldtypes=getNumberOfTypes(MED_EN::MED_CELL);
     int nboldpolyhedra=getNumberOfPolyhedron();
@@ -2819,12 +2831,15 @@ void MESH::convertToPoly()
     {
       newconnindex.push_back(newconnindex[newconnindex.size()-1]+oldconnpolyindex[i+1]-oldconnpolyindex[i]);
     }
-  for (int i=0; i<oldconnpolyindex[nboldpolyhedra]-1;i++)
-    {
-      newfaceindex.push_back(newfaceindex[newfaceindex.size()-1]+oldfaceindex[i+1]-oldfaceindex[i]);
-    }
-  for (int i=0; i< oldfaceindex[oldconnpolyindex[nboldpolyhedra]-1]-1; i++)
-    newconn.push_back(oldconnpoly[i]);
+  if(oldconnpolyindex)
+  {
+    for (int i=0; i<oldconnpolyindex[nboldpolyhedra]-1;i++)
+      {
+        newfaceindex.push_back(newfaceindex[newfaceindex.size()-1]+oldfaceindex[i+1]-oldfaceindex[i]);
+      }
+    for (int i=0; i< oldfaceindex[oldconnpolyindex[nboldpolyhedra]-1]-1; i++)
+      newconn.push_back(oldconnpoly[i]);
+  }
   //  memcpy(newconn_ptr,oldconnpoly,sizeof(int)*(oldfaceindex[oldconnpoly[nboldpolyhedra]-1]-1));
 
     
