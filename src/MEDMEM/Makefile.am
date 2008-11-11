@@ -157,7 +157,7 @@ if MED_ENABLE_KERNEL
     libmedmem_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
 endif
 
-bin_PROGRAMS=
+bin_PROGRAMS= convertToPoly
 #bin_PROGRAMS= \
 #	ensight2med med2ensight \
 #	med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH test_write_groups_poly\
@@ -184,6 +184,7 @@ if MED_ENABLE_KERNEL
      LDADD+=-lSALOMEBasics
 endif
 
+dist_convertToPoly_SOURCES= convertToPoly.cxx
 #dist_ensight2med_SOURCES= ensight2med.cxx
 #dist_med2ensight_SOURCES= med2ensight.cxx
 #dist_med2_1_To_med2_2_SOURCES= med2_1_To_med2_2.cxx
