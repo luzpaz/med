@@ -1,4 +1,4 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, C[M m7EA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 // 
 // This library is free software; you can redistribute it and/or
@@ -1063,6 +1063,8 @@ public :
   int getMeshDimension();
 
   int getNumberOfNodes();
+  
+  void convertToPoly();
 
   bool getIsAGrid();
 
