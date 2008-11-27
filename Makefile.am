@@ -61,3 +61,6 @@ $(pkgincludedir)/SALOMEconfig.h: ./salome_adm/unix/SALOMEconfig.h
 
 $(pkgincludedir)/sstream: ./include/salome/sstream
 	cp -f $^ $(pkgincludedir)
+
+dev_docs:
+	(cd doc && $(MAKE) $(AM_MAKEFLAGS) dev_docs)
