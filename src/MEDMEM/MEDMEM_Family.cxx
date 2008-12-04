@@ -40,7 +40,7 @@ using namespace MED_EN;
 
 FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), _numberOfGroup(0)
 {
-    MESSAGE("FAMILY::FAMILY()");
+    MESSAGE_MED("FAMILY::FAMILY()");
 };
 
 FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
@@ -55,10 +55,10 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
 		  _numberOfAttribute(NumberOfAttribute), 
 		  _numberOfGroup(NumberOfGroup)
 {
-  MESSAGE("FAMILY(int Identifier, string Name, int NumberOfAttribute,int *AttributeIdentifier,int *AttributeValue,string AttributeDescription,int NumberOfGroup,string GroupName, int ** Number) : "<<Identifier);
+  MESSAGE_MED("FAMILY(int Identifier, string Name, int NumberOfAttribute,int *AttributeIdentifier,int *AttributeValue,string AttributeDescription,int NumberOfGroup,string GroupName, int ** Number) : "<<Identifier);
 
   _isOnAllElts = false ;
-  SCRUTE(_numberOfAttribute);
+  SCRUTE_MED(_numberOfAttribute);
   if (_numberOfAttribute > 0)
     {
       _attributeIdentifier.set(_numberOfAttribute,AttributeIdentifier);
@@ -69,7 +69,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
       for (int i=0;i<NumberOfAttribute;i++) {
 	_attributeDescription[i].assign(AttributeDescription,i*MED_TAILLE_DESC,MED_TAILLE_DESC);
 	_attributeDescription[i].erase(strlen(_attributeDescription[i].c_str()));
-	//SCRUTE(_attributeDescription[i]);
+	//SCRUTE_MED(_attributeDescription[i]);
       }
     }
   else
@@ -85,7 +85,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   for (int i=0;i<NumberOfGroup;i++) {
     _groupName[i].assign(GroupName,i*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
     _groupName[i].erase(strlen(_groupName[i].c_str()));
-    //SCRUTE(_groupName[i]);
+    //SCRUTE_MED(_groupName[i]);
   }
 
   // well, we must set SUPPORT attribut
@@ -107,7 +107,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
       NumberOfNodesInFamily++;
     }
 
-  SCRUTE(NumberOfNodesInFamily);
+  SCRUTE_MED(NumberOfNodesInFamily);
 
   // If we found nodes set the family attributes adequatly
   if (NumberOfNodesInFamily>0) {
@@ -185,30 +185,30 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   if (!Find) {
     _numberOfGeometricType = 0 ;
     _isOnAllElts = false ;
-    MESSAGE ("FAMILY() : No entity found !") ;
+    MESSAGE_MED ("FAMILY() : No entity found !") ;
   }
 
-  MESSAGE("Well now ??? :::");
+  MESSAGE_MED("Well now ??? :::");
 
-  MESSAGE("Name : "<< getName());
-  MESSAGE("Description : "<< getDescription());
-  MESSAGE("Mesh name : " << getMesh()->getName());
-  MESSAGE("Entity : "<< getEntity());
-  MESSAGE("Entity list :");
+  MESSAGE_MED("Name : "<< getName());
+  MESSAGE_MED("Description : "<< getDescription());
+  MESSAGE_MED("Mesh name : " << getMesh()->getName());
+  MESSAGE_MED("Entity : "<< getEntity());
+  MESSAGE_MED("Entity list :");
   if (!(isOnAllElements())) {
     int numberoftypes = getNumberOfTypes() ;
-    MESSAGE("NumberOfTypes : "<<numberoftypes);
+    MESSAGE_MED("NumberOfTypes : "<<numberoftypes);
     const medGeometryElement * types = getTypes();
     for (int j=0;j<numberoftypes;j++) {
       int numberOfElements = getNumberOfElements(types[j]);
-      MESSAGE("    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) : ");
+      MESSAGE_MED("    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) : ");
       const int * number = getNumber(types[j]);
-      SCRUTE(number);
+      SCRUTE_MED(number);
       //      for (int k=0; k<numberOfElements;k++)
-        //	MESSAGE("________________ " << number[k]);
+        //	MESSAGE_MED("________________ " << number[k]);
     }
   } else
-    MESSAGE("Is on all entities !");
+    MESSAGE_MED("Is on all entities !");
 
 
 
@@ -216,7 +216,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
 
 FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
 {
-  MESSAGE("FAMILY::FAMILY(FAMILY & m)");
+  MESSAGE_MED("FAMILY::FAMILY(FAMILY & m)");
   _identifier = m._identifier;
   _numberOfAttribute = m._numberOfAttribute;
 
@@ -240,7 +240,7 @@ FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
 
 FAMILY::FAMILY(const SUPPORT & s):SUPPORT(s)
 {
-  MESSAGE("FAMILY::FAMILY(const SUPPORT & s)");
+  MESSAGE_MED("FAMILY::FAMILY(const SUPPORT & s)");
 
   _identifier = 0;
   _numberOfAttribute = 0;
@@ -250,12 +250,12 @@ FAMILY::FAMILY(const SUPPORT & s):SUPPORT(s)
 
 FAMILY::~FAMILY() 
 {
-    MESSAGE("~FAMILY()");
+    MESSAGE_MED("~FAMILY()");
 };
   
 FAMILY & FAMILY::operator=(const FAMILY &fam) 
 {
-    MESSAGE("FAMILY::operator=");
+    MESSAGE_MED("FAMILY::operator=");
     if ( this == &fam ) return *this;
 
     //Etant donné que l'opérateur d'affectation de la classe SUPPORT effectuait
@@ -316,7 +316,7 @@ ostream & MEDMEM::operator<<(ostream &os, const FAMILY &myFamily)
 
 bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
 {
-  MESSAGE("FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)");
+  MESSAGE_MED("FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)");
   bool Find = false ;
   // Get types information from <_mesh>
   int    numberOfTypes             = _mesh->getNumberOfTypesWithPoly(Entity) ;
@@ -331,7 +331,7 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
   const int *  GlobalNumberingIndex          = _mesh->getGlobalNumberingIndex(Entity);
   
 
-  SCRUTE(numberOfTypes);
+  SCRUTE_MED(numberOfTypes);
 
   // we search for all elements in this family
   for (int TypeNumber=0; TypeNumber < numberOfTypes; TypeNumber++) {
@@ -343,7 +343,7 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
       
     for (int i=0; i<NumberOfElements; i++)
       {
-        //	SCRUTE(ElementsOfThisFamilyNumber[i]);
+        //	SCRUTE_MED(ElementsOfThisFamilyNumber[i]);
 	if (_identifier == ElementsOfThisFamilyNumber[i]) {
 	  tmp_ElementsList[NumberOfElementsInThisFamily]=i+GlobalNumberingIndex[TypeNumber] ;
 	  NumberOfElementsInThisFamily++;

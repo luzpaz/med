@@ -840,7 +840,7 @@ public:
 
     PyObject *  applyPyFunc( PyObject * func )
       {
-        MESSAGE("Appel de applyPyFunc");
+        MESSAGE_MED("Appel de applyPyFunc");
         if (!PyCallable_Check(func)) {
           PyErr_SetString(PyExc_TypeError, "FIELD.applyPyFunc prend en argument une fonction");
           return NULL;
@@ -870,7 +870,7 @@ public:
     %newobject __add__(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * __add__(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator +  : Creation of the addition of two FIELDs");
+	MESSAGE_MED("operator +  : Creation of the addition of two FIELDs");
 	
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::add( *(FIELD<T1, INTERLACING_TAG>*)self ,
@@ -881,7 +881,7 @@ public:
     %newobject __sub__(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * __sub__(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator -  : Creation of the substraction of two FIELDs");
+	MESSAGE_MED("operator -  : Creation of the substraction of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::sub( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					   (FIELD<T1, INTERLACING_TAG>&)m );
@@ -891,7 +891,7 @@ public:
     %newobject __mul__(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * __mul__(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator *  : Creation of the multiplication of two FIELDs");
+	MESSAGE_MED("operator *  : Creation of the multiplication of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::mul( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					   (FIELD<T1, INTERLACING_TAG>&)m );
@@ -901,7 +901,7 @@ public:
     %newobject __div__(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * __div__(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator /  : Creation of the division of two FIELDs");
+	MESSAGE_MED("operator /  : Creation of the division of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::div( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					   (FIELD<T1, INTERLACING_TAG>&)m );
@@ -911,7 +911,7 @@ public:
     %newobject addDeep(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * addDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator +  : Creation of the addition of two FIELDINTs");
+	MESSAGE_MED("operator +  : Creation of the addition of two FIELDINTs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::addDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					       (FIELD<T1, INTERLACING_TAG>&)m );
@@ -921,7 +921,7 @@ public:
     %newobject subDeep(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * subDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator -  : Creation of the substraction of two FIELDs");
+	MESSAGE_MED("operator -  : Creation of the substraction of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::subDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					       (FIELD<T1, INTERLACING_TAG>&)m );
@@ -931,7 +931,7 @@ public:
     %newobject mulDeep(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * mulDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator *  : Creation of the multiplication of two FIELDs");
+	MESSAGE_MED("operator *  : Creation of the multiplication of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::mulDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					       (FIELD<T1, INTERLACING_TAG>&)m );
@@ -941,7 +941,7 @@ public:
     %newobject divDeep(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * divDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator /  : Creation of the division of two FIELDs");
+	MESSAGE_MED("operator /  : Creation of the division of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::divDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					       (FIELD<T1, INTERLACING_TAG>&)m );
@@ -2528,8 +2528,8 @@ template <class INTERLACING_TAG> class GAUSS_LOCALIZATION
   template<class T, class INTERLACING_TAG>
     FIELD<T, INTERLACING_TAG> * createTypedFieldFromField(FIELD_ * field)
     {
-      MESSAGE("createTypedFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
-      MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
+      MESSAGE_MED("createTypedFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
+      MESSAGE_MED("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
       if ( field ) {
         if (field->getInterlacingType() != SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType)
           throw MEDEXCEPTION("cast to wrong medModeSwitch (_interlacingType)");
@@ -2614,8 +2614,8 @@ GRID * createGridFromMesh( MESH * aMesh );
 %{
   GRID * createGridFromMesh( MESH * aMesh )
     {
-      MESSAGE("createGridFromMesh : Constructor (for Python API) GRID with parameter MESH *");
-      MESSAGE("Its returns a proper cast of the input pointer :: MESH --> GRID");
+      MESSAGE_MED("createGridFromMesh : Constructor (for Python API) GRID with parameter MESH *");
+      MESSAGE_MED("Its returns a proper cast of the input pointer :: MESH --> GRID");
 
       if (aMesh->getIsAGrid())
         return (GRID *) aMesh;
@@ -2630,7 +2630,7 @@ GRID * createGridFromMesh( MESH * aMesh );
 							int NumberOfComponents,
 							PyObject * double_function)
     {
-      MESSAGE("createFieldFromAnalytic : Constructor (for Python API) FIELD from an analytic fonction");
+      MESSAGE_MED("createFieldFromAnalytic : Constructor (for Python API) FIELD from an analytic fonction");
 
       FIELD<T, INTERLACING_TAG> * fieldAnalytic =
 	new FIELD<T, INTERLACING_TAG>(Support, NumberOfComponents);

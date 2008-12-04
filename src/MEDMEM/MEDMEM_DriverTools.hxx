@@ -259,7 +259,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
         if ( !sub_grp.empty() && sub_grp.mailles[0]->geometricType == types[ iType ])
           break;
       }
-      ASSERT( sub_data != sub_end );
+      ASSERT_MED( sub_data != sub_end );
       nbgaussgeo[ iType+1 ] = sub_data->nbGauss();
     }
   }
@@ -283,13 +283,13 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
     // check validity of a sub_data
     bool validSub = true;
     if ( !nb_val ) {
-      INFOS("Skip field <" << _name << ">: invalid supporting group "
+      INFOS_MED("Skip field <" << _name << ">: invalid supporting group "
             << (hasCommonSupport() ? _group_id : sub_data->_supp_id )
             << " of " << i_sub << "-th subcomponent" );
       validSub = false;
     }
     if ( !sub_data->isValidNbGauss() ) {
-      INFOS("Skip field <" << _name << ">: different nb of gauss points in components ");
+      INFOS_MED("Skip field <" << _name << ">: different nb of gauss points in components ");
       validSub = false;
     }
     if ( !validSub ) {
@@ -325,7 +325,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
       f->setMEDComponentsUnits( &str[0] );
 
       res.push_back( make_pair( f , hasCommonSupport() ? _group_id : sub_data->_supp_id ));
-      MESSAGE(" MAKE " << nb_fields << "-th field <" << _name << "> on group_id " << _group_id );
+      MESSAGE_MED(" MAKE " << nb_fields << "-th field <" << _name << "> on group_id " << _group_id );
 
       // make an array
       if ( !sub_data->hasGauss() ) {
@@ -360,7 +360,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
     _groupe & sub_grp = groupes[ sub_data->_supp_id ];
     int nb_supp_elems = sub_grp.mailles.size();
     int nb_gauss      = sub_data->nbGauss();
-    MESSAGE("insert sub data, group_id: " << sub_data->_supp_id <<
+    MESSAGE_MED("insert sub data, group_id: " << sub_data->_supp_id <<
             ", nb values: "               << comp_values[ i_comp_tot ].size() <<
             ", relocMap size: "           << sub_grp.relocMap.size() <<
             ", nb mailles: "              << nb_supp_elems);
@@ -379,7 +379,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
       // store values
       const std::vector< T > & values = comp_values[ i_comp_tot++ ];
       bool oneValue = ( values.size() == 1 );
-      ASSERT( oneValue || values.size() == nb_supp_elems * nb_gauss );
+      ASSERT_MED( oneValue || values.size() == nb_supp_elems * nb_gauss );
       for ( int k = 0; k < nb_supp_elems; ++k )
       {
         const T& val = oneValue ? values[ 0 ] : values[ k * elem_step ];

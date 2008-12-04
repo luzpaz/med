@@ -59,7 +59,7 @@ These methods are the different constructors for the grid objects.
 
 GRID::GRID() {
   init();
-  MESSAGE("A GRID CREATED");
+  MESSAGE_MED("A GRID CREATED");
 }
 //
 //=======================================================================
@@ -144,7 +144,7 @@ GRID::GRID(const MED_EN::med_grid_type type)
   init();
   _gridType = type;
   _is_default_gridType = false;
-  MESSAGE("A TYPED GRID CREATED");
+  MESSAGE_MED("A TYPED GRID CREATED");
 }
 
 //=======================================================================
@@ -162,7 +162,7 @@ GRID::GRID(const GRID& otherGrid) {
 //=======================================================================
 
 GRID::~GRID() {
-  MESSAGE("GRID::~GRID() : Destroying the Grid");
+  MESSAGE_MED("GRID::~GRID() : Destroying the Grid");
   if ( _iArray != (double* ) NULL) delete [] _iArray;
   if ( _jArray != (double* ) NULL) delete [] _jArray;
   if ( _kArray != (double* ) NULL) delete [] _kArray;
@@ -213,7 +213,7 @@ GRID::GRID(driverTypes driverType, const string &  fileName,
 {
   
   const char* LOC = "GRID::GRID(driverTypes , const string &  , const string &) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   init();
   GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,RDONLY);
@@ -225,7 +225,7 @@ GRID::GRID(driverTypes driverType, const string &  fileName,
 
   fillMeshAfterRead();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 /*!
@@ -275,7 +275,7 @@ void GRID::fillMeshAfterRead()
 
     // nb of nodes in each direction is not known, set anything
     // in order to be able to work anyhow
-//     INFOS("GRID::fillMeshAfterRead(): This stub must be removed");
+//     INFOS_MED("GRID::fillMeshAfterRead(): This stub must be removed");
 //     switch (_spaceDimension) {
 //     case 1:
 //       _iArrayLength = _numberOfNodes;
@@ -321,7 +321,7 @@ void GRID::fillCoordinates() const
     return;
   
   const char* LOC = "GRID::fillCoordinates()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   // if coordonate has not been allocated, perform shalow copy, transfer ownership of matrix
   if(_coordinate->getSpaceDimension()*_coordinate->getNumberOfNodes() == 0)
@@ -357,7 +357,7 @@ void GRID::fillCoordinates() const
   }
       
   (const_cast <GRID *> (this))->_is_coordinates_filled = true;
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -429,12 +429,12 @@ void GRID::fillConnectivity() const
 {
   if (_is_connectivity_filled)
   {
-    MESSAGE("GRID::fillConnectivity(): Already filled");
+    MESSAGE_MED("GRID::fillConnectivity(): Already filled");
     return;
   }
 
   const char * LOC = "GRID::fillConnectivity() ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   int nbCells, nbFaces, nbEdges;
   int nbCNodes, nbFNodes, nbENodes, nbMeshNodes;
@@ -774,7 +774,7 @@ void GRID::fillConnectivity() const
 
   (const_cast <GRID *> (this))->_is_connectivity_filled = true;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -859,7 +859,7 @@ int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
 {
   const char * LOC = "GRID::getEdgeNumber(Axis, i,j,k) :";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   int Len[4] = {0,_iArrayLength, _jArrayLength, _kArrayLength }, I=1, J=2, K=3;
   int maxAxis = Len[ K ] ? 3 : 2;
@@ -884,7 +884,7 @@ int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
     Nb += Len[ I ]*Len[ J ]*Len[ K ];
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return Nb;
 }
@@ -903,7 +903,7 @@ int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
 {
   const char * LOC = "GRID::getFaceNumber(Axis, i,j,k) :";
   
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
 //  if (Axis <= 0 || Axis > 3)
   if (Axis < 0 || Axis > 3)
@@ -925,7 +925,7 @@ int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
     Nb += Len[ I ]*Len[ J ]*Len[ K ];
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return Nb;
 }
@@ -951,7 +951,7 @@ void GRID::getNodePosition(const int Number, int& i, int& j, int& k) const
 {
   const char * LOC = "GRID::getNodePosition(Number, i,j,k) :";
   
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (Number <= 0 || Number > _numberOfNodes)
     throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "Number is out of range: " << Number));
@@ -968,7 +968,7 @@ void GRID::getNodePosition(const int Number, int& i, int& j, int& k) const
 
   ////cout <<" NODE POS: " << Number << " - " << i << ", " << j << ", " << k << endl;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 }
 
@@ -982,7 +982,7 @@ void GRID::getCellPosition(const int Number, int& i, int& j, int& k) const
 {
   
   const char* LOC = "GRID::getCellPosition(Number, i,j,k) :";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   int Len[4] = {0,_iArrayLength-1, _jArrayLength-1, _kArrayLength-1 }, I=1, J=2;
   // , K=3; !! UNUSED VARIABLE !!
@@ -997,7 +997,7 @@ void GRID::getCellPosition(const int Number, int& i, int& j, int& k) const
   j = kLen / Len[J];
   k = (Number - 1) / ijLen;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -1010,7 +1010,7 @@ void GRID::getEdgePosition(const int Number, int& Axis, int& i, int& j, int& k)
 {
   const char * LOC = "GRID::getEdgePosition(Number, i,j,k) :";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (!_jArrayLength)
     throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "no edges in the grid: "));
@@ -1052,7 +1052,7 @@ void GRID::getEdgePosition(const int Number, int& Axis, int& i, int& j, int& k)
       k = (theNb - 1) / ijLen;
     }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
     return;
   }
@@ -1075,7 +1075,7 @@ void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
 {
   const char * LOC = "GRID::getFacePosition(Number, i,j,k) :";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_kArrayLength == 0) {
     getCellPosition(Number, i, j, k);
@@ -1121,7 +1121,7 @@ void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
       k = (theNb - 1) / ijLen;
     }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
     return;
   }
@@ -1142,7 +1142,7 @@ void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
 void GRID::writeUnstructured(int index, const string & driverName)
 {
   const char * LOC = "GRID::writeUnstructured(int index=0, const string & driverName) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( _drivers[index] ) {
 
@@ -1162,13 +1162,13 @@ void GRID::writeUnstructured(int index, const string & driverName)
                                     << _drivers.size() 
                                     )
                          ); 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void GRID::read(int index)  
 { 
   const char * LOC = "GRID::read(int index=0) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_drivers[index]) {
     _drivers[index]->open();   
@@ -1184,5 +1184,5 @@ void GRID::read(int index)
   if (_isAGrid)
     fillMeshAfterRead();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }

@@ -69,11 +69,11 @@ MED_MESH_DRIVER21::~MED_MESH_DRIVER21()
 void MED_MESH_DRIVER21::open()
 {
   const char * LOC = "MED_MESH_DRIVER21::open()" ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   int accessMode = getMedAccessMode( _accessMode, MED_EN::V21 );
-  MESSAGE(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< accessMode);
+  MESSAGE_MED(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< accessMode);
   _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (_fileName.c_str())),(med_2_1::med_mode_acces) accessMode);
-  MESSAGE(LOC<<" _medIdt : "<< _medIdt );
+  MESSAGE_MED(LOC<<" _medIdt : "<< _medIdt );
   if (_medIdt > 0) 
     _status = MED_OPENED; 
   else {
@@ -82,13 +82,13 @@ void MED_MESH_DRIVER21::open()
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName<<" in mode "<<_accessMode));
   }
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
   
 void MED_MESH_DRIVER21::close()
 {
   const char * LOC = "MED_MESH_DRIVER21::close() " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   int err = 0;
   if ( _status == MED_OPENED) {
     err=med_2_1::MEDfermer(_medIdt);
@@ -100,12 +100,12 @@ void MED_MESH_DRIVER21::close()
 				    <<" Error when closing file !"
 				    )
 			  );
-    MESSAGE(LOC <<": _medIdt= " << _medIdt );
-    MESSAGE(LOC<<": MEDfermer : err    = " << err );
+    MESSAGE_MED(LOC <<": _medIdt= " << _medIdt );
+    MESSAGE_MED(LOC<<": MEDfermer : err    = " << err );
     _status = MED_CLOSED;
     _medIdt = MED_INVALID;
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //A FAIRE UTILISER LES MAPS...
@@ -133,7 +133,7 @@ MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21(const string & fileName,
   MED_MESH_DRIVER(fileName,ptrMesh,RDONLY),
   _computeFaces(true)
 { 
-  MESSAGE("MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21(const string & fileName, MESH * ptrMesh) has been created");
 }
   
 MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21(const MED_MESH_RDONLY_DRIVER21 & driver): 
@@ -146,7 +146,7 @@ MED_MESH_RDONLY_DRIVER21::MED_MESH_RDONLY_DRIVER21(const MED_MESH_RDONLY_DRIVER2
 
 MED_MESH_RDONLY_DRIVER21::~MED_MESH_RDONLY_DRIVER21()
 {
-  //MESSAGE("MED_MESH_RDONLY_DRIVER21::~MED_MESH_RDONLY_DRIVER21() has been destroyed");
+  //MESSAGE_MED("MED_MESH_RDONLY_DRIVER21::~MED_MESH_RDONLY_DRIVER21() has been destroyed");
 }
   
 GENDRIVER * MED_MESH_RDONLY_DRIVER21::copy(void) const
@@ -157,13 +157,13 @@ GENDRIVER * MED_MESH_RDONLY_DRIVER21::copy(void) const
 void MED_MESH_RDONLY_DRIVER21::read(void)
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER21::read() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The _idt of file " << _fileName << " is : " << _medIdt <<  " (the file is not opened)." )) ;
 
   _ptrMesh->_name =  _meshName;
 
-  SCRUTE(_ptrMesh->getIsAGrid());
+  SCRUTE_MED(_ptrMesh->getIsAGrid());
 
   if (_ptrMesh->getIsAGrid())
     {
@@ -175,7 +175,7 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
 	  buildAllGroups(_ptrMesh->_groupNode,_ptrMesh->_familyNode) ;
 	}
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
       return;
     }
   // (EAP at EDF): Commented for MEDMEMTest_VtkMedDriver.cxx:126 -
@@ -228,15 +228,15 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
     // on edge
     buildAllGroups(_ptrMesh->_groupEdge,_ptrMesh->_familyEdge) ;
 
-//   MESSAGE(LOC<<"Checking of CellModel !!!!!!!");
+//   MESSAGE_MED(LOC<<"Checking of CellModel !!!!!!!");
 
 //   int nbOfTypes =  _ptrMesh->_connectivity->_numberOfTypes;
 //    for(int i=0;i<nbOfTypes;i++)
 //      {
-//        MESSAGE(LOC << _ptrMesh->_connectivity->_type[i]) ;
+//        MESSAGE_MED(LOC << _ptrMesh->_connectivity->_type[i]) ;
 //      }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -247,7 +247,7 @@ void MED_MESH_RDONLY_DRIVER21::read(void)
 void MED_MESH_RDONLY_DRIVER21::getGRID()
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER21::getGRID() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "med file is not opened"));
@@ -294,7 +294,7 @@ void MED_MESH_RDONLY_DRIVER21::getGRID()
   
   // Read node coordinates for MED_BODY_FITTED grid
 
-  SCRUTE(ptrGrid->getGridType());
+  SCRUTE_MED(ptrGrid->getGridType());
 
   if (ptrGrid->getGridType() == MED_EN::MED_BODY_FITTED)
     {
@@ -341,13 +341,13 @@ void MED_MESH_RDONLY_DRIVER21::getGRID()
 				       MEDArrayNodeFamily,
 				       NumberOfNodes);
 
-      MESSAGE(LOC << " NumberOfNodes = " << NumberOfNodes << " SpaceDimension = " << SpaceDimension);
+      MESSAGE_MED(LOC << " NumberOfNodes = " << NumberOfNodes << " SpaceDimension = " << SpaceDimension);
 
       ptrGrid->_is_coordinates_filled = true;
 
 //       for (int icoor = 0 ; icoor<NumberOfNodes ; icoor++)
 //  	for(int jcoor = 0 ; jcoor<SpaceDimension ; jcoor++)
-//  	  MESSAGE(LOC << " icoor = " << icoor << " jcoor = " << jcoor << " COOR = " << _ptrMesh->getCoordinates(MED_FULL_INTERLACE)[icoor*SpaceDimension+jcoor]);
+//  	  MESSAGE_MED(LOC << " icoor = " << icoor << " jcoor = " << jcoor << " COOR = " << _ptrMesh->getCoordinates(MED_FULL_INTERLACE)[icoor*SpaceDimension+jcoor]);
 
       delete[] MEDArrayNodeFamily;
       if (err != MED_VALID)
@@ -415,7 +415,7 @@ void MED_MESH_RDONLY_DRIVER21::getGRID()
   _ptrMesh->_coordinate->setCoordinatesSystem(coordinateSystem);
 
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -425,7 +425,7 @@ void MED_MESH_RDONLY_DRIVER21::getGRID()
 int  MED_MESH_RDONLY_DRIVER21::getCOORDINATE()
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER21::getCOORDINATE() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_status==MED_OPENED)
     {
@@ -529,7 +529,7 @@ int  MED_MESH_RDONLY_DRIVER21::getCOORDINATE()
 		     tmp_node_name,NumberOfNodes*MED_TAILLE_PNOM21,med_2_1::MED_NOEUD,
 		     (med_2_1::med_geometrie_element) MED_NONE);
       if (err == MED_VALID) 
-        MESSAGE(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have names but we do not read them !");
+        MESSAGE_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have names but we do not read them !");
       delete[] tmp_node_name ;
 
 
@@ -538,10 +538,10 @@ int  MED_MESH_RDONLY_DRIVER21::getCOORDINATE()
       err=MEDnumLire(_medIdt,const_cast <char*> (_ptrMesh->_name.c_str()),
 		     tmp_node_number,NumberOfNodes,med_2_1::MED_NOEUD,(med_2_1::med_geometrie_element)0);
       if (err == MED_VALID) {
-        // INFOS(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
-        // INFOS(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have numbers but we do not take care of them !");
-        // INFOS(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
-	MESSAGE(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : Nodes have numbers, we DO TAKE care of them !");
+        // INFOS_MED(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
+        // INFOS_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have numbers but we do not take care of them !");
+        // INFOS_MED(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
+	MESSAGE_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : Nodes have numbers, we DO TAKE care of them !");
 	_ptrMesh->_coordinate->_nodeNumber.set(NumberOfNodes) ; 
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	for(med_2_1::med_int i2=0;i2<NumberOfNodes;i2++)
@@ -567,7 +567,7 @@ int  MED_MESH_RDONLY_DRIVER21::getCOORDINATE()
 
       delete[] tmp_node_number ;
       
-  END_OF(LOC);
+  END_OF_MED(LOC);
       return MED_VALID;
     }
   return MED_ERROR;
@@ -577,7 +577,7 @@ int  MED_MESH_RDONLY_DRIVER21::getCOORDINATE()
 int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY() 
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_status==MED_OPENED)
     {
@@ -621,17 +621,17 @@ int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY()
 
       if(Connectivity->_constituent==NULL)
 	{
-	  SCRUTE(_ptrMesh->_meshDimension);
+	  SCRUTE_MED(_ptrMesh->_meshDimension);
 	  if (_ptrMesh->_meshDimension == 3)
 	    {
-	      MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES FACES..." );
+	      MESSAGE_MED(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES FACES..." );
 	      CONNECTIVITY * ConnectivityFace = new CONNECTIVITY(MED_EN::MED_FACE) ;
 	      ConnectivityFace->_typeConnectivity = Connectivity->_typeConnectivity ;
 	      // NODAL or DESCENDING
-	      SCRUTE(ConnectivityFace->_typeConnectivity);
+	      SCRUTE_MED(ConnectivityFace->_typeConnectivity);
 	      if (Connectivity->_typeConnectivity == MED_DESCENDING)
 		{
-		  MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DESCENDANTE DES FACES" );
+		  MESSAGE_MED(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DESCENDANTE DES FACES" );
 		  err = getDescendingConnectivity(ConnectivityFace) ;
 		  if (err!=MED_VALID)
 		    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
@@ -640,7 +640,7 @@ int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY()
 		}
 	      else
 		{
-		  MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE NODALE DES FACES" );
+		  MESSAGE_MED(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE NODALE DES FACES" );
 		  err = getNodalConnectivity(ConnectivityFace) ;
 		  if (err!=MED_VALID)
 		    { // or error ????? we are in NODAL mode.
@@ -653,11 +653,11 @@ int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY()
 	      if (err!=MED_VALID)
 		{
 		  delete ConnectivityFace ;
-		  MESSAGE(LOC<<"No FACE defined.") ;
+		  MESSAGE_MED(LOC<<"No FACE defined.") ;
 		}
 	      else
 		{
-		  MESSAGE(LOC<<" SAUVEGARDE DE LA CONNECTIVITE DES " <<
+		  MESSAGE_MED(LOC<<" SAUVEGARDE DE LA CONNECTIVITE DES " <<
 			  "FACES DANS L'OBJET CONNECTIVITY" );
 		  Connectivity->_constituent=ConnectivityFace ; 
 		}
@@ -666,12 +666,12 @@ int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY()
 	  // read MED_EDGE connectivity
 	  if (_ptrMesh->_meshDimension > 1)
 	    { // we are in 3 or 2D 
-	      MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES ARRETES...." );
+	      MESSAGE_MED(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES ARRETES...." );
 	      CONNECTIVITY * ConnectivityEdge = new CONNECTIVITY(MED_EDGE) ;
 	      ConnectivityEdge->_typeConnectivity = Connectivity->_typeConnectivity ;
 	      if (Connectivity->_typeConnectivity == MED_DESCENDING)
 		{
-		  MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DESCENDANTE " <<
+		  MESSAGE_MED(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DESCENDANTE " <<
 			  "DES ARRETES" );
 		  err = getDescendingConnectivity(ConnectivityEdge) ;
 		  if (err!=MED_VALID)
@@ -681,7 +681,7 @@ int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY()
 		}
 	      else
 		{
-		  MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE NODALE DES ARRETES" );
+		  MESSAGE_MED(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE NODALE DES ARRETES" );
 		  err = getNodalConnectivity(ConnectivityEdge) ;
 		  if (err!=MED_VALID)
 		    { // or error ????? we are in NODAL mode.
@@ -694,7 +694,7 @@ int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY()
 	      if (err!=MED_VALID)
 		{
 		  delete ConnectivityEdge ;
-		  MESSAGE(LOC<<"No EDGE defined.") ;
+		  MESSAGE_MED(LOC<<"No EDGE defined.") ;
 		}
 	      else
 		{
@@ -705,7 +705,7 @@ int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY()
 		      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "EDGE defined but there are no FACE !")) ;
 		  else
 		    { // IN 2D
-		      MESSAGE(LOC<<" SAUVEGARDE DE LA CONNECTIVITE DES " <<
+		      MESSAGE_MED(LOC<<" SAUVEGARDE DE LA CONNECTIVITE DES " <<
 			      "ARETES DANS L'OBJET CONNECTIVITY" );
 		      Connectivity->_constituent=ConnectivityEdge ;
 		    }
@@ -731,7 +731,7 @@ int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY()
 	  
 //  	}
       
-  END_OF(LOC);
+  END_OF_MED(LOC);
       return MED_VALID;
     }
   return MED_ERROR;
@@ -740,7 +740,7 @@ int MED_MESH_RDONLY_DRIVER21::getCONNECTIVITY()
 int MED_MESH_RDONLY_DRIVER21::getNodalConnectivity(CONNECTIVITY * Connectivity) 
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER21::getNodalConnectivity : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_status==MED_OPENED)
     {
@@ -898,7 +898,7 @@ int MED_MESH_RDONLY_DRIVER21::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	      
 		size+=tmp_cells_count[i]*((MED_MESH_DRIVER21::all_cell_type[i])%100) ;
 	    
-		MESSAGE(LOC
+		MESSAGE_MED(LOC
 			<< Connectivity->_count[typeNumber]-1 << " cells of type " 
 			<< all_cell_type_tab[i] ); 
 
@@ -949,7 +949,7 @@ int MED_MESH_RDONLY_DRIVER21::getNodalConnectivity(CONNECTIVITY * Connectivity)
 		delete[] tmp_cells_count;
 		delete[] tmpFaceCount;
 		delete[] tmpEdgeCount;
-		MESSAGE(LOC<<": MEDconnLire returns "<<err) ;
+		MESSAGE_MED(LOC<<": MEDconnLire returns "<<err) ;
 		return MED_ERROR ;
 	      }
 
@@ -1058,7 +1058,7 @@ int MED_MESH_RDONLY_DRIVER21::getNodalConnectivity(CONNECTIVITY * Connectivity)
             tmp_constituentArray = new med_2_1::med_int[(NumberOfNodeByFace+1)*tmp_numberOfFaces] ;
           else {
             tmp_constituentArray = new med_2_1::med_int[NumberOfNodeByFace*tmp_numberOfFaces] ;
-            MESSAGE(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !") ;
+            MESSAGE_MED(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !") ;
 	  }
 
 	  int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
@@ -1066,7 +1066,7 @@ int MED_MESH_RDONLY_DRIVER21::getNodalConnectivity(CONNECTIVITY * Connectivity)
 			      med_2_1::MED_FULL_INTERLACE,NULL,0,med_2_1::MED_MAILLE,med_type,med_2_1::MED_NOD);
 
 	  if ( err != MED_VALID) {
-	    MESSAGE(LOC<<": MEDconnLire returns "<<err) ;
+	    MESSAGE_MED(LOC<<": MEDconnLire returns "<<err) ;
 	    delete constituent ;
 	    delete[] tmp_constituentArray;
 	    delete[] tmpFaceCount;
@@ -1171,7 +1171,7 @@ int MED_MESH_RDONLY_DRIVER21::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	    tmp_constituentArray = new med_2_1::med_int[(NumberOfNodeByEdge+1)*tmp_numberOfEdges] ;
           else {
 	    tmp_constituentArray = new med_2_1::med_int[NumberOfNodeByEdge*tmp_numberOfEdges] ;
-            MESSAGE(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !") ;
+            MESSAGE_MED(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !") ;
           }
 	  
 	  int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
@@ -1179,7 +1179,7 @@ int MED_MESH_RDONLY_DRIVER21::getNodalConnectivity(CONNECTIVITY * Connectivity)
 			      med_2_1::MED_FULL_INTERLACE,NULL,0,med_2_1::MED_MAILLE,
 			      med_type,med_2_1::MED_NOD);
 	  if ( err != MED_VALID) {
-	    MESSAGE(LOC<<": MEDconnLire returns "<<err) ;
+	    MESSAGE_MED(LOC<<": MEDconnLire returns "<<err) ;
 	    delete constituent ;
 	    delete[] tmp_constituentArray;
 	    delete[] tmpEdgeCount;
@@ -1244,7 +1244,7 @@ int MED_MESH_RDONLY_DRIVER21::getNodalConnectivity(CONNECTIVITY * Connectivity)
 int  MED_MESH_RDONLY_DRIVER21::getFAMILY() 
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER21::getFAMILY() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_status==MED_OPENED) {
     int err = 0 ;
@@ -1262,7 +1262,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 	err = getNodesFamiliesNumber(MEDArrayNodeFamily) ; // error only if (_status!=MED_OPENED), other case exeception !
 	// CELL
 
-	MESSAGE(LOC << "error returned from getNodesFamiliesNumber " << err);
+	MESSAGE_MED(LOC << "error returned from getNodesFamiliesNumber " << err);
 
 	MEDArrayCellFamily = new int*[_ptrMesh->getNumberOfTypes(MED_CELL)] ; // ET SI IL N'Y A PAS DE CELLS ?
 	const medGeometryElement * myTypes = _ptrMesh->getTypes(MED_CELL);
@@ -1271,7 +1271,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 
 	err = getCellsFamiliesNumber(MEDArrayCellFamily,_ptrMesh->_connectivity,MED_CELL) ;
 
-	MESSAGE(LOC << "error returned from getCellsFamiliesNumber for Cells " << err);
+	MESSAGE_MED(LOC << "error returned from getCellsFamiliesNumber for Cells " << err);
 
 	if (_ptrMesh->_connectivity->_constituent != NULL) {
 	  if (_ptrMesh->_connectivity->_constituent->_entity == MED_EN::MED_FACE) {
@@ -1283,7 +1283,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 
 	    err = getCellsFamiliesNumber(MEDArrayFaceFamily,_ptrMesh->_connectivity->_constituent,MED_FACE) ;
 
-	    MESSAGE(LOC << "error returned from getCellsFamiliesNumber for Faces " << err);
+	    MESSAGE_MED(LOC << "error returned from getCellsFamiliesNumber for Faces " << err);
 
 	  } else {
 	    // EDGE in 2D
@@ -1293,7 +1293,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 	      MEDArrayEdgeFamily[i] = new int[_ptrMesh->getNumberOfElements(MED_EDGE,myTypes[i])] ;
 	    err = getCellsFamiliesNumber(MEDArrayEdgeFamily,_ptrMesh->_connectivity->_constituent,MED_EDGE) ;
 
-	    MESSAGE(LOC << "error returned from getCellsFamiliesNumber for Edges in 2D " << err);
+	    MESSAGE_MED(LOC << "error returned from getCellsFamiliesNumber for Edges in 2D " << err);
 
 	  }
 	  // EDGE in 3D
@@ -1304,7 +1304,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 	      MEDArrayEdgeFamily[i] = new int[_ptrMesh->getNumberOfElements(MED_EDGE,myTypes[i])] ;
 	    err = getCellsFamiliesNumber(MEDArrayEdgeFamily,_ptrMesh->_connectivity->_constituent->_constituent,MED_EDGE) ; // we are in 3D !
 
-	    MESSAGE(LOC << "error returned from getCellsFamiliesNumber for Edges in 3D " << err);
+	    MESSAGE_MED(LOC << "error returned from getCellsFamiliesNumber for Edges in 3D " << err);
 
 	  }
 	}
@@ -1339,7 +1339,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
     if ( NumberOfFamilies < 1 ) // at least family 0 must exist 
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"There is no FAMILY, FAMILY 0 must exists" ));
 
-    SCRUTE(NumberOfFamilies);
+    SCRUTE_MED(NumberOfFamilies);
 
     vector<FAMILY*> &NodeFamilyVector = _ptrMesh->_familyNode ;
     vector<FAMILY*> &CellFamilyVector = _ptrMesh->_familyCell ;
@@ -1395,10 +1395,10 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 		       );
 #endif
 
-      SCRUTE(GroupsNames);
-      SCRUTE(FamilyName);
-      SCRUTE(err);
-      SCRUTE(i);
+      SCRUTE_MED(GroupsNames);
+      SCRUTE_MED(FamilyName);
+      SCRUTE_MED(err);
+      SCRUTE_MED(i);
 
       if (err != MED_VALID)
 	throw MEDEXCEPTION("MED_MESH_RDONLY_DRIVER21::getFAMILY() : ERROR when get FAMILY informations" );
@@ -1416,12 +1416,12 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 	// if nothing found, delete Family
 
 
-	//MESSAGE(LOC << " Well is that OK now ?? " << (*Family));
+	//MESSAGE_MED(LOC << " Well is that OK now ?? " << (*Family));
 
 
 
 	if (Family->getNumberOfTypes() == 0) {
-	  MESSAGE(LOC<<"Nothing found for family "<<FamilyName<< " : skip");
+	  MESSAGE_MED(LOC<<"Nothing found for family "<<FamilyName<< " : skip");
 	  delete Family;
 	} else
 	  switch (Family->getEntity()) {
@@ -1443,7 +1443,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 	    break ;
 	  }
 
-	//	MESSAGE(LOC << (*Family));
+	//	MESSAGE_MED(LOC << (*Family));
 
 
 
@@ -1472,7 +1472,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
       delete[] MEDArrayEdgeFamily ;
     }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
     return MED_VALID ;
   }
   return MED_ERROR;
@@ -1481,7 +1481,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 int  MED_MESH_RDONLY_DRIVER21::getNodesFamiliesNumber(int * MEDArrayNodeFamily) 
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER21::getNodesFamiliesNumber() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   if (_status==MED_OPENED) {
     int err = 0 ;
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
@@ -1505,7 +1505,7 @@ int  MED_MESH_RDONLY_DRIVER21::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
                                    << "| nodes in mesh |" 
                                    << _ptrMesh->_name.c_str() << "|" ));
     }
-  END_OF(LOC);
+  END_OF_MED(LOC);
     return MED_VALID;
   }
   return MED_ERROR;
@@ -1516,7 +1516,7 @@ int  MED_MESH_RDONLY_DRIVER21::getCellsFamiliesNumber(int **MEDArrayFamily,
 						      MED_EN::medEntityMesh entity)
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER21::getCellsFamiliesNumber " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_status==MED_OPENED) {
     int i, err = 0 ;
@@ -1542,7 +1542,7 @@ int  MED_MESH_RDONLY_DRIVER21::getCellsFamiliesNumber(int **MEDArrayFamily,
 
       // provisoire : si les faces ou les aretes sont des mailles !!!
       if (err != MED_VALID) {
-	MESSAGE(LOC<<"search face/edge family on cell !!!");
+	MESSAGE_MED(LOC<<"search face/edge family on cell !!!");
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	int lgthI=_ptrMesh->getNumberOfElements(entity,myTypes[i]);
 	med_2_1::med_int *temp=new med_2_1::med_int[lgthI];
@@ -1583,7 +1583,7 @@ MED_MESH_WRONLY_DRIVER21::MED_MESH_WRONLY_DRIVER21(const string & fileName,
   IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),
   MED_MESH_DRIVER(fileName,ptrMesh,WRONLY)
 {
-  MESSAGE("MED_MESH_WRONLY_DRIVER21::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("MED_MESH_WRONLY_DRIVER21::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 MED_MESH_WRONLY_DRIVER21::MED_MESH_WRONLY_DRIVER21(const MED_MESH_WRONLY_DRIVER21 & driver): 
@@ -1593,7 +1593,7 @@ MED_MESH_WRONLY_DRIVER21::MED_MESH_WRONLY_DRIVER21(const MED_MESH_WRONLY_DRIVER2
 
 MED_MESH_WRONLY_DRIVER21::~MED_MESH_WRONLY_DRIVER21()
 {
-  //MESSAGE("MED_MESH_WRONLY_DRIVER21::MED_MESH_WRONLY_DRIVER21(const string & fileName, MESH * ptrMesh) has been destroyed");
+  //MESSAGE_MED("MED_MESH_WRONLY_DRIVER21::MED_MESH_WRONLY_DRIVER21(const string & fileName, MESH * ptrMesh) has been destroyed");
 }
 
 GENDRIVER * MED_MESH_WRONLY_DRIVER21::copy(void) const
@@ -1604,10 +1604,10 @@ GENDRIVER * MED_MESH_WRONLY_DRIVER21::copy(void) const
 void MED_MESH_WRONLY_DRIVER21::write(void) const
 { 
   const char * LOC = "void MED_MESH_WRONLY_DRIVER21::write(void) const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // we must first create mesh !!
-  MESSAGE(LOC << "MeshName : |" << _meshName << "| FileName : |"<<_fileName<<"| MedIdt : | "<< _medIdt << "|");
+  MESSAGE_MED(LOC << "MeshName : |" << _meshName << "| FileName : |"<<_fileName<<"| MedIdt : | "<< _medIdt << "|");
 
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "File "<<_fileName<<" is not open. Open it before write !"));
@@ -1646,10 +1646,10 @@ void MED_MESH_WRONLY_DRIVER21::write(void) const
     int err ;
     // test if the family already exists (HDF trick waiting a MED evolution to be replaced)
     string dataGroupFam = "/ENS_MAA/"+_meshName+"/FAS/FAMILLE_0/";  
-    MESSAGE("|"<<dataGroupFam<<"|");
+    MESSAGE_MED("|"<<dataGroupFam<<"|");
     err = med_2_1::_MEDdatagroupOuvrir(_medIdt,const_cast <char *> (dataGroupFam.c_str()) );
     if ( err < MED_VALID ) {
-      SCRUTE(err);
+      SCRUTE_MED(err);
       
       err = med_2_1::MEDfamCr( _medIdt,
 			      const_cast <char *> ( _meshName.c_str() ),
@@ -1665,23 +1665,23 @@ void MED_MESH_WRONLY_DRIVER21::write(void) const
      
   }
 
-  MESSAGE(LOC<<"writeFamilies(_ptrMesh->_familyNode)");
+  MESSAGE_MED(LOC<<"writeFamilies(_ptrMesh->_familyNode)");
   if (writeFamilies(_ptrMesh->_familyNode) !=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERROR in writeFamilies(_ptrMesh->_familyNode)"  )) ;
 
-  MESSAGE(LOC<<"writeFamilies(_ptrMesh->_familyCell)");
+  MESSAGE_MED(LOC<<"writeFamilies(_ptrMesh->_familyCell)");
   if (writeFamilies(_ptrMesh->_familyCell) !=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERROR in writeFamilies(_ptrMesh->_familyCell)"  )) ;
 
-  MESSAGE(LOC<<"writeFamilies(_ptrMesh->_familyFace)");
+  MESSAGE_MED(LOC<<"writeFamilies(_ptrMesh->_familyFace)");
   if (writeFamilies(_ptrMesh->_familyFace) !=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERROR in writeFamilies(_ptrMesh->_familyFace)"  )) ;
 
-  MESSAGE(LOC<<"writeFamilies(_ptrMesh->_familyEdge)");
+  MESSAGE_MED(LOC<<"writeFamilies(_ptrMesh->_familyEdge)");
   if (writeFamilies(_ptrMesh->_familyEdge) !=MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERROR in writeFamilies(_ptrMesh->_familyEdge)"  )) ;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 } 
 
 //=======================================================================
@@ -1692,11 +1692,11 @@ void MED_MESH_WRONLY_DRIVER21::write(void) const
 int MED_MESH_WRONLY_DRIVER21::writeGRID() const
 {
   const char * LOC = "MED_MESH_WRONLY_DRIVER21::writeGRID() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   if (_status!=MED_OPENED)
   {
-    MESSAGE (LOC<<" Not open !!!");
+    MESSAGE_MED (LOC<<" Not open !!!");
     return MED_ERROR;
   }
   GRID * ptrGrid = (GRID*) _ptrMesh;
@@ -1720,7 +1720,7 @@ int MED_MESH_WRONLY_DRIVER21::writeGRID() const
     if (err != MED_VALID)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Unable to create Grid"));
     else 
-      MESSAGE(LOC<<"Grid "<<_meshName<<" created in file "<<_fileName<<" !");
+      MESSAGE_MED(LOC<<"Grid "<<_meshName<<" created in file "<<_fileName<<" !");
   }
   else if (dim != _ptrMesh->_spaceDimension) 
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Grid |" << _meshName.c_str() <<
@@ -1733,7 +1733,7 @@ int MED_MESH_WRONLY_DRIVER21::writeGRID() const
   int lengthString ;
   string valueString ;
   for (int i=0;i<_ptrMesh->_spaceDimension;i++) {
-    SCRUTE(i);
+    SCRUTE_MED(i);
     valueString = _ptrMesh->_coordinate->_coordinateName[i] ;
     lengthString = (MED_TAILLE_PNOM21<valueString.size())?MED_TAILLE_PNOM21:valueString.size() ;
     tmp_name.replace(i*MED_TAILLE_PNOM21,i*MED_TAILLE_PNOM21+lengthString,valueString,0,lengthString);
@@ -1827,7 +1827,7 @@ int MED_MESH_WRONLY_DRIVER21::writeGRID() const
 
   } // end Write  Cartesian or Polar Grid
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   return MED_VALID;
 }
 
@@ -1839,7 +1839,7 @@ int MED_MESH_WRONLY_DRIVER21::writeGRID() const
 int MED_MESH_WRONLY_DRIVER21::writeCoordinates() const {
  
   const char * LOC = "int MED_MESH_WRONLY_DRIVER21::writeCoordinates() const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   med_2_1::med_err err = MED_ERROR;
   med_2_1::med_repere rep;
@@ -1868,7 +1868,7 @@ int MED_MESH_WRONLY_DRIVER21::writeCoordinates() const {
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Unable to create Mesh : |" << _meshName << "|"));
     else 
       {
-	MESSAGE(LOC<<"Mesh "<<_meshName<<" created in file "<<_fileName<<" !");
+	MESSAGE_MED(LOC<<"Mesh "<<_meshName<<" created in file "<<_fileName<<" !");
       }
   else if (dim != _ptrMesh->_spaceDimension) 
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Mesh |" << _meshName.c_str() << "| already exists in file |" << _fileName
@@ -1940,7 +1940,7 @@ int MED_MESH_WRONLY_DRIVER21::writeCoordinates() const {
       }
       //////////////////////////////////////////////////////////////////////////////////////
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
     
   return MED_VALID;
 }
@@ -1951,7 +1951,7 @@ int MED_MESH_WRONLY_DRIVER21::writeCoordinates() const {
 int MED_MESH_WRONLY_DRIVER21::writeConnectivities(medEntityMesh entity) const {
   
   const char * LOC="int MED_MESH_WRONLY_DRIVER21::writeConnectivities() const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   med_2_1::med_err err;
   
@@ -2091,14 +2091,14 @@ int MED_MESH_WRONLY_DRIVER21::writeConnectivities(medEntityMesh entity) const {
             
     }
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
   return MED_VALID;
 }
 
 int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
   
   const char * LOC="int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   med_2_1::med_err err;
   
@@ -2130,8 +2130,8 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
       NumberOfNodesFamilies=myFamilies->size() ;
     }
     for (int i=0 ; i<NumberOfNodesFamilies; i++) {
-      //SCRUTE(i);
-      //SCRUTE(myFamilies[i]->getName());
+      //SCRUTE_MED(i);
+      //SCRUTE_MED(myFamilies[i]->getName());
       int FamilyIdentifier = (*myFamilies)[i]->getIdentifier() ;
       int TotalNumber = (*myFamilies)[i]->getNumberOfElements(MED_ALL_ELEMENTS) ;
       if ((*myFamilies)[i]->isOnAllElements())
@@ -2144,7 +2144,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
       }
     }
     for(int j=0; j<NumberOfNodes; j++) {
-      SCRUTE(MEDArrayNodeFamily[j]);
+      SCRUTE_MED(MEDArrayNodeFamily[j]);
     }
     if ( !_ptrMesh->getIsAGrid() ){
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
@@ -2219,7 +2219,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
 	int NumberOfGroups = myGroups.size() ;
 	// build families from groups
 	for (int i=0; i<NumberOfGroups; i++) {
-	  SCRUTE( myGroups[i]->getName() );
+	  SCRUTE_MED( myGroups[i]->getName() );
 	  SUPPORT * mySupport = myGroups[i] ;
 	  FAMILY* myFamily = new FAMILY(*mySupport);
 	  myFamily->setIdentifier(-i-1);
@@ -2263,7 +2263,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
 			(med_2_1::med_geometrie_element) types[i]
 ); 
 #endif
-	MESSAGE("OK "<<i);
+	MESSAGE_MED("OK "<<i);
 	if ( err != MED_VALID) 
 	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write family for the |"<< _ptrMesh->getNumberOfElements(entity, types[i])
 				       << "| cells of geometric type |" << geoNames[ types[i]] <<"|in mesh |"      
@@ -2288,7 +2288,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
 
       int numberOfTypes           = _ptrMesh->getNumberOfTypes (entity) ;
       const medGeometryElement  * types = _ptrMesh->getTypes         (entity) ;
-      SCRUTE(numberOfTypes);
+      SCRUTE_MED(numberOfTypes);
       
       int numberOfElements = _ptrMesh->getNumberOfElements(entity, MED_ALL_ELEMENTS) ;
       int * familyArray = new int[numberOfElements] ;
@@ -2305,7 +2305,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
 	int NumberOfGroups = myGroups.size() ;
 	// build families from groups
 	for (int i=0; i<NumberOfGroups; i++) {
-	  SCRUTE( myGroups[i]->getName() );
+	  SCRUTE_MED( myGroups[i]->getName() );
 	  SUPPORT * mySupport = myGroups[i] ;
 	  FAMILY* myFamily = new FAMILY(*mySupport);
 	  myFamily->setIdentifier(-i-1000);
@@ -2390,7 +2390,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
 	int NumberOfGroups = myGroups.size() ;
 	// build families from groups
 	for (int i=0; i<NumberOfGroups; i++) {
-	  SCRUTE( myGroups[i]->getName() );
+	  SCRUTE_MED( myGroups[i]->getName() );
 	  SUPPORT * mySupport = myGroups[i] ;
 	  FAMILY* myFamily = new FAMILY(*mySupport);
 	  myFamily->setIdentifier(-i-2000);
@@ -2451,18 +2451,18 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilyNumbers() const {
     }
   }
     
-  END_OF(LOC);
+  END_OF_MED(LOC);
   return MED_VALID;
 }
 
 int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
   
   const char * LOC="int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> families) const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   med_2_1::med_err err;
   
-  MESSAGE(LOC<<" families.size() :"<<families.size());
+  MESSAGE_MED(LOC<<" families.size() :"<<families.size());
 
   for (unsigned int i=0; i< families.size(); i++) {
 
@@ -2503,10 +2503,10 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
 
     // test if the family already exists (HDF trick waiting a MED evolution to be replaced)
     string dataGroupFam = "/ENS_MAA/"+_meshName+"/FAS/"+families[i]->getName()+"/";  
-    SCRUTE("|"<<dataGroupFam<<"|");
+    SCRUTE_MED("|"<<dataGroupFam<<"|");
     err =med_2_1::_MEDdatagroupOuvrir(_medIdt,const_cast <char *> (dataGroupFam.c_str()) ) ;
     if ( err < MED_VALID ) {
-      SCRUTE(err);
+      SCRUTE_MED(err);
       if ( families[i]->getName().size() > MED_TAILLE_NOM )
 	throw MEDEXCEPTION
           ( LOCALIZED(STRING(LOC) << "The size of the name of the family |" << i+1
@@ -2515,16 +2515,16 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
                       <<  families[i]->getName().size()  <<"| and is more than |"
                       << MED_TAILLE_NOM << "|")) ;
 
-      MESSAGE(LOC<<"families[i]->getName().c_str() : "<<families[i]->getName().c_str());
-      MESSAGE(LOC<<"_meshName.c_str() : "<<_meshName.c_str());
-      MESSAGE(LOC<<"families[i]->getIdentifier() : "<<families[i]->getIdentifier());
-      MESSAGE(LOC<<"numberOfAttributes : "<<numberOfAttributes);
+      MESSAGE_MED(LOC<<"families[i]->getName().c_str() : "<<families[i]->getName().c_str());
+      MESSAGE_MED(LOC<<"_meshName.c_str() : "<<_meshName.c_str());
+      MESSAGE_MED(LOC<<"families[i]->getIdentifier() : "<<families[i]->getIdentifier());
+      MESSAGE_MED(LOC<<"numberOfAttributes : "<<numberOfAttributes);
 	
-      //MESSAGE(LOC<<"families[i]->getAttributesIdentifiers() : "<<families[i]->getAttributesIdentifiers()[0]);
-      //MESSAGE(LOC<<"families[i]->getAttributesValues() : "<<families[i]->getAttributesValues()[0]);
-      MESSAGE(LOC<<"attributesDescriptions.c_str() : "<<attributesDescriptions.c_str());
-      MESSAGE(LOC<<"numberOfGroups : "<<numberOfGroups);
-      MESSAGE(LOC<<"groupsNames.c_str() : "<<groupsNames.c_str());
+      //MESSAGE_MED(LOC<<"families[i]->getAttributesIdentifiers() : "<<families[i]->getAttributesIdentifiers()[0]);
+      //MESSAGE_MED(LOC<<"families[i]->getAttributesValues() : "<<families[i]->getAttributesValues()[0]);
+      MESSAGE_MED(LOC<<"attributesDescriptions.c_str() : "<<attributesDescriptions.c_str());
+      MESSAGE_MED(LOC<<"numberOfGroups : "<<numberOfGroups);
+      MESSAGE_MED(LOC<<"groupsNames.c_str() : "<<groupsNames.c_str());
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       int lgth=families[i]->getNumberOfAttributes();
       med_2_1::med_int *  AttributesIdentifier2 = new med_2_1::med_int[lgth] ;
@@ -2558,7 +2558,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
 			      const_cast <char *> (groupsNames.c_str()), 
 			      numberOfGroups);
 #endif
-      SCRUTE(err);
+      SCRUTE_MED(err);
       if ( err != MED_VALID) 
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't create family |" << families[i]->getName()
 				     << "| with identifier |" << families[i]->getIdentifier()  << "| groups names |" 
@@ -2570,7 +2570,7 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
 
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
     
   return MED_VALID;
 }
@@ -2597,7 +2597,7 @@ MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const string & fileName,
   MED_MESH_RDONLY_DRIVER21(fileName,ptrMesh),
   MED_MESH_WRONLY_DRIVER21(fileName,ptrMesh)
 {
-  MESSAGE("MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const MED_MESH_RDWR_DRIVER21 & driver):
@@ -2612,7 +2612,7 @@ MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const MED_MESH_RDWR_DRIVER21 & dr
 }
 
 MED_MESH_RDWR_DRIVER21::~MED_MESH_RDWR_DRIVER21() {
-  //MESSAGE("MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const string & fileName, MESH * ptrMesh) has been destroyed");
+  //MESSAGE_MED("MED_MESH_RDWR_DRIVER21::MED_MESH_RDWR_DRIVER21(const string & fileName, MESH * ptrMesh) has been destroyed");
 }
 
 GENDRIVER * MED_MESH_RDWR_DRIVER21::copy(void) const

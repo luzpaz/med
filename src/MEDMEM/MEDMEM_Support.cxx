@@ -70,7 +70,7 @@ SUPPORT::SUPPORT(): _name(""),	_description("None"), _mesh((MESH*)NULL),
 		    _number((MEDSKYLINEARRAY*)NULL)
 //--------------------------------------------------------------------------
 {
-    MESSAGE("SUPPORT::SUPPORT()");
+    MESSAGE_MED("SUPPORT::SUPPORT()");
 };
 
 /*!
@@ -94,7 +94,7 @@ SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, MED_EN::medEntityMesh Entity/*=
 		_totalNumberOfElements(0), _number((MEDSKYLINEARRAY*)NULL)
 //--------------------------------------------------------------------------
 {
-  MESSAGE("SUPPORT::SUPPORT(MESH*Mesh,string Name,medEntityMesh Entity)");
+  MESSAGE_MED("SUPPORT::SUPPORT(MESH*Mesh,string Name,medEntityMesh Entity)");
   update() ;
 };
 
@@ -106,7 +106,7 @@ SUPPORT::SUPPORT(const SUPPORT & m)
 //--------------------------------------------------------------------------
 {
   const char* LOC = "SUPPORT::SUPPORT(SUPPORT & m) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   _name = m._name ;
   _description = m._description ;
@@ -131,7 +131,7 @@ SUPPORT::SUPPORT(const SUPPORT & m)
 
   _profilNames=m._profilNames;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 /*!
 @}
@@ -146,7 +146,7 @@ SUPPORT & SUPPORT::operator=(const SUPPORT & m)
 //--------------------------------------------------------------------------
 {
   const char* LOC = "SUPPORT::operator=(const SUPPORT & m) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( this == &m ) return *this;
 
@@ -174,7 +174,7 @@ SUPPORT & SUPPORT::operator=(const SUPPORT & m)
 
   _profilNames=m._profilNames;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   return *this;
 }
 
@@ -185,7 +185,7 @@ SUPPORT & SUPPORT::operator=(const SUPPORT & m)
 SUPPORT::~SUPPORT()
 //-----------------
 {
-  MESSAGE("Destructeur ~SUPPORT()");
+  MESSAGE_MED("Destructeur ~SUPPORT()");
   clearDataOnNumbers();
 }
 
@@ -242,7 +242,7 @@ void SUPPORT::update()
 //-------------------
 {
   const char* LOC = "SUPPORT::update() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_isOnAllElts)
     {
@@ -258,7 +258,7 @@ void SUPPORT::update()
       else
 	{ // we duplicate information from _mesh
 	  _numberOfGeometricType=_mesh->getNumberOfTypesWithPoly(_entity);
-	  SCRUTE(_numberOfGeometricType);
+	  SCRUTE_MED(_numberOfGeometricType);
 	  medGeometryElement *  allType = _mesh->getTypesWithPoly(_entity);
 	  _geometricType.set(_numberOfGeometricType,allType );
 	  _numberOfElements.set(_numberOfGeometricType);
@@ -271,10 +271,10 @@ void SUPPORT::update()
 	  delete [] allType;
 	}
 
-      SCRUTE(_name);
-      SCRUTE(_numberOfGeometricType);
+      SCRUTE_MED(_name);
+      SCRUTE_MED(_numberOfGeometricType);
     }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 /*!
   Get the field value index (in fortran mode) from the support global number.
@@ -285,7 +285,7 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
 //-------------------
 {
   const char * LOC="getValIndFromGlobalNumber(const int number) : ";
-  //BEGIN_OF(LOC);
+  //BEGIN_OF_MED(LOC);
 
   if (_isOnAllElts) return number;
 
@@ -317,7 +317,7 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
   // It should never arrive here !!
   return 0;
 
-  //END_OF();
+  //END_OF_MED();
 }
 
 /*!
@@ -343,7 +343,7 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
 //-------------------
 {
   const char * LOC="SUPPORT::blending(SUPPORT *) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   if (_entity!=mySupport->getEntity())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entities are different !"));
   if(!(*_mesh == *mySupport->getMesh()))
@@ -372,7 +372,7 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
       for(iter=idsSet.begin();iter!=idsSet.end();iter++)
 	idsList.push_back(*iter);
 
-      MESSAGE(LOC << " size Set " << idsSet.size() << " size List " << idsList.size());
+      MESSAGE_MED(LOC << " size Set " << idsSet.size() << " size List " << idsList.size());
 
       if(_entity==MED_NODE)
 	fillFromNodeList(idsList);
@@ -381,7 +381,7 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
     }
   else
     clearDataOnNumbers();
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 /*!  @}  */
 
@@ -436,7 +436,7 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
 //-------------------
 {
   const char * LOC = "SUPPORT::setpartial(string , int , int , medGeometryElement * , int * , int *) : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   _isOnAllElts = false ;
 
@@ -477,7 +477,7 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   }
   setProfilNames(prof_names);
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 /*! @}  */
@@ -498,7 +498,7 @@ void SUPPORT::setpartial(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDE
 //-------------------
 {
   const char * LOC = "SUPPORT::setpartial(MEDSKYLINEARRAY * number) : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   if ( ! _geometricType )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"SUPPORT must contains"
@@ -524,27 +524,27 @@ void SUPPORT::setpartial(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDE
 
   // cout << *_number << endl;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 void SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDEXCEPTION)
 //-------------------
 {
   const char* LOC = "SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( shallowCopy )
     _number_fromfile = number;
   else
     _number_fromfile = new MEDSKYLINEARRAY(*number);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
 
   const char * LOC = "SUPPORT::setProfilNames(vector<string> profilNames) : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   if ( _isOnAllElts )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"SUPPORT shouldn't be on all elements"
@@ -571,7 +571,7 @@ void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
 
   _profilNames = profilNames;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
@@ -596,7 +596,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
 //-------------------
 {
   const char * LOC = "SUPPORT::getBoundaryElements() : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   if (_mesh == (MESH*)NULL) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"You shlould use the appropriate SUPPORT Constructor before calling this method"));
 
@@ -616,22 +616,22 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   int numberOf = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS) ;
   list<int> myElementsList ;
   int size = 0 ;
-  SCRUTE(numberOf) ;
+  SCRUTE_MED(numberOf) ;
   for (int i=0 ; i<numberOf; i++)
     if (myConnectivityValue[myConnectivityIndex[i]] == 0) {
-      SCRUTE(i+1) ;
+      SCRUTE_MED(i+1) ;
       myElementsList.push_back(i+1) ;
       size++ ;
     }
-  SCRUTE(size) ;
+  SCRUTE_MED(size) ;
   // Well, we must know how many geometric type we have found
   int * myListArray = new int[size] ;
   int id = 0 ;
   list<int>::iterator myElementsListIt ;
   for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
     myListArray[id]=(*myElementsListIt) ;
-    SCRUTE(id);
-    SCRUTE(myListArray[id]);
+    SCRUTE_MED(id);
+    SCRUTE_MED(myListArray[id]);
     id ++ ;
   }
 
@@ -712,7 +712,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   delete[] myListArray;
   delete mySkyLineArray;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 /*!
@@ -723,7 +723,7 @@ If A.intersecting(B) is called, on output, \f$ A \f$ contains \f$A \cap B\f$.
 void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
 {
   const char * LOC="SUPPORT::intersecting(SUPPORT *) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   if (_entity!=mySupport->getEntity())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entities are different !"));
   if(!(*_mesh == *mySupport->getMesh()))
@@ -750,7 +750,7 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
   int size=idsSet.size();
   int sizeList = idsList.size();
 
-  MESSAGE(LOC << " size Set " << idsSet.size() << " size List " << idsList.size());
+  MESSAGE_MED(LOC << " size Set " << idsSet.size() << " size List " << idsList.size());
 
   if(size!=0 && sizeList != 0)
     {
@@ -763,7 +763,7 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
     {
       clearDataOnNumbers();
     }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 /*!  @}  */
 
@@ -793,7 +793,7 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
 {
 
   const char* LOC = "bool SUPPORT::operator ==(const SUPPORT &support) const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   bool operatorReturn = false;
 
@@ -826,7 +826,7 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
 	}
     }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return operatorReturn;
 };
@@ -1063,7 +1063,7 @@ SUPPORT *MEDMEM::SUPPORT::getComplement() const
 SUPPORT *MEDMEM::SUPPORT::substract(const SUPPORT& other) const throw (MEDEXCEPTION)
 {
   const char * LOC = "SUPPORT *MEDMEM::subtract(const SUPPORT * other) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   SUPPORT *ret;
   if (_entity!=other.getEntity())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entities are different !"));
@@ -1089,7 +1089,7 @@ SUPPORT *MEDMEM::SUPPORT::substract(const SUPPORT& other) const throw (MEDEXCEPT
     ret=_mesh->buildSupportOnElementsFromElementList(*ids,_entity);
   delete ids;
   return ret;
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 /*!
@@ -1099,7 +1099,7 @@ SUPPORT *MEDMEM::SUPPORT::substract(const SUPPORT& other) const throw (MEDEXCEPT
 SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION)
 {
   const char * LOC = "SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   int spaceDimension=_mesh->getSpaceDimension();
   MED_EN::medEntityMesh baseEntity=Entity;
   if (spaceDimension == 3)

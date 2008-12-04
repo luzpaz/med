@@ -70,7 +70,7 @@ ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(const ENSIGHT_MESH_DRIVER & driver):
 
 ENSIGHT_MESH_DRIVER::~ENSIGHT_MESH_DRIVER()
 {
-  MESSAGE("ENSIGHT_MESH_DRIVER::~ENSIGHT_MESH_DRIVER() has been destroyed");
+  MESSAGE_MED("ENSIGHT_MESH_DRIVER::~ENSIGHT_MESH_DRIVER() has been destroyed");
 }
 
 void    ENSIGHT_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
@@ -114,7 +114,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::openConst() const
 {
   const char * LOC = "ENSIGHT_MESH_WRONLY_DRIVER::open()" ;
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( _fileName == "" )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -130,13 +130,13 @@ void ENSIGHT_MESH_WRONLY_DRIVER::openConst() const
 				     << _fileName)
 			  );
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void ENSIGHT_MESH_WRONLY_DRIVER::closeConst() const {
 
   const char * LOC = "ENSIGHT_MESH_WRONLY_DRIVER::close() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   (*_ensightFile).close();
  
@@ -144,7 +144,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::closeConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close main Ensight file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void ENSIGHT_MESH_WRONLY_DRIVER::read() throw (MEDEXCEPTION) {
@@ -155,7 +155,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
 { 
 
   const char * LOC = "ENSIGHT_MESH_WRONLY_DRIVER::write() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Well we must open ensight file first, because there are
   // no other driver than MESH for ENSIGHT that do it !
@@ -590,7 +590,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
   ensightGeomFile << endl ;
   return ;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void ENSIGHT_MESH_WRONLY_DRIVER::addSupport(SUPPORT *sup)
@@ -599,9 +599,9 @@ void ENSIGHT_MESH_WRONLY_DRIVER::addSupport(SUPPORT *sup)
 }
 
 // void ENSIGHT_MESH_WRONLY_DRIVER::writeSupport(SUPPORT * mySupport) const {
-//   BEGIN_OF(LOC) ;
-//   MESSAGE(LOC << "Not yet implemented, acting on the object " << *mySupport);
-//   END_OF();
+//   BEGIN_OF_MED(LOC) ;
+//   MESSAGE_MED(LOC << "Not yet implemented, acting on the object " << *mySupport);
+//   END_OF_MED();
 // }
 
 ENSIGHT_MESH_RDONLY_DRIVER::ENSIGHT_MESH_RDONLY_DRIVER() : ENSIGHT_MESH_DRIVER()
@@ -633,7 +633,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::openConst() const {
 
   const char * LOC ="ENSIGHT_MESH_RDONLY_DRIVER::open() : ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( _fileName == "" )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -648,13 +648,13 @@ void ENSIGHT_MESH_RDONLY_DRIVER::openConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open main Ensight file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void ENSIGHT_MESH_RDONLY_DRIVER::closeConst() const {
 
   const char * LOC = "ENSIGHT_MESH_RDONLY_DRIVER::close() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   (*_ensightFile).close();
  
@@ -662,7 +662,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::closeConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close main Ensight file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void ENSIGHT_MESH_RDONLY_DRIVER::write() const throw (MEDEXCEPTION) {
@@ -672,7 +672,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::write() const throw (MEDEXCEPTION) {
 void ENSIGHT_MESH_RDONLY_DRIVER::read()
 {
   const char* LOC = "ENSIGHT_MESH_RDONLY_DRIVER::read() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   openConst() ;
 
@@ -889,6 +889,6 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read()
 //     cout << "Impression de _ptrmesh dans EnsightMeshDriver: " << endl;
 //     cout << *_ptrMesh ;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 

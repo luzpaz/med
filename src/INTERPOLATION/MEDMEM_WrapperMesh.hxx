@@ -242,7 +242,7 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 	// et dans ce cas, la maille secondaire est voisine de la maille primaire, on met à jour les tableaux
 	// si on voulait construire le tableau des faces, c'est ici qu'il faudrait le faire -1-
 						
-                                                  // MESSAGE("La maille "<<num_maille<<" a pour voisin la maille "<<num_maille_sec<<" via la face "<<nbr_formants);
+                                                  // MESSAGE_MED("La maille "<<num_maille<<" a pour voisin la maille "<<num_maille_sec<<" via la face "<<nbr_formants);
 						face_au_bord.push_back(FAUX);
 						faces_contenues[num_maille][num_local_face]=nbr_formants;
 						voisins_de_maille[num_maille][num_local_face]=num_maille_sec;
@@ -280,7 +280,7 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 	// si un seul numéro n'est pas défini, la maille est au bord
 	// si on voulait construire le tableau des faces, c'est ici qu'il faudrait le faire -2-
 				
-                                  // MESSAGE("La maille "<<num_maille<<" est au bord via sa face "<<ind_num_cont);
+                                  // MESSAGE_MED("La maille "<<num_maille<<" est au bord via sa face "<<ind_num_cont);
 				test_bord=1;
 				faces_contenues[num_maille][ind_num_cont]=nbr_formants;
 				maille_au_bord[num_maille]=VRAI;
@@ -318,12 +318,12 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 		}
 		
 	
-	MESSAGE("IL Y A "<<verif<<" PROBLEMES A LA SUITE DE LA CONSTRUCTION DE CONNEXITE");
-	MESSAGE("Nombre de mailles : "<<nbr_mailles);
-	MESSAGE("Approximation du nombre de faces : "<<approx_nbr_formants);
-	MESSAGE("Nombre réel de faces de bord : "<<nbr_faces_bord);
-	MESSAGE("Nombre réel total de faces : "<<nbr_formants);
-	MESSAGE("Nombre de Mailles Isolées : "<<nbf);	
+	MESSAGE_MED("IL Y A "<<verif<<" PROBLEMES A LA SUITE DE LA CONSTRUCTION DE CONNEXITE");
+	MESSAGE_MED("Nombre de mailles : "<<nbr_mailles);
+	MESSAGE_MED("Approximation du nombre de faces : "<<approx_nbr_formants);
+	MESSAGE_MED("Nombre réel de faces de bord : "<<nbr_faces_bord);
+	MESSAGE_MED("Nombre réel total de faces : "<<nbr_formants);
+	MESSAGE_MED("Nombre de Mailles Isolées : "<<nbf);	
 	}
 
 #endif

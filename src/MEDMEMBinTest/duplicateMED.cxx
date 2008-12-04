@@ -51,7 +51,7 @@ int main (int argc, char ** argv) {
     myMed.write(id);
 
   } catch (MEDEXCEPTION& ex) {
-    MESSAGE(ex.what()) ;
+    MESSAGE_MED(ex.what()) ;
   }
 
 }

@@ -72,41 +72,39 @@ inline std::string healName(const std::string& name ) {
   return name.substr( 0, last + 1 );
 }
 
-#ifdef MED_WITHOUT_KERNEL
-
 #  include <cstdlib>
 #  include <iostream>
 using namespace std;
 
 /* ---  INFOS is always defined (without _DEBUG_): to be used for warnings, with release version --- */
 
-# define HEREWEARE {cout<<flush ; cerr << __FILE__ << " [" << __LINE__ << "] : " << flush ;}
-# define INFOS(chain) {HEREWEARE ; cerr << chain << endl ;}
-# define PYSCRIPT(chain) {cout<<flush ; cerr << "---PYSCRIPT--- " << chain << endl ;}
+# define HEREWEARE_MED {cout<<flush ; cerr << __FILE__ << " [" << __LINE__ << "] : " << flush ;}
+# define INFOS_MED(chain) {HEREWEARE_MED ; cerr << chain << endl ;}
+# define PYSCRIPT_MED(chain) {cout<<flush ; cerr << "---PYSCRIPT--- " << chain << endl ;}
 
 
 /* --- To print date and time of compilation of current source on stdout --- */
 
 # if defined ( __GNUC__ )
-# define COMPILER		"g++" ;
+# define COMPILER_MED		"g++" ;
 # elif defined ( __sun )
-# define COMPILER		"CC" ;
+# define COMPILER_MED		"CC" ;
 # elif defined ( __KCC )
-# define COMPILER		"KCC" ;
+# define COMPILER_MED		"KCC" ;
 # elif defined ( __PGI )
-# define COMPILER		"pgCC" ;
+# define COMPILER_MED		"pgCC" ;
 # else
-# define COMPILER		"undefined" ;
+# define COMPILER_MED		"undefined" ;
 # endif
 
-# ifdef INFOS_COMPILATION
-# undef INFOS_COMPILATION
+# ifdef INFOS_COMPILATION_MED
+# undef INFOS_COMPILATION_MED
 # endif
-# define INFOS_COMPILATION	{\
+# define INFOS_COMPILATION_MED	{\
   cerr << flush;\
   cout << __FILE__ ;\
   cout << " [" << __LINE__ << "] : " ;\
-  cout << "COMPILED with " << COMPILER ;\
+  cout << "COMPILED with " << COMPILER_MED ;\
   cout << ", " << __DATE__ ; \
   cout << " at " << __TIME__ << endl ;\
   cout << "\n\n" ;\
@@ -117,59 +115,38 @@ using namespace std;
 
 /* --- the following MACROS are useful at debug time --- */
 
-# define HERE {cout<<flush ; cerr << "- Trace " << __FILE__ << " [" << __LINE__ << "] : " << flush ;}
-# define SCRUTE(var) {HERE ; cerr << #var << "=" << var << endl ;}
-# define MESSAGE(chain) {HERE ; cerr << chain << endl ;}
-# define INTERRUPTION(code) {HERE ; cerr << "INTERRUPTION return code= " << code << endl ; exit(code) ;}
+# define HERE_MED {cout<<flush ; cerr << "- Trace " << __FILE__ << " [" << __LINE__ << "] : " << flush ;}
+# define SCRUTE_MED(var) {HERE_MED ; cerr << #var << "=" << var << endl ;}
+# define MESSAGE_MED(chain) {HERE_MED ; cerr << chain << endl ;}
+# define INTERRUPTION_MED(code) {HERE_MED ; cerr << "INTERRUPTION return code= " << code << endl ; exit(code) ;}
 
-# ifndef ASSERT
-# define ASSERT(condition) if (!(condition)){ HERE ; cerr << "CONDITION " << #condition << " NOT VERIFIED"<< endl ; INTERRUPTION(1) ;}
-# endif /* ASSERT */
-#define REPERE {cout<<flush ; cerr << "   --------------" << endl << flush ;}
-#define __PREFIX const char* __LOC
-#define PREFIX __LOC
-#define BEGIN_OF(chain) __PREFIX = chain; {REPERE ; HERE ; cerr << "Begin of: " << PREFIX << endl ; REPERE ; }
-#define END_OF(chain) {REPERE ; HERE ; cerr << "Normal end of: " << chain << endl ; REPERE ; }
+# ifndef ASSERT_MED
+# define ASSERT_MED(condition) if (!(condition)){ HERE_MED ; cerr << "CONDITION " << #condition << " NOT VERIFIED"<< endl ; INTERRUPTION_MED(1) ;}
+# endif /* ASSERT_MED */
+#define REPERE_MED {cout<<flush ; cerr << "   --------------" << endl << flush ;}
+#define __PREFIX_MED const char* __LOC_MED
+#define PREFIX_MED __LOC_MED 
+#define BEGIN_OF_MED(chain) __PREFIX_MED = chain; {REPERE_MED ; HERE_MED ; cerr << "Begin of: " << PREFIX_MED << endl ; REPERE_MED ; }
+#define END_OF_MED(chain) {REPERE_MED ; HERE_MED ; cerr << "Normal end of: " << chain << endl ; REPERE_MED ; }
 
 
 # else /* ifdef _DEBUG_*/
 
 
-# define HERE
-# define SCRUTE(var) {}
-# define MESSAGE(chain) {}
-# define INTERRUPTION(code) {}
+# define HERE_MED
+# define SCRUTE_MED(var) {}
+# define MESSAGE_MED(chain) {}
+# define INTERRUPTION_MED(code) {}
 
-# ifndef ASSERT
-# define ASSERT(condition) {}
+# ifndef ASSERT_MED
+# define ASSERT_MED(condition) {}
 # endif /* ASSERT */
 
-# define REPERE
-# define BEGIN_OF(chain)  const char* __LOC; {__LOC=chain;}
-# define END_OF(chain) const char* __LOC_END; {__LOC_END=chain;}
+# define REPERE_MED
+# define BEGIN_OF_MED(chain)  const char* __LOC_MED; {__LOC_MED=chain;}
+# define END_OF_MED(chain) const char* __LOC_END_MED; {__LOC_END_MED=chain;}
 
 
 #endif /* ifdef _DEBUG_*/
-
-#else //MED_WITH_KERNEL
-
-
-#include <utilities.h>
-
-#undef BEGIN_OF
-#undef END_OF
-#if defined(_DEBUG_) || defined(_DEBUG)
-//don't use __PREFIX - it's a auxiliary macros. Use only PREFIX, please.
-# define __PREFIX const char* __LOC
-# define PREFIX __LOC
-# define BEGIN_OF(msg) __PREFIX = msg; {MESS_BEGIN(REPERE) << "Begin of: "      << PREFIX << MESS_END} 
-# define END_OF(msg)   {MESS_BEGIN(REPERE) << "Normal end of: " << msg << MESS_END}
-#else
-# define PREFIX __LOC
-# define BEGIN_OF(msg) const char* __LOC; {__LOC = msg;} // to avoid warning on unused variable LOC
-# define END_OF(msg) const char* __LOC_END; {__LOC_END = msg;}
-#endif
-
-#endif
 
 #endif

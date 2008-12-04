@@ -90,10 +90,10 @@ int main (int argc, char ** argv)
 
   
   MEDARRAY<int> * myArrayfull= new MEDARRAY<int>(SpaceDimension,NumberOfNodes,MED_EN::MED_FULL_INTERLACE);
-  ASSERT(myArrayfull != NULL);
+  ASSERT_MED(myArrayfull != NULL);
 
   const int * myValues = myArrayfull->get(MED_EN::MED_FULL_INTERLACE);
-  ASSERT(myValues!= NULL);
+  ASSERT_MED(myValues!= NULL);
 
   for (int i=0; i<NumberOfNodes; i++)
   {
@@ -105,14 +105,14 @@ int main (int argc, char ** argv)
   }
   
   const int * myOthers = myArrayfull->get(MED_EN::MED_NO_INTERLACE) ;
-  ASSERT(myOthers != NULL);
+  ASSERT_MED(myOthers != NULL);
   
   imprime("Initialisation full interlace (xi=yi=zi=i+1)",myValues,myOthers,NumberOfNodes,SpaceDimension);
 
   MEDARRAY<int> * myArrayno= new MEDARRAY<int>(SpaceDimension,NumberOfNodes,MED_EN::MED_NO_INTERLACE);
-  ASSERT(myArrayno != NULL);
+  ASSERT_MED(myArrayno != NULL);
   const int * myValuesno = myArrayno->get(MED_EN::MED_NO_INTERLACE);
-  ASSERT(myValuesno!= NULL);
+  ASSERT_MED(myValuesno!= NULL);
 
   for (int k=0; k<SpaceDimension; k++)
   {
@@ -124,7 +124,7 @@ int main (int argc, char ** argv)
   }
   
   const int * myOthersno = myArrayno->get(MED_EN::MED_FULL_INTERLACE) ;
-  ASSERT(myOthersno != NULL);
+  ASSERT_MED(myOthersno != NULL);
 
   imprime("Initialisation no interlace (xi=yi=zi=i+1)",myOthersno,myValuesno,NumberOfNodes,SpaceDimension);
 
@@ -152,7 +152,7 @@ int main (int argc, char ** argv)
 	cout << "--------------" << endl;
         cout << "   Pb au setI " << endl;
         cout << "--------------" << endl;
-	MESSAGE( "catched exception : " << e.what() ) ;
+	MESSAGE_MED( "catched exception : " << e.what() ) ;
 	return EXIT_FAILURE ;
   }
   catch (...)
@@ -177,7 +177,7 @@ int main (int argc, char ** argv)
 	cout << "--------------" << endl;
         cout << "   Pb au setJ " << endl;
         cout << "--------------" << endl;
-	MESSAGE( "catched exception : " << e.what() ) ;
+	MESSAGE_MED( "catched exception : " << e.what() ) ;
 	return EXIT_FAILURE ;
   }
   catch (...)
@@ -199,7 +199,7 @@ int main (int argc, char ** argv)
 	cout << "---------------------------" << endl;
         cout << "   Pb au setIJ()  de 1 , 2 "  << endl;
 	cout << "---------------------------" << endl;
-	MESSAGE( "catched exception : " << e.what() ) ;
+	MESSAGE_MED( "catched exception : " << e.what() ) ;
 	return EXIT_FAILURE ;
   }
   catch (...)
@@ -221,7 +221,7 @@ int main (int argc, char ** argv)
 	cout << "---------------------------" << endl;
         cout << "   Pb au setIJ()  de 1 , 2 "  << endl;
 	cout << "---------------------------" << endl;
-	MESSAGE( "catched exception : " << e.what() ) ;
+	MESSAGE_MED( "catched exception : " << e.what() ) ;
 	return EXIT_FAILURE ;
   }
   catch (...)
@@ -249,7 +249,7 @@ int main (int argc, char ** argv)
 	cout << "-------------" << endl;
         cout << "   Pb au set "  << endl;
 	cout << "-------------" << endl;
-	MESSAGE( "catched exception : " << e.what() ) ;
+	MESSAGE_MED( "catched exception : " << e.what() ) ;
 	return EXIT_FAILURE ;
   }
   catch (...)
@@ -271,7 +271,7 @@ int main (int argc, char ** argv)
 	cout << "-------------" << endl;
         cout << "   Pb au set "  << endl;
 	cout << "-------------" << endl;
-	MESSAGE( "catched exception : " << e.what() ) ;
+	MESSAGE_MED( "catched exception : " << e.what() ) ;
 	return EXIT_FAILURE ;
   }
   catch (...)
@@ -296,11 +296,11 @@ int main (int argc, char ** argv)
   imprime("test contructeur par recopie non profonde",sharevalues,shareno,NumberOfNodes,SpaceDimension);
 
   myArrayfull->setIJ(1,2,1992);
-  ASSERT(myArrayShare->getIJ(1,2) == 1992);
+  ASSERT_MED(myArrayShare->getIJ(1,2) == 1992);
   imprime("change valeur tableau source, impression tableau cible",sharevalues,shareno,NumberOfNodes,SpaceDimension);
 
   myArrayShare->setIJ(1,2,1995);
-  ASSERT(myArrayfull->getIJ(1,2) == 1995);
+  ASSERT_MED(myArrayfull->getIJ(1,2) == 1995);
   imprime("change valeur tableau cible, impression tableau source",myValues,myOthers,NumberOfNodes,SpaceDimension);
 
   delete myArrayShare;
@@ -329,11 +329,11 @@ int main (int argc, char ** argv)
   imprime("test contructeur par recopie non profonde",sharevalues,shareno,NumberOfNodes,SpaceDimension);
 
   myArrayno->setIJ(1,2,1992);
-  ASSERT(myArrayShare3->getIJ(1,2) == 1992);
+  ASSERT_MED(myArrayShare3->getIJ(1,2) == 1992);
   imprime("change valeur tableau source, impression tableau cible",sharevalues,shareno,NumberOfNodes,SpaceDimension);
 
   myArrayShare3->setIJ(1,2,1995);
-  ASSERT(myArrayno->getIJ(1,2) == 1995);
+  ASSERT_MED(myArrayno->getIJ(1,2) == 1995);
   imprime("change valeur tableau cible, impression tableau source",myValuesno,myOthersno,NumberOfNodes,SpaceDimension);
 
   delete myArrayno;
@@ -341,7 +341,7 @@ int main (int argc, char ** argv)
   delete myArrayfull;
   delete myArrayShare2;
   delete myArrayShare3;
-  MESSAGE("FIN NORMALE DU TRAITEMENT");
+  MESSAGE_MED("FIN NORMALE DU TRAITEMENT");
   return EXIT_SUCCESS ;
 }
 /*

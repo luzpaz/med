@@ -352,14 +352,14 @@ inline void MESH::setConnectivityptr(CONNECTIVITY* conn)
 inline void MESH::write(const GENDRIVER & genDriver)
 {
   const char* LOC = "MESH::write(const MED_MED_DRIVER & genDriver): ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
 
       // EAP for MEDMEMTest_Med.cxx:305 :
-      // CPPUNIT_ASSERT_NO_THROW(myMed->writeFrom(idMedV21_from));
-      // CPPUNIT_ASSERT(access(filenameout21_from.data(), F_OK) != 0);
+      // CPPUNIT_ASSERT_MED_NO_THROW(myMed->writeFrom(idMedV21_from));
+      // CPPUNIT_ASSERT_MED(access(filenameout21_from.data(), F_OK) != 0);
       string myDrvName = _drivers[index]->getFileName();
       string otherName = genDriver.getFileName();
       if ( !otherName.empty() )
@@ -374,7 +374,7 @@ inline void MESH::write(const GENDRIVER & genDriver)
       // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
     }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 }
 
@@ -383,7 +383,7 @@ inline void MESH::write(const GENDRIVER & genDriver)
 inline void MESH::read(const GENDRIVER & genDriver)
 {
   const char* LOC = "MESH::read(const MED_MED_DRIVER & genDriver): ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
@@ -393,7 +393,7 @@ inline void MESH::read(const GENDRIVER & genDriver)
       // ? FINALEMENT PAS BESOIN DE L'EXCEPTION ?
     }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 }
 
@@ -554,7 +554,7 @@ Python version may be found in
 */
 inline int MESH::getNumberOfTypes(MED_EN::medEntityMesh entity) const
 {
-  MESSAGE("MESH::getNumberOfTypes(medEntityMesh entity) : "<<entity);
+  MESSAGE_MED("MESH::getNumberOfTypes(medEntityMesh entity) : "<<entity);
   if (entity == MED_EN::MED_NODE)
     return 1;
 //   checkGridFillConnectivity();
@@ -1130,7 +1130,7 @@ const MEDMEM::FAMILY* MESH::getFamily(MED_EN::medEntityMesh entity, int i) const
 
 inline bool MESH::getIsAGrid()
 {
-  SCRUTE(_isAGrid);
+  SCRUTE_MED(_isAGrid);
 
   return _isAGrid;
 }
@@ -1147,7 +1147,7 @@ FIELD<T, FullInterlace> * MESH::mergeFields(const vector< FIELD<T, FullInterlace
 					    bool meshCompare)
 {
   const char * LOC = "MESH::mergeFields(const vector< FIELD<T>* >& others,bool meshCompare): ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   int i,j;
   if(others.size()==0)
     return 0;
@@ -1202,7 +1202,7 @@ FIELD<T, FullInterlace> * MESH::mergeFields(const vector< FIELD<T, FullInterlace
 	}
     }
   delete [] tempValues;
-  END_OF(LOC);
+  END_OF_MED(LOC);
   return ret;
 }
 

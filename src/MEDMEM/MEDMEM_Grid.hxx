@@ -371,14 +371,14 @@ inline const double GRID::getCoordinate(int number, int axis) const
 */
 inline int GRID::getNumberOfTypes(MED_EN::medEntityMesh entity) const
 {
-  MESSAGE("GRID::getNumberOfTypes(medEntityMesh entity) : "<<entity);
+  MESSAGE_MED("GRID::getNumberOfTypes(medEntityMesh entity) : "<<entity);
     return 1; // a grid has one type
 }
 
 
 inline int GRID::getNumberOfTypesWithPoly(MED_EN::medEntityMesh entity) const
 {
-  MESSAGE("GRID::getNumberOfTypes(medEntityMesh entity) : "<<entity);
+  MESSAGE_MED("GRID::getNumberOfTypes(medEntityMesh entity) : "<<entity);
     return 1; // a grid has one type
 }
 
@@ -441,8 +441,8 @@ inline int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
     else if (entity==MED_EN::MED_CELL && _spaceDimension==1 && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS) )
 	numberOfElements=_iArrayLength-1;
 
-    MESSAGE("GRID::getNumberOfElements - entity=" << entity << " Type=" << Type);
-    MESSAGE("_spaceDimension=" << _spaceDimension << "  numberOfElements=" << numberOfElements);
+    MESSAGE_MED("GRID::getNumberOfElements - entity=" << entity << " Type=" << Type);
+    MESSAGE_MED("_spaceDimension=" << _spaceDimension << "  numberOfElements=" << numberOfElements);
 
     return numberOfElements;
 }

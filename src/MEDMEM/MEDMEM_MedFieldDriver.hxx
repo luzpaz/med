@@ -96,7 +96,7 @@ public :
   */
   virtual ~MED_FIELD_DRIVER()
   {
-    MESSAGE("MED_FIELD_DRIVER::~MED_FIELD_DRIVER() has been destroyed");
+    MESSAGE_MED("MED_FIELD_DRIVER::~MED_FIELD_DRIVER() has been destroyed");
   }
 
   virtual void open() throw (MEDEXCEPTION) = 0;
@@ -147,8 +147,8 @@ public :
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY)
   {
   const char* LOC = "IMED_FIELD_RDONLY_DRIVER::IMED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
+  BEGIN_OF_MED(LOC);
+  END_OF_MED(LOC);
   }
 
   /*!
@@ -198,8 +198,8 @@ public :
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
   const char* LOC = "MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
+  BEGIN_OF_MED(LOC);
+  END_OF_MED(LOC);
   }
 
   /*!
@@ -251,9 +251,9 @@ public :
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR)
   {
   const char* LOC = "MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
     //_accessMode = MED_RDWR ;
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   /*!
@@ -388,7 +388,7 @@ template <class T> void IMED_FIELD_RDONLY_DRIVER<T>::write( void ) const
 }
 
 template <class T>  MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER() {
-    MESSAGE("You are using the default constructor of the Field read only Driver and it is 2.1 one");
+    MESSAGE_MED("You are using the default constructor of the Field read only Driver and it is 2.1 one");
     _concreteFieldDrv=new MED_FIELD_RDONLY_DRIVER21<T>();
 }
 
@@ -399,11 +399,11 @@ MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER(const string & fileName,
   IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField)
 {
   const char* LOC = "MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
     _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::RDONLY);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 /*--------------------- WRONLY PART -------------------------------*/
@@ -415,7 +415,7 @@ template <class T> void IMED_FIELD_WRONLY_DRIVER<T>::read (void)
 }
 
 template <class T>  MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER() {
-    MESSAGE("You are using the default constructor of the Field write only Driver and it is 2.1 one");
+    MESSAGE_MED("You are using the default constructor of the Field write only Driver and it is 2.1 one");
 
     _concreteFieldDrv=new MED_FIELD_WRONLY_DRIVER21<T>();
 }
@@ -427,17 +427,17 @@ MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER(const string & fileName,
   IMED_FIELD_WRONLY_DRIVER<T>( fileName, ptrField)
 {
   const char* LOC = "MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::WRONLY/*ECRI*/);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 /*--------------------- RDWR PART -------------------------------*/
 
 template <class T>  MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER() {
-    MESSAGE("You are using the default constructor of the Field read/write Driver and it is 2.1 one");
+    MESSAGE_MED("You are using the default constructor of the Field read/write Driver and it is 2.1 one");
 
     _concreteFieldDrv=new MED_FIELD_RDWR_DRIVER21<T>();
 }
@@ -449,11 +449,11 @@ MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER(const string & fileName,
   IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
 {
   const char* LOC = "MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::RDWR);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 

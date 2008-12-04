@@ -221,7 +221,7 @@ namespace MEDMEM {
 	version = DRIVERFACTORY::globalMedFileVersionForWriting;
       }
 
-    MESSAGE("buildFieldDriverFromFile version of the file " << version);
+    MESSAGE_MED("buildFieldDriverFromFile version of the file " << version);
 
     GENDRIVER * driver;
 
@@ -260,7 +260,7 @@ namespace MEDMEM {
 							    MED_EN::medFileVersion version)
   {
 
-    MESSAGE("buildConcreteMedDriverForField version of the file " << version);
+    MESSAGE_MED("buildConcreteMedDriverForField version of the file " << version);
 
     GENDRIVER * driver;
 

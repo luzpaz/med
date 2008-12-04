@@ -102,7 +102,7 @@ void MEDMEMTest::testPointerOf()
   P2=P;
   for (int i=0; i < size; i++)
   {
-    SCRUTE(P2[i]);
+    SCRUTE_MED(P2[i]);
   }
 
   int * p=new int [size];

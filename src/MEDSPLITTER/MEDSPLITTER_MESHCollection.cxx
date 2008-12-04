@@ -117,7 +117,7 @@ MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topolog
 			m_mesh[idomain]= static_cast<MEDMEM::MESH*> (mesh_builder);
 			ostringstream osname;
 			osname << mesh_name<<"_"<<idomain+1;
-      SCRUTE(osname.str());
+      SCRUTE_MED(osname.str());
 			mesh_builder->setName(osname.str());
 
 			createNodalConnectivity(initial_collection,idomain, MED_EN::MED_CELL);
@@ -519,7 +519,7 @@ void MESHCollection::getTypeList(int* cell_list,int nb_cells,
 																 MED_EN::medEntityMesh entity,
 																 MED_EN::medGeometryElement* type_list) const 
 {
-  MESSAGE (" Beginning of getTypeList with entity "<<entity);
+  MESSAGE_MED (" Beginning of getTypeList with entity "<<entity);
 	int *local=new int[nb_cells];
 	int *ip=new int[nb_cells];
 	switch (entity)
@@ -539,7 +539,7 @@ void MESHCollection::getTypeList(int* cell_list,int nb_cells,
 		}
 	delete[]local;
 	delete[]ip;
-  MESSAGE("end of getTypeList");
+  MESSAGE_MED("end of getTypeList");
 }
 
 
@@ -1026,7 +1026,7 @@ Topology* MESHCollection::createPartition(int nbdomain,
 	MEDMEM::MEDSKYLINEARRAY* array=0;
 	int* edgeweights=0;
 
-	MESSAGE("Building cell graph");
+	MESSAGE_MED("Building cell graph");
 	buildCellGraph(array,edgeweights);
 
 	switch (split)
@@ -1053,17 +1053,17 @@ Topology* MESHCollection::createPartition(int nbdomain,
 	if (user_vertices_weights!=0)
 	  m_cell_graph->setVerticesWeights(user_vertices_weights);
 
-	MESSAGE("Partitioning graph");
+	MESSAGE_MED("Partitioning graph");
 	m_cell_graph->partGraph(nbdomain,options_string);
 
-	MESSAGE("Building new topology");
+	MESSAGE_MED("Building new topology");
 	//m_cell_graph is a shared pointer 
 	Topology* topology = new ParallelTopology (m_cell_graph, nbdomain, getMeshDimension());
 
 	//cleaning
 	if (edgeweights!=0) delete[] edgeweights;
 	//if (array!=0) delete array;
-	MESSAGE("End of partition creation");
+	MESSAGE_MED("End of partition creation");
 	return topology;
 }
 
@@ -1680,7 +1680,7 @@ void MESHCollection::castAllFields(const MESHCollection& initial_collection)
 
 void MESHCollection::createNodalConnectivity(const MESHCollection& initial_collection,int idomain, MED_EN::medEntityMesh entity)
 {
-  MESSAGE ("beginning of createNodalConnectivity for entity "<<entity);
+  MESSAGE_MED ("beginning of createNodalConnectivity for entity "<<entity);
 	int dimension=0;
 	int nb_elems=0;
 	MEDMEM::MESHING* mesh_builder = static_cast<MEDMEM::MESHING*>(m_mesh[idomain]);
@@ -1707,7 +1707,7 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
 		}
  
   if (nb_elems == 0) return;
-  SCRUTE(nb_elems);
+  SCRUTE_MED(nb_elems);
   
    	
 	int *list= new int[nb_elems];
@@ -1776,7 +1776,7 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
 	//setting the list of present ypes
 	int* present_type_numbers=new int[nb_present_types];
 	MED_EN::medGeometryElement* type_array = new MED_EN::medGeometryElement[nb_present_types];
-	MESSAGE("Nb de types presents "<<nb_present_types);
+	MESSAGE_MED("Nb de types presents "<<nb_present_types);
 	int itype=0;
    for (iter = type_numbers.begin();iter != type_numbers.end(); iter++)  
   	{
@@ -1787,7 +1787,7 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
 		
 			present_type_numbers[itype]=type_numbers[type];
 		
-			MESSAGE("Nombre d'elements de type "<<type<<" : "<<type_numbers[type]);
+			MESSAGE_MED("Nombre d'elements de type "<<type<<" : "<<type_numbers[type]);
 			itype++;
 		}
 		
@@ -1869,7 +1869,7 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
 		{
 			//setting coordinates from initial_collection coordinates
 			int nbnode=m_topology->getNodeNumber(idomain);
-			MESSAGE("Number of nodes on domain "<< idomain <<" : "<<nbnode);
+			MESSAGE_MED("Number of nodes on domain "<< idomain <<" : "<<nbnode);
 		
 			double* coordinates=new double[initial_collection.getSpaceDimension()*nbnode];
 			int* node_list=new int[nbnode];
@@ -1936,7 +1936,7 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
                                                 
       }
 		}
-		MESSAGE("end of createNodalConnectivity");
+		MESSAGE_MED("end of createNodalConnectivity");
 }
 
 
@@ -2016,7 +2016,7 @@ MEDSPLITTER_FaceModel* MESHCollection::getCommonFace(int ip1,int ilocal1,int ip2
  
  while (iface<nbfaces)
  {
-  //SCRUTE (iface);
+  //SCRUTE_MED (iface);
   int nbnodes= types[iface]%100;
   const int* nodes = celltype1.getNodesConstituent(1,iface+1);
   int common_nodes=0;

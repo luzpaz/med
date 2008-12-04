@@ -34,17 +34,17 @@ using namespace MED_EN;
 
 GROUP::GROUP():SUPPORT(),_numberOfFamilies(0),_family() 
 {
-  MESSAGE("GROUP()");
+  MESSAGE_MED("GROUP()");
 };
 
 GROUP::~GROUP() 
 {
-  MESSAGE("~GROUP()");
+  MESSAGE_MED("~GROUP()");
 };
   
 GROUP & GROUP::operator=(const GROUP &group) 
 {
-  MESSAGE("GROUP::operator=");
+  MESSAGE_MED("GROUP::operator=");
   if ( &group == this ) return *this;
   SUPPORT::operator=(group);
   _numberOfFamilies = group._numberOfFamilies ;
@@ -68,9 +68,9 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
 {
   const char * LOC = "GROUP( const string & , const list<FAMILY*> & ) : " ;
   
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
-  MESSAGE(LOC<<name);
+  MESSAGE_MED(LOC<<name);
 
   int numberOfFamilies = families.size();
   _name = name ;
@@ -82,8 +82,8 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   _entity = myFamily->getEntity() ;
   bool isOnAllElts = myFamily->isOnAllElements() ;
 
-  SCRUTE(isOnAllElts);
-  SCRUTE(numberOfFamilies);
+  SCRUTE_MED(isOnAllElts);
+  SCRUTE_MED(numberOfFamilies);
 
 
   if ((numberOfFamilies==1) && (isOnAllElts))
@@ -106,13 +106,13 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   const medGeometryElement * geometricType = myFamily->getTypes() ;
   //int * geometricTypeNumber = myFamily->getGeometricTypeNumber() ;
 
-  SCRUTE(_numberOfGeometricType);
+  SCRUTE_MED(_numberOfGeometricType);
 
   for (int i=0 ; i<_numberOfGeometricType; i++) {
     _geometricType[i]= geometricType[i] ;
     // _geometricTypeNumber[i] = geometricTypeNumber[i] ;
     _numberOfElements[i]=myFamily->getNumberOfElements(geometricType[i]);
-    MESSAGE(LOC << " Type : " << _geometricType[i] << " number of element(s) " << _numberOfElements[i]);
+    MESSAGE_MED(LOC << " Type : " << _geometricType[i] << " number of element(s) " << _numberOfElements[i]);
   }
   _isOnAllElts = false ;
   //_totalNumberOfEntities = myFamily->getNumberOfElements(MED_ALL_ELEMENTS) ;
@@ -127,28 +127,28 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   int famNumberCount = famNumber->getNumberOf();
   int famNumberLength = famNumber->getLength();
 
-  SCRUTE(famNumber);
-  SCRUTE(famNumberCount);
-  SCRUTE(famNumberLength);
-  SCRUTE(famNumberValue);
-  SCRUTE(famNumberIndex);
+  SCRUTE_MED(famNumber);
+  SCRUTE_MED(famNumberCount);
+  SCRUTE_MED(famNumberLength);
+  SCRUTE_MED(famNumberValue);
+  SCRUTE_MED(famNumberIndex);
 
 //   _number = new MEDSKYLINEARRAY(*famNumber) ;
   _number = new MEDSKYLINEARRAY(famNumberCount,famNumberLength,
 				famNumberIndex,famNumberValue) ;
 
-  SCRUTE(_number);
+  SCRUTE_MED(_number);
 
   _numberOfFamilies = families.size();
 
-  SCRUTE(numberOfFamilies);
+  SCRUTE_MED(numberOfFamilies);
 
-  //SCRUTE(_numberOfFamilies);
+  //SCRUTE_MED(_numberOfFamilies);
 
   _family.resize(_numberOfFamilies) ;
   list<FAMILY*>::const_iterator li ;
 
-  // MESSAGE(LOC<<"Printing of the object GROUP built right before the blending"<< (SUPPORT) *this);
+  // MESSAGE_MED(LOC<<"Printing of the object GROUP built right before the blending"<< (SUPPORT) *this);
 
 
   int it = 0 ;
@@ -158,9 +158,9 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
     it++ ;
   }
 
-  //MESSAGE(LOC<<"Printing of the object GROUP built "<< (GROUP)*this);
+  //MESSAGE_MED(LOC<<"Printing of the object GROUP built "<< (GROUP)*this);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 GROUP::GROUP(const GROUP & m):SUPPORT(m)
@@ -172,20 +172,20 @@ GROUP::GROUP(const GROUP & m):SUPPORT(m)
 // void GROUP::init(const list<FAMILY*> & families)
 // {
   
-//   BEGIN_OF(LOC);
+//   BEGIN_OF_MED(LOC);
   
 //   FAMILY * myFamily = families.front() ;
 //   _mesh =  myFamily->getMesh() ;
 
 //   _isOnAllElts = myFamily->isOnAllElements() ;
 
-//   SCRUTE(_mesh);
+//   SCRUTE_MED(_mesh);
 
-//   SCRUTE(_isOnAllElts);
+//   SCRUTE_MED(_isOnAllElts);
 
 //   _entity = myFamily->getEntity() ;
 
-//   SCRUTE(_mesh->getNumberOfTypes(_entity));
+//   SCRUTE_MED(_mesh->getNumberOfTypes(_entity));
 
 //   _numberOfGeometricType = myFamily->getNumberOfTypes() ;
 //   _geometricType = new medGeometryElement[_numberOfGeometricType];
@@ -218,6 +218,6 @@ GROUP::GROUP(const GROUP & m):SUPPORT(m)
 //     it++ ;
 //   }
   
-//   END_OF();
+//   END_OF_MED();
 // };
 

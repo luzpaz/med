@@ -56,7 +56,7 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
   //_numberOfonstituentsType=(int*)NULL ;
   _constituentsType=(medGeometryElement**)NULL ;
   
-  MESSAGE("CELLMODEL : constructeur pour le type " << t);
+  MESSAGE_MED("CELLMODEL : constructeur pour le type " << t);
   switch (t)
     {
     case MED_POINT1  : {

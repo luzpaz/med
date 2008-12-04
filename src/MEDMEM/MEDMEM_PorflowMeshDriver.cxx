@@ -99,7 +99,7 @@ PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER(const string & fileName,
     string::size_type pos=fileName.find(ext,0);
     string::size_type pos1=fileName.rfind('/');
     _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
-    SCRUTE(_meshName);
+    SCRUTE_MED(_meshName);
 }
   
 PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER(const PORFLOW_MESH_DRIVER & driver): 
@@ -118,7 +118,7 @@ void PORFLOW_MESH_DRIVER::open()
   throw (MEDEXCEPTION)
 {
     const char * LOC = "PORFLOW_MESH_DRIVER::open()" ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
     if (_status == MED_OPENED)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"File "<<_fileName<<" is already open"));
@@ -131,19 +131,19 @@ void PORFLOW_MESH_DRIVER::open()
 	_status = MED_CLOSED;
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName<<" in mode ios::in"));
     }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
   
 void PORFLOW_MESH_DRIVER::close()
   throw (MEDEXCEPTION)
 {
   const char* LOC = "PORFLOW_MESH_DRIVER::close() ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   if ( _status == MED_OPENED) {
     _porflow.close();
     _status = MED_CLOSED;
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void    PORFLOW_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
@@ -160,7 +160,7 @@ PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const string & fileName,
                                                  MESH * ptrMesh):
   PORFLOW_MESH_DRIVER(fileName,ptrMesh,RDONLY)
 { 
-  MESSAGE("PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
   
 PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const PORFLOW_MESH_RDONLY_DRIVER & driver): 
@@ -170,7 +170,7 @@ PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const PORFLOW_MESH_RDONLY
 
 PORFLOW_MESH_RDONLY_DRIVER::~PORFLOW_MESH_RDONLY_DRIVER()
 {
-  //MESSAGE("PORFLOW_MESH_RDONLY_DRIVER::~PORFLOW_MESH_RDONLY_DRIVER() has been destroyed");
+  //MESSAGE_MED("PORFLOW_MESH_RDONLY_DRIVER::~PORFLOW_MESH_RDONLY_DRIVER() has been destroyed");
 }
   
 GENDRIVER * PORFLOW_MESH_RDONLY_DRIVER::copy(void) const
@@ -307,9 +307,9 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowConnectivityFile(bool hybride,const 
 	  maille.geometricType = geomPORFLOWtoMED[code-1];
 	  if(maille.geometricType%100!=nodes_number) // following incohenrences founded in some porflow files!
 	  {
-	      MESSAGE("WARNING : the read node number don't seem to be compatible with geometric type!");
-	      SCRUTE(maille.geometricType);
-	      SCRUTE(nodes_number);
+	      MESSAGE_MED("WARNING : the read node number don't seem to be compatible with geometric type!");
+	      SCRUTE_MED(maille.geometricType);
+	      SCRUTE_MED(nodes_number);
 	  }
 	  maille.sommets.resize(nodes_number);
 	  for (unsigned i=0; i!=nodes_number; ++i)
@@ -363,7 +363,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
   throw (MEDEXCEPTION)
 {
     const char * LOC = "PORFLOW_MESH_RDONLY_DRIVER::read() : " ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
     if (_status!=MED_OPENED)
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The _idt of file " << _fileName 
@@ -423,7 +423,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the syntax corresponding to the use of input file is not implemented
 	if ( isKeyWord(buf_ligne,"LOCA") )
 	{
-	    MESSAGE("Mot clé LOCA détecté");
+	    MESSAGE_MED("Mot clé LOCA détecté");
 	    processLoca=true;
 	    // if currentGroup is not empty, a group has been precessed 
 	    //  -> we store it, clear currentGroup, and start the precessing of a new group
@@ -461,7 +461,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the syntax corresponding to structured grids is not implemented
 	else if ( isKeyWord(buf_ligne,"GRID") )
 	{
-	    MESSAGE("Mot clé GRID détecté");
+	    MESSAGE_MED("Mot clé GRID détecté");
 	    processLoca=false;
 	    pos=buf_ligne.find("UNST",0);
 	    if ( pos != string::npos ) // unstructured grid
@@ -493,7 +493,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the default option is HYBR
 	else if ( isKeyWord(buf_ligne,"CONN") )
 	{
-	    MESSAGE("Mot clé CONN détecté");
+	    MESSAGE_MED("Mot clé CONN détecté");
 	    processLoca=false;
 	    string fileCONN=getPorflowFileName(buf_ligne,"CONN");
 	    
@@ -514,7 +514,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   expected syntax : COOR {VERT} {filename}
 	else if ( isKeyWord(buf_ligne,"COOR") )
 	{
-	    MESSAGE("Mot clé COOR");
+	    MESSAGE_MED("Mot clé COOR");
 	    processLoca=false;
 	    string fileCOOR=getPorflowFileName(buf_ligne,"COOR");
 
@@ -637,8 +637,8 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     }
 
     p_ma_table.clear(); // we don't need it anymore
-    MESSAGE(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
-    MESSAGE(LOC <<  medi );
+    MESSAGE_MED(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
+    MESSAGE_MED(LOC <<  medi );
 	    // TRANSFORMATION EN STRUCTURES MED
     if ( ! _ptrMesh->isEmpty() )
     {
@@ -668,7 +668,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 
 	// appele en dernier car cette fonction detruit le maillage intermediaire!
 	_ptrMesh->_connectivity = medi.getConnectivity(); 
-	MESSAGE(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : FIN ");
+	MESSAGE_MED(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : FIN ");
 
 	// calcul de la connectivite d-1 complete, avec renumerotation des groupes
 	// if (_ptrMesh->_spaceDimension==3)
@@ -681,7 +681,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     }
 
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void PORFLOW_MESH_RDONLY_DRIVER::write( void ) const
@@ -701,7 +701,7 @@ PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName,
                                                  MESH * ptrMesh):
   PORFLOW_MESH_DRIVER(fileName,ptrMesh,WRONLY)
 {
-  MESSAGE("PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const PORFLOW_MESH_WRONLY_DRIVER & driver): 
@@ -711,7 +711,7 @@ PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const PORFLOW_MESH_WRONLY
 
 PORFLOW_MESH_WRONLY_DRIVER::~PORFLOW_MESH_WRONLY_DRIVER()
 {
-  //MESSAGE("PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
+  //MESSAGE_MED("PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
 }
 
 GENDRIVER * PORFLOW_MESH_WRONLY_DRIVER::copy(void) const
@@ -729,11 +729,11 @@ void PORFLOW_MESH_WRONLY_DRIVER::write(void) const
   throw (MEDEXCEPTION)
 { 
   const char * LOC = "void PORFLOW_MESH_WRONLY_DRIVER::write(void) const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "Write Driver isn\'t implemented"));
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 } 
 
 
@@ -748,7 +748,7 @@ PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName,
 					   MESH * ptrMesh):
   PORFLOW_MESH_DRIVER(fileName,ptrMesh,RDWR)
 {
-  MESSAGE("PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const PORFLOW_MESH_RDWR_DRIVER & driver): 
@@ -757,7 +757,7 @@ PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const PORFLOW_MESH_RDWR_DRIVE
 }
 
 PORFLOW_MESH_RDWR_DRIVER::~PORFLOW_MESH_RDWR_DRIVER() {
-  //MESSAGE("PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
+  //MESSAGE_MED("PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
 } 
   
 GENDRIVER * PORFLOW_MESH_RDWR_DRIVER::copy(void) const

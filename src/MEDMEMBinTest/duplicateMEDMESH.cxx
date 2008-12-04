@@ -52,31 +52,31 @@ int main (int argc, char ** argv) {
     myMedDriver.close();
     
     // read all mesh
-    MESSAGE("Read all meshes :") ;
+    MESSAGE_MED("Read all meshes :") ;
     int NumberOfMeshes = myMed->getNumberOfMeshes() ;
-    MESSAGE("Number of meshes : "<<NumberOfMeshes) ;
+    MESSAGE_MED("Number of meshes : "<<NumberOfMeshes) ;
     deque<string> MeshName = myMed->getMeshNames() ;
     map<string,MESH*> _meshes ;
     for (int i=0; i<NumberOfMeshes; i++) {
       _meshes[MeshName[i]]=myMed->getMesh(MeshName[i]) ;
       _meshes[MeshName[i]]->read();
-      MESSAGE("  - Mesh "<<i+1<<", named "<<MeshName[i]<<" read !");
+      MESSAGE_MED("  - Mesh "<<i+1<<", named "<<MeshName[i]<<" read !");
       MED_MESH_WRONLY_DRIVER myMeshDriver(filenameOUT,_meshes[MeshName[i]]);
-      MESSAGE("After declaration of MED_MESH_DRIVER");
+      MESSAGE_MED("After declaration of MED_MESH_DRIVER");
       myMeshDriver.setMeshName(MeshName[i]);
-      MESSAGE("After setMeshName");
+      MESSAGE_MED("After setMeshName");
       myMeshDriver.open() ;
-      MESSAGE("After open");
+      MESSAGE_MED("After open");
       myMeshDriver.write() ;
-      MESSAGE("After write");
+      MESSAGE_MED("After write");
       myMeshDriver.close() ;
-      MESSAGE("After close");
+      MESSAGE_MED("After close");
     }
 
     // set support : support must be calculated with mesh information !!!
     myMed->updateSupport() ;
 
   } catch (MEDEXCEPTION& ex){
-    MESSAGE(ex.what()) ;
+    MESSAGE_MED(ex.what()) ;
   }
 }

@@ -65,7 +65,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
 
   if ((minor21 == -1) || (release21 == -1))
     {
-      MESSAGE("getMedFileVersion the file may have been produced by a version 2.1.x x<5");
+      MESSAGE_MED("getMedFileVersion the file may have been produced by a version 2.1.x x<5");
       minor21 = 1;
       release21 = 5;
     }
@@ -92,7 +92,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
 
   if ((minor22 == -1) || (release22 == -1))
     {
-      MESSAGE("getMedFileVersion the file may have been produced by a version 2.1.x x<5");
+      MESSAGE_MED("getMedFileVersion the file may have been produced by a version 2.1.x x<5");
       minor22 = 1;
       release22 = 5;
     }
@@ -105,9 +105,9 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
   if ((major21 != major22) || (minor21 != minor22) || (release21 != release22))
     throw MEDEXCEPTION("Problem in getMedFileVersion(const string &) Med file V21 and V22 version numbers are different");
 
-  MESSAGE("getMedFileVersion: status version 21 of the file major " << major21 << " minor " << minor21 << " release " << release21);
+  MESSAGE_MED("getMedFileVersion: status version 21 of the file major " << major21 << " minor " << minor21 << " release " << release21);
 
-  MESSAGE("getMedFileVersion: status version 22 of the file major " << major22 << " minor " << minor22 << " release " << release22);
+  MESSAGE_MED("getMedFileVersion: status version 22 of the file major " << major22 << " minor " << minor22 << " release " << release22);
 
   if (major21 == 2)
     {
@@ -119,7 +119,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
   else
     version = V22;
 
-  MESSAGE("getMedFileVersion the version of the file is " << version);
+  MESSAGE_MED("getMedFileVersion the version of the file is " << version);
 
   return version;
 }

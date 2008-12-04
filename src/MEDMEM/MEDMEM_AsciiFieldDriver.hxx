@@ -235,7 +235,7 @@ namespace MEDMEM {
     _file.open(_fileName.c_str(),ofstream::out | ofstream::app);
     // for MEDMEMTest_AsciiFieldDriver.cxx:208 :
     // must throw because the file is opened
-    //CPPUNIT_ASSERT_THROW(aDriver1->setFileName("anyfile2"), MEDEXCEPTION);
+    //CPPUNIT_ASSERT_MED_THROW(aDriver1->setFileName("anyfile2"), MEDEXCEPTION);
     _status = _file.is_open() ? MED_OPENED : MED_INVALID;
   }
 

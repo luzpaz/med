@@ -75,15 +75,15 @@ elements.
 /*! Creates an empty MESH. */
 MESHING::MESHING(): MESH()
 {
-  MESSAGE("MESHING::MESHING()");
-  SCRUTE(_coordinate);
-  SCRUTE(_connectivity);
+  MESSAGE_MED("MESHING::MESHING()");
+  SCRUTE_MED(_coordinate);
+  SCRUTE_MED(_connectivity);
 }
 /*!  @}  */
 
 MESHING::~MESHING()
 {
-  MESSAGE("Deleting MESHING !!");
+  MESSAGE_MED("Deleting MESHING !!");
 }
 
 /*!  
@@ -148,8 +148,8 @@ void MESHING::setCoordinates(const int SpaceDimension,
   setSpaceDimension(SpaceDimension);
   setNumberOfNodes(NumberOfNodes);
 
-  SCRUTE(_coordinate);
-  SCRUTE(_connectivity);
+  SCRUTE_MED(_coordinate);
+  SCRUTE_MED(_connectivity);
   //if (NULL != _coordinate) delete _coordinate;
 
   _coordinate = new COORDINATE(SpaceDimension,
@@ -259,7 +259,7 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not required with MED_NODE !"));
 
   if (MED_CELL == Entity) {
-    SCRUTE(_connectivity);
+    SCRUTE_MED(_connectivity);
 //     if (_connectivity != (CONNECTIVITY *) NULL)
 //       delete _connectivity ;
     _connectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;
@@ -462,10 +462,10 @@ void MESHING::setConnectivities (const int * ConnectivityIndex,
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESHING::setConnectivities : " ;
-  SCRUTE(Entity);
-  SCRUTE(ConnectivityType);
-  SCRUTE(ConnectivityValue);
-  SCRUTE(ConnectivityIndex);
+  SCRUTE_MED(Entity);
+  SCRUTE_MED(ConnectivityType);
+  SCRUTE_MED(ConnectivityValue);
+  SCRUTE_MED(ConnectivityIndex);
 
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not Yet Implemented :: Warning !"));
 }

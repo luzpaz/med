@@ -87,7 +87,7 @@ int main (int argc, char ** argv)
 	  cout << "-------------------------------" << endl;
 	  cout << "	Pb au getName()		" << endl;
 	  cout << "-------------------------------" << endl;
-	  MESSAGE( "catched exception : " << e.what() ) ;
+	  MESSAGE_MED( "catched exception : " << e.what() ) ;
 	  return EXIT_FAILURE ;
   	}
       catch (...)
@@ -107,7 +107,7 @@ int main (int argc, char ** argv)
 	  cout << "-------------------------------" << endl;
 	  cout << "	Pb au getNumberOfVertexes()	" << endl;
 	  cout << "-------------------------------" << endl;
-	  MESSAGE( "catched exception : " << e.what() ) ;
+	  MESSAGE_MED( "catched exception : " << e.what() ) ;
 	  return EXIT_FAILURE ;
   	}
       catch (...)
@@ -127,7 +127,7 @@ int main (int argc, char ** argv)
 	  cout << "-------------------------------" << endl;
 	  cout << "	Pb au getNumberOfNodes()  " << endl;
 	  cout << "-------------------------------" << endl;
-	  MESSAGE( "catched exception : " << e.what() ) ;
+	  MESSAGE_MED( "catched exception : " << e.what() ) ;
 	  return EXIT_FAILURE ;
   	}
       catch (...)
@@ -149,7 +149,7 @@ int main (int argc, char ** argv)
 	  cout << "-------------------------------" << endl;
 	  cout << "	Pb au getDimension()	" << endl;
 	  cout << "-------------------------------" << endl;
-	  MESSAGE( "catched exception : " << e.what() ) ;
+	  MESSAGE_MED( "catched exception : " << e.what() ) ;
 	  return EXIT_FAILURE ;
   	}
       catch (...)
@@ -174,7 +174,7 @@ int main (int argc, char ** argv)
 	      cout << "------------------------------------" << endl;
 	      cout << "  Pb au getNumberOfConstituents()   " << endl;
 	      cout << "------------------------------------" << endl;
-	      MESSAGE( "catched exception : " << e.what() ) ;
+	      MESSAGE_MED( "catched exception : " << e.what() ) ;
 	      return EXIT_FAILURE ;
 	    }
 	  catch (...)
@@ -202,7 +202,7 @@ int main (int argc, char ** argv)
        			cout << "-------------------------------" << endl;
 			cout << "  Pb au getConstituents()   " << endl;
         		cout << "-------------------------------" << endl;
-        		MESSAGE( "catched exception : " << e.what() ) ;
+        		MESSAGE_MED( "catched exception : " << e.what() ) ;
         		return EXIT_FAILURE ;
   		}
 		catch (...)
@@ -228,7 +228,7 @@ int main (int argc, char ** argv)
        			cout << "-------------------------------" << endl;
 			cout << "  Pb au getConstituentsType()   " << endl;
         		cout << "-------------------------------" << endl;
-        		MESSAGE( "catched exception : " << e.what() ) ;
+        		MESSAGE_MED( "catched exception : " << e.what() ) ;
         		return EXIT_FAILURE ;
   		}
 		catch (...)
@@ -256,7 +256,7 @@ int main (int argc, char ** argv)
        				cout << "-------------------------------" << endl;
 				cout << "  Pb au getConstituentType()   " << endl;
         			cout << "-------------------------------" << endl;
-        			MESSAGE( "catched exception : " << e.what() ) ;
+        			MESSAGE_MED( "catched exception : " << e.what() ) ;
         			return EXIT_FAILURE ;
   			}
 			catch (...)
@@ -297,7 +297,7 @@ int main (int argc, char ** argv)
        					cout << "-------------------------------" << endl;
 					cout << "  Pb au getNodeConstituent()   " << endl;
         				cout << "-------------------------------" << endl;
-        				MESSAGE( "catched exception : " << e.what() ) ;
+        				MESSAGE_MED( "catched exception : " << e.what() ) ;
         				return EXIT_FAILURE ;
   				}
 				catch (...)
@@ -315,7 +315,7 @@ int main (int argc, char ** argv)
        			cout << "-------------------------------" << endl;
 			cout << "  Pb au getNodeConstituent()    " << endl;
         		cout << "-------------------------------" << endl;
-        		MESSAGE( "catched exception : " << e.what() ) ;
+        		MESSAGE_MED( "catched exception : " << e.what() ) ;
         		return EXIT_FAILURE ;
   		}
 		catch (...)
@@ -346,7 +346,7 @@ int main (int argc, char ** argv)
        			cout << "-------------------------------" << endl;
 			cout << "  Pb au getAllConstituentsType()    " << endl;
         		cout << "-------------------------------" << endl;
-        		MESSAGE( "catched exception : " << e.what() ) ;
+        		MESSAGE_MED( "catched exception : " << e.what() ) ;
         		return EXIT_FAILURE ;
   		}
 		catch (...)

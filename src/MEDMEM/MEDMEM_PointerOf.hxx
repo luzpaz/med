@@ -82,9 +82,9 @@ template <typename T> PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf) :
   _pointer((T*)(const T* const)pointerOf), _done(false)
 {
   const char* LOC = "PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf)";
-  BEGIN_OF(LOC);
-	MESSAGE("Warning ! No Propriety Transfer");
-  END_OF(LOC);
+  BEGIN_OF_MED(LOC);
+	MESSAGE_MED("Warning ! No Propriety Transfer");
+  END_OF_MED(LOC);
 }
 
 /*! 
@@ -140,13 +140,13 @@ template <typename T> PointerOf<T>::~PointerOf()
 	{
 		if( _done )
 		{
-			MESSAGE("PointerOf<T>::~PointerOf() --> deleting _pointer") ;
+			MESSAGE_MED("PointerOf<T>::~PointerOf() --> deleting _pointer") ;
 			delete [] _pointer ;
 			_done = false ;
 		}
 		else
 		{
-			MESSAGE("_pointer is only nullified") ;
+			MESSAGE_MED("_pointer is only nullified") ;
 		}
 		_pointer = 0 ;
 	}
@@ -162,12 +162,12 @@ template <typename T> PointerOf<T>::~PointerOf()
 template <typename T> PointerOf<T>& PointerOf<T>::operator=( const PointerOf<T> &pointer )
 {
   const char* LOC = "PointerOf<T>::operator=( const PointerOf<T> &pointer )";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 	if ( &pointer != this )
 	{
 		this->set( pointer._pointer ) ;
 	}
-  END_OF(LOC);
+  END_OF_MED(LOC);
 	return *this ;
 }
 
@@ -214,19 +214,19 @@ template <typename T> void PointerOf<T>::set( const int &size )
     memory will not be released when erasing this PointerOf*/
 template <typename T> void PointerOf<T>::set( const T *pointer )
 {
-	MESSAGE( "BEGIN PointerOf<T>::set( const T *pointer )" ) ;
-	SCRUTE(pointer) ;
-	SCRUTE(_done) ;
+	MESSAGE_MED( "BEGIN PointerOf<T>::set( const T *pointer )" ) ;
+	SCRUTE_MED(pointer) ;
+	SCRUTE_MED(_done) ;
 	if ( _pointer && _done )
 	{
-		MESSAGE("PointerOf<T>::set --> deleting _pointer") ;
+		MESSAGE_MED("PointerOf<T>::set --> deleting _pointer") ;
 		delete [] _pointer ;
 		_pointer=0 ;
 		_done=false ;
 	}
 	_pointer=(T*)pointer ;
 	_done=false ;
-	MESSAGE( "END PointerOf<T>::set( const T *pointer )" ) ;
+	MESSAGE_MED( "END PointerOf<T>::set( const T *pointer )" ) ;
 	return ;
 }
 

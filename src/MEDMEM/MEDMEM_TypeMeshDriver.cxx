@@ -68,7 +68,7 @@ void TYPE_MESH_DRIVER::open()
   throw (MEDEXCEPTION)
 {
   const char * LOC = "TYPE_MESH_DRIVER::open()" ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
 //   if (_medIdt > 0) 
 //     _status = MED_OPENED; 
@@ -78,14 +78,14 @@ void TYPE_MESH_DRIVER::open()
 //     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName<<" in mode "<<_accessMode));
 //   }
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
   
 void TYPE_MESH_DRIVER::close()
   throw (MEDEXCEPTION)
 {
   const char * LOC = "TYPE_MESH_DRIVER::close() " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
 //   int err = 0;
 //   if ( _status == MED_OPENED) {
@@ -100,7 +100,7 @@ void TYPE_MESH_DRIVER::close()
 //     _medIdt = MED_INVALID;
 //   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void    TYPE_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
@@ -117,7 +117,7 @@ TYPE_MESH_RDONLY_DRIVER::TYPE_MESH_RDONLY_DRIVER(const string & fileName,
                                                  MESH * ptrMesh):
   TYPE_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY)
 { 
-  MESSAGE("TYPE_MESH_RDONLY_DRIVER::TYPE_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("TYPE_MESH_RDONLY_DRIVER::TYPE_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
   
 TYPE_MESH_RDONLY_DRIVER::TYPE_MESH_RDONLY_DRIVER(const TYPE_MESH_RDONLY_DRIVER & driver): 
@@ -127,7 +127,7 @@ TYPE_MESH_RDONLY_DRIVER::TYPE_MESH_RDONLY_DRIVER(const TYPE_MESH_RDONLY_DRIVER &
 
 TYPE_MESH_RDONLY_DRIVER::~TYPE_MESH_RDONLY_DRIVER()
 {
-  //MESSAGE("TYPE_MESH_RDONLY_DRIVER::~TYPE_MESH_RDONLY_DRIVER() has been destroyed");
+  //MESSAGE_MED("TYPE_MESH_RDONLY_DRIVER::~TYPE_MESH_RDONLY_DRIVER() has been destroyed");
 }
   
 GENDRIVER * TYPE_MESH_RDONLY_DRIVER::copy(void) const
@@ -139,7 +139,7 @@ void TYPE_MESH_RDONLY_DRIVER::read(void)
   throw (MEDEXCEPTION)
 {
   const char * LOC = "TYPE_MESH_RDONLY_DRIVER::read() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
  
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The _idt of file " << _fileName << " is : "  <<  " (the file is not opened)." )) ;
@@ -147,7 +147,7 @@ void TYPE_MESH_RDONLY_DRIVER::read(void)
   _ptrMesh->_name =  _meshName;
   
  
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void TYPE_MESH_RDONLY_DRIVER::write( void ) const
@@ -167,7 +167,7 @@ TYPE_MESH_WRONLY_DRIVER::TYPE_MESH_WRONLY_DRIVER(const string & fileName,
                                                  MESH * ptrMesh):
   TYPE_MESH_DRIVER(fileName,ptrMesh,MED_WRONLY)
 {
-  MESSAGE("TYPE_MESH_WRONLY_DRIVER::TYPE_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("TYPE_MESH_WRONLY_DRIVER::TYPE_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 TYPE_MESH_WRONLY_DRIVER::TYPE_MESH_WRONLY_DRIVER(const TYPE_MESH_WRONLY_DRIVER & driver): 
@@ -177,7 +177,7 @@ TYPE_MESH_WRONLY_DRIVER::TYPE_MESH_WRONLY_DRIVER(const TYPE_MESH_WRONLY_DRIVER &
 
 TYPE_MESH_WRONLY_DRIVER::~TYPE_MESH_WRONLY_DRIVER()
 {
-  //MESSAGE("TYPE_MESH_WRONLY_DRIVER::TYPE_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
+  //MESSAGE_MED("TYPE_MESH_WRONLY_DRIVER::TYPE_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
 }
 
 GENDRIVER * TYPE_MESH_WRONLY_DRIVER::copy(void) const
@@ -195,11 +195,11 @@ void TYPE_MESH_WRONLY_DRIVER::write(void) const
   throw (MEDEXCEPTION)
 { 
   const char * LOC = "void TYPE_MESH_WRONLY_DRIVER::write(void) const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "Write Driver isn\'t implemented"));
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 } 
 
 
@@ -214,7 +214,7 @@ TYPE_MESH_RDWR_DRIVER::TYPE_MESH_RDWR_DRIVER(const string & fileName,
 					   MESH * ptrMesh):
   TYPE_MESH_DRIVER(fileName,ptrMesh,MED_RDWR)
 {
-  MESSAGE("TYPE_MESH_RDWR_DRIVER::TYPE_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("TYPE_MESH_RDWR_DRIVER::TYPE_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 TYPE_MESH_RDWR_DRIVER::TYPE_MESH_RDWR_DRIVER(const TYPE_MESH_RDWR_DRIVER & driver): 
@@ -223,7 +223,7 @@ TYPE_MESH_RDWR_DRIVER::TYPE_MESH_RDWR_DRIVER(const TYPE_MESH_RDWR_DRIVER & drive
 }
 
 TYPE_MESH_RDWR_DRIVER::~TYPE_MESH_RDWR_DRIVER() {
-  //MESSAGE("TYPE_MESH_RDWR_DRIVER::TYPE_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
+  //MESSAGE_MED("TYPE_MESH_RDWR_DRIVER::TYPE_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
 } 
   
 GENDRIVER * TYPE_MESH_RDWR_DRIVER::copy(void) const

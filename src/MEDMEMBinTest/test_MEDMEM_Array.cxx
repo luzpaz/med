@@ -35,7 +35,7 @@ int main (int argc, char ** argv) {
       myArray->setIJ(i,j,i) ;
   
   int numberof ;
-  MESSAGE("Show all 1 :");
+  MESSAGE_MED("Show all 1 :");
   numberof = myArray->getLeadingValue() ;
   for (int i=1; i<=myArray->getLengthValue() ; i++) {
     //int * node = myArray->getI(MED_FULL_INTERLACE,i) ;
@@ -45,7 +45,7 @@ int main (int argc, char ** argv) {
       cout << node[j] << " " ;
     cout << endl ;
   }
-  MESSAGE("Show all 2 :");
+  MESSAGE_MED("Show all 2 :");
   numberof = myArray->getLengthValue() ;
   for (int i=1; i<=myArray->getLeadingValue() ; i++) {
     //int * node = myArray->getJ(MED_NO_INTERLACE,i) ;
@@ -55,7 +55,7 @@ int main (int argc, char ** argv) {
       cout << node[j] << " " ;
     cout << endl ;
   }
-  MESSAGE("Show all 3 :");
+  MESSAGE_MED("Show all 3 :");
   numberof = myArray->getLeadingValue() ;
   for (int i=1; i<=myArray->getLengthValue() ; i++) {
     cout << " - " ;
@@ -64,7 +64,7 @@ int main (int argc, char ** argv) {
     cout << endl ;
   }
 
-  MESSAGE("Show all 0 :");
+  MESSAGE_MED("Show all 0 :");
   numberof = myArray->getLeadingValue() ;
   int length = myArray->getLengthValue() ;
   const int * NoInterlaceArray = myArray->get(MED_EN::MED_NO_INTERLACE) ;

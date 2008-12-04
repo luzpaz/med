@@ -96,6 +96,6 @@ main () {
 	}
 
   } catch (MEDEXCEPTION& ex){
-    MESSAGE(ex.what()) ;
+    MESSAGE_MED(ex.what()) ;
   }
 }

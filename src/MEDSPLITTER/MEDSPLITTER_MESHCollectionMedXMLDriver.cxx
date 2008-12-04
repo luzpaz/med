@@ -85,7 +85,7 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 {
   
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::read()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
 		//ditributed meshes
 	vector<int*> cellglobal;
@@ -98,7 +98,7 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 
   // reading ascii master file
   try{
-    MESSAGE("Start reading");
+    MESSAGE_MED("Start reading");
 
     // Setting up the XML tree corresponding to filename
     xmlDocPtr master_doc=xmlParseFile(filename);
@@ -227,7 +227,7 @@ int MESHCollectionMedXMLDriver::read(char* filename)
     xmlXPathFreeContext(xpathCtx); 
     xmlFreeDoc(master_doc); 
   
-		MESSAGE("end of read");
+		MESSAGE_MED("end of read");
   }//of try
   catch(...)
     {
@@ -246,7 +246,7 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 			if (faceglobal[i]!=0) delete[] faceglobal[i];
     }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 		return 0;
 }
 
@@ -260,7 +260,7 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 {
 	
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::writeXML()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
  
 	xmlDocPtr master_doc = 0;
 	xmlNodePtr root_node = 0, node, node2;
@@ -333,11 +333,11 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 
 			m_filename[idomain]=string(distfilename);
 		
-			MESSAGE("File name "<<string(distfilename));
+			MESSAGE_MED("File name "<<string(distfilename));
 		
 			int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
 		
-			MESSAGE("Start writing");
+			MESSAGE_MED("Start writing");
 			(m_collection->getMesh())[idomain]->write(id);
 			(m_collection->getMesh())[idomain]->rmDriver(id);
 		
@@ -360,6 +360,6 @@ void MESHCollectionMedXMLDriver::write(char* filename)
  	xmlFreeDoc(master_doc);
 	xmlCleanupParser();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 }

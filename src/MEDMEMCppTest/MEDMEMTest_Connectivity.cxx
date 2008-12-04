@@ -247,8 +247,8 @@ void showConnectivity(CONNECTIVITY * myConnectivity,
   }
 
   if (MeshDimension == 1) {
-    MESSAGE("ERROR : MeshDimension = 1 !");
-    MESSAGE("We could not see Reverse Descending Connectivity.");
+    MESSAGE_MED("ERROR : MeshDimension = 1 !");
+    MESSAGE_MED("We could not see Reverse Descending Connectivity.");
     return;
   }
 

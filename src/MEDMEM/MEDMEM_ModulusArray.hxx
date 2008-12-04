@@ -64,9 +64,9 @@ public:
 MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) : 
   _length(length), _array(array), _length2(length)
 {
-//    SCRUTE(_length);
+//    SCRUTE_MED(_length);
 //    for (int i=0;i<_length;i++){
-//      MESSAGE("MEDMODULUSARRAY["<<i<<"]="<<_array[i]);
+//      MESSAGE_MED("MEDMODULUSARRAY["<<i<<"]="<<_array[i]);
 //    }
 };
 
@@ -78,7 +78,7 @@ MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) :
 MEDMODULUSARRAY::~MEDMODULUSARRAY()
 {
   // do nothing because nothing is allocated !
-  //  MESSAGE("MEDMODULUSARRAY::~MEDMODULUSARRAY()") ;
+  //  MESSAGE_MED("MEDMODULUSARRAY::~MEDMODULUSARRAY()") ;
 };
 
 

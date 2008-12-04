@@ -45,7 +45,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec setName " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -65,7 +65,7 @@ int main (int argc, char ** argv)
         cout << "------------------------" << endl;
         cout << " pb avec setDescription " << endl;
         cout << "------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -85,7 +85,7 @@ int main (int argc, char ** argv)
         cout << "------------------" << endl;
         cout << " pb avec setMasse " << endl;
         cout << "------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -105,7 +105,7 @@ int main (int argc, char ** argv)
         cout << "-------------------" << endl;
         cout << " pb avec setLength " << endl;
         cout << "-------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -125,7 +125,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec setTime " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -145,7 +145,7 @@ int main (int argc, char ** argv)
         cout << "------------------------" << endl;
         cout << " pb avec setTemperature " << endl;
         cout << "------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -165,7 +165,7 @@ int main (int argc, char ** argv)
         cout << "---------------------------" << endl;
         cout << " pb avec setMatterQuantity " << endl;
         cout << "---------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -185,7 +185,7 @@ int main (int argc, char ** argv)
         cout << "---------------------------" << endl;
         cout << " pb avec setCurrentStrengt " << endl;
         cout << "---------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -205,7 +205,7 @@ int main (int argc, char ** argv)
         cout << "---------------------------" << endl;
         cout << " pb avec setLightIntensity " << endl;
         cout << "---------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -226,7 +226,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec getName " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -246,7 +246,7 @@ int main (int argc, char ** argv)
         cout << "------------------------" << endl;
         cout << " pb avec getDescription " << endl;
         cout << "------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -266,7 +266,7 @@ int main (int argc, char ** argv)
         cout << "------------------" << endl;
         cout << " pb avec getMasse " << endl;
         cout << "------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -286,7 +286,7 @@ int main (int argc, char ** argv)
         cout << "-------------------" << endl;
         cout << " pb avec getLength " << endl;
         cout << "-------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -306,7 +306,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec getTime " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -326,7 +326,7 @@ int main (int argc, char ** argv)
         cout << "------------------------" << endl;
         cout << " pb avec getTemperature " << endl;
         cout << "------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -346,7 +346,7 @@ int main (int argc, char ** argv)
         cout << "---------------------------" << endl;
         cout << " pb avec getMatterQuantity " << endl;
         cout << "---------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -366,7 +366,7 @@ int main (int argc, char ** argv)
         cout << "----------------------------" << endl;
         cout << " pb avec getCurrentStrength " << endl;
         cout << "----------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -386,7 +386,7 @@ int main (int argc, char ** argv)
         cout << "---------------------------" << endl;
         cout << " pb avec getLightIntensity " << endl;
         cout << "---------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)

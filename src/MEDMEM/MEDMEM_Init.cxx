@@ -57,5 +57,5 @@ MEDMEM::INIT::INIT()
       assert(traceKind);
     }
 
-  MESSAGE("Med Memory Initialization with $SALOME_trace = " << traceKind);
+  MESSAGE_MED("Med Memory Initialization with $SALOME_trace = " << traceKind);
 }

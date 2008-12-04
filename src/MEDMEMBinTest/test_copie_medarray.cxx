@@ -45,7 +45,7 @@ using namespace MED_EN;
 void affiche_medarray(MEDARRAY<double> & myMedArray)
 {
   int numberof ;
-  MESSAGE("Show all 1 :");
+  MESSAGE_MED("Show all 1 :");
   numberof = myMedArray.getLeadingValue() ;
   for (int i=1; i<=myMedArray.getLengthValue() ; i++) {
     const double * node = myMedArray.getRow(i) ;
@@ -54,7 +54,7 @@ void affiche_medarray(MEDARRAY<double> & myMedArray)
       cout << node[j] << " " ;
     cout << endl ;
   }
-  MESSAGE("Show all 2 :");
+  MESSAGE_MED("Show all 2 :");
   numberof = myMedArray.getLengthValue() ;
   for (int i=1; i<=myMedArray.getLeadingValue() ; i++) {
     const double * node = myMedArray.getColumn(i) ;
@@ -63,7 +63,7 @@ void affiche_medarray(MEDARRAY<double> & myMedArray)
       cout << node[j] << " " ;
     cout << endl ;
   }
-  MESSAGE("Show all 3 :");
+  MESSAGE_MED("Show all 3 :");
   numberof = myMedArray.getLeadingValue() ;
   for (int i=1; i<=myMedArray.getLengthValue() ; i++) {
     cout << " - " ;
@@ -72,7 +72,7 @@ void affiche_medarray(MEDARRAY<double> & myMedArray)
     cout << endl ;
   }
 
-  MESSAGE("Show all 0 :");
+  MESSAGE_MED("Show all 0 :");
   numberof = myMedArray.getLeadingValue() ;
   int length = myMedArray.getLengthValue() ;
   const double * NoInterlaceArray = myMedArray.get(MED_NO_INTERLACE) ;

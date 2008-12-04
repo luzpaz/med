@@ -39,7 +39,7 @@ COORDINATE::COORDINATE():_coordinateSystem(""),
 //----------------------------------------------------------//
 {
   const char* LOC = "Default Constructor COORDINATE";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 }
 
 /*! This constructor allocate a MEDARRAY of SpaceDimension * NumberOfNodes.\n
@@ -55,7 +55,7 @@ COORDINATE::COORDINATE(int SpaceDimension, int NumberOfNodes, medModeSwitch Mode
 //------------------------------------------------------------------------------//
 {
   const char* LOC = "Constructor COORDINATE";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 }
 
 /*! This constructor is specialy designed for use in class GRID.\n
@@ -87,13 +87,13 @@ COORDINATE::COORDINATE(const COORDINATE & m):
 //------------------------------------------------------------------------------//
 {
   const char* LOC = "Copy Constructor COORDINATE";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   _coordinate = m._coordinate;
   int spaceDimension = _coordinate.getLeadingValue();
   int numberOfNodes = _coordinate.getLengthValue();
 
-  SCRUTE(spaceDimension);
+  SCRUTE_MED(spaceDimension);
   //setCoordinatesNames((const string*)m._coordinateName) ;
   //setCoordinatesUnits((const string*)m._coordinateUnit) ;
   setCoordinatesNames( m.getCoordinatesNames() );
@@ -114,7 +114,7 @@ COORDINATE::COORDINATE(const COORDINATE & m):
 COORDINATE::~COORDINATE()
 //----------------------//
 {
-  MESSAGE("~COORDINATE()");
+  MESSAGE_MED("~COORDINATE()");
 }
 
 /*! sets the attribute _coordinate with Coordinate           */

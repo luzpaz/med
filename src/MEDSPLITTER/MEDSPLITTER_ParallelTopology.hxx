@@ -269,8 +269,8 @@ namespace MEDSPLITTER {
       pair<MMiter,MMiter> eq = m_face_glob_to_loc.equal_range(iglobal);
       for (MMiter it=eq.first; it != eq.second; it++)
       {
-        SCRUTE (it->second.first);
-        SCRUTE (idomain);
+        SCRUTE_MED (it->second.first);
+        SCRUTE_MED (idomain);
         if (it->second.first == idomain) return it->second.second;
         
       }

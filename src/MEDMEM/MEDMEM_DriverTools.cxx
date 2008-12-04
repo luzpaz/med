@@ -65,7 +65,7 @@ bool _maille::operator < (const _maille& ma) const
 
 _link _maille::link(int i) const
 {
-  ASSERT ( i >= 0 && i < sommets.size() );
+  ASSERT_MED ( i >= 0 && i < sommets.size() );
   int i2 = ( i + 1 == sommets.size() ) ? 0 : i + 1;
   if ( reverse )
     return make_pair( sommets[i2]->first, sommets[i]->first );
@@ -77,7 +77,7 @@ _link _maille::link(int i) const
 MED_EN::medEntityMesh _maille::getEntity(const int meshDimension) const throw (MEDEXCEPTION)
 {
   const char * LOC = "_maille::getEntity(const int meshDimension)" ;
-//   BEGIN_OF(LOC);
+//   BEGIN_OF_MED(LOC);
 
   int mailleDimension = this->dimension();
   medEntityMesh entity;
@@ -100,7 +100,7 @@ MED_EN::medEntityMesh _maille::getEntity(const int meshDimension) const throw (M
       }
 return entity;
 
-//END_OF(LOC);
+//END_OF_MED(LOC);
 };
 
 std::ostream& operator << (std::ostream& os, const _maille& ma)
@@ -213,7 +213,7 @@ std::ostream& operator << (std::ostream& os, const _intermediateMED& mi)
 void _intermediateMED::treatGroupes()
 {
   const char * LOC = "_intermediateMED::treatGroupes() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( myGroupsTreated )
     return;
@@ -228,7 +228,7 @@ void _intermediateMED::treatGroupes()
   for (unsigned int i=0; i!=this->groupes.size(); ++i)
   {
     _groupe& grp = groupes[i];
-    //INFOS( i << " " << grp.nom );
+    //INFOS_MED( i << " " << grp.nom );
     j = grp.groupes.begin();
     while( j!=grp.groupes.end() ) {
       int grpInd = *j-1;
@@ -238,7 +238,7 @@ void _intermediateMED::treatGroupes()
       }
       _groupe & sub_grp = groupes[ grpInd ];
       if ( !sub_grp.groupes.empty() ) {
-        MESSAGE("High hierarchical depth of subgroups in group " << i );
+        MESSAGE_MED("High hierarchical depth of subgroups in group " << i );
         *j = sub_grp.groupes[0]; // replace j with its 1st subgroup
         // push back the rest subs
         for ( int k = 1; k < (int)sub_grp.groupes.size(); ++k )
@@ -284,7 +284,7 @@ void _intermediateMED::treatGroupes()
       _groupe& grp = groupes[i];
       grp.mailles.clear();
       grp.groupes.clear();
-      MESSAGE( "Erase " << i << "-th group " << grp.nom );
+      MESSAGE_MED( "Erase " << i << "-th group " << grp.nom );
     }
   }
 
@@ -309,11 +309,11 @@ void _intermediateMED::treatGroupes()
           // cant create a group of nodes plus anything else
           grp.mailles.clear();
           grp.groupes.clear();
-          MESSAGE( "Erase mixed dim group with nodes:" << i << "-th group " << grp.nom );
+          MESSAGE_MED( "Erase mixed dim group with nodes:" << i << "-th group " << grp.nom );
         }
         else {
           hasMixedCells = true;
-          MESSAGE( "Mixed dim group: " << i << "-th " << grp.nom <<
+          MESSAGE_MED( "Mixed dim group: " << i << "-th " << grp.nom <<
                    "  dim1 = " << dim << " dim2 = " << dim2 );
         }
         break;
@@ -322,14 +322,14 @@ void _intermediateMED::treatGroupes()
   }
 
 //   if ( hasMixedCells )
-//     INFOS( "There will be groups of mixed dimention" );
-  END_OF(LOC);
+//     INFOS_MED( "There will be groups of mixed dimention" );
+  END_OF_MED(LOC);
 }
 
 void _intermediateMED::numerotationMaillage()
 {
   const char* LOC = "_intermediateMED::numerotationMaillage() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   treatGroupes();
 
@@ -413,13 +413,13 @@ void _intermediateMED::numerotationMaillage()
   {
     if ( !hasMixedCells && dimension != i->dimension() ) // on change d'entite
     {
-      MESSAGE( "NB dim " << dimension << " entities: " << i_maille);
+      MESSAGE_MED( "NB dim " << dimension << " entities: " << i_maille);
       dimension=i->dimension();
       i_maille=0;
     }
     i->ordre=++i_maille;
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void _intermediateMED::numerotationPoints()
@@ -471,7 +471,7 @@ _intermediateMED::getCoordinate(const string & coordinateSystem)
 CONNECTIVITY * _intermediateMED::getConnectivity()
 {
     const char * LOC = "_intermediateMED::getConnectivity() : ";
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
     int numberOfNodes=points.size(); // number of nodes in the mesh
     int numberOfTypes=0;
     medEntityMesh entity;
@@ -579,9 +579,9 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 	for (unsigned int k=0; k!=vcount.size(); ++k )
 	  count[k+1]=count[k]+vcount[k];
 	Connectivity->setCount (count, entity);
-	SCRUTE( entity );
-	SCRUTE(numberOfTypes);
-	SCRUTE(count[numberOfTypes]-1);
+	SCRUTE_MED( entity );
+	SCRUTE_MED(numberOfTypes);
+	SCRUTE_MED(count[numberOfTypes]-1);
 	delete [] count;
 
 	for (int k=0; k!=numberOfTypes; ++k )
@@ -632,7 +632,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
     }
     while ( i != maillage.end() );
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
     return Connectivity;
 }
 
@@ -650,11 +650,11 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
                             vector<GROUP *> & _groupNode, MESH * _ptrMesh)
 {
   const char* LOC = "_intermediateMED::getGroups() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   medGroupes.resize( groupes.size(), 0 );
   if (maillage.size() == 0) {
-    INFOS( "Erreur : il n'y a plus de mailles");
+    INFOS_MED( "Erreur : il n'y a plus de mailles");
     return;
   }
 
@@ -678,9 +678,9 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     // si le groupe est vide, ou si le groupe n'est pas nommé : on passe au suivant
     if ( grp.empty() || ( grp.nom.empty() && !isFieldSupport )) {
       if ( !grp.nom.empty() ) {
-        INFOS("Skip group " << i << grp.nom);
+        INFOS_MED("Skip group " << i << grp.nom);
 //       } else {
-//         MESSAGE("Skip group " << i << " <" << grp.nom << "> " << ( grp.empty() ? ": empty" : ""));
+//         MESSAGE_MED("Skip group " << i << " <" << grp.nom << "> " << ( grp.empty() ? ": empty" : ""));
       }
       continue;
     }
@@ -697,17 +697,17 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
         for( ; maIt!=groupes[*j-1].mailles.end(); ++maIt) {
 //           TMailleSet::const_iterator ma_it = mailleSet.find( *maIt );
 //           if ( ma_it != mailleSet.end() ) {
-//             MESSAGE("EQUAL ELEMS: " << *ma_it << " AND " << *maIt);
+//             MESSAGE_MED("EQUAL ELEMS: " << *ma_it << " AND " << *maIt);
 //           }
 //           else
             mailleSet.insert( *maIt );
         }
       }
       if ( nb_elem != mailleSet.size() ) { // Self intersecting compound group
-        INFOS("Self intersecting group: " << i << " <" << grp.nom << ">"
+        INFOS_MED("Self intersecting group: " << i << " <" << grp.nom << ">"
               << ", mailleSet.size = " << mailleSet.size() << ", sum nb elems = " << nb_elem);
         for( vector<int>::iterator j=grp.groupes.begin(); j!=grp.groupes.end(); ++j)
-          INFOS(" in sub-group "<<  *j << " <" << groupes[*j-1].nom << "> "
+          INFOS_MED(" in sub-group "<<  *j << " <" << groupes[*j-1].nom << "> "
                 << groupes[*j-1].mailles.size() << " mailles of type "
                 << groupes[*j-1].mailles[0]->geometricType);
         // if a group serve as a support to a field, then the _field is to be converted
@@ -738,7 +738,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
       for(; maIt!=grp.mailles.end(); ++maIt)
         mailleSet.insert( *maIt );
       if ( grp.mailles.size() != mailleSet.size() )
-        INFOS( "Self intersecting group: " << i << " <" << grp.nom << ">"
+        INFOS_MED( "Self intersecting group: " << i << " <" << grp.nom << ">"
                << ", mailleSet.size = " << mailleSet.size()
                << ", nb elems = " << grp.mailles.size());
     }
@@ -747,7 +747,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     int group_min_dim = (**mailleSet.begin()).dimension();
     int group_max_dim = (**(--mailleSet.end())).dimension();
     if ( group_max_dim != 0 && group_min_dim <= dimension_maillage - 2  ) {
-      MESSAGE("Skip group: " << i << " <" << grp.nom << "> - too small dimension: "
+      MESSAGE_MED("Skip group: " << i << " <" << grp.nom << "> - too small dimension: "
               << group_min_dim);
       continue;
     }
@@ -761,7 +761,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
       grp.relocMap.insert( make_pair( &(**maIt), ++iMa ));
       (*maIt)->groupes.push_back( i );
     }
-    ASSERT( iMa == grp.relocMap.size() );
+    ASSERT_MED( iMa == grp.relocMap.size() );
 
     int nb_geometric_types=1;
     TMailleSet::iterator j=mailleSet.begin(); 
@@ -814,7 +814,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     {
       tab_nombres_elements[k] = tab_index_types_geometriques[k+1]-tab_index_types_geometriques[k];
     }
-    //INFOS( "MAX ORDRE in grp " << grp.nom << " entity " << groupe_entity << " : " << maxOrdre);
+    //INFOS_MED( "MAX ORDRE in grp " << grp.nom << " entity " << groupe_entity << " : " << maxOrdre);
 
     //Determination type entite du groupe
     vector <GROUP *> * vect_group;
@@ -855,7 +855,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     delete [] tab_nombres_elements;
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -871,7 +871,7 @@ void _intermediateMED::getFamilies(std::vector<FAMILY *> & _famCell,
                                    std::vector<FAMILY *> & _famNode, MESH * _ptrMesh)
 {
   const char* LOC = "_intermediateMED::getFamilies() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   int nbElemFam = 0, nbNodeFam = 0;
   std::map< GROUP*, vector< FAMILY * > > grpFamsMap;
@@ -1001,7 +1001,7 @@ GROUP * _intermediateMED::getGroup( int i )
 void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
 {
   const char * LOC = "_intermediateMED::getFields() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   std::list< _fieldBase* >::const_iterator fIt = fields.begin();
   for ( ; fIt != fields.end(); fIt++ )
@@ -1033,12 +1033,12 @@ void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
       f->setOrderNumber( j );
     }
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 _intermediateMED::~_intermediateMED()
 {
-  MESSAGE( "~_intermediateMED()");
+  MESSAGE_MED( "~_intermediateMED()");
   std::list< _fieldBase* >::const_iterator fIt = fields.begin();
   for ( ; fIt != fields.end(); fIt++ )
     delete *fIt;

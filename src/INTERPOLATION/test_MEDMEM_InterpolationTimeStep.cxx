@@ -47,7 +47,7 @@ main () {
 
   try {
     
-    string flag="================[MAIN MESSAGES]================> ";
+    string flag="================[MAIN MESSAGE_MEDS]================> ";
     
     cout<<flag<<"Lecture de la structure MED               : "<<flush; 
     MED             fromMED     (MED_DRIVER,fromFileName); 
@@ -126,6 +126,6 @@ main () {
 	}
 
   } catch (MEDEXCEPTION& ex){
-    MESSAGE(ex.what()) ;
+    MESSAGE_MED(ex.what()) ;
   }
 }

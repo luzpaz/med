@@ -117,7 +117,7 @@ namespace MEDMEM {
     _interlacingType(SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType)
   {
     const char * LOC = "GAUSS_LOCALIZATION(locName,typeGeo, nGauss, const ArrayNoGauss & cooRef,..) : ";
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
     if (_cooRef.getDim() != _cooGauss.getDim() )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"cooRef and cooGaus must have the same number of components")) ;
 
@@ -133,7 +133,7 @@ namespace MEDMEM {
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
 				     << _nGauss ));
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   };
 
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION
@@ -150,7 +150,7 @@ namespace MEDMEM {
     _interlacingType(SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType)
   {
     const char * LOC = "GAUSS_LOCALIZATION(locName,typeGeo, nGauss, const double * cooRef,..) :";
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
     if (_cooRef.getDim() != _cooGauss.getDim() )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"cooRef and cooGaus must have the same number of components")) ;
 
@@ -164,7 +164,7 @@ namespace MEDMEM {
     if (_wg.size() != _nGauss )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
 				     << _nGauss ));
-  END_OF(LOC);
+  END_OF_MED(LOC);
   };
 
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG> &

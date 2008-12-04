@@ -104,7 +104,7 @@ public :
   void open() throw (MEDEXCEPTION)
   {
     const char * LOC = "MED_FIELD_DRIVER21::open() ";
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
     // we must set fieldname before open, because we must find field number in file (if it exist !!!)
     if ( MED_FIELD_DRIVER<T>::_fileName == "" ) {
@@ -118,12 +118,12 @@ public :
 
     MED_EN::med_mode_acces mode = dynamic_cast<GENDRIVER*>(this)->getAccessMode();
     med_2_1::med_mode_acces m21mode = (med_2_1::med_mode_acces)getMedAccessMode(mode,MED_EN::V21);
-    MESSAGE(LOC<<"_fileName.c_str : "<< MED_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< MED_FIELD_DRIVER<T>::_accessMode);
+    MESSAGE_MED(LOC<<"_fileName.c_str : "<< MED_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< MED_FIELD_DRIVER<T>::_accessMode);
     _medIdt = med_2_1::MEDouvrir( (const_cast <char *> (MED_FIELD_DRIVER<T>::_fileName.c_str())),
                                   //(med_2_1::med_mode_acces) MED_FIELD_DRIVER<T>::_accessMode);
                                   m21mode);
     //                             (med_2_1::med_mode_acces) mode);
-    MESSAGE(LOC<<"_medIdt : "<< _medIdt );
+    MESSAGE_MED(LOC<<"_medIdt : "<< _medIdt );
     if (_medIdt > 0) 
       MED_FIELD_DRIVER<T>::_status=MED_OPENED;
     else {
@@ -136,22 +136,22 @@ public :
 			   );
     }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
   
   void close() {
   const char* LOC = "MED_FIELD_DRIVER21::close()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
     med_2_1::med_int err = 0;
     if (MED_FIELD_DRIVER<T>::_status == MED_OPENED) {
       err=med_2_1::MEDfermer(MED_FIELD_DRIVER21<T>::_medIdt);
       //H5close(); // If we call H5close() all the files are closed.
       MED_FIELD_DRIVER<T>::_status = MED_CLOSED;
       MED_FIELD_DRIVER21<T>::_medIdt = MED_INVALID;
-      MESSAGE(" MED_FIELD_DRIVER21::close() : MEDfermer : MED_FIELD_DRIVER21<T>::_medIdt= " << _medIdt );
-      MESSAGE(" MED_FIELD_DRIVER21::close() : MEDfermer : err    = " << err );
+      MESSAGE_MED(" MED_FIELD_DRIVER21::close() : MEDfermer : MED_FIELD_DRIVER21<T>::_medIdt= " << _medIdt );
+      MESSAGE_MED(" MED_FIELD_DRIVER21::close() : MEDfermer : err    = " << err );
     }
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
 
@@ -189,8 +189,8 @@ public :
     IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField)
   { 
   const char* LOC = "MED_FIELD_RDONLY_DRIVER21::MED_FIELD_RDONLY_DRIVER21(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
+  BEGIN_OF_MED(LOC);
+  END_OF_MED(LOC);
   }
   
   /*!
@@ -254,8 +254,8 @@ public :
     MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
   const char* LOC = "MED_FIELD_WRONLY_DRIVER21::MED_FIELD_WRONLY_DRIVER21(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
+  BEGIN_OF_MED(LOC);
+  END_OF_MED(LOC);
   }
 
   /*!
@@ -321,9 +321,9 @@ public :
     IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
   {
   const char* LOC = "MED_FIELD_RDWR_DRIVER21::MED_FIELD_RDWR_DRIVER21(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
     //_accessMode = MED_RDWR ;
-  END_OF(LOC);
+  END_OF_MED(LOC);
   };
 
   /*!
@@ -372,7 +372,7 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
   //EF : Gérer le meshName pour le driver 2.2
   const char * LOC="MED_FIELD_DRIVER<T>::search_field(...)";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   map<int, list<MED_EN::medGeometryElement> > CellAndNodeEntities;
   map<int, list<MED_EN::medGeometryElement> >::iterator currentEntity;
@@ -430,7 +430,7 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
 
       numberOfElements = (numberOfElements1>numberOfElements2)?numberOfElements1:numberOfElements2;
 
-      SCRUTE(numberOfElements);
+      SCRUTE_MED(numberOfElements);
 
       if ( numberOfElements <=  0 )
 	continue;
@@ -447,8 +447,8 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
 					(med_2_1::med_entite_maillage) entityCurrent,
 					(med_2_1::med_geometrie_element)  *currentGeometry );
 
-      SCRUTE(nbPdtIt);
-      SCRUTE(numberOfElements);
+      SCRUTE_MED(nbPdtIt);
+      SCRUTE_MED(numberOfElements);
 
       if ( nbPdtIt < 0 )
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = ("
@@ -480,7 +480,7 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
 	      //		  if ( nmaa > 1 )
 	      {
 		//EF : Gérer le meshName pour le driver 2.2
-		// 		      MESSAGE(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = (" << ndt << ","
+		// 		      MESSAGE_MED(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = (" << ndt << ","
 		// 			      << ot << ") is  defined on " << nmaa << " meshes, using mesh |"
 		// 			      << maa << "|");
 		// 		    }
@@ -495,7 +495,7 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
 	}
       }
 
-      MESSAGE(LOC << " a (dt,it) is found ?? " << alreadyFoundPdtIt);
+      MESSAGE_MED(LOC << " a (dt,it) is found ?? " << alreadyFoundPdtIt);
 
       if ( !alreadyFoundPdtIt )
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = ("
@@ -510,7 +510,7 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
 				     << MED_EN::entNames[entityCurrent] << ","
 				     << MED_EN::geoNames[*currentGeometry] << ")" ));
       if ( ngauss > 1000 ) { // some gabage
-        INFOS( "Set to 1 invalid nb of Gauss points " << ngauss << " for  Field |" << fieldName
+        INFOS_MED( "Set to 1 invalid nb of Gauss points " << ngauss << " for  Field |" << fieldName
                << "| with (ndt,or) = (" << ndt << "," << od << ") for (entityType,geometricType)=("
                << MED_EN::entNames[entityCurrent] << ","
                << MED_EN::geoNames[*currentGeometry] << ")" );
@@ -540,12 +540,12 @@ MED_FIELD_DRIVER21<T>::createFieldSupport(med_2_1::med_idt id,
     support.setNumberOfElements(numberOfElementsOfType);    //setNumberOfElements effectue une copie
     support.setAll(true);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
     return alreadyFoundAnEntity;
   } else
     {
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
       return false;
     }
@@ -569,7 +569,7 @@ MED_FIELD_DRIVER21<T>::getMeshGeometricType(med_2_1::med_idt id,
   else
     if (entity == MED_EN::MED_NODE) quoi=med_2_1::MED_COOR;
     else
-      MESSAGE("MED_FIELD_DRIVER<T>::getMeshGeometricType(...)"<<" Support Creation from Mesh |"  << meshName
+      MESSAGE_MED("MED_FIELD_DRIVER<T>::getMeshGeometricType(...)"<<" Support Creation from Mesh |"  << meshName
 				   << "| on entity " << MED_EN::entNames[entity]
 				   << "| is impossible,  must be  on MED_NODE or MED_CELL");
 
@@ -616,7 +616,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   throw (MEDEXCEPTION)
 {
   const char * LOC = " MED_FIELD_RDONLY_DRIVER21::read() " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array       ArrayNo;
   typedef typename MEDMEM_ArrayInterface<T,NoInterlace,Gauss>::Array         ArrayNoWg;
@@ -636,13 +636,13 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     MED_FIELD_DRIVER<T>::_fieldName=MED_FIELD_DRIVER<T>::_ptrField->_name;
 
   if ( MED_FIELD_DRIVER<T>::_fieldName.size() > MED_TAILLE_NOM )
-    MESSAGE(LOC << "Warning <fieldName> size in object driver FIELD is > MED_TAILLE_NOM .");
+    MESSAGE_MED(LOC << "Warning <fieldName> size in object driver FIELD is > MED_TAILLE_NOM .");
    
 //     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
 // 				 <<" <fieldName> size in object driver FIELD is > MED_TAILLE_NOM ."));
 
 
-  MESSAGE("###### "<<LOC<<" fieldNameDRIVER : "<< MED_FIELD_DRIVER<T>::_fieldName << 
+  MESSAGE_MED("###### "<<LOC<<" fieldNameDRIVER : "<< MED_FIELD_DRIVER<T>::_fieldName << 
 	  " fieldName : "<<MED_FIELD_DRIVER<T>::_fieldName);
 
 
@@ -693,7 +693,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
 	    //  	      throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
 	    //  					       <<  "Be careful there is no compound for field n°" 
 	    //  					       << i << "in file |"<<_fileName<<"| !"));
-	    MESSAGE(LOC<<"Be careful there is no compound for field n°"<<i<<"in file |"<<MED_FIELD_DRIVER<T>::_fileName<<"| !");
+	    MESSAGE_MED(LOC<<"Be careful there is no compound for field n°"<<i<<"in file |"<<MED_FIELD_DRIVER<T>::_fileName<<"| !");
 
 	  componentName = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;
 	  unitName      = new char[numberOfComponents*MED_TAILLE_PNOM21+1] ;   
@@ -701,10 +701,10 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
 	  err = med_2_1::MEDchampInfo(id, i, fieldName, &type, componentName, 
 				      unitName, numberOfComponents) ;
 
-	  MESSAGE("Champ "<<i<<" : #" << fieldName <<"# et recherche #"<<MED_FIELD_DRIVER<T>::_fieldName.c_str()<<"#");
+	  MESSAGE_MED("Champ "<<i<<" : #" << fieldName <<"# et recherche #"<<MED_FIELD_DRIVER<T>::_fieldName.c_str()<<"#");
 	  if ( !strcmp(fieldName,MED_FIELD_DRIVER<T>::_fieldName.c_str()) )
 	    {
-	      MESSAGE("FOUND FIELD "<< fieldName <<" : "<<i);
+	      MESSAGE_MED("FOUND FIELD "<< fieldName <<" : "<<i);
 	      MED_FIELD_DRIVER<T>::_fieldNum = i ;
 	      break ;
 	    }
@@ -719,7 +719,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   if (MED_FIELD_DRIVER<T>::_fieldNum==MED_INVALID)
     throw MEDEXCEPTION(LOCALIZED( STRING(LOC) << ": Field "<<MED_FIELD_DRIVER<T>::_fieldName << " not found in file " << MED_FIELD_DRIVER<T>::_fileName ) );
 
-  MESSAGE ("FieldNum : "<<MED_FIELD_DRIVER<T>::_fieldNum);
+  MESSAGE_MED ("FieldNum : "<<MED_FIELD_DRIVER<T>::_fieldNum);
 
   if (numberOfComponents < 1)
     {
@@ -831,9 +831,9 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     {
       MED_FIELD_DRIVER<T>::_ptrField->_componentsTypes[i] = 1 ;
       MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i] = string(componentName+i*MED_TAILLE_PNOM21,MED_TAILLE_PNOM21) ;
-      SCRUTE(MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i]);
+      SCRUTE_MED(MED_FIELD_DRIVER<T>::_ptrField->_componentsNames[i]);
       MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits[i] = string(unitName+i*MED_TAILLE_PNOM21,MED_TAILLE_PNOM21) ;
-      SCRUTE(MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits[i]);
+      SCRUTE_MED(MED_FIELD_DRIVER<T>::_ptrField->_MEDComponentsUnits[i]);
     }
 
   delete[] componentName;
@@ -845,7 +845,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   T ** myValues = new T*[NumberOfTypes] ;
   int * NumberOfValues = new int[NumberOfTypes] ;
   int TotalNumberOfValues = 0 ; // Profils a gerer en 2.2 Rmq from EF
-  MESSAGE ("NumberOfTypes :"<< NumberOfTypes);
+  MESSAGE_MED ("NumberOfTypes :"<< NumberOfTypes);
   MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues=0 ;
   bool anyGauss=false;
 
@@ -862,8 +862,8 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     modswt = med_2_1::MED_FULL_INTERLACE;
 
   for (int i=0; i<NumberOfTypes; i++) {
-    MESSAGE ("Type["<<i+1<<"] :"<< Types[i]);
-    MESSAGE ("Entity :"<< mySupport->getEntity());
+    MESSAGE_MED ("Type["<<i+1<<"] :"<< Types[i]);
+    MESSAGE_MED ("Entity :"<< mySupport->getEntity());
 
     int refNumberOfValues = 
       MEDnVal(MED_FIELD_DRIVER21<T>::_medIdt,
@@ -889,14 +889,14 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     myValues[i] = new T[ NumberOfValues[i]*numberOfComponents ] ;
     TotalNumberOfValues+=NumberOfValues[i] ;
     char * ProfilName = new char[MED_TAILLE_NOM+1];
-    MESSAGE ("NumberOfValues :"<< NumberOfValues[i]);
-    MESSAGE ("NumberOfComponents :"<< numberOfComponents);
-    MESSAGE ("MESH_NAME :"<< meshName.c_str());
-    MESSAGE ("FIELD_NAME :"<< MED_FIELD_DRIVER<T>::_fieldName.c_str());
-    MESSAGE ("MED_ENTITE :"<< (med_2_1::med_entite_maillage) mySupport->getEntity());
-    MESSAGE("MED_GEOM :"<<(med_2_1::med_geometrie_element)Types[i]);
-    MESSAGE("Iteration :"<<MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
-    MESSAGE("Order :"<<MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
+    MESSAGE_MED ("NumberOfValues :"<< NumberOfValues[i]);
+    MESSAGE_MED ("NumberOfComponents :"<< numberOfComponents);
+    MESSAGE_MED ("MESH_NAME :"<< meshName.c_str());
+    MESSAGE_MED ("FIELD_NAME :"<< MED_FIELD_DRIVER<T>::_fieldName.c_str());
+    MESSAGE_MED ("MED_ENTITE :"<< (med_2_1::med_entite_maillage) mySupport->getEntity());
+    MESSAGE_MED("MED_GEOM :"<<(med_2_1::med_geometrie_element)Types[i]);
+    MESSAGE_MED("Iteration :"<<MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
+    MESSAGE_MED("Order :"<<MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
     MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues+=mySupport->getNumberOfElements(Types[i]); // Ne doit pas prendre en compte les points de Gauss
 
     med_2_1::med_err ret;
@@ -1166,7 +1166,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     }
   }
       
-  //  END_OF();
+  //  END_OF_MED();
 }
 
 template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::write( void ) const
@@ -1192,7 +1192,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MED_FIELD_WRONLY_DRIVER21::write(void) const " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   typedef typename MEDMEM_ArrayInterface<T,NoInterlace,NoGauss>::Array ArrayNo;
   typedef typename MEDMEM_ArrayInterface<T,FullInterlace,NoGauss>::Array ArrayFull;
@@ -1238,12 +1238,12 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 			       listcomponent_unit[i],0,length);
       }
 
-      MESSAGE("component_name=|"<<component_name<<"|");
-      MESSAGE("component_unit=|"<<component_unit<<"|");
+      MESSAGE_MED("component_name=|"<<component_name<<"|");
+      MESSAGE_MED("component_unit=|"<<component_unit<<"|");
 
       MED_EN::med_type_champ ValueType=MED_FIELD_DRIVER<T>::_ptrField->getValueType() ;
       
-      MESSAGE("Template Type =|"<<ValueType<<"|");
+      MESSAGE_MED("Template Type =|"<<ValueType<<"|");
       
       // le champ existe deja ???
       char * champName = new char[MED_TAILLE_NOM+1] ;
@@ -1276,10 +1276,10 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 					 )
 			      );
 	// component name and unit
-	MESSAGE(LOC<<" Component name in file : "<<compName);
-	MESSAGE(LOC<<" Component name in memory : "<<component_name);
-	MESSAGE(LOC<<" Component unit in file : "<<compUnit);
-	MESSAGE(LOC<<" Component unit in memory : "<<component_unit);
+	MESSAGE_MED(LOC<<" Component name in file : "<<compName);
+	MESSAGE_MED(LOC<<" Component name in memory : "<<component_name);
+	MESSAGE_MED(LOC<<" Component unit in file : "<<compUnit);
+	MESSAGE_MED(LOC<<" Component unit in memory : "<<component_unit);
 	delete[] compName ;
 	delete[] compUnit ;
 
@@ -1288,7 +1288,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 
         string dataGroupName =  "/CHA/";
         dataGroupName        += MED_FIELD_DRIVER<T>::_ptrField->getName();
-        MESSAGE(LOC << "|" << dataGroupName << "|" );
+        MESSAGE_MED(LOC << "|" << dataGroupName << "|" );
         med_2_1::med_idt gid =  H5Gopen(MED_FIELD_DRIVER21<T>::_medIdt, dataGroupName.c_str() );
         
         if ( gid < 0 ) {
@@ -1349,17 +1349,17 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
         else {
           value = myArray->getRow(Index) ;
 	}
-	MESSAGE("MED_FIELD_DRIVER21<T>::_medIdt                         : "<<MED_FIELD_DRIVER21<T>::_medIdt);
-	MESSAGE("MeshName.c_str()                : "<<MeshName.c_str());
-	MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getName()            : "<<MED_FIELD_DRIVER<T>::_ptrField->getName());
-	MESSAGE("value                           : "<<value);
-	MESSAGE("NumberOfElements                : "<<NumberOfElements);
-	MESSAGE("NumberOfGaussPoints             : "<<NumberOfGaussPoints);
-	MESSAGE("mySupport->getEntity()          : "<<mySupport->getEntity());
-	MESSAGE("Types[i]                        : "<<Types[i]);
-	MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber() : "<<MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
-	MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getTime()            : "<<MED_FIELD_DRIVER<T>::_ptrField->getTime());
-	MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()     : "<<MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
+	MESSAGE_MED("MED_FIELD_DRIVER21<T>::_medIdt                         : "<<MED_FIELD_DRIVER21<T>::_medIdt);
+	MESSAGE_MED("MeshName.c_str()                : "<<MeshName.c_str());
+	MESSAGE_MED("MED_FIELD_DRIVER<T>::_ptrField->getName()            : "<<MED_FIELD_DRIVER<T>::_ptrField->getName());
+	MESSAGE_MED("value                           : "<<value);
+	MESSAGE_MED("NumberOfElements                : "<<NumberOfElements);
+	MESSAGE_MED("NumberOfGaussPoints             : "<<NumberOfGaussPoints);
+	MESSAGE_MED("mySupport->getEntity()          : "<<mySupport->getEntity());
+	MESSAGE_MED("Types[i]                        : "<<Types[i]);
+	MESSAGE_MED("MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber() : "<<MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
+	MESSAGE_MED("MED_FIELD_DRIVER<T>::_ptrField->getTime()            : "<<MED_FIELD_DRIVER<T>::_ptrField->getTime());
+	MESSAGE_MED("MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()     : "<<MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
 	
 /*	char chanom[MED_TAILLE_NOM+1];
 	char chacomp[MED_TAILLE_NOM+1];
@@ -1442,7 +1442,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 
     }
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 /*--------------------- RDWR PART -------------------------------*/
@@ -1456,18 +1456,18 @@ template <class T> void MED_FIELD_RDWR_DRIVER21<T>::write(void) const
   throw (MEDEXCEPTION)
 {
   const char* LOC = "MED_FIELD_RDWR_DRIVER21::write(void)";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   MED_FIELD_WRONLY_DRIVER21<T>::write(); 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 } 
 
 template <class T> void MED_FIELD_RDWR_DRIVER21<T>::read (void)
   throw (MEDEXCEPTION)
 {
   const char* LOC = "MED_FIELD_RDWR_DRIVER21::read(void)";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   MED_FIELD_RDONLY_DRIVER21<T>::read();
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 }//End namespace MEDMEM
 /*-----------------------------------------------------------------*/

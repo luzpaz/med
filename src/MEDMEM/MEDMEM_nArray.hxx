@@ -181,7 +181,7 @@ public  :
          operator=( const MEDMEM_Array & array) {
     if ( this == &array) return *this;
   const char* LOC = "MEDMEM_Array  operator =";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
     InterlacingPolicy::operator=(array); //Appel des classes de base ?
 
     this->_array.set(array._array); // Le propriétaire reste le ARRAY initial

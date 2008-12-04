@@ -68,7 +68,7 @@ MED_MESH_DRIVER::MED_MESH_DRIVER(const MED_MESH_DRIVER & driver):
 
 MED_MESH_DRIVER::~MED_MESH_DRIVER()
 {
-  MESSAGE("MED_MESH_DRIVER::~MED_MESH_DRIVER()has been destroyed");
+  MESSAGE_MED("MED_MESH_DRIVER::~MED_MESH_DRIVER()has been destroyed");
 
 }
 
@@ -92,7 +92,7 @@ IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(const string & fileName,
 						 MESH * ptrMesh):
   MED_MESH_DRIVER(fileName, ptrMesh, MED_EN::RDONLY)
 { 
-  MESSAGE("IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
   
 IMED_MESH_RDONLY_DRIVER::IMED_MESH_RDONLY_DRIVER(const IMED_MESH_RDONLY_DRIVER & driver): 
@@ -104,8 +104,8 @@ int IMED_MESH_RDONLY_DRIVER::getDescendingConnectivity(CONNECTIVITY * Connectivi
 {
   if (_status==MED_OPENED)
     {
-      MESSAGE("MED_MESH_RDONLY_DRIVER::getDescendingConnectivity : "<<"call on the object " << Connectivity);
-      MESSAGE("MED_MESH_RDONLY_DRIVER::getDescendingConnectivity : "<<"Not yet implemented !");
+      MESSAGE_MED("MED_MESH_RDONLY_DRIVER::getDescendingConnectivity : "<<"call on the object " << Connectivity);
+      MESSAGE_MED("MED_MESH_RDONLY_DRIVER::getDescendingConnectivity : "<<"Not yet implemented !");
     }
   return MED_ERROR;
 }
@@ -113,24 +113,24 @@ int IMED_MESH_RDONLY_DRIVER::getDescendingConnectivity(CONNECTIVITY * Connectivi
 void IMED_MESH_RDONLY_DRIVER::buildAllGroups(vector<GROUP*> & Groups, vector<FAMILY*> & Families) 
 {
   const char* LOC = "MED_MESH_RDONLY_DRIVER::buildAllGroups ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   int numberOfFamilies = Families.size() ;
-  //SCRUTE(numberOfFamilies);
+  //SCRUTE_MED(numberOfFamilies);
   map< string,list<FAMILY*> > groupsNames ;
   for(int i=0; i<numberOfFamilies; i++) {
     FAMILY * myFamily = Families[i] ;
     int numberOfGroups_ = myFamily->getNumberOfGroups();
-    //SCRUTE(i);
-    //SCRUTE(numberOfGroups_);
+    //SCRUTE_MED(i);
+    //SCRUTE_MED(numberOfGroups_);
     for (int j=0; j<numberOfGroups_; j++) {
-      //SCRUTE(j);
-      //SCRUTE(myFamily->getGroupName(j+1));
+      //SCRUTE_MED(j);
+      //SCRUTE_MED(myFamily->getGroupName(j+1));
       groupsNames[myFamily->getGroupName(j+1)].push_back(myFamily);
     }
   }
   int numberOfGroups = groupsNames.size() ;
-  SCRUTE(numberOfGroups);
+  SCRUTE_MED(numberOfGroups);
   Groups.resize(numberOfGroups);
   map< string,list<FAMILY*> >::const_iterator currentGroup ;
   int it = 0 ;
@@ -138,21 +138,21 @@ void IMED_MESH_RDONLY_DRIVER::buildAllGroups(vector<GROUP*> & Groups, vector<FAM
     GROUP * myGroup = new GROUP(healName((*currentGroup).first),(*currentGroup).second) ;
 //     GROUP * myGroup = new GROUP() ;
 //     myGroup->setName((*currentGroup).first);
-//     SCRUTE(myGroup->getName());
+//     SCRUTE_MED(myGroup->getName());
 //     //myGroup->setMesh(_ptrMesh);
 //     myGroup->init((*currentGroup).second);
     Groups[it]=myGroup;
-    //SCRUTE(it);
+    //SCRUTE_MED(it);
     it++;
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void IMED_MESH_RDONLY_DRIVER::updateFamily()
 {
   const char* LOC = "MED_MESH_RDONLY_DRIVER::updateFamily() ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // we need to update family on constituent if we have constituent, but no 
   // descending connectivity, so, we must calculate all constituent and
@@ -160,7 +160,7 @@ void IMED_MESH_RDONLY_DRIVER::updateFamily()
   _ptrMesh->_connectivity->updateFamily(_ptrMesh->_familyFace) ; // in 2d, do nothing
   _ptrMesh->_connectivity->updateFamily(_ptrMesh->_familyEdge) ; // in 3d, do nothing
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 
@@ -180,7 +180,7 @@ IMED_MESH_WRONLY_DRIVER::IMED_MESH_WRONLY_DRIVER(const string & fileName,
 																								 MED_EN::med_mode_acces access):
   MED_MESH_DRIVER(fileName,ptrMesh,access)
 {
-  MESSAGE("MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 IMED_MESH_WRONLY_DRIVER::IMED_MESH_WRONLY_DRIVER(const IMED_MESH_WRONLY_DRIVER & driver): 
@@ -190,7 +190,7 @@ IMED_MESH_WRONLY_DRIVER::IMED_MESH_WRONLY_DRIVER(const IMED_MESH_WRONLY_DRIVER &
 
 IMED_MESH_WRONLY_DRIVER::~IMED_MESH_WRONLY_DRIVER()
 {
-  //MESSAGE("MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
+  //MESSAGE_MED("MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
 }
 
 void IMED_MESH_WRONLY_DRIVER::read (void)
@@ -208,7 +208,7 @@ IMED_MESH_RDWR_DRIVER::IMED_MESH_RDWR_DRIVER(const string & fileName,
 					   MESH * ptrMesh):
    IMED_MESH_RDONLY_DRIVER(fileName,ptrMesh),IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,RDWR)
 {
-  MESSAGE("MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 IMED_MESH_RDWR_DRIVER::IMED_MESH_RDWR_DRIVER(const IMED_MESH_RDWR_DRIVER & driver): 
@@ -217,14 +217,14 @@ IMED_MESH_RDWR_DRIVER::IMED_MESH_RDWR_DRIVER(const IMED_MESH_RDWR_DRIVER & drive
 }
 
 IMED_MESH_RDWR_DRIVER::~IMED_MESH_RDWR_DRIVER() {
-  //MESSAGE("MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
+  //MESSAGE_MED("MED_MESH_RDWR_DRIVER::MED_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
 }
 
 /////////// Concrete MED_MESH_DRIVERS implementations
 
 MED_MESH_RDONLY_DRIVER::MED_MESH_RDONLY_DRIVER()
 {
-  MESSAGE("You are using the default constructor of the Mesh read only Driver and it is 2.1 one");
+  MESSAGE_MED("You are using the default constructor of the Mesh read only Driver and it is 2.1 one");
   _concreteMeshDrv = new MED_MESH_RDONLY_DRIVER21();
 }
 
@@ -335,7 +335,7 @@ GENDRIVER * MED_MESH_RDONLY_DRIVER::copy ( void ) const
 
 MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER()
 {
-  MESSAGE("You are using the default constructor of the Mesh write only Driver and it is 2.1 one");
+  MESSAGE_MED("You are using the default constructor of the Mesh write only Driver and it is 2.1 one");
   _concreteMeshDrv = new MED_MESH_WRONLY_DRIVER21();
 }
 

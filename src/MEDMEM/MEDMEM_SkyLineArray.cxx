@@ -29,7 +29,7 @@ using namespace MEDMEM;
 MEDSKYLINEARRAY::MEDSKYLINEARRAY(): _count(0), _length(0),
 				_index((int*)NULL),_value((int*)NULL)
 {
-  MESSAGE("Constructeur MEDSKYLINEARRAY sans parametre");
+  MESSAGE_MED("Constructeur MEDSKYLINEARRAY sans parametre");
 }
 
 MEDSKYLINEARRAY::MEDSKYLINEARRAY(const MEDSKYLINEARRAY &myArray):
@@ -37,15 +37,15 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(const MEDSKYLINEARRAY &myArray):
 				_index(_count+1),_value(_length)
 {
   const char* LOC = "MEDSKYLINEARRAY(const MEDSKYLINEARRAY &)";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   memcpy(_index,myArray._index,sizeof(int)*(_count+1));
   memcpy(_value,myArray._value,sizeof(int)*_length);
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 MEDSKYLINEARRAY::~MEDSKYLINEARRAY()
 {
-  MESSAGE("Destructeur ~MEDSKYLINEARRAY");
+  MESSAGE_MED("Destructeur ~MEDSKYLINEARRAY");
 
   //if (_index != NULL) delete [] _index;
   //if (_value != NULL) delete [] _value;
@@ -55,14 +55,14 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(const int count, const int length):
                                 _count(count), _length(length),
                                 _index(_count+1),_value(_length)
 {
-	MESSAGE("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
+	MESSAGE_MED("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
 }
 
 MEDSKYLINEARRAY::MEDSKYLINEARRAY(const int count, const int length,
 				 const int* index, const int* value,bool shallowCopy):
                                 _count(count), _length(length)
 {
-// 	MESSAGE("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
+// 	MESSAGE_MED("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
 		if(shallowCopy)
 	  {
 	    _index.setShallowAndOwnership(index);
@@ -131,7 +131,7 @@ ostream& MEDMEM::operator<<(ostream &os, const MEDSKYLINEARRAY &sky) {
 
 //  void MEDSKYLINEARRAY::setMEDSKYLINEARRAY( const int count , const int length, int* index , int* value )
 //  {
-//    MESSAGE("void MEDSKYLINEARRAY::setMEDSKYLINEARRAY(count, length, index, value)");
+//    MESSAGE_MED("void MEDSKYLINEARRAY::setMEDSKYLINEARRAY(count, length, index, value)");
 //    _count  = count  ;
 //    _length = length ;
 

@@ -43,7 +43,7 @@ FIELD_::FIELD_():
   _valueType(MED_EN::MED_UNDEFINED_TYPE),
   _interlacingType(MED_EN::MED_UNDEFINED_INTERLACE)
 {
-  MESSAGE("Constructeur FIELD_ sans parametre");
+  MESSAGE_MED("Constructeur FIELD_ sans parametre");
 }
 
 FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
@@ -55,7 +55,7 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
   _valueType(MED_EN::MED_UNDEFINED_TYPE),
   _interlacingType(MED_EN::MED_UNDEFINED_INTERLACE)
 {
-  MESSAGE("FIELD_(const SUPPORT * Support, const int NumberOfComponents)");
+  MESSAGE_MED("FIELD_(const SUPPORT * Support, const int NumberOfComponents)");
 
   _numberOfValues = Support->getNumberOfElements(MED_ALL_ELEMENTS);
   //_componentsTypes = new int[NumberOfComponents] ;
@@ -148,7 +148,7 @@ FIELD_::FIELD_(const FIELD_ &m)
 
 FIELD_::~FIELD_()
 {
-  MESSAGE("~FIELD_()");
+  MESSAGE_MED("~FIELD_()");
   //if ( _componentsTypes !=NULL)
   //  delete[] _componentsTypes ;
   //if ( _componentsNames !=NULL)
@@ -161,19 +161,19 @@ FIELD_::~FIELD_()
   //  delete[] _MEDComponentsUnits ;
   // delete driver
 //   vector<GENDRIVER *>::const_iterator it ;
-//   SCRUTE(_drivers.size());
+//   SCRUTE_MED(_drivers.size());
 //   int i=0;
 //   for (it=_drivers.begin();it!=_drivers.end();it++) {
 //     i++;
-//     SCRUTE(i);
+//     SCRUTE_MED(i);
 //     delete (*it) ;
 
 
-  MESSAGE("In this object FIELD_ there is(are) " << _drivers.size() << " driver(s)");
+  MESSAGE_MED("In this object FIELD_ there is(are) " << _drivers.size() << " driver(s)");
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     {
-      SCRUTE(_drivers[index]);
+      SCRUTE_MED(_drivers[index]);
       if ( _drivers[index] != NULL) delete _drivers[index];
     }
   //CCAR: if _support is a SUPPORTClient remove reference
@@ -393,7 +393,7 @@ void FIELD_::_deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n , boo
 
 void     FIELD_::rmDriver      (int index)
 {
-  MESSAGE("void FIELD_::rmDriver(int index) : removing the driver " << index);
+  MESSAGE_MED("void FIELD_::rmDriver(int index) : removing the driver " << index);
 };
 
 int      FIELD_::addDriver     (driverTypes driverType, 
@@ -401,13 +401,13 @@ int      FIELD_::addDriver     (driverTypes driverType,
 				const string & driverFieldName,
 				MED_EN::med_mode_acces access)
 {
-  MESSAGE("int FIELD_::addDriver(driverTypes driverType, const string & fileName, const string & driverFieldName) : adding the driver " << driverType << " fileName = " << fileName.c_str() << " driverFieldName = " << driverFieldName.c_str());
+  MESSAGE_MED("int FIELD_::addDriver(driverTypes driverType, const string & fileName, const string & driverFieldName) : adding the driver " << driverType << " fileName = " << fileName.c_str() << " driverFieldName = " << driverFieldName.c_str());
   return 0;
 };
 
 int      FIELD_::addDriver     (GENDRIVER & driver)
 {
-  MESSAGE("int FIELD_::addDriver(GENDRIVER & driver) : driver " << driver);
+  MESSAGE_MED("int FIELD_::addDriver(GENDRIVER & driver) : driver " << driver);
   return 0;
 };
 

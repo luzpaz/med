@@ -186,7 +186,7 @@ inline CELLMODEL::CELLMODEL(const CELLMODEL &m)
 }
 inline CELLMODEL::~CELLMODEL() 
 {
-  //  MESSAGE("CELLMODEL::~CELLMODEL() destroying the cell");
+  //  MESSAGE_MED("CELLMODEL::~CELLMODEL() destroying the cell");
   clean() ;
 };
 inline CELLMODEL & CELLMODEL::operator=(const CELLMODEL &m) 

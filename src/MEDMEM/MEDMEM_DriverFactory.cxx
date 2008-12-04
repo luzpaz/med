@@ -305,7 +305,7 @@ GENDRIVER * DRIVERFACTORY::buildMedDriverFromFile(const string & fileName,
       version = DRIVERFACTORY::globalMedFileVersionForWriting;
     }
 
-  MESSAGE("buildMedDriverFromFile version of the file " << version);
+  MESSAGE_MED("buildMedDriverFromFile version of the file " << version);
 
   GENDRIVER * driver;
 
@@ -352,7 +352,7 @@ GENDRIVER * DRIVERFACTORY::buildMeshDriverFromFile(const string & fileName,
       version = DRIVERFACTORY::globalMedFileVersionForWriting;
     }
 
-  MESSAGE("buildMeshDriverFromFile version of the file " << version);
+  MESSAGE_MED("buildMeshDriverFromFile version of the file " << version);
 
   GENDRIVER * driver;
 
@@ -391,7 +391,7 @@ GENDRIVER * DRIVERFACTORY::buildConcreteMedDriverForMesh(const std::string & fil
 {
   GENDRIVER * driver;
 
-  MESSAGE("buildConcreteMedDriverForMesh version of the file " << version);
+  MESSAGE_MED("buildConcreteMedDriverForMesh version of the file " << version);
 
   switch(access)
     {

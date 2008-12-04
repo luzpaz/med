@@ -134,11 +134,11 @@ public :
   ENSIGHT_FIELD_RDONLY_DRIVER():ENSIGHT_FIELD_DRIVER<T>()
   {
     const char * LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::ENSIGHT_FIELD_RDONLY_DRIVER() ";
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
     _ensightFile = new ifstream();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
   /*!
     Constructor.
@@ -148,10 +148,10 @@ public :
 				 FIELD<T,INTERLACING_TAG> * ptrField):ENSIGHT_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY)
   {
   const char* LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::ENSIGHT_FIELD_RDONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
     _ensightFile = new ifstream();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   /*!
@@ -168,25 +168,25 @@ public :
   ~ENSIGHT_FIELD_RDONLY_DRIVER()
   {
   const char* LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::~ENSIGHT_FIELD_RDONLY_DRIVER()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
     close();
 
-    SCRUTE(_ensightFile);
+    SCRUTE_MED(_ensightFile);
 
     delete _ensightFile ;
 
-    SCRUTE(_ensightFile);
+    SCRUTE_MED(_ensightFile);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void openConst() const throw (MEDEXCEPTION)
   {
     const char * LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::openConst()" ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
-    MESSAGE(LOC<<" : _fileName.c_str : "<< ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< ENSIGHT_FIELD_DRIVER<T>::_accessMode);
+    MESSAGE_MED(LOC<<" : _fileName.c_str : "<< ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< ENSIGHT_FIELD_DRIVER<T>::_accessMode);
 
     if ( ENSIGHT_FIELD_DRIVER<T>::_fileName == "" )
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -197,8 +197,8 @@ public :
     if (!(*_ensightFile).is_open())
       (*_ensightFile).open(ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str()) ; 
 
-    SCRUTE((*_ensightFile).is_open());
-    SCRUTE(_ensightFile);
+    SCRUTE_MED((*_ensightFile).is_open());
+    SCRUTE_MED(_ensightFile);
 
     if (!(*_ensightFile))
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
@@ -206,15 +206,15 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void openConstAppend() const throw (MEDEXCEPTION)
   {
     const char * LOC = "ENSIGHT_FIELD_DRIVER::openConstAppend()" ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
-    MESSAGE(LOC<<" : _fileName.c_str : "<< ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< ENSIGHT_FIELD_DRIVER<T>::_accessMode);
+    MESSAGE_MED(LOC<<" : _fileName.c_str : "<< ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< ENSIGHT_FIELD_DRIVER<T>::_accessMode);
 
     if ( ENSIGHT_FIELD_DRIVER<T>::_fileName == "" )
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -222,24 +222,24 @@ public :
 				       )
 			    );
 
-    SCRUTE((*_ensightFile).is_open());
+    SCRUTE_MED((*_ensightFile).is_open());
 
     if (!(*_ensightFile).is_open())
       {
-	MESSAGE(LOC<<"The file is already close and it is opened with the right option");
+	MESSAGE_MED(LOC<<"The file is already close and it is opened with the right option");
 	(*_ensightFile).open(ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str(), ofstream::out | ofstream::app) ; 
       }
     else
       {
-	MESSAGE(LOC<<"The file is still open, it is closed to make sure that it will be opened with the right option");
+	MESSAGE_MED(LOC<<"The file is still open, it is closed to make sure that it will be opened with the right option");
 
 	(*_ensightFile).close() ;
 
 	_ensightFile->open(ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str(), ofstream::out | ofstream::app) ; 
       }
 
-    SCRUTE((*_ensightFile).is_open());
-    SCRUTE(_ensightFile);
+    SCRUTE_MED((*_ensightFile).is_open());
+    SCRUTE_MED(_ensightFile);
 
     if (!(*_ensightFile))
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
@@ -247,7 +247,7 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void open() throw (MEDEXCEPTION)
@@ -263,24 +263,24 @@ public :
   void closeConst() const throw (MEDEXCEPTION)
   {
     const char * LOC = "ENSIGHT_FIELD_DRIVER::closeConst() " ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
-    SCRUTE(_ensightFile);
-    SCRUTE(*_ensightFile);
+    SCRUTE_MED(_ensightFile);
+    SCRUTE_MED(*_ensightFile);
 
 
     if ((*_ensightFile).is_open())
       (*_ensightFile).close();
   
-    SCRUTE(_ensightFile);
-    SCRUTE(*_ensightFile);
+    SCRUTE_MED(_ensightFile);
+    SCRUTE_MED(*_ensightFile);
 
     if (!(*_ensightFile))
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
 				       << ENSIGHT_FIELD_DRIVER<T>::_fileName)
 			    );
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void close() {
@@ -335,11 +335,11 @@ public :
   ENSIGHT_FIELD_WRONLY_DRIVER():ENSIGHT_FIELD_DRIVER<T>()
   {
     const char * LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER() ";
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
     _ensightFile = new ifstream();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
   /*!
     Constructor.
@@ -350,10 +350,10 @@ public :
     ENSIGHT_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
   const char* LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
     _ensightFile = new ifstream();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   /*!
@@ -370,25 +370,25 @@ public :
   ~ENSIGHT_FIELD_WRONLY_DRIVER()
   {
   const char* LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::~ENSIGHT_FIELD_WRONLY_DRIVER()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
     close();
 
-    SCRUTE(_ensightFile);
+    SCRUTE_MED(_ensightFile);
 
     delete _ensightFile ;
 
-    SCRUTE(_ensightFile);
+    SCRUTE_MED(_ensightFile);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void openConst() const throw (MEDEXCEPTION)
   {
     const char * LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::openConst()" ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
-    MESSAGE(LOC<<" : _fileName.c_str : "<< ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< ENSIGHT_FIELD_DRIVER<T>::_accessMode);
+    MESSAGE_MED(LOC<<" : _fileName.c_str : "<< ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< ENSIGHT_FIELD_DRIVER<T>::_accessMode);
 
     if ( ENSIGHT_FIELD_DRIVER<T>::_fileName == "" )
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -399,8 +399,8 @@ public :
     if (!(*_ensightFile).is_open())
       (*_ensightFile).open(ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str()) ; 
 
-    SCRUTE((*_ensightFile).is_open());
-    SCRUTE(_ensightFile);
+    SCRUTE_MED((*_ensightFile).is_open());
+    SCRUTE_MED(_ensightFile);
 
     if (!(*_ensightFile))
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
@@ -408,15 +408,15 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void openConstAppend() const throw (MEDEXCEPTION)
   {
     const char * LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::openConstAppend()" ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
-    MESSAGE(LOC<<" : _fileName.c_str : "<< ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< ENSIGHT_FIELD_DRIVER<T>::_accessMode);
+    MESSAGE_MED(LOC<<" : _fileName.c_str : "<< ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< ENSIGHT_FIELD_DRIVER<T>::_accessMode);
 
     if ( ENSIGHT_FIELD_DRIVER<T>::_fileName == "" )
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -424,24 +424,24 @@ public :
 				       )
 			    );
 
-    SCRUTE((*_ensightFile).is_open());
+    SCRUTE_MED((*_ensightFile).is_open());
 
     if (!(*_ensightFile).is_open())
       {
-	MESSAGE(LOC<<"The file is already close and it is opened with the right option");
+	MESSAGE_MED(LOC<<"The file is already close and it is opened with the right option");
 	(*_ensightFile).open(ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str(), ofstream::out | ofstream::app) ; 
       }
     else
       {
-	MESSAGE(LOC<<"The file is still open, it is closed to make sure that it will be opened with the right option");
+	MESSAGE_MED(LOC<<"The file is still open, it is closed to make sure that it will be opened with the right option");
 
 	(*_ensightFile).close() ;
 
 	_ensightFile->open(ENSIGHT_FIELD_DRIVER<T>::_fileName.c_str(), ofstream::out | ofstream::app) ; 
       }
 
-    SCRUTE((*_ensightFile).is_open());
-    SCRUTE(_ensightFile);
+    SCRUTE_MED((*_ensightFile).is_open());
+    SCRUTE_MED(_ensightFile);
 
     if (!(*_ensightFile))
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
@@ -449,7 +449,7 @@ public :
 			    );
 //     _ensightFile.setf(ios::scientific);	
 //     _ensightFile.precision(5);	
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void open() throw (MEDEXCEPTION)
@@ -465,24 +465,24 @@ public :
   void closeConst() const throw (MEDEXCEPTION)
   {
     const char * LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::closeConst() " ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
-    SCRUTE(_ensightFile);
-    SCRUTE(*_ensightFile);
+    SCRUTE_MED(_ensightFile);
+    SCRUTE_MED(*_ensightFile);
 
 
     if ((*_ensightFile).is_open())
       (*_ensightFile).close();
   
-    SCRUTE(_ensightFile);
-    SCRUTE(*_ensightFile);
+    SCRUTE_MED(_ensightFile);
+    SCRUTE_MED(*_ensightFile);
 
     if (!(*_ensightFile))
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
 				       << ENSIGHT_FIELD_DRIVER<T>::_fileName)
 			    );
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void close() {
@@ -702,7 +702,7 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
 {
 
   const char * LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   string mot_lu ;
   int is_node     = 0 ;
@@ -757,8 +757,8 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
   ensightCaseFile.close();
 
   MED_EN::med_type_champ type =  ENSIGHT_FIELD_DRIVER<T>::_ptrField->getValueType() ;
-  SCRUTE(name);
-  SCRUTE(type);
+  SCRUTE_MED(name);
+  SCRUTE_MED(type);
 
   if ( ENSIGHT_FIELD_DRIVER<T>::_ptrField->getSupport()->getEntity() == 0 ) is_element = 1 ;
   else if ( ENSIGHT_FIELD_DRIVER<T>::_ptrField->getSupport()->getEntity() == 3 ) is_node = 1 ;
@@ -794,7 +794,7 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
 
     {
     case MED_EN::MED_INT32 : {
-      MESSAGE("MED_INT32");
+      MESSAGE_MED("MED_INT32");
       if (NumberOfComponents==3) {
 	if (is_node)    ensightDataFile << "vector per node integer 32 mode for " << nameField << " following " << endl ;
 	if (is_element) ensightDataFile << "vector per element integer 32 mode for " << nameField << "following " << endl ;
@@ -802,7 +802,7 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
 	if (is_node)    ensightDataFile << "scalar per node integer 32 mode for " << nameField << " following " << endl ;
 	if (is_element) ensightDataFile << "scalar per element integer 32 mode for " << nameField << " following " << endl ;
       } else {
-	MESSAGE(LOC << "Could not write field "<< nameField << " there are more than 4 components !");
+	MESSAGE_MED(LOC << "Could not write field "<< nameField << " there are more than 4 components !");
 	return ;
       }
 
@@ -840,7 +840,7 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
     }
 
     case MED_EN::MED_REEL64 : {
-      MESSAGE("MED_REEL64");
+      MESSAGE_MED("MED_REEL64");
       if (NumberOfComponents==3) {
 	if (is_node)    ensightDataFile << "vector per node real 64 mode for " << nameField << " following " << endl ;
 	if (is_element) ensightDataFile << "vector per element real 64 mode for " << nameField << " following " << endl ;
@@ -848,7 +848,7 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
 	if (is_node)    ensightDataFile << "scalar per node real 64 mode for " << nameField << " following " << endl ;
 	if (is_element) ensightDataFile << "scalar per element real 64 mode for " << nameField << " following " << endl ;
       } else {
-	MESSAGE(LOC << "Could not write field "<<ENSIGHT_FIELD_DRIVER<T>::_ptrField->getName()<<" there are more than 4 components !");
+	MESSAGE_MED(LOC << "Could not write field "<<ENSIGHT_FIELD_DRIVER<T>::_ptrField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -885,7 +885,7 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::write(void) const
       break ;
     }
     default : { 
-      MESSAGE(LOC << "Could not write field "<<name<<" the type is not int or double !");
+      MESSAGE_MED(LOC << "Could not write field "<<name<<" the type is not int or double !");
     }
     }
 
@@ -897,11 +897,11 @@ template <class T> void ENSIGHT_FIELD_WRONLY_DRIVER<T>::writeAppend(void) const
   throw (MEDEXCEPTION)
 {
   const char* LOC = "ENSIGHT_FIELD_DRIVER::writeAppend(void) const ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
 // redondant avec write()
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 }//End namespace MEDMEM

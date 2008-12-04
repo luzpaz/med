@@ -90,7 +90,7 @@ Wrapper_Maille_Penta15 Penta15;Penta15.positionne(liste);cout<<"Penta15"<<endl;P
 
   try {
     
-    string flag="================[MAIN MESSAGES]================> ";
+    string flag="================[MAIN MESSAGE_MEDS]================> ";
     
     cout<<flag<<"Lecture de la structure MED               : "<<flush; 
     MED             fromMED     (MED_DRIVER,fromFileName); 
@@ -172,7 +172,7 @@ Wrapper_Maille_Penta15 Penta15;Penta15.positionne(liste);cout<<"Penta15"<<endl;P
 	}
 
   } catch (MEDEXCEPTION& ex){
-    MESSAGE(ex.what()) ;
+    MESSAGE_MED(ex.what()) ;
   }
 //*/
 }

@@ -60,7 +60,7 @@ GENDRIVER::~GENDRIVER() {}
 GENDRIVER & MEDMEM::GENDRIVER::operator=(const GENDRIVER &  genDriver) 
 {
   const char* LOC = " GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver)  : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   _fileName    = genDriver._fileName;
   _accessMode  = genDriver._accessMode;
   _status      = genDriver._status;
@@ -83,17 +83,17 @@ void GENDRIVER::writeAppend ( void ) const {};
 void GENDRIVER::setId ( int id )
 {
   const char* LOC = "void GENDRIVER::setId ( int id ) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( id >= 0 ) _id=id; else _id = MED_INVALID ;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 int GENDRIVER::getId ( void) const
 {
   const char* LOC = "int GENDRIVER::getId ( void) const ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   return _id ;
 };
@@ -101,7 +101,7 @@ int GENDRIVER::getId ( void) const
 string GENDRIVER::getFileName() const {
 
   const char* LOC = "string GENDRIVER::getFileName() const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   return _fileName;
 }
@@ -110,7 +110,7 @@ string GENDRIVER::getFileName() const {
 void GENDRIVER::setFileName(const string & fileName)
 {
   const char * LOC = "void GENDRIVER::setFileName(const string & fileName) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( _status == MED_OPENED )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<" File |" << _fileName 
@@ -118,7 +118,7 @@ void GENDRIVER::setFileName(const string & fileName)
   else
     _fileName = fileName; 
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
        
 
@@ -126,7 +126,7 @@ void GENDRIVER::setFileName(const string & fileName)
 med_mode_acces GENDRIVER::getAccessMode() const
 {
   const char* LOC = "med_mode_acces GENDRIVER::getAccessMode() const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   return _accessMode;
 }
@@ -164,7 +164,7 @@ ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
 bool MEDMEM::GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
   
 
-  MESSAGE("bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const : ");
+  MESSAGE_MED("bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const : ");
 
   return /*( _id == genDriver._id )  &&*/
     ( _driverType == genDriver._driverType ) &&

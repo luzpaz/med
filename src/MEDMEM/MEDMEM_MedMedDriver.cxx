@@ -66,7 +66,7 @@ MED_MED_DRIVER::MED_MED_DRIVER(const MED_MED_DRIVER & driver):
 
 MED_MED_DRIVER::~MED_MED_DRIVER()
 {
-  MESSAGE("MED_MED_DRIVER::~MED_MED_DRIVER() has been destroyed");
+  MESSAGE_MED("MED_MED_DRIVER::~MED_MED_DRIVER() has been destroyed");
   if (_concreteMedDrv) delete _concreteMedDrv;
   _concreteMedDrv=0;
 }
@@ -80,7 +80,7 @@ IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER():MED_MED_DRIVER(),_fileStructIsR
 IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed):
   MED_MED_DRIVER(fileName,ptrMed,MED_EN::RDONLY),_fileStructIsRead(false)
 {
-  MESSAGE("MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed) Constructeur read only");
+  MESSAGE_MED("MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER(const string & fileName,  MED * const ptrMed) Constructeur read only");
 }
 
 IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER(const IMED_MED_RDONLY_DRIVER & driver):
@@ -90,7 +90,7 @@ IMED_MED_RDONLY_DRIVER::IMED_MED_RDONLY_DRIVER(const IMED_MED_RDONLY_DRIVER & dr
 
 IMED_MED_RDONLY_DRIVER::~IMED_MED_RDONLY_DRIVER()
 {
-  MESSAGE("MED_MED_RDONLY_DRIVER::~MED_MED_RDONLY_DRIVER() has been destroyed");
+  MESSAGE_MED("MED_MED_RDONLY_DRIVER::~MED_MED_RDONLY_DRIVER() has been destroyed");
 } 
 
 void IMED_MED_RDONLY_DRIVER::write(void) const
@@ -121,7 +121,7 @@ IMED_MED_WRONLY_DRIVER::IMED_MED_WRONLY_DRIVER(const IMED_MED_WRONLY_DRIVER & dr
 
 IMED_MED_WRONLY_DRIVER::~IMED_MED_WRONLY_DRIVER()
 {
-  MESSAGE("MED_MED_WRONLY_DRIVER::~MED_MED_WRONLY_DRIVER() has been destroyed");
+  MESSAGE_MED("MED_MED_WRONLY_DRIVER::~MED_MED_WRONLY_DRIVER() has been destroyed");
 } 
 
 void IMED_MED_WRONLY_DRIVER::read(void)
@@ -150,12 +150,12 @@ IMED_MED_RDWR_DRIVER::IMED_MED_RDWR_DRIVER(const IMED_MED_RDWR_DRIVER & driver):
 {}
 
 IMED_MED_RDWR_DRIVER::~IMED_MED_RDWR_DRIVER() { 
-  MESSAGE("MED_MED_RDWR_DRIVER::~MED_MED_RDWR_DRIVER() has been destroyed");
+  MESSAGE_MED("MED_MED_RDWR_DRIVER::~MED_MED_RDWR_DRIVER() has been destroyed");
 }
 
 MED_MED_RDONLY_DRIVER::MED_MED_RDONLY_DRIVER()
 {
-  MESSAGE("You are using the default constructor of the Med read only Driver and it is 2.1 one");
+  MESSAGE_MED("You are using the default constructor of the Med read only Driver and it is 2.1 one");
   _concreteMedDrv = new MED_MED_RDONLY_DRIVER21();
 }
 
@@ -208,7 +208,7 @@ GENDRIVER * MED_MED_RDONLY_DRIVER::copy ( void ) const
 
 MED_MED_WRONLY_DRIVER::MED_MED_WRONLY_DRIVER()
 {
-  MESSAGE("You are using the default constructor of the Med write only Driver and it is 2.1 one");
+  MESSAGE_MED("You are using the default constructor of the Med write only Driver and it is 2.1 one");
 
   _concreteMedDrv = new MED_MED_WRONLY_DRIVER21();
 }
@@ -263,7 +263,7 @@ GENDRIVER * MED_MED_WRONLY_DRIVER::copy ( void ) const
 
 MED_MED_RDWR_DRIVER::MED_MED_RDWR_DRIVER()
 {
-  MESSAGE("You are using the default constructor of the Med read write Driver and it is 2.1 one");
+  MESSAGE_MED("You are using the default constructor of the Med read write Driver and it is 2.1 one");
   _concreteMedDrv = new MED_MED_RDWR_DRIVER21();
 }
 

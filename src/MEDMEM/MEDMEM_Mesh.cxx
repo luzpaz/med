@@ -100,11 +100,11 @@ int MESH::addDriver(driverTypes driverType,
 		    MED_EN::med_mode_acces access)
 {
   const char* LOC = "MESH::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Mesh Name\",MED_EN::med_mode_acces access) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   GENDRIVER * driver;
 
-  SCRUTE(driverType);
+  SCRUTE_MED(driverType);
 
   driver = DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,
 					     driverName,access) ;
@@ -115,7 +115,7 @@ int MESH::addDriver(driverTypes driverType,
 
   _drivers[current]->setMeshName(driverName);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return current;
 }
@@ -124,7 +124,7 @@ int MESH::addDriver(driverTypes driverType,
 int  MESH::addDriver(GENDRIVER & driver)
 {
   const char* LOC = "MESH::addDriver(GENDRIVER &) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // A faire : Vérifier que le driver est de type MESH.
   GENDRIVER * newDriver = driver.copy() ;
@@ -132,18 +132,18 @@ int  MESH::addDriver(GENDRIVER & driver)
   _drivers.push_back(newDriver);
   return _drivers.size()-1;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 /*! Remove an existing MESH driver. */
 void MESH::rmDriver (int index/*=0*/) {
   const char * LOC = "MESH::rmDriver (int index=0): ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (index >= 0 && index < _drivers.size() && _drivers[index]) {
     delete _drivers[index];
     _drivers[index] = 0;
-     MESSAGE ("detruire");
+     MESSAGE_MED ("detruire");
   }
   else
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
@@ -152,7 +152,7 @@ void MESH::rmDriver (int index/*=0*/) {
                                      )
                           );
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
@@ -163,7 +163,7 @@ void MESH::init()
 {
 
   const char* LOC = "MESH::init(): ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   _name = "NOT DEFINED"; // A POSITIONNER EN FCT DES IOS ?
 
@@ -178,7 +178,7 @@ void MESH::init()
 
   _arePresentOptionnalNodesNumbers = 0;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 /*! Create an empty MESH. */
@@ -280,7 +280,7 @@ MESH::MESH(MESH &m)
 
 MESH::~MESH() {
 
-  MESSAGE("MESH::~MESH() : Destroying the Mesh");
+  MESSAGE_MED("MESH::~MESH() : Destroying the Mesh");
   if (_coordinate != ((COORDINATE *) NULL)) delete _coordinate ;
   if (_connectivity != ((CONNECTIVITY *) NULL)) delete _connectivity ;
   int size ;
@@ -314,11 +314,11 @@ MESH::~MESH() {
     if((*it).second != NULL)
       delete (*it).second;
 
-  MESSAGE("In this object MESH there is(are) " << _drivers.size() << " driver(s)");
+  MESSAGE_MED("In this object MESH there is(are) " << _drivers.size() << " driver(s)");
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     {
-      SCRUTE(_drivers[index]);
+      SCRUTE_MED(_drivers[index]);
       if ( _drivers[index] != NULL) delete _drivers[index];
     }
 
@@ -387,9 +387,9 @@ bool MESH::existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
 MESH & MESH::operator=(const MESH &m)
 {
   const char* LOC = "MESH & MESH::operator=(const MESH &m) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
-  MESSAGE(PREFIX <<"Not yet implemented, operating on the object " << m);
+  MESSAGE_MED(PREFIX_MED <<"Not yet implemented, operating on the object " << m);
   //  A FAIRE.........
 
   // ATTENTION CET OPERATEUR DE RECOPIE EST DANGEREUX POUR LES
@@ -422,7 +422,7 @@ MESH & MESH::operator=(const MESH &m)
 //        reverse_nodal_connectivity = m.reverse_nodal_connectivity;
 //        reverse_nodal_connectivity_index = m.reverse_nodal_connectivity_index ;
 //      }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return *this;
 }
@@ -430,7 +430,7 @@ MESH & MESH::operator=(const MESH &m)
 bool MESH::operator==(const MESH& other) const
 {
   const char* LOC = "MESH::operator==";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   return this==&other;
 }
 
@@ -446,7 +446,7 @@ The constructor will throw an exception if the file does not exist, has no readi
 MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::MESH(driverTypes driverType, const string &  fileName="", const string &  driverName/="") : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   int current;
 
@@ -458,7 +458,7 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
   _drivers[current]->read();
   _drivers[current]->close();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 /*!\if MEDMEM_ug 
   @}
@@ -616,7 +616,7 @@ int MESH::getElementNumber(MED_EN::medConnectivity ConnectivityType,
 													 int * connectivity) const
 {
   const char* LOC="MESH::getElementNumber " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   int numberOfValue ; // size of connectivity array
   CELLMODEL myType(Type) ;
@@ -664,7 +664,7 @@ int MESH::getElementNumber(MED_EN::medConnectivity ConnectivityType,
   if (cellsList.size()==0)
     return -1;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return cellsList.front() ;
 }
@@ -692,7 +692,7 @@ SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getBoundaryElements : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
   // some test :
   // actually we could only get face (in 3D) and edge (in 2D)
   medEntityMesh entityToParse=Entity;
@@ -736,7 +736,7 @@ SUPPORT * MESH::getSupportOnAll(medEntityMesh entity)
   throw(MEDEXCEPTION)
 {
   const char * LOC = "MESH::getSupportOnAll : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
   if(entity == MED_ALL_ENTITIES)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined on entity MED_ALL_ENTITIES !"));
 
@@ -804,10 +804,10 @@ SUPPORT *MESH::buildSupportOnNodeFromElementList(const list<int>& listOfElt,MED_
 SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION)
 {
   const char* LOC = "MESH::buildSupportOnElementsFromElementList : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   SUPPORT *mySupport=new SUPPORT((MESH *)this,"Boundary",entity);
   mySupport->fillFromElementList(listOfElt);
-  END_OF(LOC);
+  END_OF_MED(LOC);
   return mySupport ;
 }
 
@@ -821,7 +821,7 @@ a FIELD structure based on this support. It only works on MED_CELL for 3D meshes
 FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getVolume(SUPPORT*) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Support must be on 3D elements
 
@@ -1054,7 +1054,7 @@ for 3D meshes.
 FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getArea(SUPPORT*) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Support must be on 2D elements
 
@@ -1220,7 +1220,7 @@ a FIELD structure based on this support. It only works on MED_EDGE supports.
 FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getLength(SUPPORT*) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Support must be on 1D elements
 
@@ -1332,7 +1332,7 @@ The direction of the vector is undetermined.
 FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getNormal(SUPPORT*) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Support must be on 2D or 1D elements
 
@@ -1515,7 +1515,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
       if (!onAll && type!=MED_EN::MED_POLYGON)
 	delete [] global_connectivity ;
     }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return Normal;
 }
@@ -1823,7 +1823,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 	if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
 	  delete [] global_connectivity;
     }
-  //END_OF();
+  //END_OF_MED();
   return Barycenter;
 }
 /*!  
@@ -1845,7 +1845,7 @@ bool MESH::isEmpty() const
 void MESH::read(int index)
 {
   const char * LOC = "MESH::read(int index=0) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_drivers[index]) {
     _drivers[index]->open();
@@ -1858,7 +1858,7 @@ void MESH::read(int index)
                                      << _drivers.size()
                                      )
                           );
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 /*!
@@ -1879,7 +1879,7 @@ mesh.write(driver_handle);
 void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
 {
   const char * LOC = "MESH::write(int index=0, const string & driverName = \"\") : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( _drivers[index] ) {
     _drivers[index]->open();
@@ -1893,7 +1893,7 @@ void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
                                      << _drivers.size()
                                      )
                           );
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 /*!
 @}
@@ -1913,7 +1913,7 @@ support.
 SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getSkin : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
   // some test :
   if (this != Support3D->getMesh())
     throw MEDEXCEPTION(STRING(LOC) <<  "no compatibility between *this and SUPPORT::_mesh !");
@@ -1961,7 +1961,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
       for (j = faceFirst; j < faceLast; ++j)
       {
         int faceNb = abs( myConnectivityValue [ j-1 ] );
-        //MESSAGE( "Cell # " << i << " -- Face: " << faceNb);
+        //MESSAGE_MED( "Cell # " << i << " -- Face: " << faceNb);
         if (FaceNbEncounterNb.find( faceNb ) == FaceNbEncounterNb.end())
           FaceNbEncounterNb[ faceNb ] = 1;
         else
@@ -2051,7 +2051,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   delete[] myListArray;
 //   delete mySkyLineArray;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   return mySupport ;
 
 }
@@ -2063,7 +2063,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH:::mergeSupports(const vector<SUPPORT *> ) : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   SUPPORT * returnedSupport;
   string returnedSupportName;
@@ -2078,7 +2078,7 @@ SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPT
     
   if (size == 1)
     {
-      MESSAGE(LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
+      MESSAGE_MED(LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
       SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
 
       returnedSupport = new SUPPORT(*obj);
@@ -2175,7 +2175,7 @@ SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPT
       delete [] returnedSupportDescriptionChar;
     }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   return returnedSupport;
 }
 
@@ -2187,7 +2187,7 @@ SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPT
 SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
 {
   const char* LOC = "MESH:::intersectSupports(const vector<SUPPORT *> ) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   SUPPORT * returnedSupport;
   string returnedSupportName;
@@ -2198,7 +2198,7 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEX
 
   if (size == 1)
     {
-      MESSAGE(PREFIX <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
+      MESSAGE_MED(PREFIX_MED <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
       SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
 
       returnedSupport = new SUPPORT(*obj);
@@ -2309,7 +2309,7 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEX
 	}
     }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   return returnedSupport;
 }
 /*!
@@ -2499,8 +2499,8 @@ void MESH::createFamilies()
 	const int * index=getGlobalNumberingIndex(entity);
 	const medGeometryElement* geometricTypes=_connectivity->getGeometricTypes(entity); // pb avec entity=MED_NODE???
 	med_int numberOfCells=index[numberOfTypes]-1;  // total number of cells for that entity
-	SCRUTE(numberOfTypes);
-	SCRUTE(numberOfCells);
+	SCRUTE_MED(numberOfTypes);
+	SCRUTE_MED(numberOfCells);
 	vector< _cell > tab_cell(numberOfCells);
 	for(med_int t=0; t!=numberOfTypes; ++t)
 	    for(int n=index[t]-1; n!=index[t+1]-1; ++n)
@@ -2647,7 +2647,7 @@ void MESH::createFamilies()
 
 	    int sizeOfFamVect = myFamilies->size();
 
-	    MESSAGE("  MESH::createFamilies() entity " << entity << " size " << sizeOfFamVect);
+	    MESSAGE_MED("  MESH::createFamilies() entity " << entity << " size " << sizeOfFamVect);
 
 	    myFamilies->push_back(newFam);
 	}

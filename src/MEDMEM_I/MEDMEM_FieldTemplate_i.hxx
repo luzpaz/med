@@ -30,6 +30,7 @@
 #include "MultiCommException.hxx"
 #include "MEDMEM_ArrayConvert.hxx"
 #include "MEDMEM_TraitsForFields.hxx"
+#include "utilities.h"
 
 namespace MEDMEM
 {

@@ -34,18 +34,18 @@ namespace med_2_3 {
       fflush(stderr) ;							\
     }
 
-# define ISCRUTE(entier)        {					\
+# define ISCRUTE_MED(entier)        {					\
       ICI ;								\
       fprintf(stderr,"%s = %d\n",#entier,entier) ;			\
       fflush(stderr) ;							\
     }
 
-# define SSCRUTE(chaine)        {					\
+# define SSCRUTE_MED(chaine)        {					\
       ICI ;								\
       fprintf(stderr,"%s = \"%s\"\n",#chaine,chaine) ;			\
       fflush(stderr) ;							\
     }
-# define MESSAGE(chaine)        {					\
+# define MESSAGE_MED(chaine)        {					\
       ICI ;								\
       fprintf(stderr,"%s\n",chaine) ;					\
       fflush(stderr) ;							\
@@ -203,14 +203,14 @@ namespace med_2_3 {
 
       /* Lire le nbre des points de GAUSS*/
       if (_MEDattrEntierLire(datagroup3,MED_NOM_NGA,&ngauss) < 0) {
-	MESSAGE("Erreur à la lecture de l'attribut MED_NOM_NGA : ");
-	ISCRUTE(ngauss);goto ERROR;
+	MESSAGE_MED("Erreur à la lecture de l'attribut MED_NOM_NGA : ");
+	ISCRUTE_MED(ngauss);goto ERROR;
       };
 
       /* Lire l'identificateur de localisation des points de GAUSS*/
       if ( _MEDattrStringLire(datagroup3,MED_NOM_GAU,MED_TAILLE_NOM,locname) < 0) {
-	MESSAGE("Erreur à la lecture de l'attribut MED_NOM_GAU : ");
-	SSCRUTE(locname); goto ERROR;
+	MESSAGE_MED("Erreur à la lecture de l'attribut MED_NOM_GAU : ");
+	SSCRUTE_MED(locname); goto ERROR;
       }
 
       /*
@@ -269,32 +269,32 @@ namespace med_2_3 {
       if ( pfluse ) { free(pfltab); free(pfltabtmp);}
 
       if (datagroup3>0)     if (_MEDdatagroupFermer(datagroup3) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(datagroup3); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(datagroup3); ret = -1;
       }
 
       if (datagroup2>0)     if (_MEDdatagroupFermer(datagroup2) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(datagroup2); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(datagroup2); ret = -1;
       }
 
       if (datagroup1>0)     if (_MEDdatagroupFermer(datagroup1) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(datagroup1); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(datagroup1); ret = -1;
       }
 
       if (gid>0)     if (_MEDdatagroupFermer(gid) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(gid); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(gid); ret = -1;
       }
 
       return ret;
     }
 
 
-#undef MESSAGE
-#undef SSCRUTE
-#undef ISCRUTE
+#undef MESSAGE_MED
+#undef SSCRUTE_MED
+#undef ISCRUTE_MED
 
   }
 }

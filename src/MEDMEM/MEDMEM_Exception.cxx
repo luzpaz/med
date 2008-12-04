@@ -44,11 +44,11 @@ extern "C"
 char* duplicate( const char *const str ) ;
 char* duplicate( const char *const str )
 {
-	ASSERT(str!=NULL) ;
+	ASSERT_MED(str!=NULL) ;
 	const size_t length = strlen( str ) ;
-	ASSERT(length>0) ;
+	ASSERT_MED(length>0) ;
 	char *new_str = new char[ 1+length ] ;
-	ASSERT(new_str) ;
+	ASSERT_MED(new_str) ;
 	strcpy( new_str , str ) ;
 	return new_str ;
 }
@@ -60,8 +60,8 @@ char* duplicate( const char *const str )
 MEDEXCEPTION::MEDEXCEPTION( void ): exception() , _text(0)
 // ------------------------------------------------------ //
 {
-  MESSAGE( "You must user the standard builder : MEDEXCEPTION::MEDEXCEPTION( const char *text )" ) ;
-  INTERRUPTION(1) ;
+  MESSAGE_MED( "You must user the standard builder : MEDEXCEPTION::MEDEXCEPTION( const char *text )" ) ;
+  INTERRUPTION_MED(1) ;
 }
 
 
@@ -75,7 +75,7 @@ char *makeText( const char *text, const char *fileName, const unsigned int lineN
 {
   char *newText = 0 ;
 
-  ASSERT(text) ;
+  ASSERT_MED(text) ;
   const size_t l1 = strlen(text) ;
 
   const char* prefix = "MED Exception" ;
@@ -85,13 +85,13 @@ char *makeText( const char *text, const char *fileName, const unsigned int lineN
   {
       const size_t l2 = strlen(fileName) ;
 
-      ASSERT(lineNumber>=1) ;
+      ASSERT_MED(lineNumber>=1) ;
       const size_t l3 = 1+int(log10(float(lineNumber))) ;
 	
       const size_t l4 =  l0+l1+l2+l3+10+1 ;
       newText = new char [ l4 ] ;
       sprintf( newText , "%s in %s [%u] : %s" , prefix, fileName, lineNumber, text ) ;
-      ASSERT(newText[l4-1] == '\0' );
+      ASSERT_MED(newText[l4-1] == '\0' );
 
   }
   else
@@ -99,7 +99,7 @@ char *makeText( const char *text, const char *fileName, const unsigned int lineN
       newText = new char [ l0+l1+3+1 ] ;
       sprintf( newText , "%s : %s" , prefix, text ) ;
    }
-  ASSERT(newText) ;
+  ASSERT_MED(newText) ;
   return newText ;
 }
 
@@ -114,7 +114,7 @@ MEDEXCEPTION::MEDEXCEPTION( const char *text, const char *fileName, const unsign
 	      exception(), _text( makeText( text , fileName , lineNumber ) )
 // ------------------------------------------------------------------------------------------------ //
 {
-  MESSAGE(_text);
+  MESSAGE_MED(_text);
 }
 
 /*!
@@ -131,7 +131,7 @@ MEDEXCEPTION::~MEDEXCEPTION() throw ()
       delete [] _text ;
       _text = 0 ;
     }
-  ASSERT(_text==NULL) ;
+  ASSERT_MED(_text==NULL) ;
 }
 
 

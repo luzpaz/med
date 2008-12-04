@@ -98,7 +98,7 @@ template <int DIMENSION> void INTERPOLATION<DIMENSION>::init()
 {
 
   const char* LOC = "INTERPOLATION::init(): ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   _fromField   = ( FIELD<double> * )           NULL;
   _toField     = ( FIELD<double> * )           NULL;
   _fromMesh    = ( MESH * )                    NULL;
@@ -108,14 +108,14 @@ template <int DIMENSION> void INTERPOLATION<DIMENSION>::init()
   _mapping     = ( Meta_Mapping<DIMENSION> * ) NULL;
   _iType            = MED_UNDEFINED ;
   _isConvexFromMesh = MED_UNDEFINED ;
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 
 template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fromMesh ) {
 
   const char * LOC = "INTERPOLATION::INTERPOLATION(MESH * fromMesh ) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   init();	
   
@@ -133,13 +133,13 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
 
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
 					        
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }; 
 
 template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fromMesh,const MESH & toMesh ) {
 
   const char * LOC = "INTERPOLATION::INTERPOLATION(MESH * fromMesh,,const MESH & toMesh) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   init();	
   
@@ -166,13 +166,13 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
 
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
 					        
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const FIELD<double> & fromField,const MESH & toMesh) {
 
   const char * LOC = "INTERPOLATION(const FIELD<double> & field,const MESH & toMesh) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   init();
 
@@ -201,7 +201,7 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const FIELD<dou
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
   
 					  
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 template <int DIMENSION> INTERPOLATION<DIMENSION>::~INTERPOLATION()
@@ -215,13 +215,13 @@ template <int DIMENSION> int INTERPOLATION<DIMENSION>::getNearestNode(  double *
   
   const char * LOC = "INTERPOLATION::getNearestNode( double * node ) ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   if ( ! _mapping ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"mapping is a NULL pointer  !")) ;
   
   return _mapping->Donne_dTree()->trouve_plus_proche_point(Wrapper_Noeud<DIMENSION > (node) );
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
@@ -229,7 +229,7 @@ template <int DIMENSION> int INTERPOLATION<DIMENSION>::getContainingCell ( doubl
   
   const char * LOC = "INTERPOLATION::getContainingCell( double * node ) ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   if ( ! _mapping ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"mapping is a NULL pointer  !")) ;
 
@@ -239,7 +239,7 @@ template <int DIMENSION> int INTERPOLATION<DIMENSION>::getContainingCell ( doubl
 
   return _mapping->Trouve_Maille_Contenant_Noeud(node,beginingCell,flagIsConvexMesh);
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
@@ -247,7 +247,7 @@ template <int DIMENSION> vector<int> INTERPOLATION<DIMENSION>::getMapping ( int 
   
   const char * LOC = "INTERPOLATION::getMapping( ) ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( ! _mapping   ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"mapping is a NULL pointer  !")) ;
   if ( ! _toWrapper ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"toWrapper  is a NULL pointer  !")) ;
@@ -258,7 +258,7 @@ template <int DIMENSION> vector<int> INTERPOLATION<DIMENSION>::getMapping ( int 
 
   return _mapping->Get_Mapping();
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
@@ -266,7 +266,7 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolate(i
   
   const char * LOC = "INTERPOLATION::interpolate(int itype,int flagIsConvexFromMesh) ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( ! _mapping      ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"mapping is a NULL pointer  !")) ;
   if ( ! _toWrapper    ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"toWrapper  is a NULL pointer  !")) ;
@@ -334,7 +334,7 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolate(i
 
   return _toField;
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
@@ -342,7 +342,7 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolateNe
   
   const char * LOC = "INTERPOLATION::interpolateNextStep(int itype,int flagIsConvexFromMesh) ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( ! _mapping      ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"mapping is a NULL pointer  !"        ));
   if ( ! _toWrapper    ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"toWrapper  is a NULL pointer  !"     )) ;

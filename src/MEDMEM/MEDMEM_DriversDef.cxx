@@ -53,9 +53,9 @@ GEO_NAME::GEO_NAME() : map<int,string>()
  
 GEO_NAME::~GEO_NAME()
 {
-//   MESSAGE(" destructor GEO_NAME::~GEO_NAME() "<< size() );
+//   MESSAGE_MED(" destructor GEO_NAME::~GEO_NAME() "<< size() );
 //   clear();
-//   MESSAGE(" end of destructor GEO_NAME::~GEO_NAME() "<< size() );
+//   MESSAGE_MED(" end of destructor GEO_NAME::~GEO_NAME() "<< size() );
 }
  
 string & GEO_NAME::operator[]( const MED_EN::medGeometryElement &c ) const
@@ -80,9 +80,9 @@ ENT_NAME::ENT_NAME() : map<int,string>()
 
 ENT_NAME::~ENT_NAME()
 {
-//   MESSAGE(" destructor ENT_NAME::~ENT_NAME() "<< size() );
+//   MESSAGE_MED(" destructor ENT_NAME::~ENT_NAME() "<< size() );
 //   clear();
-//   MESSAGE(" end of destructor ENT_NAME::~ENT_NAME() "<< size() );
+//   MESSAGE_MED(" end of destructor ENT_NAME::~ENT_NAME() "<< size() );
 }
 
 string & ENT_NAME::operator[]( const MED_EN::medEntityMesh &c ) const
@@ -154,9 +154,9 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
 
 MESH_ENTITIES::~MESH_ENTITIES()
 {
-//   MESSAGE(" destructor MESH_ENTITIES::~MESH_ENTITIES() "<< size() );
+//   MESSAGE_MED(" destructor MESH_ENTITIES::~MESH_ENTITIES() "<< size() );
 //   clear();
-//   MESSAGE(" end of destructor MESH_ENTITIES::~MESH_ENTITIES() "<< size() );
+//   MESSAGE_MED(" end of destructor MESH_ENTITIES::~MESH_ENTITIES() "<< size() );
 }
 
 const list<MED_EN::medGeometryElement> & MESH_ENTITIES::operator[]( const  MED_EN::medEntityMesh &c ) const

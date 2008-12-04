@@ -46,7 +46,7 @@ main () {
 
   try {
     
-    string flag="================[MAIN MESSAGES]================> ";
+    string flag="================[MAIN MESSAGE_MEDS]================> ";
     
     cout<<flag<<"Lecture de la structure MED               : "<<flush; MED             fromMED     (MED_DRIVER,fromFileName)                                   ; cout<<"OK !"<<endl;
     
@@ -72,6 +72,6 @@ main () {
 //    cout<<flag<<"Ecriture du Mesh résultat                 : "<<flush; toMesh.write(1)                                                                         ; cout<<"OK !"<<endl;
 
   } catch (MEDEXCEPTION& ex){
-    MESSAGE(ex.what()) ;
+    MESSAGE_MED(ex.what()) ;
   }
 }

@@ -569,7 +569,7 @@ void ENSIGHT_FIELD_DRIVER::setFieldName(const string & fieldName) throw (MEDEXCE
 void ENSIGHT_FIELD_DRIVER::openConst(bool checkDataFile) const throw (MEDEXCEPTION)
 {
   const char * LOC ="ENSIGHT_FIELD_DRIVER::open() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( checkDataFile )
   {
@@ -598,7 +598,7 @@ void ENSIGHT_FIELD_DRIVER::openConst(bool checkDataFile) const throw (MEDEXCEPTI
                      << " in access mode " << getAccessMode()));
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 // ==========================================================================================
 //function : ENSIGHT_FIELD_RDONLY_DRIVER
@@ -673,7 +673,7 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read (void)
   throw (MEDEXCEPTION)
 {
   const char * LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::read() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   openConst(false); // check if can read case file
 
@@ -1361,7 +1361,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
   throw (MEDEXCEPTION)
 {
   const char * LOC = "ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   openConst(false) ; // check if can write to case file
 

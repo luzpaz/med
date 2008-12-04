@@ -72,7 +72,7 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
 {
   
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::read()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
     //ditributed meshes
     vector<int*> cellglobal;
@@ -83,7 +83,7 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
 
   // reading ascii master file
   try{
-    MESSAGE("Start reading");
+    MESSAGE_MED("Start reading");
     ifstream asciiinput(filename);
     
     if (!asciiinput)     
@@ -137,7 +137,7 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
       
   
       }//loop on domains
-    MESSAGE("end of read");
+    MESSAGE_MED("end of read");
   }//of try
   catch(...)
     {
@@ -157,7 +157,7 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
       if (faceglobal[i]!=0) delete[] faceglobal[i];
     }
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
     return 0;
 }
 
@@ -171,7 +171,7 @@ void MESHCollectionMedAsciiDriver::write(char* filename)
 {
 	
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::write()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
  
     ofstream file(filename);
 
@@ -194,11 +194,11 @@ void MESHCollectionMedAsciiDriver::write(char* filename)
 
       m_filename[idomain]=string(distfilename);
 		
-      MESSAGE("File name "<<string(distfilename));
+      MESSAGE_MED("File name "<<string(distfilename));
 		
       int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
 		
-      MESSAGE("Start writing");
+      MESSAGE_MED("Start writing");
       (m_collection->getMesh())[idomain]->write(id);
 		
       //updating the ascii description file
@@ -207,6 +207,6 @@ void MESHCollectionMedAsciiDriver::write(char* filename)
       writeSubdomain(idomain, nbdomains, distfilename);
     }
 	
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 }

@@ -350,14 +350,14 @@ inline MED_EN::medEntityMesh CONNECTIVITY::getEntity() const
 inline int CONNECTIVITY::getNumberOfTypes(MED_EN::medEntityMesh Entity) const
 //-----------------------------------------------------------------------//
 {
-  MESSAGE("CONNECTIVITY::getNumberOfTypes : Entity = "<<Entity<<", _entity = "<<_entity);
+  MESSAGE_MED("CONNECTIVITY::getNumberOfTypes : Entity = "<<Entity<<", _entity = "<<_entity);
   if (_entity==Entity)
     return _numberOfTypes;
   else if (_constituent!=NULL)
     return _constituent->getNumberOfTypes(Entity);
   else if (_constituent == NULL)
     {
-      MESSAGE("CONNECTIVITY::getNumberOfTypes : _constituent == NULL");
+      MESSAGE_MED("CONNECTIVITY::getNumberOfTypes : _constituent == NULL");
       try
 	{
 	  (const_cast <CONNECTIVITY *> (this))->calculateDescendingConnectivity();
@@ -367,7 +367,7 @@ inline int CONNECTIVITY::getNumberOfTypes(MED_EN::medEntityMesh Entity) const
 	  return 0 ;
 	}
 
-      SCRUTE(_entityDimension);
+      SCRUTE_MED(_entityDimension);
 
       if (_entityDimension != 2 && _entityDimension != 3) return 0;
 
@@ -454,7 +454,7 @@ inline bool CONNECTIVITY::existPolygonsConnectivity(MED_EN::medConnectivity Conn
 {
   if (_entity == Entity)
     {
-      MESSAGE("existPolygonsConnectivity : _entity == Entity = "<<Entity);
+      MESSAGE_MED("existPolygonsConnectivity : _entity == Entity = "<<Entity);
       if (ConnectivityType == MED_EN::MED_NODAL && _polygonsNodal != (MEDSKYLINEARRAY*) NULL)
 	return true;
       if (ConnectivityType == MED_EN::MED_DESCENDING && _polygonsDescending != (MEDSKYLINEARRAY*) NULL)
@@ -473,7 +473,7 @@ inline bool CONNECTIVITY::existPolyhedronConnectivity(MED_EN::medConnectivity Co
 {
   if (_entity == Entity)
     {
-      MESSAGE("existPolyhedronConnectivity : _entity == Entity = "<<Entity);
+      MESSAGE_MED("existPolyhedronConnectivity : _entity == Entity = "<<Entity);
       if (ConnectivityType == MED_EN::MED_NODAL && _polyhedronNodal != (POLYHEDRONARRAY*) NULL)
 	return true;
       if (ConnectivityType == MED_EN::MED_DESCENDING && _polyhedronDescending != (MEDSKYLINEARRAY*) NULL)

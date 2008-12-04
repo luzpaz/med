@@ -69,7 +69,7 @@ int main (int argc, char ** argv)
   MED_EN::medModeSwitch ModeFull=MED_EN::MED_FULL_INTERLACE;
   MED_EN::medModeSwitch ModeNo=MED_EN::MED_NO_INTERLACE;
   double coor[15] = {0,0,0,0,0,1,0,1,0,1,0,0,0.5,0.5,0.5} ;
-  ASSERT(SpaceDim*NbOfNodes == 15);
+  ASSERT_MED(SpaceDim*NbOfNodes == 15);
 
 
   cout << "      - mode : MED_FULL_INTERLACE"  << endl;
@@ -91,7 +91,7 @@ int main (int argc, char ** argv)
         cout << "-------------------------------" << endl;
 	cout << "pb avec setCoordinates" << endl;
         cout << "-------------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -120,7 +120,7 @@ int main (int argc, char ** argv)
         cout << "-------------------------------" << endl;
 	cout << "pb avec setCoordinatesNames" << endl;
         cout << "-------------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -140,7 +140,7 @@ int main (int argc, char ** argv)
         cout << "-------------------------------" << endl;
 	cout << "pb avec setCoordinatesUnits" << endl;
         cout << "-------------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -160,7 +160,7 @@ int main (int argc, char ** argv)
         cout << "-------------------------------" << endl;
 	cout << "pb avec setCoordinatesSystem" << endl;
         cout << "-------------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -180,7 +180,7 @@ int main (int argc, char ** argv)
         cout << "-------------------------------" << endl;
 	cout << "pb avec setNodesNumbers" << endl;
         cout << "-------------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -213,7 +213,7 @@ int main (int argc, char ** argv)
         cout << "-------------------------------" << endl;
 	cout << "pb avec getCoordinatesSystem" << endl;
         cout << "-------------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -241,7 +241,7 @@ int main (int argc, char ** argv)
         		cout << "-------------------------" << endl;
 			cout << "pb avec getCoordinateUnit" << endl;
         		cout << "-------------------------" << endl;
-        		MESSAGE( "catched exception : " << e.what() ) ;
+        		MESSAGE_MED( "catched exception : " << e.what() ) ;
         		return EXIT_FAILURE ;
   		}
   		catch (...)
@@ -258,7 +258,7 @@ int main (int argc, char ** argv)
         cout << "---------------------------" << endl;
 	cout << "pb avec getCoordinatesUnits" << endl;
         cout << "---------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -286,7 +286,7 @@ int main (int argc, char ** argv)
         		cout << "-------------------------" << endl;
 			cout << "pb avec getCoordinateName" << endl;
         		cout << "-------------------------" << endl;
-        		MESSAGE( "catched exception : " << e.what() ) ;
+        		MESSAGE_MED( "catched exception : " << e.what() ) ;
         		return EXIT_FAILURE ;
   		}
   		catch (...)
@@ -303,7 +303,7 @@ int main (int argc, char ** argv)
         cout << "---------------------------" << endl;
 	cout << "pb avec getCoordinatesNames" << endl;
         cout << "---------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -334,16 +334,16 @@ int main (int argc, char ** argv)
 				{
 					const double d = mycoo.getCoordinate(num + 1,axe+1);
 					cout << d <<" , ";
-					ASSERT(fabs(d - coor3[num])  < pouieme);
-       	         			ASSERT(fabs(d - coor2[(num * SpaceDim)+axe]) < pouieme);
-                			ASSERT(fabs(d - coor [(num * SpaceDim)+axe]) < pouieme);
+					ASSERT_MED(fabs(d - coor3[num])  < pouieme);
+       	         			ASSERT_MED(fabs(d - coor2[(num * SpaceDim)+axe]) < pouieme);
+                			ASSERT_MED(fabs(d - coor [(num * SpaceDim)+axe]) < pouieme);
 				}
   				catch ( const std::exception &e )
   				{
         				cout << "----------------------" << endl;
 					cout << "pb avec getCoordinates" << endl;
         				cout << "----------------------" << endl;
-        				MESSAGE( "catched exception : " << e.what() ) ;
+        				MESSAGE_MED( "catched exception : " << e.what() ) ;
         				return EXIT_FAILURE ;
   				}
   				catch (...)
@@ -361,7 +361,7 @@ int main (int argc, char ** argv)
         		cout << "-------------------------" << endl;
 			cout << "pb avec getCoordinateAxis" << endl;
         		cout << "-------------------------" << endl;
-        		MESSAGE( "catched exception : " << e.what() ) ;
+        		MESSAGE_MED( "catched exception : " << e.what() ) ;
         		return EXIT_FAILURE ;
   		}
   		catch (...)
@@ -378,7 +378,7 @@ int main (int argc, char ** argv)
         cout << "----------------------" << endl;
 	cout << "pb avec getCoordinates" << endl;
         cout << "----------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -396,7 +396,7 @@ int main (int argc, char ** argv)
 
   delete CoordinateArray ;
 
-  MESSAGE("FIN normale du traitement");
+  MESSAGE_MED("FIN normale du traitement");
   return EXIT_SUCCESS ;
 }
 

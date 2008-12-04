@@ -153,10 +153,6 @@ libmedmem_la_CXXFLAGS= @CXXTMPDPTHFLAGS@
 # change motivated by the bug KERNEL4778.
 libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
 	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB)
-if MED_ENABLE_KERNEL
-    libmedmem_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
-    libmedmem_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
-endif
 
 bin_PROGRAMS= convertToPoly
 #bin_PROGRAMS= \
@@ -181,9 +177,6 @@ bin_PROGRAMS= convertToPoly
 AM_CPPFLAGS= $(libmedmem_la_CPPFLAGS)
 AM_CXXFLAGS= $(libmedmem_la_CXXFLAGS)
 LDADD= $(libmedmem_la_LDFLAGS) -lm libmedmem.la
-if MED_ENABLE_KERNEL
-     LDADD+=-lSALOMEBasics
-endif
 
 dist_convertToPoly_SOURCES= convertToPoly.cxx
 #dist_ensight2med_SOURCES= ensight2med.cxx

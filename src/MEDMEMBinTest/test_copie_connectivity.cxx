@@ -115,8 +115,8 @@ void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
   }
 
   if (MeshDimension==1) {
-    MESSAGE("ERROR : MeshDimension = 1 !");
-    MESSAGE("We could not see Reverse Descending Connectivity.") ;
+    MESSAGE_MED("ERROR : MeshDimension = 1 !");
+    MESSAGE_MED("We could not see Reverse Descending Connectivity.") ;
   } else {
     NumberOfConstituents = myMesh->getNumberOfElements (constituentEntity,MED_ALL_ELEMENTS);
     for (int i=0; i<NumberOfConstituents; i++) {

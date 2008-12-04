@@ -30,19 +30,19 @@ using namespace std;
 using namespace MEDMEM;
 
 UNIT::UNIT():_name(""),_description(""),_masse(0),_length(0),_time(0),_temperature(0),_matterQuantity(0),_currentStrength(0),_lightIntensity(0) {
-  MESSAGE("UNIT()");
+  MESSAGE_MED("UNIT()");
 };
 
 UNIT::UNIT(string Name, string Description):_name(Name),_description(Description),_masse(0),_length(0),_time(0),_temperature(0),_matterQuantity(0),_currentStrength(0),_lightIntensity(0) {
-  MESSAGE("UNIT(string Name, string Description)");
+  MESSAGE_MED("UNIT(string Name, string Description)");
 };
 
 UNIT::~UNIT() {
-  MESSAGE("~UNIT()") ;
+  MESSAGE_MED("~UNIT()") ;
 };
 
 UNIT & UNIT::operator=(const UNIT &unit) {
-  MESSAGE("UNIT::operateur=") ;
+  MESSAGE_MED("UNIT::operateur=") ;
   _name=unit._name ;
   _description=unit._description ;
   _masse=unit._masse ; 

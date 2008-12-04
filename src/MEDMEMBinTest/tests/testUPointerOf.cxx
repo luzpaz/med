@@ -44,42 +44,42 @@ int main (int argc, char ** argv)
   try
   {
 	P.set(0);
-	ASSERT((int *)P == NULL);
+	ASSERT_MED((int *)P == NULL);
   }
   catch ( const std::exception &e )
   {
         cout << "-------------------------" << endl;
         cout << " pb avec set(taille = 0) " << endl;
         cout << "-------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
 
   try
   {
 	P.set(-1 * size);
-	ASSERT((int *)P == NULL);
+	ASSERT_MED((int *)P == NULL);
   }
   catch ( const std::exception &e )
   {
         cout << "---------------------" << endl;
         cout << " pb avec set(taille) " << endl;
         cout << "---------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
 
   try
   {
 	P.set(size);
-	ASSERT((int *)P != NULL);
+	ASSERT_MED((int *)P != NULL);
   }
   catch ( const std::exception &e )
   {
         cout << "---------------------" << endl;
         cout << " pb avec set(taille) " << endl;
         cout << "---------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   for (int i=0; i < size; i++)
@@ -92,7 +92,7 @@ int main (int argc, char ** argv)
   P2=P;
   for (int i=0; i < size; i++)
   {
-        SCRUTE(P2[i]);
+        SCRUTE_MED(P2[i]);
   }
 
   int * p=new int [size];
@@ -106,8 +106,8 @@ int main (int argc, char ** argv)
 
   for (int i=0; i < size; i++)
   {
-        SCRUTE(P2[i]);
-        SCRUTE(P3[i]);
+        SCRUTE_MED(P2[i]);
+        SCRUTE_MED(P3[i]);
   }
 
   const PointerOf<int> P4(p);

@@ -90,7 +90,7 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
       
   		if (cellglobal[idomain]==0)
 				{
-          MESSAGE("Creating global numbering"); 
+          MESSAGE_MED("Creating global numbering"); 
 					//creating global numbering from scratch
 					for (int i=0; i<m_nb_cells[idomain]; i++)
 						{
@@ -104,7 +104,7 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 			//using global numbering coming from a previous numbering
 			else
 				{
-          MESSAGE("Using former global numbering");
+          MESSAGE_MED("Using former global numbering");
 					for (int i=0; i<m_nb_cells[idomain]; i++)
 						{
 							int global=cellglobal[idomain][i];
@@ -142,9 +142,9 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 						}
 					m_nb_total_faces=nbfaces;		
 					m_nb_faces[0]=nbfaces;
-					MESSAGE ("nb total cells "<< m_nb_total_cells);
-					MESSAGE("nb total nodes "<< m_nb_total_nodes);	
-					MESSAGE("nb total faces "<< m_nb_total_faces);	
+					MESSAGE_MED ("nb total cells "<< m_nb_total_cells);
+					MESSAGE_MED("nb total nodes "<< m_nb_total_nodes);	
+					MESSAGE_MED("nb total faces "<< m_nb_total_faces);	
 					return;
 				}
 		
@@ -210,7 +210,7 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 		
 			//		meshes[idomain]->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
 			m_nb_faces[idomain]=meshes[idomain]->getNumberOfElementsWithPoly(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
-			MESSAGE ("Nb faces domain " << idomain<<m_nb_faces[idomain]);
+			MESSAGE_MED ("Nb faces domain " << idomain<<m_nb_faces[idomain]);
 		  m_face_loc_to_glob[idomain].resize(m_nb_faces[idomain]);
 			local2distant.clear();
 			for (int icz=0; icz<cz.size(); icz++)
@@ -260,7 +260,7 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 						{
 			
 						  int global_number=faceglobal[idomain][iface];
-						  //SCRUTE(global_number);
+						  //SCRUTE_MED(global_number);
 							m_face_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,iface+1)));
 							//m_face_loc_to_glob[make_pair(idomain,iface+1)]=global_number;
               m_face_loc_to_glob[idomain][iface]=global_number;
@@ -271,9 +271,9 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 	m_nb_total_cells=index_global;
 	m_nb_total_nodes=index_node_global;		
 	m_nb_total_faces=index_face_global;
-	SCRUTE(m_nb_total_cells);
-	SCRUTE(m_nb_total_faces);
-	SCRUTE(m_nb_total_nodes);
+	SCRUTE_MED(m_nb_total_cells);
+	SCRUTE_MED(m_nb_total_faces);
+	SCRUTE_MED(m_nb_total_nodes);
 	
 }
 
@@ -309,9 +309,9 @@ ParallelTopology::ParallelTopology(boost::shared_ptr<Graph> graph, int nb_domain
       
 		}
 	for (int idomain=0; idomain<m_nb_domain; idomain++)
-		MESSAGE("Nombre de cellules dans le domaine "<< idomain <<" : "<<m_nb_cells[idomain]); 
+		MESSAGE_MED("Nombre de cellules dans le domaine "<< idomain <<" : "<<m_nb_cells[idomain]); 
 	
-	SCRUTE(m_nb_total_cells);
+	SCRUTE_MED(m_nb_total_cells);
 
 }
 
@@ -413,7 +413,7 @@ void ParallelTopology::convertGlobalFaceListWithTwins(const int* face_list, int 
 	for (int i=0; i< nbface; i++)
 		{
 			//int count = m_face_glob_to_loc.count(face_list[i]);
-			//if (count >1) MESSAGE("face en doublon "<<face_list[i]);
+			//if (count >1) MESSAGE_MED("face en doublon "<<face_list[i]);
 			size+= m_face_glob_to_loc.count(face_list[i]);
 		}
 	int index=0;
@@ -613,8 +613,8 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
 		{
 			int nbplainface = initial_collection.getMesh(iold)->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
       int nbtotalface = initial_collection.getMesh(iold)->getNumberOfElementsWithPoly(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
-      SCRUTE(nbplainface);
-      SCRUTE(nbtotalface);	
+      SCRUTE_MED(nbplainface);
+      SCRUTE_MED(nbtotalface);	
 			const int* face_conn;
 			const int* face_offset;
       const int* poly_conn;
@@ -674,10 +674,10 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
             for (int inode= poly_index[iface-nbplainface];inode < poly_index[iface-nbplainface+1]; inode++)
               {
                 int node=poly_conn[inode-1];
-             //   SCRUTE(node);
+             //   SCRUTE_MED(node);
                 int global = old_topology->convertNodeToGlobal(iold,node);
                 //        cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
-               // SCRUTE(global);
+               // SCRUTE_MED(global);
                 nodes.insert(global);
                 typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
                 pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
@@ -710,11 +710,11 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
 									global_face_number=global_index;
 					
 								}
-             //  SCRUTE(nbnodes);
+             //  SCRUTE_MED(nbnodes);
                
 							for (int inew=0;inew<m_nb_domain;inew++)
 								{
-              //     SCRUTE(domain_counts[inew]);
+              //     SCRUTE_MED(domain_counts[inew]);
 									if(domain_counts[inew]==nbnodes)
 										{
 											new_counts[inew]++;
@@ -730,9 +730,9 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
 	for (int inew=0;inew<m_nb_domain;inew++)
 		{
 			m_nb_faces[inew]=new_counts[inew];
-			MESSAGE(" Nb faces ["<<inew<<"]="<<m_nb_faces[inew]);
+			MESSAGE_MED(" Nb faces ["<<inew<<"]="<<m_nb_faces[inew]);
 		}
-	MESSAGE(" total number of faces"<<getFaceNumber());
+	MESSAGE_MED(" total number of faces"<<getFaceNumber());
 }
 
 ////creating node mapping 
@@ -768,7 +768,7 @@ void ParallelTopology::createFaceMapping2ndversion(const MESHCollection& initial
 												MED_EN::MED_DESCENDING,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 			const int* face_offset = initial_collection.getMesh(iold)->
 				getConnectivityIndex(MED_EN::MED_DESCENDING,MED_EN::MED_CELL);
-			MESSAGE("end of connectivity calculation");
+			MESSAGE_MED("end of connectivity calculation");
 			set<int> global_treated;
 			for (int icell=0; icell<nbcell; icell++)
 				{
@@ -798,7 +798,7 @@ void ParallelTopology::createFaceMapping2ndversion(const MESHCollection& initial
 			m_nb_faces[inew]=new_counts[inew];
 			//	cout << " Nb faces ["<<inew<<"]="<<m_nb_faces[inew]<<endl;
 		}
-	MESSAGE(" total number of faces"<<getFaceNumber());
+	MESSAGE_MED(" total number of faces"<<getFaceNumber());
 }
 
 	

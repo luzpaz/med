@@ -59,7 +59,7 @@ VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName,
   //  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "This driver is only used to write in VTK format So thie object can not be instantied using a file!"));
 
   //  _ptrMesh->addDriver(*this); // OU RECUPERER L'ID.
-  MESSAGE("VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName, MESH * ptrMesh) : "
+  MESSAGE_MED("VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName, MESH * ptrMesh) : "
           << "WARNING this driver is only used to write in VTK format So the object can not be instantied using a file!");
 
   _vtkFile = new ofstream(); 
@@ -78,25 +78,25 @@ VTK_MESH_DRIVER::VTK_MESH_DRIVER(const VTK_MESH_DRIVER & driver):
 VTK_MESH_DRIVER::~VTK_MESH_DRIVER()
 {
   const char* LOC = "VTK_MESH_DRIVER::~VTK_MESH_DRIVER()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   close();
 
-  SCRUTE(_vtkFile);
+  SCRUTE_MED(_vtkFile);
 
   delete _vtkFile ;
 
-  SCRUTE(_vtkFile);
+  SCRUTE_MED(_vtkFile);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void VTK_MESH_DRIVER::openConst() const throw (MEDEXCEPTION)
 {
   const char * LOC = "VTK_MESH_DRIVER::openConst()" ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
-  MESSAGE(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
+  MESSAGE_MED(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
 
   if ( _fileName == "" )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -111,8 +111,8 @@ void VTK_MESH_DRIVER::openConst() const throw (MEDEXCEPTION)
 //    else
 
 
-  SCRUTE((*_vtkFile).is_open());
-  SCRUTE(_vtkFile);
+  SCRUTE_MED((*_vtkFile).is_open());
+  SCRUTE_MED(_vtkFile);
 
 
 
@@ -120,7 +120,7 @@ void VTK_MESH_DRIVER::openConst() const throw (MEDEXCEPTION)
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void VTK_MESH_DRIVER::open() {
@@ -130,10 +130,10 @@ void VTK_MESH_DRIVER::open() {
 void VTK_MESH_DRIVER::closeConst() const throw (MEDEXCEPTION)
 {
   const char * LOC = "VTK_MESH_DRIVER::closeConst() " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
-  SCRUTE(_vtkFile);
-  SCRUTE(*_vtkFile);
+  SCRUTE_MED(_vtkFile);
+  SCRUTE_MED(*_vtkFile);
 
 
   if ((*_vtkFile).is_open())
@@ -143,16 +143,16 @@ void VTK_MESH_DRIVER::closeConst() const throw (MEDEXCEPTION)
 //      _status = MED_CLOSED ;
 //    else
 
-  SCRUTE(_vtkFile);
-  SCRUTE(*_vtkFile);
-  SCRUTE(_vtkFile->is_open());
+  SCRUTE_MED(_vtkFile);
+  SCRUTE_MED(*_vtkFile);
+  SCRUTE_MED(_vtkFile->is_open());
 
   if ( (*_vtkFile) && _vtkFile->is_open() )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
 				     << _fileName)
 			  );
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void VTK_MESH_DRIVER::close() {
@@ -165,13 +165,13 @@ string  VTK_MESH_DRIVER::getMeshName() const { return _meshName; };
 void VTK_MESH_DRIVER::read(void) throw (MEDEXCEPTION)
 {
   const char * LOC = "VTK_MESH_DRIVER::read() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Send an exception
 
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "This driver is only used to write in VTK format !"));
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 
@@ -179,7 +179,7 @@ void VTK_MESH_DRIVER::write(void) const
   throw (MEDEXCEPTION)
 { 
   const char * LOC = "void VTK_MESH_DRIVER::write(void) const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Well we must open vtk file first, because there are
   // no other driver than MED for VTK that do it !
@@ -414,7 +414,7 @@ void VTK_MESH_DRIVER::write(void) const
       (*_vtkFile) << vtkType << endl ;
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 } 
 
 GENDRIVER * VTK_MESH_DRIVER::copy(void) const

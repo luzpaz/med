@@ -65,7 +65,7 @@ int main (int argc, char ** argv)
         cout << "----------------" << endl;
         cout << "pb avec getIndex" << endl;
         cout << "----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -86,7 +86,7 @@ int main (int argc, char ** argv)
         cout << "----------------" << endl;
         cout << "pb avec getValue" << endl;
         cout << "----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -100,7 +100,7 @@ int main (int argc, char ** argv)
 
   try
   {
-        ASSERT(myArray->getNumberOf()==NumberOfCell);
+        ASSERT_MED(myArray->getNumberOf()==NumberOfCell);
   	cout << myArray->getNumberOf() << endl;
   }
   catch ( const std::exception &e )
@@ -108,7 +108,7 @@ int main (int argc, char ** argv)
         cout << "-------------------" << endl;
         cout << "pb avec getNumberOf" << endl;
         cout << "-------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -121,7 +121,7 @@ int main (int argc, char ** argv)
 
   try
   {
-        ASSERT(myArray->getLength()==Size);
+        ASSERT_MED(myArray->getLength()==Size);
         cout << myArray->getLength() << endl; 
   }
   catch ( const std::exception &e )
@@ -129,7 +129,7 @@ int main (int argc, char ** argv)
         cout << "-------------------" << endl;
         cout << "pb avec getLength" << endl;
         cout << "-------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -153,7 +153,7 @@ int main (int argc, char ** argv)
         cout << "-----------------------------" << endl;
         cout << "pb avec getI, valeur de i : " << i << endl;
         cout << "-----------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
     }
     catch (...)
@@ -168,14 +168,14 @@ int main (int argc, char ** argv)
     try
     {
  	numberof= myArray->getNumberOfI(i) ;
-        ASSERT(numberof==index[i]-index[i-1]);
+        ASSERT_MED(numberof==index[i]-index[i-1]);
     }
     catch ( const std::exception &e )
     {
         cout << "----------------------------------" << endl;
         cout << "pb avec getNumberOfI, valeur de i : " << i << endl;
         cout << "----------------------------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
     }
     catch (...)
@@ -208,7 +208,7 @@ int main (int argc, char ** argv)
         	cout << "----------------------------------" << endl;
         	cout << "pb avec getIJ, valeurs de i / j : " << i << " " << j<< endl;
         	cout << "----------------------------------" << endl;
-        	MESSAGE( "catched exception : " << e.what() ) ;
+        	MESSAGE_MED( "catched exception : " << e.what() ) ;
         	return EXIT_FAILURE ;
     	}
     	catch (...)
@@ -226,7 +226,7 @@ int main (int argc, char ** argv)
   delete[] value ;
 
   delete myArray;
-  MESSAGE("FIN normale du traitement");
+  MESSAGE_MED("FIN normale du traitement");
   return EXIT_SUCCESS ;
 
 

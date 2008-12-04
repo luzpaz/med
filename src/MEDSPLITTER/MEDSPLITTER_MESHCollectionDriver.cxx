@@ -69,7 +69,7 @@ MESHCollectionDriver::MESHCollectionDriver(MESHCollection* collection):m_collect
 int MESHCollectionDriver::readSeq(char* filename, char* meshname)
 {
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::readSeq()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
         m_filename.resize(1);
 	m_filename[0]=string(filename);
@@ -91,7 +91,7 @@ int MESHCollectionDriver::readSeq(char* filename, char* meshname)
         ParallelTopology* aPT = new ParallelTopology
           ((m_collection->getMesh()), (m_collection->getCZ()), cellglobal, nodeglobal, faceglobal);
 	m_collection->setTopology(aPT);
-  END_OF(LOC);
+  END_OF_MED(LOC);
         return 0;
 }
 
@@ -109,12 +109,12 @@ int MESHCollectionDriver::readSeq(char* filename, char* meshname)
 void MESHCollectionDriver::readFileStruct(vector <string>&  field_names,vector<int>& iternumber,vector <int>&  ordernumber, vector <int>& types)
 {
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::readFileStruct()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
  
 		const MEDMEM::MED med_struct (MEDMEM::MED_DRIVER,m_filename[0]);
 	int nb_fields = med_struct.getNumberOfFields();
 	
-	MESSAGE("found "<<nb_fields<<" fields in file")
+	MESSAGE_MED("found "<<nb_fields<<" fields in file")
 		deque<string> names = med_struct.getFieldNames();
 	for (int ifield = 0; ifield < nb_fields; ifield++)
 		{
@@ -135,14 +135,14 @@ void MESHCollectionDriver::readFileStruct(vector <string>&  field_names,vector<i
 			
 				}
 		}
-  END_OF(LOC);
+  END_OF_MED(LOC);
 	}
 
 //!retrieves the type of a field for a given fieldname
 int MESHCollectionDriver::getFieldType(const string& fieldname)
 {
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::getFieldType()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 		const MEDMEM::MED med_struct (MEDMEM::MED_DRIVER,m_filename[0]);
 
 	deque<MEDMEM::DT_IT_> dtit=med_struct.getFieldIteration(fieldname);
@@ -151,7 +151,7 @@ int MESHCollectionDriver::getFieldType(const string& fieldname)
 	// testing whether the field is of double or int type		
 	MEDMEM::FIELD_* field = med_struct.getField(fieldname,iter->dt,iter->it);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   
 	if (dynamic_cast<MEDMEM::FIELD<double>*>(field))
 	  return 1;
@@ -168,7 +168,7 @@ vector<int*>& nodeglobal, int idomain
 )
 {
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::readSubdomain()";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   char file[256];
   char meshname[MED_TAILLE_NOM];
       
@@ -235,7 +235,7 @@ vector<int*>& nodeglobal, int idomain
   {
     int * array=new int[ncell];
     int offset=0;
-    MESSAGE("Reading cell global numbering for mesh "<< idomain);
+    MESSAGE_MED("Reading cell global numbering for mesh "<< idomain);
     list<MED_EN::medGeometryElement>::const_iterator iter;
     char meshchar[MED_TAILLE_NOM];
     strcpy(meshchar,(m_collection->getMesh())[idomain]->getName().c_str());
@@ -255,7 +255,7 @@ vector<int*>& nodeglobal, int idomain
     delete[] types;
   } 
         
-  MESSAGE("Reading node global numbering");
+  MESSAGE_MED("Reading node global numbering");
   int nnode= (m_collection->getMesh())[idomain]->getNumberOfNodes();
   {
   int* array=new int[nnode];
@@ -264,7 +264,7 @@ vector<int*>& nodeglobal, int idomain
   nodeglobal[idomain]=array;
   } 
         
-  MESSAGE("Reading face global numbering for mesh "<<idomain);
+  MESSAGE_MED("Reading face global numbering for mesh "<<idomain);
   int nbface=(m_collection->getMesh())[idomain]->getNumberOfElementsWithPoly(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS);
   if (nbface!=0)
     {
@@ -290,7 +290,7 @@ vector<int*>& nodeglobal, int idomain
   med_2_3::MEDfermer(fid);
  
   //        if (nbface!=0) delete[]array;
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
   
   void MESHCollectionDriver::writeSubdomain(int idomain, int nbdomains, char* distfilename)
@@ -299,7 +299,7 @@ vector<int*>& nodeglobal, int idomain
 //      if (nbdomains>1)
 //  m_collection->buildConnectZones(idomain);
     
-      MESSAGE(" Number of connect zones "<<(m_collection->getCZ()).size());
+      MESSAGE_MED(" Number of connect zones "<<(m_collection->getCZ()).size());
         
       //writing connect zones in joints
     
@@ -327,7 +327,7 @@ vector<int*>& nodeglobal, int idomain
         char mesh_name[MED_TAILLE_NOM];
               
         strcpy (mesh_name, m_collection->getMesh(idomain)->getName().c_str());
-        SCRUTE(m_collection->getMesh(idomain)->getName());
+        SCRUTE_MED(m_collection->getMesh(idomain)->getName());
         error = med_2_3::MEDjointCr(fid,mesh_name, joint_name, desc, 
             idistant, distant_name);
         if (error==-1) cout << "erreur creation de joint "<<endl;
@@ -450,7 +450,7 @@ vector<int*>& nodeglobal, int idomain
 			}
 
 			med_2_3::MEDfermer(fid);
-			MESSAGE("End of writing");
+			MESSAGE_MED("End of writing");
 			
 }
 

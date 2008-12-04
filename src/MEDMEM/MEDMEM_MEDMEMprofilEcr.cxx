@@ -34,18 +34,18 @@ namespace med_2_3 {
       fflush(stderr) ;							\
     }
 
-# define ISCRUTE(entier)        {		\
+# define ISCRUTE_MED(entier)        {		\
       ICI ;								\
       fprintf(stderr,"%s = %d\n",#entier,entier) ;			\
       fflush(stderr) ;							\
     }
 
-# define SSCRUTE(chaine)        {		\
+# define SSCRUTE_MED(chaine)        {		\
       ICI ;								\
       fprintf(stderr,"%s = \"%s\"\n",#chaine,chaine) ;			\
       fflush(stderr) ;							\
     }
-# define MESSAGE(chaine)        {		\
+# define MESSAGE_MED(chaine)        {		\
       ICI ;								\
       fprintf(stderr,"%s\n",chaine) ;					\
       fflush(stderr) ;							\
@@ -97,8 +97,8 @@ namespace med_2_3 {
       chemin[MED_TAILLE_PROFILS-1] = '\0';
       if ((gid = _MEDdatagroupOuvrir(fid,chemin)) < 0)
 	if ((gid = _MEDdatagroupCreer(fid,chemin)) < 0) {
-	  MESSAGE("Impossible de creer le groupe MED_PROFILS : ");
-	  SSCRUTE(chemin); goto ERROR;
+	  MESSAGE_MED("Impossible de creer le groupe MED_PROFILS : ");
+	  SSCRUTE_MED(chemin); goto ERROR;
 	}
 
       /*
@@ -108,8 +108,8 @@ namespace med_2_3 {
       if ((chid = _MEDdatagroupOuvrir(gid,profilname)) >= 0) {
 	if ( false )//MED_MODE_ACCES != MED_LECTURE_ECRITURE )
   {
-	  MESSAGE("Le profil existe déjà : ");
-	  SSCRUTE(profilname); goto ERROR;
+	  MESSAGE_MED("Le profil existe déjà : ");
+	  SSCRUTE_MED(profilname); goto ERROR;
 	}
       } else
 	if ((chid = _MEDdatagroupCreer(gid,profilname)) < 0)
@@ -119,8 +119,8 @@ namespace med_2_3 {
        * On stocke "n" sous forme d'attribut
        */
       if ((ret = _MEDattrEntierEcrire(chid,MED_NOM_NBR,&n)) < 0) {
-	MESSAGE("Erreur à l'écriture de l'attribut MED_NOM_NBR : ");
-	ISCRUTE(n); goto ERROR;
+	MESSAGE_MED("Erreur à l'écriture de l'attribut MED_NOM_NBR : ");
+	ISCRUTE_MED(n); goto ERROR;
       };
 
       /*
@@ -135,8 +135,8 @@ namespace med_2_3 {
 				  (unsigned char*) pflval);
 #endif
       if (ret < 0 ) {
-	MESSAGE("Impossible d'ecrire le dataset pflval de taille  : ");
-	ISCRUTE(n); goto ERROR;
+	MESSAGE_MED("Impossible d'ecrire le dataset pflval de taille  : ");
+	ISCRUTE_MED(n); goto ERROR;
       }
 
       ret = 0;
@@ -145,21 +145,21 @@ namespace med_2_3 {
        * On ferme tout
        */
       if (chid>0)     if (_MEDdatagroupFermer(chid) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(chid); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(chid); ret = -1;
       }
 
       if (gid>0)     if (_MEDdatagroupFermer(gid) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(gid); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(gid); ret = -1;
       }
 
       return ret;
     }
 
-#undef MESSAGE
-#undef SSCRUTE
-#undef ISCRUTE
+#undef MESSAGE_MED
+#undef SSCRUTE_MED
+#undef ISCRUTE_MED
 
   }
 }

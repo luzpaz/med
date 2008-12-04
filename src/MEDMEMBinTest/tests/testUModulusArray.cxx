@@ -64,7 +64,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec compare " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -103,7 +103,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec compare " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -141,7 +141,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec compare " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -178,7 +178,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec compare " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -230,7 +230,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec compare " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -268,7 +268,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec compare " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -321,7 +321,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec compare " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -360,7 +360,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec compare " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)
@@ -397,7 +397,7 @@ int main (int argc, char ** argv)
         cout << "-----------------" << endl;
         cout << " pb avec compare " << endl;
         cout << "-----------------" << endl;
-        MESSAGE( "catched exception : " << e.what() ) ;
+        MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
   }
   catch (...)

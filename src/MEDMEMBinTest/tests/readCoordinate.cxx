@@ -71,10 +71,10 @@ int main (int argc, char ** argv) {
   }
   catch (const exception & ex)
   {
-         MESSAGE("Catch Exception : ");
-         SCRUTE(ex.what());
+         MESSAGE_MED("Catch Exception : ");
+         SCRUTE_MED(ex.what());
   };
-  MESSAGE("Open done");
+  MESSAGE_MED("Open done");
 
   try
   {
@@ -82,10 +82,10 @@ int main (int argc, char ** argv) {
   }
   catch (const exception & ex)
   {
-         MESSAGE("Catch Exception : ");
-         SCRUTE(ex.what());
+         MESSAGE_MED("Catch Exception : ");
+         SCRUTE_MED(ex.what());
   };
-  MESSAGE("Read done");
+  MESSAGE_MED("Read done");
   
   int SpaceDimension = myMesh->getSpaceDimension() ;
   int MeshDimension  = myMesh->getMeshDimension() ;

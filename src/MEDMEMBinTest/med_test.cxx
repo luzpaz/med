@@ -233,8 +233,8 @@ int main (int argc, char ** argv) {
   }
 
   if (MeshDimension==1) {
-    INFOS("ERROR : MeshDimension = 1 !");
-    INFOS("We could not see Reverse Descending Connectivity.") ;
+    INFOS_MED("ERROR : MeshDimension = 1 !");
+    INFOS_MED("We could not see Reverse Descending Connectivity.") ;
   } else {
     NumberOfConstituents = myMesh->getNumberOfElements (constituentEntity,MED_ALL_ELEMENTS);
     for (int i=0; i<NumberOfConstituents; i++) {
