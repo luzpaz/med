@@ -55,6 +55,10 @@ if test "$WITHMPICH" = yes; then
   CPPFLAGS="$CPPFLAGS_old"
 
   if test "$WITHMPICH" = "yes";then
+     MPI_LIBS="$MPI_LIBS -lmpich -lpmpich"
+  fi
+
+  if test "$WITHMPICH" = "yes";then
     LDFLAGS_old="$LDFLAGS"
     LDFLAGS="$MPI_LIBS $LDFLAGS"
     AC_CHECK_LIB(mpich,MPI_Init,WITHMPICH="yes",WITHMPICH="no")
@@ -65,7 +69,6 @@ if test "$WITHMPICH" = yes; then
   if test "$WITHMPICH" = "yes";then
      WITHMPI="yes"
      mpi_ok=yes
-     MPI_LIBS="$MPI_LIBS -lmpich"
   else
      mpi_ok=no
   fi
