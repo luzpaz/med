@@ -1918,30 +1918,31 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   if (this != Support3D->getMesh())
     throw MEDEXCEPTION(STRING(LOC) <<  "no compatibility between *this and SUPPORT::_mesh !");
   if (_meshDimension != 3 || Support3D->getEntity() != MED_CELL)
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Defined on 3D cells only"));
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Defined on 3D cells only"));
 
   // well, all rigth !
   SUPPORT * mySupport = new SUPPORT(this,"Skin",MED_FACE);
   mySupport->setAll(false);
 
-  list<int> myElementsList ;
-  int i,j, size = 0 ;
+  list<int> myElementsList;
+  int i,j, size = 0;
 
   calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL);
   if (Support3D->isOnAllElements())
   {
-    const int* value = getReverseConnectivity(MED_DESCENDING) ;
-		const int* index = getReverseConnectivityIndex(MED_DESCENDING);
+    const int* value = getReverseConnectivity(MED_DESCENDING);
+    const int* index = getReverseConnectivityIndex(MED_DESCENDING);
 
     int nbFaces = getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS);
-		for (int i=0; i<nbFaces;i++)
-			{
-				//a face is in skin if it is linked to one element or if one of the elements 
-				//it is linked to is "virtual"
-				if ((index[i+1]-index[i]==1) || (value[index[i]-1]==0) || (value[index[i]]==0) )
-						myElementsList.push_back( j ) ;
-						size++ ;	
-			}
+    for (int i = 0; i < nbFaces; i++)
+    {
+      //a face is in skin if it is linked to one element or if one of the elements
+      //it is linked to is "virtual"
+      if ((index[i+1]-index[i]==1) || (value[index[i]-1]==0) || (value[index[i]]==0)) {
+        myElementsList.push_back( i+1 );
+        size++;
+      }
+    }
   }
   else
   {
