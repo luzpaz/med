@@ -32,13 +32,20 @@ from random import *
 
 import sys,os,string
 
-filesPath=os.environ["MED_ROOT_DIR"]
-filePath=os.path.join(filePath, "share", "salome", "resources", "med")
+filesPath = os.environ["MED_ROOT_DIR"]
+filesPath = os.path.join(filesPath, "share", "salome", "resources", "med")
+print "filesPath = ", filesPath #jfa:tmp
 
-os.system("rm -rf "+filesPath+"/*_test.*")
+tmpDir = os.getenv("TEMP")
+if tmpDir == None:
+  tmpDir = "/tmp"
 
-files = []
-meshNameFiles = []
+tmpMask = os.path.join(tmpDir, "*_test.*")
+print "tmpMask = ", tmpMask #jfa:tmp
+os.system("rm -rf " + tmpMask)
+
+fileNames = []
+meshNames = []
 
 def print_ord(i):
     if i == 0:
@@ -64,168 +71,168 @@ def add_one(i):
 # from CODE_ASTER
 #
 
-##files.append("maill.0.med")
-##meshNameFiles.append("MAILTRQU")
+##fileNames.append("maill.0.med")
+##meshNames.append("MAILTRQU")
 
-##files.append("zzzz121b.med")
-##meshNameFiles.append("MUN")
+##fileNames.append("zzzz121b.med")
+##meshNames.append("MUN")
 
 #
 # from the SMESH Salome Module
 #
 
-files.append("mesh.med")
-meshNameFiles.append("Mesh 1")
+fileNames.append("mesh.med")
+meshNames.append("Mesh 1")
 
-files.append("mesh_import22.med")
-meshNameFiles.append("Mesh 1")
+fileNames.append("mesh_import22.med")
+meshNames.append("Mesh 1")
 
 #
 # from other source including LGLS ones
 #
 
-files.append("maillage_UniSegFam.med")
-meshNameFiles.append("maillage_CHEMVAL_100elts")
+fileNames.append("maillage_UniSegFam.med")
+meshNames.append("maillage_CHEMVAL_100elts")
 
-files.append("maillage_UniSegFam_import22.med")
-meshNameFiles.append("maillage_CHEMVAL_100elts")
+fileNames.append("maillage_UniSegFam_import22.med")
+meshNames.append("maillage_CHEMVAL_100elts")
 
-files.append("carre_en_quad4.med")
-meshNameFiles.append("carre_en_quad4")
+fileNames.append("carre_en_quad4.med")
+meshNames.append("carre_en_quad4")
 
-files.append("carre_en_quad4_import22.med")
-meshNameFiles.append("carre_en_quad4")
+fileNames.append("carre_en_quad4_import22.med")
+meshNames.append("carre_en_quad4")
 
-files.append("cube_hexa8.med")
-meshNameFiles.append("CUBE_EN_HEXA8")
+fileNames.append("cube_hexa8.med")
+meshNames.append("CUBE_EN_HEXA8")
 
-files.append("cube_hexa8_import22.med")
-meshNameFiles.append("CUBE_EN_HEXA8")
+fileNames.append("cube_hexa8_import22.med")
+meshNames.append("CUBE_EN_HEXA8")
 
-##files.append("test19.med")
-##meshNameFiles.append("CartGrid")
+##fileNames.append("test19.med")
+##meshNames.append("CartGrid")
 
-##files.append("test19.med")
-##meshNameFiles.append("bodyfitted")
+##fileNames.append("test19.med")
+##meshNames.append("bodyfitted")
 
-##files.append("test19.med")
-##meshNameFiles.append("maa1")
+##fileNames.append("test19.med")
+##meshNames.append("maa1")
 
-files.append("carre_en_quad4_seg2.med")
-meshNameFiles.append("carre_en_quad4_seg2")
+fileNames.append("carre_en_quad4_seg2.med")
+meshNames.append("carre_en_quad4_seg2")
 
-files.append("carre_en_quad4_seg2_import22.med")
-meshNameFiles.append("carre_en_quad4_seg2")
+fileNames.append("carre_en_quad4_seg2_import22.med")
+meshNames.append("carre_en_quad4_seg2")
 
-files.append("cube_hexa8_quad4.med")
-meshNameFiles.append("CUBE_EN_HEXA8_QUAD4")
+fileNames.append("cube_hexa8_quad4.med")
+meshNames.append("CUBE_EN_HEXA8_QUAD4")
 
-files.append("cube_hexa8_quad4_import22.med")
-meshNameFiles.append("CUBE_EN_HEXA8_QUAD4")
+fileNames.append("cube_hexa8_quad4_import22.med")
+meshNames.append("CUBE_EN_HEXA8_QUAD4")
 
-files.append("pointe.med")
-meshNameFiles.append("maa1")
+fileNames.append("pointe.med")
+meshNames.append("maa1")
 
-files.append("pointe_import22.med")
-meshNameFiles.append("maa1")
+fileNames.append("pointe_import22.med")
+meshNames.append("maa1")
 
-files.append("Mistrat.med")
-meshNameFiles.append("Mistrat_Hexa")
+fileNames.append("Mistrat.med")
+meshNames.append("Mistrat_Hexa")
 
-files.append("Mistrat_import22.med")
-meshNameFiles.append("Mistrat_Hexa")
+fileNames.append("Mistrat_import22.med")
+meshNames.append("Mistrat_Hexa")
 
-##files.append("TimeStamps.med")
-##meshNameFiles.append("dom")
+##fileNames.append("TimeStamps.med")
+##meshNames.append("dom")
 
-files.append("Darcy3_3D_H_10x10x10_2.med")
-meshNameFiles.append("Darcy3_3D_H_10x10x10")
+fileNames.append("Darcy3_3D_H_10x10x10_2.med")
+meshNames.append("Darcy3_3D_H_10x10x10")
 
-files.append("elle_3D_HPr_10x10x10_2.med")
-meshNameFiles.append("elle_3D_HPr_10x10x10")
+fileNames.append("elle_3D_HPr_10x10x10_2.med")
+meshNames.append("elle_3D_HPr_10x10x10")
 
-files.append("elle_3D_HPr_2x2x2_2.med")
-meshNameFiles.append("elle_3D_HPr_2x2x2")
+fileNames.append("elle_3D_HPr_2x2x2_2.med")
+meshNames.append("elle_3D_HPr_2x2x2")
 
-files.append("elle_3D_HPr_4x4x4_2.med")
-meshNameFiles.append("elle_3D_HPr_4x4x4")
+fileNames.append("elle_3D_HPr_4x4x4_2.med")
+meshNames.append("elle_3D_HPr_4x4x4")
 
 
 
-files.append("ChampsDarcy.med")
-meshNameFiles.append("2D_I129")
+fileNames.append("ChampsDarcy.med")
+meshNames.append("2D_I129")
 
-files.append("darcy_1.1_res.med")
-meshNameFiles.append("mail_test1-1-tri")
+fileNames.append("darcy_1.1_res.med")
+meshNames.append("mail_test1-1-tri")
 
-files.append("darcy_1.3_resCASTEM.med")
-meshNameFiles.append("mail_ktest1-3-tetra")
+fileNames.append("darcy_1.3_resCASTEM.med")
+meshNames.append("mail_ktest1-3-tetra")
 
-files.append("darcy_1.3_resPORFLOW.med")
-meshNameFiles.append("mail_ktest1-3-hexa")
+fileNames.append("darcy_1.3_resPORFLOW.med")
+meshNames.append("mail_ktest1-3-hexa")
 
-files.append("darcy_1.3_resTRACES.med")
-meshNameFiles.append("mail_ktest1-3-tetra")
+fileNames.append("darcy_1.3_resTRACES.med")
+meshNames.append("mail_ktest1-3-tetra")
 
-files.append("darcy2_Castem_EFMH.med")
-meshNameFiles.append("mail_test1-2-tri")
+fileNames.append("darcy2_Castem_EFMH.med")
+meshNames.append("mail_test1-2-tri")
 
-files.append("darcy2_Castem_qua_EFMH.med")
-meshNameFiles.append("mail_test1-2-qua")
+fileNames.append("darcy2_Castem_qua_EFMH.med")
+meshNames.append("mail_test1-2-qua")
 
-files.append("darcy2_Castem_qua_VF.med")
-meshNameFiles.append("mail_test1-2-qua")
-
-# there is a field with too long name (38 > MED_TAILLE_NOM==32):
-# "analytical_field - CONCENTRATION of A1"
-# so that invalid writing is sometimes fatal
-# files.append("Deff_fdt_5.8_castem_efmh_diff_conc_dom.med")
-# meshNameFiles.append("maillage_deffec_fdt")
+fileNames.append("darcy2_Castem_qua_VF.med")
+meshNames.append("mail_test1-2-qua")
 
 # there is a field with too long name (38 > MED_TAILLE_NOM==32):
 # "analytical_field - CONCENTRATION of A1"
 # so that invalid writing is sometimes fatal
-# files.append("Deff_fdt_5.8_castem_vf_diff_conc_dom.med")
-# meshNameFiles.append("maillage_deffec_fdt")
+# fileNames.append("Deff_fdt_5.8_castem_efmh_diff_conc_dom.med")
+# meshNames.append("maillage_deffec_fdt")
 
-files.append("extendedtransport53_triangles.med")
-meshNameFiles.append("TestA3_2094_0.1_rsurf_tri")
+# there is a field with too long name (38 > MED_TAILLE_NOM==32):
+# "analytical_field - CONCENTRATION of A1"
+# so that invalid writing is sometimes fatal
+# fileNames.append("Deff_fdt_5.8_castem_vf_diff_conc_dom.med")
+# meshNames.append("maillage_deffec_fdt")
 
-files.append("H_CastCast_EFMH_I129_COUPLEX1.med")
-meshNameFiles.append("COUPLEX1")
+fileNames.append("extendedtransport53_triangles.med")
+meshNames.append("TestA3_2094_0.1_rsurf_tri")
 
-files.append("H_CastCast_VF_I129_COUPLEX1.med")
-meshNameFiles.append("COUPLEX1")
+fileNames.append("H_CastCast_EFMH_I129_COUPLEX1.med")
+meshNames.append("COUPLEX1")
 
-files.append("H_CastCast_VF_Se79_COUPLEX1.med")
-meshNameFiles.append("COUPLEX1")
+fileNames.append("H_CastCast_VF_I129_COUPLEX1.med")
+meshNames.append("COUPLEX1")
 
-files.append("H_CastPorf_I129_COUPLEX1.med")
-meshNameFiles.append("COUPLEX1")
+fileNames.append("H_CastCast_VF_Se79_COUPLEX1.med")
+meshNames.append("COUPLEX1")
 
-files.append("H_CastPorf_Se79_COUPLEX1.med")
-meshNameFiles.append("COUPLEX1")
+fileNames.append("H_CastPorf_I129_COUPLEX1.med")
+meshNames.append("COUPLEX1")
 
-files.append("H_PorfCast_EFMH_I129_COUPLEX1.med")
-meshNameFiles.append("COUPLEX1")
+fileNames.append("H_CastPorf_Se79_COUPLEX1.med")
+meshNames.append("COUPLEX1")
 
-files.append("H_PorfCast_EFMH_Se79_COUPLEX1.med")
-meshNameFiles.append("COUPLEX1")
+fileNames.append("H_PorfCast_EFMH_I129_COUPLEX1.med")
+meshNames.append("COUPLEX1")
 
-files.append("H_PorfPorf_I129_COUPLEX1.med")
-meshNameFiles.append("COUPLEX1")
+fileNames.append("H_PorfCast_EFMH_Se79_COUPLEX1.med")
+meshNames.append("COUPLEX1")
 
-files.append("H_Traces_I129_COUPLEX1.med")
-meshNameFiles.append("COUPLEX1")
+fileNames.append("H_PorfPorf_I129_COUPLEX1.med")
+meshNames.append("COUPLEX1")
 
-files.append("H_Traces_Se79_COUPLEX1.med")
-meshNameFiles.append("COUPLEX1")
+fileNames.append("H_Traces_I129_COUPLEX1.med")
+meshNames.append("COUPLEX1")
 
-files.append("maillage_5_5_5.med")
-meshNameFiles.append("maillage_5_5_5")
+fileNames.append("H_Traces_Se79_COUPLEX1.med")
+meshNames.append("COUPLEX1")
 
-files.append("maillage_chemvalIV_cas1_40elts.med")
-meshNameFiles.append("maillage_chemvalIV_cas1_40elts")
+fileNames.append("maillage_5_5_5.med")
+meshNames.append("maillage_5_5_5")
+
+fileNames.append("maillage_chemvalIV_cas1_40elts.med")
+meshNames.append("maillage_chemvalIV_cas1_40elts")
 
 
 
@@ -234,115 +241,116 @@ meshNameFiles.append("maillage_chemvalIV_cas1_40elts")
 # Castem or Gibi file list
 #
 
-files.append("Darcy3_3D_H_10x10x10.sauve")
-meshNameFiles.append("")
+fileNames.append("Darcy3_3D_H_10x10x10.sauve")
+meshNames.append("")
 
-files.append("dx200_dy1_avec_2couches.sauve")
-meshNameFiles.append("")
+fileNames.append("dx200_dy1_avec_2couches.sauve")
+meshNames.append("")
 
-files.append("elle_2D_QT_10x10.sauve")
-meshNameFiles.append("")
+fileNames.append("elle_2D_QT_10x10.sauve")
+meshNames.append("")
 
-files.append("elle_2D_QT_2x2.sauve")
-meshNameFiles.append("")
+fileNames.append("elle_2D_QT_2x2.sauve")
+meshNames.append("")
 
-files.append("elle_2D_QT_40x40.sauve")
-meshNameFiles.append("")
+fileNames.append("elle_2D_QT_40x40.sauve")
+meshNames.append("")
 
-files.append("elle_2D_QT_4x4.sauve")
-meshNameFiles.append("")
+fileNames.append("elle_2D_QT_4x4.sauve")
+meshNames.append("")
 
-files.append("elle_3D_HPr_10x10x10.sauve")
-meshNameFiles.append("")
+fileNames.append("elle_3D_HPr_10x10x10.sauve")
+meshNames.append("")
 
-files.append("elle_3D_HPr_2x2x2.sauve")
-meshNameFiles.append("")
+fileNames.append("elle_3D_HPr_2x2x2.sauve")
+meshNames.append("")
 
-files.append("elle_3D_HPr_4x4x4.sauve")
-meshNameFiles.append("")
+fileNames.append("elle_3D_HPr_4x4x4.sauve")
+meshNames.append("")
 
-files.append("inclusion_2d_raf.sauve")
-meshNameFiles.append("")
+fileNames.append("inclusion_2d_raf.sauve")
+meshNames.append("")
 
-files.append("inclusion_2d.sauve")
-meshNameFiles.append("")
+fileNames.append("inclusion_2d.sauve")
+meshNames.append("")
 
-files.append("mail_ktest1-3-hexa.sauve")
-meshNameFiles.append("")
+fileNames.append("mail_ktest1-3-hexa.sauve")
+meshNames.append("")
 
-files.append("mail_ktest1-3-tetra.sauve")
-meshNameFiles.append("")
+fileNames.append("mail_ktest1-3-tetra.sauve")
+meshNames.append("")
 
-files.append("mail_ktest3-1.sauve")
-meshNameFiles.append("")
+fileNames.append("mail_ktest3-1.sauve")
+meshNames.append("")
 
-files.append("mail_ktest3-2.sauve")
-meshNameFiles.append("")
+fileNames.append("mail_ktest3-2.sauve")
+meshNames.append("")
 
-files.append("maillage_andra2_100elts.sauve")
-meshNameFiles.append("")
+fileNames.append("maillage_andra2_100elts.sauve")
+meshNames.append("")
 
-files.append("maillage_cas2_2d.sauve")
-meshNameFiles.append("")
+fileNames.append("maillage_cas2_2d.sauve")
+meshNames.append("")
 
-files.append("maillage_cas4_234elts.sauve")
-meshNameFiles.append("")
+fileNames.append("maillage_cas4_234elts.sauve")
+meshNames.append("")
 
-files.append("maillage_CHEMVAL_100elts.sauve")
-meshNameFiles.append("")
+fileNames.append("maillage_CHEMVAL_100elts.sauve")
+meshNames.append("")
 
-files.append("maillage_CHEMVAL_40elts.sauve")
-meshNameFiles.append("")
+fileNames.append("maillage_CHEMVAL_40elts.sauve")
+meshNames.append("")
 
-files.append("maillage_chemvalIV_cas1_100elts.sauve")
-meshNameFiles.append("")
+fileNames.append("maillage_chemvalIV_cas1_100elts.sauve")
+meshNames.append("")
 
-files.append("maillage_chemvalIV_cas1_40elts.sauve")
-meshNameFiles.append("")
+fileNames.append("maillage_chemvalIV_cas1_40elts.sauve")
+meshNames.append("")
 
-files.append("mail_test1-1-qua.sauve")
-meshNameFiles.append("")
+fileNames.append("mail_test1-1-qua.sauve")
+meshNames.append("")
 
-files.append("mail_test1-1-tri.sauve")
-meshNameFiles.append("")
+fileNames.append("mail_test1-1-tri.sauve")
+meshNames.append("")
 
-files.append("mail_test1-2-qua.sauve")
-meshNameFiles.append("")
+fileNames.append("mail_test1-2-qua.sauve")
+meshNames.append("")
 
-files.append("mail_test1-2-tri.sauve")
-meshNameFiles.append("")
+fileNames.append("mail_test1-2-tri.sauve")
+meshNames.append("")
 
-files.append("mail-test1-4-1.sauve")
-meshNameFiles.append("")
+fileNames.append("mail-test1-4-1.sauve")
+meshNames.append("")
 
-files.append("mail-test1-4-2.sauve")
-meshNameFiles.append("")
+fileNames.append("mail-test1-4-2.sauve")
+meshNames.append("")
 
 #
 # Porflow file list
 #
 
-files.append("boitenew.inp")
-meshNameFiles.append("")
+fileNames.append("boitenew.inp")
+meshNames.append("")
 
-files.append("Case1.inp")
-meshNameFiles.append("")
+fileNames.append("Case1.inp")
+meshNames.append("")
 
-files.append("cube.inp")
-meshNameFiles.append("")
+fileNames.append("cube.inp")
+meshNames.append("")
 
-files.append("test3.inp")
-meshNameFiles.append("")
+fileNames.append("test3.inp")
+meshNames.append("")
 
-files.append("titi.inp")
-meshNameFiles.append("")
+fileNames.append("titi.inp")
+meshNames.append("")
 
 ###################################################################################
 
-nbOfFiles = len(files)
+nbOfFiles = len(fileNames)
+filesFull = []
 
 for i in range(nbOfFiles):
-    files[i] = filesPath + files[i]
+    filesFull.append(os.path.join(filesPath, fileNames[i]))
 
 ###################################################################################
 #
@@ -354,12 +362,13 @@ print " This test is running on ",nbOfFiles," files"
 print ""
 
 for i in range(nbOfFiles):
-    file = files[i]
-    decompFile = string.split(file,".")
+    fileName = fileNames[i]
+    fileFull = filesFull[i]
+    decompFile = string.split(fileName,".")
     lenDecompFileM1 = len(decompFile)-1
 
     if (lenDecompFileM1 == 0) :
-        print "The file ",file," should have at least a . in its name "
+        print "The file ",fileName," should have at least a . in its name "
         sys.exit(1)
 
     extensionFile = decompFile[lenDecompFileM1]
@@ -368,46 +377,48 @@ for i in range(nbOfFiles):
     for k in range(1,lenDecompFileM1):
         rootFile = rootFile + "." + decompFile[k]
 
-    medV21FileName = rootFile + "V21_test.med"
-    medV22FileName = rootFile + "V22_test.med"
-    vtkFileName = rootFile + "_test.vtk"
+    rootFileFull = os.path.join(tmpDir, rootFile)
+
+    medV21FileName = rootFileFull + "V21_test.med"
+    medV22FileName = rootFileFull + "V22_test.med"
+    vtkFileName    = rootFileFull + "_test.vtk"
 
     try:
         mesh = MESH()
         if (extensionFile == "med"):
-            print "The file ",file," is a MED file and the name of the mesh is ", meshNameFiles[i]
-            meshDriver = MED_MESH_RDONLY_DRIVER(file,mesh)
-            meshDriver.setMeshName(meshNameFiles[i])
+            print "The file ",fileName," is a MED file and the name of the mesh is ", meshNames[i]
+            meshDriver = MED_MESH_RDONLY_DRIVER(fileFull,mesh)
+            meshDriver.setMeshName(meshNames[i])
         elif (extensionFile == "sauve"):
-            print "The file ",file," is a GIBI file"
-            meshDriver = GIBI_MESH_RDONLY_DRIVER(file,mesh)
+            print "The file ",fileName," is a GIBI file"
+            meshDriver = GIBI_MESH_RDONLY_DRIVER(fileFull,mesh)
         elif (extensionFile == "inp"):
-            print "The file ",file," is a PORFLOW file"
-            meshDriver = PORFLOW_MESH_RDONLY_DRIVER(file,mesh)
+            print "The file ",fileName," is a PORFLOW file"
+            meshDriver = PORFLOW_MESH_RDONLY_DRIVER(fileFull,mesh)
         else :
-            print "the file ",file,"has an unknow extension"
+            print "the file ",fileName,"has an unknow extension"
             sys.exit(1)
 
         meshDriver.open()
         meshDriver.read()
     except:
         meshDriver.close()
-        print "The mesh stored in the file ",file," is perhaps a GRID."
+        print "The mesh stored in the file ",fileName," is perhaps a GRID."
         try:
             print "... of MED_CARTESIAN type ?"
             type = MED_CARTESIAN
             mesh = GRID()
             mesh.setGridType(type)
             if (extensionFile == "med"):
-                meshDriver = MED_MESH_RDONLY_DRIVER(file,mesh)
-                meshDriver.setMeshName(meshNameFiles[i])
+                meshDriver = MED_MESH_RDONLY_DRIVER(fileFull,mesh)
+                meshDriver.setMeshName(meshNames[i])
             elif (extensionFile == "sauve"):
-                meshDriver = GIBI_MESH_RDONLY_DRIVER(file,mesh)
+                meshDriver = GIBI_MESH_RDONLY_DRIVER(fileFull,mesh)
             elif (extensionFile == "inp"):
-                print "The file ",file," is a PORFLOW file"
-                meshDriver = PORFLOW_MESH_RDONLY_DRIVER(file,mesh)
+                print "The file ",fileName," is a PORFLOW file"
+                meshDriver = PORFLOW_MESH_RDONLY_DRIVER(fileFull,mesh)
             else :
-                print "the file ",file,"has an unknow extension"
+                print "the file ",fileName,"has an unknow extension"
                 sys.exit(1)
 
             meshDriver.open()
@@ -420,12 +431,12 @@ for i in range(nbOfFiles):
                 type = MED_POLAR
                 mesh.setGridType(type)
                 if (extensionFile == "med"):
-                    meshDriver = MED_MESH_RDONLY_DRIVER(file,mesh)
-                    meshDriver.setMeshName(meshNameFiles[i])
+                    meshDriver = MED_MESH_RDONLY_DRIVER(fileFull,mesh)
+                    meshDriver.setMeshName(meshNames[i])
                 elif (extensionFile == "sauve"):
-                    meshDriver = GIBI_MESH_RDONLY_DRIVER(file,mesh)
+                    meshDriver = GIBI_MESH_RDONLY_DRIVER(fileFull,mesh)
                 else :
-                    print "the file ",file,"has an unknow extension"
+                    print "the file ",fileName,"has an unknow extension"
                     sys.exit(1)
 
                 meshDriver.open()
@@ -437,12 +448,12 @@ for i in range(nbOfFiles):
                 type = MED_BODY_FITTED
                 mesh.setGridType(type)
                 if (extensionFile == "med"):
-                    meshDriver = MED_MESH_RDONLY_DRIVER(file,mesh)
-                    meshDriver.setMeshName(meshNameFiles[i])
+                    meshDriver = MED_MESH_RDONLY_DRIVER(fileFull,mesh)
+                    meshDriver.setMeshName(meshNames[i])
                 elif (extensionFile == "sauve"):
-                    meshDriver = GIBI_MESH_RDONLY_DRIVER(file,mesh)
+                    meshDriver = GIBI_MESH_RDONLY_DRIVER(fileFull,mesh)
                 else :
-                    print "the file ",file,"has an unknow extension"
+                    print "the file ",fileName,"has an unknow extension"
                     sys.exit(1)
 
                 meshDriver.open()
@@ -792,7 +803,7 @@ for i in range(nbOfFiles):
 
         idMedV22 = normal.addDriver(MED_DRIVER,medV22FileName,normal.getName())
         normal.write(idMedV22)
-        
+
         print "but not in vtk format because vtk does not offer the possibility to view a field on edges or faces"
         print ""
 
@@ -805,7 +816,7 @@ for i in range(nbOfFiles):
             print "    * ",areaCell
             areatot = areatot + areaCell
         print "Area of the mesh:",areatot
-        print ""            
+        print ""
 
         print "Saving in file the cell area field under the med and vtk format"
         medFileVersion = getMedFileVersionForWriting()
@@ -869,7 +880,7 @@ for i in range(nbOfFiles):
 
         idMedV22 = normal.addDriver(MED_DRIVER,medV22FileName,normal.getName())
         normal.write(idMedV22)
-        
+
         print "but no in vtk format because vtk does not offer the possibility to view a field on edges or faces"
 
     print ""
@@ -906,7 +917,7 @@ for i in range(nbOfFiles):
     if (extensionFile == "med"):
         md = MED()
 
-        mdDriver = MED_MED_RDONLY_DRIVER(file,md)
+        mdDriver = MED_MED_RDONLY_DRIVER(fileFull,md)
 
         mdDriver.open()
         mdDriver.readFileStruct()
@@ -914,7 +925,7 @@ for i in range(nbOfFiles):
         nbMeshes = md.getNumberOfMeshes()
         nbFields = md.getNumberOfFields()
 
-        print "The med file", file, "contains", nbMeshes, "mesh(es) and", nbFields, "field(s)"
+        print "The med file", fileName, "contains", nbMeshes, "mesh(es) and", nbFields, "field(s)"
 
         if (nbMeshes>0):
             print "Mesh(es) Name(s) is(are) "
@@ -933,7 +944,7 @@ for i in range(nbOfFiles):
         print ""
 
 #        mesh_name = md.getMeshName(0)
-        mesh_name = meshNameFiles[i]
+        mesh_name = meshNames[i]
         mesh = md.getMesh(mesh_name)
         mesh.read()
         spaceDim = mesh.getSpaceDimension()
@@ -1350,7 +1361,7 @@ for i in range(nbOfFiles):
                                 print "     *",valueI[:nbOfComp]
                         except:
                             print "testMedMemGeneral  fielddoublediv = fielddouble / fielddouble2 catch/except error"
-                            
+
                         print ""
                         print "TESTS OPERATIONS SUR FIELDDOUBLE : "
                         fielddoublesub = fielddouble-fielddouble2
