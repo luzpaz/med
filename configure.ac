@@ -501,9 +501,9 @@ else
 fi
 
 if test "${MED_WITH_GUI}" = "yes"; then
-  variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok sip_ok pyqt_ok qwt_ok occ_ok cppunit_ok doxygen_ok Kernel_ok SalomeGUI_ok"
+  variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok sip_ok pyqt_ok qwt_ok occ_ok doxygen_ok Kernel_ok SalomeGUI_ok"
 else
-  variables="cc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok cppunit_ok doxygen_ok Kernel_ok"
+  variables="cc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok doxygen_ok Kernel_ok"
 fi
 
 if test "x$ENABLE_SPLITTER" = "xyes"; then
@@ -523,7 +523,7 @@ dnl optional variables
 
 echo "---Optional:"
 
-variables="mpi_ok fvm_ok"
+variables="mpi_ok fvm_ok cppunit_ok"
 if test "${MED_WITH_KERNEL}" = "yes"; then
    variables="$variables openpbs_ok lsf_ok graphviz_ok"
 fi
