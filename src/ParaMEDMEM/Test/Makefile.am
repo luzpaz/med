@@ -23,17 +23,17 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 lib_LTLIBRARIES = libParaMEDMEMTest.la
 
 salomeinclude_HEADERS =  MPIMainTest.hxx \
-												 MPIAccessDECTest.hxx \
-												 MPIAccessTest.hxx \
-												 ParaMEDMEMTest.hxx
+			 MPIAccessDECTest.hxx \
+			 MPIAccessTest.hxx \
+			 ParaMEDMEMTest.hxx
 
 EXTRA_DIST += MPIMainTest.hxx ParaMEDMEMTest_NonCoincidentDEC.cxx
 dist_libParaMEDMEMTest_la_SOURCES= \
-	ParaMEDMEMTest.cxx \
- ParaMEDMEMTest_MPIProcessorGroup.cxx \
-	  ParaMEDMEMTest_BlockTopology.cxx \
-	  ParaMEDMEMTest_IntersectionDEC.cxx \
-	  ParaMEDMEMTest_StructuredCoincidentDEC.cxx \
+    ParaMEDMEMTest.cxx \
+    ParaMEDMEMTest_MPIProcessorGroup.cxx \
+    ParaMEDMEMTest_BlockTopology.cxx \
+    ParaMEDMEMTest_IntersectionDEC.cxx \
+    ParaMEDMEMTest_StructuredCoincidentDEC.cxx \
     MPIAccessDECTest.cxx \
     test_AllToAllDEC.cxx \
     test_AllToAllvDEC.cxx \
@@ -74,8 +74,8 @@ endif
 
 # Executables targets
 bin_PROGRAMS = TestParaMEDMEM  \
-							 TestMPIAccessDEC \
-		  			   TestMPIAccess
+	       TestMPIAccessDEC \
+	       TestMPIAccess
 
 dist_TestParaMEDMEM_SOURCES = TestParaMEDMEM.cxx
 dist_TestMPIAccessDEC_SOURCES = TestMPIAccessDEC.cxx
@@ -100,3 +100,5 @@ endif
 AM_CPPFLAGS= $(libParaMEDMEMTest_la_CPPFLAGS)
 
 UNIT_TEST_PROG = TestParaMEDMEM
+
+check: tests

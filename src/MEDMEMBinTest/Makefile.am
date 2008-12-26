@@ -82,6 +82,7 @@ bin_PROGRAMS= \
 #AM_CPPFLAGS= $(libMEDMEMBinTest_la_CPPFLAGS)
 #LDADD= $(libMEDMEMBinTest_la_LDFLAGS) -lm libMEDMEMBinTest.la
 
+TESTS = $(bin_PROGRAMS)
 
 #if MED_ENABLE_KERNEL
 #     LDADD+=-lSALOMEBasics

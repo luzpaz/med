@@ -65,3 +65,5 @@ endif
 dist_salomescript_DATA = testMEDSPLITTER.py
 
 UNIT_TEST_PROG = TestMEDSPLITTER
+
+check: tests

@@ -95,3 +95,5 @@ endif
 AM_CPPFLAGS = $(libInterpKernelTest_la_CPPFLAGS)
 
 UNIT_TEST_PROG = TestInterpKernel
+
+check: tests

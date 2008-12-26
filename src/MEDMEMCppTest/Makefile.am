@@ -122,3 +122,5 @@ OBSOLETE_FILES = \
 	TestOpenMED.cxx
 
 EXTRA_DIST += $(OBSOLETE_FILES)
+
+check: tests
