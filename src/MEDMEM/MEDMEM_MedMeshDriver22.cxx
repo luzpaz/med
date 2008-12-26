@@ -189,6 +189,23 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
 
   _ptrMesh->_name =  _meshName;
 
+  // 0020058: Check version of med, which was used to save the file.
+  // 0020058: An assertion happens in MEDcoordLire(), if this version
+  // 0020058: is higher than the currently used version of med product.
+  med_int aMajor, aMinor, aRelease;
+  med_int aMajorCurr, aMinorCurr, aReleaseCurr;
+
+  med_err aRet = med_2_3::MEDversionLire(_medIdt, &aMajor, &aMinor, &aRelease);
+  med_2_3::MEDversionDonner(&aMajorCurr, &aMinorCurr, &aReleaseCurr);
+
+  int aVersionHex     = (aMajor << 16 | aMinor << 8 | aRelease);
+  int aVersionHexCurr = (aMajorCurr << 16 | aMinorCurr << 8 | aReleaseCurr);
+
+  if (aRet != 0 || aVersionHex > aVersionHexCurr)
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
+	  <<" cannot read a file of version higher than the currently used version of med."));
+  // 0020058: end of version check
+
   SCRUTE(_ptrMesh->getIsAGrid());
 
   if (_ptrMesh->getIsAGrid())
