@@ -160,49 +160,67 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER22::read() : " ;
   BEGIN_OF_MED(LOC);
-  if (_status!=MED_OPENED)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The _idt of file " << _fileName << " is : " << _medIdt <<  " (the file is not opened)." )) ;
+  if (_status != MED_OPENED)
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The _idt of file " << _fileName
+                                 << " is : " << _medIdt << " (the file is not opened)."));
 
-  if ( ( _meshName.empty() ) && ( _ptrMesh->_name.empty() )    )
+  if ( ( _meshName.empty() ) && ( _ptrMesh->_name.empty() ) )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
-				 <<" neither <meshName> is set in driver nor in object MESH.")) ;
+				 <<" neither <meshName> is set in driver nor in object MESH."));
 
   // If _meshName is not set in driver, try to use _ptrMesh->_name
-  if ( ( _meshName.empty() ) && ( !_ptrMesh->_name.empty() )    )
-    _meshName=_ptrMesh->_name;
+  if ( ( _meshName.empty() ) && ( !_ptrMesh->_name.empty() ) )
+    _meshName = _ptrMesh->_name;
 
   if ( _meshName.size() > MED_TAILLE_NOM )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
 				 <<" <meshName> size in object driver MESH is > MED_TAILLE_NOM ."));
 
+  _ptrMesh->_name = _meshName;
 
-  _ptrMesh->_name =  _meshName;
+  // 0020058: Check version of med, which was used to save the file.
+  // 0020058: An assertion happens in MEDcoordLire(), if this version
+  // 0020058: is higher than the currently used version of med product.
+  med_int aMajor, aMinor, aRelease;
+  med_int aMajorCurr, aMinorCurr, aReleaseCurr;
+
+  med_err aRet = med_2_3::MEDversionLire(_medIdt, &aMajor, &aMinor, &aRelease);
+  med_2_3::MEDversionDonner(&aMajorCurr, &aMinorCurr, &aReleaseCurr);
+
+  int aVersionHex     = (aMajor << 16 | aMinor << 8 | aRelease);
+  int aVersionHexCurr = (aMajorCurr << 16 | aMinorCurr << 8 | aReleaseCurr);
+
+  if (aRet != 0 || aVersionHex > aVersionHexCurr)
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
+	  <<" cannot read a file of version higher than the currently used version of med."));
+  // 0020058: end of version check
 
   SCRUTE_MED(_ptrMesh->getIsAGrid());
 
   if (_ptrMesh->getIsAGrid())
   {
-    getGRID( );
+    getGRID();
     {
-      if (getFAMILY()!=MED_VALID)
+      if (getFAMILY() != MED_VALID)
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY when the mesh is a grid")) ;
-      buildAllGroups(_ptrMesh->_groupNode,_ptrMesh->_familyNode) ;
+      buildAllGroups(_ptrMesh->_groupNode, _ptrMesh->_familyNode);
     }
-  END_OF_MED(LOC);
+    END_OF_MED(LOC);
     return;
   }
   else // check that the mesh is really unstructured (PAL14113)
   {
-    char                  meshName[MED_TAILLE_NOM+1]="";
-    char                  meshDescription[MED_TAILLE_DESC+1]="";
+    char                  meshName[MED_TAILLE_NOM+1] = "";
+    char                  meshDescription[MED_TAILLE_DESC+1] = "";
     med_2_3::med_int      meshDim;
     med_2_3::med_maillage meshType;
-    int numberOfMeshes = med_2_3::MEDnMaa(_medIdt);
-    for (int i=1;i<=numberOfMeshes;i++)
+    int                   numberOfMeshes = med_2_3::MEDnMaa(_medIdt);
+
+    for (int i = 1; i <= numberOfMeshes; i++)
     {
-      MEDmaaInfo(_medIdt, i ,meshName, &meshDim, &meshType, meshDescription);
+      MEDmaaInfo(_medIdt, i, meshName, &meshDim, &meshType, meshDescription);
       if (_meshName == string(meshName)) {
-        if ( meshType == med_2_3::MED_STRUCTURE ) {
+        if (meshType == med_2_3::MED_STRUCTURE) {
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
                                        "class GRID must be used for a structured mesh"));
         }
@@ -213,14 +231,14 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
     }
   }
 
-  if (getCOORDINATE()!=MED_VALID)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getCOORDINATE"  )) ;
- 
-  if (getCONNECTIVITY()!=MED_VALID)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getCOONECTIVITY")) ;
-  
-  if (getFAMILY()!=MED_VALID)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY"      )) ;
+  if (getCOORDINATE() != MED_VALID)
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getCOORDINATE"  ));
+
+  if (getCONNECTIVITY() != MED_VALID)
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getCOONECTIVITY"));
+
+  if (getFAMILY() != MED_VALID)
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY"      ));
 
   if (_computeFaces)
     updateFamily();
@@ -515,15 +533,16 @@ int  MED_MESH_RDONLY_DRIVER22::getCOORDINATE()
   BEGIN_OF_MED(LOC);
 
   if (_status==MED_OPENED)
-    {
-      int err ;
-      
-  int numberOfMeshesInFile = med_2_3::MEDnMaa(_medIdt);
+  {
+    int err;
 
-  if (numberOfMeshesInFile == MED_INVALID)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Problem in File where the mesh " << _meshName << " is supposed to be stored"));
+    int numberOfMeshesInFile = med_2_3::MEDnMaa(_medIdt);
 
-  for (int index = 0; index < numberOfMeshesInFile; index++)
+    if (numberOfMeshesInFile == MED_INVALID)
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Problem in File where the mesh " << _meshName
+                                   << " is supposed to be stored"));
+
+    for (int index = 0; index < numberOfMeshesInFile; index++)
     {
       char meshName[MED_TAILLE_NOM+1]="";
       char meshDescription[MED_TAILLE_DESC+1]="";
@@ -532,170 +551,165 @@ int  MED_MESH_RDONLY_DRIVER22::getCOORDINATE()
       med_2_3::med_maillage meshType;
 
       err = med_2_3::MEDmaaInfo(_medIdt, (index+1), meshName, &meshDim,
-			       &meshType, meshDescription) ;
+                                &meshType, meshDescription) ;
 
-      MESSAGE_MED(LOC<<": Mesh n°"<< (index+1) <<" nammed "<< meshName << " with the description " << meshDescription << " is structured");
+      MESSAGE_MED(LOC<<": Mesh n°"<< (index+1) <<" nammed "<< meshName
+                  << " with the description " << meshDescription << " is structured");
 
       if (_meshName == string(meshName))
-	{
-	  _ptrMesh->_description = meshDescription;
-	}
-    }
-
-
-      // Read the dimension of the mesh <_meshName>
-      int MeshDimension = med_2_3::MEDdimLire(_medIdt, const_cast <char *>
-					     (_meshName.c_str())) ;
-
-      if ( MeshDimension == MED_INVALID ) 
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The mesh dimension |" <<
-				     MeshDimension <<
-				     "| seems to be incorrect " <<
-				     "for the mesh : |" << _meshName << "|")) ;
-
-      _ptrMesh->_meshDimension = MeshDimension;
-
-      // Read or get the dimension of the space for the mesh <_meshName>
-      int SpaceDimension = MeshDimension;
-
-      int SpaceDimensionRead = med_2_3::MEDdimEspaceLire(_medIdt,
-							const_cast <char *>
-							(_meshName.c_str())) ;
-
-      if (SpaceDimensionRead  != MED_INVALID)
-	SpaceDimension = SpaceDimensionRead;
-
-      _ptrMesh->_spaceDimension = SpaceDimension;
-
-      // Read the number of nodes used in the mesh <_meshName>
-      // to be able to create a COORDINATE object
-      int NumberOfNodes=MEDnEntMaa(_medIdt,
-                                   const_cast <char *> (_meshName.c_str()),
-                                   med_2_3::MED_COOR,
-                                   med_2_3::MED_NOEUD,
-                                   (med_2_3::med_geometrie_element) MED_NONE,
-                                   (med_2_3::med_connectivite)      MED_NONE);
-      if ( NumberOfNodes <= MED_VALID )
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"The number of nodes |" << NumberOfNodes << "| seems to be incorrect "
-                                     << "for the mesh : |" << _meshName << "|" )) ;
-      _ptrMesh->_numberOfNodes = NumberOfNodes ;
-
-      // create a COORDINATE object
-      if (_ptrMesh->_coordinate)
-        delete _ptrMesh->_coordinate;
-      _ptrMesh->_coordinate = new COORDINATE(SpaceDimension, NumberOfNodes, MED_EN::MED_FULL_INTERLACE);
-      
-      med_2_3::med_repere rep ; // ATTENTION ---> DOIT ETRE INTEGRE DS MESH EF: FAIT NON?
-      string tmp_nom_coord (MED_TAILLE_PNOM22*(_ptrMesh->_spaceDimension)+1,'\0');
-      string tmp_unit_coord(MED_TAILLE_PNOM22*(_ptrMesh->_spaceDimension)+1,'\0');
-      char * tmp_nom = (const_cast <char *> ( tmp_nom_coord.c_str())  ) ;
-      char * tmp_unit= (const_cast <char *> ( tmp_unit_coord.c_str()) ) ;
-
-      err=MEDcoordLire(_medIdt,
-                       const_cast <char *> (_ptrMesh->_name.c_str()),
-		       _ptrMesh->_spaceDimension,
-		       //const_cast <double *> ( _ptrMesh->_coordinate->_coordinate->get(MED_EN::MED_FULL_INTERLACE) ),
-		       const_cast <double *> ( _ptrMesh->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE) ),
-                       med_2_3::MED_FULL_INTERLACE,
-                       MED_ALL,                      // we read all the coordinates
-                       NULL,                         // we don't use a profile
-                       0,                            // so the profile's size is 0
-                       &rep,tmp_nom,tmp_unit);
-      if (err != MED_VALID)
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't read coordinates of the |" << NumberOfNodes << "| nodes "
-                                     << "for the mesh : |" << _meshName 
-                                     << "| of space dimension |" << SpaceDimension 
-                                     << "| with units names |"   << tmp_nom
-                                     << "| and units |"          << tmp_unit
-                                     << " |")) ;
-      
-
-      for (int i=0;i<_ptrMesh->_spaceDimension;i++) {
-	string myStringName(tmp_nom_coord,i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
-	string myStringUnit(tmp_unit_coord,i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
-	// suppress space at the end
-	int j ;
-	for(j=MED_TAILLE_PNOM22-1;j>=0;j--)
-	  if (myStringName[j] != ' ') break ;
-	_ptrMesh->_coordinate->_coordinateName[i]=string(myStringName,0,j+1);
-	for(j=MED_TAILLE_PNOM22-1;j>=0;j--)
-	  if (myStringUnit[j] != ' ') break ;
-	_ptrMesh->_coordinate->_coordinateUnit[i]=string(myStringUnit,0,j+1);
+      {
+        _ptrMesh->_description = meshDescription;
       }
-
-      // Pourquoi le stocker sous forme de chaîne ?
-      switch (rep)
-	{
-	case med_2_3::MED_CART : 
-	  {
-	    _ptrMesh->_coordinate->_coordinateSystem = "CARTESIAN";
-	    break ;
-	  }
-	case med_2_3::MED_CYL :
-	  {
-	    _ptrMesh->_coordinate->_coordinateSystem = "CYLINDRICAL";
-	    break ;
-	  }
-	case med_2_3::MED_SPHER :
-	  {
-	    _ptrMesh->_coordinate->_coordinateSystem = "SPHERICAL";
-	    break ;
-	  }
-	default :
-	  {
-	    _ptrMesh->_coordinate->_coordinateSystem = "UNDEFINED"; // ?Erreur ?
-	    break ;
-	  }
-	}
-
-      // Read the unused optional node Names
-      char * tmp_node_name = new char[NumberOfNodes*MED_TAILLE_PNOM22+1];
-      tmp_node_name[NumberOfNodes]='\0' ;
-      err=MEDnomLire(_medIdt,const_cast <char*> (_ptrMesh->_name.c_str()),
-		     tmp_node_name,NumberOfNodes*MED_TAILLE_PNOM22,med_2_3::MED_NOEUD,
-		     (med_2_3::med_geometrie_element) MED_NONE);
-      if (err == MED_VALID) 
-        MESSAGE_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have names but we do not read them !");
-      delete[] tmp_node_name ;
-
-
-      // ??? Read the unused optional node Numbers ???
-      med_2_3::med_int * tmp_node_number = new med_2_3::med_int[NumberOfNodes] ;
-      err=MEDnumLire(_medIdt,const_cast <char*> (_ptrMesh->_name.c_str()),
-		     tmp_node_number,NumberOfNodes,med_2_3::MED_NOEUD,(med_2_3::med_geometrie_element)0);
-      if (err == MED_VALID) {
-        // INFOS_MED(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
-        // INFOS_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have numbers but we do not take care of them !");
-        // INFOS_MED(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
-	MESSAGE_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : Nodes have numbers, we DO TAKE care of them !");
-	_ptrMesh->_coordinate->_nodeNumber.set(NumberOfNodes) ; 
-#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-	for(med_2_3::med_int i2=0;i2<NumberOfNodes;i2++)
-	  _ptrMesh->_coordinate->_nodeNumber[i2]=(int)(tmp_node_number[i2]);
-#else
-	memcpy((int*)_ptrMesh->_coordinate->_nodeNumber,tmp_node_number,sizeof(int)*NumberOfNodes) ;
-#endif
-	
-	//////////////////////////////////////////////////////////////////////////////////////
-  	///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
-  	//////////////////////////////////////////////////////////////////////////////////////
-  	///
-	/// Calcule _optionnalToCanonicNodesNumbers de telle sorte que _optionnalToCanonicNodesNumbers[OptionnalNumber]==CanonicNumber
-	
-// 	_ptrMesh->_arePresentOptionnalNodesNumbers=1;
-//   	for (int canonicNumber=1;canonicNumber<=NumberOfNodes;canonicNumber++) _ptrMesh->_optionnalToCanonicNodesNumbers[tmp_node_number[canonicNumber-1]]=canonicNumber;
-// ICI RETOUR A LA NORMALE::: AUCUNE PRISE EN COMPTE D'UN NUMEROTATION OPTIONNEL
-	_ptrMesh->_arePresentOptionnalNodesNumbers=0;
-      } 
-      else _ptrMesh->_arePresentOptionnalNodesNumbers=0;
-
-  	//////////////////////////////////////////////////////////////////////////////////////
-
-      delete[] tmp_node_number ;
-      
-  END_OF_MED(LOC);
-      return MED_VALID;
     }
+
+    // Read the dimension of the mesh <_meshName>
+    int MeshDimension = med_2_3::MEDdimLire(_medIdt, const_cast <char *>
+                                            (_meshName.c_str())) ;
+
+    if ( MeshDimension == MED_INVALID )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The mesh dimension |" << MeshDimension
+                                   << "| seems to be incorrect for the mesh : |" << _meshName << "|"));
+
+    _ptrMesh->_meshDimension = MeshDimension;
+
+    // Read or get the dimension of the space for the mesh <_meshName>
+    int SpaceDimension = MeshDimension;
+
+    int SpaceDimensionRead = med_2_3::MEDdimEspaceLire(_medIdt,
+                                                       const_cast <char *>
+                                                       (_meshName.c_str())) ;
+
+    if (SpaceDimensionRead  != MED_INVALID)
+      SpaceDimension = SpaceDimensionRead;
+
+    _ptrMesh->_spaceDimension = SpaceDimension;
+
+    // Read the number of nodes used in the mesh <_meshName>
+    // to be able to create a COORDINATE object
+    int NumberOfNodes=MEDnEntMaa(_medIdt,
+                                 const_cast <char *> (_meshName.c_str()),
+                                 med_2_3::MED_COOR,
+                                 med_2_3::MED_NOEUD,
+                                 (med_2_3::med_geometrie_element) MED_NONE,
+                                 (med_2_3::med_connectivite)      MED_NONE);
+    if ( NumberOfNodes <= MED_VALID )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"The number of nodes |" << NumberOfNodes
+                                   << "| seems to be incorrect for the mesh : |" << _meshName << "|" ));
+    _ptrMesh->_numberOfNodes = NumberOfNodes;
+
+    // create a COORDINATE object
+    if (_ptrMesh->_coordinate)
+      delete _ptrMesh->_coordinate;
+    _ptrMesh->_coordinate = new COORDINATE(SpaceDimension, NumberOfNodes, MED_EN::MED_FULL_INTERLACE);
+
+    med_2_3::med_repere rep; // ATTENTION ---> DOIT ETRE INTEGRE DS MESH EF: FAIT NON?
+    string tmp_nom_coord (MED_TAILLE_PNOM22*(_ptrMesh->_spaceDimension)+1,'\0');
+    string tmp_unit_coord(MED_TAILLE_PNOM22*(_ptrMesh->_spaceDimension)+1,'\0');
+    char * tmp_nom = (const_cast <char *> ( tmp_nom_coord.c_str())  ) ;
+    char * tmp_unit= (const_cast <char *> ( tmp_unit_coord.c_str()) ) ;
+
+    err=MEDcoordLire(_medIdt,
+                     const_cast <char *> (_ptrMesh->_name.c_str()),
+                     _ptrMesh->_spaceDimension,
+                     const_cast<double *>(_ptrMesh->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE)),
+                     med_2_3::MED_FULL_INTERLACE,
+                     MED_ALL,                      // we read all the coordinates
+                     NULL,                         // we don't use a profile
+                     0,                            // so the profile's size is 0
+                     &rep,tmp_nom,tmp_unit);
+    if (err != MED_VALID)
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't read coordinates of the |" << NumberOfNodes
+                                   << "| nodes for the mesh : |" << _meshName 
+                                   << "| of space dimension |" << SpaceDimension 
+                                   << "| with units names |"   << tmp_nom
+                                   << "| and units |"          << tmp_unit
+                                   << " |")) ;
+
+    for (int i=0;i<_ptrMesh->_spaceDimension;i++) {
+      string myStringName(tmp_nom_coord,i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
+      string myStringUnit(tmp_unit_coord,i*MED_TAILLE_PNOM22,MED_TAILLE_PNOM22) ;
+      // suppress space at the end
+      int j ;
+      for(j=MED_TAILLE_PNOM22-1;j>=0;j--)
+        if (myStringName[j] != ' ') break ;
+      _ptrMesh->_coordinate->_coordinateName[i]=string(myStringName,0,j+1);
+      for(j=MED_TAILLE_PNOM22-1;j>=0;j--)
+        if (myStringUnit[j] != ' ') break ;
+      _ptrMesh->_coordinate->_coordinateUnit[i]=string(myStringUnit,0,j+1);
+    }
+
+    // Pourquoi le stocker sous forme de chaîne ?
+    switch (rep)
+    {
+    case med_2_3::MED_CART : 
+      {
+        _ptrMesh->_coordinate->_coordinateSystem = "CARTESIAN";
+        break ;
+      }
+    case med_2_3::MED_CYL :
+      {
+        _ptrMesh->_coordinate->_coordinateSystem = "CYLINDRICAL";
+        break ;
+      }
+    case med_2_3::MED_SPHER :
+      {
+        _ptrMesh->_coordinate->_coordinateSystem = "SPHERICAL";
+        break ;
+      }
+    default :
+      {
+        _ptrMesh->_coordinate->_coordinateSystem = "UNDEFINED"; // ?Erreur ?
+        break ;
+      }
+    }
+
+    // Read the unused optional node Names
+    char * tmp_node_name = new char[NumberOfNodes*MED_TAILLE_PNOM22+1];
+    tmp_node_name[NumberOfNodes]='\0' ;
+    err=MEDnomLire(_medIdt,const_cast <char*> (_ptrMesh->_name.c_str()),
+                   tmp_node_name,NumberOfNodes*MED_TAILLE_PNOM22,med_2_3::MED_NOEUD,
+                   (med_2_3::med_geometrie_element) MED_NONE);
+    if (err == MED_VALID) 
+      MESSAGE_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have names but we do not read them !");
+    delete[] tmp_node_name ;
+
+    // ??? Read the unused optional node Numbers ???
+    med_2_3::med_int * tmp_node_number = new med_2_3::med_int[NumberOfNodes] ;
+    err=MEDnumLire(_medIdt,const_cast <char*> (_ptrMesh->_name.c_str()),
+                   tmp_node_number,NumberOfNodes,med_2_3::MED_NOEUD,(med_2_3::med_geometrie_element)0);
+    if (err == MED_VALID) {
+      // INFOS_MED(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
+      // INFOS_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have numbers but we do not take care of them !");
+      // INFOS_MED(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
+      MESSAGE_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : Nodes have numbers, we DO TAKE care of them !");
+      _ptrMesh->_coordinate->_nodeNumber.set(NumberOfNodes) ; 
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
+      for(med_2_3::med_int i2=0;i2<NumberOfNodes;i2++)
+        _ptrMesh->_coordinate->_nodeNumber[i2]=(int)(tmp_node_number[i2]);
+#else
+      memcpy((int*)_ptrMesh->_coordinate->_nodeNumber,tmp_node_number,sizeof(int)*NumberOfNodes) ;
+#endif
+
+      //////////////////////////////////////////////////////////////////////////////////////
+      ///  Modification pour prise en compte de la numérotation optionnelle des noeuds  ///
+      //////////////////////////////////////////////////////////////////////////////////////
+      ///
+      /// Calcule _optionnalToCanonicNodesNumbers de telle sorte que _optionnalToCanonicNodesNumbers[OptionnalNumber]==CanonicNumber
+
+      // 	_ptrMesh->_arePresentOptionnalNodesNumbers=1;
+      //   	for (int canonicNumber=1;canonicNumber<=NumberOfNodes;canonicNumber++) _ptrMesh->_optionnalToCanonicNodesNumbers[tmp_node_number[canonicNumber-1]]=canonicNumber;
+      // ICI RETOUR A LA NORMALE::: AUCUNE PRISE EN COMPTE D'UN NUMEROTATION OPTIONNEL
+      _ptrMesh->_arePresentOptionnalNodesNumbers=0;
+    }
+    else _ptrMesh->_arePresentOptionnalNodesNumbers=0;
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    delete[] tmp_node_number;
+
+    END_OF_MED(LOC);
+    return MED_VALID;
+  }
   return MED_ERROR;
 }
 
