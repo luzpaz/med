@@ -36,6 +36,7 @@
 #include "MULTIPR_Exceptions.hxx"
 
 #include <iostream>
+#include <limits>
 
 using namespace std;
 

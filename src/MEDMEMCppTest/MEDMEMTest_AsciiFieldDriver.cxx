@@ -29,7 +29,7 @@
 #include <stdio.h>
 
 #include <sstream>
-#include <fstream.h>
+#include <fstream>
 #include <cmath>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault

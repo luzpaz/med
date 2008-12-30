@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <iterator>
 #include <set>
+#include <memory>
 
 using namespace std;
 using namespace INTERP_KERNEL;

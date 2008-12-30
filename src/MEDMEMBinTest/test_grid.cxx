@@ -20,6 +20,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_Grid.hxx"
+#include <memory>
 
 using namespace MEDMEM;
 using namespace MED_EN;

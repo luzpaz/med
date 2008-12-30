@@ -19,6 +19,7 @@
 #include "MPI_Access.hxx"
 
 #include <iostream>
+#include <cstdlib>
 
 #include "MEDMEM_Exception.hxx"
 

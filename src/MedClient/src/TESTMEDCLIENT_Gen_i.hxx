@@ -23,7 +23,7 @@
 #define _TESTMEDCLIENT_GEN_I_HXX_
 
 #include <TESTMEDCLIENT_Gen.hh>
-#include <iostream.h>
+#include <iostream>
 #include "SALOME_Component_i.hxx"
 
 class TESTMEDCLIENT_Gen_i :

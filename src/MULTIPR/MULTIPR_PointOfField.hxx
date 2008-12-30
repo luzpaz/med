@@ -39,7 +39,7 @@ extern "C"
 {
     #include "med.h"
 }
-
+#include <limits>
 
 namespace multipr
 {

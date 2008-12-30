@@ -43,6 +43,7 @@ extern "C"
     #include "med.h"
 }
 
+#include <iostream>
 #include <set>
 #include <vector>
 

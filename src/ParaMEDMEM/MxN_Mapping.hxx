@@ -39,8 +39,8 @@ public:
   void addElementFromSource(int distant_proc, int distant_elem);
   void prepareSendRecv();
   void sendRecv(MEDMEM::FIELD<double>& field);
-  void sendRecv(double* field, MEDMEM::FIELD<double>& field) const ;
-	void reverseSendRecv(double* field, MEDMEM::FIELD<double>& field) const ;
+  void sendRecv(double* field1, MEDMEM::FIELD<double>& field2) const ;
+	void reverseSendRecv(double* field1, MEDMEM::FIELD<double>& field2) const ;
  
 	MPI_AccessDEC* getAccessDEC(){return _accessDEC;}
 private :

@@ -44,6 +44,7 @@ extern "C"
 
 #include <vector>
 #include <set>
+#include <iostream>
 
 namespace multipr
 {

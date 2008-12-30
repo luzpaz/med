@@ -23,6 +23,7 @@
 #include <set>
 #include <list>
 #include <vector>
+#include <iostream>
 
 namespace INTERP_KERNEL
 {
