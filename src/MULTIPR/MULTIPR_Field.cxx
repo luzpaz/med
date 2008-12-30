@@ -41,6 +41,7 @@
 #include "MULTIPR_Profil.hxx"
 
 #include <iostream>
+#include <limits>
 
 using namespace std;
 

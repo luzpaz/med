@@ -27,6 +27,7 @@
 
 #include <sstream>
 #include <cmath>
+#include <cstring>
 
 using namespace std;
 using namespace MEDMEM;

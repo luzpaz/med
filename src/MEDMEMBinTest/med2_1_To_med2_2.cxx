@@ -21,6 +21,7 @@
 //
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_medimport_src.hxx"
+#include <cstdlib>
 
 using namespace std;
 using namespace MEDMEM;
