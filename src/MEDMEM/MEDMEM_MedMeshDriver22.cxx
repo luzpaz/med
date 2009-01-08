@@ -192,8 +192,8 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
   // 0020058: Check version of med, which was used to save the file.
   // 0020058: An assertion happens in MEDcoordLire(), if this version
   // 0020058: is higher than the currently used version of med product.
-  med_int aMajor, aMinor, aRelease;
-  med_int aMajorCurr, aMinorCurr, aReleaseCurr;
+  med_2_3::med_int aMajor, aMinor, aRelease;
+  med_2_3::med_int aMajorCurr, aMinorCurr, aReleaseCurr;
 
   med_err aRet = med_2_3::MEDversionLire(_medIdt, &aMajor, &aMinor, &aRelease);
   med_2_3::MEDversionDonner(&aMajorCurr, &aMinorCurr, &aReleaseCurr);
