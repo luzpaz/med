@@ -21,7 +21,7 @@
 #include <vector>
 #include <map>
 #include <iostream>
-#include <ctime.h>
+#include <ctime>
 
 #include "MPIAccessDECTest.hxx"
 #include <cppunit/TestAssert.h>

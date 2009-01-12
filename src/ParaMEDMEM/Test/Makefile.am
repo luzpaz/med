@@ -101,4 +101,13 @@ AM_CPPFLAGS= $(libParaMEDMEMTest_la_CPPFLAGS)
 
 UNIT_TEST_PROG = TestParaMEDMEM
 
-check: tests
+check: mytests
+
+mytests: $(UNIT_TEST_PROG)
+	@if test "x$(UNIT_TEST_PROG)" != "x"; then \
+	    mpirun -np 1 $(UNIT_TEST_PROG); \
+	    mpirun -np 2 $(UNIT_TEST_PROG); \
+	    mpirun -np 3 $(UNIT_TEST_PROG); \
+	    mpirun -np 4 $(UNIT_TEST_PROG); \
+	    mpirun -np 5 $(UNIT_TEST_PROG); \
+	fi;
