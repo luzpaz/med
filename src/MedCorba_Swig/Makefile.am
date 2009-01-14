@@ -53,7 +53,7 @@ libMedCorba_Swig_wrap.cxx: $(SWIG_DEF) $(SWIG_DEP)
 #############################################################################
 
 _libMedCorba_Swig_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
-	$(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} -ftemplate-depth-42 \
+	$(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../MEDMEM_I -I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDMEM_SWIG -I$(srcdir)/../MED -I$(srcdir)/../MEDWrapper/V2_1/Core \
 	-I$(srcdir)/../INTERP_KERNEL -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl
 _libMedCorba_Swig_la_LDFLAGS  = -module $(PYTHON_LIBS) $(MED2_LIBS) $(HDF5_LIBS)  ${KERNEL_LDFLAGS} -lSALOMELocalTrace \

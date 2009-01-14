@@ -18,7 +18,9 @@
 //
 #include "InterpolationOptionsTest.hxx"
 #include "MEDNormalizedUnstructuredMesh.hxx"
+#include "MEDNormalizedUnstructuredMesh.txx"
 #include "Interpolation2D.hxx"
+#include "Interpolation2D.txx"
 #include <iostream>
 #include <vector>
 

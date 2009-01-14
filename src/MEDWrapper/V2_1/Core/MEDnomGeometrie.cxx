@@ -19,6 +19,8 @@
 #include "med.hxx"
 #include "med_outils.hxx"
 
+#include <cstring>
+
 /*
  * - Nom de la fonction : _MEDnomGeometrie
  * - Description : fournit le nom de l'element geometrique associe

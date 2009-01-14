@@ -20,6 +20,8 @@
 #include "med.hxx"
 #include "med_outils.hxx"
 
+#include <cstring>
+
 /*
  * - Nom de la fonction : _MEDnomDataset
  * - Description : fournit un nom de dataset

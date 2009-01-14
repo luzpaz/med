@@ -20,6 +20,7 @@
 #include "med_outils.hxx"
 
 #include <stdio.h>
+#include <cstring>
 
 namespace med_2_1{
 

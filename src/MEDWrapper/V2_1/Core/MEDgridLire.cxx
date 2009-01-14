@@ -1,6 +1,8 @@
 #include "med_outils.hxx"
 #include "med.hxx"
 
+#include <cstring>
+
 namespace med_2_1{
 
 med_err 

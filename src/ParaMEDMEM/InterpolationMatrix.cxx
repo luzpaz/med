@@ -26,6 +26,7 @@
 #include "Interpolation3DSurf.txx"
 #include "Interpolation3D.txx"
 #include "MEDNormalizedUnstructuredMesh.hxx"
+#include "MEDNormalizedUnstructuredMesh.txx"
 #include "InterpolationOptions.hxx"
 
 /*! \class InterpolationMatrix

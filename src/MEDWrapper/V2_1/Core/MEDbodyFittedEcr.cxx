@@ -19,6 +19,8 @@
 #include "med_outils.hxx"
 #include "med.hxx"
 
+#include <cstring>
+
 #if defined(HAVE_F77INT64)
 #define MED_INTEGER MED_INT64
 #else

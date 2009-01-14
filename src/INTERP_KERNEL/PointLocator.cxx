@@ -21,6 +21,7 @@
 #include "MEDMEM_Exception.hxx"
 #include "PointLocatorAlgos.txx"
 #include "PointLocator.hxx"
+#include "MEDNormalizedUnstructuredMesh.txx"
 
 namespace INTERP_KERNEL {
   PointLocator::PointLocator(const MEDMEM::MESH& mesh)

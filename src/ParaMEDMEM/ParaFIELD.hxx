@@ -26,7 +26,6 @@
 
 namespace MEDMEM{
 	class MEDEXCEPTION;
-  template <class T> class FIELD<T>;
 }
 
 

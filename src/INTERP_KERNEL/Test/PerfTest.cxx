@@ -24,6 +24,7 @@
 
 #include "MEDMEM_Mesh.hxx"
 #include "MEDNormalizedUnstructuredMesh.hxx"
+#include "MEDNormalizedUnstructuredMesh.txx"
 
 #include <cassert>
 #include <string>
