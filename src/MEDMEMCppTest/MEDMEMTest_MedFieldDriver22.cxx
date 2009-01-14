@@ -78,12 +78,12 @@ void MEDMEMTest::testMedFieldDriver22()
   FIELD<int> *aField                = new FIELD<int> ();
   FIELD<int> *aField_1              = new FIELD<int> ();
   FIELD<double> *aField_2           = new FIELD<double> ();
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/pointe_import22.med";
-  string filenameWithOutFileds      = data_dir + "/MedFiles/mesh_import22.med";
+  string filename_rd                = data_dir + "/share/salome/resources/med/pointe_import22.med";
+  string filenameWithOutFileds      = data_dir + "/share/salome/resources/med/mesh_import22.med";
   string fileldnotexist             = "anyfield";
   string fieldname                  = "fieldnodeint";
   string fieldname_cpy              = fieldname + "_cpy";
@@ -94,7 +94,7 @@ void MEDMEMTest::testMedFieldDriver22()
   string cp_file_wr                 = "cp " + filename_rd + " " + filename_wr;
   string fileNotExist_wr            = "/path_not_exist/file_not_exist.med";
   string emptyfile_wr               = tmp_dir + "/myWrField_pointe_empty22.med";
-  string other_file                 = data_dir + "/MedFiles/cube_hexa8_import22.med";
+  string other_file                 = data_dir + "/share/salome/resources/med/cube_hexa8_import22.med";
   string other_file_wr              = tmp_dir + "/myWRcube_hexa8_import22.med";
   string cp_other_file              = "cp " + other_file + " " + other_file_wr;
 

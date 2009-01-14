@@ -79,12 +79,12 @@ void MEDMEMTest::testMedFieldDriver21()
   FIELD<int> *aField                = new FIELD<int> ();
   FIELD<int> *aField_1              = new FIELD<int> ();
   FIELD<double> *aField_2           = new FIELD<double> ();
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/pointe.med";
-  string filenameWithOutFileds      = data_dir + "/MedFiles/Mistrat.med";
+  string filename_rd                = data_dir + "/share/salome/resources/med/pointe.med";
+  string filenameWithOutFileds      = data_dir + "/share/salome/resources/med/Mistrat.med";
   string fileldnotexist             = "anyfield";
   string fieldname                  = "fieldnodeint";
   string fieldname_cpy              = fieldname + "_cpy";
@@ -95,7 +95,7 @@ void MEDMEMTest::testMedFieldDriver21()
   string cp_file_wr                 = "cp " + filename_rd + " " + filename_wr;
   string fileNotExist_wr            = "/path_not_exist/file_not_exist.med";
   string emptyfile_wr               = tmp_dir + "/myWrField_pointe_empty21.med";
-  string other_file                 = data_dir + "/MedFiles/fra.med";
+  string other_file                 = data_dir + "/share/salome/resources/med/fra.med";
   string other_file_wr              = tmp_dir + "/myWRfrab.med";
   string cp_other_file              = "cp " + other_file + " " + other_file_wr;
 

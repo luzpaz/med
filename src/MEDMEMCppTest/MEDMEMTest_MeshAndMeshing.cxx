@@ -239,8 +239,8 @@ void addMedFacesGroupAll (MESHING& meshing, string groupName)
  */
 void MEDMEMTest::testMeshAndMeshing()
 {
-  string datadir  = getenv("DATA_DIR");
-  string filename = datadir + "/MedFiles/pointe.med";
+  string datadir  = getenv("MED_ROOT_DIR");
+  string filename = datadir + "/share/salome/resources/med/pointe.med";
   string meshname = "maa1";
   string tmp_dir  = getenv("TMP");
   if (tmp_dir == "")

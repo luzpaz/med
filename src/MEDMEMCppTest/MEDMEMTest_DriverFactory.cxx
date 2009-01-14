@@ -484,8 +484,8 @@ void MEDMEMTest::testDriverFactory()
                        MED_EXCEPTION);
 
   // now try with valid field
-  string datadir   = getenv("DATA_DIR");
-  string filename  = datadir + "/MedFiles/pointe.med";
+  string datadir   = getenv("MED_ROOT_DIR");
+  string filename  = datadir + "/share/salome/resources/med/pointe.med";
   string meshname  = "maa1";
   string fieldname = "fieldcelldouble";
   FIELD<double> * aField1 = new FIELD<double> (MED_DRIVER, filename, fieldname);
@@ -518,8 +518,8 @@ void MEDMEMTest::testDriverFactory()
   ////////////////////////////////////
   // Test 6: buildMedDriverFromFile //
   ////////////////////////////////////
-  string aFileName1 = datadir + "/MedFiles/pointe.med";
-  string aFileName2 = datadir + "/MedFiles/polyedres.med";
+  string aFileName1 = datadir + "/share/salome/resources/med/pointe.med";
+  string aFileName2 = datadir + "/share/salome/resources/med/polyedres.med";
   medFileVersion version1, version2;
 
   try {

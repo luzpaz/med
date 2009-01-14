@@ -553,15 +553,15 @@ void proj2d (const double * temp, double* output)
 
 void testDrivers()
 {
-  string data_dir                     = getenv("DATA_DIR");
+  string data_dir                     = getenv("MED_ROOT_DIR");
   string tmp_dir                      = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
 
-  string filename_rd                  = data_dir + "/MedFiles/pointe.med";
+  string filename_rd                  = data_dir + "/share/salome/resources/med/pointe.med";
   string filename_wr                  = tmp_dir  + "/myMedFieldfile.med";
   string filename_support_wr          = tmp_dir  + "/myMedSupportFiledfile.med";
-  string filename22_rd                = data_dir + "/MedFiles/pointe_import22.med";
+  string filename22_rd                = data_dir + "/share/salome/resources/med/pointe_import22.med";
   string filenamevtk_wr                = tmp_dir  + "/myMedFieldfile22.vtk";
   string cp_file                      = "cp " + filename_rd + " " + filename_wr;
 

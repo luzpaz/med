@@ -104,11 +104,11 @@ void MEDMEMTest::testGibiMeshDriver()
   MED  *aMed                       = new MED();
   MED  *aMed_1                     = NULL;
 
-  string data_dir                  = getenv("DATA_DIR");
+  string data_dir                  = getenv("MED_ROOT_DIR");
   string tmp_dir                   = getenv("TMP");
 
-  string filename_rd               = data_dir + "/Sauv/Darcy3_3D_H_10x10x10.sauve";
-  string filenamemed_rd            = data_dir + "/Sauv/elle_3D_HPr_10x10x10.sauve";
+  string filename_rd               = data_dir + "/share/salome/resources/med/Darcy3_3D_H_10x10x10.sauve";
+  string filenamemed_rd            = data_dir + "/share/salome/resources/med/elle_3D_HPr_10x10x10.sauve";
   string filename_wr               = tmp_dir  + "/myWr_Darcy3_3D_H_10x10x10.sauve";
   string tmpfile                   = tmp_dir  + "/tmp.sauve";
   string tmpfile_rdwr              = tmp_dir  + "/rdwr_tmp.sauve";

@@ -51,13 +51,13 @@ void MEDMEMTest::testTopLevel()
 {
   MED * aMed = NULL;
 
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
 
-  string filename_rd                = data_dir + "/MedFiles/pointe.med";
-  string filename22_rd              = data_dir + "/MedFiles/pointe_import22.med";
+  string filename_rd                = data_dir + "/share/salome/resources/med/pointe.med";
+  string filename22_rd              = data_dir + "/share/salome/resources/med/pointe_import22.med";
   string filenameMesh_wr            = tmp_dir + "/myMesh.med";
   string filenameMed_wr             = tmp_dir + "/myMed.med";
   string filenameField_wr           = tmp_dir + "/myField.med";

@@ -41,8 +41,8 @@ using namespace MED_EN;
 
 void MEDMEMTest::testMedVersion()
 {
-  string filename = getenv("DATA_DIR");
-  filename += "/MedFiles/pointe.med";
+  string filename = getenv("MED_ROOT_DIR");
+  filename += "/share/salome/resources/med/pointe.med";
   string notExistFileName = "anyfile";
   medFileVersion myFileVersion;
   medFileVersion myEmptyFileVersion;
