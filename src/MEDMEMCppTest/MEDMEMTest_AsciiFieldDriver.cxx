@@ -81,7 +81,7 @@ void MEDMEMTest::testAsciiFieldDriver()
 {
   // read a mesh from a MED file
   string datadir   = getenv("MED_ROOT_DIR");
-  string tmp_dir   = getenv("TMP");
+  string tmp_dir   = getenv("TMP") ? getenv("TMP") : "/tmp";
   string filename  = datadir + "/share/salome/resources/med/pointe.med";
   string meshname  = "maa1";
   string fieldname = "fieldcelldouble";
@@ -145,6 +145,9 @@ void MEDMEMTest::testAsciiFieldDriver()
     CPPUNIT_ASSERT_EQUAL(aa[2], bb[0]);
   }
 
+  printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+  printf("1\n");
+  printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
   // template<int N> bool compare(const double* a, const double* b)
   {
     {

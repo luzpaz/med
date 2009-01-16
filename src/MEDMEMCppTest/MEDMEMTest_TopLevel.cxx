@@ -52,7 +52,7 @@ void MEDMEMTest::testTopLevel()
   MED * aMed = NULL;
 
   string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
+  string tmp_dir                    = getenv("TMP") ? getenv("TMP") : "/tmp";
   if (tmp_dir == "")
     tmp_dir = "/tmp";
 

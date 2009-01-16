@@ -79,7 +79,7 @@ void MEDMEMTest::testPorflowMeshDriver()
   MESH *aMesh_1                    = new MESH();
 
   string data_dir                  = getenv("MED_ROOT_DIR");
-  string tmp_dir                   = getenv("TMP");
+  string tmp_dir                   = getenv("TMP") ? getenv("TMP") : "/tmp";
 
   string filename_rd               = data_dir + "/share/salome/resources/med/Case1.inp";
   string filename_wr               = tmp_dir  + "/myWr_Case1.inp";

@@ -555,7 +555,7 @@ void proj2d (const double * temp, double* output)
 void testDrivers()
 {
   string data_dir                     = getenv("MED_ROOT_DIR");
-  string tmp_dir                      = getenv("TMP");
+  string tmp_dir                      = getenv("TMP") ? getenv("TMP") : "/tmp";
   if (tmp_dir == "")
     tmp_dir = "/tmp";
 
