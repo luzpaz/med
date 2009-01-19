@@ -34,6 +34,7 @@
 from medmem import *
 from dumpMEDMEM import *
 from re import search
+import sys
 
 ASCII = False
 Binary = True
