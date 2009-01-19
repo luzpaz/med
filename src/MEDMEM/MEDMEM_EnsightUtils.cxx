@@ -893,6 +893,26 @@ void _CaseFileDriver::read() throw (MEDEXCEPTION)
     cout << badFile <<
       "Warning: there are different fields with equal names, you may have problems!" << endl;
 //     throw MEDEXCEPTION(badFile );
+
+  // As variable does not refer to time set if there is one step (issue 0020113),
+  // we try to restore the reference
+
+  for ( ivars = _variables.begin(); ivars != _variables.end(); ++ivars ) {
+    _Variable & var = ivars->second;
+    if ( var._timeSetNumber.empty() )
+    {
+      // try to find time set with id equal to variable order number
+      map< int, _TimeSet >::iterator iTs = _timeSets.find( ivars->first );
+      if ( iTs != _timeSets.end() && iTs->second._times.size() == 1 )
+        var._timeSetNumber = STRING( iTs->second._number );
+      else {
+        // find any time set with 1 time value
+        for ( iTs = _timeSets.begin(); iTs != _timeSets.end(); ++iTs )
+          if ( iTs->second._times.size() == 1 )
+            var._timeSetNumber = STRING( iTs->second._number ); 
+      }
+    }
+  }
 }
 
 //================================================================================
@@ -1403,7 +1423,7 @@ void _CaseFileDriver::write() throw (MEDEXCEPTION)
       }
       if ( !_model._timeSetNumber.empty() && !_variables.empty() ) {
         // Make time set of the model independent of that of variables as
-        // the number of time steps is apparently becomeing different
+        // the number of time steps is apparently becoming different
         map< int, _Variable>::iterator ivar = _variables.begin();
         for ( ; ivar != _variables.end(); ++ivar ) {
           if ( ivar->second._timeSetNumber == _model._timeSetNumber ) {
@@ -1612,12 +1632,12 @@ void _CaseFileDriver::write() throw (MEDEXCEPTION)
     map< int, _TimeSet >::iterator its, tsEnd = _timeSets.end();
     for ( --tsEnd, its = _timeSets.begin(); its != tsEnd; ++its ) {
       if ( ts == its->second ) {
-        var._timeSetNumber = STRING( its->first );
+        tsNum = its->first;
+        var._timeSetNumber = STRING( tsNum );
         _timeSets.erase( tsEnd );
         break;
       }
     }
-
     tDrv = sortedDrivers->begin();
     for ( i = 1; tDrv != sortedDrivers->end(); ++tDrv, ++i ) {
       _CaseFileDriver_User* fieldDriver = tDrv->second;
@@ -1631,6 +1651,11 @@ void _CaseFileDriver::write() throw (MEDEXCEPTION)
       fieldDriver->_transientMode   = ( fieldDriver->_indexInDataFile > 0 );
       fieldDriver->_singleFileMode  = ( !_fileSets.empty() );
     }
+
+    // do not refer to time set if there is one step (issue 0020113)
+    if ( nbNewSteps == 1 )
+      var._timeSetNumber = "";
+
   } // loop on _fieldDrivers
 
   if ( nbOldMeshes + nbNewMeshes > 1 && !_variables.empty() )
