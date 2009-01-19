@@ -118,9 +118,9 @@ using namespace MED_EN;
  */
 void MEDMEMTest_testGrid()
 {
-  string datadir  = getenv("DATA_DIR");
-  string filename = datadir + "/MedFiles/test19.med" ;
-  string tmp_dir  = getenv("TMP");
+  string datadir  = getenv("MED_ROOT_DIR");
+  string filename = datadir + "/share/salome/resources/med/test19.med" ;
+  string tmp_dir  = getenv("TMP") ? getenv("TMP") : "/tmp";
   if (tmp_dir == "")
     tmp_dir = "/tmp";
   string filenameout21 = tmp_dir + "/myGridWrite_grid21.med";

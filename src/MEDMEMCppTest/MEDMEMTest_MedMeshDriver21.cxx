@@ -75,11 +75,11 @@ void MEDMEMTest::testMedMeshDriver21()
   MESH *aMesh                      = new MESH();
   MESH *aMesh_1                    = new MESH();
 
-  string data_dir                  = getenv("DATA_DIR");
-  string tmp_dir                   = getenv("TMP");
+  string data_dir                  = getenv("MED_ROOT_DIR");
+  string tmp_dir                   = getenv("TMP") ? getenv("TMP") : "/tmp";
   if (tmp_dir == "") tmp_dir = "/tmp";
 
-  string filename_rd               = data_dir + "/MedFiles/pointe.med";
+  string filename_rd               = data_dir + "/share/salome/resources/med/pointe.med";
   string filename_wr               = tmp_dir  + "/myWr_pointe21.med";
   string tmpfile                   = tmp_dir  + "/tmp.med";
   string meshname                  = "maa1";

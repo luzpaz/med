@@ -94,8 +94,8 @@ using namespace MEDMEM;
  
 void MEDSPLITTERTest::testMESHCollection_constructor()
 {
-  string data_dir                   = getenv("DATA_DIR");
-  string filename_rd                = data_dir + "/MedFiles/carre_en_quad4_import22.med";
+  string data_dir                   = getenv("MED_ROOT_DIR");
+  string filename_rd                = data_dir + "/share/salome/resources/med/carre_en_quad4_import22.med";
   string fileNotExist_rd            = "notExist22.med";
   string emptyfilename              = "";
 
@@ -126,11 +126,11 @@ void MEDSPLITTERTest::testMESHCollection_constructor()
 //! Testing basic manipulation for a sequential file 
 void MEDSPLITTERTest::testMESHCollection_read_seq()
 {
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/pointe_import22.med";
+  string filename_rd                = data_dir + "/share/salome/resources/med/pointe_import22.med";
   string filename_seq_wr            = tmp_dir + "/myWrField_seq_pointe22";
   string filename_seq_med           = tmp_dir + "/myWrField_seq_pointe221.med";
   
@@ -172,11 +172,11 @@ void MEDSPLITTERTest::testMESHCollection_read_seq()
 
 void MEDSPLITTERTest::testMESHCollection_read_para()
 {
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/pointe_import22.med";  
+  string filename_rd                = data_dir + "/share/salome/resources/med/pointe_import22.med";  
   string filename_para_wr            = tmp_dir + "/myWrField_para_pointe22_";
 	string filename_xml                = tmp_dir + "/myWrField_para_pointe22_.xml";
   string filename_para_med0           = tmp_dir + "/myWrField_para_pointe22_1.med";
@@ -255,11 +255,11 @@ void MEDSPLITTERTest::testMESHCollection_read_para()
 
 void MEDSPLITTERTest::testMESHCollection_square()
 {
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/carre_en_quad4_import22.med";
+  string filename_rd                = data_dir + "/share/salome/resources/med/carre_en_quad4_import22.med";
   string filename_wr                 = tmp_dir+"/carre_split";
   string filename_wr_1                = tmp_dir+"/carre_split1.med";
   string filename_wr_2                 = tmp_dir+"/carre_split2.med";
@@ -419,11 +419,11 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
 void MEDSPLITTERTest::testMESHCollection_square_with_faces()
 {
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/carre_en_quad4_import22.med";
+  string filename_rd                = data_dir + "/share/salome/resources/med/carre_en_quad4_import22.med";
   string filename_wr                 = tmp_dir+"/carre_split_faces";
   string filename_wr_1                = tmp_dir+"/carre_split_faces1.med";
   string filename_wr_2                 = tmp_dir+"/carre_split_faces2.med";
@@ -629,11 +629,11 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
 
 void MEDSPLITTERTest::testMESHCollection_indivisible()
 {
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/maill.00.med";
+  string filename_rd                = data_dir + "/share/salome/resources/med/maill.00.med";
   string filename_wr                = tmp_dir + "/carre_indivisible";
   string filename_wr_1              = tmp_dir + "/carre_indivisible1.med";
   string filename_wr_2              = tmp_dir + "/carre_indivisible2.med";
@@ -727,11 +727,11 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
 
 void MEDSPLITTERTest::testMESHCollection_user_partition()
 {
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/carre_en_quad4_import22.med";
+  string filename_rd                = data_dir + "/share/salome/resources/med/carre_en_quad4_import22.med";
   string filename_wr                 = tmp_dir+"/carre_split_user";
   string filename_wr_1                = tmp_dir+"/carre_split_user1.med";
   string filename_wr_2                 = tmp_dir+"/carre_split_user2.med";
@@ -899,11 +899,11 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
  
 void MEDSPLITTERTest::testMESHCollection_complete_sequence()
 {
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/pointe_import22.med";  
+  string filename_rd                = data_dir + "/share/salome/resources/med/pointe_import22.med";  
   string filename_para_wr            = tmp_dir + "/myWrField_para1_pointe22_";
   string filename_para_med1           = tmp_dir + "/myWrField_para1_pointe22_1.med";
   string filename_para_med2           = tmp_dir + "/myWrField_para1_pointe22_2.med";
@@ -977,11 +977,11 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
  
 void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polygon()
 {
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/recoll_bord.med";  
+  string filename_rd                = data_dir + "/share/salome/resources/med/recoll_bord.med";  
   string filename_para_wr            = tmp_dir + "/myWrField_para_recoll_";
   string filename_para_med1           = tmp_dir + "/myWrField_para_recoll_1.med";
   string filename_para_med2           = tmp_dir + "/myWrField_para_recoll_2.med";
@@ -1052,11 +1052,11 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polygon()
  
 void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polyhedra()
 {
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/poly3D.med";
+  string filename_rd                = data_dir + "/share/salome/resources/med/poly3D.med";
   //string filename_rd = "/tmp/polyedres.med"  ;
   string filename_para_wr            = tmp_dir + "/myWrField_para_poly3D_";
   string filename_para_med1           = tmp_dir + "/myWrField_para_poly3D_1.med";
@@ -1120,11 +1120,11 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polyhedra()
 
 void MEDSPLITTERTest::testMESHCollection_families()
 {
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/trio_2D.med";
+  string filename_rd                = data_dir + "/share/salome/resources/med/trio_2D.med";
   string filename_wr                 = tmp_dir+"/trio_split_faces";
   string filename_wr_1                = tmp_dir+"/trio_split_faces1.med";
   string filename_wr_2                 = tmp_dir+"/trio_split_faces2.med";

@@ -107,11 +107,11 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
 #ifndef ENABLE_METIS
   CPPUNIT_FAIL("METIS is not available. Please, check your compilation.");
 #else
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/carre_en_quad4_import22.med";  
+  string filename_rd                = data_dir + "/share/salome/resources/med/carre_en_quad4_import22.med";  
   string filename_para_wr            = tmp_dir + "/myWrField_seq_pointe22_";
   string filename_para_med0           = tmp_dir + "/myWrField_seq_pointe22_1.med";
   string filename_para_med1           = tmp_dir + "/myWrField_seq_pointe22_2.med";

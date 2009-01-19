@@ -89,12 +89,12 @@ using namespace MED_EN;
  */
 void MEDMEMTest_testMedMedDriver22() {
   MED *aMed                        = new MED();
-  string data_dir                  = getenv("DATA_DIR");
-  string tmp_dir                   = getenv("TMP");
+  string data_dir                  = getenv("MED_ROOT_DIR");
+  string tmp_dir                   = getenv("TMP") ? getenv("TMP") : "/tmp";
   if(tmp_dir == "")
     tmp_dir = "/tmp";
 
-  string filename_rd               = data_dir + "/MedFiles/pointe_import22.med";
+  string filename_rd               = data_dir + "/share/salome/resources/med/pointe_import22.med";
   string emptyfilename             = "";
   string filename_wr               = tmp_dir  + "/myMedWr_pointe22.med";
   string fileNotExistsName_rd      = "notExists.med";

@@ -51,11 +51,11 @@ using namespace MED_EN;
 void MEDMEMTest::testVtkMedDriver()
 {
   MED *aMed                = new MED();
-  string data_dir          = getenv("DATA_DIR");
-  string tmp_dir           = getenv("TMP");
+  string data_dir          = getenv("MED_ROOT_DIR");
+  string tmp_dir           = getenv("TMP") ? getenv("TMP") : "/tmp";
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd       = data_dir + "/MedFiles/pointe.med";
+  string filename_rd       = data_dir + "/share/salome/resources/med/pointe.med";
   string emptyfilename     = "";
   string fileNotExistsName = "/path_not_exists/file_not_exists.vtk";
   string filename_wr       =  tmp_dir  + "/myMED_pointe.vtk";
