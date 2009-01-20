@@ -72,15 +72,15 @@
         </message>
         <message>
             <source>MEN_FIELDSEL</source>
-            <translation>Field selection</translation>
+            <translation>Field Selection</translation>
         </message>
         <message>
             <source>MEN_MESHSEL</source>
-            <translation>Mesh selection</translation>
+            <translation>Mesh Selection</translation>
         </message>
         <message>
             <source>MEN_POPUPTEST</source>
-            <translation>Popup test</translation>
+            <translation>Popup Test</translation>
         </message>
         <message>
             <source>STB_SHOW</source>

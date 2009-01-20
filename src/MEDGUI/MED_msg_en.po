@@ -76,7 +76,7 @@ msgid "TOP_MESHSEL"
 msgstr "Mesh selection"
 
 msgid "MEN_MESHSEL"
-msgstr "Mesh selection"
+msgstr "Mesh Selection"
 
 msgid "STB_MESHSEL"
 msgstr "Read a mesh"
@@ -85,7 +85,7 @@ msgid "TOP_FIELDSEL"
 msgstr "Field selection"
 
 msgid "MEN_FIELDSEL"
-msgstr "Field selection"
+msgstr "Field Selection"
 
 msgid "STB_FIELDSEL"
 msgstr "Read a field"
@@ -121,7 +121,7 @@ msgid "TOP_POPUPTEST"
 msgstr "Popup test"
 
 msgid "MEN_POPUPTEST"
-msgstr "Popup test"
+msgstr "Popup Test"
 
 msgid "STB_POPUPTEST"
 msgstr "Popup test"
