@@ -41,6 +41,9 @@ namespace med_2_1 {
   extern "C" {
     extern med_idt _MEDdatagroupOuvrir(med_idt pid, char *nom);
     extern med_err _MEDdatagroupFermer(med_idt id);
+    extern med_err _MEDparametresGeometrie(med_entite_maillage type_ent, 
+                                           med_geometrie_element type_geo,
+                                           int *dim, int *nnoe,int *ndes);
   }
 }
 
@@ -2055,11 +2058,31 @@ int MED_MESH_WRONLY_DRIVER21::writeConnectivities(medEntityMesh entity) const {
       const int * connectivity = _ptrMesh->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_DESCENDING, entity, types[i]); 
       
       // Pour l'instant la class utilise le multi.....
+      int multi = 0 ;
+      if (entity==MED_EN::MED_CELL)
+	if ( (types[i]/ 100) < _ptrMesh->_spaceDimension) 
+	  multi=1 ;
+
+      int dim, numberOfNod, numberOfDesc ;
+      if (_MEDparametresGeometrie(med_2_1::med_entite_maillage(entity),
+                                  med_2_1::med_geometrie_element(types[i]),
+                                  &dim,&numberOfNod,&numberOfDesc) < 0 )
+        continue;
+
+      int * connectivityArray = new int[numberOfElements*(numberOfDesc+multi)];
+      for (int j=0 ; j<numberOfElements; j++) 
+       	{
+	  for (int k=0; k<numberOfDesc; k++)
+	    connectivityArray[j*(numberOfDesc+multi)+k]=connectivity[j*numberOfDesc+k] ;
+
+	  if (multi>0) connectivityArray[j*(numberOfDesc+multi)+numberOfDesc]=0;
+	}
+      
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-      int lgth=_ptrMesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE, MED_DESCENDING, entity, types[i]);
+      int lgth=numberOfElements*(numberOfDesc+multi);
       med_2_1::med_int *temp=new med_2_1::med_int[lgth];
       for(int i2=0;i2<lgth;i2++)
-	temp[i2]=(med_2_1::med_int)(connectivity[i2]);
+	temp[i2]=(med_2_1::med_int)(connectivityArray[i2]);
       err = med_2_1::MEDconnEcr( _medIdt,
 				const_cast <char *> ( _meshName.c_str()),
 				_ptrMesh->_spaceDimension,
@@ -2075,7 +2098,7 @@ int MED_MESH_WRONLY_DRIVER21::writeConnectivities(medEntityMesh entity) const {
       err = med_2_1::MEDconnEcr( _medIdt,
 				const_cast <char *> ( _meshName.c_str()),
 				_ptrMesh->_spaceDimension,
-				const_cast <int *> (connectivity),
+				const_cast <int *> (connectivityArray),
 				med_2_1::MED_FULL_INTERLACE,
 				numberOfElements,
 				med_2_1::MED_REMP,
@@ -2083,7 +2106,7 @@ int MED_MESH_WRONLY_DRIVER21::writeConnectivities(medEntityMesh entity) const {
 				(med_2_1::med_geometrie_element) types[i],
 				med_2_1::MED_DESC );
 #endif
-	
+      delete[] connectivityArray ;
       if (err<0) // ETENDRE LES EXPLICATIONS
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write connectivities of mesh |" << _meshName.c_str() << "| in file |" << _fileName
 				     << "| with dimension |"  << _ptrMesh->_spaceDimension <<"| and" 

@@ -92,19 +92,19 @@ protected:
   MED_EN::medConnectivity         _typeConnectivity;
 					 /*! count of differents cells types
 					    used by the mesh */
-  int                 _numberOfTypes;
+  int                             _numberOfTypes;
 					/*! array of all med_geometric_type used by MESH. */
   MED_EN::medGeometryElement*     _geometricTypes;
 
 					/*! map indexed by med_geometric_type
 					    which contains the different
 					    'CellModel' used by MESH. */
-  CELLMODEL *             _type;
+  CELLMODEL *      _type;
 					/*! contains the dimension of the entity */
-  int                 _entityDimension;
+  int              _entityDimension;
 
                     			/*! needed by calculateReverseNodalConnectivity */
-  int                 _numberOfNodes;
+  int              _numberOfNodes;
 
   					 /*! array of size _numberOfTypes+1 which
 					 gives for each cell type the first
@@ -115,7 +115,7 @@ protected:
 					 ( 0 <= i < _numberOfTypes ).
                                   	 Note that _count[_numberOfTypes] returns
 					 total cells count + 1 */
-  int *               _count;
+  int *            _count;
 
 					/*! pointer to an array which stores the nodal connectivity */
   MEDSKYLINEARRAY* _nodal;
@@ -145,7 +145,10 @@ protected:
   MEDSKYLINEARRAY* _neighbourhood;
 					/*! connectivity of sub cell if
 					    descendant connectivity is calculated */
-  CONNECTIVITY * _constituent;
+  CONNECTIVITY *   _constituent;
+					/*! is descending connectivity computed by 
+					    calculatePartialDescendingConnectivity() */
+  bool             _isDescendingConnectivityPartial;
 
   /* -------------------- */
   /*    Class Methods     */
@@ -165,10 +168,10 @@ private:
 					    evaluates _descending from _nodal */
   void calculateDescendingConnectivity();
 
-	void calculatePartialDescendingConnectivity();
-	void addToDescendingConnectivity( const set<int>& nodes,
+  void calculatePartialDescendingConnectivity();
+  void addToDescendingConnectivity( const set<int>&    nodes,
                                     multimap<int,int>& descending,
-                                    int iglobal_cell ,
+                                    int                iglobal_cell ,
                                     const CONNECTIVITY_HashMap & );
 	
 					/*! private method :\n
@@ -243,20 +246,22 @@ public:
 				 int NumberOfFaces=0);
 
   inline bool    existConnectivity (MED_EN::medConnectivity connectivityType,
-                                    MED_EN::medEntityMesh Entity) const;
+                                    MED_EN::medEntityMesh   Entity) const;
   bool   existConnectivityWithPoly (MED_EN::medConnectivity connectivityType,
-                                    MED_EN::medEntityMesh Entity) const;
+                                    MED_EN::medEntityMesh   Entity) const;
 
   virtual bool existPolygonsConnectivity (MED_EN::medConnectivity connectivityType,
-                                          MED_EN::medEntityMesh Entity) const;
+                                          MED_EN::medEntityMesh   Entity) const;
 
   virtual bool existPolyhedronConnectivity (MED_EN::medConnectivity connectivityType,
-                                            MED_EN::medEntityMesh Entity) const;
+                                            MED_EN::medEntityMesh   Entity) const;
 
-  virtual void      calculateConnectivity (MED_EN::medConnectivity connectivityType,
-                                           MED_EN::medEntityMesh Entity);
+  virtual void calculateConnectivity (MED_EN::medConnectivity connectivityType,
+                                      MED_EN::medEntityMesh   Entity);
 
-  virtual void          updateFamily (const vector<FAMILY*>& myFamilies);
+  virtual void calculateFullDescendingConnectivity(MED_EN::medEntityMesh Entity);
+
+  virtual void updateFamily (const vector<FAMILY*>& myFamilies);
 
   inline MED_EN::medEntityMesh         getEntity () const;
 

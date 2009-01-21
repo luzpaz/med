@@ -680,13 +680,16 @@ computation time can be large.
 
 /*!
   Returns a support which reference all elements on the boundary of mesh.
-	For a d-dimensional mesh, a boundary element is defined as a d-1 dimension
+  For a d-dimensional mesh, a boundary element is defined as a d-1 dimension
   element that is referenced by only one element in the full descending connectivity.
   
-	This method can also return the list of nodes that belong to the boundary elements.
+  This method can also return the list of nodes that belong to the boundary elements.
 
-	\param Entity entity on which the boundary is desired. It has to be either \a MED_NODE or the 
-	d-1 dimension entity type (MED_FACE in 3D, MED_EDGE in 2D).
+  WARNING: This method can recalculate descending connectivity from partial to full form,
+  so that partial SUPPORT on d-1 dimension elements becomes invalid.
+
+  \param Entity entity on which the boundary is desired. It has to be either \a MED_NODE or the 
+  d-1 dimension entity type (MED_FACE in 3D, MED_EDGE in 2D).
 */
 SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
   throw (MEDEXCEPTION)
@@ -709,6 +712,11 @@ SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
       else
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
 
+  // assure that descending connectivity is full
+  if ( !_connectivity )
+    throw MEDEXCEPTION("MESH::getgetBoundaryElements() : no connectivity defined in MESH !");
+  _connectivity->calculateFullDescendingConnectivity(MED_CELL);
+
   const int * myConnectivityValue = getReverseConnectivity(MED_DESCENDING) ;
   const int * myConnectivityIndex = getReverseConnectivityIndex(MED_DESCENDING) ;
   int numberOf = getNumberOfElementsWithPoly(entityToParse,MED_ALL_ELEMENTS) ;
@@ -718,6 +726,8 @@ SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
     if (myConnectivityValue[myConnectivityIndex[i]] == 0) {
       myElementsList.push_back(i+1);
     }
+  if ( myElementsList.empty() && numberOf != 0 )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No boundary elements found by reverse descending connectivity for entity "<<Entity<<" !"));
 
   if(Entity==MED_NODE)
     return buildSupportOnNodeFromElementList(myElementsList,entityToParse);
@@ -1909,6 +1919,9 @@ Retrieves the skin of support \a Support3D. This method is only available in 3D.
 On output, it returns a MED_FACE support with the skin of all elements contained in support.
 The skin is defined as the list of faces that are compnents of only one volume in the input
 support.
+
+WARNING: This method can recalculate descending connectivity from partial to full form,
+so that partial SUPPORT on MED_FACE on this mesh becomes invalid.
  */
 SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 {
@@ -1927,7 +1940,11 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   list<int> myElementsList;
   int i,j, size = 0;
 
-  calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL);
+  // assure that descending connectivity is full
+  if ( !_connectivity )
+    throw MEDEXCEPTION(STRING(LOC) << "no connectivity defined in MESH !");
+  _connectivity->calculateFullDescendingConnectivity(MED_CELL);
+  //calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL);
   if (Support3D->isOnAllElements())
   {
     const int* value = getReverseConnectivity(MED_DESCENDING);

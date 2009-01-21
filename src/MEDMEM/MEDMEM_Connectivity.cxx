@@ -91,7 +91,8 @@ CONNECTIVITY::CONNECTIVITY(medEntityMesh Entity /* =MED_CELL */) :
   				_reverseNodalConnectivity((MEDSKYLINEARRAY*)NULL),
   				_reverseDescendingConnectivity((MEDSKYLINEARRAY*)NULL),
   				_neighbourhood((MEDSKYLINEARRAY*)NULL),
-  				_constituent((CONNECTIVITY*)NULL)
+  				_constituent((CONNECTIVITY*)NULL),
+                                _isDescendingConnectivityPartial(false)
 {
   const char* LOC = "CONNECTIVITY(medEntityMesh Entity=MED_CELL)";
   BEGIN_OF_MED(LOC);
@@ -121,7 +122,8 @@ CONNECTIVITY::CONNECTIVITY(int numberOfTypes,medEntityMesh Entity /* =MED_CELL *
   				_reverseNodalConnectivity((MEDSKYLINEARRAY*)NULL),
   				_reverseDescendingConnectivity((MEDSKYLINEARRAY*)NULL),
   				_neighbourhood((MEDSKYLINEARRAY*)NULL),
-  				_constituent((CONNECTIVITY*)NULL)
+  				_constituent((CONNECTIVITY*)NULL),
+                                _isDescendingConnectivityPartial(false)
 {
   MESSAGE_MED("CONNECTIVITY(int numberOfTypes,medEntityMesh Entity=MED_CELL)");
   _geometricTypes = new medGeometryElement[numberOfTypes];
@@ -140,7 +142,8 @@ CONNECTIVITY::CONNECTIVITY (const CONNECTIVITY & m):
   				_typeConnectivity (m._typeConnectivity),
   				_numberOfTypes    (m._numberOfTypes),
   				_entityDimension  (m._entityDimension),
-  				_numberOfNodes    (m._numberOfNodes)
+  				_numberOfNodes    (m._numberOfNodes),
+                                _isDescendingConnectivityPartial(m._isDescendingConnectivityPartial)
 {
  if (m._geometricTypes != NULL)
  {
@@ -1314,27 +1317,54 @@ void CONNECTIVITY::calculateReverseNodalConnectivity()
 //-------------------------------------------------//
 void CONNECTIVITY::calculateDescendingConnectivity()
   //-------------------------------------------------//
-  {
+{
   const char * LOC = "CONNECTIVITY::calculateDescendingConnectivity() : ";
   BEGIN_OF_MED(LOC);
 
   if (_descending==NULL && _polygonsDescending==NULL && _polyhedronDescending==NULL)
+  {
+    if (_nodal==NULL && _polygonsNodal==NULL && _polyhedronNodal==NULL)
+    {
+      MESSAGE_MED(LOC<<"No connectivity found !");
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity found !"));
+    }
+    // calcul _descending from _nodal
+    // we need CONNECTIVITY for constituent
+
+    if (_constituent != NULL && _constituent->_nodal != NULL)
+    {
+      calculatePartialDescendingConnectivity();
+    }
+    else
+    {
+      calculateFullDescendingConnectivity(_entity);
+    }
+  }
+}
+
+/*! If not yet done, calculate the full Descending Connectivity */
+//-------------------------------------------------//
+void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Entity)
+//-------------------------------------------------//
+{
+  const char * LOC = "CONNECTIVITY::calculateFullDescendingConnectivity() : ";
+  BEGIN_OF_MED(LOC);
+  if (_entity != Entity)
+  {
+    if (_constituent == NULL)
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entity not found !"));
+    _constituent->calculateFullDescendingConnectivity(Entity);
+  }
+  else
+  {
+    if (_descending==NULL && _polygonsDescending==NULL && _polyhedronDescending==NULL ||
+        _isDescendingConnectivityPartial )
     {
       if (_nodal==NULL && _polygonsNodal==NULL && _polyhedronNodal==NULL)
-				{
-					MESSAGE_MED(LOC<<"No connectivity found !");
-					throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity found !"));
-        }
-      // calcul _descending from _nodal
-      // we need CONNECTIVITY for constituent
-			
-      if (_constituent != NULL && _constituent->_nodal != NULL)
-				{
-					calculatePartialDescendingConnectivity();
-					return;
-				}
-	//      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"ERROR : No descending connectivity defined, but constituent exist !"));
-				//	MESSAGE_MED(LOC<<": No descending connectivity defined, but constituent exist !");
+      {
+        MESSAGE_MED(LOC<<"No connectivity found !");
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity found !"));
+      }
       delete _constituent;
       _constituent=0;
       if (_entityDimension == 3)
@@ -1888,7 +1918,7 @@ void CONNECTIVITY::calculateDescendingConnectivity()
     }
   END_OF_MED(LOC);
   }
-
+}
 	
 void CONNECTIVITY::addToDescendingConnectivity(const set<int>& nodes,
                                                multimap<int,int>& descending,
@@ -2126,7 +2156,7 @@ void CONNECTIVITY::calculatePartialDescendingConnectivity()
 			index.push_back(index[index.size()-1]+nb);
 		}
 	_descending=new MEDSKYLINEARRAY(index.size()-1,value.size(),&index[0],&value[0]);
-	
+	_isDescendingConnectivityPartial = true;
 }
 
 

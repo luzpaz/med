@@ -970,7 +970,7 @@ inline int MESH::getReverseConnectivityLength(MED_EN::medConnectivity Connectivi
 	nb = getNumberOfElements(MED_EN::MED_FACE,
 					MED_EN::MED_ALL_ELEMENTS);
     }
-  return getReverseConnectivityIndex(ConnectivityType)[nb]-1;
+  return getReverseConnectivityIndex(ConnectivityType,Entity)[nb]-1;
 }
 /*!
   Returns the reverse connectivity required by ConnectivityType :

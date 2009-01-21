@@ -34,14 +34,12 @@ import sys,os,string
 
 filesPath = os.environ["MED_ROOT_DIR"]
 filesPath = os.path.join(filesPath, "share", "salome", "resources", "med")
-print "filesPath = ", filesPath #jfa:tmp
 
 tmpDir = os.getenv("TEMP")
 if tmpDir == None:
   tmpDir = "/tmp"
 
 tmpMask = os.path.join(tmpDir, "*_test.*")
-print "tmpMask = ", tmpMask #jfa:tmp
 os.system("rm -rf " + tmpMask)
 
 fileNames = []
