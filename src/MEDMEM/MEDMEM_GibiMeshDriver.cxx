@@ -403,9 +403,9 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
                 p_no=medi->points.insert(make_pair(no.number, no));
                 ma.sommets[n]=p_no.first;
               }
-              ma.ordre = ++order;
-              p=medi->maillage.insert(ma);
-              groupe.mailles[i] = p.first; // on stocke dans le groupe un iterateur sur la maille
+              ma.setOrdre( ++order );
+              // on stocke dans le groupe un iterateur sur la maille
+              groupe.mailles[i] = medi->insert(ma);
             }
           }
         } // loop on groups
@@ -1240,7 +1240,7 @@ static inline void fixConnectivity(const _maille & aMaille )
   if ( const int * conn = getGibi2MedConnectivity( aMaille.geometricType )) {
     _maille* ma = (_maille*) & aMaille;
     //cout << "###### BEFORE fixConnectivity() " << *ma << endl;
-    vector< _maille::iter > newSommets( ma->sommets.size() );
+    vector< _maille::TNoeud > newSommets( ma->sommets.size() );
     for ( int i = 0; i < newSommets.size(); ++i )
       newSommets[ i ] = ma->sommets[ conn[ i ]];
     ma->sommets = newSommets;
@@ -1256,20 +1256,36 @@ static inline void fixConnectivity(const _maille & aMaille )
 static void orientElements( _intermediateMED& medi )
 {
   MESSAGE_MED("orientElements()");
-  set<_maille>::iterator elemIt = medi.maillage.begin();
+
+  set<_maille>::const_iterator elemIt, elemEnd;
 
   int type = -100;
   vector< pair<int,int> > swapVec;
-  bool isQuadratic = ( getGibi2MedConnectivity( medi.maillage.rbegin()->geometricType ));
 
-  if ( elemIt->sommets[0]->second.coord.size() == 2 ) { // space dimension
+  bool isQuadratic = false;
+  _maillageByDimIterator maIt(medi);
+  while ( !isQuadratic && maIt.nextType() )
+    isQuadratic = getGibi2MedConnectivity( maIt.type() );
 
+  if ( medi.points.begin()->second.coord.size() == 2 ) { // space dimension
+
+    // fix connectivity of quadratic edges
+    if ( isQuadratic ) {
+      if ( const set<_maille > * edges = _maillageByDimIterator( medi, 1 ).nextType() ) {
+        elemIt = edges->begin(), elemEnd = edges->end();
+        for ( ; elemIt != elemEnd; ++elemIt )
+          fixConnectivity( *elemIt );
+      }
+    }
     // --------------------------
     // Orient 2D faces clockwise
     // --------------------------
 
-    for ( ; elemIt != medi.maillage.end(); elemIt++ )
-      if ( elemIt->dimension() == 2 )
+    _maillageByDimIterator faceMailIt( medi, 2 );
+    while ( const set<_maille > * faces = faceMailIt.nextType() )
+    {
+      elemIt = faces->begin(), elemEnd = faces->end();
+      for ( ; elemIt != elemEnd; elemIt++ )
       {
         // fix connectivity of quadratic faces
         if ( isQuadratic )
@@ -1317,12 +1333,7 @@ static void orientElements( _intermediateMED& medi )
           }
         }
       }
-      else
-      {
-        // fix connectivity of quadratic edges
-        if ( isQuadratic )
-          fixConnectivity( *elemIt );
-      }
+    }
   }
   else {
 
@@ -1342,8 +1353,8 @@ static void orientElements( _intermediateMED& medi )
     for (unsigned int i=0; i!=medi.groupes.size(); ++i)
     {
       _groupe& grp = medi.groupes[i];
-      _groupe::mailleIter maIt=grp.mailles.begin();
-      if ( maIt==grp.mailles.end() || (*maIt)->dimension() != 2 )
+      _groupe::TMailleIter maIt=grp.mailles.begin();
+      if ( maIt==grp.mailles.end() || (*maIt)->dimensionWithPoly() != 2 )
         continue;
       for(; maIt!=grp.mailles.end(); ++maIt) {
         if ( faces.insert( &(**maIt )).second ) {
@@ -1449,104 +1460,113 @@ static void orientElements( _intermediateMED& medi )
 
 
     // ---------------------------------------------------
-    // Orient volumes according to MED conventions:
-    // normal of a bottom (first) face should be downward,
     // fix connectivity of quadratic elements
     // ---------------------------------------------------
 
-    for ( ; elemIt != medi.maillage.end(); elemIt++ ) {
-
-      // GIBI connectivity -> MED one
-      if ( isQuadratic )
-        fixConnectivity( *elemIt );
-
-      // reverse quadratic faces
-      if ( elemIt->reverse ) {
-        if ( elemIt->geometricType != type ) {
-          type = elemIt->geometricType;
-          getReverseVector( type, swapVec );
-        }
-        reverse ( *elemIt, swapVec );
-      }
-
-      // treate volumes
-      if ( elemIt->dimension() == 3 )
+    for ( int dim = 1; dim <= 3; ++dim )
+    {
+      _maillageByDimIterator mailIt( medi, dim );
+      while ( const set<_maille > * elems = mailIt.nextType() )
       {
-        int nbBottomNodes = 0;
-        switch ( elemIt->geometricType ) {
-        case MED_TETRA4:
-        case MED_TETRA10:
-        case MED_PENTA6:
-        case MED_PENTA15:
-          nbBottomNodes = 3; break;
-        case MED_PYRA5:
-        case MED_PYRA13:
-        case MED_HEXA8:
-        case MED_HEXA20:
-          nbBottomNodes = 4; break;
-        default: continue;
-        }
+        elemIt = elems->begin(), elemEnd = elems->end();
+        for ( ; elemIt != elemEnd; elemIt++ )
+        {
+          // GIBI connectivity -> MED one
+          if ( isQuadratic )
+            fixConnectivity( *elemIt );
 
-        // find a normal to the bottom face
-        const _noeud* n[4] = {
-          &elemIt->sommets[0]->second, // 3 bottom nodes
-          &elemIt->sommets[1]->second,
-          &elemIt->sommets[2]->second,
-          &elemIt->sommets[nbBottomNodes]->second };// a top node
-        double vec01 [3] = { // vector n[0]-n[1]
-          n[1]->coord[0] - n[0]->coord[0],
-          n[1]->coord[1] - n[0]->coord[1],
-          n[1]->coord[2] - n[0]->coord[2], };
-        double vec02 [3] = { // vector n[0]-n[2]
-          n[2]->coord[0] - n[0]->coord[0],
-          n[2]->coord[1] - n[0]->coord[1],
-          n[2]->coord[2] - n[0]->coord[2] };
-        double normal [3] = { // vec01 ^ vec02
-          vec01[1] * vec02[2] - vec01[2] * vec02[1],
-          vec01[2] * vec02[0] - vec01[0] * vec02[2],
-          vec01[0] * vec02[1] - vec01[1] * vec02[0] };
-        // check if the 102 angle is convex
-        if ( nbBottomNodes > 3 ) {
-          const _noeud* n3 = &elemIt->sommets[nbBottomNodes-1]->second;// last bottom node
-          double vec03 [3] = { // vector n[0]-n3
-            n3->coord[0] - n[0]->coord[0],
-            n3->coord[1] - n[0]->coord[1],
-            n3->coord[2] - n[0]->coord[2], };
-          if ( fabs( normal[0]+normal[1]+normal[2] ) <= DBL_MIN ) { // vec01 || vec02
-            normal[0] = vec01[1] * vec03[2] - vec01[2] * vec03[1]; // vec01 ^ vec03
-            normal[1] = vec01[2] * vec03[0] - vec01[0] * vec03[2];
-            normal[2] = vec01[0] * vec03[1] - vec01[1] * vec03[0];
-          }
-          else {
-            double vec [3] = { // normal ^ vec01
-              normal[1] * vec01[2] - normal[2] * vec01[1],
-              normal[2] * vec01[0] - normal[0] * vec01[2],
-              normal[0] * vec01[1] - normal[1] * vec01[0] };
-            double dot2 = vec[0]*vec03[0] + vec[1]*vec03[1] + vec[2]*vec03[2]; // vec*vec03
-            if ( dot2 < 0 ) { // concave -> reverse normal
-              normal[0] *= -1;
-              normal[1] *= -1;
-              normal[2] *= -1;
+          // reverse quadratic faces
+          if ( elemIt->reverse ) {
+            if ( elemIt->geometricType != type ) {
+              type = elemIt->geometricType;
+              getReverseVector( type, swapVec );
             }
+            reverse ( *elemIt, swapVec );
           }
         }
-        // direction from top to bottom
-        vector<double> tbDir(3);
-        tbDir[0] = n[0]->coord[0] - n[3]->coord[0];
-        tbDir[1] = n[0]->coord[1] - n[3]->coord[1];
-        tbDir[2] = n[0]->coord[2] - n[3]->coord[2];
-        // compare 2 directions: normal and top-bottom
-        double dot = normal[0]*tbDir[0] + normal[1]*tbDir[1] + normal[2]*tbDir[2];
-        if ( dot < 0. ) { // need reverse
-          if ( elemIt->geometricType != type ) {
-            type = elemIt->geometricType;
-            getReverseVector( type, swapVec );
-          }
-          reverse( *elemIt, swapVec );
-        }
-      } // dimension() == 3
-    } // loop on maillage
+      }
+    }
 
+    // ---------------------------------------------------
+    // Orient volumes according to MED conventions:
+    // normal of a bottom (first) face should be downward
+    // ---------------------------------------------------
+
+    _maillageByDimIterator mailIt( medi, 3 );
+    while ( const set<_maille > * elems = mailIt.nextType() )
+    {
+      elemIt = elems->begin(), elemEnd = elems->end();
+      int nbBottomNodes = 0;
+      switch ( elemIt->geometricType ) {
+      case MED_TETRA4:
+      case MED_TETRA10:
+      case MED_PENTA6:
+      case MED_PENTA15:
+        nbBottomNodes = 3; break;
+      case MED_PYRA5:
+      case MED_PYRA13:
+      case MED_HEXA8:
+      case MED_HEXA20:
+        nbBottomNodes = 4; break;
+      default: continue;
+      }
+      // find a normal to the bottom face
+      const _noeud* n[4] = {
+        &elemIt->sommets[0]->second, // 3 bottom nodes
+        &elemIt->sommets[1]->second,
+        &elemIt->sommets[2]->second,
+        &elemIt->sommets[nbBottomNodes]->second };// a top node
+      double vec01 [3] = { // vector n[0]-n[1]
+        n[1]->coord[0] - n[0]->coord[0],
+        n[1]->coord[1] - n[0]->coord[1],
+        n[1]->coord[2] - n[0]->coord[2], };
+      double vec02 [3] = { // vector n[0]-n[2]
+        n[2]->coord[0] - n[0]->coord[0],
+        n[2]->coord[1] - n[0]->coord[1],
+        n[2]->coord[2] - n[0]->coord[2] };
+      double normal [3] = { // vec01 ^ vec02
+        vec01[1] * vec02[2] - vec01[2] * vec02[1],
+        vec01[2] * vec02[0] - vec01[0] * vec02[2],
+        vec01[0] * vec02[1] - vec01[1] * vec02[0] };
+      // check if the 102 angle is convex
+      if ( nbBottomNodes > 3 ) {
+        const _noeud* n3 = &elemIt->sommets[nbBottomNodes-1]->second;// last bottom node
+        double vec03 [3] = { // vector n[0]-n3
+          n3->coord[0] - n[0]->coord[0],
+          n3->coord[1] - n[0]->coord[1],
+          n3->coord[2] - n[0]->coord[2], };
+        if ( fabs( normal[0]+normal[1]+normal[2] ) <= DBL_MIN ) { // vec01 || vec02
+          normal[0] = vec01[1] * vec03[2] - vec01[2] * vec03[1]; // vec01 ^ vec03
+          normal[1] = vec01[2] * vec03[0] - vec01[0] * vec03[2];
+          normal[2] = vec01[0] * vec03[1] - vec01[1] * vec03[0];
+        }
+        else {
+          double vec [3] = { // normal ^ vec01
+            normal[1] * vec01[2] - normal[2] * vec01[1],
+            normal[2] * vec01[0] - normal[0] * vec01[2],
+            normal[0] * vec01[1] - normal[1] * vec01[0] };
+          double dot2 = vec[0]*vec03[0] + vec[1]*vec03[1] + vec[2]*vec03[2]; // vec*vec03
+          if ( dot2 < 0 ) { // concave -> reverse normal
+            normal[0] *= -1;
+            normal[1] *= -1;
+            normal[2] *= -1;
+          }
+        }
+      }
+      // direction from top to bottom
+      vector<double> tbDir(3);
+      tbDir[0] = n[0]->coord[0] - n[3]->coord[0];
+      tbDir[1] = n[0]->coord[1] - n[3]->coord[1];
+      tbDir[2] = n[0]->coord[2] - n[3]->coord[2];
+      // compare 2 directions: normal and top-bottom
+      double dot = normal[0]*tbDir[0] + normal[1]*tbDir[1] + normal[2]*tbDir[2];
+      if ( dot < 0. ) // need reverse
+      {
+        getReverseVector( elemIt->geometricType, swapVec );
+        for ( ; elemIt != elemEnd; elemIt++ )
+          reverse( *elemIt, swapVec );
+      }
+    } // loop on volumes of one geometry
 
   } // space dimension == 3
 }
@@ -1565,9 +1585,9 @@ void GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi)
 
   if (_ptrMedi)
   {
-    if (_ptrMedi->maillage.size()==0 ||
-        _ptrMedi->groupes.size()==0 ||
-        _ptrMedi->points.size()==0) {
+    if (!_maillageByDimIterator(*_ptrMedi).nextType() ||
+        _ptrMedi->groupes.empty() ||
+        _ptrMedi->points.empty()) {
       INFOS_MED(" Error while reading file: the data read are not completed " ) ;
       return;
     }
@@ -1575,10 +1595,10 @@ void GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi)
     orientElements( *_ptrMedi );
 
     _ptrMesh->_spaceDimension = _ptrMedi->points.begin()->second.coord.size();
-    _ptrMesh->_meshDimension = _ptrMedi->maillage.rbegin()->dimension();
-    _ptrMesh->_numberOfNodes = _ptrMedi->points.size();
-    _ptrMesh->_isAGrid = 0;
-    _ptrMesh->_coordinate = _ptrMedi->getCoordinate();
+    _ptrMesh->_meshDimension  = _ptrMedi->getMeshDimension();
+    _ptrMesh->_numberOfNodes  = _ptrMedi->points.size();
+    _ptrMesh->_isAGrid        = 0;
+    _ptrMesh->_coordinate     = _ptrMedi->getCoordinate();
 
     //Construction des groupes
     _ptrMedi->getGroups(_ptrMesh->_groupCell,
@@ -2625,7 +2645,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
 
   // get all fields on _ptrMesh and add their support to be written
   list<FIELD_*> fields;
-  int iField, nbFileds = _med->getNumberOfFields();
+  int iField, nbFields = _med->getNumberOfFields();
   int nb_obj = 0;
   list<int> nb_sub_list;
   map<string,int> nameNbMap;
@@ -2633,9 +2653,9 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   list<pair<int,int> >           subIdSizeList; // pair( <submesh id>, <submesh size> );
   list<pair<int,int> >::iterator idsize;
 
-  string *names=new string[ nbFileds ];
+  string *names=new string[ nbFields ];
   _med->getFieldNames( names );
-  for ( iField = 0; iField < nbFileds; ++iField )
+  for ( iField = 0; iField < nbFields; ++iField )
   {
     int nb_sub = 0;
     deque<DT_IT_> dtit = _med->getFieldIteration( names[ iField ]);

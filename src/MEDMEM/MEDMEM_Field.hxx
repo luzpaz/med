@@ -21,7 +21,6 @@
 //
 /*
  File Field.hxx
- $Header$
 */
 
 #ifndef FIELD_HXX
@@ -3099,20 +3098,19 @@ inline int FIELD<T, INTERLACING_TAG>::addDriver (GENDRIVER & driver )
   // duplicate driver to delete it with destructor !
   //GENDRIVER * newDriver = driver.copy() ;
 
+  // for FIELD->read( genDriver ) if FIELD was not passed to genDriver
   GENDRIVER * newDriver = 
     DRIVERFACTORY::buildDriverForField(driver.getDriverType(),
                                        driver.getFileName(), this,
                                        driver.getAccessMode());
-
   _drivers.push_back(newDriver);
 
   current = _drivers.size()-1;
   SCRUTE_MED(current);
   driver.setId(current);
 
-  MESSAGE_MED(PREFIX_MED << " je suis la 1");
-  END_OF_MED(LOC);
-  MESSAGE_MED(PREFIX_MED << " je suis la 2");
+  newDriver->merge( driver );
+  newDriver->setId(current);
 
   return current ;
 };

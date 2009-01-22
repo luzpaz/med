@@ -92,12 +92,12 @@ namespace MEDMEM {
   }
 }
 
-#include "MEDMEM_EnsightFieldDriver.hxx"
 #include "MEDMEM_VtkFieldDriver.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_MedFieldDriver21.hxx"
 #include "MEDMEM_MedFieldDriver22.hxx"
 #include "MEDMEM_AsciiFieldDriver.hxx"
+#include "MEDMEM_EnsightFieldDriver.hxx"
 
 namespace MEDMEM {
   template<class T, class INTERLACING_TAG>
@@ -134,11 +134,11 @@ namespace MEDMEM {
 	switch(access)
 	  {
 	  case MED_EN::RDONLY : {
-	    ret = new ENSIGHT_FIELD_RDONLY_DRIVER<T>(fileName,field);
+	    ret = new ENSIGHT_FIELD_RDONLY_DRIVER(fileName,field);
 	    break;
 	  }
 	  case MED_EN::WRONLY : {
-	    ret=new ENSIGHT_FIELD_WRONLY_DRIVER<T>(fileName,field);
+	    ret=new ENSIGHT_FIELD_WRONLY_DRIVER(fileName,field);
 	    break;
 	  }
 	  case MED_EN::RDWR : {

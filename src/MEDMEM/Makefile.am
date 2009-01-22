@@ -101,7 +101,8 @@ EXTRA_DIST+= DataTest \
 MEDMEM_MEDMEMchampLire.hxx \
 MEDMEM_MEDMEMgaussEcr.hxx \
 MEDMEM_MEDMEMprofilEcr.hxx \
-MEDMEM_Formulae.hxx
+MEDMEM_Formulae.hxx \
+MEDMEM_EnsightUtils.hxx
 
 dist_libmedmem_la_SOURCES= \
 MEDMEM_Init.cxx \
@@ -120,7 +121,6 @@ MEDMEM_MedMedDriver.cxx \
 MEDMEM_MedMeshDriver.cxx \
 MEDMEM_GibiMeshDriver.cxx \
 MEDMEM_PorflowMeshDriver.cxx \
-MEDMEM_DriverTools.cxx \
 MEDMEM_SkyLineArray.cxx \
 MEDMEM_Mesh.cxx \
 MEDMEM_Meshing.cxx \
@@ -139,9 +139,13 @@ MEDMEM_MedMedDriver22.cxx \
 MEDMEM_MedMeshDriver22.cxx \
 MEDMEM_TopLevel.cxx \
 MEDMEM_ConnectZone.cxx \
+MEDMEM_EnsightFieldDriver.cxx \
+MEDMEM_EnsightUtils.cxx \
 MEDMEM_EnsightMedDriver.cxx \
 MEDMEM_EnsightMeshDriver.cxx \
+MEDMEM_DriverTools.cxx \
 MEDMEM_GaussLocalization.cxx
+
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 # libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@

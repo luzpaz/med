@@ -293,13 +293,14 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowConnectivityFile(bool hybride,const 
     }
 
     _maille maille;
-    unsigned int code, nodes_number, node;
-    pair<set<_maille>::iterator,bool> p_ma;
+    unsigned int code, nodes_number, node, ordre;
+    set<_maille>::iterator p_ma;
 
     if (hybride) // "HYBR" key-word
       while (connFile)
 	{
-	  connFile >> maille.ordre;
+	  connFile >> ordre;
+          maille.setOrdre( ordre );
 	  if (!connFile) // for spaces at the end of the file
 	    break;
 	  connFile >> code;
@@ -317,10 +318,10 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowConnectivityFile(bool hybride,const 
 	      connFile >> node;
 	      maille.sommets[numPORFLOWtoMED[code-1][i]-1] = medi.points.find(node);
 	    }
-	  p_ma = medi.maillage.insert(maille);
-	  if (maille.ordre > p_ma_table.size()-1) // construction of a vector of iterators on _maille structures
-	    p_ma_table.resize(2*maille.ordre);
-	  p_ma_table[maille.ordre] = p_ma.first;
+	  p_ma = medi.insert(maille);
+	  if (maille.ordre() > p_ma_table.size()-1) // construction of a vector of iterators on _maille structures
+	    p_ma_table.resize(2*maille.ordre());
+	  p_ma_table[maille.ordre()] = p_ma;
 	}
     else // default case (or "VERT" key-word)
       {
@@ -342,7 +343,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowConnectivityFile(bool hybride,const 
 	  throw MEDEXCEPTION("PORFLOW_MESH_RDONLY_DRIVER::read()\nError, can't determine geometric type for this VERT mesh");
 	while (connFile)
 	  {
-	    connFile >> maille.ordre;
+	    connFile >> ordre; maille.setOrdre(ordre);
 	    if (!connFile) // for spaces at the end of the file
 	      break;
 	    for (unsigned i=0; i!=nodes_number; ++i)
@@ -350,10 +351,10 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowConnectivityFile(bool hybride,const 
 		connFile >> node;
 		maille.sommets[numPORFLOWtoMED[code-1][i]-1] = medi.points.find(node);
 	      }
-	    p_ma = medi.maillage.insert(maille);
-	    if (maille.ordre > p_ma_table.size()-1) // construction of a vector of iterators on _maille structures
-	      p_ma_table.resize(2*maille.ordre);
-	    p_ma_table[maille.ordre] = p_ma.first;
+	    p_ma = medi.insert(maille);
+	    if (maille.ordre() > p_ma_table.size()-1) // construction of a vector of iterators on _maille structures
+	      p_ma_table.resize(2*maille.ordre());
+	    p_ma_table[maille.ordre()] = p_ma;
 	  }
       }
     connFile.close();
@@ -626,7 +627,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 		// the corresponding 2D MED geometric type depends upon the number of nodes
 		maille2D.sommets.resize(l);
 		maille2D.geometricType = get2DMedGeomType(l);
-		p_ma = medi.maillage.insert(maille2D).first; // we insert the face in our mesh
+		p_ma = medi.insert(maille2D); // we insert the face in our mesh
 		medi.groupes[i].mailles[ielem++]=p_ma; // and insert an iterator on it in our group
 		maille2D.sommets.clear();
 	    }
@@ -644,7 +645,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     {
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Mesh object not empty : can't fill it!"));
     }
-    else if ( medi.maillage.size()==0 || medi.groupes.size()==0 || medi.points.size()==0)
+    else if ( /*medi.maillage.size()==0 || */medi.groupes.size()==0 || medi.points.size()==0)
     {
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " Error while reading file " << _fileName 
 		    << " The data read are not completed " ) ) ;
@@ -653,7 +654,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     {
 	_ptrMesh->_name = _meshName;
 	_ptrMesh->_spaceDimension = medi.points.begin()->second.coord.size();
-	_ptrMesh->_meshDimension = medi.maillage.rbegin()->dimension();
+	_ptrMesh->_meshDimension = medi.getMeshDimension();
 	_ptrMesh->_numberOfNodes = medi.points.size();
 	_ptrMesh->_isAGrid = 0;
 	_ptrMesh->_coordinate = medi.getCoordinate();

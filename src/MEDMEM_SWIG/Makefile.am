@@ -79,4 +79,7 @@ dist_salomescript_DATA   = \
 		   test_profil_MedFieldDriver.py \
 		   testWriteAndFam.py \
 		   testMedMemGeneral.py \
-		   testMedMemCxxTests.py
+		   testMedMemCxxTests.py \
+		   dumpMEDMEM.py \
+		   ensightMedEnsight_test.py \
+		   medEnsightMed_test.py

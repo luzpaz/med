@@ -21,7 +21,6 @@
 //
 /*
  File Mesh.cxx
- $Header$
 */
 
 #include <math.h>
@@ -127,10 +126,24 @@ int  MESH::addDriver(GENDRIVER & driver)
   BEGIN_OF_MED(LOC);
 
   // A faire : Vérifier que le driver est de type MESH.
-  GENDRIVER * newDriver = driver.copy() ;
 
+  // For the case where driver does not know about me, i.e. has been created through
+  // constructor witout parameters: create newDriver knowing me and get missing data
+  // from driver using merge()
+  //GENDRIVER * newDriver = driver.copy() ;
+  GENDRIVER* newDriver = DRIVERFACTORY::buildDriverForMesh(driver.getDriverType(),
+                                                           driver.getFileName(), this,
+                                                           driver.getMeshName(),
+                                                           driver.getAccessMode());
   _drivers.push_back(newDriver);
-  return _drivers.size()-1;
+
+  int current = _drivers.size()-1;
+  driver.setId(current);
+
+  newDriver->merge( driver );
+  newDriver->setId( current );
+
+  return current;
 
   END_OF_MED(LOC);
 }
@@ -2513,17 +2526,19 @@ void MESH::createFamilies()
 	// 1 - Create a vector containing for each cell (of the entity) an information structure
 	//     giving geometric type and the groups it belong to
 
-	med_int numberOfTypes=getNumberOfTypes(entity);
-	const int * index=getGlobalNumberingIndex(entity);
-	const medGeometryElement* geometricTypes=_connectivity->getGeometricTypes(entity); // pb avec entity=MED_NODE???
-	med_int numberOfCells=index[numberOfTypes]-1;  // total number of cells for that entity
+	med_int numberOfTypes=getNumberOfTypesWithPoly(entity);
+	medGeometryElement* geometricTypes=_connectivity->getGeometricTypesWithPoly(entity); // pb avec entity=MED_NODE???
+	med_int numberOfCells=getNumberOfElementsWithPoly(entity, MED_ALL_ELEMENTS);  // total number of cells for that entity
 	SCRUTE_MED(numberOfTypes);
 	SCRUTE_MED(numberOfCells);
 	vector< _cell > tab_cell(numberOfCells);
-	for(med_int t=0; t!=numberOfTypes; ++t)
-	    for(int n=index[t]-1; n!=index[t+1]-1; ++n)
-		tab_cell[n].geometricType=geometricTypes[t];
-
+        vector< _cell >::iterator cell = tab_cell.begin();
+	for(med_int t=0; t!=numberOfTypes; ++t) {
+          int nbCellsOfType = getNumberOfElementsWithPoly(entity,geometricTypes[t]);
+          for(int n=0; n!=nbCellsOfType; ++n, ++cell)
+            cell->geometricType=geometricTypes[t];
+        }
+        delete [] geometricTypes;
 
 	// 2 - Scan cells in groups and update in tab_cell the container of groups a cell belong to
 
@@ -2598,9 +2613,11 @@ void MESH::createFamilies()
                 famName = famName.substr(4);
               }
               else { // try to make a unique name by cutting off char by char from the tail
-                famName.substr(0, MED_TAILLE_NOM);
+                famName = famName.substr(0, MED_TAILLE_NOM);
                 map< string,vector<int> >::iterator foundName = tab_families.find( famName );
-                while ( foundName != tab_families.end() && !famName.empty() ) {
+                while ( !famName.empty() &&
+                        ( foundName != tab_families.end() || famName[ famName.size()-1 ] == ' ' ))
+                {
                   famName = famName.substr( 0, famName.size() - 1 );
                   foundName = tab_families.find( famName );
                 }

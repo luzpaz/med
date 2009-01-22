@@ -25,8 +25,7 @@
 // Author    : Edward AGAPOV (eap)
 // Project   : SALOME Pro
 // Module    : MED 
-// $Header$
-//
+
 #ifndef MEDMEM_Grid_HeaderFile
 #define MEDMEM_Grid_HeaderFile
 
@@ -102,8 +101,10 @@ class MEDMEM_EXPORT GRID: public MESH
   GRID(const MED_EN::med_grid_type type);
   GRID(const GRID &m);
   GRID( driverTypes driverType, const string & fileName="",const string & meshName="");
-  GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name,
-       const std::vector<std::string>& coord_unit, const MED_EN::med_grid_type type=MED_EN::MED_CARTESIAN);
+  GRID(const std::vector<std::vector<double> >& xyz_array,
+       const std::vector<std::string>&          coord_name,
+       const std::vector<std::string>&          coord_unit,
+       const MED_EN::med_grid_type              type=MED_EN::MED_CARTESIAN);
   GRID & operator=(const GRID &m);
   virtual ~GRID();
   virtual void init();
@@ -287,6 +288,7 @@ class MEDMEM_EXPORT GRID: public MESH
   friend class MED_MESH_WRONLY_DRIVER21;
   friend class MED_MESH_RDONLY_DRIVER22;
   friend class MED_MESH_WRONLY_DRIVER22;
+  friend class ENSIGHT_MESH_RDONLY_DRIVER;
 };
 
 

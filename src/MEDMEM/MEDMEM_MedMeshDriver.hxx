@@ -244,6 +244,7 @@ public:
   void read ( void );
   void open();
   void close();
+  virtual void merge ( const GENDRIVER& driver );
   virtual void setFileName ( const string & fileName) {_concreteMeshDrv->setFileName(fileName); }
 protected:
   GENDRIVER * _concreteMeshDrv;
@@ -270,6 +271,7 @@ public :
   void write( void ) const;
   void open();
   void close();
+  virtual void merge ( const GENDRIVER& driver );
   virtual void setFileName ( const string & fileName) {_concreteMeshDrv->setFileName(fileName); }
 protected:
   GENDRIVER * _concreteMeshDrv;
@@ -295,6 +297,7 @@ public :
   void desactivateFacesComputation();
   void open();
   void close();
+  virtual void merge ( const GENDRIVER& driver );
   virtual void setFileName ( const string & fileName) {_concreteMeshDrv->setFileName(fileName); }
 protected:
   GENDRIVER * _concreteMeshDrv;

@@ -25,8 +25,8 @@
 // Author    : Edward AGAPOV (eap)
 // Project   : SALOME Pro
 // Module    : MED 
-// $Header$
-//
+
+
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
@@ -698,7 +698,7 @@ void GRID::fillConnectivity() const
     }
   }
   if (nbENodes != indexE+1) {
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Wrong nbFNodes : " \
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Wrong nbENodes : " \
                                         << nbENodes << " indexE : " << indexE ));
   }
 

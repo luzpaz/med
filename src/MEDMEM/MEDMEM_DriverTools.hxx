@@ -52,62 +52,97 @@ class COORDINATE;
 class GROUP;
 class FAMILY;
 class FIELD_;
+class _intermediateMED;
 
+// ==============================================================================
 struct MEDMEM_EXPORT _noeud
 {
-    mutable int number;
-    std::vector<double> coord;
+  mutable int number; // negative if node is merged
+  std::vector<double> coord;
 };
 
+// ==============================================================================
 typedef pair<int,int> _link; // a pair of node numbers
 
+// ==============================================================================
 struct MEDMEM_EXPORT _maille
 {
-    typedef std::map<int,_noeud>::iterator iter;
-    MED_EN::medGeometryElement geometricType;
-    std::vector< iter > sommets;
-    mutable unsigned ordre; // l'ordre est fixé après insertion dans le set, et ne change ni l'état, ni l'ordre -> mutable
-    mutable bool reverse; // to reverse sommets of a face
-    mutable list<unsigned> groupes; // the GROUPs maille belongs to, used to create families
+  typedef std::map<int,_noeud>::iterator TNoeud; //iter;
+  std::vector< TNoeud >      sommets;
+  MED_EN::medGeometryElement geometricType;
+  mutable bool               reverse; // to reverse sommets of a face
+  mutable int*               sortedNodeIDs; // for comparison and merge
+  //mutable list<unsigned>   groupes; // the GROUPs maille belongs to, used to create families
 
-    _maille() : geometricType(MED_EN::MED_NONE),ordre(0),reverse(false)
-    {
-    };
-    _maille(MED_EN::medGeometryElement _geometricType, size_t nelem) : geometricType(_geometricType),ordre(0),reverse(false)
-    {
-	sommets.reserve(nelem);
-    };
-    int dimension() const // retourne la dimension de la maille
-    {
-	return geometricType/100;
-    };
-    bool operator < (const _maille& ma) const;
-    MED_EN::medEntityMesh getEntity(const int meshDimension) const throw (MEDEXCEPTION);
-   _link link(int i) const;
+  _maille(MED_EN::medGeometryElement type=MED_EN::MED_NONE, size_t nelem=0)
+    : geometricType(type),_ordre(0),reverse(false),sortedNodeIDs(0) { sommets.reserve(nelem); }
+
+  _maille(const _maille& ma);
+  void init() const { if ( sortedNodeIDs ) delete [] sortedNodeIDs; sortedNodeIDs = 0; }
+  ~_maille() { init(); }
+
+  int dimension() const // retourne la dimension de la maille
+  { return geometricType/100; }
+
+  int dimensionWithPoly() const // retourne la dimension de la maille
+  { return geometricType >= MED_EN::MED_POLYGON ? dimension()-2 : dimension(); }
+
+  const int* getSortedNodes() const; // creates if needed and return sortedNodeIDs
+  bool operator < (const _maille& ma) const;
+  MED_EN::medEntityMesh getEntity(const int meshDimension) const throw (MEDEXCEPTION);
+  _link link(int i) const;
+
+  //bool isMerged(int i) const { return sommets[i]->second.number < 0; }
+  int nodeNum(int i) const { return abs( sommets[i]->second.number ); }
+  int nodeID (int i) const { return sommets[i]->first; } // key in points map
+
+  unsigned ordre() const { return abs( _ordre ); }
+  bool isMerged() const { return _ordre < 0; }
+  void setMergedOrdre(unsigned o) const { _ordre = -o; }
+  void setOrdre(int o) const { _ordre = o; }
+
+private:
+  mutable int _ordre; // l'ordre est fixé après insertion dans le set, et ne change ni l'état, ni l'ordre -> mutable
+  _maille& operator=(const _maille& ma);
 };
 
+// ==============================================================================
 struct MEDMEM_EXPORT _mailleIteratorCompare // pour ordonner le set d'iterateurs sur mailles
 {
-    bool operator () (std::set<_maille>::iterator i1, std::set<_maille>::iterator i2)
-    {
-	return *i1<*i2;
-    }
+  // this operator is used for ordering mailles thinin a group, which happens when
+  // right numbers are already given to _maille's, so we can use _maille::ordre
+  // for comparison instead of a heavy _maille::operator <
+  bool operator () (std::set<_maille>::iterator i1, std::set<_maille>::iterator i2)
+  {
+    //return *i1<*i2;
+    return i1->ordre() < i2->ordre();
+  }
 };
 
+// ==============================================================================
 struct MEDMEM_EXPORT _groupe
 {
-    typedef std::vector< std::set<_maille>::iterator>::const_iterator mailleIter;
-    std::string nom;
-    std::vector< std::set<_maille>::iterator > mailles; // iterateurs sur les mailles composant le groupe
-    std::vector<int> groupes; // indices des sous-groupes composant le groupe
-    std::map<const _maille*,int> relocMap; // map _maille* -> index in MEDMEM::GROUP.getNumber(MED_ALL_ELEMENTS). It is built by _intermediateMED::getGroups()
-    bool empty() const { return mailles.empty() && groupes.empty(); }
+  typedef std::set<_maille>::iterator            TMaille;
+  typedef std::vector< TMaille >::const_iterator TMailleIter;
+  std::string            nom;
+  std::vector< TMaille > mailles; // iterateurs sur les mailles composant le groupe
+  std::vector<int>       groupes; // indices des sous-groupes composant le groupe
+  std::map<unsigned,int> relocMap; // map _maille::ordre() -> index in GROUP, built by getGroups()
+  GROUP*                 medGroup;
+
+  const _maille& maille(int index) { return *mailles[index]; }
+  bool empty() const { return mailles.empty() && groupes.empty(); }
+  int  size()  const { return std::max( mailles.size(), relocMap.size() ); }
+  _groupe():medGroup(0) {}
 };
 
+// ==============================================================================
 struct MEDMEM_EXPORT _fieldBase {
   // a field contains several subcomponents each referring to its own support and
   // having several named components
+  // ----------------------------------------------------------------------------
   struct _sub_data // a subcomponent
+  // --------------------------------
   {
     int                      _supp_id;    // group index within _intermediateMED::groupes
     std::vector<std::string> _comp_names; // component names
@@ -122,6 +157,7 @@ struct MEDMEM_EXPORT _fieldBase {
     int nbGauss() const { return std::max( 1, _nb_gauss[0] ); }
     bool hasGauss() const { return nbGauss() > 1; }
   };
+  // ----------------------------------------------------------------------------
   std::vector< _sub_data > _sub;
   int                      _group_id; // group index within _intermediateMED::groupes
   // if _group_id == -1 then each subcomponent makes a separate MEDMEM::FIELD, else all subcomponents
@@ -133,8 +169,7 @@ struct MEDMEM_EXPORT _fieldBase {
 
   _fieldBase( MED_EN::med_type_champ theType, int nb_sub )
     : _group_id(-1),_type(theType) { _sub.resize( nb_sub ); }
-  virtual std::list<std::pair< FIELD_*, int> > getField(std::vector<_groupe>& groupes,
-                                                        std::vector<GROUP *>& medGroups) const = 0;
+  virtual std::list<std::pair< FIELD_*, int> > getField(std::vector<_groupe>& groupes) const = 0;
   void getGroupIds( std::set<int> & ids, bool all ) const; // return ids of main and/or sub-groups
   bool hasCommonSupport() const { return _group_id >= 0; } // true if there is one support for all subs
   bool hasSameComponentsBySupport() const;
@@ -142,6 +177,7 @@ struct MEDMEM_EXPORT _fieldBase {
   virtual ~_fieldBase() {}
 };
 
+// ==============================================================================
 template< class T > class _field: public _fieldBase
 {
   std::vector< std::vector< T > > comp_values;
@@ -149,11 +185,67 @@ template< class T > class _field: public _fieldBase
   _field< T > ( MED_EN::med_type_champ theType, int nb_sub, int total_nb_comp )
     : _fieldBase( theType, nb_sub ) { comp_values.reserve( total_nb_comp ); }
   std::vector< T >& addComponent( int nb_values ); // return a vector ready to fill in
-  std::list<std::pair< FIELD_*, int> > getField(std::vector<_groupe>& groupes,
-                                                std::vector<GROUP *>& medGroups) const;
+  std::list<std::pair< FIELD_*, int> > getField(std::vector<_groupe>& groupes) const;
   virtual void dump(std::ostream&) const;
 };
 
+// ==============================================================================
+/*!
+ * \if developper
+ * Iterator on set of _maille's of given dimension
+ * \endif
+ */
+class MEDMEM_EXPORT _maillageByDimIterator
+{
+public:
+  // if (convertPoly) then treat poly as 2d and 3d, else as 4d and 5d (=medGeometryElement/100)
+  _maillageByDimIterator( const _intermediateMED & medi,
+                          const int                dim=-1, // dim=-1 - for all dimensions
+                          const bool               convertPoly = false )
+  { myImed = & medi; init( dim, convertPoly ); }
+
+  // if (convertPoly) then treat poly as 2d and 3d, else as 4d and 5d (=medGeometryElement/100)
+  void init(const int  dim=-1, // dim=-1 - for all dimensions
+            const bool convertPoly = false );
+
+  //!< return next set of _maille's of required dimension
+  const std::set<_maille > * nextType() {
+    while ( myIt != myEnd )
+      if ( !myIt->second.empty() && ( myDim < 0 || dim(false) == myDim ))
+        return & (myIt++)->second;
+      else
+        ++myIt;
+    return 0;
+  }
+  //!< return dimension of mailles returned by the last or further next()
+  int dim(const bool last=true) const {
+    iterator it = myIt;
+    if ( last ) --it;
+    return myConvertPoly ?
+      it->second.begin()->dimensionWithPoly() :
+      it->second.begin()->dimension();
+  }
+  //!< return type of mailles returned by the last next()
+  MED_EN::medGeometryElement type() const { iterator it = myIt; return (--it)->first; }
+
+  //!< return number of mailles taking into account merged ones
+  int sizeWithoutMerged() const {
+    iterator it = myIt;
+    removed::const_iterator tNb = nbRemovedByType->find( (--it)->first );
+    return it->second.size() - ( tNb == nbRemovedByType->end() ? 0 : tNb->second );
+  }
+private:
+  typedef std::map<MED_EN::medGeometryElement, int >                removed;
+  typedef std::map<MED_EN::medGeometryElement, std::set<_maille > > TMaillageByType;
+  typedef TMaillageByType::const_iterator                                 iterator;
+
+  const _intermediateMED* myImed;
+  iterator myIt, myEnd;
+  int myDim, myConvertPoly;
+  const removed * nbRemovedByType;
+};
+
+// ==============================================================================
 /*!
  * \if developper
  * Intermediate structure used by drivers to store data read from the other format file.
@@ -166,34 +258,71 @@ template< class T > class _field: public _fieldBase
  */
 struct MEDMEM_EXPORT _intermediateMED
 {
-  std::set<_maille>        maillage;
+  typedef std::map<MED_EN::medGeometryElement, std::set<_maille > > TMaillageByType;
+  typedef std::map<MED_EN::medGeometryElement, int >                TNbByType;
+  typedef std::map< const _maille*, std::vector<int> >              TPolyherdalNbFaceNodes;
+
+  TNbByType                nbRemovedByType; // nb mailles removed by merge
   std::vector<_groupe>     groupes;
-  std::vector<GROUP *>     medGroupes;
+  //std::vector<GROUP *>     medGroupes;
   std::map< int, _noeud >  points;
   std::list< _fieldBase* > fields;
-  bool hasMixedCells; // true if there are groups with mixed entity types
+  bool                     hasMixedCells; // true if there are groups with mixed entity types
+  TPolyherdalNbFaceNodes   polyherdalNbFaceNodes; // nb of nodes in faces for each polyhedron
 
-  CONNECTIVITY * getConnectivity(); // set MED connectivity from the intermediate structure
-  COORDINATE * getCoordinate(const string & coordinateSystem="CARTESIAN"); // set MED coordinate from the 
-  // intermediate structure
-  void getFamilies(std::vector<FAMILY *> & _famCell, std::vector<FAMILY *> & _famFace, 
-                   std::vector<FAMILY *> & _famEdge, std::vector<FAMILY *> & _famNode, MESH * _ptrMesh);
+  inline _groupe::TMaille insert(const _maille& ma);
+
+  int getMeshDimension() const;
+  void mergeNodesAndElements(double tolerance); // optionally merge nodes and elements
+  CONNECTIVITY * getConnectivity(); // creates MED connectivity from the intermediate structure
+  COORDINATE * getCoordinate(const string & coordinateSystem="CARTESIAN"); // makes MED coordinate
+//   void getFamilies(std::vector<FAMILY *> & _famCell, std::vector<FAMILY *> & _famFace, 
+//                    std::vector<FAMILY *> & _famEdge, std::vector<FAMILY *> & _famNode,
+//                    MESH * _ptrMesh);
   void getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP *> & _groupFace, 
-                 std::vector<GROUP *> & _groupEdge, std::vector<GROUP *> & _groupNode, MESH * _ptrMesh);
-  GROUP * getGroup( int i );
+                 std::vector<GROUP *> & _groupEdge, std::vector<GROUP *> & _groupNode,
+                 MESH * _ptrMesh);
+  //GROUP * getGroup( int i );
 
   void getFields(std::list< FIELD_* >& fields);
 
   // used by previous functions to renumber points & mesh.
-  void treatGroupes(); // detect groupes of mixed dimention
-  void numerotationMaillage(); 
-  void numerotationPoints();
   bool myGroupsTreated;
-  bool myPointsNumerated;
+  void treatGroupes(); // detect groupes of mixed dimension
+  void numerotationMaillage();
+  bool numerotationPoints(); // return true if renumeration done
+  int nbMerged(int geoType) const; //!< nb nodes removed by merge
 
-  _intermediateMED() { myGroupsTreated = myPointsNumerated = false; }
-    ~_intermediateMED();
+  _intermediateMED()
+  { myNodesNumerated = myMaillesNumerated = myGroupsTreated = false; currentTypeMailles = 0; }
+  ~_intermediateMED();
+
+private:
+
+  bool myNodesNumerated, myMaillesNumerated;
+  // mailles groupped by geom type; use insert() for filling in and
+  // _maillageByDimIterator for exploring it
+  //std::set<_maille> maillage;
+  TMaillageByType              maillageByType;
+  TMaillageByType::value_type* currentTypeMailles; // for fast insertion
+  friend class _maillageByDimIterator;
 };
+//-----------------------------------------------------------------------
+_groupe::TMaille _intermediateMED::insert(const _maille& ma)
+{
+  if ( !currentTypeMailles || currentTypeMailles->first != ma.geometricType )
+    currentTypeMailles = & *maillageByType.insert
+      ( make_pair( ma.geometricType, std::set<_maille >())).first;
+
+  _groupe::TMaille res = currentTypeMailles->second.insert( ma ).first;
+
+  ((_maille&)ma).init(); // this method was added for the sake of this call which is needed to
+  // remove comparison key (sortedNodeIDs) from a temporary _maille ma
+
+  return res;
+}
+
+// ==============================================================================
 
 std::ostream& operator << (std::ostream& , const _maille& );
 std::ostream& operator << (std::ostream& , const _groupe& );
@@ -220,8 +349,7 @@ template <class T>
 //=======================================================================
 
 template <class T>
-std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> & groupes,
-                                                           std::vector<GROUP *> & medGroups) const
+std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> & groupes) const
 {
   const char* LOC = "_field< T >::getField()";
 
@@ -240,7 +368,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
   if ( hasCommonSupport() ) // several subs are combined into one field
   {
     grp    = & groupes[ _group_id ];
-    medGrp = medGroups[ _group_id ];
+    medGrp = grp->medGroup;
     if ( !grp || grp->empty() || !medGrp || !medGrp->getNumberOfTypes())
       return res;
 
@@ -276,9 +404,9 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
     // nb values in a field
     if ( !hasCommonSupport() ) {
       grp    = & groupes[ sub_data->_supp_id ];
-      medGrp = medGroups[ sub_data->_supp_id ];
+      medGrp = grp->medGroup;
     }
-    int nb_val = grp->relocMap.size();
+    int nb_val = grp->size();
 
     // check validity of a sub_data
     bool validSub = true;
@@ -383,20 +511,16 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
       for ( int k = 0; k < nb_supp_elems; ++k )
       {
         const T& val = oneValue ? values[ 0 ] : values[ k * elem_step ];
-        const _maille* ma = &(*sub_grp.mailles[ k ]);
+        const _maille& ma = sub_grp.maille( k );
         if ( medGrp->isOnAllElements() ) {
-          i = ma->ordre;
-          if ( i > nb_val )
-            throw MEDEXCEPTION (LOCALIZED(STRING(LOC) << ", wrong elem position. "
-                                          << k << "-th elem: " << ma
-                                          << ", pos (" << i << ") must be <= " << nb_val));
+          i = ma.ordre();
         }
         else {
-          std::map<const _maille*,int>::const_iterator ma_i = grp->relocMap.find( ma );
-          if ( ma_i == grp->relocMap.end() )
+          std::map<unsigned,int>::const_iterator ordre_i = grp->relocMap.find( ma.ordre() );
+          if ( ordre_i == grp->relocMap.end() )
             throw MEDEXCEPTION (LOCALIZED(STRING(LOC) << ", cant find elem index. "
                                           << k << "-th elem: " << ma));
-          i = ma_i->second;
+          i = ordre_i->second;
         }
         if ( arrayNoGauss ) {
           arrayNoGauss->setIJ( i, i_comp, val );
@@ -414,7 +538,9 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
 }
 
 
+// ==============================================================================
 template <class T> void _field< T >::dump(std::ostream& os) const
+// ==============================================================================
 {
   _fieldBase::dump(os);
   os << endl;
