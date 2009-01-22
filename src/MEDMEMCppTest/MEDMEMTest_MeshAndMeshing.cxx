@@ -825,7 +825,8 @@ void MEDMEMTest::testMeshAndMeshing()
     CPPUNIT_ASSERT_MESSAGE("Current mesh hasn't Families", NumberOfFamilies == 0);
 
     //create families - it's not possible to create, becase not all entities are defined
-    CPPUNIT_ASSERT_THROW( myMesh2->createFamilies(),MEDEXCEPTION);
+    // EAP: the problem has been fixed for ENSIGHT Industrialization project
+    CPPUNIT_ASSERT_NO_THROW( myMesh2->createFamilies() );
 
     /*CPPUNIT_ASSERT_NO_THROW(NumberOfFamilies = myMesh2->getNumberOfFamilies(MED_CELL));
       CPPUNIT_ASSERT( NumberOfFamilies != 0);*/
