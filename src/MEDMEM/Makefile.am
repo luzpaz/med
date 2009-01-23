@@ -94,15 +94,15 @@ MEDMEM_EnsightMedDriver.hxx \
 MEDMEM_EnsightMeshDriver.hxx \
 MEDMEM_EnsightFieldDriver.hxx \
 MEDMEM.hxx \
-MEDMEM_OptionManager.hxx
+MEDMEM_OptionManager.hxx \
+MEDMEM_EnsightUtils.hxx
 
 # not exported headers
 EXTRA_DIST+= DataTest \
 MEDMEM_MEDMEMchampLire.hxx \
 MEDMEM_MEDMEMgaussEcr.hxx \
 MEDMEM_MEDMEMprofilEcr.hxx \
-MEDMEM_Formulae.hxx \
-MEDMEM_EnsightUtils.hxx
+MEDMEM_Formulae.hxx
 
 dist_libmedmem_la_SOURCES= \
 MEDMEM_Init.cxx \
