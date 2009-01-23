@@ -90,10 +90,10 @@ COORDINATE::COORDINATE(const COORDINATE & m):
   BEGIN_OF_MED(LOC);
 
   _coordinate = m._coordinate;
-  int spaceDimension = _coordinate.getLeadingValue();
+  //int spaceDimension = _coordinate.getLeadingValue();
   int numberOfNodes = _coordinate.getLengthValue();
 
-  SCRUTE_MED(spaceDimension);
+  SCRUTE_MED(_coordinate.getLeadingValue());
   //setCoordinatesNames((const string*)m._coordinateName) ;
   //setCoordinatesUnits((const string*)m._coordinateUnit) ;
   setCoordinatesNames( m.getCoordinatesNames() );

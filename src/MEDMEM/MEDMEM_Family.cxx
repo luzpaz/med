@@ -196,20 +196,19 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   MESSAGE_MED("Entity : "<< getEntity());
   MESSAGE_MED("Entity list :");
   if (!(isOnAllElements())) {
-    int numberoftypes = getNumberOfTypes() ;
-    MESSAGE_MED("NumberOfTypes : "<<numberoftypes);
-    const medGeometryElement * types = getTypes();
-    for (int j=0;j<numberoftypes;j++) {
-      int numberOfElements = getNumberOfElements(types[j]);
-      MESSAGE_MED("    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) : ");
-      const int * number = getNumber(types[j]);
-      SCRUTE_MED(number);
+    MESSAGE_MED("NumberOfTypes : "<<getNumberOfTypes());
+    for (int j=0;j<getNumberOfTypes();j++) {
+      MESSAGE_MED("    * Type "<<getTypes()[j]<<" : there is(are) "<<
+                  getNumberOfElements(getTypes()[j])<<" element(s) : ");
+      SCRUTE_MED(getNumber(types[j]));
       //      for (int k=0; k<numberOfElements;k++)
         //	MESSAGE_MED("________________ " << number[k]);
     }
-  } else
+  }
+  else
+  {
     MESSAGE_MED("Is on all entities !");
-
+  }
 
 
 };

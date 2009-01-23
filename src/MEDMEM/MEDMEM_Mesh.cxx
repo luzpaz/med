@@ -2680,9 +2680,8 @@ void MESH::createFamilies()
 		newFam->setGroupsNames(groupNames);
 	    }
 
-	    int sizeOfFamVect = myFamilies->size();
-
-	    MESSAGE_MED("  MESH::createFamilies() entity " << entity << " size " << sizeOfFamVect);
+	    MESSAGE_MED("  MESH::createFamilies() entity " << entity <<
+                        " size " << myFamilies->size());
 
 	    myFamilies->push_back(newFam);
 	}
