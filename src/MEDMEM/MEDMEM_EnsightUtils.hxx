@@ -438,30 +438,6 @@ private:
 
 };
 
-
-// ==============================================================================
-/*!
- * \brief Structure to temporarily store data read from EnSight geom file
- */
-// ==============================================================================
-
-struct _InterMed : public _intermediateMED
-{
-  MESH * _medMesh;
-  bool   _isOwnMedMesh; //!< whether to delete _medMesh
-  int    _nbUsers;      //!< to know when to delete _medMesh
-
-  bool   _needSubParts; //!< true if there are fields needing _SubPart data
-
-  map< _SubPartDesc, _SubPart > _subPartDescribed;
-
-  map< _SupportDesc, _Support > _supportDescribed;
-
-  void addSubPart(const _SubPart& subPart);
-
-  ~_InterMed() { if ( _isOwnMedMesh ) { delete _medMesh; _medMesh=0; }}
-};
-
 // ==============================================================================
 /*!
  * \brief Descriptor of the sub-part: part number and elem type or "block" etc.
@@ -537,6 +513,29 @@ struct _Support
 
 //   medGeometryElement getType( const pair<const int,_noeud>& node);
 //   medGeometryElement getType( const _groupe::TMaille&       cell);
+};
+
+// ==============================================================================
+/*!
+ * \brief Structure to temporarily store data read from EnSight geom file
+ */
+// ==============================================================================
+
+struct _InterMed : public _intermediateMED
+{
+  MESH * _medMesh;
+  bool   _isOwnMedMesh; //!< whether to delete _medMesh
+  int    _nbUsers;      //!< to know when to delete _medMesh
+
+  bool   _needSubParts; //!< true if there are fields needing _SubPart data
+
+  map< _SubPartDesc, _SubPart > _subPartDescribed;
+
+  map< _SupportDesc, _Support > _supportDescribed;
+
+  void addSubPart(const _SubPart& subPart);
+
+  ~_InterMed() { if ( _isOwnMedMesh ) { delete _medMesh; _medMesh=0; }}
 };
 
 // ==============================================================================

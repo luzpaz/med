@@ -384,7 +384,7 @@ namespace {
       // value iterator for each component
       vector< _ValueIterator<T> > compValIt( nbComponents+1 );
       for ( j = 1; j <= nbComponents; ++j )
-        compValIt[ j ] = subValue->getValues<T>( j, nbValues, nbComponents );
+        compValIt[ j ] = subValue->template getValues<T>( j, nbValues, nbComponents );
 
       // Set values
 
@@ -1226,7 +1226,7 @@ void write6ASCIIValues( const _SubPartValues& subPartValues,
   if ( subPartValues.myNumbers )
   {
     vector< _SelectedValueIterator<T> > compValIt =
-      subPartValues.getAllSelectedValues<T>( componentShift, nbComponents, add3dComp );
+      subPartValues.template getAllSelectedValues<T>( componentShift, nbComponents, add3dComp );
     nbComponents = compValIt.size();
     // in full interlace
     for (int i=0; i<nbValues; i++)
@@ -1240,7 +1240,7 @@ void write6ASCIIValues( const _SubPartValues& subPartValues,
   }
   else {
     vector< _ValueIterator<T> > compValIt =
-      subPartValues.getAllValues<T>( componentShift, nbComponents, add3dComp );
+      subPartValues.template getAllValues<T>( componentShift, nbComponents, add3dComp );
     nbComponents = compValIt.size();
     // in full interlace
     for (int i=0; i<nbValues; i++)
@@ -1274,13 +1274,13 @@ void writeGoldASCIIValues( const _SubPartValues& subPartValues,
     if ( subPartValues.myNumbers )
     {
       _SelectedValueIterator<T> values
-        = subPartValues.getSelectedValues<T>( j, componentShift, nbComponents );
+        = subPartValues.template getSelectedValues<T>( j, componentShift, nbComponents );
       for (int i=0; i<nbValues; i++)
         ensightDataFile << setw(12) << _toFloat( values.next() ) << endl;
     }
     else {
       _ValueIterator<T> values
-        = subPartValues.getValues<T>( j, componentShift, nbComponents );
+        = subPartValues.template getValues<T>( j, componentShift, nbComponents );
       for (int i=0; i<nbValues; i++)
         ensightDataFile << setw(12) << _toFloat( values.next() )<< endl;
     }
@@ -1309,13 +1309,13 @@ void write6BinaryValues( const _SubPartValues& subPartValues,
   if ( subPartValues.myNumbers )
   {
     vector< _SelectedValueIterator<T> > compValIt =
-      subPartValues.getAllSelectedValues<T>( componentShift, nbComponents, add3dComp );
+      subPartValues.template getAllSelectedValues<T>( componentShift, nbComponents, add3dComp );
     ensightDataFile.addReal( compValIt, nbValues, MED_FULL_INTERLACE );
   }
   else
   {
     vector< _ValueIterator<T> > compValIt =
-      subPartValues.getAllValues<T>( componentShift, nbComponents, add3dComp );
+      subPartValues.template getAllValues<T>( componentShift, nbComponents, add3dComp );
     ensightDataFile.addReal( compValIt, nbValues, MED_FULL_INTERLACE );
   }
 }
@@ -1337,13 +1337,13 @@ void writeGoldBinaryValues( const _SubPartValues& subPartValues,
   if ( subPartValues.myNumbers )
   {
     vector< _SelectedValueIterator<T> > compValIt =
-      subPartValues.getAllSelectedValues<T>( componentShift, nbComponents, add3dComp );
+      subPartValues.template getAllSelectedValues<T>( componentShift, nbComponents, add3dComp );
     ensightDataFile.addReal( compValIt, nbValues, MED_NO_INTERLACE );
   }
   else
   {
     vector< _ValueIterator<T> > compValIt =
-      subPartValues.getAllValues<T>( componentShift, nbComponents, add3dComp );
+      subPartValues.template getAllValues<T>( componentShift, nbComponents, add3dComp );
     ensightDataFile.addReal( compValIt, nbValues, MED_NO_INTERLACE );
   }
   // add the 3-d component to a vector in 2D space
