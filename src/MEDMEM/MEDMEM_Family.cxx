@@ -200,7 +200,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
     for (int j=0;j<getNumberOfTypes();j++) {
       MESSAGE_MED("    * Type "<<getTypes()[j]<<" : there is(are) "<<
                   getNumberOfElements(getTypes()[j])<<" element(s) : ");
-      SCRUTE_MED(getNumber(types[j]));
+      SCRUTE_MED(getNumber(getTypes()[j]));
       //      for (int k=0; k<numberOfElements;k++)
         //	MESSAGE_MED("________________ " << number[k]);
     }
