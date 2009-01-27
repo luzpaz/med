@@ -549,6 +549,10 @@ else
    AC_SUBST(SETX) SETX="set -x"
 fi
 
+if test -n "${NO_MED_TRACE+X}"; then
+    CPPFLAGS="${CPPFLAGS} -D_NO_MED_TRACE_"
+fi
+
 echo
 echo ---------------------------------------------
 echo generating Makefiles and configure files
