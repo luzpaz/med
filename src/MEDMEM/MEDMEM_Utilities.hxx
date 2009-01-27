@@ -111,7 +111,7 @@ using namespace std;
   cout << flush ;\
 }
 
-#if defined(_DEBUG_) || defined(_DEBUG)
+#if ( defined(_DEBUG_) || defined(_DEBUG) ) && !defined(_NO_MED_TRACE_)
 
 /* --- the following MACROS are useful at debug time --- */
 
