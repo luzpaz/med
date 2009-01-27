@@ -1915,6 +1915,7 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
 							   &Reversedescendingconnectivityindex[0],
 							   &Reversedescendingconnectivityvalue[0]);
       ////
+      _isDescendingConnectivityPartial = false;
     }
   END_OF_MED(LOC);
   }
