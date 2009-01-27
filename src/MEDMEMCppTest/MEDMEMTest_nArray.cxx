@@ -139,7 +139,7 @@ void MEDMEMTest::testnArray()
     //size the array stays the same, only first 10 element are being overwritten
     myArray1Ptr = myArray1valsh.getPtr();
     for (int i = 0; i < 10; i++)
-      CPPUNIT_ASSERT_EQUAL(myArray1Ptr[i], myPtr[i]);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(myArray1Ptr[i], myPtr[i], EPS);
   }
 
   //test MEDMEM_Array(ElementType * values, int dim, int nbelem, bool shallowCopy=true, bool ownershipOfValues=true);
