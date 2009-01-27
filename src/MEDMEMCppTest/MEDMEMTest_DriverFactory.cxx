@@ -487,7 +487,7 @@ void MEDMEMTest::testDriverFactory()
   string datadir   = getenv("MED_ROOT_DIR");
   string filename  = datadir + "/share/salome/resources/med/pointe.med";
   string meshname  = "maa1";
-  string fieldname = "fieldcelldouble";
+  string fieldname = "fieldcelldoublescalar";
   FIELD<double> * aField1 = new FIELD<double> (MED_DRIVER, filename, fieldname);
   const SUPPORT * aSupport = aField1->getSupport();
   MESH * aMesh = new MESH (MED_DRIVER, filename, aSupport->getMeshName());

@@ -138,7 +138,7 @@ void MEDMEMTest::testnArray()
     CPPUNIT_ASSERT_NO_THROW(myArray1valsh.setPtr(myPtr));
     //size the array stays the same, only first 10 element are being overwritten
     myArray1Ptr = myArray1valsh.getPtr();
-    for (int i = 0; i < 11; i++)
+    for (int i = 0; i < 10; i++)
       CPPUNIT_ASSERT_EQUAL(myArray1Ptr[i], myPtr[i]);
   }
 

@@ -102,7 +102,7 @@ void MEDMEMTest::testMedFieldDriver21()
   string filename_rdwr              = tmp_dir + "/myRdWrField_pointe21.med";
   string cp_file_rdwr               = "cp " + filename_rd + " " + filename_rdwr;
   string emptyfile_rdwr             = tmp_dir + "/myRdWrField_pointe_empty21.med";
-  string fieldnameDouble            = "fieldcelldouble";
+  string fieldnameDouble            = "fieldcelldoublescalar";
   string fieldnameDouble_cpy        = fieldnameDouble + "_cpy";
 
   // To remove tmp files from disk
@@ -258,7 +258,7 @@ void MEDMEMTest::testMedFieldDriver21()
   //--------------------------Test WRITE ONLY part------------------------------//
 
   //Copy file
-  system(cp_other_file.c_str());
+  //system(cp_other_file.c_str());
   system(cp_file_wr.c_str());
 
   /////////////////////////////////////

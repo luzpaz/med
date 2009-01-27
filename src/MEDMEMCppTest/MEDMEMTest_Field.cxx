@@ -566,7 +566,7 @@ void testDrivers()
   string filenamevtk_wr                = tmp_dir  + "/myMedFieldfile22.vtk";
   string cp_file                      = "cp " + filename_rd + " " + filename_wr;
 
-  string fieldname_celldouble_rd      = "fieldcelldouble";
+  string fieldname_celldouble_rd      = "fieldcelldoublescalar";
   string fieldname_celldouble_wr      = fieldname_celldouble_rd + "_cpy";
   string fieldname_nodeint_rd         = "fieldnodeint";
   string fieldname_nodeint_wr         = fieldname_nodeint_rd + "_cpy";
