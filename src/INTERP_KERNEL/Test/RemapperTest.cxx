@@ -69,10 +69,14 @@ namespace INTERP_TEST
 		remapper.prepare(source_mesh,target_mesh);
 		remapper.transfer(source_field,target_field);
 
-		MEDMEM::FIELD<double> source_areas(&source_support,1);
-		MEDMEM::FIELD<double> target_areas(&target_support,1);
-		source_areas.getArea();
-		target_areas.getArea();
+                // issue 0020142: [CEA 315] Unused function in MEDMEM::FIELD
+                // FIELD::getArea() does nothing
+// 		MEDMEM::FIELD<double> source_areas(&source_support,1);
+// 		MEDMEM::FIELD<double> target_areas(&target_support,1);
+// 		source_areas.getArea();
+// 		target_areas.getArea();
+		MEDMEM::FIELD<double>& source_areas = *source_mesh.getArea(&source_support);
+		MEDMEM::FIELD<double>& target_areas = *target_mesh.getArea(&target_support);
 		absField(source_areas); //absolute value
 		absField(target_areas); //absolute value
 
@@ -82,7 +86,9 @@ namespace INTERP_TEST
 		double target_integral=target_field.normL2(1,&target_areas);
 		
 		CPPUNIT_ASSERT_DOUBLES_EQUAL(source_integral,target_integral,1e-10);
-		
+
+                delete &source_areas;
+                delete &target_areas;
   }
 
 		void RemapperTest::absField(MEDMEM::FIELD<double>& field)

@@ -432,38 +432,45 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
     theField->deallocValue();
     theField->allocValue(/*NumberOfComponents = */spaceDim + 1);
 
-    CPPUNIT_ASSERT_THROW(theField->getVolume(), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(theField->getArea(), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(theField->getLength(), MEDEXCEPTION);
-    if (aMesh) {
-      CPPUNIT_ASSERT_THROW(theField->getNormal(), MEDEXCEPTION);
-      CPPUNIT_ASSERT_THROW(theField->getBarycenter(), MEDEXCEPTION);
-    }
+    //  0020142: [CEA 315] Unused function in MEDMEM::FIELD
+    // getVolume() etc. does nothing
+    //
+//     CPPUNIT_ASSERT_THROW(theField->getVolume(), MEDEXCEPTION);
+//     CPPUNIT_ASSERT_THROW(theField->getArea(), MEDEXCEPTION);
+//     CPPUNIT_ASSERT_THROW(theField->getLength(), MEDEXCEPTION);
+//     if (aMesh) {
+//       CPPUNIT_ASSERT_THROW(theField->getNormal(), MEDEXCEPTION);
+//       CPPUNIT_ASSERT_THROW(theField->getBarycenter(), MEDEXCEPTION);
+//     }
 
     theField->deallocValue();
     theField->allocValue(/*NumberOfComponents = */1);
-    if (aValueType == MED_EN::MED_REEL64) {
-      CPPUNIT_ASSERT_NO_THROW(theField->getVolume());
-      CPPUNIT_ASSERT_NO_THROW(theField->getArea());
-      CPPUNIT_ASSERT_NO_THROW(theField->getLength());
-    }
-    else {
-      CPPUNIT_ASSERT_THROW(theField->getVolume(), MEDEXCEPTION);
-      CPPUNIT_ASSERT_THROW(theField->getArea(), MEDEXCEPTION);
-      CPPUNIT_ASSERT_THROW(theField->getLength(), MEDEXCEPTION);
-    }
+    //  0020142: [CEA 315] Unused function in MEDMEM::FIELD
+    // getVolume() etc. does nothing
+//     if (aValueType == MED_EN::MED_REEL64) {
+//       CPPUNIT_ASSERT_NO_THROW(theField->getVolume());
+//       CPPUNIT_ASSERT_NO_THROW(theField->getArea());
+//       CPPUNIT_ASSERT_NO_THROW(theField->getLength());
+//     }
+//     else {
+//       CPPUNIT_ASSERT_THROW(theField->getVolume(), MEDEXCEPTION);
+//       CPPUNIT_ASSERT_THROW(theField->getArea(), MEDEXCEPTION);
+//       CPPUNIT_ASSERT_THROW(theField->getLength(), MEDEXCEPTION);
+//     }
 
     if (aMesh) {
       theField->deallocValue();
       theField->allocValue(/*NumberOfComponents = */spaceDim);
-      if (aValueType == MED_EN::MED_REEL64) {
-        CPPUNIT_ASSERT_NO_THROW(theField->getNormal());
-        CPPUNIT_ASSERT_NO_THROW(theField->getBarycenter());
-      }
-      else {
-        CPPUNIT_ASSERT_THROW(theField->getNormal(), MEDEXCEPTION);
-        CPPUNIT_ASSERT_THROW(theField->getBarycenter(), MEDEXCEPTION);
-      }
+    //  0020142: [CEA 315] Unused function in MEDMEM::FIELD
+    // getVolume() etc. does nothing
+//       if (aValueType == MED_EN::MED_REEL64) {
+//         CPPUNIT_ASSERT_NO_THROW(theField->getNormal());
+//         CPPUNIT_ASSERT_NO_THROW(theField->getBarycenter());
+//       }
+//       else {
+//         CPPUNIT_ASSERT_THROW(theField->getNormal(), MEDEXCEPTION);
+//         CPPUNIT_ASSERT_THROW(theField->getBarycenter(), MEDEXCEPTION);
+//       }
     }
   }
 

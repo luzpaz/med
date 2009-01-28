@@ -1090,7 +1090,7 @@ the components.
     has be a SUPPORT on 3D cells. This initialisation could be done by the empty
     constructor followed by a setSupport and setNumberOfComponents call.
    */
-  void getVolume() const throw (MEDEXCEPTION) ;
+  //void getVolume() const throw (MEDEXCEPTION) ;
   /*!
     This fonction feeds the FIELD<double> private attributs _value with the
     area of each cells (or faces) belonging to the attribut _support. The field
@@ -1099,7 +1099,7 @@ the components.
     SUPPORT on 2D cells or 3D faces. This initialisation could be done by the
     empty constructor followed by a setSupport and setNumberOfComponents call.
    */
-  void getArea() const throw (MEDEXCEPTION) ;
+  //void getArea() const throw (MEDEXCEPTION) ;
   /*!
     This fonction feeds the FIELD<double> private attributs _value with the
     length of each segments belonging to the attribut _support. The field has
@@ -1108,7 +1108,7 @@ the components.
     SUPPORT on 3D edges or 2D faces. This initialisation could be done by the
     empty constructor followed by a setSupport and setNumberOfComponents call.
    */
-  void getLength() const throw (MEDEXCEPTION) ;
+  //void getLength() const throw (MEDEXCEPTION) ;
   /*!
     This fonction feeds the FIELD<double> private attributs _value with the
     normal vector of each faces belonging to the attribut _support. The field
@@ -1118,7 +1118,7 @@ the components.
     by the empty constructor followed by a setSupport and setNumberOfComponents
     call.
    */
-  void getNormal() const throw (MEDEXCEPTION) ;
+  //void getNormal() const throw (MEDEXCEPTION) ;
   /*!
     This fonction feeds the FIELD<double> private attributs _value with the
     barycenter of each faces or cells or edges belonging to the attribut _support.
@@ -1128,7 +1128,7 @@ the components.
     This initialisation could be done by the empty constructor followed by a
     setSupport and setNumberOfComponents call.
    */
-  void getBarycenter() const throw (MEDEXCEPTION) ;
+  //void getBarycenter() const throw (MEDEXCEPTION) ;
 
   typedef void (*myFuncType)(const double *,T*);
   void fillFromAnalytic(myFuncType f) throw (MEDEXCEPTION);
@@ -3966,107 +3966,107 @@ template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::s
 /*!
   Fill values array with volume values.
 */
-template <class T, class INTERLACING_TAG>
-void FIELD<T, INTERLACING_TAG>::getVolume() const throw (MEDEXCEPTION)
-{
-  const char * LOC = "FIELD<double>::getVolume() const : ";
-  BEGIN_OF_MED(LOC);
+// template <class T, class INTERLACING_TAG>
+// void FIELD<T, INTERLACING_TAG>::getVolume() const throw (MEDEXCEPTION)
+// {
+//   const char * LOC = "FIELD<double>::getVolume() const : ";
+//   BEGIN_OF_MED(LOC);
 
-  // The field has to be initilised by a non empty support and a
-  // number of components = 1 and its value type has to be set to MED_REEL64
-  // (ie a FIELD<double>)
+//   // The field has to be initilised by a non empty support and a
+//   // number of components = 1 and its value type has to be set to MED_REEL64
+//   // (ie a FIELD<double>)
 
-  if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
+//   if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
+//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
 
-  END_OF_MED(LOC);
-}
+//   END_OF_MED(LOC);
+// }
 
-/*!
-  Fill values array with area values.
-*/
-template <class T, class INTERLACING_TAG>
-void FIELD<T, INTERLACING_TAG>::getArea() const throw (MEDEXCEPTION)
-{
-  const char * LOC = "FIELD<double>::getArea() const : ";
-  BEGIN_OF_MED(LOC);
+// /*!
+//   Fill values array with area values.
+// */
+// template <class T, class INTERLACING_TAG>
+// void FIELD<T, INTERLACING_TAG>::getArea() const throw (MEDEXCEPTION)
+// {
+//   const char * LOC = "FIELD<double>::getArea() const : ";
+//   BEGIN_OF_MED(LOC);
 
-  // The field has to be initilised by a non empty support and a
-  // number of components = 1 and its value type has to be set to MED_REEL64
-  // (ie a FIELD<double>)
+//   // The field has to be initilised by a non empty support and a
+//   // number of components = 1 and its value type has to be set to MED_REEL64
+//   // (ie a FIELD<double>)
 
-  if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
+//   if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
+//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
 
-  END_OF_MED(LOC);
-}
+//   END_OF_MED(LOC);
+// }
 
-/*!
-  Fill values array with length values.
-*/
-template <class T, class INTERLACING_TAG>
-void FIELD<T, INTERLACING_TAG>::getLength() const throw (MEDEXCEPTION)
-{
-  const char * LOC = "FIELD<double>::getLength() const : ";
-  BEGIN_OF_MED(LOC);
+// /*!
+//   Fill values array with length values.
+// */
+// template <class T, class INTERLACING_TAG>
+// void FIELD<T, INTERLACING_TAG>::getLength() const throw (MEDEXCEPTION)
+// {
+//   const char * LOC = "FIELD<double>::getLength() const : ";
+//   BEGIN_OF_MED(LOC);
 
-  // The field has to be initilised by a non empty support and a
-  // number of components = 1 and its value type has to be set to MED_REEL64
-  // (ie a FIELD<double>)
+//   // The field has to be initilised by a non empty support and a
+//   // number of components = 1 and its value type has to be set to MED_REEL64
+//   // (ie a FIELD<double>)
 
-  if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
+//   if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
+//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
 
-  END_OF_MED(LOC);
-}
+//   END_OF_MED(LOC);
+// }
 
-/*!
-  Fill values array with normal values.
-*/
-template <class T, class INTERLACING_TAG>
-void FIELD<T, INTERLACING_TAG>::getNormal() const throw (MEDEXCEPTION)
-{
-  const char * LOC = "FIELD<double>::getNormal() const : ";
-  BEGIN_OF_MED(LOC);
+// /*!
+//   Fill values array with normal values.
+// */
+// template <class T, class INTERLACING_TAG>
+// void FIELD<T, INTERLACING_TAG>::getNormal() const throw (MEDEXCEPTION)
+// {
+//   const char * LOC = "FIELD<double>::getNormal() const : ";
+//   BEGIN_OF_MED(LOC);
 
-  // The field has to be initilised by a non empty support and a
-  // number of components = 1 and its value type has to be set to MED_REEL64
-  // (ie a FIELD<double>)
+//   // The field has to be initilised by a non empty support and a
+//   // number of components = 1 and its value type has to be set to MED_REEL64
+//   // (ie a FIELD<double>)
 
-  if (_support == (SUPPORT *) NULL)
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
+//   if (_support == (SUPPORT *) NULL)
+//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
 
-  int dim_space = _support->getMesh()->getSpaceDimension();
+//   int dim_space = _support->getMesh()->getSpaceDimension();
 
-  if ((_numberOfComponents != dim_space) || (_valueType != MED_EN::MED_REEL64))
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
+//   if ((_numberOfComponents != dim_space) || (_valueType != MED_EN::MED_REEL64))
+//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
 
-  END_OF_MED(LOC);
-}
+//   END_OF_MED(LOC);
+// }
 
-/*!
-  Fill values array with barycenter values.
-*/
-template <class T, class INTERLACING_TAG>
-void FIELD<T, INTERLACING_TAG>::getBarycenter() const throw (MEDEXCEPTION)
-{
-  const char * LOC = "FIELD<double>::getBarycenter() const : ";
-  BEGIN_OF_MED(LOC);
+// /*!
+//   Fill values array with barycenter values.
+// */
+// template <class T, class INTERLACING_TAG>
+// void FIELD<T, INTERLACING_TAG>::getBarycenter() const throw (MEDEXCEPTION)
+// {
+//   const char * LOC = "FIELD<double>::getBarycenter() const : ";
+//   BEGIN_OF_MED(LOC);
 
-  // The field has to be initilised by a non empty support and a number of
-  //components = space dimension and its value type has to be set to MED_REEL64
-  // (ie a FIELD<double>)
+//   // The field has to be initilised by a non empty support and a number of
+//   //components = space dimension and its value type has to be set to MED_REEL64
+//   // (ie a FIELD<double>)
 
-  if (_support == (SUPPORT *) NULL)
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
+//   if (_support == (SUPPORT *) NULL)
+//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
 
-  int dim_space = _support->getMesh()->getSpaceDimension();
+//   int dim_space = _support->getMesh()->getSpaceDimension();
 
-  if ((_numberOfComponents != dim_space) || (_valueType != MED_EN::MED_REEL64))
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
+//   if ((_numberOfComponents != dim_space) || (_valueType != MED_EN::MED_REEL64))
+//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
 
-  END_OF_MED(LOC);
-}
+//   END_OF_MED(LOC);
+// }
 
 /*!
   Fill array by using T_Analytic.
