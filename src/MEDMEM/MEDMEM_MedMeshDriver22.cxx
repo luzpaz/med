@@ -1784,14 +1784,20 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
       
 	int FamilyIdentifier ;
 	string FamilyName(MED_TAILLE_NOM,'\0');
-	int *  AttributesIdentifier = new int[NumberOfAttributes] ;
-	int *  AttributesValues     = new int[NumberOfAttributes] ;
+        // 0020071: Crash of V4_1_4rc2 (of testMedMemGeneral.py)
+        // Pb with Mistrat_import22.med: it's zero family has non-empty AttributesIdentifier's and
+        // AttributesValues' but MEDnAttribut() returns 0 (0 is hardcoded for zero family).
+        // So we allocate nothing but MEDfamInfo() reads file contents so overwritting
+        // stranger's memory. Stupid solution: allocate more than MEDnAttribut()
+        const int iSafe = 10;
+	int *  AttributesIdentifier = new int[NumberOfAttributes+iSafe] ;
+	int *  AttributesValues     = new int[NumberOfAttributes+iSafe] ;
 	string AttributesDescription(MED_TAILLE_DESC*NumberOfAttributes,' ') ;
 	string GroupsNames(MED_TAILLE_LNOM*NumberOfGroups+1,'\0') ;
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	med_2_3::med_int tmp_FamilyIdentifier ;
-	med_2_3::med_int *  tmp_AttributesIdentifier = new med_2_3::med_int[NumberOfAttributes] ;
-	med_2_3::med_int *  tmp_AttributesValues     = new med_2_3::med_int[NumberOfAttributes] ;
+	med_2_3::med_int *  tmp_AttributesIdentifier = new med_2_3::med_int[NumberOfAttributes+iSafe] ;
+	med_2_3::med_int *  tmp_AttributesValues     = new med_2_3::med_int[NumberOfAttributes+iSafe] ;
 	err = med_2_3::MEDfamInfo(_medIdt,
 				  const_cast <char *>(_meshName.c_str()),
 				  (i+1),
