@@ -46,43 +46,26 @@ private:
   int   _length2;
   const int * _array ;
 
-  bool compareNotVertexNodes(const MEDMODULUSARRAY &modulusArray) const;
+  inline bool compareNotVertexNodes(const MEDMODULUSARRAY &modulusArray) const;
 
 public:
-  MEDMODULUSARRAY(int length, const int * array) ;
-  MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array);
-  ~MEDMODULUSARRAY() ;
+  MEDMODULUSARRAY(int length, const int * array) :
+    _length(length), _array(array), _length2(length) {};
 
-  const int operator[](const int &i) const ;
+  MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array):
+    _length(vertexLength), _length2( totalLength ), _array(array) {}
 
-  int compare(const MEDMODULUSARRAY &modulusArray) const;
+  ~MEDMODULUSARRAY() {}
+
+  inline const int operator[](const int &i) const ;
+
+  inline int compare(const MEDMODULUSARRAY &modulusArray) const;
 
   const int  *getArray(int& length) const { length=_length; return _array; }
 };
 
 
-MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) : 
-  _length(length), _array(array), _length2(length)
-{
-//    SCRUTE(_length);
-//    for (int i=0;i<_length;i++){
-//      MESSAGE("MEDMODULUSARRAY["<<i<<"]="<<_array[i]);
-//    }
-};
-
-  MEDMODULUSARRAY::MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array):
-  _length(vertexLength), _length2( totalLength ), _array(array)
-{
-}
-
-MEDMODULUSARRAY::~MEDMODULUSARRAY()
-{
-  // do nothing because nothing is allocated !
-  //  MESSAGE("MEDMODULUSARRAY::~MEDMODULUSARRAY()") ;
-};
-
-
-const int MEDMODULUSARRAY::operator[](const int &i) const
+inline const int MEDMODULUSARRAY::operator[](const int &i) const
 {
   int position = i%_length ;
   //int position = i%_length2 ;
@@ -92,7 +75,7 @@ const int MEDMODULUSARRAY::operator[](const int &i) const
   return _array[position] ;
 };
 
-int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
+inline int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
 {
   int ret = 0 ;
 
@@ -151,7 +134,7 @@ int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
  * \brief Check presence of the same not vertex nodes
   * \retval bool - comparison result
  */
-bool MEDMODULUSARRAY::compareNotVertexNodes(const MEDMODULUSARRAY &modulusArray) const
+inline bool MEDMODULUSARRAY::compareNotVertexNodes(const MEDMODULUSARRAY &modulusArray) const
 {
   if ( _length2 > _length ) {
     for ( int i = _length; i < _length2; ++i ) {
