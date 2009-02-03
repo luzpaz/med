@@ -38,6 +38,7 @@
 #include <map>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 
 // Way of storing values with gauss points by CASTEM: full/no interlace.
 // Remove code switched by this symbol as soon as the way is found out,
