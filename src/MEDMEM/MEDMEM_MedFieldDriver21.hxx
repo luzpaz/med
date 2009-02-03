@@ -1383,10 +1383,10 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64) || defined(PCLINUX64_32)
 	if(MED_FIELD_DRIVER<T>::_ptrField->getValueType()==MED_EN::MED_INT32)
 	  {
-	    int lgth2=MED_FIELD_DRIVER<T>::_ptrField->getNumberOfValues();
-	    med_2_1::med_int *temp=new med_2_1::med_int[lgth2];
+	    int lgth2=MED_FIELD_DRIVER<T>::_ptrField->getValueLength();
+	    T *temp=new T[lgth2];
 	    for(int i2=0;i2<lgth2;i2++)
-	      temp[i2]=(int)(value[i2]);
+	      temp[i2]=(T)(value[i2]);
 	    err=med_2_1::MEDchampEcr(MED_FIELD_DRIVER21<T>::_medIdt, 
 				    const_cast <char*> ( MeshName.c_str()) ,                         //( string(mesh_name).resize(MED_TAILLE_NOM).c_str())
 				    const_cast <char*> ( (MED_FIELD_DRIVER<T>::_ptrField->getName()).c_str()),
