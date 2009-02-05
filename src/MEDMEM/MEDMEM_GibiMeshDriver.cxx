@@ -1880,6 +1880,8 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
       types = _ptrMesh->getTypes( entity );
     for ( int iType = 0; iType < nbTypes; ++iType )
     {
+      if ( types && types[ iType ] > MED_HEXA20 )
+        continue; // poly
       medGeometryElement geomType = types ? types[ iType ] : MED_ALL_ELEMENTS;
       const int * ptrElemIDs = 0;
       int elemID1 = 0, nbElems = 0;
@@ -2153,7 +2155,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh()
   // Collect object names
   // --------------------------------------------------------------------
 
-  vector<int> nbSuppElemsByType(MED_HEXA20,0);
+  vector<int> nbSuppElemsByType(MED_HEXA20+1,0);
   map<string,int> nameNbMap;
   map<const SUPPORT*,supportData>::iterator supIt = _supports.begin();
   int i, nb_objects = 0;
