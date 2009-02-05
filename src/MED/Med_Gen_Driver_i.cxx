@@ -23,7 +23,6 @@
 //  File   : Med_Gen_Driver_i.cxx
 //  Author : Paul RASCLE, EDF
 //  Module : MED
-//  $Header$
 //
 #include "Med_Gen_Driver_i.hxx"
 
