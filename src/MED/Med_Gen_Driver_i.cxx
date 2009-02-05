@@ -23,7 +23,6 @@
 //  File   : Med_Gen_Driver_i.cxx
 //  Author : Paul RASCLE, EDF
 //  Module : MED
-//  $Header$
 //
 #include "Med_Gen_Driver_i.hxx"
 
@@ -649,6 +648,10 @@ char* Med_Gen_Driver_i::LocalPersistentIDToIOR (SALOMEDS::SObject_ptr theSObject
       aMeshName[aMeshNameLen-1] = 0;
       try {
         object = med->getMeshByName( aMeshName.c_str() );
+        if ( CORBA::is_nil( object )) {
+          aMeshName = healName( aMeshName );
+          object = med->getMeshByName( aMeshName.c_str() );
+        }
       }
       catch (const std::exception & ex) {
         SCRUTE(ex.what());
@@ -666,6 +669,10 @@ char* Med_Gen_Driver_i::LocalPersistentIDToIOR (SALOMEDS::SObject_ptr theSObject
       // Get a field that is already read
       try {
         object = med->getField( aFieldName.c_str(), anIterNumber, aNumOrdre );
+        if ( CORBA::is_nil( object )) {
+          aFieldName = healName( aFieldName );
+          object = med->getField( aFieldName.c_str(), anIterNumber, aNumOrdre );
+        }
       }
       catch (const std::exception & ex) {
         SCRUTE(ex.what());
@@ -683,6 +690,10 @@ char* Med_Gen_Driver_i::LocalPersistentIDToIOR (SALOMEDS::SObject_ptr theSObject
         if ( type == "SUPPORT" ) {
           try {
             object = med_i->getSupport( meshName, medEntity );
+            if ( CORBA::is_nil( object )) {
+              meshName = healName( meshName );
+              object = med_i->getSupport( meshName, medEntity );
+            }
           }
           catch (const std::exception & ex) {
             SCRUTE(ex.what());
@@ -694,6 +705,10 @@ char* Med_Gen_Driver_i::LocalPersistentIDToIOR (SALOMEDS::SObject_ptr theSObject
           SALOME_MED::MESH_var mesh;
           try {
             mesh = med->getMeshByName( meshName.c_str() );
+            if ( mesh->_is_nil() ) {
+              meshName = healName( meshName );
+              mesh = med->getMeshByName( meshName.c_str() );
+            }
           }
           catch (const std::exception & ex) {
             SCRUTE(ex.what());
@@ -701,17 +716,20 @@ char* Med_Gen_Driver_i::LocalPersistentIDToIOR (SALOMEDS::SObject_ptr theSObject
                                          SALOME::INTERNAL_ERROR);
           }
           if ( !mesh->_is_nil() ) {
+            string healedName = healName( name );
             try {
               if ( type == "FAMILY" ) {
                 SALOME_MED::Family_array_var families = mesh->getFamilies( medEntity );
                 for ( int i = 0; CORBA::is_nil(object) && i <= families->length(); ++i )
-                  if ( families[ i ]->getName() == name )
+                  if ( families[ i ]->getName() == name ||
+                       families[ i ]->getName() == healedName )
                     object = SALOME_MED::FAMILY::_duplicate( families[ i ]);
               }
               else {
                 SALOME_MED::Group_array_var groups = mesh->getGroups( medEntity );
                 for ( int i = 0; CORBA::is_nil(object) && i <= groups->length(); ++i )
-                  if ( groups[ i ]->getName() == name )
+                  if ( groups[ i ]->getName() == name ||
+                       groups[ i ]->getName() == healedName )
                     object = SALOME_MED::GROUP::_duplicate( groups[ i ]);
               }
             }
