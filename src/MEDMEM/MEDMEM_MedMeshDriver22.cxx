@@ -3205,6 +3205,8 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
     }
   }
 
+  if (!_ptrMesh->getIsAGrid() || _ptrMesh->_meshDimension == 3 ) // for grid - only in 3D mesh
+
   { // FACE RELATED BLOCK
     medEntityMesh entity=MED_EN::MED_FACE;
     // SOLUTION TEMPORAIRE CAR _ptrMesh->_MEDArray____Family DOIT ETRE ENLEVER DE LA CLASSE MESH
@@ -3297,6 +3299,8 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
 //      }
     }
   }
+
+  if (!_ptrMesh->getIsAGrid() || _ptrMesh->_meshDimension > 1 ) // for grid - only in 3D and 2D mesh
 
   { // EDGE RELATED BLOCK
     //medEntityMesh entity=MED_EN::MED_FACE;
