@@ -261,9 +261,6 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 	SCRUTE(numberOfMeshes);
   // MESHES :
 	deque<string> meshesNames = _med->getMeshNames();
-	string meshName0 = meshesNames[0];
-
-	SCRUTE(meshName0);
 
 	for (int i=0; i<numberOfMeshes; i++) 
 	{
