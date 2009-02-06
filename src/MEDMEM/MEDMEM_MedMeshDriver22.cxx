@@ -1981,15 +1981,15 @@ int  MED_MESH_RDONLY_DRIVER22::getCellsFamiliesNumber(int **MEDArrayFamily,
 		       tmp_MEDArrayFamily,NumberOfCell,
 		       (med_2_3::med_entite_maillage) Connectivity->_entity,
 		       (med_2_3::med_geometrie_element)types[i]);
-	if (err != MED_VALID)
+	if (err != MED_VALID
+            && !_ptrMesh->getIsAGrid() ) // it's normal for a grid (PAL14113)
 	  {
 	    err=MEDfamLire(_medIdt,const_cast <char *>
 			   (_ptrMesh->_name.c_str()),
 			   tmp_MEDArrayFamily,NumberOfCell,
 			   med_2_3::MED_MAILLE,
 			   (med_2_3::med_geometrie_element)types[i]);
-	    if (err != MED_VALID
-                && !_ptrMesh->getIsAGrid() ) // (skl for IPAL14260)
+	    if (err != MED_VALID)
 	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<types[i]));
 	  }
 	if (err == MED_VALID) {
@@ -2003,15 +2003,15 @@ int  MED_MESH_RDONLY_DRIVER22::getCellsFamiliesNumber(int **MEDArrayFamily,
 		       MEDArrayFamily[i],NumberOfCell,
 		       (med_2_3::med_entite_maillage) Connectivity->_entity,
 		       (med_2_3::med_geometrie_element)types[i]);
-	if (err != MED_VALID)
+	if (err != MED_VALID
+            && !_ptrMesh->getIsAGrid() ) // it's normal for a grid (PAL14113)
 	  {
 	    err=MEDfamLire(_medIdt,const_cast <char *>
 			   (_ptrMesh->_name.c_str()),
 			   MEDArrayFamily[i],NumberOfCell,
 			   med_2_3::MED_MAILLE,
 			   (med_2_3::med_geometrie_element)types[i]);
-	    if (err != MED_VALID
-                && !_ptrMesh->getIsAGrid() ) // it's normal for a grid (PAL14113)
+	    if (err != MED_VALID)
 	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<types[i]));
 	  }
 #endif
@@ -2030,8 +2030,8 @@ MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22()
 }
   
 MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22(const string & fileName,
-																									 MESH * ptrMesh, 
-																									 MED_EN::med_mode_acces access):
+                                                   MESH * ptrMesh, 
+                                                   MED_EN::med_mode_acces access):
   MED_MESH_DRIVER22(fileName,ptrMesh,access),IMED_MESH_WRONLY_DRIVER(fileName,ptrMesh),MED_MESH_DRIVER(fileName,ptrMesh,access)
 {
   MESSAGE("MED_MESH_WRONLY_DRIVER22::MED_MESH_WRONLY_DRIVER22(const string & fileName, MESH * ptrMesh) has been created");
