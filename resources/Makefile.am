@@ -215,7 +215,14 @@ dist_salomeres_DATA = \
     square2_split \
     square2_split1.med \
     square2_split2.med \
-    Pol1.fig Pol2.fig Pol3.fig  Pol4.fig
+    Pol1.fig Pol2.fig Pol3.fig  Pol4.fig \
+    blow5_ascii.case \
+    blow5_ascii.geo \
+    blow5_ascii_cd_displacement \
+    blow5_ascii_cd_thickness \
+    blow5_ascii_pd_displacement \
+    blow5_ascii_pd_thickness
+
 
 # VSR: little trick to avoid putting if MEDCatalog.xml to the distribution archive
 nodist_salomeres_SCRIPTS = MEDCatalog.xml
