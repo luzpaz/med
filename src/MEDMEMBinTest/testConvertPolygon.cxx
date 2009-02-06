@@ -23,9 +23,36 @@
 
 int main()
 {
-  //  MEDMEM::MESH mesh(MEDMEM::MED_DRIVER, "/export/home/vb144235/MED_INTEGRATION/MED_INSTALL/share/salome/resources/med/poly3D.med","poly3D");
-  MEDMEM::MESH mesh(MEDMEM::MED_DRIVER, "/export/home/bergeaud/Extruded_hexagon_fluidmesh.med","FluidMesh_1");
+  // Get file to convert.
+  string file;
+  // During 'make check' $srcdir exists
+  if ( getenv("srcdir") ) {
+    file = string( getenv("srcdir")) + "/../../resources/";
+  }
+  else if ( getenv( "MED_ROOT_DIR")) {
+    // after installation
+    file = string( getenv( "MED_ROOT_DIR" )) + "/share/salome/resources/med/";
+  }
+  else
+  {
+    return -1;
+  }
+  file += "BoxTetra2.med";
+  cout << "File to cnvert: " << file << endl;
+  // convertion
+  MEDMEM::MESH mesh(MEDMEM::MED_DRIVER, file.c_str(), "BoxTetra2");
   mesh.convertToPoly();
-  int id=mesh.addDriver(MEDMEM::MED_DRIVER,"/export/home/bergeaud/Zxtruded_hexagon_fluidmesh_polyhedra.med","Fluidmesh_1");
+
+  // File to store conversion result
+  if ( getenv("TMP") )
+    file = getenv("TMP");
+  else if ( getenv("TMPDIR") )
+    file = getenv("TMPDIR");
+  else
+    file = "/tmp";
+  file += "pointe_testConvertPolygon.med";
+
+  int id=mesh.addDriver(MEDMEM::MED_DRIVER,file.c_str(),"mesh");
   mesh.write(id);
+  return 0;
 }
