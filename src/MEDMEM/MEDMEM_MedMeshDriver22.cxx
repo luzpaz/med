@@ -1940,15 +1940,15 @@ int  MED_MESH_RDONLY_DRIVER22::getCellsFamiliesNumber(int **MEDArrayFamily,
 		       tmp_MEDArrayFamily,NumberOfCell,
 		       (med_2_3::med_entite_maillage) Connectivity->_entity,
 		       (med_2_3::med_geometrie_element)types[i]);
-	if (err != MED_VALID)
+	if (err != MED_VALID
+            && !_ptrMesh->getIsAGrid()) // it's normal for a grid (PAL14113)
 	  {
 	    err=MEDfamLire(_medIdt,const_cast <char *>
 			   (_ptrMesh->_name.c_str()),
 			   tmp_MEDArrayFamily,NumberOfCell,
 			   med_2_3::MED_MAILLE,
 			   (med_2_3::med_geometrie_element)types[i]);
-	    if (err != MED_VALID
-                && !_ptrMesh->getIsAGrid() ) // (skl for IPAL14260)
+	    if (err != MED_VALID )
 	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<types[i]));
 	  }
 	if (err == MED_VALID) {
@@ -1962,21 +1962,21 @@ int  MED_MESH_RDONLY_DRIVER22::getCellsFamiliesNumber(int **MEDArrayFamily,
 		       MEDArrayFamily[i],NumberOfCell,
 		       (med_2_3::med_entite_maillage) Connectivity->_entity,
 		       (med_2_3::med_geometrie_element)types[i]);
-	if (err != MED_VALID)
-	  {
+	if (err != MED_VALID
+            && !_ptrMesh->getIsAGrid() ) // it's normal for a grid (PAL14113)
+        {
 	    err=MEDfamLire(_medIdt,const_cast <char *>
 			   (_ptrMesh->_name.c_str()),
 			   MEDArrayFamily[i],NumberOfCell,
 			   med_2_3::MED_MAILLE,
 			   (med_2_3::med_geometrie_element)types[i]);
-	    if (err != MED_VALID
-                && !_ptrMesh->getIsAGrid() ) // it's normal for a grid (PAL14113)
+	    if (err != MED_VALID)
 	      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<types[i]));
 	  }
 #endif
       }
     delete [] types;
-    return MED_VALID;
+    return err ? MED_INVALID : MED_VALID;
     }
   return MED_ERROR;
 }
@@ -2253,7 +2253,7 @@ int MED_MESH_WRONLY_DRIVER22::writeGRID() const
       if (err != MED_VALID)
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"error in writing the structure of the grid |" << _meshName.c_str()));
 
-      delete structure;
+      delete [] structure;
     }
   else if ((gridType == MED_EN::MED_CARTESIAN) ||
 	   (gridType == MED_EN::MED_POLAR))
