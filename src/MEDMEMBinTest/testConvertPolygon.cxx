@@ -50,7 +50,7 @@ int main()
     file = getenv("TMPDIR");
   else
     file = "/tmp";
-  file += "pointe_testConvertPolygon.med";
+  file += "/pointe_testConvertPolygon.med";
 
   int id=mesh.addDriver(MEDMEM::MED_DRIVER,file.c_str(),"mesh");
   mesh.write(id);

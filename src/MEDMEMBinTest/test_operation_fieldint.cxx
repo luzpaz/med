@@ -205,7 +205,7 @@ int main (int argc, char ** argv)
     catch (MEDEXCEPTION & ex)
     {
 	std::cout << ex.what() << endl;
-	myField1->setSupport(mySupport);
+	myField1->setSupport( myField2->getSupport() );
     }
 
     // champs de taille nulle
