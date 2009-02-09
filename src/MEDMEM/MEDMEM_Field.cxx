@@ -193,7 +193,7 @@ FIELD<double>* FIELD_::_getFieldSize() const
     switch (getSupport()->getEntity())
     {
 	case MED_CELL :
-	    switch (getSupport()->getMesh()->getSpaceDimension() ) 
+	    switch (getSupport()->getMesh()->getMeshDimension() ) 
 	    {
 		case 1:
 		    p_field_size=getSupport()->getMesh()->getLength(getSupport() );
