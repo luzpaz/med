@@ -164,7 +164,6 @@ AM_CXXFLAGS= $(libmedmem_la_CXXFLAGS)
 LDADD= $(libmedmem_la_LDFLAGS) -lm libmedmem.la
 
 OBSOLETE_FILES = \
-	MEDMEM_EnsightFieldDriver.cxx \
 	MEDMEM_MEDMEMchampLire.cxx \
 	MEDMEM_MEDMEMgaussEcr.cxx \
 	MEDMEM_MEDMEMprofilEcr.cxx \
