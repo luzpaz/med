@@ -1954,11 +1954,11 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 
     fileHasMesh = ( med_2_3::MEDdimLire(id, const_cast<char *>(meshName.c_str())) > 0);
     MESH * meshPtr = mySupport->getMesh();
-    if(!meshPtr)
-      throw MEDEXCEPTION( LOCALIZED (STRING(LOC)
-                                     <<": Mesh in support is null"
-                                     )
-                          );
+//     if(!meshPtr)
+//       throw MEDEXCEPTION( LOCALIZED (STRING(LOC)
+//                                      <<": Mesh in support is null"
+//                                      )
+//                           );
 
     if (fileHasMesh)
       this->getMeshGeometricTypeFromFile(id, meshName,
