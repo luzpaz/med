@@ -21,6 +21,7 @@
 //
 #include<string>
 #include<deque>
+#include<vector>
 
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
@@ -37,7 +38,8 @@ using namespace MEDMEM;
 void usage(char * name)
 {
   cout << " ERROR ABOUT SYNTAX " << endl ;
-  cout << "  " << name << " <input ensight file> <output med file> " << endl ;
+  cout << "  " << name << " <input ensight file> <output med file> [I - to read into MED_INT32 fields]"
+       << endl ;
   exit(-1);
 }
 
@@ -58,6 +60,50 @@ int main (int argc, char ** argv) {
 
     int id = myMed.addDriver(MED_DRIVER,filenameOUT);
     myMed.write(id);
+  }
+  else if ( argc == 4 && strncmp(argv[3], "I", 1 )==0 )
+  {
+    // we read all variables into INT32 fields
+    // (we need such fields for test_operation_fieldint)
+
+    filenameIN  = argv[1] ;
+    filenameOUT = argv[2] ;
+    MED myMed(ENSIGHT_DRIVER,filenameIN);
+
+    // read-write the mesh
+    if ( myMed.getNumberOfMeshes() < 1 ) {
+      cout << "No meshes found in EnSight file " << filenameIN << endl;
+      return -1;
+    }
+    vector<string> meshNames( myMed.getNumberOfMeshes() );
+    myMed.getMeshNames( &meshNames[0] );
+    MESH * mesh = myMed.getMesh( meshNames[0] );
+    mesh->read();
+    int drv = mesh->addDriver(MED_DRIVER, filenameOUT, mesh->getName() );
+    mesh->write( drv );
+
+    // read-write fields
+    int nbFields = myMed.getNumberOfFields();
+    vector<string> fieldNames( nbFields );
+    myMed.getFieldNames( &fieldNames[0] );
+    for ( int i = 0; i < nbFields; ++i )
+    {
+      deque<DT_IT_> dis = myMed.getFieldIteration( fieldNames[i] );
+      for ( deque<DT_IT_>::iterator d_i = dis.begin(); d_i != dis.end(); ++d_i )
+      {
+        FIELD_* f = myMed.getField( fieldNames[i], d_i->dt, d_i->it );
+        FIELD<int> intF(ENSIGHT_DRIVER, filenameIN, f->getName() );
+        // replace zero values as theses fields are used for division
+        int nbVals = intF.getValueLength();
+        int* values = const_cast<int*>(intF.getValue());
+        while ( nbVals-- ) {
+          if ( values[nbVals]==0 )
+            values[nbVals]= nbVals%5 + 1;
+        }
+        int drv = intF.addDriver(MED_DRIVER, filenameOUT, f->getName() );
+        intF.write( drv );
+      }
+    }
   }
   else usage(argv[0]);
 
