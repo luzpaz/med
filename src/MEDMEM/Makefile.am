@@ -170,18 +170,6 @@ OBSOLETE_FILES = \
 	MEDMEM_MEDMEMprofilEcr.cxx \
 	MEDMEM_TypeMeshDriver.cxx \
 	MEDMEM_TypeMeshDriver.hxx \
-	checkScript \
-	tests/readEntete.cxx \
-	tests/testUArray.cxx.ok \
-	tests/testUCoordinate.cxx \
-	tests/testUMedException.cxx \
-	tests/testUPointerOf.cxx \
-	tests/testUUnit.cxx \
-	tests/readCoordinate.cxx \
-	tests/testUArray.cxx \
-	tests/testUCellModel.cxx \
-	tests/testUGeoNameMeshEntities.cxx \
-	tests/testUModulusArray.cxx \
-	tests/testUSkyLineArray.cxx
+	checkScript
 
 EXTRA_DIST += $(OBSOLETE_FILES)
