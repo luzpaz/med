@@ -85,7 +85,7 @@ int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
    MED_CREATION         : Créer le fichier s'il n'existe pas, l'écrase sinon
 */
     switch ( mode ) {
-    case MED_EN::WRONLY: return med_2_3::MED_CREATION;
+    case MED_EN::WRONLY: return med_2_3::MED_LECTURE_ECRITURE;// be coherent with V21 /*MED_CREATION;*/
     case MED_EN::RDONLY: return med_2_3::MED_LECTURE;
     case MED_EN::RDWR:   return med_2_3::MED_LECTURE_ECRITURE;
     default:
