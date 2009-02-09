@@ -124,6 +124,7 @@ int main (int argc, char ** argv) {
   try {
     myFieldDriver.read() ;
   } catch (...) {
+    myField->setSupport(0);
     delete mySupport ;
     mySupport = new SUPPORT(myMesh,"On_all_node",MED_EN::MED_NODE);
     myField->setSupport(mySupport);
