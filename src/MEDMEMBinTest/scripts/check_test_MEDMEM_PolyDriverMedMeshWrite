@@ -1,0 +1,24 @@
+#! /bin/sh -f
+
+outdir="/tmp"
+if test "z$TMP" != "z" && test -e $TMP; then
+    outdir=$TMP
+else
+ if test "z$TMPDIR" != "z" && test -e $TMPDIR; then
+    outdir=$TMPDIR
+ fi
+fi
+
+initfile=${srcdir}/../../resources/pointe_import22.med
+infile=$outdir/test_MEDMEM_PolyDriverMedMeshWrite.med
+outfile=$outdir/test_MEDMEM_PolyDriverMedMeshWrite.med_copy
+
+cp $initfile $infile
+
+./test_MEDMEM_PolyDriverMedMeshWrite $infile maa1
+
+ok=$?
+
+rm $outfile
+
+exit $ok

@@ -1,0 +1,30 @@
+#! /bin/sh -f
+
+outdir="/tmp"
+if test "z$TMP" != "z" && test -e $TMP; then
+    outdir=$TMP
+else
+ if test "z$TMPDIR" != "z" && test -e $TMPDIR; then
+    outdir=$TMPDIR
+ fi
+fi
+
+infile=${srcdir}/../../resources/pointe.med
+
+outfile=${outdir}/pointe.case
+
+./med2ensight $infile $outfile
+
+ok=$?
+
+rm $outfile
+rm ${outdir}/pointe.geo
+rm ${outdir}/pointe.fieldcelldoublescalar
+rm ${outdir}/pointe.fieldcelldoublevector
+rm ${outdir}/pointe.fieldnodedouble000
+rm ${outdir}/pointe.fieldnodedouble001
+rm ${outdir}/pointe.fieldnodedouble002
+rm ${outdir}/pointe.fieldnodeint
+
+
+exit $ok

@@ -61,7 +61,7 @@ endif
 
 
 bin_PROGRAMS= \
-	ensight2med med2ensight \
+	ensight2med med2ensight convertToPoly \
 	med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH test_write_groups_poly\
 	test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray \
 	test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit \
@@ -84,10 +84,74 @@ bin_PROGRAMS= \
 
 TESTS = $(bin_PROGRAMS)
 
+# tests that fail because they require arguments
+XFAIL_TESTS = \
+	convertToPoly \
+	duplicateMED \
+	duplicateMEDMESH \
+	ensight2med \
+	med2_1_To_med2_2 \
+	med2ensight \
+	med2vtk \
+	med_test \
+	readCoordinate \
+	readEntete \
+	testAnalFile \
+	test_MEDMEM_PolyDriverMedMeshRead \
+	test_MEDMEM_PolyDriverMedMeshWrite \
+	test_MEDMEM_poly3D \
+	test_copie_connectivity \
+	test_copie_family \
+	test_copie_fieldT \
+	test_copie_field_ \
+	test_copie_group \
+	test_copie_mesh \
+	test_copie_support \
+	test_gibi_driver \
+	test_grid \
+	test_operation_fielddouble \
+	test_operation_fieldint \
+	test_porflow_driver \
+	test_profil_MedFieldDriver \
+	test_profil_gauss_MedFieldDriver
+
+TESTS_ENVIRONMENT = $(SHELL)
+
+# scripts running tests with appropriate arguments
+TESTS += \
+	scripts/check_convertToPoly \
+	scripts/check_duplicateMED \
+	scripts/check_ensight2med \
+	scripts/check_med2_1_To_med2_2 \
+	scripts/check_med2ensight \
+	scripts/check_med2vtk \
+	scripts/check_readCoordinate \
+	scripts/check_readEntete \
+	scripts/check_testAnalFile \
+	scripts/check_test_MEDMEM_PolyDriverMedMeshRead \
+	scripts/check_test_MEDMEM_PolyDriverMedMeshWrite \
+	scripts/check_test_MEDMEM_poly3D \
+	scripts/check_test_copie_connectivity \
+	scripts/check_test_copie_family \
+	scripts/check_test_copie_fieldT \
+	scripts/check_test_copie_field_ \
+	scripts/check_test_copie_group \
+	scripts/check_test_copie_mesh \
+	scripts/check_test_copie_support \
+	scripts/check_test_gibi_driver \
+	scripts/check_test_grid \
+	scripts/check_test_operation_fielddouble \
+	scripts/check_test_operation_fieldint \
+	scripts/check_test_porflow_driver \
+	scripts/check_test_profil_MedFieldDriver \
+	scripts/check_test_profil_gauss_MedFieldDriver
+
+
 #if MED_ENABLE_KERNEL
 #     LDADD+=-lSALOMEBasics
 #endif
 
+dist_convertToPoly_SOURCES= convertToPoly.cxx
 dist_ensight2med_SOURCES= ensight2med.cxx
 dist_med2ensight_SOURCES= med2ensight.cxx
 dist_med2_1_To_med2_2_SOURCES= med2_1_To_med2_2.cxx
