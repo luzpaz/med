@@ -151,6 +151,7 @@ dist_salomeres_DATA=\
     Structure.png \
     test19.med \
     test_2D.med \
+    trio_2D.med \
     test3.cnc \
     test3.inp \
     test3.xyz \
