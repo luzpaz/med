@@ -115,10 +115,8 @@ XFAIL_TESTS = \
 	test_profil_MedFieldDriver \
 	test_profil_gauss_MedFieldDriver
 
-TESTS_ENVIRONMENT = $(SHELL)
-
 # scripts running tests with appropriate arguments
-TESTS += \
+SCRIPT_TESTS = \
 	scripts/check_convertToPoly \
 	scripts/check_duplicateMED \
 	scripts/check_ensight2med \
@@ -146,6 +144,9 @@ TESTS += \
 	scripts/check_test_profil_MedFieldDriver \
 	scripts/check_test_profil_gauss_MedFieldDriver
 
+TESTS_ENVIRONMENT = $(SHELL)
+
+TESTS += $(SCRIPT_TESTS)
 
 #if MED_ENABLE_KERNEL
 #     LDADD+=-lSALOMEBasics
@@ -210,4 +211,4 @@ OBSOLETE_FILES = \
 	create_poly2D.c \
 	testAG.cxx
 
-EXTRA_DIST += $(OBSOLETE_FILES)
+EXTRA_DIST += $(OBSOLETE_FILES) $(SCRIPT_TESTS)
