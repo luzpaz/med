@@ -266,6 +266,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);
+  aRemover.Register(filename_wr+".xml");
   aRemover.Register(filename_wr_1);
   aRemover.Register(filename_wr_2);
   
@@ -430,6 +431,7 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);
+  aRemover.Register(filename_wr+".xml");
   aRemover.Register(filename_wr_1);
   aRemover.Register(filename_wr_2);
   
@@ -634,6 +636,7 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
     tmp_dir = "/tmp";
   string filename_rd                = data_dir + "/share/salome/resources/med/maill.00.med";
   string filename_wr                = tmp_dir + "/carre_indivisible";
+  string filename_wr_xml            = tmp_dir + "/carre_indivisible.xml";
   string filename_wr_1              = tmp_dir + "/carre_indivisible1.med";
   string filename_wr_2              = tmp_dir + "/carre_indivisible2.med";
   string filename_wr_3              = tmp_dir + "/carre_indivisible3.med";
@@ -642,6 +645,7 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
 	// To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);
+  aRemover.Register(filename_wr_xml);
   aRemover.Register(filename_wr_1);
   aRemover.Register(filename_wr_2);
   aRemover.Register(filename_wr_3);
@@ -738,6 +742,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);
+  aRemover.Register(filename_wr+".xml");
   aRemover.Register(filename_wr_1);
   aRemover.Register(filename_wr_2);
 
@@ -924,6 +929,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   aRemover.Register(filename_para2_med2);
   aRemover.Register(filename_para2_med3);
   aRemover.Register(filename_seq_wr);
+  aRemover.Register(filename_seq_wr+".xml");
   aRemover.Register(filename_seq_med);
   
   
@@ -1002,6 +1008,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polygon()
   aRemover.Register(filename_para2_med2);
   aRemover.Register(filename_para2_med3);
   aRemover.Register(filename_seq_wr);
+  aRemover.Register(filename_seq_wr+".xml");
   aRemover.Register(filename_seq_med);
   
   
@@ -1131,8 +1138,9 @@ void MEDSPLITTERTest::testMESHCollection_families()
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);
-	//  aRemover.Register(filename_wr_1);
-	//aRemover.Register(filename_wr_2);
+  aRemover.Register(filename_wr+".xml");
+  aRemover.Register(filename_wr_1);
+  aRemover.Register(filename_wr_2);
   
   char meshname[30]  = "dom";
   char meshname1[30]  = "dom_1";
