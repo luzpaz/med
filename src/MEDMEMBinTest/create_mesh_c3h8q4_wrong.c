@@ -361,5 +361,9 @@ int main (int argc, char **argv)
   ret = MEDfermer(fid);
   printf("%d\n",ret);
   
+  if ( getenv("srcdir") ) 
+    /* we are in 'make check' */
+    remove( "cube_hexa8_quad4_wrong.med" );
+
   return 0;
 }

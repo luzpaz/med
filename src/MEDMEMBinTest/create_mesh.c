@@ -405,6 +405,12 @@ int main (int argc, char **argv)
   ret = MEDfermer(fid);
   printf("MEDfermer : %d\n",ret);
   
+  if ( getenv("srcdir") ) {
+    /* we are in 'make check' */
+    remove( "pointe.med" );
+    printf("Remove generated file");
+  }
+
   return 0;
 }
 

@@ -42,9 +42,16 @@ int main (int argc, char ** argv) {
   }
 
   string filenameRoot;
-  if (argc==1)
+  if (argc==1) {
       // filename to save the generated MESH
-    filenameRoot = "/tmp/test_MEDMEM_Meshing" ;
+    if ( getenv("TMP"))
+      filenameRoot=getenv("TMP");
+    else if (getenv("TMPDIR"))
+      filenameRoot=getenv("TMPDIR");
+    else
+      filenameRoot="/tmp";
+    filenameRoot += "/test_MEDMEM_Meshing" ;
+  }
   else
     filenameRoot=argv[1];
     
@@ -639,6 +646,12 @@ int main (int argc, char ** argv) {
   idVtk = fieldIntVectorOnCells->addDriver(VTK_DRIVER,filenameVtk,fieldIntVectorOnCells->getName());
   fieldIntVectorOnCells->writeAppend(idVtk) ;
 
+  if (argc==1) {
+    cout << "Remove generated files" << endl;
+    remove(filenameMed21.c_str());
+    remove(filenameMed22.c_str());
+    remove(filenameVtk.c_str());
+  }
 
   delete fieldDoubleScalarOnNodes;
   delete fieldIntScalarOnNodes;

@@ -311,5 +311,9 @@ int main (int argc, char **argv)
   ret = MEDfermer(fid);
   printf("%d\n",ret);
   
+  if ( getenv("srcdir") ) 
+    /* we are in 'make check' */
+    remove( "carre_en_quad4_seg2_wrong.med" );
+
   return 0;
 }

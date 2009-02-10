@@ -242,6 +242,10 @@ int main (int argc, char **argv)
 
   ret = MEDfermer(fid);
   printf("MEDfermer : %d\n",ret);
+
+  if ( getenv("srcdir") ) 
+    /* we are in 'make check' */
+    remove( "carre_en_quad4.med" );
   
   return 0;
 }

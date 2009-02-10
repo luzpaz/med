@@ -196,8 +196,18 @@ int main()
   addMedFacesGroup( *meshing, 4,  top,    "TopFaces",topTypes,topIndex,topNbOfElts,2) ;
   addMedFacesGroup( *meshing, 24, side,   "SideFaces",sideTypes,sideIndex,sideNbOfElts,2) ;
   //writing...
-  int id=meshing->addDriver(MED_DRIVER,"/tmp/totoFlica_V22.med");
+  string medfile = "/tmp";
+  if ( getenv("TMP"))
+    medfile=getenv("TMP");
+  else if (getenv("TMPDIR"))
+    medfile=getenv("TMPDIR");
+  medfile += "/totoFlica_V22.med";
+  
+  int id=meshing->addDriver(MED_DRIVER,medfile.c_str());
   meshing->write(id);
   delete meshing;
+
+  remove(medfile.c_str());
+
   return 0;
 }

@@ -195,4 +195,5 @@ int main (int argc, char ** argv) {
   int idMed22 = myMeshing.addDriver(MED_DRIVER,"totoPoly_V22.med",myMeshing.getName());
   myMeshing.write(idMed22);
 
+  remove("totoPoly_V22.med");
 }

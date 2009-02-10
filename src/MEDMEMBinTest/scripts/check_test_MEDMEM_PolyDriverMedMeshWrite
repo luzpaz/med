@@ -19,6 +19,7 @@ cp $initfile $infile
 
 ok=$?
 
+rm $infile
 rm $outfile
 
 exit $ok

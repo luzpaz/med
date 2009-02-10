@@ -164,4 +164,10 @@ int main()
 
   int id = pmesh->addDriver(MED_DRIVER, "cronoshexa.med", pmesh->getName());
   pmesh->write(id);
+
+  if ( getenv("srcdir") )
+    /* we are in 'make check' */
+    remove( "cronoshexa.med" );
+
+  return 0;
 }

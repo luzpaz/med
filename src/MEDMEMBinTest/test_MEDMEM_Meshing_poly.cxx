@@ -41,8 +41,15 @@ int main (int argc, char ** argv)
     string filenameRoot;
     if (argc==2) 
       filenameRoot= argv[1] ;
-    else
-      filenameRoot="/tmp/testMeshingPoly";
+    else {
+      if ( getenv("TMP"))
+        filenameRoot=getenv("TMP");
+      else if (getenv("TMPDIR"))
+        filenameRoot=getenv("TMPDIR");
+      else
+        filenameRoot="/tmp";
+      filenameRoot+="/testMeshingPoly";
+    }
 
     string medfilename  = filenameRoot + "22.med";
 
@@ -144,4 +151,8 @@ int main (int argc, char ** argv)
   cout << "Impression de MESHING : " << endl;
   cout << myMeshing;
 
+  if (argc==1) {
+    cout << "Remove generated file" << endl;
+    remove( medfilename.c_str() );
+  }
 }
