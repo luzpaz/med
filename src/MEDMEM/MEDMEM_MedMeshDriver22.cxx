@@ -1831,12 +1831,6 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
 				 (GroupsNames.c_str()),&NumberOfGroups);
 #endif
 
-
-	SCRUTE(GroupsNames);
-	SCRUTE(FamilyName);
-	SCRUTE(err);
-	SCRUTE(i);
-
       if (err != MED_VALID)
 	throw MEDEXCEPTION("MED_MESH_RDONLY_DRIVER22::getFAMILY() : ERROR when get FAMILY informations" );
 
