@@ -2490,7 +2490,8 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
   for (unsigned int i=0; i< families.size(); i++) {
 
     int      numberOfAttributes         = families[i]->getNumberOfAttributes ();
-    string   attributesDescriptions     = "";
+    string   attributesDescriptions (numberOfAttributes*MED_TAILLE_DESC,'\0');
+    //string   attributesDescriptions     = "";
 
     // Recompose the attributes descriptions arg for MED
     for (int j=0; j < numberOfAttributes; j++) {
@@ -2502,7 +2503,9 @@ int MED_MESH_WRONLY_DRIVER21::writeFamilies(vector<FAMILY*> & families ) const {
 				      << "| with identifier |" << families[i]->getIdentifier()  << "| is |" 
 				      <<  attributeDescription.size()  <<"| and is more than |" <<  MED_TAILLE_DESC << "|")) ;
         
-      attributesDescriptions += attributeDescription;
+      int length = min(MED_TAILLE_LNOM,(int)attributeDescription.size());
+      attributesDescriptions.replace(j*MED_TAILLE_DESC,length, attributeDescription,0,length);
+      //attributesDescriptions += attributeDescription;
     }
       
 
