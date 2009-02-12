@@ -37,7 +37,12 @@
 using namespace std;
 using namespace MEDMEM;
 int main (int argc, char ** argv) {
-    string filenameIN = argv[1] ;
+
+  if ( argc < 3 ) {
+    cout << "Usage: " << argv[0] << "<input med file> <output med file>" << endl;
+    return -1;
+  }
+  string filenameIN = argv[1] ;
     string filenameOUT = argv[2] ;
     
     MED * myMed = new MED() ;
@@ -78,5 +83,7 @@ int main (int argc, char ** argv) {
 
   } catch (MEDEXCEPTION& ex){
     MESSAGE_MED(ex.what()) ;
+    return -1;
   }
+  return 0;
 }
