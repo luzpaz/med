@@ -227,11 +227,11 @@ inline void FAMILY::setNumberOfGroups(int NumberOfGroups)
 //     _groupName.set(_numberOfGroup, GroupName) ;
 
   int nbGr = getNumberOfGroups();
-  if(nbGr<1) {
-    std::string diagnosis;
-    diagnosis="Can not set groups names - number of groups is not set";
-    throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
-  }
+//   if(nbGr<1) {
+//     std::string diagnosis;
+//     diagnosis="Can not set groups names - number of groups is not set";
+//     throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
+//   }
   if (giveOwnership) {
     //_groupName.setShallowAndOwnership(GroupName);
     _groupName.resize(nbGr);
