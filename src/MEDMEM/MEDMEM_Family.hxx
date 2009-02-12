@@ -195,11 +195,11 @@ inline void FAMILY::setAttributesDescriptions(string * AttributeDescription)
   //_attributeDescription = AttributeDescription ; 
   //_attributeDescription.setShallowAndOwnership(AttributeDescription) ;
   int nbAttr = getNumberOfAttributes();
-  if(nbAttr<1) {
-    std::string diagnosis;
-    diagnosis="Can not set attributes descriptions - number of attributes is not set";
-    throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
-  }
+//   if(nbAttr<1) {
+//     std::string diagnosis;
+//     diagnosis="Can not set attributes descriptions - number of attributes is not set";
+//     throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
+//   }
   _attributeDescription.resize(nbAttr);
   for(int i=0; i<nbAttr; i++) {
     _attributeDescription[i] = AttributeDescription[i];
