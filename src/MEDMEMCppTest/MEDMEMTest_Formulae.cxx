@@ -22,8 +22,9 @@
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
-#include "MEDMEM_Formulae.hxx"
+#include "VolSurfFormulae.hxx"
 #include "MEDMEM_STRING.hxx"
+#include "MEDMEM_Exception.hxx"
 
 #include <iostream>
 #include <sstream>
@@ -130,27 +131,27 @@ void MEDMEMTest::testFormulae()
     const double * poly_2d_cw[5] = {xy1, xy4, xy3, xy6, xy2};
 
     // counter-clockwise
-    val = CalculateAreaForPolyg(poly_2d_cc, /*nbOfPtsInPolygs*/5, /*dim*/2);
+    val = INTERP_KERNEL::calculateAreaForPolyg(poly_2d_cc, /*nbOfPtsInPolygs*/5, /*dim*/2);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-14.7, val, 0.000001);
 
     // clockwise
-    val = CalculateAreaForPolyg(poly_2d_cw, /*nbOfPtsInPolygs*/5, /*dim*/2);
+    val = INTERP_KERNEL::calculateAreaForPolyg(poly_2d_cw, /*nbOfPtsInPolygs*/5, /*dim*/2);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(14.7, val, 0.000001);
 
     // 2D: Non-convex polygon
     const double * poly_2d_nc[6] = {xy1, xy4, xy3, xy6, xy5, xy2};
-    val = CalculateAreaForPolyg(poly_2d_nc, /*nbOfPtsInPolygs*/6, /*dim*/2);
+    val = INTERP_KERNEL::calculateAreaForPolyg(poly_2d_nc, /*nbOfPtsInPolygs*/6, /*dim*/2);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(13.2, val, 0.000001);
 
     // 3D: Convex polygon
     const double * poly_3d_cc[5] = {xyz1, xyz2, xyz6, xyz3, xyz4};
 
-    val = CalculateAreaForPolyg(poly_3d_cc, /*nbOfPtsInPolygs*/5, /*dim*/3);
+    val = INTERP_KERNEL::calculateAreaForPolyg(poly_3d_cc, /*nbOfPtsInPolygs*/5, /*dim*/3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(24.5, val, 0.000001);
 
     // 3D: Non-convex polygon
     const double * poly_3d_nc[6] = {xyz1, xyz4, xyz3, xyz6, xyz5, xyz2};
-    val = CalculateAreaForPolyg(poly_3d_nc, /*nbOfPtsInPolygs*/6, /*dim*/3);
+    val = INTERP_KERNEL::calculateAreaForPolyg(poly_3d_nc, /*nbOfPtsInPolygs*/6, /*dim*/3);
     //#ifdef ENABLE_FORCED_FAILURES
     // (BUG) Wrong area calculation for non-convex polygons in 3D space,
     //       because area of triangle is always positive
@@ -165,19 +166,19 @@ void MEDMEMTest::testFormulae()
   //////////////////////////
   {
     // 2D: counter-clockwise
-    val = CalculateAreaForTria(xy1, xy2, xy3, /*dim*/2);
+    val = INTERP_KERNEL::calculateAreaForTria(xy1, xy2, xy3, /*dim*/2);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-6.0, val, 0.000001);
 
     // 2D: clockwise
-    val = CalculateAreaForTria(xy2, xy1, xy3, /*dim*/2);
+    val = INTERP_KERNEL::calculateAreaForTria(xy2, xy1, xy3, /*dim*/2);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(6.0, val, 0.000001);
 
     // 3D
-    val = CalculateAreaForTria(xyz1, xyz2, xyz3, /*dim*/3);
+    val = INTERP_KERNEL::calculateAreaForTria(xyz1, xyz2, xyz3, /*dim*/3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(10.0, val, 0.000001);
 
     // Invalid (three points on one line)
-    val = CalculateAreaForTria(xyz1, xyz8, xyz3, /*dim*/3);
+    val = INTERP_KERNEL::calculateAreaForTria(xyz1, xyz8, xyz3, /*dim*/3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, val, 0.000001);
   }
 
@@ -188,42 +189,42 @@ void MEDMEMTest::testFormulae()
     // 2D: Convex quadrangle
 
     // counter-clockwise
-    val = CalculateAreaForQuad(xy1, xy2, xy3, xy4, /*dim*/2);
+    val = INTERP_KERNEL::calculateAreaForQuad(xy1, xy2, xy3, xy4, /*dim*/2);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-9.0, val, 0.000001);
 
     // clockwise
-    val = CalculateAreaForQuad(xy2, xy1, xy4, xy3, /*dim*/2);
+    val = INTERP_KERNEL::calculateAreaForQuad(xy2, xy1, xy4, xy3, /*dim*/2);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(9.0, val, 0.000001);
 
     // wrong order
-    CPPUNIT_ASSERT_NO_THROW(CalculateAreaForQuad(xy2, xy1, xy3, xy4, /*dim*/2));
+    CPPUNIT_ASSERT_NO_THROW(INTERP_KERNEL::calculateAreaForQuad(xy2, xy1, xy3, xy4, /*dim*/2));
 
     // 2D: Non-convex quadrangle
 
     // counter-clockwise
-    val = CalculateAreaForQuad(xy1, xy2, xy3, xy5, /*dim*/2);
+    val = INTERP_KERNEL::calculateAreaForQuad(xy1, xy2, xy3, xy5, /*dim*/2);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-3.0, val, 0.000001);
 
     // clockwise
-    val = CalculateAreaForQuad(xy1, xy5, xy3, xy2, /*dim*/2);
+    val = INTERP_KERNEL::calculateAreaForQuad(xy1, xy5, xy3, xy2, /*dim*/2);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, val, 0.000001);
 
     // 3D: Convex quadrangle
 
     // good order
-    val = CalculateAreaForQuad(xyz1, xyz2, xyz3, xyz4, /*dim*/3);
+    val = INTERP_KERNEL::calculateAreaForQuad(xyz1, xyz2, xyz3, xyz4, /*dim*/3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(15.0, val, 0.000001);
 
     // wrong order
-    CPPUNIT_ASSERT_NO_THROW(CalculateAreaForQuad(xyz1, xyz4, xyz2, xyz3, /*dim*/3));
+    CPPUNIT_ASSERT_NO_THROW(INTERP_KERNEL::calculateAreaForQuad(xyz1, xyz4, xyz2, xyz3, /*dim*/3));
 
     // 3D: Non-convex quadrangle
-    val = CalculateAreaForQuad(xyz1, xyz2, xyz3, xyz5, /*dim*/3);
+    val = INTERP_KERNEL::calculateAreaForQuad(xyz1, xyz2, xyz3, xyz5, /*dim*/3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(5.0, val, 0.000001);
 
     // 3D: Non-planar quadrangle
     double xyz7[3] = {-1.5, 3.0,  2.0};
-    CPPUNIT_ASSERT_NO_THROW(CalculateAreaForQuad(xyz1, xyz2, xyz3, xyz7, /*dim*/3));
+    CPPUNIT_ASSERT_NO_THROW(INTERP_KERNEL::calculateAreaForQuad(xyz1, xyz2, xyz3, xyz7, /*dim*/3));
   }
 
   ////////////////////////////
@@ -233,26 +234,26 @@ void MEDMEMTest::testFormulae()
     double tria_normal [3];
 
     // Triangle in plane XOY, normal is opposit to axis Z
-    CalculateNormalForTria(xyz1, xyz3, xyz7, tria_normal);
+    INTERP_KERNEL::calculateNormalForTria(xyz1, xyz3, xyz7, tria_normal);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, tria_normal[0], 0.0000001); // Nx
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, tria_normal[1], 0.0000001); // Ny
     CPPUNIT_ASSERT(tria_normal[2] < -0.0000001); // Nz
 
     // Triangle in plane XOY, normal co-directed with axis Z
-    CalculateNormalForTria(xyz1, xyz7, xyz3, tria_normal);
+    INTERP_KERNEL::calculateNormalForTria(xyz1, xyz7, xyz3, tria_normal);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, tria_normal[0], 0.0000001); // Nx
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, tria_normal[1], 0.0000001); // Ny
     CPPUNIT_ASSERT(tria_normal[2] > 0.0000001); // Nz
 
     // Triangle in 3D
-    CalculateNormalForTria(xyz1, xyz3, xyz6, tria_normal);
+    INTERP_KERNEL::calculateNormalForTria(xyz1, xyz3, xyz6, tria_normal);
     double koeff = tria_normal[0]/12.8;
     //CPPUNIT_ASSERT_DOUBLES_EQUAL(12.8, tria_normal[0], 0.0000001); // Nx
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0        , tria_normal[1], 0.0000001); // Ny
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-9.6 * koeff, tria_normal[2], 0.0000001); // Nz
 
     // Invalid Triangle (three points on one line)
-    CPPUNIT_ASSERT_NO_THROW(CalculateNormalForTria(xyz1, xyz8, xyz3, tria_normal));
+    CPPUNIT_ASSERT_NO_THROW(INTERP_KERNEL::calculateNormalForTria(xyz1, xyz8, xyz3, tria_normal));
     //MEDMEMTest_DumpArray<double>(cout, tria_normal, 3, "Invalid Triangle normal");
     //Invalid Triangle normal: {0, 0, 0}
   }
@@ -264,19 +265,19 @@ void MEDMEMTest::testFormulae()
     double quad_normal [3];
 
     // Quadrangle in plane XOY, normal is opposit to axis Z
-    CalculateNormalForQuad(xyz1, xyz3, xyz7, xyz9, quad_normal);
+    INTERP_KERNEL::calculateNormalForQuad(xyz1, xyz3, xyz7, xyz9, quad_normal);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, quad_normal[0], 0.0000001); // Nx
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, quad_normal[1], 0.0000001); // Ny
     CPPUNIT_ASSERT(quad_normal[2] < -0.0000001); // Nz
 
     // Quadrangle in plane XOY, normal co-directed with axis Z
-    CalculateNormalForQuad(xyz1, xyz9, xyz7, xyz3, quad_normal);
+    INTERP_KERNEL::calculateNormalForQuad(xyz1, xyz9, xyz7, xyz3, quad_normal);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, quad_normal[0], 0.0000001); // Nx
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, quad_normal[1], 0.0000001); // Ny
     CPPUNIT_ASSERT(quad_normal[2] > 0.0000001); // Nz
 
     // Quadrangle in 3D
-    CalculateNormalForQuad(xyz1, xyz3, xyz6, xyz2, quad_normal);
+    INTERP_KERNEL::calculateNormalForQuad(xyz1, xyz3, xyz6, xyz2, quad_normal);
     //MEDMEMTest_DumpArray<double>(cout, quad_normal, 3, "Quadrangle in 3D normal");
     double koeff = quad_normal[0]/15.6;
     //CPPUNIT_ASSERT_DOUBLES_EQUAL(15.6, quad_normal[0], 0.0000001); // Nx
@@ -284,7 +285,7 @@ void MEDMEMTest::testFormulae()
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-11.7 * koeff, quad_normal[2], 0.0000001); // Nz
 
     // Invalid Quadrangle (four points on one line)
-    CPPUNIT_ASSERT_NO_THROW(CalculateNormalForQuad(xyz1, xyz8, xyz3, xyz3, quad_normal));
+    CPPUNIT_ASSERT_NO_THROW(INTERP_KERNEL::calculateNormalForQuad(xyz1, xyz8, xyz3, xyz3, quad_normal));
     //MEDMEMTest_DumpArray<double>(cout, quad_normal, 3, "Invalid Quadrangle normal");
     //#ifdef ENABLE_FORCED_FAILURES
     // (BUG) division on zero in CalculateNormalForQuad(), if quadrangle is singular
@@ -308,7 +309,7 @@ void MEDMEMTest::testFormulae()
     const double * polygon_si[4] = {xyz1, xyz8, xyz3, xyz3};
 
     // Polygon in plane XOY, normal is opposit to axis Z
-    CalculateNormalForPolyg(polygon_cc, /*nbOfPtsInPolygs*/4, poly_normal);
+    INTERP_KERNEL::calculateNormalForPolyg(polygon_cc, /*nbOfPtsInPolygs*/4, poly_normal);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, poly_normal[0], 0.0000001); // Nx
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, poly_normal[1], 0.0000001); // Ny
     //#ifdef ENABLE_FORCED_FAILURES
@@ -317,7 +318,7 @@ void MEDMEMTest::testFormulae()
     //#endif
 
     // Polygon in plane XOY, normal co-directed with axis Z
-    CalculateNormalForPolyg(polygon_cw, /*nbOfPtsInPolygs*/4, poly_normal);
+    INTERP_KERNEL::calculateNormalForPolyg(polygon_cw, /*nbOfPtsInPolygs*/4, poly_normal);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, poly_normal[0], 0.0000001); // Nx
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, poly_normal[1], 0.0000001); // Ny
     //#ifdef ENABLE_FORCED_FAILURES
@@ -328,7 +329,7 @@ void MEDMEMTest::testFormulae()
     // Polygon in plane XOY, normal is opposit to axis Z, first three points lay on one line
     //CPPUNIT_ASSERT_THROW(CalculateNormalForPolyg(polygon_er, /*nbOfPtsInPolygs*/4,
     //                                             poly_normal),MEDEXCEPTION);
-    CPPUNIT_ASSERT_NO_THROW(CalculateNormalForPolyg(polygon_er, /*nbOfPtsInPolygs*/4,
+    CPPUNIT_ASSERT_NO_THROW(INTERP_KERNEL::calculateNormalForPolyg(polygon_er, /*nbOfPtsInPolygs*/4,
                                                     poly_normal));
     //CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, poly_normal[0], 0.0000001); // Nx
     //CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, poly_normal[1], 0.0000001); // Ny
@@ -339,15 +340,15 @@ void MEDMEMTest::testFormulae()
     //#endif
 
     // Polygon in 3D
-    CalculateNormalForPolyg(polygon_3d, /*nbOfPtsInPolygs*/4, poly_normal);
+    INTERP_KERNEL::calculateNormalForPolyg(polygon_3d, /*nbOfPtsInPolygs*/4, poly_normal);
     double koeff = poly_normal[0]/15.6;
     //CPPUNIT_ASSERT_DOUBLES_EQUAL(15.6, poly_normal[0], 0.0000001); // Nx
     CPPUNIT_ASSERT_DOUBLES_EQUAL(  0.0        , poly_normal[1], 0.0000001); // Ny
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-11.7 * koeff, poly_normal[2], 0.0000001); // Nz
 
     // Invalid Polygon (four points on one line)
-    CPPUNIT_ASSERT_THROW(CalculateNormalForPolyg(polygon_si, /*nbOfPtsInPolygs*/4,
-                                                 poly_normal),MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(INTERP_KERNEL::calculateNormalForPolyg(polygon_si, /*nbOfPtsInPolygs*/4,
+                                                                poly_normal),exception);
     //MEDMEMTest_DumpArray<double>(cout, poly_normal, 3, "Invalid Polygon normal");
     //#ifdef ENABLE_FORCED_FAILURES
     // (BUG) division on zero in CalculateNormalForPolyg(), if polygon is singular
@@ -364,23 +365,23 @@ void MEDMEMTest::testFormulae()
   /////////////////////////////
   {
     // good
-    val = CalculateVolumeForTetra(xyz1, xyz3, xyz7, xyz5);
+    val = INTERP_KERNEL::calculateVolumeForTetra(xyz1, xyz3, xyz7, xyz5);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(6.4, val, 0.000001);
 
     // reversed
-    val = CalculateVolumeForTetra(xyz1, xyz7, xyz3, xyz5);
+    val = INTERP_KERNEL::calculateVolumeForTetra(xyz1, xyz7, xyz3, xyz5);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-6.4, val, 0.000001);
 
     // good
-    val = CalculateVolumeForTetra(xyz1, xyz7, xyz3, xyz4);
+    val = INTERP_KERNEL::calculateVolumeForTetra(xyz1, xyz7, xyz3, xyz4);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(6.4, val, 0.000001);
 
     // reversed
-    val = CalculateVolumeForTetra(xyz1, xyz3, xyz7, xyz4);
+    val = INTERP_KERNEL::calculateVolumeForTetra(xyz1, xyz3, xyz7, xyz4);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-6.4, val, 0.000001);
 
     // singular (in plane)
-    val = CalculateVolumeForTetra(xyz1, xyz3, xyz7, xyz9);
+    val = INTERP_KERNEL::calculateVolumeForTetra(xyz1, xyz3, xyz7, xyz9);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, val, 0.000001);
   }
 
@@ -389,23 +390,23 @@ void MEDMEMTest::testFormulae()
   ////////////////////////////
   {
     // good
-    val = CalculateVolumeForPyra(xyz1, xyz3, xyz7, xyz9, xyz5);
+    val = INTERP_KERNEL::calculateVolumeForPyra(xyz1, xyz3, xyz7, xyz9, xyz5);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(7.8, val, 0.000001);
 
     // reversed
-    val = CalculateVolumeForPyra(xyz1, xyz9, xyz7, xyz3, xyz5);
+    val = INTERP_KERNEL::calculateVolumeForPyra(xyz1, xyz9, xyz7, xyz3, xyz5);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-7.8, val, 0.000001);
 
     // good
-    val = CalculateVolumeForPyra(xyz1, xyz9, xyz7, xyz3, xyz4);
+    val = INTERP_KERNEL::calculateVolumeForPyra(xyz1, xyz9, xyz7, xyz3, xyz4);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(7.8, val, 0.000001);
 
     // reversed
-    val = CalculateVolumeForPyra(xyz1, xyz3, xyz7, xyz9, xyz4);
+    val = INTERP_KERNEL::calculateVolumeForPyra(xyz1, xyz3, xyz7, xyz9, xyz4);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-7.8, val, 0.000001);
 
     // singular (in plane)
-    val = CalculateVolumeForPyra(xyz1, xyz3, xyz7, xyz9, xyz8);
+    val = INTERP_KERNEL::calculateVolumeForPyra(xyz1, xyz3, xyz7, xyz9, xyz8);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, val, 0.000001);
   }
 
@@ -418,11 +419,11 @@ void MEDMEMTest::testFormulae()
     double top7[3] = {xyz7[0], xyz7[1], xyz7[2] + 10.0};
 
     // good
-    val = CalculateVolumeForPenta(xyz1, xyz3, xyz7, top1, top3, top7);
+    val = INTERP_KERNEL::calculateVolumeForPenta(xyz1, xyz3, xyz7, top1, top3, top7);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(96.0, val, 0.000001);
 
     // reversed
-    val = CalculateVolumeForPenta(xyz1, xyz7, xyz3, top1, top7, top3);
+    val = INTERP_KERNEL::calculateVolumeForPenta(xyz1, xyz7, xyz3, top1, top7, top3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-96.0, val, 0.000001);
 
     // good
@@ -430,11 +431,11 @@ void MEDMEMTest::testFormulae()
     top3[0] = top3[0] + 7.0;
     top7[0] = top7[0] + 7.0;
 
-    val = CalculateVolumeForPenta(xyz1, xyz3, xyz7, top1, top3, top7);
+    val = INTERP_KERNEL::calculateVolumeForPenta(xyz1, xyz3, xyz7, top1, top3, top7);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(96.0, val, 0.000001);
 
     // reversed
-    val = CalculateVolumeForPenta(xyz1, xyz7, xyz3, top1, top7, top3);
+    val = INTERP_KERNEL::calculateVolumeForPenta(xyz1, xyz7, xyz3, top1, top7, top3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-96.0, val, 0.000001);
 
     // singular (in plane)
@@ -442,7 +443,7 @@ void MEDMEMTest::testFormulae()
     top3[2] = top3[2] - 10.0;
     top7[2] = top7[2] - 10.0;
 
-    val = CalculateVolumeForPenta(xyz1, xyz3, xyz7, top1, top3, top7);
+    val = INTERP_KERNEL::calculateVolumeForPenta(xyz1, xyz3, xyz7, top1, top3, top7);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, val, 0.000001);
   }
 
@@ -456,11 +457,11 @@ void MEDMEMTest::testFormulae()
     double top9[3] = {xyz9[0], xyz9[1], xyz9[2] + 10.0};
 
     // good
-    val = CalculateVolumeForHexa(xyz1, xyz3, xyz7, xyz9, top1, top3, top7, top9);
+    val = INTERP_KERNEL::calculateVolumeForHexa(xyz1, xyz3, xyz7, xyz9, top1, top3, top7, top9);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(117.0, val, 0.000001);
 
     // reversed
-    val = CalculateVolumeForHexa(xyz1, xyz9, xyz7, xyz3, top1, top9, top7, top3);
+    val = INTERP_KERNEL::calculateVolumeForHexa(xyz1, xyz9, xyz7, xyz3, top1, top9, top7, top3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-117.0, val, 0.000001);
 
     // good
@@ -469,11 +470,11 @@ void MEDMEMTest::testFormulae()
     top7[0] = top7[0] + 7.0;
     top9[0] = top9[0] + 7.0;
 
-    val = CalculateVolumeForHexa(xyz1, xyz3, xyz7, xyz9, top1, top3, top7, top9);
+    val = INTERP_KERNEL::calculateVolumeForHexa(xyz1, xyz3, xyz7, xyz9, top1, top3, top7, top9);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(117.0, val, 0.000001);
 
     // reversed
-    val = CalculateVolumeForHexa(xyz1, xyz9, xyz7, xyz3, top1, top9, top7, top3);
+    val = INTERP_KERNEL::calculateVolumeForHexa(xyz1, xyz9, xyz7, xyz3, top1, top9, top7, top3);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-117.0, val, 0.000001);
 
     // singular (in plane)
@@ -482,7 +483,7 @@ void MEDMEMTest::testFormulae()
     top7[2] = top7[2] - 10.0;
     top9[2] = top9[2] - 10.0;
 
-    val = CalculateVolumeForHexa(xyz1, xyz3, xyz7, xyz9, top1, top3, top7, top9);
+    val = INTERP_KERNEL::calculateVolumeForHexa(xyz1, xyz3, xyz7, xyz9, top1, top3, top7, top9);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, val, 0.000001);
   }
 
@@ -497,7 +498,7 @@ void MEDMEMTest::testFormulae()
 
     const double * nodes[4] = {xyz1, xyz7, xyz3, xyz5};
     double bary[3];
-    CalculateBarycenterDyn(nodes, 4, /*dim*/3, bary);
+    INTERP_KERNEL::calculateBarycenterDyn(nodes, 4, /*dim*/3, bary);
 
     // good
     const double * fa1[3] = {xyz1, xyz7, xyz3};
@@ -506,8 +507,8 @@ void MEDMEMTest::testFormulae()
     const double * fa4[3] = {xyz7, xyz1, xyz5};
     const double ** polyh[4] = {fa1, fa2, fa3, fa4};
 
-    val = CalculateVolumeForPolyh(polyh, nbOfNodesPerFaces, nbFaces, bary);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(6.4, val, 0.000001);
+    val = INTERP_KERNEL::calculateVolumeForPolyh(polyh, nbOfNodesPerFaces, nbFaces, bary);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(-6.4, val, 0.000001);
 
     // reversed
     //const double * fa1_r[3] = {xyz1, xyz3, xyz7};
@@ -522,7 +523,7 @@ void MEDMEMTest::testFormulae()
     // singular (in plane)
     const double * nodes_si[4] = {xyz1, xyz7, xyz3, xyz9};
     double bary_si[3];
-    CalculateBarycenterDyn(nodes_si, 4, /*dim*/3, bary_si);
+    INTERP_KERNEL::calculateBarycenterDyn(nodes_si, 4, /*dim*/3, bary_si);
 
     const double * fa1_si[3] = {xyz1, xyz7, xyz3};
     const double * fa2_si[3] = {xyz1, xyz3, xyz9};
@@ -530,7 +531,7 @@ void MEDMEMTest::testFormulae()
     const double * fa4_si[3] = {xyz7, xyz1, xyz9};
     const double ** polyh_si[4] = {fa1_si, fa2_si, fa3_si, fa4_si};
 
-    val = CalculateVolumeForPolyh(polyh_si, nbOfNodesPerFaces, nbFaces, bary_si);
+    val = INTERP_KERNEL::calculateVolumeForPolyh(polyh_si, nbOfNodesPerFaces, nbFaces, bary_si);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, val, 0.000001);
   }
 
@@ -541,23 +542,23 @@ void MEDMEMTest::testFormulae()
     // five points
     const double * pts[5] = {xyz2, xyz1, xyz3, xyz4, xyz5};
 
-    val = addComponentsOfVec<5>(pts, 0); // x
+    val = INTERP_KERNEL::addComponentsOfVec<5>(pts, 0); // x
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, val, 0.000001);
 
-    val = addComponentsOfVec<5>(pts, 1); // y
+    val = INTERP_KERNEL::addComponentsOfVec<5>(pts, 1); // y
     CPPUNIT_ASSERT_DOUBLES_EQUAL(9.0, val, 0.000001);
 
-    val = addComponentsOfVec<5>(pts, 2); // z
+    val = INTERP_KERNEL::addComponentsOfVec<5>(pts, 2); // z
     CPPUNIT_ASSERT_DOUBLES_EQUAL(4.0, val, 0.000001);
 
     // one point: xyz2
-    val = addComponentsOfVec<1>(pts, 0); // x
+    val = INTERP_KERNEL::addComponentsOfVec<1>(pts, 0); // x
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, val, 0.000001);
 
-    val = addComponentsOfVec<1>(pts, 1); // y
+    val = INTERP_KERNEL::addComponentsOfVec<1>(pts, 1); // y
     CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, val, 0.000001);
 
-    val = addComponentsOfVec<1>(pts, 2); // z
+    val = INTERP_KERNEL::addComponentsOfVec<1>(pts, 2); // z
     CPPUNIT_ASSERT_DOUBLES_EQUAL(4.0, val, 0.000001);
   }
 
@@ -570,17 +571,17 @@ void MEDMEMTest::testFormulae()
     double bary_3d[3];
     double bary_2d[2];
 
-    CalculateBarycenterDyn(pts, /*nbPts*/5, /*dim*/3, bary_3d);
+    INTERP_KERNEL::calculateBarycenterDyn(pts, /*nbPts*/5, /*dim*/3, bary_3d);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0/5.0, bary_3d[0], 0.000001); // x
     CPPUNIT_ASSERT_DOUBLES_EQUAL(9.0/5.0, bary_3d[1], 0.000001); // y
     CPPUNIT_ASSERT_DOUBLES_EQUAL(4.0/5.0, bary_3d[2], 0.000001); // z
 
-    CalculateBarycenterDyn(pts, /*nbPts*/5, /*dim*/2, bary_2d);
+    INTERP_KERNEL::calculateBarycenterDyn(pts, /*nbPts*/5, /*dim*/2, bary_2d);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0/5.0, bary_2d[0], 0.000001); // x
     CPPUNIT_ASSERT_DOUBLES_EQUAL(9.0/5.0, bary_2d[1], 0.000001); // y
 
     // one point: xyz2
-    CalculateBarycenterDyn(pts, /*nbPts*/1, /*dim*/3, bary_3d);
+    INTERP_KERNEL::calculateBarycenterDyn(pts, /*nbPts*/1, /*dim*/3, bary_3d);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, bary_3d[0], 0.000001); // x
     CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, bary_3d[1], 0.000001); // y
     CPPUNIT_ASSERT_DOUBLES_EQUAL(4.0, bary_3d[2], 0.000001); // z
@@ -603,12 +604,12 @@ void MEDMEMTest::testFormulae()
     double bary_3d[3];
     double bary_2d[2];
 
-    CalculateBarycenter<5,3>(pts, bary_3d);
+    INTERP_KERNEL::calculateBarycenter<5,3>(pts, bary_3d);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0/5.0, bary_3d[0], 0.000001); // x
     CPPUNIT_ASSERT_DOUBLES_EQUAL(9.0/5.0, bary_3d[1], 0.000001); // y
     CPPUNIT_ASSERT_DOUBLES_EQUAL(4.0/5.0, bary_3d[2], 0.000001); // z
 
-    CalculateBarycenter<5,2>(pts, bary_2d);
+    INTERP_KERNEL::calculateBarycenter<5,2>(pts, bary_2d);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0/5.0, bary_2d[0], 0.000001); // x
     CPPUNIT_ASSERT_DOUBLES_EQUAL(9.0/5.0, bary_2d[1], 0.000001); // y
 
