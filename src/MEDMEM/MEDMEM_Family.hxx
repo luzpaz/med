@@ -120,14 +120,14 @@ public:
 			/*! Destructor. */
   virtual ~FAMILY();
   FAMILY & operator=(const FAMILY &fam);
-  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, FAMILY &my) ;
+  friend ostream & operator<<(ostream &os, FAMILY &my) ;
 
-  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, const FAMILY &my) ;
+  friend ostream & operator<<(ostream &os, const FAMILY &my) ;
 
   bool build(MED_EN::medEntityMesh Entity,int **FamilyNumber);
 
-  // Il faudrait mettre en coherence les methodes set
-  // avec l'operateur d'affection ! Rmq from EF !!!
+  // Il faudrait mettre en cohérence les méthodes set
+  // avec l'opérateur d'affection ! Rmq from EF !!!
 
   inline void setIdentifier             (int Identifier);        
   inline void setNumberOfAttributes     (int NumberOfAttribute);
@@ -192,14 +192,14 @@ inline void FAMILY::setAttributesValues(int * AttributeValue)
 inline void FAMILY::setAttributesDescriptions(string * AttributeDescription) 
 //--------------------------------------------------------------------------
 { 
-    //_attributeDescription = AttributeDescription ; 
+  //_attributeDescription = AttributeDescription ; 
   //_attributeDescription.setShallowAndOwnership(AttributeDescription) ;
   int nbAttr = getNumberOfAttributes();
-  if(nbAttr<1) {
-    std::string diagnosis;
-    diagnosis="Can not set attributes descriptions - number of attributes is not set";
-    throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
-  }
+//   if(nbAttr<1) {
+//     std::string diagnosis;
+//     diagnosis="Can not set attributes descriptions - number of attributes is not set";
+//     throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
+//   }
   _attributeDescription.resize(nbAttr);
   for(int i=0; i<nbAttr; i++) {
     _attributeDescription[i] = AttributeDescription[i];
@@ -227,11 +227,11 @@ inline void FAMILY::setNumberOfGroups(int NumberOfGroups)
 //     _groupName.set(_numberOfGroup, GroupName) ;
 
   int nbGr = getNumberOfGroups();
-  if(nbGr<1) {
-    std::string diagnosis;
-    diagnosis="Can not set groups names - number of groups is not set";
-    throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
-  }
+//   if(nbGr<1) {
+//     std::string diagnosis;
+//     diagnosis="Can not set groups names - number of groups is not set";
+//     throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
+//   }
   if (giveOwnership) {
     //_groupName.setShallowAndOwnership(GroupName);
     _groupName.resize(nbGr);
@@ -241,7 +241,7 @@ inline void FAMILY::setNumberOfGroups(int NumberOfGroups)
     delete [] GroupName;
   }
   else {
-    	//_groupName = GroupName ; 
+    //_groupName = GroupName ; 
     //_groupName.set(_numberOfGroup, GroupName) ;
     _groupName.resize(nbGr);
     for(int i=0; i<nbGr; i++) {
