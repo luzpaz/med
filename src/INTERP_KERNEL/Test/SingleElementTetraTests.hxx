@@ -46,7 +46,7 @@ namespace INTERP_TEST
     CPPUNIT_TEST( tetraSimpleHalfstripOnly );
     CPPUNIT_TEST( generalTetra );
     CPPUNIT_TEST( trickyTetra1 );
-		//    CPPUNIT_TEST( inconsistentTetra );
+    //    CPPUNIT_TEST( inconsistentTetra );
 
     CPPUNIT_TEST_SUITE_END();
 

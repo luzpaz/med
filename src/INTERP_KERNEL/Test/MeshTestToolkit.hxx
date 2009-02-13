@@ -32,12 +32,12 @@ typedef std::vector<std::map<int,double> > IntersectionMatrix;
 
 namespace INTERP_KERNEL
 {
-class Interpolation3D;
+  class Interpolation3D;
 }
 
 
 namespace MEDMEM {
-class MESH;
+  class MESH;
 };
 
 namespace INTERP_TEST
@@ -46,15 +46,15 @@ namespace INTERP_TEST
    * \brief Class providing services for mesh intersection tests.
    *
    */
-	template<int SPACEDIM, int MESHDIM>
+  template<int SPACEDIM, int MESHDIM>
   class MeshTestToolkit
   {
 
   public:
     double _precision;
-		INTERP_KERNEL::IntersectionType _intersectionType;//Used only in the case MESHDIM==2 (planar intersections)
+    INTERP_KERNEL::IntersectionType _intersectionType;//Used only in the case MESHDIM==2 (planar intersections)
 
-		MeshTestToolkit():_precision(1.e-6),_intersectionType(INTERP_KERNEL::Triangulation)  {}
+    MeshTestToolkit():_precision(1.e-6),_intersectionType(INTERP_KERNEL::Triangulation)  {}
   
     ~MeshTestToolkit() {}
 
@@ -69,7 +69,7 @@ namespace INTERP_TEST
 
     double sumCol(const IntersectionMatrix& m, int i) const;
 
-    void getVolumes( MEDMEM::MESH& mesh,const double*& tab) const;
+    void getVolumes( MEDMEM::MESH& mesh, double* tab) const;
 
     bool testVolumes(const IntersectionMatrix& m,  MEDMEM::MESH& sMesh,  MEDMEM::MESH& tMesh) const;
 
@@ -82,7 +82,7 @@ namespace INTERP_TEST
     bool testDiagonal(const IntersectionMatrix& m) const;
   
     void calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) const;
-	
+  
   };
 }
 #endif

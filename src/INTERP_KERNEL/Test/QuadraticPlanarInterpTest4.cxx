@@ -25,13 +25,14 @@
 #include <cmath>
 #include <sstream>
 #include <iostream>
+#include <iterator>
 
 using namespace std;
 using namespace INTERP_KERNEL;
 
 void QuadraticPlanarInterpTest::checkPolygonsIntersection1()
 {
-   //The "most" basic test1
+  //The "most" basic test1
   Node *n1=new Node(0.,0.);                Node *n4=new Node(0.,-0.3);   
   Node *n2=new Node(1.,0.);                Node *n5=new Node(1.,-0.3);
   Node *n3=new Node(0.5,1.);               Node *n6=new Node(0.5,0.7);
@@ -53,12 +54,11 @@ void QuadraticPlanarInterpTest::checkPolygonsIntersection1()
             result=pol1.intersectMySelfWith(pol2);
             CPPUNIT_ASSERT_EQUAL(1,(int)result.size()); checkBasicsOfPolygons(*result[0],*result[0],false);
             CPPUNIT_ASSERT_EQUAL(3,result[0]->recursiveSize());
-            double tmp1=0.,tmp2=0.,tmp3=0.,tmp4=0.;
-            pol1.intersectForPerimeter(pol2,tmp1,tmp2,tmp3,tmp4);
+            double tmp1=0.,tmp2=0.,tmp3=0.;
+            pol1.intersectForPerimeter(pol2,tmp1,tmp2,tmp3);
             vector<double> v1,v2;
             vector<int> v3;
-            double area2;
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(0.,pol1.intersectForPerimeterAdvanced(pol2,v1,v2,area2),1.e-14);//no common edge
+            pol1.intersectForPerimeterAdvanced(pol2,v1,v2);//no common edge
             pol1.intersectForPoint(pol2,v3);
             CPPUNIT_ASSERT_EQUAL(3,(int)v1.size());
             CPPUNIT_ASSERT_EQUAL(3,(int)v2.size());
@@ -75,11 +75,9 @@ void QuadraticPlanarInterpTest::checkPolygonsIntersection1()
                 CPPUNIT_ASSERT_DOUBLES_EQUAL(0.78262379212492639,v2[1],1.e-14);
                 CPPUNIT_ASSERT_DOUBLES_EQUAL(0.78262379212492639,v2[2],1.e-14);
               }
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(0.245,area2,1.e-14);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(0.7,tmp1,1.e-14);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(1.5652475842498528,tmp2,1.e-14);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(0.,tmp3,1.e-14);//no common edge
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(0.245,tmp4,1.e-14);
             delete result[0];
           }
       }
@@ -161,18 +159,15 @@ void QuadraticPlanarInterpTest::checkPolygonsIntersection1()
             CPPUNIT_ASSERT_EQUAL(1,(int)result.size()); checkBasicsOfPolygons(*result[0],*result[0],false);
             CPPUNIT_ASSERT_EQUAL(3,result[0]->recursiveSize());
             delete result[0];
-            double tmp1=0.,tmp2=0.,tmp3=0.,tmp4=0.;
-            pol7.intersectForPerimeter(pol8,tmp1,tmp2,tmp3,tmp4);
+            double tmp1=0.,tmp2=0.,tmp3=0.;
+            pol7.intersectForPerimeter(pol8,tmp1,tmp2,tmp3);
             vector<double> v1,v2;
-            double area2;
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(3.2360679774997898,pol7.intersectForPerimeterAdvanced(pol8,v1,v2,area2),1.e-14);//only common edges.
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(0.,v1[0]+v1[1]+v1[2],1.e-14);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(0.,v2[0]+v2[1]+v2[2],1.e-14);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5,area2,1.e-14);
+            pol7.intersectForPerimeterAdvanced(pol8,v1,v2);//only common edges.
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(3.2360679774997898,v1[0]+v1[1]+v1[2],1.e-14);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(3.2360679774997898,v2[0]+v2[1]+v2[2],1.e-14);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(0.,tmp1,1.e-14);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(0.,tmp2,1.e-14);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(3.2360679774997898,tmp3,1.e-14);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5,tmp4,1.e-14);
           }
       }
   //clean-up test4
@@ -260,47 +255,78 @@ void QuadraticPlanarInterpTest::checkPolygonsIntersection1()
 
   //Multi polygons
   
-   n1=new Node(0.,0.);
-   n2=new Node(1.,0.);
-   n3=new Node(1.,1.);
-   n4=new Node(0.,1.);
-   //
-   n5=new Node(0.2,0.7);
-   n6=new Node(0.4,0.7);
-   n7=new Node(0.4,1.3);
-   Node *n8=new Node(0.6,1.3);
-   Node *n9=new Node(0.6,0.7);
-   Node *n10=new Node(0.9,0.7);
-   Node *n11=new Node(0.9,2.);
-   Node *n12=new Node(0.2,2.);
-   //
-   e1_2=new EdgeLin(n1,n2); e2_3=new EdgeLin(n2,n3); Edge *e3_4=new EdgeLin(n3,n4); Edge *e4_1=new EdgeLin(n4,n1);
-   e5_6=new EdgeLin(n5,n6); Edge *e6_7=new EdgeLin(n6,n7); Edge *e7_8=new EdgeLin(n7,n8); Edge *e8_9=new EdgeLin(n8,n9); Edge *e9_10=new EdgeLin(n9,n10); Edge *e10_11=new EdgeLin(n10,n11);
-   Edge *e11_12=new EdgeLin(n11,n12); Edge *e12_1=new EdgeLin(n12,n5);
-   //
-   for(int k=0;k<2;k++)
-     for(int i=0;i<4;i++)
-       {
-         for(int j=0;j<8;j++)
-           {
-             e1_2->incrRef(); e2_3->incrRef(); e3_4->incrRef(); e4_1->incrRef(); e5_6->incrRef(); e6_7->incrRef(); e7_8->incrRef(); e8_9->incrRef(); e9_10->incrRef(); e10_11->incrRef(); e11_12->incrRef(); e12_1->incrRef();
-             QuadraticPolygon pol15; pol15.pushBack(e1_2); pol15.pushBack(e2_3); pol15.pushBack(e3_4); pol15.pushBack(e4_1);
-             for(int i1=0;i1<i;i1++) pol15.circularPermute(); if(k==1) pol15.reverse();
-             QuadraticPolygon pol16; pol16.pushBack(e5_6); pol16.pushBack(e6_7); pol16.pushBack(e7_8); pol16.pushBack(e8_9); pol16.pushBack(e9_10); pol16.pushBack(e10_11); pol16.pushBack(e11_12); pol16.pushBack(e12_1);
-             for(int j1=0;j1<j;j1++) pol16.circularPermute();
-             result=pol15.intersectMySelfWith(pol16);
-             CPPUNIT_ASSERT_EQUAL(2,(int)result.size());
-             checkBasicsOfPolygons(*result[0],*result[1],false);
-             CPPUNIT_ASSERT_EQUAL(4,result[0]->recursiveSize()); CPPUNIT_ASSERT_EQUAL(4,result[1]->recursiveSize());
-             CPPUNIT_ASSERT_DOUBLES_EQUAL(0.15,result[0]->getArea()+result[1]->getArea(),1e-10);
-             CPPUNIT_ASSERT_DOUBLES_EQUAL(0.03,fabs(result[0]->getArea()-result[1]->getArea()),1e-10);
-             CPPUNIT_ASSERT_DOUBLES_EQUAL(0.15,pol15.intersectWith(pol16),1e-10);
-             delete result[0]; delete result[1];
-           }
-       }
-   //clean-up test8
-   e1_2->decrRef(); e2_3->decrRef(); e3_4->decrRef(); e4_1->decrRef(); e5_6->decrRef(); e6_7->decrRef(); e7_8->decrRef(); e8_9->decrRef(); e9_10->decrRef(); e10_11->decrRef(); e11_12->decrRef(); e12_1->decrRef();
-   n1->decrRef(); n2->decrRef(); n3->decrRef(); n4->decrRef(); n5->decrRef(); n6->decrRef(); n7->decrRef(); n8->decrRef(); n9->decrRef(); n10->decrRef(); n11->decrRef(); n12->decrRef();
+  n1=new Node(0.,0.);
+  n2=new Node(1.,0.);
+  n3=new Node(1.,1.);
+  n4=new Node(0.,1.);
+  //
+  n5=new Node(0.2,0.7);
+  n6=new Node(0.4,0.7);
+  n7=new Node(0.4,1.3);
+  Node *n8=new Node(0.6,1.3);
+  Node *n9=new Node(0.6,0.7);
+  Node *n10=new Node(0.9,0.7);
+  Node *n11=new Node(0.9,2.);
+  Node *n12=new Node(0.2,2.);
+  //
+  e1_2=new EdgeLin(n1,n2); e2_3=new EdgeLin(n2,n3); Edge *e3_4=new EdgeLin(n3,n4); Edge *e4_1=new EdgeLin(n4,n1);
+  e5_6=new EdgeLin(n5,n6); Edge *e6_7=new EdgeLin(n6,n7); Edge *e7_8=new EdgeLin(n7,n8); Edge *e8_9=new EdgeLin(n8,n9); Edge *e9_10=new EdgeLin(n9,n10); Edge *e10_11=new EdgeLin(n10,n11);
+  Edge *e11_12=new EdgeLin(n11,n12); Edge *e12_1=new EdgeLin(n12,n5);
+  //
+  for(int k=0;k<2;k++)
+    for(int i=0;i<4;i++)
+      {
+        for(int j=0;j<8;j++)
+          {
+            e1_2->incrRef(); e2_3->incrRef(); e3_4->incrRef(); e4_1->incrRef(); e5_6->incrRef(); e6_7->incrRef(); e7_8->incrRef(); e8_9->incrRef(); e9_10->incrRef(); e10_11->incrRef(); e11_12->incrRef(); e12_1->incrRef();
+            QuadraticPolygon pol15; pol15.pushBack(e1_2); pol15.pushBack(e2_3); pol15.pushBack(e3_4); pol15.pushBack(e4_1);
+            for(int i1=0;i1<i;i1++) pol15.circularPermute(); if(k==1) pol15.reverse();
+            QuadraticPolygon pol16; pol16.pushBack(e5_6); pol16.pushBack(e6_7); pol16.pushBack(e7_8); pol16.pushBack(e8_9); pol16.pushBack(e9_10); pol16.pushBack(e10_11); pol16.pushBack(e11_12); pol16.pushBack(e12_1);
+            for(int j1=0;j1<j;j1++) pol16.circularPermute();
+            result=pol15.intersectMySelfWith(pol16);
+            CPPUNIT_ASSERT_EQUAL(2,(int)result.size());
+            checkBasicsOfPolygons(*result[0],*result[1],false);
+            CPPUNIT_ASSERT_EQUAL(4,result[0]->recursiveSize()); CPPUNIT_ASSERT_EQUAL(4,result[1]->recursiveSize());
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(0.15,result[0]->getArea()+result[1]->getArea(),1e-10);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(0.03,fabs(result[0]->getArea()-result[1]->getArea()),1e-10);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(0.15,pol15.intersectWith(pol16),1e-10);
+            delete result[0]; delete result[1];
+          }
+      }
+  //clean-up test8
+  e1_2->decrRef(); e2_3->decrRef(); e3_4->decrRef(); e4_1->decrRef(); e5_6->decrRef(); e6_7->decrRef(); e7_8->decrRef(); e8_9->decrRef(); e9_10->decrRef(); e10_11->decrRef(); e11_12->decrRef(); e12_1->decrRef();
+  n1->decrRef(); n2->decrRef(); n3->decrRef(); n4->decrRef(); n5->decrRef(); n6->decrRef(); n7->decrRef(); n8->decrRef(); n9->decrRef(); n10->decrRef(); n11->decrRef(); n12->decrRef();
+}
+
+/*!
+ * Testing case where a polygon pol1 is included in an onother polygon pol2.
+ */
+void QuadraticPlanarInterpTest::checkPolygonsIntersection2()
+{
+  Node *n1=new Node(0.,0.);          Node *n4=new Node(0.2,0.2);
+  Node *n2=new Node(1.,0.);          Node *n5=new Node(0.8,0.2);
+  Node *n3=new Node(0.5,1.);         Node *n6=new Node(0.5,0.8);
+  Edge *e1_2=new EdgeLin(n1,n2);     Edge *e4_5=new EdgeLin(n4,n5);
+  Edge *e2_3=new EdgeLin(n2,n3);     Edge *e5_6=new EdgeLin(n5,n6);
+  Edge *e3_1=new EdgeLin(n3,n1);     Edge *e6_4=new EdgeLin(n6,n4);
+  //
+  QuadraticPolygon pol1; pol1.pushBack(e1_2); pol1.pushBack(e2_3); pol1.pushBack(e3_1);
+  QuadraticPolygon pol2; pol2.pushBack(e4_5); pol2.pushBack(e5_6); pol2.pushBack(e6_4);
+  vector<QuadraticPolygon *> result=pol1.intersectMySelfWith(pol2);
+  CPPUNIT_ASSERT_EQUAL(1,(int)result.size());
+  CPPUNIT_ASSERT_EQUAL(3,result[0]->recursiveSize());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.18,result[0]->getArea(),1e-10);
+  delete result[0];
+  result.clear();
+  pol1.initLocations();
+  pol2.initLocations();
+  result=pol2.intersectMySelfWith(pol1);
+  CPPUNIT_ASSERT_EQUAL(1,(int)result.size());
+  CPPUNIT_ASSERT_EQUAL(3,result[0]->recursiveSize());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.18,result[0]->getArea(),1e-10);
+  delete result[0];
+  //clean-up
+  n1->decrRef(); n2->decrRef(); n3->decrRef(); n4->decrRef(); n5->decrRef(); n6->decrRef();
 }
 
 void QuadraticPlanarInterpTest::checkAreasCalculations()
@@ -381,6 +407,83 @@ void QuadraticPlanarInterpTest::checkAreasCalculations()
   //clean-up case3
   e1_2->decrRef(); e2_3->decrRef(); e3_4->decrRef(); e4_1->decrRef(); 
   n1->decrRef(); n2->decrRef(); n2m->decrRef(); n3->decrRef(); n3m->decrRef(); n4->decrRef();
+}
+
+void QuadraticPlanarInterpTest::checkBarycenterCalculations()
+{
+  Node *n1=new Node(3.,7.);
+  Node *n2=new Node(5.,7.);
+  Node *n3=new Node(4.,8.);
+  Edge *e1_2=new EdgeLin(n1,n2);
+  Edge *e2_3=new EdgeLin(n2,n3);
+  Edge *e3_1=new EdgeLin(n3,n1);
+  //
+  double bary[2];
+  e1_2->incrRef(); e2_3->incrRef(); e3_1->incrRef();
+  QuadraticPolygon pol1; pol1.pushBack(e1_2); pol1.pushBack(e2_3); pol1.pushBack(e3_1);
+  bary[0]=0.; bary[1]=0.;
+  e1_2->getBarycenterOfZone(bary);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(-56.,bary[0],1.e-10);
+  bary[0]=0.; bary[1]=0.;
+  e2_3->getBarycenterOfZone(bary);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(33.66666666666667,bary[0],1.e-10);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(28.16666666666667,bary[1],1.e-10);
+  bary[0]=0.; bary[1]=0.;
+  e3_1->getBarycenterOfZone(bary);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(26.333333333333336,bary[0],1.e-10);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(28.1666666666667,bary[1],1.e-10);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,pol1.getArea(),1e-10);
+  pol1.getBarycenter(bary);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(4.,bary[0],1.e-10);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(7.333333333333333,bary[1],1.e-10);
+  //
+  e1_2->incrRef(); e2_3->incrRef(); e3_1->incrRef();
+  QuadraticPolygon pol4; pol4.pushBack(e3_1,false); pol4.pushBack(e2_3,false); pol4.pushBack(e1_2,false);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(-1.,pol4.getArea(),1e-10);
+  pol4.getBarycenter(bary);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(4.,bary[0],1.e-10);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(7.333333333333333,bary[1],1.e-10);
+  //clean-up
+  e1_2->decrRef(); e2_3->decrRef(); e3_1->decrRef();
+  n1->decrRef(); n2->decrRef(); n3->decrRef();
+  //Inverting polygon
+  n1=new Node(3.,7.);
+  n2=new Node(5.,7.);
+  n3=new Node(4.,8.);
+  e1_2=new EdgeLin(n1,n3);
+  e2_3=new EdgeLin(n3,n2);
+  e3_1=new EdgeLin(n2,n1);
+  e1_2->incrRef(); e2_3->incrRef(); e3_1->incrRef();
+  QuadraticPolygon pol3; pol3.pushBack(e1_2); pol3.pushBack(e2_3); pol3.pushBack(e3_1);
+  bary[0]=0.; bary[1]=0.;
+  pol3.getBarycenter(bary);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(-1.,pol3.getArea(),1e-10);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(4.,bary[0],1.e-10);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(7.333333333333333,bary[1],1.e-10);
+  //clean-up
+  e1_2->decrRef(); e2_3->decrRef(); e3_1->decrRef();
+  n1->decrRef(); n2->decrRef(); n3->decrRef();
+  //
+  double center[2]={3.,7.};
+  e1_2=buildArcOfCircle(center,4.,M_PI/3.,4.*M_PI/3.);
+  bary[0]=0.; bary[1]=0.;
+  e1_2->getBarycenterOfZone(bary);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(131.685410765053,bary[0],1.e-10);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(303.262521934362,bary[1],1.e-10);
+  n1=new Node(0.99999999999999822,3.5358983848622465);
+  n2=new Node(5.,10.4641016151377544);
+  Edge *e2_1=new EdgeLin(n1,n2);
+  //
+  e1_2->incrRef(); e2_1->incrRef();
+  QuadraticPolygon pol2; pol2.pushBack(e1_2); pol2.pushBack(e2_1);
+  pol2.getBarycenter(bary);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.132741228718345,pol2.getArea(),1e-10);
+  //4*radius/(3.*pi)
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.5297896122085546,bary[0],1.e-10);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(7.8488263631567756,bary[1],1.e-10);
+  //clean-up
+  e1_2->decrRef(); e2_1->decrRef();
+  n1->decrRef(); n2->decrRef();
 }
 
 /*!
@@ -525,6 +628,42 @@ void QuadraticPlanarInterpTest::check1DInterpLin()
       CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,m[i+2][i+9],1e-12);
     }
   QUADRATIC_PLANAR::setPrecision(1e-14);
+}
+
+/*!
+ * This test looks if intersectors are in coherency.
+ */
+void QuadraticPlanarInterpTest::checkEpsilonCoherency1()
+{
+  INTERP_KERNEL::QUADRATIC_PLANAR::setPrecision(1e-12);
+  INTERP_KERNEL::QUADRATIC_PLANAR::setArcDetectionPrecision(1e-5);
+
+  const double pol1[]={
+    -2.1083388455000001, 1.2172499999999999,
+    -1.7320508075000001, 1,
+    -1.9201948265, 1.108625
+  };
+
+  const double pol2[]={
+    -2.2379999998, 0,
+    -1.9381648534, 1.1189999998,
+    -2.1617419990000002, 0.57923702298000002,
+    -1.9381648534, 1.1189999998,
+    -1.9909924031999999, 1.1494999999,
+    -1.9645786283, 1.1342499998
+  };
+  //
+  Node *n1=new Node(pol1[0],pol1[1]);
+  Node *n2=new Node(pol1[2],pol1[3]);
+  Node *n3;
+  //
+  Edge *e1=new EdgeLin(n1,n2); n1->decrRef(); n2->decrRef();
+  n1=new Node(pol2[0],pol2[1]);
+  n2=new Node(pol2[4],pol2[5]);
+  n3=new Node(pol2[2],pol2[3]);
+  Edge *e2=new EdgeArcCircle(n1,n2,n3); n1->decrRef(); n2->decrRef(); n3->decrRef();
+  e2->decrRef();
+  e1->decrRef();
 }
 
 /*!
@@ -737,6 +876,8 @@ void QuadraticPlanarInterpTest::checkNonRegression5()
       -1.9645786283, 1.1342499998,
       -2.2206634745999998, 0.59502498461999997,
       -2.2684999997999999, 0};
+  //Edge1_of_pol2 inter Edge4_of_pol1 = {-1.9381648533711939, 1.1189999998498941}
+  //Edge4_of_pol1 _angle = -0.523598775922546, _angle0 = -3.1415926535897931, _radius = 2.2379999983074721, _center = {-1.4925279436059493e-09, 1.3300635705141101e-10}}
   vector<Node *> nodes1;
   nodes1.push_back(new Node(coords1));
   nodes1.push_back(new Node(coords1+2));
@@ -757,7 +898,6 @@ void QuadraticPlanarInterpTest::checkNonRegression5()
   nodes2.push_back(new Node(coords2+12));
   nodes2.push_back(new Node(coords2+14));
   QuadraticPolygon *pol2=QuadraticPolygon::buildArcCirclePolygon(nodes2);
-  pol1->dumpInXfigFileWithOther(*pol2,"this.fig");
   vector<QuadraticPolygon *> v=pol1->intersectMySelfWith(*pol2);
   CPPUNIT_ASSERT_EQUAL(0,(int)v.size());
   //CPPUNIT_ASSERT_DOUBLES_EQUAL(0.00164773941455998,v[0]->getArea(),1e-7);
@@ -1100,8 +1240,370 @@ void QuadraticPlanarInterpTest::checkNonRegression12()
   QuadraticPolygon *pol2=QuadraticPolygon::buildArcCirclePolygon(nodes2);
   vector<QuadraticPolygon *> v=pol1->intersectMySelfWith(*pol2);
   CPPUNIT_ASSERT_EQUAL(1,(int)v.size());
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(2.28973e-06,v[0]->getArea(),1.e-11);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.,v[0]->getArea(),1.e-6);
   delete v[0];
+  delete pol1;
+  delete pol2;
+}
+
+void QuadraticPlanarInterpTest::checkNonRegression13()
+{
+  INTERP_KERNEL::QUADRATIC_PLANAR::setPrecision(1e-7);
+  INTERP_KERNEL::QUADRATIC_PLANAR::setArcDetectionPrecision(1e-6);
+
+  double coords_1[194]={ 
+    0, 0, 0.304375, -7.454791178893722e-17, 0.2152256265236553, -0.2152256265236555, -5.591093384170291e-17, -0.304375, 
+    -0.2152256265236555, -0.2152256265236554, -0.304375, 3.727395589446861e-17, -0.2152256265236554, 0.2152256265236554, 1.86369779472343e-17, 0.304375, 
+    0.2152256265236554, 0.2152256265236554, 0.60875, -1.490958235778744e-16, 0.5624116654162459, -0.2329585394522483, 0.4304512530473107, -0.4304512530473109, 
+    0.2329585394522485, -0.5624116654162458, -1.118218676834058e-16, -0.60875, -0.2329585394522482, -0.5624116654162459, -0.4304512530473109, -0.4304512530473108, 
+    -0.5624116654162459, -0.2329585394522483, -0.60875, 7.454791178893722e-17, -0.5624116654162458, 0.2329585394522485, -0.4304512530473108, 0.4304512530473109, 
+    -0.2329585394522484, 0.5624116654162458, 3.727395589446861e-17, 0.60875, 0.2329585394522485, 0.5624116654162458, 0.4304512530473109, 0.4304512530473108, 
+    0.5624116654162458, 0.2329585394522484, 0.913125, -2.236437353668116e-16, 0.645676879570966, -0.6456768795709663, -1.677328015251087e-16, -0.913125, 
+    -0.6456768795709663, -0.6456768795709661, -0.913125, 1.118218676834058e-16, -0.6456768795709661, 0.6456768795709662, 5.591093384170291e-17, 0.913125, 
+    0.6456768795709662, 0.6456768795709661, 1.2175, -2.981916471557489e-16, 1.124823330832492, -0.4659170789044966, 0.8609025060946214, -0.8609025060946218, 
+    0.4659170789044971, -1.124823330832492, -2.236437353668116e-16, -1.2175, -0.4659170789044965, -1.124823330832492, -0.8609025060946218, -0.8609025060946216, 
+    -1.124823330832492, -0.4659170789044967, -1.2175, 1.490958235778744e-16, -1.124823330832492, 0.465917078904497, -0.8609025060946216, 0.8609025060946217, 
+    -0.4659170789044967, 1.124823330832492, 7.454791178893722e-17, 1.2175, 0.4659170789044969, 1.124823330832492, 0.8609025060946217, 0.8609025060946216, 
+    1.124823330832492, 0.4659170789044968, 1.521875, -3.727395589446861e-16, 1.076128132618277, -1.076128132618277, -2.795546692085146e-16, -1.521875, 
+    -1.076128132618277, -1.076128132618277, -1.521875, 1.86369779472343e-16, -1.076128132618277, 1.076128132618277, 9.318488973617152e-17, 1.521875, 
+    1.076128132618277, 1.076128132618277, 1.82625, -4.472874707336233e-16, 1.687234996248738, -0.6988756183567448, 1.291353759141932, -1.291353759141933, 
+    0.6988756183567456, -1.687234996248737, -3.354656030502175e-16, -1.82625, -0.6988756183567447, -1.687234996248738, -1.291353759141933, -1.291353759141932, 
+    -1.687234996248738, -0.6988756183567449, -1.82625, 2.236437353668116e-16, -1.687234996248737, 0.6988756183567454, -1.291353759141932, 1.291353759141932, 
+    -0.6988756183567451, 1.687234996248737, 1.118218676834058e-16, 1.82625, 0.6988756183567453, 1.687234996248737, 1.291353759141932, 1.291353759141932, 
+    1.687234996248737, 0.6988756183567452, 2.130625, -5.218353825225606e-16, 1.506579385665588, -1.506579385665588, -3.913765368919204e-16, -2.130625, 
+    -1.506579385665588, -1.506579385665588, -2.130625, 2.609176912612803e-16, -1.506579385665588, 1.506579385665588, 1.304588456306401e-16, 2.130625, 
+    1.506579385665588, 1.506579385665588, 2.435, -5.963832943114977e-16, 2.249646661664984, -0.9318341578089931, 1.721805012189243, -1.721805012189244, 
+    0.9318341578089941, -2.249646661664983, -4.472874707336233e-16, -2.435, -0.9318341578089929, -2.249646661664984, -1.721805012189244, -1.721805012189243, 
+    -2.249646661664984, -0.9318341578089934, -2.435, 2.981916471557489e-16, -2.249646661664983, 0.9318341578089939, -1.721805012189243, 1.721805012189243, 
+    -0.9318341578089935, 2.249646661664983, 1.490958235778744e-16, 2.435, 0.9318341578089938, 2.249646661664983, 1.721805012189243, 1.721805012189243, 
+    2.249646661664983, 0.9318341578089936 };
+
+  int tab6_1[48]={ 
+    0, 9, 11, 1, 10, 2, 0, 11, 13, 2, 12, 3, 0, 13, 15, 3, 14, 4, 0, 15, 
+    17, 4, 16, 5, 0, 17, 19, 5, 18, 6, 0, 19, 21, 6, 20, 7, 0, 21, 23, 7, 
+    22, 8, 0, 23, 9, 8, 24, 1 };
+
+  int tab8_1[192]={ 
+    9, 33, 35, 11, 25, 34, 26, 10, 11, 35, 37, 13, 26, 36, 27, 12, 13, 37, 39, 15, 
+    27, 38, 28, 14, 15, 39, 41, 17, 28, 40, 29, 16, 17, 41, 43, 19, 29, 42, 30, 18, 
+    19, 43, 45, 21, 30, 44, 31, 20, 21, 45, 47, 23, 31, 46, 32, 22, 23, 47, 33, 9, 
+    32, 48, 25, 24, 33, 57, 59, 35, 49, 58, 50, 34, 35, 59, 61, 37, 50, 60, 51, 36, 
+    37, 61, 63, 39, 51, 62, 52, 38, 39, 63, 65, 41, 52, 64, 53, 40, 41, 65, 67, 43, 
+    53, 66, 54, 42, 43, 67, 69, 45, 54, 68, 55, 44, 45, 69, 71, 47, 55, 70, 56, 46, 
+    47, 71, 57, 33, 56, 72, 49, 48, 57, 81, 83, 59, 73, 82, 74, 58, 59, 83, 85, 61, 
+    74, 84, 75, 60, 61, 85, 87, 63, 75, 86, 76, 62, 63, 87, 89, 65, 76, 88, 77, 64, 
+    65, 89, 91, 67, 77, 90, 78, 66, 67, 91, 93, 69, 78, 92, 79, 68, 69, 93, 95, 71, 
+    79, 94, 80, 70, 71, 95, 81, 57, 80, 96, 73, 72 };
+
+  double coords_2[20]={ 
+    0.5159941860137611, 0, 0, -0.5159941860137611, -0.5159941860137611, 0, 0, 0.5159941860137611, 
+    0.6684941860137611, 0, 0, -0.6684941860137611, -0.6684941860137611, 0, 0, 0.6684941860137611, 
+    0.5922441860137611, 0, -0.5922441860137611, 0 };
+  
+  int tab8_2[16]={ 
+    0, 4, 6, 2, 8, 5, 9, 1, 2, 6, 4, 0, 9, 7, 8, 3 };
+  
+  double perimeterFromPol1,perimeterFromPol2,perimeterFromPol1AndPol2;
+
+  const int *work1=tab6_1;
+  for(int i=0;i<8;i++,work1+=6)
+    {
+      QuadraticPolygon *pol1=buildQuadraticPolygonCoarseInfo(coords_1,work1,6);
+      const int *work2=tab8_2;
+      for(int j=0;j<2;j++,work2+=8)
+        {
+          QuadraticPolygon *pol2=buildQuadraticPolygonCoarseInfo(coords_2,work2,8);
+          //vector<int> tmp;
+          //pol1->intersectForPoint(*pol2,tmp);
+          pol1->intersectForPerimeter(*pol2,perimeterFromPol1,perimeterFromPol2,perimeterFromPol1AndPol2);
+          //pol1->intersectMySelfWith(*pol2);
+          delete pol2;
+        }
+      delete pol1;
+    }
+  work1=tab8_1;
+  for(int i=0;i<24;i++,work1+=8)
+    {
+      QuadraticPolygon *pol1=buildQuadraticPolygonCoarseInfo(coords_1,work1,8);
+      const int *work2=tab8_2;
+      for(int j=0;j<2;j++,work2+=8)
+        {
+          
+          QuadraticPolygon *pol2=buildQuadraticPolygonCoarseInfo(coords_2,work2,8);
+          //vector<int> tmp;
+          //pol1->intersectForPoint(*pol2,tmp);
+          pol1->intersectForPerimeter(*pol2,perimeterFromPol1,perimeterFromPol2,perimeterFromPol1AndPol2);
+          delete pol2;
+        }
+      delete pol1;
+    }
+}
+
+/*!
+  Some overlapping cases for intersectForPoint.
+*/
+void QuadraticPlanarInterpTest::checkNonRegression14()
+{
+  INTERP_KERNEL::QUADRATIC_PLANAR::setPrecision(1e-7);
+  INTERP_KERNEL::QUADRATIC_PLANAR::setArcDetectionPrecision(1e-6);
+
+  double coords[72]={
+    1.,0.,1.3,0.,-1.3,0.,-1.,0.,1.15,0.,0.,1.3,-1.15,0.,0.,1.,
+    -0.91923881554251186,-0.91923881554251186,-0.91923881554251186,0.91923881554251186,-1.0606601717798214,1.0606601717798214,-1.0606601717798214,-1.0606601717798214,-1.5,0.,
+    -0.98994949366116658,-0.98994949366116658,-0.98994949366116658,0.98994949366116658,
+    0.91923881554251186,0.91923881554251186,1.0606601717798214,1.0606601717798214,0.98994949366116658,0.98994949366116658, 0., 1.5,
+    -0.83562389259250125,0.99585777605467141, -0.65, 1.1258330249197703, -1.2216004070216808, 0.44462618632336953, -1.1258330249197703, 0.65,
+    -0.74564936725635955, 1.0648976575756897, -1.6770646146510724, 1.4072242996141826, -1.1782001231476449, 0.54940374026290939, -1.5873847317707279, 0.74020965686300877,
+    -1.1782001231476449, 0.54940374026290939, -1.0648976575756894, 0.74564936725635977, -1.2950531075192693, -0.11330246557195534, -1.2950531075192693, 0.11330246557195565,
+    -1.1258330249197703, 0.65, -2.1146554070041046, 0.56662020857685746, -1.6918048488667423, 0.45331774300490169,
+    0.,-1.3,0.,-1.5
+  };
+  int tab[48]={
+    0,1,2,3,4,5,6,7,
+    8,9,10,11,2,14,12,13,
+    9,15,16,10,5,17,18,14,
+    9,15,16,10,34,17,35,14,
+    19,20,21,22,23,24,25,26,
+    27,28,29,30,31,32,2,33
+  };
+  QuadraticPolygon *pol1,*pol2;
+  vector<int> goalOfTest;
+  //
+  pol1=buildQuadraticPolygonCoarseInfo(coords,tab,8);
+  // Level 1
+  pol2=buildQuadraticPolygonCoarseInfo(coords,tab+8,8);
+  pol1->intersectForPoint(*pol2,goalOfTest);
+  const int res1[4]={0,1,0,0};
+  CPPUNIT_ASSERT_EQUAL(4,(int)goalOfTest.size());
+  CPPUNIT_ASSERT(equal(goalOfTest.begin(),goalOfTest.end(),res1));
+  delete pol2;
+  // Level 2
+  pol2=buildQuadraticPolygonCoarseInfo(coords,tab+16,8);
+  pol1->intersectForPoint(*pol2,goalOfTest);
+  const int res2[4]={0,2,0,0};
+  CPPUNIT_ASSERT_EQUAL(4,(int)goalOfTest.size());
+  CPPUNIT_ASSERT(equal(goalOfTest.begin(),goalOfTest.end(),res2));
+  delete pol2;
+  //Level 2 bis
+  pol2=buildQuadraticPolygonCoarseInfo(coords,tab+24,8);
+  pol1->intersectForPoint(*pol2,goalOfTest);
+  const int res2Bis[4]={0,2,0,0};
+  CPPUNIT_ASSERT_EQUAL(4,(int)goalOfTest.size());
+  CPPUNIT_ASSERT(equal(goalOfTest.begin(),goalOfTest.end(),res2Bis));
+  delete pol2;
+  // Level 3
+  pol2=buildQuadraticPolygonCoarseInfo(coords,tab+40,8);
+  pol1->intersectForPoint(*pol2,goalOfTest);
+  const int res3[4]={0,3,0,0};
+  CPPUNIT_ASSERT_EQUAL(4,(int)goalOfTest.size());
+  CPPUNIT_ASSERT(equal(goalOfTest.begin(),goalOfTest.end(),res3));
+  delete pol2;
+  // Level 4
+  pol2=buildQuadraticPolygonCoarseInfo(coords,tab+32,8);
+  pol1->intersectForPoint(*pol2,goalOfTest);
+  const int res4[4]={0,4,0,0};
+  CPPUNIT_ASSERT_EQUAL(4,(int)goalOfTest.size());
+  CPPUNIT_ASSERT(equal(goalOfTest.begin(),goalOfTest.end(),res4));
+  delete pol2;
+  //
+  delete pol1;
+}
+
+/*!
+ * This test is one of the most complicated intersection configuration.
+ */
+void QuadraticPlanarInterpTest::checkNonRegression15()
+{
+  INTERP_KERNEL::QUADRATIC_PLANAR::setPrecision(1e-7);
+  INTERP_KERNEL::QUADRATIC_PLANAR::setArcDetectionPrecision(1e-6);
+
+  double coords[72]={
+    1.,0.,1.3,0.,-1.3,0.,-1.,0.,1.15,0.,0.,1.3,-1.15,0.,0.,1.,
+    -0.91923881554251186,-0.91923881554251186,-0.91923881554251186,0.91923881554251186,-1.0606601717798214,1.0606601717798214,-1.0606601717798214,-1.0606601717798214,-1.5,0.,
+    -0.98994949366116658,-0.98994949366116658,-0.98994949366116658,0.98994949366116658,
+    0.91923881554251186,0.91923881554251186,1.0606601717798214,1.0606601717798214,0.98994949366116658,0.98994949366116658, 0., 1.5,
+    -0.83562389259250125,0.99585777605467141, -0.65, 1.1258330249197703, -1.2216004070216808, 0.44462618632336953, -1.1258330249197703, 0.65,
+    -0.74564936725635955, 1.0648976575756897, -1.6770646146510724, 1.4072242996141826, -1.1782001231476449, 0.54940374026290939, -1.5873847317707279, 0.74020965686300877,
+    -1.1782001231476449, 0.54940374026290939, -1.0648976575756894, 0.74564936725635977, -1.2950531075192693, -0.11330246557195534, -1.2950531075192693, 0.11330246557195565,
+    -1.1258330249197703, 0.65, -2.1146554070041046, 0.56662020857685746, -1.6918048488667423, 0.45331774300490169,
+    0.,-1.3,0.,-1.5
+  };
+
+  int tab[24]={
+    0,1,2,3,4,5,6,7,
+    9,15,16,10,7,17,5,14,
+    9,10,16,15,14,5,17,7
+  };
+
+  const double RefLgth=3.88995883524451;
+  const double RefArea=0.383185168001075;
+  //
+  QuadraticPolygon *pol1,*pol2;
+  //pol1 and pol2 in same orientation
+  pol1=buildQuadraticPolygonCoarseInfo(coords,tab,8);
+  pol2=buildQuadraticPolygonCoarseInfo(coords,tab+8,8);
+  vector<QuadraticPolygon *> res=pol1->intersectMySelfWith(*pol2);
+  CPPUNIT_ASSERT_EQUAL(1,(int)res.size());
+  CPPUNIT_ASSERT_EQUAL(4,res[0]->recursiveSize());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(RefLgth,res[0]->getPerimeter(),1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(RefArea,res[0]->getArea(),1e-12);
+  delete res[0];
+  //pol1 and pol2 in same orientation but inversing intersection call pol1<->pol2
+  res=pol2->intersectMySelfWith(*pol1);
+  CPPUNIT_ASSERT_EQUAL(1,(int)res.size());
+  CPPUNIT_ASSERT_EQUAL(4,res[0]->recursiveSize());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(RefLgth,res[0]->getPerimeter(),1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(RefArea,res[0]->getArea(),1e-12);
+  delete res[0];
+  delete pol2;
+  //pol1 and pol2 in opposite orientation
+  pol2=buildQuadraticPolygonCoarseInfo(coords,tab+16,8);
+  res=pol1->intersectMySelfWith(*pol2);
+  CPPUNIT_ASSERT_EQUAL(1,(int)res.size());
+  CPPUNIT_ASSERT_EQUAL(4,res[0]->recursiveSize());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(RefLgth,res[0]->getPerimeter(),1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(-RefArea,res[0]->getArea(),1e-12);
+  delete res[0];
+  //pol1 and pol2 in opposite orientation but inversing intersection call pol1<->pol2
+  res=pol2->intersectMySelfWith(*pol1);
+  CPPUNIT_ASSERT_EQUAL(1,(int)res.size());
+  CPPUNIT_ASSERT_EQUAL(4,res[0]->recursiveSize());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(RefLgth,res[0]->getPerimeter(),1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(RefArea,res[0]->getArea(),1e-12);
+  delete res[0];
+  delete pol2;
+  //
+  delete pol1;
+}
+
+class DoubleEqual
+{
+public:
+  DoubleEqual(double eps):_eps(eps) { }
+  bool operator()(double x, double y) { return fabs(x-y)<_eps; }
+private:
+  double _eps;
+};
+
+/*!
+ * This test is to see the reuse of a polygon in intersect* methods. initLocation needed ...
+ */
+void QuadraticPlanarInterpTest::checkNonRegression16()
+{
+  INTERP_KERNEL::QUADRATIC_PLANAR::setPrecision(1e-7);
+  INTERP_KERNEL::QUADRATIC_PLANAR::setArcDetectionPrecision(1e-7);
+  double coords1[194]={ 
+    0, 0, 0.304375, 0, 0.2152256265236554, 0.2152256265236554, 1.86369779472343e-17, 0.304375, 
+    -0.2152256265236554, 0.2152256265236554, -0.304375, 3.727395589446861e-17, -0.2152256265236555, -0.2152256265236554, -5.591093384170291e-17, -0.304375, 
+    0.2152256265236553, -0.2152256265236555, 0.60875, 0, 0.5624116654162458, 0.2329585394522484, 0.4304512530473109, 0.4304512530473108, 
+    0.2329585394522485, 0.5624116654162458, 3.727395589446861e-17, 0.60875, -0.2329585394522484, 0.5624116654162458, -0.4304512530473108, 0.4304512530473109, 
+    -0.5624116654162458, 0.2329585394522485, -0.60875, 7.454791178893722e-17, -0.5624116654162459, -0.2329585394522483, -0.4304512530473109, -0.4304512530473108, 
+    -0.2329585394522482, -0.5624116654162459, -1.118218676834058e-16, -0.60875, 0.2329585394522485, -0.5624116654162458, 0.4304512530473107, -0.4304512530473109, 
+    0.5624116654162459, -0.2329585394522483, 0.913125, 0, 0.6456768795709662, 0.6456768795709661, 5.591093384170291e-17, 0.913125, 
+    -0.6456768795709661, 0.6456768795709662, -0.913125, 1.118218676834058e-16, -0.6456768795709663, -0.6456768795709661, -1.677328015251087e-16, -0.913125, 
+    0.645676879570966, -0.6456768795709663, 1.2175, 0, 1.124823330832492, 0.4659170789044968, 0.8609025060946217, 0.8609025060946216, 
+    0.4659170789044969, 1.124823330832492, 7.454791178893722e-17, 1.2175, -0.4659170789044967, 1.124823330832492, -0.8609025060946216, 0.8609025060946217, 
+    -1.124823330832492, 0.465917078904497, -1.2175, 1.490958235778744e-16, -1.124823330832492, -0.4659170789044967, -0.8609025060946218, -0.8609025060946216, 
+    -0.4659170789044965, -1.124823330832492, -2.236437353668116e-16, -1.2175, 0.4659170789044971, -1.124823330832492, 0.8609025060946214, -0.8609025060946218, 
+    1.124823330832492, -0.4659170789044966, 1.521875, 0, 1.076128132618277, 1.076128132618277, 9.318488973617152e-17, 1.521875, 
+    -1.076128132618277, 1.076128132618277, -1.521875, 1.86369779472343e-16, -1.076128132618277, -1.076128132618277, -2.795546692085146e-16, -1.521875, 
+    1.076128132618277, -1.076128132618277, 1.82625, 0, 1.687234996248737, 0.6988756183567452, 1.291353759141932, 1.291353759141932, 
+    0.6988756183567453, 1.687234996248737, 1.118218676834058e-16, 1.82625, -0.6988756183567451, 1.687234996248737, -1.291353759141932, 1.291353759141932, 
+    -1.687234996248737, 0.6988756183567454, -1.82625, 2.236437353668116e-16, -1.687234996248738, -0.6988756183567449, -1.291353759141933, -1.291353759141932, 
+    -0.6988756183567447, -1.687234996248738, -3.354656030502175e-16, -1.82625, 0.6988756183567456, -1.687234996248737, 1.291353759141932, -1.291353759141933, 
+    1.687234996248738, -0.6988756183567448, 2.130625, 0, 1.506579385665588, 1.506579385665588, 1.304588456306401e-16, 2.130625, 
+    -1.506579385665588, 1.506579385665588, -2.130625, 2.609176912612803e-16, -1.506579385665588, -1.506579385665588, -3.913765368919204e-16, -2.130625, 
+    1.506579385665588, -1.506579385665588, 2.435, 0, 2.249646661664983, 0.9318341578089936, 1.721805012189243, 1.721805012189243, 
+    0.9318341578089938, 2.249646661664983, 1.490958235778744e-16, 2.435, -0.9318341578089935, 2.249646661664983, -1.721805012189243, 1.721805012189243, 
+    -2.249646661664983, 0.9318341578089939, -2.435, 2.981916471557489e-16, -2.249646661664984, -0.9318341578089934, -1.721805012189244, -1.721805012189243, 
+    -0.9318341578089929, -2.249646661664984, -4.472874707336233e-16, -2.435, 0.9318341578089941, -2.249646661664983, 1.721805012189243, -1.721805012189244, 
+    2.249646661664984, -0.9318341578089931, };
+
+  int tab1_8[192]={ 
+    11, 35, 33, 9, 26, 34, 25, 10, 13, 37, 35, 11, 27, 36, 26, 12, 15, 39, 37, 13, 
+    28, 38, 27, 14, 17, 41, 39, 15, 29, 40, 28, 16, 19, 43, 41, 17, 30, 42, 29, 18, 
+    21, 45, 43, 19, 31, 44, 30, 20, 23, 47, 45, 21, 32, 46, 31, 22, 9, 33, 47, 23, 
+    25, 48, 32, 24, 35, 59, 57, 33, 50, 58, 49, 34, 37, 61, 59, 35, 51, 60, 50, 36, 
+    39, 63, 61, 37, 52, 62, 51, 38, 41, 65, 63, 39, 53, 64, 52, 40, 43, 67, 65, 41, 
+    54, 66, 53, 42, 45, 69, 67, 43, 55, 68, 54, 44, 47, 71, 69, 45, 56, 70, 55, 46, 
+    33, 57, 71, 47, 49, 72, 56, 48, 59, 83, 81, 57, 74, 82, 73, 58, 61, 85, 83, 59, 
+    75, 84, 74, 60, 63, 87, 85, 61, 76, 86, 75, 62, 65, 89, 87, 63, 77, 88, 76, 64, 
+    67, 91, 89, 65, 78, 90, 77, 66, 69, 93, 91, 67, 79, 92, 78, 68, 71, 95, 93, 69, 
+    80, 94, 79, 70, 57, 81, 95, 71, 73, 96, 80, 72, };
+
+  double coords2[20]={ 
+    2.435, 0, 0, -2.435, -2.435, 0, 0, 2.435, 
+    2.6925, 0, 0, -2.6925, -2.6925, 0, 0, 2.6925, 
+    2.56375, 0, -2.56375, 0, };
+
+  int tab2_8[16]={ 0, 4, 6, 2, 8, 5, 9, 1, 2, 6, 4, 0, 9, 7, 8, 3 };
+
+  QuadraticPolygon *pol1,*pol2;
+  //pol1 and pol2 in same orientation
+  vector<double> test1,test2;
+  for(int ii=0;ii<24;ii++)
+    {
+      pol1=buildQuadraticPolygonCoarseInfo(coords1,tab1_8+8*ii,8);
+      for(int jj=0;jj<2;jj++)
+        {
+          pol2=buildQuadraticPolygonCoarseInfo(coords2,tab2_8+jj*8,8);
+          //
+          vector<double> v1,v2;
+          pol1->initLocations();
+          pol1->intersectForPerimeterAdvanced(*pol2,v1,v2);
+          if(ii==16 && jj==1)
+            test1=v1;
+          if(ii==20 && jj==1)
+            test2=v1;
+          delete pol2;
+        }
+      delete pol1;
+    }
+  const double test1_res[4]={0.,1.9124445278727873,0.,0.};
+  CPPUNIT_ASSERT(std::equal(test1.begin(),test1.end(),test1_res,DoubleEqual(1e-10)));
+  const double test2_res[4]={0.,0.,0.,0.};
+  CPPUNIT_ASSERT(std::equal(test2.begin(),test2.end(),test2_res,DoubleEqual(1e-10)));
+}
+
+/*!
+ * This test checks overlapped intersections END-INSIDE and INSIDE-START with same and opposite orientation.
+ */
+void QuadraticPlanarInterpTest::checkNonRegression17()
+{
+  INTERP_KERNEL::QUADRATIC_PLANAR::setPrecision(1e-7);
+  INTERP_KERNEL::QUADRATIC_PLANAR::setArcDetectionPrecision(1e-7);
+  double coords[16]={
+    -1., 0., 1., 0. , 1.5, 0., -1.5, 0., 
+    0. , 1., 1.25, 0., 0., 1.5, -1.25, 0.};
+  
+  double coords2[16]={
+    0.70710678118654757, 0.70710678118654757, -1., 0., -1.25, 0.,  0.88388347648318444, 0.88388347648318444,
+    0., -1., -1.125, 0., 0., -1.25, 0.79549512883486606, 0.79549512883486606 };
+
+  double coords3[16]={
+    0.70710678118654757, 0.70710678118654757, 0.88388347648318444, 0.88388347648318444, -1.25, 0., -1., 0.,
+    0.79549512883486606, 0.79549512883486606, 0., -1.25, -1.125, 0., 0., -1. };
+
+  int tab8[8]={
+    0, 1, 2, 3, 4, 5, 6, 7 };
+  QuadraticPolygon *pol1=buildQuadraticPolygonCoarseInfo(coords,tab8,8);
+  QuadraticPolygon *pol2=buildQuadraticPolygonCoarseInfo(coords2,tab8,8);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.22089323345553233,pol1->intersectWith(*pol2),1.e-13);
+  delete pol1;
+  delete pol2;
+  pol1=buildQuadraticPolygonCoarseInfo(coords,tab8,8);
+  pol2=buildQuadraticPolygonCoarseInfo(coords2,tab8,8);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.22089323345553233,pol2->intersectWith(*pol1),1.e-13);
+  delete pol1;
+  delete pol2;
+  pol1=buildQuadraticPolygonCoarseInfo(coords,tab8,8);
+  pol2=buildQuadraticPolygonCoarseInfo(coords3,tab8,8);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.22089323345553233,pol1->intersectWith(*pol2),1.e-13);
+  delete pol1;
+  delete pol2;
+  pol1=buildQuadraticPolygonCoarseInfo(coords,tab8,8);
+  pol2=buildQuadraticPolygonCoarseInfo(coords3,tab8,8);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.22089323345553233,pol2->intersectWith(*pol1),1.e-13);
   delete pol1;
   delete pol2;
 }

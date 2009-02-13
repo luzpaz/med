@@ -20,7 +20,7 @@
 #define __TU_REMAPPER_HXX__
 
 #include <cppunit/extensions/HelperMacros.h>
-#include "../Remapper.hxx"
+#include "Remapper.hxx"
 #include "MEDMEM_Field.hxx"
 
 namespace INTERP_TEST
@@ -46,8 +46,8 @@ namespace INTERP_TEST
     // tests
     void test_Remapper();
 
-	private:
-		void absField(MEDMEM::FIELD<double>&);
+  private:
+    void absField(MEDMEM::FIELD<double>&);
   };
 
 

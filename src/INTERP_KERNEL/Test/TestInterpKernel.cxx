@@ -18,6 +18,7 @@
 //
 #include "CppUnitTest.hxx"
 #include "TransformedTriangleTest.hxx"
+#include "UnitTetraIntersectionBaryTest.hxx"
 #include "TransformedTriangleIntersectTest.hxx"
 #include "MultiElementTetraTests.hxx"
 #include "SingleElementTetraTests.hxx"
@@ -32,11 +33,13 @@
 using namespace INTERP_TEST;
 
 //--- Registers the fixture into the 'registry'
+
 CPPUNIT_TEST_SUITE_REGISTRATION( HexaTests );
 CPPUNIT_TEST_SUITE_REGISTRATION( MultiElementTetraTests );
 CPPUNIT_TEST_SUITE_REGISTRATION( SingleElementTetraTests );
 CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleIntersectTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( TransformedTriangleTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( UnitTetraIntersectionBaryTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( BBTreeTest);
 CPPUNIT_TEST_SUITE_REGISTRATION( RemapperTest);
 CPPUNIT_TEST_SUITE_REGISTRATION( PointLocatorTest);

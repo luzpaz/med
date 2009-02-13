@@ -46,8 +46,8 @@ namespace INTERP_TEST
     // tests
     void test_InterpolationOptions();
 
-	private:
-	 
+  private:
+   
   };
 
 

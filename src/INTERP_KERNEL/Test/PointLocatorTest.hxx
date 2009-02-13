@@ -20,7 +20,7 @@
 #define __TU_POINTLOCATOR_HXX__
 
 #include <cppunit/extensions/HelperMacros.h>
-#include "../PointLocator.hxx"
+#include "PointLocator.hxx"
 
 namespace INTERP_TEST
 {

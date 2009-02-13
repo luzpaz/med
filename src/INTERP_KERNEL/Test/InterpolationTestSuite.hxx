@@ -30,7 +30,7 @@ namespace INTERP_TEST
    * \brief Base class for mesh intersection test suites.
    * 
    */
-	template<int SPACEDIM, int MESHDIM>
+  template<int SPACEDIM, int MESHDIM>
   class InterpolationTestSuite : public CppUnit::TestFixture
   {
 
@@ -59,7 +59,7 @@ namespace INTERP_TEST
   protected:
     /// MeshTestToolkit object to which the tests are delegated
     MeshTestToolkit<SPACEDIM,MESHDIM>* _testTools; 
-	
+  
   };
 }
 #endif

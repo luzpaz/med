@@ -34,28 +34,28 @@ namespace INTERP_TEST
   class MultiElement2DTests : public InterpolationTestSuite<3,2>
   {
     CPPUNIT_TEST_SUITE( MultiElement3DSurfTests );
-		
-		CPPUNIT_TEST(SymetryTranspose3DSurfTest);
-		CPPUNIT_TEST(SelfIntersection3DSurfTest);
+    
+    CPPUNIT_TEST(SymetryTranspose3DSurfTest);
+    CPPUNIT_TEST(SelfIntersection3DSurfTest);
 
     CPPUNIT_TEST_SUITE_END();
 
   public:
-		void SymetryTranspose3DSurfTest()
-		{ 
-			_testTools->_intersectionType=INTERP_KERNEL::Triangulation;
-			_testTools->intersectMeshes("square1.med", "Mesh_2","square2.med","Mesh_3", 10000.);
-			_testTools->_intersectionType=INTERP_KERNEL::Convex;
-			_testTools->intersectMeshes("square1.med", "Mesh_2","square2.med","Mesh_3", 10000.);
-		}
-		void SelfIntersection3DSurfTest()
-		{ 
-			IntersectionMatrix m;
-			_testTools->_intersectionType=INTERP_KERNEL::Triangulation;
-			_testTools->calcIntersectionMatrix("square1.med", "Mesh_2","square1.med","Mesh_2", m);
-			_testTools->_intersectionType=INTERP_KERNEL::Convex;
-			_testTools->calcIntersectionMatrix("square1.med", "Mesh_2","square1.med","Mesh_2", m);
-		}
+    void SymetryTranspose3DSurfTest()
+    { 
+      _testTools->_intersectionType=INTERP_KERNEL::Triangulation;
+      _testTools->intersectMeshes("square1.med", "Mesh_2","square2.med","Mesh_3", 10000.);
+      _testTools->_intersectionType=INTERP_KERNEL::Convex;
+      _testTools->intersectMeshes("square1.med", "Mesh_2","square2.med","Mesh_3", 10000.);
+    }
+    void SelfIntersection3DSurfTest()
+    { 
+      IntersectionMatrix m;
+      _testTools->_intersectionType=INTERP_KERNEL::Triangulation;
+      _testTools->calcIntersectionMatrix("square1.med", "Mesh_2","square1.med","Mesh_2", m);
+      _testTools->_intersectionType=INTERP_KERNEL::Convex;
+      _testTools->calcIntersectionMatrix("square1.med", "Mesh_2","square1.med","Mesh_2", m);
+    }
   };
 }
 

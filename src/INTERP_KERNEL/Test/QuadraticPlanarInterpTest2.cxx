@@ -83,7 +83,7 @@ void QuadraticPlanarInterpTest::IntersectArcCircleBase()
   CPPUNIT_ASSERT_DOUBLES_EQUAL(e1->getBounds()[3],center[1]+radius*sin(7*M_PI/4),ADMISSIBLE_ERROR);
   e1->decrRef();
   //
-   e1=buildArcOfCircle(center,radius,7.*M_PI/4.,15.*M_PI/8.);
+  e1=buildArcOfCircle(center,radius,7.*M_PI/4.,15.*M_PI/8.);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(e1->getBounds()[0],center[0]+radius*cos(7*M_PI/4),ADMISSIBLE_ERROR);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(e1->getBounds()[1],center[0]+radius*cos(15*M_PI/8),ADMISSIBLE_ERROR);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(e1->getBounds()[2],center[1]+radius*sin(7*M_PI/4),ADMISSIBLE_ERROR);
@@ -240,7 +240,7 @@ void QuadraticPlanarInterpTest::IntersectArcCircleBase()
       CPPUNIT_ASSERT(!v4[0]->isEqual(*v4[1]));
       CPPUNIT_ASSERT_DOUBLES_EQUAL(btw2NodesAndACenter(*v4[0],*v4[1],e1->getCenter()),0.6793851523346941,1e-10);
       for(vector<Node *>::iterator iter=v4.begin();iter!=v4.end();iter++)
-	(*iter)->decrRef();
+        (*iter)->decrRef();
       v4.clear(); v3.clear();
       delete intersector; e2->decrRef(); e1->decrRef();
     }
@@ -418,7 +418,7 @@ void QuadraticPlanarInterpTest::IntersectArcCircleBase()
       v4[0]->decrRef();
       v4.clear(); v3.clear();
       delete intersector; e2->decrRef(); e1->decrRef();
-      }
+    }
   // Extremities # 3
   for(unsigned k=0;k<8;k++)
     {
@@ -447,7 +447,7 @@ void QuadraticPlanarInterpTest::IntersectArcCircleBase()
       double angle=k*M_PI/4.-0.17793931986099812;
       angle=angle>M_PI?angle-2.*M_PI:angle;
       e1=new EdgeArcCircle(nodeS,nodeE,//Problem of precision 1e-14 to easily reached.
-			   center,3.,angle,0.17793931986099812);
+                           center,3.,angle,0.17793931986099812);
       nodeS->decrRef(); nodeE->decrRef();
       e2=buildArcOfCircle(center2,1.,M_PI+k*M_PI/4.+0.7,M_PI+k*M_PI/4.-0.7);
       intersector=new ArcCArcCIntersector(*e1,*e2);
@@ -471,7 +471,7 @@ void QuadraticPlanarInterpTest::IntersectArcCircleBase()
       double angle=k*M_PI/4.-0.17793931986099812;
       angle=angle>M_PI?angle-2.*M_PI:angle;
       e1=new EdgeArcCircle(nodeS,nodeE,//Problem of precision 1e-14 to easily reached.
-			   center,3.,angle,0.67793931986099812);
+                           center,3.,angle,0.67793931986099812);
       nodeS->decrRef(); nodeE->decrRef();
       e2=buildArcOfCircle(center2,1.,M_PI+k*M_PI/4.+0.7,M_PI+k*M_PI/4.-0.7);
       intersector=new ArcCArcCIntersector(*e1,*e2);
@@ -602,7 +602,7 @@ void QuadraticPlanarInterpTest::IntersectArcCircleSegumentBase()
   double center[2]={2.,2.};
   EdgeArcCircle *e1=buildArcOfCircle(center,2.3,M_PI/4.,5.*M_PI/4.);
   EdgeLin *e2=new EdgeLin(-1.3,1.,3.,5.3);
-  Intersector *intersector=new ArcCSegIntersector(*e1,*e2);
+  EdgeIntersector *intersector=new ArcCSegIntersector(*e1,*e2);
   bool order;
   bool obvious,areOverlapped;
   intersector->areOverlappedOrOnlyColinears(0,obvious,areOverlapped);
@@ -637,12 +637,20 @@ void QuadraticPlanarInterpTest::IntersectArcCircleSegumentBase()
   e1->decrRef();
 }
 
+QuadraticPolygon *QuadraticPlanarInterpTest::buildQuadraticPolygonCoarseInfo(const double *coords, const int *conn, int lgth)
+{
+  vector<INTERP_KERNEL::Node *> nodes;
+  for(int i=0;i<lgth;i++)
+    nodes.push_back(new INTERP_KERNEL::Node(coords[2*conn[i]],coords[2*conn[i]+1]));
+  return INTERP_KERNEL::QuadraticPolygon::buildArcCirclePolygon(nodes);
+}
+
 EdgeArcCircle *QuadraticPlanarInterpTest::buildArcOfCircle(const double *center, double radius, double alphaStart, double alphaEnd)
 {
   double alphaM=(alphaStart+alphaEnd)/2;
   return new EdgeArcCircle(center[0]+cos(alphaStart)*radius,center[1]+sin(alphaStart)*radius,
-			   center[0]+cos(alphaM)*radius,center[1]+sin(alphaM)*radius,
-			   center[0]+cos(alphaEnd)*radius,center[1]+sin(alphaEnd)*radius);
+                           center[0]+cos(alphaM)*radius,center[1]+sin(alphaM)*radius,
+                           center[0]+cos(alphaEnd)*radius,center[1]+sin(alphaEnd)*radius);
 }
 
 double QuadraticPlanarInterpTest::btw2NodesAndACenter(const Node& n1, const Node& n2, const double *center)

@@ -52,10 +52,10 @@ double Interpolation3DTest::sumRow(const IntersectionMatrix& m, int i) const
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
     {
       if(iter->count(i) != 0.0)
-	{
-	  map<int, double>::const_iterator iter2 = iter->find(i);
-	  vol += iter2->second;
-	}
+        {
+          map<int, double>::const_iterator iter2 = iter->find(i);
+          vol += iter2->second;
+        }
     }
   return vol;
 }
@@ -72,12 +72,13 @@ double Interpolation3DTest::sumCol(const IntersectionMatrix& m, int i) const
 }
 
 
-void Interpolation3DTest::getVolumes(MESH& mesh, const double*& tab) const
+void Interpolation3DTest::getVolumes(MESH& mesh, double* tab) const
 {
   SUPPORT *sup=new SUPPORT(&mesh,"dummy",MED_CELL);
   FIELD<double>* f=mesh.getVolume(sup);
-  tab = f->getValue();
-  delete sup;
+  const double *tabS=f->getValue();
+  std::copy(tabS,tabS+mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS),tab)
+    delete sup;
 }
 
 double Interpolation3DTest::sumVolume(const IntersectionMatrix& m) const
@@ -87,10 +88,10 @@ double Interpolation3DTest::sumVolume(const IntersectionMatrix& m) const
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  volumes.push_back(iter2->second);
-	  //	  vol += std::abs(iter2->second);
-	}
+        {
+          volumes.push_back(iter2->second);
+          //    vol += std::abs(iter2->second);
+        }
     }
   
   // sum in ascending order to avoid rounding errors
@@ -106,31 +107,31 @@ bool Interpolation3DTest::testVolumes(const IntersectionMatrix& m,  MESH& sMesh,
   bool ok = true;
 
   // source elements
-  const double* sVol = new double[sMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)];
+  double* sVol = new double[sMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)];
   getVolumes(sMesh, sVol);
 
   for(int i = 0; i < sMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS); ++i)
     {
       const double sum_row = sumRow(m, i+1);
       if(!epsilonEqualRelative(sum_row, sVol[i], VOL_PREC))
-	{
-	  LOG(1, "Source volume inconsistent : vol of cell " << i << " = " << sVol[i] << " but the row sum is " << sum_row );
-	  ok = false;
-	}
+        {
+          LOG(1, "Source volume inconsistent : vol of cell " << i << " = " << sVol[i] << " but the row sum is " << sum_row );
+          ok = false;
+        }
       LOG(1, "diff = " <<sum_row - sVol[i] );
     }
 
   // target elements
-  const double* tVol = new double[tMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)];
+  double* tVol = new double[tMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)];
   getVolumes(tMesh, tVol);
   for(int i = 0; i < tMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS); ++i)
     {
       const double sum_col = sumCol(m, i);
       if(!epsilonEqualRelative(sum_col, tVol[i], VOL_PREC))
-	{
-	  LOG(1, "Target volume inconsistent : vol of cell " << i << " = " << tVol[i] << " but the col sum is " << sum_col);
-	  ok = false;
-	}
+        {
+          LOG(1, "Target volume inconsistent : vol of cell " << i << " = " << tVol[i] << " but the col sum is " << sum_col);
+          ok = false;
+        }
       LOG(1, "diff = " <<sum_col - tVol[i] );
     }
   delete[] sVol;
@@ -146,18 +147,18 @@ bool Interpolation3DTest::areCompatitable(const IntersectionMatrix& m1, const In
   for(IntersectionMatrix::const_iterator iter = m1.begin() ; iter != m1.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  int j = iter2->first;
-	  if(m2.at(j-1).count(i+1) == 0)
-	    {
-	      if(!epsilonEqual(iter2->second, 0.0, VOL_PREC))
-		{
-		  LOG(2, "V1( " << i << ", " << j << ") exists, but V2( " << j - 1 << ", " << i + 1 << ") " << " does not " );
-		  LOG(2, "(" << i << ", " << j << ") fails");
-		  compatitable = false;
-		}
-	    }
-	}
+        {
+          int j = iter2->first;
+          if(m2.at(j-1).count(i+1) == 0)
+            {
+              if(!epsilonEqual(iter2->second, 0.0, VOL_PREC))
+                {
+                  LOG(2, "V1( " << i << ", " << j << ") exists, but V2( " << j - 1 << ", " << i + 1 << ") " << " does not " );
+                  LOG(2, "(" << i << ", " << j << ") fails");
+                  compatitable = false;
+                }
+            }
+        }
       ++i;
     }
   if(!compatitable)
@@ -166,7 +167,7 @@ bool Interpolation3DTest::areCompatitable(const IntersectionMatrix& m1, const In
     }
   return compatitable;
 }
-	    
+      
 bool Interpolation3DTest::testSymmetric(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const
 {
 
@@ -178,33 +179,33 @@ bool Interpolation3DTest::testSymmetric(const IntersectionMatrix& m1, const Inte
   LOG(1, "Checking symmetry target - src" );
   isSymmetric = isSymmetric & areCompatitable(m2, m1);
 
- for(IntersectionMatrix::const_iterator iter = m1.begin() ; iter != m1.end() ; ++iter)
+  for(IntersectionMatrix::const_iterator iter = m1.begin() ; iter != m1.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  int j = iter2->first;
-	  const double v1 = iter2->second;
-	  //if(m2[j - 1].count(i+1) > 0)
-	  //  {
-	  map<int, double> theMap =  m2.at(j-1);
-	  const double v2 = theMap[i + 1];
-	  if(v1 != v2)
-	    {
-	      LOG(2, "V1( " << i << ", " << j << ") = " << v1 << " which is different from V2( " << j - 1 << ", " << i + 1 << ") = " << v2 << " | diff = " << v1 - v2 );
-	      if(!epsilonEqualRelative(v1, v2, VOL_PREC))
-		{
-		  LOG(2, "(" << i << ", " << j << ") fails");
-		  isSymmetric = false;
-		}
-	    }
-	}
+        {
+          int j = iter2->first;
+          const double v1 = iter2->second;
+          //if(m2[j - 1].count(i+1) > 0)
+          //  {
+          map<int, double> theMap =  m2.at(j-1);
+          const double v2 = theMap[i + 1];
+          if(v1 != v2)
+            {
+              LOG(2, "V1( " << i << ", " << j << ") = " << v1 << " which is different from V2( " << j - 1 << ", " << i + 1 << ") = " << v2 << " | diff = " << v1 - v2 );
+              if(!epsilonEqualRelative(v1, v2, VOL_PREC))
+                {
+                  LOG(2, "(" << i << ", " << j << ") fails");
+                  isSymmetric = false;
+                }
+            }
+        }
       ++i;
     }
- if(!isSymmetric)
-   {
-     LOG(1, "*** matrices are not symmetric");
-   }
- return isSymmetric;
+  if(!isSymmetric)
+    {
+      LOG(1, "*** matrices are not symmetric");
+    }
+  return isSymmetric;
 }
 
 bool Interpolation3DTest::testDiagonal(const IntersectionMatrix& m) const
@@ -215,19 +216,19 @@ bool Interpolation3DTest::testDiagonal(const IntersectionMatrix& m) const
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  int j = iter2->first;
-	  const double vol = iter2->second;
-	  if(vol != 0.0 && (i != j))
-	    {
-	      LOG(2, "V( " << i - 1 << ", " << j << ") = " << vol << " which is not zero" );
-	      if(!epsilonEqual(vol, 0.0, VOL_PREC))
-		{
-		  LOG(2, "(" << i << ", " << j << ") fails");
-		  isDiagonal = false;
-		}
-	    }
-	}
+        {
+          int j = iter2->first;
+          const double vol = iter2->second;
+          if(vol != 0.0 && (i != j))
+            {
+              LOG(2, "V( " << i - 1 << ", " << j << ") = " << vol << " which is not zero" );
+              if(!epsilonEqual(vol, 0.0, VOL_PREC))
+                {
+                  LOG(2, "(" << i << ", " << j << ") fails");
+                  isDiagonal = false;
+                }
+            }
+        }
       ++i;
     }
   if(!isDiagonal)
@@ -244,11 +245,11 @@ void Interpolation3DTest::dumpIntersectionMatrix(const IntersectionMatrix& m) co
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  
-	  std::cout << "V(" << i << ", " << iter2->first << ") = " << iter2->second << endl;
-	  
-	}
+        {
+    
+          std::cout << "V(" << i << ", " << iter2->first << ") = " << iter2->second << endl;
+    
+        }
       ++i;
     }
   std::cout << "Sum of volumes = " << sumVolume(m) << std::endl;
@@ -317,9 +318,9 @@ void Interpolation3DTest::intersectMeshes(const char* mesh1path, const char* mes
       CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(correctVol, vol1));
 
       if(isTestReflexive)
-	{
-	  CPPUNIT_ASSERT_EQUAL_MESSAGE("Reflexive test failed", true, testDiagonal(matrix1));
-	}
+        {
+          CPPUNIT_ASSERT_EQUAL_MESSAGE("Reflexive test failed", true, testDiagonal(matrix1));
+        }
     }
   else
     {

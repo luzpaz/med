@@ -24,7 +24,6 @@
 
 #include "MEDMEM_Mesh.hxx"
 #include "MEDNormalizedUnstructuredMesh.hxx"
-#include "MEDNormalizedUnstructuredMesh.txx"
 
 #include <cassert>
 #include <string>
@@ -74,27 +73,22 @@ namespace INTERP_TEST
       
       LOG(5, "Loading " << mesh1 << " from " << mesh1path);
       const MESH sMesh(MED_DRIVER, dataDir+mesh1path, mesh1);
-      const int numSrcElems = sMesh.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
-      LOG(1, "Source mesh has " << numSrcElems << " elements");
     
     
       LOG(5, "Loading " << mesh2 << " from " << mesh2path);
       const MESH tMesh(MED_DRIVER, dataDir+mesh2path, mesh2);
-      const int numTargetElems = tMesh.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
-    
-      LOG(1, "Target mesh has " << numTargetElems << " elements");
-			
-			MEDNormalizedUnstructuredMesh<3,3> sMesh_wrapper(&sMesh);
-			MEDNormalizedUnstructuredMesh<3,3> tMesh_wrapper(&tMesh);
-			
-			Interpolation3D interpolator;
-      interpolator.interpolateMeshes(sMesh_wrapper, tMesh_wrapper,m);
+      
+      MEDNormalizedUnstructuredMesh<3,3> sMesh_wrapper(&sMesh);
+      MEDNormalizedUnstructuredMesh<3,3> tMesh_wrapper(&tMesh);
+      
+      Interpolation3D interpolator;
+      interpolator.interpolateMeshes(sMesh_wrapper, tMesh_wrapper,m,"P0P0");
     
       std::pair<int, int> eff = countNumberOfMatrixEntries(m);
       LOG(1, eff.first << " of " << numTargetElems * numSrcElems << " intersections calculated : ratio = " 
-	  << double(eff.first) / double(numTargetElems * numSrcElems));
+          << double(eff.first) / double(numTargetElems * numSrcElems));
       LOG(1, eff.second << " non-zero elements of " << eff.first << " total : filter efficiency = " 
-	  << double(eff.second) / double(eff.first));
+          << double(eff.second) / double(eff.first));
     
       LOG(1, "Intersection calculation done. " << std::endl );
     
@@ -113,18 +107,18 @@ namespace INTERP_TEST
       int numElems = 0;
       int numNonZero = 0;
       for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
-	{
-	  numElems += iter->size();
-	  for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	    {
-	      if(!INTERP_KERNEL::epsilonEqual(iter2->second, 0.0, VOL_PREC))
-		{
-		  ++numNonZero;
-		}
-	    }
-	}
+        {
+          numElems += iter->size();
+          for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
+            {
+              if(!INTERP_KERNEL::epsilonEqual(iter2->second, 0.0, VOL_PREC))
+                {
+                  ++numNonZero;
+                }
+            }
+        }
       return std::make_pair(numElems, numNonZero);
-  }
+    }
     
   };
 }

@@ -21,28 +21,20 @@
 
 #include "Log.hxx"
 
-#ifdef OPTIMIZE
 /// macro to test for zero double products outside the segment-edge intersection test method
 /// as is done in TransformedTriangle when OPTIMIZE is defined
 #define TEST_ZERO_DP_EDGE(seg, edge) isZero[TT::NO_DP*int(seg) + int(DoubleProduct(edge))]
 
 /// macro to test for zero double products outside the segment-corner intersection test method
 /// as is done in TransformedTriangle when OPTIMIZE is defined
-#define TEST_ZERO_DP_CORNER(seg, corner) \
-isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner] )] && \
-isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner+1] )] && \
-isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner+2] )]
+#define TEST_ZERO_DP_CORNER(seg, corner)                                \
+  isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner] )] && \
+  isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner+1] )] && \
+  isZero[DoubleProduct(TT::NO_DP*int(seg) +  TT::EDGES_FOR_CORNER[3*corner+2] )]
 
 /// macro to test for zero double products outside the segment-ray intersection test method
 /// as is done in TransformedTriangle when OPTIMIZE is defined
 #define TEST_ZERO_DP_RAY(seg, corner) isZero[TT::NO_DP*int(seg) + TT::DP_SEGMENT_RAY_INTERSECTION[7*(corner-1)]]
-
-#else
-
-#define TEST_ZERO_DP_EDGE(seg, edge) true
-#define TEST_ZERO_DP_CORNER(seg, corner) true
-#define TEST_ZERO_DP_RAY(seg, corner) true
-#endif
 
 using namespace INTERP_KERNEL;
 
@@ -146,9 +138,9 @@ namespace INTERP_TEST
 
     double coords[9] = 
       {
-	0.4,-0.5, 0.5, // P
-	0.4, 2.5,-1.0, // Q
-	0.4, 2.5, 0.5  // R
+        0.4,-0.5, 0.5, // P
+        0.4, 2.5,-1.0, // Q
+        0.4, 2.5, 0.5  // R
       };
 
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -157,18 +149,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
@@ -271,7 +261,7 @@ namespace INTERP_TEST
     CPPUNIT_ASSERT_EQUAL(false, tri->testSurfaceEdgeIntersection(TT::OZ));
     CPPUNIT_ASSERT_EQUAL(false, tri->testSurfaceEdgeIntersection(TT::YZ));
     CPPUNIT_ASSERT_EQUAL(false, tri->testSurfaceEdgeIntersection(TT::ZX));
-    CPPUNIT_ASSERT_EQUAL(true , tri->testSurfaceEdgeIntersection(TT::XY));
+    CPPUNIT_ASSERT(tri->testSurfaceEdgeIntersection(TT::XY));
 
     // surface-ray (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testSurfaceRayIntersection(TT::X));
@@ -303,9 +293,9 @@ namespace INTERP_TEST
 
     double coords[9] =
       {
-	-0.5, 0.5, 0.25, // P
-	1.5, 0.5,-0.25, // Q
-	-0.5,-1.5, 0.75  // R
+        -0.5, 0.5, 0.25, // P
+        1.5, 0.5,-0.25, // Q
+        -0.5,-1.5, 0.75  // R
       };
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
 
@@ -313,18 +303,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
@@ -458,9 +446,9 @@ namespace INTERP_TEST
 
     double coords[9] =
       {
-	0.35, 0.15, 0.1, // P
-	0.8, 0.8, 0.8,  // Q
-	-0.4, 0.3, 0.9   // R
+        0.35, 0.15, 0.1, // P
+        0.8, 0.8, 0.8,  // Q
+        -0.4, 0.3, 0.9   // R
       };
 
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -469,20 +457,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-  
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
-
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(true , tri->testCornerInTetrahedron(TT::P));
@@ -616,9 +600,9 @@ namespace INTERP_TEST
 
     double coords[9] =
       {
-	0.3, 0.3, 1.8,  // P
-	0.75, 0.1, 0.1,  // Q
-	0.2, -1.3, -1.4   // R
+        0.3, 0.3, 1.8,  // P
+        0.75, 0.1, 0.1,  // Q
+        0.2, -1.3, -1.4   // R
       };
 
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -626,19 +610,17 @@ namespace INTERP_TEST
     // run all intersection tests and ensure that the ones
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
-
-#ifdef OPTIMIZE  
+  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
@@ -774,9 +756,9 @@ namespace INTERP_TEST
 
     double coords[9] =
       {
-	-0.5, 0.5, 2.3,  // P
-	0.5, 1.5, 2.8,  // Q
-	0.5, -2.6, 1.3   // R
+        -0.5, 0.5, 2.3,  // P
+        0.5, 1.5, 2.8,  // Q
+        0.5, -2.6, 1.3   // R
       };
 
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -785,18 +767,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
@@ -931,9 +911,9 @@ namespace INTERP_TEST
   
     double coords[9] =
       {
-	1.5, 0.5, 1.35,  // P
-	0.5, -0.5, 2.1,  // Q
-	-3.0, 3.0, -0.5   // R
+        1.5, 0.5, 1.35,  // P
+        0.5, -0.5, 2.1,  // Q
+        -3.0, 3.0, -0.5   // R
       };
   
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -942,18 +922,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
@@ -1088,9 +1066,9 @@ namespace INTERP_TEST
 
     double coords[9] =
       {
-	-2.3, -1.5, -2.5,  // P
-	3.1, 0.15, 0.8,  // Q
-	0.3, 0.4, 0.2   // R
+        -2.3, -1.5, -2.5,  // P
+        3.1, 0.15, 0.8,  // Q
+        0.3, 0.4, 0.2   // R
       };
 
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -1099,18 +1077,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
@@ -1245,9 +1221,9 @@ namespace INTERP_TEST
 
     double coords[9] =
       {
-	-0.75, 3.25, -1.5,  // P
-	0.25, 0.25, 0.5,  // Q
-	-0.1, -0.4, 0.9   // R
+        -0.75, 3.25, -1.5,  // P
+        0.25, 0.25, 0.5,  // Q
+        -0.1, -0.4, 0.9   // R
       };
 
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -1256,18 +1232,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
@@ -1401,9 +1375,9 @@ namespace INTERP_TEST
 
     double coords[9] =
       {
-	0.6, 0.2, 0.2,  // P
-	0.3, -0.2, 0.8,  // Q
-	0.1, 0.2, 0.8   // R
+        0.6, 0.2, 0.2,  // P
+        0.3, -0.2, 0.8,  // Q
+        0.1, 0.2, 0.8   // R
       };
 
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -1412,18 +1386,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(true , tri->testCornerInTetrahedron(TT::P));
@@ -1558,9 +1530,9 @@ namespace INTERP_TEST
 
     double coords[9] =
       {
-	-0.1, 0.3, 0.6,  // P
-	0.1, 0.1, 1.0,  // Q
-	0.4, 0.3, 0.3   // R
+        -0.1, 0.3, 0.6,  // P
+        0.1, 0.1, 1.0,  // Q
+        0.4, 0.3, 0.3   // R
       };
 
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -1569,18 +1541,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
@@ -1714,9 +1684,9 @@ namespace INTERP_TEST
   
     double coords[9] =
       {
-	-0.2, -0.2, -0.2,  // P
-	0.2, 0.1, 0.1,  // Q
-	0.3, 0.3, 0.3   // R
+        -0.2, -0.2, -0.2,  // P
+        0.2, 0.1, 0.1,  // Q
+        0.3, 0.3, 0.3   // R
       };
   
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -1725,18 +1695,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
@@ -1871,9 +1839,9 @@ namespace INTERP_TEST
 
     double coords[9] =
       {
-	-0.2, 0.2, 0.2,  // P
-	0.2, -0.2, 0.3,  // Q
-	0.6, 0.6, -0.6   // R
+        -0.2, 0.2, 0.2,  // P
+        0.2, -0.2, 0.3,  // Q
+        0.6, 0.6, -0.6   // R
       };
 
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -1882,18 +1850,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));
@@ -2027,9 +1993,9 @@ namespace INTERP_TEST
 
     double coords[9] =
       {
-	-0.2, 0.3, 5.0,  // P
-	0.2, 0.1, -1.0,  // Q
-	-0.2, -0.1, 3.0   // R
+        -0.2, 0.3, 5.0,  // P
+        0.2, 0.1, -1.0,  // Q
+        -0.2, -0.1, 3.0   // R
       };
 
     TransformedTriangle* tri = new TransformedTriangle(&coords[0], &coords[3], &coords[6]);
@@ -2038,18 +2004,16 @@ namespace INTERP_TEST
     // listed with yes in the tables above return true and 
     // that the ones listed with no or not listed at all return false
 
-#ifdef OPTIMIZE  
     bool isZero[TT::NO_TRI_SEGMENT * TT::NO_DP];
   
     for(TriSegment seg = TT::PQ ; seg < TT::NO_TRI_SEGMENT ; seg = TT::TriSegment(seg + 1))
       {
-	// check beforehand which double-products are zero
-	for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
-	  {
-	    isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
-	  }
+        // check beforehand which double-products are zero
+        for(DoubleProduct dp = TT::C_YZ; dp < TT::NO_DP; dp = DoubleProduct(dp + 1))
+          {
+            isZero[TT::NO_DP*int(seg) + int(dp)] = (tri->calcStableC(seg, dp) == 0.0);
+          }
       }
-#endif
 
     // corner in tetrahedron (3 possibilities)
     CPPUNIT_ASSERT_EQUAL(false, tri->testCornerInTetrahedron(TT::P));

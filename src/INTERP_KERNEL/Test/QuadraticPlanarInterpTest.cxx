@@ -214,7 +214,7 @@ void QuadraticPlanarInterpTest::IntersectionEdgeOverlapUnitarySegSeg()
   ComposedEdge& v2=*(new ComposedEdge);
   MergePoints v3;
   //Testing merge of geometric equals seg2.
-  EdgeLin *e1=new EdgeLin(0.5,0.5,1.,1.); EdgeLin *e2=new EdgeLin(0.5,0.5,1.,1.);
+  Edge *e1=new EdgeLin(0.5,0.5,1.,1.); Edge *e2=new EdgeLin(0.5,0.5,1.,1.);
   CPPUNIT_ASSERT(e1->intersectWith(e2,v3,v1,v2));
   CPPUNIT_ASSERT_EQUAL(2,(int)v3.getNumberOfAssociations());
   CPPUNIT_ASSERT_EQUAL(1,(int)v1.size()); CPPUNIT_ASSERT_EQUAL(1,(int)v2.size());
@@ -349,6 +349,84 @@ void QuadraticPlanarInterpTest::IntersectionEdgeOverlapUnitarySegSeg()
   CPPUNIT_ASSERT(v1[0]->getEndNode()==e2->getEndNode()); CPPUNIT_ASSERT(v1[1]->getEndNode()==e2->getStartNode());
   CPPUNIT_ASSERT(e1->getStartNode()==v1.front()->getStartNode() && e1->getEndNode()==v1.back()->getEndNode());
   CPPUNIT_ASSERT(e2->getStartNode()==v2.front()->getStartNode() && e2->getEndNode()==v2.back()->getEndNode());
+  e2->decrRef(); e1->decrRef();
+  v1.clear(); v2.clear(); v3.clear();
+  //Test 3bis - INSIDE - INSIDE - Bis | opp dir.
+  double center[2]={0.,0.};
+  double radius=1.;
+  e1=buildArcOfCircle(center,radius,-M_PI,0); e2=buildArcOfCircle(center,radius,-2*M_PI/3.+2*M_PI,-M_PI/3.);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,e1->getCurveLength(),1e-12); CPPUNIT_ASSERT_DOUBLES_EQUAL(5.*M_PI/3.,e2->getCurveLength(),1e-12);// To check that in the previous line +2.M_PI has done its job.
+  CPPUNIT_ASSERT(e1->intersectWith(e2,v3,v1,v2));
+  CPPUNIT_ASSERT_EQUAL(0,(int)v3.getNumberOfAssociations());
+  CPPUNIT_ASSERT_EQUAL(3,(int)v1.size());
+  CPPUNIT_ASSERT_EQUAL(3,(int)v2.size());
+  CPPUNIT_ASSERT(v1[0]->intresincEqCoarse(v2[0]->getPtr())); CPPUNIT_ASSERT(v1[0]->getDirection()); CPPUNIT_ASSERT(!v2[0]->getDirection());
+  CPPUNIT_ASSERT(v1[2]->intresincEqCoarse(v2[2]->getPtr())); CPPUNIT_ASSERT(v1[2]->getDirection()); CPPUNIT_ASSERT(!v2[2]->getDirection());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,v2[1]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI/3.,v1[1]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT(v2[1]->getStartNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v2[1]->getEndNode()==e1->getEndNode());
+  CPPUNIT_ASSERT(v1[0]->getStartNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[0]->getEndNode()==e2->getStartNode());
+  CPPUNIT_ASSERT(v1[1]->getStartNode()==e2->getStartNode());
+  CPPUNIT_ASSERT(v1[1]->getEndNode()==e2->getEndNode());
+  e2->decrRef(); e1->decrRef();
+  v1.clear(); v2.clear(); v3.clear();
+  //Test 3bis - INSIDE - INSIDE - Bis | same dir.
+  e1=buildArcOfCircle(center,radius,-M_PI,0); e2=buildArcOfCircle(center,radius,-M_PI/3.,-2*M_PI/3.+2*M_PI);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,e1->getCurveLength(),1e-12); CPPUNIT_ASSERT_DOUBLES_EQUAL(5.*M_PI/3.,e2->getCurveLength(),1e-12);// To check that in the previous line +2.M_PI has done its job.
+  CPPUNIT_ASSERT(e1->intersectWith(e2,v3,v1,v2));
+  CPPUNIT_ASSERT_EQUAL(0,(int)v3.getNumberOfAssociations());
+  CPPUNIT_ASSERT_EQUAL(3,(int)v1.size());
+  CPPUNIT_ASSERT_EQUAL(3,(int)v2.size());
+  CPPUNIT_ASSERT(v1[0]->intresincEqCoarse(v2[2]->getPtr())); CPPUNIT_ASSERT(v1[0]->getDirection()); CPPUNIT_ASSERT(v2[2]->getDirection());
+  CPPUNIT_ASSERT(v1[2]->intresincEqCoarse(v2[0]->getPtr())); CPPUNIT_ASSERT(v1[2]->getDirection()); CPPUNIT_ASSERT(v2[0]->getDirection());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,v2[1]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI/3.,v1[1]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT(v2[1]->getStartNode()==e1->getEndNode());
+  CPPUNIT_ASSERT(v2[1]->getEndNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[0]->getStartNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[0]->getEndNode()==e2->getEndNode());
+  CPPUNIT_ASSERT(v1[1]->getStartNode()==e2->getEndNode());
+  CPPUNIT_ASSERT(v1[1]->getEndNode()==e2->getStartNode());
+  e2->decrRef(); e1->decrRef();
+  v1.clear(); v2.clear(); v3.clear();
+  //Test 3bis - INSIDE - INSIDE - Bis | opp dir. | e1<->e2 to test symetry
+  e1=buildArcOfCircle(center,radius,-M_PI,0); e2=buildArcOfCircle(center,radius,-2*M_PI/3.+2*M_PI,-M_PI/3.);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,e1->getCurveLength(),1e-12); CPPUNIT_ASSERT_DOUBLES_EQUAL(5.*M_PI/3.,e2->getCurveLength(),1e-12);// To check that in the previous line +2.M_PI has done its job.
+  CPPUNIT_ASSERT(e2->intersectWith(e1,v3,v2,v1));
+  CPPUNIT_ASSERT_EQUAL(0,(int)v3.getNumberOfAssociations());
+  CPPUNIT_ASSERT_EQUAL(3,(int)v1.size());
+  CPPUNIT_ASSERT_EQUAL(3,(int)v2.size());
+  CPPUNIT_ASSERT(v1[0]->intresincEqCoarse(v2[0]->getPtr())); CPPUNIT_ASSERT(!v1[0]->getDirection()); CPPUNIT_ASSERT(v2[0]->getDirection());
+  CPPUNIT_ASSERT(v1[2]->intresincEqCoarse(v2[2]->getPtr())); CPPUNIT_ASSERT(!v1[2]->getDirection()); CPPUNIT_ASSERT(v2[2]->getDirection());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,v2[1]->getCurveLength(),1.e-5); // << not maximal precision because node switching 
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI/3.,v1[1]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT(v2[1]->getStartNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v2[1]->getEndNode()==e1->getEndNode());
+  CPPUNIT_ASSERT(v1[0]->getStartNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[0]->getEndNode()==e2->getStartNode());
+  CPPUNIT_ASSERT(v1[1]->getStartNode()==e2->getStartNode());
+  CPPUNIT_ASSERT(v1[1]->getEndNode()==e2->getEndNode());
+  e2->decrRef(); e1->decrRef();
+  v1.clear(); v2.clear(); v3.clear();
+  //Test 3bis - INSIDE - INSIDE - Bis | same dir. | e1<->e2 to test symetry
+  e1=buildArcOfCircle(center,radius,-M_PI,0); e2=buildArcOfCircle(center,radius,-M_PI/3.,-2*M_PI/3.+2*M_PI);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,e1->getCurveLength(),1e-12); CPPUNIT_ASSERT_DOUBLES_EQUAL(5.*M_PI/3.,e2->getCurveLength(),1e-12);// To check that in the previous line +2.M_PI has done its job.
+  CPPUNIT_ASSERT(e2->intersectWith(e1,v3,v2,v1));
+  CPPUNIT_ASSERT_EQUAL(0,(int)v3.getNumberOfAssociations());
+  CPPUNIT_ASSERT_EQUAL(3,(int)v1.size());
+  CPPUNIT_ASSERT_EQUAL(3,(int)v2.size());
+  CPPUNIT_ASSERT(v1[0]->intresincEqCoarse(v2[2]->getPtr())); CPPUNIT_ASSERT(v1[0]->getDirection()); CPPUNIT_ASSERT(v2[2]->getDirection());
+  CPPUNIT_ASSERT(v1[2]->intresincEqCoarse(v2[0]->getPtr())); CPPUNIT_ASSERT(v1[2]->getDirection()); CPPUNIT_ASSERT(v2[0]->getDirection());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,v2[1]->getCurveLength(),1.e-5); // << not maximal precision because node switching 
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI/3.,v1[1]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT(v2[1]->getStartNode()==e1->getEndNode());
+  CPPUNIT_ASSERT(v2[1]->getEndNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[0]->getStartNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[0]->getEndNode()==e2->getEndNode());
+  CPPUNIT_ASSERT(v1[1]->getStartNode()==e2->getEndNode());
+  CPPUNIT_ASSERT(v1[1]->getEndNode()==e2->getStartNode());
   e2->decrRef(); e1->decrRef();
   v1.clear(); v2.clear(); v3.clear();
   //Test 4 - OUT_BEFORE - OUT_BEFORE | same dir. - 0 °
@@ -741,6 +819,76 @@ void QuadraticPlanarInterpTest::IntersectionEdgeOverlapUnitarySegSeg()
   CPPUNIT_ASSERT(e2->getStartNode()==v2.front()->getStartNode() && e2->getEndNode()==v2.back()->getEndNode());
   e2->decrRef(); e1->decrRef();
   v1.clear(); v2.clear(); v3.clear();
+  //Test 14 - INSIDE - START | same dir.
+  e1=buildArcOfCircle(center,radius,-M_PI,2.*M_PI); e2=buildArcOfCircle(center,radius,M_PI/3.,-M_PI);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,e1->getCurveLength(),1e-12); CPPUNIT_ASSERT_DOUBLES_EQUAL(4.*M_PI/3.,e2->getCurveLength(),1e-12);
+  CPPUNIT_ASSERT(e1->intersectWith(e2,v3,v1,v2));
+  CPPUNIT_ASSERT_EQUAL(1,(int)v3.getNumberOfAssociations());
+  CPPUNIT_ASSERT_EQUAL(2,(int)v1.size());
+  CPPUNIT_ASSERT_EQUAL(2,(int)v2.size());
+  CPPUNIT_ASSERT(v1[1]->intresicEqual(v2[0]));
+  CPPUNIT_ASSERT(v2[1]->getEndNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[0]->getStartNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[1]->getEndNode()==e1->getEndNode());
+  CPPUNIT_ASSERT(v2[1]->getStartNode()==e1->getEndNode());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(2*M_PI/3.,v1[0]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI/3.,v2[0]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,v2[1]->getCurveLength(),1.e-12);
+  e2->decrRef(); e1->decrRef();
+  v1.clear(); v2.clear(); v3.clear();
+  //Test 14 - INSIDE - START | opp dir.
+  e1=buildArcOfCircle(center,radius,-M_PI,2.*M_PI); e2=buildArcOfCircle(center,radius,-M_PI,M_PI/3.);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,e1->getCurveLength(),1e-12); CPPUNIT_ASSERT_DOUBLES_EQUAL(4.*M_PI/3.,e2->getCurveLength(),1e-12);
+  CPPUNIT_ASSERT(e1->intersectWith(e2,v3,v1,v2));
+  CPPUNIT_ASSERT_EQUAL(1,(int)v3.getNumberOfAssociations());
+  CPPUNIT_ASSERT_EQUAL(2,(int)v1.size());
+  CPPUNIT_ASSERT_EQUAL(2,(int)v2.size());
+  CPPUNIT_ASSERT(v1[1]->intresincEqCoarse(v2[1]->getPtr()) && !v2[1]->getDirection() && v1[1]->getDirection());
+  CPPUNIT_ASSERT(v2[0]->getStartNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[0]->getStartNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[1]->getEndNode()==e1->getEndNode());
+  CPPUNIT_ASSERT(v2[1]->getStartNode()==e1->getEndNode());
+  CPPUNIT_ASSERT(v2[0]->getEndNode()==e1->getEndNode());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(2*M_PI/3.,v1[0]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI/3.,v2[1]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,v2[0]->getCurveLength(),1.e-12);
+  e2->decrRef(); e1->decrRef();
+  v1.clear(); v2.clear(); v3.clear();
+  //Test 15 - END - INSIDE | same dir.
+  e1=buildArcOfCircle(center,radius,-M_PI,2.*M_PI); e2=buildArcOfCircle(center,radius,0.,-4.*M_PI/3);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,e1->getCurveLength(),1e-12); CPPUNIT_ASSERT_DOUBLES_EQUAL(4.*M_PI/3.,e2->getCurveLength(),1e-12);
+  CPPUNIT_ASSERT(e1->intersectWith(e2,v3,v1,v2));
+  CPPUNIT_ASSERT_EQUAL(1,(int)v3.getNumberOfAssociations());
+  CPPUNIT_ASSERT_EQUAL(2,(int)v1.size());
+  CPPUNIT_ASSERT_EQUAL(2,(int)v2.size());
+  CPPUNIT_ASSERT(v1[0]->intresicEqual(v2[1]));
+  CPPUNIT_ASSERT(v2[0]->getEndNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[0]->getStartNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[1]->getEndNode()==e1->getEndNode());
+  CPPUNIT_ASSERT(v2[0]->getStartNode()==e1->getEndNode());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI/3.,v1[0]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,v2[0]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(2.*M_PI/3.,v1[1]->getCurveLength(),1.e-12);
+  e2->decrRef(); e1->decrRef();
+  v1.clear(); v2.clear(); v3.clear();
+  //Test 15 - END - INSIDE | opp dir.
+  e1=buildArcOfCircle(center,radius,-M_PI,2.*M_PI); e2=buildArcOfCircle(center,radius,-4.*M_PI/3,0.);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,e1->getCurveLength(),1e-12); CPPUNIT_ASSERT_DOUBLES_EQUAL(4.*M_PI/3.,e2->getCurveLength(),1e-12);
+  CPPUNIT_ASSERT(e1->intersectWith(e2,v3,v1,v2));
+  CPPUNIT_ASSERT_EQUAL(1,(int)v3.getNumberOfAssociations());
+  CPPUNIT_ASSERT_EQUAL(2,(int)v1.size());
+  CPPUNIT_ASSERT_EQUAL(2,(int)v2.size());
+  CPPUNIT_ASSERT(v1[0]->intresincEqCoarse(v2[0]->getPtr()) && !v2[0]->getDirection() && v1[0]->getDirection());
+  CPPUNIT_ASSERT(v2[0]->getEndNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[0]->getStartNode()==e1->getStartNode());
+  CPPUNIT_ASSERT(v1[1]->getEndNode()==e1->getEndNode());
+  CPPUNIT_ASSERT(v2[1]->getEndNode()==e1->getEndNode());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI/3.,v1[0]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(M_PI,v2[1]->getCurveLength(),1.e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(2.*M_PI/3.,v1[1]->getCurveLength(),1.e-12);
+  e2->decrRef(); e1->decrRef();
+  v1.clear(); v2.clear(); v3.clear();
+  //
   ComposedEdge::Delete(&v1);
   ComposedEdge::Delete(&v2);
 }

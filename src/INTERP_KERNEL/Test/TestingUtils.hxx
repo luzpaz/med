@@ -51,10 +51,10 @@ double sumVolume(const IntersectionMatrix& m)
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  volumes.push_back(iter2->second);
-	  //	  vol += std::fabs(iter2->second);
-	}
+        {
+          volumes.push_back(iter2->second);
+          //    vol += std::fabs(iter2->second);
+        }
     }
   
   // sum in ascending order to avoid rounding errors
@@ -74,18 +74,18 @@ bool areCompatitable(const IntersectionMatrix& m1, const IntersectionMatrix& m2)
   for(IntersectionMatrix::const_iterator iter = m1.begin() ; iter != m1.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  int j = iter2->first;
-	  if(m2.at(j-1).count(i+1) == 0)
-	    {
-	      if(!epsilonEqual(iter2->second, 0.0, VOL_PREC))
-		{
-		  LOG(2, "V1( " << i << ", " << j << ") exists, but V2( " << j - 1 << ", " << i + 1 << ") " << " does not " );
-		  LOG(2, "(" << i << ", " << j << ") fails");
-		  compatitable = false;
-		}
-	    }
-	}
+        {
+          int j = iter2->first;
+          if(m2.at(j-1).count(i+1) == 0)
+            {
+              if(!epsilonEqual(iter2->second, 0.0, VOL_PREC))
+                {
+                  LOG(2, "V1( " << i << ", " << j << ") exists, but V2( " << j - 1 << ", " << i + 1 << ") " << " does not " );
+                  LOG(2, "(" << i << ", " << j << ") fails");
+                  compatitable = false;
+                }
+            }
+        }
       ++i;
     }
   if(!compatitable)
@@ -94,7 +94,7 @@ bool areCompatitable(const IntersectionMatrix& m1, const IntersectionMatrix& m2)
     }
   return compatitable;
 }
-	    
+      
 bool testSymmetric(const IntersectionMatrix& m1, const IntersectionMatrix& m2)
 {
 
@@ -106,33 +106,33 @@ bool testSymmetric(const IntersectionMatrix& m1, const IntersectionMatrix& m2)
   LOG(1, "Checking symmetry target - src" );
   isSymmetric = isSymmetric & areCompatitable(m2, m1);
 
- for(IntersectionMatrix::const_iterator iter = m1.begin() ; iter != m1.end() ; ++iter)
+  for(IntersectionMatrix::const_iterator iter = m1.begin() ; iter != m1.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  int j = iter2->first;
-	  const double v1 = iter2->second;
-	  //if(m2[j - 1].count(i+1) > 0)
-	  //  {
-	  map<int, double> theMap =  m2.at(j-1);
-	  const double v2 = theMap[i + 1];
-	  if(v1 != v2)
-	    {
-	      LOG(2, "V1( " << i << ", " << j << ") = " << v1 << " which is different from V2( " << j - 1 << ", " << i + 1 << ") = " << v2 << " | diff = " << v1 - v2 );
-	      if(!epsilonEqualRelative(v1, v2, VOL_PREC))
-		{
-		  LOG(2, "(" << i << ", " << j << ") fails");
-		  isSymmetric = false;
-		}
-	    }
-	}
+        {
+          int j = iter2->first;
+          const double v1 = iter2->second;
+          //if(m2[j - 1].count(i+1) > 0)
+          //  {
+          map<int, double> theMap =  m2.at(j-1);
+          const double v2 = theMap[i + 1];
+          if(v1 != v2)
+            {
+              LOG(2, "V1( " << i << ", " << j << ") = " << v1 << " which is different from V2( " << j - 1 << ", " << i + 1 << ") = " << v2 << " | diff = " << v1 - v2 );
+              if(!epsilonEqualRelative(v1, v2, VOL_PREC))
+                {
+                  LOG(2, "(" << i << ", " << j << ") fails");
+                  isSymmetric = false;
+                }
+            }
+        }
       ++i;
     }
- if(!isSymmetric)
-   {
-     LOG(1, "*** matrices are not symmetric");
-   }
- return isSymmetric;
+  if(!isSymmetric)
+    {
+      LOG(1, "*** matrices are not symmetric");
+    }
+  return isSymmetric;
 }
 
 bool testDiagonal(const IntersectionMatrix& m)
@@ -143,19 +143,19 @@ bool testDiagonal(const IntersectionMatrix& m)
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  int j = iter2->first;
-	  const double vol = iter2->second;
-	  if(vol != 0.0 && (i != j))
-	    {
-	      LOG(2, "V( " << i - 1 << ", " << j << ") = " << vol << " which is not zero" );
-	      if(!epsilonEqual(vol, 0.0, VOL_PREC))
-		{
-		  LOG(2, "(" << i << ", " << j << ") fails");
-		  isDiagonal = false;
-		}
-	    }
-	}
+        {
+          int j = iter2->first;
+          const double vol = iter2->second;
+          if(vol != 0.0 && (i != j))
+            {
+              LOG(2, "V( " << i - 1 << ", " << j << ") = " << vol << " which is not zero" );
+              if(!epsilonEqual(vol, 0.0, VOL_PREC))
+                {
+                  LOG(2, "(" << i << ", " << j << ") fails");
+                  isDiagonal = false;
+                }
+            }
+        }
       ++i;
     }
   if(!isDiagonal)
@@ -174,11 +174,11 @@ void dumpIntersectionMatrix(const IntersectionMatrix& m)
   for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
     {
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  
-	  std::cout << "V(" << i << ", " << iter2->first << ") = " << iter2->second << endl;
-	  
-	}
+        {
+    
+          std::cout << "V(" << i << ", " << iter2->first << ") = " << iter2->second << endl;
+    
+        }
       ++i;
     }
   std::cout << "Sum of volumes = " << sumVolume(m) << std::endl;
@@ -193,12 +193,12 @@ std::pair<int,int> countNumberOfMatrixEntries(const IntersectionMatrix& m)
     {
       numElems += iter->size();
       for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	{
-	  if(!epsilonEqual(iter2->second, 0.0, VOL_PREC))
-	    {
-	      ++numNonZero;
-	    }
-	}
+        {
+          if(!epsilonEqual(iter2->second, 0.0, VOL_PREC))
+            {
+              ++numNonZero;
+            }
+        }
     }
   return std::make_pair(numElems, numNonZero);
 }
@@ -274,9 +274,9 @@ void intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2
       // CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(correctVol, vol1));
      
       if(isTestReflexive)
-	{
-	  // CPPUNIT_ASSERT_EQUAL_MESSAGE("Reflexive test failed", true, testDiagonal(matrix1));
-	}
+        {
+          // CPPUNIT_ASSERT_EQUAL_MESSAGE("Reflexive test failed", true, testDiagonal(matrix1));
+        }
     }
   else
     {

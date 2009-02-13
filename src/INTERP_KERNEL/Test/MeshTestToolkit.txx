@@ -65,17 +65,17 @@ namespace INTERP_TEST
    * @return the sum of the values of row i
    *
    */
-	template <int SPACEDIM, int MESHDIM>
+  template <int SPACEDIM, int MESHDIM>
   double MeshTestToolkit<SPACEDIM,MESHDIM>::sumRow(const IntersectionMatrix& m, int i) const
   {
     double vol = 0.0;
     for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
       {
-	if(iter->count(i) != 0.0)
-	  {
-	    map<int, double>::const_iterator iter2 = iter->find(i);
-	    vol += fabs(iter2->second);
-	  }
+        if(iter->count(i) != 0.0)
+          {
+            map<int, double>::const_iterator iter2 = iter->find(i);
+            vol += fabs(iter2->second);
+          }
       }
     return vol;
   }
@@ -88,14 +88,14 @@ namespace INTERP_TEST
    * @return the sum of the values of column i
    *
    */
-	template <int SPACEDIM, int MESHDIM>
+  template <int SPACEDIM, int MESHDIM>
   double MeshTestToolkit<SPACEDIM,MESHDIM>::sumCol(const IntersectionMatrix& m, int i) const
   {
     double vol = 0.0;
     const std::map<int, double>& col = m[i];
     for(map<int, double>::const_iterator iter = col.begin() ; iter != col.end() ; ++iter)
       {
-				vol += fabs(iter->second);
+        vol += fabs(iter->second);
       }
     return vol;
   }
@@ -106,22 +106,24 @@ namespace INTERP_TEST
    * @param mesh   the mesh
    * @param tab    pointer to double[no. elements of mesh] array in which to store the volumes
    */
-	template <int SPACEDIM, int MESHDIM>
-  void MeshTestToolkit<SPACEDIM,MESHDIM>::getVolumes(MEDMEM::MESH& mesh, const double*& tab) const
+  template <int SPACEDIM, int MESHDIM>
+  void MeshTestToolkit<SPACEDIM,MESHDIM>::getVolumes(MEDMEM::MESH& mesh, double* tab) const
   {
     SUPPORT *sup=new SUPPORT(&mesh,"dummy",MED_CELL);
-		FIELD<double>* f;
-		switch (MESHDIM)
-			{
-			case 2:
-				f=mesh.getArea(sup);
-				break;
-			case 3:
-				f=mesh.getVolume(sup);
-				break;
-			}
-    tab = f->getValue();
+    FIELD<double>* f;
+    switch (MESHDIM)
+      {
+      case 2:
+        f=mesh.getArea(sup);
+        break;
+      case 3:
+        f=mesh.getVolume(sup);
+        break;
+      }
+    const double *tabS = f->getValue();
+    std::copy(tabS,tabS+mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS),tab);
     delete sup;
+    delete f;
   }
 
   /**
@@ -131,24 +133,24 @@ namespace INTERP_TEST
    * @return   the sum of the elements of m
    */
 
-	template <int SPACEDIM, int MESHDIM>
-	double MeshTestToolkit<SPACEDIM,MESHDIM>::sumVolume(const IntersectionMatrix& m) const
+  template <int SPACEDIM, int MESHDIM>
+  double MeshTestToolkit<SPACEDIM,MESHDIM>::sumVolume(const IntersectionMatrix& m) const
   {
-		
+    
     vector<double> volumes;
     for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
       {
-				for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-					{
-						volumes.push_back(fabs(iter2->second));
-					}
+        for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
+          {
+            volumes.push_back(fabs(iter2->second));
+          }
       }
-		
+    
     // sum in ascending order to avoid rounding errors
-		
+    
     sort(volumes.begin(), volumes.end());
     const double vol = accumulate(volumes.begin(), volumes.end(), 0.0);
-		
+    
     return vol;
   }
 
@@ -164,38 +166,38 @@ namespace INTERP_TEST
    * @param  tMesh   the target mesh
    * @return true if the condition is verified, false if not.
    */
-	template <int SPACEDIM, int MESHDIM>
+  template <int SPACEDIM, int MESHDIM>
   bool MeshTestToolkit<SPACEDIM,MESHDIM>::testVolumes(const IntersectionMatrix& m,  MEDMEM::MESH& sMesh,  MEDMEM::MESH& tMesh) const
   {
     bool ok = true;
 
     // source elements
-    const double* sVol = new double[sMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)];
+    double* sVol = new double[sMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)];
     getVolumes(sMesh, sVol);
 
     for(int i = 0; i < sMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS); ++i)
       {
-	const double sum_row = sumRow(m, i+1);
-	if(!epsilonEqualRelative(sum_row, fabs(sVol[i]), _precision))
-	  {
-	    LOG(1, "Source volume inconsistent : vol of cell " << i << " = " << sVol[i] << " but the row sum is " << sum_row );
-	    ok = false;
-	  }
-	LOG(1, "diff = " <<sum_row - sVol[i] );
+        const double sum_row = sumRow(m, i+1);
+        if(!epsilonEqualRelative(sum_row, fabs(sVol[i]), _precision))
+          {
+            LOG(1, "Source volume inconsistent : vol of cell " << i << " = " << sVol[i] << " but the row sum is " << sum_row );
+            ok = false;
+          }
+        LOG(1, "diff = " <<sum_row - sVol[i] );
       }
 
     // target elements
-    const double* tVol = new double[tMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)];
+    double* tVol = new double[tMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)];
     getVolumes(tMesh, tVol);
     for(int i = 0; i < tMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS); ++i)
       {
-	const double sum_col = sumCol(m, i);
-	if(!epsilonEqualRelative(sum_col,fabs(tVol[i]), _precision))
-	  {
-	    LOG(1, "Target volume inconsistent : vol of cell " << i << " = " << tVol[i] << " but the col sum is " << sum_col);
-	    ok = false;
-	  }
-	LOG(1, "diff = " <<sum_col - tVol[i] );
+        const double sum_col = sumCol(m, i);
+        if(!epsilonEqualRelative(sum_col,fabs(tVol[i]), _precision))
+          {
+            LOG(1, "Target volume inconsistent : vol of cell " << i << " = " << tVol[i] << " but the col sum is " << sum_col);
+            ok = false;
+          }
+        LOG(1, "diff = " <<sum_col - tVol[i] );
       }
     delete[] sVol;
     delete[] tVol;
@@ -211,35 +213,35 @@ namespace INTERP_TEST
    *
    * @return true if for each element (i,j) of m1, the element (j,i) exists in m2, false if not.
    */
-	template <int SPACEDIM, int MESHDIM>
+  template <int SPACEDIM, int MESHDIM>
   bool MeshTestToolkit<SPACEDIM,MESHDIM>::areCompatitable(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const
   {
     bool compatitable = true;
     int i = 0;
     for(IntersectionMatrix::const_iterator iter = m1.begin() ; iter != m1.end() ; ++iter)
       {
-	for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	  {
-	    int j = iter2->first;
-	    if(m2.at(j-1).count(i+1) == 0)
-	      {
-		if(!epsilonEqual(iter2->second, 0.0, _precision))
-		  {
-		    LOG(2, "V1( " << i << ", " << j << ") exists, but V2( " << j - 1 << ", " << i + 1 << ") " << " does not " );
-		    LOG(2, "(" << i << ", " << j << ") fails");
-		    compatitable = false;
-		  }
-	      }
-	  }
-	++i;
+        for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
+          {
+            int j = iter2->first;
+            if(m2.at(j-1).count(i+1) == 0)
+              {
+                if(!epsilonEqual(iter2->second, 0.0, _precision))
+                  {
+                    LOG(2, "V1( " << i << ", " << j << ") exists, but V2( " << j - 1 << ", " << i + 1 << ") " << " does not " );
+                    LOG(2, "(" << i << ", " << j << ") fails");
+                    compatitable = false;
+                  }
+              }
+          }
+        ++i;
       }
     if(!compatitable)
       {
-	LOG(1, "*** matrices are not compatitable");
+        LOG(1, "*** matrices are not compatitable");
       }
     return compatitable;
   }
-	    
+      
   /**
    * Tests if two intersection matrices are each others' transposes.
    *
@@ -247,7 +249,7 @@ namespace INTERP_TEST
    * @param m2  the second intersection matrix
    * @return true if m1 = m2^T, false if not.
    */
-	template <int SPACEDIM, int MESHDIM>
+  template <int SPACEDIM, int MESHDIM>
   bool MeshTestToolkit<SPACEDIM,MESHDIM>::testTranspose(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const
   {
 
@@ -261,29 +263,29 @@ namespace INTERP_TEST
 
     for(IntersectionMatrix::const_iterator iter = m1.begin() ; iter != m1.end() ; ++iter)
       {
-	for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	  {
-	    int j = iter2->first;
-	    const double v1 = fabs(iter2->second);
-	    //if(m2[j - 1].count(i+1) > 0)
-	    //  {
-	    map<int, double> theMap =  m2.at(j-1);
-	    const double v2 = fabs(theMap[i + 1]); 
-	    if(v1 != v2)
-	      {
-		LOG(2, "V1( " << i << ", " << j << ") = " << v1 << " which is different from V2( " << j - 1 << ", " << i + 1 << ") = " << v2 << " | diff = " << v1 - v2 );
-		if(!epsilonEqualRelative(v1, v2, _precision))
-		  {
-		    LOG(2, "(" << i << ", " << j << ") fails");
-		    isSymmetric = false;
-		  }
-	      }
-	  }
-	++i;
+        for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
+          {
+            int j = iter2->first;
+            const double v1 = fabs(iter2->second);
+            //if(m2[j - 1].count(i+1) > 0)
+            //  {
+            map<int, double> theMap =  m2.at(j-1);
+            const double v2 = fabs(theMap[i + 1]); 
+            if(v1 != v2)
+              {
+                LOG(2, "V1( " << i << ", " << j << ") = " << v1 << " which is different from V2( " << j - 1 << ", " << i + 1 << ") = " << v2 << " | diff = " << v1 - v2 );
+                if(!epsilonEqualRelative(v1, v2, _precision))
+                  {
+                    LOG(2, "(" << i << ", " << j << ") fails");
+                    isSymmetric = false;
+                  }
+              }
+          }
+        ++i;
       }
     if(!isSymmetric)
       {
-	LOG(1, "*** matrices are not symmetric"); 
+        LOG(1, "*** matrices are not symmetric"); 
       }
     return isSymmetric;
   }
@@ -295,7 +297,7 @@ namespace INTERP_TEST
    * @return true if m is diagonal; false if not
    *
    */
-	template <int SPACEDIM, int MESHDIM>
+  template <int SPACEDIM, int MESHDIM>
   bool MeshTestToolkit<SPACEDIM,MESHDIM>::testDiagonal(const IntersectionMatrix& m) const
   {
     LOG(1, "Checking if matrix is diagonal" );
@@ -303,25 +305,25 @@ namespace INTERP_TEST
     bool isDiagonal = true;
     for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
       {
-	for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	  {
-	    int j = iter2->first;
-	    const double vol = iter2->second;
-	    if(vol != 0.0 && (i != j))
-	      {
-		LOG(2, "V( " << i - 1 << ", " << j << ") = " << vol << " which is not zero" );
-		if(!epsilonEqual(vol, 0.0, _precision))
-		  {
-		    LOG(2, "(" << i << ", " << j << ") fails");
-		    isDiagonal = false;
-		  }
-	      }
-	  }
-	++i;
+        for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
+          {
+            int j = iter2->first;
+            const double vol = iter2->second;
+            if(vol != 0.0 && (i != j))
+              {
+                LOG(2, "V( " << i - 1 << ", " << j << ") = " << vol << " which is not zero" );
+                if(!epsilonEqual(vol, 0.0, _precision))
+                  {
+                    LOG(2, "(" << i << ", " << j << ") fails");
+                    isDiagonal = false;
+                  }
+              }
+          }
+        ++i;
       }
     if(!isDiagonal)
       {
-	LOG(1, "*** matrix is not diagonal");
+        LOG(1, "*** matrix is not diagonal");
       }
     return isDiagonal;
   }
@@ -331,20 +333,20 @@ namespace INTERP_TEST
    *
    * @param m the intersection matrix to output
    */
-	template <int SPACEDIM, int MESHDIM>
+  template <int SPACEDIM, int MESHDIM>
   void MeshTestToolkit<SPACEDIM,MESHDIM>::dumpIntersectionMatrix(const IntersectionMatrix& m) const
   {
     int i = 0;
     std::cout << "Intersection matrix is " << endl;
     for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
       {
-	for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
-	  {
-	  
-	    std::cout << "V(" << i << ", " << iter2->first << ") = " << iter2->second << endl;
-	  
-	  }
-	++i;
+        for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
+          {
+    
+            std::cout << "V(" << i << ", " << iter2->first << ") = " << iter2->second << endl;
+    
+          }
+        ++i;
       }
     std::cout << "Sum of volumes = " << sumVolume(m) << std::endl;
   }
@@ -359,7 +361,7 @@ namespace INTERP_TEST
    * @param  mesh2       the name of the target mesh
    * @param  m           intersection matrix in which to store the result of the intersection
    */
-	template <int SPACEDIM, int MESHDIM>
+  template <int SPACEDIM, int MESHDIM>
   void MeshTestToolkit<SPACEDIM,MESHDIM>::calcIntersectionMatrix(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, IntersectionMatrix& m) const
   {
     const string dataBaseDir = getenv("MED_ROOT_DIR");
@@ -373,38 +375,38 @@ namespace INTERP_TEST
     LOG(5, "Loading " << mesh2 << " from " << mesh2path);
     MESH tMesh(MED_DRIVER, dataDir+mesh2path, mesh2);
 
-		MEDNormalizedUnstructuredMesh<SPACEDIM,MESHDIM> sMesh_wrapper(&sMesh);
-		MEDNormalizedUnstructuredMesh<SPACEDIM,MESHDIM> tMesh_wrapper(&tMesh);
+    MEDNormalizedUnstructuredMesh<SPACEDIM,MESHDIM> sMesh_wrapper(&sMesh);
+    MEDNormalizedUnstructuredMesh<SPACEDIM,MESHDIM> tMesh_wrapper(&tMesh);
 
-		if (SPACEDIM==2 && MESHDIM==2)
-			{
-				Interpolation2D interpolator;
-				interpolator.setOptions(_precision, LOG_LEVEL, _intersectionType,1);
-				interpolator.interpolateMeshes(sMesh_wrapper, tMesh_wrapper,m);
-			}
-		else if (SPACEDIM==3 && MESHDIM==2)
-			{
-				Interpolation3DSurf interpolator;
-				interpolator.setOptions(_precision,LOG_LEVEL, 0.5,_intersectionType,false,1);
-				interpolator.interpolateMeshes(sMesh_wrapper, tMesh_wrapper,m);
-			}
-		else if (SPACEDIM==3 && MESHDIM==3)
-			{
-				Interpolation3D interpolator;
-				interpolator.interpolateMeshes(sMesh_wrapper, tMesh_wrapper,m);
-			}
-		else
-			{
-				throw MEDEXCEPTION("Wrong dimensions");
-			}
+    if (SPACEDIM==2 && MESHDIM==2)
+      {
+        Interpolation2D interpolator;
+        interpolator.setOptions(_precision, LOG_LEVEL, _intersectionType,1);
+        interpolator.interpolateMeshes(sMesh_wrapper, tMesh_wrapper,m,"P0P0");
+      }
+    else if (SPACEDIM==3 && MESHDIM==2)
+      {
+        Interpolation3DSurf interpolator;
+        interpolator.setOptions(_precision,LOG_LEVEL, 0.5,_intersectionType,false,1);
+        interpolator.interpolateMeshes(sMesh_wrapper, tMesh_wrapper,m,"P0P0");
+      }
+    else if (SPACEDIM==3 && MESHDIM==3)
+      {
+        Interpolation3D interpolator;
+        interpolator.interpolateMeshes(sMesh_wrapper, tMesh_wrapper,m,"P0P0");
+      }
+    else
+      {
+        throw MEDEXCEPTION("Wrong dimensions");
+      }
     // if reflexive, check volumes
     if(strcmp(mesh1path,mesh2path) == 0)
       {
-	const bool row_and_col_sums_ok = testVolumes(m, sMesh, tMesh);
-	CPPUNIT_ASSERT_EQUAL_MESSAGE("Row or column sums incorrect", true, row_and_col_sums_ok);
-	const bool is_diagonal =testDiagonal(m);
-	CPPUNIT_ASSERT_EQUAL_MESSAGE("Self intersection matrix is not diagonal", true, is_diagonal);
-     }
+        const bool row_and_col_sums_ok = testVolumes(m, sMesh, tMesh);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Row or column sums incorrect", true, row_and_col_sums_ok);
+        const bool is_diagonal =testDiagonal(m);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Self intersection matrix is not diagonal", true, is_diagonal);
+      }
 
     LOG(1, "Intersection calculation done. " << std::endl );
   
@@ -426,7 +428,7 @@ namespace INTERP_TEST
    * @param  doubleTest  if false, only the test with mesh 1 as the source mesh and mesh 2 as the target mesh will be performed
    *
    */
-	template <int SPACEDIM, int MESHDIM>
+  template <int SPACEDIM, int MESHDIM>
   void MeshTestToolkit<SPACEDIM,MESHDIM>::intersectMeshes(const char* mesh1path, const char* mesh1, const char* mesh2path, const char* mesh2, const double correctVol, const double prec, bool doubleTest) const
   {
     LOG(1, std::endl << std::endl << "=============================" );
@@ -450,32 +452,32 @@ namespace INTERP_TEST
 
     if(!doubleTest)
       {
-	LOG(1, "vol =  " << vol1 <<"  correctVol = " << correctVol );
-	CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(correctVol, vol1));
+        LOG(1, "vol =  " << vol1 <<"  correctVol = " << correctVol );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(correctVol, vol1));
 
-	if(isTestReflexive)
-	  {
-	    CPPUNIT_ASSERT_EQUAL_MESSAGE("Reflexive test failed", true, testDiagonal(matrix1));
-	  }
+        if(isTestReflexive)
+          {
+            CPPUNIT_ASSERT_EQUAL_MESSAGE("Reflexive test failed", true, testDiagonal(matrix1));
+          }
       }
     else
       {
       
-	IntersectionMatrix matrix2;
-	calcIntersectionMatrix(mesh2path, mesh2, mesh1path, mesh1, matrix2);    
+        IntersectionMatrix matrix2;
+        calcIntersectionMatrix(mesh2path, mesh2, mesh1path, mesh1, matrix2);    
 
 #if LOG_LEVEL >= 2
-	dumpIntersectionMatrix(matrix2);
+        dumpIntersectionMatrix(matrix2);
 #endif
       
-	const double vol2 = sumVolume(matrix2);
+        const double vol2 = sumVolume(matrix2);
 
-	LOG(1, "vol1 =  " << vol1 << ", vol2 = " << vol2 << ", correctVol = " << correctVol );
+        LOG(1, "vol1 =  " << vol1 << ", vol2 = " << vol2 << ", correctVol = " << correctVol );
 
-	CPPUNIT_ASSERT_EQUAL_MESSAGE("Symmetry test failed", true, testTranspose(matrix1, matrix2));
-	CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(vol1, correctVol));
-	CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol2, prec * std::max(vol2, correctVol));
-	CPPUNIT_ASSERT_DOUBLES_EQUAL(vol1, vol2, prec * std::max(vol1, vol2));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Symmetry test failed", true, testTranspose(matrix1, matrix2));
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol1, prec * std::max(vol1, correctVol));
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol2, prec * std::max(vol2, correctVol));
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(vol1, vol2, prec * std::max(vol1, vol2));
       }
 
   }
@@ -493,8 +495,8 @@ namespace INTERP_TEST
    * @param  doubleTest  if false, only the test with mesh 1 as the source mesh and mesh 2 as the target mesh will be performed
    *
    */
- 	template <int SPACEDIM, int MESHDIM>
- void MeshTestToolkit<SPACEDIM,MESHDIM>::intersectMeshes(const char* mesh1, const char* mesh2, const double correctVol, const double prec, bool doubleTest) const
+  template <int SPACEDIM, int MESHDIM>
+  void MeshTestToolkit<SPACEDIM,MESHDIM>::intersectMeshes(const char* mesh1, const char* mesh2, const double correctVol, const double prec, bool doubleTest) const
   {
     const string path1 = string(mesh1) + string(".med");
     std::cout << "here :" << path1 << std::endl;
