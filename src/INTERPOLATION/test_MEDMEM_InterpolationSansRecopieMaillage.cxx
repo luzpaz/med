@@ -34,7 +34,7 @@
 using namespace MEDMEM;
 using namespace MED_EN;
 
-main () {
+int main () {
   const char * fromFileName   = "ResultatSyrthes.med";
   const char * toFileName     = "MaillageAster.med";
 //  const char * resultFileName = "ResultatInterpolation.med";

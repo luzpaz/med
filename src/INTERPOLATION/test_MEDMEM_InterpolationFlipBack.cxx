@@ -154,7 +154,7 @@ void Flipback(FIELD<double> * firstField, FIELD<double> * secondField)
 
 #include "MEDMEM_WrapperCells.hxx"
 
-main () {
+int main () {
   const char * fromFileName   = "ResultatSyrthes.med";
   const char * toFileName     = "MaillageAster.med";
   const char * resultFileName = "ResultatFlipback.med";

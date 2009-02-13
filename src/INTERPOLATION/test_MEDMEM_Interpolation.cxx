@@ -28,7 +28,7 @@
 
 #include "stdio.h"
 
-main () {
+int main () {
   const char * fromFileName  = "fromMesh.med";
   const char * toFileName    = "toMesh.med";
   //const char * fieldName     = "fieldcelldoublevector"; 

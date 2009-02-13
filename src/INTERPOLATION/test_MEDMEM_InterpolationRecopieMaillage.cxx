@@ -55,7 +55,7 @@ double CPUtime()
 
 #include "MEDMEM_WrapperCells.hxx"
 
-main () {
+int main () {
 /*
 int taille=100;
 int * liste = new int [taille] ;

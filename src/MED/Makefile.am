@@ -35,7 +35,7 @@ libMEDEngine_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} @
 libMEDEngine_la_LDFLAGS=\
 	$(top_builddir)/idl/libSalomeIDLMED.la \
 	../MEDMEM_I/libMEDMEMImpl.la \
-	${KERNEL_LDFLAGS} -lTOOLSDS -lSalomeHDFPersist
+	${KERNEL_LDFLAGS} -lTOOLSDS -lSalomeHDFPersist -lSalomeContainer
 #	${KERNEL_LDFLAGS} \
 #	@CORBA_LIBS@ \
 #	@CAS_OCAF@ \

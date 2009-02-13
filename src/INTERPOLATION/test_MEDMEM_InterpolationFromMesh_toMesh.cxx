@@ -31,7 +31,7 @@
 using namespace MEDMEM;
 using namespace MED_EN;
 
-main () {
+int main () {
   const char * fromFileName  = "fromMesh.med";
   const char * toFileName    = "toMesh.med";
   //const char * fieldName     = "fieldcelldoublevector"; 

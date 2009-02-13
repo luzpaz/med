@@ -114,7 +114,7 @@ int main (int argc, char ** argv) {
   MEDARRAY<double> * myMedArray = new MEDARRAY<double>(dimension,nb_noeuds,mode);
   for (med_int i=1; i<=myMedArray->getLengthValue(); i++) {
     for (med_int j=1; j<=myMedArray->getLeadingValue(); j++)
-      myMedArray->setIJ(i,j,(double) random());
+      myMedArray->setIJ(i,j,(double) rand());
   };
 
   affiche_medarray(* myMedArray);

@@ -93,7 +93,7 @@ int main (int argc, char ** argv) {
   MEDARRAY<double> * myMedArray = new MEDARRAY<double>(spaceDimension,numberofNodes,mode);
   for (med_int i=1; i<=myMedArray->getLengthValue(); i++) {
     for (med_int j=1; j<=myMedArray->getLeadingValue(); j++)
-      myMedArray->setIJ(i,j,(double) random());
+      myMedArray->setIJ(i,j,(double) rand());
   };
 
   //construction noms des coordonnées
