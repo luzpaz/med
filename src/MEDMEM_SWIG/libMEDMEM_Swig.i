@@ -157,7 +157,7 @@ typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 
   if(PyCallable_Check($input) == 0)
     {
-      char * message = "Error in typemap(python,in) for double or integer callable fonction pointeur : the argument should be a callable object";
+      const char * message = "Error in typemap(python,in) for double or integer callable fonction pointeur : the argument should be a callable object";
       PyErr_SetString(PyExc_RuntimeError, message);
       return NULL;
     }
@@ -239,7 +239,7 @@ typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
       int err = PyList_SetItem(py_list, i, type_converter( arrayvar[ i ]));
       if(err)
 	{
-	  char * message = "Error in " #method;
+	  const char * message = "Error in " #method;
 	  PyErr_SetString(PyExc_RuntimeError, message);
 	  return NULL;
 	}
@@ -285,7 +285,7 @@ typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
                                 SWIG_POINTER_EXCEPTION);
       if (err == -1)
       {
-        char * message = "Error in typemap(python,in) for vector<TYPE>"
+        const char * message = "Error in typemap(python,in) for vector<TYPE>"
           "each component should be a TYPE";
         PyErr_SetString(PyExc_RuntimeError, message);
         return NULL;
@@ -1168,15 +1168,15 @@ public :
       }
 
     int addDriver(driverTypes driverType,
-		  char * fileName="Default File Name.med",
-		  char * driverName="Default Mesh Name",
+		  const char * fileName="Default File Name.med",
+		  const char * driverName="Default Mesh Name",
 		  med_mode_acces access=RDWR)
       {
 	return self->addDriver(driverType,string(fileName),
 			       string(driverName),access);
       }
 
-    void write(int index=0, char * driverName="")
+    void write(int index=0, const char * driverName="")
       {
 	self->write(index, string(driverName));
       }
@@ -1510,8 +1510,8 @@ class GRID : public MESH
         i++;
         break;
       default:
-        char * message = "Error in GRID::getEntityPosition: wrong Entity";
-        PyErr_SetString(PyExc_RuntimeError, message);
+        const char * message = "Error in GRID::getEntityPosition: wrong Entity";
+        PyErr_SetString(PyExc_RuntimeError, (char *)message);
         return NULL;
       }
       PyObject *py_list = PyList_New( size );
@@ -1521,8 +1521,8 @@ class GRID : public MESH
                                  Py_BuildValue("i", ijk[j++]));
         if(err)
         {
-          char * message = "Error in GRID::getNodePosition";
-          PyErr_SetString(PyExc_RuntimeError, message);
+          const char * message = "Error in GRID::getNodePosition";
+          PyErr_SetString(PyExc_RuntimeError, (char *)message);
           return NULL;
         }
       }
@@ -1547,8 +1547,8 @@ public:
 		    std::list<int> mylist = self->locate(x);
 			  if (mylist.size()>10)
 			  {
-			  char * message = "Error in PointLocator : SWIG interface limits the number of cells to 10";
-        PyErr_SetString(PyExc_RuntimeError, message);
+			  const char * message = "Error in PointLocator : SWIG interface limits the number of cells to 10";
+        PyErr_SetString(PyExc_RuntimeError, (char *)message);
         return NULL;
 				}
 			  
@@ -1596,7 +1596,7 @@ class MED
       }
 
     int addDriver(driverTypes driverType,
-		  char * fileName="Default File Name.med",
+		  const char * fileName="Default File Name.med",
 		  med_mode_acces access=RDWR)
       {
 	return self->addDriver(driverType,string(fileName),access);
@@ -2704,8 +2704,8 @@ GRID * createGridFromMesh( MESH * aMesh );
       if (aMesh->getIsAGrid())
         return (GRID *) aMesh;
 
-      char * message = "Error in GRID(mesh): mesh is not a grid";
-      PyErr_SetString(PyExc_RuntimeError, message);
+      const char * message = "Error in GRID(mesh): mesh is not a grid";
+      PyErr_SetString(PyExc_RuntimeError, (char *)message);
       return NULL;
     }
 

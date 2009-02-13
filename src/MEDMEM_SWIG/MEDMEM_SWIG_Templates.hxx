@@ -37,7 +37,7 @@ template<>
     static double Traducer(PyObject *a) { return PyFloat_AsDouble(a); }
     static PyObject * Traducer( double value ) { return Py_BuildValue("d", value ); }
     static double Functor(PyObject *func, double value)
-    { return Traducer( PyObject_CallFunction( func, "f", value )); }
+  { return Traducer( PyObject_CallFunction( func, (char *)"f", value )); }
   };
 
 template<>
@@ -47,7 +47,7 @@ template<>
     static int Traducer(PyObject *a) { return (int) PyInt_AsLong(a); }
     static PyObject * Traducer( int value ) { return Py_BuildValue("i", value ); }
     static int Functor(PyObject *func, int value)
-    { return Traducer( PyObject_CallFunction( func, "i", value )); }
+  { return Traducer( PyObject_CallFunction( func, (char *)"i", value )); }
   };
 
 template<class T, class U>
