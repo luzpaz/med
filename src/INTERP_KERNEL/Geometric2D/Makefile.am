@@ -16,7 +16,6 @@
 #
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-#  MED MEDMEM : MED files in memory
 #  File   : Makefile.am
 #  Author : Anthony GEAY (CEA/DEN/DANS/DM2S/SFME/LGLS)
 #  Module : MED
@@ -26,18 +25,6 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 noinst_LTLIBRARIES = libInterpGeometric2DAlg.la
 
 dist_libInterpGeometric2DAlg_la_SOURCES = \
-AbstractEdge.hxx     \
-Bounds.hxx           \
-Precision.hxx        \
-ComposedEdge.hxx     \
-EdgeArcCircle.hxx    \
-Edge.hxx             \
-Edge.txx             \
-EdgeInfLin.hxx       \
-EdgeLin.hxx          \
-ElementaryEdge.hxx   \
-Node.hxx             \
-QuadraticPolygon.hxx \
 AbstractEdge.cxx     \
 Bounds.cxx           \
 Precision.cxx        \
@@ -48,23 +35,23 @@ EdgeInfLin.cxx       \
 EdgeLin.cxx          \
 ElementaryEdge.cxx   \
 Node.cxx             \
-QuadraticPolygon.cxx \
-Geometric2D_defines.hxx
+QuadraticPolygon.cxx
 
-salomeinclude_HEADERS = \
-AbstractEdge.hxx     \
-Bounds.hxx           \
-Precision.hxx        \
-ComposedEdge.hxx     \
-EdgeArcCircle.hxx    \
-Edge.hxx             \
-EdgeInfLin.hxx       \
-EdgeLin.hxx          \
-ElementaryEdge.hxx   \
-Node.hxx             \
-QuadraticPolygon.hxx \
-Geometric2D_defines.hxx \
+salomeinclude_HEADERS =  \
+INTERPKERNELGEOMETRIC2DDefines.hxx \
+AbstractEdge.hxx         \
+Bounds.hxx               \
+Precision.hxx            \
+ComposedEdge.hxx         \
+EdgeArcCircle.hxx        \
+Edge.hxx                 \
+EdgeInfLin.hxx           \
+EdgeLin.hxx              \
+ElementaryEdge.hxx       \
+Node.hxx                 \
+QuadraticPolygon.hxx     \
 Edge.txx
 
-libInterpGeometric2DAlg_la_CPPFLAGS = -I$(srcdir)/..
+libInterpGeometric2DAlg_la_CPPFLAGS = -I$(srcdir)/../Bases
 
+libInterpGeometric2DAlg_la_LIBADD = ../Bases/libinterpkernelbases.la

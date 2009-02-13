@@ -19,19 +19,9 @@
 #ifndef __TRANSFORMED_TRIANGLE_HXX__
 #define __TRANSFORMED_TRIANGLE_HXX__
 
-#include <INTERPKERNEL_defines.hxx>
+#include "INTERPKERNELDefines.hxx"
 
 #include <vector>
-
-
-
-#ifdef OPTIMIZE
-/// OPT_INLINE will be replaced by "inline" if OPTIMIZE is defined and else nothing
-#define OPT_INLINE inline
-#else
-/// OPT_INLINE will be replaced by "inline" if OPTIMIZE is defined and else nothing
-#define OPT_INLINE 
-#endif
 
 // Levels : 
 // 1 - overview of algorithm + volume result
@@ -145,8 +135,17 @@ namespace INTERP_KERNEL
 
     void dumpCoords() const;
 
-  private:
-    
+    // Queries of member values used by UnitTetraIntersectionBary
+
+    const double* getCorner(TriCorner corner) const { return _coords + 5*corner; }
+
+    const std::vector<double*>& getPolygonA() const { return _polygonA; }
+
+    double getVolume() const { return _volume; }
+
+  protected:
+
+    TransformedTriangle() { }
 
     // ----------------------------------------------------------------------------------
     //  High-level methods called directly by calculateIntersectionVolume()     
@@ -167,17 +166,19 @@ namespace INTERP_KERNEL
     
     bool isTriangleParallelToFacet(const TetraFacet facet) const;
 
+    int isTriangleInclinedToFacet(const TetraFacet facet) const;
+
     bool isTriangleBelowTetraeder() const;
 
     // ----------------------------------------------------------------------------------
     //  Intersection test methods and intersection point calculations           
     // ----------------------------------------------------------------------------------
  
-    OPT_INLINE bool testSurfaceEdgeIntersection(const TetraEdge edge) const; 
+    inline bool testSurfaceEdgeIntersection(const TetraEdge edge) const; 
 
     void calcIntersectionPtSurfaceEdge(const TetraEdge edge, double* pt) const;  
 
-    OPT_INLINE bool testSegmentFacetIntersection(const TriSegment seg, const TetraFacet facet) const; 
+    inline bool testSegmentFacetIntersection(const TriSegment seg, const TetraFacet facet) const; 
 
     void calcIntersectionPtSegmentFacet(const TriSegment seg, const TetraFacet facet, double* pt) const;  
 
@@ -187,7 +188,7 @@ namespace INTERP_KERNEL
 
     bool testSegmentCornerIntersection(const TriSegment seg, const TetraCorner corner) const ;
 
-    OPT_INLINE bool testSurfaceRayIntersection(const TetraCorner corner) const;
+    inline bool testSurfaceRayIntersection(const TetraCorner corner) const;
 
     bool testSegmentHalfstripIntersection(const TriSegment seg, const TetraEdge edg);
 
@@ -195,11 +196,11 @@ namespace INTERP_KERNEL
     
     bool testSegmentRayIntersection(const TriSegment seg, const TetraCorner corner) const;
 
-    OPT_INLINE bool testCornerInTetrahedron(const TriCorner corner) const;
+    inline bool testCornerInTetrahedron(const TriCorner corner) const;
 
-    OPT_INLINE bool testCornerOnXYZFacet(const TriCorner corner) const;
+    inline bool testCornerOnXYZFacet(const TriCorner corner) const;
 
-    OPT_INLINE bool testCornerAboveXYZFacet(const TriCorner corner) const;
+    inline bool testCornerAboveXYZFacet(const TriCorner corner) const;
 
     // ----------------------------------------------------------------------------------
     //  Utility methods used in intersection tests                       
@@ -207,11 +208,11 @@ namespace INTERP_KERNEL
     
     bool testTriangleSurroundsEdge(const TetraEdge edge) const;
 
-    OPT_INLINE bool testEdgeIntersectsTriangle(const TetraEdge edge) const;
+    inline bool testEdgeIntersectsTriangle(const TetraEdge edge) const;
 
-    OPT_INLINE bool testFacetSurroundsSegment(const TriSegment seg, const TetraFacet facet) const;
+    inline bool testFacetSurroundsSegment(const TriSegment seg, const TetraFacet facet) const;
 
-    OPT_INLINE bool testSegmentIntersectsFacet(const TriSegment seg, const TetraFacet facet) const;
+    inline bool testSegmentIntersectsFacet(const TriSegment seg, const TetraFacet facet) const;
 
     bool testSegmentIntersectsHPlane(const TriSegment seg) const;
 
@@ -229,7 +230,7 @@ namespace INTERP_KERNEL
 
     void preCalculateDoubleProducts(void);
 
-    OPT_INLINE void resetDoubleProducts(const TriSegment seg, const TetraCorner corner);
+    inline void resetDoubleProducts(const TriSegment seg, const TetraCorner corner);
 
     double calculateDistanceCornerSegment(const TetraCorner corner, const TriSegment seg) const;
     
@@ -237,18 +238,18 @@ namespace INTERP_KERNEL
 
     double calculateAngleEdgeTriangle(const TetraEdge edge) const;
 
-    OPT_INLINE double calcStableC(const TriSegment seg, const DoubleProduct dp) const;
+    inline double calcStableC(const TriSegment seg, const DoubleProduct dp) const;
 
-    OPT_INLINE double calcStableT(const TetraCorner corner) const;
+    inline double calcStableT(const TetraCorner corner) const;
 
-    OPT_INLINE double calcUnstableC(const TriSegment seg, const DoubleProduct dp) const;
+    inline double calcUnstableC(const TriSegment seg, const DoubleProduct dp) const;
 
     double calcTByDevelopingRow(const TetraCorner corner, const int row = 1, const bool project = false) const;
 
     // ----------------------------------------------------------------------------------
     //  Member variables                                                 
     // ----------------------------------------------------------------------------------
-  private:
+  protected:
 
     /// Array holding the coordinates of the triangle's three corners
     /// order : 
@@ -256,10 +257,10 @@ namespace INTERP_KERNEL
     double _coords[15];
     
     /// Flag showing whether the double products have been calculated yet
-    bool _isDoubleProductsCalculated;
+    bool _is_double_products_calculated;
 
     /// Flag showing whether the triple products have been calculated yet
-    bool _isTripleProductsCalculated; 
+    bool _is_triple_products_calculated; 
 
     /// Array containing the 24 double products.
     /// order : c^PQ_YZ, ... ,cPQ_10, ... c^QR_YZ, ... c^RP_YZ
@@ -284,14 +285,15 @@ namespace INTERP_KERNEL
 
     /// Array holding the coordinates of the barycenter of the polygon B
     /// This point is calculated in calculatePolygonBarycenter
-    double _barycenterB[3];
+    //double _barycenterB[3];
 
     /// Array of flags indicating which of the four triple products have been correctly calculated.
     /// Used for asserts in debug mode
     bool _validTP[4];
 
-#ifdef OPTIMIZE
-
+    /// calculated volume for use of UnitTetraIntersectionBary
+    double _volume;
+    
     /**
      * Calls TransformedTriangle::testTriangleSurroundsEdge for edges OX to ZX and stores the result in
      * member variable array_triangleSurroundsEdgeCache. 
@@ -302,8 +304,6 @@ namespace INTERP_KERNEL
     /// Array holding results of the test testTriangleSurroundsEdge() for all the edges. 
     /// These are calculated in preCalculateTriangleSurroundsEdge().
     bool _triangleSurroundsEdgeCache[NO_TET_EDGE];
-#endif
-
 
     // ----------------------------------------------------------------------------------
     //  Constants                                                    
@@ -366,16 +366,10 @@ namespace INTERP_KERNEL
 
   };
 
-
-
   // include definitions of inline methods
-#ifdef OPTIMIZE
 
-#include "TransformedTriangle_inline.hxx"
-  
-#endif
-
-};
+#include "TransformedTriangleInline.hxx"
+}
 
 
 #endif

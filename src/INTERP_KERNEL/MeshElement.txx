@@ -33,21 +33,22 @@ namespace INTERP_KERNEL
   /**
    * Constructor
    *
-   * @param index   global number of element in the mesh
+   * @param index   global number of element in the mesh in C mode.
    * @param mesh    mesh that the element belongs to
    */
   template<class ConnType>
   template<class MyMeshType>
   MeshElement<ConnType>::MeshElement(const ConnType index, const MyMeshType& mesh)
-    : _index(index), _box(0), _number(mesh.getNumberOfNodesOfElement(index))
+    : _index(index), _box(0), _number(mesh.getNumberOfNodesOfElement(OTT<typename MyMeshType::MyConnType,MyMeshType::My_numPol>::indFC(index)))
   {
     const double**vertices = new const double*[_number];
 
     for(unsigned char i = 0 ; i < _number ; ++i)
-      vertices[i] = getCoordsOfNode(i , index, mesh);
+      vertices[i] = getCoordsOfNode(i , OTT<typename MyMeshType::MyConnType,MyMeshType::My_numPol>::indFC(index), mesh);
 
     // create bounding box
     _box = new BoundingBox(vertices,_number);
+    delete [] vertices;
   }
     
   /**

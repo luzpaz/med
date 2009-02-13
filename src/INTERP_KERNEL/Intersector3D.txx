@@ -16,18 +16,19 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef __INTERPKERNEL_DEFINES_HXX__
-#define __INTERPKERNEL_DEFINES_HXX__
+#ifndef __INTERSECTOR3D_TXX__
+#define __INTERSECTOR3D_TXX__
 
-//export symbols
-#ifdef WIN32
-# ifdef INTERPKERNEL_EXPORTS
-#  define INTERPKERNEL_EXPORT __declspec(dllexport)
-# else
-#  define INTERPKERNEL_EXPORT __declspec(dllimport)
-# endif
-#else
-# define INTERPKERNEL_EXPORT
-#endif 
+#include "Intersector3D.hxx"
 
-#endif //__INTERPKERNEL_DEFINES_HXX__
+namespace INTERP_KERNEL
+{
+  template<class MyMeshType, class MyMatrix>
+  Intersector3D<MyMeshType,MyMatrix>::Intersector3D(const MyMeshType& targetMesh, const MyMeshType& srcMesh):_target_mesh(targetMesh),_src_mesh(srcMesh)
+  {
+  }
+
+  
+}
+
+#endif

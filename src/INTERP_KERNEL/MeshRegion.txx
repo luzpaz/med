@@ -70,16 +70,17 @@ namespace INTERP_KERNEL
         // get coordinates of the nodes of the element
         for(unsigned char i = 0 ; i < numNodes ; ++i)
           {
-            pts[i] = getCoordsOfNode(i, elemIdx, mesh);
+            pts[i] = getCoordsOfNode(i, OTT<typename MyMeshType::MyConnType,MyMeshType::My_numPol>::indFC(elemIdx), mesh);
           }
            
         _box = new BoundingBox(pts, numNodes);
-           
+        delete [] pts;
+
       } else {
 
       for(unsigned char i = 0 ; i < numNodes ; ++i)
         {
-          const double* pt = getCoordsOfNode(i, elemIdx, mesh);
+          const double* pt = getCoordsOfNode(i, OTT<typename MyMeshType::MyConnType,MyMeshType::My_numPol>::indFC(elemIdx), mesh);
           _box->updateWithPoint(pt);
         }
     }

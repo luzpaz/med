@@ -19,9 +19,8 @@
 #ifndef __NODE_HXX__
 #define __NODE_HXX__
 
-#include "Geometric2D_defines.hxx"
-
 #include "Precision.hxx"
+#include "INTERPKERNELGEOMETRIC2DDefines.hxx"
 
 #include <cmath>
 #include <vector>
@@ -44,7 +43,7 @@ namespace INTERP_KERNEL
   /*!
    * As nodes can be shared between edges it is dealed with ref counting.
    */
-  class GEOMETRIC2D_EXPORT Node
+  class INTERPKERNELGEOMETRIC2D_EXPORT Node
   {
   public:
     Node(double x, double y);
@@ -53,6 +52,7 @@ namespace INTERP_KERNEL
     void incrRef() const { _cnt++; }
     bool decrRef();
     void initLocs() const { _loc=UNKNOWN; }
+    void setLoc(TypeOfLocInPolygon loc) const { _loc=loc; }
     TypeOfLocInPolygon getLoc() const { return _loc; }
     void declareIn() const { if(_loc==UNKNOWN) _loc=IN_1; }
     void declareOn() const { if(_loc==UNKNOWN) _loc=ON_1; }

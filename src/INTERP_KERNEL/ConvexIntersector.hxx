@@ -19,13 +19,15 @@
 #ifndef __CONVEXINTERSECTOR_HXX__
 #define __CONVEXINTERSECTOR_HXX__
 
-#include "PlanarIntersector.hxx"
+#include "PlanarIntersectorP0P0.hxx"
+#include "PlanarIntersectorP0P1.hxx"
+#include "PlanarIntersectorP1P0.hxx"
 #include "InterpolationUtils.hxx"
 
 namespace INTERP_KERNEL
 {
-  template<class MyMeshType>
-  class INTERPKERNEL_EXPORT ConvexIntersector : public PlanarIntersector<MyMeshType>
+  template<class MyMeshType, class MyMatrix, template <class MeshType, class TheMatrix, class ThisIntersector> class InterpType >
+  class ConvexIntersector : public InterpType<MyMeshType,MyMatrix,ConvexIntersector<MyMeshType,MyMatrix,InterpType> >
   {
   public:
     static const int SPACEDIM=MyMeshType::MY_SPACEDIM;
@@ -33,18 +35,13 @@ namespace INTERP_KERNEL
     typedef typename MyMeshType::MyConnType ConnType;
     static const NumberingPolicy numPol=MyMeshType::My_numPol;
   public:
-    ConvexIntersector(const MyMeshType& mesh_A, const MyMeshType& mesh_B, 
+    ConvexIntersector(const MyMeshType& meshT, const MyMeshType& meshS, 
                       double dimCaracteristic, double precision, double medianPlane,
-                      bool doRotate, int printLevel);
-    double intersectCells(ConnType icell_A, ConnType icell_B, int nb_NodesA, int nb_NodesB);
+                      bool doRotate, int orientation, int printLevel);
+    double intersectGeometry(ConnType icellT, ConnType icellS, ConnType nbNodesT, ConnType nbNodesS);
+    double intersectGeometryWithQuadrangle(const double *quadrangle, const std::vector<double>& sourceCoords, bool isSourceQuad);
   private :
     double _epsilon;
-    const ConnType *_connectA;
-    const ConnType *_connectB;
-    const ConnType *_connIndexA;
-    const ConnType *_connIndexB;
-    const double *_coordsA;
-    const double *_coordsB;
   };
 }
 

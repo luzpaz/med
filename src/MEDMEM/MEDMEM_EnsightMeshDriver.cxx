@@ -22,7 +22,6 @@
 #include "MEDMEM_EnsightMeshDriver.hxx"
 
 #include <sstream>
-#include <strstream>
 #include <iomanip>
 #include <numeric>
 

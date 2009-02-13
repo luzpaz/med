@@ -22,8 +22,9 @@
 #include "Interpolation3D.hxx"
 #include "MeshElement.txx"
 #include "TransformedTriangle.hxx"
-#include "IntersectorTetra.txx"
-#include "IntersectorHexa.txx"
+#include "PolyhedronIntersector.txx"
+#include "PolyhedronIntersectorP0P1.txx"
+#include "PolyhedronIntersectorP1P0.txx"
 #include "Log.hxx"
 /// If defined, use recursion to traverse the binary search tree, else use the BBTree class
 #define USE_RECURSIVE_BBOX_FILTER
@@ -54,7 +55,7 @@ namespace INTERP_KERNEL
   Interpolation3D::Interpolation3D()
   {
   }
-	Interpolation3D::Interpolation3D(const InterpolationOptions& io):Interpolation<Interpolation3D>(io)
+  Interpolation3D::Interpolation3D(const InterpolationOptions& io):Interpolation<Interpolation3D>(io)
   {
   }
     
@@ -79,11 +80,10 @@ namespace INTERP_KERNEL
    * @param result      matrix in which the result is stored 
    *
    */
-  template<class MatrixType, class MyMeshType>
-  void Interpolation3D::interpolateMeshes(const MyMeshType& srcMesh, const MyMeshType& targetMesh, MatrixType& result)
+  template<class MyMeshType, class MatrixType>
+  int Interpolation3D::interpolateMeshes(const MyMeshType& srcMesh, const MyMeshType& targetMesh, MatrixType& result, const char *method)
   {
     typedef typename MyMeshType::MyConnType ConnType;
-    const NumberingPolicy numPol=MyMeshType::My_numPol;
     // create MeshElement objects corresponding to each element of the two meshes
     const unsigned long numSrcElems = srcMesh.getNumberOfElements();
     const unsigned long numTargetElems = targetMesh.getNumberOfElements();
@@ -96,20 +96,23 @@ namespace INTERP_KERNEL
     std::map<MeshElement<ConnType>*, int> indices;
     
     for(unsigned long i = 0 ; i < numSrcElems ; ++i)
-      {
-        //const medGeometryElement type = srcMesh.getElementType(MED_CELL, i + 1);
-        srcElems[i] = new MeshElement<ConnType>(OTT<ConnType,numPol>::indFC(i), srcMesh);       
-      }
+      srcElems[i] = new MeshElement<ConnType>(i, srcMesh);       
     
     for(unsigned long i = 0 ; i < numTargetElems ; ++i)
-      {
-        //const medGeometryElement type = targetMesh.getElementType(MED_CELL, i + 1);
-        targetElems[i] = new MeshElement<ConnType>(OTT<ConnType,numPol>::indFC(i), targetMesh);
-      }
-    
-    // create empty maps for all source elements
-    result.resize(numTargetElems);
+      targetElems[i] = new MeshElement<ConnType>(i, targetMesh);
 
+    Intersector3D<MyMeshType,MatrixType>* intersector=0;
+    std::string methC(method);
+    if(method=="P0P0")
+      intersector=new PolyhedronIntersector<MyMeshType,MatrixType>(targetMesh, srcMesh, getSplittingPolicy());
+    else if(method=="P0P1")
+      intersector=new PolyhedronIntersectorP0P1<MyMeshType,MatrixType>(targetMesh, srcMesh, getSplittingPolicy());
+    else if(method=="P1P0")
+      intersector=new PolyhedronIntersectorP1P0<MyMeshType,MatrixType>(targetMesh, srcMesh, getSplittingPolicy());
+    else
+      throw Exception("Invalid method choosed must be in \"P0P0\", \"P0P1\".");
+    // create empty maps for all source elements
+    result.resize(intersector->getNumberOfRowsOfResMatrix());
 
 #ifdef USE_RECURSIVE_BBOX_FILTER
     
@@ -166,49 +169,11 @@ namespace INTERP_KERNEL
             LOG(4, " - One element");
 
             MeshElement<ConnType>* targetElement = *(currNode->getTargetRegion().getBeginElements());
-             
-            // NB : srcElement indices are from 0 .. numSrcElements - 1
-            // targetElement indicies from 1 .. numTargetElements
-            // maybe this is not ideal ...
-            const ConnType targetIdx = targetElement->getIndex();
-
-
-            TargetIntersector<ConnType>* intersector;
-            // here we descrimine the type of the element by number of nodes constituting this element.
-            switch(targetElement->getNumberOfNodes())
-              {
-              case 4:
-                intersector = new IntersectorTetra<MyMeshType>(srcMesh, targetMesh, targetIdx);
-                break;
-
-              case 8:
-
-								intersector = new IntersectorHexa<MyMeshType>(srcMesh, targetMesh, targetIdx,getSplittingPolicy());
-                break;
-              
-              default:
-                assert(false);
-              }
-
-
-
-            for(typename std::vector< MeshElement<ConnType>* >::const_iterator iter = currNode->getSrcRegion().getBeginElements() ; 
-                iter != currNode->getSrcRegion().getEndElements() ; ++iter)
-              {
-            
-                const ConnType srcIdx = (*iter)->getIndex();
-                const double vol = intersector->intersectSourceCell(srcIdx);
-
-                if(vol != 0.0)
-                  {
-                    result[OTT<ConnType,numPol>::ind2C(targetIdx)].insert(make_pair(srcIdx,vol));
-                    LOG3(2, "Result : V (" << srcIdx << "- " << targetIdx << ") = " <<  result[ OTT<ConnType,numPol>::ind2C(srcIdx) ][targetIdx] );
-                  }
-              }
-           
-            delete intersector;
-
-          } 
+            std::vector<ConnType> intersectElems;
+            for(typename std::vector< MeshElement<ConnType>* >::const_iterator iter = currNode->getSrcRegion().getBeginElements();iter != currNode->getSrcRegion().getEndElements();++iter)
+              intersectElems.push_back((*iter)->getIndex());
+            intersector->intersectCells(targetElement->getIndex(),intersectElems,result);
+          }
         else // recursion 
           {
 
@@ -284,8 +249,6 @@ namespace INTERP_KERNEL
         LOG(4, "Next iteration. Nodes left : " << nodes.size());
       }
 
-      
-
 #else // Use BBTree
       
       // create BBTree structure
@@ -304,11 +267,11 @@ namespace INTERP_KERNEL
         bboxes[6*i+5] = box->getCoordinate(BoundingBox::ZMAX);
 
         // source indices have to begin with zero for BBox, I think
-        srcElemIdx[i] = OTT<ConnType,numPol>::ind2C( srcElems[i]->getIndex() );
+        srcElemIdx[i] = srcElems[i]->getIndex();
       }
-      
-    BBTree<3> tree(bboxes, srcElemIdx, 0, numSrcElems);
-
+    
+    BBTree<3,ConnType> tree(bboxes, srcElemIdx, 0, numSrcElems);
+    
     // for each target element, get source elements with which to calculate intersection
     // - calculate intersection by calling intersectCells
     for(unsigned long i = 0; i < numTargetElems; ++i)
@@ -325,31 +288,19 @@ namespace INTERP_KERNEL
         targetBox[4] = box->getCoordinate(BoundingBox::ZMIN);
         targetBox[5] = box->getCoordinate(BoundingBox::ZMAX);
 
-        vector<int> intersectElems;
+        std::vector<ConnType> intersectElems;
 
         tree.getIntersectingElems(targetBox, intersectElems);
 
-        // create intersector
-        IntersectorTetra intersector(srcMesh, targetMesh, targetIdx);
-
-        for(vector<int>::const_iterator iter = intersectElems.begin() ; iter != intersectElems.end() ; ++iter)
-          {
-
-            const int srcIdx = *iter + 1;
-            const double vol = intersector.intersectSourceCell(srcIdx);
-
-            if(vol != 0.0)
-              {
-                result[targetIdx - 1].insert(make_pair(srcIdx, vol));
-              }
-
-          }
+        intersector->intersectCells(targetIdx,intersectElems,result);
       }
     
 #endif
-
-
     // free allocated memory
+    int ret=intersector->getNumberOfColsOfResMatrix();
+
+    delete intersector;
+
     for(unsigned long i = 0 ; i < numSrcElems ; ++i)
       {
         delete srcElems[i];
@@ -358,7 +309,7 @@ namespace INTERP_KERNEL
       {
         delete targetElems[i];
       }
-
+    return ret;
 
   }
 

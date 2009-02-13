@@ -16,8 +16,8 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef _INTERPOLATION2D_TXX_
-#define _INTERPOLATION2D_TXX_
+#ifndef __INTERPOLATION2D_TXX__
+#define __INTERPOLATION2D_TXX__
 
 #include "Interpolation2D.hxx"
 

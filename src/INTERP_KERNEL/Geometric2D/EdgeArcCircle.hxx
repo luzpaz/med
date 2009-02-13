@@ -19,15 +19,12 @@
 #ifndef __EDGEARCCIRCLE_HXX__
 #define __EDGEARCCIRCLE_HXX__
 
-#include "Geometric2D_defines.hxx"
-
 #include "Edge.hxx"
 
 namespace INTERP_KERNEL
 {
-  class GEOMETRIC2D_EXPORT ArcCArcCIntersector : public SameTypeIntersector
+  class ArcCArcCIntersector : public SameTypeEdgeIntersector
   {
-    friend class EdgeArcCircle;
   public:
     ArcCArcCIntersector(const EdgeArcCircle& e1, const EdgeArcCircle& e2);
     bool haveTheySameDirection() const;
@@ -38,11 +35,6 @@ namespace INTERP_KERNEL
     //! return angle in ]-Pi;Pi[ - 'node' must be on curve of '_e1'
     double getAngle(Node *node) const;
     static bool areArcsOverlapped(const EdgeArcCircle& a1, const EdgeArcCircle& a2);
-    static bool isIn2Pi(double start, double delta, double angleIn);
-    //! 'delta' 'start' in ]-Pi;Pi[
-    static bool isAngleNotIn(double start, double delta, double angleIn);
-    //! for an angle 'angle' in ]-3*Pi;3*Pi[ returns angle in ]-Pi;Pi[
-    static double normalizeAngle(double angle) { if(angle> M_PI) return angle-2.*M_PI; if(angle<-M_PI) return angle+2.*M_PI; return angle; }
   private:
     const EdgeArcCircle& getE1() const { return (const EdgeArcCircle&)_e1; }
     const EdgeArcCircle& getE2() const { return (const EdgeArcCircle&)_e2; }
@@ -50,7 +42,7 @@ namespace INTERP_KERNEL
     double _dist;
   };
 
-  class ArcCSegIntersector : public CrossTypeIntersector
+  class ArcCSegIntersector : public CrossTypeEdgeIntersector
   {
   public:
     ArcCSegIntersector(const EdgeArcCircle& e1, const EdgeLin& e2, bool reverse=true);
@@ -83,6 +75,7 @@ namespace INTERP_KERNEL
     double getAreaOfZone() const;
     double getCurveLength() const;
     void getBarycenter(double *bary) const;
+    void getBarycenterOfZone(double *bary) const;
     bool isIn(double characterVal) const;
     Node *buildRepresentantOfMySelf() const;
     bool isLower(double val1, double val2) const;
@@ -100,12 +93,19 @@ namespace INTERP_KERNEL
     double getRadius() const { return _radius; }
     double getAngle() const { return _angle; }
     static double getAbsoluteAngle(const double *vect, double& normVect);
+    static double getAbsoluteAngleOfNormalizedVect(double ux, double uy);
     static void getArcOfCirclePassingThru(const double *start, const double *middle, const double *end, 
                                           double *center, double& radius, double& angleInRad, double& angleInRad0);
     //! To avoid in aggressive optimizations nan.
-    static double safeSqrt(double val) { double ret=fmax(val,0.); return sqrt(ret); }
-    static double safeAcos(double cosAngle) { double ret=fmin(cosAngle,1.); ret=fmax(ret,-1.); return acos(ret); }
-    static double safeAsin(double sinAngle) { double ret=fmin(sinAngle,1.); ret=fmax(ret,-1.); return asin(ret); }
+    static double safeSqrt(double val) { double ret=std::max(val,0.); return sqrt(ret); }
+    static double safeAcos(double cosAngle) { double ret=std::min(cosAngle,1.); ret=std::max(ret,-1.); return acos(ret); }
+    static double safeAsin(double sinAngle) { double ret=std::min(sinAngle,1.); ret=std::max(ret,-1.); return asin(ret); }
+    //! @param start and @param angleIn in ]-Pi;Pi] and @param delta in ]-2*Pi,2*Pi[
+    static bool isIn2Pi(double start, double delta, double angleIn);
+    //! 'delta' 'start' in ]-Pi;Pi[
+    static bool isAngleNotIn(double start, double delta, double angleIn);
+    //! for an angle 'angle' in ]-3*Pi;3*Pi[ returns angle in ]-Pi;Pi[
+    static double normalizeAngle(double angle) { if(angle>M_PI) return angle-2.*M_PI; if(angle<-M_PI) return angle+2.*M_PI; return angle; }
   protected:
     void updateBounds();
     Edge *buildEdgeLyingOnMe(Node *start, Node *end, bool direction=true) const;

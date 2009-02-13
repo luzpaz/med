@@ -19,8 +19,9 @@
 #ifndef __BOUNDS_HXX__
 #define __BOUNDS_HXX__
 
-#include "Geometric2D_defines.hxx"
-#include <cmath>
+#include "INTERPKERNELGEOMETRIC2DDefines.hxx"
+
+#include <numeric>
 
 namespace INTERP_KERNEL
 {
@@ -35,18 +36,18 @@ namespace INTERP_KERNEL
       ON_BOUNDARY_NEG = 3
     } Position;
   
-  class GEOMETRIC2D_EXPORT Bounds
+  class INTERPKERNELGEOMETRIC2D_EXPORT Bounds
   {
   public:
-    Bounds():_xMin(0.),_xMax(0.),_yMin(0.),_yMax(0.) { }
+    Bounds():_x_min(0.),_x_max(0.),_y_min(0.),_y_max(0.) { }
     double &operator[](int i);
     const double& operator[](int i) const;
     double getDiagonal() const;
     void getBarycenter(double& xBary, double& yBary) const;
     void applySimilarity(double xBary, double yBary, double dimChar);
-    Bounds& operator=(const Bounds& other) { _xMin=other._xMin; _xMax=other._xMax; _yMin=other._yMin; _yMax=other._yMax; return *this; }
-    Bounds(double xMin, double xMax, double yMin, double yMax):_xMin(xMin),_xMax(xMax),_yMin(yMin),_yMax(yMax) { }
-    void setValues(double xMin, double xMax, double yMin, double yMax) { _xMin=xMin; _xMax=xMax; _yMin=yMin; _yMax=yMax; }
+    Bounds& operator=(const Bounds& other) { _x_min=other._x_min; _x_max=other._x_max; _y_min=other._y_min; _y_max=other._y_max; return *this; }
+    Bounds(double xMin, double xMax, double yMin, double yMax):_x_min(xMin),_x_max(xMax),_y_min(yMin),_y_max(yMax) { }
+    void setValues(double xMin, double xMax, double yMin, double yMax) { _x_min=xMin; _x_max=xMax; _y_min=yMin; _y_max=yMax; }
     void prepareForAggregation();
     void getInterceptedArc(const double *center, double radius, double& intrcptArcAngle0, double& intrcptArcDelta) const;
     int fitXForXFig(double val, int res) const { return (int)fitXForXFigD(val,res); }
@@ -60,12 +61,12 @@ namespace INTERP_KERNEL
     //! Idem where method but with approximations.
     Position nearlyWhere(double x, double y) const;
     void aggregate(const Bounds& other);
-    double getCaracteristicDim() const { return fmax(_xMax-_xMin,_yMax-_yMin); }
+    double getCaracteristicDim() const { return std::max(_x_max-_x_min,_y_max-_y_min); }
   protected:
-    double _xMin;
-    double _xMax;
-    double _yMin;
-    double _yMax;
+    double _x_min;
+    double _x_max;
+    double _y_min;
+    double _y_max;
   };
 }
 

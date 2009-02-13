@@ -41,7 +41,7 @@ namespace MEDMEM {
 */
 // ==============================================================================
 
-class ENSIGHT_MESH_DRIVER : public MEDMEM_ENSIGHT::_CaseFileDriver_User
+class MEDMEM_EXPORT ENSIGHT_MESH_DRIVER : public MEDMEM_ENSIGHT::_CaseFileDriver_User
 {
 protected:
 
@@ -73,7 +73,7 @@ public :
  */
 // ==============================================================================
   
-class ENSIGHT_MESH_RDONLY_DRIVER : public virtual ENSIGHT_MESH_DRIVER
+class MEDMEM_EXPORT ENSIGHT_MESH_RDONLY_DRIVER : public virtual ENSIGHT_MESH_DRIVER
 {
 public :
   //!< to read mesh of index-th time step
@@ -117,7 +117,7 @@ private:
  */
 // ==============================================================================
 
-class ENSIGHT_MESH_WRONLY_DRIVER : public virtual ENSIGHT_MESH_DRIVER
+class MEDMEM_EXPORT ENSIGHT_MESH_WRONLY_DRIVER : public virtual ENSIGHT_MESH_DRIVER
 {
 public :
   //!< write a mesh;

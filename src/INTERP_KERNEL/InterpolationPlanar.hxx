@@ -16,8 +16,8 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef _INTERPOLATIONPLANAR_HXX_
-#define _INTERPOLATIONPLANAR_HXX_
+#ifndef __INTERPOLATIONPLANAR_HXX__
+#define __INTERPOLATIONPLANAR_HXX__
 
 #include "Interpolation.hxx"
 #include "PlanarIntersector.hxx"
@@ -27,10 +27,10 @@
 namespace INTERP_KERNEL
 {
   template<class RealPlanar>
-  class INTERPKERNEL_EXPORT InterpolationPlanar : public Interpolation< InterpolationPlanar<RealPlanar> >
+  class InterpolationPlanar : public Interpolation< InterpolationPlanar<RealPlanar> >
   {
   private:
-    double _dimCaracteristic;
+    double _dim_caracteristic;
     static const double DEFAULT_PRECISION;
 
   public:
@@ -40,16 +40,16 @@ namespace INTERP_KERNEL
     // geometric precision, debug print level, coice of the median plane, intersection etc ...
     void setOptions(double precision, int printLevel,
                     IntersectionType intersectionType, int orientation=0);
-
+    
     // Main function to interpolate triangular and quadratic meshes
-    template<class MatrixType, class MyMeshType>
-    void interpolateMeshes(const MyMeshType& mesh1, const MyMeshType& mesh2, MatrixType& result);
-
+    template<class MyMeshType, class MatrixType>
+      int interpolateMeshes(const MyMeshType& mesh1, const MyMeshType& mesh2, MatrixType& result, const char *method);
+    
   public:
     bool doRotate() const { return asLeafInterpPlanar().doRotate(); }
     double medianPlane() const { return asLeafInterpPlanar().medianPlane(); }
-    template<class MyMeshType>
-    void performAdjustmentOfBB(PlanarIntersector<MyMeshType>* intersector, std::vector<double>& bbox) const
+    template<class MyMeshType, class MyMatrixRow>
+      void performAdjustmentOfBB(PlanarIntersector<MyMeshType,MyMatrixRow>* intersector, std::vector<double>& bbox) const
     { return asLeafInterpPlanar().performAdjustmentOfBB(intersector,bbox); }
 
   protected:

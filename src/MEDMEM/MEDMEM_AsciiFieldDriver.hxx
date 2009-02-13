@@ -104,7 +104,7 @@ namespace MEDMEM {
     template <class INTERLACING_TAG>
     ASCII_FIELD_DRIVER():GENDRIVER(),
 			 _ptrField((FIELD<T>)MED_NULL),
-			 _fileName("") {};
+			 _fileName("") {}
 
     template <class INTERLACING_TAG>
     ASCII_FIELD_DRIVER(const string & fileName, FIELD<T,INTERLACING_TAG> * ptrField,

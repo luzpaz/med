@@ -19,14 +19,14 @@
 #ifndef __ELEMENTARYEDGE_HXX__
 #define __ELEMENTARYEDGE_HXX__
 
-#include "Geometric2D_defines.hxx"
-#include "InterpolationUtils.hxx"
+#include "INTERPKERNELGEOMETRIC2DDefines.hxx"
+#include "InterpKernelException.hxx"
 #include "AbstractEdge.hxx"
 #include "Edge.hxx"
 
 namespace INTERP_KERNEL
 {
-  class GEOMETRIC2D_EXPORT ElementaryEdge
+  class INTERPKERNELGEOMETRIC2D_EXPORT ElementaryEdge
   {
   public:
     ElementaryEdge(Edge *ptr, bool direction):_direction(direction),_ptr(ptr) { }
@@ -43,6 +43,7 @@ namespace INTERP_KERNEL
     void reverse() { _direction=(!_direction); }
     bool isNodeIn(Node *n) const;
     double getAreaOfZone() const { double ret=_ptr->getAreaOfZone(); return _direction?ret:-ret; }
+    void getBarycenterOfZone(double *bary) const;
     void fillBounds(Bounds& output) const;
     void applySimilarity(double xBary, double yBary, double dimChar) { _ptr->applySimilarity(xBary,yBary,dimChar); }
     void getAllNodes(std::set<Node *>& output) const;

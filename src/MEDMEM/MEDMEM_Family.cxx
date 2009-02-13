@@ -41,7 +41,7 @@ using namespace MED_EN;
 FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), _numberOfGroup(0)
 {
     MESSAGE_MED("FAMILY::FAMILY()");
-};
+}
 
 FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
                int *AttributeIdentifier, int *AttributeValue, string AttributeDescription,
@@ -211,7 +211,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   }
 
 
-};
+}
 
 FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
 {
@@ -235,7 +235,7 @@ FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
   _groupName.resize(_numberOfGroup) ;
   for (int i=0;i<m._numberOfGroup;i++)
     _groupName[i]=m._groupName[i];
-};
+}
 
 FAMILY::FAMILY(const SUPPORT & s):SUPPORT(s)
 {
@@ -245,12 +245,12 @@ FAMILY::FAMILY(const SUPPORT & s):SUPPORT(s)
   _numberOfAttribute = 0;
 
   _numberOfGroup = 0;
-};
+}
 
 FAMILY::~FAMILY() 
 {
     MESSAGE_MED("~FAMILY()");
-};
+}
   
 FAMILY & FAMILY::operator=(const FAMILY &fam) 
 {
@@ -275,7 +275,7 @@ FAMILY & FAMILY::operator=(const FAMILY &fam)
     _groupName.clear();
     _groupName = fam._groupName;
     return *this;
-};
+}
 
 ostream & MEDMEM::operator<<(ostream &os, FAMILY &myFamily)
 {
@@ -293,7 +293,7 @@ ostream & MEDMEM::operator<<(ostream &os, FAMILY &myFamily)
     os << "    * "<<myFamily.getGroupName(j).c_str()<<endl ;
 
   return os;
-};
+}
 
 ostream & MEDMEM::operator<<(ostream &os, const FAMILY &myFamily)
 {
@@ -311,7 +311,7 @@ ostream & MEDMEM::operator<<(ostream &os, const FAMILY &myFamily)
     os << "    * "<<myFamily.getGroupName(j).c_str()<<endl ;
 
   return os;
-};
+}
 
 bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
 {

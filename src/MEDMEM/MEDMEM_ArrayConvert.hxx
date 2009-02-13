@@ -56,7 +56,7 @@ ArrayConvert(
 
   return myArray;
 
-};
+}
 
 template  <class T, class CHECKING_POLICY>
 MEDMEM_Array<T, NoInterlaceGaussPolicy, CHECKING_POLICY> *
@@ -90,7 +90,7 @@ ArrayConvert(
 
   return myArray;
 
-};
+}
 
 template  <class T, class CHECKING_POLICY>
 MEDMEM_Array<T, FullInterlaceGaussPolicy, CHECKING_POLICY> *
@@ -158,7 +158,7 @@ ArrayConvert2No(
   
   return myArray;
 
-};
+}
 
 template  <class T, class CHECKING_POLICY>
 MEDMEM_Array<T, NoInterlaceNoGaussPolicy, CHECKING_POLICY> *
@@ -184,7 +184,7 @@ ArrayConvert(
 
   return myArray;
 
-};
+}
 
 template  <class T, class CHECKING_POLICY>
 MEDMEM_Array<T, FullInterlaceNoGaussPolicy, CHECKING_POLICY> *
@@ -236,7 +236,7 @@ ArrayConvert2No(
   
   return myArray;
 
-};
+}
 
 template  <class T, class CHECKING_POLICY>
 MEDMEM_Array<T, FullInterlaceNoGaussPolicy, CHECKING_POLICY> *
@@ -262,7 +262,7 @@ ArrayConvert(
 
   return myArray;
 
-};
+}
 
 
 

@@ -16,15 +16,17 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef _TRIANGULATION_INTERSECTOR_HXX_
-#define _TRIANGULATION_INTERSECTOR_HXX_
+#ifndef __TRIANGULATIONINTERSECTOR_HXX__
+#define __TRIANGULATIONINTERSECTOR_HXX__
 
-#include "PlanarIntersector.hxx"
+#include "PlanarIntersectorP0P0.hxx"
+#include "PlanarIntersectorP0P1.hxx"
+#include "PlanarIntersectorP1P0.hxx"
 
 namespace INTERP_KERNEL
 {
-  template<class MyMeshType>
-  class INTERPKERNEL_EXPORT TriangulationIntersector : public PlanarIntersector<MyMeshType>
+  template<class MyMeshType, class MyMatrix, template <class MeshType, class TheMatrix, class ThisIntersector> class InterpType >
+  class TriangulationIntersector : public InterpType<MyMeshType,MyMatrix,TriangulationIntersector<MyMeshType,MyMatrix,InterpType> >
   {
   public:
     static const int SPACEDIM=MyMeshType::MY_SPACEDIM;
@@ -32,16 +34,10 @@ namespace INTERP_KERNEL
     typedef typename MyMeshType::MyConnType ConnType;
     static const NumberingPolicy numPol=MyMeshType::My_numPol;
   public:
-    TriangulationIntersector(const MyMeshType& mesh_A, const MyMeshType& mesh_B,
-                             double dimCaracteristic, double precision, double medianPlane, int printLevel);
-    double intersectCells(ConnType icell_A, ConnType icell_B, int nb_NodesA, int nb_NodesB);
-  private :
-    const ConnType *_connectA;
-    const ConnType *_connectB;
-    const double *_coordsA;
-    const double *_coordsB;
-    const ConnType *_connIndexA;
-    const ConnType *_connIndexB;
+    TriangulationIntersector(const MyMeshType& meshT, const MyMeshType& meshS,
+                             double dimCaracteristic, double precision, double medianPlane, int orientation, int printLevel);
+    double intersectGeometry(ConnType icellT, ConnType icellS, ConnType nbNodesT, ConnType nbNodesS);
+    double intersectGeometryWithQuadrangle(const double *quadrangle, const std::vector<double>& sourceCoords, bool isSourceQuad);
   };
 }
 

@@ -19,7 +19,7 @@
 #ifndef __CELLMODEL_INTERP_KERNEL_HXX__
 #define __CELLMODEL_INTERP_KERNEL_HXX__
 
-#include <INTERPKERNEL_defines.hxx>
+#include "INTERPKERNELDefines.hxx"
 
 #include "NormalizedUnstructuredMesh.hxx"
 
@@ -40,22 +40,26 @@ namespace INTERP_KERNEL
     static void buildUniqueInstance();
   public:
     static const CellModel& getCellModel(NormalizedCellType type);
-    //! sonId is in C format.
+    bool isDynamic() const { return _dyn; }
+    bool isQuadratic() const { return _quadratic; }
     unsigned getDimension() const { return _dim; }
-    const unsigned *getNodesConstituentTheSon(unsigned sonId) const { return _sonsCon[sonId]; }
-    unsigned getNumberOfNodes() const { return _nbOfPts; }
-    unsigned getNumberOfSons() const { return _nbOfSons; }
-    unsigned getNumberOfNodesConstituentTheSon(unsigned sonId) const { return _nbOfSonsCon[sonId]; }
-    NormalizedCellType getSonType(unsigned sonId) const { return _sonsType[sonId]; }
+    //! sonId is in C format.
+    const unsigned *getNodesConstituentTheSon(unsigned sonId) const { return _sons_con[sonId]; }
+    unsigned getNumberOfNodes() const { return _nb_of_pts; }
+    unsigned getNumberOfSons() const { return _nb_of_sons; }
+    unsigned getNumberOfNodesConstituentTheSon(unsigned sonId) const { return _nb_of_sons_con[sonId]; }
+    NormalizedCellType getSonType(unsigned sonId) const { return _sons_type[sonId]; }
     void fillSonCellNodalConnectivity(int sonId, const int *nodalConn, int *sonNodalConn) const;
   private:
+    bool _dyn;
+    bool _quadratic;
     unsigned _dim;
-    unsigned _nbOfPts;
-    unsigned _nbOfSons;
-    unsigned _sonsCon[MAX_NB_OF_SONS][MAX_NB_OF_NODES_PER_ELEM];
-    unsigned _nbOfSonsCon[MAX_NB_OF_SONS];
-    NormalizedCellType _sonsType[MAX_NB_OF_SONS];
-    static std::map<NormalizedCellType,CellModel> _mapOfUniqueInstance;
+    unsigned _nb_of_pts;
+    unsigned _nb_of_sons;
+    unsigned _sons_con[MAX_NB_OF_SONS][MAX_NB_OF_NODES_PER_ELEM];
+    unsigned _nb_of_sons_con[MAX_NB_OF_SONS];
+    NormalizedCellType _sons_type[MAX_NB_OF_SONS];
+    static std::map<NormalizedCellType,CellModel> _map_of_unique_instance;
   };
 }
 

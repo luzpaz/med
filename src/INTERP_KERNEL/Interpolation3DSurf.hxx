@@ -24,24 +24,24 @@
 
 namespace INTERP_KERNEL
 {
-  class INTERPKERNEL_EXPORT Interpolation3DSurf : public InterpolationPlanar<Interpolation3DSurf>
+  class Interpolation3DSurf : public InterpolationPlanar<Interpolation3DSurf>
   {
   public:
     Interpolation3DSurf();
-		Interpolation3DSurf(const InterpolationOptions& io);
+    Interpolation3DSurf(const InterpolationOptions& io);
     void setOptions(double precision, int printLevel, double medianPlane, 
                     IntersectionType intersectionType, bool doRotate, int orientation=0);
 
   public:
-    bool doRotate() const { return _doRotate; }
-    double medianPlane() const { return _medianPlane; }
-    template<class MyMeshType>
-    void performAdjustmentOfBB(PlanarIntersector<MyMeshType>* intersector, std::vector<double>& bbox) const
-    { intersector->adjustBoundingBoxes(bbox,_surf3DAdjustmentEps); }
+    bool doRotate() const { return _do_rotate; }
+    double medianPlane() const { return _median_plane; }
+    template<class MyMeshType, class MyMatrixRow>
+      void performAdjustmentOfBB(PlanarIntersector<MyMeshType,MyMatrixRow>* intersector, std::vector<double>& bbox) const
+    { intersector->adjustBoundingBoxes(bbox,_surf_3D_adjustment_eps); }
   protected:
-    bool _doRotate;
-    double _medianPlane;
-    double _surf3DAdjustmentEps;
+    bool _do_rotate;
+    double _median_plane;
+    double _surf_3D_adjustment_eps;
     static const double DFT_MEDIAN_PLANE;
     static const double DFT_SURF3D_ADJ_EPS;
   };

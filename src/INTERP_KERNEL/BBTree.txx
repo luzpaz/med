@@ -16,18 +16,16 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef __BBTREE_H__
-#define __BBTREE_H__
+#ifndef __BBTREE_TXX__
+#define __BBTREE_TXX__
 
 #include <vector>
 #include <algorithm>
 
 #include <iostream>
 #include <limits>
-const int MIN_NB_ELEMS =15;
-const int MAX_LEVEL=20;
 
-template <int dim>
+template <int dim, class ConnType = int>
 class BBTree
 {
 
@@ -38,32 +36,34 @@ private:
   double _max_left;
   double _min_right;
   double* _bb;
-  std::vector<int> _elems;
+  typename std::vector<ConnType> _elems;
   bool _terminal;
-  int _nbelems;
-	double _epsilon;
+  ConnType _nbelems;
+  double _epsilon;
 
+  static const int MIN_NB_ELEMS=15;
+  static const int MAX_LEVEL=20;
 public:
 
-	/*!
-		Constructor of the bounding box tree
-		\param bbs pointer to the [xmin1 xmax1 ymin1 ymax1 xmin2 xmax2 ...] array containing the bounding boxes that are to be indexed.
-		\param elems array to the indices of the elements contained in the BBTree
-		\param level level in the BBTree recursive structure
-		\param nbelems nb of elements in the BBTree
-		\param epsilon precision to which points are decided to be coincident
+  /*!
+    Constructor of the bounding box tree
+    \param bbs pointer to the [xmin1 xmax1 ymin1 ymax1 xmin2 xmax2 ...] array containing the bounding boxes that are to be indexed.
+    \param elems array to the indices of the elements contained in the BBTree
+    \param level level in the BBTree recursive structure
+    \param nbelems nb of elements in the BBTree
+    \param epsilon precision to which points are decided to be coincident
 
-		Parameters \a elems and \a level are used only by BBTree itself for creating trees recursively. A typical use is therefore :
-\code
+    Parameters \a elems and \a level are used only by BBTree itself for creating trees recursively. A typical use is therefore :
+    \code
     int nbelems=...
     double* bbs= new double[2*2*nbelems];
-		// filling bbs ...
-   	...
-		BBTree<2> tree = new BBTree<2>(elems,0,0,nbelems,1e-12);
-\endcode
-	 */
+    // filling bbs ...
+    ...
+    BBTree<2> tree = new BBTree<2>(elems,0,0,nbelems,1e-12);
+    \endcode
+  */
 
-  BBTree(double* bbs, int* elems, int level, int nbelems, double epsilon=1E-12):
+  BBTree(double* bbs, ConnType* elems, int level, ConnType nbelems, double epsilon=1E-12):
     _left(0), _right(0), _level(level), _bb(bbs), _terminal(false),_nbelems(nbelems),_epsilon(epsilon)
   {
     if (nbelems < MIN_NB_ELEMS || level> MAX_LEVEL)
@@ -73,9 +73,9 @@ public:
       }
     double* nodes=new double [nbelems];
     _elems.resize(nbelems);
-    for (int i=0; i<nbelems; i++)
+    for (ConnType i=0; i<nbelems; i++)
       {
-        int elem;
+        ConnType elem;
         if (elems!=0)
           elem= elems[i];
         else
@@ -91,8 +91,8 @@ public:
     delete[] nodes;
     // std:: cout << *median <<std::endl;
 
-    std::vector<int> new_elems_left;
-    std::vector<int> new_elems_right;
+    std::vector<ConnType> new_elems_left;
+    std::vector<ConnType> new_elems_right;
  
     new_elems_left.reserve(nbelems/2+1);
     new_elems_right.reserve(nbelems/2+1);
@@ -142,10 +142,10 @@ public:
   /*! returns in \a elems the list of elements potentially intersecting the bounding box pointed to by \a bb
     
     \param bb pointer to query bounding box
-    \param elems list of elements (given in 0-indexing) intersecting the bounding box
+    \param elems list of elements (given in 0-indexing that is to say in \b C \b mode) intersecting the bounding box
   */
 
-  void getIntersectingElems(const double* bb, std::vector<int>& elems) const
+  void getIntersectingElems(const double* bb, std::vector<ConnType>& elems) const
   {
     //  terminal node : return list of elements intersecting bb
     if (_terminal)
@@ -190,12 +190,12 @@ public:
     \param elems list of elements (given in 0-indexing) intersecting the bounding box
   */
 
-  void getElementsAroundPoint(const double* xx, std::vector<int>& elems) const
+  void getElementsAroundPoint(const double* xx, std::vector<ConnType>& elems) const
   {
     //  terminal node : return list of elements intersecting bb
     if (_terminal)
       {
-        for (int i=0; i<_nbelems; i++)
+        for (ConnType i=0; i<_nbelems; i++)
           {
             const double* const  bb_ptr=_bb+_elems[i]*2*dim;
             bool intersects = true;

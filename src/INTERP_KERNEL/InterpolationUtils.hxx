@@ -16,10 +16,11 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef _INTERPOLATIONUTILS_HXX_
-#define _INTERPOLATIONUTILS_HXX_
+#ifndef __INTERPOLATIONUTILS_HXX__
+#define __INTERPOLATIONUTILS_HXX__
 
-#include <INTERPKERNEL_defines.hxx>
+#include "INTERPKERNELDefines.hxx"
+#include "InterpKernelException.hxx"
 
 #include "NormalizedUnstructuredMesh.hxx"
 
@@ -34,17 +35,6 @@
 
 namespace INTERP_KERNEL
 {
-
-  class Exception : std::exception
-  {
-  public:
-    Exception(const char *what):_reason(what) { }
-    ~Exception() throw () { }
-    const char *what() { return _reason.c_str(); }
-  protected:
-    std::string _reason;
-  };
-
   template<class ConnType, NumberingPolicy numPol>
   class OTT//OffsetToolTrait
   {
@@ -125,18 +115,42 @@ namespace INTERP_KERNEL
     double N=P1_P2*P1_P2+P3_P1*P3_P1-P2_P3*P2_P3;
     double D=2.0*P1_P2*P3_P1;
     double COS=N/D;
-		if (COS>1.0) COS=1.0;
-		if (COS<-1.0) COS=-1.0;
+    if (COS>1.0) COS=1.0;
+    if (COS<-1.0) COS=-1.0;
     Vect.push_back(COS);
     double V=mon_determinant(P_2,P_3,P_1);
     double D_1=P1_P2*P3_P1;
     double SIN=V/D_1;
-		if (SIN>1.0) SIN=1.0;
-		if (SIN<-1.0) SIN=-1.0;
+    if (SIN>1.0) SIN=1.0;
+    if (SIN<-1.0) SIN=-1.0;
     Vect.push_back(SIN);
        
     return Vect;
        
+  }
+
+  /*!
+   * This method builds a quadrangle built with the first point of 'triIn' the barycenter of two edges starting or ending with
+   * the first point of 'triIn' and the barycenter of 'triIn'.
+   *
+   * @param triIn is a 6 doubles array in full interlace mode, that represents a triangle.
+   * @param quadOut is a 8 doubles array filled after the following call.
+   */
+  template<int SPACEDIM>
+  inline void fillDualCellOfTri(const double *triIn, double *quadOut)
+  {
+    //1st point
+    std::copy(triIn,triIn+SPACEDIM,quadOut);
+    double tmp[SPACEDIM];
+    std::transform(triIn,triIn+SPACEDIM,triIn+SPACEDIM,tmp,std::plus<double>());
+    //2nd point
+    std::transform(tmp,tmp+SPACEDIM,quadOut+SPACEDIM,std::bind2nd(std::multiplies<double>(),0.5));
+    std::transform(tmp,tmp+SPACEDIM,triIn+2*SPACEDIM,tmp,std::plus<double>());
+    //3rd point
+    std::transform(tmp,tmp+SPACEDIM,quadOut+2*SPACEDIM,std::bind2nd(std::multiplies<double>(),1/3.));
+    //4th point
+    std::transform(triIn,triIn+SPACEDIM,triIn+2*SPACEDIM,tmp,std::plus<double>());
+    std::transform(tmp,tmp+SPACEDIM,quadOut+3*SPACEDIM,std::bind2nd(std::multiplies<double>(),0.5));
   }
 
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */
@@ -164,6 +178,128 @@ namespace INTERP_KERNEL
 
 
     return Bary;
+  }
+
+
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  /*     Calculate barycentric coordinates of a 2D point p */ 
+  /*     with respect to the triangle verices.             */
+  /*     triaCoords are in full interlace                  */
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+
+  inline void barycentric_coords(const double* triaCoords, const double* p, double* bc)
+  {
+    // matrix 2x2
+    double
+      T11 = triaCoords[0]-triaCoords[4], T12 = triaCoords[2]-triaCoords[4],
+      T21 = triaCoords[1]-triaCoords[5], T22 = triaCoords[3]-triaCoords[5];
+    // matrix determinant
+    double Tdet = T11*T22 - T12*T21;
+    if ( fabs( Tdet ) < std::numeric_limits<double>::min() ) {
+      bc[0]=1; bc[1]=0; bc[2]=0;
+      return;
+    }
+    // matrix inverse
+    double t11 = T22, t12 = -T12, t21 = -T21, t22 = T11;
+    // vector
+    double r11 = p[0]-triaCoords[4], r12 = p[1]-triaCoords[5];
+    // barycentric coordinates: mutiply matrix by vector
+    bc[0] = (t11 * r11 + t12 * r12)/Tdet;
+    bc[1] = (t21 * r11 + t22 * r12)/Tdet;
+    bc[2] = 1. - bc[0] - bc[1];
+  }
+
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+  /*     Calculate barycentric coordinates of a point p    */ 
+  /*     with respect to triangle or tetra verices.        */
+  /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
+
+  inline void barycentric_coords(const std::vector<const double*>& n, const double* p, double* bc)
+  {
+    enum { _X, _Y, _Z };
+    if ( n.size() == 3 ) // TRIA3
+      {
+        // matrix 2x2
+        double
+          T11 = n[0][_X]-n[2][_X], T12 = n[1][_X]-n[2][_X],
+          T21 = n[0][_Y]-n[2][_Y], T22 = n[1][_Y]-n[2][_Y];
+        // matrix determinant
+        double Tdet = T11*T22 - T12*T21;
+        if ( std::fabs( Tdet ) < std::numeric_limits<double>::min() ) {
+          bc[0]=1; bc[1]=bc[2]=0; // no solution
+          return;
+        }
+        // matrix inverse
+        double t11 = T22, t12 = -T12, t21 = -T21, t22 = T11;
+        // vector
+        double r11 = p[_X]-n[2][_X], r12 = p[_Y]-n[2][_Y];
+        // barycentric coordinates: mutiply matrix by vector
+        bc[0] = (t11 * r11 + t12 * r12)/Tdet;
+        bc[1] = (t21 * r11 + t22 * r12)/Tdet;
+        bc[2] = 1. - bc[0] - bc[1];
+      }
+    else // TETRA4
+      {
+        bc[3]=0; // for no solution
+
+        // Find bc by solving system of 3 equations using Gaussian elimination algorithm
+        // bc1*( x1 - x4 ) + bc2*( x2 - x4 ) + bc3*( x3 - x4 ) = px - x4
+        // bc1*( y1 - y4 ) + bc2*( y2 - y4 ) + bc3*( y3 - y4 ) = px - y4
+        // bc1*( z1 - z4 ) + bc2*( z2 - z4 ) + bc3*( z3 - z4 ) = px - z4
+        const int nbCol=4, nbRow=3;
+
+        double T[nbRow][nbCol]=
+          {{ n[0][_X]-n[3][_X], n[1][_X]-n[3][_X], n[2][_X]-n[3][_X], p[_X]-n[3][_X] },
+           { n[0][_Y]-n[3][_Y], n[1][_Y]-n[3][_Y], n[2][_Y]-n[3][_Y], p[_Y]-n[3][_Y] },
+           { n[0][_Z]-n[3][_Z], n[1][_Z]-n[3][_Z], n[2][_Z]-n[3][_Z], p[_Z]-n[3][_Z] }};
+
+        // make upper triangular matrix (forward elimination)
+
+        int iR[nbRow] = { 0, 1, 2 };
+
+        for ( int i = 0; i < 2; ++i ) // nullify 2 rows
+          {
+            // swap rows to have max value of i-th column in i-th row
+            double max = std::fabs( T[ iR[i] ][i] );
+            for ( int r = i+1; r < nbRow; ++r ) {
+              double t = std::fabs( T[ iR[r] ][i] );
+              if ( t > max ) {
+                max = t;
+                std::swap( iR[r], iR[i] );
+              }
+            }
+            if ( max < std::numeric_limits<double>::min() ) {
+              bc[0]=1; bc[1]=bc[2]=bc[3]=0;
+              return; // no solution
+            }
+            // make 0 below T[i][i] (actually we do not modify i-th column)
+            double* tUpRow = T[ iR[i] ];
+            for ( int r = i+1; r < nbRow; ++r ) {
+              double* tRow = T[ iR[r] ];
+              double coef = tRow[ i ] / tUpRow[ i ];
+              for ( int c = i+1; c < nbCol; ++c )
+                tRow[ c ] -= tUpRow[ c ] * coef;
+            }
+          }
+        double* tRow = T[ iR[2] ];
+        if ( std::fabs( tRow[ 2 ] ) < std::numeric_limits<double>::min() ) {
+          bc[0]=1; bc[1]=bc[2]=bc[3]=0;
+          return; // no solution
+        }
+        tRow[ 3 ] /= tRow[ 2 ];
+
+        // calculate solution (back substitution)
+
+        bc[ 2 ] = tRow[ 3 ];
+
+        tRow = T[ iR[1] ];
+        bc[ 1 ] = (tRow[ 3 ] - bc[2]*tRow[ 2 ]) / tRow[ 1 ];
+
+        tRow = T[ iR[0] ];
+        bc[ 0 ] = (tRow[ 3 ] - bc[2]*tRow[ 2 ] - bc[1]*tRow[ 1 ]) / tRow[ 0 ];
+
+        bc[ 3 ] = 1. - bc[0] - bc[1] - bc[2];
+      }
   }
 
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */
@@ -274,12 +410,12 @@ namespace INTERP_KERNEL
         double k_1=-((P_3[1]-P_4[1])*(P_3[0]-P_1[0])+(P_4[0]-P_3[0])*(P_3[1]-P_1[1]))/det;
 
         if (k_1 >= -absolute_precision && k_1 <= 1+absolute_precision)
-        //if( k_1 >= -precision && k_1 <= 1+precision)
+          //if( k_1 >= -precision && k_1 <= 1+precision)
           {
             double k_2= ((P_1[1]-P_2[1])*(P_1[0]-P_3[0])+(P_2[0]-P_1[0])*(P_1[1]-P_3[1]))/det;
 
             if (k_2 >= -absolute_precision && k_2 <= 1+absolute_precision)
-            //if( k_2 >= -precision && k_2 <= 1+precision)
+              //if( k_2 >= -precision && k_2 <= 1+precision)
               {
                 double P_0[2];
                 P_0[0]=P_1[0]+k_1*(P_2[0]-P_1[0]);
@@ -336,24 +472,24 @@ namespace INTERP_KERNEL
       {V.push_back(Num); }
   }
 
-	/*! Function that compares two angles from the values of the pairs (sin,cos)*/
-	/*! Angles are considered in [0, 2Pi] bt are not computed explicitely */
+  /*! Function that compares two angles from the values of the pairs (sin,cos)*/
+  /*! Angles are considered in [0, 2Pi] bt are not computed explicitely */
   class AngleLess
   {
   public:
     bool operator()(std::pair<double,double>theta1, std::pair<double,double> theta2) 
     {
-			double norm1 = sqrt(theta1.first*theta1.first +theta1.second*theta1.second);
- 			double norm2 = sqrt(theta2.first*theta2.first +theta2.second*theta2.second);
-			
-			double epsilon = 1.e-12;
-			
-			if( norm1 < epsilon || norm2 < epsilon  ) 
-				std::cout << "Warning InterpolationUtils.hxx: AngleLess : Vector with zero norm, cannot define the angle !!!! " << std::endl;
-			
+      double norm1 = sqrt(theta1.first*theta1.first +theta1.second*theta1.second);
+      double norm2 = sqrt(theta2.first*theta2.first +theta2.second*theta2.second);
+      
+      double epsilon = 1.e-12;
+      
+      if( norm1 < epsilon || norm2 < epsilon  ) 
+        std::cout << "Warning InterpolationUtils.hxx: AngleLess : Vector with zero norm, cannot define the angle !!!! " << std::endl;
+      
       return theta1.second*(norm2 + theta2.first) < theta2.second*(norm1 + theta1.first);
     
-}
+    }
   };
 
 
@@ -376,7 +512,7 @@ namespace INTERP_KERNEL
         double *COS=new double[taille/2];
         double *SIN=new double[taille/2];
         //double *angle=new double[taille/2];
-				std::vector<double> Bary=bary_poly(V);
+        std::vector<double> Bary=bary_poly(V);
         COS[0]=1.0;
         SIN[0]=0.0;
         //angle[0]=0.0;
@@ -386,30 +522,30 @@ namespace INTERP_KERNEL
             COS[i+1]=Trigo[0];
             SIN[i+1]=Trigo[1];
             //if(SIN[i+1]>=0)
-						//    {angle[i+1]=atan2(SIN[i+1],COS[i+1]);}
-//             else
-//               {angle[i+1]=-atan2(SIN[i+1],COS[i+1]);}
+            //    {angle[i+1]=atan2(SIN[i+1],COS[i+1]);}
+            //             else
+            //               {angle[i+1]=-atan2(SIN[i+1],COS[i+1]);}
           }
                      
         //ensuite on ordonne les angles.
         std::vector<double> Pt_ordonne;
         Pt_ordonne.reserve(taille);
-				//        std::multimap<double,int> Ordre;
+        //        std::multimap<double,int> Ordre;
         std::multimap<std::pair<double,double>,int, AngleLess> CosSin;
         for(int i=0;i<taille/2;i++)       
           {
-						//	Ordre.insert(std::make_pair(angle[i],i));
-						CosSin.insert(std::make_pair(std::make_pair(SIN[i],COS[i]),i));
-					}
-				//        std::multimap <double,int>::iterator mi;
-				std::multimap<std::pair<double,double>,int, AngleLess>::iterator   micossin;
-// 				for(mi=Ordre.begin();mi!=Ordre.end();mi++)
-//           {
-//             int j=(*mi).second;
-//             Pt_ordonne.push_back(V[2*j]);
-//             Pt_ordonne.push_back(V[2*j+1]);
-//           }
-				for(micossin=CosSin.begin();micossin!=CosSin.end();micossin++)
+            //  Ordre.insert(std::make_pair(angle[i],i));
+            CosSin.insert(std::make_pair(std::make_pair(SIN[i],COS[i]),i));
+          }
+        //        std::multimap <double,int>::iterator mi;
+        std::multimap<std::pair<double,double>,int, AngleLess>::iterator   micossin;
+        //         for(mi=Ordre.begin();mi!=Ordre.end();mi++)
+        //           {
+        //             int j=(*mi).second;
+        //             Pt_ordonne.push_back(V[2*j]);
+        //             Pt_ordonne.push_back(V[2*j+1]);
+        //           }
+        for(micossin=CosSin.begin();micossin!=CosSin.end();micossin++)
           {
             int j=(*micossin).second;
             Pt_ordonne.push_back(V[2*j]);
@@ -417,7 +553,7 @@ namespace INTERP_KERNEL
           }
         delete [] COS;
         delete [] SIN;
-				//        delete [] angle;
+        //        delete [] angle;
         return Pt_ordonne;
       }
   }
@@ -426,12 +562,12 @@ namespace INTERP_KERNEL
   inline void getElemBB(double* bb, const double *coordsOfMesh, int iP, int nb_nodes)
   {
     bb[0]=std::numeric_limits<double>::max();
-		bb[1]=-std::numeric_limits<double>::max();
-		bb[2]=std::numeric_limits<double>::max();
-		bb[3]=-std::numeric_limits<double>::max();
-		bb[4]=std::numeric_limits<double>::max();
-		bb[5]=-std::numeric_limits<double>::max();
-		
+    bb[1]=-std::numeric_limits<double>::max();
+    bb[2]=std::numeric_limits<double>::max();
+    bb[3]=-std::numeric_limits<double>::max();
+    bb[4]=std::numeric_limits<double>::max();
+    bb[5]=-std::numeric_limits<double>::max();
+    
     for (int i=0; i<nb_nodes; i++)
       {
         double x = coordsOfMesh[3*(iP+i)];
@@ -450,7 +586,7 @@ namespace INTERP_KERNEL
   /* Computes the dot product of a and b */
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
   template<int dim> 
-	inline double dotprod( double * a, double * b)
+  inline double dotprod( double * a, double * b)
   {
     double result=0;
     for(int idim = 0; idim < dim ; idim++) result += a[idim]*b[idim];
@@ -460,7 +596,7 @@ namespace INTERP_KERNEL
   /* Computes the norm of vector v */
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/  
   template<int dim> 
-	inline double norm( double * v)
+  inline double norm( double * v)
   {   
     double result =0;
     for(int idim =0; idim<dim; idim++) result+=v[idim]*v[idim];
@@ -470,14 +606,14 @@ namespace INTERP_KERNEL
   /* Computes the square norm of vector a-b */
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/  
   template<int dim> 
-	inline double distance2( const double * a, const double * b)
+  inline double distance2( const double * a, const double * b)
   {   
     double result =0;
     for(int idim =0; idim<dim; idim++) result+=(a[idim]-b[idim])*(a[idim]-b[idim]);
     return result;
   }
-	template<class T, int dim> 
-	inline double distance2(  T * a, int inda, T * b, int indb)
+  template<class T, int dim> 
+  inline double distance2(  T * a, int inda, T * b, int indb)
   {   
     double result =0;
     for(int idim =0; idim<dim; idim++) result += ((*a)[inda+idim] - (*b)[indb+idim])* ((*a)[inda+idim] - (*b)[indb+idim]);
@@ -640,96 +776,96 @@ namespace INTERP_KERNEL
       }
     return result;
   }
-	
-	/*! Computes the triple product (XA^XB).XC (in 3D)*/
-	inline double triple_product(const double* A, const double*B, const double*C, const double*X)
-	{
-		double XA[3];
-		XA[0]=A[0]-X[0];
-		XA[1]=A[1]-X[1];
-		XA[2]=A[2]-X[2];
-		double XB[3];
-		XB[0]=B[0]-X[0];
-		XB[1]=B[1]-X[1];
-		XB[2]=B[2]-X[2];
-		double XC[3];
-		XC[0]=C[0]-X[0];
-		XC[1]=C[1]-X[1];
-		XC[2]=C[2]-X[2];
-		
-		return 
-			(XA[1]*XB[2]-XA[2]*XB[1])*XC[0]+
-			(XA[2]*XB[0]-XA[0]*XB[2])*XC[1]+
-			(XA[0]*XB[1]-XA[1]*XB[0])*XC[2];
-	}
-	
-	/*! Subroutine of checkEqualPolygins that tests if two list of nodes (not necessarily distincts) describe the same polygon, assuming they share a comon point.*/
-	/*! Indexes istart1 and istart2 designate two points P1 in L1 and P2 in L2 that have identical coordinates. Generally called with istart1=0.*/
-	/*! Integer sign ( 1 or -1) indicate the direction used in going all over L2. */
-	template<class T, int dim> 
-	bool checkEqualPolygonsOneDirection(T * L1, T * L2, int size1, int size2, int istart1, int istart2, double epsilon, int sign)
-	{
-		int i1 = istart1;
-		int i2 = istart2;
-		int i1next = ( i1 + 1 ) % size1;
-		int i2next = ( i2 + sign +size2) % size2;
-		
-		while(true)
-			{
-				while( i1next!=istart1 && distance2<T,dim>(L1,i1*dim, L1,i1next*dim) < epsilon ) i1next = (	i1next + 1 ) % size1;	
-				while( i2next!=istart2 && distance2<T,dim>(L2,i2*dim, L2,i2next*dim) < epsilon ) i2next = (	i2next + sign +size2 ) % size2;	
-				
-				if(i1next == istart1)
-					{
-						if(i2next == istart2)
-							return true;
-						else return false;
-					}
-				else
-					if(i2next == istart2)
-						return false;
-					else 
-						{
-							if(distance2<T,dim>(L1,i1next*dim, L2,i2next*dim) > epsilon )
-								return false;
-							else
-								{
-									i1 = i1next;
-									i2 = i2next;
-									i1next = ( i1 + 1 ) % size1;
-									i2next = ( i2 + sign + size2 ) % size2;
-								}
-						}
-			}
-	}
+  
+  /*! Computes the triple product (XA^XB).XC (in 3D)*/
+  inline double triple_product(const double* A, const double*B, const double*C, const double*X)
+  {
+    double XA[3];
+    XA[0]=A[0]-X[0];
+    XA[1]=A[1]-X[1];
+    XA[2]=A[2]-X[2];
+    double XB[3];
+    XB[0]=B[0]-X[0];
+    XB[1]=B[1]-X[1];
+    XB[2]=B[2]-X[2];
+    double XC[3];
+    XC[0]=C[0]-X[0];
+    XC[1]=C[1]-X[1];
+    XC[2]=C[2]-X[2];
+    
+    return 
+      (XA[1]*XB[2]-XA[2]*XB[1])*XC[0]+
+      (XA[2]*XB[0]-XA[0]*XB[2])*XC[1]+
+      (XA[0]*XB[1]-XA[1]*XB[0])*XC[2];
+  }
+  
+  /*! Subroutine of checkEqualPolygins that tests if two list of nodes (not necessarily distincts) describe the same polygon, assuming they share a comon point.*/
+  /*! Indexes istart1 and istart2 designate two points P1 in L1 and P2 in L2 that have identical coordinates. Generally called with istart1=0.*/
+  /*! Integer sign ( 1 or -1) indicate the direction used in going all over L2. */
+  template<class T, int dim> 
+  bool checkEqualPolygonsOneDirection(T * L1, T * L2, int size1, int size2, int istart1, int istart2, double epsilon, int sign)
+  {
+    int i1 = istart1;
+    int i2 = istart2;
+    int i1next = ( i1 + 1 ) % size1;
+    int i2next = ( i2 + sign +size2) % size2;
+    
+    while(true)
+      {
+        while( i1next!=istart1 && distance2<T,dim>(L1,i1*dim, L1,i1next*dim) < epsilon ) i1next = (  i1next + 1 ) % size1;  
+        while( i2next!=istart2 && distance2<T,dim>(L2,i2*dim, L2,i2next*dim) < epsilon ) i2next = (  i2next + sign +size2 ) % size2;  
+        
+        if(i1next == istart1)
+          {
+            if(i2next == istart2)
+              return true;
+            else return false;
+          }
+        else
+          if(i2next == istart2)
+            return false;
+          else 
+            {
+              if(distance2<T,dim>(L1,i1next*dim, L2,i2next*dim) > epsilon )
+                return false;
+              else
+                {
+                  i1 = i1next;
+                  i2 = i2next;
+                  i1next = ( i1 + 1 ) % size1;
+                  i2next = ( i2 + sign + size2 ) % size2;
+                }
+            }
+      }
+  }
 
-	/*! Tests if two list of nodes (not necessarily distincts) describe the same polygon.*/
-	/*! Existence of multiple points in the list is considered.*/
-	template<class T, int dim> 
-	bool checkEqualPolygons(T * L1, T * L2, double epsilon)
-	{
-		if(L1==NULL || L2==NULL) 
-			{
-				std::cout << "Warning InterpolationUtils.hxx:checkEqualPolygonsPointer: Null pointer " << std::endl;
-				throw(Exception("big error: not closed polygon..."));
-			}
-		
-		int size1 = (*L1).size()/dim;
-		int size2 = (*L2).size()/dim;
-		int istart1 = 0;
-		int istart2 = 0;
-		
-		while( istart2 < size2  && distance2<T,dim>(L1,istart1*dim, L2,istart2*dim) > epsilon ) istart2++;
-	
-		if(istart2 == size2)
-			{	
-				return (size1 == 0) && (size2 == 0);
-			}
-		else 
-			return   checkEqualPolygonsOneDirection<T,dim>( L1, L2, size1, size2, istart1, istart2, epsilon,  1)
-				    || checkEqualPolygonsOneDirection<T,dim>( L1, L2, size1, size2, istart1, istart2, epsilon, -1);
+  /*! Tests if two list of nodes (not necessarily distincts) describe the same polygon.*/
+  /*! Existence of multiple points in the list is considered.*/
+  template<class T, int dim> 
+  bool checkEqualPolygons(T * L1, T * L2, double epsilon)
+  {
+    if(L1==NULL || L2==NULL) 
+      {
+        std::cout << "Warning InterpolationUtils.hxx:checkEqualPolygonsPointer: Null pointer " << std::endl;
+        throw(Exception("big error: not closed polygon..."));
+      }
+    
+    int size1 = (*L1).size()/dim;
+    int size2 = (*L2).size()/dim;
+    int istart1 = 0;
+    int istart2 = 0;
+    
+    while( istart2 < size2  && distance2<T,dim>(L1,istart1*dim, L2,istart2*dim) > epsilon ) istart2++;
+  
+    if(istart2 == size2)
+      {  
+        return (size1 == 0) && (size2 == 0);
+      }
+    else 
+      return   checkEqualPolygonsOneDirection<T,dim>( L1, L2, size1, size2, istart1, istart2, epsilon,  1)
+        || checkEqualPolygonsOneDirection<T,dim>( L1, L2, size1, size2, istart1, istart2, epsilon, -1);
 
-	}
+  }
 }
 
 

@@ -46,7 +46,7 @@ namespace MEDMEM {
 
   enum EnSightFormat { ENSIGHT_6, ENSIGHT_GOLD };
 
-  void setEnSightFormatForWriting (EnSightFormat format, bool isBinary);
+  void MEDMEM_EXPORT setEnSightFormatForWriting (EnSightFormat format, bool isBinary);
 
   EnSightFormat getEnSightFormatForWriting();
   bool          isBinaryEnSightFormatForWriting();
@@ -64,7 +64,7 @@ namespace MEDMEM {
    */
   // ==============================================================================
 
-  void setIgnoreIncompatibility(bool toIgnore=true);
+  void MEDMEM_EXPORT setIgnoreIncompatibility(bool toIgnore=true);
 }
 
 namespace MEDMEM {
@@ -186,7 +186,10 @@ namespace MEDMEM_ENSIGHT { // INTERNAL MATTERS
   static inline float _toFloat (const double & value) {
     if ( value >  FLT_MAX ) return  FLT_MAX;
     if ( value < -FLT_MAX ) return -FLT_MAX;
+#ifdef WNT
+#else
     if ( isnan( value ))    throw MEDEXCEPTION(compatibilityPb("NaN value not allowed"));
+#endif
     return float( value );
   }
   static inline float _toFloat (const int & value) { return float( value ); }
@@ -603,7 +606,10 @@ public:
   }
   float  getReal() throw (MEDEXCEPTION) {
     if ( eof() ) throw MEDEXCEPTION("Unexpected EOF");
+#ifdef WNT
+#else
     return strtof(_ptr, &_ptr);
+#endif
   }
   //!< needed after getWord(), getInt() or getReal() to get a next line
   void toNextLine() {
@@ -790,6 +796,8 @@ private:
     if ( bufSize > _maxPos - _pos )
       throw _exception;
     T* buf = new T[ nb ];
+#ifdef WNT
+#else
     ssize_t nBytesRead = ::read (_file, buf, bufSize );
     _pos += nBytesRead;
     if ( nBytesRead < bufSize ) {
@@ -802,6 +810,7 @@ private:
       while ( ++intBuf < bufEnd )
         *intBuf = InverseInt( *intBuf );
     }
+#endif
     return buf;
   }
   //!<  swap bytes of int
@@ -873,8 +882,11 @@ private:
   template <typename T>
   void add(const T* data, int nbValues) throw (MEDEXCEPTION)
   {
+#ifdef WNT
+#else
     ssize_t nbWritten = ::write( _file, (const void *) data, nbValues * sizeof(T));
     if ( nbWritten < 0 ) throw _exception;
+#endif
   }
   // ------------------------------------------------------------------------
   /*!

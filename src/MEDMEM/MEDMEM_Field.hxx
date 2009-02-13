@@ -899,8 +899,8 @@ protected:
   static T pow(T x);
 
 private:
-  void _operation(const FIELD& m,const FIELD& n, char* Op);
-  void _operationInitialize(const FIELD& m,const FIELD& n, char* Op);
+  void _operation(const FIELD& m,const FIELD& n, const char* Op);
+  void _operationInitialize(const FIELD& m,const FIELD& n, const char* Op);
   void _add_in_place(const FIELD& m,const FIELD& n);
   void _sub_in_place(const FIELD& m,const FIELD& n);
   void _mul_in_place(const FIELD& m,const FIELD& n);
@@ -1794,7 +1794,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::divDeep(const FIELD& m, co
   \endif
 */
 template <class T, class INTERLACING_TAG>
-void FIELD<T, INTERLACING_TAG>::_operationInitialize(const FIELD& m,const FIELD& n, char* Op)
+void FIELD<T, INTERLACING_TAG>::_operationInitialize(const FIELD& m,const FIELD& n, const char* Op)
 {
     MESSAGE_MED("Appel methode interne " << Op);
 
@@ -2299,7 +2299,7 @@ void FIELD<T, INTERLACIN_TAG>::applyFunc()
 
 template <class T, class INTERLACIN_TAG> T FIELD<T, INTERLACIN_TAG>::pow(T x)
 {
-  return (T)::pow(x,FIELD<T, INTERLACIN_TAG>::_scalarForPow);
+  return (T)::pow((double)x,FIELD<T, INTERLACIN_TAG>::_scalarForPow);
 }
 
 /*!  Apply to each (scalar) field component the math function pow.
@@ -3113,7 +3113,7 @@ inline int FIELD<T, INTERLACING_TAG>::addDriver (GENDRIVER & driver )
   newDriver->setId(current);
 
   return current ;
-};
+}
 
 /*!
   Remove the driver referenced by its index.
@@ -3634,7 +3634,7 @@ template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::get
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
   END_OF_MED(LOC);
-};
+}
 
 /*! \if MEDMEM_ug
 \addtogroup FIELD_gauss
@@ -3656,7 +3656,7 @@ FIELD<T,INTERLACING_TAG>::getGaussLocalization(MED_EN::medGeometryElement geomEl
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find any GaussLocalization on this geometric type" ));
 
-};
+}
 
 template <class T,class INTERLACING_TAG> const GAUSS_LOCALIZATION<INTERLACING_TAG> *
 FIELD<T,INTERLACING_TAG>::getGaussLocalizationPtr(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION)
@@ -3672,7 +3672,7 @@ FIELD<T,INTERLACING_TAG>::getGaussLocalizationPtr(MED_EN::medGeometryElement geo
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find any GaussLocalization on this geometric type" ));
 
-};
+}
 
 /*!
  * \brief Return GAUSS_LOCALIZATION_* whose interlacing type may differ from one of the field
@@ -3689,7 +3689,7 @@ FIELD<T,INTERLACING_TAG>::getGaussLocalizationRoot(MED_EN::medGeometryElement ge
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find any GaussLocalization on this geometric type: "<< geomElement ));
 
-};
+}
 
 /*!
  * \brief Take onership of GAUSS_LOCALIZATION_* whose interlacing type may differ from one of the field
@@ -3705,7 +3705,7 @@ FIELD<T,INTERLACING_TAG>::setGaussLocalization(MED_EN::medGeometryElement geomEl
   else {
     _gaussModel[ geomElement ] = gaussloc;
   }
-};
+}
 
 
 template <class T,class INTERLACING_TAG> void
@@ -3719,7 +3719,7 @@ FIELD<T,INTERLACING_TAG>::setGaussLocalization(MED_EN::medGeometryElement geomEl
   else {
     _gaussModel[ geomElement ] = new GAUSS_LOCALIZATION<INTERLACING_TAG> (gaussloc);
   }
-};
+}
 
 /*!
   Returns number of Gauss points for this medGeometryElement.
@@ -3800,7 +3800,7 @@ template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::get
  else
    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_value not defined" ));
 //   END_OF_MED();
-};
+}
 /*!
 @}
  */
@@ -3815,7 +3815,7 @@ template <class T,class INTERLACING_TAG> const int * FIELD<T,INTERLACING_TAG>::g
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
   END_OF_MED(LOC);
-};
+}
 
 template <class T,class INTERLACING_TAG> const MED_EN::medGeometryElement  * FIELD<T,INTERLACING_TAG>::getGeometricTypes()  const throw (MEDEXCEPTION)
 {
@@ -3826,7 +3826,7 @@ template <class T,class INTERLACING_TAG> const MED_EN::medGeometryElement  * FIE
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
   END_OF_MED(LOC);
-};
+}
 template <class T,class INTERLACING_TAG> bool  FIELD<T,INTERLACING_TAG>::isOnAllElements() const throw (MEDEXCEPTION)
 {
   const char * LOC = "isOnAllElements(..)";
@@ -3836,7 +3836,7 @@ template <class T,class INTERLACING_TAG> bool  FIELD<T,INTERLACING_TAG>::isOnAll
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
   END_OF_MED(LOC);
-};
+}
 
 
 /*! \if MEDMEM_ug

@@ -21,17 +21,17 @@
 
 #include "Interpolation.hxx"
 #include "NormalizedUnstructuredMesh.hxx"
-#include "IntersectorHexa.hxx"
 #include "InterpolationOptions.hxx"
+
 namespace INTERP_KERNEL
 {
-  class INTERPKERNEL_EXPORT Interpolation3D : public Interpolation<Interpolation3D>
+  class Interpolation3D : public Interpolation<Interpolation3D>
   {
   public:
     Interpolation3D();
     Interpolation3D(const InterpolationOptions& io);
-    template<class MatrixType, class MyMeshType>
-    void interpolateMeshes(const MyMeshType& srcMesh, const MyMeshType& targetMesh, MatrixType& result);
+    template<class MyMeshType, class MatrixType>
+    int interpolateMeshes(const MyMeshType& srcMesh, const MyMeshType& targetMesh, MatrixType& result, const char *method);
   private:
     SplittingPolicy _splitting_policy;
   };

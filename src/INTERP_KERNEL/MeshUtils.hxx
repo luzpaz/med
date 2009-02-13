@@ -25,7 +25,6 @@ namespace INTERP_KERNEL
 {
   /**
    * Returns the global number of the node of an element.
-   * (1 <= node <= no. nodes of element)
    *
    * @param      node       the node for which the global number is sought (ALWAYS in C mode)
    * @param      element    an element of the mesh (in numPol policy)
@@ -43,19 +42,58 @@ namespace INTERP_KERNEL
 
   /**
    * Returns the coordinates of a node of an element
-   * (1 <= node <= no. nodes)
    *
-   * @param      node       the node for which the coordinates are sought
-   * @param      element    an element of the mesh
+   * @param      node       the node for which the coordinates are sought. In C mode.
+   * @param      element    an element of the mesh. In mesh policy.
    * @param      mesh       a mesh
    * @return    pointer to an array of 3 doubles containing the coordinates of the node
    */
   template<class MyMeshType>
-  inline const double* getCoordsOfNode(int node, int element, const MyMeshType& mesh)
+  inline const double* getCoordsOfNode(typename MyMeshType::MyConnType node, typename MyMeshType::MyConnType element, const MyMeshType& mesh)
   {
     typedef typename MyMeshType::MyConnType ConnType;
     const ConnType connIdx = getGlobalNumberOfNode(node, element, mesh);
     return mesh.getCoordinatesPtr()+MyMeshType::MY_SPACEDIM*connIdx;
+  }
+
+  /**
+   * Returns the coordinates of a node of an element
+   *
+   * @param      node       the node for which the coordinates are sought. In C mode.
+   * @param      element    an element of the mesh. In mesh policy.
+   * @param      mesh       a mesh
+   * @param      nodeId     globale nodeId in whole mesh point of view in C mode.
+   * @return    pointer to an array of 3 doubles containing the coordinates of the node
+   */
+  template<class MyMeshType>
+  inline const double* getCoordsOfNode2(typename MyMeshType::MyConnType node, typename MyMeshType::MyConnType element, const MyMeshType& mesh, typename MyMeshType::MyConnType& nodeId)
+  {
+    typedef typename MyMeshType::MyConnType ConnType;
+    nodeId= getGlobalNumberOfNode(node, element, mesh);
+    return mesh.getCoordinatesPtr()+MyMeshType::MY_SPACEDIM*nodeId;
+  }
+
+  /**
+   * Returns the barycentric coordinates of a point within a triangle or tetrahedron
+   *
+   * @param      point       the point for which the barycentric coordinates are sought
+   * @param      element    an element of the mesh
+   * @param      mesh       a mesh
+   * @param     barycentricCoords an array of 3 doubles containing the coordinates of the node
+   */
+  template<class MyMeshType, int NB_NODES>
+  inline void getBarycentricCoordinates(const double*                   point,
+                                        typename MyMeshType::MyConnType element,
+                                        const MyMeshType&               mesh,
+                                        double*                         barycentricCoords)
+  {
+    std::vector<const double*> nodes( NB_NODES );
+    typedef typename MyMeshType::MyConnType ConnType;
+    for ( int node = 0; node < NB_NODES; ++node )
+      {
+        nodes[ node ] = getCoordsOfNode( node, element, mesh );
+      }
+    barycentric_coords( nodes, point, barycentricCoords );
   }
     
 }

@@ -16,31 +16,21 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef REMAPPER_HXX_
-#define REMAPPER_HXX_
+#ifndef __INTERSECTOR3DP0P1_HXX__
+#define __INTERSECTOR3DP0P1_HXX__
 
-#include "InterpKernelMatrix.hxx"
-#include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_Support.hxx"
-#include "MEDMEM_Field.hxx"
+#include "Intersector3D.hxx"
 
 namespace INTERP_KERNEL
 {
-
-  class INTERPKERNEL_EXPORT Remapper
+  template<class MyMeshType, class MyMatrix>
+  class Intersector3DP0P1 : public Intersector3D<MyMeshType,MyMatrix>
   {
   public:
-    Remapper();
-    virtual ~Remapper();
-    void prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH& mesh_target);
-    void transfer(const MEDMEM::FIELD<double>& field_source, MEDMEM::FIELD<double>& field_target);
-    void setOptionDouble(const std::string& key, double value);
-    void setOptionInt(const std::string& key, int value);
-  private :
-    Matrix<double,ALL_FORTRAN_MODE>* _matrix;
-    MEDMEM::FIELD<double>* getSupportVolumes(const MEDMEM::SUPPORT& support);
+    Intersector3DP0P1(const MyMeshType& targetMesh, const MyMeshType& srcMesh);
+    int getNumberOfRowsOfResMatrix() const;
+    int getNumberOfColsOfResMatrix() const;
   };
-
 }
 
-#endif /*REMAPPER_HXX_*/
+#endif

@@ -16,24 +16,18 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef __GEOMETRIC2D_DEFINES_HXX__
-#define __GEOMETRIC2D_DEFINES_HXX__
+#ifndef __INTERPKERNELGEOMETRIC2DDEFINES_HXX__
+#define __INTERPKERNELGEOMETRIC2DDEFINES_HXX__
 
 //export symbols
 #ifdef WIN32
-# ifdef GEOMETRIC2D_EXPORTS
-#  define GEOMETRIC2D_EXPORT __declspec(dllexport)
+# ifdef INTERPKERNELGEOMETRIC2D_EXPORTS
+#  define INTERPKERNELGEOMETRIC2D_EXPORT __declspec(dllexport)
 # else
-#  define GEOMETRIC2D_EXPORT __declspec(dllimport)
+#  define INTERPKERNELGEOMETRIC2D_EXPORT __declspec(dllimport)
 # endif
 #else
-# define GEOMETRIC2D_EXPORT
+# define INTERPKERNELGEOMETRIC2D_EXPORT
 #endif 
 
-#ifdef WIN32
-# include <stdlib.h>
-# define fmax __max
-# define fmin __min
 #endif
-
-#endif //__GEOMETRIC2D_DEFINES_HXX__

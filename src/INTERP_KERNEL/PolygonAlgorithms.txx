@@ -30,9 +30,9 @@ namespace INTERP_KERNEL
   template<int DIM>
   PolygonAlgorithms<DIM>::PolygonAlgorithms(double epsilon, double precision)//: (0)
   {
-    _Is_in_intersection = false;
-    _Epsilon = epsilon;
-    _Precision = precision;
+    _is_in_intersection = false;
+    _epsilon = epsilon;
+    _precision = precision;
   }
   /*************************************************************/
   /* Computes the 3D intersection between two COPLANAR         */
@@ -42,8 +42,8 @@ namespace INTERP_KERNEL
   /* with C or D, a special treatment is performed             */
   /*************************************************************/
   template<int DIM>
-  bool PolygonAlgorithms<DIM>::intersect_segment_segment(const double * A,  const double * B, const double * C,
-                                                         const double * D, const double * E, double * V)
+  bool PolygonAlgorithms<DIM>::intersectSegmentSegment(const double * A,  const double * B, const double * C,
+                                                       const double * D, const double * E, double * V)
   {    
     double AB[DIM], DC[DIM], AC[DIM], det, t1, t2, inv_det;
     
@@ -57,7 +57,7 @@ namespace INTERP_KERNEL
     
     /******* Resolution of the linear system  t1*AB+t2*DC=AC ***********/    
     det = determinant(AB,DC);//determinant of the first two coordinates
-    if(fabs(det) >_Epsilon)
+    if(fabs(det) >_epsilon)
       {   
         inv_det = 1/det;
         t1 = determinant(AC,DC)*inv_det;//solves the linear system t1*AB+t2*DC=AC
@@ -68,10 +68,14 @@ namespace INTERP_KERNEL
         switch(DIM)
           {
           case 2:
-            return false;
+            {
+              if(distance2<DIM>(A,D)<_epsilon)
+                crossprod<DIM>(A,C,E,_vdouble);//store the crossprod between vectors AC and AE (E=vertex preceding A)                     
+              return false;//case of paralell segments
+            }
           case 3://beware AB and CD may belong to a vertical plane
             det = determinant(&AB[1],&DC[1]);//determinant of the last two coefficients
-            if(fabs(det) > _Epsilon) 
+            if(fabs(det) > _epsilon) 
               {
                 inv_det = 1/det;
                 t1=(AC[1]*DC[2]-AC[2]*DC[1])*inv_det;
@@ -80,70 +84,76 @@ namespace INTERP_KERNEL
             else //beware AB and CD may belong to a plane y = constant
               {
                 det = AB[0]*DC[2]-AB[2]*DC[0];
-                if(fabs(det) > _Epsilon) 
+                if(fabs(det) > _epsilon) 
                   {
                     inv_det = 1/det;
                     t1=(AC[0]*DC[2]-AC[2]*DC[0])*inv_det;
                     t2=(AB[0]*AC[2]-AB[2]*AC[0])*inv_det;
                   }
-                else return false;//case of paralell segments
+                else
+                  {
+                    if(distance2<DIM>(A,D)<_epsilon)
+                      crossprod<DIM>(A,C,E,_vdouble);//store the crossprod between vectors AC and AE (E=vertex preceding A)                     
+                    return false;//case of paralell segments
+                  }
               }
           }
       }
     
-    if(t1>_Precision && t1<1-_Precision)
+    if(t1>_precision && t1<1-_precision)
       {
-        if( t2>_Precision && t2<1-_Precision)
+        if( t2>_precision && t2<1-_precision)
           {         
             for(int idim=0;idim<DIM;idim++) V[idim]=t1*AB[idim] + A[idim];
             return true;
           }
       }
-    else if(fabs(t1) <= _Precision)
+    else if(fabs(t1) <= _precision)
       {
-        if( t2>_Precision && t2<1-_Precision)//vertex on an edge
+        if( t2>_precision && t2<1-_precision)//vertex on an edge
           {
             double V12[DIM];
             double V34[DIM];
             crossprod<DIM>(A,D,B,V12);
             crossprod<DIM>(A,D,E,V34);
             double same_side =dotprod<DIM>(V12, V34);        
-            if( same_side < -_Epsilon ) // <= epsilon or 0 ?//crossing
+            if( same_side < -_epsilon ) // <= epsilon or 0 ?//crossing
               {
                 for(int idim=0;idim<DIM;idim++) V[idim]=A[idim]; 
                 return true;
               }
-            else if( same_side > _Epsilon ) _Terminus= !_Is_in_intersection;//reflexion
+            else if( same_side > _epsilon ) _terminus= !_is_in_intersection;//reflexion
             else //separation of overlaping edges
               {
-                if(_Inter.empty() ) _Terminus=true;
-                else if(!_Is_in_intersection)
+                if(_Inter.empty() ) _terminus=true;
+                else if(!_is_in_intersection)
                   {
                     for(int idim=0;idim<DIM;idim++) V[idim]=A[idim];
                     return true;
                   }
               }         
           }
-        else if(fabs(t2-1) <= _Precision)//vertex on a vertex (A=D), first run
-          crossprod<DIM>(A,C,E,_Vdouble);//angle between vectors AC and AE (E=vertex preceding A)                     
-        else if(fabs(t2) <= _Precision)//vertex on a vertex (A=C), second run
+        else if(fabs(t2-1) <= _precision)//vertex on a vertex (A=D), first run
+          crossprod<DIM>(A,C,E,_vdouble);//store the angle between vectors AC and AE (E=vertex preceding A)                     
+        else if(fabs(t2) <= _precision)//vertex on a vertex (A=C), second run
           {
             double Vdoublebis[DIM];
+            //crossprod<DIM>(A,C,E,_vdouble);
             crossprod<DIM>(A,B,D,Vdoublebis);
-            double in_between =dotprod<DIM>(Vdoublebis,_Vdouble);
-            if(in_between>_Epsilon)//crossing
+            double in_between =dotprod<DIM>(Vdoublebis,_vdouble);
+            if(in_between>_epsilon)//crossing
               {
                 for(int idim=0;idim<DIM;idim++) V[idim]=A[idim]; 
                 return true;
               }
-            else if(fabs(in_between)<=_Epsilon && dotprod<DIM>(Vdoublebis,Vdoublebis) > _Epsilon)
-              //ie _Vdouble=0, separation of overlaping edges at a double point
+            else if(fabs(in_between)<=_epsilon && dotprod<DIM>(Vdoublebis,Vdoublebis) > _epsilon)
+              //ie _vdouble=0, separation of overlaping edges at a double point
               {
-                crossprod<DIM>(A,E,B,_Vdouble); 
-                if(dotprod<DIM>(_Vdouble,Vdoublebis) >=_Epsilon )//crossing
+                //crossprod<DIM>(A,E,B,_vdouble); 
+                if(dotprod<DIM>(_vdouble,Vdoublebis) >=_epsilon )//crossing
                   {
-                    if(_Inter.empty()) _Terminus=true;
-                    else if(!_Is_in_intersection)
+                    if(_Inter.empty()) _terminus=true;
+                    else if(!_is_in_intersection)
                       {
                         for(int idim=0;idim<DIM;idim++) V[idim]=A[idim];
                         return true;
@@ -160,8 +170,8 @@ namespace INTERP_KERNEL
   /* i is the local index of the current vertex                */
   /*************************************************************/ 
   template<int DIM>
-  inline void PolygonAlgorithms<DIM>::add_new_vertex( int i, int i_glob, int i_next_glob, int i_prev_glob,
-                                                      const double * P)
+  inline void PolygonAlgorithms<DIM>::addNewVertex( int i, int i_glob, int i_next_glob, int i_prev_glob,
+                                                    const double * P)
   {    
     /* Question:Should we add vertex i to the front or back ? */
     if( _End_segments[1].second == i_glob)
@@ -182,15 +192,15 @@ namespace INTERP_KERNEL
   /* according to endsegments, updates _End_segments           */
   /************************************************************/ 
   template<int DIM>
-  inline void PolygonAlgorithms<DIM>::add_crossing( double * ABCD, std::pair< int,int > i_i_next, 
-                                                    std::pair< int,int > j_j_next)
+  inline void PolygonAlgorithms<DIM>::addCrossing( double * ABCD, std::pair< int,int > i_i_next, 
+                                                   std::pair< int,int > j_j_next)
   {    
     if(!_Inter.empty() )
       {
         if(_End_segments[0] ==i_i_next)
           {
             for(int idim=DIM-1;idim>=0;idim--) _Inter.push_front(ABCD[idim]);
-            _Terminus= (_End_segments[1]== j_j_next);
+            _terminus= (_End_segments[1]== j_j_next);
             _End_segments[0] = j_j_next;
           }
         else
@@ -198,7 +208,7 @@ namespace INTERP_KERNEL
             if( _End_segments[0]== j_j_next)
               {        
                 for(int idim=DIM-1;idim>=0;idim--) _Inter.push_front(ABCD[idim]);
-                _Terminus= (_End_segments[1]== i_i_next);
+                _terminus= (_End_segments[1]== i_i_next);
                 _End_segments[0] = i_i_next;
               }
             else
@@ -226,16 +236,16 @@ namespace INTERP_KERNEL
   /*******************************************************/
  
   template<int DIM>
-  void PolygonAlgorithms<DIM>::add_crossing0(const double * A, const double * B, int i, int i_next,
-                                             const double * C, const double * D, int j, int j_next)
+  void PolygonAlgorithms<DIM>::addCrossing0(const double * A, const double * B, int i, int i_next,
+                                            const double * C, const double * D, int j, int j_next)
   {
     double ABCD[DIM];                
-    if(intersect_segment_segment(A,B,C,D,ABCD, ABCD))
+    if(intersectSegmentSegment(A,B,C,D,ABCD, ABCD))
       //fifth and sixth arguments are useless here
       {
         /* Updating _End_segments */
-        pair< int,int > i_i_next = make_pair(i, i_next);
-        pair< int,int > j_j_next = make_pair(j, j_next); 
+        std::pair< int,int > i_i_next = std::make_pair(i, i_next);
+        std::pair< int,int > j_j_next = std::make_pair(j, j_next); 
         if( _End_segments[0] == i_i_next)
           {         
             for(int idim=DIM-1;idim>-1;idim--) _Inter.push_front(ABCD[idim]);
@@ -245,15 +255,15 @@ namespace INTERP_KERNEL
           {
             for(int idim=0;idim<DIM;idim++) _Inter.push_back(ABCD[idim]);
             _End_segments[1] = j_j_next;
-            _Terminus = _End_segments[0]== j_j_next;
+            _terminus = _End_segments[0]== j_j_next;
           }
          
         /* Updating _Status */
-        _Status.insert(make_pair(i_next,make_pair(i, false)));
-        multimap< int, pair< int,bool> >::iterator mi =_Status.find(j_next);
+        _Status.insert(make_pair(i_next,std::make_pair(i, false)));
+        std::multimap< int, std::pair< int,bool> >::iterator mi =_Status.find(j_next);
         ((* mi).second).second= !((* mi).second).second;
       }
-    else        _Status.insert(make_pair(i_next,make_pair(i,true)));
+    else        _Status.insert(std::make_pair(i_next,std::make_pair(i,true)));
   }  
 
   /*******************************************************/
@@ -262,31 +272,31 @@ namespace INTERP_KERNEL
   /* In cases of ambiguity, the vertex G is used to decide wether the crossing should be accepted */
   /*******************************************************/
   template<int DIM>
-  inline void PolygonAlgorithms<DIM>::add_crossings( const double * A, const double * B, int i , int i_next,
-                                                     const double * C, const double * D, int j1, int j2,
-                                                     const double * E, const double * F, int j3, int j4,
-                                                     const double * G)
+  inline void PolygonAlgorithms<DIM>::addCrossings( const double * A, const double * B, int i , int i_next,
+                                                    const double * C, const double * D, int j1, int j2,
+                                                    const double * E, const double * F, int j3, int j4,
+                                                    const double * G)
   {
     double ABCD[DIM];
     double ABEF[DIM];
     std::multimap< int, std::pair< int,bool> >::iterator mi;
     
-    if(intersect_segment_segment(A,B,C,D,G,ABCD))
+    if(intersectSegmentSegment(A,B,C,D,G,ABCD))
       {
-        if(intersect_segment_segment(A,B,E,F,G,ABEF))
+        if(intersectSegmentSegment(A,B,E,F,G,ABEF))
           {
             VertexLess<DIM> vl;
             if (vl(ABCD,ABEF))
               {
-                add_crossing(ABCD,  std::make_pair(i, i_next),  std::make_pair(j1, j2));
-                add_crossing(ABEF,  std::make_pair(i, i_next),  std::make_pair(j3, j4));
+                addCrossing(ABCD,  std::make_pair(i, i_next),  std::make_pair(j1, j2));
+                addCrossing(ABEF,  std::make_pair(i, i_next),  std::make_pair(j3, j4));
               }
             else
               {
-                add_crossing(ABEF,  std::make_pair(i, i_next),  std::make_pair(j3, j4));
-                add_crossing(ABCD,  std::make_pair(i, i_next),  std::make_pair(j1, j2));
+                addCrossing(ABEF,  std::make_pair(i, i_next),  std::make_pair(j3, j4));
+                addCrossing(ABCD,  std::make_pair(i, i_next),  std::make_pair(j1, j2));
               }
-            _Status.insert(std::make_pair(i_next,std::make_pair(i, _Is_in_intersection)));
+            _Status.insert(std::make_pair(i_next,std::make_pair(i, _is_in_intersection)));
             mi=_Status.find(j2);
             ((* mi).second).second= !((* mi).second).second;
             mi=_Status.find(j4); 
@@ -294,22 +304,22 @@ namespace INTERP_KERNEL
           }
         else
           {
-            add_crossing(ABCD, std::make_pair( i, i_next),  std::make_pair(j1,j2));
-            _Status.insert(std::make_pair(i_next,std::make_pair(i, !_Is_in_intersection)));
+            addCrossing(ABCD, std::make_pair( i, i_next),  std::make_pair(j1,j2));
+            _Status.insert(std::make_pair(i_next,std::make_pair(i, !_is_in_intersection)));
             mi=_Status.find(j2); 
             ((* mi).second).second= !((* mi).second).second;
           }
       }
     else
       {
-        if(intersect_segment_segment(A,B,E,F,G, ABEF))
+        if(intersectSegmentSegment(A,B,E,F,G, ABEF))
           {
-            add_crossing(ABEF, std::make_pair( i, i_next), std::make_pair( j3, j4));  
-            _Status.insert(std::make_pair(i_next,std::make_pair(i, !_Is_in_intersection)));
+            addCrossing(ABEF, std::make_pair( i, i_next), std::make_pair( j3, j4));  
+            _Status.insert(std::make_pair(i_next,std::make_pair(i, !_is_in_intersection)));
             mi=_Status.find(j4);
             ((* mi).second).second= !((* mi).second).second;
           }
-        else           _Status.insert(std::make_pair(i_next,std::make_pair(i, _Is_in_intersection)));      
+        else           _Status.insert(std::make_pair(i_next,std::make_pair(i, _is_in_intersection)));      
       }
   }
 
@@ -317,13 +327,13 @@ namespace INTERP_KERNEL
   /* define various indices required in the function intersect_conv_polygon */
   /* vertices from the both polygons are supposed to be present in the status */
   template<int DIM>
-  inline void PolygonAlgorithms<DIM>::define_indices(int& i_loc, int& i_next, int& i_prev, 
-                                                     const double *& Poly1, const double *& Poly2,
-                                                     int& j1, int& j1_glob, int& j2, int& j2_glob,
-                                                     int& j3, int& j3_glob, int& j4,  int& j4_glob, 
-                                                     int& i_glob, int& i_next_glob, int& i_prev_glob, 
-                                                     const double * P_1, const double * P_2, 
-                                                     int N1, int N2, int sign)
+  inline void PolygonAlgorithms<DIM>::defineIndices(int& i_loc, int& i_next, int& i_prev, 
+                                                    const double *& Poly1, const double *& Poly2,
+                                                    int& j1, int& j1_glob, int& j2, int& j2_glob,
+                                                    int& j3, int& j3_glob, int& j4,  int& j4_glob, 
+                                                    int& i_glob, int& i_next_glob, int& i_prev_glob, 
+                                                    const double * P_1, const double * P_2, 
+                                                    int N1, int N2, int sign)
   {
     int N0, shift;
     if(i_glob < N1)
@@ -369,9 +379,9 @@ namespace INTERP_KERNEL
     i_prev_glob = i_prev+shift;
     //warning: sign is either 1 or -1;
     //To do: test and remove from Convex_intersecor.cxx
-    //        while(distance2<DIM>(&Poly1[DIM*i_loc],&Poly1[DIM*i_next])< _Epsilon && i_next != i_loc)
+    //        while(distance2<DIM>(&Poly1[DIM*i_loc],&Poly1[DIM*i_next])< _epsilon && i_next != i_loc)
     //          i_next =(i_next+sign+N0)%N0; 
-    //        while(distance2<DIM>(&Poly1[DIM*i_loc],&Poly1[DIM*i_prev])< _Epsilon && i_prev != i_loc) 
+    //        while(distance2<DIM>(&Poly1[DIM*i_loc],&Poly1[DIM*i_prev])< _epsilon && i_prev != i_loc) 
     //          i_prev =(i_prev+sign+N0)%N0; 
   }
   /*******************************************************/
@@ -380,18 +390,18 @@ namespace INTERP_KERNEL
   /* P1 and P2 contain the 3D coordinates of the successive vertices */
   /*******************************************************/
   template<int DIM>
-  std::deque< double > PolygonAlgorithms<DIM>::intersect_convex_polygons(const double* P_1,const double* P_2,
-                                                                         int N1, int N2)
+  std::deque< double > PolygonAlgorithms<DIM>::intersectConvexPolygons(const double* P_1,const double* P_2,
+                                                                       int N1, int N2)
   {    
     int i_loc, i_glob, j1, j1_glob, j2,j2_glob, j3, j3_glob, j4,j4_glob,
       i_prev, i_prev_glob, i_next, i_next_glob, nb_prev, sign, idim;
     const double * Poly1, * Poly2;
     bool four_neighbours=false;
-    _Terminus = N1 < 3 || N2<3;
+    _terminus = N1 < 3 || N2<3;
 
     /* list of future events ordered according to their coordinates (x,y,z) (lexicographical order) */
     std::multimap< const double *, int, VertexLess<DIM> > mmap_events;
-    typename std::list< pair< const double *, int > >::iterator mi1,mi2;
+    typename std::list< std::pair< const double *, int > >::iterator mi1,mi2;
 
     std::multimap< int, std::pair< int,bool> >::iterator mi;
 
@@ -401,9 +411,9 @@ namespace INTERP_KERNEL
     for(i_loc=0;i_loc<N2;i_loc++)
       mmap_events.insert(std::make_pair(&P_2[DIM*i_loc],i_loc+N1));
                 
-    std::list< pair< const double *, int > > events(mmap_events.begin(),mmap_events.end());
+    std::list< std::pair< const double *, int > > events(mmap_events.begin(),mmap_events.end());
                 
-    if(!_Terminus)
+    if(!_terminus)
       {
         /******** Treatment of the first vertex ********/
         mi1=events.begin();
@@ -443,23 +453,22 @@ namespace INTERP_KERNEL
                     mi2=mi1;
                     mi2++;
                     /* detection of double points */
-                    if(distance2<DIM>((* mi1).first, (*mi2).first) > _Epsilon)
+                    if(distance2<DIM>((* mi1).first, (*mi2).first) > _epsilon)
                       four_neighbours = true;
                     else         /* Rare pothological case:  */
                       {
-                        //std::cout<<"coucou" << std::endl;
-                        const pair< const double *, int > next_pt= *mi2;
+                        const std::pair< const double *, int > next_pt= *mi2;
                         events.erase(mi2);
                         mi1=events.insert(mi1,next_pt);
                       }
                   }
                 break;
               default:
-                throw Exception("intersect_convex_polygons: sequence of nodes does not describe a simple polygon (1)"); 
+                throw Exception("intersectConvexPolygon: sequence of nodes does not describe a simple polygon (1)"); 
               }
           }
         /******** Loop until a terminal point or crossing is reached ************/
-        while( !_Terminus)  
+        while( !_terminus)  
           {
             //std::cout<< "nb_prev= "<< nb_prev<< " nb_inter= " << _Inter.size()/DIM << std::endl;
             switch (nb_prev)
@@ -469,15 +478,15 @@ namespace INTERP_KERNEL
                 i_prev_glob = ((*mi).second).first;//starting point of the segment ending at i
                 sign = (i_prev_glob - i_glob > 0) == (abs(i_prev_glob - i_glob) == 1)  ? - 1 : + 1;
                 i_next_glob = i_glob+sign;
-                _Is_in_intersection = ((*mi).second).second;//boolean that tells if i is in the intersection
+                _is_in_intersection = ((*mi).second).second;//boolean that tells if i is in the intersection
                 _Status.erase(mi);
-                define_indices(i_loc,i_next,i_prev, Poly1,Poly2,
-                               j1,j1_glob,j2,j2_glob,j3,j3_glob,j4,j4_glob,
-                               i_glob,i_next_glob,i_prev_glob, P_1,P_2, N1, N2, sign);
-                if( _Is_in_intersection ) add_new_vertex(i_loc, i_glob, i_next_glob, i_prev_glob, Poly1);
-                add_crossings(&Poly1[DIM*i_loc], &Poly1[DIM*i_next], i_glob, i_next_glob,
-                              &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob,
-                              &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob, &Poly1[DIM*i_prev]); 
+                defineIndices(i_loc,i_next,i_prev, Poly1,Poly2,
+                              j1,j1_glob,j2,j2_glob,j3,j3_glob,j4,j4_glob,
+                              i_glob,i_next_glob,i_prev_glob, P_1,P_2, N1, N2, sign);
+                if( _is_in_intersection ) addNewVertex(i_loc, i_glob, i_next_glob, i_prev_glob, Poly1);
+                addCrossings(&Poly1[DIM*i_loc], &Poly1[DIM*i_next], i_glob, i_next_glob,
+                             &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob,
+                             &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob, &Poly1[DIM*i_prev]); 
                 break;
               case 2 :
                 if(!_Inter.empty())
@@ -488,29 +497,29 @@ namespace INTERP_KERNEL
                 if(_Inter.empty() && (i_glob < N1) != which_start){
                   i_next_glob = i_glob+1;
                   i_prev_glob = i_glob-1;
-                  define_indices(i_loc,i_next,i_prev, Poly1,Poly2,
-                                 j1,j1_glob,j2,j2_glob,j3,j3_glob,j4,j4_glob,
-                                 i_glob,i_next_glob,i_prev_glob, P_1,P_2, N1, N2, 1);
+                  defineIndices(i_loc,i_next,i_prev, Poly1,Poly2,
+                                j1,j1_glob,j2,j2_glob,j3,j3_glob,j4,j4_glob,
+                                i_glob,i_next_glob,i_prev_glob, P_1,P_2, N1, N2, 1);
                   double V12[DIM], V34[DIM];
                   double inside = check_inside<DIM>(&Poly1[DIM*i_loc],&Poly2[DIM*j1],&Poly2[DIM*j2],
                                                     &Poly2[DIM*j3],   &Poly2[DIM*j4],V12, V34);      
-                  _Is_in_intersection=( inside < _Epsilon ); // <= epsilon or 0 ?                
+                  _is_in_intersection=( inside < _epsilon ); // <= epsilon or 0 ?                
               
-                  if(fabs(inside) > _Epsilon)//vertex clearly inside or outside
+                  if(fabs(inside) > _epsilon)//vertex clearly inside or outside
                     {                                                                                        
                       //std::cout<<"coucou1" << std::endl;
-                      if( _Is_in_intersection)
+                      if( _is_in_intersection)
                         {
                           for(int idim=0;idim<DIM;idim++) _Inter.push_back(Poly1[DIM*i_loc+idim]);
                           _End_segments.push_back(std::make_pair(i_glob,i_next_glob));
                           _End_segments.push_back(std::make_pair(i_glob,i_prev_glob));
                         }
-                      add_crossings(&Poly1[DIM*i_loc], &Poly1[DIM*i_next], i_glob, i_next_glob,
-                                    &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob,
-                                    &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob, &Poly1[DIM*i_prev]);
-                      add_crossings(&Poly1[DIM*i_loc], &Poly1[DIM*i_prev], i_glob, i_prev_glob,
-                                    &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob,
-                                    &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob, &Poly1[DIM*i_next]); 
+                      addCrossings(&Poly1[DIM*i_loc], &Poly1[DIM*i_next], i_glob, i_next_glob,
+                                   &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob,
+                                   &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob, &Poly1[DIM*i_prev]);
+                      addCrossings(&Poly1[DIM*i_loc], &Poly1[DIM*i_prev], i_glob, i_prev_glob,
+                                   &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob,
+                                   &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob, &Poly1[DIM*i_next]); 
                     }
                   else //vertex on an edge
                     {
@@ -519,7 +528,7 @@ namespace INTERP_KERNEL
                       double Vnext[DIM], Vprev[DIM];
                       for(idim=0;idim<DIM;idim++) _Inter.push_back(Poly1[DIM*i_loc+idim]); 
                   
-                      if(dotprod<DIM>(V34,V34) > _Epsilon)//vertex i on edge (j1,j2), not on (j3,j4)
+                      if(dotprod<DIM>(V34,V34) > _epsilon)//vertex i on edge (j1,j2), not on (j3,j4)
                         {
                           crossprod<DIM>(&Poly1[DIM*i_loc], &Poly2[DIM*j2], &Poly1[DIM*i_next],Vnext);
                           crossprod<DIM>(&Poly1[DIM*i_loc], &Poly2[DIM*j2], &Poly1[DIM*i_prev],Vprev);
@@ -531,8 +540,8 @@ namespace INTERP_KERNEL
                           if(is_inside_next)
                             {
                               _End_segments.push_back(std::make_pair(i_glob,i_next_glob));
-                              add_crossing0(&Poly1[DIM*i_loc], &Poly1[DIM*i_next], i_glob, i_next_glob,
-                                            &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob); 
+                              addCrossing0(&Poly1[DIM*i_loc], &Poly1[DIM*i_next], i_glob, i_next_glob,
+                                           &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob); 
                             }
                           else
                             {
@@ -544,8 +553,8 @@ namespace INTERP_KERNEL
                           if(is_inside_prev)
                             {
                               _End_segments.push_back(std::make_pair(i_glob,i_prev_glob));
-                              add_crossing0(&Poly1[DIM*i_loc], &Poly1[DIM*i_prev], i_glob, i_prev_glob,
-                                            &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob); 
+                              addCrossing0(&Poly1[DIM*i_loc], &Poly1[DIM*i_prev], i_glob, i_prev_glob,
+                                           &Poly2[DIM*j3]   , &Poly2[DIM*j4]    , j3_glob,j4_glob); 
                             }
                           else
                             {
@@ -555,7 +564,7 @@ namespace INTERP_KERNEL
                               ((* mi).second).second= !((* mi).second).second;
                             }
                         }
-                      else if(dotprod<DIM>(V12,V12) > _Epsilon)//vertex i on a edge (j3,j4), not on (j1,j2)
+                      else if(dotprod<DIM>(V12,V12) > _epsilon)//vertex i on a edge (j3,j4), not on (j1,j2)
                         {
                           crossprod<DIM>(&Poly1[DIM*i_loc], &Poly2[DIM*j4], &Poly1[DIM*i_next],Vnext);
                           crossprod<DIM>(&Poly1[DIM*i_loc], &Poly2[DIM*j4], &Poly1[DIM*i_prev],Vprev);
@@ -567,8 +576,8 @@ namespace INTERP_KERNEL
                           if(is_inside_next)
                             {
                               _End_segments.push_back(std::make_pair(i_glob,i_next_glob));
-                              add_crossing0(&Poly1[DIM*i_loc], &Poly1[DIM*i_next], i_glob, i_next_glob,
-                                            &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob); 
+                              addCrossing0(&Poly1[DIM*i_loc], &Poly1[DIM*i_next], i_glob, i_next_glob,
+                                           &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob); 
                             }
                           else
                             {
@@ -580,8 +589,8 @@ namespace INTERP_KERNEL
                           if(is_inside_prev)
                             {
                               _End_segments.push_back(std::make_pair(i_glob,i_prev_glob));
-                              add_crossing0(&Poly1[DIM*i_loc], &Poly1[DIM*i_prev], i_glob, i_prev_glob,
-                                            &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob); 
+                              addCrossing0(&Poly1[DIM*i_loc], &Poly1[DIM*i_prev], i_glob, i_prev_glob,
+                                           &Poly2[DIM*j1]   , &Poly2[DIM*j2]    , j1_glob,j2_glob); 
                             }
                           else
                             {
@@ -603,20 +612,20 @@ namespace INTERP_KERNEL
                           double inside_j2  = dotprod<DIM>(Vnext,Vprev);
                           double inside_j4  = dotprod<DIM>(V12,V34);
                                                                                                         
-                          std::map<double, pair<int,int> > which_is_inside;
-                          which_is_inside[inside_next] = std:: make_pair(i_glob,i_next_glob);
-                          which_is_inside[inside_prev] = std:: make_pair(i_glob,i_prev_glob);
+                          std::map<double, std::pair<int,int> > which_is_inside;
+                          which_is_inside[inside_next] = std::make_pair(i_glob,i_next_glob);
+                          which_is_inside[inside_prev] = std::make_pair(i_glob,i_prev_glob);
                           which_is_inside[inside_j2] =  std::make_pair(j1_glob,j2_glob);
                           which_is_inside[inside_j4] =  std::make_pair(j3_glob,j4_glob);
 
-                          std::map<double, pair<int,int> >::iterator min = which_is_inside.begin();
-                          std::map<double, pair<int,int> >::iterator minext = min;
+                          std::map<double, std::pair<int,int> >::iterator min = which_is_inside.begin();
+                          std::map<double, std::pair<int,int> >::iterator minext = min;
                           minext++;
-                          std::map<double, pair<int,int> >::reverse_iterator max = which_is_inside.rbegin();
+                          std::map<double, std::pair<int,int> >::reverse_iterator max = which_is_inside.rbegin();
                           std::multimap< int, std::pair< int,bool> >::iterator j2_in_status = _Status.find(((*min).second).second);
                           std::multimap< int, std::pair< int,bool> >::iterator j4_in_status = _Status.find(((*minext).second).second);
 
-                          if((*min).first < -_Epsilon) //there is someone clearly inside
+                          if((*min).first < -_epsilon) //there is someone clearly inside
                             {
                               _End_segments.push_back( (*min).second );
                               _End_segments.push_back((* minext).second);
@@ -628,9 +637,9 @@ namespace INTERP_KERNEL
                               is_inside_prev = ((*min).second).second == i_prev_glob || ((*minext).second).second == i_prev_glob;
                             }
                           else
-                            if(fabs((*min).first) <= _Epsilon) //nobody is clearly inside but two segments are superposed
+                            if(fabs((*min).first) <= _epsilon) //nobody is clearly inside but two segments are superposed
                               {
-                                if(fabs((*max).first) > _Epsilon) 
+                                if(fabs((*max).first) > _epsilon) 
                                   return std::deque< double >();
                                 else //all four segments are superposed
                                   {
@@ -651,7 +660,7 @@ namespace INTERP_KERNEL
                 break;
               default:
                 std::cout << "Problem: nbprev= " << nb_prev << " ; i_glob = " << i_glob << std::endl;
-                throw Exception("intersect_convex_polygons: sequence of nodes does not describe a simple polygon (2)"); 
+                throw Exception("intersectConvexPolygon: sequence of nodes does not describe a simple polygon (2)"); 
               } 
             mi1++;
             i_glob=(* mi1).second;//global index of vertex i
@@ -667,9 +676,9 @@ namespace INTERP_KERNEL
   /* in the end, subP contains only the elements belonging to the convex hull, and  not_in_hull the others */
   /**************************************************************************/
   template<int DIM>
-  inline void PolygonAlgorithms<DIM>::conv_hull(const double *P, int N, double * normal,  
-                                                std::map< int,int >& subP, std::map< int,int >& not_in_hull,
-                                                int& NsubP, const double epsilon)
+  inline void PolygonAlgorithms<DIM>::convHull(const double *P, int N, double * normal,  
+                                               std::map< int,int >& subP, std::map< int,int >& not_in_hull,
+                                               int& NsubP, const double epsilon)
   {
     if(NsubP>3)
       {
@@ -726,9 +735,9 @@ namespace INTERP_KERNEL
   }
   
   template<int DIM>
-  void PolygonAlgorithms<DIM>::convex_decomposition(const double * P, int N, double *normal, std::vector< int > subP, int NsubP,
-                                                    std::vector< std::map< int,int > >& components, std::vector< int >& components_index,
-                                                    int& Ncomp, int sign, const double epsilon)
+  void PolygonAlgorithms<DIM>::convexDecomposition(const double * P, int N, double *normal, std::vector< int > subP, int NsubP,
+                                                   std::vector< std::map< int,int > >& components, std::vector< int >& components_index,
+                                                   int& Ncomp, int sign, const double epsilon)
   {
     int i;
     std::map< int, int > hull;
@@ -750,7 +759,7 @@ namespace INTERP_KERNEL
     /* renumbering of SubP elements for the convex hull*/
     for(i=0; i<NsubP; i++) hull.insert(hull.end(),std::make_pair(i,subP[(i+i_xmax)%NsubP]));
     /* compute the convex hull */
-    conv_hull(P, N, normal, hull, not_in_hull, NsubP,epsilon);
+    convHull(P, N, normal, hull, not_in_hull, NsubP,epsilon);
     /* convex hull is the next component */
     components.push_back(hull);
     components_index.push_back(sign*NsubP);
@@ -773,7 +782,7 @@ namespace INTERP_KERNEL
           }
         reflex_region.push_back(hull[(*mi).first+1]);
         Nreflex++;       
-        convex_decomposition( P, N,normal, reflex_region, Nreflex, components, components_index, Ncomp, -sign, epsilon);
+        convexDecomposition( P, N,normal, reflex_region, Nreflex, components, components_index, Ncomp, -sign, epsilon);
       }
   }
 
@@ -785,8 +794,8 @@ namespace INTERP_KERNEL
   /* if P is composed of a single point, then an empty polygon is returned */
   /**************************************************************************/
   template<int DIM>
-  int PolygonAlgorithms<DIM>::convex_decomposition(const double * P, int N, std::vector< std::map< int,int > >& components,
-                                                   std::vector< int >& components_index, const double epsilon)
+  int PolygonAlgorithms<DIM>::convexDecomposition(const double * P, int N, std::vector< std::map< int,int > >& components,
+                                                  std::vector< int >& components_index, const double epsilon)
   {
     int Ncomp=0;
     std::vector< int > subP(N);
@@ -804,7 +813,7 @@ namespace INTERP_KERNEL
         i2++;
       }
     
-    convex_decomposition(P, N, normal, subP, N, components, components_index, Ncomp, 1, epsilon);
+    convexDecomposition(P, N, normal, subP, N, components, components_index, Ncomp, 1, epsilon);
     return Ncomp;
   }
 }

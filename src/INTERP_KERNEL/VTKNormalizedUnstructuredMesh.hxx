@@ -39,6 +39,7 @@ public:
   void getBoundingBox(double *boundingBox) const;
   NormalizedCellType getTypeOfElement(vtkIdType eltId) const;
   unsigned long getNumberOfElements() const;
+  unsigned long getNumberOfNodes() const;
   const vtkIdType *getConnectivityPtr() const;
   const double *getCoordinatesPtr() const;
   const vtkIdType *getConnectivityIndexPtr() const;
@@ -46,8 +47,8 @@ public:
 protected:
   void putinMEDFormat() const;
 protected:
-  vtkUnstructuredGrid *_meshInVtkMode;
-  mutable vtkIdType *_tmpIndexArray;
+  vtkUnstructuredGrid *_mesh_in_vtk_mode;
+  mutable vtkIdType *_tmp_index_array;
 };
 
 #endif

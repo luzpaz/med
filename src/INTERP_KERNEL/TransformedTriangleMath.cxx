@@ -84,7 +84,7 @@ namespace INTERP_KERNEL
    */
   void TransformedTriangle::preCalculateDoubleProducts(void)
   {
-    if(_isDoubleProductsCalculated)
+    if(_is_double_products_calculated)
       return;
 
     // -- calculate all unstable double products -- store in _doubleProducts
@@ -154,7 +154,7 @@ namespace INTERP_KERNEL
           }
       }
     
-    _isDoubleProductsCalculated = true;
+    _is_double_products_calculated = true;
   }
 
   /**
@@ -191,34 +191,6 @@ namespace INTERP_KERNEL
     return !((num_zero == 1 && num_neg != 1) || num_zero == 2 || (num_neg == 0 && num_zero != 3) || num_neg == 3 );
 
   }
-
-#ifndef OPTIMIZE // inlined otherwise -> see TransformedTriangle_inline.hxx
-  
-  /**
-   * Sets the three double product associated with a given segment and a given corner to 0.0.
-   *
-   * @param  seg a segment of the triangle
-   * @param  corner a corner of the tetrahedron
-   */ 
-  void TransformedTriangle::resetDoubleProducts(const TriSegment seg, const TetraCorner corner)
-  {
-    // set the three corresponding double products to 0.0
-    static const DoubleProduct DOUBLE_PRODUCTS[12] =
-      {
-        C_YZ, C_ZX, C_XY, // O
-        C_YZ, C_ZH, C_YH, // X
-        C_ZX, C_ZH, C_XH, // Y
-        C_XY, C_YH, C_XH  // Z
-      };
-    
-    for(int i = 0 ; i < 3 ; ++i) {
-      const DoubleProduct dp = DOUBLE_PRODUCTS[3*corner + i];
-      
-      LOG(6, std::endl << "resetting inconsistent dp :" << dp << " for corner " << corner);
-      _doubleProducts[8*seg + dp] = 0.0;
-    };
-  }
-#endif //OPTIMIZE
 
   /**
    * Calculate the shortest distance between a tetrahedron corner and a triangle segment.
@@ -270,7 +242,7 @@ namespace INTERP_KERNEL
    */
   void TransformedTriangle::preCalculateTripleProducts(void)
   {
-    if(_isTripleProductsCalculated)
+    if(_is_triple_products_calculated)
       {
         return;
       }
@@ -292,11 +264,7 @@ namespace INTERP_KERNEL
             TetraEdge edge = TetraEdge(dp);
            
             // use edge only if it is surrounded by the surface
-#ifdef OPTIMIZE
             if( _triangleSurroundsEdgeCache[edge] )
-#else
-              if( testTriangleSurroundsEdge(edge) )
-#endif
                 {
                   // -- calculate angle between edge and PQR
                   const double angle = calculateAngleEdgeTriangle(edge);
@@ -332,7 +300,7 @@ namespace INTERP_KERNEL
 
       }
 
-    _isTripleProductsCalculated = true;
+    _is_triple_products_calculated = true;
   }
 
   /**
@@ -389,70 +357,6 @@ namespace INTERP_KERNEL
     return atan(1.0)*4.0 - acos( dotProd / ( lenNormal * lenEdgeVec ) );
 
   }
-
-#ifndef OPTIMIZE
-  /**
-   * Returns the stable double product  c_{xy}^{pq}
-   *
-   * @pre The stable double products have been calculated with preCalculateDoubleProducts.
-   * @param seg   segment of triangle
-   * @param dp    double product sought
-   *
-   * @return stabilised double product c_{xy}^{pq}
-   *
-   */
-  double TransformedTriangle::calcStableC(const TriSegment seg, const DoubleProduct dp) const
-  {
-    assert(_isDoubleProductsCalculated);
-    return _doubleProducts[8*seg + dp];
-  }
-
-  /**
-   * Returns the stable triple product t_X for a given corner
-   * The triple product gives the signed volume of the tetrahedron between 
-   * this corner and the triangle PQR. These triple products have been calculated
-   * in a way to avoid problems with cancellation.
-   *
-   * @pre            double products have already been calculated
-   * @pre            triple products have already been calculated
-   * @param corner   corner for which the triple product is calculated
-   * @return        triple product associated with corner (see Grandy, eqs. [50]-[52])
-   */
-  double TransformedTriangle::calcStableT(const TetraCorner corner) const
-  {
-    assert(_isTripleProductsCalculated);
-    assert(_validTP[corner]);
-    return _tripleProducts[corner];
-  }
-
-
-  /**
-   * Calculates the given double product c_{xy}^{pq} = x_p*y_q - y_p*x_q for a
-   * a segment PQ of the triangle. This method does not compensate for 
-   * precision errors.
-   *
-   * @param seg   segment of triangle
-   * @param dp    double product sought
-   *
-   * @return double product c_{xy}^{pq}
-   *
-   */
-  double TransformedTriangle::calcUnstableC(const TriSegment seg, const DoubleProduct dp) const
-  {
-  
-    // find the points of the triangle
-    // 0 -> P, 1 -> Q, 2 -> R 
-    const int pt1 = seg;
-    const int pt2 = (seg + 1) % 3;
-
-    // find offsets
-    const int off1 = DP_OFFSET_1[dp];
-    const int off2 = DP_OFFSET_2[dp];
-
-    return _coords[5*pt1 + off1] * _coords[5*pt2 + off2] - _coords[5*pt1 + off2] * _coords[5*pt2 + off1];
-  }
-
-#endif
 
   /**
    * Calculates triple product associated with the given corner of tetrahedron, developing 
@@ -583,4 +487,4 @@ namespace INTERP_KERNEL
 
   }
 
-}; // NAMESPACE
+}

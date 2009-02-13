@@ -16,25 +16,21 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef _POINT_LOCATOR_HXX_
-#define _POINT_LOCATOR_HXX_
+#include "InterpKernelException.hxx"
 
-#include <list>
-#include "MEDNormalizedUnstructuredMesh.hxx"
-#include "PointLocatorAlgos.txx"
-
-namespace INTERP_KERNEL
+INTERP_KERNEL::Exception::Exception(const char *what):_reason(what)
 {
-  class INTERPKERNEL_EXPORT PointLocator
-  {
-  public:
-    PointLocator(const MEDMEM::MESH& mesh);
-    virtual ~PointLocator();
-    std::list<int> locate(const double* x);
-  private:
-    GenericMesh* _medmesh;
-    GenericPointLocatorAlgos* _point_locator;
-  };
 }
 
-#endif
+INTERP_KERNEL::Exception::Exception(const char *what, const char *file, int line):_reason(what)
+{
+}
+
+INTERP_KERNEL::Exception::~Exception() throw ()
+{
+}
+
+const char *INTERP_KERNEL::Exception::what() const throw()
+{
+  return _reason.c_str();
+}

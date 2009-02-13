@@ -18,7 +18,7 @@
 //
 #include "EdgeLin.hxx"
 #include "Node.hxx"
-#include "InterpolationUtils.hxx"
+#include "InterpKernelException.hxx"
 
 using namespace std;
 using namespace INTERP_KERNEL;
@@ -28,7 +28,7 @@ namespace INTERP_KERNEL
   extern const unsigned MAX_SIZE_OF_LINE_XFIG_FILE=1024;
 }
 
-SegSegIntersector::SegSegIntersector(const EdgeLin& e1, const EdgeLin& e2):SameTypeIntersector(e1,e2)
+SegSegIntersector::SegSegIntersector(const EdgeLin& e1, const EdgeLin& e2):SameTypeEdgeIntersector(e1,e2)
 {
   _matrix[0]=(*(e2.getStartNode()))[0]-(*(e2.getEndNode()))[0];
   _matrix[1]=(*(e1.getEndNode()))[0]-(*(e1.getStartNode()))[0];
@@ -68,8 +68,7 @@ void SegSegIntersector::getCurveAbscisse(Node *node, TypeOfLocInEdge& where, Mer
   obviousCaseForCurvAbscisse(node,where,commonNode,obvious);
   if(obvious)
     return ;
-  int index = !_ind;
-  double ret=((*node)[index]-(*_e1.getStartNode())[index])/((*_e1.getEndNode())[index]-(*_e1.getStartNode())[index]);
+  double ret=((*node)[!_ind]-(*_e1.getStartNode())[!_ind])/((*_e1.getEndNode())[!_ind]-(*_e1.getStartNode())[!_ind]);
   if(ret>0. && ret <1.)
     where=INSIDE;
   else if(ret<0.)
@@ -107,7 +106,7 @@ std::list< IntersectElement > SegSegIntersector::getIntersectionsCharacteristicV
 bool SegSegIntersector::areColinears() const
 {
   double determinant=_matrix[0]*_matrix[3]-_matrix[1]*_matrix[2];
-  return fabs(determinant)<QUADRATIC_PLANAR::_arcDetectionPrecision;
+  return fabs(determinant)<QUADRATIC_PLANAR::_arc_detection_precision;
 }
 
 /*!
@@ -194,7 +193,7 @@ double EdgeLin::getDistanceToPoint(const double *pt) const
     {
       double dist1=Node::distanceBtw2Pt(*_start,pt);
       double dist2=Node::distanceBtw2Pt(*_end,pt);
-      return fmin(dist1,dist2);
+      return std::min(dist1,dist2);
     }
 }
 
@@ -226,6 +225,12 @@ double EdgeLin::getNormSq() const
   return _start->distanceWithSq(*_end);
 }
 
+/*!
+ * This methods computes :
+ * \f[
+ * \int_{Current Edge} -ydx
+ * \f]
+ */
 double EdgeLin::getAreaOfZone() const
 {
   return ((*_start)[0]-(*_end)[0])*((*_start)[1]+(*_end)[1])/2.;
@@ -235,6 +240,30 @@ void EdgeLin::getBarycenter(double *bary) const
 {
   bary[0]=((*_start)[0]+(*_end)[0])/2.;
   bary[1]=((*_start)[1]+(*_end)[1])/2.;
+}
+
+/*!
+ * \f[
+ * bary[0]=\int_{Current Edge} -yxdx
+ * \f]
+ * \f[
+ * bary[1]=\int_{Current Edge} -\frac{y^{2}}{2}dx
+ * \f]
+ * To compute these 2 expressions in this class we have :
+ * \f[
+ * y=y_{1}+\frac{y_{2}-y_{1}}{x_{2}-x_{1}}(x-x_{1})
+ * \f]
+ */
+void EdgeLin::getBarycenterOfZone(double *bary) const
+{
+  double x1=(*_start)[0];
+  double y1=(*_start)[1];
+  double x2=(*_end)[0];
+  double y2=(*_end)[1];
+  bary[0]=(x1-x2)*(y1*(2.*x1+x2)+y2*(2.*x2+x1))/6.;
+  //bary[0]+=(y1-y2)*(x2*x2/3.-(x1*x2+x1*x1)/6.)+y1*(x1*x1-x2*x2)/2.;
+  //bary[0]+=(y1-y2)*((x2*x2+x1*x2+x1*x1)/3.-(x2+x1)*x1/2.)+y1*(x1*x1-x2*x2)/2.;
+  bary[1]=(x1-x2)*(y1*(y1+y2)+y2*y2)/6.;
 }
 
 double EdgeLin::getCurveLength() const
@@ -254,7 +283,7 @@ Edge *EdgeLin::buildEdgeLyingOnMe(Node *start, Node *end, bool direction) const
  */
 void EdgeLin::updateBounds()
 {
-  _bounds.setValues(fmin((*_start)[0],(*_end)[0]),fmax((*_start)[0],(*_end)[0]),fmin((*_start)[1],(*_end)[1]),fmax((*_start)[1],(*_end)[1]));
+  _bounds.setValues(std::min((*_start)[0],(*_end)[0]),std::max((*_start)[0],(*_end)[0]),std::min((*_start)[1],(*_end)[1]),std::max((*_start)[1],(*_end)[1]));
 }
 
 double EdgeLin::getCharactValueEng(const double *node) const

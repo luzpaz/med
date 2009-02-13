@@ -46,7 +46,7 @@ class MED;
  */
 // ==============================================================================
 
-class ENSIGHT_MED_DRIVER : public MEDMEM_ENSIGHT::_CaseFileDriver_User
+class MEDMEM_EXPORT ENSIGHT_MED_DRIVER : public MEDMEM_ENSIGHT::_CaseFileDriver_User
 {
 protected:
   
@@ -72,7 +72,7 @@ public :
  */
 // ==============================================================================
 
-class ENSIGHT_MED_RDONLY_DRIVER : public virtual ENSIGHT_MED_DRIVER
+class MEDMEM_EXPORT ENSIGHT_MED_RDONLY_DRIVER : public virtual ENSIGHT_MED_DRIVER
 {
 public :
   ENSIGHT_MED_RDONLY_DRIVER();
@@ -97,7 +97,7 @@ private:
  */
 // ==============================================================================
 
-class ENSIGHT_MED_WRONLY_DRIVER : public virtual ENSIGHT_MED_DRIVER
+class MEDMEM_EXPORT ENSIGHT_MED_WRONLY_DRIVER : public virtual ENSIGHT_MED_DRIVER
 {
 public :
   ENSIGHT_MED_WRONLY_DRIVER();
@@ -110,7 +110,7 @@ public :
   GENDRIVER * copy ( void ) const;
 };
 
-};
+}
 
 
 #endif /* ENSIGTH_MED_DRIVER_HXX */

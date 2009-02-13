@@ -16,8 +16,8 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef _TRANSFORMED_TRIANGLE_INLINE_HXX
-#define _TRANSFORMED_TRIANGLE_INLINE_HXX
+#ifndef __TRANSFORMEDTRIANGLEINLINE_HXX__
+#define __TRANSFORMEDTRIANGLEINLINE_HXX__
 
 // This file contains inline versions of some of the methods in the TransformedTriangle*.cxx files.
 // It replaces those methods if OPTIMIZE is defined.

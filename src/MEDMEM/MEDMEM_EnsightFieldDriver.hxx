@@ -34,7 +34,7 @@
 
 namespace MEDMEM {
 
-class ENSIGHT_FIELD_DRIVER : public MEDMEM_ENSIGHT::_CaseFileDriver_User
+class MEDMEM_EXPORT ENSIGHT_FIELD_DRIVER : public MEDMEM_ENSIGHT::_CaseFileDriver_User
 {
 protected:
   FIELD_ *    _ptrField;
@@ -88,7 +88,7 @@ public :
 
 // ==========================================================================================
 
-class ENSIGHT_FIELD_RDONLY_DRIVER : public ENSIGHT_FIELD_DRIVER
+class MEDMEM_EXPORT ENSIGHT_FIELD_RDONLY_DRIVER : public ENSIGHT_FIELD_DRIVER
 {
 public :
   
@@ -128,7 +128,7 @@ private:
 
 // ==========================================================================================
 
-class ENSIGHT_FIELD_WRONLY_DRIVER : public ENSIGHT_FIELD_DRIVER
+class MEDMEM_EXPORT ENSIGHT_FIELD_WRONLY_DRIVER : public ENSIGHT_FIELD_DRIVER
 {
 public :
   

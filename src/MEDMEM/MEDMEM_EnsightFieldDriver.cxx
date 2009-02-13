@@ -243,7 +243,7 @@ namespace {
     else
     {
       // set values from the first till undefined end
-      set<int>::iterator undef = localUndefIndices.begin();
+      set<int>::const_iterator undef = localUndefIndices.begin();
       int c = 1, last = min( nbValues, *localUndefIndices.rbegin() );
       for ( ; c <= last; ++c, ++cellIt )
       {

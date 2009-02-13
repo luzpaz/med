@@ -19,13 +19,12 @@
 #ifndef __TETRA_AFFINE_TRANSFORM_HXX__
 #define __TETRA_AFFINE_TRANSFORM_HXX__
 
-#include <INTERPKERNEL_defines.hxx>
+#include "INTERPKERNELDefines.hxx"
 
 #undef INVERSION_SELF_CHECK // debugging : check that calculated inverse is correct
 
 namespace INTERP_KERNEL
 {
-
   /**
    * \brief Class representing an affine transformation x -> Ax + b that transforms a given tetrahedron
    * into the unit tetrahedron.
@@ -38,6 +37,8 @@ namespace INTERP_KERNEL
     TetraAffineTransform(const double** pts);
 
     void apply(double* destPt, const double* srcPt) const;
+
+    void reverseApply(double* destPt, const double* srcPt) const;
 
     double determinant() const;
 
@@ -55,11 +56,11 @@ namespace INTERP_KERNEL
 
     void backwardSubstitution(double* x, const double* lu, const double* b, const int* idx) const;
 
-    // The affine transformation Ax + b is represented with _linearTransformation containing the elements of
+    // The affine transformation Ax + b is represented with _linear_transformation containing the elements of
     // A in row-first ordering and _translation containing the elements of b
 
     /// 3x3 matrix A in affine transform x -> Ax + b
-    double _linearTransform[9];
+    double _linear_transform[9];
 
     /// 3x1 vector b in affine transform x -> Ax + b
     double _translation[3];
@@ -67,10 +68,13 @@ namespace INTERP_KERNEL
     /// The determinant of the matrix A is calculated at the construction of the object and cached.
     double _determinant;
 
+    /// 3x3 matrix AT is transposed A matrix used for y -> ATy - c transformation
+    double _back_linear_transform[9];
+
+    /// 3x1 vector c in affine transform y -> ATy - c
+    double _back_translation[3];
+
   };
-
-
-};
-
+}
 
 #endif

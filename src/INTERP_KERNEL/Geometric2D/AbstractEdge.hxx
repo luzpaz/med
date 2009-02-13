@@ -19,8 +19,6 @@
 #ifndef __ABSTRACTEDGE_HXX__
 #define __ABSTRACTEDGE_HXX__
 
-#include "Geometric2D_defines.hxx"
-
 #include <set>
 #include <list>
 #include <fstream>
@@ -37,7 +35,7 @@ namespace INTERP_KERNEL
   /*!
    * Asumption is done with this iterator that we iterate on a container containing more than one edge.
    */
-  class GEOMETRIC2D_EXPORT IteratorOnComposedEdge
+  class IteratorOnComposedEdge
   {
     friend class ComposedEdge;
     friend class ElementaryEdge;
@@ -45,21 +43,21 @@ namespace INTERP_KERNEL
   public:
     IteratorOnComposedEdge();
     IteratorOnComposedEdge(ComposedEdge *compEdges);
-    bool isValid() const { return _listHandle!=0; } 
+    bool isValid() const { return _list_handle!=0; } 
     void operator=(const IteratorOnComposedEdge& other);
-    void first() { _deepIt=_listHandle->begin(); }
-    void next() { _deepIt++; }
+    void first() { _deep_it=_list_handle->begin(); }
+    void next() { _deep_it++; }
     void last();
     void nextLoop();
     void previousLoop();
-    bool finished() const { return _deepIt==_listHandle->end(); }
+    bool finished() const { return _deep_it==_list_handle->end(); }
     bool goToNextInOn(bool direction, int& i, int nbMax);
-    ElementaryEdge *current() { return *_deepIt; }
+    ElementaryEdge *current() { return *_deep_it; }
     void assignMySelfToAllElems(ComposedEdge *elems);
     void insertElemEdges(ComposedEdge *elems, bool changeMySelf);
   private:
-    std::list<ElementaryEdge *>::iterator _deepIt;
-    std::list<ElementaryEdge *>* _listHandle;
+    std::list<ElementaryEdge *>::iterator _deep_it;
+    std::list<ElementaryEdge *>* _list_handle;
   };
 }
 

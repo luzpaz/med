@@ -76,7 +76,7 @@ struct MEDMEM_EXPORT _maille
   //mutable list<unsigned>   groupes; // the GROUPs maille belongs to, used to create families
 
   _maille(MED_EN::medGeometryElement type=MED_EN::MED_NONE, size_t nelem=0)
-    : geometricType(type),_ordre(0),reverse(false),sortedNodeIDs(0) { sommets.reserve(nelem); }
+    : geometricType(type),reverse(false),sortedNodeIDs(0),_ordre(0) { sommets.reserve(nelem); }
 
   _maille(const _maille& ma);
   void init() const { if ( sortedNodeIDs ) delete [] sortedNodeIDs; sortedNodeIDs = 0; }
@@ -133,7 +133,11 @@ struct MEDMEM_EXPORT _groupe
 
   const _maille& maille(int index) { return *mailles[index]; }
   bool empty() const { return mailles.empty() && groupes.empty(); }
+#ifdef WNT
+  int  size()  const { return (mailles.size()>relocMap.size())?mailles.size():relocMap.size(); }
+#else
   int  size()  const { return std::max( mailles.size(), relocMap.size() ); }
+#endif
   _groupe():medGroup(0) {}
 };
 
@@ -155,7 +159,11 @@ struct MEDMEM_EXPORT _fieldBase {
     std::string & compName( int i_comp ) { return _comp_names[ i_comp ]; }
     bool isValidNbGauss() const { return *std::max_element( _nb_gauss.begin(), _nb_gauss.end() ) ==
                                     *std::min_element( _nb_gauss.begin(), _nb_gauss.end() ); }
+#ifdef WNT
+    int nbGauss() const { return (1>_nb_gauss[0])?1:_nb_gauss[0]; }
+#else
     int nbGauss() const { return std::max( 1, _nb_gauss[0] ); }
+#endif
     bool hasGauss() const { return nbGauss() > 1; }
   };
   // ----------------------------------------------------------------------------
@@ -551,6 +559,6 @@ template <class T> void _field< T >::dump(std::ostream& os) const
   }
 }
 
-}; // namespace MEDMEM
+} // namespace MEDMEM
 
 #endif /* DRIVERTOOLS_HXX */

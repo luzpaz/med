@@ -16,67 +16,60 @@
 #
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-#  MED MEDMEM : MED files in memory
+#  MED files in memory
 #  File   : Makefile.am
 #  Author : Vincent BERGEAUD (CEA/DEN/DANS/DM2S/SFME/LGLS)
 #  Module : MED
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-# first '.' says that this folder must be compiled before Test (MEDMEM/Test uses MEDMEM)
-if CPPUNIT_IS_OK
- SUBDIRS = Geometric2D . Test 
-else
- SUBDIRS = Geometric2D .
-endif
+SUBDIRS = Bases Geometric2D .
 
-DIST_SUBDIRS = Geometric2D Test
+DIST_SUBDIRS = Bases Geometric2D
 
 lib_LTLIBRARIES = libinterpkernel.la
 
 
 salomeinclude_HEADERS = \
-BoundingBox.hxx             IntersectorHexa.hxx                RegionNode.hxx\
-ConvexIntersector.hxx       IntersectorTetra.hxx               Remapper.hxx\
-Geometric2DIntersector.hxx  Log.hxx                            TargetIntersector.hxx\
-INTERPKERNEL_defines.hxx    MEDNormalizedUnstructuredMesh.hxx  TetraAffineTransform.hxx\
-InterpKernelMatrix.hxx      MeshElement.hxx                    TransformedTriangle.hxx\
-Interpolation2D.hxx         MeshRegion.hxx                     TransformedTriangle_inline.hxx\
-Interpolation3D.hxx         MeshUtils.hxx                      TranslationRotationMatrix.hxx\
-Interpolation3DSurf.hxx     NormalizedUnstructuredMesh.hxx     TriangulationIntersector.hxx\
-Interpolation.hxx           PlanarIntersector.hxx              VectorUtils.hxx\
-InterpolationPlanar.hxx     PointLocator.hxx                   VTKNormalizedUnstructuredMesh.hxx\
-InterpolationUtils.hxx      PolygonAlgorithms.hxx              InterpolationOptions.hxx\
-BBTree.txx                  InterpolationPlanar.txx            PlanarIntersector.txx\
-ConvexIntersector.txx       IntersectorHexa.txx                PointLocatorAlgos.txx\
-Geometric2DIntersector.txx  IntersectorTetra.txx               PolygonAlgorithms.txx\
-Interpolation2D.txx         MEDNormalizedUnstructuredMesh.txx  TriangulationIntersector.txx\
-Interpolation3DSurf.txx     MeshElement.txx                    VTKNormalizedUnstructuredMesh.txx\
-Interpolation3D.txx         MeshRegion.txx                     CellModel.hxx
+INTERPKERNELDefines.hxx \
+BoundingBox.hxx                 PolyhedronIntersector.hxx          RegionNode.hxx\
+ConvexIntersector.hxx           SplitterTetra.hxx                  Intersector3DP0P1.txx \
+Geometric2DIntersector.hxx      Log.hxx                            TargetIntersector.hxx\
+CellModel.hxx                   TetraAffineTransform.hxx           Intersector3DP1P0.hxx \
+InterpKernelMatrix.hxx          MeshElement.hxx                    TransformedTriangle.hxx\
+Interpolation2D.hxx             MeshRegion.hxx                     TransformedTriangleInline.hxx\
+Interpolation3D.hxx             MeshUtils.hxx                      TranslationRotationMatrix.hxx\
+Interpolation3DSurf.hxx         MeshRegion.txx                     TriangulationIntersector.hxx\
+Interpolation.hxx               PlanarIntersector.hxx              VectorUtils.hxx\
+InterpolationPlanar.hxx         PolyhedronIntersectorP1P0.txx      VTKNormalizedUnstructuredMesh.hxx\
+InterpolationUtils.hxx          PolygonAlgorithms.hxx              InterpolationOptions.hxx\
+BBTree.txx                      InterpolationPlanar.txx            PlanarIntersector.txx\
+ConvexIntersector.txx           PolyhedronIntersector.txx          Intersector3DP1P0.txx\
+Geometric2DIntersector.txx      SplitterTetra.txx                  PolygonAlgorithms.txx\
+Interpolation2D.txx             TriangulationIntersector.txx       PolyhedronIntersectorP1P0.hxx\
+Interpolation3DSurf.txx         MeshElement.txx                    VTKNormalizedUnstructuredMesh.txx\
+Interpolation3D.txx             PlanarIntersectorP0P0.hxx          PlanarIntersectorP0P0.txx\
+PolyhedronIntersectorP0P1.hxx   PolyhedronIntersectorP0P1.txx      Intersector3D.hxx\
+Intersector3D.txx               Intersector3DP0P1.hxx 
+
 
 # Libraries targets
 
 dist_libinterpkernel_la_SOURCES = \
 	TransformedTriangle.cxx\
-	TransformedTriangle_intersect.cxx\
-	TransformedTriangle_math.cxx\
+	TransformedTriangleIntersect.cxx\
+	TransformedTriangleMath.cxx\
 	BoundingBox.cxx \
 	TetraAffineTransform.cxx\
-	CellModel.cxx \
-	Remapper.cxx \
-	PointLocator.cxx
+	CellModel.cxx\
+	UnitTetraIntersectionBary.cxx
 
-libinterpkernel_la_LDFLAGS= $(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la $(STDLIB) ../MEDMEM/libmedmem.la -lutil -lm
+libinterpkernel_la_CPPFLAGS=-I$(srcdir)/Geometric2D -I$(srcdir)/Bases
 
-libinterpkernel_la_CPPFLAGS=  @CXXTMPDPTHFLAGS@ \
-	-I$(srcdir) -I$(srcdir)/../MEDMEM $(BOOST_CPPFLAGS) -DOPTIMIZE -DLOG_LEVEL=0 \
-	-I$(srcdir)/../MEDWrapper/Base \
-	-I$(srcdir)/../MEDWrapper/V2_1/Core \
-	-I$(srcdir)/Geometric2D \
-	$(MED2_INCLUDES)
+libinterpkernel_la_LDFLAGS=
 
 # the geom2D library is included in the interpkernel one
-libinterpkernel_la_LIBADD= ./Geometric2D/libInterpGeometric2DAlg.la
+libinterpkernel_la_LIBADD= ./Geometric2D/libInterpGeometric2DAlg.la Bases/libinterpkernelbases.la
 
 AM_CPPFLAGS= $(libinterpkernel_la_CPPFLAGS)
 LDADD= $(libinterpkernel_la_LDFLAGS)
@@ -97,10 +90,18 @@ EXTRA_DIST += \
 	InterpolationPlanar.hxx \
 	InterpolationPlanar.txx \
 	InterpolationUtils.hxx \
-	IntersectorHexa.hxx \
-	IntersectorHexa.txx \
-	IntersectorTetra.hxx \
-	IntersectorTetra.txx \
+	Intersector3D.hxx \
+	Intersector3D.txx \
+	Intersector3DP0P1.hxx \
+	Intersector3DP0P1.txx \
+	Intersector3DP1P0.hxx \
+	Intersector3DP1P0.txx \
+	PolyhedronIntersector.hxx \
+	PolyhedronIntersector.txx \
+	PolyhedronIntersectorP0P1.hxx \
+	PolyhedronIntersectorP0P1.txx \
+	SplitterTetra.hxx \
+	SplitterTetra.txx \
 	Log.hxx \
 	MEDNormalizedUnstructuredMesh.hxx \
 	MEDNormalizedUnstructuredMesh.txx \
@@ -109,9 +110,10 @@ EXTRA_DIST += \
 	MeshRegion.hxx \
 	MeshRegion.txx \
 	MeshUtils.hxx \
-	NormalizedUnstructuredMesh.hxx \
 	PlanarIntersector.hxx \
 	PlanarIntersector.txx \
+	PlanarIntersectorP0P0.hxx \
+	PlanarIntersectorP0P0.txx \
 	PointLocatorAlgos.txx \
 	PolygonAlgorithms.hxx \
 	PolygonAlgorithms.txx \
@@ -120,7 +122,7 @@ EXTRA_DIST += \
 	TestInterpKernel.cpp \
 	TetraAffineTransform.hxx \
 	TransformedTriangle.hxx \
-	TransformedTriangle_inline.hxx \
+	TransformedTriangleInline.hxx \
 	TranslationRotationMatrix.hxx \
 	TriangulationIntersector.hxx \
 	TriangulationIntersector.txx \

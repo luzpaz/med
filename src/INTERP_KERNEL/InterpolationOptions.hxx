@@ -16,69 +16,67 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef _INTERPOLATIONOPTIONS_HXX_
-#define _INTERPOLATIONOPTIONS_HXX_
+#ifndef __INTERPOLATIONOPTIONS_HXX__
+#define __INTERPOLATIONOPTIONS_HXX__
 
 
 namespace INTERP_KERNEL {
-  typedef enum {Triangulation, Convex, Geometric2D, Generic} IntersectionType;
-	/// Type describing the different ways in which the hexahedron can be split into tetrahedra.
-	/// The PLANAR_* policies persume that each face is to be considered planar, while the general
-	/// policies make no such hypothesis. The integer at the end gives the number of tetrahedra
-	/// that result from the split.
-	typedef enum  { PLANAR_FACE_5 = 5, PLANAR_FACE_6 = 6, GENERAL_24 = 24, GENERAL_48 = 48 } SplittingPolicy;
+  typedef enum { Triangulation, Convex, Geometric2D } IntersectionType;
+  /// Type describing the different ways in which the hexahedron can be split into tetrahedra.
+  /// The PLANAR_* policies persume that each face is to be considered planar, while the general
+  /// policies make no such hypothesis. The integer at the end gives the number of tetrahedra
+  /// that result from the split.
+  typedef enum  { PLANAR_FACE_5 = 5, PLANAR_FACE_6 = 6, GENERAL_24 = 24, GENERAL_48 = 48 } SplittingPolicy;
 
-	
-	class InterpolationOptions{
-	private :
-		int _printLevel ;
-		IntersectionType _intersectionType;
-		double _precision;
-		double _medianPlane ;
-		bool _doRotate ;
-		double _boundingBoxAdjustment ;
-		int _orientation ;
-		SplittingPolicy _splittingPolicy ;
+  
+  class InterpolationOptions{
+  private :
+    int _print_level ;
+    IntersectionType _intersection_type;
+    double _precision;
+    double _median_plane ;
+    bool _do_rotate ;
+    double _bounding_box_adjustment ;
+    int _orientation ;
+    SplittingPolicy _splitting_policy ;
 
-	public:
-		InterpolationOptions()
-		{init();
-		}
-		int getPrintLevel() const {return _printLevel;}
-	  void setPrintLevel(int pl) {_printLevel=pl;}
+  public:
+    InterpolationOptions() { init(); }
+    int getPrintLevel() const { return _print_level; }
+    void setPrintLevel(int pl) { _print_level=pl; }
 
-		IntersectionType getIntersectionType() const{return InterpolationOptions::_intersectionType;}
-		void setIntersectionType(IntersectionType it) {InterpolationOptions::_intersectionType=it;}
+    IntersectionType getIntersectionType() const { return InterpolationOptions::_intersection_type; }
+    void setIntersectionType(IntersectionType it) { InterpolationOptions::_intersection_type=it; }
 
-		double getPrecision() const {return InterpolationOptions::_precision;}
-		void setPrecision(double p) {InterpolationOptions::_precision=p;}
+    double getPrecision() const { return InterpolationOptions::_precision; }
+    void setPrecision(double p) { InterpolationOptions::_precision=p; }
 
-		double getMedianPlane() {return InterpolationOptions::_medianPlane;}
-		void setMedianPlane(double mp) {InterpolationOptions::_medianPlane=mp;}
-		
-		bool getDoRotate() {return InterpolationOptions::_doRotate;}
-		void setDoRotate( bool dr) {InterpolationOptions::_doRotate = dr;}
-		
-		double getBoundingBoxAdjustment() {return InterpolationOptions::_boundingBoxAdjustment;}
-		void setBoundingBoxAdjustment(double bba) {InterpolationOptions::_boundingBoxAdjustment=bba;}
-		
-		int getOrientation() {return InterpolationOptions::_orientation;}
-		void setOrientation(int o) {InterpolationOptions::_orientation=o;}
-		
-		SplittingPolicy getSplittingPolicy() {return _splittingPolicy;}
-		void setSplittingPolicy(SplittingPolicy sp) {_splittingPolicy=sp;}
-		void init()
-		{	
-			 _printLevel=0;
-			_intersectionType=Triangulation;
-			_precision=1e-12;;
-			_medianPlane =0.5;
-			_doRotate =true;
-			_boundingBoxAdjustment =0.1;
-			_orientation =0;
-			_splittingPolicy =GENERAL_48;
-		}
-	};
+    double getMedianPlane() { return InterpolationOptions::_median_plane; }
+    void setMedianPlane(double mp) { InterpolationOptions::_median_plane=mp; }
+    
+    bool getDoRotate() { return InterpolationOptions::_do_rotate; }
+    void setDoRotate( bool dr) { InterpolationOptions::_do_rotate = dr; }
+    
+    double getBoundingBoxAdjustment() { return InterpolationOptions::_bounding_box_adjustment; }
+    void setBoundingBoxAdjustment(double bba) { InterpolationOptions::_bounding_box_adjustment=bba; }
+    
+    int getOrientation() { return InterpolationOptions::_orientation; }
+    void setOrientation(int o) { InterpolationOptions::_orientation=o; }
+    
+    SplittingPolicy getSplittingPolicy() { return _splitting_policy; }
+    void setSplittingPolicy(SplittingPolicy sp) { _splitting_policy=sp; }
+    void init()
+    {  
+      _print_level=0;
+      _intersection_type=Triangulation;
+      _precision=1e-12;;
+      _median_plane=0.5;
+      _do_rotate=true;
+      _bounding_box_adjustment=0.1;
+      _orientation=0;
+      _splitting_policy=GENERAL_48;
+    }
+  };
 
 }
 #endif

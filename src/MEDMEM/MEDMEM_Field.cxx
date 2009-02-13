@@ -394,7 +394,7 @@ void FIELD_::_deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n , boo
 void     FIELD_::rmDriver      (int index)
 {
   MESSAGE_MED("void FIELD_::rmDriver(int index) : removing the driver " << index);
-};
+}
 
 int      FIELD_::addDriver     (driverTypes driverType, 
                                 const string & fileName,
@@ -403,21 +403,21 @@ int      FIELD_::addDriver     (driverTypes driverType,
 {
   MESSAGE_MED("int FIELD_::addDriver(driverTypes driverType, const string & fileName, const string & driverFieldName) : adding the driver " << driverType << " fileName = " << fileName.c_str() << " driverFieldName = " << driverFieldName.c_str());
   return 0;
-};
+}
 
 int      FIELD_::addDriver     (GENDRIVER & driver)
 {
   MESSAGE_MED("int FIELD_::addDriver(GENDRIVER & driver) : driver " << driver);
   return 0;
-};
+}
 
-void     FIELD_::openAppend    ( void )                               {};
-void     FIELD_::write         (const GENDRIVER &)                    {};
-void     FIELD_::writeAppend   (const GENDRIVER &)                    {};
-void     FIELD_::read          (const GENDRIVER &)                    {};
-void     FIELD_::write         (int , const string & ) {};
-void     FIELD_::writeAppend   (int , const string & ) {};
-void     FIELD_::read          (int )                                  {};
+void     FIELD_::openAppend    ( void )                               {}
+void     FIELD_::write         (const GENDRIVER &)                    {}
+void     FIELD_::writeAppend   (const GENDRIVER &)                    {}
+void     FIELD_::read          (const GENDRIVER &)                    {}
+void     FIELD_::write         (int , const string & ) {}
+void     FIELD_::writeAppend   (int , const string & ) {}
+void     FIELD_::read          (int )                                  {}
 void     FIELD_::copyGlobalInfo(const FIELD_& m)
 {  
 

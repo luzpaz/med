@@ -17,6 +17,8 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "TransformedTriangle.hxx"
+#include "VectorUtils.hxx"
+
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -25,8 +27,6 @@
 #include <iterator>
 #include <math.h>
 #include <vector>
-
-#include "VectorUtils.hxx"
 
 namespace INTERP_KERNEL
 {
@@ -51,7 +51,7 @@ namespace INTERP_KERNEL
      *                    to the plane being projected on
      */
     ProjectedCentralCircularSortOrder(const double* barycenter, const CoordType type)
-      : _aIdx((type == YZ) ? 2 : 0), 
+      : _aIdx((type == YZ) ? 1 : 0), 
         _bIdx((type == XY) ? 1 : 2),
         _a(barycenter[_aIdx]), 
         _b(barycenter[_bIdx])
@@ -104,7 +104,7 @@ namespace INTERP_KERNEL
    * @param r   array of three doubles containing coordinates of R
    */
   TransformedTriangle::TransformedTriangle(double* p, double* q, double* r)
-    : _isDoubleProductsCalculated(false),  _isTripleProductsCalculated(false)
+    : _is_double_products_calculated(false),  _is_triple_products_calculated(false), _volume(0)
   {
   
     for(int i = 0 ; i < 3 ; ++i) 
@@ -129,9 +129,7 @@ namespace INTERP_KERNEL
     // initialise rest of data
     preCalculateDoubleProducts();
 
-#ifdef OPTIMIZE
     preCalculateTriangleSurroundsEdge();
-#endif
 
     preCalculateTripleProducts();
  
@@ -176,23 +174,24 @@ namespace INTERP_KERNEL
     // get the sign of the volume -  equal to the sign of the z-component of the normal
     // of the triangle, u_x * v_y - u_y * v_x, where u = q - p and v = r - p
     // if it is zero, the triangle is perpendicular to the z - plane and so the volume is zero
-    const double uv_xy[4] = 
-      {
-        _coords[5*Q] - _coords[5*P], _coords[5*Q + 1] - _coords[5*P + 1], // u_x, u_y
-        _coords[5*R] - _coords[5*P], _coords[5*R + 1] - _coords[5*P + 1]  // v_x, v_y
-      };
+//     const double uv_xy[4] = 
+//       {
+//         _coords[5*Q] - _coords[5*P], _coords[5*Q + 1] - _coords[5*P + 1], // u_x, u_y
+//         _coords[5*R] - _coords[5*P], _coords[5*R + 1] - _coords[5*P + 1]  // v_x, v_y
+//       };
 
-    double sign = uv_xy[0] * uv_xy[3] - uv_xy[1] * uv_xy[2];
+//     double sign = uv_xy[0] * uv_xy[3] - uv_xy[1] * uv_xy[2];
+    int sign = isTriangleInclinedToFacet( OXY );
 
-    if(sign == 0.0)
+    if(sign == 0 )
       {
         LOG(2, " --- Triangle is perpendicular to z-plane - V = 0.0");
-        return 0.0;
+        return _volume = 0.0;
       }
 
 
     // normalize sign
-    sign = sign > 0.0 ? 1.0 : -1.0;
+    //sign = sign > 0.0 ? 1.0 : -1.0;
 
     LOG(2, "-- Calculating intersection polygons ... ");
     calculateIntersectionPolygons();
@@ -224,7 +223,7 @@ namespace INTERP_KERNEL
 
     LOG(2, "volA + volB = " << sign * (volA + volB) << std::endl << "***********");
   
-    return sign * (volA + volB);
+    return _volume = sign * (volA + volB);
 
   } 
 
@@ -244,14 +243,10 @@ namespace INTERP_KERNEL
   {
     assert(_polygonA.size() == 0);
     assert(_polygonB.size() == 0);
-
-#ifdef OPTIMIZE
     // avoid reallocations in push_back() by pre-allocating enough memory
     // we should never have more than 20 points
     _polygonA.reserve(20);
     _polygonB.reserve(20);
-#endif
-
     // -- surface intersections
     // surface - edge
     for(TetraEdge edge = OX ; edge <= ZX ; edge = TetraEdge(edge + 1))
@@ -284,7 +279,6 @@ namespace INTERP_KERNEL
             LOG(3,"Surface-ray : " << vToStr(ptB) << " added to B");
           }
       }
-#ifdef OPTIMIZE
 
     // -- segment intersections
     for(TriSegment seg = PQ ; seg < NO_TRI_SEGMENT ; seg = TriSegment(seg + 1))
@@ -367,72 +361,6 @@ namespace INTERP_KERNEL
                   }
               }
           }
-    
-#else
-
-        // -- segment intersections
-        for(TriSegment seg = PQ ; seg < NO_TRI_SEGMENT ; seg = TriSegment(seg + 1))
-          {
-
-            // segment - facet
-            for(TetraFacet facet = OYZ ; facet < NO_TET_FACET ; facet = TetraFacet(facet + 1))
-              {
-                if(testSegmentFacetIntersection(seg, facet))
-                  {
-                    double* ptA = new double[3];
-                    calcIntersectionPtSegmentFacet(seg, facet, ptA);
-                    _polygonA.push_back(ptA);
-                    LOG(3,"Segment-facet : " << vToStr(ptA) << " added to A");
-                    if(facet == XYZ)
-                      {
-                        double* ptB = new double[3];
-                        copyVector3(ptA, ptB);
-                        _polygonB.push_back(ptB);
-                        LOG(3,"Segment-facet : " << vToStr(ptB) << " added to B");
-                      }
-              
-                  }
-              }
-
-            // segment - edge
-            for(TetraEdge edge = OX ; edge <= ZX ; edge = TetraEdge(edge + 1))
-              {
-                if(testSegmentEdgeIntersection(seg, edge))
-                  {
-                    double* ptA = new double[3];
-                    calcIntersectionPtSegmentEdge(seg, edge, ptA);
-                    _polygonA.push_back(ptA);
-                    LOG(3,"Segment-edge : " << vToStr(ptA) << " added to A");
-                    if(edge >= XY)
-                      {
-                        double* ptB = new double[3];
-                        copyVector3(ptA, ptB);
-                        _polygonB.push_back(ptB);
-                      }
-                  }
-              }
-       
-            // segment - corner
-            for(TetraCorner corner = O ; corner < NO_TET_CORNER ; corner = TetraCorner(corner + 1))
-              {
-                if(testSegmentCornerIntersection(seg, corner))
-                  {
-                    double* ptA = new double[3];
-                    copyVector3(&COORDS_TET_CORNER[3 * corner], ptA);
-                    _polygonA.push_back(ptA);
-                    LOG(3,"Segment-corner : " << vToStr(ptA) << " added to A");
-                    if(corner != O)
-                      {
-                        double* ptB = new double[3];
-                        _polygonB.push_back(ptB);
-                        copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
-                        LOG(3,"Segment-corner : " << vToStr(ptB) << " added to B");
-                      }
-                  }
-              }
-#endif
-
-#ifdef OPTIMIZE
 
             // segment - ray 
             for(TetraCorner corner = X ; corner < NO_TET_CORNER ; corner = TetraCorner(corner + 1))
@@ -467,37 +395,8 @@ namespace INTERP_KERNEL
                       LOG(3,"Segment-halfstrip : " << vToStr(ptB) << " added to B");
                     }
               }
+      }
 
-                     
-#else
-
-            // segment - ray 
-            for(TetraCorner corner = X ; corner < NO_TET_CORNER ; corner = TetraCorner(corner + 1))
-              {
-                if(testSegmentRayIntersection(seg, corner))
-                  {
-                    double* ptB = new double[3];
-                    copyVector3(&COORDS_TET_CORNER[3 * corner], ptB);
-                    _polygonB.push_back(ptB);
-                    LOG(3,"Segment-ray : " << vToStr(ptB) << " added to B");
-                  }
-              }
-       
-            // segment - halfstrip
-            for(TetraEdge edge = XY ; edge <= ZX ; edge = TetraEdge(edge + 1))
-              {
-                if(testSegmentHalfstripIntersection(seg, edge))
-                  {
-                    double* ptB = new double[3];
-                    calcIntersectionPtSegmentHalfstrip(seg, edge, ptB);
-                    _polygonB.push_back(ptB);
-                    LOG(3,"Segment-halfstrip : " << vToStr(ptB) << " added to B");
-                  }
-              }
-
-#endif
-          }      
-    
         // inclusion tests
         for(TriCorner corner = P ; corner < NO_TRI_CORNER ; corner = TriCorner(corner + 1))
           {
@@ -599,20 +498,20 @@ namespace INTERP_KERNEL
 
       // determine type of sorting
       CoordType type = SortOrder::XY;
-      if(poly == A) // B is on h = 0 plane -> ok
+      if(poly == A && !isTriangleInclinedToFacet( OXY )) // B is on h = 0 plane -> ok
         {
           // NB : the following test is never true if we have eliminated the
           // triangles parallel to x == 0 and y == 0 in calculateIntersectionVolume().
           // We keep the test here anyway, to avoid interdependency.
 
-          // is triangle parallel to x == 0 ?
-          if(isTriangleParallelToFacet(OZX))
-            {
-              type = SortOrder::YZ;
-            }
-          else if(isTriangleParallelToFacet(OYZ))
+          // is triangle inclined to x == 0 ?
+          if(isTriangleInclinedToFacet(OZX))
             {
               type = SortOrder::XZ;
+            }
+          else //if(isTriangleParallelToFacet(OYZ))
+            {
+              type = SortOrder::YZ;
             }
         }
 
@@ -709,6 +608,30 @@ namespace INTERP_KERNEL
       // coordinate to check
       const int coord = static_cast<int>(facet);
       return (_coords[5*P + coord] == _coords[5*Q + coord]) && (_coords[5*P + coord] == _coords[5*R + coord]);
+    }
+
+    /**
+     * Checks if the triangle is not perpedicular to the given facet
+     *
+     * @param facet  one of the facets of the unit tetrahedron
+     * @return       zero if the triangle is perpendicular to the facet,
+     *               else 1 or -1 depending on the sign of cross product of facet edges
+     */
+    int TransformedTriangle::isTriangleInclinedToFacet(const TetraFacet facet) const
+    {
+      // coordinate to check
+      const int coord = static_cast<int>(facet);
+      const int ind1 = ( coord+1 ) % 3, ind2 = ( coord+2 ) % 3;
+      const double uv_xy[4] = 
+        {
+          // u_x, u_y
+          _coords[5*Q+ind1] - _coords[5*P+ind1], _coords[5*Q+ind2] - _coords[5*P+ind2],
+          // v_x, v_y
+          _coords[5*R+ind1] - _coords[5*P+ind1], _coords[5*R+ind2] - _coords[5*P+ind2]
+        };
+
+      double sign = uv_xy[0] * uv_xy[3] - uv_xy[1] * uv_xy[2];
+      return (sign < 0.) ? -1 : (sign > 0.) ? 1 : 0;
     }
 
     /**

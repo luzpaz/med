@@ -42,12 +42,15 @@
 using namespace __gnu_cxx;
 #else
 using namespace std;
+using stdext::hash_map;
 #endif
 
 namespace MEDMEM {
 class MEDSKYLINEARRAY;
  class FAMILY;
 class GROUP;
+  class CONNECTIVITY;
+  MEDMEM_EXPORT ostream & operator<<(ostream &os, CONNECTIVITY &my);
 
 /*!
 	This class deals with all type of connectivity .\n
@@ -65,7 +68,7 @@ class MEDMEM_EXPORT CONNECTIVITY
 		size_t operator()(const vector<int>& key) const
 		{
 			size_t sum=0;
-			for (int i=0; i<key.size(); i++)
+			for (int i=0; i<(int)key.size(); i++)
 				sum+=key[i];
 			return sum;
 		}

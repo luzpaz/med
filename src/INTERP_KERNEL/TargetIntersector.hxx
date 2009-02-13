@@ -19,7 +19,9 @@
 #ifndef __TARGETINTERSECTOR__HXX__
 #define __TARGETINTERSECTOR__HXX__
 
-#include <INTERPKERNEL_defines.hxx>
+#include "INTERPKERNELDefines.hxx"
+
+#include <vector>
 
 namespace INTERP_KERNEL
 {
@@ -28,22 +30,29 @@ namespace INTERP_KERNEL
    * These classes represent a target element and calculate its intersection
    * with the source elements.
    */
-  template<class ConnType>
-  class INTERPKERNEL_EXPORT TargetIntersector
+  template<class MyMeshType, class MyMatrix>
+  class TargetIntersector
   {
   public:
-
-    /// Virtual destructor
-    virtual ~TargetIntersector() {}
-    
-    /**
-     * Calculate the volume of the intersection between target cell 
-     * and the given source cell.
-     *
-     * @param srcCell     global number of the source cell
+    typedef typename MyMeshType::MyConnType ConnType;
+  public:
+    /*!
+     * \addtogroup InterpKerGrpIntPlan
+     * @{
      */
-    virtual double intersectSourceCell(ConnType srcCell) = 0;
+    /*!
+     * Tool for cell intersection, result is always positive.
+     * @param icellT id of cell in target mesh in \b C \b mode.
+     * @param icellsS ids of cells in source mesh in \b C \b mode.
+     * @param res is an IN/OUT parameter that represents the icellTth row in final matrix, fed with at most icellsS elements. 
+     */
+    virtual void intersectCells(ConnType targetCell, const std::vector<ConnType>& srcCells, MyMatrix& res) = 0;
+    //! @}
+    //Tool for cell filtering
+    virtual int getNumberOfRowsOfResMatrix() const = 0;
+    virtual int getNumberOfColsOfResMatrix() const = 0;
+    virtual ~TargetIntersector() { }
   };
-};
+}
 
 #endif

@@ -19,7 +19,7 @@
 #ifndef __BOUNDINGBOX_HXX__
 #define __BOUNDINGBOX_HXX__
 
-#include <INTERPKERNEL_defines.hxx>
+#include "INTERPKERNELDefines.hxx"
 #include <iostream>
 
 namespace INTERP_KERNEL
@@ -104,6 +104,6 @@ namespace INTERP_KERNEL
     std::cout << std::endl;
   }
 
-};
+}
 
 #endif

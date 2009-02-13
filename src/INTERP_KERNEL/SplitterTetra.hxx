@@ -16,10 +16,9 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef __INTERSECTORTETRA_HXX__
-#define __INTERSECTORTETRA_HXX__
+#ifndef __SPLITTERTETRA_HXX__
+#define __SPLITTERTETRA_HXX__
 
-#include "TargetIntersector.hxx"
 #include "TransformedTriangle.hxx"
 #include "TetraAffineTransform.hxx"
 
@@ -33,19 +32,20 @@
 # include <ext/hash_map>
 #endif
 
-#include "MEDMEM_define.hxx"
-
 #ifndef WIN32
 using __gnu_cxx::hash_map;
+#else
+using stdext::hash_map;
+using stdext::hash_compare;
 #endif
 
 namespace INTERP_KERNEL
 {
   /**
-   * \brief Class representing a triangular face, used as key in caching hash map in IntersectorTetra.
+   * \brief Class representing a triangular face, used as key in caching hash map in SplitterTetra.
    *
    */
-  class INTERPKERNEL_EXPORT TriangleFaceKey
+  class TriangleFaceKey
   {
   public:
     
@@ -197,22 +197,23 @@ namespace INTERP_KERNEL
    *
    */
   template<class MyMeshType>
-  class INTERPKERNEL_EXPORT IntersectorTetra : public TargetIntersector<typename MyMeshType::MyConnType>
+  class SplitterTetra
   {
-
   public: 
+    
+    SplitterTetra(const MyMeshType& srcMesh, const double** tetraCorners, const typename MyMeshType::MyConnType *nodesId);
 
-    IntersectorTetra(const MyMeshType& srcMesh, const MyMeshType& targetMesh,
-                     typename MyMeshType::MyConnType targetCell);
-    
-    IntersectorTetra(const MyMeshType& srcMesh, const double** tetraCorners);
-    
-    ~IntersectorTetra();
+    ~SplitterTetra();
 
     double intersectSourceCell(typename MyMeshType::MyConnType srcCell);
 
-  private:
+    typename MyMeshType::MyConnType getId(int id) { return _conn[id]; }
     
+    void splitIntoDualCells(SplitterTetra<MyMeshType> **output);
+
+    void splitMySelfForDual(double* output, int i, typename MyMeshType::MyConnType& nodeId);
+
+  private:
     // member functions
     inline void createAffineTransform(const double** corners);
     inline void checkIsOutside(const double* pt, bool* isOutside) const;
@@ -221,17 +222,17 @@ namespace INTERP_KERNEL
         
 
     /// disallow copying
-    IntersectorTetra(const IntersectorTetra& t);
+    SplitterTetra(const SplitterTetra& t);
     
     /// disallow assignment
-    IntersectorTetra& operator=(const IntersectorTetra& t);
+    SplitterTetra& operator=(const SplitterTetra& t);
 
     // member variables
     /// affine transform associated with this target element
     TetraAffineTransform* _t;
     
     /// hash_map relating node numbers to transformed nodes, used for caching
-    hash_map< int, double* > _nodes;
+    hash_map< int , double* > _nodes;
     
     /// hash_map relating triangular faces to calculated volume contributions, used for caching
     hash_map< TriangleFaceKey, double
@@ -241,8 +242,12 @@ namespace INTERP_KERNEL
     > _volumes;
 
     /// reference to the source mesh
-    const MyMeshType& _srcMesh;
+    const MyMeshType& _src_mesh;
                 
+    // node id of the first node in target mesh in C mode.
+    typename MyMeshType::MyConnType _conn[4];
+
+    double _coords[12];
   };
 
   /**
@@ -252,7 +257,7 @@ namespace INTERP_KERNEL
    *                 coordinates of the corners of the tetrahedron
    */
   template<class MyMeshType>
-  inline void IntersectorTetra<MyMeshType>::createAffineTransform(const double** corners)
+  inline void SplitterTetra<MyMeshType>::createAffineTransform(const double** corners)
   {
     // create AffineTransform from tetrahedron
     _t = new TetraAffineTransform( corners );
@@ -268,7 +273,7 @@ namespace INTERP_KERNEL
    * @param isOutside bool[8] which indicate the results of earlier checks. 
    */
   template<class MyMeshType>
-  inline void IntersectorTetra<MyMeshType>::checkIsOutside(const double* pt, bool* isOutside) const
+  inline void SplitterTetra<MyMeshType>::checkIsOutside(const double* pt, bool* isOutside) const
   {
     isOutside[0] = isOutside[0] && (pt[0] <= 0.0);
     isOutside[1] = isOutside[1] && (pt[0] >= 1.0);
@@ -282,20 +287,19 @@ namespace INTERP_KERNEL
   
   /**
    * Calculates the transformed node with a given global node number.
-   * Gets the coordinates for the node in _srcMesh with the given global number and applies TetraAffineTransform
+   * Gets the coordinates for the node in _src_mesh with the given global number and applies TetraAffineTransform
    * _t to it. Stores the result in the cache _nodes. The non-existance of the node in _nodes should be verified before
    * calling.
    *
-   * @param globalNodeNum  global node number of the node in the mesh _srcMesh
+   * @param globalNodeNum  global node number of the node in the mesh _src_mesh
    *
    */
   template<class MyMeshType>
-  inline void IntersectorTetra<MyMeshType>::calculateNode(typename MyMeshType::MyConnType globalNodeNum)
+  inline void SplitterTetra<MyMeshType>::calculateNode(typename MyMeshType::MyConnType globalNodeNum)
   {  
-    const double* node = _srcMesh.getCoordinatesPtr()+MyMeshType::MY_SPACEDIM*globalNodeNum;
+    const double* node = _src_mesh.getCoordinatesPtr()+MyMeshType::MY_SPACEDIM*globalNodeNum;
     double* transformedNode = new double[MyMeshType::MY_SPACEDIM];
     assert(transformedNode != 0);
-    
     _t->apply(transformedNode, node);
     _nodes[globalNodeNum] = transformedNode;
   }
@@ -308,10 +312,94 @@ namespace INTERP_KERNEL
    * @param key    key associated with the face
    */
   template<class MyMeshType>
-  inline void IntersectorTetra<MyMeshType>::calculateVolume(TransformedTriangle& tri, const TriangleFaceKey& key)
+  inline void SplitterTetra<MyMeshType>::calculateVolume(TransformedTriangle& tri, const TriangleFaceKey& key)
   {
     const double vol = tri.calculateIntersectionVolume();
     _volumes.insert(std::make_pair(key, vol));
+  }
+
+  template<class MyMeshType>
+  class SplitterTetra2
+  {
+  public:
+    SplitterTetra2(const MyMeshType& targetMesh, const MyMeshType& srcMesh, SplittingPolicy policy);
+    ~SplitterTetra2();
+    void releaseArrays();
+    void splitTargetCell(typename MyMeshType::MyConnType targetCell, typename MyMeshType::MyConnType nbOfNodesT,
+                         typename std::vector< SplitterTetra<MyMeshType>* >& tetra);
+    void fiveSplit(const int* const subZone, typename std::vector< SplitterTetra<MyMeshType>* >& tetra);
+    void sixSplit(const int* const subZone, typename std::vector< SplitterTetra<MyMeshType>* >& tetra);
+    void calculateGeneral24Tetra(typename std::vector< SplitterTetra<MyMeshType>* >& tetra);
+    void calculateGeneral48Tetra(typename std::vector< SplitterTetra<MyMeshType>* >& tetra);
+    void calculateSubNodes(const MyMeshType& targetMesh, typename MyMeshType::MyConnType targetCell);
+    inline const double* getCoordsOfSubNode(typename MyMeshType::MyConnType node);
+    inline const double* getCoordsOfSubNode2(typename MyMeshType::MyConnType node, typename MyMeshType::MyConnType& nodeId);
+    template<int n>
+    inline void calcBarycenter(double* barycenter, const typename MyMeshType::MyConnType* pts);
+  private:
+    const MyMeshType& _target_mesh;
+    const MyMeshType& _src_mesh;
+    SplittingPolicy _splitting_pol;
+    /// vector of pointers to double[3] containing the coordinates of the
+    /// (sub) - nodes of split target cell
+    std::vector<const double*> _nodes;
+    std::vector<typename MyMeshType::MyConnType> _node_ids;
+  };
+
+  /**
+   * Calculates the barycenter of n (sub) - nodes
+   *
+   * @param  n  number of nodes for which to calculate barycenter
+   * @param  barycenter  pointer to double[3] array in which to store the result
+   * @param  pts pointer to int[n] array containing the (sub)-nodes for which to calculate the barycenter
+   */
+  template<class MyMeshType>
+  template<int n>
+  inline void SplitterTetra2<MyMeshType>::calcBarycenter(double* barycenter, const typename MyMeshType::MyConnType* pts)
+  {
+    barycenter[0] = barycenter[1] = barycenter[2] = 0.0;
+    for(int i = 0; i < n ; ++i)
+      {
+       const double* pt = getCoordsOfSubNode(pts[i]);
+       barycenter[0] += pt[0];
+       barycenter[1] += pt[1];
+       barycenter[2] += pt[2];
+      }
+    
+    barycenter[0] /= n;
+    barycenter[1] /= n;
+    barycenter[2] /= n;
+  }
+
+  /**
+   * Accessor to the coordinates of a given (sub)-node
+   *
+   * @param  node  local number of the (sub)-node 0,..,7 are the elements nodes, sub-nodes are numbered from 8,..
+   * @return pointer to double[3] containing the coordinates of the nodes
+   */
+  template<class MyMeshType>
+  inline const double* SplitterTetra2<MyMeshType>::getCoordsOfSubNode(typename MyMeshType::MyConnType node)
+  {
+    // replace "at()" with [] for unsafe but faster access
+    return _nodes.at(node);
+  }
+
+  /**
+   * Accessor to the coordinates of a given (sub)-node
+   *
+   * @param  node  local number of the (sub)-node 0,..,7 are the elements nodes, sub-nodes are numbered from 8,..
+   * @param nodeId is an output that is node id in target whole mesh in C mode.
+   * @return pointer to double[3] containing the coordinates of the nodes
+   */
+  template<class MyMeshType>
+  const double* SplitterTetra2<MyMeshType>::getCoordsOfSubNode2(typename MyMeshType::MyConnType node, typename MyMeshType::MyConnType& nodeId)
+  {
+    const double *ret=_nodes.at(node);
+    if(node<8)
+      nodeId=_node_ids[node];
+    else
+      nodeId=-1;
+    return ret;    
   }
 }
 

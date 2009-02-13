@@ -1454,6 +1454,8 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       _constituent->_geometricTypes = new medGeometryElement[_constituent->_numberOfTypes];
       _constituent->_type = new CELLMODEL[_constituent->_numberOfTypes];
 //CCRT      _constituent->_count = new med_int[_constituent->_numberOfTypes+1];
+      if(_constituent->_count)
+        delete [] _constituent->_count;
       _constituent->_count = new int[_constituent->_numberOfTypes+1];
       _constituent->_count[0]=1;
       med_int* tmp_NumberOfConstituentsForeachType = new med_int[_constituent->_numberOfTypes+1];

@@ -405,7 +405,7 @@ void _intermediateMED::numerotationMaillage()
 
   treatGroupes();
 
-  set<_maille>::iterator i, iEnd;
+  set<_maille>::const_iterator i, iEnd;
 
   // numerotation mailles of type MED_POINT1 by node number
   bool hasPointMailles = false;
@@ -1248,7 +1248,7 @@ namespace {
 
 struct __NOEUD
 {
-  typedef map<const int,_noeud>::iterator Inoeud;
+  typedef map<int,_noeud>::iterator Inoeud;
   Inoeud i_noeud;
 
   __NOEUD() {}
@@ -1399,7 +1399,7 @@ void _intermediateMED::mergeNodesAndElements(double tolerance)
   _maillageByDimIterator entityMailles( *this, 0 );
   if ( const set<_maille> * points = entityMailles.nextType() ) {
     hasPointMailles = true;
-    set<_maille>::iterator i, iEnd = points->end();
+    set<_maille>::const_iterator i, iEnd = points->end();
     for ( i = points->begin(); i != iEnd; ++i )
       i->setOrdre( i->sommets[0]->second.number ); // is merged if point is merged
   }
@@ -1428,9 +1428,9 @@ void _intermediateMED::mergeNodesAndElements(double tolerance)
     {
       int nbRemoved = 0;
       set<_mailleWrap> maNodeNumSorted;
-      pair< set<_mailleWrap>::iterator, bool > mw_isunique;
+      pair< set<_mailleWrap>::const_iterator, bool > mw_isunique;
 
-      set<_maille>::iterator ma = typeMailles->begin(), maEnd = typeMailles->end();
+      set<_maille>::const_iterator ma = typeMailles->begin(), maEnd = typeMailles->end();
       while ( ma != maEnd )
       {
         const _maille & m = *ma++;

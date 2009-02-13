@@ -40,7 +40,7 @@ if test "$WITHMPICH" = yes; then
   MPICH_HOME=$withval
 
   if test "$MPICH_HOME"; then
-    MPI_INCLUDES="-I$MPICH_HOME/include"
+    MPI_INCLUDES="-I$MPICH_HOME/include -DMPICH_IGNORE_CXX_SEEK"
     if test "x$MPICH_HOME" = "x/usr"
     then
       MPI_LIBS=""

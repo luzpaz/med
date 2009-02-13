@@ -27,17 +27,17 @@ namespace INTERP_KERNEL
   const double Interpolation3DSurf::DFT_MEDIAN_PLANE=0.5;
   const double Interpolation3DSurf::DFT_SURF3D_ADJ_EPS=1e-4;
   
-  Interpolation3DSurf::Interpolation3DSurf():_doRotate(true)
-                                            ,_medianPlane(DFT_MEDIAN_PLANE)
-                                            ,_surf3DAdjustmentEps(DFT_SURF3D_ADJ_EPS)
+  Interpolation3DSurf::Interpolation3DSurf():_do_rotate(true)
+                                            ,_median_plane(DFT_MEDIAN_PLANE)
+                                            ,_surf_3D_adjustment_eps(DFT_SURF3D_ADJ_EPS)
   {
   }
 
-	Interpolation3DSurf::Interpolation3DSurf(const InterpolationOptions& io):InterpolationPlanar<Interpolation3DSurf>(io)
+  Interpolation3DSurf::Interpolation3DSurf(const InterpolationOptions& io):InterpolationPlanar<Interpolation3DSurf>(io)
   {
   }
 
-	
+  
   /**
      \brief  Function used to set the options for the intersection calculation
      \details The following options can be modified:
@@ -61,8 +61,8 @@ namespace INTERP_KERNEL
                                        IntersectionType intersectionType, bool doRotate, int orientation)
   {
     InterpolationPlanar<Interpolation3DSurf>::setOptions(precision,printLevel,intersectionType, orientation);
-    _doRotate=doRotate;
-    _medianPlane=medianPlane;
+    _do_rotate=doRotate;
+    _median_plane=medianPlane;
   }
 }
 

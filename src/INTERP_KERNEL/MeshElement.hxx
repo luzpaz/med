@@ -30,7 +30,7 @@ namespace INTERP_KERNEL
    * easy bounding box intersection tests between MeshElements and collections of MeshElement (MeshRegions)
    */
   template<class ConnType>
-  class INTERPKERNEL_EXPORT MeshElement
+  class MeshElement
   {
 
   public:

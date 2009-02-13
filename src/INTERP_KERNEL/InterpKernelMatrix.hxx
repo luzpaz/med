@@ -38,8 +38,18 @@ namespace INTERP_KERNEL
   std::istream& operator>>(std::istream& in, Matrix<U,type>& m);
         
   template<class T, NumberingPolicy type=ALL_C_MODE>
-  class INTERPKERNEL_EXPORT Matrix
+  class Matrix
   {
+
+    class KeyComparator
+    {
+    public:
+      KeyComparator(int val):_val(val) { }
+      bool operator()(const typename std::pair<int,T>& val) { return val.first==_val; }
+    protected:
+      int _val;
+    };
+
     class Row : public std::vector< typename std::pair<int,T> >
     {
     public:
@@ -57,8 +67,13 @@ namespace INTERP_KERNEL
           (*this)[i]=row[i];
         return *this;
       }
-                        
-    
+      typename std::vector< std::pair<int,T> >::const_iterator find(int elem) const
+      {
+        return std::find_if(std::vector< typename std::pair<int,T> >::begin(),std::vector< typename std::pair<int,T> >::end(),KeyComparator(elem));
+      }
+
+      void erase(int elem) { std::vector< typename std::pair<int,T> >::erase(std::find_if(std::vector< typename std::pair<int,T> >::begin(),std::vector< typename std::pair<int,T> >::end(),KeyComparator(elem))); }
+
       void insert(const std::pair<int,T>& myPair) { push_back(myPair); }
     };
     
@@ -71,6 +86,8 @@ namespace INTERP_KERNEL
     friend std::ostream& operator<<<>(std::ostream& in, const Matrix<T,type>& m);
     friend std::istream& operator>><>(std::istream& in, Matrix<T,type>& m);
     bool _is_configured;
+  public:
+    typedef Row value_type;
   public:
     Matrix():_coeffs(0), _cols(0), _nb_rows(0), _is_configured(false)
     { }

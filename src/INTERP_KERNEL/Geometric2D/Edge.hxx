@@ -19,9 +19,9 @@
 #ifndef __EDGE_HXX__
 #define __EDGE_HXX__
 
-#include "Geometric2D_defines.hxx"
+#include "INTERPKERNELGEOMETRIC2DDefines.hxx"
 #include "ComposedEdge.hxx"
-#include "InterpolationUtils.hxx"
+#include "InterpKernelException.hxx"
 #include "Bounds.hxx"
 #include "Node.hxx"
 
@@ -62,10 +62,11 @@ namespace INTERP_KERNEL
       FULL_UNKNOWN = 3
     } TypeOfEdgeLocInPolygon;
 
-  class GEOMETRIC2D_EXPORT MergePoints
+  class INTERPKERNELGEOMETRIC2D_EXPORT MergePoints
   {
   public:
     MergePoints();
+
     //methods called during intersection edge-edge
     void start1Replaced();
     void end1Replaced();
@@ -91,17 +92,24 @@ namespace INTERP_KERNEL
     unsigned _ass2End2    : 1;
   };
 
-  class GEOMETRIC2D_EXPORT IntersectElement
+  /*!
+   * This class is in charge to store an intersection point as result of \b non oververlapping edge intersection.
+   * This class manages the cases when intersect element is one of the extrimities of edge1 and/or edge2.
+   */
+  class INTERPKERNELGEOMETRIC2D_EXPORT IntersectElement
   {
   public:
     IntersectElement(double val1, double val2, bool start1, bool end1, bool start2, bool end2, Node *node, const Edge& e1, const Edge& e2, bool keepOrder);
     IntersectElement(const IntersectElement& other);
+    //! The sort operator is done on the edge 1 \b not edge 2.
     bool operator<(const IntersectElement& other) const;
     IntersectElement& operator=(const IntersectElement& other);
-    double getVal1() const { return _chararctValForE1; }
-    double getVal2() const { return _chararctValForE2; }
+    double getVal1() const { return _chararct_val_for_e1; }
+    double getVal2() const { return _chararct_val_for_e2; }
+    //! idem operator< method except that the orientation is done on edge 2 \b not edge 1.
     bool isLowerOnOther(const IntersectElement& other) const;
     unsigned isOnExtrForAnEdgeAndInForOtherEdge() const;
+    void attachLoc() { _node->setLoc(_loc_of_node); }
     bool isOnMergedExtremity() const;
     bool isIncludedByBoth() const;
     void setNode(Node *node) const;
@@ -114,9 +122,10 @@ namespace INTERP_KERNEL
     bool _1E;
     bool _2S;
     bool _2E;
-    double _chararctValForE1;
-    double _chararctValForE2;
+    double _chararct_val_for_e1;
+    double _chararct_val_for_e2;
     Node *_node;
+    TypeOfLocInPolygon _loc_of_node;
     const Edge& _e1;
     const Edge& _e2;
   public:
@@ -125,13 +134,16 @@ namespace INTERP_KERNEL
     static const unsigned NO_LIMIT = 19;
   };
 
-  class GEOMETRIC2D_EXPORT Intersector
+  /*!
+   * This abstract interface specifies all the methods to be overloaded of all possibilities edge-intersection.
+   */
+  class INTERPKERNELGEOMETRIC2D_EXPORT EdgeIntersector
   {
   protected:
     //! All non symetric methods are relative to 'e1'.
-    Intersector(const Edge& e1, const Edge& e2):_e1(e1),_e2(e2) { }
+    EdgeIntersector(const Edge& e1, const Edge& e2):_e1(e1),_e2(e2) { }
   public:
-    virtual ~Intersector() { }
+    virtual ~EdgeIntersector() { }
     virtual bool keepOrder() const = 0;
     //!to call only if 'areOverlapped' have been set to true when areOverlappedOrOnlyColinears was called
     virtual bool haveTheySameDirection() const = 0;
@@ -150,17 +162,17 @@ namespace INTERP_KERNEL
     const Edge& _e2;
   };
 
-  class GEOMETRIC2D_EXPORT SameTypeIntersector : public Intersector
+  class INTERPKERNELGEOMETRIC2D_EXPORT SameTypeEdgeIntersector : public EdgeIntersector
   {
   protected:
-    SameTypeIntersector(const Edge& e1, const Edge& e2):Intersector(e1,e2) { }
+    SameTypeEdgeIntersector(const Edge& e1, const Edge& e2):EdgeIntersector(e1,e2) { }
     bool keepOrder() const { return true; }
   };
 
-  class GEOMETRIC2D_EXPORT CrossTypeIntersector : public Intersector
+  class INTERPKERNELGEOMETRIC2D_EXPORT CrossTypeEdgeIntersector : public EdgeIntersector
   {
   protected:
-    CrossTypeIntersector(const Edge& e1, const Edge& e2, bool reverse):Intersector(e1,e2),_reverse(reverse) { }
+    CrossTypeEdgeIntersector(const Edge& e1, const Edge& e2, bool reverse):EdgeIntersector(e1,e2),_reverse(reverse) { }
     bool keepOrder() const { return _reverse; }
     bool haveTheySameDirection() const { throw Exception("Cross type intersector is not supposed to deal with overlapped in cross type."); }
     const Edge *myE1() { if(_reverse) return &_e1; else return &_e2; }
@@ -176,17 +188,19 @@ namespace INTERP_KERNEL
 
   /*!
    * Deal with an oriented edge of a polygon.
+   * An Edge is definied with a start node a end node and an equation of 1D curve.
+   * All other attributes are mutable because they don't impact these 3 invariant attributes.
+   * To be exact start and end node can change (adress) but their location remain
+   * the same (at precision).
    */
-  class GEOMETRIC2D_EXPORT Edge
+  class INTERPKERNELGEOMETRIC2D_EXPORT Edge
   {
   public:
-    Edge(Node *start, Node *end, bool direction=true):_cnt(1),_loc(FULL_UNKNOWN),_id(_idCounter++) { if(direction) { _start=start; _end=end; } else { _start=end; _end=start; } _start->incrRef(); _end->incrRef(); }
+    Edge(Node *start, Node *end, bool direction=true):_cnt(1),_loc(FULL_UNKNOWN) { if(direction) { _start=start; _end=end; } else { _start=end; _end=start; } _start->incrRef(); _end->incrRef(); }
     Edge(double sX, double sY, double eX, double eY);
     TypeOfEdgeLocInPolygon getLoc() const { return _loc; }
     void incrRef() const { _cnt++; }
     bool decrRef();
-    int getId() const { return _id; }
-    void setId(int val) { _id=val; }
     void initLocs() const { _loc=FULL_UNKNOWN; _start->initLocs(); _end->initLocs(); }
     void declareOn() const;
     void declareIn() const;
@@ -204,7 +218,7 @@ namespace INTERP_KERNEL
     bool changeEndNodeWithAndKeepTrack(Node *otherEndNode, std::vector<Node *>& track) const;
     void addSubEdgeInVector(Node *start, Node *end, ComposedEdge& vec) const;
     void getNormalVector(double *vectOutput) const;
-    static Intersector *buildIntersectorWith(const Edge *e1, const Edge *e2);
+    static EdgeIntersector *buildIntersectorWith(const Edge *e1, const Edge *e2);
     static Edge *buildFromXfigLine(std::istream& str);
     static Edge *buildEdgeFrom(Node *start, Node *end);
     template<TypeOfMod4QuadEdge type>
@@ -217,6 +231,7 @@ namespace INTERP_KERNEL
     //! return the length of arc. Value is always > 0. !
     virtual double getCurveLength() const = 0;
     virtual void getBarycenter(double *bary) const = 0;
+    virtual void getBarycenterOfZone(double *bary) const = 0;
     //! Retrieves a point that is owning to this, well placed for IN/OUT detection of this. Typically midlle of this is returned.
     virtual Node *buildRepresentantOfMySelf() const = 0;
     //! Given a magnitude specified by sub-type returns if in or not. See getCharactValue method.
@@ -232,19 +247,18 @@ namespace INTERP_KERNEL
     virtual TypeOfFunction getTypeOfFunc() const = 0;
     virtual void dynCastFunction(const EdgeLin * &seg,
                                  const EdgeArcCircle * &arcSeg) const = 0;
-    Edge *buildEdgeLyingOnMeWithId(Node *start, Node *end, bool direction=true) const;
     bool intersectWith(const Edge *other, MergePoints& commonNode,
                        ComposedEdge& outVal1, ComposedEdge& outVal2) const;
-    static bool intersectOverlapped(const Edge *f1, const Edge *f2, Intersector *intersector, MergePoints& commonNode,
+    static bool intersectOverlapped(const Edge *f1, const Edge *f2, EdgeIntersector *intersector, MergePoints& commonNode,
                                     ComposedEdge& outValForF1, ComposedEdge& outValForF2);
     static void interpolate1DLin(const std::vector<double>& distrib1, const std::vector<double>& distrib2,
                                  std::map<int, std::map<int,double> >& result);
     virtual void dumpInXfigFile(std::ostream& stream, bool direction, int resolution, const Bounds& box) const = 0;
   protected:
-    Edge():_cnt(1),_loc(FULL_UNKNOWN),_start(0),_end(0),_id(_idCounter++) { }
+    Edge():_cnt(1),_loc(FULL_UNKNOWN),_start(0),_end(0) { }
     virtual ~Edge();
     static int combineCodes(TypeOfLocInEdge code1, TypeOfLocInEdge code2);
-    static bool intersect(const Edge *f1, const Edge *f2, Intersector *intersector, const Bounds *whereToFind, MergePoints& commonNode,
+    static bool intersect(const Edge *f1, const Edge *f2, EdgeIntersector *intersector, const Bounds *whereToFind, MergePoints& commonNode,
                           ComposedEdge& outValForF1, ComposedEdge& outValForF2);
     //! The code 'code' is built by method combineCodes
     static bool splitOverlappedEdges(const Edge *e1, const Edge *e2, Node *nS, Node *nE, bool direction, int code,
@@ -256,9 +270,7 @@ namespace INTERP_KERNEL
     Bounds _bounds;
     Node *_start;
     Node *_end;
-    int _id;
   protected:
-    static int _idCounter;
     //In relation with max possible value of TypeOfLocInEdge.
     static const int OFFSET_FOR_TYPEOFLOCINEDGE = 8;
   };

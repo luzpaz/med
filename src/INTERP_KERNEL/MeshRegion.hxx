@@ -33,7 +33,7 @@ namespace INTERP_KERNEL
    *
    */
   template<class ConnType>
-  class INTERPKERNEL_EXPORT MeshRegion
+  class MeshRegion
   {
   public:
     

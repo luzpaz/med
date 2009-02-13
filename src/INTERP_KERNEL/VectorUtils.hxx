@@ -16,8 +16,8 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef __VECTOR_UTILS_HXX__
-#define __VECTOR_UTILS_HXX__
+#ifndef __VECTORUTILS_HXX__
+#define __VECTORUTILS_HXX__
 
 #include <sstream>
 #include <numeric>
@@ -156,9 +156,6 @@ namespace INTERP_KERNEL
     return relError < relTol;
   }
 
-};
-
-
-
+}
 
 #endif

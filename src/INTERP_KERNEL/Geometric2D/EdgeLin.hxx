@@ -19,13 +19,11 @@
 #ifndef __EDGELIN_HXX__
 #define __EDGELIN_HXX__
 
-#include "Geometric2D_defines.hxx"
-
 #include "Edge.hxx"
 
 namespace INTERP_KERNEL
 {
-  class GEOMETRIC2D_EXPORT SegSegIntersector : SameTypeIntersector
+  class SegSegIntersector : SameTypeEdgeIntersector
     {
       friend class Edge;
     public:
@@ -44,7 +42,7 @@ namespace INTERP_KERNEL
       double _matrix[4];//SPACEDIM*SPACEDIM
     };
 
-  class GEOMETRIC2D_EXPORT EdgeLin : public Edge
+  class EdgeLin : public Edge
   {
     friend class SegSegIntersector;
   public:
@@ -59,6 +57,7 @@ namespace INTERP_KERNEL
     double getAreaOfZone() const;
     double getCurveLength() const;
     void getBarycenter(double *bary) const;
+    void getBarycenterOfZone(double *bary) const;
     bool isIn(double characterVal) const;
     Node *buildRepresentantOfMySelf() const;
     double getCharactValue(const Node& node) const;

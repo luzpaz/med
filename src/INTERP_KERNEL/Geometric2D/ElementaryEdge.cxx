@@ -17,7 +17,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "ElementaryEdge.hxx"
-#include "InterpolationUtils.hxx"
+#include "InterpKernelException.hxx"
 #include "Edge.hxx"
 
 using namespace INTERP_KERNEL;
@@ -36,6 +36,26 @@ ElementaryEdge::~ElementaryEdge()
 bool ElementaryEdge::isNodeIn(Node *n) const
 {
   return _ptr->getStartNode()==n || _ptr->getEndNode()==n;
+}
+
+/*!
+ * \b WARNING contrary to INTERP_KERNEL::Edge::getBarycenterOfZone method called,
+ * this one is cumulative.
+ */
+void ElementaryEdge::getBarycenterOfZone(double *bary) const
+{
+  double tmp[2];
+  _ptr->getBarycenterOfZone(tmp);
+  if(_direction)
+    {
+      bary[0]+=tmp[0];
+      bary[1]+=tmp[1];
+    }
+  else
+    {
+      bary[0]-=tmp[0];
+      bary[1]-=tmp[1];
+    }
 }
 
 void ElementaryEdge::fillBounds(Bounds& output) const

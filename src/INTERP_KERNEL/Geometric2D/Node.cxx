@@ -56,9 +56,9 @@ bool Node::decrRef()
 
 bool Node::isEqual(const Node& other) const
 {
-  const int SPACEDIM=2;
+  const unsigned SPACEDIM=2;
   bool ret=true;
-  for(int i=0;i<SPACEDIM;i++)
+  for(unsigned i=0;i<SPACEDIM;i++)
     ret&=areDoubleEquals((*this)[i],other[i]);
   return ret;
 }
@@ -116,11 +116,7 @@ double Node::computeAngle(const double *pt1, const double *pt2)
   double x=pt2[0]-pt1[0];
   double y=pt2[1]-pt1[1];
   double norm=sqrt(x*x+y*y);
-  double ret=EdgeArcCircle::safeAcos(x/norm);
-  if(y>=0)
-    return ret;
-  else
-    return -ret;
+  return EdgeArcCircle::getAbsoluteAngleOfNormalizedVect(x/norm,y/norm);
 }
 
 /*!

@@ -2136,7 +2136,7 @@ _Support* _CaseFileDriver_User::getSupport(const _SupportDesc & descriptor,
     set<int> dimensions;
 
     // fill grp with sub-group indices
-    _SupportDesc::iterator subPartDesc = descriptor.begin();
+    _SupportDesc::const_iterator subPartDesc = descriptor.begin();
     for ( ; subPartDesc != descriptor.end(); ++subPartDesc )
     {
       const _SubPart* subPart = getSubPart(*subPartDesc);

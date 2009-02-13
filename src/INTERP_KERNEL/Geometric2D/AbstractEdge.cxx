@@ -22,38 +22,38 @@
 
 using namespace INTERP_KERNEL;
 
-IteratorOnComposedEdge::IteratorOnComposedEdge():_listHandle(0)
+IteratorOnComposedEdge::IteratorOnComposedEdge():_list_handle(0)
 {
 }
 
-IteratorOnComposedEdge::IteratorOnComposedEdge(ComposedEdge *compEdges):_listHandle(compEdges->getListBehind()) 
+IteratorOnComposedEdge::IteratorOnComposedEdge(ComposedEdge *compEdges):_list_handle(compEdges->getListBehind()) 
 {
   first(); 
 }
 
 void IteratorOnComposedEdge::operator=(const IteratorOnComposedEdge& other)
 {
-  _deepIt=other._deepIt;
-  _listHandle=other._listHandle;
+  _deep_it=other._deep_it;
+  _list_handle=other._list_handle;
 }
 
 void IteratorOnComposedEdge::last()
 {
-  _deepIt=_listHandle->end();
-  _deepIt--;
+  _deep_it=_list_handle->end();
+  _deep_it--;
 }
 
 void IteratorOnComposedEdge::nextLoop()
 {
-  _deepIt++;
-  if(_deepIt==_listHandle->end())
+  _deep_it++;
+  if(_deep_it==_list_handle->end())
     first();
 }
 
 void IteratorOnComposedEdge::previousLoop()
 {
-  if(_deepIt!=_listHandle->begin())
-    _deepIt--;
+  if(_deep_it!=_list_handle->begin())
+    _deep_it--;
   else
     last();
 }
@@ -102,14 +102,15 @@ void IteratorOnComposedEdge::insertElemEdges(ComposedEdge *elems, bool changeMyS
 {
   std::list<ElementaryEdge *> *myListToInsert=elems->getListBehind();
   std::list<ElementaryEdge *>::iterator iter=myListToInsert->begin();
-  *_deepIt=*iter;
-  _deepIt++;
+  *_deep_it=*iter;
+  _deep_it++;
   iter++;
   int sizeOfMyList=myListToInsert->size();
-  _listHandle->insert(_deepIt,iter,myListToInsert->end());
+  _list_handle->insert(_deep_it,iter,myListToInsert->end());
   if(!changeMySelf)
     {
       for(int i=0;i<sizeOfMyList;i++)
-        _deepIt--;
+        _deep_it--;
     }
 }
+

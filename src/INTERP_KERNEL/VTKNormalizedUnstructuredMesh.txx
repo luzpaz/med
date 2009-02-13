@@ -26,15 +26,15 @@
 #include "vtkPoints.h"
 
 template<int MESHDIM>
-VTKNormalizedUnstructuredMesh<MESHDIM>::VTKNormalizedUnstructuredMesh(vtkUnstructuredGrid *mesh):_meshInVtkMode(mesh),
-                                                                                                 _tmpIndexArray(0)
+VTKNormalizedUnstructuredMesh<MESHDIM>::VTKNormalizedUnstructuredMesh(vtkUnstructuredGrid *mesh):_mesh_in_vtk_mode(mesh),
+                                                                                                 _tmp_index_array(0)
 {
 }
 
 template<int MESHDIM>
 VTKNormalizedUnstructuredMesh<MESHDIM>::~VTKNormalizedUnstructuredMesh()
 {
-  _meshInVtkMode->Delete();
+  _mesh_in_vtk_mode->Delete();
   ReleaseTempArrays();
 }
 
@@ -42,7 +42,7 @@ template<int MESHDIM>
 void VTKNormalizedUnstructuredMesh<MESHDIM>::getBoundingBox(double *boundingBox) const
 {
   double tmp[6];
-  _meshInVtkMode->GetBounds(tmp);
+  _mesh_in_vtk_mode->GetBounds(tmp);
   for(unsigned i=0;i<3;i++)
     {
       boundingBox[i]=tmp[2*i];
@@ -53,7 +53,7 @@ void VTKNormalizedUnstructuredMesh<MESHDIM>::getBoundingBox(double *boundingBox)
 template<int MESHDIM>
 NormalizedCellType VTKNormalizedUnstructuredMesh<MESHDIM>::getTypeOfElement(vtkIdType eltId) const
 {
-  int cellType=_meshInVtkMode->GetCellType(eltId);
+  int cellType=_mesh_in_vtk_mode->GetCellType(eltId);
   int convTab[30]={0,0,0,0,0,(int)NORM_TRI3,0,(int)NORM_POLYGON,0,(int)NORM_QUAD4,(int)NORM_TETRA4,0,(int)NORM_HEXA8
                    0,(int)NORM_PYRA5,0,0,0,(int)NORM_TRI6,(int)NORM_QUAD8,};
 }
@@ -61,14 +61,20 @@ NormalizedCellType VTKNormalizedUnstructuredMesh<MESHDIM>::getTypeOfElement(vtkI
 template<int MESHDIM>
 unsigned long VTKNormalizedUnstructuredMesh<MESHDIM>::getNumberOfElements() const
 {
-  return _meshInVtkMode->GetNumberOfCells();
+  return _mesh_in_vtk_mode->GetNumberOfCells();
+}
+
+template<int MESHDIM>
+unsigned long VTKNormalizedUnstructuredMesh<MESHDIM>::getNumberOfNodes() const
+{
+  return _mesh_in_vtk_mode->GetNumberOfPoints();
 }
 
 template<int MESHDIM>
 const vtkIdType *VTKNormalizedUnstructuredMesh<MESHDIM>::getConnectivityPtr() const
 {
-  vtkIdType *ret=_meshInVtkMode->GetCells()->GetPointer();
-  if(_tmpIndexArray)
+  vtkIdType *ret=_mesh_in_vtk_mode->GetCells()->GetPointer();
+  if(_tmp_index_array)
     return ret;
   else
     {
@@ -80,18 +86,18 @@ const vtkIdType *VTKNormalizedUnstructuredMesh<MESHDIM>::getConnectivityPtr() co
 template<int MESHDIM>
 const double *VTKNormalizedUnstructuredMesh<MESHDIM>::getCoordinatesPtr() const
 {
-  return (const double *)_meshInVtkMode->GetPoints()->GetVoidPointer(0);
+  return (const double *)_mesh_in_vtk_mode->GetPoints()->GetVoidPointer(0);
 }
 
 template<int MESHDIM>
 const vtkIdType *VTKNormalizedUnstructuredMesh<MESHDIM>::getConnectivityIndexPtr() const
 {
-  if(_tmpIndexArray)
-    return _tmpIndexArray;
+  if(_tmp_index_array)
+    return _tmp_index_array;
   else
     {
       putinMEDFormat();
-      return _tmpIndexArray;
+      return _tmp_index_array;
     }
 }
 
@@ -99,9 +105,9 @@ template<int MESHDIM>
 void VTKNormalizedUnstructuredMesh<MESHDIM>::putinMEDFormat() const
 {
   long nbOfElem=getNumberOfElements();
-  _tmpIndexArray=new vtkIdType[nbOfElem+1];
-  _tmpIndexArray[0]=0;
-  vtkIdType *coarseConn=_meshInVtkMode->GetCells()->GetPointer();
+  _tmp_index_array=new vtkIdType[nbOfElem+1];
+  _tmp_index_array[0]=0;
+  vtkIdType *coarseConn=_mesh_in_vtk_mode->GetCells()->GetPointer();
   long ptInCC=0;
   vtkIdType *finalConn=coarseConn;
   for(long i=0;i<nbOfElem;i++)
@@ -109,7 +115,7 @@ void VTKNormalizedUnstructuredMesh<MESHDIM>::putinMEDFormat() const
       vtkIdType cellLgth=coarseConn[ptInCC];
       for(vtkIdType j=0;j<cellLgth;j++)
         *finalConn++=coarseConn[ptInCC+j+1];
-      _tmpIndexArray[i+1]=_tmpIndexArray[i]+cellLgth;
+      _tmp_index_array[i+1]=_tmp_index_array[i]+cellLgth;
       ptInCC+=cellLgth+1;
     }
   int gh=0;
@@ -119,8 +125,8 @@ void VTKNormalizedUnstructuredMesh<MESHDIM>::putinMEDFormat() const
 template<int MESHDIM>
 void VTKNormalizedUnstructuredMesh<MESHDIM>::ReleaseTempArrays()
 {
-  delete [] _tmpIndexArray;
-  _tmpIndexArray=0;
+  delete [] _tmp_index_array;
+  _tmp_index_array=0;
 }
 
 #endif

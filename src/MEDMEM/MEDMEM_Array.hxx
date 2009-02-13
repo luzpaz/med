@@ -131,13 +131,13 @@ template <class T> inline MEDARRAY<T>::MEDARRAY():
   _valuesFull(), _valuesNo(),
   _valuesDefault(), _valuesOther()
 {
-};
+}
 
 //				------------------
 
 template <class T> inline MEDARRAY<T>::~MEDARRAY()
 {
-};
+}
 
 //				------------------
 
@@ -410,7 +410,7 @@ template <class T> MEDARRAY<T> & MEDARRAY<T>::shallowCopy(const MEDARRAY & m)
 template <class T> inline int MEDARRAY<T>::getLeadingValue() const
 {
   return _ldValues;
-};
+}
 
 //				------------------
 
@@ -418,7 +418,7 @@ template <class T> inline int MEDARRAY<T>::getLeadingValue() const
 template <class T> inline int MEDARRAY<T>::getLengthValue() const
 {
   return _lengthValues;
-};
+}
 
 //				------------------
 

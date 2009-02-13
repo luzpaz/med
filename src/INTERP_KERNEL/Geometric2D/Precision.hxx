@@ -19,15 +19,15 @@
 #ifndef __PRECISION_HXX__
 #define __PRECISION_HXX__
 
-#include "Geometric2D_defines.hxx"
+#include "INTERPKERNELGEOMETRIC2DDefines.hxx"
 
 namespace INTERP_KERNEL
 {
-  class GEOMETRIC2D_EXPORT QUADRATIC_PLANAR
+  class INTERPKERNELGEOMETRIC2D_EXPORT QUADRATIC_PLANAR
   {
   public:
     static double _precision;
-    static double _arcDetectionPrecision;
+    static double _arc_detection_precision;
     static void setPrecision(double precision);
     static void setArcDetectionPrecision(double precision);
   };

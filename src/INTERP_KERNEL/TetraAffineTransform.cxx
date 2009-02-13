@@ -50,9 +50,13 @@ namespace INTERP_KERNEL
         for(int j = 0 ; j < 3 ; ++j)
           {
             // NB we insert columns, not rows
-            _linearTransform[3*j + i] = (pts[i+1])[j] - (pts[0])[j];
+            _linear_transform[3*j + i] = (pts[i+1])[j] - (pts[0])[j];
           }
       }
+
+    // remember _linear_transform for the reverse transformation
+    memcpy( _back_linear_transform, _linear_transform, 9*sizeof(double));
+    memcpy( _back_translation,      pts[0],          3*sizeof(double));
     
     calculateDeterminant();
     
@@ -75,7 +79,7 @@ namespace INTERP_KERNEL
     // and O is the position vector of the point that is mapped onto the origin
     for(int i = 0 ; i < 3 ; ++i)
       {
-        _translation[i] = -(_linearTransform[3*i]*(pts[0])[0] + _linearTransform[3*i+1]*(pts[0])[1] + _linearTransform[3*i+2]*(pts[0])[2]) ;
+        _translation[i] = -(_linear_transform[3*i]*(pts[0])[0] + _linear_transform[3*i+1]*(pts[0])[1] + _linear_transform[3*i+2]*(pts[0])[2]) ;
       }
     
     // precalculate determinant (again after inversion of transform)
@@ -128,10 +132,52 @@ namespace INTERP_KERNEL
     for(int i = 0 ; i < 3 ; ++i)
       {
         // matrix - vector multiplication
-        dest[i] = _linearTransform[3*i] * srcPt[0] + _linearTransform[3*i + 1] * srcPt[1] + _linearTransform[3*i + 2] * srcPt[2];
+        dest[i] = _linear_transform[3*i] * srcPt[0] + _linear_transform[3*i + 1] * srcPt[1] + _linear_transform[3*i + 2] * srcPt[2];
        
         // translation
         dest[i] += _translation[i];
+      }
+
+    if(selfAllocation)
+      {
+        // copy result back to destPt
+        for(int i = 0 ; i < 3 ; ++i)
+          {
+            destPt[i] = dest[i];
+          }
+        delete[] dest;
+      }
+  }
+
+  /**
+   * Calculates the reverse transform of point srcPt and stores the result in destPt.
+   * If destPt == srcPt, then srcPt is overwritten safely.
+   *
+   * @param destPt  double[3] in which to store the transformed point
+   * @param srcPt   double[3] containing coordinates of points to be transformed
+   */
+  void TetraAffineTransform::reverseApply(double* destPt, const double* srcPt) const
+  {
+    double* dest = destPt;
+    
+    // are we self-allocating ?
+    const bool selfAllocation = (destPt == srcPt);
+    
+    if(selfAllocation)
+      {
+        // alloc temporary memory
+        dest = new double[3];
+       
+        LOG(6, "Info : Self-affectation in TetraAffineTransform::reverseApply");
+      }
+    
+    for(int i = 0 ; i < 3 ; ++i)
+      {
+        // matrix - vector multiplication
+        dest[i] = _back_linear_transform[3*i] * srcPt[0] + _back_linear_transform[3*i + 1] * srcPt[1] + _back_linear_transform[3*i + 2] * srcPt[2];
+
+        // translation
+        dest[i] += _back_translation[i];
       }
 
     if(selfAllocation)
@@ -168,7 +214,7 @@ namespace INTERP_KERNEL
     std::cout << "A = " << std::endl << "[";
     for(int i = 0; i < 3; ++i)
       {
-        std::cout << _linearTransform[3*i] << ", " << _linearTransform[3*i + 1] << ", " << _linearTransform[3*i + 2];
+        std::cout << _linear_transform[3*i] << ", " << _linear_transform[3*i + 1] << ", " << _linear_transform[3*i + 2];
         if(i != 2 ) std::cout << endl;
       }
     std::cout << "]" << endl;
@@ -181,7 +227,7 @@ namespace INTERP_KERNEL
   /////////////////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Calculates the inverse of the matrix A, stored in _linearTransform
+   * Calculates the inverse of the matrix A, stored in _linear_transform
    * by LU-factorization and substitution
    *
    */
@@ -192,7 +238,7 @@ namespace INTERP_KERNEL
     double lu[9];
     for(int i = 0 ; i < 9; ++i)
       {
-        lu[i] = _linearTransform[i];
+        lu[i] = _linear_transform[i];
       }
     
     // calculate LU factorization
@@ -200,8 +246,8 @@ namespace INTERP_KERNEL
     factorizeLU(lu, idx);
     
     // calculate inverse by forward and backward substitution
-    // store in _linearTransform
-    // NB _linearTransform cannot be overwritten with lu in the loop
+    // store in _linear_transform
+    // NB _linear_transform cannot be overwritten with lu in the loop
     for(int i = 0 ; i < 3 ; ++i)
       {
         // form standard base vector i
@@ -220,12 +266,12 @@ namespace INTERP_KERNEL
         double x[3];
         backwardSubstitution(x, lu, y, idx);
        
-        // copy to _linearTransform matrix
+        // copy to _linear_transform matrix
         // NB : this is a column operation, so we cannot 
         // do this directly when we calculate x
         for(int j = 0 ; j < 3 ; j++)
           {
-            _linearTransform[3*j + i] = x[idx[j]];
+            _linear_transform[3*j + i] = x[idx[j]];
           }
       }
   }
@@ -238,12 +284,12 @@ namespace INTERP_KERNEL
   {
     const double subDet[3] = 
       {
-        _linearTransform[4] * _linearTransform[8] - _linearTransform[5] * _linearTransform[7],
-        _linearTransform[3] * _linearTransform[8] - _linearTransform[5] * _linearTransform[6],
-        _linearTransform[3] * _linearTransform[7] - _linearTransform[4] * _linearTransform[6]
+        _linear_transform[4] * _linear_transform[8] - _linear_transform[5] * _linear_transform[7],
+        _linear_transform[3] * _linear_transform[8] - _linear_transform[5] * _linear_transform[6],
+        _linear_transform[3] * _linear_transform[7] - _linear_transform[4] * _linear_transform[6]
       };
 
-    _determinant = _linearTransform[0] * subDet[0] - _linearTransform[1] * subDet[1] + _linearTransform[2] * subDet[2]; 
+    _determinant = _linear_transform[0] * subDet[0] - _linear_transform[1] * subDet[1] + _linear_transform[2] * subDet[2]; 
   }
 
   
@@ -253,7 +299,7 @@ namespace INTERP_KERNEL
 
 
   /**
-   * Calculates the LU-factorization of the matrix A (_linearTransform)
+   * Calculates the LU-factorization of the matrix A (_linear_transform)
    * and stores it in lu. Since partial pivoting is used, there are 
    * row swaps. This is represented by the index permutation vector idx : to access element
    * (i,j) of lu, use lu[3*idx[i] + j]

@@ -46,7 +46,7 @@ using namespace std;
 */
 namespace MEDMEM {
   class MEDEXCEPTION;
-  ostream & operator<< (ostream &os, const MEDEXCEPTION &ex );
+  MEDMEM_EXPORT ostream & operator<< (ostream &os, const MEDEXCEPTION &ex );
 //--------------------------------------//
   class MEDMEM_EXPORT MEDEXCEPTION : public std::exception
 //--------------------------------------//
@@ -81,6 +81,6 @@ public :
   ~MED_DRIVER_NOT_FOUND_EXCEPTION() throw();
 
 };
-};
+}
 
 #endif	/* MEDEXCEPTION_HXX */
