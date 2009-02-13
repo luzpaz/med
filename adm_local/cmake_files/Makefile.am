@@ -21,4 +21,8 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-SUBDIRS = unix cmake_files
+admlocal_cmakedir = $(admlocaldir)/cmake_files
+
+dist_admlocal_cmake_DATA = \
+FindMEDFILE.cmake \
+FindMED.cmake

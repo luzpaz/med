@@ -50,7 +50,13 @@ if MED_ENABLE_KERNEL
   IDLDIR = idl
 endif
 
-SUBDIRS = adm_local $(IDLDIR) src doc resources bin
+SUBDIRS = adm_local
+
+if !MED_ENABLE_KERNEL
+SUBDIRS += adm_local_without_kernel
+endif
+
+SUBDIRS += $(IDLDIR) src doc resources bin
 
 DIST_SUBDIRS = adm_local adm_local_without_kernel idl src doc resources bin
 

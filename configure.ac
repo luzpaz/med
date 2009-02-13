@@ -57,8 +57,8 @@ echo
 echo
 
 dnl remember MED_WITH_KERNEL set by build configure
-MED_WITH_KERNEL=yes
-MED_WITH_GUI=yes
+MED_WITH_KERNEL=no
+MED_WITH_GUI=no
 old_with_kernel=${MED_WITH_KERNEL}
 
 dnl
@@ -565,11 +565,12 @@ AC_OUTPUT_COMMANDS([ \
 
 AC_OUTPUT([ \
 	./salome_adm/unix/SALOMEconfig.h \
-	./adm_local_without_kernel/unix/sstream \
+	./adm_local_without_kernel/unix/SALOMEconfig.h \
 	Makefile \
 	./MED_version.h \
 	./adm_local/unix/config_files/Makefile \
         ./adm_local/unix/Makefile \
+        ./adm_local/cmake_files/Makefile \
 	./adm_local/Makefile \
 	./adm_local_without_kernel/unix/config_files/Makefile \
         ./adm_local_without_kernel/unix/Makefile \
@@ -595,13 +596,19 @@ AC_OUTPUT([ \
 	./src/MEDMEMBinTest/Makefile \
 	./src/MEDMEMCppTest/Makefile \
 	./src/INTERP_KERNEL/Makefile \
+        ./src/INTERP_KERNEL/Bases/Makefile \
 	./src/INTERP_KERNEL/Geometric2D/Makefile \
-	./src/INTERP_KERNEL/Test/Makefile \
+	./src/INTERP_KERNELTest/Makefile \
+        ./src/MEDCoupling/Makefile \
+        ./src/MEDCoupling/Test/Makefile \
 	./src/MEDSPLITTER/Makefile \
 	./src/MEDSPLITTER/Test/Makefile \
+        ./src/MEDSPLITTER_Swig/Makefile \
 	./src/MULTIPR/Makefile \
 	./src/ParaMEDMEM/Makefile \
+        ./src/ParaMEDMEM/MEDLoader/Makefile \
 	./src/ParaMEDMEM/Test/Makefile \
+        ./src/ParaMEDMEM_Swig/Makefile \
 	./src/MEDMEM_I/Makefile \
 	./src/MED/Makefile \
 	./src/MedCorba_Swig/Makefile \
