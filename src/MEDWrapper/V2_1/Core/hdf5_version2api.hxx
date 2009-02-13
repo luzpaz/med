@@ -31,7 +31,12 @@
 
 #if H5_VERS_RELEASE < 4
 #else
+#if H5_VERS_RELEASE >= 7
+#define HDF_NEW_API2
 #define HDF_NEW_API
+#else
+#define HDF_NEW_API
+#endif
 #endif
 
 #else /* H5_VERS_MINOR >= 7 */

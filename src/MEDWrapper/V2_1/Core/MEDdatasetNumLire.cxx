@@ -204,7 +204,13 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 		}
 	    }
 	    
-#ifdef HDF_NEW_API
+#ifdef HDF_NEW_API2
+	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hsize_t *) pflmem ) ) <0) 
+	      return -1; 
+	    
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t *) pfldsk ) ) <0) 
+	      return -1; 
+#elif defined HDF_NEW_API
 	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hsize_t **) pflmem ) ) <0) 
 	      return -1; 
 	    
@@ -239,7 +245,13 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 		}	      
 	    }
 	    
-#ifdef HDF_NEW_API
+#ifdef HDF_NEW_API2
+	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hsize_t *) pflmem ) ) <0) 
+	      return -1; 
+	    
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t *) pfldsk ) ) <0) 
+	      return -1; 
+#elif defined HDF_NEW_API
 	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hsize_t **) pflmem ) ) <0) 
 	      return -1; 
 	    
@@ -325,7 +337,10 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 		}
 	    }
 	    
-#ifdef HDF_NEW_API
+#ifdef HDF_NEW_API2
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t *) pfldsk ) ) <0) 
+	      return -1;
+#elif defined HDF_NEW_API
 	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t **) pfldsk ) ) <0) 
 	      return -1;
 #else
@@ -369,7 +384,13 @@ _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
 		}
 	    }
 	    
-#ifdef HDF_NEW_API
+#ifdef HDF_NEW_API2
+	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hsize_t *) pflmem ) ) <0) 
+	      return -1; 
+	    
+	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t *) pfldsk ) ) <0) 
+	      return -1;	  
+#elif defined HDF_NEW_API
 	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET, pcount[0], (const hsize_t **) pflmem ) ) <0) 
 	      return -1; 
 	    
