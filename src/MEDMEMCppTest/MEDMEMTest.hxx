@@ -99,6 +99,7 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testVtkMeshDriver );
   //CPPUNIT_TEST( testmedimport_src /* not in spec */ );
   //60
+  CPPUNIT_TEST( testExtractor );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -168,6 +169,7 @@ public:
   void testVtkMeshDriver();
   //void testmedimport_src() /* not in spec */;
   //60
+  void testExtractor();
 };
 
 // to create a mesh with certain filling
