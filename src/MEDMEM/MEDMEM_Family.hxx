@@ -126,8 +126,8 @@ public:
 
   bool build(MED_EN::medEntityMesh Entity,int **FamilyNumber);
 
-  // Il faudrait mettre en cohérence les méthodes set
-  // avec l'opérateur d'affection ! Rmq from EF !!!
+  // Il faudrait mettre en coherence les methodes set
+  // avec l'operateur d'affection ! Rmq from EF !!!
 
   inline void setIdentifier             (int Identifier);        
   inline void setNumberOfAttributes     (int NumberOfAttribute);
