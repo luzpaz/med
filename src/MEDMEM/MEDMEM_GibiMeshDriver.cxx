@@ -1979,7 +1979,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeElements (medGeometryElement geomType,
   // NBEL : nombre d'鬩ments
 
   int castemType = GIBI_MESH_DRIVER::med2gibiGeom( geomType );
-  char* zeroI8 = "       0"; // FORMAT(I8)
+  const char* zeroI8 = "       0"; // FORMAT(I8)
   int nbElemNodes = geomType % 100;
 
   // indices to transform MED connectivity to GIBI one
@@ -2252,7 +2252,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh()
   // la liste des r馩rences , les num?s des couleurs puis les connectivit鳮
 
   TFieldCounter fcount( _gibi, 10 );
-  char* zeroI8 = "       0"; // FORMAT(I8)
+  const char* zeroI8 = "       0"; // FORMAT(I8)
   for ( supIt = _supports.begin(); supIt != _supports.end(); supIt++ )
   {
     supportData & data = supIt->second;

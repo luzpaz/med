@@ -992,6 +992,8 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 						// We use <tmp_cells_count> to calculate <Connectivity->_count> then we release it
 						Connectivity->_geometricTypes = new MED_EN::medGeometryElement [Connectivity->_numberOfTypes]   ;  // Double emploi pour des raisons pratiques 
 						Connectivity->_type           = new CELLMODEL                  [Connectivity->_numberOfTypes]   ;  //
+						if(Connectivity->_count)
+                                                  delete [] Connectivity->_count;
 						Connectivity->_count          = new int                        [Connectivity->_numberOfTypes+1] ;
 						Connectivity->_count[0]       = 1;
 						

@@ -86,41 +86,41 @@ public:
 
 inline void UNIT::setName(string Name) {
   _name = Name ;
-};
+}
 inline void UNIT::setDescription(string Description) {
   _description = Description ;
-};
+}
 inline void UNIT::setMasse(int Masse) {
   _masse=Masse ;
-};
+}
 inline void UNIT::setLength(int Length) {
   _length=Length ;
-};
+}
 inline void UNIT::setTime(int Time) {
   _time=Time ;
-};
+}
 inline void UNIT::setTemperature(int Temperature) {
   _temperature=Temperature ;
-};
+}
 inline void UNIT::setMatterQuantity(int MatterQuantity) {
   _matterQuantity=MatterQuantity ;
-};
+}
 inline void UNIT::setCurrentStrength(int CurrentStrength) {
   _currentStrength=CurrentStrength ;
-};
+}
 inline void UNIT::setLightIntensity(int LightIntensity) {
   _lightIntensity=LightIntensity ;
-};
+}
 
-inline string UNIT::getName() const            { return _name ; } ;
-inline string UNIT::getDescription() const     { return _description ; } ;
-inline int    UNIT::getMasse() const           { return _masse ; } ;
-inline int    UNIT::getLength() const          { return _length ; } ;
-inline int    UNIT::getTime() const            { return _time ; } ;
-inline int    UNIT::getTemperature() const     { return _temperature ; } ;
-inline int    UNIT::getMatterQuantity() const  { return _matterQuantity ; } ;
-inline int    UNIT::getCurrentStrength() const { return _currentStrength ; } ;
-inline int    UNIT::getLightIntensity() const  { return _lightIntensity ; } ;
+inline string UNIT::getName() const            { return _name ; }
+inline string UNIT::getDescription() const     { return _description ; }
+inline int    UNIT::getMasse() const           { return _masse ; }
+inline int    UNIT::getLength() const          { return _length ; }
+inline int    UNIT::getTime() const            { return _time ; }
+inline int    UNIT::getTemperature() const     { return _temperature ; }
+inline int    UNIT::getMatterQuantity() const  { return _matterQuantity ; }
+inline int    UNIT::getCurrentStrength() const { return _currentStrength ; }
+inline int    UNIT::getLightIntensity() const  { return _lightIntensity ; }
 }//End namespace MEDMEM
 
 #endif /* UNIT_HXX */

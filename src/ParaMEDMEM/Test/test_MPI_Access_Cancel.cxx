@@ -16,12 +16,12 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#include <mpi.h>
 #include <time.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <iostream>
+#include <mpi.h>
 
 #include "MPIAccessTest.hxx"
 #include <cppunit/TestAssert.h>
@@ -29,7 +29,7 @@
 //#include "CommInterface.hxx"
 //#include "ProcessorGroup.hxx"
 //#include "MPIProcessorGroup.hxx"
-#include "MPI_Access.hxx"
+#include "MPIAccess.hxx"
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 #define ENABLE_FAULTS
@@ -64,10 +64,10 @@ void MPIAccessTest::test_MPI_Access_Cancel() {
 
   ParaMEDMEM::MPIProcessorGroup* group = new ParaMEDMEM::MPIProcessorGroup(interface) ;
 
-  ParaMEDMEM::MPI_Access mpi_access( group ) ;
+  ParaMEDMEM::MPIAccess mpi_access( group ) ;
 
   if ( myrank >= 2 ) {
-    mpi_access.Barrier() ;
+    mpi_access.barrier() ;
     delete group ;
     return ;
   }
@@ -119,8 +119,8 @@ void MPIAccessTest::test_MPI_Access_Cancel() {
                                         RequestId[i] ) ;
                  if ( datatype == MPI_INT ) {
                    int source, tag, error, outcount ;
-                   mpi_access.Wait( RequestId[i] ) ;
-                   mpi_access.Status( RequestId[i], source, tag, error, outcount,
+                   mpi_access.wait( RequestId[i] ) ;
+                   mpi_access.status( RequestId[i], source, tag, error, outcount,
                                       true ) ;
                    if ( (outcount != 1) | (recvbuf != i) ) {
                      ostringstream strstream ;
@@ -143,7 +143,7 @@ void MPIAccessTest::test_MPI_Access_Cancel() {
         }
         char msgerr[MPI_MAX_ERROR_STRING] ;
         int lenerr ;
-        mpi_access.Error_String(sts, msgerr, &lenerr) ;
+        mpi_access.errorString(sts, msgerr, &lenerr) ;
         cout << "test" << myrank << " lenerr " << lenerr << " "
              << msgerr << endl ;
         if ( sts != MPI_SUCCESS ) {
@@ -155,7 +155,7 @@ void MPIAccessTest::test_MPI_Access_Cancel() {
           cout << strstream.str() << endl ;
           CPPUNIT_FAIL( strstream.str() ) ;
         }
-        mpi_access.Check() ;
+        mpi_access.check() ;
      }
 
      if ( myrank != 0 ) {
@@ -171,7 +171,7 @@ void MPIAccessTest::test_MPI_Access_Cancel() {
                                         probeflag ) ;
                char msgerr[MPI_MAX_ERROR_STRING] ;
                int lenerr ;
-               mpi_access.Error_String(sts, msgerr, &lenerr) ;
+               mpi_access.errorString(sts, msgerr, &lenerr) ;
                cout << "test" << myrank << " IProbe iprobe " << iprobe
                     << " target " << target << " probeflag " << probeflag
                     << " tag " << tag << " outcount " << outcount << " datatype "
@@ -209,9 +209,9 @@ void MPIAccessTest::test_MPI_Access_Cancel() {
                  }
                  else {
                    int flag ;
-                   sts = mpi_access.Cancel( source, tag, datatype, outcount, flag ) ;
+                   sts = mpi_access.cancel( source, tag, datatype, outcount, flag ) ;
                    if ( sts != MPI_SUCCESS || !flag ) {
-                     mpi_access.Error_String(sts, msgerr, &lenerr) ;
+                     mpi_access.errorString(sts, msgerr, &lenerr) ;
                      cout << "======================================================"
                           << endl << "test" << myrank << " lenerr " << lenerr << " "
                           << msgerr << endl << "test" << myrank
@@ -231,19 +231,19 @@ void MPIAccessTest::test_MPI_Access_Cancel() {
                    }
                  }
                  int Reqtarget, Reqtag, Reqerror, Reqoutcount ;
-                 mpi_access.Status( RequestId[iprobe], Reqtarget, Reqtag, Reqerror,
+                 mpi_access.status( RequestId[iprobe], Reqtarget, Reqtag, Reqerror,
                                     Reqoutcount, true ) ;
                  cout << "test" << myrank << " Status Reqtarget "<< Reqtarget
                       << " Reqtag " << Reqtag << " Reqoutcount " << Reqoutcount
                       << endl ;
                  int Reqflag ;
-                 sts = mpi_access.Cancel( RequestId[iprobe] , Reqflag ) ;
+                 sts = mpi_access.cancel( RequestId[iprobe] , Reqflag ) ;
                  cout << "test" << myrank << " " << iprobe
                       << " Cancel Irecv done Reqtarget " << Reqtarget
                       << " Reqtag " << Reqtag << " Reqoutcount " << Reqoutcount
                       << " Reqflag " << Reqflag << endl ;
                  if ( sts != MPI_SUCCESS || !Reqflag ) {
-                   mpi_access.Error_String(sts, msgerr, &lenerr) ;
+                   mpi_access.errorString(sts, msgerr, &lenerr) ;
                    ostringstream strstream ;
                    strstream << "========================================================"
                              << endl << "test" << myrank << " lenerr " << lenerr << " "
@@ -268,8 +268,8 @@ void MPIAccessTest::test_MPI_Access_Cancel() {
           }
        }
      }
-     mpi_access.WaitAll(10,RequestId) ;
-     mpi_access.DeleteRequests(10,RequestId) ;
+     mpi_access.waitAll(10,RequestId) ;
+     mpi_access.deleteRequests(10,RequestId) ;
   }
 
   int source, tag, outcount, flag ;
@@ -277,7 +277,7 @@ void MPIAccessTest::test_MPI_Access_Cancel() {
   sts = mpi_access.IProbe(target, source, tag, datatype, outcount, flag ) ;
   char msgerr[MPI_MAX_ERROR_STRING] ;
   int lenerr ;
-  mpi_access.Error_String(sts, msgerr, &lenerr) ;
+  mpi_access.errorString(sts, msgerr, &lenerr) ;
   cout << "test" << myrank << " lenerr " << lenerr << " "
        << msgerr << endl ;
   if ( sts != MPI_SUCCESS || flag ) {
@@ -292,19 +292,19 @@ void MPIAccessTest::test_MPI_Access_Cancel() {
     CPPUNIT_FAIL( strstream.str() ) ;
   }
 
-  mpi_access.TestAll(10,RequestId,flag) ;
-  mpi_access.WaitAll(10,RequestId) ;
-  mpi_access.DeleteRequests(10,RequestId) ;
-  mpi_access.TestAll(10,RequestId,flag) ;
+  mpi_access.testAll(10,RequestId,flag) ;
+  mpi_access.waitAll(10,RequestId) ;
+  mpi_access.deleteRequests(10,RequestId) ;
+  mpi_access.testAll(10,RequestId,flag) ;
   if ( !flag ) {
     ostringstream strstream ;
     strstream << "test" << myrank << " flag " << flag << " KO" << endl ;
     cout << strstream.str() << endl ;
     CPPUNIT_FAIL( strstream.str() ) ;
   }
-  mpi_access.Check() ;
+  mpi_access.check() ;
 
-  mpi_access.Barrier() ;
+  mpi_access.barrier() ;
 
   delete group ;
 

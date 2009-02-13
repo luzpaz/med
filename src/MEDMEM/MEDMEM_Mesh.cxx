@@ -37,7 +37,7 @@
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_CellModel.hxx"
-#include "MEDMEM_Formulae.hxx"
+#include "VolSurfFormulae.hxx"
 #include "MEDMEM_InterpolationHighLevelObjects.hxx"
 #include "MEDMEM_DriverFactory.hxx"
 
@@ -930,7 +930,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 		int N2 = global_connectivity[tetra_index+1]-1;
 		int N3 = global_connectivity[tetra_index+2]-1;
 		int N4 = global_connectivity[tetra_index+3]-1;
-		xvolume=CalculateVolumeForTetra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4);
+		xvolume=INTERP_KERNEL::calculateVolumeForTetra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4);
 		volume->setIJ(index,1,xvolume) ;
 		index++;
 	      }
@@ -946,7 +946,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 		int N3 = global_connectivity[pyra_index+2]-1;
 		int N4 = global_connectivity[pyra_index+3]-1;
 		int N5 = global_connectivity[pyra_index+4]-1;
-		xvolume=CalculateVolumeForPyra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5);
+		xvolume=INTERP_KERNEL::calculateVolumeForPyra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5);
 		volume->setIJ(index,1,xvolume) ;
 		index++;
 	      }
@@ -963,7 +963,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 		int N4 = global_connectivity[penta_index+3]-1;
 		int N5 = global_connectivity[penta_index+4]-1;
 		int N6 = global_connectivity[penta_index+5]-1;
-		xvolume=CalculateVolumeForPenta(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6);
+		xvolume=INTERP_KERNEL::calculateVolumeForPenta(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6);
 		volume->setIJ(index,1,xvolume) ;
 		index++;
 	      }
@@ -983,7 +983,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 		int N6 = global_connectivity[hexa_index+5]-1;
 		int N7 = global_connectivity[hexa_index+6]-1;
 		int N8 = global_connectivity[hexa_index+7]-1;
-		xvolume=CalculateVolumeForHexa(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6,coord+dim_space*N7,coord+dim_space*N8);
+		xvolume=INTERP_KERNEL::calculateVolumeForHexa(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6,coord+dim_space*N7,coord+dim_space*N8);
 		volume->setIJ(index,1,xvolume) ;
 		index++;
 	      }
@@ -1012,10 +1012,10 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 			  pts1[iFaces][iPtsInFace]=(double *)(coord+3*(nodes1[iFaces][iPtsInFace]-1));
 		      }
 		    delete [] nodes1;
-		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
 		    delete [] nodes;
 		    delete [] pts;
-		    xvolume=CalculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+		    xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
 		    delete [] nbOfNodesPerFaces;
 		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
 			delete [] pts1[iFaces];
@@ -1044,10 +1044,10 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 			  pts1[iFaces][iPtsInFace]=(double *)(coord+3*(nodes1[iFaces][iPtsInFace]-1));
 		      }
 		    delete [] nodes1;
-		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
 		    delete [] nodes;
 		    delete [] pts;
-		    xvolume=CalculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+		    xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
 		    delete [] nbOfNodesPerFaces;
 		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
 			delete [] pts1[iFaces];
@@ -1164,7 +1164,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
 		int N2 = global_connectivity[tria_index+1]-1;
 		int N3 = global_connectivity[tria_index+2]-1;
 
-		area[index]=CalculateAreaForTria(coord+(dim_space*N1),
+		area[index]=INTERP_KERNEL::calculateAreaForTria(coord+(dim_space*N1),
 						   coord+(dim_space*N2),
 						   coord+(dim_space*N3),dim_space);
 		index++;
@@ -1182,7 +1182,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
 		int N3 = global_connectivity[quad_index+2]-1;
 		int N4 = global_connectivity[quad_index+3]-1;
 
-		area[index]=CalculateAreaForQuad(coord+dim_space*N1,
+		area[index]=INTERP_KERNEL::calculateAreaForQuad(coord+dim_space*N1,
 						   coord+dim_space*N2,
 						   coord+dim_space*N3,
 						   coord+dim_space*N4,dim_space);
@@ -1202,7 +1202,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1]-1));
-		    area[index] = CalculateAreaForPolyg((const double **)pts,size,dim_space);
+		    area[index] = INTERP_KERNEL::calculateAreaForPolyg((const double **)pts,size,dim_space);
 		    delete [] pts;
 		    index++;
 		  }
@@ -1219,7 +1219,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[supp_number[polygs]-offsetWithClassicType-1]+iPts-1]-1));
-		    area[index]=CalculateAreaForPolyg((const double **)pts,size,dim_space);
+		    area[index]=INTERP_KERNEL::calculateAreaForPolyg((const double **)pts,size,dim_space);
 		    delete [] pts;
 		    index++;
 		  }
@@ -1449,7 +1449,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 		int N1 = global_connectivity[tria_index]-1;
 		int N2 = global_connectivity[tria_index+1]-1;
 		int N3 = global_connectivity[tria_index+2]-1;
-		CalculateNormalForTria(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,normal+3*index);
+		INTERP_KERNEL::calculateNormalForTria(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,normal+3*index);
 		index++;
 	      }
 	    break;
@@ -1463,7 +1463,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 		int N2 = global_connectivity[quad_index+1]-1;
 		int N3 = global_connectivity[quad_index+2]-1;
 		int N4 = global_connectivity[quad_index+3]-1;
-		CalculateNormalForQuad(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,normal+3*index);
+		INTERP_KERNEL::calculateNormalForQuad(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,normal+3*index);
 		index++;
 	      }
 	    break;
@@ -1506,7 +1506,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1])-1);
-		    CalculateNormalForPolyg((const double **)pts,size,normal+3*index);
+		    INTERP_KERNEL::calculateNormalForPolyg((const double **)pts,size,normal+3*index);
 		    delete [] pts;
 		    index++;
 		  }
@@ -1524,7 +1524,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[localPolygsNbP1-1]+iPts-1])-1);
-		    CalculateNormalForPolyg((const double **)pts,size,normal+3*index);
+		    INTERP_KERNEL::calculateNormalForPolyg((const double **)pts,size,normal+3*index);
 		    delete [] pts;
 		    index++;
 		  }
@@ -1626,7 +1626,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[1]=(double *)coord+dim_space*N2;
 		pts[2]=(double *)coord+dim_space*N3;
 		pts[3]=(double *)coord+dim_space*N4;
-		CalculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
+		INTERP_KERNEL::calculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1648,7 +1648,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[2]=(double *)coord+dim_space*N3;
 		pts[3]=(double *)coord+dim_space*N4;
 		pts[4]=(double *)coord+dim_space*N5;
-		CalculateBarycenter<5,3>((const double **)pts,barycenter+3*index);
+		INTERP_KERNEL::calculateBarycenter<5,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1672,7 +1672,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[3]=(double *)coord+dim_space*N4;
 		pts[4]=(double *)coord+dim_space*N5;
 		pts[5]=(double *)coord+dim_space*N6;
-		CalculateBarycenter<6,3>((const double **)pts,barycenter+3*index);
+		INTERP_KERNEL::calculateBarycenter<6,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1700,7 +1700,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[5]=(double *)coord+dim_space*N6;
 		pts[6]=(double *)coord+dim_space*N7;
 		pts[7]=(double *)coord+dim_space*N8;
-		CalculateBarycenter<8,3>((const double **)pts,barycenter+3*index);
+		INTERP_KERNEL::calculateBarycenter<8,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1718,9 +1718,9 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[1]=(double *)coord+dim_space*N2;
 		pts[2]=(double *)coord+dim_space*N3;
 		if (dim_space==2)
-		  CalculateBarycenter<3,2>((const double **)pts,barycenter+2*index);
+		  INTERP_KERNEL::calculateBarycenter<3,2>((const double **)pts,barycenter+2*index);
 		else
-		  CalculateBarycenter<3,3>((const double **)pts,barycenter+3*index);
+		  INTERP_KERNEL::calculateBarycenter<3,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1740,9 +1740,9 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[2]=(double *)coord+dim_space*N3;
 		pts[3]=(double *)coord+dim_space*N4;
 		if (dim_space==2)
-		  CalculateBarycenter<4,2>((const double **)pts,barycenter+2*index);
+		  INTERP_KERNEL::calculateBarycenter<4,2>((const double **)pts,barycenter+2*index);
 		else
-		  CalculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
+		  INTERP_KERNEL::calculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1758,9 +1758,9 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[0]=(double *)coord+dim_space*N1;
 		pts[1]=(double *)coord+dim_space*N2;
 		if (dim_space==2)
-		  CalculateBarycenter<2,2>((const double **)pts,barycenter+2*index);
+		  INTERP_KERNEL::calculateBarycenter<2,2>((const double **)pts,barycenter+2*index);
 		else
-		  CalculateBarycenter<2,3>((const double **)pts,barycenter+3*index);
+		  INTERP_KERNEL::calculateBarycenter<2,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1777,7 +1777,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1]-1);
-		    CalculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
 		    delete [] pts;
 		  }
 	      }
@@ -1794,7 +1794,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[localPolygsNbP1-1]+iPts-1]-1);
-		    CalculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
 		    delete [] pts;
 		  }
 	      }
@@ -1813,7 +1813,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		    double **pts=new double * [lgthNodes];
 		    for(int iPts=0;iPts<lgthNodes;iPts++)
 		      pts[iPts]=(double *)coord+3*(nodes[iPts]-1);
-		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
 		    delete [] pts;
 		    delete [] nodes;
 		    index++;
@@ -1829,7 +1829,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		    double **pts=new double * [lgthNodes];
 		    for(int iPts=0;iPts<lgthNodes;iPts++)
 		      pts[iPts]=(double *)coord+3*(nodes[iPts]-1);
-		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
 		    delete [] pts;
 		    delete [] nodes;
 		    index++;

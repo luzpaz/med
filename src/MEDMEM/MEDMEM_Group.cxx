@@ -35,12 +35,12 @@ using namespace MED_EN;
 GROUP::GROUP():SUPPORT(),_numberOfFamilies(0),_family() 
 {
   MESSAGE_MED("GROUP()");
-};
+}
 
 GROUP::~GROUP() 
 {
   MESSAGE_MED("~GROUP()");
-};
+}
   
 GROUP & GROUP::operator=(const GROUP &group) 
 {
@@ -50,7 +50,7 @@ GROUP & GROUP::operator=(const GROUP &group)
   _numberOfFamilies = group._numberOfFamilies ;
   _family      	    = group._family ;
   return *this;
-};
+}
 
 ostream & MEDMEM::operator<<(ostream &os, GROUP &myGroup)
 {
@@ -62,7 +62,7 @@ ostream & MEDMEM::operator<<(ostream &os, GROUP &myGroup)
     os << "    * "<<myGroup.getFamily(j)->getName().c_str()<<endl ;
 
   return os;
-};
+}
 
 GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCEPTION)
 {
@@ -161,13 +161,13 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   //MESSAGE_MED(LOC<<"Printing of the object GROUP built "<< (GROUP)*this);
 
   END_OF_MED(LOC);
-};
+}
 
 GROUP::GROUP(const GROUP & m):SUPPORT(m)
 {
   _numberOfFamilies = m._numberOfFamilies;
   _family = m._family; //Copie profonde dans FAMILY Rmq from EF
-};
+}
 
 // void GROUP::init(const list<FAMILY*> & families)
 // {

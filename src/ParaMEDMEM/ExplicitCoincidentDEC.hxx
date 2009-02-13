@@ -16,20 +16,20 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef ExplicitCOINCIDENTDEC_HXX_
-#define ExplicitCOINCIDENTDEC_HXX_
+#ifndef __EXPLICITCOINCIDENTDEC_HXX__
+#define __EXPLICITCOINCIDENTDEC_HXX__
 
 #include "DEC.hxx"
 #include "ExplicitMapping.hxx"
 #include "ExplicitTopology.hxx"
+
 #include <map>
 
 namespace ParaMEDMEM
 {
-  class DEC;
   class BlockTopology;
-  //  class ExplicitMapping;
-  class ExplicitCoincidentDEC: public DEC
+
+  class ExplicitCoincidentDEC : public DEC
   {
   public:
     ExplicitCoincidentDEC();
@@ -42,8 +42,7 @@ namespace ParaMEDMEM
     void prepareTargetDE();
     void recvData();
     void sendData();
-  private :
-    
+  private:  
     ExplicitTopology* _toposource;
     ExplicitTopology* _topotarget;
     ProcessorGroup* _targetgroup;
@@ -56,9 +55,7 @@ namespace ParaMEDMEM
     double* _sendbuffer;
     std::map<int,std::pair<int,int> > _distant_elems;
     ExplicitMapping _explicit_mapping;
-  };
-  
+  }; 
 }
 
-#endif /*ExplicitCOINCIDENTDEC_HXX_*/
-	
+#endif

@@ -16,24 +16,23 @@
 #
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-#  SALOMELocalTrace : log on local machine
-#
+
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES = libParaMEDMEMTest.la
 
 salomeinclude_HEADERS =  MPIMainTest.hxx \
-			 MPIAccessDECTest.hxx \
-			 MPIAccessTest.hxx \
-			 ParaMEDMEMTest.hxx
+												 MPIAccessDECTest.hxx \
+												 MPIAccessTest.hxx \
+												 ParaMEDMEMTest.hxx
 
 EXTRA_DIST += MPIMainTest.hxx ParaMEDMEMTest_NonCoincidentDEC.cxx
 dist_libParaMEDMEMTest_la_SOURCES= \
-    ParaMEDMEMTest.cxx \
-    ParaMEDMEMTest_MPIProcessorGroup.cxx \
-    ParaMEDMEMTest_BlockTopology.cxx \
-    ParaMEDMEMTest_IntersectionDEC.cxx \
-    ParaMEDMEMTest_StructuredCoincidentDEC.cxx \
+	ParaMEDMEMTest.cxx \
+ ParaMEDMEMTest_MPIProcessorGroup.cxx \
+	  ParaMEDMEMTest_BlockTopology.cxx \
+	  ParaMEDMEMTest_IntersectionDEC.cxx \
+	  ParaMEDMEMTest_StructuredCoincidentDEC.cxx \
     MPIAccessDECTest.cxx \
     test_AllToAllDEC.cxx \
     test_AllToAllvDEC.cxx \
@@ -58,14 +57,16 @@ dist_libParaMEDMEMTest_la_SOURCES= \
     test_MPI_Access_ISend_IRecv_BottleNeck.cxx
 
 
-libParaMEDMEMTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) \
-	$(MPI_INCLUDES) $(HDF5_INCLUDES) \
-	-I$(srcdir)/../../MEDMEM -I$(srcdir)/../../MEDWrapper/V2_1/Core \
+libParaMEDMEMTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ \
+	$(MPI_INCLUDES) \
 	-I$(srcdir)/../../INTERP_KERNEL \
+	-I$(srcdir)/../../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../../INTERP_KERNEL/Geometric2D \
-	-I$(srcdir)/../../ParaMEDMEM 
+	-I$(srcdir)/../../ParaMEDMEM \
+	-I$(srcdir)/../../MEDCoupling \
+	-I$(srcdir)/../MEDLoader
 
-libParaMEDMEMTest_la_LDFLAGS= @CPPUNIT_LIBS@ $(MPI_LIBS)
+libParaMEDMEMTest_la_LDFLAGS= ../MEDLoader/libparamedmemmedloader.la @CPPUNIT_LIBS@ $(MPI_LIBS)
 
 if MED_ENABLE_KERNEL
     libParaMEDMEMTest_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
@@ -74,17 +75,16 @@ endif
 
 # Executables targets
 bin_PROGRAMS = TestParaMEDMEM  \
-	       TestMPIAccessDEC \
-	       TestMPIAccess
+							 TestMPIAccessDEC \
+		  			   TestMPIAccess
 
 dist_TestParaMEDMEM_SOURCES = TestParaMEDMEM.cxx
 dist_TestMPIAccessDEC_SOURCES = TestMPIAccessDEC.cxx
 dist_TestMPIAccess_SOURCES = TestMPIAccess.cxx
 
 LDADD= $(MED2_LIBS) $(libMEDMEMTest_la_LDFLAGS) -lm $(MPI_LIBS) \
-	../../MEDWrapper/V2_1/Core/libmed_V2_1.la ../libparamedmem.la libParaMEDMEMTest.la \
-	../../INTERP_KERNEL/libinterpkernel.la \
-	../../MEDMEM/libmedmem.la
+	../libparamedmem.la libParaMEDMEMTest.la \
+	../../INTERP_KERNEL/libinterpkernel.la 
 
 if MED_ENABLE_KERNEL
      LDADD+= -lSALOMEBasics
@@ -100,14 +100,3 @@ endif
 AM_CPPFLAGS= $(libParaMEDMEMTest_la_CPPFLAGS)
 
 UNIT_TEST_PROG = TestParaMEDMEM
-
-check: mytests
-
-mytests: $(UNIT_TEST_PROG)
-	@if test "x$(UNIT_TEST_PROG)" != "x"; then \
-	    mpirun -np 1 $(UNIT_TEST_PROG); \
-	    mpirun -np 2 $(UNIT_TEST_PROG); \
-	    mpirun -np 3 $(UNIT_TEST_PROG); \
-	    mpirun -np 4 $(UNIT_TEST_PROG); \
-	    mpirun -np 5 $(UNIT_TEST_PROG); \
-	fi;

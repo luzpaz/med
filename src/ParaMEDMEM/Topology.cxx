@@ -20,13 +20,11 @@
 
 namespace ParaMEDMEM
 {
+  Topology::Topology()
+  {
+  }
 
-Topology::Topology()
-{
-}
-
-Topology::~Topology()
-{
-}
-
+  Topology::~Topology()
+  {
+  }
 }

@@ -37,6 +37,7 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_Coordinate.cxx \
 	MEDMEMTest_DriverFactory.cxx \
 	MEDMEMTest_Exception.cxx \
+	MEDMEMTest_Extractor.cxx \
 	MEDMEMTest_Family.cxx \
 	MEDMEMTest_Field.cxx \
 	MEDMEMTest_Formulae.cxx \
@@ -67,7 +68,7 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_VtkMeshDriver.cxx
 
 libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) $(HDF5_INCLUDES) \
-	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
+	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../MEDWrapper/V2_1/Core
 libMEDMEMCppTest_la_LDFLAGS= $(MED2_LIBS) @CPPUNIT_LIBS@
 
 if MED_ENABLE_KERNEL

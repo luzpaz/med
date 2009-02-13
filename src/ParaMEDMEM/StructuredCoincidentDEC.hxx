@@ -16,8 +16,8 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef STRUCTUREDCOINCIDENTDEC_HXX_
-#define STRUCTUREDCOINCIDENTDEC_HXX_
+#ifndef __STRUCTUREDCOINCIDENTDEC_HXX__
+#define __STRUCTUREDCOINCIDENTDEC_HXX__
 
 #include "DEC.hxx"
 #include "BlockTopology.hxx"
@@ -25,35 +25,33 @@
 
 namespace ParaMEDMEM
 {
-class DEC;
-class BlockTopology;
-class StructuredCoincidentDEC: public DEC
-{
-public:
-	StructuredCoincidentDEC();
-	StructuredCoincidentDEC( ProcessorGroup& source, ProcessorGroup& target);
-	virtual ~StructuredCoincidentDEC();
-	void synchronize();
-	void recvData();
-	void sendData();
-	void prepareSourceDE();
-	void prepareTargetDE();
+  class DEC;
+  class BlockTopology;
+  class StructuredCoincidentDEC : public DEC
+  {
+  public:
+    StructuredCoincidentDEC();
+    StructuredCoincidentDEC( ProcessorGroup& source, ProcessorGroup& target);
+    virtual ~StructuredCoincidentDEC();
+    void synchronize();
+    void recvData();
+    void sendData();
+    void prepareSourceDE();
+    void prepareTargetDE();
 
-private :
-	void synchronizeTopology();
-	void broadcastTopology(BlockTopology*&, int tag);
+  private :
+    void synchronizeTopology();
+    void broadcastTopology(BlockTopology*&, int tag);
 
-	BlockTopology* _toposource;
-	BlockTopology* _topotarget;
-	int* _sendcounts;
-	int* _recvcounts;
-	int* _senddispls;
-	int* _recvdispls;
-	double* _recvbuffer;
-	double* _sendbuffer;
-};
-
+    BlockTopology* _topo_source;
+    BlockTopology* _topo_target;
+    int* _send_counts;
+    int* _recv_counts;
+    int* _send_displs;
+    int* _recv_displs;
+    double* _recv_buffer;
+    double* _send_buffer;
+  };
 }
 
-#endif /*STRUCTUREDCOINCIDENTDEC_HXX_*/
-	
+#endif

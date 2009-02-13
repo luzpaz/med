@@ -53,5 +53,11 @@ dist_libMEDWrapperBase_la_SOURCES= \
 	MED_Utilities.cxx \
 	MED_GaussDef.cxx
 
-libMEDWrapperBase_la_CPPFLAGS= $(BOOST_CPPFLAGS) $(HDF5_INCLUDES) -D@MACHINE@ -I$(top_builddir)/salome_adm/unix $(MED_CPPFLAGS)
+libMEDWrapperBase_la_CPPFLAGS= $(BOOST_CPPFLAGS) $(HDF5_INCLUDES) -D@MACHINE@
+if MED_ENABLE_KERNEL
+  libMEDWrapperBase_la_CPPFLAGS+= -I$(KERNEL_ROOT_DIR)/include/salome
+else
+  libMEDWrapperBase_la_CPPFLAGS+= -I$(top_builddir)/adm_local_without_kernel/unix
+endif
+libMEDWrapperBase_la_CPPFLAGS+= $(MED_CPPFLAGS)
 libMEDWrapperBase_la_LDFLAGS= $(BOOST_LIBS) -lboost_thread${BOOST_LIBSUFFIX}

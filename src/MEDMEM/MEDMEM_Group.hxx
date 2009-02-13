@@ -98,7 +98,7 @@ inline void GROUP::setNumberOfFamilies(int numberOfFamilies)
 //----------------------------------------------------------
 {
   _numberOfFamilies = numberOfFamilies; 
-};
+}
 
 
 /*! set the attribut _family to Family              */
@@ -107,7 +107,7 @@ inline void GROUP::setFamilies(vector<FAMILY*> Family)
 //----------------------------------------------------
 { 
   _family = Family; 
-};
+}
 
 /*! returns number of families in the group */
 //--------------------------------------------
@@ -115,7 +115,7 @@ inline int GROUP::getNumberOfFamilies() const
 //-------------------------------------------
 { 
   return _numberOfFamilies; 
-};
+}
 
 /*! returns the vector of families in the group */
 //------------------------------------------------
@@ -123,7 +123,7 @@ inline vector<FAMILY*> GROUP::getFamilies() const
 //------------------------------------------------
 { 
   return _family; 
-};
+}
 
 /*! returns  a reference on family I of the group */
 //--------------------------------------------------
@@ -131,7 +131,7 @@ FAMILY * GROUP::getFamily(int i) const
 //--------------------------------------------------
 { 
   return _family[i-1]; 
-};
+}
 }//End namespace MEDMEM
 
 #endif /* GROUP_HXX */

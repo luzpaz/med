@@ -47,13 +47,13 @@ using namespace MEDMEM;
 /*
  * Check methods defined in IntersectionDEC.hxx
  *
-    IntersectionDEC();
-    IntersectionDEC(ProcessorGroup& local_group, ProcessorGroup& distant_group);
-    virtual ~IntersectionDEC();
-    void synchronize();
-    void recvData();
-    void sendData();
- */
+ IntersectionDEC();
+ IntersectionDEC(ProcessorGroup& local_group, ProcessorGroup& distant_group);
+ virtual ~IntersectionDEC();
+ void synchronize();
+ void recvData();
+ void sendData();
+*/
 
 void ParaMEDMEMTest::testNonCoincidentDEC_2D()
 {
@@ -61,15 +61,15 @@ void ParaMEDMEMTest::testNonCoincidentDEC_2D()
   int size;
   MPI_Comm_size(MPI_COMM_WORLD,&size);
 
- //the test is meant to run on five processors
+  //the test is meant to run on five processors
   if (size !=5) return ;
   
   testNonCoincidentDEC( "/share/salome/resources/med/square1_split",
-			"Mesh_2",
-			"/share/salome/resources/med/square2_split",
-			"Mesh_3",
-			3,
-			1e-6);
+                        "Mesh_2",
+                        "/share/salome/resources/med/square2_split",
+                        "Mesh_3",
+                        3,
+                        1e-6);
 } 
 
 void ParaMEDMEMTest::testNonCoincidentDEC_3D()
@@ -81,19 +81,19 @@ void ParaMEDMEMTest::testNonCoincidentDEC_3D()
   if (size !=4) return ;
   
   testNonCoincidentDEC( "/share/salome/resources/med/blade_12000_split2",
-			"Mesh_1",
-			"/share/salome/resources/med/blade_3000_split2",
-			"Mesh_1",
-			2,
-			1e4);
+                        "Mesh_1",
+                        "/share/salome/resources/med/blade_3000_split2",
+                        "Mesh_1",
+                        2,
+                        1e4);
 } 
 
 void ParaMEDMEMTest::testNonCoincidentDEC(const string& filename1,
-				       const string& meshname1,
-				       const string& filename2,
-				       const string& meshname2,
-					  int nproc_source,
-					  double epsilon)
+                                          const string& meshname1,
+                                          const string& filename2,
+                                          const string& meshname2,
+                                          int nproc_source,
+                                          double epsilon)
 {
   int size;
   int rank;
@@ -143,7 +143,7 @@ void ParaMEDMEMTest::testNonCoincidentDEC(const string& filename1,
   //aRemover.Register(filename_seq_wr);
   //aRemover.Register(filename_seq_med);
   MPI_Barrier(MPI_COMM_WORLD);
-	ICoCo::Field* icocofield;
+  ICoCo::Field* icocofield;
   if (source_group->containsMyRank())
     {
       string master = filename_xml1;
@@ -153,7 +153,7 @@ void ParaMEDMEMTest::testNonCoincidentDEC(const string& filename1,
       ostringstream meshname ;
       meshname<< meshname1<<"_"<< rank+1;
       
-       CPPUNIT_ASSERT_NO_THROW(mesh = new MESH(MED_DRIVER,strstream.str(),meshname.str()));
+      CPPUNIT_ASSERT_NO_THROW(mesh = new MESH(MED_DRIVER,strstream.str(),meshname.str()));
       support=new MEDMEM::SUPPORT(mesh,"all elements",MED_EN::MED_CELL);
     
       paramesh=new ParaMESH (*mesh,*source_group,"source mesh");
@@ -163,7 +163,7 @@ void ParaMEDMEMTest::testNonCoincidentDEC(const string& filename1,
       parafield = new ParaFIELD(parasupport, comptopo);
 
       
-  int nb_local=support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+      int nb_local=support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
       double * value= new double[nb_local];
       for(int ielem=0; ielem<nb_local;ielem++)
         value[ielem]=1.0;
@@ -180,7 +180,7 @@ void ParaMEDMEMTest::testNonCoincidentDEC(const string& filename1,
     {
       string master= filename_xml2;
       ostringstream strstream;
-            strstream << master<<(rank-nproc_source+1)<<".med";
+      strstream << master<<(rank-nproc_source+1)<<".med";
       ostringstream meshname ;
       meshname<< meshname2<<"_"<<rank-nproc_source+1;
       
@@ -188,12 +188,12 @@ void ParaMEDMEMTest::testNonCoincidentDEC(const string& filename1,
       support=new MEDMEM::SUPPORT(mesh,"all elements",MED_EN::MED_CELL);
       
       paramesh=new ParaMESH (*mesh,*target_group,"target mesh");
-     parasupport=new UnstructuredParaSUPPORT(support,*target_group);
+      parasupport=new UnstructuredParaSUPPORT(support,*target_group);
       ParaMEDMEM::ComponentTopology comptopo;
       parafield = new ParaFIELD(parasupport, comptopo);
 
       
-			int nb_local=support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+      int nb_local=support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
       double * value= new double[nb_local];
       for(int ielem=0; ielem<nb_local;ielem++)
         value[ielem]=0.0;
@@ -230,27 +230,27 @@ void ParaMEDMEMTest::testNonCoincidentDEC(const string& filename1,
       MPI_Bcast(&field_before_int, 1,MPI_DOUBLE, 0,MPI_COMM_WORLD);
      
       dec.synchronize();
-			dec.setOption("ForcedRenormalization",false);
+      dec.setOption("ForcedRenormalization",false);
       dec.recvData();
       //paramesh->write(MED_DRIVER, "./targetsquarenc");
       //parafield->write(MED_DRIVER, "./targetsquarenc", "boundary");
       field_after_int = parafield->getVolumeIntegral(1);
       
     }
-  	MPI_Bcast(&field_before_int,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-    MPI_Bcast(&field_after_int, 1,MPI_DOUBLE, size-1,MPI_COMM_WORLD);
+  MPI_Bcast(&field_before_int,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+  MPI_Bcast(&field_after_int, 1,MPI_DOUBLE, size-1,MPI_COMM_WORLD);
      
-   CPPUNIT_ASSERT_DOUBLES_EQUAL(field_before_int, field_after_int, epsilon);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(field_before_int, field_after_int, epsilon);
     
-   delete source_group;
+  delete source_group;
   delete target_group;
   delete self_group;
-	delete icocofield;
-	delete paramesh;
-	delete parafield;
-	delete support;
-	delete parasupport;
-	delete mesh;
+  delete icocofield;
+  delete paramesh;
+  delete parafield;
+  delete support;
+  delete parasupport;
+  delete mesh;
   MPI_Barrier(MPI_COMM_WORLD);
   
 }

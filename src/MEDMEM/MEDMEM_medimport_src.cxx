@@ -30,14 +30,14 @@ using namespace MEDMEM;
 char * MEDMEM::med2_1_To_med2_3(char * fileNameIn) throw (MEDEXCEPTION)
 {
 //  char * fileNameOut = new char[strlen(fileNameIn)+strlen("2.3")+1];
-  char * fileNameOut = "";
+  const char * fileNameOut = "";
   int ret;
 
 //  strcpy(fileNameOut,fileNameIn);
 //  strcat(fileNameOut,"2.3");
   
   try {
-    ret=MEDimport(fileNameIn,fileNameOut) ;
+    ret=MEDimport(fileNameIn,(char *)fileNameOut) ;
   } catch ( std::exception &ex) {
       std::cout << "An error eoccured durrnig execution of medImport" << std::endl;
       std::cout << ex.what() << std::endl;
@@ -45,5 +45,5 @@ char * MEDMEM::med2_1_To_med2_3(char * fileNameIn) throw (MEDEXCEPTION)
       
   }
   
-  return fileNameOut;
+  return (char*)fileNameOut;
 }

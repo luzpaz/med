@@ -426,7 +426,7 @@ public :
 
   NoInterlaceGaussPolicy(const NoInterlaceGaussPolicy & policy,
 			    bool shallowcopie=true)
-    : InterlacingPolicy(policy),_cumul(policy._cumul),_nbtypegeo(policy._nbtypegeo)
+    : InterlacingPolicy(policy),_nbtypegeo(policy._nbtypegeo),_cumul(policy._cumul)
   {
     //Seuls les tableaux de grande taille sont recopiés superficiellement
     if(shallowcopie) {

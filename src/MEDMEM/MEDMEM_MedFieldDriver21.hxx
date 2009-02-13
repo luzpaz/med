@@ -324,7 +324,7 @@ public :
   BEGIN_OF_MED(LOC);
     //_accessMode = MED_RDWR ;
   END_OF_MED(LOC);
-  };
+  }
 
   /*!
     Copy constructor.
@@ -1409,19 +1409,19 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
 	else
 #endif
 	err=med_2_1::MEDchampEcr(MED_FIELD_DRIVER21<T>::_medIdt, 
-				const_cast <char*> ( MeshName.c_str()) ,                         //( string(mesh_name).resize(MED_TAILLE_NOM).c_str())
-				const_cast <char*> ( (MED_FIELD_DRIVER<T>::_ptrField->getName()).c_str()),
-				(unsigned char*)value, 
+                                const_cast <char*> ( MeshName.c_str()) ,                         //( string(mesh_name).resize(MED_TAILLE_NOM).c_str())
+                                const_cast <char*> ( (MED_FIELD_DRIVER<T>::_ptrField->getName()).c_str()),
+                                (unsigned char*)value, 
                                 modswt /*med_2_1::MED_FULL_INTERLACE*/, //PAL17011
 				NumberOfElements,
 				NumberOfGaussPoints,
 				MED_ALL,
-				MED_NOPFL,
+                                 (char *)MED_NOPFL,
 				med_2_1::MED_REMP,  // PROFIL NON GERE, mode de remplacement non géré
 				(med_2_1::med_entite_maillage)mySupport->getEntity(),
 				(med_2_1::med_geometrie_element)Types[i],
 				MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber(),
-				"        ",
+                                 (char *) "        ",
 				MED_FIELD_DRIVER<T>::_ptrField->getTime(),
 				MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()
 				);

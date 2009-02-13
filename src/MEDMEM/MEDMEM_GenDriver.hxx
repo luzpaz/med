@@ -147,7 +147,7 @@ public:
   virtual MED_EN::med_mode_acces getAccessMode() const;
   driverTypes getDriverType() const { return _driverType; }
 };
-};
+}
 
 
 #endif /* GENDRIVER_HXX */

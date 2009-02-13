@@ -16,49 +16,54 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef ELEMENTLOCATOR_HXX_
-#define ELEMENTLOCATOR_HXX_
+#ifndef __ELEMENTLOCATOR_HXX__
+#define __ELEMENTLOCATOR_HXX__
+
+#include "InterpolationOptions.hxx"
+#include "MEDCouplingUMesh.hxx"
 
 #include <vector>
 #include <set>
-#include "InterpolationOptions.hxx"
 
-namespace MEDMEM
-{
-  class MESH;
-}
 namespace ParaMEDMEM
 {
-class ParaMESH;
-class ProcessorGroup;
-class ParaSUPPORT;
-class InterpolationMatrix;
+  class ParaMESH;
+  class ProcessorGroup;
+  class ParaSUPPORT;
+  class InterpolationMatrix;
 
 
-	class ElementLocator: public INTERP_KERNEL::InterpolationOptions
-{
-public:
-	ElementLocator(const ParaMESH& mesh, const ProcessorGroup& distant_group);
-  ElementLocator(const ParaSUPPORT& support, const ProcessorGroup& distant_group);
-	virtual ~ElementLocator();
-  void exchangeMesh(int idistantrank, MEDMEM::MESH*& distant_mesh, int*& distant_ids);
- 
-private:
-  MEDMEM::MESH* _local_mesh;
-  std::vector<MEDMEM::MESH*> _distant_meshes;
-  double* _domain_bounding_boxes;
-  const ProcessorGroup& _distant_group;
-  const ProcessorGroup& _local_group;
-  ProcessorGroup* _union_group;
-  std::vector<int> _distant_proc_ids;
+  class ElementLocator : public INTERP_KERNEL::InterpolationOptions
+  {
+  public:
+    ElementLocator(const ParaMESH& sourceMesh, const ProcessorGroup& distant_group);
+
+    virtual ~ElementLocator();
+    void exchangeMesh(int idistantrank,
+                      MEDCouplingUMesh*& target_mesh,
+                      int*& distant_ids);
+    void exchangeMethod(const std::string& sourceMeth, int idistantrank, std::string& targetMeth);
+  private:
+    const ParaMESH&  _local_para_mesh ;
+    MEDCouplingUMesh* _local_cell_mesh;
+    MEDCouplingUMesh* _local_face_mesh;
+    std::vector<MEDCouplingUMesh*> _distant_cell_meshes;
+    std::vector<MEDCouplingUMesh*> _distant_face_meshes;
+    double* _domain_bounding_boxes;
+    const ProcessorGroup& _distant_group;
+    const ProcessorGroup& _local_group;
+    ProcessorGroup* _union_group;
+    std::vector<int> _distant_proc_ids;
   
-  void _computeBoundingBoxes();
-  bool _intersectsBoundingBox(int irank);
-  bool _intersectsBoundingBox(double* bb1, double* bb2, int dim);
-  void _exchangeMesh(MEDMEM::MESH* local_mesh, MEDMEM::MESH*& distant_mesh, int iproc_distant, const int* distant_ids_send, int*& distant_ids_recv);
-  MEDMEM::MESH* _meshFromElems(std::set<int>& elems);
-};
+    void _computeBoundingBoxes();
+    bool _intersectsBoundingBox(int irank);
+    bool _intersectsBoundingBox(double* bb1, double* bb2, int dim);
+    void _exchangeMesh(MEDCouplingUMesh* local_mesh, MEDCouplingUMesh*& distant_mesh,
+                       int iproc_distant, const int* distant_ids_send,
+                       int*& distant_ids_recv);
+    MEDCouplingUMesh* _meshFromElems(std::set<int>& elems);
+  };
 
 }
 
-#endif /*ELEMENTLOCATOR_HXX_*/
+#endif

@@ -177,6 +177,7 @@ rules :
         -# \code void getBoundingBox(double *boundingBox) const \endcode
         -# \code INTERP_KERNEL::NormalizedCellType getTypeOfElement(MyConnType eltId) const \endcode
         -# \code unsigned char getNumberOfNodesOfElement(MyConnType eltId) const \endcode
+        -# \code unsigned long getNumberOfNodes() const \endcode
         -# \code unsigned long getNumberOfElements() const \endcode
         -# \code const MyConnType *getConnectivityPtr() const \endcode
         -# \code const double *getCoordinatesPtr() const \endcode
@@ -260,7 +261,7 @@ INTERP_KERNEL::Interpolation2D myInterpolator;
 //optionnal call to parametrize your interpolation. First precision, tracelevel, intersector wanted.
 myInterpolator.setOptions(1e-7,0,Geometric2D);
 INTERP_KERNEL::Matrix<double,ALL_FORTRAN_MODE> resultMatrix;
-myInterpolator.interpolateMeshes(wrap_source_mesh,wrap_target_mesh,resultMatrix);
+myInterpolator.interpolateMeshes(wrap_source_mesh,wrap_target_mesh,resultMatrix,"P0P0");
 //Ok let's multiply resultMatrix by source field to interpolate to target field.
 resultMatrix.multiply(...)
 ...
@@ -287,7 +288,7 @@ INTERP_KERNEL::Interpolation2D myInterpolator;
 //optionnal call to parametrize your interpolation. First precision, tracelevel, intersector wanted.
 myInterpolator.setOptions(1e-7,0,Geometric2D);
 INTERP_KERNEL::Matrix<double,ALL_C_MODE> resultMatrix;
-myInterpolator.interpolateMeshes(wrap_source_mesh,wrap_target_mesh,resultMatrix);
+myInterpolator.interpolateMeshes(wrap_source_mesh,wrap_target_mesh,resultMatrix,"P0P0");
 //Ok let's multiply resultMatrix by source field to interpolate to target field.
 resultMatrix.multiply(...)
 //clean-up

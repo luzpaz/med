@@ -19,28 +19,27 @@
 #ifndef _MPIACCESSDECTEST_HXX_
 #define _MPIACCESSDECTEST_HXX_
 
-#include "mpi.h"
-
 #include <cppunit/extensions/HelperMacros.h>
 
 #include <set>
 #include <string>
 #include <iostream>
+#include "mpi.h"
 
 
 class MPIAccessDECTest : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( MPIAccessDECTest );
-  CPPUNIT_TEST( test_AllToAllDECSynchronousPointToPoint ) ;
+  //  CPPUNIT_TEST( test_AllToAllDECSynchronousPointToPoint ) ;
   CPPUNIT_TEST( test_AllToAllDECAsynchronousPointToPoint ) ;
-  CPPUNIT_TEST( test_AllToAllvDECSynchronousPointToPoint ) ;
+  //CPPUNIT_TEST( test_AllToAllvDECSynchronousPointToPoint ) ;
   CPPUNIT_TEST( test_AllToAllvDECAsynchronousPointToPoint ) ;
-  CPPUNIT_TEST( test_AllToAllTimeDECSynchronousPointToPoint ) ;
+  //CPPUNIT_TEST( test_AllToAllTimeDECSynchronousPointToPoint ) ;
   CPPUNIT_TEST( test_AllToAllTimeDECAsynchronousPointToPoint ) ;
   CPPUNIT_TEST( test_AllToAllvTimeDECSynchronousNative ) ;
-  CPPUNIT_TEST( test_AllToAllvTimeDECSynchronousPointToPoint ) ;
+  //CPPUNIT_TEST( test_AllToAllvTimeDECSynchronousPointToPoint ) ;
   CPPUNIT_TEST( test_AllToAllvTimeDECAsynchronousPointToPoint ) ;
-  CPPUNIT_TEST( test_AllToAllvTimeDoubleDECSynchronousPointToPoint ) ;
+  //CPPUNIT_TEST( test_AllToAllvTimeDoubleDECSynchronousPointToPoint ) ;
   CPPUNIT_TEST( test_AllToAllvTimeDoubleDECAsynchronousPointToPoint ) ;
   CPPUNIT_TEST_SUITE_END();
   

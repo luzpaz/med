@@ -16,22 +16,23 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef _ICOCOFIELD_HXX_
-#define  _ICOCOFIELD_HXX_
+#ifndef __ICOCOFIELD_HXX__
+#define __ICOCOFIELD_HXX__
 
 #include <string>
+
 namespace ICoCo
 {
-class Field
+  class Field
   {
   public:
-     Field(){};
-    virtual ~Field(){};
-    void setName(const std::string& name) {_name=name;}
-    std::string getName()const {return _name;}
-   
+    Field() { }
+    virtual ~Field() { }
+    void setName(const std::string& name) { _name=name; }
+    std::string getName() const { return _name; }
   protected:
     std::string _name;
   };
 }
+
 #endif

@@ -19,12 +19,12 @@
 #ifndef _ParaMEDMEMTEST_HXX_
 #define _ParaMEDMEMTEST_HXX_
 
-#include "mpi.h"
 #include <cppunit/extensions/HelperMacros.h>
 
 #include <set>
 #include <string>
 #include <iostream>
+#include "mpi.h"
 
 
 class ParaMEDMEMTest : public CppUnit::TestFixture
@@ -36,22 +36,23 @@ class ParaMEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST(testBlockTopology_constructor);
   CPPUNIT_TEST(testBlockTopology_serialize);
   CPPUNIT_TEST(testIntersectionDEC_2D);
+  CPPUNIT_TEST(testIntersectionDEC_2DP0P1);
 
- 	CPPUNIT_TEST(testSynchronousEqualIntersectionWithoutInterpNativeDEC_2D);
-	CPPUNIT_TEST(testSynchronousEqualIntersectionWithoutInterpDEC_2D);
-	CPPUNIT_TEST(testSynchronousEqualIntersectionDEC_2D);
-	CPPUNIT_TEST(testSynchronousFasterSourceIntersectionDEC_2D);
- 	CPPUNIT_TEST(testSynchronousSlowerSourceIntersectionDEC_2D);
- 	CPPUNIT_TEST(testSynchronousSlowSourceIntersectionDEC_2D);
- 	CPPUNIT_TEST(testSynchronousFastSourceIntersectionDEC_2D);
+  CPPUNIT_TEST(testSynchronousEqualIntersectionWithoutInterpNativeDEC_2D);
+  CPPUNIT_TEST(testSynchronousEqualIntersectionWithoutInterpDEC_2D);
+  CPPUNIT_TEST(testSynchronousEqualIntersectionDEC_2D);
+  CPPUNIT_TEST(testSynchronousFasterSourceIntersectionDEC_2D);
+  CPPUNIT_TEST(testSynchronousSlowerSourceIntersectionDEC_2D);
+  CPPUNIT_TEST(testSynchronousSlowSourceIntersectionDEC_2D);
+  CPPUNIT_TEST(testSynchronousFastSourceIntersectionDEC_2D);
   CPPUNIT_TEST(testAsynchronousEqualIntersectionDEC_2D);
- 	CPPUNIT_TEST(testAsynchronousFasterSourceIntersectionDEC_2D);
-	CPPUNIT_TEST(testAsynchronousSlowerSourceIntersectionDEC_2D);
-	CPPUNIT_TEST(testAsynchronousSlowSourceIntersectionDEC_2D);
-	CPPUNIT_TEST(testAsynchronousFastSourceIntersectionDEC_2D);
+  CPPUNIT_TEST(testAsynchronousFasterSourceIntersectionDEC_2D);
+  CPPUNIT_TEST(testAsynchronousSlowerSourceIntersectionDEC_2D);
+  CPPUNIT_TEST(testAsynchronousSlowSourceIntersectionDEC_2D);
+  CPPUNIT_TEST(testAsynchronousFastSourceIntersectionDEC_2D);
 #ifdef MED_ENABLE_FVM
-	//can be added again after FVM correction for 2D
-	//  CPPUNIT_TEST(testNonCoincidentDEC_2D);
+  //can be added again after FVM correction for 2D
+  //  CPPUNIT_TEST(testNonCoincidentDEC_2D);
   CPPUNIT_TEST(testNonCoincidentDEC_3D); 
 #endif
   CPPUNIT_TEST(testStructuredCoincidentDEC);
@@ -70,6 +71,7 @@ public:
   void testBlockTopology_constructor();
   void testBlockTopology_serialize();
   void testIntersectionDEC_2D();
+  void testIntersectionDEC_2DP0P1();
 #ifdef MED_ENABLE_FVM
   void testNonCoincidentDEC_2D();
   void testNonCoincidentDEC_3D();
@@ -92,15 +94,16 @@ public:
 
 private:
   void testNonCoincidentDEC(const std::string& filename1, 
-			   const std::string& meshname1, 
-			   const std::string& filename2, 
-			   const std::string& meshname2,
-			    int nbprocsource, double epsilon);
+                            const std::string& meshname1, 
+                            const std::string& filename2, 
+                            const std::string& meshname2,
+                            int nbprocsource, double epsilon);
   void testAsynchronousIntersectionDEC_2D(double dtA, double tmaxA, 
-  									  double dtB, double tmaxB,
-                      bool WithPointToPoint, bool Asynchronous, bool WithInterp );
+                                          double dtB, double tmaxB,
+                                          bool WithPointToPoint, bool Asynchronous, bool WithInterp, const char *srcMeth, const char *targetMeth);
+  void testIntersectionDEC_2D_(const char *srcMeth, const char *targetMeth);
   
-  };
+};
 
 // to automatically remove temporary files from disk
 class ParaMEDMEMTest_TmpFilesRemover

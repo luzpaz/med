@@ -178,7 +178,7 @@ namespace MED{
 
   struct TWrapper;
   typedef SharedPtr<TWrapper> PWrapper;
-};
+}
 
 
 #endif

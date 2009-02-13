@@ -16,11 +16,11 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#include <mpi.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <iostream>
+#include <mpi.h>
 
 #include "MPIAccessTest.hxx"
 #include <cppunit/TestAssert.h>
@@ -28,7 +28,7 @@
 //#include "CommInterface.hxx"
 //#include "ProcessorGroup.hxx"
 //#include "MPIProcessorGroup.hxx"
-#include "MPI_Access.hxx"
+#include "MPIAccess.hxx"
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 #define ENABLE_FAULTS
@@ -39,11 +39,11 @@
 using namespace std;
 using namespace ParaMEDMEM;
 
-void chksts( int sts , int myrank , ParaMEDMEM::MPI_Access * mpi_access ) {
+void chksts( int sts , int myrank , ParaMEDMEM::MPIAccess * mpi_access ) {
   char msgerr[MPI_MAX_ERROR_STRING] ;
   int lenerr ;
   if ( sts != MPI_SUCCESS ) {
-    mpi_access->Error_String(sts, msgerr, &lenerr) ;
+    mpi_access->errorString(sts, msgerr, &lenerr) ;
     cout << "test" << myrank << " lenerr " << lenerr << " "
          << msgerr << endl ;
     ostringstream strstream ;
@@ -90,15 +90,15 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
 
   ParaMEDMEM::MPIProcessorGroup* group = new ParaMEDMEM::MPIProcessorGroup(interface) ;
 
-  ParaMEDMEM::MPI_Access * mpi_access = new ParaMEDMEM::MPI_Access( group ) ;
+  ParaMEDMEM::MPIAccess * mpi_access = new ParaMEDMEM::MPIAccess( group ) ;
 
   if ( myrank >= 2 ) {
-    cout << "test_MPI_Access_Time_0 rank" << myrank << " --> mpi_access->Barrier" << endl ;
-    mpi_access->Barrier() ;
-    cout << "test_MPI_Access_Time_0 rank" << myrank << " <-- mpi_access->Barrier" << endl ;
-    cout << "test_MPI_Access_Time_0 rank" << myrank << " --> mpi_access->Barrier" << endl ;
-    mpi_access->Barrier() ;
-    cout << "test_MPI_Access_Time_0 rank" << myrank << " <-- mpi_access->Barrier" << endl ;
+    cout << "test_MPI_Access_Time_0 rank" << myrank << " --> mpi_access->barrier" << endl ;
+    mpi_access->barrier() ;
+    cout << "test_MPI_Access_Time_0 rank" << myrank << " <-- mpi_access->barrier" << endl ;
+    cout << "test_MPI_Access_Time_0 rank" << myrank << " --> mpi_access->barrier" << endl ;
+    mpi_access->barrier() ;
+    cout << "test_MPI_Access_Time_0 rank" << myrank << " <-- mpi_access->barrier" << endl ;
     delete group ;
     delete mpi_access ;
     cout << "test_MPI_Access_Time" << myrank << " OK" << endl ;
@@ -130,7 +130,7 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
          aSendTimeMsg[istep].deltatime = 0 ;
        }
        sts = mpi_access->ISend( &aSendTimeMsg[istep] , 1 ,
-                               mpi_access->TimeType() , target ,
+                               mpi_access->timeType() , target ,
                                SendTimeRequestId[istep]) ;
        cout << "test" << myrank << " ISend TimeRequestId " << SendTimeRequestId[istep]
             << " tag " << mpi_access->MPITag(SendTimeRequestId[istep]) << endl ;
@@ -143,14 +143,14 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
 //CheckSent
 //=========
        int sendrequests[2*maxreq] ;
-       int sendreqsize = mpi_access->SendRequestIds( target , 2*maxreq ,
+       int sendreqsize = mpi_access->sendRequestIds( target , 2*maxreq ,
                                                     sendrequests ) ;
        int j , flag ;
        for ( j = 0 ; j < sendreqsize ; j++ ) {
-          sts = mpi_access->Test( sendrequests[j] , flag ) ;
+          sts = mpi_access->test( sendrequests[j] , flag ) ;
           chksts( sts , myrank , mpi_access ) ;
           if ( flag ) {
-            mpi_access->DeleteRequest( sendrequests[j] ) ;
+            mpi_access->deleteRequest( sendrequests[j] ) ;
             cout << "test" << myrank << " " << j << ". " << sendrequests[j]
                  << " sendrequest deleted" << endl ;
           }
@@ -162,7 +162,7 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
        if ( t == 0 ) {
          aRecvTimeMsg[lasttime].time = 0 ;
          sts = mpi_access->IRecv( &aRecvTimeMsg[lasttime+1] , 1 ,
-                                 mpi_access->TimeType() ,
+                                 mpi_access->timeType() ,
                                  target , RecvTimeRequestId[lasttime+1]) ;
          cout << "test" << myrank << " t == 0 IRecv TimeRequestId "
               << RecvTimeRequestId[lasttime+1]
@@ -216,7 +216,7 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
               lasttime += 1 ;
 //TimeMessage
 //===========
-              sts = mpi_access->Wait( RecvTimeRequestId[lasttime] ) ;
+              sts = mpi_access->wait( RecvTimeRequestId[lasttime] ) ;
               chksts( sts , myrank , mpi_access ) ;
               cout << "test" << myrank << " Wait done RecvTimeRequestId "
                    << RecvTimeRequestId[lasttime] << " lasttime " << lasttime
@@ -225,7 +225,7 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
               if ( lasttime == 0 ) {
                 aRecvTimeMsg[lasttime-1] = aRecvTimeMsg[lasttime] ;
               }
-              mpi_access->DeleteRequest( RecvTimeRequestId[lasttime] ) ;
+              mpi_access->deleteRequest( RecvTimeRequestId[lasttime] ) ;
 
               double deltatime = aRecvTimeMsg[lasttime].deltatime ;
               //double maxtime = aRecvTimeMsg[lasttime].maxtime ;
@@ -241,22 +241,22 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
                 while ( deltatime != 0 && t > nexttime ) {
                      int source, MPITag, outcount ;
                      MPI_Datatype datatype ;
-                     sts = mpi_access->Probe( target , source, MPITag, datatype,
+                     sts = mpi_access->probe( target , source, MPITag, datatype,
                                              outcount ) ;
                      chksts( sts , myrank , mpi_access ) ;
 // Cancel DataMessages jusqu'a un TimeMessage
                      int cancelflag ;
-                     while ( !mpi_access->IsTimeMessage( MPITag ) ) {
-                          sts = mpi_access->Cancel( source, MPITag, datatype, outcount ,
-                          //sts = mpi_access->Cancel( source, datatype, outcount ,
+                     while ( !mpi_access->isTimeMessage( MPITag ) ) {
+                          sts = mpi_access->cancel( source, MPITag, datatype, outcount ,
+                          //sts = mpi_access->cancel( source, datatype, outcount ,
                                                    //RecvRequestId[lasttime] ,
                                                    cancelflag ) ;
                           cout << "test" << myrank << " Recv TO CANCEL RequestId "
                                << RecvRequestId[lasttime]
-                               << " tag " << mpi_access->RecvMPITag( target )
+                               << " tag " << mpi_access->recvMPITag( target )
                                << " cancelflag " << cancelflag << endl ;
                           chksts( sts , myrank , mpi_access ) ;
-                          sts = mpi_access->Probe( target , source, MPITag, datatype,
+                          sts = mpi_access->probe( target , source, MPITag, datatype,
                                                   outcount ) ;
                           chksts( sts , myrank , mpi_access ) ;
                      }
@@ -265,13 +265,13 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
                      //if ( nexttime < maxtime && t > nexttime ) {
                      if ( deltatime != 0 && t > nexttime ) {
 // Cancel du TimeMessage
-                       sts = mpi_access->Cancel( source, MPITag, datatype, outcount ,
-                       //sts = mpi_access->Cancel( source, datatype, outcount ,
+                       sts = mpi_access->cancel( source, MPITag, datatype, outcount ,
+                       //sts = mpi_access->cancel( source, datatype, outcount ,
                                                 //RecvRequestId[lasttime] ,
                                                 cancelflag ) ;
                        cout << "test" << myrank << " Time TO CANCEL RequestId "
                             << RecvRequestId[lasttime]
-                            << " tag " << mpi_access->RecvMPITag( target )
+                            << " tag " << mpi_access->recvMPITag( target )
                             << " cancelflag " << cancelflag << endl ;
                        chksts( sts , myrank , mpi_access ) ;
                      }
@@ -285,11 +285,11 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
                      << " lasttime-1 " << aRecvTimeMsg[lasttime-1]
                      << " lasttime " << aRecvTimeMsg[lasttime]
                      << endl ;
-                sts = mpi_access->Recv(&recvbuf[lasttime],1,MPI_INT,target,
+                sts = mpi_access->recv(&recvbuf[lasttime],1,MPI_INT,target,
                                        RecvRequestId[lasttime]) ;
                 cout << "test" << myrank << " Recv RequestId "
                      << RecvRequestId[lasttime]
-                     << " tag " << mpi_access->RecvMPITag( target )
+                     << " tag " << mpi_access->recvMPITag( target )
                      << endl ;
                 chksts( sts , myrank , mpi_access ) ;
               }
@@ -300,7 +300,7 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
               if ( !outtime ) {
 // Une lecture asynchrone d'un message temps a l'avance
                 sts = mpi_access->IRecv( &aRecvTimeMsg[lasttime+1] , 1 ,
-                                        mpi_access->TimeType() , target ,
+                                        mpi_access->timeType() , target ,
                                         RecvTimeRequestId[lasttime+1]) ;
                 cout << "test" << myrank << " IRecv TimeRequestId "
                      << RecvTimeRequestId[lasttime+1] << " MPITag "
@@ -356,21 +356,21 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
   }
 
   cout << "test" << myrank << " Barrier :" << endl ;
-  mpi_access->Barrier() ;
+  mpi_access->barrier() ;
 
-  mpi_access->Check() ;
+  mpi_access->check() ;
 
   if ( myrank == 0 ) {
 //CheckFinalSent
 //==============
     cout << "test" << myrank << " CheckFinalSent :" << endl ;
     int sendrequests[2*maxreq] ;
-    int sendreqsize = mpi_access->SendRequestIds( target , 2*maxreq , sendrequests ) ;
+    int sendreqsize = mpi_access->sendRequestIds( target , 2*maxreq , sendrequests ) ;
     int j ;
     for ( j = 0 ; j < sendreqsize ; j++ ) {
-       sts = mpi_access->Wait( sendrequests[j] ) ;
+       sts = mpi_access->wait( sendrequests[j] ) ;
        chksts( sts , myrank , mpi_access ) ;
-       mpi_access->DeleteRequest( sendrequests[j] ) ;
+       mpi_access->deleteRequest( sendrequests[j] ) ;
        cout << "test" << myrank << " " << j << ". " << sendrequests[j] << " deleted"
             << endl ;
     }
@@ -378,13 +378,13 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
   else {
     cout << "test" << myrank << " CheckFinalRecv :" << endl ;
     int recvrequests[2*maxreq] ;
-    int recvreqsize = mpi_access->RecvRequestIds( target , 2*maxreq , recvrequests ) ;
+    int recvreqsize = mpi_access->recvRequestIds( target , 2*maxreq , recvrequests ) ;
     int cancelflag ;
     int j ;
     for ( j = 0 ; j < recvreqsize ; j++ ) {
-       sts = mpi_access->Cancel( recvrequests[j] , cancelflag ) ;
+       sts = mpi_access->cancel( recvrequests[j] , cancelflag ) ;
        chksts( sts , myrank , mpi_access ) ;
-       mpi_access->DeleteRequest( recvrequests[j] ) ;
+       mpi_access->deleteRequest( recvrequests[j] ) ;
        cout << "test" << myrank << " " << j << ". " << recvrequests[j] << " deleted"
             << " cancelflag " << cancelflag << endl ;
     }
@@ -394,13 +394,13 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
                              outcount , flag ) ;
     chksts( sts , myrank , mpi_access ) ;
     while ( flag ) {
-         sts = mpi_access->Cancel( source, MPITag, datatype, outcount ,
-         //sts = mpi_access->Cancel( source, datatype, outcount ,
+         sts = mpi_access->cancel( source, MPITag, datatype, outcount ,
+         //sts = mpi_access->cancel( source, datatype, outcount ,
                                   //RecvRequestId[lasttime] ,
                                   cancelflag ) ;
          cout << "test" << myrank << " TO CANCEL RequestId "
               << RecvRequestId[lasttime]
-              << " tag " << mpi_access->RecvMPITag( target )
+              << " tag " << mpi_access->recvMPITag( target )
               << " cancelflag " << cancelflag << endl ;
          chksts( sts , myrank , mpi_access ) ;
          sts = mpi_access->IProbe( target , source, MPITag, datatype,
@@ -408,11 +408,11 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
          chksts( sts , myrank , mpi_access ) ;
     }
   }
-  mpi_access->Check() ;
+  mpi_access->check() ;
 
   if ( myrank == 0 ) {
     int sendrequests[2*maxreq] ;
-    int sendreqsize = mpi_access->SendRequestIds( target , 2*maxreq , sendrequests ) ;
+    int sendreqsize = mpi_access->sendRequestIds( target , 2*maxreq , sendrequests ) ;
     if ( sendreqsize != 0 ) {
       ostringstream strstream ;
       strstream << "=========================================================" << endl
@@ -429,7 +429,7 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
   }
   else {
     int recvrequests[2*maxreq] ;
-    int recvreqsize = mpi_access->RecvRequestIds( target , 2*maxreq , recvrequests ) ;
+    int recvreqsize = mpi_access->recvRequestIds( target , 2*maxreq , recvrequests ) ;
     if ( recvreqsize != 0 ) {
       ostringstream strstream ;
       strstream << "=========================================================" << endl
@@ -451,9 +451,9 @@ void MPIAccessTest::test_MPI_Access_Time_0() {
           << aRecvTimeMsg[i].time << " recvbuf " << recvbuf[i] << endl ;
   }
 
-  cout << "test_MPI_Access_Time_0 rank" << myrank << " --> mpi_access->Barrier" << endl ;
-  mpi_access->Barrier() ;
-  cout << "test_MPI_Access_Time_0 rank" << myrank << " <-- mpi_access->Barrier" << endl ;
+  cout << "test_MPI_Access_Time_0 rank" << myrank << " --> mpi_access->barrier" << endl ;
+  mpi_access->barrier() ;
+  cout << "test_MPI_Access_Time_0 rank" << myrank << " <-- mpi_access->barrier" << endl ;
 
   delete group ;
   delete mpi_access ;

@@ -93,19 +93,19 @@ public :
 inline int MEDSKYLINEARRAY::getNumberOf() const
 {
   return _count ;
-};
+}
 inline int MEDSKYLINEARRAY::getLength() const
 {
   return _length ;
-};
+}
 inline const int*  MEDSKYLINEARRAY::getIndex() const
 {
   return (const int*)_index ;
-} ;
+} 
 inline const int*  MEDSKYLINEARRAY::getValue() const
 {
   return (const int*)_value ;
-} ;
+} 
 inline int MEDSKYLINEARRAY::getNumberOfI(int i) const throw (MEDEXCEPTION)
 {
   if (i<1)
@@ -113,7 +113,7 @@ inline int MEDSKYLINEARRAY::getNumberOfI(int i) const throw (MEDEXCEPTION)
   if (i>_count)
     throw MEDEXCEPTION("MEDSKYLINEARRAY::getNumberOfI : argument is out of range");
   return _index[i]-_index[i-1] ;
-} ;
+} 
 inline const int* MEDSKYLINEARRAY::getI(int i) const throw (MEDEXCEPTION)
 {
     if (i<1)

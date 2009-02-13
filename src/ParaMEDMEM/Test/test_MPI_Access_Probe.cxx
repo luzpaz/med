@@ -16,11 +16,11 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#include <mpi.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <iostream>
+#include <mpi.h>
 
 #include "MPIAccessTest.hxx"
 #include <cppunit/TestAssert.h>
@@ -28,7 +28,7 @@
 //#include "CommInterface.hxx"
 //#include "ProcessorGroup.hxx"
 //#include "MPIProcessorGroup.hxx"
-#include "MPI_Access.hxx"
+#include "MPIAccess.hxx"
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 #define ENABLE_FAULTS
@@ -61,10 +61,10 @@ void MPIAccessTest::test_MPI_Access_Probe() {
 
   ParaMEDMEM::MPIProcessorGroup* group = new ParaMEDMEM::MPIProcessorGroup(interface) ;
 
-  ParaMEDMEM::MPI_Access mpi_access( group ) ;
+  ParaMEDMEM::MPIAccess mpi_access( group ) ;
 
   if ( myrank >= 2 ) {
-    mpi_access.Barrier() ;
+    mpi_access.barrier() ;
     delete group ;
     return ;
   }
@@ -75,18 +75,18 @@ void MPIAccessTest::test_MPI_Access_Probe() {
   int i ;
   for ( i = 0 ; i < 10 ; i++ ) {
      if ( myrank == 0 ) {
-       sts = mpi_access.Send(&i,1,MPI_INT,target, RequestId[i]) ;
+       sts = mpi_access.send(&i,1,MPI_INT,target, RequestId[i]) ;
        cout << "test" << myrank << " Send RequestId " << RequestId[i]
             << endl ;
      }
      else {
        int source, tag, outcount ;
        MPI_Datatype datatype ;
-       sts = mpi_access.Probe(target, source, tag, datatype, outcount ) ;
+       sts = mpi_access.probe(target, source, tag, datatype, outcount ) ;
        cout << "test" << myrank << " Probe target " << target << " source " << source
             << " tag " << tag << " outcount " << outcount << endl ;
        int recvbuf ;
-       sts = mpi_access.Recv(&recvbuf,outcount,datatype,source, RequestId[i],
+       sts = mpi_access.recv(&recvbuf,outcount,datatype,source, RequestId[i],
                              &outcount) ;
        if ( (outcount != 1) | (recvbuf != i) ) {
          ostringstream strstream ;
@@ -101,7 +101,7 @@ void MPIAccessTest::test_MPI_Access_Probe() {
      }
      char msgerr[MPI_MAX_ERROR_STRING] ;
      int lenerr ;
-     mpi_access.Error_String(sts, msgerr, &lenerr) ;
+     mpi_access.errorString(sts, msgerr, &lenerr) ;
      cout << "test" << myrank << " lenerr " << lenerr << " "
           << msgerr << endl ;
 
@@ -114,20 +114,20 @@ void MPIAccessTest::test_MPI_Access_Probe() {
        cout << strstream.str() << endl ;
        CPPUNIT_FAIL( strstream.str() ) ;
      }
-     mpi_access.Check() ;
+     mpi_access.check() ;
   }
   int flag ;
-  mpi_access.TestAll(10,RequestId,flag) ;
+  mpi_access.testAll(10,RequestId,flag) ;
   if ( !flag ) {
     ostringstream strstream ;
     strstream << "test" << myrank << " flag " << flag << " KO" << endl ;
     cout << strstream.str() << endl ;
     CPPUNIT_FAIL( strstream.str() ) ;
   }
-  mpi_access.WaitAll(10,RequestId) ;
-  mpi_access.Check() ;
+  mpi_access.waitAll(10,RequestId) ;
+  mpi_access.check() ;
 
-  mpi_access.Barrier() ;
+  mpi_access.barrier() ;
 
   delete group ;
 

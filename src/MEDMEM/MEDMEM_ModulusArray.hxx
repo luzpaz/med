@@ -50,7 +50,7 @@ private:
 
 public:
   MEDMODULUSARRAY(int length, const int * array) :
-    _length(length), _array(array), _length2(length) {};
+    _length(length), _length2(length), _array(array) {}
 
   MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array):
     _length(vertexLength), _length2( totalLength ), _array(array) {}
@@ -73,7 +73,7 @@ inline const int MEDMODULUSARRAY::operator[](const int &i) const
     position+=_length ;
   //position += _length2 ;
   return _array[position] ;
-};
+}
 
 inline int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
 {

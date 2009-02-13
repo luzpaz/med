@@ -40,7 +40,11 @@ namespace MED
   ::TLockProxy(TWrapper* theWrapper):
     myWrapper(theWrapper)
   {
+#if BOOST_VERSION >= 103500
+    myWrapper->myMutex.lock();
+#else
     boost::detail::thread::lock_ops<TWrapper::TMutex>::lock(myWrapper->myMutex);
+#endif
     INITMSG(MYDEBUG,"TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<std::endl);
   }
   
@@ -48,7 +52,11 @@ namespace MED
   ::~TLockProxy()
   {
     INITMSG(MYDEBUG,"~TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<std::endl);
+#if BOOST_VERSION >= 103500
+    myWrapper->myMutex.unlock();
+#else
     boost::detail::thread::lock_ops<TWrapper::TMutex>::unlock(myWrapper->myMutex);
+#endif
   }
   
   TWrapper*

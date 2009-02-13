@@ -77,9 +77,9 @@ namespace MED
       superclass(__a) 
     {}
     
-    TVector(size_type __n, const value_type& __value,
+    TVector(size_type __n, const value_type& __val,
 	    const allocator_type& __a = allocator_type()):
-      superclass(__n, __value, __a)
+      superclass(__n, __val, __a)
     {}
     
     explicit

@@ -256,6 +256,6 @@ private:
   virtual GENDRIVER * copy ( void ) const ;
 
 };
-};
+}
 
 #endif /* MED_MED_DRIVER22_HXX */

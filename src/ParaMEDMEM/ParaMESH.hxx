@@ -16,60 +16,60 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef PARAMESH_HXX_
-#define PARAMESH_HXX_
+#ifndef __PARAMESH_HXX__
+#define __PARAMESH_HXX__
 
-#include "CommInterface.hxx"
+#include "MEDCouplingUMesh.hxx"
+#include "ProcessorGroup.hxx"
 
 #include <string>
 #include <vector>
 
-#include "MEDMEM_Exception.hxx"
-#include "MEDMEM_define.hxx"
-#include "MEDMEM_GenDriver.hxx"
-#include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_ConnectZone.hxx"
-#include "ProcessorGroup.hxx"
-
 namespace ParaMEDMEM
 {
-class BlockTopology;
+  class Topology;
+  class BlockTopology;
+  class DataArrayInt;
 
-class ParaMESH
-{
-public:
-	ParaMESH(MEDMEM::driverTypes driver_type, const std::string& file_name, 
-		const ProcessorGroup& group)
-	throw (MEDMEM::MEDEXCEPTION);
-  ParaMESH(MEDMEM::MESH& subdomain_mesh, const ProcessorGroup& proc_group, const string& name);
-	void write(MEDMEM::driverTypes driverType, const std::string& fileName="")
-	throw (MEDMEM::MEDEXCEPTION);
-	virtual ~ParaMESH();
-	MEDMEM::MESH* getMesh() const {return _mesh;}
-	ParaMEDMEM::BlockTopology* getBlockTopology()const {return _block_topology;}
-//	const string& getFilename() const {return _medfilename;}
-	const int* getGlobalNumbering(MED_EN::medEntityMesh)const; 
-private:
-	//mesh object underlying the ParaMESH object
-	MEDMEM::MESH* _mesh;
-  
-  bool _has_mesh_ownership;
-	//name of the mesh
-	string _name;
-	//connect zone
-	std::vector<MEDMEM::CONNECTZONE*> _connect_zone;
-	//id of the local grid
-	int _my_domain_id;
-	//global topology of the cells
-	ParaMEDMEM::BlockTopology* _block_topology;
-	// pointers to global numberings
-	int* _nodeglobal;
-	int* _edgeglobal;
-	int* _faceglobal;
-	int* _cellglobal;
- 
-};
+  class ParaMESH
+  {
+  public:
+    ParaMESH( MEDCouplingUMesh *subdomain_mesh,
+              MEDCouplingUMesh *subdomain_face,
+              DataArrayInt *CorrespElt_local2global,
+              DataArrayInt *CorrespFace_local2global,
+              DataArrayInt *CorrespNod_local2global,
+              const ProcessorGroup& proc_group ) ;
+    ParaMESH( MEDCouplingUMesh *mesh,
+              const ProcessorGroup& proc_group, const std::string& name);
 
+    virtual ~ParaMESH();
+    Topology* getTopology() const { return _explicit_topology; }
+    bool isStructured() const { return _cell_mesh->isStructured(); }
+    MEDCouplingUMesh *getCellMesh() const { return _cell_mesh; }
+    MEDCouplingUMesh *getFaceMesh() const { return _face_mesh; }
+    BlockTopology* getBlockTopology() const { return _block_topology; }
+
+    const int* getGlobalNumberingNode() const { return _node_global->getPointer(); } 
+    const int* getGlobalNumberingFace() const { return _face_global->getPointer(); } 
+    const int* getGlobalNumberingCell() const { return _cell_global->getPointer(); } 
+
+  private:
+    //mesh object underlying the ParaMESH object
+    MEDCouplingUMesh *_cell_mesh ;
+    MEDCouplingUMesh *_face_mesh ;
+
+    //id of the local grid
+    int _my_domain_id;
+
+    //global topology of the cells
+    ParaMEDMEM::BlockTopology* _block_topology;
+    Topology*  _explicit_topology;
+    // pointers to global numberings
+    DataArrayInt* _node_global;
+    DataArrayInt* _face_global;
+    DataArrayInt* _cell_global;
+  };
 }
 
-#endif /*PARAMESH_H_*/
+#endif

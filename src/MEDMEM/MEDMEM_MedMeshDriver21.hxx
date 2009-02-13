@@ -217,6 +217,6 @@ private:
   GENDRIVER * copy(void) const ;
 
 };
-};
+}
 
 #endif /* MED_MESH_DRIVER21_HXX */

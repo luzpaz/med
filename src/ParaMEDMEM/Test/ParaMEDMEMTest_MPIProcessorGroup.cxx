@@ -18,11 +18,10 @@
 //
 #include "ParaMEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
-
-#include "MEDMEM_Exception.hxx"
 #include "CommInterface.hxx"
 #include "ProcessorGroup.hxx"
 #include "MPIProcessorGroup.hxx"
+#include "InterpolationUtils.hxx"
 
 #include <string>
 
@@ -35,26 +34,25 @@
 
 using namespace std;
 using namespace ParaMEDMEM;
-using namespace MEDMEM;
  
 /*
  * Check methods defined in MPPIProcessorGroup.hxx
  *
-  (+) MPIProcessorGroup(const CommInterface& interface);
-  (+) MPIProcessorGroup(const CommInterface& interface, set<int> proc_ids);
-  (u) MPIProcessorGroup (const ProcessorGroup& proc_group, set<int> proc_ids);
-  (+) MPIProcessorGroup(const CommInterface& interface,int pstart, int pend);
-  (+) virtual ~MPIProcessorGroup();
-  (+) virtual ProcessorGroup* fuse (const ProcessorGroup&) const;
-  (u) void intersect (ProcessorGroup&){};
-  (+) int myRank() const {int rank; MPI_Comm_rank(_comm,&rank); return rank;}
-  (+) bool containsMyRank() const { int rank; MPI_Group_rank(_group, &rank); return (rank!=MPI_UNDEFINED);}
-  (+) int translateRank(const ProcessorGroup* group, int rank) const;
-  (+) const MPI_Comm* getComm() const {return &_comm;}
-  (+) ProcessorGroup* createComplementProcGroup() const;
-  (o) ProcessorGroup* createProcGroup() const;
+ (+) MPIProcessorGroup(const CommInterface& interface);
+ (+) MPIProcessorGroup(const CommInterface& interface, set<int> proc_ids);
+ (u) MPIProcessorGroup (const ProcessorGroup& proc_group, set<int> proc_ids);
+ (+) MPIProcessorGroup(const CommInterface& interface,int pstart, int pend);
+ (+) virtual ~MPIProcessorGroup();
+ (+) virtual ProcessorGroup* fuse (const ProcessorGroup&) const;
+ (u) void intersect (ProcessorGroup&){};
+ (+) int myRank() const {int rank; MPI_Comm_rank(_comm,&rank); return rank;}
+ (+) bool containsMyRank() const { int rank; MPI_Group_rank(_group, &rank); return (rank!=MPI_UNDEFINED);}
+ (+) int translateRank(const ProcessorGroup* group, int rank) const;
+ (+) const MPI_Comm* getComm() const {return &_comm;}
+ (+) ProcessorGroup* createComplementProcGroup() const;
+ (o) ProcessorGroup* createProcGroup() const;
    
- */
+*/
  
 void ParaMEDMEMTest::testMPIProcessorGroup_constructor()
 {
@@ -74,30 +72,30 @@ void ParaMEDMEMTest::testMPIProcessorGroup_constructor()
   procs.insert(0);
   procs.insert(1);
   if (size==1)
-    CPPUNIT_ASSERT_THROW(group=new MPIProcessorGroup(comm_interface,procs),MEDMEM::MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(group=new MPIProcessorGroup(comm_interface,procs),INTERP_KERNEL::Exception);
   else
-  {
-    CPPUNIT_ASSERT_NO_THROW(  group=new MPIProcessorGroup(comm_interface,procs));
-    CPPUNIT_ASSERT_EQUAL (group->size(),2);
-     delete group;
-  }
+    {
+      CPPUNIT_ASSERT_NO_THROW(  group=new MPIProcessorGroup(comm_interface,procs));
+      CPPUNIT_ASSERT_EQUAL (group->size(),2);
+      delete group;
+    }
   
   
   //throws because plast<pfirst
-  CPPUNIT_ASSERT_THROW(group=new MPIProcessorGroup(comm_interface,1,0),MEDMEM::MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(group=new MPIProcessorGroup(comm_interface,1,0),INTERP_KERNEL::Exception);
   //throws because plast is beyond size-1
-  CPPUNIT_ASSERT_THROW(group=new MPIProcessorGroup(comm_interface,0,size),MEDMEM::MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(group=new MPIProcessorGroup(comm_interface,0,size),INTERP_KERNEL::Exception);
   if (size>1)
-  {
-    group=new MPIProcessorGroup(comm_interface,0,size-2);
-    CPPUNIT_ASSERT_EQUAL(group->size(),size-1);
-    delete group;
-  }
+    {
+      group=new MPIProcessorGroup(comm_interface,0,size-2);
+      CPPUNIT_ASSERT_EQUAL(group->size(),size-1);
+      delete group;
+    }
   
- }
+}
  
- void ParaMEDMEMTest::testMPIProcessorGroup_boolean()
- {
+void ParaMEDMEMTest::testMPIProcessorGroup_boolean()
+{
   int size;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   
@@ -111,18 +109,18 @@ void ParaMEDMEMTest::testMPIProcessorGroup_constructor()
   ProcessorGroup* group_complement=((MPIProcessorGroup*)group_fuse)->createComplementProcGroup();
   CPPUNIT_ASSERT_EQUAL(group_complement->size(),size-group_fuse_size);
   
-	delete group_fuse;
-	delete group_complement;
+  delete group_fuse;
+  delete group_complement;
 
-	//intersect not implemented yet
-//   if (size>1)
-//   {
-//     MPIProcessorGroup group3(comm_interface,0,size-2);
-//     MPIProcessorGroup group4(comm_interface,1,size-1);
-//     group3.intersect(group4);
-//     CPPUNIT_ASSERT_EQUAL(group3.size(),size-2);
-//   }
- }
+  //intersect not implemented yet
+  //   if (size>1)
+  //   {
+  //     MPIProcessorGroup group3(comm_interface,0,size-2);
+  //     MPIProcessorGroup group4(comm_interface,1,size-1);
+  //     group3.intersect(group4);
+  //     CPPUNIT_ASSERT_EQUAL(group3.size(),size-2);
+  //   }
+}
 
 void ParaMEDMEMTest::testMPIProcessorGroup_rank()
 {
@@ -135,7 +133,7 @@ void ParaMEDMEMTest::testMPIProcessorGroup_rank()
   MPIProcessorGroup group(comm_interface,0,0);
   MPIProcessorGroup group2(comm_interface,size-1,size-1);
   ProcessorGroup* group_fuse=group2.fuse(group);
-	
+  
   if (group.containsMyRank())
     CPPUNIT_ASSERT_EQUAL (group.myRank(), rank);
 
@@ -145,7 +143,7 @@ void ParaMEDMEMTest::testMPIProcessorGroup_rank()
       if (size==1)
         CPPUNIT_ASSERT_EQUAL(trank,0);
       else  
-			  CPPUNIT_ASSERT_EQUAL(trank,1);
+        CPPUNIT_ASSERT_EQUAL(trank,1);
     }
-	delete group_fuse;
+  delete group_fuse;
 }

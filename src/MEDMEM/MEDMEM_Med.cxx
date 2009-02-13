@@ -59,7 +59,7 @@ object, the other one writing the file.
 */
 MED::MED() {
   MESSAGE_MED("MED::MED()");
-};
+}
 
 /*! \if MEDMEM_ug 
 \addtogroup MED_constructors
@@ -87,7 +87,7 @@ MED::MED(driverTypes driverType, const string & fileName)
   _drivers[current]->close();
 
   END_OF_MED(LOC);
-};
+}
 
 /*!\if MEDMEM_ug @} \endif */
 
@@ -196,7 +196,7 @@ MED::~MED()
 
 
   END_OF_MED(LOC);
-} ;
+} 
 
 /*! \if MEDMEM_ug
 \addtogroup MED_io
@@ -309,7 +309,7 @@ void MED::writeFrom (int index/*=0*/)
                           ); 
   }
   END_OF_MED(LOC);
-}; 
+} 
 
 /*!\if MEDMEM_ug 
 \addtogroup MED_io
@@ -337,7 +337,7 @@ void MED::write (int index/*=0*/)
                                      )
                           ); 
   END_OF_MED(LOC);
-}; 
+} 
 /*!\if MEDMEM_ug @} \endif */
 
 /*!
@@ -395,7 +395,7 @@ void MED::read  (int index/*=0*/)
 			  );  
   END_OF_MED(LOC);
   
-};
+}
 
 // ------- End Of Drivers Management Part
 
@@ -414,7 +414,7 @@ int      MED::getNumberOfMeshes ( void ) const
   BEGIN_OF_MED(LOC);
 
   return _meshes.size();
-};   
+}   
     
 /*!
   Gets the number of FIELD objects.
@@ -425,7 +425,7 @@ int      MED::getNumberOfFields ( void ) const
   BEGIN_OF_MED(LOC);
 
   return _fields.size(); // we get number of field with different name
-};       
+}       
 
 /*!
   Gets the names of all MESH objects.
@@ -453,7 +453,7 @@ void MED::getMeshNames      ( string * meshNames ) const
   }
 
   END_OF_MED(LOC);
-};
+}
 
 /*!
   Gets the names of all MESH objects.
@@ -478,7 +478,7 @@ deque<string> MED::getMeshNames      () const
 
   END_OF_MED(LOC);
   return meshNames ;
-};
+}
 
 
 /*!
@@ -539,7 +539,7 @@ MESH   * MED::getMesh           (const FIELD_ * const field ) const
   END_OF_MED(LOC);
 
   return (*itMeshes).second;
-};
+}
 
 
 /*!
@@ -578,7 +578,7 @@ void MED::getFieldNames     ( string * fieldNames ) const
 
   END_OF_MED(LOC);
 
-};
+}
 
 /*!
   Gets the names of all FIELD objects.
@@ -603,7 +603,7 @@ deque<string> MED::getFieldNames     () const
 
   END_OF_MED(LOC);
   return fieldNames ;
-};
+}
 
 /*!
   Returns a deque<DT_IT_> which contain all iteration step for the FIELD 
@@ -660,7 +660,7 @@ deque<DT_IT_> MED::getFieldIteration (const string & fieldName) const
 
   END_OF_MED(LOC);
   return Iteration ;
-};
+}
 
 /*!
  Returns a reference to the FIELD object named fieldName with 
@@ -705,7 +705,7 @@ FIELD_  * MED::getField          ( const string & fieldName, const int dt=MED_NO
   //return _fields[fieldName][dtIt];
   return (*itMap_dtIt).second;
   
-};
+}
 /*!\if MEDMEM_ug
  @}
  \endif 
@@ -840,7 +840,7 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
                           );
   END_OF_MED(LOC);
   return (*itSupport).second ;
-};
+}
 /*!\if MEDMEM_ug @} \endif */
 
 

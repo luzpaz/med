@@ -1656,7 +1656,7 @@ void MED_MESH_WRONLY_DRIVER21::write(void) const
       
       err = med_2_1::MEDfamCr( _medIdt,
 			      const_cast <char *> ( _meshName.c_str() ),
-			      "FAMILLE_0", 0,
+			      (char*)"FAMILLE_0", 0,
 			      (med_2_1::med_int*)NULL, (med_2_1::med_int*)NULL, (char*)NULL, 0,
 			      (char*)NULL, 0);
       

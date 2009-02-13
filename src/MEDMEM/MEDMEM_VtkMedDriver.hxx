@@ -79,7 +79,7 @@ private :
   void writeField(FIELD_ * myField,string name) const ;
 
 };
-};
+}
 
 
 #endif /* VTK_MED_DRIVER_HXX */

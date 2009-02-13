@@ -259,7 +259,7 @@ private:
   GENDRIVER * copy(void) const ;
 
 };
-};
+}
 
 
 #endif /* PORFLOW_MESH_DRIVER_HXX */

@@ -105,7 +105,7 @@ namespace MEDMEM {
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION() throw (MEDEXCEPTION) :
     _typeGeo(MED_EN::MED_NONE), _nGauss(-1),
     _interlacingType( SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType) 
-  {};
+  {}
 
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION(const string & locName,
 											   const MED_EN::medGeometryElement typeGeo,
@@ -134,7 +134,7 @@ namespace MEDMEM {
 				     << _nGauss ));
 
   END_OF_MED(LOC);
-  };
+  }
 
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION
              (const string & locName,
@@ -165,7 +165,7 @@ namespace MEDMEM {
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
 				     << _nGauss ));
   END_OF_MED(LOC);
-  };
+  }
 
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG> &
   GAUSS_LOCALIZATION<INTERLACING_TAG>::operator=(const GAUSS_LOCALIZATION & gaussLoc)

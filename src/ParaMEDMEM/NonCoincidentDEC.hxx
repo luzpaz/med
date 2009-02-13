@@ -16,18 +16,18 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef NONCOINCIDENTDEC_HXX_
-#define NONCOINCIDENTDEC_HXX_
+#ifndef __NONCOINCIDENTDEC_HXX__
+#define __NONCOINCIDENTDEC_HXX__
+
+#include "DEC.hxx"
 
 struct _fvm_locator_t;
 
 typedef enum {NN} InterpolationMethod;
 
 namespace ParaMEDMEM
-{
-  class DEC;
-    
-  class NonCoincidentDEC:public DEC
+{   
+  class NonCoincidentDEC : public DEC
   {
     public:  
     NonCoincidentDEC();
@@ -41,11 +41,10 @@ namespace ParaMEDMEM
 
     void sendData();
     
-    void prepareSourceDE(){};
-    void prepareTargetDE(){};
+    void prepareSourceDE() { }
+    void prepareTargetDE() { }
     
-    void setInterpolationMethod(InterpolationMethod method)
-    {_method=method;}
+    void setInterpolationMethod(InterpolationMethod method) { _method=method; }
     
     private :
     // Structure for computing the localization

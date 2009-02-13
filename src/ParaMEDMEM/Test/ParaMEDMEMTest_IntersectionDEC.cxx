@@ -19,7 +19,6 @@
 #include "ParaMEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
-#include "MEDMEM_Exception.hxx"
 #include "CommInterface.hxx"
 #include "ProcessorGroup.hxx"
 #include "MPIProcessorGroup.hxx"
@@ -29,8 +28,8 @@
 #include "IntersectionDEC.hxx"
 #include "ParaMESH.hxx"
 #include "ParaFIELD.hxx"
-#include "UnstructuredParaSUPPORT.hxx"
 #include "ICoCoMEDField.hxx"
+#include "MEDLoader.hxx"
  
 #include <string>
 
@@ -43,27 +42,38 @@
 
 using namespace std;
 using namespace ParaMEDMEM;
-using namespace MEDMEM;
- 
-/*
- * Check methods defined in IntersectionDEC.hxx
- *
-    IntersectionDEC();
-    IntersectionDEC(ProcessorGroup& local_group, ProcessorGroup& distant_group);
-    virtual ~IntersectionDEC();
-    void synchronize();
-    void recvData();
-    void sendData();
- */
  
 void ParaMEDMEMTest::testIntersectionDEC_2D()
 {
+  testIntersectionDEC_2D_("P0","P0");
+}
+
+void ParaMEDMEMTest::testIntersectionDEC_2DP0P1()
+{
+  //testIntersectionDEC_2D_("P0","P1");
+}
+
+/*
+ * Check methods defined in IntersectionDEC.hxx
+ *
+ IntersectionDEC();
+ IntersectionDEC(ProcessorGroup& local_group, ProcessorGroup& distant_group);
+ virtual ~IntersectionDEC();
+ void synchronize();
+ void recvData();
+ void sendData();
+*/
+ 
+void ParaMEDMEMTest::testIntersectionDEC_2D_(const char *srcMeth, const char *targetMeth)
+{
+  std::string srcM(srcMeth);
+  std::string targetM(targetMeth);
   int size;
   int rank;
   MPI_Comm_size(MPI_COMM_WORLD,&size);
   MPI_Comm_rank(MPI_COMM_WORLD,&rank);
- 
- //the test is meant to run on five processors
+
+  //the test is meant to run on five processors
   if (size !=5) return ;
    
   int nproc_source = 3;
@@ -87,12 +97,9 @@ void ParaMEDMEMTest::testIntersectionDEC_2D()
 
   ParaMEDMEM::IntersectionDEC dec (*source_group,*target_group);
 
-  MEDMEM::MESH* mesh;
-  MEDMEM::SUPPORT* support;
+  ParaMEDMEM::MEDCouplingUMesh* mesh;
   ParaMEDMEM::ParaMESH* paramesh;
   ParaMEDMEM::ParaFIELD* parafield;
-  ParaMEDMEM::ParaSUPPORT* parasupport;
-  double * value;
   ICoCo::Field* icocofield ;
   
   string data_dir                   = getenv("MED_ROOT_DIR");
@@ -117,27 +124,30 @@ void ParaMEDMEMTest::testIntersectionDEC_2D()
       ostringstream meshname ;
       meshname<< "Mesh_2_"<< rank+1;
       
-       CPPUNIT_ASSERT_NO_THROW(mesh = new MESH(MED_DRIVER,strstream.str(),meshname.str()));
-      support=new MEDMEM::SUPPORT(mesh,"all elements",MED_EN::MED_CELL);
-    
-      paramesh=new ParaMESH (*mesh,*source_group,"source mesh");
-    
-//      ParaMEDMEM::ParaSUPPORT* parasupport=new UnstructuredParaSUPPORT( support,*source_group);
-      parasupport=new UnstructuredParaSUPPORT( support,*source_group);
-      ParaMEDMEM::ComponentTopology comptopo;
-      parafield = new ParaFIELD(parasupport, comptopo);
-
+      mesh=MEDLoader::ReadUMeshFromFile(strstream.str().c_str(),meshname.str().c_str(),0);
       
-			int nb_local=support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-//      double * value= new double[nb_local];
-      value= new double[nb_local];
+    
+      paramesh=new ParaMESH (mesh,*source_group,"source mesh");
+    
+      //      ParaMEDMEM::ParaSUPPORT* parasupport=new UnstructuredParaSUPPORT( support,*source_group);
+      ParaMEDMEM::ComponentTopology comptopo;
+      if(srcM=="P0")
+        parafield = new ParaFIELD(ON_CELLS,paramesh, comptopo);
+      else
+        parafield = new ParaFIELD(ON_NODES,paramesh, comptopo);
+      int nb_local;
+      if(srcM=="P0")
+        nb_local=mesh->getNumberOfCells();
+      else
+        nb_local=mesh->getNumberOfNodes();
+      //      double * value= new double[nb_local];
+      double *value=parafield->getField()->getArray()->getPointer();
       for(int ielem=0; ielem<nb_local;ielem++)
         value[ielem]=1.0;
-      parafield->getField()->setValue(value);
     
-//      ICoCo::Field* icocofield=new ICoCo::MEDField(paramesh,parafield);
+      //      ICoCo::Field* icocofield=new ICoCo::MEDField(paramesh,parafield);
       icocofield=new ICoCo::MEDField(paramesh,parafield);
-     
+      dec.setMethod(srcMeth);
       dec.attachLocalField(icocofield);
     }
   
@@ -146,29 +156,30 @@ void ParaMEDMEMTest::testIntersectionDEC_2D()
     {
       string master= filename_xml2;
       ostringstream strstream;
-            strstream << master<<(rank-nproc_source+1)<<".med";
+      strstream << master<<(rank-nproc_source+1)<<".med";
       ostringstream meshname ;
-            meshname<< "Mesh_3_"<<rank-nproc_source+1;
+      meshname<< "Mesh_3_"<<rank-nproc_source+1;
+      mesh = MEDLoader::ReadUMeshFromFile(strstream.str().c_str(),meshname.str().c_str(),0);
       
-      CPPUNIT_ASSERT_NO_THROW(mesh = new MESH(MED_DRIVER,strstream.str(),meshname.str()));
-      support=new MEDMEM::SUPPORT(mesh,"all elements",MED_EN::MED_CELL);
-      
-      paramesh=new ParaMESH (*mesh,*target_group,"target mesh");
-//      ParaMEDMEM::ParaSUPPORT* parasupport=new UnstructuredParaSUPPORT(support,*target_group);
-      parasupport=new UnstructuredParaSUPPORT(support,*target_group);
+      paramesh=new ParaMESH (mesh,*target_group,"target mesh");
+      //      ParaMEDMEM::ParaSUPPORT* parasupport=new UnstructuredParaSUPPORT(support,*target_group);
       ParaMEDMEM::ComponentTopology comptopo;
-      parafield = new ParaFIELD(parasupport, comptopo);
-
-			
-			int nb_local=support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-//      double * value= new double[nb_local];
-      value= new double[nb_local];
+      if(targetM=="P0")
+        parafield = new ParaFIELD(ON_CELLS,paramesh, comptopo);
+      else
+        parafield = new ParaFIELD(ON_NODES,paramesh, comptopo);
+      int nb_local;
+      if(targetM=="P0")
+        nb_local=mesh->getNumberOfCells();
+      else
+        nb_local=mesh->getNumberOfNodes();
+      //      double * value= new double[nb_local];
+      double *value=parafield->getField()->getArray()->getPointer();
       for(int ielem=0; ielem<nb_local;ielem++)
         value[ielem]=0.0;
-      parafield->getField()->setValue(value);
-//      ICoCo::Field* icocofield=new ICoCo::MEDField(paramesh,parafield);
+      //      ICoCo::Field* icocofield=new ICoCo::MEDField(paramesh,parafield);
       icocofield=new ICoCo::MEDField(paramesh,parafield);
-      
+      dec.setMethod(targetMeth);
       dec.attachLocalField(icocofield);
     }
     
@@ -179,38 +190,38 @@ void ParaMEDMEMTest::testIntersectionDEC_2D()
   
   if (source_group->containsMyRank())
     { 
-      field_before_int = parafield->getVolumeIntegral(1);
+      field_before_int = parafield->getVolumeIntegral(0);
       dec.synchronize();
       cout<<"DEC usage"<<endl;
       dec.setForcedRenormalization(false);
 
       dec.sendData();
-      paramesh->write(MED_DRIVER,"./sourcesquareb");
+      MEDLoader::writeParaMesh("./sourcesquareb",paramesh);
       if (source_group->myRank()==0)
         aRemover.Register("./sourcesquareb");
       ostringstream filename;
       filename<<"./sourcesquareb_"<<source_group->myRank()+1;
       aRemover.Register(filename.str().c_str());
-      parafield->write(MED_DRIVER,"./sourcesquareb","boundary");  
+      MEDLoader::writeParaField("./sourcesquareb","boundary",parafield);
    
       dec.recvData();
       cout <<"writing"<<endl;
-      paramesh->write(MED_DRIVER,"./sourcesquare");
+      MEDLoader::writeParaMesh("./sourcesquare",paramesh);
       if (source_group->myRank()==0)
         aRemover.Register("./sourcesquare");
-      parafield->write(MED_DRIVER,"./sourcesquare","boundary");
+      MEDLoader::writeParaField("./sourcesquare","boundary",parafield);
       
      
       filename<<"./sourcesquare_"<<source_group->myRank()+1;
       aRemover.Register(filename.str().c_str());
-      field_after_int = parafield->getVolumeIntegral(1);
-			
-			
- //      MPI_Bcast(&field_before_int,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-//       MPI_Bcast(&field_after_int,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+      field_after_int = parafield->getVolumeIntegral(0);
+      
+      
+      //      MPI_Bcast(&field_before_int,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+      //       MPI_Bcast(&field_after_int,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
 
-	CPPUNIT_ASSERT_DOUBLES_EQUAL(field_before_int, field_after_int, 1e-6);
-		
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(field_before_int, field_after_int, 1e-6);
+    
     }
   
   //attaching a DEC to the target group
@@ -220,39 +231,38 @@ void ParaMEDMEMTest::testIntersectionDEC_2D()
       dec.setForcedRenormalization(false);
 
       dec.recvData();
-      paramesh->write(MED_DRIVER, "./targetsquareb");
-      parafield->write(MED_DRIVER, "./targetsquareb", "boundary");
-       if (target_group->myRank()==0)
+      MEDLoader::writeParaMesh("./targetsquareb",paramesh);
+      MEDLoader::writeParaField("./targetsquareb", "boundary",parafield);
+      if (target_group->myRank()==0)
         aRemover.Register("./targetsquareb");
       ostringstream filename;
       filename<<"./targetsquareb_"<<target_group->myRank()+1;
       aRemover.Register(filename.str().c_str());
       dec.sendData();
-      paramesh->write(MED_DRIVER, "./targetsquare");
-      parafield->write(MED_DRIVER, "./targetsquare", "boundary");
-			if (target_group->myRank()==0)
+      MEDLoader::writeParaMesh("./targetsquare",paramesh);
+      MEDLoader::writeParaField("./targetsquare", "boundary",parafield);
+      
+      if (target_group->myRank()==0)
         aRemover.Register("./targetsquareb");
       
       filename<<"./targetsquareb_"<<target_group->myRank()+1;
       aRemover.Register(filename.str().c_str());
-			//		double field_before_int, field_after_int;
-// 			MPI_Bcast(&field_before_int,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-//       MPI_Bcast(&field_after_int,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-			
-//			CPPUNIT_ASSERT_DOUBLES_EQUAL(field_before_int, field_after_int, 1e-6);
-		
+      //    double field_before_int, field_after_int;
+      //       MPI_Bcast(&field_before_int,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+      //       MPI_Bcast(&field_after_int,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+      
+      //      CPPUNIT_ASSERT_DOUBLES_EQUAL(field_before_int, field_after_int, 1e-6);
+    
     }
   
-   delete source_group;
+  delete source_group;
   delete target_group;
   delete self_group;
-  delete mesh;
+  delete parafield;
   delete paramesh;
-	delete parafield;
-  delete parasupport;
-  delete [] value;
+  mesh->decrRef();
+
   delete icocofield;
-  delete support;
 
   MPI_Barrier(MPI_COMM_WORLD);
   cout << "end of IntersectionDEC_2D test"<<endl;
@@ -261,57 +271,57 @@ void ParaMEDMEMTest::testIntersectionDEC_2D()
 //Synchronous tests without interpolation with native mode (AllToAll(v) from lam/MPI:
 void ParaMEDMEMTest::testSynchronousEqualIntersectionWithoutInterpNativeDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.1,1,0.1,1,false,false,false);
+  testAsynchronousIntersectionDEC_2D(0.1,1,0.1,1,false,false,false,"P0","P0");
 }
 
 //Synchronous tests without interpolation :
 void ParaMEDMEMTest::testSynchronousEqualIntersectionWithoutInterpDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.1,1,0.1,1,true,false,false);
+  testAsynchronousIntersectionDEC_2D(0.1,1,0.1,1,true,false,false,"P0","P0");
 }
 
 //Synchronous tests with interpolation :
 void ParaMEDMEMTest::testSynchronousEqualIntersectionDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.1,1,0.1,1,true,false,true);
+  testAsynchronousIntersectionDEC_2D(0.1,1,0.1,1,true,false,true,"P0","P0");
 }
 void ParaMEDMEMTest::testSynchronousFasterSourceIntersectionDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.09,1,0.1,1,true,false,true);
+  testAsynchronousIntersectionDEC_2D(0.09,1,0.1,1,true,false,true,"P0","P0");
 }
 void ParaMEDMEMTest::testSynchronousSlowerSourceIntersectionDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.11,1,0.1,1,true,false,true);
+  testAsynchronousIntersectionDEC_2D(0.11,1,0.1,1,true,false,true,"P0","P0");
 }
 void ParaMEDMEMTest::testSynchronousSlowSourceIntersectionDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.11,1,0.01,1,true,false,true);
+  testAsynchronousIntersectionDEC_2D(0.11,1,0.01,1,true,false,true,"P0","P0");
 }
 void ParaMEDMEMTest::testSynchronousFastSourceIntersectionDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.01,1,0.11,1,true,false,true);
+  testAsynchronousIntersectionDEC_2D(0.01,1,0.11,1,true,false,true,"P0","P0");
 }
 
 //Asynchronous tests with interpolation :
 void ParaMEDMEMTest::testAsynchronousEqualIntersectionDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.1,1,0.1,1,true,true,true);
+  testAsynchronousIntersectionDEC_2D(0.1,1,0.1,1,true,true,true,"P0","P0");
 }
 void ParaMEDMEMTest::testAsynchronousFasterSourceIntersectionDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.09,1,0.1,1,true,true,true);
+  testAsynchronousIntersectionDEC_2D(0.09,1,0.1,1,true,true,true,"P0","P0");
 }
 void ParaMEDMEMTest::testAsynchronousSlowerSourceIntersectionDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.11,1,0.1,1,true,true,true);
+  testAsynchronousIntersectionDEC_2D(0.11,1,0.1,1,true,true,true,"P0","P0");
 }
 void ParaMEDMEMTest::testAsynchronousSlowSourceIntersectionDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.11,1,0.01,1,true,true,true);
+  testAsynchronousIntersectionDEC_2D(0.11,1,0.01,1,true,true,true,"P0","P0");
 }
 void ParaMEDMEMTest::testAsynchronousFastSourceIntersectionDEC_2D()
 {
-	testAsynchronousIntersectionDEC_2D(0.01,1,0.11,1,true,true,true);
+  testAsynchronousIntersectionDEC_2D(0.01,1,0.11,1,true,true,true,"P0","P0");
 }
 
 /*!
@@ -320,15 +330,17 @@ void ParaMEDMEMTest::testAsynchronousFastSourceIntersectionDEC_2D()
  * the other one receives with dtB as an interval, the max time being tmaxB
  */
 void ParaMEDMEMTest::testAsynchronousIntersectionDEC_2D(double dtA, double tmaxA, 
-									  double dtB, double tmaxB, bool WithPointToPoint, bool Asynchronous,
-                    bool WithInterp )
+                                                        double dtB, double tmaxB, bool WithPointToPoint, bool Asynchronous,
+                                                        bool WithInterp, const char *srcMeth, const char *targetMeth)
 {
+  std::string srcM(srcMeth);
+  std::string targetM(targetMeth);
   int size;
   int rank;
   MPI_Comm_size(MPI_COMM_WORLD,&size);
   MPI_Comm_rank(MPI_COMM_WORLD,&rank);
  
- //the test is meant to run on five processors
+  //the test is meant to run on five processors
   if (size !=5) return ;
    
   int nproc_source = 3;
@@ -351,13 +363,10 @@ void ParaMEDMEMTest::testAsynchronousIntersectionDEC_2D(double dtA, double tmaxA
   //loading the geometry for the source group
 
   ParaMEDMEM::IntersectionDEC dec (*source_group,*target_group);
-
-  MEDMEM::MESH* mesh;
-  MEDMEM::SUPPORT* support;
-//  MEDMEM::FIELD<double>* field;
+  
+  ParaMEDMEM::MEDCouplingUMesh* mesh;
   ParaMEDMEM::ParaMESH* paramesh;
   ParaMEDMEM::ParaFIELD* parafield;
-  ParaMEDMEM::ParaSUPPORT* parasupport ;
   
   double * value ;
   ICoCo::Field* icocofield ;
@@ -385,25 +394,28 @@ void ParaMEDMEMTest::testAsynchronousIntersectionDEC_2D(double dtA, double tmaxA
       ostringstream meshname ;
       meshname<< "Mesh_2_"<< rank+1;
       
-       CPPUNIT_ASSERT_NO_THROW(mesh = new MESH(MED_DRIVER,strstream.str(),meshname.str()));
-      support=new MEDMEM::SUPPORT(mesh,"all elements",MED_EN::MED_CELL);
+      mesh=MEDLoader::ReadUMeshFromFile(strstream.str().c_str(),meshname.str().c_str(),0);
     
-      paramesh=new ParaMESH (*mesh,*source_group,"source mesh");
+      paramesh=new ParaMESH (mesh,*source_group,"source mesh");
     
-//      ParaMEDMEM::ParaSUPPORT* parasupport=new UnstructuredParaSUPPORT( support,*source_group);
-      parasupport=new UnstructuredParaSUPPORT( support,*source_group);
+      //      ParaMEDMEM::ParaSUPPORT* parasupport=new UnstructuredParaSUPPORT( support,*source_group);
       ParaMEDMEM::ComponentTopology comptopo;
-      parafield = new ParaFIELD(parasupport, comptopo);
+      if(srcM=="P0")
+        parafield = new ParaFIELD(ON_CELLS,paramesh, comptopo);
+      else
+        parafield = new ParaFIELD(ON_NODES,paramesh, comptopo);
 
-      
-			int nb_local=support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-//      double * value= new double[nb_local];
-      value = new double[nb_local];
+      int nb_local;
+      if(srcM=="P0")
+        nb_local=mesh->getNumberOfCells();
+      else
+        nb_local=mesh->getNumberOfNodes();
+      //      double * value= new double[nb_local];
+      double *value=parafield->getField()->getArray()->getPointer();
       for(int ielem=0; ielem<nb_local;ielem++)
         value[ielem]=0.0;
-      parafield->getField()->setValue(value);
     
-//      ICoCo::Field* icocofield=new ICoCo::MEDField(paramesh,parafield);
+      //      ICoCo::Field* icocofield=new ICoCo::MEDField(paramesh,parafield);
       icocofield=new ICoCo::MEDField(paramesh,parafield);
      
       dec.attachLocalField(icocofield);
@@ -416,27 +428,30 @@ void ParaMEDMEMTest::testAsynchronousIntersectionDEC_2D(double dtA, double tmaxA
     {
       string master= filename_xml2;
       ostringstream strstream;
-            strstream << master<<(rank-nproc_source+1)<<".med";
+      strstream << master<<(rank-nproc_source+1)<<".med";
       ostringstream meshname ;
-            meshname<< "Mesh_3_"<<rank-nproc_source+1;
+      meshname<< "Mesh_3_"<<rank-nproc_source+1;
       
-      CPPUNIT_ASSERT_NO_THROW(mesh = new MESH(MED_DRIVER,strstream.str(),meshname.str()));
-      support=new MEDMEM::SUPPORT(mesh,"all elements",MED_EN::MED_CELL);
+      mesh = MEDLoader::ReadUMeshFromFile(strstream.str().c_str(),meshname.str().c_str(),0);
       
-      paramesh=new ParaMESH (*mesh,*target_group,"target mesh");
-//      ParaMEDMEM::ParaSUPPORT* parasupport=new UnstructuredParaSUPPORT(support,*target_group);
-      parasupport=new UnstructuredParaSUPPORT(support,*target_group);
+      paramesh=new ParaMESH (mesh,*target_group,"target mesh");
+      //      ParaMEDMEM::ParaSUPPORT* parasupport=new UnstructuredParaSUPPORT(support,*target_group);
       ParaMEDMEM::ComponentTopology comptopo;
-      parafield = new ParaFIELD(parasupport, comptopo);
-
-			
-			int nb_local=support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-//      double * value= new double[nb_local];
-      value = new double[nb_local];
+      if(targetM=="P0")
+        parafield = new ParaFIELD(ON_CELLS,paramesh, comptopo);
+      else
+        parafield = new ParaFIELD(ON_NODES,paramesh, comptopo);
+      
+      int nb_local;
+      if(targetM=="P0")
+        nb_local=mesh->getNumberOfCells();
+      else
+        nb_local=mesh->getNumberOfNodes();
+                        
+      double *value=parafield->getField()->getArray()->getPointer();
       for(int ielem=0; ielem<nb_local;ielem++)
         value[ielem]=0.0;
-      parafield->getField()->setValue(value);
-//      ICoCo::Field* icocofield=new ICoCo::MEDField(paramesh,parafield);
+      //      ICoCo::Field* icocofield=new ICoCo::MEDField(paramesh,parafield);
       icocofield=new ICoCo::MEDField(paramesh,parafield);
       
       dec.attachLocalField(icocofield);
@@ -461,22 +476,22 @@ void ParaMEDMEMTest::testAsynchronousIntersectionDEC_2D(double dtA, double tmaxA
       dec.synchronize();
       dec.setForcedRenormalization(false);
       for (double time=0; time<tmaxA+1e-10; time+=dtA)
-      {
-        cout << "testAsynchronousIntersectionDEC_2D" << rank << " time " << time
-             << " dtA " << dtA << " tmaxA " << tmaxA << endl ;
-        if ( time+dtA < tmaxA+1e-7 ) {
-    	    dec.sendData( time , dtA );
-        }
-        else {
-    	    dec.sendData( time , 0 );
-        }
-    	  double* value = const_cast<double*> (parafield->getField()->getValue());
-    	  int nb_local=parafield->getField()->getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-    	  for (int i=0; i<nb_local;i++)
-    		  value[i]= time+dtA;
+        {
+          cout << "testAsynchronousIntersectionDEC_2D" << rank << " time " << time
+               << " dtA " << dtA << " tmaxA " << tmaxA << endl ;
+          if ( time+dtA < tmaxA+1e-7 ) {
+            dec.sendData( time , dtA );
+          }
+          else {
+            dec.sendData( time , 0 );
+          }
+          double* value = parafield->getField()->getArray()->getPointer();
+          int nb_local=parafield->getField()->getMesh()->getNumberOfCells();
+          for (int i=0; i<nb_local;i++)
+            value[i]= time+dtA;
 
-    	 
-      }
+       
+        }
     }
   
   //attaching a DEC to the target group
@@ -497,33 +512,30 @@ void ParaMEDMEMTest::testAsynchronousIntersectionDEC_2D(double dtA, double tmaxA
       dec.setForcedRenormalization(false);
       vector<double> times;
       for (double time=0; time<tmaxB+1e-10; time+=dtB)
-      {
+        {
           cout << "testAsynchronousIntersectionDEC_2D" << rank << " time " << time
                << " dtB " << dtB << " tmaxB " << tmaxB << endl ;
-      	  dec.recvData( time );
-					double vi = parafield->getVolumeIntegral(1);
-					          cout << "testAsynchronousIntersectionDEC_2D" << rank << " time " << time
+          dec.recvData( time );
+          double vi = parafield->getVolumeIntegral(0);
+          cout << "testAsynchronousIntersectionDEC_2D" << rank << " time " << time
                << " VolumeIntegral " << vi
                << " time*10000 " << time*10000 << endl ;
-					
-								CPPUNIT_ASSERT_DOUBLES_EQUAL(vi,time*10000,0.001);
-      }
+          
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(vi,time*10000,0.001);
+        }
       
     }
   
   delete source_group;
   delete target_group;
   delete self_group;
-  delete mesh ;
-  delete paramesh ;
   delete parafield ;
-  delete parasupport ;
-  delete [] value ;
+  delete paramesh ;
+  mesh->decrRef() ;
   delete icocofield ;
-  delete support ;
 
   cout << "testAsynchronousIntersectionDEC_2D" << rank << " MPI_Barrier " << endl ;
  
-	if (Asynchronous) MPI_Barrier(MPI_COMM_WORLD);
+  if (Asynchronous) MPI_Barrier(MPI_COMM_WORLD);
   cout << "end of IntersectionDEC_2D test"<<endl;
 }

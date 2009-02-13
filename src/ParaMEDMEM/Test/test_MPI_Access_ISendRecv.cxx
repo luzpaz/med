@@ -16,11 +16,11 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#include <mpi.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <iostream>
+#include <mpi.h>
 
 #include "MPIAccessTest.hxx"
 #include <cppunit/TestAssert.h>
@@ -28,7 +28,7 @@
 //#include "CommInterface.hxx"
 //#include "ProcessorGroup.hxx"
 //#include "MPIProcessorGroup.hxx"
-#include "MPI_Access.hxx"
+#include "MPIAccess.hxx"
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 #define ENABLE_FAULTS
@@ -61,10 +61,10 @@ void MPIAccessTest::test_MPI_Access_ISendRecv() {
 
   ParaMEDMEM::MPIProcessorGroup* group = new ParaMEDMEM::MPIProcessorGroup(interface) ;
 
-  ParaMEDMEM::MPI_Access mpi_access( group ) ;
+  ParaMEDMEM::MPIAccess mpi_access( group ) ;
 
   if ( myrank >= 2 ) {
-    mpi_access.Barrier() ;
+    mpi_access.barrier() ;
     delete group ;
     return ;
   }
@@ -81,12 +81,12 @@ void MPIAccessTest::test_MPI_Access_ISendRecv() {
      sts = mpi_access.ISendRecv(&sendbuf[i],1,MPI_INT,target, SendRequestId[i],
                                 &recvbuf[i],1,MPI_INT,target, RecvRequestId[i]) ;
      cout << "test" << myrank << " Send sendRequestId " << SendRequestId[i]
-          << " tag " << mpi_access.SendMPITag(target)
+          << " tag " << mpi_access.sendMPITag(target)
           << " recvRequestId " << RecvRequestId[i]
-          << " tag " << mpi_access.RecvMPITag(target) << endl ;
+          << " tag " << mpi_access.recvMPITag(target) << endl ;
      char msgerr[MPI_MAX_ERROR_STRING] ;
      int lenerr ;
-     mpi_access.Error_String(sts, msgerr, &lenerr) ;
+     mpi_access.errorString(sts, msgerr, &lenerr) ;
      cout << "test" << myrank << " lenerr " << lenerr
           << " " << msgerr << endl ;
 
@@ -105,23 +105,23 @@ void MPIAccessTest::test_MPI_Access_ISendRecv() {
         if ( j < i ) {
           cout << "test" << myrank << " " << j << " -> Test-Send("<< SendRequestId[j]
                << ")" << endl ;
-          mpi_access.Test( SendRequestId[j], flag ) ;
+          mpi_access.test( SendRequestId[j], flag ) ;
           if ( flag ) {
             int target, tag, error, outcount ;
-              mpi_access.Status( SendRequestId[j], target, tag, error, outcount,
+              mpi_access.status( SendRequestId[j], target, tag, error, outcount,
                                  true ) ;
               cout << "test" << myrank << " Send RequestId " << SendRequestId[j]
                    << " target " << target << " tag " << tag << " error " << error
                    << endl ;
-            mpi_access.DeleteRequest( SendRequestId[j] ) ;
+            mpi_access.deleteRequest( SendRequestId[j] ) ;
           }
         }
         cout << "test" << myrank << " " << j << " -> Test-Recv("<< SendRequestId[j]
              << ")" << endl ;
-        mpi_access.Test( RecvRequestId[j], flag ) ;
+        mpi_access.test( RecvRequestId[j], flag ) ;
         if ( flag ) {
           int source, tag, error, outcount ;
-          mpi_access.Status( RecvRequestId[j], source, tag, error, outcount,
+          mpi_access.status( RecvRequestId[j], source, tag, error, outcount,
                              true ) ;
           cout << "test" << myrank << " Recv RequestId" << j << " "
                << RecvRequestId[j] << " source " << source << " tag " << tag
@@ -138,17 +138,17 @@ void MPIAccessTest::test_MPI_Access_ISendRecv() {
           }
         }
      }
-     mpi_access.Error_String(sts, msgerr, &lenerr) ;
+     mpi_access.errorString(sts, msgerr, &lenerr) ;
      cout << "test" << myrank << " lenerr " << lenerr << " "
           << msgerr << endl ;
-     mpi_access.Check() ;
+     mpi_access.check() ;
   }
 
   int flag ;
-  mpi_access.TestAll(10,SendRequestId,flag) ;
-  mpi_access.WaitAll(10,SendRequestId) ;
-  mpi_access.DeleteRequests(10,SendRequestId) ;
-  mpi_access.TestAll(10,SendRequestId,flag) ;
+  mpi_access.testAll(10,SendRequestId,flag) ;
+  mpi_access.waitAll(10,SendRequestId) ;
+  mpi_access.deleteRequests(10,SendRequestId) ;
+  mpi_access.testAll(10,SendRequestId,flag) ;
   if ( !flag ) {
     ostringstream strstream ;
     strstream << "test" << myrank << " flag " << flag << " KO" << endl ;
@@ -156,20 +156,20 @@ void MPIAccessTest::test_MPI_Access_ISendRecv() {
     CPPUNIT_FAIL( strstream.str() ) ;
   }
 
-  mpi_access.TestAll(10,RecvRequestId,flag) ;
-  mpi_access.WaitAll(10,RecvRequestId) ;
-  mpi_access.DeleteRequests(10,RecvRequestId) ;
-  mpi_access.TestAll(10,RecvRequestId,flag) ;
+  mpi_access.testAll(10,RecvRequestId,flag) ;
+  mpi_access.waitAll(10,RecvRequestId) ;
+  mpi_access.deleteRequests(10,RecvRequestId) ;
+  mpi_access.testAll(10,RecvRequestId,flag) ;
   if ( !flag ) {
     ostringstream strstream ;
     strstream << "test" << myrank << " flag " << flag << " KO" << endl ;
     cout << strstream.str() << endl ;
     CPPUNIT_FAIL( strstream.str() ) ;
   }
-  mpi_access.Check() ;
+  mpi_access.check() ;
 
   int sendrequests[10] ;
-  int sendreqsize = mpi_access.SendRequestIds( target , 10 , sendrequests ) ;
+  int sendreqsize = mpi_access.sendRequestIds( target , 10 , sendrequests ) ;
   if ( sendreqsize != 0 ) {
     ostringstream strstream ;
     strstream << "=========================================================" << endl
@@ -184,7 +184,7 @@ void MPIAccessTest::test_MPI_Access_ISendRecv() {
          << "=========================================================" << endl ;
   }
   int recvrequests[10] ;
-  int recvreqsize = mpi_access.SendRequestIds( target , 10 , recvrequests ) ;
+  int recvreqsize = mpi_access.sendRequestIds( target , 10 , recvrequests ) ;
   if ( recvreqsize != 0 ) {
     ostringstream strstream ;
     strstream << "=========================================================" << endl
@@ -199,7 +199,7 @@ void MPIAccessTest::test_MPI_Access_ISendRecv() {
          << "=========================================================" << endl ;
   }
 
-  mpi_access.Barrier() ;
+  mpi_access.barrier() ;
 
   delete group ;
 

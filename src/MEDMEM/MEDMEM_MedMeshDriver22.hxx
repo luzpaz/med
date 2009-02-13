@@ -230,6 +230,6 @@ private:
   GENDRIVER * copy(void) const ;
 
 };
-};
+}
 
 #endif /* MED_MESH_DRIVER22_HXX */

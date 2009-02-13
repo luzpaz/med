@@ -47,7 +47,7 @@ namespace MED
 
     static std::string GetPrefix();
   };
-};
+}
 
 #ifdef _DEBUG_
   #define MSG(deb,msg) if(deb) std::cout<<MED::PrefixPrinter::GetPrefix()<<msg<<" ("<<__FILE__<<" ["<<__LINE__<<"])\n"

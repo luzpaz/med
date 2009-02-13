@@ -180,4 +180,4 @@ autoconf
 #   Makefile.in (from Makefile.am)
 echo "====================================================== automake"
 
-automake --copy --gnu --add-missing
+automake --copy --gnu --add-missing --warnings=no-portability

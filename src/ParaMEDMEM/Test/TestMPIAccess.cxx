@@ -16,8 +16,9 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // --- include all MPIAccess Test
-//
+
 #include "MPIAccessTest.hxx"
 
 // --- Registers the fixture into the 'registry'

@@ -16,45 +16,30 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef UNSTRUCTUREDPARASUPPORT_HXX_
-#define UNSTRUCTUREDPARASUPPORT_HXX_
+#ifndef __PARAMEDMEM_MEDCOUPLINGMESH_HXX__
+#define __PARAMEDMEM_MEDCOUPLINGMESH_HXX__
 
-#include "ParaSUPPORT.hxx"
-#include "MEDMEM_define.hxx"
-#include "Topology.hxx"
-#include "ExplicitTopology.hxx"
-
-using namespace MED_EN;
-namespace MEDMEM
-{
-	class SUPPORT;
-}
+#include "RefCountObject.hxx"
+#include "InterpKernelException.hxx"
 
 namespace ParaMEDMEM
 {
-  class Topology;
-  class ExplicitTopology;
-  class ParaMESH;
-  
-
-  class UnstructuredParaSUPPORT:public ParaSUPPORT
+  class MEDCouplingMesh : public RefCountObject
   {
   public:
-    
-    UnstructuredParaSUPPORT(const ParaMESH* const mesh, const MEDMEM::SUPPORT* support );
-    UnstructuredParaSUPPORT(const MEDMEM::SUPPORT* support , const ProcessorGroup& group);
-    
-    UnstructuredParaSUPPORT(const ParaMESH* const mesh, const MED_EN::medEntityMesh entity);
-    virtual ~UnstructuredParaSUPPORT(); 
-    const Topology* getTopology() const
-      {return _explicit_topology;}
-
+    void setName(const char *name) { _name=name; }
+    const char *getName() const { return _name.c_str(); }
+    virtual void checkCoherency() const throw(INTERP_KERNEL::Exception) = 0;
+    virtual bool isStructured() const = 0;
+    virtual int getNumberOfCells() const = 0;
+    virtual int getNumberOfNodes() const = 0;
+    virtual int getSpaceDimension() const = 0;
+    virtual int getMeshDimension() const = 0;
+  protected:
+    virtual ~MEDCouplingMesh() { }
   private:
-    const Topology*  _explicit_topology;
-    const MED_EN::medEntityMesh _entity;
-
-	
+    std::string _name;
   };
-  
 }
-#endif /*STRUCTUREDPARASUPPORT_HXX_*/
+
+#endif

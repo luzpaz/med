@@ -46,7 +46,7 @@ endif
 endif
 
 if MED_ENABLE_KERNEL
-  SUBDIRS+= $(MULTIPR_DIR) MEDMEM_I MED MedCorba_Swig MED_SWIG # MedClient
+  SUBDIRS+= $(MULTIPR_DIR) MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
 endif
 
 if MED_ENABLE_GUI

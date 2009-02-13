@@ -90,6 +90,6 @@ namespace MEDMEM {
       return *this ;
     }
   } ;
-} ;
+} 
 
 # endif

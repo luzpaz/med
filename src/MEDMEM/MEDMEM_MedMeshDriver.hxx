@@ -317,6 +317,6 @@ protected:
   GENDRIVER * copy ( void ) const;
 };
 
-};
+}
 
 #endif /* MED_MESH_DRIVER_HXX */

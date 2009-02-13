@@ -481,7 +481,7 @@ private:
 //   GENDRIVER * copy(void) const ;
 
 // };
-};
+}
 
 
 #endif /* GIBI_MESH_DRIVER_HXX */

@@ -19,8 +19,6 @@
 #include "MPIAccessDECTest.hxx"
 #include <cppunit/TestAssert.h>
 
-#include "MEDMEM_STRING.hxx"
-
 #include <sstream>
 #include <cmath>
 

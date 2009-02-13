@@ -62,27 +62,27 @@ public :
 inline MED_EN::med_int POLYHEDRONARRAY::getNumberOfPolyhedron() const
 {
   return _numberOfPolyhedron;
-};
+}
 inline MED_EN::med_int POLYHEDRONARRAY::getNumberOfFaces() const
 {
   return _numberOfFaces;
-};
+}
 inline MED_EN::med_int POLYHEDRONARRAY::getNumberOfNodes() const
 {
   return _numberOfNodes;
-};
+}
 inline const MED_EN::med_int* POLYHEDRONARRAY::getPolyhedronIndex() const
 {
   return (const MED_EN::med_int*) _polyhedronIndex;
-};
+}
 inline const MED_EN::med_int* POLYHEDRONARRAY::getFacesIndex() const
 {
   return (const MED_EN::med_int*) _facesIndex;
-};
+}
 inline const MED_EN::med_int* POLYHEDRONARRAY::getNodes() const
 {
   return (const MED_EN::med_int*) _nodes;
-};
+}
 
 
 inline void POLYHEDRONARRAY::setPolyhedronIndex(const MED_EN::med_int* polyhedronindex)

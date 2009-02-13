@@ -95,14 +95,17 @@ MEDMEM_EnsightMeshDriver.hxx \
 MEDMEM_EnsightFieldDriver.hxx \
 MEDMEM.hxx \
 MEDMEM_OptionManager.hxx \
-MEDMEM_EnsightUtils.hxx
+MEDMEM_EnsightUtils.hxx \
+MEDMEM_Extractor.hxx \
+Remapper.hxx \
+PointLocator.hxx \
+MEDNormalizedUnstructuredMesh.hxx
 
 # not exported headers
 EXTRA_DIST+= DataTest \
 MEDMEM_MEDMEMchampLire.hxx \
 MEDMEM_MEDMEMgaussEcr.hxx \
-MEDMEM_MEDMEMprofilEcr.hxx \
-MEDMEM_Formulae.hxx
+MEDMEM_MEDMEMprofilEcr.hxx
 
 dist_libmedmem_la_SOURCES= \
 MEDMEM_Init.cxx \
@@ -144,19 +147,24 @@ MEDMEM_EnsightUtils.cxx \
 MEDMEM_EnsightMedDriver.cxx \
 MEDMEM_EnsightMeshDriver.cxx \
 MEDMEM_DriverTools.cxx \
-MEDMEM_GaussLocalization.cxx
-
+MEDMEM_GaussLocalization.cxx \
+MEDMEM_Extractor.cxx \
+PointLocator.cxx \
+Remapper.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 # libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@
 libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 	-I$(srcdir)/../MEDWrapper/Base \
+	-I$(srcdir)/../INTERP_KERNEL \
+	-I$(srcdir)/../INTERP_KERNEL/Bases \
+	-I$(srcdir)/../INTERP_KERNEL/Geometric2D \
 	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERPOLATION
 libmedmem_la_CXXFLAGS= @CXXTMPDPTHFLAGS@
 
 # change motivated by the bug KERNEL4778.
 libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
-	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB)
+	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) ../INTERP_KERNEL/libinterpkernel.la
 
 
 AM_CPPFLAGS= $(libmedmem_la_CPPFLAGS)

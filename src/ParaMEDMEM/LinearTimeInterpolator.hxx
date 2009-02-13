@@ -16,32 +16,30 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef LINEARTIMEINTERPOLATOR_HXX_
-#define LINEARTIMEINTERPOLATOR_HXX_
+#ifndef __LINEARTIMEINTERPOLATOR_HXX__
+#define __LINEARTIMEINTERPOLATOR_HXX__
 
 #include "TimeInterpolator.hxx"
+
 #include <map>
 #include <iostream>
 
-namespace ParaMEDMEM {
-
+namespace ParaMEDMEM
+{
   class DEC;
-
-  class LinearTimeInterpolator:public TimeInterpolator {
-
+  
+  class LinearTimeInterpolator : public TimeInterpolator
+  {
     public:  
       LinearTimeInterpolator( double InterpPrecision=0, int nStepBefore=1,
                               int nStepAfter=1 ) ;
       virtual ~LinearTimeInterpolator();
-
-      void DoInterp( double time0, double time1, double time, int recvcount,
+      void doInterp( double time0, double time1, double time, int recvcount,
                      int nbuff0, int nbuff1,
-                     int **recvbuff0, int **recvbuff1, int *result ) ;
-      void DoInterp( double time0, double time1, double time, int recvcount,
+                     int **recvbuff0, int **recvbuff1, int *result );
+      void doInterp( double time0, double time1, double time, int recvcount,
                      int nbuff0, int nbuff1,
-                     double **recvbuff0, double **recvbuff1, double *result ) ;
-
-    private :
+                     double **recvbuff0, double **recvbuff1, double *result );
   };
 }
 

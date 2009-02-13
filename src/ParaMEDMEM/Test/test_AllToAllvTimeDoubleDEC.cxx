@@ -16,13 +16,13 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#include <mpi.h>
 #include <math.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <iostream>
-#include <ctime>
+#include <mpi.h>
+#include <time.h>
 
 #include "MPIAccessDECTest.hxx"
 #include <cppunit/TestAssert.h>
@@ -30,7 +30,7 @@
 //#include "CommInterface.hxx"
 //#include "ProcessorGroup.hxx"
 //#include "MPIProcessorGroup.hxx"
-#include "MPI_AccessDEC.hxx"
+#include "MPIAccessDEC.hxx"
 #include "LinearTimeInterpolator.hxx"
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
@@ -49,11 +49,11 @@ void MPIAccessDECTest::test_AllToAllvTimeDoubleDECAsynchronousPointToPoint() {
   test_AllToAllvTimeDoubleDEC( true ) ;
 }
 
-static void chksts( int sts , int myrank , ParaMEDMEM::MPI_Access * mpi_access ) {
+static void chksts( int sts , int myrank , ParaMEDMEM::MPIAccess * mpi_access ) {
   char msgerr[MPI_MAX_ERROR_STRING] ;
   int lenerr ;
   if ( sts != MPI_SUCCESS ) {
-    mpi_access->Error_String(sts, msgerr, &lenerr) ;
+    mpi_access->errorString(sts, msgerr, &lenerr) ;
     cout << "test" << myrank << " lenerr " << lenerr << " "
          << msgerr << endl ;
     ostringstream strstream ;
@@ -108,14 +108,14 @@ void MPIAccessDECTest::test_AllToAllvTimeDoubleDEC( bool Asynchronous ) {
   ParaMEDMEM::MPIProcessorGroup* targetgroup = new ParaMEDMEM::MPIProcessorGroup(interface,targetprocs) ;
 
 //  TimeInterpolator * aLinearInterpDEC = new LinearTimeInterpolator( 0 ) ;
-  MPI_AccessDEC * MPIAccessDEC = new MPI_AccessDEC( *sourcegroup , *targetgroup ,
+  MPIAccessDEC * MyMPIAccessDEC = new MPIAccessDEC( *sourcegroup , *targetgroup ,
                                                     Asynchronous ) ;
 //                                                    Asynchronous , LinearInterp , 0.5 ) ;
-  MPIAccessDEC->SetTimeInterpolator( LinearTimeInterp ) ;
-  MPI_Access * mpi_access = MPIAccessDEC->MPIAccess() ;
+  MyMPIAccessDEC->setTimeInterpolator( LinearTimeInterp ) ;
+  MPIAccess * mpi_access = MyMPIAccessDEC->getMPIAccess() ;
 
   cout << "test_AllToAllvTimeDoubleDEC" << myrank << " Barrier :" << endl ;
-  mpi_access->Barrier() ;
+  mpi_access->barrier() ;
 
 #define maxproc 11
 #define maxreq 100
@@ -168,7 +168,7 @@ void MPIAccessDECTest::test_AllToAllvTimeDoubleDEC( bool Asynchronous ) {
           }
         }
      }
-     MPIAccessDEC->SetTime( time[myrank] , nextdeltatime[myrank] ) ;
+     MyMPIAccessDEC->setTime( time[myrank] , nextdeltatime[myrank] ) ;
      cout << "test" << myrank << "=====TIME " << time[myrank] << "=====DELTATIME "
           << nextdeltatime[myrank] << "=====MAXTIME " << maxtime[myrank] << " ======"
           << endl ; 
@@ -188,7 +188,7 @@ void MPIAccessDECTest::test_AllToAllvTimeDoubleDEC( bool Asynchronous ) {
         //cout << endl ;
      }
 
-     int sts = MPIAccessDEC->AllToAllvTime( sendbuf, sendcounts , sdispls , MPI_DOUBLE ,
+     int sts = MyMPIAccessDEC->allToAllvTime( sendbuf, sendcounts , sdispls , MPI_DOUBLE ,
                                             recvbuf, recvcounts , rdispls , MPI_DOUBLE ) ;
      chksts( sts , myrank , mpi_access ) ;
 
@@ -198,7 +198,7 @@ void MPIAccessDECTest::test_AllToAllvTimeDoubleDEC( bool Asynchronous ) {
 //     }
 //     cout << endl ;
 
-     int nRecvReq = mpi_access->RecvRequestIdsSize() ;
+     int nRecvReq = mpi_access->recvRequestIdsSize() ;
      if ( nRecvReq != 0 ) {
        ostringstream strstream ;
        strstream << "=============================================================" << endl
@@ -207,8 +207,8 @@ void MPIAccessDECTest::test_AllToAllvTimeDoubleDEC( bool Asynchronous ) {
                  << endl << "============================================================"
                  << endl ;
        int *ArrayOfRecvRequests = new int[nRecvReq] ;
-       int nReq = mpi_access->RecvRequestIds( nRecvReq, ArrayOfRecvRequests ) ;
-       mpi_access->WaitAll( nReq , ArrayOfRecvRequests ) ;
+       int nReq = mpi_access->recvRequestIds( nRecvReq, ArrayOfRecvRequests ) ;
+       mpi_access->waitAll( nReq , ArrayOfRecvRequests ) ;
        delete [] ArrayOfRecvRequests ;
        cout << strstream.str() << endl ;
        CPPUNIT_FAIL( strstream.str() ) ;
@@ -256,10 +256,10 @@ void MPIAccessDECTest::test_AllToAllvTimeDoubleDEC( bool Asynchronous ) {
   }
 
   cout << "test_AllToAllvTimeDoubleDEC" << myrank << " Barrier :" << endl ;
-  mpi_access->Barrier() ;
+  mpi_access->barrier() ;
 
   cout << "test_AllToAllvTimeDoubleDEC" << myrank << " CheckFinalSent" << endl ;
-  sts = MPIAccessDEC->CheckFinalSent() ;
+  sts = MyMPIAccessDEC->checkFinalSent() ;
   if ( sts != MPI_SUCCESS ) {
     ostringstream strstream ;
     strstream << "=================================================================" << endl
@@ -271,7 +271,7 @@ void MPIAccessDECTest::test_AllToAllvTimeDoubleDEC( bool Asynchronous ) {
   }
 
   cout << "test_AllToAllvTimeDoubleDEC" << myrank << " CheckFinalRecv" << endl ;
-  sts = MPIAccessDEC->CheckFinalRecv() ;
+  sts = MyMPIAccessDEC->checkFinalRecv() ;
   if ( sts != MPI_SUCCESS ) {
     ostringstream strstream ;
     strstream << "=================================================================" << endl
@@ -282,7 +282,7 @@ void MPIAccessDECTest::test_AllToAllvTimeDoubleDEC( bool Asynchronous ) {
     CPPUNIT_FAIL( strstream.str() ) ;
   }
 
-  int nRecvReq = mpi_access->RecvRequestIdsSize() ;
+  int nRecvReq = mpi_access->recvRequestIdsSize() ;
   if ( nRecvReq ) {
     ostringstream strstream ;
     strstream << "===============================================================" << endl
@@ -304,11 +304,11 @@ void MPIAccessDECTest::test_AllToAllvTimeDoubleDEC( bool Asynchronous ) {
        << " calls to AllToAll" << endl ;
 
   cout << "test" << myrank << " Barrier :" << endl ;
-  mpi_access->Barrier() ;
+  mpi_access->barrier() ;
 
   delete sourcegroup ;
   delete targetgroup ;
-  delete MPIAccessDEC ;
+  delete MyMPIAccessDEC ;
 //  delete aLinearInterpDEC ;
 
   delete [] sendcounts ;

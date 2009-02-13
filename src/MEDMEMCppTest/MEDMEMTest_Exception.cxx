@@ -86,7 +86,7 @@ void MEDMEMTest::testException()
 
     const char* prefix = "MED Exception";
     const char* exctxt = static_cast<const char *>(msgErr);
-    char* filen = __FILE__;
+    const char* filen = __FILE__;
     unsigned int linen = __LINE__ + 5;
     const size_t len = strlen(prefix) + strlen(exctxt) + strlen(filen) +
       (1 + int(log10(float(linen)))) + 10 + 1;

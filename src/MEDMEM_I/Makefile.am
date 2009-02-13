@@ -51,6 +51,6 @@ libMEDMEMImpl_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(MED2_INCLUDES) 
 libMEDMEMImpl_la_LDFLAGS= \
 	../../idl/libSalomeIDLMED.la \
 	../MEDMEM/libmedmem.la \
-	${KERNEL_LDFLAGS} -lSalomeLifeCycleCORBA -lSALOMELocalTrace -lSalomeCommunication -lSalomeGenericObj -lSalomeNS \
+	${KERNEL_LDFLAGS} -lSalomeLifeCycleCORBA -lSALOMELocalTrace -lSalomeCommunication -lSalomeGenericObj -lSalomeNS -lOpUtil \
 	$(MED2_LIBS) \
 	$(HDF5_LIBS)

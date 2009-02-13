@@ -2218,7 +2218,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
 			     (med_2_3::med_entite_maillage)entityType,
 			     (med_2_3::med_geometrie_element)types[typeNo],
 			     MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber(),
-			     "        ",                     // A FAIRE : IMPLEMENTER L'UNITE DU PAS DE TEMPS!
+			     (char*)"        ",                     // A FAIRE : IMPLEMENTER L'UNITE DU PAS DE TEMPS!
 			     MED_FIELD_DRIVER<T>::_ptrField->getTime(),
 			     MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()
 			     );

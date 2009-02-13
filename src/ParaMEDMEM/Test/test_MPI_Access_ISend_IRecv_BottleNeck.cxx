@@ -16,12 +16,12 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#include <mpi.h>
 #include <time.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <iostream>
+#include <mpi.h>
 
 #include "MPIAccessTest.hxx"
 #include <cppunit/TestAssert.h>
@@ -29,7 +29,7 @@
 //#include "CommInterface.hxx"
 //#include "ProcessorGroup.hxx"
 //#include "MPIProcessorGroup.hxx"
-#include "MPI_Access.hxx"
+#include "MPIAccess.hxx"
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 #define ENABLE_FAULTS
@@ -65,12 +65,12 @@ void MPIAccessTest::test_MPI_Access_ISend_IRecv_BottleNeck() {
 
   ParaMEDMEM::MPIProcessorGroup* group = new ParaMEDMEM::MPIProcessorGroup(interface) ;
 
-  ParaMEDMEM::MPI_Access mpi_access( group ) ;
+  ParaMEDMEM::MPIAccess mpi_access( group ) ;
 
 #define maxreq 10000
 
   if ( myrank >= 2 ) {
-    mpi_access.Barrier() ;
+    mpi_access.barrier() ;
     delete group ;
     return ;
   }
@@ -87,29 +87,29 @@ void MPIAccessTest::test_MPI_Access_ISend_IRecv_BottleNeck() {
        sendbuf[i] = i ;
        sts = mpi_access.ISend(sendbuf,i,MPI_INT,target, SendRequestId[i]) ;
        cout << "test" << myrank << " ISend RequestId " << SendRequestId[i]
-            << " tag " << mpi_access.SendMPITag(target) << endl ;
+            << " tag " << mpi_access.sendMPITag(target) << endl ;
      }
      else {
        //sleep( 1 ) ;
        sts = mpi_access.IRecv(recvbuf,i,MPI_INT,target, RecvRequestId[i]) ;
        cout << "test" << myrank << " IRecv RequestId " << RecvRequestId[i]
-            << " tag " << mpi_access.RecvMPITag(target) << endl ;
-       int recvreqsize = mpi_access.RecvRequestIdsSize() ;
+            << " tag " << mpi_access.recvMPITag(target) << endl ;
+       int recvreqsize = mpi_access.recvRequestIdsSize() ;
        int * recvrequests = new int[ recvreqsize ] ;
-       recvreqsize = mpi_access.RecvRequestIds( target , recvreqsize , recvrequests ) ;
+       recvreqsize = mpi_access.recvRequestIds( target , recvreqsize , recvrequests ) ;
        int j ;
        for (j = 0 ; j < recvreqsize ; j++) {
           int flag ;
-          mpi_access.Test( recvrequests[j], flag ) ;
+          mpi_access.test( recvrequests[j], flag ) ;
           if ( flag ) {
             int source, tag, error, outcount ;
-            mpi_access.Status( recvrequests[j], source, tag, error, outcount,
+            mpi_access.status( recvrequests[j], source, tag, error, outcount,
                                true ) ;
             cout << "test" << myrank << " Test(Recv RequestId "
                  << recvrequests[j] << ") : source " << source << " tag " << tag
                  << " error " << error << " outcount " << outcount
                  << " flag " << flag << " : DeleteRequest" << endl ;
-            mpi_access.DeleteRequest( recvrequests[j] ) ;
+            mpi_access.deleteRequest( recvrequests[j] ) ;
           }
           else {
 //            cout << "test" << myrank << " Test(Recv RequestId "
@@ -121,7 +121,7 @@ void MPIAccessTest::test_MPI_Access_ISend_IRecv_BottleNeck() {
      if ( sts != MPI_SUCCESS ) {
        char msgerr[MPI_MAX_ERROR_STRING] ;
        int lenerr ;
-       mpi_access.Error_String(sts, msgerr, &lenerr) ;
+       mpi_access.errorString(sts, msgerr, &lenerr) ;
        cout << "test" << myrank << " lenerr " << lenerr << " "
             << msgerr << endl ;
      }
@@ -137,40 +137,40 @@ void MPIAccessTest::test_MPI_Access_ISend_IRecv_BottleNeck() {
      }
   }
 
-  mpi_access.Check() ;
+  mpi_access.check() ;
   if ( myrank == 0 ) {
-    int size = mpi_access.SendRequestIdsSize() ;
+    int size = mpi_access.sendRequestIdsSize() ;
     cout << "test" << myrank << " before WaitAll sendreqsize " << size << endl ;
-    mpi_access.WaitAll(maxreq, SendRequestId) ;
-    size = mpi_access.SendRequestIdsSize() ;
+    mpi_access.waitAll(maxreq, SendRequestId) ;
+    size = mpi_access.sendRequestIdsSize() ;
     cout << "test" << myrank << " after WaitAll sendreqsize " << size << endl ;
     int * ArrayOfSendRequests = new int[ size ] ;
-    int nSendRequest = mpi_access.SendRequestIds( size , ArrayOfSendRequests ) ;
+    int nSendRequest = mpi_access.sendRequestIds( size , ArrayOfSendRequests ) ;
     int i ;
     for ( i = 0 ; i < nSendRequest ; i++ ) {
-       mpi_access.DeleteRequest( ArrayOfSendRequests[i] ) ;
+       mpi_access.deleteRequest( ArrayOfSendRequests[i] ) ;
     }
     delete [] ArrayOfSendRequests ;
   }
   else {
-    int size = mpi_access.RecvRequestIdsSize() ;
+    int size = mpi_access.recvRequestIdsSize() ;
     cout << "test" << myrank << " before WaitAll recvreqsize " << size << endl ;
-    mpi_access.WaitAll(maxreq, RecvRequestId) ;
-    size = mpi_access.RecvRequestIdsSize() ;
+    mpi_access.waitAll(maxreq, RecvRequestId) ;
+    size = mpi_access.recvRequestIdsSize() ;
     cout << "test" << myrank << " after WaitAll recvreqsize " << size << endl ;
     int * ArrayOfRecvRequests = new int[ size ] ;
-    int nRecvRequest = mpi_access.RecvRequestIds( size , ArrayOfRecvRequests ) ;
+    int nRecvRequest = mpi_access.recvRequestIds( size , ArrayOfRecvRequests ) ;
     int i ;
     for ( i = 0 ; i < nRecvRequest ; i++ ) {
-       mpi_access.DeleteRequest( ArrayOfRecvRequests[i] ) ;
+       mpi_access.deleteRequest( ArrayOfRecvRequests[i] ) ;
     }
     delete [] ArrayOfRecvRequests ;
   }
-  mpi_access.Check() ;
+  mpi_access.check() ;
 
   if ( myrank == 0 ) {
     int sendrequests[maxreq] ;
-    int sendreqsize = mpi_access.SendRequestIds( target , maxreq , sendrequests ) ;
+    int sendreqsize = mpi_access.sendRequestIds( target , maxreq , sendrequests ) ;
     int i ;
     if ( sendreqsize != 0 ) {
       ostringstream strstream ;
@@ -192,7 +192,7 @@ void MPIAccessTest::test_MPI_Access_ISend_IRecv_BottleNeck() {
   }
   else {
     int recvrequests[maxreq] ;
-    int recvreqsize = mpi_access.RecvRequestIds( target , maxreq , recvrequests ) ;
+    int recvreqsize = mpi_access.recvRequestIds( target , maxreq , recvrequests ) ;
     if ( recvreqsize != 0 ) {
       ostringstream strstream ;
       strstream << "=========================================================" << endl
@@ -208,7 +208,7 @@ void MPIAccessTest::test_MPI_Access_ISend_IRecv_BottleNeck() {
     }
   }
 
-  mpi_access.Barrier() ;
+  mpi_access.barrier() ;
 
   delete group ;
 

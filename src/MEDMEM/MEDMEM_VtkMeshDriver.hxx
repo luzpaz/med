@@ -100,6 +100,6 @@ private:
   GENDRIVER * copy ( void ) const;
 
 };
-};
+}
 
 #endif /* VTK_MESH_DRIVER_HXX */

@@ -19,7 +19,7 @@
 #include "ParaMEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
-#include "MEDMEM_Exception.hxx"
+#include "InterpolationUtils.hxx"
 #include "CommInterface.hxx"
 #include "ProcessorGroup.hxx"
 #include "MPIProcessorGroup.hxx"
@@ -37,7 +37,6 @@
 
 using namespace std;
 using namespace ParaMEDMEM;
-using namespace MEDMEM;
  
 /*
  * Check methods defined in BlockTopology.hxx
@@ -119,5 +118,5 @@ void ParaMEDMEMTest::testBlockTopology_serialize()
   blocktopo.serialize(serializer,sersize);
   blocktopo_recv.unserialize(serializer,interface);
   CPPUNIT_ASSERT_EQUAL(blocktopo.getNbElements(),blocktopo_recv.getNbElements());
-	delete [] serializer;
+  delete [] serializer;
 }

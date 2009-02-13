@@ -16,13 +16,12 @@
 #
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-#  MED MEDMEM : MED files in memory
-#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-# first '.' says that this folder must be compiled before Test (MEDMEM/Test uses MEDMEM)
 if CPPUNIT_IS_OK
- SUBDIRS=. Test
+ SUBDIRS=. MEDLoader Test
+else
+ SUBDIRS=. MEDLoader
 endif
 
 DIST_SUBDIRS= Test
@@ -37,73 +36,58 @@ BlockTopology.hxx\
 Topology.hxx\
 ParaGRID.hxx\
 ParaMESH.hxx\
-ParaSUPPORT.hxx\
-StructuredParaSUPPORT.hxx\
 ComponentTopology.hxx\
 ExplicitTopology.hxx\
 ParaFIELD.hxx\
 DEC.hxx\
-DECOptions.hxx \
 MxN_Mapping.hxx\
 StructuredCoincidentDEC.hxx\
 InterpolationMatrix.hxx\
 IntersectionDEC.hxx\
-UnstructuredParaSUPPORT.hxx\
 ExplicitCoincidentDEC.hxx\
 ElementLocator.hxx\
 ExplicitMapping.hxx\
 ICoCoField.hxx \
 ICoCoMEDField.hxx \
 ICoCoTrioField.hxx \
-MPI_Access.hxx \
-MPI_AccessDEC.hxx \
+MPIAccess.hxx \
+MPIAccessDEC.hxx \
 TimeInterpolator.hxx \
 LinearTimeInterpolator.hxx
 
 dist_libparamedmem_la_SOURCES= \
 ProcessorGroup.cxx \
 MPIProcessorGroup.cxx\
-BlockTopology.cxx\
-ParaGRID.cxx\
 ParaMESH.cxx\
-ParaSUPPORT.cxx\
-StructuredParaSUPPORT.cxx\
 ComponentTopology.cxx\
-ParaFIELD.cxx\
-DEC.cxx\
-MxN_Mapping.cxx\
+MPIAccess.cxx \
 InterpolationMatrix.cxx\
 StructuredCoincidentDEC.cxx\
 ExplicitCoincidentDEC.cxx\
 IntersectionDEC.cxx\
-UnstructuredParaSUPPORT.cxx\
 ElementLocator.cxx\
-ExplicitTopology.cxx\
-ICoCoMEDField.cxx \
-MPI_Access.cxx \
-MPI_AccessDEC.cxx \
+MPIAccessDEC.cxx \
 TimeInterpolator.cxx \
-LinearTimeInterpolator.cxx
-
+LinearTimeInterpolator.cxx\
+DEC.cxx\
+ExplicitTopology.cxx\
+MxN_Mapping.cxx\
+ICoCoMEDField.cxx\
+ParaFIELD.cxx\
+ParaGRID.cxx\
+BlockTopology.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
-libparamedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES)  $(MPI_INCLUDES) @CXXTMPDPTHFLAGS@ \
-	-I$(srcdir)/../MEDWrapper/Base \
-	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERP_KERNEL \
+libparamedmem_la_CPPFLAGS= $(MPI_INCLUDES) @CXXTMPDPTHFLAGS@ \
+	-I$(srcdir)/../INTERP_KERNEL \
+	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/Geometric2D \
-	-I$(srcdir)/../MEDMEM
+	-I$(srcdir)/../MEDCoupling
 
 # change motivated by the bug KERNEL4778.
-libparamedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
-../MEDMEM/libmedmem.la \
+libparamedmem_la_LDFLAGS= ../MEDCoupling/libmedcoupling.la \
 ../INTERP_KERNEL/libinterpkernel.la \
-	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) \
 $(MPI_LIBS)
-
-if MED_ENABLE_KERNEL
-    libparamedmem_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
-    libparamedmem_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
-endif
 
 if MED_ENABLE_FVM
 	salomeinclude_HEADERS += NonCoincidentDEC.hxx
@@ -112,12 +96,7 @@ if MED_ENABLE_FVM
 	libparamedmem_la_CPPFLAGS+= $(FVM_INCLUDES)
 endif
 
-
-AM_CPPFLAGS= $(libmedmem_la_CPPFLAGS)
-LDADD= $(libmedmem_la_LDFLAGS) -lm libmedmem.la
-if MED_ENABLE_KERNEL
-     LDADD+=-lSALOMEBasics
-endif
+LDADD= -lm
 
 EXTRA_DIST += \
 	BASICS_JR \

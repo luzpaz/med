@@ -36,7 +36,13 @@ dist_libMEDWrapper_la_SOURCES= \
 	MED_Factory.cxx
 
 libMEDWrapper_la_CPPFLAGS= $(BOOST_CPPFLAGS) $(MED2_INCLUDES) \
-	-I$(srcdir)/../Base -I$(top_builddir)/salome_adm/unix -I$(srcdir)/../V2_1/Wrapper -I$(srcdir)/../V2_2
+	-I$(srcdir)/../Base
+if MED_ENABLE_KERNEL
+  libMEDWrapper_la_CPPFLAGS+= -I$(KERNEL_ROOT_DIR)/include/salome
+else
+  libMEDWrapper_la_CPPFLAGS+= -I$(top_builddir)/adm_local_without_kernel/unix
+endif
+libMEDWrapper_la_CPPFLAGS+= -I$(srcdir)/../V2_1/Wrapper -I$(srcdir)/../V2_2
 libMEDWrapper_la_LDFLAGS= ../V2_2/libMEDWrapper_V2_2.la ../V2_1/Wrapper/libMEDWrapper_V2_1.la
 
 # Executables targets

@@ -16,11 +16,11 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#include <mpi.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <iostream>
+#include <mpi.h>
 
 #include "MPIAccessTest.hxx"
 #include <cppunit/TestAssert.h>
@@ -28,7 +28,7 @@
 //#include "CommInterface.hxx"
 //#include "ProcessorGroup.hxx"
 //#include "MPIProcessorGroup.hxx"
-#include "MPI_Access.hxx"
+#include "MPIAccess.hxx"
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 #define ENABLE_FAULTS
@@ -61,10 +61,10 @@ void MPIAccessTest::test_MPI_Access_SendRecv() {
 
   ParaMEDMEM::MPIProcessorGroup* group = new ParaMEDMEM::MPIProcessorGroup(interface) ;
 
-  ParaMEDMEM::MPI_Access mpi_access( group ) ;
+  ParaMEDMEM::MPIAccess mpi_access( group ) ;
 
   if ( myrank >= 2 ) {
-    mpi_access.Barrier() ;
+    mpi_access.barrier() ;
     delete group ;
     return ;
   }
@@ -79,20 +79,20 @@ void MPIAccessTest::test_MPI_Access_SendRecv() {
      int outcount ;
      if ( i & 1 ) {
        outcount = -1 ;
-       sts = mpi_access.SendRecv(&i,1,MPI_INT,target, sendRequestId[i],
+       sts = mpi_access.sendRecv(&i,1,MPI_INT,target, sendRequestId[i],
                                  &recvbuf,1,MPI_INT,target, recvRequestId[i],
                                  &outcount) ;
      }
      else {
-       sts = mpi_access.SendRecv(&i,1,MPI_INT,target, sendRequestId[i],
+       sts = mpi_access.sendRecv(&i,1,MPI_INT,target, sendRequestId[i],
                                  &recvbuf,1,MPI_INT,target, recvRequestId[i]) ;
 //       outcount = mpi_access.MPIOutCount( recvRequestId[i] ) ;
        outcount = 1 ;
      }
      cout << "test" << myrank << " Send sendRequestId " << sendRequestId[i]
-          << " tag " << mpi_access.SendMPITag(target)
+          << " tag " << mpi_access.sendMPITag(target)
           << " recvRequestId " << recvRequestId[i]
-          << " tag " << mpi_access.RecvMPITag(target)
+          << " tag " << mpi_access.recvMPITag(target)
           << " outcount " << outcount << " MPIOutCount "
           << mpi_access.MPIOutCount( recvRequestId[i] ) << endl ;
      if ( (outcount != 1) | (recvbuf != i) ) {
@@ -107,7 +107,7 @@ void MPIAccessTest::test_MPI_Access_SendRecv() {
      }
      char msgerr[MPI_MAX_ERROR_STRING] ;
      int lenerr ;
-     mpi_access.Error_String(sts, msgerr, &lenerr) ;
+     mpi_access.errorString(sts, msgerr, &lenerr) ;
      cout << "test" << myrank << " lenerr " << lenerr << " "
           << msgerr << endl ;
 
@@ -120,30 +120,30 @@ void MPIAccessTest::test_MPI_Access_SendRecv() {
        cout << strstream.str() << endl ;
        CPPUNIT_FAIL( strstream.str() ) ;
      }
-     mpi_access.Check() ;
+     mpi_access.check() ;
   }
 
   int flag ;
-  mpi_access.TestAll(10,sendRequestId,flag) ;
+  mpi_access.testAll(10,sendRequestId,flag) ;
   if ( !flag ) {
     ostringstream strstream ;
     strstream << "test" << myrank << " flag " << flag << " KO" << endl ;
     cout << strstream.str() << endl ;
     CPPUNIT_FAIL( strstream.str() ) ;
   }
-  mpi_access.WaitAll(10,sendRequestId) ;
-  mpi_access.TestAll(10,recvRequestId,flag) ;
+  mpi_access.waitAll(10,sendRequestId) ;
+  mpi_access.testAll(10,recvRequestId,flag) ;
   if ( !flag ) {
     ostringstream strstream ;
     strstream << "test" << myrank << " flag " << flag << " KO" << endl ;
     cout << strstream.str() << endl ;
     CPPUNIT_FAIL( strstream.str() ) ;
   }
-  mpi_access.WaitAll(10,recvRequestId) ;
-  mpi_access.Check() ;
+  mpi_access.waitAll(10,recvRequestId) ;
+  mpi_access.check() ;
 
   int sendrequests[10] ;
-  int sendreqsize = mpi_access.SendRequestIds( target , 10 , sendrequests ) ;
+  int sendreqsize = mpi_access.sendRequestIds( target , 10 , sendrequests ) ;
   if ( sendreqsize != 0 ) {
     ostringstream strstream ;
     strstream << "=========================================================" << endl
@@ -153,7 +153,7 @@ void MPIAccessTest::test_MPI_Access_SendRecv() {
     CPPUNIT_FAIL( strstream.str() ) ;
   }
   int recvrequests[10] ;
-  int recvreqsize = mpi_access.SendRequestIds( target , 10 , recvrequests ) ;
+  int recvreqsize = mpi_access.sendRequestIds( target , 10 , recvrequests ) ;
   if ( recvreqsize != 0 ) {
     ostringstream strstream ;
     strstream << "=========================================================" << endl
@@ -163,7 +163,7 @@ void MPIAccessTest::test_MPI_Access_SendRecv() {
     CPPUNIT_FAIL( strstream.str() ) ;
   }
 
-  mpi_access.Barrier() ;
+  mpi_access.barrier() ;
 
   delete group ;
 

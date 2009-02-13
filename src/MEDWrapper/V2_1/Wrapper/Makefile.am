@@ -35,6 +35,11 @@ dist_libMEDWrapper_V2_1_la_SOURCES= \
 	MED_V2_1_Wrapper.cxx
 
 libMEDWrapper_V2_1_la_CPPFLAGS= -D@MACHINE@ $(BOOST_CPPFLAGS) $(HDF5_INCLUDES) \
-	-I$(srcdir)/../../Base -I$(srcdir)/../Core -I$(top_builddir)/salome_adm/unix
+	-I$(srcdir)/../../Base -I$(srcdir)/../Core
+if MED_ENABLE_KERNEL
+  libMEDWrapper_V2_1_la_CPPFLAGS+= -I$(KERNEL_ROOT_DIR)/include/salome
+else
+  libMEDWrapper_V2_1_la_CPPFLAGS+= -I$(top_builddir)/adm_local_without_kernel/unix
+endif
 libMEDWrapper_V2_1_la_LDFLAGS= $(HDF5_LIBS)
 libMEDWrapper_V2_1_la_LIBADD= ../../Base/libMEDWrapperBase.la ../Core/libmed_V2_1.la

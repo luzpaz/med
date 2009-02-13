@@ -16,46 +16,32 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#include "ParaMESH.hxx"
-#include "ParaSUPPORT.hxx"
-#include "ParaMESH.hxx"
-#include "MEDMEM_Support.hxx"
+#ifndef REMAPPER_HXX_
+#define REMAPPER_HXX_
 
-namespace ParaMEDMEM
+#include "InterpKernelMatrix.hxx"
+#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Support.hxx"
+#include "MEDMEM_Field.hxx"
+#include "MEDMEM.hxx"
+
+namespace INTERP_KERNEL
 {
 
-  ParaSUPPORT::ParaSUPPORT()
+  class MEDMEM_EXPORT Remapper
   {
-  }
-  
-  ParaSUPPORT::ParaSUPPORT(const MEDMEM::SUPPORT& support, const ProcessorGroup& proc_group):
-  _support(&support), 
-  _has_support_ownership(false),
-  _has_mesh_ownership(true)
-   {
-    _mesh = new ParaMESH(*(support.getMesh()),  proc_group, "mesh from support");
-  } 
-
-  ParaSUPPORT::~ParaSUPPORT()
-  {
-		if (_has_support_ownership)
-			{
-				delete _support;
-				_support=0;
-			}
-    if (_has_mesh_ownership)
-			{
-				delete _mesh;
-				_mesh=0;
-			}
-  }
-
-	const int* ParaSUPPORT::getGlobalNumbering() const
-	{
-		if (! _support->isOnAllElements())
-			throw MEDMEM::MEDEXCEPTION("GlobalNumbering can only be retrieved on supports on all elements");
-		return _mesh->getGlobalNumbering(_support->getEntity());
-	}
+  public:
+    Remapper();
+    virtual ~Remapper();
+    void prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH& mesh_target, const char *method);
+    void transfer(const MEDMEM::FIELD<double>& field_source, MEDMEM::FIELD<double>& field_target);
+    void setOptionDouble(const std::string& key, double value);
+    void setOptionInt(const std::string& key, int value);
+  private :
+    Matrix<double,ALL_FORTRAN_MODE>* _matrix;
+    MEDMEM::FIELD<double>* getSupportVolumes(const MEDMEM::SUPPORT& support);
+  };
 
 }
 
+#endif /*REMAPPER_HXX_*/
