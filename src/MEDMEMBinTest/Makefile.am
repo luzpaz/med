@@ -62,7 +62,7 @@ endif
 
 bin_PROGRAMS= \
 	ensight2med med2ensight convertToPoly \
-	med2_1_To_med2_2 med2vtk duplicateMED med_test duplicateMEDMESH test_write_groups_poly\
+	med2_1_To_med2_2 med2vtk duplicateMED medmembin_test duplicateMEDMESH test_write_groups_poly\
 	test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray \
 	test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit \
 	testUGeoNameMeshEntities testUMedException testUModulusArray \
@@ -93,7 +93,7 @@ XFAIL_TESTS = \
 	med2_1_To_med2_2 \
 	med2ensight \
 	med2vtk \
-	med_test \
+	medmembin_test \
 	readCoordinate \
 	readEntete \
 	testAnalFile \
@@ -158,7 +158,7 @@ dist_med2ensight_SOURCES= med2ensight.cxx
 dist_med2_1_To_med2_2_SOURCES= med2_1_To_med2_2.cxx
 dist_med2vtk_SOURCES= med2vtk.cxx
 dist_duplicateMED_SOURCES= duplicateMED.cxx
-dist_med_test_SOURCES= med_test.cxx
+dist_medmembin_test_SOURCES= med_test.cxx
 dist_duplicateMEDMESH_SOURCES= duplicateMEDMESH.cxx
 dist_test_write_groups_poly_SOURCES= test_write_groups_poly.cxx
 dist_test_MEDMEM_ModulusArray_SOURCES= test_MEDMEM_ModulusArray.cxx
