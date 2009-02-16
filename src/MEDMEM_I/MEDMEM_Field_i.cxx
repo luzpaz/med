@@ -1,21 +1,24 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-// 
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //=============================================================================
 // File      : MEDMEM_Field_i.cxx
 // Created   : mer fév 20 15:47:57 CET 2002
@@ -23,7 +26,7 @@
 // Project   : SALOME
 // $Header   : $
 //=============================================================================
-
+//
 #include "MEDMEM_Field_i.hxx"
 
 #include "SALOME_NamingService.hxx"
@@ -47,8 +50,9 @@ int  FIELD_i::fieldIndex = 0;
 //FIELD_i::FIELD_i():_fieldTptr(FIELD_i::constructConstField())
 FIELD_i::FIELD_i():_fieldTptr(constructConstField()),_corbaIndex(FIELD_i::fieldIndex++)
 {
-        BEGIN_OF("Default Constructor Field_i");
-        END_OF(" Default Constructor Field_i");
+  const char* LOC = "Default Constructor Field_i";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -70,14 +74,15 @@ FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
   _FieldId(""),
   _ownCppPtr(ownCppPtr)
 {
-  BEGIN_OF("Constructor FIELD_i(SALOME_MED::SUPPORT_ptr support,::FIELD<T> * const field)");
+  const char* LOC = "Constructor FIELD_i(SALOME_MED::SUPPORT_ptr support,::FIELD<T> * const field)";
+  BEGIN_OF(LOC);
   FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 
   MESSAGE("FIELD_i::FIELD_i  Checking of pointeurs !!!");
 
   SCRUTE(_fieldTptr);
 
-  END_OF("Constructor FIELD_i(SALOME_MED::SUPPORT_ptr support,::FIELD<T> * const field)");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -89,9 +94,10 @@ FIELD_i::FIELD_i( FIELD_i & f):_fieldTptr(f._fieldTptr),
 			       _corbaIndex(FIELD_i::fieldIndex++),
 			       _FieldId(""), _ownCppPtr(false)
 {
-        BEGIN_OF("Constructor Field_i");
+  const char* LOC = "Constructor Field_i";
+  BEGIN_OF(LOC);
         FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
-        END_OF("Constructor Field_i");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -170,7 +176,8 @@ throw (SALOME::SALOME_Exception)
 SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()
   throw (SALOME::SALOME_Exception)
 {
-  BEGIN_OF("SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()");
+  const char* LOC = "SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()";
+  BEGIN_OF(LOC);
 
   if (_fieldTptr==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Field",
@@ -182,7 +189,7 @@ SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()
 
   SCRUTE(_fieldTptr);
 
-  END_OF("SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()");
+  END_OF(LOC);
 
   return support ;
 }
@@ -492,7 +499,8 @@ void FIELD_i::addInStudyToComponent (SALOMEDS::SComponent_ptr myComponent,
                                      SALOME_MED::FIELD_ptr    myIor)
   throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
 {
-        BEGIN_OF(" FIELD_i::addInStudy");
+  const char* LOC = " FIELD_i::addInStudy";
+  BEGIN_OF(LOC);
 
         if (CORBA::is_nil(myComponent) || CORBA::is_nil(myIor))
 	  THROW_SALOME_CORBA_EXCEPTION("Null parameter", SALOME::BAD_PARAM);
@@ -640,7 +648,7 @@ void FIELD_i::addInStudyToComponent (SALOMEDS::SComponent_ptr myComponent,
 
 	MESSAGE("FIELD_i::addInStudy");
 
-        //END_OF("FIELD_i::addInStudy");
+        //END_OF();
 }
 
 //=============================================================================

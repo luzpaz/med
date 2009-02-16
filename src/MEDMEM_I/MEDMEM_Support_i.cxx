@@ -1,28 +1,31 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-// 
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //=============================================================================
 // File      : MEDMEM_Support_i.cxx
 // Project   : SALOME
 // Author    : EDF
 // $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Support_i.cxx
 //=============================================================================
-
+//
 #include "utilities.h"
 #include "Utils_CorbaException.hxx"
 #include "Utils_ORB_INIT.hxx"
@@ -56,8 +59,9 @@ int SUPPORT_i::supportIndex = 0 ;
 //=============================================================================
 SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL),_corbaIndex(SUPPORT_i::supportIndex++)
 {
-	BEGIN_OF("Default Constructor SUPPORT_i");
-	END_OF("Default Constructor SUPPORT_i");
+  const char* LOC = "Default Constructor SUPPORT_i";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -68,9 +72,10 @@ SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL),_corbaIndex(SUPPORT_i::suppo
 SUPPORT_i::SUPPORT_i(const ::SUPPORT * const s) :_support(s),
 	           _corbaIndex(SUPPORT_i::supportIndex++)
 {
-	BEGIN_OF("Constructor SUPPORT_i");
+  const char* LOC = "Constructor SUPPORT_i";
+  BEGIN_OF(LOC);
 	SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
-	END_OF("Constructor SUPPORT_i");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -80,9 +85,10 @@ SUPPORT_i::SUPPORT_i(const ::SUPPORT * const s) :_support(s),
 SUPPORT_i::SUPPORT_i(const SUPPORT_i &s) :_support(s._support),
 	                    _corbaIndex(SUPPORT_i::supportIndex++)
 {
-	BEGIN_OF("Constructor SUPPORT_i");
+  const char* LOC = "Constructor SUPPORT_i";
+  BEGIN_OF(LOC);
 	SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
-	END_OF("Constructor SUPPORT_i");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -253,7 +259,8 @@ SALOME_MED::SUPPORT::supportInfos * SUPPORT_i::getSupportGlobal()
 SALOME_MED::MESH_ptr SUPPORT_i::getMesh()
 throw (SALOME::SALOME_Exception)
 {
-  BEGIN_OF("SALOME_MED::MESH_ptr SUPPORT_i::getMesh()");
+  const char* LOC = "SALOME_MED::MESH_ptr SUPPORT_i::getMesh()";
+  BEGIN_OF(LOC);
 
 	if (_support==NULL)
 		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
@@ -271,7 +278,7 @@ throw (SALOME::SALOME_Exception)
 		SCRUTE(m1);
 		SCRUTE(m2);
 
-		END_OF("SALOME_MED::MESH_ptr SUPPORT_i::getMesh()");
+  END_OF(LOC);
 
 	        return (m2);
         }
@@ -338,14 +345,15 @@ throw (SALOME::SALOME_Exception)
 SALOME_MED::medEntityMesh SUPPORT_i::getEntity() 
 throw (SALOME::SALOME_Exception)
 {
-  BEGIN_OF("SALOME_MED::medEntityMesh SUPPORT_i::getEntity()");
+  const char* LOC = "SALOME_MED::medEntityMesh SUPPORT_i::getEntity()";
+  BEGIN_OF(LOC);
 
   if (_support==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
 				             SALOME::INTERNAL_ERROR);
   try
     {
-      END_OF("SALOME_MED::medEntityMesh SUPPORT_i::getEntity()");
+  END_OF(LOC);
       return convertMedEntToIdlEnt(_support->getEntity());
     }
   catch (MEDEXCEPTION &ex)
@@ -616,19 +624,19 @@ throw (SALOME::SALOME_Exception)
 void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr myIor)
   throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-  const char * LOC = "SUPPORT_i::addInStudy";
+  const char* LOC = "SUPPORT_i::addInStudy";
   BEGIN_OF(LOC);
 
   if ( _supportId != "" )
   {
-      MESSAGE(LOC << "Support already in Study");
+      MESSAGE("Support already in Study");
       THROW_SALOME_CORBA_EXCEPTION("Support already in Study", \
 				   SALOME::BAD_PARAM);
   };
 
   if ( CORBA::is_nil(myStudy) )
   {
-      MESSAGE(LOC << "Study not found");
+      MESSAGE("Study not found");
       THROW_SALOME_CORBA_EXCEPTION("Study deleted !!!",
                                     SALOME::INTERNAL_ERROR);
   }
@@ -640,11 +648,11 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   SALOMEDS::AttributeIOR_var     aIOR;
   
   // Find SComponent labelled 'Med'
-  MESSAGE(LOC << " Find SComponent labelled 'MED'");
+  MESSAGE(" Find SComponent labelled 'MED'");
   SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
   if ( CORBA::is_nil(medfather) ) 
   { 
-    MESSAGE(LOC << "MED not found");
+    MESSAGE("MED not found");
     THROW_SALOME_CORBA_EXCEPTION("SComponent labelled 'Med' not Found",SALOME::INTERNAL_ERROR);
   }
 
@@ -652,10 +660,10 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   SALOMEDS::SObject_var medmeshfather = myStudy->FindObjectByPath("/Med/MEDMESH");
   if ( CORBA::is_nil(medmeshfather) )
   { 
-    MESSAGE(LOC << " No /Med/MEDMESH Found in study")
+    MESSAGE(" No /Med/MEDMESH Found in study")
     THROW_SALOME_CORBA_EXCEPTION("SObject labelled 'MEDMESH' not Found",SALOME::INTERNAL_ERROR);
   }
-  MESSAGE(LOC << " Find SObject MESH (represent mesh in support)");
+  MESSAGE(" Find SObject MESH (represent mesh in support)");
 
   string meshName = _support->getMesh()->getName() ;
   string meshNameStudy = meshName;

@@ -1,22 +1,24 @@
-# Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-#           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation; either 
-# version 2.1 of the License.
-# 
-# This library is distributed in the hope that it will be useful 
-# but WITHOUT ANY WARRANTY; without even the implied warranty of 
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-# Lesser General Public License for more details.
-# 
-# You should have received a copy of the GNU Lesser General Public  
-# License along with this library; if not, write to the Free Software 
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-# 
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-# 
-
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 #
@@ -25,26 +27,42 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 # ===============================================================
 #
 
-dist_salomeres_DATA=\
+dist_salomeres_DATA = \
+    MED.config \
+    MED_en.xml \
+    SalomeApp.xml \
+    ModuleMed.png \
+    Data.png \
+    Infos.png \
+    Structure.png \
+    explore_med_file.png \
+    field_selection.png \
+    mesh_selection.png \
     boitenew.cnc \
     boitenew.inp \
     boitenew.xyz \
+    Case1.cnc \
+    Case1.inp \
+    Case1.xyz \
+    cube.cnc \
+    cube.inp \
+    cube.xyz \
+    test3.cnc \
+    test3.inp \
+    test3.xyz \
+    titi.cnc \
+    titi.inp \
+    titi.xyz \
     carre_en_quad4_import22.med \
     carre_en_quad4.med \
     carre_en_quad4_seg2_import22.med \
     carre_en_quad4_seg2.med \
     cas_defaut_domaine_fluide.med \
-    Case1.cnc \
-    Case1.inp \
-    Case1.xyz \
     ChampsDarcy.med \
-    cube.cnc \
     cube_hexa8_import22.med \
     cube_hexa8.med \
     cube_hexa8_quad4_import22.med \
     cube_hexa8_quad4.med \
-    cube.inp \
-    cube.xyz \
     darcy_1.1_res.med \
     darcy_1.3_resCASTEM.med \
     darcy_1.3_resPORFLOW.med \
@@ -54,7 +72,6 @@ dist_salomeres_DATA=\
     darcy2_Castem_qua_VF.med \
     Darcy3_3D_H_10x10x10_2.med \
     Darcy3_3D_H_10x10x10.sauve \
-    Data.png \
     Deff_fdt_5.8_castem_efmh_diff_conc_dom.med \
     Deff_fdt_5.8_castem_vf_diff_conc_dom.med \
     dx200_dy1_avec_2couches.sauve \
@@ -83,7 +100,6 @@ dist_salomeres_DATA=\
     H_Traces_Se79_COUPLEX1.med \
     inclusion_2d_raf.sauve \
     inclusion_2d.sauve \
-    Infos.png \
     mail_ktest1-3-hexa.sauve \
     mail_ktest1-3-tetra.sauve \
     mail_ktest3-1.sauve \
@@ -110,13 +126,10 @@ dist_salomeres_DATA=\
     mail_test1-2-tri.sauve \
     mail-test1-4-1.sauve \
     mail-test1-4-2.sauve \
-    MED.config \
-    MED_en.xml \
     mesh_import22.med \
     mesh.med \
     Mistrat_import22.med \
     Mistrat.med \
-    ModuleMed.png \
     Old_ChampsDarcy.med \
     Old_darcy_1.1_res.med \
     Old_darcy_1.3_resCASTEM.med \
@@ -145,20 +158,71 @@ dist_salomeres_DATA=\
     polyedres.med \
     polygones.med \
     recoll_bord.med \
-    SalomeApp.xml \
-    Structure.png \
     test19.med \
     test_2D.med \
-    test3.cnc \
-    test3.inp \
-    test3.xyz \
+    trio_2D.med \
     TimeStamps_import22.med \
     TimeStamps.med \
-    titi.cnc \
-    titi.inp \
-    titi.xyz \
     zzzz121b.med \
-    zzzz121b_without_tr6.med
+    zzzz121b_without_tr6.med \
+    UnitTetra.med \
+    GeneralTetra.med \
+    NudgedSimpler.med \
+    NudgedTetra.med \
+    CornerTetra.med \
+    SimpleIncludedTetra.med \
+    SimpleIncludingTetra.med \
+    trio_2D.med \
+    UnitTetraDegenT.med \
+    DegenEdgeXY.med \
+    DegenFaceXYZ.med \
+    DegenTranslatedInPlane.med \
+    ComplexIncludedTetra.med \
+    ComplexIncludingTetra.med \
+    HalfstripOnly.med \
+    HalfstripOnly2.med \
+    SimpleHalfstripOnly.med \
+    GenTetra1.med \
+    GenTetra2.med \
+    TrickyTetra1.med \
+    LargeUnitTetra.med \
+    LargeInconsistentTetra.med \
+    DividedUnitTetraSimpler.med \
+    DividedUnitTetra.med \
+    NudgedDividedUnitTetra.med \
+    NudgedDividedUnitTetraSimpler.med \
+    DividedGenTetra1.med DividedGenTetra2.med \
+    Box1.med \
+    Box2.med \
+    Box3.med \
+    Box1Moderate.med \
+    Box2Moderate.med \
+    BoxModSmall1.med \
+    BoxModSmall2.med \
+    BoxEvenSmaller1.med \
+    TinyBox.med \
+    BoxHexa1.med \
+    BoxHexa2.med \
+    MovedHexaBox1.med \
+    MovedHexaBox2.med \
+    BoxTetra2.med \
+    square1.med \
+    square1_split \
+    square1_split1.med \
+    square1_split2.med \
+    square1_split3.med \
+    square2.med \
+    square2_split \
+    square2_split1.med \
+    square2_split2.med \
+    Pol1.fig Pol2.fig Pol3.fig  Pol4.fig \
+    blow5_ascii.case \
+    blow5_ascii.geo \
+    blow5_ascii_cd_displacement \
+    blow5_ascii_cd_thickness \
+    blow5_ascii_pd_displacement \
+    blow5_ascii_pd_thickness
 
-nodist_salomeres_DATA=MEDCatalog.xml
-EXTRA_DIST+= config
+
+# VSR: little trick to avoid putting if MEDCatalog.xml to the distribution archive
+nodist_salomeres_SCRIPTS = MEDCatalog.xml

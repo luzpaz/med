@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 # ifndef INTERPOLATION_HXX
 # define INTERPOLATION_HXX
@@ -92,11 +94,11 @@ public :
 
 };
 
-template <int DIMENSION> void INTERPOLATION<DIMENSION>::init() {
+template <int DIMENSION> void INTERPOLATION<DIMENSION>::init()
+{
 
-  const char * LOC = "INTERPOLATION::init(): ";
-
-  BEGIN_OF(LOC);
+  const char* LOC = "INTERPOLATION::init(): ";
+  BEGIN_OF_MED(LOC);
   _fromField   = ( FIELD<double> * )           NULL;
   _toField     = ( FIELD<double> * )           NULL;
   _fromMesh    = ( MESH * )                    NULL;
@@ -104,16 +106,16 @@ template <int DIMENSION> void INTERPOLATION<DIMENSION>::init() {
   _fromWrapper = ( Meta_Wrapper<DIMENSION> * ) NULL;
   _toWrapper   = ( Meta_Wrapper<DIMENSION> * ) NULL;
   _mapping     = ( Meta_Mapping<DIMENSION> * ) NULL;
-  _iType            = UNDEFINED ;
-  _isConvexFromMesh = UNDEFINED ;
-  END_OF(LOC);
+  _iType            = MED_UNDEFINED ;
+  _isConvexFromMesh = MED_UNDEFINED ;
+  END_OF_MED(LOC);
 }
 
 
 template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fromMesh ) {
 
   const char * LOC = "INTERPOLATION::INTERPOLATION(MESH * fromMesh ) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   init();	
   
@@ -131,13 +133,13 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
 
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
 					        
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }; 
 
 template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fromMesh,const MESH & toMesh ) {
 
   const char * LOC = "INTERPOLATION::INTERPOLATION(MESH * fromMesh,,const MESH & toMesh) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   init();	
   
@@ -164,13 +166,13 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
 
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
 					        
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const FIELD<double> & fromField,const MESH & toMesh) {
 
   const char * LOC = "INTERPOLATION(const FIELD<double> & field,const MESH & toMesh) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   init();
 
@@ -199,7 +201,7 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const FIELD<dou
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
   
 					  
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 template <int DIMENSION> INTERPOLATION<DIMENSION>::~INTERPOLATION()
@@ -213,13 +215,13 @@ template <int DIMENSION> int INTERPOLATION<DIMENSION>::getNearestNode(  double *
   
   const char * LOC = "INTERPOLATION::getNearestNode( double * node ) ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   if ( ! _mapping ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"mapping is a NULL pointer  !")) ;
   
   return _mapping->Donne_dTree()->trouve_plus_proche_point(Wrapper_Noeud<DIMENSION > (node) );
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
@@ -227,7 +229,7 @@ template <int DIMENSION> int INTERPOLATION<DIMENSION>::getContainingCell ( doubl
   
   const char * LOC = "INTERPOLATION::getContainingCell( double * node ) ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   if ( ! _mapping ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"mapping is a NULL pointer  !")) ;
 
@@ -237,7 +239,7 @@ template <int DIMENSION> int INTERPOLATION<DIMENSION>::getContainingCell ( doubl
 
   return _mapping->Trouve_Maille_Contenant_Noeud(node,beginingCell,flagIsConvexMesh);
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
@@ -245,7 +247,7 @@ template <int DIMENSION> vector<int> INTERPOLATION<DIMENSION>::getMapping ( int 
   
   const char * LOC = "INTERPOLATION::getMapping( ) ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( ! _mapping   ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"mapping is a NULL pointer  !")) ;
   if ( ! _toWrapper ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"toWrapper  is a NULL pointer  !")) ;
@@ -256,7 +258,7 @@ template <int DIMENSION> vector<int> INTERPOLATION<DIMENSION>::getMapping ( int 
 
   return _mapping->Get_Mapping();
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
@@ -264,7 +266,7 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolate(i
   
   const char * LOC = "INTERPOLATION::interpolate(int itype,int flagIsConvexFromMesh) ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( ! _mapping      ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"mapping is a NULL pointer  !")) ;
   if ( ! _toWrapper    ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"toWrapper  is a NULL pointer  !")) ;
@@ -332,7 +334,7 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolate(i
 
   return _toField;
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
@@ -340,7 +342,7 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolateNe
   
   const char * LOC = "INTERPOLATION::interpolateNextStep(int itype,int flagIsConvexFromMesh) ";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( ! _mapping      ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"mapping is a NULL pointer  !"        ));
   if ( ! _toWrapper    ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"toWrapper  is a NULL pointer  !"     )) ;
@@ -349,8 +351,8 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolateNe
   
   
   if ( ! _toField                   ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"toField  is a NULL pointer, wrong use of interpolateNextStep"       )) ;
-  if ( _iType==UNDEFINED            ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_iType is not defined, wrong use of interpolateNextStep"            )) ;
-  if ( _isConvexFromMesh==UNDEFINED ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_isConvexFromMesh is not defined, wrong use of interpolateNextStep" )) ;  
+  if ( _iType==MED_UNDEFINED            ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_iType is not defined, wrong use of interpolateNextStep"            )) ;
+  if ( _isConvexFromMesh==MED_UNDEFINED ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_isConvexFromMesh is not defined, wrong use of interpolateNextStep" )) ;  
 
   // delete _toField; ????????????????????????????
 

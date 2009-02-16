@@ -1,0 +1,17 @@
+#! /bin/sh -f
+
+outdir="/tmp"
+if test "z$TMP" != "z" && test -e $TMP; then
+    outdir=$TMP
+else
+ if test "z$TMPDIR" != "z" && test -e $TMPDIR; then
+    outdir=$TMPDIR
+ fi
+fi
+
+infile=${srcdir}/../../resources/pointe_import22.med
+
+./test_copie_group $infile maa1
+
+exit
+

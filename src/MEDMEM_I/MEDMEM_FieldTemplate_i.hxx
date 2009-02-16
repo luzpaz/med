@@ -1,21 +1,24 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-// 
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #ifndef __MED_FIELDTEMPLATE_I_HXX__
 #define __MED_FIELDTEMPLATE_I_HXX__
 
@@ -27,6 +30,7 @@
 #include "MultiCommException.hxx"
 #include "MEDMEM_ArrayConvert.hxx"
 #include "MEDMEM_TraitsForFields.hxx"
+#include "utilities.h"
 
 namespace MEDMEM
 {
@@ -54,8 +58,9 @@ namespace MEDMEM
   template < class T, class INTERLACING_TAG >
   FIELDTEMPLATE_I<T,INTERLACING_TAG>::FIELDTEMPLATE_I(): FIELD_i()
   {
-    BEGIN_OF("Default Constructor FIELDTEMPLATE_I");
-    END_OF("Default Constructor FIELDTEMPLATE_I");
+  const char* LOC = "Default Constructor FIELDTEMPLATE_I";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
   }
   //=============================================================================
   /*!
@@ -65,8 +70,9 @@ namespace MEDMEM
   template < class T, class INTERLACING_TAG >
   FIELDTEMPLATE_I<T,INTERLACING_TAG>::~FIELDTEMPLATE_I()
   {
-    BEGIN_OF("Default Destructor FIELDTEMPLATE_I");
-    END_OF("Default Destructor FIELDTEMPLATE_I");
+  const char* LOC = "Default Destructor FIELDTEMPLATE_I";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
   }
   //=============================================================================
   /*!
@@ -77,8 +83,9 @@ namespace MEDMEM
   FIELDTEMPLATE_I<T,INTERLACING_TAG>::FIELDTEMPLATE_I(FIELDTEMPLATE_I<T, INTERLACING_TAG>& fd):
     FIELD_i(fd)
   {
-    BEGIN_OF("Default Constructor FIELDTEMPLATE_I");
-    END_OF("Default Constructor FIELDTEMPLATE_I");
+  const char* LOC = "Default Constructor FIELDTEMPLATE_I";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
   }
   //=============================================================================
   /*!
@@ -88,8 +95,9 @@ namespace MEDMEM
   template < class T, class INTERLACING_TAG >
   FIELDTEMPLATE_I<T,INTERLACING_TAG>::FIELDTEMPLATE_I(MEDMEM::FIELD<T, INTERLACING_TAG> *f, bool ownCppPtr):FIELD_i(f,ownCppPtr)
   {
-    BEGIN_OF("Constructor FIELDTEMPLATE_I");
-    END_OF(" Constructor FIELDTEMPLATE_I");
+  const char* LOC = "Constructor FIELDTEMPLATE_I";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
   }
 
   //=============================================================================

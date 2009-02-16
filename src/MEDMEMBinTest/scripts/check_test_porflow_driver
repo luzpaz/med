@@ -1,0 +1,31 @@
+#! /bin/sh -f
+
+outdir="/tmp"
+if test "z$TMP" != "z" && test -e $TMP; then
+    outdir=$TMP
+else
+ if test "z$TMPDIR" != "z" && test -e $TMPDIR; then
+    outdir=$TMPDIR
+ fi
+fi
+
+initfile=${srcdir}/../../resources/cube.inp
+xyzfile=${srcdir}/../../resources/cube.xyz
+cncfile=${srcdir}/../../resources/cube.cnc
+infile=${outdir}/test_porflow_driver.inp
+
+cp $initfile $infile
+cp $xyzfile ${outdir}/cube.xyz
+cp $cncfile ${outdir}/cube.cnc
+
+./test_porflow_driver $infile
+
+ok=$?
+
+rm $infile
+rm ${outdir}/cube.xyz
+rm ${outdir}/cube.cnc
+rm ${outdir}/test_porflow_driver.med
+rm ${outdir}/test_porflow_driver.vtk
+
+exit $ok

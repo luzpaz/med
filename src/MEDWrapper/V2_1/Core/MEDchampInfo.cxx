@@ -19,6 +19,8 @@
 #include "med.hxx"
 #include "med_outils.hxx"
 
+#include <cstring>
+
 namespace med_2_1{
 
 med_err 

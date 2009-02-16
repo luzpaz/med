@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Exception.hxx"
@@ -36,7 +38,8 @@ COORDINATE::COORDINATE():_coordinateSystem(""),
 			 _nodeNumber()
 //----------------------------------------------------------//
 {
-    BEGIN_OF("Default Constructor COORDINATE");
+  const char* LOC = "Default Constructor COORDINATE";
+  BEGIN_OF_MED(LOC);
 }
 
 /*! This constructor allocate a MEDARRAY of SpaceDimension * NumberOfNodes.\n
@@ -51,7 +54,8 @@ COORDINATE::COORDINATE(int SpaceDimension, int NumberOfNodes, medModeSwitch Mode
 
 //------------------------------------------------------------------------------//
 {
-    BEGIN_OF("Constructor COORDINATE");
+  const char* LOC = "Constructor COORDINATE";
+  BEGIN_OF_MED(LOC);
 }
 
 /*! This constructor is specialy designed for use in class GRID.\n
@@ -79,18 +83,21 @@ COORDINATE::COORDINATE(int SpaceDimension,const string * CoordinateName, const s
     exist in original object) :  for example only full_interlace mode  */
 //------------------------------------------------------------------------------//
 COORDINATE::COORDINATE(const COORDINATE & m):
-  _coordinateSystem(m._coordinateSystem),
-  _coordinate(m._coordinate,false)
+  _coordinateSystem(m._coordinateSystem)
 //------------------------------------------------------------------------------//
 {
-  BEGIN_OF("Copy Constructor COORDINATE");
+  const char* LOC = "Copy Constructor COORDINATE";
+  BEGIN_OF_MED(LOC);
 
-  int spaceDimension = _coordinate.getLeadingValue();
+  _coordinate = m._coordinate;
+  //int spaceDimension = _coordinate.getLeadingValue();
   int numberOfNodes = _coordinate.getLengthValue();
 
-  SCRUTE(spaceDimension);
-  setCoordinatesNames((const string*)m._coordinateName) ;
-  setCoordinatesUnits((const string*)m._coordinateUnit) ;
+  SCRUTE_MED(_coordinate.getLeadingValue());
+  //setCoordinatesNames((const string*)m._coordinateName) ;
+  //setCoordinatesUnits((const string*)m._coordinateUnit) ;
+  setCoordinatesNames( m.getCoordinatesNames() );
+  setCoordinatesUnits( m.getCoordinatesUnits() );
 
   if ( (const int * const) m._nodeNumber != NULL)
     _nodeNumber.set(numberOfNodes,(const int*)m._nodeNumber);
@@ -107,7 +114,7 @@ COORDINATE::COORDINATE(const COORDINATE & m):
 COORDINATE::~COORDINATE()
 //----------------------//
 {
-  MESSAGE("~COORDINATE()");
+  MESSAGE_MED("~COORDINATE()");
 }
 
 /*! sets the attribute _coordinate with Coordinate           */
@@ -160,7 +167,8 @@ void COORDINATE::setCoordinatesNames(const string * CoordinateName)
 //----------------------------------------------------------//
 {
   int SpaceDimension = getSpaceDimension() ;
-  _coordinateName.set(SpaceDimension) ;
+  //_coordinateName.set(SpaceDimension) ;
+  _coordinateName.resize(SpaceDimension);
   for (int i=0; i<SpaceDimension; i++)
     _coordinateName[i]=CoordinateName[i];
 }
@@ -182,7 +190,8 @@ void COORDINATE::setCoordinatesUnits(const string * CoordinateUnit)
 //----------------------------------------------------------//
 { 
   int SpaceDimension = getSpaceDimension() ;
-  _coordinateUnit.set(SpaceDimension) ; 
+  //_coordinateUnit.set(SpaceDimension) ; 
+  _coordinateUnit.resize(SpaceDimension) ; 
   for (int i=0; i<SpaceDimension; i++)
     _coordinateUnit[i]=CoordinateUnit[i];
 }
@@ -267,7 +276,7 @@ const double *  COORDINATE::getCoordinateAxis(int Axis)
 //--------------------------------------//
 const string * COORDINATE::getCoordinatesNames() const
 {
-      	return _coordinateName ;
+  return &(_coordinateName[0]) ;
 }
 
 /* returns the name of axis Axis             */
@@ -275,7 +284,7 @@ const string * COORDINATE::getCoordinatesNames() const
 string COORDINATE::getCoordinateName(int Axis) const
 //-------------------------------------------//
 {
-      	return _coordinateName[Axis-1];
+  return _coordinateName[Axis-1];
 }
 
 /*!  returns an array with units of coordinates (cm, m, mm, ...)
@@ -284,7 +293,7 @@ string COORDINATE::getCoordinateName(int Axis) const
 const string * COORDINATE::getCoordinatesUnits() const
 //-----------------------------------------------------//
 {
-      	return _coordinateUnit ;
+  return &(_coordinateUnit[0]) ;
 }
 
 /*! returns the unit of axis Axis           */
@@ -292,7 +301,7 @@ const string * COORDINATE::getCoordinatesUnits() const
 string COORDINATE::getCoordinateUnit(int Axis) const
 //------------------------------------------//
 {
-      	return _coordinateUnit[Axis-1] ;
+  return _coordinateUnit[Axis-1] ;
 }
 /*! returns "CARTESIAN", "CYLINDRICAL" or "SPHERICAL"*/
 //---------------------------------------------------//

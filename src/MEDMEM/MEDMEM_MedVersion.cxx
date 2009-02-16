@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_MedVersion.hxx"
 #include "MEDMEM_Utilities.hxx"
@@ -63,7 +65,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
 
   if ((minor21 == -1) || (release21 == -1))
     {
-      MESSAGE("getMedFileVersion the file may have been produced by a version 2.1.x x<5");
+      MESSAGE_MED("getMedFileVersion the file may have been produced by a version 2.1.x x<5");
       minor21 = 1;
       release21 = 5;
     }
@@ -90,7 +92,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
 
   if ((minor22 == -1) || (release22 == -1))
     {
-      MESSAGE("getMedFileVersion the file may have been produced by a version 2.1.x x<5");
+      MESSAGE_MED("getMedFileVersion the file may have been produced by a version 2.1.x x<5");
       minor22 = 1;
       release22 = 5;
     }
@@ -103,9 +105,9 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
   if ((major21 != major22) || (minor21 != minor22) || (release21 != release22))
     throw MEDEXCEPTION("Problem in getMedFileVersion(const string &) Med file V21 and V22 version numbers are different");
 
-  MESSAGE("getMedFileVersion: status version 21 of the file major " << major21 << " minor " << minor21 << " release " << release21);
+  MESSAGE_MED("getMedFileVersion: status version 21 of the file major " << major21 << " minor " << minor21 << " release " << release21);
 
-  MESSAGE("getMedFileVersion: status version 22 of the file major " << major22 << " minor " << minor22 << " release " << release22);
+  MESSAGE_MED("getMedFileVersion: status version 22 of the file major " << major22 << " minor " << minor22 << " release " << release22);
 
   if (major21 == 2)
     {
@@ -117,7 +119,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
   else
     version = V22;
 
-  MESSAGE("getMedFileVersion the version of the file is " << version);
+  MESSAGE_MED("getMedFileVersion the version of the file is " << version);
 
   return version;
 }
@@ -133,12 +135,12 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
  */
 //================================================================================
 
-int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
-                             MED_EN::medFileVersion medVersion)
-  throw (MEDEXCEPTION)
-{
-  switch ( medVersion ) {
-  case V21:
+//int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
+//                             MED_EN::medFileVersion medVersion)
+//  throw (MEDEXCEPTION)
+//{
+//  switch ( medVersion ) {
+//  case V21:
 /*
   from MEDouvrir.c:
      switch(mode_acces)
@@ -167,14 +169,14 @@ int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
 	return -1;
       break;
 */
-    switch ( mode ) {
-    case MED_EN::MED_LECT: return med_2_1::MED_LECT;
-    case MED_EN::MED_ECRI: return med_2_1::MED_ECRI;
-    case MED_EN::MED_REMP: return med_2_1::MED_ECRI;
-    default:
-      throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
-    }
-  case V22:
+//    switch ( mode ) {
+//    case MED_EN::MED_LECT: return med_2_1::MED_LECT;
+//    case MED_EN::MED_ECRI: return med_2_1::MED_ECRI;
+//    case MED_EN::MED_REMP: return med_2_1::MED_ECRI;
+//    default:
+//      throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
+//    }
+//  case V22:
 /*
   from med.h:
    MED_LECTURE          : Ouverture en lecture seule
@@ -182,15 +184,15 @@ int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
    MED_LECTURE_AJOUT    : Ouverture en lecture/ecriture, si un élément existe une erreur est générée
    MED_CREATION         : Créer le fichier s'il n'existe pas, l'écrase sinon
 */
-    switch ( mode ) {
-    case MED_EN::MED_LECT: return med_2_3::MED_LECTURE;
-    case MED_EN::MED_ECRI: return med_2_3::MED_LECTURE_ECRITURE;
-    case MED_EN::MED_REMP: return med_2_3::MED_LECTURE_ECRITURE;
-		case MED_EN::MED_CREA: return med_2_3::MED_CREATION;
-    default:
-      throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
-    }
-  default:;
-  }
-  throw MEDEXCEPTION("getMedAccessMode(): Unknown med version");
-}
+//    switch ( mode ) {
+//    case MED_EN::MED_LECT: return med_2_3::MED_LECTURE;
+//    case MED_EN::MED_ECRI: return med_2_3::MED_LECTURE_ECRITURE;
+//    case MED_EN::MED_REMP: return med_2_3::MED_LECTURE_ECRITURE;
+//		case MED_EN::MED_CREA: return med_2_3::MED_CREATION;
+//    default:
+//      throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
+//    }
+//  default:;
+//  }
+//  throw MEDEXCEPTION("getMedAccessMode(): Unknown med version");
+//}

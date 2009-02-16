@@ -1,21 +1,24 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-// 
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 /*
   creation d'une geometrie 3d : un cube [0,1]^3
   maillé uniformement en hexahedres reguliers;
@@ -250,7 +253,7 @@ int main (int argc, char **argv)
   strcat(MedFile,buff);
   strcat(MedFile,".med");
 
-  fid = MEDouvrir(MedFile,MED_REMP);
+  fid = MEDouvrir(MedFile,RDWR);
 
   if (fid < 0)
     ret = -1;
@@ -273,7 +276,7 @@ int main (int argc, char **argv)
   if (ret == 0)
     ret = MEDnoeudsEcr(fid,maa,mdim,coo,MED_FULL_INTERLACE,MED_CART,
 		       nomcoo,unicoo,nomnoe,MED_FAUX,numnoe,MED_VRAI,
-		       nufano,nnoe,MED_ECRI);
+		       nufano,nnoe,WRONLY);
   printf("%d\n",ret);
 
   /*
@@ -287,7 +290,7 @@ int main (int argc, char **argv)
   if (ret == 0) 
     ret = MEDelementsEcr(fid,maa,mdim,hexa8,MED_FULL_INTERLACE,
 			 nomhexa8,MED_FAUX,numhexa8,MED_VRAI,nufahexa8,nhexa8,
-			 MED_MAILLE,MED_HEXA8,MED_NOD,MED_ECRI);
+			 MED_MAILLE,MED_HEXA8,MED_NOD,WRONLY);
   printf("%d \n",ret);
 
   /***************************************************************************/
@@ -328,7 +331,7 @@ int main (int argc, char **argv)
 	  ret = MEDchampEcr(fid, maa, champDbleVectNode,
 			    (unsigned char *)DbleVectNode,
 			    MED_NO_INTERLACE, nnoe,
-			    MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_NOEUD, 
+			    MED_NOPG, MED_ALL, MED_NOPFL, WRONLY, MED_NOEUD, 
 			    0, MED_NOPDT,"        ", 0., MED_NONOR);
 	
 	  printf("MEDchampEcr DbleVectNode : %d \n",ret);
@@ -347,7 +350,7 @@ int main (int argc, char **argv)
 	  ret = MEDchampEcr(fid, maa, champDbleVectCell,
 			    (unsigned char *)DbleVectCell,
 			    MED_NO_INTERLACE, nhexa8,
-			    MED_NOPG, MED_ALL, MED_NOPFL, MED_ECRI, MED_MAILLE,
+			    MED_NOPG, MED_ALL, MED_NOPFL, WRONLY, MED_MAILLE,
 			    MED_HEXA8, MED_NOPDT,"        ", 0., MED_NONOR);
 	
 	  printf("MEDchampEcr DbleVectCell : %d \n",ret);

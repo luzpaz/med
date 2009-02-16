@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
  File Group.cxx
@@ -32,23 +34,23 @@ using namespace MED_EN;
 
 GROUP::GROUP():SUPPORT(),_numberOfFamilies(0),_family() 
 {
-  MESSAGE("GROUP()");
-};
+  MESSAGE_MED("GROUP()");
+}
 
 GROUP::~GROUP() 
 {
-  MESSAGE("~GROUP()");
-};
+  MESSAGE_MED("~GROUP()");
+}
   
 GROUP & GROUP::operator=(const GROUP &group) 
 {
-  MESSAGE("GROUP::operator=");
+  MESSAGE_MED("GROUP::operator=");
   if ( &group == this ) return *this;
   SUPPORT::operator=(group);
   _numberOfFamilies = group._numberOfFamilies ;
   _family      	    = group._family ;
   return *this;
-};
+}
 
 ostream & MEDMEM::operator<<(ostream &os, GROUP &myGroup)
 {
@@ -60,15 +62,15 @@ ostream & MEDMEM::operator<<(ostream &os, GROUP &myGroup)
     os << "    * "<<myGroup.getFamily(j)->getName().c_str()<<endl ;
 
   return os;
-};
+}
 
 GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCEPTION)
 {
   const char * LOC = "GROUP( const string & , const list<FAMILY*> & ) : " ;
   
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
-  MESSAGE(LOC<<name);
+  MESSAGE_MED(LOC<<name);
 
   int numberOfFamilies = families.size();
   _name = name ;
@@ -80,8 +82,8 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   _entity = myFamily->getEntity() ;
   bool isOnAllElts = myFamily->isOnAllElements() ;
 
-  SCRUTE(isOnAllElts);
-  SCRUTE(numberOfFamilies);
+  SCRUTE_MED(isOnAllElts);
+  SCRUTE_MED(numberOfFamilies);
 
 
   if ((numberOfFamilies==1) && (isOnAllElts))
@@ -104,13 +106,13 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   const medGeometryElement * geometricType = myFamily->getTypes() ;
   //int * geometricTypeNumber = myFamily->getGeometricTypeNumber() ;
 
-  SCRUTE(_numberOfGeometricType);
+  SCRUTE_MED(_numberOfGeometricType);
 
   for (int i=0 ; i<_numberOfGeometricType; i++) {
     _geometricType[i]= geometricType[i] ;
     // _geometricTypeNumber[i] = geometricTypeNumber[i] ;
     _numberOfElements[i]=myFamily->getNumberOfElements(geometricType[i]);
-    MESSAGE(LOC << " Type : " << _geometricType[i] << " number of element(s) " << _numberOfElements[i]);
+    MESSAGE_MED(LOC << " Type : " << _geometricType[i] << " number of element(s) " << _numberOfElements[i]);
   }
   _isOnAllElts = false ;
   //_totalNumberOfEntities = myFamily->getNumberOfElements(MED_ALL_ELEMENTS) ;
@@ -125,28 +127,28 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   int famNumberCount = famNumber->getNumberOf();
   int famNumberLength = famNumber->getLength();
 
-  SCRUTE(famNumber);
-  SCRUTE(famNumberCount);
-  SCRUTE(famNumberLength);
-  SCRUTE(famNumberValue);
-  SCRUTE(famNumberIndex);
+  SCRUTE_MED(famNumber);
+  SCRUTE_MED(famNumberCount);
+  SCRUTE_MED(famNumberLength);
+  SCRUTE_MED(famNumberValue);
+  SCRUTE_MED(famNumberIndex);
 
 //   _number = new MEDSKYLINEARRAY(*famNumber) ;
   _number = new MEDSKYLINEARRAY(famNumberCount,famNumberLength,
 				famNumberIndex,famNumberValue) ;
 
-  SCRUTE(_number);
+  SCRUTE_MED(_number);
 
   _numberOfFamilies = families.size();
 
-  SCRUTE(numberOfFamilies);
+  SCRUTE_MED(numberOfFamilies);
 
-  //SCRUTE(_numberOfFamilies);
+  //SCRUTE_MED(_numberOfFamilies);
 
   _family.resize(_numberOfFamilies) ;
   list<FAMILY*>::const_iterator li ;
 
-  // MESSAGE(LOC<<"Printing of the object GROUP built right before the blending"<< (SUPPORT) *this);
+  // MESSAGE_MED(LOC<<"Printing of the object GROUP built right before the blending"<< (SUPPORT) *this);
 
 
   int it = 0 ;
@@ -156,35 +158,34 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
     it++ ;
   }
 
-  //MESSAGE(LOC<<"Printing of the object GROUP built "<< (GROUP)*this);
+  //MESSAGE_MED(LOC<<"Printing of the object GROUP built "<< (GROUP)*this);
 
-  END_OF(LOC);
-};
+  END_OF_MED(LOC);
+}
 
 GROUP::GROUP(const GROUP & m):SUPPORT(m)
 {
   _numberOfFamilies = m._numberOfFamilies;
   _family = m._family; //Copie profonde dans FAMILY Rmq from EF
-};
+}
 
 // void GROUP::init(const list<FAMILY*> & families)
 // {
-//   const char * LOC = "GROUP::init( const list<FAMILY*> & ) : " ;
   
-//   BEGIN_OF(LOC);
+//   BEGIN_OF_MED(LOC);
   
 //   FAMILY * myFamily = families.front() ;
 //   _mesh =  myFamily->getMesh() ;
 
 //   _isOnAllElts = myFamily->isOnAllElements() ;
 
-//   SCRUTE(_mesh);
+//   SCRUTE_MED(_mesh);
 
-//   SCRUTE(_isOnAllElts);
+//   SCRUTE_MED(_isOnAllElts);
 
 //   _entity = myFamily->getEntity() ;
 
-//   SCRUTE(_mesh->getNumberOfTypes(_entity));
+//   SCRUTE_MED(_mesh->getNumberOfTypes(_entity));
 
 //   _numberOfGeometricType = myFamily->getNumberOfTypes() ;
 //   _geometricType = new medGeometryElement[_numberOfGeometricType];
@@ -217,6 +218,6 @@ GROUP::GROUP(const GROUP & m):SUPPORT(m)
 //     it++ ;
 //   }
   
-//   END_OF(LOC);
+//   END_OF_MED();
 // };
 

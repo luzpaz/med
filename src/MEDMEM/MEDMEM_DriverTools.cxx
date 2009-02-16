@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_DriverTools.hxx"
 #include "MEDMEM_STRING.hxx"
@@ -23,6 +25,8 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Field.hxx"
+#include "MEDMEM_InterpolationHighLevelObjects.hxx"
+
 #include <iomanip>
 #include <algorithm>
 
@@ -33,37 +37,78 @@ using namespace MED_EN;
 
 namespace MEDMEM {
 
+// avoid coping sortedNodeIDs
+_maille::_maille(const _maille& ma)
+  : sommets(ma.sommets), geometricType(ma.geometricType), _ordre(ma._ordre),
+    reverse(ma.reverse), sortedNodeIDs(0)
+{
+}
+
 // Cet opérateur permet d'ordonner les mailles dans un set suivant l'ordre requis par MED
 bool _maille::operator < (const _maille& ma) const
 {
   // si le type géométrique differe, la comparaison est basée dessus
-  // sinon on se base sur une comparaison des numéros de sommets 
-  if(geometricType==ma.geometricType)
-  {
-    // construction de deux vecteur temporaire contenant les numeros de sommets
-    // pour faire le tri et les comparaisons
-    size_t l=sommets.size();
-    std::vector<int> v1(l);
-    std::vector<int> v2(l);
-    for (unsigned int i=0; i!=l; ++i)
-    {
-      v1[i]=sommets[i]->second.number;
-      v2[i]=ma.sommets[i]->second.number;
-    }
-    std::sort(v1.begin(), v1.end());
-    std::sort(v2.begin(), v2.end());
-    for(std::vector<int>::const_iterator i1=v1.begin(), i2=v2.begin(); i1!=v1.end(); ++i1, ++i2)
-      if(*i1 != *i2)
-        return *i1 < *i2;
-    return false; // cas d'égalité
+  // sinon on se base sur une comparaison des numéros de sommets
+  // we compare _mailles of only same geometricType due to maillageByType usage
+  size_t l=sommets.size();
+  if ( dimension() > 3 ) { // poly
+    size_t l2 = ma.sommets.size();
+    if ( l != l2 )
+      return l < l2;
   }
-  else
-    return geometricType<ma.geometricType;
-};
+  const int* v1 = getSortedNodes();
+  const int* v2 = ma.getSortedNodes();
+  for ( const int* vEnd = v1 + l; v1 < vEnd; ++v1, ++v2 )
+    if(*v1 != *v2)
+      return *v1 < *v2;
+  return false; // cas d'égalité
+  
+//   if(geometricType==ma.geometricType)
+//   {
+//     // construction de deux vecteur temporaire contenant les numeros de sommets
+//     // pour faire le tri et les comparaisons
+//     size_t l=sommets.size();
+//     if ( dimension() > 3 ) { // poly
+//       size_t l2 = ma.sommets.size();
+//       if ( l != l2 )
+//         return l < l2;
+//     }
+//     std::vector<int> v1(l);
+//     std::vector<int> v2(l);
+//     for (unsigned int i=0; i!=l; ++i)
+//     {
+//       v1[i]=nodeNum(i);
+//       v2[i]=ma.nodeNum(i);
+//     }
+//     std::sort(v1.begin(), v1.end());
+//     std::sort(v2.begin(), v2.end());
+//     for(std::vector<int>::const_iterator i1=v1.begin(), i2=v2.begin(); i1!=v1.end(); ++i1, ++i2)
+//       if(*i1 != *i2)
+//         return *i1 < *i2;
+//     return false; // cas d'égalité
+//   }
+//   else
+//     return geometricType<ma.geometricType;
+}
+
+// creates if needed and return sortedNodeIDs  
+const int* _maille::getSortedNodes() const
+{
+  if ( !sortedNodeIDs )
+  {
+    size_t l=sommets.size();
+    sortedNodeIDs = new int[ l ];
+
+    for (size_t i=0; i!=l; ++i)
+      sortedNodeIDs[i]=nodeID(i);
+    std::sort( sortedNodeIDs, sortedNodeIDs + l );
+  }
+  return sortedNodeIDs;
+}
 
 _link _maille::link(int i) const
 {
-  ASSERT ( i >= 0 && i < sommets.size() );
+  ASSERT_MED ( i >= 0 && i < sommets.size() );
   int i2 = ( i + 1 == sommets.size() ) ? 0 : i + 1;
   if ( reverse )
     return make_pair( sommets[i2]->first, sommets[i]->first );
@@ -75,9 +120,9 @@ _link _maille::link(int i) const
 MED_EN::medEntityMesh _maille::getEntity(const int meshDimension) const throw (MEDEXCEPTION)
 {
   const char * LOC = "_maille::getEntity(const int meshDimension)" ;
-//   BEGIN_OF(LOC);
+//   BEGIN_OF_MED(LOC);
 
-  int mailleDimension = this->dimension();
+  int mailleDimension = this->dimensionWithPoly();
   medEntityMesh entity;
   if (mailleDimension == meshDimension)
     entity = MED_CELL;
@@ -98,17 +143,36 @@ MED_EN::medEntityMesh _maille::getEntity(const int meshDimension) const throw (M
       }
 return entity;
 
-//END_OF(LOC);
+//END_OF_MED(LOC);
 };
+
+void _maillageByDimIterator::init(const int dim, const bool convertPoly )
+{
+  myIt = myImed->maillageByType.begin();
+  myEnd = myImed->maillageByType.end();
+  myDim = dim;
+  myConvertPoly = convertPoly;
+  nbRemovedByType = & myImed->nbRemovedByType;
+}
 
 std::ostream& operator << (std::ostream& os, const _maille& ma)
 {
-    os << "maille " << ma.ordre << " (" << ma.geometricType << ") : < ";
-    std::vector< std::map<int,_noeud>::iterator >::const_iterator i=ma.sommets.begin();
-    os << (*i++)->second.number ;
-    for( ; i!=ma.sommets.end(); ++i)
-	os << ", " << (*i)->second.number;
-    os << " >";
+    os << "maille " << ma.ordre() << " (" << ma.geometricType << ") : < ";
+    os << ma.nodeNum(0);
+    for( int i=1; i!=ma.sommets.size(); ++i)
+	os << ", " << ma.nodeNum( i );
+    os << " > sortedNodeIDs: ";
+    if ( ma.sortedNodeIDs ) {
+      os << "< ";
+      for( int i=0; i!=ma.sommets.size(); ++i)
+	os << ( i ? ", " : "" ) << ma.sortedNodeIDs[ i ];
+      os << " >";
+    }
+    else {
+      os << "NULL";
+    }
+    if ( ma.isMerged() )
+      os << " MERGED ";
     return os;
 }
 
@@ -121,7 +185,7 @@ std::ostream& operator << (std::ostream& os, const _groupe& gr)
     
     os << std::endl << " -> liste des "<< gr.mailles.size() << " mailles : " << std::endl;
     
-    _groupe::mailleIter i1=gr.mailles.begin();
+    _groupe::TMailleIter i1=gr.mailles.begin();
     int l;
     for(l = 0; l < DUMP_LINES_LIMIT && i1!=gr.mailles.end(); i1++, l++)
 	    os << setw(3) << l+1 << " " << *(*i1) << std::endl;
@@ -130,7 +194,7 @@ std::ostream& operator << (std::ostream& os, const _groupe& gr)
       os << "   ... skip " << gr.mailles.size() - l << " mailles" << endl;
     
     os << " relocMap, size=" << gr.relocMap.size() << endl;
-    map<const _maille*,int>::const_iterator it = gr.relocMap.begin();
+    map<unsigned,int>::const_iterator it = gr.relocMap.begin();
     for ( l = 0; l < DUMP_LINES_LIMIT && it != gr.relocMap.end(); ++it, ++l )
       os << " (" << it->first << "," << it->second << ")";
     if ( gr.relocMap.size() > 0 )
@@ -174,31 +238,35 @@ std::ostream& operator << (std::ostream& os, const _fieldBase * f)
 
 std::ostream& operator << (std::ostream& os, const _intermediateMED& mi)
 {
-    os << "Set des " << mi.maillage.size() << " mailles : " << std::endl;
-    std::set<_maille>::const_iterator i=mi.maillage.begin();
-    int l;
-    for( l = 0; l < DUMP_LINES_LIMIT && i!=mi.maillage.end(); ++i, ++l)
-	os << setw(3) << l+1 << " " <<*i << std::endl;
+  int l;
+  _maillageByDimIterator maIt( mi );
+  while ( const set<_maille >* maillage = maIt.nextType() )
+  {
+    os << "Set des " << maillage->size()
+       << " mailles of type " << maIt.type() << ": "<< std::endl;
+    std::set<_maille>::const_iterator i=maillage->begin();
+    for( l = 0; l < DUMP_LINES_LIMIT && i!=maillage->end(); ++i, ++l)
+      os << setw(3) << l+1 << " " <<*i << std::endl;
     if ( l == DUMP_LINES_LIMIT )
-      os << "   ... skip " << mi.maillage.size() - l << " mailles" << endl;
-    
-    os << std::endl << "Vector des " << mi.groupes.size() << " groupes : " << std::endl;
-    for (unsigned int k=0; k!=mi.groupes.size(); k++)
-      os << std::setw(3) << k << " " << mi.groupes[k] << std::endl;
-    
-    os << std::endl << "map des " << mi.points.size() << " noeuds : " << std::endl;
-    std::map<int,_noeud>::const_iterator j=mi.points.begin();
-    for( l = 0; l < DUMP_LINES_LIMIT && j!=mi.points.end(); ++j, ++l)
-	os << j->second << std::endl;
-    if ( l == DUMP_LINES_LIMIT )
-      os << "   ... skip " << mi.points.size() - l << " noeuds" << endl;
+      os << "   ... skip " << maillage->size() - l << " mailles" << endl;
+  }
+  os << std::endl << "Vector des " << mi.groupes.size() << " groupes : " << std::endl;
+  for (unsigned int k=0; k!=mi.groupes.size(); k++)
+    os << std::setw(3) << k << " " << mi.groupes[k] << std::endl;
 
-    os << endl << mi.fields.size() << " fields:" << endl;
-    std::list<_fieldBase* >::const_iterator fIt = mi.fields.begin();
-    for ( l = 0; fIt != mi.fields.end(); ++fIt, ++l )
-      os << " - " << l+1 << " " << *fIt << endl;
+  os << std::endl << "map des " << mi.points.size() << " noeuds : " << std::endl;
+  std::map<int,_noeud>::const_iterator j=mi.points.begin();
+  for( l = 0; l < DUMP_LINES_LIMIT && j!=mi.points.end(); ++j, ++l)
+    os << j->second << std::endl;
+  if ( l == DUMP_LINES_LIMIT )
+    os << "   ... skip " << mi.points.size() - l << " noeuds" << endl;
 
-    return os;
+  os << endl << mi.fields.size() << " fields:" << endl;
+  std::list<_fieldBase* >::const_iterator fIt = mi.fields.begin();
+  for ( l = 0; fIt != mi.fields.end(); ++fIt, ++l )
+    os << " - " << l+1 << " " << *fIt << endl;
+
+  return os;
 }
 
 
@@ -211,7 +279,7 @@ std::ostream& operator << (std::ostream& os, const _intermediateMED& mi)
 void _intermediateMED::treatGroupes()
 {
   const char * LOC = "_intermediateMED::treatGroupes() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( myGroupsTreated )
     return;
@@ -226,7 +294,7 @@ void _intermediateMED::treatGroupes()
   for (unsigned int i=0; i!=this->groupes.size(); ++i)
   {
     _groupe& grp = groupes[i];
-    //INFOS( i << " " << grp.nom );
+    //INFOS_MED( i << " " << grp.nom );
     j = grp.groupes.begin();
     while( j!=grp.groupes.end() ) {
       int grpInd = *j-1;
@@ -236,7 +304,7 @@ void _intermediateMED::treatGroupes()
       }
       _groupe & sub_grp = groupes[ grpInd ];
       if ( !sub_grp.groupes.empty() ) {
-        MESSAGE("High hierarchical depth of subgroups in group " << i );
+        MESSAGE_MED("High hierarchical depth of subgroups in group " << i );
         *j = sub_grp.groupes[0]; // replace j with its 1st subgroup
         // push back the rest subs
         for ( int k = 1; k < (int)sub_grp.groupes.size(); ++k )
@@ -282,7 +350,7 @@ void _intermediateMED::treatGroupes()
       _groupe& grp = groupes[i];
       grp.mailles.clear();
       grp.groupes.clear();
-      MESSAGE( "Erase " << i << "-th group " << grp.nom );
+      MESSAGE_MED( "Erase " << i << "-th group " << grp.nom );
     }
   }
 
@@ -300,156 +368,162 @@ void _intermediateMED::treatGroupes()
     // check if sub-groups have different dimension
     j = grp.groupes.begin();
     int dim = groupes[*j-1].mailles[0]->dimension();
-    for( j++; /*!hasMixedCells &&*/ j!=grp.groupes.end(); ++j) {
+    for( j++; j!=grp.groupes.end(); ++j) {
       int dim2 = groupes[*j-1].mailles[0]->dimension();
       if ( dim != dim2 ) {
-        if ( dim == 0 || dim2 == 0 ) {
-          // cant create a group of nodes plus anything else
+        if ( dim == 0 || dim2 == 0 || dim + dim2 == 9 ) {
+          // cant create a group of nodes plus anything else,
+          // neither a group of polygones + polyhedrons
           grp.mailles.clear();
           grp.groupes.clear();
-          MESSAGE( "Erase mixed dim group with nodes:" << i << "-th group " << grp.nom );
+          MESSAGE_MED( "Erase mixed dim group with nodes:" << i << "-th group " << grp.nom );
+          break;
         }
-        else {
+        int d1 = dim  < 4 ? dim  : dim  - 2; // care of poly
+        int d2 = dim2 < 4 ? dim2 : dim2 - 2;
+        if ( d1 != d2 ) {
           hasMixedCells = true;
-          MESSAGE( "Mixed dim group: " << i << "-th " << grp.nom <<
+          MESSAGE_MED( "Mixed dim group: " << i << "-th " << grp.nom <<
                    "  dim1 = " << dim << " dim2 = " << dim2 );
         }
-        break;
       }
     }
   }
 
 //   if ( hasMixedCells )
-//     INFOS( "There will be groups of mixed dimention" );
-  END_OF(LOC);
+//     INFOS_MED( "There will be groups of mixed dimention" );
+  END_OF_MED(LOC);
 }
 
 void _intermediateMED::numerotationMaillage()
 {
-  const char * LOC = "_intermediateMED::numerotationMaillage() : ";
-  BEGIN_OF(LOC);
+  const char* LOC = "_intermediateMED::numerotationMaillage() : ";
+  BEGIN_OF_MED(LOC);
+  if ( myMaillesNumerated )
+    return;
+  myMaillesNumerated = true;
 
   treatGroupes();
 
+  set<_maille>::const_iterator i, iEnd;
+
   // numerotation mailles of type MED_POINT1 by node number
-  std::set<_maille>::iterator i=maillage.begin();
-  if ( i->geometricType == MED_POINT1 ) {
+  bool hasPointMailles = false;
+  if ( const set<_maille> * points = _maillageByDimIterator( *this, 0 ).nextType() ) {
+    hasPointMailles = true;
     numerotationPoints();
-    while ( i!=maillage.end() && i->geometricType == MED_POINT1 ) {
-      i->ordre = i->sommets[0]->second.number;
-      i++;
-    }
+    for ( i = points->begin(), iEnd = points->end(); i != iEnd; ++i )
+      i->setOrdre( i->sommets[0]->second.number ); // is merged if point is merged
   }
 
-  // check if numeration is needed
-  if ( i->ordre  > 0 && maillage.rbegin()->ordre > 0 )
+  // loop on entities
+  for ( int dim = 1; dim <= 3; ++dim )
   {
-    // already numerated, check numeration
-    bool ok = true;
-    const int maxNbTypes = 20;
-    pair< unsigned, unsigned > minMaxOrder[ maxNbTypes ];
-    int nbElems[ maxNbTypes ];
-    std::set<_maille>::iterator j=i;
+    int iterDim = hasMixedCells ? -1 : dim;
+    const bool skipFirstType = ( hasPointMailles && hasMixedCells );
 
-    do { // loop on elements of one entity
-      int iType = 0;
-      minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
-      int i_maille = 0, dimension = j->dimension(), type = j->geometricType;
-
-      std::set<_maille>::iterator k=j;
-      for ( ; j!=maillage.end() && (hasMixedCells || dimension==j->dimension()); ++j)
-      {
-        if (type != j->geometricType) // si changement de type geometrique
-        {
-          nbElems[ iType ] = i_maille;
-          i_maille=0;
-          type = j->geometricType;
-          iType++;
-          minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
-        }
-        ++i_maille;
-        if ( j->ordre < minMaxOrder[ iType ].first )
-          minMaxOrder[ iType ].first = j->ordre;
-        if ( j->ordre > minMaxOrder[ iType ].second )
-          minMaxOrder[ iType ].second = j->ordre;
+    // check if any numeration is present
+    bool hasNumeration = true;
+    _maillageByDimIterator entityMailles( *this, iterDim, true );
+    if ( skipFirstType ) entityMailles.nextType();
+    while ( const set<_maille> * typeMailles = entityMailles.nextType() ) {
+      if ( typeMailles->begin()->ordre() == 0 || typeMailles->rbegin()->ordre() == 0 ) {
+        hasNumeration = false;
+        break;
       }
-      nbElems[ iType ] = i_maille;
+    }
+    // check if re-numeration is needed
+    bool ok = false, renumEntity = false;
+    if ( hasNumeration )
+    {
+      ok = true;
+      _maillageByDimIterator entityMailles( *this, iterDim, true );
+      if ( skipFirstType ) entityMailles.nextType();
 
-      bool renumEntity = false; 
-      for ( int t = 0; t <= iType; ++t ) {
-        int orderRange = minMaxOrder[ t ].second - minMaxOrder[ t ].first;
-        if ( nbElems[ t ] != orderRange + 1 )
+      int prevNbElems = 0;
+      while ( const set<_maille> * typeMailles = entityMailles.nextType() )
+      {
+        unsigned minOrdre = INT_MAX, maxOrdre = 0;
+        for ( i = typeMailles->begin(), iEnd = typeMailles->end(); i!=iEnd; ++i) {
+          if ( i->ordre() < minOrdre ) minOrdre = i->ordre();
+          if ( i->ordre() > maxOrdre ) maxOrdre = i->ordre();
+        }
+        unsigned typeSize = entityMailles.sizeWithoutMerged();
+        if ( typeSize != maxOrdre - minOrdre + 1 )
           ok = false;
-        if ( t > 0 ) {
-          if ( minMaxOrder[ t ].first == 1 )
+        if ( prevNbElems != 0 ) {
+          if ( minOrdre == 1 )
             renumEntity = true;
-          else if ( minMaxOrder[ t-1 ].second+1 != minMaxOrder[ t ].first )
+          else if ( prevNbElems+1 != minOrdre )
             ok = false;
         }
+        prevNbElems += typeSize;
       }
-      if ( ok && renumEntity ) { // each type of entity is numerated separately
-        int iType = 0, i_shift = 0;
-        type = k->geometricType;
-        for ( ; k != j; ++k ) {
-          if (type != k->geometricType) { // si changement de type geometrique
-            i_shift = minMaxOrder[ iType++ ].second;
-            type = k->geometricType;
-          }
-          k->ordre += i_shift;
+
+      if ( ok && renumEntity ) // each geom type was numerated separately
+      {
+        entityMailles.init( iterDim, true );
+        if ( skipFirstType ) entityMailles.nextType();
+        prevNbElems = entityMailles.nextType()->size(); // no need to renumber the first type
+        while ( const set<_maille> * typeMailles = entityMailles.nextType() ) {
+          for ( i = typeMailles->begin(), iEnd = typeMailles->end(); i!=iEnd; ++i)
+            i->setOrdre( i->ordre() + prevNbElems );
+          prevNbElems += typeMailles->size();
         }
       }
-
-    } while ( ok && j != maillage.end() );
-
-    if ( ok ) return; // renumeration not needed
-  }
-
-  // numerotation des mailles par entité
-  int i_maille=0;
-  int dimension=i->dimension();
-  for( ; i!=maillage.end(); ++i)
-  {
-    if ( !hasMixedCells && dimension != i->dimension() ) // on change d'entite
-    {
-      MESSAGE( "NB dim " << dimension << " entities: " << i_maille);
-      dimension=i->dimension();
-      i_maille=0;
     }
-    i->ordre=++i_maille;
+    if ( !ok )
+    {
+      int i_maille=0;
+      entityMailles.init( iterDim, true );
+      if ( skipFirstType ) entityMailles.nextType();
+      while ( const set<_maille> * typeMailles = entityMailles.nextType() )
+        for ( i = typeMailles->begin(), iEnd = typeMailles->end(); i!=iEnd; ++i)
+          i->setOrdre( ++i_maille );
+    }
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
-void _intermediateMED::numerotationPoints()
+bool _intermediateMED::numerotationPoints()
 {
-//   if ( myPointsNumerated )
-//     return;
-//   myPointsNumerated = true;
-    // Fonction de renumerotation des noeuds (necessaire quand il y a des trous dans la numerotation.
+  if ( !myNodesNumerated ) // is negative if numerated by merge
+  {
     int i_noeud=0;
-    for( std::map<int,_noeud>::const_iterator i=points.begin(); i!=points.end(); ++i)
-	i->second.number = ++i_noeud ;
+    for( map<int,_noeud>::iterator i=points.begin(); i!=points.end(); ++i)
+      i->second.number = ++i_noeud ;
+    myNodesNumerated = true;
+    return true;
+  }
+  return false;
 }
     
+int _intermediateMED::nbMerged(int type) const //!< nb nodes removed by merge
+{
+  TNbByType::const_iterator typeNb = nbRemovedByType.find( type );
+  return ( typeNb == nbRemovedByType.end() ? 0 : typeNb->second );
+}
+
 
 /*!
  * \if developper
  * create a MED COORDINATE from the intermediate structure.
  * \endif
  */
-COORDINATE *
-_intermediateMED::getCoordinate(const string & coordinateSystem)
+COORDINATE * _intermediateMED::getCoordinate(const string & coordinateSystem)
 {
     const medModeSwitch mode=MED_FULL_INTERLACE;
     int spaceDimension=points.begin()->second.coord.size();
-    int numberOfNodes=points.size();
-
+    int numberOfNodes=points.size() - nbMerged( MED_POINT1 );
 
     // creation du tableau des coordonnees en mode MED_FULL_INTERLACE
     double * coord = new double[spaceDimension*numberOfNodes];
-    int k=0;
-    for( std::map<int,_noeud>::const_iterator i=points.begin(); i!=points.end(); ++i, ++k)
-	std::copy(i->second.coord.begin(), i->second.coord.end(), coord+k*spaceDimension);
+    double * xyz = coord;
+    for( std::map<int,_noeud>::const_iterator i=points.begin(); i!=points.end(); ++i )
+      if ( i->second.number > 0 ) {
+	std::copy(i->second.coord.begin(), i->second.coord.end(), xyz );
+        xyz += spaceDimension;
+      }
 
     // creation de l'objet COORDINATE
     COORDINATE * coordinate = new COORDINATE(spaceDimension, numberOfNodes, mode);
@@ -460,199 +534,269 @@ _intermediateMED::getCoordinate(const string & coordinateSystem)
 }
 
 
-  /*!
-   * \if developper
-   * create a MED CONNECTIVITY from the intermediate structure.
-   * for memory optimisation, clear the intermediate structure (the "maillage" set )
-   * \endif
-   */
+/*!
+ * \if developper
+ * create a MED CONNECTIVITY from the intermediate structure.
+ * \endif
+ */
 CONNECTIVITY * _intermediateMED::getConnectivity()
 {
-    const char * LOC = "_intermediateMED::getConnectivity() : ";
-    BEGIN_OF(LOC);
-    int numberOfNodes=points.size(); // number of nodes in the mesh
-    int numberOfTypes=0;
-    medEntityMesh entity;
-    medGeometryElement * types=NULL; // pointeurs pour allouer les structures MED
-    int * count=NULL;
-    int * connectivity=NULL;
-    CONNECTIVITY *Connectivity, *Constituent;
-    //int dimension_maillage_moin_2=maillage.rbegin()->dimension() - 2;
+  const char * LOC = "_intermediateMED::getConnectivity() : ";
+  BEGIN_OF_MED(LOC);
 
-    medGeometryElement type=0; // variables de travail
-    int nbtype=0;
-    int dimension=0;
-    bool first = true;
+  int numberOfNodes=points.size() - nbMerged( MED_POINT1 ); // number of nodes in the mesh
+  medEntityMesh entity;
+  CONNECTIVITY *Connectivity = NULL, *Constituent = NULL;
 
-    std::vector<medGeometryElement> vtype; // tableau de travail : stockage des types geometriques pour UNE entite
-    std::vector<int> vcount; // tableau de travail : nombre d'elements pour chaque type geometrique de vtype
+  set<_maille>::const_iterator i, iEnd; // iterateurs sur les mailles
 
-    std::set<_maille>::const_iterator i, j; // iterateurs sur les mailles
+  // find out mesh dimension
+  medGeometryElement meshDim;
+  _maillageByDimIterator allMailles( *this, -1, true );
+  while ( allMailles.nextType() )
+    meshDim = allMailles.dim();
 
-    // min and max element nb for each geom type
-    const int maxNbTypes = 20;
-    vector< pair< unsigned, unsigned > > minMaxOrder( maxNbTypes );
+  // renumerote les points de 1 a n (pour le cas ou certains points ne sont pas presents dans le maillage d'origine)
+  numerotationPoints();
 
+  // STANDARD types connectivity
+
+  // loop on entities
+  for ( int dim = 0; dim <= 3; ++dim )
+  {
     // skip nodes and elements of <dimension_maillage - 2> or less dimension
     // Unfortunately, it is impossible because of MESH::createFamilies() that requires
     // presence of connectivity even for nodes!
-    for ( i = maillage.begin(); i != maillage.end(); ++i )
-      //if ( i->geometricType != MED_POINT1 && i->dimension() > dimension_maillage_moin_2 )
-        break;
-    j = i;
+    //int dimension_maillage_moin_2=maillage.rbegin()->dimension() - 2;
 
-    // renumerote les points de 1 a n (pour le cas ou certains points ne sont pas presents dans le maillage d'origine)
-    numerotationPoints(); 
+    // tableau de travail : nombre d'elements pour chaque type geometrique
+    vector<int> count;
+    count.reserve( maillageByType.size() );
+    count.push_back( 1 );
 
-    do 
-    {
-	// boucle sur les entites de la structure maillage :
-	//   - on parcourt une premiere fois avec i les mailles d'une entite pour récupérer 
-	//     des infos sur les types geometriques, leur nombre et le nombre d'elements.
-	//   - on alloue la connectivite
-	//   - on parcourt une deuxieme fois avec j pour lire les noeuds.
+    // tableau de travail : stockage des types geometriques pour UNE entite
+    vector<medGeometryElement> types;
+    types.reserve( maillageByType.size() );
 
-	type=i->geometricType; // init boucle for
-	dimension=i->dimension();
-	nbtype=0;
-	vtype.push_back(type);
-	// Boucle sur i de parcours des mailles d'une entite
-	// Une entite se termine lorsqu'on atteint la fin de maillage ou lorsque la dimension des mailles change
+    // iterator returning mailles of each type of an entity,
+    // but if hasMixedCells, we iterate on all types at every dim, since
+    // in this case we store POINT1 elems as MED_NODE and
+    // elems of all the rest types as MED_CELL
+    int iterDim = hasMixedCells ? -1 : dim;
+    _maillageByDimIterator entityMailles( *this, iterDim );
 
-        int iType=0;
-        minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
-
-        // if hasMixedCells, store POINT1 elems as MED_NODE and
-        // elems of all the rest types as MED_CELL, i.e. do not break the loop
-        // when dimension changes
-        bool ignoreDimChange = hasMixedCells && dimension > 0;
-	for( ; i!=maillage.end() && ( ignoreDimChange || dimension==i->dimension()) ; ++i)
-	{
-	    if (type != i->geometricType) // si changement de type geometrique
-	    {
-		vcount.push_back(nbtype); // stocke le nombre d'elements de type nbtype
-		nbtype=0;
-		type=i->geometricType;
-		vtype.push_back(type); // stocke le nouveau type geometrique rencontre
-                dimension=i->dimension();
-                iType++;
-                minMaxOrder[ iType ] = make_pair( maillage.size(), 0 );
-	    }
-            if ( i->ordre < minMaxOrder[ iType ].first )
-              minMaxOrder[ iType ].first = i->ordre;
-            if ( i->ordre > minMaxOrder[ iType ].second )
-              minMaxOrder[ iType ].second = i->ordre;
-	    ++nbtype;
-	}
-	vcount.push_back(dimension ? nbtype : numberOfNodes); // n'a pas été stocké dans la boucle
-	
-	// Pour l'entite qu'on vient de parcourir, allocation des tableau et creation de la connectivite
-//	cout << "Dimension = " << dimension << endl;
-//	cout << "Nombre de type geometriques : " << vtype.size() << endl;
-//	for (unsigned k=0; k!=vtype.size(); ++k )
-//	    cout << "  -> " << vtype[k] << " : " << vcount[k] << endl;
-
-	numberOfTypes=vtype.size(); // nombre de types de l'entite
-	
-	if ( i==maillage.end() ) // cas de l'entite de plus haut niveau
-	    entity=MED_CELL;
-	else if (dimension==2 )
-	    entity=MED_FACE;
-	else if (dimension==1 )
-	    entity=MED_EDGE;
-	else if (dimension==0 )
-	    entity=MED_NODE;
-
-	Connectivity = new CONNECTIVITY(numberOfTypes,entity);
-	Connectivity->setEntityDimension(dimension);
-	Connectivity->setNumberOfNodes(numberOfNodes);
-	
-	types = new medGeometryElement[numberOfTypes];
-	std::copy(vtype.begin(),vtype.end(),types);
-	Connectivity->setGeometricTypes(types,entity);
-	delete [] types;
-
-	count = new int[numberOfTypes+1];
-	count[0]=1;
-	for (unsigned int k=0; k!=vcount.size(); ++k )
-	  count[k+1]=count[k]+vcount[k];
-	Connectivity->setCount (count, entity);
-	SCRUTE( entity );
-	SCRUTE(numberOfTypes);
-	SCRUTE(count[numberOfTypes]-1);
-	delete [] count;
-
-	for (int k=0; k!=numberOfTypes; ++k )
-	  {
-            int orderShift = 1;
-            if ( minMaxOrder[ k ].first > 1 ) // min elem number != 1
-              orderShift += minMaxOrder[ k-1 ].second; // max elem number in previous type
-	    // pour chaque type géometrique k, copie des sommets dans connectivity et set dans Connectivity
-	    int nbSommetsParMaille = j->sommets.size();
-	    int n, nbSommets = vcount[k] * nbSommetsParMaille;
-	    connectivity = new int[ nbSommets ];
-	    for (int l=0; l!=vcount[k]; ++l) // loop on elements of geom type
-	    {
-                if ( entity==MED_NODE )
-                  connectivity[l] = l+1;
-                else
-                {
-                  int index0 = nbSommetsParMaille * ( j->ordre - orderShift );
-                  for ( n=0; n != nbSommetsParMaille; ++n) {
-		    //connectivity[nbSommetsParMaille*l+n] =
-                    connectivity[ index0 + n ] =
-                      j->sommets[ j->reverse ? nbSommetsParMaille-n-1 : n ]->second.number;
-                  }
-                // DO NOT ERASE, maillage will be used while fields construction
-		//maillage.erase(j);    ; // dangereux, mais optimise la mémoire consommée!
-                  j++;
-                }
-	    }	   
-
-	    Connectivity->setNodal  (connectivity, entity, vtype[k]);
-	    delete [] connectivity;
-	  }
-
-        if ( entity==MED_NODE )
-          j = i;		
-	else if (i!=j)
-	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Erreur de lecture des mailles ."));
-
-	if ( ! first)
-	    Connectivity->setConstituent (Constituent);
-	else
-	    first = false;
-	Constituent = Connectivity; // stocke Connectivity pour utilisation dans setConstituent lors de la boucle suivante
-
-	vtype.clear();
-	vcount.clear();
-
+    // count nb of types and nb mailles of each type
+    int dimension=0;
+    if ( dim == 0 ) {
+      if ( entityMailles.nextType() && entityMailles.dim() == 0 )
+      {
+        count.push_back( count.back() + numberOfNodes );
+        types.push_back( MED_POINT1 );
+      }
     }
-    while ( i != maillage.end() );
+    else {
+      while ( entityMailles.nextType() )
+      {
+        if ( entityMailles.dim() > 3 ) break; // ignore poly
 
-    END_OF(LOC);
-    return Connectivity;
+        dimension = entityMailles.dim();
+        if ( dimension == 0 ) continue; // if hasMixedCells, iterator returns all types
+
+        count.push_back( count.back() + entityMailles.sizeWithoutMerged() );
+        types.push_back( entityMailles.type() );
+      }
+    }
+    int numberOfTypes = types.size(); // nombre de types de l'entite
+    if ( numberOfTypes == 0 )
+      continue;
+
+    if ( dimension == meshDim ) entity=MED_CELL;
+    else if (dimension==2 )     entity=MED_FACE;
+    else if (dimension==1 )     entity=MED_EDGE;
+    else if (dimension==0 )     entity=MED_NODE;
+
+    Connectivity = new CONNECTIVITY ( numberOfTypes, entity );
+    Connectivity->setEntityDimension( dimension );
+    Connectivity->setNumberOfNodes  ( numberOfNodes );
+    Connectivity->setGeometricTypes ( &types[0], entity);
+    Connectivity->setCount          ( &count[0], entity );
+
+    int prevNbElems = 1; // in previous type
+    for (int k=0; k!=numberOfTypes; ++k )
+    {
+      set<_maille> & typeMailles = maillageByType[ types[k] ];
+      i = typeMailles.begin(), iEnd = typeMailles.end();
+      // copie des sommets dans connectivity et set dans Connectivity
+      int nbSommetsParMaille = i->sommets.size();
+      int nbMailles = count[k+1]-count[k];
+      int nbSommets = nbMailles * nbSommetsParMaille;
+      int* connectivity = new int[ nbSommets ];
+      if ( entity==MED_NODE ) {
+        for (int l=0; l!=nbSommets; ++l) {
+          connectivity[l] = l+1;
+        }
+      }
+      else {
+        for ( ; i != iEnd; ++i ) { // loop on elements of geom type
+          if ( i->isMerged() )
+            continue;
+          int* mailleConn = connectivity + nbSommetsParMaille * ( i->ordre() - prevNbElems );
+          if ( i->reverse )
+            for ( int n=nbSommetsParMaille-1; n!=-1; --n)
+              *mailleConn++ = i->nodeNum( n );
+          else
+            for ( int n=0; n != nbSommetsParMaille; ++n)
+              *mailleConn++ = i->nodeNum( n );
+        }
+        // DO NOT ERASE, maillage will be used while fields construction
+        //maillage.erase(j);    ; // dangereux, mais optimise la mémoire consommée!
+      }
+      Connectivity->setNodal (connectivity, entity, types[k]);
+      delete [] connectivity;
+      prevNbElems += nbMailles;
+    }
+
+    if ( Constituent )
+      Connectivity->setConstituent (Constituent);
+    // stocke Connectivity pour utilisation dans setConstituent lors de la boucle suivante
+    Constituent = Connectivity;
+
+    if ( entity == MED_CELL )
+      break; // necessary if hasMixedCells
+  }
+
+  // POLYGONAL connectivity
+
+  set<_maille > & polygones = maillageByType[ MED_POLYGON ];
+  if ( !polygones.empty() )
+  {
+    // create connectivity if necessary
+    entity = ( meshDim == 2 ) ? MED_CELL : MED_FACE;
+    if ( !Connectivity || Connectivity->getEntity() > entity ) {
+      Connectivity = new CONNECTIVITY ( 0, entity );
+      Connectivity->setEntityDimension( 2 );
+      Connectivity->setNumberOfNodes  ( numberOfNodes );
+      if ( Constituent )
+        Connectivity->setConstituent (Constituent);
+      Constituent = Connectivity;
+    }
+    
+    // put polygones in order of increasing number
+    int numShift = 1 + Connectivity->getNumberOf( entity, MED_ALL_ELEMENTS );
+    int nbPoly = polygones.size() - nbMerged( MED_POLYGON );
+    vector<const _maille*> orderedPoly( nbPoly );
+    for ( i = polygones.begin(), iEnd = polygones.end(); i != iEnd; ++i )
+      if ( !i->isMerged() )
+        orderedPoly[ i->ordre() - numShift ] = &(*i);
+
+    // make index
+    vector<int> polyIndex;
+    polyIndex.reserve( nbPoly + 1 );
+    vector<const _maille*>::iterator poly = orderedPoly.begin(), polyEnd = orderedPoly.end();
+    for ( polyIndex.push_back( 1 ); poly != polyEnd; ++poly)
+      polyIndex.push_back( polyIndex.back() + (*poly)->sommets.size() );
+
+    // make connectivity
+    int nbNodes = polyIndex.back() - 1;
+    vector<int> polyConn( nbNodes );
+    vector<int>::iterator conn = polyConn.begin();
+    for ( poly = orderedPoly.begin(); poly != polyEnd; ++poly) {
+      for ( int j = 0, nbNodes = (*poly)->sommets.size(); j < nbNodes; ++j )
+        *conn++ = (*poly)->nodeNum( j );
+    }
+    Connectivity->setPolygonsConnectivity(MED_NODAL, entity,
+                                          &polyConn[0], &polyIndex[0],
+                                          polyConn.size(), nbPoly );
+  }
+
+  // POLYHEDRAL connectivity
+
+  set<_maille > & pHedra = maillageByType[ MED_POLYHEDRA ];
+  if ( !pHedra.empty() )
+  {
+    if ( pHedra.size() != polyherdalNbFaceNodes.size() )
+      throw MEDEXCEPTION (LOCALIZED(STRING(LOC) << "Missing info on polyhedron faces"));
+
+    // create connectivity if necessary
+    entity = MED_CELL;
+    if ( !Connectivity || Connectivity->getEntity() != entity ) {
+      Connectivity = new CONNECTIVITY ( 0, entity );
+      Connectivity->setEntityDimension( 3 );
+      Connectivity->setNumberOfNodes  ( numberOfNodes );
+      if ( Constituent )
+        Connectivity->setConstituent (Constituent);
+    }
+    typedef TPolyherdalNbFaceNodes::iterator TPolyFaNoIter;
+    TPolyFaNoIter polyFaNo, polyFaNoEnd = polyherdalNbFaceNodes.end();
+
+    // put poly's in order of increasing number
+    int numShift = 1 + Connectivity->getNumberOf( entity, MED_ALL_ELEMENTS );
+    int nbPoly = pHedra.size() - nbMerged( MED_POLYHEDRA );
+    vector<TPolyFaNoIter> orderedPolyFaNo( nbPoly );
+    for ( polyFaNo = polyherdalNbFaceNodes.begin(); polyFaNo != polyFaNoEnd; ++polyFaNo )
+      if ( !polyFaNo->first->isMerged() )
+        orderedPolyFaNo[ polyFaNo->first->ordre() - numShift ] = polyFaNo;
+
+    vector<TPolyFaNoIter>::iterator pfnIter, pfnEnd = orderedPolyFaNo.end();
+
+    // make index pointing to faces of a polyhedron
+    vector<int> polyIndex;
+    polyIndex.reserve( nbPoly + 1 );
+    polyIndex.push_back( 1 );
+    for ( pfnIter = orderedPolyFaNo.begin(); pfnIter != pfnEnd; ++pfnIter) {
+      int nbFaces = (*pfnIter)->second.size();
+      polyIndex.push_back( polyIndex.back() + nbFaces );
+    }
+
+    // make face index pointing to nodes of a face
+    int nbFaces = polyIndex.back() - 1;
+    vector<int> faceIndex;
+    faceIndex.reserve( polyIndex.back() );
+    faceIndex.push_back( 1 );
+    for ( pfnIter = orderedPolyFaNo.begin(); pfnIter != pfnEnd; ++pfnIter) {
+      vector<int> & faceNodes = (*pfnIter)->second;
+      vector<int>::iterator nbNodes = faceNodes.begin(), nbEnd = faceNodes.end();
+      for ( ; nbNodes != nbEnd; ++nbNodes )
+        faceIndex.push_back( faceIndex.back() + *nbNodes );
+    }
+
+    // make connectivity
+    int nbNodes = faceIndex.back() - 1;
+    vector<int> polyConn( nbNodes );
+    vector<int>::iterator conn = polyConn.begin();
+    for ( pfnIter = orderedPolyFaNo.begin(); pfnIter != pfnEnd; ++pfnIter) {
+      const _maille * poly = (*pfnIter)->first;
+      for ( int j = 0, nbNodes = poly->sommets.size(); j < nbNodes; ++j )
+        *conn++ = poly->nodeNum( j );
+    }
+    Connectivity->setPolyhedronConnectivity(MED_NODAL,
+                                            &polyConn[0], &polyIndex[0],
+                                            polyConn.size(), nbPoly,
+                                            &faceIndex[0], nbFaces );
+  }
+
+  END_OF_MED(LOC);
+  return Connectivity;
 }
 
 
-  /*!
-   * \if developper
-   * fill the arguments vector of groups from the intermediate structure.
-   * This function must be called before getConnectivity()
-   * \endif
-   */
-void
-_intermediateMED::getGroups(vector<GROUP *> & _groupCell,
-                            vector<GROUP *> & _groupFace,
-                            vector<GROUP *> & _groupEdge,
-                            vector<GROUP *> & _groupNode, MESH * _ptrMesh)
+/*!
+ * \if developper
+ * fill the arguments vector of groups from the intermediate structure.
+ * This function must be called before getConnectivity()
+ * \endif
+ */
+void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
+                                 vector<GROUP *> & _groupFace,
+                                 vector<GROUP *> & _groupEdge,
+                                 vector<GROUP *> & _groupNode, MESH * _ptrMesh)
 {
-  const char * LOC = "_intermediateMED::getGroups() : ";
-  BEGIN_OF(LOC);
+  const char* LOC = "_intermediateMED::getGroups() : ";
+  BEGIN_OF_MED(LOC);
 
-  medGroupes.resize( groupes.size(), 0 );
-  if (maillage.size() == 0) {
-    INFOS( "Erreur : il n'y a plus de mailles");
+  //medGroupes.resize( groupes.size(), 0 );
+  if (maillageByType.size() == 0) {
+    INFOS_MED( "Erreur : il n'y a plus de mailles");
     return;
   }
 
@@ -664,26 +808,27 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
 
   numerotationMaillage(); // Renumerotation des mailles par entite
 
-  int dimension_maillage=maillage.rbegin()->dimension();
+  int dimension_maillage=getMeshDimension();
 
-  for (unsigned int i=0; i!=this->groupes.size(); ++i)
+  for (size_t i=0; i!=this->groupes.size(); ++i)
   {
     _groupe& grp = groupes[i];
-    if ( medGroupes[ i ] )
+    if ( grp.medGroup /*medGroupes[ i ]*/ )
       continue; // grp already converted into a MED group
 
     bool isFieldSupport = ( support_groups.find( i ) != support_groups.end() );
     // si le groupe est vide, ou si le groupe n'est pas nommé : on passe au suivant
     if ( grp.empty() || ( grp.nom.empty() && !isFieldSupport )) {
       if ( !grp.nom.empty() ) {
-        INFOS("Skip group " << i << grp.nom);
+        INFOS_MED("Skip group " << i << " " << grp.nom);
 //       } else {
-//         MESSAGE("Skip group " << i << " <" << grp.nom << "> " << ( grp.empty() ? ": empty" : ""));
+//         MESSAGE_MED("Skip group " << i << " <" << grp.nom << "> " << ( grp.empty() ? ": empty" : ""));
       }
       continue;
     }
 
     // Build a set of mailles: sort mailles by type and exclude maille doubling
+    bool isSelfIntersect = false;
     typedef set< set<_maille>::iterator, _mailleIteratorCompare > TMailleSet;
     TMailleSet mailleSet;
     if( grp.groupes.size() ) {// le groupe i contient des sous-maillages
@@ -691,21 +836,22 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
       for( vector<int>::iterator j=grp.groupes.begin(); j!=grp.groupes.end(); ++j)
       {
         nb_elem += groupes[*j-1].mailles.size();
-        _groupe::mailleIter maIt=groupes[*j-1].mailles.begin();
+        _groupe::TMailleIter maIt=groupes[*j-1].mailles.begin();
         for( ; maIt!=groupes[*j-1].mailles.end(); ++maIt) {
 //           TMailleSet::const_iterator ma_it = mailleSet.find( *maIt );
 //           if ( ma_it != mailleSet.end() ) {
-//             MESSAGE("EQUAL ELEMS: " << *ma_it << " AND " << *maIt);
+//             MESSAGE_MED("EQUAL ELEMS: " << *ma_it << " AND " << *maIt);
 //           }
 //           else
             mailleSet.insert( *maIt );
         }
       }
       if ( nb_elem != mailleSet.size() ) { // Self intersecting compound group
-        INFOS("Self intersecting group: " << i << " <" << grp.nom << ">"
+        isSelfIntersect = true;
+        INFOS_MED("Self intersecting group: " << i << " <" << grp.nom << ">"
               << ", mailleSet.size = " << mailleSet.size() << ", sum nb elems = " << nb_elem);
         for( vector<int>::iterator j=grp.groupes.begin(); j!=grp.groupes.end(); ++j)
-          INFOS(" in sub-group "<<  *j << " <" << groupes[*j-1].nom << "> "
+          INFOS_MED(" in sub-group "<<  *j << " <" << groupes[*j-1].nom << "> "
                 << groupes[*j-1].mailles.size() << " mailles of type "
                 << groupes[*j-1].mailles[0]->geometricType);
         // if a group serve as a support to a field, then the _field is to be converted
@@ -732,44 +878,53 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
       }
     }
     else {
-      _groupe::mailleIter maIt=grp.mailles.begin();
+      _groupe::TMailleIter maIt=grp.mailles.begin();
       for(; maIt!=grp.mailles.end(); ++maIt)
         mailleSet.insert( *maIt );
       if ( grp.mailles.size() != mailleSet.size() )
-        INFOS( "Self intersecting group: " << i << " <" << grp.nom << ">"
+        INFOS_MED( "Self intersecting group: " << i << " <" << grp.nom << ">"
                << ", mailleSet.size = " << mailleSet.size()
                << ", nb elems = " << grp.mailles.size());
     }
     // MEDMEM does not allow constituents of <mesh_dim>-2 and less dimension
     // but do not skip node group
-    int group_min_dim = (**mailleSet.begin()).dimension();
-    int group_max_dim = (**(--mailleSet.end())).dimension();
+    int group_min_dim = (**mailleSet.begin()).dimensionWithPoly();
+    int group_max_dim = (**(--mailleSet.end())).dimensionWithPoly();
     if ( group_max_dim != 0 && group_min_dim <= dimension_maillage - 2  ) {
-      MESSAGE("Skip group: " << i << " <" << grp.nom << "> - too small dimension: "
+      MESSAGE_MED("Skip group: " << i << " <" << grp.nom << "> - too small dimension: "
               << group_min_dim);
       continue;
     }
 
-    // 1. Build a map _maille* -> index in MEDMEM::GROUP.getNumber(MED_ALL_ELEMENTS).
-    // It is used while fields building.
-    // 2. make mailles know the groups they belong to, that is used in getFamilies()
-    TMailleSet::iterator maIt = mailleSet.begin();
-    int iMa;
-    for ( iMa = 0; maIt != mailleSet.end(); maIt++ ) {
-      grp.relocMap.insert( make_pair( &(**maIt), ++iMa ));
-      (*maIt)->groupes.push_back( i );
-    }
-    ASSERT( iMa == grp.relocMap.size() );
-
-    int nb_geometric_types=1;
-    TMailleSet::iterator j=mailleSet.begin(); 
     // initialise groupe_entity a l'entite de la premiere maille du groupe
     medEntityMesh groupe_entity = (**mailleSet.rbegin()).getEntity(dimension_maillage);
     if ( hasMixedCells && group_min_dim > 0 )
       groupe_entity = MED_CELL;
-    medGeometryElement geometrictype=(**j).geometricType;
 
+    // total nb of elements in mesh of groupe_entity
+    int totalNbElements = 0;
+    if ( groupe_entity == MED_NODE )
+      totalNbElements = points.size() - nbMerged( MED_POINT1 );
+    else {
+      int entityDim = hasMixedCells ? -1 : group_min_dim;
+      _maillageByDimIterator allMailles( *this, entityDim, true );
+      while ( allMailles.nextType() )
+        if ( allMailles.dim() > 0 )
+          totalNbElements += allMailles.sizeWithoutMerged();
+    }
+    const bool isOnAll = ( mailleSet.size() == totalNbElements );
+
+    // if !isOnAll, build a map _maille::ordre() -> index in GROUP.getNumber(MED_ALL_ELEMENTS).
+    // It is used while fields building.
+    if ( !isOnAll || isSelfIntersect ) {
+      TMailleSet::iterator maIt = mailleSet.begin();
+      for ( int iMa = 0; maIt != mailleSet.end(); maIt++ )
+        grp.relocMap.insert( make_pair( (*maIt)->ordre(), ++iMa ));
+    }
     //Parcours des mailles (a partir de la deuxieme) pour compter les types geometriques
+    int nb_geometric_types=1;
+    TMailleSet::iterator j=mailleSet.begin(); 
+    medGeometryElement geometrictype=(**j).geometricType;
     for ( ++j ; j!=mailleSet.end(); ++j )
     {
       //Compte nombre de types geometriques
@@ -796,7 +951,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     for (  ; j!=mailleSet.end(); ++j , ++indice_mailles)
     {
       const _maille& ma = **j;
-      tab_numeros_elements[indice_mailles]= ma.ordre;
+      tab_numeros_elements[indice_mailles]= ma.ordre();
 //       if ( maxOrdre < tab_numeros_elements[indice_mailles] )
 //         maxOrdre = tab_numeros_elements[indice_mailles];
       if (ma.geometricType != geometrictype)
@@ -812,7 +967,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     {
       tab_nombres_elements[k] = tab_index_types_geometriques[k+1]-tab_index_types_geometriques[k];
     }
-    //INFOS( "MAX ORDRE in grp " << grp.nom << " entity " << groupe_entity << " : " << maxOrdre);
+    //INFOS_MED( "MAX ORDRE in grp " << grp.nom << " entity " << groupe_entity << " : " << maxOrdre);
 
     //Determination type entite du groupe
     vector <GROUP *> * vect_group;
@@ -831,11 +986,12 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
       vect_group= & _groupNode;
       break;
     }
+
     //Creation nouveau groupe MED
     GROUP * new_group = new GROUP();
-    medGroupes[ i ] = new_group;
+    grp.medGroup = new_group;
     //Appel methodes set
-    new_group->setTotalNumberOfElements(mailleSet.size());
+    //new_group->setTotalNumberOfElements(mailleSet.size());
     new_group->setName(grp.nom);
     new_group->setMesh(_ptrMesh);
     new_group->setNumberOfGeometricType(nb_geometric_types);
@@ -843,7 +999,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     new_group->setNumberOfElements(tab_nombres_elements);
     new_group->setNumber(tab_index_types_geometriques,tab_numeros_elements);
     new_group->setEntity(groupe_entity);
-    new_group->setAll(mailleSet.size() == maillage.size());
+    new_group->setAll( isOnAll );
 
     vect_group->push_back(new_group);
 
@@ -853,7 +1009,7 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     delete [] tab_nombres_elements;
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -863,133 +1019,133 @@ _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
 //           order. Call it after getGroups()
 //=======================================================================
 
-void _intermediateMED::getFamilies(std::vector<FAMILY *> & _famCell,
-                                   std::vector<FAMILY *> & _famFace, 
-                                   std::vector<FAMILY *> & _famEdge,
-                                   std::vector<FAMILY *> & _famNode, MESH * _ptrMesh)
-{
-  const char * LOC = "_intermediateMED::getFamilies() : ";
-  BEGIN_OF(LOC);
+// void _intermediateMED::getFamilies(std::vector<FAMILY *> & _famCell,
+//                                    std::vector<FAMILY *> & _famFace, 
+//                                    std::vector<FAMILY *> & _famEdge,
+//                                    std::vector<FAMILY *> & _famNode, MESH * _ptrMesh)
+// {
+//   const char * LOC = "_intermediateMED::getFamilies() : ";
+//   BEGIN_OF_MED(LOC);
   
-  int nbElemFam = 0, nbNodeFam = 0;
-  std::map< GROUP*, vector< FAMILY * > > grpFamsMap;
-  int dimension_maillage=maillage.rbegin()->dimension();
+//   int nbElemFam = 0, nbNodeFam = 0;
+//   std::map< GROUP*, vector< FAMILY * > > grpFamsMap;
+//   int dimension_maillage=maillage.rbegin()->dimension();
 
-  std::set<_maille>::const_iterator i=maillage.begin(); // iterateurs sur les mailles
-  std::set<_maille>::const_iterator j=maillage.begin();
+//   std::set<_maille>::const_iterator i=maillage.begin(); // iterateurs sur les mailles
+//   std::set<_maille>::const_iterator j=maillage.begin();
 
-  do
-  {
-    // make a family containing mailles shared by the same set of groups
-    std::list<unsigned>&  grList = i->groupes;  // to define the family end
-    int           dimension = i->dimension();        // to define the entity end
-    medGeometryElement type = i->geometricType;
-    medEntityMesh    entity = i->getEntity( dimension_maillage );
+//   do
+//   {
+//     // make a family containing mailles shared by the same set of groups
+//     std::list<unsigned>&  grList = i->groupes;  // to define the family end
+//     int           dimension = i->dimension();        // to define the entity end
+//     medGeometryElement type = i->geometricType;
+//     medEntityMesh    entity = i->getEntity( dimension_maillage );
 
-    std::vector<medGeometryElement> tab_types_geometriques;
-    std::vector<int> tab_index_types_geometriques;
-    std::vector<int> tab_nombres_elements;
-    std::vector<int> tab_numeros_elements;
+//     std::vector<medGeometryElement> tab_types_geometriques;
+//     std::vector<int> tab_index_types_geometriques;
+//     std::vector<int> tab_nombres_elements;
+//     std::vector<int> tab_numeros_elements;
 
-    int iMa = 1, nbtype = 0;
-    tab_types_geometriques.push_back( type );
-    tab_index_types_geometriques.push_back( iMa );
+//     int iMa = 1, nbtype = 0;
+//     tab_types_geometriques.push_back( type );
+//     tab_index_types_geometriques.push_back( iMa );
 
-    // scan family cells and fill the tab that are needed by the create a MED FAMILY
-    while (i != maillage.end() &&
-           i->groupes == grList &&
-           i->dimension() == dimension)
-    {
-      if (type != i->geometricType) // si changement de type geometrique
-      {
-        tab_index_types_geometriques.push_back(iMa);
-        tab_nombres_elements.push_back(nbtype);
-        nbtype=0;
-        type=i->geometricType;
-        tab_types_geometriques.push_back(type); // stocke le nouveau type geometrique rencontre
-      }
-      ++nbtype;
-      ++iMa;
-      ++i;
-    }
-    tab_index_types_geometriques.push_back(iMa);
-    tab_nombres_elements.push_back(nbtype); // n'a pas été stocké dans la boucle
+//     // scan family cells and fill the tab that are needed by the create a MED FAMILY
+//     while (i != maillage.end() &&
+//            i->groupes == grList &&
+//            i->dimension() == dimension)
+//     {
+//       if (type != i->geometricType) // si changement de type geometrique
+//       {
+//         tab_index_types_geometriques.push_back(iMa);
+//         tab_nombres_elements.push_back(nbtype);
+//         nbtype=0;
+//         type=i->geometricType;
+//         tab_types_geometriques.push_back(type); // stocke le nouveau type geometrique rencontre
+//       }
+//       ++nbtype;
+//       ++iMa;
+//       ++i;
+//     }
+//     tab_index_types_geometriques.push_back(iMa);
+//     tab_nombres_elements.push_back(nbtype); // n'a pas été stocké dans la boucle
 
-    tab_numeros_elements.resize( iMa - 1 );
-    for ( iMa = 0; j != i; j++, iMa++ )
-      tab_numeros_elements[ iMa ] = j->ordre;
+//     tab_numeros_elements.resize( iMa - 1 );
+//     for ( iMa = 0; j != i; j++, iMa++ )
+//       tab_numeros_elements[ iMa ] = j->ordre;
 
-    int id = ( entity == MED_NODE ? ++nbNodeFam : -(++nbElemFam) );
+//     int id = ( entity == MED_NODE ? ++nbNodeFam : -(++nbElemFam) );
 
-    ostringstream name;
-    name << "FAM_" << id;
+//     ostringstream name;
+//     name << "FAM_" << id;
 
-    // create a empty MED FAMILY and fill it with the tabs we constructed
-    FAMILY* newFam = new FAMILY();
-    newFam->setTotalNumberOfElements( iMa );
-    newFam->setName( name.str() );
-    newFam->setMesh( _ptrMesh );
-    newFam->setNumberOfGeometricType( tab_types_geometriques.size() );
-    newFam->setGeometricType( &tab_types_geometriques[0] ); // we know the tab is not empy
-    newFam->setNumberOfElements( &tab_nombres_elements[0] );
-    newFam->setNumber( &tab_index_types_geometriques[0], &tab_numeros_elements[0] );
-    newFam->setEntity( entity );
-    newFam->setAll( false );
-    newFam->setIdentifier( id );
-    newFam->setNumberOfGroups( grList.size() );
+//     // create a empty MED FAMILY and fill it with the tabs we constructed
+//     FAMILY* newFam = new FAMILY();
+//     newFam->setTotalNumberOfElements( iMa );
+//     newFam->setName( name.str() );
+//     newFam->setMesh( _ptrMesh );
+//     newFam->setNumberOfGeometricType( tab_types_geometriques.size() );
+//     newFam->setGeometricType( &tab_types_geometriques[0] ); // we know the tab is not empy
+//     newFam->setNumberOfElements( &tab_nombres_elements[0] );
+//     newFam->setNumber( &tab_index_types_geometriques[0], &tab_numeros_elements[0] );
+//     newFam->setEntity( entity );
+//     newFam->setAll( false );
+//     newFam->setIdentifier( id );
+//     newFam->setNumberOfGroups( grList.size() );
 
-    // Update links between families and groups
-    if ( ! grList.empty() )
-    {
-      std::string * groupNames = new string[ grList.size() ];
-      std::list<unsigned>::iterator g = grList.begin();
-      for ( int i = 0; g != grList.end(); ++g, ++i ) {
-        GROUP * medGROUP = getGroup( *g );
-        groupNames[ i ] = medGROUP->getName();
-        grpFamsMap[ medGROUP ].push_back( newFam );
-      }
-      newFam->setGroupsNames(groupNames);
-    }
-    // store newFam
-    std::vector<FAMILY*>* families = 0;
-    switch ( entity )
-    {
-    case MED_CELL :
-      families = & _famCell; break;
-    case MED_FACE :
-      families = & _famFace; break;
-    case MED_EDGE :
-      families = & _famEdge; break;
-    case MED_NODE :
-      families = & _famNode; break;
-    }
-    if ( families )
-      families->push_back( newFam );
+//     // Update links between families and groups
+//     if ( ! grList.empty() )
+//     {
+//       std::string * groupNames = new string[ grList.size() ];
+//       std::list<unsigned>::iterator g = grList.begin();
+//       for ( int i = 0; g != grList.end(); ++g, ++i ) {
+//         GROUP * medGROUP = getGroup( *g );
+//         groupNames[ i ] = medGROUP->getName();
+//         grpFamsMap[ medGROUP ].push_back( newFam );
+//       }
+//       newFam->setGroupsNames(groupNames);
+//     }
+//     // store newFam
+//     std::vector<FAMILY*>* families = 0;
+//     switch ( entity )
+//     {
+//     case MED_CELL :
+//       families = & _famCell; break;
+//     case MED_FACE :
+//       families = & _famFace; break;
+//     case MED_EDGE :
+//       families = & _famEdge; break;
+//     case MED_NODE :
+//       families = & _famNode; break;
+//     }
+//     if ( families )
+//       families->push_back( newFam );
 
-  } while ( i != maillage.end() );
+//   } while ( i != maillage.end() );
 
-  // update references in groups
-  std::map< GROUP*, vector< FAMILY * > >::iterator gf = grpFamsMap.begin();
-  for ( ; gf != grpFamsMap.end(); ++gf )
-  {
-    gf->first->setNumberOfFamilies( gf->second.size() );
-    gf->first->setFamilies( gf->second );
-  }
-}
+//   // update references in groups
+//   std::map< GROUP*, vector< FAMILY * > >::iterator gf = grpFamsMap.begin();
+//   for ( ; gf != grpFamsMap.end(); ++gf )
+//   {
+//     gf->first->setNumberOfFamilies( gf->second.size() );
+//     gf->first->setFamilies( gf->second );
+//   }
+//}
 
 //=======================================================================
 //function : getGroup
 //purpose  : 
 //=======================================================================
 
-GROUP * _intermediateMED::getGroup( int i )
-{
-  if ( i <(int) medGroupes.size() )
-    return medGroupes[ i ];
-  throw MEDEXCEPTION
-    (LOCALIZED(STRING("_intermediateMED::getGroup(): WRONG GROUP INDEX: ")
-               << medGroupes.size() << " <= " << i ));
-}
+// GROUP * _intermediateMED::getGroup( int i )
+// {
+//   if ( i <(int) medGroupes.size() )
+//     return medGroupes[ i ];
+//   throw MEDEXCEPTION
+//     (LOCALIZED(STRING("_intermediateMED::getGroup(): WRONG GROUP INDEX: ")
+//                << medGroupes.size() << " <= " << i ));
+// }
 
 //=======================================================================
 //function : getFields
@@ -999,18 +1155,18 @@ GROUP * _intermediateMED::getGroup( int i )
 void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
 {
   const char * LOC = "_intermediateMED::getFields() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   std::list< _fieldBase* >::const_iterator fIt = fields.begin();
   for ( ; fIt != fields.end(); fIt++ )
   {
     const _fieldBase* fb = *fIt;
-    list<pair< FIELD_*, int> >  ff = fb->getField(groupes, medGroupes);
+    list<pair< FIELD_*, int> >  ff = fb->getField(groupes);
     list<pair< FIELD_*, int> >::iterator f_sup = ff.begin();
     for (int j = 1 ; f_sup != ff.end(); f_sup++, ++j )
     {
       FIELD_    * f = f_sup->first;
-      SUPPORT * sup = getGroup( f_sup->second );
+      SUPPORT * sup = groupes[ f_sup->second ].medGroup;
       if ( !sup )
         throw MEDEXCEPTION
           (LOCALIZED(STRING(LOC) <<"_intermediateMED::getFields(), NULL field support: "
@@ -1031,12 +1187,17 @@ void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
       f->setOrderNumber( j );
     }
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
+
+//=======================================================================
+//function : ~_intermediateMED
+//purpose  : destructor
+//=======================================================================
 
 _intermediateMED::~_intermediateMED()
 {
-  MESSAGE( "~_intermediateMED()");
+  MESSAGE_MED( "~_intermediateMED()");
   std::list< _fieldBase* >::const_iterator fIt = fields.begin();
   for ( ; fIt != fields.end(); fIt++ )
     delete *fIt;
@@ -1076,6 +1237,251 @@ bool _fieldBase::hasSameComponentsBySupport() const
       return false; // diff nb of gauss points
   }
   return true;
+}
+
+//=======================================================================
+//
+//function : mergeNodes
+//
+//=======================================================================
+namespace {
+
+struct __NOEUD
+{
+  typedef map<int,_noeud>::iterator Inoeud;
+  Inoeud i_noeud;
+
+  __NOEUD() {}
+  __NOEUD(Inoeud n): i_noeud(n) {}
+  const double & operator[] (int i) const { return i_noeud->second.coord[i]; }
+  double         operator[] (int i)       { return i_noeud->second.coord[i]; }
+  int dim() const { return i_noeud->second.coord.size(); }
+  int& num() { return i_noeud->second.number; }
+  int id() const { return i_noeud->first; }
+  bool isMerged() const { return i_noeud->second.number < 1; }
+};
+//-----------------------------------------------------------------------
+double DistanceL2(const __NOEUD &A,const __NOEUD &B)
+{
+  if ( B.isMerged() ) return DBL_MAX;
+  const double* cooA = &A[0], *cooB = &B[0], *cooEnd = cooA + A.dim();
+  double dist, somme=0;
+  while ( cooA < cooEnd ) {
+    dist=((*cooA++) - (*cooB++));
+    somme+=dist*dist;
+  }
+  return sqrt(somme);
+}
+//-----------------------------------------------------------------------
+struct __NUAGENOEUD
+{
+  vector< __NOEUD > nodes;
+  __NUAGENOEUD(_intermediateMED& imed);
+  __NOEUD & operator [] (int i) { return nodes[i]; }
+  int size() const { return nodes.size(); }
+};
+//-----------------------------------------------------------------------
+__NUAGENOEUD::__NUAGENOEUD(_intermediateMED& imed)
+{
+  nodes.resize( imed.points.size() );
+  map<int,_noeud>::iterator i_noeud = imed.points.begin();
+  for( int i = 0; i_noeud!=imed.points.end(); ++i_noeud, ++i ) {
+    i_noeud->second.number = i+1;
+    nodes[ i ] = i_noeud;
+  }
+}
+//-----------------------------------------------------------------------
+// mergeNodes
+template<int DIM> int mergeNodes(double            tolerance,
+                                 _intermediateMED& imed,
+                                 vector< int > &   /*newNodeIDs*/)
+{
+  typedef dTree<__NOEUD,__NUAGENOEUD,DIM > DTree;
+  __NUAGENOEUD aNUAGENOEUD( imed );
+  DTree tree( &aNUAGENOEUD );
+
+//   int maxID = imed.points.rbegin()->first;
+//   newNodeIDs.resize( maxID + 1, 0 );
+
+  int num = 0, nbRemoved = 0;
+  int nbNodes = aNUAGENOEUD.size();
+  for ( int i = 0; i < nbNodes; ++i )
+  {
+    __NOEUD & node = aNUAGENOEUD[i];
+    int & number = node.num();
+    if ( number < 0 )
+      continue; // already merged
+    number = ++num;
+
+    list<int> closeNumbers;
+    int nbCoinsident = tree.get_all_close( node, tolerance, closeNumbers );
+    if ( nbCoinsident > 1 ) // not only node it-self found
+    {
+      nbRemoved += nbCoinsident-1; // one of coincident nodes remains
+      int id = node.id();
+      list<int>::iterator n = closeNumbers.begin(), nEnd = closeNumbers.end();
+      while ( n != nEnd ) {
+        __NOEUD & coincNode = aNUAGENOEUD[ *n++ ];
+        int coincID = coincNode.id();
+        if ( coincID != id ) {
+          coincNode.num() = -number;
+          //newNodeIDs[ coincID ] = id;
+        }
+      }
+    }
+  }
+  return nbRemoved;
+}
+//-----------------------------------------------------------------------
+// wrapper of _maille used after merging nodes to find equal mailles
+struct _mailleWrap
+{
+  const _maille* _ma;
+
+  _mailleWrap(const _maille* ma=0): _ma(ma) { if (_ma) _ma->init(); }
+  ~_mailleWrap()                            { if (_ma) _ma->init(); }
+
+  bool operator < (const _mailleWrap& mw) const
+  {
+    size_t l=_ma->sommets.size();
+    const int* v1 = getSortedNodeNums(_ma);
+    const int* v2 = getSortedNodeNums(mw._ma);
+    for ( const int* vEnd = v1 + l; v1 < vEnd; ++v1, ++v2 )
+      if(*v1 != *v2)
+        return *v1 < *v2;
+    return false; // cas d'égalité
+  }
+  static const int* getSortedNodeNums(const _maille* ma)
+  {
+    if ( !ma->sortedNodeIDs ) {
+      size_t l=ma->sommets.size();
+      ma->sortedNodeIDs = new int[ l ];
+      for (size_t i=0; i!=l; ++i)
+        ma->sortedNodeIDs[i]=ma->nodeNum(i);
+      std::sort( ma->sortedNodeIDs, ma->sortedNodeIDs + l );
+    }
+    return ma->sortedNodeIDs;
+  }
+};
+
+} // namespace
+
+//=======================================================================
+//function : mergeNodesAndElements
+//purpose  : optionally merge nodes and elements
+//=======================================================================
+
+void _intermediateMED::mergeNodesAndElements(double tolerance)
+{
+  //const char * LOC = "_intermediateMED::mergeNodesAndElements(): ";
+  vector< int > newNodeIDs; // for i-th node id, id to replace with
+
+  int nbRemovedNodes = 0;
+  const int spaceDimension=points.begin()->second.coord.size();
+  if ( spaceDimension == 3 )
+    nbRemovedNodes = mergeNodes<3>( tolerance, *this, newNodeIDs );
+  else if ( spaceDimension == 2 )
+    nbRemovedNodes = mergeNodes<2>( tolerance, *this, newNodeIDs );
+
+  myNodesNumerated = true;
+
+  if ( nbRemovedNodes == 0 )
+    return;
+
+  // all commented code here was used to keep initial numeration but it was too slow
+  //numerotationMaillage();
+  treatGroupes();
+
+  nbRemovedByType[ MED_NONE   ] = nbRemovedNodes;
+  nbRemovedByType[ MED_POINT1 ] = nbRemovedNodes;
+
+  bool hasPointMailles = false;
+  _maillageByDimIterator entityMailles( *this, 0 );
+  if ( const set<_maille> * points = entityMailles.nextType() ) {
+    hasPointMailles = true;
+    set<_maille>::const_iterator i, iEnd = points->end();
+    for ( i = points->begin(); i != iEnd; ++i )
+      i->setOrdre( i->sommets[0]->second.number ); // is merged if point is merged
+  }
+  const bool skipFirstType = ( hasPointMailles && hasMixedCells );
+  // loop on entities
+  for ( int dim = 1; dim <= 3; ++dim )
+  {
+    int iterDim = hasMixedCells ? -1 : dim;
+    //int nbRemovedInEntity = 0;
+
+    // count total nb of mailles in entity
+//     int nbMailles = 0;
+//     entityMailles.init( iterDim, true );
+//     if ( skipFirstType ) entityMailles.nextType(); // merged POINT1's are same as nodes
+//     while ( const set<_maille> * typeMailles = entityMailles.nextType() )
+//       nbMailles += typeMailles->size();
+
+    // for each maille number, count shift due to removed mailles with lower numbers
+    //vector<int> shift( nbMailles+1, 0 );
+
+    // merge and numerate mailles
+    int num = 0;
+    entityMailles.init( iterDim, true );
+    if ( skipFirstType ) entityMailles.nextType(); // merged POINT1's are same as nodes
+    while ( const set<_maille> * typeMailles = entityMailles.nextType() )
+    {
+      int nbRemoved = 0;
+      set<_mailleWrap> maNodeNumSorted;
+      pair< set<_mailleWrap>::const_iterator, bool > mw_isunique;
+
+      set<_maille>::const_iterator ma = typeMailles->begin(), maEnd = typeMailles->end();
+      while ( ma != maEnd )
+      {
+        const _maille & m = *ma++;
+        mw_isunique = maNodeNumSorted.insert( &m );
+        if ( mw_isunique.second ) {
+          m.setOrdre( ++num );
+        }
+        else {
+          const _maille* equalMa = mw_isunique.first->_ma;
+          //unsigned ordreToRemove = m.ordre();
+          m.setMergedOrdre( equalMa->ordre() );
+          nbRemoved++;
+//           while ( ordreToRemove <= nbMailles )
+//             shift[ ordreToRemove++ ]++;
+        }
+      }
+
+      if ( nbRemoved ) {
+        nbRemovedByType[ entityMailles.type() ] = nbRemoved;
+        //nbRemovedInEntity += nbRemoved;
+      }
+
+      // update maille ordre
+//       if ( nbRemovedInEntity ) {
+//         for ( ma = typeMailles->begin(); ma != maEnd; ++ma ) {
+//           unsigned newOrdre = ma->ordre() - shift[ ma->ordre() ];
+//           if ( ma->isMerged() )
+//             ma->setMergedOrdre( newOrdre );
+//           else
+//             ma->setOrdre( newOrdre );
+//         }
+//       }
+    }
+  }
+
+  myMaillesNumerated = true;
+
+}
+
+//=======================================================================
+//function : getMeshDimension
+//purpose  : count mesh dimension
+//=======================================================================
+
+int _intermediateMED::getMeshDimension() const
+{
+  int dim = 0;
+  _maillageByDimIterator allMailles( *this, -1, true );
+  while ( allMailles.nextType() )
+    dim = allMailles.dim();
+  return dim;
 }
 
 }

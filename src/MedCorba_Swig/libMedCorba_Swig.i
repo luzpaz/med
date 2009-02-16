@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 %module libMedCorba_Swig
 
@@ -572,7 +574,8 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 %{
   SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDDOUBLE * field, bool ownCppPtr=false)
     {
-      BEGIN_OF("SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble from libMedCorba_Swig");
+  const char* LOC = "SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble from libMedCorba_Swig";
+  BEGIN_OF(LOC);
 
       SCRUTE(field);
 
@@ -589,7 +592,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(fieldcorba2);
 
-      END_OF("SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble from libMedCorba_Swig");
+  END_OF(LOC);
 
       MESSAGE("Test de tirarge sur le pointeur Corba Field dans le cxx");
 
@@ -617,7 +620,8 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
   SALOME_MED::FIELDINT_ptr createCorbaFieldInt(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDINT * field, bool ownCppPtr=false)
     {
-      BEGIN_OF("SALOME_MED::FIELDINT_ptr createCorbaFieldInt from libMedCorba_Swig");
+  const char* LOC = "SALOME_MED::FIELDINT_ptr createCorbaFieldInt from libMedCorba_Swig";
+  BEGIN_OF(LOC);
 
       SCRUTE(field);
 
@@ -634,7 +638,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(fieldcorba2);
 
-      END_OF("SALOME_MED::FIELDINT_ptr createCorbaFieldInt from libMedCorba_Swig");
+  END_OF(LOC);
       MESSAGE("Test de tirarge sur le pointeur Corba Field dans le cxx");
 
       char * name = fieldcorba2->getName();
@@ -661,7 +665,8 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
   SALOME_MED::SUPPORT_ptr createCorbaSupport(const SUPPORT * const support)
     {
-      BEGIN_OF("SALOME_MED::SUPPORT_ptr createCorbaSupport from libMedCorba_Swig");
+  const char* LOC = "SALOME_MED::SUPPORT_ptr createCorbaSupport from libMedCorba_Swig";
+  BEGIN_OF(LOC);
 
       SCRUTE(support);
 
@@ -674,14 +679,15 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(supportcorba);
 
-      END_OF("SALOME_MED::SUPPORT_ptr createCorbaSupport from libMedCorba_Swig");
+  END_OF(LOC);
 
       return supportcorba;
     }
 
   SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh)
     {
-      BEGIN_OF("SALOME_MED::MESH_ptr createCorbaMesh from libMedCorba_Swig");
+  const char* LOC = "SALOME_MED::MESH_ptr createCorbaMesh from libMedCorba_Swig";
+  BEGIN_OF(LOC);
 
       SCRUTE(mesh);
 
@@ -694,7 +700,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(meshcorba);
 
-      END_OF("SALOME_MED::MESH_ptr createCorbaMesh from libMedCorba_Swig");
+  END_OF(LOC);
 
       return meshcorba;
     }
@@ -702,7 +708,8 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
   FIELDDOUBLE * createLocalFieldDouble(const int NumberOfComponents,
 				      const int LengthValue)
     {
-      BEGIN_OF("FIELDDOUBLE createLocalFieldDouble from libMedCorba_Swig");
+  const char* LOC = "FIELDDOUBLE createLocalFieldDouble from libMedCorba_Swig";
+  BEGIN_OF(LOC);
 
       SCRUTE(NumberOfComponents);
       SCRUTE(LengthValue);
@@ -711,7 +718,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
       FIELDDOUBLE * fieldloc =  new FIELDDOUBLE();
       fieldloc -> allocValue(NumberOfComponents,LengthValue);
 
-      END_OF("FIELDDOUBLE createLocalFieldDouble from libMedCorba_Swig");
+  END_OF(LOC);
 
       return fieldloc;
     }
@@ -719,7 +726,8 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
   FIELDINT * createLocalFieldInt(const int NumberOfComponents,
 				 const int LengthValue)
     {
-      BEGIN_OF("FIELDINT createLocalFieldInt from libMedCorba_Swig");
+  const char* LOC = "FIELDINT createLocalFieldInt from libMedCorba_Swig";
+  BEGIN_OF(LOC);
 
       SCRUTE(NumberOfComponents);
       SCRUTE(LengthValue);
@@ -728,7 +736,7 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
       FIELDINT * fieldloc =  new FIELDINT();
       fieldloc -> allocValue(NumberOfComponents,LengthValue);
 
-      END_OF("FIELDDOUBLE createLocalFieldInt from libMedCorba_Swig");
+  END_OF(LOC);
 
       return fieldloc;
     }

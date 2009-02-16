@@ -1,31 +1,30 @@
-
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : MEDMEM_Grid.hxx
 // Created   : Wed Dec 18 08:35:26 2002
 // Descr     : class containing structured mesh data
-
 // Author    : Edward AGAPOV (eap)
 // Project   : SALOME Pro
 // Module    : MED 
-// $Header$
 
 
 #include "MEDMEM_Grid.hxx"
@@ -37,6 +36,22 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
+
+// Block defining the comments for the MEDMEM_ug documentation
+
+/*! 
+
+\defgroup GRID_axes Information about axes
+This group of methods retrieves information about the axes of the grid.
+
+\defgroup GRID_connectivity Utility methods for defining element positions in the grid
+These methods enable the user to convert a position on the grid to a global element number
+
+\defgroup GRID_constructors Constructors
+These methods are the different constructors for the grid objects.
+
+*/
+
 //=======================================================================
 //function : GRID
 //purpose  : empty constructor
@@ -44,17 +59,33 @@ using namespace MED_EN;
 
 GRID::GRID() {
   init();
-  MESSAGE("A GRID CREATED");
+  MESSAGE_MED("A GRID CREATED");
 }
 //
 //=======================================================================
 ////function : GRID
 ////purpose  : array constructor
 ////=======================================================================
-GRID::GRID(const std::vector<std::vector<double> >& xyz_array,
-           const std::vector<std::string>&          coord_name, 
-	   const std::vector<std::string>&          coord_unit,
-           const med_grid_type                      type) : _gridType(type)
+/*!
+\if MEDMEM_ug
+\addtogroup GRID_constructors
+@{
+\endif
+*/
+/*!
+ * \brief Constructor specifying the axes of the grid
+ *
+ * This constructor describes the grid by specifying the location of the nodes on 
+each of the axis. The dimension of the grid is implicitly defined by the
+size of vector \a xyz_array.
+ *
+ *\param xyz_array specifies the node coordinates for each direction 
+ *\param coord_name names of the different coordinates
+ *\param coord_unit names of the different coordinate units
+ *\param type  grid type (MED_POLAR, MED_CARTESIAN)
+*/
+GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name, 
+					 const std::vector<std::string>& coord_unit, const MED_EN::med_grid_type type) : _gridType(type)
 {
     init(); // PAL 12136
     _is_default_gridType = false;
@@ -101,18 +132,19 @@ GRID::GRID(const std::vector<std::vector<double> >& xyz_array,
     _is_connectivity_filled = false;
     _isAGrid = true;
 }
+/*!\if MEDMEM_ug @} \endif */
 
 //=======================================================================
 //function : GRID
 //purpose  : empty constructor
 //=======================================================================
 
-GRID::GRID(const med_grid_type type)
+GRID::GRID(const MED_EN::med_grid_type type)
 {
   init();
   _gridType = type;
   _is_default_gridType = false;
-  MESSAGE("A TYPED GRID CREATED");
+  MESSAGE_MED("A TYPED GRID CREATED");
 }
 
 //=======================================================================
@@ -130,7 +162,7 @@ GRID::GRID(const GRID& otherGrid) {
 //=======================================================================
 
 GRID::~GRID() {
-  MESSAGE("GRID::~GRID() : Destroying the Grid");
+  MESSAGE_MED("GRID::~GRID() : Destroying the Grid");
   if ( _iArray != (double* ) NULL) delete [] _iArray;
   if ( _jArray != (double* ) NULL) delete [] _jArray;
   if ( _kArray != (double* ) NULL) delete [] _kArray;
@@ -179,12 +211,12 @@ GRID & GRID::operator=(const GRID & otherGrid)
 GRID::GRID(driverTypes driverType, const string &  fileName,
            const string &  driverName)// : MESH(driverType, fileName, driverName)
 {
-  const char * LOC ="GRID::GRID(driverTypes , const string &  , const string &) : ";
   
-  BEGIN_OF(LOC);
+  const char* LOC = "GRID::GRID(driverTypes , const string &  , const string &) : ";
+  BEGIN_OF_MED(LOC);
   
   init();
-  GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,MED_LECT);
+  GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,RDONLY);
   int current = addDriver(*myDriver);
   delete myDriver;
   _drivers[current]->open();
@@ -193,13 +225,13 @@ GRID::GRID(driverTypes driverType, const string &  fileName,
 
   fillMeshAfterRead();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 /*!
   return the GRID Geometric type, without computing all connectivity
 */
-const medGeometryElement * GRID::getTypes(medEntityMesh entity) const
+const medGeometryElement * GRID::getTypes(MED_EN::medEntityMesh entity) const
 {
     static const medGeometryElement _gridGeometry[4]={MED_HEXA8,MED_QUAD4,MED_SEG2,MED_POINT1};
     int i=0;
@@ -243,7 +275,7 @@ void GRID::fillMeshAfterRead()
 
     // nb of nodes in each direction is not known, set anything
     // in order to be able to work anyhow
-//     INFOS("GRID::fillMeshAfterRead(): This stub must be removed");
+//     INFOS_MED("GRID::fillMeshAfterRead(): This stub must be removed");
 //     switch (_spaceDimension) {
 //     case 1:
 //       _iArrayLength = _numberOfNodes;
@@ -284,9 +316,12 @@ void GRID::fillCoordinates() const
 {
   if (_is_coordinates_filled)
     return;
+
+  if (!_coordinate)
+    return;
   
-  const char * LOC ="GRID::fillCoordinates()";
-  BEGIN_OF(LOC);
+  const char* LOC = "GRID::fillCoordinates()";
+  BEGIN_OF_MED(LOC);
   
   // if coordonate has not been allocated, perform shalow copy, transfer ownership of matrix
   if(_coordinate->getSpaceDimension()*_coordinate->getNumberOfNodes() == 0)
@@ -322,7 +357,7 @@ void GRID::fillCoordinates() const
   }
       
   (const_cast <GRID *> (this))->_is_coordinates_filled = true;
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -330,8 +365,8 @@ void GRID::fillCoordinates() const
 //purpose  : 
 //=======================================================================
 
-CONNECTIVITY * GRID::makeConnectivity (medEntityMesh           Entity,
-				       medGeometryElement Geometry,
+CONNECTIVITY * GRID::makeConnectivity (MED_EN::medEntityMesh           Entity,
+																			 MED_EN::medGeometryElement Geometry,
 				       int                NbEntities,
 				       int                NbNodes,
 				       int                nbMeshNodes,
@@ -394,12 +429,12 @@ void GRID::fillConnectivity() const
 {
   if (_is_connectivity_filled)
   {
-    MESSAGE("GRID::fillConnectivity(): Already filled");
+    MESSAGE_MED("GRID::fillConnectivity(): Already filled");
     return;
   }
 
   const char * LOC = "GRID::fillConnectivity() ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   
   int nbCells, nbFaces, nbEdges;
   int nbCNodes, nbFNodes, nbENodes, nbMeshNodes;
@@ -663,7 +698,7 @@ void GRID::fillConnectivity() const
     }
   }
   if (nbENodes != indexE+1) {
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Wrong nbFNodes : " \
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Wrong nbENodes : " \
                                         << nbENodes << " indexE : " << indexE ));
   }
 
@@ -739,14 +774,20 @@ void GRID::fillConnectivity() const
 
   (const_cast <GRID *> (this))->_is_connectivity_filled = true;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
 //function : getArrayLength
 //purpose  : return array length. Axis = [1,2,3] meaning [i,j,k],
 //=======================================================================
-
+/*!\if MEDMEM_ug
+\addtogroup GRID_axes
+@{
+\endif
+*/
+/*! Returns the number of nodes on axis number \a Axis (axis numbering starts at 1).
+*/
 int GRID::getArrayLength( const int Axis ) const throw (MEDEXCEPTION)
 {
   switch (Axis) {
@@ -765,7 +806,9 @@ int GRID::getArrayLength( const int Axis ) const throw (MEDEXCEPTION)
 //           exception if Axis out of [1-3] range
 //           exception if i is out of range 0 <= i < getArrayLength(Axis);
 //=======================================================================
-
+/*!
+Returns the value of node coordinate \a i on axis \a Axis.
+ */
 const double GRID::getArrayValue (const int Axis, const int i) const throw (MEDEXCEPTION)
 {
   if (i < 0 || i >= getArrayLength(Axis))
@@ -780,17 +823,43 @@ const double GRID::getArrayValue (const int Axis, const int i) const throw (MEDE
   return 0.0;
 }
 
+/*!
+\if MEDMEM_ug
+@}
+\endif
+ */
+
 //=======================================================================
 //function : getEdgeNumber
 //purpose  : 
 //=======================================================================
+
+/*!
+\if MEDMEM_ug
+\addtogroup GRID_connectivity
+@{
+\endif
+*/
+/*!
+@{
+\name Position to number conversion methods
+\a getXXXNumber methods enable the user to convert an \f$ (i,j,k)\f$ position into a global number in the array.
+
+Axis [1,2,3] means one of directions: along \a i, \a j or \a k.
+For cell constituents (FACE or EDGE), Axis selects one of those having same  \f$ (i, j, k )\f$ :
+- a FACE which is normal to direction along given \a Axis;
+- an EDGE going along given \a Axis.
+
+Exception for \a Axis out of range.
+For 2D grids, \a k is a dummy argument. */
+/*! Edge position to number conversion method*/
 
 int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
   const throw (MEDEXCEPTION)
 {
   const char * LOC = "GRID::getEdgeNumber(Axis, i,j,k) :";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   int Len[4] = {0,_iArrayLength, _jArrayLength, _kArrayLength }, I=1, J=2, K=3;
   int maxAxis = Len[ K ] ? 3 : 2;
@@ -815,27 +884,26 @@ int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
     Nb += Len[ I ]*Len[ J ]*Len[ K ];
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return Nb;
 }
 
-//=======================================================================
-//function : getFaceNumber
-//purpose  : return a NODE, EDGE, FACE, CELL number by its position in the grid.
-//           Axis [1,2,3] means one of directions: along i, j or k
-//           For Cell contituents (FACE or EDGE), Axis selects one of those having same (i,j,k):
-//           * a FACE which is normal to direction along given Axis;
-//           * an EDGE going along given Axis.
-//           Exception for Axis out of range
-//=======================================================================
+/*!
+Returns a NODE, EDGE, FACE, CELL number by its position in the grid.
+Axis [1,2,3] means one of directions: along i, j or k
+For Cell contituents (FACE or EDGE), Axis selects one of those having same (i,j,k):
+- a FACE which is normal to direction along given Axis;
+- an EDGE going along given Axis.
+Exception for Axis out of range
+*/
 
 int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
   const throw (MEDEXCEPTION)
 {
   const char * LOC = "GRID::getFaceNumber(Axis, i,j,k) :";
   
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
 //  if (Axis <= 0 || Axis > 3)
   if (Axis < 0 || Axis > 3)
@@ -857,22 +925,33 @@ int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
     Nb += Len[ I ]*Len[ J ]*Len[ K ];
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return Nb;
 }
+/*! @} */
 
-//=======================================================================
-//function : getNodePosition
-//purpose  : 
-//=======================================================================
 
+/*!
+@{
+\name Number to position conversion methods
+
+\a getXXXPosition functions enable the user to convert
+a number into a \f$ (i,j,k) \f$ position. 
+           Axis [1,2,3] means one of directions: along i, j or k
+           For Cell contituents (FACE or EDGE), Axis selects one of those having same (i,j,k):
+           - a FACE which is normal to direction along given Axis;
+           - an EDGE going along given Axis.
+
+    Exception for Number out of range.
+*/
+/*! Node number to position conversion method */
 void GRID::getNodePosition(const int Number, int& i, int& j, int& k) const
   throw (MEDEXCEPTION)
 {
   const char * LOC = "GRID::getNodePosition(Number, i,j,k) :";
   
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (Number <= 0 || Number > _numberOfNodes)
     throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "Number is out of range: " << Number));
@@ -889,7 +968,7 @@ void GRID::getNodePosition(const int Number, int& i, int& j, int& k) const
 
   ////cout <<" NODE POS: " << Number << " - " << i << ", " << j << ", " << k << endl;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 }
 
@@ -897,13 +976,13 @@ void GRID::getNodePosition(const int Number, int& i, int& j, int& k) const
 //function : getCellPosition
 //purpose  : 
 //=======================================================================
-
+/*! Cell number to position conversion method */
 void GRID::getCellPosition(const int Number, int& i, int& j, int& k) const
   throw (MEDEXCEPTION)
 {
-  const char * LOC = "GRID::getCellPosition(Number, i,j,k) :";
   
-  BEGIN_OF(LOC);
+  const char* LOC = "GRID::getCellPosition(Number, i,j,k) :";
+  BEGIN_OF_MED(LOC);
 
   int Len[4] = {0,_iArrayLength-1, _jArrayLength-1, _kArrayLength-1 }, I=1, J=2;
   // , K=3; !! UNUSED VARIABLE !!
@@ -918,20 +997,20 @@ void GRID::getCellPosition(const int Number, int& i, int& j, int& k) const
   j = kLen / Len[J];
   k = (Number - 1) / ijLen;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
 //function : getEdgePosition
 //purpose  : 
 //=======================================================================
-
+/*! Edge number to poistion conversion method*/
 void GRID::getEdgePosition(const int Number, int& Axis, int& i, int& j, int& k)
   const throw (MEDEXCEPTION)
 {
   const char * LOC = "GRID::getEdgePosition(Number, i,j,k) :";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (!_jArrayLength)
     throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "no edges in the grid: "));
@@ -973,7 +1052,7 @@ void GRID::getEdgePosition(const int Number, int& Axis, int& i, int& j, int& k)
       k = (theNb - 1) / ijLen;
     }
 
-    END_OF(LOC);
+  END_OF_MED(LOC);
 
     return;
   }
@@ -990,13 +1069,13 @@ void GRID::getEdgePosition(const int Number, int& Axis, int& i, int& j, int& k)
 //           * an EDGE going along given Axis.
 //           Exception for Number out of range
 //=======================================================================
-
+/*! Face number to position convertion method*/
 void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
   const throw (MEDEXCEPTION)
 {
   const char * LOC = "GRID::getFacePosition(Number, i,j,k) :";
 
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_kArrayLength == 0) {
     getCellPosition(Number, i, j, k);
@@ -1042,14 +1121,19 @@ void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
       k = (theNb - 1) / ijLen;
     }
 
-    END_OF(LOC);
+  END_OF_MED(LOC);
 
     return;
   }
   
   throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "Number is out of range: " << Number));
 }
-
+/*!
+@}
+\if MEDMEM_ug
+@}
+\endif
+*/
 //=======================================================================
 //function : writeUnstructured
 //purpose  : write a Grid as an Unstructured mesh
@@ -1058,7 +1142,7 @@ void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
 void GRID::writeUnstructured(int index, const string & driverName)
 {
   const char * LOC = "GRID::writeUnstructured(int index=0, const string & driverName) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( _drivers[index] ) {
 
@@ -1078,13 +1162,13 @@ void GRID::writeUnstructured(int index, const string & driverName)
                                     << _drivers.size() 
                                     )
                          ); 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void GRID::read(int index)  
 { 
   const char * LOC = "GRID::read(int index=0) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_drivers[index]) {
     _drivers[index]->open();   
@@ -1100,5 +1184,5 @@ void GRID::read(int index)
   if (_isAGrid)
     fillMeshAfterRead();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }

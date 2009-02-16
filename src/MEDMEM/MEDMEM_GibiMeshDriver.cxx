@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include <algorithm>
 #include <queue>
@@ -61,10 +63,10 @@ using namespace MEDMEM;
 
 // to see full dump of RESULTATS STRUCTURE INTERMEDIAIRES
 #ifdef _DEBUG_
-// #undef MESSAGE
-// #define MESSAGE(txt) std::cout << txt << endl;
-// #undef INFOS
-// #define INFOS(txt) std::cout << txt << endl;
+// #undef MESSAGE_MED
+// #define MESSAGE_MED(txt) std::cout << txt << endl;
+// #undef INFOS_MED
+// #define INFOS_MED(txt) std::cout << txt << endl;
 #endif
 
 // Every memory allocation made in the MedDriver members function are desallocated in the Mesh destructor
@@ -159,13 +161,45 @@ static int getGroupId(const vector<int>& support_ids, _intermediateMED*  medi)
 //purpose  : 
 //=======================================================================
 
-#ifdef GIBI_READ_ONLY_NAMED_FIELD
+//#ifdef GIBI_READ_ONLY_NAMED_FIELD
 static inline bool isNamedObject( int obj_index, const vector<int>& indices_objets_nommes )
 {
   return ( std::find( indices_objets_nommes.begin(), indices_objets_nommes.end(), obj_index)
            != indices_objets_nommes.end() );
 }
-#endif
+//#endif
+
+//=======================================================================
+//function : setFieldNames
+//purpose  : set field names
+//=======================================================================
+
+static void setFieldNames(const vector< _fieldBase* >& fields,
+                          const vector<string>&        objets_nommes,
+                          const vector<int>&           indices_objets_nommes)
+{
+  // set field names
+  int i;
+  set<string> fnames;
+  for ( i = 0; i < indices_objets_nommes.size(); ++i ) {
+    int fieldIndex = indices_objets_nommes[ i ];
+    fnames.insert( objets_nommes[ i ]);
+    if ( fields[ fieldIndex - 1 ] )
+      fields[ fieldIndex - 1 ]->_name = objets_nommes[ i ];
+  }
+  int noNameIndex = 0;
+  for ( int i = 0; i < fields.size(); ++i ) {
+    if ( !fields[ i ] ) {
+      if ( !isNamedObject( i+1, indices_objets_nommes ))
+        ++noNameIndex;
+    }
+    else if ( fields[ i ]->_name.empty() ) {
+      do {
+        fields[ i ]->_name = STRING("F_") << ++noNameIndex;
+      } while ( !fnames.insert( fields[ i ]->_name ).second );
+    }
+  }
+}
 
 //=======================================================================
 //function : read
@@ -173,13 +207,13 @@ static inline bool isNamedObject( int obj_index, const vector<int>& indices_obje
 //=======================================================================
 
 #define GIBI_EQUAL(var_str, stat_str) \
-  (strncmp (var_str, stat_str, sizeof(stat_str)-1) == 0)
+  (strncmp (var_str, stat_str, strlen(stat_str)) == 0)
 #define DUMP_LINE_NB " on line " << _lineNb
 
 bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields )
 {
-  const char * LOC = "GIBI_MESH_RDONLY_DRIVER::readFile() : " ;
-  BEGIN_OF(LOC);
+  const char* LOC = "GIBI_MESH_RDONLY_DRIVER::readFile() : ";
+  BEGIN_OF_MED(LOC);
 
   // LECTURE DES DONNEES DS FICHIER GIBI
 
@@ -229,21 +263,21 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       const char* s = " NIVEAU  15 NIVEAU ERREUR   0 DIMENSION";
       space_dimension = atoi( ligne + strlen( s ) + 1 );
       if ( !GIBI_EQUAL( ligne, " NIVEAU" ) || space_dimension < 1 ) {
-        INFOS( " Could not read file: syntax error in type 4 record" << DUMP_LINE_NB );
+        INFOS_MED( " Could not read file: syntax error in type 4 record" << DUMP_LINE_NB );
         return false;
       }
     }
     else if (numero_enregistrement == ENREG_TYPE_2 )
     {
       if ( space_dimension == 0 ) {
-        INFOS( "Missing ENREGISTREMENT DE TYPE   4" << DUMP_LINE_NB );
+        INFOS_MED( "Missing ENREGISTREMENT DE TYPE   4" << DUMP_LINE_NB );
         return false;
       }
       // FORMAT(' PILE NUMERO',I4,'NBRE OBJETS NOMMES',I8,'NBRE OBJETS',I8)
       getNextLine(ligne);
       const char *s1 = " PILE NUMERO", *s2 = "NBRE OBJETS NOMMES", *s3 = "NBRE OBJETS";
       if ( ! GIBI_EQUAL( ligne, s1 ) ) {
-        INFOS( " Could not read file: error in type 2 record. " << ligne << DUMP_LINE_NB );
+        INFOS_MED( " Could not read file: error in type 2 record. " << ligne << DUMP_LINE_NB );
         return false;
       }
       ligne = ligne + strlen(s1);
@@ -253,7 +287,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       ligne = ligne + 8 + strlen(s3);
       nb_objets = atoi( ligne );
       if ( nb_objets_nommes<0 || nb_objets<0  ) {
-        INFOS(" Could not read file: " << nb_objets << " " <<nb_objets_nommes << DUMP_LINE_NB );
+        INFOS_MED(" Could not read file: " << nb_objets << " " <<nb_objets_nommes << DUMP_LINE_NB );
         return false;
       }
       if ( !donePiles.insert( numero_pile ).second ) // piles may repeat
@@ -281,7 +315,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
       // boucle interne : lecture de la pile
 
-      MESSAGE(LOC << "---- Traitement pile " << numero_pile);
+      MESSAGE_MED(PREFIX_MED << "---- Traitement pile " << numero_pile);
 
       // -----------------------------------
       //                        MESH GROUPS
@@ -304,7 +338,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
           // le cas type_geom_castem=0 correspond aux maillages composites
           if (type_geom_castem<0) {
-            INFOS(" Error while reading file, bad geometric type:" <<
+            INFOS_MED(" Error while reading file, bad geometric type:" <<
                   type_geom_castem << DUMP_LINE_NB );
             return false;
           }
@@ -362,16 +396,16 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
               for (unsigned n = 0; n < nb_noeud; ++n, next() )
               {
                 if ( !more() ) {
-                  INFOS( " Error while reading elem nodes ");
+                  INFOS_MED( " Error while reading elem nodes ");
                   return false;
                 }
                 no.number = getInt();
                 p_no=medi->points.insert(make_pair(no.number, no));
                 ma.sommets[n]=p_no.first;
               }
-              ma.ordre = ++order;
-              p=medi->maillage.insert(ma);
-              groupe.mailles[i] = p.first; // on stocke dans le groupe un iterateur sur la maille
+              ma.setOrdre( ++order );
+              // on stocke dans le groupe un iterateur sur la maille
+              groupe.mailles[i] = medi->insert(ma);
             }
           }
         } // loop on groups
@@ -392,7 +426,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 #ifdef _DEBUG
             cout << "Skip " << grp.nom << " of not supported CASTEM type: " << it->second << endl;
 #endif
-            //INFOS( "Skip " << grp.nom << " of not supported CASTEM type: " << it->second );
+            //INFOS_MED( "Skip " << grp.nom << " of not supported CASTEM type: " << it->second );
           }
         }
 
@@ -409,7 +443,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         nb_indices = atoi ( ligne );
         if (nb_indices != nb_objets)
         {
-          INFOS("Erreur de lecture dans enregistrement de pile " <<
+          INFOS_MED("Erreur de lecture dans enregistrement de pile " <<
                 PILE_NOEUDS << DUMP_LINE_NB );
           return false;
         }
@@ -437,7 +471,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         unsigned nb_reels = atoi( ligne );
         // PROVISOIRE : certains fichier gibi n`ont
         if (nb_reels < numero_noeuds.size()*(space_dimension)) {
-          INFOS("Erreur de lecture dans enregistrement de pile " <<
+          INFOS_MED("Erreur de lecture dans enregistrement de pile " <<
                 PILE_COORDONNEES << DUMP_LINE_NB );
           return false;
         }
@@ -475,7 +509,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 #ifdef GIBI_READ_ONLY_NAMED_FIELD
           ignoreField = !isNamedObject( objet+1, indices_objets_nommes );
           if ( ignoreField )
-            INFOS("Skip non-named field " << objet+1 << DUMP_LINE_NB);
+            INFOS_MED("Skip non-named field " << objet+1 << DUMP_LINE_NB);
 #endif
 
           // EXAMPLE ( with no values )
@@ -496,7 +530,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           next(); // ignore IFOUR
           int nb_attr = getInt();
           if ( nb_sub < 0 || total_nb_comp < 0 || nb_attr < 0 ) {
-            INFOS("Error of field reading: wrong nb of components "
+            INFOS_MED("Error of field reading: wrong nb of components "
                   << nb_sub << " " << total_nb_comp << DUMP_LINE_NB);
             return false;
           }
@@ -511,14 +545,14 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           {
             support_ids[ i_sub ] = -getInt(); next(); // (a) reference to support
             if ( support_ids[ i_sub ] < 1 || support_ids[ i_sub ] > medi->groupes.size() ) {
-              INFOS("Error of field reading: wrong mesh reference "<<
+              INFOS_MED("Error of field reading: wrong mesh reference "<<
                     support_ids[ i_sub ] << DUMP_LINE_NB );
               return false;
             }
             nb_values[ i_sub ] = getInt(); next();    // (b) nb points
             total_nb_values += nb_values[ i_sub ];
             if ( nb_values[ i_sub ] < 0 ) {
-              INFOS(" Wrong nb of points: " << nb_values[ i_sub ]  << DUMP_LINE_NB );
+              INFOS_MED(" Wrong nb of points: " << nb_values[ i_sub ]  << DUMP_LINE_NB );
               return false;
             }
             nb_comps[ i_sub ] = getInt(); next();     // (c) nb of components in i_sub
@@ -539,7 +573,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
               fdouble->_sub[ i_sub ].setData( nb_comps[ i_sub ], support_ids[ i_sub ] );
             for ( i_comp = 0; i_comp < nb_comps[ i_sub ]; ++i_comp, next() )
             {
-              ASSERT( more() );
+              ASSERT_MED( more() );
               // store component name
               if ( fdouble )
                 fdouble->_sub[ i_sub ].compName( i_comp ) = getName();
@@ -578,11 +612,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         } // end loop on field objects
 
         // set field names
-        for ( i = 0; i < nb_objets_nommes; ++i ) {
-          int fieldIndex = indices_objets_nommes[ i ];
-          if ( fields[ fieldIndex - 1 ] ) 
-            fields[ fieldIndex - 1 ]->_name = objets_nommes[ i ];
-        }
+        setFieldNames( fields, objets_nommes, indices_objets_nommes );
 
       }  // Fin numero_pile == PILE_NODES_FIELD
 
@@ -619,12 +649,12 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 #ifdef GIBI_READ_ONLY_NAMED_FIELD
           ignoreField = !isNamedObject( objet+1, indices_objets_nommes );
           if ( ignoreField )
-            INFOS("Skip non-named field " << objet+1 << DUMP_LINE_NB);
+            INFOS_MED("Skip non-named field " << objet+1 << DUMP_LINE_NB);
 #endif
           initIntReading( 4 );
           int i_sub, nb_sub = getInt(); // (1) <nb_sub> 2 6 <title length>
           if ( nb_sub < 1 ) {
-            INFOS("Error of field reading: wrong nb of subcomponents " <<
+            INFOS_MED("Error of field reading: wrong nb of subcomponents " <<
                   nb_sub << DUMP_LINE_NB );
             return false;
           }
@@ -652,12 +682,12 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
             for ( i = 0; i < 6; ++i )                 // ignore 6 ints, in example 0 0 0 -2 0 3
               next();
             if ( support_ids[ i_sub ] < 1 || support_ids[ i_sub ] > medi->groupes.size() ) {
-              INFOS("Error of field reading: wrong mesh reference "<<
+              INFOS_MED("Error of field reading: wrong mesh reference "<<
                     support_ids[ i_sub ] << DUMP_LINE_NB );
               return false;
             }
-            if ( nb_comp[ i_sub ] < 1 ) {
-              INFOS("Error of field reading: wrong nb of components " <<
+            if ( nb_comp[ i_sub ] < 0 /*1*/ ) { // [SALOME platform 0019886]
+              INFOS_MED("Error of field reading: wrong nb of components " <<
                     nb_comp[ i_sub ] << DUMP_LINE_NB );
               return false;
             }
@@ -689,18 +719,18 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
               comp_type[ index() ] = getName();
               // component types must be the same
               if ( index() > 0 && comp_type[ index() ] != comp_type[ index() - 1] ) {
-                INFOS( "Error of field reading: diff component types <"
+                INFOS_MED( "Error of field reading: diff component types <"
                       << comp_type[ index() ] << "> != <" << comp_type[ index() - 1 ]
                        << ">" << DUMP_LINE_NB );
                 return false;
               }
             }
             // now type is known, create a field, one for all subs
-            bool isReal = ( comp_type[0] == "REAL*8" );
-            if ( !ignoreField && !fbase ) {
+            bool isReal = (nb_comp[i_sub] > 0) ? (comp_type[0] == "REAL*8") : true;
+            if ( !ignoreField && !fbase && total_nb_comp ) {
               if ( !isReal ) {
                 fbase = fint = new _field<int>( MED_INT32, nb_sub, total_nb_comp );
-                INFOS( "Warning: read NOT REAL field, type <" << comp_type[0] << ">"
+                INFOS_MED( "Warning: read NOT REAL field, type <" << comp_type[0] << ">"
                       << DUMP_LINE_NB);
               }
               else
@@ -754,11 +784,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         } // end loop on field objects
 
         // set field names
-        for ( i = 0; i < nb_objets_nommes; ++i ) {
-          int fieldIndex = indices_objets_nommes[ i ] - 1;
-          if ( fields[ fieldIndex ]) 
-            fields[ fieldIndex ]->_name = objets_nommes[ i ];
-        }
+        setFieldNames( fields, objets_nommes, indices_objets_nommes );
 
       } // numero_pile == PILE_FIELD && readFields
 
@@ -772,43 +798,43 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
   if ( donePiles.find( PILE_SOUS_MAILLAGE ) != donePiles.end() )
   {
     if (donePiles.find( PILE_NOEUDS ) == donePiles.end() ) {
-      INFOS( " Missing pile " << PILE_NOEUDS );
+      INFOS_MED( " Missing pile " << PILE_NOEUDS );
       return false;
     }
     if (donePiles.find( PILE_COORDONNEES ) == donePiles.end()) {
-      INFOS( " Missing pile " << PILE_COORDONNEES );
+      INFOS_MED( " Missing pile " << PILE_COORDONNEES );
       return false;
     }
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   return true;
 }
 
 GIBI_MESH_DRIVER::GIBI_MESH_DRIVER():
-       GENDRIVER(),
+       GENDRIVER(GIBI_DRIVER),
        _ptrMesh(( MESH *) NULL),
        // A VOIR _medIdt(MED_INVALID),
        _meshName("")
 {
-  MESSAGE("GIBI_MESH_DRIVER()");
+  MESSAGE_MED("GIBI_MESH_DRIVER()");
 }
 
 GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const string & fileName,
                                    MESH * ptrMesh,
                                    MED_EN::med_mode_acces accessMode):
-  GENDRIVER(fileName,accessMode),
+  GENDRIVER(fileName, accessMode, GIBI_DRIVER),
   _ptrMesh(ptrMesh)
   // A VOIR _medIdt(MED_INVALID),
 {
-  MESSAGE( "GIBI_MESH_DRIVER(" << fileName <<","<<accessMode );
+  MESSAGE_MED( "GIBI_MESH_DRIVER(" << fileName <<","<<accessMode );
 //   _meshName=fileName.substr(0,fileName.rfind("."));
     // mesh name construction from fileName
     const string ext=".sauve"; // expected extension
     string::size_type pos=fileName.find(ext,0);
     string::size_type pos1=fileName.rfind('/');
     _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
-    SCRUTE(_meshName);
+    SCRUTE_MED(_meshName);
 }
 
 GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const GIBI_MESH_DRIVER & driver):
@@ -817,12 +843,12 @@ GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const GIBI_MESH_DRIVER & driver):
   // A VOIR _medIdt(MED_INVALID),
   _meshName(driver._meshName)
 {
-  MESSAGE("GIBI_MESH_DRIVER(const GIBI_MESH_DRIVER & driver)");
+  MESSAGE_MED("GIBI_MESH_DRIVER(const GIBI_MESH_DRIVER & driver)");
 }
 
 GIBI_MESH_DRIVER::~GIBI_MESH_DRIVER()
 {
-  MESSAGE("~GIBI_MESH_DRIVER()");
+  MESSAGE_MED("~GIBI_MESH_DRIVER()");
 }
 void    GIBI_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
 string  GIBI_MESH_DRIVER::getMeshName() const { return _meshName; };
@@ -836,12 +862,12 @@ GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER():
 {
 }
 GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER(const string & fileName,MESH * ptrMesh):
-       GIBI_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY),
+       GIBI_MESH_DRIVER(fileName,ptrMesh,RDONLY),
        _File (-1),_start(0L),_ptr  (0L),_eptr (0L)
 {
-    MESSAGE("GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER"
+    MESSAGE_MED("GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER"
             "(const string & fileName, MESH * ptrMesh) has been created, "
-            << fileName << ", " << MED_RDONLY);
+            << fileName << ", " << RDONLY);
 }
 GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER(const GIBI_MESH_RDONLY_DRIVER & driver):
 GIBI_MESH_DRIVER(driver)
@@ -849,14 +875,15 @@ GIBI_MESH_DRIVER(driver)
 }
 GIBI_MESH_RDONLY_DRIVER::~GIBI_MESH_RDONLY_DRIVER()
 {
-  BEGIN_OF( "~GIBI_MESH_RDONLY_DRIVER()");
+  const char* LOC = "~GIBI_MESH_RDONLY_DRIVER()";
+  BEGIN_OF_MED(LOC);
   if (_File >= 0)
   {
     ::close (_File);
     if (_start != 0L)
       delete [] _start;
   }
-  MESSAGE("GIBI_MESH_RDONLY_DRIVER::~GIBI_MESH_RDONLY_DRIVER() has been destroyed");
+  MESSAGE_MED("GIBI_MESH_RDONLY_DRIVER::~GIBI_MESH_RDONLY_DRIVER() has been destroyed");
 }
 GENDRIVER * GIBI_MESH_RDONLY_DRIVER::copy(void) const
 {
@@ -874,8 +901,11 @@ const int GIBI_BufferSize     = 16184; // for non-stream input
 void GIBI_MESH_RDONLY_DRIVER::open()
   //     throw (MEDEXCEPTION)
 {
+  if( _status == MED_OPENED )
+    return;
+
   const char * LOC = "GIBI_MESH_RDONLY_DRIVER::open()" ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
 //   MED_EN::med_mode_acces aMode = getAccessMode();
 //   if ( aMode != MED_EN::MED_LECT && aMode != MED_EN::MED_REMP )
@@ -900,7 +930,7 @@ void GIBI_MESH_RDONLY_DRIVER::open()
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName
                                  << " fd: " << _File));
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -910,20 +940,18 @@ void GIBI_MESH_RDONLY_DRIVER::open()
 
 void GIBI_MESH_RDONLY_DRIVER::close()
 {
-    const char * LOC = "GIBI_MESH_DRIVER::close() " ;
-    BEGIN_OF(LOC);
-    if ( _status == MED_OPENED)
-    {
-      if (_File >= 0)
-      {
-        ::close (_File);
-        if (_start != 0L)
-          delete [] _start;
-        _File = -1;
-      }
-      _status = MED_CLOSED;
+  const char* LOC = "GIBI_MESH_DRIVER::close() ";
+  BEGIN_OF_MED(LOC);
+  if ( _status == MED_OPENED) {
+    if (_File >= 0) {
+      ::close (_File);
+      if (_start != 0L)
+        delete [] _start;
+      _File = -1;
     }
-    END_OF(LOC);
+    _status = MED_CLOSED;
+  }
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -1050,7 +1078,7 @@ string GIBI_MESH_RDONLY_DRIVER::getName() const
 void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 {
   const char * LOC = "_GIBI_RDONLY_DRIVER::read() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The _idt of file " << _fileName << " is : "
@@ -1062,17 +1090,17 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
   try {
     if ( readFile( &medi, false )) {
       // impression résultats
-      MESSAGE(LOC << "GIBI_MESH_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
-      MESSAGE(LOC <<  medi );
+      MESSAGE_MED(LOC << "GIBI_MESH_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
+      MESSAGE_MED(LOC <<  medi );
 
       fillMesh( &medi );
     }
   }
   catch (MEDEXCEPTION &ex)
   {
-    INFOS( ex.what() );
+    INFOS_MED( ex.what() );
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -1083,7 +1111,8 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
 static void getReverseVector (const medGeometryElement type,
                               vector<pair<int,int> > & swapVec )
 {
-  BEGIN_OF("void getReverseVector()");
+  const char* LOC = "void getReverseVector()";
+  BEGIN_OF_MED(LOC);
   swapVec.clear();
 
   switch ( type ) {
@@ -1152,7 +1181,7 @@ static void getReverseVector (const medGeometryElement type,
     break;
   default:;
   }
-  END_OF("void getReverseVector()");
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -1211,7 +1240,7 @@ static inline void fixConnectivity(const _maille & aMaille )
   if ( const int * conn = getGibi2MedConnectivity( aMaille.geometricType )) {
     _maille* ma = (_maille*) & aMaille;
     //cout << "###### BEFORE fixConnectivity() " << *ma << endl;
-    vector< _maille::iter > newSommets( ma->sommets.size() );
+    vector< _maille::TNoeud > newSommets( ma->sommets.size() );
     for ( int i = 0; i < newSommets.size(); ++i )
       newSommets[ i ] = ma->sommets[ conn[ i ]];
     ma->sommets = newSommets;
@@ -1226,21 +1255,37 @@ static inline void fixConnectivity(const _maille & aMaille )
 
 static void orientElements( _intermediateMED& medi )
 {
-  MESSAGE("orientElements()");
-  set<_maille>::iterator elemIt = medi.maillage.begin();
+  MESSAGE_MED("orientElements()");
+
+  set<_maille>::const_iterator elemIt, elemEnd;
 
   int type = -100;
   vector< pair<int,int> > swapVec;
-  bool isQuadratic = ( getGibi2MedConnectivity( medi.maillage.rbegin()->geometricType ));
 
-  if ( elemIt->sommets[0]->second.coord.size() == 2 ) { // space dimension
+  bool isQuadratic = false;
+  _maillageByDimIterator maIt(medi);
+  while ( !isQuadratic && maIt.nextType() )
+    isQuadratic = getGibi2MedConnectivity( maIt.type() );
 
+  if ( medi.points.begin()->second.coord.size() == 2 ) { // space dimension
+
+    // fix connectivity of quadratic edges
+    if ( isQuadratic ) {
+      if ( const set<_maille > * edges = _maillageByDimIterator( medi, 1 ).nextType() ) {
+        elemIt = edges->begin(), elemEnd = edges->end();
+        for ( ; elemIt != elemEnd; ++elemIt )
+          fixConnectivity( *elemIt );
+      }
+    }
     // --------------------------
     // Orient 2D faces clockwise
     // --------------------------
 
-    for ( ; elemIt != medi.maillage.end(); elemIt++ )
-      if ( elemIt->dimension() == 2 )
+    _maillageByDimIterator faceMailIt( medi, 2 );
+    while ( const set<_maille > * faces = faceMailIt.nextType() )
+    {
+      elemIt = faces->begin(), elemEnd = faces->end();
+      for ( ; elemIt != elemEnd; elemIt++ )
       {
         // fix connectivity of quadratic faces
         if ( isQuadratic )
@@ -1288,12 +1333,7 @@ static void orientElements( _intermediateMED& medi )
           }
         }
       }
-      else
-      {
-        // fix connectivity of quadratic edges
-        if ( isQuadratic )
-          fixConnectivity( *elemIt );
-      }
+    }
   }
   else {
 
@@ -1313,8 +1353,8 @@ static void orientElements( _intermediateMED& medi )
     for (unsigned int i=0; i!=medi.groupes.size(); ++i)
     {
       _groupe& grp = medi.groupes[i];
-      _groupe::mailleIter maIt=grp.mailles.begin();
-      if ( maIt==grp.mailles.end() || (*maIt)->dimension() != 2 )
+      _groupe::TMailleIter maIt=grp.mailles.begin();
+      if ( maIt==grp.mailles.end() || (*maIt)->dimensionWithPoly() != 2 )
         continue;
       for(; maIt!=grp.mailles.end(); ++maIt) {
         if ( faces.insert( &(**maIt )).second ) {
@@ -1342,7 +1382,7 @@ static void orientElements( _intermediateMED& medi )
     while ( !linkFacesMap.empty() )
     {
       if ( faceQueue.empty() ) {
-        ASSERT( !linkFacesMap.begin()->second.empty() );
+        ASSERT_MED( !linkFacesMap.begin()->second.empty() );
         faceQueue.push( linkFacesMap.begin()->second.front() );
       }
       while ( !faceQueue.empty() )
@@ -1361,7 +1401,7 @@ static void orientElements( _intermediateMED& medi )
           {
             list<const _maille*> & fList = lfIt->second;
             list<const _maille*>::iterator fIt = fList.begin();
-            ASSERT( fIt != fList.end() );
+            ASSERT_MED( fIt != fList.end() );
             for ( ; fIt != fList.end(); fIt++, nbFaceByLink++ ) {
               ml.push_back( *fIt );
               if ( *fIt != face ) // wrongly oriented neighbor face
@@ -1380,7 +1420,7 @@ static void orientElements( _intermediateMED& medi )
                   }
                 }
                 badFace->reverse = true; // reverse
-                //INFOS( "REVERSE " << *badFace );
+                //INFOS_MED( "REVERSE " << *badFace );
                 faceQueue.push( badFace );
               }
             }
@@ -1403,10 +1443,10 @@ static void orientElements( _intermediateMED& medi )
           if ( nbFaceByLink > 2 ) {
             if ( manifold ) {
               list<const _maille*>::iterator i = ml.begin();
-              INFOS(nbFaceByLink << " faces by 1 link:");
+              INFOS_MED(nbFaceByLink << " faces by 1 link:");
               for( ; i!= ml.end(); i++ ) {
-                INFOS("in object " << fgm[ *i ]->nom);
-                INFOS( **i );
+                INFOS_MED("in object " << fgm[ *i ]->nom);
+                INFOS_MED( **i );
               }
             }
             manifold = false;
@@ -1416,108 +1456,117 @@ static void orientElements( _intermediateMED& medi )
     } // while ( !linkFacesMap.empty() )
 
     if ( !manifold )
-      INFOS(" -> Non manifold mesh, faces orientation may be incorrect");
+      INFOS_MED(" -> Non manifold mesh, faces orientation may be incorrect");
 
 
     // ---------------------------------------------------
-    // Orient volumes according to MED conventions:
-    // normal of a bottom (first) face should be downward,
     // fix connectivity of quadratic elements
     // ---------------------------------------------------
 
-    for ( ; elemIt != medi.maillage.end(); elemIt++ ) {
-
-      // GIBI connectivity -> MED one
-      if ( isQuadratic )
-        fixConnectivity( *elemIt );
-
-      // reverse quadratic faces
-      if ( elemIt->reverse ) {
-        if ( elemIt->geometricType != type ) {
-          type = elemIt->geometricType;
-          getReverseVector( type, swapVec );
-        }
-        reverse ( *elemIt, swapVec );
-      }
-
-      // treate volumes
-      if ( elemIt->dimension() == 3 )
+    for ( int dim = 1; dim <= 3; ++dim )
+    {
+      _maillageByDimIterator mailIt( medi, dim );
+      while ( const set<_maille > * elems = mailIt.nextType() )
       {
-        int nbBottomNodes = 0;
-        switch ( elemIt->geometricType ) {
-        case MED_TETRA4:
-        case MED_TETRA10:
-        case MED_PENTA6:
-        case MED_PENTA15:
-          nbBottomNodes = 3; break;
-        case MED_PYRA5:
-        case MED_PYRA13:
-        case MED_HEXA8:
-        case MED_HEXA20:
-          nbBottomNodes = 4; break;
-        default: continue;
-        }
+        elemIt = elems->begin(), elemEnd = elems->end();
+        for ( ; elemIt != elemEnd; elemIt++ )
+        {
+          // GIBI connectivity -> MED one
+          if ( isQuadratic )
+            fixConnectivity( *elemIt );
 
-        // find a normal to the bottom face
-        const _noeud* n[4] = {
-          &elemIt->sommets[0]->second, // 3 bottom nodes
-          &elemIt->sommets[1]->second,
-          &elemIt->sommets[2]->second,
-          &elemIt->sommets[nbBottomNodes]->second };// a top node
-        double vec01 [3] = { // vector n[0]-n[1]
-          n[1]->coord[0] - n[0]->coord[0],
-          n[1]->coord[1] - n[0]->coord[1],
-          n[1]->coord[2] - n[0]->coord[2], };
-        double vec02 [3] = { // vector n[0]-n[2]
-          n[2]->coord[0] - n[0]->coord[0],
-          n[2]->coord[1] - n[0]->coord[1],
-          n[2]->coord[2] - n[0]->coord[2] };
-        double normal [3] = { // vec01 ^ vec02
-          vec01[1] * vec02[2] - vec01[2] * vec02[1],
-          vec01[2] * vec02[0] - vec01[0] * vec02[2],
-          vec01[0] * vec02[1] - vec01[1] * vec02[0] };
-        // check if the 102 angle is convex
-        if ( nbBottomNodes > 3 ) {
-          const _noeud* n3 = &elemIt->sommets[nbBottomNodes-1]->second;// last bottom node
-          double vec03 [3] = { // vector n[0]-n3
-            n3->coord[0] - n[0]->coord[0],
-            n3->coord[1] - n[0]->coord[1],
-            n3->coord[2] - n[0]->coord[2], };
-          if ( fabs( normal[0]+normal[1]+normal[2] ) <= DBL_MIN ) { // vec01 || vec02
-            normal[0] = vec01[1] * vec03[2] - vec01[2] * vec03[1]; // vec01 ^ vec03
-            normal[1] = vec01[2] * vec03[0] - vec01[0] * vec03[2];
-            normal[2] = vec01[0] * vec03[1] - vec01[1] * vec03[0];
-          }
-          else {
-            double vec [3] = { // normal ^ vec01
-              normal[1] * vec01[2] - normal[2] * vec01[1],
-              normal[2] * vec01[0] - normal[0] * vec01[2],
-              normal[0] * vec01[1] - normal[1] * vec01[0] };
-            double dot2 = vec[0]*vec03[0] + vec[1]*vec03[1] + vec[2]*vec03[2]; // vec*vec03
-            if ( dot2 < 0 ) { // concave -> reverse normal
-              normal[0] *= -1;
-              normal[1] *= -1;
-              normal[2] *= -1;
+          // reverse quadratic faces
+          if ( elemIt->reverse ) {
+            if ( elemIt->geometricType != type ) {
+              type = elemIt->geometricType;
+              getReverseVector( type, swapVec );
             }
+            reverse ( *elemIt, swapVec );
           }
         }
-        // direction from top to bottom
-        vector<double> tbDir(3);
-        tbDir[0] = n[0]->coord[0] - n[3]->coord[0];
-        tbDir[1] = n[0]->coord[1] - n[3]->coord[1];
-        tbDir[2] = n[0]->coord[2] - n[3]->coord[2];
-        // compare 2 directions: normal and top-bottom
-        double dot = normal[0]*tbDir[0] + normal[1]*tbDir[1] + normal[2]*tbDir[2];
-        if ( dot < 0. ) { // need reverse
-          if ( elemIt->geometricType != type ) {
-            type = elemIt->geometricType;
-            getReverseVector( type, swapVec );
-          }
-          reverse( *elemIt, swapVec );
-        }
-      } // dimension() == 3
-    } // loop on maillage
+      }
+    }
 
+    // ---------------------------------------------------
+    // Orient volumes according to MED conventions:
+    // normal of a bottom (first) face should be downward
+    // ---------------------------------------------------
+
+    _maillageByDimIterator mailIt( medi, 3 );
+    while ( const set<_maille > * elems = mailIt.nextType() )
+    {
+      elemIt = elems->begin(), elemEnd = elems->end();
+      int nbBottomNodes = 0;
+      switch ( elemIt->geometricType ) {
+      case MED_TETRA4:
+      case MED_TETRA10:
+      case MED_PENTA6:
+      case MED_PENTA15:
+        nbBottomNodes = 3; break;
+      case MED_PYRA5:
+      case MED_PYRA13:
+      case MED_HEXA8:
+      case MED_HEXA20:
+        nbBottomNodes = 4; break;
+      default: continue;
+      }
+      // find a normal to the bottom face
+      const _noeud* n[4] = {
+        &elemIt->sommets[0]->second, // 3 bottom nodes
+        &elemIt->sommets[1]->second,
+        &elemIt->sommets[2]->second,
+        &elemIt->sommets[nbBottomNodes]->second };// a top node
+      double vec01 [3] = { // vector n[0]-n[1]
+        n[1]->coord[0] - n[0]->coord[0],
+        n[1]->coord[1] - n[0]->coord[1],
+        n[1]->coord[2] - n[0]->coord[2], };
+      double vec02 [3] = { // vector n[0]-n[2]
+        n[2]->coord[0] - n[0]->coord[0],
+        n[2]->coord[1] - n[0]->coord[1],
+        n[2]->coord[2] - n[0]->coord[2] };
+      double normal [3] = { // vec01 ^ vec02
+        vec01[1] * vec02[2] - vec01[2] * vec02[1],
+        vec01[2] * vec02[0] - vec01[0] * vec02[2],
+        vec01[0] * vec02[1] - vec01[1] * vec02[0] };
+      // check if the 102 angle is convex
+      if ( nbBottomNodes > 3 ) {
+        const _noeud* n3 = &elemIt->sommets[nbBottomNodes-1]->second;// last bottom node
+        double vec03 [3] = { // vector n[0]-n3
+          n3->coord[0] - n[0]->coord[0],
+          n3->coord[1] - n[0]->coord[1],
+          n3->coord[2] - n[0]->coord[2], };
+        if ( fabs( normal[0]+normal[1]+normal[2] ) <= DBL_MIN ) { // vec01 || vec02
+          normal[0] = vec01[1] * vec03[2] - vec01[2] * vec03[1]; // vec01 ^ vec03
+          normal[1] = vec01[2] * vec03[0] - vec01[0] * vec03[2];
+          normal[2] = vec01[0] * vec03[1] - vec01[1] * vec03[0];
+        }
+        else {
+          double vec [3] = { // normal ^ vec01
+            normal[1] * vec01[2] - normal[2] * vec01[1],
+            normal[2] * vec01[0] - normal[0] * vec01[2],
+            normal[0] * vec01[1] - normal[1] * vec01[0] };
+          double dot2 = vec[0]*vec03[0] + vec[1]*vec03[1] + vec[2]*vec03[2]; // vec*vec03
+          if ( dot2 < 0 ) { // concave -> reverse normal
+            normal[0] *= -1;
+            normal[1] *= -1;
+            normal[2] *= -1;
+          }
+        }
+      }
+      // direction from top to bottom
+      vector<double> tbDir(3);
+      tbDir[0] = n[0]->coord[0] - n[3]->coord[0];
+      tbDir[1] = n[0]->coord[1] - n[3]->coord[1];
+      tbDir[2] = n[0]->coord[2] - n[3]->coord[2];
+      // compare 2 directions: normal and top-bottom
+      double dot = normal[0]*tbDir[0] + normal[1]*tbDir[1] + normal[2]*tbDir[2];
+      if ( dot < 0. ) // need reverse
+      {
+        getReverseVector( elemIt->geometricType, swapVec );
+        for ( ; elemIt != elemEnd; elemIt++ )
+          reverse( *elemIt, swapVec );
+      }
+    } // loop on volumes of one geometry
 
   } // space dimension == 3
 }
@@ -1529,27 +1578,27 @@ static void orientElements( _intermediateMED& medi )
 
 void GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi)
 {
-  const char * LOC = "GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi) : " ;
-  BEGIN_OF(LOC);
+  const char* LOC = "GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi) : ";
+  BEGIN_OF_MED(LOC);
 
   _ptrMesh->_name = _meshName;
 
   if (_ptrMedi)
   {
-    if (_ptrMedi->maillage.size()==0 ||
-        _ptrMedi->groupes.size()==0 ||
-        _ptrMedi->points.size()==0) {
-      INFOS(" Error while reading file: the data read are not completed " ) ;
+    if (!_maillageByDimIterator(*_ptrMedi).nextType() ||
+        _ptrMedi->groupes.empty() ||
+        _ptrMedi->points.empty()) {
+      INFOS_MED(" Error while reading file: the data read are not completed " ) ;
       return;
     }
     // fix element orientation
     orientElements( *_ptrMedi );
 
     _ptrMesh->_spaceDimension = _ptrMedi->points.begin()->second.coord.size();
-    _ptrMesh->_meshDimension = _ptrMedi->maillage.rbegin()->dimension();
-    _ptrMesh->_numberOfNodes = _ptrMedi->points.size();
-    _ptrMesh->_isAGrid = 0;
-    _ptrMesh->_coordinate = _ptrMedi->getCoordinate();
+    _ptrMesh->_meshDimension  = _ptrMedi->getMeshDimension();
+    _ptrMesh->_numberOfNodes  = _ptrMedi->points.size();
+    _ptrMesh->_isAGrid        = 0;
+    _ptrMesh->_coordinate     = _ptrMedi->getCoordinate();
 
     //Construction des groupes
     _ptrMedi->getGroups(_ptrMesh->_groupCell,
@@ -1613,7 +1662,7 @@ void GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi)
       }
     }
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void GIBI_MESH_RDONLY_DRIVER::write( void ) const
@@ -1630,9 +1679,9 @@ GIBI_MESH_WRONLY_DRIVER::GIBI_MESH_WRONLY_DRIVER():GIBI_MESH_DRIVER()
 }
 GIBI_MESH_WRONLY_DRIVER::GIBI_MESH_WRONLY_DRIVER(const string & fileName,
                                                  MESH * ptrMesh):
-  GIBI_MESH_DRIVER(fileName,ptrMesh,MED_WRONLY)
+  GIBI_MESH_DRIVER(fileName,ptrMesh,WRONLY)
 {
-  MESSAGE("GIBI_MESH_WRONLY_DRIVER::GIBI_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("GIBI_MESH_WRONLY_DRIVER::GIBI_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 GIBI_MESH_WRONLY_DRIVER::GIBI_MESH_WRONLY_DRIVER(const GIBI_MESH_WRONLY_DRIVER & driver):
   GIBI_MESH_DRIVER(driver)
@@ -1640,7 +1689,7 @@ GIBI_MESH_WRONLY_DRIVER::GIBI_MESH_WRONLY_DRIVER(const GIBI_MESH_WRONLY_DRIVER &
 }
 GIBI_MESH_WRONLY_DRIVER::~GIBI_MESH_WRONLY_DRIVER()
 {
-  //MESSAGE("GIBI_MESH_WRONLY_DRIVER::GIBI_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
+  //MESSAGE_MED("GIBI_MESH_WRONLY_DRIVER::GIBI_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
 }
 GENDRIVER * GIBI_MESH_WRONLY_DRIVER::copy(void) const
 {
@@ -1660,13 +1709,16 @@ void GIBI_MESH_WRONLY_DRIVER::read (void)
 void GIBI_MESH_WRONLY_DRIVER::open()
   //     throw (MEDEXCEPTION)
 {
+  if( _status == MED_OPENED )
+    return;
+
   const char * LOC = "GIBI_MESH_DRIVER::open()" ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   MED_EN::med_mode_acces aMode = getAccessMode();
   switch (aMode) {
-  case MED_EN::MED_REMP:
-  case MED_EN::MED_ECRI: // should never append !!
+  case MED_EN::RDWR:
+  case MED_EN::WRONLY: // should never append !!
     _gibi.open(_fileName.c_str(), ios::out);
     break;
   default:
@@ -1688,7 +1740,7 @@ void GIBI_MESH_WRONLY_DRIVER::open()
   {
     _status = MED_OPENED;
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -1699,14 +1751,14 @@ void GIBI_MESH_WRONLY_DRIVER::open()
 void GIBI_MESH_WRONLY_DRIVER::close()
   //  throw (MEDEXCEPTION)
 {
-    const char * LOC = "GIBI_MESH_DRIVER::close() " ;
-    BEGIN_OF(LOC);
+  const char* LOC = "GIBI_MESH_DRIVER::close() ";
+  BEGIN_OF_MED(LOC);
     if ( _status == MED_OPENED)
     {
 	_gibi.close();
 	_status = MED_CLOSED;
     }
-    END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -1717,8 +1769,8 @@ void GIBI_MESH_WRONLY_DRIVER::close()
 void GIBI_MESH_WRONLY_DRIVER::write(void) const
   throw (MEDEXCEPTION)
 {
-  const char * LOC = "void GIBI_MESH_WRONLY_DRIVER::write(void) const : ";
-  BEGIN_OF(LOC);
+  const char* LOC = "void GIBI_MESH_WRONLY_DRIVER::write(void) const : ";
+  BEGIN_OF_MED(LOC);
 
   // we are going to modify the _gibi field
   GIBI_MESH_WRONLY_DRIVER * me = const_cast<GIBI_MESH_WRONLY_DRIVER *>(this);
@@ -1728,10 +1780,10 @@ void GIBI_MESH_WRONLY_DRIVER::write(void) const
 //   }
 //   catch (MEDEXCEPTION &ex)
 //   {
-//     INFOS( ex.what() );
+//     INFOS_MED( ex.what() );
 //   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -1804,7 +1856,7 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
   // nodal connectivity for a support entity exists
   medEntityMesh entity = support->getEntity();
   if ( entity != MED_NODE && !_ptrMesh->existConnectivity( MED_NODAL, entity )) {
-    INFOS("Do not save " << supType << " of entity " << entity
+    INFOS_MED("Do not save " << supType << " of entity " << entity
           << " named <" << data._cleanName << "> nodal connectivity not defined");
     return false;
   }
@@ -1828,6 +1880,8 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
       types = _ptrMesh->getTypes( entity );
     for ( int iType = 0; iType < nbTypes; ++iType )
     {
+      if ( types && types[ iType ] > MED_HEXA20 )
+        continue; // poly
       medGeometryElement geomType = types ? types[ iType ] : MED_ALL_ELEMENTS;
       const int * ptrElemIDs = 0;
       int elemID1 = 0, nbElems = 0;
@@ -1847,7 +1901,7 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
   }
 
   if ( data.getNumberOfTypes() == 0 ) {
-    INFOS("Do not save " << supType << " of entity " << entity
+    INFOS_MED("Do not save " << supType << " of entity " << entity
           << " named <" << data._cleanName << "> no geometric types");
     return false;
   }
@@ -1925,7 +1979,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeElements (medGeometryElement geomType,
   // NBEL : nombre d'鬩ments
 
   int castemType = GIBI_MESH_DRIVER::med2gibiGeom( geomType );
-  char* zeroI8 = "       0"; // FORMAT(I8)
+  const char* zeroI8 = "       0"; // FORMAT(I8)
   int nbElemNodes = geomType % 100;
 
   // indices to transform MED connectivity to GIBI one
@@ -1954,7 +2008,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeElements (medGeometryElement geomType,
           setw(8) << nbElements <<  // NBEL
             endl;
 
-  MESSAGE("writeElements(): geomType=" << geomType << " nbElements= " << nbElements)
+  MESSAGE_MED("writeElements(): geomType=" << geomType << " nbElements= " << nbElements)
 
   // L 'enregistrement donnant le num? de la couleur des 鬩ments.
   // * 8000 FORMAT(10I8)
@@ -2029,7 +2083,7 @@ void GIBI_MESH_WRONLY_DRIVER::addName(map<string,int>& nameMap,
         ok = nameMap.insert( make_pair( str, index )).second;
         j++;
       } while ( !ok );
-      INFOS( "Save <" << name << "> as <" << str << ">");
+      INFOS_MED( "Save <" << name << "> as <" << str << ">");
       delete [] str;
     }
 #endif
@@ -2074,7 +2128,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeNames( map<string,int>& nameNbMap )
 void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh()
 {
   const char * LOC = "void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh() ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "file " << _fileName<<  " is not opened." ));
@@ -2101,7 +2155,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh()
   // Collect object names
   // --------------------------------------------------------------------
 
-  vector<int> nbSuppElemsByType(MED_HEXA20,0);
+  vector<int> nbSuppElemsByType(MED_HEXA20+1,0);
   map<string,int> nameNbMap;
   map<const SUPPORT*,supportData>::iterator supIt = _supports.begin();
   int i, nb_objects = 0;
@@ -2115,7 +2169,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh()
     nb_objects += nbSupObj;
 
     addName( nameNbMap, data._cleanName, data._id, "C" );
-    MESSAGE( "obj " << data._id << " " << data._cleanName);
+    MESSAGE_MED( "obj " << data._id << " " << data._cleanName);
 
     // count elements: take into account supports on all elements and families only
     const SUPPORT* support = supIt->first;
@@ -2198,14 +2252,14 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh()
   // la liste des r馩rences , les num?s des couleurs puis les connectivit鳮
 
   TFieldCounter fcount( _gibi, 10 );
-  char* zeroI8 = "       0"; // FORMAT(I8)
+  const char* zeroI8 = "       0"; // FORMAT(I8)
   for ( supIt = _supports.begin(); supIt != _supports.end(); supIt++ )
   {
     supportData & data = supIt->second;
     int nbSupObj = data.getNumberObjects();
     if ( nbSupObj == 0 )
       continue;
-    MESSAGE("support " << data._id << "<" << data._cleanName << ">");
+    MESSAGE_MED("support " << data._id << "<" << data._cleanName << ">");
 
     // write a compound object
     int nbTypes = data.getNumberOfTypes();
@@ -2320,7 +2374,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh()
   }
   fcount.stop();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -2341,23 +2395,24 @@ GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER():GIBI_MESH_DRIVER()
 }
 GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(const string & fileName,
                                              MESH * ptrMesh):
-       GIBI_MESH_DRIVER(fileName,ptrMesh,MED_RDWR)
+       GIBI_MESH_DRIVER(fileName,ptrMesh,RDWR)
 {
-  MESSAGE("GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(const GIBI_MESH_RDWR_DRIVER & driver):
   GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_DRIVER(driver)
 {
-  MESSAGE("GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(driver) has been created");
+  MESSAGE_MED("GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(driver) has been created");
 }
 GIBI_MESH_RDWR_DRIVER::~GIBI_MESH_RDWR_DRIVER() {
-  MESSAGE("GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
+  MESSAGE_MED("GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
 }
 GENDRIVER * GIBI_MESH_RDWR_DRIVER::copy(void) const
 {
-  BEGIN_OF( "GIBI_MESH_RDWR_DRIVER::copy()");
+  const char* LOC = "GIBI_MESH_RDWR_DRIVER::copy()";
+  BEGIN_OF_MED(LOC);
   GENDRIVER * driver = new GIBI_MESH_RDWR_DRIVER(*this);
-  END_OF( "GIBI_MESH_RDWR_DRIVER::copy()");
+  END_OF_MED(LOC);
   return driver;
 }
 void GIBI_MESH_RDWR_DRIVER::write(void) const
@@ -2371,11 +2426,12 @@ void GIBI_MESH_RDWR_DRIVER::write(void) const
 void GIBI_MESH_RDWR_DRIVER::read (void)
   throw (MEDEXCEPTION)
 {
-  BEGIN_OF( "GIBI_MESH_RDWR_DRIVER::read()");
+  const char* LOC = "GIBI_MESH_RDWR_DRIVER::read()";
+  BEGIN_OF_MED(LOC);
   GIBI_MESH_RDONLY_DRIVER::open();
   GIBI_MESH_RDONLY_DRIVER::read();
   GIBI_MESH_RDONLY_DRIVER::close();
-  END_OF( "GIBI_MESH_RDWR_DRIVER::read()");
+  END_OF_MED(LOC);
 }
 void GIBI_MESH_RDWR_DRIVER::open()
   // throw (MEDEXCEPTION)
@@ -2396,9 +2452,9 @@ GIBI_MED_RDONLY_DRIVER::GIBI_MED_RDONLY_DRIVER():GIBI_MESH_RDONLY_DRIVER()
 GIBI_MED_RDONLY_DRIVER::GIBI_MED_RDONLY_DRIVER(const string & fileName, MED * ptrMed):
        GIBI_MESH_RDONLY_DRIVER(fileName,NULL), _med( ptrMed )
 {
-  MESSAGE("GIBI_MED_RDONLY_DRIVER(const string & fileName, MED * ptrMed) has been created");
+  MESSAGE_MED("GIBI_MED_RDONLY_DRIVER(const string & fileName, MED * ptrMed) has been created");
   _fileName = fileName;
-  _accessMode = MED_RDONLY;
+  _accessMode = RDONLY;
 }
 GIBI_MED_RDONLY_DRIVER::GIBI_MED_RDONLY_DRIVER(const GIBI_MED_RDONLY_DRIVER & driver)
 {
@@ -2419,7 +2475,7 @@ GENDRIVER * GIBI_MED_RDONLY_DRIVER::copy ( void ) const
 void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
 {
   const char * LOC = "GIBI_MED_RDONLY_DRIVER::read() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "file " << _fileName<<" is not opened." ));
@@ -2431,30 +2487,14 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
     if ( !readFile( &medi, true ) )
       return;
 
-    // set name of field if it is empty
-    set<string> fnames;
-    list< _fieldBase* >::iterator fIt = medi.fields.begin();
-    for ( ; fIt != medi.fields.end(); fIt++ )
-      fnames.insert( (*fIt)->_name );
-    int i = 0;
-    for (fIt = medi.fields.begin(); fIt != medi.fields.end(); fIt++ ) {
-      _fieldBase* f = *fIt;
-      if ( f->_name.empty() ) {
-        do {
-          ostringstream name;
-          name << "F_" << ++i;
-          f->_name = name.str();
-        } while ( !fnames.insert( f->_name ).second );
-      }
-    }
-    //MESSAGE(LOC <<  medi );
+    //MESSAGE_MED(LOC <<  medi );
     fillMesh( &medi );
-    MESSAGE(LOC << "GIBI_MED_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
-    MESSAGE(LOC <<  medi );
+    MESSAGE_MED(LOC << "GIBI_MED_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
+    MESSAGE_MED(LOC <<  medi );
 
     list< FIELD_* > fields;
     medi.getFields( fields );
-    MESSAGE( "nb fields: " << fields.size() );
+    MESSAGE_MED( "nb fields: " << fields.size() );
 
     if ( _ptrMesh->getName().empty() )
       _ptrMesh->setName( "MESH" );
@@ -2479,10 +2519,10 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
   }
   catch (MEDEXCEPTION &ex)
   {
-    INFOS( ex.what() );
+    INFOS_MED( ex.what() );
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //============================== ====================================================
@@ -2499,10 +2539,10 @@ GIBI_MED_WRONLY_DRIVER::GIBI_MED_WRONLY_DRIVER(const string & fileName,
 {
   const char * LOC =
     "GIBI_MED_WRONLY_DRIVER(const string & fileName, MED * ptrMed, MESH * ptrMesh)" ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   _fileName = fileName;
-  _accessMode = MED_WRONLY;
+  _accessMode = WRONLY;
   _ptrMesh = ptrMesh;
   if ( !_med || !_ptrMesh )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " Bad params " << ptrMed << " " << ptrMesh ));
@@ -2530,7 +2570,7 @@ static void writeDataSection (fstream&                    file,
 			      const int                   id2) throw (MEDEXCEPTION)
 {
   const char * LOC="writeDataSection (.....) :";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   int nbGauss, nbComp = field->getNumberOfComponents();
 
@@ -2589,7 +2629,7 @@ static void writeDataSection (fstream&                    file,
     }
     fcount.stop();
   }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 //=======================================================================
@@ -2599,15 +2639,15 @@ static void writeDataSection (fstream&                    file,
 
 void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
 {
-  const char * LOC = "void GIBI_MED_WRONLY_DRIVER::write(void) const : ";
-  BEGIN_OF(LOC);
+  const char* LOC = "void GIBI_MED_WRONLY_DRIVER::write(void) const : ";
+  BEGIN_OF_MED(LOC);
 
   // we are going to modify the _gibi field
   GIBI_MED_WRONLY_DRIVER * me = const_cast<GIBI_MED_WRONLY_DRIVER *>(this);
 
   // get all fields on _ptrMesh and add their support to be written
   list<FIELD_*> fields;
-  int iField, nbFileds = _med->getNumberOfFields();
+  int iField, nbFields = _med->getNumberOfFields();
   int nb_obj = 0;
   list<int> nb_sub_list;
   map<string,int> nameNbMap;
@@ -2615,9 +2655,9 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   list<pair<int,int> >           subIdSizeList; // pair( <submesh id>, <submesh size> );
   list<pair<int,int> >::iterator idsize;
 
-  string *names=new string[ nbFileds ];
+  string *names=new string[ nbFields ];
   _med->getFieldNames( names );
-  for ( iField = 0; iField < nbFileds; ++iField )
+  for ( iField = 0; iField < nbFields; ++iField )
   {
     int nb_sub = 0;
     deque<DT_IT_> dtit = _med->getFieldIteration( names[ iField ]);
@@ -2627,7 +2667,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
       FIELD_ * f = _med->getField( names[ iField ], fIt->dt, fIt->it );
       if ( f->getValueType() != MED_EN::MED_REEL64 )
       {
-        MESSAGE("GIBI_MED_WRONLY_DRIVER::write( FIELD< int > ) not implemented");
+        MESSAGE_MED("GIBI_MED_WRONLY_DRIVER::write( FIELD< int > ) not implemented");
         continue;
       }
       const SUPPORT * sup = f->getSupport();
@@ -2649,7 +2689,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
 //   }
 //   catch (MEDEXCEPTION &ex)
 //   {
-//     INFOS( ex.what() );
+//     INFOS_MED( ex.what() );
 //     return;
 //   }
 
@@ -2676,12 +2716,16 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
         // start the next field writting
         nb_sub = *(itNbSub++);
         string description = (*itF)->getDescription();
+        if ( description.size() > 72 )
+          description = description.substr(0,72);
         gibi << setw(8) << nb_sub
              << setw(8) << -1
              << setw(8) << 6
-             << setw(8) << description.size() << endl;
+             << setw(8) << 72 /*description.size()*/ << endl; // PAL19100
         if ( !description.empty() )
           gibi << setw(72) << description << endl;
+        else
+          gibi << setw(72) << "Field" << endl;
         gibi << setw(72) << " " << endl;
 
         // Sub Components section
@@ -2762,5 +2806,5 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   }
   me->writeLastRecord();
   delete [] names;
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }

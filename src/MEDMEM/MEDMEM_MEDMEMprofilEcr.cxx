@@ -1,21 +1,24 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-// 
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #include "MEDMEM_MEDMEMprofilEcr.hxx"
 /*
  * En attendant une correction de la gestion du mode d'accès au fichier dans MEDfichier
@@ -31,42 +34,24 @@ namespace med_2_3 {
       fflush(stderr) ;							\
     }
 
-# define ISCRUTE(entier)        {		\
+# define ISCRUTE_MED(entier)        {		\
       ICI ;								\
       fprintf(stderr,"%s = %d\n",#entier,entier) ;			\
       fflush(stderr) ;							\
     }
 
-# define SSCRUTE(chaine)        {		\
+# define SSCRUTE_MED(chaine)        {		\
       ICI ;								\
       fprintf(stderr,"%s = \"%s\"\n",#chaine,chaine) ;			\
       fflush(stderr) ;							\
     }
-# define MESSAGE(chaine)        {		\
+# define MESSAGE_MED(chaine)        {		\
       ICI ;								\
       fprintf(stderr,"%s\n",chaine) ;					\
       fflush(stderr) ;							\
     }
 
     extern void _MEDmodeErreurVerrouiller(void);
-
-    /*************************************************************************
-     * COPYRIGHT (C) 1999 - 2003  EDF R&D
-     * THIS LIBRARY IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY
-     * IT UNDER THE TERMS OF THE GNU LESSER GENERAL PUBLIC LICENSE
-     * AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION;
-     * EITHER VERSION 2.1 OF THE LICENSE, OR (AT YOUR OPTION) ANY LATER VERSION.
-     *
-     * THIS LIBRARY IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT
-     * WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF
-     * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. SEE THE GNU
-     * LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
-     *
-     * YOU SHOULD HAVE RECEIVED A COPY OF THE GNU LESSER GENERAL PUBLIC LICENSE
-     * ALONG WITH THIS LIBRARY; IF NOT, WRITE TO THE FREE SOFTWARE FOUNDATION,
-     * INC., 59 TEMPLE PLACE, SUITE 330, BOSTON, MA 02111-1307 USA
-     *
-     *************************************************************************/
 
 #include <med.h>
 #include <med_outils.h>
@@ -94,8 +79,8 @@ namespace med_2_3 {
       chemin[MED_TAILLE_PROFILS-1] = '\0';
       if ((gid = _MEDdatagroupOuvrir(fid,chemin)) < 0)
 	if ((gid = _MEDdatagroupCreer(fid,chemin)) < 0) {
-	  MESSAGE("Impossible de creer le groupe MED_PROFILS : ");
-	  SSCRUTE(chemin); goto ERROR;
+	  MESSAGE_MED("Impossible de creer le groupe MED_PROFILS : ");
+	  SSCRUTE_MED(chemin); goto ERROR;
 	}
 
       /*
@@ -105,8 +90,8 @@ namespace med_2_3 {
       if ((chid = _MEDdatagroupOuvrir(gid,profilname)) >= 0) {
 	if ( false )//MED_MODE_ACCES != MED_LECTURE_ECRITURE )
   {
-	  MESSAGE("Le profil existe déjà : ");
-	  SSCRUTE(profilname); goto ERROR;
+	  MESSAGE_MED("Le profil existe déjà : ");
+	  SSCRUTE_MED(profilname); goto ERROR;
 	}
       } else
 	if ((chid = _MEDdatagroupCreer(gid,profilname)) < 0)
@@ -116,8 +101,8 @@ namespace med_2_3 {
        * On stocke "n" sous forme d'attribut
        */
       if ((ret = _MEDattrEntierEcrire(chid,MED_NOM_NBR,&n)) < 0) {
-	MESSAGE("Erreur à l'écriture de l'attribut MED_NOM_NBR : ");
-	ISCRUTE(n); goto ERROR;
+	MESSAGE_MED("Erreur à l'écriture de l'attribut MED_NOM_NBR : ");
+	ISCRUTE_MED(n); goto ERROR;
       };
 
       /*
@@ -132,8 +117,8 @@ namespace med_2_3 {
 				  (unsigned char*) pflval);
 #endif
       if (ret < 0 ) {
-	MESSAGE("Impossible d'ecrire le dataset pflval de taille  : ");
-	ISCRUTE(n); goto ERROR;
+	MESSAGE_MED("Impossible d'ecrire le dataset pflval de taille  : ");
+	ISCRUTE_MED(n); goto ERROR;
       }
 
       ret = 0;
@@ -142,21 +127,21 @@ namespace med_2_3 {
        * On ferme tout
        */
       if (chid>0)     if (_MEDdatagroupFermer(chid) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(chid); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(chid); ret = -1;
       }
 
       if (gid>0)     if (_MEDdatagroupFermer(gid) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(gid); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(gid); ret = -1;
       }
 
       return ret;
     }
 
-#undef MESSAGE
-#undef SSCRUTE
-#undef ISCRUTE
+#undef MESSAGE_MED
+#undef SSCRUTE_MED
+#undef ISCRUTE_MED
 
   }
 }

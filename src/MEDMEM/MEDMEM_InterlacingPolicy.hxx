@@ -1,21 +1,24 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-// 
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #ifndef MEDMEM_INTERLACING_HXX
 #define MEDMEM_INTERLACING_HXX
 
@@ -55,7 +58,8 @@ public :
 
   InterlacingPolicy & operator=(const InterlacingPolicy & intpol) {
     if ( this == &intpol ) return *this;
-    BEGIN_OF("InterlacingPolicy operator =");
+  const char* LOC = "InterlacingPolicy operator =";
+  BEGIN_OF_MED(LOC);
 
     _dim           = intpol._dim;
     _nbelem        = intpol._nbelem; //ne prend pas en compte les points de Gauss
@@ -211,7 +215,8 @@ public :
   NoInterlaceByTypeNoGaussPolicy & operator=(const NoInterlaceByTypeNoGaussPolicy & policy) {
     if ( this == &policy) return *this;
 
-    BEGIN_OF("NoInterlaceNoGaussPolicy operator =");
+  const char* LOC = "NoInterlaceNoGaussPolicy operator =";
+  BEGIN_OF_MED(LOC);
     InterlacingPolicy::operator=(policy);
     this->_G.set(policy._G);
     this->_T.set(policy._T);
@@ -324,7 +329,8 @@ public :
   }
 
   FullInterlaceGaussPolicy & operator=(const FullInterlaceGaussPolicy & policy) {
-    BEGIN_OF("FullInterlaceGaussPolicy operator =");
+  const char* LOC = "FullInterlaceGaussPolicy operator =";
+  BEGIN_OF_MED(LOC);
 
     if ( this == &policy) return *this;
 
@@ -420,7 +426,7 @@ public :
 
   NoInterlaceGaussPolicy(const NoInterlaceGaussPolicy & policy,
 			    bool shallowcopie=true)
-    : InterlacingPolicy(policy),_cumul(policy._cumul),_nbtypegeo(policy._nbtypegeo)
+    : InterlacingPolicy(policy),_nbtypegeo(policy._nbtypegeo),_cumul(policy._cumul)
   {
     //Seuls les tableaux de grande taille sont recopiés superficiellement
     if(shallowcopie) {
@@ -438,7 +444,8 @@ public :
   NoInterlaceGaussPolicy & operator=(const NoInterlaceGaussPolicy & policy) {
     if ( this == &policy) return *this;
 
-    BEGIN_OF("NoInterlaceGaussPolicy operator =");
+  const char* LOC = "NoInterlaceGaussPolicy operator =";
+  BEGIN_OF_MED(LOC);
     InterlacingPolicy::operator=(policy);
     this->_G.set(policy._G);
     this->_S.set(policy._S);
@@ -543,7 +550,8 @@ public :
   NoInterlaceByTypeGaussPolicy & operator=(const NoInterlaceByTypeGaussPolicy & policy) {
     if ( this == &policy) return *this;
 
-    BEGIN_OF("NoInterlaceGaussPolicy operator =");
+  const char* LOC = "NoInterlaceGaussPolicy operator =";
+  BEGIN_OF_MED(LOC);
     InterlacingPolicy::operator=(policy);
     this->_G.set(policy._G);
     this->_T.set(policy._T);

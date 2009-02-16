@@ -1,31 +1,29 @@
-//  
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  File   : 
 //  Author : 
 //  Module : 
 //  $Header$
-
+//
 #include "MED_V2_2_Wrapper.hxx"
 #include "MED_Algorithm.hxx"
 #include "MED_Utilities.hxx"
@@ -1742,8 +1740,14 @@ namespace MED
       TValueHolder<TString, char> aFieldName(anInfo.myName);
       MED::TMeshInfo& aMeshInfo = anInfo.myMeshInfo;
 
-      TEntityInfo::const_iterator anIter = theEntityInfo.begin();
-      for(; anIter != theEntityInfo.end(); anIter++){
+      MED::TEntityInfo localEntityInfo = theEntityInfo;
+      TEntityInfo::iterator anLocalIter = localEntityInfo.find(eMAILLE);
+      if(anLocalIter != localEntityInfo.end()){
+        localEntityInfo[eNOEUD_ELEMENT] = anLocalIter->second;
+      }
+        
+      TEntityInfo::const_iterator anIter = localEntityInfo.begin();
+      for(; anIter != localEntityInfo.end(); anIter++){
 	med_entite_maillage anEntity = med_entite_maillage(anIter->first);
 	const TGeom2Size& aGeom2Size = anIter->second;
 	TGeom2Size::const_iterator anGeomIter = aGeom2Size.begin();
@@ -2024,18 +2028,6 @@ namespace MED
 	  }
 	}
 
-	if(aNbGauss > 1 && !aGaussInfo){
-	  if(theErr){
-	    *theErr = MED_FAUX;
-	    return;
-	  }
-	  EXCEPTION(std::runtime_error,"GetTimeStampValue "<<
-		    "- aNbGauss("<<aNbGauss<<") > 1 && !aGaussInfo"<<
-		    "; aGaussName = '"<<&aGaussName[0]<<"'"<<
-		    "; aGeom = "<<aGeom<<
-		    "");
-	}
-	  
 	if(aGaussInfo && aNbGauss != aGaussInfo->GetNbGauss()){
 	  if(theErr){
 	    *theErr = MED_FAUX;
@@ -2465,5 +2457,5 @@ namespace MED
 	EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDstructureCoordLire(...)");
     }
 
-  }
+  }  
 }

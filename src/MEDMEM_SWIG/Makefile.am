@@ -1,36 +1,37 @@
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
 #  MED MEDMEM_SWIG : binding of C++ implementation and Python
 #
-#  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-# 
-#  This library is free software; you can redistribute it and/or 
-#  modify it under the terms of the GNU Lesser General Public 
-#  License as published by the Free Software Foundation; either 
-#  version 2.1 of the License. 
-# 
-#  This library is distributed in the hope that it will be useful, 
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-#  Lesser General Public License for more details. 
-# 
-#  You should have received a copy of the GNU Lesser General Public 
-#  License along with this library; if not, write to the Free Software 
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-# 
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-#
-
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-lib_LTLIBRARIES= libMEDMEM_Swigcmodule.la
+lib_LTLIBRARIES = _libMEDMEM_Swig.la
 
-salomeinclude_HEADERS= \
+salomeinclude_HEADERS =  \
 	libMEDMEM_Swig.i \
-	my_typemap.i \
+	my_typemap.i     \
 	MEDMEM_SWIG_Templates.hxx 
 
 if MED_SWIG_1_3_21
-SWIG_DEF= libMEDMEM_Swig.i dummy.i
+SWIG_DEF = libMEDMEM_Swig.i dummy.i
 
 dummy_wrap.cxx: libMEDMEM_Swig_wrap.cxx
 	sed -e 's/SwigValueWrapper< vector<FAMILY \* > >/vector<FAMILY \* >/g' libMEDMEM_Swig_wrap.cxx > toto
@@ -39,30 +40,27 @@ dummy_wrap.cxx: libMEDMEM_Swig_wrap.cxx
 	mv toto libMEDMEM_Swig_wrap.cxx
 	touch dummy_wrap.cxx
 else !MED_SWIG_1_3_21
-SWIG_DEF= libMEDMEM_Swig.i
+SWIG_DEF = libMEDMEM_Swig.i
 endif
 
-SWIG_FLAGS=@SWIG_FLAGS@ -I$(srcdir)
+SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir)
 
-nodist_libMEDMEM_Swigcmodule_la_SOURCES= libMEDMEM_Swig_wrap.cxx
+dist__libMEDMEM_Swig_la_SOURCES   = libMEDMEM_Swig.i
+nodist__libMEDMEM_Swig_la_SOURCES = libMEDMEM_Swig_wrap.cxx
 libMEDMEM_Swig.py: libMEDMEM_Swig_wrap.cxx
 
 libMEDMEM_Swig_wrap.cxx: $(SWIG_DEF)
 	$(SWIG) $(SWIG_FLAGS) -o $@  $<
 
-libMEDMEM_Swigcmodule_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
-	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
-libMEDMEM_Swigcmodule_la_LDFLAGS= $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
-	../MEDMEM/libmedmem.la
-if MED_ENABLE_KERNEL
-  libMEDMEM_Swigcmodule_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
-  libMEDMEM_Swigcmodule_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace
-endif
+_libMEDMEM_Swig_la_CPPFLAGS = $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases
+_libMEDMEM_Swig_la_LDFLAGS  = -module $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
+	../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
 
-CLEANFILES=libMEDMEM_Swig_wrap.cxx libMEDMEM_Swig.py
+CLEANFILES = libMEDMEM_Swig_wrap.cxx libMEDMEM_Swig.py
 
-nodist_salomescript_DATA= libMEDMEM_Swig.py
-dist_salomescript_DATA= \
+nodist_salomescript_DATA = libMEDMEM_Swig.py
+dist_salomescript_DATA   = \
 		   medmem.py \
 		   med_test1.py \
 		   med_test2.py \
@@ -80,14 +78,8 @@ dist_salomescript_DATA= \
 		   testMedObj.py \
 		   test_profil_MedFieldDriver.py \
 		   testWriteAndFam.py \
-		   testMedMemGeneral.py
-
-#############################################################################
-
-install-exec-hook: $(DESTDIR)$(libdir)/_libMEDMEM_Swig.so
-
-$(DESTDIR)$(libdir)/_libMEDMEM_Swig.so:
-	( cd $(DESTDIR)$(libdir); ln -sf libMEDMEM_Swigcmodule.so _libMEDMEM_Swig.so; )
-
-uninstall-hook:
-	( cd $(DESTDIR)$(libdir); rm -f _libMEDMEM_Swig.so; )
+		   testMedMemGeneral.py \
+		   testMedMemCxxTests.py \
+		   dumpMEDMEM.py \
+		   ensightMedEnsight_test.py \
+		   medEnsightMed_test.py

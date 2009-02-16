@@ -1,21 +1,24 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-// 
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #ifndef MEDMEM_ARRAY_HXX
 #define MEDMEM_ARRAY_HXX
 
@@ -177,7 +180,8 @@ public  :
   inline MEDMEM_Array<ElementType,InterlacingPolicy,CheckingPolicy> &
          operator=( const MEDMEM_Array & array) {
     if ( this == &array) return *this;
-    BEGIN_OF("MEDMEM_Array  operator =");
+  const char* LOC = "MEDMEM_Array  operator =";
+  BEGIN_OF_MED(LOC);
     InterlacingPolicy::operator=(array); //Appel des classes de base ?
 
     this->_array.set(array._array); // Le propriétaire reste le ARRAY initial
@@ -194,6 +198,10 @@ public  :
   }
 
   ElementType * getPtr() {
+    return  _array;
+  }
+
+  const ElementType * getPtr() const {
     return  _array;
   }
 
@@ -227,9 +235,14 @@ public  :
     // setRow fonctionne
     // dans les deux modes d'entrelacement.
 
-    for (int j =1; j <= InterlacingPolicy::getDim(); j++)
-      for (int k = 1 ; k <= InterlacingPolicy::getNbGauss(i); k++)
+    // int index = -1;
+    for (int j =1; j <= InterlacingPolicy::getDim(); j++) {
+      for (int k = 1 ; k <= InterlacingPolicy::getNbGauss(i); k++) {
 	_array[InterlacingPolicy::getIndex(i,j,k)] = value[InterlacingPolicy::getIndex(1,j,k)];
+        //index++;
+	//_array[InterlacingPolicy::getIndex(i,j,k)] = value[index];
+      }
+    }
   }
 
   inline const ElementType * getColumn(int j) const {
@@ -244,9 +257,14 @@ public  :
     // setColumn fonctionne
     // dans les deux modes d'entrelacement.
 
-    for (int i=1; i <= InterlacingPolicy::getNbElem(); i++)
-      for (int k = 1 ; k <= InterlacingPolicy::getNbGauss(i); k++)
-	_array[InterlacingPolicy::getIndex(i,j,k)] = value[InterlacingPolicy::getIndex(i,1,k)];
+    int index = -1;
+    for (int i=1; i <= InterlacingPolicy::getNbElem(); i++) {
+      for (int k = 1 ; k <= InterlacingPolicy::getNbGauss(i); k++) {
+	//_array[InterlacingPolicy::getIndex(i,j,k)] = value[InterlacingPolicy::getIndex(i,1,k)];
+        index++;
+	_array[InterlacingPolicy::getIndex(i,j,k)] = value[index];
+      }
+    }
   }
 
 

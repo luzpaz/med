@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef MEDMEM_MAPPING_HXX
 #define MEDMEM_MAPPING_HXX
@@ -107,8 +109,8 @@ _TEMPLATE_ void _MAPPING_::Cree_Mapping(int flag_convexe)
 		int nbr_noeuds=noeuds_front->SIZE();
 		int num_maille_depart;
 		int nma=0;
-		resultat_mapping     = vector<int>(nbr_noeuds,UNDEFINED);
-		point_le_plus_proche = vector<int>(nbr_noeuds,UNDEFINED);
+		resultat_mapping     = vector<int>(nbr_noeuds,MED_UNDEFINED);
+		point_le_plus_proche = vector<int>(nbr_noeuds,MED_UNDEFINED);
 	
 		// noeuds_back->affiche();
 		
@@ -187,7 +189,7 @@ _TEMPLATE_ int _MAPPING_::Donne_Directions(int num_maille,const NOEUD &n,int eta
 	for (int i=0;i<nbr_faces;i++)
 		{
 		tf=(ef[i]<0);
-		tv=(maillage_back->DONNE_VOISIN_DE_MAILLE(num_maille,i)==UNDEFINED);
+		tv=(maillage_back->DONNE_VOISIN_DE_MAILLE(num_maille,i)==MED_UNDEFINED);
 		tb=(maillage_back->EST_AU_BORD_FACE_DE_MAILLE(num_maille,i));
 		if (tf) // extérieur
 			{
@@ -213,7 +215,7 @@ _TEMPLATE_ int _MAPPING_::Trouve_Maille_Contenant_Point_Mth_Co(const NOEUD &n,in
 	int indirection[NBR_FACES_MAX];
 	int ind_reel;
 	int num_reel;
-	int new_num=UNDEFINED;
+	int new_num=MED_UNDEFINED;
 	
 	int test=Donne_Directions(num_maille,n,etat_face);
 	
@@ -224,7 +226,7 @@ _TEMPLATE_ int _MAPPING_::Trouve_Maille_Contenant_Point_Mth_Co(const NOEUD &n,in
           int etat_face_for_check[NBR_FACES_MAX];
           for (i=0;i<nbr_faces;i++) {
             int num_neighbor=maillage_back->DONNE_VOISIN_DE_MAILLE(num_maille,i);
-            if ( num_neighbor != UNDEFINED &&
+            if ( num_neighbor != MED_UNDEFINED &&
                  Donne_Directions(num_neighbor,n,etat_face_for_check) == INTERIEUR )
               return num_neighbor;
             indirection[i]=i;
@@ -241,7 +243,7 @@ _TEMPLATE_ int _MAPPING_::Trouve_Maille_Contenant_Point_Mth_Co(const NOEUD &n,in
 			}
 		if ((test==EXTERIEUR_AU_BORD)&&(flag_convexe)) 
 			{
-			return 2*UNDEFINED;
+			return 2*MED_UNDEFINED;
 			}
 		nbr_mailles_examinees++;
 		for (i=0;i<nbr_faces;i++)
@@ -251,7 +253,7 @@ _TEMPLATE_ int _MAPPING_::Trouve_Maille_Contenant_Point_Mth_Co(const NOEUD &n,in
 			indirection[i]=indirection[nbr_rnd];
 			indirection[nbr_rnd]=tmp;
 			}
-		for (i=0;(i<nbr_faces)&&(new_num==UNDEFINED);i++) 
+		for (i=0;(i<nbr_faces)&&(new_num==MED_UNDEFINED);i++) 
 			{
 			ind_reel=indirection[i];
 			num_reel=maillage_back->DONNE_VOISIN_DE_MAILLE(num_maille,ind_reel);
@@ -260,7 +262,7 @@ _TEMPLATE_ int _MAPPING_::Trouve_Maille_Contenant_Point_Mth_Co(const NOEUD &n,in
 				new_num=num_reel;
 				}
 			}
-		for (i=0;(i<nbr_faces)&&(new_num==UNDEFINED);i++) 
+		for (i=0;(i<nbr_faces)&&(new_num==MED_UNDEFINED);i++) 
 			{
 			ind_reel=indirection[i];
 			num_reel=maillage_back->DONNE_VOISIN_DE_MAILLE(num_maille,ind_reel);
@@ -269,16 +271,16 @@ _TEMPLATE_ int _MAPPING_::Trouve_Maille_Contenant_Point_Mth_Co(const NOEUD &n,in
 				new_num=num_reel;
 				}
 			}
-		if (new_num==UNDEFINED) 
+		if (new_num==MED_UNDEFINED) 
 			{
 			new_num=num_maille_interdit;
 			}
 		num_maille_interdit=num_maille;
 		num_maille=new_num;
-		new_num=UNDEFINED;
+		new_num=MED_UNDEFINED;
 		test=Donne_Directions(num_maille,n,etat_face);
 		}
-	return UNDEFINED;
+	return MED_UNDEFINED;
 	}
 
 #undef _TEMPLATE_

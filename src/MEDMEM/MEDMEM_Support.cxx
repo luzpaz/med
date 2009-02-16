@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
  File Support.cxx
@@ -36,6 +38,25 @@ using namespace MEDMEM;
 
 #define MED_NBR_GEOMETRIE_MAILLE 15
 
+/*!
+\defgroup SUPPORT_general General information
+
+\defgroup SUPPORT_creation Creation methods
+The creation of a support requires a number of information
+which is supplied to the MedMem library with the following methods.
+When the support is defined on all elements, the creation method is 
+very simple, for the element list is implicitly defined.
+
+\defgroup SUPPORT_query Query methods
+
+\defgroup SUPPORT_constructors Constructors
+
+\defgroup SUPPORT_advanced Advanced methods
+
+*/
+
+
+
 /* This class is a generic class for family and group */
 
 /*!
@@ -49,20 +70,31 @@ SUPPORT::SUPPORT(): _name(""),	_description("None"), _mesh((MESH*)NULL),
 		    _number((MEDSKYLINEARRAY*)NULL)
 //--------------------------------------------------------------------------
 {
-    MESSAGE("SUPPORT::SUPPORT()");
+    MESSAGE_MED("SUPPORT::SUPPORT()");
 };
 
 /*!
-  Constructor.
+\addtogroup SUPPORT_constructors
+@{
+*/
+
+/*!
+  Constructor of a support lying on mesh \a Mesh. By default,
+the support lies on all elements of type \a Entity. 
+Partial support can be described using \a setpartial method.
+
+\param Mesh Pointer to the mesh on which the support lies
+\param Name Support name (should not exceed MED_TAILLE_NOM as defined in Med - i.e. 32 characters)
+\param Entity Entity type of the support (MED_CELL,MED_FACE,MED_EDGE, MED_NODE)
 */
 //--------------------------------------------------------------------------
-SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL*/):
+SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, MED_EN::medEntityMesh Entity/*=MED_CELL*/):
 		_name(Name), _description("None"), _mesh(Mesh), _entity(Entity),
 		_numberOfGeometricType(0), _isOnAllElts(true),
 		_totalNumberOfElements(0), _number((MEDSKYLINEARRAY*)NULL)
 //--------------------------------------------------------------------------
 {
-  MESSAGE("SUPPORT::SUPPORT(MESH*Mesh,string Name,medEntityMesh Entity)");
+  MESSAGE_MED("SUPPORT::SUPPORT(MESH*Mesh,string Name,medEntityMesh Entity)");
   update() ;
 };
 
@@ -73,8 +105,8 @@ SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL
 SUPPORT::SUPPORT(const SUPPORT & m)
 //--------------------------------------------------------------------------
 {
-  const char * LOC = "SUPPORT::SUPPORT(SUPPORT & m) : " ;
-  BEGIN_OF(LOC) ;
+  const char* LOC = "SUPPORT::SUPPORT(SUPPORT & m) : ";
+  BEGIN_OF_MED(LOC);
 
   _name = m._name ;
   _description = m._description ;
@@ -99,17 +131,22 @@ SUPPORT::SUPPORT(const SUPPORT & m)
 
   _profilNames=m._profilNames;
 
-  END_OF(LOC) ;
+  END_OF_MED(LOC);
 };
 /*!
+@}
+ */
+
+/*!\ifnot MEDMEM_ug
   Affectation operator. operator = perform et deep copy except for attribute _mesh
+\endif
 */
 //--------------------------------------------------------------------------
 SUPPORT & SUPPORT::operator=(const SUPPORT & m)
 //--------------------------------------------------------------------------
 {
-  const char * LOC = "SUPPORT::operator=(const SUPPORT & m) : " ;
-  BEGIN_OF(LOC) ;
+  const char* LOC = "SUPPORT::operator=(const SUPPORT & m) : ";
+  BEGIN_OF_MED(LOC);
 
   if ( this == &m ) return *this;
 
@@ -124,17 +161,20 @@ SUPPORT & SUPPORT::operator=(const SUPPORT & m)
   if (m._numberOfElements)
     _numberOfElements.set(_numberOfGeometricType,m._numberOfElements);
   _totalNumberOfElements = m._totalNumberOfElements;
+
   if (m._isOnAllElts == false) {
     if (_number) delete _number;
     if  ( m._number ) // m may be not filled SUPPORTClient
       _number = new MEDSKYLINEARRAY(* m._number);
     else
       _number = (MEDSKYLINEARRAY *) NULL;
-  } else
+  }
+  else
     _number = (MEDSKYLINEARRAY *) NULL;
+
   _profilNames=m._profilNames;
 
-  END_OF(LOC) ;
+  END_OF_MED(LOC);
   return *this;
 }
 
@@ -145,7 +185,7 @@ SUPPORT & SUPPORT::operator=(const SUPPORT & m)
 SUPPORT::~SUPPORT()
 //-----------------
 {
-  MESSAGE("Destructeur ~SUPPORT()");
+  MESSAGE_MED("Destructeur ~SUPPORT()");
   clearDataOnNumbers();
 }
 
@@ -182,11 +222,16 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
     os << "    On Type "<<MED_EN::geoNames[types[j]]
        <<" : there is(are) "<<numberOfElements<<" element(s) and " <<endl;
   }
+  int nbProfilNames = my._profilNames.size();
+  os<<"Number of profil names = "<<nbProfilNames<<endl;
+  for(int j=0; j<nbProfilNames; j++) {
+    os<<"    Profil Name N"<<j+1<<" = "<<my._profilNames[j]<<endl;
+  }
   return os ;
 }
 
 /*!
-  Updade the SUPPORT attributs with rigth MESH information.
+  Updade the SUPPORT attributs with right MESH information.
 
   It has an effect only if SUPPORT is on all elements.
 
@@ -196,8 +241,8 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
 void SUPPORT::update()
 //-------------------
 {
-  const char * LOC = "SUPPORT::update() : " ;
-  BEGIN_OF(LOC) ;
+  const char* LOC = "SUPPORT::update() : ";
+  BEGIN_OF_MED(LOC);
 
   if (_isOnAllElts)
     {
@@ -207,13 +252,13 @@ void SUPPORT::update()
 	  _geometricType.set(1);
 	  _geometricType[0]=MED_POINT1;
 	  _numberOfElements.set(1);
-	  _numberOfElements[0]=_mesh->getNumberOfNodes(); // Vérifier le pointeur !
+	  _numberOfElements[0]=_mesh->getNumberOfNodes(); // VÃ©rifier le pointeur !
 	  _totalNumberOfElements=_numberOfElements[0];
 	}
       else
 	{ // we duplicate information from _mesh
 	  _numberOfGeometricType=_mesh->getNumberOfTypesWithPoly(_entity);
-	  SCRUTE(_numberOfGeometricType);
+	  SCRUTE_MED(_numberOfGeometricType);
 	  medGeometryElement *  allType = _mesh->getTypesWithPoly(_entity);
 	  _geometricType.set(_numberOfGeometricType,allType );
 	  _numberOfElements.set(_numberOfGeometricType);
@@ -226,10 +271,10 @@ void SUPPORT::update()
 	  delete [] allType;
 	}
 
-      SCRUTE(_name);
-      SCRUTE(_numberOfGeometricType);
+      SCRUTE_MED(_name);
+      SCRUTE_MED(_numberOfGeometricType);
     }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 /*!
   Get the field value index (in fortran mode) from the support global number.
@@ -240,7 +285,7 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
 //-------------------
 {
   const char * LOC="getValIndFromGlobalNumber(const int number) : ";
-  //BEGIN_OF(LOC);
+  //BEGIN_OF_MED(LOC);
 
   if (_isOnAllElts) return number;
 
@@ -272,18 +317,33 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
   // It should never arrive here !!
   return 0;
 
-  //END_OF(LOC);
+  //END_OF_MED();
 }
 
 /*!
-  Blend the given SUPPORT mySupport into the calling object SUPPORT.
+\addtogroup SUPPORT_advanced
+@{
+
+ */
+
+/*!
+Blends the given SUPPORT mySupport into the calling object SUPPORT.
+Example :
+\verbatim
+SUPPORT mySupport ;
+SUPPORT myOtherSupport ;
+...
+mySupport.blending(myOtherSupport) ;
+\endverbatim
+Support \a mySupport now contains a union of the elements originally
+contained in \a mySupport and \a myOtherSupport.
 */
 //-------------------
 void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
 //-------------------
 {
   const char * LOC="SUPPORT::blending(SUPPORT *) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   if (_entity!=mySupport->getEntity())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entities are different !"));
   if(!(*_mesh == *mySupport->getMesh()))
@@ -312,7 +372,7 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
       for(iter=idsSet.begin();iter!=idsSet.end();iter++)
 	idsList.push_back(*iter);
 
-      MESSAGE(LOC << " size Set " << idsSet.size() << " size List " << idsList.size());
+      MESSAGE_MED(LOC << " size Set " << idsSet.size() << " size List " << idsList.size());
 
       if(_entity==MED_NODE)
 	fillFromNodeList(idsList);
@@ -321,26 +381,62 @@ void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
     }
   else
     clearDataOnNumbers();
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
+/*!  @}  */
+
+/*! 
+\addtogroup SUPPORT_creation
+@{
+*/
 
 /*!
-    This function allows the user to set a support not on all entities Entity,
-    it should be used after an initialisation with the constructor
-    SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL) and
-    after the call to the function setAll(false).
-    It allocates and initialises all the attributs of the class SUPPORT.
+This function allows the user to set a support not on all entities Entity,
+it should be used after an initialisation with the constructor
+SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL).
+It allocates and initialises all the attributs of the class SUPPORT.
+
+\param Description string describing the support for information purposes (should not exceed MED_TAILLE_DESC length - i.e. 200 characters)
+\param NumberOfGeometricType number of geometric types contained in the support 
+\param TotalNumberOfElements number of elements in the support
+\param GeometricType array describing the geometric types (must be consistent with the entity that was passed as an argument to the support constructor)
+\param NumberOfElements array describing the number of elements for each type
+\param NumberValue array of IDs of the elements that constitute the group.
+
+The following example refers to the mesh given in the mesh connectivity example.
+It creates a group containing the two cells on the right (the quadratic triangle and the quadrangle on the right).
+
+\verbatim
+// creating SUPPORT on cells with one value per cell
+SUPPORT right_group(mesh, MED_CELL, 1);
+
+string description = "right group";
+int number_of_types=2;
+int number_of_elements=2;
+medGeometryElement geom_types[2]={MED_QUAD4, MED_TRIA6};
+int number_of_elem_per_type[2]={1,1};
+int number_value[2]={3,4};
+
+//defining the region of the support
+right_group.setpartial(description, number_of_types,
+                       number_of_elements, geom_types,
+                       number_of_elem_per_type, number_value);
+\endverbatim
+
+When MED_POLYGON or MED_POLYHEDRON elements are included in the support,
+their global number should be given. For instance, on a mesh having ten MED_TRIA3 
+and five MED_POLYGON, the number of the first polygonal element is 11. 
  */
 
 //-------------------
 void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
 			 int TotalNumberOfElements,
-			 medGeometryElement *GeometricType,
+												 MED_EN::medGeometryElement *GeometricType,
 			 int *NumberOfElements, int *NumberValue)
 //-------------------
 {
   const char * LOC = "SUPPORT::setpartial(string , int , int , medGeometryElement * , int * , int *) : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   _isOnAllElts = false ;
 
@@ -376,22 +472,25 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   for (int itype=0; itype < NumberOfGeometricType; itype++)
   {
     ostringstream typestr;
-    typestr<<_name<<"_type"<<itype;
+    typestr<<_name<<"_type"<<_geometricType[itype];
     prof_names[itype]=typestr.str();
   }
   setProfilNames(prof_names);
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
+/*! @}  */
 
 /*!
+\ifnot MEDMEM_ug
     This function allows the user to set a support not on all entities Entity,
     it should be used after an initialisation of :
     SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL) and
     after calling  at least setGeometricType and perharps setEntity.
     It allocates and initialises all the attributs of the class SUPPORT but
     doesn't set a description, a SUPPORT name, a meshName and an associated MESH.
+\endif
  */
 
 //-------------------
@@ -399,7 +498,7 @@ void SUPPORT::setpartial(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDE
 //-------------------
 {
   const char * LOC = "SUPPORT::setpartial(MEDSKYLINEARRAY * number) : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   if ( ! _geometricType )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"SUPPORT must contains"
@@ -425,27 +524,27 @@ void SUPPORT::setpartial(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDE
 
   // cout << *_number << endl;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 void SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDEXCEPTION)
 //-------------------
 {
-  const char * LOC = "SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number) : " ;
-  BEGIN_OF(LOC) ;
+  const char* LOC = "SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number) : ";
+  BEGIN_OF_MED(LOC);
 
   if ( shallowCopy )
     _number_fromfile = number;
   else
     _number_fromfile = new MEDSKYLINEARRAY(*number);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
 
   const char * LOC = "SUPPORT::setProfilNames(vector<string> profilNames) : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   if ( _isOnAllElts )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"SUPPORT shouldn't be on all elements"
@@ -472,7 +571,7 @@ void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
 
   _profilNames = profilNames;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
@@ -481,6 +580,10 @@ vector<string> SUPPORT::getProfilNames() const throw (MEDEXCEPTION)
   return _profilNames;
 };
 
+/*!
+\addtogroup SUPPORT_advanced
+@{
+*/
 
 /*!
   This method gets the boundary elements of the mesh. The support has to be
@@ -493,7 +596,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
 //-------------------
 {
   const char * LOC = "SUPPORT::getBoundaryElements() : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   if (_mesh == (MESH*)NULL) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"You shlould use the appropriate SUPPORT Constructor before calling this method"));
 
@@ -513,22 +616,22 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   int numberOf = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS) ;
   list<int> myElementsList ;
   int size = 0 ;
-  SCRUTE(numberOf) ;
+  SCRUTE_MED(numberOf) ;
   for (int i=0 ; i<numberOf; i++)
     if (myConnectivityValue[myConnectivityIndex[i]] == 0) {
-      SCRUTE(i+1) ;
+      SCRUTE_MED(i+1) ;
       myElementsList.push_back(i+1) ;
       size++ ;
     }
-  SCRUTE(size) ;
+  SCRUTE_MED(size) ;
   // Well, we must know how many geometric type we have found
   int * myListArray = new int[size] ;
   int id = 0 ;
   list<int>::iterator myElementsListIt ;
   for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
     myListArray[id]=(*myElementsListIt) ;
-    SCRUTE(id);
-    SCRUTE(myListArray[id]);
+    SCRUTE_MED(id);
+    SCRUTE_MED(myListArray[id]);
     id ++ ;
   }
 
@@ -583,14 +686,14 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
 
   setNumberOfGeometricType(numberOfGeometricType) ;
-  //  setGeometricType(geometricType) ;
- for (int i=0;i<numberOfGeometricType;i++)
-    {
-      _geometricType[i] = geometricType[i];
-    }
+  setGeometricType(geometricType) ;
+  //for (int i=0;i<numberOfGeometricType;i++)
+  //   {
+  //     _geometricType[i] = geometricType[i];
+  //   }
 
   setNumberOfElements(numberOfElements) ;
-  setTotalNumberOfElements(size) ;
+  //setTotalNumberOfElements(size) ;
   //  setNumber(mySkyLineArray) ;
 
   _number = new MEDSKYLINEARRAY(numberOfGeometricType,size);
@@ -609,17 +712,18 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   delete[] myListArray;
   delete mySkyLineArray;
 
-  END_OF(LOC) ;
+  END_OF_MED(LOC);
 }
 
 /*!
-  intersect the given SUPPORT mySupport into the calling SUPPORT object.
+Intersects \a mySupport into the calling SUPPORT object.
+If A.intersecting(B) is called, on output, \f$ A \f$ contains \f$A \cap B\f$.
 */
 //-------------------
 void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
 {
   const char * LOC="SUPPORT::intersecting(SUPPORT *) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   if (_entity!=mySupport->getEntity())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entities are different !"));
   if(!(*_mesh == *mySupport->getMesh()))
@@ -646,7 +750,7 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
   int size=idsSet.size();
   int sizeList = idsList.size();
 
-  MESSAGE(LOC << " size Set " << idsSet.size() << " size List " << idsList.size());
+  MESSAGE_MED(LOC << " size Set " << idsSet.size() << " size List " << idsList.size());
 
   if(size!=0 && sizeList != 0)
     {
@@ -659,8 +763,9 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
     {
       clearDataOnNumbers();
     }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
+/*!  @}  */
 
 /*!
   Method that cleans up all the fields related to _numbers. Defined for code factorization.
@@ -686,16 +791,17 @@ void MEDMEM::SUPPORT::clearDataOnNumbers()
 bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
 //--------------------------------------------------
 {
-  const char * LOC = "bool SUPPORT::operator ==(const SUPPORT &support) const : ";
 
-  BEGIN_OF(LOC);
+  const char* LOC = "bool SUPPORT::operator ==(const SUPPORT &support) const : ";
+  BEGIN_OF_MED(LOC);
 
   bool operatorReturn = false;
 
   operatorReturn = (*_mesh == *support._mesh) && (_entity == support._entity) &&
     (_numberOfGeometricType == support._numberOfGeometricType) &&
     ((_isOnAllElts && support._isOnAllElts) || (!_isOnAllElts && !support._isOnAllElts)) &&
-    (_totalNumberOfElements == support._totalNumberOfElements);
+    (_totalNumberOfElements == support._totalNumberOfElements) &&
+    (_profilNames.size() == support._profilNames.size());
 
   if (operatorReturn)
     {
@@ -720,7 +826,7 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
 	}
     }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return operatorReturn;
 };
@@ -872,8 +978,9 @@ list<int> *MEDMEM::SUPPORT::sub(int start,int end,const int *idsToSuppress,int l
       return ret;
     }
   ret=new list<int>;
-  int *temp=new int[lgthIdsToSuppress];
+  int *temp=new int[lgthIdsToSuppress+1];
   memcpy(temp,idsToSuppress,sizeof(int)*lgthIdsToSuppress);
+  temp[lgthIdsToSuppress] = -1;
   qsort(temp,lgthIdsToSuppress,sizeof(int),compareId);
   int k=0;
   for(int i=start;i<=end;i++)
@@ -956,7 +1063,7 @@ SUPPORT *MEDMEM::SUPPORT::getComplement() const
 SUPPORT *MEDMEM::SUPPORT::substract(const SUPPORT& other) const throw (MEDEXCEPTION)
 {
   const char * LOC = "SUPPORT *MEDMEM::subtract(const SUPPORT * other) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   SUPPORT *ret;
   if (_entity!=other.getEntity())
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Entities are different !"));
@@ -982,7 +1089,7 @@ SUPPORT *MEDMEM::SUPPORT::substract(const SUPPORT& other) const throw (MEDEXCEPT
     ret=_mesh->buildSupportOnElementsFromElementList(*ids,_entity);
   delete ids;
   return ret;
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 /*!
@@ -992,7 +1099,7 @@ SUPPORT *MEDMEM::SUPPORT::substract(const SUPPORT& other) const throw (MEDEXCEPT
 SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION)
 {
   const char * LOC = "SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(MED_EN::medEntityMesh Entity) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
   int spaceDimension=_mesh->getSpaceDimension();
   MED_EN::medEntityMesh baseEntity=Entity;
   if (spaceDimension == 3)
@@ -1069,7 +1176,7 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
   setNumberOfGeometricType(numberOfGeometricType);
   setGeometricType(geometricType);
   setNumberOfElements(numberOfElements);
-  setTotalNumberOfElements(numberOfElements[0]);
+  //setTotalNumberOfElements(numberOfElements[0]);
   setNumber(mySkyLineArray);
 
   delete[] numberOfElements;
@@ -1142,8 +1249,8 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
   MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray,true) ;
   setNumberOfGeometricType(numberOfGeometricType) ;
   setGeometricType(geometricType) ;
-   setNumberOfElements(numberOfElements) ;
-  setTotalNumberOfElements(size) ;
+  setNumberOfElements(numberOfElements) ;
+  //setTotalNumberOfElements(size) ;
   setNumber(mySkyLineArray) ;
 
   delete[] numberOfElements;

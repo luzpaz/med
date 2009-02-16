@@ -1,25 +1,26 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
  File Mesh.cxx
- $Header$
 */
 
 #include <math.h>
@@ -36,7 +37,7 @@
 #include "MEDMEM_Coordinate.hxx"
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_CellModel.hxx"
-#include "MEDMEM_Formulae.hxx"
+#include "VolSurfFormulae.hxx"
 #include "MEDMEM_InterpolationHighLevelObjects.hxx"
 #include "MEDMEM_DriverFactory.hxx"
 
@@ -47,6 +48,47 @@ using namespace MED_EN;
 #define MED_NOPDT -1
 #define MED_NONOR -1
 
+// Block defining groups for the MEDMEM_ug documentation
+/*!
+\defgroup MESH_constructors MESH Constructors
+
+The MESH class provides only two constructors : a copy constructor and
+a constructor enabling creation from file reading. The creation of 
+a user-defined mesh implies the use of the MESHING class.
+
+\defgroup MESH_advanced MESH Advanced features
+These functions provide access to high-level manipulation of the meshes, giving 
+information about the cells or extracting supports from the mesh.
+
+\defgroup MESH_connectivity MESH Connectivity information
+These methods are related to the extraction of connectivity information
+from the mesh.
+
+\defgroup MESH_nodes MESH Nodes information
+These methods are related to the extraction of information about the mesh nodes.
+
+\defgroup MESH_general MESH General information
+
+These methods are related to the retrieval of general information about the mesh.
+
+\defgroup MESH_poly MESH Polygons and Polyhedra information
+
+These methods are specific methods used for retrieving connectivity
+information for MED_POLYGON and MED_POLYHEDRON elements.
+
+
+\defgroup MESH_families Families and Groups handling
+
+The methods described in this section enable the manipulation of families and groups. These
+notions define subsets of MED elements in a mesh. They differ because families are non 
+overlapping (a mesh element is associated to zero or one family)  while groups are more general.
+
+\defgroup MESH_io Mesh I/O
+These methods describe how to read and write meshes. Generally speaking, meshes should be read 
+via a constructor and should be written with the addDriver()/write() methods.
+
+*/
+
 // ------- Drivers Management Part
 
 /*! Add a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. The meshname used in the file
@@ -54,15 +96,14 @@ using namespace MED_EN;
 int MESH::addDriver(driverTypes driverType,
                     const string & fileName/*="Default File Name.med"*/,
 		    const string & driverName/*="Default Mesh Name"*/,
-		    med_mode_acces access) {
-
-  const char * LOC = "MESH::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Mesh Name\",MED_EN::med_mode_acces access) : ";
+		    MED_EN::med_mode_acces access)
+{
+  const char* LOC = "MESH::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Mesh Name\",MED_EN::med_mode_acces access) : ";
+  BEGIN_OF_MED(LOC);
 
   GENDRIVER * driver;
 
-  BEGIN_OF(LOC);
-
-  SCRUTE(driverType);
+  SCRUTE_MED(driverType);
 
   driver = DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,
 					     driverName,access) ;
@@ -73,34 +114,49 @@ int MESH::addDriver(driverTypes driverType,
 
   _drivers[current]->setMeshName(driverName);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return current;
 }
 
 /*! Add an existing MESH driver. */
-int  MESH::addDriver(GENDRIVER & driver) {
-  const char * LOC = "MESH::addDriver(GENDRIVER &) : ";
-  BEGIN_OF(LOC);
+int  MESH::addDriver(GENDRIVER & driver)
+{
+  const char* LOC = "MESH::addDriver(GENDRIVER &) : ";
+  BEGIN_OF_MED(LOC);
 
   // A faire : Vérifier que le driver est de type MESH.
-  GENDRIVER * newDriver = driver.copy() ;
 
+  // For the case where driver does not know about me, i.e. has been created through
+  // constructor witout parameters: create newDriver knowing me and get missing data
+  // from driver using merge()
+  //GENDRIVER * newDriver = driver.copy() ;
+  GENDRIVER* newDriver = DRIVERFACTORY::buildDriverForMesh(driver.getDriverType(),
+                                                           driver.getFileName(), this,
+                                                           driver.getMeshName(),
+                                                           driver.getAccessMode());
   _drivers.push_back(newDriver);
-  return _drivers.size()-1;
 
-  END_OF(LOC);
+  int current = _drivers.size()-1;
+  driver.setId(current);
+
+  newDriver->merge( driver );
+  newDriver->setId( current );
+
+  return current;
+
+  END_OF_MED(LOC);
 }
 
 /*! Remove an existing MESH driver. */
 void MESH::rmDriver (int index/*=0*/) {
   const char * LOC = "MESH::rmDriver (int index=0): ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
-  if ( _drivers[index] ) {
-    //_drivers.erase(&_drivers[index]);
-    // why not ????
-    MESSAGE ("detruire");
+  if (index >= 0 && index < _drivers.size() && _drivers[index]) {
+    delete _drivers[index];
+    _drivers[index] = 0;
+     MESSAGE_MED ("detruire");
   }
   else
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
@@ -109,18 +165,18 @@ void MESH::rmDriver (int index/*=0*/) {
                                      )
                           );
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
 };
 
 // ------ End of Drivers Management Part
 
 
-void MESH::init() {
+void MESH::init()
+{
 
-  const char * LOC = "MESH::init(): ";
-
-  BEGIN_OF(LOC);
+  const char* LOC = "MESH::init(): ";
+  BEGIN_OF_MED(LOC);
 
   _name = "NOT DEFINED"; // A POSITIONNER EN FCT DES IOS ?
 
@@ -135,7 +191,7 @@ void MESH::init() {
 
   _arePresentOptionnalNodesNumbers = 0;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
 
 /*! Create an empty MESH. */
@@ -143,6 +199,14 @@ MESH::MESH():_coordinate(NULL),_connectivity(NULL), _isAGrid(false) {
   init();
 };
 
+/*! \if MEDMEM_ug
+  \addtogroup MESH_constructors
+@{
+\endif
+*/
+/*!
+Copy constructor
+*/
 MESH::MESH(MESH &m)
 {
   _name=m._name;
@@ -221,9 +285,15 @@ MESH::MESH(MESH &m)
   //_drivers = m._drivers;  //Recopie des drivers?
 }
 
+/*! 
+\if MEDMEM_ug
+@}
+\endif
+*/
+
 MESH::~MESH() {
 
-  MESSAGE("MESH::~MESH() : Destroying the Mesh");
+  MESSAGE_MED("MESH::~MESH() : Destroying the Mesh");
   if (_coordinate != ((COORDINATE *) NULL)) delete _coordinate ;
   if (_connectivity != ((CONNECTIVITY *) NULL)) delete _connectivity ;
   int size ;
@@ -252,17 +322,28 @@ MESH::~MESH() {
   for (int i=0;i<size;i++)
     delete _groupEdge[i] ;
 
-  MESSAGE("In this object MESH there is(are) " << _drivers.size() << " driver(s)");
+  map<medEntityMesh,SUPPORT*>::iterator it = _entitySupport.begin();
+  for(;it!=_entitySupport.end();it++)
+    if((*it).second != NULL)
+      delete (*it).second;
+
+  MESSAGE_MED("In this object MESH there is(are) " << _drivers.size() << " driver(s)");
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
     {
-      SCRUTE(_drivers[index]);
+      SCRUTE_MED(_drivers[index]);
       if ( _drivers[index] != NULL) delete _drivers[index];
     }
 
 }
 
-/*
+
+/*! \if MEDMEM_ug
+\addtogroup MESH_poly
+@{
+\endif
+*/
+/*!
   Method equivalent to getNumberOfTypes except that it includes not only classical Types but polygons/polyhedra also.
  */
 int MESH::getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const
@@ -305,6 +386,9 @@ int MESH::getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_EN::medG
     return getNumberOfElements(Entity,Type);
 }
 
+/*! \if MEDMEM_ug
+@}
+\endif*/
 bool MESH::existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
                                      MED_EN::medEntityMesh Entity) const
 {
@@ -315,10 +399,10 @@ bool MESH::existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
 
 MESH & MESH::operator=(const MESH &m)
 {
-  const char * LOC = "MESH & MESH::operator=(const MESH &m) : ";
-  BEGIN_OF(LOC);
+  const char* LOC = "MESH & MESH::operator=(const MESH &m) : ";
+  BEGIN_OF_MED(LOC);
 
-  MESSAGE(LOC <<"Not yet implemented, operating on the object " << m);
+  MESSAGE_MED(PREFIX_MED <<"Not yet implemented, operating on the object " << m);
   //  A FAIRE.........
 
   // ATTENTION CET OPERATEUR DE RECOPIE EST DANGEREUX POUR LES
@@ -351,59 +435,94 @@ MESH & MESH::operator=(const MESH &m)
 //        reverse_nodal_connectivity = m.reverse_nodal_connectivity;
 //        reverse_nodal_connectivity_index = m.reverse_nodal_connectivity_index ;
 //      }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return *this;
 }
 
 bool MESH::operator==(const MESH& other) const
 {
-  BEGIN_OF("MESH::operator==");
+  const char* LOC = "MESH::operator==";
+  BEGIN_OF_MED(LOC);
   return this==&other;
 }
 
-/*! Create a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName.
-  The meshname driverName must already exists in the file.*/
+/*!\if MEDMEM_ug
+\addtogroup MESH_constructors
+@{
+\endif
+*/
+/*!
+ Creates a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, GIBI_DRIVER, ...) associated with file \a fileName. As several meshes can coexist in the same file (notably in MED files) , the constructor takes a third argument that specifies the name of the mesh.
+The constructor will throw an exception if the file does not exist, has no reading permissions or if the mesh does not exist in the file.
+*/
 MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION)
 {
-  const char * LOC ="MESH::MESH(driverTypes driverType, const string &  fileName="", const string &  driverName="") : ";
+  const char * LOC = "MESH::MESH(driverTypes driverType, const string &  fileName="", const string &  driverName/="") : ";
+  BEGIN_OF_MED(LOC);
+
   int current;
 
-  BEGIN_OF(LOC);
-
   init();
-  GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,MED_LECT);
+  GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,RDONLY);
   current = addDriver(*myDriver);
   delete myDriver;
   _drivers[current]->open();
   _drivers[current]->read();
   _drivers[current]->close();
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 };
-
-/*
-  for a deep comparison of 2 meshes.
+/*!\if MEDMEM_ug 
+  @}
+\endif
 */
+
+/*!
+\addtogroup MESH_general
+@{
+*/
+/*!
+Returns true if mesh \a other has same
+coordinates (to 1E-15 precision ) and same connectivity as the calling object.
+Information like name or description is not taken into account 
+for the comparison.
+*/
+
 bool MESH::deepCompare(const MESH& other) const
 {
   int size1=getSpaceDimension()*getNumberOfNodes();
   int size2=other.getSpaceDimension()*other.getNumberOfNodes();
   if(size1!=size2)
     return false;
-  const double* coord1=getCoordinates(MED_FULL_INTERLACE);
-  const double* coord2=other.getCoordinates(MED_FULL_INTERLACE);
+
+  const COORDINATE* CRD = other.getCoordinateptr();
+  if( (!CRD && _coordinate) || (CRD && !(_coordinate)) ) {
+    return false;
+  }
+
   bool ret=true;
-  for(int i=0;i<size1 && ret;i++)
-    {
+  if( _coordinate ) {
+    const double* coord1=getCoordinates(MED_FULL_INTERLACE);
+    const double* coord2=other.getCoordinates(MED_FULL_INTERLACE);
+    for(int i=0;i<size1 && ret;i++) {
       ret=(fabs(coord1[i]-coord2[i])<1e-15);
     }
-  if(ret)
-    {
+  }
+  if(ret) {
+    const CONNECTIVITY* CNV = other.getConnectivityptr();
+    if( (!CNV && _connectivity) || (CNV && !(_connectivity)) ) {
+      return false;
+    }
+    if(_connectivity) {
       return _connectivity->deepCompare(*other._connectivity);
     }
+  }
   return ret;
 }
+/*!
+@}
+*/
 
 /*!
  * \brief print my contents
@@ -420,6 +539,11 @@ void MESH::printMySelf(ostream &os) const
   int meshdimension  = myMesh.getMeshDimension();
   int numberofnodes  = myMesh.getNumberOfNodes();
 
+  if ( spacedimension == MED_INVALID ) {
+    os << " Empty mesh ...";
+    return;
+  }
+
   os << "Space Dimension : " << spacedimension << endl << endl;
 
   os << "Mesh Dimension : " << meshdimension << endl << endl;
@@ -430,15 +554,19 @@ void MESH::printMySelf(ostream &os) const
     os << "SHOW NODES COORDINATES : " << endl;
     os << "Name :" << endl;
     const string * coordinatesnames = myMesh.getCoordinatesNames();
-    for(int i=0; i<spacedimension ; i++)
-    {
-      os << " - " << coordinatesnames[i] << endl;
+    if ( coordinatesnames ) {
+      for(int i=0; i<spacedimension ; i++)
+      {
+        os << " - " << coordinatesnames[i] << endl;
+      }
     }
     os << "Unit :" << endl;
     const string * coordinatesunits = myMesh.getCoordinatesUnits();
-    for(int i=0; i<spacedimension ; i++)
-    {
-      os << " - " << coordinatesunits[i] << endl;
+    if ( coordinatesunits ) {
+      for(int i=0; i<spacedimension ; i++)
+      {
+        os << " - " << coordinatesunits[i] << endl;
+      }
     }
     for(int i=0; i<numberofnodes ; i++)
     {
@@ -495,10 +623,13 @@ void MESH::printMySelf(ostream &os) const
 
   Return -1 if not found.
 */
-int MESH::getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type, int * connectivity) const
+int MESH::getElementNumber(MED_EN::medConnectivity ConnectivityType, 
+													 MED_EN::medEntityMesh Entity, 
+													 MED_EN::medGeometryElement Type,
+													 int * connectivity) const
 {
   const char* LOC="MESH::getElementNumber " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   int numberOfValue ; // size of connectivity array
   CELLMODEL myType(Type) ;
@@ -546,21 +677,38 @@ int MESH::getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entit
   if (cellsList.size()==0)
     return -1;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return cellsList.front() ;
 }
 
 /*!
-  Return a support which reference all elements on the boundary of mesh.
-
-  For instance, we could get only face in 3D and edge in 2D.
+\addtogroup MESH_advanced
+@{
+The methods described in this section are algorithms that perform a computation
+and return a result in the form of a SUPPORT or a FIELD to the user. For large meshes,
+as the returned information is not stored in the mesh but is rather computed, the 
+computation time can be large.
 */
-SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
+
+/*!
+  Returns a support which reference all elements on the boundary of mesh.
+  For a d-dimensional mesh, a boundary element is defined as a d-1 dimension
+  element that is referenced by only one element in the full descending connectivity.
+  
+  This method can also return the list of nodes that belong to the boundary elements.
+
+  WARNING: This method can recalculate descending connectivity from partial to full form,
+  so that partial SUPPORT on d-1 dimension elements becomes invalid.
+
+  \param Entity entity on which the boundary is desired. It has to be either \a MED_NODE or the 
+  d-1 dimension entity type (MED_FACE in 3D, MED_EDGE in 2D).
+*/
+SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getBoundaryElements : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
   // some test :
   // actually we could only get face (in 3D) and edge (in 2D)
   medEntityMesh entityToParse=Entity;
@@ -577,6 +725,11 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
       else
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
 
+  // assure that descending connectivity is full
+  if ( !_connectivity )
+    throw MEDEXCEPTION("MESH::getgetBoundaryElements() : no connectivity defined in MESH !");
+  _connectivity->calculateFullDescendingConnectivity(MED_CELL);
+
   const int * myConnectivityValue = getReverseConnectivity(MED_DESCENDING) ;
   const int * myConnectivityIndex = getReverseConnectivityIndex(MED_DESCENDING) ;
   int numberOf = getNumberOfElementsWithPoly(entityToParse,MED_ALL_ELEMENTS) ;
@@ -586,12 +739,46 @@ SUPPORT * MESH::getBoundaryElements(medEntityMesh Entity)
     if (myConnectivityValue[myConnectivityIndex[i]] == 0) {
       myElementsList.push_back(i+1);
     }
+  if ( myElementsList.empty() && numberOf != 0 )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No boundary elements found by reverse descending connectivity for entity "<<Entity<<" !"));
 
   if(Entity==MED_NODE)
     return buildSupportOnNodeFromElementList(myElementsList,entityToParse);
   else
     return buildSupportOnElementsFromElementList(myElementsList,entityToParse);
 }
+/*! 
+@}
+*/
+
+/*!
+  Method return a reference on a support define on all the element of an entity.
+*/
+
+SUPPORT * MESH::getSupportOnAll(medEntityMesh entity)
+  throw(MEDEXCEPTION)
+{
+  const char * LOC = "MESH::getSupportOnAll : " ;
+  BEGIN_OF_MED(LOC) ;
+  if(entity == MED_ALL_ENTITIES)
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined on entity MED_ALL_ENTITIES !"));
+
+  map<medEntityMesh,SUPPORT*>::const_iterator it =  _entitySupport.find(entity);
+
+  // find support and return is if exists
+  if(it != _entitySupport.end())
+    return (*it).second;
+  else{
+    
+    //build, store and return support
+    string aSuppName = "SupportOnAll_"+entNames[entity];
+    SUPPORT * aSupport = new SUPPORT((MESH *)this,aSuppName,entity);
+    
+    _entitySupport.insert(make_pair(entity,aSupport));
+    return aSupport;
+  }
+}
+
 
 /*!
   Method that do the same thing as buildSupportOnNodeFromElementList except that a SUPPORT is not created.
@@ -604,17 +791,22 @@ void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT 
 
   int i;
   set<int> nodes;
-  for(list<int>::const_iterator iter=listOfElt.begin();iter!=listOfElt.end();iter++)
+  if ( entity == MED_NODE ) {
+    supportToFill->fillFromNodeList(listOfElt);
+  }
+  else {
+    for(list<int>::const_iterator iter=listOfElt.begin();iter!=listOfElt.end();iter++)
     {
       int lgth;
       const int *conn=_connectivity->getConnectivityOfAnElementWithPoly(MED_NODAL,entity,*iter,lgth);
       for(i=0;i<lgth;i++)
 	nodes.insert(conn[i]);
     }
-  list<int> nodesList;
-  for(set<int>::iterator iter2=nodes.begin();iter2!=nodes.end();iter2++)
-    nodesList.push_back(*iter2);
-  supportToFill->fillFromNodeList(nodesList);
+    list<int> nodesList;
+    for(set<int>::iterator iter2=nodes.begin();iter2!=nodes.end();iter2++)
+      nodesList.push_back(*iter2);
+    supportToFill->fillFromNodeList(nodesList);
+  }
 }
 
 /*!
@@ -634,18 +826,25 @@ SUPPORT *MESH::buildSupportOnNodeFromElementList(const list<int>& listOfElt,MED_
  */
 SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION)
 {
-  const char * LOC = "MESH::buildSupportOnElementsFromElementList : " ;
-  BEGIN_OF(LOC);
+  const char* LOC = "MESH::buildSupportOnElementsFromElementList : ";
+  BEGIN_OF_MED(LOC);
   SUPPORT *mySupport=new SUPPORT((MESH *)this,"Boundary",entity);
   mySupport->fillFromElementList(listOfElt);
-  END_OF(LOC) ;
+  END_OF_MED(LOC);
   return mySupport ;
 }
 
+/*!
+\addtogroup MESH_advanced
+@{
+*/
+/*! Retrieves the volume of all the elements contained in \a Support. This method returns 
+a FIELD structure based on this support. It only works on MED_CELL for 3D meshes.
+*/
 FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getVolume(SUPPORT*) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Support must be on 3D elements
 
@@ -731,7 +930,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 		int N2 = global_connectivity[tetra_index+1]-1;
 		int N3 = global_connectivity[tetra_index+2]-1;
 		int N4 = global_connectivity[tetra_index+3]-1;
-		xvolume=CalculateVolumeForTetra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4);
+		xvolume=INTERP_KERNEL::calculateVolumeForTetra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4);
 		volume->setIJ(index,1,xvolume) ;
 		index++;
 	      }
@@ -747,7 +946,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 		int N3 = global_connectivity[pyra_index+2]-1;
 		int N4 = global_connectivity[pyra_index+3]-1;
 		int N5 = global_connectivity[pyra_index+4]-1;
-		xvolume=CalculateVolumeForPyra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5);
+		xvolume=INTERP_KERNEL::calculateVolumeForPyra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5);
 		volume->setIJ(index,1,xvolume) ;
 		index++;
 	      }
@@ -764,7 +963,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 		int N4 = global_connectivity[penta_index+3]-1;
 		int N5 = global_connectivity[penta_index+4]-1;
 		int N6 = global_connectivity[penta_index+5]-1;
-		xvolume=CalculateVolumeForPenta(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6);
+		xvolume=INTERP_KERNEL::calculateVolumeForPenta(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6);
 		volume->setIJ(index,1,xvolume) ;
 		index++;
 	      }
@@ -784,7 +983,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 		int N6 = global_connectivity[hexa_index+5]-1;
 		int N7 = global_connectivity[hexa_index+6]-1;
 		int N8 = global_connectivity[hexa_index+7]-1;
-		xvolume=CalculateVolumeForHexa(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6,coord+dim_space*N7,coord+dim_space*N8);
+		xvolume=INTERP_KERNEL::calculateVolumeForHexa(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6,coord+dim_space*N7,coord+dim_space*N8);
 		volume->setIJ(index,1,xvolume) ;
 		index++;
 	      }
@@ -813,10 +1012,10 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 			  pts1[iFaces][iPtsInFace]=(double *)(coord+3*(nodes1[iFaces][iPtsInFace]-1));
 		      }
 		    delete [] nodes1;
-		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
 		    delete [] nodes;
 		    delete [] pts;
-		    xvolume=CalculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+		    xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
 		    delete [] nbOfNodesPerFaces;
 		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
 			delete [] pts1[iFaces];
@@ -845,10 +1044,10 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 			  pts1[iFaces][iPtsInFace]=(double *)(coord+3*(nodes1[iFaces][iPtsInFace]-1));
 		      }
 		    delete [] nodes1;
-		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
 		    delete [] nodes;
 		    delete [] pts;
-		    xvolume=CalculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+		    xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
 		    delete [] nbOfNodesPerFaces;
 		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
 			delete [] pts1[iFaces];
@@ -870,11 +1069,15 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 
   return Volume;
 }
+/*! Retrieves the area of all the elements contained in \a Support. This method returns 
+a FIELD structure based on this support. It only works on MED_CELL for 2D meshes or MED_FACE
+for 3D meshes.
+*/
 
 FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getArea(SUPPORT*) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Support must be on 2D elements
 
@@ -927,9 +1130,10 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
     {
       medGeometryElement type = types[i] ;
       nb_entity_type = Support->getNumberOfElements(type);
-      const int *global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+      const int *global_connectivityIndex = 0;
       if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
 	{
+	  global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
 	  if (onAll)
 	    {
 	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
@@ -960,7 +1164,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
 		int N2 = global_connectivity[tria_index+1]-1;
 		int N3 = global_connectivity[tria_index+2]-1;
 
-		area[index]=CalculateAreaForTria(coord+(dim_space*N1),
+		area[index]=INTERP_KERNEL::calculateAreaForTria(coord+(dim_space*N1),
 						   coord+(dim_space*N2),
 						   coord+(dim_space*N3),dim_space);
 		index++;
@@ -978,7 +1182,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
 		int N3 = global_connectivity[quad_index+2]-1;
 		int N4 = global_connectivity[quad_index+3]-1;
 
-		area[index]=CalculateAreaForQuad(coord+dim_space*N1,
+		area[index]=INTERP_KERNEL::calculateAreaForQuad(coord+dim_space*N1,
 						   coord+dim_space*N2,
 						   coord+dim_space*N3,
 						   coord+dim_space*N4,dim_space);
@@ -998,7 +1202,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1]-1));
-		    area[index] = CalculateAreaForPolyg((const double **)pts,size,dim_space);
+		    area[index] = INTERP_KERNEL::calculateAreaForPolyg((const double **)pts,size,dim_space);
 		    delete [] pts;
 		    index++;
 		  }
@@ -1015,7 +1219,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[supp_number[polygs]-offsetWithClassicType-1]+iPts-1]-1));
-		    area[index]=CalculateAreaForPolyg((const double **)pts,size,dim_space);
+		    area[index]=INTERP_KERNEL::calculateAreaForPolyg((const double **)pts,size,dim_space);
 		    delete [] pts;
 		    index++;
 		  }
@@ -1033,11 +1237,13 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
     }
   return Area;
 }
-
+/*! Retrieves the length of all the elements contained in \a Support. This method returns 
+a FIELD structure based on this support. It only works on MED_EDGE supports.
+*/
 FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getLength(SUPPORT*) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Support must be on 1D elements
 
@@ -1139,10 +1345,17 @@ FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const thr
   return Length;
 }
 
+/*! Retrieves the normal for all elements contained in SUPPORT \a Support.
+The method is only functional for 2D supports for 3D meshes and 1D supports
+for 2D meshes. It returns 
+a FIELD for which the number of components is equal to the dimension of the 
+mesh and which represents coordinates of the vector normal to the element.
+The direction of the vector is undetermined.
+*/
 FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getNormal(SUPPORT*) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Support must be on 2D or 1D elements
 
@@ -1236,7 +1449,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 		int N1 = global_connectivity[tria_index]-1;
 		int N2 = global_connectivity[tria_index+1]-1;
 		int N3 = global_connectivity[tria_index+2]-1;
-		CalculateNormalForTria(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,normal+3*index);
+		INTERP_KERNEL::calculateNormalForTria(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,normal+3*index);
 		index++;
 	      }
 	    break;
@@ -1250,7 +1463,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 		int N2 = global_connectivity[quad_index+1]-1;
 		int N3 = global_connectivity[quad_index+2]-1;
 		int N4 = global_connectivity[quad_index+3]-1;
-		CalculateNormalForQuad(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,normal+3*index);
+		INTERP_KERNEL::calculateNormalForQuad(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,normal+3*index);
 		index++;
 	      }
 	    break;
@@ -1293,7 +1506,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1])-1);
-		    CalculateNormalForPolyg((const double **)pts,size,normal+3*index);
+		    INTERP_KERNEL::calculateNormalForPolyg((const double **)pts,size,normal+3*index);
 		    delete [] pts;
 		    index++;
 		  }
@@ -1311,7 +1524,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[localPolygsNbP1-1]+iPts-1])-1);
-		    CalculateNormalForPolyg((const double **)pts,size,normal+3*index);
+		    INTERP_KERNEL::calculateNormalForPolyg((const double **)pts,size,normal+3*index);
 		    delete [] pts;
 		    index++;
 		  }
@@ -1325,11 +1538,14 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
       if (!onAll && type!=MED_EN::MED_POLYGON)
 	delete [] global_connectivity ;
     }
-  END_OF(LOC);
+  END_OF_MED(LOC);
 
   return Normal;
 }
-
+/*!Returns the barycenter for each element in the support. The barycenter positions are returned
+as a field with a number of components equal to the mesh dimension.
+The barycenter computed by this method is actually the barycenter of the set of nodes of the elements, each having the same weight. 
+*/
 FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getBarycenter(SUPPORT*) : ";
@@ -1410,7 +1626,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[1]=(double *)coord+dim_space*N2;
 		pts[2]=(double *)coord+dim_space*N3;
 		pts[3]=(double *)coord+dim_space*N4;
-		CalculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
+		INTERP_KERNEL::calculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1432,7 +1648,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[2]=(double *)coord+dim_space*N3;
 		pts[3]=(double *)coord+dim_space*N4;
 		pts[4]=(double *)coord+dim_space*N5;
-		CalculateBarycenter<5,3>((const double **)pts,barycenter+3*index);
+		INTERP_KERNEL::calculateBarycenter<5,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1456,7 +1672,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[3]=(double *)coord+dim_space*N4;
 		pts[4]=(double *)coord+dim_space*N5;
 		pts[5]=(double *)coord+dim_space*N6;
-		CalculateBarycenter<6,3>((const double **)pts,barycenter+3*index);
+		INTERP_KERNEL::calculateBarycenter<6,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1484,7 +1700,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[5]=(double *)coord+dim_space*N6;
 		pts[6]=(double *)coord+dim_space*N7;
 		pts[7]=(double *)coord+dim_space*N8;
-		CalculateBarycenter<8,3>((const double **)pts,barycenter+3*index);
+		INTERP_KERNEL::calculateBarycenter<8,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1502,9 +1718,9 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[1]=(double *)coord+dim_space*N2;
 		pts[2]=(double *)coord+dim_space*N3;
 		if (dim_space==2)
-		  CalculateBarycenter<3,2>((const double **)pts,barycenter+2*index);
+		  INTERP_KERNEL::calculateBarycenter<3,2>((const double **)pts,barycenter+2*index);
 		else
-		  CalculateBarycenter<3,3>((const double **)pts,barycenter+3*index);
+		  INTERP_KERNEL::calculateBarycenter<3,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1524,9 +1740,9 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[2]=(double *)coord+dim_space*N3;
 		pts[3]=(double *)coord+dim_space*N4;
 		if (dim_space==2)
-		  CalculateBarycenter<4,2>((const double **)pts,barycenter+2*index);
+		  INTERP_KERNEL::calculateBarycenter<4,2>((const double **)pts,barycenter+2*index);
 		else
-		  CalculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
+		  INTERP_KERNEL::calculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1542,9 +1758,9 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		pts[0]=(double *)coord+dim_space*N1;
 		pts[1]=(double *)coord+dim_space*N2;
 		if (dim_space==2)
-		  CalculateBarycenter<2,2>((const double **)pts,barycenter+2*index);
+		  INTERP_KERNEL::calculateBarycenter<2,2>((const double **)pts,barycenter+2*index);
 		else
-		  CalculateBarycenter<2,3>((const double **)pts,barycenter+3*index);
+		  INTERP_KERNEL::calculateBarycenter<2,3>((const double **)pts,barycenter+3*index);
 		index++;
 	      }
 	    break;
@@ -1561,7 +1777,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1]-1);
-		    CalculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
 		    delete [] pts;
 		  }
 	      }
@@ -1578,7 +1794,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		    double **pts=new double * [size];
 		    for(int iPts=0;iPts<size;iPts++)
 		      pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[localPolygsNbP1-1]+iPts-1]-1);
-		    CalculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
 		    delete [] pts;
 		  }
 	      }
@@ -1597,7 +1813,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		    double **pts=new double * [lgthNodes];
 		    for(int iPts=0;iPts<lgthNodes;iPts++)
 		      pts[iPts]=(double *)coord+3*(nodes[iPts]-1);
-		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
 		    delete [] pts;
 		    delete [] nodes;
 		    index++;
@@ -1613,7 +1829,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 		    double **pts=new double * [lgthNodes];
 		    for(int iPts=0;iPts<lgthNodes;iPts++)
 		      pts[iPts]=(double *)coord+3*(nodes[iPts]-1);
-		    CalculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
+		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
 		    delete [] pts;
 		    delete [] nodes;
 		    index++;
@@ -1630,9 +1846,12 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 	if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
 	  delete [] global_connectivity;
     }
-  END_OF(LOC);
+  //END_OF_MED();
   return Barycenter;
 }
+/*!  
+@}
+*/
 
 bool MESH::isEmpty() const
 {
@@ -1649,7 +1868,7 @@ bool MESH::isEmpty() const
 void MESH::read(int index)
 {
   const char * LOC = "MESH::read(int index=0) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if (_drivers[index]) {
     _drivers[index]->open();
@@ -1662,14 +1881,28 @@ void MESH::read(int index)
                                      << _drivers.size()
                                      )
                           );
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
-/*! Write all the content of the MESH using driver referenced by the integer handler index.*/
+/*!
+\addtogroup MESH_io
+@{
+ */
+/*! Writes all the content of the MESH using driver referenced by the integer handle returned by a \a addDriver call.
+
+Example :
+\verbatim
+//...
+// Attaching the driver to file "output.med", meshname "Mesh"
+int driver_handle = mesh.addDriver(MED_DRIVER, "output.med", "Mesh");
+// Writing the content of mesh to the file 
+mesh.write(driver_handle);
+\endverbatim
+*/
 void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
 {
   const char * LOC = "MESH::write(int index=0, const string & driverName = \"\") : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( _drivers[index] ) {
     _drivers[index]->open();
@@ -1683,45 +1916,61 @@ void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
                                      << _drivers.size()
                                      )
                           );
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
+/*!
+@}
+*/
 
-//=======================================================================
-//function : getSkin
-//purpose  :
-//=======================================================================
+/*!
+\addtogroup MESH_advanced
+@{
+ */
 
+/*!
+Retrieves the skin of support \a Support3D. This method is only available in 3D.
+On output, it returns a MED_FACE support with the skin of all elements contained in support.
+The skin is defined as the list of faces that are compnents of only one volume in the input
+support.
+
+WARNING: This method can recalculate descending connectivity from partial to full form,
+so that partial SUPPORT on MED_FACE on this mesh becomes invalid.
+ */
 SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getSkin : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
   // some test :
   if (this != Support3D->getMesh())
     throw MEDEXCEPTION(STRING(LOC) <<  "no compatibility between *this and SUPPORT::_mesh !");
   if (_meshDimension != 3 || Support3D->getEntity() != MED_CELL)
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Defined on 3D cells only"));
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Defined on 3D cells only"));
 
   // well, all rigth !
   SUPPORT * mySupport = new SUPPORT(this,"Skin",MED_FACE);
   mySupport->setAll(false);
 
-  list<int> myElementsList ;
-  int i,j, size = 0 ;
+  list<int> myElementsList;
+  int i,j, size = 0;
 
-  calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL);
+  // assure that descending connectivity is full
+  if ( !_connectivity )
+    throw MEDEXCEPTION(STRING(LOC) << "no connectivity defined in MESH !");
+  _connectivity->calculateFullDescendingConnectivity(MED_CELL);
+  //calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL);
   if (Support3D->isOnAllElements())
   {
-    int * myConnectivityValue = const_cast <int*> (getReverseConnectivity(MED_DESCENDING)) ;
+    const int* value = getReverseConnectivity(MED_DESCENDING);
+    const int* index = getReverseConnectivityIndex(MED_DESCENDING);
+
     int nbFaces = getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS);
-    for (i=0, j=1 ; j<=nbFaces; ++j, i += 2)
+    for (int i = 0; i < nbFaces; i++)
     {
-      int cellNb1 = myConnectivityValue [i];
-      int cellNb2 = myConnectivityValue [i+1];
-      //MESSAGE( " FACE # " << j << " -- Cells: " << cellNb1 << ", " << cellNb2 );
-      if ((cellNb1 == 0 || cellNb2 == 0) && (cellNb1 + cellNb2 > 0))
-      {
-        myElementsList.push_back( j ) ;
-        size++ ;
+      //a face is in skin if it is linked to one element or if one of the elements
+      //it is linked to is "virtual"
+      if ((index[i+1]-index[i]==1) || (value[index[i]-1]==0) || (value[index[i]]==0)) {
+        myElementsList.push_back( i+1 );
+        size++;
       }
     }
   }
@@ -1743,7 +1992,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
       for (j = faceFirst; j < faceLast; ++j)
       {
         int faceNb = abs( myConnectivityValue [ j-1 ] );
-        //MESSAGE( "Cell # " << i << " -- Face: " << faceNb);
+        //MESSAGE_MED( "Cell # " << i << " -- Face: " << faceNb);
         if (FaceNbEncounterNb.find( faceNb ) == FaceNbEncounterNb.end())
           FaceNbEncounterNb[ faceNb ] = 1;
         else
@@ -1823,7 +2072,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   mySupport->setGeometricType(geometricType) ;
   //  mySupport->setGeometricTypeNumber(geometricTypeNumber) ;
   mySupport->setNumberOfElements(numberOfEntities) ;
-  mySupport->setTotalNumberOfElements(size) ;
+  //mySupport->setTotalNumberOfElements(size) ;
   mySupport->setNumber(mySkyLineArray) ;
 
   delete[] numberOfEntities;
@@ -1833,7 +2082,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   delete[] myListArray;
 //   delete mySkyLineArray;
 
-  END_OF(LOC) ;
+  END_OF_MED(LOC);
   return mySupport ;
 
 }
@@ -1845,7 +2094,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH:::mergeSupports(const vector<SUPPORT *> ) : " ;
-  BEGIN_OF(LOC) ;
+  BEGIN_OF_MED(LOC) ;
 
   SUPPORT * returnedSupport;
   string returnedSupportName;
@@ -1854,9 +2103,13 @@ SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPT
   char * returnedSupportDescriptionChar;
   int size = Supports.size();
 
+  if (size == 0)
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) <<
+                                     " mergeSupports() does't accept zero size vector"));
+    
   if (size == 1)
     {
-      MESSAGE(LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
+      MESSAGE_MED(LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
       SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
 
       returnedSupport = new SUPPORT(*obj);
@@ -1953,7 +2206,7 @@ SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPT
       delete [] returnedSupportDescriptionChar;
     }
 
-  END_OF(LOC) ;
+  END_OF_MED(LOC);
   return returnedSupport;
 }
 
@@ -1964,8 +2217,8 @@ SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPT
 */
 SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
 {
-  const char * LOC = "MESH:::intersectSupports(const vector<SUPPORT *> ) : " ;
-  BEGIN_OF(LOC) ;
+  const char* LOC = "MESH:::intersectSupports(const vector<SUPPORT *> ) : ";
+  BEGIN_OF_MED(LOC);
 
   SUPPORT * returnedSupport;
   string returnedSupportName;
@@ -1976,7 +2229,7 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEX
 
   if (size == 1)
     {
-      MESSAGE(LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
+      MESSAGE_MED(PREFIX_MED <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
       SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
 
       returnedSupport = new SUPPORT(*obj);
@@ -2087,10 +2340,12 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEX
 	}
     }
 
-  END_OF(LOC) ;
+  END_OF_MED(LOC);
   return returnedSupport;
 }
-
+/*!
+@}
+*/
 
 // internal helper type
 struct _cell
@@ -2099,12 +2354,97 @@ struct _cell
     MED_EN::medGeometryElement geometricType;
 };
 
-/*!
-Create groups from families.
+/*!\addtogroup MESH_families
+@{
+*/
 
-It is used to create groups that have only one family
-for meshes that come from codes that use families instead 
-of groups to define a subregion.
+/*! Retrieves the group named \a name.
+The method browses all the entities in order to find the group.
+If two groups with the same name coexist, the first one found will be
+returned. If no group with the correct name is found, the method throws
+an exception.
+ */
+const GROUP* MESH::getGroup(const string& name) const  throw (MEDEXCEPTION)
+{
+	const vector<GROUP*>* group_vectors [4]={&_groupNode, &_groupEdge,&_groupFace,&_groupCell};
+	for (int ientity=0;ientity<4;ientity++)
+		for (int igroup=0; igroup< group_vectors[ientity]->size();igroup++)
+			{
+				const vector<GROUP*>& group_vect = *group_vectors[ientity];
+				GROUP* group=group_vect[igroup];
+				if (group->getName()==name)
+					return group;
+			}
+	cerr << "MESH::getGroup("<<name<<") : group "<<name <<" was not found"<<endl;
+	throw MEDEXCEPTION("MESH::getGroup(name) : name not found");
+}
+/*! 
+@}
+*/
+
+const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
+{
+  const char * LOC = "MESH::getGroup(medEntityMesh entity, int i) : ";
+  if (i<=0)
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i must be > 0"));
+  vector<GROUP*> Group;
+  switch (entity) {
+  case MED_EN::MED_NODE : {
+    Group = _groupNode;
+    break;
+  }
+  case MED_EN::MED_CELL : {
+    Group = _groupCell;
+    break;
+  }
+  case MED_EN::MED_FACE : {
+    Group = _groupFace;
+    break;
+  }
+  case MED_EN::MED_EDGE : {
+    Group = _groupEdge;
+    break;
+  }
+  default :
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Unknown entity"));
+  }
+  if (i>(int)Group.size())
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i="<<i<<" must be <= _numberOfGroups="<<Group.size()));
+  return Group[i-1];
+}
+
+
+/*! 
+\addtogroup MESH_families
+@{
+*/
+/*! Returns the groups of type \a entity present in the mesh as a vector of pointers. The GROUP class inheriting from the SUPPORT class, the 
+methods that can be used on these groups are explained in the related section.*/
+const vector<GROUP*> MESH::getGroups(MED_EN::medEntityMesh entity) const
+{
+  switch (entity) {
+  case MED_EN::MED_NODE :
+    return _groupNode;
+  case MED_EN::MED_CELL :
+    return _groupCell;
+  case MED_EN::MED_FACE :
+    return _groupFace;
+  case MED_EN::MED_EDGE :
+    return _groupEdge;
+  default :
+    throw MEDEXCEPTION("MESH::getGroups : Unknown entity");
+  }
+}
+/*!
+@}
+*/
+
+/*!
+  Create groups from families.
+
+  It is used to create groups that have only one family
+  for meshes that come from codes that use families instead 
+  of groups to define a subregion.
 */
 void MESH::createGroups()
 {
@@ -2114,37 +2454,36 @@ void MESH::createGroups()
       vector<FAMILY*>* myFamilies;
       vector<GROUP*>* myGroups;
       switch ( entity )
-				{
-				case MED_CELL :
-					myFamilies = & _familyCell;
-					myGroups = & _groupCell;
-					break;
-				case MED_FACE :
-					myFamilies = & _familyFace;
-					myGroups = & _groupFace;
-					break;
-				case MED_EDGE :
-					myFamilies = & _familyEdge;
-					myGroups = & _groupEdge;
-					break;
-				case MED_NODE :
-					myFamilies = & _familyNode;
-					myGroups = & _groupNode;
-					break;
-				}
+        {
+        case MED_CELL :
+          myFamilies = & _familyCell;
+          myGroups = & _groupCell;
+          break;
+        case MED_FACE :
+          myFamilies = & _familyFace;
+          myGroups = & _groupFace;
+          break;
+        case MED_EDGE :
+          myFamilies = & _familyEdge;
+          myGroups = & _groupEdge;
+          break;
+        case MED_NODE :
+          myFamilies = & _familyNode;
+          myGroups = & _groupNode;
+          break;
+        }
       
       
-			for (int i=0; i< myFamilies->size(); i++)
-				{
-					list <FAMILY*> fam_list;
-					fam_list.push_back((*myFamilies)[i]);
-					//creates a group with the family name and only one family
-					GROUP* group=new GROUP((*myFamilies)[i]->getName(),fam_list);
-					(*myGroups).push_back(group);
-				}
+      for (int i=0; i< myFamilies->size(); i++)
+        {
+          list <FAMILY*> fam_list;
+          fam_list.push_back((*myFamilies)[i]);
+          //creates a group with the family name and only one family
+          GROUP* group=new GROUP((*myFamilies)[i]->getName(),fam_list);
+          (*myGroups).push_back(group);
+        }
     }
 }
-
 // Create families from groups
 void MESH::createFamilies()
 {
@@ -2187,17 +2526,19 @@ void MESH::createFamilies()
 	// 1 - Create a vector containing for each cell (of the entity) an information structure
 	//     giving geometric type and the groups it belong to
 
-	med_int numberOfTypes=getNumberOfTypes(entity);
-	const int * index=getGlobalNumberingIndex(entity);
-	const medGeometryElement* geometricTypes=_connectivity->getGeometricTypes(entity); // pb avec entity=MED_NODE???
-	med_int numberOfCells=index[numberOfTypes]-1;  // total number of cells for that entity
-	SCRUTE(numberOfTypes);
-	SCRUTE(numberOfCells);
+	med_int numberOfTypes=getNumberOfTypesWithPoly(entity);
+	medGeometryElement* geometricTypes=_connectivity->getGeometricTypesWithPoly(entity); // pb avec entity=MED_NODE???
+	med_int numberOfCells=getNumberOfElementsWithPoly(entity, MED_ALL_ELEMENTS);  // total number of cells for that entity
+	SCRUTE_MED(numberOfTypes);
+	SCRUTE_MED(numberOfCells);
 	vector< _cell > tab_cell(numberOfCells);
-	for(med_int t=0; t!=numberOfTypes; ++t)
-	    for(int n=index[t]-1; n!=index[t+1]-1; ++n)
-		tab_cell[n].geometricType=geometricTypes[t];
-
+        vector< _cell >::iterator cell = tab_cell.begin();
+	for(med_int t=0; t!=numberOfTypes; ++t) {
+          int nbCellsOfType = getNumberOfElementsWithPoly(entity,geometricTypes[t]);
+          for(int n=0; n!=nbCellsOfType; ++n, ++cell)
+            cell->geometricType=geometricTypes[t];
+        }
+        delete [] geometricTypes;
 
 	// 2 - Scan cells in groups and update in tab_cell the container of groups a cell belong to
 
@@ -2272,9 +2613,11 @@ void MESH::createFamilies()
                 famName = famName.substr(4);
               }
               else { // try to make a unique name by cutting off char by char from the tail
-                famName.substr(0, MED_TAILLE_NOM);
+                famName = famName.substr(0, MED_TAILLE_NOM);
                 map< string,vector<int> >::iterator foundName = tab_families.find( famName );
-                while ( foundName != tab_families.end() && !famName.empty() ) {
+                while ( !famName.empty() &&
+                        ( foundName != tab_families.end() || famName[ famName.size()-1 ] == ' ' ))
+                {
                   famName = famName.substr( 0, famName.size() - 1 );
                   foundName = tab_families.find( famName );
                 }
@@ -2284,7 +2627,7 @@ void MESH::createFamilies()
 
 	    // create an empty MED FAMILY and fill it with the tabs we constructed
 	    FAMILY* newFam = new FAMILY();
-	    newFam->setTotalNumberOfElements(fam->second.size());
+	    //newFam->setTotalNumberOfElements(fam->second.size());
 	    newFam->setName(famName);
 	    newFam->setMeshDirectly(this);
 	    newFam->setNumberOfGeometricType(tab_types_geometriques.size());
@@ -2337,9 +2680,8 @@ void MESH::createFamilies()
 		newFam->setGroupsNames(groupNames);
 	    }
 
-	    int sizeOfFamVect = myFamilies->size();
-
-	    MESSAGE("  MESH::createFamilies() entity " << entity << " size " << sizeOfFamVect);
+	    MESSAGE_MED("  MESH::createFamilies() entity " << entity <<
+                        " size " << myFamilies->size());
 
 	    myFamilies->push_back(newFam);
 	}
@@ -2382,6 +2724,177 @@ int MESH::getElementContainingPoint(const double *coord)
       }
   else
     throw MEDEXCEPTION("MESH::getElementContainingPoint : invalid _spaceDimension must be equal to 2 or 3 !!!");
+}
+
+//! Converts MED_CELL connectivity to polyhedra connectivity
+//! Converts MED_FACE connectivity to polygon connectivity
+//! Wil work only for 3D meshes with nodal connectivity
+
+void MESH::convertToPoly()
+{
+  if (getMeshDimension()!=3) return;
+
+  CONNECTIVITY* newpolygonconnectivity = new CONNECTIVITY(MED_EN::MED_FACE);  
+  CONNECTIVITY* newpolyhedraconnectivity = new CONNECTIVITY(MED_EN::MED_CELL);
+
+  {
+    ////////////////////////////////////////////:
+    // First step : Treating polygons connectivity
+    ///////////////////////////////////////////
+
+    const int* oldconn = getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL, MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS);
+    
+    const int* oldconnindex= getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_FACE);
+    int oldnbface = getNumberOfElements(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS);
+    const int* oldconnpoly =0;
+    const int* oldconnpolyindex =0;
+    if(existPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE))
+    {
+     oldconnpoly = getPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE);
+     oldconnpolyindex = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_FACE);
+     }
+    int oldnbtotalface = getNumberOfElementsWithPoly(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS);
+    
+    int nbnodes=0;
+    
+    if (oldconnindex !=0)
+      nbnodes += oldconnindex[oldnbface] -1 ;
+    
+    if (oldconnpolyindex !=0)
+      nbnodes+= oldconnpolyindex[oldnbtotalface-oldnbface]-1;
+    
+    int* newconn = new int[nbnodes];
+    int* newconnindex= new int [oldnbtotalface+1];
+    
+    //copying classical types connectivity  
+    memcpy(newconn, oldconn, sizeof(int)*(oldconnindex[oldnbface]-1) );
+    
+    //copying poly types connectivity
+    if(oldconnpoly)
+      memcpy (newconn+oldconnindex[oldnbface]-1, oldconnpoly, sizeof(int)*(oldconnpolyindex[oldnbtotalface-oldnbface]-1) );
+    
+    newconnindex[0]=1;
+    for (int i=0; i<oldnbface;i++)
+      newconnindex[i+1]=newconnindex[i]+oldconnindex[i+1]-oldconnindex[i];
+    for (int i=oldnbface; i<oldnbtotalface;i++)
+      newconnindex[i+1]=newconnindex[i]+
+	oldconnpolyindex[i-oldnbface+1]-oldconnpolyindex[i-oldnbface];
+    
+    
+    newpolygonconnectivity->setPolygonsConnectivity(MED_EN::MED_NODAL,
+					     MED_EN::MED_FACE,
+					     newconn,
+					     newconnindex,
+					     nbnodes,
+					     oldnbtotalface);
+    //    _connectivity->setConstituent(newconnectivity);
+  }
+  ///////////////////////////////////////////
+  // 2nd step : Treating polyhedra connectivity
+  //////////////////////////////////////////
+  {
+  
+    const int* oldconn = getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
+    
+    const int* oldconnindex= getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
+    int oldnbelem = getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+    const int* oldconnpoly = 0;
+    const int* oldconnpolyindex = 0;
+    const int* oldfaceindex = 0;
+    if(existPolyhedronConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL))
+    {
+       oldconnpoly = getPolyhedronConnectivity(MED_EN::MED_NODAL);
+       oldconnpolyindex = getPolyhedronIndex(MED_EN::MED_NODAL);
+       oldfaceindex =  getPolyhedronFacesIndex();
+    }
+    const MED_EN::medGeometryElement* oldtypes = getTypes(MED_EN::MED_CELL);
+    int nboldtypes=getNumberOfTypes(MED_EN::MED_CELL);
+    int nboldpolyhedra=getNumberOfPolyhedron();
+    int oldnbtotalelem = getNumberOfElementsWithPoly(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+    
+    int nbnodes=0;
+    
+    if (oldconnindex !=0)
+      nbnodes += oldconnindex[oldnbelem] -1 ;
+    
+    if (oldconnpolyindex !=0)
+      nbnodes+= oldconnpolyindex[oldnbtotalelem-oldnbelem]-1;
+  
+    //computing number of faces
+    int nbfaces=0;
+    //    first part : number of faces for the classical types
+    for (int itype=0; itype<nboldtypes; itype++)
+      {
+	MED_EN::medGeometryElement type = oldtypes[itype];
+	MEDMEM::CELLMODEL cellmodel(type);
+	int nb_elems=getNumberOfElements(MED_EN::MED_CELL,type);
+	int nbfacespertype = cellmodel.getNumberOfConstituents(1);
+	nbfaces+=nb_elems*nbfacespertype;
+      }
+    //   second part : number of faces for the polyhedra
+    nbfaces += getNumberOfPolyhedronFaces();
+
+    //allocating tables for new connectivity
+  vector<int> newconn;
+  vector<int> newconnindex(1,1);
+  vector<int> newfaceindex(1,1);
+  
+  for (int itype=0; itype<nboldtypes; itype++)
+    {
+      MED_EN::medGeometryElement type = oldtypes[itype];
+      MEDMEM::CELLMODEL cellmodel(type);
+      int nb_elems=getNumberOfElements(MED_EN::MED_CELL,type);
+      int nbfacespertype = cellmodel.getNumberOfConstituents(1);
+	for (int ielem = 0; ielem<nb_elems; ielem++)
+	  {
+	    for (int iface =0; iface< nbfacespertype; iface ++)
+	      {
+		//local conn contains the local nodal connectivity for the iface-th face of type type
+		const int* local_conn = cellmodel.getNodesConstituent(1,iface+1); // iface+1 for MED numbering
+		MED_EN::medGeometryElement facetype = cellmodel.getConstituentType(1,iface+1);
+		int nbface_nodes=facetype%100;
+		for ( int inode=0; inode<nbface_nodes;inode++)
+		  {
+		    newconn.push_back(oldconn[oldconnindex[newconnindex.size()-1]-1+local_conn[inode]-1]);
+		  }
+		newfaceindex.push_back(newfaceindex[newfaceindex.size()-1]+nbface_nodes);
+	      }
+	    newconnindex.push_back(newconnindex[newconnindex.size()-1]+nbfacespertype);
+	  }
+      }
+
+  for (int i=0; i<nboldpolyhedra; i++)
+    {
+      newconnindex.push_back(newconnindex[newconnindex.size()-1]+oldconnpolyindex[i+1]-oldconnpolyindex[i]);
+    }
+  if(oldconnpolyindex)
+  {
+    for (int i=0; i<oldconnpolyindex[nboldpolyhedra]-1;i++)
+      {
+        newfaceindex.push_back(newfaceindex[newfaceindex.size()-1]+oldfaceindex[i+1]-oldfaceindex[i]);
+      }
+    for (int i=0; i< oldfaceindex[oldconnpolyindex[nboldpolyhedra]-1]-1; i++)
+      newconn.push_back(oldconnpoly[i]);
+  }
+  //  memcpy(newconn_ptr,oldconnpoly,sizeof(int)*(oldfaceindex[oldconnpoly[nboldpolyhedra]-1]-1));
+
+    
+  newpolyhedraconnectivity->setPolyhedronConnectivity(MED_EN::MED_NODAL,
+					     &newconn[0],
+					     &newconnindex[0],
+					     newfaceindex[newfaceindex.size()-1]-1,
+					     newconnindex.size()-1,
+					     &newfaceindex[0],
+					     newfaceindex.size()-1);
+
+  newpolyhedraconnectivity->setEntityDimension(3);
+
+  delete _connectivity;
+
+ _connectivity=newpolyhedraconnectivity;
+ _connectivity->setConstituent(newpolygonconnectivity);
+
+  }
 }
 
 vector< vector<double> > MESH::getBoundingBox() const

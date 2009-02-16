@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
   File Support.hxx
@@ -39,6 +41,11 @@
 #include "MEDMEM_SkyLineArray.hxx"
 #include "MEDMEM_RCBase.hxx"
 
+
+namespace MEDMEM {
+
+  class MESH;
+
 /*!
 
   This class describe a support of elements on an entity of the mesh.
@@ -47,11 +54,6 @@
   MED_CELL, MED_FACE or MED_EDGE).
 
 */
-
-namespace MEDMEM {
-
-  class MESH;
-
 class MEDMEM_EXPORT SUPPORT : public RCBASE
 {
 protected:
@@ -173,7 +175,6 @@ public:
   SUPPORT& operator=(const SUPPORT &support);
   bool operator == (const SUPPORT &support) const;
   bool deepCompare(const SUPPORT &support) const;
-  // function to set all value when SUPPORT was created by MedMedDriver without all MESH information !!! Change with new API !
   void update();
 
   inline void setName(string Name);
@@ -186,7 +187,7 @@ public:
   inline void setNumberOfGeometricType(int NumberOfGeometricType);
   inline void setGeometricType(const MED_EN::medGeometryElement *GeometricType);
   inline void setNumberOfElements(const int *NumberOfElements);
-  inline void setTotalNumberOfElements(int TotalNumberOfElements);
+  //inline void setTotalNumberOfElements(int TotalNumberOfElements);
   inline void setNumber(MEDSKYLINEARRAY * Number);
   inline void setNumber(const int * index, const int* value, bool shallowCopy=false);
 
@@ -210,7 +211,7 @@ public:
 
   void blending(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
 
-  // Les numéros d'entités dans les profils doivent être croissant
+  // Les numÃ©ros d'entitÃ©s dans les profils doivent Ãªtre croissant
   // pour respecter la norme MED
   void setpartial(string Description, int NumberOfGeometricType,
 		  int TotalNumberOfEntity, MED_EN::medGeometryElement *GeometricType,
@@ -221,8 +222,8 @@ public:
 
   void setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
   
-  // Si les noms de profils ne sont pas positionnés, les profils ne seront
-  // pas écrits par MEDFICHIER.
+  // Si les noms de profils ne sont pas positionnÃ©s, les profils ne seront
+  // pas Ã©crits par MEDFICHIER.
   void   setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION);
   //string getProfilName(const MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
   vector<string> getProfilNames() const throw (MEDEXCEPTION);
@@ -249,17 +250,23 @@ protected:
 // Methodes Inline
 // _____________________
 
+/*!\if MEDMEM_ug 
+\addtogroup SUPPORT_query
+@{
+\endif
+*/
+
 /*!
   This method returns the number of all elements of the type GeometricType.
 
   If isOnAllElements is false, it returns the number of elements in the
-  support else it returns number of elements in the mesh.
+  support otherwise it returns number of elements in the mesh.
 
   Example : number of MED_TRIA3 or MED_ALL_ELEMENTS elements
-  in entity of support.
+  in support.
 
   Note : If SUPPORT is defined on MED_NODE, use MED_ALL_ELEMENTS as
-         medGeometryElement GeometricType and it will returns the number
+         medGeometryElement GeometricType and it will return the number
 	 of nodes in the support (or in the mesh).
 */
 //-----------------------------------------------------------------------------
@@ -274,6 +281,8 @@ inline int SUPPORT::getNumberOfElements(MED_EN::medGeometryElement GeometricType
       return _numberOfElements[i];
   throw MEDEXCEPTION("Support::getNumberOfElements : Geometric type not found !") ;
 }
+
+  /*! Returns the total number of elements in the support. */
 //-----------------------------------------------------------------------------
 inline  const int * SUPPORT::getNumberOfElements() const throw (MEDEXCEPTION) {
 //-----------------------------------------------------------------------------
@@ -358,7 +367,9 @@ inline const int * SUPPORT::getNumberIndex() const
     throw MEDEXCEPTION("Support::getNumberIndex : Not defined, support is on all entity !") ;
   return _number->getIndex() ;
 }
-
+/*! \if MEDMEM_ug
+@}
+\endif */
 
 /*! set the attribute _name to Name */
 //--------------------------------------
@@ -390,10 +401,17 @@ inline void SUPPORT::setMeshName(const string & meshName)
   _meshName=meshName;
 }
 
-/*! set the attribute _isOnAllElts to All
-  Even if _isonAllElts is true, geometric types definning the FIELD's SUPPORT
+  /*! \if MEDMEM_ug
+\addtogroup SUPPORT_creation
+@{
+\endif
+  */
+
+/*! Creates a support on all elements of the type specified in the constructor.
+
+  Even if _isonAllElts is true, geometric types defining the FIELD's SUPPORT
   must be read from the SUPPORT not from the associated MESH (the geometric
-  types definning the FIELD's SUPPORT may be a subset of the geometric types
+  types defining the FIELD's SUPPORT may be a subset of the geometric types
   defined in the MESH even if for each SUPPORT geometric type all MESH entities
   are used).
 */
@@ -403,6 +421,7 @@ inline void SUPPORT::setAll(bool All)
 {
   _isOnAllElts=All;
 }
+  /*! \if MEDMEM_ug  @} \endif */
 
 /*! set the attribute _entity to Entity */
 //------------------------------------------
@@ -439,7 +458,7 @@ inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *Geometri
       for (int itype=0; itype < _numberOfGeometricType; itype++)
 	{
 	  ostringstream typestr;
-	  typestr<<_name<<"_type"<<itype;
+	  typestr<<_name<<"_type"<<_geometricType[itype];
 	  prof_names[itype]=typestr.str();
 	}
       _profilNames=prof_names;
@@ -467,17 +486,21 @@ inline void SUPPORT::setNumberOfElements(const int *NumberOfElements)
 
 /*! set the attribute _totalNumberOfElements to TotalNumberOfElements */
 //--------------------------------------------------------------------
-inline void SUPPORT::setTotalNumberOfElements(int TotalNumberOfElements)
+//inline void SUPPORT::setTotalNumberOfElements(int TotalNumberOfElements)
 //--------------------------------------------------------------------
-{
-  _totalNumberOfElements=TotalNumberOfElements;
-}
+//{
+//  _totalNumberOfElements=TotalNumberOfElements;
+//}
 
 /*! set the attribute _number to Number */
 //---------------------------------------------------
 inline void SUPPORT::setNumber(MEDSKYLINEARRAY * Number)
 //---------------------------------------------------
 {
+  const char * LOC = "SUPPORT::setNumber(MEDSKYLINEARRAY * Number)";
+  if ( _isOnAllElts )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support is on all elements")) ;
+
   if (_number != NULL) delete _number ;
   _number=Number;
 }

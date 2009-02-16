@@ -19,6 +19,8 @@
 #include "med.hxx"
 #include "med_outils.hxx"
 
+#include <cstring>
+
 /* Le nom de cette fonction n'est pas très bien choisie */
 
 namespace med_2_1{

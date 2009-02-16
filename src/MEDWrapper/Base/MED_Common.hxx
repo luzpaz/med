@@ -1,31 +1,29 @@
-//  
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  File   : 
 //  Author : 
 //  Module : 
 //  $Header$
-
+//
 #ifndef MED_Common_HeaderFile
 #define MED_Common_HeaderFile
 
@@ -78,7 +76,7 @@ namespace MED{
 		ePYRA13=313, ePENTA15=315, eHEXA20=320, 
 		ePOLYGONE=400, ePOLYEDRE=500, eNONE=0} EGeometrieElement;
 
-  typedef enum {eMAILLE, eFACE, eARETE, eNOEUD} EEntiteMaillage; 
+  typedef enum {eMAILLE, eFACE, eARETE, eNOEUD, eNOEUD_ELEMENT} EEntiteMaillage; 
 
   typedef enum {eNO_PFLMOD, eGLOBAL, eCOMPACT}  EModeProfil; 
 
@@ -102,19 +100,19 @@ namespace MED{
   GetEntity2GeomSet();
 
   template<EVersion>
-  TInt
+  TInt MEDWRAPPER_EXPORT
   GetDESCLength();
   
   template<EVersion>
-  TInt
+  TInt MEDWRAPPER_EXPORT
   GetIDENTLength();
   
   template<EVersion>
-  TInt
+  TInt MEDWRAPPER_EXPORT
   GetNOMLength();
   
   template<EVersion>
-  TInt
+  TInt MEDWRAPPER_EXPORT
   GetLNOMLength();
   
   template<EVersion>
@@ -180,7 +178,7 @@ namespace MED{
 
   struct TWrapper;
   typedef SharedPtr<TWrapper> PWrapper;
-};
+}
 
 
 #endif

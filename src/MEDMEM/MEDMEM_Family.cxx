@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
  File MEDMEM_Family.cxx
@@ -38,8 +40,8 @@ using namespace MED_EN;
 
 FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), _numberOfGroup(0)
 {
-    MESSAGE("FAMILY::FAMILY()");
-};
+    MESSAGE_MED("FAMILY::FAMILY()");
+}
 
 FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
                int *AttributeIdentifier, int *AttributeValue, string AttributeDescription,
@@ -53,34 +55,37 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
 		  _numberOfAttribute(NumberOfAttribute), 
 		  _numberOfGroup(NumberOfGroup)
 {
-  MESSAGE("FAMILY(int Identifier, string Name, int NumberOfAttribute,int *AttributeIdentifier,int *AttributeValue,string AttributeDescription,int NumberOfGroup,string GroupName, int ** Number) : "<<Identifier);
+  MESSAGE_MED("FAMILY(int Identifier, string Name, int NumberOfAttribute,int *AttributeIdentifier,int *AttributeValue,string AttributeDescription,int NumberOfGroup,string GroupName, int ** Number) : "<<Identifier);
 
   _isOnAllElts = false ;
-  SCRUTE(_numberOfAttribute);
+  SCRUTE_MED(_numberOfAttribute);
   if (_numberOfAttribute > 0)
     {
       _attributeIdentifier.set(_numberOfAttribute,AttributeIdentifier);
       _attributeValue.set(_numberOfAttribute,AttributeValue);
 
-      _attributeDescription.set(_numberOfAttribute);
+      //_attributeDescription.set(_numberOfAttribute);
+      _attributeDescription.resize(_numberOfAttribute);
       for (int i=0;i<NumberOfAttribute;i++) {
 	_attributeDescription[i].assign(AttributeDescription,i*MED_TAILLE_DESC,MED_TAILLE_DESC);
 	_attributeDescription[i].erase(strlen(_attributeDescription[i].c_str()));
-	//SCRUTE(_attributeDescription[i]);
+	//SCRUTE_MED(_attributeDescription[i]);
       }
     }
   else
     {
       _attributeIdentifier.set(_numberOfAttribute);
       _attributeValue.set(_numberOfAttribute);
-      _attributeDescription.set(_numberOfAttribute);
+      //_attributeDescription.set(_numberOfAttribute);
+      _attributeDescription.resize(_numberOfAttribute);
     }
  
-  _groupName.set(_numberOfGroup);
+  //_groupName.set(_numberOfGroup);
+  _groupName.resize(_numberOfGroup);
   for (int i=0;i<NumberOfGroup;i++) {
     _groupName[i].assign(GroupName,i*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
     _groupName[i].erase(strlen(_groupName[i].c_str()));
-    //SCRUTE(_groupName[i]);
+    //SCRUTE_MED(_groupName[i]);
   }
 
   // well, we must set SUPPORT attribut
@@ -102,7 +107,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
       NumberOfNodesInFamily++;
     }
 
-  SCRUTE(NumberOfNodesInFamily);
+  SCRUTE_MED(NumberOfNodesInFamily);
 
   // If we found nodes set the family attributes adequatly
   if (NumberOfNodesInFamily>0) {
@@ -180,38 +185,37 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   if (!Find) {
     _numberOfGeometricType = 0 ;
     _isOnAllElts = false ;
-    MESSAGE ("FAMILY() : No entity found !") ;
+    MESSAGE_MED ("FAMILY() : No entity found !") ;
   }
 
-  MESSAGE("Well now ??? :::");
+  MESSAGE_MED("Well now ??? :::");
 
-  MESSAGE("Name : "<< getName());
-  MESSAGE("Description : "<< getDescription());
-  MESSAGE("Mesh name : " << getMesh()->getName());
-  MESSAGE("Entity : "<< getEntity());
-  MESSAGE("Entity list :");
+  MESSAGE_MED("Name : "<< getName());
+  MESSAGE_MED("Description : "<< getDescription());
+  MESSAGE_MED("Mesh name : " << getMesh()->getName());
+  MESSAGE_MED("Entity : "<< getEntity());
+  MESSAGE_MED("Entity list :");
   if (!(isOnAllElements())) {
-    int numberoftypes = getNumberOfTypes() ;
-    MESSAGE("NumberOfTypes : "<<numberoftypes);
-    const medGeometryElement * types = getTypes();
-    for (int j=0;j<numberoftypes;j++) {
-      int numberOfElements = getNumberOfElements(types[j]);
-      MESSAGE("    * Type "<<types[j]<<" : there is(are) "<<numberOfElements<<" element(s) : ");
-      const int * number = getNumber(types[j]);
-      SCRUTE(number);
+    MESSAGE_MED("NumberOfTypes : "<<getNumberOfTypes());
+    for (int j=0;j<getNumberOfTypes();j++) {
+      MESSAGE_MED("    * Type "<<getTypes()[j]<<" : there is(are) "<<
+                  getNumberOfElements(getTypes()[j])<<" element(s) : ");
+      SCRUTE_MED(getNumber(getTypes()[j]));
       //      for (int k=0; k<numberOfElements;k++)
-        //	MESSAGE("________________ " << number[k]);
+        //	MESSAGE_MED("________________ " << number[k]);
     }
-  } else
-    MESSAGE("Is on all entities !");
+  }
+  else
+  {
+    MESSAGE_MED("Is on all entities !");
+  }
 
 
-
-};
+}
 
 FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
 {
-  MESSAGE("FAMILY::FAMILY(FAMILY & m)");
+  MESSAGE_MED("FAMILY::FAMILY(FAMILY & m)");
   _identifier = m._identifier;
   _numberOfAttribute = m._numberOfAttribute;
 
@@ -220,36 +224,37 @@ FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
     _attributeValue.set(_numberOfAttribute,m._attributeValue);
   }
 
-  _attributeDescription.set(_numberOfAttribute);
+  //_attributeDescription.set(_numberOfAttribute);
+  _attributeDescription.resize(_numberOfAttribute);
   for (int i=0;i<m._numberOfAttribute;i++)
     _attributeDescription[i] = m._attributeDescription[i];
 
   _numberOfGroup = m._numberOfGroup;
 
-  _groupName.set(_numberOfGroup) ;
-
+  //_groupName.set(_numberOfGroup) ;
+  _groupName.resize(_numberOfGroup) ;
   for (int i=0;i<m._numberOfGroup;i++)
     _groupName[i]=m._groupName[i];
-};
+}
 
 FAMILY::FAMILY(const SUPPORT & s):SUPPORT(s)
 {
-  MESSAGE("FAMILY::FAMILY(const SUPPORT & s)");
+  MESSAGE_MED("FAMILY::FAMILY(const SUPPORT & s)");
 
   _identifier = 0;
   _numberOfAttribute = 0;
 
   _numberOfGroup = 0;
-};
+}
 
 FAMILY::~FAMILY() 
 {
-    MESSAGE("~FAMILY()");
-};
+    MESSAGE_MED("~FAMILY()");
+}
   
 FAMILY & FAMILY::operator=(const FAMILY &fam) 
 {
-    MESSAGE("FAMILY::operator=");
+    MESSAGE_MED("FAMILY::operator=");
     if ( this == &fam ) return *this;
 
     //Etant donné que l'opérateur d'affectation de la classe SUPPORT effectuait
@@ -262,11 +267,15 @@ FAMILY & FAMILY::operator=(const FAMILY &fam)
     _numberOfAttribute = fam._numberOfAttribute; 
     _attributeIdentifier.set(_numberOfAttribute, fam._attributeIdentifier) ;
     _attributeValue.set(_numberOfAttribute, fam._attributeValue) ;
-    _attributeDescription.set(_numberOfAttribute, fam._attributeDescription) ;
+    //_attributeDescription.set(_numberOfAttribute, fam._attributeDescription) ;
+    _attributeDescription.clear();
+    _attributeDescription = fam._attributeDescription;
     _numberOfGroup = fam._numberOfGroup;
-    _groupName.set(_numberOfGroup, fam._groupName) ;
+    //_groupName.set(_numberOfGroup, fam._groupName) ;
+    _groupName.clear();
+    _groupName = fam._groupName;
     return *this;
-};
+}
 
 ostream & MEDMEM::operator<<(ostream &os, FAMILY &myFamily)
 {
@@ -284,7 +293,7 @@ ostream & MEDMEM::operator<<(ostream &os, FAMILY &myFamily)
     os << "    * "<<myFamily.getGroupName(j).c_str()<<endl ;
 
   return os;
-};
+}
 
 ostream & MEDMEM::operator<<(ostream &os, const FAMILY &myFamily)
 {
@@ -302,11 +311,11 @@ ostream & MEDMEM::operator<<(ostream &os, const FAMILY &myFamily)
     os << "    * "<<myFamily.getGroupName(j).c_str()<<endl ;
 
   return os;
-};
+}
 
 bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
 {
-  MESSAGE("FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)");
+  MESSAGE_MED("FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)");
   bool Find = false ;
   // Get types information from <_mesh>
   int    numberOfTypes             = _mesh->getNumberOfTypesWithPoly(Entity) ;
@@ -321,7 +330,7 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
   const int *  GlobalNumberingIndex          = _mesh->getGlobalNumberingIndex(Entity);
   
 
-  SCRUTE(numberOfTypes);
+  SCRUTE_MED(numberOfTypes);
 
   // we search for all elements in this family
   for (int TypeNumber=0; TypeNumber < numberOfTypes; TypeNumber++) {
@@ -333,7 +342,7 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
       
     for (int i=0; i<NumberOfElements; i++)
       {
-        //	SCRUTE(ElementsOfThisFamilyNumber[i]);
+        //	SCRUTE_MED(ElementsOfThisFamilyNumber[i]);
 	if (_identifier == ElementsOfThisFamilyNumber[i]) {
 	  tmp_ElementsList[NumberOfElementsInThisFamily]=i+GlobalNumberingIndex[TypeNumber] ;
 	  NumberOfElementsInThisFamily++;
@@ -384,7 +393,8 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
     //    delete[] GeometricTypeNumber;
       
     // family on all ELEMENT ?
-    if (_totalNumberOfElements == _mesh->getNumberOfElementsWithPoly(Entity,MED_ALL_ELEMENTS) && Entity==MED_EN::MED_CELL) {
+    if (_totalNumberOfElements == 
+        _mesh->getNumberOfElementsWithPoly(Entity,MED_ALL_ELEMENTS)/* && Entity==MED_EN::MED_CELL*/) {
       _isOnAllElts = true ;
       // all others attributs are rights !
       for (int i=0; i<_numberOfGeometricType; i++)

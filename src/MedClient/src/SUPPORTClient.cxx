@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "Utils_CorbaException.hxx"
 #include "UtilClient.hxx"
@@ -37,7 +39,8 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
   SUPPORT(), 
   IOR_Support(SALOME_MED::SUPPORT::_duplicate(S)),_refCounter(1)
 {
-  BEGIN_OF("SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)");
+  const char* LOC = "SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)";
+  BEGIN_OF(LOC);
 
   SCRUTE(S);
   SCRUTE(M);
@@ -50,7 +53,7 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
     }
   blankCopy();
 
-  END_OF("SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -59,7 +62,8 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
 //=============================================================================
 void SUPPORTClient::blankCopy()
 {
-  BEGIN_OF("SUPPORTClient::blankCopy");
+  const char* LOC = "SUPPORTClient::blankCopy";
+  BEGIN_OF(LOC);
 
  try
   {
@@ -96,7 +100,7 @@ void SUPPORTClient::blankCopy()
                                        SALOME::INTERNAL_ERROR);
   }
 
-  END_OF("SUPPORTClient::blankCopy");
+  END_OF(LOC);
 
 }
 //=============================================================================
@@ -106,7 +110,8 @@ void SUPPORTClient::blankCopy()
 //=============================================================================
 void SUPPORTClient::fillCopy()
 {
-  BEGIN_OF("SUPPORTClient::fillCopy");
+  const char* LOC = "SUPPORTClient::fillCopy";
+  BEGIN_OF(LOC);
 
   if (!_complete_support) {
     if(!_isOnAllElts) {
@@ -125,7 +130,7 @@ void SUPPORTClient::fillCopy()
     _complete_support = true;
   }
 
-  END_OF("SUPPORTClient::fillCopy");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -134,11 +139,12 @@ void SUPPORTClient::fillCopy()
 //=============================================================================
 SUPPORTClient::~SUPPORTClient()
 {
-  BEGIN_OF("SUPPORTClient::~SUPPORTClient");
+  const char* LOC = "SUPPORTClient::~SUPPORTClient";
+  BEGIN_OF(LOC);
   IOR_Support->Destroy();
   if(_mesh)
     _mesh->removeReference();
-  END_OF("SUPPORTClient::~SUPPORTClient");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -148,12 +154,13 @@ SUPPORTClient::~SUPPORTClient()
 //=============================================================================
 MEDSKYLINEARRAY *  SUPPORTClient::getnumber() const throw (MEDEXCEPTION)
 {
-  BEGIN_OF("SUPPORTClient::getnumber()");
+  const char* LOC = "SUPPORTClient::getnumber()";
+  BEGIN_OF(LOC);
 
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   MEDSKYLINEARRAY *m = SUPPORT::getnumber();
 
-  END_OF("SUPPORTClient::getnumber()");
+  END_OF(LOC);
   return m;
 }
 
@@ -165,12 +172,13 @@ MEDSKYLINEARRAY *  SUPPORTClient::getnumber() const throw (MEDEXCEPTION)
 const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType) 
     const throw (MEDEXCEPTION)
 {
-  BEGIN_OF("SUPPORTClient::getnumber(medGeometryElement)");
+  const char* LOC = "SUPPORTClient::getnumber(medGeometryElement)";
+  BEGIN_OF(LOC);
 
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   const int *n = SUPPORT::getNumber(GeometricType);
 
-  END_OF("SUPPORTClient::getnumber(medGeometryElement)");
+  END_OF(LOC);
   return n;
 }
 
@@ -181,12 +189,13 @@ const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType)
 //=============================================================================
 const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION) 
 {
-  BEGIN_OF("SUPPORTClient::getnumberIndex()");
+  const char* LOC = "SUPPORTClient::getnumberIndex()";
+  BEGIN_OF(LOC);
 
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   const int * n = SUPPORT::getNumberIndex();
 
-  END_OF("SUPPORTClient::getnumberIndex()");
+  END_OF(LOC);
   return n;
 }
 
@@ -197,12 +206,13 @@ const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION)
 //=============================================================================
 int SUPPORTClient::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION)
 {
-  BEGIN_OF("SUPPORTClient::getValIndFromGlobalNumber()");
+  const char* LOC = "SUPPORTClient::getValIndFromGlobalNumber()";
+  BEGIN_OF(LOC);
   
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   const int n = SUPPORT::getValIndFromGlobalNumber(number);
   
-  END_OF("SUPPORTClient::getValIndFromGlobalNumber()");
+  END_OF(LOC);
   return n;
 }
 

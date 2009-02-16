@@ -1,11 +1,28 @@
-//  Copyright (C) 2003  CEA/DEN, EDF R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  File   : MED_Wrapper.cxx
 //  Author : Alexey PETROV
 //  Module : MED
-
+//
 #include "MED_Wrapper.hxx"
 #include "MED_Utilities.hxx"
  
@@ -23,7 +40,11 @@ namespace MED
   ::TLockProxy(TWrapper* theWrapper):
     myWrapper(theWrapper)
   {
+#if BOOST_VERSION >= 103500
+    myWrapper->myMutex.lock();
+#else
     boost::detail::thread::lock_ops<TWrapper::TMutex>::lock(myWrapper->myMutex);
+#endif
     INITMSG(MYDEBUG,"TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<std::endl);
   }
   
@@ -31,7 +52,11 @@ namespace MED
   ::~TLockProxy()
   {
     INITMSG(MYDEBUG,"~TLockProxy() - this -"<<this<<"; myWrapper = "<<myWrapper<<std::endl);
+#if BOOST_VERSION >= 103500
+    myWrapper->myMutex.unlock();
+#else
     boost::detail::thread::lock_ops<TWrapper::TMutex>::unlock(myWrapper->myMutex);
+#endif
   }
   
   TWrapper*
@@ -662,5 +687,5 @@ namespace MED
   {
     PGrilleInfo anInfo = CrGrilleInfo(theMeshInfo,theInfo);
     return anInfo;
-  }
+  }  
 }

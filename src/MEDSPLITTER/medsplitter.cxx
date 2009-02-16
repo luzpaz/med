@@ -1,32 +1,28 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  MED medsplitter : tool to split n MED files into p separate 
 //                    MED files with a partitioning specified 
 //                    by an external tool
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : medsplitter.cxx
 //  Author : Vincent BERGEAUD (CEA-DEN/DANS/DM2S/SFME/LGLS)
 //  Module : MED
-
+//
 #ifdef BOOST_PROGRAM_OPTIONS_LIB
 #include <boost/program_options.hpp>
 namespace po=boost::program_options;
@@ -291,6 +287,12 @@ int main(int argc, char** argv)
 
   // Creating a new mesh collection from the partitioning
   MEDSPLITTER::MESHCollection new_collection(*collection, new_topo, split_families, empty_groups);
+	if (mesh_only)
+		{
+			delete collection;
+			collection=0;
+		}
+
   if (!xml_output_master)
     new_collection.setDriverType(MEDSPLITTER::MedAscii);
 

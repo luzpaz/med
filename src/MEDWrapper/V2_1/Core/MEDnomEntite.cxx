@@ -19,6 +19,8 @@
 #include "med.hxx"
 #include "med_outils.hxx"
 
+#include <cstring>
+
 /*
  * - Nom de la fonction : _MEDnomEntite
  * - Description : fournit le nom associe a un type d'entite MED

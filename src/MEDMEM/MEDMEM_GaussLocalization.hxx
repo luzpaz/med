@@ -1,25 +1,29 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-// 
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #ifndef GAUSS_LOCALIZATION_HXX
 #define GAUSS_LOCALIZATION_HXX
 
 #include <vector>
+#include <MEDMEM.hxx>
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_ArrayInterface.hxx"
@@ -33,7 +37,7 @@ using namespace MED_EN;
 
 namespace MEDMEM {
 
-  class GAUSS_LOCALIZATION_ {
+  class MEDMEM_EXPORT GAUSS_LOCALIZATION_ {
   public:
     virtual MED_EN::medModeSwitch getInterlacingType() const {return MED_EN::MED_UNDEFINED_INTERLACE;}
     virtual ~GAUSS_LOCALIZATION_() {}; //Indispensable pour détruire le vrai objet pointé
@@ -92,8 +96,8 @@ namespace MEDMEM {
     string          getName()    const {return _locName;}
     MED_EN::medGeometryElement getType() const {return _typeGeo;}
     int             getNbGauss() const {return _nGauss;}
-    ArrayNoGauss    getRefCoo () const {return _cooRef;}     //Ces tableaux sont petits
-    ArrayNoGauss    getGsCoo  () const {return _cooGauss;}   //Ces tableaux sont petits
+    const ArrayNoGauss& getRefCoo () const {return _cooRef;}     //Ces tableaux sont petits
+    const ArrayNoGauss& getGsCoo  () const {return _cooGauss;}   //Ces tableaux sont petits
     vector <double> getWeight () const {return _wg;}         //Ces tableaux sont petits
     inline MED_EN::medModeSwitch  getInterlacingType() const { return _interlacingType;}
 
@@ -101,7 +105,7 @@ namespace MEDMEM {
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION() throw (MEDEXCEPTION) :
     _typeGeo(MED_EN::MED_NONE), _nGauss(-1),
     _interlacingType( SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType) 
-  {};
+  {}
 
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION(const string & locName,
 											   const MED_EN::medGeometryElement typeGeo,
@@ -113,7 +117,7 @@ namespace MEDMEM {
     _interlacingType(SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType)
   {
     const char * LOC = "GAUSS_LOCALIZATION(locName,typeGeo, nGauss, const ArrayNoGauss & cooRef,..) : ";
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
     if (_cooRef.getDim() != _cooGauss.getDim() )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"cooRef and cooGaus must have the same number of components")) ;
 
@@ -129,15 +133,16 @@ namespace MEDMEM {
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
 				     << _nGauss ));
 
-    END_OF(LOC);
-  };
+  END_OF_MED(LOC);
+  }
 
-  template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION(const string & locName,
-											   const MED_EN::medGeometryElement  typeGeo,
-											   const int  nGauss,
-											   const double  * const cooRef,
-											   const double  * const cooGauss,
-											   const double  * const wg) throw (MEDEXCEPTION) :
+  template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION
+             (const string & locName,
+              const MED_EN::medGeometryElement  typeGeo,
+              const int  nGauss,
+              const double  * const cooRef,
+              const double  * const cooGauss,
+              const double  * const wg) throw (MEDEXCEPTION) :
     _locName(locName),_typeGeo(typeGeo),_nGauss(nGauss),
     _cooRef(ArrayNoGauss(const_cast<double *>(cooRef),typeGeo/100,typeGeo%100)),
     _cooGauss(ArrayNoGauss(const_cast<double *>(cooGauss),typeGeo/100,_nGauss)),
@@ -145,7 +150,7 @@ namespace MEDMEM {
     _interlacingType(SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType)
   {
     const char * LOC = "GAUSS_LOCALIZATION(locName,typeGeo, nGauss, const double * cooRef,..) :";
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
     if (_cooRef.getDim() != _cooGauss.getDim() )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"cooRef and cooGaus must have the same number of components")) ;
 
@@ -159,8 +164,8 @@ namespace MEDMEM {
     if (_wg.size() != _nGauss )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
 				     << _nGauss ));
-    END_OF(LOC);
-  };
+  END_OF_MED(LOC);
+  }
 
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG> &
   GAUSS_LOCALIZATION<INTERLACING_TAG>::operator=(const GAUSS_LOCALIZATION & gaussLoc)
@@ -170,8 +175,10 @@ namespace MEDMEM {
     _locName  = gaussLoc._locName;
     _typeGeo  = gaussLoc._typeGeo;
     _nGauss   = gaussLoc._nGauss;
-    _cooRef   = ArrayNoGauss(gaussLoc._cooRef);   //utilisation de la copie superficielle par défaut n'est pas une bonne idée
-    _cooGauss = ArrayNoGauss(gaussLoc._cooGauss);  //dans l'opérateur = de MEDnArray
+    //_cooRef.setPtr((double*)gaussLoc._cooRef.getPtr(), false, true);     //utilisation de la copie superficielle par défaut n'est pas une bonne idée
+    //_cooGauss.setPtr((double*)gaussLoc._cooGauss.getPtr(), false, true); //dans l'opérateur = de MEDnArray
+    _cooRef   = gaussLoc._cooRef;
+    _cooGauss = gaussLoc._cooGauss;
     _wg       = gaussLoc._wg;
 
     return *this;

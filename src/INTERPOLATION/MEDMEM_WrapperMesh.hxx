@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef MEDMEM_WRAPPER_MESH_HXX
 #define MEDMEM_WRAPPER_MESH_HXX
@@ -27,8 +29,8 @@
 
 #include <vector>
 
-#ifndef UNDEFINED
-#define UNDEFINED -1
+#ifndef MED_UNDEFINED
+#define MED_UNDEFINED -1
 #endif
 
 #ifndef FAUX
@@ -176,7 +178,7 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 	
 	voisins_de_maille.resize(nbr_mailles);
 	faces_contenues.resize(nbr_mailles);
-	maille_au_bord.resize(nbr_mailles,UNDEFINED);
+	maille_au_bord.resize(nbr_mailles,MED_UNDEFINED);
 	
 	type_retour sommets_face;
 	
@@ -189,8 +191,8 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 	for (num_maille=0;num_maille<nbr_mailles;num_maille++)
 		{
 		tmp=(*mailles)[num_maille].DONNE_NBR_FACES();
-		voisins_de_maille[num_maille]=vector<int>(tmp,UNDEFINED);
-		faces_contenues[num_maille]=vector<int>(tmp,UNDEFINED);
+		voisins_de_maille[num_maille]=vector<int>(tmp,MED_UNDEFINED);
+		faces_contenues[num_maille]=vector<int>(tmp,MED_UNDEFINED);
 		approx_nbr_formants+=tmp;
 		}
 		
@@ -234,13 +236,13 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 	// (borné, par 8*4=32)			
 					
 					num_loc=(*mailles)[num_maille_sec].DONNE_NUM_LOC_FACE_EGALE_A_FORMANT(sommets_face);					
-					if (num_loc>UNDEFINED)
+					if (num_loc>MED_UNDEFINED)
 						{
 						
 	// et dans ce cas, la maille secondaire est voisine de la maille primaire, on met à jour les tableaux
 	// si on voulait construire le tableau des faces, c'est ici qu'il faudrait le faire -1-
 						
-                                                  // MESSAGE("La maille "<<num_maille<<" a pour voisin la maille "<<num_maille_sec<<" via la face "<<nbr_formants);
+                                                  // MESSAGE_MED("La maille "<<num_maille<<" a pour voisin la maille "<<num_maille_sec<<" via la face "<<nbr_formants);
 						face_au_bord.push_back(FAUX);
 						faces_contenues[num_maille][num_local_face]=nbr_formants;
 						voisins_de_maille[num_maille][num_local_face]=num_maille_sec;
@@ -272,13 +274,13 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 			
 	// On regarde si tous les numéros globaux des faces sont définis
 			
-			if (faces_contenues[num_maille][ind_num_cont]==UNDEFINED)
+			if (faces_contenues[num_maille][ind_num_cont]==MED_UNDEFINED)
 				{
 				
 	// si un seul numéro n'est pas défini, la maille est au bord
 	// si on voulait construire le tableau des faces, c'est ici qu'il faudrait le faire -2-
 				
-                                  // MESSAGE("La maille "<<num_maille<<" est au bord via sa face "<<ind_num_cont);
+                                  // MESSAGE_MED("La maille "<<num_maille<<" est au bord via sa face "<<ind_num_cont);
 				test_bord=1;
 				faces_contenues[num_maille][ind_num_cont]=nbr_formants;
 				maille_au_bord[num_maille]=VRAI;
@@ -308,20 +310,20 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
 		nf=0;
 		for (j=0;j<(int)faces_contenues[i].size();j++) 
 			{
-			if (faces_contenues[i][j]==UNDEFINED) verif++;
-			if (voisins_de_maille[i][j]==UNDEFINED) nf++;
+			if (faces_contenues[i][j]==MED_UNDEFINED) verif++;
+			if (voisins_de_maille[i][j]==MED_UNDEFINED) nf++;
 			}
-		if (maille_au_bord[i]==UNDEFINED) cerr<<"Maille "<<i<<" non completement construite"<<endl;
+		if (maille_au_bord[i]==MED_UNDEFINED) cerr<<"Maille "<<i<<" non completement construite"<<endl;
 		if (nf==faces_contenues[i].size()) nbf++;
 		}
 		
 	
-	MESSAGE("IL Y A "<<verif<<" PROBLEMES A LA SUITE DE LA CONSTRUCTION DE CONNEXITE");
-	MESSAGE("Nombre de mailles : "<<nbr_mailles);
-	MESSAGE("Approximation du nombre de faces : "<<approx_nbr_formants);
-	MESSAGE("Nombre réel de faces de bord : "<<nbr_faces_bord);
-	MESSAGE("Nombre réel total de faces : "<<nbr_formants);
-	MESSAGE("Nombre de Mailles Isolées : "<<nbf);	
+	MESSAGE_MED("IL Y A "<<verif<<" PROBLEMES A LA SUITE DE LA CONSTRUCTION DE CONNEXITE");
+	MESSAGE_MED("Nombre de mailles : "<<nbr_mailles);
+	MESSAGE_MED("Approximation du nombre de faces : "<<approx_nbr_formants);
+	MESSAGE_MED("Nombre réel de faces de bord : "<<nbr_faces_bord);
+	MESSAGE_MED("Nombre réel total de faces : "<<nbr_formants);
+	MESSAGE_MED("Nombre de Mailles Isolées : "<<nbf);	
 	}
 
 #endif

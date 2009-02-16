@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef FAMILY_HXX
 #define FAMILY_HXX
@@ -35,8 +37,8 @@
 */
 namespace MEDMEM {
   class FAMILY;
-  ostream & operator<<(ostream &os, FAMILY &my);
-  ostream & operator<<(ostream &os, const FAMILY &my) ;
+  MEDMEM_EXPORT ostream & operator<<(ostream &os, FAMILY &my);
+  MEDMEM_EXPORT ostream & operator<<(ostream &os, const FAMILY &my) ;
 
 class MEDMEM_EXPORT FAMILY : virtual public SUPPORT
 {
@@ -75,7 +77,8 @@ protected :
     There is one for each attribute.
     \endif
   */
-  PointerOf<string>  _attributeDescription ;
+  //PointerOf<string>  _attributeDescription ;
+  vector<string>  _attributeDescription ;
   /*!
     \if developper
     Number of the group the family belongs to.
@@ -87,7 +90,8 @@ protected :
     Name of the group the family belongs to.
     \endif
   */
-  PointerOf<string> _groupName ;
+  //PointerOf<string> _groupName ;
+  vector<string> _groupName ;
 
 public:
 			/*! Constructor. */
@@ -116,9 +120,9 @@ public:
 			/*! Destructor. */
   virtual ~FAMILY();
   FAMILY & operator=(const FAMILY &fam);
-  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, FAMILY &my) ;
+  friend ostream & operator<<(ostream &os, FAMILY &my) ;
 
-  friend MEDMEM_EXPORT ostream & operator<<(ostream &os, const FAMILY &my) ;
+  friend ostream & operator<<(ostream &os, const FAMILY &my) ;
 
   bool build(MED_EN::medEntityMesh Entity,int **FamilyNumber);
 
@@ -137,9 +141,9 @@ public:
   inline int      getNumberOfAttributes()            const;
   inline const int *    getAttributesIdentifiers()   const;
   inline const int *    getAttributesValues()        const;
-  inline const string * getAttributesDescriptions()  const;
+  inline const string*  getAttributesDescriptions()  const;
   inline int      getNumberOfGroups()                const;
-  inline const string * getGroupsNames()             const;
+  inline const string*  getGroupsNames()             const;
 
   // A FAIRE : VERIFIER LA VALIDITE DES PARAMETRES !
   inline int      getAttributeIdentifier(int i)  const;
@@ -188,8 +192,18 @@ inline void FAMILY::setAttributesValues(int * AttributeValue)
 inline void FAMILY::setAttributesDescriptions(string * AttributeDescription) 
 //--------------------------------------------------------------------------
 { 
-    //_attributeDescription = AttributeDescription ; 
-    _attributeDescription.setShallowAndOwnership(AttributeDescription) ;
+  //_attributeDescription = AttributeDescription ; 
+  //_attributeDescription.setShallowAndOwnership(AttributeDescription) ;
+  int nbAttr = getNumberOfAttributes();
+//   if(nbAttr<1) {
+//     std::string diagnosis;
+//     diagnosis="Can not set attributes descriptions - number of attributes is not set";
+//     throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
+//   }
+  _attributeDescription.resize(nbAttr);
+  for(int i=0; i<nbAttr; i++) {
+    _attributeDescription[i] = AttributeDescription[i];
+  }
 }
 
 /*! Sets the attribute _numberOfGroup to NumberOfGroups. */
@@ -205,11 +219,35 @@ inline void FAMILY::setNumberOfGroups(int NumberOfGroups)
   inline void FAMILY::setGroupsNames(string * GroupName, bool giveOwnership) 
 //----------------------------------------------------
 { 
-	if (giveOwnership)
-		_groupName.setShallowAndOwnership(GroupName);
-	else	
-    	//_groupName = GroupName ; 
-    _groupName.set(_numberOfGroup, GroupName) ;
+  // SKL, CPP TESTS: _groupName is no more PointerOf(string) but vector<string>
+//   if (giveOwnership)
+//     _groupName.setShallowAndOwnership(GroupName);
+//   else  
+//     //_groupName = GroupName ; 
+//     _groupName.set(_numberOfGroup, GroupName) ;
+
+  int nbGr = getNumberOfGroups();
+//   if(nbGr<1) {
+//     std::string diagnosis;
+//     diagnosis="Can not set groups names - number of groups is not set";
+//     throw MEDMEM::MEDEXCEPTION(diagnosis.c_str());
+//   }
+  if (giveOwnership) {
+    //_groupName.setShallowAndOwnership(GroupName);
+    _groupName.resize(nbGr);
+    for(int i=0; i<nbGr; i++) {
+      _groupName[i] = GroupName[i];
+    }
+    delete [] GroupName;
+  }
+  else {
+    //_groupName = GroupName ; 
+    //_groupName.set(_numberOfGroup, GroupName) ;
+    _groupName.resize(nbGr);
+    for(int i=0; i<nbGr; i++) {
+      _groupName[i] = GroupName[i];
+    }
+  }
 }
 /*! Returns the attribute _identifier.\n
    Note that there is one identifier precisely for each family. */
@@ -263,7 +301,7 @@ inline int FAMILY::getAttributeValue(int i) const
 inline const string * FAMILY::getAttributesDescriptions() const
 //-------------------------------------------------------
 { 
-    return _attributeDescription ; 
+    return &(_attributeDescription[0]);
 }
 /*! Returns description of the Ith attribute of the family\n
    Note that they are numbered from 1 to N */
@@ -285,7 +323,7 @@ inline int FAMILY::getNumberOfGroups() const
 inline const string * FAMILY::getGroupsNames() const
 //--------------------------------------------
 { 
-    return _groupName ; 
+  return &(_groupName[0]);
 }
 /*! Returns the name of the Ith group the family belongs to.\n
     Note that they are numbered from 1 to N*/

@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef VTK_FIELD_DRIVER_HXX
 #define VTK_FIELD_DRIVER_HXX
@@ -73,11 +75,11 @@ public :
 		     _fieldNum(MED_INVALID)
   {
     const char * LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER() ";
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
     _vtkFile = new ofstream();
 
-    END_OF(LOC);
+  END_OF_MED(LOC);
   }
   /*!
     Constructor.
@@ -85,16 +87,16 @@ public :
   template <class INTERLACING_TAG>
   VTK_FIELD_DRIVER(const string & fileName,
 		   FIELD<T, INTERLACING_TAG> * ptrField):
-    GENDRIVER(fileName,MED_EN::MED_WRONLY),
+    GENDRIVER(fileName, MED_EN::WRONLY, VTK_DRIVER),
     _ptrField((FIELD<T> *) ptrField),
     _fieldName(fileName),_fieldNum(MED_INVALID) 
   {
-    const char * LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
-    BEGIN_OF(LOC);
+  const char* LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
+  BEGIN_OF_MED(LOC);
 
     _vtkFile = new ofstream();
 
-    END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   /*!
@@ -115,26 +117,26 @@ public :
   */
   ~VTK_FIELD_DRIVER()
   {
-  const char * LOC ="VTK_FIELD_DRIVER::~VTK_FIELD_DRIVER()";
-  BEGIN_OF(LOC);
+  const char* LOC = "VTK_FIELD_DRIVER::~VTK_FIELD_DRIVER()";
+  BEGIN_OF_MED(LOC);
 
-  close();
+    close();
 
-  SCRUTE(_vtkFile);
+    SCRUTE_MED(_vtkFile);
 
-  delete _vtkFile ;
+    delete _vtkFile ;
 
-  SCRUTE(_vtkFile);
+    SCRUTE_MED(_vtkFile);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void openConst() const throw (MEDEXCEPTION)
   {
     const char * LOC = "VTK_FIELD_DRIVER::openConst()" ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
-    MESSAGE(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
+    MESSAGE_MED(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
 
     if ( _fileName == "" )
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -149,8 +151,8 @@ public :
 //    else
 
 
-    SCRUTE((*_vtkFile).is_open());
-    SCRUTE(_vtkFile);
+    SCRUTE_MED((*_vtkFile).is_open());
+    SCRUTE_MED(_vtkFile);
 
 
 
@@ -158,15 +160,15 @@ public :
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				       << _fileName)
 			    );
-    END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void openConstAppend() const throw (MEDEXCEPTION)
   {
     const char * LOC = "VTK_FIELD_DRIVER::openConstAppend()" ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
-    MESSAGE(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
+    MESSAGE_MED(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
 
     if ( _fileName == "" )
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -174,16 +176,16 @@ public :
 				       )
 			    );
 
-    SCRUTE((*_vtkFile).is_open());
+    SCRUTE_MED((*_vtkFile).is_open());
 
     if (!(*_vtkFile).is_open())
       {
-	MESSAGE(LOC<<"The file is already close and it is opened with the right option");
+	MESSAGE_MED(LOC<<"The file is already close and it is opened with the right option");
 	(*_vtkFile).open(_fileName.c_str(), ofstream::out | ofstream::app) ; 
       }
     else
       {
-	MESSAGE(LOC<<"The file is still open, it is closed to make sure that it will be opened with the right option");
+	MESSAGE_MED(LOC<<"The file is still open, it is closed to make sure that it will be opened with the right option");
 	//	closeConst();
 
 
@@ -196,8 +198,8 @@ public :
 //    else
 
 
-    SCRUTE((*_vtkFile).is_open());
-    SCRUTE(_vtkFile);
+    SCRUTE_MED((*_vtkFile).is_open());
+    SCRUTE_MED(_vtkFile);
 
 
 
@@ -205,7 +207,7 @@ public :
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				       << _fileName)
 			    );
-    END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void open() throw (MEDEXCEPTION)
@@ -221,10 +223,10 @@ public :
   void closeConst() const throw (MEDEXCEPTION)
   {
     const char * LOC = "VTK_FIELD_DRIVER::closeConst() " ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
-    SCRUTE(_vtkFile);
-    SCRUTE(*_vtkFile);
+    SCRUTE_MED(_vtkFile);
+    SCRUTE_MED(*_vtkFile);
 
 
     if ((*_vtkFile).is_open())
@@ -234,15 +236,16 @@ public :
 //      _status = MED_CLOSED ;
 //    else
 
-    SCRUTE(_vtkFile);
-    SCRUTE(*_vtkFile);
+    SCRUTE_MED(_vtkFile);
+    SCRUTE_MED(*_vtkFile);
 
-    if (!(*_vtkFile))
+    if ( (*_vtkFile) && _vtkFile->is_open() )
+      //if (!(*_vtkFile))
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
 				       << _fileName)
 			    );
 
-    END_OF(LOC);
+  END_OF_MED(LOC);
   }
 
   void close() {
@@ -318,12 +321,14 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   throw (MEDEXCEPTION)
 {
   const char * LOC = "VTK_FIELD_DRIVER::write(void) const " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // we get the Support and its associated Mesh
 
   const SUPPORT * supportField = _ptrField->getSupport();
   MESH * meshField = supportField->getMesh();
+  if (! meshField )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": mesh was not read before writing")) ;
 
   // Well we must open vtk file first, because there are
   // no other driver than MED for VTK that do it !
@@ -586,8 +591,8 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
 
   MED_EN::med_type_champ fieldType = _ptrField->getValueType() ;
 
-  SCRUTE(name.str());
-  SCRUTE(fieldType);
+  SCRUTE_MED(name.str());
+  SCRUTE_MED(fieldType);
 
   switch (fieldType)
     {
@@ -645,19 +650,21 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   
   if ( _ptrField->getInterlacingType() != MED_EN::MED_NO_INTERLACE )
     delete tmpArray;
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   throw (MEDEXCEPTION)
 {
   const char * LOC = "VTK_FIELD_DRIVER::writeAppend(void) const " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // we get the Support and its associated Mesh
 
   const SUPPORT * supportField = _ptrField->getSupport();
   MESH * meshField = supportField->getMesh();
+  if (! meshField )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": mesh was not read before writing")) ;
 
   // Well we must open vtk file first, because there are
   // no other driver than MED for VTK that do it !
@@ -695,8 +702,8 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
 
   MED_EN::med_type_champ fieldType = _ptrField->getValueType() ;
 
-  SCRUTE(name.str());
-  SCRUTE(fieldType);
+  SCRUTE_MED(name.str());
+  SCRUTE_MED(fieldType);
   switch (fieldType)
     {
     case MED_EN::MED_INT32 :
@@ -752,7 +759,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   if ( _ptrField->getInterlacingType() != MED_EN::MED_NO_INTERLACE )
     delete tmpArray;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 }//End namespace MEDMEM
 

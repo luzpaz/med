@@ -1,7 +1,4 @@
-#  SALOMELocalTrace : log on local machine
-#
-#  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +16,8 @@
 #
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+#  SALOMELocalTrace : log on local machine
+#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES = libMEDSPLITTERTest.la
@@ -33,7 +32,7 @@ salomeinclude_HEADERS = MEDSPLITTERTest.hxx
 libMEDSPLITTERTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) \
 	$(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ $(BOOST_CPPFLAGS) $(LIBXML_CXXFLAGS) \
 	-I$(srcdir)/.. -I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM \
-	-I$(srcdir)/../../MEDMEM/Test
+	-I$(srcdir)/../../MEDMEMCppTest
 libMEDSPLITTERTest_la_LDFLAGS= $(MED2_LIBS) @CPPUNIT_LIBS@
 
 if MED_ENABLE_KERNEL
@@ -63,5 +62,8 @@ if MED_ENABLE_KERNEL
      TestMEDSPLITTER_LDADD+= -lSALOMEBasics
 endif
 
-salomescript_DATA = testMEDSPLITTER.py
+dist_salomescript_DATA = testMEDSPLITTER.py
+
 UNIT_TEST_PROG = TestMEDSPLITTER
+
+check: tests

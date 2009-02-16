@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef CONNECTIVITY_HXX
 #define CONNECTIVITY_HXX
@@ -23,17 +25,32 @@
 #include <MEDMEM.hxx>
 
 #include <vector>
-
+#include <set>
+#include <map>
 #include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_PolyhedronArray.hxx"
 #include "MEDMEM_CellModel.hxx"
+#ifndef WNT
+#include <ext/hash_map>
+#else
+#include <hash_map>
+#endif
+
+#ifndef WNT
+using namespace __gnu_cxx;
+#else
+using namespace std;
+using stdext::hash_map;
+#endif
 
 namespace MEDMEM {
 class MEDSKYLINEARRAY;
  class FAMILY;
 class GROUP;
+  class CONNECTIVITY;
+  MEDMEM_EXPORT ostream & operator<<(ostream &os, CONNECTIVITY &my);
 
 /*!
 	This class deals with all type of connectivity .\n
@@ -44,6 +61,29 @@ class GROUP;
 class MEDMEM_EXPORT CONNECTIVITY
 /* ------------------------------------------- */
 {
+
+  class myHashFn
+	{
+	public:
+		size_t operator()(const vector<int>& key) const
+		{
+			size_t sum=0;
+			for (int i=0; i<(int)key.size(); i++)
+				sum+=key[i];
+			return sum;
+		}
+#ifdef WNT
+    static const size_t bucket_size = 4;
+    static const size_t min_buckets = 8;
+		bool operator()(const vector<int>& key1, const vector<int>& key2) const
+		{
+      return ::size_t()(key1) < ::size_t()(key2);
+		}
+#endif		
+	};
+
+  typedef hash_map<vector<int>,int, myHashFn > CONNECTIVITY_HashMap;
+
   /* ---------------------- */
   /*	Class Attributs     */
   /* ---------------------- */
@@ -55,19 +95,19 @@ protected:
   MED_EN::medConnectivity         _typeConnectivity;
 					 /*! count of differents cells types
 					    used by the mesh */
-  int                 _numberOfTypes;
+  int                             _numberOfTypes;
 					/*! array of all med_geometric_type used by MESH. */
   MED_EN::medGeometryElement*     _geometricTypes;
 
 					/*! map indexed by med_geometric_type
 					    which contains the different
 					    'CellModel' used by MESH. */
-  CELLMODEL *             _type;
+  CELLMODEL *      _type;
 					/*! contains the dimension of the entity */
-  int                 _entityDimension;
+  int              _entityDimension;
 
                     			/*! needed by calculateReverseNodalConnectivity */
-  int                 _numberOfNodes;
+  int              _numberOfNodes;
 
   					 /*! array of size _numberOfTypes+1 which
 					 gives for each cell type the first
@@ -78,7 +118,7 @@ protected:
 					 ( 0 <= i < _numberOfTypes ).
                                   	 Note that _count[_numberOfTypes] returns
 					 total cells count + 1 */
-  int *               _count;
+  int *            _count;
 
 					/*! pointer to an array which stores the nodal connectivity */
   MEDSKYLINEARRAY* _nodal;
@@ -108,7 +148,10 @@ protected:
   MEDSKYLINEARRAY* _neighbourhood;
 					/*! connectivity of sub cell if
 					    descendant connectivity is calculated */
-  CONNECTIVITY * _constituent;
+  CONNECTIVITY *   _constituent;
+					/*! is descending connectivity computed by 
+					    calculatePartialDescendingConnectivity() */
+  bool             _isDescendingConnectivityPartial;
 
   /* -------------------- */
   /*    Class Methods     */
@@ -127,6 +170,13 @@ private:
 					    does nothing if already exists, else
 					    evaluates _descending from _nodal */
   void calculateDescendingConnectivity();
+
+  void calculatePartialDescendingConnectivity();
+  void addToDescendingConnectivity( const set<int>&    nodes,
+                                    multimap<int,int>& descending,
+                                    int                iglobal_cell ,
+                                    const CONNECTIVITY_HashMap & );
+	
 					/*! private method :\n
 					    does nothing if already exists, else
 					    evaluates from _descending */
@@ -180,7 +230,7 @@ public:
                                         throw (MEDEXCEPTION);
 
   inline void setNumberOfNodes(int NumberOfNodes);
-
+	inline int getNumberOfNodes();
   inline int getEntityDimension() const;
 
   inline void setEntityDimension(int EntityDimension);
@@ -199,20 +249,22 @@ public:
 				 int NumberOfFaces=0);
 
   inline bool    existConnectivity (MED_EN::medConnectivity connectivityType,
-                                    MED_EN::medEntityMesh Entity) const;
+                                    MED_EN::medEntityMesh   Entity) const;
   bool   existConnectivityWithPoly (MED_EN::medConnectivity connectivityType,
-                                    MED_EN::medEntityMesh Entity) const;
+                                    MED_EN::medEntityMesh   Entity) const;
 
   virtual bool existPolygonsConnectivity (MED_EN::medConnectivity connectivityType,
-                                          MED_EN::medEntityMesh Entity) const;
+                                          MED_EN::medEntityMesh   Entity) const;
 
   virtual bool existPolyhedronConnectivity (MED_EN::medConnectivity connectivityType,
-                                            MED_EN::medEntityMesh Entity) const;
+                                            MED_EN::medEntityMesh   Entity) const;
 
-  virtual void      calculateConnectivity (MED_EN::medConnectivity connectivityType,
-                                           MED_EN::medEntityMesh Entity);
+  virtual void calculateConnectivity (MED_EN::medConnectivity connectivityType,
+                                      MED_EN::medEntityMesh   Entity);
 
-  virtual void          updateFamily (const vector<FAMILY*>& myFamilies);
+  virtual void calculateFullDescendingConnectivity(MED_EN::medEntityMesh Entity);
+
+  virtual void updateFamily (const vector<FAMILY*>& myFamilies);
 
   inline MED_EN::medEntityMesh         getEntity () const;
 
@@ -284,6 +336,8 @@ public:
   const int*      getNeighbourhood() const;
   void invertConnectivityForAFace(int faceId, const int *nodalConnForFace, bool polygonFace=false);
   bool deepCompare(const CONNECTIVITY& other) const;
+
+
 };
 /*----------------------*/
 /* Methodes Inline	*/
@@ -304,14 +358,14 @@ inline MED_EN::medEntityMesh CONNECTIVITY::getEntity() const
 inline int CONNECTIVITY::getNumberOfTypes(MED_EN::medEntityMesh Entity) const
 //-----------------------------------------------------------------------//
 {
-  MESSAGE("CONNECTIVITY::getNumberOfTypes : Entity = "<<Entity<<", _entity = "<<_entity);
+  MESSAGE_MED("CONNECTIVITY::getNumberOfTypes : Entity = "<<Entity<<", _entity = "<<_entity);
   if (_entity==Entity)
     return _numberOfTypes;
   else if (_constituent!=NULL)
     return _constituent->getNumberOfTypes(Entity);
   else if (_constituent == NULL)
     {
-      MESSAGE("CONNECTIVITY::getNumberOfTypes : _constituent == NULL");
+      MESSAGE_MED("CONNECTIVITY::getNumberOfTypes : _constituent == NULL");
       try
 	{
 	  (const_cast <CONNECTIVITY *> (this))->calculateDescendingConnectivity();
@@ -321,7 +375,7 @@ inline int CONNECTIVITY::getNumberOfTypes(MED_EN::medEntityMesh Entity) const
 	  return 0 ;
 	}
 
-      SCRUTE(_entityDimension);
+      SCRUTE_MED(_entityDimension);
 
       if (_entityDimension != 2 && _entityDimension != 3) return 0;
 
@@ -408,7 +462,7 @@ inline bool CONNECTIVITY::existPolygonsConnectivity(MED_EN::medConnectivity Conn
 {
   if (_entity == Entity)
     {
-      MESSAGE("existPolygonsConnectivity : _entity == Entity = "<<Entity);
+      MESSAGE_MED("existPolygonsConnectivity : _entity == Entity = "<<Entity);
       if (ConnectivityType == MED_EN::MED_NODAL && _polygonsNodal != (MEDSKYLINEARRAY*) NULL)
 	return true;
       if (ConnectivityType == MED_EN::MED_DESCENDING && _polygonsDescending != (MEDSKYLINEARRAY*) NULL)
@@ -427,7 +481,7 @@ inline bool CONNECTIVITY::existPolyhedronConnectivity(MED_EN::medConnectivity Co
 {
   if (_entity == Entity)
     {
-      MESSAGE("existPolyhedronConnectivity : _entity == Entity = "<<Entity);
+      MESSAGE_MED("existPolyhedronConnectivity : _entity == Entity = "<<Entity);
       if (ConnectivityType == MED_EN::MED_NODAL && _polyhedronNodal != (POLYHEDRONARRAY*) NULL)
 	return true;
       if (ConnectivityType == MED_EN::MED_DESCENDING && _polyhedronDescending != (MEDSKYLINEARRAY*) NULL)
@@ -546,6 +600,11 @@ inline void CONNECTIVITY::setNumberOfNodes(int NumberOfNodes)
     _numberOfNodes=NumberOfNodes;
 }
 
+inline int CONNECTIVITY::getNumberOfNodes()
+{
+	return _numberOfNodes;
+}
+
 inline void CONNECTIVITY::setEntityDimension(int EntityDimension)
 {
     _entityDimension=EntityDimension;
@@ -566,6 +625,20 @@ MED_EN::medGeometryElement CONNECTIVITY::getPolyTypeRelativeTo() const
     throw MEDEXCEPTION("getPolyTypeRelativeTo : ");
 }
 
+
+
+
 }//End namespace MEDMEM
+
+// namespace __gnu_cxx {
+// template <> struct hash< std::vector<int> > {
+// 	size_t operator()(const std::vector<int>& input) {
+// 			size_t sum=0;
+// 			for (int i=0; i<input.size();i++)
+// 				sum+=input[i];
+// 			return sum;
+//     }
+// };
+//}
 
 #endif /* CONNECTIVITY_HXX */

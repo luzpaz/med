@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 %module libMEDMEM_Swig
 
@@ -49,21 +51,28 @@
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_DriverFactory.hxx"
 #include "MEDMEM_GaussLocalization.hxx"
+#include "MEDMEM_EnsightMedDriver.hxx"
+#include "MEDMEM_EnsightMeshDriver.hxx"
+#include "MEDMEM_EnsightFieldDriver.hxx"
 #include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_SWIG_Templates.hxx"
+#include "PointLocator.hxx"
 
   using namespace MEDMEM;
   using namespace MED_EN;
-
+	using namespace INTERP_KERNEL;
   /*  typedef FIELD <double, FullInterlace> FIELDDOUBLEFULLINTERLACE;*/
   /*  typedef FIELD <int, FullInterlace> FIELDINTFULLINTERLACE;*/
   typedef FIELD <double, FullInterlace> FIELDDOUBLE;
-  typedef FIELD <int, FullInterlace> FIELDINT;
+  typedef FIELD <int   , FullInterlace> FIELDINT;
   typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
-  typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
+  typedef FIELD <int   , NoInterlace> FIELDINTNOINTERLACE;
   typedef FIELD <double, NoInterlaceByType> FIELDDOUBLENOINTERLACEBYTYPE;
-  typedef FIELD <int, NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
+  typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 
+  // to keep old scripts working
+  typedef enum {MED_LECT=RDONLY, MED_ECRI=WRONLY, MED_REMP=RDWR} med_mode_acces_old;
+  
 %}
 
 /*
@@ -75,11 +84,11 @@
 /*typedef FIELD <double, FullInterlace> FIELDDOUBLEFULLINTERLACE;*/
 /*typedef FIELD <int, FullInterlace> FIELDINTFULLINTERLACE;*/
 typedef FIELD <double, FullInterlace> FIELDDOUBLE;
-typedef FIELD <int, FullInterlace> FIELDINT;
+typedef FIELD <int   , FullInterlace> FIELDINT;
 typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
-typedef FIELD <int, NoInterlace> FIELDINTNOINTERLACE;
+typedef FIELD <int   , NoInterlace> FIELDINTNOINTERLACE;
 typedef FIELD <double, NoInterlaceByType> FIELDDOUBLENOINTERLACEBYTYPE;
-typedef FIELD <int, NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
+typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 
 %include "typemaps.i"
 %include "my_typemap.i"
@@ -148,7 +157,7 @@ typedef FIELD <int, NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 
   if(PyCallable_Check($input) == 0)
     {
-      char * message = "Error in typemap(python,in) for double or integer callable fonction pointeur : the argument should be a callable object";
+      const char * message = "Error in typemap(python,in) for double or integer callable fonction pointeur : the argument should be a callable object";
       PyErr_SetString(PyExc_RuntimeError, message);
       return NULL;
     }
@@ -230,7 +239,7 @@ typedef FIELD <int, NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
       int err = PyList_SetItem(py_list, i, type_converter( arrayvar[ i ]));
       if(err)
 	{
-	  char * message = "Error in " #method;
+	  const char * message = "Error in " #method;
 	  PyErr_SetString(PyExc_RuntimeError, message);
 	  return NULL;
 	}
@@ -276,7 +285,7 @@ typedef FIELD <int, NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
                                 SWIG_POINTER_EXCEPTION);
       if (err == -1)
       {
-        char * message = "Error in typemap(python,in) for vector<TYPE>"
+        const char * message = "Error in typemap(python,in) for vector<TYPE>"
           "each component should be a TYPE";
         PyErr_SetString(PyExc_RuntimeError, message);
         return NULL;
@@ -358,7 +367,8 @@ typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
 
 typedef enum {MED_FULL_INTERLACE, MED_NO_INTERLACE} medModeSwitch;
 
-typedef enum {MED_LECT, MED_ECRI, MED_REMP} med_mode_acces;
+typedef enum {RDONLY, WRONLY, RDWR} med_mode_acces;
+typedef enum {MED_LECT, MED_ECRI, MED_REMP} med_mode_acces_old;// to keep old scripts working
 
 typedef enum {ASCENDING=7,DESCENDING=77} med_sort_direc;
 
@@ -375,7 +385,7 @@ typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
 typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ;
 
 typedef enum {MED_DRIVER=0, GIBI_DRIVER=1, PORFLOW_DRIVER = 2, VTK_DRIVER=254,
-	      NO_DRIVER=255, ASCII_DRIVER = 3} driverTypes;
+	      NO_DRIVER=255, ASCII_DRIVER = 3, ENSIGHT_DRIVER = 250 } driverTypes;
 
 typedef enum {MED_REEL64=6, MED_INT32=24, MED_INT64=26} med_type_champ;
 
@@ -495,7 +505,7 @@ class SUPPORT
 
   void setNumberOfElements(int *NumberOfElements);
 
-  void setTotalNumberOfElements(int TotalNumberOfElements);
+  //void setTotalNumberOfElements(int TotalNumberOfElements);
 
   void getBoundaryElements();
 
@@ -694,7 +704,7 @@ public:
   int addDriver(driverTypes driverType,
 		const std::string& fileName="Default File Name.med",
                 const std::string& driverName="Default Field Name",
-		med_mode_acces access=MED_REMP);
+		med_mode_acces access=RDWR);
 
   %extend {
     %newobject getSupportAndOwner();
@@ -833,7 +843,7 @@ public:
 
     PyObject *  applyPyFunc( PyObject * func )
       {
-        MESSAGE("Appel de applyPyFunc");
+        MESSAGE_MED("Appel de applyPyFunc");
         if (!PyCallable_Check(func)) {
           PyErr_SetString(PyExc_TypeError, "FIELD.applyPyFunc prend en argument une fonction");
           return NULL;
@@ -863,7 +873,7 @@ public:
     %newobject __add__(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * __add__(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator +  : Creation of the addition of two FIELDs");
+	MESSAGE_MED("operator +  : Creation of the addition of two FIELDs");
 	
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::add( *(FIELD<T1, INTERLACING_TAG>*)self ,
@@ -874,7 +884,7 @@ public:
     %newobject __sub__(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * __sub__(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator -  : Creation of the substraction of two FIELDs");
+	MESSAGE_MED("operator -  : Creation of the substraction of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::sub( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					   (FIELD<T1, INTERLACING_TAG>&)m );
@@ -884,7 +894,7 @@ public:
     %newobject __mul__(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * __mul__(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator *  : Creation of the multiplication of two FIELDs");
+	MESSAGE_MED("operator *  : Creation of the multiplication of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::mul( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					   (FIELD<T1, INTERLACING_TAG>&)m );
@@ -894,7 +904,7 @@ public:
     %newobject __div__(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * __div__(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator /  : Creation of the division of two FIELDs");
+	MESSAGE_MED("operator /  : Creation of the division of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::div( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					   (FIELD<T1, INTERLACING_TAG>&)m );
@@ -904,7 +914,7 @@ public:
     %newobject addDeep(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * addDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator +  : Creation of the addition of two FIELDINTs");
+	MESSAGE_MED("operator +  : Creation of the addition of two FIELDINTs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::addDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					       (FIELD<T1, INTERLACING_TAG>&)m );
@@ -914,7 +924,7 @@ public:
     %newobject subDeep(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * subDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator -  : Creation of the substraction of two FIELDs");
+	MESSAGE_MED("operator -  : Creation of the substraction of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::subDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					       (FIELD<T1, INTERLACING_TAG>&)m );
@@ -924,7 +934,7 @@ public:
     %newobject mulDeep(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * mulDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator *  : Creation of the multiplication of two FIELDs");
+	MESSAGE_MED("operator *  : Creation of the multiplication of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::mulDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					       (FIELD<T1, INTERLACING_TAG>&)m );
@@ -934,7 +944,7 @@ public:
     %newobject divDeep(const FIELD<T1, INTERLACING_TAG> & );
     FIELD<T1, INTERLACING_TAG> * divDeep(const FIELD<T1, INTERLACING_TAG> & m)
       {
-	MESSAGE("operator /  : Creation of the division of two FIELDs");
+	MESSAGE_MED("operator /  : Creation of the division of two FIELDs");
 	FIELD<T1, INTERLACING_TAG>* result =
 	  FIELD<T1, INTERLACING_TAG>::divDeep( *(FIELD<T1, INTERLACING_TAG>*)self ,
 					       (FIELD<T1, INTERLACING_TAG>&)m );
@@ -1058,6 +1068,8 @@ public :
   int getMeshDimension();
 
   int getNumberOfNodes();
+  
+  void convertToPoly();
 
   bool getIsAGrid();
 
@@ -1103,6 +1115,8 @@ public :
                                    medEntityMesh Entity);
 
   medGeometryElement getElementTypeWithPoly(medEntityMesh Entity,int Number);
+
+  SUPPORT * getSupportOnAll(medEntityMesh Entity);
 
   std::string getName() const;
   
@@ -1154,15 +1168,15 @@ public :
       }
 
     int addDriver(driverTypes driverType,
-		  char * fileName="Default File Name.med",
-		  char * driverName="Default Mesh Name",
-		  med_mode_acces access=MED_REMP)
+		  const char * fileName="Default File Name.med",
+		  const char * driverName="Default Mesh Name",
+		  med_mode_acces access=RDWR)
       {
 	return self->addDriver(driverType,string(fileName),
 			       string(driverName),access);
       }
 
-    void write(int index=0, char * driverName="")
+    void write(int index=0, const char * driverName="")
       {
 	self->write(index, string(driverName));
       }
@@ -1496,8 +1510,8 @@ class GRID : public MESH
         i++;
         break;
       default:
-        char * message = "Error in GRID::getEntityPosition: wrong Entity";
-        PyErr_SetString(PyExc_RuntimeError, message);
+        const char * message = "Error in GRID::getEntityPosition: wrong Entity";
+        PyErr_SetString(PyExc_RuntimeError, (char *)message);
         return NULL;
       }
       PyObject *py_list = PyList_New( size );
@@ -1507,8 +1521,8 @@ class GRID : public MESH
                                  Py_BuildValue("i", ijk[j++]));
         if(err)
         {
-          char * message = "Error in GRID::getNodePosition";
-          PyErr_SetString(PyExc_RuntimeError, message);
+          const char * message = "Error in GRID::getNodePosition";
+          PyErr_SetString(PyExc_RuntimeError, (char *)message);
           return NULL;
         }
       }
@@ -1520,6 +1534,34 @@ class GRID : public MESH
       return result;
     }
   }
+};
+
+class PointLocator
+{
+public:
+	PointLocator(const MESH& mesh);
+	virtual ~PointLocator();
+	%extend{
+	  PyObject* locate(const double* x)
+	    {
+		    std::list<int> mylist = self->locate(x);
+			  if (mylist.size()>10)
+			  {
+			  const char * message = "Error in PointLocator : SWIG interface limits the number of cells to 10";
+        PyErr_SetString(PyExc_RuntimeError, (char *)message);
+        return NULL;
+				}
+			  
+			  int array[10]; // maximum number of cells in which the point lies
+			  int index=0;
+			  for (list<int>::const_iterator iter= mylist.begin();
+			   iter != mylist.end();
+			  	iter++)
+				    array[index++]= *iter;
+		    TYPEMAP_OUTPUT_ARRAY(array, mylist.size(), PyInt_FromLong,
+			     PointLocator::locate);
+      }
+   }
 };
 
 class MED
@@ -1554,8 +1596,8 @@ class MED
       }
 
     int addDriver(driverTypes driverType,
-		  char * fileName="Default File Name.med",
-		  med_mode_acces access=MED_REMP)
+		  const char * fileName="Default File Name.med",
+		  med_mode_acces access=RDWR)
       {
 	return self->addDriver(driverType,string(fileName),access);
       }
@@ -2099,6 +2141,10 @@ class MED_MESH_RDONLY_DRIVER
 
   void read ( void ) ;
 
+  void desactivateFacesComputation();
+
+  void activateFacesComputation();
+
   %extend {
     MED_MESH_RDONLY_DRIVER(char * fileName,  MESH * ptrMesh)
       {
@@ -2388,8 +2434,89 @@ public:
 %template (ASCII_FIELDDOUBLE_DRIVER) ASCII_FIELD_DRIVER< double >;
 %template (ASCII_FIELDINT_DRIVER) ASCII_FIELD_DRIVER< int >;
 
+//=======================================================================
 /*
+  EnSight drivers
 */
+// ---------------------------------------------------------------
+//!< supported formats
+enum EnSightFormat { ENSIGHT_6, ENSIGHT_GOLD };
+
+// ---------------------------------------------------------------
+//!< set writing format
+
+void setEnSightFormatForWriting (EnSightFormat format, bool isBinary);
+
+// ---------------------------------------------------------------
+//!< To raise or not if MEDMEM-EnSight incompatibility encounters or suspected.
+// See MEDMEM_EnsightUtils.hxx for raison why
+
+void setIgnoreIncompatibility(bool toIgnore=true);
+
+// ---------------------------------------------------------------
+//!< EnSight reading driver reads all meshes and fields
+
+class ENSIGHT_MED_RDONLY_DRIVER
+{
+public:
+  ENSIGHT_MED_RDONLY_DRIVER(const std::string & fileName,  MED * ptrMed);
+  void read();
+  void readFileStruct();
+};
+// ---------------------------------------------------------------
+//!< EnSight writing driver
+
+class ENSIGHT_MED_WRONLY_DRIVER
+{
+public :
+  ENSIGHT_MED_WRONLY_DRIVER(const std::string & fileName, MED * ptrMed);
+  void write();
+};
+// ---------------------------------------------------------------
+//!< EnSight mesh reading driver
+
+class ENSIGHT_MESH_RDONLY_DRIVER
+{
+public :
+  //!< to read mesh of index-th time step
+  ENSIGHT_MESH_RDONLY_DRIVER(const std::string & fileName, MESH * ptrMesh, int index=1);
+  void read();
+};
+// ---------------------------------------------------------------
+//!< Writing EnSight mesh driver.
+
+class ENSIGHT_MESH_WRONLY_DRIVER
+{
+public :
+  ENSIGHT_MESH_WRONLY_DRIVER(const std::string & fileName, MESH * ptrMesh, bool append=false);
+  void write();
+};
+// ---------------------------------------------------------------
+//!< EnSight field reading driver
+
+class ENSIGHT_FIELD_RDONLY_DRIVER
+{
+public :
+  //!< Set the name of the FIELD in EnSight file
+  void setFieldName(const string & fieldName);
+  //!<  read the field of a specified name and index-th time step.
+  ENSIGHT_FIELD_RDONLY_DRIVER(const std::string & fileName, FIELD_ * ptrField, int step=1);
+  void read();
+};
+// ---------------------------------------------------------------
+//!< Writing EnSight field driver.
+
+class ENSIGHT_FIELD_WRONLY_DRIVER
+{
+public :
+  //!< Set the name of the FIELD in EnSight file
+  void setFieldName(const std::string & fieldName);
+  ENSIGHT_FIELD_WRONLY_DRIVER(const std::string & fileName, FIELD_ * ptrField);
+  //!<  Write FIELD, the mesh is supposed to be written in this file.
+  void write();
+};
+// end of EnSight drivers
+//=======================================================================
 
 
 template <class INTERLACING_TAG> class GAUSS_LOCALIZATION
@@ -2485,8 +2612,8 @@ template <class INTERLACING_TAG> class GAUSS_LOCALIZATION
   template<class T, class INTERLACING_TAG>
     FIELD<T, INTERLACING_TAG> * createTypedFieldFromField(FIELD_ * field)
     {
-      MESSAGE("createTypedFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
-      MESSAGE("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
+      MESSAGE_MED("createTypedFieldFromField : Constructor (for Python API) FIELD<T> with parameter FIELD_");
+      MESSAGE_MED("Its returns a proper cast of the input pointer :: FIELD_ --> FIELD<T>");
       if ( field ) {
         if (field->getInterlacingType() != SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType)
           throw MEDEXCEPTION("cast to wrong medModeSwitch (_interlacingType)");
@@ -2571,14 +2698,14 @@ GRID * createGridFromMesh( MESH * aMesh );
 %{
   GRID * createGridFromMesh( MESH * aMesh )
     {
-      MESSAGE("createGridFromMesh : Constructor (for Python API) GRID with parameter MESH *");
-      MESSAGE("Its returns a proper cast of the input pointer :: MESH --> GRID");
+      MESSAGE_MED("createGridFromMesh : Constructor (for Python API) GRID with parameter MESH *");
+      MESSAGE_MED("Its returns a proper cast of the input pointer :: MESH --> GRID");
 
       if (aMesh->getIsAGrid())
         return (GRID *) aMesh;
 
-      char * message = "Error in GRID(mesh): mesh is not a grid";
-      PyErr_SetString(PyExc_RuntimeError, message);
+      const char * message = "Error in GRID(mesh): mesh is not a grid";
+      PyErr_SetString(PyExc_RuntimeError, (char *)message);
       return NULL;
     }
 
@@ -2587,7 +2714,7 @@ GRID * createGridFromMesh( MESH * aMesh );
 							int NumberOfComponents,
 							PyObject * double_function)
     {
-      MESSAGE("createFieldFromAnalytic : Constructor (for Python API) FIELD from an analytic fonction");
+      MESSAGE_MED("createFieldFromAnalytic : Constructor (for Python API) FIELD from an analytic fonction");
 
       FIELD<T, INTERLACING_TAG> * fieldAnalytic =
 	new FIELD<T, INTERLACING_TAG>(Support, NumberOfComponents);

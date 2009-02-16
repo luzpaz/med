@@ -1,0 +1,25 @@
+#! /bin/sh -f
+
+outdir="/tmp"
+if test "z$TMP" != "z" && test -e $TMP; then
+    outdir=$TMP
+else
+ if test "z$TMPDIR" != "z" && test -e $TMPDIR; then
+    outdir=$TMPDIR
+ fi
+fi
+
+initfile=${srcdir}/../../resources/TimeStamps.med
+infile=$outdir/testAnalFile.med
+
+cp $initfile $infile
+
+./testAnalFile $infile
+
+ok=$?
+
+rm $infile
+rm $outdir/testAnalFileAnal_V21.med
+rm $outdir/testAnalFileAnal_V22.med
+
+exit $ok

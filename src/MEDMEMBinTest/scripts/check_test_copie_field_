@@ -1,0 +1,21 @@
+#! /bin/sh -f
+
+outdir="/tmp"
+if test "z$TMP" != "z" && test -e $TMP; then
+    outdir=$TMP
+else
+ if test "z$TMPDIR" != "z" && test -e $TMPDIR; then
+    outdir=$TMPDIR
+ fi
+fi
+
+infile=${srcdir}/../../resources/pointe.med
+
+./test_copie_field_ $infile maa1 fieldcelldoublevector
+
+if test $? -ne 0; then exit -1;fi
+
+./test_copie_field_ $infile maa1 fieldnodeint
+
+exit
+

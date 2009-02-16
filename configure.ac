@@ -1,15 +1,35 @@
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
 # Author : Marc Tajchman (CEA)
 # Date : 28/06/2001
 # Modified by : Patrick GOLDBRONN (CEA)
 # Modified by : Marc Tajchman (CEA)
 # Modified by : Mikhail PONIKAROV (OCN)
 #
-
-AC_INIT([Salome2 Project MED module], [4.1.1], [webmaster.salome@opencascade.com], [salome])
+AC_INIT([Salome2 Project MED module], [5.1.0], [webmaster.salome@opencascade.com], [SalomeMED])
 AC_CONFIG_AUX_DIR(salome_adm/unix/config_files)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([tar-pax])
 
 XVERSION=`echo $VERSION | awk -F. '{printf("0x%02x%02x%02x",$1,$2,$3)}'`
 AC_SUBST(XVERSION)
@@ -208,7 +228,6 @@ echo
 
 CHECK_HDF5
 
-
 echo
 echo ---------------------------------------------
 echo BOOST Library
@@ -216,7 +235,6 @@ echo ---------------------------------------------
 echo
 
 CHECK_BOOST
-
 
 echo
 echo ---------------------------------------------
@@ -233,40 +251,25 @@ echo "MED_WITH_GUI   : ${MED_WITH_GUI}"
 echo ---------------------------------------------
 
 openpbs_ok=no
-# CHECK_OPENPBS ONLY if MED_WITH_KERNEL=yes
-# echo
-# echo ---------------------------------------------
-# echo testing OpenPBS
-# echo ---------------------------------------------
-# echo
-
-# CHECK_OPENPBS
-# dnl openpbs_ok is set to yes by CHECK_OPENPBS
-
-# CHECK_LSF ONLY if MED_WITH_KERNEL=yes
-# echo
-# echo ---------------------------------------------
-# echo testing LSF
-# echo ---------------------------------------------
-# echo
+# CHECK_OPENPBS ONLY if MED_WITH_KERNEL is yes
 
 lsf_ok=no
-# CHECK_LSF
-# dnl lsf_ok is set to yes by CHECK_LSF
+# CHECK_LSF ONLY if MED_WITH_KERNEL is yes
 
 echo
 echo ----------------------------------------------
 echo testing CPPUNIT only required for unit testing
 echo ----------------------------------------------
 echo
+
 CHECK_CPPUNIT
-#AM_CONDITIONAL(CPPUNIT_IS_OK, test)
 
 echo
 echo ---------------------------------------------
 echo checking SPLITTER
 echo ---------------------------------------------
 echo
+
 AC_ENABLE_SPLITTER(yes)
 AM_CONDITIONAL(MED_ENABLE_SPLITTER, [test "$ENABLE_SPLITTER" = yes])
 
@@ -303,11 +306,35 @@ fi
 AM_CONDITIONAL(MED_ENABLE_METIS, [test "$ENABLE_METIS" = yes])
 AM_CONDITIONAL(MED_ENABLE_SCOTCH, [test "$ENABLE_SCOTCH" = yes])
 
+dnl
+dnl ---------------------------------------------
+dnl testing MPI
+dnl ---------------------------------------------
+dnl
+
+CHECK_MPI
+#CHECK_MPICH
+AM_CONDITIONAL(MED_WITHMPI, [test "$WITHMPI" = yes])
+
+echo
+echo ---------------------------------------------
+echo Testing FVM library generators
+echo ---------------------------------------------
+echo
+
+CHECK_FVM
+AM_CONDITIONAL(MED_ENABLE_FVM, [test "$ENABLE_FVM" = yes])
+
+echo
+echo ---------------------------------------------
+echo Testing html generators
+echo ---------------------------------------------
+echo
+
+CHECK_HTML_GENERATORS
 
 if test "${MED_WITH_KERNEL}" = "yes"; then
 {
-
-
         echo
         echo ---------------------------------------------
         echo testing OpenPBS
@@ -355,23 +382,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 		lex_yacc_ok=yes
 	fi
 
-	dnl
-	dnl ---------------------------------------------
-	dnl testing MPI
-	dnl ---------------------------------------------
-	dnl
-
-	CHECK_MPI
-	CHECK_MPICH
-
-	dnl echo
-	dnl echo ---------------------------------------------
-	dnl echo testing java
-	dnl echo ---------------------------------------------
-	dnl echo
-
-	dnl CHECK_JAVA
-
 	echo
 	echo ---------------------------------------------
 	echo testing omniORB
@@ -418,15 +428,15 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 		echo
 
 		CHECK_VTK
+
+		echo
+		echo ---------------------------------------------
+		echo Testing OpenCascade
+		echo ---------------------------------------------
+		echo
+
+		CHECK_CAS
 	fi
-
-	echo
-	echo ---------------------------------------------
-	echo Testing OpenCascade
-	echo ---------------------------------------------
-	echo
-
-	CHECK_CAS
 
 	echo
 	echo ---------------------------------------------
@@ -443,24 +453,6 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	dnl echo
 
 	dnl CHECK_MICO
-
-	if test "${MED_WITH_GUI}" = "yes"; then
-		echo
-		echo ---------------------------------------------
-		echo testing MSG2QM
-		echo ---------------------------------------------
-		echo
-
-		CHECK_MSG2QM
-	fi
-
-	echo
-	echo ---------------------------------------------
-	echo Testing html generators
-	echo ---------------------------------------------
-	echo
-
-	CHECK_HTML_GENERATORS
 }
 else
 {
@@ -469,7 +461,6 @@ else
 	
 	AC_SUBST(WITHIHM)
 	AC_SUBST(WITHOPENPBS)
-	CPPFLAGS="$CPPFLAGS -DMED_WITHOUT_KERNEL"
 }
 fi # MED_WITH_KERNEL
 
@@ -509,14 +500,14 @@ else
    echo Configure
 fi
 
-#variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok boost_ok doxygen_ok graphviz_ok OpenGL_ok qt_ok vtk_ok omniORB_ok occ_ok Kernel_ok"
-
 if test "${MED_WITH_GUI}" = "yes"; then
-variables="cc_ok lex_yacc_ok mpi_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok occ_ok sip_ok pyqt_ok qwt_ok Kernel_ok cppunit_ok"
+  variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok sip_ok pyqt_ok qwt_ok occ_ok doxygen_ok Kernel_ok SalomeGUI_ok"
+else
+  variables="cc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok doxygen_ok Kernel_ok"
 fi
 
-if test "${MED_WITH_GUI}" = "no"; then
-variables="cc_ok mpi_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok occ_ok Kernel_ok cppunit_ok"
+if test "x$ENABLE_SPLITTER" = "xyes"; then
+  variables="$variables metis_ok scotch_ok libxml_ok"
 fi
 
 for var in $variables
@@ -531,30 +522,20 @@ done
 dnl optional variables 
 
 echo "---Optional:"
-variables="metis_ok scotch_ok libxml_ok"
-for var in $variables
-     do
-         eval toto=\$$var
-         if test x$toto != "x"; then
-                printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
-                eval echo \$$var
-         fi
-     done
 
+variables="mpi_ok fvm_ok cppunit_ok"
 if test "${MED_WITH_KERNEL}" = "yes"; then
-{
-        variables="openpbs_ok lsf_ok doxygen_ok graphviz_ok"
- 
-        for var in $variables
-        do
-           eval toto=\$$var
-           if test x$toto != "x"; then
-                printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
-                eval echo \$$var
-           fi
-        done
-}
+   variables="$variables openpbs_ok lsf_ok graphviz_ok"
 fi
+
+for var in $variables
+do
+   eval toto=\$$var
+   if test x$toto != "x"; then
+     printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
+     eval echo \$$var
+   fi
+done
 
 echo
 echo "Default ORB   : $DEFAULT_ORB"
@@ -566,6 +547,10 @@ if test "X$GMAKE" = "Xyes"; then
    AC_SUBST(SETX) SETX=":"
 else
    AC_SUBST(SETX) SETX="set -x"
+fi
+
+if test -n "${NO_MED_TRACE+X}"; then
+    CPPFLAGS="${CPPFLAGS} -D_NO_MED_TRACE_"
 fi
 
 echo
@@ -580,11 +565,12 @@ AC_OUTPUT_COMMANDS([ \
 
 AC_OUTPUT([ \
 	./salome_adm/unix/SALOMEconfig.h \
-	./adm_local_without_kernel/unix/sstream \
+	./adm_local_without_kernel/unix/SALOMEconfig.h \
 	Makefile \
 	./MED_version.h \
 	./adm_local/unix/config_files/Makefile \
         ./adm_local/unix/Makefile \
+        ./adm_local/cmake_files/Makefile \
 	./adm_local/Makefile \
 	./adm_local_without_kernel/unix/config_files/Makefile \
         ./adm_local_without_kernel/unix/Makefile \
@@ -605,12 +591,24 @@ AC_OUTPUT([ \
 	./src/MEDMEM/Doxyfile_med_devel \
 	./src/MEDMEM/Doxyfile_med_user \
 	./src/MEDMEM/Makefile \
-	./src/MEDMEM/Test/Makefile \
 	./src/INTERPOLATION/Makefile \
 	./src/MEDMEM_SWIG/Makefile \
+	./src/MEDMEMBinTest/Makefile \
+	./src/MEDMEMCppTest/Makefile \
+	./src/INTERP_KERNEL/Makefile \
+        ./src/INTERP_KERNEL/Bases/Makefile \
+	./src/INTERP_KERNEL/Geometric2D/Makefile \
+	./src/INTERP_KERNELTest/Makefile \
+        ./src/MEDCoupling/Makefile \
+        ./src/MEDCoupling/Test/Makefile \
 	./src/MEDSPLITTER/Makefile \
 	./src/MEDSPLITTER/Test/Makefile \
+        ./src/MEDSPLITTER_Swig/Makefile \
 	./src/MULTIPR/Makefile \
+	./src/ParaMEDMEM/Makefile \
+        ./src/ParaMEDMEM/MEDLoader/Makefile \
+	./src/ParaMEDMEM/Test/Makefile \
+        ./src/ParaMEDMEM_Swig/Makefile \
 	./src/MEDMEM_I/Makefile \
 	./src/MED/Makefile \
 	./src/MedCorba_Swig/Makefile \
@@ -641,11 +639,9 @@ AC_OUTPUT([ \
 	./doc/MEDMEM/MEDMEM_UsersGuide.tex \
 	./doc/salome/Makefile \
 	./doc/salome/tui/Makefile \
-	./doc/salome/tui/MED/Makefile \
-	./doc/salome/tui/MED/sources/Makefile \
-	./doc/salome/tui/MED/sources/static/Makefile \
-	./doc/salome/tui/MED/doxyfile \
-	./doc/salome/tui/MED/sources/static/tree.js
+	./doc/salome/tui/doxyfile \
+	./doc/doxygen/Makefile \
+	./doc/doxygen/Doxyfile_med_user \
 ])
 
 dnl To avoid recompiling half of the sources because of SALOMEconfig.h recreating

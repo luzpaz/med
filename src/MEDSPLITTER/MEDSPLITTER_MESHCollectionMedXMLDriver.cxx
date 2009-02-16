@@ -1,4 +1,21 @@
-
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #include <vector>
 #include <string>
 #include <map>
@@ -67,7 +84,8 @@ MESHCollectionMedXMLDriver::MESHCollectionMedXMLDriver(MESHCollection* collectio
 int MESHCollectionMedXMLDriver::read(char* filename)
 {
   
-  BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::read()");
+  const char* LOC = "MEDSPLITTER::MESHCollectionDriver::read()";
+  BEGIN_OF_MED(LOC);
   
 		//ditributed meshes
 	vector<int*> cellglobal;
@@ -80,7 +98,7 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 
   // reading ascii master file
   try{
-    MESSAGE("Start reading");
+    MESSAGE_MED("Start reading");
 
     // Setting up the XML tree corresponding to filename
     xmlDocPtr master_doc=xmlParseFile(filename);
@@ -209,7 +227,7 @@ int MESHCollectionMedXMLDriver::read(char* filename)
     xmlXPathFreeContext(xpathCtx); 
     xmlFreeDoc(master_doc); 
   
-		MESSAGE("end of read");
+		MESSAGE_MED("end of read");
   }//of try
   catch(...)
     {
@@ -228,7 +246,7 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 			if (faceglobal[i]!=0) delete[] faceglobal[i];
     }
 
-  END_OF("MEDSPLITTER::MESHCollectionDriver::read()")
+  END_OF_MED(LOC);
 		return 0;
 }
 
@@ -241,7 +259,8 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 void MESHCollectionMedXMLDriver::write(char* filename)
 {
 	
-	BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::writeXML()");
+  const char* LOC = "MEDSPLITTER::MESHCollectionDriver::writeXML()";
+  BEGIN_OF_MED(LOC);
  
 	xmlDocPtr master_doc = 0;
 	xmlNodePtr root_node = 0, node, node2;
@@ -303,7 +322,7 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 	m_filename.resize(nbdomains);
 
 	//loop on the domains
-	for (int idomain=0; idomain<nbdomains;idomain++)
+	for (int idomain=nbdomains-1; idomain>=0;idomain--)
 		{
 			char distfilename[256];
 	
@@ -314,12 +333,13 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 
 			m_filename[idomain]=string(distfilename);
 		
-			MESSAGE("File name "<<string(distfilename));
+			MESSAGE_MED("File name "<<string(distfilename));
 		
-			int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::MED_CREATE);
+			int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
 		
-			MESSAGE("Start writing");
+			MESSAGE_MED("Start writing");
 			(m_collection->getMesh())[idomain]->write(id);
+			(m_collection->getMesh())[idomain]->rmDriver(id);
 		
 			//updating the ascii description file
 			node = xmlNewChild(file_node, 0, BAD_CAST "subfile",0);
@@ -332,8 +352,7 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 			xmlNewProp(node, BAD_CAST "subdomain", BAD_CAST buff);
       xmlNewChild(node,0,BAD_CAST "name", BAD_CAST (m_collection->getMesh())[idomain]->getName().c_str());
 		
-      writeSubdomain(idomain, nbdomains, distfilename);
-			
+			writeSubdomain(idomain, nbdomains, distfilename);
 		}
 	strcat(filename,".xml");
 	m_master_filename=filename;
@@ -341,6 +360,6 @@ void MESHCollectionMedXMLDriver::write(char* filename)
  	xmlFreeDoc(master_doc);
 	xmlCleanupParser();
 
-	END_OF("MEDSPLITTER::MESHCollectionDriver::writeXML()");
+  END_OF_MED(LOC);
 
 }

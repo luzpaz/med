@@ -1,6 +1,6 @@
-//  MED MED : implemetation of MED idl descriptions
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
@@ -19,12 +19,12 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//
+//  MED MED : implemetation of MED idl descriptions
 //  File   : Med_Gen_i.cxx
 //  Author : Paul RASCLE, EDF
 //  Module : MED
 //  $Header$
-
+//
 #include "Med_Gen_i.hxx"
 
 #include "MEDMEM_Mesh.hxx"
@@ -54,9 +54,6 @@
 #include <string>
 #include <deque>
 #include <map>
-
-#include <TCollection_AsciiString.hxx>
-#include <TColStd_SequenceOfAsciiString.hxx>
 
 #include <HDFascii.hxx>
 
@@ -265,7 +262,8 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
 {
         beginService("Med_Gen_i::readStructFileWithFieldType");
 
-	BEGIN_OF("Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)");
+  const char* LOC = "Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)";
+  BEGIN_OF(LOC);
 
 	SCRUTE(fileName);
   	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
@@ -295,7 +293,7 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
         }
 
         endService("Med_Gen_i::readStructFileWithFieldType");
-	END_OF("Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)");
+  END_OF(LOC);
 }
 
 //=============================================================================

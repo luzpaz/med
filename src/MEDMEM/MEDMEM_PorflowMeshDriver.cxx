@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_PorflowMeshDriver.hxx"
 #include "MEDMEM_DriversDef.hxx"
@@ -79,7 +81,7 @@ inline static medGeometryElement get2DMedGeomType(int nbSommets);
 // Every memory allocation made in the MedDriver members function are desallocated in the Mesh destructor 
 
 PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER():
-  GENDRIVER(),
+  GENDRIVER(PORFLOW_DRIVER),
   _ptrMesh(( MESH *) NULL),
   // A VOIR _medIdt(MED_INVALID),
   _meshName("")
@@ -89,7 +91,7 @@ PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER():
 PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER(const string & fileName,
                                    MESH * ptrMesh,
                                    MED_EN::med_mode_acces accessMode): 
-  GENDRIVER(fileName,accessMode),
+  GENDRIVER(fileName, accessMode, PORFLOW_DRIVER),
   _ptrMesh(ptrMesh)
 {
     // mesh name construction from fileName
@@ -97,7 +99,7 @@ PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER(const string & fileName,
     string::size_type pos=fileName.find(ext,0);
     string::size_type pos1=fileName.rfind('/');
     _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
-    SCRUTE(_meshName);
+    SCRUTE_MED(_meshName);
 }
   
 PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER(const PORFLOW_MESH_DRIVER & driver): 
@@ -116,7 +118,11 @@ void PORFLOW_MESH_DRIVER::open()
   throw (MEDEXCEPTION)
 {
     const char * LOC = "PORFLOW_MESH_DRIVER::open()" ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
+
+    if (_status == MED_OPENED)
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"File "<<_fileName<<" is already open"));
+
     _porflow.open(_fileName.c_str(), ios::in);
     if(_porflow)
 	_status = MED_OPENED;
@@ -125,20 +131,19 @@ void PORFLOW_MESH_DRIVER::open()
 	_status = MED_CLOSED;
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName<<" in mode ios::in"));
     }
-    END_OF(LOC);
+  END_OF_MED(LOC);
 }
   
 void PORFLOW_MESH_DRIVER::close()
   throw (MEDEXCEPTION)
 {
-    const char * LOC = "PORFLOW_MESH_DRIVER::close() " ;
-    BEGIN_OF(LOC);
-    if ( _status == MED_OPENED) 
-    {
-	_porflow.close();
-	_status = MED_CLOSED;
-    }
-    END_OF(LOC);
+  const char* LOC = "PORFLOW_MESH_DRIVER::close() ";
+  BEGIN_OF_MED(LOC);
+  if ( _status == MED_OPENED) {
+    _porflow.close();
+    _status = MED_CLOSED;
+  }
+  END_OF_MED(LOC);
 }
 
 void    PORFLOW_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
@@ -153,9 +158,9 @@ PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(): PORFLOW_MESH_DRIVER()
   
 PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const string & fileName,
                                                  MESH * ptrMesh):
-  PORFLOW_MESH_DRIVER(fileName,ptrMesh,MED_RDONLY)
+  PORFLOW_MESH_DRIVER(fileName,ptrMesh,RDONLY)
 { 
-  MESSAGE("PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
   
 PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const PORFLOW_MESH_RDONLY_DRIVER & driver): 
@@ -165,7 +170,7 @@ PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const PORFLOW_MESH_RDONLY
 
 PORFLOW_MESH_RDONLY_DRIVER::~PORFLOW_MESH_RDONLY_DRIVER()
 {
-  //MESSAGE("PORFLOW_MESH_RDONLY_DRIVER::~PORFLOW_MESH_RDONLY_DRIVER() has been destroyed");
+  //MESSAGE_MED("PORFLOW_MESH_RDONLY_DRIVER::~PORFLOW_MESH_RDONLY_DRIVER() has been destroyed");
 }
   
 GENDRIVER * PORFLOW_MESH_RDONLY_DRIVER::copy(void) const
@@ -288,13 +293,14 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowConnectivityFile(bool hybride,const 
     }
 
     _maille maille;
-    unsigned int code, nodes_number, node;
-    pair<set<_maille>::iterator,bool> p_ma;
+    unsigned int code, nodes_number, node, ordre;
+    set<_maille>::iterator p_ma;
 
     if (hybride) // "HYBR" key-word
       while (connFile)
 	{
-	  connFile >> maille.ordre;
+	  connFile >> ordre;
+          maille.setOrdre( ordre );
 	  if (!connFile) // for spaces at the end of the file
 	    break;
 	  connFile >> code;
@@ -302,9 +308,9 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowConnectivityFile(bool hybride,const 
 	  maille.geometricType = geomPORFLOWtoMED[code-1];
 	  if(maille.geometricType%100!=nodes_number) // following incohenrences founded in some porflow files!
 	  {
-	      MESSAGE("WARNING : the read node number don't seem to be compatible with geometric type!");
-	      SCRUTE(maille.geometricType);
-	      SCRUTE(nodes_number);
+	      MESSAGE_MED("WARNING : the read node number don't seem to be compatible with geometric type!");
+	      SCRUTE_MED(maille.geometricType);
+	      SCRUTE_MED(nodes_number);
 	  }
 	  maille.sommets.resize(nodes_number);
 	  for (unsigned i=0; i!=nodes_number; ++i)
@@ -312,10 +318,10 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowConnectivityFile(bool hybride,const 
 	      connFile >> node;
 	      maille.sommets[numPORFLOWtoMED[code-1][i]-1] = medi.points.find(node);
 	    }
-	  p_ma = medi.maillage.insert(maille);
-	  if (maille.ordre > p_ma_table.size()-1) // construction of a vector of iterators on _maille structures
-	    p_ma_table.resize(2*maille.ordre);
-	  p_ma_table[maille.ordre] = p_ma.first;
+	  p_ma = medi.insert(maille);
+	  if (maille.ordre() > p_ma_table.size()-1) // construction of a vector of iterators on _maille structures
+	    p_ma_table.resize(2*maille.ordre());
+	  p_ma_table[maille.ordre()] = p_ma;
 	}
     else // default case (or "VERT" key-word)
       {
@@ -337,7 +343,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowConnectivityFile(bool hybride,const 
 	  throw MEDEXCEPTION("PORFLOW_MESH_RDONLY_DRIVER::read()\nError, can't determine geometric type for this VERT mesh");
 	while (connFile)
 	  {
-	    connFile >> maille.ordre;
+	    connFile >> ordre; maille.setOrdre(ordre);
 	    if (!connFile) // for spaces at the end of the file
 	      break;
 	    for (unsigned i=0; i!=nodes_number; ++i)
@@ -345,10 +351,10 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowConnectivityFile(bool hybride,const 
 		connFile >> node;
 		maille.sommets[numPORFLOWtoMED[code-1][i]-1] = medi.points.find(node);
 	      }
-	    p_ma = medi.maillage.insert(maille);
-	    if (maille.ordre > p_ma_table.size()-1) // construction of a vector of iterators on _maille structures
-	      p_ma_table.resize(2*maille.ordre);
-	    p_ma_table[maille.ordre] = p_ma.first;
+	    p_ma = medi.insert(maille);
+	    if (maille.ordre() > p_ma_table.size()-1) // construction of a vector of iterators on _maille structures
+	      p_ma_table.resize(2*maille.ordre());
+	    p_ma_table[maille.ordre()] = p_ma;
 	  }
       }
     connFile.close();
@@ -358,7 +364,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
   throw (MEDEXCEPTION)
 {
     const char * LOC = "PORFLOW_MESH_RDONLY_DRIVER::read() : " ;
-    BEGIN_OF(LOC);
+    BEGIN_OF_MED(LOC);
 
     if (_status!=MED_OPENED)
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The _idt of file " << _fileName 
@@ -418,7 +424,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the syntax corresponding to the use of input file is not implemented
 	if ( isKeyWord(buf_ligne,"LOCA") )
 	{
-	    MESSAGE("Mot clé LOCA détecté");
+	    MESSAGE_MED("Mot clé LOCA détecté");
 	    processLoca=true;
 	    // if currentGroup is not empty, a group has been precessed 
 	    //  -> we store it, clear currentGroup, and start the precessing of a new group
@@ -456,7 +462,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the syntax corresponding to structured grids is not implemented
 	else if ( isKeyWord(buf_ligne,"GRID") )
 	{
-	    MESSAGE("Mot clé GRID détecté");
+	    MESSAGE_MED("Mot clé GRID détecté");
 	    processLoca=false;
 	    pos=buf_ligne.find("UNST",0);
 	    if ( pos != string::npos ) // unstructured grid
@@ -488,7 +494,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   the default option is HYBR
 	else if ( isKeyWord(buf_ligne,"CONN") )
 	{
-	    MESSAGE("Mot clé CONN détecté");
+	    MESSAGE_MED("Mot clé CONN détecté");
 	    processLoca=false;
 	    string fileCONN=getPorflowFileName(buf_ligne,"CONN");
 	    
@@ -509,7 +515,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 	//   expected syntax : COOR {VERT} {filename}
 	else if ( isKeyWord(buf_ligne,"COOR") )
 	{
-	    MESSAGE("Mot clé COOR");
+	    MESSAGE_MED("Mot clé COOR");
 	    processLoca=false;
 	    string fileCOOR=getPorflowFileName(buf_ligne,"COOR");
 
@@ -621,7 +627,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 		// the corresponding 2D MED geometric type depends upon the number of nodes
 		maille2D.sommets.resize(l);
 		maille2D.geometricType = get2DMedGeomType(l);
-		p_ma = medi.maillage.insert(maille2D).first; // we insert the face in our mesh
+		p_ma = medi.insert(maille2D); // we insert the face in our mesh
 		medi.groupes[i].mailles[ielem++]=p_ma; // and insert an iterator on it in our group
 		maille2D.sommets.clear();
 	    }
@@ -632,14 +638,14 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     }
 
     p_ma_table.clear(); // we don't need it anymore
-    MESSAGE(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
-    MESSAGE(LOC <<  medi );
+    MESSAGE_MED(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : RESULTATS STRUCTURE INTERMEDIAIRES : ");
+    MESSAGE_MED(LOC <<  medi );
 	    // TRANSFORMATION EN STRUCTURES MED
     if ( ! _ptrMesh->isEmpty() )
     {
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Mesh object not empty : can't fill it!"));
     }
-    else if ( medi.maillage.size()==0 || medi.groupes.size()==0 || medi.points.size()==0)
+    else if ( /*medi.maillage.size()==0 || */medi.groupes.size()==0 || medi.points.size()==0)
     {
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " Error while reading file " << _fileName 
 		    << " The data read are not completed " ) ) ;
@@ -648,7 +654,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     {
 	_ptrMesh->_name = _meshName;
 	_ptrMesh->_spaceDimension = medi.points.begin()->second.coord.size();
-	_ptrMesh->_meshDimension = medi.maillage.rbegin()->dimension();
+	_ptrMesh->_meshDimension = medi.getMeshDimension();
 	_ptrMesh->_numberOfNodes = medi.points.size();
 	_ptrMesh->_isAGrid = 0;
 	_ptrMesh->_coordinate = medi.getCoordinate();
@@ -663,7 +669,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
 
 	// appele en dernier car cette fonction detruit le maillage intermediaire!
 	_ptrMesh->_connectivity = medi.getConnectivity(); 
-	MESSAGE(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : FIN ");
+	MESSAGE_MED(LOC << "PORFLOW_MESH_RDONLY_DRIVER::read : FIN ");
 
 	// calcul de la connectivite d-1 complete, avec renumerotation des groupes
 	// if (_ptrMesh->_spaceDimension==3)
@@ -676,7 +682,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     }
 
 
-    END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void PORFLOW_MESH_RDONLY_DRIVER::write( void ) const
@@ -694,9 +700,9 @@ PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER():PORFLOW_MESH_DRIVER()
   
 PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName,
                                                  MESH * ptrMesh):
-  PORFLOW_MESH_DRIVER(fileName,ptrMesh,MED_WRONLY)
+  PORFLOW_MESH_DRIVER(fileName,ptrMesh,WRONLY)
 {
-  MESSAGE("PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const PORFLOW_MESH_WRONLY_DRIVER & driver): 
@@ -706,7 +712,7 @@ PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const PORFLOW_MESH_WRONLY
 
 PORFLOW_MESH_WRONLY_DRIVER::~PORFLOW_MESH_WRONLY_DRIVER()
 {
-  //MESSAGE("PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
+  //MESSAGE_MED("PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
 }
 
 GENDRIVER * PORFLOW_MESH_WRONLY_DRIVER::copy(void) const
@@ -724,11 +730,11 @@ void PORFLOW_MESH_WRONLY_DRIVER::write(void) const
   throw (MEDEXCEPTION)
 { 
   const char * LOC = "void PORFLOW_MESH_WRONLY_DRIVER::write(void) const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "Write Driver isn\'t implemented"));
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 } 
 
 
@@ -741,9 +747,9 @@ PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER():PORFLOW_MESH_DRIVER()
 
 PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName,
 					   MESH * ptrMesh):
-  PORFLOW_MESH_DRIVER(fileName,ptrMesh,MED_RDWR)
+  PORFLOW_MESH_DRIVER(fileName,ptrMesh,RDWR)
 {
-  MESSAGE("PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
+  MESSAGE_MED("PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const PORFLOW_MESH_RDWR_DRIVER & driver): 
@@ -752,7 +758,7 @@ PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const PORFLOW_MESH_RDWR_DRIVE
 }
 
 PORFLOW_MESH_RDWR_DRIVER::~PORFLOW_MESH_RDWR_DRIVER() {
-  //MESSAGE("PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
+  //MESSAGE_MED("PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been destroyed");
 } 
   
 GENDRIVER * PORFLOW_MESH_RDWR_DRIVER::copy(void) const

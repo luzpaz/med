@@ -1,25 +1,23 @@
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
 #  MED MEDMEM : MED files in memory
 #
-#  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-# 
-#  This library is free software; you can redistribute it and/or 
-#  modify it under the terms of the GNU Lesser General Public 
-#  License as published by the Free Software Foundation; either 
-#  version 2.1 of the License. 
-# 
-#  This library is distributed in the hope that it will be useful, 
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-#  Lesser General Public License for more details. 
-# 
-#  You should have received a copy of the GNU Lesser General Public 
-#  License along with this library; if not, write to the Free Software 
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-# 
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-#
-
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 # this directory must be recompiled before Test folder
@@ -33,6 +31,10 @@ lib_LTLIBRARIES= libmedsplitter.la
 salomeinclude_HEADERS= \
 MEDSPLITTER_Topology.hxx \
 MEDSPLITTER_MESHCollection.hxx \
+MEDSPLITTER_MESHCollection.H \
+MEDSPLITTER_MESHCollectionDriver.H \
+MEDSPLITTER_MESHCollectionMedXMLDriver.H \
+MEDSPLITTER_MESHCollectionMedAsciiDriver.H \
 MEDSPLITTER_MESHCollectionDriver.hxx \
 MEDSPLITTER_MESHCollectionMedXMLDriver.hxx \
 MEDSPLITTER_MESHCollectionMedAsciiDriver.hxx \
@@ -41,6 +43,8 @@ MEDSPLITTER_FaceModel.hxx \
 MEDSPLITTER_Graph.hxx\
 MEDSPLITTER_UserGraph.hxx\
 MEDSPLITTER_API.hxx \
+MEDSPLITTER_SequentialTopology.hxx \
+MEDSPLITTER_utils.hxx \
 MEDSPLITTER.hxx
 
 if MED_ENABLE_METIS
@@ -96,3 +100,9 @@ medsplitter_LDADD= $(libmedsplitter_la_LDFLAGS) -lm $(BOOST_LIBS) libmedsplitter
 if MED_ENABLE_KERNEL
   medsplitter_LDADD+= -lSALOMEBasics
 endif
+
+OBSOLETE_FILES = \
+	MEDSPLITTER_SequentialTopology.cxx \
+	test_HighLevelAPI.cxx
+
+EXTRA_DIST += $(OBSOLETE_FILES)

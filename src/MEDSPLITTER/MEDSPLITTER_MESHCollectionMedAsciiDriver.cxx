@@ -1,4 +1,21 @@
-
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #include <vector>
 #include <string>
 #include <map>
@@ -54,7 +71,8 @@ MESHCollectionMedAsciiDriver::MESHCollectionMedAsciiDriver(MESHCollection* colle
 int MESHCollectionMedAsciiDriver::read(char* filename)
 {
   
-  BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::read()")
+  const char* LOC = "MEDSPLITTER::MESHCollectionDriver::read()";
+  BEGIN_OF_MED(LOC);
   
     //ditributed meshes
     vector<int*> cellglobal;
@@ -65,7 +83,7 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
 
   // reading ascii master file
   try{
-    MESSAGE("Start reading");
+    MESSAGE_MED("Start reading");
     ifstream asciiinput(filename);
     
     if (!asciiinput)     
@@ -119,7 +137,7 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
       
   
       }//loop on domains
-    MESSAGE("end of read");
+    MESSAGE_MED("end of read");
   }//of try
   catch(...)
     {
@@ -139,7 +157,7 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
       if (faceglobal[i]!=0) delete[] faceglobal[i];
     }
   
-  END_OF("MEDSPLITTER::MESHCollectionDriver::read()")
+  END_OF_MED(LOC);
     return 0;
 }
 
@@ -152,7 +170,8 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
 void MESHCollectionMedAsciiDriver::write(char* filename)
 {
 	
-  BEGIN_OF("MEDSPLITTER::MESHCollectionDriver::write()")
+  const char* LOC = "MEDSPLITTER::MESHCollectionDriver::write()";
+  BEGIN_OF_MED(LOC);
  
     ofstream file(filename);
 
@@ -175,11 +194,11 @@ void MESHCollectionMedAsciiDriver::write(char* filename)
 
       m_filename[idomain]=string(distfilename);
 		
-      MESSAGE("File name "<<string(distfilename));
+      MESSAGE_MED("File name "<<string(distfilename));
 		
-      int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::MED_CREATE);
+      int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
 		
-      MESSAGE("Start writing");
+      MESSAGE_MED("Start writing");
       (m_collection->getMesh())[idomain]->write(id);
 		
       //updating the ascii description file
@@ -188,6 +207,6 @@ void MESHCollectionMedAsciiDriver::write(char* filename)
       writeSubdomain(idomain, nbdomains, distfilename);
     }
 	
-  END_OF("MEDSPLITTER::MESHCollectionDriver::write()");
+  END_OF_MED(LOC);
 
 }

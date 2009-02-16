@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef __MEDMODULUSARRAY_H__
 #define __MEDMODULUSARRAY_H__
@@ -44,43 +46,26 @@ private:
   int   _length2;
   const int * _array ;
 
-  bool compareNotVertexNodes(const MEDMODULUSARRAY &modulusArray) const;
+  inline bool compareNotVertexNodes(const MEDMODULUSARRAY &modulusArray) const;
 
 public:
-  MEDMODULUSARRAY(int length, const int * array) ;
-  MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array);
-  ~MEDMODULUSARRAY() ;
+  MEDMODULUSARRAY(int length, const int * array) :
+    _length(length), _length2(length), _array(array) {}
 
-  const int operator[](const int &i) const ;
+  MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array):
+    _length(vertexLength), _length2( totalLength ), _array(array) {}
 
-  int compare(const MEDMODULUSARRAY &modulusArray) const;
+  ~MEDMODULUSARRAY() {}
+
+  inline const int operator[](const int &i) const ;
+
+  inline int compare(const MEDMODULUSARRAY &modulusArray) const;
 
   const int  *getArray(int& length) const { length=_length; return _array; }
 };
 
 
-MEDMODULUSARRAY::MEDMODULUSARRAY(int length, const int * array) : 
-  _length(length), _array(array), _length2(0)
-{
-//    SCRUTE(_length);
-//    for (int i=0;i<_length;i++){
-//      MESSAGE("MEDMODULUSARRAY["<<i<<"]="<<_array[i]);
-//    }
-};
-
-  MEDMODULUSARRAY::MEDMODULUSARRAY(int vertexLength, int totalLength, const int * array):
-  _length(vertexLength), _length2( totalLength ), _array(array)
-{
-}
-
-MEDMODULUSARRAY::~MEDMODULUSARRAY()
-{
-  // do nothing because nothing is allocated !
-  //  MESSAGE("MEDMODULUSARRAY::~MEDMODULUSARRAY()") ;
-};
-
-
-const int MEDMODULUSARRAY::operator[](const int &i) const
+inline const int MEDMODULUSARRAY::operator[](const int &i) const
 {
   int position = i%_length ;
   //int position = i%_length2 ;
@@ -88,9 +73,9 @@ const int MEDMODULUSARRAY::operator[](const int &i) const
     position+=_length ;
   //position += _length2 ;
   return _array[position] ;
-};
+}
 
-int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
+inline int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
 {
   int ret = 0 ;
 
@@ -149,7 +134,7 @@ int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
  * \brief Check presence of the same not vertex nodes
   * \retval bool - comparison result
  */
-bool MEDMODULUSARRAY::compareNotVertexNodes(const MEDMODULUSARRAY &modulusArray) const
+inline bool MEDMODULUSARRAY::compareNotVertexNodes(const MEDMODULUSARRAY &modulusArray) const
 {
   if ( _length2 > _length ) {
     for ( int i = _length; i < _length2; ++i ) {

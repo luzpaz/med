@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 # if ! defined( __PointerOf_HXX__ )
 # define __PointerOf_HXX__
@@ -49,7 +51,7 @@ public :
 	PointerOf( const T *pointer ) ;
 	PointerOf( const int &size, const T *pointer ) ;
 	PointerOf( const PointerOf<T> & pointerOf ) ;
-	PointerOf( const int &size, const PointerOf<T> & pointerOf ) ;
+  ///PointerOf( const int &size, const PointerOf<T> & pointerOf ) ;
 	operator T*() ;
 	operator const T*() const ;
 	void set( const int &size ) ;
@@ -79,20 +81,21 @@ template <typename T> PointerOf<T>::PointerOf() : _pointer(0), _done(false)
 template <typename T> PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf) :
   _pointer((T*)(const T* const)pointerOf), _done(false)
 {
-	BEGIN_OF("PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf)");
-	MESSAGE("Warning ! No Propriety Transfer");
-	END_OF  ("PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf)");
+  const char* LOC = "PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf)";
+  BEGIN_OF_MED(LOC);
+	MESSAGE_MED("Warning ! No Propriety Transfer");
+  END_OF_MED(LOC);
 }
 
 /*! 
   Duplicate array of size size pointed in pointerOf.
 */
-template <typename T> PointerOf<T>::PointerOf( const int &size, const PointerOf<T> & pointerOf) : 
-  _pointer((size,(T*)pointerOf))
-{
-}
+//template <typename T> PointerOf<T>::PointerOf( const int &size, const PointerOf<T> & pointerOf) : 
+//  _pointer((size,(T*)pointerOf))
+//{
+//}
 
-/*! If size <= 0, creates a null "T*" pointer\n
+/*! If size < 0, creates a null "T*" pointer\n
     Else allocates memory and sets desallocation boolean to true.\n
     Memory will be desallocated  when erasing this PointerOf*/
 template <typename T> PointerOf<T>::PointerOf( const int &size )
@@ -116,13 +119,13 @@ template <typename T> PointerOf<T>::PointerOf( const T* pointer ) : _pointer( (T
 {
 }
 
-/*! If size <= 0, return an exception\n
+/*! If size < 0, return an exception\n
     Else duplicate array and sets desallocation boolean to true.\n
     Memory will be desallocated  when erasing this PointerOf*/
 template <typename T> PointerOf<T>::PointerOf( const int &size, const T* pointer)
 {
   if (size < 0)
-    throw MEDEXCEPTION("PointerOf( const int,const T*) : array size <= 0");
+    throw MEDEXCEPTION("PointerOf( const int,const T*) : array size < 0");
 
   _pointer = new T[ size ] ;
   memcpy(_pointer,pointer,size*sizeof(T));
@@ -137,13 +140,13 @@ template <typename T> PointerOf<T>::~PointerOf()
 	{
 		if( _done )
 		{
-			MESSAGE("PointerOf<T>::~PointerOf() --> deleting _pointer") ;
+			MESSAGE_MED("PointerOf<T>::~PointerOf() --> deleting _pointer") ;
 			delete [] _pointer ;
 			_done = false ;
 		}
 		else
 		{
-			MESSAGE("_pointer is only nullified") ;
+			MESSAGE_MED("_pointer is only nullified") ;
 		}
 		_pointer = 0 ;
 	}
@@ -158,12 +161,13 @@ template <typename T> PointerOf<T>::~PointerOf()
     - it works the same way as PointerOf(const PointerOf<T> & pointerOf) */
 template <typename T> PointerOf<T>& PointerOf<T>::operator=( const PointerOf<T> &pointer )
 {
-	BEGIN_OF("PointerOf<T>::operator=( const PointerOf<T> &pointer )") ;
+  const char* LOC = "PointerOf<T>::operator=( const PointerOf<T> &pointer )";
+  BEGIN_OF_MED(LOC);
 	if ( &pointer != this )
 	{
 		this->set( pointer._pointer ) ;
 	}
-	END_OF("PointerOf<T>::operator=( const PointerOf<T> &pointer )") ;
+  END_OF_MED(LOC);
 	return *this ;
 }
 
@@ -191,6 +195,7 @@ template <typename T> void PointerOf<T>::set( const int &size )
 		delete [] _pointer ;
 		_pointer=0 ;
 	}
+	// if (size < 0) TODO: analyse why it does not work
 	if (size <= 0)
 	{
 		_pointer=(T*)NULL;
@@ -209,24 +214,24 @@ template <typename T> void PointerOf<T>::set( const int &size )
     memory will not be released when erasing this PointerOf*/
 template <typename T> void PointerOf<T>::set( const T *pointer )
 {
-	MESSAGE( "BEGIN PointerOf<T>::set( const T *pointer )" ) ;
-	SCRUTE(pointer) ;
-	SCRUTE(_done) ;
+	MESSAGE_MED( "BEGIN PointerOf<T>::set( const T *pointer )" ) ;
+	SCRUTE_MED(pointer) ;
+	SCRUTE_MED(_done) ;
 	if ( _pointer && _done )
 	{
-		MESSAGE("PointerOf<T>::set --> deleting _pointer") ;
+		MESSAGE_MED("PointerOf<T>::set --> deleting _pointer") ;
 		delete [] _pointer ;
 		_pointer=0 ;
 		_done=false ;
 	}
 	_pointer=(T*)pointer ;
 	_done=false ;
-	MESSAGE( "END PointerOf<T>::set( const T *pointer )" ) ;
+	MESSAGE_MED( "END PointerOf<T>::set( const T *pointer )" ) ;
 	return ;
 }
 
 /*! If necessary, released memory holded by PointerOf\n.
-    If size <= 0, return an exception\n.
+    If size < 0, return an exception\n.
     Else allocates memory and sets desallocation boolean to true.\n
     Can be used in order to "nullify" an existing PointerOf\n
     Memory will be desallocated  when erasing this PointerOf*/
@@ -238,7 +243,7 @@ template <typename T> void PointerOf<T>::set( const int &size, const T *pointer)
       _pointer = NULL ;
     }
   if (size < 0)
-    throw MEDEXCEPTION("PointerOf( const int,const T*) : array size <= 0");
+    throw MEDEXCEPTION("PointerOf( const int,const T*) : array size < 0");
 
   _pointer = new T[ size ] ;
   memcpy(_pointer,pointer,size*sizeof(T));

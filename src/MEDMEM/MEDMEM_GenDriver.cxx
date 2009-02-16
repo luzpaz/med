@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_STRING.hxx"
@@ -25,18 +27,23 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-GENDRIVER::GENDRIVER(): _id(MED_INVALID),
-                        _fileName(""),
-                        _accessMode( (med_mode_acces) MED_INVALID ),
-                        _status(MED_INVALID),
-                        _driverType(NO_DRIVER) {}
+GENDRIVER::GENDRIVER(driverTypes driverType):
+  _id(MED_INVALID),
+  _fileName(""),
+  _accessMode( (med_mode_acces) MED_INVALID ),
+  _status(MED_INVALID),
+  _driverType(driverType) {}
 
 GENDRIVER::GENDRIVER(const string & fileName,
-                     med_mode_acces accessMode=(med_mode_acces) MED_INVALID): _id(MED_INVALID),
-                                                                              _fileName(fileName),
-                                                                              _accessMode(accessMode),
-                                                                              _status(MED_CLOSED),
-                                                                              _driverType(NO_DRIVER) {}
+                     med_mode_acces accessMode/*=(med_mode_acces) MED_INVALID*/,
+                     driverTypes driverType)
+  : _id(MED_INVALID),
+    _fileName(fileName),
+    _accessMode(accessMode),
+    _status(MED_CLOSED),
+    _driverType(driverType) 
+{
+}
 
 GENDRIVER::GENDRIVER(const GENDRIVER & genDriver):
   //_id(MED_INVALID), 
@@ -52,56 +59,58 @@ GENDRIVER::~GENDRIVER() {}
 
 GENDRIVER & MEDMEM::GENDRIVER::operator=(const GENDRIVER &  genDriver) 
 {
-  const char * LOC = " GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver)  : ";
-  
-  BEGIN_OF(LOC);
+  const char* LOC = " GENDRIVER & GENDRIVER::operator=(const GENDRIVER &  genDriver)  : ";
+  BEGIN_OF_MED(LOC);
   _fileName    = genDriver._fileName;
   _accessMode  = genDriver._accessMode;
   _status      = genDriver._status;
   _id          = genDriver._id;
+  _driverType  = genDriver._driverType;
   return *this;
 }
 
-void GENDRIVER::writeFrom      ( void ) {};
-void GENDRIVER::readFileStruct ( void ) {};
+void GENDRIVER::writeFrom      ( void ) const {}
+void GENDRIVER::readFileStruct ( void ) {}
 
-void GENDRIVER::setMeshName    (const string & ) {};
-void GENDRIVER::setFieldName   (const string & ) {};
+void   GENDRIVER::setMeshName   (const string & ) {}
+string GENDRIVER::getMeshName()  const { return ""; }
+void   GENDRIVER::setFieldName  (const string & ) {}
+string GENDRIVER::getFieldName() const { return ""; }
 
-void GENDRIVER::openAppend ( void ) {};
-void GENDRIVER::writeAppend ( void ) const {};
+void GENDRIVER::openAppend ( void ) {}
+void GENDRIVER::writeAppend ( void ) const {}
 
-void GENDRIVER::setId ( int id ) {
-  const char * LOC = "void GENDRIVER::setId ( int id ) : ";
-
-  BEGIN_OF(LOC);
+void GENDRIVER::setId ( int id )
+{
+  const char* LOC = "void GENDRIVER::setId ( int id ) : ";
+  BEGIN_OF_MED(LOC);
 
   if ( id >= 0 ) _id=id; else _id = MED_INVALID ;
 
-  END_OF(LOC);
-};
+  END_OF_MED(LOC);
+}
 
-int GENDRIVER::getId ( void) const {
-  const char * LOC = "int GENDRIVER::getId ( void) const ";
-
-  BEGIN_OF(LOC);
+int GENDRIVER::getId ( void) const
+{
+  const char* LOC = "int GENDRIVER::getId ( void) const ";
+  BEGIN_OF_MED(LOC);
 
   return _id ;
-};
+}
 
 string GENDRIVER::getFileName() const {
 
-  const char * LOC = "string GENDRIVER::getFileName() const : ";
-  BEGIN_OF(LOC);
+  const char* LOC = "string GENDRIVER::getFileName() const : ";
+  BEGIN_OF_MED(LOC);
   
   return _fileName;
 }
     
 
-void GENDRIVER::setFileName(const string & fileName)  {
-
+void GENDRIVER::setFileName(const string & fileName)
+{
   const char * LOC = "void GENDRIVER::setFileName(const string & fileName) : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( _status == MED_OPENED )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<" File |" << _fileName 
@@ -109,16 +118,15 @@ void GENDRIVER::setFileName(const string & fileName)  {
   else
     _fileName = fileName; 
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
        
 
 
-med_mode_acces GENDRIVER::getAccessMode() const {
-
-  const char * LOC = "med_mode_acces GENDRIVER::getAccessMode() const : ";
-
-  BEGIN_OF(LOC);
+med_mode_acces GENDRIVER::getAccessMode() const
+{
+  const char* LOC = "med_mode_acces GENDRIVER::getAccessMode() const : ";
+  BEGIN_OF_MED(LOC);
 
   return _accessMode;
 }
@@ -127,18 +135,15 @@ ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
 {
   switch (drv._accessMode)
     {
-    case MED_RDONLY : 
+    case RDONLY : 
       os<<"C'est un IO de READ"<<endl;
       break;
-    case MED_RDWR :
+    case RDWR :
       os<<"C'est un IO d'READ/WRITE"<<endl;
       break;
-    case MED_REMP :
-      os <<"C'est un IO de remplacement"<<endl;
-      break;
-		case MED_CREATE :
-			os <<"C'est un IO de création"<<endl;
-			break;
+      //case MED_REMP :
+      //os <<"C'est un IO de remplacement"<<endl;
+      //break;
     }
   switch (drv._status)
     {
@@ -158,13 +163,31 @@ ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
 // Test if this driver has been created from  MED driver
 bool MEDMEM::GENDRIVER::operator ==(const GENDRIVER &genDriver) const {
   
-  const char * LOC = "bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const : ";
 
-  MESSAGE(LOC);
+  MESSAGE_MED("bool GENDRIVER::operator ==(const GENDRIVER &genDriver) const : ");
 
-  return ( _id == genDriver._id )  &&
+  return /*( _id == genDriver._id )  &&*/
     ( _driverType == genDriver._driverType ) &&
     (_accessMode == genDriver._accessMode);
   
-};
+}
 
+// Take missing data from other driver.
+// Is for object->read( genDriver ) if object was not passed to genDriver,
+// then object asks driverFactory to create a driver initialized by object
+// and fills the new driver up using merge( genDriver )
+
+void GENDRIVER::merge ( const GENDRIVER &genDriver )
+{
+  if ( _id == MED_INVALID )
+    _id = genDriver._id;
+  if ( _fileName.empty() )
+    _fileName = genDriver._fileName;
+  if ( _accessMode == MED_INVALID )
+    _accessMode = genDriver._accessMode;
+
+  if ( getMeshName().empty() )
+    setMeshName( genDriver.getMeshName() );
+  if ( getFieldName().empty() )
+    setFieldName( genDriver.getFieldName() );
+}

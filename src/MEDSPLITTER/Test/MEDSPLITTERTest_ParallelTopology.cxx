@@ -1,22 +1,21 @@
-// Copyright (C) 2006  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #include "MEDSPLITTERTest.hxx"
 #include <cppunit/TestAssert.h>
 
@@ -107,11 +106,11 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
 #ifndef ENABLE_METIS
   CPPUNIT_FAIL("METIS is not available. Please, check your compilation.");
 #else
-  string data_dir                   = getenv("DATA_DIR");
+  string data_dir                   = getenv("MED_ROOT_DIR");
   string tmp_dir                    = getenv("TMP");
   if (tmp_dir == "")
     tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/MedFiles/carre_en_quad4_import22.med";  
+  string filename_rd                = data_dir + "/share/salome/resources/med/carre_en_quad4_import22.med";  
   string filename_para_wr            = tmp_dir + "/myWrField_seq_pointe22_";
   string filename_para_med0           = tmp_dir + "/myWrField_seq_pointe22_1.med";
   string filename_para_med1           = tmp_dir + "/myWrField_seq_pointe22_2.med";

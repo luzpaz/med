@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "GROUPClient.hxx"
 #include "MESHClient.hxx"
@@ -33,12 +35,13 @@ GROUPClient::GROUPClient(const SALOME_MED::GROUP_ptr G,
     GROUP(),
     IOR_Group(SALOME_MED::GROUP::_duplicate(G))
 {
-  BEGIN_OF("GROUPClient::GROUPClient()");
+  const char* LOC = "GROUPClient::GROUPClient()";
+  BEGIN_OF(LOC);
 
   SCRUTE(G);
   SCRUTE(M);
 
-  END_OF("GROUPClient::GROUPClient()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -48,12 +51,13 @@ GROUPClient::GROUPClient(const SALOME_MED::GROUP_ptr G,
 //=============================================================================
 void GROUPClient::blankCopy()
 {
-  BEGIN_OF("GROUPClient::blankCopy()");
+  const char* LOC = "GROUPClient::blankCopy()";
+  BEGIN_OF(LOC);
 
   SUPPORTClient::blankCopy();
   _complete = false;
 
-  END_OF("GROUPClient::blankCopy()");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -63,12 +67,13 @@ void GROUPClient::blankCopy()
 
 void GROUPClient::fillCopy()
 {
-  BEGIN_OF("GROUPClient::fillCopy()");
+  const char* LOC = "GROUPClient::fillCopy()";
+  BEGIN_OF(LOC);
 
   SUPPORTClient::fillCopy();
   _complete = true;
 
-  END_OF("GROUPClient::fillCopy()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -79,6 +84,7 @@ void GROUPClient::fillCopy()
 
 GROUPClient::~GROUPClient()
 {
-  BEGIN_OF("GROUPClient::~GROUPClient()");
-  END_OF("GROUPClient::~GROUPClient()");
+  const char* LOC = "GROUPClient::~GROUPClient()";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
 }

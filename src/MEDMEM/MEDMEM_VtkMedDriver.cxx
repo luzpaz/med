@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_VtkMedDriver.hxx"
 
@@ -32,7 +34,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(), 
+VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(VTK_DRIVER), 
                                   _ptrMed((MED * const)MED_NULL)
 {
   _vtkFile = new ofstream();
@@ -42,7 +44,7 @@ VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(),
 
 
 VTK_MED_DRIVER::VTK_MED_DRIVER(const string & fileName,  MED * const ptrMed):
-  GENDRIVER(fileName,MED_EN::MED_RDWR), _ptrMed(ptrMed)
+  GENDRIVER(fileName, MED_EN::RDWR, VTK_DRIVER), _ptrMed(ptrMed)
 {
   _vtkFile = new ofstream();
 }
@@ -59,12 +61,12 @@ VTK_MED_DRIVER::VTK_MED_DRIVER(const VTK_MED_DRIVER & driver):
 
 VTK_MED_DRIVER::~VTK_MED_DRIVER()
 {
-  const char * LOC ="VTK_MED_DRIVER::~VTK_MED_DRIVER()";
-  BEGIN_OF(LOC);
+  const char* LOC = "VTK_MED_DRIVER::~VTK_MED_DRIVER()";
+  BEGIN_OF_MED(LOC);
 
   delete _vtkFile ;
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 GENDRIVER * VTK_MED_DRIVER::copy() const
@@ -77,7 +79,7 @@ GENDRIVER * VTK_MED_DRIVER::copy() const
 void VTK_MED_DRIVER::openConst() const {
 
   const char * LOC ="VTK_MED_DRIVER::open() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   if ( _fileName == "" )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -94,7 +96,7 @@ void VTK_MED_DRIVER::openConst() const {
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void VTK_MED_DRIVER::open() {
@@ -103,8 +105,8 @@ void VTK_MED_DRIVER::open() {
 
 void VTK_MED_DRIVER::closeConst() const {
 
-  const char * LOC = "VTK_MED_DRIVER::close() : ";
-  BEGIN_OF(LOC);
+  const char* LOC = "VTK_MED_DRIVER::close() : ";
+  BEGIN_OF_MED(LOC);
   
   (*_vtkFile).close();
   
@@ -115,7 +117,7 @@ void VTK_MED_DRIVER::closeConst() const {
 //    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
 //				     << _fileName)
 //			  );
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void VTK_MED_DRIVER::close() {
@@ -123,10 +125,10 @@ void VTK_MED_DRIVER::close() {
 }
 
 
-void VTK_MED_DRIVER::write() const {
-
-  const char * LOC = "VTK_MED_DRIVER::write() : ";
-  BEGIN_OF(LOC);
+void VTK_MED_DRIVER::write() const
+{
+  const char* LOC = "VTK_MED_DRIVER::write() : ";
+  BEGIN_OF_MED(LOC);
 
   // Well we must open vtk file first, because there are
   // no other driver than MED for VTK that do it !
@@ -171,7 +173,7 @@ void VTK_MED_DRIVER::write() const {
 	      name << myField->getName() << "_" << dt << "_" << it ;
 	      writeField(myField,name.str()) ;
 	    } else
-	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
+	      MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
 	}
       }
     }
@@ -192,8 +194,9 @@ void VTK_MED_DRIVER::write() const {
 	      ostringstream name ; 
 	      name << myField->getName() << "_" << dt << "_" << it ;
 	      writeField(myField,name.str()) ;
-	    } else
-	      MESSAGE(LOC << "Could not write field "<<myField->getName()<<" which is not on all cells !");
+	    }
+            else
+	      MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all cells !");
 	}
       }
     }
@@ -204,13 +207,13 @@ void VTK_MED_DRIVER::write() const {
   // no other driver than MED for VTK that do it !
   //  closeConst() ;
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
 
   const char * LOC = "VTK_MED_DRIVER::writeMesh() : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   (*_vtkFile) << "DATASET UNSTRUCTURED_GRID" << endl ;
   // put points (all point are in 3D, so if we are in 1D or 2D, we complete by zero !
@@ -441,13 +444,13 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
   return ;
 
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
-void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
-
-  const char * LOC = "VTK_MED_DRIVER::writeField() : ";
-  BEGIN_OF(LOC);
+void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
+{
+  const char* LOC = "VTK_MED_DRIVER::writeField() : ";
+  BEGIN_OF_MED(LOC);
   
   typedef MEDMEM_ArrayInterface<int,NoInterlace,NoGauss>::Array ArrayIntNo;
   typedef MEDMEM_ArrayInterface<double,NoInterlace,NoGauss>::Array ArrayDoubleNo;
@@ -456,19 +459,21 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
   int NumberOfComponents =  myField->getNumberOfComponents() ;
 
   med_type_champ type = myField->getValueType() ;
-  SCRUTE(name);
-  SCRUTE(type);
+  SCRUTE_MED(name);
+  SCRUTE_MED(type);
   switch (type)
     {
     case MED_INT32 : {
-      MESSAGE("MED_INT32");
+      MESSAGE_MED("MED_INT32");
       if (NumberOfComponents==3) {
 	(*_vtkFile) << "VECTORS " << name << " int" << endl ;
-      } else if (NumberOfComponents<=4) {
+      }
+      else if (NumberOfComponents<=4) {
 	(*_vtkFile) << "SCALARS " << name << " int " << NumberOfComponents << endl ;
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
-      } else {
-	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+      }
+      else {
+	MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -501,14 +506,16 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
       break ;
     }
     case MED_REEL64 : {
-      MESSAGE("MED_REEL64");
+      MESSAGE_MED("MED_REEL64");
       if (NumberOfComponents==3) {
 	(*_vtkFile) << "VECTORS " << name << " float" << endl ;
-      } else if (NumberOfComponents<=4) {
+      }
+      else if (NumberOfComponents<=4) {
 	(*_vtkFile) << "SCALARS " << name << " float " << NumberOfComponents << endl ;
 	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
-      } else {
-	MESSAGE(LOC << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+      }
+      else {
+	MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
 	return ;
       }
 
@@ -520,13 +527,15 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
 				   )
 				);
 	value = myArray->getPtr();
-      } else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
+      }
+      else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
 	myArray = ArrayConvert2No( *( dynamic_cast< FIELD<double,NoInterlaceByType>* >
 				   (myField)->getArrayNoGauss()
 				   )
 				);
 	value = myArray->getPtr();
-      } else {
+      }
+      else {
 	value = ((FIELD<double>*)myField)->getValue() ;
       }
 
@@ -541,16 +550,16 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const {
       break ;
     }
     default : { 
-      MESSAGE(LOC << "Could not write field "<<name<<" the type is not int or double !");
+      MESSAGE_MED(PREFIX_MED << "Could not write field "<<name<<" the type is not int or double !");
     }
     }
   
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void VTK_MED_DRIVER::writeSupport(SUPPORT * mySupport) const {
-  const char * LOC = "VTK_MED_DRIVER::writeSupport(SUPPORT *) : " ;
-  BEGIN_OF(LOC) ;
-  MESSAGE(LOC << "Not yet implemented, acting on the object " << *mySupport);
-  END_OF(LOC) ;
+  const char* LOC = "VTK_MED_DRIVER::writeSupport(SUPPORT *) : ";
+  BEGIN_OF_MED(LOC);
+  MESSAGE_MED(PREFIX_MED << "Not yet implemented, acting on the object " << *mySupport);
+  END_OF_MED(LOC);
 }

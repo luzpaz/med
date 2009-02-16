@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "FAMILYClient.hxx"
 #include "MESHClient.hxx"
@@ -32,14 +34,15 @@ FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr S,
     FAMILY(), 
     IOR_Family(SALOME_MED::FAMILY::_duplicate(S))
 {
-  BEGIN_OF("FAMILYClient::FAMILYClient(SALOME_MED::FAMILY_ptr m)");
+  const char* LOC = "FAMILYClient::FAMILYClient(SALOME_MED::FAMILY_ptr m)";
+  BEGIN_OF(LOC);
 
   SCRUTE(S);
   SCRUTE(M);
 
   blankCopy(false);
 
-  END_OF("FAMILYClient::FAMILYClient(SALOME_MED::FAMILY_ptr m)");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -48,7 +51,8 @@ FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr S,
 //=============================================================================
 void FAMILYClient::blankCopy(bool blankSupport)
 {
-  BEGIN_OF("FAMILYClient::blankCopy()");
+  const char* LOC = "FAMILYClient::blankCopy()";
+  BEGIN_OF(LOC);
 
   if (blankSupport)
     SUPPORTClient::blankCopy();
@@ -93,7 +97,7 @@ void FAMILYClient::blankCopy(bool blankSupport)
 
   _complete = false;
 
-  END_OF("FAMILYClient::blankCopy()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -103,7 +107,8 @@ void FAMILYClient::blankCopy(bool blankSupport)
 //=============================================================================
 void FAMILYClient::fillCopy(bool fillSupport)
 {
-  BEGIN_OF("FAMILYClient::fillCopy()");
+  const char* LOC = "FAMILYClient::fillCopy()";
+  BEGIN_OF(LOC);
 
   if (!_complete) {
 
@@ -115,7 +120,7 @@ void FAMILYClient::fillCopy(bool fillSupport)
     _complete = true;
   }
 
-  END_OF("FAMILYClient::fillCopy()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -126,6 +131,7 @@ void FAMILYClient::fillCopy(bool fillSupport)
 
 FAMILYClient::~FAMILYClient()
 {
-  BEGIN_OF("FAMILYClient::~FAMILYClient()");
-  END_OF("FAMILYClient::~FAMILYClient()");
+  const char* LOC = "FAMILYClient::~FAMILYClient()";
+  BEGIN_OF(LOC);
+  END_OF(LOC);
 }

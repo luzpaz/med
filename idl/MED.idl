@@ -1,26 +1,28 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File: MED.idl
 // Project: SALOME
 // $Header$
-
+//
 /*!
 This file contains the main IDL definitions of the %MED component in %SALOME application.
 */
@@ -256,6 +258,12 @@ This enumeration contains a set of elements defining the type of connectivity.
     */
 
     SUPPORT getBoundaryElements(in medEntityMesh Entity)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
+      Returns the %SUPPORT defined on all the element of an Entity.
+    */
+    SUPPORT getSupportOnAll(in medEntityMesh Entity)
       raises (SALOME::SALOME_Exception);
 
     /*!
@@ -1096,6 +1104,15 @@ Internal Corba method.
     void addField (in FIELD  ptrField  ) raises (SALOME::SALOME_Exception);
 
     void addInStudy (in SALOMEDS::Study myStudy, in MED medPtr) raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
+  };
+  
+  /*! \brief A structure containing information about MED file
+  */
+  struct MedFileInfo
+  {
+    string fileName; //!< name of file
+    long   fileSize; //!< size of file
+    long   major, minor, release; //!< MED file version
   };
 };
 

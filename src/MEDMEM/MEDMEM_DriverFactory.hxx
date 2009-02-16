@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef DRIVERFACTORY_HXX
 #define DRIVERFACTORY_HXX
@@ -90,12 +92,12 @@ namespace MEDMEM {
   }
 }
 
-#include "MEDMEM_EnsightFieldDriver.hxx"
 #include "MEDMEM_VtkFieldDriver.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_MedFieldDriver21.hxx"
 #include "MEDMEM_MedFieldDriver22.hxx"
 #include "MEDMEM_AsciiFieldDriver.hxx"
+#include "MEDMEM_EnsightFieldDriver.hxx"
 
 namespace MEDMEM {
   template<class T, class INTERLACING_TAG>
@@ -110,15 +112,15 @@ namespace MEDMEM {
       case MED_DRIVER : {
 	switch(access)
 	  {
-	  case MED_EN::MED_LECT : {
+	  case MED_EN::RDONLY : {
 	    ret = new MED_FIELD_RDONLY_DRIVER<T>(fileName,field);
 	    break;
 	  }
-	  case MED_EN::MED_ECRI : {
+	  case MED_EN::WRONLY : {
 	    ret= new MED_FIELD_WRONLY_DRIVER<T>(fileName,field);
 	    break;
 	  }
-	  case MED_EN::MED_REMP : {
+	  case MED_EN::RDWR : {
 	    ret = new MED_FIELD_RDWR_DRIVER<T>(fileName,field);
 	    break;
 	  }
@@ -131,15 +133,15 @@ namespace MEDMEM {
       case ENSIGHT_DRIVER : {
 	switch(access)
 	  {
-	  case MED_EN::MED_LECT : {
-	    ret = new ENSIGHT_FIELD_RDONLY_DRIVER<T>(fileName,field);
+	  case MED_EN::RDONLY : {
+	    ret = new ENSIGHT_FIELD_RDONLY_DRIVER(fileName,field);
 	    break;
 	  }
-	  case MED_EN::MED_ECRI : {
-	    ret=new ENSIGHT_FIELD_WRONLY_DRIVER<T>(fileName,field);
+	  case MED_EN::WRONLY : {
+	    ret=new ENSIGHT_FIELD_WRONLY_DRIVER(fileName,field);
 	    break;
 	  }
-	  case MED_EN::MED_REMP : {
+	  case MED_EN::RDWR : {
 	    throw MED_EXCEPTION ("not yet implemented");
 	    break ;
 	  }
@@ -152,15 +154,15 @@ namespace MEDMEM {
       case VTK_DRIVER : {
 	switch(access)
 	  {
-	  case MED_EN::MED_LECT : {
+	  case MED_EN::RDONLY : {
 	    throw MED_EXCEPTION ("access mode other than MED_ECRI and MED_REMP has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
 	    break;
 	  }
-	  case MED_EN::MED_ECRI : {
+	  case MED_EN::WRONLY : {
 	    ret=new VTK_FIELD_DRIVER<T>(fileName,field);
 	    break;
 	  }
-	  case MED_EN::MED_REMP : {
+	  case MED_EN::RDWR : {
 	    ret=new VTK_FIELD_DRIVER<T>(fileName,field);
 	    break ;
 	  }
@@ -183,7 +185,7 @@ namespace MEDMEM {
       case ASCII_DRIVER : {
 	switch(access)
 	  {
-	  case MED_EN::MED_ECRI : {
+	  case MED_EN::WRONLY : {
 	    ret=new ASCII_FIELD_DRIVER<T>(fileName,field);
 	    break;
 	  }
@@ -219,27 +221,27 @@ namespace MEDMEM {
 	version = DRIVERFACTORY::globalMedFileVersionForWriting;
       }
 
-    MESSAGE("buildFieldDriverFromFile version of the file " << version);
+    MESSAGE_MED("buildFieldDriverFromFile version of the file " << version);
 
     GENDRIVER * driver;
 
     switch(access)
       {
-      case MED_EN::MED_LECT : {
+      case MED_EN::RDONLY : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)
 	  driver = new MED_FIELD_RDONLY_DRIVER22<T>(fileName,ptrField);
 	return driver;
       }
-      case MED_EN::MED_ECRI : {
+      case MED_EN::WRONLY : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_WRONLY_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)
 	  driver = new MED_FIELD_WRONLY_DRIVER22<T>(fileName,ptrField);
 	return driver;
       }
-      case MED_EN::MED_REMP : {
+      case MED_EN::RDWR : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_RDWR_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)
@@ -258,27 +260,27 @@ namespace MEDMEM {
 							    MED_EN::medFileVersion version)
   {
 
-    MESSAGE("buildConcreteMedDriverForField version of the file " << version);
+    MESSAGE_MED("buildConcreteMedDriverForField version of the file " << version);
 
     GENDRIVER * driver;
 
     switch(access)
       {
-      case MED_EN::MED_LECT : {
+      case MED_EN::RDONLY : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)
 	  driver = new MED_FIELD_RDONLY_DRIVER22<T>(fileName,ptrField);
 	return driver;
       }
-      case MED_EN::MED_ECRI : {
+      case MED_EN::WRONLY : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_WRONLY_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)
 	  driver = new MED_FIELD_WRONLY_DRIVER22<T>(fileName,ptrField);
 	return driver;
       }
-      case MED_EN::MED_REMP : {
+      case MED_EN::RDWR : {
 	if (version == MED_EN::V21)
 	  driver = new MED_FIELD_RDWR_DRIVER21<T>(fileName,ptrField);
 	else if (version == MED_EN::V22)

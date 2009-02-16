@@ -1,32 +1,32 @@
-# Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-#           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation; either 
-# version 2.1 of the License.
-# 
-# This library is distributed in the hope that it will be useful 
-# but WITHOUT ANY WARRANTY; without even the implied warranty of 
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-# Lesser General Public License for more details.
-# 
-# You should have received a copy of the GNU Lesser General Public  
-# License along with this library; if not, write to the Free Software 
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-# 
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-# 
-###################################################################################
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 #
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
+###################################################################################
 # This Python script is testing the mounting in memory of a med file,
 # via the object MED and the writing of this object MED in Med file format
 # V2.1 V2.2
-#
 # Then from the 2 file produced before, a mounting and a writing of those files in
 # different Med file format is tested
-#
 ###################################################################################
-
+#
 from libMEDMEM_Swig import *
 import string
 import os
@@ -34,11 +34,11 @@ import os
 #befor running this script, please be sure about the path the files
 #
 filePath=os.environ["MED_ROOT_DIR"]
-filePath=filePath+"/share/salome/resources/med/"
+filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
 medFile = "pointe.med"
 
-medFile = filePath + medFile
+medFile = os.path.join(filePath, medFile)
 rootFile = string.split(medFile,".")[0]
 medFileOut21 = rootFile + "_Out21.med"
 medFileOut22 = rootFile + "_Out22.med"

@@ -1,0 +1,27 @@
+#! /bin/sh -f
+
+outdir="/tmp"
+if test "z$TMP" != "z" && test -e $TMP; then
+    outdir=$TMP
+else
+ if test "z$TMPDIR" != "z" && test -e $TMPDIR; then
+    outdir=$TMPDIR
+ fi
+fi
+
+# make med file containing int field on cells from ensight file
+
+infile=${srcdir}/../../resources/blow5_ascii.case
+outfile=${outdir}/test_operation_fieldint.med
+
+./ensight2med $infile $outfile I
+
+# main test
+./test_operation_fieldint $outfile EnsightMesh displacement_c
+
+ok=$?
+
+echo $outfile
+rm $outfile
+
+exit $ok

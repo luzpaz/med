@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "COORDINATEClient.hxx"
 #include <string>
@@ -39,11 +41,12 @@ COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
   _complete(false),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m))
 {
-  BEGIN_OF("COORDINATEClient::COORDINATEClient(...)");
+  const char* LOC = "COORDINATEClient::COORDINATEClient(...)";
+  BEGIN_OF(LOC);
 
   blankCopy();
 
-  END_OF("COORDINATEClient::COORDINATEClient(...)");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -52,7 +55,8 @@ COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
 //=============================================================================
 void COORDINATEClient::blankCopy()
 {
-  BEGIN_OF("void COORDINATEClient::blankCopy()");
+  const char* LOC = "void COORDINATEClient::blankCopy()";
+  BEGIN_OF(LOC);
 
   std::string *tA;
   long nA;
@@ -84,7 +88,7 @@ void COORDINATEClient::blankCopy()
 
   _complete = false;
 
-  END_OF("void COORDINATEClient::blankCopy()");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -94,7 +98,8 @@ void COORDINATEClient::blankCopy()
 
 void COORDINATEClient::fillCopy()
 {
-  BEGIN_OF("void COORDINATEClient::fillCopy()");
+  const char* LOC = "void COORDINATEClient::fillCopy()";
+  BEGIN_OF(LOC);
 
   //PN ?? Est-ce qu on peut pas mettre une variable dans COORDINATEClient
   // qu on remplirait dans blankCopy ??
@@ -112,7 +117,7 @@ void COORDINATEClient::fillCopy()
 
   _complete = true;
 
-  END_OF("void COORDINATEClient::fillCopy()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -123,12 +128,13 @@ void COORDINATEClient::fillCopy()
 
 const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 {
-  BEGIN_OF("void COORDINATEClient::getCoordinates()");
+  const char* LOC = "void COORDINATEClient::getCoordinates()";
+  BEGIN_OF(LOC);
 
   if (!_complete) fillCopy();
   const double * c = COORDINATE::getCoordinates(Mode);
 
-  END_OF("void COORDINATEClient::getCoordinates()");
+  END_OF(LOC);
 
   return c;
 }
@@ -140,12 +146,13 @@ const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 
 double COORDINATEClient::getCoordinate(int Number,int Axis)
 {
-  BEGIN_OF("void COORDINATEClient::getCoordinate()");
+  const char* LOC = "void COORDINATEClient::getCoordinate()";
+  BEGIN_OF(LOC);
 
   if (!_complete) fillCopy();
   double d = COORDINATE::getCoordinate(Number, Axis);
 
-  END_OF("void COORDINATEClient::getCoordinate()");
+  END_OF(LOC);
 
   return d;
 }
@@ -156,12 +163,13 @@ double COORDINATEClient::getCoordinate(int Number,int Axis)
 //=============================================================================
 const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 {
-  BEGIN_OF("void COORDINATEClient::getCoordinateAxis()");
+  const char* LOC = "void COORDINATEClient::getCoordinateAxis()";
+  BEGIN_OF(LOC);
 
   if (!_complete) fillCopy();
   const double *c = COORDINATE::getCoordinateAxis(Axis);
 
-  END_OF("void COORDINATEClient::getCoordinateAxis()");
+  END_OF(LOC);
 
   return c;
 }
@@ -172,12 +180,13 @@ const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 //=============================================================================
 const int*      COORDINATEClient::getNodesNumbers() const
 {
-  BEGIN_OF("void COORDINATEClient::getNodesNumbers()");
+  const char* LOC = "void COORDINATEClient::getNodesNumbers()";
+  BEGIN_OF(LOC);
 
   if (!_complete) (const_cast < COORDINATEClient * >(this))->fillCopy();
 
   MESSAGE("NON IMPLEMENTE DANS L'API CORBA");
-  END_OF("void COORDINATEClient::getNodesNumbers()");
+  END_OF(LOC);
 
   return NULL;
 }

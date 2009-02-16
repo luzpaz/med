@@ -1,4 +1,6 @@
-#  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 #  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
 #  This library is free software; you can redistribute it and/or
@@ -15,14 +17,23 @@
 #  License along with this library; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-SUBDIRS = MEDWrapper MEDMEM INTERPOLATION MEDMEM_SWIG 
+SUBDIRS = MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling INTERPOLATION MEDMEM_SWIG MEDMEMBinTest $(MPIDIR)
+
+if CPPUNIT_IS_OK
+ SUBDIRS+= MEDMEMCppTest INTERP_KERNELTest
+endif
+
+if MPI_IS_OK
+  SUBDIRS+= ParaMEDMEM
+endif
 
 if MED_ENABLE_SPLITTER
-  SUBDIRS+= MEDSPLITTER
+  SUBDIRS+= MEDSPLITTER MEDSPLITTER_Swig
+
 
 # MULTIPR
 if MED_ENABLE_METIS
@@ -42,4 +53,4 @@ if MED_ENABLE_GUI
   SUBDIRS+= MEDGUI
 endif
 
-DIST_SUBDIRS= MEDWrapper INTERPOLATION MEDMEM MEDMEM_SWIG MEDSPLITTER MULTIPR MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient MEDGUI
+DIST_SUBDIRS= MEDWrapper INTERPOLATION MEDCoupling MEDMEM INTERP_KERNEL MEDMEM_SWIG MEDMEMBinTest MEDMEMCppTest MEDSPLITTER MULTIPR ParaMEDMEM ParaMEDMEM_Swig MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient MEDGUI

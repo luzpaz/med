@@ -1,28 +1,31 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-// 
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //=============================================================================
 // File      : MEDMEM_Mesh_i.cxx
 // Project   : SALOME
 // Author    : EDF 
 // $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Mesh_i.cxx
 //=============================================================================
-
+//
 #include <vector>
 
 #include "utilities.h"
@@ -61,9 +64,10 @@ MESH_i::MESH_i(): _mesh(constructConstMesh()),
 		  _corbaIndex(MESH_i::meshIndex++),
   		  _meshId("") 
 {
-        BEGIN_OF("Default Constructor MESH_i");
+  const char* LOC = "Default Constructor MESH_i";
+  BEGIN_OF(LOC);
         MESH_i::meshMap[_corbaIndex]=_mesh;
-        END_OF("Default Constructor MESH_i");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -82,11 +86,12 @@ MESH_i::MESH_i(::MESH * const m ) :_mesh(m),
 			_corbaIndex(MESH_i::meshIndex++),
   		        _meshId("") 
 {
-        BEGIN_OF("Constructor MESH_i(::MESH * const m )");
+  const char* LOC = "Constructor MESH_i(::MESH * const m )";
+  BEGIN_OF(LOC);
         MESH_i::meshMap[_corbaIndex]=_mesh;
 	SCRUTE(_mesh);
 
-        END_OF("Constructor MESH_i(::MESH * const m )");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -98,9 +103,10 @@ MESH_i::MESH_i( MESH_i & m) :_mesh(m._mesh),
 		             _corbaIndex(MESH_i::meshIndex++),
   		             _meshId("") 
 {
-        BEGIN_OF("Constructor MESH_i");
+  const char* LOC = "Constructor MESH_i";
+  BEGIN_OF(LOC);
         MESH_i::meshMap[_corbaIndex]=_mesh;
-        END_OF("Constructor MESH_i");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -1315,6 +1321,30 @@ throw (SALOME::SALOME_Exception)
                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
+
+//=============================================================================
+/*!
+ * CORBA:
+ */
+//=============================================================================
+SALOME_MED::SUPPORT_ptr MESH_i::getSupportOnAll(SALOME_MED::medEntityMesh entity)
+throw (SALOME::SALOME_Exception)
+{
+        if (_mesh==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
+                                              SALOME::INTERNAL_ERROR);
+        try
+        {
+                SUPPORT * myNewSupport = _mesh->getSupportOnAll(convertIdlEntToMedEnt(entity));
+                SUPPORT_i * mySupportI = new SUPPORT_i(myNewSupport);
+                return mySupportI->_this();
+        }
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to get the support ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+}
 //=============================================================================
 /*!
  * CORBA: 
@@ -1492,7 +1522,8 @@ throw (SALOME::SALOME_Exception)
 void MESH_i::addInStudy(SALOMEDS::Study_ptr myStudy,SALOME_MED::MESH_ptr myIor )
 throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-	BEGIN_OF("MED_Mesh_i::addInStudy");
+  const char* LOC = "MED_Mesh_i::addInStudy";
+  BEGIN_OF(LOC);
 	if ( _meshId != "" )
 	{
 		MESSAGE("Mesh already in Study");
@@ -1560,7 +1591,7 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
    	MESSAGE("Registering of the Corba Mesh pointer");
 	Register();
 
-	END_OF("Mesh_i::addInStudy(SALOMEDS::Study_ptr myStudy)");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -1570,7 +1601,8 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 void MESH_i::addInStudy(SALOMEDS::Study_ptr myStudy,SALOME_MED::MESH_ptr myIor,const string & fileName )
 throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-        BEGIN_OF("MED_Mesh_i::addInStudy");
+  const char* LOC = "MED_Mesh_i::addInStudy";
+  BEGIN_OF(LOC);
         if ( _meshId != "" )
         {
                 MESSAGE("Mesh already in Study");
@@ -1626,7 +1658,7 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
    	MESSAGE("Registering of the Corba Mesh pointer");
 	Register();
 
-        END_OF("Mesh_i::addInStudy(SALOMEDS::Study_ptr myStudy)");
+  END_OF(LOC);
 }
 //=============================================================================
 

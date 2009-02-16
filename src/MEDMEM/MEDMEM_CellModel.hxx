@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
  File MEDMEM_CellModel.hxx
@@ -184,9 +186,9 @@ inline CELLMODEL::CELLMODEL(const CELLMODEL &m)
 }
 inline CELLMODEL::~CELLMODEL() 
 {
-  //  MESSAGE("CELLMODEL::~CELLMODEL() destroying the cell");
+  //  MESSAGE_MED("CELLMODEL::~CELLMODEL() destroying the cell");
   clean() ;
-};
+}
 inline CELLMODEL & CELLMODEL::operator=(const CELLMODEL &m) 
 {
     clean() ;
@@ -237,6 +239,36 @@ inline MED_EN::medGeometryElement CELLMODEL::getConstituentType(int dim,int num)
 {
   return _constituentsType[dim-1][num-1];
 }
+
+/*!: Utility  class for storing cell models. Avoids calling the cellmodel constructor too
+often.
+*/
+class MEDMEM_EXPORT CELLMODEL_Map
+{
+public:
+	static const MEDMEM::CELLMODEL& retrieveCellModel(MED_EN::medGeometryElement type);
+private:
+	static CELLMODEL_Map *getInstance();
+	static CELLMODEL_Map *_singleton;
+ std::map<MED_EN::medGeometryElement,MEDMEM::CELLMODEL> _cell_models;
+	
+	CELLMODEL_Map(){
+		_cell_models.insert(make_pair(MED_EN::MED_TRIA3,CELLMODEL(MED_EN::MED_TRIA3)));
+		_cell_models.insert(make_pair(MED_EN::MED_QUAD4,CELLMODEL(MED_EN::MED_QUAD4)));
+		_cell_models.insert(make_pair(MED_EN::MED_TETRA4,CELLMODEL(MED_EN::MED_TETRA4)));
+		_cell_models.insert(make_pair(MED_EN::MED_HEXA8,CELLMODEL(MED_EN::MED_HEXA8)));
+		_cell_models.insert(make_pair(MED_EN::MED_PYRA5,CELLMODEL(MED_EN::MED_PYRA5)));
+		_cell_models.insert(make_pair(MED_EN::MED_PENTA6,CELLMODEL(MED_EN::MED_PENTA6)));
+		
+	};
+	~CELLMODEL_Map(){ if(_singleton) delete _singleton;};
+	
+	const MEDMEM::CELLMODEL& getCellModel(MED_EN::medGeometryElement type)
+	{
+		return _cell_models[type];
+	};
+
+};
 
 }//End of namespace MEDMEM
 

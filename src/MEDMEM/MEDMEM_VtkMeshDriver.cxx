@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_VtkMeshDriver.hxx"
 
@@ -37,7 +39,7 @@ using namespace MED_EN;
 
 #define MED_NULL     NULL
 
-VTK_MESH_DRIVER::VTK_MESH_DRIVER(): GENDRIVER(), 
+VTK_MESH_DRIVER::VTK_MESH_DRIVER(): GENDRIVER(VTK_DRIVER), 
 				    _ptrMesh((MESH * const)MED_NULL)
 {
   _vtkFile = new ofstream();
@@ -47,10 +49,9 @@ VTK_MESH_DRIVER::VTK_MESH_DRIVER(): GENDRIVER(),
 
 VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName,
 				 MESH * ptrMesh) :
-  GENDRIVER(fileName,MED_WRONLY),
+  GENDRIVER(fileName, WRONLY, VTK_DRIVER),
   _ptrMesh(ptrMesh)
 {
-  const char * LOC = "VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName, MESH * ptrMesh) : " ;
 
   // Send an exception because a VTK_MESH_DRIVER object cannot be instantied
   // from a file and there is no read for that kind of driver
@@ -58,7 +59,8 @@ VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName,
   //  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "This driver is only used to write in VTK format So thie object can not be instantied using a file!"));
 
   //  _ptrMesh->addDriver(*this); // OU RECUPERER L'ID.
-  MESSAGE(LOC << "WARNING this driver is only used to write in VTK format So the object can not be instantied using a file!");
+  MESSAGE_MED("VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName, MESH * ptrMesh) : "
+          << "WARNING this driver is only used to write in VTK format So the object can not be instantied using a file!");
 
   _vtkFile = new ofstream(); 
 }
@@ -75,26 +77,26 @@ VTK_MESH_DRIVER::VTK_MESH_DRIVER(const VTK_MESH_DRIVER & driver):
 
 VTK_MESH_DRIVER::~VTK_MESH_DRIVER()
 {
-  const char * LOC ="VTK_MESH_DRIVER::~VTK_MESH_DRIVER()";
-  BEGIN_OF(LOC);
+  const char* LOC = "VTK_MESH_DRIVER::~VTK_MESH_DRIVER()";
+  BEGIN_OF_MED(LOC);
 
   close();
 
-  SCRUTE(_vtkFile);
+  SCRUTE_MED(_vtkFile);
 
   delete _vtkFile ;
 
-  SCRUTE(_vtkFile);
+  SCRUTE_MED(_vtkFile);
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void VTK_MESH_DRIVER::openConst() const throw (MEDEXCEPTION)
 {
   const char * LOC = "VTK_MESH_DRIVER::openConst()" ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
-  MESSAGE(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
+  MESSAGE_MED(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< _accessMode);
 
   if ( _fileName == "" )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
@@ -109,8 +111,8 @@ void VTK_MESH_DRIVER::openConst() const throw (MEDEXCEPTION)
 //    else
 
 
-  SCRUTE((*_vtkFile).is_open());
-  SCRUTE(_vtkFile);
+  SCRUTE_MED((*_vtkFile).is_open());
+  SCRUTE_MED(_vtkFile);
 
 
 
@@ -118,7 +120,7 @@ void VTK_MESH_DRIVER::openConst() const throw (MEDEXCEPTION)
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
 				     << _fileName)
 			  );
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void VTK_MESH_DRIVER::open() {
@@ -128,10 +130,10 @@ void VTK_MESH_DRIVER::open() {
 void VTK_MESH_DRIVER::closeConst() const throw (MEDEXCEPTION)
 {
   const char * LOC = "VTK_MESH_DRIVER::closeConst() " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
-  SCRUTE(_vtkFile);
-  SCRUTE(*_vtkFile);
+  SCRUTE_MED(_vtkFile);
+  SCRUTE_MED(*_vtkFile);
 
 
   if ((*_vtkFile).is_open())
@@ -141,15 +143,16 @@ void VTK_MESH_DRIVER::closeConst() const throw (MEDEXCEPTION)
 //      _status = MED_CLOSED ;
 //    else
 
-  SCRUTE(_vtkFile);
-  SCRUTE(*_vtkFile);
+  SCRUTE_MED(_vtkFile);
+  SCRUTE_MED(*_vtkFile);
+  SCRUTE_MED(_vtkFile->is_open());
 
-  if (!(*_vtkFile))
+  if ( (*_vtkFile) && _vtkFile->is_open() )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
 				     << _fileName)
 			  );
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 void VTK_MESH_DRIVER::close() {
@@ -162,13 +165,13 @@ string  VTK_MESH_DRIVER::getMeshName() const { return _meshName; };
 void VTK_MESH_DRIVER::read(void) throw (MEDEXCEPTION)
 {
   const char * LOC = "VTK_MESH_DRIVER::read() : " ;
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Send an exception
 
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "This driver is only used to write in VTK format !"));
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 }
 
 
@@ -176,12 +179,17 @@ void VTK_MESH_DRIVER::write(void) const
   throw (MEDEXCEPTION)
 { 
   const char * LOC = "void VTK_MESH_DRIVER::write(void) const : ";
-  BEGIN_OF(LOC);
+  BEGIN_OF_MED(LOC);
 
   // Well we must open vtk file first, because there are
   // no other driver than MED for VTK that do it !
 
   openConst();
+
+  int SpaceDimension = _ptrMesh->getSpaceDimension() ;
+  int NumberOfNodes = _ptrMesh->getNumberOfNodes() ;
+  if ( SpaceDimension < 1 )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh is empty"));
 
   (*_vtkFile) << "# vtk DataFile Version 2.0" << endl 
 	   << "maillage from MedMemory"  << endl ;
@@ -191,8 +199,6 @@ void VTK_MESH_DRIVER::write(void) const
 
   (*_vtkFile) << "DATASET UNSTRUCTURED_GRID" << endl ;
   // put points (all point are in 3D, so if we are in 1D or 2D, we complete by zero !
-  int SpaceDimension = _ptrMesh->getSpaceDimension() ;
-  int NumberOfNodes = _ptrMesh->getNumberOfNodes() ;
   (*_vtkFile) << "POINTS " << NumberOfNodes << " float" << endl ;
   const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) ;
   for (int i=0;i<NumberOfNodes;i++) {
@@ -408,7 +414,7 @@ void VTK_MESH_DRIVER::write(void) const
       (*_vtkFile) << vtkType << endl ;
   }
 
-  END_OF(LOC);
+  END_OF_MED(LOC);
 } 
 
 GENDRIVER * VTK_MESH_DRIVER::copy(void) const

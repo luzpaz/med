@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef MEDMEM_INTERPOLATION_HIGHLEVEL_OBJECTS_HXX
 #define MEDMEM_INTERPOLATION_HIGHLEVEL_OBJECTS_HXX
@@ -60,7 +62,8 @@ public :
 	inline int trouve_plus_proche_point_bourrin(double *node);
 	// FIN PATCH
 	inline int trouve_plus_proche_point(double * node);
-};
+        int get_all_close(double * node, double tolerance, list<int> & closeNumbers);
+  };
 
 /*********************************************************/
 /*                                                       */
@@ -270,7 +273,7 @@ public :
 				nlpp = mapping->Get_Noeud_Le_Plus_Proche(i);
 				//cout<<" | et dont le point le plus proche a pour numéro : "<<nlpp<<flush;
 				//cout<<" | valeurs qui va etre assignée = "<<(*fromWrapper->Get_Champ())[nlpp]<<flush;
-				if (nlpp!=UNDEFINED) 
+				if (nlpp!=MED_UNDEFINED) 
 					{
 					resultat[i]=(*fromWrapper->Get_Champ())[nlpp];
 					ne++;
@@ -319,6 +322,12 @@ template <int DIMENSION> inline int Meta_dTree<DIMENSION>::trouve_plus_proche_po
 	static Wrapper_Noeud<DIMENSION> nodetmp;
 	nodetmp.positionne(node);
 	return dTree<Wrapper_Noeud<DIMENSION>,Wrapper_Nuage_Noeud<DIMENSION>,DIMENSION>::trouve_plus_proche_point_bourrin(Wrapper_Noeud<DIMENSION>(nodetmp));
+	}
+template <int DIMENSION> inline int Meta_dTree<DIMENSION>::get_all_close(double * node, double tolerance, list<int> & closeNumbers)
+	{
+	static Wrapper_Noeud<DIMENSION> nodetmp;
+	nodetmp.positionne(node);
+	return dTree<Wrapper_Noeud<DIMENSION>,Wrapper_Nuage_Noeud<DIMENSION>,DIMENSION>::get_all_close(Wrapper_Noeud<DIMENSION>(nodetmp), tolerance, closeNumbers );
 	}
 /*********************************************************/
 /*                                                       */

@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef DEFINE_HXX
 #define DEFINE_HXX
@@ -84,7 +86,8 @@ namespace MED_EN {
 
     typedef enum {MED_CARTESIAN, MED_POLAR, MED_BODY_FITTED} med_grid_type;
 
-    typedef enum {MED_LECT,MED_ECRI,MED_REMP,MED_CREA} med_mode_acces;
+    //typedef enum {MED_LECT,MED_ECRI,MED_REMP,MED_CREA} med_mode_acces;
+    typedef enum {RDONLY,WRONLY,RDWR} med_mode_acces;
 
     typedef enum {ASCENDING=7,DESCENDING=77} med_sort_direc;
 
@@ -204,15 +207,15 @@ typedef double         med_float;
 #define MED_VALID    0
 //#define MED_NULL     NULL
 
-#define MED_RDONLY MED_LECT
-  //   rem: MED_WRONLY=MED_ECR n'empêche malheureusement pas de lire le fichier
-  //   mais permet de conserver l'existant. Attention à la création d'objet
-  //   ne prenant pas de paramètre de type mode d'accès il faut tester si il
-  //   est déjà présent dans le fichier. Si  MED_WRONLY=MED_REMP le fichier est
-  //   réinitialisé. Cf une évolution de MED.
-#define MED_WRONLY MED_ECRI
-#define MED_RDWR   MED_ECRI
-#define MED_CREATE MED_CREA
+//#define MED_RDONLY RDONLY
+////   rem: MED_WRONLY=MED_ECR n'empêche malheureusement pas de lire le fichier
+////   mais permet de conserver l'existant. Attention à la création d'objet
+////   ne prenant pas de paramètre de type mode d'accès il faut tester si il
+////   est déjà présent dans le fichier. Si  MED_WRONLY=MED_REMP le fichier est
+////   réinitialisé. Cf une évolution de MED.
+//#define MED_WRONLY WRONLY
+//#define MED_RDWR   RDWR
+//#define MED_CREATE MED_CREA
 // Fin
 
 #define FAUX 0
@@ -220,7 +223,7 @@ typedef double         med_float;
 #define longueur_string 100
 #define PRECISION 0.0000001
 // #define undefined -1
-#define UNDEFINED -1
+#define MED_UNDEFINED -1
 
 // type des connectivites
 //#define CONN_NOD 0

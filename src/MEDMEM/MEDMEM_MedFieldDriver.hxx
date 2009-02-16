@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef MED_FIELD_DRIVER_HXX
 #define MED_FIELD_DRIVER_HXX
@@ -61,8 +63,10 @@ public :
   /*!
     Constructor.
   */
-  MED_FIELD_DRIVER():_ptrField((FIELD<T> *) MED_NULL),
-                     _fieldName(""),_fieldNum(MED_INVALID)
+  MED_FIELD_DRIVER():
+    GENDRIVER(MED_DRIVER),
+    _ptrField((FIELD<T> *) MED_NULL),
+    _fieldName(""),_fieldNum(MED_INVALID)
   {}
   /*!
     Constructor.
@@ -70,7 +74,7 @@ public :
   template <class INTERLACING_TAG>
   MED_FIELD_DRIVER(const string & fileName, FIELD<T, INTERLACING_TAG> * ptrField,
 		   MED_EN::med_mode_acces accessMode)
-    : GENDRIVER(fileName,accessMode),
+    : GENDRIVER(fileName, accessMode, MED_DRIVER),
       _ptrField((FIELD<T> *) ptrField),
       _fieldName(""),_fieldNum(MED_INVALID)
   {
@@ -92,7 +96,7 @@ public :
   */
   virtual ~MED_FIELD_DRIVER()
   {
-    MESSAGE("MED_FIELD_DRIVER::~MED_FIELD_DRIVER() has been destroyed");
+    MESSAGE_MED("MED_FIELD_DRIVER::~MED_FIELD_DRIVER() has been destroyed");
   }
 
   virtual void open() throw (MEDEXCEPTION) = 0;
@@ -140,10 +144,11 @@ public :
   template <class INTERLACING_TAG>
   IMED_FIELD_RDONLY_DRIVER(const string & fileName,
 			   FIELD<T, INTERLACING_TAG> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY)
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY)
   {
-    BEGIN_OF("IMED_FIELD_RDONLY_DRIVER::IMED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
-    END_OF("IMED_FIELD_RDONLY_DRIVER::IMED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  const char* LOC = "IMED_FIELD_RDONLY_DRIVER::IMED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF_MED(LOC);
+  END_OF_MED(LOC);
   }
 
   /*!
@@ -190,10 +195,11 @@ public :
   template <class INTERLACING_TAG>
   IMED_FIELD_WRONLY_DRIVER(const string & fileName,
 			   FIELD<T, INTERLACING_TAG> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_WRONLY)
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
   {
-    BEGIN_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
-    END_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  const char* LOC = "MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF_MED(LOC);
+  END_OF_MED(LOC);
   }
 
   /*!
@@ -242,11 +248,12 @@ public :
 			 FIELD<T, INTERLACING_TAG> * ptrField):
     IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField),
     IMED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField),
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDWR)
+    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR)
   {
-    BEGIN_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  const char* LOC = "MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF_MED(LOC);
     //_accessMode = MED_RDWR ;
-    END_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  END_OF_MED(LOC);
   }
 
   /*!
@@ -290,6 +297,7 @@ public :
   virtual void close() { _concreteFieldDrv->close(); }
   virtual void   setFieldName(const string & fieldName) { _concreteFieldDrv->setFieldName(fieldName); }
   virtual string getFieldName() const { return MED_FIELD_DRIVER<T>::getFieldName(); }
+  virtual void setFileName ( const string & fileName) {_concreteFieldDrv->setFileName(fileName); }
   
 private:
   virtual GENDRIVER * copy ( void ) const { return new MED_FIELD_RDONLY_DRIVER<T>(*this); }
@@ -314,6 +322,7 @@ public :
   virtual void close() { _concreteFieldDrv->close(); }
   virtual void   setFieldName(const string & fieldName) { _concreteFieldDrv->setFieldName(fieldName); }
   virtual string getFieldName() const { return MED_FIELD_DRIVER<T>::getFieldName(); }
+  virtual void setFileName ( const string & fileName) {_concreteFieldDrv->setFileName(fileName); }
 private:
   virtual GENDRIVER * copy ( void ) const { return new MED_FIELD_WRONLY_DRIVER<T>(*this); }
 protected:
@@ -341,6 +350,7 @@ public:
   virtual void close() { _concreteFieldDrv->close(); }
   virtual void   setFieldName(const string & fieldName) { _concreteFieldDrv->setFieldName(fieldName); }
   virtual string getFieldName() const { return MED_FIELD_DRIVER<T>::getFieldName(); }
+  virtual void setFileName ( const string & fileName) {_concreteFieldDrv->setFileName(fileName); }
 private:
   virtual GENDRIVER * copy ( void ) const { return new MED_FIELD_RDWR_DRIVER<T>(*this); }
 protected:
@@ -378,21 +388,22 @@ template <class T> void IMED_FIELD_RDONLY_DRIVER<T>::write( void ) const
 }
 
 template <class T>  MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER() {
-    MESSAGE("You are using the default constructor of the Field read only Driver and it is 2.1 one");
+    MESSAGE_MED("You are using the default constructor of the Field read only Driver and it is 2.1 one");
     _concreteFieldDrv=new MED_FIELD_RDONLY_DRIVER21<T>();
 }
 
 template <class T> template < class INTERLACING_TAG >
 MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER(const string & fileName,
 						    FIELD<T, INTERLACING_TAG> * ptrField):
-  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_RDONLY),
+  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY),
   IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField)
 {
-    BEGIN_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  const char* LOC = "MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF_MED(LOC);
 
-    _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::MED_LECT);
+    _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::RDONLY);
 
-    END_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  END_OF_MED(LOC);
 }
 
 /*--------------------- WRONLY PART -------------------------------*/
@@ -404,7 +415,7 @@ template <class T> void IMED_FIELD_WRONLY_DRIVER<T>::read (void)
 }
 
 template <class T>  MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER() {
-    MESSAGE("You are using the default constructor of the Field write only Driver and it is 2.1 one");
+    MESSAGE_MED("You are using the default constructor of the Field write only Driver and it is 2.1 one");
 
     _concreteFieldDrv=new MED_FIELD_WRONLY_DRIVER21<T>();
 }
@@ -412,20 +423,21 @@ template <class T>  MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER() {
 template <class T> template < class INTERLACING_TAG >
 MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER(const string & fileName,
 						    FIELD<T, INTERLACING_TAG> * ptrField):
-  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_WRONLY),
+  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY),
   IMED_FIELD_WRONLY_DRIVER<T>( fileName, ptrField)
 {
-  BEGIN_OF("MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  const char* LOC = "MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF_MED(LOC);
 
-  _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::MED_ECRI);
+  _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::WRONLY/*ECRI*/);
 
-  END_OF("MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  END_OF_MED(LOC);
 }
 
 /*--------------------- RDWR PART -------------------------------*/
 
 template <class T>  MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER() {
-    MESSAGE("You are using the default constructor of the Field read/write Driver and it is 2.1 one");
+    MESSAGE_MED("You are using the default constructor of the Field read/write Driver and it is 2.1 one");
 
     _concreteFieldDrv=new MED_FIELD_RDWR_DRIVER21<T>();
 }
@@ -433,14 +445,15 @@ template <class T>  MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER() {
 template <class T> template < class INTERLACING_TAG >
 MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER(const string & fileName,
 						FIELD<T, INTERLACING_TAG> * ptrField):
-  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::MED_REMP),
+  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR),
   IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
 {
-  BEGIN_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  const char* LOC = "MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
+  BEGIN_OF_MED(LOC);
 
-  _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::MED_REMP);
+  _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::RDWR);
 
-  END_OF("MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)");
+  END_OF_MED(LOC);
 }
 
 

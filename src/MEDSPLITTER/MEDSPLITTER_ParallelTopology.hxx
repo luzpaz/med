@@ -1,3 +1,21 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #ifndef PARALLELTOPOLOGY_HXX_
 #define PARALLELTOPOLOGY_HXX_
 
@@ -251,8 +269,8 @@ namespace MEDSPLITTER {
       pair<MMiter,MMiter> eq = m_face_glob_to_loc.equal_range(iglobal);
       for (MMiter it=eq.first; it != eq.second; it++)
       {
-        SCRUTE (it->second.first);
-        SCRUTE (idomain);
+        SCRUTE_MED (it->second.first);
+        SCRUTE_MED (idomain);
         if (it->second.first == idomain) return it->second.second;
         
       }

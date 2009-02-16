@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
  File Unit.hxx
@@ -84,41 +86,41 @@ public:
 
 inline void UNIT::setName(string Name) {
   _name = Name ;
-};
+}
 inline void UNIT::setDescription(string Description) {
   _description = Description ;
-};
+}
 inline void UNIT::setMasse(int Masse) {
   _masse=Masse ;
-};
+}
 inline void UNIT::setLength(int Length) {
   _length=Length ;
-};
+}
 inline void UNIT::setTime(int Time) {
   _time=Time ;
-};
+}
 inline void UNIT::setTemperature(int Temperature) {
   _temperature=Temperature ;
-};
+}
 inline void UNIT::setMatterQuantity(int MatterQuantity) {
   _matterQuantity=MatterQuantity ;
-};
+}
 inline void UNIT::setCurrentStrength(int CurrentStrength) {
   _currentStrength=CurrentStrength ;
-};
+}
 inline void UNIT::setLightIntensity(int LightIntensity) {
   _lightIntensity=LightIntensity ;
-};
+}
 
-inline string UNIT::getName() const            { return _name ; } ;
-inline string UNIT::getDescription() const     { return _description ; } ;
-inline int    UNIT::getMasse() const           { return _masse ; } ;
-inline int    UNIT::getLength() const          { return _length ; } ;
-inline int    UNIT::getTime() const            { return _time ; } ;
-inline int    UNIT::getTemperature() const     { return _temperature ; } ;
-inline int    UNIT::getMatterQuantity() const  { return _matterQuantity ; } ;
-inline int    UNIT::getCurrentStrength() const { return _currentStrength ; } ;
-inline int    UNIT::getLightIntensity() const  { return _lightIntensity ; } ;
+inline string UNIT::getName() const            { return _name ; }
+inline string UNIT::getDescription() const     { return _description ; }
+inline int    UNIT::getMasse() const           { return _masse ; }
+inline int    UNIT::getLength() const          { return _length ; }
+inline int    UNIT::getTime() const            { return _time ; }
+inline int    UNIT::getTemperature() const     { return _temperature ; }
+inline int    UNIT::getMatterQuantity() const  { return _matterQuantity ; }
+inline int    UNIT::getCurrentStrength() const { return _currentStrength ; }
+inline int    UNIT::getLightIntensity() const  { return _lightIntensity ; }
 }//End namespace MEDMEM
 
 #endif /* UNIT_HXX */

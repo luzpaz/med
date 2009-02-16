@@ -20,6 +20,8 @@
 #include "med.hxx"
 #include "med_outils.hxx"
 
+#include <cstring>
+
 /*
  * - Nom de la fonction : _MEDindiceInfo
  * - Description : en argument de H5Giterate, donne le nom

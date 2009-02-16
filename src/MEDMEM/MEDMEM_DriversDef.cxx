@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_DriversDef.hxx"
 
@@ -51,9 +53,9 @@ GEO_NAME::GEO_NAME() : map<int,string>()
  
 GEO_NAME::~GEO_NAME()
 {
-//   MESSAGE(" destructor GEO_NAME::~GEO_NAME() "<< size() );
+//   MESSAGE_MED(" destructor GEO_NAME::~GEO_NAME() "<< size() );
 //   clear();
-//   MESSAGE(" end of destructor GEO_NAME::~GEO_NAME() "<< size() );
+//   MESSAGE_MED(" end of destructor GEO_NAME::~GEO_NAME() "<< size() );
 }
  
 string & GEO_NAME::operator[]( const MED_EN::medGeometryElement &c ) const
@@ -78,9 +80,9 @@ ENT_NAME::ENT_NAME() : map<int,string>()
 
 ENT_NAME::~ENT_NAME()
 {
-//   MESSAGE(" destructor ENT_NAME::~ENT_NAME() "<< size() );
+//   MESSAGE_MED(" destructor ENT_NAME::~ENT_NAME() "<< size() );
 //   clear();
-//   MESSAGE(" end of destructor ENT_NAME::~ENT_NAME() "<< size() );
+//   MESSAGE_MED(" end of destructor ENT_NAME::~ENT_NAME() "<< size() );
 }
 
 string & ENT_NAME::operator[]( const MED_EN::medEntityMesh &c ) const
@@ -152,9 +154,9 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
 
 MESH_ENTITIES::~MESH_ENTITIES()
 {
-//   MESSAGE(" destructor MESH_ENTITIES::~MESH_ENTITIES() "<< size() );
+//   MESSAGE_MED(" destructor MESH_ENTITIES::~MESH_ENTITIES() "<< size() );
 //   clear();
-//   MESSAGE(" end of destructor MESH_ENTITIES::~MESH_ENTITIES() "<< size() );
+//   MESSAGE_MED(" end of destructor MESH_ENTITIES::~MESH_ENTITIES() "<< size() );
 }
 
 const list<MED_EN::medGeometryElement> & MESH_ENTITIES::operator[]( const  MED_EN::medEntityMesh &c ) const

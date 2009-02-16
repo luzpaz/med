@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef __MEDMEM_UTILITIES
 #define __MEDMEM_UTILITIES
@@ -23,12 +25,12 @@
 // standart Linux/Unix functions 
 #include <string>
 
-#ifndef WNT
-  #include <libgen.h>
+#ifndef WIN32
+#include <libgen.h>
 #endif
-inline std::string getBaseName( std::string dataname ) {
+inline std::string getBaseName( const std::string& dataname ) {
   std::string aBaseName = "";
-#ifndef WNT
+#ifndef WIN32
   aBaseName = basename((char*)dataname.c_str());
 #else
   for ( int i = dataname.size()-1; i >= 0; i-- ) {
@@ -41,9 +43,9 @@ inline std::string getBaseName( std::string dataname ) {
   return aBaseName;
 }
 
-inline std::string getDirName( std::string dataname ) {
+inline std::string getDirName(const std::string& dataname ) {
   std::string aDirName = "";
-#ifndef WNT
+#ifndef WIN32
   aDirName = dirname((char*)dataname.c_str());
 #else
   bool aFindLine = false;
@@ -60,7 +62,15 @@ inline std::string getDirName( std::string dataname ) {
   return aDirName;
 }
 
-#ifdef MED_WITHOUT_KERNEL
+/*!
+* \brief Make a name valid. So far, removes white spaces from name end
+*/
+inline std::string healName(const std::string& name ) {
+  size_t last = name.size()-1;
+  while ( last >= 0 && isspace( name[last] ))
+    last--;
+  return name.substr( 0, last + 1 );
+}
 
 #  include <cstdlib>
 #  include <iostream>
@@ -68,78 +78,75 @@ using namespace std;
 
 /* ---  INFOS is always defined (without _DEBUG_): to be used for warnings, with release version --- */
 
-# define HEREWEARE {cout<<flush ; cerr << __FILE__ << " [" << __LINE__ << "] : " << flush ;}
-# define INFOS(chain) {HEREWEARE ; cerr << chain << endl ;}
-# define PYSCRIPT(chain) {cout<<flush ; cerr << "---PYSCRIPT--- " << chain << endl ;}
+# define HEREWEARE_MED {cout<<flush ; cerr << __FILE__ << " [" << __LINE__ << "] : " << flush ;}
+# define INFOS_MED(chain) {HEREWEARE_MED ; cerr << chain << endl ;}
+# define PYSCRIPT_MED(chain) {cout<<flush ; cerr << "---PYSCRIPT--- " << chain << endl ;}
 
 
 /* --- To print date and time of compilation of current source on stdout --- */
 
 # if defined ( __GNUC__ )
-# define COMPILER		"g++" ;
+# define COMPILER_MED		"g++" ;
 # elif defined ( __sun )
-# define COMPILER		"CC" ;
+# define COMPILER_MED		"CC" ;
 # elif defined ( __KCC )
-# define COMPILER		"KCC" ;
+# define COMPILER_MED		"KCC" ;
 # elif defined ( __PGI )
-# define COMPILER		"pgCC" ;
+# define COMPILER_MED		"pgCC" ;
 # else
-# define COMPILER		"undefined" ;
+# define COMPILER_MED		"undefined" ;
 # endif
 
-# ifdef INFOS_COMPILATION
-# undef INFOS_COMPILATION
+# ifdef INFOS_COMPILATION_MED
+# undef INFOS_COMPILATION_MED
 # endif
-# define INFOS_COMPILATION	{\
-					cerr << flush;\
-					cout << __FILE__ ;\
-					cout << " [" << __LINE__ << "] : " ;\
-					cout << "COMPILED with " << COMPILER ;\
-					cout << ", " << __DATE__ ; \
-					cout << " at " << __TIME__ << endl ;\
-					cout << "\n\n" ;\
-					cout << flush ;\
-				}
+# define INFOS_COMPILATION_MED	{\
+  cerr << flush;\
+  cout << __FILE__ ;\
+  cout << " [" << __LINE__ << "] : " ;\
+  cout << "COMPILED with " << COMPILER_MED ;\
+  cout << ", " << __DATE__ ; \
+  cout << " at " << __TIME__ << endl ;\
+  cout << "\n\n" ;\
+  cout << flush ;\
+}
 
-# ifdef _DEBUG_
+#if ( defined(_DEBUG_) || defined(_DEBUG) ) && !defined(_NO_MED_TRACE_)
 
 /* --- the following MACROS are useful at debug time --- */
 
-# define HERE {cout<<flush ; cerr << "- Trace " << __FILE__ << " [" << __LINE__ << "] : " << flush ;}
-# define SCRUTE(var) {HERE ; cerr << #var << "=" << var << endl ;}
-# define MESSAGE(chain) {HERE ; cerr << chain << endl ;}
-# define INTERRUPTION(code) {HERE ; cerr << "INTERRUPTION return code= " << code << endl ; exit(code) ;}
+# define HERE_MED {cout<<flush ; cerr << "- Trace " << __FILE__ << " [" << __LINE__ << "] : " << flush ;}
+# define SCRUTE_MED(var) {HERE_MED ; cerr << #var << "=" << var << endl ;}
+# define MESSAGE_MED(chain) {HERE_MED ; cerr << chain << endl ;}
+# define INTERRUPTION_MED(code) {HERE_MED ; cerr << "INTERRUPTION return code= " << code << endl ; exit(code) ;}
 
-# ifndef ASSERT
-# define ASSERT(condition) if (!(condition)){ HERE ; cerr << "CONDITION " << #condition << " NOT VERIFIED"<< endl ; INTERRUPTION(1) ;}
-# endif /* ASSERT */
-
-#define REPERE {cout<<flush ; cerr << "   --------------" << endl << flush ;}
-#define BEGIN_OF(chain) {REPERE ; HERE ; cerr << "Begin of: " << chain << endl ; REPERE ; }
-#define END_OF(chain) {REPERE ; HERE ; cerr << "Normal end of: " << chain << endl ; REPERE ; }
-
+# ifndef ASSERT_MED
+# define ASSERT_MED(condition) if (!(condition)){ HERE_MED ; cerr << "CONDITION " << #condition << " NOT VERIFIED"<< endl ; INTERRUPTION_MED(1) ;}
+# endif /* ASSERT_MED */
+#define REPERE_MED {cout<<flush ; cerr << "   --------------" << endl << flush ;}
+#define __PREFIX_MED const char* __LOC_MED
+#define PREFIX_MED __LOC_MED 
+#define BEGIN_OF_MED(chain) __PREFIX_MED = chain; {REPERE_MED ; HERE_MED ; cerr << "Begin of: " << PREFIX_MED << endl ; REPERE_MED ; }
+#define END_OF_MED(chain) {REPERE_MED ; HERE_MED ; cerr << "Normal end of: " << chain << endl ; REPERE_MED ; }
 
 
 # else /* ifdef _DEBUG_*/
 
-# define HERE
-# define SCRUTE(var) {}
-# define MESSAGE(chain) {}
-# define INTERRUPTION(code) {}
 
-# ifndef ASSERT
-# define ASSERT(condition) {}
+# define HERE_MED
+# define SCRUTE_MED(var) {}
+# define MESSAGE_MED(chain) {}
+# define INTERRUPTION_MED(code) {}
+
+# ifndef ASSERT_MED
+# define ASSERT_MED(condition) {}
 # endif /* ASSERT */
 
-#define REPERE
-#define BEGIN_OF(chain) {}
-#define END_OF(chain) {}
+# define REPERE_MED
+# define BEGIN_OF_MED(chain)  const char* __LOC_MED; {__LOC_MED=chain;}
+# define END_OF_MED(chain) const char* __LOC_END_MED; {__LOC_END_MED=chain;}
 
-#endif
 
-#else
-// #ifdef _SALOME
+#endif /* ifdef _DEBUG_*/
 
-#  include <utilities.h>
-#endif
 #endif

@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef ASCII_FIELD_DRIVER_HXX
 #define ASCII_FIELD_DRIVER_HXX
@@ -102,7 +104,7 @@ namespace MEDMEM {
     template <class INTERLACING_TAG>
     ASCII_FIELD_DRIVER():GENDRIVER(),
 			 _ptrField((FIELD<T>)MED_NULL),
-			 _fileName("") {};
+			 _fileName("") {}
 
     template <class INTERLACING_TAG>
     ASCII_FIELD_DRIVER(const string & fileName, FIELD<T,INTERLACING_TAG> * ptrField,
@@ -176,7 +178,10 @@ namespace MEDMEM {
 					    FIELD<T,INTERLACING_TAG> * ptrField,
 					    MED_EN::med_sort_direc direction,
 					    const char *priority)
-    :GENDRIVER(fileName,MED_EN::MED_ECRI),_ptrField((FIELD<T>*)ptrField),_fileName(fileName),_direc(direction)
+    :GENDRIVER(fileName, MED_EN::WRONLY, ASCII_DRIVER),
+     _ptrField((FIELD<T>*)ptrField),
+     _fileName(fileName),
+     _direc(direction)
     {
       _nbComponents=_ptrField->getNumberOfComponents();
       if(_nbComponents<=0)
@@ -199,7 +204,7 @@ namespace MEDMEM {
 	  for(i=_spaceDimension-1;i>=0;i--)
 	    {
 	      char c=toupper(priority[i]);
-	      if(int(c-'X')>(_spaceDimension-1))
+	      if(int(c-'X')>(_spaceDimension-1) || int(c-'X')<0)
 		throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid priority definition");
 	      _code<<=2;
 	      _code+=c-'X';
@@ -209,9 +214,16 @@ namespace MEDMEM {
 
 
   template <class T>
-  ASCII_FIELD_DRIVER<T>::ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other)
-    :_ptrField(other._ptrField),_fileName(other._fileName),_direc(other._direc),_mesh(other._mesh),_nbComponents(other._nbComponents),
-     _code(other._code),_spaceDimension(other._spaceDimension),_support(other._support)
+  ASCII_FIELD_DRIVER<T>::ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other):
+    GENDRIVER(ASCII_DRIVER),
+    _ptrField(other._ptrField),
+    _fileName(other._fileName),
+    _direc(other._direc),
+    _mesh(other._mesh),
+    _nbComponents(other._nbComponents),
+    _code(other._code),
+    _spaceDimension(other._spaceDimension),
+    _support(other._support)
   {
   }
 
@@ -221,12 +233,17 @@ namespace MEDMEM {
 		if (_file.is_open())
 			throw MEDEXCEPTION("ASCII_FIELD_DRIVER::open() : file is already open !");
     _file.open(_fileName.c_str(),ofstream::out | ofstream::app);
+    // for MEDMEMTest_AsciiFieldDriver.cxx:208 :
+    // must throw because the file is opened
+    //CPPUNIT_ASSERT_MED_THROW(aDriver1->setFileName("anyfile2"), MEDEXCEPTION);
+    _status = _file.is_open() ? MED_OPENED : MED_INVALID;
   }
 
   template <class T>
   void ASCII_FIELD_DRIVER<T>::close()
   {
     _file.close();
+    _status = MED_CLOSED;
   }
 
   template <class T>

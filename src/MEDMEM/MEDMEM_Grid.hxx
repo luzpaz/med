@@ -1,30 +1,30 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : MEDMEM_Grid.hxx
 // Created   : Wed Dec 18 08:35:26 2002
 // Descr     : class containing structured mesh data
-
 // Author    : Edward AGAPOV (eap)
 // Project   : SALOME Pro
 // Module    : MED 
-// $Header$
 
 #ifndef MEDMEM_Grid_HeaderFile
 #define MEDMEM_Grid_HeaderFile
@@ -101,8 +101,10 @@ class MEDMEM_EXPORT GRID: public MESH
   GRID(const MED_EN::med_grid_type type);
   GRID(const GRID &m);
   GRID( driverTypes driverType, const string & fileName="",const string & meshName="");
-  GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name,
-       const std::vector<std::string>& coord_unit, const MED_EN::med_grid_type type=MED_EN::MED_CARTESIAN);
+  GRID(const std::vector<std::vector<double> >& xyz_array,
+       const std::vector<std::string>&          coord_name,
+       const std::vector<std::string>&          coord_unit,
+       const MED_EN::med_grid_type              type=MED_EN::MED_CARTESIAN);
   GRID & operator=(const GRID &m);
   virtual ~GRID();
   virtual void init();
@@ -233,7 +235,7 @@ class MEDMEM_EXPORT GRID: public MESH
 
   inline int getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
 
-  inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
+  const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
 
   MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
 
@@ -249,9 +251,6 @@ class MEDMEM_EXPORT GRID: public MESH
 
   inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
 				MED_EN::medEntityMesh Entity) const;
-
-  inline bool existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
-                                        MED_EN::medEntityMesh Entity) const;
 
   inline MED_EN::medGeometryElement getElementType(MED_EN::medEntityMesh Entity,
 					   int Number) const;
@@ -289,6 +288,7 @@ class MEDMEM_EXPORT GRID: public MESH
   friend class MED_MESH_WRONLY_DRIVER21;
   friend class MED_MESH_RDONLY_DRIVER22;
   friend class MED_MESH_WRONLY_DRIVER22;
+  friend class ENSIGHT_MESH_RDONLY_DRIVER;
 };
 
 
@@ -373,14 +373,14 @@ inline const double GRID::getCoordinate(int number, int axis) const
 */
 inline int GRID::getNumberOfTypes(MED_EN::medEntityMesh entity) const
 {
-  MESSAGE("GRID::getNumberOfTypes(medEntityMesh entity) : "<<entity);
+  MESSAGE_MED("GRID::getNumberOfTypes(medEntityMesh entity) : "<<entity);
     return 1; // a grid has one type
 }
 
 
 inline int GRID::getNumberOfTypesWithPoly(MED_EN::medEntityMesh entity) const
 {
-  MESSAGE("GRID::getNumberOfTypes(medEntityMesh entity) : "<<entity);
+  MESSAGE_MED("GRID::getNumberOfTypes(medEntityMesh entity) : "<<entity);
     return 1; // a grid has one type
 }
 
@@ -426,25 +426,10 @@ inline int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
     
     // Cas où le nombre d'éléments n'est pas nul
     if (entity==MED_EN::MED_FACE && (Type==MED_EN::MED_QUAD4 || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>2)
-      if ( _meshDimension == 2 )
 	numberOfElements=(_iArrayLength-1)*(_jArrayLength-1);
-      else
-	numberOfElements=
-          (_iArrayLength-1)*(_jArrayLength-1)*_kArrayLength +
-          (_jArrayLength-1)*(_kArrayLength-1)*_iArrayLength +
-          (_iArrayLength-1)*(_kArrayLength-1)*_jArrayLength;
 
     else if (entity==MED_EN::MED_EDGE && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>1)
-      if ( _meshDimension == 1 )
 	numberOfElements=_iArrayLength-1;
-      else if ( _meshDimension == 2 )
-	numberOfElements=
-          (_iArrayLength-1)*_jArrayLength + (_jArrayLength-1)*_iArrayLength;
-      else
-	numberOfElements=
-          (_iArrayLength-1)*_jArrayLength*_kArrayLength +
-          (_jArrayLength-1)*_kArrayLength*_iArrayLength +
-          (_kArrayLength-1)*_iArrayLength*_jArrayLength;
 
     else if (entity==MED_EN::MED_NODE && (Type==MED_EN::MED_NONE || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>0)
 	numberOfElements=_numberOfNodes;
@@ -458,8 +443,8 @@ inline int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
     else if (entity==MED_EN::MED_CELL && _spaceDimension==1 && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS) )
 	numberOfElements=_iArrayLength-1;
 
-    MESSAGE("GRID::getNumberOfElements - entity=" << entity << " Type=" << Type);
-    MESSAGE("_spaceDimension=" << _spaceDimension << "  numberOfElements=" << numberOfElements);
+    MESSAGE_MED("GRID::getNumberOfElements - entity=" << entity << " Type=" << Type);
+    MESSAGE_MED("_spaceDimension=" << _spaceDimension << "  numberOfElements=" << numberOfElements);
 
     return numberOfElements;
 }
@@ -481,15 +466,6 @@ inline bool GRID::existConnectivity(MED_EN::medConnectivity connectivityType, ME
   if (_connectivity==(CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("GRID::existConnectivity(medConnectivity,medEntityMesh) : no connectivity defined !");
   return _connectivity->existConnectivity(connectivityType,entity);
-}
-
-/*!
-  Same as the previous
- */
-inline bool GRID::existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
-                                            MED_EN::medEntityMesh Entity) const
-{
-  return existConnectivity(ConnectivityType,Entity);
 }
 
 /*!

@@ -1,6 +1,6 @@
-#  MED MED : implemetation of MED idl descriptions
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 #  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
 #  This library is free software; you can redistribute it and/or
@@ -17,10 +17,10 @@
 #  License along with this library; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+#  MED MED : implemetation of MED idl descriptions
 #
-
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES= libMEDEngine.la
@@ -28,14 +28,14 @@ lib_LTLIBRARIES= libMEDEngine.la
 dist_libMEDEngine_la_SOURCES= Med_Gen_i.cxx Med_Gen_Driver_i.cxx
 salomeinclude_HEADERS = Med_Gen_i.hxx Med_Gen_Driver_i.hxx
 
-libMEDEngine_la_CPPFLAGS= @CAS_CPPFLAGS@ $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} @CORBA_CXXFLAGS@ @CORBA_INCLUDES@ \
+libMEDEngine_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} @CORBA_CXXFLAGS@ @CORBA_INCLUDES@ \
 	-I$(srcdir)/../MEDMEM_I -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
 
 libMEDEngine_la_LDFLAGS=\
 	$(top_builddir)/idl/libSalomeIDLMED.la \
 	../MEDMEM_I/libMEDMEMImpl.la \
-	${KERNEL_LDFLAGS} -lTOOLSDS -lSalomeHDFPersist
+	${KERNEL_LDFLAGS} -lTOOLSDS -lSalomeHDFPersist -lSalomeContainer
 #	${KERNEL_LDFLAGS} \
 #	@CORBA_LIBS@ \
 #	@CAS_OCAF@ \

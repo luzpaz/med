@@ -1,0 +1,26 @@
+#! /bin/sh -f
+
+outdir="/tmp"
+if test "z$TMP" != "z" && test -e $TMP; then
+    outdir=$TMP
+else
+ if test "z$TMPDIR" != "z" && test -e $TMPDIR; then
+    outdir=$TMPDIR
+ fi
+fi
+
+initfile=${srcdir}/../../resources/mail-test1-4-1.sauve
+infile=${outdir}/test_gibi_driver.sauve
+
+cp $initfile $infile
+
+./test_gibi_driver $infile
+
+ok=$?
+
+rm $infile
+rm ${outdir}/test_gibi_driver.vtk
+rm ${outdir}/test_gibi_driver_V21.med
+rm ${outdir}/test_gibi_driver_V22.med
+
+exit $ok

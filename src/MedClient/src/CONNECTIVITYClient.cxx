@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_convert.hxx"
 #include "Utils_CorbaException.hxx"
@@ -37,13 +39,14 @@ CONNECTIVITYClient::CONNECTIVITYClient(const SALOME_MED::MESH_ptr m,
   _numberOfElements_client(0),
   _complete(false)
 {
-  BEGIN_OF("CONNECTIVITYClient::CONNECTIVITYClient()");
+  const char* LOC = "CONNECTIVITYClient::CONNECTIVITYClient()";
+  BEGIN_OF(LOC);
 
   ASSERT(m);
 
   blankCopy();
   
-  END_OF("CONNECTIVITYClient::CONNECTIVITYClient()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -53,12 +56,13 @@ CONNECTIVITYClient::CONNECTIVITYClient(const SALOME_MED::MESH_ptr m,
 //=============================================================================
 CONNECTIVITYClient::~CONNECTIVITYClient()
 {
-  BEGIN_OF("CONNECTIVITYClient::~CONNECTIVITYClient()");
+  const char* LOC = "CONNECTIVITYClient::~CONNECTIVITYClient()";
+  BEGIN_OF(LOC);
 
   if (_numberOfElements_client)
     delete [] _numberOfElements_client;
 
-  END_OF("CONNECTIVITYClient::~CONNECTIVITYClient()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -69,7 +73,8 @@ CONNECTIVITYClient::~CONNECTIVITYClient()
 //=============================================================================
 void CONNECTIVITYClient::blankCopy()
 {
-  BEGIN_OF("CONNECTIVITYClient::blankCopy()");
+  const char* LOC = "CONNECTIVITYClient::blankCopy()";
+  BEGIN_OF(LOC);
    SALOME_MED::MESH::connectivityInfos_var all;
    medEntityMesh Entity = getEntity();
    try
@@ -134,7 +139,7 @@ void CONNECTIVITYClient::blankCopy()
 
   _complete = false;
 
-  END_OF("CONNECTIVITYClient::blankCopy()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -154,7 +159,8 @@ void CONNECTIVITYClient::blankCopy()
 
 void CONNECTIVITYClient::fillCopy()
 {
-  BEGIN_OF("void CONNECTIVITYClient::fillCopy()");
+  const char* LOC = "void CONNECTIVITYClient::fillCopy()";
+  BEGIN_OF(LOC);
 
 
   if (!_complete) {
@@ -236,7 +242,7 @@ void CONNECTIVITYClient::fillCopy()
     _complete = true;
   }
 
-  END_OF("void CONNECTIVITYClient::fillCopy()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -246,7 +252,8 @@ void CONNECTIVITYClient::fillCopy()
 int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity, 
                                     medGeometryElement Type) const
 {
-  BEGIN_OF("void CONNECTIVITYClient::getNumberOf()");
+  const char* LOC = "void CONNECTIVITYClient::getNumberOf()";
+  BEGIN_OF(LOC);
 
   int n = 0;
 
@@ -276,7 +283,7 @@ int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity,
     n = CONNECTIVITY::getNumberOf(Entity, Type);
 
   SCRUTE(n);
-  END_OF("void CONNECTIVITYClient::getNumberOf()");
+  END_OF(LOC);
   return n;
 }
 
@@ -289,7 +296,8 @@ const int * CONNECTIVITYClient::getConnectivity
 		       medEntityMesh Entity,
 		       medGeometryElement Type)
 {
-  BEGIN_OF("void CONNECTIVITYClient::getConnectivity()");
+  const char* LOC = "void CONNECTIVITYClient::getConnectivity()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     fillCopy();
@@ -297,7 +305,7 @@ const int * CONNECTIVITYClient::getConnectivity
   const int * c = CONNECTIVITY::getConnectivity
     (ConnectivityType, Entity, Type);
 
-  END_OF("void CONNECTIVITYClient::getConnectivity()");
+  END_OF(LOC);
   return c;
 }
 
@@ -309,7 +317,8 @@ const int * CONNECTIVITYClient::getConnectivityIndex
                       (medConnectivity ConnectivityType,
 		       medEntityMesh Entity)
 {
-  BEGIN_OF("void CONNECTIVITYClient::getConnectivityIndex()");
+  const char* LOC = "void CONNECTIVITYClient::getConnectivityIndex()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     fillCopy();
@@ -317,7 +326,7 @@ const int * CONNECTIVITYClient::getConnectivityIndex
   const int *c = CONNECTIVITY::getConnectivityIndex
     (ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::getConnectivityIndex()");
+  END_OF(LOC);
   return c;
 }
 
@@ -329,14 +338,15 @@ void CONNECTIVITYClient::calculateConnectivity
                       (medConnectivity connectivityType, 
 		       medEntityMesh Entity)
 {
-  BEGIN_OF("void CONNECTIVITYClient::calculateConnectivity()");
+  const char* LOC = "void CONNECTIVITYClient::calculateConnectivity()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     fillCopy();
 
   CONNECTIVITY::calculateConnectivity(connectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::calculateConnectivity()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -345,14 +355,15 @@ void CONNECTIVITYClient::calculateConnectivity
 //=============================================================================
 void  CONNECTIVITYClient::updateFamily (vector<FAMILY*> myFamilies)
 {
-  BEGIN_OF("void CONNECTIVITYClient::updateFamily()");
+  const char* LOC = "void CONNECTIVITYClient::updateFamily()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     fillCopy();
 
   CONNECTIVITY::updateFamily(myFamilies);
 
-  END_OF("void CONNECTIVITYClient::updateFamily()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -362,14 +373,15 @@ void  CONNECTIVITYClient::updateFamily (vector<FAMILY*> myFamilies)
 const int * CONNECTIVITYClient::getGlobalNumberingIndex 
                       (medEntityMesh Entity) const throw (MEDEXCEPTION)
 {
-  BEGIN_OF("void CONNECTIVITYClient::getGlobalNumberingIndex()");
+  const char* LOC = "void CONNECTIVITYClient::getGlobalNumberingIndex()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int * index = CONNECTIVITY::getGlobalNumberingIndex(Entity);
 
-  END_OF("void CONNECTIVITYClient::getGlobalNumberingIndex()");
+  END_OF(LOC);
 
   return index;
 }
@@ -381,14 +393,15 @@ const int * CONNECTIVITYClient::getGlobalNumberingIndex
 bool CONNECTIVITYClient::existConnectivity(medConnectivity ConnectivityType, 
 					   medEntityMesh Entity) const
 { 
-  BEGIN_OF("void CONNECTIVITYClient::existConnectivity()");
+  const char* LOC = "void CONNECTIVITYClient::existConnectivity()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   bool b = CONNECTIVITY::existConnectivity(ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::existConnectivity()");
+  END_OF(LOC);
 
   return b;
 }
@@ -401,7 +414,8 @@ const int * CONNECTIVITYClient::getReverseConnectivity
                       (medConnectivity ConnectivityType, 
 		       medEntityMesh Entity) throw (MEDEXCEPTION)
 {
-  BEGIN_OF("void CONNECTIVITYClient::getReverseConnectivity()");
+  const char* LOC = "void CONNECTIVITYClient::getReverseConnectivity()";
+  BEGIN_OF(LOC);
   
   if (!_complete)
     fillCopy();
@@ -409,7 +423,7 @@ const int * CONNECTIVITYClient::getReverseConnectivity
   const int *c = CONNECTIVITY::getReverseConnectivity
     (ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::getReverseConnectivity()");
+  END_OF(LOC);
 
   return c;
 }
@@ -422,7 +436,8 @@ const int * CONNECTIVITYClient::getReverseConnectivityIndex
                       (medConnectivity ConnectivityType,
 		       medEntityMesh Entity) throw (MEDEXCEPTION)
 {
-  BEGIN_OF("void CONNECTIVITYClient::getReverseConnectivityIndex()");
+  const char* LOC = "void CONNECTIVITYClient::getReverseConnectivityIndex()";
+  BEGIN_OF(LOC);
   
   if (!_complete)
     fillCopy();
@@ -430,7 +445,7 @@ const int * CONNECTIVITYClient::getReverseConnectivityIndex
   const int *c =  CONNECTIVITY::getReverseConnectivityIndex
     (ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::getReverseConnectivityIndex()");
+  END_OF(LOC);
 
   return c;
 }
@@ -442,14 +457,15 @@ const int * CONNECTIVITYClient::getReverseConnectivityIndex
 const int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity, 
 			medGeometryElement Type)
 {
-  BEGIN_OF("void CONNECTIVITYClient::getValue()");
+  const char* LOC = "void CONNECTIVITYClient::getValue()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     fillCopy();
 
   const int * c =  CONNECTIVITY::getValue(TypeConnectivity, Type);
 
-  END_OF("void CONNECTIVITYClient::()");
+  END_OF(LOC);
 
   return c;
 }
@@ -460,14 +476,15 @@ const int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity,
 //=============================================================================
 const int* CONNECTIVITYClient::getValueIndex(medConnectivity TypeConnectivity)
 {
-  BEGIN_OF("void CONNECTIVITYClient::getValueIndex()");
+  const char* LOC = "void CONNECTIVITYClient::getValueIndex()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     fillCopy();
 
   const int * c =  CONNECTIVITY::getValueIndex(TypeConnectivity);
 
-  END_OF("void CONNECTIVITYClient::getValueIndex()");
+  END_OF(LOC);
 
   return c;
 }
@@ -478,14 +495,15 @@ const int* CONNECTIVITYClient::getValueIndex(medConnectivity TypeConnectivity)
 //=============================================================================
 const int* CONNECTIVITYClient::getNeighbourhood() const
 {
-  BEGIN_OF("void CONNECTIVITYClient::getNeighbourhood()");
+  const char* LOC = "void CONNECTIVITYClient::getNeighbourhood()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int * c =  CONNECTIVITY::getNeighbourhood();
 
-  END_OF("void CONNECTIVITYClient::getNeighbourhood()");
+  END_OF(LOC);
 
   return c;
 }
@@ -498,14 +516,15 @@ const int* CONNECTIVITYClient::getNeighbourhood() const
 bool CONNECTIVITYClient::existPolygonsConnectivity(medConnectivity connectivityType,
                                                    medEntityMesh   Entity) const
 {
-  BEGIN_OF("void CONNECTIVITYClient::existPolygonsConnectivity()");
+  const char* LOC = "void CONNECTIVITYClient::existPolygonsConnectivity()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   bool b = CONNECTIVITY::existPolygonsConnectivity( connectivityType, Entity );
 
-  END_OF("void CONNECTIVITYClient::existPolygonsConnectivity(connectivityType, Entity)");
+  END_OF(LOC);
 
   return b;
 }
@@ -518,14 +537,15 @@ bool CONNECTIVITYClient::existPolygonsConnectivity(medConnectivity connectivityT
 bool CONNECTIVITYClient::existPolyhedronConnectivity(medConnectivity connectivityType,
                                                      medEntityMesh   Entity) const
 {
-  BEGIN_OF("void CONNECTIVITYClient::existPolyhedronConnectivity()");
+  const char* LOC = "void CONNECTIVITYClient::existPolyhedronConnectivity()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   bool b = CONNECTIVITY::existPolyhedronConnectivity( connectivityType, Entity );
 
-  END_OF("void CONNECTIVITYClient::existPolyhedronConnectivity(connectivityType, Entity)");
+  END_OF(LOC);
 
   return b;
 }
@@ -538,14 +558,15 @@ bool CONNECTIVITYClient::existPolyhedronConnectivity(medConnectivity connectivit
 const int* CONNECTIVITYClient::getPolygonsConnectivity(medConnectivity ConnectivityType,
                                                        medEntityMesh Entity)
 {
-  BEGIN_OF("void CONNECTIVITYClient::getPolygonsConnectivity()");
+  const char* LOC = "void CONNECTIVITYClient::getPolygonsConnectivity()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     fillCopy();
 
   const int * c = CONNECTIVITY::getPolygonsConnectivity (ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::getPolygonsConnectivity()");
+  END_OF(LOC);
   return c;
 }
 
@@ -557,14 +578,15 @@ const int* CONNECTIVITYClient::getPolygonsConnectivity(medConnectivity Connectiv
 const int* CONNECTIVITYClient::getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
                                                             medEntityMesh Entity)
 {
-  BEGIN_OF("void CONNECTIVITYClient::getPolygonsConnectivityIndex()");
+  const char* LOC = "void CONNECTIVITYClient::getPolygonsConnectivityIndex()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     fillCopy();
 
   const int * c = CONNECTIVITY::getPolygonsConnectivityIndex (ConnectivityType, Entity);
 
-  END_OF("void CONNECTIVITYClient::getPolygonsConnectivityIndex()");
+  END_OF(LOC);
   return c;
 }
 
@@ -575,14 +597,15 @@ const int* CONNECTIVITYClient::getPolygonsConnectivityIndex(medConnectivity Conn
 
 const int* CONNECTIVITYClient::getPolyhedronConnectivity(medConnectivity ConnectivityType) const
 {
-  BEGIN_OF("void CONNECTIVITYClient::getPolyhedronConnectivity()");
+  const char* LOC = "void CONNECTIVITYClient::getPolyhedronConnectivity()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int * c = CONNECTIVITY::getPolyhedronConnectivity (ConnectivityType);
 
-  END_OF("void CONNECTIVITYClient::getPolyhedronConnectivity()");
+  END_OF(LOC);
   return c;
 }
 
@@ -593,14 +616,15 @@ const int* CONNECTIVITYClient::getPolyhedronConnectivity(medConnectivity Connect
 
 const int* CONNECTIVITYClient::getPolyhedronFacesIndex() const
 {
-  BEGIN_OF("void CONNECTIVITYClient::getPolyhedronFacesIndex()");
+  const char* LOC = "void CONNECTIVITYClient::getPolyhedronFacesIndex()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int * c = CONNECTIVITY::getPolyhedronFacesIndex();
 
-  END_OF("void CONNECTIVITYClient::getPolyhedronFacesIndex()");
+  END_OF(LOC);
   return c;
 }
 
@@ -611,14 +635,15 @@ const int* CONNECTIVITYClient::getPolyhedronFacesIndex() const
 
 const int* CONNECTIVITYClient::getPolyhedronIndex(medConnectivity ConnectivityType) const
 {
-  BEGIN_OF("void CONNECTIVITYClient::getPolyhedronIndex()");
+  const char* LOC = "void CONNECTIVITYClient::getPolyhedronIndex()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int * c = CONNECTIVITY::getPolyhedronIndex (ConnectivityType);
 
-  END_OF("void CONNECTIVITYClient::getPolyhedronIndex()");
+  END_OF(LOC);
   return c;
 }
 
@@ -629,7 +654,8 @@ const int* CONNECTIVITYClient::getPolyhedronIndex(medConnectivity ConnectivityTy
 
 int CONNECTIVITYClient::getNumberOfPolygons() const
 {
-  BEGIN_OF("void CONNECTIVITYClient::getNumberOfPolygons()");
+  const char* LOC = "void CONNECTIVITYClient::getNumberOfPolygons()";
+  BEGIN_OF(LOC);
 
   int n = 0;
 
@@ -642,7 +668,7 @@ int CONNECTIVITYClient::getNumberOfPolygons() const
 
   SCRUTE(n);
 
-  END_OF("void CONNECTIVITYClient::getNumberOfPolygons()");
+  END_OF(LOC);
   return n;
 }
 
@@ -653,7 +679,8 @@ int CONNECTIVITYClient::getNumberOfPolygons() const
 
 int CONNECTIVITYClient::getNumberOfPolyhedronFaces() const
 {
-  BEGIN_OF("void CONNECTIVITYClient::getNumberOfPolyhedronFaces()");
+  const char* LOC = "void CONNECTIVITYClient::getNumberOfPolyhedronFaces()";
+  BEGIN_OF(LOC);
 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
@@ -662,7 +689,7 @@ int CONNECTIVITYClient::getNumberOfPolyhedronFaces() const
 
   SCRUTE(n);
 
-  END_OF("void CONNECTIVITYClient::getNumberOfPolyhedronFaces()");
+  END_OF(LOC);
   return n;
 }
 
@@ -673,7 +700,8 @@ int CONNECTIVITYClient::getNumberOfPolyhedronFaces() const
 
 int CONNECTIVITYClient::getNumberOfPolyhedron() const
 {
-  BEGIN_OF("void CONNECTIVITYClient::getNumberOfPolyhedron()");
+  const char* LOC = "void CONNECTIVITYClient::getNumberOfPolyhedron()";
+  BEGIN_OF(LOC);
 
   int n = 0;
 
@@ -686,7 +714,7 @@ int CONNECTIVITYClient::getNumberOfPolyhedron() const
 
   SCRUTE(n);
 
-  END_OF("void CONNECTIVITYClient::getNumberOfPolyhedron()");
+  END_OF(LOC);
   return n;
 }
 

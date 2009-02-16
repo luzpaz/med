@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef GENDRIVER_HXX
 #define GENDRIVER_HXX
@@ -38,12 +40,15 @@ using namespace std;
 */
 namespace MEDMEM {
 
-/* Modify the following line to add a new driver type (step 1) */
-typedef enum { MED_DRIVER = 0, GIBI_DRIVER = 1, PORFLOW_DRIVER = 2, ENSIGHT_DRIVER = 250, VTK_DRIVER = 254, ASCII_DRIVER = 3, NO_DRIVER = 255 } driverTypes;
-  class GENDRIVER;
-  ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
+  /* Modify the following line to add a new driver type (step 1) */
+  typedef enum { MED_DRIVER = 0, GIBI_DRIVER = 1, PORFLOW_DRIVER = 2,
+                 ENSIGHT_DRIVER = 250, VTK_DRIVER = 254, ASCII_DRIVER = 3,
+                 NO_DRIVER = 255 } driverTypes;
 
-class MEDMEM_EXPORT GENDRIVER {
+  class GENDRIVER;
+  MEDMEM_EXPORT ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
+
+  class MEDMEM_EXPORT GENDRIVER {
 
 protected :
 
@@ -60,11 +65,12 @@ public:
   /*!
     Constructor.
   */
-  GENDRIVER();
+  GENDRIVER(driverTypes driverType);
   /*!
     Constructor.
   */
-  GENDRIVER(const string & fileName,MED_EN::med_mode_acces accessMode);
+  GENDRIVER(const string & fileName, MED_EN::med_mode_acces accessMode,
+            driverTypes driverType);
   /*!
     Copy constructor.
   */
@@ -83,7 +89,7 @@ public:
   /*!
     Operator << : put GENDRIVER object information to the given stream
   */
-  friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
+  friend ostream & operator<<(ostream &os,const GENDRIVER &genDriver);
 
   bool operator ==(const GENDRIVER &genDriver) const;
   /*!
@@ -116,22 +122,32 @@ public:
   // needed to duplicate arrays 
   virtual GENDRIVER * copy ( void ) const = 0 ;
 
+  // Take missing data from other driver.
+  // Is for object->read( genDriver ) if object was not passed to genDriver
+  // (i.e. genDriver has been created through constructor without parameters),
+  // then object asks driverFactory to create a driver initialized by object
+  // and fills the new driver up using merge( genDriver ).
+  // Needed for drivers possessing own data
+  virtual void merge ( const GENDRIVER &genDriver );
+
   // MED  related part
-  virtual void writeFrom      ( void );
+  virtual void writeFrom      ( void ) const;
   virtual void readFileStruct ( void );
   // MESH related Part
   virtual void setMeshName    ( const string & meshName);
-  virtual string getMeshName() const { return string(""); }
+  virtual string getMeshName() const;
   // FIELD related Part
   virtual void setFieldName   ( const string & fieldName);
+  virtual string getFieldName() const;
 
   void   setId       ( int id = MED_INVALID );
   int    getId       ( void ) const ;
   string getFileName () const;
-  void   setFileName ( const string & fileName);
+  virtual void setFileName ( const string & fileName);
   virtual MED_EN::med_mode_acces getAccessMode() const;
+  driverTypes getDriverType() const { return _driverType; }
 };
-};
+}
 
 
 #endif /* GENDRIVER_HXX */

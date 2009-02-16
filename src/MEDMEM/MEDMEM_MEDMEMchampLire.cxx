@@ -1,21 +1,24 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-//           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-// 
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #include "MEDMEM_MEDMEMchampLire.hxx"
 /*
  * En attendant une correction de la gestion du mode d'accès au fichier dans MEDfichier
@@ -31,42 +34,24 @@ namespace med_2_3 {
       fflush(stderr) ;							\
     }
 
-# define ISCRUTE(entier)        {					\
+# define ISCRUTE_MED(entier)        {					\
       ICI ;								\
       fprintf(stderr,"%s = %d\n",#entier,entier) ;			\
       fflush(stderr) ;							\
     }
 
-# define SSCRUTE(chaine)        {					\
+# define SSCRUTE_MED(chaine)        {					\
       ICI ;								\
       fprintf(stderr,"%s = \"%s\"\n",#chaine,chaine) ;			\
       fflush(stderr) ;							\
     }
-# define MESSAGE(chaine)        {					\
+# define MESSAGE_MED(chaine)        {					\
       ICI ;								\
       fprintf(stderr,"%s\n",chaine) ;					\
       fflush(stderr) ;							\
     }
 
     extern void _MEDmodeErreurVerrouiller(void);
-
-    /*************************************************************************
-     * COPYRIGHT (C) 1999 - 2003  EDF R&D
-     * THIS LIBRARY IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY
-     * IT UNDER THE TERMS OF THE GNU LESSER GENERAL PUBLIC LICENSE
-     * AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION;
-     * EITHER VERSION 2.1 OF THE LICENSE, OR (AT YOUR OPTION) ANY LATER VERSION.
-     *
-     * THIS LIBRARY IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT
-     * WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF
-     * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. SEE THE GNU
-     * LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
-     *
-     * YOU SHOULD HAVE RECEIVED A COPY OF THE GNU LESSER GENERAL PUBLIC LICENSE
-     * ALONG WITH THIS LIBRARY; IF NOT, WRITE TO THE FREE SOFTWARE FOUNDATION,
-     * INC., 59 TEMPLE PLACE, SUITE 330, BOSTON, MA 02111-1307 USA
-     *
-     *************************************************************************/
 
 #include <med.h>
 #include <med_outils.h>
@@ -200,14 +185,14 @@ namespace med_2_3 {
 
       /* Lire le nbre des points de GAUSS*/
       if (_MEDattrEntierLire(datagroup3,MED_NOM_NGA,&ngauss) < 0) {
-	MESSAGE("Erreur à la lecture de l'attribut MED_NOM_NGA : ");
-	ISCRUTE(ngauss);goto ERROR;
+	MESSAGE_MED("Erreur à la lecture de l'attribut MED_NOM_NGA : ");
+	ISCRUTE_MED(ngauss);goto ERROR;
       };
 
       /* Lire l'identificateur de localisation des points de GAUSS*/
       if ( _MEDattrStringLire(datagroup3,MED_NOM_GAU,MED_TAILLE_NOM,locname) < 0) {
-	MESSAGE("Erreur à la lecture de l'attribut MED_NOM_GAU : ");
-	SSCRUTE(locname); goto ERROR;
+	MESSAGE_MED("Erreur à la lecture de l'attribut MED_NOM_GAU : ");
+	SSCRUTE_MED(locname); goto ERROR;
       }
 
       /*
@@ -266,32 +251,32 @@ namespace med_2_3 {
       if ( pfluse ) { free(pfltab); free(pfltabtmp);}
 
       if (datagroup3>0)     if (_MEDdatagroupFermer(datagroup3) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(datagroup3); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(datagroup3); ret = -1;
       }
 
       if (datagroup2>0)     if (_MEDdatagroupFermer(datagroup2) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(datagroup2); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(datagroup2); ret = -1;
       }
 
       if (datagroup1>0)     if (_MEDdatagroupFermer(datagroup1) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(datagroup1); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(datagroup1); ret = -1;
       }
 
       if (gid>0)     if (_MEDdatagroupFermer(gid) < 0) {
-	MESSAGE("Impossible de fermer le datagroup : ");
-	ISCRUTE(gid); ret = -1;
+	MESSAGE_MED("Impossible de fermer le datagroup : ");
+	ISCRUTE_MED(gid); ret = -1;
       }
 
       return ret;
     }
 
 
-#undef MESSAGE
-#undef SSCRUTE
-#undef ISCRUTE
+#undef MESSAGE_MED
+#undef SSCRUTE_MED
+#undef ISCRUTE_MED
 
   }
 }

@@ -1,21 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MESHClient.hxx"
 #include "MEDMEM_convert.hxx"
@@ -40,7 +42,8 @@ MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) :
   _complete(false)
 
 {
-  BEGIN_OF("MESHClient::MESHClient(SALOME_MED::MESH_ptr m)");
+  const char* LOC = "MESHClient::MESHClient(SALOME_MED::MESH_ptr m)";
+  BEGIN_OF(LOC);
 
   ASSERT(m);
 
@@ -49,7 +52,7 @@ MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) :
 
   blankCopy();
 
-  END_OF("MESHClient::MESHClient(SALOME_MED::MESH_ptr m)");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -77,7 +80,8 @@ GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, MESH *M)
 //=============================================================================
 void MESHClient::blankCopy()
 {
-  BEGIN_OF("MESHClient::blankCopy()");
+  const char* LOC = "MESHClient::blankCopy()";
+  BEGIN_OF(LOC);
   SALOME_MED::MESH::meshInfos_var all = IOR_Mesh->getMeshGlobal();
 
   //CORBA::String_var s;
@@ -151,7 +155,7 @@ void MESHClient::blankCopy()
  
   _complete = false;
 
-  END_OF("MESHClient::blankCopy()");
+  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -161,7 +165,8 @@ void MESHClient::blankCopy()
 
 void MESHClient::fillCopy()
 {
-  BEGIN_OF("MESHClient::fillCopy()");
+  const char* LOC = "MESHClient::fillCopy()";
+  BEGIN_OF(LOC);
 
   COORDINATEClient *_coord 
     = dynamic_cast<COORDINATEClient *> (_coordinate);
@@ -215,7 +220,7 @@ void MESHClient::fillCopy()
 
   _complete = true;
 
-  END_OF("MESHClient::fillCopy()");
+  END_OF(LOC);
 }
 
 //=============================================================================
@@ -225,7 +230,8 @@ void MESHClient::fillCopy()
 //=============================================================================
 bool MESHClient::operator==(const MESH& other) const
 {
-  BEGIN_OF("MESHClient::operator==");
+  const char* LOC = "MESHClient::operator==";
+  BEGIN_OF(LOC);
   const MESHClient* otherClt=dynamic_cast<const MESHClient *>(&other);
   if(otherClt)
     {
@@ -246,9 +252,10 @@ bool MESHClient::operator==(const MESH& other) const
 
 MESHClient::~MESHClient()
 {
-  BEGIN_OF("MESHClient::~MESHClient()");
+  const char* LOC = "MESHClient::~MESHClient()";
+  BEGIN_OF(LOC);
   IOR_Mesh->Destroy();
-  END_OF("MESHClient::~MESHClient()");
+  END_OF(LOC);
 }
 
 //=============================================================================
