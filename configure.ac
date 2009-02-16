@@ -57,8 +57,8 @@ echo
 echo
 
 dnl remember MED_WITH_KERNEL set by build configure
-MED_WITH_KERNEL=yes
-MED_WITH_GUI=yes
+MED_WITH_KERNEL=no
+MED_WITH_GUI=no
 old_with_kernel=${MED_WITH_KERNEL}
 
 dnl
