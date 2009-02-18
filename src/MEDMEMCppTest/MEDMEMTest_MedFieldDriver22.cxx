@@ -79,9 +79,7 @@ void MEDMEMTest::testMedFieldDriver22()
   FIELD<int> *aField_1              = new FIELD<int> ();
   FIELD<double> *aField_2           = new FIELD<double> ();
   string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP") ? getenv("TMP") : "/tmp";
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
+  string tmp_dir                    = getTmpDirectory();
   string filename_rd                = data_dir + "/share/salome/resources/med/pointe_import22.med";
   string filenameWithOutFileds      = data_dir + "/share/salome/resources/med/mesh_import22.med";
   string fileldnotexist             = "anyfield";

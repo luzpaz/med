@@ -90,10 +90,7 @@ using namespace MED_EN;
 void MEDMEMTest::testMedMedDriver21() {
   MED *aMed                        = new MED();
   string data_dir                  = getenv("MED_ROOT_DIR");
-  string tmp_dir                   = getenv("TMP") ? getenv("TMP") : "/tmp";
-  if(tmp_dir == "")
-    tmp_dir = "/tmp";
-
+  string tmp_dir                   = getTmpDirectory();
   string filename_rd               = data_dir + "/share/salome/resources/med/pointe.med";
   string emptyfilename             = "";
   string filename_wr               = tmp_dir  + "/myMedWr_pointe21.med";

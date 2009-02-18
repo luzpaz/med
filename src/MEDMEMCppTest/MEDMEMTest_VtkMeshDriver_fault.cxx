@@ -30,7 +30,7 @@ using namespace MEDMEM;
 
 int main (int argc, char** argv)
 {
-  string tmp_dir  = getenv("TMP") ? getenv("TMP") : "/tmp";
+  string tmp_dir  = getTmpDirectory();
   string meshname = "MyMesh";
   string filename =  tmp_dir + "/my_pointe.vtk";
 

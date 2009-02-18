@@ -81,13 +81,11 @@ void MEDMEMTest::testAsciiFieldDriver()
 {
   // read a mesh from a MED file
   string datadir   = getenv("MED_ROOT_DIR");
-  string tmp_dir   = getenv("TMP") ? getenv("TMP") : "/tmp";
+  string tmp_dir   = getTmpDirectory();
   string filename  = datadir + "/share/salome/resources/med/pointe.med";
   string meshname  = "maa1";
   string fieldname = "fieldcelldouble";
 
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
   string anyfile1  = tmp_dir + "/anyfile1";
   string SDFfilename = tmp_dir + "/myfile";
   ofstream aFile(SDFfilename.c_str());

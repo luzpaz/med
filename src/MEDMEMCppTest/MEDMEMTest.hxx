@@ -201,4 +201,6 @@ void MEDMEMTest_DumpArray (std::ostream & stream, const T* array, const int leng
   stream << "}" << std::endl;
 };
 
+std::string getTmpDirectory();
+
 #endif
