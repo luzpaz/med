@@ -57,7 +57,7 @@ void MEDMEMTest::testVtkMeshDriver()
   MESH * aMesh = new MESH();
 
   string data_dir                  = getenv("MED_ROOT_DIR");
-  string tmp_dir                   = getenv("TMP") ? getenv("TMP") : "/tmp";
+  string tmp_dir                   = getTmpDirectory();
   string filename_rd               = data_dir + "/share/salome/resources/med/pointe_import22.med";
   string emptyfilename             = "";
   string meshname_rd               = "maa1";

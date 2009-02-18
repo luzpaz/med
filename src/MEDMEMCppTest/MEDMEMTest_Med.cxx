@@ -80,11 +80,7 @@ void MEDMEMTest::testMed()
 {
   string datadir  = getenv("MED_ROOT_DIR");
   string filename = datadir + "/share/salome/resources/med/pointe.med";
-
-  string tmp_dir  = getenv("TMP") ? getenv("TMP") : "/tmp";
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-
+  string tmp_dir  = getTmpDirectory();
   string filenameout21      = tmp_dir  + "/myMedWrite_pointe21.med";
   string filenameout21_from = tmp_dir  + "/myMedWrite_pointe21_from.med";
 

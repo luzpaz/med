@@ -77,13 +77,11 @@ void MEDMEMTest::testExtractor()
 
   // read a mesh from a MED file
   string datadir   = getenv("MED_ROOT_DIR");
-  string tmp_dir   = getenv("TMP");
+  string tmp_dir   = getTmpDirectory();
   string filename  = datadir + "/share/salome/resources/med/pointe.med";
   string meshname  = "maa1";
   string fieldname = "fieldcelldoublescalar";
 
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
   string result_file  = tmp_dir + "/extracted_2D.med";
 
   // To remove tmp files from disk

@@ -79,8 +79,7 @@ void MEDMEMTest::testPorflowMeshDriver()
   MESH *aMesh_1                    = new MESH();
 
   string data_dir                  = getenv("MED_ROOT_DIR");
-  string tmp_dir                   = getenv("TMP") ? getenv("TMP") : "/tmp";
-
+  string tmp_dir                   = getTmpDirectory();
   string filename_rd               = data_dir + "/share/salome/resources/med/Case1.inp";
   string filename_wr               = tmp_dir  + "/myWr_Case1.inp";
   string meshname                  = "Case1";
@@ -201,7 +200,8 @@ void MEDMEMTest::testPorflowMeshDriver()
     //Test open() method
     //#ifndef ENABLE_FORCED_FAILURES
     FILE *tmpFile = fopen(filename_wr.data(), "w");
-    fclose(tmpFile);
+    if ( tmpFile )
+      fclose(tmpFile);
     //#endif
     CPPUNIT_ASSERT_NO_THROW(aPorflowWrDriver->open());
 

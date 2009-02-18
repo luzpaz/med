@@ -242,9 +242,7 @@ void MEDMEMTest::testMeshAndMeshing()
   string datadir  = getenv("MED_ROOT_DIR");
   string filename = datadir + "/share/salome/resources/med/pointe.med";
   string meshname = "maa1";
-  string tmp_dir  = getenv("TMP") ? getenv("TMP") : "/tmp";
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
+  string tmp_dir  = getTmpDirectory();
   string filenameout21        = tmp_dir + "/myMeshWrite4_pointe21.med";
   string filename_profiles_wr = tmp_dir + "/myMedProfilesFieldfile.med";
 
