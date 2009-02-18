@@ -175,7 +175,7 @@ int main (int argc, char ** argv) {
   SUPPORT *sup = new SUPPORT(&myMeshing);
   FIELD<double> *vols = myMeshing.getVolume(sup);
   const double *vals = vols->getValue();
-  const double REFVolOfPolyHedron[3] = {2.333333333333333, 11.66666666666666, 13.83224131414673};
+  const double REFVolOfPolyHedron[3] = {2.333333333333333, -11.66666666666666, -13.83224131414673};
   for(i=0;i<3;i++)
     if(fabs(REFVolOfPolyHedron[i]-vals[i])<1e-12)
       nbPts++;
