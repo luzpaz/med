@@ -197,9 +197,9 @@ int main()
   addMedFacesGroup( *meshing, 24, side,   "SideFaces",sideTypes,sideIndex,sideNbOfElts,2) ;
   //writing...
   string medfile = "/tmp";
-  if ( getenv("TMP"))
+  if ( getenv("TMP") && access(getenv("TMP"),W_OK)==0 )
     medfile=getenv("TMP");
-  else if (getenv("TMPDIR"))
+  else if (getenv("TMPDIR") && access(getenv("TMPDIR"),W_OK)==0 )
     medfile=getenv("TMPDIR");
   medfile += "/totoFlica_V22.med";
   

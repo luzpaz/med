@@ -44,9 +44,9 @@ int main()
   mesh.convertToPoly();
 
   // File to store conversion result
-  if ( getenv("TMP") )
+  if ( getenv("TMP") && access(getenv("TMP"),W_OK)==0 )
     file = getenv("TMP");
-  else if ( getenv("TMPDIR") )
+  else if ( getenv("TMPDIR") && access(getenv("TMPDIR"),W_OK)==0 )
     file = getenv("TMPDIR");
   else
     file = "/tmp";

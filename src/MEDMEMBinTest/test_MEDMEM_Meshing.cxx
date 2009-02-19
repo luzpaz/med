@@ -44,9 +44,9 @@ int main (int argc, char ** argv) {
   string filenameRoot;
   if (argc==1) {
       // filename to save the generated MESH
-    if ( getenv("TMP"))
+    if ( getenv("TMP") && access(getenv("TMP"),W_OK)==0 )
       filenameRoot=getenv("TMP");
-    else if (getenv("TMPDIR"))
+    else if (getenv("TMPDIR") && access(getenv("TMPDIR"),W_OK)==0 )
       filenameRoot=getenv("TMPDIR");
     else
       filenameRoot="/tmp";

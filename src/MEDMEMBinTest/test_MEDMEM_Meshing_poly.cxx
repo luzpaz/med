@@ -42,9 +42,9 @@ int main (int argc, char ** argv)
     if (argc==2) 
       filenameRoot= argv[1] ;
     else {
-      if ( getenv("TMP"))
+      if ( getenv("TMP") && access(getenv("TMP"),W_OK)==0 )
         filenameRoot=getenv("TMP");
-      else if (getenv("TMPDIR"))
+      else if (getenv("TMPDIR") && access(getenv("TMPDIR"),W_OK)==0 )
         filenameRoot=getenv("TMPDIR");
       else
         filenameRoot="/tmp";
