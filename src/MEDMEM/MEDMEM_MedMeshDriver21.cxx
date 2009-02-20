@@ -2068,15 +2068,20 @@ int MED_MESH_WRONLY_DRIVER21::writeConnectivities(medEntityMesh entity) const {
                                   med_2_1::med_geometrie_element(types[i]),
                                   &dim,&numberOfNod,&numberOfDesc) < 0 )
         continue;
-
+      // descending connectivity can be partial
+      int connLen = _ptrMesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE, MED_DESCENDING,
+                                                    entity, types[i]);
+      int nbEl = min( numberOfElements, connLen / numberOfDesc );
       int * connectivityArray = new int[numberOfElements*(numberOfDesc+multi)];
-      for (int j=0 ; j<numberOfElements; j++) 
+      for (int j=0 ; j<nbEl; j++)
        	{
 	  for (int k=0; k<numberOfDesc; k++)
-	    connectivityArray[j*(numberOfDesc+multi)+k]=connectivity[j*numberOfDesc+k] ;
+	    connectivityArray[j*(numberOfDesc+multi)+k]=connectivity[j*numberOfDesc+k];
 
 	  if (multi>0) connectivityArray[j*(numberOfDesc+multi)+numberOfDesc]=0;
 	}
+      for (int j=connLen; j < numberOfDesc*numberOfElements; ++j)
+        connectivityArray[j]=0;
       
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       int lgth=numberOfElements*(numberOfDesc+multi);
