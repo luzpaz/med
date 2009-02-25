@@ -34,7 +34,7 @@ using namespace med_2_1;
 #ifdef _DEBUG_
 static int MYDEBUG = 0;
 #else
-static int MYDEBUG = 0;
+// static int MYDEBUG = 0;
 #endif
 
 

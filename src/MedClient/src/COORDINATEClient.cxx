@@ -41,7 +41,9 @@ COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
   _complete(false),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m))
 {
+#ifdef _DEBUG_
   const char* LOC = "COORDINATEClient::COORDINATEClient(...)";
+#endif
   BEGIN_OF(LOC);
 
   blankCopy();
@@ -55,7 +57,9 @@ COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
 //=============================================================================
 void COORDINATEClient::blankCopy()
 {
+#ifdef _DEBUG_
   const char* LOC = "void COORDINATEClient::blankCopy()";
+#endif
   BEGIN_OF(LOC);
 
   std::string *tA;
@@ -98,7 +102,9 @@ void COORDINATEClient::blankCopy()
 
 void COORDINATEClient::fillCopy()
 {
+#ifdef _DEBUG_
   const char* LOC = "void COORDINATEClient::fillCopy()";
+#endif
   BEGIN_OF(LOC);
 
   //PN ?? Est-ce qu on peut pas mettre une variable dans COORDINATEClient
@@ -128,7 +134,9 @@ void COORDINATEClient::fillCopy()
 
 const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 {
+#ifdef _DEBUG_
   const char* LOC = "void COORDINATEClient::getCoordinates()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete) fillCopy();
@@ -146,7 +154,9 @@ const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 
 double COORDINATEClient::getCoordinate(int Number,int Axis)
 {
+#ifdef _DEBUG_
   const char* LOC = "void COORDINATEClient::getCoordinate()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete) fillCopy();
@@ -163,7 +173,9 @@ double COORDINATEClient::getCoordinate(int Number,int Axis)
 //=============================================================================
 const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 {
+#ifdef _DEBUG_
   const char* LOC = "void COORDINATEClient::getCoordinateAxis()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete) fillCopy();
@@ -180,7 +192,9 @@ const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 //=============================================================================
 const int*      COORDINATEClient::getNodesNumbers() const
 {
+#ifdef _DEBUG_
   const char* LOC = "void COORDINATEClient::getNodesNumbers()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete) (const_cast < COORDINATEClient * >(this))->fillCopy();

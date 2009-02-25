@@ -96,7 +96,6 @@ void affiche_groupe(MESH *myMesh,medEntityMesh Entity)
 }
 
 int main (int argc, char ** argv) {
-  int read;
 
   if (argc <3) { // after 3, ignored !
     cerr << "Usage : " << argv[0] 

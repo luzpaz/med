@@ -46,9 +46,6 @@ using namespace MEDMEM;
 GROUP_i::GROUP_i():_group((::GROUP*)NULL),
 		   SUPPORT_i()
 {
-  const char* LOC = "Default Constructor GROUP_i";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 };
 //=============================================================================
 /*!
@@ -66,9 +63,6 @@ GROUP_i::~GROUP_i()
 GROUP_i::GROUP_i(const ::GROUP * const g):_group(g),
 		   SUPPORT_i(g)
 {
-  const char* LOC = "Constructor GROUP_i";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 };
 //=============================================================================
 /*!
@@ -78,9 +72,6 @@ GROUP_i::GROUP_i(const ::GROUP * const g):_group(g),
 GROUP_i::GROUP_i(const GROUP_i & g):_group(g._group),
 		   SUPPORT_i(g._group)
 {
-  const char* LOC = "Constructor GROUP_i";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 };
 //=============================================================================
 /*!

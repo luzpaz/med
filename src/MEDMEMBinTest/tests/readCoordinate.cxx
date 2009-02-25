@@ -88,7 +88,6 @@ int main (int argc, char ** argv) {
   MESSAGE_MED("Read done");
   
   int SpaceDimension = myMesh->getSpaceDimension() ;
-  int MeshDimension  = myMesh->getMeshDimension() ;
   int NumberOfNodes  = myMesh->getNumberOfNodes() ;
 
   cout << "(************************)"<<endl;

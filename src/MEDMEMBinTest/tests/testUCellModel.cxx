@@ -162,7 +162,6 @@ int main (int argc, char ** argv)
 
       for (int dim=1; dim< dimension; dim++)
 	{
-	  int dim2=dimension - dim;
 	  cout << "Nb d elements de dimension " << dim << " : ";
 
 	  try

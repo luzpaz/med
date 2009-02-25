@@ -94,7 +94,7 @@ MEDgro2famB (med_int nnoe,med_int nele,med_int *numnoe,med_int *numele,
   int newnumnoe, newnumele;
   int tmp1;
   int existfam0 = 0;
-  int ind = 0;
+  // int ind = 0;
 
   famnoe = NULL;
   famele = NULL;

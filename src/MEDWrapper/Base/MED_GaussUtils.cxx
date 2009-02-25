@@ -31,8 +31,8 @@
 static int MYDEBUG = 0;
 static int MYVALUEDEBUG = 0;
 #else
-static int MYDEBUG = 0;
-static int MYVALUEDEBUG = 0;
+// static int MYDEBUG = 0;
+// static int MYVALUEDEBUG = 0;
 #endif
 
 //#define _DEBUG_REF_COORDS_
@@ -238,6 +238,7 @@ namespace MED
           }
         }
         if(!anIsEqual){
+#ifdef _DEBUG_
           TCCoordSlice aCoord = GetCoord(aRefId);
           INITMSG(MYDEBUG,aRefId + 1<<": aCoord = {");
           TInt aDim = aCoord.size();
@@ -248,6 +249,7 @@ namespace MED
           for(TInt anId = 0; anId < aDim; anId++)
             ADDMSG(MYDEBUG,"\t"<<aCoord2[anId]);
           ADDMSG(MYDEBUG,"}\n");
+#endif
 #ifndef _DEBUG_
           BEGMSG(MYDEBUG,"anIsSatisfy = "<<anIsSatisfy<<"\n");
           return anIsSatisfy;

@@ -64,10 +64,7 @@ MESH_i::MESH_i(): _mesh(constructConstMesh()),
 		  _corbaIndex(MESH_i::meshIndex++),
   		  _meshId("") 
 {
-  const char* LOC = "Default Constructor MESH_i";
-  BEGIN_OF(LOC);
         MESH_i::meshMap[_corbaIndex]=_mesh;
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -86,12 +83,8 @@ MESH_i::MESH_i(::MESH * const m ) :_mesh(m),
 			_corbaIndex(MESH_i::meshIndex++),
   		        _meshId("") 
 {
-  const char* LOC = "Constructor MESH_i(::MESH * const m )";
-  BEGIN_OF(LOC);
         MESH_i::meshMap[_corbaIndex]=_mesh;
 	SCRUTE(_mesh);
-
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -103,10 +96,7 @@ MESH_i::MESH_i( MESH_i & m) :_mesh(m._mesh),
 		             _corbaIndex(MESH_i::meshIndex++),
   		             _meshId("") 
 {
-  const char* LOC = "Constructor MESH_i";
-  BEGIN_OF(LOC);
         MESH_i::meshMap[_corbaIndex]=_mesh;
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -1522,8 +1512,6 @@ throw (SALOME::SALOME_Exception)
 void MESH_i::addInStudy(SALOMEDS::Study_ptr myStudy,SALOME_MED::MESH_ptr myIor )
 throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-  const char* LOC = "MED_Mesh_i::addInStudy";
-  BEGIN_OF(LOC);
 	if ( _meshId != "" )
 	{
 		MESSAGE("Mesh already in Study");
@@ -1591,7 +1579,6 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
    	MESSAGE("Registering of the Corba Mesh pointer");
 	Register();
 
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -1601,8 +1588,6 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 void MESH_i::addInStudy(SALOMEDS::Study_ptr myStudy,SALOME_MED::MESH_ptr myIor,const string & fileName )
 throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-  const char* LOC = "MED_Mesh_i::addInStudy";
-  BEGIN_OF(LOC);
         if ( _meshId != "" )
         {
                 MESSAGE("Mesh already in Study");
@@ -1658,7 +1643,6 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
    	MESSAGE("Registering of the Corba Mesh pointer");
 	Register();
 
-  END_OF(LOC);
 }
 //=============================================================================
 

@@ -77,7 +77,7 @@
   // Get the orb Corba C++
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
 
@@ -85,7 +85,7 @@
   SCRUTE(s);
   PyObject * tmp = PyString_FromString(s.c_str());
   SCRUTE(tmp);
-  PyObject * corbaObj = PyObject_CallMethod(orb, "string_to_object", "O", tmp);
+  PyObject * corbaObj = PyObject_CallMethod(orb, (char*)"string_to_object", (char*)"O", tmp);
   $result = corbaObj;
 
   // cast CORBA object, if necessary
@@ -102,7 +102,7 @@
 //   PyObject* cls = PyDict_GetItemString(pdict, "cls");
 
 //   // cast
-//   $result = PyObject_CallMethod(corbaObj, "_narrow", "O", cls);
+//   $result = PyObject_CallMethod(corbaObj, (char*)"_narrow", (char*)"O", cls);
 
   SCRUTE($result);
 }
@@ -128,7 +128,7 @@
   // Get the orb Corba C++
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
 
@@ -136,7 +136,7 @@
   SCRUTE(s);
   PyObject * tmp = PyString_FromString(s.c_str());
   SCRUTE(tmp);
-  $result = PyObject_CallMethod(orb, "string_to_object", "O", tmp);
+  $result = PyObject_CallMethod(orb, (char*)"string_to_object", (char*)"O", tmp);
   SCRUTE($result);
 }
 
@@ -169,7 +169,7 @@
   // Ask omniORBpy to transform MESH (python Corba) ptr to IOR string
 
   PyObject* iorMesh
-    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
  
   if (iorMesh == Py_None)
     return NULL;
@@ -178,7 +178,7 @@
   // Ask omniORB to convert IOR string to MESH (C++ Corba) ptr
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
   CORBA::Object_var O =  ORB->string_to_object(s);
@@ -207,7 +207,7 @@
   // Ask omniORBpy to transform FIELDDOUBLE (python Corba) ptr to IOR string
 
   PyObject* iorFieldDouble
-    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
  
   if (iorFieldDouble == Py_None)
     return NULL;
@@ -216,7 +216,7 @@
   // Ask omniORB to convert IOR string to FIELDDOUBLE (C++ Corba) ptr
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
   CORBA::Object_var O =  ORB->string_to_object(s);
@@ -245,7 +245,7 @@
   // Ask omniORBpy to transform FIELDINT (python Corba) ptr to IOR string
 
   PyObject* iorFieldInt
-    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
  
   if (iorFieldInt == Py_None)
     return NULL;
@@ -254,7 +254,7 @@
   // Ask omniORB to convert IOR string to FIELDINT (C++ Corba) ptr
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
   CORBA::Object_var O =  ORB->string_to_object(s);
@@ -283,7 +283,7 @@
   // Ask omniORBpy to transform FIELDDOUBLE (python Corba) ptr to IOR string
 
   PyObject* iorFieldDouble
-    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
  
   if (iorFieldDouble == Py_None)
     return NULL;
@@ -292,7 +292,7 @@
   // Ask omniORB to convert IOR string to FIELDDOUBLE (C++ Corba) ptr
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
   CORBA::Object_var O =  ORB->string_to_object(s);
@@ -321,7 +321,7 @@
   // Ask omniORBpy to transform FIELDINT (python Corba) ptr to IOR string
 
   PyObject* iorFieldInt
-    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
  
   if (iorFieldInt == Py_None)
     return NULL;
@@ -330,7 +330,7 @@
   // Ask omniORB to convert IOR string to FIELDINT (C++ Corba) ptr
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
   CORBA::Object_var O =  ORB->string_to_object(s);
@@ -358,7 +358,7 @@
   // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
 
   PyObject* iorSupport
-    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
  
   if (iorSupport == Py_None)
     return NULL;
@@ -367,7 +367,7 @@
   // Ask omniORB to convert IOR string to SUPPORT (C++ Corba) ptr
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
   CORBA::Object_var O =  ORB->string_to_object(s);
@@ -397,7 +397,7 @@
   // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
 
   PyObject* iorSupport
-    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
  
   if (iorSupport == Py_None)
     return NULL;
@@ -406,7 +406,7 @@
   // Ask omniORB to convert IOR string to SUPPORT (C++ Corba) ptr
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
   CORBA::Object_var O =  ORB->string_to_object(s);
@@ -436,7 +436,7 @@
   // Ask omniORBpy to transform MESH (python Corba) ptr to IOR string
 
   PyObject* iorMesh
-    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
  
   if (iorMesh == Py_None)
     return NULL;
@@ -445,7 +445,7 @@
   // Ask omniORB to convert IOR string to MESH (C++ Corba) ptr
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
   CORBA::Object_var O =  ORB->string_to_object(s);
@@ -476,7 +476,7 @@
   // Ask omniORBpy to transform FIELDDOUBLE (python Corba) ptr to IOR string
 
   PyObject* iorFieldDouble
-    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
  
   if (iorFieldDouble == Py_None)
     return NULL;
@@ -485,7 +485,7 @@
   // Ask omniORB to convert IOR string to FIELDDOUBLE (C++ Corba) ptr
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
   CORBA::Object_var O =  ORB->string_to_object(s);
@@ -516,7 +516,7 @@
   // Ask omniORBpy to transform FIELDINT (python Corba) ptr to IOR string
 
   PyObject* iorFieldInt
-    = PyObject_CallMethod(orb, "object_to_string", "O", $input);
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
  
   if (iorFieldInt == Py_None)
     return NULL;
@@ -525,7 +525,7 @@
   // Ask omniORB to convert IOR string to FIELDINT (C++ Corba) ptr
 
   int argc = 0;
-  char *xargv = "";
+  char *xargv = (char*)"";
   char **argv = &xargv;
   CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
   CORBA::Object_var O =  ORB->string_to_object(s);
@@ -574,7 +574,9 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 %{
   SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDDOUBLE * field, bool ownCppPtr=false)
     {
+#ifdef _DEBUG_
   const char* LOC = "SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble from libMedCorba_Swig";
+#endif
   BEGIN_OF(LOC);
 
       SCRUTE(field);
@@ -620,7 +622,9 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
   SALOME_MED::FIELDINT_ptr createCorbaFieldInt(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDINT * field, bool ownCppPtr=false)
     {
+#ifdef _DEBUG_
   const char* LOC = "SALOME_MED::FIELDINT_ptr createCorbaFieldInt from libMedCorba_Swig";
+#endif
   BEGIN_OF(LOC);
 
       SCRUTE(field);
@@ -665,7 +669,9 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
   SALOME_MED::SUPPORT_ptr createCorbaSupport(const SUPPORT * const support)
     {
+#ifdef _DEBUG_
   const char* LOC = "SALOME_MED::SUPPORT_ptr createCorbaSupport from libMedCorba_Swig";
+#endif
   BEGIN_OF(LOC);
 
       SCRUTE(support);
@@ -686,7 +692,9 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
   SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh)
     {
+#ifdef _DEBUG_
   const char* LOC = "SALOME_MED::MESH_ptr createCorbaMesh from libMedCorba_Swig";
+#endif
   BEGIN_OF(LOC);
 
       SCRUTE(mesh);
@@ -708,7 +716,9 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
   FIELDDOUBLE * createLocalFieldDouble(const int NumberOfComponents,
 				      const int LengthValue)
     {
+#ifdef _DEBUG_
   const char* LOC = "FIELDDOUBLE createLocalFieldDouble from libMedCorba_Swig";
+#endif
   BEGIN_OF(LOC);
 
       SCRUTE(NumberOfComponents);
@@ -726,7 +736,9 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
   FIELDINT * createLocalFieldInt(const int NumberOfComponents,
 				 const int LengthValue)
     {
+#ifdef _DEBUG_
   const char* LOC = "FIELDINT createLocalFieldInt from libMedCorba_Swig";
+#endif
   BEGIN_OF(LOC);
 
       SCRUTE(NumberOfComponents);

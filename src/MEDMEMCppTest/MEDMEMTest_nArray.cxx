@@ -377,10 +377,7 @@ void MEDMEMTest::testnArray()
     }
   };
 
-  int nnn = myArray3qua.getArraySize();
   for (int i =0; i < myArray3qua.getArraySize(); i++) {
-    double aa = myArray3Ptr[i];
-    double bb = array3Ref[i];
     CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3Ptr[i], array3Ref[i], EPS );
   }
 

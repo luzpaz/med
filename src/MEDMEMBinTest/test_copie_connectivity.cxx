@@ -44,7 +44,6 @@ using namespace MED_EN;
 
 void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
 {
-  int SpaceDimension = myMesh->getSpaceDimension() ;
   int MeshDimension  = myMesh->getMeshDimension() ;
   int NumberOfNodes  = myMesh->getNumberOfNodes() ;
 

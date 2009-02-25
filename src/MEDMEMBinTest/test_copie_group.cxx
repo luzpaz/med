@@ -86,7 +86,6 @@ void affiche_groupe(const GROUP * myGroup)
 }
 
 int main (int argc, char ** argv) {
-  int read;
 
   if (argc <3) { // after 3, ignored !
     cerr << "Usage : " << argv[0] 

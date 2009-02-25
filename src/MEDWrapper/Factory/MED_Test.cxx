@@ -32,7 +32,7 @@
 #ifdef _DEBUG_
 static int MYDEBUG = 1;
 #else
-static int MYDEBUG = 0;
+// static int MYDEBUG = 0;
 #endif
 
 static int MYWRITEDEBUG = 1;
@@ -149,9 +149,11 @@ void CopyMed(const PWrapper& theMed,
   std::string aName;
   for(TInt iMesh = 0; iMesh < aNbMeshes; iMesh++){
     PMeshInfo aMeshInfo = theMed->GetPMeshInfo(iMesh+1);
+#ifdef _DEBUG_
     TInt aDim = aMeshInfo->myDim;
     aName = aMeshInfo->GetName();
     INITMSG(MYDEBUG,"GetMeshInfo - aName = '"<<aName<<"'; aDim = "<<aDim<<"\n");
+#endif
     PMeshInfo aMeshInfo2 = theMed2->CrMeshInfo(aMeshInfo);
     if(MYWRITEDEBUG){
       aName = aMeshInfo2->GetName();
@@ -170,8 +172,10 @@ void CopyMed(const PWrapper& theMed,
     MSG(MYDEBUG,"GetNbFields() = "<<aNbFields);
     for(TInt iField = 0; iField < aNbFields; iField++){
       PFieldInfo aFieldInfo = theMed->GetPFieldInfo(aMeshInfo,iField+1);
+#ifdef _DEBUG_
       TInt aNbComp = aFieldInfo->GetNbComp();
       INITMSG(MYDEBUG,"aName = '"<<aFieldInfo->GetName()<<"'; aNbComp = "<<aNbComp<<";\n");
+#endif
       PFieldInfo aFieldInfo2 = theMed->CrFieldInfo(aMeshInfo2,aFieldInfo);
 
       if(MYWRITEDEBUG){
@@ -190,8 +194,10 @@ void CopyMed(const PWrapper& theMed,
 	for(TInt iTimeStamp = 0; iTimeStamp < aNbTimeStamps; iTimeStamp++){
 	  PTimeStampInfo aTimeStampInfo = 
 	  theMed->GetPTimeStampInfo(aFieldInfo,anEntity,aGeom2Size,iTimeStamp+1);
+#ifdef _DEBUG_
 	  TInt aNumDt = aTimeStampInfo->GetNumDt();
 	  INITMSG(MYDEBUG,"aNumDt = "<<aNumDt<<"\n");
+#endif
 	  
 	  PTimeStampInfo aTimeStampInfo2 = 
 	    theMed->CrTimeStampInfo(aFieldInfo2,aTimeStampInfo);
@@ -215,14 +221,18 @@ void CopyMed(const PWrapper& theMed,
     for(TInt iFam = 0; iFam < aNbFam; iFam++){
       PFamilyInfo aFamilyInfo = theMed->GetPFamilyInfo(aMeshInfo,iFam+1);
       TInt aNbGroup = aFamilyInfo->GetNbGroup();
+#ifdef _DEBUG_
       TInt aNbAttr = aFamilyInfo->GetNbAttr();
+#endif
       TInt anId = aFamilyInfo->GetId();
       if(anId == 0)
 	continue;
 
       aName = aFamilyInfo->GetName();
+#ifdef _DEBUG_
       INITMSG(MYDEBUG,"aName = '"<<aName<<"'; anId = "<<anId<<
 	      "; aNbAttr = "<<aNbAttr<<"; aNbGroup = "<<aNbGroup<<"\n");
+#endif
       PFamilyInfo aFamilyInfo2 = theMed->CrFamilyInfo(aMeshInfo2,aFamilyInfo);
       for(TInt iGroup = 0; iGroup < aNbGroup; iGroup++){
 	aName = aFamilyInfo->GetGroupName(iGroup);
@@ -255,8 +265,10 @@ void CopyMed(const PWrapper& theMed,
       TGeom2Size::iterator aGeomIter = aGeom2Size.begin();
       for(; aGeomIter != aGeom2Size.end(); aGeomIter++){
 	const EGeometrieElement& aGeom = aGeomIter->first;
+#ifdef _DEBUG_
 	const TInt& aNbElem = aGeomIter->second;
 	INITMSG(MYDEBUG,"aGeom = "<<aGeom<<"; aNbElem = "<<aNbElem<<": ");
+#endif
 	switch(aGeom){
 	case ePOLYGONE: {
 	  PPolygoneInfo aPolygoneInfo = theMed->GetPPolygoneInfo(aMeshInfo,anEntity,aGeom);

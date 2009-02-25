@@ -39,7 +39,9 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
   SUPPORT(), 
   IOR_Support(SALOME_MED::SUPPORT::_duplicate(S)),_refCounter(1)
 {
+#ifdef _DEBUG_
   const char* LOC = "SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)";
+#endif
   BEGIN_OF(LOC);
 
   SCRUTE(S);
@@ -62,7 +64,9 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
 //=============================================================================
 void SUPPORTClient::blankCopy()
 {
+#ifdef _DEBUG_
   const char* LOC = "SUPPORTClient::blankCopy";
+#endif
   BEGIN_OF(LOC);
 
  try
@@ -110,7 +114,9 @@ void SUPPORTClient::blankCopy()
 //=============================================================================
 void SUPPORTClient::fillCopy()
 {
+#ifdef _DEBUG_
   const char* LOC = "SUPPORTClient::fillCopy";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete_support) {
@@ -139,7 +145,9 @@ void SUPPORTClient::fillCopy()
 //=============================================================================
 SUPPORTClient::~SUPPORTClient()
 {
+#ifdef _DEBUG_
   const char* LOC = "SUPPORTClient::~SUPPORTClient";
+#endif
   BEGIN_OF(LOC);
   IOR_Support->Destroy();
   if(_mesh)
@@ -154,7 +162,9 @@ SUPPORTClient::~SUPPORTClient()
 //=============================================================================
 MEDSKYLINEARRAY *  SUPPORTClient::getnumber() const throw (MEDEXCEPTION)
 {
+#ifdef _DEBUG_
   const char* LOC = "SUPPORTClient::getnumber()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
@@ -172,7 +182,9 @@ MEDSKYLINEARRAY *  SUPPORTClient::getnumber() const throw (MEDEXCEPTION)
 const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType) 
     const throw (MEDEXCEPTION)
 {
+#ifdef _DEBUG_
   const char* LOC = "SUPPORTClient::getnumber(medGeometryElement)";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
@@ -189,7 +201,9 @@ const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType)
 //=============================================================================
 const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION) 
 {
+#ifdef _DEBUG_
   const char* LOC = "SUPPORTClient::getnumberIndex()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
@@ -206,7 +220,9 @@ const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION)
 //=============================================================================
 int SUPPORTClient::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION)
 {
+#ifdef _DEBUG_
   const char* LOC = "SUPPORTClient::getValIndFromGlobalNumber()";
+#endif
   BEGIN_OF(LOC);
   
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();

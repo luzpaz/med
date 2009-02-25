@@ -59,9 +59,6 @@ int SUPPORT_i::supportIndex = 0 ;
 //=============================================================================
 SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL),_corbaIndex(SUPPORT_i::supportIndex++)
 {
-  const char* LOC = "Default Constructor SUPPORT_i";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -72,10 +69,7 @@ SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL),_corbaIndex(SUPPORT_i::suppo
 SUPPORT_i::SUPPORT_i(const ::SUPPORT * const s) :_support(s),
 	           _corbaIndex(SUPPORT_i::supportIndex++)
 {
-  const char* LOC = "Constructor SUPPORT_i";
-  BEGIN_OF(LOC);
 	SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -85,10 +79,7 @@ SUPPORT_i::SUPPORT_i(const ::SUPPORT * const s) :_support(s),
 SUPPORT_i::SUPPORT_i(const SUPPORT_i &s) :_support(s._support),
 	                    _corbaIndex(SUPPORT_i::supportIndex++)
 {
-  const char* LOC = "Constructor SUPPORT_i";
-  BEGIN_OF(LOC);
 	SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -259,8 +250,6 @@ SALOME_MED::SUPPORT::supportInfos * SUPPORT_i::getSupportGlobal()
 SALOME_MED::MESH_ptr SUPPORT_i::getMesh()
 throw (SALOME::SALOME_Exception)
 {
-  const char* LOC = "SALOME_MED::MESH_ptr SUPPORT_i::getMesh()";
-  BEGIN_OF(LOC);
 
 	if (_support==NULL)
 		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
@@ -277,8 +266,6 @@ throw (SALOME::SALOME_Exception)
 
 		SCRUTE(m1);
 		SCRUTE(m2);
-
-  END_OF(LOC);
 
 	        return (m2);
         }
@@ -345,15 +332,12 @@ throw (SALOME::SALOME_Exception)
 SALOME_MED::medEntityMesh SUPPORT_i::getEntity() 
 throw (SALOME::SALOME_Exception)
 {
-  const char* LOC = "SALOME_MED::medEntityMesh SUPPORT_i::getEntity()";
-  BEGIN_OF(LOC);
 
   if (_support==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
 				             SALOME::INTERNAL_ERROR);
   try
     {
-  END_OF(LOC);
       return convertMedEntToIdlEnt(_support->getEntity());
     }
   catch (MEDEXCEPTION &ex)
@@ -624,8 +608,6 @@ throw (SALOME::SALOME_Exception)
 void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr myIor)
   throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-  const char* LOC = "SUPPORT_i::addInStudy";
-  BEGIN_OF(LOC);
 
   if ( _supportId != "" )
   {
@@ -758,7 +740,6 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   MESSAGE("Registering of the Corba Support pointer");
   Register();
 
-  END_OF(LOC);
 }
 
 //=======================================================================

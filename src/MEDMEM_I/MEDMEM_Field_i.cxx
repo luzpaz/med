@@ -50,9 +50,6 @@ int  FIELD_i::fieldIndex = 0;
 //FIELD_i::FIELD_i():_fieldTptr(FIELD_i::constructConstField())
 FIELD_i::FIELD_i():_fieldTptr(constructConstField()),_corbaIndex(FIELD_i::fieldIndex++)
 {
-  const char* LOC = "Default Constructor Field_i";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -74,15 +71,11 @@ FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
   _FieldId(""),
   _ownCppPtr(ownCppPtr)
 {
-  const char* LOC = "Constructor FIELD_i(SALOME_MED::SUPPORT_ptr support,::FIELD<T> * const field)";
-  BEGIN_OF(LOC);
   FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 
   MESSAGE("FIELD_i::FIELD_i  Checking of pointeurs !!!");
 
   SCRUTE(_fieldTptr);
-
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -94,10 +87,7 @@ FIELD_i::FIELD_i( FIELD_i & f):_fieldTptr(f._fieldTptr),
 			       _corbaIndex(FIELD_i::fieldIndex++),
 			       _FieldId(""), _ownCppPtr(false)
 {
-  const char* LOC = "Constructor Field_i";
-  BEGIN_OF(LOC);
         FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -176,9 +166,6 @@ throw (SALOME::SALOME_Exception)
 SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()
   throw (SALOME::SALOME_Exception)
 {
-  const char* LOC = "SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()";
-  BEGIN_OF(LOC);
-
   if (_fieldTptr==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Field",
 				 SALOME::INTERNAL_ERROR);
@@ -188,8 +175,6 @@ SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()
   SALOME_MED::SUPPORT_ptr support=servant->_this();
 
   SCRUTE(_fieldTptr);
-
-  END_OF(LOC);
 
   return support ;
 }
@@ -499,9 +484,6 @@ void FIELD_i::addInStudyToComponent (SALOMEDS::SComponent_ptr myComponent,
                                      SALOME_MED::FIELD_ptr    myIor)
   throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
 {
-  const char* LOC = " FIELD_i::addInStudy";
-  BEGIN_OF(LOC);
-
         if (CORBA::is_nil(myComponent) || CORBA::is_nil(myIor))
 	  THROW_SALOME_CORBA_EXCEPTION("Null parameter", SALOME::BAD_PARAM);
 

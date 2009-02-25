@@ -42,7 +42,9 @@ MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) :
   _complete(false)
 
 {
+#ifdef _DEBUG_
   const char* LOC = "MESHClient::MESHClient(SALOME_MED::MESH_ptr m)";
+#endif
   BEGIN_OF(LOC);
 
   ASSERT(m);
@@ -80,7 +82,9 @@ GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, MESH *M)
 //=============================================================================
 void MESHClient::blankCopy()
 {
+#ifdef _DEBUG_
   const char* LOC = "MESHClient::blankCopy()";
+#endif
   BEGIN_OF(LOC);
   SALOME_MED::MESH::meshInfos_var all = IOR_Mesh->getMeshGlobal();
 
@@ -165,7 +169,9 @@ void MESHClient::blankCopy()
 
 void MESHClient::fillCopy()
 {
+#ifdef _DEBUG_
   const char* LOC = "MESHClient::fillCopy()";
+#endif
   BEGIN_OF(LOC);
 
   COORDINATEClient *_coord 
@@ -230,7 +236,9 @@ void MESHClient::fillCopy()
 //=============================================================================
 bool MESHClient::operator==(const MESH& other) const
 {
+#ifdef _DEBUG_
   const char* LOC = "MESHClient::operator==";
+#endif
   BEGIN_OF(LOC);
   const MESHClient* otherClt=dynamic_cast<const MESHClient *>(&other);
   if(otherClt)
@@ -252,7 +260,9 @@ bool MESHClient::operator==(const MESH& other) const
 
 MESHClient::~MESHClient()
 {
+#ifdef _DEBUG_
   const char* LOC = "MESHClient::~MESHClient()";
+#endif
   BEGIN_OF(LOC);
   IOR_Mesh->Destroy();
   END_OF(LOC);

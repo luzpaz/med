@@ -34,7 +34,9 @@ FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr S,
     FAMILY(), 
     IOR_Family(SALOME_MED::FAMILY::_duplicate(S))
 {
+#ifdef _DEBUG_
   const char* LOC = "FAMILYClient::FAMILYClient(SALOME_MED::FAMILY_ptr m)";
+#endif
   BEGIN_OF(LOC);
 
   SCRUTE(S);
@@ -51,7 +53,9 @@ FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr S,
 //=============================================================================
 void FAMILYClient::blankCopy(bool blankSupport)
 {
+#ifdef _DEBUG_
   const char* LOC = "FAMILYClient::blankCopy()";
+#endif
   BEGIN_OF(LOC);
 
   if (blankSupport)
@@ -107,7 +111,9 @@ void FAMILYClient::blankCopy(bool blankSupport)
 //=============================================================================
 void FAMILYClient::fillCopy(bool fillSupport)
 {
+#ifdef _DEBUG_
   const char* LOC = "FAMILYClient::fillCopy()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete) {
@@ -131,7 +137,9 @@ void FAMILYClient::fillCopy(bool fillSupport)
 
 FAMILYClient::~FAMILYClient()
 {
+#ifdef _DEBUG_
   const char* LOC = "FAMILYClient::~FAMILYClient()";
+#endif
   BEGIN_OF(LOC);
   END_OF(LOC);
 }

@@ -96,7 +96,7 @@ MEDchampLire(med_idt fid,char *maa, char *cha, unsigned char *val,med_mode_switc
   if ((ret = _MEDattrStringLire(datagroup2,MED_NOM_PFL,MED_TAILLE_NOM,pfltmp)) < 0)
     return -1;
   
-  if ( pfluse = (strcmp(pfltmp,MED_NOPFLi) && strcmp(pfltmp,"")) ) /* le test "" pour des raisons de compatibilité */
+  if ( (pfluse = (strcmp(pfltmp,MED_NOPFLi) && strcmp(pfltmp,""))) ) /* le test "" pour des raisons de compatibilité */
     {
       strcpy(profil,pfltmp);
       if ( (i = MEDnValProfil(fid,profil)) < 0 )

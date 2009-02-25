@@ -33,8 +33,8 @@
 static int MYDEBUG = 0;
 static int MYVALUEDEBUG = 0;
 #else
-static int MYDEBUG = 0;
-static int MYVALUEDEBUG = 0;
+// static int MYDEBUG = 0;
+// static int MYVALUEDEBUG = 0;
 #endif
 
 namespace MED

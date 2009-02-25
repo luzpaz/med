@@ -60,7 +60,7 @@ MEDfichEntete(med_idt fid, med_fich_info quoi, char str[])
        * Si non => erreur
        * Si oui => on le copie dans str
        */
-      if ((ret = _MEDattrStringLire(root,MED_NOM_DESCRIPTEUR,
+      if ((ret = _MEDattrStringLire(root,(char*)MED_NOM_DESCRIPTEUR,
 				    MED_TAILLE_DESC,locale)) < 0)
 	return -1;
       strcpy(str,locale);

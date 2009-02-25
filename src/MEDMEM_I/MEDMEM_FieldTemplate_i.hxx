@@ -58,9 +58,6 @@ namespace MEDMEM
   template < class T, class INTERLACING_TAG >
   FIELDTEMPLATE_I<T,INTERLACING_TAG>::FIELDTEMPLATE_I(): FIELD_i()
   {
-  const char* LOC = "Default Constructor FIELDTEMPLATE_I";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
   }
   //=============================================================================
   /*!
@@ -70,9 +67,6 @@ namespace MEDMEM
   template < class T, class INTERLACING_TAG >
   FIELDTEMPLATE_I<T,INTERLACING_TAG>::~FIELDTEMPLATE_I()
   {
-  const char* LOC = "Default Destructor FIELDTEMPLATE_I";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
   }
   //=============================================================================
   /*!
@@ -83,9 +77,6 @@ namespace MEDMEM
   FIELDTEMPLATE_I<T,INTERLACING_TAG>::FIELDTEMPLATE_I(FIELDTEMPLATE_I<T, INTERLACING_TAG>& fd):
     FIELD_i(fd)
   {
-  const char* LOC = "Default Constructor FIELDTEMPLATE_I";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
   }
   //=============================================================================
   /*!
@@ -95,9 +86,6 @@ namespace MEDMEM
   template < class T, class INTERLACING_TAG >
   FIELDTEMPLATE_I<T,INTERLACING_TAG>::FIELDTEMPLATE_I(MEDMEM::FIELD<T, INTERLACING_TAG> *f, bool ownCppPtr):FIELD_i(f,ownCppPtr)
   {
-  const char* LOC = "Constructor FIELDTEMPLATE_I";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
   }
 
   //=============================================================================

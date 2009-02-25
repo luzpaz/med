@@ -39,7 +39,9 @@ CONNECTIVITYClient::CONNECTIVITYClient(const SALOME_MED::MESH_ptr m,
   _numberOfElements_client(0),
   _complete(false)
 {
+#ifdef _DEBUG_
   const char* LOC = "CONNECTIVITYClient::CONNECTIVITYClient()";
+#endif
   BEGIN_OF(LOC);
 
   ASSERT(m);
@@ -56,7 +58,9 @@ CONNECTIVITYClient::CONNECTIVITYClient(const SALOME_MED::MESH_ptr m,
 //=============================================================================
 CONNECTIVITYClient::~CONNECTIVITYClient()
 {
+#ifdef _DEBUG_
   const char* LOC = "CONNECTIVITYClient::~CONNECTIVITYClient()";
+#endif
   BEGIN_OF(LOC);
 
   if (_numberOfElements_client)
@@ -73,7 +77,9 @@ CONNECTIVITYClient::~CONNECTIVITYClient()
 //=============================================================================
 void CONNECTIVITYClient::blankCopy()
 {
+#ifdef _DEBUG_
   const char* LOC = "CONNECTIVITYClient::blankCopy()";
+#endif
   BEGIN_OF(LOC);
    SALOME_MED::MESH::connectivityInfos_var all;
    medEntityMesh Entity = getEntity();
@@ -159,7 +165,9 @@ void CONNECTIVITYClient::blankCopy()
 
 void CONNECTIVITYClient::fillCopy()
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::fillCopy()";
+#endif
   BEGIN_OF(LOC);
 
 
@@ -185,7 +193,9 @@ void CONNECTIVITYClient::fillCopy()
     for (iT=0; iT<nT; iT++) {
       
       SCRUTE(iT);
+#ifdef _DEBUG_
       int kT = Count[iT+1]-Count[iT];
+#endif
       SCRUTE(kT);
       
       SALOME::SenderInt_var senderForConnectivity=IOR_Mesh->getSenderForConnectivity(MED_FULL_INTERLACE, MED_NODAL, Entity, T[iT]);
@@ -252,7 +262,9 @@ void CONNECTIVITYClient::fillCopy()
 int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity, 
                                     medGeometryElement Type) const
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getNumberOf()";
+#endif
   BEGIN_OF(LOC);
 
   int n = 0;
@@ -296,7 +308,9 @@ const int * CONNECTIVITYClient::getConnectivity
 		       medEntityMesh Entity,
 		       medGeometryElement Type)
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getConnectivity()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -317,7 +331,9 @@ const int * CONNECTIVITYClient::getConnectivityIndex
                       (medConnectivity ConnectivityType,
 		       medEntityMesh Entity)
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getConnectivityIndex()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -338,7 +354,9 @@ void CONNECTIVITYClient::calculateConnectivity
                       (medConnectivity connectivityType, 
 		       medEntityMesh Entity)
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::calculateConnectivity()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -355,7 +373,9 @@ void CONNECTIVITYClient::calculateConnectivity
 //=============================================================================
 void  CONNECTIVITYClient::updateFamily (vector<FAMILY*> myFamilies)
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::updateFamily()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -373,7 +393,9 @@ void  CONNECTIVITYClient::updateFamily (vector<FAMILY*> myFamilies)
 const int * CONNECTIVITYClient::getGlobalNumberingIndex 
                       (medEntityMesh Entity) const throw (MEDEXCEPTION)
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getGlobalNumberingIndex()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -393,7 +415,9 @@ const int * CONNECTIVITYClient::getGlobalNumberingIndex
 bool CONNECTIVITYClient::existConnectivity(medConnectivity ConnectivityType, 
 					   medEntityMesh Entity) const
 { 
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::existConnectivity()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -414,7 +438,9 @@ const int * CONNECTIVITYClient::getReverseConnectivity
                       (medConnectivity ConnectivityType, 
 		       medEntityMesh Entity) throw (MEDEXCEPTION)
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getReverseConnectivity()";
+#endif
   BEGIN_OF(LOC);
   
   if (!_complete)
@@ -436,7 +462,9 @@ const int * CONNECTIVITYClient::getReverseConnectivityIndex
                       (medConnectivity ConnectivityType,
 		       medEntityMesh Entity) throw (MEDEXCEPTION)
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getReverseConnectivityIndex()";
+#endif
   BEGIN_OF(LOC);
   
   if (!_complete)
@@ -457,7 +485,9 @@ const int * CONNECTIVITYClient::getReverseConnectivityIndex
 const int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity, 
 			medGeometryElement Type)
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getValue()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -476,7 +506,9 @@ const int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity,
 //=============================================================================
 const int* CONNECTIVITYClient::getValueIndex(medConnectivity TypeConnectivity)
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getValueIndex()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -495,7 +527,9 @@ const int* CONNECTIVITYClient::getValueIndex(medConnectivity TypeConnectivity)
 //=============================================================================
 const int* CONNECTIVITYClient::getNeighbourhood() const
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getNeighbourhood()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -516,7 +550,9 @@ const int* CONNECTIVITYClient::getNeighbourhood() const
 bool CONNECTIVITYClient::existPolygonsConnectivity(medConnectivity connectivityType,
                                                    medEntityMesh   Entity) const
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::existPolygonsConnectivity()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -537,7 +573,9 @@ bool CONNECTIVITYClient::existPolygonsConnectivity(medConnectivity connectivityT
 bool CONNECTIVITYClient::existPolyhedronConnectivity(medConnectivity connectivityType,
                                                      medEntityMesh   Entity) const
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::existPolyhedronConnectivity()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -558,7 +596,9 @@ bool CONNECTIVITYClient::existPolyhedronConnectivity(medConnectivity connectivit
 const int* CONNECTIVITYClient::getPolygonsConnectivity(medConnectivity ConnectivityType,
                                                        medEntityMesh Entity)
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getPolygonsConnectivity()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -578,7 +618,9 @@ const int* CONNECTIVITYClient::getPolygonsConnectivity(medConnectivity Connectiv
 const int* CONNECTIVITYClient::getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
                                                             medEntityMesh Entity)
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getPolygonsConnectivityIndex()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -597,7 +639,9 @@ const int* CONNECTIVITYClient::getPolygonsConnectivityIndex(medConnectivity Conn
 
 const int* CONNECTIVITYClient::getPolyhedronConnectivity(medConnectivity ConnectivityType) const
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getPolyhedronConnectivity()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -616,7 +660,9 @@ const int* CONNECTIVITYClient::getPolyhedronConnectivity(medConnectivity Connect
 
 const int* CONNECTIVITYClient::getPolyhedronFacesIndex() const
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getPolyhedronFacesIndex()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -635,7 +681,9 @@ const int* CONNECTIVITYClient::getPolyhedronFacesIndex() const
 
 const int* CONNECTIVITYClient::getPolyhedronIndex(medConnectivity ConnectivityType) const
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getPolyhedronIndex()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -654,7 +702,9 @@ const int* CONNECTIVITYClient::getPolyhedronIndex(medConnectivity ConnectivityTy
 
 int CONNECTIVITYClient::getNumberOfPolygons() const
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getNumberOfPolygons()";
+#endif
   BEGIN_OF(LOC);
 
   int n = 0;
@@ -679,7 +729,9 @@ int CONNECTIVITYClient::getNumberOfPolygons() const
 
 int CONNECTIVITYClient::getNumberOfPolyhedronFaces() const
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getNumberOfPolyhedronFaces()";
+#endif
   BEGIN_OF(LOC);
 
   if (!_complete)
@@ -700,7 +752,9 @@ int CONNECTIVITYClient::getNumberOfPolyhedronFaces() const
 
 int CONNECTIVITYClient::getNumberOfPolyhedron() const
 {
+#ifdef _DEBUG_
   const char* LOC = "void CONNECTIVITYClient::getNumberOfPolyhedron()";
+#endif
   BEGIN_OF(LOC);
 
   int n = 0;

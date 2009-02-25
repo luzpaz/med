@@ -30,7 +30,7 @@
 #include "MED_V2_1_Wrapper.hxx"
 
 #include <stdio.h>
-#include <strstream>
+#include <sstream>
 
 extern "C"
 {

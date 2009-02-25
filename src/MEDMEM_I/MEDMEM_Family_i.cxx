@@ -40,9 +40,6 @@ using namespace MEDMEM;
 FAMILY_i::FAMILY_i(): _family((::FAMILY*)NULL),
 				SUPPORT_i()
 {
-  const char* LOC = "Default Constructor FAMILY_i";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -52,9 +49,6 @@ FAMILY_i::FAMILY_i(): _family((::FAMILY*)NULL),
 FAMILY_i::FAMILY_i(const FAMILY_i & f): _family(f._family),
 				        SUPPORT_i(f._family)
 {
-  const char* LOC = "Default Constructor FAMILY_i";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -72,9 +66,6 @@ FAMILY_i::~FAMILY_i()
 FAMILY_i::FAMILY_i(const ::FAMILY * const f): _family(f),
 				              SUPPORT_i(f)
 {
-  const char* LOC = "Constructor FAMILY_i";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 }
 //=============================================================================
 /*!

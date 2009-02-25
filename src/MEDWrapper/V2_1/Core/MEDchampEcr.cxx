@@ -149,7 +149,7 @@ MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch
 
   /*Cree ou ouvre (en mode MED_REMP) l'attribut  MED_NOM_UNI */ 
   if ( strlen(dt_unit) == 0) {
-    if ((ret = _MEDattrStringEcrire(datagroup2,MED_NOM_UNI,MED_TAILLE_PNOM,"        ",mode)) < 0)
+    if ((ret = _MEDattrStringEcrire(datagroup2,MED_NOM_UNI,MED_TAILLE_PNOM,(char*)"        ",mode)) < 0)
       return -1;
   } else
     if ((ret = _MEDattrStringEcrire(datagroup2,MED_NOM_UNI,MED_TAILLE_PNOM,dt_unit,mode)) < 0)
