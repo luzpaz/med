@@ -74,13 +74,11 @@ endif
 libmedsplitter_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	$(BOOST_CPPFLAGS) $(LIBXML_CPPFLAGS) \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
-libmedsplitter_la_LDFLAGS= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) \
-	../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la
 
-if MED_ENABLE_KERNEL
-  libmedsplitter_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
-  libmedsplitter_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
-endif
+libmedsplitter_la_LDFLAGS= 
+#libmedsplitter_la_LDFLAGS= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) \
+#	../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la
+
 if MED_ENABLE_METIS
   libmedsplitter_la_CPPFLAGS+= $(METIS_CPPFLAGS)
   libmedsplitter_la_LDFLAGS+= $(METIS_LIBS)
@@ -89,6 +87,13 @@ if MED_ENABLE_SCOTCH
   libmedsplitter_la_CPPFLAGS+= $(SCOTCH_CPPFLAGS)
   libmedsplitter_la_LDFLAGS+= $(SCOTCH_LIBS)
 endif
+if MED_ENABLE_KERNEL
+  libmedsplitter_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
+  libmedsplitter_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
+endif
+
+libmedsplitter_la_LDFLAGS+= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) \
+	../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la
 
 # Executables targets
 bin_PROGRAMS= medsplitter
