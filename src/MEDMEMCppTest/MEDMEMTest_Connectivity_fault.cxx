@@ -59,7 +59,6 @@ void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
   // this variable is needed in check mode (!create)
   // because of bug with getGlobalNumberingIndex() method (see below)
-  bool triaFirst = true;
 
   if (create) {
     theC->setGeometricTypes(aCellTypes, MED_EN::MED_CELL);

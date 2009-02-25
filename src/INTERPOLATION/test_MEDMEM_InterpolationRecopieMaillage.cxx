@@ -84,7 +84,6 @@ Wrapper_Maille_Penta15 Penta15;Penta15.positionne(liste);cout<<"Penta15"<<endl;P
 
   const char * fromFieldName  = "THERDEP_TEMP____________________";
 
-  const char * fromMeshName   = "MA";
   const char * toMeshName     = "MAILLAGE_IDEAS";
   int handle;
 

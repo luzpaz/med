@@ -3392,13 +3392,12 @@ FIELD<T, INTERLACING_TAG>::getArrayNoGauss() const throw (MEDEXCEPTION)
 template <class T,class INTERLACING_TAG> inline bool
 FIELD<T, INTERLACING_TAG>::getGaussPresence() const throw (MEDEXCEPTION)
 {
-  const char * LOC = "FIELD<T, INTERLACING_TAG>::getGaussPresence() const :";
   //BEGIN_OF_MED(LOC);
 
   if (_value != NULL)
     return _value->getGaussPresence();
   else
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't call getGaussPresence on a null _value"));
+    throw MEDEXCEPTION("FIELD<T, INTERLACING_TAG>::getGaussPresence() const : Can't call getGaussPresence on a null _value");
 
   //END_OF_MED();
 }

@@ -262,7 +262,9 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
 {
         beginService("Med_Gen_i::readStructFileWithFieldType");
 
+#ifdef _DEBUG_
   const char* LOC = "Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)";
+#endif
   BEGIN_OF(LOC);
 
 	SCRUTE(fileName);

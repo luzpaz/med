@@ -179,7 +179,9 @@ namespace {
                                 bool                     isMultiFile,
                                 bool                     isAscii)
   {
+#ifdef _DEBUG_
   const char* LOC = "Med_Gen_Driver_i::Save";
+#endif
   BEGIN_OF(LOC);
 
     // Write all MEDMEM objects in one med file because of problems with
@@ -484,7 +486,9 @@ CORBA::Boolean Med_Gen_Driver_i::Load (SALOMEDS::SComponent_ptr theComponent,
                                        const char* theURL,
                                        bool isMultiFile)
 {
+#ifdef _DEBUG_
   const char* LOC = "Med_Gen_Driver_i::Load";
+#endif
   BEGIN_OF(LOC);
 
   loadStudy ( theComponent, theStream, theURL, isMultiFile, NON_ASCII );
@@ -535,7 +539,9 @@ char* Med_Gen_Driver_i::IORToLocalPersistentID (SALOMEDS::SObject_ptr theSObject
                                                 CORBA::Boolean isMultiFile,
                                                 CORBA::Boolean isASCII)
 {
+#ifdef _DEBUG_
   const char* LOC = "Med_Gen_Driver_i::IORToLocalPersistentID";
+#endif
   BEGIN_OF(LOC);
   SCRUTE(IORString);
 
@@ -619,7 +625,9 @@ char* Med_Gen_Driver_i::LocalPersistentIDToIOR (SALOMEDS::SObject_ptr theSObject
                                                 CORBA::Boolean isASCII)
   throw(SALOME::SALOME_Exception)
 {
+#ifdef _DEBUG_
   const char* LOC = "Med_Gen_Driver_i::LocalPersistentIDToIOR";
+#endif
   BEGIN_OF(LOC);
 
   // all object are restored in Load() if their name in study coincides

@@ -325,15 +325,14 @@ inline const int * SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) 
   throw (MEDEXCEPTION)
 //---------------------------------------------------------------------
 {
-  const char * LOC = "Support::getNumber : " ;
   if (_isOnAllElts)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined, support is on all entity !")) ;
+    throw MEDEXCEPTION("Support::getNumber : Not defined, support is on all entity !") ;
   if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
     return _number->getValue() ;
   for (int i=0;i<_numberOfGeometricType;i++)
     if (_geometricType[i]==GeometricType)
       return _number->getI(i+1) ;
-  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"GeometricType not found !")) ;
+  throw MEDEXCEPTION("Support::getNumber : GeometricType not found !") ;
 }
 
 //---------------------------------------------------------------------
@@ -341,15 +340,14 @@ inline const int * SUPPORT::getNumberFromFile(MED_EN::medGeometryElement Geometr
   throw (MEDEXCEPTION)
 //---------------------------------------------------------------------
 {
-  const char * LOC = "Support::getNumberFromFile : " ;
 //   if (_isOnAllElts)
-//     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined, support is on all entity !")) ;
+//     throw MEDEXCEPTION("Support::getNumberFromFile : Not defined, support is on all entity !") ;
   if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
     return _number_fromfile->getValue() ;
   for (int i=0;i<_numberOfGeometricType;i++)
     if (_geometricType[i]==GeometricType)
       return _number_fromfile->getI(i+1) ;
-  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"GeometricType not found !")) ;
+  throw MEDEXCEPTION("Support::getNumberFromFile : GeometricType not found !") ;
 }
 
 /*!
@@ -393,10 +391,8 @@ inline void SUPPORT::setDescription(string Description)
 inline void SUPPORT::setMeshName(const string & meshName)
 //--------------------------------------
 {
-  const char * LOC = "SUPPORT::setMeshName(const string & meshName) : ";
-
   if (_mesh)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Setting meshName is not possible when an associated mesh is set !")) ;
+    throw MEDEXCEPTION("SUPPORT::setMeshName(const string & meshName) : Setting meshName is not possible when an associated mesh is set !") ;
 
   _meshName=meshName;
 }
@@ -497,9 +493,8 @@ inline void SUPPORT::setNumberOfElements(const int *NumberOfElements)
 inline void SUPPORT::setNumber(MEDSKYLINEARRAY * Number)
 //---------------------------------------------------
 {
-  const char * LOC = "SUPPORT::setNumber(MEDSKYLINEARRAY * Number)";
   if ( _isOnAllElts )
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support is on all elements")) ;
+    throw MEDEXCEPTION("SUPPORT::setNumber(MEDSKYLINEARRAY * Number) Support is on all elements") ;
 
   if (_number != NULL) delete _number ;
   _number=Number;

@@ -41,7 +41,6 @@ int main () {
 
   const char * fromFieldName  = "THERDEP_TEMP____________________";
 
-  const char * fromMeshName   = "MA";
   const char * toMeshName     = "MAILLAGE_IDEAS";
   int handle;
 

@@ -331,10 +331,10 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolate(i
   _toField->setValue(resultat.Get_Valeurs());
  
   _toWrapper->Construit_Wrapper_Champ(_toField);
-
-  return _toField;
   
   END_OF_MED(LOC);
+
+  return _toField;
 
 };
 

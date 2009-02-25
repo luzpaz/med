@@ -584,8 +584,6 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
   string name = MEDMesh->getName();
   SCRUTE(name);
 
-  int dim = MEDMesh->getMeshDimension();
-  SCRUTE(dim);
   int dim2 = MEDMesh->getSpaceDimension();
   SCRUTE(dim2);
 
@@ -616,10 +614,6 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
     SCRUTE(k);
     string nomFam=Families[k]->getName();
     SCRUTE(nomFam);
-    int identfam=Families[k]->getIdentifier();
-    SCRUTE(identfam);
-    int nbelemnts=Families[k]->getNumberOfElements(SALOME_MED::MED_NONE);
-    SCRUTE(nbelemnts);
     SALOME_MED::long_array_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MED_NONE);
     for (int l=0;l<(int)tabnoeuds->length();l++)
       SCRUTE(tabnoeuds[l]);
