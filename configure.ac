@@ -57,8 +57,7 @@ echo
 echo
 
 dnl remember MED_WITH_KERNEL set by build configure
-MED_WITH_KERNEL=no
-MED_WITH_GUI=no
+MED_WITH_KERNEL=yes
 old_with_kernel=${MED_WITH_KERNEL}
 
 dnl
@@ -83,7 +82,7 @@ if test "x${old_with_kernel}" != "x${MED_WITH_KERNEL}"; then
              echo "Configuration changed: without KERNEL -> with KERNEL"
              echo -n "Updating 'configure' script ...  "
              cd $ROOT_SRCDIR
-	     if build_configure --with-kernel={MED_WITH_KERNEL} --with-gui={MED_WITH_GUI}; then
+	     if build_configure --with-kernel={MED_WITH_KERNEL}; then
 	       echo "... done"
 	     else
 	       echo "... failed"
@@ -98,7 +97,33 @@ if test "x${old_with_kernel}" != "x${MED_WITH_KERNEL}"; then
 fi
 
 AM_CONDITIONAL(MED_ENABLE_KERNEL, [test "$MED_WITH_KERNEL" = yes])
-AM_CONDITIONAL(MED_ENABLE_GUI, [test "$MED_WITH_GUI" = yes])
+
+echo
+echo ---------------------------------------------
+echo Testing GUI
+echo ---------------------------------------------
+echo
+
+CHECK_GUI_MODULE
+
+gui_ok=no
+if test "${SalomeGUI_need}" != "no" -a "${FullGUI_ok}" = "yes" ; then 
+  gui_ok=yes
+fi
+
+AM_CONDITIONAL(MED_ENABLE_GUI, [test "${gui_ok}" = "yes"])
+
+if test "${SalomeGUI_need}" == "yes"; then
+  if test "${FullGUI_ok}" != "yes"; then
+    AC_MSG_WARN(For configure MED module necessary full GUI!)
+  fi
+elif test "${SalomeGUI_need}" == "auto"; then
+  if test "${FullGUI_ok}" != "yes"; then
+    AC_MSG_WARN(Full GUI not found. Build will be done without GUI!)
+  fi
+elif test "${SalomeGUI_need}" == "no"; then
+  echo Build without GUI option has been chosen
+fi
 
 dnl Modification B. Secher portage sur osf CCRT
 AC_CHECK_PROG(SHELL,sh,,)
@@ -247,7 +272,6 @@ CHECK_MED2
 echo
 echo ---------------------------------------------
 echo "MED_WITH_KERNEL: ${MED_WITH_KERNEL}"
-echo "MED_WITH_GUI   : ${MED_WITH_GUI}"
 echo ---------------------------------------------
 
 openpbs_ok=no
@@ -369,7 +393,7 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	test x$openpbs_ok = xyes || test x$lsf_ok = xyes && WITH_BATCH=yes
 	AC_SUBST(WITH_BATCH)
 
-	if test "${MED_WITH_GUI}" = "yes"; then
+	if test "${gui_ok}" = "yes"; then
 		echo
 		echo ---------------------------------------------
 		echo testing LEX \& YACC
@@ -403,7 +427,7 @@ if test "${MED_WITH_KERNEL}" = "yes"; then
 	corba=make_$ORB
 	CORBA=adm_local/unix/$corba
 
-	if test "${MED_WITH_GUI}" = "yes"; then
+	if test "${gui_ok}" = "yes"; then
 
 		echo
 		echo ---------------------------------------------
@@ -464,30 +488,6 @@ else
 }
 fi # MED_WITH_KERNEL
 
-if test "${MED_WITH_GUI}" = "yes"; then
-{
-    echo
-    echo ---------------------------------------------
-    echo Testing GUI
-    echo ---------------------------------------------
-    echo
-
-    CHECK_SALOME_GUI
-
-    echo
-    echo ---------------------------------------------
-    echo Testing full GUI
-    echo ---------------------------------------------
-    echo
-
-    CHECK_CORBA_IN_GUI
-    if test "x${CORBA_IN_GUI}" != "xyes"; then
-      echo "failed : For configure MED module necessary full GUI !"
-      exit
-    fi
-}
-fi # MED_WITH_GUI
-
 echo
 echo ---------------------------------------------
 echo Summary
@@ -500,8 +500,10 @@ else
    echo Configure
 fi
 
-if test "${MED_WITH_GUI}" = "yes"; then
-  variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok sip_ok pyqt_ok qwt_ok occ_ok doxygen_ok Kernel_ok SalomeGUI_ok"
+if test "${gui_ok}" = "yes"; then
+  variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok sip_ok pyqt_ok qwt_ok occ_ok doxygen_ok Kernel_ok gui_ok"
+elif test "${SalomeGUI_need}" != "no"; then
+  variables="cc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok doxygen_ok Kernel_ok gui_ok"
 else
   variables="cc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok doxygen_ok Kernel_ok"
 fi

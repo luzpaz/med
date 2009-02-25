@@ -32,4 +32,8 @@ dist_admlocalm4_DATA =		\
     med_check_sizeof_medint.m4	\
     check_bft.m4		\
     check_fvm.m4		\
-    check_libxml.m4
+    check_libxml.m4             \
+    check_GUI.m4                \
+    check_opengl.m4             \
+    check_qt.m4                 \
+    check_vtk.m4
