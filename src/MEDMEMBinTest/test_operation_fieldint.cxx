@@ -223,7 +223,7 @@ int main (int argc, char ** argv)
     }
     try
     {
-	double mynorm2=myField1->norm2();
+	myField1->norm2();
     }
     catch (MEDEXCEPTION & ex)
     {

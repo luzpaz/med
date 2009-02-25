@@ -1138,7 +1138,7 @@ void MEDMEMTest::testConnectivity()
 
 
   //Nodal
-  int PolygonsNodalConnectivity[ConnectivitySize] = {1,2,3,4,5,10,10,5,6,7,8,9};
+  // int PolygonsNodalConnectivity[ConnectivitySize] = {1,2,3,4,5,10,10,5,6,7,8,9};
 
   //  myNodalConnectivity.setPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE,
 //                                                PolygonsNodalConnectivity,
@@ -1290,7 +1290,7 @@ void MEDMEMTest::testConnectivity()
       (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, /*Number*/1, len_pg1); // {1,2,3,4,11,10}
     CPPUNIT_ASSERT_EQUAL(9, len_pg1);
     //second polyhedron
-    const int * dc_pg2 = myDesceConnectivity.getConnectivityOfAnElementWithPoly
+    myDesceConnectivity.getConnectivityOfAnElementWithPoly
       (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, /*Number*/2, len_pg2); // {11,5,6,7,8,9}
     CPPUNIT_ASSERT_EQUAL(10, len_pg2);
     //first polygon
@@ -1484,8 +1484,8 @@ void MEDMEMTest::testConnectivity()
   int nodesFaces1_TRIA3[24] = {1,2,3, 1,3,4, 1,4,5, 1,5,2,
                                10,6,7, 10,7,8,  10,8,9, 10,9,6};
   int nodesFaces1_QUAD4[24] = {2,3,4,5, 6,7,8,9, 2,3,7,6, 5,4,8,9, 2,5,9,6, 3,4,8,7};
-  int nodesFaces1_TRIA6[6] = {11,12,13,14,15,16};
-  int nodesFaces1_QUAD8[8] = {15,14,13,17,18,19,20,21};
+  // int nodesFaces1_TRIA6[6] = {11,12,13,14,15,16};
+  // int nodesFaces1_QUAD8[8] = {15,14,13,17,18,19,20,21};
 
   aCells1.setNodal(nodesFaces1_TRIA3, MED_EN::MED_FACE, MED_EN::MED_TRIA3);
   aCells1.setNodal(nodesFaces1_QUAD4, MED_EN::MED_FACE, MED_EN::MED_QUAD4);

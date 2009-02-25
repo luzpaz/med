@@ -272,6 +272,7 @@ void MEDMEMTest::testAsciiFieldDriver()
 
   //Test copy() function
   ASCII_FIELD_DRIVER<double> *aDriver1_Cpy2 = (ASCII_FIELD_DRIVER<double>*)aDriver1->copy();
+  CPPUNIT_ASSERT(aDriver1_Cpy2);
 
   // free memory
   delete aDriver1;

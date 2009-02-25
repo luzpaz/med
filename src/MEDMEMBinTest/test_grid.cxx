@@ -66,6 +66,6 @@ int main (int argc, char ** argv) {
 
     // creation du pointeur MESH à partir d'un GRID, test affichage
     std::auto_ptr<MEDMEM::MESH> Mesh (new MEDMEM::GRID( XYZ_Array, coord_name, coord_unit, MED_CARTESIAN) );
-    const MEDMEM::CONNECTIVITY* conn = Mesh->getConnectivityptr();
+    Mesh->getConnectivityptr();
     std::cout << "Affichage du maillage : " << endl << *Mesh << endl;
 }

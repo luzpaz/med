@@ -1738,6 +1738,7 @@ void MEDMEMTest::testFieldConvert()
     // no need to delete anArray, because it will be deleted in destructor of aField
 
     FIELD<int, NoInterlace> * aField_conv = FieldConvert(*aField);
+    CPPUNIT_ASSERT(aField_conv);
   }
   //#endif
   //#ifdef ENABLE_FORCED_FAILURES

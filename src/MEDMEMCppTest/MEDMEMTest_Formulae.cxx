@@ -347,8 +347,17 @@ void MEDMEMTest::testFormulae()
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-11.7 * koeff, poly_normal[2], 0.0000001); // Nz
 
     // Invalid Polygon (four points on one line)
-    CPPUNIT_ASSERT_THROW(INTERP_KERNEL::calculateNormalForPolyg(polygon_si, /*nbOfPtsInPolygs*/4,
-                                                                poly_normal),exception);
+    bool isException=false;
+    try
+      {
+	INTERP_KERNEL::calculateNormalForPolyg(polygon_si, /*nbOfPtsInPolygs*/4,
+					       poly_normal);
+      }
+    catch(std::exception& e)
+      {
+	isException=true;
+      }
+    CPPUNIT_ASSERT(isException);
     //MEDMEMTest_DumpArray<double>(cout, poly_normal, 3, "Invalid Polygon normal");
     //#ifdef ENABLE_FORCED_FAILURES
     // (BUG) division on zero in CalculateNormalForPolyg(), if polygon is singular
