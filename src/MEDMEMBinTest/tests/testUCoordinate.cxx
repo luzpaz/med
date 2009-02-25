@@ -45,7 +45,9 @@ int main (int argc, char ** argv)
 
   if (argc < 1) usage(argv[0]);
 
+#ifdef _DEBUG_
   const double pouieme = 0.009; 
+#endif
 
   cout << "COORDINATE Test" << endl;
   cout << "---------------" << endl;
@@ -67,7 +69,6 @@ int main (int argc, char ** argv)
   for (int i=0; i< 5; i++) numbers[i] =10+i;
 
   MED_EN::medModeSwitch ModeFull=MED_EN::MED_FULL_INTERLACE;
-  MED_EN::medModeSwitch ModeNo=MED_EN::MED_NO_INTERLACE;
   double coor[15] = {0,0,0,0,0,1,0,1,0,1,0,0,0.5,0.5,0.5} ;
   ASSERT_MED(SpaceDim*NbOfNodes == 15);
 
@@ -317,7 +318,9 @@ int main (int argc, char ** argv)
 
   try
   {
+#ifdef _DEBUG_
   	const double * coor2=mycoo.getCoordinates(ModeFull);
+#endif
 
   	for (int axe = 0; axe < SpaceDim; axe++)
   	{
@@ -327,7 +330,9 @@ int main (int argc, char ** argv)
 
 		try
 		{
+#ifdef _DEBUG_
         		const double * coor3=mycoo.getCoordinateAxis(axe+1);
+#endif
   			for (int num=0; num < NbOfNodes; num++)
   			{
 				try
