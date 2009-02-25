@@ -19,7 +19,7 @@ cp $initfile $infile
 
 ok=$?
 
-rm $infile
-rm $outfile
+\rm -f $infile
+\rm -f $outfile
 
 exit $ok

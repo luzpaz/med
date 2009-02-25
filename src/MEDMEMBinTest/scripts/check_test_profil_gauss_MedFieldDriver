@@ -20,8 +20,8 @@ $curdir/test_profil_gauss_MedFieldDriver $infile RESUZEROSIEF_ELGA_DEPL_________
 
 ok=$?
 
-rm $infile
-rm Copy_withmesh_test_profil_gauss_MedFieldDriver.med
-rm Copy_nomesh_test_profil_gauss_MedFieldDriver.med
+\rm -f $infile
+\rm -f Copy_withmesh_test_profil_gauss_MedFieldDriver.med
+\rm -f Copy_nomesh_test_profil_gauss_MedFieldDriver.med
 
 exit $ok

@@ -18,9 +18,9 @@ cp $initfile $infile
 
 ok=$?
 
-rm $infile
-rm ${outdir}/test_gibi_driver.vtk
-rm ${outdir}/test_gibi_driver_V21.med
-rm ${outdir}/test_gibi_driver_V22.med
+\rm -f $infile
+\rm -f ${outdir}/test_gibi_driver.vtk
+\rm -f ${outdir}/test_gibi_driver_V21.med
+\rm -f ${outdir}/test_gibi_driver_V22.med
 
 exit $ok

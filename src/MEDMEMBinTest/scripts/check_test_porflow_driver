@@ -22,10 +22,10 @@ cp $cncfile ${outdir}/cube.cnc
 
 ok=$?
 
-rm $infile
-rm ${outdir}/cube.xyz
-rm ${outdir}/cube.cnc
-rm ${outdir}/test_porflow_driver.med
-rm ${outdir}/test_porflow_driver.vtk
+\rm -f $infile
+\rm -f ${outdir}/cube.xyz
+\rm -f ${outdir}/cube.cnc
+\rm -f ${outdir}/test_porflow_driver.med
+\rm -f ${outdir}/test_porflow_driver.vtk
 
 exit $ok

@@ -18,8 +18,8 @@ cp $initfile $infile
 
 ok=$?
 
-rm $infile
-rm $outdir/testAnalFileAnal_V21.med
-rm $outdir/testAnalFileAnal_V22.med
+\rm -f $infile
+\rm -f $outdir/testAnalFileAnal_V21.med
+\rm -f $outdir/testAnalFileAnal_V22.med
 
 exit $ok
