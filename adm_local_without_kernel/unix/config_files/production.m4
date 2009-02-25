@@ -50,7 +50,6 @@ no) enable_production=no ;;
 esac],
 enable_production=AC_ENABLE_PRODUCTION_DEFAULT)dnl
 
-AC_CXX_OPTION(-Wno-deprecated,CXXFLAGS)
 AC_CXX_OPTION(-Wparentheses,CXXFLAGS)
 AC_CXX_OPTION(-Wreturn-type,CXXFLAGS)
 AC_CXX_OPTION(-Wmissing-declarations,CXXFLAGS)
