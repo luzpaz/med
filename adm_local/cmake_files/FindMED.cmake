@@ -22,8 +22,15 @@
 
 SET(MED_CXXFLAGS -I${MED_ROOT_DIR}/include/salome)
 
+FIND_LIBRARY(InterpGeometric2DAlg InterpGeometric2DAlg ${MED_ROOT_DIR}/lib/salome)
+FIND_LIBRARY(interpkernelbases interpkernelbases ${MED_ROOT_DIR}/lib/salome)
 FIND_LIBRARY(interpkernel interpkernel ${MED_ROOT_DIR}/lib/salome)
+FIND_LIBRARY(MEDClientcmodule MEDClientcmodule ${MED_ROOT_DIR}/lib/salome)
+FIND_LIBRARY(medcoupling medcoupling ${MED_ROOT_DIR}/lib/salome)
+FIND_LIBRARY(MEDEngine MEDEngine ${MED_ROOT_DIR}/lib/salome)
+FIND_LIBRARY(MEDMEMImpl MEDMEMImpl ${MED_ROOT_DIR}/lib/salome)
 FIND_LIBRARY(medmem medmem ${MED_ROOT_DIR}/lib/salome)
+FIND_LIBRARY(MED MED ${MED_ROOT_DIR}/lib/salome)
 FIND_LIBRARY(med_V2_1 med_V2_1 ${MED_ROOT_DIR}/lib/salome)
 FIND_LIBRARY(MEDWrapperBase MEDWrapperBase ${MED_ROOT_DIR}/lib/salome)
 FIND_LIBRARY(MEDWrapper MEDWrapper ${MED_ROOT_DIR}/lib/salome)
