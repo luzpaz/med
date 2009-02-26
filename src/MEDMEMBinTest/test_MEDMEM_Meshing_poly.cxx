@@ -21,6 +21,11 @@
 //
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_DriverFactory.hxx"
+#ifdef WNT
+#include <io.h>
+#define access _access
+#define W_OK 02
+#endif
 
 using namespace std;
 using namespace MEDMEM;

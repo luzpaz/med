@@ -20,6 +20,11 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_Mesh.hxx"
+#ifdef WNT
+#include <io.h>
+#define access _access
+#define W_OK 02
+#endif
 
 int main()
 {

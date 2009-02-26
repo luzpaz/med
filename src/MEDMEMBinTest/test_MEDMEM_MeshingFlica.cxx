@@ -21,6 +21,11 @@
 //
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Group.hxx"
+#ifdef WNT
+#include <io.h>
+#define access _access
+#define W_OK 02
+#endif
 
 double coords[108]=
   {0, 0.21504, 0.21504, 0, 0.43008, 
