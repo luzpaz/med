@@ -41,14 +41,7 @@ COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
   _complete(false),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m))
 {
-#ifdef _DEBUG_
-  const char* LOC = "COORDINATEClient::COORDINATEClient(...)";
-#endif
-  BEGIN_OF(LOC);
-
   blankCopy();
-
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -57,11 +50,6 @@ COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
 //=============================================================================
 void COORDINATEClient::blankCopy()
 {
-#ifdef _DEBUG_
-  const char* LOC = "void COORDINATEClient::blankCopy()";
-#endif
-  BEGIN_OF(LOC);
-
   std::string *tA;
   long nA;
   SALOME_MED::MESH::coordinateInfos_var all;
@@ -91,8 +79,6 @@ void COORDINATEClient::blankCopy()
   setCoordinatesSystem( all->coordSystem.in());
 
   _complete = false;
-
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -102,11 +88,6 @@ void COORDINATEClient::blankCopy()
 
 void COORDINATEClient::fillCopy()
 {
-#ifdef _DEBUG_
-  const char* LOC = "void COORDINATEClient::fillCopy()";
-#endif
-  BEGIN_OF(LOC);
-
   //PN ?? Est-ce qu on peut pas mettre une variable dans COORDINATEClient
   // qu on remplirait dans blankCopy ??
   long nN = IOR_Mesh->getNumberOfNodes();
@@ -122,8 +103,6 @@ void COORDINATEClient::fillCopy()
   setCoordinates(&mC,true);
 
   _complete = true;
-
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -134,15 +113,8 @@ void COORDINATEClient::fillCopy()
 
 const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 {
-#ifdef _DEBUG_
-  const char* LOC = "void COORDINATEClient::getCoordinates()";
-#endif
-  BEGIN_OF(LOC);
-
   if (!_complete) fillCopy();
   const double * c = COORDINATE::getCoordinates(Mode);
-
-  END_OF(LOC);
 
   return c;
 }
@@ -154,15 +126,8 @@ const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 
 double COORDINATEClient::getCoordinate(int Number,int Axis)
 {
-#ifdef _DEBUG_
-  const char* LOC = "void COORDINATEClient::getCoordinate()";
-#endif
-  BEGIN_OF(LOC);
-
   if (!_complete) fillCopy();
   double d = COORDINATE::getCoordinate(Number, Axis);
-
-  END_OF(LOC);
 
   return d;
 }
@@ -173,15 +138,8 @@ double COORDINATEClient::getCoordinate(int Number,int Axis)
 //=============================================================================
 const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 {
-#ifdef _DEBUG_
-  const char* LOC = "void COORDINATEClient::getCoordinateAxis()";
-#endif
-  BEGIN_OF(LOC);
-
   if (!_complete) fillCopy();
   const double *c = COORDINATE::getCoordinateAxis(Axis);
-
-  END_OF(LOC);
 
   return c;
 }
@@ -192,15 +150,9 @@ const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 //=============================================================================
 const int*      COORDINATEClient::getNodesNumbers() const
 {
-#ifdef _DEBUG_
-  const char* LOC = "void COORDINATEClient::getNodesNumbers()";
-#endif
-  BEGIN_OF(LOC);
-
   if (!_complete) (const_cast < COORDINATEClient * >(this))->fillCopy();
 
   MESSAGE("NON IMPLEMENTE DANS L'API CORBA");
-  END_OF(LOC);
 
   return NULL;
 }

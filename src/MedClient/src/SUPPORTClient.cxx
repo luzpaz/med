@@ -39,11 +39,6 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
   SUPPORT(), 
   IOR_Support(SALOME_MED::SUPPORT::_duplicate(S)),_refCounter(1)
 {
-#ifdef _DEBUG_
-  const char* LOC = "SUPPORTClient::SUPPORTClient(SALOME_MED::SUPPORT_ptr m)";
-#endif
-  BEGIN_OF(LOC);
-
   SCRUTE(S);
   SCRUTE(M);
   if(M)
@@ -54,8 +49,6 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
       _mesh=new MESHClient(ior_mesh);
     }
   blankCopy();
-
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -64,11 +57,6 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
 //=============================================================================
 void SUPPORTClient::blankCopy()
 {
-#ifdef _DEBUG_
-  const char* LOC = "SUPPORTClient::blankCopy";
-#endif
-  BEGIN_OF(LOC);
-
  try
   {
         SALOME_MED::SUPPORT::supportInfos_var all = IOR_Support->getSupportGlobal();
@@ -103,9 +91,6 @@ void SUPPORTClient::blankCopy()
          THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
                                        SALOME::INTERNAL_ERROR);
   }
-
-  END_OF(LOC);
-
 }
 //=============================================================================
 /*!
@@ -114,11 +99,6 @@ void SUPPORTClient::blankCopy()
 //=============================================================================
 void SUPPORTClient::fillCopy()
 {
-#ifdef _DEBUG_
-  const char* LOC = "SUPPORTClient::fillCopy";
-#endif
-  BEGIN_OF(LOC);
-
   if (!_complete_support) {
     if(!_isOnAllElts) {
     const int * index, * value;
@@ -135,8 +115,6 @@ void SUPPORTClient::fillCopy()
     }
     _complete_support = true;
   }
-
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -145,14 +123,9 @@ void SUPPORTClient::fillCopy()
 //=============================================================================
 SUPPORTClient::~SUPPORTClient()
 {
-#ifdef _DEBUG_
-  const char* LOC = "SUPPORTClient::~SUPPORTClient";
-#endif
-  BEGIN_OF(LOC);
   IOR_Support->Destroy();
   if(_mesh)
     _mesh->removeReference();
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -162,15 +135,9 @@ SUPPORTClient::~SUPPORTClient()
 //=============================================================================
 MEDSKYLINEARRAY *  SUPPORTClient::getnumber() const throw (MEDEXCEPTION)
 {
-#ifdef _DEBUG_
-  const char* LOC = "SUPPORTClient::getnumber()";
-#endif
-  BEGIN_OF(LOC);
-
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   MEDSKYLINEARRAY *m = SUPPORT::getnumber();
 
-  END_OF(LOC);
   return m;
 }
 
@@ -182,15 +149,9 @@ MEDSKYLINEARRAY *  SUPPORTClient::getnumber() const throw (MEDEXCEPTION)
 const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType) 
     const throw (MEDEXCEPTION)
 {
-#ifdef _DEBUG_
-  const char* LOC = "SUPPORTClient::getnumber(medGeometryElement)";
-#endif
-  BEGIN_OF(LOC);
-
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   const int *n = SUPPORT::getNumber(GeometricType);
 
-  END_OF(LOC);
   return n;
 }
 
@@ -201,15 +162,9 @@ const int *  SUPPORTClient::getNumber(medGeometryElement GeometricType)
 //=============================================================================
 const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION) 
 {
-#ifdef _DEBUG_
-  const char* LOC = "SUPPORTClient::getnumberIndex()";
-#endif
-  BEGIN_OF(LOC);
-
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   const int * n = SUPPORT::getNumberIndex();
 
-  END_OF(LOC);
   return n;
 }
 
@@ -220,15 +175,9 @@ const int *  SUPPORTClient::getNumberIndex() const throw (MEDEXCEPTION)
 //=============================================================================
 int SUPPORTClient::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION)
 {
-#ifdef _DEBUG_
-  const char* LOC = "SUPPORTClient::getValIndFromGlobalNumber()";
-#endif
-  BEGIN_OF(LOC);
-  
   if (!_complete_support) (const_cast<SUPPORTClient *>(this))->fillCopy();
   const int n = SUPPORT::getValIndFromGlobalNumber(number);
   
-  END_OF(LOC);
   return n;
 }
 

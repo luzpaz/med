@@ -261,12 +261,6 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
   throw (SALOME::SALOME_Exception)
 {
         beginService("Med_Gen_i::readStructFileWithFieldType");
-
-#ifdef _DEBUG_
-  const char* LOC = "Med_Gen_i::readStructFileWithFieldType (const char* fileName,const char* studyName)";
-#endif
-  BEGIN_OF(LOC);
-
 	SCRUTE(fileName);
   	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
 	if (!_duringLoad) addInStudy(myStudy) ;
@@ -295,7 +289,6 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
         }
 
         endService("Med_Gen_i::readStructFileWithFieldType");
-  END_OF(LOC);
 }
 
 //=============================================================================

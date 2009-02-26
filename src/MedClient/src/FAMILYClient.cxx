@@ -34,17 +34,10 @@ FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr S,
     FAMILY(), 
     IOR_Family(SALOME_MED::FAMILY::_duplicate(S))
 {
-#ifdef _DEBUG_
-  const char* LOC = "FAMILYClient::FAMILYClient(SALOME_MED::FAMILY_ptr m)";
-#endif
-  BEGIN_OF(LOC);
-
   SCRUTE(S);
   SCRUTE(M);
 
   blankCopy(false);
-
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -53,11 +46,6 @@ FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr S,
 //=============================================================================
 void FAMILYClient::blankCopy(bool blankSupport)
 {
-#ifdef _DEBUG_
-  const char* LOC = "FAMILYClient::blankCopy()";
-#endif
-  BEGIN_OF(LOC);
-
   if (blankSupport)
     SUPPORTClient::blankCopy();
 
@@ -100,8 +88,6 @@ void FAMILYClient::blankCopy(bool blankSupport)
   setGroupsNames(s,true);
 
   _complete = false;
-
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -111,11 +97,6 @@ void FAMILYClient::blankCopy(bool blankSupport)
 //=============================================================================
 void FAMILYClient::fillCopy(bool fillSupport)
 {
-#ifdef _DEBUG_
-  const char* LOC = "FAMILYClient::fillCopy()";
-#endif
-  BEGIN_OF(LOC);
-
   if (!_complete) {
 
     if (fillSupport)
@@ -125,8 +106,6 @@ void FAMILYClient::fillCopy(bool fillSupport)
 
     _complete = true;
   }
-
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -137,9 +116,4 @@ void FAMILYClient::fillCopy(bool fillSupport)
 
 FAMILYClient::~FAMILYClient()
 {
-#ifdef _DEBUG_
-  const char* LOC = "FAMILYClient::~FAMILYClient()";
-#endif
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 }

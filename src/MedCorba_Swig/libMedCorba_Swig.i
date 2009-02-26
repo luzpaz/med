@@ -574,11 +574,6 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 %{
   SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDDOUBLE * field, bool ownCppPtr=false)
     {
-#ifdef _DEBUG_
-  const char* LOC = "SALOME_MED::FIELDDOUBLE_ptr createCorbaFieldDouble from libMedCorba_Swig";
-#endif
-  BEGIN_OF(LOC);
-
       SCRUTE(field);
 
       // MT : Keep the local field name
@@ -593,8 +588,6 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
       SCRUTE(fieldimpl);
 
       SCRUTE(fieldcorba2);
-
-  END_OF(LOC);
 
       MESSAGE("Test de tirarge sur le pointeur Corba Field dans le cxx");
 
@@ -622,11 +615,6 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
   SALOME_MED::FIELDINT_ptr createCorbaFieldInt(SALOME_MED::SUPPORT_ptr mySupportIOR,FIELDINT * field, bool ownCppPtr=false)
     {
-#ifdef _DEBUG_
-  const char* LOC = "SALOME_MED::FIELDINT_ptr createCorbaFieldInt from libMedCorba_Swig";
-#endif
-  BEGIN_OF(LOC);
-
       SCRUTE(field);
 
       // MT : Keep the local field name
@@ -642,7 +630,6 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(fieldcorba2);
 
-  END_OF(LOC);
       MESSAGE("Test de tirarge sur le pointeur Corba Field dans le cxx");
 
       char * name = fieldcorba2->getName();
@@ -669,11 +656,6 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
   SALOME_MED::SUPPORT_ptr createCorbaSupport(const SUPPORT * const support)
     {
-#ifdef _DEBUG_
-  const char* LOC = "SALOME_MED::SUPPORT_ptr createCorbaSupport from libMedCorba_Swig";
-#endif
-  BEGIN_OF(LOC);
-
       SCRUTE(support);
 
       SUPPORT_i * supportimpl = new SUPPORT_i(support);
@@ -685,18 +667,11 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(supportcorba);
 
-  END_OF(LOC);
-
       return supportcorba;
     }
 
   SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh)
     {
-#ifdef _DEBUG_
-  const char* LOC = "SALOME_MED::MESH_ptr createCorbaMesh from libMedCorba_Swig";
-#endif
-  BEGIN_OF(LOC);
-
       SCRUTE(mesh);
 
       MESH_i * meshimpl = new MESH_i(mesh);
@@ -708,19 +683,12 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
 
       SCRUTE(meshcorba);
 
-  END_OF(LOC);
-
       return meshcorba;
     }
 
   FIELDDOUBLE * createLocalFieldDouble(const int NumberOfComponents,
 				      const int LengthValue)
     {
-#ifdef _DEBUG_
-  const char* LOC = "FIELDDOUBLE createLocalFieldDouble from libMedCorba_Swig";
-#endif
-  BEGIN_OF(LOC);
-
       SCRUTE(NumberOfComponents);
       SCRUTE(LengthValue);
 
@@ -728,27 +696,18 @@ SALOME_MED::MESH_ptr createCorbaMesh(MESH * mesh);
       FIELDDOUBLE * fieldloc =  new FIELDDOUBLE();
       fieldloc -> allocValue(NumberOfComponents,LengthValue);
 
-  END_OF(LOC);
-
       return fieldloc;
     }
 
   FIELDINT * createLocalFieldInt(const int NumberOfComponents,
 				 const int LengthValue)
     {
-#ifdef _DEBUG_
-  const char* LOC = "FIELDINT createLocalFieldInt from libMedCorba_Swig";
-#endif
-  BEGIN_OF(LOC);
-
       SCRUTE(NumberOfComponents);
       SCRUTE(LengthValue);
 
       //FIELD<int> * fieldloc =  new FIELD<int>();
       FIELDINT * fieldloc =  new FIELDINT();
       fieldloc -> allocValue(NumberOfComponents,LengthValue);
-
-  END_OF(LOC);
 
       return fieldloc;
     }
