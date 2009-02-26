@@ -24,11 +24,12 @@
 
 #include <SALOMEconfig.h>
 #include <utilities.h>
+#include "MEDClient.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include CORBA_CLIENT_HEADER(MED)
 
 namespace MEDMEM {
-class MESHClient : public MESH {
+class MEDCLIENT_EXPORT MESHClient : public MESH {
 
 private :
 

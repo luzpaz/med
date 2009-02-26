@@ -24,12 +24,13 @@
 
 #include <SALOMEconfig.h>
 #include <utilities.h>
+#include "MEDClient.hxx"
 #include "MEDMEM_Support.hxx"
 #include CORBA_CLIENT_HEADER(MED)
 
 
 namespace MEDMEM {
-class SUPPORTClient : virtual public SUPPORT {
+class MEDCLIENT_EXPORT SUPPORTClient : virtual public SUPPORT {
 
 private :
 
