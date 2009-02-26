@@ -23,7 +23,8 @@
 #include <stdio.h>
 %}
 
-%typemap(python,in) string * , const string * , const string * const {
+#if defined(SWIGPYTHON)
+%typemap(in) string * , const string * , const string * const {
   /* typemap in for string * , const string * , const string * const */
   /* Check if is a list */
   if (PyList_Check($input)) {
@@ -47,8 +48,10 @@
       return NULL;
     }
 }
+#endif
 
-%typemap(python,in) double * , const double * , const double * const
+#if defined(SWIGPYTHON)
+%typemap(in) double * , const double * , const double * const
 {
   /* typemap in for double * , const double * , const double * const */
   /* Check if is a list */
@@ -73,8 +76,10 @@
       return NULL;
     }
 } 
+#endif
 
-%typemap(python,in) int * , const int * , const int * const
+#if defined(SWIGPYTHON)
+%typemap(in) int * , const int * , const int * const
 {
   /* typemap in for int * , const int * , const int * const */
   /* Check if is a list */
@@ -99,9 +104,10 @@
       return NULL;
     }
 } 
+#endif
 
-
-%typemap(python,in) medGeometryElement * , const  medGeometryElement * , const  medGeometryElement * const 
+#if defined(SWIGPYTHON)
+%typemap(in) medGeometryElement * , const  medGeometryElement * , const  medGeometryElement * const 
 {
   /* typemap in for medGeometryElement * , const  medGeometryElement * , const  medGeometryElement * const */
   /* Check if is a list */
@@ -126,8 +132,10 @@
       return NULL;
     }
 } 
+#endif
 
-%typemap(python,out) list<string> {
+#if defined(SWIGPYTHON)
+%typemap(out) list<string> {
   int i;
   list<string>::iterator iL;
 
@@ -135,6 +143,7 @@
   for (i=0, iL=$1->begin(); iL!=$1->end(); i++, iL++)
     PyList_SetItem($result,i,PyString_FromString((*iL).c_str())); 
 }
+#endif
 
 %typemap(freearg) int * , const int * , const int * const {
   /* free the memory allocated in the typemap in for int * , const int * , const int * const */

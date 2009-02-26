@@ -150,7 +150,8 @@ typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
   double or int fonction pointeur
 */
 
-%typemap(python,in) PyObject * double_function, PyObject * integer_function
+#if defined(SWIGPYTHON)
+%typemap(in) PyObject * double_function, PyObject * integer_function
 {
   /* typemap in for double or integer callable fonction pointeur */
   /* Check if it is a callable fonction pointer */
@@ -164,6 +165,7 @@ typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 
   $1 = $input;
 }
+#endif
 
 /*
   MACRO converting C++ MEDMEM::FIELD_ pointer into a PyObject pointer rightly
@@ -302,23 +304,35 @@ typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 }
 %enddef
 
-%typemap(python,in) vector< FAMILY* >, const vector< FAMILY* >
+#if defined(SWIGPYTHON)
+%typemap(in) vector< FAMILY* >, const vector< FAMILY* >
 { TYPEMAP_INPUT_VECTOR_BY_VALUE( FAMILY * ) }
+#endif
 
-%typemap(python,in) vector< SUPPORT* >, const vector< SUPPORT* >
+#if defined(SWIGPYTHON)
+%typemap(in) vector< SUPPORT* >, const vector< SUPPORT* >
 { TYPEMAP_INPUT_VECTOR_BY_VALUE( SUPPORT * ) }
+#endif
 
-%typemap(python,in) vector< FIELDDOUBLE* >, const vector< FIELDDOUBLE* >
+#if defined(SWIGPYTHON)
+%typemap(in) vector< FIELDDOUBLE* >, const vector< FIELDDOUBLE* >
 { TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDDOUBLE * ) }
+#endif
 
-%typemap(python,in) vector< FIELDINT* >, const vector< FIELDINT* >
+#if defined(SWIGPYTHON)
+%typemap(in) vector< FIELDINT* >, const vector< FIELDINT* >
 { TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDINT * ) }
+#endif
 
-%typemap(python,in) vector< FIELDDOUBLENOINTERLACE* >, const vector< FIELDDOUBLENOINTERLACE* >
+#if defined(SWIGPYTHON)
+%typemap(in) vector< FIELDDOUBLENOINTERLACE* >, const vector< FIELDDOUBLENOINTERLACE* >
 { TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDDOUBLENOINTERLACE * ) }
+#endif
 
-%typemap(python,in) vector< FIELDINTNOINTERLACE* >, const vector< FIELDINTNOINTERLACE* >
+#if defined(SWIGPYTHON)
+%typemap(in) vector< FIELDINTNOINTERLACE* >, const vector< FIELDINTNOINTERLACE* >
 { TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDINTNOINTERLACE * ) }
+#endif
 
 /**************************************************
   OUT typemaps for some std::vector's
@@ -340,23 +354,35 @@ typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 }
 %enddef
 
-%typemap(python,out) vector< FAMILY* >
+#if defined(SWIGPYTHON)
+%typemap(out) vector< FAMILY* >
 { TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FAMILY * ) }
+#endif
 
-%typemap(python,out) vector< SUPPORT* >
+#if defined(SWIGPYTHON)
+%typemap(out) vector< SUPPORT* >
 { TYPEMAP_OUTPUT_VECTOR_BY_VALUE( SUPPORT * ) }
+#endif
 
-%typemap(python,out) vector< FIELDDOUBLE* >
+#if defined(SWIGPYTHON)
+%typemap(out) vector< FIELDDOUBLE* >
 { TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDDOUBLE * ) }
+#endif
 
-%typemap(python,out) vector< FIELDINT* >
+#if defined(SWIGPYTHON)
+%typemap(out) vector< FIELDINT* >
 { TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDINT * )  }
+#endif
 
-%typemap(python,out) vector< FIELDDOUBLENOINTERLACE* >
+#if defined(SWIGPYTHON)
+%typemap(out) vector< FIELDDOUBLENOINTERLACE* >
 { TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDDOUBLENOINTERLACE * ) }
+#endif
 
-%typemap(python,out) vector< FIELDINTNOINTERLACE* >
+#if defined(SWIGPYTHON)
+%typemap(out) vector< FIELDINTNOINTERLACE* >
 { TYPEMAP_OUTPUT_VECTOR_BY_VALUE( FIELDINTNOINTERLACE * ) }
+#endif
 
 
 /*

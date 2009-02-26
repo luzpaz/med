@@ -54,7 +54,8 @@
   only in nb of parameters (there are default ones)
 */
 
-%typemap(python,out) SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
+#if defined(SWIGPYTHON)
+%typemap(out) SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
   SALOME_MED::FIELDINT_ptr, SALOME_MED::SUPPORT_ptr,
   const SALOME_MED::MESH_ptr, const SALOME_MED::FIELDDOUBLE_ptr,
   const SALOME_MED::FIELDINT_ptr, const SALOME_MED::SUPPORT_ptr
@@ -106,8 +107,10 @@
 
   SCRUTE($result);
 }
+#endif
 
-%typemap(python,out) SALOME_MED::MESH_var, SALOME_MED::FIELDDOUBLE_var,
+#if defined(SWIGPYTHON)
+%typemap(out) SALOME_MED::MESH_var, SALOME_MED::FIELDDOUBLE_var,
   SALOME_MED::FIELDINT_var, SALOME_MED::SUPPORT_var,
   const SALOME_MED::MESH_var, const SALOME_MED::FIELDDOUBLE_var,
   const SALOME_MED::FIELDINT_var, const SALOME_MED::SUPPORT_var
@@ -139,7 +142,9 @@
   $result = PyObject_CallMethod(orb, (char*)"string_to_object", (char*)"O", tmp);
   SCRUTE($result);
 }
+#endif
 
+#if defined(SWIGPYTHON)
 %typemap(typecheck) SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
                     SALOME_MED::FIELDINT_ptr, SALOME_MED::SUPPORT_ptr,
                     const SALOME_MED::MESH_ptr, const SALOME_MED::FIELDDOUBLE_ptr,
@@ -151,8 +156,10 @@
 {
   $1 = 1;
 }
+#endif
 
-%typemap(python,in) const SALOME_MED::MESH_ptr &, SALOME_MED::MESH_ptr &
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::MESH_ptr &, SALOME_MED::MESH_ptr &
 {
 
   MESSAGE("typemap in sur Objet Corba MESH avec reference");
@@ -188,8 +195,10 @@
   $1 = &t;
   SCRUTE(*$1);
 }
+#endif
 
-%typemap(python,in) const SALOME_MED::FIELDDOUBLE_ptr &,
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::FIELDDOUBLE_ptr &,
                     SALOME_MED::FIELDDOUBLE_ptr &
 {
 
@@ -226,8 +235,10 @@
   $1 = &t;
   SCRUTE(*$1);
 }
+#endif
 
-%typemap(python,in) const SALOME_MED::FIELDINT_ptr &,
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::FIELDINT_ptr &,
                     SALOME_MED::FIELDINT_ptr &
 {
 
@@ -264,8 +275,10 @@
   $1 = &t;
   SCRUTE(*$1);
 }
+#endif
 
-%typemap(python,in) const SALOME_MED::FIELDDOUBLE_ptr,
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::FIELDDOUBLE_ptr,
                     SALOME_MED::FIELDDOUBLE_ptr
 {
 
@@ -302,8 +315,10 @@
   $1 = t;
   SCRUTE($1);
 }
+#endif
 
-%typemap(python,in) const SALOME_MED::FIELDINT_ptr,
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::FIELDINT_ptr,
                     SALOME_MED::FIELDINT_ptr
 {
 
@@ -340,8 +355,10 @@
   $1 = t;
   SCRUTE($1);
 }
+#endif
 
-%typemap(python,in) const SALOME_MED::SUPPORT_ptr &, SALOME_MED::SUPPORT_ptr &
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::SUPPORT_ptr &, SALOME_MED::SUPPORT_ptr &
 {
 
   MESSAGE("typemap in sur Objet Corba SUPPORT avec reference");
@@ -377,8 +394,10 @@
   $1 = &t;
   SCRUTE(*$1);
 }
+#endif
 
-%typemap(python,in) const SALOME_MED::SUPPORT_ptr, SALOME_MED::SUPPORT_ptr
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::SUPPORT_ptr, SALOME_MED::SUPPORT_ptr
 {
 
   MESSAGE("typemap in sur Objet Corba SUPPORT sans reference");
@@ -416,8 +435,10 @@
   $1 = t;
   SCRUTE($1);
 }
+#endif
 
-%typemap(python,in) const SALOME_MED::MESH_ptr, SALOME_MED::MESH_ptr
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::MESH_ptr, SALOME_MED::MESH_ptr
 {
 
   MESSAGE("typemap in sur Objet Corba MESH sans reference");
@@ -455,8 +476,10 @@
   $1 = t;
   SCRUTE($1);
 }
+#endif
 
-%typemap(python,in) const SALOME_MED::FIELDDOUBLE_ptr,
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::FIELDDOUBLE_ptr,
 		    SALOME_MED::FIELDDOUBLE_ptr &
 {
 
@@ -495,8 +518,10 @@
   $1 = t;
   SCRUTE($1);
 }
+#endif
 
-%typemap(python,in) const SALOME_MED::FIELDINT_ptr,
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::FIELDINT_ptr,
                     SALOME_MED::FIELDINT_ptr
 {
 
@@ -535,6 +560,7 @@
   $1 = t;
   SCRUTE($1);
 }
+#endif
 
 
 /*
