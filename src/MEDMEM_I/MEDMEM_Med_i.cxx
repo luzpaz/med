@@ -54,9 +54,6 @@ using namespace MEDMEM;
 //=============================================================================
 MED_i::MED_i():_med((::MED*)NULL)
 {
-  const char* LOC = "Default Constructor MED_i";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -66,8 +63,6 @@ MED_i::MED_i():_med((::MED*)NULL)
 //=============================================================================
 void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const string & fileName)
 {
-  const char* LOC = "MED_i::init(driverTypes, const string &)";
-  BEGIN_OF(LOC);
 
   // we create all IOR from _med
 	_med = new ::MED(driverType,fileName);
@@ -105,30 +100,27 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
 		     currentEntity != MED_EN::meshEntities.end(); 
 		     currentEntity++) 
 		{
-// 		     MESSAGE(LOC << ": for entity " << (*currentEntity).first);
 		// family :
   		     familyVector = ptrMesh->getFamilies((MED_EN::medEntityMesh)(*currentEntity).first);
 		     int nb = familyVector.size();
-// 		     MESSAGE(LOC << ": there is(are) " << nb << " family(ies)");
 		     for (familyVectorIt = familyVector.begin();
 			  familyVectorIt != familyVector.end();
 			  familyVectorIt++) 
 		     {
-			  FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
-			  SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->_this();
+		          // FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
+			  // SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->_this();
 // 			   myFamilyI->addInStudy(myStudy,myFamilyIOR);
       		     }
 
 	       // group :
       		     groupVector = ptrMesh->getGroups((MED_EN::medEntityMesh)(*currentEntity).first);
 		     nb = groupVector.size();
-// 		     MESSAGE(LOC << ": there is(are) " << nb << " group(s)");
       		    for (groupVectorIt = groupVector.begin();
 			 groupVectorIt != groupVector.end();
 			 groupVectorIt++) 
 		    {
-			 GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
-			 SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->_this();
+		         // GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
+			 // SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->_this();
 // 			 myGroupI->addInStudy(myStudy,myGroupIOR);
       		    }
                 }      
@@ -189,11 +181,13 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
       		        }
       			default: 
 			{
-			     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
-					 <<"   * Iteration "<<FieldIteration[j].dt
-					 <<", order number "<<FieldIteration[j].it
-					 <<" has wrong type : "<<type));
-			     break;
+			  ostringstream stream;
+			  stream << "MED_i::init(driverTypes, const string &)"
+				 <<"   * Iteration "<<myIteration[j].dt
+				 <<", order number "<<myIteration[j].it
+				 <<" has wrong type : "<<type;
+			  throw MED_EXCEPTION(stream.str().c_str());
+			  break;
       			}
       		}
 
@@ -204,7 +198,6 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes driverType, const strin
              }
   }
   
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -246,9 +239,6 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 {
   // if (persistence):
   //    some objects can be not published
-
-  const char* LOC = "MED_i::initWithFieldType(driverTypes, const string &)";
-  BEGIN_OF(LOC);
 
   // we create all IOR from _med
 
@@ -302,12 +292,10 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 		     currentEntity != MED_EN::meshEntities.end(); 
 		     currentEntity++) 
 		{
-                  //MESSAGE(LOC << ": for entity " << (*currentEntity).first);
                   MESSAGE("initWithFieldType: for entity " << (*currentEntity).first);
                   // family :
   		     familyVector = ptrMesh->getFamilies((MED_EN::medEntityMesh)(*currentEntity).first);
 		     int nb = familyVector.size();
-		     //MESSAGE(LOC << ": there is(are) " << nb << " family(ies)");
 		     MESSAGE("initWithFieldType: there is(are) " << nb << " family(ies)");
 		     for (familyVectorIt = familyVector.begin();
 			  familyVectorIt != familyVector.end();
@@ -325,7 +313,6 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 	       // group :
       		     groupVector = ptrMesh->getGroups((MED_EN::medEntityMesh)(*currentEntity).first);
 		     nb = groupVector.size();
-		     //MESSAGE(LOC << ": there is(are) " << nb << " group(s)");
 		     MESSAGE("initWithFieldType: there is(are) " << nb << " group(s)");
       		    for (groupVectorIt = groupVector.begin();
 			 groupVectorIt != groupVector.end();
@@ -543,7 +530,6 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
                         myFieldIntI = new FIELDTEMPLATE_I<int,NoInterlace>((FIELD<int,NoInterlace>*)myField);
                         myFieldIntIOR = myFieldIntI->_this();
                       }
-                      //MESSAGE(LOC << " add in study of the field " << fieldsNames[i].c_str()
                       MESSAGE("initWithFieldType: add in study of the field " << fieldsNames[i].c_str()
                               << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
@@ -570,7 +556,6 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
                          myFieldDoubleI = new FIELDTEMPLATE_I<double,NoInterlace>((FIELD<double,NoInterlace>*)myField);
                          myFieldDoubleIOR = myFieldDoubleI->_this();
                        }
-                       //MESSAGE(LOC << " add in study of the field "
                        MESSAGE("initWithFieldType: add in study of the field "
                                << fieldsNames[i].c_str() << " dt = " << dtIt.dt << " it = " << dtIt.it);
 
@@ -583,11 +568,13 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
   		     }
 
       		    default: 
-		    {
-			throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
-					 <<"   * Iteration "<<FieldIteration[j].dt
-					 <<", order number "<<FieldIteration[j].it
-					 <<" has wrong type : "<<type));
+		      {
+			ostringstream stream;
+			stream << "MED_i::initWithFieldType(driverTypes, const string &)"
+			       <<"   * Iteration "<<myIteration[j].dt
+			       <<", order number "<<myIteration[j].it
+			       <<" has wrong type : "<<type;
+			throw MED_EXCEPTION(stream.str().c_str());
 			break;
   		     }
      		  }
@@ -595,7 +582,6 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes driverType
 
 	     MESSAGE("Here we are i="<< i);
 	}
-  END_OF(LOC);
 }
 
 //================================================================================
@@ -616,18 +602,26 @@ SALOME_MED::SUPPORT_ptr MED_i::getSupport(string                meshName,
   map<string, map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> >::const_iterator 
     itSupportOnMesh = _supports.find(meshName);
   if (itSupportOnMesh == _supports.end() )
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "There is no support on mesh named |" 
-                                     << meshName << "|"));
+    {
+      ostringstream stream;
+      stream << "MED_i::getSupport(string meshName, MED_EN::medEntityMesh entity) "
+	     << "There is no support on mesh named |" 
+	     << meshName << "|";
+      throw MED_EXCEPTION(stream.str().c_str());
+    }
   const map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> & SupportOnMesh 
     = (*itSupportOnMesh).second;
   map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr>::const_iterator itSupport
     = SupportOnMesh.find(entity);
   if (itSupport == SupportOnMesh.end() )
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "There is no support on entity "
-                                     << entity << " in mesh named |" 
-                                     << meshName << "|"));
+    {
+      ostringstream stream;
+      stream << "MED_i::getSupport(string meshName, MED_EN::medEntityMesh entity) "
+	     << "There is no support on entity "
+	     << entity << " in mesh named |" 
+	     << meshName << "|";
+      throw MED_EXCEPTION(stream.str().c_str());
+    }
   return SALOME_MED::SUPPORT::_duplicate( itSupport->second );
 }
 
@@ -913,8 +907,6 @@ SALOME_MED::FIELD_ptr MED_i::getField(const char* fieldName,
 				      CORBA::Long numOrdre ) 
 throw (SALOME::SALOME_Exception)
 {
-  const char* LOC = "MED_i::getField(const char*,CORBA::Long,CORBA::Long) ";
-  BEGIN_OF(LOC);
 
 	DT_IT_ dtIt;
 
@@ -932,7 +924,6 @@ throw (SALOME::SALOME_Exception)
 	if ( itMap_dtIt == map_dtIt.end() )
 		THROW_SALOME_CORBA_EXCEPTION("Iteration not found !", SALOME::INTERNAL_ERROR);
   
-  END_OF(LOC);
 	return (*itMap_dtIt).second;
 
 }
@@ -1094,7 +1085,7 @@ throw (SALOME::SALOME_Exception)
 
                 ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
 
-                ::FIELD<double> * fdouble = (::FIELD<double> *)FIELD_i::fieldMap[ind];
+                (::FIELD<double> *)FIELD_i::fieldMap[ind];
 		// A modifier
                 //_med->addField(fdouble);
         }
@@ -1102,7 +1093,7 @@ throw (SALOME::SALOME_Exception)
         {
                 MESSAGE("Integer");
                 ASSERT(FIELD_i::fieldMap.find(ind)!=FIELD_i::fieldMap.end());
-                ::FIELD<int> * fint = (::FIELD<int> *)FIELD_i::fieldMap[ind];
+                (::FIELD<int> *)FIELD_i::fieldMap[ind];
                 //_med->addField(fint);
         }
 }
@@ -1114,8 +1105,6 @@ throw (SALOME::SALOME_Exception)
 void MED_i::addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor) 
 throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-  const char* LOC = "MED_Mesh_i::addInStudy";
-  BEGIN_OF(LOC);
         if ( _medId != "" )
         {
                 MESSAGE("Med already in Study");
@@ -1157,7 +1146,6 @@ throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
    	MESSAGE("Registering of the Corba Med pointer");
 	Register();
 
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -1174,8 +1162,6 @@ void MED_i::addInStudy (SALOMEDS::Study_ptr myStudy,
                         const char * fileName)
   throw (SALOME::SALOME_Exception,SALOMEDS::StudyBuilder::LockProtection)
 {
-  const char* LOC = "MED_i::addInStudy(myStudy, myIor, fileName)";
-  BEGIN_OF(LOC);
         if ( _medId != "" ) {
           MESSAGE("Med already in Study");
           THROW_SALOME_CORBA_EXCEPTION("Med already in Study", SALOME::BAD_PARAM);
@@ -1285,5 +1271,4 @@ void MED_i::addInStudy (SALOMEDS::Study_ptr myStudy,
    	MESSAGE("Registering of the Corba Med pointer");
 	Register();
 
-  END_OF(LOC);
 }
