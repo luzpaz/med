@@ -21,11 +21,13 @@
 
 #include <list>
 #include "MEDNormalizedUnstructuredMesh.hxx"
-#include "PointLocatorAlgos.txx"
 #include "MEDMEM.hxx"
 
 namespace INTERP_KERNEL
 {
+  class GenericMesh;
+  class GenericPointLocatorAlgos;
+
   class MEDMEM_EXPORT PointLocator
   {
   public:
