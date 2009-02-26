@@ -31,6 +31,8 @@
 #include "MEDMEM_Coordinate.hxx"
 #include <string> 
 
+#define pouieme 0.009
+
 using namespace std;
 using namespace MEDMEM;
 
@@ -44,10 +46,6 @@ int main (int argc, char ** argv)
  
 
   if (argc < 1) usage(argv[0]);
-
-#ifdef _DEBUG_
-  const double pouieme = 0.009; 
-#endif
 
   cout << "COORDINATE Test" << endl;
   cout << "---------------" << endl;
@@ -318,10 +316,6 @@ int main (int argc, char ** argv)
 
   try
   {
-#ifdef _DEBUG_
-  	const double * coor2=mycoo.getCoordinates(ModeFull);
-#endif
-
   	for (int axe = 0; axe < SpaceDim; axe++)
   	{
 
@@ -330,17 +324,14 @@ int main (int argc, char ** argv)
 
 		try
 		{
-#ifdef _DEBUG_
-        		const double * coor3=mycoo.getCoordinateAxis(axe+1);
-#endif
   			for (int num=0; num < NbOfNodes; num++)
   			{
 				try
 				{
 					const double d = mycoo.getCoordinate(num + 1,axe+1);
 					cout << d <<" , ";
-					ASSERT_MED(fabs(d - coor3[num])  < pouieme);
-       	         			ASSERT_MED(fabs(d - coor2[(num * SpaceDim)+axe]) < pouieme);
+					ASSERT_MED(fabs(d - mycoo.getCoordinateAxis(axe+1)[num])  < pouieme);
+       	         			ASSERT_MED(fabs(d - mycoo.getCoordinates(ModeFull)[(num * SpaceDim)+axe]) < pouieme);
                 			ASSERT_MED(fabs(d - coor [(num * SpaceDim)+axe]) < pouieme);
 				}
   				catch ( const std::exception &e )
