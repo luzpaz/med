@@ -355,109 +355,109 @@ int main (int argc, char ** argv) {
       delete myField1;
     }
 
- mode2:
-    /////////////////////////////////////////////////////////////////////////////
-      // TEST DEUXIEME MODE :
-      // Lecture idem 1er mode
-      // A l'écriture, le fichier cible ne contient pas le maillage mais la
-      // relation SUPPORT-MESH est établie, le driver peut donc utiliser les informations
-      // dans le maillage pour transcrire les profils.
-      // Selon le modèle MED FICHIER, ce mode est interdit : le fichier doit au moins
-      // contenir un lien sur le maillage (information pas encore exploitée dans MEDMEMOIRE
-      // : pas de gestion de montage/démontage des fichiers )
-      // Attention si le driver MED_MESH modifie le nombre d'éléments d'un type géométrique :
-      // le calcul de renumérotation à l'écriture du champ risque d'être faux car les
-      // profils crées à la lecture sont basés sur le nombre d'éléments par type géoémtrique
-      // du maillage contenu dans le fichier à la lecture.
-      // Une solution consisterait à prendre en compte le montage de fichiers distants
-      // et de prendre en compte la différence de nombre d'éléments par type géométrique
-      // entre le maillage MEDMEM et le maillage MEDFICHIER
-      // (Hum ! : Il serait plus simple que MEDMEMOIRE ne recalcule pas systématiquement
-      //  ce que l'on ne lui demande pas, ce qui permettrait aussi de réécrire à l'identique
-      // un fichier que l'on vient de lire)
-   {
-     FIELD<double,INTERLACING_MODE> * myField2  = new FIELD<double,INTERLACING_MODE>(MED_DRIVER,fileName,fieldName,
-										     iterationNumber, orderNumber);
+//  mode2:
+//     /////////////////////////////////////////////////////////////////////////////
+//       // TEST DEUXIEME MODE :
+//       // Lecture idem 1er mode
+//       // A l'écriture, le fichier cible ne contient pas le maillage mais la
+//       // relation SUPPORT-MESH est établie, le driver peut donc utiliser les informations
+//       // dans le maillage pour transcrire les profils.
+//       // Selon le modèle MED FICHIER, ce mode est interdit : le fichier doit au moins
+//       // contenir un lien sur le maillage (information pas encore exploitée dans MEDMEMOIRE
+//       // : pas de gestion de montage/démontage des fichiers )
+//       // Attention si le driver MED_MESH modifie le nombre d'éléments d'un type géométrique :
+//       // le calcul de renumérotation à l'écriture du champ risque d'être faux car les
+//       // profils crées à la lecture sont basés sur le nombre d'éléments par type géoémtrique
+//       // du maillage contenu dans le fichier à la lecture.
+//       // Une solution consisterait à prendre en compte le montage de fichiers distants
+//       // et de prendre en compte la différence de nombre d'éléments par type géométrique
+//       // entre le maillage MEDMEM et le maillage MEDFICHIER
+//       // (Hum ! : Il serait plus simple que MEDMEMOIRE ne recalcule pas systématiquement
+//       //  ce que l'on ne lui demande pas, ce qui permettrait aussi de réécrire à l'identique
+//       // un fichier que l'on vient de lire)
+//    {
+//      FIELD<double,INTERLACING_MODE> * myField2  = new FIELD<double,INTERLACING_MODE>(MED_DRIVER,fileName,fieldName,
+// 										     iterationNumber, orderNumber);
 
-     meshName = myField2->getSupport()->getMeshName();
-     MESH * myMesh2 = new MESH(MED_DRIVER,fileName,meshName);
+//      meshName = myField2->getSupport()->getMeshName();
+//      MESH * myMesh2 = new MESH(MED_DRIVER,fileName,meshName);
 
-     const SUPPORT * mySupport2=myField2->getSupport();
-     mySupport2->setMesh(myMesh2);
+//      const SUPPORT * mySupport2=myField2->getSupport();
+//      mySupport2->setMesh(myMesh2);
 
-     // On ajoute un driver en écriture, comme la relation SUPPORT-MESH est
-     // initialisée, le driver utilise le maillage en mémoire
-     // pour réaliser la transcription des profils MEDMEMOIRE à MEDFICHIER.
-     MED_FIELD_WRONLY_DRIVER<double> myFieldDriver3("Copy_nomesh_"+fileName,myField2) ;
-     int current = myField2->addDriver(myFieldDriver3);
-     myField2->write(current);
+//      // On ajoute un driver en écriture, comme la relation SUPPORT-MESH est
+//      // initialisée, le driver utilise le maillage en mémoire
+//      // pour réaliser la transcription des profils MEDMEMOIRE à MEDFICHIER.
+//      MED_FIELD_WRONLY_DRIVER<double> myFieldDriver3("Copy_nomesh_"+fileName,myField2) ;
+//      int current = myField2->addDriver(myFieldDriver3);
+//      myField2->write(current);
 
-     //Pour regarder le fichier produit avec MDUMP decommenter ces trois lignes
-     //car le fichier qui est produit n'est pas à la norme MED
-     //Il doit contenir soit le maillage associé soit un lien vers le maillage associé.
-     //MED_MESH_WRONLY_DRIVER myMeshDriver2("Copy_nomesh_"+fileName,myMesh2);
-     //current=myMesh2->addDriver(myMeshDriver2);
-     //myMesh2->write(current);
+//      //Pour regarder le fichier produit avec MDUMP decommenter ces trois lignes
+//      //car le fichier qui est produit n'est pas à la norme MED
+//      //Il doit contenir soit le maillage associé soit un lien vers le maillage associé.
+//      //MED_MESH_WRONLY_DRIVER myMeshDriver2("Copy_nomesh_"+fileName,myMesh2);
+//      //current=myMesh2->addDriver(myMeshDriver2);
+//      //myMesh2->write(current);
 
-     delete myField2;
-     delete myMesh2;
-
-
-   }
- mode3:
-   // TEST TROISIEME MODE  :
-   // A la lecture, le fichier MED lu ne contient pas le maillage  associé au champ demandé
-   // (mais un lien MEDFICHIER qui n'est pas exploité à ce jour).
-   // Cependant avant sa lecture le FIELD a été associé à un SUPPORT
-   // avec le lien au MESH préalablement chargé.
-   // Le driver du FIELD (automatiquement crée) est capable de lire les profils MEDFICHIER
-   //   et utilise la relation SUPPORT-MESH initialisée pour transcrire les profils
-   //   de la numérotation locale MEDFICHIER à la numérotation globale MEDMEMOIRE).
-   // REM: Une fois le champ chargé, il possède un nouveau support, le premier peut être libéré.
-   //      En effet le driver du FIELD se fit uniquement au type géométriques définis dans le champ MEDFICHIER
-   //      pour créer son SUPPORT car un SUPPORT crée "onAll" à partir d'un MESH repose sur tous
-   //      les types géométriques du MESH ce qui n'est pas forcément le cas d'un champ MEDFICHIER
-   //      (même sans profil) lu à posteriori.
-   {
-     med_2_3::med_err err=-1;
-     med_2_3::med_idt id = med_2_3::MEDouvrir(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
-					      med_2_3::MED_LECTURE_ECRITURE);
-     if (id <=0) cout << "Erreur dans MEDouvrir pour le fichier " << "Copy_nomesh_"+fileName <<endl;
-
-     err=med_2_3::MEDlienEcr(id, const_cast<char *> ( ("Copy_withmesh_"+fileName).c_str()),
-			     const_cast<char *> (meshName.c_str()) );
-     if (err !=0) cout << "Erreur dans MEDlienEcr pour le maillage distant " << meshName
-		       <<" contenu dans le fichier " << "Copy_withmesh_"+fileName <<endl;
+//      delete myField2;
+//      delete myMesh2;
 
 
-     err=med_2_3::MEDfermer(id);
+//    }
+//  mode3:
+//    // TEST TROISIEME MODE  :
+//    // A la lecture, le fichier MED lu ne contient pas le maillage  associé au champ demandé
+//    // (mais un lien MEDFICHIER qui n'est pas exploité à ce jour).
+//    // Cependant avant sa lecture le FIELD a été associé à un SUPPORT
+//    // avec le lien au MESH préalablement chargé.
+//    // Le driver du FIELD (automatiquement crée) est capable de lire les profils MEDFICHIER
+//    //   et utilise la relation SUPPORT-MESH initialisée pour transcrire les profils
+//    //   de la numérotation locale MEDFICHIER à la numérotation globale MEDMEMOIRE).
+//    // REM: Une fois le champ chargé, il possède un nouveau support, le premier peut être libéré.
+//    //      En effet le driver du FIELD se fit uniquement au type géométriques définis dans le champ MEDFICHIER
+//    //      pour créer son SUPPORT car un SUPPORT crée "onAll" à partir d'un MESH repose sur tous
+//    //      les types géométriques du MESH ce qui n'est pas forcément le cas d'un champ MEDFICHIER
+//    //      (même sans profil) lu à posteriori.
+//    {
+//      med_2_3::med_err err=-1;
+//      med_2_3::med_idt id = med_2_3::MEDouvrir(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
+// 					      med_2_3::MED_LECTURE_ECRITURE);
+//      if (id <=0) cout << "Erreur dans MEDouvrir pour le fichier " << "Copy_nomesh_"+fileName <<endl;
 
-     MESH * myMesh3 = new MESH(MED_DRIVER,fileName,meshName);
-     const SUPPORT * mySupport3= new SUPPORT(myMesh3,"Temporary Support",MED_CELL);
-     FIELD<double,INTERLACING_MODE> * myField3  = new FIELD<double,INTERLACING_MODE>(mySupport3,MED_DRIVER,"Copy_nomesh_"+fileName,fieldName, iterationNumber, orderNumber);
-     delete mySupport3; // Il est déjà possible de libérer ce SUPPORT
-
-     //TEST à la réecriture (renommage des profils
-     // à cause de MEDprofilEcr qui ne prend pas en compte le mode
-     // MED_LECTURE_AJOUT) ):
-     string cpy("__Copy");
-     vector < string > pflNames = myField3->getSupport()->getProfilNames();
-     for (int i=0; i< pflNames.size(); ++i) {
-       pflNames[i].resize(pflNames[i].size()-cpy.size());
-       pflNames[i]+=cpy;
-     }
-     const_cast<SUPPORT*>(myField3->getSupport())->setProfilNames(pflNames);
-
-     MED_FIELD_WRONLY_DRIVER<double> myFieldDriver4("Copy_nomesh_"+fileName,myField3) ;
-     myFieldDriver4.setFieldName(myField3->getName()+"__Copy");
-     int current = myField3->addDriver(myFieldDriver4);
-     myField3->write(current);
-
-     delete myMesh3;
-     delete myField3;
+//      err=med_2_3::MEDlienEcr(id, const_cast<char *> ( ("Copy_withmesh_"+fileName).c_str()),
+// 			     const_cast<char *> (meshName.c_str()) );
+//      if (err !=0) cout << "Erreur dans MEDlienEcr pour le maillage distant " << meshName
+// 		       <<" contenu dans le fichier " << "Copy_withmesh_"+fileName <<endl;
 
 
-     //ESSAYER AVEC MAILLAGE DS FICHIER ET LIEN SUPORT-MESH PRESENTS SIMULTANEMENT
-     //EN VERSION COHERENTE ET NON COHERENTE
-   }
+//      err=med_2_3::MEDfermer(id);
+
+//      MESH * myMesh3 = new MESH(MED_DRIVER,fileName,meshName);
+//      const SUPPORT * mySupport3= new SUPPORT(myMesh3,"Temporary Support",MED_CELL);
+//      FIELD<double,INTERLACING_MODE> * myField3  = new FIELD<double,INTERLACING_MODE>(mySupport3,MED_DRIVER,"Copy_nomesh_"+fileName,fieldName, iterationNumber, orderNumber);
+//      delete mySupport3; // Il est déjà possible de libérer ce SUPPORT
+
+//      //TEST à la réecriture (renommage des profils
+//      // à cause de MEDprofilEcr qui ne prend pas en compte le mode
+//      // MED_LECTURE_AJOUT) ):
+//      string cpy("__Copy");
+//      vector < string > pflNames = myField3->getSupport()->getProfilNames();
+//      for (int i=0; i< pflNames.size(); ++i) {
+//        pflNames[i].resize(pflNames[i].size()-cpy.size());
+//        pflNames[i]+=cpy;
+//      }
+//      const_cast<SUPPORT*>(myField3->getSupport())->setProfilNames(pflNames);
+
+//      MED_FIELD_WRONLY_DRIVER<double> myFieldDriver4("Copy_nomesh_"+fileName,myField3) ;
+//      myFieldDriver4.setFieldName(myField3->getName()+"__Copy");
+//      int current = myField3->addDriver(myFieldDriver4);
+//      myField3->write(current);
+
+//      delete myMesh3;
+//      delete myField3;
+
+
+//      //ESSAYER AVEC MAILLAGE DS FICHIER ET LIEN SUPORT-MESH PRESENTS SIMULTANEMENT
+//      //EN VERSION COHERENTE ET NON COHERENTE
+//    }
 }
