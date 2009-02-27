@@ -166,7 +166,7 @@ MESHCollection::MESHCollection(const string& filename)
 			m_driver_type = MedXML;
 
 		}
-	catch(MEDEXCEPTION){
+	catch(MEDEXCEPTION&){
 		delete m_driver;
 		try
 			{
@@ -174,7 +174,7 @@ MESHCollection::MESHCollection(const string& filename)
 				m_driver->read (filenamechar);
 				m_driver_type=MedAscii;
 			}
-		catch(MEDEXCEPTION)
+		catch(MEDEXCEPTION&)
 			{
 				delete m_driver;
 				throw MEDEXCEPTION("file does not comply with any recognized format");
@@ -1955,7 +1955,7 @@ void MESHCollection::getFaces(int idomain,
   {
     types = m_mesh[idomain]->getTypes(constituent_entity);
   }
-  catch(MEDEXCEPTION){ return;}
+  catch(MEDEXCEPTION&){ return;}
     
   int nbtypes  = m_mesh[idomain]->getNumberOfTypes(constituent_entity);
   const int* global_numbering= m_mesh[idomain]->getGlobalNumberingIndex(constituent_entity);

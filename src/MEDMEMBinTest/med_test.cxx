@@ -203,7 +203,7 @@ int main (int argc, char ** argv) {
     connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
     connectivity_index =  myMesh->getConnectivityIndex(MED_DESCENDING,MED_CELL);
   }
-  catch (MEDEXCEPTION m) {
+  catch (MEDEXCEPTION& m) {
     cout << m.what() << endl ;
     exit (-1) ;
   }
