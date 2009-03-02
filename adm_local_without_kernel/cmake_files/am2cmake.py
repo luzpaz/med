@@ -424,7 +424,7 @@ class CMakeFile(object):
         if self.root == self.the_root:
             # --
             newlines.append("""
-            CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+            CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)
             IF(COMMAND cmake_policy)
             cmake_policy(SET CMP0003 NEW)
             ENDIF(COMMAND cmake_policy)
