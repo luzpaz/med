@@ -24,7 +24,11 @@
 CURRENT_DIR=`pwd`
 CONF_DIR=`echo $0 | sed -e "s,[^/]*$,,;s,/$,,;s,^$,.,"`
 cd ${CONF_DIR}
-python $KERNEL_ROOT_DIR/salome_adm/cmake_files/am2cmake.py --med
+if test -f $KERNEL_ROOT_DIR/salome_adm/cmake_files/am2cmake.py ; then
+    python $KERNEL_ROOT_DIR/salome_adm/cmake_files/am2cmake.py --med
+else
+    python adm_local_without_kernel/cmake_files/am2cmake.py --med
+fi
 status=$?
 cd ${CURRENT_DIR}
 exit $status
