@@ -21,15 +21,15 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-if MICRO_MED
+##if MICRO_MED
 
-SUBDIRS = INTERP_KERNEL MEDCoupling $(MPIDIR)
+##SUBDIRS = INTERP_KERNEL MEDCoupling $(MPIDIR)
 
-if MPI_IS_OK
-  SUBDIRS+= ParaMEDMEM
-endif
+##if MPI_IS_OK
+##  SUBDIRS+= ParaMEDMEM
+##endif
 
-else # if MICRO_MED
+##else # if MICRO_MED
 
 SUBDIRS = MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling INTERPOLATION MEDMEM_SWIG MEDMEMBinTest $(MPIDIR)
 
@@ -63,6 +63,6 @@ if MED_ENABLE_GUI
   SUBDIRS+= MEDGUI
 endif
 
-endif # if MICRO_MED
+##endif # if MICRO_MED
 
 DIST_SUBDIRS= MEDWrapper INTERPOLATION MEDCoupling MEDMEM INTERP_KERNEL MEDMEM_SWIG MEDMEMBinTest MEDMEMCppTest MEDSPLITTER MULTIPR ParaMEDMEM ParaMEDMEM_Swig MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient MEDGUI
