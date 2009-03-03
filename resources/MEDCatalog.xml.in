@@ -31,6 +31,19 @@
 <path-prefix-list>
 </path-prefix-list>
 
+<type-list>
+  <objref name="SALOME_MED/MED" />
+  <objref name="SALOME_MED/MESH" />
+  <objref name="SALOME_MED/SUPPORT" />
+  <objref name="SALOME_MED/FIELD" />
+  <objref name="SALOME_MED/FIELDDOUBLE" >
+    <base>SALOME_MED/FIELD</base>
+  </objref>
+  <objref name="SALOME_MED/FIELDINT" >
+    <base>SALOME_MED/FIELD</base>
+  </objref>
+</type-list>
+
 <!-- Component list -->
 <component-list>
 	<component>
@@ -78,7 +91,7 @@
 				<outParameter-list>
 				    <outParameter>
 					<outParameter-name>return</outParameter-name>
-					<outParameter-type>MESH</outParameter-type>
+					<outParameter-type>SALOME_MED/MESH</outParameter-type>
 					<outParameter-comment>unknown</outParameter-comment>
 				    </outParameter>
 				</outParameter-list>
@@ -120,7 +133,7 @@
 				<outParameter-list>
 				    <outParameter>
 					<outParameter-name>return</outParameter-name>
-					<outParameter-type>FIELD</outParameter-type>
+					<outParameter-type>SALOME_MED/FIELD</outParameter-type>
 					<outParameter-comment>unknown</outParameter-comment>
 				    </outParameter>
 				</outParameter-list>
@@ -147,7 +160,7 @@
 				<outParameter-list>
 				    <outParameter>
 					<outParameter-name>return</outParameter-name>
-					<outParameter-type>MED</outParameter-type>
+					<outParameter-type>SALOME_MED/MED</outParameter-type>
 					<outParameter-comment>unknown</outParameter-comment>
 				    </outParameter>
 				</outParameter-list>
