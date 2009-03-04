@@ -89,6 +89,7 @@ void MEDMEMTest::testMedMeshDriver21()
   string fcopy                     = "cp " + filename_rd + " " + filename_rdwr;
   for (int i = 0; i<MED_TAILLE_NOM+2; ++i)
     longmeshname[i] = 'a';
+  longmeshname[MED_TAILLE_NOM+1]='\0';
 
   //Copy file in the TMP dir for testing READ/WRITE case
   system(fcopy.data());
@@ -520,7 +521,7 @@ void MEDMEMTest::testMedMeshDriver21()
   CPPUNIT_ASSERT(rwostr1.str() == rwostr2.str());
 
   //Delete all objects
-  delete longmeshname;
+  delete [] longmeshname;
 
   delete aInvalidRdDriver21;
   delete aRdDriver21;
