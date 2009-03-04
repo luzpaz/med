@@ -45,7 +45,7 @@ void MEDMEMTest::testMedVersion()
   filename += "/share/salome/resources/med/pointe.med";
   string notExistFileName = "anyfile";
   medFileVersion myFileVersion;
-  medFileVersion myEmptyFileVersion;
+  medFileVersion myEmptyFileVersion = (medFileVersion)-22;
 
   // Test - getMedFileVersion
   CPPUNIT_ASSERT_THROW(getMedFileVersion(notExistFileName),MEDEXCEPTION);
