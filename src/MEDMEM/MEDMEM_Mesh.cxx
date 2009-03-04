@@ -2347,13 +2347,6 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEX
 @}
 */
 
-// internal helper type
-struct _cell
-{
-    std::vector<int> groups;
-    MED_EN::medGeometryElement geometricType;
-};
-
 /*!\addtogroup MESH_families
 @{
 */
@@ -2484,6 +2477,16 @@ void MESH::createGroups()
         }
     }
 }
+
+// internal helper type
+struct _cell
+{
+    std::vector<int> groups;
+    MED_EN::medGeometryElement geometricType;
+  // to have geometricType good for nodal groups when MESH::getNumberOfTypesWithPoly(MED_NODE)==0
+  _cell():geometricType(MED_POINT1) {}
+};
+
 // Create families from groups
 void MESH::createFamilies()
 {
