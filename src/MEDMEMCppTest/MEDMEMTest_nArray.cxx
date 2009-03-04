@@ -134,7 +134,7 @@ void MEDMEMTest::testnArray()
       CPPUNIT_ASSERT( myArray1Ptr[i] == array1Ref[i] );
 
     //test setPtr
-    double myPtr[] = {-1, -2, -3, -4, -5, -6, -7, -8, -9, 0};
+    double myPtr[10] = {-1, -2, -3, -4, -5, -6, -7, -8, -9, 0};
     CPPUNIT_ASSERT_NO_THROW(myArray1valsh.setPtr(myPtr));
     //size the array stays the same, only first 10 element are being overwritten
     myArray1Ptr = myArray1valsh.getPtr();
