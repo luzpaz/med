@@ -374,7 +374,7 @@ void MEDMEMTest::testMedFieldDriver21()
     aMeshDriver.open();
     aMeshDriver.read();
     aMeshDriver.close();
-    SUPPORT* sup = new SUPPORT(aMesh);
+    SUPPORT* sup = new SUPPORT(aMesh,"maa1",MED_EN::MED_NODE);// "fieldnodeint" is nodal field
     aField->setSupport(sup);
   }
   catch(MEDEXCEPTION &e) {
