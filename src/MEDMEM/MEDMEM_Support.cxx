@@ -611,6 +611,8 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
 
   setAll(false);
 
+  const_cast<CONNECTIVITY*>
+    (_mesh->getConnectivityptr())->calculateFullDescendingConnectivity(MED_CELL);
   const int * myConnectivityValue = _mesh->getReverseConnectivity(MED_DESCENDING) ;
   const int * myConnectivityIndex = _mesh->getReverseConnectivityIndex(MED_DESCENDING) ;
   int numberOf = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS) ;
