@@ -1559,6 +1559,11 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
     mySupport->setpartial(skyLine,true);
     mySupport->setpartial_fromfile(skyLineFromFile,true);
     mySupport->setProfilNames(profilNameList);
+
+    // update pointers
+    NumberOfTypes = mySupport->getNumberOfTypes();
+    types         = mySupport->getTypes();
+    nbOfElOfType  = mySupport->getNumberOfElements();
 //    cout << "Valeurs du skyline du SUPPORT partiel crée : " << *skyLine << endl;
   }
 
@@ -2202,6 +2207,8 @@ template <class T> void MED_FIELD_WRONLY_DRIVER22<T>::write(void) const
     MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber() : "<<MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber());
     MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getTime()            : "<<MED_FIELD_DRIVER<T>::_ptrField->getTime());
     MESSAGE("MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()     : "<<MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber());
+
+    meshName.resize( MED_TAILLE_NOM+1, '\0'); // for valgrind reporting "Invalid read of size 1"
 
     // Rem 1 : le nombre d'éléments passé à MEDchampEcr ne doit pas tenir compte de la taille
     //         des profils : c'est la taille du champ sans profil.
