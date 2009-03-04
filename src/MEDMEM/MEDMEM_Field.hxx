@@ -1164,6 +1164,8 @@ FIELD<T, INTERLACING_TAG>::FIELD():FIELD_()
   FIELD_::_interlacingType=SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType;
 
   _value = ( ArrayNoGauss * ) NULL;
+
+  _mesh  = ( MESH* ) NULL;
 }
 
 	/*!
@@ -1221,6 +1223,7 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
     _value = new ArrayNoGauss (_numberOfComponents,_numberOfValues);
     _isRead = true ;
   }
+  _mesh  = ( MESH* ) NULL;
 
   END_OF_MED(LOC);
 }
@@ -1263,6 +1266,7 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::FIELD(const
   _valueType       = m._valueType;
   _interlacingType = m._interlacingType;
   //drivers = m._drivers;
+  _mesh            = m._mesh;
 }
 
 /*!
@@ -1291,6 +1295,7 @@ FIELD<T, INTERLACING_TAG> & FIELD<T, INTERLACING_TAG>::operator=(const FIELD &m)
 
   _valueType       = m._valueType;
   _interlacingType = m._interlacingType;
+  _mesh            = m._mesh;
 
   return *this;
 }
@@ -2810,6 +2815,8 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
   int current;
 
   init();
+
+  _mesh  = ( MESH* ) NULL;
 
   //INITIALISATION DE _valueType DS LE CONSTRUCTEUR DE FIELD_
   ASSERT_MED(FIELD_::_valueType == MED_EN::MED_UNDEFINED_TYPE)
