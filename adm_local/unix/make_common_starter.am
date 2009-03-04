@@ -76,8 +76,12 @@ mostlyclean-local:
 tests: unittest
 
 unittest: $(UNIT_TEST_PROG)
-	@if test "x$(UNIT_TEST_PROG)" != "x"; then \
-	    $(UNIT_TEST_PROG);                     \
+	@if test "x$(UNIT_TEST_PROG)" != "x"; then   \
+	    ./$(UNIT_TEST_PROG);                     \
+	    if [[ `awk '{ print $$1 }' UnitTestsResult` != "OK" ]]; then \
+	    	cat UnitTestsResult;                 \
+	    	exit 10;                             \
+	    fi;                                      \
 	fi;
 
 # documentation
