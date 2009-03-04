@@ -2156,6 +2156,7 @@ int MED_MESH_WRONLY_DRIVER22::writeGRID() const
 
   if ((spaceDimension <= MED_VALID) && (meshDimension <= MED_VALID))
     {
+      _ptrMesh->_description.resize(MED_TAILLE_DESC+1,'\0');
       err = MEDmaaCr(_medIdt,
 		     const_cast <char *> (_meshName.c_str()),
 		     _ptrMesh->_meshDimension,med_2_3::MED_STRUCTURE,
@@ -2339,6 +2340,7 @@ int MED_MESH_WRONLY_DRIVER22::writeCoordinates() const {
 
   if ((spaceDimension != MED_VALID) && (meshDimension < MED_VALID))
     {
+      _ptrMesh->_description.resize(MED_TAILLE_DESC+1,'\0');
       err = MEDmaaCr(_medIdt, const_cast <char *> (_meshName.c_str()),
 		     _ptrMesh->_meshDimension, med_2_3::MED_NON_STRUCTURE,
 		     const_cast <char *> (_ptrMesh->_description.c_str()));
