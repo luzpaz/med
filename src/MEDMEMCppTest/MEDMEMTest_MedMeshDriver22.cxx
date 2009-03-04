@@ -89,6 +89,7 @@ void MEDMEMTest::testMedMeshDriver22()
   string fcopy                     = "cp " + filename_rd + " " + filename_rdwr;
   for (int i = 0; i<MED_TAILLE_NOM+2; ++i)
     longmeshname[i] = 'a';
+  longmeshname[MED_TAILLE_NOM+1] = '\0';
 
   //Copy file in the TMP dir for testing READ/WRITE case
   system(fcopy.data());
