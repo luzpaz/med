@@ -25,7 +25,7 @@
 #define MEDSPLITTER_HXX_
 
 #ifdef WNT
-# ifdef MEDSPLITTER_EXPORTS
+# if defined MEDSPLITTER_EXPORTS || defined medsplitter_EXPORTS
 #  define MEDSPLITTER_EXPORT __declspec( dllexport )
 # else
 #  define MEDSPLITTER_EXPORT __declspec( dllimport )

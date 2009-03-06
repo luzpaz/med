@@ -28,7 +28,7 @@
 #define MED_V2_2_Wrapper_HeaderFile
 
 #ifdef WNT
- #if defined MEDWRAPPER_V2_2_EXPORTS
+ #if defined MEDWRAPPER_V2_2_EXPORTS || defined MEDWrapper_V2_2_EXPORTS
   #if defined WIN32
    #define MED_V22_WRAPPER_EXPORT __declspec( dllexport )
   #else

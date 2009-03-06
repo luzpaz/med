@@ -27,7 +27,7 @@
 #define _MEDCLIENT_HXX_
 
 #ifdef WNT
-#  if defined MEDCLIENT_EXPORTS
+#  if defined MEDCLIENT_EXPORTS || defined MEDClientcmodule_EXPORTS
 #    define MEDCLIENT_EXPORT __declspec( dllexport )
 #  else
 #    define MEDCLIENT_EXPORT __declspec( dllimport )

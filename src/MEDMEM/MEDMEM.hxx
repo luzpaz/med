@@ -27,7 +27,7 @@
 #define _MEDMEM_HXX_
 
 #ifdef WNT
- #if defined MEDMEM_EXPORTS
+ #if defined MEDMEM_EXPORTS || defined medmem_EXPORTS
   #if defined WIN32
    #define MEDMEM_EXPORT __declspec( dllexport )
   #else

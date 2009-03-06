@@ -20,7 +20,7 @@
 #define MED_PROTO_H
 
 #ifdef WNT
- #if defined MEDWRAPPER_V2_1_CORE_EXPORTS
+ #if defined MEDWRAPPER_V2_1_CORE_EXPORTS || defined med_V2_1_EXPORTS
   #if defined WIN32
    #define MEDWRAPPER_V2_1_CORE_EXPORT __declspec( dllexport )
   #else
