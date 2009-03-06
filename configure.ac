@@ -98,6 +98,10 @@ fi
 
 AM_CONDITIONAL(MED_ENABLE_KERNEL, [test "$MED_WITH_KERNEL" = yes])
 
+gui_ok=no
+
+if test "$MED_WITH_KERNEL" = "yes" ; then 
+
 echo
 echo ---------------------------------------------
 echo Testing GUI
@@ -106,12 +110,9 @@ echo
 
 CHECK_GUI_MODULE
 
-gui_ok=no
 if test "${SalomeGUI_need}" != "no" -a "${FullGUI_ok}" = "yes" ; then 
   gui_ok=yes
 fi
-
-AM_CONDITIONAL(MED_ENABLE_GUI, [test "${gui_ok}" = "yes"])
 
 if test "${SalomeGUI_need}" == "yes"; then
   if test "${FullGUI_ok}" != "yes"; then
@@ -124,6 +125,10 @@ elif test "${SalomeGUI_need}" == "auto"; then
 elif test "${SalomeGUI_need}" == "no"; then
   echo Build without GUI option has been chosen
 fi
+
+fi
+
+AM_CONDITIONAL(MED_ENABLE_GUI, [test "${gui_ok}" = "yes"])
 
 dnl Modification B. Secher portage sur osf CCRT
 AC_CHECK_PROG(SHELL,sh,,)
