@@ -26,7 +26,7 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-BASEIDL_FILES= MED.idl MED_Gen.idl Compo1Py.idl
+BASEIDL_FILES = MED.idl MED_Gen.idl Compo1Py.idl
 
 # This variable defines the files to be installed
 dist_salomeidl_DATA = $(BASEIDL_FILES)
@@ -38,7 +38,7 @@ lib_LTLIBRARIES = libSalomeIDLMED.la
 nodist_libSalomeIDLMED_la_SOURCES = MEDSK.cc MED_GenSK.cc Compo1PySK.cc
 
 # header files must be exported: other modules have to use this library
-nodist_salomeinclude_HEADERS = $(BASEIDL_FILES:%.idl=%.hh)
+nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh Compo1Py.hh
 
 libSalomeIDLMED_la_CPPFLAGS =			\
 	-I$(top_builddir)/salome_adm/unix	\
@@ -54,12 +54,17 @@ OMNIORB_IDLPYFLAGS  = @OMNIORB_IDLPYFLAGS@ -I$(top_builddir)/idl/salome -I$(KERN
 IDLCXXFLAGS = -bcxx @IDLCXXFLAGS@ -I$(top_builddir)/idl/salome -I$(KERNEL_ROOT_DIR)/idl/salome -I$(top_builddir)/salome_adm/unix
 IDLPYFLAGS  = @IDLPYFLAGS@ -I$(KERNEL_ROOT_DIR)/idl/salome
 
-# potential problem on parallel make on the following - multiple outputs
-SUFFIXES = .idl .hh SK.cc
-.idlSK.cc: $(BASEIDL_FILES:%.idl=%.hh)
-#	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
-.idl.hh:
+MEDSK.cc : MED.idl
 	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+MED.hh : MEDSK.cc
+
+MED_GenSK.cc : MED_Gen.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+MED_Gen.hh : MED_GenSK.cc
+
+Compo1PySK.cc : Compo1Py.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+Compo1Py.hh : Compo1PySK.cc
 
 install-exec-local: $(BASEIDL_FILES:%=$(top_srcdir)/idl/%)
 	$(INSTALL) -d  $(DESTDIR)$(salomepythondir)
