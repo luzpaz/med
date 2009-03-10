@@ -1792,7 +1792,7 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
         const int iSafe = 10;
 	int *  AttributesIdentifier = new int[NumberOfAttributes+iSafe] ;
 	int *  AttributesValues     = new int[NumberOfAttributes+iSafe] ;
-	string AttributesDescription(MED_TAILLE_DESC*NumberOfAttributes,' ') ;
+	string AttributesDescription(MED_TAILLE_DESC*(NumberOfAttributes+iSafe),' ') ;
 	string GroupsNames(MED_TAILLE_LNOM*NumberOfGroups+1,'\0') ;
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
 	med_2_3::med_int tmp_FamilyIdentifier ;
