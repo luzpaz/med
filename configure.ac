@@ -608,6 +608,7 @@ AC_OUTPUT([ \
 	./src/INTERP_KERNELTest/Makefile \
         ./src/MEDCoupling/Makefile \
         ./src/MEDCoupling/Test/Makefile \
+        ./src/MEDCoupling_Swig/Makefile \
 	./src/MEDSPLITTER/Makefile \
 	./src/MEDSPLITTER/Test/Makefile \
         ./src/MEDSPLITTER_Swig/Makefile \
