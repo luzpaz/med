@@ -99,13 +99,9 @@ MEDMEM_EnsightUtils.hxx \
 MEDMEM_Extractor.hxx \
 Remapper.hxx \
 PointLocator.hxx \
-MEDNormalizedUnstructuredMesh.hxx
-
-# not exported headers
-EXTRA_DIST+= DataTest \
-MEDMEM_MEDMEMchampLire.hxx \
-MEDMEM_MEDMEMgaussEcr.hxx \
-MEDMEM_MEDMEMprofilEcr.hxx
+PointLocatorAlgos.txx \
+MEDNormalizedUnstructuredMesh.hxx \
+MEDNormalizedUnstructuredMesh.txx
 
 dist_libmedmem_la_SOURCES= \
 MEDMEM_Init.cxx \
@@ -172,11 +168,15 @@ AM_CXXFLAGS= $(libmedmem_la_CXXFLAGS)
 LDADD= $(libmedmem_la_LDFLAGS) -lm libmedmem.la
 
 OBSOLETE_FILES = \
+	MEDMEM_MEDMEMchampLire.hxx \
 	MEDMEM_MEDMEMchampLire.cxx \
+	MEDMEM_MEDMEMgaussEcr.hxx \
 	MEDMEM_MEDMEMgaussEcr.cxx \
+	MEDMEM_MEDMEMprofilEcr.hxx
 	MEDMEM_MEDMEMprofilEcr.cxx \
 	MEDMEM_TypeMeshDriver.cxx \
 	MEDMEM_TypeMeshDriver.hxx \
-	checkScript
+	checkScript \
+	DataTest
 
 EXTRA_DIST += $(OBSOLETE_FILES)
