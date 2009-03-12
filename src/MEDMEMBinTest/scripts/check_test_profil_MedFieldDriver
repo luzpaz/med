@@ -13,8 +13,8 @@ initfile=${srcdir}/../../resources/zzzz121b_without_tr6.med
 infile=test_profil_MedFieldDriver.med
 
 curdir=`pwd`
+cp $initfile $outdir/$infile
 cd $outdir
-cp $initfile ./$infile
 
 $curdir/test_profil_MedFieldDriver $infile RESUZERODEPL____________________ 1 1
 
