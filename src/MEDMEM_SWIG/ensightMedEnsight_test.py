@@ -48,7 +48,7 @@ formats = [
 dataDir = os.getenv("DATA_DIR")
 tmpDir  = os.getenv("TMP")
 if not tmpDir:
-    tmpDir = os.getenv("TMPDIR")
+    tmpDir = os.getenv("TMPDIR", "/tmp")
 
 # EnSight samples are in EXAMPLES CVS repository, in directory SAMPLES_SRC/EnSight.
 # DATA_DIR should contain path to SAMPLES_SRC

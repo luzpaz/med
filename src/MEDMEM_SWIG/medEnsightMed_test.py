@@ -45,7 +45,7 @@ formats = [
 
 tmpDir  = os.getenv("TMP")
 if not tmpDir:
-    tmpDir = os.getenv("TMPDIR")
+    tmpDir = os.getenv("TMPDIR","/tmp")
 
 inDir = os.path.join(os.getenv("MED_ROOT_DIR"), "share","salome","resources","med")
 if not os.access(inDir, os.F_OK):
