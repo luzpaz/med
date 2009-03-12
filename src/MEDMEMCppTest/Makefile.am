@@ -125,3 +125,9 @@ OBSOLETE_FILES = \
 EXTRA_DIST += $(OBSOLETE_FILES)
 
 check: tests
+
+CLEANFILES =            \
+        UnitTestsResult
+
+clean-local:
+	rm -rf *.med
