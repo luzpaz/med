@@ -231,7 +231,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
   const char* line1 = theDescriptionPrefix;
   string      line2 = _ptrMesh->getDescription();
   for ( int i = 0; i < line2.size(); ++i ) { // protect from gabage
-    if ( !isascii( line2[ i ])) {
+    if ( !line2[ i ] || !isascii( line2[ i ])) {
       line2.resize( i );
       break;
     }
