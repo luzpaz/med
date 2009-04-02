@@ -23,6 +23,10 @@
 #include <sstream>
 #include <iomanip>
 
+#ifndef WNT
+#include <fenv.h>
+#endif
+
 #include "MEDMEM_Utilities.hxx"
 
 #include "MEDMEM_Field.hxx"
@@ -731,6 +735,10 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read (void)
   {
     // Read values
 
+#ifndef WNT
+    int curExcept = fedisableexcept( FE_ALL_EXCEPT ); //!< there may be nan values
+#endif
+
     if ( isBinaryDataFile( getDataFileName() ) ) // binary
     {
       if ( isGoldFormat() ) // Gold
@@ -753,6 +761,12 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read (void)
         read6ASCII();
       }
     }
+
+#ifndef WNT
+    feclearexcept( FE_ALL_EXCEPT );
+    if ( curExcept >= 0 )
+      feenableexcept( curExcept );
+#endif
   }
 }
 
