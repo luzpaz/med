@@ -212,7 +212,8 @@ int main()
   meshing->write(id);
   delete meshing;
 
-  remove(medfile.c_str());
+  if ( getenv("srcdir") )
+    remove(medfile.c_str());
 
   return 0;
 }
