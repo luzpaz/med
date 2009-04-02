@@ -221,6 +221,11 @@ namespace MED
 			     &aDim,
 			     &aType,
 			     &theInfo.myDesc[0]);
+      // read space dimension of the mesh (issue 20232)
+      med_int spaceDim = MEDdimEspaceLire(myFile->Id(), &aMeshName);
+      if ( spaceDim > aDim )
+        aDim.myRepresentation = spaceDim;
+
       if(theErr) 
 	*theErr = aRet;
       else if(aRet < 0)
