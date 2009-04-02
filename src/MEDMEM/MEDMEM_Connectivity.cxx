@@ -2333,7 +2333,7 @@ const int * CONNECTIVITY::getConnectivityOfAnElementWithPoly(MED_EN::medConnecti
     throw  MEDEXCEPTION("No connectivity attached to a node entity");
   if(Entity==_entity)
     {
-      if(_entity==MED_EDGE && _entityDimension==1)
+      if((_entity==MED_EDGE) || (_entity==MED_CELL && _entityDimension==1))
 	{
 	  const int * newConstituentValue = 0;
 	  const int * newConstituentIndex = 0;
