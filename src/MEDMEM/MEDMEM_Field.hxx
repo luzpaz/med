@@ -2034,40 +2034,84 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
 
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃ©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
     // Il n'est vraiment pas optimal de mixer des champs dans des modes d'entrelacement
     // different juste pour le calcul
 
-    const T * value     = NULL;
-    ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-      value = getValue();
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-      myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
-    }
-    else {
-      myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
-    }
-    
-    value = value + (component-1) * getNumberOfValues();
-    const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
 
     double integrale=0.0;
     double totVol=0.0;
-    for (; value!=lastvalue ; ++value ,++vol)
-    {
-	integrale += static_cast<double>((*value) * (*value)) * (*vol);
-	totVol+=*vol;
+
+    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+      const T* value = getValue();
+      value = value + (component-1) * getNumberOfValues();
+      const T* lastvalue = value + getNumberOfValues(); // pointing just after the end of column
+      for (; value!=lastvalue ; ++value ,++vol) {
+	integrale += double((*value) * (*value)) * std::abs(*vol);
+	totVol+=std::abs(*vol);
+      }
     }
+    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+      ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
+      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
+      //    integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*vol) );
+      //    totVol+=*vol;
+      //  }
+      //}
+      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+        integrale += anArray->getIJ(i,component) * anArray->getIJ(i,component) * std::abs(*vol);
+        totVol+=std::abs(*vol);
+      }
+      //delete anArray;
+    }
+    else { // FULL_INTERLACE
+      ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
+      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
+      //for (int j=1; j<= anArray->getDim(); j++ ) {
+      //  for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+      //    integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*vol) );
+      //    totVol+=*vol;
+      //  }
+      //}
+      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+        integrale += anArray->getIJ(i,component) * anArray->getIJ(i,component) * std::abs(*vol);
+        totVol+=std::abs(*vol);
+      }
+      //delete anArray;
+    }
+
+    //const T * value     = NULL;
+    //ArrayNo * myArray   = NULL;
+    //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+    //  value = getValue();
+    //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+    //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getPtr();
+    //}
+    //else {
+    //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getPtr();
+    //}
+    
+    //value = value + (component-1) * getNumberOfValues();
+    //const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
+
+    //double integrale=0.0;
+    //double totVol=0.0;
+    //for (; value!=lastvalue ; ++value ,++vol)
+    //{
+    //integrale += static_cast<double>((*value) * (*value)) * (*vol);
+    //totVol+=*vol;
+    //}
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+    //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -2084,38 +2128,75 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
     _checkNormCompatibility(p_field_volume); // may throw exception
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÂ©mentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃƒÂ©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
     const double* lastvol=vol+getNumberOfValues(); // pointing just after the end of vol
 
-    const T * value     = NULL;
-    ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-      value = getValue();
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ){
-      myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
-    }
-    else {
-      myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
-    }
 
+    double integrale=0.0;
     double totVol=0.0;
     const double* p_vol=vol;
     for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
-	totVol+=*p_vol;
+	totVol+=std::abs(*p_vol);
 
-    double integrale=0.0;
-    for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
-	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
-	    integrale += static_cast<double>((*value) * (*value)) * (*p_vol);
+    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+      const T* value = getValue();
+      for (int i=1; i<=getNumberOfComponents(); ++i) { // compute integral on all components
+	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) {
+          integrale += (*value) * (*value) * std::abs(*p_vol);
+        }
+      }
+    }
+    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+      ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+      for (int j=1; j<=anArray->getDim(); j++) {
+        int i = 1;
+        for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+          integrale += anArray->getIJ(i,j) * anArray->getIJ(i,j) * std::abs(*p_vol);
+        }
+      }
+      //delete anArray;
+    }
+    else { // FULL_INTERLACE
+      ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+      for (int j=1; j<=anArray->getDim(); j++) {
+        int i = 1;
+        for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+          integrale += anArray->getIJ(i,j) * anArray->getIJ(i,j) * std::abs(*p_vol);
+        }
+      }
+      //delete anArray;
+    }
+
+
+    //const T * value     = NULL;
+    //ArrayNo * myArray   = NULL;
+    //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+    //  value = getValue();
+    //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ){
+    //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getPtr();
+    //}
+    //else {
+    //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getPtr();
+    //}
+
+    //double totVol=0.0;
+    //const double* p_vol=vol;
+    //for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
+    //totVol+=*p_vol;
+
+    //double integrale=0.0;
+    //for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
+    //for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
+    //    integrale += static_cast<double>((*value) * (*value)) * (*p_vol);
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+    //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -2136,36 +2217,77 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
 
     const FIELD<double,FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÂ©mentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃƒÂ©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue();
-    const T * value     = NULL;
-    ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-      value = getColumn(component);
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-      myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-      value   = myArray->getColumn(component);
-    }
-    else {
-      myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-      value   = myArray->getColumn(component);
-    }
-
-    const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
+    const double* vol = p_field_size->getValue();
 
     double integrale=0.0;
     double totVol=0.0;
-    for (; value!=lastvalue ; ++value ,++vol)
-    {
-	integrale += std::abs( static_cast<double>(*value) ) * (*vol);
-	totVol+=*vol;
+
+    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+      const T* value = getValue();
+      const T* lastvalue = value + getNumberOfValues(); // pointing just after the end of column
+      for (; value!=lastvalue ; ++value ,++vol) {
+	integrale += std::abs( *value * *vol );
+	totVol+=std::abs(*vol);
+      }
     }
+    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+      ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
+      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
+      //    integrale += std::abs(static_cast<double>( anArray->getIJ(i,j)) ) * (*vol);
+      //    totVol+=*vol;
+      //  }
+      //}
+      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+        integrale += std::abs( anArray->getIJ(i,component) * (*vol));
+        totVol+=std::abs(*vol);
+      }
+      //delete anArray;
+    }
+    else { // FULL_INTERLACE
+      ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
+      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
+      //    integrale += std::abs(static_cast<double>( anArray->getIJ(i,j)) ) * (*vol);
+      //    totVol+=*vol;
+      //  }
+      //}
+      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+        integrale += std::abs( anArray->getIJ(i,component) * *vol);
+        totVol+=std::abs(*vol);
+      }
+      //delete anArray;
+    }
+    
+    //const T * value     = NULL;
+    //ArrayNo * myArray   = NULL;
+    //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+    //  value = getColumn(component);
+    //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+    //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getColumn(component);
+    //}
+    //else {
+    //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
+    //  value   = myArray->getColumn(component);
+    //}
+
+    //const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
+
+    //double integrale=0.0;
+    //double totVol=0.0;
+    //for (; value!=lastvalue ; ++value ,++vol)
+    //{
+    //integrale += std::abs( static_cast<double>(*value) ) * (*vol);
+    //totVol+=*vol;
+    //}
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+    //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -2179,45 +2301,81 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
 template <class T, class INTERLACING_TAG>
 double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_field_volume) const
 {
-    _checkNormCompatibility(p_field_volume); // may throw exception
-    const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
-    if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÂ©mentation dans mesh]
+  _checkNormCompatibility(p_field_volume); // may throw exception
+  const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
+  if(!p_field_volume) // if the user don't supply the volume
+    p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÂ©mentation dans mesh]
+  
+  // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
+  const double* vol = p_field_size->getValue();
+  const double* lastvol = vol+getNumberOfValues(); // pointing just after the end of vol
 
-    // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
-    const double* vol=p_field_size->getValue();
-    const double* lastvol=vol+getNumberOfValues(); // pointing just after the end of vol
+  double integrale=0.0;
+  double totVol=0.0;
+  const double* p_vol=vol;
+  for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
+    totVol+=std::abs(*p_vol);
 
-   const T * value     = NULL;
-    ArrayNo * myArray   = NULL;
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-      value = getValue();
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-      myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
+  if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+    const T* value = getValue();
+    for (int i=1; i<=getNumberOfComponents(); ++i) { // compute integral on all components
+      for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) {
+        integrale += std::abs( *value * *p_vol );
+      }
     }
-    else {
-      myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-      value   = myArray->getPtr();
+  }
+  else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+    ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+    for (int j=1; j<=anArray->getDim(); j++) {
+      int i = 1;
+      for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+        integrale += std::abs( anArray->getIJ(i,j) * *p_vol );
+      }
     }
-
-    double totVol=0.0;
-    const double* p_vol=vol;
-    for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
-	totVol+=*p_vol;
-
-    double integrale=0.0;
-    for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
-	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
-	    integrale += std::abs( static_cast<double>(*value) ) * (*p_vol);
-
-    if(!p_field_volume) // if the user didn't supply the volume
-	delete p_field_size; // delete temporary volume field
-    if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
-    if( totVol <= 0)
-	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
-
-    return integrale/totVol;
+    //delete anArray;
+  }
+  else { // FULL_INTERLACE
+    ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+    for (int j=1; j<=anArray->getDim(); j++) {
+      int i = 1;
+      for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+        integrale += std::abs( anArray->getIJ(i,j) * *p_vol );
+      }
+    }
+    //delete anArray;
+  }
+  
+  
+  //const T * value     = NULL;
+  //ArrayNo * myArray   = NULL;
+  //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+  //  value = getValue();
+  //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+  //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
+  //  value   = myArray->getPtr();
+  //}
+  //else {
+  //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
+  //  value   = myArray->getPtr();
+  //}
+  
+  //double totVol=0.0;
+  //const double* p_vol=vol;
+  //for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
+  //  totVol+=*p_vol;
+  
+  //double integrale=0.0;
+  //for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
+  //  for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
+  //    integrale += std::abs( static_cast<double>(*value) ) * (*p_vol);
+  
+  if(!p_field_volume) // if the user didn't supply the volume
+    delete p_field_size; // delete temporary volume field
+  //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+  if( totVol <= 0)
+    throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
+  
+  return integrale/totVol;
 }
 
 /*! Return a new field (to deallocate with delete) lying on subSupport that is included by
