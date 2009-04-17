@@ -56,7 +56,7 @@ endif
 endif
 
 if MED_ENABLE_KERNEL
-  SUBDIRS+= $(MULTIPR_DIR) MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
+  SUBDIRS+= $(MULTIPR_DIR) MEDCouplingCorba MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
 endif
 
 if MED_ENABLE_GUI
@@ -65,7 +65,7 @@ endif
 
 ##endif # if MICRO_MED
 
-DIST_SUBDIRS= MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig INTERPOLATION MEDMEM_SWIG \
-              MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig               \
-	      MEDSPLITTER MEDSPLITTER_Swig MULTIPR MEDMEM_I MED MED_SWIG MedCorba_Swig               \
+DIST_SUBDIRS= MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig INTERPOLATION MEDMEM_SWIG    \
+              MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig                  \
+	      MEDSPLITTER MEDSPLITTER_Swig MULTIPR MEDCouplingCorba MEDMEM_I MED MED_SWIG MedCorba_Swig \
 	      MedClient MEDGUI

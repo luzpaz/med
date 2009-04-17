@@ -16,29 +16,11 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#include "TimeLabel.hxx"
+#include "MEDCouplingUMeshServant.hxx"
+#include "MEDCouplingUMesh.hxx"
 
 using namespace ParaMEDMEM;
 
-unsigned int TimeLabel::GLOBAL_TIME=0;
-
-TimeLabel::TimeLabel():_time(GLOBAL_TIME++)
+MEDCouplingUMeshServant::MEDCouplingUMeshServant(const MEDCouplingUMesh *cppPointerOfMesh):MEDCouplingPointSetServant(cppPointerOfMesh)
 {
-}
-
- TimeLabel& TimeLabel::operator=(const TimeLabel& other)
-{
-  _time=GLOBAL_TIME++;
-  return *this;
-}
-
-void TimeLabel::declareAsNew()
-{
-  _time=GLOBAL_TIME++;
-}
-
-void TimeLabel::updateTimeWith(const TimeLabel& other)
-{
-  if(_time<other._time)
-    _time=other._time;
 }

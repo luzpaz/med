@@ -35,10 +35,10 @@ dist_salomeidl_DATA = $(BASEIDL_FILES)
 lib_LTLIBRARIES = libSalomeIDLMED.la
 
 # Sources built from idl files
-nodist_libSalomeIDLMED_la_SOURCES = MEDSK.cc MED_GenSK.cc Compo1PySK.cc
+nodist_libSalomeIDLMED_la_SOURCES = MEDSK.cc MED_GenSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc MEDCouplingCorbaServantTestSK.cc
 
 # header files must be exported: other modules have to use this library
-nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh Compo1Py.hh
+nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh MEDCouplingCorbaServant.hh Compo1Py.hh MEDCouplingCorbaServantTest.hh
 
 libSalomeIDLMED_la_CPPFLAGS =			\
 	-I$(top_builddir)/salome_adm/unix	\
@@ -62,9 +62,17 @@ MED_GenSK.cc : MED_Gen.idl
 	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
 MED_Gen.hh : MED_GenSK.cc
 
+MEDCouplingCorbaServantSK.cc : MEDCouplingCorbaServant.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+MEDCouplingCorbaServant.hh : MEDCouplingCorbaServantSK.cc
+
 Compo1PySK.cc : Compo1Py.idl
 	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
 Compo1Py.hh : Compo1PySK.cc
+
+MEDCouplingCorbaServantTestSK.cc : MEDCouplingCorbaServantTest.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+MEDCouplingCorbaServantTest.hh : MEDCouplingCorbaServantTestSK.cc
 
 install-exec-local: $(BASEIDL_FILES:%=$(top_srcdir)/idl/%)
 	$(INSTALL) -d  $(DESTDIR)$(salomepythondir)

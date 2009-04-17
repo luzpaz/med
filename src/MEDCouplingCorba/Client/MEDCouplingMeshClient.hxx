@@ -16,31 +16,22 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef __PARAMEDMEM_TIMELABEL_HXX__
-#define __PARAMEDMEM_TIMELABEL_HXX__
+#ifndef __MEDCOUPLINGMESHCLIENT_HXX__
+#define __MEDCOUPLINGMESHCLIENT_HXX__
 
-#include "MEDCoupling.hxx"
+#include "SALOMEconfig.h"
+
+#include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
+#include "MEDCouplingClient.hxx"
 
 namespace ParaMEDMEM
 {
-  /*!
-   * Class representing a label of time of the lastely modified part of this.
-   * More _time is high more the object has been modified recently.
-   */
-  class MEDCOUPLING_EXPORT TimeLabel
+  class MEDCouplingMesh;
+
+  class MEDCOUPLINGCLIENT_EXPORT MEDCouplingMeshClient
   {
   public:
-    TimeLabel& operator=(const TimeLabel& other);
-    //! This method should be called when write access has been done on this.
-    void declareAsNew();
-    //! This method should be called on high level classes as Field or Mesh to take into acount modifications done in aggragates objects.
-    virtual void updateTime() = 0;
-  protected:
-    TimeLabel();
-    void updateTimeWith(const TimeLabel& other);
-  private:
-    static unsigned int GLOBAL_TIME;
-    unsigned int _time;
+    static MEDCouplingMesh *New(SALOME_MED::MEDCouplingMeshCorbaInterface_ptr mesh);
   };
 }
 

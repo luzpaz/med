@@ -1,0 +1,59 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+#ifndef __MEDCOUPLINGCORBASERVANT_IDL__
+#define __MEDCOUPLINGCORBASERVANT_IDL__
+
+#include "SALOME_GenericObj.idl"
+
+module SALOME_MED
+{
+  typedef sequence<long> long_array;
+  typedef sequence<double> double_array;
+  typedef sequence<string> string_array;
+  typedef sequence<double_array> double_array2;
+
+  interface MEDCouplingMeshCorbaInterface : SALOME::GenericObj
+  {
+  };
+
+  interface MEDCouplingPointSetCorbaInterface : MEDCouplingMeshCorbaInterface
+  {
+    //!CORBA inplementation of MEDCouplingPointSet::getTinySerializationInformation
+    void getTinyInfo(out long_array la, out string_array sa);
+    void getSerialisationData(out long_array la, out double_array da);
+  };
+
+  interface MEDCouplingUMeshCorbaInterface : MEDCouplingPointSetCorbaInterface
+  {
+  };
+
+  interface MEDCouplingFieldCorbaInterface : SALOME::GenericObj
+  {
+    MEDCouplingMeshCorbaInterface getMesh();
+  };
+
+  interface MEDCouplingFieldDoubleCorbaInterface : MEDCouplingFieldCorbaInterface
+  {
+    //!returns the 3 tiny arrays to prepare the new instance locally.
+    void getTinyInfo(out long_array la, out double_array da, out string_array sa);
+    void getSerialisationData(out double_array2 da2);
+  };
+};
+
+#endif
