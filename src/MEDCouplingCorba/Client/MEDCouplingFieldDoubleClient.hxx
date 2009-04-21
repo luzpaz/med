@@ -31,6 +31,8 @@ namespace ParaMEDMEM
   {
   public:
     static MEDCouplingFieldDouble *New(SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr field);
+  private:
+    MEDCouplingFieldDoubleClient();
   };
 }
 
