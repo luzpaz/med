@@ -578,6 +578,7 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
 
   const int * reverseFaceNodal = _constituent->getReverseNodalConnectivity(); //Common to polygons and classic geometric types
   const int * reverseFaceNodalIndex = _constituent->getReverseNodalConnectivityIndex(); //Common to polygons and classic geometric types
+  int nbOfClassicalFaces=_constituent->getNumberOf(_constituent->getEntity(),MED_ALL_ELEMENTS);
 
   for (int loop=startNbOfTurnInGlobalLoop; loop<nbOfTurnInGlobalLoop; loop++)
     {
@@ -644,7 +645,9 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
 	  if(retCompareNewOld==0)
 	    throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"Uncompatible given user face with calculated existing faces"));
 	  if(retCompareNewOld==-1)
-	    invertConnectivityForAFace(renumberingFromOldToNewLoop[iOldFace],nodesOfCurrentFaceOld,loop==1);
+            // Issue 0020316 [CEA 338]. Classical face can become polygon after calculateDescendingConnectivity()
+	    //invertConnectivityForAFace(renumberingFromOldToNewLoop[iOldFace],nodesOfCurrentFaceOld,loop==1);
+            invertConnectivityForAFace(renumberingFromOldToNewLoop[iOldFace],nodesOfCurrentFaceOld,renumberingFromOldToNewLoop[iOldFace]>nbOfClassicalFaces);
 	}
     }
   // Updating the Family
