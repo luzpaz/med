@@ -593,6 +593,7 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
       int * renumberingFromOldToNewLoop=renumberingFromOldToNewTab[loop];
       CELLMODEL * aCELLMODEL = 0;
       if ( loop == 0 ) aCELLMODEL = & oldConstituent->_type[0];
+      int nbOfClassicalFaces=_constituent->getNumberOf(_constituent->getEntity(),MED_ALL_ELEMENTS);
       for(int iOldFace=0;iOldFace<oldNumberOfFaceLoop;iOldFace++)
 	{
 	  const int *nodesOfCurrentFaceOld=oldConstituentValueLoop+oldConstituentIndexLoop[iOldFace]-1;
@@ -650,7 +651,9 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
 	  if(retCompareNewOld==0)
 	    throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"Uncompatible given user face with calculated existing faces"));
 	  if(retCompareNewOld==-1)
-	    invertConnectivityForAFace(renumberingFromOldToNewLoop[iOldFace],nodesOfCurrentFaceOld,loop==1);
+            // Issue 0020316 [CEA 338]. Classical face can become polygon after calculateFullDescendingConnectivity()
+	    //invertConnectivityForAFace(renumberingFromOldToNewLoop[iOldFace],nodesOfCurrentFaceOld,loop==1);
+            invertConnectivityForAFace(renumberingFromOldToNewLoop[iOldFace],nodesOfCurrentFaceOld,renumberingFromOldToNewLoop[iOldFace]>nbOfClassicalFaces);
 	}
     }
   // Updating the Family
@@ -2580,7 +2583,7 @@ void CONNECTIVITY::invertConnectivityForAFace(int faceId, const int *nodalConnFo
   int cell1 = _reverseDescendingConnectivity->getIJ(faceId,1);
   int cell2 = _reverseDescendingConnectivity->getIJ(faceId,2);
 
-  if (cell2 != 0) { // we are not on border, update compulsary. If we aren't on border no update necessary so WARNING because user specified a bad oriented face
+  if (cell2 != 0) { // we are not on border, update compulsory. If we aren't on border no update necessary so WARNING because user specified a bad oriented face
     // Updating _reverseDescendingConnectivity
     _reverseDescendingConnectivity->setIJ(faceId,1,cell2);
     _reverseDescendingConnectivity->setIJ(faceId,2,cell1);
