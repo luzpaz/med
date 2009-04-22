@@ -1615,6 +1615,8 @@ class MED
 
   void addMesh  ( MESH    * const ptrMesh   );
 
+  void updateNamesInMaps();
+
   %extend {
     MED(driverTypes driverType, char * fileName)
       {

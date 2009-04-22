@@ -931,6 +931,39 @@ void MED::addMesh( MESH * const ptrMesh)
   END_OF_MED(LOC);
 }
 
+void MED::updateNamesInMaps()
+{
+  map<MESH_NAME_,MESH*> newMeshes=_meshes;
+  _meshes.clear();
+  for(map<MESH_NAME_,MESH*>::const_iterator iter=newMeshes.begin();iter!=newMeshes.end();iter++)
+    _meshes[(*iter).second->getName()]=(*iter).second;
+  newMeshes.clear();
+  //
+  map<FIELD_NAME_,MAP_DT_IT_>  newFields=_fields;
+  _fields.clear();
+  for(map<FIELD_NAME_,MAP_DT_IT_>::const_iterator iter1=newFields.begin();iter1!=newFields.end();iter1++)
+    for(MAP_DT_IT_::const_iterator iter2=(*iter1).second.begin();iter2!=(*iter1).second.end();iter2++)
+      {
+        DT_IT_ tmp;
+        tmp.dt=(*iter2).first.dt; tmp.it=(*iter2).first.it;
+        _fields[(*iter2).second->getName()][tmp]=(*iter2).second;
+      }
+  
+  //
+  map < MESH_NAME_, map < MED_EN::medEntityMesh, SUPPORT * > > newSupport=_support;
+  _support.clear();
+  for(map < MESH_NAME_, map < MED_EN::medEntityMesh, SUPPORT * > >::const_iterator iter3=newSupport.begin();iter3!=newSupport.end();iter3++)
+    for(map < MED_EN::medEntityMesh, SUPPORT * >::const_iterator iter4=(*iter3).second.begin();iter4!=(*iter3).second.end();iter4++)
+      _support[(*iter4).second->getMesh()->getName()][(*iter4).first]=(*iter4).second;
+  newSupport.clear();
+  //
+  map<FIELD_ *, MESH_NAME_> newMeshName=_meshName;
+  _meshName.clear();
+  for(map<FIELD_ *, MESH_NAME_>::const_iterator iter5=newMeshName.begin();iter5!=newMeshName.end();iter5++)
+    _meshName[(*iter5).first]=(*iter5).first->getSupport()->getMesh()->getName();
+  newMeshName.clear();
+}
+
 /*!
   Add the given FIELD object. MED object control it,
   and destroy it, so you must not destroy it after.

@@ -106,6 +106,7 @@ public:
 
   void addField ( FIELD_  * const ptrField  ) throw (MED_EXCEPTION) ;
   void addMesh  ( MESH    * const ptrMesh   ) throw (MED_EXCEPTION) ;
+  void updateNamesInMaps();
   int  addDriver     (driverTypes driverType,
 		      const string & fileName,
 		      MED_EN::med_mode_acces access=MED_EN::RDWR);
