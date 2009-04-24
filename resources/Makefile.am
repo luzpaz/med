@@ -28,16 +28,6 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 #
 
 dist_salomeres_DATA = \
-    MED.config \
-    MED_en.xml \
-    SalomeApp.xml \
-    ModuleMed.png \
-    Data.png \
-    Infos.png \
-    Structure.png \
-    explore_med_file.png \
-    field_selection.png \
-    mesh_selection.png \
     boitenew.cnc \
     boitenew.inp \
     boitenew.xyz \
@@ -226,6 +216,20 @@ dist_salomeres_DATA = \
     blow5_ascii_pd_displacement \
     blow5_ascii_pd_thickness
 
+if !MED_ENABLE_MICROMED
+  dist_salomeres_DATA += \
+    SalomeApp.xml
 
-# VSR: little trick to avoid putting if MEDCatalog.xml to the distribution archive
-nodist_salomeres_SCRIPTS = MEDCatalog.xml
+  nodist_salomeres_SCRIPTS = MEDCatalog.xml
+endif
+
+if MED_ENABLE_GUI
+  dist_salomeres_DATA += \
+    ModuleMed.png \
+    Data.png \
+    Infos.png \
+    Structure.png \
+    explore_med_file.png \
+    field_selection.png \
+    mesh_selection.png
+endif

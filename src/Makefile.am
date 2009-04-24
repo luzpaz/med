@@ -19,51 +19,72 @@
 #
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-##if MICRO_MED
+###
+# Common subdirectories
+###
 
-##SUBDIRS = INTERP_KERNEL MEDCoupling $(MPIDIR)
+COMMON_SUBDIRS = INTERP_KERNEL MEDCoupling 
 
-##if MPI_IS_OK
-##  SUBDIRS+= ParaMEDMEM
-##endif
-
-##else # if MICRO_MED
-
-SUBDIRS = MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig INTERPOLATION MEDMEM_SWIG MEDMEMBinTest $(MPIDIR)
+###
+# Unitary tests for INTERP_KERNEL
+### 
 
 if CPPUNIT_IS_OK
- SUBDIRS+= MEDMEMCppTest INTERP_KERNELTest
+ INTERPTEST_SUBDIRS = INTERP_KERNELTest
 endif
 
+###
+# ParaMEDMEM is enabled if MPI is detected ok
+# In addition, ParaMEDMEM_Swig is not available in MICROMED mode
+###
+
 if MPI_IS_OK
-  SUBDIRS+= ParaMEDMEM ParaMEDMEM_Swig
+  PARAMEDMEM_SUBDIRS = ParaMEDMEM
+endif
+
+###
+# Other packages are not available in MICROMED mode
+###
+
+if !MED_ENABLE_MICROMED
+
+  BASE_SUBDIRS = MEDWrapper MEDMEM MEDCoupling_Swig INTERPOLATION MEDMEM_SWIG MEDMEMBinTest
+
+if MPI_IS_OK
+    PARAMEDMEM_SUBDIRS += ParaMEDMEM_Swig
+endif
+
+if CPPUNIT_IS_OK
+    BASE_SUBDIRS += MEDMEMCppTest
 endif
 
 if MED_ENABLE_SPLITTER
-  SUBDIRS+= MEDSPLITTER MEDSPLITTER_Swig
+    SPLITTER_SUBDIRS = MEDSPLITTER MEDSPLITTER_Swig
 
-
-# MULTIPR
 if MED_ENABLE_METIS
-  MULTIPR_DIR = MULTIPR
+      MULTIPR_SUBDIRS = MULTIPR
 endif
 if MED_ENABLE_SCOTCH
-  MULTIPR_DIR = MULTIPR
+      MULTIPR_SUBDIRS = MULTIPR
 endif
 
 endif
 
 if MED_ENABLE_KERNEL
-  SUBDIRS+= $(MULTIPR_DIR) MEDCouplingCorba MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
+    KERNEL_SUBDIRS = $(MULTIPR_SUBDIRS) MEDCouplingCorba MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
 endif
 
 if MED_ENABLE_GUI
-  SUBDIRS+= MEDGUI
+    GUI_SUBDIRS = MEDGUI
 endif
 
-##endif # if MICRO_MED
+endif
+
+SUBDIRS = $(COMMON_SUBDIRS) $(PARAMEDMEM_SUBDIRS) $(BASE_SUBDIRS) $(INTERPTEST_SUBDIRS) \
+          $(SPLITTER_SUBDIRS) $(KERNEL_SUBDIRS) $(GUI_SUBDIRS)
 
 DIST_SUBDIRS= MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig INTERPOLATION MEDMEM_SWIG    \
               MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig                  \

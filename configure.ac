@@ -56,7 +56,7 @@ echo Build  root directory : $ROOT_BUILDDIR
 echo
 
 dnl remember MED_WITH_KERNEL set by build configure
-MED_WITH_KERNEL=no
+MED_WITH_KERNEL=yes
 old_with_kernel=${MED_WITH_KERNEL}
 
 dnl

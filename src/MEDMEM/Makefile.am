@@ -172,7 +172,7 @@ OBSOLETE_FILES = \
 	MEDMEM_MEDMEMchampLire.cxx \
 	MEDMEM_MEDMEMgaussEcr.hxx \
 	MEDMEM_MEDMEMgaussEcr.cxx \
-	MEDMEM_MEDMEMprofilEcr.hxx
+	MEDMEM_MEDMEMprofilEcr.hxx \
 	MEDMEM_MEDMEMprofilEcr.cxx \
 	MEDMEM_TypeMeshDriver.cxx \
 	MEDMEM_TypeMeshDriver.hxx \
