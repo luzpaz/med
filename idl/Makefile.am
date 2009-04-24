@@ -26,7 +26,7 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-BASEIDL_FILES = MED.idl MED_Gen.idl Compo1Py.idl
+BASEIDL_FILES = MED.idl MED_Gen.idl Compo1Py.idl MEDCouplingCorbaServant.idl MEDCouplingCorbaServantTest.idl
 
 # This variable defines the files to be installed
 dist_salomeidl_DATA = $(BASEIDL_FILES)
