@@ -54,15 +54,14 @@ echo
 echo Source root directory : $ROOT_SRCDIR
 echo Build  root directory : $ROOT_BUILDDIR
 echo
-echo
 
 dnl remember MED_WITH_KERNEL set by build configure
-MED_WITH_KERNEL=yes
+MED_WITH_KERNEL=no
 old_with_kernel=${MED_WITH_KERNEL}
 
 dnl
 dnl Check --with-kernel option
-echo
+dnl
 dnl  ---------------------------------------------
                  WITH_KERNEL
 dnl  ---------------------------------------------
@@ -96,39 +95,30 @@ if test "x${old_with_kernel}" != "x${MED_WITH_KERNEL}"; then
     fi
 fi
 
-AM_CONDITIONAL(MED_ENABLE_KERNEL, [test "$MED_WITH_KERNEL" = yes])
-
-gui_ok=no
-
-if test "$MED_WITH_KERNEL" = "yes" ; then 
-
 echo
 echo ---------------------------------------------
-echo Testing GUI
+echo "MED_WITH_KERNEL: ${MED_WITH_KERNEL}"
 echo ---------------------------------------------
 echo
 
-CHECK_GUI_MODULE
+###
+# --with-interp-kernel-only option: available only in --with-kernel=no mode (see build_configure)
+###
 
-if test "${SalomeGUI_need}" != "no" -a "${FullGUI_ok}" = "yes" ; then 
-  gui_ok=yes
-fi
+AC_ARG_WITH([interp-kernel-only],
+	    [AC_HELP_STRING([--with-interp-kernel-only],[Build MicroMED packages only, default=no])],
+	    [],[with_interp_kernel_only=no])
 
-if test "${SalomeGUI_need}" == "yes"; then
-  if test "${FullGUI_ok}" != "yes"; then
-    AC_MSG_WARN(For configure MED module necessary full GUI!)
+if test "$MED_WITH_KERNEL" == "yes" ; then
+  if test "$with_interp_kernel_only" != "no" ; then
+    AC_MSG_WARN([Option --with-interp-kernel-only is supported in --without-kernel mode only])
   fi
-elif test "${SalomeGUI_need}" == "auto"; then
-  if test "${FullGUI_ok}" != "yes"; then
-    AC_MSG_WARN(Full GUI not found. Build will be done without GUI!)
-  fi
-elif test "${SalomeGUI_need}" == "no"; then
-  echo Build without GUI option has been chosen
+  with_interp_kernel_only="no"
 fi
 
-fi
-
-AM_CONDITIONAL(MED_ENABLE_GUI, [test "${gui_ok}" = "yes"])
+###
+# Common tests
+###
 
 dnl Modification B. Secher portage sur osf CCRT
 AC_CHECK_PROG(SHELL,sh,,)
@@ -157,9 +147,11 @@ dnl libtool macro check for CC, LD, NM, LN_S, RANLIB, STRIP + pour les librairie
 AC_ENABLE_DEBUG(yes)
 AC_DISABLE_PRODUCTION
 
+echo
 echo ---------------------------------------------
 echo testing libtool
 echo ---------------------------------------------
+echo
 
 dnl first, we set static to no!
 dnl if we want it, use --enable-static
@@ -214,7 +206,6 @@ dnl We must test if it exists. If not, add it in include !
 dnl
 
 AC_CXX_HAVE_SSTREAM
-AM_CONDITIONAL(MED_ENABLE_SSTREAM, [test "$HAVE_SSTREAM" = yes])
 
 dnl
 dnl ---------------------------------------------
@@ -234,37 +225,11 @@ ENABLE_PTHREADS
 
 echo
 echo ---------------------------------------------
-echo testing python
-echo ---------------------------------------------
-echo
-
-CHECK_PYTHON
-
-echo
-echo ---------------------------------------------
-echo testing swig
-echo ---------------------------------------------
-echo
-
-AM_PATH_PYTHON(2.3)
-CHECK_SWIG
-AM_CONDITIONAL(MED_SWIG_1_3_21, [test "$SWIG_VERSION" = 1.3.21])
-
-echo
-echo ---------------------------------------------
 echo testing HDF5
 echo ---------------------------------------------
 echo
 
 CHECK_HDF5
-
-echo
-echo ---------------------------------------------
-echo BOOST Library
-echo ---------------------------------------------
-echo
-
-CHECK_BOOST
 
 echo
 echo ---------------------------------------------
@@ -275,9 +240,41 @@ echo
 CHECK_MED2
 
 echo
+echo ---------------------------------------------------
+echo "testing CPPUNIT (only required for unitary testing)"
+echo --------------------------------------------------
+echo
+
+CHECK_CPPUNIT
+
+echo
 echo ---------------------------------------------
-echo "MED_WITH_KERNEL: ${MED_WITH_KERNEL}"
+echo testing MPI
 echo ---------------------------------------------
+echo
+
+CHECK_MPI
+#CHECK_MPICH
+
+echo
+echo ---------------------------------------------
+echo testing FVM library generators
+echo ---------------------------------------------
+echo
+
+CHECK_FVM
+
+echo
+echo ---------------------------------------------
+echo testing html generators
+echo ---------------------------------------------
+echo
+
+CHECK_HTML_GENERATORS
+
+###
+# Defaults
+###
 
 openpbs_ok=no
 # CHECK_OPENPBS ONLY if MED_WITH_KERNEL is yes
@@ -285,213 +282,252 @@ openpbs_ok=no
 lsf_ok=no
 # CHECK_LSF ONLY if MED_WITH_KERNEL is yes
 
-echo
-echo ----------------------------------------------
-echo testing CPPUNIT only required for unit testing
-echo ----------------------------------------------
-echo
+gui_ok=no
+# CHECK_LSF ONLY if MED_WITH_KERNEL is yes
 
-CHECK_CPPUNIT
+WITHIHM="no"
+WITHOPENPBS="no"
+WITH_LSF="no"
 
-echo
-echo ---------------------------------------------
-echo checking SPLITTER
-echo ---------------------------------------------
-echo
+###
+# Other tests should be performed only in --with-interp-kernel-only=no mode
+###
 
-AC_ENABLE_SPLITTER(yes)
-AM_CONDITIONAL(MED_ENABLE_SPLITTER, [test "$ENABLE_SPLITTER" = yes])
-
-if test "x$ENABLE_SPLITTER" = "xyes"; then
-
-    echo  
-    echo --------------------------------------------- 
-    echo testing METIS 
-    echo ---------------------------------------------
-    echo 
-    metis_ok=no 
-    CHECK_METIS dnl metis_ok is set to yes by CHECK_METIS
+if test "$with_interp_kernel_only" != "yes" ; then
     
-
-    echo  
-    echo --------------------------------------------- 
-    echo testing SCOTCH 
+    echo
     echo ---------------------------------------------
-    echo scotch_ok=no 
-    CHECK_SCOTCH 
-    dnl scotch_ok is set to yes by CHECK_SCOTCH	 
-
-
-    echo        
-    echo --------------------------------------------- 
-    echo testing LIBXML2
+    echo testing python
     echo ---------------------------------------------
-    echo libxml_ok=no 
-    CHECK_LIBXML 
-    dnl libxml_ok is set to yes by CHECK_LIBXML         
-
-fi
-
-AM_CONDITIONAL(MED_ENABLE_METIS, [test "$ENABLE_METIS" = yes])
-AM_CONDITIONAL(MED_ENABLE_SCOTCH, [test "$ENABLE_SCOTCH" = yes])
-
-dnl
-dnl ---------------------------------------------
-dnl testing MPI
-dnl ---------------------------------------------
-dnl
-
-CHECK_MPI
-#CHECK_MPICH
-AM_CONDITIONAL(MED_WITHMPI, [test "$WITHMPI" = yes])
-
-echo
-echo ---------------------------------------------
-echo Testing FVM library generators
-echo ---------------------------------------------
-echo
-
-CHECK_FVM
-AM_CONDITIONAL(MED_ENABLE_FVM, [test "$ENABLE_FVM" = yes])
-
-echo
-echo ---------------------------------------------
-echo Testing html generators
-echo ---------------------------------------------
-echo
-
-CHECK_HTML_GENERATORS
-
-if test "${MED_WITH_KERNEL}" = "yes"; then
-{
+    echo
+    
+    CHECK_PYTHON
+    
+    echo
+    echo ---------------------------------------------
+    echo testing swig
+    echo ---------------------------------------------
+    echo
+    
+    AM_PATH_PYTHON(2.3)
+    CHECK_SWIG
+    
+    echo
+    echo ---------------------------------------------
+    echo testing BOOST Library
+    echo ---------------------------------------------
+    echo
+    
+    CHECK_BOOST
+    
+    echo
+    echo ---------------------------------------------
+    echo checking SPLITTER
+    echo ---------------------------------------------
+    echo
+    
+    AC_ENABLE_SPLITTER(yes)
+    
+    if test "x$ENABLE_SPLITTER" = "xyes"; then
+        
+        echo  
+        echo --------------------------------------------- 
+        echo testing METIS 
+        echo ---------------------------------------------
+        echo 
+        metis_ok=no 
+        CHECK_METIS dnl metis_ok is set to yes by CHECK_METIS
+        
+        echo  
+        echo --------------------------------------------- 
+        echo testing SCOTCH 
+        echo ---------------------------------------------
+        echo scotch_ok=no 
+        CHECK_SCOTCH 
+        dnl scotch_ok is set to yes by CHECK_SCOTCH	 
+        
+        echo        
+        echo --------------------------------------------- 
+        echo testing LIBXML2
+        echo ---------------------------------------------
+        echo libxml_ok=no 
+        CHECK_LIBXML 
+        dnl libxml_ok is set to yes by CHECK_LIBXML         
+        
+    fi
+    
+    if test "${MED_WITH_KERNEL}" = "yes"; then
+        
         echo
         echo ---------------------------------------------
         echo testing OpenPBS
         echo ---------------------------------------------
         echo
-
+        
         CHECK_OPENPBS
-
+        
         echo
         echo ---------------------------------------------
         echo testing LSF
         echo ---------------------------------------------
         echo
-
+        
         CHECK_LSF
-
+        
 	dnl
 	dnl ---------------------------------------------
 	dnl testing sockets
 	dnl ---------------------------------------------
 	dnl
-
+        
 	CHECK_SOCKETS
-
+        
 	dnl
 	dnl ---------------------------------------------
 	dnl testing Batch
 	dnl ---------------------------------------------
 	dnl
-
+        
 	WITH_BATCH=no
 	test x$openpbs_ok = xyes || test x$lsf_ok = xyes && WITH_BATCH=yes
 	AC_SUBST(WITH_BATCH)
-
-	if test "${gui_ok}" = "yes"; then
-		echo
-		echo ---------------------------------------------
-		echo testing LEX \& YACC
-		echo ---------------------------------------------
-		echo
-
-		lex_yacc_ok=no
-		AC_PROG_YACC
-		AC_PROG_LEX
-		lex_yacc_ok=yes
-	fi
-
+        
 	echo
 	echo ---------------------------------------------
 	echo testing omniORB
 	echo ---------------------------------------------
 	echo
-
+        
 	CHECK_OMNIORB
-
-	echo
-	echo ---------------------------------------------
-	echo default ORB : omniORB
-	echo ---------------------------------------------
-	echo
-
+        
 	DEFAULT_ORB=omniORB
 	CHECK_CORBA
-
+        
 	AC_SUBST_FILE(CORBA)
 	corba=make_$ORB
 	CORBA=adm_local/unix/$corba
-
-	if test "${gui_ok}" = "yes"; then
-
-		echo
-		echo ---------------------------------------------
-		echo testing openGL
-		echo ---------------------------------------------
-		echo
-
-		CHECK_OPENGL
-
-		echo
-		echo ---------------------------------------------
-		echo testing QT
-		echo ---------------------------------------------
-		echo
-
-		CHECK_QT
-
-		echo
-		echo ---------------------------------------------
-		echo testing VTK
-		echo ---------------------------------------------
-		echo
-
-		CHECK_VTK
-
-		echo
-		echo ---------------------------------------------
-		echo Testing OpenCascade
-		echo ---------------------------------------------
-		echo
-
-		CHECK_CAS
-	fi
-
-	echo
-	echo ---------------------------------------------
-	echo Testing Kernel
-	echo ---------------------------------------------
-	echo
-
-	CHECK_KERNEL
-
+        
 	dnl echo
 	dnl echo ---------------------------------------------
 	dnl echo testing mico
 	dnl echo ---------------------------------------------
 	dnl echo
-
+        
 	dnl CHECK_MICO
-}
-else
-{
-	WITHIHM="no"
-	WITHOPENPBS="no"
-	
-	AC_SUBST(WITHIHM)
-	AC_SUBST(WITHOPENPBS)
-}
-fi # MED_WITH_KERNEL
+        
+	echo
+	echo ---------------------------------------------
+	echo testing SALOME Kernel
+	echo ---------------------------------------------
+	echo
+        
+	CHECK_KERNEL
+        
+        echo
+        echo ---------------------------------------------
+        echo testing SALOME GUI
+        echo ---------------------------------------------
+        echo
+        
+        CHECK_GUI_MODULE
+        
+        if test "${SalomeGUI_need}" != "no" -a "${FullGUI_ok}" = "yes" ; then 
+            gui_ok=yes
+        fi
+        
+        if test "${SalomeGUI_need}" == "yes"; then
+            if test "${FullGUI_ok}" != "yes"; then
+                AC_MSG_WARN(For configure MED module necessary full GUI!)
+            fi
+        elif test "${SalomeGUI_need}" == "auto"; then
+            if test "${FullGUI_ok}" != "yes"; then
+                AC_MSG_WARN(Full GUI not found. Build will be done without GUI!)
+            fi
+        elif test "${SalomeGUI_need}" == "no"; then
+            echo Build without GUI option has been chosen
+        fi
+        
+	if test "${gui_ok}" = "yes" ; then
+            
+            echo
+            echo ---------------------------------------------
+            echo testing LEX \& YACC
+            echo ---------------------------------------------
+            echo
+            
+            lex_yacc_ok=no
+            AC_PROG_YACC
+            AC_PROG_LEX
+            lex_yacc_ok=yes
+            
+            echo
+            echo ---------------------------------------------
+            echo testing openGL
+            echo ---------------------------------------------
+            echo
+            
+            CHECK_OPENGL
+            
+            echo
+            echo ---------------------------------------------
+            echo testing QT
+            echo ---------------------------------------------
+            echo
+            
+            CHECK_QT
+            
+            echo
+            echo ---------------------------------------------
+            echo testing VTK
+            echo ---------------------------------------------
+            echo
+            
+            CHECK_VTK
+            
+            echo
+            echo ---------------------------------------------
+            echo testing OpenCascade
+            echo ---------------------------------------------
+            echo
+            
+            CHECK_CAS
+            
+        fi # if "${gui_ok}" = "yes" ...
+        
+    fi # MED_WITH_KERNEL
+    
+fi # "$with_interp_kernel_only" != "yes" ...
+
+
+###
+# Additional substitutions
+###
+
+AC_SUBST(WITHIHM)
+AC_SUBST(WITHOPENPBS)      
+AC_SUBST(WITH_LSF)      
+
+###
+# Conditionals
+###
+
+AM_CONDITIONAL(MED_ENABLE_KERNEL,   [test "$MED_WITH_KERNEL" = yes])
+AM_CONDITIONAL(MED_ENABLE_MICROMED, [test "$with_interp_kernel_only" = yes])
+AM_CONDITIONAL(MED_ENABLE_GUI,      [test "${gui_ok}" = "yes"])
+AM_CONDITIONAL(MED_ENABLE_SSTREAM,  [test "$HAVE_SSTREAM" = yes])
+AM_CONDITIONAL(MED_SWIG_1_3_21,     [test "$SWIG_VERSION" = 1.3.21])
+AM_CONDITIONAL(MED_ENABLE_SPLITTER, [test "$ENABLE_SPLITTER" = yes])
+AM_CONDITIONAL(MED_ENABLE_METIS,    [test "$ENABLE_METIS" = yes])
+AM_CONDITIONAL(MED_ENABLE_SCOTCH,   [test "$ENABLE_SCOTCH" = yes])
+AM_CONDITIONAL(MED_WITHMPI,         [test "$WITHMPI" = yes])
+AM_CONDITIONAL(MED_ENABLE_FVM,      [test "$ENABLE_FVM" = yes])
+AM_CONDITIONAL(WITH_OPENPBS,        [test "$WITHOPENPBS" = yes])
+AM_CONDITIONAL(WITH_LSF,            [test "$WITH_LSF" = yes])
+AM_CONDITIONAL(MED_ENABLE_MED2,     [test "$med2_ok" = yes])
+
+###
+# Print summary
+###
 
 echo
 echo ---------------------------------------------
@@ -499,25 +535,48 @@ echo Summary
 echo ---------------------------------------------
 echo
 
-if test "$MED_WITH_KERNEL" = "no"; then 
-   echo "Configure (without Kernel)"
+if test "$with_interp_kernel_only" = "yes"; then 
+    echo "Configure (Micro MED)"
+elif test "$MED_WITH_KERNEL" = "no"; then 
+    echo "Configure (without Kernel)"
 else
-   echo Configure
+    echo Configure
 fi
 
-if test "${gui_ok}" = "yes"; then
-  variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok med2_ok omniORB_ok sip_ok pyqt_ok qwt_ok occ_ok doxygen_ok Kernel_ok gui_ok"
-elif test "${SalomeGUI_need}" != "no"; then
-  variables="cc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok doxygen_ok Kernel_ok gui_ok"
+obligatory_vars="cc_ok threads_ok doxygen_ok"
+optional_vars="mpi_ok fvm_ok cppunit_ok"
+gui_vars=""
+
+if test "x$ENABLE_SPLITTER" = "xyes" ; then
+  splitter_vars="metis_ok scotch_ok libxml_ok"
+fi
+
+if test "$MED_WITH_KERNEL" = "yes" ; then 
+    # --with-kernel=yes
+    obligatory_vars="$obligatory_vars python_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars"
+    optional_vars="$optional_vars openpbs_ok lsf_ok graphviz_ok Kernel_ok"
+    if test "${gui_ok}" = "yes"; then
+        # GUI is enabled
+        gui_vars="lex_yacc_ok OpenGL_ok qt_ok vtk_ok sip_ok pyqt_ok qwt_ok occ_ok gui_ok"
+    elif test "${SalomeGUI_need}" != "no"; then
+        gui_vars="gui_ok"
+    fi
 else
-  variables="cc_ok python_ok swig_ok threads_ok hdf5_ok med2_ok omniORB_ok doxygen_ok Kernel_ok"
+    # --with-kernel=no
+    if test "$with_interp_kernel_only" == "yes" ; then
+        # --with-interp-kernel-only=yes mode
+        optional_vars="$optional_vars hdf5_ok med2_ok"
+    else
+        # --with-interp-kernel-only=no mode
+        obligatory_vars="$obligatory_vars python_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars"
+    fi
 fi
 
-if test "x$ENABLE_SPLITTER" = "xyes"; then
-  variables="$variables metis_ok scotch_ok libxml_ok"
-fi
+###
+# obligatory products
+###
 
-for var in $variables
+for var in $obligatory_vars
 do
    eval toto=\$$var
    if test x$toto != "x"; then
@@ -526,16 +585,31 @@ do
    fi
 done
 
-dnl optional variables 
+###
+# GUI products (if enabled)
+###
+
+if test "$gui_vars" != "" ; then
+
+    echo "---GUI:"
+
+    for var in $gui_vars
+    do
+        eval toto=\$$var
+        if test x$toto != "x"; then
+        printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
+        eval echo \$$var
+    fi
+    done
+fi
+
+###
+# optional products
+###
 
 echo "---Optional:"
 
-variables="mpi_ok fvm_ok cppunit_ok"
-if test "${MED_WITH_KERNEL}" = "yes"; then
-   variables="$variables openpbs_ok lsf_ok graphviz_ok"
-fi
-
-for var in $variables
+for var in $optional_vars
 do
    eval toto=\$$var
    if test x$toto != "x"; then
@@ -544,9 +618,15 @@ do
    fi
 done
 
-echo
-echo "Default ORB   : $DEFAULT_ORB"
-echo
+###
+# default ORB (if enabled)
+###
+
+if test "$DEFAULT_ORB" != "" ; then
+   echo
+   echo "Default ORB   : $DEFAULT_ORB"
+   echo
+fi
 
 dnl We don t need to say when we re entering directories if we re using
 dnl GNU make becuase make does it for us.
