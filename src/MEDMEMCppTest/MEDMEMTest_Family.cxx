@@ -473,7 +473,10 @@ void MEDMEMTest::testFamily()
     // ? (BUG) ? Why _isOnAllElts is set to true only for nodes and cells. What about faces?
     //      _isOnAllElts = true ;
     // See MEDMEM_Family.cxx lines 118-119 and 386-387.
-    CPPUNIT_ASSERT(aFacesF7.isOnAllElements());
+    // -----------
+    // _isOnAllElts of FACE family must be false.
+    // For the reason see issue 0020305: [CEA - 332] family on all faces
+    CPPUNIT_ASSERT(!aFacesF7.isOnAllElements());
 //#endif
 
     CPPUNIT_ASSERT_EQUAL(2, aFacesF7.getNumberOfAttributes());
