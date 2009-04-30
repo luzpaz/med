@@ -26,19 +26,38 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-BASEIDL_FILES = MED.idl MED_Gen.idl ParaMEDMEMComponent.idl Compo1Py.idl MEDCouplingCorbaServant.idl MEDCouplingCorbaServantTest.idl
+BASEIDL_FILES = MED.idl MED_Gen.idl Compo1Py.idl MEDCouplingCorbaServant.idl MEDCouplingCorbaServantTest.idl
+
+MPIIDL_FILES = ParaMEDMEMComponent.idl
+
+IDL_FILES = $(BASEIDL_FILES)
+if MPI_IS_OK
+  IDL_FILES += $(MPIIDL_FILES)
+endif
 
 # This variable defines the files to be installed
-dist_salomeidl_DATA = $(BASEIDL_FILES)
+dist_salomeidl_DATA = $(IDL_FILES)
 
 # GUI idl common library
 lib_LTLIBRARIES = libSalomeIDLMED.la
 
 # Sources built from idl files
-nodist_libSalomeIDLMED_la_SOURCES = MEDSK.cc MED_GenSK.cc ParaMEDMEMComponentSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc MEDCouplingCorbaServantTestSK.cc
+BASEIDL_SOURCES = MEDSK.cc MED_GenSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc MEDCouplingCorbaServantTestSK.cc
+
+MPIIDL_SOURCES = ParaMEDMEMComponentSK.cc 
+
+IDL_SOURCES = $(BASEIDL_SOURCES)
+if MPI_IS_OK
+  IDL_SOURCES += $(MPIIDL_SOURCES)
+endif
+
+nodist_libSalomeIDLMED_la_SOURCES = $(IDL_SOURCES)
 
 # header files must be exported: other modules have to use this library
-nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh MEDCouplingCorbaServant.hh ParaMEDMEMComponent.hh Compo1Py.hh MEDCouplingCorbaServantTest.hh
+nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh MEDCouplingCorbaServant.hh Compo1Py.hh MEDCouplingCorbaServantTest.hh
+if MPI_IS_OK
+  nodist_salomeinclude_HEADERS += ParaMEDMEMComponent.hh 
+endif
 
 libSalomeIDLMED_la_CPPFLAGS =			\
 	-I$(top_builddir)/salome_adm/unix	\
