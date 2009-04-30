@@ -26,7 +26,7 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-BASEIDL_FILES = MED.idl MED_Gen.idl Compo1Py.idl MEDCouplingCorbaServant.idl MEDCouplingCorbaServantTest.idl
+BASEIDL_FILES = MED.idl MED_Gen.idl ParaMEDMEMComponent.idl Compo1Py.idl MEDCouplingCorbaServant.idl MEDCouplingCorbaServantTest.idl
 
 # This variable defines the files to be installed
 dist_salomeidl_DATA = $(BASEIDL_FILES)
@@ -35,10 +35,10 @@ dist_salomeidl_DATA = $(BASEIDL_FILES)
 lib_LTLIBRARIES = libSalomeIDLMED.la
 
 # Sources built from idl files
-nodist_libSalomeIDLMED_la_SOURCES = MEDSK.cc MED_GenSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc MEDCouplingCorbaServantTestSK.cc
+nodist_libSalomeIDLMED_la_SOURCES = MEDSK.cc MED_GenSK.cc ParaMEDMEMComponentSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc MEDCouplingCorbaServantTestSK.cc
 
 # header files must be exported: other modules have to use this library
-nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh MEDCouplingCorbaServant.hh Compo1Py.hh MEDCouplingCorbaServantTest.hh
+nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh MEDCouplingCorbaServant.hh ParaMEDMEMComponent.hh Compo1Py.hh MEDCouplingCorbaServantTest.hh
 
 libSalomeIDLMED_la_CPPFLAGS =			\
 	-I$(top_builddir)/salome_adm/unix	\
@@ -61,6 +61,10 @@ MED.hh : MEDSK.cc
 MED_GenSK.cc : MED_Gen.idl
 	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
 MED_Gen.hh : MED_GenSK.cc
+
+ParaMEDMEMComponentSK.cc : ParaMEDMEMComponent.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+ParaMEDMEMComponent.hh : ParaMEDMEMComponentSK.cc
 
 MEDCouplingCorbaServantSK.cc : MEDCouplingCorbaServant.idl
 	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<

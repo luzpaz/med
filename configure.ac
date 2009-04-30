@@ -697,6 +697,7 @@ AC_OUTPUT([ \
         ./src/MEDSPLITTER_Swig/Makefile \
 	./src/MULTIPR/Makefile \
 	./src/ParaMEDMEM/Makefile \
+ 	./src/ParaMEDMEMComponent/Makefile \
         ./src/ParaMEDMEM/MEDLoader/Makefile \
 	./src/ParaMEDMEM/Test/Makefile \
         ./src/ParaMEDMEM_Swig/Makefile \

@@ -1,0 +1,14 @@
+#ifndef _SALOME_PARAMEDMEMCOMPO_IDL_
+#define _SALOME_PARAMEDMEMCOMPO_IDL_
+
+#include "SALOME_Component.idl"
+#include "SALOME_MPIObject.idl"
+
+module SALOME_MED
+{
+  interface ParaMEDMEMComponent:Engines::Component,Engines::MPIObject
+  {
+  } ;
+} ;
+#endif
+
