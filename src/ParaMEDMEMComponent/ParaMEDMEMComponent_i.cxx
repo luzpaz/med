@@ -79,24 +79,14 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling, const bool
   // Creation of processors group for ParaMEDMEM
   if(source)
     {
-      for (int i=0; i<=_nbproc-1; i++)
-	procs.insert(i);
-      _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,procs,_gcom[coupling]);
-      procs.clear();
-      for (int i=_nbproc; i<=gsize-1; i++)
-	procs.insert(i);
-      _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,procs,_gcom[coupling]);
+      _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
+      _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_nbproc,gsize-1,_gcom[coupling]);
       _commgroup = _source[coupling];
     }
   else
     {
-      for (int i=0; i<=gsize-_nbproc-1; i++)
-	procs.insert(i);
-      _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,procs,_gcom[coupling]);
-      procs.clear();
-      for (int i=gsize-_nbproc; i<=gsize-1; i++)
-	procs.insert(i);
-      _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,procs,_gcom[coupling]);
+      _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,gsize-_nbproc-1,_gcom[coupling]);
+      _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,gsize-_nbproc,gsize-1,_gcom[coupling]);
       _commgroup = _target[coupling];
     }
   
