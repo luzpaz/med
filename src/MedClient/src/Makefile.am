@@ -75,7 +75,8 @@ libMEDClientcmodule_la_LDFLAGS  = ${KERNEL_LDFLAGS} -lOpUtil -lSalomeCommunicati
                                   ../../MEDMEM_I/libMEDMEMImpl.la ../../INTERP_KERNEL/libinterpkernel.la ../../MED/libMEDEngine.la
 
 _libMEDClient_la_CPPFLAGS = $(libMEDClientcmodule_la_CPPFLAGS)
-_libMEDClient_la_LDFLAGS  = $(PYTHON_LIBS) -module $(libMEDClientcmodule_la_LDFLAGS) libMEDClientcmodule.la
+_libMEDClient_la_LDFLAGS  = $(PYTHON_LIBS) -module $(libMEDClientcmodule_la_LDFLAGS)
+_libMEDClient_la_LIBADD   = libMEDClientcmodule.la
 
 SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../../MedCorba_Swig -I$(srcdir)/../../MEDMEM_SWIG
 SWIG_DEP   = $(srcdir)/../../MedCorba_Swig/libMedCorba_Swig.i $(srcdir)/../../MEDMEM_SWIG/libMEDMEM_Swig.i
