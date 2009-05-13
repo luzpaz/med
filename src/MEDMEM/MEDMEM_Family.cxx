@@ -395,7 +395,7 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
       
     // family on all ELEMENT ?
     if (_totalNumberOfElements == 
-        _mesh->getNumberOfElementsWithPoly(Entity,MED_ALL_ELEMENTS)/* && Entity==MED_EN::MED_CELL*/) {
+        _mesh->getNumberOfElementsWithPoly(Entity,MED_ALL_ELEMENTS) && Entity==MED_EN::MED_CELL) {
       _isOnAllElts = true ;
       // all others attributs are rights !
       for (int i=0; i<_numberOfGeometricType; i++)
