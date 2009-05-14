@@ -214,6 +214,23 @@ FIELD<double>* FIELD_::_getFieldSize() const
 	case MED_EDGE :
 	    p_field_size=getSupport()->getMesh()->getLength(getSupport() );
 	    break;
+        case MED_NODE : // issue 0020120: [CEA 206] normL2 on NODE field
+          {
+            SUPPORT volSupport(getSupport()->getMesh());
+	    switch (getSupport()->getMesh()->getMeshDimension() ) 
+	    {
+		case 1:
+		    p_field_size=getSupport()->getMesh()->getLength( &volSupport );
+		    break;
+		case 2:
+		    p_field_size=getSupport()->getMesh()->getArea( &volSupport );
+		    break;
+		case 3:
+		    p_field_size=getSupport()->getMesh()->getVolume( &volSupport );
+		    break;
+	    }
+	    break;
+          }
     }
     return p_field_size;
 }
@@ -224,15 +241,31 @@ FIELD<double>* FIELD_::_getFieldSize() const
   Check up the compatibility of field before computing sobolev norm 
   \endif
 */
-void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume) const throw (MEDEXCEPTION)
+void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
+                                     const bool           nodalAllowed) const throw (MEDEXCEPTION)
 {
     string diagnosis;
 
-    if( getSupport()->getEntity() == MED_NODE )
+    if( getSupport()->getEntity() == MED_NODE)
     {
+      if ( !nodalAllowed )
+      {
 	diagnosis="Cannot compute sobolev norm on a field "+getName()+
 	    " : it has support on nodes!";
 	throw MEDEXCEPTION(diagnosis.c_str());
+      }
+      if ( !getSupport()->getMesh() )
+      {
+        diagnosis="Cannot compute Lnorm of nodal field "+getName()+
+          " : it's support has no mesh reference";
+          throw MEDEXCEPTION(diagnosis.c_str());
+      }
+      if ( !getSupport()->getMesh()->existConnectivity(MED_NODAL,MED_CELL) )
+      {
+        diagnosis="Cannot compute Lnorm of nodal field"+getName()+
+          " : it's supporting mesh has no nodal connectivity data";
+          throw MEDEXCEPTION(diagnosis.c_str());
+      }
     }
 	
     if (getNumberOfValues()*getNumberOfComponents()<= 0) // Size of array has to be strictly positive
@@ -256,6 +289,17 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume) const 
 
     if(support_volume) // if the user has supplied the volume
     {
+      if ( getSupport()->getEntity() == MED_NODE )
+      {
+        if (support_volume->getNumberOfValues()!=
+            getSupport()->getMesh()->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS))
+        {
+          diagnosis="Cannot compute Lnorm of nodal field "+getName()+
+	    " : the volume furnished has wrong number of values";
+          throw MEDEXCEPTION(diagnosis.c_str());
+        }
+        return;
+      }
 	if(support_volume->getSupport()!=getSupport())
 	{
 	    diagnosis="Cannot compute Lnorm of "+getName()+
