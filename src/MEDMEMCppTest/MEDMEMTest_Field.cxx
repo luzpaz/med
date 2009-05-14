@@ -1069,9 +1069,6 @@ void MEDMEMTest::testField()
   aSubSupport1->setpartial("Support for sub-field 1 on one type of elements",
                            nbTypes1, nbElems1, aGeomTypes1, nbElemsInEachType1, anElems1);
 
-  //cout << "aSubSupport1:" << endl;
-  //cout << *aSubSupport1 << endl;
-
   // extract sub-field on aSubSupport1
   FIELD<double, FullInterlace> * aSubField1 = aFieldOnGroup1->extract(aSubSupport1);
   CPPUNIT_ASSERT_EQUAL(nbElems1 * /*NumberOfComponents = */2, aSubField1->getValueLength());
@@ -1090,12 +1087,7 @@ void MEDMEMTest::testField()
   CPPUNIT_ASSERT_DOUBLES_EQUAL(2.44949, area2, 0.00001);
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(210.5, aSubField1->normL2(1), 0.00001); // (14*14 + 15*15)/2
-  //#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) FIELD::normL2(int component, const FIELD * p_field_volume):
-  //       component is not taken into account
-  //TODO:: implement for each interlace w/o conversion
   CPPUNIT_ASSERT_DOUBLES_EQUAL(132.5, aSubField1->normL2(2), 0.00001); // (12*12 + 11*11)/2
-  //#endif
   CPPUNIT_ASSERT_DOUBLES_EQUAL(343.0, aSubField1->normL2() , 0.00001); // 210.5 + 132.5
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(14.5, aSubField1->normL1(1), 0.00001); // (14 + 15)/2
@@ -1106,17 +1098,64 @@ void MEDMEMTest::testField()
   anAreaField->setValue(aNewArea);
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(196.0, aSubField1->normL2(1, anAreaField), 0.00001); // 14*14/1
-  //#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) FIELD::normL2(int component, const FIELD * p_field_volume):
-  //       component is not taken into account
-  //TODO:: implement for each interlace w/o conversion
   CPPUNIT_ASSERT_DOUBLES_EQUAL(144.0, aSubField1->normL2(2, anAreaField), 0.00001); // 12*12/1
-  //#endif
   CPPUNIT_ASSERT_DOUBLES_EQUAL(340.0, aSubField1->normL2(anAreaField) , 0.00001); // 196 + 144
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(14.0, aSubField1->normL1(1, anAreaField), 0.00001); // 14/1
   CPPUNIT_ASSERT_DOUBLES_EQUAL(12.0, aSubField1->normL1(2, anAreaField), 0.00001); // 12/1
   CPPUNIT_ASSERT_DOUBLES_EQUAL(26.0, aSubField1->normL1(anAreaField) , 0.00001); // 14 + 12
+
+  // check normL2() on nodal field (issue 0020120)
+  {
+    // read nodal field from pointe_import22.med
+    string data_dir  = getenv("MED_ROOT_DIR");
+    string filename  = data_dir + "/share/salome/resources/med/pointe_import22.med";
+    string fieldname = "fieldnodedouble";
+    string meshname  = "maa1";
+    FIELD<double> nodalField( MED_DRIVER, filename, fieldname);
+    MESH mesh( MED_DRIVER, filename, meshname);
+    nodalField.getSupport()->setMesh( &mesh );
+
+    // make a field on the nodes of first cell only
+    SUPPORT oneCellNodesSup(&mesh, "Sub-Support of nodes of 1 cell", MED_NODE);
+    int NumberOfElements[] = { mesh.getTypes(MED_CELL)[0]%100 };
+    medGeometryElement GeometricType[] = { MED_POINT1 };
+    oneCellNodesSup.setpartial("Support for sub-field of one cell nodes",
+                               /*NumberOfGeometricType=*/1,
+                               /*TotalNumberOfElements=*/ *NumberOfElements,
+                               GeometricType,
+                               NumberOfElements,
+                               /*NumberValue=*/ mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,
+                                                                     MED_CELL,MED_ALL_ELEMENTS ));
+    FIELD<double, FullInterlace> * oneCellNodesField = nodalField.extract( &oneCellNodesSup );
+
+    // compute normL2 by avarage nodal value on the cell
+
+    SUPPORT allCellsSupport( &mesh );
+    FIELD<double>* volumeField = mesh.getVolume(&allCellsSupport);
+    // mdump output:
+    // - Mailles de type MED_TETRA4 : 
+    //  [     1 ] :          1          2          3          6
+    // - Valeurs :
+    // | 1.000000 | 1.000000 | 1.000000 | 2.000000 | 2.000000 | 2.000000 | ...
+    const double cellVal = ( 1.000000 + 1.000000 + 1.000000 + 2.000000 ) / 4;
+    const double vol = abs( volumeField->getValueIJ( 1, 1 ));
+    const double norm = cellVal*cellVal*vol/vol; // v*v*vol/totVol;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(norm, oneCellNodesField->normL2(), 0.000001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(norm, oneCellNodesField->normL2(1), 0.000001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(norm, oneCellNodesField->normL2(volumeField), 0.000001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(norm, oneCellNodesField->normL2(1, volumeField), 0.000001);
+
+    CPPUNIT_ASSERT_THROW(oneCellNodesField->normL1(), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(oneCellNodesField->normL1(1), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(oneCellNodesField->normL2(&nodalField), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(oneCellNodesField->normL2(anAreaField), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(oneCellNodesField->normL2(aSubField1), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(oneCellNodesField->normL2(aFieldOnGroup1), MEDEXCEPTION);
+
+    delete volumeField;
+    delete oneCellNodesField;
+  }
 
   // applyPow
   aSubField1->applyPow(2.);
