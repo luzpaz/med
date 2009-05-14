@@ -342,7 +342,8 @@ protected:
   vector<GENDRIVER *> _drivers; // Storage of the drivers currently in use
   static void _checkFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true) throw (MEDEXCEPTION);
   static void _deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true) throw (MEDEXCEPTION);
-  void _checkNormCompatibility(const FIELD<double>* p_field_volume=NULL) const  throw (MEDEXCEPTION);
+  void _checkNormCompatibility(const FIELD<double>* p_field_volume=NULL,
+                               const bool           nodalAllowed = false) const  throw (MEDEXCEPTION);
   FIELD<double>* _getFieldSize() const;
 
 public:
@@ -2396,12 +2397,13 @@ FIELD<T, INTERLACING_TAG>::scalarProduct(const FIELD & m, const FIELD & n, bool 
 /*!  Return L2 Norm  of the field's component.
  *   Cannot be applied to a field with a support on nodes.
  *   If the optional p_field_volume argument is furnished, the volume is not re-calculated.
+ *   For the nodal field, p_field_volume must be for all cells even if the field is partial.
  */
 template <class T, class INTERLACING_TAG>
 double FIELD<T, INTERLACING_TAG>::normL2(int component,
 					 const FIELD<double, FullInterlace> * p_field_volume) const
 {
-    _checkNormCompatibility(p_field_volume); // may throw exception
+    _checkNormCompatibility(p_field_volume, /*nodalAllowed=*/true); // may throw exception
     if ( component<1 || component>getNumberOfComponents() )
 	throw MEDEXCEPTION(STRING("FIELD<T>::normL2() : The component argument should be between 1 and the number of components"));
 
@@ -2418,73 +2420,63 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
     double integrale=0.0;
     double totVol=0.0;
 
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
-      const T* value = getValue();
-      value = value + (component-1) * getNumberOfValues();
-      const T* lastvalue = value + getNumberOfValues(); // pointing just after the end of column
-      for (; value!=lastvalue ; ++value ,++vol) {
-	integrale += double((*value) * (*value)) * std::abs(*vol);
+    if ( getSupport()->getEntity() == MED_NODE ) // issue 20120: [CEA 206] normL2 on NODE field
+    {
+      //Most frequently the FIELD is on the whole mesh and
+      // there is no need in optimizing iterations from supporting nodes-> back to cells,
+      // so we iterate just on all cells
+      MESH * mesh = getSupport()->getMesh();
+      const int nbCells = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
+      const int *C = mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+      const int *iC = mesh->getConnectivityIndex(MED_NODAL,MED_CELL);
+      for (int i = 0; i < nbCells; ++i, ++vol) {
+        // calculate integral on current element as average summ of values on all it's nodes
+        double curCellValue = 0;
+        try { // we expect exception with partial fields for nodes w/o values
+          for (int ij = iC[i]; ij < iC[i+1]; ij++) {
+            int node = C[ij-1];
+            curCellValue += getValueIJ( node, component );
+          }
+        }
+        catch ( MEDEXCEPTION ) {
+          continue;
+        }
+	int nbNodes = iC[i+1]-iC[i];
+	curCellValue /= nbNodes;
+	integrale += (curCellValue * curCellValue) * std::abs(*vol);
 	totVol+=std::abs(*vol);
       }
     }
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-      ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
-      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
-      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
-      //    integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*vol) );
-      //    totVol+=*vol;
-      //  }
-      //}
-      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
-        integrale += anArray->getIJ(i,component) * anArray->getIJ(i,component) * std::abs(*vol);
-        totVol+=std::abs(*vol);
+    else
+    {
+      if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+        const T* value = getValue();
+        value = value + (component-1) * getNumberOfValues();
+        const T* lastvalue = value + getNumberOfValues(); // pointing just after the end of column
+        for (; value!=lastvalue ; ++value ,++vol) {
+	  integrale += double((*value) * (*value)) * std::abs(*vol);
+	  totVol+=std::abs(*vol);
+        }
       }
-      //delete anArray;
-    }
-    else { // FULL_INTERLACE
-      ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
-      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
-      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
-      //for (int j=1; j<= anArray->getDim(); j++ ) {
-      //  for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
-      //    integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*vol) );
-      //    totVol+=*vol;
-      //  }
-      //}
-      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
-        integrale += anArray->getIJ(i,component) * anArray->getIJ(i,component) * std::abs(*vol);
-        totVol+=std::abs(*vol);
+      else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+        ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+        for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+          integrale += anArray->getIJ(i,component) * anArray->getIJ(i,component) * std::abs(*vol);
+          totVol+=std::abs(*vol);
+        }
       }
-      //delete anArray;
+      else { // FULL_INTERLACE
+        ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+        for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+          integrale += anArray->getIJ(i,component) * anArray->getIJ(i,component) * std::abs(*vol);
+          totVol+=std::abs(*vol);
+        }
+      }
     }
-
-    //const T * value     = NULL;
-    //ArrayNo * myArray   = NULL;
-    //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-    //  value = getValue();
-    //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-    //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-    //  value   = myArray->getPtr();
-    //}
-    //else {
-    //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-    //  value   = myArray->getPtr();
-    //}
-    
-    //value = value + (component-1) * getNumberOfValues();
-    //const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
-
-    //double integrale=0.0;
-    //double totVol=0.0;
-    //for (; value!=lastvalue ; ++value ,++vol)
-    //{
-    //integrale += static_cast<double>((*value) * (*value)) * (*vol);
-    //totVol+=*vol;
-    //}
 
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -2492,16 +2484,16 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
 }
 
 /*!  Return L2 Norm  of the field.
- *   Cannot be applied to a field with a support on nodes.
  *   If the optional p_field_volume argument is furnished, the volume is not re-calculated.
+ *   For the nodal field, p_field_volume must be for all cells even if the field is partial.
  */
 template <class T, class INTERLACING_TAG>
 double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_field_volume) const
 {
-    _checkNormCompatibility(p_field_volume); // may throw exception
+    _checkNormCompatibility(p_field_volume, /*nodalAllowed=*/true); // may throw exception
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃ©mentation dans mesh]
+	p_field_size=_getFieldSize(); // we calculate the volume
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
@@ -2510,66 +2502,74 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
 
     double integrale=0.0;
     double totVol=0.0;
-    const double* p_vol=vol;
-    for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
+
+    if ( getSupport()->getEntity() == MED_NODE ) // issue 20120: [CEA 206] normL2 on NODE field
+    {
+      //Most frequently the FIELD is on the whole mesh and
+      // there is no need in optimizing iterations from supporting nodes-> back to cells,
+      // so we iterate just on all cells
+      MESH * mesh = getSupport()->getMesh();
+      const int nbCells = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
+      const int *C = mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+      const int *iC = mesh->getConnectivityIndex(MED_NODAL,MED_CELL);
+      int nbComp = getNumberOfComponents();
+      for (int i = 0; i < nbCells; ++i, ++vol) {
+        // calculate integral on current element as average summ of values on all it's nodes
+	int nbNodes = iC[i+1]-iC[i];
+        vector< double > curCellValue( nbComp, 0 );
+        try { // we expect exception with partial fields for nodes w/o values
+          for (int ij = iC[i]; ij < iC[i+1]; ij++) {
+            int node = C[ij-1];
+            for ( int j = 0; j < nbComp; ++j )
+              curCellValue[ j ] += getValueIJ( node, j+1 ) / nbNodes;
+          }
+        }
+        catch ( MEDEXCEPTION ) {
+          continue;
+        }
+
+        for ( int j = 0; j < nbComp; ++j ) {
+          integrale += (curCellValue[j] * curCellValue[j]) * std::abs(*vol);
+        }
+        totVol+=std::abs(*vol);
+      }
+    }
+    else
+    {
+      const double* p_vol=vol;
+      for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
 	totVol+=std::abs(*p_vol);
 
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
-      const T* value = getValue();
-      for (int i=1; i<=getNumberOfComponents(); ++i) { // compute integral on all components
-	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) {
-          integrale += (*value) * (*value) * std::abs(*p_vol);
+      if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+        const T* value = getValue();
+        for (int i=1; i<=getNumberOfComponents(); ++i) { // compute integral on all components
+	  for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) {
+            integrale += (*value) * (*value) * std::abs(*p_vol);
+          }
+        }
+      }
+      else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+        ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+        for (int j=1; j<=anArray->getDim(); j++) {
+          int i = 1;
+          for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+            integrale += anArray->getIJ(i,j) * anArray->getIJ(i,j) * std::abs(*p_vol);
+          }
+        }
+      }
+      else { // FULL_INTERLACE
+        ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+        for (int j=1; j<=anArray->getDim(); j++) {
+          int i = 1;
+          for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+            integrale += anArray->getIJ(i,j) * anArray->getIJ(i,j) * std::abs(*p_vol);
+          }
         }
       }
     }
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-      ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
-      for (int j=1; j<=anArray->getDim(); j++) {
-        int i = 1;
-        for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
-          integrale += anArray->getIJ(i,j) * anArray->getIJ(i,j) * std::abs(*p_vol);
-        }
-      }
-      //delete anArray;
-    }
-    else { // FULL_INTERLACE
-      ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
-      for (int j=1; j<=anArray->getDim(); j++) {
-        int i = 1;
-        for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
-          integrale += anArray->getIJ(i,j) * anArray->getIJ(i,j) * std::abs(*p_vol);
-        }
-      }
-      //delete anArray;
-    }
-
-
-    //const T * value     = NULL;
-    //ArrayNo * myArray   = NULL;
-    //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-    //  value = getValue();
-    //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ){
-    //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-    //  value   = myArray->getPtr();
-    //}
-    //else {
-    //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-    //  value   = myArray->getPtr();
-    //}
-
-    //double totVol=0.0;
-    //const double* p_vol=vol;
-    //for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
-    //totVol+=*p_vol;
-
-    //double integrale=0.0;
-    //for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
-    //for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
-    //    integrale += static_cast<double>((*value) * (*value)) * (*p_vol);
-
     if(!p_field_volume) // if the user didn't supply the volume
 	delete p_field_size; // delete temporary volume field
-    //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+
     if( totVol <= 0)
 	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
@@ -2577,7 +2577,6 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
 }
 
 /*!  Return L1 Norm  of the field's component.
- *   Cannot be applied to a field with a support on nodes.
  *   If the optional p_field_volume argument is furnished, the volume is not re-calculated.
  */
 template <class T, class INTERLACING_TAG>
@@ -2586,7 +2585,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
 {
     _checkNormCompatibility(p_field_volume); // may throw exception
     if ( component<1 || component>getNumberOfComponents() )
-	throw MEDEXCEPTION(STRING("FIELD<T,INTERLACING_TAG>::normL2() : The component argument should be between 1 and the number of components"));
+	throw MEDEXCEPTION(STRING("FIELD<T,INTERLACING_TAG>::normL1() : The component argument should be between 1 and the number of components"));
 
     const FIELD<double,FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
