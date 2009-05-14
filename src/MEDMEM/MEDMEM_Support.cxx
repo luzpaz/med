@@ -307,7 +307,7 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
       iThis++;
 
   //if (!_isOnAllElts)
-  cout << "----Contenu du skyline : ---------------------" << *_number << endl;
+  //cout << "----Contenu du skyline : ---------------------" << *_number << endl;
 
   if(!found)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find the global number |"
@@ -431,8 +431,8 @@ and five MED_POLYGON, the number of the first polygonal element is 11.
 //-------------------
 void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
 			 int TotalNumberOfElements,
-												 MED_EN::medGeometryElement *GeometricType,
-			 int *NumberOfElements, int *NumberValue)
+                         MED_EN::medGeometryElement *GeometricType,
+			 const int *NumberOfElements, const int *NumberValue)
 //-------------------
 {
   const char * LOC = "SUPPORT::setpartial(string , int , int , medGeometryElement * , int * , int *) : " ;
