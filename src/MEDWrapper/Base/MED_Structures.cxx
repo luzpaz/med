@@ -26,6 +26,8 @@
 #include "MED_Structures.hxx"
 #include "MED_Utilities.hxx"
 
+#include <cstring>
+
 using namespace MED;
 
 namespace MED

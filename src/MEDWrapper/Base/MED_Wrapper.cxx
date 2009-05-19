@@ -26,6 +26,8 @@
 #include "MED_Wrapper.hxx"
 #include "MED_Utilities.hxx"
  
+#include <boost/version.hpp>
+
 #ifdef _DEBUG_
 static int MYDEBUG = 0;
 static int MYVALUEDEBUG = 0;

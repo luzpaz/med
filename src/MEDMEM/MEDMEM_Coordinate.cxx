@@ -25,6 +25,8 @@
 
 #include "MEDMEM_Utilities.hxx"
 
+#include <cstring>
+
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;

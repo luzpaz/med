@@ -23,6 +23,7 @@
 # define __PointerOf_HXX__
 
 #include <cstdlib>
+#include <cstring>
 #include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_Exception.hxx"
 

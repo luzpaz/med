@@ -29,6 +29,8 @@
 #include "MEDMEM_PointerOf.hxx"
 #include "MEDMEM_define.hxx"
 
+#include <cstring>
+
 namespace MEDMEM {
   class MEDSKYLINEARRAY;
   ostream& operator<<(ostream &os, const MEDSKYLINEARRAY &sky);
