@@ -29,7 +29,7 @@ AC_INIT([Salome2 Project MED module], [4.1.5], [webmaster.salome@opencascade.com
 AC_CONFIG_AUX_DIR(salome_adm/unix/config_files)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([-Wno-portability])
 
 XVERSION=`echo $VERSION | awk -F. '{printf("0x%02x%02x%02x",$1,$2,$3)}'`
 AC_SUBST(XVERSION)
@@ -593,75 +593,75 @@ AC_OUTPUT_COMMANDS([ \
 ])
 
 AC_OUTPUT([ \
-	./salome_adm/unix/SALOMEconfig.h \
-	./adm_local_without_kernel/unix/sstream \
+	salome_adm/unix/SALOMEconfig.h \
+	adm_local_without_kernel/unix/sstream \
 	Makefile \
-	./MED_version.h \
-	./adm_local/unix/config_files/Makefile \
-        ./adm_local/unix/Makefile \
-	./adm_local/Makefile \
-	./adm_local_without_kernel/unix/config_files/Makefile \
-        ./adm_local_without_kernel/unix/Makefile \
-	./adm_local_without_kernel/Makefile \
-	./resources/Makefile
-	./resources/MEDCatalog.xml \
-	./bin/Makefile \
-	./bin/VERSION \
-	./idl/Makefile \
-	./src/Makefile \
-	./src/MEDWrapper/Makefile \
-	./src/MEDWrapper/Base/Makefile \
-	./src/MEDWrapper/Factory/Makefile \
-	./src/MEDWrapper/V2_1/Makefile \
-	./src/MEDWrapper/V2_1/Core/Makefile \
-	./src/MEDWrapper/V2_1/Wrapper/Makefile \
-	./src/MEDWrapper/V2_2/Makefile \
-	./src/MEDMEM/Doxyfile_med_devel \
-	./src/MEDMEM/Doxyfile_med_user \
-	./src/MEDMEM/Makefile \
-	./src/INTERPOLATION/Makefile \
-	./src/MEDMEM_SWIG/Makefile \
-	./src/MEDMEMBinTest/Makefile \
-	./src/MEDMEMCppTest/Makefile \
-	./src/MEDSPLITTER/Makefile \
-	./src/MEDSPLITTER/Test/Makefile \
-	./src/MULTIPR/Makefile \
-	./src/MEDMEM_I/Makefile \
-	./src/MED/Makefile \
-	./src/MedCorba_Swig/Makefile \
-	./src/MED_SWIG/Makefile \
-	./src/MedClient/Makefile \
-	./src/MedClient/src/Makefile \
-	./src/MedClient/test/Makefile \
-	./src/MedClient/test/environ/Makefile \
-	./src/MedClient/test/environ/runContainer \
-	./src/MedClient/test/environ/runEnvironTests \
-	./src/MedClient/test/environ/runTestMedCorba \
-	./src/MedClient/test/environ/stopContainer \
-	./src/MedClient/test/environ/csh/init1 \
-	./src/MedClient/test/environ/csh/init2 \
-	./src/MedClient/test/environ/csh/init3 \
-	./src/MedClient/test/environ/csh/Makefile \
-	./src/MedClient/test/environ/csh/runContainer \
-	./src/MedClient/test/environ/csh/runEnvironTests \
-	./src/MedClient/test/environ/csh/stopContainer \
-	./src/MedClient/test/test1/Makefile \
-	./src/MedClient/test/test2/Makefile \
-	./src/MEDGUI/Makefile \
-	./doc/Makefile \
-	./doc/MEDMEM/Makefile \
-	./doc/MEDMEM/MEDMEM_Content.tex \
-	./doc/MEDMEM/MEDMEM_UML_light.png \
-	./doc/MEDMEM/MEDMEM_UML.png \
-	./doc/MEDMEM/MEDMEM_UsersGuide.tex \
-	./doc/salome/Makefile \
-	./doc/salome/tui/Makefile \
-	./doc/salome/tui/MED/Makefile \
-	./doc/salome/tui/MED/sources/Makefile \
-	./doc/salome/tui/MED/sources/static/Makefile \
-	./doc/salome/tui/MED/doxyfile \
-	./doc/salome/tui/MED/sources/static/tree.js
+	MED_version.h \
+	adm_local/unix/config_files/Makefile \
+        adm_local/unix/Makefile \
+	adm_local/Makefile \
+	adm_local_without_kernel/unix/config_files/Makefile \
+        adm_local_without_kernel/unix/Makefile \
+	adm_local_without_kernel/Makefile \
+	resources/Makefile
+	resources/MEDCatalog.xml \
+	bin/Makefile \
+	bin/VERSION \
+	idl/Makefile \
+	src/Makefile \
+	src/MEDWrapper/Makefile \
+	src/MEDWrapper/Base/Makefile \
+	src/MEDWrapper/Factory/Makefile \
+	src/MEDWrapper/V2_1/Makefile \
+	src/MEDWrapper/V2_1/Core/Makefile \
+	src/MEDWrapper/V2_1/Wrapper/Makefile \
+	src/MEDWrapper/V2_2/Makefile \
+	src/MEDMEM/Doxyfile_med_devel \
+	src/MEDMEM/Doxyfile_med_user \
+	src/MEDMEM/Makefile \
+	src/INTERPOLATION/Makefile \
+	src/MEDMEM_SWIG/Makefile \
+	src/MEDMEMBinTest/Makefile \
+	src/MEDMEMCppTest/Makefile \
+	src/MEDSPLITTER/Makefile \
+	src/MEDSPLITTER/Test/Makefile \
+	src/MULTIPR/Makefile \
+	src/MEDMEM_I/Makefile \
+	src/MED/Makefile \
+	src/MedCorba_Swig/Makefile \
+	src/MED_SWIG/Makefile \
+	src/MedClient/Makefile \
+	src/MedClient/src/Makefile \
+	src/MedClient/test/Makefile \
+	src/MedClient/test/environ/Makefile \
+	src/MedClient/test/environ/runContainer \
+	src/MedClient/test/environ/runEnvironTests \
+	src/MedClient/test/environ/runTestMedCorba \
+	src/MedClient/test/environ/stopContainer \
+	src/MedClient/test/environ/csh/init1 \
+	src/MedClient/test/environ/csh/init2 \
+	src/MedClient/test/environ/csh/init3 \
+	src/MedClient/test/environ/csh/Makefile \
+	src/MedClient/test/environ/csh/runContainer \
+	src/MedClient/test/environ/csh/runEnvironTests \
+	src/MedClient/test/environ/csh/stopContainer \
+	src/MedClient/test/test1/Makefile \
+	src/MedClient/test/test2/Makefile \
+	src/MEDGUI/Makefile \
+	doc/Makefile \
+	doc/MEDMEM/Makefile \
+	doc/MEDMEM/MEDMEM_Content.tex \
+	doc/MEDMEM/MEDMEM_UML_light.png \
+	doc/MEDMEM/MEDMEM_UML.png \
+	doc/MEDMEM/MEDMEM_UsersGuide.tex \
+	doc/salome/Makefile \
+	doc/salome/tui/Makefile \
+	doc/salome/tui/MED/Makefile \
+	doc/salome/tui/MED/sources/Makefile \
+	doc/salome/tui/MED/sources/static/Makefile \
+	doc/salome/tui/MED/doxyfile \
+	doc/salome/tui/MED/sources/static/tree.js
 ])
 
 dnl To avoid recompiling half of the sources because of SALOMEconfig.h recreating
-touch -d 01Jan2007 ./salome_adm/unix/SALOMEconfig.h
+touch -d 01Jan2007 salome_adm/unix/SALOMEconfig.h
