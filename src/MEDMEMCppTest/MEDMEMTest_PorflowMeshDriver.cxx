@@ -78,9 +78,8 @@ void MEDMEMTest::testPorflowMeshDriver()
   MESH *aMesh                      = new MESH();
   MESH *aMesh_1                    = new MESH();
 
-  string data_dir                  = getenv("MED_ROOT_DIR");
   string tmp_dir                   = getTmpDirectory();
-  string filename_rd               = data_dir + "/share/salome/resources/med/Case1.inp";
+  string filename_rd               = getResourceFile("Case1.inp");
   string filename_wr               = tmp_dir  + "/myWr_Case1.inp";
   string meshname                  = "Case1";
   string newmeshname               = "new" + meshname;
@@ -88,8 +87,8 @@ void MEDMEMTest::testPorflowMeshDriver()
   string fileNotExistsName_wr      = "/path_not_exists/file_not_exists.inp";
   string filename_rdwr             =  tmp_dir  + "/myRdWr_Case1.inp";
   string fcopy                     = "cp " + filename_rd  + " " + filename_rdwr;
-  string fcopy1                    = "cp " + data_dir + "/share/salome/resources/med/Case1.xyz" + " " + tmp_dir + "/Case1.xyz";
-  string fcopy2                    = "cp " + data_dir + "/share/salome/resources/med/Case1.cnc" + " " + tmp_dir + "/Case1.cnc";
+  string fcopy1                    = "cp " + getResourceFile("Case1.xyz") + " " + tmp_dir + "/Case1.xyz";
+  string fcopy2                    = "cp " + getResourceFile("Case1.cnc") + " " + tmp_dir + "/Case1.cnc";
 
   //Copy files in the TMP dir for testing READ/WRITE case
   system(fcopy.data());

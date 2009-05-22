@@ -75,9 +75,8 @@ void MEDMEMTest::testMedMeshDriver22()
   MESH *aMesh                      = new MESH();
   MESH *aMesh_1                    = new MESH();
 
-  string data_dir                  = getenv("MED_ROOT_DIR");
   string tmp_dir                   = getTmpDirectory();
-  string filename_rd               = data_dir + "/share/salome/resources/med/pointe_import22.med";
+  string filename_rd               = getResourceFile("pointe_import22.med");
   string filename_wr               = tmp_dir  + "/myWr_pointe22.med";
   string tmpfile                   = tmp_dir  + "/tmp.med";
   string meshname                  = "maa1";

@@ -561,13 +561,12 @@ void proj2d (const double * temp, double* output)
 
 void testDrivers()
 {
-  string data_dir                     = getenv("MED_ROOT_DIR");
   string tmp_dir                      = getTmpDirectory();
 
-  string filename_rd                  = data_dir + "/share/salome/resources/med/pointe.med";
+  string filename_rd                  = getResourceFile("pointe.med");
   string filename_wr                  = tmp_dir  + "/myMedFieldfile.med";
   string filename_support_wr          = tmp_dir  + "/myMedSupportFiledfile.med";
-  string filename22_rd                = data_dir + "/share/salome/resources/med/pointe_import22.med";
+  string filename22_rd                = getResourceFile("pointe_import22.med");
   string filenamevtk_wr                = tmp_dir  + "/myMedFieldfile22.vtk";
   string cp_file                      = "cp " + filename_rd + " " + filename_wr;
 
@@ -1108,8 +1107,7 @@ void MEDMEMTest::testField()
   // check normL2() on nodal field (issue 0020120)
   {
     // read nodal field from pointe_import22.med
-    string data_dir  = getenv("MED_ROOT_DIR");
-    string filename  = data_dir + "/share/salome/resources/med/pointe_import22.med";
+    string filename  = getResourceFile("pointe_import22.med");
     string fieldname = "fieldnodedouble";
     string meshname  = "maa1";
     FIELD<double> nodalField( MED_DRIVER, filename, fieldname);

@@ -19,6 +19,9 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
+#include "MEDMEMTest_Utils.hxx"
+
 #include <string>
 #include <iostream>
 
@@ -37,8 +40,7 @@ int main(int argc, char** argv)
 {
   cout<<"test start"<<endl;
 
-  string datadir  = getenv("MED_ROOT_DIR");
-  std::string filename = datadir + "/share/salome/resources/med/pointe_import22.med";
+  std::string filename = getResourceFile("pointe_import22.med");
 
   med_2_3::med_idt medIdt = med_2_3::MEDouvrir( (const_cast <char *> (filename.c_str())),
                                                  med_2_3::MED_LECTURE_ECRITURE);

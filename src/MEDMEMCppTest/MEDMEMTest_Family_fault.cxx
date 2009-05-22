@@ -23,14 +23,14 @@
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_Mesh.hxx"
+#include "MEDMEMTest_Utils.hxx"
 
 using namespace std;
 using namespace MEDMEM;
 
 int main (int argc, char** argv)
 {
-  string datadir  = getenv("MED_ROOT_DIR");
-  string filename = datadir + "/share/salome/resources/med/pointe.med";
+  string filename = getResourceFile("pointe.med");
   string meshname = "maa1";
 
   MESH * aMesh = new MESH();

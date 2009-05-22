@@ -51,9 +51,8 @@ using namespace MED_EN;
 void MEDMEMTest::testVtkMedDriver()
 {
   MED *aMed                = new MED();
-  string data_dir          = getenv("MED_ROOT_DIR");
   string tmp_dir           = getTmpDirectory();
-  string filename_rd       = data_dir + "/share/salome/resources/med/pointe.med";
+  string filename_rd       = getResourceFile("pointe.med");
   string emptyfilename     = "";
   string fileNotExistsName = "/path_not_exists/file_not_exists.vtk";
   string filename_wr       =  tmp_dir  + "/myMED_pointe.vtk";

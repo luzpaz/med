@@ -76,9 +76,8 @@ void MEDMEMTest::testExtractor()
   // =======================
 
   // read a mesh from a MED file
-  string datadir   = getenv("MED_ROOT_DIR");
   string tmp_dir   = getTmpDirectory();
-  string filename  = datadir + "/share/salome/resources/med/pointe.med";
+  string filename  = getResourceFile("pointe.med");
   string meshname  = "maa1";
   string fieldname = "fieldcelldoublescalar";
 
@@ -433,7 +432,7 @@ void MEDMEMTest::testExtractor()
   // =======================================
 
   // read a mesh
-  filename = datadir + "/share/salome/resources/med/geomMesh22.med";
+  filename = getResourceFile("geomMesh22.med");
   meshname = "GeomMesh";
   aMesh = new MESH (MED_DRIVER, filename, meshname);
   aSupport = new SUPPORT( aMesh );

@@ -89,9 +89,8 @@ using namespace MED_EN;
  */
 void MEDMEMTest_testMedMedDriver21() {
   MED *aMed                        = new MED();
-  string data_dir                  = getenv("MED_ROOT_DIR");
   string tmp_dir                   = getTmpDirectory();
-  string filename_rd               = data_dir + "/share/salome/resources/med/pointe.med";
+  string filename_rd               = getResourceFile("pointe.med");
   string emptyfilename             = "";
   string filename_wr               = tmp_dir  + "/myMedWr_pointe21.med";
   string fileNotExistsName_rd      = "notExists.med";

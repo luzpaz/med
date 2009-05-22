@@ -118,8 +118,7 @@ using namespace MED_EN;
  */
 void MEDMEMTest::testGrid()
 {
-  string datadir  = getenv("MED_ROOT_DIR");
-  string filename = datadir + "/share/salome/resources/med/test19.med" ;
+  string filename = getResourceFile("test19.med") ;
   string tmp_dir  = getTmpDirectory();
   string filenameout21 = tmp_dir + "/myGridWrite_grid21.med";
 
@@ -673,7 +672,7 @@ void MEDMEMTest::testGrid()
 
   {
     GRID* myGrid4 = new GRID();
-    filename = datadir + "/share/salome/resources/med/pointe.med";
+    filename = getResourceFile("pointe.med");
     myGrid4->setName("maa1");
     MED_MESH_RDONLY_DRIVER myMeshDriver(filename, myGrid4);
     myMeshDriver.setMeshName("maa1");

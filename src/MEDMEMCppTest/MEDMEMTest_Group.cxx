@@ -53,8 +53,7 @@ using namespace MED_EN;
  */
 void MEDMEMTest::testGroup()
 {
-  string datadir  = getenv("MED_ROOT_DIR");
-  string filename = datadir + "/share/salome/resources/med/pointe.med" ;
+  string filename = getResourceFile("pointe.med") ;
   string meshname = "maa1";
 
   MESH * myMesh= new MESH() ;

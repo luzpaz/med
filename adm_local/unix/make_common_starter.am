@@ -77,7 +77,7 @@ tests: unittest
 
 unittest: $(UNIT_TEST_PROG)
 	@if test "x$(UNIT_TEST_PROG)" != "x"; then   \
-	    ./$(UNIT_TEST_PROG);                     \
+	    env top_srcdir=@top_srcdir@ ./$(UNIT_TEST_PROG);             \
 	    if [[ `awk '{ print $$1 }' UnitTestsResult` != "OK" ]]; then \
 	    	cat UnitTestsResult;                 \
 	    	exit 10;                             \

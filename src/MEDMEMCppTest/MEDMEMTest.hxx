@@ -22,6 +22,8 @@
 #ifndef _MEDMEMTEST_HXX_
 #define _MEDMEMTEST_HXX_
 
+#include "MEDMEMTest_Utils.hxx"
+
 #include <cppunit/extensions/HelperMacros.h>
 
 #include <set>
@@ -103,7 +105,6 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void setUp();
   void tearDown();
 

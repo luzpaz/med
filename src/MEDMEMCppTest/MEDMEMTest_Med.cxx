@@ -78,8 +78,7 @@ using namespace MED_EN;
  */
 void MEDMEMTest::testMed()
 {
-  string datadir  = getenv("MED_ROOT_DIR");
-  string filename = datadir + "/share/salome/resources/med/pointe.med";
+  string filename = getResourceFile("pointe.med");
   string tmp_dir  = getTmpDirectory();
   string filenameout21      = tmp_dir  + "/myMedWrite_pointe21.med";
   string filenameout21_from = tmp_dir  + "/myMedWrite_pointe21_from.med";

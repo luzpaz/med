@@ -65,7 +65,9 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_Unit.cxx \
 	MEDMEMTest_VtkFieldDriver.cxx \
 	MEDMEMTest_VtkMedDriver.cxx \
-	MEDMEMTest_VtkMeshDriver.cxx
+	MEDMEMTest_VtkMeshDriver.cxx \
+	MEDMEMTest_Utils.h \
+	MEDMEMTest_Utils.cxx
 
 libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../MEDWrapper/V2_1/Core
