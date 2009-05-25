@@ -21,6 +21,7 @@
 //
 
 #include "MEDMEMTest_Utils.hxx"
+#include <cstdlib>
 
 std::string getResourceFile( const std::string& filename )
 {
