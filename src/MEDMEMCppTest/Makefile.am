@@ -66,7 +66,7 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_VtkFieldDriver.cxx \
 	MEDMEMTest_VtkMedDriver.cxx \
 	MEDMEMTest_VtkMeshDriver.cxx \
-	MEDMEMTest_Utils.h \
+	MEDMEMTest_Utils.hxx \
 	MEDMEMTest_Utils.cxx
 
 libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) $(HDF5_INCLUDES) \
