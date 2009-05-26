@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+ //  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -238,6 +238,7 @@ public:
   void fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION);
   void fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION);
   void clearDataOnNumbers();
+  MESH* makeMesh();
   //A.G. Addings for RC
   virtual void addReference() const;
   virtual void removeReference() const;

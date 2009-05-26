@@ -28,11 +28,13 @@
 #include <algorithm>
 #include <list>
 
+
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_DriversDef.hxx"
 #include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Meshing.hxx"
 
-using namespace std;
+ using namespace std;
 using namespace MED_EN;
 using namespace MEDMEM;
 
@@ -1029,6 +1031,8 @@ list<int> *MEDMEM::SUPPORT::sub(const int *ids,int lgthIds,const int *idsToSuppr
 }
 
 /*!
+\ifdef SUPPORT_advanced
+@{
   returns a new SUPPORT (responsability to caller to destroy it)
   that is the complement to "this", lying on the same entity than "this".
  */
@@ -1182,6 +1186,9 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
   delete[] numberOfElements;
   delete[] geometricType;
 }
+/*!
+@}
+*/
 
 /*
   Method created to factorize code. This method fills the current SUPPORT on entity 'entity' containing all the entities contained in
@@ -1281,8 +1288,117 @@ string SUPPORT::getMeshName() const
     return _meshName;
 }
 
+/*! \ifdef SUPPORT_advanced
+
+\brief creates a MESH that contains only the elements in the current support.
+
+The output mesh has no group, nor elements of connectivity lesser than that of the present support. The method does not handle polygon or polyhedral elements. Nodes are renumbered so that they are numberd from 1 to N in the new mesh. The order of the elements in the new mesh corresponds to that of the elements in the original support.
+*/
+MESH* SUPPORT::makeMesh()
+{	
+
+	// the first part of the method consists in browsing through elements to create a mapping between 
+	//the new nodes and the old nodes
+	// nodes are numbered
+	map<int,int> oldnodes;	
+	//loop on all elements to map nodes
+	int nbtypes = getNumberOfTypes();
+	const MED_EN::medGeometryElement* types=getTypes();
+	int newid=1;
+	for (int itype=0; itype<nbtypes;itype++)
+		{
+			MED_EN::medGeometryElement type= types[itype];
+			int nbelems = getNumberOfElements(type);
+			const int* conn = _mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,_entity,type);
+			
+			for (int ielem=0; ielem<nbelems;ielem++)
+				{
+					for (int i=0; i<type%100;i++)
+						{
+							map<int,int>::iterator iter=oldnodes.find(conn[ielem*(type%100)+i]);
+							if (iter == oldnodes.end())
+								{
+									oldnodes.insert(make_pair(conn[ielem*(type%100)+i],newid));
+									newid++;
+								}
+						}
+				}
+		}
+
+	//Creating the new mesh
+
+	MESHING* newmesh= new MESHING();
+	newmesh->setName("MeshFromSupport");
+
+
+	//definition of coordinates
+	int spacedim=_mesh->getSpaceDimension();	
+	double* newcoords=new double[oldnodes.size()*spacedim];
+	const double*oldcoords = _mesh->getCoordinates(MED_FULL_INTERLACE);
+	double* newcoordsp=newcoords;
+	for (std::map<int,int>::const_iterator iter=oldnodes.begin(); iter!=oldnodes.end();iter++)
+		{
+			std::copy( oldcoords+iter->first*spacedim, oldcoords+iter->first*spacedim+spacedim,newcoordsp);
+			newcoordsp+=spacedim;
+		}
+	newmesh->setCoordinates(spacedim,oldnodes.size(),newcoords,"CARTESIAN",MED_FULL_INTERLACE);
+
+	//defining mesh dimension form the support entity type
+	int newmeshdim = 0;
+	if (_entity==MED_CELL)
+		newmeshdim=_mesh->getMeshDimension() ;
+	else
+		switch (_entity) 
+			{
+			case MED_FACE:
+				newmeshdim=2;
+				break;
+			case MED_EDGE:
+				newmeshdim=1;
+        break;
+			default:
+				throw MEDEXCEPTION("makeMesh is not available for node supports");
+			}
+	newmesh->setMeshDimension(newmeshdim);
+
+	//setting up connectivity information
+	newmesh->setNumberOfTypes(nbtypes,MED_EN::MED_CELL);
+	MED_EN::medGeometryElement* elemtypes = new MED_EN::medGeometryElement[nbtypes];
+	int* elemtypenumbers = new int [nbtypes];
+	for (int itype=0; itype<nbtypes;itype++)
+		{
+			elemtypes[itype]=types[itype];
+			elemtypenumbers[itype]=getNumberOfElements(elemtypes[itype]);
+			
+		}
+	newmesh->setTypes(elemtypes,MED_EN::MED_CELL);
+	newmesh->setNumberOfElements(elemtypenumbers,MED_CELL);
+	delete[] elemtypes;
+	delete[] elemtypenumbers;
+	for (int itype=0; itype<nbtypes;itype++)
+		{
+			MED_EN::medGeometryElement type=types[itype];
+			int nbelems = getNumberOfElements(type);
+			const int* conn = _mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL, _entity,type);
+			int* newconn=new int[(type%100) * nbelems];
+			int* newconnp=newconn;
+			for (int ielem=0; ielem<nbelems;ielem++)
+				{
+					for (int i=0; i<type%100;i++)
+						{
+							//adding the connectivity taking into account the correspondency
+							//between old and new nodes
+							*(newconnp++)=oldnodes[conn[ielem*(type%100)+i]];
+							
+						}
+				}
+			newmesh->setConnectivity(newconn,MED_EN::MED_CELL,type);
+			
+		}
+	return newmesh;
+}
 /*!
-  addReference : reference counter presently disconnected in C++ -> just connected for client.
+	addReference : reference counter presently disconnected in C++ -> just connected for client.
 */
 void MEDMEM::SUPPORT::addReference() const
 {
