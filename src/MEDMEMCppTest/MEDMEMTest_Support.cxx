@@ -117,6 +117,7 @@ using namespace MEDMEM;
  *   (+)     void fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION);
  *
  *   (+)     void clearDataOnNumbers();
+ *   (+)     MESH* makeMESH();
  *
  *   (reference counter presently disconnected in C++) virtual void addReference() const;
  *   (reference counter presently disconnected in C++) virtual void removeReference() const;
@@ -386,6 +387,16 @@ void MEDMEMTest::testSupport()
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1.getNumberOfElements(MED_EN::MED_TRIA6), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1.getNumberOfElements(MED_EN::MED_QUAD8), MEDEXCEPTION);
 
+	MESH* meshFromSupport=aSupportOnFaces1.makeMesh();
+	CPPUNIT_ASSERT_EQUAL(4,meshFromSupport->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_TRIA3));
+	CPPUNIT_ASSERT_EQUAL(4,meshFromSupport->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4));
+	int nbnodes=  meshFromSupport->getNumberOfNodes();
+	const int* conn=meshFromSupport->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_TRIA3);
+	for (int i=0; i<12;i++)
+		{
+			CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
+		}
+	
   // check number
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1.getNumberIndex(), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1.getNumber(MED_EN::MED_TRIA3), MEDEXCEPTION);
