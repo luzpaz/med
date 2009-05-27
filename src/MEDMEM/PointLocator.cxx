@@ -17,6 +17,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include <list>
+#include "MEDNormalizedUnstructuredMesh.txx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "PointLocatorAlgos.txx"
