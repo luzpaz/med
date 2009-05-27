@@ -35,6 +35,7 @@ namespace INTERP_KERNEL
     virtual ~Remapper();
     void prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH& mesh_target, const char *method);
     void transfer(const MEDMEM::FIELD<double>& field_source, MEDMEM::FIELD<double>& field_target);
+		void reverseTransfer(const MEDMEM::FIELD<double>& field_source,MEDMEM::FIELD<double>& field_target);
     void setOptionDouble(const std::string& key, double value);
     void setOptionInt(const std::string& key, int value);
   private :
