@@ -86,7 +86,7 @@ namespace INTERP_KERNEL
   }
 
 	/*
-		remaps a source field defined on the source mesh onto the target mesh using the intersection matrix
+		remaps a scalar source field defined on the source mesh onto the target mesh using the intersection matrix
 		\param field_source : source field to be remapped
 		\param target_field : field resulting from the remapping on the target mesh
 	*/
@@ -110,9 +110,33 @@ namespace INTERP_KERNEL
 
     delete target_volumes;
   }
+	/*
+		remaps a vector source field defined on the source mesh onto the target mesh using the intersection matrix
+		\param field_source : source field to be remapped
+		\param target_field : field resulting from the remapping on the target mesh
+	*/
+  void Remapper::transferVector(const MEDMEM::FIELD<double>& field_source,MEDMEM::FIELD<double>& field_target)
+  {
+    int source_nbcomp=field_source.getNumberOfComponents();
+    int target_nbcomp=field_target.getNumberOfComponents();
+    if (source_nbcomp != target_nbcomp)
+      throw MEDMEM::MEDEXCEPTION("incoherent number of components for source and target fields");
+    MEDMEM::FIELD<double>* target_volumes = getSupportVolumes(*field_target.getSupport());
+    int nbelem_target=field_target.getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+
+    double* value_target = const_cast<double*> (field_target.getValue());
+    const double* value_source = field_source.getValue();
+
+    _matrix->multiply(value_source, value_target,source_nbcomp);
+    for (int i=0; i< nbelem_target; i++)
+			for(int comp = 0; comp < source_nbcomp; comp++)
+				value_target[i*source_nbcomp+comp]/=target_volumes->getValueIJ(i+1,1);
+
+    delete target_volumes;
+  }
 
  	/*
-		reverses the direct transfer remapping: a field supported on the target mesh is remapped onto 
+		reverses the direct transfer remapping: a scalar field supported on the target mesh is remapped onto 
 		the source mesh using the transpose of the intersection matrix
 		\param field_target : target field to be remapped
 		\param source_field : field resulting from the remapping on the source mesh
@@ -134,6 +158,31 @@ namespace INTERP_KERNEL
     _matrix->transposeMultiply(value_target, value_source, nbelem_source);//transposeMultiply(input,output, nbcols)
     for (int i=0; i< nbelem_source; i++)
       value_source[i]/=source_volumes->getValueIJ(i+1,1);
+
+    delete source_volumes;
+  }
+ 	/*
+		reverses the direct transfer remapping: a Vector field supported on the target mesh is remapped onto 
+		the source mesh using the transpose of the intersection matrix
+		\param field_target : target field to be remapped
+		\param source_field : field resulting from the remapping on the source mesh
+	*/
+	void Remapper::reverseTransferVector(const MEDMEM::FIELD<double>& field_source,MEDMEM::FIELD<double>& field_target)
+  {
+    int source_nbcomp=field_source.getNumberOfComponents();
+    int target_nbcomp=field_target.getNumberOfComponents();
+    if (source_nbcomp != target_nbcomp)
+      throw MEDMEM::MEDEXCEPTION("incoherent number of components for source and target fields");
+    MEDMEM::FIELD<double>* source_volumes = getSupportVolumes(*field_source.getSupport());
+    int nbelem_source=field_source.getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+
+    double* value_source = const_cast<double*> (field_source.getValue());
+    const double* value_target = field_target.getValue();
+
+    _matrix->transposeMultiply(value_target, value_source, nbelem_source,target_nbcomp);//transposeMultiply(input,output, nbcols,nbcomp)
+    for (int i=0; i< nbelem_source; i++)
+      for(int comp = 0; comp < source_nbcomp; comp++)
+				value_source[i*target_nbcomp+comp]/=source_volumes->getValueIJ(i+1,1);
 
     delete source_volumes;
   }
