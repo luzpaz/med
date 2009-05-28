@@ -65,25 +65,33 @@ namespace INTERP_KERNEL
         MEDNormalizedUnstructuredMesh<2,2> source_mesh_wrapper(&mesh_source);
         MEDNormalizedUnstructuredMesh<2,2> target_mesh_wrapper(&mesh_target);
         Interpolation2D interpolation;
-        interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
+        _nb_cols = interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
       }
     else if ((sm_spacedim==3)&&(sm_meshdim==3))
       {
         MEDNormalizedUnstructuredMesh<3,3> source_mesh_wrapper(&mesh_source);
         MEDNormalizedUnstructuredMesh<3,3> target_mesh_wrapper(&mesh_target);
         Interpolation3D interpolation;
-        interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
+         _nb_cols = interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
       }
     else if ((sm_spacedim==3)&&(sm_meshdim==2))
       {
         MEDNormalizedUnstructuredMesh<3,2> source_mesh_wrapper(&mesh_source);
         MEDNormalizedUnstructuredMesh<3,2> target_mesh_wrapper(&mesh_target);
         Interpolation3DSurf interpolation;
-        interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
+        _nb_cols =  interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
       }
     else
       throw MEDEXCEPTION("no Interpolation exists for the given mesh and space dimensions");
-  }
+
+		_nb_rows=(*_matrix).getNbRows();
+
+		_deno_multiply.resize(_nb_rows);
+		_matrix->rowSum(_deno_multiply);
+		_deno_reverse_multiply.resize(_nb_cols);
+		_matrix->colSum(_deno_reverse_multiply, _nb_cols);
+
+ }
 
 	/*
 		remaps a scalar source field defined on the source mesh onto the target mesh using the intersection matrix
@@ -97,7 +105,7 @@ namespace INTERP_KERNEL
     if (source_nbcomp != target_nbcomp)
       throw MEDMEM::MEDEXCEPTION("incoherent number of components for source and target fields");
     if (source_nbcomp>1)
-      throw MEDMEM::MEDEXCEPTION("interpolations with more than one component are not yet handled");//MN: Warum ?
+      throw MEDMEM::MEDEXCEPTION("interpolations with more than one component are not yet handled");
     MEDMEM::FIELD<double>* target_volumes = getSupportVolumes(*field_target.getSupport());
     int nbelem_target=field_target.getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
 
@@ -121,18 +129,16 @@ namespace INTERP_KERNEL
     int target_nbcomp=field_target.getNumberOfComponents();
     if (source_nbcomp != target_nbcomp)
       throw MEDMEM::MEDEXCEPTION("incoherent number of components for source and target fields");
-    MEDMEM::FIELD<double>* target_volumes = getSupportVolumes(*field_target.getSupport());
-    int nbelem_target=field_target.getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
 
     double* value_target = const_cast<double*> (field_target.getValue());
     const double* value_source = field_source.getValue();
 
     _matrix->multiply(value_source, value_target,source_nbcomp);
-    for (int i=0; i< nbelem_target; i++)
-			for(int comp = 0; comp < source_nbcomp; comp++)
-				value_target[i*source_nbcomp+comp]/=target_volumes->getValueIJ(i+1,1);
 
-    delete target_volumes;
+		for (int i=0; i< _nb_rows; i++)
+			for(int comp = 0; comp < source_nbcomp; comp++)
+				value_target[i*source_nbcomp+comp]/=_deno_multiply[i];
+		
   }
 
  	/*
@@ -173,18 +179,16 @@ namespace INTERP_KERNEL
     int target_nbcomp=field_target.getNumberOfComponents();
     if (source_nbcomp != target_nbcomp)
       throw MEDMEM::MEDEXCEPTION("incoherent number of components for source and target fields");
-    MEDMEM::FIELD<double>* source_volumes = getSupportVolumes(*field_source.getSupport());
-    int nbelem_source=field_source.getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
 
     double* value_source = const_cast<double*> (field_source.getValue());
     const double* value_target = field_target.getValue();
 
-    _matrix->transposeMultiply(value_target, value_source, nbelem_source,target_nbcomp);//transposeMultiply(input,output, nbcols,nbcomp)
-    for (int i=0; i< nbelem_source; i++)
-      for(int comp = 0; comp < source_nbcomp; comp++)
-				value_source[i*target_nbcomp+comp]/=source_volumes->getValueIJ(i+1,1);
+    _matrix->transposeMultiply(value_target, value_source, _nb_cols,target_nbcomp);//transposeMultiply(input,output, nbcols,nbcomp)
 
-    delete source_volumes;
+    for (int i=0; i< _nb_cols; i++)
+      for(int comp = 0; comp < source_nbcomp; comp++)
+				value_source[i*target_nbcomp+comp]/=_deno_reverse_multiply[i];
+
   }
 
   void Remapper::setOptionDouble(const std::string& key, double value)
