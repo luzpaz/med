@@ -35,6 +35,10 @@
 #include <float.h>
 #include <cmath>
 
+#ifdef WNT
+#define isnan _isnan
+#endif
+
 namespace MEDMEM {
 
   // ==============================================================================
@@ -186,10 +190,7 @@ namespace MEDMEM_ENSIGHT { // INTERNAL MATTERS
   static inline float _toFloat (const double & value) {
     if ( value >  FLT_MAX ) return  FLT_MAX;
     if ( value < -FLT_MAX ) return -FLT_MAX;
-#ifdef WNT
-#else
     if ( isnan( value ))    throw MEDEXCEPTION(compatibilityPb("NaN value not allowed"));
-#endif
     return float( value );
   }
   static inline float _toFloat (const int & value) { return float( value ); }
