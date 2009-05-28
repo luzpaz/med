@@ -43,6 +43,10 @@ namespace INTERP_KERNEL
   private :
     Matrix<double,ALL_FORTRAN_MODE>* _matrix;
     MEDMEM::FIELD<double>* getSupportVolumes(const MEDMEM::SUPPORT& support);
+    std::vector<double> _deno_multiply;
+    std::vector<double> _deno_reverse_multiply;
+		int _nb_rows;
+		int _nb_cols;
   };
 
 }
