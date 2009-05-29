@@ -238,6 +238,8 @@ public:
   void fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION);
   void fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION);
   void clearDataOnNumbers();
+	MESH* makeMesh();
+
   //A.G. Addings for RC
   virtual void addReference() const;
   virtual void removeReference() const;
