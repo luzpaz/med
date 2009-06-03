@@ -56,13 +56,12 @@ void MEDMEMTest::testVtkMeshDriver()
 {
   MESH * aMesh = new MESH();
 
-  string tmp_dir                   = getTmpDirectory();
   string filename_rd               = getResourceFile("pointe_import22.med");
   string emptyfilename             = "";
   string meshname_rd               = "maa1";
   string meshname                  = "MyMesh";
   string fileNotExistsName         = "/path_not_exists/file_not_exists.vtk";
-  string filename                  =  tmp_dir  + "/my_pointe.vtk";
+  string filename                  = makeTmpFile("my_pointe.vtk");
 
   MEDMEMTest_TmpFilesRemover aRemover;
   aRemover.Register(filename);

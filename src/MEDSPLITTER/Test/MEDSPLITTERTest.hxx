@@ -64,6 +64,10 @@ public:
 	void testMESHCollection_families();
   void testParallelTopology_graph_constructor();
     
+  std::string getResourceFile( const std::string& );
+  std::string getTmpDirectory();
+  std::string makeTmpFile( const std::string&, const std::string& = "" );
+
   };
 
 // to automatically remove temporary files from disk

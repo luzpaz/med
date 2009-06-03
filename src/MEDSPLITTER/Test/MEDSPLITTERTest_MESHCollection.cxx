@@ -93,8 +93,7 @@ using namespace MEDMEM;
  
 void MEDSPLITTERTest::testMESHCollection_constructor()
 {
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string filename_rd                = data_dir + "/share/salome/resources/med/carre_en_quad4_import22.med";
+  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
   string fileNotExist_rd            = "notExist22.med";
   string emptyfilename              = "";
 
@@ -125,13 +124,9 @@ void MEDSPLITTERTest::testMESHCollection_constructor()
 //! Testing basic manipulation for a sequential file 
 void MEDSPLITTERTest::testMESHCollection_read_seq()
 {
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/share/salome/resources/med/pointe_import22.med";
-  string filename_seq_wr            = tmp_dir + "/myWrField_seq_pointe22";
-  string filename_seq_med           = tmp_dir + "/myWrField_seq_pointe221.med";
+  string filename_rd                = getResourceFile("pointe_import22.med");
+  string filename_seq_wr            = makeTmpFile("myWrField_seq_pointe22");
+  string filename_seq_med           = makeTmpFile("myWrField_seq_pointe221.med");
   
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
@@ -171,15 +166,11 @@ void MEDSPLITTERTest::testMESHCollection_read_seq()
 
 void MEDSPLITTERTest::testMESHCollection_read_para()
 {
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/share/salome/resources/med/pointe_import22.med";  
-  string filename_para_wr            = tmp_dir + "/myWrField_para_pointe22_";
-	string filename_xml                = tmp_dir + "/myWrField_para_pointe22_.xml";
-  string filename_para_med0           = tmp_dir + "/myWrField_para_pointe22_1.med";
-  string filename_para_med1           = tmp_dir + "/myWrField_para_pointe22_2.med";
+  string filename_rd                = getResourceFile("pointe_import22.med");
+  string filename_para_wr           = makeTmpFile("myWrField_para_pointe22_");
+  string filename_xml               = makeTmpFile("myWrField_para_pointe22_.xml");
+  string filename_para_med0         = makeTmpFile("myWrField_para_pointe22_1.med");
+  string filename_para_med1         = makeTmpFile("myWrField_para_pointe22_2.med");
   
   
   // To remove tmp files from disk
@@ -254,14 +245,10 @@ void MEDSPLITTERTest::testMESHCollection_read_para()
 
 void MEDSPLITTERTest::testMESHCollection_square()
 {
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/share/salome/resources/med/carre_en_quad4_import22.med";
-  string filename_wr                 = tmp_dir+"/carre_split";
-  string filename_wr_1                = tmp_dir+"/carre_split1.med";
-  string filename_wr_2                 = tmp_dir+"/carre_split2.med";
+  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
+  string filename_wr                = makeTmpFile("carre_split");
+  string filename_wr_1              = makeTmpFile("carre_split1.med");
+  string filename_wr_2              = makeTmpFile("carre_split2.med");
   
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
@@ -419,14 +406,10 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
 void MEDSPLITTERTest::testMESHCollection_square_with_faces()
 {
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/share/salome/resources/med/carre_en_quad4_import22.med";
-  string filename_wr                 = tmp_dir+"/carre_split_faces";
-  string filename_wr_1                = tmp_dir+"/carre_split_faces1.med";
-  string filename_wr_2                 = tmp_dir+"/carre_split_faces2.med";
+  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
+  string filename_wr                = makeTmpFile("carre_split_faces");
+  string filename_wr_1              = makeTmpFile("carre_split_faces1.med");
+  string filename_wr_2              = makeTmpFile("carre_split_faces2.med");
   
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
@@ -630,17 +613,13 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
 
 void MEDSPLITTERTest::testMESHCollection_indivisible()
 {
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/share/salome/resources/med/maill.00.med";
-  string filename_wr                = tmp_dir + "/carre_indivisible";
-  string filename_wr_xml            = tmp_dir + "/carre_indivisible.xml";
-  string filename_wr_1              = tmp_dir + "/carre_indivisible1.med";
-  string filename_wr_2              = tmp_dir + "/carre_indivisible2.med";
-  string filename_wr_3              = tmp_dir + "/carre_indivisible3.med";
-  string filename_wr_4              = tmp_dir + "/carre_indivisible4.med";
+  string filename_rd                = getResourceFile("maill.00.med");
+  string filename_wr                = makeTmpFile("carre_indivisible");
+  string filename_wr_xml            = makeTmpFile("carre_indivisible.xml");
+  string filename_wr_1              = makeTmpFile("carre_indivisible1.med");
+  string filename_wr_2              = makeTmpFile("carre_indivisible2.med");
+  string filename_wr_3              = makeTmpFile("carre_indivisible3.med");
+  string filename_wr_4              = makeTmpFile("carre_indivisible4.med");
   
 	// To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
@@ -730,14 +709,10 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
 
 void MEDSPLITTERTest::testMESHCollection_user_partition()
 {
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/share/salome/resources/med/carre_en_quad4_import22.med";
-  string filename_wr                 = tmp_dir+"/carre_split_user";
-  string filename_wr_1                = tmp_dir+"/carre_split_user1.med";
-  string filename_wr_2                 = tmp_dir+"/carre_split_user2.med";
+  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
+  string filename_wr                = makeTmpFile("carre_split_user");
+  string filename_wr_1              = makeTmpFile("carre_split_user1.med");
+  string filename_wr_2              = makeTmpFile("carre_split_user2.med");
   
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
@@ -903,20 +878,16 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
  
 void MEDSPLITTERTest::testMESHCollection_complete_sequence()
 {
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/share/salome/resources/med/pointe_import22.med";  
-  string filename_para_wr            = tmp_dir + "/myWrField_para1_pointe22_";
-  string filename_para_med1           = tmp_dir + "/myWrField_para1_pointe22_1.med";
-  string filename_para_med2           = tmp_dir + "/myWrField_para1_pointe22_2.med";
-  string filename_para2_wr            = tmp_dir + "/myWrField_para2_pointe22_";
-  string filename_para2_med1           = tmp_dir + "/myWrField_para2_pointe22_1.med";
-  string filename_para2_med2           = tmp_dir + "/myWrField_para2_pointe22_2.med";
-  string filename_para2_med3           = tmp_dir + "/myWrField_para2_pointe22_3.med";
-  string filename_seq_wr               = tmp_dir + "/myWrField_seq_pointe22_";
-  string filename_seq_med               = tmp_dir + "/myWrField_seq_pointe22_1.med";
+  string filename_rd                = getResourceFile("pointe_import22.med");
+  string filename_para_wr           = makeTmpFile("myWrField_para1_pointe22_");
+  string filename_para_med1         = makeTmpFile("myWrField_para1_pointe22_1.med");
+  string filename_para_med2         = makeTmpFile("myWrField_para1_pointe22_2.med");
+  string filename_para2_wr          = makeTmpFile("myWrField_para2_pointe22_");
+  string filename_para2_med1        = makeTmpFile("myWrField_para2_pointe22_1.med");
+  string filename_para2_med2        = makeTmpFile("myWrField_para2_pointe22_2.med");
+  string filename_para2_med3        = makeTmpFile("myWrField_para2_pointe22_3.med");
+  string filename_seq_wr            = makeTmpFile("myWrField_seq_pointe22_");
+  string filename_seq_med           = makeTmpFile("myWrField_seq_pointe22_1.med");
   
   
   // To remove tmp files from disk
@@ -982,20 +953,16 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
  
 void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polygon()
 {
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/share/salome/resources/med/recoll_bord.med";  
-  string filename_para_wr            = tmp_dir + "/myWrField_para_recoll_";
-  string filename_para_med1           = tmp_dir + "/myWrField_para_recoll_1.med";
-  string filename_para_med2           = tmp_dir + "/myWrField_para_recoll_2.med";
-  string filename_para2_wr            = tmp_dir + "/myWrField_para2_recoll_";
-  string filename_para2_med1           = tmp_dir + "/myWrField_para2_recoll_1.med";
-  string filename_para2_med2           = tmp_dir + "/myWrField_para2_recoll_2.med";
-  string filename_para2_med3           = tmp_dir + "/myWrField_para2_recoll_3.med";
-  string filename_seq_wr               = tmp_dir + "/myWrField_seq_recoll_";
-  string filename_seq_med               = tmp_dir + "/myWrField_seq_recoll_1.med";
+  string filename_rd                = getResourceFile("recoll_bord.med");
+  string filename_para_wr           = makeTmpFile("myWrField_para_recoll_");
+  string filename_para_med1         = makeTmpFile("myWrField_para_recoll_1.med");
+  string filename_para_med2         = makeTmpFile("myWrField_para_recoll_2.med");
+  string filename_para2_wr          = makeTmpFile("myWrField_para2_recoll_");
+  string filename_para2_med1        = makeTmpFile("myWrField_para2_recoll_1.med");
+  string filename_para2_med2        = makeTmpFile("myWrField_para2_recoll_2.med");
+  string filename_para2_med3        = makeTmpFile("myWrField_para2_recoll_3.med");
+  string filename_seq_wr            = makeTmpFile("myWrField_seq_recoll_");
+  string filename_seq_med           = makeTmpFile("myWrField_seq_recoll_1.med");
   
   
   // To remove tmp files from disk
@@ -1058,21 +1025,17 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polygon()
  
 void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polyhedra()
 {
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/share/salome/resources/med/poly3D.med";
+  string filename_rd                = getResourceFile("poly3D.med");
   //string filename_rd = "/tmp/polyedres.med"  ;
-  string filename_para_wr            = tmp_dir + "/myWrField_para_poly3D_";
-  string filename_para_med1           = tmp_dir + "/myWrField_para_poly3D_1.med";
-  string filename_para_med2           = tmp_dir + "/myWrField_para_poly3D_2.med";
-  string filename_para2_wr            = tmp_dir + "/myWrField_para2_poly3D_";
-  string filename_para2_med1           = tmp_dir + "/myWrField_para2_poly3D_1.med";
-  string filename_para2_med2           = tmp_dir + "/myWrField_para2_poly3D_2.med";
-  string filename_para2_med3           = tmp_dir + "/myWrField_para2_poly3D_3.med";
-  string filename_seq_wr               = tmp_dir + "/myWrField_seq_poly3D_";
-  string filename_seq_med               = tmp_dir + "/myWrField_seq_poly3D_1.med";
+  string filename_para_wr           = makeTmpFile("myWrField_para_poly3D_");
+  string filename_para_med1         = makeTmpFile("myWrField_para_poly3D_1.med");
+  string filename_para_med2         = makeTmpFile("myWrField_para_poly3D_2.med");
+  string filename_para2_wr          = makeTmpFile("myWrField_para2_poly3D_");
+  string filename_para2_med1        = makeTmpFile("myWrField_para2_poly3D_1.med");
+  string filename_para2_med2        = makeTmpFile("myWrField_para2_poly3D_2.med");
+  string filename_para2_med3        = makeTmpFile("myWrField_para2_poly3D_3.med");
+  string filename_seq_wr            = makeTmpFile("myWrField_seq_poly3D_");
+  string filename_seq_med           = makeTmpFile("myWrField_seq_poly3D_1.med");
   
   
   // To remove tmp files from disk
@@ -1126,14 +1089,10 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polyhedra()
 
 void MEDSPLITTERTest::testMESHCollection_families()
 {
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/share/salome/resources/med/trio_2D.med";
-  string filename_wr                 = tmp_dir+"/trio_split_faces";
-  string filename_wr_1                = tmp_dir+"/trio_split_faces1.med";
-  string filename_wr_2                 = tmp_dir+"/trio_split_faces2.med";
+  string filename_rd                = getResourceFile("trio_2D.med");
+  string filename_wr                = makeTmpFile("trio_split_faces");
+  string filename_wr_1              = makeTmpFile("trio_split_faces1.med");
+  string filename_wr_2              = makeTmpFile("trio_split_faces2.med");
   
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;

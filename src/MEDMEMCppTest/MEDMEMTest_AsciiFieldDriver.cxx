@@ -80,13 +80,12 @@ using namespace MEDMEM;
 void MEDMEMTest::testAsciiFieldDriver()
 {
   // read a mesh from a MED file
-  string tmp_dir   = getTmpDirectory();
   string filename  = getResourceFile("pointe.med");
   string meshname  = "maa1";
   string fieldname = "fieldcelldoublescalar";
 
-  string anyfile1  = tmp_dir + "/anyfile1";
-  string SDFfilename = tmp_dir + "/myfile";
+  string anyfile1    = makeTmpFile( "anyfile1" );
+  string SDFfilename = makeTmpFile( "myfile" );
   ofstream aFile(SDFfilename.c_str());
 
   // To remove tmp files from disk

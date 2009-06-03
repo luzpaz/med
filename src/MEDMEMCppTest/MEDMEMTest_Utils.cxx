@@ -22,6 +22,20 @@
 
 #include "MEDMEMTest_Utils.hxx"
 #include <cstdlib>
+#include <list>
+#include <stdexcept>
+
+//================================================================================
+/*!
+ * \brief Get path to the resources file.
+ *
+ * When running 'make test' source file is taken from MED_SRC/resources folder.
+ * Otherwise, file is searched in ${MED_ROOT_DIR}/share/salome/resources/med folder.
+ * 
+ * \param filename name of the resource file (should not include a path)
+ * \return full path to the resource file
+ */
+//================================================================================
 
 std::string getResourceFile( const std::string& filename )
 {
@@ -41,3 +55,52 @@ std::string getResourceFile( const std::string& filename )
   return resourceFile;
 }
 
+
+//================================================================================
+/*!
+ * \brief Returns writable temporary directory
+ * \return full path to the temporary directory
+ */
+//================================================================================
+
+std::string getTmpDirectory()
+{
+  std::string path;
+
+  std::list<std::string> dirs;
+  if ( getenv("TMP") )    dirs.push_back( getenv("TMP" ));
+  if ( getenv("TMPDIR") ) dirs.push_back( getenv("TMPDIR" ));
+  dirs.push_back( "/tmp" );
+
+  std::string tmpd = "";
+  for ( std::list<std::string>::iterator dir = dirs.begin(); dir != dirs.end() && tmpd == "" ; ++dir ) {
+    if ( access( dir->data(), W_OK ) == 0 ) {
+      tmpd = dir->data();
+    }
+  }
+
+  if ( tmpd == "" )
+    throw std::runtime_error("Can't find writable temporary directory. Set TMP environment variable");
+
+  return tmpd;
+}
+
+//================================================================================
+/*!
+ * \brief Creates a copy of source file (if source file is specified) 
+ * in the temporary directory and returns a path to the tmp file
+ *
+ * \param tmpfile name of the temporary file (without path)
+ * \param srcfile source file
+ * \return path to the temporary file
+ */
+//================================================================================
+std::string makeTmpFile( const std::string& tmpfile, const std::string& srcfile )
+{
+  std::string tmpf = getTmpDirectory() + "/" + tmpfile;
+  if ( srcfile != "" ) {
+    std::string cmd  = "cp " + srcfile + " " + tmpf + " ; chmod +w " + tmpf;
+    system( cmd.c_str() );
+  }
+  return tmpf;
+}

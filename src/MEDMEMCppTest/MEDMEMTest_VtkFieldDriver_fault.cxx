@@ -64,12 +64,10 @@ void MEDMEMTest_testVtkFieldDriver()
   FIELD<int> *aField                = new FIELD<int> ();
   FIELD<double> *aField_1           = new FIELD<double> ();
 
-  string tmp_dir                    = getTmpDirectory();
-
   string filename_rd                = getResourceFile("pointe.med");
   string emptyfilename              = "";
   string fileNotExistsName          = "/path_not_exists/file_not_exists.vtk";
-  string filename_wr                = tmp_dir  + "/myField_pointe.vtk";
+  string filename_wr                = makeTmpFile("myField_pointe.vtk");
 
   string fieldname_rd_int           = "fieldnodeint";
   string fieldname_wr_int           = "myintfield";

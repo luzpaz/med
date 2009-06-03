@@ -30,9 +30,8 @@ using namespace MEDMEM;
 
 int main (int argc, char** argv)
 {
-  string tmp_dir  = getTmpDirectory();
   string meshname = "MyMesh";
-  string filename = tmp_dir + "/my_pointe.vtk";
+  string filename = makeTmpFile( "my_pointe.vtk" );
 
   MEDMEMTest_TmpFilesRemover aRemover;
   aRemover.Register(filename);

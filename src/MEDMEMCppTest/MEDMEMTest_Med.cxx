@@ -79,9 +79,8 @@ using namespace MED_EN;
 void MEDMEMTest::testMed()
 {
   string filename = getResourceFile("pointe.med");
-  string tmp_dir  = getTmpDirectory();
-  string filenameout21      = tmp_dir  + "/myMedWrite_pointe21.med";
-  string filenameout21_from = tmp_dir  + "/myMedWrite_pointe21_from.med";
+  string filenameout21      = makeTmpFile("myMedWrite_pointe21.med");
+  string filenameout21_from = makeTmpFile("myMedWrite_pointe21_from.med");
 
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;
