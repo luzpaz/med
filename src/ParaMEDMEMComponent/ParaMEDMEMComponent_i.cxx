@@ -112,12 +112,15 @@ void ParaMEDMEMComponent_i::setInputFieldCoupling(const char * coupling, ParaMED
     {
 
       //Creating the intersection Data Exchange Channel
+      cerr << "Creating the intersection Data Exchange Channel" << endl;
       _dec[coupling] = new ParaMEDMEM::IntersectionDEC(*_source[coupling], *_target[coupling]);
       
       //Attaching the field to the DEC
+      cerr << "Attaching the field to the DEC" << endl;
       _dec[coupling]->attachLocalField(field);
 
       // computing the interpolation matrix
+      cerr << "computing the interpolation matrix" << endl;
       _dec[coupling]->synchronize();
 
     }
@@ -126,6 +129,7 @@ void ParaMEDMEMComponent_i::setInputFieldCoupling(const char * coupling, ParaMED
   _dec[coupling]->attachLocalField(field);
   
   //Receiving data
+  cerr << "Receiving data" << endl;
   _dec[coupling]->recvData();
 }
 
@@ -148,12 +152,15 @@ void ParaMEDMEMComponent_i::getOutputFieldCoupling(const char * coupling, ParaME
     {
 
       //Creating the intersection Data Exchange Channel
+      cerr << "Creating the intersection Data Exchange Channel" << endl;
       _dec[coupling] = new ParaMEDMEM::IntersectionDEC(*_source[coupling], *_target[coupling]);
   
       //Attaching the field to the DEC
+      cerr << "Attaching the field to the DEC" << endl;
       _dec[coupling]->attachLocalField(field);
     
       // computing the interpolation matrix
+      cerr << "computing the interpolation matrix" << endl;
       _dec[coupling]->synchronize();
 
     }
@@ -162,6 +169,7 @@ void ParaMEDMEMComponent_i::getOutputFieldCoupling(const char * coupling, ParaME
   _dec[coupling]->attachLocalField(field);
 
   //Sending data
+  cerr << "Sending data" << endl;
   _dec[coupling]->sendData();
 }
 
