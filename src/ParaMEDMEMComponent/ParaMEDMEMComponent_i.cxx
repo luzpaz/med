@@ -126,7 +126,6 @@ void ParaMEDMEMComponent_i::setInputFieldCoupling(const char * coupling, ParaMED
   _dec[coupling]->attachLocalField(field);
   
   //Receiving data
-  cerr << "Receiving data" << endl;
   _dec[coupling]->recvData();
 }
 
@@ -163,7 +162,6 @@ void ParaMEDMEMComponent_i::getOutputFieldCoupling(const char * coupling, ParaME
   _dec[coupling]->attachLocalField(field);
 
   //Sending data
-  cerr << "Sending data" << endl;
   _dec[coupling]->sendData();
 }
 
