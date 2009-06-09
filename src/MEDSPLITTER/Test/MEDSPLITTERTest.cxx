@@ -25,6 +25,7 @@
 #include <cmath>
 #include <list>
 #include <stdexcept>
+#include <cstdlib>
 
 // ============================================================================
 /*!
