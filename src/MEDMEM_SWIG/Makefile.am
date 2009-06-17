@@ -81,7 +81,13 @@ dist_salomescript_DATA= \
 		   testMedObj.py \
 		   test_profil_MedFieldDriver.py \
 		   testWriteAndFam.py \
-		   testMedMemGeneral.py
+		   testMedMemGeneral.py \
+		   med2sauv \
+		   sauv2med \
+		   avs2med
+
+dist_pkgpython_DATA = \
+		   medutilities.py
 
 #############################################################################
 
