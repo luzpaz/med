@@ -82,4 +82,10 @@ dist_salomescript_DATA   = \
 		   testMedMemCxxTests.py \
 		   dumpMEDMEM.py \
 		   ensightMedEnsight_test.py \
-		   medEnsightMed_test.py
+		   medEnsightMed_test.py \
+		   med2sauv \
+		   sauv2med \
+		   avs2med
+
+dist_salomepython_DATA = \
+		   medutilities.py

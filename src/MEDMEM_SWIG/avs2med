@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+# --
+# Copyright (C) CEA DEN
+# Author : Erwan ADAM (CEA)
+# --
+
+from sys import argv
+d = argv[0]
+from os.path import dirname
+d = dirname(d)
+from os.path import abspath
+d = abspath(d+'/../lib')
+from sys import path
+if d not in path:
+    path.insert(0, d)
+    pass
+
+from medutilities import avs2med
+from sys import argv
+avs2med(*argv[1:])
